@@ -171,11 +171,17 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
 
 
               .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
+### FIXME: ssclme_initial should only be called on the first iteration
               .Call("ssclme_initial", obj, PACKAGE="Matrix")
-              .Call("ssclme_factor", obj, PACKAGE = "Matrix")
+### The call to ssclme_factor is unnecessary as ssclme_EMsteps will
+### force factoring
+              #.Call("ssclme_factor", obj, PACKAGE = "Matrix")
+### May want to adjust number of EMiterations on second and subsequent
+### iterations.  Probably one or two iterations will suffice
               .Call("ssclme_EMsteps", obj, controlvals$niterEM,
                     method == "REML", controlvals$EMverbose, PACKAGE = "Matrix")
-
+### Do you want to call LMEoptimize(obj) = controlvals here?  Probably
+### set number of iterations low.
               coefFixed <- c(.Call("ssclme_fixef", obj, PACKAGE = "Matrix"), 0)
               ## what happens for more than one random effect ?
               coefRanef <- .Call("ssclme_ranef", obj, PACKAGE = "Matrix")
