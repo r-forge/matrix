@@ -227,6 +227,7 @@ setClass("lmer",
                         Linv = "list",  # list of diagonal blocks of L^{-1}
                         ZZpO = "list",  # list of diagonal blocks of Z'Z+Omega
                         Omega = "list", # list of relative precision matrices
+                        REML = "logical", 
                         RXX = "matrix", # Augmented RXX component or its inverse
                         RZX = "matrix", # Augmented RZX component or its inverse
                         XtX = "matrix", # Original X'X matrix
