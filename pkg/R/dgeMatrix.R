@@ -142,18 +142,15 @@ setMethod("t", signature(x = "dgeMatrix"),
               x })
 
 setMethod("crossprod", signature(x = "dgeMatrix", y = "missing"),
-          function(x, y = NULL)
-          .Call("dgeMatrix_crossprod", x),
+          function(x, y = NULL) .Call("dgeMatrix_crossprod", x),
           valueClass = "dpoMatrix")
 
 setMethod("crossprod", signature(x = "dgeMatrix", y = "dgeMatrix"),
-          function(x, y = NULL)
-          .Call("dgeMatrix_dgeMatrix_crossprod", x, y),
+          function(x, y = NULL) .Call("dgeMatrix_dgeMatrix_crossprod", x, y),
           valueClass = "dgeMatrix")
 
 setMethod("crossprod", signature(x = "dgeMatrix", y = "matrix"),
-          function(x, y = NULL)
-          .Call("dgeMatrix_matrix_crossprod", x, y),
+          function(x, y = NULL) .Call("dgeMatrix_matrix_crossprod", x, y),
           valueClass = "dgeMatrix")
 
 setMethod("crossprod", signature(x = "dgeMatrix", y = "numeric"),
@@ -166,24 +163,12 @@ setMethod("diag", signature(x = "dgeMatrix"),
           .Call("dgeMatrix_getDiag", x))
 
 ## should be done once and for all in ./Matrix.R - but that fails (as "show"):
-setMethod("dim", signature(x = "dgeMatrix"),
-          function(x) x@Dim, valueClass = "integer")
-setMethod("dimnames", signature(x = "dgeMatrix"), function(x) x@Dimnames)
+## setMethod("dim", signature(x = "dgeMatrix"),
+##           function(x) x@Dim, valueClass = "integer")
+## setMethod("dimnames", signature(x = "dgeMatrix"), function(x) x@Dimnames)
 
-## not exported but used more than once for "dimnames<-" method :
-## -- or do only once for all "Matrix" classes ??
-dimnamesGets <- function (x, value) {
-    d <- dim(x)
-    if (!is.list(value) || length(value) != 2 ||
-        !(is.null(v1 <- value[[1]]) || length(v1) == d[1]) ||
-        !(is.null(v2 <- value[[2]]) || length(v2) == d[2]))
-        stop(sprintf("invalid dimnames given for '%s' object", class(x)))
-    x@Dimnames <- list(if(!is.null(v1)) as.character(v1),
-                       if(!is.null(v2)) as.character(v2))
-    x
-}
-setMethod("dimnames<-", signature(x = "dgeMatrix", value = "list"),
-          dimnamesGets)
+## setMethod("dimnames<-", signature(x = "dgeMatrix", value = "list"),
+##           dimnamesGets)
 
 
 
@@ -207,8 +192,12 @@ setMethod("determinant", signature(x = "dgeMatrix", logarithm = "logical"),
           .Call("dgeMatrix_determinant", x, logarithm))
 
 setMethod("%*%", signature(x = "dgeMatrix", y = "dgeMatrix"),
-          function(x, y)
-          .Call("dgeMatrix_dgeMatrix_mm", x, y))
+          function(x, y) .Call("dgeMatrix_dgeMatrix_mm", x, y))
+
+setMethod("%*%", signature(x = "dgeMatrix", y = "numeric"),
+          function(x, y) callGeneric(x, as(as.matrix(y), "dgeMatrix")))
+setMethod("%*%", signature(x = "numeric", y = "dgeMatrix"),
+          function(x, y) callGeneric(as(as.matrix(x), "dgeMatrix"), y))
 
 setMethod("expm", signature(x = "dgeMatrix"),
           function(x) .Call("dgeMatrix_exp", x),
