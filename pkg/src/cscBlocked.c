@@ -341,6 +341,7 @@ void cscb_syrk(char uplo, char trans, double alpha, SEXP A, double beta, SEXP C)
 	    for (k = Ap[j]; k < k2; k++) {
 		int ii = Ai[k], K = Ind(ii, ii, Cp, Ci);
 
+		if (K < 0) error("cscb_syrk: C[%d,%d] not defined", ii, ii);
 		if (scalar) Cx[K] += alpha * Ax[k] * Ax[k];
 		else F77_CALL(dsyrk)(&uplo, "N", cdims, adims + 1,
 				     &alpha, Ax + k * asz, adims,
@@ -348,7 +349,9 @@ void cscb_syrk(char uplo, char trans, double alpha, SEXP A, double beta, SEXP C)
 
 		for (kk = k+1; kk < k2; kk++) {
 		    int jj = Ai[kk];
-		    K = (iup) ? Ind(jj, ii, Cp, Ci) : Ind(ii, jj, Cp, Ci);
+		    K = (iup) ? Ind(ii, jj, Cp, Ci) : Ind(jj, ii, Cp, Ci);
+		    
+		    if (K < 0) error("cscb_syrk: C[%d,%d] not defined", ii, jj);
 		    if (scalar) Cx[K] += alpha * Ax[k] * Ax[kk];
 		    else F77_CALL(dgemm)("N", "T", cdims, cdims + 1, adims + 1,
 					 &alpha, Ax + ((iup)?kk:k) * asz, adims,
