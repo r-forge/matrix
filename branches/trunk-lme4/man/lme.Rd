@@ -96,7 +96,7 @@ lme(formula, data, random, \dots)
 %\note{}
 \seealso{\code{\link{lme-class}}, \code{\link[stats]{lm}}}
 \examples{
-data(bdf)
+data(bdf, package = "mlmRev")
 fm <- lme(langPOST ~ IQ.ver.cen + avg.IQ.ver.cen, data = bdf,
           random = ~ IQ.ver.cen | schoolNR)
 summary(fm)

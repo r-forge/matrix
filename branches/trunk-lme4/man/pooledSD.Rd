@@ -22,7 +22,7 @@ pooledSD(object)
 %\author{Jose Pinheiro \email{Jose.Pinheiro@pharma.novartis.com} and Douglas Bates \email{bates@stat.wisc.edu}}
 \seealso{\code{\link{lmList}}, \code{\link{lm}}}
 \examples{
-data(Orthodont)
+data(Orthodont, package = "MEMSS")
 fm <- lmList(distance ~ age | Subject, Orthodont)
 pooledSD(fm)
 }

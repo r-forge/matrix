@@ -81,7 +81,7 @@ gsummary(object, FUN, form, level, groups, omitGroupingFactor = FALSE, invariant
 \seealso{\code{\link{summary}}, \code{\link{groupedData}},
   \code{\link{getGroups}}} 
 \examples{
-data(Early)
+data(Early, package = 'mlmRev')
 class(Early)
 gsummary(Early, groups = Early$id)
 gsummary(Early, groups = Early$id, invariantsOnly = TRUE)

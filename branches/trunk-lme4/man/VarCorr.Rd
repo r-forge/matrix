@@ -21,7 +21,7 @@
 %\author{Saikat DebRoy \email{saikat@stat.wisc.edu} and Douglas Bates \email{bates@stat.wisc.edu}}
 \seealso{\code{\link{lme}}, \code{\link{GLMM}}, \code{\link{VarCorr-class}}}
 \examples{
-data(bdf)
+data(bdf, package = 'mlmRev')
 fm <- lme(langPOST ~ IQ.ver.cen + avg.IQ.ver.cen, data = bdf,
           random = ~ IQ.ver.cen | schoolNR)
 VarCorr(fm)
