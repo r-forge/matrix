@@ -117,6 +117,49 @@ SEXP sscCrosstab_L_LI_sizes(SEXP ctab, SEXP permexp)
 }
 
 /** 
+ * Check for a nested series of grouping factors in the sparse,
+ * symmetric representation of the pairwise cross-tabulations.
+ * 
+ * @param n size of pairwise cross-tabulation matrix
+ * @param nf number of groups of columns in pairwise cross-tabulation
+ * @param upper non-zero if the upper triangle is stored
+ * @param Ap array of pointers to columns
+ * @param Ai row indices
+ * @param Gp array of pointers to groups
+ * 
+ * @return 0 for non-nested groups, 1 for nested groups
+ */
+static
+int ctab_isNested(int n, int nf, int upper,
+		  const int Ap[], const int Ai[], const int Gp[])
+{
+    if (nf > 1) {  /* single factor always nested */
+	int  i;
+	if (upper) {
+	    int *nnz = (int *) R_alloc(n, sizeof(int)), nz = Ap[n];
+				/* count number of nonzeros in each row */
+	    for (i = 0; i < n; i++) nnz[i] = 0;
+	    for (i = 0; i < nz; i++) nnz[Ai[i]]++;
+	    for (i = 0; i < nf; i++) {
+		int j, p2 = Gp[i+1], target = nf - i;
+		for (j = Gp[i]; j < p2; j++) {
+		    if (nnz[j] != target) return 0;
+		}
+	    }
+	} else {		/* lower triangle - the easy case */
+	    for (i = 0; i < nf; i++) {
+		int j, p2 = Gp[i+1], target = nf - i;
+		for (j = Gp[i]; j < p2; j++) {
+		    if ((Ap[j+1] - Ap[j]) != target)
+			return 0;
+		}
+	    }
+	}
+    }
+    return 1;
+}
+
+/** 
   * Determine the inverse of the permutation of the rows of the sparse,
   * column-oriented matrix represented by m, n, Ap and Ai that will
   * concentrate non-zeros in the lower rows.
@@ -208,37 +251,52 @@ SEXP sscCrosstab_groupedPerm(SEXP ctab)
 	i,
 	n = length(pSlot) - 1,	/* number of columns */
 	nf = length(GpSlot) - 1, /* number of factors */
-	*np = Calloc(n + 1, int), /* column pointers */
-	*ni = Calloc(length(iSlot) - n, int); /* row indices */
+	up;
     SEXP ans = PROTECT(allocVector(INTSXP, n));
 
-    if (toupper(*CHAR(STRING_ELT(GET_SLOT(ctab, Matrix_uploSym), 0))) != 'L')
-	error("Lower triangle required in sscCrosstab object");
+    up = toupper(*CHAR(STRING_ELT(GET_SLOT(ctab, Matrix_uploSym), 0))) != 'L';
+    if (nf > 1 && up) {			/* transpose */
+	int nz = length(iSlot);
+	int *ai = Calloc(nz, int),
+	    *ap = Calloc(n + 1, int);
+	double *ax = Calloc(nz, double);
 
+	csc_components_transpose(n, n, nz, Ap, Ai,
+				 REAL(GET_SLOT(ctab, Matrix_xSym)),
+				 ap, ai, ax);
+	Ap = ap;
+	Ai = ai;
+	Free(ax);		/* don't need values, only positions */
+    }
     for (i = 0; i < n; i++) {
 	INTEGER(ans)[i] = i;    /* initialize permutation to identity */
     }
-    np[0] = 0;
+    if (!ctab_isNested(n, nf, 0, Ap, Ai, Gp)) {
+	int *np = Calloc(n + 1, int), /* column pointers */
+	    *ni = Calloc(length(iSlot) - n, int); /* row indices */
 
-    for (i = 1; i < nf; i++) {	/* adjacent pairs of grouping factors */
-	int j, k, p0 = 0, p1 = Gp[i-1], p2 = Gp[i], p3 = Gp[i+1];
-	
-	for (j = p1; j < p2; j++) { /* for this set of columns */
-	    int lk = Ap[j+1];
-	    for (k = Ap[j]; k < lk; k++) {
-		int ii = Ai[k];
-		if (p2 <= ii && ii < p3) { /* check the row */
-		    ni[p0++] = ii - p2;
+	np[0] = 0;
+	for (i = 1; i < nf; i++) { /* adjacent pairs of grouping factors */
+	    int j, k, p0 = 0, p1 = Gp[i-1], p2 = Gp[i], p3 = Gp[i+1];
+	    
+	    for (j = p1; j < p2; j++) { /* for this set of columns */
+		int lk = Ap[j+1];
+		for (k = Ap[j]; k < lk; k++) {
+		    int ii = Ai[k];
+		    if (p2 <= ii && ii < p3) { /* check the row */
+			ni[p0++] = ii - p2;
+		    }
 		}
+		np[j + 1 - p1] = p0;
 	    }
-	    np[j + 1 - p1] = p0;
+	    pair_perm(p3 - p2, p2 - p1, np, ni,
+		      INTEGER(ans) + p2,
+		      (i == 1) ? INTEGER(ans) + p1 : (int *) 0);
+	    for (j = p2; j < p3; j++) INTEGER(ans)[j] += p2;
 	}
-	pair_perm(p3 - p2, p2 - p1, np, ni,
-		  INTEGER(ans) + p2, INTEGER(ans));
-	for (j = p2; j < p3; j++) INTEGER(ans)[j] += p2;
+	Free(np); Free(ni);
     }
-
-    Free(np); Free(ni);
+    if (nf > 1 && up) {Free(Ap); Free(Ai);}
     UNPROTECT(1);
     return ans;
 }
