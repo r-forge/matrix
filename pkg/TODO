@@ -25,3 +25,11 @@
 
 - src/Metis/ : some Makefile needs fixing, as changing src/Metis/*.c
 	     does not lead to recompilation.
+
+- man/Matrix.Rd :  has example with dimnames, but we just drop them!
+		MM thinks dimnames should be supported (but then ...)
+
+- data/ : names 'mm' and even more 'y' are  ``too short''.
+	If we really want to keep them, don't use "LazyData"
+	(such that one needs  data(*) explicitly);
+	But MM would rather want something like  ex.mm and ex.y

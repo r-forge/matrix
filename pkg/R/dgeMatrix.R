@@ -1,11 +1,15 @@
+## FIXME: dimnames ?
+
 setAs("matrix", "dgeMatrix",
       function(from) {
-          new("dgeMatrix", x = c(from), Dim = as.integer(attr(from, "dim")))
+          new("dgeMatrix",
+              x = as.double(from),
+              Dim = as.integer(dim(from)))
       })
 
 setAs("dgeMatrix", "matrix",
       function(from) {
-          array(from@x, from@Dim)
+          array(from@x, dim = from@Dim)
       })
 
 setMethod("norm", signature(x = "dgeMatrix", type = "missing"),
