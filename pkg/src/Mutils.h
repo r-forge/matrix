@@ -34,5 +34,8 @@ SEXP nlme_weight_matrix_list(SEXP MLin, SEXP wts, SEXP adjst, SEXP MLout);
 extern
 #include "Syms.h"
 
+/* zero an array */
+#define AZERO(x, n) {int _i_, _sz_ = (n); for(_i_ = 0; _i_ < _sz_; _i_++) (x)[_i_] = 0;}
+
 #endif
 
