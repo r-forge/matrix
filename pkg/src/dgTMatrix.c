@@ -30,6 +30,33 @@ SEXP dgTMatrix_validate(SEXP x)
     return ScalarLogical(1);
 }
 
+SEXP dgTMatrix_to_dgCMatrix(SEXP x)
+{
+    SEXP dd = GET_SLOT(x, Matrix_DimSym),
+	iP = GET_SLOT(x, Matrix_iSym),
+	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix")));
+    int *dims = INTEGER(dd), nnz = length(iP);
+    int *p, *ti = Calloc(nnz, int), m = dims[0], n = dims[1];
+    double *tx = Calloc(nnz, double);
+    
+    SET_SLOT(ans, Matrix_pSym, allocVector(INTSXP, n + 1));
+    SET_SLOT(ans, Matrix_DimSym, duplicate(dd));
+    p = INTEGER(GET_SLOT(ans, Matrix_pSym));
+    triplet_to_col(m, n, nnz, INTEGER(iP),
+		   INTEGER(GET_SLOT(x, Matrix_jSym)),
+		   REAL(GET_SLOT(x, Matrix_xSym)),
+		   p, ti, tx);
+    nnz = p[n];
+    SET_SLOT(ans, Matrix_iSym, allocVector(INTSXP, nnz));
+    Memcpy(INTEGER(GET_SLOT(ans, Matrix_iSym)), ti, nnz);
+    SET_SLOT(ans, Matrix_xSym, allocVector(REALSXP, nnz));
+    Memcpy(REAL(GET_SLOT(ans, Matrix_xSym)), tx, nnz);
+
+    Free(ti); Free(tx);
+    UNPROTECT(1);
+    return ans;
+}
+
 static void
 insert_triplets_in_array(int m, int n, int nnz,
 			 const int xi[], const int xj[], const double xx[],
@@ -79,4 +106,3 @@ SEXP dgTMatrix_to_matrix(SEXP x)
     UNPROTECT(1);
     return ans;
 }
-

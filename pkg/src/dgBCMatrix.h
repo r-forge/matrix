@@ -3,7 +3,7 @@
 
 #include "Mutils.h"
 #include "R_ldl.h"
-#include "dgTMatrix_to_dgCMatrix.h"
+#include "triplet_to_col.h"
 #include <R_ext/Lapack.h>
 
 SEXP dgBCMatrix_validate(SEXP x);

@@ -1,5 +1,5 @@
 #include "Mutils.h"
-#include "dgTMatrix_to_dgCMatrix.h"
+#include "triplet_to_col.h"
 #include <R_ext/Lapack.h>
 
 char norm_type(char *typstr)
@@ -233,7 +233,7 @@ SEXP triple_as_SEXP(int nrow, int ncol, int nz,
     SET_SLOT(val, Matrix_pSym, allocVector(INTSXP, ncol + 1));
     Ap = INTEGER(GET_SLOT(val, Matrix_pSym));
     Ai = Calloc(nz, int); Ax = Calloc(nz, double);
-    dgTMatrix_to_dgCMatrix(nrow, ncol, nz, Ti, Tj, Tx, Ap, Ai, Ax);
+    triplet_to_col(nrow, ncol, nz, Ti, Tj, Tx, Ap, Ai, Ax);
     nz = Ap[ncol];
     SET_SLOT(val, Matrix_iSym, allocVector(INTSXP, nz));
     Memcpy(INTEGER(GET_SLOT(val, Matrix_iSym)), Ai, nz); Free(Ai);

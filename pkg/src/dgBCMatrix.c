@@ -583,7 +583,7 @@ cscb_trcbsm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
 				/* transpose B */
 	    for (i = 0, nrbB = -1; i < nnz; i++) if (Bi[i] > nrbB) nrbB = Bi[i];
 	    BTp = Calloc(nrbB, int);
-	    dgTMatrix_to_dgCMatrix(ncbB, nrbB, nnz, tmp, Bi, Bx, BTp, BTi, BTx);
+	    triplet_to_col(ncbB, nrbB, nnz, tmp, Bi, Bx, BTp, BTi, BTx);
 				/* sanity check */
 	    if (BTp[nrbB] != nnz) error("cscb_trcbsm: transpose operation failed");
 	    Free(tmp);

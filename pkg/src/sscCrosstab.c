@@ -59,7 +59,7 @@ SEXP sscCrosstab(SEXP flist, SEXP upper)
     }
     SET_SLOT(val, Matrix_pSym, allocVector(INTSXP, ncol + 1));
     Ap = INTEGER(GET_SLOT(val, Matrix_pSym));
-    dgTMatrix_to_dgCMatrix(ncol, ncol, ntrpl, Ti, Tj, Tx, Ap, TTi, TTx);
+    triplet_to_col(ncol, ncol, ntrpl, Ti, Tj, Tx, Ap, TTi, TTx);
     nz = Ap[ncol];		/* non-zeros in Z'Z crosstab */
     SET_SLOT(val, Matrix_iSym, allocVector(INTSXP, nz));
     SET_SLOT(val, Matrix_xSym, allocVector(REALSXP, nz));
@@ -115,7 +115,7 @@ void col_metis_order(int j0, int j1, int i2,
 		}
 	    }
 	}
-	dgTMatrix_to_dgCMatrix(n, n, nnz, TTi, Tj, (double *) NULL,
+	triplet_to_col(n, n, nnz, TTi, Tj, (double *) NULL,
 		       Ap, Ai, (double *) NULL);
 	ssc_metis_order(n, Ap, Ai, perm, iperm);
 	for (j = j1; j < i2; j++) ans[j] = j1 + iperm[j - j1];
@@ -243,7 +243,7 @@ SEXP sscCrosstab_project(SEXP ctab)
 		}
 	    }
 	}
-	dgTMatrix_to_dgCMatrix(n, n, nnz, TTi, Tj, (double *) NULL,
+	triplet_to_col(n, n, nnz, TTi, Tj, (double *) NULL,
 		       AAp, AAi, (double *) NULL);
 	nz = AAp[n];
 	SET_SLOT(ans, Matrix_iSym, allocVector(INTSXP, nz));

@@ -4,11 +4,11 @@
 #include <Rdefines.h>
 #include "Mutils.h"
 #include "R_ldl.h"
-#include "dgTMatrix_to_dgCMatrix.h"
+#include "triplet_to_col.h"
 
 SEXP csc_crossprod(SEXP x);
 SEXP csc_matrix_crossprod(SEXP x, SEXP y);
-SEXP csc_validate(SEXP x);
+SEXP dgCMatrix_validate(SEXP x);
 SEXP csc_to_dgTMatrix(SEXP x);
 SEXP csc_to_matrix(SEXP x);
 SEXP csc_to_dgeMatrix(SEXP x);

@@ -4,7 +4,7 @@
 #include <Rdefines.h>
 #include "Mutils.h"
 #include "R_ldl.h"
-#include "dgTMatrix_to_dgCMatrix.h"
+#include "triplet_to_col.h"
 
 SEXP dsCMatrix_validate(SEXP x);
 SEXP dsCMatrix_chol(SEXP x, SEXP pivot);
