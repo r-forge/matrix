@@ -9,6 +9,7 @@
 #include "dsCMatrix.h"
 #include "dsyMatrix.h"
 #include "dtCMatrix.h"
+#include "dtTMatrix.h"
 #include "dtrMatrix.h"
 #include "factorizations.h"
 #include "lmer.h"
@@ -75,6 +76,8 @@ static R_CallMethodDef CallEntries[] = {
     {"dsyMatrix_rcond", (DL_FUNC) &dsyMatrix_rcond, 2},
     {"dsyMatrix_solve", (DL_FUNC) &dsyMatrix_solve, 1},
     {"dsyMatrix_validate", (DL_FUNC) &dsyMatrix_validate, 1},
+    {"dtTMatrix_as_dtrMatrix", (DL_FUNC) &dtTMatrix_as_dtrMatrix, 1},
+    {"dtTMatrix_validate", (DL_FUNC) &dtTMatrix_validate, 1},
     {"dtrMatrix_as_dgeMatrix", (DL_FUNC) &dtrMatrix_as_dgeMatrix, 1},
     {"dtrMatrix_as_matrix", (DL_FUNC) &dtrMatrix_as_matrix, 1},
     {"dtrMatrix_dgeMatrix_mm", (DL_FUNC) &dtrMatrix_dgeMatrix_mm, 2},

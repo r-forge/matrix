@@ -16,6 +16,7 @@ SOURCES_C =  \
             dsCMatrix.c \
             dsyMatrix.c \
             dtCMatrix.c \
+            dtTMatrix.c \
             dtrMatrix.c \
             factorizations.c \
             sscCrosstab.c \
