@@ -46,6 +46,10 @@ stopifnot(colnames(m1) == c.nam,
           identical(dimnames(t(m1)), list(c.nam, NULL)),
           identical(m1, t(t(m1))))
 
+## an example of *named* dimnames
+(t34N <- as(unclass(table(x = gl(3,4), y=gl(4,3))), "dgeMatrix"))
+stopifnot(identical(dimnames(t34N),
+                    dimnames(as(t34N, "matrix"))))
 
 ## "dpo"
 chk.matrix(cm <- crossprod(m1))
