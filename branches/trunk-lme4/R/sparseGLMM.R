@@ -140,7 +140,6 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
           facs <- lapply(names(random),
                          function(x) eval(as.name(x), envir = data))
           names(facs) <- names(random)
-print(str(facs))
 
           ## creates model matrices
           mmats.unadjusted <-
@@ -161,11 +160,8 @@ print(str(facs))
           facs = facshuffle(obj, facs)
           names(facs) = names(random)
 
-
           obj = obj[[1]]
           ##.Call("ssclme_initial", obj, PACKAGE="Matrix")
-
-print(str(facs))
 
 
           ## get initial estimates
@@ -231,6 +227,8 @@ cat(paste("\n\n\nIteration", iter, "\n"))
               z <- eta + (mmats.unadjusted$.Xy[, responseIndex] - mu) / dmu.deta
               ## weights
               w <- dmu.deta / sqrt(family$variance(mu))
+#w <- 1#rep(c(.9, 1.1), length = length(w))
+print(summary(w))
 #plot(z, mmats$.Xy[, responseIndex])
 
               ## Does this prevent overwriting of components ?
@@ -242,20 +240,20 @@ cat(paste("\n\n\nIteration", iter, "\n"))
 
 
 
-#print(summary(data.frame(eta = eta, z, w, zw = z * w)))
 
+
+#print(summary(data.frame(eta = eta, z, w, zw = z * w)))
               .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
-              ## ssclme_initial should only be called on the first iteration
+return(obj)
+## ssclme_initial should only be called on the first iteration
               if (firstIter) .Call("ssclme_initial", obj, PACKAGE="Matrix")
+print(3)
 print(str(obj@Omega))
               .Call("ssclme_EMsteps", obj, controlvals$niterEM,
                     method == "REML", controlvals$EMverbose, PACKAGE = "Matrix")
-print(str(obj@Omega))
               LMEoptimize(obj) = controlvals
               eta[] <- .Call("ssclme_fitted", obj, facs, mmats.unadjusted, PACKAGE = "Matrix")
 
-#print(str(obj@bVar))
-#print(range(eta))
 
 print(max(abs(eta - etaold)) / (0.1 + max(abs(eta))))
 
