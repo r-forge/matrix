@@ -18,8 +18,8 @@ SEXP tsc_transpose(SEXP x)
     SET_SLOT(ans, Matrix_DimSym, allocVector(INTSXP, 2));
     adims = INTEGER(GET_SLOT(ans, Matrix_DimSym));
     adims[0] = xdims[1]; adims[1] = xdims[0];
-    if (toupper(CHAR(asChar(GET_SLOT(x, Matrix_uploSym)))[0]) == 'U')
-	SET_SLOT(ans, Matrix_uploSym, ScalarString(mkChar("L")));
+    if (CHAR(asChar(GET_SLOT(x, Matrix_uploSym)))[0] == 'U')
+	SET_SLOT(ans, Matrix_uploSym, mkString("L"));
     SET_SLOT(ans, Matrix_pSym, allocVector(INTSXP, xdims[0] + 1));
     SET_SLOT(ans, Matrix_iSym, allocVector(INTSXP, nnz));
     SET_SLOT(ans, Matrix_xSym, allocVector(REALSXP, nnz));
@@ -37,10 +37,10 @@ SEXP tsc_transpose(SEXP x)
 SEXP tsc_to_dgTMatrix(SEXP x)
 {
     SEXP ans;
-    if (toupper(CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0))[0]) != 'U')
+    if (CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0))[0] != 'U')
 	ans = csc_to_dgTMatrix(x);
     else {			/* unit triangular matrix */
-	SEXP islot = GET_SLOT(x, Matrix_iSym), 
+	SEXP islot = GET_SLOT(x, Matrix_iSym),
 	    pslot = GET_SLOT(x, Matrix_pSym);
 	int *ai, *aj, j,
 	    n = length(pslot) - 1,
@@ -48,7 +48,7 @@ SEXP tsc_to_dgTMatrix(SEXP x)
 	    nout = n + nod,
 	    *p = INTEGER(pslot);
 	double *ax;
-    
+
 	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgTMatrix")));
 	SET_SLOT(ans, Matrix_DimSym, duplicate(GET_SLOT(x, Matrix_DimSym)));
 	SET_SLOT(ans, Matrix_iSym, allocVector(INTSXP, nout));
@@ -70,14 +70,14 @@ SEXP tsc_to_dgTMatrix(SEXP x)
     return ans;
 }
 
-/** 
+/**
  * Derive the column pointer vector for the inverse of L from the parent array
- * 
+ *
  * @param n length of parent array
  * @param countDiag 0 for a unit triangular matrix with implicit diagonal, otherwise 1
  * @param pr parent vector describing the elimination tree
  * @param ap array of length n+1 to be filled with the column pointers
- * 
+ *
  * @return the number of non-zero entries (ap[n])
  */
 int parent_inv_ap(int n, int countDiag, const int pr[], int ap[])
@@ -95,9 +95,9 @@ int parent_inv_ap(int n, int countDiag, const int pr[], int ap[])
     return ap[n];
 }
 
-/** 
+/**
  * Derive the row index array for the inverse of L from the parent array
- * 
+ *
  * @param n length of parent array
  * @param countDiag 0 for a unit triangular matrix with implicit diagonal, otherwise 1
  * @param pr parent vector describing the elimination tree
@@ -111,7 +111,7 @@ void parent_inv_ai(int n, int countDiag, const int pr[], int ai[])
 	for (k = pr[j]; k >= 0; k = pr[k]) ai[pos++] = k;
     }
 }
-    
+
 SEXP Parent_inverse(SEXP par, SEXP unitdiag)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dtCMatrix")));
@@ -119,7 +119,7 @@ SEXP Parent_inverse(SEXP par, SEXP unitdiag)
 	countDiag = 1 - asLogical(unitdiag),
 	j, n = length(par), nnz;
     double *ax;
-    
+
     if (!isInteger(par)) error("par argument must be an integer vector");
     SET_SLOT(ans, Matrix_pSym, allocVector(INTSXP, n + 1));
     ap = INTEGER(GET_SLOT(ans, Matrix_pSym));
@@ -132,10 +132,8 @@ SEXP Parent_inverse(SEXP par, SEXP unitdiag)
     SET_SLOT(ans, Matrix_DimSym, allocVector(INTSXP, 2));
     dims = INTEGER(GET_SLOT(ans, Matrix_DimSym));
     dims[0] = dims[1] = n;
-    SET_SLOT(ans, Matrix_uploSym, ScalarString(mkChar("L")));
-    SET_SLOT(ans, Matrix_diagSym,
-	     (countDiag ? ScalarString(mkChar("N")) :
-		 ScalarString(mkChar("U"))));
+    SET_SLOT(ans, Matrix_uploSym, mkString("L"));
+    SET_SLOT(ans, Matrix_diagSym, (countDiag ? mkString("N") : mkString("U")));
     parent_inv_ai(n, countDiag, pr, ai);
     UNPROTECT(1);
     return ans;

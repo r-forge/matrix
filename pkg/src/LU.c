@@ -17,21 +17,18 @@ SEXP LU_expand(SEXP x)
     SET_VECTOR_ELT(val, 1, U);
     SET_SLOT(L, Matrix_xSym, duplicate(lux));
     SET_SLOT(L, Matrix_DimSym, dd);
-    SET_SLOT(L, Matrix_uploSym, ScalarString(mkChar("L")));
-    SET_SLOT(L, Matrix_diagSym, ScalarString(mkChar("U")));
+    SET_SLOT(L, Matrix_uploSym, mkString("L"));
+    SET_SLOT(L, Matrix_diagSym, mkString("U"));
     SET_SLOT(L, Matrix_rcondSym, allocVector(REALSXP, 0));
     SET_SLOT(L, Matrix_factorSym, allocVector(VECSXP, 0));
     make_array_triangular(REAL(GET_SLOT(L, Matrix_xSym)), L);
     SET_SLOT(U, Matrix_xSym, duplicate(lux));
     SET_SLOT(U, Matrix_DimSym, dd);
-    SET_SLOT(U, Matrix_uploSym, ScalarString(mkChar("U")));
-    SET_SLOT(U, Matrix_diagSym, ScalarString(mkChar("N")));
+    SET_SLOT(U, Matrix_uploSym, mkString("U"));
+    SET_SLOT(U, Matrix_diagSym, mkString("N"));
     SET_SLOT(U, Matrix_rcondSym, allocVector(REALSXP, 0));
     SET_SLOT(U, Matrix_factorSym, allocVector(VECSXP, 0));
     make_array_triangular(REAL(GET_SLOT(U, Matrix_xSym)), U);
     UNPROTECT(4);
     return val;
 }
-
-    
-	     
