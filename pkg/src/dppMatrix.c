@@ -19,7 +19,6 @@ SEXP dppMatrix_chol(SEXP x)
 	uploP = GET_SLOT(x, Matrix_uploSym);
     char *uplo = CHAR(STRING_ELT(uploP, 0));
     int *dims = INTEGER(dimP), info;
-    double *vx;
 
     if (val != R_NilValue) return val;
     dims = INTEGER(dimP);
