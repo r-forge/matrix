@@ -338,10 +338,34 @@ void bVj_to_A(int ncj, int Gpj, int Gpjp, const double bVj[],
 }
 
 SEXP
+ssclme_transfer_dimnames(SEXP x, SEXP facs, SEXP mmats)
+{
+    SEXP bVar = GET_SLOT(x, Matrix_bVarSym),
+	nms2 = PROTECT(allocVector(VECSXP, 2)),
+	nms3 = PROTECT(allocVector(VECSXP, 3));
+    int i, nf = length(mmats) - 1;
+    SEXP xcols = VECTOR_ELT(GetArrayDimnames(VECTOR_ELT(mmats, nf)), 1);
+
+    for (i = 0; i < nf; i++) {
+	SEXP cnms = VECTOR_ELT(GetArrayDimnames(VECTOR_ELT(mmats, i)), 1);
+	SET_VECTOR_ELT(nms3, 0, cnms);
+	SET_VECTOR_ELT(nms3, 1, cnms);
+	SET_VECTOR_ELT(nms3, 2,
+		       getAttrib(VECTOR_ELT(facs, i), R_LevelsSymbol));
+	dimnamesgets(VECTOR_ELT(bVar, i), duplicate(nms3));
+    }
+    SET_VECTOR_ELT(nms2, 0, xcols);
+    SET_VECTOR_ELT(nms2, 1, xcols);
+    dimnamesgets(GET_SLOT(x, Matrix_XtXSym), nms2);
+    dimnamesgets(GET_SLOT(x, Matrix_RXXSym), nms2);
+    UNPROTECT(2);
+    return R_NilValue;
+}
+
+SEXP
 ssclme_update_mm(SEXP x, SEXP facs, SEXP mmats)
 {
-    SEXP
-	bVar = GET_SLOT(x, Matrix_bVarSym);
+    SEXP bVar = GET_SLOT(x, Matrix_bVarSym);
     int
 	*Ai = INTEGER(GET_SLOT(x, Matrix_iSym)),
 	*Ap = INTEGER(GET_SLOT(x, Matrix_pSym)),
@@ -428,6 +452,7 @@ ssclme_update_mm(SEXP x, SEXP facs, SEXP mmats)
 		if (ind < 0) error("logic error in ssclme_update_mm");
 		if (Ncj || nck > 1) {
 				/* FIXME: run a loop to update */
+		    error("code not yet written");
 		} else {	/* update scalars directly */
 		    Ax[ind] += Zj[fpji] * Zk[fpki];
 		}
@@ -435,6 +460,7 @@ ssclme_update_mm(SEXP x, SEXP facs, SEXP mmats)
 	}
     }
     Free(Z);
+    ssclme_transfer_dimnames(x, facs, mmats);
     return R_NilValue;
 }
 
