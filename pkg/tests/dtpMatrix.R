@@ -8,12 +8,13 @@ round(tp6, 3)## round() is "Math2" group method
 str(tp6)
 stopifnot(validObject(tp6),
           all.equal(tp6 %*% diag(6), as(tp6, "matrix")),
-## this SEG.FAULTS: -- FIXME -- validObject(tp6. <- diag(6) %*% tp6),
+          validObject(tp6. <- diag(6) %*% tp6),
           class((tt6 <- t(tp6))) == "dtpMatrix",
           identical(t(tt6), tp6),
           tp6@uplo == "U" && tt6@uplo == "L")
 
-## all.equal(tp6., tp6)
+all.equal(as(tp6.,"matrix"),
+          as(tp6, "matrix"), tol= 1e-15)
 (tr6 <- as(tp6, "dtrMatrix")) ## prints using wrong class name
 D. <- determinant(tp6)
 rc <- rcond(tp6)
@@ -29,8 +30,11 @@ object.size(as(tp6, "dtrMatrix"))
 object.size(as(tp6, "matrix"))
 D6 <- as(diag(6), "dgeMatrix")
 ge6 <- as(tp6, "dgeMatrix")
-stopifnot(all.equal(D6 %*% tp6, ge6))
-stopifnot(all.equal(tp6 %*% D6, ge6))
+## Direct all.equal() fails, because ge6 has 'rcond', but the product not:
+mge6 <- as(ge6, "matrix")
+stopifnot(all.equal(as(D6 %*% tp6,"matrix"), mge6),
+          all.equal(as(tp6 %*% D6,"matrix"), mge6)
+          )
 
 ## larger case
 set.seed(123)
@@ -42,9 +46,12 @@ norm(rl, "I")
 norm(rl, "1")
 norm(rl, "F")
 rcond(rl)# 0 !
-all.equal(rl %*% diag(1000), as(rl, "matrix"))
+stopifnot(all.equal(rl %*% diag(1000),
+                    as(rl, "matrix")))
 object.size(rl)
 object.size(as(rl, "dtrMatrix"))
 object.size(as(rl, "matrix"))
 determinant(rl)
 
+
+proc.time() # for ``statistical reasons''
