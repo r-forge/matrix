@@ -465,3 +465,34 @@ SEXP dgeMatrix_exp(SEXP x)
     UNPROTECT(1);
     return val;
 }
+
+SEXP dgeMatrix_Schur(SEXP x, SEXP vectors)
+{
+    int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
+    int vecs = asLogical(vectors), info, izero = 0, lwork = -1, n = dims[0];
+    double *work, tmp;
+    char *nms[] = {"WR", "WI", "T", "Z", ""};
+    SEXP val = PROTECT(Matrix_make_named(VECSXP, nms));
+    
+    if (n != dims[1] || n < 1)
+	error("dgeMatrix_Schur: argument x must be a non-null square matrix");
+    SET_VECTOR_ELT(val, 0, allocVector(REALSXP, n));
+    SET_VECTOR_ELT(val, 1, allocVector(REALSXP, n));
+    SET_VECTOR_ELT(val, 2, allocMatrix(REALSXP, n, n));
+    Memcpy(REAL(VECTOR_ELT(val, 2)), REAL(GET_SLOT(x, Matrix_xSym)), n * n);
+    SET_VECTOR_ELT(val, 3, allocMatrix(REALSXP, vecs ? n : 0, vecs ? n : 0));
+    F77_CALL(dgees)(vecs ? "V" : "N", "N", NULL, dims, (double *) NULL, dims, &izero,
+		    (double *) NULL, (double *) NULL, (double *) NULL, dims,
+		    &tmp, &lwork, (int *) NULL, &info);
+    if (info) error("dgeMatrix_Schur: first call to dgees failed");
+    lwork = (int) tmp;
+    work = Calloc(lwork, double);
+    F77_CALL(dgees)(vecs ? "V" : "N", "N", NULL, dims, REAL(VECTOR_ELT(val, 2)), dims,
+		    &izero, REAL(VECTOR_ELT(val, 0)), REAL(VECTOR_ELT(val, 1)),
+		    REAL(VECTOR_ELT(val, 3)), dims, work, &lwork, 
+		    (int *) NULL, &info);
+    if (info) error("dgeMatrix_Schur: dgees returned code %d", info);
+    Free(work);
+    UNPROTECT(1);
+    return val;
+}

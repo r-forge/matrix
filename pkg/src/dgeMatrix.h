@@ -13,6 +13,7 @@ SEXP dgeMatrix_matrix_crossprod(SEXP x, SEXP y);
 SEXP dgeMatrix_getDiag(SEXP x);
 SEXP dgeMatrix_LU(SEXP x);
 SEXP dgeMatrix_determinant(SEXP x, SEXP logarithm);
+SEXP dgeMatrix_Schur(SEXP x, SEXP vectors);
 SEXP dgeMatrix_solve(SEXP a);
 SEXP dgeMatrix_dgeMatrix_mm(SEXP a, SEXP b);
 SEXP dgeMatrix_svd(SEXP x, SEXP nu, SEXP nv);
