@@ -54,7 +54,7 @@ lmeControl =                            # Control parameters for lme
            nlmStepMax = NULL,
            natural = TRUE, optimizer="nlm", EMverbose=FALSE,
            analyticGradient = TRUE,
-           analyticHessian=FALSE)
+           analyticHessian=FALSE, maxLIsize = as.integer(2e5))
 {
     if (missing(msScale)) msScale = function(start) {
         scale <- abs(start)
@@ -78,17 +78,9 @@ lmeControl =                            # Control parameters for lme
          minAbsParApVar = minAbsParApVar, natural = natural,
          optimizer=optimizer, EMverbose=EMverbose,
          analyticHessian=analyticHessian,
-         analyticGradient=analyticGradient)
+         analyticGradient=analyticGradient,
+         maxLIsize = maxLIsize)
 }
-
-#setMethod("lme", signature(data = "missing"),
-#          function(formula, data, random, ...)
-#      {
-#          nCall = mCall = match.call()
-#          nCall$data = data.frame()
-#          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
-#                mCall, PACKAGE = "lme4")
-#      })
 
 setMethod("lme", signature(formula = "missing"),
           function(formula, data, random, ...)
@@ -140,11 +132,10 @@ setMethod("lme", signature(formula = "formula",
                    method = c("REML", "ML"),
                    control = list(),
                    subset, weights, na.action, offset,
-                   model = TRUE, x = FALSE, ...)
+                   model = TRUE, x = FALSE, y = FALSE,...)
       {
           method = match.arg(method)
-          random = lapply(as(random, "list"),
-                   get("formula", pos = parent.frame(), mode = "function"))
+          random = lapply(random, formula) # formula function, not argument
           controlvals = do.call("lmeControl", control)
           controlvals$REML = method == "REML"
           data <- eval(make.mf.call(match.call(expand.dots = FALSE),
@@ -152,16 +143,15 @@ setMethod("lme", signature(formula = "formula",
           facs = lapply(names(random),
                          function(x) eval(as.name(x), envir = data))
           names(facs) = names(random)
-          facs =                        # order in decreasing number of levels
-              facs[rev(order(unlist(lapply(facs,
-                                           function(fac)
-                                           length(levels(fac))))))]
+          facs =                        # order by decreasing number of levels
+              facs[rev(order(sapply(facs, function(fac)
+                                    length(levels(fac)))))]
           mmats <- c(lapply(random,
                             function(x) model.matrix(formula(x), data = data)),
                      list(.Xy = cbind(model.matrix(formula, data = data),
                           .response = model.response(data))))
-          obj = .Call("ssclme_create", facs, unlist(lapply(mmats, ncol)),
-                       as.integer(2e5), PACKAGE = "Matrix")
+          obj = .Call("ssclme_create", facs, sapply(mmats, ncol),
+                       as.integer(controlvals$maxLIsize), PACKAGE = "Matrix")
           facs = facshuffle(obj, facs)
           obj = obj[[1]]
           .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
@@ -220,7 +210,7 @@ setMethod("summary", signature(object="lme"),
                   residuals = resd)
           })
 
-setMethod("show", "summary.lme",
+setMethod("show", signature(object = "summary.lme"),
           function(object)
       {
           rdig <- 5
@@ -246,7 +236,7 @@ setMethod("show", "summary.lme",
           invisible(object)
       })
 
-setMethod("show", "lme",
+setMethod("show", signature(object = "lme"),
           function(object)
       {
           sumry = summary(object)
@@ -286,10 +276,6 @@ setMethod("fixef", signature(object = "lme"),
       })
 
 setMethod("formula", "lme", function(x, ...) x@call$formula)
-
-#setMethod("intervals", signature(object = "lme", level = "ANY"),
-#          function(object, level = 0.95, ...)
-#          cat("intervals method for lme not yet implemented\n"))
 
 setMethod("plot", signature(x = "lme"),
           function(x, y, ...)
