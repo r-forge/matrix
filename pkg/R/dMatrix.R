@@ -1,5 +1,12 @@
 ### Define Methods that can be inherited for all subclasses
 
+if(paste(R.version$major, R.version$minor, sep=".") < "2.0.1") {
+    ## for R 2.0.0 (and earlier)
+    setAs("dMatrix", "dgeMatrix",
+	  function(from) new("dgeMatrix", x = from@x,
+			     Dim = from@Dim, Dimnames = from@Dimnames))
+}
+
 setAs("dMatrix", "matrix",
       function(from) as(as(from, "dgeMatrix"), "matrix"))
 

@@ -8,28 +8,35 @@ setAs("dtpMatrix", "dgeMatrix",
 
 setAs("dtpMatrix", "matrix",
       function(from) as(as(from, "dtrMatrix"), "matrix"))
+setAs("matrix", "dtpMatrix",
+      function(from) as(as(from, "dtrMatrix"), "dtpMatrix"))
 
 
 setMethod("%*%", signature(x = "dtpMatrix", y = "dgeMatrix"),
 	  function(x, y) .Call("dtpMatrix_dgeMatrix_mm", x, y))
 setMethod("%*%", signature(x = "dgeMatrix", y = "dtpMatrix"),
 	  function(x, y) .Call("dgeMatrix_dtpMatrix_mm", x, y))
-## "matrix"
-setMethod("%*%", signature(x = "dtpMatrix", y = "matrix"),
-	  function(x, y) .Call("dtpMatrix_matrix_mm", x, y))# result = "matrix"
-setMethod("%*%", signature(x = "matrix", y = "dtpMatrix"),
- 	  function(x, y) callGeneric(as(x,"dgeMatrix"), y))# result: "dgeMatrix"
+## %*% should always work for  <fooMatrix> %*% <fooMatrix>
+setMethod("%*%", signature(x = "dtpMatrix", y = "dtpMatrix"),
+          function(x, y)
+          ## FIXME: this is cheap; could we optimize chosing the better of
+          ## callGeneric(x, as(y, "dgeMatrix"))  and
+          ## callGeneric(as(x "dgeMatrix"), y))  depending on their 'uplo' ?
+          callGeneric(x, as(y, "dgeMatrix")))
 
-## "numeric" (same as "dgeMatrix")
-setMethod("%*%", signature(x = "dtpMatrix", y = "numeric"), .M.n)
-setMethod("%*%", signature(x = "numeric", y = "dtpMatrix"), .n.M)
+## dtpMatrix <-> matrix : will be used by the "numeric" one
+setMethod("%*%", signature(x = "dtpMatrix", y = "matrix"),
+          function(x, y) callGeneric(x, as(y, "dgeMatrix")))
+setMethod("%*%", signature(x = "matrix", y = "dtpMatrix"),
+          function(x, y) callGeneric(as(x, "dgeMatrix"), y))
+
+## dtpMatrix <-> numeric : the auxiliary functions are R version specific!
+setMethod("%*%", signature(x = "dtpMatrix", y = "numeric"), .M.v)
+setMethod("%*%", signature(x = "numeric", y = "dtpMatrix"), .v.M)
+
 
 setMethod("determinant", signature(x = "dtpMatrix", logarithm = "missing"),
 	  function(x, logarithm, ...) determinant(x, TRUE))
-
-setMethod("diag", signature(x = "dtpMatrix"),
-          function(x = 1, nrow, ncol = n) .Call("dtpMatrix_getDiag", x),
-          valueClass = "numeric")
 
 setMethod("determinant", signature(x = "dtpMatrix", logarithm = "logical"),
 	  function(x, logarithm, ...) {
@@ -47,6 +54,10 @@ setMethod("determinant", signature(x = "dtpMatrix", logarithm = "logical"),
 	      class(val) <- "det"
 	      val
 	  })
+
+setMethod("diag", signature(x = "dtpMatrix"),
+          function(x = 1, nrow, ncol = n) .Call("dtpMatrix_getDiag", x),
+          valueClass = "numeric")
 
 setMethod("norm", signature(x = "dtpMatrix", type = "character"),
 	  function(x, type, ...)

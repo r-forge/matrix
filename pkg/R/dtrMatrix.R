@@ -10,6 +10,9 @@ setAs("dtrMatrix", "dtpMatrix",
 setAs("dtrMatrix", "matrix",
       function(from) .Call("dtrMatrix_as_matrix", from) )
 
+setAs("matrix", "dtrMatrix",
+      function(from) as(as(from, "dgeMatrix"), "dtrMatrix"))
+
 ## Group Methods:
 ## TODO: carefully check for the cases where the result remains triangular
 ## instead : inherit them from "dgeMatrix" via definition in ./dMatrix.R

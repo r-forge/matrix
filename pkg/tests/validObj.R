@@ -31,6 +31,7 @@ chk.matrix(new("dgeMatrix"))
 
 ## "dge"
 assertError( new("dgeMatrix", Dim = c(2,2), x= 1:4) )# double 'Dim'
+if(paste(R.version$major, R.version$minor, sep=".") >= "2.0.1")
 assertError( new("dgeMatrix", Dim = as.integer(c(2,2)), x= 1:4) )# int 'x'
 assertError( new("dgeMatrix", Dim = 2:2, x=as.double(1:4)) )# length(Dim) !=2
 assertError( new("dgeMatrix", Dim = as.integer(c(2,2)), x= as.double(1:5)))
@@ -67,6 +68,7 @@ stopifnot(all.equal(as(ch, "matrix"), as(ch2, "matrix")))
 ### Very basic  triangular matrix stuff
 
 assertError( new("dtrMatrix", Dim = c(2,2), x= 1:4) )# double 'Dim'
+if(paste(R.version$major, R.version$minor, sep=".") >= "2.0.1")
 assertError( new("dtrMatrix", Dim = as.integer(c(2,2)), x= 1:4) )# int 'x'
 ## This caused a segfault (before revision r1172 in ../src/dtrMatrix.c):
 assertError( new("dtrMatrix", Dim = 2:2, x=as.double(1:4)) )# length(Dim) !=2

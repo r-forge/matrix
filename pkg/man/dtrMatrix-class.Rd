@@ -1,5 +1,6 @@
 \name{dtrMatrix-class}
 \docType{class}
+\alias{\%*\%,dtrMatrix,dtrMatrix-method}
 \alias{\%*\%,dgeMatrix,dtrMatrix-method}
 \alias{\%*\%,dtrMatrix,dgeMatrix-method}
 \alias{\%*\%,dtrMatrix,matrix-method}
@@ -7,6 +8,7 @@
 \alias{coerce,dtrMatrix,dgeMatrix-method}
 \alias{coerce,dtrMatrix,matrix-method}
 \alias{coerce,dtrMatrix,dtpMatrix-method}
+\alias{coerce,matrix,dtrMatrix-method}
 \alias{crossprod,dtrMatrix,missing-method}
 \alias{determinant,dtrMatrix,logical-method}
 \alias{determinant,dtrMatrix,missing-method}
@@ -52,11 +54,15 @@ Class \code{"Matrix"}, by class \code{"dgeMatrix"}.
 }
 \section{Methods}{
   \describe{
+    \item{\%*\%}{\code{signature(x = "dtrMatrix", y = "matrix")} and other
+      signatures (use \code{showMethods("\%*\%", class="dtrMatrix")}):
+      matrix multiplication.}
+    \item{coerce}{\code{signature(from = "dtrMatrix", to = "dgeMatrix")}}
     \item{coerce}{\code{signature(from = "dtrMatrix", to = "dgeMatrix")}}
     \item{coerce}{\code{signature(from = "dtrMatrix", to = "matrix")}}
     \item{coerce}{\code{signature(from = "dtrMatrix", to = "dtpMatrix")}}
     \item{norm}{\code{signature(x = "dtrMatrix", type = "character")}}
-    \item{rcond}{\code{signature(x = "dtrMatrix", type = "character")}}    
+    \item{rcond}{\code{signature(x = "dtrMatrix", type = "character")}}
     \item{solve}{\code{signature(a = "dtrMatrix", b = "missing")}}
     \item{solve}{\code{signature(a = "dtrMatrix", b = "matrix")}}
   }

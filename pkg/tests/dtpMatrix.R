@@ -7,7 +7,7 @@ round(tp6, 3)## round() is "Math2" group method
 1/tp6        ## "Arith" group : gives 'dgeMatrix'
 str(tp6)
 stopifnot(validObject(tp6),
-          all.equal(tp6 %*% diag(6), as(tp6, "matrix")),
+          all.equal(tp6 %*% diag(6), as(tp6, "dgeMatrix")),
           validObject(tp6. <- diag(6) %*% tp6),
           class((tt6 <- t(tp6))) == "dtpMatrix",
           identical(t(tt6), tp6),
@@ -42,15 +42,13 @@ rl <- new("dtpMatrix", uplo="L", diag="N", Dim = rep.int(1000:1000,2),
           x = rnorm(500*1001))
 validObject(rl)
 str(rl)
-norm(rl, "I")
-norm(rl, "1")
-norm(rl, "F")
+sapply(c("I", "1", "F"), function(type) norm(rl, type=type))
 rcond(rl)# 0 !
-stopifnot(all.equal(rl %*% diag(1000),
+stopifnot(all.equal(as(rl %*% diag(1000),"matrix"),
                     as(rl, "matrix")))
-object.size(rl)
-object.size(as(rl, "dtrMatrix"))
-object.size(as(rl, "matrix"))
+object.size(rl) ## 4 mio
+object.size(as(rl, "dtrMatrix"))# 8 mio
+object.size(as(rl, "matrix"))# dito
 determinant(rl)
 
 
