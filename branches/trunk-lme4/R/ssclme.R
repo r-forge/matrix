@@ -2,19 +2,19 @@ setReplaceMethod("LMEoptimize", signature(x="ssclme", value="list"),
                  function(x, value)
              {
                  if (value$msMaxIter < 1) return(x)
-                 st = coef(x, unconstr = TRUE) # starting values
+                 st = coef(x, unconst = TRUE) # starting values
                  if (value$optimizer == "optim") {
                      optimRes =
                          if (value$analyticGradient) {
                              optim(st,
                                    fn = function(pars) {
-                                       coef(x, unconstr = TRUE) = pars
+                                       coef(x, unconst = TRUE) = pars
                                        deviance(x, REML = value$REML)
                                    },
                                    gr = function(pars) {
-                                       coef(x, unconstr = TRUE) = pars
+                                       coef(x, unconst = TRUE) = pars
                                        gradient(x, REML = value$REML,
-                                                unconstr = TRUE)
+                                                unconst = TRUE)
                                    },
                                    method = "BFGS",
                                    control = list(trace = value$msVerbose,
@@ -23,7 +23,7 @@ setReplaceMethod("LMEoptimize", signature(x="ssclme", value="list"),
                          } else {
                              optim(st,
                                    fn = function(pars) {
-                                       coef(x, unconstr = TRUE) = pars
+                                       coef(x, unconst = TRUE) = pars
                                        deviance(x, REML = value$REML)
                                    },
                                    method = "BFGS",
@@ -34,7 +34,7 @@ setReplaceMethod("LMEoptimize", signature(x="ssclme", value="list"),
                      if (optimRes$convergence != 0) {
                          warning("optim failed to converge")
                      }
-                     coef(x, unconstr = TRUE) = optimRes$par
+                     coef(x, unconst = TRUE) = optimRes$par
                  } else {
                      typsize <- rep(1.0, length(st))
                      if (is.null(value$nlmStepMax))
@@ -43,17 +43,17 @@ setReplaceMethod("LMEoptimize", signature(x="ssclme", value="list"),
                      nlmRes =
                          nlm(f = if (value$analyticGradient) {
                              function(pars) {
-                                 coef(x, unconstr = TRUE) = pars
+                                 coef(x, unconst = TRUE) = pars
                                  ans = deviance(x, REML = value$REML)
                                  attr(ans, "gradient") =
                                      gradient(x, REML = value$REML,
-                                              unconstr = TRUE)
+                                              unconst = TRUE)
                                  ans
                              }
                          } else {
                              function(pars)
                              {
-                                 coef(x, unconstr = TRUE) = pars
+                                 coef(x, unconst = TRUE) = pars
                                  deviance(x, REML = value$REML)
                              }
                          },
@@ -64,7 +64,7 @@ setReplaceMethod("LMEoptimize", signature(x="ssclme", value="list"),
                              stepmax = value$nlmStepMax,
                              typsize=typsize,
                              iterlim = value$msMaxIter)
-                     coef(x, unconstr = TRUE) = nlmRes$estimate
+                     coef(x, unconst = TRUE) = nlmRes$estimate
                  }
                  return(x)
              })
@@ -114,5 +114,5 @@ setMethod("VarCorr", signature(x = "ssclme"),
           })
 
 setMethod("gradient", signature(x = "ssclme"),
-          function(x, REML, unconstr, ...)
-          .Call("ssclme_gradient", x, REML, unconstr))
+          function(x, REML, unconst, ...)
+          .Call("ssclme_gradient", x, REML, unconst))
