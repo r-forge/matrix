@@ -7,9 +7,6 @@ SEXP
     Matrix_DIsqrtSym,
     Matrix_DimSym,
     Matrix_GpSym,
-    Matrix_LIiSym,
-    Matrix_LIpSym,
-    Matrix_LIxSym,
     Matrix_LiSym,
     Matrix_LpSym,
     Matrix_LxSym,
@@ -41,9 +38,6 @@ SEXP Matrix_init(void)
     Matrix_DIsqrtSym = install("DIsqrt");
     Matrix_DimSym = install("Dim");
     Matrix_GpSym = install("Gp");
-    Matrix_LIiSym = install("LIi");
-    Matrix_LIpSym = install("LIp");
-    Matrix_LIxSym = install("LIx");
     Matrix_LiSym = install("Li");
     Matrix_LpSym = install("Lp");
     Matrix_LxSym = install("Lx");

@@ -72,35 +72,6 @@ SEXP sscCrosstab(SEXP flist, SEXP upper)
     return val;
 }
 
-SEXP sscCrosstab_L_LI_sizes(SEXP ctab, SEXP permexp)
-{
-    SEXP ans = PROTECT(allocVector(INTSXP, 4));
-    int *Ai = INTEGER(GET_SLOT(ctab, Matrix_iSym)),
-	*Ap = INTEGER(GET_SLOT(ctab, Matrix_pSym)),
-	*aa = INTEGER(ans),
-	*perm = INTEGER(permexp),
-	n = INTEGER(GET_SLOT(ctab, Matrix_DimSym))[1],
-	*Lp = Calloc(n + 1, int),
-	*Parent = Calloc(n, int),
-	*Lnz = Calloc(n, int),
-	*Flag = Calloc(n, int);
-
-    ldl_symbolic(n, Ap, Ai, Lp, Parent, Lnz, Flag,
-		 (int *) NULL, (int *) NULL); /* P & Pinv */
-    aa[0] = Lp[n];
-    ssclme_fill_LIp(n, Parent, Lp);
-    aa[1] = Lp[n];
-    ssc_symbolic_permute(n, 1, perm, Ap, Ai);
-    ldl_symbolic(n, Ap, Ai, Lp, Parent, Lnz, Flag,
-		 (int *) NULL, (int *) NULL); /* P & Pinv */
-    aa[2] = Lp[n];
-    ssclme_fill_LIp(n, Parent, Lp);
-    aa[3] = Lp[n];
-    Free(Flag); Free(Lnz); Free(Parent); Free(Lp); 
-    UNPROTECT(1);
-    return ans;
-}
-
 static
 void col_metis_order(int j0, int j1, int i2,
 		     const int Tp[], const int Ti[], int ans[])
