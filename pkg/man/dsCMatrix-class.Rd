@@ -1,6 +1,7 @@
 \name{dsCMatrix-class}
 \docType{class}
 \alias{dsCMatrix-class}
+\alias{dsTMatrix-class}
 \alias{solve,dsCMatrix,matrix-method}
 \alias{chol,dsCMatrix,missing-method}
 \alias{chol,dsCMatrix,logical-method}
@@ -14,9 +15,11 @@
 \description{The \code{dsCMatrix} class is a class of symmetric, sparse
   matrices in the compressed, column-oriented format.  In this
   implementation the non-zero elements in the columns are sorted into
-  increasing row order.}
+  increasing row order. The \code{dsTMatrix} class is a class of
+  symmetric, sparse matrices in triplet format.}
 \section{Objects from the Class}{
-  Objects can be created by calls of the form \code{new("dsCMatrix", ...)}.
+  Objects can be created by calls of the form \code{new("dsCMatrix",
+    ...)} or \code{new("dsTMatrix", ...)}
 }
 \section{Slots}{
   \describe{
@@ -26,10 +29,14 @@
       triangle form is allowed.}
     \item{\code{p}:}{Object of class \code{"integer"} of pointers, one
       for each column, to the initial (zero-based) index of elements in
-      the column.}
+      the column. (Only present in the \code{dsCMatrix} class.)}
     \item{\code{i}:}{Object of class \code{"integer"} of length nnzero
       (number of non-zero elements).  These are the row numbers for
       each non-zero element in the matrix.}
+    \item{\code{j}:}{Object of class \code{"integer"} of length nnzero
+      (number of non-zero elements).  These are the column numbers for
+      each non-zero element in the matrix. (Only present in the
+      \code{dsTMatrix} class.)} 
     \item{\code{x}:}{Object of class \code{"numeric"} - the non-zero
       elements of the matrix.}
     \item{\code{factors}:}{Object of class \code{"list"} - a list
