@@ -53,7 +53,7 @@ SEXP triplet_to_geMatrix(SEXP x)
 	n = dims[1];
     
     SET_SLOT(ans, Matrix_rcondSym, allocVector(REALSXP, 0));
-    SET_SLOT(ans, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(ans, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(ans, Matrix_DimSym, duplicate(dd));
     SET_SLOT(ans, Matrix_xSym, allocVector(REALSXP, m * n));
     insert_triplets_in_array(m, n, length(islot),

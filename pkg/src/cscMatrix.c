@@ -49,7 +49,7 @@ SEXP csc_crossprod(SEXP x)
     int j, *iVal, ncol = length(pslot) - 1, maxnz, nnz = 0, *pVal;
     double *xVal;
     
-    SET_SLOT(ans, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(ans, Matrix_factorSym, allocVector(VECSXP, 0));
     maxnz = (ncol * (ncol + 1))/2;
     iVal = Calloc(maxnz, int); xVal = Calloc(maxnz, double);
     SET_SLOT(ans, Matrix_pSym, allocVector(INTSXP, ncol + 1));
@@ -114,7 +114,7 @@ SEXP csc_tcrossprod(SEXP x)
     int *itmp, *ansp;
     double *xVal, *xtmp;
 
-    SET_SLOT(ans, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(ans, Matrix_factorSym, allocVector(VECSXP, 0));
     ntrip = nrow;  		/* number of triplets */
     for (j = 0; j < ncol; j++) {
 	int nzj = xp[j+1] - xp[j];
@@ -251,7 +251,7 @@ SEXP csc_to_geMatrix(SEXP x)
     SET_SLOT(ans, Matrix_DimSym, duplicate(Dimslot));
     SET_SLOT(ans, Matrix_xSym, allocVector(REALSXP, nrow*ncol));
     SET_SLOT(ans, Matrix_rcondSym, allocVector(REALSXP, 0));
-    SET_SLOT(ans, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(ans, Matrix_factorSym, allocVector(VECSXP, 0));
     ax = REAL(GET_SLOT(ans, Matrix_xSym));
     for (j = 0; j < (nrow * ncol); j++) ax[j] = 0.;
     for (j = 0; j < ncol; j++) {
@@ -275,7 +275,7 @@ SEXP matrix_to_csc(SEXP A)
     if (!(isMatrix(A) && isReal(A)))
 	error("A must be a numeric matrix");
     nrow = adims[0]; ncol = adims[1];
-    SET_SLOT(val, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(val, Matrix_pSym, allocVector(INTSXP, ncol + 1));
     vp = INTEGER(GET_SLOT(val, Matrix_pSym));
     maxnz = nrow * ncol;
@@ -357,7 +357,7 @@ SEXP csc_transpose(SEXP x)
 	*xdims = INTEGER(GET_SLOT(x, Matrix_DimSym));
 
     adims[0] = xdims[1]; adims[1] = xdims[0];
-    SET_SLOT(ans, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(ans, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(ans, Matrix_pSym, allocVector(INTSXP, xdims[0] + 1));
     SET_SLOT(ans, Matrix_iSym, allocVector(INTSXP, nnz));
     SET_SLOT(ans, Matrix_xSym, allocVector(REALSXP, nnz));
@@ -408,7 +408,7 @@ SEXP csc_col_permute(SEXP x, SEXP perm)
     int *iperm, *prm, *vi, *vp, *xi, *xp, j, k, ncol, pos;
     double *vx, *xx;
 
-    SET_SLOT(val, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     tmp = GET_SLOT(x, Matrix_DimSym);
     SET_SLOT(val, Matrix_DimSym, duplicate(tmp));
     ncol = INTEGER(tmp)[1];

@@ -690,7 +690,7 @@ SEXP cscBlocked_2cscMatrix(SEXP A)
     int sz = nc * nr;
     double *Ax = REAL(AxP), *Bx;
 
-    SET_SLOT(val, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(val, Matrix_DimSym, allocVector(INTSXP, 2));
     Dims = INTEGER(GET_SLOT(val, Matrix_DimSym));
     Dims[1] = ncb * adims[1];

@@ -37,7 +37,7 @@ or, more commonly, by coercion from the \code{matrix} class.
     \item{\code{rcond}:}{Object of class \code{"numeric"} - an estimate
       of the reciprocal of the condition number, if it has been computed
       at some point.}
-    \item{\code{factorization}:}{Object of class \code{"list"} - a list
+    \item{\code{factors}:}{Object of class \code{"list"} - a list
       of factorizations of the matrix. }
   }
 }

@@ -4,7 +4,7 @@ SEXP geMatrix_validate(SEXP obj)
 {
     SEXP x = GET_SLOT(obj, Matrix_xSym),
 	Dim = GET_SLOT(obj, Matrix_DimSym),
-	fact = GET_SLOT(obj, Matrix_factorization),
+	fact = GET_SLOT(obj, Matrix_factorSym),
 	rc = GET_SLOT(obj, Matrix_rcondSym);    
     int m, n;
 
@@ -16,7 +16,7 @@ SEXP geMatrix_validate(SEXP obj)
     if (length(x) != m * n)
     	return ScalarString(mkChar("length of x slot != prod(Dim)"));
     if (length(fact) > 0 && getAttrib(fact, R_NamesSymbol) == R_NilValue)
-	return ScalarString(mkChar("factorization slot must be named list"));
+	return ScalarString(mkChar("factors slot must be named list"));
     if (length(rc) > 0 && getAttrib(rc, R_NamesSymbol) == R_NilValue)
 	return ScalarString(mkChar("rcond slot must be named numeric vector"));
     return ScalarLogical(1);
@@ -83,7 +83,7 @@ SEXP geMatrix_crossprod(SEXP x)
     int nsqr = n * n;
     double one = 1.0, *xvals, zero = 0.0;
 
-    SET_SLOT(val, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(val, Matrix_rcondSym, allocVector(REALSXP, 0));
     SET_SLOT(val, Matrix_uploSym, ScalarString(mkChar("U")));
     SET_SLOT(val, Matrix_DimSym, allocVector(INTSXP, 2));
@@ -109,7 +109,7 @@ SEXP geMatrix_geMatrix_crossprod(SEXP x, SEXP y)
     double one = 1.0, zero = 0.0;
 
     SET_SLOT(val, Matrix_rcondSym, allocVector(REALSXP, 0));
-    SET_SLOT(val, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(val, Matrix_DimSym, allocVector(INTSXP, 2));
     vDims = INTEGER(GET_SLOT(val, Matrix_DimSym));
     if ((*xDims) > 0 && (*yDims) > 0 && n > 0 && m > 0) {
@@ -139,7 +139,7 @@ SEXP geMatrix_matrix_crossprod(SEXP x, SEXP y)
     if (!(isMatrix(y) && isReal(y)))
 	error("Argument y must be a numeric (real) matrix");
     SET_SLOT(val, Matrix_rcondSym, allocVector(REALSXP, 0));
-    SET_SLOT(val, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(val, Matrix_DimSym, allocVector(INTSXP, 2));
     vDims = INTEGER(GET_SLOT(val, Matrix_DimSym));
     if ((*xDims) > 0 && (*yDims) > 0 && n > 0 && m > 0) {
@@ -173,7 +173,7 @@ SEXP geMatrix_getDiag(SEXP x)
 
 SEXP geMatrix_LU(SEXP x)
 {
-    SEXP val = get_factorization(x, "LU");
+    SEXP val = get_factors(x, "LU");
     int *dims, npiv, info;
     
     if (val != R_NilValue) return val;
@@ -190,7 +190,7 @@ SEXP geMatrix_LU(SEXP x)
 		     &info);
     if (info) error("Lapack routine dgetrf returned error code %d", info);
     UNPROTECT(1);
-    return set_factorization(x, val, "LU");
+    return set_factors(x, val, "LU");
 }
 
 SEXP geMatrix_determinant(SEXP x, SEXP logarithm)
@@ -236,7 +236,7 @@ SEXP geMatrix_solve(SEXP a)
 
     if (dims[0] != dims[1]) error("Solve requires a square matrix");
     SET_SLOT(val, Matrix_rcondSym, allocVector(REALSXP, 0));
-    SET_SLOT(val, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(lu, Matrix_xSym)));
     x = REAL(GET_SLOT(val, Matrix_xSym));
     SET_SLOT(val, Matrix_DimSym, duplicate(GET_SLOT(lu, Matrix_DimSym)));
@@ -264,7 +264,7 @@ SEXP geMatrix_geMatrix_mm(SEXP a, SEXP b)
     if (m < 1 || n < 1 || k < 1)
 	error("Matrices with zero extents cannot be multiplied");
     SET_SLOT(val, Matrix_rcondSym, allocVector(REALSXP, 0));
-    SET_SLOT(val, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(val, Matrix_xSym, allocVector(REALSXP, m * n));
     SET_SLOT(val, Matrix_DimSym, allocVector(INTSXP, 2));
     cdims = INTEGER(GET_SLOT(val, Matrix_DimSym));

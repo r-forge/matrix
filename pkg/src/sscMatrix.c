@@ -83,12 +83,12 @@ SEXP sscMatrix_chol(SEXP x, SEXP pivot)
 	Free(Pinv); Free(Ax); Free(Ai); Free(Ap);
     }
     UNPROTECT(lo ? 2 : 1);
-    return set_factorization(xorig, val, "Cholesky");
+    return set_factors(xorig, val, "Cholesky");
 }
 
 SEXP sscMatrix_matrix_solve(SEXP a, SEXP b)
 {
-    SEXP Chol = get_factorization(a, "Cholesky"), perm,
+    SEXP Chol = get_factors(a, "Cholesky"), perm,
 	val = PROTECT(duplicate(b));
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(getAttrib(b, R_DimSymbol)),

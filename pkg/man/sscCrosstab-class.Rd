@@ -25,7 +25,7 @@ or by a call to the constructor function \code{sscCrosstab}.
     \item{\code{i}:}{as for \code{"sscMatrix"} objects.}
     \item{\code{x}:}{as for \code{"sscMatrix"} objects.}
     \item{\code{Dim}:}{as for \code{"sscMatrix"} objects.}
-    \item{\code{factorization}:}{as for \code{"sscMatrix"} objects.}
+    \item{\code{factors}:}{as for \code{"sscMatrix"} objects.}
   }
 }
 \section{Extends}{

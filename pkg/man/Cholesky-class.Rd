@@ -18,8 +18,8 @@
     \item{\code{x}:}{inherited from the \code{"trMatrix"} class.}
     \item{\code{Dim}:}{inherited from the \code{"trMatrix"} class.}
     \item{\code{rcond}:}{inherited from the \code{"trMatrix"} class.}
-    \item{\code{factorization}:}{inherited from the \code{"trMatrix"}
-      class.  For this class the \code{factorization} slot is always an
+    \item{\code{factors}:}{inherited from the \code{"trMatrix"}
+      class.  For this class the \code{factors} slot is always an
       empty list.}
   }
 }
