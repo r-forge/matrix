@@ -15,6 +15,7 @@ cscBlocked-class        Class "cscBlocked" compressed, sparse, blocked
 cscMatrix-class         Class "cscMatrix" compressed, sparse, column
                         Matrix
 expand                  Expand a Decomposition into Factors
+expm                    Matrix exponential
 facmul                  Multiplication by Decomposition Factors
 geMatrix-class          General S4 Matrix class
 lu                      Triangular Decomposition of a Square Matrix
