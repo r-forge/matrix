@@ -868,7 +868,6 @@ SEXP ssclme_initial(SEXP x)
 
 /** 
  * Extract the conditional estimates of the fixed effects
- * FIXME: Add names
  * 
  * @param x Pointer to an ssclme object
  * 
@@ -896,8 +895,6 @@ SEXP ssclme_fixef(SEXP x)
 
 /** 
  * Extract the conditional modes of the random effects.
- * FIXME: Change the returned value to be a named list of matrices
- *        with dimnames.
  * 
  * @param x Pointer to an ssclme object
  * 
@@ -966,7 +963,7 @@ int coef_length(int nf, const int nc[])
 
 /** 
  * Extract the upper triangles of the Omega matrices.
- * (These are not in any sense "coefficients" but the extractor is
+ * (These aren't "coefficients" but the extractor is
  * called coef for historical reasons.)
  * 
  * @param x pointer to an ssclme object
@@ -984,12 +981,20 @@ SEXP ssclme_coef(SEXP x)
 
     vind = 0;
     for (i = 0; i < nf; i++) {
-	int j, k, nci = nc[i];
-	double *omgi = REAL(VECTOR_ELT(Omega, i));
-	for (j = 0; j < nci; j++) {
-	    for (k = 0; k <= j; k++) {
-		vv[vind++] = omgi[j*nci + k];
+	int nci = nc[i];
+	if (nci == 1) {
+	    vv[vind++] = REAL(VECTOR_ELT(Omega, i))[0];
+	} else {
+	    int j, k, odind = vind + nci, ncip1 = nci + 1;
+	    double *omgi = REAL(VECTOR_ELT(Omega, i));
+	    
+	    for (j = 0; j < nci; j++) {
+		vv[vind++] = omgi[j * ncip1];
+		for (k = j + 1; k < nci; k++) {
+		    vv[odind++] = omgi[k*nci + j];
+		}
 	    }
+	    vind = odind;
 	}
     }
     UNPROTECT(1);
@@ -997,14 +1002,12 @@ SEXP ssclme_coef(SEXP x)
 }
 
 /** 
- * Extract the upper triangles of the Omega matrices in the unconstrained
- * parameterization.
- * (These are not in any sense "coefficients" but the extractor is
- * called coef for historical reasons.)
+ * Extract the unconstrained parameters that determine the
+ * Omega matrices. (Called coef for historical reasons.)
  * 
  * @param x pointer to an ssclme object
  * 
- * @return numeric vector of the values in the upper triangles of the
+ * @return numeric vector of unconstrained parameters that determine the
  * Omega matrices
  */
 SEXP ssclme_coefUnc(SEXP x)
@@ -1026,7 +1029,8 @@ SEXP ssclme_coefUnc(SEXP x)
 				 REAL(VECTOR_ELT(Omega, i)), ncisq);
 	    F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
 	    if (j)		/* should never happen */
-		error("DPOTRF returned error code %d", j);
+		error("DPOTRF returned error code %d on Omega[[%d]]",
+		      j, i+1);
 	    for (j = 0; j < nci; j++) {
 		double diagj = tmp[j * ncip1];
 		vv[vind++] = 2. * log(diagj);
@@ -1047,8 +1051,7 @@ SEXP ssclme_coefUnc(SEXP x)
 }
 
 /** 
- * Assign the upper triangles of the Omega matrices in the unconstrained
- * parameterization.
+ * Assign the Omega matrices from the unconstrained parameterization.
  * 
  * @param x pointer to an ssclme object
  * @param coef pointer to an numeric vector of appropriate length
@@ -1079,18 +1082,17 @@ SEXP ssclme_coefGetsUnc(SEXP x, SEXP coef)
 	    double
 		*omgi = REAL(VECTOR_ELT(Omega, i)),
 		*tmp = Calloc(ncisq, double),
-		diagj, one = 1.;
-	    /* FIXEME: Change this to use a factor and dsyrk */
-				/* LD in omgi and L' in tmp */
+		diagj, one = 1., zero = 0.;
+
 	    memset(omgi, 0, sizeof(double) * ncisq);
 	    for (j = 0; j < nci; j++) {
-		omgi[j * ncip1] = diagj = exp(cc[cind++]);
+		tmp[j * ncip1] = diagj = exp(cc[cind++]/2.);
 		for (k = j + 1; k < nci; k++) {
-		    omgi[j*nci + k] = diagj * (tmp[k*nci + j] = cc[odind++]);
+		    tmp[k*nci + j] = cc[odind++] * diagj;
 		}
 	    }
-	    F77_CALL(dtrmm)("R", "U", "N", "U", &nci, &nci, &one,
-			    tmp, &nci, omgi, &nci);
+	    F77_CALL(dsyrk)("U", "T", &nci, &nci, &one,
+			    tmp, &nci, &zero, omgi, &nci);
 	    Free(tmp);
 	    cind = odind;
 	}
@@ -1101,8 +1103,7 @@ SEXP ssclme_coefGetsUnc(SEXP x, SEXP coef)
 
 /** 
  * Assign the upper triangles of the Omega matrices.
- * (These are not in any sense "coefficients" but are
- * called coef for historical reasons.)
+ * (Called coef for historical reasons.)
  * 
  * @param x pointer to an ssclme object
  * @param coef pointer to an numeric vector of appropriate length
@@ -1122,12 +1123,20 @@ SEXP ssclme_coefGets(SEXP x, SEXP coef)
 	      coef_length(nf, nc));
     cind = 0;
     for (i = 0; i < nf; i++) {
-	int j, k, nci = nc[i];
-	double *omgi = REAL(VECTOR_ELT(Omega, i));
-	for (j = 0; j < nci; j++) {
-	    for (k = 0; k <= j; k++) {
-		omgi[j*nci + k] = cc[cind++];
+	int nci = nc[i];
+	if (nci == 1) {
+	    REAL(VECTOR_ELT(Omega, i))[0] = cc[cind++];
+	} else {
+	    int j, k, odind = cind + nci, ncip1 = nci + 1;
+	    double *omgi = REAL(VECTOR_ELT(Omega, i));
+	
+	    for (j = 0; j < nci; j++) {
+		omgi[j * ncip1] = cc[cind++];
+		for (k = j + 1; k < nci; k++) {
+		    omgi[k*nci + j] = cc[odind++];
+		}
 	    }
+	    cind = odind;
 	}
     }
     status[0] = status[1] = 0;
@@ -1215,7 +1224,7 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
     SEXP
 	Omega = GET_SLOT(x, Matrix_OmegaSym),
 	RZXsl = GET_SLOT(x, Matrix_RZXSym),
-	ans = PROTECT(duplicate(Omega)),
+	ans,
 	ncsl = GET_SLOT(x, Matrix_ncSym),
 	bVar = GET_SLOT(x, Matrix_bVarSym);
     int
@@ -1223,12 +1232,9 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
 	*dims = INTEGER(getAttrib(RZXsl, R_DimSymbol)),
 	*nc = INTEGER(ncsl),
 	REML = asLogical(REMLp),
-	i, info,
-	n = dims[0],
+	cind, i, n = dims[0],
 	nf = length(ncsl) - 2,
-	nobs = nc[nf + 1],
-	p,
-	pp1 = dims[1],
+	nobs, odind, p, pp1 = dims[1],
 	uncst = asLogical(Uncp);
     double
 	*RZX = REAL(RZXsl),
@@ -1236,47 +1242,59 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
         alpha,
 	one = 1.;
 
+    nobs = nc[nf + 1];
     p = pp1 - 1;
     b = RZX + p * n;
+    ans = PROTECT(allocVector(REALSXP, coef_length(nf, nc)));
     ssclme_invert(x);
+    cind = 0;
     for (i = 0; i < nf; i++) {
-	int ki = Gp[i+1] - Gp[i],
+	int j, ki = Gp[i+1] - Gp[i],
 	    nci = nc[i],
 	    mi = ki/nci;
 	double
-	    *vali = REAL(VECTOR_ELT(ans, i));
+	    *tmp = Memcpy(Calloc(nci * nci, double),
+			  REAL(VECTOR_ELT(Omega, i)), nci * nci);
 	    
-	F77_CALL(dpotrf)("U", &nci, vali, &nci, &info);
-	if (info)
-	    error("DPOTRF returned error code %d for component %d of Omega",
-		  info, i + 1);
-	F77_CALL(dpotri)("U", &nci, vali, &nci, &info);
-	if (info)
-	    error("DPOTRI returned error code %d for component %d of Omega",
-		  info, i + 1);
+	F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
+	if (j)
+	    error("DPOTRF gave error code %d on Omega[[%d]]", j, i + 1);
+	F77_CALL(dpotri)("U", &nci, tmp, &nci, &j);
+	if (j)
+	    error("DPOTRI gave error code %d on Omega[[%d]]", j, i + 1);
 	alpha = (double) -mi;
 	F77_CALL(dsyrk)("U", "N", &nci, &ki,
 			&one, REAL(VECTOR_ELT(bVar, i)), &nci,
-			&alpha, vali, &nci);
+			&alpha, tmp, &nci);
 	alpha = ((double)(REML?(nobs-p):nobs));
 	F77_CALL(dsyrk)("U", "N", &nci, &mi,
 			&alpha, b + Gp[i], &nci,
-			&one, vali, &nci);
+			&one, tmp, &nci);
 	if (REML) {
-	    int j;
 	    for (j = 0; j < p; j++) { 
 		F77_CALL(dsyrk)("U", "N", &nci, &mi,
 				&one, RZX + Gp[i] + j*n, &nci,
-				&one, vali, &nci);
+				&one, tmp, &nci);
 	    }
 	}
-	if (uncst) {
-	    if (nci == 1) {
-		*vali *= *REAL(VECTOR_ELT(Omega, i));
-	    } else {
+	if (nci == 1) {
+	    REAL(ans)[cind++] = *tmp *
+		(uncst ? *REAL(VECTOR_ELT(Omega, i)) : 1.);
+	} else {
+	    if (uncst) {
 		error("Code not written yet");
+	    } else {
+		int k, ncip1 = nci + 1, odind = cind + nci;
+		for (j = 0; j < nci; j++) {
+		    REAL(ans)[cind++] = tmp[j * ncip1];
+		    for (k = j + 1; k < nci; k++) {
+			REAL(ans)[odind++] = tmp[k*nci + j] * 2.;
+		    }
+		}
+		cind = odind;
 	    }
 	}
+	Free(tmp);
     }
     UNPROTECT(1);
     return ans;
