@@ -1,6 +1,6 @@
 setMethod("solve", signature(a = "sscMatrix", b = "matrix"),
           function(a, b, ...)
-          .Call("sscMatrix_matrix_solve", a, b, TRUE, PACKAGE = "Matrix"))
+          .Call("sscMatrix_matrix_solve", a, b, PACKAGE = "Matrix"))
 
 setMethod("chol", signature(x = "sscMatrix", pivot = "missing"),
           function(x, pivot, LINPACK)

@@ -11,6 +11,7 @@ SOURCES_C =  \
             dense.c \
             factorizations.c \
             geMatrix.c \
+	    init.c \
 	    ldl.c \
 	    lmeRep.c \
             poMatrix.c \
