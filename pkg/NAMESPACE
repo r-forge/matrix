@@ -34,7 +34,6 @@ exportClasses(
               "cscBlocked",
               "cscMatrix",
               "geMatrix",
-              "lmeRep",
               "lmer",
               "pdfactor",
               "pdmatrix",
