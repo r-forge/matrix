@@ -81,14 +81,14 @@ lmeControl =                            # Control parameters for lme
          analyticGradient=analyticGradient)
 }
 
-setMethod("lme", signature(data = "missing"),
-          function(formula, data, random, ...)
-      {
-          nCall = mCall = match.call()
-          nCall$data = data.frame()
-          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
-                mCall, PACKAGE = "lme4")
-      })
+#setMethod("lme", signature(data = "missing"),
+#          function(formula, data, random, ...)
+#      {
+#          nCall = mCall = match.call()
+#          nCall$data = data.frame()
+#          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
+#                mCall, PACKAGE = "lme4")
+#      })
 
 setMethod("lme", signature(formula = "missing"),
           function(formula, data, random, ...)
@@ -134,7 +134,7 @@ setMethod("lme", signature(formula = "formula", data = "groupedData",
                 mCall, PACKAGE = "lme4")
       })
           
-setMethod("lme", signature(formula = "formula", data = "data.frame",
+setMethod("lme", signature(formula = "formula",
                            random = "list"),
           function(formula, data, random,
                    method = c("REML", "ML"),

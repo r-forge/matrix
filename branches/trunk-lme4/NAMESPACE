@@ -42,6 +42,7 @@ importMethodsFrom("Matrix",
                   )
 
 export(
+       "GLMM",
        "Names",
        "Names<-",
        "VarCorr",
@@ -62,12 +63,15 @@ exportClasses(
               "VarCorr",
               "groupedData",
               "lmList",
-              "lme"
+              "lme",
+              "summary.lme",
+              "summary.ssclme"
               )
 
 exportMethods(
               "$",
               "$<-",
+              "GLMM",
               "[",
               "[<-",
               "[[",

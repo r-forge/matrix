@@ -1,3 +1,66 @@
+#setMethod("GLMM", signature(data = "missing"),
+#          function(formula, family, data, random, ...)
+#      {
+#          nCall = mCall = match.call()
+#          nCall$data = data.frame()
+#          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
+#                mCall, PACKAGE = "lme4")
+#      })
+
+setMethod("GLMM", signature(family = "name"),
+          function(formula, family, data, random, ...)
+      {
+          nCall = mCall = match.call()
+          nCall$family = eval(substitute(family()))
+          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
+                mCall, PACKAGE = "lme4")
+      })
+
+setMethod("GLMM", signature(formula = "missing", family = "family"),
+          function(formula, family, data, random, ...)
+      {
+          nCall = mCall = match.call()
+          resp = getResponseFormula(data)[[2]]
+          cov = getCovariateFormula(data)[[2]]
+          nCall$formula = eval(substitute(resp ~ cov))
+          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
+                mCall, PACKAGE = "lme4")
+      })
+
+setMethod("GLMM", signature(formula = "formula", family = "family",
+                            data = "groupedData", random = "missing"),
+          function(formula, family, data, random, ...)
+      {
+          nCall = mCall = match.call()
+          cov = formula[[3]]
+          grps = getGroupsFormula(data)[[2]]
+          nCall$random = eval(substitute(~ cov | grps))
+          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
+                mCall, PACKAGE = "lme4")
+      })
+
+setMethod("GLMM", signature(family = "family", random = "formula"),
+          function(formula, family, data, random, ...)
+      {
+          nCall = mCall = match.call()
+          cov = getCovariateFormula(random)
+          nCall$random <- lapply(getGroupsFormula(random, asList = TRUE),
+                                 function(f) cov)
+          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
+                mCall, PACKAGE = "lme4")
+      })
+
+setMethod("GLMM", signature(formula = "formula", family = "family",
+                            data = "groupedData",
+                           random = "list"),
+          function(formula, family, data, random, ...)
+      {
+          nCall = mCall = match.call()
+          nCall$data <- data@data
+          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
+                mCall, PACKAGE = "lme4")
+      })
+
 setMethod("GLMM",
           signature(formula = "formula",
                     family = "family",
@@ -9,8 +72,7 @@ setMethod("GLMM",
                    model = TRUE, x = FALSE, ...)
       {
           random <-
-              lapply(as(random, "list"),
-                     get("formula", pos = parent.frame(), mode = "function"))
+              lapply(get("formula", pos = parent.frame(), mode = "function"))
           controlvals <- do.call("lmeControl", control)
           controlvals$REML <- FALSE
           data <- eval(make.mf.call(match.call(expand.dots = FALSE),
