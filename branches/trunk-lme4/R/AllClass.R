@@ -26,8 +26,11 @@ setClass("lme", representation(call = "call",
                                fitted = "numeric",
                                residuals = "numeric"))
 
-setClass("GLMM", representation(logLik = "numeric",
-                                fixef = "numeric"),
+setClass("GLMM", representation(family = "family",
+                                logLik = "numeric",
+                                fixef = "numeric",
+                                Hessian = "matrix",
+                                method = "character"),
          contains = "lme")
 
 setClass("lmList",
@@ -69,3 +72,6 @@ setClass("summary.lme",
                         logLik = "logLik",
                         re = "summary.ssclme",
                         residuals = "numeric"))
+
+setClass("summary.GLMM", representation(family = "family"),
+         contains = "summary.lme")

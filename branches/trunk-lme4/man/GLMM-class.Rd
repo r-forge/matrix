@@ -18,6 +18,9 @@
 }
 \section{Slots}{
   \describe{
+    \item{\code{family}:}{The family of functions
+      defining the generalized linear model.  See
+      \code{\link[stats]{family}} for details.}
     \item{\code{logLik}:}{the \code{"numeric"} value of the log-likelihood.}
     \item{\code{fixef}:}{A \code{"numeric"} vector of fixed-effects
       parameters.}

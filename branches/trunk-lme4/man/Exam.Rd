@@ -38,14 +38,14 @@
 data(Exam)
 str(Exam)
 summary(Exam)
-system.time(fm1 <- lme(normexam ~ standlrt + gender + schgend,
-    data = Exam, random = ~ 1|school))
+fm1 <- lme(normexam ~ standlrt + gender + schgend,
+           data = Exam, random = ~ 1|school)
 summary(fm1)
-system.time(fm2 <- lme(normexam ~ standlrt*gender + schgend,
-    data = Exam, random = ~ 1|school))
+fm2 <- lme(normexam ~ standlrt*gender + schgend,
+           data = Exam, random = ~ 1|school)
 summary(fm2)
-system.time(fm3 <- lme(normexam ~ standlrt*gender + schgend,
-    data = Exam, random = ~ standlrt|school))
+fm3 <- lme(normexam ~ standlrt*gender + schgend,
+          data = Exam, random = ~ standlrt|school)
 summary(fm3)
 }
 \keyword{datasets}
