@@ -1,21 +1,23 @@
-\name{bbCrosstab}
-\alias{bbCrosstab}
+\name{bCrosstab}
+\alias{bCrosstab}
 \title{Create pairwise crosstabulation}
 \description{
   Create the pairwise crosstabulation of two or more factors and store
-  it as an object of class \code{"bbCrosstab"} which consists of a
+  it as an object of class \code{"bCrosstab"} which consists of a
   list of sparse, blocked matrices.
 }
 \usage{
-bbCrosstab(flist)
+bCrosstab(flist, reorder = TRUE)
 }
 \arguments{
   \item{flist}{A list of two or more factors.  All factors must have the
     same length.}
+  \item{reorder}{Logical flag determining if reordering of the factors
+    is allowed.}
 }
 %\details{}
 \value{
-  An object of class \code{"bbCrosstab"}.
+  A list.
 }
 %\references{}
 %\author{}
