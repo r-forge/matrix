@@ -1,0 +1,3 @@
+- check to see if the .onLoad function to require the methods package
+  (in the AllClass.R file) is needed
+  -- no, it is not:  "Depends: " in DESCRIPTION suffices.
