@@ -957,6 +957,108 @@ SEXP ssclme_coef(SEXP x)
 }
 
 /** 
+ * Extract the upper triangles of the Omega matrices in the unconstrained
+ * parameterization.
+ * (These are not in any sense "coefficients" but the extractor is
+ * called coef for historical reasons.)
+ * 
+ * @param x pointer to an ssclme object
+ * 
+ * @return numeric vector of the values in the upper triangles of the
+ * Omega matrices
+ */
+SEXP ssclme_coefUnc(SEXP x)
+{
+    SEXP Omega = GET_SLOT(x, Matrix_OmegaSym);
+    int	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	i, nf = length(Omega), vind;
+    SEXP val = PROTECT(allocVector(REALSXP, coef_length(nf, nc)));
+    double *vv = REAL(val);
+
+    vind = 0;
+    for (i = 0; i < nf; i++) {
+	int  nci = nc[i];
+	if (nci == 1) {
+	    vv[vind++] = log(REAL(VECTOR_ELT(Omega, i))[0]);
+	} else {
+	    int j, k, ncip1 = nci + 1, ncisq = nci * nci;
+	    double *tmp = Memcpy(Calloc(ncisq, double), 
+				 REAL(VECTOR_ELT(Omega, i)), ncisq);
+	    F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
+	    if (j)		/* should never happen */
+		error("DPOTRF returned error code %d", j);
+	    for (j = 0; j < nci; j++) {
+		double diagj = tmp[j * ncip1];
+		vv[vind++] = 2. * log(diagj);
+		for (k = j + 1; k < nci; k++) {
+		    tmp[j + k * nci] /= diagj;
+		}
+	    }
+	    for (j = 0; j < nci; j++) {
+		for (k = j + 1; k < nci; k++) {
+		    vv[vind++] = tmp[j + k * nci];
+		}
+	    }
+	    Free(tmp);
+	}
+    }
+    UNPROTECT(1);
+    return val;
+}
+
+/** 
+ * Assign the upper triangles of the Omega matrices in the unconstrained
+ * parameterization.
+ * 
+ * @param x pointer to an ssclme object
+ * @param coef pointer to an numeric vector of appropriate length
+ * 
+ * @return R_NilValue
+ */
+SEXP ssclme_coefGetsUnc(SEXP x, SEXP coef)
+{
+    SEXP Omega = GET_SLOT(x, Matrix_OmegaSym);
+    int	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	cind, i, nf = length(Omega),
+	*status = LOGICAL(GET_SLOT(x, Matrix_statusSym));
+    double *cc = REAL(coef);
+
+    if (length(coef) != coef_length(nf, nc) || !isReal(coef))
+	error("coef must be a numeric vector of length %d",
+	      coef_length(nf, nc));
+    cind = 0;
+    for (i = 0; i < nf; i++) {
+	int nci = nc[i];
+	if (nci == 1) {
+	    REAL(VECTOR_ELT(Omega, i))[0] = exp(cc[cind++]);
+	} else {
+	    int odind = cind + nci, /* off-diagonal index */
+		j, k,
+		ncip1 = nci + 1,
+		ncisq = nci * nci;
+	    double
+		*omgi = REAL(VECTOR_ELT(Omega, i)),
+		*tmp = Calloc(ncisq, double),
+		diagj, one = 1.;
+				/* LD in omgi and L' in tmp */
+	    memset(omgi, 0, sizeof(double) * ncisq);
+	    for (j = 0; j < nci; j++) {
+		omgi[j * ncip1] = diagj = exp(cc[cind++]);
+		for (k = j + 1; k < nci; k++) {
+		    omgi[j*nci + k] = diagj * (tmp[k*nci + j] = cc[odind++]);
+		}
+	    }
+	    F77_CALL(dtrmm)("R", "U", "N", "U", &nci, &nci, &one,
+			    tmp, &nci, omgi, &nci);
+	    Free(tmp);
+	    cind = odind;
+	}
+    }
+    status[0] = status[1] = 0;
+    return x;
+}
+
+/** 
  * Assign the upper triangles of the Omega matrices.
  * (These are not in any sense "coefficients" but are
  * called coef for historical reasons.)
