@@ -2,9 +2,7 @@
 \alias{bCrosstab}
 \title{Create pairwise crosstabulation}
 \description{
-  Create the pairwise crosstabulation of two or more factors and store
-  it as an object of class \code{"bCrosstab"} which consists of a
-  list of sparse, blocked matrices.
+  Create the pairwise crosstabulation of two or more factors.
 }
 \usage{
 bCrosstab(flist, reorder = TRUE)
@@ -17,12 +15,13 @@ bCrosstab(flist, reorder = TRUE)
 }
 %\details{}
 \value{
-  A list.
+  A list with components \code{flist}, a possibly reordered copy of the
+  first argument, and \code{ctab}, the pairwise crosstabulation.
 }
 %\references{}
 %\author{}
 %\note{}
-\seealso{\code{\link{bbCrosstab-class}}}
+%\seealso{}
 %\examples{}
 \keyword{manip}
 \keyword{algebra}
