@@ -99,29 +99,23 @@ void ssclme_copy_ctab(int nf, const int nc[], SEXP ctab, SEXP ssc)
     }
 }
 
-void ssclme_fill_LIp(int n, const int Parent[], int LIp[])
+/** 
+ * Calculate and store the maximum number of off-diagonal elements in
+ * the inverse of L, based on the elimination tree.  The maximum is
+ * itself stored in the Parent array.  (FIXME: come up with a better design.)
+ * 
+ * @param n number of columns in the matrix
+ * @param Parent elimination tree for the matrix
+ */
+static void ssclme_calc_maxod(int n, int Parent[])
 {
-    int *sz = Calloc(n, int), i;
+    int *sz = Calloc(n, int), i, mm = -1;
     for (i = n - 1; i >= 0; i--) {
-	sz[i] = (Parent[i] < 0) ? 0 : 1 + sz[Parent[i]];
+	sz[i] = (Parent[i] < 0) ? 0 : (1 + sz[Parent[i]]);
+	if (sz[i] > mm) mm = sz[i];
     }
-    LIp[0] = 0;
-    for (i = 0; i < n; i++) LIp[i+1] = LIp[i] + sz[i];
+    Parent[n] = mm;
     Free(sz);
-}
-
-static
-void ssclme_fill_LIi(int n, const int Parent[], const int LIp[], int LIi[])
-{
-    int i;
-    for (i = n; i > 0; i--) {
-	int im1 = i - 1, Par = Parent[im1];
-	if (Par >= 0) {
-	    LIi[LIp[im1]] = Par;
-	    Memcpy(LIi + LIp[im1] + 1, LIi + LIp[Par],
-		   LIp[Par + 1] - LIp[Par]);
-	}
-    }
 }
 
 SEXP
@@ -130,7 +124,7 @@ ssclme_create(SEXP facs, SEXP ncv, SEXP threshold)
     SEXP ctab, nms, ssc, tmp,
 	val = PROTECT(allocVector(VECSXP, 2)),
 	dd = PROTECT(allocVector(INTSXP, 3));	/* dimensions of 3-D arrays */
-    int *Ai, *Ap, *Gp, *LIp, *Lp, *Parent,
+    int *Ai, *Ap, *Gp, *Lp, *Parent,
 	*nc, Lnz, i, nf = length(facs), nzcol, pp1,
 	*dims = INTEGER(dd);
 
@@ -170,7 +164,7 @@ ssclme_create(SEXP facs, SEXP ncv, SEXP threshold)
 	   sizeof(double) * pp1 * pp1);
     SET_SLOT(ssc, Matrix_LpSym, allocVector(INTSXP, nzcol + 1));
     Lp = INTEGER(GET_SLOT(ssc, Matrix_LpSym));
-    SET_SLOT(ssc, Matrix_ParentSym, allocVector(INTSXP, nzcol));
+    SET_SLOT(ssc, Matrix_ParentSym, allocVector(INTSXP, nzcol + 1));
     Parent = INTEGER(GET_SLOT(ssc, Matrix_ParentSym));
     SET_SLOT(ssc, Matrix_DSym, allocVector(REALSXP, nzcol));
     SET_SLOT(ssc, Matrix_DIsqrtSym, allocVector(REALSXP, nzcol));
@@ -178,6 +172,7 @@ ssclme_create(SEXP facs, SEXP ncv, SEXP threshold)
 		 (int *) R_alloc(nzcol, sizeof(int)), /* Lnz */
 		 (int *) R_alloc(nzcol, sizeof(int)), /* Flag */
 		 (int *) NULL, (int *) NULL); /* P & Pinv */
+    ssclme_calc_maxod(nzcol, Parent);
     Lnz = Lp[nzcol];
     SET_SLOT(ssc, Matrix_LiSym, allocVector(INTSXP, Lnz));
     SET_SLOT(ssc, Matrix_LxSym, allocVector(REALSXP, Lnz));
@@ -214,17 +209,6 @@ ssclme_create(SEXP facs, SEXP ncv, SEXP threshold)
 	SET_VECTOR_ELT(tmp, i, allocArray(REALSXP, dd));
 	memset(REAL(VECTOR_ELT(tmp, i)), 0,
 	       sizeof(double) * nci * nci * mi);
-    }
-    SET_SLOT(ssc, Matrix_LIpSym, allocVector(INTSXP, nzcol + 1));
-    LIp = INTEGER(GET_SLOT(ssc, Matrix_LIpSym));
-    ssclme_fill_LIp(nzcol, Parent, LIp);
-    if (asInteger(threshold) > (Lnz = LIp[nzcol])) {
-	SET_SLOT(ssc, Matrix_LIiSym, allocVector(INTSXP, Lnz));
-	ssclme_fill_LIi(nzcol, Parent, LIp,
-			INTEGER(GET_SLOT(ssc, Matrix_LIiSym)));
-    	SET_SLOT(ssc, Matrix_LIxSym, allocVector(REALSXP, Lnz));
-	memset(REAL(GET_SLOT(ssc, Matrix_LIxSym)), 0,
-	       sizeof(double) * Lnz);
     }
     UNPROTECT(2);
     return val;
@@ -543,8 +527,7 @@ int ldl_update_ind(int probe, int start, const int ind[])
 }
 
 /** 
- * Create the inverse of L and update the diagonal blocks of the inverse
- * of LDL' (=Z'Z+W)
+ * Update the diagonal blocks of the inverse of LDL' (=Z'Z+W)
  * 
  * @param x pointer to an ssclme object
  *
@@ -556,126 +539,41 @@ SEXP ldl_inverse(SEXP x)
 {
     SEXP
 	Gpsl = GET_SLOT(x, Matrix_GpSym),
-	LIisl = GET_SLOT(x, Matrix_LIiSym),
-	LIpsl = GET_SLOT(x, Matrix_LIpSym),
 	bVar = GET_SLOT(x, Matrix_bVarSym);
     int *Gp = INTEGER(Gpsl),
-	*Li,
-	*LIp = INTEGER(LIpsl), *Lp,
+	*Parent = INTEGER(GET_SLOT(x, Matrix_ParentSym)),
+	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	i,
 	nf = length(Gpsl) - 1,
-	nzc = length(LIpsl) - 1;
-    double
-	*DIsqrt = REAL(GET_SLOT(x, Matrix_DIsqrtSym)),
-	*Lx;
+	nzc = INTEGER(GET_SLOT(x, Matrix_DimSym))[1];
+    int maxod = Parent[nzc];
+    double *DIsqrt = REAL(GET_SLOT(x, Matrix_DIsqrtSym));
 	
     ssclme_factor(x);
-    if (LIp[nzc] == 0) {	/* L and LI are the identity */
+    if (maxod == 0) {		/* L and L^{-1} are the identity */
 	for (i = 0; i < nf; i++) {
 	    Memcpy(REAL(VECTOR_ELT(bVar, i)), DIsqrt + Gp[i],
 		   Gp[i+1] - Gp[i]);
 	}
-	return R_NilValue;
-    }
-    Lp = INTEGER(GET_SLOT(x, Matrix_LpSym));
-    Li = INTEGER(GET_SLOT(x, Matrix_LiSym));
-    Lx = REAL(GET_SLOT(x, Matrix_LxSym));
-    if (length(LIisl) == LIp[nzc]) { /* LIi is filled */
-	int *LIi = INTEGER(LIisl),
-	    *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
-	    j, jj, k, kk, p1, p2, pi1, pi2;
-
-	double *LIx = REAL(GET_SLOT(x, Matrix_LIxSym)),
-	    one = 1., zero = 0.;
-
-	memset(LIx, 0, sizeof(double) * LIp[nzc]);
-				/* calculate inverse */
-	for (i = 0; i < nzc; i++) {
-	    p1 = Lp[i]; p2 = Lp[i+1]; pi1 = LIp[i]; pi2 = LIp[i+1];
-				/* initialize from unit diagonal term */
-	    kk = pi1;
-	    for (j = p1; j < p2; j++) {
-		k = Li[j];
-		while (LIi[kk] < k && kk < pi2) kk++;
-		if (LIi[kk] != k) error("logic error in ldl_inverse");
-		LIx[kk] = -Lx[j];
-	    }
-	    for (j = pi1; j < pi2; j++) {
-		jj = LIi[j];
-		p1 = Lp[jj]; p2 = Lp[jj+1];
-		kk = j;
-		for (jj = p1; jj < p2; jj++) {
-		    k = Li[jj];
-		    while (LIi[kk] < k && kk < pi2) kk++;
-		    if (LIi[kk] != k) error("logic error in ldl_inverse");
-		    LIx[kk] -= Lx[jj]*LIx[j];
-		}
-	    }
-	}
-	for (i = 0; i < nf; i++) { /* accumulate bVar */
-	    int G1 = Gp[i], G2 = Gp[i+1], j, k, kk,
-		nci = nc[i], nr, nr1, rr;
-	    double *bVi = REAL(VECTOR_ELT(bVar, i)), *tmp;
-
-	    nr = -1;
-	    for (j = G1; j < G2; j += nci) {
-		rr = 1 + LIp[j + 1] - LIp[j];
-		if (rr > nr) nr = rr;
-	    }
-	    tmp = Calloc(nr * nci, double); /* scratch storage */
-	    nr1 = nr + 1;
-				/* initialize bVi to zero */
-	    memset(bVi, 0, sizeof(double) * (G2 - G1) * nci);
-	    for (j = G1; j < G2; j += nci) {
-		memset(tmp, 0, sizeof(double) * nr * nci);
-		rr = 1 + LIp[j + 1] - LIp[j];
-		for (k = 0; k < nci; k++) { /* copy columns */
-		    tmp[k * nr1] = 1.; /* (unstored) diagonal elt  */
-		    Memcpy(tmp + k*nr1 + 1, LIx + LIp[j + k], rr - k - 1);
-		}
-				/* scale the rows */
-		tmp[0] = DIsqrt[j]; /* first row only has one non-zero */
-		for (kk = 1; kk < rr; kk++) {
-		    for (k = 0; k < nci; k++) {
-			tmp[k * nr + kk] *= DIsqrt[LIi[LIp[j] + kk - 1]];
-		    }
-		}
-		F77_CALL(dsyrk)("L", "T", &nci, &rr, &one, tmp, &nr,
-				&zero, bVi + (j - G1) * nci, &nci);
-		F77_CALL(dpotrf)("L", &nci, bVi + (j - G1) * nci,
-				 &nci, &kk);
-		if (kk)		/* should never happen */
-		    error(
-			"Rank deficient variance matrix at group %d, level %d",
-			i + 1, j + 1);
-	    }
-	    Free(tmp);
-	}
-	return R_NilValue;
-    }
-    if (length(LIisl)) error("logic error in ssclme_ldl_inverse");
-    else {		    /* LIi and LIx are too big and not used */
-	int info, maxod;
-	int *Parent = INTEGER(GET_SLOT(x, Matrix_ParentSym));
-	int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym));
-	double one = 1.0, zero = 0.;
-			
-	maxod = -1;	    /* determine maximum # of off-diagonals */
-	for (i = 0; i < nzc; i++) { /* in a column of L^{-1} */
-	    int ci = LIp[i+1] - LIp[i];
-	    if (ci > maxod) maxod = ci;
-	}
-/* FIXME: Don't bother storing LIp, store maxod only */
+    } else {
+	int *Lp = INTEGER(GET_SLOT(x, Matrix_LpSym)),
+	    *Li = INTEGER(GET_SLOT(x, Matrix_LiSym));
+	    
+	double one = 1.0, zero = 0.,
+	    *Lx = REAL(GET_SLOT(x, Matrix_LxSym));
 	
 	for (i = 0; i < nf; i++) {
 	    int j, jj, k, kk, nci = nc[i], nr, p, p2, pj, pp,
 		m = maxod + 1,
-		*ind = Calloc(m, int);
+		*ind = Calloc(m, int), G1 = Gp[i], G2 = Gp[i+1];
 	    double
 		*tmp = Calloc(m * nci, double),
-		*mpt = REAL(VECTOR_ELT(bVar, i));
+		*bVi = REAL(VECTOR_ELT(bVar, i));
 	    
-	    for (j = Gp[i]; j < Gp[i+1]; j += nci) {
+				/* initialize bVi to zero */
+	    memset(bVi, 0, sizeof(double) * (G2 - G1) * nci);
+
+	    for (j = G1; j < G2; j += nci) {
 		kk = 0;		/* ind gets indices of non-zeros */
 		jj = j;		/* in this block of columns */
 		while (jj >= 0) {
@@ -706,13 +604,13 @@ SEXP ldl_inverse(SEXP x)
 		    }
 		}
 		F77_CALL(dsyrk)("L", "T", &nci, &nr, &one, tmp, &nr,
-				&zero, mpt + (j - Gp[i])*nci, &nci);
-		F77_CALL(dpotrf)("L", &nci, mpt + (j - Gp[i])*nci,
-				 &nci, &info);
-		if (info)	/* should never happen */
+				&zero, bVi + (j - G1)*nci, &nci);
+		F77_CALL(dpotrf)("L", &nci, bVi + (j - G1)*nci,
+				 &nci, &jj);
+		if (jj)		/* should never happen */
 		    error(
-			"Rank deficient variance matrix at group %d, level %d",
-			i + 1, j + 1);
+			"Rank deficient variance matrix at group %d, level %d, error code %d",
+			i + 1, j + 1, jj);
 	    }
 	    Free(tmp); Free(ind);
 	}
@@ -1343,15 +1241,13 @@ SEXP ssclme_collapse(SEXP x)
 	Dim = GET_SLOT(x, Matrix_DimSym);
     int i, nf = length(Omega), nz = INTEGER(Dim)[1];
     SEXP copy[] = {Matrix_DSym, Matrix_DIsqrtSym, Matrix_DimSym,
-		   Matrix_GpSym, Matrix_LIiSym, Matrix_LIpSym,
-		   Matrix_LIxSym, Matrix_LiSym, Matrix_LpSym,
+		   Matrix_GpSym, Matrix_LiSym, Matrix_LpSym,
 		   Matrix_LxSym, Matrix_OmegaSym, Matrix_ParentSym,
-		   Matrix_LIxSym, Matrix_LiSym, Matrix_LpSym,
 		   Matrix_bVarSym, Matrix_devianceSym,
 		   Matrix_devCompSym, Matrix_iSym, Matrix_ncSym,
 		   Matrix_statusSym, Matrix_pSym, Matrix_xSym};
 
-    for (i = 0; i < 23; i++)
+    for (i = 0; i < 17; i++)
 	SET_SLOT(ans, copy[i], duplicate(GET_SLOT(x, copy[i])));
 
     INTEGER(GET_SLOT(ans, Matrix_ncSym))[nf] = 1;
