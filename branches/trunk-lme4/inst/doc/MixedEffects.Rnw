@@ -227,7 +227,7 @@ unity, they are not explicitly stored.
 The conditional estimates of $\bbeta$ satisfy
 \begin{equation}
   \label{eq:betaHat}
-  \bD^{1/2}\bL\trans\widehat{\bbeta}(\btheta)=\rXy
+  \RXX\widehat{\bbeta}(\btheta)=\rXy
 \end{equation}
 and the conditional modes of the random effects satisfy
 \begin{equation}
@@ -547,35 +547,6 @@ print(image(as(fm1@rep, "tscMatrix"),ylim=c(166.5,147.5),
     Rows and columns are numbered from zero.}
   \label{fig:Lnonzero}
 \end{figure}
-
-When the grouping factors are not in a strictly nested sequence, the
-number of nonzeros in $\bL^{-1}$ can be much greater than the number
-of nonzeros in $\bL$.  The positions of the nonzeros in the last 19
-rows of $\bL^{-1}$ (again, the first 148 rows are an identity matrix
-augmented with 19 columns of zeros) are shown in
-Figure~\ref{fig:LInonz}.
-\begin{figure}[tbp]
-  \centering
-\setkeys{Gin}{width=\textwidth}
-<<FigLInonz,fig=TRUE,echo=FALSE,height=2.5,width=8>>=
-fmr = fm1@rep
-LI = as(new("tscMatrix", i = fmr@LIi, p = fmr@LIp, Dim=fmr@Dim,
-         x = fmr@LIx, uplo = "L", diag = "U"), "tripletMatrix")
-print(image(LI, ylim=c(166.5,147.5), xlim=c(-0.5,166.5),
-            colorkey=FALSE,aspect='xy'))
-@   
-  \caption{Location of non-zero elements in the last 19 rows of the unit
-    lower triangular matrix $\bL^{-1}$ for model \var{fm1} fit to the
-    \var{ScotsSec} data. Darker squares indicate larger magnitudes.
-    Rows and columns are numbered from zero. The levels of the
-    grouping factors have been rearranged according to a fill-reducing
-    permutation.}
-  \label{fig:LInonz}
-\end{figure}
-There are 1544 nonzero off-diagonal elements in $\bL^{-1}$ for this
-example.  However, even this count is less than the number of cells
-required in MLwiN (2812, according to \citet{MLwiN:2002}) to
-store the off-diagonal part of $\bZ\trans\bZ$.
 
 
 \subsection{Results on examples}
@@ -1328,3 +1299,33 @@ be expressed as
 where $\deri$ and $\derj$
 represent differentiation with respect to elements $i$ and $j$ of
 $\btheta$, respectively.
+
+When the grouping factors are not in a strictly nested sequence, the
+number of nonzeros in $\bL^{-1}$ can be much greater than the number
+of nonzeros in $\bL$.  The positions of the nonzeros in the last 19
+rows of $\bL^{-1}$ (again, the first 148 rows are an identity matrix
+augmented with 19 columns of zeros) are shown in
+Figure~\ref{fig:LInonz}.
+\begin{figure}[tbp]
+  \centering
+\setkeys{Gin}{width=\textwidth}
+<<FigLInonz,fig=TRUE,echo=FALSE,height=2.5,width=8>>=
+fmr = fm1@rep
+#LI = as(new("tscMatrix", i = fmr@LIi, p = fmr@LIp, Dim=fmr@Dim,
+#         x = fmr@LIx, uplo = "L", diag = "U"), "tripletMatrix")
+#print(image(LI, ylim=c(166.5,147.5), xlim=c(-0.5,166.5),
+#            colorkey=FALSE,aspect='xy'))
+@   
+  \caption{Location of non-zero elements in the last 19 rows of the unit
+    lower triangular matrix $\bL^{-1}$ for model \var{fm1} fit to the
+    \var{ScotsSec} data. Darker squares indicate larger magnitudes.
+    Rows and columns are numbered from zero. The levels of the
+    grouping factors have been rearranged according to a fill-reducing
+    permutation.}
+  \label{fig:LInonz}
+\end{figure}
+There are 1544 nonzero off-diagonal elements in $\bL^{-1}$ for this
+example.  However, even this count is less than the number of cells
+required in MLwiN (2812, according to \citet{MLwiN:2002}) to
+store the off-diagonal part of $\bZ\trans\bZ$.
+
