@@ -44,7 +44,7 @@ export(
        "gsummary",
        "lmList",
        "lme",
-       "lme1",
+       #"lme1",
        "lmeControl",
        "pooledSD",
        "ranef"
