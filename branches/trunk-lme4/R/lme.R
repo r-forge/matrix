@@ -55,7 +55,7 @@ lmeControl =                            # Control parameters for lme
            nlmStepMax = NULL,
            natural = TRUE, optimizer="nlm", EMverbose=FALSE,
            analyticGradient = TRUE,
-           analyticHessian=FALSE, maxLIsize = as.integer(2e5))
+           analyticHessian=FALSE)
 {
     if (missing(msScale)) msScale = function(start) {
         scale <- abs(start)
@@ -79,8 +79,7 @@ lmeControl =                            # Control parameters for lme
          minAbsParApVar = minAbsParApVar, natural = natural,
          optimizer=optimizer, EMverbose=EMverbose,
          analyticHessian=analyticHessian,
-         analyticGradient=analyticGradient,
-         maxLIsize = maxLIsize)
+         analyticGradient=analyticGradient)
 }
 
 setMethod("lme", signature(formula = "missing"),
@@ -170,7 +169,7 @@ setMethod("lme", signature(formula = "formula",
                      list(.Xy = cbind(model.matrix(formula, data = data),
                           .response = model.response(data))))
           obj = .Call("ssclme_create", facs, sapply(mmats, ncol),
-                       as.integer(controlvals$maxLIsize), PACKAGE = "Matrix")
+                       PACKAGE = "Matrix")
           facs = facshuffle(obj, facs)
           obj = obj[[1]]
           .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
