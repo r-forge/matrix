@@ -1,11 +1,12 @@
-\name{Bang}
-\alias{Bang}
+\name{Contraception}
+\alias{Contraception}
 \docType{data}
-\title{Bangladesh fertility survey}
+\title{Contraceptive use in Bangladesh}
 \description{
-  These data come from the 1988 Bangladesh Fertility Survey.
+  These data on the use of contraception by women in urban and rural
+  areas come from the 1988 Bangladesh Fertility Survey.
 }
-\usage{data(Bang)}
+\usage{data(Contraception)}
 \format{
   A data frame with 1934 observations on the following 6 variables.
   \describe{
@@ -30,20 +31,18 @@
     Statistical Society, Series A} (159): 289-299.
 }
 \examples{
-data(Bang)
-str(Bang)
-summary(Bang)
-system.time(fm1 <- GLMM(use ~ urban+age+livch,
-   family = binomial, data = Bang, random = ~ 1|district))
+data(Contraception)
+str(Contraception)
+summary(Contraception)
+fm1 <- GLMM(use ~ urban+age+livch, family = binomial,
+            data = Contraception, random = ~ 1|district)
 summary(fm1)
-system.time(fm2 <- GLMM(use ~ urban+age+livch,
-   family = binomial, data = Bang, random = ~ 1|district, method = "Laplace"))
+fm2 <- GLMM(use ~ urban+age+livch, family = binomial,
+            data = Contraception, random = ~ 1|district,
+            method = "Laplace")
 summary(fm2)
-\dontrun{
-system.time(fm2 <- GLMM(use ~ urban+age+livch,
-   family = binomial, data = Bang, random = ~ urban|district,
-   niter = 50, verbose = TRUE))
-summary(fm2)
-}
+fm3 <- GLMM(use ~ urban+age+livch, family = binomial,
+            data = Contraception, random = ~ urban|district)
+summary(fm3)
 }
 \keyword{datasets}
