@@ -1,5 +1,5 @@
 #include "Mutils.h"
-#include "umfpack/umfpack.h"
+#include "triplet_to_col.h"
 #include <R_ext/Lapack.h>
 
 SEXP
@@ -263,29 +263,6 @@ SEXP csc_check_column_sorting(SEXP m)
     return m;
 }
 
-void triplet_to_col(int nrow, int ncol, int nz,
-		    const int Ti [], const int Tj [], const double Tx [],
-		    int Ap [], int Ai [], double Ax [])
-{
-    int status = umfpack_di_triplet_to_col(nrow, ncol, nz, Ti, Tj, Tx,
-					   Ap, Ai, Ax, (int *) NULL);
-    if (status != UMFPACK_OK) {
-	char *emsg = "umfpack_di_triplet_to_col reported %s error";
-	switch (status) {
-	case UMFPACK_ERROR_argument_missing:
-	    error(emsg, "argument missing");
-	case UMFPACK_ERROR_n_nonpositive:
-	    error(emsg, "non-positive dimension");
-	case UMFPACK_ERROR_invalid_matrix:
-	    error(emsg,"invalid matrix");
-	case UMFPACK_ERROR_out_of_memory:
-	    error(emsg, "out of memory");
-	default:
-	    error(emsg, "unknown");
-	};
-    }
-}
-    
 SEXP triple_as_SEXP(int nrow, int ncol, int nz,
 		    const int Ti [], const int Tj [], const double Tx [],
 		    char *Rclass)
