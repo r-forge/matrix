@@ -8,9 +8,7 @@ void ssc_metis_order(int n, const int Tp [], const int Ti [],
 	*perm = Calloc(n, idxtype), /* in case idxtype != int */
 	*iperm = Calloc(n, idxtype),
 	*xadj = Calloc(n+1, idxtype),
-	*adj = Calloc(2 * (Tp[n] - n), idxtype),
-	*perm = Calloc(n, idxtype), /* in case idxtype != int */
-	*iperm = Calloc(n, idxtype);
+	*adj = Calloc(2 * (Tp[n] - n), idxtype);
 
 				/* temporarily use perm to store lengths */
     memset(perm, 0, sizeof(idxtype) * n);
@@ -42,8 +40,8 @@ void ssc_metis_order(int n, const int Tp [], const int Ti [],
     }
     METIS_NodeND(&n, xadj, adj, &num_flag, &options_flag, perm, iperm);
     for (j = 0; j < n; j++) {
-	Perm[i] = (int) perm[i];
-	iPerm[i] = (int) iperm[i];
+	Perm[j] = (int) perm[j];
+	iPerm[j] = (int) iperm[j];
     }
     Free(iperm); Free(perm); Free(xadj); Free(adj);
 }
