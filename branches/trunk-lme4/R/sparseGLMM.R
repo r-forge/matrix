@@ -151,6 +151,7 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
 
           ## initial 'fitted' values on linear scale
           eta <- drop(mmats.unadjusted$.Xy %*% coefFixed)
+          etaold <- eta + 1
 
 
           for (iter in seq(length = niter))
@@ -195,6 +196,20 @@ plot(z, mmats$.Xy[, responseIndex])
               LMEoptimize(obj) = controlvals
               eta[] <- .Call("ssclme_fitted", obj, facs, mmats.unadjusted, PACKAGE = "Matrix")
 
+print(sqrt(max((eta - etaold)^2)) /
+                  (0.1 + sqrt(max(eta^2))))
+
+              ## use this to determine convergence
+              if (sqrt(max((eta - etaold)^2)) /
+                  (0.1 + sqrt(max(eta^2))) <
+                  controlvals$tolerance) {
+                  conv <- TRUE
+                  break
+              }
+              etaold[] <- eta
+
+
+
 
 
               if (debug)
@@ -219,14 +234,6 @@ plot(z, mmats$.Xy[, responseIndex])
                   firstIter <- FALSE
               }
 
-              ## use this to determine convergence
-              dev <- deviance(obj, REML = controlvals$REML)
-              print(dev)
-              if (abs(dev - devold)/(0.1 + abs(dev)) < controlvals$tolerance) {
-                  conv <- TRUE
-                  break
-              }
-              devold <- dev
           }
           if (!conv) warning("IRLS iterations for glmm did not converge")
 
