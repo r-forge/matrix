@@ -250,7 +250,7 @@ deviance, is
   \end{aligned}
 \end{equation}
 \begin{equation}
-  \label{eq:ProfiledLogRestLik}
+`  \label{eq:ProfiledLogRestLik}
   \begin{aligned}
     \widehat{\btheta_R}&=\arg\min_{\btheta} -2\tilde{\ell_R}(\btheta)\\
     &=\arg\min_{\btheta}\left\{\log\left(\frac{\left|\bD\right|\left|\RXX\right|^2}
@@ -537,8 +537,8 @@ identity matrix augmented with 19 columns of zeros)
 \begin{figure}[tbp]
   \centering
 \setkeys{Gin}{width=\textwidth}
-<<FigLnonzero,fig=TRUE,echo=FALSE,height=2.5,width=8>>=
-print(image(as(fm1@rep, "tscMatrix"),ylim=c(166.5,147.5),
+<<Figlnonzero,Fig=True,Echo=False,Height=2.5,Width=8>>=
+Print(Image(As(fm1@rep, "tscMatrix"),ylim=c(166.5,147.5),
             xlim=c(-0.5,166.5),colorkey=FALSE,aspect='xy'))
 @   
   \caption{Location of non-zero elements in the last 19 rows of the
@@ -547,7 +547,6 @@ print(image(as(fm1@rep, "tscMatrix"),ylim=c(166.5,147.5),
     Rows and columns are numbered from zero.}
   \label{fig:Lnonzero}
 \end{figure}
-
 
 \subsection{Results on examples}
 \label{sec:Examples}
