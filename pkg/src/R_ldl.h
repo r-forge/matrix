@@ -13,6 +13,7 @@
  */
 
 #include <R_ext/RS.h>
+#include <R_ext/Memory.h>
 
 extern void R_ldl_symbolic(int n, const int Ap[], const int Ai[],
 			   int Lp[], int Parent[], const int P[],
