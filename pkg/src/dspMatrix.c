@@ -136,9 +136,8 @@ SEXP dspMatrix_matrix_mm(SEXP a, SEXP b, SEXP classedP)
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
 	bdimP = (classed ? GET_SLOT(b, Matrix_DimSym) :
 		 getAttrib(b, R_DimSymbol));
-    int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
-	*bdims = INTEGER(bdimP);
-    int i, ione = 1, n = bdims[0], nrhs = bdims[1], info;
+    int *bdims = INTEGER(bdimP);
+    int i, ione = 1, n = bdims[0], nrhs = bdims[1];
     int sz = n * nrhs;
     char *uplo = CHAR(STRING_ELT(GET_SLOT(a, Matrix_uploSym), 0));
     double *ax = REAL(GET_SLOT(a, Matrix_xSym)), one = 1., zero = 0.,
@@ -149,7 +148,7 @@ SEXP dspMatrix_matrix_mm(SEXP a, SEXP b, SEXP classedP)
 	error(_("Matrices are not conformable for multiplication"));
     if (nrhs < 1 || n < 1)
 	error(_("Matrices with zero extents cannot be multiplied"));
-    
+
     SET_SLOT(val, Matrix_DimSym, duplicate(bdimP));
     for (i = 0; i < nrhs; i++)
 	F77_CALL(dspmv)(uplo, &n, &one, ax, bx + i * n, &ione,

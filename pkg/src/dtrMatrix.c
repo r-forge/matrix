@@ -82,13 +82,13 @@ SEXP dtrMatrix_solve(SEXP a)
 }
 
 SEXP dtrMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
-{ 
+{
     int cl = asLogical(classed);
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(cl ? GET_SLOT(b, Matrix_DimSym) :
 			 getAttrib(b, R_DimSymbol));
-    int info, n = bdims[0], nrhs = bdims[1];
+    int n = bdims[0], nrhs = bdims[1];
     int sz = n * nrhs;
     double one = 1.0;
 
