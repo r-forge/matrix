@@ -6,7 +6,7 @@ library(Matrix)
 assert.EQ.mat <- function(M, m, tol = if(show) 0 else 1e-15, show=FALSE) {
     ## temporary fix for R-2.0.1
     MM <- as(M, "matrix")
-    attr(MM, "dimnames") <- NULL
+    attr(MM, "dimnames") <- attr(m, "dimnames") <- NULL
     if(show) all.equal(MM, m, tol = tol)
     else stopifnot(all.equal(MM, m, tol = tol))
 }

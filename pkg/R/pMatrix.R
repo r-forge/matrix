@@ -3,21 +3,27 @@
 setAs("integer", "pMatrix",
       function(from) {
           n <- length(from)
-          new("pMatrix", Dim = rep.int(n, 2), perm = from)
+          nn <- names(from)
+          new("pMatrix", Dim = rep.int(n, 2), Dimnames = list(nn,nn),
+              perm = from)
       })
 
 setAs("pMatrix", "matrix",
       function(from) {
-          fp <- from@perm
-          diag(nrow = length(fp))[fp , ]
+	  fp <- from@perm
+	  r <- diag(nrow = length(fp))[fp,]
+	  if(.has.DN(from)) dimnames(r) <- from@Dimnames
+	  r
       })
 
 setMethod("solve", signature(a = "pMatrix", b = "missing"),
           function(a, b) {
               bp <- ap <- a@perm
               bp[ap] <- seq(along = ap)
-              new("pMatrix", Dim = a@Dim, perm = bp)
+              new("pMatrix", perm = bp, Dim = a@Dim,
+                  Dimnames = rev(a@Dimnames))
           }, valueClass = "pMatrix")
+
 
 setMethod("t", signature(x = "pMatrix"), function(x) solve(x))
 
@@ -27,8 +33,17 @@ setMethod("%*%", signature(x = "matrix", y = "pMatrix"),
 setMethod("%*%", signature(x = "pMatrix", y = "matrix"),
 	  function(x, y) y[x@perm ,], valueClass = "matrix")
 
+setMethod("%*%", signature(x = "pMatrix", y = "pMatrix"),
+	  function(x, y) {
+              stopifnot(identical(d <- x@Dim, y@Dim))
+              n <- d[1]
+              ## FIXME: dimnames dealing: as with S3 matrix's  %*%
+              x@perm <- x@perm[y@perm]
+              x
+          })
+
 ## the following methods can be rewritten when "[" methods for
-## dgeMatrix are available  
+## dgeMatrix are available
 
 setMethod("%*%", signature(x = "dgeMatrix", y = "pMatrix"),
 	  function(x, y) as(callGeneric(x, as(y, "matrix")), "dgeMatrix"),

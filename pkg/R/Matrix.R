@@ -11,8 +11,7 @@ setAs(from = "ddenseMatrix", to = "matrix",
 prMatrix <- function(object) {
     d <- dim(object)
     cl <- class(object)
-    cat(paste(d, collapse= " x "), " Matrix of class ", sQuote(cl),
-        "\n", sep='')
+    cat(sprintf('%d x %d Matrix of class "%s"\n', d[1], d[2], cl))
     if(cl == "Matrix") { ## have no data slot
         cat("Dim = ", d)
         if(any(sapply(object@Dimnames,length) > 0)) {

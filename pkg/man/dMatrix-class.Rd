@@ -3,6 +3,7 @@
 \alias{dMatrix-class}
 \alias{show,dMatrix-method}
 \alias{coerce,dMatrix,matrix-method}
+\alias{coerce,dMatrix,dgeMatrix-method}
 % Group methods
 \alias{Arith,dMatrix,dMatrix-method}
 \alias{Arith,dMatrix,numeric-method}
@@ -34,7 +35,7 @@
   }
 }
 \section{Methods}{
-  The are (very simplistic) group methods (see, e.g., \code{\link{Arith}})
+  There are (very simplistic) group methods (see, e.g., \code{\link{Arith}})
   \describe{
     \item{Arith}{\code{signature(e1 = "dMatrix", e2 = "dMatrix")}: ... }
     \item{Arith}{\code{signature(e1 = "dMatrix", e2 = "numeric")}: ... }

@@ -3,6 +3,7 @@
 \alias{pMatrix-class}
 \alias{\%*\%,matrix,pMatrix-method}
 \alias{\%*\%,pMatrix,matrix-method}
+\alias{\%*\%,pMatrix,pMatrix-method}
 \alias{\%*\%,dgeMatrix,pMatrix-method}
 \alias{\%*\%,pMatrix,dgeMatrix-method}
 \alias{coerce,integer,pMatrix-method}
@@ -34,8 +35,8 @@ Class \code{"Matrix"}, directly.
 }
 \section{Methods}{
   \describe{
-    \item{\%*\%}{\code{signature(x = "matrix", y = "pMatrix")}: ... }
-    \item{\%*\%}{\code{signature(x = "pMatrix", y = "matrix")}: ... }
+    \item{\%*\%}{\code{signature(x = "matrix", y = "pMatrix")} and other
+      signatures (use \code{showMethods("\%*\%", class="pMatrix")}): ... }
     \item{coerce}{\code{signature(from = "integer", to = "pMatrix")}: ... }
     \item{coerce}{\code{signature(from = "pMatrix", to = "matrix")}: ... }
     \item{solve}{\code{signature(a = "pMatrix", b = "missing")}: return

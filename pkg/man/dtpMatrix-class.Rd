@@ -3,6 +3,7 @@
 \alias{dtpMatrix-class}
 \alias{\%*\%,dtpMatrix,dgeMatrix-method}
 \alias{\%*\%,dgeMatrix,dtpMatrix-method}
+\alias{\%*\%,dtpMatrix,dtpMatrix-method}
 \alias{\%*\%,dtpMatrix,matrix-method}
 \alias{\%*\%,matrix,dtpMatrix-method}
 \alias{\%*\%,dtpMatrix,numeric-method}
@@ -10,6 +11,7 @@
 \alias{coerce,dtpMatrix,dtrMatrix-method}
 \alias{coerce,dtpMatrix,dgeMatrix-method}
 \alias{coerce,dtpMatrix,matrix-method}
+\alias{coerce,matrix,dtpMatrix-method}
 \alias{determinant,dtpMatrix,missing-method}
 \alias{determinant,dtpMatrix,logical-method}
 \alias{diag,dtpMatrix-method}

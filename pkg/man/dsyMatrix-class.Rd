@@ -68,7 +68,7 @@ Class \code{"Matrix"}, by class \code{"dgeMatrix"}.
     \item{coerce}{\code{signature(from = "dspMatrix", to = "matrix")}}
     \item{coerce}{\code{signature(from = "dsyMatrix", to = "matrix")}}
     \item{coerce}{\code{signature(from = "dsyMatrix", to = "dspMatrix")}}
-    \item{coerce}{\code{signature(from = "dspMatrix", to = "dsyMatrix")}}    
+    \item{coerce}{\code{signature(from = "dspMatrix", to = "dsyMatrix")}}
     \item{norm}{\code{signature(x = "dspMatrix", type = "character")}}
     \item{norm}{\code{signature(x = "dsyMatrix", type = "character")}}
     \item{norm}{\code{signature(x = "dspMatrix", type = "missing")}}
@@ -96,7 +96,11 @@ str(c2)
 
 ## An example where chol() can't work
 (sy3 <- new("dsyMatrix", Dim = as.integer(c(2,2)), x = c(14, -1, 2, -7)))
+
+## gives an error in R <= 2.0.0 :
+\dontrun{
 validObject(as(sy3, "dpoMatrix"), test=TRUE) # >> is not pos.def.
+}
 try(chol(sy3)) ## Error: not pos.def
 }
 \keyword{classes}
