@@ -1,11 +1,11 @@
-\name{sscChol-class}
+\name{dCholCMatrix-class}
 \docType{class}
-\alias{sscChol-class}
+\alias{dCholCMatrix-class}
 \title{Cholesky decompositions of dsCMatrix objects}
 \description{The class of Cholesky decompositions of symmetric, sparse
   column matrices from the \code{"dsCMatrix"} class.}
 \section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("sscChol", ...)}
+Objects can be created by calls of the form \code{new("dCholCMatrix", ...)}
 but are more commonly created from \code{chol} applied to an
 \code{dsCMatrix} object.
 }
@@ -46,7 +46,7 @@ Class \code{"dtCMatrix"}, directly.
 Class \code{"dgCMatrix"}, by class \code{"dtCMatrix"}.
 }
 \section{Methods}{
-No methods defined with class "sscChol" in the signature.
+No methods defined with class "dCholCMatrix" in the signature.
 }
 %\references{}
 %\author{}

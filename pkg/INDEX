@@ -10,17 +10,19 @@ coef<-                  Assign parameters
 corFactor               Extract the correlation factor
 corMatrix               Generate the correlation matrix
 corrmatrix-class        Class "corrmatrix"
-cscBlocked-class        Class "cscBlocked" compressed, sparse, blocked
+dCholCMatrix-class      Cholesky decompositions of dsCMatrix objects
+dgBCMatrix-class        Class "dgBCMatrix" compressed, sparse, blocked
                         Matrix
 dgCMatrix-class         Class "dgCMatrix" compressed, sparse, column
                         Matrix
 dgTMatrix-class         Class "dgTMatrix" sparse matrices in triplet
                         form
 dgeMatrix-class         General S4 Matrix class
+dpoMatrix-class         Positive semi-definite, dense, real matrices
 dsCMatrix-class         Symmetric, compressed, sparse column matrices
-dsyMatrix-class         Class "dsyMatrix" of symmetric matrices
+dsyMatrix-class         Symmetric, dense matrices
 dtCMatrix-class         Triangular, compressed, sparse column matrices
-dtrMatrix-class         Triangular, dense, non-packed, real matrices
+dtrMatrix-class         Triangular, dense, numeric matrices
 expand                  Expand a Decomposition into Factors
 expm                    Matrix exponential
 facmul                  Multiplication by Decomposition Factors
@@ -32,9 +34,7 @@ pdFactor                Square-root factor
 pdMatrix                Return the positive-definite matrix
 pdfactor-class          Factors of positive-definite matrices
 pdmatrix-class          Positive-definite matrices
-poMatrix-class          Positive semi-definite, dense, real matrices
 rcond                   Estimate the Reciprocal Condition Number
-sscChol-class           Cholesky decompositions of dsCMatrix objects
 sscCrosstab             Create pairwise crosstabulation
 sscCrosstab-class       Pairwise crosstabulations
 ssclme-class            lme models as sparse, symmetric matrices

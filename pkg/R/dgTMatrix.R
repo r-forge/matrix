@@ -1,5 +1,5 @@
 setAs("dgTMatrix", "dgCMatrix",
-      function(from) .Call("dgTMatrix_to_csc", from) )
+      function(from) .Call("dgTMatrix_to_dgCMatrix", from) )
 
 setAs("dgTMatrix", "dgeMatrix",
       function(from) .Call("dgTMatrix_to_dgeMatrix", from) )

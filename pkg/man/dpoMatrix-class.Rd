@@ -1,6 +1,7 @@
 \name{dpoMatrix-class}
 \docType{class}
 \alias{dpoMatrix-class}
+\alias{dppMatrix-class}
 \alias{rcond,dpoMatrix,character-method}
 \alias{rcond,dpoMatrix,missing-method}
 \alias{chol,dpoMatrix-method}
@@ -10,9 +11,10 @@
 \alias{solve,dpoMatrix,matrix-method}
 \alias{solve,dpoMatrix,missing-method}
 \alias{solve,dpoMatrix,numeric-method}
-\title{Positive semi-definite, dense, real matrices}
+\title{Positive semi-definite, dense, numeric matrices}
 \description{The \code{"dpoMatrix"} class is the class of
-  positive-semidefinite symmetric matrices in non-packed storage. Only the
+  positive-semidefinite symmetric matrices in nonpacked storage.  The
+  \code{"dppMatrix"} class is the same except in packed storage. Only the
   upper triangle or the lower triangle is required to be available.}
 \section{Objects from the Class}{Objects can be created by calls of the
   form \code{new("dpoMatrix", ...)} or from \code{crossprod} applied to
