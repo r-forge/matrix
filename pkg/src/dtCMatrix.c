@@ -38,7 +38,7 @@ SEXP tsc_to_dgTMatrix(SEXP x)
 {
     SEXP ans;
     if (CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0))[0] != 'U')
-	ans = csc_to_dgTMatrix(x);
+	ans = compressed_to_dgTMatrix(x, ScalarLogical(1));
     else {			/* unit triangular matrix */
 	SEXP islot = GET_SLOT(x, Matrix_iSym),
 	    pslot = GET_SLOT(x, Matrix_pSym);

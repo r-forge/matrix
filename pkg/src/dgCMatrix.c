@@ -190,28 +190,22 @@ SEXP csc_matrix_crossprod(SEXP x, SEXP y)
     return ans;
 }
 
-SEXP csc_to_dgTMatrix(SEXP x)
+SEXP compressed_to_dgTMatrix(SEXP x, SEXP colP)
 {
-    SEXP
-	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgTMatrix"))),
-	dimslot = GET_SLOT(x, Matrix_DimSym),
-	islot = GET_SLOT(x, Matrix_iSym),
-	pslot = GET_SLOT(x, Matrix_pSym);
-    int *dims = INTEGER(dimslot), j, jj,
-	*xp = INTEGER(pslot), *yj;
+    int col = asLogical(colP);
+    SEXP indSym = col ? Matrix_iSym : Matrix_jSym;
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgTMatrix"))),
+	indP = GET_SLOT(x, indSym),
+	pP = GET_SLOT(x, Matrix_pSym);
+    int npt = length(pP);
 
-    SET_SLOT(ans, Matrix_iSym, duplicate(islot));
-    SET_SLOT(ans, Matrix_DimSym, duplicate(dimslot));
+    SET_SLOT(ans, Matrix_DimSym, duplicate(GET_SLOT(x, Matrix_DimSym)));
     SET_SLOT(ans, Matrix_xSym, duplicate(GET_SLOT(x, Matrix_xSym)));
-    SET_SLOT(ans, Matrix_jSym, allocVector(INTSXP, length(islot)));
-    yj = INTEGER(GET_SLOT(ans, Matrix_jSym));
-    jj = 0;
-    for (j = 0; j < dims[1]; j++) {
-	while (jj < xp[j + 1]) {
-	    yj[jj] = j;
-	    jj++;
-	}
-    }
+    SET_SLOT(ans, indSym, duplicate(indP));
+    expand_column_pointers(length(pP) - 1, INTEGER(pP),
+			   INTEGER(ALLOC_SLOT(ans,
+					      col ? Matrix_jSym : Matrix_iSym,
+					      INTSXP, length(indP))));
     UNPROTECT(1);
     return ans;
 }
