@@ -81,4 +81,8 @@ setMethod("solve", signature(a = "dtpMatrix", b="matrix"),
 setMethod("t", signature(x = "dtpMatrix"),
           function(x) as(t(as(x, "dtrMatrix")), "dtpMatrix"),
           valueClass = "dtpMatrix")
+
+setMethod("unpack", signature(x = "dtpMatrix"),
+          function(x, ...) as(x, "dtrMatrix"),
+          valueClass = "dtrMatrix")
 ###
