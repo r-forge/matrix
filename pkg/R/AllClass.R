@@ -1,7 +1,9 @@
-## Ensure that the methods package is available
 .onLoad <- function(lib, pkg) {
-    require("methods", character = TRUE, quietly = TRUE)
+    if(is.null(getOption("max.print")))
+        options(max.print = 10000)#-> show() of large matrices
 }
+
+## ------------- Virtual Classes ----------------------------------------
 
 # Virtual class of all Matrix objects
 setClass("Matrix", representation(Dim = "integer"),
@@ -17,52 +19,51 @@ setClass("Matrix", representation(Dim = "integer"),
 
 # Virtual class of numeric matrices
 setClass("dMatrix",
-         representation(x = "numeric"),
-         contains = "Matrix")
+         representation(x = "numeric"), contains = "Matrix")
 
 # Virtual class of integer matrices
 setClass("iMatrix",
-         representation(x = "integer"),
-         contains = "Matrix")
+         representation(x = "integer"), contains = "Matrix")
 
 # Virtual class of logical matrices
 setClass("lMatrix",
-         representation(x = "logical"),
-         contains = "Matrix")
+         representation(x = "logical"), contains = "Matrix")
 
-# Virtual class of complex matrices
+# Virtual class of complex matricesn
 setClass("zMatrix", # letter 'z' is as in the names of Lapack subroutines
-         representation(x = "complex"),
-         contains = "Matrix")
+         representation(x = "complex"), contains = "Matrix")
 
 # Virtual class of dense, numeric matrices
 setClass("ddenseMatrix",
          representation(rcond = "numeric", factors = "list"),
          contains = "dMatrix")
 
+## ------------------ Proper (non-virtual) Classes ----------------------------
+
+##----------------------  DENSE  -----------------------------------------
+
 # numeric, dense, general matrices
 setClass("dgeMatrix", contains = "ddenseMatrix",
-         validity = function(object) { ## checks the length of x is prod(Dim)
-             .Call("dgeMatrix_validate", object)
-         })
+         ## checks the length of x is prod(Dim):
+         validity = function(object) .Call("dgeMatrix_validate", object)
+         )
+## i.e. "dgeMatrix" cannot be packed, but "ddenseMatrix" can ..
 
 # numeric, dense, non-packed, triangular matrices
 setClass("dtrMatrix",
          representation(uplo = "character", diag = "character"),
          contains = "dgeMatrix",
          prototype = prototype(uplo = "U", diag = "N"),
-         validity = function(object) {
-             .Call("dtrMatrix_validate", object)
-         })
+         validity = function(object) .Call("dtrMatrix_validate", object)
+         )
 
 # numeric, dense, packed, triangular matrices
 setClass("dtpMatrix",
          representation(uplo = "character", diag = "character"),
          contains = "ddenseMatrix",
          prototype = prototype(uplo = "U", diag = "N"),
-         validity = function(object) {
-             .Call("dtpMatrix_validate", object)
-         })
+         validity = function(object) .Call("dtpMatrix_validate", object)
+         )
 
 # numeric, dense, non-packed symmetric matrices
 setClass("dsyMatrix",
@@ -72,11 +73,11 @@ setClass("dsyMatrix",
          validity = function(object) .Call("dsyMatrix_validate", object)
          )
 
-# numeric, dense, non-packed symmetric matrices
+# numeric, dense, packed symmetric matrices
 setClass("dspMatrix",
          representation(uplo = "character"),
          prototype = prototype(uplo = "U"),
-         contains = "dgeMatrix",
+         contains = "ddenseMatrix",
          validity = function(object) .Call("dspMatrix_validate", object)
          )
 
@@ -89,6 +90,8 @@ setClass("dpoMatrix", contains = "dsyMatrix",
 setClass("dppMatrix", contains = "dspMatrix",
          validity = function(object) .Call("dppMatrix_validate", object)
          )
+
+##-------------------- S P A R S E ----------------------------------------
 
 # numeric, sparse, triplet general matrices
 setClass("dgTMatrix",
@@ -154,7 +157,18 @@ setClass("dsRMatrix",
          )
 
 ## Compressed sparse column matrix in blocks
-setClass("dgBCMatrix", representation(p = "integer", i = "integer", x = "array"))
+setClass("dgBCMatrix",
+         representation(p = "integer", i = "integer", x = "array"))
+
+setClass("Cholesky", contains = "dtrMatrix")
+
+setClass("dCholCMatrix",
+         representation(perm = "integer", Parent = "integer", D = "numeric"),
+         contains = "dtCMatrix",
+         validity = function(object) .Call("dCholCMatrix_validate", object))
+
+
+## --------------------- non-"Matrix" Classes --------------------------------
 
 setClass("determinant",
          representation(modulus ="numeric",
@@ -164,23 +178,12 @@ setClass("determinant",
 
 setClass("LU", representation(x = "numeric",
                               pivot = "integer"),
-         validity = function(object)
-                    .Call("LU_validate", object))
-
-setClass("Cholesky", contains = "dtrMatrix")
-
-setClass("dCholCMatrix",
-         representation = representation(perm = "integer", Parent = "integer",
-         D = "numeric"),
-         contains = "dtCMatrix",
-         validity = function(object)
-           .Call("dCholCMatrix_validate", object))
+         validity = function(object) .Call("LU_validate", object))
 
 setClass("sscCrosstab", representation =
          representation(Gp = "integer", perm = "integer"),
          contains = "dsCMatrix",
-         validity = function(object)
-           .Call("sscCrosstab_validate", object))
+         validity = function(object) .Call("sscCrosstab_validate", object))
 
 setClass("ssclme", representation =
          representation(
