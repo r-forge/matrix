@@ -29,3 +29,7 @@
 - man/Matrix.Rd :  has example with dimnames, but we just drop them!
 		MM thinks dimnames should be supported (but then ...)
   -- added 'Dimnames' slot (2005-02-10)
+
+- bCrosstab(): yes, we really do want the diagonal "V:V" crosstabs.
+   -- explained a bit more in man/bCrosstab.Rd
+
