@@ -1,9 +1,9 @@
-setMethod("t", signature(x = "tscMatrix"),
+setMethod("t", signature(x = "dtCMatrix"),
           function(x) .Call("tsc_transpose", x),
-          valueClass = "tscMatrix")
+          valueClass = "dtCMatrix")
 
-setAs("tscMatrix", "dgTMatrix",
+setAs("dtCMatrix", "dgTMatrix",
       function(from) .Call("tsc_to_dgTMatrix", from))
 
-setAs("tscMatrix", "dgeMatrix",
+setAs("dtCMatrix", "dgeMatrix",
       function(from) as(as(from, "dgTMatrix"), "dgeMatrix"))

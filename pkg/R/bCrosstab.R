@@ -28,7 +28,7 @@ bCrosstab <- function(flist, reorder = TRUE) {
             lst[[IND]] <- as(new("dgTMatrix",
                                  i = zb[[i]], j = zb[[j]],
                                  x = ones, Dim = nlev[c(i,j)]),
-                             ifelse(j != i,"dgCMatrix","sscMatrix"))
+                             ifelse(j != i,"dgCMatrix","dsCMatrix"))
             nms[ind(i,j)] <- nmat[i, j]
         }
     }

@@ -71,7 +71,7 @@ setMethod("isSymmetric", signature(object = "dgTMatrix"),
               all(sort(paste(i, j, sep=':')) == sort(paste(j, i, sep=':')))
           })
 
-setAs("dgTMatrix", "sscMatrix",
+setAs("dgTMatrix", "dsCMatrix",
       function(from) {
           i <- from@i
           j <- from@j
@@ -79,6 +79,6 @@ setAs("dgTMatrix", "sscMatrix",
               from@j[upper] <- i[upper]
               from@i[upper] <- j[upper]
           }
-          as(as(from, "dgCMatrix"), "sscMatrix")
+          as(as(from, "dgCMatrix"), "dsCMatrix")
       })
 

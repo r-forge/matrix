@@ -1,11 +1,11 @@
-setAs("ssclme", "sscMatrix",
+setAs("ssclme", "dsCMatrix",
       function(from)
-      new("sscMatrix", i = from@i, p = from@p, Dim = from@Dim, x = from@x,
+      new("dsCMatrix", i = from@i, p = from@p, Dim = from@Dim, x = from@x,
 	  uplo = "U"))
 
-setAs("ssclme", "tscMatrix",
+setAs("ssclme", "dtCMatrix",
       function(from)
-      new("tscMatrix", i = from@Li, p = from@Lp, Dim = from@Dim, x = from@Lx,
+      new("dtCMatrix", i = from@Li, p = from@Lp, Dim = from@Dim, x = from@Lx,
 	  uplo = "L", diag = "U"))
 
 setReplaceMethod("coef", signature(object = "ssclme", value = "numeric"),
