@@ -1002,17 +1002,18 @@ SEXP ssclme_EMsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP verb)
 
     p = pp1 - 1;
     b = RZX + p * n;
-    if (verbose) Rprintf("  EM iterations\n");
-    for (iter = 0; iter <= nEM; iter++) {
+    if (verbose) {
+	SEXP coef = PROTECT(ssclme_coef(x));
+	int lc = length(coef); double *cc = REAL(coef);
+
+	Rprintf("  EM iterations\n");
+	Rprintf("%3d %.3f", 0, dev[REML ? 1 : 0]);
+	for (i = 0; i < lc; i++) Rprintf(" %#8g", cc[i]);
+	Rprintf("\n");
+	UNPROTECT(1);
+    }
+    for (iter = 0; iter < nEM; iter++) {
 	ssclme_invert(x);
-	if (verbose) {
-	    SEXP coef = PROTECT(ssclme_coef(x));
-	    int lc = length(coef); double *cc = REAL(coef);
-	    Rprintf("%3d %.3f", iter, dev[REML ? 1 : 0]);
-	    for (i = 0; i < lc; i++) Rprintf(" %#8g", cc[i]);
-	    Rprintf("\n");
-	    UNPROTECT(1);
-	}
 	for (i = 0; i < nf; i++) {
 	    int ki = Gp[i+1] - Gp[i],
 		nci = nc[i],
@@ -1046,6 +1047,14 @@ SEXP ssclme_EMsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP verb)
 		      info, i + 1);
 	}
 	status[0] = status[1] = 0;
+	if (verbose) {
+	    SEXP coef = PROTECT(ssclme_coef(x));
+	    int lc = length(coef); double *cc = REAL(coef);
+	    Rprintf("%3d %.3f", iter + 1, dev[REML ? 1 : 0]);
+	    for (i = 0; i < lc; i++) Rprintf(" %#8g", cc[i]);
+	    Rprintf("\n");
+	    UNPROTECT(1);
+	}
     }
     ssclme_factor(x);
     return R_NilValue;
