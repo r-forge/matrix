@@ -1,5 +1,6 @@
 #include "LU.h"
 #include "Mutils.h"
+#include "cscBlocked.h"
 #include "cscMatrix.h"
 #include "dense.h"
 #include "factorizations.h"
@@ -54,6 +55,7 @@ static R_CallMethodDef CallEntries[] = {
     {"nlme_replaceSlot", (DL_FUNC) &nlme_replaceSlot, 3},
     {"nlme_weight_matrix_list", (DL_FUNC) &nlme_weight_matrix_list, 4},
     {"LU_expand", (DL_FUNC) &LU_expand, 1},
+    {"cscBlocked_validate", (DL_FUNC) &cscBlocked_validate, 1},
     {"csc_crossprod", (DL_FUNC) &csc_crossprod, 1},
     {"csc_matrix_crossprod", (DL_FUNC) &csc_matrix_crossprod, 2},
     {"csc_validate", (DL_FUNC) &csc_validate, 1},

@@ -6,7 +6,8 @@ PKG_LIBS = ${LAPACK_LIBS} ${BLAS_LIBS}
 SOURCES_C =  \
 	    LU.c \
             Mutils.c \
-	    Metis_utils.c\
+	    Metis_utils.c \
+	    cscBlocked.c \
             cscMatrix.c \
             dense.c \
             factorizations.c \
