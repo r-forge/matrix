@@ -29,30 +29,33 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
 	n = length(pSlot)-1,
 	nnz, piv = asLogical(pivot);
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dCholCMatrix")));
-    int *P = (int *) NULL, *Pinv = (int *) NULL;
+    int *P, *Pinv;
     double *Ax;
 
+    /* FIXME: Check if there is a Cholesky factorization.  If yes,
+       check if the permutation status matches that of the call.  If
+       so, return it. */
+ 
     if (lo) {
 	x = PROTECT(ssc_transpose(x));
 	Ai = INTEGER(GET_SLOT(x, Matrix_iSym));
 	Ap = INTEGER(GET_SLOT(x, Matrix_pSym));
     }
-    SET_SLOT(val, Matrix_uploSym, ScalarString(mkChar("L")));
-    SET_SLOT(val, Matrix_diagSym, ScalarString(mkChar("N")));
+    SET_SLOT(val, Matrix_uploSym, mkString("L"));
+    SET_SLOT(val, Matrix_diagSym, mkString("U"));
     SET_SLOT(val, Matrix_DimSym, duplicate(GET_SLOT(x, Matrix_DimSym)));
     SET_SLOT(val, Matrix_ParentSym, allocVector(INTSXP, n));
     Parent = INTEGER(GET_SLOT(val, Matrix_ParentSym));
     SET_SLOT(val, Matrix_pSym, allocVector(INTSXP, n + 1));
     Lp = INTEGER(GET_SLOT(val, Matrix_pSym));
-    Ax = REAL(GET_SLOT(x, Matrix_xSym));
+    SET_SLOT(val, Matrix_permSym, allocVector(INTSXP, n));
+    P = INTEGER(GET_SLOT(val, Matrix_permSym));
     if (piv) {
 	SEXP trip = PROTECT(dsCMatrix_to_dgTMatrix(x));
 	SEXP Ti = GET_SLOT(trip, Matrix_iSym);
 
 	/* determine the permutation with Metis */
 	Pinv = Calloc(n, int);
-	SET_SLOT(val, Matrix_permSym, allocVector(INTSXP, n));
-	P = INTEGER(GET_SLOT(val, Matrix_permSym));
 	ssc_metis_order(n, Ap, Ai, P, Pinv);
 	/* create a symmetrized form of x */
 	nnz = length(Ti);
@@ -63,23 +66,29 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
 		       INTEGER(GET_SLOT(trip, Matrix_jSym)),
 		       REAL(GET_SLOT(trip, Matrix_xSym)),
 		       Ap, Ai, Ax);
-    } 
-    R_ldl_symbolic(n, Ap, Ai, Lp, Parent, P, Pinv);
+	UNPROTECT(1);
+    } else {
+	int i;
+	for (i = 0; i < n; i++) P[i] = i;
+	Ax = REAL(GET_SLOT(x, Matrix_xSym));
+
+    }
+    R_ldl_symbolic(n, Ap, Ai, Lp, Parent, (piv) ? P : (int *)NULL,
+		   (piv) ? Pinv : (int *)NULL);
     nnz = Lp[n];
     SET_SLOT(val, Matrix_iSym, allocVector(INTSXP, nnz));
     SET_SLOT(val, Matrix_xSym, allocVector(REALSXP, nnz));
     SET_SLOT(val, Matrix_DSym, allocVector(REALSXP, n));    
-    info = R_ldl_numeric(n, Ap, Ai, Ax,
-		       Lp, Parent,
-		       INTEGER(GET_SLOT(val, Matrix_iSym)),
-		       REAL(GET_SLOT(val, Matrix_xSym)),
-		       REAL(GET_SLOT(val, Matrix_DSym)),
-		       P, Pinv);
+    info = R_ldl_numeric(n, Ap, Ai, Ax, Lp, Parent,
+			 INTEGER(GET_SLOT(val, Matrix_iSym)),
+			 REAL(GET_SLOT(val, Matrix_xSym)),
+			 REAL(GET_SLOT(val, Matrix_DSym)),
+			 (piv) ? P : (int *)NULL,
+			 (piv) ? Pinv : (int *)NULL);
     if (info != n)
 	error("Leading minor of size %d (possibly after permutation) is indefinite",
 	      info + 1);
     if (piv) {
-	UNPROTECT(1);
 	Free(Pinv); Free(Ax); Free(Ai); Free(Ap);
     }
     UNPROTECT(lo ? 2 : 1);

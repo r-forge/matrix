@@ -5,6 +5,7 @@
 
 # Virtual class of all Matrix objects
 setClass("Matrix", representation(Dim = "integer"),
+         prototype = prototype(Dim = integer(2)),
          validity = function(object) {
              Dim <- object@Dim
              if (length(Dim) != 2)
