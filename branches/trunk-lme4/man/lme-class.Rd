@@ -16,6 +16,8 @@
 \alias{residuals,lme-method}
 \alias{show,lme-method}
 \alias{show,ssclme-method}
+\alias{show,summary.lme-method}
+\alias{show,summary.ssclme-method}
 \alias{summary,lme-method}
 \alias{summary,ssclme-method}
 \alias{update,lme-method}
@@ -88,7 +90,6 @@
   generic on the \code{"rep"} component of the first argument.  Thus the
   methods actually are applied to an object of the \code{"ssclme"} class.}
 \seealso{
-  \code{\link{lme}}, \code{\link{summary.lme-class}},
-  \code{\link[Matrix]{ssclme-class}}
+  \code{\link{lme}}, \code{\link[Matrix]{ssclme-class}}
 }
 \keyword{classes}

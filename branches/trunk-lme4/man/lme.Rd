@@ -1,13 +1,14 @@
 \name{lme}
 \docType{genericFunction}
 \alias{lme}
+\alias{lme,ANY,ANY,formula-method}
 \alias{lme,ANY,missing,ANY-method}
+\alias{lme,missing,ANY,ANY-method}
 \alias{lme,formula,ANY,formula-method}
 \alias{lme,formula,ANY,list-method}
 \alias{lme,formula,data.frame,list-method}
 \alias{lme,formula,groupedData,list-method}
 \alias{lme,formula,groupedData,missing-method}
-\alias{lme,formula,list,list-method}
 \alias{lme,missing,groupedData,ANY-method}
 \title{Fit linear mixed-effects models}
 \description{
@@ -17,8 +18,7 @@
   and/or have unequal variances. 
 }
 \usage{
-lme(formula, data, random, correlation, weights, subset,
-    method, na.action, control, model, x, \dots)
+lme(formula, data, random, \dots)
 }
 \arguments{
   \item{formula}{a two-sided linear formula object describing the
@@ -38,40 +38,43 @@ lme(formula, data, random, correlation, weights, subset,
    grouping; (ii) a list of one-sided formulas of the form
    \code{~x1+...+xn | g}, with possibly different random effects models
    for each grouping factor; or (iii) a named list of formulas.}
- \item{correlation}{an optional \code{corStruct} object describing the
-   within-group correlation structure. See the documentation of
-   \code{corClasses} for a description of the available \code{corStruct}
-   classes. Defaults to \code{NULL},
-   corresponding to no within-group correlations.}
- \item{weights}{an optional \code{varFunc} object or one-sided formula
-   describing the within-group heteroscedasticity structure. If given as
-   a formula, it is used as the argument to \code{varFixed},
-   corresponding to fixed variance weights. See the documentation on
-   \code{varClasses} for a description of the available \code{varFunc}
-   classes. Defaults to \code{NULL}, corresponding to homocesdatic
-   within-group errors.} 
- \item{subset}{an optional expression indicating the subset of the rows of
-   \code{data} that should be used in the fit. This can be a logical
-   vector, or a numeric vector indicating which observation numbers are
-   to be included, or a  character  vector of the row names to be
-   included.  All observations are included by default.}
- \item{method}{a character string.  If \code{"REML"} the model is fit by
-   maximizing the restricted log-likelihood.  If \code{"ML"} the
-   log-likelihood is maximized.  Defaults to \code{"REML"}.}
- \item{na.action}{a function that indicates what should happen when the
-   data contain \code{NA}s.  The default action (\code{na.fail}) causes
-   \code{lme} to print an error message and terminate if there are any
-   incomplete observations.}
- \item{control}{a list of control values for the estimation algorithm to
-   replace the default values returned by the function \code{lmeControl}.
-   Defaults to an empty list.}
- \item{model, x}{logicals.  If \code{TRUE} the corresponding
-   components of the fit (the model frame, the model matrices)
-   are returned.}
  \item{\dots}{Optional arguments for methods.  Currently none are used.}
 }
 \details{
-  Many of the options are not yet implemented.
+  Additional standard arguments to model-fitting functions can be passed
+  to \code{lme}.
+  \describe{
+    \item{correlation}{an optional \code{corStruct} object describing
+      the within-group correlation structure. See the documentation of
+      \code{corClasses} for a description of the available \code{corStruct}
+      classes. Defaults to \code{NULL}, corresponding to no within-group
+      correlations.} 
+    \item{weights}{an optional \code{varFunc} object or one-sided formula
+      describing the within-group heteroscedasticity structure. If given as
+      a formula, it is used as the argument to \code{varFixed},
+      corresponding to fixed variance weights. See the documentation on
+      \code{varClasses} for a description of the available \code{varFunc}
+      classes. Defaults to \code{NULL}, corresponding to homocesdatic
+      within-group errors.} 
+    \item{subset}{an optional expression indicating the subset of the rows of
+      \code{data} that should be used in the fit. This can be a logical
+      vector, or a numeric vector indicating which observation numbers are
+      to be included, or a  character  vector of the row names to be
+      included.  All observations are included by default.}
+    \item{method}{a character string.  If \code{"REML"} the model is fit by
+      maximizing the restricted log-likelihood.  If \code{"ML"} the
+      log-likelihood is maximized.  Defaults to \code{"REML"}.}
+    \item{na.action}{a function that indicates what should happen when the
+      data contain \code{NA}s.  The default action (\code{na.fail}) causes
+      \code{lme} to print an error message and terminate if there are any
+      incomplete observations.}
+    \item{control}{a list of control values for the estimation algorithm to
+      replace the default values returned by the function \code{lmeControl}.
+      Defaults to an empty list.}
+    \item{model, x}{logicals.  If \code{TRUE} the corresponding
+      components of the fit (the model frame, the model matrices)
+      are returned.}
+  }
 }
 \value{
   An \code{\link{lme-class}{lme}} object.
@@ -79,7 +82,7 @@ lme(formula, data, random, correlation, weights, subset,
 %\references{ ~put references to the literature/web site here ~ }
 %\author{}
 %\note{}
-\seealso{\code{\link{lme-class}}}
+\seealso{\code{\link{lme-class}}, \code{\link[stats]{lm}}}
 \examples{
 data(bdf)
 fm <- lme(langPOST ~ IQ.ver.cen + avg.IQ.ver.cen, data = bdf,

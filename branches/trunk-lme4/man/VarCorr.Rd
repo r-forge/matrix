@@ -19,7 +19,7 @@
   an object of class \code{VarCorr}.
 }
 %\author{Saikat DebRoy \email{saikat@stat.wisc.edu} and Douglas Bates \email{bates@stat.wisc.edu}}
-\seealso{\code{\link{lme}}, \code{\link{sparseGLMM}}, \code{\link{VarCorr-class}}}
+\seealso{\code{\link{lme}}, \code{\link{GLMM}}, \code{\link{VarCorr-class}}}
 \examples{
 data(bdf)
 fm <- lme(langPOST ~ IQ.ver.cen + avg.IQ.ver.cen, data = bdf,

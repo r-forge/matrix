@@ -18,7 +18,7 @@ facshuffle = function(sslm, facs)       # unexported utility
     ff
 }
 
-make.mf.call = function(mf, frm, random)
+make.mf.call = function(mf, frm, random) #unexported utility
 {
     m <- match(c("formula", "data", "subset", "weights", "na.action",
                  "offset"), names(mf), 0)
@@ -44,8 +44,7 @@ make.mf.call = function(mf, frm, random)
     mf
 }
 
-lmeControl <-
-  ## Control parameters for lme
+lmeControl =                            # Control parameters for lme
   function(maxIter = 50, msMaxIter = 50, tolerance =
            sqrt((.Machine$double.eps)), niterEM = 25,
            msTol = sqrt(.Machine$double.eps), msScale, msVerbose = FALSE,
@@ -83,18 +82,16 @@ lmeControl <-
 }
 
 setMethod("lme", signature(data = "missing"),
-          function(formula, data, random, correlation, weights, subset,
-                   method, na.action, control, model, x)
+          function(formula, data, random, ...)
       {
           nCall = mCall = match.call()
-          nCall$data = list()
+          nCall$data = data.frame()
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
                 mCall, PACKAGE = "lme4")
       })
 
-setMethod("lme", signature(formula = "missing", data = "groupedData"),
-          function(formula, data, random, correlation, weights, subset,
-                   method, na.action, control, model, x)
+setMethod("lme", signature(formula = "missing"),
+          function(formula, data, random, ...)
       {
           nCall = mCall = match.call()
           resp = getResponseFormula(data)[[2]]
@@ -106,8 +103,7 @@ setMethod("lme", signature(formula = "missing", data = "groupedData"),
 
 setMethod("lme", signature(formula = "formula", data = "groupedData",
                            random = "missing"),
-          function(formula, data, random, correlation, weights, subset,
-                   method, na.action, control, model, x)
+          function(formula, data, random, ...)
       {
           nCall = mCall = match.call()
           cov = formula[[3]]
@@ -117,57 +113,39 @@ setMethod("lme", signature(formula = "formula", data = "groupedData",
                 mCall, PACKAGE = "lme4")
       })
 
-setMethod("lme", signature(formula = "formula", random = "formula"),
-          function(formula, data, random, correlation, weights, subset,
-                   method, na.action, control, model, x)
+setMethod("lme", signature(random = "formula"),
+          function(formula, data, random, ...)
       {
           nCall = mCall = match.call()
           cov = getCovariateFormula(random)
           nCall$random <- lapply(getGroupsFormula(random, asList = TRUE),
                                  function(f) cov)
-          nCall$data <- as.list(as(data, "data.frame"))
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
                 mCall, PACKAGE = "lme4")
       })
 
 setMethod("lme", signature(formula = "formula", data = "groupedData",
                            random = "list"),
-          function(formula, data, random, correlation, weights, subset,
-                   method, na.action, control, model, x)
+          function(formula, data, random, ...)
       {
           nCall = mCall = match.call()
-          nCall$data <- as(data, "data.frame")
+          nCall$data <- data@data
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
                 mCall, PACKAGE = "lme4")
       })
           
 setMethod("lme", signature(formula = "formula", data = "data.frame",
                            random = "list"),
-          function(formula, data, random, correlation, weights, subset,
-                   method, na.action, control, model, x)
+          function(formula, data, random,
+                   method = c("REML", "ML"),
+                   control = list(),
+                   subset, weights, na.action, offset,
+                   model = TRUE, x = FALSE, ...)
       {
-          nCall = mCall = match.call()
-          nCall$data <- as.list(data)
-          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
-                mCall, PACKAGE = "lme4")
-      })
-
-setMethod("lme", signature(formula = "formula", data = "list",
-                           random = "list"),
-          function(formula, data, random, correlation, weights, subset,
-                   method, na.action, control, model, x)
-      {
-          
-          if (missing(model))
-              model = TRUE
-          if (missing(x))
-              x = FALSE
+          method = match.arg(method)
           random = lapply(as(random, "list"),
                    get("formula", pos = parent.frame(), mode = "function"))
-          method = if (missing(method)) "REML" else
-                   match.arg(method, c("REML", "ML"))
-          controlvals <- if (missing(control)) lmeControl() else
-                            do.call("lmeControl", control)
+          controlvals = do.call("lmeControl", control)
           controlvals$REML = method == "REML"
           data <- eval(make.mf.call(match.call(expand.dots = FALSE),
                                     formula, random), parent.frame())

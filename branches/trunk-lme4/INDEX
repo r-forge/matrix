@@ -6,6 +6,7 @@ Cefamandole             Pharmacokinetics of Cefamandole
 Dialyzer                High-Flux Hemodialyzer
 Earthquake              Earthquake Intensity
 Fatigue                 Cracks caused by metal fatigue
+GLMM                    Fit Generalized Linear Mixed Models via PQL
 Gasoline                Refinery yield of gasoline
 Glucose                 Glucose levels over time
 Glucose2                Glucose Levels Following Alcohol Ingestion
@@ -69,5 +70,3 @@ s3bbx                   Covariates in the Rodriguez and Goldman
                         simulation
 s3bby                   Responses simulated by Rodriguez and Goldman
 solve-methods           Methods for Function solve
-sparseGLMM              Fit Generalized Linear Mixed Models via PQL
-summary.lme-class       Class "summary.lme"

@@ -55,18 +55,14 @@ export(
        "lme",
        "lmeControl",
        "pooledSD",
-       "ranef",
-       "sparseGLMM"
+       "ranef"
        )
 
 exportClasses(
               "VarCorr",
               "groupedData",
               "lmList",
-              "lme",
-#              "summary.pdMat",
-              "summary.lme"
-#             ,"summary.ssclme"
+              "lme"
               )
 
 exportMethods(
