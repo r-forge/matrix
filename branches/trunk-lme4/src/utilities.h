@@ -2,6 +2,6 @@
 #define NLME_UTILITIES_H
 #include <Rdefines.h>
 
-SEXP nlme_replaceSlot(SEXP obj, const SEXPREC* names, const SEXPREC* value);
+SEXP nlme_replaceSlot(SEXP obj, SEXP names, SEXP value);
 
 #endif
