@@ -48,8 +48,8 @@ setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
                   warning("not using incompatible 'Dimnames' in arithmetical result")
               }
               ##
-              new("dgeMatrix", Dim = d, Dimnames = dn0,
-                  x = callGeneric(e1@x, e2@x)
+              new("dgeMatrix", Dim = d, Dimnames = dn,
+                  x = callGeneric(e1@x, e2@x))
           })
 
 
