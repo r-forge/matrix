@@ -1,7 +1,7 @@
 
 
 
-testfun <- function() # test function
+testfun <- function(...) # test function
 {
     ## simulation: 300 obs, 30 students, 10 obs per student, one covariate
 
@@ -18,7 +18,7 @@ testfun <- function() # test function
     fm.bin <-
         sparseGLMM(resp ~ x, data = dat, family = binomial(),
                    random = list(id = ~1),
-                   control = lmeControl(EMverbose = F))
+                   control = lmeControl(EMverbose = F), ...)
 
 
     return (fm.bin)
@@ -60,7 +60,7 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
       {
 
           ##print("got here")
-          
+
           if (missing(model))
               model = TRUE
           if (missing(x))
@@ -74,6 +74,8 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
           controlvals <- if (missing(control)) lmeControl() else
                             do.call("lmeControl", control)
           mCall <- match.call(expand.dots = FALSE)
+          controlvals$REML <- method == "REML"
+
 
 
           mCall[[1]] <- as.name("model.frame")
@@ -103,7 +105,6 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
                          function(x) eval(as.name(x), envir = data))
           names(facs) <- names(random)
 
-
           ## creates model matrices
           mmats.unadjusted <-
               c(lapply(random,
@@ -119,6 +120,7 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
                        as.integer(2e5), PACKAGE = "Matrix")
           facs = facshuffle(obj, facs)
           obj = obj[[1]]
+          .Call("ssclme_initial", obj, PACKAGE="Matrix")
 
 
 
@@ -127,64 +129,73 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
           fm.glm <- glm(formula, family, data)
           coefFixed <- c(coef(fm.glm), 0)
           ## what happens for more than one random effect ?
-          coefRanef <- rep(0, nlevels(facs[[1]]))
-
-
-
-
-
-#          print(str(mmats.unadjusted))
-
-
+          coefRanef <-
+              lapply(facs,
+                     function(x) numeric(nlevels(x)))
 
 
 
           mmats <- mmats.unadjusted
           niter <- 20
+          conv <- FALSE
+          firstIter <- TRUE
 
           for (iter in seq(length = niter))
           {
+              if (conv) break
               eta <- mmats.unadjusted$.Xy %*% coefFixed
               for (facname in names(facs))
               {
-                  ## FIXME: coefRanef depends on facname
                   eta <- eta + mmats.unadjusted[[facname]] * 
-                      coefRanef[facs[[facname]]]
+                      coefRanef[[facname]][facs[[facname]]]
               }
               mu <- family$linkinv(eta)
               deta.dmu <- 1 / family$mu.eta(eta)
 
               ## adjusted response
               z <- eta + (mmats.unadjusted$.Xy[, responseIndex] - mu) * deta.dmu
-              ## weights (needs sqrt ?)
-              w <- 1 / (deta.dmu^2 * family$variance(mu))
+              ## weights (needs sqrt ? Yes!)
+              w <- 1 / (deta.dmu * sqrt(family$variance(mu)))
 
               plot(z, mmats$.Xy[, responseIndex])
 
-              ## simple option:  mmats <- mmats.unadjusted
               ## Does this prevent overwriting of components ?
               for (facname in names(facs))
-                  mmats[[facname]][,] <- mmats.unadjusted[[facname]] * w
-              mmats$.Xy[,] <- mmats.unadjusted$.Xy
+                  mmats[[facname]][] <- mmats.unadjusted[[facname]] * w
+              mmats$.Xy[] <- mmats.unadjusted$.Xy
               mmats$.Xy[, responseIndex] <- z
-              mmats$.Xy[,] <- mmats$.Xy * w
-
+              mmats$.Xy[] <- mmats$.Xy * w
 
               .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
-### FIXME: ssclme_initial should only be called on the first iteration
-              .Call("ssclme_initial", obj, PACKAGE="Matrix")
-### The call to ssclme_factor is unnecessary as ssclme_EMsteps will
-### force factoring
-              #.Call("ssclme_factor", obj, PACKAGE = "Matrix")
+
+### ssclme_initial should only be called on the first iteration
+
+              if (firstIter) .Call("ssclme_initial", obj, PACKAGE="Matrix")
+
 ### May want to adjust number of EMiterations on second and subsequent
 ### iterations.  Probably one or two iterations will suffice
               .Call("ssclme_EMsteps", obj, controlvals$niterEM,
                     method == "REML", controlvals$EMverbose, PACKAGE = "Matrix")
+
 ### Do you want to call LMEoptimize(obj) = controlvals here?  Probably
 ### set number of iterations low.
+
+              LMEoptimize(obj) = controlvals
+
               coefFixed <- c(.Call("ssclme_fixef", obj, PACKAGE = "Matrix"), 0)
-              ## what happens for more than one random effect ?
               coefRanef <- .Call("ssclme_ranef", obj, PACKAGE = "Matrix")
+              if (!is.null(names(coefRanef))) print("time to modify code here")
+              names(coefRanef) <- names(facs)
+
+              if (firstIter) {
+                  controlvals$niterEM <- 2
+                  controlvals$msMaxIter <- 10
+                  firstIter <- FALSE
+              }
+
+              ## use this to determine convergence
+              print(deviance(obj, REML = controlvals$REML))
+
           }
 
           new("lme", call = match.call(), facs = facs,
@@ -203,130 +214,109 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
 
 
 
+## what happens in glm.fit:
 
 
-## trying to modify
+#             eta <- drop(x %*% start)
+#             mu <- linkinv(eta <- eta + offset)
+#             dev <- sum(dev.resids(y, mu, weights))
+#             if (control$trace)
+#                 cat("Deviance =", dev, "Iterations -", iter, "\n")
+#             ## check for divergence
+#             boundary <- FALSE
+#             if (!is.finite(dev)) {
+#                 if(is.null(coefold))
+#                     stop("no valid set of coefficients has been found:please supply starting values", call. = FALSE)
+#                 warning("Step size truncated due to divergence", call. = FALSE)
+#                 ii <- 1
+#                 while (!is.finite(dev)) {
+#                     if (ii > control$maxit)
+#                         stop("inner loop 1; can't correct step size")
+#                     ii <- ii + 1
+#                     start <- (start + coefold)/2
+#                     eta <- drop(x %*% start)
+#                     mu <- linkinv(eta <- eta + offset)
+#                     dev <- sum(dev.resids(y, mu, weights))
+#                 }
+#                 boundary <- TRUE
+#                 if (control$trace)
+#                     cat("Step halved: new deviance =", dev, "\n")
+#             }
+#             ## check for fitted values outside domain.
+#             if (!(valideta(eta) && validmu(mu))) {
+#                 warning("Step size truncated: out of bounds", call. = FALSE)
+#                 ii <- 1
+#                 while (!(valideta(eta) && validmu(mu))) {
+#                     if (ii > control$maxit)
+#                         stop("inner loop 2; can't correct step size")
+#                     ii <- ii + 1
+#                     start <- (start + coefold)/2
+#                     eta <- drop(x %*% start)
+#                     mu <- linkinv(eta <- eta + offset)
+#                 }
+#                 boundary <- TRUE
+#                 dev <- sum(dev.resids(y, mu, weights))
+#                 if (control$trace)
+#                     cat("Step halved: new deviance =", dev, "\n")
+#             }
+#             ## check for convergence
+#             if (abs(dev - devold)/(0.1 + abs(dev)) < control$epsilon) {
+#                 conv <- TRUE
+#                 coef <- start
+#                 break
+#             } else {
+#                 devold <- dev
+#                 coef <- coefold <- start
+#             }
+#         } ##-------------- end IRLS iteration -------------------------------
 
-# setMethod("sparseGLMMold", signature(formula = "formula", random = "list"),
-#           function(formula, family, data, random, control, niter,
-#                    method, verbose, nEM.IRLS, model, x, ...)
-#       {
-#           if (missing(nEM.IRLS))
-#               nEM.IRLS <- 1
-#           if (missing(verbose)) verbose = FALSE
-#           m <- Call <- match.call()
-#           method <- if(missing(method)) "PQL" else
-#                     match.arg(method, c("PQL", "Laplace"))
-#           nm <- names(m)[-1]
-#           dontkeep <-
-#               is.element(nm, c("correlation", "control", "niter",
-#                                "verbose", "nEM.IRLS", "method"))
-#           for(i in nm[dontkeep]) m[[i]] <- NULL
-#           m[[1]] <- as.name("glmmStruct")
-#           m$nextraCols <- 1
-#           m$method <- method
-#           fit <- eval(m, parent.frame())
+#         if (!conv) warning("Algorithm did not converge")
+#         if (boundary) warning("Algorithm stopped at boundary value")
+#         eps <- 10*.Machine$double.eps
+#         if (family$family == "binomial") {
+#             if (any(mu > 1 - eps) || any(mu < eps))
+#                 warning("fitted probabilities numerically 0 or 1 occurred")
+#         }
+#         if (family$family == "poisson") {
+#             if (any(mu < eps))
+#                 warning("fitted rates numerically 0 occurred")
+#         }
+#         ## If X matrix was not full rank then columns were pivoted,
+#         ## hence we need to re-label the names ...
+#         ## Original code changed as suggested by BDR---give NA rather
+#         ## than 0 for non-estimable parameters
+#         if (fit$rank < nvars) coef[fit$pivot][seq(fit$rank+1, nvars)] <- NA
+#         xxnames <- xnames[fit$pivot]
+#         residuals <- rep.int(NA, nobs)
+#         residuals[good] <- z - (eta - offset)[good] # z does not have offset in.
+#         fit$qr <- as.matrix(fit$qr)
+#         nr <- min(sum(good), nvars)
+#         if (nr < nvars) {
+#             Rmat <- diag(nvars)
+#             Rmat[1:nr, 1:nvars] <- fit$qr[1:nr, 1:nvars]
+#         }
+#         else Rmat <- fit$qr[1:nvars, 1:nvars]
+#         Rmat <- as.matrix(Rmat)
+#         Rmat[row(Rmat) > col(Rmat)] <- 0
+#         names(coef) <- xnames
+#         colnames(fit$qr) <- xxnames
+#         dimnames(Rmat) <- list(xxnames, xxnames)
 
-#           off <- fit@reStruct@offset
-#           w <-  fit@prior.weights
-#           origy <- fit@origy
-#           fam <- fit@family
 
-#           ## We always do the PQL steps. For that, we extract the reStruct
-#           ## slot from fit
-#           fit <- as(fit, "reStruct")
-#           control = if (missing(control)) lmeControl() else
-#                     do.call("lmeControl", control)
-#           EMsteps(fit) <- control
 
-#           control$niterEM <- nEM.IRLS
-#           converged <- FALSE
-#           eta <- .Call("nlme_reStruct_fitted", fit, NULL, PACKAGE="lme4")
 
-#           for(i in seq(length=if(missing(niter)) 20 else niter)) {
-#               ##update zz and wz
-#               mu <- fam$linkinv(eta)
-#               mu.eta.val <- fam$mu.eta(eta)
-#               zz <- eta + (origy - mu)/mu.eta.val  - off
-#               wz <- w * mu.eta.val^2 / fam$variance(mu)
 
-#               response(fit) <- zz
-#               weighted(fit) <- sqrt(abs(wz))
-#               EMsteps(fit) <- control
-#               LMEoptimize(fit) <- control
-#               if(verbose) {
-#                   cat("iteration", i, "\n")
-# ###             class(fit) <- "glmmStruct"
-# ###             fit@logLik <- as.numeric(NA)
-# ###             cat("Approximate logLik:",
-# ###                 .Call("nlme_glmmLa2_logLikelihood",
-# ###                     fit, NULL, PACKAGE="lme4"), "\n")
-# ###            class(fit) <- "reStruct"
-# ###            fit@logLik <- as.numeric(NA)
-#                   cat("Parameters:", coef(fit), "\n")
-#                   cat("Fixed Effects:", fixef(fit), "\n")
-#               }
-#               etaold <- eta
-#               eta <- .Call("nlme_reStruct_fitted", fit, NULL, PACKAGE="lme4")
-#               if(sum((eta-etaold)^2) < 1e-6*sum(eta^2)) {
-#                   converged <- TRUE
-#                   break
-#               }
-#           }
-#           if (control$msMaxIter > 0 && !converged)
-#               stop("IRLS iterations in sparseGLMM failed to converge")
-#           ## We recreate the glmm object and set the reStruct slot
-#           .Call("nlme_replaceSlot", fit, "logLik",
-#                 as.numeric(NA), PACKAGE = "lme4")
-#           .Call("nlme_replaceSlot", fit, "dontCopy", TRUE, PACKAGE = "lme4")
-#           fit <- .Call("nlme_replaceSlot", eval(m, parent.frame()),
-#                        "reStruct", fit, PACKAGE = "lme4")
-#           .Call("nlme_replaceSlot", fit, c("reStruct", "dontCopy"),
-#                 TRUE, PACKAGE = "lme4")
-#           fit <- .Call("nlme_glmmLaplace_solveOnly", fit,
-#                        500, 1, PACKAGE="lme4")
-#           ## dirtyStored is FALSE but should be TRUE
-# #          .Call("nlme_replaceSlot", fit, c("reStruct", "dirtyStored"),
-# #                TRUE, PACKAGE = "lme4")
-# #          .Call("nlme_replaceSlot", fit, "reStruct",
-# #                .Call("nlme_commonDecompose", fit@reStruct,
-# #                      NULL, PACKAGE="lme4"), PACKAGE = "lme4")
-# #          .Call("nlme_replaceSlot", fit, c("reStruct", "dontCopy"),
-# #                FALSE, PACKAGE = "lme4")
 
-#           if (method != "PQL") {
-#               ## Do the 2nd order Laplace fit here
-#               LMEoptimize(fit) <- control
-#           }
-#           ## dirtyStored is FALSE but should be TRUE
-#           .Call("nlme_replaceSlot", fit, c("reStruct", "dirtyStored"),
-#                 TRUE, PACKAGE = "lme4")
-#           .Call("nlme_replaceSlot", fit, "reStruct",
-#                 .Call("nlme_commonDecompose", fit@reStruct,
-#                       NULL, PACKAGE="lme4"), PACKAGE = "lme4")
-#           .Call("nlme_replaceSlot", fit, c("reStruct", "dontCopy"),
-#                 FALSE, PACKAGE = "lme4")
-#           ## zero some of the matrix slots
-#           if (!missing(x) && x == FALSE)
-#               .Call("nlme_replaceSlot", fit, c("reStruct", "original"),
-#                     matrix(0.0, nrow = 0, ncol = 0), PACKAGE = "lme4")
-#           .Call("nlme_replaceSlot", fit, c("reStruct", "decomposed"),
-#                 matrix(0.0, nrow = 0, ncol = 0), PACKAGE = "lme4")
-#           .Call("nlme_replaceSlot", fit, c("reStruct", "weighted"),
-#                 matrix(0.0, nrow = 0, ncol = 0), PACKAGE = "lme4")
 
-#           if (!missing(model) && model == FALSE)
-#               .Call("nlme_replaceSlot", fit, "frame",
-#                     data.frame(), PACKAGE = "lme4")
-#           .Call("nlme_replaceSlot", fit, "fitted",
-#                 fam$linkinv(if (is.null(fit@na.action)) {
-#                     fitted(fit@reStruct)[fit@reStruct@reverseOrder]
-#                 } else {
-#                     napredict(attr(data, "na.action"),
-#                               fitted(fit@reStruct)[fit@reStruct@reverseOrder])
-#                 }), PACKAGE = "lme4")
-#           fit
-#       })
+
+
+
+
+
+
+
+
+
 
 
 ### Local variables:
