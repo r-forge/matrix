@@ -1,10 +1,10 @@
 Alfalfa                 Split-Plot Experiment on Varieties of Alfalfa
 Assay                   Bioassay on Cell Culture Plate
 BIC                     Bayesian Information Criterion
-Bang                    Bangladesh fertility survey
 BodyWeight              Rat weight over time for different diets
 Cefamandole             Pharmacokinetics of Cefamandole
 Chem97                  Scores on A-level Chemistry in 1997
+Contraception           Contraceptive use in Bangladesh
 Dialyzer                High-Flux Hemodialyzer
 Earthquake              Earthquake Intensity
 Exam                    Exam scores from inner London
@@ -73,4 +73,5 @@ s3bbx                   Covariates in the Rodriguez and Goldman
                         simulation
 s3bby                   Responses simulated by Rodriguez and Goldman
 solve-methods           Methods for Function solve
+summary.GLMM-class      Class "summary.GLMM"
 summary.lme-class       Class "summary.lme"
