@@ -139,7 +139,7 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
                        as.integer(2e5), PACKAGE = "Matrix")
           facs = facshuffle(obj, facs)
           obj = obj[[1]]
-          .Call("ssclme_initial", obj, PACKAGE="Matrix")
+          ##.Call("ssclme_initial", obj, PACKAGE="Matrix")
 
 
 
