@@ -1209,35 +1209,6 @@ SEXP ssclme_EMsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP verb)
     return R_NilValue;
 }
 
-SEXP ssclme_asSscMatrix(SEXP x)
-{
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("sscMatrix")));
-    int *dims = INTEGER(GET_SLOT(val, Matrix_DimSym));
-
-    dims[0] = dims[1] = INTEGER(GET_SLOT(x, Matrix_DimSym))[1];
-    SET_SLOT(val, Matrix_pSym, duplicate(GET_SLOT(x, Matrix_pSym)));
-    SET_SLOT(val, Matrix_iSym, duplicate(GET_SLOT(x, Matrix_iSym)));
-    SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(x, Matrix_xSym)));
-    CHAR(STRING_ELT(GET_SLOT(x, Matrix_uploSym), 0))[0] = 'U';
-    UNPROTECT(1);
-    return val;
-}
-
-SEXP ssclme_asTscMatrix(SEXP x)
-{
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("tscMatrix")));
-    int *dims = INTEGER(GET_SLOT(val, Matrix_DimSym));
-
-    dims[0] = dims[1] = INTEGER(GET_SLOT(x, Matrix_DimSym))[1];
-    SET_SLOT(val, Matrix_pSym, duplicate(GET_SLOT(x, Matrix_LpSym)));
-    SET_SLOT(val, Matrix_iSym, duplicate(GET_SLOT(x, Matrix_LiSym)));
-    SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(x, Matrix_LxSym)));
-    CHAR(STRING_ELT(GET_SLOT(x, Matrix_uploSym), 0))[0] = 'U';
-    CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0))[0] = 'U';
-    UNPROTECT(1);
-    return val;
-}
-
 SEXP ssclme_fitted(SEXP x, SEXP facs, SEXP mmats)
 {
     SEXP val, b;
