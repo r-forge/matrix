@@ -42,44 +42,6 @@ setMethod("t", signature(x = "cscMatrix"),
 
 setMethod("image", "cscMatrix",
           function(x, ...) {
-              dots = list(...)
-              col = c("white", "black")
-              if (!is.null(tmp <- dots$col)) col = tmp
-              xlab = "column"
-              if (!is.null(tmp <- dots$xlab)) xlab = tmp
-              ylab = "row"
-              if (!is.null(tmp <- dots$ylab)) ylab = tmp
-              dd = dim(x)
-              nr = dd[1]
-              nc = dd[2]
-              opar = par(las = 1)
-              image(x = 1:nc, y = 1:nr,
-                    z = .Call("csc_to_imagemat", x, PACKAGE = "Matrix"),
-                    zlim = 0:1, axes = FALSE, col = col, las = 1,
-                    xlab = xlab, ylab = ylab, ...)
-              axis(1, pretty(c(1,nc)))
-              axis(2, 1+nr-pretty(c(1,nr)), labels = pretty(c(1,nr)))
-              box()
-              par(opar)
-          })
-
-setMethod("image", "tripletMatrix",
-          function(x,
-                   xlim = c(0, matdim[2] + 1),
-                   ylim = c(matdim[1] + 1, 0),
-                   sub = sprintf("Dimensions: %d x %d", matdim[1], matdim[2]),
-                   xlab = "Column", ylab = "Row",
-                   cuts = 20,
-                   col.regions = grey(seq(from = 0.7, to = 0, length = 100)),
-                   ...) {
-              require(lattice)
-              
-              matdim <- x@Dim
-              levelplot(abs(trip@x) ~ trip@j * trip@i,
-                        sub = sub,
-                        xlab = xlab, ylab = ylab,
-                        xlim = xlim, ylim = ylim,
-                        col.regions = col.regions,
-                        par.settings = list(background = list(col = "transparent")),
-                        ...)
+              x = as(x, "tripletMatrix")
+              callGeneric()
           })
