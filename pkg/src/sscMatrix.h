@@ -2,6 +2,7 @@
 #define MATRIX_SSC_H
 
 #include "taucs_utils.h"
+#include "Metis_utils.h"
 
 SEXP sscMatrix_validate(SEXP x);
 SEXP sscMatrix_chol(SEXP x, SEXP pivot);
