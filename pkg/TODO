@@ -21,4 +21,7 @@
 - Fix the calculation of the Dim slot for the crossprod method for
   dgCMatrix objects (too tired to do that now).
 
+- bCrosstab(): do we really want the diagonal "V:V" crosstabs?
 
+- src/Metis/ : some Makefile needs fixing, as changing src/Metis/*.c
+	     does not lead to recompilation.
