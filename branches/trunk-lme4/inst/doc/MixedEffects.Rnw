@@ -1118,19 +1118,18 @@ $\bbeta$).
 fm1 = lme(attain~verbal*sex,ScotsSec,list(primary=~1,second=~1))
 @ 
 
-
                                 Scottish                Dallas
 Number of levels of factor 1       148                    13471
 Number of levels of factor 2        19                     3722
 Number of diagonals                167                   138435
-Dense storage                     2812                501401786
-Sparse ZtZ                         303                   238676
+Dense storage                     2812                501401786 
+Sparse ZtZ                         303 (10.77\%)         238676 (0.05\%)
 No permutation
- L
- LI
+ L                                 457 (16.25\%)        4707800 (0.94\%)
+ LI                               1833 (65.18\%)      404759242 (80.73\%)
 Metis permutation
  L
  LI
 Separated Metis perm
- L                                 464 (16.50%)         3763597 (0.75\%)
- LI                               2200 (78.24%)       266944262 (53.24\%)
+ L                                 464 (16.50\%)        3763597 (0.75\%)
+ LI                               2200 (78.24\%)      266944262 (53.24\%)
