@@ -19,8 +19,6 @@
 \alias{\%*\%,dgeMatrix,dgeMatrix-method}
 \alias{\%*\%,dgeMatrix,matrix-method}
 \alias{\%*\%,matrix,dgeMatrix-method}
-\alias{\%*\%,dgeMatrix,numeric-method}
-\alias{\%*\%,numeric,dgeMatrix-method}
 \alias{Schur,dgeMatrix,logical-method}
 \alias{Schur,dgeMatrix,missing-method}
 \alias{chol,dgeMatrix,ANY-method}
