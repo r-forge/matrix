@@ -171,3 +171,7 @@ if (!isGeneric("pooledSD")) {
 if (!isGeneric("VarCorr")) {
     setGeneric("VarCorr", function(x) standardGeneric("VarCorr"))
 }
+
+if (!isGeneric("gradient")) {           # not exported
+    setGeneric("gradient", function(x, ...) standardGeneric("gradient"))
+}
