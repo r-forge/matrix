@@ -115,13 +115,76 @@ SEXP sscCrosstab_L_LI_sizes(SEXP ctab, SEXP permexp)
     UNPROTECT(1);
     return ans;
 }
+
+/** 
+  * Determine the inverse of the permutation of the rows of the sparse,
+  * column-oriented matrix represented by m, n, Ap and Ai that will
+  * concentrate non-zeros in the lower rows.
+  * 
+  * @param m number of rows in the matrix
+  * @param n number of columns in the matrix
+  * @param Ap column pointers in Ai (modified)
+  * @param Ai row indices (modified)
+  * @param iperm on return contains the inverse permutation
+  */
+static
+void pair_perm(int m, int n, int Ap[], int Ai[], int iperm[])
+{
+    int *cc = Calloc(n, int),	/* column counts */
+	ii, j,
+	*rc = Calloc(m, int);	/* row counts */
     
-/* FIXME:
- *  Split main part into a function that takes nr, nc, p, i, and
- *  returns perm of size nr.
- *  Call function for successive pairs.
- *  Invert the permutation before return.
- */
+    for (j = 0; j < n; j++) {	/* initialize col counts */
+	cc[j] = Ap[j+1] - Ap[j];
+    }
+    for (ii = m - 1; 0 <= ii; ii--) { /* fill iperm from RHS */
+	int maxrc, rr;
+	int i, mincc, p1, p3;
+
+	mincc = m + 1;		/* find minimum positive cc */
+	for (j = 0; j < n; j++) {
+	    if (0 < cc[j] && cc[j] < mincc) mincc = cc[j];
+	    if (mincc < 2) break;
+	}
+
+	for (i = 0; i < m; i++) rc[i] = 0;
+	for (j = 0; j < n; j++) { /* row counts for cols where cc = mincc */
+	    if (cc[j] == mincc) {
+		int p2 = Ap[j+1];
+		for (i = Ap[j]; i < p2; i++) rc[Ai[i]]++;
+	    }
+	}
+				
+	maxrc = -1;		/* find last row with rc[i] == max(rc) */
+	for (i = 0; i < m; i++) {
+	    int ic = rc[i];
+	    if (ic >= maxrc) {
+		maxrc = ic;
+		rr = i;
+	    }
+	}
+
+	iperm[ii] = rr;
+
+	p1 = p3 = 0;		/* update cc, Ap and Ai */
+	for (j = 0; j < n; j++) {
+	    int p2 = Ap[j+1];
+	    for (i = Ap[j]; i < p2; i++) {
+		if (Ai[i] == rr) {
+		    cc[j]--;
+		} else {
+		    if (i != p1) Ai[p1] = Ai[i];
+		    p1++;
+		}
+	    }
+	    Ap[j] = p3;
+	    p3 = p1;		/* save current pos for next iteration */
+	}
+	Ap[n] = p3;
+    }
+    Free(cc); Free(rc);
+}
+
 SEXP sscCrosstab_groupedPerm(SEXP ctab)
 {
     SEXP
@@ -131,89 +194,43 @@ SEXP sscCrosstab_groupedPerm(SEXP ctab)
     int *Ai = INTEGER(iSlot),
 	*Ap = INTEGER(pSlot),
 	*Gp = INTEGER(GpSlot),
-	nl1 = Gp[1],		/* number of levels of first factor */
-	*icounts,		/* counts for rows */
-	*jcounts = Calloc(nl1, int), /* counts for columns */
-	nl2,			/* delay initializing until nf is known */
-	ii, j, jj,
+	i,
 	n = length(pSlot) - 1,	/* number of columns */
 	nf = length(GpSlot) - 1, /* number of factors */
-	nz = length(iSlot),	/* number of non-zeros */
-	nod = nz - n,		/* number of off-diagonals */
-	*np = Calloc(nl1 + 1, int), /* new array pointers */
-	*ni = Calloc(nod, int),	/* new array row indices */
-	p1, p3;
+	*np = Calloc(n + 1, int), /* column pointers */
+	*ni = Calloc(length(iSlot) - n, int); /* row indices */
     SEXP ans = PROTECT(allocVector(INTSXP, n));
-    int *perm = INTEGER(ans);
+    int *iperm = Calloc(n, int);
 
     if (toupper(*CHAR(STRING_ELT(GET_SLOT(ctab, Matrix_uploSym), 0))) != 'L')
 	error("Lower triangle required in sscCrosstab object");
 
-    for (j = 0; j < n; j++) perm[j] = j; /* initialize permutation to identity */
-
-    if (nf > 1) {
-	nl2 = Gp[2] - nl1;	/* number of levels of factor 2 */
-	icounts = Calloc(nl2, int);
-	np[0] = 0;
-	for (j = 0; j < nl1; j++) jcounts[j] = 0;
-	p1 = 0;			/* copy off-diagonals from first nl1 cols */
-	for (j = 0; j < nl1; j++) { /* and 0 <= row - nl1 < nl2 */
-	    int p3 = Ap[j + 1];
-	    for (jj = Ap[j]; jj < p3; jj++) {
-		int i = Ai[jj] - nl1;
-		if (0 <= i && i < nl2) {
-		    ni[p1++] = i;	
-		    jcounts[j]++;
-		}
-	    }
-	    np[j+1] = p1;
-	}
-
-	for (ii = 1; ii <= nl2; ii++) {
-	    int maxrc, rr;
-	    int i, minjc = nl2+1;	/* find minimum positive jcount */
-	    for (j = 0; j < nl1; j++) {
-		if (jcounts[j] > 0 && jcounts[j] < minjc) minjc = jcounts[j];
-		if (minjc == 1) break;
-	    }
-				/* accumulate the row counts on cols where jcount=minjc */
-	    for (i = 0; i < nl2; i++) icounts[i] = 0;
-	    for (j = 0; j < nl1; j++) {
-		if (jcounts[j] == minjc) {
-		    int p2 = np[j+1];
-		    for (i = np[j]; i < p2; i++) icounts[ni[i]]++;
-		}
-	    }
-			/* find the last row with count==max(icount) */
-	    maxrc = -1;
-	    for (i = 0; i < nl2; i++) {
-		int ic = icounts[i];
-		if (ic >= maxrc) {
-		    maxrc = ic;
-		    rr = i;
-		}
-	    }
-	    perm[nl1 + nl2 - ii] = rr + nl1;
-				/* update icounts, np and ni */
-	    p1 = p3 = 0; 
-	    for (j = 0; j < nl1; j++) {
-		int p2 = np[j+1];
-		for (i = np[j]; i < p2; i++) {
-		    if (ni[i] == rr) {
-			jcounts[j]--;
-		    } else {
-			if (i != p1) ni[p1] = ni[i];
-			p1++;
-		    }
-		}
-		np[j] = p3;
-		p3 = p1;	/* save the count for the next iteration */
-	    }
-	    np[nl1] = p3;
-	}
-	Free(icounts);
+    for (i = 0; i < n; i++) {
+	iperm[i] = i;    /* initialize inverse permutation to identity */
     }
-    Free(np); Free(ni); Free(jcounts);
+    np[0] = 0;
+
+    for (i = 1; i < nf; i++) {	/* adjacent pairs of grouping factors */
+	int j, k, p0 = 0, p1 = Gp[i-1], p2 = Gp[i], p3 = Gp[i+1];
+	
+	for (j = p1; j < p2; j++) { /* for this set of columns */
+	    int lk = Ap[j+1];
+	    for (k = Ap[j]; k < lk; k++) {
+		int ii = Ai[k];
+		if (p2 <= ii && ii < p3) { /* check the row */
+		    ni[p0++] = ii - p2;
+		}
+	    }
+	    np[j + 1 - p1] = p0;
+	}
+	pair_perm(p3 - p2, p2 - p1, np, ni, iperm + p2);
+	for (j = p2; j < p3; j++) iperm[j] += p2;
+    }
+    
+    for(i = 0; i < n; i++) {	/* invert the permutation */
+	INTEGER(ans)[iperm[i]] = i;
+    }
+    Free(np); Free(ni); Free(iperm);
     UNPROTECT(1);
     return ans;
 }
