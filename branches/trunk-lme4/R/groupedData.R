@@ -23,17 +23,14 @@ groupedData <-
 ### inner: equivalent of groups. Not sure what more than one means
 ### ...: stored separately, can be used to override gplotArgs calculations
 {
-    attr(data, "ginfo") <-
+    gplotArgs(data) <-
         list(formula = formula,
              order.groups = order.groups,
              FUN = FUN,
              outer = outer,
              inner = inner,
              labels = labels,
-             units = units)
-    dots <- list(...)
-    if (length(dots) > 0)
-        attr(data, "gplot.args") <- dots
+             units = units, ...)
     data
 }
 
