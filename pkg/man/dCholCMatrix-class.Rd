@@ -35,6 +35,8 @@
     \item{\code{Dim}:}{Object of class \code{"integer"} - the dimensions
      of the matrix - must be an integer vector with exactly two
      non-negative values.}
+    \item{\code{Dimnames}:}{list of length two; inherited from the
+      \code{"Matrix"} class, see \code{\link{Matrix-class}}.}
     \item{\code{D}:}{Object of class \code{"numeric"} - the diagonal
       elements of the matrix D in the LDL' decomposition.}
     \item{\code{Parent}:}{Object of class \code{"integer"} - the

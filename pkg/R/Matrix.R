@@ -25,7 +25,7 @@ Matrix <-
 {
     if (is(data, "Matrix")) return(data)
     if (is.matrix(data)) { val <- data }
-    else {
+    else { ## cut & paste from "base::matrix" :
         if (missing(nrow))
             nrow <- ceiling(length(data)/ncol)
         else if (missing(ncol))

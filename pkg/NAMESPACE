@@ -1,10 +1,11 @@
 useDynLib(Matrix)
-importFrom("graphics","image")
-importFrom("lattice", "levelplot")
-importFrom("grid", "grid.rect", "gpar", "grob")
-importFrom("stats", "deviance", "formula", "coef")
 
-# Generics and functions defined in this package
+importFrom("graphics",image)
+importFrom("lattice", levelplot)
+importFrom("grid",    grid.rect, gpar, grob)
+importFrom("stats",   deviance, formula, coef)
+
+## Generics and functions defined in this package
 export(
        "Hilbert",
        "Matrix",
@@ -31,6 +32,11 @@ exportClasses(
 	      "Cholesky",
 	      "LU",
               "Matrix",
+              ## also intermediate `virtual' ones:
+              "dMatrix",
+              ## "iMatrix", "lMatrix", "zMatrix",
+              "ddenseMatrix",
+
               "corrmatrix",
               "dgBCMatrix",
               "dgCMatrix",
@@ -44,6 +50,7 @@ exportClasses(
               "dtCMatrix",
               "dtpMatrix",
               "dtrMatrix",
+
               "pdfactor",
               "pdmatrix",
               "dCholCMatrix",
@@ -52,7 +59,12 @@ exportClasses(
               )
 
 exportMethods(
+              ## Group Methods
+## fails!     "Arith",
+
+              "+",# for dgT(Matrix) only
               "%*%",
+
               "Schur",
               "chol",
               "coef",

@@ -16,3 +16,6 @@ stopifnot(identical(mmT, mmN)) # !!
 ## weaker (and hence TRUE too):
 stopifnot(all.equal(as(mmN, "matrix"),
                     as(mmT, "matrix"), tol=0))
+
+mm <- as(mmN, "dgCMatrix")
+## save(mm, file = "....../Matrix/data/mm.rda", compress = TRUE)
