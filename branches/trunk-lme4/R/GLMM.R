@@ -98,6 +98,7 @@ setMethod("GLMM",
                    offset,
                    model = TRUE, x = FALSE, y = FALSE, ...)
       {
+          gVerb <- getOption("verbose")
           random <-
               lapply(random,
                      get("formula", pos = parent.frame(), mode = "function"))
@@ -179,7 +180,10 @@ setMethod("GLMM",
               .Call("nlme_weight_matrix_list",
                     mmats.unadjusted, w, z, mmats, PACKAGE="Matrix")
               .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
-              if (firstIter) .Call("ssclme_initial", obj, PACKAGE="Matrix")
+              if (firstIter) {
+                  .Call("ssclme_initial", obj, PACKAGE="Matrix")
+                  if (gVerb) cat(" PQL iterations convergence criterion\n")
+              }
               .Call("ssclme_EMsteps", obj,
                     controlvals$niterEM,
                     FALSE, #controlvals$REML,
@@ -190,8 +194,7 @@ setMethod("GLMM",
                   .Call("ssclme_fitted", obj, facs,
                         mmats.unadjusted, TRUE, PACKAGE = "Matrix")
               crit <- max(abs(eta - etaold)) / (0.1 + max(abs(eta)))
-              cat(paste("Iteration", iter,"Termination Criterion:",
-                        format(crit), "\n"))
+              if (gVerb) cat(sprintf("%3d: %#8g\n", iter, crit))
               ## use this to determine convergence
               if (crit < controlvals$tolerance) {
                   conv <- TRUE
