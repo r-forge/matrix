@@ -73,13 +73,6 @@ setMethod("deviance", signature(object = "ssclme"),
               object@deviance[ifelse(REML, 2, 1)]
           })
 
-setMethod("coef", signature(object = "ssclme"),
-          function(object, unconst = FALSE, ...) {
-              .Call(ifelse(as(unconst, "logical")[1],
-                           "ssclme_coefUnc", "ssclme_coef"),
-                    object, PACKAGE = "Matrix")
-          })
-
 setMethod("ranef", signature(object = "ssclme"),
           function(object, ...) {
               val = .Call("ssclme_ranef", object, PACKAGE = "Matrix")
