@@ -20,6 +20,7 @@
 \alias{solve,dtpMatrix,missing-method}
 \alias{solve,dtpMatrix,matrix-method}
 \alias{t,dtpMatrix-method}
+\alias{unpack,dtpMatrix-method}
 \title{Packed triangular dense matrices}
 \description{The \code{"dtpMatrix"} class is the class of triangular,
   dense, numeric matrices in packed storage.  The \code{"dtrMatrix"}
@@ -75,6 +76,7 @@ Class \code{"Matrix"}, by class \code{"ddenseMatrix"}.
     \item{solve}{\code{signature(a = "dtpMatrix", b = "missing")}: ... }
     \item{solve}{\code{signature(a = "dtpMatrix", b = "matrix")}: ... }
     \item{t}{\code{signature(x = "dtpMatrix")}: ... }
+    \item{unpack}{\code{signature(x = "dtpMatrix")}: ... }
   }
 }
 \seealso{
