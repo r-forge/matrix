@@ -8,13 +8,6 @@
 #include "Mutils.h"
 
 SEXP cscBlocked_validate(SEXP x);
-void cscBlocked_mm(enum CBLAS_SIDE side, enum CBLAS_TRANSPOSE transa,
-		   int m, int n, int k,
-		   double alpha, int nr, int nc,
-		   const int ap[], const int ai[],
-		   const double ax[],
-		   const double b[], int ldb,
-		   double beta, double c[], int ldc);
 void cscb_tri(enum CBLAS_UPLO upper, enum CBLAS_DIAG unit,
 	      SEXP A, const int Parent[], SEXP AI);
 void cscb_syrk(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE trans,
