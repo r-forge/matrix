@@ -62,11 +62,12 @@ static R_CallMethodDef CallEntries[] = {
     {"csc_to_triplet", (DL_FUNC) &csc_to_triplet, 1},
     {"csc_to_matrix", (DL_FUNC) &csc_to_matrix, 1},
     {"csc_to_geMatrix", (DL_FUNC) &csc_to_geMatrix, 1},
-    {"csc_to_imagemat", (DL_FUNC) &csc_to_imagemat, 1},
+/*     {"csc_to_imagemat", (DL_FUNC) &csc_to_imagemat, 1}, */
     {"matrix_to_csc", (DL_FUNC) &matrix_to_csc, 1},
     {"triplet_to_csc", (DL_FUNC) &triplet_to_csc, 1},
     {"csc_getDiag", (DL_FUNC) &csc_getDiag, 1},
     {"csc_transpose", (DL_FUNC) &csc_transpose, 1},
+    {"csc_matrix_mm", (DL_FUNC) &csc_matrix_mm, 2},
     {"lsq_dense_Chol", (DL_FUNC) &lsq_dense_Chol, 2},
     {"lsq_dense_QR", (DL_FUNC) &lsq_dense_QR, 2},
     {"lapack_qr", (DL_FUNC) &lapack_qr, 2},
