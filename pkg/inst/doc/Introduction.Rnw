@@ -84,8 +84,8 @@ implemented.  These classes are
 \item[dpoMatrix] Positive semi-definite symmetric real matrices in
   non-package storage
 \end{description}
-Methods for these classes include coersion between these classes, when
-appropriate, and coersion to the \code{matrix} class; methods for
+Methods for these classes include coercion between these classes, when
+appropriate, and coercion to the \code{matrix} class; methods for
 matrix multiplication (\code{\%*\%}); cross products
 (\code{crossprod}), matrix norm (\code{norm}); reciprocal condition
 number (\code{rcond}); LU factorization (\code{lu}) or, for the
