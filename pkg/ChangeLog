@@ -1,6 +1,11 @@
+2004-11-16  Douglas Bates  <bates@bates1-home>
+
+	* src/Metis_utils.c: Move metis.h include to C sources so that the
+	.h file can be included.
+
 2004-11-12  Douglas Bates  <bates@bates1-home>
 
-	* src/LU.c,geMatrix.c,trMatrix.c:
+	* src/LU.c,geMatrix.c,trMatrix.c, etc.:
 	Complete allocation of slots in NEW_OBJECT.
 
 	* src/Mutils.h: Moved list of symbols to an include file
