@@ -221,7 +221,8 @@ setClass("lmer",
                         flist = "list", # list of grouping factors
                         perm = "list",  # list of permutations of levels (0-based)
                         Parent = "list",# list of Parent arrays for ZZpO
-                        D = "list",     # list of diagonal factors (lower triangle)
+                        D = "list",     # list of diagonal factors (upper triangle)
+                        bVar = "list",  # list of conditional variance factors (upper triangle)
                         L = "list",     # list of blocks of L
                         Linv = "list",  # list of diagonal blocks of L^{-1}
                         ZZpO = "list",  # list of diagonal blocks of Z'Z+Omega
