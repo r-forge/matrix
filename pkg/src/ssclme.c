@@ -196,9 +196,7 @@ ssclme_create(SEXP facs, SEXP ncv)
     Parent = INTEGER(GET_SLOT(ssc, Matrix_ParentSym));
     SET_SLOT(ssc, Matrix_DSym, allocVector(REALSXP, nzcol));
     SET_SLOT(ssc, Matrix_DIsqrtSym, allocVector(REALSXP, nzcol));
-    ldl_symbolic(nzcol, Ap, Ai, Lp, Parent,
-		 (int *) R_alloc(nzcol, sizeof(int)), /* Lnz */
-		 (int *) R_alloc(nzcol, sizeof(int)), /* Flag */
+    R_ldl_symbolic(nzcol, Ap, Ai, Lp, Parent,
 		 (int *) NULL, (int *) NULL); /* P & Pinv */
     ssclme_calc_maxod(nzcol, Parent);
     Lnz = Lp[nzcol];
@@ -478,13 +476,12 @@ SEXP ssclme_inflate_and_factor(SEXP x)
 	    }
 	}
     }
-    j = ldl_numeric(n, Ap, Ai, xcp,
+    j = R_ldl_numeric(n, Ap, Ai, xcp,
 		    INTEGER(GET_SLOT(x, Matrix_LpSym)),
 		    INTEGER(GET_SLOT(x, Matrix_ParentSym)),
-		    Lnz, INTEGER(GET_SLOT(x, Matrix_LiSym)),
+		    INTEGER(GET_SLOT(x, Matrix_LiSym)),
 		    REAL(GET_SLOT(x, Matrix_LxSym)),
-		    D, Y, Pattern, Flag,
-		    (int *) NULL, (int *) NULL); /* P & Pinv */
+		    D, (int *) NULL, (int *) NULL); /* P & Pinv */
     if (j != n)
 	error("rank deficiency of ZtZ+W detected at column %d",
 	      j + 1);
@@ -568,7 +565,7 @@ SEXP ssclme_factor(SEXP x)
 	for (i = 0; i < pp1; i++) {
 	    int j;
 	    double *RZXi = RZX + i * n;
-	    ldl_lsolve(n, RZXi, Lp, Li, Lx);
+	    R_ldl_lsolve(n, RZXi, Lp, Li, Lx);
 	    for (j = 0; j < n; j++) RZXi[j] *= DIsqrt[j];
 	}
 				/* downdate and factor X'X */
@@ -747,7 +744,7 @@ SEXP ssclme_invert(SEXP x)
 	for (i = 0; i < pp1; i++) {
 	    int j; double *RZXi = RZX + i * n;
 	    for (j = 0; j < n; j++) RZXi[j] *= DIsqrt[j];
-	    ldl_ltsolve(n, RZXi, Lp, Li, Lx);
+	    R_ldl_ltsolve(n, RZXi, Lp, Li, Lx);
 	}
 	ldl_inverse(x);
 	status[1] = 1;
