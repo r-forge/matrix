@@ -211,13 +211,16 @@ lmeRep_create(SEXP facs, SEXP ncv)
  */
 SEXP lmeRep_update_mm(SEXP x, SEXP facs, SEXP mmats)
 {
-    SEXP ZZxP = GET_SLOT(x, Matrix_ZZxSym),
+    SEXP
+	LP = GET_SLOT(x, Matrix_LSym),
+	TP = GET_SLOT(x, Matrix_TSym),
+	ZZxP = GET_SLOT(x, Matrix_ZZxSym),
 	ZtXP = GET_SLOT(x, Matrix_ZtXSym),
 	levs = GET_SLOT(x, R_LevelsSymbol),
 	cnames = GET_SLOT(x, Matrix_cnamesSym);
     int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	*status = LOGICAL(GET_SLOT(x, Matrix_statusSym)),
-	I = length(ZZxP), Ip1 = I + 1,
+	I = length(ZZxP), Ip1 = I + 1, Tpos = 0,
 	i, ione = 1,
 	nobs = nc[Ip1],
 	ncZ = 0,
@@ -249,13 +252,12 @@ SEXP lmeRep_update_mm(SEXP x, SEXP facs, SEXP mmats)
 					    1)));
     }
     for (i = 0; i < I; i++) {
-	SEXP fac = VECTOR_ELT(facs, i),
-	    lev = getAttrib(fac, R_LevelsSymbol);
+	SEXP fac = VECTOR_ELT(facs, i);
 
 	if (!isFactor(fac))
 	    error("element %i in list facs is not a factor", i + 1);
-	SET_VECTOR_ELT(levs, i, duplicate(lev));
-	ncZ += length(lev) * nc[i];
+	SET_VECTOR_ELT(levs, i, duplicate(getAttrib(fac, R_LevelsSymbol)));
+	ncZ += length(VECTOR_ELT(levs, i)) * nc[i];
     }
     if (ncZ != INTEGER(getAttrib(ZtXP, R_DimSymbol))[0])
 	error("# rows of ZtX slot, %d, != sum of # levels * # columns, %d",
@@ -265,9 +267,10 @@ SEXP lmeRep_update_mm(SEXP x, SEXP facs, SEXP mmats)
     F77_CALL(dsyrk)("U", "T", &pp1, &nobs, &one, X, &nobs, &zero, XtX, nc + 1);
 				/* Zero an accumulator */
     memset((void *) ZtX, 0, sizeof(double) * pp1 * ncZ);
+    Tpos = 0;
     for (i = 0; i < I; i++) {
 	int *fac = INTEGER(VECTOR_ELT(facs, i)),
-	    j, nci = nc[i], ncisqr = nci * nci,
+	    j, k, nci = nc[i], ncisqr = nci * nci,
 	    nlev = length(VECTOR_ELT(levs, i));
 	int ZtXrows = nci * nlev;
 	double *Z = REAL(VECTOR_ELT(mmats, i)),
@@ -293,6 +296,11 @@ SEXP lmeRep_update_mm(SEXP x, SEXP facs, SEXP mmats)
 	    }
 	}
 	ZtX += ZtXrows;
+	for (k = 0; k < i; k++) {
+	    SEXP Tmat = VECTOR_ELT(TP, Tpos),
+		Lmat = VECTOR_ELT(LP, Tpos); /* can this just be one matrix? */
+	    int *f2 = INTEGER(VECTOR_ELT(facs, k)), nck = nc[k];
+	}
     }
     status[0] = status[1] = 0;
     return R_NilValue;
