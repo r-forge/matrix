@@ -34,12 +34,9 @@ if (!isGeneric("%p%")) {
     setGeneric("%p%", function(a, b) standardGeneric("%p%"))
 }
 
-if (!isGeneric("EMsteps<-")) {
-    setGeneric("EMsteps<-", function(x, value) standardGeneric("EMsteps<-"))
-}
-
 if (!isGeneric("coef<-")) {
-    setGeneric("coef<-", function(object, value) standardGeneric("coef<-"))
+    setGeneric("coef<-", function(object, ..., value)
+               standardGeneric("coef<-"))
 }
 
 ## The generics pdFactor, pdMatrix, corFactor and corMatrix will be deprecated
