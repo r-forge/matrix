@@ -13,7 +13,8 @@ setReplaceMethod("LMEoptimize", signature(x="ssclme", value="list"),
                                    },
                                    gr = function(pars) {
                                        coef(x, unconstr = TRUE) = pars
-                                       gradient(x, REML = value$REML)
+                                       gradient(x, REML = value$REML,
+                                                unconstr = TRUE)
                                    },
                                    method = "BFGS",
                                    control = list(trace = value$msVerbose,
@@ -45,7 +46,8 @@ setReplaceMethod("LMEoptimize", signature(x="ssclme", value="list"),
                                  coef(x, unconstr = TRUE) = pars
                                  ans = deviance(x, REML = value$REML)
                                  attr(ans, "gradient") =
-                                     gradient(x, REML = value$REML)
+                                     gradient(x, REML = value$REML,
+                                              unconstr = TRUE)
                                  ans
                              }
                          } else {
@@ -110,3 +112,7 @@ setMethod("VarCorr", signature(x = "ssclme"),
               new("VarCorr", scale = val[[2]], reSumry = val[1],
                    useScale = TRUE)
           })
+
+setmethod("gradient", signature(x = "ssclme"),
+          function(x, REML, unconstr, ...)
+          .Call("ssclme_gradient", x, REML, unconstr))
