@@ -4,8 +4,6 @@
         stop(paste("Package lme4 conflicts with package nlme.\n",
                    "To attach lme4 you must restart R without package nlme."))
     }
-    require("methods", quietly = TRUE)
-    require("Matrix", quietly = TRUE)
 }
 
 setOldClass("data.frame")
