@@ -1,6 +1,6 @@
 
 R : Copyright 2005, The R Foundation for Statistical Computing
-Version 2.1.0 Under development (unstable) (2005-03-15), ISBN 3-900051-07-0
+Version 2.0.1 Patched (2005-03-15), ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -85,8 +85,8 @@ Formal class 'dpoMatrix' [package "Matrix"] with 6 slots
  [7,] 0.1429 0.1250 0.11111 0.10000 0.09091 0.08333 0.07692 0.07143 0.06667
  [8,] 0.1250 0.1111 0.10000 0.09091 0.08333 0.07692 0.07143 0.06667 0.06250
  [9,] 0.1111 0.1000 0.09091 0.08333 0.07692 0.07143 0.06667 0.06250 0.05882
-> stopifnot(all.equal(as(h9, "matrix"),
-+                     as(cf9,"matrix"), tol= 1e-15))
+> stopifnot(all.equal(as.matrix(h9),
++                     as.matrix(cf9), tol= 1e-15))
 > 
 > str(hp9 <- as(h9, "dppMatrix"))
 Formal class 'dppMatrix' [package "Matrix"] with 6 slots
@@ -110,18 +110,11 @@ Formal class 'dppMatrix' [package "Matrix"] with 6 slots
   .. ..$ : NULL
   .. ..$ : NULL
 > 
-> (s9 <- solve(hp9, seq(nrow(hp9))))
-9 x 1 Matrix of class "dgeMatrix"
-           [,1]
- [1,]       729
- [2,]    -57600
- [3,]   1094938
- [4,]  -8648622
- [5,]  34684584
- [6,] -76684473
- [7,]  94594344
- [8,] -60952225
- [9,]  15971647
+> s9 <- solve(hp9, seq(nrow(hp9)))
+> signif(t(s9)/10000, 4)# only rounded numbers are platform-independent
+1 x 9 Matrix of class "dgeMatrix"
+       [,1]  [,2]  [,3]   [,4] [,5]  [,6] [,7]  [,8] [,9]
+[1,] 0.0729 -5.76 109.5 -864.9 3468 -7668 9459 -6095 1597
 > hp9 %*% s9
 9 x 1 Matrix of class "dgeMatrix"
       [,1]
@@ -134,5 +127,7 @@ Formal class 'dppMatrix' [package "Matrix"] with 6 slots
  [7,]    7
  [8,]    8
  [9,]    9
-> 
+> ## Works in 2.1.0, but not earlier:
+> ## stopifnot(all.equal(cbind(1:9), as.matrix(hp9 %*% s9)))
+> stopifnot(all.equal(1:9, (hp9 %*% s9)@x))
 > 
