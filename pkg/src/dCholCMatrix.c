@@ -1,6 +1,6 @@
-#include "sscChol.h"
+#include "dCholCMatrix.h"
 
-SEXP sscChol_validate(SEXP object)
+SEXP dCholCMatrix_validate(SEXP object)
 {
     return ScalarLogical(1);
 }
