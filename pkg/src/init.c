@@ -43,6 +43,7 @@ static R_CallMethodDef CallEntries[] = {
     {"SVD_validate", (DL_FUNC) &SVD_validate, 1},
     {"geMatrix_validate", (DL_FUNC) &geMatrix_validate, 1},
     {"geMatrix_norm", (DL_FUNC) &geMatrix_norm, 2},
+    {"geMatrix_rcond", (DL_FUNC) &geMatrix_rcond, 2},
     {"geMatrix_crossprod", (DL_FUNC) &geMatrix_crossprod, 1},
     {"geMatrix_geMatrix_crossprod", (DL_FUNC) &geMatrix_geMatrix_crossprod, 2},
     {"geMatrix_matrix_crossprod", (DL_FUNC) &geMatrix_matrix_crossprod, 2},
