@@ -1,3 +1,10 @@
+2004-04-05  Douglas Bates  <bates@bates2_home>
+
+	* src/triplet_to_col.c: Create triplet_to_col as a native
+	function, not the version from umfpack.  There were problems with
+	the configuration of UMFPACK for 64-bit processors and there was
+	only one umfpack routine being used so I moved it here.
+
 2004-04-04  Douglas Bates  <bates@bates2_home>
 
 	* src/ssclme.c (ssclme_variances): New function.
