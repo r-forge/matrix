@@ -16,12 +16,28 @@ bCrosstab(flist, reorder = TRUE)
 %\details{}
 \value{
   A list with components \code{flist}, a possibly reordered copy of the
-  first argument, and \code{ctab}, the pairwise crosstabulation.
+  first argument, and \code{ctab}, itself a list of all pairwise
+  crosstabulation matrices.
 }
 %\references{}
 %\author{}
 %\note{}
-%\seealso{}
-%\examples{}
+\seealso{\code{\link{:}} for factor interaction,
+  \code{\link{xtabs}} for another cross tabulation function.
+}
+\examples{
+str(esoph)
+bCrosstab(list(agegp, alcgp)) $ ctab
+
+grps <- list(age = agegp, alc = alcgp, tob = tobgp)
+bCn <- bCrosstab( grps, reorder = FALSE)
+stopifnot(all.equal(bCn$flist, grps))
+str(bC <- bCrosstab(grps))
+bC$ctab$"alc:age" # generally 4 obs. per cell, but not always:
+aa.m <- as(bC$ctab$"alc:age", "matrix")
+table(aa.m) # #(2,3,4) = (2, 4, 18)
+stopifnot(all.equal(as.vector(t(aa.m)),
+                    as.vector(table(with(esoph, alcgp:agegp))), tol=0))
+}
 \keyword{manip}
 \keyword{algebra}
