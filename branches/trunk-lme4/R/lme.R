@@ -575,7 +575,6 @@ setMethod("lme1", signature(formula = "formula",
                 controlvals$niterEM,
                 controlvals$REML,
                 controlvals$EMverbose,
-                TRUE,
                 PACKAGE = "Matrix")
           LMEoptimize(obj) <- controlvals
           #fitted = .Call("ssclme_fitted", obj, facs, mmats, TRUE, PACKAGE = "Matrix")
@@ -677,7 +676,7 @@ setMethod("fixef", signature(object = "lmeRep"),
 setMethod("vcov", signature(object = "lmeRep"),
           function(object, REML = TRUE, useScale = TRUE,...) {
               ## force an "lmeRep_invert"
-              sc <- .Call("lmeRep_sigma", object, PACKAGE = "Matrix")
+              sc <- .Call("lmeRep_sigma", object, REML, PACKAGE = "Matrix")
               rr <- object@RXX
               nms <- object@cnames[[".fixed"]]
               dimnames(rr) <- list(nms, nms)
