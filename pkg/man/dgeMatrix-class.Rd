@@ -5,7 +5,12 @@
 % FIXME: These two are not (yet) further referenced below:
 \alias{dMatrix-class}
 \alias{ddenseMatrix-class}
-% Methods:
+% METHODS:
+% Group ones
+\alias{Arith,dgeMatrix,dgeMatrix-method}
+\alias{Arith,dgeMatrix,numeric-method}
+\alias{Arith,numeric,dgeMatrix-method}
+% others
 \alias{\%*\%,dgeMatrix,dgeMatrix-method}
 \alias{Schur,dgeMatrix,logical-method}
 \alias{Schur,dgeMatrix,missing-method}
@@ -40,6 +45,8 @@
     \item{\code{Dim}:}{Object of class \code{"integer"} - the dimensions
      of the matrix - must be an integer vector with exactly two
      non-negative values.}
+    \item{\code{Dimnames}:}{a list of length two - inherited from class
+      \code{Matrix}, see \code{\link{Matrix-class}}.}
     \item{\code{rcond}:}{Object of class \code{"numeric"} - an estimate
       of the reciprocal of the condition number, if it has been computed
       at some point.}
@@ -48,6 +55,13 @@
   }
 }
 \section{Methods}{
+  The are group methods (see, e.g., \code{\link{Arith}})
+  \describe{
+    \item{Arith}{\code{signature(e1 = "dgeMatrix", e2 = "dgeMatrix")}: ... }
+    \item{Arith}{\code{signature(e1 = "dgeMatrix", e2 = "numeric")}: ... }
+    \item{Arith}{\code{signature(e1 = "numeric", e2 = "dgeMatrix")}: ... }
+  }
+  and other matrix methods available:
   \describe{
     \item{Schur}{\code{signature(x = "dgeMatrix", vectors = "logical")}: ... }
     \item{Schur}{\code{signature(x = "dgeMatrix", vectors = "missing")}: ... }

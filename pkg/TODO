@@ -3,14 +3,11 @@
 
 - [,] indexing
 
-- group generics: "Arith", but also "Ops" and "Math";  see
-  ?Math.data.frame  and the examples in
-  ?SetGeneric
+- group generics: "Arith" (partly done),
+  but also "Compare", "Math" etc;
+  see ?Math  and the examples in ?SetGeneric
 
 - methods for rbind and cbind where they make sense
-
-- bCrosstab(): do we really want the diagonal "V:V" crosstabs?
-	       (if so or in any case: add to  man/bCrosstab.Rd )
 
 - consider moving alloc3Darray from ./src/Mutils.c to
   $(RSRC)/src/base/array.c
