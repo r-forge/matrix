@@ -469,7 +469,7 @@ setMethod("GLMM",
 
           loglik <- loglikLaplace(optpars)
 
-          ## Things to include in retruned object: new ranef
+          ## Things to include in returned object: new ranef
           ## estimates, new parameter estimates (fixed effects and
           ## coefs) (with standard errors from hessian ?) and
           ## (Laplace) approximate log likelihood.
@@ -477,7 +477,7 @@ setMethod("GLMM",
           new("GLMM", call = match.call(), facs = facs,
               x = if (x) mmats else list(),
               model = if(model) data else data.frame(list()),
-              REML = FALSE, rep = obj, fitted = eta, logLik = loglik,
+              REML = FALSE, rep = obj, fitted = eta, logLik = -loglik,
               fixef = optpars[1:(responseIndex-1)])
       })
 
