@@ -51,8 +51,8 @@ convertFromS3groupedData <- function(from)
     old.labels <- attr(from, "labels")
     old.units <- attr(from, "units")
 
-    yvar <- lattice:::.responseName(formula)
-    xvar <- lattice:::.covariateName(formula)
+    yvar <- latticeExtra:::.responseName(formula)
+    xvar <- latticeExtra:::.covariateName(formula)
 
     labels <- list()
     units <- list()
