@@ -145,7 +145,6 @@ setMethod("lme", signature(formula = "formula", random = "list"),
           data <- eval(mCall, parent.frame())
           facs <- lapply(names(random),
                          function(x) eval(as.name(x), envir = data))
-          names(facs) <- names(random)
           mmats <- c(lapply(random,
                             function(x) model.matrix(formula(x), data = data)),
                      list(.Xy = cbind(model.matrix(formula, data = data),
@@ -153,6 +152,7 @@ setMethod("lme", signature(formula = "formula", random = "list"),
           obj <- .Call("ssclme_create", facs, unlist(lapply(mmats, ncol)),
                        as.integer(2e5), PACKAGE = "Matrix")
           facs = facshuffle(obj, facs)
+          names(facs) <- names(random)
           obj = obj[[1]]
           .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
           .Call("ssclme_initial", obj, PACKAGE="Matrix")
@@ -341,7 +341,7 @@ setMethod("ranef", signature(object = "ssclme"),
               for (i in seq(along = val)) {
                   dimnames(val[[i]]) = dimnames(bv[[i]])[-1]
               }
-              val
+              lapply(val, t)
           })
 
 setMethod("fixef", signature(object = "ssclme"),
