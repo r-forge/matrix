@@ -7,5 +7,6 @@
 SEXP tsc_validate(SEXP x);
 SEXP tsc_transpose(SEXP x);
 SEXP tsc_to_triplet(SEXP x);
+SEXP Parent_inverse(SEXP par, SEXP unitdiag);
 
 #endif
