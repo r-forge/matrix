@@ -219,9 +219,11 @@ SEXP
 ssclme_create(SEXP facs, SEXP ncv, SEXP threshold)
 {
     SEXP ctab, nms, ssc, tmp,
-	val = PROTECT(allocVector(VECSXP, 2));
+	val = PROTECT(allocVector(VECSXP, 2)),
+	dd = PROTECT(allocVector(INTSXP, 3));	/* dimensions of 3-D arrays */
     int *Ai, *Ap, *Gp, *LIp, *Lp, *Parent,
-	*nc, Lnz, i, nf = length(facs), nzcol, pp1;
+	*nc, Lnz, i, nf = length(facs), nzcol, pp1,
+	*dims = INTEGER(dd);
 
     if (length(ncv) != (nf + 1))
 	error("length of nc (%d) should be length of facs (%d) + 1",
@@ -296,11 +298,13 @@ ssclme_create(SEXP facs, SEXP ncv, SEXP threshold)
     tmp = GET_SLOT(ssc, Matrix_bVarSym);
     setAttrib(tmp, R_NamesSymbol, getAttrib(facs, R_NamesSymbol));
     for (i = 0; i < nf; i++) {
-	int ncol = Gp[i+1] - Gp[i], nrow = nc[i];
+	int nci = nc[i], mi = (Gp[i+1] - Gp[i])/nc[i];
 
-	SET_VECTOR_ELT(tmp, i, allocMatrix(REALSXP, nrow, ncol));
+	dims[0] = dims[1] = nci;
+	dims[2] = mi;
+	SET_VECTOR_ELT(tmp, i, allocArray(REALSXP, dd));
 	memset(REAL(VECTOR_ELT(tmp, i)), 0,
-	       sizeof(double) * nrow * ncol);
+	       sizeof(double) * nci * nci * mi);
     }
     SET_SLOT(ssc, Matrix_LIpSym, allocVector(INTSXP, nzcol + 1));
     LIp = INTEGER(GET_SLOT(ssc, Matrix_LIpSym));
@@ -313,7 +317,7 @@ ssclme_create(SEXP facs, SEXP ncv, SEXP threshold)
 	memset(REAL(GET_SLOT(ssc, Matrix_LIxSym)), 0,
 	       sizeof(double) * Lnz);
     }
-    UNPROTECT(1);
+    UNPROTECT(2);
     return val;
 }
 
@@ -876,22 +880,32 @@ SEXP ssclme_fixef(SEXP x)
  */
 SEXP ssclme_ranef(SEXP x)
 {
-    SEXP RZXsl = GET_SLOT(x, Matrix_RZXSym);
+    SEXP RZXsl = GET_SLOT(x, Matrix_RZXSym),
+	GpSl = GET_SLOT(x, Matrix_GpSym);
     int *dims = INTEGER(getAttrib(RZXsl, R_DimSymbol)),
-	j,
+	*Gp = INTEGER(GpSl),
+	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	i, j,
 	n = dims[0],
+	nf = length(GpSl) - 1,
 	pp1 = dims[1],
 	p = pp1 - 1;
-    SEXP val = PROTECT(allocVector(REALSXP, n));
+    SEXP val = PROTECT(allocVector(VECSXP, nf));
     double
-	*RZX = REAL(RZXsl),
-	*b = REAL(val),
+	*b = REAL(RZXsl) + n * p,
 	ryyinv;		/* ryy-inverse */
 
     ssclme_invert(x);
-    Memcpy(b, RZX + p * n, n);
     ryyinv = REAL(GET_SLOT(x, Matrix_RXXSym))[pp1*pp1 - 1];
-    for (j = 0; j < n; j++) b[j] /= ryyinv;
+    for (i = 0; i < nf; i++) {
+	int nci = nc[i], Mi = (Gp[i+1] - Gp[i]), mi = Mi/nci;
+	double *mm;
+	
+	SET_VECTOR_ELT(val, i, allocMatrix(REALSXP, nci, mi));
+	mm = Memcpy(REAL(VECTOR_ELT(val, i)), b, Mi);
+	b += nci * mi;
+	for (j = 0; j < Mi; j++) mm[j] /= ryyinv;
+    }
     UNPROTECT(1);
     return val;
 }
