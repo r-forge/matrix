@@ -113,6 +113,6 @@ setMethod("VarCorr", signature(x = "ssclme"),
                    useScale = TRUE)
           })
 
-setmethod("gradient", signature(x = "ssclme"),
+setMethod("gradient", signature(x = "ssclme"),
           function(x, REML, unconstr, ...)
           .Call("ssclme_gradient", x, REML, unconstr))
