@@ -252,7 +252,7 @@ ssclme_create(SEXP facs, SEXP ncv, SEXP threshold)
     SET_SLOT(ssc, Matrix_RXXSym, allocMatrix(REALSXP, pp1, pp1));
     SET_SLOT(ssc, Matrix_ZtXSym, allocMatrix(REALSXP, nzcol, pp1));
     SET_SLOT(ssc, Matrix_RZXSym, allocMatrix(REALSXP, nzcol, pp1));
-        /* Zero the symmetric matrices (for cosmetic reasons only). */
+				/* Zero symmetric matrices (cosmetic) */
     memset(REAL(GET_SLOT(ssc, Matrix_XtXSym)), 0,
 	   sizeof(double) * pp1 * pp1); 
     memset(REAL(GET_SLOT(ssc, Matrix_RXXSym)), 0,
@@ -791,6 +791,7 @@ SEXP ldl_inverse(SEXP x)
     }
     return R_NilValue;
 }
+
 SEXP ssclme_invert(SEXP x)
 {
     int *status = LOGICAL(GET_SLOT(x, Matrix_statusSym));
@@ -1209,11 +1210,12 @@ SEXP ssclme_EMsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP verb)
     return R_NilValue;
 }
 
-SEXP ssclme_gradient(SEXP x, SEXP REMLp)
+SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
 {
     SEXP
+	Omega = GET_SLOT(x, Matrix_OmegaSym),
 	RZXsl = GET_SLOT(x, Matrix_RZXSym),
-	ans = PROTECT(duplicate(GET_SLOT(x, Matrix_OmegaSym))),
+	ans = PROTECT(duplicate(Omega)),
 	ncsl = GET_SLOT(x, Matrix_ncSym),
 	bVar = GET_SLOT(x, Matrix_bVarSym);
     int
@@ -1226,7 +1228,8 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp)
 	nf = length(ncsl) - 2,
 	nobs = nc[nf + 1],
 	p,
-	pp1 = dims[1];
+	pp1 = dims[1],
+	uncst = asLogical(Uncp);
     double
 	*RZX = REAL(RZXsl),
 	*b,
@@ -1265,6 +1268,13 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp)
 		F77_CALL(dsyrk)("U", "N", &nci, &mi,
 				&one, RZX + Gp[i] + j*n, &nci,
 				&one, vali, &nci);
+	    }
+	}
+	if (uncst) {
+	    if (nci == 1) {
+		*vali *= *REAL(VECTOR_ELT(Omega, i));
+	    } else {
+		error("Code not written yet");
 	    }
 	}
     }
