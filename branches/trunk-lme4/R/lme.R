@@ -336,8 +336,10 @@ setMethod("coef", signature(object = "ssclme"),
 setMethod("ranef", signature(object = "ssclme"),
           function(object, ...) {
               val = .Call("ssclme_ranef", object, PACKAGE = "Matrix")
+              bv = object@bVar
+              names(val) = names(bv)
               for (i in seq(along = val)) {
-                  dimnames(val[i]) = dimnames(object@bVar)[-1]
+                  dimnames(val[[i]]) = dimnames(bv[[i]])[-1]
               }
               val
           })
