@@ -125,6 +125,7 @@ static R_CallMethodDef CallEntries[] = {
     {"trMatrix_geMatrix_mm_R", (DL_FUNC) &trMatrix_geMatrix_mm_R, 2},
     {"triplet_validate", (DL_FUNC) &triplet_validate, 1},
     {"triplet_to_geMatrix", (DL_FUNC) &triplet_to_geMatrix, 1},
+    {"triplet_to_matrix", (DL_FUNC) &triplet_to_matrix, 1},
     {"tsc_validate", (DL_FUNC) &tsc_validate, 1},
     {"tsc_transpose", (DL_FUNC) &tsc_transpose, 1},
     {"tsc_to_triplet", (DL_FUNC) &tsc_to_triplet, 1},
