@@ -59,7 +59,8 @@ export(
        "lmeControl",
        "pdgradient",
        "pooledSD",
-       "ranef"
+       "ranef",
+       "sparseGLMM"
        )
 
 exportClasses(
