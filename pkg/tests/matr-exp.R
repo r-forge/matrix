@@ -1,3 +1,5 @@
+library(Matrix)
+
 ## Matrix Exponential
 
 assert.EQ.mat <- function(M, m, tol = 1e-15)
