@@ -69,7 +69,8 @@ exportClasses(
               "groupedData",
               "lmList",
               "lme",
-              "summary.pdMat"
+              "summary.pdMat",
+              "summary.ssclme"
               )
 
 exportMethods(

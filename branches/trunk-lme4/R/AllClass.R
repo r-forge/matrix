@@ -32,7 +32,6 @@ setClass("lme", representation(call = "call",
                                rep = "ssclme",
                                fitted = "numeric"))
 
-## This is needed for the family slot of glmmStruct
 setOldClass("family")
 
 ## Structure for fitting glmm classes
@@ -57,8 +56,6 @@ setClass("VarCorr",
                         useScale="logical"),
          prototype = list(scale = 1.0, useScale = TRUE))
 
-## Deepayan experimenting with possible groupedData structures:
-
 setClass("groupedData",
          representation(data = "data.frame",
                         formula = "formula",
@@ -67,3 +64,15 @@ setClass("groupedData",
                         labels = "list",
                         units = "list"))
 
+setClass("summary.ssclme",
+         representation(coefficients="matrix",
+                        scale="numeric",
+                        denomDF="integer",
+                        REML="logical",
+                        ngrps="integer",
+                        nobs="integer",
+                        corFixed="corrmatrix",
+                        reSumry="list",
+                        useScale="logical",
+                        showCorrelation="logical"
+                        ))

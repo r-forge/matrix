@@ -86,7 +86,6 @@ setMethod("ranef", signature(object = "ssclme"),
               lapply(val, t)
           })
 
-
 setMethod("fixef", signature(object = "ssclme"),
           function(object, ...) {
               val = .Call("ssclme_fixef", object, PACKAGE = "Matrix")
@@ -104,15 +103,144 @@ setMethod("vcov", signature(object = "ssclme"),
           })
 
 setMethod("VarCorr", signature(x = "ssclme"),
-          function(x) {
-              val = .Call("ssclme_variances", x, TRUE, PACKAGE = "Matrix")
+          function(x, REML, useScale) {
+              val = .Call("ssclme_variances", x, PACKAGE = "Matrix")
               bVar = x@bVar
-              for (i in seq(along = val[1]))
-                  dimnames(val[1][[i]]) = dimnames(bVar[[i]][1:2])
-              new("VarCorr", scale = val[[2]], reSumry = val[1],
-                   useScale = TRUE)
+              for (i in seq(along = val))
+                  dimnames(val[[i]]) = dimnames(bVar[[i]][1:2])
+              new("VarCorr",
+                  scale = .Call("ssclme_sigma", x, REML)^2,
+                  reSumry = val,
+                  useScale = useScale)
           })
 
 setMethod("gradient", signature(x = "ssclme"),
           function(x, REML, unconst, ...)
           .Call("ssclme_gradient", x, REML, unconst))
+
+setMethod("summary", "ssclme",
+          function(object, REML = TRUE, useScale = TRUE, ...) {
+              fcoef = fixef(object)
+              corF = as(as(vcov(object), "pdmatrix"), "corrmatrix")
+              DF = getFixDF(object)
+              coefs = cbind(fcoef, corF@stdDev, DF)
+              nc = object@nc
+              dimnames(coefs) =
+                  list(names(fcoef), c("Estimate", "Std. Error", "DF"))
+              new("summary.ssclme",
+                  coefficients = as.matrix(coefs),
+                  scale = .Call("ssclme_sigma", object, REML),
+                  denomDF = as.integer(DF),
+                  REML = REML,
+                  ngrps = length(object@Omega),
+                  nobs = nc[length(nc)],
+                  corFixed = corF,
+                  reSumry = VarCorr(object, REML, FALSE))
+          })
+
+setMethod("getFixDF", signature(object="ssclme"),
+          function(object)
+      {
+          nc = object@nc[-seq(along = object@Omega)]
+          p = nc[1] - 1
+          n = nc[2]
+          rep(n-p, p)
+          ## calculates degrees of freedom for fixed effects Wald tests
+#          Q <- length(object@random)-2
+#          columns = object@random[["*fixed*"]]@columns
+#          X = object@original[, columns, drop = FALSE]
+#          ngrps = unlist(lapply(object@random, function(lmeLevel)
+#                                 lmeLevel@nlev))
+#          names(ngrps) = names(object@random)
+#          val = .Call("nlme_getFixDF", object, PACKAGE = "lme4")
+#          names(val$X) =
+#              colnames(object@original)[object@random[["*fixed*"]]@columns]
+#                                        # Convert R's assign to S-PLUS style
+#          assign = object@assign.X
+#          terms = terms(object@fixed)
+#          namTerms = attr(terms, "term.labels")
+#          if (attr(terms, "intercept") > 0) {
+#              namTerms = c("(Intercept)", namTerms)
+#          }
+#          names(val$terms) = namTerms
+#          namTerms = factor(assign, labels = namTerms)
+#          attr(val, "assign") = split(order(assign), namTerms)
+#          val
+      })
+
+setMethod("show", signature(object="summary.ssclme"),
+          function(object) {
+              digits = max(3, getOption("digits") - 2)
+              useScale = length(object@useScale) > 0 && object@useScale[1]
+              sc = ifelse(useScale, object@scale,  1.)
+              reStdDev = lapply(object@reSumry, function(x, sc) sc*x@stdDev,
+              sc = sc)
+              reLens = unlist(lapply(reStdDev, length))
+              reMat = array('', c(sum(reLens), 4),
+              list(rep('', sum(reLens)),
+                   c("Groups", "Name", "Variance", "Std.Dev.")))
+              reMat[1+cumsum(reLens)-reLens, 1] = names(reLens)
+              reMat[,2] = unlist(lapply(reStdDev, names))
+              reMat[,3] = format(unlist(reStdDev)^2, digits = digits)
+              reMat[,4] = format(unlist(reStdDev), digits = digits)
+              if (any(reLens > 1)) {
+                  maxlen = max(reLens)
+                  corr =
+                      do.call("rbind",
+                              lapply(object@reSumry,
+                                     function(x, maxlen) {
+                                         cc = format(round(x, 3), nsmall = 3)
+                                         cc[!lower.tri(cc)] = ""
+                                         nr = dim(cc)[1]
+                                         cbind(cc, matrix("",
+                                                          nr, maxlen-nr))
+                                     }, maxlen))
+                  colnames(corr) = c("Corr", rep("", maxlen - 1))
+                  reMat = cbind(reMat, corr)
+              }
+              if (useScale) {
+                  reMat = rbind(reMat, c("Residual", "",
+                  format(sc^2, digits = digits),
+                  format(sc, digits = digits),
+                  rep('', ncol(reMat) - 4)))
+              }
+              cat("Random effects:\n")
+              print(reMat, quote = FALSE)
+              cm = object@coefficients
+              if (useScale) {
+                  cm[,"Std. Error"] = sc * cm[, "Std. Error"]
+                  stat = cm[,1]/cm[,2]
+                  pval = 2*pt(abs(stat), cm[,3], lower = FALSE)
+                  nms = colnames(cm)
+                  cm = cbind(cm, stat, pval)
+                  colnames(cm) = c(nms, "t value", "Pr(>|t|)")
+              } else {
+                  cat("\nEstimated scale (compare to 1) ", object@scale, "\n")
+                  stat = cm[,1]/cm[,2]
+                  pval = 2*pnorm(abs(stat), lower = FALSE)
+                  nms = colnames(cm)
+                  cm = cbind(cm, stat, pval)
+                  colnames(cm) = c(nms, "z value", "Pr(>|z|)")
+              }
+#              cat("\nFixed effects:",
+#                  paste(deparse(object@fixed),
+#                        sep = '\n', collapse = '\n'), "\n")
+              printCoefmat(cm, tst.ind = 4, zap.ind = 3)
+              if (length(object@showCorrelation) > 0 &&
+                  object@showCorrelation[1]) {
+                  correl = object@corFixed
+                  rn = rownames(cm)
+                  dimnames(correl) = list(
+                          abbreviate(rn, minlen=11), abbreviate(rn, minlen=6))
+                  if (!is.null(correl)) {
+                      p = NCOL(correl)
+                      if (p > 1) {
+                          cat("\nCorrelation of Fixed Effects:\n")
+                          correl = format(round(correl, 3), nsmall = 3)
+                          correl[!lower.tri(correl)] = ""
+                          print(correl[-1, -p, drop=FALSE], quote = FALSE)
+                      }
+                  }
+              }
+          })
+
