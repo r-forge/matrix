@@ -2,17 +2,11 @@
 
 SEXP dsCMatrix_validate(SEXP obj)
 {
-    SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+    SEXP val = check_scalar_string(GET_SLOT(obj, Matrix_uploSym),
+				   "LU", "uplo");
     int *Dim = INTEGER(GET_SLOT(obj, Matrix_DimSym));
-    char *val;
 
-    if (length(uplo) != 1)
-	return mkString(_("uplo slot must have length 1"));
-    val = CHAR(STRING_ELT(uplo, 0));
-    if (strlen(val) != 1)
-    	return mkString(_("uplo[1] must have string length 1"));
-    if (*val != 'U' && *val != 'L')
-    	return mkString(_("uplo[1] must be \"U\" or \"L\""));
+    if (isString(val)) return val;
     if (Dim[0] != Dim[1])
 	return mkString(_("Symmetric matrix must be square"));
     csc_check_column_sorting(obj);

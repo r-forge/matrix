@@ -8,24 +8,12 @@
 */
 SEXP dtrMatrix_validate(SEXP obj)
 {
-    SEXP uplo = GET_SLOT(obj, Matrix_uploSym),
-	diag = GET_SLOT(obj, Matrix_diagSym);
-    char *val;
+    SEXP val;
 
-    if (length(uplo) != 1)
-	return mkString(_("'uplo' slot must have length 1"));
-    if (length(diag) != 1)
-	return mkString(_("'diag' slot must have length 1"));
-    val = CHAR(STRING_ELT(uplo, 0));
-    if (strlen(val) != 1)
-    	return mkString(_("'uplo' must have string length 1"));
-    if (*val != 'U' && *val != 'L')
-    	return mkString(_("'uplo' must be \"U\" or \"L\""));
-    val = CHAR(STRING_ELT(diag, 0));
-    if (strlen(val) != 1)
-    	return mkString(_("'diag' must have string length 1"));
-    if (*val != 'U' && *val != 'N')
-    	return mkString(_("'diag' must be \"U\" or \"N\""));
+    if (isString(val = check_scalar_string(GET_SLOT(obj, Matrix_uploSym),
+					   "LU", "uplo"))) return val;
+    if (isString(val = check_scalar_string(GET_SLOT(obj, Matrix_diagSym),
+					   "NU", "diag"))) return val;
     return ScalarLogical(1);
 }
 

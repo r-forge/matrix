@@ -540,3 +540,77 @@ double *expand_csc_column(double *dest, int m, int j,
     return dest;
 }
 
+#define Matrix_Error_Bufsiz    4096
+
+SEXP check_scalar_string(SEXP sP, char *vals, char *nm)
+{
+    SEXP val = ScalarLogical(1);
+    char *buf = Calloc(Matrix_Error_Bufsiz, char), *str;
+
+    if (length(sP) != 1) {
+	sprintf(buf, _("'%s' slot must have length 1"), nm);
+	val = mkString(buf);
+    } else {
+	str = CHAR(STRING_ELT(sP, 0));
+	if (strlen(str) != 1) {
+	    sprintf(buf, _("'%s' must have string length 1"), nm);
+	    val = mkString(buf);
+	} else {
+	    int i, len, match;
+
+	    for (i = 0, len = strlen(vals), match = 0; i < len; i++) {
+		if (str[0] == vals[i]) {
+		    match = 1;
+		    break;
+		}
+	    }
+	    sprintf(buf, _("'%s' must be in '%s'"), nm, vals);
+	    val = match ? R_NilValue : mkString(buf);
+	}
+    }
+    Free(buf);
+    return val;
+}
+
+double *packed_to_full(double *dest, const double *src, int n,
+		       enum CBLAS_UPLO uplo)
+{
+    int i, j, pos = 0;
+    
+    AZERO(dest, n*n);
+    for (j = 0; j < n; j++) {
+	switch(uplo) {
+	case UPP:
+	    for (i = 0; i <= j; i++) dest[i + j * n] = src[pos++];
+	    break;
+	case LOW:
+	    for (i = j; i < n; i++) dest[i + j * n] = src[pos++];
+	    break;
+	default:
+	    error(_("'uplo' must be UPP or LOW"));
+	}
+    }
+    return dest;
+}
+
+double *full_to_packed(double *dest, const double *src, int n,
+		       enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag)
+{
+    int i, j, pos = 0;
+
+    for (j = 0; j < n; j++) {
+	switch(uplo) {
+	case UPP:
+	    for (i = 0; i <= j; i++)
+		dest[pos++] = (i == j && diag == UNT) ? 1. : src[i + j * n];
+	    break;
+	case LOW:
+	    for (i = j; i < n; i++)
+		dest[pos++] = (i == j && diag == UNT) ? 1. : src[i + j * n];
+	    break;
+	default:
+	    error(_("'uplo' must be UPP or LOW"));
+	}
+    }
+    return dest;
+}

@@ -4,18 +4,18 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+    
 #include <Rdefines.h>
 #include <Rconfig.h>
 #include <R.h>  /* to include Rconfig.h */
-
+    
 #ifdef ENABLE_NLS
 #include <libintl.h>
 #define _(String) dgettext ("Matrix", String)
 #else
 #define _(String) (String)
 #endif
-
+    
 /* enum constants from cblas.h and some short forms */
 enum CBLAS_ORDER {CblasRowMajor=101, CblasColMajor=102};
 enum CBLAS_TRANSPOSE {CblasNoTrans=111, CblasTrans=112, CblasConjTrans=113};
@@ -58,9 +58,13 @@ void nlme_check_Lapack_error(int info, const char *laName);
 SEXP nlme_replaceSlot(SEXP obj, SEXP names, SEXP value);
 SEXP nlme_weight_matrix_list(SEXP MLin, SEXP wts, SEXP adjst, SEXP MLout);
 SEXP Matrix_make_named(int TYP, char **names);
-				/* stored pointers to symbols */
-				/* initialized in R_init_Matrix */
-extern
+SEXP check_scalar_string(SEXP sP, char *vals, char *nm);
+double *packed_to_full(double *dest, const double *src, int n,
+		       enum CBLAS_UPLO uplo);
+double *full_to_packed(double *dest, const double *src, int n,
+		       enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
+
+extern	 /* stored pointers to symbols initialized in R_init_Matrix */
 #include "Syms.h"
 
 /* zero an array */
