@@ -56,7 +56,7 @@ exportClasses(
               "dtrMatrix",
 
               "corrmatrix",
-              #"pdfactor",
+              "pMatrix",
               "pdmatrix",
               "dCholCMatrix",
               "sscCrosstab",
