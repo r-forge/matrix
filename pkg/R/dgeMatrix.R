@@ -14,10 +14,8 @@ setAs("dgeMatrix", "matrix",
       })
 
 ## Group Methods, see ?Arith (e.g.)
+## ----- only work with NAMESPACE importFrom(methods, ..)
 
-if(FALSE) {
-## this fails with NAMESPACE --- but works otherwise :
-## >> Error in getAllMethods(f, fdef, where) : "Arith" is not a function visible from "Matrix"
 setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
           signature(e1 = "dgeMatrix", e2 = "dgeMatrix"),
           function(e1, e2) {
@@ -52,7 +50,6 @@ setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
                   x = callGeneric(e1@x, e2@x))
           })
 
-
 setMethod("Arith",
           signature(e1 = "dgeMatrix", e2 = "numeric"),
           ## could use this function twice  for   A o B  and   B o A
@@ -77,7 +74,6 @@ setMethod("Arith",
               } else stop ("length of 1st arg does not match dimension of 2nd")
           })
 
-}
 ## -- end{group generics} -----------------------
 
 

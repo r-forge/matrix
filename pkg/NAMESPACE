@@ -5,6 +5,9 @@ importFrom("lattice", levelplot)
 importFrom("grid",    grid.rect, gpar, grob)
 importFrom("stats",   deviance, formula, coef)
 
+## Currently, group generics need to be explicitly imported (Bug?):
+importFrom("methods", Arith, Compare, Math, Math2, Summary, Complex)
+
 ## Generics and functions defined in this package
 export(
        "Hilbert",
@@ -34,7 +37,7 @@ exportClasses(
               "Matrix",
               ## also intermediate `virtual' ones:
               "dMatrix",
-              ## "iMatrix", "lMatrix", "zMatrix",
+              ## not yet:   "iMatrix", "lMatrix", "zMatrix",
               "ddenseMatrix",
 
               "corrmatrix",
@@ -60,7 +63,7 @@ exportClasses(
 
 exportMethods(
               ## Group Methods
-## fails!     "Arith",
+              "Arith",
 
               "+",# for dgT(Matrix) only
               "%*%",
@@ -88,5 +91,3 @@ exportMethods(
               "t",
               "tcrossprod"
               )
-
-
