@@ -319,7 +319,8 @@ setMethod("anova", signature(object = "lme"),
           if (!is.null(subset[[1]]))
               header <-
                   c(header,
-                    paste("Subset", deparse(subset[[1]], forDisplay = TRUE), sep = ": "))
+#                    paste("Subset", deparse(subset[[1]], forDisplay = TRUE), sep = ": "))
+                    paste("Subset", deparse(subset[[1]]), sep = ": "))
           llks <- lapply(mods, logLik, REML = FALSE)
           Df <- sapply(llks, attr, "df")
           llk <- unlist(llks)
@@ -337,8 +338,10 @@ setMethod("anova", signature(object = "lme"),
           attr(val, "heading") <-
               c(header, "", "Models: <fixed>: <random>",
                 paste(names(mods),
-                      unlist(lapply(lapply(calls, "[[", "formula"), deparse, forDisplay = TRUE)),
-                      unlist(lapply(lapply(calls, "[[", "random"), deparse, forDisplay = TRUE)),
+#                      unlist(lapply(lapply(calls, "[[", "formula"), deparse, forDisplay = TRUE)),
+#                      unlist(lapply(lapply(calls, "[[", "random"), deparse, forDisplay = TRUE)),
+                      unlist(lapply(lapply(calls, "[[", "formula"), deparse)),
+                      unlist(lapply(lapply(calls, "[[", "random"), deparse)),
                       sep = ": "),"")
           val
       })
@@ -366,8 +369,10 @@ setMethod("ranef", signature(object = "lme"),
 setMethod("coef", signature(object = "lme"),
           function(object, ...)
       {
-          object = object@rep
-          callGeneric()
+          mCall <- match.call()
+          mCall[[1]] <- as.name("ranef")
+          random <- eval(mCall, parent.frame())
+          random
       })
 
 setMethod("update", signature(object = "lme"),
