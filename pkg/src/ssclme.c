@@ -602,7 +602,7 @@ SEXP ssclme_factor(SEXP x)
 			RZX, &n, &one, RXX, &pp1);
 	F77_CALL(dpotrf)("U", &pp1, RXX, &pp1, &i);
 	if (i)
-	    error("DPOTRF returned error code %d", i);
+	    error("Could not factor downdated X'X, code %d", i);
 				/* logdet of RXX */
 	for (i = 0; i < (pp1 - 1); i++)
 	    dcmp[2] += 2 * log(RXX[i*pp2]);
@@ -1222,9 +1222,13 @@ SEXP ssclme_EMsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP verb)
 		}
 	    }
 	    F77_CALL(dpotrf)("U", &nci, vali, &nci, &info);
-	    if (info) error("DPOTRF returned error code %d", info);
+	    if (info)
+		error("DPOTRF returned error code %d in Omega[[%d]] update",
+		      info, i + 1);
 	    F77_CALL(dpotri)("U", &nci, vali, &nci, &info);
-	    if (info) error("DPOTRI returned error code %d", info);
+	    if (info)
+		error("DPOTRI returned error code %d in Omega[[%d]] update",
+		      info, i + 1);
 	}
 	status[0] = status[1] = 0;
     }
@@ -1413,3 +1417,31 @@ SEXP ssclme_variances(SEXP x, SEXP REML)
     return val;
 }
 
+SEXP ssclme_collapse(SEXP x)
+{
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("ssclme"))),
+	Omega = GET_SLOT(x, Matrix_OmegaSym),
+	Dim = GET_SLOT(x, Matrix_DimSym);
+    int i, nf = length(Omega), nz = INTEGER(Dim)[1];
+    SEXP copy[] = {Matrix_DSym, Matrix_DIsqrtSym, Matrix_DimSym,
+		   Matrix_GpSym, Matrix_LIiSym, Matrix_LIpSym,
+		   Matrix_LIxSym, Matrix_LiSym, Matrix_LpSym,
+		   Matrix_LxSym, Matrix_OmegaSym, Matrix_ParentSym,
+		   Matrix_LIxSym, Matrix_LiSym, Matrix_LpSym,
+		   Matrix_bVarSym, Matrix_devianceSym,
+		   Matrix_devCompSym, Matrix_iSym, Matrix_ncSym,
+		   Matrix_statusSym, Matrix_pSym, Matrix_xSym};
+
+    for (i = 0; i < 23; i++)
+	SET_SLOT(ans, copy[i], duplicate(GET_SLOT(x, copy[i])));
+
+    INTEGER(GET_SLOT(ans, Matrix_ncSym))[nf] = 1;
+    SET_SLOT(ans, Matrix_XtXSym, allocMatrix(REALSXP, 1, 1));
+    SET_SLOT(ans, Matrix_RXXSym, allocMatrix(REALSXP, 1, 1));
+    SET_SLOT(ans, Matrix_ZtXSym, allocMatrix(REALSXP, nz, 1));
+    SET_SLOT(ans, Matrix_RZXSym, allocMatrix(REALSXP, nz, 1));
+    UNPROTECT(1);
+    return ans;
+}
+
+    
