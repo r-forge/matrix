@@ -1,7 +1,7 @@
 library(lme4)
 # data(guPrenat)
 # system.time(fm <-
-#             sparseGLMM(ifelse(prenat == 'Modern', 1, 0) ~ childAge +
+#             GLMM(ifelse(prenat == 'Modern', 1, 0) ~ childAge +
 #                        motherAge + indig + momEd +
 #                        husEd + husEmpl + toilet + pcInd81 + ssDist,
 #                        data = as(guPrenat, "data.frame"), family = binomial,

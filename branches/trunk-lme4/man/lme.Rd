@@ -2,7 +2,7 @@
 \docType{genericFunction}
 \alias{lme}
 \alias{lme,ANY,ANY,formula-method}
-\alias{lme,ANY,missing,ANY-method}
+%\alias{lme,ANY,missing,ANY-method}
 \alias{lme,missing,ANY,ANY-method}
 \alias{lme,formula,ANY,formula-method}
 \alias{lme,formula,ANY,list-method}

@@ -1,11 +1,14 @@
 \name{GLMM}
 \alias{GLMM}
-\alias{GLMM,ANY,ANY,missing,ANY-method}
-\alias{GLMM,missing,ANY,groupedData,ANY-method}
-\alias{GLMM,formula,ANY,groupedData,missing-method}
-\alias{GLMM,formula,ANY,ANY,formula-method}
+\alias{GLMM,ANY,family,ANY,formula-method}
+\alias{GLMM,ANY,name,ANY,ANY-method}
+\alias{GLMM,formula,family,ANY,formula-method}
 \alias{GLMM,formula,family,ANY,list-method}
-\alias{GLMM,formula,ANY,ANY,list-method}
+\alias{GLMM,formula,family,ANY,list-method}
+\alias{GLMM,formula,family,groupedData,list-method}
+\alias{GLMM,formula,family,groupedData,missing-method}
+\alias{GLMM,missing,family,ANY,ANY-method}
+\alias{GLMM,missing,family,groupedData,ANY-method}
 \title{
 Fit Generalized Linear Mixed Models via PQL
 }

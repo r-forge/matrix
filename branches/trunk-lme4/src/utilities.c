@@ -27,6 +27,18 @@ nlme_replaceSlot(SEXP obj, SEXP names, SEXP value)
     return obj;
 }
 
+/** 
+ * Produce a weighted copy of the matrices in MLin in the storage
+ * allocated to MLout
+ * 
+ * @param MLin input matrix list
+ * @param wts real vector of weights
+ * @param adjst adjusted response
+ * @param MLout On input a list of matrices of the same dimensions as MLin.  
+ * 
+ * @return MLout with its contents overwritten by a weighted copy of
+ * MLin according to wts with adjst overwriting the response.
+ */
 SEXP nlme_weight_matrix_list(SEXP MLin, SEXP wts, SEXP adjst, SEXP MLout)
 {
     int i, j, n, nf;

@@ -1,6 +1,8 @@
 \name{lme-class}
 \docType{class}
 \alias{lme-class}
+\alias{summary.lme-class}
+\alias{summary.ssclme-class}
 \alias{VarCorr,lme-method}
 \alias{VarCorr,ssclme-method}
 \alias{anova,lme-method}
