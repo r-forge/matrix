@@ -149,7 +149,8 @@ setMethod("lme", signature(formula = "formula",
                    method = c("REML", "ML"),
                    control = list(),
                    subset, weights, na.action, offset,
-                   model = TRUE, x = FALSE, y = FALSE,...)
+                   model = TRUE, x = FALSE, y
+                   = FALSE,...)
       {
           method = match.arg(method)
           random = lapply(random, formula) # formula function, not argument
@@ -177,11 +178,14 @@ setMethod("lme", signature(formula = "formula",
                 controlvals$REML, controlvals$EMverbose, PACKAGE = "Matrix")
           LMEoptimize(obj) = controlvals
           fitted = .Call("ssclme_fitted", obj, facs, mmats, PACKAGE = "Matrix")
+          if (as.logical(x)[1]) x = mmats else x = list()
+          residuals = mmats$.Xy[,".response"] - fitted
+          rm(mmats)
           new("lme", call = match.call(), facs = facs,
-              x = if(x) mmats else list(),
+              x = x,
               model = if(model) data else data.frame(list()),
               REML = method == "REML", rep = obj, fitted = fitted,
-              residuals = mmats$.Xy[,".response"] - fitted)
+              residuals = residuals)
       })
 
 setMethod("fitted", signature(object="lme"),
