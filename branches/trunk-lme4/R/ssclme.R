@@ -194,36 +194,40 @@ setMethod("show", signature(object="summary.ssclme"),
               REML = length(object@REML) > 0 && object@REML[1]
               cat("Random effects:\n")
               show(object@VarCorr)
-              cm = object@coefficients
-              if (useScale) {
-                  stat = cm[,1]/cm[,2]
-                  pval = 2*pt(abs(stat), cm[,3], lower = FALSE)
-                  nms = colnames(cm)
-                  cm = cbind(cm, stat, pval)
-                  colnames(cm) = c(nms, "t value", "Pr(>|t|)")
-              } else {
+              if (!useScale)
                   cat("\nEstimated scale (compare to 1) ", object@scale, "\n")
-                  stat = cm[,1]/cm[,2]
-                  pval = 2*pnorm(abs(stat), lower = FALSE)
-                  nms = colnames(cm)
-                  cm = cbind(cm, stat, pval)
-                  colnames(cm) = c(nms, "z value", "Pr(>|z|)")
-              }
-              cat("\nFixed effects:\n")
-              printCoefmat(cm, tst.ind = 4, zap.ind = 3)
-              if (length(object@showCorrelation) > 0 &&
-                  object@showCorrelation[1]) {
-                  correl = object@corFixed
-                  rn = rownames(cm)
-                  dimnames(correl) = list(
-                          abbreviate(rn, minlen=11), abbreviate(rn, minlen=6))
-                  if (!is.null(correl)) {
-                      p = NCOL(correl)
-                      if (p > 1) {
-                          cat("\nCorrelation of Fixed Effects:\n")
-                          correl = format(round(correl, 3), nsmall = 3)
-                          correl[!lower.tri(correl)] = ""
-                          print(correl[-1, -p, drop=FALSE], quote = FALSE)
+              cm = object@coefficients
+              if (nrow(cm) > 0) {
+                  if (useScale) {
+                      stat = cm[,1]/cm[,2]
+                      pval = 2*pt(abs(stat), cm[,3], lower = FALSE)
+                      nms = colnames(cm)
+                      cm = cbind(cm, stat, pval)
+                      colnames(cm) = c(nms, "t value", "Pr(>|t|)")
+                  } else {
+                      stat = cm[,1]/cm[,2]
+                      pval = 2*pnorm(abs(stat), lower = FALSE)
+                      nms = colnames(cm)
+                      cm = cbind(cm, stat, pval)
+                      colnames(cm) = c(nms, "z value", "Pr(>|z|)")
+                  }
+                  cat("\nFixed effects:\n")
+                  printCoefmat(cm, tst.ind = 4, zap.ind = 3)
+                  if (length(object@showCorrelation) > 0 &&
+                      object@showCorrelation[1]) {
+                      correl = object@corFixed
+                      rn = rownames(cm)
+                      dimnames(correl) = list(
+                              abbreviate(rn, minlen=11),
+                              abbreviate(rn, minlen=6))
+                      if (!is.null(correl)) {
+                          p = NCOL(correl)
+                          if (p > 1) {
+                              cat("\nCorrelation of Fixed Effects:\n")
+                              correl = format(round(correl, 3), nsmall = 3)
+                              correl[!lower.tri(correl)] = ""
+                              print(correl[-1, -p, drop=FALSE], quote = FALSE)
+                          }
                       }
                   }
               }
