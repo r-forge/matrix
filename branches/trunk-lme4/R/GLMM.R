@@ -168,7 +168,7 @@ setMethod("GLMM",
           firstIter <- TRUE
           msMaxIter.orig <- controlvals$msMaxIter
 
-          for (iter in seq(length = controlvals$glmmMaxIter)) ## FIXME: rename to pqlMaxIter ?
+          for (iter in seq(length = controlvals$PQLmaxIt))
           {
               mu <- family$linkinv(eta)
               dmu.deta <- family$mu.eta(eta)
@@ -391,11 +391,9 @@ setMethod("GLMM",
                       optim(fn = devLaplace,
                             par = c(fixef(obj), coef(obj, unconst = TRUE)),
                             method = "BFGS", hessian = TRUE,
-                            control = list(trace = getOption("verbose")),
-                            reltol = controlvals$msTol,
-                            ##fnscale = -xval,
-                            ##parscale = 1/controlvals$msScale(coef(obj)),
-                            maxit = controlvals$msMaxIter)
+                            control = list(trace = getOption("verbose"),
+                                           reltol = controlvals$msTol,
+                                           maxit = controlvals$msMaxIter))
                   if (optimRes$convergence != 0)
                       warning("optim failed to converge")
                   optpars <- optimRes$par
