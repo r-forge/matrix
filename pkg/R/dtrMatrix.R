@@ -3,6 +3,7 @@
 setAs("dtrMatrix", "dgeMatrix",
       function(from) .Call("dtrMatrix_as_dgeMatrix", from) )
 
+## needed for t() method
 setAs("dtrMatrix", "matrix",
       function(from) .Call("dtrMatrix_as_matrix", from) )
 
@@ -73,3 +74,23 @@ setMethod("t", signature(x = "dtrMatrix"),
 	      if (x@diag == "U") val@diag <- "U"
 	      val
 	  }, valueClass = "dtrMatrix")
+
+###
+
+## in construction -> not yet exported
+Diagonal <- function(n, x = NULL, ncol = n)
+{
+    ## Purpose: Constructor of diagonal matrices -- *not* diag() extractor!
+    stopifnot(length(n) == 1, n == as.integer(n), n >= 0)
+    n <- as.integer(n)
+    stopifnot(length(ncol <- as.integer(ncol)) == 1, ncol >= 0)
+    if(missing(x)) # unit diagonal matrix
+        new("dtrMatrix", Dim = c(n,ncol), diag = "U",
+            x = rep(0, .......))
+    else {
+        x <- as.numeric(x)
+        stopifnot(length(x) == min(n, ncol))
+        new("dtrMatrix", Dim = c(n,ncol), diag = "N",
+            x = ..x..and..many..0s)
+    }
+}

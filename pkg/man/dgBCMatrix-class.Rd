@@ -1,8 +1,10 @@
 \name{dgBCMatrix-class}
 \docType{class}
 \alias{dgBCMatrix-class}
+\alias{coerce,dgBCMatrix,dgeMatrix-method}
 \alias{coerce,dgBCMatrix,dgCMatrix-method}
 \alias{coerce,dgBCMatrix,dgTMatrix-method}
+\alias{coerce,dgBCMatrix,matrix-method}
 \title{Class "dgBCMatrix" Real Sparse Blocked Column Compressed Matrix}
 \description{
   The \code{dgCMatrix} class is a class of sparse blocked matrices in
@@ -37,6 +39,8 @@
   \describe{
     \item{coerce}{\code{signature(from = "dgBCMatrix", to = "dgCMatrix")}}
     \item{coerce}{\code{signature(from = "dgBCMatrix", to = "dgTMatrix")}}
+    \item{coerce}{\code{signature(from = "dgBCMatrix", to = "dgeMatrix")}}
+    \item{coerce}{\code{signature(from = "dgBCMatrix", to = "matrix")}}
     \item{coerce}{\code{signature(from = "dgCMatrix", to = "dgBCMatrix")}}
   }
 }
@@ -46,5 +50,7 @@
 \seealso{
  \code{\link{dgCMatrix-class}}
 }
-%\examples{}
+% \examples{
+
+% }
 \keyword{classes}

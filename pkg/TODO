@@ -16,7 +16,7 @@
 		MM thinks dimnames should be supported (but then ...)
 
 - consider moving alloc3Darray from ./src/Mutils.c to
-  $(RSRC)/src/base/array.c 
+  $(RSRC)/src/base/array.c
 
 - data/ : names 'mm' and even more 'y' are  ``too short''.
 	If we really want to keep them, don't use "LazyData"
@@ -42,3 +42,11 @@ We have a (at least one) basic problem :
 
   {Of course, we don't need a workaround but must understand
    and solve the problem}
+
+---
+
+- implement (more) methods for supporting "packed" (symmetric / triangular)
+  matrices; particularly something like pack() and unpack().
+
+- implement diagonal Matrix class  "ddiMatrix" etc
+  using constructor function Diagonal() or Diag().

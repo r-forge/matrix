@@ -1,16 +1,49 @@
-## FIXME: dimnames ?
-
 setAs("matrix", "dgeMatrix",
       function(from) {
           new("dgeMatrix",
               x = as.double(from),
-              Dim = as.integer(dim(from)))
+              Dim = as.integer(dim(from)),
+              Dimnames =
+              if(!is.null(dn <- dimnames(from))) dn else list(NULL,NULL)
+              )
       })
 
 setAs("dgeMatrix", "matrix",
       function(from) {
-          array(from@x, dim = from@Dim)
+          array(from@x, dim = from@Dim, dimnames = from@Dimnames)
       })
+
+## Group Methods, see ?Arith (e.g.)
+
+if(FALSE)
+## don't know why this fails with
+## >> Error in getAllMethods(f, fdef, where) : "Arith" is not a function visible from "Matrix"
+setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
+          signature(e1 = "dgeMatrix", e2 = "dgeMatrix"),
+          function(e1, e2) {
+              d1 <- e1@Dim
+              d2 <- e2@Dim
+              eqD <- d1 == d2
+              if (!eqD[1])
+                  stop("Matrices must have same number of rows for arithmetic")
+              if (eqD[2])
+                  d <- d1
+              else { # nrows differ
+                  if(d2[2] %% d1[2] == 0) { # nrow(e2) is a multiple
+                      e1@x <- rep.int(e1@x, d2[2] %/% d1[2])
+                      d <- d2
+                  } else if(d1[2] %% d2[2] == 0) { # nrow(e1) is a multiple
+                      e2@x <- rep.int(e2@x, d1[2] %/% d2[2])
+                      d <- d1
+                  }
+                  else
+                      stop("number of rows are not compatible for arithmetic")
+              }
+              new("dgeMatrix", Dim = d, x = callGeneric(e1@x, e2@x))
+          })
+
+
+##
 
 setMethod("norm", signature(x = "dgeMatrix", type = "missing"),
           function(x, type, ...) norm(x, type = "O", ...))

@@ -26,3 +26,6 @@
 	     src/Metis/Makefile fixed but not src/Makefile
   --DB - now have both working, I believe.
 
+- man/Matrix.Rd :  has example with dimnames, but we just drop them!
+		MM thinks dimnames should be supported (but then ...)
+  -- added 'Dimnames' slot (2005-02-10)

@@ -19,6 +19,7 @@
     \item{\code{diag}:}{inherited from the \code{"dtrMatrix"} class.}
     \item{\code{x}:}{inherited from the \code{"dtrMatrix"} class.}
     \item{\code{Dim}:}{inherited from the \code{"dtrMatrix"} class.}
+    \item{\code{Dimnames}:}{inherited from the \code{"dtrMatrix"} class.}
     \item{\code{rcond}:}{inherited from the \code{"dtrMatrix"} class.}
     \item{\code{factors}:}{inherited from the \code{"dtrMatrix"}
       class.  For this class the \code{factors} slot is always an

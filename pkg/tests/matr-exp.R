@@ -2,9 +2,31 @@ library(Matrix)
 
 ## Matrix Exponential
 
-assert.EQ.mat <- function(M, m, tol = 1e-15)
-    stopifnot(all.equal(as(M, "matrix"), m, tol = tol))
 
+## checking;  'show' is for convenience of the developer
+assert.EQ.mat <- function(M, m, tol = if(show) 0 else 1e-15, show=FALSE) {
+    if(show) all.equal(as(M, "matrix"), m, tol = tol)
+    else stopifnot(all.equal(as(M, "matrix"), m, tol = tol))
+}
+## The relative error typically returned by all.equal:
+relErr <- function(target, current)
+    mean(abs(target - current)) / mean(abs(target))
+
+## e ^ 0 = 1  - for matrices:
+assert.EQ.mat(expm(Matrix(0, 3,3)), diag(3), tol = 0)# exactly
+## e ^ diag(.) = diag(e ^ .):
+assert.EQ.mat(expm(as(diag(-1:4), "dgeMatrix")), diag(exp(-1:4)))
+set.seed(1)
+rE <- replicate(100,
+            { x <- rlnorm(12)
+              relErr(as(expm(as(diag(x), "dgeMatrix")),
+                        "matrix"),
+                     diag(exp(x))) })
+stopifnot(mean(rE) < 1e-15,
+          max(rE)  < 1e-14)
+summary(rE)
+
+## Some small matrices
 
 m1 <- Matrix(c(1,0,1,1), nc = 2)
 e1 <- expm(m1)
@@ -33,3 +55,4 @@ assert.EQ.mat(e3,
 		    c(0,0, 1, 6),
 		    c(0,0, 0, 1)))
 
+proc.time() # for ``statistical reasons''

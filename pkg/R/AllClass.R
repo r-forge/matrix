@@ -6,14 +6,17 @@
 ## ------------- Virtual Classes ----------------------------------------
 
 # Virtual class of all Matrix objects
-setClass("Matrix", representation(Dim = "integer"),
-         prototype = prototype(Dim = integer(2)),
+setClass("Matrix", representation(Dim = "integer", Dimnames = "list"),
+         prototype = prototype(Dim = integer(2), Dimnames = list(NULL,NULL)),
          validity = function(object) {
              Dim <- object@Dim
              if (length(Dim) != 2)
                  return("Dim slot must be of length 2")
              if (any(Dim < 0))
                  return("Dim slot must contain non-negative values")
+             Dn <- object@Dimnames
+             if (!is.list(Dn) || length(Dn) != 2)
+                 return("'Dimnames' slot must be list of length 2")
              TRUE
          })
 

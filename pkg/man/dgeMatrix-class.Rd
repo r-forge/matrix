@@ -1,6 +1,11 @@
 \name{dgeMatrix-class}
+\title{General S4 Matrix class}
 \docType{class}
 \alias{dgeMatrix-class}
+% FIXME: These two are not (yet) further referenced below:
+\alias{dMatrix-class}
+\alias{ddenseMatrix-class}
+% Methods:
 \alias{\%*\%,dgeMatrix,dgeMatrix-method}
 \alias{Schur,dgeMatrix,logical-method}
 \alias{Schur,dgeMatrix,missing-method}
@@ -21,7 +26,7 @@
 \alias{rcond,dgeMatrix,character-method}
 \alias{solve,dgeMatrix,matrix-method}
 \alias{solve,dgeMatrix,missing-method}
-\title{General S4 Matrix class}
+%
 \description{A general, numeric matrix in the S4 Matrix representation}
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("dgeMatrix", ...)}
