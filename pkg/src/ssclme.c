@@ -1440,6 +1440,7 @@ SEXP ssclme_collapse(SEXP x)
     SET_SLOT(ans, Matrix_RXXSym, allocMatrix(REALSXP, 1, 1));
     SET_SLOT(ans, Matrix_ZtXSym, allocMatrix(REALSXP, nz, 1));
     SET_SLOT(ans, Matrix_RZXSym, allocMatrix(REALSXP, nz, 1));
+    LOGICAL(GET_SLOT(ans, Matrix_statusSym))[0] = 0;
     UNPROTECT(1);
     return ans;
 }
