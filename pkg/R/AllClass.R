@@ -1,4 +1,4 @@
-# Ensure that the methods package is available
+## Ensure that the methods package is available
 .onLoad <- function(lib, pkg) {
     require("methods", character = TRUE, quietly = TRUE)
 }
@@ -39,14 +39,14 @@ setClass("zMatrix", # letter 'z' is as in the names of Lapack subroutines
 setClass("ddenseMatrix",
          representation(rcond = "numeric", factors = "list"),
          contains = "dMatrix")
-         
+
 # numeric, dense, general matrices
 setClass("dgeMatrix", contains = "ddenseMatrix",
-         validity = function(object) { ## dgeMatrix checks the length of x is prod(Dim)
+         validity = function(object) { ## checks the length of x is prod(Dim)
              .Call("dgeMatrix_validate", object)
          })
 
-# numeric, dense, non-packed, triangular matrices 
+# numeric, dense, non-packed, triangular matrices
 setClass("dtrMatrix",
          representation(uplo = "character", diag = "character"),
          contains = "dgeMatrix",
@@ -55,7 +55,7 @@ setClass("dtrMatrix",
              .Call("dtrMatrix_validate", object)
          })
 
-# numeric, dense, packed, triangular matrices 
+# numeric, dense, packed, triangular matrices
 setClass("dtpMatrix",
          representation(uplo = "character", diag = "character"),
          contains = "ddenseMatrix",
@@ -162,7 +162,7 @@ setClass("determinant",
                         sign = "integer",
                         call = "call"))
 
-setClass("LU", representation(x = "numeric", 
+setClass("LU", representation(x = "numeric",
                               pivot = "integer"),
          validity = function(object)
                     .Call("LU_validate", object))
@@ -217,6 +217,3 @@ setClass("pdfactor", representation("matrix", logDet = "numeric"))
 
                        # correlation matrices and standard deviations
 setClass("corrmatrix", representation("matrix", stdDev = "numeric"))
-
-
-
