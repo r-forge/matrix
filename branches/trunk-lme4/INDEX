@@ -86,6 +86,7 @@ s3bbx                   Covariates in the Rodriguez and Goldman
                         simulation
 s3bby                   Responses simulated by Rodriguez and Goldman
 solve-methods           Methods for Function solve
+sparseGLMM              Fit Generalized Linear Mixed Models via PQL
 summary.reStruct-class
                         Class "summary.reStruct"
 weighted<-              Modify the weights
