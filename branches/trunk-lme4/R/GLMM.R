@@ -52,7 +52,6 @@ setMethod("GLMM",
                    subset, weights, na.action, offset,
                    model = TRUE, x = FALSE, ...)
       {
-          if (is.name(family)) family = substitute(family())
           if (is.character(family)) family = get(family)
           if (is.function(family)) family = family()
           random <-

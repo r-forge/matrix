@@ -16,13 +16,13 @@ lmeControl(maxIter = 50, msMaxIter = 50, tolerance =
                  (.Machine$double.eps)^(1/3), minAbsParApVar = 0.05,
                  nlmStepMax = NULL, natural = TRUE, optimizer = "nlm",
                  EMverbose = FALSE, analyticGradient = TRUE,
-                 analyticHessian = FALSE)
+                 analyticHessian = FALSE, maxLIsize = as.integer(2e5))
 }
 \usage{
 lmeControl(maxIter, msMaxIter, tolerance, niterEM, msTol,
            msScale, msVerbose, returnObject, gradHess, apVar,
            .relStep, minAbsParApVar, nlmStepMax, natural, optimizer,
-           EMverbose, analyticGradient, analyticHessian)
+           EMverbose, analyticGradient, analyticHessian, maxLIsize)
 }
 \arguments{
  \item{maxIter}{maximum number of iterations for the \code{lme}
@@ -82,11 +82,16 @@ lmeControl(maxIter, msMaxIter, tolerance, niterEM, msTol,
    hessian of the objective should be calculated. This is an
    experimental feature and at present the default is \code{FALSE}. In
    future we may use the analytic Hessian in the optimization.}
+ \item{maxLIsize}{integer - the maximum number of elements allowed in
+   the \code{LI} slot of the \code{"ssclme"} object representing the
+   model.  If the size of the \code{LI} slot would exceed this value
+   then it will not be created and analytic Hessians are not available.
+   Analytic gradients will still be calculated but less efficiently.
+   Default is 200,000.}
 }
 \value{
   a list with a component for each of the possible arguments.
 }
-%\author{Jose Pinheiro \email{Jose.Pinheiro@pharma.novartis.com} and Douglas Bates \email{bates@stat.wisc.edu}}
 \seealso{\code{\link{lme}}, \code{\link{nlm}}, \code{\link{optim}},
   \code{\link{lmeScale}}}
 \examples{

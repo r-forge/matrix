@@ -70,4 +70,3 @@ s3bbx                   Covariates in the Rodriguez and Goldman
                         simulation
 s3bby                   Responses simulated by Rodriguez and Goldman
 solve-methods           Methods for Function solve
-summary.lme-class       Class "summary.lme"
