@@ -151,7 +151,7 @@ cscb_mm(char side, char transa, int m, int n, int k,
     int j;
     double *Ax = REAL(AxP);
 
-    if (ldc < n) error("incompatible dims n=%d, ldc=%d", n, ldc);
+    if (ldc < m) error("incompatible dims m=%d, ldc=%d", m, ldc);
     if (lside) {
 	/* B is of size k by n */
 	if (ldb < k)
@@ -189,7 +189,7 @@ cscb_mm(char side, char transa, int m, int n, int k,
 		    F77_CALL(dgemm)("N", "N", adims, &n, adims+1,
 				    &alpha, Ax + kk * absz, adims,
 				    B + j*adims[1], &ldb,
-				    &beta, C + ii * adims[1], &ldc);
+				    &beta, C + ii * adims[0], &ldc);
 		}
 	    }
 	}
@@ -286,9 +286,7 @@ void cscb_syrk(char uplo, char trans, double alpha, SEXP A, double beta, SEXP C)
 	*Cp = INTEGER(CpP),
 	iup = (uplo == 'U' || uplo == 'u'),
 	itr = (trans == 'T' || trans == 't'),
-	j, k,
-	ancb = length(ApP) - 1,
-	cncb = length(CpP) - 1;
+	j, k;
     double *Ax = REAL(AxP), *Cx = REAL(CxP), one = 1.;
     int scalar = (adims[0] == 1 && adims[1] == 1),
 	asz = adims[0] * adims[1],
@@ -300,22 +298,22 @@ void cscb_syrk(char uplo, char trans, double alpha, SEXP A, double beta, SEXP C)
 	error("Code for trans == 'T' not yet written");
 				/* FIXME: Write this part */
     } else {
-	if (adims[1] != cdims[0])
-	    error("Inconsistent dimensions: A[%d,%d,%d]x%d, C[%d,%d,%d]x%d",
-		  adims[0], adims[1], adims[2], ancb,
-		  cdims[0], cdims[1], cdims[2], cncb);
+	if (adims[0] != cdims[0])
+	    error("Inconsistent dimensions: A[%d,%d,%d], C[%d,%d,%d]",
+		  adims[0], adims[1], adims[2],
+		  cdims[0], cdims[1], cdims[2]);
 				/* check the row indices */
 	for (k = 0; k < adims[2]; k++) {
 	    int aik = Ai[k];
-	    if (aik < 0 || aik >= cncb)
+	    if (aik < 0 || aik >= cdims[2])
 		error("Row index %d = %d is out of range [0, %d]",
-		      k, aik, cncb - 1);
+		      k, aik, cdims[2] - 1);
 	}
 				/* multiply C by beta */
 	if (beta != 1.)
 	    for (j = 0; j < csz * cdims[2]; j++) Cx[j] *= beta;
 				/* individual products */
-	for (j = 0; j < ancb; j++) {
+	for (j = 0; j < adims[2]; j++) {
 	    int k, kk, k2 = Ap[j+1];
 	    for (k = Ap[j]; k < k2; k++) {
 		int ii = Ai[k], K = Ind(ii, ii, Cp, Ci);

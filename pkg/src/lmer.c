@@ -513,12 +513,12 @@ SEXP lmer_factor(SEXP x)
 		int ntot = xdims[0] * xdims[1];
 
 		/* ZZpO_{j,i} := ZZpO_{j,i} %*% Linv_{i,i}^T %*% D_i^{-1/2} */
-		/* FIXME: This should be in L, not ZZpO or change L to diagonal blocks*/
+		/* FIXME: Change L to diagonal blocks - off-diagonals are not used*/
 		cscb_trcbm('R', 'L', 'T', 'U', 1.0, LinvP, ZZOji);
 		for (jj = 0; jj < nlev; jj++) {
 		    int k, k2 = ZZp[jj + 1];
 		    for (k = ZZp[jj]; k < k2; k++)
-			F77_CALL(dtrsm)("R", "U", "N", "N", &nci, xdims + 1,
+			F77_CALL(dtrsm)("R", "U", "N", "N", xdims, xdims + 1,
 					&one, D + jj * ncisqr, &nci,
 					ZZO + k * ntot, xdims);
 		}
@@ -548,7 +548,7 @@ SEXP lmer_factor(SEXP x)
 		for (jj = 0; jj < nlev; jj++) {
 		    int k, k2 = ZZp[jj + 1];
 		    for (k = ZZp[jj]; k < k2; k++)
-			F77_CALL(dtrsm)("R", "U", "T", "N", &nci, xdims + 1,
+			F77_CALL(dtrsm)("R", "U", "T", "N", xdims, xdims + 1,
 					&one, D + jj * ncisqr, &nci,
 					ZZO + k * ntot, xdims);
 		}
@@ -641,10 +641,12 @@ SEXP lmer_invert(SEXP x)
 	    *RZX = REAL(RZXsl),
 	     minus1 = -1., one = 1.;
 
+	/* RXX := RXX^{-1} */
 	F77_CALL(dtrtri)("U", "N", dims + 1, RXX, dims + 1, &i);
 	if (i)
 	    error("Leading minor of size %d of downdated X'X,is indefinite",
 		    i + 1);
+	/* RZX := - RZX %*% RXX */
 	F77_CALL(dtrmm)("R", "U", "N", "N", dims, dims + 1, &minus1,
 			RXX, dims + 1, RZX, dims);
 	for(i = 0; i < nf; i++) {
@@ -653,6 +655,7 @@ SEXP lmer_invert(SEXP x)
 	    double *Di = REAL(VECTOR_ELT(Dsl, i)),
 		*RZXi = RZX + Gp[i];
 	    
+	    /* D_i := D_i^{-1}; RZX_i := D_i %*% RZX_i */
 	    if (nci == 1) {
 		for (j = 0; j < nlev; j++) {
 		    Di[j] = 1./Di[j];
@@ -669,7 +672,8 @@ SEXP lmer_invert(SEXP x)
 		}
 	    }
 	}
-	lmer_sm('L', 'T', nf, Gp, dims[1], -1.0, GET_SLOT(x, Matrix_ZZpOSym),
+	/* RZX := L^{-T} %*% RZX */
+	lmer_sm('L', 'T', nf, Gp, dims[1], 1.0, GET_SLOT(x, Matrix_ZZpOSym),
 		GET_SLOT(x, Matrix_LinvSym), RZX, dims[0]);
 	status[1] = 1;
     }
@@ -883,8 +887,6 @@ SEXP lmer_ranef(SEXP x)
     double
 	*b = REAL(RZXsl) + dims[0] * (dims[1] - 1),
 	nryyinv;		/* negative ryy-inverse */
-    /* FIXME: Check if this really should be negative ryy-inverse now
-     * that the negative sign is used in the inversion of the RZX slot */
 
     lmer_invert(x);
     setAttrib(val, R_NamesSymbol,
@@ -926,8 +928,10 @@ SEXP lmer_ranef(SEXP x)
 static
 SEXP lmer_firstDer(SEXP x, SEXP val)
 {
-    SEXP Omega = GET_SLOT(x, Matrix_OmegaSym),
-	D = GET_SLOT(x, Matrix_DSym),
+    SEXP D = PROTECT(duplicate(GET_SLOT(x, Matrix_DSym))),
+	LinvP = GET_SLOT(x, Matrix_LinvSym),
+	ZZOP = GET_SLOT(x, Matrix_ZZpOSym),
+	Omega = GET_SLOT(x, Matrix_OmegaSym),
 	RZXsl = GET_SLOT(x, Matrix_RZXSym);
     int *dims = INTEGER(getAttrib(RZXsl, R_DimSymbol)),
 	*Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
@@ -936,31 +940,29 @@ SEXP lmer_firstDer(SEXP x, SEXP val)
 	*b = REAL(RZXsl) + dims[0] * p;
 
     lmer_invert(x);
-    setAttrib(val, R_NamesSymbol,
-	      duplicate(getAttrib(Omega, R_NamesSymbol)));
-    for (i = 0; i < nf; i++) {
+    for (i = nf - 1; i >= 0; i++) {
 	SEXP DiP = VECTOR_ELT(D, i);
 	int *ddims = INTEGER(getAttrib(DiP, R_DimSymbol)), j;
 	int nci = ddims[0], nlev = ddims[2];
 	int ncisqr = nci * nci, RZXrows = Gp[i + 1] - Gp[i];
 	double *Di = REAL(DiP), *RZXi = RZX + Gp[i],
-	    *bi = b + Gp[i], *mm, dlev = (double) nlev;
-	
-	mm = memset(REAL(VECTOR_ELT(val, i)), 0, sizeof(double) * ncisqr * 4);
+	    *bi = b + Gp[i], *mm = REAL(VECTOR_ELT(val, i)),
+	    *tmp = Memcpy(Calloc(ncisqr, double),
+			  REAL(VECTOR_ELT(Omega, i)), ncisqr),
+	    dlev = (double) nlev,
+	    one = 1., zero = 0.;
+
  	if (nci == 1) {
 	    int ione = 1;
  	    mm[0] = ((double) nlev)/REAL(VECTOR_ELT(Omega, i))[0]; 
  	    mm[1] = F77_CALL(ddot)(&nlev, bi, &ione, bi, &ione); 
 	    mm[2] = F77_CALL(ddot)(&nlev, Di, &ione, Di, &ione);
+	    mm[3] = 0.
   	    for (j = 0; j < p; j++) {
   		mm[3] += F77_CALL(ddot)(&RZXrows, RZXi + j * dims[0], &ione,
 					RZXi + j * dims[0], &ione);
   	    }
  	} else {
-	    double *tmp = Memcpy(Calloc(ncisqr, double),
-				 REAL(VECTOR_ELT(Omega, i)), ncisqr),
-		one = 1., zero = 0.;
-
 	    F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
 	    if (j)
 		error("Omega[[%d]] is not positive definite", i + 1);
@@ -969,11 +971,14 @@ SEXP lmer_firstDer(SEXP x, SEXP val)
 		error("Omega[[%d]] is not positive definite", i + 1);
 	    F77_CALL(dsyrk)("U", "N", &nci, &nci, &dlev, tmp, &nci,
 			    &zero, mm, &nci);
-	    Free(tmp);
 	    mm += ncisqr;	/* \bB_i term */
 	    F77_CALL(dsyrk)("U", "N", &nci, &nlev, &one, bi, &nci,
 			    &zero, mm, &nci);
 	    mm += ncisqr;     /* Sum of inverses of diagonal blocks */
+	    /* FIXME: This is wrong.  With more than one grouping
+	     * factor a bVar array will need to be calculated.
+	     * Alternatively, the array could be updated from this. It
+	     * does contain this expression as one factor.*/
 	    F77_CALL(dsyrk)("U", "N", &nci, &RZXrows, &one, Di, &nci,
 			    &zero, mm, &nci);
 	    mm += ncisqr;	/* Extra term for \vb */
@@ -984,13 +989,14 @@ SEXP lmer_firstDer(SEXP x, SEXP val)
 	    }
 	}
     }
+    Free(tmp);
+    UNPROTECT(1);
     return val;
 }
 
 /** 
- * Generate and zero the contents of a list of length nf of arrays of
- * dimension (nci, nci, 4).  The values of these arrays are assigned
- * in lmer_firstDer.
+ * Return a length nf list of arrays of dimension (nci, nci, 4).  The
+ * values of these arrays are assigned in lmer_firstDer.
  * 
  * @param nf number of factors
  * @param nc vector of number of columns per factor
@@ -1001,16 +1007,12 @@ static
 SEXP EM_grad_array(int nf, const int nc[])
 {
     SEXP val = PROTECT(allocVector(VECSXP, nf)),
-	dd = PROTECT(allocVector(INTSXP, 3));
-    int *dims = INTEGER(dd), i;
+    int i;
 
-    dims[2] = 4;
     for (i = 0; i < nf; i++) {
-	dims[0] = dims[1] = nc[i];
-	SET_VECTOR_ELT(val, i, allocArray(REALSXP, dd));
-	memset(REAL(VECTOR_ELT(val, i)), 0, sizeof(double) * nc[i] * nc[i]);
+	SET_VECTOR_ELT(val, i, alloc3Darray(REALSXP, nc[i], nc[i], 4));
     }
-    UNPROTECT(2);
+    UNPROTECT(1);
     return val;
 }
 	
