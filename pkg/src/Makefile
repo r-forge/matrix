@@ -23,6 +23,9 @@ $(SUBLIBS): $(SUBSTAMP)
 	  touch $${d}.stamp; \
 	done
 
+$(SUBSTAMP): 
+	touch $(SUBSTAMP)
+
 clean:
 	@-rm -rf .libs _libs
 	@-rm -f *.o *.so *.a
