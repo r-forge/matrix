@@ -26,7 +26,7 @@ lmeControl <-
            .relStep = (.Machine$double.eps)^(1/3), minAbsParApVar = 0.05,
            nlmStepMax = NULL,
            natural = TRUE, optimizer="nlm", EMverbose=FALSE,
-           analyticGradient = TRUE,
+           analyticGradient = FALSE,
            analyticHessian=FALSE)
 {
     if (missing(msScale)) msScale = function(start) {
@@ -119,6 +119,7 @@ setMethod("lme", signature(formula = "formula", random = "list"),
                    match.arg(method, c("REML", "ML"))
           controlvals <- if (missing(control)) lmeControl() else
                             do.call("lmeControl", control)
+          controlvals$REML = method == "REML"
           mCall <- match.call(expand.dots = FALSE)
           mCall[[1]] <- as.name("model.frame")
           names(mCall)[2] <- "formula"
@@ -157,7 +158,8 @@ setMethod("lme", signature(formula = "formula", random = "list"),
           .Call("ssclme_initial", obj, PACKAGE="Matrix")
           .Call("ssclme_factor", obj, PACKAGE = "Matrix")
           .Call("ssclme_EMsteps", obj, controlvals$niterEM,
-                method == "REML", controlvals$EMverbose, PACKAGE = "Matrix")
+                controlvals$REML, controlvals$EMverbose, PACKAGE = "Matrix")
+          LMEoptimize(obj) = controlvals
           new("lme", call = match.call(), facs = facs,
               x = if(x) mmats else list(),
               model = if(model) data else data.frame(list()),
