@@ -17,12 +17,10 @@ Type 'q()' to quit R.
 > library(lme4)
 Loading required package: Matrix 
 Loading required package: latticeExtra 
-> pixel <- if (inherits(Pixel, "groupedData")) Pixel@data else Pixel
-> pixel$DS <- pixel$Dog : pixel$Side
-> lme(pixel ~ day + I(day^2), pixel, list(Dog = ~ day, DS = ~ 1))
+> lme(pixel ~ day + I(day^2), Pixel, list(Dog = ~ day, DS = ~ 1))
 Linear mixed-effects model
 Fixed: pixel ~ day + I(day^2) 
- Data: pixel 
+ Data: Pixel 
  log-restricted-likelihood:  -412.6051 
 Random effects:
  Groups   Name        Variance Std.Dev. Corr   
@@ -37,7 +35,7 @@ Fixed effects:
 (Intercept) 1073.339130   10.171714 99 105.5220 < 2.2e-16
 day            6.129596    0.879328 99   6.9708 3.559e-10
 I(day^2)      -0.367350    0.033946 99 -10.8216 < 2.2e-16
-> show(lme1(pixel ~ day + I(day^2), pixel, list(Dog = ~ day, DS = ~ 1)))
+> show(lme1(pixel ~ day + I(day^2), Pixel, list(Dog = ~ day, DS = ~ 1)))
 Random effects:
  Groups   Name        Variance Std.Dev. Corr   
  DS       (Intercept) 127.7127 11.3010         
