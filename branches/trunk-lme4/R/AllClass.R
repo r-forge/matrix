@@ -29,7 +29,8 @@ setClass("lme", representation(call = "call",
                                x = "list",
                                model = "data.frame",
                                REML = "logical",
-                               rep = "ssclme"))
+                               rep = "ssclme",
+                               fitted = "numeric"))
 
 ## This is needed for the family slot of glmmStruct
 setOldClass("family")
