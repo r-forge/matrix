@@ -14,6 +14,7 @@ SOURCES_C =  \
             dgeMatrix.c \
             dpoMatrix.c \
             dsCMatrix.c \
+            dsTMatrix.c \
             dsyMatrix.c \
             dtCMatrix.c \
             dtTMatrix.c \

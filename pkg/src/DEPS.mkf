@@ -21,8 +21,9 @@ dsCMatrix.o: dsCMatrix.c dsCMatrix.h Mutils.h cblas.h Syms.h R_ldl.h \
 dsyMatrix.o: dsyMatrix.c dsyMatrix.h dgeMatrix.h cblas.h Syms.h
 dtCMatrix.o: dtCMatrix.c dtCMatrix.h Mutils.h cblas.h Syms.h dgCMatrix.h \
   R_ldl.h triplet_to_col.h
-dtTMatrix.o: dtTMatrix.c dtTMatrix.h
-dtrMatrix.o: dtrMatrix.c dtrMatrix.h cblas.h Syms.h
+dtTMatrix.o: dtTMatrix.c dtTMatrix.h Mutils.h cblas.h Syms.h
+dsTMatrix.o: dsTMatrix.c dsTMatrix.h Mutils.h cblas.h Syms.h
+dtrMatrix.o: dtrMatrix.c dtrMatrix.h Mutils.h cblas.h Syms.h
 factorizations.o: factorizations.c factorizations.h Mutils.h cblas.h Syms.h
 init.o: init.c LU.h dtrMatrix.h cblas.h Syms.h dgBCMatrix.h \
   R_ldl.h triplet_to_col.h dgCMatrix.h dense.h factorizations.h \

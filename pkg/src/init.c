@@ -7,6 +7,7 @@
 #include "dgeMatrix.h"
 #include "dpoMatrix.h"
 #include "dsCMatrix.h"
+#include "dsTMatrix.h"
 #include "dsyMatrix.h"
 #include "dtCMatrix.h"
 #include "dtTMatrix.h"
@@ -67,6 +68,8 @@ static R_CallMethodDef CallEntries[] = {
     {"dsCMatrix_matrix_solve", (DL_FUNC) &dsCMatrix_matrix_solve, 2},
     {"dsCMatrix_to_dgTMatrix", (DL_FUNC) &dsCMatrix_to_dgTMatrix, 1},
     {"dsCMatrix_validate", (DL_FUNC) &dsCMatrix_validate, 1},
+    {"dsTMatrix_validate", (DL_FUNC) &dsTMatrix_validate, 1},
+    {"dsTMatrix_as_dsyMatrix", (DL_FUNC) &dsTMatrix_as_dsyMatrix, 1},
     {"dsyMatrix_as_dgeMatrix", (DL_FUNC) &dsyMatrix_as_dgeMatrix, 1},
     {"dsyMatrix_as_matrix", (DL_FUNC) &dsyMatrix_as_matrix, 1},
     {"dsyMatrix_dgeMatrix_mm", (DL_FUNC) &dsyMatrix_dgeMatrix_mm, 2},
