@@ -2,26 +2,13 @@
 
 SEXP sscCrosstab(SEXP flist, SEXP upper)
 {
-    int
-	**fpt,
-	*Ap,
-	*Gp,
-	*TTi,
-	*Ti,
-	*Tj,
-	*dims,
-	i,
+    int **fpt, *Ap, *Gp, *TTi, *Ti, *Tj, *dims, i,
 	ncol = 0,
 	nfac = length(flist),
 	nfc2 = (nfac * (nfac - 1))/2, /* nfac choose 2 */
 	nobs = length(VECTOR_ELT(flist, 0)),
-	ntrpl,
-	nz,
-	pos,
-	up = asLogical(upper);
-    double
-	*TTx,
-	*Tx;
+	ntrpl, nz, pos, up = asLogical(upper);
+    double *TTx, *Tx;
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("sscCrosstab")));
 
     if (!isNewList(flist) || nfac < 1)
@@ -271,30 +258,35 @@ SEXP sscCrosstab_groupedPerm(SEXP ctab)
     for (i = 0; i < n; i++) {
 	INTEGER(ans)[i] = i;    /* initialize permutation to identity */
     }
-    if (!ctab_isNested(n, nf, 0, Ap, Ai, Gp)) {
-	int *np = Calloc(n + 1, int), /* column pointers */
-	    *ni = Calloc(length(iSlot) - n, int); /* row indices */
-
-	np[0] = 0;
-	for (i = 1; i < nf; i++) { /* adjacent pairs of grouping factors */
-	    int j, k, p0 = 0, p1 = Gp[i-1], p2 = Gp[i], p3 = Gp[i+1];
+    for (i = 1; i < nf; i++) {
+	col_metis_order(Gp[i - 1], Gp[i], Gp[i+1], Ap, Ai, INTEGER(ans));
+    }
+    if (0) {			/* skip this part */
+	if (!ctab_isNested(n, nf, 0, Ap, Ai, Gp)) {
+	    int *np = Calloc(n + 1, int), /* column pointers */
+		*ni = Calloc(length(iSlot) - n, int); /* row indices */
 	    
-	    for (j = p1; j < p2; j++) { /* for this set of columns */
-		int lk = Ap[j+1];
-		for (k = Ap[j]; k < lk; k++) {
-		    int ii = Ai[k];
-		    if (p2 <= ii && ii < p3) { /* check the row */
-			ni[p0++] = ii - p2;
+	    np[0] = 0;
+	    for (i = 1; i < nf; i++) { /* adjacent pairs of grouping factors */
+		int j, k, p0 = 0, p1 = Gp[i-1], p2 = Gp[i], p3 = Gp[i+1];
+		
+		for (j = p1; j < p2; j++) { /* for this set of columns */
+		    int lk = Ap[j+1];
+		    for (k = Ap[j]; k < lk; k++) {
+			int ii = Ai[k];
+			if (p2 <= ii && ii < p3) { /* check the row */
+			    ni[p0++] = ii - p2;
+			}
 		    }
+		    np[j + 1 - p1] = p0;
 		}
-		np[j + 1 - p1] = p0;
+		pair_perm(p3 - p2, p2 - p1, np, ni,
+			  INTEGER(ans) + p2,
+			  (i == 1) ? INTEGER(ans) + p1 : (int *) 0);
+		for (j = p2; j < p3; j++) INTEGER(ans)[j] += p2;
 	    }
-	    pair_perm(p3 - p2, p2 - p1, np, ni,
-		      INTEGER(ans) + p2,
-		      (i == 1) ? INTEGER(ans) + p1 : (int *) 0);
-	    for (j = p2; j < p3; j++) INTEGER(ans)[j] += p2;
+	    Free(np); Free(ni);
 	}
-	Free(np); Free(ni);
     }
     if (nf > 1 && up) {Free(Ap); Free(Ai);}
     UNPROTECT(1);
