@@ -1,2 +1,8 @@
 - Report the problem in the Linux ldexp manual page.  The second and
   third calls in the Synopsis should be to ldexpf and ldexpl.
+
+- [,] indexing
+
+- group generics: "Arith", but also "Ops" and "Math";  see
+  ?Math.data.frame  and the examples in
+  ?SetGeneric
