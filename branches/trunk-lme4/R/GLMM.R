@@ -276,7 +276,12 @@ setMethod("GLMM",
                   }
                   else
                   {
+#                      cat(pars)
+#                      cat("\n")
+#                      print(reducedObj@Omega) 
                       coef(reducedObj) <- pars[responseIndex:length(pars)]
+#                      print(reducedObj@Omega)
+#                      print("-----------------------")
                       off <- drop(mmats.unadjusted$.Xy %*%
                                   c(pars[1:(responseIndex-1)], 0))
                   }
@@ -321,14 +326,116 @@ setMethod("GLMM",
 
                   }
                   if (!conv) warning("iterations for bhat did not converge")
-                  ## bhat doesn't return anything, it just modifies reducedObj
-                  ## In particular, We are interested in ranef(reducedObj) and 
-                  ## reducedObj@bVar (?)
-                  invisible()
+
+                  ## bhat doesn't really need to return anything, we
+                  ## just want the side-effect of modifying reducedObj
+                  ## In particular, We are interested in
+                  ## ranef(reducedObj) and reducedObj@bVar (?). But
+                  ## the mu-scale response will be useful for log-lik
+                  ## calculations later, so return them anyway
+
+                  invisible(family$linkinv(eta)) 
               }
 
 
+          ## function that calculates log likelihood (the thing that
+          ## needs to get evaluated at each Gauss-Hermite location)
 
+          ## log scale ? worry about details later, get the pieces in place
+
+          ## this is for the Laplace approximation only. GH is more
+          ## complicated 
+
+          loglikLaplace <- function(pars = NULL)
+          {
+              mu <- bhat(pars = pars)  ## gets correct values of bhat and bvars
+
+              ## GLM family log likelihood (upto constant ?)(log scale)
+              ## FIXME: need to adjust for sigma^2 for appropriate models (not trivial!)
+              ans <- ## log lik from observations given fixed and random effects
+                  sum(family$dev.resids(y = mmats.unadjusted$.Xy[, responseIndex],
+                                        mu = mu,
+                                        wt = weights^2))
+              ranefs <- ranef(reducedObj)
+              Omega <- obj@Omega
+              jacobian <- numeric(length(ranefs))
+              for (i in seq(along = ranefs))
+              {
+                  Omega[[i]] <- Omega[[i]] + t(Omega[[i]])
+                  diag(Omega[[i]]) <- diag(Omega[[i]]) / 2
+                  ## want log of `const det(Omega) exp(-1/2 b' Omega b )`
+                  ## i.e., const + log det(Omega) - .5 * (b' Omega b)
+                  ## FIXME: need to adjust for sigma^2 for appropriate models (easy)
+                  ## these are all the b'Omega b, summed as they eventually need to be
+                  ## think of this as sum(rowSums((ranefs[[i]] %*% Omega[[i]]) * ranefs[[i]]))
+                  ans <- ans - sum((ranefs[[i]] %*% Omega[[i]]) * ranefs[[i]]) +
+                      nrow(ranefs[[i]]) * determinant(Omega[[i]], logarithm = TRUE)$modulus
+                  ## Jacobian adjustment
+                  ## log.jacobian[i] <- sum(log(apply(bVar[[i]], 3, function(x) sum(diag(x)))))
+                  ans <- ans + sum(log(apply(reducedObj@bVar[[i]], 3, function(x) sum(diag(x)))))
+              }
+              ans ## this is (upto some constant) log of the Laplacian approximation of the likelihood
+          }
+
+          if (method == "Laplace")
+          {
+              cat(paste("Using optimizer", controlvals$optim), "\n")
+
+              if (controlvals$optimizer == "optim") {
+                  optimRes =
+                      ## if (controlvals$analyticGradient)  ??
+                      optim(fn = loglikLaplace,
+                            par = c(fixef(obj), coef(obj)),
+                            ## hessian = TRUE,
+                            method = "BFGS",
+                            control = list(trace = TRUE, #controlvals$msVerbose,
+                            reltol = controlvals$msTol,
+                            ##fnscale = -xval,
+                            ##parscale = 1/controlvals$msScale(coef(obj)),
+                            maxit = controlvals$msMaxIter))
+                  if (optimRes$convergence != 0) {
+                      warning("optim failed to converge")
+                  }
+                  ##fixef(obj) <- optimRes$par[seq(length = responseIndex - 1)]
+                  print(fixef(obj))
+                  print(optimRes$par[seq(length = responseIndex - 1)])
+                  print(coef(obj))
+                  coef(obj) <- optimRes$par[responseIndex:length(optimRes$par)]
+                  print(coef(obj))
+                  ## need to calculate likelihood
+              }
+              else if (controlvals$optimizer == "nlm") {
+                  ## typsize <- 1/controlvals$msScale(coef(obj))
+                  typsize <- rep(1.0, length(coef(obj)) + responseIndex - 1)
+                  if (is.null(controlvals$nlmStepMax))
+                      controlvals$nlmStepMax <-
+                          max(100 * sqrt(sum((c(fixef(obj),
+                                                coef(obj))/typsize)^2)), 100)
+                  nlmRes =
+                      nlm(f = loglikLaplace, ## if (controlvals$analyticGradient)  ??
+                          p = c(fixef(obj), coef(obj)),
+                          ## hessian = TRUE,
+                          print.level = 2, #if (controlvals$msVerbose) 2 else 0,
+                          steptol = controlvals$msTol,
+                          gradtol = controlvals$msTol,
+                          stepmax = controlvals$nlmStepMax,
+                          typsize=typsize,
+                          ## fscale=xval,
+                          iterlim = controlvals$msMaxIter)
+                  ##fixef(obj) <- nlmRes$estimate[seq(length = responseIndex - 1)]
+                  print(fixef(obj))
+                  print(nlmRes$estimate[seq(length = responseIndex - 1)])
+                  print(coef(obj))
+                  coef(obj) <- nlmRes$estimate[responseIndex:length(nlmRes$estimate)]
+                  print(coef(obj))
+                  ## need to calculate likelihood
+              }
+
+          }
+
+
+
+          
           ## Get updated ranef estimates
 #          bhat()
 
@@ -340,8 +447,6 @@ setMethod("GLMM",
               model = if(model) data else data.frame(list()),
               REML = FALSE, rep = obj, fitted = eta)
       })
-
-
 
 
 
