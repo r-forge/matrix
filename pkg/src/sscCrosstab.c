@@ -115,23 +115,6 @@ SEXP sscCrosstab_L_LI_sizes(SEXP ctab, SEXP permexp)
     UNPROTECT(1);
     return ans;
 }
-
-static
-void make_icounts(int nod, int ni, const int i[], const int j[],
-		  const char ind[], int icounts[])
-{
-    int k, *lastj = memset(Calloc(ni, int), 0, sizeof(int) * ni);
-
-    memset(icounts, 0, sizeof(int) * ni);
-    for (k = 0; k < nod; k++) {
-	int ik = i[k], jk = j[k];
-	if (ind[k] && jk != lastj[ik]) {
-	    icounts[ik]++;
-	    lastj[ik] = jk;
-	}
-    }
-    Free(lastj);
-}
     
 SEXP sscCrosstab_groupedPerm(SEXP ctab)
 {
@@ -143,96 +126,84 @@ SEXP sscCrosstab_groupedPerm(SEXP ctab)
 	*Ap = INTEGER(pSlot),
 	*Gp = INTEGER(GpSlot),
 	nl1 = Gp[1],		/* number of levels of first factor */
-	*icounts = Calloc(nl1, int),
-	nl2, *jcounts,
-	j, jj,
+	*icounts,		/* counts for rows */
+	*jcounts = Calloc(nl1, int), /* counts for columns */
+	nl2,			/* delay initializing until nf is known */
+	ii, j, jj,
 	n = length(pSlot) - 1,	/* number of columns */
 	nf = length(GpSlot) - 1, /* number of factors */
 	nz = length(iSlot),	/* number of non-zeros */
 	nod = nz - n,		/* number of off-diagonals */
-	nuse = nod,
-	*iv = Calloc(nod, int),
-	*jv = Calloc(nod, int),
-	p1, p2;
-    char *active = (char *) memset(Calloc(n, char), 1, (size_t) n),
-	*ind = (char *) memset(Calloc(nod, char), 1, (size_t) nod);
-
+	*np = Calloc(nl1 + 1, int), /* new array pointers */
+	*ni = Calloc(nod, int),	/* new array row indices */
+	p1, p3;
     SEXP ans = PROTECT(allocVector(INTSXP, n));
     int *perm = INTEGER(ans);
 
     if (toupper(*CHAR(STRING_ELT(GET_SLOT(ctab, Matrix_uploSym), 0))) != 'L')
 	error("Lower triangle required in sscCrosstab object");
-    if (nf < 2) error("At least two factors are required");
-    nl2 = Gp[2] - Gp[1];
-    jcounts = Calloc(nl2, int);
 
-    p1 = 0; p2 = nl1;		/* copy and expand off-diagonal indices */
-    for (j = 0; j < p2; j++) {
-	int p3 = Ap[j + 1];
-	for (jj = Ap[j]; jj < p3; jj++) {
-	    int i = Ai[jj];
-/* FIXME: iv and jv are named backwards.  Reconcile this. */
-	    if (i > j) {
-		jv[p1] = i;
-		iv[p1] = j;
-		p1++;
-	    }
-	}
-    }
-    if (p1 != nod) error("Logic error - counts of off-diagonals disagree");
-    
-    p1 = 0; p2 = Gp[2] - 1;	/* fill 1st level from LHS, 2nd from RHS */
-    while (nuse > 0) {
-	int k, mcount, mind;
-	make_icounts(nod, nl1, iv, jv, ind, icounts);
+    for (j = 0; j < n; j++) perm[j] = j; /* initialize permutation to identity */
 
-	mind = -1;
-	mcount = Gp[2];	/* must be bigger than Gp[2] - Gp[1] */
-	for (k = 0; k < nl1; k++) { /* determine column with min count */
-	    int ic = icounts[k];
-	    if (active[k]) {	
-		if (ic < 1) {	/* remove active columns with zero counts */
-		    perm[p1++] = k;
-		    active[k] = 0;
-		} else if (ic < mcount) {
-		    mcount = ic;
-		    mind = k;
+    if (nf > 1) {
+	nl2 = Gp[2];
+	icounts = Calloc(nl2 - nl1, int);
+	np[0] = 0;
+	for (j = 0; j < nl1; j++) jcounts[j] = 0;
+	p1 = 0;			/* copy off-diagonals from first nl1 cols */
+	for (j = 0; j < nl1; j++) { /* and nl1 <= row < nl2 */
+	    int p3 = Ap[j + 1];
+	    for (jj = Ap[j]; jj < p3; jj++) {
+		int i = Ai[jj];
+		if (nl1 <= i && i < nl2) {
+		    ni[p1++] = i - nl1;	
+		    jcounts[j]++;
 		}
 	    }
+	    np[j+1] = p1;
 	}
-	if (mind < 0)
-	    error("Logic error - ran out of columns before nuse == 0");
-	
-				/* Count rows for j  */
-	memset(jcounts, 0, sizeof(int) * nl2);
-	for (k = 0; k < nod; k++) {
-	    if (ind[k] && icounts[iv[k]] == mcount) {
-		jcounts[jv[k] - nl1]++;
-	    }
-	}
-	
-	mcount = -1; mind = -1;	/* determine j with max count */
-	for (k = 0; k < nl2; k++) {
-	    int jc = jcounts[k];
-				/* use >= below so ties give last row */
-	    if (active[k + nl1] && jc >= mcount) {
-		mcount = jc;
-		mind = k;
-	    }
-	}
-	if (mind < 0)
-	    error("Logic error - ran out of rows before nuse == 0");
 
-	perm[p2--] = mind + nl1;
-	for (k = 0; k < nod; k++) {
-	    if (jv[k] - nl1 == mind) {
-		ind[k] = 0;
-		nuse--;
+	for (ii = 1; ii <= nl2; ii++) {
+	    int maxrc, rr;
+	    int i, minjc = nl2+1;	/* find minimum positive jcount */
+	    for (j = 0; j < nl1; j++) {
+		if (jcounts[i] > 0 && jcounts[j] < minjc) minjc = jcounts[j];
+	    }
+				/* accumulate the row counts on cols where jcount=minjc */
+	    for (i = 0; i < nl2; i++) icounts[i] = 0;
+	    for (j = 0; j < nl1; j++) {
+		if (jcounts[j] == minjc) {
+		    int p2 = np[j+1];
+		    for (i = np[j]; i < p2; i++) icounts[ni[i]]++;
+		}
+	    }
+				/* find the last row whose count in max(icount) */
+	    maxrc = -1;
+	    for (i = 0; i < nl2; i++) {
+		int ic = icounts[i];
+		if (ic >= maxrc) {
+		    maxrc = ic;
+		    rr = i;
+		}
+	    }
+	    perm[nl1 + nl2 - ii] = rr;
+				/* update icounts, np and ni */
+	    p1 = p3 = 0; 
+	    for (j = 0; j < nl1; j++) {
+		int p2 = np[j+1];
+		for (i = np[j]; i < p2; i++) {
+		    if (ni[i] != rr) {
+			if (i != p1) ni[p1] = ni[i];
+			p1++;
+		    }
+		}
+		np[j] = p3;
+		p3 = p1;	/* save the count */
 	    }
 	}
+	Free(icounts);
     }
-
-    Free(ind); Free(active); Free(jv); Free(iv); Free(jcounts); Free(icounts);
+    Free(np); Free(ni); Free(jcounts);
     UNPROTECT(1);
     return ans;
 }
