@@ -32,6 +32,8 @@ double *
 LMEgradient(const double* factor, const double* A, const int nlev,
 	    const int nc, const double* pdgradient, const int plen,
 	    double* value);
+SEXP nlme_replaceSlot(SEXP obj, SEXP names, SEXP value);
+SEXP nlme_weight_matrix_list(SEXP MLin, SEXP wts, SEXP adjst, SEXP MLout);
 
 				/* stored pointers to symbols */
 				/* initialized in Matrix_init */

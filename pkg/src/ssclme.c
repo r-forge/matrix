@@ -1161,7 +1161,7 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
     return ans;
 }
 
-SEXP ssclme_fitted(SEXP x, SEXP facs, SEXP mmats)
+SEXP ssclme_fitted(SEXP x, SEXP facs, SEXP mmats, SEXP useRf)
 {
     SEXP val, b;
     int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
@@ -1183,23 +1183,26 @@ SEXP ssclme_fitted(SEXP x, SEXP facs, SEXP mmats)
     } else {
 	memset(vv, 0, sizeof(double) * nobs);
     }
-    b = PROTECT(ssclme_ranef(x));
-    for (i = 0; i < nf; i++) {
-	int *ff = INTEGER(VECTOR_ELT(facs, i)), j, nci = nc[i];
-	double *bb = REAL(VECTOR_ELT(b, i)),
-	    *mm = REAL(VECTOR_ELT(mmats, i));
-	for (j = 0; j < nobs; ) {
-	    int nn = 1, lev = ff[j];
-	    /* check for adjacent rows with same factor level */
-	    while (ff[j + nn] == lev) nn++; 
-	    F77_CALL(dgemm)("N", "N", &nn, &ione, &nci,
-			    &one, mm + j, &nobs,
-			    bb + (lev - 1) * nci, &nci,
-			    &one, vv + j, &nobs);
-	    j += nn;
+    if (asLogical(useRf)) {
+	b = PROTECT(ssclme_ranef(x));
+	for (i = 0; i < nf; i++) {
+	    int *ff = INTEGER(VECTOR_ELT(facs, i)), j, nci = nc[i];
+	    double *bb = REAL(VECTOR_ELT(b, i)),
+		*mm = REAL(VECTOR_ELT(mmats, i));
+	    for (j = 0; j < nobs; ) {
+		int nn = 1, lev = ff[j];
+		/* check for adjacent rows with same factor level */
+		while (ff[j + nn] == lev) nn++; 
+		F77_CALL(dgemm)("N", "N", &nn, &ione, &nci,
+				&one, mm + j, &nobs,
+				bb + (lev - 1) * nci, &nci,
+				&one, vv + j, &nobs);
+		j += nn;
+	    }
 	}
+	UNPROTECT(1);
     }
-    UNPROTECT(2);
+    UNPROTECT(1);
     return val;
 }
 
@@ -1234,22 +1237,32 @@ SEXP ssclme_variances(SEXP x)
     return Omg;
 }
 
+#define slot_dup(sym)  SET_SLOT(ans, sym, duplicate(GET_SLOT(x, sym)))
+
 SEXP ssclme_collapse(SEXP x)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("ssclme"))),
 	Omega = GET_SLOT(x, Matrix_OmegaSym),
 	Dim = GET_SLOT(x, Matrix_DimSym);
-    int i, nf = length(Omega), nz = INTEGER(Dim)[1];
-    SEXP copy[] = {Matrix_DSym, Matrix_DIsqrtSym, Matrix_DimSym,
-		   Matrix_GpSym, Matrix_LiSym, Matrix_LpSym,
-		   Matrix_LxSym, Matrix_OmegaSym, Matrix_ParentSym,
-		   Matrix_bVarSym, Matrix_devianceSym,
-		   Matrix_devCompSym, Matrix_iSym, Matrix_ncSym,
-		   Matrix_statusSym, Matrix_pSym, Matrix_xSym};
+    int nf = length(Omega), nz = INTEGER(Dim)[1];
 
-    for (i = 0; i < 17; i++)
-	SET_SLOT(ans, copy[i], duplicate(GET_SLOT(x, copy[i])));
-
+    slot_dup(Matrix_DSym);
+    slot_dup(Matrix_DIsqrtSym);
+    slot_dup(Matrix_DimSym);
+    slot_dup(Matrix_GpSym);
+    slot_dup(Matrix_LiSym);
+    slot_dup(Matrix_LpSym);
+    slot_dup(Matrix_LxSym);
+    slot_dup(Matrix_OmegaSym);
+    slot_dup(Matrix_ParentSym);
+    slot_dup(Matrix_bVarSym);
+    slot_dup(Matrix_devianceSym);
+    slot_dup(Matrix_devCompSym);
+    slot_dup(Matrix_iSym);
+    slot_dup(Matrix_ncSym);
+    slot_dup(Matrix_statusSym);
+    slot_dup(Matrix_pSym);
+    slot_dup(Matrix_xSym);
     INTEGER(GET_SLOT(ans, Matrix_ncSym))[nf] = 1;
     SET_SLOT(ans, Matrix_XtXSym, allocMatrix(REALSXP, 1, 1));
     REAL(GET_SLOT(ans, Matrix_XtXSym))[0] = NA_REAL;
@@ -1262,4 +1275,19 @@ SEXP ssclme_collapse(SEXP x)
     return ans;
 }
 
-    
+SEXP ssclme_to_lme(SEXP call, SEXP facs, SEXP x, SEXP model, SEXP REML,
+		   SEXP rep, SEXP fitted, SEXP residuals)
+{
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("lme")));
+
+    SET_SLOT(ans, install("call"), call);
+    SET_SLOT(ans, install("facs"), facs);
+    SET_SLOT(ans, Matrix_xSym, x);
+    SET_SLOT(ans, install("model"), model);
+    SET_SLOT(ans, install("REML"), REML);
+    SET_SLOT(ans, install("rep"), rep);
+    SET_SLOT(ans, install("fitted"), fitted);
+    SET_SLOT(ans, install("residuals"), residuals);
+    UNPROTECT(1);
+    return ans;
+}
