@@ -1,3 +1,12 @@
+#### Toplevel ``virtual'' class "Matrix"
+
+## probably not needed eventually:
+setAs(from = "Matrix", to = "matrix",
+      function(from) {
+          if(length(d <- dim(from)) != 2) stop("dim(.) has not length 2")
+          array(as.numeric(NA), dim = d, dimnames = dimnames(from))
+      })
+
 prMatrix <-
     ## private function to be used as show() method possibly more than once
     function(object) {
@@ -18,14 +27,28 @@ prMatrix <-
         invisible()
     }
 
+setMethod("show", signature(object = "ddenseMatrix"), prMatrix)
+## this may go away {since sparse matrices need something better!} :
 setMethod("show", signature(object = "Matrix"), prMatrix)
 
-if(FALSE) {## FIXME: we should do this here (for all subclasses),
-    ##        -----  but it coerces some to "Matrix" {with no @x slot}
 setMethod("dim", signature(x = "Matrix"),
           function(x) x@Dim, valueClass = "integer")
 setMethod("dimnames", signature(x = "Matrix"), function(x) x@Dimnames)
-}# FIXME
+## not exported but used more than once for "dimnames<-" method :
+## -- or do only once for all "Matrix" classes ??
+dimnamesGets <- function (x, value) {
+    d <- dim(x)
+    if (!is.list(value) || length(value) != 2 ||
+        !(is.null(v1 <- value[[1]]) || length(v1) == d[1]) ||
+        !(is.null(v2 <- value[[2]]) || length(v2) == d[2]))
+        stop(sprintf("invalid dimnames given for '%s' object", class(x)))
+    x@Dimnames <- list(if(!is.null(v1)) as.character(v1),
+                       if(!is.null(v2)) as.character(v2))
+    x
+}
+setMethod("dimnames<-", signature(x = "Matrix", value = "list"),
+          dimnamesGets)
+
 
 Matrix <-
     function (data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL)
