@@ -128,7 +128,6 @@ setMethod("GLMM",
 
           data <- eval(make.mf.call(match.call(expand.dots = FALSE),
                                     formula, random), parent.frame())
-
           facs <- lapply(names(random),
                          function(x) eval(as.name(x), envir = data))
           names(facs) <- names(random)
@@ -235,9 +234,10 @@ setMethod("GLMM",
           reducedMmats$.Xy <-
               reducedMmats$.Xy[, responseIndex, drop = FALSE]
           .Call("ssclme_update_mm", reducedObj, facs, reducedMmats, PACKAGE="Matrix")
+          ##.Call("ssclme_update_mm", reducedObj, facs, reducedMmats.unadjusted, PACKAGE="Matrix")
 
           ## make obj comparable
-          .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
+          ## .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
 
 
 
@@ -265,42 +265,63 @@ setMethod("GLMM",
                                   c(pars[1:(responseIndex-1)], 0))
                   }
 
-                  niter <- 20
+                  niter <- 3 # 20
                   conv <- FALSE
 
-                  eta <-
-                      .Call("ssclme_fitted", reducedObj, facs,
-                            reducedMmats.unadjusted, PACKAGE = "Matrix") + off
-#                  eta.check <-
-#                      .Call("ssclme_fitted", obj, facs,
-#                            mmats.unadjusted, PACKAGE = "Matrix")
-#                  print(all.equal(eta, eta.check))
-#                  plot(eta, eta.check)
-#                  etaold <- eta
+#                  local.eta <- off + 
+#                      .Call("ssclme_fitted", reducedObj, facs,
+#                            reducedMmats.unadjusted, PACKAGE = "Matrix")
+                  local.eta <-
+                      .Call("ssclme_fitted", obj, facs,
+                            mmats.unadjusted, PACKAGE = "Matrix")
+#                  print(all.equal(local.eta, local.eta.check)) # not really sure why not TRUE
+#                  plot(local.eta, local.eta.check)
+                  local.etaold <- local.eta
 
 
                   for (iter in seq(length = niter))
                   {
-                      mu <- family$linkinv(eta)
-                      dmu.deta <- family$mu.eta(eta)
-                      z <- eta + (mmats.unadjusted$.Xy[, responseIndex] - mu) / dmu.deta - offset
+                      mu <- family$linkinv(local.eta)
+                      dmu.deta <- family$mu.eta(local.eta)
+                      z <- local.eta + (reducedMmats.unadjusted$.Xy[, 1] - mu) /
+                          dmu.deta - offset
                       w <- weights * dmu.deta / sqrt(family$variance(mu))
+
+w[1:100] <- w[1:100] + 20
+
+print(summary(reducedMmats$.Xy[,1]))
                       .Call("nlme_weight_matrix_list",
                             reducedMmats.unadjusted, w, z, reducedMmats, PACKAGE="lme4")
+print(summary(reducedMmats$.Xy[,1]))
                       .Call("ssclme_update_mm", reducedObj, facs, reducedMmats, PACKAGE="Matrix")
-                      eta[] <-
+                      local.eta[] <- off + 
                           .Call("ssclme_fitted", reducedObj, facs,
-                                reducedMmats.unadjusted, PACKAGE = "Matrix") + off
-                      cat(paste("bhat Criterion:", max(abs(eta - etaold)) /
-                                (0.1 + max(abs(eta))), "\n"))
+                                reducedMmats.unadjusted, PACKAGE = "Matrix")
+
+
+
+
+### OK, looks like reducedObj is not changing
+
+
+
+
+
+                      
+print(summary(data.frame(z = z, eta = local.eta, etaold = local.etaold)))
+
+
+
+                      cat(paste("bhat Criterion:", max(abs(local.eta - local.etaold)) /
+                                (0.1 + max(abs(local.eta))), "\n"))
                       ## use this to determine convergence
-                      if (max(abs(eta - etaold)) <
-                          (0.1 + max(abs(eta))) * controlvals$tolerance)
+                      if (max(abs(local.eta - local.etaold)) <
+                          (0.1 + max(abs(local.eta))) * controlvals$tolerance)
                       {
                           conv <- TRUE
-                          break
+                          #break
                       }
-                      etaold[] <- eta
+                      local.etaold[] <- local.eta
 
                   }
                   if (!conv) warning("iterations for bhat did not converge")
@@ -315,7 +336,7 @@ setMethod("GLMM",
           ## Get updated ranef estimates
           bhat()
 
-          print(str(ranef(reducedObj)))
+#          str(ranef(reducedObj))
 
 
           new("lme", call = match.call(), facs = facs,
