@@ -386,15 +386,17 @@ fm1 = lme(attain~verbal*sex, data = ScotsSec, random = list(primary=~1,second=~1
 
 The locations of the non-zeros in the $167\times 167$ matrix
 $\bZ\trans\bZ$ are shown in Figure~\ref{fig:ZtZ}.
-\begin{figure}[htbp]
+\begin{figure}[tbp]
   \centering
 \setkeys{Gin}{width=\textwidth}
 <<FigZtZ,fig=TRUE,echo=FALSE,height=8,width=8>>=
-print(image(as(fm1@rep, "sscMatrix"), aspect='xy', colorkey = FALSE))
+print(image(as(fm1@rep, "sscMatrix"), aspect='xy', xlim = c(-0.5,166.5),
+            ylim = c(166.5, -0.5), colorkey = FALSE))
 @   
   \caption{Location of non-zero elements in
-    $\bZ\trans\bZ$ for model \var{fm1} fit to the \var{ScotsSec}
-    data.}
+    $\bZ\trans\bZ$ for model \var{fm1} fit to the \var{ScotsSec} data.
+    Darker squares indicate larger magnitudes. Rows and columns are
+    numbered from zero.}
   \label{fig:ZtZ}
 \end{figure}
 Darker greys indicate larger magnitudes.  As can be expected the
@@ -471,15 +473,17 @@ and 464 for the row indices of the nonzero offdiagonals).
 The positions of the nonzero elements in the last 19 rows of $\bL$ are
 shown in Figure~\ref{fig:Lnonzero} (the first 148 rows of $\bL$ are an
 identity matrix augmented with 19 columns of zeros)
-\begin{figure}[htbp]
+\begin{figure}[tbp]
   \centering
 \setkeys{Gin}{width=\textwidth}
 <<FigLnonzero,fig=TRUE,echo=FALSE,height=2.5,width=8>>=
-print(image(as(fm1@rep, "tscMatrix"),ylim=c(167,149),
-            colorkey=FALSE,aspect='xy'))
+print(image(as(fm1@rep, "tscMatrix"),ylim=c(166.5,147.5),
+            xlim=c(-0.5,166.5),colorkey=FALSE,aspect='xy'))
 @   
-  \caption{Location of non-zero elements in the last 19 rows of
-    $\bL$ for model \var{fm1} fit to the \var{ScotsSec} data.}
+  \caption{Location of non-zero elements in the last 19 rows of the
+    unit lower triangular matrix $\bL$ for model \var{fm1} fit to the
+    \var{ScotsSec} data.  Darker squares indicate larger
+    magnitudes. Rows and columns are numbered from zero.}
   \label{fig:Lnonzero}
 \end{figure}
 
@@ -495,18 +499,20 @@ number of nonzeros in $\bL^{-1}$ can be much greater than the number
 in $\bL$.  The positions of the nonzeros in the last 19 rows of
 $\bL^{-1}$ (again, the first 148 rows are an identity matrix augmented
 with 19 columns of zeros) are shown in Figure~\ref{fig:LInonz}.
-\begin{figure}[htbp]
+\begin{figure}[tbp]
   \centering
 \setkeys{Gin}{width=\textwidth}
 <<FigLInonz,fig=TRUE,echo=FALSE,height=2.5,width=8>>=
 fmr = fm1@rep
 LI = as(new("tscMatrix", i = fmr@LIi, p = fmr@LIp, Dim=fmr@Dim,
          x = fmr@LIx, uplo = "L", diag = "U"), "tripletMatrix")
-print(image(LI, ylim=c(167,149),
+print(image(LI, ylim=c(166.5,147.5), xlim=c(-0.5,166.5),
             colorkey=FALSE,aspect='xy'))
 @   
-  \caption{Location of non-zero elements in the last 19 rows of
-    $\bL^{-1}$ for model \var{fm1} fit to the \var{ScotsSec} data.}
+  \caption{Location of non-zero elements in the last 19 rows of unit
+    lower triangular matrix $\bL^{-1}$ for model \var{fm1} fit to the
+    \var{ScotsSec} data. Darker squares indicate larger
+    magnitudes. Rows and columns are numbered from zero.}
   \label{fig:LInonz}
 \end{figure}
 There are 2200 nonzero off-diagonal elements in $\bL^{-1}$ for this
