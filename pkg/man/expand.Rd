@@ -16,7 +16,7 @@ expand(x, \dots)
   The expanded decomposition, typically a list of matrix factors.
 }
 \details{
-  This is a generic function with special methods for different types
+  This is a (S3) generic function with special methods for different types
   of decompositions.
   Use \code{\link{methods}("expand")} to list all the methods for the
   \code{expand} generic.
@@ -27,7 +27,9 @@ expand(x, \dots)
   The function \code{expand} allows all factors to be fully expanded.
 }
 \seealso{
-  %    \code{\link{expand.lu.Matrix}}, \code{\link{expand.lu.Hermitian}},
+  The LU decomposition \code{\link{lu}}, for which there \emph{is} an
+  \code{expand} method;
+  % \code{\link{expand.lu.Hermitian}},
   %    \code{\link{expand.qr.Matrix}}, \code{\link{expand.eigen.Matrix}},
   \code{\link{facmul}}.
 }
