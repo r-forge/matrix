@@ -2,14 +2,33 @@
 \docType{class}
 \alias{\%*\%,dgeMatrix,dsyMatrix-method}
 \alias{\%*\%,dsyMatrix,dgeMatrix-method}
+\alias{\%*\%,dspMatrix,dgeMatrix-method}
+\alias{\%*\%,dspMatrix,matrix-method}
 \alias{dsyMatrix-class}
 \alias{dspMatrix-class}
 \alias{coerce,dsyMatrix,dgeMatrix-method}
+\alias{coerce,dspMatrix,dgeMatrix-method}
+\alias{coerce,dspMatrix,dsyMatrix-method}
 \alias{coerce,dsyMatrix,matrix-method}
+\alias{coerce,dspMatrix,matrix-method}
 \alias{chol,dsyMatrix,ANY-method}
+\alias{norm,dspMatrix,character-method}
 \alias{norm,dsyMatrix,character-method}
 \alias{norm,dsyMatrix,missing-method}
+\alias{norm,dspMatrix,missing-method}
 \alias{t,dsyMatrix-method}
+\alias{t,dspMatrix-method}
+\alias{rcond,dspMatrix,missing-method}
+\alias{rcond,dsyMatrix,missing-method}
+\alias{rcond,dspMatrix,character-method}
+\alias{rcond,dsyMatrix,character-method}
+\alias{solve,dspMatrix,missing-method}
+\alias{solve,dsyMatrix,missing-method}
+\alias{solve,dspMatrix,dgeMatrix-method}
+\alias{solve,dsyMatrix,dgeMatrix-method}
+\alias{solve,dspMatrix,matrix-method}
+\alias{solve,dsyMatrix,matrix-method}
+\alias{unpack,dspMatrix-method}
 \title{Symmetric, dense matrices}
 \description{The \code{"dsyMatrix"} class is the class of symmetric, dense
   matrices in non-packed storage and \code{"dsyMatrix"} is the class of
