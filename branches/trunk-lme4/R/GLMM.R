@@ -210,7 +210,7 @@ setMethod("GLMM",
                   (0.1 + max(abs(eta))) * controlvals$tolerance)
               {
                   conv <- TRUE
-                  break
+#                  break
               }
               etaold[] <- eta
 
@@ -279,7 +279,15 @@ setMethod("GLMM",
 #                      cat(pars)
 #                      cat("\n")
 #                      print(reducedObj@Omega) 
-                      coef(reducedObj, unconst = TRUE) <- pars[responseIndex:length(pars)]
+#                      coef(reducedObj, unconst = TRUE) <<- pars[responseIndex:length(pars)]
+
+
+                      .Call("ssclme_coefGetsUnc",
+                            reducedObj, as.double(pars[responseIndex:length(pars)]), PACKAGE = "Matrix")
+
+
+
+
 #                      print(reducedObj@Omega)
 #                      print("-----------------------")
                       off <- drop(mmats.unadjusted$.Xy %*%
@@ -313,6 +321,7 @@ setMethod("GLMM",
                       eta[] <- off + 
                           .Call("ssclme_fitted", reducedObj, facs,
                                 reducedMmats.unadjusted, PACKAGE = "Matrix")
+#print(mean(eta), digits = 12)
                       ##cat(paste("bhat Criterion:", max(abs(eta - etaold)) /
                       ##          (0.1 + max(abs(eta))), "\n"))
                       ## use this to determine convergence
@@ -320,7 +329,7 @@ setMethod("GLMM",
                           (0.1 + max(abs(eta))) * controlvals$tolerance)
                       {
                           conv <- TRUE
-                          break
+#                          break
                       }
                       etaold[] <- eta
 
@@ -348,33 +357,66 @@ setMethod("GLMM",
 
           loglikLaplace <- function(pars = NULL)
           {
-              mu <- bhat(pars = pars)  ## gets correct values of bhat and bvars
+              cat("Parameters:\n\t")
+              print(pars, digits = 12)
+              cat("Value:\n\t")
 
+              mu <- bhat(pars = pars)  ## gets correct values of bhat and bvars
+#print(mean(mu), digits = 12)
+#print(densityplot(~mu, groups = mmats.unadjusted$.Xy[, responseIndex]))
+#print(mean(mmats.unadjusted$.Xy[, responseIndex]))
+#print(weights)
               ## GLM family log likelihood (upto constant ?)(log scale)
               ## FIXME: need to adjust for sigma^2 for appropriate models (not trivial!)
-              ans <- ## log lik from observations given fixed and random effects
-                  sum(family$dev.resids(y = mmats.unadjusted$.Xy[, responseIndex],
-                                        mu = mu,
-                                        wt = weights^2))
+
+              ## Keep everything on (log) likelihood scale
+
+              ## log lik from observations given fixed and random effects
+              ## get deviance, then multiply by -1/2 (since deviance = -2 log lik)
+              ans <- 
+                  -0.5 * sum(family$dev.resids(y = mmats.unadjusted$.Xy[, responseIndex],
+                                               mu = mu,
+                                               wt = weights^2))
+#              print(ans, digits = 12)
               ranefs <- ranef(reducedObj)
-              Omega <- obj@Omega
-              jacobian <- numeric(length(ranefs))
+              Omega <- reducedObj@Omega
               for (i in seq(along = ranefs))
               {
+                  ## contribution for random effects (get it working, optimize later)
+                  ## symmetrize RE variance
                   Omega[[i]] <- Omega[[i]] + t(Omega[[i]])
                   diag(Omega[[i]]) <- diag(Omega[[i]]) / 2
+
                   ## want log of `const det(Omega) exp(-1/2 b' Omega b )`
                   ## i.e., const + log det(Omega) - .5 * (b' Omega b)
                   ## FIXME: need to adjust for sigma^2 for appropriate models (easy)
                   ## these are all the b'Omega b, summed as they eventually need to be
                   ## think of this as sum(rowSums((ranefs[[i]] %*% Omega[[i]]) * ranefs[[i]]))
-                  ans <- ans - 0.5 * sum((ranefs[[i]] %*% Omega[[i]]) * ranefs[[i]]) -
-                      nrow(ranefs[[i]]) * determinant(Omega[[i]], logarithm = TRUE)$modulus
+
+                  ranef.loglik.det <- 0.5 * nrow(ranefs[[i]]) * determinant(Omega[[i]], logarithm = TRUE)$modulus
+                  ranef.loglik.re <- -0.5 * sum((ranefs[[i]] %*% Omega[[i]]) * ranefs[[i]])
+
+                  ranef.loglik <- ranef.loglik.det + ranef.loglik.re
+
+
+#                  print(as.double(ranef.loglik.det))
+#                  print(as.double(ranef.loglik.re))
+#                  print(as.double(ranef.loglik))
+
                   ## Jacobian adjustment
-                  ## log.jacobian[i] <- sum(log(apply(bVar[[i]], 3, function(x) sum(diag(x)))))
-                  ans <- ans + sum(log(apply(reducedObj@bVar[[i]], 3, function(x) sum(diag(x)))))
+                  log.jacobian <- sum(log(     abs(apply(reducedObj@bVar[[i]], 3, function(x) sum(diag(x))))      ))
+#                  print(log.jacobian, digits = 12)
+
+
+                  ans <- ans + ranef.loglik + log.jacobian
               }
-              ans ## this is (upto some constant) log of the Laplacian approximation of the likelihood
+              print(as.double(-ans), digits = 12)
+
+              ## ans is (upto some constant) log of the Laplacian
+              ## approximation of the likelihood. Return it's negative
+              ## to be minimized
+
+              -ans 
           }
 
           if (method == "Laplace")
@@ -388,7 +430,7 @@ setMethod("GLMM",
                             par = c(fixef(obj), coef(obj, unconst = TRUE)),
                             ## hessian = TRUE,
                             method = "BFGS",
-                            control = list(trace = TRUE, #controlvals$msVerbose,
+                            control = list(trace = controlvals$msVerbose,
                             reltol = controlvals$msTol,
                             ##fnscale = -xval,
                             ##parscale = 1/controlvals$msScale(coef(obj)),
@@ -397,11 +439,16 @@ setMethod("GLMM",
                       warning("optim failed to converge")
                   }
                   ##fixef(obj) <- optimRes$par[seq(length = responseIndex - 1)]
-                  print(fixef(obj))
-                  print(optimRes$par[seq(length = responseIndex - 1)])
-                  print(coef(obj, unconst = TRUE))
-                  coef(obj, unconst = TRUE) <- optimRes$par[responseIndex:length(optimRes$par)]
-                  print(coef(obj, unconst = TRUE))
+                  if (getOption("verbose")) {
+                      cat(paste("optim convergence code", optimRes$convergence, "\n"))
+                      cat("Fixed effets:\n")
+                      print(fixef(obj))
+                      print(optimRes$par[seq(length = responseIndex - 1)])
+                      cat("(Unconstrinaed) variance coefficients:\n")
+                      print(coef(obj, unconst = TRUE))
+                      coef(obj, unconst = TRUE) <- optimRes$par[responseIndex:length(optimRes$par)]
+                      print(coef(obj, unconst = TRUE))
+                  }
                   ## need to calculate likelihood
               }
               else if (controlvals$optimizer == "nlm") {
@@ -415,19 +462,23 @@ setMethod("GLMM",
                       nlm(f = loglikLaplace, ## if (controlvals$analyticGradient)  ??
                           p = c(fixef(obj), coef(obj, unconst = TRUE)),
                           ## hessian = TRUE,
-                          print.level = 2, #if (controlvals$msVerbose) 2 else 0,
+                          print.level = if (controlvals$msVerbose) 2 else 0,
                           steptol = controlvals$msTol,
                           gradtol = controlvals$msTol,
                           stepmax = controlvals$nlmStepMax,
                           typsize=typsize,
                           ## fscale=xval,
                           iterlim = controlvals$msMaxIter)
-                  ##fixef(obj) <- nlmRes$estimate[seq(length = responseIndex - 1)]
-                  print(fixef(obj))
-                  print(nlmRes$estimate[seq(length = responseIndex - 1)])
-                  print(coef(obj, unconst = TRUE))
-                  coef(obj, unconst = TRUE) <- nlmRes$estimate[responseIndex:length(nlmRes$estimate)]
-                  print(coef(obj, unconst = TRUE))
+                  if (getOption("verbose")) {
+                      cat(paste("nlm convergence code", nlmRes$code, "\n"))
+                      cat("Fixed effets:\n")
+                      print(fixef(obj))
+                      print(nlmRes$estimate[seq(length = responseIndex - 1)])
+                      cat("(Unconstrinaed) variance coefficients:\n")
+                      print(coef(obj, unconst = TRUE))
+                      coef(obj, unconst = TRUE) <- nlmRes$estimate[responseIndex:length(nlmRes$estimate)]
+                      print(coef(obj, unconst = TRUE))
+                  }
                   ## need to calculate likelihood
               }
 
