@@ -74,8 +74,10 @@ setMethod("deviance", signature(object = "ssclme"),
           })
 
 setMethod("coef", signature(object = "ssclme"),
-          function(object, ...) {
-              .Call("ssclme_coef", object, PACKAGE = "Matrix")
+          function(object, unconst = FALSE, ...) {
+              .Call(ifelse(as(unconst, "logical")[1],
+                           "ssclme_coefUnc", "ssclme_coef"),
+                    object, PACKAGE = "Matrix")
           })
 
 setMethod("ranef", signature(object = "ssclme"),
