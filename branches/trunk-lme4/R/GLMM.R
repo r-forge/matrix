@@ -180,6 +180,7 @@ setMethod("GLMM",
           mmats[[1]][1,1] <- 1 
           conv <- FALSE
           firstIter <- TRUE
+          msMaxIter.orig <- controlvals$msMaxIter
 
           for (iter in seq(length = controlvals$glmmMaxIter))
           {
@@ -210,7 +211,7 @@ setMethod("GLMM",
                   (0.1 + max(abs(eta))) * controlvals$tolerance)
               {
                   conv <- TRUE
-#                  break
+                  break
               }
               etaold[] <- eta
 
@@ -224,6 +225,7 @@ setMethod("GLMM",
               }
           }
           if (!conv) warning("IRLS iterations for glmm did not converge")
+          controlvals$msMaxIter <- msMaxIter.orig
 
 
 
@@ -249,33 +251,33 @@ setMethod("GLMM",
           ## them more than once
 
 
-#           ## reduced ssclme
+          ## reduced ssclme
 
-#           reducedObj <- .Call("ssclme_collapse", obj, PACKAGE = "Matrix")
-#           reducedMmats.unadjusted <- mmats.unadjusted
-#           reducedMmats.unadjusted$.Xy <-
-#               reducedMmats.unadjusted$.Xy[, responseIndex, drop = FALSE]
-#           reducedMmats <- mmats
-#           reducedMmats$.Xy <-
-#               reducedMmats$.Xy[, responseIndex, drop = FALSE]
-# #          .Call("ssclme_update_mm", reducedObj, facs, reducedMmats, PACKAGE="Matrix")
+          reducedObj <- .Call("ssclme_collapse", obj, PACKAGE = "Matrix")
+          reducedMmats.unadjusted <- mmats.unadjusted
+          reducedMmats.unadjusted$.Xy <-
+              reducedMmats.unadjusted$.Xy[, responseIndex, drop = FALSE]
+          reducedMmats <- mmats
+          reducedMmats$.Xy <-
+              reducedMmats$.Xy[, responseIndex, drop = FALSE]
+#          .Call("ssclme_update_mm", reducedObj, facs, reducedMmats, PACKAGE="Matrix")
 
-#           ## make obj comparable
-#           ## .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
+          ## make obj comparable
+          ## .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
 
 
 ### reduced version doesn't seem to work. Let's work with a full copy
 
 
 
-          reducedObj <- obj
-          reducedMmats.unadjusted <- mmats.unadjusted
-          reducedMmats <- mmats
-#          .Call("ssclme_update_mm", reducedObj, facs, reducedMmats, PACKAGE="Matrix")
+#           reducedObj <- obj
+#           reducedMmats.unadjusted <- mmats.unadjusted
+#           reducedMmats <- mmats
+# #          .Call("ssclme_update_mm", reducedObj, facs, reducedMmats, PACKAGE="Matrix")
 
-          reducedMmats.unadjusted[[1]] <- mmats.unadjusted[[1]]
-          reducedMmats[[1]] <- mmats[[1]]
-          reducedObj@status <- obj@status
+#           reducedMmats.unadjusted[[1]] <- mmats.unadjusted[[1]]
+#           reducedMmats[[1]] <- mmats[[1]]
+#           reducedObj@status <- obj@status
 
           ## hopefully this forces copies for all 3
 
@@ -301,92 +303,42 @@ setMethod("GLMM",
                   }
                   else
                   {
-#                      cat(pars)
-#                      cat("\n")
-#                      print(reducedObj@Omega) 
-#                      coef(reducedObj, unconst = TRUE) <<- pars[responseIndex:length(pars)]
-
-
                       .Call("ssclme_coefGetsUnc",
                             reducedObj, as.double(pars[responseIndex:length(pars)]), PACKAGE = "Matrix")
-
-
-
-
-#                      print(reducedObj@Omega)
-#                      print("-----------------------")
                       off <- drop(mmats.unadjusted$.Xy %*%
                                   c(pars[1:(responseIndex-1)], 0))
 
                   }
 
-                  niter <- 20 # FIXME: 20
+                  niter <- 20
                   conv <- FALSE
 
-                  eta <- off + 
-                      .Call("ssclme_fitted", reducedObj, facs,
-                            reducedMmats.unadjusted, TRUE, PACKAGE = "Matrix") - 
-                                .Call("ssclme_fitted", reducedObj, facs,
-                                      reducedMmats.unadjusted, FALSE, PACKAGE = "Matrix") 
-
-
-
-#                  eta.check <-
-#                      .Call("ssclme_fitted", obj, facs,
-#                            mmats.unadjusted, TRUE, PACKAGE = "Matrix")
-
-#                  print(all.equal(eta, eta.check)) # not really sure why not TRUE
-#                  plot(eta, eta.check)
+                  eta <-
+                      .Call("ssclme_fitted", obj, facs,
+                            mmats.unadjusted, TRUE, PACKAGE = "Matrix")
+#                  eta <- off + ## maybe want a + offset here ?
+#                      .Call("ssclme_fitted", reducedObj, facs,
+#                            reducedMmats.unadjusted, TRUE, PACKAGE = "Matrix")
                   etaold <- eta
                   
-
-#      firstIter <- TRUE
                   
                   for (iter in seq(length = niter))
                   {
                       mu <- family$linkinv(eta)
                       dmu.deta <- family$mu.eta(eta)
-                      z <- eta + (reducedMmats.unadjusted$.Xy[, responseIndex] - mu) / dmu.deta - offset
+                      z <- eta - off +
+                          (reducedMmats.unadjusted$.Xy[, 1] - mu) / dmu.deta -
+                              offset ## <- this offset is the user supplied offset
                       w <- weights * dmu.deta / sqrt(family$variance(mu))
                       .Call("nlme_weight_matrix_list",
                             reducedMmats.unadjusted, w, z, reducedMmats,
                             PACKAGE="Matrix")
-#str(reducedMmats)
-#print(summary(reducedMmats$.Xy[, 1]))
-
-#print(summary(ranef(reducedObj)[[1]]))
-                  
-
-
                       .Call("ssclme_update_mm", reducedObj, facs, reducedMmats,
                             PACKAGE="Matrix")
-#                      if (firstIter)
-#                      {
-#                          .Call("ssclme_initial", obj, PACKAGE="Matrix")
-#      firstIter <- FALSE
-#                      }
-#print(reducedObj@status)
-
-#print(reducedObj@deviance)
-#print(summary(reducedObj@devComp))
-#print(summary(ranef(reducedObj)[[1]]))
-
-
                       eta[] <- off + 
                           .Call("ssclme_fitted", reducedObj, facs,
                                 reducedMmats.unadjusted, TRUE,
-                                PACKAGE = "Matrix") -
-                                    .Call("ssclme_fitted", reducedObj, facs,
-                                          reducedMmats.unadjusted, FALSE,
-                                          PACKAGE = "Matrix")
-
-
-#print(reducedObj@status)
-#str(reducedObj)
-
-
-#print(summary(data.frame(w = w, eta = eta)))
-#print(mean(eta), digits = 12)
+                                PACKAGE = "Matrix")
                       ##cat(paste("bhat Criterion:", max(abs(eta - etaold)) /
                       ##          (0.1 + max(abs(eta))), "\n"))
                       ## use this to determine convergence
@@ -394,7 +346,7 @@ setMethod("GLMM",
                           (0.1 + max(abs(eta))) * controlvals$tolerance)
                       {
                           conv <- TRUE
-#                          break
+                          break
                       }
                       etaold[] <- eta
 
@@ -407,22 +359,10 @@ setMethod("GLMM",
                   ## ranef(reducedObj) and reducedObj@bVar (?). But
                   ## the mu-scale response will be useful for log-lik
                   ## calculations later, so return them anyway
-#print(mean(ranef(reducedObj)[[1]]))
+
                   invisible(family$linkinv(eta)) 
               }
 
-#bhat(c(fixef(obj), coef(obj, unconst = TRUE)))
-#print(summary(ranef(obj)[[1]]))
-#print(summary(ranef(reducedObj)[[1]]))
-#print("fitted wo re")
-#print(summary(.Call("ssclme_fitted", reducedObj, facs,
-#                    reducedMmats.unadjusted, FALSE,
-#                    PACKAGE = "Matrix")))
-#print(summary(.Call("ssclme_fitted", reducedObj, facs,
-#                    reducedMmats.unadjusted, TRUE,
-#                    PACKAGE = "Matrix")))
-#print(summary(ranef(reducedObj)[[1]]))
-#print(fixef(reducedObj))
 
 
 
@@ -438,18 +378,10 @@ setMethod("GLMM",
 
           loglikLaplace <- function(pars = NULL)
           {
-              cat("Parameters:\n\t")
-              print(pars, digits = 12)
-              cat("Value:\n\t")
+              ## gets correct values of bhat and bvars. As a side
+              ## effect, mu now has fitted values
+              mu <- bhat(pars = pars)
 
-              mu <- bhat(pars = pars)  ## gets correct values of bhat and bvars
-#print(summary(ranef(reducedObj)[[1]]))
-
-
-#print(mean(mu), digits = 12)
-#print(densityplot(~mu, groups = mmats.unadjusted$.Xy[, responseIndex]))
-#print(mean(mmats.unadjusted$.Xy[, responseIndex]))
-#print(weights)
               ## GLM family log likelihood (upto constant ?)(log scale)
               ## FIXME: need to adjust for sigma^2 for appropriate models (not trivial!)
 
@@ -461,7 +393,6 @@ setMethod("GLMM",
                   -0.5 * sum(family$dev.resids(y = mmats.unadjusted$.Xy[, responseIndex],
                                                mu = mu,
                                                wt = weights^2))
-#              print(ans, digits = 12)
               ranefs <- ranef(reducedObj)
               Omega <- reducedObj@Omega
               for (i in seq(along = ranefs))
@@ -482,23 +413,20 @@ setMethod("GLMM",
 
                   ranef.loglik <- ranef.loglik.det + ranef.loglik.re
 
-
-#                  print(as.double(ranef.loglik.det))
-#                  print(as.double(ranef.loglik.re))
-#                  print(as.double(ranef.loglik))
-
                   ## Jacobian adjustment
-                  log.jacobian <- sum(log(     abs(apply(reducedObj@bVar[[i]], 3, function(x) sum(diag(x))))      ))
-#                  print(log.jacobian, digits = 12)
-
+                  log.jacobian <- sum(log(abs(apply(reducedObj@bVar[[i]], 3, function(x) sum(diag(x))))))
 
                   ans <- ans + ranef.loglik + log.jacobian
               }
-              print(as.double(-ans), digits = 12)
-
               ## ans is (upto some constant) log of the Laplacian
               ## approximation of the likelihood. Return it's negative
               ## to be minimized
+
+#              cat("Parameters: ")
+#              print(pars)
+
+#              cat("Value: ")
+#              print(as.double(-ans))
 
               -ans 
           }
@@ -507,43 +435,23 @@ setMethod("GLMM",
 
           if (method == "Laplace")
           {
-
-
-
-
-
-# loglikLaplace(c(-0.00866819130092, 0.93670968021641, 2.04058451796758))
-# loglikLaplace(c(-0.00866819758941,  0.93670988950570, 2 * 1.02028559177603))
-
-# # new optimum
-# loglikLaplace(c(-0.00238011172953,  0.93233959123052,  3.11188910750719))
-# ## old optimum
-# loglikLaplace(c(-0.00883548391039,  0.95087135525459,  2 * 1.12915375037339))
-
-
-# stop("stopping")
-
-
-
-
-
               cat(paste("Using optimizer", controlvals$optim), "\n")
 
+              ## no analytic gradients or hessians
               if (controlvals$optimizer == "optim") {
+
+
                   optimRes =
-                      ## if (controlvals$analyticGradient)  ??
                       optim(fn = loglikLaplace,
                             par = c(fixef(obj), coef(obj, unconst = TRUE)),
-                            ## hessian = TRUE,
                             method = "BFGS",
                             control = list(trace = controlvals$msVerbose,
                             reltol = controlvals$msTol,
                             ##fnscale = -xval,
                             ##parscale = 1/controlvals$msScale(coef(obj)),
                             maxit = controlvals$msMaxIter))
-                  if (optimRes$convergence != 0) {
-                      warning("optim failed to converge")
-                  }
+                  if (optimRes$convergence != 0) warning("optim failed to converge")
+                  optpars <- optimRes$par
                   ##fixef(obj) <- optimRes$par[seq(length = responseIndex - 1)]
                   if (getOption("verbose")) {
                       cat(paste("optim convergence code", optimRes$convergence, "\n"))
@@ -556,18 +464,23 @@ setMethod("GLMM",
                       print(coef(obj, unconst = TRUE))
                   }
                   ## need to calculate likelihood
+
+
               }
               else if (controlvals$optimizer == "nlm") {
+
+                  ## not sure what the next few lines are for. Copied from Saikat's code
                   ## typsize <- 1/controlvals$msScale(coef(obj))
                   typsize <- rep(1.0, length(coef(obj, unconst = TRUE)) + responseIndex - 1)
                   if (is.null(controlvals$nlmStepMax))
                       controlvals$nlmStepMax <-
                           max(100 * sqrt(sum((c(fixef(obj),
                                                 coef(obj, unconst = TRUE))/typsize)^2)), 100)
+print(controlvals$msMaxIter)
+print(controlvals$msVerbose)
                   nlmRes =
-                      nlm(f = loglikLaplace, ## if (controlvals$analyticGradient)  ??
+                      nlm(f = loglikLaplace, 
                           p = c(fixef(obj), coef(obj, unconst = TRUE)),
-                          ## hessian = TRUE,
                           print.level = if (controlvals$msVerbose) 2 else 0,
                           steptol = controlvals$msTol,
                           gradtol = controlvals$msTol,
@@ -575,6 +488,9 @@ setMethod("GLMM",
                           typsize=typsize,
                           ## fscale=xval,
                           iterlim = controlvals$msMaxIter)
+                  if (nlmRes$code > 3) warning("nlm probably failed to converge")
+                  optpars <- nlmRes$estimate
+
                   if (getOption("verbose")) {
                       cat(paste("nlm convergence code", nlmRes$code, "\n"))
                       cat("Fixed effets:\n")
@@ -585,8 +501,9 @@ setMethod("GLMM",
                       coef(obj, unconst = TRUE) <- nlmRes$estimate[responseIndex:length(nlmRes$estimate)]
                       print(coef(obj, unconst = TRUE))
                   }
+                  ## need to calculate likelihood
+
               }
-              ## need to calculate likelihood
 
               ## also need to store new estimates of fixed effects
               ## somewhere (probably cannot update standard errors)
@@ -595,7 +512,8 @@ setMethod("GLMM",
 
 
           
-          ## Get updated ranef estimates
+          ## Get updated ranef estimates corresponding to optimum
+
 #          bhat()
 
 #          str(ranef(reducedObj))
