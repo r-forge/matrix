@@ -957,7 +957,7 @@ SEXP lmer_firstDer(SEXP x, SEXP val)
  	    mm[0] = ((double) nlev)/REAL(VECTOR_ELT(Omega, i))[0]; 
  	    mm[1] = F77_CALL(ddot)(&nlev, bi, &ione, bi, &ione); 
 	    mm[2] = F77_CALL(ddot)(&nlev, Di, &ione, Di, &ione);
-	    mm[3] = 0.
+	    mm[3] = 0.;
   	    for (j = 0; j < p; j++) {
   		mm[3] += F77_CALL(ddot)(&RZXrows, RZXi + j * dims[0], &ione,
 					RZXi + j * dims[0], &ione);
@@ -982,14 +982,15 @@ SEXP lmer_firstDer(SEXP x, SEXP val)
 	    F77_CALL(dsyrk)("U", "N", &nci, &RZXrows, &one, Di, &nci,
 			    &zero, mm, &nci);
 	    mm += ncisqr;	/* Extra term for \vb */
+	    memset(mm, 0, sizeof(double) * ncisqr);
 	    for (j = 0; j < p; j++) {
 		F77_CALL(dsyrk)("U", "N", &nci, &nlev, &one,
 				RZXi + j * dims[0], &nci,
 				&one, mm, &nci);
 	    }
 	}
+	Free(tmp);
     }
-    Free(tmp);
     UNPROTECT(1);
     return val;
 }
@@ -1006,7 +1007,7 @@ SEXP lmer_firstDer(SEXP x, SEXP val)
 static
 SEXP EM_grad_array(int nf, const int nc[])
 {
-    SEXP val = PROTECT(allocVector(VECSXP, nf)),
+    SEXP val = PROTECT(allocVector(VECSXP, nf));
     int i;
 
     for (i = 0; i < nf; i++) {
