@@ -130,4 +130,14 @@ system.time(mX2 <- lme(height ~ poly(age,4), Oxboys, ~ age + I(age^2)|Subject),
 summary(mX2)
 @ 
 
+\section{Cross-classification model}
+\label{sec:CrossClassified}
+
+<<ScotsSec>>=
+data(ScotsSec)
+str(ScotsSec)
+system.time(mS1 <- lme(attain ~ sex, ScotsSec, ~ 1|primary+second))
+summary(mS1)
+@ 
+
 \end{document}
