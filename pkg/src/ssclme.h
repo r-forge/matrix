@@ -28,6 +28,6 @@ SEXP ssclme_Hessian(SEXP x, SEXP REMLp, SEXP Uncp);
 SEXP ssclme_collapse(SEXP x);
 SEXP ssclme_to_lme(SEXP call, SEXP facs, SEXP x, SEXP model, SEXP REML,
 		   SEXP rep, SEXP fitted, SEXP residuals, SEXP terms,
-		   SEXP assign, SEXP contrasts);
+		   SEXP assign);
 
 #endif

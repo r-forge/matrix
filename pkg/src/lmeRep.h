@@ -4,6 +4,8 @@
 #include "Mutils.h"
 #include "triplet_to_col.h"
 #include "cscBlocked.h"
+#include "bCrosstab.h"
+#include "R_ldl.h"
 #include <R_ext/Lapack.h>
 #include <R_ext/Constants.h>
 
@@ -22,5 +24,9 @@ SEXP lmeRep_ranef(SEXP x);
 SEXP lmeRep_ECMEsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP Verbp);
 SEXP lmeRep_gradient(SEXP x, SEXP REMLp, SEXP Uncp);
 SEXP lmeRep_variances(SEXP x);
+SEXP lmer_create(SEXP flist, SEXP mmats);
+SEXP lmer_inflate(SEXP x);
+SEXP lmer_initial(SEXP x);
+SEXP lmer_factor(SEXP x);
 
 #endif

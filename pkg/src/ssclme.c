@@ -1692,7 +1692,7 @@ SEXP ssclme_collapse(SEXP x)
  */
 SEXP ssclme_to_lme(SEXP call, SEXP facs, SEXP x, SEXP model, SEXP REML,
 		   SEXP rep, SEXP fitted, SEXP residuals, SEXP terms,
-		   SEXP assign, SEXP contrasts)
+		   SEXP assign)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("lme")));
 
@@ -1706,7 +1706,6 @@ SEXP ssclme_to_lme(SEXP call, SEXP facs, SEXP x, SEXP model, SEXP REML,
     SET_SLOT(ans, install("residuals"), residuals);
     SET_SLOT(ans, install("terms"), terms);
     SET_SLOT(ans, install("assign"), assign);
-    SET_SLOT(ans, install("contrasts"), contrasts);
     UNPROTECT(1);
     return ans;
 }
