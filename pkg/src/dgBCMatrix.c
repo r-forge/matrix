@@ -190,9 +190,9 @@ cscb_syrk(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE trans,
 
 		    if (scalar) Cx[K] += alpha * Ax[k] * Ax[kk];
 		    else F77_CALL(dgemm)("N", "T", cdims, cdims + 1, adims + 1,
-					 &alpha, Ax + ((uplo==UPP)?kk:k) * asz, adims,
-					 Ax + ((uplo==UPP)?k:kk) * asz, adims,
-					 &one, Cx + K * asz, cdims);
+					 &alpha, Ax + ((uplo==UPP)?k:kk) * asz, adims,
+					 Ax + ((uplo==UPP)?kk:k) * asz, adims,
+					 &one, Cx + K * csz, cdims);
 		}
 	    }
 	}
