@@ -194,7 +194,7 @@ setMethod("GLMM",
                   .Call("ssclme_fitted", obj, facs,
                         mmats.unadjusted, TRUE, PACKAGE = "Matrix")
               crit <- max(abs(eta - etaold)) / (0.1 + max(abs(eta)))
-              if (gVerb) cat(sprintf("%3d: %#8g\n", iter, crit))
+              if (gVerb) cat(sprintf("%03d: %#11g\n", as.integer(iter), crit))
               ## use this to determine convergence
               if (crit < controlvals$tolerance) {
                   conv <- TRUE
