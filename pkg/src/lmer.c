@@ -1,7 +1,7 @@
 #include "lmer.h"
 /* TODO 
  * - Remove the Linv slot.
- * - Change the structure so that ZZpO is diagonal and the off-diagonals in L are used
+ * - Change the structure so that ZZpO is diagonal and the off-diagonals of L are used
  * - The egsingle example with ~year|childid+schoolid shows an unusual
  * drop in the deviance when switching from ECME to optim.  Is it real?
  * (Apparently so.) 
@@ -371,7 +371,7 @@ SEXP lmer_initial(SEXP x)
 }
 
 /** 
- * Copy ZtZ to ZZpO.  Inflate diagonal blocks of ZZpO by Omega.
+ * Copy ZtZ to ZZpO and L.  Inflate diagonal blocks of ZZpO by Omega.
  * Update devComp[1].
  * 
  * @param x pointer to an lmer object
@@ -458,17 +458,17 @@ SEXP lmer_factor(SEXP x)
     if (!status[0]) {
 	SEXP DP = GET_SLOT(x, Matrix_DSym),
 	    LP = GET_SLOT(x, Matrix_LSym),
-	    RZXsl = GET_SLOT(x, Matrix_RZXSym),
+	    RZXP = GET_SLOT(x, Matrix_RZXSym),
 	    ZZOP = GET_SLOT(x, Matrix_ZZpOSym),
 	    Parent = GET_SLOT(x, Matrix_ParentSym);
-	int *dims = INTEGER(getAttrib(RZXsl, R_DimSymbol)),
+	int *dims = INTEGER(getAttrib(RZXP, R_DimSymbol)),
 	    *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	    *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
 	    i, j, nf = length(DP);
 	int nml = nc[nf + 1], nreml = nml + 1 - nc[nf];
 	double
 	    *RXX = REAL(GET_SLOT(x, Matrix_RXXSym)),
-	    *RZX = REAL(RZXsl),
+	    *RZX = REAL(RZXP),
 	    *dcmp = REAL(GET_SLOT(x, Matrix_devCompSym)),
 	    *deviance = REAL(GET_SLOT(x, Matrix_devianceSym)),
 	    minus1 = -1., one = 1.;
@@ -488,7 +488,8 @@ SEXP lmer_factor(SEXP x)
 	    int *Pari = INTEGER(VECTOR_ELT(Parent, i));
 	    double *D = REAL(DiP);
 	
-	    cscb_ldl(ZZOiP, Pari, LiP, DiP);
+	    jj = cscb_ldl(ZZOiP, Pari, LiP, DiP);
+	    if (jj != nlev) error("cscb_ldl returned %d < nlev = %d", jj, nlev);
 	    for (j = 0; j < nlev; j++) { /* accumulate dcmp[0] */
 		double *Dj = D + j * ncisqr;
 		for (jj = 0; jj < nci; jj++) /* accumulate determinant */
@@ -586,7 +587,7 @@ SEXP lmer_factor(SEXP x)
  * @param n number of columns
  * @param alpha multiplier
  * @param ZZpO pointer to the Z'Z+Omega sparse blocked matrix
- * @param L pointer to the diagonal blocks of the inverse
+ * @param L pointer to the L cscb object
  * @param mm pointer to the matrix of right-hand sides
  */
 static void
@@ -614,6 +615,34 @@ lmer_sm(char side, char trans, int nf, const int Gp[], int n,
 }
 
 /** 
+ * Return the number of non-zero blocks below the diagonal in a jth column
+ * block of a diagonal outer block of L^{-1}.
+ * 
+ * @param j column block index
+ * @param Pari parent array
+ * @param L pointer to the list of cscBlocked objects composing L
+ * @param nnz vector to be filled in
+ */
+static R_INLINE
+int nnzcb_diag(int j, const int Pari[])
+{
+    int k, val;
+    for (k = Pari[j], val = 0; k > 0; k = Pari[k]) val++;
+    return val;
+}
+
+static
+int nnzcb_offdiag(int j, int nrb, const int Lp[], const int Li[], const int Park[])
+{
+    int k, k2 = Lp[j + 1], val;
+    char *ind = memset(Calloc(nrb, char), 0, nrb);
+
+    for (k = Park[j], val = 0; k > 0; k = Park[k]) val++;
+    return val;
+}
+	
+	
+/** 
  * If necessary, factor Z'Z+Omega, ZtX, and XtX then, if necessary,
  * replace the RZX and RXX slots by the corresponding parts of the
  * inverse of the Cholesky factor.  Replace the elements of the D slot
@@ -632,13 +661,14 @@ SEXP lmer_invert(SEXP x)
     if (!status[1]) {
 	SEXP DP = GET_SLOT(x, Matrix_DSym),
 	    LP = GET_SLOT(x, Matrix_LSym),
+	    ParP = GET_SLOT(x, Matrix_ParentSym),
 	    RZXP = GET_SLOT(x, Matrix_RZXSym),
 	    ZZpOP = GET_SLOT(x, Matrix_ZZpOSym),
 	    bVarP = GET_SLOT(x, Matrix_bVarSym);
 	int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
 	    *dims = INTEGER(getAttrib(RZXP, R_DimSymbol)),
 	    *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
-	    i, ins, nf = length(DP);
+	    i, nn, nf = length(DP);
 	double *RXX = REAL(GET_SLOT(x, Matrix_RXXSym)),
 	    *RZX = REAL(RZXP),
 	     minus1 = -1., one = 1., zero = 0.;
@@ -677,44 +707,81 @@ SEXP lmer_invert(SEXP x)
 	/* RZX := L^{-T} %*% RZX */
 	lmer_sm('L', 'T', nf, Gp, dims[1], 1.0, GET_SLOT(x, Matrix_ZZpOSym),
 		GET_SLOT(x, Matrix_LSym), RZX, dims[0]);
-	/* Create bVar */
-	for (ins = 1;	       /* length of initial nested sequence */
-	     ins < nf &&
-		 !length(GET_SLOT(VECTOR_ELT(LP, Lind(ins, ins)), Matrix_iSym));
-	     ins++) {}
+
+	/* Create bVar arrays as cprod of column blocks of D^{-T/2}%*%L^{-1} */
 	for (i = 0; i < nf; i++) {
-	    int j, k, nci = nc[i];
+	    SEXP Lii = VECTOR_ELT(LP, Lind(i, i));
+	    SEXP LxP = GET_SLOT(Lii, Matrix_xSym);
+	    int *Pari = INTEGER(VECTOR_ELT(ParP, i)),
+		*xdims = INTEGER(getAttrib(LxP, R_DimSymbol)),
+		*Lp = INTEGER(GET_SLOT(Lii, Matrix_pSym)),
+		*Li = INTEGER(GET_SLOT(Lii, Matrix_iSym)),
+		ip1 = i + 1, j, k, nci = nc[i];
 	    int ncisqr = nci * nci, nlev = (Gp[i+1] - Gp[i])/nci;
-	    double *Di = REAL(VECTOR_ELT(DP, i)), *bVi = REAL(VECTOR_ELT(bVarP, i));
+	    double *Di = REAL(VECTOR_ELT(DP, i)), *bVi = REAL(VECTOR_ELT(bVarP, i)),
+		*Lx = REAL(GET_SLOT(Lii, Matrix_xSym));
 
 	    for (j = 0; j < nlev; j++) {
-		double *bVij = bVi + j * ncisqr;
-		AZERO(bVij, ncisqr);
-		F77_CALL(dsyrk)("U", "N", &nci, &nci, &one, Di + j * ncisqr, &nci,
-				&zero, bVij, &nci);
-	    }
-	    if (i < (ins - 1)) {
-		double **tpt = Calloc(nf - 1 - i, double *);
-		for (k = i + 1; k < ins; k++) tpt[k] = Calloc(nc[k] * nci, double);
-		for (k = i + 1; k < ins; k++) {
-		    SEXP ZZki = VECTOR_ELT(ZZpOP, Lind(k, i));
-		    double *Dk = REAL(VECTOR_ELT(DP, k));
-		    int *rowind = INTEGER(GET_SLOT(ZZki, Matrix_iSym));
-		    int nck = nc[k];
-		    int sz = nci * nck;
-		    double *ZZkix = REAL(GET_SLOT(ZZki, Matrix_xSym));
+		int nzj = nnzcb_diag(j, Pari);
+		double *bVij = bVi + j * ncisqr, *Dij = Di + j * ncisqr;
 
-		    for (j = 0; j < nlev; j++) {
-			Memcpy(tpt[k], ZZkix + j * sz, sz);
-			F77_CALL(dtrmm)("L", "U", "T", "N", &nck, &nci,
-					&one, Dk + rowind[j] * sz, &nck, tpt[k], &nck);
-			F77_CALL(dsyrk)("U", "T", &nci, &nci, &one, tpt[k], &nci,
-					&one, bVi + j * ncisqr, &nci);
+		AZERO(bVij, ncisqr);
+		F77_CALL(dsyrk)("U", "N", &nci, &nci, &one, Dij, &nci, &zero, bVij, &nci);
+		if (nzj) {
+		    int *ind = Calloc(nzj, int), kk;
+		    double *tmp = Calloc(nzj * ncisqr, double);
+		    for (k = Pari[j], kk = 0; kk < nzj; kk++, k = Pari[k]) {
+			int ix = Tind(Li, Lp, k, i), jj;
+			if (ix < 0)
+			    error("%d, %d block not found in L[%d,%d]",
+				  k+1, ip1, ip1, ip1);
+			ind[kk] = k;
+			/* - sign in sol'n incorporated in dtrsm call below */
+			Memcpy(tmp + kk * ncisqr, Lx + ix * ncisqr, ncisqr);
+			for (jj = 0; jj < kk; jj++) {
+			    int ijj = ind[jj];
+			    int jx = Tind(Li, Lp, k, ijj);
+			    if (jx < 0)
+				error("%d, %d block not found in L[%d,%d]",
+				      k+1, ijj+1, ip1, ip1);
+			    F77_CALL(dgemm)("N", "N", &nci, &nci, &nci,
+					    &minus1, tmp + jj * ncisqr, &nci,
+					    Lx + jx * ncisqr, &nci,
+					    &one, tmp + kk * ncisqr, &nci);
+			}
 		    }
+		    for (k = 0; k < nzj; k++) {
+			F77_CALL(dtrsm)("L", "U", "T", "U", &nci, &nci,
+					&minus1, Di + ind[k] * ncisqr, &nci,
+					tmp + k * ncisqr, &nci);
+		    }
+		    kk = nci * nzj;
+		    F77_CALL(dsyrk)("U", "T", &kk, &nci, &one, tmp, &kk,
+				    &one, bVij, &nci);
+		    Free(tmp); Free(ind);
 		}
-		for (k = i + 1; k < ins; k++) Free(tpt[k]);
-		Free(tpt);
 	    }
+	    
+/* 	    for (k = i + 1; k < nn; k++) tpt[k] = Calloc(nc[k] * nci, double); */
+/* 	    for (k = i + 1; k < nn; k++) { */
+/* 		SEXP ZZki = VECTOR_ELT(ZZpOP, Lind(k, i)); */
+/* 		double *Dk = REAL(VECTOR_ELT(DP, k)); */
+/* 		int *rowind = INTEGER(GET_SLOT(ZZki, Matrix_iSym)); */
+/* 		int nck = nc[k]; */
+/* 		int sz = nci * nck; */
+/* 		double *ZZkix = REAL(GET_SLOT(ZZki, Matrix_xSym)); */
+		
+/* 		for (j = 0; j < nlev; j++) { */
+/* 		    Memcpy(tpt[k], ZZkix + j * sz, sz); */
+/* 		    F77_CALL(dtrmm)("L", "U", "T", "N", &nck, &nci, */
+/* 				    &one, Dk + rowind[j] * sz, &nck, tpt[k], &nck); */
+/* 		    F77_CALL(dsyrk)("U", "T", &nci, &nci, &one, tpt[k], &nci, */
+/* 				    &one, bVi + j * ncisqr, &nci); */
+/* 		} */
+/* 	    } */
+/* 	    for (k = i + 1; k < nn; k++) Free(tpt[k]); */
+/* 	    Free(tpt); */
+/* 	    } */
 	}
 	status[1] = 1;
     }
@@ -979,6 +1046,7 @@ SEXP lmer_firstDer(SEXP x, SEXP val)
 	*b = REAL(RZXP) + dims[0] * p;
 
     lmer_invert(x);
+    /* FIXME: Why is this loop run backwards?  It appears it could run forwards. */
     for (i = nf - 1; i >= 0; i--) {
 	SEXP bVPi = VECTOR_ELT(bVarP, i);
 	int *ddims = INTEGER(getAttrib(bVPi, R_DimSymbol)), j, k;
