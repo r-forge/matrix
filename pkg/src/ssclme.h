@@ -7,6 +7,7 @@
 #include <R_ext/Lapack.h>
 #include <R_ext/Constants.h>
 
+SEXP ctab_permute(SEXP ctab);
 SEXP ssclme_create(SEXP grpfac, SEXP ncv, SEXP threshhold);
 SEXP ssclme_update_mm(SEXP x, SEXP facs, SEXP mmats);
 SEXP ssclme_initial(SEXP x);
