@@ -379,7 +379,7 @@ $\bZ\trans\bZ$ are shown in Figure~\ref{fig:ZtZ}.
 \begin{figure}[tbp]
   \centering
 \setkeys{Gin}{width=\textwidth}
-<<FigZtZ,fig=TRUE,echo=FALSE,height=8,width=8>>=
+<<FigZtZ,fig=TRUE,echo=FALSE,height=8,width=8.>>=
 ctab = sscCrosstab(list(ScotsSec$primary, ScotsSec$second), FALSE)
 print(image(ctab, aspect='xy', xlim = c(-0.5,166.5),
            ylim = c(166.5, -0.5), colorkey = FALSE))
@@ -509,7 +509,7 @@ data the permuted rows are shown in Figure~\ref{fig:PermutedRows}.
 \begin{figure}[tbp]
   \centering
 \setkeys{Gin}{width=\textwidth}
-<<FigPermutedRows,fig=TRUE,echo=FALSE,height=2.5,width=8>>=
+<<FigPermutedRows,fig=TRUE,echo=FALSE,height=2.5,width=8.>>=
 perm = .Call("sscCrosstab_groupedPerm", ctab)
 trip = as(as(ctab, "sscMatrix"), "tripletMatrix")
 trip@i = perm[trip@i + 1]
@@ -537,8 +537,8 @@ identity matrix augmented with 19 columns of zeros)
 \begin{figure}[tbp]
   \centering
 \setkeys{Gin}{width=\textwidth}
-<<Figlnonzero,Fig=True,Echo=False,Height=2.5,Width=8>>=
-Print(Image(As(fm1@rep, "tscMatrix"),ylim=c(166.5,147.5),
+<<Figlnonzero,Fig=True,Echo=False,height=2.5,width=8>>=
+print(image(as(fm1@rep, "tscMatrix"),ylim=c(166.5,147.5),
             xlim=c(-0.5,166.5),colorkey=FALSE,aspect='xy'))
 @   
   \caption{Location of non-zero elements in the last 19 rows of the
