@@ -12,9 +12,11 @@ SEXP tsc_transpose(SEXP x)
 	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("tscMatrix"))),
 	islot = GET_SLOT(x, Matrix_iSym);
     int nnz = length(islot),
-	*adims = INTEGER(GET_SLOT(ans, Matrix_DimSym)),
-	*xdims = INTEGER(GET_SLOT(x, Matrix_DimSym));
+	*adims, *xdims = INTEGER(GET_SLOT(x, Matrix_DimSym));
 
+
+    SET_SLOT(ans, Matrix_DimSym, allocVector(INTSXP, 2));
+    adims = INTEGER(GET_SLOT(ans, Matrix_DimSym));
     adims[0] = xdims[1]; adims[1] = xdims[0];
     if (toupper(CHAR(asChar(GET_SLOT(x, Matrix_uploSym)))[0]) == 'U')
 	SET_SLOT(ans, Matrix_uploSym, ScalarString(mkChar("L")));
@@ -65,5 +67,47 @@ SEXP tsc_to_triplet(SEXP x)
 	}
 	UNPROTECT(1);
     }
+    return ans;
+}
+
+SEXP Parent_inverse(SEXP par, SEXP unitdiag)
+{
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("tscMatrix")));
+    int *ap, *ai, *dims, *pr = INTEGER(par),
+	countDiag = 1 - asLogical(unitdiag),
+	j, k, n = length(par), nnz, pos;
+    int *sz = Calloc(n, int);
+    double *ax;
+    
+    if (!isInteger(par)) error("par argument must be an integer vector");
+    for (j = n - 1; j >= 0; j--) {
+	int parent = pr[j];
+	sz[j] = (parent < 0) ?  countDiag : (1 + sz[parent]);
+    }
+    SET_SLOT(ans, Matrix_pSym, allocVector(INTSXP, n + 1));
+    ap = INTEGER(GET_SLOT(ans, Matrix_pSym));
+    ap[0] = 0;
+    for (j = 0; j < n; j++)
+	ap[j+1] = ap[j] + sz[j];
+    nnz = ap[n];
+    SET_SLOT(ans, Matrix_iSym, allocVector(INTSXP, nnz));
+    ai = INTEGER(GET_SLOT(ans, Matrix_iSym));
+    SET_SLOT(ans, Matrix_xSym, allocVector(REALSXP, nnz));
+    ax = REAL(GET_SLOT(ans, Matrix_xSym));
+    for (j = 0; j < nnz; j++) ax[j] = 1.;
+    SET_SLOT(ans, Matrix_DimSym, allocVector(INTSXP, 2));
+    dims = INTEGER(GET_SLOT(ans, Matrix_DimSym));
+    dims[0] = dims[1] = n;
+    SET_SLOT(ans, Matrix_uploSym, ScalarString(mkChar("L")));
+    SET_SLOT(ans, Matrix_diagSym,
+	     (countDiag ? ScalarString(mkChar("N")) :
+		 ScalarString(mkChar("U"))));
+    pos = 0;
+    for (j = 0; j < n; j++) {
+	if (countDiag) ai[pos++] = j;
+	for (k = pr[j]; k >= 0; k = pr[k]) ai[pos++] = k;
+    }
+    Free(sz);
+    UNPROTECT(1);
     return ans;
 }
