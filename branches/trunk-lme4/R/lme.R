@@ -1,31 +1,31 @@
-facshuffle = function(sslm, facs)       # unexported utility
+facshuffle <- function(sslm, facs)       # unexported utility
 {
-    s2 = sslm[[2]]
+    s2 <- sslm[[2]]
     if (all(s2 == (seq(a = s2) - 1))) return(facs)
     if (getOption("verbose")) cat(" Non-trivial permutation\n")
-    s1 = sslm[[1]]
-    lens = diff(s1@Gp)
-    lens = lens/(s1@nc[seq(a = lens)])
-    ff = vector("list", length(facs))
+    s1 <- sslm[[1]]
+    lens <- diff(s1@Gp)
+    lens <- lens/(s1@nc[seq(a = lens)])
+    ff <- vector("list", length(facs))
     for (i in seq(along = lens)) {
-        sq = seq(lens[i])
-        perm = 1 + s2[sq]
-        s2 = s2[-sq] - lens[i]
-        fi = facs[[i]]
-        fip = factor(perm[as.integer(fi)])
-        levels(fip)[perm] = levels(fi)
-        ff[[i]] = fip
+        sq <- seq(lens[i])
+        perm <- 1 + s2[sq]
+        s2 <- s2[-sq] - lens[i]
+        fi <- facs[[i]]
+        fip <- factor(perm[as.integer(fi)])
+        levels(fip)[perm] <- levels(fi)
+        ff[[i]] <- fip
     }
     ff
 }
 
-make.mf.call = function(mf, frm, random) #unexported utility
+make.mf.call <- function(mf, frm, random) #unexported utility
 {
     m <- match(c("formula", "data", "subset", "weights", "na.action",
                  "offset"), names(mf), 0)
     mf <- mf[c(1, m)]
     mf[[1]] <- as.name("model.frame")
-    form = frm
+    form <- frm
     form[[3]] <- (~a+b)[[2]]
     form[[3]][[2]] <- frm[[3]]
     form[[3]][[3]] <-
@@ -39,9 +39,9 @@ make.mf.call = function(mf, frm, random) #unexported utility
         tmp[[3]][[3]] <- formula(pdm)[[2]]
         form <- tmp
     }
-    environment(form) = environment(formula)
-    mf$formula = form
-    mf$drop.unused.levels = TRUE
+    environment(form) <- environment(formula)
+    mf$formula <- form
+    mf$drop.unused.levels <- TRUE
     mf
 }
 
@@ -61,7 +61,7 @@ lmeControl <-                            # Control parameters for lme
            analyticGradient = TRUE,
            analyticHessian=FALSE)
 {
-    if (missing(msScale)) msScale = function(start) {
+    if (missing(msScale)) msScale <- function(start) {
         scale <- abs(start)
         nonzero <- scale > 0
         if (any(nonzero)) {
@@ -96,10 +96,10 @@ setMethod("lme", signature(formula = "missing"),
                    subset, weights, na.action, offset,
                    model = TRUE, x = FALSE, y = FALSE,...)
       {
-          nCall = mCall = match.call()
-          resp = getResponseFormula(data)[[2]]
-          cov = getCovariateFormula(data)[[2]]
-          nCall$formula = eval(substitute(resp ~ cov))
+          nCall <- mCall <- match.call()
+          resp <- getResponseFormula(data)[[2]]
+          cov <- getCovariateFormula(data)[[2]]
+          nCall$formula <- eval(substitute(resp ~ cov))
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
                 mCall, PACKAGE = "Matrix")
       })
@@ -112,10 +112,10 @@ setMethod("lme", signature(formula = "formula", data = "groupedData",
                    subset, weights, na.action, offset,
                    model = TRUE, x = FALSE, y = FALSE,...)
       {
-          nCall = mCall = match.call()
-          cov = formula[[3]]
-          grps = getGroupsFormula(data)[[2]]
-          nCall$random = eval(substitute(~ cov | grps))
+          nCall <- mCall <- match.call()
+          cov <- formula[[3]]
+          grps <- getGroupsFormula(data)[[2]]
+          nCall$random <- eval(substitute(~ cov | grps))
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
                 mCall, PACKAGE = "Matrix")
       })
@@ -127,12 +127,12 @@ setMethod("lme", signature(random = "formula"),
                    subset, weights, na.action, offset,
                    model = TRUE, x = FALSE, y = FALSE,...)
       {
-          nCall = mCall = match.call()
-          cov = getCovariateFormula(random)
-          nms = all.vars(getGroupsFormula(random))
-          lst = lapply(nms, function(f) cov)
-          names(lst) = nms
-          nCall$random = lst
+          nCall <- mCall <- match.call()
+          cov <- getCovariateFormula(random)
+          nms <- all.vars(getGroupsFormula(random))
+          lst <- lapply(nms, function(f) cov)
+          names(lst) <- nms
+          nCall$random <- lst
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
                 mCall, PACKAGE = "Matrix")
       })
@@ -145,7 +145,7 @@ setMethod("lme", signature(formula = "formula", data = "groupedData",
                    subset, weights, na.action, offset,
                    model = TRUE, x = FALSE, y = FALSE,...)
       {
-          nCall = mCall = match.call()
+          nCall <- mCall <- match.call()
           nCall$data <- data@data
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
                 mCall, PACKAGE = "Matrix")
@@ -159,34 +159,37 @@ setMethod("lme", signature(formula = "formula",
                    subset, weights, na.action, offset,
                    model = TRUE, x = FALSE, y = FALSE, ...)
       {
-          method = match.arg(method)
-          random = lapply(random, formula) # formula function, not argument
-          controlvals = do.call("lmeControl", control)
-          controlvals$REML = method == "REML"
+          method <- match.arg(method)
+          random <- lapply(random, formula) # formula function, not argument
+          controlvals <- do.call("lmeControl", control)
+          controlvals$REML <- method == "REML"
           data <- eval(make.mf.call(match.call(expand.dots = FALSE),
                                     formula, random), parent.frame())
-          facs = lapply(names(random),
-                         function(x) eval(as.name(x), envir = data))
-          names(facs) = names(random)
-          facs =                        # order by decreasing number of levels
-              facs[rev(order(sapply(facs, function(fac)
-                                    length(levels(fac)))))]
+          facs <- lapply(names(random),
+                         function(x) as.factor(eval(as.name(x), envir = data)))
+          names(facs) <- names(random)
+          ## order factor list by decreasing number of levels
+          ford <- rev(order(sapply(facs, function(fac) length(levels(fac)))))
+          if (any(ford != seq(a = ford))) { # re-order both facs and random
+              facs <- facs[ford]
+              random <- random[ford]
+          }
           mmats <- c(lapply(random,
                             function(x) model.matrix(formula(x), data = data)),
                      list(.Xy = cbind(model.matrix(formula, data = data),
                           .response = model.response(data))))
-          obj = .Call("ssclme_create", facs, sapply(mmats, ncol),
+          obj <- .Call("ssclme_create", facs, sapply(mmats, ncol),
                        PACKAGE = "Matrix")
-          facs = facshuffle(obj, facs)
-          obj = obj[[1]]
+          facs <- facshuffle(obj, facs)
+          obj <- obj[[1]]
           .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
           .Call("ssclme_initial", obj, PACKAGE="Matrix")
           .Call("ssclme_EMsteps", obj, controlvals$niterEM,
                 controlvals$REML, controlvals$EMverbose, PACKAGE = "Matrix")
-          LMEoptimize(obj) = controlvals
-          fitted = .Call("ssclme_fitted", obj, facs, mmats, TRUE, PACKAGE = "Matrix")
-          residuals = mmats$.Xy[,".response"] - fitted
-          if (as.logical(x)[1]) x = mmats else x = list()
+          LMEoptimize(obj) <- controlvals
+          fitted <- .Call("ssclme_fitted", obj, facs, mmats, TRUE, PACKAGE = "Matrix")
+          residuals <- mmats$.Xy[,".response"] - fitted
+          if (as.logical(x)[1]) x <- mmats else x <- list()
           rm(mmats)
           .Call("ssclme_to_lme", match.call(), facs, x,
                 if(model) data else data.frame(list()),
@@ -204,12 +207,12 @@ setMethod("residuals", signature(object="lme"),
 
 setMethod("logLik", signature(object="lme"),
           function(object, REML = object@REML, ...) {
-              val = -deviance(object@rep, REML = REML)/2
-              rr = object@rep
-              nc = rr@nc[-seq(a = rr@Omega)]
-              attr(val, "nall") = attr(val, "nobs") = nc[2]
-              attr(val, "df") = nc[1] + length(coef(rr))
-              attr(val, "REML") = REML 
+              val <- -deviance(object@rep, REML = REML)/2
+              rr <- object@rep
+              nc <- rr@nc[-seq(a = rr@Omega)]
+              attr(val, "nall") <- attr(val, "nobs") <- nc[2]
+              attr(val, "df") <- nc[1] + length(coef(rr))
+              attr(val, "REML") <- REML 
               class(val) <- "logLik"
               val
           })
@@ -252,12 +255,12 @@ setMethod("show", signature(object = "summary.lme"),
               cat(" Subset:",
                   deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
           }
-          llik = object@logLik
+          llik <- object@logLik
           print(data.frame(AIC = AIC(llik), BIC = BIC(llik),
                            logLik = c(object@logLik), row.names = ""))
           cat("\n")
-          object@re@useScale = TRUE
-          object@re@showCorrelation = TRUE
+          object@re@useScale <- TRUE
+          object@re@showCorrelation <- TRUE
           show(object@re)
           invisible(object)
       })
@@ -271,7 +274,7 @@ setMethod("coef", signature(object = "summary.lme"),
 setMethod("show", signature(object = "lme"),
           function(object)
       {
-          sumry = summary(object)
+          sumry <- summary(object)
           rdig <- 5
           cat("Linear mixed-effects model\n")
           if (!is.null(object@call$formula)) {
@@ -286,9 +289,9 @@ setMethod("show", signature(object = "lme"),
           }
           cat(paste(" log-", ifelse(object@REML, "restricted-", ""),
                     "likelihood: ", sep = ''), logLik(object), "\n")
-          sumry@re@useScale = TRUE
-          sumry@re@showCorrelation = FALSE
-          saveopt = options(show.signif.stars=FALSE)
+          sumry@re@useScale <- TRUE
+          sumry@re@showCorrelation <- FALSE
+          saveopt <- options(show.signif.stars=FALSE)
           on.exit(options(saveopt))
           show(sumry@re)
           invisible(object)
@@ -318,9 +321,7 @@ setMethod("anova", signature(object = "lme"),
           if (any(subset != subset[[1]])) stop("all models must use the same subset")
           if (!is.null(subset[[1]]))
               header <-
-                  c(header,
-#                    paste("Subset", deparse(subset[[1]], forDisplay = TRUE), sep = ": "))
-                    paste("Subset", deparse(subset[[1]]), sep = ": "))
+                  c(header, paste("Subset", deparse(subset[[1]]), sep = ": "))
           llks <- lapply(mods, logLik, REML = FALSE)
           Df <- sapply(llks, attr, "df")
           llk <- unlist(llks)
@@ -338,8 +339,6 @@ setMethod("anova", signature(object = "lme"),
           attr(val, "heading") <-
               c(header, "", "Models: <fixed>: <random>",
                 paste(names(mods),
-#                      unlist(lapply(lapply(calls, "[[", "formula"), deparse, forDisplay = TRUE)),
-#                      unlist(lapply(lapply(calls, "[[", "random"), deparse, forDisplay = TRUE)),
                       unlist(lapply(lapply(calls, "[[", "formula"), deparse)),
                       unlist(lapply(lapply(calls, "[[", "random"), deparse)),
                       sep = ": "),"")
@@ -556,11 +555,14 @@ setMethod("lme1", signature(formula = "formula",
           data <- eval(make.mf.call(match.call(expand.dots = FALSE),
                                            formula, random), parent.frame())
           facs <- lapply(names(random),
-                         function(x) eval(as.name(x), envir = data))
+                         function(x) as.factor(eval(as.name(x), envir = data)))
           names(facs) <- names(random)
-          facs <-                        # order by decreasing number of levels
-              facs[rev(order(sapply(facs, function(fac)
-                                    length(levels(fac)))))]
+          ## order factor list by decreasing number of levels
+          ford <- rev(order(sapply(facs, function(fac) length(levels(fac)))))
+          if (any(ford != seq(a = ford))) { # re-order both facs and random
+              facs <- facs[ford]
+              random <- random[ford]
+          }
           mmats <- c(lapply(random,
                             function(x) model.matrix(formula(x), data = data)),
                      list(.Xy = cbind(model.matrix(formula, data = data),
