@@ -66,11 +66,11 @@ setMethod("image", "dgTMatrix",
                 }, ...)
       })
 
-## MM: probably rather use groupGeneric "Arith" here -- or for "dgeMatrix" !
+## Uses the triplet convention of *adding* entries with same (i,j):
 setMethod("+", signature(e1 = "dgTMatrix", e2 = "dgTMatrix"),
           function(e1, e2) {
               if (any(e1@Dim != e2@Dim))
-                  error("Dimensions not compatible for addition")
+                  stop("Dimensions not compatible for addition")
               new("dgTMatrix", i = c(e1@i, e2@i), j = c(e1@j, e2@j),
                   x = c(e1@x, e2@x), Dim = e1@Dim)
           })

@@ -4,7 +4,7 @@ bCrosstab <- function(flist, reorder = TRUE) {
     flist <- lapply(as.list(flist), function (x) as.factor(x)[drop = TRUE])
 
     nfac <- length(flist)
-    if (nfac < 1) error("flist must be a non-empty list of factors")
+    if (nfac < 1) stop("flist must be a non-empty list of factors")
                                         # Check for consistent lengths
     nobs <- length(flist[[1]])
     if (any(lapply(flist, length) != nobs))
@@ -59,7 +59,7 @@ Lstruct <- function(bcr, nc = rep(1, nf)) {
     nf <- length(fl)
     Linv <- vector("list", length(fl))
     names(Linv) <- names(fl)
-                                        
+
     if (all(unlist(lapply(ctab, function(x) all(diff(x@p)== 1))))) { # nested
         ZtZ <- ctab2bblist(ctab, nf, nc)
         for (j in 1:nf) Linv[[j]] <- ZtZ[[ind(j, j)]]
