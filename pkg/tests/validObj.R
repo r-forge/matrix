@@ -22,12 +22,15 @@ assertError <- function(expr) {
     invisible(t.res)
 }
 
-## "dMatrix"
-str(new("Matrix"))
+### --- "dMatrix" ---
+## the empty ones:
+chk.matrix(new("Matrix"))
+chk.matrix(new("dMatrix"))
+chk.matrix(new("ddenseMatrix"))
+chk.matrix(new("dgeMatrix"))
 
 ## "dge"
 assertError( new("dgeMatrix", Dim = c(2,2), x= 1:4) )# double 'Dim'
-if(FALSE)## FIXME: this creates an integer '@ x' !
 assertError( new("dgeMatrix", Dim = as.integer(c(2,2)), x= 1:4) )# int 'x'
 assertError( new("dgeMatrix", Dim = 2:2, x=as.double(1:4)) )# length(Dim) !=2
 assertError( new("dgeMatrix", Dim = as.integer(c(2,2)), x= as.double(1:5)))
@@ -59,7 +62,6 @@ try( chk.matrix(ch3 <- chol(as(cm, "dgeMatrix"))) ) # nor that one
 ### Very basic  triangular matrix stuff
 
 assertError( new("dtrMatrix", Dim = c(2,2), x= 1:4) )# double 'Dim'
-if(FALSE)## FIXME: this creates an integer '@ x' !
 assertError( new("dtrMatrix", Dim = as.integer(c(2,2)), x= 1:4) )# int 'x'
 ## This caused a segfault (before revision r1172 in ../src/dtrMatrix.c):
 assertError( new("dtrMatrix", Dim = 2:2, x=as.double(1:4)) )# length(Dim) !=2
