@@ -47,3 +47,13 @@ We have a (at least one) basic problem :
 
 - implement diagonal Matrix class  "ddiMatrix" etc
   using constructor function Diagonal() or Diag().
+
+---
+
+- create a class of permutation matrices for use in expand.  The
+  current expand method for the LU factorization is not complete
+  because it does not provide the permutation.
+
+- combine the C functions for multiplication by special forms and
+  solution wrt special forms by using a 'right' argument and a
+  'classed' argument.
