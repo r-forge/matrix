@@ -188,7 +188,6 @@ void ssclme_copy_ctab(int nf, const int nc[], SEXP ctab, SEXP ssc)
     }
 }
 
-static
 void ssclme_fill_LIp(int n, const int Parent[], int LIp[])
 {
     int *sz = Calloc(n, int), i;
@@ -1284,40 +1283,4 @@ SEXP ssclme_variances(SEXP x, SEXP REML)
     }
     UNPROTECT(2);
     return val;
-}
-
-SEXP ssclme_L_LI_sizes(SEXP facs)
-{
-    SEXP ans = PROTECT(allocVector(INTSXP, 4)),
-	ctab;
-    int *Ai, *Ap, *Lp, *Parent, *aa = INTEGER(ans), *dims, *perm,
-	nzcol;
-				/* Pairwise cross-tabulation */
-    ctab = PROTECT(sscCrosstab(facs, ScalarLogical(1)));
-    Ai = INTEGER(GET_SLOT(ctab, Matrix_iSym));
-    Ap = INTEGER(GET_SLOT(ctab, Matrix_pSym));
-    dims = INTEGER(GET_SLOT(ctab, Matrix_DimSym));
-    nzcol = dims[1];
-    Lp = Calloc(nzcol + 1, int);
-    Parent = Calloc(nzcol, int);
-    ldl_symbolic(nzcol, Ap, Ai, Lp, Parent,
-		 (int *) R_alloc(nzcol, sizeof(int)), /* Lnz */
-		 (int *) R_alloc(nzcol, sizeof(int)), /* Flag */
-		 (int *) NULL, (int *) NULL); /* P & Pinv */
-    aa[0] = Lp[nzcol];
-    ssclme_fill_LIp(nzcol, Parent, Lp);
-    aa[1] = Lp[nzcol];
-    perm = Calloc(nzcol, int);
-    ssc_metis_order(nzcol, Ap, Ai, perm, Parent);
-    ssc_symbolic_permute(nzcol, 1, Parent, Ap, Ai);
-    ldl_symbolic(nzcol, Ap, Ai, Lp, Parent,
-		 (int *) R_alloc(nzcol, sizeof(int)), /* Lnz */
-		 (int *) R_alloc(nzcol, sizeof(int)), /* Flag */
-		 (int *) NULL, (int *) NULL); /* P & Pinv */
-    aa[2] = Lp[nzcol];
-    ssclme_fill_LIp(nzcol, Parent, Lp);
-    aa[3] = Lp[nzcol];
-    Free(perm); Free(Parent); Free(Lp);
-    UNPROTECT(2);
-    return ans;
 }
