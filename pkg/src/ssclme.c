@@ -1,21 +1,40 @@
 #include "ssclme.h"
 
+#define slot_dup(dest, src, sym)  SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
+
+/** 
+ * Using the sscCrosstab object from the grouping factors, generate
+ * the slots in an ssclme object related to the symmetric sparse
+ * matrix representation of Z'Z.  If the model matrices for the
+ * grouping factors have only one column each then the structure can
+ * be copied, otherwise it must be generated from the sscCrosstab and
+ * the number of columns per grouping factor.
+ * 
+ * @param nf number of factors
+ * @param nc vector of length nf+2 with number of columns in model matrices
+ * @param ctab pointer to the sscCrosstab object
+ * @param ssc pointer to an ssclme object to be filled out
+ */
 static
 void ssclme_copy_ctab(int nf, const int nc[], SEXP ctab, SEXP ssc)
 {
     int *snc, i, copyonly = 1;
 
-    for (i = 0; i < nf; i++) {
-	if (nc[i] > 1) copyonly = 0;
+    SET_SLOT(ssc, Matrix_ncSym, allocVector(INTSXP, nf + 2));
+    snc = INTEGER(GET_SLOT(ssc, Matrix_ncSym));
+    for (i = 0; i <= nf; i++) {
+	snc[i] = nc[i];
+	if (nc[i] > 1 && i < nf) copyonly = 0;
     }
     if (copyonly) {
-	SET_SLOT(ssc, Matrix_pSym, duplicate(GET_SLOT(ctab, Matrix_pSym)));
-	SET_SLOT(ssc, Matrix_iSym, duplicate(GET_SLOT(ctab, Matrix_iSym)));
-	SET_SLOT(ssc, Matrix_xSym, duplicate(GET_SLOT(ctab, Matrix_xSym)));
-	SET_SLOT(ssc, Matrix_DimSym,
-		 duplicate(GET_SLOT(ctab, Matrix_DimSym)));
-	SET_SLOT(ssc, Matrix_GpSym, duplicate(GET_SLOT(ctab, Matrix_GpSym)));
-    } else {
+	slot_dup(ssc, ctab, Matrix_pSym);
+	slot_dup(ssc, ctab, Matrix_iSym);
+	slot_dup(ssc, ctab, Matrix_xSym);
+	slot_dup(ssc, ctab, Matrix_DimSym);
+	slot_dup(ssc, ctab, Matrix_GpSym);
+	return;
+    }
+    {
 	int
 	    *GpIn = INTEGER(GET_SLOT(ctab, Matrix_GpSym)),
 	    *GpOut,
@@ -41,8 +60,7 @@ void ssclme_copy_ctab(int nf, const int nc[], SEXP ctab, SEXP ssc)
 	    }
 	}
 	nOut = GpOut[nf];	/* size of output matrix */
-	SET_SLOT(ssc, Matrix_DimSym,
-		 duplicate(GET_SLOT(ctab, Matrix_DimSym)));
+	SET_SLOT(ssc, Matrix_DimSym, allocVector(INTSXP, 2));
 	dims = INTEGER(GET_SLOT(ssc, Matrix_DimSym));
 	dims[0] = dims[1] = nOut;
 	SET_SLOT(ssc, Matrix_pSym, allocVector(INTSXP, nOut + 1));
@@ -87,17 +105,12 @@ void ssclme_copy_ctab(int nf, const int nc[], SEXP ctab, SEXP ssc)
 						    * another diagonal element */
 			int mjj = mj + jj, pj = ApOut[mjj], pjm1 = ApOut[mjj-1];
 			Memcpy(AiOut + pj, AiOut + pjm1, pj - pjm1);
-			AiOut[ApOut[mjj + 1] - 1] = mjj; /* maybe mjj-1? */
+			AiOut[ApOut[mjj + 1] - 1] = mjj;
 		    }
 		}
 	    }
 	}
 	Free(map); Free(ncc);
-    }
-    SET_SLOT(ssc, Matrix_ncSym, allocVector(INTSXP, nf + 2));
-    snc = INTEGER(GET_SLOT(ssc, Matrix_ncSym));
-    for (i = 0; i <= nf; i++) {
-	snc[i] = nc[i];
     }
 }
 
@@ -120,6 +133,19 @@ static void ssclme_calc_maxod(int n, int Parent[])
     Free(sz);
 }
 
+/** 
+ * Create an ssclme object from a list of grouping factors, sorted in
+ * order of non-increasing numbers of levels, and an integer vector of
+ * the number of columns in the model matrices.  There is one more
+ * element in ncv than in facs.  The last element is the number of
+ * columns in the model matrix for the fixed effects plus the
+ * response.  (i.e. p+1)
+ * 
+ * @param facs pointer to a list of grouping factors
+ * @param ncv pointer to an integer vector of number of columns per model matrix
+ * 
+ * @return pointer to an ssclme object
+ */
 SEXP
 ssclme_create(SEXP facs, SEXP ncv)
 {
@@ -216,6 +242,17 @@ ssclme_create(SEXP facs, SEXP ncv)
     return val;
 }
 
+/** 
+ * Copy information on Z'Z accumulated in the bVar array to Z'Z
+ * 
+ * @param ncj number of columns in this block
+ * @param Gpj initial column for this group
+ * @param Gpjp initial column for the next group
+ * @param bVj pointer to the ncj x ncj x mj array to be filled
+ * @param Ap column pointer array for Z'Z
+ * @param Ai row indices for Z'Z
+ * @param Ax elements of Z'Z
+ */
 static
 void bVj_to_A(int ncj, int Gpj, int Gpjp, const double bVj[],
 	      const int Ap[], const int Ai[], double Ax[])
@@ -232,6 +269,17 @@ void bVj_to_A(int ncj, int Gpj, int Gpjp, const double bVj[],
     }
 }
 
+/** 
+ * Copy the dimnames from the list of grouping factors and the model
+ * matrices for the grouping factors into the appropriate parts of the
+ * ssclme object.
+ * 
+ * @param x pointer to an ssclme object
+ * @param facs pointer to a list of factors
+ * @param mmats pointer to a list of model matrices
+ * 
+ * @return NULL
+ */
 SEXP
 ssclme_transfer_dimnames(SEXP x, SEXP facs, SEXP mmats)
 {
@@ -257,6 +305,16 @@ ssclme_transfer_dimnames(SEXP x, SEXP facs, SEXP mmats)
     return R_NilValue;
 }
 
+/** 
+ * Update the numerical entries x, ZtX, and XtX in an ssclme object
+ * according to a set of model matrices.
+ * 
+ * @param x pointer to an ssclme object
+ * @param facs pointer to a list of grouping factors
+ * @param mmats pointer to a list of model matrices
+ * 
+ * @return NULL
+ */
 SEXP
 ssclme_update_mm(SEXP x, SEXP facs, SEXP mmats)
 {
@@ -373,6 +431,13 @@ ssclme_update_mm(SEXP x, SEXP facs, SEXP mmats)
     return R_NilValue;
 }
 
+/** 
+ * Inflate Z'Z according to Omega and create the factorization LDL'
+ * 
+ * @param x pointer to an ssclme object
+ * 
+ * @return NULL
+ */
 SEXP ssclme_inflate_and_factor(SEXP x)
 {
     SEXP
@@ -427,6 +492,16 @@ SEXP ssclme_inflate_and_factor(SEXP x)
     return R_NilValue;
 }
 
+
+/** 
+ * If status[["factored"]] is FALSE, create and factor Z'Z+Omega, then
+ * create RZX and RXX, the deviance components, and the value of the
+ * deviance for both ML and REML.
+ * 
+ * @param x pointer to an ssclme object
+ * 
+ * @return NULL
+ */
 SEXP ssclme_factor(SEXP x)
 {
     int *status = LOGICAL(GET_SLOT(x, Matrix_statusSym));
@@ -520,6 +595,17 @@ SEXP ssclme_factor(SEXP x)
     return R_NilValue;
 }
 
+/** 
+ * Return the position of probe in the sorted index vector ind.  It is
+ * known that the position is greater than or equal to start so a linear
+ * search from start is used.
+ * 
+ * @param probe value to be matched
+ * @param start index at which to start
+ * @param ind vector of indices
+ * 
+ * @return index of the entry matching probe
+ */
 static
 int ldl_update_ind(int probe, int start, const int ind[])
 {
@@ -529,7 +615,9 @@ int ldl_update_ind(int probe, int start, const int ind[])
 }
 
 /** 
- * Update the diagonal blocks of the inverse of LDL' (=Z'Z+W)
+ * Update the diagonal blocks of the inverse of LDL' (=Z'Z+W).  The
+ * lower Cholesky factors of the updated blocks are stored in the bVar
+ * slot.
  * 
  * @param x pointer to an ssclme object
  *
@@ -620,6 +708,14 @@ SEXP ldl_inverse(SEXP x)
     return R_NilValue;
 }
 
+/** 
+ * If necessary, factor Z'Z+Omega, ZtX, and XtX then, if necessary,
+ * form RZX, RXX, and bVar for the inverse of the Cholesky factor.
+ * 
+ * @param x pointer to an ssclme object
+ * 
+ * @return NULL (x is updated in place)
+ */
 SEXP ssclme_invert(SEXP x)
 {
     int *status = LOGICAL(GET_SLOT(x, Matrix_statusSym));
@@ -659,6 +755,13 @@ SEXP ssclme_invert(SEXP x)
     return R_NilValue;
 }
 
+/** 
+ * Create and insert initial values for Omega_i.
+ * 
+ * @param x pointer to an ssclme object
+ * 
+ * @return NULL
+ */
 SEXP ssclme_initial(SEXP x)
 {
     SEXP Gpsl = GET_SLOT(x, Matrix_GpSym),
@@ -783,6 +886,15 @@ SEXP ssclme_sigma(SEXP x, SEXP REML)
 					nobs + 1 - pp1 : nobs))));
 }
 
+/** 
+ * Calculate the length of the parameter vector, which is called coef
+ * for historical reasons.
+ * 
+ * @param nf number of factors
+ * @param nc number of columns in the model matrices for each factor
+ * 
+ * @return total length of the coefficient vector
+ */
 static
 int coef_length(int nf, const int nc[])
 {
@@ -792,9 +904,11 @@ int coef_length(int nf, const int nc[])
 }
 
 /** 
- * Extract the upper triangles of the Omega matrices.
- * (These aren't "coefficients" but the extractor is
- * called coef for historical reasons.)
+ * Extract the upper triangles of the Omega matrices.  These aren't
+ * "coefficients" but the extractor is called coef for historical
+ * reasons.  Within each group these values are in the order of the
+ * diagonal entries first then the strict upper triangle in row
+ * order.
  * 
  * @param x pointer to an ssclme object
  * 
@@ -833,7 +947,11 @@ SEXP ssclme_coef(SEXP x)
 
 /** 
  * Extract the unconstrained parameters that determine the
- * Omega matrices. (Called coef for historical reasons.)
+ * Omega matrices. (Called coef for historical reasons.)  The
+ * unconstrained parameters are derived from the LDL' decomposition of
+ * Omega_i.  The first nc[i] entries in each group are the diagonals
+ * of log(D) followed by the strict lower triangle of L in column
+ * order.
  * 
  * @param x pointer to an ssclme object
  * 
@@ -973,6 +1091,16 @@ SEXP ssclme_coefGets(SEXP x, SEXP coef)
     return x;
 }
 
+/** 
+ * Perform a number of ECME steps for the REML or ML criterion.
+ * 
+ * @param x pointer to an ssclme object
+ * @param nsteps pointer to an integer scalar giving the number of ECME steps to perform
+ * @param REMLp pointer to a logical scalar indicating if REML is to be used
+ * @param verb pointer to a logical scalar indicating verbose mode
+ * 
+ * @return NULL
+ */
 SEXP ssclme_EMsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP verb)
 {
     SEXP
@@ -1065,17 +1193,25 @@ SEXP ssclme_EMsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP verb)
     return R_NilValue;
 }
 
+/** 
+ * Return the gradient of the ML or REML deviance.
+ * 
+ * @param x pointer to an ssclme object
+ * @param REMLp pointer to a logical scalar indicating if REML is to be used
+ * @param Uncp pointer to a logical scalar indicating if the unconstrained parameterization is to be used
+ * 
+ * @return pointer to a numeric vector of the gradient.
+ */
 SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
 {
     SEXP
 	Omega = GET_SLOT(x, Matrix_OmegaSym),
 	RZXsl = GET_SLOT(x, Matrix_RZXSym),
-	ncsl = GET_SLOT(x, Matrix_ncSym),
 	bVar = GET_SLOT(x, Matrix_bVarSym);
     int
 	*Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
-	*dims = INTEGER(getAttrib(RZXsl, R_DimSymbol)),
-	*nc = INTEGER(ncsl),
+	*dims = INTEGER(getAttrib(RZXsl, R_DimSymbol)), 
+	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	REML = asLogical(REMLp),
 	cind, i, n = dims[0],
 	nf = length(Omega),
@@ -1121,7 +1257,7 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
 	F77_CALL(dsyrk)("U", "N", &nci, &ki,
 			&one, REAL(VECTOR_ELT(bVar, i)), &nci,
 			&alpha, tmp, &nci);
-	alpha = ((double)(REML?(nobs-p):nobs));
+	alpha = (double)(REML ? (nobs-p) : nobs);
 	F77_CALL(dsyrk)("U", "N", &nci, &mi,
 			&alpha, b + Gp[i], &nci,
 			&one, tmp, &nci);
@@ -1139,10 +1275,11 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
 	    int k, odind = cind + nci;
 	    if (uncst) {
 		int ione = 1, kk;
-		double *rr = Calloc(nci, double);
+		double *rr = Calloc(nci, double); /* j'th row of R, the Cholesky factor */
 		nlme_symmetrize(tmp, nci);
 		for (j = 0; j < nci; j++, cind++) {
-		    for (k = 0; k < nci; k++) rr[k] = chol[j + k*nci];
+		    for (k = 0; k < j; k++) rr[k] = 0.;
+		    for (k = j; k < nci; k++) rr[k] = chol[j + k*nci];
 		    REAL(ans)[cind] = 0.;
 		    for (k = j; k < nci; k++) {
 			for (kk = j; kk < nci; kk++) {
@@ -1150,12 +1287,9 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
 				tmp[kk * nci + k];
 			}
 		    }
-		    for (k = 0; k < nci; k++) rr[k] *= rr[j];
 		    for (k = j + 1; k < nci; k++) {
-			REAL(ans)[odind++] =
-			    F77_CALL(ddot)(&nci, rr, &ione, tmp + k, &nci) +
-			    F77_CALL(ddot)(&nci, rr, &ione,
-					   tmp + k*nci, &ione);
+			REAL(ans)[odind++] = 2. * rr[j] *
+			    F77_CALL(ddot)(&nci, rr, &ione, tmp + k*nci, &ione);
 		    }			
 		}
 		Free(rr);
@@ -1175,6 +1309,16 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
     return ans;
 }
 
+/** 
+ * Calculate and return the fitted values.
+ * 
+ * @param x pointer to an ssclme object
+ * @param facs list of grouping factors
+ * @param mmats list of model matrices
+ * @param useRf pointer to a logical scalar indicating if the random effects should be used
+ * 
+ * @return pointer to a numeric array of fitted values
+ */
 SEXP ssclme_fitted(SEXP x, SEXP facs, SEXP mmats, SEXP useRf)
 {
     SEXP val, b;
@@ -1251,8 +1395,13 @@ SEXP ssclme_variances(SEXP x)
     return Omg;
 }
 
-#define slot_dup(sym)  SET_SLOT(ans, sym, duplicate(GET_SLOT(x, sym)))
-
+/** 
+ * Copy an ssclme object collapsing the fixed effects slots to the response only.
+ * 
+ * @param x pointer to an ssclme object
+ * 
+ * @return a duplicate of x with the fixed effects slots collapsed to the response only
+ */
 SEXP ssclme_collapse(SEXP x)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("ssclme"))),
@@ -1260,23 +1409,23 @@ SEXP ssclme_collapse(SEXP x)
 	Dim = GET_SLOT(x, Matrix_DimSym);
     int nf = length(Omega), nz = INTEGER(Dim)[1];
 
-    slot_dup(Matrix_DSym);
-    slot_dup(Matrix_DIsqrtSym);
-    slot_dup(Matrix_DimSym);
-    slot_dup(Matrix_GpSym);
-    slot_dup(Matrix_LiSym);
-    slot_dup(Matrix_LpSym);
-    slot_dup(Matrix_LxSym);
-    slot_dup(Matrix_OmegaSym);
-    slot_dup(Matrix_ParentSym);
-    slot_dup(Matrix_bVarSym);
-    slot_dup(Matrix_devianceSym);
-    slot_dup(Matrix_devCompSym);
-    slot_dup(Matrix_iSym);
-    slot_dup(Matrix_ncSym);
-    slot_dup(Matrix_statusSym);
-    slot_dup(Matrix_pSym);
-    slot_dup(Matrix_xSym);
+    slot_dup(ans, x, Matrix_DSym);
+    slot_dup(ans, x, Matrix_DIsqrtSym);
+    slot_dup(ans, x, Matrix_DimSym);
+    slot_dup(ans, x, Matrix_GpSym);
+    slot_dup(ans, x, Matrix_LiSym);
+    slot_dup(ans, x, Matrix_LpSym);
+    slot_dup(ans, x, Matrix_LxSym);
+    slot_dup(ans, x, Matrix_OmegaSym);
+    slot_dup(ans, x, Matrix_ParentSym);
+    slot_dup(ans, x, Matrix_bVarSym);
+    slot_dup(ans, x, Matrix_devianceSym);
+    slot_dup(ans, x, Matrix_devCompSym);
+    slot_dup(ans, x, Matrix_iSym);
+    slot_dup(ans, x, Matrix_ncSym);
+    slot_dup(ans, x, Matrix_statusSym);
+    slot_dup(ans, x, Matrix_pSym);
+    slot_dup(ans, x, Matrix_xSym);
     INTEGER(GET_SLOT(ans, Matrix_ncSym))[nf] = 1;
     SET_SLOT(ans, Matrix_XtXSym, allocMatrix(REALSXP, 1, 1));
     REAL(GET_SLOT(ans, Matrix_XtXSym))[0] = NA_REAL;
@@ -1289,6 +1438,23 @@ SEXP ssclme_collapse(SEXP x)
     return ans;
 }
 
+
+/** 
+ * Create an lme object from its components.  This is not done by
+ * new("lme", ...) at the R level because of the possibility of
+ * causing the copying of very large objects.
+ * 
+ * @param call Pointer to the original call
+ * @param facs pointer to the list of grouping factors
+ * @param x pointer to the model matrices (may be of length zero)
+ * @param model pointer to the model frame
+ * @param REML pointer to a logical scalar indicating if REML is used
+ * @param rep pointer to the converged ssclme object
+ * @param fitted pointer to the fitted values
+ * @param residuals pointer to the residuals
+ * 
+ * @return an lme object
+ */
 SEXP ssclme_to_lme(SEXP call, SEXP facs, SEXP x, SEXP model, SEXP REML,
 		   SEXP rep, SEXP fitted, SEXP residuals)
 {
