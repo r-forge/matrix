@@ -924,17 +924,18 @@ SEXP ssclme_ranef(SEXP x)
     ssclme_invert(x);
     ryyinv = REAL(GET_SLOT(x, Matrix_RXXSym))[pp1*pp1 - 1];
     for (i = 0; i < nf; i++) {
-	int nci = nc[i], Mi = (Gp[i+1] - Gp[i]), mi = Mi/nci;
+	int nci = nc[i], Mi = Gp[i+1] - Gp[i];
 	double *mm;
 	
-	SET_VECTOR_ELT(val, i, allocMatrix(REALSXP, nci, mi));
+	SET_VECTOR_ELT(val, i, allocMatrix(REALSXP, nci, Mi/nci));
 	mm = Memcpy(REAL(VECTOR_ELT(val, i)), b, Mi);
-	b += nci * mi;
+	b += Mi;
 	for (j = 0; j < Mi; j++) mm[j] /= ryyinv;
     }
     UNPROTECT(1);
     return val;
 }
+
 /** 
  * Extract the ML or REML conditional estimate of sigma
  * 
@@ -1237,7 +1238,6 @@ SEXP ssclme_asTscMatrix(SEXP x)
     return val;
 }
 
-
 SEXP ssclme_fitted(SEXP x, SEXP facs, SEXP mmats)
 {
     SEXP val, b;
@@ -1271,7 +1271,7 @@ SEXP ssclme_fitted(SEXP x, SEXP facs, SEXP mmats)
 	    while (ff[j + nn] == lev) nn++; 
 	    F77_CALL(dgemm)("N", "N", &nn, &ione, &nci,
 			    &one, mm + j, &nobs,
-			    bb + lev - 1, &nci,
+			    bb + (lev - 1) * nci, &nci,
 			    &one, vv + j, &nobs);
 	    j += nn;
 	}
