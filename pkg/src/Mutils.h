@@ -159,9 +159,6 @@ int match_mat_dims(const int xd[], const int yd[])
 double *expand_csc_column(double *dest, int m, int j,
 			  const int Ap[], const int Ai[], const double Ax[]);
 
-#endif
-
-
 /** 
  * Apply a permutation to an integer vector
  * 
@@ -195,3 +192,5 @@ make_upper_triangular(int i[], int j[], int nnz)
 	}
     }
 }
+
+#endif
