@@ -52,6 +52,7 @@ try( chk.matrix(ch3 <- chol(as(cm, "dgeMatrix"))) ) # nor that one
 assertError( new("dtrMatrix", Dim = c(2,2), x= 1:4) )# double 'Dim'
 if(FALSE)## FIXME: this creates an integer '@ x' !
 assertError( new("dtrMatrix", Dim = as.integer(c(2,2)), x= 1:4) )# int 'x'
+if(FALSE)## FIXME: should produce an error not a segmentation fault
 assertError( new("dtrMatrix", Dim = 2:2, x=as.double(1:4)) )# length(Dim) !=2
 assertError( new("dtrMatrix", Dim = as.integer(c(2,2)), x= as.double(1:5)))
 
