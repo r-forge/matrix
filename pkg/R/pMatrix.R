@@ -19,10 +19,21 @@ setMethod("solve", signature(a = "pMatrix", b = "missing"),
               new("pMatrix", Dim = a@Dim, perm = bp)
           }, valueClass = "pMatrix")
 
+setMethod("t", signature(x = "pMatrix"), function(x) solve(x))
+
 setMethod("%*%", signature(x = "matrix", y = "pMatrix"),
 	  function(x, y) x[ , y@perm], valueClass = "matrix")
 
 setMethod("%*%", signature(x = "pMatrix", y = "matrix"),
 	  function(x, y) y[x@perm ,], valueClass = "matrix")
 
-setMethod("t", signature(x = "pMatrix"), function(x) solve(x))
+## the following methods can be rewritten when "[" methods for
+## dgeMatrix are available  
+
+setMethod("%*%", signature(x = "dgeMatrix", y = "pMatrix"),
+	  function(x, y) as(callGeneric(x, as(y, "matrix")), "dgeMatrix"),
+          valueClass = "dgeMatrix")
+
+setMethod("%*%", signature(x = "pMatrix", y = "dgeMatrix"),
+          function(x, y) as(callGeneric(as(x, "matrix"), y), "dgeMatrix"),
+          valueClass = "dgeMatrix")
