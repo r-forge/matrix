@@ -36,6 +36,7 @@ setMethod("GLMM", signature(random = "formula"),
       })
 
 
+if(0) {                                 # older version by Deepayan
 setMethod("GLMM",
           signature(formula = "formula",
                     random = "list"),
@@ -434,6 +435,7 @@ setMethod("GLMM",
               assign = attr(Xmat, "assign")
               )
       })
+}
 
 glm.call <- function (mf, frame) 
 {
