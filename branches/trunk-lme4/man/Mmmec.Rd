@@ -35,9 +35,9 @@
 data(Mmmec)
 str(Mmmec)
 summary(Mmmec)
-system.time(fm1 <- GLMM(deaths ~ offset(log(expected)) + uvb,
+fm1 <- GLMM(deaths ~ offset(log(expected)) + uvb,
  family = poisson, data = Mmmec, random = ~ 1 | region,
- verbose = TRUE, niter = 25))
+ niter = 25)
 summary(fm1)
 }
 \keyword{datasets}

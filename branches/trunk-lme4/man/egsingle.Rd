@@ -43,8 +43,9 @@
 \examples{
 data(egsingle)
 str(egsingle)
-system.time(fm3 <- lme(math~year*size+female,
-  egsingle,~1|schoolid/childid,control=list(EMv=TRUE,msV=TRUE,opt='optim')))
-summary(fm3)
+fm1 <- lme(math~year*size+female, egsingle,
+           random = ~1|schoolid/childid,
+           control = list(EMv = TRUE, msV = TRUE, opt = 'optim'))
+summary(fm1)
 }
 \keyword{datasets}

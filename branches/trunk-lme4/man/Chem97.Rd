@@ -38,11 +38,9 @@
 data(Chem97)
 str(Chem97)
 summary(Chem97)
-system.time(fm1 <- lme(score ~ 1, data = Chem97,
-        random = ~ 1 | lea/school))
+fm1 <- lme(score ~ 1, data = Chem97, random = ~ 1 | lea/school)
 summary(fm1)
-system.time(fm2 <- lme(score ~ gcsecnt, data = Chem97,
-        random = ~ 1 | lea/school))
+fm2 <- lme(score ~ gcsecnt, data = Chem97, random = ~ 1 | lea/school)
 summary(fm2)
 }
 \keyword{datasets}
