@@ -64,6 +64,7 @@ exportClasses(
               "groupedData",
               "lmList",
               "lme",
+              "summary.GLMM",
               "summary.lme",
               "summary.ssclme"
               )

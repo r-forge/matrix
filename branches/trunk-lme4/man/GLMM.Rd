@@ -96,12 +96,10 @@ pseudo-likelihood approach.
 }
 \examples{
 data(guImmun)
-numimmun <- as.numeric(guImmun$immun) - 1 # get rid of this later
 fm1 <-
-    GLMM(numimmun ~ kid2p + mom25p + ord + ethn +
-               momEd + husEd + momWork + rural + pcInd81,
-               data = guImmun, family = binomial(),
-               random = list(comm = ~1))
+    GLMM(immun ~ kid2p + mom25p + ord + ethn +
+                 momEd + husEd + momWork + rural + pcInd81,
+         family = binomial, data = guImmun, random = ~1|comm)
 summary(fm1)
 }
 \keyword{models}

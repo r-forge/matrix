@@ -211,15 +211,6 @@ setMethod("GLMM",
           if (!conv) warning("IRLS iterations for glmm did not converge")
           controlvals$msMaxIter <- msMaxIter.orig
 
-
-
-
-
-
-
-
-
-
           ## Need to optimize L(theta, beta) using Laplace approximation
 
           ## Things needed for that:
@@ -313,11 +304,6 @@ setMethod("GLMM",
                   invisible(family$linkinv(eta)) 
               }
 
-
-
-
-              
-
           ## function that calculates log likelihood (the thing that
           ## needs to get evaluated at each Gauss-Hermite location)
           
@@ -343,11 +329,15 @@ setMethod("GLMM",
                                             responseIndex],
                                             mu = mu,
                                             wt = weights^2))/2
+              #.Call("ssclme_factor", reducedObj, PACKAGE = "Matrix")
+              # ans <- ans + reducedObj@devComp[2] # log-determinant of Omega
+                                                
               ranefs <- ranef(reducedObj)
               Omega <- reducedObj@Omega
               for (i in seq(along = ranefs))
               {
-                  ## contribution for random effects (get it working, optimize later)
+                  ## contribution for random effects (get it working,
+                  ## optimize later) 
                   ## symmetrize RE variance
                   Omega[[i]] <- Omega[[i]] + t(Omega[[i]])
                   diag(Omega[[i]]) <- diag(Omega[[i]]) / 2
@@ -371,7 +361,7 @@ setMethod("GLMM",
                                               )))
                   ans <- ans + ranef.loglik + log.jacobian
               }
-              ## ans is (upto some constant) log of the Laplacian
+              ## ans is (up to some constant) log of the Laplacian
               ## approximation of the likelihood. Return it's negative
               ## to be minimized
 
@@ -394,7 +384,7 @@ setMethod("GLMM",
                   optimRes =
                       optim(fn = loglikLaplace,
                             par = c(fixef(obj), coef(obj, unconst = TRUE)),
-                            method = "BFGS",
+                            method = "BFGS", hessian = TRUE,
                             control = list(trace = controlvals$msVerbose,
                             reltol = controlvals$msTol,
                             ##fnscale = -xval,
@@ -402,6 +392,8 @@ setMethod("GLMM",
                             maxit = controlvals$msMaxIter))
                   if (optimRes$convergence != 0) warning("optim failed to converge")
                   optpars <- optimRes$par
+                  Hessian <- optimRes$hessian
+                  
                   ##fixef(obj) <- optimRes$par[seq(length = responseIndex - 1)]
                   if (getOption("verbose")) {
                       cat(paste("optim convergence code",
@@ -430,6 +422,7 @@ setMethod("GLMM",
                   nlmRes =
                       nlm(f = loglikLaplace, 
                           p = c(fixef(obj), coef(obj, unconst = TRUE)),
+                          hessian = TRUE,
                           print.level = if (controlvals$msVerbose) 2 else 0,
                           steptol = controlvals$msTol,
                           gradtol = controlvals$msTol,
@@ -437,8 +430,10 @@ setMethod("GLMM",
                           typsize=typsize,
                           ## fscale=xval,
                           iterlim = controlvals$msMaxIter)
-                  if (nlmRes$code > 3) warning("nlm probably failed to converge")
+                  if (nlmRes$code > 3)
+                      warning("nlm probably failed to converge")
                   optpars <- nlmRes$estimate
+                  Hessian <- nlmRes$hessian
                   
                   if (getOption("verbose")) {
                       cat(paste("nlm convergence code", nlmRes$code, "\n"))
@@ -453,12 +448,14 @@ setMethod("GLMM",
                       print(coef(obj, unconst = TRUE))
                   }
               }
-
+              
               ## need to calculate likelihood also need to store new
               ## estimates of fixed effects somewhere (probably cannot
               ## update standard errors)
+          } else {
+              optpars <- c(fixef(obj), coef(obj, unconst = TRUE))
+              Hessian <- new("matrix")
           }
-          else optpars <- c(fixef(obj), coef(obj, unconst = TRUE))
 
 
           ## Before finishing, we need to call loglikLaplace with the
@@ -468,21 +465,29 @@ setMethod("GLMM",
           ## have the 'correct' random effects in reducedObj.
 
           loglik <- loglikLaplace(optpars)
+          ff <- optpars[1:(responseIndex-1)]
+          names(ff) <- names(fixef(obj))
 
+          if (!x) mmats <- list()
           ## Things to include in returned object: new ranef
           ## estimates, new parameter estimates (fixed effects and
           ## coefs) (with standard errors from hessian ?) and
           ## (Laplace) approximate log likelihood.
 
-          new("GLMM", call = match.call(), facs = facs,
-              x = if (x) mmats else list(),
+          new("GLMM",
+              family = family,
+              logLik = -loglik,
+              fixef = ff,
+              Hessian = Hessian,
+              method = method,
+              call = match.call(),
+              facs = facs,
+              x = mmats,
               model = if(model) data else data.frame(list()),
-              REML = FALSE, rep = obj, fitted = eta, logLik = -loglik,
-              fixef = optpars[1:(responseIndex-1)])
+              REML = FALSE,
+              rep = if(method == 'Laplace') reducedObj else obj,
+              fitted = eta)
       })
-
-setMethod("summary", signature(object = "GLMM"),
-          function(object, ...) summary(as(object, "lme"), ...))
 
 setMethod("logLik", signature(object = "GLMM"),
           function(object, ...) {
@@ -498,9 +503,6 @@ setMethod("logLik", signature(object = "GLMM"),
 
 setMethod("deviance", signature(object = "GLMM"),
           function(object, ...) -2 * object@logLik)
-
-setMethod("show", signature(object = "GLMM"),
-          function(object) show(as(object, "lme")))
 
 setMethod("fixef", signature(object = "GLMM"),
           function(object) object@fixef)
@@ -518,3 +520,70 @@ setMethod("coef", signature(object = "GLMM"),
           object = object@rep
           callGeneric()
       })
+
+setMethod("show", signature(object = "summary.GLMM"),
+          function(object)
+      {
+          rdig <- 5
+          cat("Generalized Linear Mixed Model\n\n")
+          if (!is.null(object@call$formula)) {
+              cat("Fixed:", deparse(object@call$formula),"\n")
+          }
+          if (!is.null(object@call$data)) {
+              cat("Data:", deparse(object@call$data), "\n")
+          }
+          if (!is.null(object@call$subset)) {
+              cat(" Subset:",
+                  deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
+          }
+          llik = object@logLik
+          print(data.frame(AIC = AIC(llik), BIC = BIC(llik),
+                           logLik = c(object@logLik), row.names = ""))
+          cat("\n")
+          object@re@useScale = FALSE
+          object@re@showCorrelation = TRUE
+          show(object@re)
+          invisible(object)
+      })
+
+setMethod("show", signature(object = "GLMM"),
+          function(object)
+      {
+          sumry = summary(object)
+          rdig <- 5
+          cat("Generalized Linear Mixed Model\n\n")
+          if (!is.null(object@call$formula)) {
+              cat("Fixed:", deparse(object@call$formula),"\n")
+          }
+          if (!is.null(object@call$data)) {
+              cat(" Data:", deparse( object@call$data ), "\n")
+          }
+          if (!is.null(object@call$subset)) {
+              cat(" Subset:",
+                  deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
+          }
+          cat(paste(" log-likelihood: ", sep = ''), logLik(object), "\n")
+          sumry@re@useScale = FALSE
+          sumry@re@showCorrelation = FALSE
+          saveopt = options(show.signif.stars=FALSE)
+          on.exit(options(saveopt))
+          show(sumry@re)
+          invisible(object)
+      })
+
+setMethod("summary", signature(object="GLMM"),
+          function(object, ...) {
+              llik <- logLik(object)
+              resd <- residuals(object, type="pearson")
+              if (length(resd) > 5) {
+                  resd <- quantile(resd)
+                  names(resd) <- c("Min","Q1","Med","Q3","Max")
+              }
+              new("summary.GLMM",
+                  family = object@family,
+                  call = object@call,
+                  logLik = llik,
+                  re = summary(object@rep, REML = FALSE,
+                               useScale = FALSE),
+                  residuals = resd)
+          })

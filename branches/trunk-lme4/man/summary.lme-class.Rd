@@ -7,7 +7,7 @@
 \title{Class "summary.lme"}
 \description{A summary of an \code{"lme"} fitted model object.}
 \section{Objects from the Class}{
-  Objects created by applying the \code{summary} generic to an
+  Objects are created by applying the \code{summary} generic to an
   \code{"lme"} object.
 }
 \section{Slots}{

@@ -276,10 +276,8 @@ setMethod("show", signature(object = "lme"),
           sumry@re@useScale = TRUE
           sumry@re@showCorrelation = FALSE
           saveopt = options(show.signif.stars=FALSE)
-          on.exit(saveopt)
+          on.exit(options(saveopt))
           show(sumry@re)
-          options(saveopt)
-          on.exit()
           invisible(object)
       })
 
