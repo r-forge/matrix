@@ -1,0 +1,82 @@
+useDynLib(Matrix)
+importFrom(graphics,image)
+importFrom(stats, deviance, formula, coef)
+
+# Generics and functions defined in this package
+export(
+       "Hilbert",
+       "Matrix",
+       "coef<-",
+       "corFactor",
+       "corMatrix",
+       "expand",
+       "facmul",
+       "isInitialized",
+       "lu",
+       "matrix<-",
+       "norm",
+       "pdCompSymm",
+       "pdDiag",
+       "pdFactor",
+       "pdIdent",
+       "pdLogChol",
+       "pdMatrix",
+       "pdNatural",
+       "rcond",
+       "sscCrosstab",
+       "unpack"
+       )
+
+exportClasses(
+	      "Cholesky",
+	      "LU",
+              "Matrix",
+              "corrmatrix",
+              "cscMatrix",
+              "geMatrix",
+              "pdCompSymm",
+              "pdDiag",
+              "pdIdent",
+              "pdLogChol",
+              "pdMat",
+              "pdNatural",
+              "pdfactor",
+              "pdmatrix",
+              "poMatrix",
+              "sscChol",
+              "sscCrosstab",
+              "sscMatrix",
+              "ssclme",
+              "syMatrix",
+              "trMatrix",
+              "tripletMatrix",
+              "tscMatrix"
+              )
+
+exportMethods(
+              "%*%",
+              "chol",
+              "coef",
+              "coef<-",
+              "coerce",
+              "coerce<-",
+              "corMatrix",
+              "crossprod",
+              "determinant",
+              "diag",
+              "dim",
+              "expand",
+              "formula",
+              "image",
+              "isInitialized",
+              "matrix<-",
+              "norm",
+              "pdFactor",
+              "pdMatrix",
+              "rcond",
+              "show",
+              "solve",
+              "t"
+              )
+
+

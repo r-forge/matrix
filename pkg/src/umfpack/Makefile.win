@@ -1,0 +1,48 @@
+include $(RHOME)/src/gnuwin32/MkRules
+PKG_CFLAGS = -I.
+CPPFLAGS=$(PKG_CPPFLAGS) -I$(RHOME)/src/include
+CFLAGS=$(CPPFLAGS) $(DEBUGFLAG) -O2 $(PKG_CFLAGS)
+CXXFLAGS=$(CPPFLAGS) $(DEBUGFLAG) -O2 $(PKG_CXXFLAGS)
+
+# non-user-callable umf_*.[ch] files, int/long versions only (no real/complex):
+UMFINT = umf_malloc umf_free
+           # umf_analyze umf_apply_order umf_colamd umf_free umf_fsize \
+	   #umf_is_permutation umf_malloc umf_realloc umf_report_perm \
+	   #umf_singletons
+
+UMFINC = $(addsuffix .h,$(UMFINT))
+UMFI  = $(addsuffix .o, $(subst umf_,umf_i_,$(UMFINT)))
+
+UMFOBJS = $(UMFI)\
+	umfpack_di_triplet_to_col.o\
+	umf_di_triplet_nomap_nox.o\
+	umf_di_triplet_map_nox.o\
+	umf_di_triplet_nomap_x.o\
+	umf_di_triplet_map_x.o
+
+OBJECTS = $(UMFOBJS)
+LIB = ../umfpack.a
+
+lib: $(OBJECTS)
+	ar -ruc $(LIB) $(OBJECTS)
+
+mostlyclean: clean
+clean:
+	@-rm -rf .libs _libs $(LIB)
+	@-rm -f *.o 
+distclean: clean
+	@-rm -f Makefile
+maintainer-clean: distclean
+
+umfpack_di_triplet_to_col.o: umfpack_triplet_to_col.c
+	$(CC) -DDINT $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c $< -o $@
+umf_di_triplet_nomap_nox.o: umf_triplet.c 
+	$(CC) -DDINT $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c $< -o $@
+umf_di_triplet_map_nox.o: umf_triplet.c 
+	$(CC) -DDINT -DDO_MAP $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c $< -o $@
+umf_di_triplet_nomap_x.o: umf_triplet.c 
+	$(CC) -DDINT -DDO_VALUES $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c $< -o $@
+umf_di_triplet_map_x.o: umf_triplet.c 
+	$(CC) -DDINT -DDO_MAP -DDO_VALUES $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c $< -o $@
+umf_i_%.o: umf_%.c $(UMFINC)
+	$(CC) -DDINT -c $< -o $@
