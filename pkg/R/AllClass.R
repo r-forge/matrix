@@ -1,7 +1,6 @@
 # Ensure that the methods package is available, initialize symbols
 .onLoad <- function(lib, pkg) {
-    require(methods)
-    require(stats)
+    require("methods", character = TRUE, quietly = TRUE)
     .Call("Matrix_init", PACKAGE = "Matrix")
 }
 
