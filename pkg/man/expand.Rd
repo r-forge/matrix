@@ -4,7 +4,6 @@
 expand(x, \dots)
 }
 \alias{expand}
-\alias{expand.default}
 \description{
   Expands decompositions stored in compact form into factors.
 }
@@ -16,10 +15,9 @@ expand(x, \dots)
   The expanded decomposition, typically a list of matrix factors.
 }
 \details{
-  This is a (S3) generic function with special methods for different types
-  of decompositions.
-  Use \code{\link{methods}("expand")} to list all the methods for the
-  \code{expand} generic.
+  This is a generic function with special methods for different types
+  of decompositions, see \code{\link{showMethods}(expand)} to list them
+  all.
 }
 \note{
   Factors for decompositions such as \code{lu} and \code{qr} can be
@@ -29,8 +27,6 @@ expand(x, \dots)
 \seealso{
   The LU decomposition \code{\link{lu}}, for which there \emph{is} an
   \code{expand} method;
-  % \code{\link{expand.lu.Hermitian}},
-  %    \code{\link{expand.qr.Matrix}}, \code{\link{expand.eigen.Matrix}},
   \code{\link{facmul}}.
 }
 \examples{
