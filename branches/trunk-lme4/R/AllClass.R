@@ -1,4 +1,3 @@
-# Ensure that the stats4 and lattice packages are available
 .onLoad <- function(lib, pkg)
 {
     if ("package:nlme" %in% search()) {
@@ -6,7 +5,6 @@
                    "To attach lme4 you must restart R without package nlme."))
     }
     require("methods", quietly = TRUE)
-    #require("stats4", quietly = TRUE)
     require("Matrix", quietly = TRUE)
 }
 
