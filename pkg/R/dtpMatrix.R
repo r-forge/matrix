@@ -9,20 +9,28 @@ setAs("dtpMatrix", "dgeMatrix",
 setAs("dtpMatrix", "matrix",
       function(from) as(as(from, "dtrMatrix"), "matrix"))
 
+
 setMethod("%*%", signature(x = "dtpMatrix", y = "dgeMatrix"),
 	  function(x, y) .Call("dtpMatrix_dgeMatrix_mm", x, y))
+setMethod("%*%", signature(x = "dgeMatrix", y = "dtpMatrix"),
+	  function(x, y) callGeneric(x, as(y, "dgeMatrix")))
 
 setMethod("%*%", signature(x = "dtpMatrix", y = "matrix"),
 	  function(x, y) .Call("dtpMatrix_matrix_mm", x, y))
+## extending to vector RHS
+setMethod("%*%", signature(x = "dtpMatrix", y = "numeric"),
+          function(x, y) callGeneric(x, as.matrix(y)))
+## the other way around
+setMethod("%*%", signature(x = "numeric", y = "dtpMatrix"),
+          function(x, y) callGeneric(as(as.matrix(x), "dgeMatrix"), y))
 
 setMethod("determinant", signature(x = "dtpMatrix", logarithm = "missing"),
 	  function(x, logarithm, ...) determinant(x, TRUE))
 
 setMethod("diag", signature(x = "dtpMatrix"),
-          function(x = 1, nrow, ncol = n)
-          .Call("dtpMatrix_getDiag", x),
+          function(x = 1, nrow, ncol = n) .Call("dtpMatrix_getDiag", x),
           valueClass = "numeric")
-          
+
 setMethod("determinant", signature(x = "dtpMatrix", logarithm = "logical"),
 	  function(x, logarithm, ...) {
 	      dg <- diag(x)
