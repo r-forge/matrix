@@ -25,8 +25,9 @@ SOURCES_C =  \
             triplet_to_col.c \
             tscMatrix.c \
             # flame.c
-SOURCES_F = foo.f
-OBJECTS = $(SOURCES_C:.c=.o) $(SOURCES_F:.f=.o)
+#SOURCES_F = foo.f
+#OBJECTS = $(SOURCES_C:.c=.o) $(SOURCES_F:.f=.o)
+OBJECTS = $(SOURCES_C:.c=.o)
 SHLIB = $(pkg)$(SHLIB_EXT)
 SUBDIRS = Metis
 SUBLIBS = $(SUBDIRS:=.a)
