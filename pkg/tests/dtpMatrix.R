@@ -1,16 +1,19 @@
 ### triangular packed
 library(Matrix)
-## round(): "Math2" group method
-round(tp6 <- as(chol(Hilbert(6)),"dtpMatrix"), 3)
-1/tp6 # "Arith" group : gives 'dgeMatrix'
+
+cp6 <- chol(Hilbert(6))
+tp6 <- as(cp6,"dtpMatrix")
+round(tp6, 3)## round() is "Math2" group method
+1/tp6        ## "Arith" group : gives 'dgeMatrix'
 str(tp6)
 stopifnot(validObject(tp6),
           all.equal(tp6 %*% diag(6), as(tp6, "matrix")),
+## this SEG.FAULTS: -- FIXME -- validObject(tp6. <- diag(6) %*% tp6),
           class((tt6 <- t(tp6))) == "dtpMatrix",
+          identical(t(tt6), tp6),
           tp6@uplo == "U" && tt6@uplo == "L")
-if(FALSE) # FIXME fails inspite of
-    ##      ----  getMethod("%*%", signature("numeric", "dtpMatrix"))
-diag(6) %*% tp6
+
+## all.equal(tp6., tp6)
 (tr6 <- as(tp6, "dtrMatrix")) ## prints using wrong class name
 D. <- determinant(tp6)
 rc <- rcond(tp6)

@@ -17,6 +17,8 @@
 \alias{coerce,ddenseMatrix,matrix-method}
 %
 \alias{\%*\%,dgeMatrix,dgeMatrix-method}
+\alias{\%*\%,dgeMatrix,matrix-method}
+\alias{\%*\%,matrix,dgeMatrix-method}
 \alias{\%*\%,dgeMatrix,numeric-method}
 \alias{\%*\%,numeric,dgeMatrix-method}
 \alias{Schur,dgeMatrix,logical-method}

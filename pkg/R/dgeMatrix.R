@@ -166,12 +166,20 @@ setMethod("crossprod", signature(x = "numeric", y = "dgeMatrix"),
 setMethod("%*%", signature(x = "dgeMatrix", y = "dgeMatrix"),
           function(x, y) .Call("dgeMatrix_dgeMatrix_mm", x, y))
 
-setMethod("%*%", signature(x = "dgeMatrix", y = "numeric"),
-          function(x, y) callGeneric(x, as(as.matrix(y), "dgeMatrix")))
+## dgeMatrix <-> matrix ("matrix" dispatches before "numeric" since R 2.1.0)
+setMethod("%*%", signature(x = "dgeMatrix", y = "matrix"),
+          function(x, y) callGeneric(x, as(y, "dgeMatrix")))
 
-setMethod("%*%", signature(x = "numeric", y = "dgeMatrix"),
-          function(x, y)
-          callGeneric(as(if(is.matrix(x)) x else rbind(x), "dgeMatrix"), y))
+setMethod("%*%", signature(x = "matrix", y = "dgeMatrix"),
+          function(x, y) callGeneric(as(x, "dgeMatrix"), y))
+
+## dgeMatrix <-> numeric : uses the "matrix" one
+.M.n <- function(x, y) callGeneric(x, as.matrix(y))
+.n.M <- function(x, y) callGeneric(rbind(x), y)
+setMethod("%*%", signature(x = "dgeMatrix", y = "numeric"), .M.n)
+setMethod("%*%", signature(x = "numeric", y = "dgeMatrix"), .n.M)
+
+
 
 setMethod("diag", signature(x = "dgeMatrix"),
           function(x = 1, nrow, ncol = n)

@@ -4,6 +4,7 @@
 \alias{\%*\%,dtpMatrix,dgeMatrix-method}
 \alias{\%*\%,dgeMatrix,dtpMatrix-method}
 \alias{\%*\%,dtpMatrix,matrix-method}
+\alias{\%*\%,matrix,dtpMatrix-method}
 \alias{\%*\%,dtpMatrix,numeric-method}
 \alias{\%*\%,numeric,dtpMatrix-method}
 \alias{coerce,dtpMatrix,dtrMatrix-method}
