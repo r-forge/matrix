@@ -3,19 +3,21 @@
 \alias{dgBCMatrix-class}
 \alias{coerce,dgBCMatrix,dgCMatrix-method}
 \alias{coerce,dgBCMatrix,dgTMatrix-method}
-\title{Class "dgBCMatrix" compressed, sparse, blocked Matrix }
-\description{The \code{dgCMatrix} class is a class of sparse matrices in
+\title{Class "dgBCMatrix" Real Sparse Blocked Column Compressed Matrix}
+\description{
+  The \code{dgCMatrix} class is a class of sparse blocked matrices in
   the compressed, sparse, column-oriented format.  In this
   implementation the non-zero elements in the columns are sorted into
-  increasing row order.}
+  increasing row order.
+}
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("dgBCMatrix",
     ...)}.
 
   Objects in this class have a structure similar to those in the
-  \code{dgCMatrix} class except that each nonzero "element" is itself a
-  dense matrix with a given number of rows and columns.  These objects
-  are used in the representation of linear mixed-effects model
+  \code{dgCMatrix} class except that each nonzero \dQuote{element} is
+  itself a dense matrix with a given number of rows and columns.  These
+  objects are used in the representation of linear mixed-effects model
   structures in the \code{lme4} package.
 }
 \section{Slots}{
