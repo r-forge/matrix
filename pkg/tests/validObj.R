@@ -55,6 +55,7 @@ stopifnot(identical(dimnames(t34N),
 chk.matrix(cm <- crossprod(m1))
 chk.matrix(as(cm, "dsyMatrix"))
 chk.matrix(as(cm, "dgeMatrix"))
+chk.matrix(as(cm, "dMatrix"))
 try( chk.matrix(as(cm, "Matrix")) )# gives an error: "Matrix" has NULL 'dim()'
 
 ## Cholesky

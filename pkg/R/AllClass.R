@@ -84,12 +84,12 @@ setClass("dspMatrix",
          validity = function(object) .Call("dspMatrix_validate", object)
          )
 
-# numeric, dense, non-packed, postive-definite, symmetric matrices
+# numeric, dense, non-packed, positive-definite, symmetric matrices
 setClass("dpoMatrix", contains = "dsyMatrix",
          validity = function(object) .Call("dpoMatrix_validate", object)
          )
 
-# numeric, dense, packed, postive-definite, symmetric matrices
+# numeric, dense, packed, positive-definite, symmetric matrices
 setClass("dppMatrix", contains = "dspMatrix",
          validity = function(object) .Call("dppMatrix_validate", object)
          )

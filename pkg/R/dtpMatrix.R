@@ -13,16 +13,16 @@ setAs("dtpMatrix", "matrix",
 setMethod("%*%", signature(x = "dtpMatrix", y = "dgeMatrix"),
 	  function(x, y) .Call("dtpMatrix_dgeMatrix_mm", x, y))
 setMethod("%*%", signature(x = "dgeMatrix", y = "dtpMatrix"),
-	  function(x, y) callGeneric(x, as(y, "dgeMatrix")))
-
+	  function(x, y) .Call("dgeMatrix_dtpMatrix_mm", x, y))
+## "matrix"
 setMethod("%*%", signature(x = "dtpMatrix", y = "matrix"),
-	  function(x, y) .Call("dtpMatrix_matrix_mm", x, y))
-## extending to vector RHS
-setMethod("%*%", signature(x = "dtpMatrix", y = "numeric"),
-          function(x, y) callGeneric(x, as.matrix(y)))
-## the other way around
-setMethod("%*%", signature(x = "numeric", y = "dtpMatrix"),
-          function(x, y) callGeneric(as(as.matrix(x), "dgeMatrix"), y))
+	  function(x, y) .Call("dtpMatrix_matrix_mm", x, y))# result = "matrix"
+setMethod("%*%", signature(x = "matrix", y = "dtpMatrix"),
+ 	  function(x, y) callGeneric(as(x,"dgeMatrix"), y))# result: "dgeMatrix"
+
+## "numeric" (same as "dgeMatrix")
+setMethod("%*%", signature(x = "dtpMatrix", y = "numeric"), .M.n)
+setMethod("%*%", signature(x = "numeric", y = "dtpMatrix"), .n.M)
 
 setMethod("determinant", signature(x = "dtpMatrix", logarithm = "missing"),
 	  function(x, logarithm, ...) determinant(x, TRUE))

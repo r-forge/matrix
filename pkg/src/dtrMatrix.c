@@ -104,14 +104,13 @@ SEXP dtrMatrix_as_dgeMatrix(SEXP from)
 {
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
 
-    SET_SLOT(val, Matrix_rcondSym,
-	     duplicate(GET_SLOT(from, Matrix_rcondSym)));
+    SET_SLOT(val, Matrix_rcondSym, duplicate(GET_SLOT(from, Matrix_rcondSym)));
     SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(from, Matrix_xSym)));
     /* Dim < 2 can give a seg.fault problem in make_array_triangular(): */
     if (LENGTH(GET_SLOT(from, Matrix_DimSym)) < 2)
-	error(_(_("'Dim' slot has length less than two")));
-    SET_SLOT(val, Matrix_DimSym,
-	     duplicate(GET_SLOT(from, Matrix_DimSym)));
+	error(_("'Dim' slot has length less than two"));
+    SET_SLOT(val, Matrix_DimSym, duplicate(GET_SLOT(from, Matrix_DimSym)));
+    SET_SLOT(val, Matrix_DimNamesSym, duplicate(GET_SLOT(from, Matrix_DimNamesSym)));
     SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     make_array_triangular(REAL(GET_SLOT(val, Matrix_xSym)), from);
     UNPROTECT(1);
@@ -123,10 +122,10 @@ SEXP dtrMatrix_as_matrix(SEXP from)
     int *Dim = INTEGER(GET_SLOT(from, Matrix_DimSym));
     int m = Dim[0], n = Dim[1];
     SEXP val = PROTECT(allocMatrix(REALSXP, m, n));
-
     make_array_triangular(Memcpy(REAL(val),
 				 REAL(GET_SLOT(from, Matrix_xSym)), m * n),
 			  from);
+    setAttrib(val, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
     UNPROTECT(1);
     return val;
 }

@@ -126,6 +126,7 @@ SEXP dsyMatrix_as_matrix(SEXP from)
     make_symmetric(Memcpy(REAL(val),
 			  REAL(GET_SLOT(from, Matrix_xSym)), n * n),
 		   from, n);
+    setAttrib(val, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
     UNPROTECT(1);
     return val;
 }

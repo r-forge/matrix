@@ -1,4 +1,6 @@
-/* double (precision) Triangular Packed Matrices */
+/* double (precision) Triangular Packed Matrices
+ * Note: this means *square* {n x n} matrices
+*/
 
 #include "dtpMatrix.h"
 
@@ -11,7 +13,7 @@ SEXP dtpMatrix_validate(SEXP obj)
 					   "LU", "uplo"))) return val;
     if (isString(val = check_scalar_string(GET_SLOT(obj, Matrix_diagSym),
 					   "NU", "diag"))) return val;
-    if (dims[0] != dims[1]) return mkString(_("Matrix in not square"));
+    if (dims[0] != dims[1]) return mkString(_("Matrix is not square"));
     if (dims[0] != packed_ncol(length(GET_SLOT(obj, Matrix_xSym))))
 	return(mkString(_("Incorrect length of 'x' slot")));
     return ScalarLogical(1);
@@ -116,6 +118,7 @@ SEXP dtpMatrix_matrix_solve(SEXP a, SEXP b)
 SEXP dtpMatrix_dgeMatrix_mm(SEXP x, SEXP y)
 {
     SEXP val = PROTECT(duplicate(y));
+    /* Since 'x' is square (n x n ),   dim(x %*% y) = dim(y) */
     int *xDim = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	*yDim = INTEGER(GET_SLOT(y, Matrix_DimSym));
     int ione = 1, j;
@@ -127,9 +130,31 @@ SEXP dtpMatrix_dgeMatrix_mm(SEXP x, SEXP y)
     if (yDim[0] != xDim[1])
 	error(_("Dimensions of a (%d,%d) and b (%d,%d) do not conform"),
 	      xDim[0], xDim[1], yDim[0], yDim[1]);
-    for (j = 0; j < yDim[1]; j++)
+    for (j = 0; j < yDim[1]; j++) /* A %*% x  via BLAS 2 DTPMV(.) */
 	F77_CALL(dtpmv)(uplo, "N", diag, yDim, xx,
 			vx + j * yDim[0], &ione);
+    UNPROTECT(1);
+    return val;
+}
+
+SEXP dgeMatrix_dtpMatrix_mm(SEXP x, SEXP y)
+{
+    SEXP val = PROTECT(duplicate(x));
+    /* Since 'y' is square (n x n ),   dim(x %*% y) = dim(x) */
+    int *xDim = INTEGER(GET_SLOT(x, Matrix_DimSym)),
+	*yDim = INTEGER(GET_SLOT(y, Matrix_DimSym));
+    int i;
+    char *uplo = CHAR(STRING_ELT(GET_SLOT(y, Matrix_uploSym), 0)),
+	 *diag = CHAR(STRING_ELT(GET_SLOT(y, Matrix_diagSym), 0));
+    double *yx = REAL(GET_SLOT(y, Matrix_xSym)),
+ 	*vx = REAL(GET_SLOT(val, Matrix_xSym));
+
+    if (yDim[0] != xDim[1])
+	error(_("Dimensions of a (%d,%d) and b (%d,%d) do not conform"),
+	      xDim[0], xDim[1], yDim[0], yDim[1]);
+    for (i = 0; i < xDim[0]; i++)/* val[i,] := Y' %*% x[i,]  */
+	F77_CALL(dtpmv)(uplo, "T", diag, yDim, yx,
+			vx + i * xDim[1], /* incr = */ xDim);
     UNPROTECT(1);
     return val;
 }
@@ -137,6 +162,7 @@ SEXP dtpMatrix_dgeMatrix_mm(SEXP x, SEXP y)
 SEXP dtpMatrix_matrix_mm(SEXP x, SEXP y)
 {
     SEXP val = PROTECT(duplicate(y));
+    /* Since 'x' is square (n x n ),   dim(x %*% y) = dim(y) */
     int *xDim = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	*yDim = INTEGER(getAttrib(y, R_DimSymbol));
     int ione = 1, j;
@@ -159,12 +185,14 @@ SEXP dtpMatrix_as_dtrMatrix(SEXP from)
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dtrMatrix"))),
 	uplo = GET_SLOT(from, Matrix_uploSym),
 	diag = GET_SLOT(from, Matrix_diagSym),
-	dimP = GET_SLOT(from, Matrix_DimSym);
+	dimP = GET_SLOT(from, Matrix_DimSym),
+	dmnP = GET_SLOT(from, Matrix_DimNamesSym);
     int n = *INTEGER(dimP);
 
     SET_SLOT(val, Matrix_rcondSym,
 	     duplicate(GET_SLOT(from, Matrix_rcondSym)));
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
+    SET_SLOT(val, Matrix_DimNamesSym, duplicate(dmnP));
     SET_SLOT(val, Matrix_diagSym, duplicate(diag));
     SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
     packed_to_full(REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, n*n)),

@@ -12,6 +12,7 @@ SEXP dtpMatrix_solve(SEXP a);
 SEXP dtpMatrix_matrix_solve(SEXP a, SEXP b);
 SEXP dtpMatrix_as_dtrMatrix(SEXP from);
 SEXP dtpMatrix_dgeMatrix_mm(SEXP x, SEXP y);
+SEXP dgeMatrix_dtpMatrix_mm(SEXP x, SEXP y);
 SEXP dtpMatrix_matrix_mm(SEXP x, SEXP y);
 
 #endif /* MATRIX_TPMATRIX_H */
