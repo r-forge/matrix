@@ -11,7 +11,8 @@ for (i in 1:nres) {
     try({
         thisdat <- cbind(s3bbx, modern = s3bby[,i])
         results[i, 9:11] <-
-            system.time(fm <- GLMM(modern ~ chldcov + famcov + commcov,
+            system.time(fm <-
+                        sparseGLMM(modern ~ chldcov + famcov + commcov,
                                    data = thisdat,
                                    random = ~1|community/family,
                                    family = binomial))[1:3]

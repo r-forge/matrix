@@ -40,23 +40,10 @@ if (!isGeneric("getCovariate")) {
 }
 
 if (!isGeneric("getResponse")) {
-    ## Return the primary covariate associated with object
+    ## Return the response variable associated with object
     setGeneric("getResponse",
                function(object, form = formula(object))
                standardGeneric("getResponse"))
-}
-
-# FIXME: Remove this generic
-if (!isGeneric("LMEgradient")) {
-    setGeneric("LMEgradient",
-               function(x, A, nlev) standardGeneric("LMEgradient"))
-}
-
-# FIXME: Remove this generic
-if (!isGeneric("LMEhessian")) {
-    setGeneric("LMEhessian",
-               function(x, A, H, nlev)
-               standardGeneric("LMEhessian"))
 }
 
 # FIXME: pare down the argument list
@@ -66,20 +53,9 @@ setGeneric("lme",
            standardGeneric("lme"))
 
 # FIXME: Remove this generic
-if (!isGeneric("EMupdate<-")) {
-    setGeneric("EMupdate<-",
-               function(x, nlev, value) standardGeneric("EMupdate<-"))
-}
-
-# FIXME: Remove this generic
-if (!isGeneric("pdgradient")) {
-    setGeneric("pdgradient", function(x) standardGeneric("pdgradient"))
-}
-
-# FIXME: Remove this generic
 if (!isGeneric("EMsteps<-")) {
     setGeneric("EMsteps<-",
-               function(x, value, ...) standardGeneric("EMsteps<-"))
+               function(x, ..., value) standardGeneric("EMsteps<-"))
 }
 
 if (!isGeneric("LMEoptimize<-")) {
@@ -87,24 +63,12 @@ if (!isGeneric("LMEoptimize<-")) {
                standardGeneric("LMEoptimize<-"))
 }
 
-# FIXME: Remove this generic
-if (!isGeneric("response<-")) {
-    setGeneric("response<-", function(x, value)
-               standardGeneric("response<-"))
-}
-
 if (!isGeneric("fixef")) {
     setGeneric("fixef", function(object, ...) standardGeneric("fixef"))
 }
 
-# FIXME: Remove this generic
-if (!isGeneric("fixef<-")) {
-    setGeneric("fixef<-",
-               function(object, value) standardGeneric("fixef<-"))
-}
-
-## fixed.effects was an alternative name
 fixed.effects = function(object, ...) {
+    ## fixed.effects was an alternative name for fixef
     .Deprecated("fixef")
     mCall = match.call()
     mCall[[1]] = as.name("fixef")
@@ -116,8 +80,8 @@ if (!isGeneric("ranef")) {
                standardGeneric("ranef"))
 }
 
-## random.effects was an alternative name for ranef
 random.effects = function(object, ...) {
+    ## random.effects was an alternative name for ranef
     .Deprecated("ranef")
     mCall = match.call()
     mCall[[1]] = as.name("ranef")

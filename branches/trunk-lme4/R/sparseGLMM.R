@@ -335,7 +335,7 @@ print(str(obj@Omega))
           ## reduced ssclme
 
           offset <- mmats.unadjusted$.Xy %*% c(fixef(obj), 0)
-          reducedObj <- .Call("ssclme_collapse", obj, package = "Matrix")
+          reducedObj <- .Call("ssclme_collapse", obj, PACKAGE = "Matrix")
           reducedMmats.unadjusted <- mmats.unadjusted
           reducedMmats.unadjusted$.Xy <-
               reducedMmats.unadjusted$.Xy[, responseIndex, drop = FALSE]

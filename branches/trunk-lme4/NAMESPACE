@@ -42,9 +42,6 @@ importMethodsFrom("Matrix",
                   )
 
 export(
-       "EMupdate<-",
-       "GLMM",
-       "LMEgradient",
        "Names",
        "Names<-",
        "VarCorr",
@@ -57,7 +54,6 @@ export(
        "lmList",
        "lme",
        "lmeControl",
-       "pdgradient",
        "pooledSD",
        "ranef",
        "sparseGLMM"
@@ -65,22 +61,17 @@ export(
 
 exportClasses(
               "VarCorr",
-              "glmm",
               "groupedData",
               "lmList",
               "lme",
-              "summary.pdMat",
-              "summary.lme",
-              "summary.ssclme"
+#              "summary.pdMat",
+              "summary.lme"
+#             ,"summary.ssclme"
               )
 
 exportMethods(
               "$",
               "$<-",
-              "EMupdate<-",
-              "LMEgradient",
-              "Names",
-              "Names<-",
               "[",
               "[<-",
               "[[",
@@ -92,7 +83,6 @@ exportMethods(
               "fixef",
               "formula",
               "logLik",
-              "pdgradient",
               "plot",
               "ranef",
               "residuals",

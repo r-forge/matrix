@@ -4,6 +4,7 @@
 \alias{sparseGLMM,missing,ANY,groupedData,ANY-method}
 \alias{sparseGLMM,formula,ANY,groupedData,missing-method}
 \alias{sparseGLMM,formula,ANY,ANY,formula-method}
+\alias{sparseGLMM,formula,family,ANY,list-method}
 \alias{sparseGLMM,formula,ANY,ANY,list-method}
 \title{
 Fit Generalized Linear Mixed Models via PQL
@@ -21,21 +22,23 @@ sparseGLMM(formula, family, data, random,
     a two-sided linear model formula giving fixed-effects part of the model.
   }
   \item{family}{
-    a GLM family, see \code{\link{glm}}.
-  }
-  \item{random}{
-    A formula or list of formulae describing the random effects.
+    a GLM family, see \code{\link[stats]{glm}}.
   }
   \item{data}{
     an optional data frame used as the first place to find
     variables in the formulae.
   }
-  \item{control}{
-    an optional argument to be passed to \code{lme}.
+  \item{random}{
+    A formula or named list of formulae describing the random effects.
   }
-  \item{niter}{
-    maximum number of PQL iterations.  Default is 20.
-  }
+ \item{subset}{an optional expression indicating the subset of the rows of
+   \code{data} that should be used in the fit. This can be a logical
+   vector, or a numeric vector indicating which observation numbers are
+   to be included, or a  character  vector of the row names to be
+   included.  All observations are included by default.}
+%  \item{niter}{
+%    maximum number of PQL iterations.  Default is 20.
+%  }
   \item{method}{
     character: Estimation method to be used.  Possible values are
     \code{"PQL"}, the default, or \code{"Laplace"}.
@@ -44,15 +47,25 @@ sparseGLMM(formula, family, data, random,
     estimation followed by optimization of the second-order Laplacian
     approximation to the marginal log-likelihood.
   }
-  \item{verbose}{
-    logical: print out record of iterations?  Default is \code{FALSE}.
+ \item{na.action}{a function that indicates what should happen when the
+   data contain \code{NA}s.  The default action (\code{na.fail}) causes
+   \code{lme} to print an error message and terminate if there are any
+   incomplete observations.}
+  \item{control}{
+    an optional argument to be passed to \code{lme}.
   }
+%  \item{verbose}{
+%    logical: print out record of iterations?  Default is \code{FALSE}.
+%  }
+ \item{model, x}{logicals.  If \code{TRUE} the corresponding
+   components of the fit (the model frame, the model matrices)
+   are returned.}
   \item{\dots}{
     Optional further arguments such as \code{subset} and \code{na.action}.
   }
 }
 \value{
-A object of class \code{"glmm"}: see \code{\link{reStruct-class}}.
+  A object of class \code{"lme"}: see \code{\link[Matrix]{ssclme-class}}.
 }
 \references{
 Schall, R. (1991) Estimation in generalized linear models with
@@ -76,14 +89,15 @@ pseudo-likelihood approach.
   \code{\link{lme}}
 }
 \examples{
+\dontrun{
 library(lme4)
 data(guImmun)
 fm1 <-
     sparseGLMM(immun ~ kid2p + mom25p + ord + ethn +
                momEd + husEd + momWork + rural + pcInd81,
                data = guImmun, family = binomial(),
-               random = list(mom = ~1, comm = ~1),
-               control = lmeControl(...))
+               random = list(comm = ~1))
 summary(fm1)
+}
 }
 \keyword{models}
