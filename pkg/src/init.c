@@ -5,7 +5,7 @@
 #include "dense.h"
 #include "factorizations.h"
 #include "geMatrix.h"
-#include "lmeRep.h"
+#include "lmer.h"
 #include "poMatrix.h"
 #include "sscCrosstab.h"
 #include "sscMatrix.h"
