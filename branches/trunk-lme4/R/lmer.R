@@ -404,14 +404,13 @@ setMethod("chol", signature(x = "lmer"),
 
 setMethod("solve", signature(a = "lmer", b = "missing"),
           function(a, b, ...)
-          .Call("lmer_invert", a)
+          .Call("lmer_invert", a, PACKAGE = "Matrix")
           )
 
 setMethod("formula", "lmer", function(x, ...) x@call$formula)
 
 setMethod("vcov", signature(object = "lmer"),
           function(object, REML = object@REML, useScale = TRUE,...) {
-              ## force an "lmer_invert"
               sc <- .Call("lmer_sigma", object, REML, PACKAGE = "Matrix")
               rr <- object@RXX
               nms <- object@cnames[[".fixed"]]
@@ -428,34 +427,6 @@ setMethod("vcov", signature(object = "lmer"),
 Lind <- function(i,j) {
     if (i < j) stop(paste("Index i=", i,"must be >= index j=", j))
     ((i - 1) * i)/2 + j
-}
-
-## Generalize this and return the transpose of the current matrix
-##  so it can be checked by a crossprod operation.
-Lmat <- function(from) {
-    L <- lapply(from@L, as, "dgTMatrix")
-    nf <- length(from@D)
-    Gp <- from@Gp
-    nL <- Gp[nf + 1]
-    Zi <- integer(0)
-    Zj <- integer(0)
-    Zx <- double(0)
-    for (i in 1:nf) {
-        for (j in 1:i) {
-            Lij <- L[[Lind(i, j)]]
-            if (i == j) { ## fix up diagonal
-                nc <- Lij@Dim[2]
-                Lij@Dim <- c(nc, nc)
-                Lij@i <- c(Lij@i, as.integer(0:(nc-1)))
-                Lij@j <- c(Lij@j, as.integer(0:(nc-1)))
-                Lij@x <- c(Lij@x, rep(1, nc))
-            }
-            Zi <- c(Zi, Lij@i + Gp[i])
-            Zj <- c(Zj, Lij@j + Gp[j])
-            Zx <- c(Zx, Lij@x)
-        }
-    }
-    new("dgTMatrix", Dim = as.integer(c(nL, nL)), i = Zi, j = Zj, x = Zx)
 }
 
 Dhalf <- function(from) {
@@ -486,17 +457,49 @@ setAs("lmer", "dtTMatrix",
       nf <- length(from@D)
       Gp <- from@Gp
       nL <- Gp[nf + 1]
+      Li <- integer(0)
+      Lj <- integer(0)
+      Lx <- double(0)
+      for (i in 1:nf) {
+          for (j in 1:i) {
+              Lij <- L[[Lind(i, j)]]
+              Li <- c(Li, Lij@i + Gp[i])
+              Lj <- c(Lj, Lij@j + Gp[j])
+              Lx <- c(Lx, Lij@x)
+          }
+      }
+      new("dtTMatrix", Dim = as.integer(c(nL, nL)), i = Li, j = Lj, x = Lx,
+          uplo = "L", diag = "U")
+  })
+
+## Extract the ZZX matrix
+setAs("lmer", "dsTMatrix",
+      function(from)
+  {
+      .Call("lmer_inflate", from, PACKAGE = "Matrix")
+      ZZpO <- lapply(from@ZZpO, as, "dgTMatrix")
+      ZZ <- lapply(from@ZtZ, as, "dgTMatrix")
+      nf <- length(ZZpO)
+      Gp <- from@Gp
+      nZ <- Gp[nf + 1]
       Zi <- integer(0)
       Zj <- integer(0)
       Zx <- double(0)
       for (i in 1:nf) {
-          for (j in 1:i) {
-              Lij <- L[[Lind(i, j)]]
-              Zi <- c(Zi, Lij@i + Gp[i])
-              Zj <- c(Zj, Lij@j + Gp[j])
-              Zx <- c(Zx, Lij@x)
+          ZZpOi <- ZZpO[[i]]
+          Zi <- c(Zi, ZZpOi@i + Gp[i])
+          Zj <- c(Zj, ZZpOi@j + Gp[i])
+          Zx <- c(Zx, ZZpOi@x)
+          if (i > 1) {
+              for (j in 1:(i-1)) {
+                  ZZij <- ZZ[[Lind(i, j)]]
+                  ## off-diagonal blocks are transposed
+                  Zi <- c(Zi, ZZij@j + Gp[j])
+                  Zj <- c(Zj, ZZij@i + Gp[i])
+                  Zx <- c(Zx, ZZij@x)
+              }
           }
       }
-      new("dtTMatrix", Dim = as.integer(c(nL, nL)), i = Zi, j = Zj, x = Zx,
-          uplo = "L", diag = "U")
+      new("dsTMatrix", Dim = as.integer(c(nZ, nZ)), i = Zi, j = Zj, x = Zx,
+          uplo = "U")
   })

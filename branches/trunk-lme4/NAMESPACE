@@ -2,6 +2,7 @@ importFrom("graphics", "plot")
 
 importFrom("stats",
            "anova",
+           "coef",
 	   "confint",
            "deviance",
            "fitted",
@@ -12,16 +13,12 @@ importFrom("stats",
            "update",
            "vcov")
 importFrom("Matrix",
-           "coef",
-           "coef<-",
-           "corMatrix",
-           "matrix<-",
-           "pdFactor",
-           "pdMatrix"
+           "coef<-"
            )
 importClassesFrom("Matrix",
                   "corrmatrix",
                   "dsyMatrix",
+                  "dsTMatrix",
                   "dtTMatrix",
                   "pdfactor",
                   "pdmatrix",
