@@ -47,7 +47,6 @@ Wheat2                  Wheat Yield Trials
 bdf                     Language scores
 coerce-methods          Coercion methods and assignments
 ergoStool               Ergometrics experiment with stool types
-family-class            Class "family"
 fixed.effects           Extract Fixed Effects
 getCovariate            Utilities for formulas
 groupedData             Creation of groupedData objects
@@ -60,10 +59,6 @@ lmList-class            Class "lmList"
 lme                     Fit linear mixed-effects models
 lme-class               Class "lme"
 lmeControl              Control values for lme
-nfGroupedData-class     Class "nfGroupedData"
-nffGroupedData-class    Class "nffGroupedData"
-nfnGroupedData-class    Class "nfnGroupedData"
-nmGroupedData-class     Class "nmGroupedData"
 pooledSD                Extract pooled standard deviation
 random.effects          Extract Random Effects
 s3bbx                   Covariates in the Rodriguez and Goldman
