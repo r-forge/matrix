@@ -76,8 +76,7 @@ SEXP geMatrix_rcond(SEXP obj, SEXP type)
 
 SEXP geMatrix_crossprod(SEXP x)
 {
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("poMatrix"))),
-	xslot;
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("poMatrix")));
     int *Dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	*vDims;
     int i, n = Dims[1];
@@ -280,8 +279,8 @@ SEXP geMatrix_geMatrix_mm(SEXP a, SEXP b)
 
 SEXP geMatrix_svd(SEXP x, SEXP nnu, SEXP nnv)
 {
-    int nu = asInteger(nnu),
-	nv = asInteger(nnv),
+    int /* nu = asInteger(nnu),
+	   nv = asInteger(nnv), */
 	*dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
     double *xx = REAL(GET_SLOT(x, Matrix_xSym));
     SEXP val = PROTECT(allocVector(VECSXP, 3));
