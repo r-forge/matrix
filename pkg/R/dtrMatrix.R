@@ -15,17 +15,31 @@ setAs("dtrMatrix", "matrix",
 ## instead : inherit them from "dgeMatrix" via definition in ./dMatrix.R
 
 setMethod("%*%", signature(x = "dtrMatrix", y = "dgeMatrix"),
-	  function(x, y) .Call("dtrMatrix_dgeMatrix_mm", x, y))
+	  function(x, y) .Call("dtrMatrix_matrix_mm", x, y, TRUE, FALSE),
+          valueClass = "dgeMatrix")
+
+setMethod("%*%", signature(x = "dtrMatrix", y = "matrix"),
+	  function(x, y) .Call("dtrMatrix_matrix_mm", x, y, FALSE, FALSE),
+          valueClass = "dgeMatrix")
 
 setMethod("%*%", signature(x = "dgeMatrix", y = "dtrMatrix"),
-	  function(x, y) .Call("dtrMatrix_dgeMatrix_mm_R", y, x))
+	  function(x, y) .Call("dtrMatrix_matrix_mm", y, x, TRUE, TRUE),
+          valueClass = "dgeMatrix")
+
+setMethod("%*%", signature(x = "matrix", y = "dtrMatrix"),
+	  function(x, y) .Call("dtrMatrix_matrix_mm", y, x, FALSE, TRUE),
+          valueClass = "dgeMatrix")
+
+setMethod("%*%", signature(x = "dtrMatrix", y = "dtrMatrix"),
+	  function(x, y) callGeneric(x, as(y, "dgeMatrix")),
+          valueClass = "dgeMatrix")
 
 setMethod("crossprod", signature(x = "dtrMatrix", y = "missing"),
-	  function(x, y = NULL) crossprod(as(x, "dgeMatrix")),
+	  function(x, y = NULL) callGeneric(as(x, "dgeMatrix")),
 	  valueClass = "dpoMatrix")
 
 setMethod("determinant", signature(x = "dtrMatrix", logarithm = "missing"),
-	  function(x, logarithm, ...) determinant(x, TRUE))
+	  function(x, logarithm, ...) callGeneric(x, TRUE))
 
 setMethod("determinant", signature(x = "dtrMatrix", logarithm = "logical"),
 	  function(x, logarithm, ...) {
@@ -69,10 +83,13 @@ setMethod("solve", signature(a = "dtrMatrix", b="missing"),
 	  .Call("dtrMatrix_solve", a),
 	  valueClass = "dtrMatrix")
 
+setMethod("solve", signature(a = "dtrMatrix", b="dgeMatrix"),
+	  function(a, b, ...) .Call("dtrMatrix_matrix_solve", a, b, TRUE),
+	  valueClass = "dgeMatrix")
+
 setMethod("solve", signature(a = "dtrMatrix", b="matrix"),
-	  function(a, b, ...)
-	  .Call("dtrMatrix_matrix_solve", a, b),
-	  valueClass = "matrix")
+	  function(a, b, ...) .Call("dtrMatrix_matrix_solve", a, b, FALSE),
+	  valueClass = "dgeMatrix")
 
 setMethod("t", signature(x = "dtrMatrix"),
 	  function(x) {

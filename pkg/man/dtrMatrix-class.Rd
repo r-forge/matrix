@@ -2,6 +2,8 @@
 \docType{class}
 \alias{\%*\%,dgeMatrix,dtrMatrix-method}
 \alias{\%*\%,dtrMatrix,dgeMatrix-method}
+\alias{\%*\%,dtrMatrix,matrix-method}
+\alias{\%*\%,matrix,dtrMatrix-method}
 \alias{coerce,dtrMatrix,dgeMatrix-method}
 \alias{coerce,dtrMatrix,matrix-method}
 \alias{coerce,dtrMatrix,dtpMatrix-method}
@@ -12,6 +14,7 @@
 \alias{norm,dtrMatrix,missing-method}
 \alias{rcond,dtrMatrix,character-method}
 \alias{rcond,dtrMatrix,missing-method}
+\alias{solve,dtrMatrix,dgeMatrix-method}
 \alias{solve,dtrMatrix,matrix-method}
 \alias{solve,dtrMatrix,missing-method}
 \alias{t,dtrMatrix-method}
