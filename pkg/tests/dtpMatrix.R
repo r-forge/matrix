@@ -8,17 +8,19 @@ stopifnot(validObject(tp6),
           all.equal(tp6 %*% diag(6), as(tp6, "matrix")),
           class((tt6 <- t(tp6))) == "dtpMatrix",
           tp6@uplo == "U" && tt6@uplo == "L")
-if(FALSE) # FIXME : still fails
+if(FALSE) # FIXME fails inspite of
+    ##      ----  getMethod("%*%", signature("numeric", "dtpMatrix"))
 diag(6) %*% tp6
-(tr6 <- as(tp6, "dtrMatrix")) ## FIXME: prints horribly
+(tr6 <- as(tp6, "dtrMatrix")) ## prints using wrong class name
 D. <- determinant(tp6)
 rc <- rcond(tp6)
 stopifnot(all.equal(D.$modulus, -6.579251212),
           all.equal(rc, 1.791511257e-4),
-          rc == tp6@rcond)
-norm(tp6, "I")
-norm(tp6, "1")
-norm(tp6, "F")
+          rc == tp6@rcond,
+          all.equal(norm(tp6, "I") , 2.45),
+          all.equal(norm(tp6, "1") , 1),
+          all.equal(norm(tp6, "F") , 1.37047826623)
+          )
 object.size(tp6)
 object.size(as(tp6, "dtrMatrix"))
 object.size(as(tp6, "matrix"))
@@ -38,4 +40,4 @@ object.size(rl)
 object.size(as(rl, "dtrMatrix"))
 object.size(as(rl, "matrix"))
 determinant(rl)
-q('no')
+
