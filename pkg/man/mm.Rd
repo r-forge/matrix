@@ -11,8 +11,10 @@
 %\details{}
 %\source{}
 \references{
-  Roger Koenker and Pin Ng (2003), ``SparseM: A sparse matrix package
-  for R'', \emph{J. of Statistical Software}, 8(6).
+  Roger Koenker and Pin Ng (2003).
+  SparseM: A sparse matrix package for R;
+  \emph{J. of Statistical Software}, \bold{8} (6),
+  \url{http://www.jstatsoft.org/}
 }
 \examples{
 data(mm)
@@ -21,7 +23,7 @@ class(mm)
 dim(mm)
 str(mm)
 str(y)
-sparse.sol = solve(crossprod(mm), crossprod(mm, y))
+sparse.sol <- solve(crossprod(mm), crossprod(mm, y))
 str(sparse.sol)
 }
 \keyword{datasets}
