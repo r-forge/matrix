@@ -231,6 +231,9 @@ setMethod("GLMM",
 
 
 
+
+
+
           ## Need to optimize L(theta, beta) using Laplace approximation
 
           ## Things needed for that:
@@ -246,19 +249,41 @@ setMethod("GLMM",
           ## them more than once
 
 
-          ## reduced ssclme
+#           ## reduced ssclme
 
-          reducedObj <- .Call("ssclme_collapse", obj, PACKAGE = "Matrix")
+#           reducedObj <- .Call("ssclme_collapse", obj, PACKAGE = "Matrix")
+#           reducedMmats.unadjusted <- mmats.unadjusted
+#           reducedMmats.unadjusted$.Xy <-
+#               reducedMmats.unadjusted$.Xy[, responseIndex, drop = FALSE]
+#           reducedMmats <- mmats
+#           reducedMmats$.Xy <-
+#               reducedMmats$.Xy[, responseIndex, drop = FALSE]
+# #          .Call("ssclme_update_mm", reducedObj, facs, reducedMmats, PACKAGE="Matrix")
+
+#           ## make obj comparable
+#           ## .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
+
+
+### reduced version doesn't seem to work. Let's work with a full copy
+
+
+
+          reducedObj <- obj
           reducedMmats.unadjusted <- mmats.unadjusted
-          reducedMmats.unadjusted$.Xy <-
-              reducedMmats.unadjusted$.Xy[, responseIndex, drop = FALSE]
           reducedMmats <- mmats
-          reducedMmats$.Xy <-
-              reducedMmats$.Xy[, responseIndex, drop = FALSE]
-          .Call("ssclme_update_mm", reducedObj, facs, reducedMmats, PACKAGE="Matrix")
+#          .Call("ssclme_update_mm", reducedObj, facs, reducedMmats, PACKAGE="Matrix")
 
-          ## make obj comparable
-          ## .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
+          reducedMmats.unadjusted[[1]] <- mmats.unadjusted[[1]]
+          reducedMmats[[1]] <- mmats[[1]]
+          reducedObj@status <- obj@status
+
+          ## hopefully this forces copies for all 3
+
+
+
+
+
+
 
 
 
@@ -292,38 +317,75 @@ setMethod("GLMM",
 #                      print("-----------------------")
                       off <- drop(mmats.unadjusted$.Xy %*%
                                   c(pars[1:(responseIndex-1)], 0))
+
                   }
 
-                  niter <- 20
+                  niter <- 20 # FIXME: 20
                   conv <- FALSE
 
                   eta <- off + 
                       .Call("ssclme_fitted", reducedObj, facs,
-                            reducedMmats.unadjusted, TRUE, PACKAGE = "Matrix")
-#                  eta <-
+                            reducedMmats.unadjusted, TRUE, PACKAGE = "Matrix") - 
+                                .Call("ssclme_fitted", reducedObj, facs,
+                                      reducedMmats.unadjusted, FALSE, PACKAGE = "Matrix") 
+
+
+
+#                  eta.check <-
 #                      .Call("ssclme_fitted", obj, facs,
-#                            mmats.unadjusted, PACKAGE = "Matrix")
+#                            mmats.unadjusted, TRUE, PACKAGE = "Matrix")
+
 #                  print(all.equal(eta, eta.check)) # not really sure why not TRUE
 #                  plot(eta, eta.check)
                   etaold <- eta
+                  
 
-
+#      firstIter <- TRUE
+                  
                   for (iter in seq(length = niter))
                   {
                       mu <- family$linkinv(eta)
                       dmu.deta <- family$mu.eta(eta)
-                      z <- eta + (reducedMmats.unadjusted$.Xy[, 1] - mu) /
-                          dmu.deta - offset
+                      z <- eta + (reducedMmats.unadjusted$.Xy[, responseIndex] - mu) / dmu.deta - offset
                       w <- weights * dmu.deta / sqrt(family$variance(mu))
                       .Call("nlme_weight_matrix_list",
                             reducedMmats.unadjusted, w, z, reducedMmats,
                             PACKAGE="Matrix")
+#str(reducedMmats)
+#print(summary(reducedMmats$.Xy[, 1]))
+
+#print(summary(ranef(reducedObj)[[1]]))
+                  
+
+
                       .Call("ssclme_update_mm", reducedObj, facs, reducedMmats,
                             PACKAGE="Matrix")
+#                      if (firstIter)
+#                      {
+#                          .Call("ssclme_initial", obj, PACKAGE="Matrix")
+#      firstIter <- FALSE
+#                      }
+#print(reducedObj@status)
+
+#print(reducedObj@deviance)
+#print(summary(reducedObj@devComp))
+#print(summary(ranef(reducedObj)[[1]]))
+
+
                       eta[] <- off + 
                           .Call("ssclme_fitted", reducedObj, facs,
                                 reducedMmats.unadjusted, TRUE,
-                                PACKAGE = "Matrix")
+                                PACKAGE = "Matrix") -
+                                    .Call("ssclme_fitted", reducedObj, facs,
+                                          reducedMmats.unadjusted, FALSE,
+                                          PACKAGE = "Matrix")
+
+
+#print(reducedObj@status)
+#str(reducedObj)
+
+
+#print(summary(data.frame(w = w, eta = eta)))
 #print(mean(eta), digits = 12)
                       ##cat(paste("bhat Criterion:", max(abs(eta - etaold)) /
                       ##          (0.1 + max(abs(eta))), "\n"))
@@ -345,10 +407,26 @@ setMethod("GLMM",
                   ## ranef(reducedObj) and reducedObj@bVar (?). But
                   ## the mu-scale response will be useful for log-lik
                   ## calculations later, so return them anyway
-
+#print(mean(ranef(reducedObj)[[1]]))
                   invisible(family$linkinv(eta)) 
               }
 
+#bhat(c(fixef(obj), coef(obj, unconst = TRUE)))
+#print(summary(ranef(obj)[[1]]))
+#print(summary(ranef(reducedObj)[[1]]))
+#print("fitted wo re")
+#print(summary(.Call("ssclme_fitted", reducedObj, facs,
+#                    reducedMmats.unadjusted, FALSE,
+#                    PACKAGE = "Matrix")))
+#print(summary(.Call("ssclme_fitted", reducedObj, facs,
+#                    reducedMmats.unadjusted, TRUE,
+#                    PACKAGE = "Matrix")))
+#print(summary(ranef(reducedObj)[[1]]))
+#print(fixef(reducedObj))
+
+
+
+              
 
           ## function that calculates log likelihood (the thing that
           ## needs to get evaluated at each Gauss-Hermite location)
@@ -365,6 +443,9 @@ setMethod("GLMM",
               cat("Value:\n\t")
 
               mu <- bhat(pars = pars)  ## gets correct values of bhat and bvars
+#print(summary(ranef(reducedObj)[[1]]))
+
+
 #print(mean(mu), digits = 12)
 #print(densityplot(~mu, groups = mmats.unadjusted$.Xy[, responseIndex]))
 #print(mean(mmats.unadjusted$.Xy[, responseIndex]))
@@ -422,8 +503,30 @@ setMethod("GLMM",
               -ans 
           }
 
+
+
           if (method == "Laplace")
           {
+
+
+
+
+
+# loglikLaplace(c(-0.00866819130092, 0.93670968021641, 2.04058451796758))
+# loglikLaplace(c(-0.00866819758941,  0.93670988950570, 2 * 1.02028559177603))
+
+# # new optimum
+# loglikLaplace(c(-0.00238011172953,  0.93233959123052,  3.11188910750719))
+# ## old optimum
+# loglikLaplace(c(-0.00883548391039,  0.95087135525459,  2 * 1.12915375037339))
+
+
+# stop("stopping")
+
+
+
+
+
               cat(paste("Using optimizer", controlvals$optim), "\n")
 
               if (controlvals$optimizer == "optim") {
@@ -482,9 +585,11 @@ setMethod("GLMM",
                       coef(obj, unconst = TRUE) <- nlmRes$estimate[responseIndex:length(nlmRes$estimate)]
                       print(coef(obj, unconst = TRUE))
                   }
-                  ## need to calculate likelihood
               }
+              ## need to calculate likelihood
 
+              ## also need to store new estimates of fixed effects
+              ## somewhere (probably cannot update standard errors)
           }
 
 
