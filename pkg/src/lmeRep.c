@@ -17,12 +17,6 @@ int coef_length(int nf, const int nc[])
     return ans;
 }
 
-SEXP lmeRep_validate(SEXP x)
-{
-    /* FIXME: add checks for correct dimensions, modes, etc. */
-    return ScalarLogical(1);
-}
-
 static
 SEXP lmeRep_alloc3Darray(int TYP, int nr, int nc, int nf)
 {
@@ -30,6 +24,70 @@ SEXP lmeRep_alloc3Darray(int TYP, int nr, int nc, int nf)
     
     INTEGER(dd)[0] = nr; INTEGER(dd)[1] = nc; INTEGER(dd)[2] = nf;
     val = allocArray(TYP, dd);
+    UNPROTECT(1);
+    return val;
+}
+
+SEXP lmeRep_validate(SEXP x)
+{
+    /* FIXME: add checks for correct dimensions, modes, etc. */
+    return ScalarLogical(1);
+}
+
+SEXP
+lmeRep_crosstab(SEXP facs)
+{
+    int I = length(facs), nobs, pos = 0;
+    int Ic2 = (I * (I - 1))/2;	/* I choose 2 */
+    SEXP fac, levs, val = PROTECT(allocVector(VECSXP, Ic2));
+    
+    if (!isNewList(facs))
+	error("Argument facs must be a list");
+    nobs = length(VECTOR_ELT(facs, 0));
+
+    if (Ic2 > 0) {
+	int i, j, k, *nlevs = Calloc(I, int), *itmp = Calloc(nobs, int),
+	    *zb = Calloc(nobs * I, int); /* zero-based indices */
+	double *xtmp = Calloc(nobs, double), *atmp = Calloc(nobs, double);
+
+	for (i = 0; i < nobs; i++) xtmp[i] = 1.;
+	for (i = 0; i < I; i++) {
+	    fac = VECTOR_ELT(facs, i);
+	    if (!isFactor(fac) || length(fac) <= 0)
+		error("All elements of facs must be nonnull factors");
+	    if (length(fac) != nobs)
+		error("All elements of facs must have the same length");
+	    nlevs[i] = length(getAttrib(fac, R_LevelsSymbol));
+	    for (k = 0; k < nobs; k++) zb[i * nobs + k] = INTEGER(fac)[k] - 1;
+	    for (j = 0; j < i; j++) {
+		SEXP mm;
+		int *Dims, *mp, *mi, nz;
+		double *mx;
+
+		SET_VECTOR_ELT(val, pos, NEW_OBJECT(MAKE_CLASS("cscMatrix")));
+		mm = VECTOR_ELT(val, pos);
+		SET_SLOT(mm, Matrix_DimSym, allocVector(INTSXP, 2));
+		Dims = INTEGER(GET_SLOT(mm, Matrix_DimSym));
+		Dims[0] = nlevs[i]; Dims[1] = nlevs[j];
+		SET_SLOT(mm, Matrix_pSym, allocVector(INTSXP, nlevs[j] + 1));
+		mp = INTEGER(GET_SLOT(mm, Matrix_pSym));
+		triplet_to_col(nlevs[i], nlevs[j], nobs,
+			       zb + i * nobs, zb + j * nobs,
+			       xtmp, mp, itmp, atmp);
+		nz = mp[nlevs[j]];
+		SET_SLOT(mm, Matrix_iSym, allocVector(INTSXP, nz));
+		mi = INTEGER(GET_SLOT(mm, Matrix_iSym));
+		SET_SLOT(mm, Matrix_xSym, allocVector(REALSXP, nz));
+		mx = REAL(GET_SLOT(mm, Matrix_xSym));
+		for (k = 0; k < nz; k++) {
+		    mx[k] = atmp[k];
+		    mi[k] = itmp[k];
+		}
+		pos++;
+	    }
+	}
+	Free(nlevs); Free(itmp); Free(xtmp); Free(atmp); Free(zb);
+    }
     UNPROTECT(1);
     return val;
 }

@@ -2,6 +2,7 @@
 #define MATRIX_LMEUTILS_H
 
 #include "Mutils.h"
+#include "triplet_to_col.h"
 #include <R_ext/Lapack.h>
 #include <R_ext/Constants.h>
 
