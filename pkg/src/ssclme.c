@@ -1356,6 +1356,11 @@ SEXP ssclme_Hessian(SEXP x, SEXP REMLp, SEXP Uncp)
 	    REAL(ans)[j * ncoef + i] = (REAL(ans)[j * ncoef + i] - REAL(gradient)[i])/
 		delta;
 	UNPROTECT(1);
+	/* symmetrize */
+	for (i = 0; i < j; i++) {
+	    REAL(ans)[j * ncoef + i] = REAL(ans)[i * ncoef + j] =
+		(REAL(ans)[j * ncoef + i] + REAL(ans)[i * ncoef + j])/2.;
+	}
     }
     UNPROTECT(3);
     return ans;
