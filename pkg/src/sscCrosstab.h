@@ -3,10 +3,13 @@
 
 #include "Mutils.h"
 #include "ldl.h"
-#include "Metis_utils.h"
 
 SEXP sscCrosstab(SEXP flist, SEXP upper);
-SEXP sscCrosstab_L_LI_sizes(SEXP ctab, SEXP permexp);
+extern void ssc_metis_order(int n, const int Tp [], const int Ti [],
+			    int Perm[], int iPerm[]);
 SEXP sscCrosstab_groupedPerm(SEXP ctab);
+/* Only used for testing - will be removed */
+extern void ssclme_fill_LIp(int n, const int Parent[], int LIp[]);
+SEXP sscCrosstab_L_LI_sizes(SEXP ctab, SEXP permexp);
 
 #endif

@@ -72,8 +72,6 @@ SEXP sscCrosstab(SEXP flist, SEXP upper)
     return val;
 }
 
-extern void ssclme_fill_LIp(int n, const int Parent[], int LIp[]);
-
 SEXP sscCrosstab_L_LI_sizes(SEXP ctab, SEXP permexp)
 {
     SEXP ans = PROTECT(allocVector(INTSXP, 4));
@@ -103,127 +101,60 @@ SEXP sscCrosstab_L_LI_sizes(SEXP ctab, SEXP permexp)
     return ans;
 }
 
-/** 
- * Check for a nested series of grouping factors in the sparse,
- * symmetric representation of the pairwise cross-tabulations.
- * 
- * @param n size of pairwise cross-tabulation matrix
- * @param nf number of groups of columns in pairwise cross-tabulation
- * @param upper non-zero if the upper triangle is stored
- * @param Ap array of pointers to columns
- * @param Ai row indices
- * @param Gp array of pointers to groups
- * 
- * @return 0 for non-nested groups, 1 for nested groups
- */
 static
-int ctab_isNested(int n, int nf, int upper,
-		  const int Ap[], const int Ai[], const int Gp[])
+void col_metis_order(int j0, int j1, int i2,
+		     const int Tp[], const int Ti[], int ans[])
 {
-    if (nf > 1) {  /* single factor always nested */
-	int  i;
-	if (upper) {
-	    int *nnz = (int *) R_alloc(n, sizeof(int)), nz = Ap[n];
-				/* count number of nonzeros in each row */
-	    for (i = 0; i < n; i++) nnz[i] = 0;
-	    for (i = 0; i < nz; i++) nnz[Ai[i]]++;
-	    for (i = 0; i < nf; i++) {
-		int j, p2 = Gp[i+1], target = nf - i;
-		for (j = Gp[i]; j < p2; j++) {
-		    if (nnz[j] != target) return 0;
-		}
-	    }
-	} else {		/* lower triangle - the easy case */
-	    for (i = 0; i < nf; i++) {
-		int j, p2 = Gp[i+1], target = nf - i;
-		for (j = Gp[i]; j < p2; j++) {
-		    if ((Ap[j+1] - Ap[j]) != target)
-			return 0;
-		}
-	    }
+    int j, nz = 0;		/* count off-diagonal pairs */
+    for (j = j0; j < j1; j++) {	/* columns of interest */
+	int ii, nr = 0, p2 = Tp[j + 1];
+	for (ii = Tp[j]; ii < p2; ii++) {
+	    int i = Ti[ii];
+	    if (j1 <= i && i < i2) nr++; /* verify row index */
 	}
+	nz += (nr * (nr - 1))/2; /* add number of pairs of rows */
     }
-    return 1;
-}
+    if (nz > 0) {		/* Form an ssc Matrix */
+	int j, n = i2 - j1,	/* number of rows */
+	    nnz = n + nz, pos;
+	int *Ap = Calloc(n + 1, int),
+	    *Ai = Calloc(nnz, int),
+	    *Tj = Calloc(nnz, int),
+	    *TTi = Calloc(nnz, int);
+	double			/* needed for triplet_to_col */
+	    *Ax = Calloc(nnz, double), /* FIXME: change triplet_to_col */
+	    *Tx = Calloc(nnz, double); /* to check for null pointers */
+	idxtype *perm = Calloc(n, idxtype),
+	    *iperm = Calloc(n, idxtype);
 
-/** 
-  * Determine the inverse of the permutation of the rows of the sparse,
-  * column-oriented matrix represented by m, n, Ap and Ai that will
-  * concentrate non-zeros in the lower rows.
-  * 
-  * @param m number of rows in the matrix
-  * @param n number of columns in the matrix
-  * @param Ap column pointers in Ai (modified)
-  * @param Ai row indices (modified)
-  * @param rperm on return contains the permutation of the rows
-  * @param cperm if non-null, on return contains the permutation of the columns
-  */
-static
-void pair_perm(int m, int n, int Ap[], int Ai[], int rperm[], int cperm[])
-{
-    int *cc = Calloc(n, int),	/* column counts */
-	*cm = Calloc(n, int),	/* column removed */
-	*sm = Calloc(m, int),	/* sum of column removals for this row */
-	ii, j, pc,
-	*rc = Calloc(m, int);	/* row counts */
-    
-    for (j = 0; j < n; j++) {	/* initialize col counts */
-	cc[j] = Ap[j+1] - Ap[j];
-	cm[j] = 0;
-    }
-    pc = 0;
-    for (ii = m - 1; 0 <= ii; ii--) { /* fill rperm from RHS */
-	int maxrc, rr;
-	int i, mincc, p1, p3;
-	
-	mincc = m + 1;		/* find minimum positive cc */
-	for (j = 0; j < n; j++) {
-	    if (0 < cc[j] && cc[j] < mincc) mincc = cc[j];
-	    if (mincc < 2) break;
+	for (j = 0; j < n; j++) { /* diagonals */
+	    TTi[j] = Tj[j] = j;
+	    Tx[j] = 1.;
 	}
-	
-	for (i = 0; i < m; i++) {sm[i] = rc[i] = 0;}
-	for (j = 0; j < n; j++) { /* row counts for cols where cc = mincc */
-	    if (cc[j] == mincc) {
-		int p2 = Ap[j+1];
-		for (i = Ap[j]; i < p2; i++) {
-		    rc[Ai[i]]++;
-		    sm[Ai[i]] += cm[j];
+	pos = n;
+	for (j = j0; j < j1; j++) { /* create the pairs */
+	    int ii, nr = 0, p2 = Tp[j + 1];
+	    for (ii = Tp[j]; ii < p2; ii++) {
+		int r1 = Ti[ii], i1;
+		if (j1 <= r1 && r1 < i2) {
+		    for (i1 = ii + 1; i1 < p2; i1++) {
+			int r2 = Ti[i1];
+			if (r2 < i2) {
+			    TTi[pos] = r2 - j1;
+			    Tj[pos] = r1 - j1;
+			    Tx[pos] = 1.;
+			    pos++;
+			}
+		    }
 		}
 	    }
 	}
-	maxrc = -1;		/* find rows with rc[i] == max(rc) */
-	for (i = 0; i < m; i++) {
-	    int ic = rc[i];
-				/* Choose first on row count.  Ties go
-	                         * to smaller sum of moved.  Ties
-	                         * there go to the last one. */
-	    if (ic > maxrc || (ic == maxrc && sm[i] >= sm[rr])) {
-		maxrc = ic;
-		rr = i;
-	    }
-	}
-
-	rperm[rr] = ii;
-
-	p1 = p3 = 0;		/* update cc, Ap and Ai */
-	for (j = 0; j < n; j++) {
-	    int p2 = Ap[j+1];
-	    for (i = Ap[j]; i < p2; i++) {
-		if (Ai[i] == rr) {
-		    cc[j]--; cm[j]++; /* move from count to removed */
-		    if (cperm && cc[j] < 1) cperm[j] = pc++;
-		} else {
-		    if (i != p1) Ai[p1] = Ai[i];
-		    p1++;
-		}
-	    }
-	    Ap[j] = p3;
-	    p3 = p1;		/* save current pos for next iteration */
-	}
-	Ap[n] = p3;
+	triplet_to_col(n, n, nnz, TTi, Tj, Tx, Ap, Ai, Ax);
+	ssc_metis_order(n, Ap, Ai, perm, iperm);
+	for (j = j1; j < i2; j++) ans[j] = j1 + iperm[j - j1];
+	Free(Tx); Free(Ax); Free(TTi); Free(Tj); Free(Ai); Free(Ap);
+	Free(perm); Free(iperm);
     }
-    Free(cc); Free(cm); Free(rc); 
 }
 
 SEXP sscCrosstab_groupedPerm(SEXP ctab)
