@@ -71,15 +71,11 @@ setMethod("GLMM", signature(formula = "formula",
                 mCall, PACKAGE = "Matrix")
       })
 
-
-
-
-
 make.glm.call <- 
     function (mf, frm) 
 {
-    m <- match(c("formula", "family", "data", "weights", "subset", "na.action", 
-        "offset"), names(mf), 0)
+    m <- match(c("formula", "family", "data", "weights",
+                 "subset", "na.action", "offset"), names(mf), 0)
     mf <- mf[c(1, m)]
     mf[[1]] <- as.name("glm")
     ## environment(frm) = environment(formula) ???
@@ -89,15 +85,6 @@ make.glm.call <-
     mf$y = TRUE
     mf
 }
-
-
-
-
-
-
-
-
-
 
 setMethod("GLMM",
           signature(formula = "formula",
@@ -135,7 +122,8 @@ setMethod("GLMM",
           offset <- if (is.null(glm.fit$offset)) 0 else glm.fit$offset
           weights <- sqrt(abs(glm.fit$prior.weights))
           ## initial 'fitted' values on linear scale
-          eta <- glm.fit$linear.predictors  ## FIXME: does this include offsets (make sure it does)
+          eta <- glm.fit$linear.predictors
+          ## FIXME: does this include offsets (make sure it does)
           etaold <- eta
 
           ## END using glm fit results
@@ -144,7 +132,7 @@ setMethod("GLMM",
           ## FIXME: Not clear how (user specified) offset works. It
           ## doesn't make sense for it to be an offset for the
           ## response on the mu scale, so I'm assuming it's on the
-          ## response scale
+          ## linear predictor scale
 
 
           data <- eval(make.mf.call(match.call(expand.dots = FALSE),
@@ -167,7 +155,6 @@ setMethod("GLMM",
           obj <-  ## creates ssclme structure
               .Call("ssclme_create", facs,
                     unlist(lapply(mmats.unadjusted, ncol)),
-                    as.integer(controlvals$maxLIsize),
                     PACKAGE = "Matrix")
           facs = facshuffle(obj, facs)
           obj = obj[[1]]
@@ -176,7 +163,7 @@ setMethod("GLMM",
           ## going to use both mmats and mmats.unadjusted as arguments
           ## in a .Call where one of them will be modified (don't want
           ## the other to be modified as well)
-          mmats[[1]][1,1] <- 1 
+          mmats[[1]][1,1] <- mmats[[1]][1,1]
           conv <- FALSE
           firstIter <- TRUE
           msMaxIter.orig <- controlvals$msMaxIter
@@ -202,13 +189,11 @@ setMethod("GLMM",
               eta[] <- offset + ## FIXME: should the offset be here ?
                   .Call("ssclme_fitted", obj, facs,
                         mmats.unadjusted, TRUE, PACKAGE = "Matrix")
+              crit <- max(abs(eta - etaold)) / (0.1 + max(abs(eta)))
               cat(paste("Iteration", iter,"Termination Criterion:",
-                        format(max(abs(eta - etaold)) /
-                        (0.1 + max(abs(eta)))), "\n"))
+                        format(crit), "\n"))
               ## use this to determine convergence
-              if (max(abs(eta - etaold)) <
-                  (0.1 + max(abs(eta))) * controlvals$tolerance)
-              {
+              if (crit < controlvals$tolerance) {
                   conv <- TRUE
                   break
               }
@@ -267,15 +252,17 @@ setMethod("GLMM",
               {
                   if (is.null(pars))
                   {
-                      off <- drop(mmats.unadjusted$.Xy %*% c(fixef(obj), 0)) + offset
+                      off <- drop(mmats.unadjusted$.Xy %*%
+                                  c(fixef(obj), 0)) + offset
                   }
                   else
                   {
                       .Call("ssclme_coefGetsUnc",
-                            reducedObj, as.double(pars[responseIndex:length(pars)]), PACKAGE = "Matrix")
+                            reducedObj,
+                            as.double(pars[responseIndex:length(pars)]),
+                            PACKAGE = "Matrix")
                       off <- drop(mmats.unadjusted$.Xy %*%
                                   c(pars[1:(responseIndex-1)], 0)) + offset
-
                   }
 
                   niter <- 20
@@ -284,18 +271,15 @@ setMethod("GLMM",
                   eta <- offset + 
                       .Call("ssclme_fitted", obj, facs,
                             mmats.unadjusted, TRUE, PACKAGE = "Matrix")
-#                  eta <- off +
-#                      .Call("ssclme_fitted", reducedObj, facs,
-#                            reducedMmats.unadjusted, TRUE, PACKAGE = "Matrix")
                   etaold <- eta
-                  
                   
                   for (iter in seq(length = niter))
                   {
                       mu <- family$linkinv(eta)
                       dmu.deta <- family$mu.eta(eta)
                       w <- weights * dmu.deta / sqrt(family$variance(mu))
-                      z <- eta - off + (reducedMmats.unadjusted$.Xy[, 1] - mu) / dmu.deta 
+                      z <- eta - off + (reducedMmats.unadjusted$.Xy[, 1]
+                                        - mu) / dmu.deta 
                       .Call("nlme_weight_matrix_list",
                             reducedMmats.unadjusted, w, z, reducedMmats,
                             PACKAGE="Matrix")
@@ -315,13 +299,13 @@ setMethod("GLMM",
                           break
                       }
                       etaold[] <- eta
-
+                      
                   }
                   if (!conv) warning("iterations for bhat did not converge")
 
                   ## bhat doesn't really need to return anything, we
                   ## just want the side-effect of modifying reducedObj
-                  ## In particular, We are interested in
+                  ## In particular, we are interested in
                   ## ranef(reducedObj) and reducedObj@bVar (?). But
                   ## the mu-scale response will be useful for log-lik
                   ## calculations later, so return them anyway
@@ -336,9 +320,9 @@ setMethod("GLMM",
 
           ## function that calculates log likelihood (the thing that
           ## needs to get evaluated at each Gauss-Hermite location)
-
+          
           ## log scale ? worry about details later, get the pieces in place
-
+          
           ## this is for the Laplace approximation only. GH is more
           ## complicated 
 
@@ -352,13 +336,13 @@ setMethod("GLMM",
               ## FIXME: need to adjust for sigma^2 for appropriate models (not trivial!)
 
               ## Keep everything on (log) likelihood scale
-
+              
               ## log lik from observations given fixed and random effects
               ## get deviance, then multiply by -1/2 (since deviance = -2 log lik)
-              ans <- 
-                  -0.5 * sum(family$dev.resids(y = mmats.unadjusted$.Xy[, responseIndex],
-                                               mu = mu,
-                                               wt = weights^2))
+              ans <- -sum(family$dev.resids(y = mmats.unadjusted$.Xy[,
+                                            responseIndex],
+                                            mu = mu,
+                                            wt = weights^2))/2
               ranefs <- ranef(reducedObj)
               Omega <- reducedObj@Omega
               for (i in seq(along = ranefs))
@@ -373,15 +357,18 @@ setMethod("GLMM",
                   ## FIXME: need to adjust for sigma^2 for appropriate models (easy)
                   ## these are all the b'Omega b, summed as they eventually need to be
                   ## think of this as sum(rowSums((ranefs[[i]] %*% Omega[[i]]) * ranefs[[i]]))
-
-                  ranef.loglik.det <- 0.5 * nrow(ranefs[[i]]) * determinant(Omega[[i]], logarithm = TRUE)$modulus
-                  ranef.loglik.re <- -0.5 * sum((ranefs[[i]] %*% Omega[[i]]) * ranefs[[i]])
-
+                  
+                  ranef.loglik.det <- nrow(ranefs[[i]]) *
+                      determinant(Omega[[i]], logarithm = TRUE)$modulus/2
+                  ranef.loglik.re <- -sum((ranefs[[i]] %*% Omega[[i]]) *
+                                          ranefs[[i]])/2
                   ranef.loglik <- ranef.loglik.det + ranef.loglik.re
 
                   ## Jacobian adjustment
-                  log.jacobian <- sum(log(abs(apply(reducedObj@bVar[[i]], 3, function(x) sum(diag(x))))))
-
+                  log.jacobian <- sum(log(abs(apply(reducedObj@bVar[[i]],
+                                                    3,
+                                                    function(x) sum(diag(x)))
+                                              )))
                   ans <- ans + ranef.loglik + log.jacobian
               }
               ## ans is (upto some constant) log of the Laplacian
@@ -396,8 +383,6 @@ setMethod("GLMM",
 
               -ans 
           }
-
-
 
           if (method == "Laplace")
           {
@@ -419,13 +404,15 @@ setMethod("GLMM",
                   optpars <- optimRes$par
                   ##fixef(obj) <- optimRes$par[seq(length = responseIndex - 1)]
                   if (getOption("verbose")) {
-                      cat(paste("optim convergence code", optimRes$convergence, "\n"))
-                      cat("Fixed effets:\n")
+                      cat(paste("optim convergence code",
+                                optimRes$convergence, "\n"))
+                      cat("Fixed effects:\n")
                       print(fixef(obj))
                       print(optimRes$par[seq(length = responseIndex - 1)])
-                      cat("(Unconstrinaed) variance coefficients:\n")
+                      cat("(Unconstrained) variance coefficients:\n")
                       print(coef(obj, unconst = TRUE))
-                      coef(obj, unconst = TRUE) <- optimRes$par[responseIndex:length(optimRes$par)]
+                      coef(obj, unconst = TRUE) <-
+                          optimRes$par[responseIndex:length(optimRes$par)]
                       print(coef(obj, unconst = TRUE))
                   }
               }
@@ -433,11 +420,13 @@ setMethod("GLMM",
               {
                   ## not sure what the next few lines are for. Copied from Saikat's code
                   ## typsize <- 1/controlvals$msScale(coef(obj))
-                  typsize <- rep(1.0, length(coef(obj, unconst = TRUE)) + responseIndex - 1)
+                  typsize <- rep(1.0, length(coef(obj, unconst = TRUE)) +
+                                 responseIndex - 1)
                   if (is.null(controlvals$nlmStepMax))
                       controlvals$nlmStepMax <-
                           max(100 * sqrt(sum((c(fixef(obj),
-                                                coef(obj, unconst = TRUE))/typsize)^2)), 100)
+                                                coef(obj, unconst = TRUE))/
+                                              typsize)^2)), 100)
                   nlmRes =
                       nlm(f = loglikLaplace, 
                           p = c(fixef(obj), coef(obj, unconst = TRUE)),
@@ -450,15 +439,17 @@ setMethod("GLMM",
                           iterlim = controlvals$msMaxIter)
                   if (nlmRes$code > 3) warning("nlm probably failed to converge")
                   optpars <- nlmRes$estimate
-
+                  
                   if (getOption("verbose")) {
                       cat(paste("nlm convergence code", nlmRes$code, "\n"))
-                      cat("Fixed effets:\n")
+                      cat("Fixed effects:\n")
                       print(fixef(obj))
                       print(nlmRes$estimate[seq(length = responseIndex - 1)])
-                      cat("(Unconstrinaed) variance coefficients:\n")
+                      cat("(Unconstrained) variance coefficients:\n")
                       print(coef(obj, unconst = TRUE))
-                      coef(obj, unconst = TRUE) <- nlmRes$estimate[responseIndex:length(nlmRes$estimate)]
+                      coef(obj, unconst = TRUE) <-
+                          nlmRes$estimate[responseIndex:
+                                          length(nlmRes$estimate)]
                       print(coef(obj, unconst = TRUE))
                   }
               }
@@ -483,19 +474,47 @@ setMethod("GLMM",
           ## coefs) (with standard errors from hessian ?) and
           ## (Laplace) approximate log likelihood.
 
-          new("lme", call = match.call(), facs = facs,
+          new("GLMM", call = match.call(), facs = facs,
               x = if (x) mmats else list(),
               model = if(model) data else data.frame(list()),
-              REML = FALSE, rep = obj, fitted = eta)
+              REML = FALSE, rep = obj, fitted = eta, logLik = loglik,
+              fixef = optpars[1:(responseIndex-1)])
       })
 
+setMethod("summary", signature(object = "GLMM"),
+          function(object, ...) summary(as(object, "lme"), ...))
 
+setMethod("logLik", signature(object = "GLMM"),
+          function(object, ...) {
+              val = object@logLik
+              rr = object@rep
+              nc = rr@nc[-seq(a = rr@Omega)]
+              attr(val, "nall") = attr(val, "nobs") = nc[2]
+              attr(val, "df") = nc[1] + length(coef(rr))
+              attr(val, "REML") = FALSE
+              class(val) <- "logLik"
+              val
+          })
 
+setMethod("deviance", signature(object = "GLMM"),
+          function(object, ...) -2 * object@logLik)
 
+setMethod("show", signature(object = "GLMM"),
+          function(object) show(as(object, "lme")))
 
+setMethod("fixef", signature(object = "GLMM"),
+          function(object) object@fixef)
 
+setMethod("ranef", signature(object = "GLMM"),
+          function(object, ...)
+      {
+          object = object@rep
+          callGeneric()
+      })
 
-
-### Local variables:
-### mode: R
-### End:
+setMethod("coef", signature(object = "GLMM"),
+          function(object, ...)
+      {
+          object = object@rep
+          callGeneric()
+      })

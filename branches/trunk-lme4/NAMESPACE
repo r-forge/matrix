@@ -59,6 +59,7 @@ export(
        )
 
 exportClasses(
+              "GLMM",
               "VarCorr",
               "groupedData",
               "lmList",
