@@ -1,13 +1,13 @@
-setAs("tripletMatrix", "cscMatrix",
-      function(from) .Call("triplet_to_csc", from) )
+setAs("dgTMatrix", "dgCMatrix",
+      function(from) .Call("dgTMatrix_to_csc", from) )
 
-setAs("tripletMatrix", "geMatrix",
-      function(from) .Call("triplet_to_geMatrix", from) )
+setAs("dgTMatrix", "dgeMatrix",
+      function(from) .Call("dgTMatrix_to_dgeMatrix", from) )
 
-setAs("tripletMatrix", "matrix",
-      function(from) .Call("triplet_to_matrix", from) )
+setAs("dgTMatrix", "matrix",
+      function(from) .Call("dgTMatrix_to_matrix", from) )
 
-setMethod("image", "tripletMatrix",
+setMethod("image", "dgTMatrix",
           function(x,
                    xlim = c(-0.5, matdim[2]-0.5),
                    ylim = c(matdim[1]-0.5, -0.5),
@@ -50,20 +50,20 @@ setMethod("image", "tripletMatrix",
                 }, ...)
       })
 
-## MM: probably rather use groupGeneric "Arith" here -- or for "geMatrix" !
-setMethod("+", signature(e1 = "tripletMatrix", e2 = "tripletMatrix"),
+## MM: probably rather use groupGeneric "Arith" here -- or for "dgeMatrix" !
+setMethod("+", signature(e1 = "dgTMatrix", e2 = "dgTMatrix"),
           function(e1, e2) {
               if (any(e1@Dim != e2@Dim))
                   error("Dimensions not compatible for addition")
-              new("tripletMatrix", i = c(e1@i, e2@i), j = c(e1@j, e2@j),
+              new("dgTMatrix", i = c(e1@i, e2@i), j = c(e1@j, e2@j),
                   x = c(e1@x, e2@x), Dim = e1@Dim)
           })
 
-setMethod("t", signature(x = "tripletMatrix"),
+setMethod("t", signature(x = "dgTMatrix"),
           function(x)
-          new("tripletMatrix", i = x@j, j = x@i, x = x@x, Dim = rev(x@Dim)))
+          new("dgTMatrix", i = x@j, j = x@i, x = x@x, Dim = rev(x@Dim)))
 
-setMethod("isSymmetric", signature(object = "tripletMatrix"),
+setMethod("isSymmetric", signature(object = "dgTMatrix"),
           ## This is not a complete test.  Probably use .Call for complete test.
           function(object, ...) {
               i <- object@i
@@ -71,7 +71,7 @@ setMethod("isSymmetric", signature(object = "tripletMatrix"),
               all(sort(paste(i, j, sep=':')) == sort(paste(j, i, sep=':')))
           })
 
-setAs("tripletMatrix", "sscMatrix",
+setAs("dgTMatrix", "sscMatrix",
       function(from) {
           i <- from@i
           j <- from@j
@@ -79,6 +79,6 @@ setAs("tripletMatrix", "sscMatrix",
               from@j[upper] <- i[upper]
               from@i[upper] <- j[upper]
           }
-          as(as(from, "cscMatrix"), "sscMatrix")
+          as(as(from, "dgCMatrix"), "sscMatrix")
       })
 

@@ -17,10 +17,10 @@ setMethod("solve", signature(a = "poMatrix", b = "missing"),
           .Call("poMatrix_solve", a),
           valueClass = "poMatrix")
 
-setMethod("solve", signature(a = "poMatrix", b = "geMatrix"),
+setMethod("solve", signature(a = "poMatrix", b = "dgeMatrix"),
           function(a, b, ...)
-          .Call("poMatrix_geMatrix_solve", a, b),
-          valueClass = "geMatrix")
+          .Call("poMatrix_dgeMatrix_solve", a, b),
+          valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "poMatrix", b = "matrix"),
           function(a, b, ...)

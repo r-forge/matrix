@@ -14,7 +14,7 @@ Matrix <-
         val <- .Internal(matrix(data, nrow, ncol, byrow))
         dimnames(val) <- dimnames
     }
-    as(val, "geMatrix")
+    as(val, "dgeMatrix")
 }
 
 Matrix.class <- function(x, tol = 0, symmetry = TRUE, unit.diagonal = TRUE,

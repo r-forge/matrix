@@ -28,12 +28,12 @@ setMethod("determinant", signature(x = "sscMatrix", logarithm = "logical"),
           val
       })
 
-setAs("sscMatrix", "tripletMatrix",
-      function(from) .Call("sscMatrix_to_triplet", from))
+setAs("sscMatrix", "dgTMatrix",
+      function(from) .Call("sscMatrix_to_dgTMatrix", from))
 
-setAs("sscMatrix", "geMatrix",
-      function(from) as(as(from, "tripletMatrix"), "geMatrix"))
+setAs("sscMatrix", "dgeMatrix",
+      function(from) as(as(from, "dgTMatrix"), "dgeMatrix"))
 
 setAs("sscMatrix", "matrix",
-      function(from) as(as(from, "tripletMatrix"), "matrix"))
+      function(from) as(as(from, "dgTMatrix"), "matrix"))
 

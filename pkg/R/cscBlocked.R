@@ -1,4 +1,4 @@
-setAs("cscBlocked", "cscMatrix",
+setAs("dgBCMatrix", "dgCMatrix",
       function(from) .Call("cscBlocked_2cscMatrix", from))
           
 ##           if (any(dim(from@x)[1:2] != 1))
@@ -7,5 +7,5 @@ setAs("cscBlocked", "cscMatrix",
 ##                  Dim = c(max(from@i) + 1:1, length(from@p) - 1:1))
 ##       })
 
-setAs("cscBlocked", "tripletMatrix",
-      function(from) as(as(from, "cscMatrix"), "tripletMatrix"))
+setAs("dgBCMatrix", "dgTMatrix",
+      function(from) as(as(from, "dgCMatrix"), "dgTMatrix"))
