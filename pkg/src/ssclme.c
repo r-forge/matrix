@@ -1,94 +1,5 @@
 #include "ssclme.h"
 
-/** 
- * Check for a nested series of grouping factors in the sparse,
- *  symmetric representation of the pairwise cross-tabulations.
- * 
- * @param n size of pairwise cross-tabulation matrix
- * @param nf number of groups of columns in pairwise cross-tabulation
- * @param upper non-zero if the upper triangle is stored
- * @param Ap array of pointers to columns
- * @param Ai row indices
- * @param Gp array of pointers to groups
- * 
- * @return 0 for non-nested groups, 1 for nested groups
- */
-static
-int ctab_isNested(int n, int nf, int upper,
-		  const int Ap[], const int Ai[], const int Gp[])
-{
-    if (nf > 1) {  /* single factor always nested */
-	int  i;
-	if (upper) {
-	    int *nnz = (int *) R_alloc(n, sizeof(int)), nz = Ap[n];
-				/* count number of nonzeros in each row */
-	    for (i = 0; i < n; i++) nnz[i] = 0;
-	    for (i = 0; i < nz; i++) nnz[Ai[i]]++;
-	    for (i = 0; i < nf; i++) {
-		int j, p2 = Gp[i+1], target = nf - i;
-		for (j = Gp[i]; j < p2; j++) {
-		    if (nnz[j] != target) return 0;
-		}
-	    }
-	} else {		/* lower triangle - the easy case */
-	    for (i = 0; i < nf; i++) {
-		int j, p2 = Gp[i+1], target = nf - i;
-		for (j = Gp[i]; j < p2; j++) {
-		    if ((Ap[j+1] - Ap[j]) != target)
-			return 0;
-		}
-	    }
-	}
-    }
-    return 1;
-}
-
-/** 
- * Determine if a fill-reducing permutation is needed for the pairwise
- * cross-tabulation matrix.  If so, determine such a permutation
- * (using Metis) then separate the groups.
- * 
- * @param ctab pointer to a pairwise cross-tabulation object
- * 
- * @return pointer to an integer R vector.
- */
-
-SEXP ctab_permute(SEXP ctab)
-{
-    SEXP val, GpSl = GET_SLOT(ctab, Matrix_GpSym);
-    int *Ai = INTEGER(GET_SLOT(ctab, Matrix_iSym)),
-	*Ap = INTEGER(GET_SLOT(ctab, Matrix_pSym)),
-	*Gp = INTEGER(GpSl),
-	*perm,
-	*work,
-	i,
-	j,
-	n = INTEGER(GET_SLOT(ctab, Matrix_DimSym))[1],
-	nf = length(GpSl) - 1,
-	pos;
-
-    if (ctab_isNested(n, nf, 1, Ap, Ai, Gp))
-	return allocVector(INTSXP, 0);
-    val =  allocVector(INTSXP, n);
-    perm = INTEGER(val);
-    work = (int *) R_alloc(n, sizeof(int));
-    ssc_metis_order(n, Ap, Ai, work, perm);	/* perm gets inverse perm */
-    /* work now contains desired permutation but with groups scrambled */
-
-    /* copy work into perm preserving the order of the groups */
-    pos = 0;		/* position in new permutation */
-    for (i = 0; i < nf; i++) {
-	for (j = 0; j < n; j++) {
-	    int jj = work[j];
-	    if (Gp[i] <= jj && jj < Gp[i+1]) {
-		perm[pos] = jj;
-		pos++;
-	    }
-	}
-    }
-    return val;
-}
-
 static
 void ssclme_copy_ctab(int nf, const int nc[], SEXP ctab, SEXP ssc)
 {
@@ -230,7 +141,7 @@ ssclme_create(SEXP facs, SEXP ncv, SEXP threshold)
     ssc = VECTOR_ELT(val, 0);
 				/* Pairwise cross-tabulation */
     ctab = PROTECT(sscCrosstab(facs, ScalarLogical(1)));
-    SET_VECTOR_ELT(val, 1, ctab_permute(ctab));
+    SET_VECTOR_ELT(val, 1, sscCrosstab_groupedPerm(ctab));
     if (length(VECTOR_ELT(val, 1)) > 0) {/* Fill-reducing permutation */
 	ssc_symbolic_permute(INTEGER(GET_SLOT(ctab, Matrix_DimSym))[1],
 			     1, INTEGER(VECTOR_ELT(val, 1)),
@@ -369,6 +280,7 @@ ssclme_update_mm(SEXP x, SEXP facs, SEXP mmats)
 	*Ap = INTEGER(GET_SLOT(x, Matrix_pSym)),
 	*Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
 	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	*status = LOGICAL(GET_SLOT(x, Matrix_statusSym)),
 	i, j, k,
 	ione = 1,
 	nf = length(mmats) - 1,
@@ -471,6 +383,7 @@ ssclme_update_mm(SEXP x, SEXP facs, SEXP mmats)
     }
     Free(Z);
     ssclme_transfer_dimnames(x, facs, mmats);
+    status[0] = status[1] = 0;
     return R_NilValue;
 }
 
@@ -1263,7 +1176,6 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
         alpha,
 	one = 1.;
     SEXP ans = PROTECT(allocVector(REALSXP, coef_length(nf, nc)));
-    int *status = LOGICAL(GET_SLOT(x, Matrix_statusSym));
 
     ssclme_factor(x);
     if (!R_FINITE(REAL(GET_SLOT(x, Matrix_devianceSym))[0])) {

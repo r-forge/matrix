@@ -2,8 +2,6 @@
 #define MATRIX_SSCLME_H
 
 #include "sscCrosstab.h"
-#include "ldl.h"
-#include "Metis_utils.h"
 #include <R_ext/Lapack.h>
 #include <R_ext/Constants.h>
 

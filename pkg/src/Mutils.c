@@ -215,6 +215,15 @@ SEXP cscMatrix_set_Dim(SEXP x, int nrow)
     return x;
 }
 
+/** 
+ * Check for unsorted columns in the row indices
+ * 
+ * @param ncol number of columns
+ * @param p column pointers
+ * @param i row indices
+ * 
+ * @return 0 if all columns are sorted, otherwise 1
+ */
 int csc_unsorted_columns(int ncol, const int p[], const int i[])
 {
     int j;
@@ -227,6 +236,15 @@ int csc_unsorted_columns(int ncol, const int p[], const int i[])
     return 0;
 }
 
+/** 
+ * Sort the columns in a sparse column-oriented matrix so that each
+ * column is in increasing order of row index.
+ * 
+ * @param ncol number of columns
+ * @param p column pointers
+ * @param i row indices
+ * @param x values of nonzero elements
+ */
 void csc_sort_columns(int ncol, const int p[], int i[], double x[])
 {
     int j, maxdiff, *ord;
@@ -252,6 +270,14 @@ void csc_sort_columns(int ncol, const int p[], int i[], double x[])
     Free(ord); Free(dd);
 }
 
+/** 
+ * Check for sorted columns in an object that inherits from the
+ * cscMatrix class.  Resort the columns if necessary.
+ * 
+ * @param m pointer to an object that inherits from the cscMatrix class
+ * 
+ * @return m with the columns sorted by increasing row index
+ */
 SEXP csc_check_column_sorting(SEXP m)
 {
     int *mp = INTEGER(GET_SLOT(m, Matrix_pSym)),
