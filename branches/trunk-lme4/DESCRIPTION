@@ -9,3 +9,4 @@ Description: Fit linear and generalized linear mixed-effects models.
 Depends: methods, R(>= 1.9.0), lattice, Matrix(>= 0.8-9)
 Suggests: lattice
 License: GPL version 2 or later
+Packaged: Mon Jul  5 20:00:40 2004; bates

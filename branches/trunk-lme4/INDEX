@@ -19,7 +19,6 @@ Glucose2                Glucose Levels Following Alcohol Ingestion
 Gun                     Methods for firing naval guns
 Hsb82                   High School and Beyond - 1982
 IGF                     Radioimmunoassay of IGF-I Protein
-LMEoptimize<-           Optimize linear mixed-effects
 Machines                Productivity Scores for Machines and Workers
 MathAchSchool           School demographic data for MathAchieve
 MathAchieve             Mathematics achievement scores
@@ -59,6 +58,7 @@ fixed.effects           Extract Fixed Effects
 getCovariate            Utilities for formulas
 groupedData             Creation of groupedData objects
 groupedData-class       Class "groupedData"
+gsummary                Summarize a data frame by group
 guImmun                 Immunization in Guatemala
 guPrenat                Prenatal care in Guatemala
 intervals               Confidence Intervals on Coefficients

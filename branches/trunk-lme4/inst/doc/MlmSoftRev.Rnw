@@ -9,7 +9,7 @@
 \DefineVerbatimEnvironment{Soutput}{Verbatim}
 {formatcom={\vspace{-2.5ex}},fontfamily=courier,fontseries=b,%
   fontsize=\scriptsize}
-%%\VignetteIndexEntry{Sparse matrix representations of linear mixed models}
+%%\VignetteIndexEntry{Examples from Multilevel Software Reviews}
 %%\VignetteDepends{Matrix}
 %%\VignetteDepends{lme4}
 \begin{document}
@@ -31,6 +31,25 @@
 options(width=75)
 library(lme4)
 options(show.signif.stars = FALSE)
+sysgc.time <- function(expr, gcFirst = TRUE)
+{
+    if (!exists("proc.time")) 
+        return(rep(as.numeric(NA), 5))
+    loc.frame <- parent.frame()
+    if (gcFirst) 
+        gc(FALSE)
+    on.exit(cat("Timing stopped at:", proc.time() - time, "\n"))
+    expr <- substitute(expr)
+    time <- proc.time()
+    eval(expr, envir = loc.frame)
+    new.time <- proc.time()
+    on.exit()
+    if (length(new.time) == 3) 
+        new.time <- c(new.time, 0, 0)
+    if (length(time) == 3) 
+        time <- c(time, 0, 0)
+    new.time - time
+}
 @
 
 \section{Introduction}
@@ -45,14 +64,14 @@ normal multilevel models.
 <<ExamData>>=
 data(Exam)
 str(Exam)
-system.time(mE1 <- lme(normexam ~ standlrt + gender + schgend,
+sysgc.time(Em1 <- lme(normexam ~ standLRT + sex + schgend,
                        Exam, ~ 1|school), gc = TRUE)
-summary(mE1)
-system.time(mE2 <- lme(normexam ~ standlrt * gender + schgend, 
+summary(Em1)
+sysgc.time(Em2 <- lme(normexam ~ standLRT * sex + schgend, 
                        Exam, ~ 1|school), gc = TRUE)
-summary(mE2)
-system.time(mE3 <- lme(normexam ~ standlrt * gender + schgend, 
-                       Exam, ~ standlrt|school), gc = TRUE)
+summary(Em2)
+sysgc.time(Em3 <- lme(normexam ~ standLRT * sex + schgend, 
+                       Exam, ~ standLRT|school), gc = TRUE)
 summary(mE3)
 @ 
 
@@ -63,7 +82,7 @@ to combine the indicators of school and student to get a unique
 identifier of the student.
 
 <<ExamIds>>=
-Exam$ids <- (Exam$school : Exam$student)[, drop = TRUE]
+Exam$ids <- interaction(Exam$school, Exam$student, drop = TRUE)
 str(Exam)
 @ 
 Notice that there are 4059 observations but only 4055 unique levels of
@@ -86,9 +105,9 @@ Data from the 1997 A-level Chemistry exam are available as \code{Chem97}.
 <<Chem97>>=
 data(Chem97)
 str(Chem97)
-system.time(mC1 <- lme(score ~ 1, Chem97, ~ 1|lea/school))
+sysgc.time(mC1 <- lme(score ~ 1, Chem97, ~ 1|lea/school))
 summary(mC1)
-system.time(mC2 <- lme(score ~ gcsecnt, Chem97, ~ 1|lea/school))
+sysgc.time(mC2 <- lme(score ~ gcsecnt, Chem97, ~ 1|lea/school))
 summary(mC2)
 @ 
 
@@ -102,14 +121,14 @@ Bangladesh fertility survey.
 data(Contraception)
 str(Contraception)
 summary(Contraception[,-1])
-system.time(mB1 <- GLMM(use ~ urban+age+livch, binomial,
+sysgc.time(mB1 <- GLMM(use ~ urban+age+livch, binomial,
                         Contraception, ~ 1|district))
 summary(mB1)
-system.time(mB2 <- GLMM(use ~ urban+age+livch, binomial,
+sysgc.time(mB2 <- GLMM(use ~ urban+age+livch, binomial,
                         Contraception, ~ 1|district,
                         method = "Laplace"))
 summary(mB2)
-system.time(mB3 <- GLMM(use ~ urban+age+livch, family = binomial,
+sysgc.time(mB3 <- GLMM(use ~ urban+age+livch, family = binomial,
                         data = Contraception,
                         random = ~ urban|district))
 summary(mB3)
@@ -122,10 +141,10 @@ summary(mB3)
 <<Oxboys>>=
 data(Oxboys)
 str(Oxboys)
-system.time(mX1 <- lme(height ~ age + I(age^2) + I(age^3) + I(age^4),
+sysgc.time(mX1 <- lme(height ~ age + I(age^2) + I(age^3) + I(age^4),
                        Oxboys, ~ age + I(age^2)|Subject), gc = TRUE)
 summary(mX1)
-system.time(mX2 <- lme(height ~ poly(age,4), Oxboys, ~ age + I(age^2)|Subject),
+sysgc.time(mX2 <- lme(height ~ poly(age,4), Oxboys, ~ age + I(age^2)|Subject),
             gc = TRUE)
 summary(mX2)
 @ 
@@ -136,7 +155,7 @@ summary(mX2)
 <<ScotsSec>>=
 data(ScotsSec)
 str(ScotsSec)
-system.time(mS1 <- lme(attain ~ sex, ScotsSec, ~ 1|primary+second))
+sysgc.time(mS1 <- lme(attain ~ sex, ScotsSec, ~ 1|primary+second))
 summary(mS1)
 @ 
 

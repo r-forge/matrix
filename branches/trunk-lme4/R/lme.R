@@ -297,11 +297,15 @@ setMethod("show", signature(object = "lme"),
 setMethod("anova", signature(object = "lme"),
           function(object, ...)
       {
-          dots <- list(...)
           mCall <- match.call(expand.dots = TRUE)
-          modp <- sapply(dots, inherits, "lme") | sapply(dots, inherits, "lm")
-          if (!any(modp))
-              stop("single argument anova for lme objects not yet implemented")
+          dots <- list(...)
+          modp <- logical(0)
+          if (length(dots))
+              modp <- sapply(dots, inherits, "lme") | sapply(dots, inherits, "lm")
+          if (!any(modp)) {             # only one model - use terms
+              mCall$object <- substitute(object@rep)
+              return(eval(mCall, parent.frame()))
+          }
           opts <- dots[!modp]
           mods <- c(list(object), dots[modp])
           names(mods) <- sapply(as.list(mCall)[c(FALSE, TRUE, modp)], as.character)
