@@ -32,8 +32,7 @@ expm(x)
 \examples{
 (m1 <- Matrix(c(1,0,1,1), nc = 2))
 (e1 <- expm(m1)) ; e <- exp(1)
-stopifnot(all.equal(as(e1,"matrix"),
-                    cbind(c(e,0), e), tol = 1e-15))
+stopifnot(all.equal(e1@x, c(e,0,e,e), tol = 1e-15))
 (m2 <- Matrix(c(-49, -64, 24, 31), nc = 2))
 (e2 <- expm(m2))
 (m3 <- Matrix(cbind(0,rbind(6*diag(3),0)), nc = 4))
