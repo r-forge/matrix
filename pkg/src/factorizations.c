@@ -36,7 +36,7 @@ SEXP LU_expand(SEXP x)
     SEXP L, U, P, val = PROTECT(Matrix_make_named(VECSXP, nms)),
 	lux = GET_SLOT(x, Matrix_xSym),
 	dd = GET_SLOT(x, Matrix_DimSym);
-    int *perm, *pivot = INTEGER(GET_SLOT(x, Matrix_permSym)),
+    int *iperm, *perm, *pivot = INTEGER(GET_SLOT(x, Matrix_permSym)),
 	i, n = INTEGER(dd)[0];
 
     SET_VECTOR_ELT(val, 0, NEW_OBJECT(MAKE_CLASS("dtrMatrix")));
@@ -56,17 +56,21 @@ SEXP LU_expand(SEXP x)
     SET_SLOT(U, Matrix_diagSym, mkString("N"));
     make_array_triangular(REAL(GET_SLOT(U, Matrix_xSym)), U);
     SET_SLOT(P, Matrix_DimSym, duplicate(dd));
+    iperm = Calloc(n, int);
     perm = INTEGER(ALLOC_SLOT(P, Matrix_permSym, INTSXP, n));
-    for (i = 0; i < n; i++) perm[i] = i + 1;
-    for (i = 0; i < n; i++) {
+			
+    for (i = 0; i < n; i++) iperm[i] = i + 1; /* initialize permutation*/
+    for (i = 0; i < n; i++) {	/* generate inverse permutation */
 	int newpos = pivot[i] - 1;
 	if (newpos != i) {
-	    int tmp = perm[i];
+	    int tmp = iperm[i];
 
-	    perm[i] = newpos + 1;
-	    perm[newpos] = tmp;
+	    iperm[i] = iperm[newpos];
+	    iperm[newpos] = tmp;
 	}
     }
+				/* invert the inverse */
+    for (i = 0; i < n; i++) perm[iperm[i] - 1] = i + 1;
     UNPROTECT(1);
     return val;
 }
