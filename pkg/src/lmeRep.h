@@ -3,12 +3,9 @@
 
 #include "Mutils.h"
 #include "triplet_to_col.h"
+#include "cscBlocked.h"
 #include <R_ext/Lapack.h>
 #include <R_ext/Constants.h>
-
-#ifndef R_INLINE
-#define R_INLINE
-#endif
 
 SEXP lmeRep_validate(SEXP x);
 SEXP lmeRep_crosstab(SEXP facs);
