@@ -156,7 +156,7 @@ setMethod("lme", signature(formula = "formula", random = "list"),
           .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
           .Call("ssclme_initial", obj, PACKAGE="Matrix")
           .Call("ssclme_factor", obj, PACKAGE = "Matrix")
-          .Call("ssclme_EMstepsGets", obj, controlvals$niterEM,
+          .Call("ssclme_EMsteps", obj, controlvals$niterEM,
                 method == "REML", controlvals$EMverbose, PACKAGE = "Matrix")
           new("lme", call = match.call(), facs = facs,
               x = if(x) mmats else list(),
