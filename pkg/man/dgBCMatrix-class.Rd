@@ -1,15 +1,15 @@
-\name{cscBlocked-class}
+\name{dgBCMatrix-class}
 \docType{class}
-\alias{cscBlocked-class}
-\alias{coerce,cscBlocked,dgCMatrix-method}
-\alias{coerce,cscBlocked,dgTMatrix-method}
-\title{Class "cscBlocked" compressed, sparse, blocked Matrix }
+\alias{dgBCMatrix-class}
+\alias{coerce,dgBCMatrix,dgCMatrix-method}
+\alias{coerce,dgBCMatrix,dgTMatrix-method}
+\title{Class "dgBCMatrix" compressed, sparse, blocked Matrix }
 \description{The \code{dgCMatrix} class is a class of sparse matrices in
   the compressed, sparse, column-oriented format.  In this
   implementation the non-zero elements in the columns are sorted into
   increasing row order.}
 \section{Objects from the Class}{
-  Objects can be created by calls of the form \code{new("cscBlocked",
+  Objects can be created by calls of the form \code{new("dgBCMatrix",
     ...)}.
 
   Objects in this class have a structure similar to those in the
@@ -33,9 +33,9 @@
 }
 \section{Methods}{
   \describe{
-    \item{coerce}{\code{signature(from = "cscBlocked", to = "dgCMatrix")}}
-    \item{coerce}{\code{signature(from = "cscBlocked", to = "dgTMatrix")}}
-    \item{coerce}{\code{signature(from = "dgCMatrix", to = "cscBlocked")}}
+    \item{coerce}{\code{signature(from = "dgBCMatrix", to = "dgCMatrix")}}
+    \item{coerce}{\code{signature(from = "dgBCMatrix", to = "dgTMatrix")}}
+    \item{coerce}{\code{signature(from = "dgCMatrix", to = "dgBCMatrix")}}
   }
 }
 %\references{}
