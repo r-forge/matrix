@@ -1,3 +1,7 @@
+2005-03-03  Douglas Bates  <bates@bates1-home>
+
+	* src/lmer.c (lmer_fitted): Added.
+
 2005-03-02  Douglas Bates  <bates@bates1-home>
 
 	* R/dsTMatrix.R: Conversion from dsTMatrix to dsCMatrix
