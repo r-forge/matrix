@@ -125,54 +125,66 @@ SEXP sscCrosstab_L_LI_sizes(SEXP ctab, SEXP permexp)
   * @param n number of columns in the matrix
   * @param Ap column pointers in Ai (modified)
   * @param Ai row indices (modified)
-  * @param perm on return contains the permutation of the rows
+  * @param rperm on return contains the permutation of the rows
+  * @param cperm if non-null, on return contains the permutation of the columns
   * @param useL when more than one row matches maxrc, use last match
   */
 static
-void pair_perm(int m, int n, int Ap[], int Ai[], int iperm[], int useL)
+void pair_perm(int m, int n, int Ap[], int Ai[], int rperm[], int cperm[],
+	       int useL)
 {
     int *cc = Calloc(n, int),	/* column counts */
-	ii, j,
+	*cm = Calloc(n, int),	/* column removed */
+	*sm = Calloc(m, int),	/* sum of column removals for this row */
+	ii, j, pc,
 	*rc = Calloc(m, int);	/* row counts */
     
     for (j = 0; j < n; j++) {	/* initialize col counts */
 	cc[j] = Ap[j+1] - Ap[j];
+	cm[j] = 0;
     }
-    for (ii = m - 1; 0 <= ii; ii--) { /* fill iperm from RHS */
+    pc = 0;
+    for (ii = m - 1; 0 <= ii; ii--) { /* fill rperm from RHS */
 	int maxrc, rr;
 	int i, mincc, p1, p3;
-
+	
 	mincc = m + 1;		/* find minimum positive cc */
 	for (j = 0; j < n; j++) {
 	    if (0 < cc[j] && cc[j] < mincc) mincc = cc[j];
 	    if (mincc < 2) break;
 	}
-
-	for (i = 0; i < m; i++) rc[i] = 0;
+	
+	for (i = 0; i < m; i++) {sm[i] = rc[i] = 0;}
 	for (j = 0; j < n; j++) { /* row counts for cols where cc = mincc */
 	    if (cc[j] == mincc) {
 		int p2 = Ap[j+1];
-		for (i = Ap[j]; i < p2; i++) rc[Ai[i]]++;
+		for (i = Ap[j]; i < p2; i++) {
+		    rc[Ai[i]]++;
+		    sm[Ai[i]] += cm[j];
+		}
 	    }
 	}
-				
-	maxrc = -1;		/* find last row with rc[i] == max(rc) */
+	maxrc = -1;		/* find rows with rc[i] == max(rc) */
 	for (i = 0; i < m; i++) {
 	    int ic = rc[i];
-	    if (ic > maxrc || (useL && ic == maxrc)) {
+				/* Choose first on row count.  Ties go
+	                         * to smaller sum of moved.  Ties
+	                         * there go to the last one. */
+	    if (ic > maxrc || (ic == maxrc && sm[i] >= sm[rr])) {
 		maxrc = ic;
 		rr = i;
 	    }
 	}
 
-	iperm[rr] = ii;
+	rperm[rr] = ii;
 
 	p1 = p3 = 0;		/* update cc, Ap and Ai */
 	for (j = 0; j < n; j++) {
 	    int p2 = Ap[j+1];
 	    for (i = Ap[j]; i < p2; i++) {
 		if (Ai[i] == rr) {
-		    cc[j]--;
+		    cc[j]--; cm[j]++; /* move from count to removed */
+		    if (cperm && cc[j] < 1) cperm[j] = pc++;
 		} else {
 		    if (i != p1) Ai[p1] = Ai[i];
 		    p1++;
@@ -183,7 +195,7 @@ void pair_perm(int m, int n, int Ap[], int Ai[], int iperm[], int useL)
 	}
 	Ap[n] = p3;
     }
-    Free(cc); Free(rc);
+    Free(cc); Free(cm); Free(rc); 
 }
 
 SEXP sscCrosstab_groupedPerm(SEXP ctab, SEXP useLast)
@@ -224,7 +236,8 @@ SEXP sscCrosstab_groupedPerm(SEXP ctab, SEXP useLast)
 	    }
 	    np[j + 1 - p1] = p0;
 	}
-	pair_perm(p3 - p2, p2 - p1, np, ni, INTEGER(ans) + p2, useL);
+	pair_perm(p3 - p2, p2 - p1, np, ni,
+		  INTEGER(ans) + p2, INTEGER(ans), useL);
 	for (j = p2; j < p3; j++) INTEGER(ans)[j] += p2;
     }
 
