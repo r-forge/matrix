@@ -5,7 +5,7 @@ Matrix                  Construct a Classed Matrix
 Matrix-class            Class "Matrix" Virtual class of Matrices
 Schur                   Schur Decomposition of a Matrix
 ScotsSec                Scottish secondary school scores
-bbCrosstab              Create pairwise crosstabulation
+bCrosstab               Create pairwise crosstabulation
 bbCrosstab-class        Pairwise crosstabulations
 coef<-                  Assign parameters
 corFactor               Extract the correlation factor
