@@ -20,4 +20,6 @@ setMethod("norm", signature(x = "dsyMatrix", type = "missing"),
           function(x, type, ...) .Call("dsyMatrix_norm", x, "O"),
           valueClass = "numeric")
 
+## Should this create the opposite storage format - i.e. "U" -> "L"
+## and vice-versa?
 setMethod("t", signature(x = "dsyMatrix"), function(x) x)
