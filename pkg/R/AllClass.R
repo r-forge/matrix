@@ -128,7 +128,7 @@ setClass("dgCMatrix",
 setClass("dtCMatrix",
          representation(uplo = "character", diag = "character"),
          contains = "dgCMatrix",
-         validity = function(object) .Call("dtCMatrix_validate", object)
+         validity = function(object) .Call("tsc_validate", object)
          )
 
 # numeric, sparse, sorted compressed sparse column-oriented symmetric matrices
@@ -219,8 +219,8 @@ setClass("ssclme", representation =
                        # positive-definite symmetric matrices as matrices
 setClass("pdmatrix", contains="matrix")
 
-                       # factors of positive-definite symmetric matrices
-setClass("pdfactor", representation("matrix", logDet = "numeric"))
+#                        # factors of positive-definite symmetric matrices
+# setClass("pdfactor", representation("matrix", logDet = "numeric"))
 
                        # correlation matrices and standard deviations
 setClass("corrmatrix", representation("matrix", stdDev = "numeric"))
