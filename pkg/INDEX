@@ -19,6 +19,7 @@ dpoMatrix-class         Positive semi-definite, dense, numeric
 dsCMatrix-class         Symmetric, compressed, sparse column matrices
 dsyMatrix-class         Symmetric, dense matrices
 dtCMatrix-class         Triangular, compressed, sparse column matrices
+dtpMatrix-class         Packed triangular dense matrices
 dtrMatrix-class         Triangular, dense, numeric matrices
 expand                  Expand a Decomposition into Factors
 expm                    Matrix exponential
@@ -26,7 +27,6 @@ facmul                  Multiplication by Decomposition Factors
 lu                      Triangular Decomposition of a Square Matrix
 mm                      A sample sparse model matrix
 norm                    Norm of a Matrix
-pdfactor-class          Factors of positive-definite matrices
 pdmatrix-class          Positive-definite matrices
 rcond                   Estimate the Reciprocal Condition Number
 sscCrosstab             Create pairwise crosstabulation

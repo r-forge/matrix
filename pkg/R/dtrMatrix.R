@@ -3,6 +3,9 @@
 setAs("dtrMatrix", "dgeMatrix",
       function(from) .Call("dtrMatrix_as_dgeMatrix", from) )
 
+setAs("dtrMatrix", "dtpMatrix",
+      function(from) .Call("dtrMatrix_as_dtpMatrix", from) )
+
 ## needed for t() method
 setAs("dtrMatrix", "matrix",
       function(from) .Call("dtrMatrix_as_matrix", from) )
@@ -70,7 +73,7 @@ setMethod("solve", signature(a = "dtrMatrix", b="matrix"),
 setMethod("t", signature(x = "dtrMatrix"),
 	  function(x) {
 	      val <- new("dtrMatrix",
-                         Dim = x@Dim, Dimnames = x@Dimnames[2:1],
+                         Dim = x@Dim[2:1], Dimnames = x@Dimnames[2:1],
                          x = as.vector(t(as(x, "matrix"))))
 	      if (x@uplo == "U") val@uplo <- "L"
 	      if (x@diag == "U") val@diag <- "U"

@@ -5,11 +5,15 @@
 SEXP dtpMatrix_validate(SEXP obj)
 {
     SEXP val;
+    int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym));
 
     if (isString(val = check_scalar_string(GET_SLOT(obj, Matrix_uploSym),
 					   "LU", "uplo"))) return val;
     if (isString(val = check_scalar_string(GET_SLOT(obj, Matrix_diagSym),
 					   "NU", "diag"))) return val;
+    if (dims[0] != dims[1]) return mkString(_("Matrix in not square"));
+    if (dims[0] != packed_ncol(length(GET_SLOT(obj, Matrix_xSym))))
+	return(mkString(_("Incorrect length of 'x' slot")));
     return ScalarLogical(1);
 }
 
@@ -63,7 +67,6 @@ SEXP dtpMatrix_rcond(SEXP obj, SEXP type)
     return ScalarReal(set_rcond(obj, CHAR(asChar(type))));
 }
 
-
 SEXP dtpMatrix_solve(SEXP a)
 {
     SEXP val = PROTECT(duplicate(a));
@@ -75,21 +78,58 @@ SEXP dtpMatrix_solve(SEXP a)
     return val;
 }
 
+SEXP dtpMatrix_getDiag(SEXP x)
+{
+    int n = *INTEGER(GET_SLOT(x, Matrix_DimSym));
+    SEXP val = PROTECT(allocVector(REALSXP, n));
+
+    if (*CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0)) == 'U') {
+	int j;
+	for (j = 0; j < n; j++) REAL(val)[j] = 1.;
+    } else {
+	packed_getDiag(REAL(val), x);
+    }
+    UNPROTECT(1);
+    return val;
+}
+
 SEXP dtpMatrix_matrix_solve(SEXP a, SEXP b)
 {
     SEXP val = PROTECT(duplicate(b));
     int *Dim = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bDim = INTEGER(getAttrib(val, R_DimSymbol));
+    char *uplo = CHAR(STRING_ELT(GET_SLOT(a, Matrix_uploSym), 0)),
+	*diag = CHAR(STRING_ELT(GET_SLOT(a, Matrix_diagSym), 0));
+    double *ax = REAL(GET_SLOT(a, Matrix_xSym));
     int ione = 1, j;
 
     if (bDim[0] != Dim[1])
 	error(_("Dimensions of a (%d,%d) and b (%d,%d) do not conform"),
 	      Dim[0], Dim[1], bDim[0], bDim[1]);
     for (j = 0; j < bDim[1]; j++)
-	F77_CALL(dtpsv)(CHAR(asChar(GET_SLOT(val, Matrix_uploSym))),
-			"N", CHAR(asChar(GET_SLOT(val, Matrix_diagSym))),
-			bDim, REAL(GET_SLOT(a, Matrix_xSym)), 
+	F77_CALL(dtpsv)(uplo, "N", diag, bDim, ax,
 			REAL(val) + j * bDim[0], &ione);
+    UNPROTECT(1);
+    return val;
+}
+
+SEXP dtpMatrix_dgeMatrix_mm(SEXP x, SEXP y)
+{
+    SEXP val = PROTECT(duplicate(y));
+    int *xDim = INTEGER(GET_SLOT(x, Matrix_DimSym)),
+	*yDim = INTEGER(GET_SLOT(y, Matrix_DimSym));
+    int ione = 1, j;
+    char *uplo = CHAR(STRING_ELT(GET_SLOT(x, Matrix_uploSym), 0)),
+	*diag = CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0));
+    double *xx = REAL(GET_SLOT(x, Matrix_xSym)),
+	*vx = REAL(GET_SLOT(val, Matrix_xSym));
+
+    if (yDim[0] != xDim[1])
+	error(_("Dimensions of a (%d,%d) and b (%d,%d) do not conform"),
+	      xDim[0], xDim[1], yDim[0], yDim[1]);
+    for (j = 0; j < yDim[1]; j++)
+	F77_CALL(dtpsv)(uplo, "N", diag, yDim, xx,
+			vx + j * yDim[0], &ione);
     UNPROTECT(1);
     return val;
 }
@@ -114,23 +154,3 @@ SEXP dtpMatrix_as_dtrMatrix(SEXP from)
     return val;
 }
 
-SEXP dtrMatrix_as_dtpMatrix(SEXP from)
-{
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dtpMatrix"))),
-	uplo = GET_SLOT(from, Matrix_uploSym),
-	diag = GET_SLOT(from, Matrix_diagSym),
-	dimP = GET_SLOT(from, Matrix_DimSym);
-    int n = *INTEGER(dimP);
-
-    SET_SLOT(val, Matrix_rcondSym,
-	     duplicate(GET_SLOT(from, Matrix_rcondSym)));
-    SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
-    SET_SLOT(val, Matrix_diagSym, duplicate(diag));
-    SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
-    full_to_packed(REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, (n*(n+1))/2)),
-		   REAL(GET_SLOT(from, Matrix_xSym)), n,
-		   *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW,
-		   *CHAR(STRING_ELT(diag, 0)) == 'U' ? UNT : NUN);
-    UNPROTECT(1);
-    return val;
-}
