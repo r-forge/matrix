@@ -435,3 +435,26 @@ SEXP nlme_weight_matrix_list(SEXP MLin, SEXP wts, SEXP adjst, SEXP MLout)
 	REAL(lastM)[j*n + i] = REAL(adjst)[i] * REAL(wts)[i];
     return MLout;
 }
+
+/** 
+ * Create a named vector of type TYP
+ * 
+ * @param TYP a vector SEXP type (e.g. REALSXP)
+ * @param names names of list elements with null string appended
+ * 
+ * @return pointer to a named vector of type TYP
+ */
+SEXP
+Matrix_make_named(int TYP, char **names)
+{
+    SEXP ans, nms;
+    int i, n;
+
+    for (n = 0; strlen(names[n]) > 0; n++) {}
+    ans = PROTECT(allocVector(TYP, n));
+    nms = PROTECT(allocVector(STRSXP, n));
+    for (i = 0; i < n; i++) SET_STRING_ELT(nms, i, mkChar(names[i]));
+    setAttrib(ans, R_NamesSymbol, nms);
+    UNPROTECT(2);
+    return ans;
+}

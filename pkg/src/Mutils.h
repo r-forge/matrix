@@ -42,7 +42,7 @@ double *nlme_symmetrize(double *a, const int nc);
 void nlme_check_Lapack_error(int info, const char *laName);
 SEXP nlme_replaceSlot(SEXP obj, SEXP names, SEXP value);
 SEXP nlme_weight_matrix_list(SEXP MLin, SEXP wts, SEXP adjst, SEXP MLout);
-
+SEXP Matrix_make_named(int TYP, char **names);
 				/* stored pointers to symbols */
 				/* initialized in R_init_Matrix */
 extern
