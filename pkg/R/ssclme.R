@@ -1,7 +1,8 @@
-setReplaceMethod("coef",
-                 signature(object = "ssclme", value = "numeric"),
-                 function(object, value) 
-                 .Call("ssclme_coefGets", object, value, PACKAGE = "Matrix"))
+setReplaceMethod("coef", signature(object = "ssclme", value = "numeric"),
+                 function(object, unconst = FALSE, ..., value)
+                 .Call(ifelse(unconst, "ssclme_coefGetsUnc",
+                              "ssclme_coefGets"),
+                       object, as.double(value), PACKAGE = "Matrix"))
 
 setAs("ssclme", "sscMatrix",
       function(from)
