@@ -3,6 +3,8 @@
 \alias{pMatrix-class}
 \alias{\%*\%,matrix,pMatrix-method}
 \alias{\%*\%,pMatrix,matrix-method}
+\alias{\%*\%,dgeMatrix,pMatrix-method}
+\alias{\%*\%,pMatrix,dgeMatrix-method}
 \alias{coerce,integer,pMatrix-method}
 \alias{coerce,pMatrix,matrix-method}
 \alias{solve,pMatrix,missing-method}
