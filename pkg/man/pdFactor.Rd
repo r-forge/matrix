@@ -11,7 +11,7 @@
   factor of \eqn{\Sigma}{S} is any square matrix \eqn{L}{L} such that
   \eqn{\Sigma = L'L}{S = L'L}. This function extracts \eqn{L}.
 
-  This function is deprecated.  Use coersion to the \code{pdfactor}
+  This function is deprecated.  Use coercion to the \code{pdfactor}
   class instead.
 }
 \usage{
