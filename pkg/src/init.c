@@ -35,6 +35,7 @@ static R_CallMethodDef CallEntries[] = {
     {"csc_getDiag", (DL_FUNC) &csc_getDiag, 1},
     {"csc_matrix_crossprod", (DL_FUNC) &csc_matrix_crossprod, 2},
     {"csc_matrix_mm", (DL_FUNC) &csc_matrix_mm, 2},
+    {"csc_tcrossprod", (DL_FUNC) &csc_tcrossprod, 1},
     {"csc_to_dgTMatrix", (DL_FUNC) &csc_to_dgTMatrix, 1},
     {"csc_to_dgeMatrix", (DL_FUNC) &csc_to_dgeMatrix, 1},
     {"csc_to_matrix", (DL_FUNC) &csc_to_matrix, 1},

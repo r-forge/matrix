@@ -7,6 +7,7 @@
 #include "triplet_to_col.h"
 
 SEXP csc_crossprod(SEXP x);
+SEXP csc_tcrossprod(SEXP x);
 SEXP csc_matrix_crossprod(SEXP x, SEXP y);
 SEXP dgCMatrix_validate(SEXP x);
 SEXP csc_to_dgTMatrix(SEXP x);
