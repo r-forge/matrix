@@ -426,3 +426,52 @@ setMethod("vcov", signature(object = "lmer"),
               rr
           })
 
+Lind <- function(i,j) {
+    if (i < j) stop(paste("Index i=", i,"must be >= index j=", j))
+    ((i - 1) * i)/2 + j
+}
+
+## Generalize this and return the transpose of the current matrix
+##  so it can be checked by a crossprod operation.
+Lmat <- function(from) {
+    L <- lapply(from@L, as, "dgTMatrix")
+    nf <- length(from@D)
+    Gp <- from@Gp
+    nL <- Gp[nf + 1]
+    Zi <- integer(0)
+    Zj <- integer(0)
+    Zx <- double(0)
+    for (i in 1:nf) {
+        for (j in 1:i) {
+            Lij <- L[[Lind(i, j)]]
+            if (i == j) { ## fix up diagonal
+                nc <- Lij@Dim[2]
+                Lij@Dim <- c(nc, nc)
+                Lij@i <- c(Lij@i, as.integer(0:(nc-1)))
+                Lij@j <- c(Lij@j, as.integer(0:(nc-1)))
+                Lij@x <- c(Lij@x, rep(1, nc))
+            }
+            Zi <- c(Zi, Lij@i + Gp[i])
+            Zj <- c(Zj, Lij@j + Gp[j])
+            Zx <- c(Zx, Lij@x)
+        }
+    }
+    new("dgTMatrix", Dim = as.integer(c(nL, nL)), i = Zi, j = Zj, x = Zx)
+}
+
+Dhalf <- function(from) {
+    D <- from@D
+    nf <- length(D)
+    Gp <- from@Gp
+    res <- array(0, rep(Gp[nf+1],2))
+    for (i in 1:nf) {
+        DD <- D[[i]]
+        dd <- dim(DD)
+        for (k in 1:dd[3]) {
+            mm <- array(DD[ , , k], dd[1:2])
+            base <- Gp[i] + (k - 1)*dd[1]
+            res[cbind(c(base + row(mm)), c(base + col(mm)))] <- c(mm)
+        }
+    }
+    res
+}
