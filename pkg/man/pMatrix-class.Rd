@@ -48,8 +48,10 @@ Class \code{"Matrix"}, directly.
 (pm1 <- as(as.integer(c(2,3,1)), "pMatrix"))
 t(pm1)
 solve(pm1)
+pm1 \%*\% as(t(pm1), "matrix")   # check that the transpose is the inverse
 (mm <- round(array(rnorm(3 * 3), c(3, 3)), 2))
-mm %*% pm1
-pm1 %*% mm
+mm \%*\% pm1
+pm1 \%*\% mm
+try(as(as.integer(c(3,3,1)), "pMatrix"))
 }
 \keyword{classes}
