@@ -24,5 +24,6 @@ SEXP lmer_ECMEsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP Verbp);
 SEXP lmer_gradient(SEXP x, SEXP REMLp, SEXP Uncp);
 SEXP lmer_variances(SEXP x);
 SEXP lmer_Crosstab(SEXP flist);
+SEXP lmer_firstDer(SEXP x, SEXP val);
 
 #endif

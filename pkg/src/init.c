@@ -1,6 +1,5 @@
 #include "LU.h"
 #include "Mutils.h"
-#include "dgBCMatrix.h"
 #include "dense.h"
 #include "dgBCMatrix.h"
 #include "dgCMatrix.h"
@@ -35,6 +34,7 @@ static R_CallMethodDef CallEntries[] = {
     {"csc_transpose", (DL_FUNC) &csc_transpose, 1},
     {"dgCMatrix_validate", (DL_FUNC) &dgCMatrix_validate, 1},
     {"dgBCMatrix_to_dgCMatrix", (DL_FUNC) &dgBCMatrix_to_dgCMatrix, 1},
+    {"dgBCMatrix_to_dgTMatrix", (DL_FUNC) &dgBCMatrix_to_dgTMatrix, 1},
     {"dgBCMatrix_validate", (DL_FUNC) &dgBCMatrix_validate, 1},
     {"dgTMatrix_to_csc", (DL_FUNC) &dgTMatrix_to_csc, 1},
     {"dgTMatrix_to_dgCMatrix", (DL_FUNC) &dgTMatrix_to_dgCMatrix, 1},
@@ -92,6 +92,7 @@ static R_CallMethodDef CallEntries[] = {
     {"lmer_coefGets", (DL_FUNC) &lmer_coefGets, 3},
     {"lmer_create", (DL_FUNC) &lmer_create, 2},
     {"lmer_factor", (DL_FUNC) &lmer_factor, 1},
+    {"lmer_firstDer", (DL_FUNC) &lmer_firstDer, 2},
     {"lmer_fixef", (DL_FUNC) &lmer_fixef, 1},
     {"lmer_gradient", (DL_FUNC) &lmer_gradient, 3},
     {"lmer_initial", (DL_FUNC) &lmer_initial, 1},

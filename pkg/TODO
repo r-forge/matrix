@@ -7,16 +7,16 @@
   ?Math.data.frame  and the examples in
   ?SetGeneric
 
+- methods for rbind and cbind where they make sense
+
 - bCrosstab(): do we really want the diagonal "V:V" crosstabs?
 	       (if so or in any case: add to  man/bCrosstab.Rd )
 
-- src/Metis/ : one of the two Makefiles needs fixing, as changing
-	     src/Metis/*.c  does not lead to recompilation.
-  --DB - it seems both Makefiles need fixing.  I think I have the
-	     src/Metis/Makefile fixed but not src/Makefile
-
 - man/Matrix.Rd :  has example with dimnames, but we just drop them!
 		MM thinks dimnames should be supported (but then ...)
+
+- consider moving alloc3Darray from ./src/Mutils.c to
+  $(RSRC)/src/base/array.c 
 
 - data/ : names 'mm' and even more 'y' are  ``too short''.
 	If we really want to keep them, don't use "LazyData"

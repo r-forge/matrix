@@ -23,49 +23,6 @@ int coef_length(int nf, const int nc[])
 }
 
 /**
- * Calculate the zero-based index in a row-wise packed lower triangular matrix.
- * This is used for the arrays of blocked sparse matrices.
- *
- * @param i column number (zero-based)
- * @param k row number (zero-based)
- *
- * @return The index of the (k,i) element of a packed lower triangular matrix
- */
-static R_INLINE
-int Lind(int k, int i)
-{
-    if (k < i) error("Lind(k = %d, i = %d) must have k >= i", k, i);
-    return (k * (k + 1))/2 + i;
-}
-
-/**
- * Allocate a 3-dimensional array
- *
- * @param TYP The R Type code (e.g. INTSXP)
- * @param nr number of rows
- * @param nc number of columns
- * @param nf number of faces
- *
- * @return A 3-dimensional array of the indicated dimensions and type
- */
-static
-SEXP alloc3Darray(int TYP, int nr, int nc, int nf)
-{
-    SEXP val, dd = PROTECT(allocVector(INTSXP, 3));
-
-    INTEGER(dd)[0] = nr; INTEGER(dd)[1] = nc; INTEGER(dd)[2] = nf;
-    val = allocArray(TYP, dd);
-    UNPROTECT(1);
-    return val;
-}
-
-static R_INLINE
-int match_mat_dims(const int xd[], const int yd[])
-{
-    return xd[0] == yd[0] && xd[1] == yd[1];
-}
-
-/**
  * Check validity of an lmer object.
  *
  * @param x Pointer to an lmer object
@@ -95,17 +52,6 @@ SEXP lmer_validate(SEXP x)
     if (ZtXd[1] != XtXd[0] || XtXd[0] != XtXd[1])
 	return mkString("Slots XtX must be a square matrix with same no. of cols as ZtX");
     return ScalarLogical(1);
-}
-
-static R_INLINE
-int Tind(const int rowind[], const int colptr[], int i, int j)
-{
-    int k, k2 = colptr[j + 1];
-    for (k = colptr[j]; k < k2; k++)
-	if (rowind[k] == i) return k;
-    error("row %d and column %d not defined in rowind and colptr",
-	  i, j);
-    return -1;			/* -Wall */
 }
 
 /**
@@ -233,7 +179,8 @@ SEXP lmer_update_mm(SEXP x, SEXP mmats)
 	    for (j = 0; j < nobs; j++) {
 		F77_CALL(dgemm)("T", "N", nc + i, nc + k, &ione, &one,
 				Z + j, &nobs, Zk + j, &nobs, &one,
-				ZZx + Tind(rowind, colptr, fac[j] - 1, f2[j] - 1)
+				ZZx + check_csc_index(colptr, rowind,
+						      fac[j] - 1, f2[j] - 1, 0)
 				* (nci * nck), &nci);
 	    }
 	}
@@ -264,7 +211,7 @@ SEXP lmer_update_mm(SEXP x, SEXP mmats)
 }
 
 /**
- * Create an lmer object from a list grouping factors and a list of model
+ * Create an lmer object from a list of grouping factors and a list of model
  * matrices.  There is one more model matrix than grouping factor.  The last
  * model matrix is the fixed effects and the response.
  *
@@ -290,7 +237,8 @@ SEXP lmer_create(SEXP flist, SEXP mmats)
 	    error("flist[[%d]] must be a factor of length %d",
 		  i + 1, nobs);
     }
-    SET_SLOT(val, Matrix_flistSym, flist);
+    SET_SLOT(val, Matrix_flistSym, duplicate(flist));
+				/* Check mmats; allocate and populate nc */
     if (!(isNewList(mmats) && length(mmats) == (nf + 1)))
 	error("mmats must be a list of length %d", nf + 1);
     SET_SLOT(val, Matrix_ncSym, allocVector(INTSXP, nf + 2));
@@ -316,7 +264,7 @@ SEXP lmer_create(SEXP flist, SEXP mmats)
     /* FIXME: Check for possible reordering of the factors to maximize the
      * number of levels (columns?) in the leading nested sequence. */
     fnms = getAttrib(flist, R_NamesSymbol);
-				/* Allocate and populate nc and cnames */
+				/* Allocate and populate cnames */
     SET_SLOT(val, Matrix_cnamesSym, allocVector(VECSXP, nf + 1));
     cnames = GET_SLOT(val, Matrix_cnamesSym);
     setAttrib(cnames, R_NamesSymbol, allocVector(STRSXP, nf + 1));
@@ -326,10 +274,8 @@ SEXP lmer_create(SEXP flist, SEXP mmats)
 	SET_VECTOR_ELT(cnames, i,
 		       duplicate(VECTOR_ELT(getAttrib(mi, R_DimNamesSymbol),
 					    1)));
-	if (i < nf)
-	    SET_STRING_ELT(nms, i, duplicate(STRING_ELT(fnms, i)));
-	else
-	    SET_STRING_ELT(nms, nf, mkChar(".fixed"));
+	SET_STRING_ELT(nms, i, (i < nf) ? duplicate(STRING_ELT(fnms, i)) :
+		       mkChar(".fixed"));
     }
     lmer_update_mm(val, mmats);
     SET_SLOT(val, Matrix_bVarSym, duplicate(GET_SLOT(val, Matrix_DSym)));
@@ -403,20 +349,21 @@ lmer_inflate(SEXP x)
 	    *ZZ = REAL(GET_SLOT(ZZel, Matrix_xSym)),
 	    *tmp = Memcpy(Calloc(ncisqr, double), Omega, ncisqr);
 
-	F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j); /* update dcmp[1] */
+	F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
 	if (j)
 	    error("Leading %d minor of Omega[[%d]] not positive definite",
 		  j, i + 1);
+				/* update dcmp[1] */
 	for (j = 0; j < nci; j++) { /* nlev * logDet(Omega_i) */
 	    dcmp[1] += nlev * 2. * log(tmp[j * (nci + 1)]);
 	}
 	Free(tmp);
 	AZERO(REAL(ZZOm), dims[0] * dims[1] * dims[2]);
 	for (j = 0; j < nlev; j++) { /* copy diagonal block and inflate */
-	    double *ZZOkk = REAL(ZZOm) + Tind(Di, Dp, j, j) * sz;
+	    double *ZZOkk = REAL(ZZOm) + check_csc_index(Dp, Di, j, j, 0) * sz;
 	    int kk, k2 = Sp[j + 1];
 	    for (kk = Sp[j]; kk < k2; kk++) {
-		Memcpy(REAL(ZZOm) + Tind(Di, Dp, Si[kk], j) * sz,
+		Memcpy(REAL(ZZOm) + check_csc_index(Dp, Di, Si[kk], j, 0) * sz,
 		       ZZ + kk * sz, sz);
 	    }
 	    for (kk = 0; kk < nci; kk++) {
@@ -445,7 +392,8 @@ lmer_inflate(SEXP x)
 	    for (j = 0; j < nlev; j++) { /* copy src blocks to dest */
 		int kk, k2 = Sp[j + 1];
 		for (kk = Sp[j]; kk < k2; kk++) {
-		    Memcpy(L + Tind(Di, Dp, Si[kk], j) * sz, ZZ + kk * sz, sz);
+		    Memcpy(L + check_csc_index(Dp, Di, Si[kk], j, 0) * sz,
+			   ZZ + kk * sz, sz);
 		}
 	    }
 	}
@@ -460,15 +408,16 @@ lmer_inflate(SEXP x)
  * @param j index (0-based) of the diagonal outer block
  * @param n number of inner column blocks in the outer block
  * @param par array of length n to be filled with the parent array
- * @param Parent parent index in the extended parent pair
- * @param Block block index in the extended parent pair
+ * @param ParP pointer to the extended parent structure
  *
  * @return par
  */
 static R_INLINE
-int *block_parent(int j, int n, int par[], const int Parent[], const int Block[])
+int *block_parent(int j, int n, int par[], SEXP ParP)
 {
-    int i;
+    SEXP Parj = VECTOR_ELT(ParP, j);
+    int *Parent = INTEGER(VECTOR_ELT(Parj, 0)),
+	*Block = INTEGER(VECTOR_ELT(Parj, 1)), i;
     for (i = 0; i < n; i++) par[i] = (Block[i] == j) ? Parent[i] : -1;
     return par;
 }
@@ -515,9 +464,7 @@ SEXP lmer_factor(SEXP x)
 	    SEXP LiP = VECTOR_ELT(LP, Lind(i, i));
 	    int nlev = INTEGER(getAttrib(DiP, R_DimSymbol))[2];
 	    int jj, nci = nc[i], ncisqr = nci * nci;
-	    int *Pari = block_parent(i, nlev, Calloc(nlev, int),
-				     INTEGER(VECTOR_ELT(VECTOR_ELT(Parent, i), 0)),
-				     INTEGER(VECTOR_ELT(VECTOR_ELT(Parent, i), 1)));
+	    int *Pari = block_parent(i, nlev, Calloc(nlev, int), Parent);
 	    double *D = REAL(DiP);
 
 	    jj = cscb_ldl(ZZOiP, Pari, LiP, DiP);
@@ -642,6 +589,22 @@ lmer_sm(char side, char trans, int nf, const int Gp[], int n,
 	    }
 	} else error("Code for non-transpose case not yet written");
     } else error("Code for right-side solutions not yet written");
+}
+
+static 
+int max_nnz(int j, SEXP Parent)
+{
+    SEXP lst = VECTOR_ELT(Parent, j);
+    SEXP blk = VECTOR_ELT(lst, 1), par = VECTOR_ELT(lst, 0);
+    int i, ncj = length(blk), val;
+    int *nnz = Calloc(ncj, int);
+
+    for (val = -1, i = ncj - 1; i >= 0; i--) {
+        int thisnnz = (INTEGER(blk)[i] != j) ? 0 : nnz[INTEGER(par)[j]] + 1;
+	if (thisnnz > val) val = thisnnz;
+	nnz[i] = thisnnz;
+    }
+    return val;
 }
 
 /**
@@ -1086,7 +1049,7 @@ SEXP lmer_ranef(SEXP x)
  *
  * @return val
  */
-static
+/* static */
 SEXP lmer_firstDer(SEXP x, SEXP val)
 {
     SEXP bVarP = GET_SLOT(x, Matrix_bVarSym),
