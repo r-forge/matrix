@@ -118,17 +118,17 @@ SEXP ALLOC_SLOT(SEXP obj, SEXP nm, SEXPTYPE type, int length)
 }
 
 /** 
- * Expand the column pointers in the array mp into a full set of column indices
+ * Expand compressed pointers in the array mp into a full set of indices
  * in the array mj.
  * 
- * @param ncol number of columns
+ * @param ncol number of columns (or rows)
  * @param mp column pointer vector of length ncol + 1
- * @param mj vector of length mp[ncol] - 1 to hold the result
+ * @param mj vector of length mp[ncol] to hold the result
  * 
  * @return mj
  */
 static R_INLINE
-int* expand_column_pointers(int ncol, const int mp[], int mj[])
+int* expand_cmprPt(int ncol, const int mp[], int mj[])
 {
     int j;
     for (j = 0; j < ncol; j++) {

@@ -197,15 +197,14 @@ SEXP compressed_to_dgTMatrix(SEXP x, SEXP colP)
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgTMatrix"))),
 	indP = GET_SLOT(x, indSym),
 	pP = GET_SLOT(x, Matrix_pSym);
-    int npt = length(pP);
+    int npt = length(pP) - 1;
 
     SET_SLOT(ans, Matrix_DimSym, duplicate(GET_SLOT(x, Matrix_DimSym)));
     SET_SLOT(ans, Matrix_xSym, duplicate(GET_SLOT(x, Matrix_xSym)));
     SET_SLOT(ans, indSym, duplicate(indP));
-    expand_column_pointers(length(pP) - 1, INTEGER(pP),
-			   INTEGER(ALLOC_SLOT(ans,
-					      col ? Matrix_jSym : Matrix_iSym,
-					      INTSXP, length(indP))));
+    expand_cmprPt(npt, INTEGER(pP),
+		  INTEGER(ALLOC_SLOT(ans, col ? Matrix_jSym : Matrix_iSym,
+				     INTSXP, length(indP))));
     UNPROTECT(1);
     return ans;
 }
