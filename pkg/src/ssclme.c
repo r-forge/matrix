@@ -452,7 +452,7 @@ ssclme_update_mm(SEXP x, SEXP facs, SEXP mmats)
 				/* FIXME: run a loop to update */
 		    error("code not yet written");
 		} else {	/* update scalars directly */
-		    Ax[ind] += Zj[fpji] * Zk[fpki];
+		    Ax[ind] += Zj[i] * Zk[i];
 		}
 	    }
 	}
