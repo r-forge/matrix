@@ -11,8 +11,10 @@
 \alias{Arith,numeric,dgeMatrix-method}
 \alias{Math,dgeMatrix-method}
 \alias{Math2,dgeMatrix,numeric-method}
-% others
+% Others
+% undocu (FIXME)
 \alias{show,ddenseMatrix-method}
+\alias{coerce,ddenseMatrix,matrix-method}
 %
 \alias{\%*\%,dgeMatrix,dgeMatrix-method}
 \alias{\%*\%,dgeMatrix,numeric-method}
@@ -23,8 +25,10 @@
 \alias{coerce,dgeMatrix,matrix-method}
 \alias{crossprod,dgeMatrix,dgeMatrix-method}
 \alias{crossprod,dgeMatrix,matrix-method}
-\alias{crossprod,dgeMatrix,missing-method}
 \alias{crossprod,dgeMatrix,numeric-method}
+\alias{crossprod,dgeMatrix,missing-method}
+\alias{crossprod,matrix,dgeMatrix-method}
+\alias{crossprod,numeric,dgeMatrix-method}
 \alias{determinant,dgeMatrix,logical-method}
 \alias{determinant,dgeMatrix,missing-method}
 \alias{diag,dgeMatrix-method}
