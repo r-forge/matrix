@@ -50,6 +50,8 @@ SEXP csc_crossprod(SEXP x)
     double *xVal;
     
     SET_SLOT(ans, Matrix_factorSym, allocVector(VECSXP, 0));
+    SET_SLOT(ans, Matrix_DimSym, allocVector(INTSXP, 2));
+    SET_SLOT(ans, Matrix_uploSym, mkString("L"));
     maxnz = (ncol * (ncol + 1))/2;
     iVal = Calloc(maxnz, int); xVal = Calloc(maxnz, double);
     SET_SLOT(ans, Matrix_pSym, allocVector(INTSXP, ncol + 1));
@@ -115,6 +117,7 @@ SEXP csc_tcrossprod(SEXP x)
     double *xVal, *xtmp;
 
     SET_SLOT(ans, Matrix_factorSym, allocVector(VECSXP, 0));
+    SET_SLOT(ans, Matrix_DimSym, allocVector(INTSXP, 2));
     ntrip = nrow;  		/* number of triplets */
     for (j = 0; j < ncol; j++) {
 	int nzj = xp[j+1] - xp[j];
@@ -154,7 +157,6 @@ SEXP csc_tcrossprod(SEXP x)
     SET_SLOT(ans, Matrix_xSym, allocVector(REALSXP, nnz));
     Memcpy(INTEGER(GET_SLOT(ans, Matrix_iSym)), itmp, nnz);
     Memcpy(REAL(GET_SLOT(ans, Matrix_xSym)), xtmp, nnz);
-    SET_SLOT(ans, Matrix_DimSym, allocVector(INTSXP, 2));
     dims = INTEGER(GET_SLOT(ans, Matrix_DimSym));
     dims[0] = dims[1] = nrow;
     Free(itmp); Free(xtmp); Free(iVal); Free(jVal); Free(xVal);
@@ -276,6 +278,7 @@ SEXP matrix_to_csc(SEXP A)
 	error("A must be a numeric matrix");
     nrow = adims[0]; ncol = adims[1];
     SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
+    SET_SLOT(val, Matrix_DimSym, allocVector(INTSXP, 2));
     SET_SLOT(val, Matrix_pSym, allocVector(INTSXP, ncol + 1));
     vp = INTEGER(GET_SLOT(val, Matrix_pSym));
     maxnz = nrow * ncol;
@@ -349,13 +352,13 @@ SEXP csc_getDiag(SEXP x)
 
 SEXP csc_transpose(SEXP x)
 {
-    SEXP
-	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix"))),
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix"))),
 	islot = GET_SLOT(x, Matrix_iSym);
-    int nnz = length(islot),
-	*adims = INTEGER(GET_SLOT(ans, Matrix_DimSym)),
-	*xdims = INTEGER(GET_SLOT(x, Matrix_DimSym));
+    int *adims,	*xdims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
+	nnz = length(islot);
 
+    SET_SLOT(ans, Matrix_DimSym, allocVector(INTSXP, 2));
+    adims = INTEGER(GET_SLOT(ans, Matrix_DimSym));
     adims[0] = xdims[1]; adims[1] = xdims[0];
     SET_SLOT(ans, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(ans, Matrix_pSym, allocVector(INTSXP, xdims[0] + 1));

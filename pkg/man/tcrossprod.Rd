@@ -2,6 +2,7 @@
 \docType{methods}
 \alias{tcrossprod-methods}
 \alias{tcrossprod,dgCMatrix-method}
+\alias{tcrossprod,dgTMatrix-method}
 \alias{tcrossprod}
 \title{Cross-product of transpose}
 \description{

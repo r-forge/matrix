@@ -13,9 +13,9 @@
 \alias{dim,dgCMatrix-method}
 \alias{image,dgCMatrix-method}
 \alias{t,dgCMatrix-method}
-\title{Class "dgCMatrix" compressed, sparse, column Matrix}
-\description{The \code{dgCMatrix} class is a class of sparse matrices in
-  the compressed, sparse, column-oriented format.  In this
+\title{Compressed, sparse, column-oriented numeric matrices}
+\description{The \code{dgCMatrix} class is a class of sparse numeric
+  matrices in the compressed, sparse, column-oriented format.  In this
   implementation the non-zero elements in the columns are sorted into
   increasing row order.}
 \section{Objects from the Class}{
