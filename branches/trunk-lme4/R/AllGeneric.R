@@ -1,4 +1,4 @@
-## The generics Names, and Names<- will be deprecated in nlme_4.0
+## The generics Names, and Names<- are now removed
 # if (!isGeneric("Names")) {
 #     setGeneric("Names", function(object, ...)
 #            {
@@ -48,20 +48,28 @@ if (!isGeneric("getResponse")) {
 
 ## FIXME: Modify the generic to have a call argument
 setGeneric("lme",
-          function(formula, data, random,
-                   method = c("REML", "ML"),
-                   control = list(),
-                   subset, weights, na.action, offset,
-                   model = TRUE, x = FALSE, y = FALSE,...)
+           function(formula, data, random,
+                    method = c("REML", "ML"),
+                    control = list(),
+                    subset, weights, na.action, offset,
+                    model = TRUE, x = FALSE, y = FALSE,...)
            standardGeneric("lme"))
 
 setGeneric("lmer",
-          function(formula, data,
-                   method = c("REML", "ML"),
-                   control = list(),
-                   subset, weights, na.action, offset,
-                   model = TRUE, x = FALSE, y = FALSE,...)
+           function(formula, data,
+                    method = c("REML", "ML"),
+                    control = list(),
+                    subset, weights, na.action, offset,
+                    model = TRUE, x = FALSE, y = FALSE,...)
            standardGeneric("lmer"))
+
+setGeneric("GLMM1",
+           function(formula, family, data,
+                    method = c("PQL", "Laplace"),
+                    control = list(),
+                    subset, weights, na.action, offset,
+                    model = TRUE, x = FALSE, y = FALSE,...)
+           standardGeneric("GLMM1"))
 
 if (!isGeneric("LMEoptimize<-")) {
     setGeneric("LMEoptimize<-", function(x, ..., value)
@@ -72,7 +80,7 @@ if (!isGeneric("fixef")) {
     setGeneric("fixef", function(object, ...) standardGeneric("fixef"))
 }
 
-fixed.effects = function(object, ...) {
+fixed.effects <- function(object, ...) {
     ## fixed.effects was an alternative name for fixef
     .Deprecated("fixef")
     mCall = match.call()
@@ -85,7 +93,7 @@ if (!isGeneric("ranef")) {
                standardGeneric("ranef"))
 }
 
-random.effects = function(object, ...) {
+random.effects <- function(object, ...) {
     ## random.effects was an alternative name for ranef
     .Deprecated("ranef")
     mCall = match.call()
