@@ -22,4 +22,9 @@ setMethod("norm", signature(x = "dsyMatrix", type = "missing"),
 
 ## Should this create the opposite storage format - i.e. "U" -> "L"
 ## and vice-versa?
-setMethod("t", signature(x = "dsyMatrix"), function(x) x)
+## MM: I think yes, since the other part can be filled arbitrarily (wrongly)
+##WAS setMethod("t", signature(x = "dsyMatrix"), function(x) x)
+setMethod("t", signature(x = "dsyMatrix"),
+	  function(x) {
+	      x@uplo <- if (x@uplo == "U") "L" else "U"
+	      x })
