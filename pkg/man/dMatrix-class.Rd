@@ -2,7 +2,7 @@
 \docType{class}
 \alias{dMatrix-class}
 \alias{show,dMatrix-method}
-\alias{coerce,matrix,dMatrix-method}
+\alias{coerce,dMatrix,matrix-method}
 % Group methods
 \alias{Arith,dMatrix,dMatrix-method}
 \alias{Arith,dMatrix,numeric-method}
@@ -51,8 +51,10 @@
 }
 \examples{
  M <- new("dMatrix")
- (M <- new("dMatrix", Dim = 1:2, Dimnames = list("r1", c("c1","c2"))))
+ M <- new("dMatrix", x = c(pi,1), Dim = 1:2,
+           Dimnames = list("r1", c("c1","c2")))
  str(M)
+ M # show() needs as(*, "matrix")
 }
 \keyword{classes}
 \keyword{algebra}

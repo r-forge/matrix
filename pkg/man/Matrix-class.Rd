@@ -5,7 +5,7 @@
 \alias{dimnames,Matrix-method}
 \alias{dimnames<-,Matrix,list-method}
 \alias{show,Matrix-method}
-\alias{coerce,Matrix,matrix-method}
+%\alias{coerce,Matrix,matrix-method}
 
 \title{(Virtual) Class "Matrix" Class of Matrices}
 \description{
