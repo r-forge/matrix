@@ -177,7 +177,7 @@ setClass("bbSparseSy", representation(x = "list", uplo = "character"),
          })
 
 ## Block/block cross tabulation
-setClass("bbCrosstab", contains = "bbSparseSy")
+#setClass("bbCrosstab", contains = "bbSparseSy")
 
 ## Block/block sparse triangular matrices
 setClass("bbSparseTr", representation(x = "list", uplo = "character",
