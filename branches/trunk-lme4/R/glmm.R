@@ -167,58 +167,58 @@ setMethod("GLMM", signature(formula = "formula", random = "list"),
           fit
       })
 
-setMethod("summary", signature(object="glmm"),
-          function(object, ...) {
-              llik <- logLik(object)    # has an oldClass
-              resd <- residuals(object, type="pearson")
-              if (length(resd) > 5) {
-                  resd <- quantile(resd)
-                  names(resd) <- c("Min","Q1","Med","Q3","Max")
-              }
-              ans <- new("summary.glmm",
-                         call = object@call,
-                         logLik = llik,
-                         AIC = AIC(llik),
-                         BIC = BIC(llik),
-                         re = summary(as(object, "reStruct")),
-                         residuals = resd,
-                         method = object@method,
-                         family = object@family$family,
-                         link = object@family$link)
-              ans@re@useScale = !(ans@family %in% c("binomial", "poisson"))
-              ans
-          })
+#setMethod("summary", signature(object="glmm"),
+#          function(object, ...) {
+#              llik <- logLik(object)    # has an oldClass
+#              resd <- residuals(object, type="pearson")
+#              if (length(resd) > 5) {
+#                  resd <- quantile(resd)
+#                  names(resd) <- c("Min","Q1","Med","Q3","Max")
+#              }
+#              ans <- new("summary.glmm",
+#                         call = object@call,
+#                         logLik = llik,
+#                         AIC = AIC(llik),
+#                         BIC = BIC(llik),
+#                         re = summary(as(object, "reStruct")),
+#                         residuals = resd,
+#                         method = object@method,
+#                         family = object@family$family,
+#                         link = object@family$link)
+#              ans@re@useScale = !(ans@family %in% c("binomial", "poisson"))
+#              ans
+#          })
 
-setMethod("show", "summary.glmm",
-          function(object) {
-              rdig <- 5
-              cat("Generalized linear mixed-effects model fit by ")
-              cat(switch(object@method, PQL="PQL\n",
-                         Laplace="2nd order Laplace\n"))
-              cat(" Family:", object@family, "with",
-                  object@link, "link\n")
-              cat(" Data:", deparse( object@call$data ), "\n")
-              if (!is.null(object@call$subset)) {
-                  cat("  Subset:",
-                      deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
-              }
-              print(data.frame(AIC = object@AIC, BIC = object@BIC,
-                               logLik = c(object@logLik), row.names = ""))
-              cat("\n")
-              object@re@showCorrelation = TRUE
-              show(object@re)
-              ## Should this be part of the show method for summary.reStruct?
-              cat("\nNumber of Observations:", object@re@nobs)
-              cat("\nNumber of Groups: ")
-              ngrps <- object@re@ngrps
-              if ((length(ngrps)) == 1) {
-                  cat(ngrps,"\n")
-              } else {				# multiple nesting
-                  cat("\n")
-                  print(ngrps)
-              }
-              invisible(object)
-          })
+#setMethod("show", "summary.glmm",
+#          function(object) {
+#              rdig <- 5
+#              cat("Generalized linear mixed-effects model fit by ")
+#              cat(switch(object@method, PQL="PQL\n",
+#                         Laplace="2nd order Laplace\n"))
+#              cat(" Family:", object@family, "with",
+#                  object@link, "link\n")
+#              cat(" Data:", deparse( object@call$data ), "\n")
+#              if (!is.null(object@call$subset)) {
+#                  cat("  Subset:",
+#                      deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
+#              }
+#              print(data.frame(AIC = object@AIC, BIC = object@BIC,
+#                               logLik = c(object@logLik), row.names = ""))
+#              cat("\n")
+#              object@re@showCorrelation = TRUE
+#              show(object@re)
+#              ## Should this be part of the show method for summary.reStruct?
+#              cat("\nNumber of Observations:", object@re@nobs)
+#              cat("\nNumber of Groups: ")
+#              ngrps <- object@re@ngrps
+#              if ((length(ngrps)) == 1) {
+#                  cat(ngrps,"\n")
+#              } else {				# multiple nesting
+#                  cat("\n")
+#                  print(ngrps)
+#              }
+#              invisible(object)
+#          })
 
 setMethod("show", "glmm",
           function(object)

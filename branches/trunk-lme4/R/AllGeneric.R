@@ -1,7 +1,6 @@
 ## The generics Names, and Names<- will be deprecated in nlme_4.0
 if (!isGeneric("Names")) {
-    setGeneric("Names",
-               function(object, ...)
+    setGeneric("Names", function(object, ...)
            {
                .Deprecated("names")
                standardGeneric("Names")
@@ -20,8 +19,7 @@ if (!isGeneric("Names<-")) {
 if (!isGeneric("logDet")) {
     setGeneric("logDet",
                function(object, covariate = getCovariate(object), ...)
-               standardGeneric("logDet"))#,
-               #valueClass = "numeric")
+               standardGeneric("logDet"))
 }
 
 if (!isGeneric("weighted<-")) {
@@ -76,7 +74,7 @@ if (!isGeneric("LMEhessian")) {
 
 setGeneric("lme",
            function(formula, data, random, correlation, weights, subset,
-                    method, na.action, control, model, x)
+                    method, na.action, control, model, x, ...)
            standardGeneric("lme"))
 
 if (!isGeneric("EMupdate<-")) {
@@ -84,26 +82,13 @@ if (!isGeneric("EMupdate<-")) {
                function(x, nlev, value) standardGeneric("EMupdate<-"))
 }
 
-if (!isGeneric("reStruct")) {
-    setGeneric("reStruct",
-               function(fixed, random, data, weights, REML,
-                        nextraCols=0, analyticHessian=FALSE)
-               standardGeneric("reStruct"))
-}
-
-if (!isGeneric("glmmStruct")) {
-    setGeneric("glmmStruct",
-               function(formula, random, family, data, nextraCols=0,
-                        method="PQL", ...)
-               standardGeneric("glmmStruct"))
-}
-
 if (!isGeneric("pdgradient")) {
     setGeneric("pdgradient", function(x) standardGeneric("pdgradient"))
 }
 
 if (!isGeneric("EMsteps<-")) {
-    setGeneric("EMsteps<-", function(x, value) standardGeneric("EMsteps<-"))
+    setGeneric("EMsteps<-",
+               function(x, value, ...) standardGeneric("EMsteps<-"))
 }
 
 if (!isGeneric("LMEoptimize<-")) {
@@ -117,8 +102,7 @@ if (!isGeneric("response<-")) {
 }
 
 if (!isGeneric("fixef")) {
-    setGeneric("fixef", function(object, ...)
-               standardGeneric("fixef"))
+    setGeneric("fixef", function(object, ...) standardGeneric("fixef"))
 }
 
 if (!isGeneric("fixef<-")) {
@@ -148,8 +132,7 @@ random.effects = function(object, ...) {
 }
 
 if (!isGeneric("BIC")) {
-    setGeneric("BIC", function(object, ...)
-               standardGeneric("BIC"))
+    setGeneric("BIC", function(object, ...) standardGeneric("BIC"))
 }
 
 setMethod("BIC", "logLik",
@@ -158,9 +141,6 @@ setMethod("BIC", "logLik",
           )
 
 if (!isGeneric("getFixDF")) {
-    ## Return the formula(s) for the groups associated with object.
-    ## The result is a one-sided formula unless asList is TRUE in which case
-    ## it is a list of formulas, one for each level.
     setGeneric("getFixDF", function(object) standardGeneric("getFixDF"))
 }
 
@@ -189,6 +169,5 @@ if (!isGeneric("pooledSD")) {
 }
 
 if (!isGeneric("VarCorr")) {
-    setGeneric("VarCorr", function(x)
-               standardGeneric("VarCorr"))
+    setGeneric("VarCorr", function(x) standardGeneric("VarCorr"))
 }

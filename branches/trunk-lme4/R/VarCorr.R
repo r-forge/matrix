@@ -1,34 +1,3 @@
-setMethod("VarCorr", signature(x="reStruct"),
-          function(x)
-      {
-          nobs = dim(x@original)[1]
-          nfixed = length(x@random[['*fixed*']]@columns)
-          denomDF <- nobs - ifelse(x@REML, nfixed, 0)
-          sigma <-
-              abs(x@bbetas[x@random[['*response*']]@storedRows[[1]]])/denomDF
-          new("VarCorr",
-              scale=sigma,
-              reSumry=lapply(rev(x@random)[-c(1, 2)],
-                            function(x) summary(solve(x@precision))))
-      })
-
-setMethod("VarCorr", signature(x="lme"),
-          function(x)
-      {
-          x <- x@reStruct
-          callGeneric()
-      })
-
-setMethod("VarCorr", signature(x="glmm"),
-          function(x)
-      {
-          useScale <- !(x@family$family %in% c("binomial", "poisson"))
-          x <- x@reStruct
-          x <- callGeneric()
-          x@useScale <- useScale
-          x
-      })
-
 setMethod("show", signature(object="VarCorr"),
           function(object)
       {
