@@ -1,7 +1,7 @@
 facshuffle = function(sslm, facs)       # unexported utility
 {
     if (!length(sslm[[2]])) return(facs)
-    cat(" Non-trivial permutation\n")
+    if (getOption("verbose")) cat(" Non-trivial permutation\n")
     s1 = sslm[[1]]
     s2 = sslm[[2]]
     lens = diff(s1@Gp)
@@ -190,21 +190,30 @@ setMethod("lme", signature(formula = "formula", data = "list",
           new("lme", call = match.call(), facs = facs,
               x = if(x) mmats else list(),
               model = if(model) data else data.frame(list()),
-              REML = method == "REML", rep = obj, fitted = fitted)
+              REML = method == "REML", rep = obj, fitted = fitted,
+              residuals = mmats$.Xy[,".response"] - fitted)
       })
 
-setMethod("fitted", signature=c(object="lme"),
+setMethod("fitted", signature(object="lme"),
           function(object, ...)
       {
           object@fitted
       })
 
-setMethod("residuals", signature=c(object="lme"),
-          function(object, ...) NULL)
+setMethod("residuals", signature(object="lme"),
+          function(object, ...) object@residuals )
 
 setMethod("logLik", signature(object="lme"),
-          function(object, REML = FALSE, ...)
-          -deviance(object@rep, REML = REML)/2)
+          function(object, REML = object@REML, ...) {
+              val = -deviance(object@rep, REML = REML)/2
+              rr = object@rep
+              nc = rr@nc[-seq(a = rr@Omega)]
+              attr(val, "nall") = attr(val, "nobs") = nc[2]
+              attr(val, "df") = nc[1] + length(coef(rr))
+              attr(val, "REML") = REML 
+              class(val) <- "logLik"
+              val
+          })
 
 setMethod("deviance", signature(object="lme"),
           function(object, REML, ...)
@@ -212,71 +221,73 @@ setMethod("deviance", signature(object="lme"),
                    REML = ifelse(missing(REML), object@REML, REML))
           )
 
-#setMethod("summary", signature(object="lme"),
-#          function(object, ...) {
-#              llik <- logLik(object)    # has an oldClass
-#              resd <- residuals(object, type="pearson")
-#              if (length(resd) > 5) {
-#                  resd <- quantile(resd)
-#                  names(resd) <- c("Min","Q1","Med","Q3","Max")
-#              }
-#              new("summary.lme",
-#                  call = object@call,
-#                  logLik = llik,
-#                  AIC = AIC(llik),
-#                  BIC = BIC(llik),
-#                  re = summary(as(object, "reStruct")),
-#                  residuals = resd)
-#          })
+setMethod("summary", signature(object="lme"),
+          function(object, ...) {
+              llik <- logLik(object)
+              resd <- residuals(object, type="pearson")
+              if (length(resd) > 5) {
+                  resd <- quantile(resd)
+                  names(resd) <- c("Min","Q1","Med","Q3","Max")
+              }
+              new("summary.lme",
+                  call = object@call,
+                  logLik = llik,
+                  re = summary(object@rep, REML = object@REML,
+                               useScale = TRUE),
+                  residuals = resd)
+          })
 
-#setMethod("show", "summary.lme",
-#          function(object) {
-#              rdig <- 5
-#              cat("Linear mixed-effects model fit by ")
-#              cat(ifelse(object@re@REML, "REML\n", "maximum likelihood\n") )
-#              cat(" Data:", deparse( object@call$data ), "\n")
-#              if (!is.null(object@call$subset)) {
-#                  cat("  Subset:",
-#                      deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
-#              }
-#              print(data.frame(AIC = object@AIC, BIC = object@BIC,
-#                               logLik = c(object@logLik), row.names = ""))
-#              cat("\n")
-#              object@re@useScale = TRUE
-#              object@re@showCorrelation = TRUE
-#              show(object@re)
-#              ## Should this be part of the show method for summary.reStruct?
-#              cat("\nNumber of Observations:", object@re@nobs)
-#              cat("\nNumber of Groups: ")
-#              ngrps <- object@re@ngrps
-#              if ((length(ngrps)) == 1) {
-#                  cat(ngrps,"\n")
-#              } else {				# multiple nesting
-#                  cat("\n")
-#                  print(ngrps)
-#              }
-#              invisible(object)
-#          })
+setMethod("show", "summary.lme",
+          function(object)
+      {
+          rdig <- 5
+          cat("Linear mixed-effects model fit by ")
+          cat(ifelse(object@re@REML, "REML\n", "maximum likelihood\n") )
+          if (!is.null(object@call$formula)) {
+              cat("Fixed:", deparse(object@call$formula),"\n")
+          }
+          if (!is.null(object@call$data)) {
+              cat(" Data:", deparse(object@call$data), "\n")
+          }
+          if (!is.null(object@call$subset)) {
+              cat(" Subset:",
+                  deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
+          }
+          llik = object@logLik
+          print(data.frame(AIC = AIC(llik), BIC = BIC(llik),
+                           logLik = c(object@logLik), row.names = ""))
+          cat("\n")
+          object@re@useScale = TRUE
+          object@re@showCorrelation = TRUE
+          show(object@re)
+          invisible(object)
+      })
 
 setMethod("show", "lme",
           function(object)
       {
-          #sumry = summary(object)
+          sumry = summary(object)
           rdig <- 5
           cat("Linear mixed-effects model\n")
-          cat(" Data:", deparse( object@call$data ), "\n")
+          if (!is.null(object@call$formula)) {
+              cat("Fixed:", deparse(object@call$formula),"\n")
+          }
+          if (!is.null(object@call$data)) {
+              cat(" Data:", deparse( object@call$data ), "\n")
+          }
           if (!is.null(object@call$subset)) {
               cat(" Subset:",
                   deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
           }
           cat(paste(" log-", ifelse(object@REML, "restricted-", ""),
                     "likelihood: ", sep = ''), logLik(object), "\n")
-          show(fixef(object))
-          show(c(object@rep@Omega,
-                 sigmaSq = .Call("ssclme_sigma",
-                                 object@rep, PACKAGE="Matrix")^2))
-          nc = object@rep@nc
-          cat("\nNumber of Observations:", nc[length(nc)], "\n")
+          sumry@re@useScale = TRUE
+          sumry@re@showCorrelation = FALSE
+          saveopt = options(show.signif.stars=FALSE)
+          on.exit(saveopt)
+          show(sumry@re)
+          options(saveopt)
+          on.exit()
           invisible(object)
       })
 
@@ -344,7 +355,7 @@ setMethod("vcov", signature(object = "lme"),
           })
 
 setMethod("VarCorr", signature(x = "lme"),
-          function(x) {
+          function(x, ...) {
               x = x@rep
               callGeneric()
           })

@@ -16,21 +16,6 @@ if (!isGeneric("Names<-")) {
            })
 }
 
-if (!isGeneric("logDet")) {
-    setGeneric("logDet",
-               function(object, covariate = getCovariate(object), ...)
-               standardGeneric("logDet"))
-}
-
-if (!isGeneric("weighted<-")) {
-    setGeneric("weighted<-", function(x, value) standardGeneric("weighted<-"))
-}
-
-if (!isGeneric("model.matrix<-")) {
-    setGeneric("model.matrix<-", function(x, value)
-               standardGeneric("model.matrix<-"))
-}
-
 if (!isGeneric("getGroups")) {
     ## Return the groups associated with object according to form.
     setGeneric("getGroups",
@@ -61,41 +46,48 @@ if (!isGeneric("getResponse")) {
                standardGeneric("getResponse"))
 }
 
+# FIXME: Remove this generic
 if (!isGeneric("LMEgradient")) {
     setGeneric("LMEgradient",
                function(x, A, nlev) standardGeneric("LMEgradient"))
 }
 
+# FIXME: Remove this generic
 if (!isGeneric("LMEhessian")) {
     setGeneric("LMEhessian",
                function(x, A, H, nlev)
                standardGeneric("LMEhessian"))
 }
 
+# FIXME: pare down the argument list
 setGeneric("lme",
            function(formula, data, random, correlation, weights, subset,
                     method, na.action, control, model, x, ...)
            standardGeneric("lme"))
 
+# FIXME: Remove this generic
 if (!isGeneric("EMupdate<-")) {
     setGeneric("EMupdate<-",
                function(x, nlev, value) standardGeneric("EMupdate<-"))
 }
 
+# FIXME: Remove this generic
 if (!isGeneric("pdgradient")) {
     setGeneric("pdgradient", function(x) standardGeneric("pdgradient"))
 }
 
+# FIXME: Remove this generic
 if (!isGeneric("EMsteps<-")) {
     setGeneric("EMsteps<-",
                function(x, value, ...) standardGeneric("EMsteps<-"))
 }
 
 if (!isGeneric("LMEoptimize<-")) {
-    setGeneric("LMEoptimize<-", function(x, value)
+    setGeneric("LMEoptimize<-", function(x, ..., value)
                standardGeneric("LMEoptimize<-"))
 }
 
+# FIXME: Remove this generic
 if (!isGeneric("response<-")) {
     setGeneric("response<-", function(x, value)
                standardGeneric("response<-"))
@@ -105,6 +97,7 @@ if (!isGeneric("fixef")) {
     setGeneric("fixef", function(object, ...) standardGeneric("fixef"))
 }
 
+# FIXME: Remove this generic
 if (!isGeneric("fixef<-")) {
     setGeneric("fixef<-",
                function(object, value) standardGeneric("fixef<-"))
@@ -140,10 +133,6 @@ setMethod("BIC", "logLik",
           -2 * (c(object) - attr(object, "df") * log(attr(object, "nobs"))/2)
           )
 
-if (!isGeneric("getFixDF")) {
-    setGeneric("getFixDF", function(object) standardGeneric("getFixDF"))
-}
-
 ## FIXME: Can this be replaced by confint?
 if (!isGeneric("intervals")) {
     setGeneric("intervals",
@@ -177,8 +166,5 @@ if (!isGeneric("gradient")) {           # not exported
 }
 
 if (!isGeneric("getFixDF")) {           # not exported
-    ## Return the formula(s) for the groups associated with object.
-    ## The result is a one-sided formula unless asList is TRUE in which case
-    ## it is a list of formulas, one for each level.
-    setGeneric("getFixDF", function(object) standardGeneric("getFixDF"))
+    setGeneric("getFixDF", function(object, ...) standardGeneric("getFixDF"))
 }

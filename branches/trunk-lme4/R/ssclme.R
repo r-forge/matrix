@@ -94,22 +94,29 @@ setMethod("fixef", signature(object = "ssclme"),
           })
 
 setMethod("vcov", signature(object = "ssclme"),
-          function(object, ...) {
-              sigma = .Call("ssclme_sigma", object, PACKAGE = "Matrix")
+          function(object, REML = TRUE, useScale = TRUE,...) {
+              ## force an "ssclme_invert"
+              sc = .Call("ssclme_sigma", object, PACKAGE = "Matrix")
               rr = object@RXX
               nr = nrow(rr)
               rr = rr[-nr, -nr, drop = FALSE]
-              sigma^2 * rr %*% t(rr)
+              rr = rr %*% t(rr)
+              if (useScale) {
+                  rr = sc^2 * rr
+              }
+              rr
           })
 
 setMethod("VarCorr", signature(x = "ssclme"),
-          function(x, REML, useScale) {
+          function(x, REML = TRUE, useScale = TRUE, ...) {
               val = .Call("ssclme_variances", x, PACKAGE = "Matrix")
               bVar = x@bVar
-              for (i in seq(along = val))
-                  dimnames(val[[i]]) = dimnames(bVar[[i]][1:2])
+              for (i in seq(along = val)) {
+                  dimnames(val[[i]]) = dimnames(bVar[[i]])[1:2]
+                  val[[i]] = as(as(val[[i]], "pdmatrix"), "corrmatrix")
+              }
               new("VarCorr",
-                  scale = .Call("ssclme_sigma", x, REML)^2,
+                  scale = .Call("ssclme_sigma", x, REML),
                   reSumry = val,
                   useScale = useScale)
           })
@@ -121,31 +128,43 @@ setMethod("gradient", signature(x = "ssclme"),
 setMethod("summary", "ssclme",
           function(object, REML = TRUE, useScale = TRUE, ...) {
               fcoef = fixef(object)
-              corF = as(as(vcov(object), "pdmatrix"), "corrmatrix")
+              corF <- as(as(vcov(object, REML, useScale), "pdmatrix"),
+                         "corrmatrix")
               DF = getFixDF(object)
               coefs = cbind(fcoef, corF@stdDev, DF)
               nc = object@nc
               dimnames(coefs) =
                   list(names(fcoef), c("Estimate", "Std. Error", "DF"))
+              ngrps = diff(object@Gp)
+              ngrps = as.integer(ngrps/nc[seq(a = ngrps)])
+              names(ngrps) = names(object@Omega)
               new("summary.ssclme",
                   coefficients = as.matrix(coefs),
                   scale = .Call("ssclme_sigma", object, REML),
                   denomDF = as.integer(DF),
                   REML = REML,
-                  ngrps = length(object@Omega),
+                  ngrps = ngrps,
                   nobs = nc[length(nc)],
                   corFixed = corF,
-                  reSumry = VarCorr(object, REML, FALSE))
+                  VarCorr = VarCorr(object, REML, useScale),
+                  useScale = useScale,
+                  showCorrelation = FALSE)
           })
 
+## calculates degrees of freedom for fixed effects Wald tests
+## This is a placeholder.  The answers are generally wrong.  It will
+## be very tricky to decide what a 'right' answer should be with
+## crossed random effects.
+
 setMethod("getFixDF", signature(object="ssclme"),
-          function(object)
+          function(object, ...)
       {
           nc = object@nc[-seq(along = object@Omega)]
           p = nc[1] - 1
           n = nc[2]
           rep(n-p, p)
-          ## calculates degrees of freedom for fixed effects Wald tests
+      })
+
 #          Q <- length(object@random)-2
 #          columns = object@random[["*fixed*"]]@columns
 #          X = object@original[, columns, drop = FALSE]
@@ -166,49 +185,17 @@ setMethod("getFixDF", signature(object="ssclme"),
 #          namTerms = factor(assign, labels = namTerms)
 #          attr(val, "assign") = split(order(assign), namTerms)
 #          val
-      })
+#       })
 
 setMethod("show", signature(object="summary.ssclme"),
           function(object) {
               digits = max(3, getOption("digits") - 2)
               useScale = length(object@useScale) > 0 && object@useScale[1]
-              sc = ifelse(useScale, object@scale,  1.)
-              reStdDev = lapply(object@reSumry, function(x, sc) sc*x@stdDev,
-              sc = sc)
-              reLens = unlist(lapply(reStdDev, length))
-              reMat = array('', c(sum(reLens), 4),
-              list(rep('', sum(reLens)),
-                   c("Groups", "Name", "Variance", "Std.Dev.")))
-              reMat[1+cumsum(reLens)-reLens, 1] = names(reLens)
-              reMat[,2] = unlist(lapply(reStdDev, names))
-              reMat[,3] = format(unlist(reStdDev)^2, digits = digits)
-              reMat[,4] = format(unlist(reStdDev), digits = digits)
-              if (any(reLens > 1)) {
-                  maxlen = max(reLens)
-                  corr =
-                      do.call("rbind",
-                              lapply(object@reSumry,
-                                     function(x, maxlen) {
-                                         cc = format(round(x, 3), nsmall = 3)
-                                         cc[!lower.tri(cc)] = ""
-                                         nr = dim(cc)[1]
-                                         cbind(cc, matrix("",
-                                                          nr, maxlen-nr))
-                                     }, maxlen))
-                  colnames(corr) = c("Corr", rep("", maxlen - 1))
-                  reMat = cbind(reMat, corr)
-              }
-              if (useScale) {
-                  reMat = rbind(reMat, c("Residual", "",
-                  format(sc^2, digits = digits),
-                  format(sc, digits = digits),
-                  rep('', ncol(reMat) - 4)))
-              }
+              REML = length(object@REML) > 0 && object@REML[1]
               cat("Random effects:\n")
-              print(reMat, quote = FALSE)
+              show(object@VarCorr)
               cm = object@coefficients
               if (useScale) {
-                  cm[,"Std. Error"] = sc * cm[, "Std. Error"]
                   stat = cm[,1]/cm[,2]
                   pval = 2*pt(abs(stat), cm[,3], lower = FALSE)
                   nms = colnames(cm)
@@ -222,9 +209,7 @@ setMethod("show", signature(object="summary.ssclme"),
                   cm = cbind(cm, stat, pval)
                   colnames(cm) = c(nms, "z value", "Pr(>|z|)")
               }
-#              cat("\nFixed effects:",
-#                  paste(deparse(object@fixed),
-#                        sep = '\n', collapse = '\n'), "\n")
+              cat("\nFixed effects:\n")
               printCoefmat(cm, tst.ind = 4, zap.ind = 3)
               if (length(object@showCorrelation) > 0 &&
                   object@showCorrelation[1]) {
@@ -242,5 +227,15 @@ setMethod("show", signature(object="summary.ssclme"),
                       }
                   }
               }
+              cat("\nNumber of Observations:", object@nobs)
+              cat("\nNumber of Groups: ")
+              ngrps <- object@ngrps
+              if ((length(ngrps)) == 1) {
+                  cat(ngrps,"\n")
+              } else {				# multiple nesting
+                  cat("\n")
+                  print(ngrps)
+              }
+
           })
 
