@@ -2,6 +2,7 @@ SOURCES_C =  \
 	    LU.c \
             Mutils.c \
 	    Metis_utils.c \
+            bCrosstab.c \
 	    cscBlocked.c \
             cscMatrix.c \
             dense.c \
