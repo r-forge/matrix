@@ -3,6 +3,7 @@
 
 #include <Rdefines.h>
 #include <Rconfig.h>
+#include "cblas.h"
 
 char norm_type(char *typstr);
 char rcond_type(char *typstr);
@@ -35,7 +36,8 @@ extern
 #include "Syms.h"
 
 /* zero an array */
-#define AZERO(x, n) {int _i_, _sz_ = (n); for(_i_ = 0; _i_ < _sz_; _i_++) (x)[_i_] = 0;}
+#define AZERO(x, n) {int _I_, _SZ_ = (n); for(_I_ = 0; _I_ < _SZ_; _I_++) (x)[_I_] = 0;}
+
 
 #endif
 
