@@ -1263,7 +1263,15 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
         alpha,
 	one = 1.;
     SEXP ans = PROTECT(allocVector(REALSXP, coef_length(nf, nc)));
+    int *status = LOGICAL(GET_SLOT(x, Matrix_statusSym));
 
+    ssclme_factor(x);
+    if (!R_FINITE(REAL(GET_SLOT(x, Matrix_devianceSym))[0])) {
+	int ncoef = coef_length(nf, nc);
+	for (i = 0; i < ncoef; i++) REAL(ans)[i] = NA_REAL;
+	UNPROTECT(1);
+	return ans;
+    }
     nobs = nc[nf + 1];
     p = pp1 - 1;
     b = RZX + p * n;
