@@ -159,8 +159,6 @@ setMethod("lme", signature(formula = "formula", random = "list"),
           .Call("ssclme_EMsteps", obj, controlvals$niterEM,
                 controlvals$REML, controlvals$EMverbose, PACKAGE = "Matrix")
           LMEoptimize(obj) = controlvals
-                                        # _factor for correct deviance
-          .Call("ssclme_factor", obj, PACKAGE = "Matrix")
           fitted = .Call("ssclme_fitted", obj, facs, mmats, PACKAGE = "Matrix")
           new("lme", call = match.call(), facs = facs,
               x = if(x) mmats else list(),
