@@ -1,7 +1,6 @@
-# Ensure that the methods package is available, initialize symbols
+# Ensure that the methods package is available
 .onLoad <- function(lib, pkg) {
     require("methods", character = TRUE, quietly = TRUE)
-    .Call("Matrix_init", PACKAGE = "Matrix")
 }
 
 # Virtual class of all Matrix objects

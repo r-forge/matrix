@@ -14,7 +14,6 @@ SEXP csc_to_imagemat(SEXP x);
 SEXP matrix_to_csc(SEXP A);
 SEXP triplet_to_csc(SEXP triplet);
 SEXP csc_getDiag(SEXP x);
-SEXP csc_getDiag(SEXP x);
 SEXP csc_transpose(SEXP x);
 
 #endif

@@ -75,8 +75,7 @@ SEXP lmeRep_validate(SEXP x)
  * @return Pointer to a list of cscBlocked objects containing the
  * tabulation and pairwise cross-tabulation of the factors
  */
-SEXP
-lmeRep_crosstab(SEXP facs)
+SEXP lmeRep_crosstab(SEXP facs)
 {
     if (isNewList(facs)) {
 	int nf = length(facs);
@@ -233,8 +232,7 @@ create_matrix_lists(const int nc[], SEXP facs, SEXP ZZx, SEXP L, SEXP Linv)
  * 
  * @return pointer to an lmeRep object
  */
-SEXP
-lmeRep_create(SEXP facs, SEXP ncv)
+SEXP lmeRep_create(SEXP facs, SEXP ncv)
 {
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("lmeRep")));
     int *nc, nf = length(facs), i, nzcol;
@@ -342,7 +340,8 @@ SEXP lmeRep_update_mm(SEXP x, SEXP facs, SEXP mmats)
 	ZtXP = GET_SLOT(x, Matrix_ZtXSym),
 	levs = GET_SLOT(x, R_LevelsSymbol),
 	cnames = GET_SLOT(x, Matrix_cnamesSym);
-    int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+    int *dims = INTEGER(getAttrib(ZtXP, R_DimSymbol)),
+	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	*status = LOGICAL(GET_SLOT(x, Matrix_statusSym)),
 	nf = length(levs), nfp1 = nf + 1,
 	i, ione = 1,
@@ -383,9 +382,9 @@ SEXP lmeRep_update_mm(SEXP x, SEXP facs, SEXP mmats)
 	SET_VECTOR_ELT(levs, i, duplicate(getAttrib(fac, R_LevelsSymbol)));
 	ncZ += length(VECTOR_ELT(levs, i)) * nc[i];
     }
-    if (ncZ != INTEGER(getAttrib(ZtXP, R_DimSymbol))[0])
+    if (ncZ != dims[0])
 	error("# rows of ZtX slot, %d, != sum of # levels * # columns, %d",
-	      INTEGER(getAttrib(ZtXP, R_DimSymbol))[0], ncZ);
+	      dims[0], ncZ);
 				/* Create XtX */
     X = REAL(VECTOR_ELT(mmats, nf));
     F77_CALL(dsyrk)("U", "T", &pp1, &nobs, &one, X, &nobs, &zero, XtX, nc + nf);
@@ -422,7 +421,7 @@ SEXP lmeRep_update_mm(SEXP x, SEXP facs, SEXP mmats)
 	    for (j = 0; j < nobs; j++) {
 		int fj = fac[j] - 1; /* factor indices are 1-based */
 		ZZx[fj] += Z[j] * Z[j];
-		F77_CALL(daxpy)(&pp1, Z + j, X + j, &nobs, ZtX + fj, &nlev);
+		F77_CALL(daxpy)(&pp1, Z + j, X + j, &nobs, ZtX + fj, dims);
 	    }
 	} else {
 	    for (j = 0; j < nobs; j++) {
@@ -433,7 +432,7 @@ SEXP lmeRep_update_mm(SEXP x, SEXP facs, SEXP mmats)
 		F77_CALL(dgemm)("T", "N", nc + i, &pp1, &ione,
 				&one, Z + j, &nobs,
 				X + j, &nobs, &one,
-				ZtX + fj * nci, &ZtXrows);
+				ZtX + fj * nci, dims);
 	    }
 	}
 	ZtX += ZtXrows;
@@ -562,7 +561,7 @@ copy_ZZx_to_L(int nf, const int nc[], SEXP ZZxP, SEXP LP)
 		    if (ii < zi) { /* zero this block */
 			memset(Lx + ii * sz, 0, sizeof(double) * sz);
 		    } else if (ii == zi) { /* copy this block */
-			Memcpy(Zx + zi * sz, Lx + ii * sz, sz);
+			Memcpy(Lx + ii * sz, Zx + zi * sz, sz);
 			zpj++;
 			zi = (zpj < Z2) ? Zi[zpj] : INT_MAX;
 		    } else
@@ -641,7 +640,7 @@ SEXP lmeRep_factor(SEXP x)
 	int nml = nc[nf + 1], nreml = nml + 1 - nc[nf];
 	double
 	    *RXX = REAL(GET_SLOT(x, Matrix_RXXSym)),
-	    *RZX = REAL(GET_SLOT(x, Matrix_RZXSym)),
+	    *RZX = REAL(RZXsl),
 	    *dcmp = REAL(GET_SLOT(x, Matrix_devCompSym)),
 	    *deviance = REAL(GET_SLOT(x, Matrix_devianceSym)),
 	    minus1 = -1., one = 1.;
@@ -1334,6 +1333,7 @@ SEXP lmeRep_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
  * 
  * @return val an array consisting of five symmetric faces
  */
+static
 SEXP lmeRep_secondDer(SEXP x, SEXP Valp)
 {
     SEXP

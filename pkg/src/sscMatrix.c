@@ -103,7 +103,7 @@ SEXP sscMatrix_matrix_solve(SEXP a, SEXP b)
 	error("Argument b must be a numeric matrix");
     if (*adims != *bdims || bdims[1] < 1 || *adims < 1)
 	error("Dimensions of system to be solved are inconsistent");
-    if (Chol == R_NilValue) Chol = sscMatrix_chol(a, ScalarLogical(1.));
+    if (Chol == R_NilValue) Chol = sscMatrix_chol(a, ScalarLogical(1));
     perm = GET_SLOT(Chol, Matrix_permSym);
     piv = length(perm);
     if (piv) tmp = Calloc(n, double);
