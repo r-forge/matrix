@@ -4,7 +4,7 @@
 \bibliographystyle{plainnat}
 %%\VignetteIndexEntry{Sparse matrix representations of linear mixed models}
 %%\VignetteDepends{Matrix}
-%%\VignetteDepends{mlmrev}
+%%\VignetteDepends{lme4}
 \begin{document}
 \SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=5,height=3,strip.white=TRUE}
 \setkeys{Gin}{width=\textwidth}
@@ -18,10 +18,11 @@
   sparse matrices.  This representation provides for efficient
   evaluation of the profiled log-likelihood or profiled restricted
   log-likelihood of the model, given the relative precision parameters
-  of the random effects.  The evaluation is based upon the Cholesky
-  decomposition of the augmented sparse representation.  Additionally,
-  we can use information from this representation to evaluate ECME
-  updates and the gradient and Hessian of the objective criterion.
+  of the random effects.  The evaluation is based upon the
+  $\bL\bD\bL\trans$ form of the Cholesky decomposition of the
+  augmented sparse representation.  Additionally, we can use
+  information from this representation to evaluate ECME updates and
+  the gradient and Hessian of the criterion being optimized.
   
   The ordering of the columns (and, correspondingly, the rows) of a
   positive semidefinite, symmetric sparse matrix can have a
@@ -81,27 +82,26 @@ entries (and somewhat different values of those non-zero entries) and
 because the non-zero entries occur in dense blocks.  Many methods for
 sparse matrices have both a symbolic phase, where the pattern of the
 non-zero entries in the result is determined, and a numeric phase,
-where the actual results are determined.  For decompositions part of
-the symbolic phase is determination of permutation of the rows and
+where the numerical results are determined.  For decompositions part
+of the symbolic phase is determination of permutation of the rows and
 columns that reduces fill-in for the decomposition.  In our problem
 the symbolic phase need only be done once and it can be performed
 based the positions of the blocks.  The matrix giving the positions of
 the blocks is frequently much smaller and easier to manipulate than
 the matrix that is to be decomposed.  Furthermore, the blocks provide
-a natural way of using multifrontal techniques, that is, using dense
-matrix building blocks in a sparse matrix calculation, for this
-problem.
+a natural way of using supernodes that employ dense matrix building
+blocks in a sparse matrix calculation, for this problem.
 
 In the next section I introduce a general form of linear mixed-models
 and the notation I will use.  I also introduce three sample data sets
 and models.  These include a very simple example that can be used to
-illustrate details of the calculations, a moderate-sized example that has
-been used to illustrate other methods, and a very large example that
-can show the savings available with sparse matrix methods.  In section
-In \S\ref{sec:Examples} I introduce sparse matrix storage schemes and
-computational methods and show how they can be applied to the examples.
-Throughout we illustrate these methods using
-the \code{Matrix} package for R~\citep{R-1.9.0}, which provides an
+illustrate details of the calculations, a moderate-sized example that
+has been used to illustrate other methods, and a very large example
+that can show the savings available with sparse matrix methods.  In
+\S\ref{sec:Examples} I introduce sparse matrix storage schemes and
+computational methods and show how they can be applied to the
+examples.  Throughout we illustrate these methods using the
+\code{Matrix} package for R~\citep{R-1.9.0}, which provides an
 implementation of sparse matrix methods for linear mixed-effects
 models.  This R package is based on code from the LDL, TAUCS, Metis,
 and UMFPACK packages.
