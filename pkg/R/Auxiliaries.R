@@ -1,9 +1,12 @@
 #### "Namespace private" Auxiliaries  such as method functions
 #### (called from more than one place --> need to be defined early)
 
-## For %*% (M = Matrix; n = numeric):
-.M.n <- function(x, y) callGeneric(x, as.matrix(y))
-.n.M <- function(x, y) callGeneric(rbind(x), y)
+## For %*% (M = Matrix; v = vector (double or integer {complex maybe?}):
+.M.v <- function(x, y) callGeneric(x, as.matrix(y))
+.v.M <- function(x, y) callGeneric(rbind(x), y)
+
+.has.DN <- ## has non-trivial Dimnames slot?
+    function(x) !identical(list(NULL,NULL), x@Dimnames)
 
 ## chol() via "dpoMatrix"
 cholMat <- function(x, pivot, LINPACK) {
