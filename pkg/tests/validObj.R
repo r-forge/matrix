@@ -34,6 +34,15 @@ assertError( new("dgeMatrix", Dim = as.integer(c(2,2)), x= as.double(1:5)))
 
 chk.matrix(m1 <- Matrix(1:6, ncol=2))
 chk.matrix(m2 <- Matrix(1:7, ncol=3)) # a warning
+stopifnot(is(m1) == c("dgeMatrix", "ddenseMatrix", "dMatrix", "Matrix"),
+          dim(t(m1)) == 2:3,
+          identical(m1, t(t(m1))))
+c.nam <- paste("C",1:2, sep='')
+dimnames(m1) <- list(NULL, c.nam)
+stopifnot(colnames(m1) == c.nam,
+          identical(dimnames(t(m1)), list(c.nam, NULL)),
+          identical(m1, t(t(m1))))
+
 
 ## "dpo"
 chk.matrix(cm <- crossprod(m1))
@@ -57,12 +66,18 @@ assertError( new("dtrMatrix", Dim = 2:2, x=as.double(1:4)) )# length(Dim) !=2
 assertError( new("dtrMatrix", Dim = as.integer(c(2,2)), x= as.double(1:5)))
 
 tr22 <- new("dtrMatrix", Dim = as.integer(c(2,2)), x=as.double(1:4))
-try( t(tr22) ) # fails -- FIXME
+tt22 <- t(tr22)
+(tPt <- tr22 + tt22)
+stopifnot(identical(10 * tPt, tPt * 10),
+          (t.22 <- (tr22 / .5)* .5)@x == c(1,0,3,4),
+          TRUE) ## not yet: class(t.22) == "dtrMatrix")
 
-## non-square
+
+## non-square  triagonal Matrices --- should this be forbidden anyway? ---
 tru <- new("dtrMatrix", Dim = 2:3, x=as.double(1:6), uplo="L", diag="U")
 trn <- new("dtrMatrix", Dim = 2:3, x=as.double(1:6), uplo="L", diag="N")
 tru + trn  # a 'dgeMatrix'
 
-try( t(tru) ) ## FIXME !
-try( t(trn) ) ## FIXME
+as(t(tru),"dgeMatrix")
+as(t(trn),"dgeMatrix")
+as(t(t(tru)), "dgeMatrix")# pretty non sense

@@ -84,6 +84,8 @@ exportMethods(
               "determinant",
               "diag",
               "dim",
+              "dimnames",
+              "dimnames<-",
               "expand",
               "expm",
               "image",

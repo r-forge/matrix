@@ -1,5 +1,9 @@
 2005-02-26  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* R/dgeMatrix.R: provide "dimnames" and "dimnames<-" methods
+
+	* R/dtrMatrix.R: fix t() method
+
 	* R/dgeMatrix.R: define group methods "Arith", "Math", "Math2"
         * NAMESPACE: export them (and import generics from "methods")
 	* tests/group-methods.R : and test them.

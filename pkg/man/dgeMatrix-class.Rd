@@ -26,6 +26,8 @@
 \alias{determinant,dgeMatrix,missing-method}
 \alias{diag,dgeMatrix-method}
 \alias{dim,dgeMatrix-method}
+\alias{dimnames,dgeMatrix-method}
+\alias{dimnames<-,dgeMatrix,list-method}
 \alias{eigen,dgeMatrix,missing-method}
 \alias{eigen,dgeMatrix,logical-method}
 \alias{lu,dgeMatrix-method}
@@ -35,6 +37,7 @@
 \alias{rcond,dgeMatrix,character-method}
 \alias{solve,dgeMatrix,matrix-method}
 \alias{solve,dgeMatrix,missing-method}
+\alias{t,dgeMatrix-method}
 %
 \description{A general, numeric matrix in the S4 Matrix representation}
 \section{Objects from the Class}{
@@ -79,6 +82,8 @@
     \item{crossprod}{\code{signature(x = "dgeMatrix", y = "numeric")}: ... }
     \item{diag}{\code{signature(x = "dgeMatrix")}: ... }
     \item{dim}{\code{signature(x = "dgeMatrix")}: ... }
+    \item{dimnames}{\code{signature(x = "dgeMatrix")}: ... }
+    \item{dimnames<-}{\code{signature(x = "dgeMatrix", value = "list")}: ... }
     \item{eigen}{\code{signature(x = "dgeMatrix", only.values= "logical")}: ...}
     \item{eigen}{\code{signature(x = "dgeMatrix", only.values= "missing")}: ...}
     \item{lu}{\code{signature(x = "dgeMatrix")}: ... }
@@ -88,6 +93,7 @@
     \item{rcond}{\code{signature(x = "dgeMatrix", type = "missing")}: ... }
     \item{solve}{\code{signature(a = "dgeMatrix", b = "dgeMatrix")}: ... }
     \item{solve}{\code{signature(a = "dgeMatrix", b = "missing")}: ... }
+    \item{t}{\code{signature(x = "dgeMatrix")}: ... }
   }
 }
 %\references{}

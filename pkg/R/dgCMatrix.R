@@ -14,8 +14,9 @@ setMethod("tcrossprod", signature(x = "dgCMatrix"),
           function(x)
           .Call("csc_tcrossprod", x))
 
-setMethod("dim", signature(x = "dgCMatrix"),
-          function(x) x@Dim, valueClass = "integer")
+## try to define for "Matrix"
+## setMethod("dim", signature(x = "dgCMatrix"),
+##           function(x) x@Dim, valueClass = "integer")
 
 setMethod("diag", signature(x = "dgCMatrix"),
           function(x = 1, nrow, ncol = n)
