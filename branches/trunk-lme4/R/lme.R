@@ -490,11 +490,9 @@ setMethod("lme1", signature(formula = "formula",
                             function(x) model.matrix(formula(x), data = data)),
                      list(.Xy = cbind(model.matrix(formula, data = data),
                           .response = model.response(data))))
-          obj <- .Call("lmeRep_create", facs, sapply(mmats, ncol),
-                       PACKAGE = "Matrix")
-          .Call("lmeRep_update_mm", obj, facs, mmats, PACKAGE="Matrix")
-          .Call("lmeRep_initial", obj, PACKAGE="Matrix")
-          .Call("lmeRep_ECMEsteps", obj, 
+          obj <- .Call("lmer_create", facs, mmats, PACKAGE = "Matrix")
+          .Call("lmer_initial", obj, PACKAGE="Matrix")
+          .Call("lmer_ECMEsteps", obj, 
                 controlvals$niterEM,
                 controlvals$REML,
                 controlvals$EMverbose,

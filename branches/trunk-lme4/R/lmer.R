@@ -1,4 +1,4 @@
-setReplaceMethod("LMEoptimize", signature(x="lmeRep", value="list"),
+setReplaceMethod("LMEoptimize", signature(x="lmer", value="list"),
                  function(x, value)
              {
                  if (value$msMaxIter < 1) return(x)
@@ -29,28 +29,28 @@ setReplaceMethod("LMEoptimize", signature(x="lmeRep", value="list"),
                  return(x)
              })
 
-setMethod("deviance", signature(object = "lmeRep"),
+setMethod("deviance", signature(object = "lmer"),
           function(object, REML = FALSE, ...) {
-              .Call("lmeRep_factor", object, PACKAGE = "Matrix")
+              .Call("lmer_factor", object, PACKAGE = "Matrix")
               object@deviance[ifelse(REML, 2, 1)]
           })
 
-setMethod("ranef", signature(object = "lmeRep"),
+setMethod("ranef", signature(object = "lmer"),
           function(object, ...) {
-              .Call("lmeRep_ranef", object, PACKAGE = "Matrix")
+              .Call("lmer_ranef", object, PACKAGE = "Matrix")
           })
 
-setMethod("fixef", signature(object = "lmeRep"),
+setMethod("fixef", signature(object = "lmer"),
           function(object, ...) {
-              val = .Call("lmeRep_fixef", object, PACKAGE = "Matrix")
+              val = .Call("lmer_fixef", object, PACKAGE = "Matrix")
               names(val) = object@cnames[[".fixed"]]
               val[-length(val)]
           })
 
-setMethod("vcov", signature(object = "lmeRep"),
+setMethod("vcov", signature(object = "lmer"),
           function(object, REML = TRUE, useScale = TRUE,...) {
-              ## force an "lmeRep_invert"
-              sc <- .Call("lmeRep_sigma", object, REML, PACKAGE = "Matrix")
+              ## force an "lmer_invert"
+              sc <- .Call("lmer_sigma", object, REML, PACKAGE = "Matrix")
               rr <- object@RXX
               nms <- object@cnames[[".fixed"]]
               dimnames(rr) <- list(nms, nms)
@@ -63,24 +63,24 @@ setMethod("vcov", signature(object = "lmeRep"),
               rr
           })
 
-setMethod("VarCorr", signature(x = "lmeRep"),
+setMethod("VarCorr", signature(x = "lmer"),
           function(x, REML = TRUE, useScale = TRUE, ...) {
-              val = .Call("lmeRep_variances", x, PACKAGE = "Matrix")
+              val = .Call("lmer_variances", x, PACKAGE = "Matrix")
               for (i in seq(along = val)) {
                   dimnames(val[[i]]) = list(x@cnames[[i]], x@cnames[[i]])
                   val[[i]] = as(as(val[[i]], "pdmatrix"), "corrmatrix")
               }
               new("VarCorr",
-                  scale = .Call("lmeRep_sigma", x, REML),
+                  scale = .Call("lmer_sigma", x, REML),
                   reSumry = val,
                   useScale = useScale)
           })
 
-setMethod("gradient", signature(x = "lmeRep"),
+setMethod("gradient", signature(x = "lmer"),
           function(x, REML, unconst, ...)
-          .Call("lmeRep_gradient", x, REML, unconst))
+          .Call("lmer_gradient", x, REML, unconst))
 
-setMethod("summary", "lmeRep",
+setMethod("summary", "lmer",
           function(object, REML = TRUE, useScale = TRUE, ...) {
               fcoef <- fixef(object)
               corF <- as(as(vcov(object, REML, useScale), "pdmatrix"),
@@ -92,7 +92,7 @@ setMethod("summary", "lmeRep",
                   list(names(fcoef), c("Estimate", "Std. Error", "DF"))
               new("summary.ssclme",
                   coefficients = as.matrix(coefs),
-                  scale = .Call("lmeRep_sigma", object, REML),
+                  scale = .Call("lmer_sigma", object, REML),
                   denomDF = as.integer(DF),
                   REML = REML,
                   ngrps = unlist(lapply(object@levels, length)),
@@ -103,7 +103,7 @@ setMethod("summary", "lmeRep",
                   showCorrelation = FALSE)
           })
 
-setMethod("show", "lmeRep",
+setMethod("show", "lmer",
           function(object) {
               fcoef <- fixef(object)
               corF <- as(as(vcov(object, REML = TRUE, useScale = TRUE), "pdmatrix"),
@@ -115,7 +115,7 @@ setMethod("show", "lmeRep",
                   list(names(fcoef), c("Estimate", "Std. Error", "DF"))
               new("summary.ssclme",
                   coefficients = as.matrix(coefs),
-                  scale = .Call("lmeRep_sigma", object, REML = TRUE),
+                  scale = .Call("lmer_sigma", object, REML = TRUE),
                   denomDF = as.integer(DF),
                   REML = TRUE,
                   ngrps = unlist(lapply(object@levels, length)),
@@ -131,7 +131,7 @@ setMethod("show", "lmeRep",
 ## be very tricky to decide what a 'right' answer should be with
 ## crossed random effects.
 
-setMethod("getFixDF", signature(object="lmeRep"),
+setMethod("getFixDF", signature(object="lmer"),
           function(object, ...)
       {
           nc <- object@nc[-seq(along = object@Omega)]
@@ -140,12 +140,12 @@ setMethod("getFixDF", signature(object="lmeRep"),
           rep(n-p, p)
       })
 
-setMethod("anova", signature(object="lmeRep"),
+setMethod("anova", signature(object="lmer"),
           function(object, ...)
       {
           foo <- object
           foo@status["factored"] <- FALSE
-          .Call("lmeRep_factor", foo, PACKAGE="Matrix")
+          .Call("lmer_factor", foo, PACKAGE="Matrix")
           dfr <- getFixDF(foo)
           ss <- foo@RXX[ , ".response"]^2
           ssr <- ss[[".response"]]
