@@ -19,7 +19,8 @@ Matrix <-
 
 Matrix.class <- function(x, tol = 0, symmetry = TRUE, unit.diagonal = TRUE,
                          triangularity = c(TRUE, TRUE),
-                         orthogonality = c(TRUE, TRUE), normality = c(TRUE, TRUE))
+                         orthogonality = c(TRUE, TRUE),
+                         normality = c(TRUE, TRUE))
 {
     val <- "Matrix"
     x <- as.matrix(x)
@@ -63,6 +64,6 @@ Matrix.class <- function(x, tol = 0, symmetry = TRUE, unit.diagonal = TRUE,
 
 as.Matrix <- function(x, tol = .Machine$double.eps)
 {
-    if (inherits(x, "Matrix")) return(asObject(x, Matrix.class(x, tol = tol)))
-    asObject(as.matrix(x), Matrix.class(x, tol = tol))
+    asObject(if (inherits(x, "Matrix")) x else as.matrix(x),
+	     Matrix.class(x, tol = tol))
 }
