@@ -27,17 +27,20 @@ nlme_replaceSlot(SEXP obj, SEXP names, SEXP value)
     return obj;
 }
 
-SEXP nlme_weight_matrix_list(SEXP MLin, SEXP wts, SEXP MLout)
+SEXP nlme_weight_matrix_list(SEXP MLin, SEXP wts, SEXP adjst, SEXP MLout)
 {
     int i, n, nf;
+    SEXP lastM;
     
-    if (!(isNewList(MLin) && isReal(wts) && isNewList(MLout)))
+    if (!(isNewList(MLin) && isReal(wts) && isReal(adjst) && isNewList(MLout)))
 	error("Incorrect argument type");
     nf = length(MLin);
     if (length(MLout) != nf)
 	error("Lengths of MLin (%d) and MLout (%d) must match", nf,
 	      length(MLout));
     n = length(wts);
+    if (length(adjst) != n)
+	error("Expected adjst to have length %d, got %d", n, length(adjst));
     for (i = 0; i < nf; i++) {
 	SEXP Min = VECTOR_ELT(MLin, i),
 	    Mout = VECTOR_ELT(MLout, i);
@@ -65,5 +68,9 @@ SEXP nlme_weight_matrix_list(SEXP MLin, SEXP wts, SEXP MLout)
 	    }
 	}
     }
+    lastM = VECTOR_ELT(MLout, nf - 1);
+    j = INTEGER(getAttrib(lastM, R_DimSymbol))[1] - 1;
+    for (i = 0; i < n; i++)
+	REAL(lastM)[j*n + i] = REAL(adjst)[i] * REAL(wts)[i];
     return MLout;
 }
