@@ -1,3 +1,18 @@
+2004-11-12  Douglas Bates  <bates@bates1-home>
+
+	* src/LU.c,geMatrix.c,trMatrix.c:
+	Complete allocation of slots in NEW_OBJECT.
+
+	* src/Mutils.h: Moved list of symbols to an include file
+
+2004-11-11  Douglas Bates  <bates@bates1-home>
+
+	* src/geMutils.c (Matrix_init): remove unused function
+
+2004-11-10  Douglas Bates  <bates@bates1-home>
+
+	* src/cscMatrix.c (csc_to_imagemat): removed unused function
+
 2004-11-05  Douglas Bates  <bates@bates1-home>
 
 	* src/Makefile.win (SOURCES_C): Keep consistent with Makefile
