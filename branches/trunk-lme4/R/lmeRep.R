@@ -52,12 +52,13 @@ setReplaceMethod("LMEoptimize", signature(x="lmeRep", value="list"),
                      ccoef(x) <- pars
                      deviance(x, REML = value$REML)
                  }
-                 gr <- function(pars) {
-                     ccoef(x) <- pars
-                     grad <- lme4:::gradient(x, REML = value$REML, unconst = TRUE)
-                     grad[constr] <- -grad[constr]/pars[constr]
-                     grad
-                 }
+                 gr <- if (value$analyticGradient)
+                     function(pars) {
+                         ccoef(x) <- pars
+                         grad <- lme4:::gradient(x, REML = value$REML, unconst = TRUE)
+                         grad[constr] <- -grad[constr]/pars[constr]
+                         grad
+                     } else NULL
                  optimRes <- optim(st, fn, gr,
                                    method = "L-BFGS-B",
                                    lower = ifelse(constr, 1e-10, -Inf),
