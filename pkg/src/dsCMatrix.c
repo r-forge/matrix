@@ -139,6 +139,8 @@ SEXP ssc_transpose(SEXP x)
     adims[0] = xdims[1]; adims[1] = xdims[0];
     if (CHAR(asChar(GET_SLOT(x, Matrix_uploSym)))[0] == 'U')
 	SET_SLOT(ans, Matrix_uploSym, mkString("L"));
+    else
+	SET_SLOT(ans, Matrix_uploSym, mkString("U"));
     csc_compTr(xdims[0], xdims[1], nnz,
 	       INTEGER(GET_SLOT(x, Matrix_pSym)), INTEGER(islot),
 	       REAL(GET_SLOT(x, Matrix_xSym)),
