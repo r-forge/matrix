@@ -17,6 +17,9 @@ but are more commonly created from \code{chol} applied to an
       length 0.}
     \item{\code{iperm}:}{Object of class \code{"integer"} - the inverse
       permutation to the \code{perm} slot.}
+    \item{\code{diag}:}{A character object indicating if the triangular
+      matrix is unit triangular or not.  This slot is inherited from the
+      \code{"tscMatrix"} class.  It is always \code{"N"} for this class.}
     \item{\code{uplo}:}{A character object indicating if the upper
       triangle (\code{"U"} or \code{"u"}) or the lower triangle
       (\code{"L"} or \code{"l"}) is stored.  At present only the lower

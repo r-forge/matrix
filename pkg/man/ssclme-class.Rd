@@ -1,6 +1,8 @@
 \name{ssclme-class}
 \docType{class}
 \alias{ssclme-class}
+\alias{coerce,ssclme,sscMatrix-method}
+\alias{coerce,ssclme,tscMatrix-method}
 \title{lme models as sparse, symmetric matrices}
 \description{A representation of a linear mixed-effects model using a
   combination of sparse, symmetric, column-oriented matrices and dense matrices.}
