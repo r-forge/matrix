@@ -33,7 +33,6 @@
 data(Bang)
 str(Bang)
 summary(Bang)
-library(lme4)
 system.time(fm1 <- GLMM(use ~ urban+age+livch,
    family = binomial, data = Bang, random = ~ 1|district))
 summary(fm1)

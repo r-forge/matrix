@@ -95,7 +95,6 @@ pseudo-likelihood approach.
   \code{\link{lme}}
 }
 \examples{
-library(lme4)
 data(guImmun)
 numimmun <- as.numeric(guImmun$immun) - 1 # get rid of this later
 fm1 <-

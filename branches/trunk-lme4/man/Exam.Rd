@@ -38,7 +38,6 @@
 data(Exam)
 str(Exam)
 summary(Exam)
-library(lme4)
 system.time(fm1 <- lme(normexam ~ standlrt + gender + schgend,
     data = Exam, random = ~ 1|school))
 summary(fm1)
