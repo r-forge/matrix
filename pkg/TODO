@@ -50,10 +50,10 @@ We have a (at least one) basic problem :
 
 ---
 
-- create a class of permutation matrices for use in expand.  The
-  current expand method for the LU factorization is not complete
-  because it does not provide the permutation.
-
 - combine the C functions for multiplication by special forms and
   solution wrt special forms by using a 'right' argument and a
   'classed' argument.
+   [done with dgeMatrix_matrix_mm();  not yet for other classes;
+    and for _crossprod()]
+
+- add more comprehensive examples / tests for Schur decomposition
