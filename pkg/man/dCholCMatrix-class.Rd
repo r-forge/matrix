@@ -1,13 +1,13 @@
 \name{dCholCMatrix-class}
 \docType{class}
 \alias{dCholCMatrix-class}
-\title{Cholesky decompositions of dsCMatrix objects}
+\title{Cholesky Decompositions of dsCMatrix Objects}
 \description{The class of Cholesky decompositions of symmetric, sparse
-  column matrices from the \code{"dsCMatrix"} class.}
+  compressed column matrices from the \code{"dsCMatrix"} class.}
 \section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("dCholCMatrix", ...)}
-but are more commonly created from \code{chol} applied to an
-\code{dsCMatrix} object.
+  Objects can be created by calls of the form \code{new("dCholCMatrix", ...)}
+  but are more commonly created from \code{chol} applied to an
+  \code{dsCMatrix} object.
 }
 \section{Slots}{
   \describe{
@@ -42,11 +42,11 @@ but are more commonly created from \code{chol} applied to an
   }
 }
 \section{Extends}{
-Class \code{"dtCMatrix"}, directly.
-Class \code{"dgCMatrix"}, by class \code{"dtCMatrix"}.
+  Class \code{"dtCMatrix"}, directly.
+  Class \code{"dgCMatrix"}, by class \code{"dtCMatrix"}.
 }
 \section{Methods}{
-No methods defined with class "dCholCMatrix" in the signature.
+  No methods defined with class "dCholCMatrix" in the signature.
 }
 %\references{}
 %\author{}
@@ -57,9 +57,13 @@ No methods defined with class "dCholCMatrix" in the signature.
 %\examples{}
 \examples{
 data(mm)
-xpx = crossprod(mm)
+xpx <- crossprod(mm)
 str(xpx)
-str(chol(xpx))
+str(ch <- chol(xpx))
+
+## Visualize the sparseness:
+image(xpx, main=paste("crossprod(mm) : Sparse",dQuote(class(xpx))))
+image(ch, main=paste("chol (crossprod(mm)) : Sparse", dQuote(class(ch))))
 }
 \keyword{classes}
 \keyword{algebra}
