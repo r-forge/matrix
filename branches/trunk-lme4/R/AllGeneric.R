@@ -1,21 +1,3 @@
-## The generics Names, and Names<- are now removed
-# if (!isGeneric("Names")) {
-#     setGeneric("Names", function(object, ...)
-#            {
-#                .Deprecated("names")
-#                standardGeneric("Names")
-#            })
-# }
-
-# if (!isGeneric("Names<-")) {
-#     setGeneric("Names<-",
-#                function(object, value)
-#            {
-#                .Deprecated("names<-")
-#                standardGeneric("Names<-")
-#            })
-# }
-
 if (!isGeneric("getGroups")) {
     ## Return the groups associated with object according to form.
     setGeneric("getGroups",
@@ -45,6 +27,10 @@ if (!isGeneric("getResponse")) {
                function(object, form = formula(object))
                standardGeneric("getResponse"))
 }
+
+if (!isGeneric("coef<-"))
+    setGeneric("coef<-", function(object, ..., value)
+               standardGeneric("coef<-"))
 
 ## FIXME: Modify the generic to have a call argument
 setGeneric("lme",
