@@ -31,7 +31,7 @@ SEXP dgTMatrix_validate(SEXP x)
 }
 
 static void
-insert_dgTMatrixs_in_array(int m, int n, int nnz,
+insert_triplets_in_array(int m, int n, int nnz,
 			 const int xi[], const int xj[], const double xx[],
 			 double vx[])
 {

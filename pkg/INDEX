@@ -12,12 +12,18 @@ corMatrix               Generate the correlation matrix
 corrmatrix-class        Class "corrmatrix"
 cscBlocked-class        Class "cscBlocked" compressed, sparse, blocked
                         Matrix
-cscMatrix-class         Class "cscMatrix" compressed, sparse, column
+dgCMatrix-class         Class "dgCMatrix" compressed, sparse, column
                         Matrix
+dgTMatrix-class         Class "dgTMatrix" sparse matrices in triplet
+                        form
+dgeMatrix-class         General S4 Matrix class
+dsCMatrix-class         Symmetric, compressed, sparse column matrices
+dsyMatrix-class         Class "dsyMatrix" of symmetric matrices
+dtCMatrix-class         Triangular, compressed, sparse column matrices
+dtrMatrix-class         Triangular, dense, non-packed, real matrices
 expand                  Expand a Decomposition into Factors
 expm                    Matrix exponential
 facmul                  Multiplication by Decomposition Factors
-geMatrix-class          General S4 Matrix class
 lu                      Triangular Decomposition of a Square Matrix
 matrix<-                Assign the matrix
 mm                      A sample sparse model matrix
@@ -28,16 +34,10 @@ pdfactor-class          Factors of positive-definite matrices
 pdmatrix-class          Positive-definite matrices
 poMatrix-class          Positive semi-definite, dense, real matrices
 rcond                   Estimate the Reciprocal Condition Number
-sscChol-class           Cholesky decompositions of sscMatrix objects
+sscChol-class           Cholesky decompositions of dsCMatrix objects
 sscCrosstab             Create pairwise crosstabulation
 sscCrosstab-class       Pairwise crosstabulations
-sscMatrix-class         Symmetric, compressed, sparse column matrices
 ssclme-class            lme models as sparse, symmetric matrices
-syMatrix-class          Class "syMatrix" of symmetric matrices
 tcrossprod              Cross-product of transpose
-trMatrix-class          Triangular, dense, non-packed, real matrices
-tripletMatrix-class     Class "tripletMatrix" sparse matrices in
-                        triplet form
-tscMatrix-class         Triangular, compressed, sparse column matrices
 unpack                  Full Storage Representation of Packed Matrices
 y                       A sample response vector
