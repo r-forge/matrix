@@ -14,7 +14,7 @@ export(
        "Matrix",
        "Schur",
        "bCrosstab",
-       "coef<-",
+#       "coef<-",
 #       "corFactor",
 #       "corMatrix",
        "expand",
@@ -25,7 +25,6 @@ export(
        "rcond",
        "round", # "Math2" group (needs explicit setGeneric(.))
        "signif",#  {ditto}
-       "sscCrosstab",
        "tcrossprod",
        "unpack"
        )
@@ -60,9 +59,7 @@ exportClasses(
               "corrmatrix",
               "pMatrix",
               "pdmatrix",
-              "dCholCMatrix",
-              "sscCrosstab",
-              "ssclme"
+              "dCholCMatrix"
               )
 
 exportMethods(
@@ -77,8 +74,8 @@ exportMethods(
               "Schur",
               "as.matrix",
               "chol",
-              "coef",
-              "coef<-",
+#              "coef",
+#              "coef<-",
               "coerce",
 #             "corMatrix",
               "crossprod",

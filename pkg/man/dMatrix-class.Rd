@@ -17,9 +17,8 @@
 \title{(Virtual) Class "dMatrix" of "double" Matrices}
 \description{
   The \code{dMatrix} class is a virtual class contained by all actual
-  classes in the \pkg{dMatrix} package.
+  classes in the \pkg{Matrix} package.
 }
-%% FIXME: It's no longer virtual in the strict sense since it *has* slots
 %\section{Objects from the Class}{A virtual Class: No objects may be
 %  created from it.
 %}
@@ -50,12 +49,12 @@
   \code{\link{dgeMatrix-class}}, \code{\link{dgCMatrix-class}}, and
   \code{\link{Matrix-class}}.
 }
-\examples{
- M <- new("dMatrix")
- M <- new("dMatrix", x = c(pi,1), Dim = 1:2,
-           Dimnames = list("r1", c("c1","c2")))
- str(M)
- M # show() needs as(*, "matrix")
-}
+% \examples{
+%  M <- new("dMatrix")
+%  M <- new("dMatrix", x = c(pi,1), Dim = 1:2,
+%            Dimnames = list("r1", c("c1","c2")))
+%  str(M)
+%  M # show() needs as(*, "matrix")
+% }
 \keyword{classes}
 \keyword{algebra}

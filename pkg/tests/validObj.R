@@ -22,11 +22,7 @@ assertError <- function(expr) {
     invisible(t.res)
 }
 
-### --- "dMatrix" ---
 ## the empty ones:
-chk.matrix(new("Matrix"))
-chk.matrix(new("dMatrix"))
-chk.matrix(new("ddenseMatrix"))
 chk.matrix(new("dgeMatrix"))
 
 ## "dge"

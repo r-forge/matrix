@@ -6,7 +6,8 @@
 ## ------------- Virtual Classes ----------------------------------------
 
 # Virtual class of all Matrix objects
-setClass("Matrix", representation(Dim = "integer", Dimnames = "list"),
+setClass("Matrix", representation(Dim = "integer", Dimnames = "list",
+                                  "VIRTUAL"),
          prototype = prototype(Dim = integer(2), Dimnames = list(NULL,NULL)),
          validity = function(object) {
              Dim <- object@Dim
@@ -17,28 +18,29 @@ setClass("Matrix", representation(Dim = "integer", Dimnames = "list"),
              Dn <- object@Dimnames
              if (!is.list(Dn) || length(Dn) != 2)
                  return("'Dimnames' slot must be list of length 2")
+             ## 'else'  ok :
              TRUE
          })
 
 # Virtual class of numeric matrices
 setClass("dMatrix",
-         representation(x = "numeric"), contains = "Matrix")
+         representation(x = "numeric", "VIRTUAL"), contains = "Matrix")
 
 # Virtual class of integer matrices
 setClass("iMatrix",
-         representation(x = "integer"), contains = "Matrix")
+         representation(x = "integer", "VIRTUAL"), contains = "Matrix")
 
 # Virtual class of logical matrices
 setClass("lMatrix",
-         representation(x = "logical"), contains = "Matrix")
+         representation(x = "logical", "VIRTUAL"), contains = "Matrix")
 
 # Virtual class of complex matrices
 setClass("zMatrix", # letter 'z' is as in the names of Lapack subroutines
-         representation(x = "complex"), contains = "Matrix")
+         representation(x = "complex", "VIRTUAL"), contains = "Matrix")
 
 # Virtual class of dense, numeric matrices
 setClass("ddenseMatrix",
-         representation(rcond = "numeric", factors = "list"),
+         representation(rcond = "numeric", factors = "list", "VIRTUAL"),
          contains = "dMatrix")
 
 ## ------------------ Proper (non-virtual) Classes ----------------------------
@@ -47,7 +49,7 @@ setClass("ddenseMatrix",
 
 # numeric, dense, general matrices
 setClass("dgeMatrix", contains = "ddenseMatrix",
-         ## checks the length of x is prod(Dim):
+         ## checks that length( @ x) == prod( @ Dim):
          validity = function(object) .Call("dgeMatrix_validate", object)
          )
 ## i.e. "dgeMatrix" cannot be packed, but "ddenseMatrix" can ..

@@ -9,11 +9,10 @@
 \alias{unname,Matrix-method}
 %\alias{coerce,Matrix,matrix-method}
 
-\title{(Virtual) Class "Matrix" Class of Matrices}
+\title{Virtual Class "Matrix" Class of Matrices}
 \description{
   The \code{Matrix} class is a class contained by all actual
-  classes in the \pkg{Matrix} package.  It is not \dQuote{virtual} in
-  the strict sense since it \emph{has} slots.
+  classes in the \pkg{Matrix} package.  It is a \dQuote{virtual} class.
 }
 \section{Slots}{
   Common to \emph{all} matrix object in the package:
@@ -44,15 +43,6 @@
 \seealso{
   \code{\link{dgeMatrix-class}}, \code{\link{dgCMatrix-class}}, and
   \code{\link{Matrix}} for construction (and examples).
-}
-\examples{
- (M <- new("Matrix"))
- (M <- new("Matrix", Dim = 1:2, Dimnames = list("r1", c("c1","c2"))))
- str(M)
- validObject(M)
- ## but
- try( as.matrix(M) ) # gives an error
-
 }
 \keyword{classes}
 \keyword{algebra}
