@@ -1,6 +1,7 @@
 importFrom("graphics", "plot")
 importFrom("stats",
            "anova",
+	   "confint",
            "deviance",
            "fitted",
            "logLik",
