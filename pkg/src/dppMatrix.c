@@ -76,45 +76,27 @@ SEXP dppMatrix_solve(SEXP x)
     return val;
 }
 
-SEXP dppMatrix_dgeMatrix_solve(SEXP a, SEXP b)
+SEXP dppMatrix_matrix_solve(SEXP a, SEXP b, SEXP classedP)
 {
+    int classed = asLogical(classedP);
     SEXP Chol = dppMatrix_chol(a),
 	val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
-	*bdims = INTEGER(GET_SLOT(b, Matrix_DimSym)),
-	info;
+	*bdims = (classed ? INTEGER(GET_SLOT(b, Matrix_DimSym)) :
+		  INTEGER(getAttrib(b, R_DimSymbol)));
+    int n = bdims[0], nrhs = bdims[1], info;
+    int sz = n * nrhs;
+    double *bx = (classed ? REAL(GET_SLOT(b, Matrix_xSym)) : REAL(b));
 
-    if (*adims != *bdims || bdims[1] < 1 || *adims < 1)
-	error(_("Dimensions of system to be solved are inconsistent"));
-    SET_SLOT(val, Matrix_rcondSym, allocVector(REALSXP, 0));
-    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
-    SET_SLOT(val, Matrix_DimSym, duplicate(GET_SLOT(b, Matrix_DimSym)));
-    SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(b, Matrix_xSym)));
-    F77_CALL(dpptrs)(CHAR(asChar(GET_SLOT(Chol, Matrix_uploSym))),
-		     adims, bdims + 1,
-		     REAL(GET_SLOT(Chol, Matrix_xSym)),
-		     REAL(GET_SLOT(val, Matrix_xSym)),
-		     bdims, &info);
-    UNPROTECT(1);
-    return val;
-}
-
-SEXP dppMatrix_matrix_solve(SEXP a, SEXP b)
-{
-    SEXP Chol = dppMatrix_chol(a),
-	val = PROTECT(duplicate(b));
-    int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
-	*bdims = INTEGER(getAttrib(b, R_DimSymbol)),
-	info;
-
-    if (!(isReal(b) && isMatrix(b)))
+    if (!classed && !(isReal(b) && isMatrix(b)))
 	error(_("Argument b must be a numeric matrix"));
     if (*adims != *bdims || bdims[1] < 1 || *adims < 1)
 	error(_("Dimensions of system to be solved are inconsistent"));
+    Memcpy(INTEGER(ALLOC_SLOT(val, Matrix_DimSym, INTSXP, 2)), bdims, 2);
     F77_CALL(dpptrs)(CHAR(asChar(GET_SLOT(Chol, Matrix_uploSym))),
-		     adims, bdims + 1,
-		     REAL(GET_SLOT(Chol, Matrix_xSym)),
-		     REAL(val), bdims, &info);
+		     &n, &nrhs, REAL(GET_SLOT(Chol, Matrix_xSym)),
+		     Memcpy(REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, sz)),
+			    bx, sz), &n, &info);
     UNPROTECT(1);
     return val;
 }
