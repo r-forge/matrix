@@ -3,7 +3,7 @@
 
 #include "Mutils.h"
 #include "R_ldl.h"
-#include "triplet_to_col.h"
+#include "dgTMatrix_to_dgCMatrix.h"
 #include <R_ext/Lapack.h>
 #include "Mutils.h"
 
@@ -30,5 +30,5 @@ void cscb_cscbm(enum CBLAS_TRANSPOSE transa, enum CBLAS_TRANSPOSE transb,
 void cscb_mm(enum CBLAS_SIDE side, enum CBLAS_TRANSPOSE transa,
 	     int m, int n, int k, double alpha, SEXP A,
 	     const double B[], int ldb, double beta, double C[], int ldc);
-SEXP cscBlocked_2cscMatrix(SEXP A);
+SEXP cscBlocked_2dgCMatrix(SEXP A);
 #endif

@@ -275,7 +275,7 @@ symbolic_right_unit_mm_trans(int anc, const int Parent[], SEXP C)
 	    int rr = ci[j] + 1;
 	    if (rr > cnr) cnr = rr;
 	}
-	triplet_to_col(cnr, anc, ntot, Ti, Tj, (double *) NULL,
+	dgTMatrix_to_dgCMatrix(cnr, anc, ntot, Ti, Tj, (double *) NULL,
 		       INTEGER(cpp), Ci, (double *) NULL);
 	cnz = cp[anc];
 	SET_SLOT(C, Matrix_iSym, allocVector(INTSXP, cnz));
@@ -359,7 +359,7 @@ block_update(SEXP L, SEXP ZZpO, int j, int k, int i)
 	/* Determine maximum row index in T */
 	tnr = -1; for (jj = 0; jj < ntot; jj++) if (Ti[jj] > tnr) tnr = Ti[jj];
 	tnr++;			/* increment by 1 to get number of rows */
-	triplet_to_col(tnr, tnc, ntot, Ti, Tj, (double *) NULL,
+	dgTMatrix_to_dgCMatrix(tnr, tnc, ntot, Ti, Tj, (double *) NULL,
 		       tp, Ai, (double *) NULL);
 	nnz = tp[tnc];
 	SET_SLOT(tb, Matrix_iSym, allocVector(INTSXP, nnz));
@@ -403,7 +403,7 @@ bCrosstab_permute(SEXP ctab, int nf, int jj, const int nlev[], const int iperm[]
 	if (j <= jj) ind_permute(mi, nnz, iperm);
 	if (j >= jj) ind_permute(mj, nnz, iperm);
 	if (j == jj) make_upper_triangular(mi, mj, nnz);
-	triplet_to_col(nrow, ncol, nnz, mi, mj, mx, cp, INTEGER(cscbi), cx);
+	dgTMatrix_to_dgCMatrix(nrow, ncol, nnz, mi, mj, mx, cp, INTEGER(cscbi), cx);
 	Free(mi); Free(mj); Free(mx);
     }
 }
@@ -422,7 +422,7 @@ symmetric_permute(SEXP A, int nlev, const int iperm[])
     ind_permute(mi, nnz, iperm);
     ind_permute(mj, nnz, iperm);
     make_upper_triangular(mi, mj, nnz);
-    triplet_to_col(nlev, nlev, nnz, mi, mj, mx, Ap, INTEGER(AiP), Ax);
+    dgTMatrix_to_dgCMatrix(nlev, nlev, nnz, mi, mj, mx, Ap, INTEGER(AiP), Ax);
     Free(mi); Free(mj); Free(mx);
 }
 

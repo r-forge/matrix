@@ -59,7 +59,7 @@ SEXP sscCrosstab(SEXP flist, SEXP upper)
     }
     SET_SLOT(val, Matrix_pSym, allocVector(INTSXP, ncol + 1));
     Ap = INTEGER(GET_SLOT(val, Matrix_pSym));
-    triplet_to_col(ncol, ncol, ntrpl, Ti, Tj, Tx, Ap, TTi, TTx);
+    dgTMatrix_to_dgCMatrix(ncol, ncol, ntrpl, Ti, Tj, Tx, Ap, TTi, TTx);
     nz = Ap[ncol];		/* non-zeros in Z'Z crosstab */
     SET_SLOT(val, Matrix_iSym, allocVector(INTSXP, nz));
     SET_SLOT(val, Matrix_xSym, allocVector(REALSXP, nz));
@@ -115,7 +115,7 @@ void col_metis_order(int j0, int j1, int i2,
 		}
 	    }
 	}
-	triplet_to_col(n, n, nnz, TTi, Tj, (double *) NULL,
+	dgTMatrix_to_dgCMatrix(n, n, nnz, TTi, Tj, (double *) NULL,
 		       Ap, Ai, (double *) NULL);
 	ssc_metis_order(n, Ap, Ai, perm, iperm);
 	for (j = j1; j < i2; j++) ans[j] = j1 + iperm[j - j1];
@@ -170,7 +170,7 @@ SEXP sscCrosstab_groupedPerm(SEXP ctab)
  * 
  * @param ctab pointer to a sscCrosstab object
  * 
- * @return a pointer to an sscMatrix giving the projection of the 2,1 component
+ * @return a pointer to an dsCMatrix giving the projection of the 2,1 component
  */
 SEXP sscCrosstab_project(SEXP ctab)
 {
@@ -185,7 +185,7 @@ SEXP sscCrosstab_project(SEXP ctab)
 	n = length(pSlot) - 1,	/* number of columns */
 	nf = length(GpSlot) - 1, /* number of factors */
 	nz, up;
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("sscMatrix")));
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dsCMatrix")));
 
     up = toupper(*CHAR(STRING_ELT(GET_SLOT(ctab, Matrix_uploSym), 0))) != 'L';
     if (nf > 1 && up) {			/* transpose */
@@ -243,7 +243,7 @@ SEXP sscCrosstab_project(SEXP ctab)
 		}
 	    }
 	}
-	triplet_to_col(n, n, nnz, TTi, Tj, (double *) NULL,
+	dgTMatrix_to_dgCMatrix(n, n, nnz, TTi, Tj, (double *) NULL,
 		       AAp, AAi, (double *) NULL);
 	nz = AAp[n];
 	SET_SLOT(ans, Matrix_iSym, allocVector(INTSXP, nz));
@@ -268,7 +268,7 @@ SEXP sscCrosstab_project(SEXP ctab)
  * 
  * @param ctab pointer to a sscCrosstab object
  * 
- * @return a pointer to an sscMatrix with the projection
+ * @return a pointer to an dsCMatrix with the projection
  */
 SEXP sscCrosstab_project2(SEXP ctab)
 {
@@ -283,7 +283,7 @@ SEXP sscCrosstab_project2(SEXP ctab)
 	nf = length(GpSlot) - 1, /* number of factors */
 	nz, pos, up, *AAp, *Ti, *Cp, *ind;
     double *Ax = REAL(GET_SLOT(ctab, Matrix_xSym));
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("sscMatrix")));
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dsCMatrix")));
     
 
     if (nf < 2) error("sscCrosstab_project2 requires more than one group");

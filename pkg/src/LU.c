@@ -3,8 +3,8 @@
 /* FIXME - add the permutation matrix P to the result */
 SEXP LU_expand(SEXP x)
 {
-    SEXP L = PROTECT(NEW_OBJECT(MAKE_CLASS("trMatrix"))),
-	U = PROTECT(NEW_OBJECT(MAKE_CLASS("trMatrix"))),
+    SEXP L = PROTECT(NEW_OBJECT(MAKE_CLASS("dtrMatrix"))),
+	U = PROTECT(NEW_OBJECT(MAKE_CLASS("dtrMatrix"))),
 	val = PROTECT(allocVector(VECSXP, 2)),
 	nms = PROTECT(allocVector(STRSXP, 2)),
 	lux = GET_SLOT(x, Matrix_xSym),

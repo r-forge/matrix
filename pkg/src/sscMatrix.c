@@ -1,6 +1,6 @@
-#include "sscMatrix.h"
+#include "dsCMatrix.h"
 
-SEXP sscMatrix_validate(SEXP obj)
+SEXP dsCMatrix_validate(SEXP obj)
 {
     SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
     int *Dim = INTEGER(GET_SLOT(obj, Matrix_DimSym));
@@ -19,7 +19,7 @@ SEXP sscMatrix_validate(SEXP obj)
     return ScalarLogical(1);
 }
 
-SEXP sscMatrix_chol(SEXP x, SEXP pivot)
+SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
 {
     SEXP pSlot = GET_SLOT(x, Matrix_pSym), xorig = x;
     int *Ai = INTEGER(GET_SLOT(x, Matrix_iSym)),
@@ -46,7 +46,7 @@ SEXP sscMatrix_chol(SEXP x, SEXP pivot)
     Lp = INTEGER(GET_SLOT(val, Matrix_pSym));
     Ax = REAL(GET_SLOT(x, Matrix_xSym));
     if (piv) {
-	SEXP trip = PROTECT(sscMatrix_to_triplet(x));
+	SEXP trip = PROTECT(dsCMatrix_to_dgTMatrix(x));
 	SEXP Ti = GET_SLOT(trip, Matrix_iSym);
 
 	/* determine the permutation with Metis */
@@ -59,7 +59,7 @@ SEXP sscMatrix_chol(SEXP x, SEXP pivot)
 	Ai = Calloc(nnz, int);
 	Ax = Calloc(nnz, double);
 	Ap = Calloc(n + 1, int);
-	triplet_to_col(n, n, nnz, INTEGER(Ti),
+	dgTMatrix_to_dgCMatrix(n, n, nnz, INTEGER(Ti),
 		       INTEGER(GET_SLOT(trip, Matrix_jSym)),
 		       REAL(GET_SLOT(trip, Matrix_xSym)),
 		       Ap, Ai, Ax);
@@ -86,7 +86,7 @@ SEXP sscMatrix_chol(SEXP x, SEXP pivot)
     return set_factors(xorig, val, "Cholesky");
 }
 
-SEXP sscMatrix_matrix_solve(SEXP a, SEXP b)
+SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b)
 {
     SEXP Chol = get_factors(a, "Cholesky"), perm,
 	val = PROTECT(duplicate(b));
@@ -99,7 +99,7 @@ SEXP sscMatrix_matrix_solve(SEXP a, SEXP b)
 	error("Argument b must be a numeric matrix");
     if (*adims != *bdims || bdims[1] < 1 || *adims < 1)
 	error("Dimensions of system to be solved are inconsistent");
-    if (Chol == R_NilValue) Chol = sscMatrix_chol(a, ScalarLogical(1));
+    if (Chol == R_NilValue) Chol = dsCMatrix_chol(a, ScalarLogical(1));
     perm = GET_SLOT(Chol, Matrix_permSym);
     piv = length(perm);
     if (piv) tmp = Calloc(n, double);
@@ -120,7 +120,7 @@ SEXP sscMatrix_matrix_solve(SEXP a, SEXP b)
     return val;
 }
 
-SEXP sscMatrix_inverse_factor(SEXP A)
+SEXP dsCMatrix_inverse_factor(SEXP A)
 {
     return R_NilValue;		/* FIXME: Write this function. */
 }
@@ -128,7 +128,7 @@ SEXP sscMatrix_inverse_factor(SEXP A)
 SEXP ssc_transpose(SEXP x)
 {
     SEXP
-	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("sscMatrix"))),
+	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dsCMatrix"))),
 	islot = GET_SLOT(x, Matrix_iSym);
     int nnz = length(islot),
 	*adims = INTEGER(GET_SLOT(ans, Matrix_DimSym)),
@@ -151,10 +151,10 @@ SEXP ssc_transpose(SEXP x)
     return ans;
 }
 
-SEXP sscMatrix_to_triplet(SEXP x)
+SEXP dsCMatrix_to_dgTMatrix(SEXP x)
 {
     SEXP
-	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("tripletMatrix"))),
+	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgTMatrix"))),
 	islot = GET_SLOT(x, Matrix_iSym),
 	pslot = GET_SLOT(x, Matrix_pSym);
     int *ai, *aj, *iv = INTEGER(islot),
@@ -195,7 +195,7 @@ SEXP sscMatrix_to_triplet(SEXP x)
     return ans;
 }
 
-SEXP sscMatrix_ldl_symbolic(SEXP x, SEXP doPerm)
+SEXP dsCMatrix_ldl_symbolic(SEXP x, SEXP doPerm)
 {
     SEXP Ax, Dims = GET_SLOT(x, Matrix_DimSym),
 	ans = PROTECT(allocVector(VECSXP, 3)), tsc;
@@ -225,7 +225,7 @@ SEXP sscMatrix_ldl_symbolic(SEXP x, SEXP doPerm)
     }
     SET_VECTOR_ELT(ans, 0, allocVector(INTSXP, n));
     Parent = INTEGER(VECTOR_ELT(ans, 0));
-    SET_VECTOR_ELT(ans, 1, NEW_OBJECT(MAKE_CLASS("tscMatrix")));
+    SET_VECTOR_ELT(ans, 1, NEW_OBJECT(MAKE_CLASS("dtCMatrix")));
     tsc = VECTOR_ELT(ans, 1);
     SET_SLOT(tsc, Matrix_uploSym, ScalarString(mkChar("L")));
     SET_SLOT(tsc, Matrix_diagSym, ScalarString(mkChar("U")));
@@ -247,7 +247,7 @@ SEXP sscMatrix_ldl_symbolic(SEXP x, SEXP doPerm)
     return ans;
 }
 
-SEXP sscMatrix_metis_perm(SEXP x)
+SEXP dsCMatrix_metis_perm(SEXP x)
 {
     SEXP pSlot = GET_SLOT(x, Matrix_pSym),
 	ans = PROTECT(allocVector(VECSXP, 2));

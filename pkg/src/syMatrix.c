@@ -1,6 +1,6 @@
-#include "syMatrix.h"
+#include "dsyMatrix.h"
 
-SEXP syMatrix_validate(SEXP obj)
+SEXP dsyMatrix_validate(SEXP obj)
 {
     SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
     int *Dim = INTEGER(GET_SLOT(obj, Matrix_DimSym));
@@ -34,7 +34,7 @@ double get_norm_sy(SEXP obj, char *typstr)
 			    dims, work);
 }
 
-SEXP syMatrix_norm(SEXP obj, SEXP type)
+SEXP dsyMatrix_norm(SEXP obj, SEXP type)
 {
     return ScalarReal(get_norm_sy(obj, CHAR(asChar(type))));
 }
@@ -67,7 +67,7 @@ double set_rcond_sy(SEXP obj, char *typstr)
     return rcond;
 }
 
-SEXP syMatrix_rcond(SEXP obj, SEXP type)
+SEXP dsyMatrix_rcond(SEXP obj, SEXP type)
 {
 /* FIXME: This is a stub */
 /*     return ScalarReal(set_rcond_sy(obj, CHAR(asChar(type)))); */
@@ -93,23 +93,23 @@ void make_symmetric(double *to, SEXP from, int n)
     }
 }
     
-SEXP syMatrix_solve(SEXP a)
+SEXP dsyMatrix_solve(SEXP a)
 {
 /* FIXME: Write the code */
-    error("code for syMatrix_solve not yet written");
+    error("code for dsyMatrix_solve not yet written");
     return R_NilValue;
 }
 
-SEXP syMatrix_matrix_solve(SEXP a, SEXP b)
+SEXP dsyMatrix_matrix_solve(SEXP a, SEXP b)
 {
 /* FIXME: Write the code */
-    error("code for syMatrix_matrix_solve not yet written");
+    error("code for dsyMatrix_matrix_solve not yet written");
     return R_NilValue;
 }
 
-SEXP syMatrix_as_geMatrix(SEXP from)
+SEXP dsyMatrix_as_dgeMatrix(SEXP from)
 {
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("geMatrix"))),
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
 	rcondSym = Matrix_rcondSym;
     
     SET_SLOT(val, Matrix_rcondSym, allocVector(REALSXP, 0));
@@ -124,7 +124,7 @@ SEXP syMatrix_as_geMatrix(SEXP from)
     return val;
 }
 
-SEXP syMatrix_as_matrix(SEXP from)
+SEXP dsyMatrix_as_matrix(SEXP from)
 {
     int n = INTEGER(GET_SLOT(from, Matrix_DimSym))[0];
     SEXP val = PROTECT(allocMatrix(REALSXP, n, n));
@@ -136,13 +136,13 @@ SEXP syMatrix_as_matrix(SEXP from)
     return val;
 }
 
-SEXP syMatrix_geMatrix_mm(SEXP a, SEXP b)
+SEXP dsyMatrix_dgeMatrix_mm(SEXP a, SEXP b)
 {
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(b, Matrix_DimSym)),
 	*cdims,
 	m = adims[0], n = bdims[1], k = adims[1];
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("geMatrix")));
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
     double one = 1., zero = 0.;
     
     if (bdims[0] != k)
@@ -164,13 +164,13 @@ SEXP syMatrix_geMatrix_mm(SEXP a, SEXP b)
     return val;
 }
 
-SEXP syMatrix_geMatrix_mm_R(SEXP a, SEXP b)
+SEXP dsyMatrix_dgeMatrix_mm_R(SEXP a, SEXP b)
 {
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(b, Matrix_DimSym)),
 	*cdims,
 	m = adims[0], n = bdims[1], k = adims[1];
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("geMatrix")));
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
     double one = 1., zero = 0.;
     
     if (bdims[0] != k)

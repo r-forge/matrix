@@ -1,5 +1,5 @@
 				/* Sparse triangular matrices */
-#include "tscMatrix.h"
+#include "dtCMatrix.h"
 
 SEXP tsc_validate(SEXP x)
 {
@@ -9,7 +9,7 @@ SEXP tsc_validate(SEXP x)
 SEXP tsc_transpose(SEXP x)
 {
     SEXP
-	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("tscMatrix"))),
+	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dtCMatrix"))),
 	islot = GET_SLOT(x, Matrix_iSym);
     int nnz = length(islot),
 	*adims, *xdims = INTEGER(GET_SLOT(x, Matrix_DimSym));
@@ -34,11 +34,11 @@ SEXP tsc_transpose(SEXP x)
     return ans;
 }
 
-SEXP tsc_to_triplet(SEXP x)
+SEXP tsc_to_dgTMatrix(SEXP x)
 {
     SEXP ans;
     if (toupper(CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0))[0]) != 'U')
-	ans = csc_to_triplet(x);
+	ans = csc_to_dgTMatrix(x);
     else {			/* unit triangular matrix */
 	SEXP islot = GET_SLOT(x, Matrix_iSym), 
 	    pslot = GET_SLOT(x, Matrix_pSym);
@@ -49,7 +49,7 @@ SEXP tsc_to_triplet(SEXP x)
 	    *p = INTEGER(pslot);
 	double *ax;
     
-	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("tripletMatrix")));
+	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgTMatrix")));
 	SET_SLOT(ans, Matrix_DimSym, duplicate(GET_SLOT(x, Matrix_DimSym)));
 	SET_SLOT(ans, Matrix_iSym, allocVector(INTSXP, nout));
 	ai = INTEGER(GET_SLOT(ans, Matrix_iSym));
@@ -114,7 +114,7 @@ void parent_inv_ai(int n, int countDiag, const int pr[], int ai[])
     
 SEXP Parent_inverse(SEXP par, SEXP unitdiag)
 {
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("tscMatrix")));
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dtCMatrix")));
     int *ap, *ai, *dims, *pr = INTEGER(par),
 	countDiag = 1 - asLogical(unitdiag),
 	j, n = length(par), nnz;

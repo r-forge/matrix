@@ -1,6 +1,6 @@
-#include "geMatrix.h"
+#include "dgeMatrix.h"
 
-SEXP geMatrix_validate(SEXP obj)
+SEXP dgeMatrix_validate(SEXP obj)
 {
     SEXP x = GET_SLOT(obj, Matrix_xSym),
 	Dim = GET_SLOT(obj, Matrix_DimSym),
@@ -38,7 +38,7 @@ double get_norm(SEXP obj, char *typstr)
 			    dims, work);
 }
 
-SEXP geMatrix_norm(SEXP obj, SEXP type)
+SEXP dgeMatrix_norm(SEXP obj, SEXP type)
 {
     return ScalarReal(get_norm(obj, CHAR(asChar(type))));
 }
@@ -52,7 +52,7 @@ double set_rcond(SEXP obj, char *typstr)
 
     typnm[0] = rcond_type(typstr);
     if (R_IsNA(rcond)) {
-        SEXP LU = geMatrix_LU(obj);
+        SEXP LU = dgeMatrix_LU(obj);
 	int *dims = INTEGER(GET_SLOT(LU, Matrix_DimSym)), info;
 	double anorm = get_norm(obj, typstr);
 
@@ -69,14 +69,14 @@ double set_rcond(SEXP obj, char *typstr)
     return rcond;
 }
 
-SEXP geMatrix_rcond(SEXP obj, SEXP type)
+SEXP dgeMatrix_rcond(SEXP obj, SEXP type)
 {
   return ScalarReal(set_rcond(obj, CHAR(asChar(type))));
 }
 
-SEXP geMatrix_crossprod(SEXP x)
+SEXP dgeMatrix_crossprod(SEXP x)
 {
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("poMatrix")));
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dpoMatrix")));
     int *Dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	*vDims;
     int i, n = Dims[1];
@@ -99,9 +99,9 @@ SEXP geMatrix_crossprod(SEXP x)
     return val;
 }
 
-SEXP geMatrix_geMatrix_crossprod(SEXP x, SEXP y)
+SEXP dgeMatrix_dgeMatrix_crossprod(SEXP x, SEXP y)
 {
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("geMatrix")));
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
     int *xDims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	*yDims = INTEGER(GET_SLOT(y, Matrix_DimSym)),
 	*vDims;
@@ -127,9 +127,9 @@ SEXP geMatrix_geMatrix_crossprod(SEXP x, SEXP y)
     return val;
 }
 
-SEXP geMatrix_matrix_crossprod(SEXP x, SEXP y)
+SEXP dgeMatrix_matrix_crossprod(SEXP x, SEXP y)
 {
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("geMatrix")));
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
     int *xDims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	*yDims = INTEGER(getAttrib(y, R_DimSymbol)),
 	*vDims;
@@ -157,7 +157,7 @@ SEXP geMatrix_matrix_crossprod(SEXP x, SEXP y)
     return val;
 }
 
-SEXP geMatrix_getDiag(SEXP x)
+SEXP dgeMatrix_getDiag(SEXP x)
 {
     int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
     int i, m = dims[0], nret = (m < dims[1]) ? m : dims[1];
@@ -171,7 +171,7 @@ SEXP geMatrix_getDiag(SEXP x)
     return ret;
 }
 
-SEXP geMatrix_LU(SEXP x)
+SEXP dgeMatrix_LU(SEXP x)
 {
     SEXP val = get_factors(x, "LU");
     int *dims, npiv, info;
@@ -193,10 +193,10 @@ SEXP geMatrix_LU(SEXP x)
     return set_factors(x, val, "LU");
 }
 
-SEXP geMatrix_determinant(SEXP x, SEXP logarithm)
+SEXP dgeMatrix_determinant(SEXP x, SEXP logarithm)
 {
     int lg = asLogical(logarithm);
-    SEXP lu = geMatrix_LU(x);
+    SEXP lu = dgeMatrix_LU(x);
     int *dims = INTEGER(GET_SLOT(lu, Matrix_DimSym)),
 	*jpvt = INTEGER(GET_SLOT(lu, install("pivot"))),
 	i, n = dims[0], sign = 1;
@@ -224,10 +224,10 @@ SEXP geMatrix_determinant(SEXP x, SEXP logarithm)
     return as_det_obj(modulus, lg, sign);
 }
 
-SEXP geMatrix_solve(SEXP a)
+SEXP dgeMatrix_solve(SEXP a)
 {
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("geMatrix"))),
-	lu = geMatrix_LU(a);
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
+	lu = dgeMatrix_LU(a);
     int *dims = INTEGER(GET_SLOT(lu, Matrix_DimSym)),
 	*pivot = INTEGER(GET_SLOT(lu, install("pivot")));
     double *x, tmp;
@@ -249,13 +249,13 @@ SEXP geMatrix_solve(SEXP a)
     return val;
 }
 
-SEXP geMatrix_geMatrix_mm(SEXP a, SEXP b)
+SEXP dgeMatrix_dgeMatrix_mm(SEXP a, SEXP b)
 {
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(b, Matrix_DimSym)),
 	*cdims,
 	m = adims[0], n = bdims[1], k = adims[1];
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("geMatrix")));
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
     char *trans = "N";
     double one = 1., zero = 0.;
     
@@ -277,7 +277,7 @@ SEXP geMatrix_geMatrix_mm(SEXP a, SEXP b)
     return val;
 }
 
-SEXP geMatrix_svd(SEXP x, SEXP nnu, SEXP nnv)
+SEXP dgeMatrix_svd(SEXP x, SEXP nnu, SEXP nnv)
 {
     int /* nu = asInteger(nnu),
 	   nv = asInteger(nnv), */
@@ -342,7 +342,7 @@ static double padec [] =   /*  Constants for matrix exponential calculation. */
  * 
  * @return matrix exponential of x
  */
-SEXP geMatrix_exp(SEXP x)
+SEXP dgeMatrix_exp(SEXP x)
 {
     SEXP val = PROTECT(duplicate(x));
     int *Dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
@@ -373,9 +373,9 @@ SEXP geMatrix_exp(SEXP x)
 
     /* Preconditioning 2. Balancing with dgebal. */
     F77_CALL(dgebal)("P", &nc, v, &nc, &ilo, &ihi, perm, &j);
-    if (j) error("geMatrix_exp: LAPACK routine dgebal returned %d", j);
+    if (j) error("dgeMatrix_exp: LAPACK routine dgebal returned %d", j);
     F77_CALL(dgebal)("S", &nc, v, &nc, &ilos, &ihis, scale, &j);
-    if (j) error("geMatrix_exp: LAPACK routine dgebal returned %d", j);
+    if (j) error("dgeMatrix_exp: LAPACK routine dgebal returned %d", j);
 
     /* Preconditioning 3. Scaling according to infinity norm */
     inf_norm = F77_CALL(dlange)("I", &nc, &nc, v, &nc, work);
@@ -413,9 +413,9 @@ SEXP geMatrix_exp(SEXP x)
     
     /* Pade' approximation is solve(dpp, npp) */
     F77_CALL(dgetrf)(&nc, &nc, dpp, &nc, pivot, &j);
-    if (j) error("geMatrix_exp: dgetrf returned error code %d", j);
+    if (j) error("dgeMatrix_exp: dgetrf returned error code %d", j);
     F77_CALL(dgetrs)("N", &nc, &nc, dpp, &nc, pivot, npp, &nc, &j);
-    if (j) error("geMatrix_exp: dgetrs returned error code %d", j);
+    if (j) error("dgeMatrix_exp: dgetrs returned error code %d", j);
     Memcpy(v, npp, ncsqr);
 
     /* Now undo all of the preconditioning */

@@ -1,7 +1,7 @@
 /* Sparse matrices in triplet form */
-#include "triplet.h"
+#include "dgTMatrix.h"
 
-SEXP triplet_validate(SEXP x)
+SEXP dgTMatrix_validate(SEXP x)
 {
     SEXP 
 	islot = GET_SLOT(x, Matrix_iSym),
@@ -31,7 +31,7 @@ SEXP triplet_validate(SEXP x)
 }
 
 static void
-insert_triplets_in_array(int m, int n, int nnz,
+insert_dgTMatrixs_in_array(int m, int n, int nnz,
 			 const int xi[], const int xj[], const double xx[],
 			 double vx[])
 {
@@ -42,11 +42,11 @@ insert_triplets_in_array(int m, int n, int nnz,
     }
 }    
 			 
-SEXP triplet_to_geMatrix(SEXP x)
+SEXP dgTMatrix_to_dgeMatrix(SEXP x)
 {
     SEXP dd = GET_SLOT(x, Matrix_DimSym),
 	islot = GET_SLOT(x, Matrix_iSym),
-	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("geMatrix")));
+	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
 	
     int *dims = INTEGER(dd),
 	m = dims[0],
@@ -64,7 +64,7 @@ SEXP triplet_to_geMatrix(SEXP x)
     return ans;
 }
 
-SEXP triplet_to_matrix(SEXP x)
+SEXP dgTMatrix_to_matrix(SEXP x)
 {
     SEXP dd = GET_SLOT(x, Matrix_DimSym),
 	islot = GET_SLOT(x, Matrix_iSym);
