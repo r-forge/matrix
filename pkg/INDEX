@@ -1,8 +1,8 @@
-Cholesky-class          Cholesky decompositions
+Cholesky-class          Cholesky Decompositions
 Hilbert                 Generate a Hilbert matrix
-LU-class                LU decompositions
+LU-class                LU Matrix Decompositions
 Matrix                  Construct a Classed Matrix
-Matrix-class            Class "Matrix" Virtual class of Matrices
+Matrix-class            Class "Matrix" Virtual Class of Matrices
 Schur                   Schur Decomposition of a Matrix
 ScotsSec                Scottish secondary school scores
 bCrosstab               Create pairwise crosstabulation
@@ -10,9 +10,9 @@ coef<-                  Assign parameters
 corFactor               Extract the correlation factor
 corMatrix               Generate the correlation matrix
 corrmatrix-class        Class "corrmatrix"
-dCholCMatrix-class      Cholesky decompositions of dsCMatrix objects
-dgBCMatrix-class        Class "dgBCMatrix" compressed, sparse, blocked
-                        Matrix
+dCholCMatrix-class      Cholesky Decompositions of dsCMatrix Objects
+dgBCMatrix-class        Class "dgBCMatrix" Real Sparse Blocked Column
+                        Compressed Matrix
 dgCMatrix-class         Compressed, sparse, column-oriented numeric
                         matrices
 dgTMatrix-class         Sparse matrices in triplet form

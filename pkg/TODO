@@ -7,22 +7,13 @@
   ?Math.data.frame  and the examples in
   ?SetGeneric
 
-- Should the uplo and diag slots continue to be stored as character?
-  An alternative is to use a factor as in the enum values for the
-  cblas.
-
-- Organization of the source code files - right now they are organized
-  according to class (e.g. dgeMatrix.R, dgeMatrix.h, dgeMatrix.c).  Is
-  there a better way?
-
-- Fix the calculation of the Dim slot for the crossprod method for
-  dgCMatrix objects (too tired to do that now).
-
 - bCrosstab(): do we really want the diagonal "V:V" crosstabs?
 	       (if so or in any case: add to  man/bCrosstab.Rd )
 
 - src/Metis/ : one of the two Makefiles needs fixing, as changing
 	     src/Metis/*.c  does not lead to recompilation.
+  --DB - it seems both Makefiles need fixing.  I think I have the
+	     src/Metis/Makefile fixed but not src/Makefile
 
 - man/Matrix.Rd :  has example with dimnames, but we just drop them!
 		MM thinks dimnames should be supported (but then ...)

@@ -1,3 +1,18 @@
 - check to see if the .onLoad function to require the methods package
   (in the AllClass.R file) is needed
   -- no, it is not:  "Depends: " in DESCRIPTION suffices.
+
+- Should the uplo and diag slots continue to be stored as character?
+  An alternative is to use a factor as in the enum values for the
+  cblas.
+  -- Leave as character but use care in determining the default cases
+  -- E.g. Checks for diag slot should check for 'U' or 'u' vs. anything else
+
+- Organization of the source code files - right now they are organized
+  according to class (e.g. dgeMatrix.R, dgeMatrix.h, dgeMatrix.c).  Is
+  there a better way?
+  -- This seems ok.
+
+- Fix the calculation of the Dim slot for the crossprod method for
+  dgCMatrix objects (too tired to do that now).
+  -- Done
