@@ -1,6 +1,7 @@
 \name{summary.lme-class}
 \docType{class}
 \alias{summary.lme-class}
+\alias{summary.ssclme-class}
 \alias{show,summary.lme-method}
 \alias{show,summary.ssclme-method}
 \title{Class "summary.lme"}
