@@ -5,6 +5,8 @@
 \alias{dimnames,Matrix-method}
 \alias{dimnames<-,Matrix,list-method}
 \alias{show,Matrix-method}
+\alias{as.matrix,Matrix-method}
+\alias{unname,Matrix-method}
 %\alias{coerce,Matrix,matrix-method}
 
 \title{(Virtual) Class "Matrix" Class of Matrices}
@@ -47,6 +49,10 @@
  (M <- new("Matrix"))
  (M <- new("Matrix", Dim = 1:2, Dimnames = list("r1", c("c1","c2"))))
  str(M)
+ validObject(M)
+ ## but
+ try( as.matrix(M) ) # gives an error
+
 }
 \keyword{classes}
 \keyword{algebra}
