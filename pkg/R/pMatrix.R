@@ -9,7 +9,7 @@ setAs("integer", "pMatrix",
 setAs("pMatrix", "matrix",
       function(from) {
           fp <- from@perm
-          diag(nrow = length(fp))[ , fp]
+          diag(nrow = length(fp))[fp , ]
       })
 
 setMethod("solve", signature(a = "pMatrix", b = "missing"),
@@ -20,9 +20,9 @@ setMethod("solve", signature(a = "pMatrix", b = "missing"),
           }, valueClass = "pMatrix")
 
 setMethod("%*%", signature(x = "matrix", y = "pMatrix"),
-	  function(x, y) x[, y@perm], valueClass = "matrix")
+	  function(x, y) x[ , y@perm], valueClass = "matrix")
 
 setMethod("%*%", signature(x = "pMatrix", y = "matrix"),
-	  function(x, y) y[x@perm, ], valueClass = "matrix")
+	  function(x, y) y[x@perm ,], valueClass = "matrix")
 
 setMethod("t", signature(x = "pMatrix"), function(x) solve(x))
