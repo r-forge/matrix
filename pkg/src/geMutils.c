@@ -135,18 +135,6 @@ SEXP set_factorization(SEXP obj, SEXP val, char *nm)
     return val;
 }
 
-SEXP Matrix_init(void)
-{
-    Matrix_DimSym = install("Dim");
-    Matrix_diagSym = install("diag");
-    Matrix_iSym = install("i");
-    Matrix_pSym = install("p");
-    Matrix_uploSym = install("uplo");
-    Matrix_xSym = install("x");
-    Matrix_zSym = install("z");
-    return R_NilValue;
-}
-
 SEXP cscMatrix_set_Dim(SEXP x, int nrow)
 {
     int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
