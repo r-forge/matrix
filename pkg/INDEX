@@ -23,7 +23,7 @@ Hilbert                 Generate a Hilbert matrix
 lu                      Triangular Decomposition of a Square Matrix
 LU-class                LU Matrix Decompositions
 Matrix                  Construct a Classed Matrix
-Matrix-class            (Virtual) Class "Matrix" Class of Matrices
+Matrix-class            Virtual Class "Matrix" Class of Matrices
 mm                      A sample sparse model matrix
 norm                    Norm of a Matrix
 pdmatrix-class          Positive-definite matrices
