@@ -30,4 +30,6 @@ void cscb_mm(enum CBLAS_SIDE side, enum CBLAS_TRANSPOSE transa,
 	     int m, int n, int k, double alpha, SEXP A,
 	     const double B[], int ldb, double beta, double C[], int ldc);
 SEXP dgBCMatrix_to_dgCMatrix(SEXP A);
+SEXP dgBCMatrix_to_dgTMatrix(SEXP A);
+
 #endif

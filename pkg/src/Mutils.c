@@ -458,3 +458,56 @@ Matrix_make_named(int TYP, char **names)
     UNPROTECT(2);
     return ans;
 }
+
+/** 
+ * Allocate a 3-dimensional array
+ * 
+ * @param mode The R mode (e.g. INTSXP)
+ * @param nrow number of rows
+ * @param ncol number of columns
+ * @param nface number of faces
+ * 
+ * @return A 3-dimensional array of the indicated dimensions and mode
+ */
+SEXP alloc3Darray(SEXPTYPE mode, int nrow, int ncol, int nface)
+{
+    SEXP s, t;
+    int n;
+
+    if (nrow < 0 || ncol < 0 || nface < 0)
+	error("negative extents to 3D array");
+    if ((double)nrow * (double)ncol * (double)nface > INT_MAX)
+	error("alloc3Darray: too many elements specified");
+    n = nrow * ncol * nface;
+    PROTECT(s = allocVector(mode, n));
+    PROTECT(t = allocVector(INTSXP, 3));
+    INTEGER(t)[0] = nrow;
+    INTEGER(t)[1] = ncol;
+    INTEGER(t)[2] = nface;
+    setAttrib(s, R_DimSymbol, t);
+    UNPROTECT(2);
+    return s;
+}
+
+/** 
+ * Expand a column of a compressed, sparse, column-oriented matrix.
+ * 
+ * @param dest array to hold the result
+ * @param m number of rows in the matrix
+ * @param j index (0-based) of column to expand
+ * @param Ap array of column pointers
+ * @param Ai array of row indices
+ * @param Ax array of non-zero values
+ * 
+ * @return dest
+ */
+double *expand_csc_column(double *dest, int m, int j,
+			  const int Ap[], const int Ai[], const double Ax[])
+{
+    int k, k2 = Ap[j + 1];
+
+    for (k = 0; k < m; k++) dest[k] = 0.;
+    for (k = Ap[j]; k < k2; k++) dest[Ai[k]] = Ax[k];
+    return dest;
+}
+

@@ -27,28 +27,6 @@ SEXP dgBCMatrix_validate(SEXP x)
     return ScalarLogical(1);
 }
 
-static int*
-expand_column_pointers(int ncol, const int mp[], int mj[])
-{
-    int j;
-    for (j = 0; j < ncol; j++) {
-	int j2 = mp[j+1], jj;
-	for (jj = mp[j]; jj < j2; jj++) mj[jj] = j;
-    }
-    return mj;
-}
-
-static R_INLINE
-int Tind(const int rowind[], const int colptr[], int i, int j)
-{
-    int k, k2 = colptr[j + 1];
-    for (k = colptr[j]; k < k2; k++)
-	if (rowind[k] == i) return k;
-    error("row %d and column %d not defined in rowind and colptr",
-	  i, j);
-    return -1;			/* -Wall */
-}
-
 /** 
  * Perform one of the matrix operations 
  *  C := alpha*op(A)*B + beta*C
@@ -198,7 +176,7 @@ cscb_syrk(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE trans,
 	for (j = 0; j < anc; j++) {
 	    int k, kk, k2 = Ap[j+1];
 	    for (k = Ap[j]; k < k2; k++) {
-		int ii = Ai[k], K = Tind(Ci, Cp, ii, ii);
+		int ii = Ai[k], K = check_csc_index(Cp, Ci, ii, ii, 0);
 
 		if (K < 0) error("cscb_syrk: C[%d,%d] not defined", ii, ii);
 		if (scalar) Cx[K] += alpha * Ax[k] * Ax[k];
@@ -207,7 +185,8 @@ cscb_syrk(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE trans,
 				     &one, Cx + K * csz, cdims);
 		for (kk = k+1; kk < k2; kk++) {
 		    int jj = Ai[kk];
-		    K = (uplo == UPP) ? Tind(Ci, Cp, ii, jj) : Tind(Ci, Cp, jj, ii);
+		    K = (uplo == UPP) ? check_csc_index(Cp, Ci, ii, jj, 0) :
+			check_csc_index(Cp, Ci, jj, ii, 0);
 
 		    if (scalar) Cx[K] += alpha * Ax[k] * Ax[kk];
 		    else F77_CALL(dgemm)("N", "T", cdims, cdims + 1, adims + 1,
@@ -222,10 +201,9 @@ cscb_syrk(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE trans,
 
 /** 
  * Create the LD^{T/2}D^{1/2}L' decomposition of the positive definite
- * symmetric dgBCMatrix matrix A (upper triangle stored) in L and
- * D^{1/2}.  The notation D^{1/2} denotes the upper Cholesky factor of
- * the positive definite positive definite block diagonal matrix D.
- * The diagonal blocks are of size nci.
+ * symmetric dgBCMatrix matrix A (upper triangle stored) in L and D^{1/2}.
+ * D^{1/2} denotes the upper Cholesky factor of the positive definite positive
+ * definite block diagonal matrix D.  The diagonal blocks are of size nci.
  * 
  * @param A pointer to a dgBCMatrix object containing the upper
  * triangle of a positive definite symmetric matrix.
@@ -248,6 +226,7 @@ cscb_ldl(SEXP A, const int Parent[], SEXP L, SEXP D)
 	*Ap = INTEGER(ApP),
 	*Li = INTEGER(GET_SLOT(L, Matrix_iSym)),
 	*Lp = INTEGER(GET_SLOT(L, Matrix_pSym)), nci = adims[0];
+    int ncisqr = nci * nci;
     double *Lx = REAL(GET_SLOT(L, Matrix_xSym)),
 	*Ax = REAL(AxP), *Dx = REAL(D), minus1 = -1., one = 1.;
     
@@ -257,10 +236,11 @@ cscb_ldl(SEXP A, const int Parent[], SEXP L, SEXP D)
 	if (Parent[j] >= 0) {diag = 0; break;}
     }
     if (diag) {
-	int ncisqr = nci * nci;
 	Memcpy(Dx, Ax, ncisqr * n);
 	for (j = 0; j < n; j++) { /* form D_i^{1/2} */
 	    F77_CALL(dpotrf)("U", &nci, Dx + j * ncisqr, &nci, &k);
+	    /* Should we just return k instead of signaling an error? */
+	    /* The caller should check for return value < n */
 	    if (k) error("D[ , , %d], level %d, is not positive definite",
 			 j + 1);
 	}
@@ -274,7 +254,7 @@ cscb_ldl(SEXP A, const int Parent[], SEXP L, SEXP D)
 	return n;
     } else {		   /* Copy of ldl_numeric from the LDL package
 			    * modified for blocked sparse matrices */ 
-	int i, k, p, p2, len, nci = adims[0], ncisqr = adims[0]*adims[0], top;
+	int i, k, p, p2, len, top;
 	int *Lnz = Calloc(n, int),
 	    *Pattern = Calloc(n, int),
 	    *Flag = Calloc(n, int);
@@ -317,11 +297,11 @@ cscb_ldl(SEXP A, const int Parent[], SEXP L, SEXP D)
 				    &one, Y + Li[p]*ncisqr, &nci);
 		}
 		/* FIXME: Check that this is the correct order and transposition */
-		F77_CALL(dtrsm)("R", "U", "N", "N", &nci, &nci,
+		F77_CALL(dtrsm)("R", "U", "T", "N", &nci, &nci,
 				&one, Dx + i*ncisqr, &nci, Yi, &nci);
 		F77_CALL(dsyrk)("U", "N", &nci, &nci, &minus1, Yi, &nci,
 				&one, Dx + k*ncisqr, &nci);
-		F77_CALL(dtrsm)("R", "U", "T", "N", &nci, &nci,
+		F77_CALL(dtrsm)("R", "U", "N", "N", &nci, &nci,
 				&one, Dx + i*ncisqr, &nci, Yi, &nci);
 		Li[p] = k;	/* store L[k,i] in column form of L */
 		Memcpy(Lx + p * ncisqr, Yi, ncisqr);
@@ -336,7 +316,7 @@ cscb_ldl(SEXP A, const int Parent[], SEXP L, SEXP D)
 	Free(Y); Free(Yi); Free(Pattern); Free(Flag); Free(Lnz);
 	return n;	/* success, diagonal of D is all nonzero */
     }
-    return -1;			/* keep -Wall happy */
+    return -1;			/* -Wall */
 }
 
 /** 
@@ -511,29 +491,6 @@ cscb_trcbm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
 }
 
 /** 
- * Expand a column of a compressed, sparse, column-oriented matrix.
- * 
- * @param dest array to hold the result
- * @param m number of rows in the matrix
- * @param j index (0-based) of column to expand
- * @param Ap array of column pointers
- * @param Ai array of row indices
- * @param Ax array of non-zero values
- * 
- * @return dest
- */
-static
-double *expand_column(double *dest, int m, int j,
-		      const int Ap[], const int Ai[], const double Ax[])
-{
-    int k, k2 = Ap[j + 1];
-
-    for (k = 0; k < m; k++) dest[k] = 0.;
-    for (k = Ap[j]; k < k2; k++) dest[Ai[k]] = Ax[k];
-    return dest;
-}
-
-/** 
  * Solve one of the systems op(A)*X = alpha*B or
  * X*op(A) = alpha*B where A dgBCMatrix triangular and B is dgBCMatrix.
  * 
@@ -591,10 +548,10 @@ cscb_trcbsm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
 	    rhs = Calloc(ncbB, double);
 	    AZERO(Bx, nnz);	/* zero the result */
 	    for (i = 0; i < nrbB; i++) {
-		R_ldl_lsolve(ncbB, expand_column(rhs, ncbB, i, BTp, BTi, BTx),
+		R_ldl_lsolve(ncbB, expand_csc_column(rhs, ncbB, i, BTp, BTi, BTx),
 			     Ap, Ai, Ax);
 		for (j = 0; j < ncbB; j++) { /* write non-zeros in sol'n into B */
-		    if (BTx[j]) Bx[Tind(Bi, Bp, j, i)] = BTx[j];
+		    if (BTx[j]) Bx[check_csc_index(Bp, Bi, j, i, 0)] = BTx[j];
 		}
 		Free(rhs); Free(BTp); Free(BTx); Free(BTi);
 	    }
@@ -666,9 +623,10 @@ cscb_cscbm(enum CBLAS_TRANSPOSE transa, enum CBLAS_TRANSPOSE transb,
 	    for (ia = Ap[jj]; ia < a2; ia++) {
 		for (ib = Bp[jj]; ib < b2; ib++) {	
 	    F77_CALL(dgemm)("N", "T", cdims, cdims + 1, adims + 1,
-				    &alpha, Ax + ia * ablk, adims,
-				    Bx + ib * bblk, bdims, &one,
-				    Cx + Tind(Ci, Cp, Ai[ia], Bi[ib])*cblk, cdims);
+			    &alpha, Ax + ia * ablk, adims,
+			    Bx + ib * bblk, bdims, &one,
+			    Cx + check_csc_index(Cp, Ci, Ai[ia], Bi[ib], 0) * cblk,
+			    cdims);
 		}
 	    }
 	}
@@ -696,7 +654,7 @@ SEXP dgBCMatrix_to_dgCMatrix(SEXP A)
     Dims[1] = ncb * adims[1];
 				/* find number of row blocks */
     for (j = 0, nrb = -1; j < adims[2]; j++) if (Ai[j] > nrb) nrb = Ai[j];
-    Dims[0] = nrb * adims[0];
+    Dims[0] = (nrb + 1) * adims[0]; /* +1 because of 0-based indices */
     nnz = length(AxP);
 
     if (nc == 1) {		/* x slot is in the correct order */
@@ -744,6 +702,49 @@ SEXP dgBCMatrix_to_dgCMatrix(SEXP A)
 	    }
 	}
     }
+    UNPROTECT(1);
+    return val;
+}
+
+SEXP dgBCMatrix_to_dgTMatrix(SEXP A)
+{
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgTMatrix"))),
+	ApP = GET_SLOT(A, Matrix_pSym),
+	AxP = GET_SLOT(A, Matrix_xSym);
+    int *Ai = INTEGER(GET_SLOT(A, Matrix_iSym)), *Ap = INTEGER(ApP),
+	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym)),
+	*adims = INTEGER(getAttrib(AxP, R_DimSymbol)),
+	i, j, k, kk, ncb = length(ApP) - 1, nnz = length(AxP), nrb;
+    int *Aj = expand_column_pointers(ncb, Ap, Calloc(nnz, int)), 
+	*Bi = INTEGER(ALLOC_SLOT(val, Matrix_iSym, INTSXP, nnz)),
+	*Bj = INTEGER(ALLOC_SLOT(val, Matrix_jSym, INTSXP, nnz)),
+	nblk = adims[2], nc = adims[1], nr = adims[0];
+    int sz = nc * nr;
+    int *ai = Calloc(sz, int), *aj = Calloc(sz, int);
+    double *Ax = REAL(AxP),
+	*Bx = REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, nnz));
+
+    Memcpy(Bx, Ax, nnz);	/* x slot stays as is but w/o dim attribute */
+
+    bdims[1] = ncb * adims[1];	/* bdims - need to find number of row blocks */
+    for (j = 0, nrb = -1; j < adims[2]; j++) if (Ai[j] > nrb) nrb = Ai[j];
+    bdims[0] = (nrb + 1) * adims[0]; /* +1 because of 0-based indices */
+
+    for (j = 0; j < nc; j++) {	/* arrays of inner indices */
+	for (i = 0; i < nr; i++) {
+	    int ind = j * nc + i;
+	    ai[ind] = i;
+	    aj[ind] = j;
+	}
+    }
+    for (i = 0, k = 0; k < nblk; k++) {
+	for (kk = 0; kk < sz; kk++) {
+	    Bi[k * sz + kk] = Ai[k] * nr + ai[kk];
+	    Bj[k * sz + kk] = Aj[k] * nc + aj[kk];
+	}
+    }
+
+    Free(Aj); Free(ai); Free(aj);
     UNPROTECT(1);
     return val;
 }

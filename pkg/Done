@@ -20,4 +20,9 @@
 - spelling style: Should "coersion" be "coercion" ?
   -- Yes.  Watch for this.
 
+- src/Metis/ : one of the two Makefiles needs fixing, as changing
+	     src/Metis/*.c  does not lead to recompilation.
+  --DB - it seems both Makefiles need fixing.  I think I have the
+	     src/Metis/Makefile fixed but not src/Makefile
+  --DB - now have both working, I believe.
 

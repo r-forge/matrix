@@ -1,5 +1,11 @@
-setAs("dgBCMatrix", "dgCMatrix",
-      function(from) .Call("dgBCMatrix_to_dgCMatrix", from))
-
 setAs("dgBCMatrix", "dgTMatrix",
-      function(from) as(as(from, "dgCMatrix"), "dgTMatrix"))
+      function(from) .Call("dgBCMatrix_to_dgTMatrix", from))
+
+setAs("dgBCMatrix", "dgCMatrix",
+      function(from) as(as(from, "dgTMatrix"), "dgCMatrix"))
+
+setAs("dgBCMatrix", "dgeMatrix",
+      function(from) as(as(from, "dgTMatrix"), "dgeMatrix"))
+
+setAs("dgBCMatrix", "matrix",
+      function(from) as(as(from, "dgTMatrix"), "matrix"))
