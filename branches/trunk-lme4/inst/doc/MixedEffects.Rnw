@@ -30,6 +30,19 @@
   augmented sparse representation.  Additionally, we can use
   information from this representation to evaluate ECME updates and
   the gradient and Hessian of the criterion being optimized.
+
+  The sparse matrix methods that we employ have both a symbolic phase,
+  in which the form of the number and the positions of the
+  off-diagonal elements is determined, and a numeric phase in which
+  the actual numeric values are determined.  The symbolic phase need
+  only be done once and it can be accomplished knowing only the
+  grouping factors with which the random effects are associated. An
+  important part of the symbolic phase is determination of a
+  fill-minimizing permutation of the rows and columns of sparse
+  semi-definite matrices.  These matrices have a special structure in
+  the linear mixed-effects problem and we provide a new
+  fill-minimizing algorithm tuned to this structure.
+
 \end{abstract}
 <<preliminaries,echo=FALSE,print=FALSE>>=
 options(width=75)
@@ -76,6 +89,9 @@ For ease of reference we will restate some of the results derived in
 \citet{bate:debr:2004}.  The reader should refer to that paper for
 details of the derivations.  
 
+\subsection{Form of the model}
+\label{sec:ModelForm}
+
 We consider linear mixed-effects models that can be written as
 \begin{equation}
   \label{eq:lmeGeneral}
@@ -95,6 +111,68 @@ spherical Gaussian distribution.  The symbol $\perp$ indicates
 independence of random variables.  We assume that $\bX$ has full
 column rank and that $\bOmega$, which is a function of an
 (unconstrained) parameter vector $\btheta$, is positive definite.
+
+Although $q$, the dimension of the vector $\bb$ (and correspondingly
+the number of columns in $\bZ$ and the number of rows and columns in
+$\bZ\trans\bZ$ and $\bOmega$) can be very large, it can be divided
+into components with simple structure.  
+the association
+of components of $\bb$ with grouping factors $\bff_i,i=1,\dots,k$ in
+the data.  Each grouping factor is of length $n$, the same as the
+length of $\by$.  The number of distinct values in $\bff_i$ is
+$m_i,i=1,\dots,k$.  In the general form of the model, a model matrix
+$\bZ_i$ of size $n\times q_i$ is associated with grouping factor
+$\bff_i$, $i=1,\dots,k$.  Typically the $q_i$ are very small.  In
+fact, in one common form of the model, called a \emph{variance
+components} model, $q_1=q_2=\dots=q_k=1$ and each of the
+$\bZ_i,i=1,\dots,k$ consist of a single column of 1's.
+
+In the general form, the random effects vector $\bb$, of length
+$q=\sum_{i=1}^k m_i q_i$, is partitioned into $k$ ``outer blocks''
+where the i'th outer block is of size $m_i q_i,i=1,\dots,k$.  The
+columns of $\bZ$ and the rows and columns of $\bZ\trans\bZ$ and
+$\bOmega$ are similarly partitioned.  Each of the outer blocks is
+further subdivided into $m_i$ inner blocks of size $q_i$.  The
+grouping factors determine the outer blocks and the levels of each
+grouping factor determine the inner blocks.
+
+In the models that we will consider, the random effects associated
+with different grouping factors are independent.  That is to say that
+$\bOmega$ is block-diagonal consisting of $k$ diagonal blocks of sizes
+$m_i q_i\times m_i q_i,i=1,\dots,k$.  Furthermore the random effects
+associated with the levels of a given blocking factor are independent
+and identically distributed.  That is, the $i$'th diagonal block in
+$\bOmega$ is itself block diagonal and these diagonal blocks are $m_i$
+repetitions of a $q_i\times q_i$ matrix $\bOmega_i$, $i=1,\dots,k$.
+
+For a variance components model the matrices $\bOmega_i,i=1,\dots,k$
+are $1\times 1$ positive definite matrices which we can consider as
+positive scalars $\omega_i,i=1,\dots,k$.  The matrix $\bOmega$ is
+block-diagonal of size $\sum_{i=1}^k m_i$ and the diagonal blocks are
+$\omega_i\bI_{m_i}$ where $\bI_{m_i}$ is the $m_i\times m_i$ identity
+matrix.  Thus $\left|\bOmega\right|=\sum_{i=1}^k m_i\omega_i$. The
+$k$-dimensional vector $\btheta$ where
+$\theta_i=\log\omega_i,i=1,\dots,k$ can be used as the unconstrained
+parameter vector.
+
+The columns of the matrix $\bZ$ are similarly divided into blocks.
+For the variance components model the $i$th block is the set of
+indicator columns for the $m_i$ levels of $\bff_i,i=1,\dots,k$.
+Because each block is a set of indicators, the diagonal blocks of
+$\bZ\trans\bZ$ are themselves diagonal.  However, unlike the
+corresponding blocks in $\bOmega$, these blocks are not necessarily a
+multiple of the identity.  The diagonal elements of the $i$th diagonal
+block are the $m_i$ frequencies of occurence of each the levels of the
+$i$th grouping factor in the data.  (Because all the elements of $\bZ$
+are zero or one, the diagonals of $\bZ\trans\bZ$ are simply the counts
+of the number of ones in the corresponding column of $\bZ$.)
+
+The off-diagonal blocks of $\bZ\trans\bZ$ in a variance components
+model are the pairwise cross-tabulations of the corresponding grouping
+factors.
+
+\subsection{Criteria to evaluate}
+\label{sec:ModelCriteria}
 
 Given the observed responses $\by$ and the model matrices $\bX$ and
 $\bZ$, we wish to determine either the maximum likelihood (ML) or the
@@ -172,13 +250,13 @@ criteria are
   \label{eq:gradDev}
   \nabla(-2\tilde\ell)&=\tr\left[\der\bOmega\left(
       (\bZ\trans\bZ+\bOmega)^{-1}-\bOmega^{-1}+
-      \frac{\hat{\bb}}{\widehat{\sigma}}
-      \frac{\hat{\bb}}{\widehat{\sigma}}\trans\right)\right]\\
+      \frac{\widehat{\bb}}{\widehat{\sigma}}
+      \frac{\widehat{\bb}}{\widehat{\sigma}}\trans\right)\right]\\
   \label{eq:gradDevRest}
   \nabla(-2\tilde\ell_R)&=\tr\left[\der\bOmega\left(
       \vb-\bOmega^{-1}+
-      \frac{\hat{\bb}}{\widehat{\sigma}_R}
-      \frac{\hat{\bb}}{\widehat{\sigma}_R}\trans\right)\right]
+      \frac{\widehat{\bb}}{\widehat{\sigma}_R}
+      \frac{\widehat{\bb}}{\widehat{\sigma}_R}\trans\right)\right]
 \end{align}
 where
 \begin{equation}
@@ -192,39 +270,39 @@ be expressed as
   \label{eq:HessDev}
   \derj\deri(-2\tilde{\ell})&=\tr\left[\derj(\deri\bOmega)\left(
       (\bZ\trans\bZ+\bOmega)^{-1}-\bOmega^{-1}+
-      \frac{\hat{\bb}}{\widehat{\sigma}}
-      \frac{\hat{\bb}}{\widehat{\sigma}}\trans\right)\right]\\
+      \frac{\widehat{\bb}}{\widehat{\sigma}}
+      \frac{\widehat{\bb}}{\widehat{\sigma}}\trans\right)\right]\\
   \nonumber
   &\quad-\tr\left[\derj\bOmega
     (\bZ\trans\bZ+\bOmega)^{-1}\deri\bOmega(\bZ\trans\bZ+
     \bOmega)^{-1}\right]\\
   \nonumber
   &\quad+\tr\left(\derj\bOmega\bOmega^{-1}\deri\bOmega\bOmega^{-1}\right)
-  -2\frac{\hat{\bb}}{\widehat{\sigma}}\trans\derj\bOmega\vb\deri\bOmega
-  \frac{\hat{\bb}}{\widehat{\sigma}}\\
+  -2\frac{\widehat{\bb}}{\widehat{\sigma}}\trans\derj\bOmega\vb\deri\bOmega
+  \frac{\widehat{\bb}}{\widehat{\sigma}}\\
   \nonumber
   &\quad-\frac{1}{n}
-  \left(\frac{\hat{\bb}}{\widehat{\sigma}}\trans\derj\bOmega
-    \frac{\hat{\bb}}{\widehat{\sigma}}\right)
-  \left(\frac{\hat{\bb}}{\widehat{\sigma}}\trans\deri\bOmega
-    \frac{\hat{\bb}}{\widehat{\sigma}}\right)\\
+  \left(\frac{\widehat{\bb}}{\widehat{\sigma}}\trans\derj\bOmega
+    \frac{\widehat{\bb}}{\widehat{\sigma}}\right)
+  \left(\frac{\widehat{\bb}}{\widehat{\sigma}}\trans\deri\bOmega
+    \frac{\widehat{\bb}}{\widehat{\sigma}}\right)\\
   \label{eq:HessDevRest}
   \derj\deri(-2\tilde{\ell_R})&=\tr\left[\derj(\deri\bOmega)\left(
       \vb-\bOmega^{-1}+
-      \frac{\hat{\bb}}{\widehat{\sigma}_R}
-      \frac{\hat{\bb}}{\widehat{\sigma}_R}\trans\right)\right]\\
+      \frac{\widehat{\bb}}{\widehat{\sigma}_R}
+      \frac{\widehat{\bb}}{\widehat{\sigma}_R}\trans\right)\right]\\
   \nonumber
   &\quad-\tr\left[\derj\bOmega \vb\deri\bOmega\vb\right]\\
   \nonumber
   &\quad+\tr\left(\derj\bOmega\bOmega^{-1}\deri\bOmega\bOmega^{-1}\right)
-  -2\frac{\hat{\bb}}{\widehat{\sigma}_R}\trans\derj\bOmega\vb\deri\bOmega
-  \frac{\hat{\bb}}{\widehat{\sigma}_R}\\
+  -2\frac{\widehat{\bb}}{\widehat{\sigma}_R}\trans\derj\bOmega\vb\deri\bOmega
+  \frac{\widehat{\bb}}{\widehat{\sigma}_R}\\
   \nonumber
   &\quad-\frac{1}{n-p}
-  \left(\frac{\hat{\bb}}{\widehat{\sigma}_R}\trans\derj\bOmega
-    \frac{\hat{\bb}}{\widehat{\sigma}_R}\right)
-  \left(\frac{\hat{\bb}}{\widehat{\sigma}_R}\trans\deri\bOmega
-    \frac{\hat{\bb}}{\widehat{\sigma}_R}\right)
+  \left(\frac{\widehat{\bb}}{\widehat{\sigma}_R}\trans\derj\bOmega
+    \frac{\widehat{\bb}}{\widehat{\sigma}_R}\right)
+  \left(\frac{\widehat{\bb}}{\widehat{\sigma}_R}\trans\deri\bOmega
+    \frac{\widehat{\bb}}{\widehat{\sigma}_R}\right)
 \end{align}
 where $\deri$ and $\derj$
 represent differentiation with respect to elements $i$ and $j$ of
@@ -238,8 +316,8 @@ for which $\btheta_{i+1}$ satisfies
 \begin{equation}
   \label{eq:theta1}
   \tr\left[\der\bOmega\left(
-      \frac{\hat{\bb}(\btheta_i)}{\hat{\sigma}(\btheta_{i})}
-      \frac{\hat{\bb}(\btheta_i)\trans}{\hat{\sigma}(\btheta_{i})}+
+      \frac{\widehat{\bb}(\btheta_i)}{\widehat{\sigma}(\btheta_{i})}
+      \frac{\widehat{\bb}(\btheta_i)\trans}{\widehat{\sigma}(\btheta_{i})}+
       \left(\bZ\trans\bZ+\bOmega(\btheta_{i})\right)^{-1}
       -\bOmega(\btheta_{i+1})^{-1}\right)\right]=\bzer
 \end{equation}
@@ -247,8 +325,8 @@ for ML estimates or
 \begin{equation}
   \label{eq:theta1R}
   \tr\left[\der\bOmega\left(
-      \frac{\hat{\bb}(\btheta_{i})}{\hat{\sigma}_R(\btheta_i)}
-      \frac{\hat{\bb}(\btheta_{i})\trans}{\hat{\sigma}_R(\btheta_i)}+
+      \frac{\widehat{\bb}(\btheta_{i})}{\widehat{\sigma}_R(\btheta_i)}
+      \frac{\widehat{\bb}(\btheta_{i})\trans}{\widehat{\sigma}_R(\btheta_i)}+
       \vb(\btheta_{i})
       -\bOmega(\btheta_{i+1})^{-1}\right)\right]=\bzer
 \end{equation}
@@ -289,60 +367,7 @@ sparse and patterned and can be extremely large.  The decomposition
 (\ref{eq:CrossProdGen}) and the solution of the system
 (\ref{eq:ConditionalExp}) must be done carefully.
 
-Sparsity of $\bZ\trans\bZ$ and $\bOmega$ is induced by the association
-of components of $\bb$ with grouping factors $\bff_i,i=1,\dots,k$ in
-the data.  Each grouping factor is of length $n$, the same as the
-length of $\by$.  The number of distinct values in $\bff_i$ is
-$m_i,i=1,\dots,k$.  In the general form of the model, a model matrix
-$\bZ_i$ of size $n\times q_i$ is associated with grouping factor
-$\bff_i$, $i=1,\dots,k$.  Typically the $q_i$ are very small.  In
-fact, in one common form of the model, called a \emph{variance
-components} model, $q_1=q_2=\dots=q_k=1$ and each of the
-$\bZ_i,i=1,\dots,k$ consist of a single column of 1's.
-
-In the general form, the random effects vector $\bb$, of length
-$q=\sum_{i=1}^k m_i q_i$, is partitioned into $k$ ``outer blocks''
-where the i'th outer block is of size $m_i q_i,i=1,\dots,k$.  The
-columns of $\bZ$ and the rows and columns of $\bZ\trans\bZ$ and
-$\bOmega$ are similarly partitioned.  Each of the outer blocks is
-further subdivided into $m_i$ inner blocks of size $q_i$.  The
-grouping factors determine the outer blocks and the levels of each
-grouping factor determine the inner blocks.
-
-In the models that we will consider, the random effects associated
-with different grouping factors are independent.  That is to say that
-$\bOmega$ is block-diagonal consisting of $k$ diagonal blocks of sizes
-$m_i q_i\times m_i q_i,i=1,\dots,k$.  Furthermore the random effects
-associated with the levels of a given blocking factor are independent
-and identically distributed.  That is, the $i$'th diagonal block in
-$\bOmega$ is itself block diagonal and these diagonal blocks are $m_i$
-repetitions of a $q_i\times q_i$ matrix $\bOmega_i$, $i=1,\dots,k$.
-
-For a variance components model the matrices $\bOmega_i,i=1,\dots,k$
-are $1\times 1$ positive definite matrices which we can consider as
-positive scalars $\omega_i,i=1,\dots,k$.  The matrix $\bOmega$ is
-block-diagonal of size $\sum_{i=1}^k m_i$ and the diagonal blocks are
-$\omega_i\bI_{m_i}$ where $\bI_{m_i}$ is the $m_i\times m_i$ identity
-matrix.  Thus $\left|\bOmega\right|=\sum_{i=1}^k m_i\omega_i$. The
-$k$-dimensional vector $\btheta$ where
-$\theta_i=\log\omega_i,i=1,\dots,k$ can be used as the unconstrained
-parameter vector.
-
-The columns of the matrix $\bZ$ are similarly divided into blocks.
-For the variance components model the $i$th block is the set of
-indicator columns for the $m_i$ levels of $\bff_i,i=1,\dots,k$.
-Because each block is a set of indicators, the diagonal blocks of
-$\bZ\trans\bZ$ are themselves diagonal.  However, unlike the
-corresponding blocks in $\bOmega$, these blocks are not necessarily a
-multiple of the identity.  The diagonal elements of the $i$th diagonal
-block are the $m_i$ frequencies of occurence of each the levels of the
-$i$th grouping factor in the data.  (Because all the elements of $\bZ$
-are zero or one, the diagonals of $\bZ\trans\bZ$ are simply the counts
-of the number of ones in the corresponding column of $\bZ$.)
-
-The off-diagonal blocks of $\bZ\trans\bZ$ in a variance components
-model are the pairwise cross-tabulations of the corresponding grouping
-factors.
+Sparsity of $\bZ\trans\bZ$ and $\bOmega$ is induced by 
 
 \subsection{Scottish secondary school student scores}
 \label{sec:Scottish}
