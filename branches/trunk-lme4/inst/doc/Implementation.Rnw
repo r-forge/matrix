@@ -1,0 +1,189 @@
+\documentclass[12pt]{article}
+\usepackage{Sweave}
+\usepackage{myVignette}
+\usepackage[authoryear,round]{natbib}
+\bibliographystyle{plainnat}
+\DefineVerbatimEnvironment{Sinput}{Verbatim}
+{formatcom={\vspace{-2.5ex}},fontshape=sl,
+  fontfamily=courier,fontseries=b, fontsize=\scriptsize}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}
+{formatcom={\vspace{-2.5ex}},fontfamily=courier,fontseries=b,%
+  fontsize=\scriptsize}
+%%\VignetteIndexEntry{Implementation Details}
+%%\VignetteDepends{Matrix}
+%%\VignetteDepends{lme4}
+\begin{document}
+\SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=5,height=3,strip.white=TRUE}
+\setkeys{Gin}{width=\textwidth}
+\title{Details of linear mixed models in lme4}
+\author{Douglas Bates\\Department of Statistics\\University of
+  Wisconsin -- Madison\\\email{Bates@wisc.edu}}
+\maketitle
+\begin{abstract}
+  Expressions for the evaluation of the profiled log-likelihood or
+  profiled log-restricted-likelihood, its gradient and Hessian, and a
+  representation of such models using positive semidefinite symmetric
+  matrices and dense matrices, are given elsewhere.  In this paper we
+  present details of the implementation of these formula in the
+  \code{lme4} package for R.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:Intro}
+
+\citet{bate:debr:2004} present general formulae for the evaluation of
+the profiled log-likelihood and profiled log-restricted-likelihood in
+a linear mixed model of the form
+\begin{equation}
+  \label{eq:lmeGeneral}
+  \by=\bX\bbeta+\bZ\bb+\beps\quad
+  \beps\sim\mathcal{N}(\bzer,\sigma^2\bI),
+  \bb\sim\mathcal{N}(\bzer,\sigma^2\bOmega^{-1}),
+  \beps\perp\bb
+\end{equation}
+where $\by$ is the $n$-dimensional response vector, $\bX$ is an
+$n\times p$ model matrix for the $p$-dimensional fixed-effects vector
+$\bbeta$, $\bZ$ is the $n\times q$ model matrix for the
+$q$-dimensional random-effects vector $\bb$ that has a Gaussian
+distribution with mean $\bzer$ and relative precision matrix $\bOmega$
+(i.e., $\bOmega$ is the precision of $\bb$ relative to the precision
+of $\beps$), and $\beps$ is the random noise assumed to have a
+spherical Gaussian distribution.  The symbol $\perp$ indicates
+independence of random variables.  The matrix $\bX$ has full
+column rank and $\bOmega$ is positive definite.
+
+In \S\ref{sec:Definition} we describe the role of the grouping factors
+for the random effect and present expressions for some of the results
+to be calculated. In \S\ref{sec:representation} we provide a detailed
+description of the representation of the model.  Methods of evaluation
+of gradients and ECME steps are given in \S\ref{sec:gradients} and
+those of the Hessian in \S\ref{sec:Hessian}.
+
+\section{Grouping factors for the random effects}
+\label{sec:Definition}
+
+The random effects vector $\bb$ and the columns of $\bZ$ are divided
+into $k$ outer blocks associated with grouping factors $\bff_i,
+i=1,\dots,k$ in the data.  Because so many of the expressions we use
+involve the grouping factors and quantities associated with them, we
+will reserve the letter $i$ to index the grouping factors and related
+quantities.  We will not state the range of $i$ explicitly as it will
+always be $i=1,\dots,k$.
+
+These outer blocks are further divided into $m_i$ inner blocks of size
+$q_i$ where $m_i$ is the number of levels of $\bff_i$ (i.e.{} the
+number of distinct values in $\bff_i$).  To ensure that $m_i$ is
+well-defined, we require that each of the levels occurs at least once
+in $\bff_i$.  That is, we drop any unused levels in the grouping factors.
+
+\subsection{Variance-covariance of the random effects}
+\label{ssec:Variance}
+
+Random effects in different outer blocks are independent.  Within an
+outer block, the inner blocks of random effects are independent and
+identically distributed with $q_i\times q_i$ variance-covariance
+matrix $\bOmega_i$.  Thus $\bOmega$ is block diagonal in $k$ blocks of
+size $m_i q_i\times m_i q_i$ and each of these blocks is itself block
+diagonal in $m_i$ blocks, each of which is the positive definite
+symmetric $q_i\times q_i$ matrix $\bOmega_i$.
+
+The $\binom{q_i+1}{2}$ dimensional vector $\btheta_i$ is an
+unconstrained parameter for $\bOmega_i$.  When $q_i=1$, $\bOmega_i$ is
+a $1\times 1$ positive definite matrix, which we can consider as a
+positive scalar, and
+$\btheta_i=\log\left(\left\{\bOmega_i\right\}_{1,1}\right)$.  Details
+of the parameterization for $q_i>1$, including the $q_i^2\times
+\binom{q_i+1}{2}$ Jacobian $\bJ_i=\nabla_{\btheta_i}\ovec(\bOmega_i)$ and
+the $q_i^2\times\binom{q_i+1}{2}\times\binom{q_i+1}{2}$ Hessian
+$\nabla_{\btheta_i}^2\ovec(\bOmega_i)$  are given in
+Appendix~\ref{app:Unconstrained}. (The $\ovec$ operator produces a
+column vector from a matrix by concatenating the columns.)
+
+For $g_i$ a scalar function of $\bOmega_i$ we denote by
+$\nabla_{\Omega_i}g_i$ the $q_i\times q_i$ gradient matrix with elements
+\begin{equation}
+  \label{eq:GradientMatrix}
+  \left\{\nabla_{\Omega_i}g_i\right\}_{s,t}=
+  \frac{\partial g_i}{\partial\left\{\bOmega_i\right\}_{s,t}}\quad s,t=1,\dots,q_i .
+\end{equation}
+Although $\bOmega_i$ is required to be symmetric, we do not impose
+this restriction on $\nabla_{\Omega_i}g_i$. (However, for all the
+functions $g_i(\bOmega_i)$ that we will consider this gradient is
+indeed symmetric.)
+
+The $\binom{q_i+1}{2}$ dimensional gradient
+\begin{equation}
+  \label{eq:Chainrule}
+  \nabla_{\btheta_i}g_i(\bOmega_i)
+  =\left[\ovec(\nabla_{\bOmega_i}g_i)\right]\trans \bJ_i .
+\end{equation}
+
+\section{Details of the representation}
+\label{sec:representation}
+
+\section{Gradient and ECME step evaluations}
+\label{sec:gradients}
+
+\section{Hessian evaluations}
+\label{sec:Hessian}
+
+\section{Acknowledgements}
+\label{sec:Ack}
+
+This work was supported by U.S.{} Army Medical Research and Materiel
+Command under Contract No.{} DAMD17-02-C-0119.  The views, opinions
+and/or findings contained in this report are those of the authors and
+should not be construed as an official Department of the Army
+position, policy or decision unless so designated by other
+documentation.
+
+\appendix
+
+\section{Unconstrained parameterization}
+\label{app:Unconstrained}
+
+The vector $\btheta=\left[\btheta_1,\dots,\btheta_k\right]\trans$ is
+an unconstrained parameterization of $\bOmega$ based on the LDL form
+of the Cholesky decomposition of the $\bOmega_i$.  In this
+decomposition the $q_i\times q_i$ unit lower triangular (i.e.{} lower
+triangular with unit elements on the diagonal) matrix $\bL_i$ and the
+$q_i\times q_i$ diagonal matrix $\bD_i$ are defined to satisfy
+\begin{equation}
+  \label{eq:OmegaLDL}
+  \bOmega_i=\bL_i\bD_i\bL_i\trans .
+\end{equation}
+If $\bOmega_i$ is positive definite then the diagonal elements of
+$\bD_i$ must be positive.  We use the $q_i$ logarithms of the diagonal
+elements of $\bD_i$, written $\bdelta_i$, and, when $q_i>1$, the
+columnwise concatenation of the $\binom{q_i}{2}$ elements in the
+strict lower triangle of $\bL_i$, written $\blambda_i$, as the
+$\binom{q+1}{2}$ dimensional unconstrained parameter
+$\btheta_i=\left[\bdelta_i\trans,\blambda_i\trans\right]\trans$
+
+We can differentiate the product (\ref{eq:OmegaLDL}) to produce the
+$q_i^2\times\binom{q_i+1}{2}$ dimensional Jacobian matrix
+$\bJ_i=d\ovec{\bOmega_i}/d\btheta_i$.  In particular,
+\begin{equation}
+  \label{eq:deltaPartial}
+    \frac{\partial \bOmega_i}{\partial \left\{\bdelta_i\right\}_j}
+    =\bL_i\frac{\partial{\bD_i}}{\partial \left\{\bdelta_i\right\}_j}\bL_i\trans
+    =\bL_i\bbe_j\bbe_j\trans\exp{\left\{\bdelta_i\right\}_j}\bL_i\trans
+    \quad j=1,\dots,q_i
+\end{equation}
+where $\bbe_j$ is the $j$th column of the identity
+matrix of size $q_i$.  For partial derivatives with respect to the
+$t$th element of $\blambda_i$ we let $r(t,i)$ and $c(t.i)$ be the
+mappings from the indices $t=1,\dots,\binom{q_i}{2}$ of the elements of
+$\blambda_i$ to the row and column indices of $\bL_i$.  Then
+\begin{equation}
+  \label{eq:lambdaPartial}
+    \frac{\partial \bOmega_i}{\partial \left\{\blambda_i\right\}_t}
+    =\bbe_{r(t,i)}\bbe_{c(t,i)}\trans\bD_i\bL_i +
+    \bL_i\trans\bD_i\bbe_{c(t,i)}\bbe_{r(t,i)}\trans
+\end{equation}
+
+
+\bibliography{lme4}
+\end{document}
+
+
