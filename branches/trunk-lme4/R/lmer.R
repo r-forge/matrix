@@ -467,10 +467,10 @@ setMethod("anova", signature(object = "lmer"),
                                 check.names = FALSE)
               class(val) <- c("anova", class(val))
               attr(val, "heading") <-
-                  c(header, "", "Models:",
+                  c(header, "Models:",
                     paste(names(mods),
                           unlist(lapply(lapply(calls, "[[", "formula"), deparse)),
-                          sep = ": "),"")
+                          sep = ": "))
               return(val)
           } else {
               foo <- object
@@ -704,8 +704,7 @@ setMethod("plot", signature(x = "lmer.ranef"),
       })
 
 setMethod("with", signature(data = "lmer"),
-          function(data, expr, ...)
-              eval(substitute(substitute(expr, list(. = quote(data))),
-                              append(data@flist, eval(data@call$data)),
-                              enclos = parent.frame())
-          })
+          function(data, expr, ...) {
+          lst <- c(list(. = data), data@flist, eval(data@call$data))
+          eval(substitute(expr), lst[unique(names(lst))])})
+
