@@ -12,6 +12,11 @@ Fit Generalized Linear Mixed Models via PQL
 Fit a GLMM model with multivariate normal random effects, using
 Penalized Quasi-Likelihood.
 }
+\synopsis{
+GLMM(formula, family, data, random, method = c("PQL", "Laplace"),
+     control = list(), subset, weights, na.action, offset,
+     model = TRUE, x = FALSE, y = FALSE, \dots)
+}
 \usage{
 GLMM(formula, family, data, random, \dots)
 }

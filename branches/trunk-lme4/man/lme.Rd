@@ -17,6 +17,11 @@
   random effects. The within-group errors are allowed to be correlated
   and/or have unequal variances. 
 }
+\synopsis{
+lme(formula, data, random, method = c("REML", "ML"),
+    control = list(), subset, weights, na.action, offset,
+    model = TRUE, x = FALSE, y = FALSE, \dots)
+}
 \usage{
 lme(formula, data, random, \dots)
 }
