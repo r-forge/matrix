@@ -56,7 +56,7 @@ setGeneric("sparseGLMM",
 
 setMethod("sparseGLMM", signature(formula = "formula", family = "family", random = "list"),
           function(formula, family, data, random, subset,
-                   method, na.action, control, model, x, ...)
+                   method, na.action, control, model, x, niter = 20, ...)
       {
 
 
@@ -86,7 +86,7 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
           mCall[[1]] <- as.name("model.frame")
           names(mCall)[2] <- "formula"
           mCall$family <- mCall$random <- mCall$method <-
-              mCall$control <- mCall$model <- mCall$x <- NULL
+              mCall$control <- mCall$model <- mCall$x <- mCall$niter <- NULL
           form <- formula
           form[[3]] <- (~a+b)[[2]]
           form[[3]][[2]] <- formula[[3]]
@@ -144,7 +144,6 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
 
 
           mmats <- mmats.unadjusted
-          niter <- 20
           conv <- FALSE
           firstIter <- TRUE
           devold <- 0 ## deviance for convergence check
