@@ -33,3 +33,5 @@
 - bCrosstab(): yes, we really do want the diagonal "V:V" crosstabs.
    -- explained a bit more in man/bCrosstab.Rd
 
+- Clean up vestigial functions (pdFactor, pdMatrix, matrix<-) from the
+  nlme package.

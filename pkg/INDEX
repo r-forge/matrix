@@ -7,8 +7,6 @@ Schur                   Schur Decomposition of a Matrix
 ScotsSec                Scottish secondary school scores
 bCrosstab               Create pairwise crosstabulation
 coef<-                  Assign parameters
-corFactor               Extract the correlation factor
-corMatrix               Generate the correlation matrix
 corrmatrix-class        Class "corrmatrix"
 dCholCMatrix-class      Cholesky Decompositions of dsCMatrix Objects
 dgBCMatrix-class        Class "dgBCMatrix" Real Sparse Blocked Column
@@ -27,11 +25,8 @@ expand                  Expand a Decomposition into Factors
 expm                    Matrix exponential
 facmul                  Multiplication by Decomposition Factors
 lu                      Triangular Decomposition of a Square Matrix
-matrix<-                Assign the matrix
 mm                      A sample sparse model matrix
 norm                    Norm of a Matrix
-pdFactor                Square-root factor
-pdMatrix                Return the positive-definite matrix
 pdfactor-class          Factors of positive-definite matrices
 pdmatrix-class          Positive-definite matrices
 rcond                   Estimate the Reciprocal Condition Number

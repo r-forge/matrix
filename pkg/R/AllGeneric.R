@@ -52,20 +52,20 @@ if (!isGeneric("coef<-"))
 
 ## The generics pdFactor, pdMatrix, corFactor and corMatrix will be deprecated
 
-if (!isGeneric("pdFactor"))
-    setGeneric("pdFactor", function(object) standardGeneric("pdFactor"))
+# if (!isGeneric("pdFactor"))
+#     setGeneric("pdFactor", function(object) standardGeneric("pdFactor"))
 
-if (!isGeneric("pdMatrix"))
-    setGeneric("pdMatrix", function(object) standardGeneric("pdMatrix"))
+# if (!isGeneric("pdMatrix"))
+#     setGeneric("pdMatrix", function(object) standardGeneric("pdMatrix"))
 
-if (!isGeneric("corFactor"))
-    ## extractor for transpose inverse square root factor of corr matrix
-    setGeneric("corFactor", function(object, ...) standardGeneric("corFactor"))
+# if (!isGeneric("corFactor"))
+#     ## extractor for transpose inverse square root factor of corr matrix
+#     setGeneric("corFactor", function(object, ...) standardGeneric("corFactor"))
 
-if (!isGeneric("corMatrix"))
-    ## extractor for correlation matrix or the transpose inverse
-    ## square root matrix
-    setGeneric("corMatrix", function(object, ...) standardGeneric("corMatrix"))
+# if (!isGeneric("corMatrix"))
+#     ## extractor for correlation matrix or the transpose inverse
+#     ## square root matrix
+#     setGeneric("corMatrix", function(object, ...) standardGeneric("corMatrix"))
 
 # if (!isGeneric("isInitialized"))
 #     setGeneric("isInitialized",
@@ -73,8 +73,8 @@ if (!isGeneric("corMatrix"))
 #                valueClass = "logical")
 #
 
-if (!isGeneric("matrix<-"))
-    setGeneric("matrix<-", function(object, value) standardGeneric("matrix<-"))
+# if (!isGeneric("matrix<-"))
+#     setGeneric("matrix<-", function(object, value) standardGeneric("matrix<-"))
 
 if (!isGeneric("expm"))
     setGeneric("expm", function(x) standardGeneric("expm"))
