@@ -359,3 +359,21 @@ setMethod("gradient", signature(x = "lme"),
               callGeneric()
           })
 
+setMethod("confint", signature(object = "lme"),
+          function (object, parm, level = 0.95, ...) 
+      {
+          cf <- fixef(object)
+          pnames <- names(cf)
+          if (missing(parm)) 
+              parm <- seq(along = pnames)
+          else if (is.character(parm)) 
+              parm <- match(parm, pnames, nomatch = 0)
+          a <- (1 - level)/2
+          a <- c(a, 1 - a)
+          pct <- paste(round(100 * a, 1), "%")
+          ci <- array(NA, dim = c(length(parm), 2),
+                      dimnames = list(pnames[parm], pct))
+          ses <- sqrt(diag(vcov(object)))[parm]
+          ci[] <- cf[parm] + ses * t(outer(a, getFixDF(object@rep)[parm], qt))
+          ci
+      })
