@@ -8,6 +8,7 @@ importFrom("stats", "deviance", "formula", "coef")
 export(
        "Hilbert",
        "Matrix",
+       "Schur",
        "bCrosstab",
        "coef<-",
        "corFactor",
@@ -52,6 +53,7 @@ exportClasses(
 
 exportMethods(
               "%*%",
+              "Schur",
               "chol",
               "coef",
               "coef<-",

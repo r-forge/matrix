@@ -42,6 +42,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dgTMatrix_to_matrix", (DL_FUNC) &dgTMatrix_to_matrix, 1},
     {"dgTMatrix_validate", (DL_FUNC) &dgTMatrix_validate, 1},
     {"dgeMatrix_LU", (DL_FUNC) &dgeMatrix_LU, 1},
+    {"dgeMatrix_Schur", (DL_FUNC) &dgeMatrix_Schur, 2},
     {"dgeMatrix_crossprod", (DL_FUNC) &dgeMatrix_crossprod, 1},
     {"dgeMatrix_determinant", (DL_FUNC) &dgeMatrix_determinant, 2},
     {"dgeMatrix_dgeMatrix_crossprod", (DL_FUNC) &dgeMatrix_dgeMatrix_crossprod, 2},
@@ -51,8 +52,6 @@ static R_CallMethodDef CallEntries[] = {
     {"dgeMatrix_matrix_crossprod", (DL_FUNC) &dgeMatrix_matrix_crossprod, 2},
     {"dgeMatrix_norm", (DL_FUNC) &dgeMatrix_norm, 2},
     {"dgeMatrix_rcond", (DL_FUNC) &dgeMatrix_rcond, 2},
-
-
     {"dgeMatrix_solve", (DL_FUNC) &dgeMatrix_solve, 1},
     {"dgeMatrix_validate", (DL_FUNC) &dgeMatrix_validate, 1},
     {"dpoMatrix_chol", (DL_FUNC) &dpoMatrix_chol, 1},
