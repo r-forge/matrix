@@ -1,3 +1,7 @@
+2005-03-02  Douglas Bates  <bates@bates1-home>
+
+	* R/dsTMatrix.R: Conversion from dsTMatrix to dsCMatrix
+
 2005-02-28  Douglas Bates  <bates@bates1-home>
 
 	* src/*.c,po/,inst/po: Internationalization and localization of
