@@ -1,18 +1,18 @@
-\name{tripletMatrix-class}
+\name{dgTMatrix-class}
 \docType{class}
-\alias{tripletMatrix-class}
-\alias{+,tripletMatrix,tripletMatrix-method}
-\alias{coerce,tripletMatrix,geMatrix-method}
-\alias{coerce,tripletMatrix,matrix-method}
-\alias{coerce,tripletMatrix,cscMatrix-method}
-\alias{coerce,tripletMatrix,sscMatrix-method}
-\alias{image,tripletMatrix-method}
-\alias{t,tripletMatrix-method}
-\title{Class "tripletMatrix" sparse matrices in triplet form}
-\description{The \code{"tripletMatrix"} class is the class of sparse
+\alias{dgTMatrix-class}
+\alias{+,dgTMatrix,dgTMatrix-method}
+\alias{coerce,dgTMatrix,dgeMatrix-method}
+\alias{coerce,dgTMatrix,matrix-method}
+\alias{coerce,dgTMatrix,dgCMatrix-method}
+\alias{coerce,dgTMatrix,dsCMatrix-method}
+\alias{image,dgTMatrix-method}
+\alias{t,dgTMatrix-method}
+\title{Class "dgTMatrix" sparse matrices in triplet form}
+\description{The \code{"dgTMatrix"} class is the class of sparse
   matrices stored as (possibly redundant) triplets.}
 \section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("tripletMatrix", ...)}.
+Objects can be created by calls of the form \code{new("dgTMatrix", ...)}.
 }
 \section{Slots}{
   \describe{
@@ -30,23 +30,23 @@ Objects can be created by calls of the form \code{new("tripletMatrix", ...)}.
 }
 \section{Methods}{
   \describe{
-    \item{+}{\code{signature(e1 = "tripletMatrix", e2 = "tripletMatrix")}}
-    \item{coerce}{\code{signature(from = "tripletMatrix", to = "cscMatrix")}}
-    \item{coerce}{\code{signature(from = "tripletMatrix", to = "geMatrix")}}
-    \item{coerce}{\code{signature(from = "tripletMatrix", to = "matrix")}}
-    \item{coerce}{\code{signature(from = "tripletMatrix", to = "sscMatrix")}}
-    \item{image}{\code{signature(x = "tripletMatrix")}: plots an image of
+    \item{+}{\code{signature(e1 = "dgTMatrix", e2 = "dgTMatrix")}}
+    \item{coerce}{\code{signature(from = "dgTMatrix", to = "dgCMatrix")}}
+    \item{coerce}{\code{signature(from = "dgTMatrix", to = "dgeMatrix")}}
+    \item{coerce}{\code{signature(from = "dgTMatrix", to = "matrix")}}
+    \item{coerce}{\code{signature(from = "dgTMatrix", to = "dsCMatrix")}}
+    \item{image}{\code{signature(x = "dgTMatrix")}: plots an image of
       \code{x} using the \code{\link[lattice]{levelplot}} function}
-    \item{t}{\code{signature(x = "tripletMatrix")}: returns the transpose of
+    \item{t}{\code{signature(x = "dgTMatrix")}: returns the transpose of
       \code{x}}
   }
 }
 %\references{}
 %\author{}
 \note{Triplet matrices are a convenient form in which to construct sparse
-  matrices after which they can be coerced to \code{cscMatrix} objects.}
+  matrices after which they can be coerced to \code{dgCMatrix} objects.}
 \seealso{
-  \code{\link{cscMatrix-class}}
+  \code{\link{dgCMatrix-class}}
 }
 %\examples{}
 \keyword{classes}

@@ -1,30 +1,30 @@
-\name{geMatrix-class}
+\name{dgeMatrix-class}
 \docType{class}
-\alias{geMatrix-class}
-\alias{\%*\%,geMatrix,geMatrix-method}
-\alias{Schur,geMatrix,logical-method}
-\alias{Schur,geMatrix,missing-method}
-\alias{coerce,matrix,geMatrix-method}
-\alias{coerce,geMatrix,matrix-method}
-\alias{crossprod,geMatrix,geMatrix-method}
-\alias{crossprod,geMatrix,matrix-method}
-\alias{crossprod,geMatrix,missing-method}
-\alias{crossprod,geMatrix,numeric-method}
-\alias{determinant,geMatrix,logical-method}
-\alias{determinant,geMatrix,missing-method}
-\alias{diag,geMatrix-method}
-\alias{dim,geMatrix-method}
-\alias{lu,geMatrix-method}
-\alias{norm,geMatrix,missing-method}
-\alias{norm,geMatrix,character-method}
-\alias{rcond,geMatrix,missing-method}
-\alias{rcond,geMatrix,character-method}
-\alias{solve,geMatrix,matrix-method}
-\alias{solve,geMatrix,missing-method}
+\alias{dgeMatrix-class}
+\alias{\%*\%,dgeMatrix,dgeMatrix-method}
+\alias{Schur,dgeMatrix,logical-method}
+\alias{Schur,dgeMatrix,missing-method}
+\alias{coerce,matrix,dgeMatrix-method}
+\alias{coerce,dgeMatrix,matrix-method}
+\alias{crossprod,dgeMatrix,dgeMatrix-method}
+\alias{crossprod,dgeMatrix,matrix-method}
+\alias{crossprod,dgeMatrix,missing-method}
+\alias{crossprod,dgeMatrix,numeric-method}
+\alias{determinant,dgeMatrix,logical-method}
+\alias{determinant,dgeMatrix,missing-method}
+\alias{diag,dgeMatrix-method}
+\alias{dim,dgeMatrix-method}
+\alias{lu,dgeMatrix-method}
+\alias{norm,dgeMatrix,missing-method}
+\alias{norm,dgeMatrix,character-method}
+\alias{rcond,dgeMatrix,missing-method}
+\alias{rcond,dgeMatrix,character-method}
+\alias{solve,dgeMatrix,matrix-method}
+\alias{solve,dgeMatrix,missing-method}
 \title{General S4 Matrix class}
 \description{A general, numeric matrix in the S4 Matrix representation}
 \section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("geMatrix", ...)}
+Objects can be created by calls of the form \code{new("dgeMatrix", ...)}
 or, more commonly, by coercion from the \code{matrix} class.
 }
 \section{Slots}{
@@ -43,31 +43,31 @@ or, more commonly, by coercion from the \code{matrix} class.
 }
 \section{Methods}{
   \describe{
-    \item{Schur}{\code{signature(x = "geMatrix", vectors = "logical")}: ... }
-    \item{Schur}{\code{signature(x = "geMatrix", vectors = "missing")}: ... }
-    \item{coerce}{\code{signature(from = "geMatrix", to = "matrix")}: ... }
-    \item{coerce}{\code{signature(from = "matrix", to = "geMatrix")}: ... }
-    \item{coerce}{\code{signature(from = "matrix", to = "geMatrix")}}
-    \item{crossprod}{\code{signature(x = "geMatrix", y = "geMatrix")}: ... }
-    \item{crossprod}{\code{signature(x = "geMatrix", y = "matrix")}: ... }
-    \item{crossprod}{\code{signature(x = "geMatrix", y = "missing")}: ... }
-    \item{crossprod}{\code{signature(x = "geMatrix", y = "numeric")}: ... }
-    \item{diag}{\code{signature(x = "geMatrix")}: ... }
-    \item{dim}{\code{signature(x = "geMatrix")}: ... }
-    \item{lu}{\code{signature(x = "geMatrix")}: ... }
-    \item{norm}{\code{signature(x = "geMatrix", type = "character")}: ... }
-    \item{norm}{\code{signature(x = "geMatrix", type = "missing")}: ... }
-    \item{rcond}{\code{signature(x = "geMatrix", type = "character")}: ... }
-    \item{rcond}{\code{signature(x = "geMatrix", type = "missing")}: ... }
-    \item{solve}{\code{signature(a = "geMatrix", b = "geMatrix")}: ... }
-    \item{solve}{\code{signature(a = "geMatrix", b = "missing")}: ... }
+    \item{Schur}{\code{signature(x = "dgeMatrix", vectors = "logical")}: ... }
+    \item{Schur}{\code{signature(x = "dgeMatrix", vectors = "missing")}: ... }
+    \item{coerce}{\code{signature(from = "dgeMatrix", to = "matrix")}: ... }
+    \item{coerce}{\code{signature(from = "matrix", to = "dgeMatrix")}: ... }
+    \item{coerce}{\code{signature(from = "matrix", to = "dgeMatrix")}}
+    \item{crossprod}{\code{signature(x = "dgeMatrix", y = "dgeMatrix")}: ... }
+    \item{crossprod}{\code{signature(x = "dgeMatrix", y = "matrix")}: ... }
+    \item{crossprod}{\code{signature(x = "dgeMatrix", y = "missing")}: ... }
+    \item{crossprod}{\code{signature(x = "dgeMatrix", y = "numeric")}: ... }
+    \item{diag}{\code{signature(x = "dgeMatrix")}: ... }
+    \item{dim}{\code{signature(x = "dgeMatrix")}: ... }
+    \item{lu}{\code{signature(x = "dgeMatrix")}: ... }
+    \item{norm}{\code{signature(x = "dgeMatrix", type = "character")}: ... }
+    \item{norm}{\code{signature(x = "dgeMatrix", type = "missing")}: ... }
+    \item{rcond}{\code{signature(x = "dgeMatrix", type = "character")}: ... }
+    \item{rcond}{\code{signature(x = "dgeMatrix", type = "missing")}: ... }
+    \item{solve}{\code{signature(a = "dgeMatrix", b = "dgeMatrix")}: ... }
+    \item{solve}{\code{signature(a = "dgeMatrix", b = "missing")}: ... }
   }
 }
 %\references{}
 %\author{}
 %\note{}
 \seealso{
-  \code{\link{Matrix-class}}, \code{\link{trMatrix-class}}, \code{\link{syMatrix-class}}
+  \code{\link{Matrix-class}}, \code{\link{dtrMatrix-class}}, \code{\link{dsyMatrix-class}}
 }
 %\examples{}
 \keyword{classes}

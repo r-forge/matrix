@@ -1,13 +1,13 @@
 \name{sscChol-class}
 \docType{class}
 \alias{sscChol-class}
-\title{Cholesky decompositions of sscMatrix objects}
+\title{Cholesky decompositions of dsCMatrix objects}
 \description{The class of Cholesky decompositions of symmetric, sparse
-  column matrices from the \code{"sscMatrix"} class.}
+  column matrices from the \code{"dsCMatrix"} class.}
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("sscChol", ...)}
 but are more commonly created from \code{chol} applied to an
-\code{sscMatrix} object.
+\code{dsCMatrix} object.
 }
 \section{Slots}{
   \describe{
@@ -17,7 +17,7 @@ but are more commonly created from \code{chol} applied to an
       length 0.}
     \item{\code{diag}:}{A character object indicating if the triangular
       matrix is unit triangular or not.  This slot is inherited from the
-      \code{"tscMatrix"} class.  It is always \code{"N"} for this class.}
+      \code{"dtCMatrix"} class.  It is always \code{"N"} for this class.}
     \item{\code{uplo}:}{A character object indicating if the upper
       triangle (\code{"U"} or \code{"u"}) or the lower triangle
       (\code{"L"} or \code{"l"}) is stored.  At present only the lower
@@ -42,8 +42,8 @@ but are more commonly created from \code{chol} applied to an
   }
 }
 \section{Extends}{
-Class \code{"tscMatrix"}, directly.
-Class \code{"cscMatrix"}, by class \code{"tscMatrix"}.
+Class \code{"dtCMatrix"}, directly.
+Class \code{"dgCMatrix"}, by class \code{"dtCMatrix"}.
 }
 \section{Methods}{
 No methods defined with class "sscChol" in the signature.
@@ -52,7 +52,7 @@ No methods defined with class "sscChol" in the signature.
 %\author{}
 %\note{}
 \seealso{
-  \code{\link{cscMatrix-class}}
+  \code{\link{dgCMatrix-class}}
 }
 %\examples{}
 \examples{

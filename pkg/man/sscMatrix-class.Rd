@@ -1,22 +1,22 @@
-\name{sscMatrix-class}
+\name{dsCMatrix-class}
 \docType{class}
-\alias{sscMatrix-class}
-\alias{solve,sscMatrix,matrix-method}
-\alias{chol,sscMatrix,missing-method}
-\alias{chol,sscMatrix,logical-method}
-\alias{t,sscMatrix-method}
-\alias{coerce,sscMatrix,tripletMatrix-method}
-\alias{coerce,sscMatrix,geMatrix-method}
-\alias{coerce,sscMatrix,matrix-method}
-\alias{determinant,sscMatrix,missing-method}
-\alias{determinant,sscMatrix,logical-method}
+\alias{dsCMatrix-class}
+\alias{solve,dsCMatrix,matrix-method}
+\alias{chol,dsCMatrix,missing-method}
+\alias{chol,dsCMatrix,logical-method}
+\alias{t,dsCMatrix-method}
+\alias{coerce,dsCMatrix,dgTMatrix-method}
+\alias{coerce,dsCMatrix,dgeMatrix-method}
+\alias{coerce,dsCMatrix,matrix-method}
+\alias{determinant,dsCMatrix,missing-method}
+\alias{determinant,dsCMatrix,logical-method}
 \title{Symmetric, compressed, sparse column matrices}
-\description{The \code{sscMatrix} class is a class of symmetric, sparse
+\description{The \code{dsCMatrix} class is a class of symmetric, sparse
   matrices in the compressed, column-oriented format.  In this
   implementation the non-zero elements in the columns are sorted into
   increasing row order.}
 \section{Objects from the Class}{
-  Objects can be created by calls of the form \code{new("sscMatrix", ...)}.
+  Objects can be created by calls of the form \code{new("dsCMatrix", ...)}.
 }
 \section{Slots}{
   \describe{
@@ -40,36 +40,36 @@
   }
 }
 \section{Extends}{
-Class \code{"cscMatrix"}, directly.
+Class \code{"dgCMatrix"}, directly.
 }
 \section{Methods}{
   \describe{
-    \item{solve}{\code{signature(a = "sscMatrix", b = "matrix")}: Solve
+    \item{solve}{\code{signature(a = "dsCMatrix", b = "matrix")}: Solve
       a linear system of equations defined by \code{x} using a Cholesky
       decomposition.}
-    \item{chol}{\code{signature(x = "sscMatrix", pivot = "logical")}:
+    \item{chol}{\code{signature(x = "dsCMatrix", pivot = "logical")}:
       Returns (and stores) the Cholesky decomposition of the matrix
       \code{x}. If \code{pivot} is \code{TRUE} (the default) Metis is
       used to create a reordering of the rows and columns of \code{x} so
       as to minimize fill-in.}
-    \item{determinant}{\code{signature(x = "sscMatrix", logarithm =
+    \item{determinant}{\code{signature(x = "dsCMatrix", logarithm =
 	"missing")}: Evaluate the determinant of \code{x} on the
       logarithm scale.  This creates and stores the Cholesky factorization.}
-    \item{determinant}{\code{signature(x = "sscMatrix", logarithm =
+    \item{determinant}{\code{signature(x = "dsCMatrix", logarithm =
 	"logical")}: Evaluate the determinant of \code{x} on the
       logarithm scale or not, according to the \code{logarithm}
       argument.  This creates and stores the Cholesky factorization.}
-    \item{coerce}{\code{signature(from = "sscMatrix", to = "tripletMatrix")}}
-    \item{coerce}{\code{signature(from = "sscMatrix", to = "geMatrix")}}
-    \item{coerce}{\code{signature(from = "sscMatrix", to = "matrix")}}
+    \item{coerce}{\code{signature(from = "dsCMatrix", to = "dgTMatrix")}}
+    \item{coerce}{\code{signature(from = "dsCMatrix", to = "dgeMatrix")}}
+    \item{coerce}{\code{signature(from = "dsCMatrix", to = "matrix")}}
   }
 }
 %\references{}
 %\author{}
 %\note{}
 \seealso{
-  \code{\link{cscMatrix-class}}, \code{\link{tripletMatrix-class}},
-  \code{\link{geMatrix-class}}
+  \code{\link{dgCMatrix-class}}, \code{\link{dgTMatrix-class}},
+  \code{\link{dgeMatrix-class}}
 }
 %\examples{}
 \keyword{classes}

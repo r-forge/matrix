@@ -1,10 +1,10 @@
 \name{cscBlocked-class}
 \docType{class}
 \alias{cscBlocked-class}
-\alias{coerce,cscBlocked,cscMatrix-method}
-\alias{coerce,cscBlocked,tripletMatrix-method}
+\alias{coerce,cscBlocked,dgCMatrix-method}
+\alias{coerce,cscBlocked,dgTMatrix-method}
 \title{Class "cscBlocked" compressed, sparse, blocked Matrix }
-\description{The \code{cscMatrix} class is a class of sparse matrices in
+\description{The \code{dgCMatrix} class is a class of sparse matrices in
   the compressed, sparse, column-oriented format.  In this
   implementation the non-zero elements in the columns are sorted into
   increasing row order.}
@@ -13,7 +13,7 @@
     ...)}.
 
   Objects in this class have a structure similar to those in the
-  \code{cscMatrix} class except that each nonzero "element" is itself a
+  \code{dgCMatrix} class except that each nonzero "element" is itself a
   dense matrix with a given number of rows and columns.  These objects
   are used in the representation of linear mixed-effects model
   structures in the \code{lme4} package.
@@ -33,16 +33,16 @@
 }
 \section{Methods}{
   \describe{
-    \item{coerce}{\code{signature(from = "cscBlocked", to = "cscMatrix")}}
-    \item{coerce}{\code{signature(from = "cscBlocked", to = "tripletMatrix")}}
-    \item{coerce}{\code{signature(from = "cscMatrix", to = "cscBlocked")}}
+    \item{coerce}{\code{signature(from = "cscBlocked", to = "dgCMatrix")}}
+    \item{coerce}{\code{signature(from = "cscBlocked", to = "dgTMatrix")}}
+    \item{coerce}{\code{signature(from = "dgCMatrix", to = "cscBlocked")}}
   }
 }
 %\references{}
 %\author{}
 %\note{}
 \seealso{
- \code{\link{cscMatrix-class}}
+ \code{\link{dgCMatrix-class}}
 }
 %\examples{}
 \keyword{classes}

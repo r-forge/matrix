@@ -1,19 +1,19 @@
-\name{syMatrix-class}
+\name{dsyMatrix-class}
 \docType{class}
-\alias{\%*\%,geMatrix,syMatrix-method}
-\alias{\%*\%,syMatrix,geMatrix-method}
-\alias{syMatrix-class}
-\alias{coerce,syMatrix,geMatrix-method}
-\alias{coerce,syMatrix,matrix-method}
-\alias{norm,syMatrix,character-method}
-\alias{norm,syMatrix,missing-method}
-\alias{t,syMatrix-method}
-\title{Class "syMatrix" of symmetric matrices}
-\description{The \code{"syMatrix"} class is the class of symmetric
+\alias{\%*\%,dgeMatrix,dsyMatrix-method}
+\alias{\%*\%,dsyMatrix,dgeMatrix-method}
+\alias{dsyMatrix-class}
+\alias{coerce,dsyMatrix,dgeMatrix-method}
+\alias{coerce,dsyMatrix,matrix-method}
+\alias{norm,dsyMatrix,character-method}
+\alias{norm,dsyMatrix,missing-method}
+\alias{t,dsyMatrix-method}
+\title{Class "dsyMatrix" of symmetric matrices}
+\description{The \code{"dsyMatrix"} class is the class of symmetric
   matrices in non-packed storage.  Only the upper triangle or the lower
   triangle is stored.}
 \section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("syMatrix", ...)}.
+Objects can be created by calls of the form \code{new("dsyMatrix", ...)}.
 }
 \section{Slots}{
   \describe{
@@ -37,20 +37,20 @@ Objects can be created by calls of the form \code{new("syMatrix", ...)}.
   }
 }
 \section{Extends}{
-Class \code{"geMatrix"}, directly.
-Class \code{"Matrix"}, by class \code{"geMatrix"}.
+Class \code{"dgeMatrix"}, directly.
+Class \code{"Matrix"}, by class \code{"dgeMatrix"}.
 }
 \section{Methods}{
   \describe{
-    \item{coerce}{\code{signature(from = "syMatrix", to = "geMatrix")}}
-    \item{coerce}{\code{signature(from = "syMatrix", to = "matrix")}}
-    \item{norm}{\code{signature(x = "syMatrix", type = "character")}}
+    \item{coerce}{\code{signature(from = "dsyMatrix", to = "dgeMatrix")}}
+    \item{coerce}{\code{signature(from = "dsyMatrix", to = "matrix")}}
+    \item{norm}{\code{signature(x = "dsyMatrix", type = "character")}}
   }
 }
 %\references{}
 %\author{}
 \seealso{
-  \code{\link{geMatrix-class}}, \code{\link{Matrix-class}}
+  \code{\link{dgeMatrix-class}}, \code{\link{Matrix-class}}
 }
 %\examples{}
 \keyword{classes}

@@ -1,25 +1,25 @@
-\name{cscMatrix-class}
+\name{dgCMatrix-class}
 \docType{class}
-\alias{cscMatrix-class}
-\alias{coerce,matrix,cscMatrix-method}
-\alias{coerce,cscMatrix,tripletMatrix-method}
-\alias{coerce,cscMatrix,cscBlocked-method}
-\alias{coerce,cscMatrix,matrix-method}
-\alias{coerce,cscMatrix,geMatrix-method}
-\alias{crossprod,cscMatrix,missing-method}
-\alias{crossprod,cscMatrix,matrix-method}
-\alias{crossprod,cscMatrix,numeric-method}
-\alias{diag,cscMatrix-method}
-\alias{dim,cscMatrix-method}
-\alias{image,cscMatrix-method}
-\alias{t,cscMatrix-method}
-\title{Class "cscMatrix" compressed, sparse, column Matrix}
-\description{The \code{cscMatrix} class is a class of sparse matrices in
+\alias{dgCMatrix-class}
+\alias{coerce,matrix,dgCMatrix-method}
+\alias{coerce,dgCMatrix,dgTMatrix-method}
+\alias{coerce,dgCMatrix,cscBlocked-method}
+\alias{coerce,dgCMatrix,matrix-method}
+\alias{coerce,dgCMatrix,dgeMatrix-method}
+\alias{crossprod,dgCMatrix,missing-method}
+\alias{crossprod,dgCMatrix,matrix-method}
+\alias{crossprod,dgCMatrix,numeric-method}
+\alias{diag,dgCMatrix-method}
+\alias{dim,dgCMatrix-method}
+\alias{image,dgCMatrix-method}
+\alias{t,dgCMatrix-method}
+\title{Class "dgCMatrix" compressed, sparse, column Matrix}
+\description{The \code{dgCMatrix} class is a class of sparse matrices in
   the compressed, sparse, column-oriented format.  In this
   implementation the non-zero elements in the columns are sorted into
   increasing row order.}
 \section{Objects from the Class}{
-  Objects can be created by calls of the form \code{new("cscMatrix", ...)}.
+  Objects can be created by calls of the form \code{new("dgCMatrix", ...)}.
 }
 \section{Slots}{
   \describe{
@@ -37,19 +37,19 @@
 }
 \section{Methods}{
   \describe{
-    \item{coerce}{\code{signature(from = "matrix", to = "cscMatrix")}}
-    \item{coerce}{\code{signature(from = "cscMatrix", to = "matrix")}}
-    \item{coerce}{\code{signature(from = "cscMatrix", to = "cscBlocked")}}
-    \item{coerce}{\code{signature(from = "cscMatrix", to = "tripletMatrix")}}
-    \item{crossprod}{\code{signature(x = "cscMatrix", y = "missing")}
-      returns \code{t(x) \%*\% x} as an \code{sscMatrix} object.}
-    \item{crossprod}{\code{signature(x = "cscMatrix", y = "matrix")}: ... }
-    \item{crossprod}{\code{signature(x = "cscMatrix", y = "numeric")}: ... }
-    \item{diag}{\code{signature(x = "cscMatrix")}: returns the diagonal
+    \item{coerce}{\code{signature(from = "matrix", to = "dgCMatrix")}}
+    \item{coerce}{\code{signature(from = "dgCMatrix", to = "matrix")}}
+    \item{coerce}{\code{signature(from = "dgCMatrix", to = "cscBlocked")}}
+    \item{coerce}{\code{signature(from = "dgCMatrix", to = "dgTMatrix")}}
+    \item{crossprod}{\code{signature(x = "dgCMatrix", y = "missing")}
+      returns \code{t(x) \%*\% x} as an \code{dsCMatrix} object.}
+    \item{crossprod}{\code{signature(x = "dgCMatrix", y = "matrix")}: ... }
+    \item{crossprod}{\code{signature(x = "dgCMatrix", y = "numeric")}: ... }
+    \item{diag}{\code{signature(x = "dgCMatrix")}: returns the diagonal
       of \code{x}}
-    \item{dim}{\code{signature(x = "cscMatrix")}: returns the dimensions
+    \item{dim}{\code{signature(x = "dgCMatrix")}: returns the dimensions
       of \code{x}}
-    \item{image}{\code{signature(x = "cscMatrix")}: plots an image of
+    \item{image}{\code{signature(x = "dgCMatrix")}: plots an image of
       \code{x} using the \code{\link[lattice]{levelplot}} function}
   }
 }
@@ -57,7 +57,7 @@
 %\author{}
 %\note{}
 \seealso{
-  \code{\link{sscMatrix-class}}, \code{\link{tscMatrix-class}}
+  \code{\link{dsCMatrix-class}}, \code{\link{dtCMatrix-class}}
 }
 %\examples{}
 \keyword{classes}

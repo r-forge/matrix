@@ -6,7 +6,7 @@
 \alias{chol,poMatrix-method}
 \alias{chol,poMatrix,ANY-method}
 \alias{determinant,poMatrix,logical-method}
-\alias{solve,poMatrix,geMatrix-method}
+\alias{solve,poMatrix,dgeMatrix-method}
 \alias{solve,poMatrix,matrix-method}
 \alias{solve,poMatrix,missing-method}
 \alias{solve,poMatrix,numeric-method}
@@ -16,7 +16,7 @@
   upper triangle or the lower triangle is required to be available.}
 \section{Objects from the Class}{Objects can be created by calls of the
   form \code{new("poMatrix", ...)} or from \code{crossprod} applied to
-  an \code{"geMatrix"} object.}
+  an \code{"dgeMatrix"} object.}
 \section{Slots}{
   \describe{
     \item{\code{uplo}:}{Object of class \code{"character"}. Must be
@@ -34,9 +34,9 @@
   }
 }
 \section{Extends}{
-Class \code{"syMatrix"}, directly.
-Class \code{"geMatrix"}, by class \code{"syMatrix"}.
-Class \code{"Matrix"}, by class \code{"syMatrix"}.
+Class \code{"dsyMatrix"}, directly.
+Class \code{"dgeMatrix"}, by class \code{"dsyMatrix"}.
+Class \code{"Matrix"}, by class \code{"dsyMatrix"}.
 }
 \section{Methods}{
   \describe{
@@ -52,7 +52,7 @@ Class \code{"Matrix"}, by class \code{"syMatrix"}.
       Return the inverse of \code{a}.}
     \item{solve}{\code{signature(a = "poMatrix", b = "numeric")}:
       Solve the linear system defined by \code{a} and \code{b}, where
-      \code{b} can be a numeric vector, or a matrix, or a geMatrix
+      \code{b} can be a numeric vector, or a matrix, or a dgeMatrix
       object.  The Cholesky decomposition of \code{a} is calculated (if
       needed) while solving the system.}
   }
@@ -60,7 +60,7 @@ Class \code{"Matrix"}, by class \code{"syMatrix"}.
 %\references{}
 %\author{}
 \seealso{
-  \code{\link{syMatrix-class}}, \code{\link{geMatrix-class}},
+  \code{\link{dsyMatrix-class}}, \code{\link{dgeMatrix-class}},
   \code{\link{Matrix}}, \code{\link{rcond}}, \code{\link{chol}},
   \code{\link{solve}}, \code{\link{crossprod}}
 }
