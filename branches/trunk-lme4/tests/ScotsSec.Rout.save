@@ -15,7 +15,6 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > library(lme4)
-> data(ScotsSec, package = "Matrix")
 > fm1 <- lme(attain ~ verbal * sex, ScotsSec,
 +            random = list(primary = ~1, second = ~1))
 > summary(fm1)
