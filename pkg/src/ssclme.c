@@ -1080,6 +1080,7 @@ SEXP ssclme_coefGetsUnc(SEXP x, SEXP coef)
 		*omgi = REAL(VECTOR_ELT(Omega, i)),
 		*tmp = Calloc(ncisq, double),
 		diagj, one = 1.;
+	    /* FIXEME: Change this to use a factor and dsyrk */
 				/* LD in omgi and L' in tmp */
 	    memset(omgi, 0, sizeof(double) * ncisq);
 	    for (j = 0; j < nci; j++) {
@@ -1236,3 +1237,45 @@ SEXP ssclme_asTscMatrix(SEXP x)
     return val;
 }
 
+
+SEXP ssclme_fitted(SEXP x, SEXP facs, SEXP mmats)
+{
+    SEXP val, b;
+    int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	i, ione = 1, nf = length(facs), nobs, p;
+    double *vv, one = 1.0, zero = 0.0;
+
+    if (nf < 1)
+	error("null factor list passed to ssclme_fitted");
+    nobs = length(VECTOR_ELT(facs, 0));
+    val = PROTECT(allocVector(REALSXP, nobs));
+    vv = REAL(val);
+    p = nc[nf] - 1;
+    if (p > 0) {
+	F77_CALL(dgemm)("N", "N", &nobs, &ione, &p, &one,
+			REAL(VECTOR_ELT(mmats, nf)), &nobs,
+			REAL(PROTECT(ssclme_fixef(x))), &p,
+			&zero, vv, &nobs);
+	UNPROTECT(1);
+    } else {
+	memset(vv, 0, sizeof(double) * nobs);
+    }
+    b = PROTECT(ssclme_ranef(x));
+    for (i = 0; i < nf; i++) {
+	int *ff = INTEGER(VECTOR_ELT(facs, i)), j, nci = nc[i];
+	double *bb = REAL(VECTOR_ELT(b, i)),
+	    *mm = REAL(VECTOR_ELT(mmats, i));
+	for (j = 0; j < nobs; ) {
+	    int nn = 1, lev = ff[j];
+	    /* check for adjacent rows with same factor level */
+	    while (ff[j + nn] == lev) nn++; 
+	    F77_CALL(dgemm)("N", "N", &nn, &ione, &nci,
+			    &one, mm + j, &nobs,
+			    bb + lev - 1, &nci,
+			    &one, vv + j, &nobs);
+	    j += nn;
+	}
+    }
+    UNPROTECT(2);
+    return val;
+}
