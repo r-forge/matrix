@@ -68,6 +68,3 @@ setClass("summary.lme",
                         logLik = "logLik",
                         re = "summary.ssclme",
                         residuals = "numeric"))
-
-setOldClass("family")
-
