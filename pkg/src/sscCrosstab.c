@@ -44,7 +44,6 @@ SEXP sscCrosstab(SEXP flist, SEXP upper)
     SET_SLOT(val, Matrix_DimSym, allocVector(INTSXP, 2));
     dims = INTEGER(GET_SLOT(val, Matrix_DimSym));
     dims[0] = dims[1] = ncol;
-    SET_SLOT(val, Matrix_uploSym, ScalarString(mkChar("U")));
     ntrpl = nfc2 * nobs + ncol;
     Ti = Calloc(ntrpl, int); Tj = Calloc(ntrpl, int); TTi = Calloc(ntrpl, int);
     Tx = Calloc(ntrpl, double); TTx = Calloc(ntrpl, double);
@@ -113,6 +112,127 @@ SEXP sscCrosstab_L_LI_sizes(SEXP ctab, SEXP permexp)
     ssclme_fill_LIp(n, Parent, Lp);
     aa[3] = Lp[n];
     Free(Flag); Free(Lnz); Free(Parent); Free(Lp); 
+    UNPROTECT(1);
+    return ans;
+}
+
+static
+void make_icounts(int nod, int ni, const int i[], const int j[],
+		  const char ind[], int icounts[])
+{
+    int k, *lastj = memset(Calloc(ni, int), 0, sizeof(int) * ni);
+
+    memset(icounts, 0, sizeof(int) * ni);
+    for (k = 0; k < nod; k++) {
+	int ik = i[k], jk = j[k];
+	if (ind[k] && jk != lastj[ik]) {
+	    icounts[ik]++;
+	    lastj[ik] = jk;
+	}
+    }
+    Free(lastj);
+}
+    
+SEXP sscCrosstab_groupedPerm(SEXP ctab)
+{
+    SEXP
+	GpSlot = GET_SLOT(ctab, Matrix_GpSym),
+	iSlot = GET_SLOT(ctab, Matrix_iSym),
+	pSlot = GET_SLOT(ctab, Matrix_pSym);
+    int *Ai = INTEGER(iSlot),
+	*Ap = INTEGER(pSlot),
+	*Gp = INTEGER(GpSlot),
+	nl1 = Gp[1],		/* number of levels of first factor */
+	*icounts = Calloc(nl1, int),
+	nl2, *jcounts,
+	j, jj,
+	n = length(pSlot) - 1,	/* number of columns */
+	nf = length(GpSlot) - 1, /* number of factors */
+	nz = length(iSlot),	/* number of non-zeros */
+	nod = nz - n,		/* number of off-diagonals */
+	nuse = nod,
+	*iv = Calloc(nod, int),
+	*jv = Calloc(nod, int),
+	p1, p2;
+    char *active = (char *) memset(Calloc(n, char), 1, (size_t) n),
+	*ind = (char *) memset(Calloc(nod, char), 1, (size_t) nod);
+
+    SEXP ans = PROTECT(allocVector(INTSXP, n));
+    int *perm = INTEGER(ans);
+
+    if (toupper(*CHAR(STRING_ELT(GET_SLOT(ctab, Matrix_uploSym), 0))) != 'L')
+	error("Lower triangle required in sscCrosstab object");
+    if (nf < 2) error("At least two factors are required");
+    nl2 = Gp[2] - Gp[1];
+    jcounts = Calloc(nl2, int);
+
+    p1 = 0; p2 = nl1;		/* copy and expand off-diagonal indices */
+    for (j = 0; j < p2; j++) {
+	int p3 = Ap[j + 1];
+	for (jj = Ap[j]; jj < p3; jj++) {
+	    int i = Ai[jj];
+/* FIXME: iv and jv are named backwards.  Reconcile this. */
+	    if (i > j) {
+		jv[p1] = i;
+		iv[p1] = j;
+		p1++;
+	    }
+	}
+    }
+    if (p1 != nod) error("Logic error - counts of off-diagonals disagree");
+    
+    p1 = 0; p2 = Gp[2] - 1;	/* fill 1st level from LHS, 2nd from RHS */
+    while (nuse > 0) {
+	int k, mcount, mind;
+	make_icounts(nod, nl1, iv, jv, ind, icounts);
+
+	mind = -1;
+	mcount = Gp[2];	/* must be bigger than Gp[2] - Gp[1] */
+	for (k = 0; k < nl1; k++) { /* determine column with min count */
+	    int ic = icounts[k];
+	    if (active[k]) {	
+		if (ic < 1) {	/* remove active columns with zero counts */
+		    perm[p1++] = k;
+		    active[k] = 0;
+		} else if (ic < mcount) {
+		    mcount = ic;
+		    mind = k;
+		}
+	    }
+	}
+	if (mind < 0)
+	    error("Logic error - ran out of columns before nuse == 0");
+	
+				/* Count rows for j  */
+	memset(jcounts, 0, sizeof(int) * nl2);
+	for (k = 0; k < nod; k++) {
+	    if (ind[k] && icounts[iv[k]] == mcount) {
+		jcounts[jv[k] - nl1]++;
+	    }
+	}
+	
+	mcount = -1; mind = -1;	/* determine j with max count */
+	for (k = 0; k < nl2; k++) {
+	    int jc = jcounts[k];
+				/* use >= below so ties give last row */
+	    if (active[k + nl1] && jc >= mcount) {
+		mcount = jc;
+		mind = k;
+	    }
+	}
+	if (mind < 0)
+	    error("Logic error - ran out of rows before nuse == 0");
+
+	perm[p2--] = mind + nl1;
+	for (k = 0; k < nod; k++) {
+	    if (jv[k] - nl1 == mind) {
+		ind[k] = 0;
+		nuse--;
+	    }
+	}
+    }
+
+    Free(ind); Free(active); Free(jv); Free(iv); Free(jcounts); Free(icounts);
     UNPROTECT(1);
     return ans;
 }
