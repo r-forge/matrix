@@ -3,32 +3,32 @@
 \alias{expm,dgeMatrix-method}
 \title{Matrix exponential}
 \description{
-  Return the exponential of a matrix.
-  
+  Compute the exponential of a matrix.
 }
 \usage{
 expm(x)
 }
 \arguments{
-  \item{x}{An object that inherits from the \code{Matrix} class}
+  \item{x}{an \R object that inherits from the \code{Matrix} class}
 }
 \details{
   The exponential of a matrix is defined as the infinite Taylor
   series \code{expm(A) = I + A + A^2/2! + A^3/3! + ...} (although this is
   definitely not the way to compute it).  The method for the
   \code{dgeMatrix} class uses Ward's diagonal Pade' approximation with
-  three step preconditioning.  It is a simple translation of the
-  implementation of the corresponding Octave function contributed
-  to the Octave project by A. Scottedward Hodel
-  \email{A.S.Hodel@Eng.Auburn.EDU}.
+  three step preconditioning.
 }
 \value{
   The matrix exponential of \code{x}.
 }
-\references{}
-%\author{}
+\references{}%% << FIXME
+\author{This is a simple translation of the
+  implementation of the corresponding Octave function contributed to the
+  Octave project by A. Scottedward Hodel
+  \email{A.S.Hodel@Eng.Auburn.EDU}.
+}
 %\note{}
-%\seealso{}
+\seealso{\code{\link{Schur}}}
 \examples{
 (mm <- Matrix(c(-49, -64, 24, 31), nc = 2))
 expm(mm)
