@@ -5,6 +5,8 @@ void ssc_metis_order(int n, const int Tp [], const int Ti [],
 {
     int  j, num_flag = 0, options_flag = 0;
     idxtype
+	*perm = Calloc(n, idxtype), /* in case idxtype != int */
+	*iperm = Calloc(n, idxtype),
 	*xadj = Calloc(n+1, idxtype),
 	*adj = Calloc(2 * (Tp[n] - n), idxtype),
 	*perm = Calloc(n, idxtype), /* in case idxtype != int */

@@ -120,12 +120,9 @@ void col_metis_order(int j0, int j1, int i2,
 	int *Ap = Calloc(n + 1, int),
 	    *Ai = Calloc(nnz, int),
 	    *Tj = Calloc(nnz, int),
-	    *TTi = Calloc(nnz, int);
-	double			/* needed for triplet_to_col */
-	    *Ax = Calloc(nnz, double), /* FIXME: change triplet_to_col */
-	    *Tx = Calloc(nnz, double); /* to check for null pointers */
-	idxtype *perm = Calloc(n, idxtype),
-	    *iperm = Calloc(n, idxtype);
+	    *TTi = Calloc(nnz, int),
+	    *perm = Calloc(n, int),
+	    *iperm = Calloc(n, int);
 
 	for (j = 0; j < n; j++) { /* diagonals */
 	    TTi[j] = Tj[j] = j;
@@ -149,10 +146,10 @@ void col_metis_order(int j0, int j1, int i2,
 		}
 	    }
 	}
-	triplet_to_col(n, n, nnz, TTi, Tj, Tx, Ap, Ai, Ax);
+	triplet_to_col(n, n, nnz, TTi, Tj, (double *) 0, Ap, Ai, (double *) 0);
 	ssc_metis_order(n, Ap, Ai, perm, iperm);
 	for (j = j1; j < i2; j++) ans[j] = j1 + iperm[j - j1];
-	Free(Tx); Free(Ax); Free(TTi); Free(Tj); Free(Ai); Free(Ap);
+	Free(TTi); Free(Tj); Free(Ai); Free(Ap);
 	Free(perm); Free(iperm);
     }
 }
@@ -191,33 +188,6 @@ SEXP sscCrosstab_groupedPerm(SEXP ctab)
     }
     for (i = 1; i < nf; i++) {
 	col_metis_order(Gp[i - 1], Gp[i], Gp[i+1], Ap, Ai, INTEGER(ans));
-    }
-    if (0) {			/* skip this part */
-	if (!ctab_isNested(n, nf, 0, Ap, Ai, Gp)) {
-	    int *np = Calloc(n + 1, int), /* column pointers */
-		*ni = Calloc(length(iSlot) - n, int); /* row indices */
-	    
-	    np[0] = 0;
-	    for (i = 1; i < nf; i++) { /* adjacent pairs of grouping factors */
-		int j, k, p0 = 0, p1 = Gp[i-1], p2 = Gp[i], p3 = Gp[i+1];
-		
-		for (j = p1; j < p2; j++) { /* for this set of columns */
-		    int lk = Ap[j+1];
-		    for (k = Ap[j]; k < lk; k++) {
-			int ii = Ai[k];
-			if (p2 <= ii && ii < p3) { /* check the row */
-			    ni[p0++] = ii - p2;
-			}
-		    }
-		    np[j + 1 - p1] = p0;
-		}
-		pair_perm(p3 - p2, p2 - p1, np, ni,
-			  INTEGER(ans) + p2,
-			  (i == 1) ? INTEGER(ans) + p1 : (int *) 0);
-		for (j = p2; j < p3; j++) INTEGER(ans)[j] += p2;
-	    }
-	    Free(np); Free(ni);
-	}
     }
     if (nf > 1 && up) {Free(Ap); Free(Ai);}
     UNPROTECT(1);
