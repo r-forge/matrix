@@ -9,8 +9,6 @@
 
 */
 
-#include "reStruct.h"
-
 /* Uncomment the following to add support for the Port library 
    optimizer. The appropriate FORTRAN files from the PORT library
    must also be compiled in to do this. */
@@ -32,6 +30,8 @@ void F77_NAME(dmnf)(int* N, double* D, double* X,
                                   int*, double*, void (*ufparm)()),
                     int* IV, int* LIV, int* LV, double* V,
                     int* UIPARM, double* URPARM, void (*UFPARM)());
+
+#include "reStruct.h"
 
 static void
 nlme_calcf(int* n, double* x, int* nf, double* f, int* uiparm,

@@ -1,7 +1,26 @@
+facshuffle = function(sslm, facs)       # unexported utility
+{
+    if (!length(sslm[[2]])) return(facs)
+    s1 = sslm[[1]]
+    s2 = sslm[[2]]
+    lens = diff(s1@Gp)
+    ff = vector("list", length(facs))
+    for (i in seq(along = lens)) {
+        sq = seq(lens[i])
+        perm = 1 + s2[sq]
+        s2 = s2[-sq] - lens[i]
+        fi = facs[[i]]
+        fip = factor(perm[as.integer(fi)])
+        levels(fip)[perm] = levels(fi)
+        ff[[i]] = fip
+    }
+    ff
+}
+
 lmeControl <-
   ## Control parameters for lme
   function(maxIter = 50, msMaxIter = 50, tolerance =
-           sqrt((.Machine$double.eps)), niterEM = 35,
+           sqrt((.Machine$double.eps)), niterEM = 25,
            msTol = sqrt(.Machine$double.eps), msScale, msVerbose = FALSE,
            returnObject = FALSE, gradHess = TRUE, apVar = TRUE,
            .relStep = (.Machine$double.eps)^(1/3), minAbsParApVar = 0.05,
@@ -92,8 +111,10 @@ setMethod("lme", signature(formula = "formula", random = "list"),
               model = TRUE
           if (missing(x))
               x = TRUE
-          random = lapply(random, function(x)
-                          if(inherits(x, "formula")) pdLogChol(x) else x)
+          random = lapply(as(random, "list"),
+                   get("formula", pos = parent.frame(), mode = "function"))
+                   #lapply(random, function(x)
+                          #if(inherits(x, "formula")) pdLogChol(x) else x)
           method = if (missing(method)) "REML" else
                    match.arg(method, c("REML", "ML"))
           controlvals <- if (missing(control)) lmeControl() else
@@ -121,44 +142,24 @@ setMethod("lme", signature(formula = "formula", random = "list"),
           mCall$formula <- form
           mCall$drop.unused.levels <- TRUE
           data <- eval(mCall, parent.frame())
-          re <- reStruct(fixed = formula, random = random,
-                         data = data,
-                         REML = method != "ML",
-                         analyticHessian=controlvals$analyticHessian)
-          .Call("nlme_replaceSlot", re, "dontCopy", TRUE, PACKAGE = "lme4")
-          .Call("nlme_replaceSlot", re, "analyticHessian",
-                FALSE, PACKAGE = "lme4")
-          EMsteps(re) <- controlvals
-          .Call("nlme_replaceSlot", re, "analyticHessian",
-                controlvals$analyticHessian, PACKAGE = "lme4")
-          LMEoptimize(re) <- controlvals
-          .Call("nlme_replaceSlot", re, "dontCopy", FALSE, PACKAGE = "lme4")
-          ## zero some of the matrix slots
-          if (x == FALSE)
-              .Call("nlme_replaceSlot", re, "original",
-                    matrix(0.0, nrow = 0, ncol = 0), PACKAGE = "lme4")
-          .Call("nlme_replaceSlot", re, "decomposed",
-                matrix(0.0, nrow = 0, ncol = 0), PACKAGE = "lme4")
-          .Call("nlme_replaceSlot", re, "weighted",
-                matrix(0.0, nrow = 0, ncol = 0), PACKAGE = "lme4")
-          if (model == FALSE)
-              data = data.frame()
-          new("lme", reStruct = re, call = match.call(),
-              fitted = if (is.null(attr(data, "na.action"))) {
-                  fitted(re)[re@reverseOrder]
-              } else {
-                  napredict(attr(data, "na.action"), fitted(re)[re@reverseOrder])
-              },
-              frame = data, na.action = attr(data, "na.action"))
-      })
-
-setAs("lme", "reStruct",
-      function(from) from@reStruct,
-      function(from, value) {
-          if (nrow(from@frame) != nrow(value@original))
-              stop("Dimension mismatch between model.frame and original matrix")
-          from@reStruct <- value
-          from
+          facs <- lapply(names(random),
+                         function(x) eval(as.name(x), envir = data))
+          names(facs) <- names(random)
+          mmats <- c(lapply(random,
+                            function(x) model.matrix(formula(x), data = data)),
+                     list(.Xy = cbind(model.matrix(formula, data = data),
+                          .response = model.response(data))))
+          obj <- .Call("ssclme_create", facs, unlist(lapply(mmats, ncol)),
+                       as.integer(2e5), PACKAGE = "Matrix")
+          facs = facshuffle(obj, facs)
+          obj = obj[[1]]
+          .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
+          .Call("ssclme_initial", obj, PACKAGE="Matrix")
+          .Call("ssclme_factor", obj, PACKAGE = "Matrix")
+          .Call("ssclme_EMstepsGets", obj, controlvals$niterEM,
+                method == "REML", PACKAGE = "Matrix")
+          new("lme", call = match.call(), facs = facs, mmats = mmats,
+              model = data, REML = method == "REML", rep = obj)
       })
 
 setMethod("fitted", signature=c(object="lme"),
@@ -167,69 +168,64 @@ setMethod("fitted", signature=c(object="lme"),
           object@fitted
       })
 
-
 setMethod("residuals", signature=c(object="lme"),
-          function(object, ...)
-      {
-          re <- as(object, "reStruct")
-          if (is.null(object@na.action)) {
-              (getResponse(object@reStruct) - fitted(object@reStruct))[re@reverseOrder]
-          } else {
-              napredict(object@na.action,
-                        (getResponse(object@reStruct) -
-                         fitted(object@reStruct))[object@reStruct@reverseOrder])
-          }
-      })
-
+          function(object, ...) NULL)
 
 setMethod("logLik", signature(object="lme"),
-          function(object) logLik(object@reStruct))
+          function(object, REML = FALSE, ...)
+          -deviance(object@rep, REML = REML)/2)
 
-setMethod("summary", signature(object="lme"),
-          function(object, ...) {
-              llik <- logLik(object)    # has an oldClass
-              resd <- residuals(object, type="pearson")
-              if (length(resd) > 5) {
-                  resd <- quantile(resd)
-                  names(resd) <- c("Min","Q1","Med","Q3","Max")
-              }
-              new("summary.lme",
-                  call = object@call,
-                  logLik = llik,
-                  AIC = AIC(llik),
-                  BIC = BIC(llik),
-                  re = summary(as(object, "reStruct")),
-                  residuals = resd)
-          })
+setMethod("deviance", signature(object="lme"),
+          function(object, REML = FALSE, ...)
+          deviance(object@rep,
+                   REML = ifelse(missing(REML), object@REML, REML))
+          )
 
-setMethod("show", "summary.lme",
-          function(object) {
-              rdig <- 5
-              cat("Linear mixed-effects model fit by ")
-              cat(ifelse(object@re@REML, "REML\n", "maximum likelihood\n") )
-              cat(" Data:", deparse( object@call$data ), "\n")
-              if (!is.null(object@call$subset)) {
-                  cat("  Subset:",
-                      deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
-              }
-              print(data.frame(AIC = object@AIC, BIC = object@BIC,
-                               logLik = c(object@logLik), row.names = ""))
-              cat("\n")
-              object@re@useScale = TRUE
-              object@re@showCorrelation = TRUE
-              show(object@re)
-              ## Should this be part of the show method for summary.reStruct?
-              cat("\nNumber of Observations:", object@re@nobs)
-              cat("\nNumber of Groups: ")
-              ngrps <- object@re@ngrps
-              if ((length(ngrps)) == 1) {
-                  cat(ngrps,"\n")
-              } else {				# multiple nesting
-                  cat("\n")
-                  print(ngrps)
-              }
-              invisible(object)
-          })
+#setMethod("summary", signature(object="lme"),
+#          function(object, ...) {
+#              llik <- logLik(object)    # has an oldClass
+#              resd <- residuals(object, type="pearson")
+#              if (length(resd) > 5) {
+#                  resd <- quantile(resd)
+#                  names(resd) <- c("Min","Q1","Med","Q3","Max")
+#              }
+#              new("summary.lme",
+#                  call = object@call,
+#                  logLik = llik,
+#                  AIC = AIC(llik),
+#                  BIC = BIC(llik),
+#                  re = summary(as(object, "reStruct")),
+#                  residuals = resd)
+#          })
+
+#setMethod("show", "summary.lme",
+#          function(object) {
+#              rdig <- 5
+#              cat("Linear mixed-effects model fit by ")
+#              cat(ifelse(object@re@REML, "REML\n", "maximum likelihood\n") )
+#              cat(" Data:", deparse( object@call$data ), "\n")
+#              if (!is.null(object@call$subset)) {
+#                  cat("  Subset:",
+#                      deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
+#              }
+#              print(data.frame(AIC = object@AIC, BIC = object@BIC,
+#                               logLik = c(object@logLik), row.names = ""))
+#              cat("\n")
+#              object@re@useScale = TRUE
+#              object@re@showCorrelation = TRUE
+#              show(object@re)
+#              ## Should this be part of the show method for summary.reStruct?
+#              cat("\nNumber of Observations:", object@re@nobs)
+#              cat("\nNumber of Groups: ")
+#              ngrps <- object@re@ngrps
+#              if ((length(ngrps)) == 1) {
+#                  cat(ngrps,"\n")
+#              } else {				# multiple nesting
+#                  cat("\n")
+#                  print(ngrps)
+#              }
+#              invisible(object)
+#          })
 
 setMethod("show", "lme",
           function(object)
@@ -255,12 +251,6 @@ setMethod("show", "lme",
           invisible(object)
       })
 
-
-setMethod("isInitialized", "lmeLevelList",
-          function(object) all(sapply(object[seq(length=length(object)-2)],
-                                      function(x) isInitialized(x@precision))),
-          valueClass = "logical")
-
 setMethod("anova", signature(object = "lme"),
           function(object, ...)
           cat("anova method for lme not yet implemented\n"))
@@ -268,7 +258,7 @@ setMethod("anova", signature(object = "lme"),
 setMethod("fixef", signature(object = "lme"),
           function(object, ...)
       {
-          object = object@reStruct
+          object = object@rep
           callGeneric()
       })
 
@@ -285,14 +275,14 @@ setMethod("plot", signature(x = "lme"),
 setMethod("ranef", signature(object = "lme"),
           function(object, ...)
       {
-          object = object@reStruct
+          object = object@rep
           callGeneric()
       })
 
 setMethod("coef", signature(object = "lme"),
           function(object, ...)
       {
-          object = object@reStruct
+          object = object@rep
           callGeneric()
       })
 
@@ -318,16 +308,6 @@ setMethod("update", signature(object = "lme"),
           else call
       })
 
-setMethod("getGroups", signature(object="reStruct",
-                                 form="missing",
-                                 data="missing",
-                                 sep="missing"),
-          function(object, form, level, data, sep)
-      {
-          object <- object@reStruct
-          callGeneric()
-      })
-
 setMethod("getResponse", signature(object="lme"),
           function(object, form)
       {
@@ -335,6 +315,23 @@ setMethod("getResponse", signature(object="lme"),
           callGeneric()
       })
 
-### Local variables:
-### mode: R
-### End:
+setMethod("deviance", signature(object = "ssclme"),
+          function(object, REML = FALSE, ...) {
+              .Call("ssclme_factor", object, PACKAGE = "Matrix")
+              object@deviance[ifelse(REML, 2, 1)]
+          })
+
+setMethod("coef", signature(object = "ssclme"),
+          function(object, ...) {
+              .Call("ssclme_coef", object, PACKAGE = "Matrix")
+          })
+
+setMethod("ranef", signature(object = "ssclme"),
+          function(object, ...) {
+              .Call("ssclme_ranef", object, PACKAGE = "Matrix")
+          })
+
+setMethod("fixef", signature(object = "ssclme"),
+          function(object, ...) {
+              .Call("ssclme_fixef", object, PACKAGE = "Matrix")
+          })

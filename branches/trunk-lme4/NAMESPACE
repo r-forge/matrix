@@ -1,6 +1,13 @@
 useDynLib("lme4")
-importFrom("stats4", "logLik", "plot", "summary", "update")
-importFrom("stats", "anova", "fitted", "model.matrix", "residuals")
+importFrom("graphics", "plot")
+importFrom("stats",
+           "anova",
+           "deviance",
+           "fitted",
+           "logLik",
+           "model.matrix",
+           "residuals",
+           "update")
 importFrom("Matrix",
            "coef",
            "coef<-",
@@ -46,8 +53,6 @@ export(
        "getGroupsFormula",
        "getResponse",
        "getResponseFormula",      
-       "glmmLa2LogLikComp",
-       "glmmLa2RespWt",
        "lmList",
        "lme",
        "lmeControl",
@@ -62,13 +67,7 @@ exportClasses(
               "groupedData",
               "lmList",
               "lme",
-              "lmeLevel",
-              "lmeLevelList",
-              "reStruct",
-              "summary.glmm",
-              "summary.lme",
-              "summary.pdMat",
-              "summary.reStruct"
+              "summary.pdMat"
               )
 
 exportMethods(
@@ -83,15 +82,12 @@ exportMethods(
               "[[",
               "anova",
               "coef",
-              "coef<-",
               "coerce",
-              "coerce<-",
+              "deviance",
               "fitted",
               "fixef",
               "formula",
-              "isInitialized",
               "logLik",
-              "model.matrix",
               "pdgradient",
               "plot",
               "ranef",
