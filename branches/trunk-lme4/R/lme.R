@@ -45,15 +45,19 @@ make.mf.call = function(mf, frm, random) #unexported utility
     mf
 }
 
-lmeControl =                            # Control parameters for lme
-  function(maxIter = 50, msMaxIter = 50, tolerance =
-           sqrt((.Machine$double.eps)), niterEM = 25,
-           msTol = sqrt(.Machine$double.eps), msScale, msVerbose = FALSE,
-           glmmMaxIter = 20,
-           returnObject = FALSE, gradHess = TRUE, apVar = TRUE,
-           .relStep = (.Machine$double.eps)^(1/3), minAbsParApVar = 0.05,
+lmeControl <-                            # Control parameters for lme
+  function(maxIter = 50,
+           msMaxIter = 50,
+           tolerance = sqrt((.Machine$double.eps)),
+           niterEM = 20,
+           msTol = sqrt(.Machine$double.eps),
+           msScale,
+           msVerbose = getOption("verbose"),
+           PQLmaxIt = 20,
+           .relStep = (.Machine$double.eps)^(1/3),
            nlmStepMax = NULL,
-           natural = TRUE, optimizer="nlm", EMverbose=FALSE,
+           optimizer="nlm",
+           EMverbose = getOption("verbose"),
            analyticGradient = TRUE,
            analyticHessian=FALSE)
 {
@@ -69,15 +73,18 @@ lmeControl =                            # Control parameters for lme
         }
         scale
     }
-    list(maxIter = maxIter, msMaxIter = msMaxIter, tolerance = tolerance,
-         niterEM = niterEM, msTol = msTol, msScale = msScale,
+    list(maxIter = maxIter,
+         msMaxIter = msMaxIter,
+         tolerance = tolerance,
+         niterEM = niterEM,
+         msTol = msTol,
+         msScale = msScale,
          msVerbose = msVerbose,
-         glmmMaxIter = glmmMaxIter,
-         returnObject = returnObject,
-         gradHess = gradHess , apVar = apVar, .relStep = .relStep,
+         PQLmaxIt = PQLmaxIt,
+         .relStep = .relStep,
          nlmStepMax = nlmStepMax,
-         minAbsParApVar = minAbsParApVar, natural = natural,
-         optimizer=optimizer, EMverbose=EMverbose,
+         optimizer=optimizer,
+         EMverbose=EMverbose,
          analyticHessian=analyticHessian,
          analyticGradient=analyticGradient)
 }
