@@ -70,6 +70,7 @@ exportClasses(
               "lmList",
               "lme",
               "summary.pdMat",
+              "summary.lme",
               "summary.ssclme"
               )
 

@@ -19,10 +19,6 @@ setClass("summary.pdMat", representation(cor = "corrmatrix",
                                          formula = "formula"),
          prototype=list(structName="", formula=formula(NULL)))
 
-#setClass("summary.glmm", representation(method="character",
-#                                        family="character",
-#                                        link="character"),
-#         contains="summary.lme")
 
 setClass("lme", representation(call = "call",
                                facs = "list",
@@ -30,7 +26,8 @@ setClass("lme", representation(call = "call",
                                model = "data.frame",
                                REML = "logical",
                                rep = "ssclme",
-                               fitted = "numeric"))
+                               fitted = "numeric",
+                               residuals = "numeric"))
 
 setOldClass("family")
 
@@ -72,7 +69,20 @@ setClass("summary.ssclme",
                         ngrps="integer",
                         nobs="integer",
                         corFixed="corrmatrix",
-                        reSumry="list",
+                        VarCorr="VarCorr",
                         useScale="logical",
                         showCorrelation="logical"
                         ))
+
+setOldClass("logLik")
+
+setClass("summary.lme",
+         representation(call = "call",
+                        logLik = "logLik",
+                        re = "summary.ssclme",
+                        residuals = "numeric"))
+
+#setClass("summary.glmm", representation(method="character",
+#                                        family="character",
+#                                        link="character"),
+#         contains="summary.lme")
