@@ -35,11 +35,11 @@ SEXP dgBCMatrix_validate(SEXP x)
  * where A is a compressed, sparse, blocked matrix and
  * B and C are dense matrices.
  * 
- * @param side 'L' or 'l' for left, otherwise right
- * @param transa 'T' or 't' for transpose.
+ * @param side LFT or RGT
+ * @param transa TRN or NTR
  * @param m number of rows in C
  * @param n number of columns in C
- * @param k number of rows in B if side = 'L', otherwise
+ * @param k number of rows in B if side == LFT, otherwise
  *        number of columns in B.
  * @param alpha
  * @param A pointer to a dgBCMatrix object
@@ -111,7 +111,7 @@ cscb_mm(enum CBLAS_SIDE side, enum CBLAS_TRANSPOSE transa,
 	}
     } else {
 	/* B is of size m by k */
-	error("Call to cscb_mm must have side == 'L'");
+	error("Call to cscb_mm must have side == LFT");
     }
 }
 
@@ -373,19 +373,19 @@ cscb_trmm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
  * Solve a triangular system of the form op(A)*X = alpha*B where A
  * is a dgBCMatrix triangular matrix and B is a dense matrix.
  * 
- * @param uplo 'U' or 'L' for upper or lower
- * @param trans 'T' or 'N' for transpose or no transpose
- * @param diag 'U' or 'N' for unit diagonal or non-unit
+ * @param uplo UPP or LOW
+ * @param trans TRN or NTR
+ * @param diag UNT or NUN
  * @param A pointer to a triangular dgBCMatrix object
- * @param B pointer to the contents of the matrix B
  * @param m number of rows in B
  * @param n number of columns in B
+ * @param B pointer to the contents of the matrix B
  * @param ldb leading dimension of B as declared in the calling function
  */
 void
 cscb_trsm(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE transa,
 	  enum CBLAS_DIAG diag, double alpha, SEXP A,
-	  double B[], int m, int n, int ldb)
+	  int m, int n, double B[], int ldb)
 {
     SEXP ApP = GET_SLOT(A, Matrix_pSym),
 	AxP = GET_SLOT(A, Matrix_xSym);
@@ -422,36 +422,26 @@ cscb_trsm(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE transa,
 	    }
 	    return;
 	} else {
-	    int p, p2, sza = xdims[0] * xdims[0], szb = xdims[0] * n;
-	    double *tmp = Calloc(szb, double);
+	    int p, p2, sza = xdims[0] * xdims[0];
+
 	    if (uplo == UPP) error("Code for upper triangle not yet written");
 	    if (transa == TRN) {
 		for (j = nb - 1; j >= 0; j--) {
 		    p2 = Ap[j+1];
-
-		    F77_CALL(dlacpy)("A", xdims, &n, B + j * xdims[0], &ldb,
-				     tmp, xdims);
 		    for (p = Ap[j]; p < p2; p++)
 			F77_CALL(dgemm)("T", "N", xdims, &n, xdims,
 					&minus1, Ax + p * sza, xdims,
 					B + Ai[p] * xdims[0], &ldb,
-					&one, tmp, xdims);
-		    F77_CALL(dlacpy)("A", xdims, &n, tmp, xdims,
-				     B + j * xdims[0], &ldb);
+					&one, B + j * xdims[0], &ldb);
 		}
 	    } else {
 		for (j = 0; j < nb; j++) {
 		    p2 = Ap[j+1];
-
-		    F77_CALL(dlacpy)("A", xdims, &n, B + j * xdims[0], &ldb,
-				     tmp, xdims);
 		    for (p = Ap[j]; p < p2; p++)
 			F77_CALL(dgemm)("N", "N", xdims, &n, xdims,
 					&minus1, Ax + p * sza, xdims,
-					B + Ai[p] * xdims[0], &ldb,
-					&one, tmp, xdims);
-		    F77_CALL(dlacpy)("A", xdims, &n, tmp, xdims,
-				     B + j * xdims[0], &ldb);
+					B + j * xdims[0], &ldb,
+					&one, B + Ai[p] * xdims[0], &ldb);
 		}
 	    }
 	}
