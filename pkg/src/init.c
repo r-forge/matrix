@@ -1,19 +1,20 @@
 #include "LU.h"
 #include "Mutils.h"
-#include "cscBlocked.h"
-#include "dgCMatrix.h"
+#include "dgBCMatrix.h"
 #include "dense.h"
-#include "factorizations.h"
-#include "dgeMatrix.h"
-#include "lmer.h"
-#include "dpoMatrix.h"
-#include "sscCrosstab.h"
-#include "dsCMatrix.h"
-#include "ssclme.h"
-#include "dsyMatrix.h"
-#include "dtrMatrix.h"
+#include "dgBCMatrix.h"
+#include "dgCMatrix.h"
 #include "dgTMatrix.h"
+#include "dgeMatrix.h"
+#include "dpoMatrix.h"
+#include "dsCMatrix.h"
+#include "dsyMatrix.h"
 #include "dtCMatrix.h"
+#include "dtrMatrix.h"
+#include "factorizations.h"
+#include "lmer.h"
+#include "sscCrosstab.h"
+#include "ssclme.h"
 #include <R_ext/Rdynload.h>
 
 #include "Syms.h"
@@ -23,7 +24,7 @@ static R_CallMethodDef CallEntries[] = {
     {"nlme_replaceSlot", (DL_FUNC) &nlme_replaceSlot, 3},
     {"nlme_weight_matrix_list", (DL_FUNC) &nlme_weight_matrix_list, 4},
     {"LU_expand", (DL_FUNC) &LU_expand, 1},
-    {"cscBlocked_validate", (DL_FUNC) &cscBlocked_validate, 1},
+    {"dgBCMatrix_validate", (DL_FUNC) &dgBCMatrix_validate, 1},
     {"csc_crossprod", (DL_FUNC) &csc_crossprod, 1},
     {"csc_matrix_crossprod", (DL_FUNC) &csc_matrix_crossprod, 2},
     {"csc_validate", (DL_FUNC) &csc_validate, 1},
@@ -35,7 +36,7 @@ static R_CallMethodDef CallEntries[] = {
     {"csc_getDiag", (DL_FUNC) &csc_getDiag, 1},
     {"csc_transpose", (DL_FUNC) &csc_transpose, 1},
     {"csc_matrix_mm", (DL_FUNC) &csc_matrix_mm, 2},
-    {"cscBlocked_2dgCMatrix", (DL_FUNC) &cscBlocked_2dgCMatrix, 1},
+    {"dgBCMatrix_to_dgCMatrix", (DL_FUNC) &dgBCMatrix_to_dgCMatrix, 1},
     {"lsq_dense_Chol", (DL_FUNC) &lsq_dense_Chol, 2},
     {"lsq_dense_QR", (DL_FUNC) &lsq_dense_QR, 2},
     {"lapack_qr", (DL_FUNC) &lapack_qr, 2},

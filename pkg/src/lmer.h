@@ -3,7 +3,7 @@
 
 #include "Mutils.h"
 #include "dgTMatrix_to_dgCMatrix.h"
-#include "cscBlocked.h"
+#include "dgBCMatrix.h"
 #include "bCrosstab.h"
 #include <R_ext/Lapack.h>
 #include <R_ext/Constants.h>
