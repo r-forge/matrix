@@ -123,8 +123,10 @@ setMethod("lme", signature(random = "formula"),
       {
           nCall = mCall = match.call()
           cov = getCovariateFormula(random)
-          nCall$random <- lapply(getGroupsFormula(random, asList = TRUE),
-                                 function(f) cov)
+          nms = all.vars(getGroupsFormula(random))
+          lst = lapply(nms, function(f) cov)
+          names(lst) = nms
+          nCall$random = lst
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
                 mCall, PACKAGE = "Matrix")
       })
@@ -183,11 +185,6 @@ setMethod("lme", signature(formula = "formula",
           .Call("ssclme_to_lme", match.call(), facs, x,
                 if(model) data else data.frame(list()),
                 method == "REML", obj, fitted, residuals, PACKAGE = "Matrix")
-#          new("lme", call = match.call(), facs = facs,
-#              x = x,
-#              model = if(model) data else data.frame(list()),
-#              REML = method == "REML", rep = obj, fitted = fitted,
-#              residuals = residuals)
       })
 
 setMethod("fitted", signature(object="lme"),
