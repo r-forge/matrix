@@ -20,6 +20,7 @@ importFrom("Matrix",
            )
 importClassesFrom("Matrix",
                   "corrmatrix",
+                  "lmeRep",
                   "pdfactor",
                   "pdmatrix",
                   "ssclme"
