@@ -15,9 +15,12 @@ bCrosstab(flist, reorder = TRUE)
 }
 %\details{}
 \value{
-  A list with components \code{flist}, a possibly reordered copy of the
-  first argument, and \code{ctab}, itself a list of all pairwise
-  crosstabulation matrices.
+  A list with two components,
+  \item{\code{flist}}{a possibly reordered copy of the
+    first argument, and}
+  \item{\code{ctab}}, itself a list of all pairwise
+  crosstabulation matrices.  These include the (diagonal) matrices of
+  \dQuote{interactions of a factor with itself}, see the example.
 }
 %\references{}
 %\author{}

@@ -12,9 +12,6 @@
 - bCrosstab(): do we really want the diagonal "V:V" crosstabs?
 	       (if so or in any case: add to  man/bCrosstab.Rd )
 
-- man/Matrix.Rd :  has example with dimnames, but we just drop them!
-		MM thinks dimnames should be supported (but then ...)
-
 - consider moving alloc3Darray from ./src/Mutils.c to
   $(RSRC)/src/base/array.c
 

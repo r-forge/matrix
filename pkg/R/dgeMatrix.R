@@ -15,8 +15,8 @@ setAs("dgeMatrix", "matrix",
 
 ## Group Methods, see ?Arith (e.g.)
 
-if(FALSE)
-## don't know why this fails with
+if(FALSE) {
+## this fails with NAMESPACE --- but works otherwise :
 ## >> Error in getAllMethods(f, fdef, where) : "Arith" is not a function visible from "Matrix"
 setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
           signature(e1 = "dgeMatrix", e2 = "dgeMatrix"),
@@ -39,11 +39,47 @@ setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
                   else
                       stop("number of rows are not compatible for arithmetic")
               }
-              new("dgeMatrix", Dim = d, x = callGeneric(e1@x, e2@x))
+              dn0 <- list(NULL,NULL)
+              if(identical(dn0, dn <- e1@Dimnames))
+                  dn <- e2@Dimnames
+              else if(!identical(dn0, e2@Dimnames) &&
+                      !identical(dn,  e2@Dimnames)) {
+                  dn <- dn0
+                  warning("not using incompatible 'Dimnames' in arithmetical result")
+              }
+              ##
+              new("dgeMatrix", Dim = d, Dimnames = dn0,
+                  x = callGeneric(e1@x, e2@x)
           })
 
 
-##
+setMethod("Arith",
+          signature(e1 = "dgeMatrix", e2 = "numeric"),
+          ## could use this function twice  for   A o B  and   B o A
+          ## if callGeneric(.) became smarter:
+          function(e1, e2) {
+              d <- e1@Dim
+              le <- length(e2)
+              if(le == 1 || le == d[1] || prod(d) == le) { # matching dim
+                  new("dgeMatrix", Dim = d, Dimnames = e1@Dimnames,
+                      x = callGeneric(as.vector(e2), e1@x))
+              } else stop ("length of 2nd arg does not match dimension of first")
+          })
+
+setMethod("Arith",
+          signature(e1 = "numeric", e2 = "dgeMatrix"),
+          function(e1, e2) {
+              d <- e2@Dim
+              le <- length(e1)
+              if(le == 1 || le == d[1] || prod(d) == le) { # matching dim
+                  new("dgeMatrix", Dim = d, Dimnames = e2@Dimnames,
+                      x = callGeneric(as.vector(e1), e2@x))
+              } else stop ("length of 1st arg does not match dimension of 2nd")
+          })
+
+}
+## -- end{group generics} -----------------------
+
 
 setMethod("norm", signature(x = "dgeMatrix", type = "missing"),
           function(x, type, ...) norm(x, type = "O", ...))
