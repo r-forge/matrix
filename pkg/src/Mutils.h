@@ -2,6 +2,7 @@
 #define MATRIX_MUTILS_H
 
 #include <Rdefines.h>
+#include <Rconfig.h>
 
 char norm_type(char *typstr);
 char rcond_type(char *typstr);

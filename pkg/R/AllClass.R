@@ -170,14 +170,14 @@ setClass("lmeRep",
                         XtX = "matrix", # Original X'X matrix
                         ZZx = "list",   # list of arrays comprising ZtZ
                         ZtX = "matrix", # Original Z'X matrix
-                        call = "call",  # Copy of the original call
                         cnames = "list",# column names of model matrices
                         devComp = "numeric", # Components of deviance
                         deviance = "numeric", # Current deviance (ML and REML)
                         levels = "list",# names of levels of grouping factors
                         nc = "integer", # number of columns in (augmented)
                                         # model matrices and number of observations
-                        status = "logical"
+                        status = "logical",
+                        call = "call"   # omit this after debugging phase
                         ),
          validity = function(object)
          .Call("lmeRep_validate", object, PACKAGE = "Matrix"))
