@@ -1,3 +1,10 @@
+2005-02-27  Douglas Bates  <bates@bates1-home>
+
+	* R/lme.R: Removed the stubs of the plot methods.
+
+	* NAMESPACE: Remove imports from the Matrix package as it is a
+	listed in the Depends.
+
 2005-02-24  Douglas Bates  <bates@bates1-home>
 
 	* R/lmer.R (fn): Added an anova method for lmer objects that
