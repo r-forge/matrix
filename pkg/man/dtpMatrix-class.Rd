@@ -2,6 +2,10 @@
 \docType{class}
 \alias{dtpMatrix-class}
 \alias{\%*\%,dtpMatrix,dgeMatrix-method}
+\alias{\%*\%,dgeMatrix,dtpMatrix-method}
+\alias{\%*\%,dtpMatrix,matrix-method}
+\alias{\%*\%,dtpMatrix,numeric-method}
+\alias{\%*\%,numeric,dtpMatrix-method}
 \alias{coerce,dtpMatrix,dtrMatrix-method}
 \alias{coerce,dtpMatrix,dgeMatrix-method}
 \alias{coerce,dtpMatrix,matrix-method}
@@ -55,7 +59,8 @@ Class \code{"Matrix"}, by class \code{"ddenseMatrix"}.
 \section{Methods}{
   \describe{
     \item{\%*\%}{\code{signature(x = "dtpMatrix", y = "dgeMatrix")}:
-      Matrix multiplication}
+      Matrix multiplication; dito for several other signature
+      combinations, see \code{showMethods("\%*\%", class = "dtpMatrix")}.}
     \item{coerce}{\code{signature(from = "dtpMatrix", to = "dtrMatrix")}}
     \item{coerce}{\code{signature(from = "dtpMatrix", to = "dgeMatrix")}}
     \item{coerce}{\code{signature(from = "dtpMatrix", to = "matrix")}}
