@@ -1,13 +1,17 @@
 Alfalfa                 Split-Plot Experiment on Varieties of Alfalfa
 Assay                   Bioassay on Cell Culture Plate
 BIC                     Bayesian Information Criterion
+Bang                    Bangladesh fertility survey
 BodyWeight              Rat weight over time for different diets
 Cefamandole             Pharmacokinetics of Cefamandole
+Chem97                  Scores on A-level Chemistry in 1997
 Dialyzer                High-Flux Hemodialyzer
 Earthquake              Earthquake Intensity
+Exam                    Exam scores from inner London
 Fatigue                 Cracks caused by metal fatigue
 GLMM                    Fit Generalized Linear Mixed Models via PQL
 Gasoline                Refinery yield of gasoline
+Gcsemv                  GCSE exam score
 Glucose                 Glucose levels over time
 Glucose2                Glucose Levels Following Alcohol Ingestion
 Gun                     Methods for firing naval guns
@@ -19,6 +23,7 @@ MathAchSchool           School demographic data for MathAchieve
 MathAchieve             Mathematics achievement scores
 Meat                    Tenderness of meat
 Milk                    Protein content of cows' milk
+Mmmec                   Malignant melanoma deaths in Europe
 Muscle                  Contraction of heart muscle sections
 Names                   Extract or assign Names
 Nitrendipene            Assay of nitrendipene
@@ -35,6 +40,7 @@ Rail                    Evaluation of Stress in Railway Rails
 RatPupWeight            The weight of rat pups
 Relaxin                 Assay for Relaxin
 Remifentanil            Pharmacokinetics of remifentanil
+Socatt                  Social Attitudes Survey
 Soybean                 Growth of soybean plants
 Spruce                  Growth of Spruce Trees
 Tetracycline1           Pharmacokinetics of tetracycline
@@ -46,6 +52,7 @@ Wheat                   Yields by growing conditions
 Wheat2                  Wheat Yield Trials
 bdf                     Language scores
 coerce-methods          Coercion methods and assignments
+egsingle                US Sustaining Effects study
 ergoStool               Ergometrics experiment with stool types
 fixed.effects           Extract Fixed Effects
 getCovariate            Utilities for formulas
