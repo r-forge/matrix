@@ -3,6 +3,7 @@
 
 #include "Mutils.h"
 #include "ldl.h"
+#include "Metis_utils.h"
 
 SEXP sscCrosstab(SEXP flist, SEXP upper);
 SEXP sscCrosstab_L_LI_sizes(SEXP ctab, SEXP permexp);
