@@ -126,11 +126,10 @@ void col_metis_order(int j0, int j1, int i2,
 
 	for (j = 0; j < n; j++) { /* diagonals */
 	    TTi[j] = Tj[j] = j;
-	    Tx[j] = 1.;
 	}
 	pos = n;
 	for (j = j0; j < j1; j++) { /* create the pairs */
-	    int ii, nr = 0, p2 = Tp[j + 1];
+	    int ii, p2 = Tp[j + 1];
 	    for (ii = Tp[j]; ii < p2; ii++) {
 		int r1 = Ti[ii], i1;
 		if (j1 <= r1 && r1 < i2) {
@@ -139,14 +138,14 @@ void col_metis_order(int j0, int j1, int i2,
 			if (r2 < i2) {
 			    TTi[pos] = r2 - j1;
 			    Tj[pos] = r1 - j1;
-			    Tx[pos] = 1.;
 			    pos++;
 			}
 		    }
 		}
 	    }
 	}
-	triplet_to_col(n, n, nnz, TTi, Tj, (double *) 0, Ap, Ai, (double *) 0);
+	triplet_to_col(n, n, nnz, TTi, Tj, (double *) NULL,
+		       Ap, Ai, (double *) NULL);
 	ssc_metis_order(n, Ap, Ai, perm, iperm);
 	for (j = j1; j < i2; j++) ans[j] = j1 + iperm[j - j1];
 	Free(TTi); Free(Tj); Free(Ai); Free(Ap);
@@ -188,6 +187,104 @@ SEXP sscCrosstab_groupedPerm(SEXP ctab)
     }
     for (i = 1; i < nf; i++) {
 	col_metis_order(Gp[i - 1], Gp[i], Gp[i+1], Ap, Ai, INTEGER(ans));
+    }
+    if (nf > 1 && up) {Free(Ap); Free(Ai);}
+    UNPROTECT(1);
+    return ans;
+}
+
+/** 
+ * Project the (2,1) component of an sscCrosstab object into the (2,2)
+ * component (for illustration only)
+ * 
+ * @param ctab pointer to a sscCrosstab object
+ * 
+ * @return a pointer to an tscMatrix giving the projection of the 2,1 component
+ */
+SEXP sscCrosstab_project(SEXP ctab)
+{
+    SEXP
+	GpSlot = GET_SLOT(ctab, Matrix_GpSym),
+	iSlot = GET_SLOT(ctab, Matrix_iSym),
+	pSlot = GET_SLOT(ctab, Matrix_pSym);
+    int *Ai = INTEGER(iSlot),
+	*Ap = INTEGER(pSlot),
+	*Gp = INTEGER(GpSlot),
+	i, j, j0, j1, i2,
+	n = length(pSlot) - 1,	/* number of columns */
+	nf = length(GpSlot) - 1, /* number of factors */
+	nz, up;
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("sscMatrix")));
+
+    up = toupper(*CHAR(STRING_ELT(GET_SLOT(ctab, Matrix_uploSym), 0))) != 'L';
+    if (nf > 1 && up) {			/* transpose */
+	int nz = length(iSlot);
+	int *ai = Calloc(nz, int),
+	    *ap = Calloc(n + 1, int);
+	double *ax = Calloc(nz, double);
+
+	csc_components_transpose(n, n, nz, Ap, Ai,
+				 REAL(GET_SLOT(ctab, Matrix_xSym)),
+				 ap, ai, ax);
+	Ap = ap;
+	Ai = ai;
+	Free(ax);		/* don't need values, only positions */
+    }
+    
+    nz = 0;			/* count of off-diagonal pairs */
+    j0 = 0; j1 = Gp[1]; i2 = Gp[2];
+    for (j = j0; j < j1; j++) {	/* columns of interest */
+	int ii, nr = 0, p2 = Ap[j + 1];
+	for (ii = Ap[j]; ii < p2; ii++) {
+	    int i = Ai[ii];
+	    if (j1 <= i && i < i2) nr++; /* verify row index */
+	}
+	nz += (nr * (nr - 1))/2; /* add number of pairs of rows */
+    }
+    if (nz > 0) {		/* Form an ssc Matrix */
+	int j, n = i2 - j1,	/* number of rows */
+	    nnz = n + nz, pos;
+	int *AAp,
+	    *AAi = Calloc(nnz, int),
+	    *Tj = Calloc(nnz, int),
+	    *TTi = Calloc(nnz, int);
+	double *Ax;
+
+	SET_SLOT(ans, Matrix_pSym, allocVector(INTSXP, n + 1));
+	AAp = INTEGER(GET_SLOT(ans, Matrix_pSym));
+	for (j = 0; j < n; j++) { /* diagonals */
+	    TTi[j] = Tj[j] = j;
+	}
+	pos = n;
+	for (j = j0; j < j1; j++) { /* create the pairs */
+	    int ii, p2 = Ap[j + 1];
+	    for (ii = Ap[j]; ii < p2; ii++) {
+		int r1 = Ai[ii], i1;
+		if (j1 <= r1 && r1 < i2) {
+		    for (i1 = ii + 1; i1 < p2; i1++) {
+			int r2 = Ai[i1];
+			if (r2 < i2) {
+			    TTi[pos] = r2 - j1;
+			    Tj[pos] = r1 - j1;
+			    pos++;
+			}
+		    }
+		}
+	    }
+	}
+	triplet_to_col(n, n, nnz, TTi, Tj, (double *) NULL,
+		       AAp, AAi, (double *) NULL);
+	nz = AAp[n];
+	SET_SLOT(ans, Matrix_iSym, allocVector(INTSXP, nz));
+	Memcpy(INTEGER(GET_SLOT(ans, Matrix_iSym)), AAi, nz);
+	SET_SLOT(ans, Matrix_xSym, allocVector(REALSXP, nz));
+	Ax = REAL(GET_SLOT(ans, Matrix_xSym));
+	for (j = 0; j < nz; j++) Ax[j] = 1.;
+	SET_SLOT(ans, Matrix_uploSym, ScalarString(mkChar("L")));
+	SET_SLOT(ans, Matrix_DimSym, allocVector(INTSXP, 2));
+	AAp = INTEGER(GET_SLOT(ans, Matrix_DimSym));
+	AAp[0] = AAp[1] = n;
+	Free(TTi); Free(Tj); Free(AAi);
     }
     if (nf > 1 && up) {Free(Ap); Free(Ai);}
     UNPROTECT(1);
