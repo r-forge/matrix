@@ -462,29 +462,29 @@ ssclme_update_mm(SEXP x, SEXP facs, SEXP mmats)
     return R_NilValue;
 }
 
-SEXP ssclme_inflate_and_factor(SEXP lme)
+SEXP ssclme_inflate_and_factor(SEXP x)
 {
     SEXP
-	GpSlot = GET_SLOT(lme, Matrix_GpSym),
-	Omega = GET_SLOT(lme, Matrix_OmegaSym);
-    int n = INTEGER(GET_SLOT(lme, Matrix_DimSym))[1];
+	GpSlot = GET_SLOT(x, Matrix_GpSym),
+	Omega = GET_SLOT(x, Matrix_OmegaSym);
+    int n = INTEGER(GET_SLOT(x, Matrix_DimSym))[1];
     int
-	*Ai = INTEGER(GET_SLOT(lme, Matrix_iSym)),
-	*Ap = INTEGER(GET_SLOT(lme, Matrix_pSym)),
+	*Ai = INTEGER(GET_SLOT(x, Matrix_iSym)),
+	*Ap = INTEGER(GET_SLOT(x, Matrix_pSym)),
 	*Flag = Calloc(n, int),
 	*Gp = INTEGER(GpSlot),
 	*Lnz = Calloc(n, int),
 	*Pattern = Calloc(n, int),
-	*nc = INTEGER(GET_SLOT(lme, Matrix_ncSym)),
+	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	j,
 	nf = length(GpSlot) - 1;
     double
-	*D = REAL(GET_SLOT(lme, Matrix_DSym)),
-	*DIsqrt = REAL(GET_SLOT(lme, Matrix_DIsqrtSym)),
+	*D = REAL(GET_SLOT(x, Matrix_DSym)),
+	*DIsqrt = REAL(GET_SLOT(x, Matrix_DIsqrtSym)),
 	*Y = Calloc(n, double),
 	*xcp = Calloc(Ap[n], double);
 
-    Memcpy(xcp, REAL(GET_SLOT(lme, Matrix_xSym)), Ap[n]);
+    Memcpy(xcp, REAL(GET_SLOT(x, Matrix_xSym)), Ap[n]);
     for (j = 0; j < nf; j++) {
 	int  diag, i, ii, k, G2 = Gp[j + 1], ncj = nc[j];
 	double *omgj = REAL(VECTOR_ELT(Omega, j));
@@ -502,10 +502,10 @@ SEXP ssclme_inflate_and_factor(SEXP lme)
 	}
     }
     j = ldl_numeric(n, Ap, Ai, xcp,
-		    INTEGER(GET_SLOT(lme, Matrix_LpSym)),
-		    INTEGER(GET_SLOT(lme, Matrix_ParentSym)),
-		    Lnz, INTEGER(GET_SLOT(lme, Matrix_LiSym)),
-		    REAL(GET_SLOT(lme, Matrix_LxSym)),
+		    INTEGER(GET_SLOT(x, Matrix_LpSym)),
+		    INTEGER(GET_SLOT(x, Matrix_ParentSym)),
+		    Lnz, INTEGER(GET_SLOT(x, Matrix_LiSym)),
+		    REAL(GET_SLOT(x, Matrix_LxSym)),
 		    D, Y, Pattern, Flag,
 		    (int *) NULL, (int *) NULL); /* P & Pinv */
     if (j != n)
@@ -516,38 +516,38 @@ SEXP ssclme_inflate_and_factor(SEXP lme)
     return R_NilValue;
 }
 
-SEXP ssclme_factor(SEXP lme)
+SEXP ssclme_factor(SEXP x)
 {
-    int *status = LOGICAL(GET_SLOT(lme, Matrix_statusSym));
+    int *status = LOGICAL(GET_SLOT(x, Matrix_statusSym));
     
     if (!status[0]) {
 	SEXP
-	    GpSlot = GET_SLOT(lme, Matrix_GpSym),
-	    Omega = GET_SLOT(lme, Matrix_OmegaSym);
+	    GpSlot = GET_SLOT(x, Matrix_GpSym),
+	    Omega = GET_SLOT(x, Matrix_OmegaSym);
 	int
 	    *Gp = INTEGER(GpSlot),
-	    *Li = INTEGER(GET_SLOT(lme, Matrix_LiSym)),
-	    *Lp = INTEGER(GET_SLOT(lme, Matrix_LpSym)),
-	    *nc = INTEGER(GET_SLOT(lme, Matrix_ncSym)),
+	    *Li = INTEGER(GET_SLOT(x, Matrix_LiSym)),
+	    *Lp = INTEGER(GET_SLOT(x, Matrix_LpSym)),
+	    *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	    i,
-	    n = INTEGER(GET_SLOT(lme, Matrix_DimSym))[1],
+	    n = INTEGER(GET_SLOT(x, Matrix_DimSym))[1],
 	    nf = length(GpSlot) - 1,
 	    nobs = nc[nf + 1],
 	    nreml = nobs + 1 - nc[nf],
 	    pp1 = nc[nf],
 	    pp2 = pp1 + 1;
 	double
-	    *D = REAL(GET_SLOT(lme, Matrix_DSym)),
-	    *DIsqrt = REAL(GET_SLOT(lme, Matrix_DIsqrtSym)),
-	    *Lx = REAL(GET_SLOT(lme, Matrix_LxSym)),
-	    *RXX = REAL(GET_SLOT(lme, Matrix_RXXSym)),
-	    *RZX = REAL(GET_SLOT(lme, Matrix_RZXSym)),
-	    *dcmp = REAL(getAttrib(lme, Matrix_devCompSym)),
-	    *deviance = REAL(getAttrib(lme, Matrix_devianceSym)),
+	    *D = REAL(GET_SLOT(x, Matrix_DSym)),
+	    *DIsqrt = REAL(GET_SLOT(x, Matrix_DIsqrtSym)),
+	    *Lx = REAL(GET_SLOT(x, Matrix_LxSym)),
+	    *RXX = REAL(GET_SLOT(x, Matrix_RXXSym)),
+	    *RZX = REAL(GET_SLOT(x, Matrix_RZXSym)),
+	    *dcmp = REAL(getAttrib(x, Matrix_devCompSym)),
+	    *deviance = REAL(getAttrib(x, Matrix_devianceSym)),
 	    minus1 = -1.,
 	    one = 1.;
 	
-	ssclme_inflate_and_factor(lme);
+	ssclme_inflate_and_factor(x);
 				/* Accumulate logdet of ZtZ+W */
 	dcmp[0] = dcmp[1] = dcmp[2] = dcmp[3] = 0.;
 	for (i = 0; i < n; i++) dcmp[0] += log(D[i]);
@@ -577,7 +577,7 @@ SEXP ssclme_factor(SEXP lme)
 	    }
 	}
 				/* ldl_lsolve on Z'X */
-	Memcpy(RZX, REAL(GET_SLOT(lme, Matrix_ZtXSym)), n * pp1);
+	Memcpy(RZX, REAL(GET_SLOT(x, Matrix_ZtXSym)), n * pp1);
 	for (i = 0; i < pp1; i++) {
 	    int j;
 	    double *RZXi = RZX + i * n;
@@ -585,7 +585,7 @@ SEXP ssclme_factor(SEXP lme)
 	    for (j = 0; j < n; j++) RZXi[j] *= DIsqrt[j];
 	}
 				/* downdate and factor X'X */
-	Memcpy(RXX, REAL(GET_SLOT(lme, Matrix_XtXSym)), pp1 * pp1);
+	Memcpy(RXX, REAL(GET_SLOT(x, Matrix_XtXSym)), pp1 * pp1);
 	F77_CALL(dsyrk)("U", "T", &pp1, &n, &minus1,
 			RZX, &n, &one, RXX, &pp1);
 	F77_CALL(dpotrf)("U", &pp1, RXX, &pp1, &i);
@@ -623,6 +623,7 @@ int ldl_update_ind(int probe, int start, const int ind[])
  * @return R_NilValue (x is updated in place)
 
  */
+static
 SEXP ldl_inverse(SEXP x)
 {
     SEXP
@@ -790,25 +791,24 @@ SEXP ldl_inverse(SEXP x)
     }
     return R_NilValue;
 }
-
-SEXP ssclme_invert(SEXP lme)
+SEXP ssclme_invert(SEXP x)
 {
-    int *status = LOGICAL(GET_SLOT(lme, Matrix_statusSym));
-    if (!status[0]) ssclme_factor(lme);
+    int *status = LOGICAL(GET_SLOT(x, Matrix_statusSym));
+    if (!status[0]) ssclme_factor(x);
     if (!status[1]) {
 	SEXP
-	    RZXsl = GET_SLOT(lme, Matrix_RZXSym);
+	    RZXsl = GET_SLOT(x, Matrix_RZXSym);
 	int
 	    *dims = INTEGER(getAttrib(RZXsl, R_DimSymbol)),
-	    *Li = INTEGER(GET_SLOT(lme, Matrix_LiSym)),
-	    *Lp = INTEGER(GET_SLOT(lme, Matrix_LpSym)),
+	    *Li = INTEGER(GET_SLOT(x, Matrix_LiSym)),
+	    *Lp = INTEGER(GET_SLOT(x, Matrix_LpSym)),
 	    i,
 	    n = dims[0],
 	    pp1 = dims[1];
 	double
-	    *DIsqrt = REAL(GET_SLOT(lme, Matrix_DIsqrtSym)),
-	    *Lx = REAL(GET_SLOT(lme, Matrix_LxSym)),
-	    *RXX = REAL(GET_SLOT(lme, Matrix_RXXSym)),
+	    *DIsqrt = REAL(GET_SLOT(x, Matrix_DIsqrtSym)),
+	    *Lx = REAL(GET_SLOT(x, Matrix_LxSym)),
+	    *RXX = REAL(GET_SLOT(x, Matrix_RXXSym)),
 	    *RZX = REAL(RZXsl),
 	    one = 1.;
 
@@ -822,7 +822,7 @@ SEXP ssclme_invert(SEXP lme)
 	    for (j = 0; j < n; j++) RZXi[j] *= DIsqrt[j];
 	    ldl_ltsolve(n, RZXi, Lp, Li, Lx);
 	}
-	ldl_inverse(lme);
+	ldl_inverse(x);
 	status[1] = 1;
     }
     return R_NilValue;
