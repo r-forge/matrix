@@ -312,8 +312,10 @@ setMethod("GLMM",
           ## this is for the Laplace approximation only. GH is more
           ## complicated 
 
-          loglikLaplace <- function(pars = NULL)
+          devLaplace <- function(pars = NULL)
           {
+              ## FIXME: This actually returns half the deviance.
+              
               ## gets correct values of bhat and bvars. As a side
               ## effect, mu now has fitted values
               mu <- bhat(pars = pars)
@@ -329,10 +331,9 @@ setMethod("GLMM",
                                             responseIndex],
                                             mu = mu,
                                             wt = weights^2))/2
-              #.Call("ssclme_factor", reducedObj, PACKAGE = "Matrix")
-              # ans <- ans + reducedObj@devComp[2] # log-determinant of Omega
                                                 
               ranefs <- ranef(reducedObj)
+              # ans <- ans + reducedObj@devComp[2]/2 # log-determinant of Omega
               Omega <- reducedObj@Omega
               for (i in seq(along = ranefs))
               {
@@ -382,15 +383,16 @@ setMethod("GLMM",
               if (controlvals$optimizer == "optim")
               {
                   optimRes =
-                      optim(fn = loglikLaplace,
+                      optim(fn = devLaplace,
                             par = c(fixef(obj), coef(obj, unconst = TRUE)),
                             method = "BFGS", hessian = TRUE,
-                            control = list(trace = controlvals$msVerbose,
+                            control = list(trace = getOption("verbose")),
                             reltol = controlvals$msTol,
                             ##fnscale = -xval,
                             ##parscale = 1/controlvals$msScale(coef(obj)),
-                            maxit = controlvals$msMaxIter))
-                  if (optimRes$convergence != 0) warning("optim failed to converge")
+                            maxit = controlvals$msMaxIter)
+                  if (optimRes$convergence != 0)
+                      warning("optim failed to converge")
                   optpars <- optimRes$par
                   Hessian <- optimRes$hessian
                   
@@ -420,10 +422,10 @@ setMethod("GLMM",
                                                 coef(obj, unconst = TRUE))/
                                               typsize)^2)), 100)
                   nlmRes =
-                      nlm(f = loglikLaplace, 
+                      nlm(f = devLaplace, 
                           p = c(fixef(obj), coef(obj, unconst = TRUE)),
                           hessian = TRUE,
-                          print.level = if (controlvals$msVerbose) 2 else 0,
+                          print.level = if (getOption("verbose")) 2 else 0,
                           steptol = controlvals$msTol,
                           gradtol = controlvals$msTol,
                           stepmax = controlvals$nlmStepMax,
@@ -458,13 +460,13 @@ setMethod("GLMM",
           }
 
 
-          ## Before finishing, we need to call loglikLaplace with the
+          ## Before finishing, we need to call devLaplace with the
           ## optimum pars to get the final log likelihood (still need
           ## to make sure it's the actual likelihood and not a
           ## multiple). This would automatically call bhat() and hence
           ## have the 'correct' random effects in reducedObj.
 
-          loglik <- loglikLaplace(optpars)
+          loglik <- devLaplace(optpars)
           ff <- optpars[1:(responseIndex-1)]
           names(ff) <- names(fixef(obj))
 
@@ -556,7 +558,7 @@ setMethod("show", signature(object = "GLMM"),
               cat("Fixed:", deparse(object@call$formula),"\n")
           }
           if (!is.null(object@call$data)) {
-              cat(" Data:", deparse( object@call$data ), "\n")
+              cat("Data:", deparse( object@call$data ), "\n")
           }
           if (!is.null(object@call$subset)) {
               cat(" Subset:",
@@ -568,6 +570,9 @@ setMethod("show", signature(object = "GLMM"),
           saveopt = options(show.signif.stars=FALSE)
           on.exit(options(saveopt))
           show(sumry@re)
+          if (object@method != "PQL") { # fix up the fixed effects
+              print(t(object@fixef))
+          }
           invisible(object)
       })
 
@@ -579,11 +584,25 @@ setMethod("summary", signature(object="GLMM"),
                   resd <- quantile(resd)
                   names(resd) <- c("Min","Q1","Med","Q3","Max")
               }
+              re = summary(object@rep, REML = FALSE, useScale = FALSE)
+              if (object@method != 'PQL') {
+                  hess <- object@Hessian
+                  corFixed <- as(as(solve(hess[-nrow(hess),-ncol(hess)]),
+                                  "pdmatrix"), "corrmatrix")
+                  ## FIXME: change the name of Hessian to info, to make it
+                  ## explicit that this is the information matrix
+                  fcoef <- object@fixef
+                  re@coefficients <- array(c(fcoef, corFixed@stdDev),
+                                           c(length(fcoef), 2),
+                                           list(names(fcoef),
+                                                c("Estimate", "Std. Error")))
+                  dimnames(corFixed) <- list(names(fcoef), names(fcoef))
+                  re@corFixed <- corFixed
+              }
               new("summary.GLMM",
                   family = object@family,
                   call = object@call,
                   logLik = llik,
-                  re = summary(object@rep, REML = FALSE,
-                               useScale = FALSE),
+                  re = re,
                   residuals = resd)
           })
