@@ -7,10 +7,10 @@ stopifnot(c(0,0) == dim(Hilbert(0)))
 h9 <- Hilbert(9)
 str(h9)
 all.equal(determinant(h9)$modulus, -96.7369450737858, tol= 1e-15)
-stopifnot(0 == length(h9@factorization))# nothing yet
+stopifnot(0 == length(h9@factors))# nothing yet
 str(f9 <- as(chol(h9), "trMatrix"))
 ## h9 now has factorization
-stopifnot(names(h9@factorization) == "Cholesky")
+stopifnot(names(h9@factors) == "Cholesky")
 rcond(h9)
 rcond(f9)
 str(h9)# has 'rcond' and 'factorization'

@@ -141,7 +141,7 @@ SEXP trMatrix_as_geMatrix(SEXP from)
     SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(from, Matrix_xSym)));
     SET_SLOT(val, Matrix_DimSym,
 	     duplicate(GET_SLOT(from, Matrix_DimSym)));
-    SET_SLOT(val, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     make_array_triangular(REAL(GET_SLOT(val, Matrix_xSym)), from);
     UNPROTECT(1);
     return val;

@@ -113,7 +113,7 @@ SEXP syMatrix_as_geMatrix(SEXP from)
 	rcondSym = Matrix_rcondSym;
     
     SET_SLOT(val, Matrix_rcondSym, allocVector(REALSXP, 0));
-    SET_SLOT(val, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(val, rcondSym, duplicate(GET_SLOT(from, rcondSym)));
     SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(from, Matrix_xSym)));
     SET_SLOT(val, Matrix_DimSym,
@@ -149,7 +149,7 @@ SEXP syMatrix_geMatrix_mm(SEXP a, SEXP b)
 	error("Matrices are not conformable for multiplication");
     if (m < 1 || n < 1 || k < 1)
 	error("Matrices with zero extents cannot be multiplied");
-    SET_SLOT(val, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(val, Matrix_rcondSym, allocVector(REALSXP, 0));
     SET_SLOT(val, Matrix_xSym, allocVector(REALSXP, m * n));
     SET_SLOT(val, Matrix_DimSym, allocVector(INTSXP, 2));
@@ -178,7 +178,7 @@ SEXP syMatrix_geMatrix_mm_R(SEXP a, SEXP b)
     if (m < 1 || n < 1 || k < 1)
 	error("Matrices with zero extents cannot be multiplied");
     SET_SLOT(val, Matrix_rcondSym, allocVector(REALSXP, 0));
-    SET_SLOT(val, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(val, Matrix_xSym, allocVector(REALSXP, m * n));
     SET_SLOT(val, Matrix_DimSym, allocVector(INTSXP, 2));
     cdims = INTEGER(GET_SLOT(val, Matrix_DimSym));

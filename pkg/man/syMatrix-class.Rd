@@ -32,7 +32,7 @@ Objects can be created by calls of the form \code{new("syMatrix", ...)}.
     \item{\code{rcond}:}{Object of class \code{"numeric"}. A named
       numeric vector of reciprocal condition numbers in either the
       1-norm \code{"O"} or the infinity norm \code{"I"}.}
-    \item{\code{factorization}:}{Object of class \code{"list"}.  A named
+    \item{\code{factors}:}{Object of class \code{"list"}.  A named
       list of factorizations that have been computed for the matrix.}
   }
 }

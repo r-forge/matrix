@@ -161,7 +161,7 @@ void R_init_Matrix(DllInfo *dll)
     Matrix_devCompSym = install("devComp");
     Matrix_devianceSym = install("deviance");
     Matrix_diagSym = install("diag");
-    Matrix_factorization = install("factorization");
+    Matrix_factorSym = install("factors");
     Matrix_flistSym = install("flist");
     Matrix_iSym = install("i");
     Matrix_ipermSym = install("iperm");

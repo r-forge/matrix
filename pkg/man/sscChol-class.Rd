@@ -30,7 +30,7 @@ but are more commonly created from \code{chol} applied to an
       each non-zero element in the matrix.}
     \item{\code{x}:}{Object of class \code{"numeric"} - the non-zero
       elements of the matrix.}
-    \item{\code{factorization}:}{Object of class \code{"list"} - a list
+    \item{\code{factors}:}{Object of class \code{"list"} - a list
       of factorizations of the matrix. }
     \item{\code{Dim}:}{Object of class \code{"integer"} - the dimensions
      of the matrix - must be an integer vector with exactly two

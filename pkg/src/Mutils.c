@@ -95,14 +95,14 @@ SEXP as_det_obj(double val, int log, int sign)
     return det;
 }
 
-SEXP get_factorization(SEXP obj, char *nm)
+SEXP get_factors(SEXP obj, char *nm)
 {
-    SEXP fac = GET_SLOT(obj, Matrix_factorization),
+    SEXP fac = GET_SLOT(obj, Matrix_factorSym),
 	nms = getAttrib(fac, R_NamesSymbol);
     int i, len = length(fac);
     
     if ((!isNewList(fac)) || (length(fac) > 0 && nms == R_NilValue))
-	error("factorization slot must be a named list");
+	error("factors slot must be a named list");
     for (i = 0; i < len; i++) {
 	if (!strcmp(nm, CHAR(STRING_ELT(nms, i)))) {
 	    return VECTOR_ELT(fac, i);
@@ -111,14 +111,14 @@ SEXP get_factorization(SEXP obj, char *nm)
     return R_NilValue;
 }
 
-SEXP set_factorization(SEXP obj, SEXP val, char *nm)
+SEXP set_factors(SEXP obj, SEXP val, char *nm)
 {
-    SEXP fac = GET_SLOT(obj, Matrix_factorization),
+    SEXP fac = GET_SLOT(obj, Matrix_factorSym),
 	nms = getAttrib(fac, R_NamesSymbol), nfac, nnms;
     int i, len = length(fac);
 
     if ((!isNewList(fac)) || (length(fac) > 0 && nms == R_NilValue))
-	error("factorization slot must be a named list");
+	error("factors slot must be a named list");
     for (i = 0; i < len; i++) {
 	if (!strcmp(nm, CHAR(STRING_ELT(nms, i)))) {
 	    SET_VECTOR_ELT(fac, i, duplicate(val));
@@ -134,7 +134,7 @@ SEXP set_factorization(SEXP obj, SEXP val, char *nm)
     }
     SET_VECTOR_ELT(nfac, len, duplicate(val));
     SET_STRING_ELT(nnms, len, mkChar(nm));
-    SET_SLOT(obj, Matrix_factorization, nfac);
+    SET_SLOT(obj, Matrix_factorSym, nfac);
     UNPROTECT(2);
     return val;
 }
@@ -239,7 +239,7 @@ SEXP triple_as_SEXP(int nrow, int ncol, int nz,
     Memcpy(INTEGER(GET_SLOT(val, Matrix_iSym)), Ai, nz); Free(Ai);
     SET_SLOT(val, Matrix_xSym, allocVector(REALSXP, nz));
     Memcpy(REAL(GET_SLOT(val, Matrix_xSym)), Ax, nz); Free(Ax);
-    SET_SLOT(val, Matrix_factorization, allocVector(VECSXP, 0));
+    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     UNPROTECT(1);
     return cscMatrix_set_Dim(val, nrow);
 }    

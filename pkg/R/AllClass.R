@@ -9,10 +9,10 @@ setClass("Matrix")
 # general double-precision matrices
 setClass("geMatrix",
          representation(x = "numeric", Dim = "integer", 
-                        rcond = "numeric", factorization = "list"),
+                        rcond = "numeric", factors = "list"),
          prototype = prototype(x = numeric(0), Dim = as.integer(c(0,0)),
                                rcond = numeric(0),
-                               factorization = list()),
+                               factors = list()),
          contains = "Matrix",
          validity = function(object) {
              .Call("geMatrix_validate", object)
@@ -35,7 +35,7 @@ setClass("syMatrix",
          representation(uplo = "character"),
          prototype = prototype(uplo = "U",
            x = numeric(0), Dim = as.integer(c(0,0)),
-           rcond = numeric(0), factorization = list()),
+           rcond = numeric(0), factors = list()),
          contains = "geMatrix",
          validity = function(object) {
              .Call("syMatrix_validate", object)
@@ -48,13 +48,13 @@ setClass("syMatrix",
 setClass("poMatrix", contains = "syMatrix",
          prototype = prototype(uplo = "U",
            x = numeric(0), Dim = as.integer(c(0,0)),
-           rcond = numeric(0), factorization = list())
+           rcond = numeric(0), factors = list())
          )
 
 # Sparse general matrix in sorted compressed sparse column format
 setClass("cscMatrix",
          representation(p = "integer", i = "integer", x = "numeric",
-                        Dim = "integer", factorization = "list"),
+                        Dim = "integer", factors = "list"),
          prototype = prototype(p = as.integer(0), i = integer(0),
                         x = numeric(0), Dim = as.integer(c(0, 0))),
          validity = function(object)

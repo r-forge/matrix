@@ -93,7 +93,7 @@ number (\code{rcond}); LU factorization (\code{lu}) or, for the
 solutions of linear systems of equations (\code{solve}).
 
 Whenever a factorization or a decomposition is calculated it is
-preserved as a (list) element in the \code{factorization} slot of the
+preserved as a (list) element in the \code{factors} slot of the
 original object.  In this way a sequence of operations, such as
 determining the condition number of a matrix then solving a linear
 system based on the matrix, do not require multiple factorizations of
