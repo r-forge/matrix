@@ -138,7 +138,7 @@ expand_column_pointers(int ncol, const int mp[], int mj[])
  * 
  * @param anc number of columns in A
  * @param Parent parent array for A
- * @param C a cscBlocked object to be updated
+ * @param C a dgBCMatrix object to be updated
  */
 static void
 symbolic_right_unit_sm(int anc, const int Parent[], SEXP C)
@@ -218,8 +218,8 @@ symbolic_right_unit_sm(int anc, const int Parent[], SEXP C)
 /** 
  * Replace the structure of C by the structure of CA^{-T}
  * 
- * @param A a unit lower triangular cscBlocked object
- * @param C a cscBlocked object to be updated
+ * @param A a unit lower triangular dgBCMatrix object
+ * @param C a dgBCMatrix object to be updated
  */
 static void
 symbolic_right_unit_mm_trans(int anc, const int Parent[], SEXP C)

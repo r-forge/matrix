@@ -123,7 +123,7 @@ lmer_crosstab(SEXP flist, int nobs, const int nc[])
     int i, nf = length(flist);
     int npairs = (nf * (nf + 1))/2;
     SEXP val = PROTECT(allocVector(VECSXP, npairs));
-    SEXP cscbCl = PROTECT(MAKE_CLASS("cscBlocked"));
+    SEXP cscbCl = PROTECT(MAKE_CLASS("dgBCMatrix"));
     int *Ti = Calloc(nobs, int),
 	*nlevs = Calloc(nf, int),
 	**zb = Calloc(nf, int*); /* zero-based indices */

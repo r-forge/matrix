@@ -1,10 +1,10 @@
-#include "cscBlocked.h"
+#include "dgBCMatrix.h"
 /* TODO
  *  - code for trans = 'T' in cscb_syrk
  *  - code for non-trivial cscb_trmm and cscb_ldl
  */
 
-SEXP cscBlocked_validate(SEXP x)
+SEXP dgBCMatrix_validate(SEXP x)
 {
     SEXP pp = GET_SLOT(x, Matrix_pSym),
 	ip = GET_SLOT(x, Matrix_iSym),
@@ -64,7 +64,7 @@ int Tind(const int rowind[], const int colptr[], int i, int j)
  * @param k number of rows in B if side = 'L', otherwise
  *        number of columns in B.
  * @param alpha
- * @param A pointer to a cscBlocked object
+ * @param A pointer to a dgBCMatrix object
  * @param B matrix to be multiplied
  * @param ldb leading dimension of b as declared in the calling
  *        routine
@@ -222,15 +222,15 @@ cscb_syrk(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE trans,
 
 /** 
  * Create the LD^{T/2}D^{1/2}L' decomposition of the positive definite
- * symmetric cscBlocked matrix A (upper triangle stored) in L and
+ * symmetric dgBCMatrix matrix A (upper triangle stored) in L and
  * D^{1/2}.  The notation D^{1/2} denotes the upper Cholesky factor of
  * the positive definite positive definite block diagonal matrix D.
  * The diagonal blocks are of size nci.
  * 
- * @param A pointer to a cscBlocked object containing the upper
+ * @param A pointer to a dgBCMatrix object containing the upper
  * triangle of a positive definite symmetric matrix.
  * @param Parent the parent array for A
- * @param L pointer to a cscBlocked object to hold L
+ * @param L pointer to a dgBCMatrix object to hold L
  * @param D pointer to a 3D array to hold D
  * 
  * @return n the number of column blocks in A for success.  A value
@@ -340,14 +340,14 @@ cscb_ldl(SEXP A, const int Parent[], SEXP L, SEXP D)
 }
 
 /** 
- * Perform one of the cscBlocked-matrix operations B := alpha*op(A)*B
+ * Perform one of the dgBCMatrix-matrix operations B := alpha*op(A)*B
  * or B := alpha*B*op(A)
  * 
  * @param side
  * @param uplo
  * @param transa
  * @param diag
- * @param A pointer to a triangular cscBlocked object
+ * @param A pointer to a triangular dgBCMatrix object
  * @param B contents of the matrix B
  * @param m number of rows in B
  * @param n number of columns in B
@@ -379,12 +379,12 @@ cscb_trmm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
 
 /** 
  * Solve a triangular system of the form op(A)*X = alpha*B where A
- * is a cscBlocked triangular matrix and B is a dense matrix.
+ * is a dgBCMatrix triangular matrix and B is a dense matrix.
  * 
  * @param uplo 'U' or 'L' for upper or lower
  * @param trans 'T' or 'N' for transpose or no transpose
  * @param diag 'U' or 'N' for unit diagonal or non-unit
- * @param A pointer to a triangular cscBlocked object
+ * @param A pointer to a triangular dgBCMatrix object
  * @param B pointer to the contents of the matrix B
  * @param m number of rows in B
  * @param n number of columns in B
@@ -467,15 +467,15 @@ cscb_trsm(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE transa, enum CBLAS_DIAG dia
 
 /** 
  * Perform one of the operations B := alpha*op(A)*B or
- * B := alpha*B*op(A) where A and B are both cscBlocked.
+ * B := alpha*B*op(A) where A and B are both dgBCMatrix.
  * 
  * @param side
  * @param uplo
  * @param transa
  * @param diag
  * @param alpha scalar multiplier
- * @param A pointer to a triangular cscBlocked object
- * @param B pointer to a general cscBlocked matrix
+ * @param A pointer to a triangular dgBCMatrix object
+ * @param B pointer to a general dgBCMatrix matrix
  */
 void
 cscb_trcbm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
@@ -535,15 +535,15 @@ double *expand_column(double *dest, int m, int j,
 
 /** 
  * Solve one of the systems op(A)*X = alpha*B or
- * X*op(A) = alpha*B where A cscBlocked triangular and B is cscBlocked.
+ * X*op(A) = alpha*B where A dgBCMatrix triangular and B is dgBCMatrix.
  * 
  * @param side 'L' or 'R' for left or right
  * @param uplo 'U' or 'L' for upper or lower
  * @param transa 'T' or 'N' for transpose or no transpose
  * @param diag 'U' or 'N' for unit diagonal or non-unit
  * @param alpha scalar multiplier
- * @param A pointer to a triangular cscBlocked object
- * @param B pointer to a general cscBlocked matrix
+ * @param A pointer to a triangular dgBCMatrix object
+ * @param B pointer to a general dgBCMatrix matrix
  */
 void
 cscb_trcbsm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
@@ -612,10 +612,10 @@ cscb_trcbsm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
  * @param transa 'T' for transpose of A, else 'N'
  * @param transb 'T' for transpose of B, else 'N'
  * @param alpha scalar multiplier
- * @param A pointer to a cscBlocked object
- * @param B pointer to a cscBlocked object
+ * @param A pointer to a dgBCMatrix object
+ * @param B pointer to a dgBCMatrix object
  * @param beta scalar multiplier
- * @param C pointer to a cscBlocked object
+ * @param C pointer to a dgBCMatrix object
  */
 void
 cscb_cscbm(enum CBLAS_TRANSPOSE transa, enum CBLAS_TRANSPOSE transb,
@@ -677,7 +677,7 @@ cscb_cscbm(enum CBLAS_TRANSPOSE transa, enum CBLAS_TRANSPOSE transb,
     error("Code not yet written");
 }
 
-SEXP cscBlocked_2dgCMatrix(SEXP A)
+SEXP dgBCMatrix_to_dgCMatrix(SEXP A)
 {
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix"))),
 	ApP = GET_SLOT(A, Matrix_pSym),
