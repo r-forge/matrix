@@ -135,17 +135,16 @@ setMethod("GLMM",
           offset <- if (is.null(glm.fit$offset)) 0 else glm.fit$offset
           weights <- sqrt(abs(glm.fit$prior.weights))
           ## initial 'fitted' values on linear scale
-          eta <- glm.fit$linear.predictors
+          eta <- glm.fit$linear.predictors  ## FIXME: does this include offsets (make sure it does)
           etaold <- eta
 
           ## END using glm fit results
           ## Note: offset is on the linear scale
 
-          ## Not clear how offset works
-
-
-
-
+          ## FIXME: Not clear how (user specified) offset works. It
+          ## doesn't make sense for it to be an offset for the
+          ## response on the mu scale, so I'm assuming it's on the
+          ## response scale
 
 
           data <- eval(make.mf.call(match.call(expand.dots = FALSE),
@@ -182,14 +181,14 @@ setMethod("GLMM",
           firstIter <- TRUE
           msMaxIter.orig <- controlvals$msMaxIter
 
-          for (iter in seq(length = controlvals$glmmMaxIter))
+          for (iter in seq(length = controlvals$glmmMaxIter)) ## FIXME: rename to pqlMaxIter ?
           {
               mu <- family$linkinv(eta)
               dmu.deta <- family$mu.eta(eta)
-              ## adjusted response
-              z <- eta + (mmats.unadjusted$.Xy[, responseIndex] - mu) / dmu.deta - offset
               ## weights (note: weights is already square-rooted)
               w <- weights * dmu.deta / sqrt(family$variance(mu))
+              ## adjusted response (should be comparable to X \beta, not including offset
+              z <- eta - offset + (mmats.unadjusted$.Xy[, responseIndex] - mu) / dmu.deta
               .Call("nlme_weight_matrix_list",
                     mmats.unadjusted, w, z, mmats, PACKAGE="Matrix")
               .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
@@ -200,7 +199,7 @@ setMethod("GLMM",
                     controlvals$EMverbose,
                     PACKAGE = "Matrix")
               LMEoptimize(obj) = controlvals
-              eta[] <-
+              eta[] <- offset + ## FIXME: should the offset be here ?
                   .Call("ssclme_fitted", obj, facs,
                         mmats.unadjusted, TRUE, PACKAGE = "Matrix")
               cat(paste("Iteration", iter,"Termination Criterion:",
@@ -299,24 +298,24 @@ setMethod("GLMM",
               {
                   if (is.null(pars))
                   {
-                      off <- drop(mmats.unadjusted$.Xy %*% c(fixef(obj), 0))
+                      off <- drop(mmats.unadjusted$.Xy %*% c(fixef(obj), 0)) + offset
                   }
                   else
                   {
                       .Call("ssclme_coefGetsUnc",
                             reducedObj, as.double(pars[responseIndex:length(pars)]), PACKAGE = "Matrix")
                       off <- drop(mmats.unadjusted$.Xy %*%
-                                  c(pars[1:(responseIndex-1)], 0))
+                                  c(pars[1:(responseIndex-1)], 0)) + offset
 
                   }
 
                   niter <- 20
                   conv <- FALSE
 
-                  eta <-
+                  eta <- offset + 
                       .Call("ssclme_fitted", obj, facs,
                             mmats.unadjusted, TRUE, PACKAGE = "Matrix")
-#                  eta <- off + ## maybe want a + offset here ?
+#                  eta <- off +
 #                      .Call("ssclme_fitted", reducedObj, facs,
 #                            reducedMmats.unadjusted, TRUE, PACKAGE = "Matrix")
                   etaold <- eta
@@ -326,10 +325,8 @@ setMethod("GLMM",
                   {
                       mu <- family$linkinv(eta)
                       dmu.deta <- family$mu.eta(eta)
-                      z <- eta - off +
-                          (reducedMmats.unadjusted$.Xy[, 1] - mu) / dmu.deta -
-                              offset ## <- this offset is the user supplied offset
                       w <- weights * dmu.deta / sqrt(family$variance(mu))
+                      z <- eta - off + (reducedMmats.unadjusted$.Xy[, 1] - mu) / dmu.deta 
                       .Call("nlme_weight_matrix_list",
                             reducedMmats.unadjusted, w, z, reducedMmats,
                             PACKAGE="Matrix")
@@ -476,8 +473,6 @@ setMethod("GLMM",
                       controlvals$nlmStepMax <-
                           max(100 * sqrt(sum((c(fixef(obj),
                                                 coef(obj, unconst = TRUE))/typsize)^2)), 100)
-print(controlvals$msMaxIter)
-print(controlvals$msVerbose)
                   nlmRes =
                       nlm(f = loglikLaplace, 
                           p = c(fixef(obj), coef(obj, unconst = TRUE)),
@@ -510,13 +505,14 @@ print(controlvals$msVerbose)
           }
 
 
+          ## Before finishing, we need to call loglikLaplace with the
+          ## optimum pars to get the final log likelihood (still need
+          ## to make sure it's the actual likelihood and not a
+          ## multiple). This would automatically call bhat() and hence
+          ## have the 'correct' random effects in reducedObj.
 
-          
-          ## Get updated ranef estimates corresponding to optimum
+          loglik <- loglikLaplace(optpars)
 
-#          bhat()
-
-#          str(ranef(reducedObj))
 
 
           new("lme", call = match.call(), facs = facs,
