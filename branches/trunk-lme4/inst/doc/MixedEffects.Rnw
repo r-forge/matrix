@@ -1133,3 +1133,6 @@ Metis permutation
 Separated Metis perm
  L                                 464 (16.50\%)        3763597 (0.75\%)
  LI                               2200 (78.24\%)      266944262 (53.24\%)
+Separated native perm
+ L                                 432 (15.36\%)         519974 (0.10\%)
+ LI                               1504 (53.48\%)       17238020 (3.44\%)
