@@ -60,9 +60,9 @@ try( chk.matrix(as(cm, "Matrix")) )# gives an error: "Matrix" has NULL 'dim()'
 
 ## Cholesky
 chk.matrix(ch <- chol(cm))
-## FIXME:
-try( chk.matrix(ch2 <- chol(as(cm, "dsyMatrix"))) ) # should not give an error
-try( chk.matrix(ch3 <- chol(as(cm, "dgeMatrix"))) ) # nor that one
+chk.matrix(ch2 <- chol(as(cm, "dsyMatrix")))
+chk.matrix(ch3 <- chol(as(cm, "dgeMatrix")))
+stopifnot(all.equal(as(ch, "matrix"), as(ch3, "matrix")))
 
 ### Very basic  triangular matrix stuff
 
