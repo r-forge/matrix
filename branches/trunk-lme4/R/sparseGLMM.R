@@ -18,11 +18,25 @@ testfun <- function(...) # test function
     fm.bin <-
         sparseGLMM(resp ~ x, data = dat, family = binomial(),
                    random = list(id = ~1),
-                   control = lmeControl(EMverbose = F), ...)
+                   control = lmeControl(EMverbose = F, ...))
 
 
     return (fm.bin)
 }
+
+
+
+testfun2 <- function(...)
+{
+    data(guImmun)
+    fm1 <-
+        sparseGLMM(immun ~ kid2p + mom25p + ord + ethn +
+                   momEd + husEd + momWork + rural + pcInd81,
+                   data = guImmun, family = binomial(),
+                   random = list(mom = ~1, comm = ~1),
+                   control = lmeControl(...))
+    fm1
+}    
 
 
 
@@ -56,8 +70,10 @@ setGeneric("sparseGLMM",
 
 setMethod("sparseGLMM", signature(formula = "formula", family = "family", random = "list"),
           function(formula, family, data, random, subset,
-                   method, na.action, control, model, x, niter = 20, ...)
+                   method, na.action, control, model, x, ...)
       {
+
+
 
 
 
@@ -81,12 +97,10 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
           mCall <- match.call(expand.dots = FALSE)
           controlvals$REML <- method == "REML"
 
-
-
           mCall[[1]] <- as.name("model.frame")
           names(mCall)[2] <- "formula"
           mCall$family <- mCall$random <- mCall$method <-
-              mCall$control <- mCall$model <- mCall$x <- mCall$niter <- NULL
+              mCall$control <- mCall$model <- mCall$x <- NULL
           form <- formula
           form[[3]] <- (~a+b)[[2]]
           form[[3]][[2]] <- formula[[3]]
@@ -140,34 +154,46 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
               coefRanef <-
                   lapply(facs,
                          function(x) numeric(nlevels(x)))
+              for (facname in names(facs))
+              {
+                  coefRanef[[facname]] <-
+                      matrix(rep(coefRanef[[facname]], ncol(mmats.unadjusted[[facname]])),
+                             ncol = ncol(mmats.unadjusted[[facname]]))
+              }
           }
 
 
           mmats <- mmats.unadjusted
           conv <- FALSE
           firstIter <- TRUE
-          devold <- 0 ## deviance for convergence check
+
+
 
           ## initial 'fitted' values on linear scale
           eta <- drop(mmats.unadjusted$.Xy %*% coefFixed)
           etaold <- eta + 1
 
 
-          for (iter in seq(length = niter))
+          for (iter in seq(length = controlvals$glmmMaxIter))
           {
+
+print(iter)
+
+
               if (debug)
               {
                   eta.check <- mmats.unadjusted$.Xy %*% coefFixed
                   for (facname in names(facs))
                   {
-                      eta.check <- eta.check + mmats.unadjusted[[facname]] * 
-                          coefRanef[[facname]][facs[[facname]]]
+                      eta.check <- eta.check +
+                          mmats.unadjusted[[facname]] * coefRanef[[facname]][facs[[facname]],]
                   }
-
-                  if (any(eta.check != eta)) {
+                  eta.check <- drop(eta.check)
+                  if (!all.equal(eta.check, eta)) {
                       warning("fitted() does not match calculation, diff: ",
                               sum(((eta.check - eta)^2)))
                   }
+                  #eta <- drop(eta.check)
               }
 
 
@@ -177,7 +203,6 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
               z <- eta + (mmats.unadjusted$.Xy[, responseIndex] - mu) / dmu.deta
               ## weights
               w <- dmu.deta / sqrt(family$variance(mu))
-
 plot(z, mmats$.Xy[, responseIndex])
 
               ## Does this prevent overwriting of components ?
@@ -187,6 +212,11 @@ plot(z, mmats$.Xy[, responseIndex])
               mmats$.Xy[, responseIndex] <- z
               mmats$.Xy[] <- mmats$.Xy * w
 
+
+
+print(summary(data.frame(eta = eta, z, w, zw = z * w)))
+
+
               .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
               ## ssclme_initial should only be called on the first iteration
               if (firstIter) .Call("ssclme_initial", obj, PACKAGE="Matrix")
@@ -195,8 +225,7 @@ plot(z, mmats$.Xy[, responseIndex])
               LMEoptimize(obj) = controlvals
               eta[] <- .Call("ssclme_fitted", obj, facs, mmats.unadjusted, PACKAGE = "Matrix")
 
-print(max(abs(eta - etaold)) /
-                  (0.1 + max(abs(eta))))
+print(max(abs(eta - etaold)) / (0.1 + max(abs(eta))))
 
               ## use this to determine convergence
               if (max(abs(eta - etaold)) /
@@ -213,10 +242,8 @@ print(max(abs(eta - etaold)) /
 
               if (debug)
               {
-                  coefFixed <- c(.Call("ssclme_fixef", obj, PACKAGE = "Matrix"), 0)
-                  coefRanef <- .Call("ssclme_ranef", obj, PACKAGE = "Matrix")
-                  if (!is.null(names(coefRanef))) print("time to modify code here")
-                  names(coefRanef) <- names(facs)
+                  coefFixed <- c(fixef(obj), 0)
+                  coefRanef <- ranef(obj)
               }
 
 
