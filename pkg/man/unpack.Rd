@@ -23,14 +23,13 @@ unpack(x, \dots)
   \code{unpack} generic.
 }
 \examples{
-## NOTE:  "unpack" has no implementation yet!
 showMethods("unpack")
-\dontrun{
 cp4 <- chol(Hilbert(4))
 tp4 <- as(cp4,"dtpMatrix")
 str(tp4)
 (unpack(tp4))
 
+\dontrun{
 ## once we have Diagonal() :
 unpack(Diagonal( 1:3))
 }
