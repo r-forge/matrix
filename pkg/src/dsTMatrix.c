@@ -33,3 +33,29 @@ SEXP dsTMatrix_as_dsyMatrix(SEXP x)
     UNPROTECT(1);
     return val;
 }
+
+SEXP dsTMatrix_as_dsCMatrix(SEXP x)
+{
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dsCMatrix"))),
+	dimP = GET_SLOT(x, Matrix_DimSym),
+	xiP = GET_SLOT(x, Matrix_iSym);
+    int n = INTEGER(dimP)[0],
+	nnz = length(xiP);
+    int *ti = Calloc(nnz, int),
+        *vp = INTEGER(ALLOC_SLOT(val, Matrix_pSym, INTSXP, n + 1));
+    double *tx = Calloc(nnz, double);
+    
+    SET_SLOT(val, Matrix_uploSym, duplicate(GET_SLOT(x, Matrix_uploSym)));
+    SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
+    triplet_to_col(n, n, nnz, INTEGER(xiP),
+		   INTEGER(GET_SLOT(x, Matrix_jSym)),
+		   REAL(GET_SLOT(x, Matrix_xSym)),
+		   vp, ti, tx);
+    nnz = vp[n];
+    Memcpy(INTEGER(ALLOC_SLOT(val, Matrix_iSym, INTSXP, nnz)), ti, nnz);
+    Memcpy(REAL(ALLOC_SLOT(val, Matrix_iSym, REALSXP, nnz)), tx, nnz);	   
+    Free(ti); Free(tx);
+    UNPROTECT(1);
+    return val;
+}
+    

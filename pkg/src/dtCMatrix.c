@@ -14,22 +14,16 @@ SEXP tsc_transpose(SEXP x)
     int nnz = length(islot),
 	*adims, *xdims = INTEGER(GET_SLOT(x, Matrix_DimSym));
 
-
-    SET_SLOT(ans, Matrix_DimSym, allocVector(INTSXP, 2));
-    adims = INTEGER(GET_SLOT(ans, Matrix_DimSym));
+    adims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
     adims[0] = xdims[1]; adims[1] = xdims[0];
     if (CHAR(asChar(GET_SLOT(x, Matrix_uploSym)))[0] == 'U')
 	SET_SLOT(ans, Matrix_uploSym, mkString("L"));
-    SET_SLOT(ans, Matrix_pSym, allocVector(INTSXP, xdims[0] + 1));
-    SET_SLOT(ans, Matrix_iSym, allocVector(INTSXP, nnz));
-    SET_SLOT(ans, Matrix_xSym, allocVector(REALSXP, nnz));
-    csc_components_transpose(xdims[0], xdims[1], nnz,
-			     INTEGER(GET_SLOT(x, Matrix_pSym)),
-			     INTEGER(islot),
-			     REAL(GET_SLOT(x, Matrix_xSym)),
-			     INTEGER(GET_SLOT(ans, Matrix_pSym)),
-			     INTEGER(GET_SLOT(ans, Matrix_iSym)),
-			     REAL(GET_SLOT(ans, Matrix_xSym)));
+    csc_compTr(xdims[0], xdims[1], nnz,
+	       INTEGER(GET_SLOT(x, Matrix_pSym)), INTEGER(islot),
+	       REAL(GET_SLOT(x, Matrix_xSym)),
+	       INTEGER(ALLOC_SLOT(ans, Matrix_pSym, INTSXP, xdims[0] + 1)),
+	       INTEGER(ALLOC_SLOT(ans, Matrix_iSym, INTSXP, nnz)),
+	       REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, nnz)));
     UNPROTECT(1);
     return ans;
 }

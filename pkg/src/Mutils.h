@@ -48,10 +48,9 @@ SEXP triple_as_SEXP(int nrow, int ncol, int nz,
 		    const int Ti [], const int Tj [], const double Tx [],
 		    char *Rclass);
 SEXP csc_check_column_sorting(SEXP A);
-void csc_components_transpose(int m, int n, int nnz,
-			      const int xp[], const int xi[],
-			      const double xx[],
-			      int ap[], int ai[], double ax[]);
+void csc_compTr(int m, int n, int nnz,
+		const int xp[], const int xi[], const double xx[],
+		int ap[], int ai[], double ax[]);
 void ssc_symbolic_permute(int n, int upper, const int perm[],
 			  int Ap[], int Ai[]);
 double *nlme_symmetrize(double *a, const int nc);

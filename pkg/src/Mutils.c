@@ -245,10 +245,12 @@ SEXP triple_as_SEXP(int nrow, int ncol, int nz,
     return dgCMatrix_set_Dim(val, nrow);
 }
 
-void csc_components_transpose(int m, int n, int nnz,
-			      const int xp[], const int xi[],
-			      const double xx[],
-			      int ap[], int ai[], double ax[])
+/* Create the components of the transpose of a csc matrix from its components */
+ 
+void csc_compTr(int m, int n, int nnz,
+		const int xp[], const int xi[],
+		const double xx[],
+		int ap[], int ai[], double ax[])
 {
     int k, kk,
 	*ind = (int *) R_alloc(nnz, sizeof(int)),
