@@ -116,6 +116,12 @@ SEXP sscCrosstab_L_LI_sizes(SEXP ctab, SEXP permexp)
     return ans;
 }
     
+/* FIXME:
+ *  Split main part into a function that takes nr, nc, p, i, and
+ *  returns perm of size nr.
+ *  Call function for successive pairs.
+ *  Invert the permutation before return.
+ */
 SEXP sscCrosstab_groupedPerm(SEXP ctab)
 {
     SEXP
@@ -167,7 +173,8 @@ SEXP sscCrosstab_groupedPerm(SEXP ctab)
 	    int maxrc, rr;
 	    int i, minjc = nl2+1;	/* find minimum positive jcount */
 	    for (j = 0; j < nl1; j++) {
-		if (jcounts[i] > 0 && jcounts[j] < minjc) minjc = jcounts[j];
+		if (jcounts[j] > 0 && jcounts[j] < minjc) minjc = jcounts[j];
+		if (minjc == 1) break;
 	    }
 				/* accumulate the row counts on cols where jcount=minjc */
 	    for (i = 0; i < nl2; i++) icounts[i] = 0;
@@ -192,7 +199,9 @@ SEXP sscCrosstab_groupedPerm(SEXP ctab)
 	    for (j = 0; j < nl1; j++) {
 		int p2 = np[j+1];
 		for (i = np[j]; i < p2; i++) {
-		    if (ni[i] != rr) {
+		    if (ni[i] == rr) {
+			jcounts[j]--;
+		    } else {
 			if (i != p1) ni[p1] = ni[i];
 			p1++;
 		    }
@@ -200,6 +209,7 @@ SEXP sscCrosstab_groupedPerm(SEXP ctab)
 		np[j] = p3;
 		p3 = p1;	/* save the count for the next iteration */
 	    }
+	    np[nl1] = p3;
 	}
 	Free(icounts);
     }
