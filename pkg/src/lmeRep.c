@@ -74,9 +74,9 @@ SEXP lmeRep_validate(SEXP x)
 	ZtXP = GET_SLOT(x, Matrix_ZtXSym),
 	XtXP = GET_SLOT(x, Matrix_XtXSym),
 	RZXP = GET_SLOT(x, Matrix_RZXSym),
-	RXXP = GET_SLOT(x, Matrix_RXXSym),
-	levs = GET_SLOT(x, R_LevelsSymbol)
-				/*, cnames = GET_SLOT(x, Matrix_cnamesSym) */
+	RXXP = GET_SLOT(x, Matrix_RXXSym)
+				/* , levs = GET_SLOT(x, R_LevelsSymbol) */
+				/* , cnames = GET_SLOT(x, Matrix_cnamesSym) */
 	;
     int *ZtXd = INTEGER(getAttrib(ZtXP, R_DimSymbol)),
 	*XtXd = INTEGER(getAttrib(XtXP, R_DimSymbol));
