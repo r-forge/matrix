@@ -13,7 +13,7 @@ setMethod("GLMM", signature(formula = "missing"),
           cov = getCovariateFormula(data)[[2]]
           nCall$formula = eval(substitute(resp ~ cov))
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
-                mCall, PACKAGE = "lme4")
+                mCall, PACKAGE = "Matrix")
       })
 
 setMethod("GLMM", signature(formula = "formula",
@@ -32,7 +32,7 @@ setMethod("GLMM", signature(formula = "formula",
           grps = getGroupsFormula(data)[[2]]
           nCall$random = eval(substitute(~ cov | grps))
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
-                mCall, PACKAGE = "lme4")
+                mCall, PACKAGE = "Matrix")
       })
 
 setMethod("GLMM", signature(random = "formula"),
@@ -50,7 +50,7 @@ setMethod("GLMM", signature(random = "formula"),
           nCall$random <- lapply(getGroupsFormula(random, asList = TRUE),
                                  function(f) cov)
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
-                mCall, PACKAGE = "lme4")
+                mCall, PACKAGE = "Matrix")
       })
 
 setMethod("GLMM", signature(formula = "formula",
@@ -68,7 +68,7 @@ setMethod("GLMM", signature(formula = "formula",
           nCall = mCall = match.call()
           nCall$data <- data@data
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
-                mCall, PACKAGE = "lme4")
+                mCall, PACKAGE = "Matrix")
       })
 
 
@@ -190,7 +190,7 @@ setMethod("GLMM",
               ## weights (note: weights is already square-rooted)
               w <- weights * dmu.deta / sqrt(family$variance(mu))
               .Call("nlme_weight_matrix_list",
-                    mmats.unadjusted, w, z, mmats, PACKAGE="lme4")
+                    mmats.unadjusted, w, z, mmats, PACKAGE="Matrix")
               .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
               if (firstIter) .Call("ssclme_initial", obj, PACKAGE="Matrix")
               .Call("ssclme_EMsteps", obj,
@@ -316,11 +316,14 @@ setMethod("GLMM",
                           dmu.deta - offset
                       w <- weights * dmu.deta / sqrt(family$variance(mu))
                       .Call("nlme_weight_matrix_list",
-                            reducedMmats.unadjusted, w, z, reducedMmats, PACKAGE="lme4")
-                      .Call("ssclme_update_mm", reducedObj, facs, reducedMmats, PACKAGE="Matrix")
+                            reducedMmats.unadjusted, w, z, reducedMmats,
+                            PACKAGE="Matrix")
+                      .Call("ssclme_update_mm", reducedObj, facs, reducedMmats,
+                            PACKAGE="Matrix")
                       eta[] <- off + 
                           .Call("ssclme_fitted", reducedObj, facs,
-                                reducedMmats.unadjusted, PACKAGE = "Matrix")
+                                reducedMmats.unadjusted,
+                                PACKAGE = "Matrix")
 #print(mean(eta), digits = 12)
                       ##cat(paste("bhat Criterion:", max(abs(eta - etaold)) /
                       ##          (0.1 + max(abs(eta))), "\n"))
