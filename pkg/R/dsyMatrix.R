@@ -60,13 +60,17 @@ setMethod("t", signature(x = "dsyMatrix"),
                   rcond = x@rcond)
           }, valueClass = "dsyMatrix")
 
-## DB: I think it would be better to use a conditional setIs than to
-## define a 'chol' method.
-#setMethod("chol", signature(x = "dsyMatrix", pivot = "ANY"), cholMat)
-
 setIs("dsyMatrix", "dpoMatrix",
       test = function(obj)
-          "try-error" != class(try(.Call("dpoMatrix_chol", obj), TRUE))
+          "try-error" != class(try(.Call("dpoMatrix_chol", obj), TRUE)),
+      replace = function(obj, value) {
+          obj@uplo <- value@uplo
+          obj@rcond <- value@rcond
+          obj@factors <- value@factors
+          obj@x <- value@x
+          obj@Dim <- value@Dim
+          obj@Dimnames <- value@Dimnames
+          obj}
       )
 
 ## Now that we have "chol", we can define  "determinant" methods,

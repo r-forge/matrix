@@ -80,6 +80,14 @@ setMethod("unpack", signature(x = "dspMatrix"),
 
 setIs("dspMatrix", "dppMatrix",
       test = function(obj)
-          "try-error" != class(try(.Call("dppMatrix_chol", obj), TRUE))
+          "try-error" != class(try(.Call("dppMatrix_chol", obj), TRUE)),
+      replace = function(obj, value) {
+          obj@uplo <- value@uplo
+          obj@rcond <- value@rcond
+          obj@factors <- value@factors
+          obj@x <- value@x
+          obj@Dim <- value@Dim
+          obj@Dimnames <- value@Dimnames
+          obj}
       )
 
