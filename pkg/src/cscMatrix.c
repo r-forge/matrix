@@ -104,7 +104,7 @@ SEXP csc_crossprod(SEXP x)
 SEXP csc_tcrossprod(SEXP x)
 {
     SEXP pslot = GET_SLOT(x, Matrix_pSym),
-	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("sscMatrix"))), tmp;
+	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("sscMatrix")));
     int *xp = INTEGER(pslot),
 	*xi = INTEGER(GET_SLOT(x, Matrix_iSym)),
 	*dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
@@ -416,9 +416,9 @@ SEXP csc_col_permute(SEXP x, SEXP perm)
 	error("perm must be an integer vector of length %d",
 	      ncol);
     prm = INTEGER(perm);
-    iperm = Calloc(ncol, int);
-    if (!ldl_valid_perm(ncol, prm, iperm))
+    if (!R_ldl_valid_perm(ncol, prm))
 	error("perm is not a valid 0-based permutation");
+    iperm = Calloc(ncol, int);
     for (j = 0; j < ncol; j++) iperm[prm[j]] = j;
     tmp = GET_SLOT(x, Matrix_pSym);
     xp = INTEGER(tmp);
