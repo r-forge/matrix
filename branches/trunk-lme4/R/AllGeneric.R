@@ -134,3 +134,15 @@ if (!isGeneric("gradient")) {           # not exported
 if (!isGeneric("getFixDF")) {           # not exported
     setGeneric("getFixDF", function(object, ...) standardGeneric("getFixDF"))
 }
+
+if (!isGeneric("gsummary")) {
+    setGeneric("gsummary",
+               function (object,
+                         FUN = function(x) mean(x, na.rm = TRUE),
+                         omitGroupingFactor = FALSE, 
+                         form = formula(object),
+                         level,
+                         groups = getGroups(object, form, level),
+                         invariantsOnly = FALSE, ...)
+               standardGeneric("gsummary"))
+}
