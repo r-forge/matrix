@@ -138,9 +138,10 @@ is.Orthonormal <- function(x, tol = sqrt(.Machine$double.eps), byrow = FALSE)
     is.ColOrthonormal(x, tol)
 }
 
-Matrix.class <- function(x, tol = 0, symmetry = TRUE, unit.diagonal = TRUE,
-                         triangularity = c(TRUE, TRUE),
-                         orthogonality = c(TRUE, TRUE), normality = c(TRUE, TRUE))
+Matrix.class <-
+    function(x, tol = 0, symmetry = TRUE, unit.diagonal = TRUE,
+             triangularity = c(TRUE, TRUE),
+             orthogonality = c(TRUE, TRUE), normality = c(TRUE, TRUE))
 {
     val <- "Matrix"
     x <- as.matrix(x)
@@ -166,17 +167,15 @@ Matrix.class <- function(x, tol = 0, symmetry = TRUE, unit.diagonal = TRUE,
     if (orthogonality[1]) {
         if (is.ColOrthonormal(x, tol)) {
             val <- c("ColOrthoNormal", "ColOrthogonal", val)
-        } else {
-            if (Orthogonal.test(x, normal = FALSE) <= tol)
-                val <- c("ColOrthogonal", val)
+        } else if (Orthogonal.test(x, normal = FALSE) <= tol) {
+            val <- c("ColOrthogonal", val)
         }
     }
     if (orthogonality[2]) {
         if (normality[2] && is.RowOrthonormal(x, tol)) {
             val <- c("RowOrthoNormal", "RowOrthogonal", val)
-        } else {
-            if (Orthogonal.test(x, byrow = TRUE, normal = FALSE) <= tol)
-                val <- c("RowOrthogonal", val)
+        } else if (Orthogonal.test(x, byrow = TRUE, normal = FALSE) <= tol) {
+            val <- c("RowOrthogonal", val)
         }
     }
     val
@@ -184,7 +183,6 @@ Matrix.class <- function(x, tol = 0, symmetry = TRUE, unit.diagonal = TRUE,
 
 as.Matrix <- function(x, tol = .Machine$double.eps)
 {
-    if (inherits(x, "Matrix")) return(asObject(x, Matrix.class(x, tol = tol)))
-    asObject(as.matrix(x), Matrix.class(x, tol = tol))
+    asObject(if (inherits(x, "Matrix")) x else as.matrix(x),
+	     Matrix.class(x, tol = tol))
 }
-
