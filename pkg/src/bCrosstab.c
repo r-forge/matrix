@@ -10,21 +10,21 @@
  * @return The 0-based index of the (i,k) element of a row-wise packed lower
  * triangular matrix.
  */    
-static R_INLINE
-int Lind(int i, int k)
+static R_INLINE int
+Lind(int i, int k)
 {
     return (i * (i + 1))/2 + k;
 }
 
 /** 
- * Permute an index vector
+ * Apply a permutation to an index vector
  * 
  * @param i vector of 0-based indices
  * @param nnz length of vector i
  * @param perm 0-based permutation vector of length max(i)
  */
-static R_INLINE
-void ind_permute(int i[], int nnz, const int perm[])
+static R_INLINE void
+ind_permute(int i[], int nnz, const int perm[])
 {
     int j;
     for (j = 0; j < nnz; j++) i[j] = perm[i[j]];
@@ -37,8 +37,8 @@ void ind_permute(int i[], int nnz, const int perm[])
  * @param j vector of 0-based column indices
  * @param nnz length of index vectors
  */
-static R_INLINE
-void make_upper_triangular(int i[], int j[], int nnz)
+static R_INLINE void
+make_upper_triangular(int i[], int j[], int nnz)
 {
     int k;
     for (k = 0; k < nnz; k++) {
@@ -58,8 +58,8 @@ void make_upper_triangular(int i[], int j[], int nnz)
  * 
  * @return pointer to a named list of length n
  */
-static
-SEXP make_named_list(int n, char **names)
+static SEXP
+make_named_list(int n, char **names)
 {
     SEXP ans = PROTECT(allocVector(VECSXP, n)),
 	nms = PROTECT(allocVector(STRSXP, n));
@@ -71,8 +71,18 @@ SEXP make_named_list(int n, char **names)
     return ans;
 }
 
-static R_INLINE
-int check_csc_index(const int p[], const int i[], int row, int col)
+/** 
+ * Check for the existence of the (row, col) pair in a csc structure.
+ * 
+ * @param p vector of column pointers
+ * @param i vector of row indices
+ * @param row row index
+ * @param col column index
+ * 
+ * @return index of element at (row, col) if it exists, otherwise -1
+ */
+static R_INLINE int
+check_csc_index(const int p[], const int i[], int row, int col)
 {
     int k, k2 = p[col + 1];
 				/* use a linear search for now */
@@ -82,90 +92,96 @@ int check_csc_index(const int p[], const int i[], int row, int col)
     }
     return -1;
 }
-    
-/** 
- * Update a diagonal block
- * 
- * @param ctab pointer to a blocked crosstabulation object
- * @param j index of updating column
- * @param i index of diagonal block to be updated
- */
-static void diag_update(SEXP ctab, int j, int i)
-{
-    SEXP db = VECTOR_ELT(ctab, Lind(i, i)),
-	jb = VECTOR_ELT(ctab, Lind(i, j));
-    SEXP dpp = GET_SLOT(db, Matrix_pSym),
-	jpp = GET_SLOT(jb, Matrix_pSym);
-    int *di = INTEGER(GET_SLOT(db, Matrix_iSym)),
-	*dp = INTEGER(dpp),
-	*ji = INTEGER(GET_SLOT(jb, Matrix_iSym)),
-	*jp = INTEGER(jpp),
-	dnc = length(dpp) - 1,
-	jnc = length(jpp) - 1;
-    int jj, extra;
-				/* bound the number of extra elements */
-    extra = 0;
-    for (jj = 0; jj < jnc; jj++) {
-	int k, kk, k2 = jp[jj + 1];
-	for (k = jp[jj]; k < k2; k++) {
-	    for (kk = k; kk < k2; kk++) {
-		if (check_csc_index(dp, di, ji[k], ji[kk]) < 0) extra++;
-	    }
-	}
-    }
-    if (!extra) return;
-    {
-	int pos, nnz = dp[dnc];
-	int ntot = nnz + extra;
-	int *Ai = Calloc(ntot, int),
-	    *Ti = Calloc(ntot, int),
-	    *Tj = Calloc(ntot, int);
-	double *Ax;
 
-	Memcpy(Ti, di, nnz);	/* make a copy of the row indices */
-	pos = 0;		/* fill in the column indices */
-	for (jj = 0; jj < dnc; jj++) {
-	    int j2 = dp[jj + 1];
-	    while (pos < j2) {
-		Tj[pos] = jj;
-		pos++;
-	    }
-	}
-				/* add the extra elements */
-	for (jj = 0; jj < jnc; jj++) {
-	    int k, kk, k2 = jp[jj + 1];
-	    for (k = jp[jj]; k < k2; k++) {
-		for (kk = k; kk < k2; kk++) {
-		    if (check_csc_index(dp, di, ji[k], ji[kk]) < 0) {
-			Ti[pos] = ji[k];
-			Tj[pos] = ji[kk];
-			pos++;
-		    }
+/** 
+ * Replace the structure of C by the structure of CA
+ * 
+ * @param A a unit lower tscMatrix
+ * @param C cscMatrix to be updated
+ */
+static void
+symbolic_right_unit_mm(SEXP A, SEXP C)
+{
+    SEXP aip = GET_SLOT(A, Matrix_iSym),
+	app = GET_SLOT(A, Matrix_pSym),
+	cip = GET_SLOT(C, Matrix_iSym),
+	cpp = GET_SLOT(C, Matrix_pSym);
+    int *Flag,
+	*ai = INTEGER(aip),
+	*ap = INTEGER(app),
+	*ci = INTEGER(cip),
+	*cp = INTEGER(cpp),
+	*ncp,
+	anc = length(app) - 1, 
+	anz = length(aip),
+	cnr, cnz = length(cip),
+	i, j;
+
+    if ((length(cpp) - 1) != anc)
+	error("No. of rows in A (%d) does not match no. of cols in C (%d)",
+	      anc, length(cpp) - 1);
+    if (anz < 1) return;	/* C is the identity */
+    cnr = -1;			/* number of rows in C is max(ci + 1) */
+    for (i = 0; i < cnz; i++) {
+	int ri = ci[i] + 1;
+	if (cnr < ri) cnr = ri;
+    }
+    Flag = Calloc(cnr, int);
+    ncp = Calloc(anc + 1, int);	/* new column pointers */
+
+    ncp[0] = 0;
+    for (j = 0; j < anc; j++) {
+	int aj2 = ap[j + 1], cj2 = cp[j + 1], ka, kc;
+	for (i = 0; i < cnr; i++) Flag[i] = 0;
+	ncp[j+1] = ncp[j] + cj2 - cp[j];
+				/* positions of current column j of C */
+	for (kc = cp[j]; kc < cj2; kc++) Flag[ci[kc]] = 1;
+				/* other positions in column j of product */
+	for (ka = ap[j]; ka < aj2; ka++) {
+	    int kk = ai[ka], kk2 = cp[kk + 1];
+	    for (kc = cp[kk]; kc < kk2; kc++) {
+		if (!Flag[ci[kc]]) {
+		    ncp[j+1]++;
+		    Flag[ci[kc]] = 1;
 		}
 	    }
 	}
-	triplet_to_col(dnc, dnc, ntot, Ti, Tj, (double *) NULL,
-		       dp, Ai, (double *) NULL);
-	nnz = dp[dnc];
-	SET_SLOT(db, Matrix_iSym, allocVector(INTSXP, nnz));
-	Memcpy(INTEGER(GET_SLOT(db, Matrix_iSym)), Ai, nnz);
-	SET_SLOT(db, Matrix_xSym, allocVector(REALSXP, nnz));
-	Ax = REAL(GET_SLOT(db, Matrix_xSym));
-	for (j = 0; j < nnz; j++) Ax[j] = 1.;
-	Free(Ai); Free(Ti); Free(Tj);
-	return;
     }
-}
+    if (ncp[anc] > cp[anc]) {
+	int *nci, nnz = ncp[anc], pos = 0;
+	double *ncx;
 
+	SET_SLOT(C, Matrix_iSym, allocVector(INTSXP,  nnz));
+	nci = INTEGER(GET_SLOT(C, Matrix_iSym));
+	SET_SLOT(C, Matrix_xSym, allocVector(REALSXP,  nnz));
+	ncx = REAL(GET_SLOT(C, Matrix_xSym));
+	for (i = 0; i < nnz; i++) ncx[i] = 1.;
+				/* As Diana Krall said, "Just do it again." */
+	for (j = 0; j < anc; j++) {
+	    int aj2 = ap[j + 1], cj2 = cp[j + 1], ka, kc;
+	    for (i = 0; i < cnr; i++) Flag[i] = 0;
+	    for (kc = cp[j]; kc < cj2; kc++) Flag[ci[kc]] = 1;
+	    for (ka = ap[j]; ka < aj2; ka++) {
+		int kk = ai[ka], kk2 = cp[kk + 1];
+		for (kc = cp[kk]; kc < kk2; kc++) Flag[ci[kc]] = 1;
+	    }
+	    for (i = 0; i < cnr; i++) if (Flag[i]) nci[pos++] = i;
+	}
+	Memcpy(cp, ncp, anc + 1);
+    }	
+    Free(Flag); Free(ncp);
+}
+    
 /** 
- * Update a block
+ * Update a block of L in the blocked crosstabulation
  * 
  * @param ctab pointer to a blocked crosstabulation object
  * @param j index of updating column
  * @param k column index of block to be updated 
  * @param i row index of block to be updated (j < k <= i)
  */
-static void block_update(SEXP ctab, int j, int k, int i)
+static void
+block_update(SEXP ctab, int j, int k, int i)
 {
     SEXP tb = VECTOR_ELT(ctab, Lind(i, k)),
 	ib = VECTOR_ELT(ctab, Lind(i, j)),
@@ -250,8 +266,9 @@ static void block_update(SEXP ctab, int j, int k, int i)
  * @param perm permutation (0-based) to apply
  * @param pperm inverse of the permutation
  */
-void bCrosstab_permute(SEXP ctab, int nf, int jj,
-		       const int perm[], const int iperm[])
+static void
+bCrosstab_permute(SEXP ctab, int nf, int jj,
+		  const int perm[], const int iperm[])
 {
     SEXP trip, ipt, jpt;
     int j, nnz;
@@ -278,6 +295,17 @@ void bCrosstab_permute(SEXP ctab, int nf, int jj,
     }
 }
 
+/** 
+ * Apply a permutation vector to the levels of a factor.
+ *
+ * The dest pointer is assumed to point to a copy of the src pointer's
+ * contents.
+ * 
+ * @param dest pointer to the destination factor
+ * @param src pointer to the source factor
+ * @param perm permutation vector (0-based)
+ * @param iperm inverse permutation vector (0-based)
+ */
 static void
 factor_levels_permute(SEXP dest, SEXP src, const int perm[],
 		      const int iperm[])
@@ -297,12 +325,24 @@ factor_levels_permute(SEXP dest, SEXP src, const int perm[],
 	d[i] = 1 + iperm[s[i]-1];
 }
 
-SEXP bCrosstab_convert(SEXP bCtab)
+/** 
+ * Derive the structure of elements of an lmeRep object from a blocked
+ * crosstabulation.
+ * 
+ * @param bCtab Pointer to a list containing a blocked crosstabulation
+ * object and the factors used to generate it.
+ * 
+ * @return A list of the factor list, the blocked/blocked sparse unit
+ * lower triangular matrix L, the list of diagonal elements of
+ * L-inverse, the permutations and the Parent arrays.
+ */
+SEXP
+bCrosstab_convert(SEXP bCtab)
 {
     char *anms[] = {"flist", "L", "Linv", "perm", "Parent"};
     SEXP flist = VECTOR_ELT(bCtab, 0),
 	ctab = PROTECT(duplicate(VECTOR_ELT(bCtab, 1))),
-	ans = PROTECT(make_named_list(5, anms));
+	ans = PROTECT(make_named_list(sizeof(anms)/sizeof(char *), anms));
     SEXP fcp, perm, L, Linv, Parent;
     int ctbl = length(ctab), j, nf = length(flist);
 
@@ -351,16 +391,16 @@ SEXP bCrosstab_convert(SEXP bCtab)
 	Lp = INTEGER(GET_SLOT(Ljj, Matrix_pSym));
 	Linvp = INTEGER(GET_SLOT(Linvj, Matrix_pSym));
 	if (nnz > ncj) {	/* calculate fill-reducing permutation */
-	    int *Li, *Lnz = Calloc(ncj, int), *tmp = Calloc(ncj, int), info;
+	    int *iPerm = Calloc(ncj, int);
 
-	    ssc_metis_order(ncj, cp, ci, Perm, tmp);
+	    ssc_metis_order(ncj, cp, ci, Perm, iPerm);
 				/* apply to the crosstabulation */
-	    bCrosstab_permute(ctab, nf, j, Perm, tmp);
+	    bCrosstab_permute(ctab, nf, j, Perm, iPerm);
 				/* apply to the factor */
 	    factor_levels_permute(VECTOR_ELT(fcp, j),
-				  VECTOR_ELT(flist, j), Perm, tmp);
+				  VECTOR_ELT(flist, j), Perm, iPerm);
 				/* symbolic analysis to get Parent */
-	    ldl_symbolic(ncj, cp, ci, Lp, parent, Lnz, tmp,
+	    R_ldl_symbolic(ncj, cp, ci, Lp, parent, 
 			 (int *) NULL, (int *) NULL);
 				/* decompose the identity to get the row pointers */
 	    dtmp = REAL(GET_SLOT(ctd, Matrix_xSym));
@@ -370,16 +410,13 @@ SEXP bCrosstab_convert(SEXP bCtab)
 	    nnz = Lp[ncj];
 	    SET_SLOT(Ljj, Matrix_iSym, allocVector(INTSXP, nnz));
 	    SET_SLOT(Ljj, Matrix_xSym, allocVector(REALSXP, nnz));
-	    info = ldl_numeric(ncj, cp, ci, dtmp, Lp, parent, Lnz,
+	    i = R_ldl_numeric(ncj, cp, ci, dtmp, Lp, parent, 
 			       INTEGER(GET_SLOT(Ljj, Matrix_iSym)),
 			       REAL(GET_SLOT(Ljj, Matrix_xSym)),
 			       (double *) R_alloc(ncj, sizeof(double)),	/* D */
-			       (double *) R_alloc(ncj, sizeof(double)),	/* Y */
-			       (int *) R_alloc(ncj, sizeof(int)),	/* Pattern */
-			       (int *) R_alloc(ncj, sizeof(int)),	/* Flag */
 			       (int *) NULL, (int *) NULL);
-	    if (info < ncj) error("identity matrix is not positive definite?");
-	    Free(Lnz); Free(tmp);
+	    if (i < ncj) error("identity matrix is not positive definite?");
+	    Free(iPerm);
 	} else {
 	    for (i = 0; i <= ncj; i++) {
 		Lp[i] = 0;
@@ -396,8 +433,10 @@ SEXP bCrosstab_convert(SEXP bCtab)
 	SET_SLOT(Linvj, Matrix_xSym, allocVector(REALSXP, nnz));
 	dtmp = REAL(GET_SLOT(Linvj, Matrix_xSym));
 	for (i = 0; i < nnz; i++) dtmp[i] = 1.;
-/* FIXME: Update any blocks below the diagonal in this column if necessary*/
-	for (k = j+1; k < nf; k++) { /* update remaining columns, if any */
+	for (k = j+1; k < nf; k++) { /* Update other blocks in this column */
+	    symbolic_right_unit_mm(Linvj, VECTOR_ELT(ctab, Lind(k,j)));
+	}
+	for (k = j+1; k < nf; k++) { /* Update remaining columns */
 	    for (i = k; i < nf; i++) block_update(ctab, j, k, i);
 	}
 	for (i= 0; i < j; i++) { /* copy blocks to the left */

@@ -5,11 +5,10 @@
 #include "cscMatrix.h"
 #include "Metis_utils.h"
 #include "triplet_to_col.h"
-#include "ldl.h"
+#include "R_ldl.h"
 #include "sscMatrix.h"
 #include "tscMatrix.h"
 
-SEXP bCrosstab_project(SEXP ctab, SEXP j);
 SEXP bCrosstab_convert(SEXP bCtab);
 
 #endif
