@@ -1,11 +1,9 @@
 import("stats", "Matrix")
+importFrom("graphics", "plot")
 
 export(
        "BIC",
-       "GLMM",
-       "GLMM1",
        "VarCorr",
-       "coef<-",
        "contr.SAS",
        "convertFromS3groupedData",
        "fixef",
@@ -17,45 +15,30 @@ export(
        "groupedData",
        "gsummary",
        "lmList",
-       "lme",
-       "lmeControl",
        "lmer",
+       "lmerControl",
        "pooledSD",
-       "ranef",
-       "sscCrosstab"
+       "ranef"
        )
 
-exportClasses(
-              "GLMM",
-              "VarCorr",
-              "lmList",
-              "lme",
-              "lmer",
-              "sscCrosstab",
-              "ssclme",
-              "summary.GLMM",
-              "summary.lme",
-              "summary.lmer",
-              "summary.ssclme"
-              )
+exportClasses("VarCorr", "lmList", "lmer", "summary.lmer")
 
 exportMethods(
               "BIC",
-              "GLMM",
-              "GLMM1",
               "anova",
               "coef",
-              "coef<-",
               "coerce",
+              "confint",
               "deviance",
               "fitted",
               "fixef",
               "formula",
               "gsummary",
               "logLik",
-#              "plot",
+              "plot",
               "ranef",
               "residuals",
+              "resid",
               "show",
               "summary",
               "update",

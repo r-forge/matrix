@@ -1,7 +1,7 @@
 \name{fixef}
 \docType{genericFunction}
 \alias{fixef}
-\alias{fixedeffects}
+\alias{fixed.effects}
 \alias{fixef,ANY-method}
 \alias{fixef,lmer-method}
 \title{Extract Fixed Effects}
@@ -21,6 +21,8 @@ fixed.effects(object, \dots)  # deprecated
 \value{
   a named numeric vector of fixed effects estimates.
 }
-%\seealso{}
-%\examples{}
+\examples{
+fixef(lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
+             OrchardSprays))
+}
 \keyword{models}

@@ -1,33 +1,9 @@
-.onLoad <- function(lib, pkg)
-{
-    if ("package:nlme" %in% search()) {
-        stop(paste("Package lme4 conflicts with package nlme.\n",
-                   "To attach lme4 you must restart R without package nlme."))
-    }
-}
+## Class definitions for the package
 
 setOldClass("data.frame")
 setOldClass("family")
 setOldClass("logLik")
 setOldClass("terms")
-
-setClass("lme", representation(call = "call",
-                               facs = "list",
-                               x = "list",
-                               model = "data.frame",
-                               REML = "logical",
-                               rep = "ssclme",
-                               fitted = "numeric",
-                               residuals = "numeric",
-                               terms = "terms",
-                               assign = "integer"))
-
-setClass("GLMM", representation(family = "family",
-                                logLik = "numeric",
-                                fixef = "numeric",
-                                Hessian = "matrix",
-                                method = "character"),
-         contains = "lme")
 
 setClass("lmList",
          representation(call = "call",
@@ -66,68 +42,27 @@ setClass("lmer",
                         status = "logical",
                         call = "call",
                         terms = "terms",
-                        assign = "integer"
+                        assign = "integer",
+                        fitted = "numeric",
+                        residuals = "numeric"
                         ),
          validity = function(object) {
              .Call("lmer_validate", object, PACKAGE = "Matrix")
          })
-
-setClass("summary.ssclme",
-         representation(coefficients="matrix",
-                        scale="numeric",
-                        denomDF="integer",
-                        REML="logical",
-                        ngrps="integer",
-                        nobs="integer",
-                        corFixed="corrmatrix",
-                        VarCorr="VarCorr",
-                        useScale="logical",
-                        showCorrelation="logical"
-                        ))
-
-setClass("summary.lme",
-         representation(call = "call",
-                        logLik = "logLik",
-                        re = "summary.ssclme",
-                        residuals = "numeric"))
-
-setClass("summary.GLMM", representation(family = "family"),
-         contains = "summary.lme")
 
 setClass("summary.lmer",
          representation(useScale="logical",
                         showCorrelation="logical"),
          contains = "lmer")
 
-setClass("sscCrosstab", representation =
-         representation(Gp = "integer", perm = "integer"),
-         contains = "dsCMatrix",
-         validity = function(object)
-         .Call("sscCrosstab_validate", object, PACKAGE = "Matrix"))
+setClass("lmList.confint", contains = "array")
 
-setClass("ssclme", representation =
-         representation(
-                        D = "numeric",  # Diagonal of D in LDL'
-                        DIsqrt = "numeric", # inverse square root of D
-                        Dim = "integer", # Dimensions of Z'Z and LDL'
-                        Gp = "integer", # Pointers to groups of columns of Z
-                        Li = "integer", # Row indices of L
-                        Lp = "integer", # Column pointers of L
-                        Lx = "numeric", # Non-zero, off-diagonals of L
-                        Omega = "list", # List of symmetric matrices
-                        Parent = "integer", # Elimination tree of L
-                        RXX = "matrix", # Augmented RXX component or inverse
-                        RZX = "matrix", # Augmented RZX component or inverse
-                        XtX = "matrix", # Original X'X matrix
-                        ZtX = "matrix", # Original Z'X matrix
-                        bVar = "list",  # Diagonal blocks on (Z'Z+W)^{-1}
-                        deviance = "numeric", # Current deviance (ML and REML)
-                        devComp = "numeric", # Components of deviance
-                        i = "integer",  # Row indices of Z'Z
-                        nc = "integer", # number of columns in model matrices
-                        p = "integer",  # Pointers to columns of Z'Z
-                        status = "logical", # record if factored, if inverted
-                        x = "numeric"   # Non-zeroes in upper triangle of Z'Z
-                        ),
-         validity = function(object)
-         .Call("ssclme_validate", object, PACKAGE = "Matrix"))
+setClass("lmer.ranef", representation(varFac = "list", stdErr =
+                                      "numeric"),
+         contains = "list")
+
+setClass("lmer.ranef.confint", contains = "list")
+
+setClass("lmer.coef", representation(varFac = "list", stdErr =
+                                      "numeric"),
+         contains = "list")

@@ -54,8 +54,7 @@ lmerControl(maxIter, msMaxIter, niterEM, msTol,
 \value{
   a list with a component for each of the possible arguments.
 }
-\seealso{\code{\link{lme}}, \code{\link{nlm}}, \code{\link{optim}},
-  \code{\link{lmeScale}}, \code{\link{GLMM}}}
+\seealso{\code{\link{lmer}}, \code{\link[stats]{optim}}}
 \examples{
 # decrease the maximum number iterations in the ms call and
 # request that information on the evolution of the ms iterations be printed

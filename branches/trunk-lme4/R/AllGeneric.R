@@ -28,34 +28,13 @@ if (!isGeneric("getResponse")) {
                standardGeneric("getResponse"))
 }
 
-if (!isGeneric("coef<-"))
-    setGeneric("coef<-", function(object, ..., value)
-               standardGeneric("coef<-"))
-
-## FIXME: Modify the generic to have a call argument
-setGeneric("lme",
-           function(formula, data, random,
-                    method = c("REML", "ML"),
-                    control = list(),
-                    subset, weights, na.action, offset,
-                    model = TRUE, x = FALSE, y = FALSE,...)
-           standardGeneric("lme"))
-
 setGeneric("lmer",
-           function(formula, data,
-                    method = c("REML", "ML"),
+           function(formula, data, family,
+                    method = c("REML", "ML", "PQL", "Laplace", "AGQ"),
                     control = list(),
                     subset, weights, na.action, offset,
                     model = TRUE, x = FALSE, y = FALSE,...)
            standardGeneric("lmer"))
-
-setGeneric("GLMM1",
-           function(formula, family, data,
-                    method = c("PQL", "Laplace"),
-                    control = list(),
-                    subset, weights, na.action, offset,
-                    model = TRUE, x = FALSE, y = FALSE,...)
-           standardGeneric("GLMM1"))
 
 if (!isGeneric("LMEoptimize<-")) {
     setGeneric("LMEoptimize<-", function(x, ..., value)
@@ -96,30 +75,11 @@ setMethod("BIC", "logLik",
           -2 * (c(object) - attr(object, "df") * log(attr(object, "nobs"))/2)
           )
 
-## FIXME: Can this be replaced by confint?
-# if (!isGeneric("intervals")) {
-#     setGeneric("intervals",
-#                function(object, level = 0.95, ...)
-#                standardGeneric("intervals"))
-# }
 
 if (!isGeneric("lmList")) {
     setGeneric("lmList",
                function(formula, data, level, subset, na.action, pool)
                standardGeneric("lmList"))
-}
-
-if (!isGeneric("GLMM")) {
-    setGeneric("GLMM",
-               function(formula, family, data, random,
-                        method = c("PQL", "Laplace"),
-                        control = list(),
-                        subset,
-                        weights,
-                        na.action,
-                        offset,
-                        model = TRUE, x = FALSE, y = FALSE, ...)
-               standardGeneric("GLMM"))
 }
 
 if (!isGeneric("pooledSD")) {
@@ -145,3 +105,13 @@ if (!isGeneric("gsummary")) {
                     invariantsOnly = FALSE, ...)
                standardGeneric("gsummary"))
 }
+
+if (!isGeneric("param")) {              # not exported
+    setGeneric("param", function(object, ...) standardGeneric("param"))
+}
+
+if (!isGeneric("param<-")) {              # not exported
+    setGeneric("param<-", function(object, ..., value)
+               standardGeneric("param<-"))
+}
+
