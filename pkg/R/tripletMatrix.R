@@ -32,6 +32,7 @@ setMethod("image", "tripletMatrix",
                              panel = function(x, y, z, subscripts, at, ..., col.regions) {
                                  x <- as.numeric(x[subscripts])
                                  y <- as.numeric(y[subscripts])
+                                 z <- as.numeric(z[subscripts])
                                  
                                  numcol <- length(at) - 1
                                  numcol.r <- length(col.regions)
@@ -43,7 +44,7 @@ setMethod("image", "tripletMatrix",
                                  for (i in seq(along = col.regions))
                                      zcol[!is.na(x) & !is.na(y) & !is.na(z) & z>=at[i] & z<at[i+1]] <- i
 
-                                 zcol <- as.numeric(zcol[subscripts])
+                                 ## zcol <- as.numeric(zcol[subscripts])
                                  if (any(subscripts))
                                      grid::grid.rect(x = x, y = y, width = 1, height = 1, 
                                                      default.units = "native",
