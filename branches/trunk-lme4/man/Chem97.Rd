@@ -38,7 +38,6 @@
 data(Chem97)
 str(Chem97)
 summary(Chem97)
-library(lme4)
 system.time(fm1 <- lme(score ~ 1, data = Chem97,
         random = ~ 1 | lea/school))
 summary(fm1)
