@@ -1191,10 +1191,12 @@ SEXP ssclme_EMsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP verb)
 			    &alpha, REAL(VECTOR_ELT(bVar, i)), &nci,
 			    &one, vali, &nci);
 	    if (REML) {
-		int mp = mi * p;
-		F77_CALL(dsyrk)("U", "N", &nci, &mp,
-				&alpha, RZX + Gp[i], &nci,
+		int j;
+		for (j = 0; j < p; j++) { 
+		    F77_CALL(dsyrk)("U", "N", &nci, &mi,
+				&alpha, RZX + Gp[i] + j*n, &nci,
 				&one, vali, &nci);
+		}
 	    }
 	    F77_CALL(dpotrf)("U", &nci, vali, &nci, &info);
 	    if (info) error("DPOTRF returned error code %d", info);
