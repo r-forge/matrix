@@ -51,7 +51,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dgTMatrix_validate", (DL_FUNC) &dgTMatrix_validate, 1},
     {"dgeMatrix_LU", (DL_FUNC) &dgeMatrix_LU, 1},
     {"dgeMatrix_Schur", (DL_FUNC) &dgeMatrix_Schur, 2},
-    {"dgeMatrix_crossprod", (DL_FUNC) &dgeMatrix_crossprod, 1},
+    {"dgeMatrix_crossprod", (DL_FUNC) &dgeMatrix_crossprod, 2},
     {"dgeMatrix_determinant", (DL_FUNC) &dgeMatrix_determinant, 2},
     {"dgeMatrix_dgeMatrix_crossprod", (DL_FUNC) &dgeMatrix_dgeMatrix_crossprod, 2},
     {"dgeMatrix_matrix_mm", (DL_FUNC) &dgeMatrix_matrix_mm, 4},
