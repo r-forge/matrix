@@ -54,8 +54,8 @@ export(
        "pooledSD",
        "ranef",
 
-       "groupedData"
-
+       "groupedData",
+       "convertFromS3groupedData"
        )
 
 exportClasses(
