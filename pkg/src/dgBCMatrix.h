@@ -16,8 +16,9 @@ int cscb_ldl(SEXP A, const int Parent[], SEXP L, SEXP D);
 void cscb_trmm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
 	       enum CBLAS_TRANSPOSE transa, enum CBLAS_DIAG diag,
 	       double alpha, SEXP A, double B[], int m, int n, int ldb);
-void cscb_trsm(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE transa, enum CBLAS_DIAG diag,
-	       double alpha, SEXP A, double B[], int m, int n, int ldb);
+void cscb_trsm(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE transa,
+	       enum CBLAS_DIAG diag, double alpha, SEXP A,
+	       int m, int n, double B[], int ldb);
 void cscb_trcbm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
 		enum CBLAS_TRANSPOSE transa, enum CBLAS_DIAG diag,
 		double alpha, SEXP A, SEXP B);
