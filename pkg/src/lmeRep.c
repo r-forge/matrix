@@ -18,11 +18,11 @@ int coef_length(int nf, const int nc[])
 }
 
 /** 
- * Calculate the index in a packed lower triangular matrix.  This is
+ * Calculate the zero-based index in a packed lower triangular matrix.  This is
  * used for the arrays of blocked sparse matrices.
  * 
- * @param i column number (zero based)
- * @param k row number (zero based)
+ * @param i column number (zero-based)
+ * @param k row number (zero-based)
  * 
  * @return The index of the (k,i) element of a packed lower triangular matrix
  */    
@@ -43,7 +43,7 @@ int Lind(int i, int k)
  * @return A 3-dimensional array of the indicated dimensions and type
  */
 static
-SEXP lmeRep_alloc3Darray(int TYP, int nr, int nc, int nf)
+SEXP alloc3Darray(int TYP, int nr, int nc, int nf)
 {
     SEXP val, dd = PROTECT(allocVector(INTSXP, 3));
     
@@ -154,14 +154,37 @@ int Tind(const int rowind[], const int colptr[], int i, int j)
     return -1;			/* to keep -Wall happy */
 }
 
+/** 
+ * Check a crosstab object for nested factors.
+ * 
+ * @param nf Number of grouping factors
+ * @param ctab Pointer to a crosstab object
+ * 
+ * @return 1 if the factors are nested, otherwise 0
+ */
+static int
+crosstab_isNested(int nf, SEXP ctab)
+{
+    int i, j;
+    for (i = 1; i < nf; i++) {
+	SEXP pslot = GET_SLOT(VECTOR_ELT(ctab, Lind(i, i - 1)), Matrix_pSym);
+	int nlev = length(pslot) - 1, *px = INTEGER(pslot);
+
+	for (j = 0; j < nlev; j++) if ((px[j+1] - px[j]) > 1) return 0;
+    }
+    return 1;
+}
+
 static void
-create_matrix_lists(const int nc[], SEXP facs, SEXP ZZx, SEXP L)
+create_matrix_lists(const int nc[], SEXP facs, SEXP ZZx, SEXP L, SEXP Linv)
 {
     int i, k, nf = length(facs);
-    SEXP Lmat, Tmat, ZZmat, ctab = PROTECT(lmeRep_crosstab(facs)),
+    SEXP Lmat, LiMat, Tmat, ZZmat, ctab = PROTECT(lmeRep_crosstab(facs)),
 	cscB = MAKE_CLASS("cscBlocked");
+    int nested = crosstab_isNested(nf, ctab);
     
-    for (i = 0; i < nf; i++) {	/* create the lists */
+    if (!nested) error("code for non-nested grouping factors not yet written");
+    for (i = 0; i < nf; i++) {
 	for (k = 0; k <= i; k++) {
 	    int ind = Lind(i, k);
 
@@ -173,20 +196,26 @@ create_matrix_lists(const int nc[], SEXP facs, SEXP ZZx, SEXP L)
 	    SET_SLOT(ZZmat, Matrix_pSym, duplicate(GET_SLOT(Tmat, Matrix_pSym)));
 	    SET_SLOT(ZZmat, Matrix_iSym, duplicate(GET_SLOT(Tmat, Matrix_iSym)));
 	    SET_SLOT(ZZmat, Matrix_xSym,
-		     lmeRep_alloc3Darray(REALSXP, nc[i], nc[k],
+		     alloc3Darray(REALSXP, nc[i], nc[k],
 					 length(GET_SLOT(ZZmat, Matrix_iSym))));
 	    SET_SLOT(Lmat, Matrix_pSym, duplicate(GET_SLOT(Tmat, Matrix_pSym)));
 	    if (k < i) {
 		SET_SLOT(Lmat, Matrix_iSym, duplicate(GET_SLOT(Tmat, Matrix_iSym)));
 		SET_SLOT(Lmat, Matrix_xSym, duplicate(GET_SLOT(ZZmat, Matrix_xSym)));
 	    } else {		/* diagonal block */
-		int *px = INTEGER(GET_SLOT(Lmat, Matrix_pSym)), j,
-		    nlev = length(GET_SLOT(Tmat, Matrix_iSym));
+		SEXP pslot = GET_SLOT(Lmat, Matrix_pSym);
+		int plen = length(pslot), j;
 
-		for (j = 0; j <= nlev; j++) px[j] = 0;
+		SET_VECTOR_ELT(Linv, i, NEW_OBJECT(cscB));
+		LiMat = VECTOR_ELT(Linv, i);
+		for (j = 0; j < plen; j++) INTEGER(pslot)[j] = 0;
+		SET_SLOT(LiMat, Matrix_pSym, duplicate(pslot));
 		SET_SLOT(Lmat, Matrix_iSym, allocVector(INTSXP, 0));
+		SET_SLOT(LiMat, Matrix_iSym, allocVector(INTSXP, 0));
 		SET_SLOT(Lmat, Matrix_xSym,
-			 lmeRep_alloc3Darray(REALSXP, nc[i], nc[i], 0));
+			 alloc3Darray(REALSXP, nc[i], nc[i], 0));
+		SET_SLOT(LiMat, Matrix_xSym,
+			 alloc3Darray(REALSXP, nc[i], nc[i], 0));
 	    }
 	}
     }
@@ -227,7 +256,8 @@ lmeRep_create(SEXP facs, SEXP ncv)
     SET_SLOT(val, Matrix_LinvSym, allocVector(VECSXP, nf));
     SET_SLOT(val, Matrix_ZZxSym, allocVector(VECSXP, nblck));
     create_matrix_lists(nc, facs, GET_SLOT(val, Matrix_ZZxSym),
-			GET_SLOT(val, Matrix_LSym));
+			GET_SLOT(val, Matrix_LSym),
+			GET_SLOT(val, Matrix_LinvSym));
     /* install number of observations - checked for consistency in last call */
     nc[nf + 1] = length(VECTOR_ELT(facs, 0)); 
 				/* allocate slots that are lists */
@@ -261,7 +291,7 @@ lmeRep_create(SEXP facs, SEXP ncv)
 	SET_VECTOR_ELT(GET_SLOT(val, Matrix_OmegaSym), i,
 		   allocMatrix(REALSXP, nci, nci));
 	SET_VECTOR_ELT(GET_SLOT(val, Matrix_DSym), i,
-		       lmeRep_alloc3Darray(REALSXP, nci, nci, nlev));
+		       alloc3Darray(REALSXP, nci, nci, nlev));
     }
 				/* Create dense slots */
     SET_SLOT(val, Matrix_XtXSym, allocMatrix(REALSXP, nc[nf], nc[nf]));
@@ -308,29 +338,28 @@ lmeRep_create(SEXP facs, SEXP ncv)
 SEXP lmeRep_update_mm(SEXP x, SEXP facs, SEXP mmats)
 {
     SEXP
-	LP = GET_SLOT(x, Matrix_LSym),
 	ZZxP = GET_SLOT(x, Matrix_ZZxSym),
 	ZtXP = GET_SLOT(x, Matrix_ZtXSym),
 	levs = GET_SLOT(x, R_LevelsSymbol),
 	cnames = GET_SLOT(x, Matrix_cnamesSym);
     int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	*status = LOGICAL(GET_SLOT(x, Matrix_statusSym)),
-	I = length(levs), Ip1 = I + 1, Tpos, ZZxpos,
+	nf = length(levs), nfp1 = nf + 1,
 	i, ione = 1,
-	nobs = nc[Ip1],
+	nobs = nc[nfp1],
 	ncZ = 0,
-	pp1 = nc[I];
+	pp1 = nc[nf];
     double
 	*X,
 	*XtX = REAL(GET_SLOT(x, Matrix_XtXSym)),
 	*ZtX = REAL(ZtXP),
 	one = 1.0, zero = 0.0;
 
-    if (!isNewList(facs) || length(facs) != I)
-	error("facs must be a list of %d factors", I);
-    if (!isNewList(mmats) || length(mmats) != Ip1)
-	error("mmats must be a list of %d model matrices", Ip1);
-    for (i = 0; i <= I; i++) {
+    if (!isNewList(facs) || length(facs) != nf)
+	error("facs must be a list of %d factors", nf);
+    if (!isNewList(mmats) || length(mmats) != nfp1)
+	error("mmats must be a list of %d model matrices", nfp1);
+    for (i = 0; i <= nf; i++) {
 	SEXP mmat = VECTOR_ELT(mmats, i);
 	int *dims = INTEGER(getAttrib(mmat, R_DimSymbol));
 	
@@ -346,7 +375,7 @@ SEXP lmeRep_update_mm(SEXP x, SEXP facs, SEXP mmats)
 		       duplicate(VECTOR_ELT(getAttrib(mmat, R_DimNamesSymbol),
 					    1)));
     }
-    for (i = 0; i < I; i++) {
+    for (i = 0; i < nf; i++) {
 	SEXP fac = VECTOR_ELT(facs, i);
 
 	if (!isFactor(fac))
@@ -358,12 +387,11 @@ SEXP lmeRep_update_mm(SEXP x, SEXP facs, SEXP mmats)
 	error("# rows of ZtX slot, %d, != sum of # levels * # columns, %d",
 	      INTEGER(getAttrib(ZtXP, R_DimSymbol))[0], ncZ);
 				/* Create XtX */
-    X = REAL(VECTOR_ELT(mmats, I));
-    F77_CALL(dsyrk)("U", "T", &pp1, &nobs, &one, X, &nobs, &zero, XtX, nc + I);
+    X = REAL(VECTOR_ELT(mmats, nf));
+    F77_CALL(dsyrk)("U", "T", &pp1, &nobs, &one, X, &nobs, &zero, XtX, nc + nf);
 				/* Zero an accumulator */
     memset((void *) ZtX, 0, sizeof(double) * pp1 * ncZ);
-    ZZxpos = Tpos = 0;
-    for (i = 0; i < I; i++) {
+    for (i = 0; i < nf; i++) {
 	int *fac = INTEGER(VECTOR_ELT(facs, i)),
 	    j, k, nci = nc[i], ncisqr = nci * nci,
 	    nlev = length(VECTOR_ELT(levs, i));
@@ -388,7 +416,7 @@ SEXP lmeRep_update_mm(SEXP x, SEXP facs, SEXP mmats)
 				* (nci * nck), &nci);
 	    }
 	}
-	ZZx = REAL(VECTOR_ELT(ZZxP, ZZxpos++));
+	ZZx = REAL(GET_SLOT(VECTOR_ELT(ZZxP, Lind(i, i)), Matrix_xSym));
 	memset((void *) ZZx, 0, sizeof(double) * nci * nci * nlev);
 	if (nci == 1) {		/* single column in Z */
 	    for (j = 0; j < nobs; j++) {
@@ -428,20 +456,19 @@ SEXP lmeRep_initial(SEXP x)
 	i, nf = length(GET_SLOT(x, R_LevelsSymbol));
 
     for (i = 0; i < nf; i++) {
-	SEXP ZZxP = VECTOR_ELT(GET_SLOT(x, Matrix_ZZxSym),
-			       ((i + 1)*(i + 2))/2 - 1);
+	SEXP ZZxP = GET_SLOT(VECTOR_ELT(GET_SLOT(x, Matrix_ZZxSym), Lind(i, i)),
+			     Matrix_xSym);
 	int *dims = INTEGER(getAttrib(ZZxP, R_DimSymbol)),
 	    j, k, nzc = dims[0], nlev = dims[2],
 	    nzcsqr = nzc * nzc, nzcp1 = nzc + 1;
 	double
 	    *Omega = REAL(VECTOR_ELT(GET_SLOT(x, Matrix_OmegaSym), i)),
-	    *ZZx = REAL(ZZxP),
-	mi = 0.375 / ((double) nlev);
+	    mi = 0.375 / ((double) nlev);
     
 	memset((void *) Omega, 0, sizeof(double) * nzc * nzc);
 	for (j = 0; j < nlev; j ++) {
 	    for (k = 0; k < nzc; k++) {
-		Omega[k * nzcp1] += ZZx[k * nzcp1 + j * nzcsqr] * mi;
+		Omega[k * nzcp1] += REAL(ZZxP)[k * nzcp1 + j * nzcsqr] * mi;
 	    }
 	}
     }
@@ -468,7 +495,7 @@ lmeRep_inflate(int nf, const int nc[], SEXP ZZxP, SEXP OmegaP, SEXP levelsP,
 	int j, nci = nc[i], ncisqr = nci * nci,
 	    nlev = length(VECTOR_ELT(levelsP, i));
 	double
-	    *ZZx = REAL(VECTOR_ELT(ZZxP, ((i + 1)*(i+2))/2 - 1)),
+	    *ZZx = REAL(GET_SLOT(VECTOR_ELT(ZZxP, Lind(i, i)), Matrix_xSym)),
 	    *D = REAL(VECTOR_ELT(DP, i)),
 	    *Omega = REAL(VECTOR_ELT(OmegaP, i));
 
@@ -514,12 +541,12 @@ update_D_L(int i, const int nc[], SEXP ZZxP, SEXP LP, SEXP DP)
     int j, jj, k, nci = nc[i], offdiag = 0;
     double minus1 = -1., one = 1.;
     for (k = 0; k < i; k++) {
-	int ind = (i * (i + 1))/2 + k, nck = nc[k];
+	int ind = Lind(i, k), nck = nc[k];
 	int *colptr = INTEGER(GET_SLOT(VECTOR_ELT(LP, ind), Matrix_pSym)),
 	    *rowind = INTEGER(GET_SLOT(VECTOR_ELT(LP, ind), Matrix_iSym));
 	double *Di = REAL(VECTOR_ELT(DP, i)),
 	    *Dk = REAL(VECTOR_ELT(DP, k)),
-	    *ZZx = REAL(VECTOR_ELT(ZZxP, ind));
+	    *ZZx = REAL(GET_SLOT(VECTOR_ELT(ZZxP, ind), Matrix_xSym));
 	
 	
 	for (j = 0; j < nck; j++) {
@@ -534,6 +561,7 @@ update_D_L(int i, const int nc[], SEXP ZZxP, SEXP LP, SEXP DP)
 				&minus1, ZZx + jj * nci * nck, &nci,
 				&one, Di + ii * nci * nci, &nci);
 				/* Should there be another dtrsm call here? */
+/* FIXME: Incomplete */
 	    }
 	}
 	if (offdiag)
@@ -577,7 +605,7 @@ SEXP lmeRep_factor(SEXP x)
 	lmeRep_inflate(nf, nc, ZZxP, GET_SLOT(x, Matrix_OmegaSym),
 		       levs, DP, dcmp);
 	for (i = 0; i < nf; i++) {
-	    int ii, jj, nci = nc[i], ncisqr = nci * nci,
+	    int jj, nci = nc[i], ncisqr = nci * nci,
 		nlev = length(VECTOR_ELT(levs, i)),
 		RZXrows = nlev * nci;
 	    double
@@ -1284,7 +1312,7 @@ SEXP lmeRep_secondDer(SEXP x, SEXP Valp)
     for (i = 0; i < nf; i++) Q += nc[i] * nc[i];
     Qsqr = Q * Q;
     bbface = Calloc(Q, double);
-    val = PROTECT(lmeRep_alloc3Darray(REALSXP, Q, Q, 5));
+    val = PROTECT(alloc3Darray(REALSXP, Q, Q, 5));
     memset(REAL(val), 0, sizeof(double) * Qsqr * 5);
     
     pos = 0;
