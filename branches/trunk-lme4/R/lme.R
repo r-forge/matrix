@@ -142,20 +142,20 @@ setMethod("lme", signature(formula = "formula", random = "list"),
               tmp[[3]][[3]] <- formula(pdm)[[2]]
               form <- tmp
           }
-          environment(form) <- environment(formula)
-          mCall$formula <- form
-          mCall$drop.unused.levels <- TRUE
-          data <- eval(mCall, parent.frame())
-          facs <- lapply(names(random),
+          environment(form) = environment(formula)
+          mCall$formula = form
+          mCall$drop.unused.levels = TRUE
+          data = eval(mCall, parent.frame())
+          facs = lapply(names(random),
                          function(x) eval(as.name(x), envir = data))
+          names(facs) = names(random)
           mmats <- c(lapply(random,
                             function(x) model.matrix(formula(x), data = data)),
                      list(.Xy = cbind(model.matrix(formula, data = data),
                           .response = model.response(data))))
-          obj <- .Call("ssclme_create", facs, unlist(lapply(mmats, ncol)),
+          obj = .Call("ssclme_create", facs, unlist(lapply(mmats, ncol)),
                        as.integer(2e5), PACKAGE = "Matrix")
           facs = facshuffle(obj, facs)
-          names(facs) <- names(random)
           obj = obj[[1]]
           .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
           .Call("ssclme_initial", obj, PACKAGE="Matrix")
@@ -172,10 +172,7 @@ setMethod("lme", signature(formula = "formula", random = "list"),
 setMethod("fitted", signature=c(object="lme"),
           function(object, ...)
       {
-          if (object@x) {
-              .Call("ssclme_fitted", object, object@facs, object@x,
-                    PACKAGE = "Matrix")
-          }
+          object@fitted
       })
 
 setMethod("residuals", signature=c(object="lme"),
@@ -186,7 +183,7 @@ setMethod("logLik", signature(object="lme"),
           -deviance(object@rep, REML = REML)/2)
 
 setMethod("deviance", signature(object="lme"),
-          function(object, REML = FALSE, ...)
+          function(object, REML, ...)
           deviance(object@rep,
                    REML = ifelse(missing(REML), object@REML, REML))
           )
@@ -240,24 +237,22 @@ setMethod("deviance", signature(object="lme"),
 setMethod("show", "lme",
           function(object)
       {
-          sumry = summary(object)
+          #sumry = summary(object)
           rdig <- 5
           cat("Linear mixed-effects model\n")
-          cat(" Data:", deparse( sumry@call$data ), "\n")
-          if (!is.null(sumry@call$subset)) {
-              cat("  Subset:",
-                  deparse(asOneSidedFormula(sumry@call$subset)[[2]]),"\n")
+          cat(" Data:", deparse( object@call$data ), "\n")
+          if (!is.null(object@call$subset)) {
+              cat(" Subset:",
+                  deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
           }
-          cat(paste(" log-", ifelse(sumry@re@REML, "restricted-", ""),
-                    "likelihood: ", sep = ''), sumry@logLik, "\n")
-          sumry@re@useScale = TRUE
-          sumry@re@showCorrelation = FALSE
-          saveopt = options(show.signif.stars=FALSE)
-          on.exit(saveopt)
-          show(sumry@re)
-          options(saveopt)
-          on.exit()
-          cat("\nNumber of Observations:", sumry@re@nobs, "\n")
+          cat(paste(" log-", ifelse(object@REML, "restricted-", ""),
+                    "likelihood: ", sep = ''), logLik(object), "\n")
+          show(fixef(object))
+          show(c(object@rep@Omega,
+                 sigmaSq = .Call("ssclme_sigma",
+                                 object@rep, PACKAGE="Matrix")^2))
+          nc = object@rep@nc
+          cat("\nNumber of Observations:", nc[length(nc)], "\n")
           invisible(object)
       })
 
@@ -318,38 +313,10 @@ setMethod("update", signature(object = "lme"),
           else call
       })
 
-setMethod("getResponse", signature(object="lme"),
-          function(object, form)
-      {
-          object <- object@reStruct
-          callGeneric()
-      })
-
-setMethod("deviance", signature(object = "ssclme"),
-          function(object, REML = FALSE, ...) {
-              .Call("ssclme_factor", object, PACKAGE = "Matrix")
-              object@deviance[ifelse(REML, 2, 1)]
-          })
-
-setMethod("coef", signature(object = "ssclme"),
+setMethod("vcov", signature(object = "lme"),
           function(object, ...) {
-              .Call("ssclme_coef", object, PACKAGE = "Matrix")
+              object = object@rep
+              callGeneric()
           })
 
-setMethod("ranef", signature(object = "ssclme"),
-          function(object, ...) {
-              val = .Call("ssclme_ranef", object, PACKAGE = "Matrix")
-              bv = object@bVar
-              names(val) = names(bv)
-              for (i in seq(along = val)) {
-                  dimnames(val[[i]]) = dimnames(bv[[i]])[-1]
-              }
-              lapply(val, t)
-          })
-
-setMethod("fixef", signature(object = "ssclme"),
-          function(object, ...) {
-              val = .Call("ssclme_fixef", object, PACKAGE = "Matrix")
-              names(val) = dimnames(object@XtX)[[2]][seq(along = val)]
-              val
-          })
+          
