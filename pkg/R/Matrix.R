@@ -1,18 +1,26 @@
 #### Toplevel ``virtual'' class "Matrix"
 
 ## probably not needed eventually:
-setAs(from = "Matrix", to = "matrix",
+setAs(from = "ddenseMatrix", to = "matrix",
       function(from) {
           if(length(d <- dim(from)) != 2) stop("dim(.) has not length 2")
-          array(as.numeric(NA), dim = d, dimnames = dimnames(from))
+          array(from@x, dim = d, dimnames = dimnames(from))
       })
 
-prMatrix <-
-    ## private function to be used as show() method possibly more than once
-    function(object) {
-        d <- dim(object)
-        cat(paste(d, collapse= " x "), " Matrix of class ",
-            sQuote(class(object)),"\n", sep='')
+## private function to be used as show() method possibly more than once
+prMatrix <- function(object) {
+    d <- dim(object)
+    cl <- class(object)
+    cat(paste(d, collapse= " x "), " Matrix of class ", sQuote(cl),
+        "\n", sep='')
+    if(cl == "Matrix") { ## have no data slot
+        cat("Dim = ", d)
+        if(any(sapply(object@Dimnames,length) > 0)) {
+            cat("; Dimnames = ")
+            str(object@Dimnames)
+        }
+        cat("\n")
+    } else { # not "Matrix", hence have data 'x' slot
         m <- as(object, "matrix")
         maxp <- getOption("max.print")
         if(prod(d) <= maxp) print(m)
@@ -24,8 +32,9 @@ prMatrix <-
             print(tail(m, max(1, nr - n2)))
         }
         ## DEBUG: cat("str(.):\n") ; str(object)
-        invisible()
     }
+    invisible()
+}
 
 setMethod("show", signature(object = "ddenseMatrix"), prMatrix)
 ## this may go away {since sparse matrices need something better!} :
