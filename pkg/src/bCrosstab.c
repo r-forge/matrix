@@ -447,10 +447,9 @@ factor_levels_permute(SEXP dest, SEXP src, const int perm[],
 void
 lmer_populate(SEXP val)
 {
-    SEXP D, L, Parent, cscB = MAKE_CLASS("cscBlocked"), ZZpO,
-	flist = GET_SLOT(val, Matrix_flistSym), perm, Omega,
-	ZtZ = GET_SLOT(val, Matrix_ZtZSym);
-    int j, nf = length(flist);
+    SEXP D, L, Parent, ZZpO, flist = GET_SLOT(val, Matrix_flistSym),
+	perm, Omega, ZtZ = GET_SLOT(val, Matrix_ZtZSym);
+    int j, k, nf = length(flist);
     int *nc = INTEGER(GET_SLOT(val, Matrix_ncSym)), *Gp,
 	*nlev = Calloc(nf, int), npairs = (nf * (nf + 1))/2;
     char *statnms[] = {"factored", "inverted", ""},
@@ -461,10 +460,10 @@ lmer_populate(SEXP val)
     SET_SLOT(val, Matrix_statusSym, make_named(LGLSXP, statnms ));
     SET_SLOT(val, Matrix_devianceSym, make_named(REALSXP, devnms));
     SET_SLOT(val, Matrix_devCompSym, allocVector(REALSXP, 4));
-    /* Copy ZtZ to ZZpO */
-    SET_SLOT(val, Matrix_ZZpOSym, duplicate(ZtZ));
-    ZZpO = GET_SLOT(val, Matrix_ZZpOSym);
     /* Allocate slots that are lists of length nf */
+    SET_SLOT(val, Matrix_ZZpOSym, allocVector(VECSXP, nf));
+    ZZpO = GET_SLOT(val, Matrix_ZZpOSym);
+    setAttrib(ZZpO, R_NamesSymbol, duplicate(getAttrib(flist, R_NamesSymbol)));
     SET_SLOT(val, Matrix_DSym, allocVector(VECSXP, nf));
     D = GET_SLOT(val, Matrix_DSym);
     setAttrib(D, R_NamesSymbol, duplicate(getAttrib(flist, R_NamesSymbol)));
@@ -489,6 +488,9 @@ lmer_populate(SEXP val)
 	Gp[j + 1] = Gp[j] + nc[j] * nlev[j];
 	SET_VECTOR_ELT(D, j, alloc3Darray(REALSXP, nc[j], nc[j], nlev[j]));
 	SET_VECTOR_ELT(Omega, j, allocMatrix(REALSXP, nc[j], nc[j]));
+	SET_VECTOR_ELT(ZZpO, j, duplicate(VECTOR_ELT(ZtZ, Lind(j, j))));
+	for (k = j; k < nf; k++)
+	    SET_VECTOR_ELT(L, Lind(k, j), duplicate(VECTOR_ELT(ZtZ, Lind(k, j))));
     }
     SET_SLOT(val, Matrix_XtXSym, allocMatrix(REALSXP, nc[nf], nc[nf]));
     AZERO(REAL(GET_SLOT(val, Matrix_XtXSym)), nc[nf] * nc[nf]);
@@ -497,11 +499,13 @@ lmer_populate(SEXP val)
     SET_SLOT(val, Matrix_ZtXSym, allocMatrix(REALSXP, Gp[nf], nc[nf]));
     SET_SLOT(val, Matrix_RZXSym, allocMatrix(REALSXP, Gp[nf], nc[nf]));
     for (j = 0; j < nf; j++) {
-	int dind = Lind(j, j), i, k;
-	SEXP ctd = VECTOR_ELT(ZZpO, dind); /* diagonal in crosstab */
-	SEXP Ljj, cpp = GET_SLOT(ctd, Matrix_pSym),
+	int dind = Lind(j, j), i;
+	SEXP ctd = VECTOR_ELT(ZZpO, j); /* diagonal in crosstab */
+	SEXP Ljj = VECTOR_ELT(L, dind),
+	    cpp = GET_SLOT(ctd, Matrix_pSym),
 	    cip = GET_SLOT(ctd, Matrix_iSym), parent;
-	int *Lp, *Perm, *cp = INTEGER(cpp),
+	int *Lp = INTEGER(GET_SLOT(Ljj, Matrix_pSym)), *Perm,
+	    *cp = INTEGER(cpp),
 	    *ci = INTEGER(cip), *dims,
 	    ncj = length(cpp) - 1,
 	    nnz = length(cip);
@@ -512,10 +516,6 @@ lmer_populate(SEXP val)
 	SET_VECTOR_ELT(parent, 1, allocVector(INTSXP, ncj));
 	SET_VECTOR_ELT(perm, j, allocVector(INTSXP, ncj));
 	Perm = INTEGER(VECTOR_ELT(perm, j));
-	SET_VECTOR_ELT(L, dind, NEW_OBJECT(cscB));
-	Ljj = VECTOR_ELT(L, dind);
-	SET_SLOT(Ljj, Matrix_pSym, allocVector(INTSXP, ncj + 1));
-	Lp = INTEGER(GET_SLOT(Ljj, Matrix_pSym));
 	dims = INTEGER(getAttrib(GET_SLOT(ctd, Matrix_xSym), R_DimSymbol));
 	if (nnz > ncj) {	/* calculate fill-reducing permutation */
 	    SEXP fac = VECTOR_ELT(flist, j);
@@ -549,16 +549,12 @@ lmer_populate(SEXP val)
 	    SET_SLOT(Ljj, Matrix_iSym, allocVector(INTSXP, 0));
 	    SET_SLOT(Ljj, Matrix_xSym, alloc3Darray(REALSXP, dims[0], dims[1], 0));
 	}
-	/* FIXME: Remove the references to Linv and use L instead of ZZpO */
 	for (k = j+1; k < nf; k++) { /* Update other blocks in this column */
 	    symbolic_right_unit_mm_trans(ncj, INTEGER(VECTOR_ELT(parent, 0)),
-					 VECTOR_ELT(ZZpO, Lind(k,j)));
+					 VECTOR_ELT(L, Lind(k,j)));
 	}
 	for (k = j+1; k < nf; k++) { /* Update remaining columns */
-	    for (i = k; i < nf; i++) block_update(ZZpO, j, k, i);
-	}
-	for (i= 0; i < j; i++) { /* copy blocks to the left */
-	    SET_VECTOR_ELT(L, Lind(j,i), duplicate(VECTOR_ELT(ZZpO, Lind(j,i))));
+	    for (i = k; i < nf; i++) block_update(L, j, k, i);
 	}
     }
     /* Convert blockwise Parent arrays to extended Parent arrays */
