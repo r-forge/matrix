@@ -108,10 +108,10 @@ setMethod("vcov", signature(object = "ssclme"),
 
 setMethod("VarCorr", signature(x = "ssclme"),
           function(x) {
-              val = .Call("ssclme_variances", x, PACKAGE = "Matrix")
-              omg = x@Omega
-              names(val) = c(names(omg), "Residual")
-              for (i in seq(along = omg))
-                  dimnames(val[[i]]) = dimnames(omg[[i]])
-              val
+              val = .Call("ssclme_variances", x, TRUE, PACKAGE = "Matrix")
+              bVar = x@bVar
+              for (i in seq(along = val[1]))
+                  dimnames(val[1][[i]]) = dimnames(bVar[[i]][1:2])
+              new("VarCorr", scale = val[[2]], reSumry = val[1],
+                   useScale = TRUE)
           })
