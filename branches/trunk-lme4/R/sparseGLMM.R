@@ -100,14 +100,14 @@ setMethod("sparseGLMM",
               x = FALSE
           random = lapply(as(random, "list"),
                    get("formula", pos = parent.frame(), mode = "function"))
-                   #lapply(random, function(x)
-                          #if(inherits(x, "formula")) pdLogChol(x) else x)
-
-
           controlvals <- if (missing(control)) lmeControl() else
                             do.call("lmeControl", control)
-          mCall <- match.call(expand.dots = FALSE)
           controlvals$REML <- FALSE
+          mCall <- match.call(expand.dots = FALSE)
+
+
+
+
 
           mCall[[1]] <- as.name("model.frame")
           names(mCall)[2] <- "formula"
@@ -132,9 +132,26 @@ setMethod("sparseGLMM",
           mCall$drop.unused.levels <- TRUE
 
           data <- eval(mCall, parent.frame())
+
+
+
+
+
+
+
+
+
           facs <- lapply(names(random),
                          function(x) eval(as.name(x), envir = data))
           names(facs) <- names(random)
+          facs =                        # order in decreasing number of levels
+              facs[rev(order(unlist(lapply(facs,
+                                           function(fac)
+                                           length(levels(fac))))))]
+
+
+
+
 
           ## creates model matrices
           mmats.unadjusted <-
@@ -154,7 +171,7 @@ setMethod("sparseGLMM",
 
           ## FIXME: names of facs lost, but may be useful later
           facs = facshuffle(obj, facs)
-          names(facs) = names(random)
+          print(names(facs)) ## = names(random)
 
           obj = obj[[1]]
 
