@@ -32,7 +32,7 @@ setClass("iMatrix",
 setClass("lMatrix",
          representation(x = "logical"), contains = "Matrix")
 
-# Virtual class of complex matricesn
+# Virtual class of complex matrices
 setClass("zMatrix", # letter 'z' is as in the names of Lapack subroutines
          representation(x = "complex"), contains = "Matrix")
 
