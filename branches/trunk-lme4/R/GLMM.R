@@ -279,7 +279,7 @@ setMethod("GLMM",
 #                      cat(pars)
 #                      cat("\n")
 #                      print(reducedObj@Omega) 
-                      coef(reducedObj) <- pars[responseIndex:length(pars)]
+                      coef(reducedObj, unconst = TRUE) <- pars[responseIndex:length(pars)]
 #                      print(reducedObj@Omega)
 #                      print("-----------------------")
                       off <- drop(mmats.unadjusted$.Xy %*%
@@ -368,7 +368,7 @@ setMethod("GLMM",
                   ## FIXME: need to adjust for sigma^2 for appropriate models (easy)
                   ## these are all the b'Omega b, summed as they eventually need to be
                   ## think of this as sum(rowSums((ranefs[[i]] %*% Omega[[i]]) * ranefs[[i]]))
-                  ans <- ans - sum((ranefs[[i]] %*% Omega[[i]]) * ranefs[[i]]) +
+                  ans <- ans - 0.5 * sum((ranefs[[i]] %*% Omega[[i]]) * ranefs[[i]]) -
                       nrow(ranefs[[i]]) * determinant(Omega[[i]], logarithm = TRUE)$modulus
                   ## Jacobian adjustment
                   ## log.jacobian[i] <- sum(log(apply(bVar[[i]], 3, function(x) sum(diag(x)))))
@@ -385,7 +385,7 @@ setMethod("GLMM",
                   optimRes =
                       ## if (controlvals$analyticGradient)  ??
                       optim(fn = loglikLaplace,
-                            par = c(fixef(obj), coef(obj)),
+                            par = c(fixef(obj), coef(obj, unconst = TRUE)),
                             ## hessian = TRUE,
                             method = "BFGS",
                             control = list(trace = TRUE, #controlvals$msVerbose,
@@ -399,21 +399,21 @@ setMethod("GLMM",
                   ##fixef(obj) <- optimRes$par[seq(length = responseIndex - 1)]
                   print(fixef(obj))
                   print(optimRes$par[seq(length = responseIndex - 1)])
-                  print(coef(obj))
-                  coef(obj) <- optimRes$par[responseIndex:length(optimRes$par)]
-                  print(coef(obj))
+                  print(coef(obj, unconst = TRUE))
+                  coef(obj, unconst = TRUE) <- optimRes$par[responseIndex:length(optimRes$par)]
+                  print(coef(obj, unconst = TRUE))
                   ## need to calculate likelihood
               }
               else if (controlvals$optimizer == "nlm") {
                   ## typsize <- 1/controlvals$msScale(coef(obj))
-                  typsize <- rep(1.0, length(coef(obj)) + responseIndex - 1)
+                  typsize <- rep(1.0, length(coef(obj, unconst = TRUE)) + responseIndex - 1)
                   if (is.null(controlvals$nlmStepMax))
                       controlvals$nlmStepMax <-
                           max(100 * sqrt(sum((c(fixef(obj),
-                                                coef(obj))/typsize)^2)), 100)
+                                                coef(obj, unconst = TRUE))/typsize)^2)), 100)
                   nlmRes =
                       nlm(f = loglikLaplace, ## if (controlvals$analyticGradient)  ??
-                          p = c(fixef(obj), coef(obj)),
+                          p = c(fixef(obj), coef(obj, unconst = TRUE)),
                           ## hessian = TRUE,
                           print.level = 2, #if (controlvals$msVerbose) 2 else 0,
                           steptol = controlvals$msTol,
@@ -425,9 +425,9 @@ setMethod("GLMM",
                   ##fixef(obj) <- nlmRes$estimate[seq(length = responseIndex - 1)]
                   print(fixef(obj))
                   print(nlmRes$estimate[seq(length = responseIndex - 1)])
-                  print(coef(obj))
-                  coef(obj) <- nlmRes$estimate[responseIndex:length(nlmRes$estimate)]
-                  print(coef(obj))
+                  print(coef(obj, unconst = TRUE))
+                  coef(obj, unconst = TRUE) <- nlmRes$estimate[responseIndex:length(nlmRes$estimate)]
+                  print(coef(obj, unconst = TRUE))
                   ## need to calculate likelihood
               }
 
