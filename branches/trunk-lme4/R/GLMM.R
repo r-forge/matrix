@@ -43,24 +43,92 @@ setMethod("GLMM", signature(formula = "formula",
                 mCall, PACKAGE = "lme4")
       })
 
+
+
+
+
+make.glm.call <- 
+    function (mf, frm) 
+{
+    m <- match(c("formula", "family", "data", "weights", "subset", "na.action", 
+        "offset"), names(mf), 0)
+    mf <- mf[c(1, m)]
+    mf[[1]] <- as.name("glm")
+    ## environment(frm) = environment(formula) ???
+    mf$formula = frm
+    mf$model = FALSE
+    mf$x = FALSE
+    mf$y = TRUE
+    mf
+}
+
+
+
+
+
+
+
+
+
+
 setMethod("GLMM",
           signature(formula = "formula",
                     random = "list"),
           function(formula, family, data, random,
                    method = match.arg(c("PQL", "Laplace")),
                    control = list(),
-                   subset, weights, na.action, offset,
+                   subset,
+                   weights,
+                   na.action,
+                   offset,
                    model = TRUE, x = FALSE, ...)
       {
-          if (is.character(family)) family = get(family)
-          if (is.function(family)) family = family()
           random <-
               lapply(random,
                      get("formula", pos = parent.frame(), mode = "function"))
           controlvals <- do.call("lmeControl", control)
           controlvals$REML <- FALSE
+
+
+          ## problems with ..1, ..2
+          ## print(match.call(expand.dots = FALSE))
+
+
+
+
+          ## BEGIN glm fit without random effects
+
+          ## several arguments are handled at this point.
+          ## what about
+
+          ##   subset, na.action (arguments to model.frame) 
+
+          ## Are these  already handled ?
+          ## The rest could be part of ..., why have them explicitly ?
+          ## Do we want possibility of supplying control in glm() ?
+
+          glm.fit <- eval(make.glm.call(match.call(expand.dots = TRUE),
+                                        formula), parent.frame())
+          family <- glm.fit$family
+          offset <- if (is.null(glm.fit$offset)) 0 else glm.fit$offset
+          weights <- sqrt(abs(glm.fit$prior.weights))
+          ## initial 'fitted' values on linear scale
+          eta <- glm.fit$linear.predictors
+          etaold <- eta
+
+          ## END using glm fit results
+          ## Note: offset is on the linear scale
+
+          ## Not clear how offset works
+
+
+
+
+
+
           data <- eval(make.mf.call(match.call(expand.dots = FALSE),
                                     formula, random), parent.frame())
+
           facs <- lapply(names(random),
                          function(x) eval(as.name(x), envir = data))
           names(facs) <- names(random)
@@ -74,35 +142,32 @@ setMethod("GLMM",
                        function(x) model.matrix(formula(x), data = data)),
                 list(.Xy =
                      cbind(model.matrix(formula, data = data),
-                           .response = model.response(data))))
+                           .response = glm.fit$y))) #  WAS: model.response(data)
           responseIndex <- ncol(mmats.unadjusted$.Xy)
-          ## creates ssclme structure
-          obj <- .Call("ssclme_create", facs,
-                       unlist(lapply(mmats.unadjusted, ncol)),
-                       as.integer(2e5), PACKAGE = "Matrix")
+          obj <-  ## creates ssclme structure
+              .Call("ssclme_create", facs,
+                    unlist(lapply(mmats.unadjusted, ncol)),
+                    as.integer(controlvals$maxLIsize),
+                    PACKAGE = "Matrix")
           facs = facshuffle(obj, facs)
           obj = obj[[1]]
-          ## get initial estimates from glm
-          coefFixef <- c(coef(glm(formula, family, data)), 0)
-
           mmats <- mmats.unadjusted
-          mmats[[1]][1,1] <- 1 # to force a copy
+          ## the next line is to force a copy of mmats, because we are
+          ## going to use both mmats and mmats.unadjusted as arguments
+          ## in a .Call where one of them will be modified (don't want
+          ## the other to be modified as well)
+          mmats[[1]][1,1] <- 1 
           conv <- FALSE
           firstIter <- TRUE
 
-          ## initial 'fitted' values on linear scale
-          eta <- drop(mmats.unadjusted$.Xy %*% coefFixef)
-          etaold <- eta
-
           for (iter in seq(length = controlvals$glmmMaxIter))
           {
-              cat(paste("Iteration", iter, "\n"))
               mu <- family$linkinv(eta)
               dmu.deta <- family$mu.eta(eta)
               ## adjusted response
-              z <- eta + (mmats.unadjusted$.Xy[, responseIndex] - mu) / dmu.deta
-              ## weights
-              w <- dmu.deta / sqrt(family$variance(mu))
+              z <- eta + (mmats.unadjusted$.Xy[, responseIndex] - mu) / dmu.deta - offset
+              ## weights (note: weights is already square-rooted)
+              w <- weights * dmu.deta / sqrt(family$variance(mu))
               .Call("nlme_weight_matrix_list",
                     mmats.unadjusted, w, z, mmats, PACKAGE="lme4")
               .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
@@ -116,8 +181,9 @@ setMethod("GLMM",
               eta[] <-
                   .Call("ssclme_fitted", obj, facs,
                         mmats.unadjusted, PACKAGE = "Matrix")
-              cat(paste("\tTermination Criteria:", max(abs(eta - etaold)) /
-                        (0.1 + max(abs(eta))), "\n"))
+              cat(paste("Iteration", iter,"Termination Criterion:",
+                        format(max(abs(eta - etaold)) /
+                        (0.1 + max(abs(eta)))), "\n"))
               ## use this to determine convergence
               if (max(abs(eta - etaold)) <
                   (0.1 + max(abs(eta))) * controlvals$tolerance)
@@ -131,7 +197,7 @@ setMethod("GLMM",
               ## subsequent iterations.
               if (firstIter)
               {
-                  controlvals$niterEM <- 2 # FIXME, should be 2
+                  controlvals$niterEM <- 2
                   controlvals$msMaxIter <- 10
                   firstIter <- FALSE
               }
@@ -165,11 +231,13 @@ setMethod("GLMM",
           reducedMmats.unadjusted <- mmats.unadjusted
           reducedMmats.unadjusted$.Xy <-
               reducedMmats.unadjusted$.Xy[, responseIndex, drop = FALSE]
-
           reducedMmats <- mmats
           reducedMmats$.Xy <-
               reducedMmats$.Xy[, responseIndex, drop = FALSE]
           .Call("ssclme_update_mm", reducedObj, facs, reducedMmats, PACKAGE="Matrix")
+
+          ## make obj comparable
+          .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
 
 
 
@@ -188,41 +256,42 @@ setMethod("GLMM",
               {
                   if (is.null(pars))
                   {
-                      offset <- mmats.unadjusted$.Xy %*% c(fixef(obj), 0)
+                      off <- drop(mmats.unadjusted$.Xy %*% c(fixef(obj), 0))
                   }
                   else
                   {
                       coef(reducedObj) <- pars[responseIndex:length(pars)]
-                      offset <- mmats.unadjusted$.Xy %*%
-                          c(pars[1:(responseIndex-1)], 0)
+                      off <- drop(mmats.unadjusted$.Xy %*%
+                                  c(pars[1:(responseIndex-1)], 0))
                   }
 
                   niter <- 20
                   conv <- FALSE
 
-                  eta.check <-
-                      .Call("ssclme_fitted", reducedObj, facs,
-                            reducedMmats.unadjusted, PACKAGE = "Matrix") + offset
                   eta <-
-                      .Call("ssclme_fitted", obj, facs,
-                            mmats.unadjusted, PACKAGE = "Matrix")
-                  stopifnot(all.equal(eta, eta.check))
-                  etaold <- eta
+                      .Call("ssclme_fitted", reducedObj, facs,
+                            reducedMmats.unadjusted, PACKAGE = "Matrix") + off
+#                  eta.check <-
+#                      .Call("ssclme_fitted", obj, facs,
+#                            mmats.unadjusted, PACKAGE = "Matrix")
+#                  print(all.equal(eta, eta.check))
+#                  plot(eta, eta.check)
+#                  etaold <- eta
 
 
                   for (iter in seq(length = niter))
                   {
                       mu <- family$linkinv(eta)
                       dmu.deta <- family$mu.eta(eta)
-                      z <- eta + (mmats.unadjusted$.Xy[, responseIndex] - mu) / dmu.deta
-                      w <- dmu.deta / sqrt(family$variance(mu))
+                      z <- eta + (mmats.unadjusted$.Xy[, responseIndex] - mu) / dmu.deta - offset
+                      w <- weights * dmu.deta / sqrt(family$variance(mu))
                       .Call("nlme_weight_matrix_list",
                             reducedMmats.unadjusted, w, z, reducedMmats, PACKAGE="lme4")
                       .Call("ssclme_update_mm", reducedObj, facs, reducedMmats, PACKAGE="Matrix")
                       eta[] <-
                           .Call("ssclme_fitted", reducedObj, facs,
-                                reducedMmats.unadjusted, PACKAGE = "Matrix") + offset
-                      cat(paste("\tbhat Criteria:", max(abs(eta - etaold)) /
+                                reducedMmats.unadjusted, PACKAGE = "Matrix") + off
+                      cat(paste("bhat Criterion:", max(abs(eta - etaold)) /
                                 (0.1 + max(abs(eta))), "\n"))
                       ## use this to determine convergence
                       if (max(abs(eta - etaold)) <
@@ -244,9 +313,9 @@ setMethod("GLMM",
 
 
           ## Get updated ranef estimates
-#          bhat()
+          bhat()
 
-#          print(str(ranef(reducedObj)))
+          print(str(ranef(reducedObj)))
 
 
           new("lme", call = match.call(), facs = facs,
