@@ -3,6 +3,7 @@
 
 #include "Mutils.h"
 #include "R_ldl.h"
+#include "triplet_to_col.h"
 #include <R_ext/Lapack.h>
 
 SEXP cscBlocked_validate(SEXP x);
@@ -19,8 +20,12 @@ void cscb_syrk(char uplo, char trans,
 int cscb_ldl(SEXP A, const int Parent[], SEXP L, SEXP D);
 void cscb_trmm(char side, char uplo, char transa, char diag,
 	       double alpha, SEXP A, double B[], int m, int n, int ldb);
+void cscb_trsm(char uplo, char transa, char diag,
+	       double alpha, SEXP A, double B[], int m, int n, int ldb);
 void cscb_trcbm(char side, char uplo, char transa, char diag,
 		double alpha, SEXP A, SEXP B);
+void cscb_trcbsm(char side, char uplo, char transa, char diag,
+		 double alpha, SEXP A, const int Parent[], SEXP B);
 void cscb_cscbm(char transa, char transb, double alpha, SEXP A, SEXP B,
 	     double beta, SEXP C);
 void cscb_mm(char side, char transa, int m, int n, int k,
