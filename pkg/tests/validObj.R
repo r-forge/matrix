@@ -39,7 +39,7 @@ chk.matrix(m2 <- Matrix(1:7, ncol=3)) # a warning
 chk.matrix(cm <- crossprod(m1))
 chk.matrix(as(cm, "dsyMatrix"))
 chk.matrix(as(cm, "dgeMatrix"))
-try( chk.matrix(as(cm, "Matrix")) ) # gives an error
+try( chk.matrix(as(cm, "Matrix")) )# gives an error: "Matrix" has NULL 'dim()'
 
 ## Cholesky
 chk.matrix(ch <- chol(cm))
@@ -52,7 +52,7 @@ try( chk.matrix(ch3 <- chol(as(cm, "dgeMatrix"))) ) # nor that one
 assertError( new("dtrMatrix", Dim = c(2,2), x= 1:4) )# double 'Dim'
 if(FALSE)## FIXME: this creates an integer '@ x' !
 assertError( new("dtrMatrix", Dim = as.integer(c(2,2)), x= 1:4) )# int 'x'
-if(FALSE)## FIXME: this causes a segfault
+## This caused a segfault (before revision r1172 in ../src/dtrMatrix.c):
 assertError( new("dtrMatrix", Dim = 2:2, x=as.double(1:4)) )# length(Dim) !=2
 assertError( new("dtrMatrix", Dim = as.integer(c(2,2)), x= as.double(1:5)))
 
@@ -62,8 +62,7 @@ try( t(tr22) ) # fails -- FIXME
 ## non-square
 tru <- new("dtrMatrix", Dim = 2:3, x=as.double(1:6), uplo="L", diag="U")
 trn <- new("dtrMatrix", Dim = 2:3, x=as.double(1:6), uplo="L", diag="N")
-try( tru + trn ) # not yet
+tru + trn  # a 'dgeMatrix'
 
 try( t(tru) ) ## FIXME !
 try( t(trn) ) ## FIXME
-
