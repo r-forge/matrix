@@ -2,6 +2,7 @@ SOURCES_C =  \
 	    LU.c \
             Mutils.c \
 	    Metis_utils.c \
+	    R_ldl.c \
             bCrosstab.c \
 	    cscBlocked.c \
             cscMatrix.c \
@@ -9,7 +10,6 @@ SOURCES_C =  \
             factorizations.c \
             geMatrix.c \
 	    init.c \
-	    ldl.c \
 	    lmeRep.c \
             poMatrix.c \
             sscCrosstab.c \
