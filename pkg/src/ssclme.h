@@ -18,6 +18,8 @@ SEXP ssclme_ranef(SEXP x);
 SEXP ssclme_sigma(SEXP x, SEXP REML);
 SEXP ssclme_coef(SEXP x);
 SEXP ssclme_coefGets(SEXP x, SEXP coef);
-SEXP ssclme_EMstepsGets(SEXP x, SEXP nsteps, SEXP REMLp, SEXP verb);
+SEXP ssclme_EMsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP verb);
+SEXP ssclme_asSscMatrix(SEXP x);
+SEXP ssclme_asTscMatrix(SEXP x);
 
 #endif
