@@ -293,11 +293,11 @@ symbolic_right_unit_mm_trans(int anc, const int Parent[], SEXP C)
  * @param i row index of block to be updated (j < k <= i)
  */
 static void
-block_update(SEXP ctab, int j, int k, int i)
+block_update(SEXP L, SEXP ZZpO, int j, int k, int i)
 {
-    SEXP tb = VECTOR_ELT(ctab, Lind(i, k)),
-	ib = VECTOR_ELT(ctab, Lind(i, j)),
-	kb = VECTOR_ELT(ctab, Lind(k, j));
+    SEXP tb = (i == k) ? VECTOR_ELT(ZZpO, i) : VECTOR_ELT(L, Lind(i, k)),
+	ib = VECTOR_ELT(L, Lind(i, j)),
+	kb = VECTOR_ELT(L, Lind(k, j));
     SEXP tpp = GET_SLOT(tb, Matrix_pSym),
 	kpp = GET_SLOT(kb, Matrix_pSym);
     int *ti = INTEGER(GET_SLOT(tb, Matrix_iSym)),
@@ -384,8 +384,7 @@ block_update(SEXP ctab, int j, int k, int i)
  * @param pperm inverse of the permutation
  */
 static void
-bCrosstab_permute(SEXP ctab, int nf, int jj, const int nlev[],
-		  const int perm[], const int iperm[])
+bCrosstab_permute(SEXP ctab, int nf, int jj, const int nlev[], const int iperm[])
 {
     int j;
     for (j = 0; j < nf; j++) {
@@ -407,6 +406,24 @@ bCrosstab_permute(SEXP ctab, int nf, int jj, const int nlev[],
 	triplet_to_col(nrow, ncol, nnz, mi, mj, mx, cp, INTEGER(cscbi), cx);
 	Free(mi); Free(mj); Free(mx);
     }
+}
+
+static void
+symmetric_permute(SEXP A, int nlev, const int iperm[])
+{
+    SEXP AiP = GET_SLOT(A, Matrix_iSym);
+    int *Ap = INTEGER(GET_SLOT(A, Matrix_pSym)),
+	nnz = length(AiP);
+    double *Ax = REAL(GET_SLOT(A, Matrix_xSym));
+    int *mj = expand_column_pointers(nlev, Ap, Calloc(nnz, int));
+    int *mi = Memcpy(Calloc(nnz, int), INTEGER(AiP), nnz);
+    double *mx = Memcpy(Calloc(nnz, double), Ax, nnz);
+
+    ind_permute(mi, nnz, iperm);
+    ind_permute(mj, nnz, iperm);
+    make_upper_triangular(mi, mj, nnz);
+    triplet_to_col(nlev, nlev, nnz, mi, mj, mx, Ap, INTEGER(AiP), Ax);
+    Free(mi); Free(mj); Free(mx);
 }
 
 /** 
@@ -523,9 +540,10 @@ lmer_populate(SEXP val)
 	    int *iPerm = Calloc(ncj, int);
 
 	    ssc_metis_order(ncj, cp, ci, Perm, iPerm);
-				/* apply to the crosstabulation and ZZpO */
-	    bCrosstab_permute(ZtZ, nf, j, nlev, Perm, iPerm);
-	    bCrosstab_permute(ZZpO, nf, j, nlev, Perm, iPerm);
+				/* apply to the crosstabulation, L, and ZZpO */
+	    bCrosstab_permute(ZtZ, nf, j, nlev, iPerm);
+	    bCrosstab_permute(L, nf, j, nlev, iPerm);
+	    symmetric_permute(VECTOR_ELT(ZZpO, j), nlev[j], iPerm);
 				/* apply to the factor */
 	    factor_levels_permute(fac, fcp, Perm, iPerm);
 				/* symbolic analysis to get Parent */
@@ -554,7 +572,7 @@ lmer_populate(SEXP val)
 					 VECTOR_ELT(L, Lind(k,j)));
 	}
 	for (k = j+1; k < nf; k++) { /* Update remaining columns */
-	    for (i = k; i < nf; i++) block_update(L, j, k, i);
+	    for (i = k; i < nf; i++) block_update(L, ZZpO, j, k, i);
 	}
     }
     /* Convert blockwise Parent arrays to extended Parent arrays */

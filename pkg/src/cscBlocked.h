@@ -5,32 +5,36 @@
 #include "R_ldl.h"
 #include "triplet_to_col.h"
 #include <R_ext/Lapack.h>
+#include "Mutils.h"
 
 SEXP cscBlocked_validate(SEXP x);
-void cscBlocked_mm(char side, char transa, int m, int n, int k,
+void cscBlocked_mm(enum CBLAS_SIDE side, enum CBLAS_TRANSPOSE transa,
+		   int m, int n, int k,
 		   double alpha, int nr, int nc,
 		   const int ap[], const int ai[],
 		   const double ax[],
 		   const double b[], int ldb,
 		   double beta, double c[], int ldc);
-void cscb_tri(char upper, char unit, SEXP A, const int Parent[], SEXP AI);
-void cscb_syrk(char uplo, char trans,
+void cscb_tri(enum CBLAS_UPLO upper, enum CBLAS_DIAG unit,
+	      SEXP A, const int Parent[], SEXP AI);
+void cscb_syrk(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE trans,
 	       double alpha, SEXP A,
 	       double beta, SEXP C);
 int cscb_ldl(SEXP A, const int Parent[], SEXP L, SEXP D);
-void cscb_trmm(char side, char uplo, char transa, char diag,
+void cscb_trmm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
+	       enum CBLAS_TRANSPOSE transa, enum CBLAS_DIAG diag,
 	       double alpha, SEXP A, double B[], int m, int n, int ldb);
-void cscb_trsm(char uplo, char transa, char diag,
+void cscb_trsm(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE transa, enum CBLAS_DIAG diag,
 	       double alpha, SEXP A, double B[], int m, int n, int ldb);
-void cscb_trcbm(char side, char uplo, char transa, char diag,
+void cscb_trcbm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
+		enum CBLAS_TRANSPOSE transa, enum CBLAS_DIAG diag,
 		double alpha, SEXP A, SEXP B);
-void cscb_trcbsm(char side, char uplo, char transa, char diag,
+void cscb_trcbsm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
+		 enum CBLAS_TRANSPOSE transa, enum CBLAS_DIAG diag,
 		 double alpha, SEXP A, const int Parent[], SEXP B);
-void cscb_cscbm(char transa, char transb, double alpha, SEXP A, SEXP B,
-	     double beta, SEXP C);
-void cscb_mm(char side, char transa, int m, int n, int k,
-	     double alpha, SEXP A,
-	     const double B[], int ldb,
-	     double beta, double C[], int ldc);
-
+void cscb_cscbm(enum CBLAS_TRANSPOSE transa, enum CBLAS_TRANSPOSE transb,
+		double alpha, SEXP A, SEXP B, double beta, SEXP C);
+void cscb_mm(enum CBLAS_SIDE side, enum CBLAS_TRANSPOSE transa,
+	     int m, int n, int k, double alpha, SEXP A,
+	     const double B[], int ldb, double beta, double C[], int ldc);
 #endif

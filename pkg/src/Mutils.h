@@ -5,6 +5,19 @@
 #include <Rconfig.h>
 #include "cblas.h"
 
+/* short forms of some enum constants from cblas.h */
+#define RMJ CblasRowMajor
+#define CMJ CblasColMajor
+#define NTR CblasNoTrans
+#define TRN CblasTrans
+#define CTR CblasConjTrans
+#define UPP CblasUpper
+#define LOW CblasLower
+#define NUN CblasNonUnit
+#define UNT CblasUnit
+#define LFT CblasLeft
+#define RGT CblasRight
+
 char norm_type(char *typstr);
 char rcond_type(char *typstr);
 double get_double_by_name(SEXP obj, char *nm);
