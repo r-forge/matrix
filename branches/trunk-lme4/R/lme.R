@@ -95,7 +95,7 @@ setMethod("lme", signature(formula = "missing"),
           cov = getCovariateFormula(data)[[2]]
           nCall$formula = eval(substitute(resp ~ cov))
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
-                mCall, PACKAGE = "lme4")
+                mCall, PACKAGE = "Matrix")
       })
 
 setMethod("lme", signature(formula = "formula", data = "groupedData",
@@ -111,7 +111,7 @@ setMethod("lme", signature(formula = "formula", data = "groupedData",
           grps = getGroupsFormula(data)[[2]]
           nCall$random = eval(substitute(~ cov | grps))
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
-                mCall, PACKAGE = "lme4")
+                mCall, PACKAGE = "Matrix")
       })
 
 setMethod("lme", signature(random = "formula"),
@@ -126,7 +126,7 @@ setMethod("lme", signature(random = "formula"),
           nCall$random <- lapply(getGroupsFormula(random, asList = TRUE),
                                  function(f) cov)
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
-                mCall, PACKAGE = "lme4")
+                mCall, PACKAGE = "Matrix")
       })
 
 setMethod("lme", signature(formula = "formula", data = "groupedData",
@@ -140,7 +140,7 @@ setMethod("lme", signature(formula = "formula", data = "groupedData",
           nCall = mCall = match.call()
           nCall$data <- data@data
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
-                mCall, PACKAGE = "lme4")
+                mCall, PACKAGE = "Matrix")
       })
           
 setMethod("lme", signature(formula = "formula",
@@ -149,8 +149,7 @@ setMethod("lme", signature(formula = "formula",
                    method = c("REML", "ML"),
                    control = list(),
                    subset, weights, na.action, offset,
-                   model = TRUE, x = FALSE, y
-                   = FALSE,...)
+                   model = TRUE, x = FALSE, y = FALSE, ...)
       {
           method = match.arg(method)
           random = lapply(random, formula) # formula function, not argument
@@ -178,14 +177,17 @@ setMethod("lme", signature(formula = "formula",
                 controlvals$REML, controlvals$EMverbose, PACKAGE = "Matrix")
           LMEoptimize(obj) = controlvals
           fitted = .Call("ssclme_fitted", obj, facs, mmats, PACKAGE = "Matrix")
-          if (as.logical(x)[1]) x = mmats else x = list()
           residuals = mmats$.Xy[,".response"] - fitted
+          if (as.logical(x)[1]) x = mmats else x = list()
           rm(mmats)
-          new("lme", call = match.call(), facs = facs,
-              x = x,
-              model = if(model) data else data.frame(list()),
-              REML = method == "REML", rep = obj, fitted = fitted,
-              residuals = residuals)
+          .Call("ssclme_to_lme", match.call(), facs, x,
+                if(model) data else data.frame(list()),
+                method == "REML", obj, fitted, residuals, PACKAGE = "Matrix")
+#          new("lme", call = match.call(), facs = facs,
+#              x = x,
+#              model = if(model) data else data.frame(list()),
+#              REML = method == "REML", rep = obj, fitted = fitted,
+#              residuals = residuals)
       })
 
 setMethod("fitted", signature(object="lme"),
