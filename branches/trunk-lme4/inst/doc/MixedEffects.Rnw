@@ -33,15 +33,15 @@
 
   The sparse matrix methods that we employ have both a symbolic phase,
   in which the form of the number and the positions of the
-  off-diagonal elements is determined, and a numeric phase in which
+  off-diagonal elements are determined, and a numeric phase, in which
   the actual numeric values are determined.  The symbolic phase need
   only be done once and it can be accomplished knowing only the
   grouping factors with which the random effects are associated. An
   important part of the symbolic phase is determination of a
-  fill-minimizing permutation of the rows and columns of sparse
-  semi-definite matrices.  These matrices have a special structure in
-  the linear mixed-effects problem and we provide a new
-  fill-minimizing algorithm tuned to this structure.
+  fill-minimizing permutation of the rows and columns of a sparse
+  semi-definite matrix.  This matrix have a special structure in the
+  linear mixed-effects problem and we provide a new fill-minimizing
+  algorithm tuned to this structure.
 
 \end{abstract}
 <<preliminaries,echo=FALSE,print=FALSE>>=
@@ -85,9 +85,10 @@ illustrate these methods with the implementation provided by the
 \section{Linear mixed models}
 \label{sec:LinearMixed}
 
-For ease of reference we will restate some of the results derived in
-\citet{bate:debr:2004}.  The reader should refer to that paper for
-details of the derivations.  
+We describe the form of the linear mixed-effects model that we
+consider and restate some of the formulas from \citet{bate:debr:2004}
+using an LDL form of the Cholesky decomposition of a sparse,
+semi-definite matrix.
 
 \subsection{Form of the model}
 \label{sec:ModelForm}
@@ -112,18 +113,17 @@ independence of random variables.  We assume that $\bX$ has full
 column rank and that $\bOmega$, which is a function of an
 (unconstrained) parameter vector $\btheta$, is positive definite.
 
-Although $q$, the dimension of the vector $\bb$ (and correspondingly
+Although $q$, the dimension of the vector $\bb$ (and, correspondingly,
 the number of columns in $\bZ$ and the number of rows and columns in
-$\bZ\trans\bZ$ and $\bOmega$) can be very large, it can be divided
-into components with simple structure.  
-the association
-of components of $\bb$ with grouping factors $\bff_i,i=1,\dots,k$ in
-the data.  Each grouping factor is of length $n$, the same as the
-length of $\by$.  The number of distinct values in $\bff_i$ is
-$m_i,i=1,\dots,k$.  In the general form of the model, a model matrix
-$\bZ_i$ of size $n\times q_i$ is associated with grouping factor
-$\bff_i$, $i=1,\dots,k$.  Typically the $q_i$ are very small.  In
-fact, in one common form of the model, called a \emph{variance
+$\bZ\trans\bZ$ and $\bOmega$) can be very large, these vectors and
+matrices can be divided into components associated with grouping
+factors $\bff_i,i=1,\dots,k$ in the data.  Each grouping factor is of
+length $n$, the same as the length of $\by$.  The number of distinct
+values in $\bff_i$, also called the number of \emph{levels} of
+$\bff_i$, is $m_i,i=1,\dots,k$.  In the general form of the model, a
+model matrix $\bZ_i$ of size $n\times q_i$ is associated with grouping
+factor $\bff_i$, $i=1,\dots,k$.  Typically the $q_i$ are very small.
+In fact, in one common form of the model, called a \emph{variance
 components} model, $q_1=q_2=\dots=q_k=1$ and each of the
 $\bZ_i,i=1,\dots,k$ consist of a single column of 1's.
 
@@ -137,16 +137,20 @@ grouping factors determine the outer blocks and the levels of each
 grouping factor determine the inner blocks.
 
 In the models that we will consider, the random effects associated
-with different grouping factors are independent.  That is to say that
-$\bOmega$ is block-diagonal consisting of $k$ diagonal blocks of sizes
-$m_i q_i\times m_i q_i,i=1,\dots,k$.  Furthermore the random effects
+with different grouping factors are independent.  That is,
+$\bOmega$ is block-diagonal in $k$ blocks of sizes
+$m_i q_i\times m_i q_i,i=1,\dots,k$.  Furthermore, the random effects
 associated with the levels of a given blocking factor are independent
-and identically distributed.  That is, the $i$'th diagonal block in
+and identically distributed.  Thus the $i$'th diagonal block in
 $\bOmega$ is itself block diagonal and these diagonal blocks are $m_i$
-repetitions of a $q_i\times q_i$ matrix $\bOmega_i$, $i=1,\dots,k$.
+repetitions of a $q_i\times q_i$ matrix $\bOmega_i$, $i=1,\dots,k$, providing
+\begin{equation}
+  \label{eq:OmegaDet}
+  |\bOmega|=\sum_{i=1}^k m_i |\bOmega_i|
+\end{equation}
 
 For a variance components model the matrices $\bOmega_i,i=1,\dots,k$
-are $1\times 1$ positive definite matrices which we can consider as
+are $1\times 1$ positive definite matrices which we can consider to be
 positive scalars $\omega_i,i=1,\dots,k$.  The matrix $\bOmega$ is
 block-diagonal of size $\sum_{i=1}^k m_i$ and the diagonal blocks are
 $\omega_i\bI_{m_i}$ where $\bI_{m_i}$ is the $m_i\times m_i$ identity
@@ -171,18 +175,21 @@ The off-diagonal blocks of $\bZ\trans\bZ$ in a variance components
 model are the pairwise cross-tabulations of the corresponding grouping
 factors.
 
-\subsection{Criteria to evaluate}
+\subsection{Estimation criteria and related quantities}
 \label{sec:ModelCriteria}
+
+For ease of reference we restate some of the results from
+\citet{bate:debr:2004} in the form in which they will be calculated.
 
 Given the observed responses $\by$ and the model matrices $\bX$ and
 $\bZ$, we wish to determine either the maximum likelihood (ML) or the
 restricted maximum likelihood (REML) estimates of the parameters
 $\btheta$, $\bbeta$, and $\sigma^2$.  Because the conditional
 estimates of $\bbeta$ and $\sigma^2$, given a value of $\btheta$, for
-either criterion can be determined from a penalized least squares
-problem we can reduce the optimization problem to one involving
-$\btheta$ only.  This reduction of the dimension of the optimization
-problem is called \emph{profiling}.
+either criterion can be determined from the solution to penalized
+least squares problem, we can reduce the optimization problem to one
+involving $\btheta$ only.  This reduction of the dimension of the
+optimization problem is called \emph{profiling} the objective.
 
 The conditional, penalized least squares problem can be solved using
 the Cholesky decomposition
@@ -200,25 +207,32 @@ the Cholesky decomposition
   \end{bmatrix} .
 \end{equation}
 The matrices $\RZZ$ and $\RXX$ are upper triangular of dimension
-$q\times q$ and $p\times p$ respectively.  Because these matrices are
-triangular it is easy to evaluate the squares of the determinants
-$|\RZZ|^2$ and $|\RXX|^2$.  (Because the signs of the diagonal
-elements of $\RZZ$ and $\RXX$ are not uniquely determined, $|\RZZ|$
-and $|\RXX|$ are not well-defined.  However, their magnitudes, and
-hence their squares, are well-defined.)  The corresponding vectors,
+$q\times q$ and $p\times p$ respectively.  The corresponding vectors,
 $\rZy$ and $\rXy$, are of dimension $q$ and $p$, and $\ryy$ is a
 scalar.  The conditions that $\bOmega$ be positive definite and $\bX$
 have full column rank ensure that $\RZZ$ and $\RXX$ are nonsingular.
 
+In our implementation we do not form the upper triangular Cholesky
+factor $\RZZ$.  Instead we use Tim Davis's LDL
+package~\citep{Davis:2003} to factor
+\begin{equation}
+  \label{eq:LDLfactor}
+  \bL\bD\bL\trans = \RZZ\trans\RZZ=\bZ\trans\bZ+\bOmega
+\end{equation}
+where $\bL$ is a sparse, unit, lower triangular matrix and $\bD$ is
+diagonal with positive diagonal elements. Because the diagonal
+elements of the unit triangular matrix $\bL$ are, by definition,
+unity, they are not explicitly stored.
+
 The conditional estimates of $\bbeta$ satisfy
 \begin{equation}
   \label{eq:betaHat}
-  \RXX\widehat{\bbeta}(\btheta)=\rXy
+  \bD^{1/2}\bL\trans\widehat{\bbeta}(\btheta)=\rXy
 \end{equation}
 and the conditional modes of the random effects satisfy
 \begin{equation}
   \label{eq:ConditionalExp}
-  \RZZ\widehat{\bb}(\btheta)=\rZy-\RZX\widehat{\bbeta} .
+  \bD^{1/2}\bL\trans\widehat{\bb}(\btheta)=\rZy-\RZX\widehat{\bbeta} .
 \end{equation}
 The conditional ML estimate of $\sigma^2$ is
 $\widehat{\sigma^2}(\btheta)=\ryy^2/n$ and the conditional REML
@@ -230,7 +244,7 @@ deviance, is
   \label{eq:ProfiledLogLik}
   \begin{aligned}
     \widehat{\btheta}&=\arg\min_{\btheta} -2\tilde{\ell}(\btheta)\\
-    &=\arg\min_{\btheta}\left\{\log\left(\frac{\left|\RZZ\right|^2}
+    &=\arg\min_{\btheta}\left\{\log\left(\frac{\left|\bD\right|}
       {\left|\bOmega\right|}\right)
     + n\left[1+\log\left(\frac{2\pi\ryy^2}{n}\right)\right]\right\}
   \end{aligned}
@@ -239,7 +253,7 @@ deviance, is
   \label{eq:ProfiledLogRestLik}
   \begin{aligned}
     \widehat{\btheta_R}&=\arg\min_{\btheta} -2\tilde{\ell_R}(\btheta)\\
-    &=\arg\min_{\btheta}\left\{\log\left(\frac{\left|\RZZ\right|^2\left|\RXX\right|^2}
+    &=\arg\min_{\btheta}\left\{\log\left(\frac{\left|\bD\right|\left|\RXX\right|^2}
       {\left|\bOmega\right|}\right)
     +  (n-p)\left[1+\log\left(\frac{2\pi\ryy^2}{n-p}\right)\right]\right\}
   \end{aligned}
@@ -261,8 +275,8 @@ criteria are
 where
 \begin{equation}
   \label{eq:vbDef}
-  \vb=\RZZ^{-1}\left(\bI+\RZX\RXX^{-1}\RXX\invtrans
-    \RZX\trans\right)\RZZ\invtrans
+  \vb=\bL\invtrans\bD^{-1/2}\left(\bI+\RZX\RXX^{-1}\RXX\invtrans
+    \RZX\trans\right)\bD^{-1/2}\bL^{-1}
 \end{equation}
 and $\der$ denotes the Frechet derivative.  Terms in the Hessian can
 be expressed as
@@ -357,18 +371,6 @@ criteria are bounded below over the parameter space and,
 furthermore, that the behavior of these criteria at the extremes of
 the parameter space can be characterized.
 
-\subsection{Sparsity in the large matrices}
-\label{sec:Sparsity}
-
-In terms of equations, the solution to the estimation problem can be
-succinctly stated.  In terms of computation there is one complicating
-factor --- in practice the matrices $\bZ\trans\bZ$ and $\bOmega$ are
-sparse and patterned and can be extremely large.  The decomposition
-(\ref{eq:CrossProdGen}) and the solution of the system
-(\ref{eq:ConditionalExp}) must be done carefully.
-
-Sparsity of $\bZ\trans\bZ$ and $\bOmega$ is induced by 
-
 \subsection{Scottish secondary school student scores}
 \label{sec:Scottish}
 
@@ -385,12 +387,13 @@ the \var{primary} and secondary (\var{second}) schools attended by
 3435 students.
 
 The grouping factors for the random effects are \var{primary} (148
-distinct schools) and \var{second} (19 distinct schools).  The
-summary of these variables each give the counts for the six schools
-with the greatest number of students in the study.  A cross-tabulation
-of \var{primary} and \var{second} (we show only the first five rows),
-shows that on some occasions students from the same primary school
-attend different secondary schools.
+distinct schools) and \var{second} (19 distinct schools).  The summary
+of these variables each give the counts for the six schools with the
+greatest number of students in the study.  A cross-tabulation of
+\var{primary} and \var{second} (we show only the first five rows),
+shows that sometimes (e.g.{} primary schools 1 and 4)
+students from the same primary school attend different secondary
+schools.
 <<ScotsSecsummary>>=
 summary(ScotsSec[,c("primary", "second")])
 xtabs(~primary + second, ScotsSec)[1:5,]
@@ -408,7 +411,7 @@ are neither nested nor fully crossed are called \emph{partially
   crossed}.
 
 We begin with a variance components model that incorporates the
-student's sex and their verbal pre-test score and the interaction 
+student's sex, their verbal pre-test score, and the interaction 
 of these two covariates in the fixed effects.
 <<fm1>>=
 fm1 = lme(attain~verbal*sex, data = ScotsSec, random = list(primary=~1,second=~1))
@@ -420,21 +423,18 @@ $\bZ\trans\bZ$ are shown in Figure~\ref{fig:ZtZ}.
   \centering
 \setkeys{Gin}{width=\textwidth}
 <<FigZtZ,fig=TRUE,echo=FALSE,height=8,width=8>>=
-print(image(as(fm1@rep, "sscMatrix"), aspect='xy', xlim = c(-0.5,166.5),
-            ylim = c(166.5, -0.5), colorkey = FALSE))
+ctab = sscCrosstab(list(ScotsSec$primary, ScotsSec$second), FALSE)
+print(image(ctab, aspect='xy', xlim = c(-0.5,166.5),
+           ylim = c(166.5, -0.5), colorkey = FALSE))
 @   
   \caption{Location of non-zero elements in
     $\bZ\trans\bZ$ for model \var{fm1} fit to the \var{ScotsSec} data.
     Darker squares indicate larger magnitudes. Rows and columns are
-    numbered from zero. The levels of the grouping factors have been
-    rearranged according to a fill-reducing permutation.}
+    numbered from zero.}
   \label{fig:ZtZ}
 \end{figure}
-Darker greys indicate larger magnitudes.  As can be expected the
+Darker greys indicate larger magnitudes.  As can be expected, the
 largest magnitudes occur on the diagonal of the secondary school block.
-Figure~\ref{fig:ZtZ} corresponds to a re-ordering of the levels of the
-\var{primary} and \var{second} grouping factors, as described in the
-next section.
 
 The matrix $\bZ\trans\bZ$ is stored in the compressed, sorted, sparse,
 symmetric, column-oriented representation.  Only the upper triangle or
@@ -444,10 +444,11 @@ we will use the methods implemented in Tim Davis' LDL package
 do so.  There are a total of 404 non-zero elements in the upper
 triangle.  We store these in increasing column order and, within each
 column, in order of increasing row index.  In addition to the non-zero
-value we must store the row indices and the column indices, but the
-column indices are in increasing order and we can compress this vector
-by storing only the information on where each column begins. This is a
-standard representation for sparse matrices, as described in
+value we must store the row indices and the column indices.  However,
+the column indices are in increasing order and we can compress this
+vector by storing only the information on where each column
+begins. This compressed, sparse column-oriented (CSC) representation
+is a standard representation for sparse matrices, as described in
 \citet{Davis:2004}.
 
 The matrix $\bOmega$ is implicitly defined by the number of levels in
@@ -464,43 +465,86 @@ fm1@rep@ZtX[1:4,]
 fm1@rep@XtX
 @ 
 
-\subsection{Cholesky decomposition of the sparse matrices}
-\label{sec:Fill-reducing}
+\section{Symbolic analysis of pairwise crosstabulations}
+\label{sec:Symbolic}
 
-For each value of $(\omega_1,\omega_2)$, code from the LDL package is
-used to factor
-\begin{equation}
-  \label{eq:LDLdef}
-  \bZ\trans\bZ+\bOmega=\bL\bD\bL\trans
-\end{equation}
-where $\bL$ is a unit, lower triangular $q\times q$ matrix and $\bD$
-is diagonal with positive diagonal elements.  Because the diagonal
-elements of the unit triangular matrix $\bL$ are, by definition,
-unity, they are not explicitly stored.
+Given the CSC form of $\bZ\trans\bZ+\bOmega$ a function in the LDL
+package can compute the diagonal of $\bD$ as a vector of length
+$q$ and the strict lower triangle of $\bL$ in CSC format.  This will
+be done many times for different values of $\btheta$.  The key to the
+computational method is determining $\bL$ and, when feasible,
+$\bL^{-1}$ efficiently.
 
-The number of nonzero offdiagonal elements in $\bL$ depends on the
-order of the rows and columns in $\bZ\trans\bZ+\bOmega$ because these
-determine the amount of ``fill-in'' that occurs during the course of
-the decomposition algorithm.  There are several different approaches to
-determining a fill-reducing permutation of the rows and columns.  We
-use an algorithm based on graph partitioning and implemented in
-Metis~\citep{Metis}.  
+The number and positions of the nonzeros in $\bL$ depends on the
+positions of the nonzeros in $\bZ\trans\bZ$. There must (potentially)
+be a nonzero in $\bL$ anywhere there is a nonzero in the lower
+triangle of $\bZ\trans\bZ$ but other nonzeros in $\bL$ can be induced
+during the course of the decomposition.  This is called ``fill-in''.
+The extent of the fill-in can be changed by permuting the rows (and,
+correspondingly, the columns) of $\bZ\trans\bZ$.  Because this
+corresponds to a permutation of the columns of $\bZ$ we will refer to
+such a permutation as a column permutation, with the understanding
+that it causes a permutation of both the rows and columns of
+$\bZ\trans\bZ$. 
 
-A general fill-reducing permutation algorithm will not preserve
-separation of the rows (and columns) associated with different
-grouping factors.  Especially when working with more general
-mixed-effects models for which the $q_i,i=1,\dots,k$ can be greater
-than 1, there are substantial advantages in maintaining separation of
-the grouping factors.  To avoid the undesirable intermingling of the
-grouping factors, we take the permutation returned by Metis and
-reorder it to separate the factors.
+General techniques for choosing a fill-reducing permutation, such as
+graph-based techniques~\citep{Metis} or approximate minimal
+degree~\citep{Davis:1996}, search for an arbitrary permutation.  For our
+purposes there is a substantial advantage in choosing a fill-reducing
+permutation that preserves separation of columns associated with
+different grouping factors.  In particular, we can determine suitable
+permutations based only on the grouping factors and their pairwise
+crosstabulation.  That is, all we need to do is permute the levels of
+each of the grouping factors based upon the positions of the nonzeros
+in the pairwise crosstabulation.
 
-For the Scottish secondary school data the number of non-zero
-off-diagonal elements in $\bL$ is 464.  The total amount of storage
-required for $\bD$ and $\bL$ is 167 numeric elements in $\bD$ and 464
-numeric elements in $\bL$.  We also need 632 integer elements for the
-indices in $\bL$ (168 for the $q+1$ column pointers
-and 464 for the row indices of the nonzero offdiagonals).
+If the grouping factors are a nested sequence of factors there will be
+no fill-in.  In fact, both $\bL$ and its inverse will have exactly the
+same pattern of nonzeros as does the lower triangle of $\bZ\trans\bZ$.
+We do not seek a fill-reducing permutation if the grouping factors
+form a nested sequence.  The case $k=1$ (the random effects are
+determined by a single grouping factor) is, trivially, a nested
+sequence.
+
+Of the nontrivial cases we consider first two nonnested factors.
+
+\subsection{The two-factor case}
+\label{sec:twofactor}
+
+It is not unusual for the grouping factors to have very different
+numbers of levels, as is the case in the Scottish secondary school
+data.  Because the diagonal block for the first grouping factor is
+preserved by the decomposition we put the factor with the largest
+number of levels first.
+
+As shown in \citet{Liu:1990} and as implemented in the LDL package,
+the number and positions of the off-diagonal elements in $\bL$ and in
+$\bL^{-1}$ can be determined from the elimination tree of the matrix,
+which depends only on the position of the first non-zero in each
+column of the strict lower triangle of $\bL\trans\bL$.  Because
+nonzeros in the strict lower triangle only occur in rows corresponding
+to the second factor, there is no need to permute the levels of the
+first factor.  (In the course of generating a permutation of the
+levels of the second factor we will generate a permutation of the
+levels of the first factor but that is only for the purposes of
+illustration.)
+
+Of the three outer blocks in $\bL$, we ignore the $(1,1)$ block
+because it will be the identity and does not contribute any storage.
+Because there are potentially $m_1 m_2$ elements in the $(2,1)$ block
+and $m_1(m_1-1)/2$ elements in $(2,2)$ block (recall that the diagonal
+elements are implicit), our heuristic is to concentrate on the fill-in
+in the $(2,1)$ block and assume that the $(2,2)$ block will end up nearly
+dense.  For the Scottish secondary school data we are concentrating on
+the potential 2812 nonzeros in the $(2,1)$ block at the expense of the
+171 potential nonzeros in the $(2,2)$ block.
+
+Under this assumption a column in the $(2,1)$ block of $\bL^{-1}$ will
+be filled from the first nonzero in $\bZ\trans\bZ$ down.  Therefore,
+we permute the the levels of the second factor so as to concentrate
+the nonzeros in the $(2,1)$ block on the lower rows.
+
+The algorithm is:
 
 The positions of the nonzero elements in the last 19 rows of $\bL$ are
 shown in Figure~\ref{fig:Lnonzero} (the first 148 rows of $\bL$ are an
@@ -520,14 +564,6 @@ print(image(as(fm1@rep, "tscMatrix"),ylim=c(166.5,147.5),
     permutation.}
   \label{fig:Lnonzero}
 \end{figure}
-
-If the grouping factors are a nested sequence of factors there will be
-no fill-in.  In fact, both $\bL$ and its inverse will have exactly the
-same pattern of nonzeros as does the lower triangle of $\bZ\trans\bZ$.
-We do not seek a fill-reducing permutation if the grouping factors
-form a nested sequence.  The case $k=1$ (the random effects are
-determined by a single grouping factor) is, trivially, a nested
-sequence.
 
 When the grouping factors are not in a strictly nested sequence, the
 number of nonzeros in $\bL^{-1}$ can be much greater than the number
@@ -586,7 +622,7 @@ $\bZ\trans\bX$ evaluated.  Note that because the locations of the
 non-zero elements in the products are known in advance, it is possible
 to evaluate the $\bZ_i$ and $\bX$ row-wise (or in blocks of rows),
 update the matrix products, and then discard the rows.  When $n$ is
-very large and $p$ is moderate sequential evaluation by rows could
+very large and $p$ is moderate, sequential evaluation by rows could
 result in considerably reduced memory usage.
 
 As shown in \S\ref{sec:Generalizations} it is very convenient to allow
@@ -1209,4 +1245,45 @@ Separated native perm (use first)
  LI                               1504 (53.48\%)       17238020 (3.44\%)
 Separated native perm (use last)
  L                                 456 (15.36\%)         518576 (0.10\%)
- LI                               1574 (53.48\%)       17222327 (3.44\%)
+ LI                               1574 (53.48\%)       17222327 (3.43\%)
+Separated native perm (greedy)
+ L                                 434 (15.43\%)         518642 (0.10\%)
+ LI                               1544 (54.91\%)       17222447 (3.43\%)
+
+
+only on the the corresponding information on
+$\bZ\trans\bZ$ does not change for different values of A symbolic analysis function to determine 
+from is provided in the LDL package.  A nonzero element of
+$\bZ\trans\bZ+\bOmega$ The number of the
+nonzeros in $\bL$ is at least as large as the number of nonzeros in
+the lower triangle of , and usually larger. can change if the rows and columns of
+ are permuted.  
+
+
+
+
+For each value of $(\omega_1,\omega_2)$, code from the LDL package is
+used to factor
+\begin{equation}
+  \label{eq:LDLdef}
+  \bZ\trans\bZ+\bOmega=\bL\bD\bL\trans
+\end{equation}
+where $\bL$ is a unit, lower triangular $q\times q$ matrix and $\bD$
+is diagonal with positive diagonal elements.
+
+The number of nonzero offdiagonal elements in $\bL$ depends on the
+order of the rows and columns in $\bZ\trans\bZ+\bOmega$ because this
+ordering determines the amount of ``fill-in'' that occurs during the
+course of the decomposition algorithm.  There are several different
+approaches to determining a fill-reducing permutation of the rows and
+columns.  We use an algorithm based on graph partitioning and
+implemented in Metis~\citep{Metis}.
+
+A general fill-reducing permutation algorithm will not preserve
+separation of the rows (and columns) associated with different
+grouping factors.  Especially when working with more general
+mixed-effects models for which the $q_i,i=1,\dots,k$ can be greater
+than 1, there are substantial advantages in maintaining separation of
+the grouping factors.  To avoid the undesirable intermingling of the
+grouping factors, we take the permutation returned by Metis and
+reorder it to separate the factors.

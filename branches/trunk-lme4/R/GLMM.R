@@ -1,5 +1,12 @@
 setMethod("GLMM", signature(formula = "missing"),
-          function(formula, family, data, random, ...)
+          function(formula, family, data, random,
+                   method = c("PQL", "Laplace"),
+                   control = list(),
+                   subset,
+                   weights,
+                   na.action,
+                   offset,
+                   model = TRUE, x = FALSE, y = FALSE, ...)
       {
           nCall = mCall = match.call()
           resp = getResponseFormula(data)[[2]]
@@ -11,7 +18,14 @@ setMethod("GLMM", signature(formula = "missing"),
 
 setMethod("GLMM", signature(formula = "formula",
                             data = "groupedData", random = "missing"),
-          function(formula, family, data, random, ...)
+          function(formula, family, data, random,
+                   method = c("PQL", "Laplace"),
+                   control = list(),
+                   subset,
+                   weights,
+                   na.action,
+                   offset,
+                   model = TRUE, x = FALSE, y = FALSE, ...)
       {
           nCall = mCall = match.call()
           cov = formula[[3]]
@@ -22,7 +36,14 @@ setMethod("GLMM", signature(formula = "formula",
       })
 
 setMethod("GLMM", signature(random = "formula"),
-          function(formula, family, data, random, ...)
+          function(formula, family, data, random,
+                   method = c("PQL", "Laplace"),
+                   control = list(),
+                   subset,
+                   weights,
+                   na.action,
+                   offset,
+                   model = TRUE, x = FALSE, y = FALSE, ...)
       {
           nCall = mCall = match.call()
           cov = getCovariateFormula(random)
@@ -35,7 +56,14 @@ setMethod("GLMM", signature(random = "formula"),
 setMethod("GLMM", signature(formula = "formula",
                             data = "groupedData",
                             random = "list"),
-          function(formula, family, data, random, ...)
+          function(formula, family, data, random,
+                   method = c("PQL", "Laplace"),
+                   control = list(),
+                   subset,
+                   weights,
+                   na.action,
+                   offset,
+                   model = TRUE, x = FALSE, y = FALSE, ...)
       {
           nCall = mCall = match.call()
           nCall$data <- data@data
@@ -75,20 +103,20 @@ setMethod("GLMM",
           signature(formula = "formula",
                     random = "list"),
           function(formula, family, data, random,
-                   method = match.arg(c("PQL", "Laplace")),
+                   method = c("PQL", "Laplace"),
                    control = list(),
                    subset,
                    weights,
                    na.action,
                    offset,
-                   model = TRUE, x = FALSE, ...)
+                   model = TRUE, x = FALSE, y = FALSE, ...)
       {
           random <-
               lapply(random,
                      get("formula", pos = parent.frame(), mode = "function"))
           controlvals <- do.call("lmeControl", control)
           controlvals$REML <- FALSE
-
+          method <- match.arg(method)
 
           ## problems with ..1, ..2
           ## print(match.call(expand.dots = FALSE))
