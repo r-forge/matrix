@@ -27,7 +27,7 @@ lmeControl <-
            .relStep = (.Machine$double.eps)^(1/3), minAbsParApVar = 0.05,
            nlmStepMax = NULL,
            natural = TRUE, optimizer="nlm", EMverbose=FALSE,
-           analyticGradient = FALSE,
+           analyticGradient = TRUE,
            analyticHessian=FALSE)
 {
     if (missing(msScale)) msScale = function(start) {
@@ -90,34 +90,42 @@ setMethod("lme", signature(formula = "formula", data = "groupedData",
                 mCall, PACKAGE = "lme4")
       })
 
-
 setMethod("lme", signature(formula = "formula", random = "formula"),
           function(formula, data, random, correlation, weights, subset,
                    method, na.action, control, model, x)
       {
           nCall = mCall = match.call()
-          nCall$random = lapply(getGroupsFormula(random, asList = TRUE),
-                                function(x, form) form,
-                                form = pdLogChol(getCovariateFormula(random)))
-
-          nCall$data <- as(data, "data.frame")
-
+          cov = getCovariateFormula(random)
+          nCall$random <- lapply(getGroupsFormula(random, asList = TRUE),
+                                 function(f) cov)
+          nCall$data <- as.list(as(data, "data.frame"))
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
                 mCall, PACKAGE = "lme4")
       })
 
-setMethod("lme", signature(formula = "formula", random = "list"),
+setMethod("lme", signature(formula = "formula", data = "groupedData",
+                           random = "list"),
           function(formula, data, random, correlation, weights, subset,
                    method, na.action, control, model, x)
       {
+          nCall = mCall = match.call()
+          nCall$data <- as(data, "data.frame")
+          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
+                mCall, PACKAGE = "lme4")
+      })
+          
+setMethod("lme", signature(formula = "formula", data = "list",
+                           random = "list"),
+          function(formula, data, random, correlation, weights, subset,
+                   method, na.action, control, model, x)
+      {
+          
           if (missing(model))
               model = TRUE
           if (missing(x))
               x = FALSE
           random = lapply(as(random, "list"),
                    get("formula", pos = parent.frame(), mode = "function"))
-                   #lapply(random, function(x)
-                          #if(inherits(x, "formula")) pdLogChol(x) else x)
           method = if (missing(method)) "REML" else
                    match.arg(method, c("REML", "ML"))
           controlvals <- if (missing(control)) lmeControl() else
@@ -149,6 +157,8 @@ setMethod("lme", signature(formula = "formula", random = "list"),
           facs = lapply(names(random),
                          function(x) eval(as.name(x), envir = data))
           names(facs) = names(random)
+          facs =                        # order in decreasing number of levels
+              facs[rev(order(lapply(facs, function(fac) length(levels(fac)))))]
           mmats <- c(lapply(random,
                             function(x) model.matrix(formula(x), data = data)),
                      list(.Xy = cbind(model.matrix(formula, data = data),
