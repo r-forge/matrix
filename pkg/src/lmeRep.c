@@ -495,9 +495,8 @@ SEXP lmeRep_initial(SEXP x)
     return R_NilValue;
 }
 
-
 /** 
- * Overwrite B with the solution to LX = B where L is a 
+ * Overwrite B with the solution to L X = B where L is a 
  * sparse, blocked, unit lower triangular matrix.
  * 
  * @param nf number of grouping factors
@@ -552,6 +551,74 @@ lmeRep_L_sm(int nf, SEXP LP, SEXP Linv, SEXP mm)
 	    Free(tmp);
 	}
 	rowpt[j+1] = rowpt[j] + nrow;
+    }
+    Free(rowpt);
+}
+
+/** 
+ * Overwrite B with the solution to L'X = B where L is a 
+ * sparse, blocked, unit lower triangular matrix.
+ * 
+ * @param nf number of grouping factors
+ * @param LP pointer to the L sparse blocked matrix
+ * @param Linv pointer to the diagonal blocks of the inverse
+ * @param mm pointer to the matrix of right-hand sides
+ */
+static void
+lmeRep_Lt_sm(int nf, SEXP LP, SEXP Linv, SEXP mm)
+{
+    int *mdims = INTEGER(getAttrib(mm, R_DimSymbol)),
+	*rowpt = Calloc(nf + 1, int), j;
+	    
+    rowpt[0] = 0;
+    for (j = 0; j < nf; j++) {
+	SEXP Li = VECTOR_ELT(Linv, j);
+	SEXP LipP = GET_SLOT(Li, Matrix_pSym),
+	    LixP = GET_SLOT(Li, Matrix_xSym);
+	int *LixDims = INTEGER(getAttrib(LixP, R_DimSymbol));
+	int nrow = (length(LipP) - 1) * LixDims[1];
+
+	rowpt[j+1] = rowpt[j] + nrow;
+    }
+
+    for (j = nf - 1; j >= 0; j--) {
+	SEXP Li = VECTOR_ELT(Linv, j);
+	SEXP LipP = GET_SLOT(Li, Matrix_pSym),
+	    LixP = GET_SLOT(Li, Matrix_xSym);
+	int *Lip = INTEGER(LipP),
+	    *Lii = INTEGER(GET_SLOT(Li, Matrix_iSym)),
+	    *LixDims = INTEGER(getAttrib(LixP, R_DimSymbol)),
+	    k;
+	int nrj = rowpt[j + 1] - rowpt[j];
+
+	if (length(LixP)) {	/* Li is not the identity */
+	    double *tmp = Calloc(nrj * mdims[1], double);
+
+	    for (k = 0; k < mdims[1]; k++) {
+		Memcpy(tmp + k * nrj,
+		       REAL(mm) + rowpt[j] + k * mdims[0],
+		       nrj);
+	    }
+	    cscBlocked_mm('L', 'T', nrj, mdims[1], nrj,
+			  1., LixDims[0], LixDims[1],
+			  Lip, Lii, REAL(LixP),
+			  tmp, nrj,
+			  0., REAL(mm) + rowpt[j], mdims[0]);
+	    Free(tmp);
+	}
+	for (k = 0; k < j; k++) {
+	    SEXP Ljk = VECTOR_ELT(LP, Lind(j,k));
+	    SEXP LjkxP = GET_SLOT(Ljk, Matrix_xSym);
+	    int *LjkDims = INTEGER(getAttrib(LjkxP, R_DimSymbol));
+	    int nrk = rowpt[k + 1] - rowpt[k];
+
+	    cscBlocked_mm('L', 'T', nrk, mdims[1], nrj,
+			  -1., LjkDims[0], LjkDims[1],
+			  INTEGER(GET_SLOT(Ljk, Matrix_pSym)),
+			  INTEGER(GET_SLOT(Ljk, Matrix_iSym)),
+			  REAL(LjkxP), REAL(mm) + rowpt[j], mdims[0],
+			  1., REAL(mm) + rowpt[k], mdims[0]);
+	}
     }
     Free(rowpt);
 }
@@ -700,6 +767,35 @@ update_D_L(int i, const int nc[], SEXP LP, SEXP DP)
 }
 
 /** 
+ * Calculate the inverses of the diagonal blocks of L.
+ * 
+ * @param nf number of grouping factors
+ * @param LP pointer to the L list
+ * @param Linv pointer to the Linv list
+ * 
+ * @return NULL
+ */
+static void
+L_inverse(int nf, SEXP LP, SEXP Linv) 
+{
+    int i;
+    for (i = 0; i < nf; i++) {
+	SEXP Li = VECTOR_ELT(LP, Lind(i,i));
+	SEXP Linvi = VECTOR_ELT(Linv, i);
+	SEXP LipP = GET_SLOT(Li, Matrix_pSym);
+	SEXP LixP = GET_SLOT(Li, Matrix_xSym);
+	int *xdims = INTEGER(getAttrib(LixP, R_DimSymbol));
+
+	cscBlocked_tri('L', 'U', length(LipP) - 1, xdims[0], xdims[1],
+		       INTEGER(LipP), INTEGER(GET_SLOT(Li, Matrix_iSym)),
+		       REAL(LixP),
+		       INTEGER(GET_SLOT(Linvi, Matrix_pSym)),
+		       INTEGER(GET_SLOT(Linvi, Matrix_iSym)),
+		       REAL(GET_SLOT(Linvi, Matrix_xSym)));
+    }
+}
+
+/** 
  * If status[["factored"]] is FALSE, create and factor Z'Z+Omega, then
  * create RZX and RXX, the deviance components, and the value of the
  * deviance for both ML and REML.
@@ -759,6 +855,7 @@ SEXP lmeRep_factor(SEXP x)
 				/* solve for RZX */
 	Memcpy(RZX, REAL(GET_SLOT(x, Matrix_ZtXSym)),
 	       dims[0] * dims[1]);
+	L_inverse(nf, LP, Linv);
 	lmeRep_L_sm(nf, LP, Linv, RZXsl);
 	for (i = 0; i < nf; i++) {
 	    int nci = nc[i], ncisqr = nci * nci,
@@ -796,7 +893,6 @@ SEXP lmeRep_factor(SEXP x)
     }
     return R_NilValue;
 }
-
 
 /** 
  * If necessary, factor Z'Z+Omega, ZtX, and XtX then, if necessary,
@@ -856,6 +952,10 @@ SEXP lmeRep_invert(SEXP x)
 	    }
 	    RZX += nci * nlev;
 	}
+	lmeRep_Lt_sm(nf, GET_SLOT(x, Matrix_LSym),
+		     GET_SLOT(x, Matrix_LinvSym), RZXsl);
+/* FIXME: Does this need a negative sign?  It is in the paper.  Do we
+ * need it in the code?  May be unnecessary if always used as a square.*/
 	status[1] = 1;
     }
     return R_NilValue;
