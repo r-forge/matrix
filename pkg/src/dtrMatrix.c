@@ -189,3 +189,24 @@ SEXP dtrMatrix_dgeMatrix_mm_R(SEXP a, SEXP b)
     UNPROTECT(1);
     return val;
 }
+
+SEXP dtrMatrix_as_dtpMatrix(SEXP from)
+{
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dtpMatrix"))),
+	uplo = GET_SLOT(from, Matrix_uploSym),
+	diag = GET_SLOT(from, Matrix_diagSym),
+	dimP = GET_SLOT(from, Matrix_DimSym);
+    int n = *INTEGER(dimP);
+
+    SET_SLOT(val, Matrix_rcondSym,
+	     duplicate(GET_SLOT(from, Matrix_rcondSym)));
+    SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
+    SET_SLOT(val, Matrix_diagSym, duplicate(diag));
+    SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
+    full_to_packed(REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, (n*(n+1))/2)),
+		   REAL(GET_SLOT(from, Matrix_xSym)), n,
+		   *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW,
+		   *CHAR(STRING_ELT(diag, 0)) == 'U' ? UNT : NUN);
+    UNPROTECT(1);
+    return val;
+}

@@ -614,3 +614,24 @@ double *full_to_packed(double *dest, const double *src, int n,
     }
     return dest;
 }
+
+/** 
+ * Copy the diagonal elements of the packed array x to dest
+ * 
+ * @param dest vector of length ncol(x)
+ * @param x pointer to an object representing a packed array
+ * 
+ * @return dest
+ */
+double *packed_getDiag(double *dest, SEXP x)
+{
+    int j, n = *INTEGER(GET_SLOT(x, Matrix_DimSym)), pos;
+    double *xx = REAL(GET_SLOT(x, Matrix_xSym));
+    
+    if (*CHAR(STRING_ELT(GET_SLOT(x, Matrix_uploSym), 0)) == 'U') {
+	for (pos = 0, j = 0; j < n; pos += ++j) dest[j] = xx[pos];
+    } else {
+	for (pos = 0, j = 0; j < n; pos += (n - j), j++) dest[j] = xx[pos];
+    }
+    return dest;
+}

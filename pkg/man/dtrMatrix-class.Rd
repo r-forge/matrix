@@ -4,6 +4,7 @@
 \alias{\%*\%,dtrMatrix,dgeMatrix-method}
 \alias{coerce,dtrMatrix,dgeMatrix-method}
 \alias{coerce,dtrMatrix,matrix-method}
+\alias{coerce,dtrMatrix,dtpMatrix-method}
 \alias{crossprod,dtrMatrix,missing-method}
 \alias{determinant,dtrMatrix,logical-method}
 \alias{determinant,dtrMatrix,missing-method}
@@ -15,7 +16,6 @@
 \alias{solve,dtrMatrix,missing-method}
 \alias{t,dtrMatrix-method}
 \alias{dtrMatrix-class}
-\alias{dtpMatrix-class}
 \title{Triangular, dense, numeric matrices}
 \description{The \code{"dtrMatrix"} class is the class of triangular,
   dense, numeric matrices in nonpacked storage.  The \code{"dtpMatrix"}
@@ -51,6 +51,7 @@ Class \code{"Matrix"}, by class \code{"dgeMatrix"}.
   \describe{
     \item{coerce}{\code{signature(from = "dtrMatrix", to = "dgeMatrix")}}
     \item{coerce}{\code{signature(from = "dtrMatrix", to = "matrix")}}
+    \item{coerce}{\code{signature(from = "dtrMatrix", to = "dtpMatrix")}}
     \item{norm}{\code{signature(x = "dtrMatrix", type = "character")}}
     \item{rcond}{\code{signature(x = "dtrMatrix", type = "character")}}    
     \item{solve}{\code{signature(a = "dtrMatrix", b = "missing")}}
@@ -60,7 +61,8 @@ Class \code{"Matrix"}, by class \code{"dgeMatrix"}.
 %\references{}
 %\author{}
 \seealso{
-  \code{\link{dgeMatrix-class}}, \code{\link{Matrix-class}}
+  \code{\link{dgeMatrix-class}}, \code{\link{dtpMatrix-class}},
+  \code{\link{Matrix-class}}
 }
 %\examples{}
 \keyword{classes}

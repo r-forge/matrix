@@ -63,12 +63,35 @@ double *packed_to_full(double *dest, const double *src, int n,
 		       enum CBLAS_UPLO uplo);
 double *full_to_packed(double *dest, const double *src, int n,
 		       enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
+double *packed_getDiag(double *dest, SEXP x);
 
 extern	 /* stored pointers to symbols initialized in R_init_Matrix */
 #include "Syms.h"
 
 /* zero an array */
 #define AZERO(x, n) {int _I_, _SZ_ = (n); for(_I_ = 0; _I_ < _SZ_; _I_++) (x)[_I_] = 0;}
+
+/* number of elements in one triangle of a square matrix of order n */
+#define PACKED_LENGTH(n)   ((n) * ((n) + 1))/2
+
+/** 
+ * Check for valid length of a packed triangular array and return the
+ * corresponding number of columns
+ * 
+ * @param len length of a packed triangular array
+ * 
+ * @return number of columns
+ */
+static R_INLINE
+int packed_ncol(int len) 
+{
+    int disc = 8 * len + 1;	/* discriminant */
+    int sqrtd = (int) sqrt((double) disc);
+
+    if (len < 0 || disc != sqrtd * sqrtd)
+	error(_("invalid 'len' = %d in packed_ncol"));
+    return (sqrtd - 1)/2;
+}
 
 /** 
  * Allocate an SEXP of given type and length, assign it as slot nm in

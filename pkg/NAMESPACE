@@ -21,13 +21,10 @@ export(
        "expm",
        "facmul",
        "lu",
-#       "matrix<-",
        "norm",
-#       "pdFactor",
-#       "pdMatrix",
        "rcond",
        "round", # "Math2" group (needs explicit setGeneric(.))
-       "signif",#  {dito}
+       "signif",#  {ditto}
        "sscCrosstab",
        "tcrossprod",
        "unpack"
