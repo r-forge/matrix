@@ -655,28 +655,26 @@ SEXP ldl_inverse(SEXP x)
     }
     if (length(LIisl)) error("logic error in ssclme_ldl_inverse");
     else {		    /* LIi and LIx are too big and not used */
-	int *counts = Calloc(nzc, int), info, maxod = -1;
+	int info, maxod;
 	int *Parent = INTEGER(GET_SLOT(x, Matrix_ParentSym));
 	int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym));
 	double one = 1.0, zero = 0.;
-				/* determine maximum # of off-diagonals */
-	for (i = nzc - 1; i >= 0; i--) { /* in a column of L^{-1} */
-	    counts[i] = (Parent[i] < 0) ? 0 : 1 + counts[Parent[i]];
-	    if (counts[i] > maxod) maxod = counts[i];
+			
+	maxod = -1;	    /* determine maximum # of off-diagonals */
+	for (i = 0; i < nzc; i++) { /* in a column of L^{-1} */
+	    int ci = LIp[i+1] - LIp[i];
+	    if (ci > maxod) maxod = ci;
 	}
-	Free(counts);
-
+	
 	for (i = 0; i < nf; i++) {
 	    int j, jj, k, kk, nci = nc[i], nr, p, p2, pp,
-		m = maxod + nci,
+		m = maxod + 1,
 		*ind = Calloc(m, int);
 	    double
 		*tmp = Calloc(m * nci, double),
 		*mpt = REAL(VECTOR_ELT(bVar, i));
 	    
 	    for (j = Gp[i]; j < Gp[i+1]; j += nci) {
-		memset((void *) tmp, 0, sizeof(double) * m * nci);
-		
 		kk = 0;		/* ind holds indices of non-zeros */
 		jj = j;		/* in this block of columns */
 		while (jj >= 0) {
@@ -689,19 +687,28 @@ SEXP ldl_inverse(SEXP x)
 		for (k = 0; k < nci; k++) {
 		    double *ccol = tmp + k * nr;
 		    
-		    ccol[k] = 1.;
-		    kk = k;
+		    for (kk = 0; kk < nr; kk++) ccol[kk] = 0.;
+		    ccol[k] = 1.; /* initialize from unit diagonal */
 		    for (jj = j + k; jj >= 0; jj = Parent[jj]) {
 			p2 = Lp[jj+1];
-			pp = kk;
+			pp = k;
 			for (p = Lp[jj]; p < p2; p++) {
 			    pp = ldl_update_ind(Li[p], pp, ind);
-			    ccol[pp] -= Lx[p] * ccol[kk];
+			    ccol[pp] -= Lx[p] * ccol[jj];
 			}
 		    }
+
+/* 		    for (j = k + 1; j < nr; j++) {  */
+/* 			jj = ind[j]; p2 = Lp[jj+1]; */
+/* 			pp = k; */
+/* 			for (p = Lp[jj]; p < p2; p++) { */
+/* 			    pp = ldl_update_ind(Li[p], pp, ind); */
+/* 			    ccol[pp] -= Lx[p]*ccol[j]; */
+/* 			} */
+/* 		    } */
 		}
-				/* scale rows */
-		for (kk = 0; kk < nr; kk++) {
+				
+		for (kk = 0; kk < nr; kk++) { /* scale rows */
 		    for (k = 0; k < nci; k++) {
 			tmp[k * nr + kk] *= DIsqrt[ind[kk]];
 		    }
