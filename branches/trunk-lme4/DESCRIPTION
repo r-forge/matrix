@@ -7,4 +7,5 @@ Author: Douglas Bates <bates@stat.wisc.edu> and
 Maintainer: Douglas Bates <bates@stat.wisc.edu>
 Description: Fit linear and generalized linear mixed-effects models.
 Depends: methods, R(>= 1.9.0), lattice, Matrix(>= 0.8-9)
+Suggests: lattice
 License: GPL version 2 or later
