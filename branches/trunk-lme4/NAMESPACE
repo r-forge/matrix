@@ -49,7 +49,7 @@ export(
        "gsummary",
        "lmList",
        "lme",
-       "lme1",
+       "lmer",
        "lmeControl",
        "pooledSD",
        "ranef",
@@ -63,6 +63,7 @@ exportClasses(
 ##              "groupedData",
               "lmList",
               "lme",
+              "lmer",
               "summary.GLMM",
               "summary.lme",
               "summary.ssclme"

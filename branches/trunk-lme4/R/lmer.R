@@ -1,3 +1,88 @@
+lmerControl <-                            # Control parameters for lmer
+  function(maxIter = 50,
+           msMaxIter = 50,
+           tolerance = sqrt((.Machine$double.eps)),
+           niterEM = 20,
+           msTol = sqrt(.Machine$double.eps),
+           msVerbose = getOption("verbose"),
+           PQLmaxIt = 20,
+           .relStep = (.Machine$double.eps)^(1/3),
+           EMverbose = getOption("verbose"),
+           analyticGradient = TRUE,
+           analyticHessian=FALSE)
+{
+    list(maxIter = maxIter,
+         msMaxIter = msMaxIter,
+         tolerance = tolerance,
+         niterEM = niterEM,
+         msTol = msTol,
+         msVerbose = msVerbose,
+         PQLmaxIt = PQLmaxIt,
+         .relStep = .relStep,
+         EMverbose=EMverbose,
+         analyticHessian=analyticHessian,
+         analyticGradient=analyticGradient)
+}
+
+setMethod("lmer", signature(formula = "formula"),
+          function(formula, data,
+                   method = c("REML", "ML"),
+                   control = list(),
+                   subset, weights, na.action, offset,
+                   model = TRUE, x = FALSE, y = FALSE, ...)
+      {
+                                        # match and check parameters
+          method <- match.arg(method)
+          controlvals <- do.call("lmerControl", control)
+          controlvals$REML <- method == "REML"
+          if (length(formula) < 3) stop("formula must be a two-sided formula")
+                                        # create the model frame as frm
+          mf <- match.call()
+          m <- match(c("data", "subset", "weights", "na.action", "offset"),
+                     names(mf), 0)
+          mf <- mf[c(1, m)]
+          mf[[1]] <- as.name("model.frame")
+          frame.form <- subbars(formula)
+          environment(frame.form) <- environment(formula)
+          mf$formula <- frame.form
+          mf$drop.unused.levels <- TRUE
+          frm <- eval(mf, parent.frame())
+
+          ## grouping factors and model matrices for random effects
+          bars <- findbars(formula[[3]])
+          random <-
+              lapply(bars,
+                     function(x) list(model.matrix(eval(substitute(~term,
+                                                                   list(term=x[[2]]))),
+                                                   frm),
+                                      eval(substitute(as.factor(fac),
+                                                      list(fac = x[[3]])), frm)))
+          names(random) <- unlist(lapply(bars, function(x) deparse(x[[3]])))
+
+          ## order factor list by decreasing number of levels
+          ford <- rev(order(sapply(random, function(x) length(levels(x[[2]])))))
+          if (any(ford != seq(a = random))) { # re-order both facs and random
+              random <- random[ford]
+          }
+          mmats <- c(lapply(random, "[[", 1),
+                     .fixed = list(cbind(model.matrix(nobars(formula), frm),
+                     .response = model.response(frm))))
+          obj <- .Call("lmer_create", lapply(random, "[[", 2), mmats, PACKAGE = "Matrix")
+          .Call("lmer_initial", obj, PACKAGE="Matrix")
+          .Call("lmer_ECMEsteps", obj, 
+                controlvals$niterEM,
+                controlvals$REML,
+                controlvals$EMverbose,
+                PACKAGE = "Matrix")
+          LMEoptimize(obj) <- controlvals
+          obj@call <- match.call()
+          #fitted = .Call("ssclme_fitted", obj, facs, mmats, TRUE, PACKAGE = "Matrix")
+          #residuals = mmats$.Xy[,".response"] - fitted
+          #if (as.logical(x)[1]) x = mmats else x = list()
+          #rm(mmats)
+          obj
+      })
+
 setReplaceMethod("LMEoptimize", signature(x="lmer", value="list"),
                  function(x, value)
              {

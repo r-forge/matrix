@@ -67,6 +67,7 @@ lmList-class            Class "lmList"
 lme                     Fit linear mixed-effects models
 lme-class               Class "lme"
 lmeControl              Control values for lme
+lmer                    Fit linear mixed-effects models
 pooledSD                Extract pooled standard deviation
 random.effects          Extract Random Effects
 s3bbx                   Covariates in the Rodriguez and Goldman
