@@ -61,8 +61,8 @@ setReplaceMethod("LMEoptimize", signature(x="lmeRep", value="list"),
                  optimRes <- optim(st, fn, gr,
                                    method = "L-BFGS-B",
                                    lower = ifelse(constr, 1e-10, -Inf),
-                                   control = list(trace = value$msVerbose,
-                                   maxit = value$msMaxIter))
+                                   control = list(maxit = value$msMaxIter,
+                                   trace = ifelse(value$msVerbose,6,0)))
                  if (optimRes$convergence != 0) {
                      warning(paste("optim returned message",optimRes$message,"\n"))
                  }
