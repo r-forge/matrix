@@ -152,11 +152,26 @@ setMethod("crossprod", signature(x = "dgeMatrix", y = "dgeMatrix"),
 setMethod("crossprod", signature(x = "dgeMatrix", y = "matrix"),
           function(x, y = NULL) .Call("dgeMatrix_matrix_crossprod", x, y),
           valueClass = "dgeMatrix")
-
 setMethod("crossprod", signature(x = "dgeMatrix", y = "numeric"),
           function(x, y = NULL)
           .Call("dgeMatrix_matrix_crossprod", x, as.matrix(y)),
           valueClass = "dgeMatrix")
+setMethod("crossprod", signature(x = "matrix", y = "dgeMatrix"),
+          function(x, y = NULL) callGeneric(as(x, "dgeMatrix"), y),
+          valueClass = "dgeMatrix")
+setMethod("crossprod", signature(x = "numeric", y = "dgeMatrix"),
+          function(x, y = NULL) callGeneric(as.matrix(x), y),
+          valueClass = "dgeMatrix")
+
+setMethod("%*%", signature(x = "dgeMatrix", y = "dgeMatrix"),
+          function(x, y) .Call("dgeMatrix_dgeMatrix_mm", x, y))
+
+setMethod("%*%", signature(x = "dgeMatrix", y = "numeric"),
+          function(x, y) callGeneric(x, as(as.matrix(y), "dgeMatrix")))
+
+setMethod("%*%", signature(x = "numeric", y = "dgeMatrix"),
+          function(x, y)
+          callGeneric(as(if(is.matrix(x)) x else rbind(x), "dgeMatrix"), y))
 
 setMethod("diag", signature(x = "dgeMatrix"),
           function(x = 1, nrow, ncol = n)
@@ -191,13 +206,6 @@ setMethod("determinant", signature(x = "dgeMatrix", logarithm = "logical"),
           function(x, logarithm, ...)
           .Call("dgeMatrix_determinant", x, logarithm))
 
-setMethod("%*%", signature(x = "dgeMatrix", y = "dgeMatrix"),
-          function(x, y) .Call("dgeMatrix_dgeMatrix_mm", x, y))
-
-setMethod("%*%", signature(x = "dgeMatrix", y = "numeric"),
-          function(x, y) callGeneric(x, as(as.matrix(y), "dgeMatrix")))
-setMethod("%*%", signature(x = "numeric", y = "dgeMatrix"),
-          function(x, y) callGeneric(as(as.matrix(x), "dgeMatrix"), y))
 
 setMethod("expm", signature(x = "dgeMatrix"),
           function(x) .Call("dgeMatrix_exp", x),
