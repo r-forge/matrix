@@ -142,7 +142,11 @@ setMethod("t", signature(x = "dgeMatrix"),
               x })
 
 setMethod("crossprod", signature(x = "dgeMatrix", y = "missing"),
-          function(x, y = NULL) .Call("dgeMatrix_crossprod", x),
+          function(x, y = NULL) .Call("dgeMatrix_crossprod", x, FALSE),
+          valueClass = "dpoMatrix")
+
+setMethod("tcrossprod", signature(x = "dgeMatrix"),
+          function(x) .Call("dgeMatrix_crossprod", x, TRUE),
           valueClass = "dpoMatrix")
 
 setMethod("crossprod", signature(x = "dgeMatrix", y = "dgeMatrix"),
@@ -223,7 +227,8 @@ setMethod("lu", signature(x = "dgeMatrix"),
           function(x, ...) .Call("dgeMatrix_LU", x), valueClass = "LU")
 
 setMethod("determinant", signature(x = "dgeMatrix", logarithm = "missing"),
-          function(x, logarithm, ...) determinant(x, TRUE))
+          function(x, logarithm, ...)
+          .Call("dgeMatrix_determinant", x, TRUE))
 
 setMethod("determinant", signature(x = "dgeMatrix", logarithm = "logical"),
           function(x, logarithm, ...)
