@@ -239,3 +239,29 @@ setClass("lmeRep",
          validity = function(object)
          .Call("lmeRep_validate", object))
 
+## Representation of a linear mixed effects model
+setClass("lmer",
+         representation(
+                        flist = "list", # list of grouping factors
+                        perm = "list",  # list of permutations of levels (0-based)
+                        Parent = "list",# list of Parent arrays for ZZpO
+                        D = "list",     # list of diagonal factors (lower triangle)
+                        L = "list",     # list of blocks of L
+                        Linv = "list",  # list of diagonal blocks of L^{-1}
+                        ZZpO = "list",  # list of diagonal blocks of Z'Z+Omega
+                        Omega = "list", # list of relative precision matrices
+                        RXX = "matrix", # Augmented RXX component or its inverse
+                        RZX = "matrix", # Augmented RZX component or its inverse
+                        XtX = "matrix", # Original X'X matrix
+                        ZtZ = "list",   # list of blocks of Z'Z
+                        ZtX = "matrix", # Original Z'X matrix
+                        cnames = "list",# column names of model matrices
+                        devComp = "numeric", # Components of deviance
+                        deviance = "numeric", # Current deviance (ML and REML)
+                        nc = "integer", # number of columns in (augmented)
+                                        # model matrices and number of observations
+                        Gp = "integer", # Pointers to groups of rows in RZX
+                        status = "logical",
+                        call = "call"   # omit this after debugging phase
+                        ))
+

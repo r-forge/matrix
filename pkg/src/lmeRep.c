@@ -1651,3 +1651,434 @@ SEXP lmeRep_variances(SEXP x)
     UNPROTECT(1);
     return Omg;
 }
+
+/** 
+ * Create the crosstabulation.  Should do this early in case we need to
+ * reorder the factors.
+ * 
+ * @param flist pointer to the factor list.
+ * @param nobs number of observations.
+ * @param nc number of columns in the model matrices.
+ * 
+ * @return the pairwise crosstabulation in the form of the ZtZ array.
+ */
+static SEXP
+lmer_crosstab(SEXP flist, int nobs, const int nc[])
+{
+    int i, nf = length(flist);
+    int npairs = (nf * (nf + 1))/2;
+    SEXP val = PROTECT(allocVector(VECSXP, npairs));
+    SEXP cscbCl = MAKE_CLASS("cscBlocked");
+    int *Ti = Calloc(nobs, int),
+	*nlevs = Calloc(nf, int),
+	**zb = Calloc(nf, int*); /* zero-based indices */
+    double *ones = Calloc(nobs, double),
+	*Tx = Calloc(nobs, double);
+    
+    for (i = 0; i < nobs; i++) ones[i] = 1.;
+    for (i = 0; i < nf; i++) {	/* populate the zb vectors */
+	SEXP fi = VECTOR_ELT(flist, i);
+	int j;
+
+	zb[i] = Calloc(nobs, int);
+	nlevs[i] = length(getAttrib(fi, R_LevelsSymbol));
+	for (j = 0; j < nobs; j++) zb[i][j] = INTEGER(fi)[j] - 1; 
+	for (j = 0; j <= i; j++) {
+	    int *ijp, ind = Lind(i, j), nnz;
+	    SEXP ZZij;
+	    
+	    SET_VECTOR_ELT(val, ind, NEW_OBJECT(cscbCl));
+	    ZZij = VECTOR_ELT(val, ind);
+	    SET_SLOT(ZZij, Matrix_pSym, allocVector(INTSXP, nlevs[j] + 1));
+	    ijp = INTEGER(GET_SLOT(ZZij, Matrix_pSym));
+	    triplet_to_col(nlevs[i], nlevs[j], nobs, zb[i], zb[j], ones,
+			   ijp, Ti, Tx);
+	    nnz = ijp[nlevs[j]];
+	    SET_SLOT(ZZij, Matrix_iSym, allocVector(INTSXP, nnz));
+	    Memcpy(INTEGER(GET_SLOT(ZZij, Matrix_iSym)), Ti, nnz);
+	    SET_SLOT(ZZij, Matrix_xSym, alloc3Darray(REALSXP, nc[i], nc[j], nnz));
+	    /* The crosstab counts are copied into the first nnz elements */
+	    /* of the x slot.  These aren't the correct array positions */
+	    /* unless nc[i] == nc[j] == 1 but we don't use them. */
+	    Memcpy(REAL(GET_SLOT(ZZij, Matrix_xSym)), Tx, nnz);
+	}
+    }
+    
+    for (i = 0; i < nf; i++) Free(zb[i]);
+    Free(zb); Free(nlevs); Free(ones); Free(Ti); Free(Tx);
+    UNPROTECT(1);
+    return val;
+}
+
+    
+/** 
+ * Update the arrays ZtZ, ZtX, and XtX in an lme object
+ * according to a list of model matrices.
+ * 
+ * @param x pointer to an lmer object
+ * @param mmats pointer to a list of model matrices
+ * 
+ * @return NULL
+ */
+SEXP lmer_update_mm(SEXP x, SEXP mmats)
+{
+    SEXP
+	ZtZP = GET_SLOT(x, Matrix_ZtZSym),
+	ZtXP = GET_SLOT(x, Matrix_ZtXSym),
+	flist = GET_SLOT(x, Matrix_flistSym);
+    int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	*dims = INTEGER(getAttrib(ZtXP, R_DimSymbol)),
+	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	*status = LOGICAL(GET_SLOT(x, Matrix_statusSym)),
+	nf = length(flist), nfp1 = nf + 1,
+	i, ione = 1,
+	nobs = nc[nfp1],
+	pp1 = nc[nf];
+    double
+	*X,
+	*XtX = REAL(GET_SLOT(x, Matrix_XtXSym)),
+	*ZtX = REAL(ZtXP),
+	one = 1.0, zero = 0.0;
+
+    if (!isNewList(mmats) || length(mmats) != nfp1)
+	error("mmats must be a list of %d model matrices", nfp1);
+    for (i = 0; i <= nf; i++) {
+	SEXP mmat = VECTOR_ELT(mmats, i);
+	int *mdims = INTEGER(getAttrib(mmat, R_DimSymbol));
+	
+	if (!isMatrix(mmat) || !isReal(mmat))
+	    error("element %d of mmats is not a numeric matrix", i + 1);
+	if (nobs != mdims[0])
+	    error("Expected %d rows in the %d'th model matrix. Got %d",
+		  nobs, i+1, mdims[0]);
+	if (nc[i] != mdims[1])
+	    error("Expected %d columns in the %d'th model matrix. Got %d",
+		  nc[i], i+1, mdims[1]);
+    }
+				/* Create XtX */
+    X = REAL(VECTOR_ELT(mmats, nf));
+    F77_CALL(dsyrk)("U", "T", &pp1, &nobs, &one, X, &nobs, &zero, XtX, nc + nf);
+				/* Zero an accumulator */
+    memset((void *) ZtX, 0, sizeof(double) * pp1 * Gp[nf]);
+    for (i = 0; i < nf; i++) {
+	int *fac = INTEGER(VECTOR_ELT(flist, i)),
+	    j, k, nci = nc[i], ZtXrows = Gp[i+1] - Gp[i];
+	int ncisqr = nci * nci, nlev = ZtXrows/nci;
+	double *Z = REAL(VECTOR_ELT(mmats, i)), *ZZx;
+	
+	for (k = 0; k < i; k++) {
+	    SEXP ZZxM = VECTOR_ELT(ZtZP, Lind(i, k));
+	    int *rowind = INTEGER(GET_SLOT(ZZxM, Matrix_iSym)),
+		*colptr = INTEGER(GET_SLOT(ZZxM, Matrix_pSym));
+	    int *f2 = INTEGER(VECTOR_ELT(flist, k)), nck = nc[k];
+	    double *Zk = REAL(VECTOR_ELT(mmats, k));
+	    
+	    ZZx = REAL(GET_SLOT(ZZxM, Matrix_xSym));
+	    memset(ZZx, 0, sizeof(double) *
+		   length(GET_SLOT(ZZxM, Matrix_xSym)));
+	    for (j = 0; j < nobs; j++) {
+		F77_CALL(dgemm)("T", "N", nc + i, nc + k, &ione, &one,
+				Z + j, &nobs, Zk + j, &nobs, &one,
+				ZZx + Tind(rowind, colptr, fac[j] - 1, f2[j] - 1)
+				* (nci * nck), &nci);
+	    }
+	}
+	ZZx = REAL(GET_SLOT(VECTOR_ELT(ZtZP, Lind(i, i)), Matrix_xSym));
+	memset((void *) ZZx, 0, sizeof(double) * nci * nci * nlev);
+	if (nci == 1) {		/* single column in Z */
+	    for (j = 0; j < nobs; j++) {
+		int fj = fac[j] - 1; /* factor indices are 1-based */
+		ZZx[fj] += Z[j] * Z[j];
+		F77_CALL(daxpy)(&pp1, Z + j, X + j, &nobs, ZtX + fj, dims);
+	    }
+	} else {
+	    for (j = 0; j < nobs; j++) {
+		int fj = fac[j] - 1; /* factor indices are 1-based */
+
+		F77_CALL(dsyr)("U", nc + i, &one, Z + j, &nobs,
+			       ZZx + fj * ncisqr, nc + i);
+		F77_CALL(dgemm)("T", "N", nc + i, &pp1, &ione,
+				&one, Z + j, &nobs,
+				X + j, &nobs, &one,
+				ZtX + fj * nci, dims);
+	    }
+	}
+	ZtX += ZtXrows;
+    }
+    status[0] = status[1] = 0;
+    return R_NilValue;
+}
+
+/** 
+ * Create an lmer object from a list grouping factors and a list of model
+ * matrices.  There is one more model matrix than grouping factor.  The last
+ * model matrix is the fixed effects and the response.
+ * 
+ * @param facs pointer to a list of grouping factors
+ * @param ncv pointer to a list of model matrices
+ * 
+ * @return pointer to an lmer object
+ */
+SEXP lmer_create(SEXP flist, SEXP mmats)
+{
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("lmer")));
+    SEXP ZtZ, cnames, fnms, nms;
+    int *nc, i, nf = length(flist), nobs;
+    
+				/* Check validity of flist */
+    if (!(nf > 0 && isNewList(flist)))
+	error("flist must be a non-empty list");
+    nobs = length(VECTOR_ELT(flist, 0));
+    if (nobs < 1) error("flist[[0]] must be a non-null factor");
+    for (i = 0; i < nf; i++) {
+	SEXP fi = VECTOR_ELT(flist, i);
+	if (!(isFactor(fi) && length(fi) == nobs))
+	    error("flist[[%d]] must be a factor of length %d",
+		  i + 1, nobs);
+    }
+    SET_SLOT(val, Matrix_flistSym, flist);
+    if (!(isNewList(mmats) && length(mmats) == (nf + 1)))
+	error("mmats must be a list of length %d", nf + 1);
+    SET_SLOT(val, Matrix_ncSym, allocVector(INTSXP, nf + 2));
+    nc = INTEGER(GET_SLOT(val, Matrix_ncSym));
+    nc[nf + 1] = nobs;
+    for (i = 0; i <= nf; i++) {
+	SEXP mi = VECTOR_ELT(mmats, i);
+	int *dims;
+
+	if (!(isMatrix(mi) && isReal(mi)))
+	    error("mmats[[%d]] must be a numeric matrix", i + 1);
+	dims = INTEGER(getAttrib(mi, R_DimSymbol));
+	if (dims[0] != nobs)
+	    error("mmats[[%d]] must have %d rows", i + 1, nobs);
+	if (dims[1] < 1)
+	    error("mmats[[%d]] must have at least 1 column", i + 1);
+	nc[i] = dims[1];
+    }   /* Arguments have now been checked for type, dimension, etc. */
+				/* Create pairwise crosstabulation in ZtZ */
+    SET_SLOT(val, Matrix_ZtZSym, lmer_crosstab(flist, nobs, nc));
+    lmer_populate(val);
+    ZtZ = GET_SLOT(val, Matrix_ZtZSym);
+    /* FIXME: Check for possible reordering of the factors to maximize the
+     * number of levels in the initial sequence of nested factors. */
+    fnms = getAttrib(flist, R_NamesSymbol);
+				/* Allocate and populate nc and cnames */
+    SET_SLOT(val, Matrix_cnamesSym, allocVector(VECSXP, nf + 1));
+    cnames = GET_SLOT(val, Matrix_cnamesSym);
+    setAttrib(cnames, R_NamesSymbol, allocVector(STRSXP, nf + 1));
+    nms = getAttrib(cnames, R_NamesSymbol);
+    for (i = 0; i <= nf; i++) {
+	SEXP mi = VECTOR_ELT(mmats, i);
+	SET_VECTOR_ELT(cnames, i,
+		       duplicate(VECTOR_ELT(getAttrib(mi, R_DimNamesSymbol),
+					    1)));
+	if (i < nf)
+	    SET_STRING_ELT(nms, i, duplicate(STRING_ELT(fnms, i)));
+	else
+	    SET_STRING_ELT(nms, nf, mkChar(".fixed"));
+    }
+    lmer_update_mm(val, mmats);
+    UNPROTECT(1);
+    return val;
+}
+
+/** 
+ * Create and insert initial values for Omega.
+ * 
+ * @param x pointer to an lmer object
+ * 
+ * @return NULL
+ */
+SEXP lmer_initial(SEXP x)
+{
+    SEXP Omg = GET_SLOT(x, Matrix_OmegaSym);
+    int	*status = LOGICAL(GET_SLOT(x, Matrix_statusSym)), i, nf = length(Omg);
+
+    for (i = 0; i < nf; i++) {
+	SEXP ZZxP = GET_SLOT(VECTOR_ELT(GET_SLOT(x, Matrix_ZtZSym), Lind(i, i)),
+			     Matrix_xSym);
+	int *dims = INTEGER(getAttrib(ZZxP, R_DimSymbol));
+	int j, k, nzc = dims[0], nlev = dims[2];
+	int nzcsqr = nzc * nzc, nzcp1 = nzc + 1;
+	double *Omega = REAL(VECTOR_ELT(Omg, i)),
+	    mi = 0.375 / ((double) nlev);
+    
+	memset((void *) Omega, 0, sizeof(double) * nzc * nzc);
+	for (j = 0; j < nlev; j ++) {
+	    for (k = 0; k < nzc; k++) {
+		Omega[k * nzcp1] += REAL(ZZxP)[k * nzcp1 + j * nzcsqr] * mi;
+	    }
+	}
+    }
+    status[0] = status[1] = 0;
+    return R_NilValue;
+}
+
+/** 
+ * Copy the diagonal blocks from ZtZ to ZZpO and inflate by Omega.
+ * Update devComp[1].
+ * 
+ * @param x pointer to an lmer object
+ */
+SEXP 
+lmer_inflate(SEXP x)
+{
+    SEXP Omg = GET_SLOT(x, Matrix_OmegaSym),
+	ZZpO = GET_SLOT(x, Matrix_ZZpOSym), 
+	ZtZ = GET_SLOT(x, Matrix_ZtZSym);
+    int *dcmp = INTEGER(GET_SLOT(x, Matrix_devCompSym)),
+	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	i, nf = length(Omg);
+
+    dcmp[0] = dcmp[1] = dcmp[2] = dcmp[3] = 0.;
+    for (i = 0; i < nf; i++) {
+	int ind = Lind(i, i), j, nci = nc[i], ncisqr = nci * nci;
+	SEXP ZZOel = VECTOR_ELT(ZZpO, ind);
+	SEXP ZZm = GET_SLOT(VECTOR_ELT(ZtZ, ind), Matrix_xSym),
+	    ZZOm = GET_SLOT(ZZOel, Matrix_xSym);
+	int nlev = INTEGER(getAttrib(ZZm, R_DimSymbol))[2],
+	    *ZZOd = INTEGER(getAttrib(ZZOm, R_DimSymbol));
+	int *colptr = INTEGER(GET_SLOT(ZZOel, Matrix_pSym)),
+	    *rowind = INTEGER(GET_SLOT(ZZOel, Matrix_iSym));
+	double *ZZ = REAL(ZZm), *ZZO = REAL(ZZOm),
+	    *Omega = REAL(VECTOR_ELT(Omg, i));
+
+	/* zero the whole of the ZZpO component */
+	memset(ZZO, 0, sizeof(double) * ZZOd[0] * ZZOd[1] * ZZOd[2]);
+	if (nci == 1) {
+	    dcmp[1] += nlev * log(Omega[0]);
+	    for (j = 0; j < nlev; j++) { /* inflate */
+		ZZO[Tind(rowind, colptr, j, j)] = ZZ[j] + Omega[0];
+	    }
+	} else {
+	    double *tmp = Memcpy(Calloc(ncisqr, double), Omega, ncisqr);
+	    
+	    F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
+	    if (j)
+		error("Leading minor of size %d of Omega[[%d]] is not positive definite",
+		      j, i + 1);
+	    for (j = 0; j < nci; j++) { /* nlev * logDet(Omega_i) */
+		dcmp[1] += nlev * 2. * log(tmp[j * (nci + 1)]);
+	    }
+	    Free(tmp);
+	    
+	    for (j = 0; j < nlev; j++) {
+		int ii, jj;
+		double
+		    *ZZOj = ZZO + Tind(rowind, colptr, j, j) * ncisqr,
+		    *ZZj = ZZ + j * ncisqr;
+		
+		for (jj = 0; jj < nci; jj++) { /* Copy ZZi to ZZOj and inflate */
+		    for (ii = jj; ii < nci; ii++) { /* upper triangle only */
+			int ind = ii + jj * nci;
+
+			ZZOj[ind] = ZZj[ind] + Omega[ind];
+		    }
+		}
+	    }
+	}
+    }
+    return R_NilValue;
+}
+
+/** 
+ * If status[["factored"]] is FALSE, create and factor Z'Z+Omega, then
+ * create RZX and RXX, the deviance components, and the value of the
+ * deviance for both ML and REML.
+ * 
+ * @param x pointer to an lmeRep object
+ * 
+ * @return NULL
+ */
+SEXP lmer_factor(SEXP x)
+{
+    int *status = LOGICAL(GET_SLOT(x, Matrix_statusSym));
+    
+    if (!status[0]) {
+	SEXP DP = GET_SLOT(x, Matrix_DSym),
+	    LP = GET_SLOT(x, Matrix_LSym),
+	    Linv = GET_SLOT(x, Matrix_LinvSym),
+	    RZXsl = GET_SLOT(x, Matrix_RZXSym),
+	    ZZOP = GET_SLOT(x, Matrix_ZZpOSym);
+	int *dims = INTEGER(getAttrib(RZXsl, R_DimSymbol)),
+	    *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	    *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	    i, j, nf = length(DP);
+	int nml = nc[nf + 1], nreml = nml + 1 - nc[nf];
+	double
+	    *RXX = REAL(GET_SLOT(x, Matrix_RXXSym)),
+	    *RZX = REAL(RZXsl),
+	    *dcmp = REAL(GET_SLOT(x, Matrix_devCompSym)),
+	    *deviance = REAL(GET_SLOT(x, Matrix_devianceSym)),
+	    minus1 = -1., one = 1.;
+
+
+	lmer_inflate(x);
+	for (i = 0; i < nf; i++) {
+	    SEXP ZZOiP = VECTOR_ELT(ZZOP, Lind(i, i));
+	    SEXP DiP = VECTOR_ELT(DP, i);
+	    int nlev = INTEGER(getAttrib(DiP, R_DimSymbol))[2],
+		*colptr = INTEGER(GET_SLOT(ZZOiP, Matrix_pSym)),
+		*rowind = INTEGER(GET_SLOT(ZZOiP, Matrix_iSym));
+	    int jj, nci = nc[i], ncisqr = nci * nci;
+	    double *D = REAL(DiP), *ZZOi = REAL(ZZOiP);
+	
+	    if (nci == 1) {
+		for (j = 0; j < nlev; j++) {
+		    double ZZO = ZZOi[Tind(rowind, colptr, j, j)];
+		    dcmp[0] += log(ZZO);
+		    D[j] = sqrt(ZZO);
+		}
+	    } else {
+		for (j = 0; j < nlev; j++) {
+		    double *Dj = Memcpy(D + j * ncisqr,
+					ZZOi + Tind(rowind, colptr, j, j) * ncisqr,
+					ncisqr);
+
+		    F77_CALL(dpotrf)("U", &nci, Dj, &nci, &jj);
+		    if (jj) 
+			error("D[ , , %d], level %d, is not positive definite",
+			      j + 1, i + 1);
+		    for (jj = 0; jj < nci; jj++) /* accumulate determinant */
+			dcmp[0] += 2. * log(Dj[jj * (nci + 1)]);
+		}
+	    }
+	}
+				/* solve for RZX */
+	Memcpy(RZX, REAL(GET_SLOT(x, Matrix_ZtXSym)), dims[0] * dims[1]);
+	L_inverse(nf, LP, Linv);
+	lmeRep_L_sm(nf, LP, Linv, RZXsl);
+	for (i = 0; i < nf; i++) {
+	    SEXP DiP = VECTOR_ELT(DP, i);
+	    int nci = nc[i], ncisqr = nci * nci,
+		nlev = INTEGER(getAttrib(DiP, R_DimSymbol))[2];
+
+	    for (j = 0; j < nlev; j++) {
+		F77_CALL(dtrsm)("L", "U", "T", "N", &nci, dims + 1,
+				&one, REAL(DiP) + j * ncisqr, &nci,
+				RZX + Gp[i] + j * nci, dims);
+	    }
+	}
+				/* downdate and factor XtX */
+	Memcpy(RXX, REAL(GET_SLOT(x, Matrix_XtXSym)), dims[1] * dims[1]);
+	F77_CALL(dsyrk)("U", "T", dims + 1, dims,
+			&minus1, REAL(RZXsl), dims,
+			&one, RXX, dims + 1);
+	F77_CALL(dpotrf)("U", dims + 1, RXX, dims + 1, &j);
+	if (j) {
+	    warning("Leading minor of size %d of downdated X'X is indefinite",
+		    j);
+	    dcmp[2] = dcmp[3] = deviance[0] = deviance[1] = NA_REAL;
+	} else {
+	    for (j = 0; j < (dims[1] - 1); j++) /* 2 logDet(RXX) */
+		dcmp[2] += 2 * log(RXX[j * (dims[1] + 1)]);
+	    dcmp[3] = 2. * log(RXX[dims[1] * dims[1] - 1]); /* 2 log(ryy) */
+	    deviance[0] =	/* ML criterion */
+		dcmp[0] - dcmp[1] + nml*(1.+dcmp[3]+log(2.*PI/nml));
+	    deviance[1] = dcmp[0] - dcmp[1] + /* REML */
+		dcmp[2] + nreml*(1.+dcmp[3]+log(2.*PI/nreml));
+	}
+	status[0] = 1; status[1] = 0; /* factored but not inverted */
+    }
+    return R_NilValue;
+}

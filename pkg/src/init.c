@@ -30,7 +30,6 @@ static R_CallMethodDef CallEntries[] = {
     {"csc_to_triplet", (DL_FUNC) &csc_to_triplet, 1},
     {"csc_to_matrix", (DL_FUNC) &csc_to_matrix, 1},
     {"csc_to_geMatrix", (DL_FUNC) &csc_to_geMatrix, 1},
-/*     {"csc_to_imagemat", (DL_FUNC) &csc_to_imagemat, 1}, */
     {"matrix_to_csc", (DL_FUNC) &matrix_to_csc, 1},
     {"triplet_to_csc", (DL_FUNC) &triplet_to_csc, 1},
     {"csc_getDiag", (DL_FUNC) &csc_getDiag, 1},
@@ -67,6 +66,10 @@ static R_CallMethodDef CallEntries[] = {
     {"lmeRep_ECMEsteps", (DL_FUNC) &lmeRep_ECMEsteps, 4},
     {"lmeRep_gradient", (DL_FUNC) &lmeRep_gradient, 3},
     {"lmeRep_variances", (DL_FUNC) &lmeRep_variances, 1},
+    {"lmer_create", (DL_FUNC) &lmer_create, 2},
+    {"lmer_factor", (DL_FUNC) &lmer_factor, 1},
+    {"lmer_inflate", (DL_FUNC) &lmer_inflate, 1},
+    {"lmer_initial", (DL_FUNC) &lmer_initial, 1},
     {"poMatrix_rcond", (DL_FUNC) &poMatrix_rcond, 2},
     {"poMatrix_solve", (DL_FUNC) &poMatrix_solve, 1},
     {"poMatrix_matrix_solve", (DL_FUNC) &poMatrix_matrix_solve, 2},
@@ -103,7 +106,7 @@ static R_CallMethodDef CallEntries[] = {
     {"ssclme_gradient", (DL_FUNC) &ssclme_gradient, 3},
     {"ssclme_Hessian", (DL_FUNC) &ssclme_Hessian, 3},
     {"ssclme_collapse", (DL_FUNC) &ssclme_collapse, 1},
-    {"ssclme_to_lme", (DL_FUNC) &ssclme_to_lme, 11},
+    {"ssclme_to_lme", (DL_FUNC) &ssclme_to_lme, 10},
     {"syMatrix_validate", (DL_FUNC) &syMatrix_validate, 1},
     {"syMatrix_norm", (DL_FUNC) &syMatrix_norm, 2},
     {"syMatrix_rcond", (DL_FUNC) &syMatrix_rcond, 2},
@@ -134,10 +137,10 @@ static R_CallMethodDef CallEntries[] = {
 
 void R_init_Matrix(DllInfo *dll)
 {
-    R_useDynamicSymbols(dll, FALSE);
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
-    Matrix_DSym = install("D");
+    R_useDynamicSymbols(dll, FALSE);
     Matrix_DIsqrtSym = install("DIsqrt");
+    Matrix_DSym = install("D");
     Matrix_DimSym = install("Dim");
     Matrix_GpSym = install("Gp");
     Matrix_LSym = install("L");
@@ -150,14 +153,17 @@ void R_init_Matrix(DllInfo *dll)
     Matrix_RXXSym = install("RXX");
     Matrix_RZXSym = install("RZX");
     Matrix_XtXSym = install("XtX");
-    Matrix_ZtXSym = install("ZtX");
     Matrix_ZZxSym = install("ZZx");
+    Matrix_ZZpOSym = install("ZZpO");
+    Matrix_ZtXSym = install("ZtX");
+    Matrix_ZtZSym = install("ZtZ");
     Matrix_bVarSym = install("bVar");
     Matrix_cnamesSym = install("cnames");
-    Matrix_devianceSym = install("deviance");
     Matrix_devCompSym = install("devComp");
+    Matrix_devianceSym = install("deviance");
     Matrix_diagSym = install("diag");
     Matrix_factorization = install("factorization");
+    Matrix_flistSym = install("flist");
     Matrix_iSym = install("i");
     Matrix_ipermSym = install("iperm");
     Matrix_jSym = install("j");
