@@ -1,7 +1,8 @@
 #include "bCrosstab.h"
 /* TODO:
- * Watch distinction between ZtZ and ZZpO slots.
- * Add code to check for a dense nnz before calculating a fill-reducing permutation.
+ * - Use the off-diagonal blocks of L
+ * - Remove the off-diagonal blocks of ZZpO
+ * - Only do a fill-reducing permutation on the first non-nested factor
  */
 
 /** 
@@ -484,11 +485,9 @@ lmer_populate(SEXP val)
 	SET_VECTOR_ELT(Omega, j, allocMatrix(REALSXP, nc[j], nc[j]));
     }
     SET_SLOT(val, Matrix_XtXSym, allocMatrix(REALSXP, nc[nf], nc[nf]));
+    AZERO(REAL(GET_SLOT(val, Matrix_XtXSym)), nc[nf] * nc[nf]);
     SET_SLOT(val, Matrix_RXXSym, allocMatrix(REALSXP, nc[nf], nc[nf]));
-    Memcpy(REAL(GET_SLOT(val, Matrix_RXXSym)),
-	   memset(REAL(GET_SLOT(val, Matrix_XtXSym)), 0,
-		  sizeof(double) * nc[nf] * nc[nf]),
-	   nc[nf] * nc[nf]);
+    AZERO(REAL(GET_SLOT(val, Matrix_RXXSym)), nc[nf] * nc[nf]);
     SET_SLOT(val, Matrix_ZtXSym, allocMatrix(REALSXP, Gp[nf], nc[nf]));
     SET_SLOT(val, Matrix_RZXSym, allocMatrix(REALSXP, Gp[nf], nc[nf]));
     for (j = 0; j < nf; j++) {
