@@ -208,7 +208,7 @@ SEXP lapack_qr(SEXP Xin, SEXP tl)
 	F77_CALL(dgeqrf)(&n, &p, xpt, &n, REAL(qraux), work, &lwork, &info);
 	if (info)
 	    error("Second call to dgeqrf returned error code %d", info);
-	iwork = (int *) R_alloc(trsz, sizeof(double));
+	iwork = (int *) R_alloc(trsz, sizeof(int));
 	F77_CALL(dtrcon)("1", "U", "N", &rank, xpt, &n, &rcond,
 			 work, iwork, &info);
 	if (info)
