@@ -5,8 +5,10 @@
 #include "dgTMatrix.h"
 #include "dgeMatrix.h"
 #include "dpoMatrix.h"
+#include "dppMatrix.h"
 #include "dsCMatrix.h"
 #include "dsTMatrix.h"
+#include "dspMatrix.h"
 #include "dsyMatrix.h"
 #include "dtCMatrix.h"
 #include "dtTMatrix.h"
@@ -22,7 +24,9 @@
 
 static R_CallMethodDef CallEntries[] = {
     {"BunchKaufman_validate", (DL_FUNC) &BunchKaufman_validate, 1},
+    {"pBunchKaufman_validate", (DL_FUNC) &pBunchKaufman_validate, 1},
     {"Cholesky_validate", (DL_FUNC) &Cholesky_validate, 1},
+    {"pCholesky_validate", (DL_FUNC) &pCholesky_validate, 1},
     {"LU_expand", (DL_FUNC) &LU_expand, 1},
     {"LU_validate", (DL_FUNC) &LU_validate, 1},
     {"SVD_validate", (DL_FUNC) &SVD_validate, 1},
@@ -64,6 +68,12 @@ static R_CallMethodDef CallEntries[] = {
     {"dpoMatrix_rcond", (DL_FUNC) &dpoMatrix_rcond, 2},
     {"dpoMatrix_solve", (DL_FUNC) &dpoMatrix_solve, 1},
     {"dpoMatrix_validate", (DL_FUNC) &dpoMatrix_validate, 1},
+    {"dppMatrix_chol", (DL_FUNC) &dppMatrix_chol, 1},
+    {"dppMatrix_dgeMatrix_solve", (DL_FUNC) &dppMatrix_dgeMatrix_solve, 2},
+    {"dppMatrix_matrix_solve", (DL_FUNC) &dppMatrix_matrix_solve, 2},
+    {"dppMatrix_rcond", (DL_FUNC) &dppMatrix_rcond, 2},
+    {"dppMatrix_solve", (DL_FUNC) &dppMatrix_solve, 1},
+    {"dppMatrix_validate", (DL_FUNC) &dppMatrix_validate, 1},
     {"dsCMatrix_chol", (DL_FUNC) &dsCMatrix_chol, 2},
     {"dsCMatrix_inverse_factor", (DL_FUNC) &dsCMatrix_inverse_factor, 1},
     {"dsCMatrix_ldl_symbolic", (DL_FUNC) &dsCMatrix_ldl_symbolic, 2},
@@ -74,15 +84,27 @@ static R_CallMethodDef CallEntries[] = {
     {"dsTMatrix_as_dsyMatrix", (DL_FUNC) &dsTMatrix_as_dsyMatrix, 1},
     {"dsTMatrix_validate", (DL_FUNC) &dsTMatrix_validate, 1},
     {"dsyMatrix_as_dgeMatrix", (DL_FUNC) &dsyMatrix_as_dgeMatrix, 1},
+    {"dsyMatrix_as_dspMatrix", (DL_FUNC) &dsyMatrix_as_dspMatrix, 1},
     {"dsyMatrix_as_matrix", (DL_FUNC) &dsyMatrix_as_matrix, 1},
     {"dsyMatrix_dgeMatrix_mm", (DL_FUNC) &dsyMatrix_dgeMatrix_mm, 2},
     {"dsyMatrix_dgeMatrix_mm_R", (DL_FUNC) &dsyMatrix_dgeMatrix_mm_R, 2},
     {"dsyMatrix_matrix_solve", (DL_FUNC) &dsyMatrix_matrix_solve, 2},
+    {"dsyMatrix_dgeMatrix_solve", (DL_FUNC) &dsyMatrix_dgeMatrix_solve, 2},
     {"dsyMatrix_norm", (DL_FUNC) &dsyMatrix_norm, 2},
     {"dsyMatrix_rcond", (DL_FUNC) &dsyMatrix_rcond, 2},
     {"dsyMatrix_solve", (DL_FUNC) &dsyMatrix_solve, 1},
-    {"dsyMatrix_trf", (DL_FUNC) &dsyMatrix_trf, 1},
     {"dsyMatrix_validate", (DL_FUNC) &dsyMatrix_validate, 1},
+    {"dspMatrix_trf", (DL_FUNC) &dspMatrix_trf, 1},
+    {"dspMatrix_as_dsyMatrix", (DL_FUNC) &dspMatrix_as_dsyMatrix, 1},
+    {"dspMatrix_dgeMatrix_mm", (DL_FUNC) &dspMatrix_dgeMatrix_mm, 2},
+    {"dspMatrix_matrix_mm", (DL_FUNC) &dspMatrix_matrix_mm, 2},
+    {"dspMatrix_matrix_solve", (DL_FUNC) &dspMatrix_matrix_solve, 2},
+    {"dspMatrix_dgeMatrix_solve", (DL_FUNC) &dspMatrix_dgeMatrix_solve, 2},
+    {"dspMatrix_norm", (DL_FUNC) &dspMatrix_norm, 2},
+    {"dspMatrix_rcond", (DL_FUNC) &dspMatrix_rcond, 2},
+    {"dspMatrix_solve", (DL_FUNC) &dspMatrix_solve, 1},
+    {"dspMatrix_trf", (DL_FUNC) &dspMatrix_trf, 1},
+    {"dspMatrix_validate", (DL_FUNC) &dspMatrix_validate, 1},
     {"dtTMatrix_as_dtrMatrix", (DL_FUNC) &dtTMatrix_as_dtrMatrix, 1},
     {"dtTMatrix_validate", (DL_FUNC) &dtTMatrix_validate, 1},
     {"dtpMatrix_as_dtrMatrix", (DL_FUNC) &dtpMatrix_as_dtrMatrix, 1},
