@@ -95,6 +95,8 @@ static R_CallMethodDef CallEntries[] = {
     {"dtrMatrix_validate", (DL_FUNC) &dtrMatrix_validate, 1},
     {"dtpMatrix_as_dtrMatrix", (DL_FUNC) &dtpMatrix_as_dtrMatrix, 1},
     {"dtpMatrix_matrix_solve", (DL_FUNC) &dtpMatrix_matrix_solve, 2},
+    {"dtpMatrix_matrix_mm", (DL_FUNC) &dtpMatrix_matrix_mm, 2},
+    {"dtpMatrix_dgeMatrix_mm", (DL_FUNC) &dtpMatrix_dgeMatrix_mm, 2},
     {"dtpMatrix_norm", (DL_FUNC) &dtpMatrix_norm, 2},
     {"dtpMatrix_rcond", (DL_FUNC) &dtpMatrix_rcond, 2},
     {"dtpMatrix_getDiag", (DL_FUNC) &dtpMatrix_getDiag, 1},
