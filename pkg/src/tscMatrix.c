@@ -117,7 +117,7 @@ SEXP Parent_inverse(SEXP par, SEXP unitdiag)
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("tscMatrix")));
     int *ap, *ai, *dims, *pr = INTEGER(par),
 	countDiag = 1 - asLogical(unitdiag),
-	j, k, n = length(par), nnz;
+	j, n = length(par), nnz;
     double *ax;
     
     if (!isInteger(par)) error("par argument must be an integer vector");
