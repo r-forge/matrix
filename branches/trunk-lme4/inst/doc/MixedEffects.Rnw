@@ -29,7 +29,7 @@
   $\bL\bD\bL\trans$ form of the Cholesky decomposition of the
   augmented sparse representation.  Additionally, we can use
   information from this representation to evaluate ECME updates and
-  the gradient and Hessian of the criterion being optimized.
+  the gradient of the criterion being optimized.
 
   The sparse matrix methods that we employ have both a symbolic phase,
   in which the form of the number and the positions of the
@@ -60,8 +60,8 @@ with a single grouping factor for the random effects or with multiple,
 nested grouping factors.  Those methods are based on
 orthogonal-triangular (or ``QR'') decompositions.  Later, in
 \citet{bate:debr:2004} we generalized and extended these QR-based
-methods to provide the gradient and the Hessian of the
-criteria that are optimized by the parameter estimates.
+methods to provide the gradient of the criteria that are optimized by
+the parameter estimates.
 
 In this report we formulate a general approach to linear mixed model
 calculations using sparse matrix methods.  For an important class
@@ -278,49 +278,7 @@ where
   \vb=\bL\invtrans\bD^{-1/2}\left(\bI+\RZX\RXX^{-1}\RXX\invtrans
     \RZX\trans\right)\bD^{-1/2}\bL^{-1}
 \end{equation}
-and $\der$ denotes the Frechet derivative.  Terms in the Hessian can
-be expressed as
-\begin{align}
-  \label{eq:HessDev}
-  \derj\deri(-2\tilde{\ell})&=\tr\left[\derj(\deri\bOmega)\left(
-      (\bZ\trans\bZ+\bOmega)^{-1}-\bOmega^{-1}+
-      \frac{\widehat{\bb}}{\widehat{\sigma}}
-      \frac{\widehat{\bb}}{\widehat{\sigma}}\trans\right)\right]\\
-  \nonumber
-  &\quad-\tr\left[\derj\bOmega
-    (\bZ\trans\bZ+\bOmega)^{-1}\deri\bOmega(\bZ\trans\bZ+
-    \bOmega)^{-1}\right]\\
-  \nonumber
-  &\quad+\tr\left(\derj\bOmega\bOmega^{-1}\deri\bOmega\bOmega^{-1}\right)
-  -2\frac{\widehat{\bb}}{\widehat{\sigma}}\trans\derj\bOmega\vb\deri\bOmega
-  \frac{\widehat{\bb}}{\widehat{\sigma}}\\
-  \nonumber
-  &\quad-\frac{1}{n}
-  \left(\frac{\widehat{\bb}}{\widehat{\sigma}}\trans\derj\bOmega
-    \frac{\widehat{\bb}}{\widehat{\sigma}}\right)
-  \left(\frac{\widehat{\bb}}{\widehat{\sigma}}\trans\deri\bOmega
-    \frac{\widehat{\bb}}{\widehat{\sigma}}\right)\\
-  \label{eq:HessDevRest}
-  \derj\deri(-2\tilde{\ell_R})&=\tr\left[\derj(\deri\bOmega)\left(
-      \vb-\bOmega^{-1}+
-      \frac{\widehat{\bb}}{\widehat{\sigma}_R}
-      \frac{\widehat{\bb}}{\widehat{\sigma}_R}\trans\right)\right]\\
-  \nonumber
-  &\quad-\tr\left[\derj\bOmega \vb\deri\bOmega\vb\right]\\
-  \nonumber
-  &\quad+\tr\left(\derj\bOmega\bOmega^{-1}\deri\bOmega\bOmega^{-1}\right)
-  -2\frac{\widehat{\bb}}{\widehat{\sigma}_R}\trans\derj\bOmega\vb\deri\bOmega
-  \frac{\widehat{\bb}}{\widehat{\sigma}_R}\\
-  \nonumber
-  &\quad-\frac{1}{n-p}
-  \left(\frac{\widehat{\bb}}{\widehat{\sigma}_R}\trans\derj\bOmega
-    \frac{\widehat{\bb}}{\widehat{\sigma}_R}\right)
-  \left(\frac{\widehat{\bb}}{\widehat{\sigma}_R}\trans\deri\bOmega
-    \frac{\widehat{\bb}}{\widehat{\sigma}_R}\right)
-\end{align}
-where $\deri$ and $\derj$
-represent differentiation with respect to elements $i$ and $j$ of
-$\btheta$, respectively.
+and $\der$ denotes the Frechet derivative.
 
 If good starting estimates of $\btheta$ are not available, the initial
 Newton iterations for (\ref{eq:ProfiledLogLik}) or
@@ -359,12 +317,11 @@ or REML estimates for a linear mixed model:
   (\ref{eq:betaHat}) and (\ref{eq:ConditionalExp}).
 \item Use a Newton method to optimize the criterion
   (\ref{eq:ProfiledLogLik}) or (\ref{eq:ProfiledLogRestLik}) with
-  gradient (\ref{eq:gradDev}) or (\ref{eq:gradDevRest}) (and possibly
-  using analytic Hessians defined by (\ref{eq:HessDev}) or
-  (\ref{eq:HessDevRest})).  Each evaluation of the criterion
-  requires  evaluating $\bOmega(\btheta)$ followed by the
-  decomposition (\ref{eq:CrossProdGen}).  Gradient evaluations require
-  the solutions to (\ref{eq:betaHat}) and (\ref{eq:ConditionalExp}).
+  gradient (\ref{eq:gradDev}) or (\ref{eq:gradDevRest}).  Each
+  evaluation of the criterion requires evaluating $\bOmega(\btheta)$
+  followed by the decomposition (\ref{eq:CrossProdGen}).  Gradient
+  evaluations require the solutions to (\ref{eq:betaHat}) and
+  (\ref{eq:ConditionalExp}).
 \end{enumerate}
 In \citet{bate:debr:2004} we show that the deviance forms of the
 criteria are bounded below over the parameter space and,
@@ -387,7 +344,7 @@ the \var{primary} and secondary (\var{second}) schools attended by
 3435 students.
 
 The grouping factors for the random effects are \var{primary} (148
-distinct schools) and \var{second} (19 distinct schools).  The summary
+distinct schools) and \var{second} (19 distinct schools).  R's summary
 of these variables each give the counts for the six schools with the
 greatest number of students in the study.  A cross-tabulation of
 \var{primary} and \var{second} (we show only the first five rows),
@@ -508,20 +465,21 @@ sequence.
 
 Of the nontrivial cases we consider first two nonnested factors.
 
-\subsection{The two-factor case}
+\subsection{Two non-nested grouping factors}
 \label{sec:twofactor}
 
 It is not unusual for the grouping factors to have very different
 numbers of levels, as is the case in the Scottish secondary school
 data.  Because the diagonal block for the first grouping factor is
 preserved by the decomposition we put the factor with the largest
-number of levels first.
+number of levels first.  In general we order the grouping factors
+in decreasing order of the number of levels.
 
 As shown in \citet{Liu:1990} and as implemented in the LDL package,
 the number and positions of the off-diagonal elements in $\bL$ and in
 $\bL^{-1}$ can be determined from the elimination tree of the matrix,
 which depends only on the position of the first non-zero in each
-column of the strict lower triangle of $\bL\trans\bL$.  Because
+column of the strict lower triangle of $\bZ\trans\bZ$.  Because
 nonzeros in the strict lower triangle only occur in rows corresponding
 to the second factor, there is no need to permute the levels of the
 first factor.  (In the course of generating a permutation of the
@@ -544,7 +502,34 @@ be filled from the first nonzero in $\bZ\trans\bZ$ down.  Therefore,
 we permute the the levels of the second factor so as to concentrate
 the nonzeros in the $(2,1)$ block on the lower rows.
 
-The algorithm is:
+First we will illustrate the results of the algorithm for determining
+the permutation, then we will describe the algorithm in detail.
+The permuted rows of $\bZ\trans\bZ$ for the Scottish secondary school
+data the permuted rows are shown in Figure~\ref{fig:PermutedRows}.
+\begin{figure}[tbp]
+  \centering
+\setkeys{Gin}{width=\textwidth}
+<<FigPermutedRows,fig=TRUE,echo=FALSE,height=2.5,width=8>>=
+perm = .Call("sscCrosstab_groupedPerm", ctab)
+trip = as(as(ctab, "sscMatrix"), "tripletMatrix")
+trip@i = perm[trip@i + 1]
+trip@j = perm[trip@j + 1]
+print(image(trip,ylim=c(166.5,147.5),
+            xlim=c(-0.5,166.5),colorkey=FALSE,aspect='xy'))
+@   
+  \caption{Locations of the non-zero elements in the last 19 rows of the
+    $\bZ\trans\bZ$ matrix for model \var{fm1} fit to the
+    \var{ScotsSec} data after permutation of the rows according to our
+    algorithm.  The first 148 columns have been permuted to illustrate
+    the algorithm.  This permutation does not affect the amount of
+    fill-in in either $\bL$ or $\bL^{-1}$.
+    Darker squares indicate larger magnitudes. Rows and columns are
+    numbered from zero.}
+  \label{fig:PermutedRows}
+\end{figure}
+The first 148 columns have been permuted to help illustrate the
+algorithm.  This permutation does not affect the amount of fill-in in
+either $\bL$ or $\bL^{-1}$.
 
 The positions of the nonzero elements in the last 19 rows of $\bL$ are
 shown in Figure~\ref{fig:Lnonzero} (the first 148 rows of $\bL$ are an
@@ -559,9 +544,7 @@ print(image(as(fm1@rep, "tscMatrix"),ylim=c(166.5,147.5),
   \caption{Location of non-zero elements in the last 19 rows of the
     unit lower triangular matrix $\bL$ for model \var{fm1} fit to the
     \var{ScotsSec} data.  Darker squares indicate larger magnitudes.
-    Rows and columns are numbered from zero. The levels of the
-    grouping factors have been rearranged according to a fill-reducing
-    permutation.}
+    Rows and columns are numbered from zero.}
   \label{fig:Lnonzero}
 \end{figure}
 
@@ -589,11 +572,50 @@ print(image(LI, ylim=c(166.5,147.5), xlim=c(-0.5,166.5),
     permutation.}
   \label{fig:LInonz}
 \end{figure}
-There are 2200 nonzero off-diagonal elements in $\bL^{-1}$ for this
+There are 1544 nonzero off-diagonal elements in $\bL^{-1}$ for this
 example.  However, even this count is less than the number of cells
 required in MLwiN (2812, according to \citet{MLwiN:2002}) to
 store the off-diagonal part of $\bZ\trans\bZ$.
 
+
+\subsection{Results on examples}
+\label{sec:Examples}
+
+\begin{table}[htbp]
+  \centering
+  \begin{tabular}[]{l r r r r r }
+    \hline\\
+    &&&Scottish&Dallas\\\hline
+    levels of $\bff_1$ & 148 && 134713\\
+    levels of $\bff_2$ & 19  && 3722\\
+    diagonals          & 167 && 138435\\
+    Sparse $\bZ\trans\bZ$       & 303 & 10.77 & 238676 & 0.05\\
+    Dense storage               & 2812&& 501401786\\
+    No\\
+    $\bL$                       & 457 & 16.25 & 4707800 & 0.94\\
+    $\bL^{-1}$                  & 1833 & 65.18& 404759242 & 80.73\\
+    Metis\\
+    $\bL$                       & 444 & 15.79 & 474827 & 0.09\\
+    $\bL^{-1}$                  & 1855& 65.97 & 30144049 & 6.01\\
+    Separated Metis\\
+    $\bL$                       & 464 & 16.50 & 3763597 & 0.75\\
+    $\bL^{-1}$                  & 2200&78.24& 266944262 &53.24\\
+    Separated (greedy)\\
+    $\bL$                       & 434 & 15.43 & 518642 & 0.10\\
+    $\bL^{-1}$                  & 1544 & 54.91 & 17222447 & 3.43\\
+    Separated (first)\\
+    $\bL$                       & 432 & 15.36 & 519974 & 0.10\\
+    $\bL^{-1}$                  & 1504 & 53.48 & 17238020 & 3.44\\
+    Separated (last)\\
+    $\bL$                       & 456 & 15.36 & 518576 & 0.10\\
+    $\bL^{-1}$                  & 1574& 53.48 & 17222327 & 3.43\\
+    \hline
+  \end{tabular}
+  \caption{Number of nonzero elements in $\bL$ and $\bL^{-1}$ for
+    several different permutations applied to the Scottish secondary
+    school data and the Dallas TAAS data.}
+  \label{tab:Examples}
+\end{table}
 The small overhead incurred for index storage with sparse matrices is
 repaid many times in the savings from not storing elements that are zero.
 
@@ -1225,31 +1247,6 @@ $\bbeta$).
 fm1 = lme(attain~verbal*sex,ScotsSec,list(primary=~1,second=~1))
 @ 
 
-                                Scottish                Dallas
-Number of levels of factor 1       148                   134713
-Number of levels of factor 2        19                     3722
-Number of diagonals                167                   138435
-Dense storage                     2812                501401786 
-Sparse ZtZ                         303 (10.77\%)         238676 (0.05\%)
-No permutation
- L                                 457 (16.25\%)        4707800 (0.94\%)
- LI                               1833 (65.18\%)      404759242 (80.73\%)
-Metis permutation
- L                                 444 (15.79\%)         474827 (0.09\%)
- LI                               1855 (65.97\%)       30144049 (6.01\%)
-Separated Metis perm
- L                                 464 (16.50\%)        3763597 (0.75\%)
- LI                               2200 (78.24\%)      266944262 (53.24\%)
-Separated native perm (use first)
- L                                 432 (15.36\%)         519974 (0.10\%)
- LI                               1504 (53.48\%)       17238020 (3.44\%)
-Separated native perm (use last)
- L                                 456 (15.36\%)         518576 (0.10\%)
- LI                               1574 (53.48\%)       17222327 (3.43\%)
-Separated native perm (greedy)
- L                                 434 (15.43\%)         518642 (0.10\%)
- LI                               1544 (54.91\%)       17222447 (3.43\%)
-
 
 only on the the corresponding information on
 $\bZ\trans\bZ$ does not change for different values of A symbolic analysis function to determine 
@@ -1287,3 +1284,47 @@ than 1, there are substantial advantages in maintaining separation of
 the grouping factors.  To avoid the undesirable intermingling of the
 grouping factors, we take the permutation returned by Metis and
 reorder it to separate the factors.
+
+  Terms in the Hessian can
+be expressed as
+\begin{align}
+  \label{eq:HessDev}
+  \derj\deri(-2\tilde{\ell})&=\tr\left[\derj(\deri\bOmega)\left(
+      (\bZ\trans\bZ+\bOmega)^{-1}-\bOmega^{-1}+
+      \frac{\widehat{\bb}}{\widehat{\sigma}}
+      \frac{\widehat{\bb}}{\widehat{\sigma}}\trans\right)\right]\\
+  \nonumber
+  &\quad-\tr\left[\derj\bOmega
+    (\bZ\trans\bZ+\bOmega)^{-1}\deri\bOmega(\bZ\trans\bZ+
+    \bOmega)^{-1}\right]\\
+  \nonumber
+  &\quad+\tr\left(\derj\bOmega\bOmega^{-1}\deri\bOmega\bOmega^{-1}\right)
+  -2\frac{\widehat{\bb}}{\widehat{\sigma}}\trans\derj\bOmega\vb\deri\bOmega
+  \frac{\widehat{\bb}}{\widehat{\sigma}}\\
+  \nonumber
+  &\quad-\frac{1}{n}
+  \left(\frac{\widehat{\bb}}{\widehat{\sigma}}\trans\derj\bOmega
+    \frac{\widehat{\bb}}{\widehat{\sigma}}\right)
+  \left(\frac{\widehat{\bb}}{\widehat{\sigma}}\trans\deri\bOmega
+    \frac{\widehat{\bb}}{\widehat{\sigma}}\right)\\
+  \label{eq:HessDevRest}
+  \derj\deri(-2\tilde{\ell_R})&=\tr\left[\derj(\deri\bOmega)\left(
+      \vb-\bOmega^{-1}+
+      \frac{\widehat{\bb}}{\widehat{\sigma}_R}
+      \frac{\widehat{\bb}}{\widehat{\sigma}_R}\trans\right)\right]\\
+  \nonumber
+  &\quad-\tr\left[\derj\bOmega \vb\deri\bOmega\vb\right]\\
+  \nonumber
+  &\quad+\tr\left(\derj\bOmega\bOmega^{-1}\deri\bOmega\bOmega^{-1}\right)
+  -2\frac{\widehat{\bb}}{\widehat{\sigma}_R}\trans\derj\bOmega\vb\deri\bOmega
+  \frac{\widehat{\bb}}{\widehat{\sigma}_R}\\
+  \nonumber
+  &\quad-\frac{1}{n-p}
+  \left(\frac{\widehat{\bb}}{\widehat{\sigma}_R}\trans\derj\bOmega
+    \frac{\widehat{\bb}}{\widehat{\sigma}_R}\right)
+  \left(\frac{\widehat{\bb}}{\widehat{\sigma}_R}\trans\deri\bOmega
+    \frac{\widehat{\bb}}{\widehat{\sigma}_R}\right)
+\end{align}
+where $\deri$ and $\derj$
+represent differentiation with respect to elements $i$ and $j$ of
+$\btheta$, respectively.
