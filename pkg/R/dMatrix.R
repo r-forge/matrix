@@ -1,5 +1,8 @@
 ### Define Methods that can be inherited for all subclasses
 
+setAs("dMatrix", "matrix",
+      function(from) as(as(from, "dgeMatrix"), "matrix"))
+
 ## Group Methods, see ?Arith (e.g.)
 ## -----
 
