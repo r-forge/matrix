@@ -19,9 +19,10 @@
   dgCMatrix objects (too tired to do that now).
 
 - bCrosstab(): do we really want the diagonal "V:V" crosstabs?
+	       (if so or in any case: add to  man/bCrosstab.Rd )
 
-- src/Metis/ : some Makefile needs fixing, as changing src/Metis/*.c
-	     does not lead to recompilation.
+- src/Metis/ : one of the two Makefiles needs fixing, as changing
+	     src/Metis/*.c  does not lead to recompilation.
 
 - man/Matrix.Rd :  has example with dimnames, but we just drop them!
 		MM thinks dimnames should be supported (but then ...)
@@ -30,3 +31,23 @@
 	If we really want to keep them, don't use "LazyData"
 	(such that one needs  data(*) explicitly);
 	But MM would rather want something like  ex.mm and ex.y
+
+- spelling style: Should "coersion" be "coercion" ?
+
+-------
+
+We have a (at least one) basic problem :
+   Currently the show() method fail sometime after coercion:
+   e.g. 'sy' show()s wrongly, even though it "str()" fine :
+
+      (po <- crossprod(Matrix(0:3, 2))) # ok
+      (ge <- as(po, "dgeMatrix")) # ok
+      (sy <- as(po, "dsyMatrix")) # BAD
+      str(sy) # looks fine
+
+  or
+      example(expand) # -> ex$L and ex$U look bad, however
+      as(ex$L, "dgeMatrix") # `works'
+
+  {Of course, we don't need a workaround but must understand
+   and solve the problem}
