@@ -165,14 +165,33 @@ setClass("dgBCMatrix",
 
 setClass("Cholesky", contains = "dtrMatrix")
 
+setClass("pCholesky", contains = "dtpMatrix")
+
 setClass("BunchKaufman", representation(perm = "integer"), contains = "dtrMatrix",
          validity = function(object) .Call("BunchKaufman_validate", object));
+
+setClass("pBunchKaufman", representation(perm = "integer"), contains = "dtpMatrix",
+         validity = function(object) .Call("pBunchKaufman_validate", object));
 
 setClass("dCholCMatrix",
          representation(perm = "integer", Parent = "integer", D = "numeric"),
          contains = "dtCMatrix",
          validity = function(object) .Call("dCholCMatrix_validate", object))
 
+##-------------------- permutation ----------------------------------------
+
+setClass("pMatrix", representation(perm = "integer"), contains = "Matrix",
+         validity = function(object) {
+             dd <- object@Dim
+             n <- dd[1]
+             perm <- object@perm
+             if (dd[2] != n) return("pMatrix must be symmetric")
+             if (length(perm) != n)
+                 return(paste("length of 'perm' slot must be", n))
+             if (!(all(range(perm) == c(1, n)) && length(unique(perm)) == n))
+                 return("'perm' slot is not a valid permutation")
+             TRUE
+         })
 
 ## --------------------- non-"Matrix" Classes --------------------------------
 
