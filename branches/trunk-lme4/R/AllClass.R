@@ -39,14 +39,6 @@ setClass("VarCorr",
                         useScale="logical"),
          prototype = list(scale = 1.0, useScale = TRUE))
 
-setClass("groupedData",
-         representation(data = "data.frame",
-                        formula = "formula",
-                        outer = "formula",
-                        inner = "formula",
-                        labels = "list",
-                        units = "list"))
-
 setClass("summary.ssclme",
          representation(coefficients="matrix",
                         scale="numeric",

@@ -104,21 +104,6 @@ setMethod("lme", signature(formula = "missing"),
                 mCall, PACKAGE = "Matrix")
       })
 
-setMethod("lme", signature(formula = "formula", data = "groupedData",
-                           random = "missing"),
-          function(formula, data, random,
-                   method = c("REML", "ML"),
-                   control = list(),
-                   subset, weights, na.action, offset,
-                   model = TRUE, x = FALSE, y = FALSE,...)
-      {
-          nCall <- mCall <- match.call()
-          cov <- formula[[3]]
-          grps <- getGroupsFormula(data)[[2]]
-          nCall$random <- eval(substitute(~ cov | grps))
-          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
-                mCall, PACKAGE = "Matrix")
-      })
 
 setMethod("lme", signature(random = "formula"),
           function(formula, data, random,
@@ -137,19 +122,6 @@ setMethod("lme", signature(random = "formula"),
                 mCall, PACKAGE = "Matrix")
       })
 
-setMethod("lme", signature(formula = "formula", data = "groupedData",
-                           random = "list"),
-          function(formula, data, random,
-                   method = c("REML", "ML"),
-                   control = list(),
-                   subset, weights, na.action, offset,
-                   model = TRUE, x = FALSE, y = FALSE,...)
-      {
-          nCall <- mCall <- match.call()
-          nCall$data <- data@data
-          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
-                mCall, PACKAGE = "Matrix")
-      })
           
 setMethod("lme", signature(formula = "formula",
                            random = "list"),
@@ -493,21 +465,6 @@ setMethod("lme1", signature(formula = "missing"),
                 mCall, PACKAGE = "Matrix")
       })
 
-setMethod("lme1", signature(formula = "formula", data = "groupedData",
-                           random = "missing"),
-          function(formula, data, random,
-                   method = c("REML", "ML"),
-                   control = list(),
-                   subset, weights, na.action, offset,
-                   model = TRUE, x = FALSE, y = FALSE,...)
-      {
-          nCall = mCall = match.call()
-          cov = formula[[3]]
-          grps = getGroupsFormula(data)[[2]]
-          nCall$random = eval(substitute(~ cov | grps))
-          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
-                mCall, PACKAGE = "Matrix")
-      })
 
 setMethod("lme1", signature(random = "formula"),
           function(formula, data, random,
@@ -526,19 +483,6 @@ setMethod("lme1", signature(random = "formula"),
                 mCall, PACKAGE = "Matrix")
       })
 
-setMethod("lme1", signature(formula = "formula", data = "groupedData",
-                           random = "list"),
-          function(formula, data, random,
-                   method = c("REML", "ML"),
-                   control = list(),
-                   subset, weights, na.action, offset,
-                   model = TRUE, x = FALSE, y = FALSE,...)
-      {
-          nCall <- mCall <- match.call()
-          nCall$data <- data@data
-          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
-                mCall, PACKAGE = "Matrix")
-      })
           
 setMethod("lme1", signature(formula = "formula",
                            random = "list"),
