@@ -23,8 +23,6 @@
 	(such that one needs  data(*) explicitly);
 	But MM would rather want something like  ex.mm and ex.y
 
-- spelling style: Should "coersion" be "coercion" ?
-
 - "factors" maybe should move up to "Matrix"
 
 -------
