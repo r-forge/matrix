@@ -1,21 +1,21 @@
-\name{poMatrix-class}
+\name{dpoMatrix-class}
 \docType{class}
-\alias{poMatrix-class}
-\alias{rcond,poMatrix,character-method}
-\alias{rcond,poMatrix,missing-method}
-\alias{chol,poMatrix-method}
-\alias{chol,poMatrix,ANY-method}
-\alias{determinant,poMatrix,logical-method}
-\alias{solve,poMatrix,dgeMatrix-method}
-\alias{solve,poMatrix,matrix-method}
-\alias{solve,poMatrix,missing-method}
-\alias{solve,poMatrix,numeric-method}
+\alias{dpoMatrix-class}
+\alias{rcond,dpoMatrix,character-method}
+\alias{rcond,dpoMatrix,missing-method}
+\alias{chol,dpoMatrix-method}
+\alias{chol,dpoMatrix,ANY-method}
+\alias{determinant,dpoMatrix,logical-method}
+\alias{solve,dpoMatrix,dgeMatrix-method}
+\alias{solve,dpoMatrix,matrix-method}
+\alias{solve,dpoMatrix,missing-method}
+\alias{solve,dpoMatrix,numeric-method}
 \title{Positive semi-definite, dense, real matrices}
-\description{The \code{"poMatrix"} class is the class of
+\description{The \code{"dpoMatrix"} class is the class of
   positive-semidefinite symmetric matrices in non-packed storage. Only the
   upper triangle or the lower triangle is required to be available.}
 \section{Objects from the Class}{Objects can be created by calls of the
-  form \code{new("poMatrix", ...)} or from \code{crossprod} applied to
+  form \code{new("dpoMatrix", ...)} or from \code{crossprod} applied to
   an \code{"dgeMatrix"} object.}
 \section{Slots}{
   \describe{
@@ -40,17 +40,17 @@ Class \code{"Matrix"}, by class \code{"dsyMatrix"}.
 }
 \section{Methods}{
   \describe{
-    \item{chol}{\code{signature(x = "poMatrix")}:
+    \item{chol}{\code{signature(x = "dpoMatrix")}:
       Returns (and stores) the Cholesky decomposition of the matrix
       \code{x}.}
-    \item{rcond}{\code{signature(x = "poMatrix", type = "character")}:
+    \item{rcond}{\code{signature(x = "dpoMatrix", type = "character")}:
       Returns (and stores) the reciprocal of the condition number of
       \code{x}.  The \code{type} can be \code{"O"} for the
       one-norm (the default) or \code{"I"} for the infinity-norm.  For
       symmetric matrices the result does not depend on the type.}
-    \item{solve}{\code{signature(a = "poMatrix", b = "missing")}:
+    \item{solve}{\code{signature(a = "dpoMatrix", b = "missing")}:
       Return the inverse of \code{a}.}
-    \item{solve}{\code{signature(a = "poMatrix", b = "numeric")}:
+    \item{solve}{\code{signature(a = "dpoMatrix", b = "numeric")}:
       Solve the linear system defined by \code{a} and \code{b}, where
       \code{b} can be a numeric vector, or a matrix, or a dgeMatrix
       object.  The Cholesky decomposition of \code{a} is calculated (if

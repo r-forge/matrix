@@ -8,8 +8,8 @@
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("Cholesky", ...)}
   or by calls of the form \code{chol(pm)} where \code{pm} inherits from
-  the \code{"poMatrix"} class or as a side-effect of other functions
-  applied to \code{"poMatrix"} objects.
+  the \code{"dpoMatrix"} class or as a side-effect of other functions
+  applied to \code{"dpoMatrix"} objects.
 }
 \section{Slots}{
   \describe{
@@ -32,7 +32,7 @@ Class \code{"Matrix"}, by class \code{"dtrMatrix"}.
 No methods defined with class "Cholesky" in the signature.
 }
 \seealso{
-  \code{\link{dtrMatrix-class}}, \code{chol}, \code{poMatrix-class}
+  \code{\link{dtrMatrix-class}}, \code{chol}, \code{dpoMatrix-class}
 }
 \examples{
 print(pm <- crossprod(Matrix(rnorm(18), nrow = 6, ncol = 3)))
