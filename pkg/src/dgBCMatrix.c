@@ -1,7 +1,7 @@
 #include "dgBCMatrix.h"
 /* TODO
  *  - code for trans = 'T' in cscb_syrk
- *  - code for non-trivial cscb_trmm and cscb_ldl
+ *  - code for non-trivial cscb_trmm
  */
 
 SEXP dgBCMatrix_validate(SEXP x)
@@ -201,6 +201,17 @@ cscb_syrk(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE trans,
     }
 }
 
+static void
+copy_transpose(double dest[], const double src[], int n)
+{
+    int i, j;
+    for (i = 0; i < n; i++) {
+	for (j = 0; j < n; j++) {
+	    dest[i + j * n] = src[j + i * n];
+	}
+    }
+}
+
 /** 
  * Create the LD^{T/2}D^{1/2}L' decomposition of the positive definite
  * symmetric dgBCMatrix matrix A (upper triangle stored) in L and D^{1/2}.
@@ -241,17 +252,14 @@ cscb_ldl(SEXP A, const int Parent[], SEXP L, SEXP D)
 	Memcpy(Dx, Ax, ncisqr * n);
 	for (j = 0; j < n; j++) { /* form D_i^{1/2} */
 	    F77_CALL(dpotrf)("U", &nci, Dx + j * ncisqr, &nci, &k);
-	    /* Should we just return k instead of signaling an error? */
-	    /* The caller should check for return value < n */
-	    if (k) error("D[ , , %d], level %d, is not positive definite",
-			 j + 1);
+	    if (k) return j; /* return block number, not col no. */
 	}
 	return n;
     }
     if (nci == 1) {
 	k = R_ldl_numeric(n, Ap, Ai, Ax, Lp, Parent, Li, Lx, Dx,
 			  (int *) NULL, (int *) NULL);
-	if (k < n) error("cscb_ldl: error code %k from R_ldl_numeric", k);
+	if (k < n) return k;
 	for (j = 0; j < n; j++) Dx[j] = sqrt(Dx[j]);
 	return n;
     } else {		   /* Copy of ldl_numeric from the LDL package
@@ -271,18 +279,17 @@ cscb_ldl(SEXP A, const int Parent[], SEXP L, SEXP D)
 	    p2 = Ap[k+1];
 	    for (p = Ap[k]; p < p2; p++) {
 		i = Ai[p];	/* get A[i,k] */
-		if (i <= k) {	/* [i,k] in upper triangle? Should be true */
+		if (i > k) error("cscb_ldl: A has nonzeros below diagonal");
 				/* copy A(i,k) into Y */ 
-		    Memcpy(Y + i * ncisqr, Ax + p * ncisqr, ncisqr); 
-		    /* follow path from i to root of etree,
-		     * stop at flagged node */
-		    for (len = 0; Flag[i] != k; i = Parent[i]) {
-			Pattern[len++] = i; /* L[k,i] is nonzero */
-			Flag[i] = k; /* mark i as visited */
-		    }
-		    while (len > 0) { /* push path on top of stack */
-			Pattern[--top] = Pattern[--len];
-		    }
+		Memcpy(Y + i * ncisqr, Ax + p * ncisqr, ncisqr); 
+		/* follow path from i to root of etree,
+		 * stop at flagged node */
+		for (len = 0; Flag[i] != k; i = Parent[i]) {
+		    Pattern[len++] = i; /* L[k,i] is nonzero */
+		    Flag[i] = k; /* mark i as visited */
+		}
+		while (len > 0) { /* push path on top of stack */
+		    Pattern[--top] = Pattern[--len];
 		}
 	    }
 	    /* Pattern [top ... n-1] now contains nonzero pattern of L[,k] */
@@ -301,20 +308,21 @@ cscb_ldl(SEXP A, const int Parent[], SEXP L, SEXP D)
 				    &one, Y + Li[p]*ncisqr, &nci);
 		}
 		/* FIXME: Is this the correct order and transposition? */
-		F77_CALL(dtrsm)("R", "U", "T", "N", &nci, &nci,
+		F77_CALL(dtrsm)("L", "U", "T", "N", &nci, &nci,
 				&one, Dx + i*ncisqr, &nci, Yi, &nci);
-		F77_CALL(dsyrk)("U", "N", &nci, &nci, &minus1, Yi, &nci,
+		F77_CALL(dsyrk)("U", "T", &nci, &nci, &minus1, Yi, &nci,
 				&one, Dx + k*ncisqr, &nci);
-		F77_CALL(dtrsm)("R", "U", "N", "N", &nci, &nci,
+		F77_CALL(dtrsm)("L", "U", "N", "N", &nci, &nci,
 				&one, Dx + i*ncisqr, &nci, Yi, &nci);
 		Li[p] = k;	/* store L[k,i] in column form of L */
-		Memcpy(Lx + p * ncisqr, Yi, ncisqr);
-		Lnz[i]++;	/* increment count of nonzeros in col i */
+		/* Yi contains L[k,i]', not L[k,i] */
+		copy_transpose(Lx + p * ncisqr, Yi, nci);
+		Lnz[i]++;   /* increment count of nonzeros in col i */
 	    }
 	    F77_CALL(dpotrf)("U", &nci, Dx + k*ncisqr, &nci, &info);
 	    if (info) {
 		Free(Y); Free(Yi); Free(Pattern); Free(Flag); Free(Lnz); 
-		return k;	    /* failure, D[,,k] is not positive definite */
+		return k;  /* failure, D[,,k] not positive definite */
 	    }
 	}
 	Free(Y); Free(Yi); Free(Pattern); Free(Flag); Free(Lnz);
@@ -375,8 +383,9 @@ cscb_trmm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
  * @param ldb leading dimension of B as declared in the calling function
  */
 void
-cscb_trsm(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE transa, enum CBLAS_DIAG diag,
-	  double alpha, SEXP A, double B[], int m, int n, int ldb)
+cscb_trsm(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE transa,
+	  enum CBLAS_DIAG diag, double alpha, SEXP A,
+	  double B[], int m, int n, int ldb)
 {
     SEXP ApP = GET_SLOT(A, Matrix_pSym),
 	AxP = GET_SLOT(A, Matrix_xSym);
@@ -542,7 +551,8 @@ cscb_trcbsm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
 	    double *BTx = Calloc(nnz, double), *rhs;
 
 				/* transpose B */
-	    for (i = 0, nrbB = -1; i < nnz; i++) if (Bi[i] > nrbB) nrbB = Bi[i];
+	    for (i = 0, nrbB = -1; i < nnz; i++)
+		if (Bi[i] > nrbB) nrbB = Bi[i];
 	    BTp = Calloc(nrbB, int);
 	    triplet_to_col(ncbB, nrbB, nnz, tmp, Bi, Bx, BTp, BTi, BTx);
 				/* sanity check */
@@ -552,9 +562,11 @@ cscb_trcbsm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
 	    rhs = Calloc(ncbB, double);
 	    AZERO(Bx, nnz);	/* zero the result */
 	    for (i = 0; i < nrbB; i++) {
-		R_ldl_lsolve(ncbB, expand_csc_column(rhs, ncbB, i, BTp, BTi, BTx),
+		R_ldl_lsolve(ncbB,
+			     expand_csc_column(rhs, ncbB, i, BTp, BTi, BTx),
 			     Ap, Ai, Ax);
-		for (j = 0; j < ncbB; j++) { /* write non-zeros in sol'n into B */
+		/* write non-zeros in sol'n into B */
+		for (j = 0; j < ncbB; j++) {
 		    if (BTx[j]) Bx[check_csc_index(Bp, Bi, j, i, 0)] = BTx[j];
 		}
 		Free(rhs); Free(BTp); Free(BTx); Free(BTi);
@@ -629,7 +641,7 @@ cscb_cscbm(enum CBLAS_TRANSPOSE transa, enum CBLAS_TRANSPOSE transb,
 	    F77_CALL(dgemm)("N", "T", cdims, cdims + 1, adims + 1,
 			    &alpha, Ax + ia * ablk, adims,
 			    Bx + ib * bblk, bdims, &one,
-			    Cx + check_csc_index(Cp, Ci, Ai[ia], Bi[ib], 0) * cblk,
+			    Cx + check_csc_index(Cp,Ci,Ai[ia],Bi[ib],0)*cblk,
 			    cdims);
 		}
 	    }
@@ -728,9 +740,10 @@ SEXP dgBCMatrix_to_dgTMatrix(SEXP A)
     double *Ax = REAL(AxP),
 	*Bx = REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, nnz));
 
-    Memcpy(Bx, Ax, nnz);	/* x slot stays as is but w/o dim attribute */
+    Memcpy(Bx, Ax, nnz); /* x slot stays as is but w/o dim attribute */
 
-    bdims[1] = ncb * adims[1];	/* bdims - need to find number of row blocks */
+    bdims[1] = ncb * adims[1];
+    /* find number of row blocks */
     for (j = 0, nrb = -1; j < adims[2]; j++) if (Ai[j] > nrb) nrb = Ai[j];
     bdims[0] = (nrb + 1) * adims[0]; /* +1 because of 0-based indices */
 
