@@ -1,3 +1,13 @@
+2004-03-28  Douglas Bates  <bates@bates2_home>
+
+	* R/lme.R: added a fitted method for lme.  Added dimnames and
+	names to the value of the fixef and ranef methods for ssclme.
+
+	* R/AllClass.R (lme): Added a fitted slot.
+
+	* R/{lme.R,sparseGLMM.R}: Remove redundant call to ssclme_factor
+	before ssclme_EMsteps
+
 2004-03-18  Douglas Bates  <bates@stat.wisc.edu>
 
 	* R/{pdMat.R,pdIdent.R,pdLogChol.R,pdMatrixLog.R,pdNatural.R},

@@ -161,16 +161,20 @@ setMethod("lme", signature(formula = "formula", random = "list"),
           LMEoptimize(obj) = controlvals
                                         # _factor for correct deviance
           .Call("ssclme_factor", obj, PACKAGE = "Matrix")
+          fitted = .Call("ssclme_fitted", obj, facs, mmats, PACKAGE = "Matrix")
           new("lme", call = match.call(), facs = facs,
               x = if(x) mmats else list(),
               model = if(model) data else data.frame(list()),
-              REML = method == "REML", rep = obj)
+              REML = method == "REML", rep = obj, fitted = fitted)
       })
 
 setMethod("fitted", signature=c(object="lme"),
           function(object, ...)
       {
-          object@fitted
+          if (object@x) {
+              .Call("ssclme_fitted", object, object@facs, object@x,
+                    PACKAGE = "Matrix")
+          }
       })
 
 setMethod("residuals", signature=c(object="lme"),
@@ -333,10 +337,16 @@ setMethod("coef", signature(object = "ssclme"),
 
 setMethod("ranef", signature(object = "ssclme"),
           function(object, ...) {
-              .Call("ssclme_ranef", object, PACKAGE = "Matrix")
+              val = .Call("ssclme_ranef", object, PACKAGE = "Matrix")
+              for (i in seq(along = val)) {
+                  dimnames(val[i]) = dimnames(object@bVar)[-1]
+              }
+              val
           })
 
 setMethod("fixef", signature(object = "ssclme"),
           function(object, ...) {
-              .Call("ssclme_fixef", object, PACKAGE = "Matrix")
+              val = .Call("ssclme_fixef", object, PACKAGE = "Matrix")
+              names(val) = dimnames(object@XtX)[[2]][seq(along = val)]
+              val
           })
