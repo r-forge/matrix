@@ -21,7 +21,7 @@ setReplaceMethod("LMEoptimize", signature(x="ssclme", value="list"),
                                    method = "L-BFGS-B",
                                    lower = ifelse(constr, 1e-10, -Inf),
                                    control = list(maxit = value$msMaxIter,
-                                   trace = ifelse(value$msVerbose,4,0)))
+                                   trace = as.integer(value$msVerbose)))
                  if (optimRes$convergence != 0) {
                      warning(paste("optim returned message",optimRes$message,"\n"))
                  }
