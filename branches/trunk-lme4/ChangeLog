@@ -1,3 +1,7 @@
+2004-10-04  Douglas Bates  <bates@bates1-home>
+
+	* R/lme.R: Corrected number of arguments to lmeRep_sigma
+
 2004-10-02  Douglas Bates  <bates@bates1-home>
 
 	* R/lme.R Re-order random when facs is reordered (Closes #10)
