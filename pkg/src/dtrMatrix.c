@@ -1,3 +1,5 @@
+/* double (precision) TRiangular Matrices */
+
 #include "dtrMatrix.h"
 
 SEXP dtrMatrix_validate(SEXP obj)
@@ -5,21 +7,21 @@ SEXP dtrMatrix_validate(SEXP obj)
     SEXP uplo = GET_SLOT(obj, Matrix_uploSym),
 	diag = GET_SLOT(obj, Matrix_diagSym);
     char *val;
-    
+
     if (length(uplo) != 1)
-	return ScalarString(mkChar("uplo slot must have length 1"));
+	return mkString("'uplo' slot must have length 1");
     if (length(diag) != 1)
-	return ScalarString(mkChar("diag slot must have length 1"));
+	return mkString("'diag' slot must have length 1");
     val = CHAR(STRING_ELT(uplo, 0));
-    if (strlen(val) != 1) 
-    	return ScalarString(mkChar("uplo[1] must have string length 1"));
-    if (toupper(*val) != 'U' && toupper(*val) != 'L')
-    	return ScalarString(mkChar("uplo[1] must be \"U\" or \"L\""));
+    if (strlen(val) != 1)
+    	return mkString("'uplo' must have string length 1");
+    if (*val != 'U' && *val != 'L')
+    	return mkString("'uplo' must be \"U\" or \"L\"");
     val = CHAR(STRING_ELT(diag, 0));
-    if (strlen(val) != 1) 
-    	return ScalarString(mkChar("diag[1] must have string length 1"));
-    if (toupper(*val) != 'U' && toupper(*val) != 'N')
-    	return ScalarString(mkChar("diag[1] must be \"U\" or \"N\""));
+    if (strlen(val) != 1)
+    	return mkString("'diag' must have string length 1");
+    if (*val != 'U' && *val != 'N')
+    	return mkString("'diag' must be \"U\" or \"N\"");
     return ScalarLogical(1);
 }
 
@@ -111,7 +113,7 @@ void make_array_triangular(double *to, SEXP from)
     int i, j, *dims = INTEGER(GET_SLOT(from, Matrix_DimSym));
     int n = dims[0], m = dims[1];
 
-    if (toupper(*CHAR(asChar(GET_SLOT(from, Matrix_uploSym)))) == 'U') {
+    if (*CHAR(asChar(GET_SLOT(from, Matrix_uploSym))) == 'U') {
 	for (j = 0; j < n; j++) {
 	    for (i = j+1; i < m; i++) {
 		to[i + j*m] = 0.;
@@ -124,18 +126,18 @@ void make_array_triangular(double *to, SEXP from)
 	    }
 	}
     }
-    if (toupper(*CHAR(asChar(GET_SLOT(from, Matrix_diagSym)))) == 'U') {
+    if (*CHAR(asChar(GET_SLOT(from, Matrix_diagSym))) == 'U') {
 	j = (n < m) ? n : m;
 	for (i = 0; i < j; i++) {
 	    to[i * (m + 1)] = 1.;
 	}
     }
 }
-    
+
 SEXP dtrMatrix_as_dgeMatrix(SEXP from)
 {
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
-    
+
     SET_SLOT(val, Matrix_rcondSym,
 	     duplicate(GET_SLOT(from, Matrix_rcondSym)));
     SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(from, Matrix_xSym)));
@@ -152,7 +154,7 @@ SEXP dtrMatrix_as_matrix(SEXP from)
     int *Dim = INTEGER(GET_SLOT(from, Matrix_DimSym));
     int m = Dim[0], n = Dim[1];
     SEXP val = PROTECT(allocMatrix(REALSXP, m, n));
-    
+
     make_array_triangular(Memcpy(REAL(val),
 				 REAL(GET_SLOT(from, Matrix_xSym)), m * n),
 			  from);
@@ -166,7 +168,7 @@ SEXP dtrMatrix_getDiag(SEXP x)
     SEXP ret = PROTECT(allocVector(REALSXP, n)),
 	xv = GET_SLOT(x, Matrix_xSym);
 
-    if ('U' == toupper(CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0))[0])) {
+    if ('U' == CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0))[0]) {
 	for (i = 0; i < n; i++) REAL(ret)[i] = 1.;
     } else {
 	for (i = 0; i < n; i++) {
@@ -176,7 +178,7 @@ SEXP dtrMatrix_getDiag(SEXP x)
     UNPROTECT(1);
     return ret;
 }
-    
+
 SEXP dtrMatrix_dgeMatrix_mm(SEXP a, SEXP b)
 {
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
@@ -184,7 +186,7 @@ SEXP dtrMatrix_dgeMatrix_mm(SEXP a, SEXP b)
 	m = adims[0], n = bdims[1], k = adims[1];
     SEXP val = PROTECT(duplicate(b));
     double one = 1.;
-    
+
     if (bdims[0] != k)
 	error("Matrices are not conformable for multiplication");
     if (m < 1 || n < 1 || k < 1)
@@ -205,7 +207,7 @@ SEXP dtrMatrix_dgeMatrix_mm_R(SEXP a, SEXP b)
 	m = adims[0], n = bdims[1], k = adims[1];
     SEXP val = PROTECT(duplicate(b));
     double one = 1.;
-    
+
     if (bdims[0] != k)
 	error("Matrices are not conformable for multiplication");
     if (m < 1 || n < 1 || k < 1)

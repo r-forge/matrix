@@ -11,33 +11,30 @@ SEXP dgCMatrix_validate(SEXP x)
 	nrow,
 	*xp = INTEGER(pslot),
 	*xi = INTEGER(islot);
-    
+
     nrow = dims[0];
     if (length(islot) != length(xslot))
-	return ScalarString(mkChar("lengths of slots i and x must match"));
+	return mkString("lengths of slots i and x must match");
     if (length(pslot) <= 0)
-	return ScalarString(mkChar("slot p must have length > 0"));
+	return mkString("slot p must have length > 0");
     if (xp[0] != 0)
-	return ScalarString(mkChar("first element of slot p must be zero"));
+	return mkString("first element of slot p must be zero");
     if (length(islot) != xp[ncol])
-	return ScalarString(
-	    mkChar(
-		"last element of slot p must match length of slots i and x"));
+	return mkString("last element of slot p must match length of slots i and x");
     for (j = 0; j < ncol; j++) {
 	if (xp[j] > xp[j+1])
-	    return ScalarString(mkChar("slot p must be non-decreasing"));
+	    return mkString("slot p must be non-decreasing");
     }
     for (j = 0; j < length(islot); j++) {
 	if (xi[j] < 0 || xi[j] >= nrow)
-	    return ScalarString(
-		mkChar("all row indices must be between 0 and nrow-1"));
+	    return mkString("all row indices must be between 0 and nrow-1");
     }
     if (csc_unsorted_columns(ncol, xp, xi)) {
 	csc_sort_columns(ncol, xp, xi, REAL(xslot));
     }
     return ScalarLogical(1);
 }
-    
+
 SEXP csc_crossprod(SEXP x)
 {
     SEXP pslot = GET_SLOT(x, Matrix_pSym),
@@ -48,7 +45,7 @@ SEXP csc_crossprod(SEXP x)
 
     int j, *iVal, ncol = length(pslot) - 1, maxnz, nnz = 0, *pVal;
     double *xVal;
-    
+
     SET_SLOT(ans, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(ans, Matrix_DimSym, allocVector(INTSXP, 2));
     SET_SLOT(ans, Matrix_uploSym, mkString("L"));
@@ -152,7 +149,7 @@ SEXP csc_tcrossprod(SEXP x)
     triplet_to_col(nrow, nrow, ntrip, iVal, jVal, xVal,
 		   ansp, itmp, xtmp);
     nnz = ansp[nrow];
-    SET_SLOT(ans, Matrix_uploSym, ScalarString(mkChar("L")));
+    SET_SLOT(ans, Matrix_uploSym, mkString("L"));
     SET_SLOT(ans, Matrix_iSym, allocVector(INTSXP, nnz));
     SET_SLOT(ans, Matrix_xSym, allocVector(REALSXP, nnz));
     Memcpy(INTEGER(GET_SLOT(ans, Matrix_iSym)), itmp, nnz);
@@ -163,7 +160,7 @@ SEXP csc_tcrossprod(SEXP x)
     UNPROTECT(1);
     return ans;
 }
-    
+
 SEXP csc_matrix_crossprod(SEXP x, SEXP y)
 {
     SEXP pslot = GET_SLOT(x, Matrix_pSym), ans;
@@ -198,11 +195,11 @@ SEXP csc_to_dgTMatrix(SEXP x)
     SEXP
 	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgTMatrix"))),
 	dimslot = GET_SLOT(x, Matrix_DimSym),
-	islot = GET_SLOT(x, Matrix_iSym), 
+	islot = GET_SLOT(x, Matrix_iSym),
 	pslot = GET_SLOT(x, Matrix_pSym);
     int *dims = INTEGER(dimslot), j, jj,
 	*xp = INTEGER(pslot), *yj;
-    
+
     SET_SLOT(ans, Matrix_iSym, duplicate(islot));
     SET_SLOT(ans, Matrix_DimSym, duplicate(dimslot));
     SET_SLOT(ans, Matrix_xSym, duplicate(GET_SLOT(x, Matrix_xSym)));
@@ -249,7 +246,7 @@ SEXP csc_to_dgeMatrix(SEXP x)
 	*xi = INTEGER(GET_SLOT(x, Matrix_iSym));
     double *xx = REAL(GET_SLOT(x, Matrix_xSym)), *ax;
     int j, nrow = dims[0], ncol = dims[1];
-		      
+
     SET_SLOT(ans, Matrix_DimSym, duplicate(Dimslot));
     SET_SLOT(ans, Matrix_xSym, allocVector(REALSXP, nrow*ncol));
     SET_SLOT(ans, Matrix_rcondSym, allocVector(REALSXP, 0));
@@ -271,7 +268,7 @@ SEXP matrix_to_csc(SEXP A)
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix")));
     int *adims = INTEGER(getAttrib(A, R_DimSymbol)), j,
 	maxnz, nrow, ncol, nnz, *vp, *vi;
-    
+
     double *vx;
 
     if (!(isMatrix(A) && isReal(A)))
@@ -306,7 +303,7 @@ SEXP matrix_to_csc(SEXP A)
     return dgCMatrix_set_Dim(val, nrow);
 }
 
-    
+
 SEXP dgTMatrix_to_csc(SEXP dgTMatrix)
 {
     SEXP Tisl = GET_SLOT(dgTMatrix, Matrix_iSym);
@@ -452,5 +449,5 @@ SEXP csc_col_permute(SEXP x, SEXP perm)
     return val;
 }
 
-	
-    
+
+

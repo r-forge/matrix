@@ -5,26 +5,26 @@ SEXP dgeMatrix_validate(SEXP obj)
     SEXP x = GET_SLOT(obj, Matrix_xSym),
 	Dim = GET_SLOT(obj, Matrix_DimSym),
 	fact = GET_SLOT(obj, Matrix_factorSym),
-	rc = GET_SLOT(obj, Matrix_rcondSym);    
+	rc = GET_SLOT(obj, Matrix_rcondSym);
     int m, n;
 
     if (length(Dim) != 2)
-	return ScalarString(mkChar("Dim slot must have length 2"));
+	return mkString("Dim slot must have length 2");
     m = INTEGER(Dim)[0]; n = INTEGER(Dim)[1];
     if (m < 0 || n < 0)
-	return ScalarString(mkChar("Negative value(s) in Dim"));
+	return mkString("Negative value(s) in Dim");
     if (length(x) != m * n)
-    	return ScalarString(mkChar("length of x slot != prod(Dim)"));
+    	return mkString("length of x slot != prod(Dim)");
     if (length(fact) > 0 && getAttrib(fact, R_NamesSymbol) == R_NilValue)
-	return ScalarString(mkChar("factors slot must be named list"));
+	return mkString("factors slot must be named list");
     if (length(rc) > 0 && getAttrib(rc, R_NamesSymbol) == R_NilValue)
-	return ScalarString(mkChar("rcond slot must be named numeric vector"));
+	return mkString("rcond slot must be named numeric vector");
     return ScalarLogical(1);
 }
 
 static
 double get_norm(SEXP obj, char *typstr)
-{    
+{
     char typnm[] = {'\0', '\0'};
     int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym));
     double *work = (double *) NULL;
@@ -85,7 +85,7 @@ SEXP dgeMatrix_crossprod(SEXP x)
 
     SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(val, Matrix_rcondSym, allocVector(REALSXP, 0));
-    SET_SLOT(val, Matrix_uploSym, ScalarString(mkChar("U")));
+    SET_SLOT(val, Matrix_uploSym, mkString("U"));
     SET_SLOT(val, Matrix_DimSym, allocVector(INTSXP, 2));
     vDims = INTEGER(GET_SLOT(val, Matrix_DimSym));
     vDims[0] = vDims[1] = n;
@@ -175,7 +175,7 @@ SEXP dgeMatrix_LU(SEXP x)
 {
     SEXP val = get_factors(x, "LU");
     int *dims, npiv, info;
-    
+
     if (val != R_NilValue) return val;
     dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
     if (dims[0] < 1 || dims[1] < 1)
@@ -258,7 +258,7 @@ SEXP dgeMatrix_dgeMatrix_mm(SEXP a, SEXP b)
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
     char *trans = "N";
     double one = 1., zero = 0.;
-    
+
     if (bdims[0] != k)
 	error("Matrices are not conformable for multiplication");
     if (m < 1 || n < 1 || k < 1)
@@ -335,11 +335,11 @@ static double padec [] =   /*  Constants for matrix exponential calculation. */
   1.9270852604185938e-9,
 };
 
-/** 
+/**
  * Matrix exponential - based on the code for Octave's expm function.
- * 
+ *
  * @param x real square matrix to exponentiate
- * 
+ *
  * @return matrix exponential of x
  */
 SEXP dgeMatrix_exp(SEXP x)
@@ -357,12 +357,12 @@ SEXP dgeMatrix_exp(SEXP x)
 	*v = REAL(GET_SLOT(val, Matrix_xSym)),
 	*work = Calloc(ncsqr, double), inf_norm, m1_j, /* (-1)^j */
 	one = 1., trshift, zero = 0.;
-    
+
     if (nc < 1 || Dims[0] != nc)
 	error("Matrix exponential requires square, non-null matrix");
 
     /* FIXME: Add special treatment for nc == 1 */
- 
+
     /* Preconditioning 1.  Shift diagonal by average diagonal if positive. */
     trshift = 0;		/* determine average diagonal element */
     for (i = 0; i < nc; i++) trshift += v[i * ncp1];
@@ -410,7 +410,7 @@ SEXP dgeMatrix_exp(SEXP x)
 	npp[j * ncp1] += 1.;
 	dpp[j * ncp1] += 1.;
     }
-    
+
     /* Pade' approximation is solve(dpp, npp) */
     F77_CALL(dgetrf)(&nc, &nc, dpp, &nc, pivot, &j);
     if (j) error("dgeMatrix_exp: dgetrf returned error code %d", j);
@@ -453,13 +453,13 @@ SEXP dgeMatrix_exp(SEXP x)
     for (j = 0; j < nc; j++)
 	for (i = 0; i < nc; i++)
 	    v[i + j * nc] = work[iperm[i] + iperm[j] * nc];
-    
+
     /* Preconditioning 1: Trace normalization */
     if (trshift > 0.) {
 	double mult = exp(trshift);
 	for (i = 0; i < ncsqr; i++) v[i] *= mult;
     }
-	
+
     /* Clean up */
     Free(dpp); Free(npp); Free(perm); Free(iperm); Free(pivot); Free(scale); Free(work);
     UNPROTECT(1);
@@ -473,7 +473,7 @@ SEXP dgeMatrix_Schur(SEXP x, SEXP vectors)
     double *work, tmp;
     char *nms[] = {"WR", "WI", "T", "Z", ""};
     SEXP val = PROTECT(Matrix_make_named(VECSXP, nms));
-    
+
     if (n != dims[1] || n < 1)
 	error("dgeMatrix_Schur: argument x must be a non-null square matrix");
     SET_VECTOR_ELT(val, 0, allocVector(REALSXP, n));
@@ -489,7 +489,7 @@ SEXP dgeMatrix_Schur(SEXP x, SEXP vectors)
     work = Calloc(lwork, double);
     F77_CALL(dgees)(vecs ? "V" : "N", "N", NULL, dims, REAL(VECTOR_ELT(val, 2)), dims,
 		    &izero, REAL(VECTOR_ELT(val, 0)), REAL(VECTOR_ELT(val, 1)),
-		    REAL(VECTOR_ELT(val, 3)), dims, work, &lwork, 
+		    REAL(VECTOR_ELT(val, 3)), dims, work, &lwork,
 		    (int *) NULL, &info);
     if (info) error("dgeMatrix_Schur: dgees returned code %d", info);
     Free(work);

@@ -5,21 +5,21 @@ SEXP dsyMatrix_validate(SEXP obj)
     SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
     int *Dim = INTEGER(GET_SLOT(obj, Matrix_DimSym));
     char *val;
-    
+
     if (length(uplo) != 1)
-	return ScalarString(mkChar("uplo slot must have length 1"));
+	return mkString("uplo slot must have length 1");
     val = CHAR(STRING_ELT(uplo, 0));
-    if (strlen(val) != 1) 
-    	return ScalarString(mkChar("uplo[1] must have string length 1"));
-    if (toupper(*val) != 'U' && toupper(*val) != 'L')
-    	return ScalarString(mkChar("uplo[1] must be \"U\" or \"L\""));
+    if (strlen(val) != 1)
+    	return mkString("uplo must have string length 1");
+    if (*val != 'U' && *val != 'L')
+    	return mkString("uplo must be \"U\" or \"L\"");
     if (Dim[0] != Dim[1])
-	return ScalarString(mkChar("Symmetric matrix must be square"));
+	return mkString("Symmetric matrix must be square");
     return ScalarLogical(1);
 }
 
 double get_norm_sy(SEXP obj, char *typstr)
-{    
+{
     char typnm[] = {'\0', '\0'};
     int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym));
     double *work = (double *) NULL;
@@ -58,7 +58,7 @@ double set_rcond_sy(SEXP obj, char *typstr)
 	F77_CALL(dsycon)(CHAR(asChar(GET_SLOT(obj, Matrix_uploSym))),
 			 dims, REAL(GET_SLOT(obj, Matrix_xSym)),
 			 dims, INTEGER(GET_SLOT(obj, install("pivot"))),
-			 &anorm, &rcond, 
+			 &anorm, &rcond,
 			 (double *) R_alloc(2*dims[0], sizeof(double)),
 			 (int *) R_alloc(dims[0], sizeof(int)), &info);
 	SET_SLOT(obj, Matrix_rcondSym,
@@ -74,11 +74,11 @@ SEXP dsyMatrix_rcond(SEXP obj, SEXP type)
     return ScalarReal(NA_REAL);
 }
 
-static 
+static
 void make_symmetric(double *to, SEXP from, int n)
 {
     int i, j;
-    if (toupper(*CHAR(asChar(GET_SLOT(from, Matrix_uploSym)))) == 'U') {
+    if (*CHAR(asChar(GET_SLOT(from, Matrix_uploSym))) == 'U') {
 	for (j = 0; j < n; j++) {
 	    for (i = j+1; i < n; i++) {
 		to[i + j*n] = to[j + i*n];
@@ -92,7 +92,7 @@ void make_symmetric(double *to, SEXP from, int n)
 	}
     }
 }
-    
+
 SEXP dsyMatrix_solve(SEXP a)
 {
 /* FIXME: Write the code */
@@ -111,7 +111,7 @@ SEXP dsyMatrix_as_dgeMatrix(SEXP from)
 {
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
 	rcondSym = Matrix_rcondSym;
-    
+
     SET_SLOT(val, Matrix_rcondSym, allocVector(REALSXP, 0));
     SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(val, rcondSym, duplicate(GET_SLOT(from, rcondSym)));
@@ -128,7 +128,7 @@ SEXP dsyMatrix_as_matrix(SEXP from)
 {
     int n = INTEGER(GET_SLOT(from, Matrix_DimSym))[0];
     SEXP val = PROTECT(allocMatrix(REALSXP, n, n));
-    
+
     make_symmetric(Memcpy(REAL(val),
 			  REAL(GET_SLOT(from, Matrix_xSym)), n * n),
 		   from, n);
@@ -144,7 +144,7 @@ SEXP dsyMatrix_dgeMatrix_mm(SEXP a, SEXP b)
 	m = adims[0], n = bdims[1], k = adims[1];
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
     double one = 1., zero = 0.;
-    
+
     if (bdims[0] != k)
 	error("Matrices are not conformable for multiplication");
     if (m < 1 || n < 1 || k < 1)
@@ -172,7 +172,7 @@ SEXP dsyMatrix_dgeMatrix_mm_R(SEXP a, SEXP b)
 	m = adims[0], n = bdims[1], k = adims[1];
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
     double one = 1., zero = 0.;
-    
+
     if (bdims[0] != k)
 	error("Matrices are not conformable for multiplication");
     if (m < 1 || n < 1 || k < 1)
@@ -191,4 +191,4 @@ SEXP dsyMatrix_dgeMatrix_mm_R(SEXP a, SEXP b)
     UNPROTECT(1);
     return val;
 }
-    
+

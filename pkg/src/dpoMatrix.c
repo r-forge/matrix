@@ -18,12 +18,12 @@ SEXP dpoMatrix_chol(SEXP x)
 	dimP = GET_SLOT(x, Matrix_DimSym),
 	uploP = GET_SLOT(x, Matrix_uploSym);
     int *dims, info;
-    
+
     if (val != R_NilValue) return val;
     dims = INTEGER(dimP);
     val = PROTECT(NEW_OBJECT(MAKE_CLASS("Cholesky")));
     SET_SLOT(val, Matrix_uploSym, duplicate(uploP));
-    SET_SLOT(val, Matrix_diagSym, ScalarString(mkChar("N")));
+    SET_SLOT(val, Matrix_diagSym, mkString("N"));
     SET_SLOT(val, Matrix_rcondSym, allocVector(REALSXP, 0));
     SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(x, Matrix_xSym)));

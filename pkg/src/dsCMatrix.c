@@ -5,16 +5,16 @@ SEXP dsCMatrix_validate(SEXP obj)
     SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
     int *Dim = INTEGER(GET_SLOT(obj, Matrix_DimSym));
     char *val;
-    
+
     if (length(uplo) != 1)
-	return ScalarString(mkChar("uplo slot must have length 1"));
+	return mkString("uplo slot must have length 1");
     val = CHAR(STRING_ELT(uplo, 0));
-    if (strlen(val) != 1) 
-    	return ScalarString(mkChar("uplo[1] must have string length 1"));
-    if (toupper(*val) != 'U' && toupper(*val) != 'L')
-    	return ScalarString(mkChar("uplo[1] must be \"U\" or \"L\""));
+    if (strlen(val) != 1)
+    	return mkString("uplo[1] must have string length 1");
+    if (*val != 'U' && *val != 'L')
+    	return mkString("uplo[1] must be \"U\" or \"L\"");
     if (Dim[0] != Dim[1])
-	return ScalarString(mkChar("Symmetric matrix must be square"));
+	return mkString("Symmetric matrix must be square");
     csc_check_column_sorting(obj);
     return ScalarLogical(1);
 }
@@ -25,7 +25,7 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
     int *Ai = INTEGER(GET_SLOT(x, Matrix_iSym)),
 	*Ap = INTEGER(pSlot),
 	*Lp, *Parent, info,
-	lo = toupper(CHAR(asChar(GET_SLOT(x, Matrix_uploSym)))[0]) == 'L',
+	lo = CHAR(asChar(GET_SLOT(x, Matrix_uploSym)))[0] == 'L',
 	n = length(pSlot)-1,
 	nnz, piv = asLogical(pivot);
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dCholCMatrix")));
@@ -35,7 +35,7 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
     /* FIXME: Check if there is a Cholesky factorization.  If yes,
        check if the permutation status matches that of the call.  If
        so, return it. */
- 
+
     if (lo) {
 	x = PROTECT(ssc_transpose(x));
 	Ai = INTEGER(GET_SLOT(x, Matrix_iSym));
@@ -78,7 +78,7 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
     nnz = Lp[n];
     SET_SLOT(val, Matrix_iSym, allocVector(INTSXP, nnz));
     SET_SLOT(val, Matrix_xSym, allocVector(REALSXP, nnz));
-    SET_SLOT(val, Matrix_DSym, allocVector(REALSXP, n));    
+    SET_SLOT(val, Matrix_DSym, allocVector(REALSXP, n));
     info = R_ldl_numeric(n, Ap, Ai, Ax, Lp, Parent,
 			 INTEGER(GET_SLOT(val, Matrix_iSym)),
 			 REAL(GET_SLOT(val, Matrix_xSym)),
@@ -144,8 +144,8 @@ SEXP ssc_transpose(SEXP x)
 	*xdims = INTEGER(GET_SLOT(x, Matrix_DimSym));
 
     adims[0] = xdims[1]; adims[1] = xdims[0];
-    if (toupper(CHAR(asChar(GET_SLOT(x, Matrix_uploSym)))[0]) == 'U')
-	SET_SLOT(ans, Matrix_uploSym, ScalarString(mkChar("L")));
+    if (CHAR(asChar(GET_SLOT(x, Matrix_uploSym)))[0] == 'U')
+	SET_SLOT(ans, Matrix_uploSym, mkString("L"));
     SET_SLOT(ans, Matrix_pSym, allocVector(INTSXP, xdims[0] + 1));
     SET_SLOT(ans, Matrix_iSym, allocVector(INTSXP, nnz));
     SET_SLOT(ans, Matrix_xSym, allocVector(REALSXP, nnz));
@@ -193,7 +193,7 @@ SEXP dsCMatrix_to_dgTMatrix(SEXP x)
 	for (jj = p[j]; jj < p2; jj++) {
 	    int ii = iv[jj];
 	    double xx = xv[jj];
-	    
+
 	    ai[pos] = ii; aj[pos] = j; ax[pos] = xx; pos++;
 	    if (ii != j) {
 		aj[pos] = ii; ai[pos] = j; ax[pos] = xx; pos++;
@@ -214,7 +214,7 @@ SEXP dsCMatrix_ldl_symbolic(SEXP x, SEXP doPerm)
 	*P = (int *) NULL, *Pinv = (int *) NULL;
 
 
-    if (toupper(CHAR(asChar(GET_SLOT(x, Matrix_uploSym)))[0]) == 'L') {
+    if (CHAR(asChar(GET_SLOT(x, Matrix_uploSym)))[0] == 'L') {
 	x = PROTECT(ssc_transpose(x));
     } else {
 	x = PROTECT(duplicate(x));
@@ -236,8 +236,8 @@ SEXP dsCMatrix_ldl_symbolic(SEXP x, SEXP doPerm)
     Parent = INTEGER(VECTOR_ELT(ans, 0));
     SET_VECTOR_ELT(ans, 1, NEW_OBJECT(MAKE_CLASS("dtCMatrix")));
     tsc = VECTOR_ELT(ans, 1);
-    SET_SLOT(tsc, Matrix_uploSym, ScalarString(mkChar("L")));
-    SET_SLOT(tsc, Matrix_diagSym, ScalarString(mkChar("U")));
+    SET_SLOT(tsc, Matrix_uploSym, mkString("L"));
+    SET_SLOT(tsc, Matrix_diagSym, mkString("U"));
     SET_SLOT(tsc, Matrix_DimSym, Dims);
     SET_SLOT(tsc, Matrix_pSym, allocVector(INTSXP, n + 1));
     Lp = INTEGER(GET_SLOT(tsc, Matrix_pSym));
@@ -261,9 +261,9 @@ SEXP dsCMatrix_metis_perm(SEXP x)
     SEXP pSlot = GET_SLOT(x, Matrix_pSym),
 	ans = PROTECT(allocVector(VECSXP, 2));
     int n = length(pSlot) - 1;
-    
+
     SET_VECTOR_ELT(ans, 0, allocVector(INTSXP, n));
-    SET_VECTOR_ELT(ans, 1, allocVector(INTSXP, n));    
+    SET_VECTOR_ELT(ans, 1, allocVector(INTSXP, n));
     ssc_metis_order(n,
 		    INTEGER(pSlot),
 		    INTEGER(GET_SLOT(x, Matrix_iSym)),

@@ -3,9 +3,9 @@
 
 SEXP dgTMatrix_validate(SEXP x)
 {
-    SEXP 
+    SEXP
 	islot = GET_SLOT(x, Matrix_iSym),
-	jslot = GET_SLOT(x, Matrix_jSym),	
+	jslot = GET_SLOT(x, Matrix_jSym),
 	xslot = GET_SLOT(x, Matrix_xSym),
 	dimslot = GET_SLOT(x, Matrix_DimSym);
     int j,
@@ -13,19 +13,17 @@ SEXP dgTMatrix_validate(SEXP x)
 	ncol, nrow, nnz = length(islot),
 	*xj = INTEGER(jslot),
 	*xi = INTEGER(islot);
-    
+
     if (length(xslot) != nnz || length(jslot) != nnz)
-	return ScalarString(mkChar("lengths of slots i, j, and x must match"));
+	return mkString("lengths of slots i, j, and x must match");
     if (length(dimslot) != 2)
-	return ScalarString(mkChar("slot Dim must have length 2"));
+	return mkString("slot Dim must have length 2");
     nrow = dims[0]; ncol = dims[1];
     for (j = 0; j < nnz; j++) {
 	if (xi[j] < 0 || xi[j] >= nrow)
-	    return ScalarString(
-		mkChar("all row indices must be between 0 and nrow-1"));
+	    return mkString("all row indices must be between 0 and nrow-1");
 	if (xj[j] < 0 || xj[j] >= ncol)
-	    return ScalarString(
-		mkChar("all column indices must be between 0 and ncol-1"));
+	    return mkString("all column indices must be between 0 and ncol-1");
     }
     return ScalarLogical(1);
 }
@@ -38,7 +36,7 @@ SEXP dgTMatrix_to_dgCMatrix(SEXP x)
     int *dims = INTEGER(dd), nnz = length(iP);
     int *p, *ti = Calloc(nnz, int), m = dims[0], n = dims[1];
     double *tx = Calloc(nnz, double);
-    
+
     SET_SLOT(ans, Matrix_pSym, allocVector(INTSXP, n + 1));
     SET_SLOT(ans, Matrix_DimSym, duplicate(dd));
     p = INTEGER(GET_SLOT(ans, Matrix_pSym));
@@ -67,25 +65,25 @@ insert_triplets_in_array(int m, int n, int nnz,
     for (i = 0; i < nnz; i++) {
 	vx[xi[i] + xj[i] * m] += xx[i];	/* allow redundant entries in x */
     }
-}    
-			 
+}
+
 SEXP dgTMatrix_to_dgeMatrix(SEXP x)
 {
     SEXP dd = GET_SLOT(x, Matrix_DimSym),
 	islot = GET_SLOT(x, Matrix_iSym),
 	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
-	
+
     int *dims = INTEGER(dd),
 	m = dims[0],
 	n = dims[1];
-    
+
     SET_SLOT(ans, Matrix_rcondSym, allocVector(REALSXP, 0));
     SET_SLOT(ans, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(ans, Matrix_DimSym, duplicate(dd));
     SET_SLOT(ans, Matrix_xSym, allocVector(REALSXP, m * n));
     insert_triplets_in_array(m, n, length(islot),
 			     INTEGER(islot), INTEGER(GET_SLOT(x, Matrix_jSym)),
-			     REAL(GET_SLOT(x, Matrix_xSym)),	     
+			     REAL(GET_SLOT(x, Matrix_xSym)),
 			     REAL(GET_SLOT(ans, Matrix_xSym)));
     UNPROTECT(1);
     return ans;
@@ -101,7 +99,7 @@ SEXP dgTMatrix_to_matrix(SEXP x)
 
     insert_triplets_in_array(m, n, length(islot),
 			     INTEGER(islot), INTEGER(GET_SLOT(x, Matrix_jSym)),
-			     REAL(GET_SLOT(x, Matrix_xSym)),	     
+			     REAL(GET_SLOT(x, Matrix_xSym)),
 			     REAL(ans));
     UNPROTECT(1);
     return ans;
