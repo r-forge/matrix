@@ -91,13 +91,9 @@ data(mm, package = "Matrix")
 data(y, package = "Matrix")
 mm = as(mm, "matrix")
 dim(mm)
-naive.sol = solve(t(mm) %*% mm) %*% t(mm) %*% y
-system.time(solve(t(mm) %*% mm) %*% t(mm) %*% y)
-system.time(solve(t(mm) %*% mm) %*% t(mm) %*% y)
-system.time(solve(t(mm) %*% mm) %*% t(mm) %*% y)
+invisible(gc())
+system.time(naive.sol <- solve(t(mm) %*% mm) %*% t(mm) %*% y)
 @ 
-(Here and in what follows we will repeat timings four times to obtain
-timings that are close to the steady-state values.)
 
 Because the calculation of a ``cross-product'' matrix, such as
 $\bX\trans\bX$ or $\bX\trans\bm{y}$, is a common operation in
@@ -119,10 +115,8 @@ is solved directly.
 
 Combining these optimizations we obtain
 <<crossKoenNg>>=
-cpod.sol = solve(crossprod(mm), crossprod(mm,y))
-system.time(solve(crossprod(mm), crossprod(mm,y)))
-system.time(solve(crossprod(mm), crossprod(mm,y)))
-system.time(solve(crossprod(mm), crossprod(mm,y)))
+invisible(gc())
+system.time(cpod.sol <- solve(crossprod(mm), crossprod(mm,y)))
 all.equal(naive.sol, cpod.sol)
 @ 
 
@@ -131,9 +125,7 @@ crossprod form of the calculation is about four times as fast as the
 naive calculation.  In fact, the entire crossprod solution is
 faster than simply calculating $\bX\trans\bX$ the naive way.
 <<xpxKoenNg>>=
-system.time(t(mm) %*% mm)
-system.time(t(mm) %*% mm)
-system.time(t(mm) %*% mm)
+invisible(gc())
 system.time(t(mm) %*% mm)
 @ 
 
@@ -150,14 +142,11 @@ use a Cholesky decomposition.  The Cholesky decomposition could be used
 but it is rather awkward
 <<naiveChol>>=
 ch = chol(crossprod(mm))
+invisible(gc())
 system.time(chol(crossprod(mm)))
-system.time(chol(crossprod(mm)))
-system.time(chol(crossprod(mm)))
-chol.sol = backsolve(ch,
-   forwardsolve(ch, crossprod(mm, y), upper = TRUE, trans = TRUE))
-system.time(backsolve(ch, forwardsolve(ch, crossprod(mm, y), upper = TRUE, trans = TRUE)))
-system.time(backsolve(ch, forwardsolve(ch, crossprod(mm, y), upper = TRUE, trans = TRUE)))
-system.time(backsolve(ch, forwardsolve(ch, crossprod(mm, y), upper = TRUE, trans = TRUE)))
+invisible(gc())
+system.time(chol.sol <- backsolve(ch,
+   forwardsolve(ch, crossprod(mm, y), upper = TRUE, trans = TRUE)))
 all.equal(chol.sol, naive.sol)
 @ 
 
@@ -172,10 +161,8 @@ Cholesky decomposition.
 data(mm, package = "Matrix")
 mm = as(mm, "geMatrix")
 class(crossprod(mm))
-Mat.sol = solve(crossprod(mm), crossprod(mm, y))
-system.time(solve(crossprod(mm), crossprod(mm, y)))
-system.time(solve(crossprod(mm), crossprod(mm, y)))
-system.time(solve(crossprod(mm), crossprod(mm, y)))
+invisible(gc())
+system.time(Mat.sol <- solve(crossprod(mm), crossprod(mm, y)))
 all.equal(naive.sol, as(Mat.sol, "matrix"))
 @ 
 
@@ -185,8 +172,9 @@ the original object so that it can be reused without recalculation.
 <<saveFactor>>=
 xpx = crossprod(mm)
 xpy = crossprod(mm, y)
+invisible(gc())
 system.time(solve(xpx, xpy))
-system.time(solve(xpx, xpy))
+invisible(gc())
 system.time(solve(xpx, xpy))
 @ 
 
@@ -197,10 +185,8 @@ methods for sparse matrices, which produce the fastest results of all.
 <<SparseKoenNg>>=
 data(mm, package = "Matrix")
 class(mm)
-sparse.sol = solve(crossprod(mm), crossprod(mm, y))
-system.time(solve(crossprod(mm), crossprod(mm, y)))
-system.time(solve(crossprod(mm), crossprod(mm, y)))
-system.time(solve(crossprod(mm), crossprod(mm, y)))
+invisible(gc())
+system.time(sparse.sol <- solve(crossprod(mm), crossprod(mm, y)))
 all.equal(naive.sol, as(sparse.sol, "matrix"))
 @ 
 
@@ -212,8 +198,9 @@ difficult to determine the difference in the solution times.
 <<SparseSaveFactor>>=
 xpx = crossprod(mm)
 xpy = crossprod(mm, y)
+invisible(gc())
 system.time(solve(xpx, xpy))
-system.time(solve(xpx, xpy))
+invisible(gc())
 system.time(solve(xpx, xpy))
 @ 
 
