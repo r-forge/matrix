@@ -8,7 +8,7 @@ Maintainer: Douglas Bates <bates@stat.wisc.edu>
 Description: Fit linear and generalized linear mixed-effects models.
 Depends: methods, R(>= 2.0.0), Matrix(>= 0.95-1), latticeExtra
 Imports: graphics, stats
-Suggests: mlmRev(>= 0.9-1)
+Suggests: mlmRev
 SaveImage: no
 LazyLoad: yes
 License: GPL version 2 or later

@@ -33,8 +33,11 @@
 \end{abstract}
 
 <<preliminaries,echo=FALSE,print=FALSE>>=
-library(lme4)
 library(lattice)
+library(Matrix)
+library(latticeExtra)
+library(lme4)
+data("Early", package = "mlmRev")
 options(width=80, show.signif.stars = FALSE,
         lattice.theme = function() canonical.theme("pdf", color = FALSE))
 @
@@ -566,7 +569,6 @@ of whom were in the treatment group and 45 in the control group
 (identified by \code{trt}).  We convert the \code{age} measurement to
 ``time on study'', \code{tos} as the treatment began at age 0.5 years.
 <<EarlyDataLoad>>=
-data(Early)
 Early$tos <- Early$age - 0.5
 str(Early)
 @ 
