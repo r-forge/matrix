@@ -130,7 +130,7 @@ SEXP dtpMatrix_dgeMatrix_mm(SEXP x, SEXP y)
     if (yDim[0] != xDim[1])
 	error(_("Dimensions of a (%d,%d) and b (%d,%d) do not conform"),
 	      xDim[0], xDim[1], yDim[0], yDim[1]);
-    for (j = 0; j < yDim[1]; j++) /* A %*% x  via BLAS 2 DTPMV(.) */
+    for (j = 0; j < yDim[1]; j++) /* X %*% y[,j]  via BLAS 2 DTPMV(.) */
 	F77_CALL(dtpmv)(uplo, "N", diag, yDim, xx,
 			vx + j * yDim[0], &ione);
     UNPROTECT(1);
@@ -154,7 +154,7 @@ SEXP dgeMatrix_dtpMatrix_mm(SEXP x, SEXP y)
 	      xDim[0], xDim[1], yDim[0], yDim[1]);
     for (i = 0; i < xDim[0]; i++)/* val[i,] := Y' %*% x[i,]  */
 	F77_CALL(dtpmv)(uplo, "T", diag, yDim, yx,
-			vx + i * xDim[1], /* incr = */ xDim);
+			vx + i, /* incr = */ xDim);
     UNPROTECT(1);
     return val;
 }

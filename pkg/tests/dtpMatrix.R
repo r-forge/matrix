@@ -27,6 +27,10 @@ stopifnot(all.equal(D.$modulus, -6.579251212),
 object.size(tp6)
 object.size(as(tp6, "dtrMatrix"))
 object.size(as(tp6, "matrix"))
+D6 <- as(diag(6), "dgeMatrix")
+ge6 <- as(tp6, "dgeMatrix")
+stopifnot(all.equal(D6 %*% tp6, ge6))
+stopifnot(all.equal(tp6 %*% D6, ge6))
 
 ## larger case
 set.seed(123)
