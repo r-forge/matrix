@@ -1200,7 +1200,9 @@ common_ECME_gradient(SEXP x, int REML, SEXP val)
 static void EMsteps_verbose_print(SEXP x, int iter, int REML)
 {
     SEXP coef = PROTECT(ssclme_coef(x, ScalarLogical(0)));
-    int lc = length(coef); double *cc = REAL(coef);
+    int i, lc = length(coef);
+    double *cc = REAL(coef), *dev = REAL(GET_SLOT(x, Matrix_devianceSym));
+			       
 
     ssclme_factor(x);
     if (iter == 0) Rprintf("  EM iterations\n");
@@ -1232,8 +1234,6 @@ SEXP ssclme_EMsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP verb)
 	nEM = asInteger(nsteps),
 	nf = length(Omega),
 	verbose = asLogical(verb);
-    double
-	*dev = REAL(GET_SLOT(x, Matrix_devianceSym));
 
     if (verbose) EMsteps_verbose_print(x, 0, REML);
     for (iter = 0; iter < nEM; iter++) {
@@ -1358,7 +1358,7 @@ static void upperTriList_to_vector(SEXP mList, int *nc, SEXP cvec)
 	}
     }
 }
-    
+
 /** 
  * Return the gradient of the ML or REML deviance.
  * 
@@ -1380,7 +1380,7 @@ SEXP ssclme_grad(SEXP x, SEXP REMLp, SEXP Unc, SEXP OneVector)
 	int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym));
 	SEXP val = PROTECT(allocVector(REALSXP, coef_length(length(ans), nc)));
 	
-	upperTri_as_vector(ans, nc, val);
+	upperTriList_to_vector(ans, nc, val);
 	UNPROTECT(2);
 	return val;
     }
