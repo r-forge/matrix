@@ -270,10 +270,10 @@ SEXP geMatrix_svd(SEXP x, SEXP nnu, SEXP nnv)
 	    lwork = -1, info;
 	int *iwork = Calloc(8 * mm, int);
 	double tmp, *work;
-	int bdspac = 3*m*m + 4*m,
-	    wrkbl, maxwrk, minwrk, itmp,
-	    ione = 1, iminus1 = -1;
-	int i1, i2, i3;
+/* 	int bdspac = 3*m*m + 4*m, */
+/* 	    wrkbl, maxwrk, minwrk, itmp, */
+/* 	    ione = 1, iminus1 = -1; */
+/* 	int i1, i2, i3; */
 
 	SET_VECTOR_ELT(val, 0, allocVector(REALSXP, mm));
 	SET_VECTOR_ELT(val, 1, allocMatrix(REALSXP, m, mm));
@@ -284,13 +284,13 @@ SEXP geMatrix_svd(SEXP x, SEXP nnu, SEXP nnv)
 			 REAL(VECTOR_ELT(val, 2)), &mm,
 			 &tmp, &lwork, iwork, &info);
 	lwork = (int) tmp;
-	F77_CALL(foo)(&i1, &i2, &i3);
-	wrkbl = 3*m+(m+n)*i1;
-	if (wrkbl < (itmp = 3*m + m*i2)) wrkbl = itmp;
-	if (wrkbl < (itmp = 3*m + m*i3)) wrkbl = itmp;
-	itmp = bdspac+3*m;
-	maxwrk = (wrkbl > itmp) ? wrkbl : itmp;
-	minwrk = 3*m + ((bdspac > n) ?  bdspac : n);
+/* 	F77_CALL(foo)(&i1, &i2, &i3); */
+/* 	wrkbl = 3*m+(m+n)*i1; */
+/* 	if (wrkbl < (itmp = 3*m + m*i2)) wrkbl = itmp; */
+/* 	if (wrkbl < (itmp = 3*m + m*i3)) wrkbl = itmp; */
+/* 	itmp = bdspac+3*m; */
+/* 	maxwrk = (wrkbl > itmp) ? wrkbl : itmp; */
+/* 	minwrk = 3*m + ((bdspac > n) ?  bdspac : n); */
 	work = Calloc(lwork, double);
 	F77_CALL(dgesdd)("S", &m, &n, xx, &m,
 			 REAL(VECTOR_ELT(val, 0)),
