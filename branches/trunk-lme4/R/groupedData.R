@@ -268,10 +268,10 @@ setMethod("plot",
           
           groupVar <- getGroupsFormula(x)[[2]]
           isMultipleGroups <- length(groupVar) > 2
-
-          if (isMultipleGroups) return("multiple groups not implemented yet")
-
-          if (!isNumericResponse) return("non-numeric response plots not implemented yet")
+          if (isMultipleGroups)
+              return("multiple groups not implemented yet")
+          if (!isNumericResponse)
+              return("non-numeric response plots not implemented yet")
 
           if (isTrivialCovariate || !isNumericCovariate) {
               xargs <- list()
