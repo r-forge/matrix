@@ -1,6 +1,5 @@
 #include "lmer.h"
 /* TODO 
- * - Change the structure so that ZZpO is diagonal and the off-diagonals of L are used
  * - The egsingle example with ~year|childid+schoolid shows an unusual
  * drop in the deviance when switching from ECME to optim.  Is it real?
  * (Apparently so.) 
@@ -380,17 +379,28 @@ lmer_inflate(SEXP x)
 {
     SEXP Omg = GET_SLOT(x, Matrix_OmegaSym),
 	ZZpO = GET_SLOT(x, Matrix_ZZpOSym), 
-	ZtZ = GET_SLOT(x, Matrix_ZtZSym);
+	ZtZ = GET_SLOT(x, Matrix_ZtZSym),
+	LP = GET_SLOT(x, Matrix_LSym);
     int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
 	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	i, k, nf = length(Omg);
     double *dcmp = REAL(GET_SLOT(x, Matrix_devCompSym));
 
     for (i = 0; i < nf; i++) {
-	int j, nci = nc[i], ncisqr = nci * nci;
+	SEXP ZZOel = VECTOR_ELT(ZZpO, i);
+	SEXP ZZOm = GET_SLOT(ZZOel, Matrix_xSym);
+	SEXP ZZel = VECTOR_ELT(ZtZ, Lind(i, i));
+	int *Di = INTEGER(GET_SLOT(ZZOel, Matrix_iSym)),
+	    *Dp = INTEGER(GET_SLOT(ZZOel, Matrix_pSym)),
+	    *Si = INTEGER(GET_SLOT(ZZel, Matrix_iSym)),
+	    *Sp = INTEGER(GET_SLOT(ZZel, Matrix_pSym)),
+	    *dims = INTEGER(getAttrib(ZZOm, R_DimSymbol));
+	int sz = dims[0] * dims[1];
+	int ii, j, nci = nc[i], ncisqr = nci * nci;
 	int nlev = (Gp[i + 1] - Gp[i])/nci;
-	double *Omega = REAL(VECTOR_ELT(Omg, i));
-	double *tmp = Memcpy(Calloc(ncisqr, double), Omega, ncisqr);
+	double *Omega = REAL(VECTOR_ELT(Omg, i)),
+	    *ZZ = REAL(GET_SLOT(ZZel, Matrix_xSym)),
+	    *tmp = Memcpy(Calloc(ncisqr, double), Omega, ncisqr);
 
 	F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j); /* update dcmp[1] */
 	if (j)
@@ -400,39 +410,40 @@ lmer_inflate(SEXP x)
 	    dcmp[1] += nlev * 2. * log(tmp[j * (nci + 1)]);
 	}
 	Free(tmp);
-	for (k = i; k < nf; k++) {
+	for (j = 0; j < nlev; j++) { /* copy diagonal block and inflate */
+	    double *ZZOkk = REAL(ZZOm) + Tind(Di, Dp, j, j) * sz;
+	    int kk, k2 = Sp[j + 1];
+	    for (kk = Sp[j]; kk < k2; kk++) {
+		Memcpy(REAL(ZZOm) + Tind(Di, Dp, Si[kk], j) * sz,
+		       ZZ + kk * sz, sz);
+	    }
+	    for (kk = 0; kk < nci; kk++) { 
+		for (ii = 0; ii <= kk; ii++) {
+		    int ind = ii + kk * nci;
+		    ZZOkk[ind] += Omega[ind];
+		}
+	    }
+	}
+	for (k = i + 1; k < nf; k++) {
 	    int ind = Lind(k, i);
-	    SEXP ZZOel = VECTOR_ELT(ZZpO, ind);
-	    SEXP ZZel = VECTOR_ELT(ZtZ, ind);
-	    SEXP ZZm = GET_SLOT(ZZel, Matrix_xSym),
-		ZZOm = GET_SLOT(ZZOel, Matrix_xSym);
-	    int *Di = INTEGER(GET_SLOT(ZZOel, Matrix_iSym)),
-		*Dp = INTEGER(GET_SLOT(ZZOel, Matrix_pSym)),
-		*Si = INTEGER(GET_SLOT(ZZel, Matrix_iSym)),
-		*Sp = INTEGER(GET_SLOT(ZZel, Matrix_pSym)),
-		*dims = INTEGER(getAttrib(ZZm, R_DimSymbol));
-	    int ii, jj, nblk = dims[0] * dims[1];
-	    double *ZZ = REAL(ZZm), *ZZO = REAL(ZZOm);
+	    SEXP Lel = VECTOR_ELT(LP, ind),
+		Lm = GET_SLOT(Lel, Matrix_xSym);
+	    double *L = REAL(Lm);
 
-				/* zero the whole of the ZZpO component */
-	    AZERO(ZZO, INTEGER(getAttrib(ZZOm, R_DimSymbol))[2]);
+	    dims = INTEGER(getAttrib(Lm, R_DimSymbol));
+	    ZZel = VECTOR_ELT(ZtZ, ind);
+	    ZZ = REAL(GET_SLOT(ZZel, Matrix_xSym));
+	    Di = INTEGER(GET_SLOT(Lel, Matrix_iSym));
+	    Dp = INTEGER(GET_SLOT(Lel, Matrix_pSym));
+	    Si = INTEGER(GET_SLOT(ZZel, Matrix_iSym));
+	    Sp = INTEGER(GET_SLOT(ZZel, Matrix_pSym));
+	    sz = dims[0] * dims[1];
+
+	    AZERO(L, sz * dims[2]); /* zero L  */
 	    for (j = 0; j < nlev; j++) { /* copy src blocks to dest */
 		int kk, k2 = Sp[j + 1];
 		for (kk = Sp[j]; kk < k2; kk++) {
-		    Memcpy(ZZO + Tind(Di, Dp, Si[kk], j) * nblk,
-			   ZZ + kk * nblk, nblk);
-		}
-	    }
-	    
-	    if (k == i) { /* inflate diagonal blocks */
-		for (j = 0; j < nlev; j++) { 
-		    double *ZZOkk = ZZO + Tind(Di, Dp, j, j) * nblk;
-		    for (jj = 0; jj < nci; jj++) { 
-			for (ii = 0; ii <= jj; ii++) {
-			    int ind = ii + jj * nci;
-			    ZZOkk[ind] += Omega[ind];
-			}
-		    }
+		    Memcpy(L + Tind(Di, Dp, Si[kk], j) * sz, ZZ + kk * sz, sz);
 		}
 	    }
 	}
@@ -440,6 +451,25 @@ lmer_inflate(SEXP x)
     return R_NilValue;
 }
 
+/** 
+ * Convert the extended parent pair (Parent, Block) to a parent array
+ * for the jth diagonal block of size n.
+ * 
+ * @param j index (0-based) of the diagonal outer block
+ * @param n number of inner column blocks in the outer block
+ * @param par array of length n to be filled with the parent array
+ * @param Parent parent index in the extended parent pair
+ * @param Block block index in the extended parent pair
+ * 
+ * @return par
+ */
+static /* R_INLINE */
+int *block_parent(int j, int n, int par[], const int Parent[], const int Block[])
+{
+    int i;
+    for (i = 0; i < n; i++) par[i] = (Block[i] == j) ? Parent[i] : -1;
+    return par;
+}
 
 /** 
  * If status[["factored"]] is FALSE, create and factor Z'Z+Omega.  Also
@@ -476,15 +506,17 @@ SEXP lmer_factor(SEXP x)
 	dcmp[0] = dcmp[1] = dcmp[2] = dcmp[3] = 0.;
 	Memcpy(RZX, REAL(GET_SLOT(x, Matrix_ZtXSym)), dims[0] * dims[1]);
 	Memcpy(RXX, REAL(GET_SLOT(x, Matrix_XtXSym)), dims[1] * dims[1]);
-	lmer_inflate(x);	/* initialize ZZpO */
+	lmer_inflate(x);	/* initialize ZZpO and L */
 	for (i = 0; i < nf; i++) {
 	    int dind = Lind(i, i);
-	    SEXP ZZOiP = VECTOR_ELT(ZZOP, dind);
+	    SEXP ZZOiP = VECTOR_ELT(ZZOP, i);
 	    SEXP DiP = VECTOR_ELT(DP, i);
 	    SEXP LiP = VECTOR_ELT(LP, dind);
 	    int nlev = INTEGER(getAttrib(DiP, R_DimSymbol))[2];
 	    int jj, nci = nc[i], ncisqr = nci * nci;
-	    int *Pari = INTEGER(VECTOR_ELT(VECTOR_ELT(Parent, i), 0));
+	    int *Pari = block_parent(i, nlev, Calloc(nlev, int),
+				     INTEGER(VECTOR_ELT(VECTOR_ELT(Parent, i), 0)),
+				     INTEGER(VECTOR_ELT(VECTOR_ELT(Parent, i), 1)));
 	    double *D = REAL(DiP);
 	
 	    jj = cscb_ldl(ZZOiP, Pari, LiP, DiP);
@@ -497,61 +529,60 @@ SEXP lmer_factor(SEXP x)
 	    /* Solve L_{i,i} %*% RZX_i := RZX_i */
 	    cscb_trsm('L', 'N', 'U', 1., LiP, RZX + Gp[i],
 		      Gp[i+1] - Gp[i], dims[1], dims[0]);
-	    /* Solve D_i^{1/2} %*% RZX_i := RZX_i */
+	    /* Solve D_i^{T/2} %*% RZX_i := RZX_i */
 	    for (jj = 0; jj < nlev; jj++) {
 		F77_CALL(dtrsm)("L", "U", "T", "N", &nci, dims + 1,
 				&one, D + jj * ncisqr, &nci,
 				RZX + Gp[i] + jj * nci, dims);
 	    }
 	    for (j = i + 1; j < nf; j++) { /*  further blocks */
-		SEXP ZZOji = VECTOR_ELT(ZZOP, Lind(j, i));
-		SEXP ZZOx = GET_SLOT(ZZOji, Matrix_xSym);
-		double *ZZO = REAL(ZZOx);
-		int *xdims = INTEGER(getAttrib(ZZOx, R_DimSymbol)),
-		    *ZZp = INTEGER(GET_SLOT(ZZOji, Matrix_pSym));
+		SEXP Lji = VECTOR_ELT(LP, Lind(j, i));
+		SEXP Lx = GET_SLOT(Lji, Matrix_xSym);
+		double *L = REAL(Lx);
+		int *xdims = INTEGER(getAttrib(Lx, R_DimSymbol)),
+		    *Lp = INTEGER(GET_SLOT(Lji, Matrix_pSym));
 		int ntot = xdims[0] * xdims[1];
 
-		/* ZZpO_{j,i} := ZZpO_{j,i} %*% L_{i,i}^{-T} %*% D_i^{-1/2} */
-		/* FIXME: Change off-diagonal blocks to L, not ZZO */
-		cscb_trcbsm('R', 'L', 'T', 'U', 1.0, LiP, Pari, ZZOji);
+		/* L_{j,i} := L_{j,i} %*% L_{i,i}^{-T} %*% D_i^{-1/2} */
+		cscb_trcbsm('R', 'L', 'T', 'U', 1.0, LiP, Pari, Lji);
 		for (jj = 0; jj < nlev; jj++) {
-		    int k, k2 = ZZp[jj + 1];
-		    for (k = ZZp[jj]; k < k2; k++)
+		    int k, k2 = Lp[jj + 1];
+		    for (k = Lp[jj]; k < k2; k++)
 			F77_CALL(dtrsm)("R", "U", "N", "N", xdims, xdims + 1,
 					&one, D + jj * ncisqr, &nci,
-					ZZO + k * ntot, xdims);
+					L + k * ntot, xdims);
 		}
-		/* RZX_j := RZX_j - ZZpO_{j,i} %*% RZX_i */
+		/* RZX_j := RZX_j - L_{j,i} %*% RZX_i */
 		cscb_mm('L', 'N', Gp[j + 1] - Gp[j], dims[1], Gp[i+1] - Gp[i],
-			-1.0, ZZOji, RZX + Gp[i], dims[0],
+			-1.0, Lji, RZX + Gp[i], dims[0],
 			1.0, RZX + Gp[j], dims[0]);
 	    }
 	    for (j = i + 1; j < nf; j++) { /* block pairs and final update */
-		SEXP ZZOji = VECTOR_ELT(ZZOP, Lind(j, i));
-		SEXP ZZOx = GET_SLOT(ZZOji, Matrix_xSym);
-		double *ZZO = REAL(ZZOx);
-		int *xdims = INTEGER(getAttrib(ZZOx, R_DimSymbol)),
-		    *ZZp = INTEGER(GET_SLOT(ZZOji, Matrix_pSym));
+		SEXP Lji = VECTOR_ELT(LP, Lind(j, i));
+		SEXP Lx = GET_SLOT(Lji, Matrix_xSym);
+		double *L = REAL(Lx);
+		int *xdims = INTEGER(getAttrib(Lx, R_DimSymbol)),
+		    *Lp = INTEGER(GET_SLOT(Lji, Matrix_pSym));
 		int ntot = xdims[0] * xdims[1];
 
 		
-		/* ZZpO_{j,j} := ZZpO_{j,j} - ZZpO{j,i}%*%ZZpO_{j,i}^T */
-		cscb_syrk('U', 'N', -1.0, ZZOji,
-			  1.0, VECTOR_ELT(ZZOP, Lind(j, j)));
+		/* ZZpO_{j,j} := ZZpO_{j,j} - L{j,i} %*% L_{j,i}^T */
+		cscb_syrk('U', 'N', -1.0, Lji, 1.0, VECTOR_ELT(ZZOP, j));
 		for (jj = j+1; jj < nf; jj++) {
-		    /* ZZpO_{jj,j} := ZZpO_{jj,j} - ZZpO{jj,i}%*%ZZpO_{j,i}^T */
-		    cscb_cscbm('N', 'T', -1.0, VECTOR_ELT(ZZOP, Lind(jj, i)),
-			    ZZOji, 1.0, VECTOR_ELT(ZZOP, Lind(jj, j)));
+		    /* L_{jj,j} := L_{jj,j} - L{jj,i} %*% L_{j,i}^T */
+		    cscb_cscbm('N', 'T', -1.0, VECTOR_ELT(LP, Lind(jj, i)),
+			    Lji, 1.0, VECTOR_ELT(LP, Lind(jj, j)));
 		}
-		/* ZZpO_{j,i} := ZZpO_{j,i} %*% D_i^{-T/2} */
+		/* L_{j,i} := L_{j,i} %*% D_i^{-T/2} */
 		for (jj = 0; jj < nlev; jj++) {
-		    int k, k2 = ZZp[jj + 1];
-		    for (k = ZZp[jj]; k < k2; k++)
+		    int k, k2 = Lp[jj + 1];
+		    for (k = Lp[jj]; k < k2; k++)
 			F77_CALL(dtrsm)("R", "U", "T", "N", xdims, xdims + 1,
 					&one, D + jj * ncisqr, &nci,
-					ZZO + k * ntot, xdims);
+					L + k * ntot, xdims);
 		}
 	    }
+	    Free(Pari);
 	}
 				/* downdate and factor XtX */
 	F77_CALL(dsyrk)("U", "T", dims + 1, dims,
@@ -585,13 +616,12 @@ SEXP lmer_factor(SEXP x)
  * @param Gp group pointers for the rows
  * @param n number of columns
  * @param alpha multiplier
- * @param ZZpO pointer to the Z'Z+Omega sparse blocked matrix
  * @param L pointer to the L cscb object
  * @param mm pointer to the matrix of right-hand sides
  */
 static void
 lmer_sm(char side, char trans, int nf, const int Gp[], int n,
-	double alpha, SEXP ZZpO, SEXP L, double B[], int ldb)
+	double alpha, SEXP L, double B[], int ldb)
 {
     int itr = (trans == 'T' || trans == 't'), j, k,
 	lside = (side == 'L' || side == 'l');
@@ -605,7 +635,7 @@ lmer_sm(char side, char trans, int nf, const int Gp[], int n,
 			   B + Gp[j], nrj, n, ldb);
 		for (k = 0; k < j; k++) {
 		    cscb_mm('L', 'T', Gp[k + 1] - Gp[k], n, nrj,
-			    -1., VECTOR_ELT(ZZpO, Lind(j,k)),
+			    -1., VECTOR_ELT(L, Lind(j, k)),
 			    B + Gp[j], ldb, alpha, B + Gp[k], ldb);
 		}
 	    }
@@ -613,32 +643,6 @@ lmer_sm(char side, char trans, int nf, const int Gp[], int n,
     } else error("Code for right-side solutions not yet written");
 }
 
-/** 
- * Return the number of non-zero blocks below the diagonal in a jth column
- * block of a diagonal outer block of L^{-1}.
- * 
- * @param j column block index
- * @param Pari parent array
- * @param L pointer to the list of cscBlocked objects composing L
- * @param nnz vector to be filled in
- */
-static R_INLINE
-int nnzcb_diag(int j, const int Pari[])
-{
-    int k, val;
-    for (k = Pari[j], val = 0; k > 0; k = Pari[k]) val++;
-    return val;
-}
-
-static
-int nnzcb_offdiag(int j, int nrb, const int Lp[], const int Li[], const int Park[])
-{
-    int k, val;
-    for (k = Park[j], val = 0; k > 0; k = Park[k]) val++;
-    return val;
-}
-
-	
 /** 
  * Fill the nnz array with the number of nonzero inner blocks in each
  * outer block of the jth inner column block of the ith outer block of L^{-1}
@@ -668,26 +672,6 @@ int *nnzcb(int i, int j, int nf, SEXP Parent, int nnz[])
     }
     return nnz;
 }
-
-/** 
- * Convert the extended parent pair (Parent, Block) to a parent array
- * for the jth diagonal block of size n.
- * 
- * @param j index (0-based) of the diagonal outer block
- * @param n number of inner column blocks in the outer block
- * @param par array of length n to be filled with the parent array
- * @param Parent parent index in the extended parent pair
- * @param Block block index in the extended parent pair
- * 
- * @return par
- */
-static R_INLINE
-int *block_parent(int j, int n, int par[], const int Parent[], const int Block[])
-{
-    int i;
-    for (i = 0; i < n; i++) par[i] = (Block[i] == j) ? Parent[i] : -1;
-    return par;
-}
 	
 /** 
  * If necessary, factor Z'Z+Omega, ZtX, and XtX then, if necessary,
@@ -710,12 +694,11 @@ SEXP lmer_invert(SEXP x)
 	    LP = GET_SLOT(x, Matrix_LSym),
 	    ParP = GET_SLOT(x, Matrix_ParentSym),
 	    RZXP = GET_SLOT(x, Matrix_RZXSym),
-	    ZZpOP = GET_SLOT(x, Matrix_ZZpOSym),
 	    bVarP = GET_SLOT(x, Matrix_bVarSym);
 	int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
 	    *dims = INTEGER(getAttrib(RZXP, R_DimSymbol)),
 	    *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
-	    i, nn, nf = length(DP);
+	    i, nf = length(DP);
 	int ***Li = Calloc(nf, int **),
 	    ***Lp = Calloc(nf, int **),
 	    **ind = Calloc(nf, int *),
@@ -759,11 +742,11 @@ SEXP lmer_invert(SEXP x)
 		}
 	    }
 				/* While looping on i allocate some arrays */
-	    ind[i] = Calloc(nf, int); Li[i] = Calloc(nf, int *);
+	    Li[i] = Calloc(nf, int *);
 	    Lp[i] = Calloc(nf, int *);
-	    sz[i] = Calloc(nf, int); Lx[i] = Calloc(nf, double *);
-/* FIXME: The following assumes that the L components are in L.  Right
- * now some of them are in ZZpO */
+	    Lx[i] = Calloc(nf, double *);
+	    ind[i] = Calloc(nf, int);
+	    sz[i] = Calloc(nf, int);
 	    for (k = 0; k < nf; k++) {
 		if (k >= i) {
 		    SEXP Lki = VECTOR_ELT(LP, Lind(k, i));
@@ -780,8 +763,7 @@ SEXP lmer_invert(SEXP x)
 	}
 
 	/* RZX := L^{-T} %*% RZX */
-	lmer_sm('L', 'T', nf, Gp, dims[1], 1.0, GET_SLOT(x, Matrix_ZZpOSym),
-		GET_SLOT(x, Matrix_LSym), RZX, dims[0]);
+	lmer_sm('L', 'T', nf, Gp, dims[1], 1.0, LP, RZX, dims[0]);
 
 	/* Create bVar arrays as crossprod of column blocks of D^{-T/2}%*%L^{-1} */
 	for (i = 0; i < nf; i++) {
@@ -810,10 +792,10 @@ SEXP lmer_invert(SEXP x)
 		}
 				/* Loop over the extended parent pairs */
 		while (blk >= 0) {
-		    int ix = Tind(Li[i][blk], Lp[i][blk], par, j), jj,
+		    int nblk = INTEGER(VECTOR_ELT(VECTOR_ELT(ParP, blk), 1))[par],
 			npar = INTEGER(VECTOR_ELT(VECTOR_ELT(ParP, blk), 0))[par],
-			nblk = INTEGER(VECTOR_ELT(VECTOR_ELT(ParP, blk), 1))[par];
-		
+			ix = Tind(Li[i][blk], Lp[i][blk], par, j), jj;
+
 		    if (ix < 0)
 			error("%d, %d block not found in L[%d,%d]",
 			      par + 1, j + 1, blk + 1, i + 1);
@@ -829,9 +811,9 @@ SEXP lmer_invert(SEXP x)
 			    if (jx < 0)
 				error("%d, %d block not found in L[%d,%d]",
 				      par+1, ijk+1, blk+1, k+1);
-			    F77_CALL(dgemm)("N", "N", &nci, nc+blk, nc+k,
-					    &minus1, tmp[k] + jj*sz[k][blk], nc+k,
-					    Lx[k][blk]+jj*sz[k][blk], &nci,
+			    F77_CALL(dgemm)("N", "N", nc+blk, &nci, nc+k,
+					    &minus1, tmp[k] + jj*sz[k][blk], nc+blk,
+					    Lx[k][blk]+jj*sz[k][blk], nc+k,
 					    &one, tmp[blk] + ik[k]*sz[k][blk], nc+blk);
 			}
 		    }
@@ -841,14 +823,13 @@ SEXP lmer_invert(SEXP x)
 		}
 		for (k = 0; k < nf; k++) {
 		    for (jj = 0; jj < nnz[k]; jj++) {
-			/* FIXME: get the indices straight here */
-			F77_CALL(dtrsm)("L", "U", "T", "U", &nci, nc + k, &minus1,
+			F77_CALL(dtrsm)("L", "U", "T", "N", nc + k, &nci, &minus1,
 					REAL(VECTOR_ELT(DP, k)) + ind[k][jj] * sz[k][k],
-					nc + k, tmp[k] + jj * sz[i][k], &nci);
+					nc + k, tmp[k] + jj * sz[i][k], nc + k);
 		    }
 		    if (nnz[k] > 0) {
 			jj = nc[k] * nnz[k]; 
-			F77_CALL(dsyrk)("U", "T", &jj, &nci, &one, tmp[k], &jj,
+			F77_CALL(dsyrk)("U", "T", &nci, &jj, &one, tmp[k], &jj,
 					&one, bVij, &nci);
 		    }
 		}
@@ -856,6 +837,9 @@ SEXP lmer_invert(SEXP x)
 	    for (k = 0; k < nf; k++) {
 		if (tmp[k]) Free(tmp[k]);
 		if (ind[k]) Free(ind[k]);
+		if (Lp[k]) Free(Lp[k]);
+		if (Li[k]) Free(Li[k]);
+		if (Lx[k]) Free(Lx[k]);
 	    }
 	}
 	Free(tmp); Free(Lx); Free(nnz); Free(ik); Free(sz); Free(Lp); Free(Li); Free(ind);
