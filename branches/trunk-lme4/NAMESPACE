@@ -53,7 +53,6 @@ export(
        "lmeControl",
        "pooledSD",
        "ranef",
-
        "groupedData",
        "convertFromS3groupedData"
        )
