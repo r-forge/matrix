@@ -97,12 +97,14 @@ SEXP syMatrix_solve(SEXP a)
 {
 /* FIXME: Write the code */
     error("code for syMatrix_solve not yet written");
+    return R_NilValue;
 }
 
 SEXP syMatrix_matrix_solve(SEXP a, SEXP b)
 {
 /* FIXME: Write the code */
     error("code for syMatrix_matrix_solve not yet written");
+    return R_NilValue;
 }
 
 SEXP syMatrix_as_geMatrix(SEXP from)
