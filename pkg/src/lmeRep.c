@@ -1,4 +1,7 @@
 #include "lmeRep.h"
+/* TODO - create the equivalent of R_ldl_numeric, R_ldl_lsolve,
+ * R_ldl_ltsolve without permutations and with an nc argument.  Also
+ * need an Linv routine and a way of multiplying by Linv. */
 
 /** 
  * Calculate the length of the parameter vector (historically called "coef"

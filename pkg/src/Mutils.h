@@ -22,9 +22,6 @@ void csc_components_transpose(int m, int n, int nnz,
 			      const int xp[], const int xi[],
 			      const double xx[],
 			      int ap[], int ai[], double ax[]);
-void triplet_to_col(int nrow, int ncol, int nz,
-		    const int Ti [], const int Tj [], const double Tx [],
-		    int Ap [], int Ai [], double Ax []);
 void ssc_symbolic_permute(int n, int upper, const int perm[],
 			  int Ap[], int Ai[]);
 double *nlme_symmetrize(double *a, const int nc);
