@@ -42,7 +42,7 @@ Class \code{"dgCMatrix"}, by class \code{"dsCMatrix"}.
 %\author{}
 %\note{}
 \seealso{
- \code{\link{dsCMatrix-class}}, \code{\link{sscCrosstab}}
+ \code{\link[Matrix]{dsCMatrix-class}}, \code{\link{sscCrosstab}}
 }
 %\examples{}
 \keyword{classes}

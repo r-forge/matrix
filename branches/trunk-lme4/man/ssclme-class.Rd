@@ -94,8 +94,8 @@ or, more commonly, via the \code{ssclme} constructor function.}
 %\author{}
 %\note{}
 \seealso{
-  \code{\link{sscCrosstab-class}}, \code{\link{dsCMatrix-class}},
-  \code{\link{dtCMatrix-class}}
+  \code{\link{sscCrosstab-class}}, \code{\link[Matrix]{dsCMatrix-class}},
+  \code{\link[Matrix]{dtCMatrix-class}}
 }
 %\examples{}
 \keyword{classes}
