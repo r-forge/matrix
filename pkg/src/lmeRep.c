@@ -77,12 +77,17 @@ SEXP lmeRep_validate(SEXP x)
 	RXXP = GET_SLOT(x, Matrix_RXXSym),
 	levs = GET_SLOT(x, R_LevelsSymbol),
 	cnames = GET_SLOT(x, Matrix_cnamesSym);
-    int *ZtXd = INTEGER(getAttrib(ZtXP, R_DimSymbol));
+    int *ZtXd = INTEGER(getAttrib(ZtXP, R_DimSymbol)),
+	*XtXd = INTEGER(getAttrib(XtXP, R_DimSymbol));
     
     if (!(isReal(ZtXP) && isReal(XtXP) && isReal(RZXP) && isReal(RXXP) ))
 	return ScalarString(mkChar("Slots ZtX, XtX, RZX, and RXX must be real matrices"));
     if (!match_mat_dims(ZtXd, INTEGER(getAttrib(RZXP, R_DimSymbol))))
-	return ScalarString(mkChar("Slots ZtX and RZX must match in dimension"));
+	return ScalarString(mkChar("Dimensions of slots ZtX and RZX must match"));
+    if (!match_mat_dims(XtXd, INTEGER(getAttrib(RXXP, R_DimSymbol))))
+	return ScalarString(mkChar("Dimensions of slots XtX and RXX must match"));
+    if (ZtXd[1] != XtXd[0] || XtXd[0] != XtXd[1])
+	return ScalarString(mkChar("Slots XtX must be a square matrix with same no. of cols as ZtX"));
     return ScalarLogical(1);
 }
 
@@ -104,9 +109,9 @@ SEXP lmeRep_crosstab(SEXP facs)
 	    cscBlk = MAKE_CLASS("cscBlocked");
 	int i, j, k, *nlevs = Calloc(nf, int), *itmp = Calloc(nobs, int),
 	    *zb = Calloc(nobs * nf, int); /* zero-based indices */
-	double *xtmp = Calloc(nobs, double), *atmp = Calloc(nobs, double);
+/* 	double *xtmp = Calloc(nobs, double), *atmp = Calloc(nobs, double); */
     
-	for (i = 0; i < nobs; i++) xtmp[i] = 1.; /* needed for triplet_to_col */
+/* 	for (i = 0; i < nobs; i++) xtmp[i] = 1.; */
 	for (i = 0; i < nf; i++) {
 	    int *dp, *di, nlev;  double *dx; /* diagonal block */
 	    SEXP diag;
@@ -141,19 +146,20 @@ SEXP lmeRep_crosstab(SEXP facs)
 		mp = INTEGER(GET_SLOT(mm, Matrix_pSym));
 		triplet_to_col(nlevs[i], nlevs[j], nobs,
 			       zb + i * nobs, zb + j * nobs,
-			       xtmp, mp, itmp, atmp); /* Check if xtmp and atmp are needed.  Can they be NULL? */
+			       (double *) NULL, mp, itmp, (double *) NULL);
 		nz = mp[nlevs[j]];
 		SET_SLOT(mm, Matrix_iSym, allocVector(INTSXP, nz));
 		mi = INTEGER(GET_SLOT(mm, Matrix_iSym));
 		SET_SLOT(mm, Matrix_xSym, allocVector(REALSXP, nz));
 		mx = REAL(GET_SLOT(mm, Matrix_xSym));
-		for (k = 0; k < nz; k++) {
-		    mx[k] = atmp[k];
-		    mi[k] = itmp[k];
-		}
+/* 		for (k = 0; k < nz; k++) { */
+/* 		    mx[k] = atmp[k]; */
+/* 		    mi[k] = itmp[k]; */
+/* 		} */
 	    }
 	}
-	Free(nlevs); Free(itmp); Free(xtmp); Free(atmp); Free(zb);
+	Free(nlevs); Free(itmp); Free(zb);
+/* 	Free(xtmp); Free(atmp); */
 	UNPROTECT(1);
 	return val;
     }
