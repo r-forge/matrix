@@ -126,7 +126,7 @@ cscBlocked_tri(char upper, char unit, int n, int nr, int nc,
 	       const int ap[], const int ai[], const double ax[],
 	       int aip[], int aii[], double aix[])
 {
-    int iup = (upper == 'U' || upper == 'u') ? 1 : 0,
+    int /* iup = (upper == 'U' || upper == 'u') ? 1 : 0, */
 	iunit = (unit == 'U' || unit == 'u') ? 1 : 0;
     
     if (!iunit)
@@ -251,5 +251,6 @@ SEXP cscBlocked_syrk(SEXP uplo, SEXP trans, SEXP alpha, SEXP A, SEXP beta, SEXP 
 	    }
 	}
     }
+    return C;
 }
 

@@ -1507,8 +1507,9 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
 SEXP ssclme_Hessian(SEXP x, SEXP REMLp, SEXP Uncp)
 {
     int j, ncoef = coef_length(length(GET_SLOT(x, Matrix_OmegaSym)),
-			       INTEGER(GET_SLOT(x, Matrix_ncSym))),
-	unc = asLogical(Uncp);
+			       INTEGER(GET_SLOT(x, Matrix_ncSym)))
+	/* , unc = asLogical(Uncp) */
+	;
     SEXP ans = PROTECT(allocMatrix(REALSXP, ncoef, ncoef)),
 	base = PROTECT(ssclme_coef(x, Uncp)),
 	current = PROTECT(duplicate(base)),
