@@ -1,5 +1,24 @@
-setMethod("show", signature(object = "Matrix"),
-          function(object) print(as(object, "matrix")))
+prMatrix <-
+    ## private function to be used as show() method possibly more than once
+    function(object) {
+        d <- dim(object)
+        cat(paste(d, collapse= " x "), " Matrix of class ",
+            sQuote(class(object)),"\n", sep='')
+        m <- as(object, "matrix")
+        maxp <- getOption("max.print")
+        if(prod(d) <= maxp) print(m)
+        else { ## d[1] > maxp / d[2] >= nr :
+            nr <- maxp %/% d[2]
+            n2 <- ceiling(nr / 2)
+            print(head(m, max(1, n2)))
+            cat("\n ..........\n\n")
+            print(tail(m, max(1, nr - n2)))
+        }
+        ## DEBUG: cat("str(.):\n") ; str(object)
+        invisible()
+    }
+
+setMethod("show", signature(object = "Matrix"), prMatrix)
 
 Matrix <-
     function (data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL)
@@ -17,6 +36,10 @@ Matrix <-
     as(val, "dgeMatrix")
 }
 
+
+if(FALSE) { ##--- never used --
+
+## utility for as.Matrix() :
 Matrix.class <- function(x, tol = 0, symmetry = TRUE, unit.diagonal = TRUE,
                          triangularity = c(TRUE, TRUE),
                          orthogonality = c(TRUE, TRUE),
@@ -67,3 +90,5 @@ as.Matrix <- function(x, tol = .Machine$double.eps)
     asObject(if (inherits(x, "Matrix")) x else as.matrix(x),
 	     Matrix.class(x, tol = tol))
 }
+
+}## never used
