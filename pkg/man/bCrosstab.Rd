@@ -27,9 +27,9 @@ bCrosstab(flist, reorder = TRUE)
 }
 \examples{
 str(esoph)
-bCrosstab(list(agegp, alcgp)) $ ctab
+bCrosstab(with(esoph,list(agegp, alcgp))) $ ctab
 
-grps <- list(age = agegp, alc = alcgp, tob = tobgp)
+grps <- with(esoph, list(age = agegp, alc = alcgp, tob = tobgp))
 bCn <- bCrosstab( grps, reorder = FALSE)
 stopifnot(all.equal(bCn$flist, grps))
 str(bC <- bCrosstab(grps))
