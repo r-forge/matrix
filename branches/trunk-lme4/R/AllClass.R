@@ -7,10 +7,8 @@
     }
     require("methods", quietly = TRUE)
     require("stats4", quietly = TRUE)
-    require("lattice", quietly = TRUE)
+    #require("lattice", quietly = TRUE)
     require("Matrix", quietly = TRUE)
-    cat(paste(" This package is in development.  For production work use\n",
-              "lme from package nlme or glmmPQL from package MASS.\n"))
 }
 
 setClass("summary.pdMat", representation(cor = "corrmatrix",
