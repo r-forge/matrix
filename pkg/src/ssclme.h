@@ -5,7 +5,7 @@
 #include <R_ext/Lapack.h>
 #include <R_ext/Constants.h>
 
-SEXP ssclme_create(SEXP facs, SEXP ncv, SEXP threshhold);
+SEXP ssclme_create(SEXP facs, SEXP ncv);
 SEXP ssclme_transfer_dimnames(SEXP x, SEXP facs, SEXP mmats);
 SEXP ssclme_update_mm(SEXP x, SEXP facs, SEXP mmats);
 SEXP ssclme_inflate_and_factor(SEXP x);

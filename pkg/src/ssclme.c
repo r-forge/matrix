@@ -73,20 +73,22 @@ void ssclme_copy_ctab(int nf, const int nc[], SEXP ctab, SEXP ssc)
 	for (i = 0; i < nf; i++) { /* fill in the rows */
 	    int j, jj, nci = nc[i], p2 = GpIn[i+1];
 	    for (j = GpIn[i]; j < p2; j++) { /* first col for input col */
-		int ii = AiIn[j], mj = map[j], ncci = ncc[ii],
-		    pos = ApOut[mj];
-		AiOut[pos++] = map[ii];
-		if (ii < j) {	/* above the diagonal */
-		    for (jj = 1; jj < ncci; jj++) {
-			AiOut[pos+1] = AiOut[pos] + 1;
-			pos++;
+		int k, mj = map[j], p3 = ApIn[j+1], pos = ApOut[mj];
+		for (k = ApIn[j]; k < p3; k++) {
+		    int ii = AiIn[k], ncci = ncc[ii];
+		    AiOut[pos++] = map[ii];
+		    if (ii < j) {	/* above the diagonal */
+			for (jj = 1; jj < ncci; jj++) {
+			    AiOut[pos+1] = AiOut[pos] + 1;
+			    pos++;
+			}
 		    }
-		}
-		for (jj = 1; jj < nci; jj++) { /* repeat the column adding 
-						* another diagonal element */
-		    int mjj = mj + jj, pj = ApOut[mjj], pjm1 = ApOut[mjj-1];
-		    Memcpy(AiOut + pj, AiOut + pjm1, pj - pjm1);
-		    AiOut[ApOut[mjj + 1] - 1] = mjj; /* maybe mjj-1? */
+		    for (jj = 1; jj < nci; jj++) { /* repeat the column adding 
+						    * another diagonal element */
+			int mjj = mj + jj, pj = ApOut[mjj], pjm1 = ApOut[mjj-1];
+			Memcpy(AiOut + pj, AiOut + pjm1, pj - pjm1);
+			AiOut[ApOut[mjj + 1] - 1] = mjj; /* maybe mjj-1? */
+		    }
 		}
 	    }
 	}
@@ -119,7 +121,7 @@ static void ssclme_calc_maxod(int n, int Parent[])
 }
 
 SEXP
-ssclme_create(SEXP facs, SEXP ncv, SEXP threshold)
+ssclme_create(SEXP facs, SEXP ncv)
 {
     SEXP ctab, nms, ssc, tmp,
 	val = PROTECT(allocVector(VECSXP, 2)),
@@ -1006,6 +1008,7 @@ SEXP ssclme_EMsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP verb)
 	SEXP coef = PROTECT(ssclme_coef(x));
 	int lc = length(coef); double *cc = REAL(coef);
 
+	ssclme_factor(x);
 	Rprintf("  EM iterations\n");
 	Rprintf("%3d %.3f", 0, dev[REML ? 1 : 0]);
 	for (i = 0; i < lc; i++) Rprintf(" %#8g", cc[i]);
@@ -1050,6 +1053,8 @@ SEXP ssclme_EMsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP verb)
 	if (verbose) {
 	    SEXP coef = PROTECT(ssclme_coef(x));
 	    int lc = length(coef); double *cc = REAL(coef);
+
+	    ssclme_factor(x);
 	    Rprintf("%3d %.3f", iter + 1, dev[REML ? 1 : 0]);
 	    for (i = 0; i < lc; i++) Rprintf(" %#8g", cc[i]);
 	    Rprintf("\n");
