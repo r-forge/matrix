@@ -1,3 +1,10 @@
+2005-03-14  Douglas Bates  <bates@bates1-home>
+
+	* R/dtpMatrix.R: Add unpack method and an example.
+
+	* src/dsyMatrix.c (dsyMatrix_trf): Add BunchKaufman factorization
+	of general symmetric matrices and associated S4 methods.
+
 2005-03-03  Douglas Bates  <bates@bates1-home>
 
 	* src/lmer.c (lmer_fitted): Added.
