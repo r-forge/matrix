@@ -1,7 +1,7 @@
 
 
 
-testfun <- function()
+testfun <- function() # test function
 {
     ## simulation: 300 obs, 30 students, 10 obs per student, one covariate
 
