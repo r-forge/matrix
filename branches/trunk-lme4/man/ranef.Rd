@@ -1,16 +1,16 @@
 % $Id: random.effects.Rd,v 1.1 2002/11/27 22:49:45 bates Exp $
-\name{random.effects}
+\name{ranef}
 \docType{genericFunction}
 \docType{methods}
-\title{Extract Random Effects}
-\alias{random.effects}
 \alias{ranef}
+\alias{random.effects}
 \alias{ranef-methods}
 \alias{ranef,ANY-method}
 \alias{ranef,lmer-method}
+\title{Extract Random Effects}
 \usage{
-random.effects(object, \dots)
 ranef(object, \dots)
+random.effects(object, \dots)   # deprecated
 }
 \description{
   A generic function to extract the random effects.
