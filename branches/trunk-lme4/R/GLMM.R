@@ -1,22 +1,4 @@
-#setMethod("GLMM", signature(data = "missing"),
-#          function(formula, family, data, random, ...)
-#      {
-#          nCall = mCall = match.call()
-#          nCall$data = data.frame()
-#          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
-#                mCall, PACKAGE = "lme4")
-#      })
-
-setMethod("GLMM", signature(family = "name"),
-          function(formula, family, data, random, ...)
-      {
-          nCall = mCall = match.call()
-          nCall$family = eval(substitute(family()))
-          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
-                mCall, PACKAGE = "lme4")
-      })
-
-setMethod("GLMM", signature(formula = "missing", family = "family"),
+setMethod("GLMM", signature(formula = "missing"),
           function(formula, family, data, random, ...)
       {
           nCall = mCall = match.call()
@@ -27,7 +9,7 @@ setMethod("GLMM", signature(formula = "missing", family = "family"),
                 mCall, PACKAGE = "lme4")
       })
 
-setMethod("GLMM", signature(formula = "formula", family = "family",
+setMethod("GLMM", signature(formula = "formula",
                             data = "groupedData", random = "missing"),
           function(formula, family, data, random, ...)
       {
@@ -39,7 +21,7 @@ setMethod("GLMM", signature(formula = "formula", family = "family",
                 mCall, PACKAGE = "lme4")
       })
 
-setMethod("GLMM", signature(family = "family", random = "formula"),
+setMethod("GLMM", signature(random = "formula"),
           function(formula, family, data, random, ...)
       {
           nCall = mCall = match.call()
@@ -50,7 +32,7 @@ setMethod("GLMM", signature(family = "family", random = "formula"),
                 mCall, PACKAGE = "lme4")
       })
 
-setMethod("GLMM", signature(formula = "formula", family = "family",
+setMethod("GLMM", signature(formula = "formula",
                             data = "groupedData",
                            random = "list"),
           function(formula, family, data, random, ...)
@@ -63,7 +45,6 @@ setMethod("GLMM", signature(formula = "formula", family = "family",
 
 setMethod("GLMM",
           signature(formula = "formula",
-                    family = "family",
                     random = "list"),
           function(formula, family, data, random,
                    method = match.arg(c("PQL", "Laplace")),
@@ -71,6 +52,7 @@ setMethod("GLMM",
                    subset, weights, na.action, offset,
                    model = TRUE, x = FALSE, ...)
       {
+          if (is.name(family)) family = substitute(family())
           random <-
               lapply(get("formula", pos = parent.frame(), mode = "function"))
           controlvals <- do.call("lmeControl", control)
