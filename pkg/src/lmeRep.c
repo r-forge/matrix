@@ -9,7 +9,7 @@
  * 
  * @return total length of the coefficient vector
  */
-static
+static R_INLINE
 int coef_length(int nf, const int nc[])
 {
     int i, ans = 0;
@@ -53,6 +53,12 @@ SEXP alloc3Darray(int TYP, int nr, int nc, int nf)
     return val;
 }
 
+static R_INLINE
+int match_mat_dims(const int xd[], const int yd[])
+{
+    return xd[0] == yd[0] && xd[1] == yd[1];
+}
+    
 /** 
  * Check validity of an lmeRep object.
  * 
@@ -63,7 +69,20 @@ SEXP alloc3Darray(int TYP, int nr, int nc, int nf)
  */
 SEXP lmeRep_validate(SEXP x)
 {
-    /* FIXME: add checks for correct dimensions, modes, etc. */
+    SEXP 
+	ZZxP = GET_SLOT(x, Matrix_ZZxSym),
+	ZtXP = GET_SLOT(x, Matrix_ZtXSym),
+	XtXP = GET_SLOT(x, Matrix_XtXSym),
+	RZXP = GET_SLOT(x, Matrix_RZXSym),
+	RXXP = GET_SLOT(x, Matrix_RXXSym),
+	levs = GET_SLOT(x, R_LevelsSymbol),
+	cnames = GET_SLOT(x, Matrix_cnamesSym);
+    int *ZtXd = INTEGER(getAttrib(ZtXP, R_DimSymbol));
+    
+    if (!(isReal(ZtXP) && isReal(XtXP) && isReal(RZXP) && isReal(RXXP) ))
+	return ScalarString(mkChar("Slots ZtX, XtX, RZX, and RXX must be real matrices"));
+    if (!match_mat_dims(ZtXd, INTEGER(getAttrib(RZXP, R_DimSymbol))))
+	return ScalarString(mkChar("Slots ZtX and RZX must match in dimension"));
     return ScalarLogical(1);
 }
 
@@ -87,7 +106,7 @@ SEXP lmeRep_crosstab(SEXP facs)
 	    *zb = Calloc(nobs * nf, int); /* zero-based indices */
 	double *xtmp = Calloc(nobs, double), *atmp = Calloc(nobs, double);
     
-	for (i = 0; i < nobs; i++) xtmp[i] = 1.;
+	for (i = 0; i < nobs; i++) xtmp[i] = 1.; /* needed for triplet_to_col */
 	for (i = 0; i < nf; i++) {
 	    int *dp, *di, nlev;  double *dx; /* diagonal block */
 	    SEXP diag;
@@ -122,7 +141,7 @@ SEXP lmeRep_crosstab(SEXP facs)
 		mp = INTEGER(GET_SLOT(mm, Matrix_pSym));
 		triplet_to_col(nlevs[i], nlevs[j], nobs,
 			       zb + i * nobs, zb + j * nobs,
-			       xtmp, mp, itmp, atmp);
+			       xtmp, mp, itmp, atmp); /* Check if xtmp and atmp are needed.  Can they be NULL? */
 		nz = mp[nlevs[j]];
 		SET_SLOT(mm, Matrix_iSym, allocVector(INTSXP, nz));
 		mi = INTEGER(GET_SLOT(mm, Matrix_iSym));
