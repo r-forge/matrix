@@ -174,11 +174,8 @@ setMethod("%*%", signature(x = "matrix", y = "dgeMatrix"),
           function(x, y) callGeneric(as(x, "dgeMatrix"), y))
 
 ## dgeMatrix <-> numeric : uses the "matrix" one
-.M.n <- function(x, y) callGeneric(x, as.matrix(y))
-.n.M <- function(x, y) callGeneric(rbind(x), y)
 setMethod("%*%", signature(x = "dgeMatrix", y = "numeric"), .M.n)
 setMethod("%*%", signature(x = "numeric", y = "dgeMatrix"), .n.M)
-
 
 
 setMethod("diag", signature(x = "dgeMatrix"),
@@ -193,7 +190,7 @@ setMethod("diag", signature(x = "dgeMatrix"),
 ## setMethod("dimnames<-", signature(x = "dgeMatrix", value = "list"),
 ##           dimnamesGets)
 
-
+setMethod("chol", signature(x = "dgeMatrix", pivot = "ANY"), cholMat)
 
 setMethod("solve", signature(a = "dgeMatrix", b = "missing"),
           function(a, b, ...) .Call("dgeMatrix_solve", a)

@@ -28,3 +28,12 @@ setMethod("t", signature(x = "dsyMatrix"),
 	  function(x) {
 	      x@uplo <- if (x@uplo == "U") "L" else "U"
 	      x })
+
+setMethod("chol", signature(x = "dsyMatrix", pivot = "ANY"), cholMat)
+
+## Now that we have "chol", we can define  "determinant" methods,
+## exactly like in ./dsCMatrix.R
+## {{FIXME: Shouldn't it be possible to have "determinant" work by
+## default automatically for "Matrix"es  when there's a "chol" method available?
+## -- not have to define showMethod("determinant", ...) for all classes
+
