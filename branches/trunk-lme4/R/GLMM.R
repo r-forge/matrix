@@ -259,37 +259,6 @@ setMethod("GLMM",
           reducedMmats <- mmats
           reducedMmats$.Xy <-
               reducedMmats$.Xy[, responseIndex, drop = FALSE]
-#          .Call("ssclme_update_mm", reducedObj, facs, reducedMmats, PACKAGE="Matrix")
-
-          ## make obj comparable
-          ## .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
-
-
-### reduced version doesn't seem to work. Let's work with a full copy
-
-
-
-#           reducedObj <- obj
-#           reducedMmats.unadjusted <- mmats.unadjusted
-#           reducedMmats <- mmats
-# #          .Call("ssclme_update_mm", reducedObj, facs, reducedMmats, PACKAGE="Matrix")
-
-#           reducedMmats.unadjusted[[1]] <- mmats.unadjusted[[1]]
-#           reducedMmats[[1]] <- mmats[[1]]
-#           reducedObj@status <- obj@status
-
-          ## hopefully this forces copies for all 3
-
-
-
-
-
-
-
-
-
-
-
 
           ## define function that calculates bhats given theta and beta 
 
@@ -435,9 +404,8 @@ setMethod("GLMM",
               cat(paste("Using optimizer", controlvals$optim), "\n")
 
               ## no analytic gradients or hessians
-              if (controlvals$optimizer == "optim") {
-
-
+              if (controlvals$optimizer == "optim")
+              {
                   optimRes =
                       optim(fn = loglikLaplace,
                             par = c(fixef(obj), coef(obj, unconst = TRUE)),
@@ -460,12 +428,9 @@ setMethod("GLMM",
                       coef(obj, unconst = TRUE) <- optimRes$par[responseIndex:length(optimRes$par)]
                       print(coef(obj, unconst = TRUE))
                   }
-                  ## need to calculate likelihood
-
-
               }
-              else if (controlvals$optimizer == "nlm") {
-
+              else if (controlvals$optimizer == "nlm")
+              {
                   ## not sure what the next few lines are for. Copied from Saikat's code
                   ## typsize <- 1/controlvals$msScale(coef(obj))
                   typsize <- rep(1.0, length(coef(obj, unconst = TRUE)) + responseIndex - 1)
@@ -496,13 +461,13 @@ setMethod("GLMM",
                       coef(obj, unconst = TRUE) <- nlmRes$estimate[responseIndex:length(nlmRes$estimate)]
                       print(coef(obj, unconst = TRUE))
                   }
-                  ## need to calculate likelihood
-
               }
 
-              ## also need to store new estimates of fixed effects
-              ## somewhere (probably cannot update standard errors)
+              ## need to calculate likelihood also need to store new
+              ## estimates of fixed effects somewhere (probably cannot
+              ## update standard errors)
           }
+          else optpars <- c(fixef(obj), coef(obj, unconst = TRUE))
 
 
           ## Before finishing, we need to call loglikLaplace with the
@@ -513,7 +478,10 @@ setMethod("GLMM",
 
           loglik <- loglikLaplace(optpars)
 
-
+          ## Things to include in retruned object: new ranef
+          ## estimates, new parameter estimates (fixed effects and
+          ## coefs) (with standard errors from hessian ?) and
+          ## (Laplace) approximate log likelihood.
 
           new("lme", call = match.call(), facs = facs,
               x = if (x) mmats else list(),
