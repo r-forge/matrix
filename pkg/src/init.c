@@ -35,6 +35,7 @@ static R_CallMethodDef CallEntries[] = {
     {"csc_getDiag", (DL_FUNC) &csc_getDiag, 1},
     {"csc_transpose", (DL_FUNC) &csc_transpose, 1},
     {"csc_matrix_mm", (DL_FUNC) &csc_matrix_mm, 2},
+    {"cscBlocked_2cscMatrix", (DL_FUNC) &cscBlocked_2cscMatrix, 1},
     {"lsq_dense_Chol", (DL_FUNC) &lsq_dense_Chol, 2},
     {"lsq_dense_QR", (DL_FUNC) &lsq_dense_QR, 2},
     {"lapack_qr", (DL_FUNC) &lapack_qr, 2},
