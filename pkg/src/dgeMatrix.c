@@ -14,7 +14,9 @@ SEXP dgeMatrix_validate(SEXP obj)
     if (m < 0 || n < 0)
 	return mkString(_("Negative value(s) in Dim"));
     if (length(x) != m * n)
-    	return mkString(_("length of x slot != prod(Dim)"));
+	return mkString(_("length of x slot != prod(Dim)"));
+    if (!isReal(x))
+	return mkString(_("x slot must be numeric \"double\""));
     if (length(fact) > 0 && getAttrib(fact, R_NamesSymbol) == R_NilValue)
 	return mkString(_("factors slot must be named list"));
     if (length(rc) > 0 && getAttrib(rc, R_NamesSymbol) == R_NilValue)
