@@ -82,3 +82,8 @@ if (!isGeneric("matrix<-")) {
     setGeneric("matrix<-",
                function(object, value) standardGeneric("matrix<-"))
 }
+
+if (!isGeneric("expm")) {
+    setGeneric("expm",
+               function(x) standardGeneric("expm"))
+}

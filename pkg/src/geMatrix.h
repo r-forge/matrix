@@ -16,6 +16,7 @@ SEXP geMatrix_determinant(SEXP x, SEXP logarithm);
 SEXP geMatrix_solve(SEXP a);
 SEXP geMatrix_geMatrix_mm(SEXP a, SEXP b);
 SEXP geMatrix_svd(SEXP x, SEXP nu, SEXP nv);
+SEXP geMatrix_exp(SEXP x);
 
 /* DGESDD - compute the singular value decomposition (SVD); of a   */
 /* real M-by-N matrix A, optionally computing the left and/or      */

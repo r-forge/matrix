@@ -322,3 +322,146 @@ SEXP geMatrix_svd(SEXP x, SEXP nnu, SEXP nnv)
     UNPROTECT(1);
     return val;
 }
+
+static double padec [] =   /*  Constants for matrix exponential calculation. */
+{
+  5.0000000000000000e-1,
+  1.1666666666666667e-1,
+  1.6666666666666667e-2,
+  1.6025641025641026e-3,
+  1.0683760683760684e-4,
+  4.8562548562548563e-6,
+  1.3875013875013875e-7,
+  1.9270852604185938e-9,
+};
+
+/** 
+ * Matrix exponential - based on the code for Octave's expm function.
+ * 
+ * @param x real square matrix to exponentiate
+ * 
+ * @return matrix exponential of x
+ */
+SEXP geMatrix_exp(SEXP x)
+{
+    SEXP val = PROTECT(duplicate(x));
+    int *Dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
+    int i, ilo, ilos, ihi, ihis, j, nc = Dims[1], sqpow;
+    int ncp1 = Dims[1] + 1, ncsqr = nc * nc;
+    int *pivot = Calloc(nc, int);
+    int *iperm = Calloc(nc, int);
+    double *dpp = Calloc(ncsqr, double), /* denominator power Pade' */
+	*npp = Calloc(ncsqr, double), /* numerator power Pade' */
+	*perm = Calloc(nc, double),
+	*scale = Calloc(nc, double),
+	*v = REAL(GET_SLOT(val, Matrix_xSym)),
+	*work = Calloc(ncsqr, double), inf_norm, m1_j, /* (-1)^j */
+	one = 1., trshift, zero = 0.;
+    
+    if (nc < 1 || Dims[0] != nc)
+	error("Matrix exponential requires square, non-null matrix");
+
+    /* FIXME: Add special treatment for nc == 1 */
+ 
+    /* Preconditioning 1.  Shift diagonal by average diagonal if positive. */
+    trshift = 0;		/* determine average diagonal element */
+    for (i = 0; i < nc; i++) trshift += v[i * ncp1];
+    trshift /= nc;
+    if (trshift > 0.) {		/* shift diagonal by -trshift */
+	for (i = 0; i < nc; i++) v[i * ncp1] -= trshift;
+    }
+
+    /* Preconditioning 2. Balancing with dgebal. */
+    F77_CALL(dgebal)("P", &nc, v, &nc, &ilo, &ihi, perm, &j);
+    if (j) error("geMatrix_exp: LAPACK routine dgebal returned %d", j);
+    F77_CALL(dgebal)("S", &nc, v, &nc, &ilos, &ihis, scale, &j);
+    if (j) error("geMatrix_exp: LAPACK routine dgebal returned %d", j);
+
+    /* Preconditioning 3. Scaling according to infinity norm */
+    inf_norm = F77_CALL(dlange)("I", &nc, &nc, v, &nc, work);
+    sqpow = (inf_norm > 0) ? (int) (1 + log(inf_norm)/log(2.)) : 0;
+    if (sqpow < 0) sqpow = 0;
+    if (sqpow > 0) {
+	double scale_factor = 1.0;
+	for (i = 0; i < sqpow; i++) scale_factor *= 2.;
+	for (i = 0; i < ncsqr; i++) v[i] /= scale_factor;
+    }
+
+    /* Pade' approximation. Powers v^8, v^7, ..., v^1 */
+    AZERO(npp, ncsqr);
+    AZERO(dpp, ncsqr);
+    m1_j = -1;
+    for (j = 7; j >=0; j--) {
+	double mult = padec[j];
+	/* npp = m * npp + padec[j] *m */
+	F77_CALL(dgemm)("N", "N", &nc, &nc, &nc, &one, v, &nc, npp, &nc,
+			&zero, work, &nc);
+	for (i = 0; i < ncsqr; i++) npp[i] = work[i] + mult * v[i];
+	/* dpp = m * dpp * (m1_j * padec[j]) * m */
+	mult *= m1_j;
+	F77_CALL(dgemm)("N", "N", &nc, &nc, &nc, &one, v, &nc, dpp, &nc,
+			&zero, work, &nc);
+	for (i = 0; i < ncsqr; i++) dpp[i] = work[i] + mult * v[i];
+	m1_j *= -1;
+    }
+    /* Zero power */
+    for (i = 0; i < ncsqr; i++) dpp[i] *= -1.;
+    for (j = 0; j < nc; j++) {
+	npp[j * ncp1] += 1.;
+	dpp[j * ncp1] += 1.;
+    }
+    
+    /* Pade' approximation is solve(dpp, npp) */
+    F77_CALL(dgetrf)(&nc, &nc, dpp, &nc, pivot, &j);
+    if (j) error("geMatrix_exp: dgetrf returned error code %d", j);
+    F77_CALL(dgetrs)("N", &nc, &nc, dpp, &nc, pivot, npp, &nc, &j);
+    if (j) error("geMatrix_exp: dgetrs returned error code %d", j);
+    Memcpy(v, npp, ncsqr);
+
+    /* Now undo all of the preconditioning */
+    /* Preconditioning 3: square the result for every power of 2 */
+    while (sqpow--) {
+	F77_CALL(dgemm)("N", "N", &nc, &nc, &nc, &one, v, &nc, v, &nc,
+			&zero, work, &nc);
+	Memcpy(v, work, ncsqr);
+    }
+    /* Preconditioning 2: apply inverse scaling */
+    for (j = 0; j < nc; j++)
+	for (i = 0; i < nc; i++)
+	    v[i + j * nc] *= scale[i]/scale[j];
+    /* Construct balancing permutation vector */
+    for (i = 0; i < nc; i++) iperm[i] = i; /* identity permutation */
+    /* Leading permutations applied in forward order */
+    for (i = 0; i < (ilo - 1); i++) {
+	int swapidx = (int) (perm[i]) - 1;
+	int tmp = iperm[i];
+	iperm[i] = iperm[swapidx];
+	iperm[swapidx] = tmp;
+    }
+    /* Trailing permutations applied in reverse order */
+    for (i = nc - 1; i >= ihi; i--) {
+	int swapidx = (int) (perm[i]) - 1;
+	int tmp = iperm[i];
+	iperm[i] = iperm[swapidx];
+	iperm[swapidx] = tmp;
+    }
+    /* Construct inverse balancing permutation vector */
+    Memcpy(pivot, iperm, nc);
+    for (i = 0; i < nc; i++) iperm[pivot[i]] = i;
+    /* Apply inverse permutation */
+    Memcpy(work, v, ncsqr);
+    for (j = 0; j < nc; j++)
+	for (i = 0; i < nc; i++)
+	    v[i + j * nc] = work[iperm[i] + iperm[j] * nc];
+    
+    /* Preconditioning 1: Trace normalization */
+    if (trshift > 0.) {
+	double mult = exp(trshift);
+	for (i = 0; i < ncsqr; i++) v[i] *= mult;
+    }
+	
+    /* Clean up */
+    Free(dpp); Free(npp); Free(perm); Free(iperm); Free(pivot); Free(scale); Free(work);
+    UNPROTECT(1);
+    return val;
+}
