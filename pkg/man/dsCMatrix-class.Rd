@@ -6,9 +6,13 @@
 \alias{chol,dsCMatrix,missing-method}
 \alias{chol,dsCMatrix,logical-method}
 \alias{t,dsCMatrix-method}
+\alias{t,dsTMatrix-method}
 \alias{coerce,dsCMatrix,dgTMatrix-method}
 \alias{coerce,dsCMatrix,dgeMatrix-method}
 \alias{coerce,dsCMatrix,matrix-method}
+\alias{coerce,dsTMatrix,matrix-method}
+\alias{coerce,dsTMatrix,dgeMatrix-method}
+\alias{coerce,dsTMatrix,dsyMatrix-method}
 \alias{determinant,dsCMatrix,missing-method}
 \alias{determinant,dsCMatrix,logical-method}
 \title{Symmetric, compressed, sparse column matrices}
@@ -66,9 +70,18 @@ Class \code{"dgCMatrix"}, directly.
 	"logical")}: Evaluate the determinant of \code{x} on the
       logarithm scale or not, according to the \code{logarithm}
       argument.  This creates and stores the Cholesky factorization.}
+    \item{t}{\code{signature(x = "dsCMatrix")}: Transpose.  Because
+      \code{x} is symmetric this has no effect.}
+    \item{t}{\code{signature(x = "dsTMatrix")}: Transpose.  For the
+      \code{dsTMatrix} class the row and column indices are interchanged
+      so that a matrix for which the upper triangle is stored produces a
+      matrix for which the lower triangle is stored and vice versa.}
     \item{coerce}{\code{signature(from = "dsCMatrix", to = "dgTMatrix")}}
     \item{coerce}{\code{signature(from = "dsCMatrix", to = "dgeMatrix")}}
     \item{coerce}{\code{signature(from = "dsCMatrix", to = "matrix")}}
+    \item{coerce}{\code{signature(from = "dsTMatrix", to = "dgeMatrix")}}
+    \item{coerce}{\code{signature(from = "dsTMatrix", to = "dsyMatrix")}}
+    \item{coerce}{\code{signature(from = "dsTMatrix", to = "matrix")}}
   }
 }
 %\references{}

@@ -2,12 +2,13 @@
 \docType{class}
 \alias{dtCMatrix-class}
 \alias{dtTMatrix-class}
-\alias{t,dtCMatrix-method}
-\alias{t,dtTMatrix-method}
 \alias{coerce,dtCMatrix,dgTMatrix-method}
 \alias{coerce,dtCMatrix,dgeMatrix-method}
+\alias{coerce,dtTMatrix,dgeMatrix-method}
 \alias{coerce,dtTMatrix,dtrMatrix-method}
 \alias{coerce,dtTMatrix,matrix-method}
+\alias{t,dtCMatrix-method}
+\alias{t,dtTMatrix-method}
 \title{Triangular, compressed, sparse column matrices}
 \description{The \code{dtCMatrix} class is a class of triangular, sparse
   matrices in the compressed, column-oriented format.  In this
@@ -48,10 +49,9 @@
 \section{Methods}{
   \describe{
     \item{coerce}{\code{signature(from = "dtCMatrix", to = "dgTMatrix")}}
-    \item{coerce}{\code{signature(from = "dtCMatrix", to =
-	"dgeMatrix")}}
-    \item{coerce}{\code{signature(from = "dtTMatrix", to =
-	"dtrMatrix")}}
+    \item{coerce}{\code{signature(from = "dtCMatrix", to = "dgeMatrix")}}
+    \item{coerce}{\code{signature(from = "dtTMatrix", to = "dgeMatrix")}}
+    \item{coerce}{\code{signature(from = "dtTMatrix", to = "dtrMatrix")}}
     \item{coerce}{\code{signature(from = "dtTMatrix", to = "matrix")}}
     \item{t}{\code{signature(x = "dtCMatrix")}: returns the transpose of
       \code{x}}
