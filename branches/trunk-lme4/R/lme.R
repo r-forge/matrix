@@ -18,6 +18,32 @@ facshuffle = function(sslm, facs)       # unexported utility
     ff
 }
 
+make.mf.call = function(mf, frm, random)
+{
+    m <- match(c("formula", "data", "subset", "weights", "na.action",
+                 "offset"), names(mf), 0)
+    mf <- mf[c(1, m)]
+    mf[[1]] <- as.name("model.frame")
+    form = frm
+    form[[3]] <- (~a+b)[[2]]
+    form[[3]][[2]] <- frm[[3]]
+    form[[3]][[3]] <-
+        as.formula((parse(text=paste("~",
+                          paste(names(random),
+                                collapse = "+")))[[1]]))[[2]]
+    for (pdm in random) {
+        tmp <- form
+        tmp[[3]] <- (~a+b)[[2]]
+        tmp[[3]][[2]] <- form[[3]]
+        tmp[[3]][[3]] <- formula(pdm)[[2]]
+        form <- tmp
+    }
+    environment(form) = environment(formula)
+    mf$formula = form
+    mf$drop.unused.levels = TRUE
+    mf
+}
+
 lmeControl <-
   ## Control parameters for lme
   function(maxIter = 50, msMaxIter = 50, tolerance =
@@ -143,29 +169,8 @@ setMethod("lme", signature(formula = "formula", data = "list",
           controlvals <- if (missing(control)) lmeControl() else
                             do.call("lmeControl", control)
           controlvals$REML = method == "REML"
-          mCall <- match.call(expand.dots = FALSE)
-          mCall[[1]] <- as.name("model.frame")
-          names(mCall)[2] <- "formula"
-          mCall$random <- mCall$correlation <- mCall$method <-
-              mCall$control <- mCall$model <- mCall$x <- NULL
-          form <- formula
-          form[[3]] <- (~a+b)[[2]]
-          form[[3]][[2]] <- formula[[3]]
-          form[[3]][[3]] <-
-              as.formula((parse(text=paste("~",
-                                paste(names(random),
-                                      collapse = "+")))[[1]]))[[2]]
-          for (pdm in random) {
-              tmp <- form
-              tmp[[3]] <- (~a+b)[[2]]
-              tmp[[3]][[2]] <- form[[3]]
-              tmp[[3]][[3]] <- formula(pdm)[[2]]
-              form <- tmp
-          }
-          environment(form) = environment(formula)
-          mCall$formula = form
-          mCall$drop.unused.levels = TRUE
-          data = eval(mCall, parent.frame())
+          data <- eval(make.mf.call(match.call(expand.dots = FALSE),
+                                    formula, random), parent.frame())
           facs = lapply(names(random),
                          function(x) eval(as.name(x), envir = data))
           names(facs) = names(random)
