@@ -12,6 +12,7 @@ SOURCES_C =  \
             factorizations.c \
             geMatrix.c \
 	    ldl.c \
+	    lmeRep.c \
             poMatrix.c \
             sscCrosstab.c \
             sscMatrix.c \

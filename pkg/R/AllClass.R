@@ -190,3 +190,25 @@ setClass("pdfactor", representation("matrix", logDet = "numeric"))
                        # correlation matrices and standard deviations
 setClass("corrmatrix", representation("matrix", stdDev = "numeric"))
 
+## Representation of a linear mixed effects model
+setClass("lmeRep",
+         representation(
+                        Omega = "list", # list of relative precision matrices
+                        D = "list",     # list of diagonal factors (lower triangle)
+                        DIsqrt = "list",# list of inverse of lower Cholesky factors
+                        ZZx = "list",   # list of arrays comprising ZtZ
+                        RXX = "matrix", # Augmented RXX component or its inverse
+                        RZX = "matrix", # Augmented RZX component or its inverse
+                        XtX = "matrix", # Original X'X matrix
+                        ZtX = "matrix", # Original Z'X matrix
+                        cnames = "list",# column names of model matrices
+                        deviance = "numeric", # Current deviance (ML and REML)
+                        devComp = "numeric", # Components of deviance
+                        levels = "list",# names of levels of grouping factors
+                        nc = "integer", # number of columns in (augmented)
+                                        # model matrices and number of observations
+                        status = "logical"
+                        ),
+         validity = function(object)
+         .Call("lmeRep_validate", object, PACKAGE = "Matrix"))
+
