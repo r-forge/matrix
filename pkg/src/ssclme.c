@@ -432,29 +432,41 @@ ssclme_update_mm(SEXP x, SEXP facs, SEXP mmats)
 	for (k = j+1; k < nf; k++) { /* off-diagonals */
 	    int *fpk = INTEGER(VECTOR_ELT(facs, k)),
 		*Apk = Ap + Gp[k],
-		nck = nc[k];
+		nck = nc[k],
+		scalar = ncj == 1 && nck == 1;
 	    double
-		*Zk = Z[k];
-
+		*Zk = Z[k], *work;
+	    if (!scalar) work = Calloc(ncj * nck, double);
 	    for (i = 0; i < nobs; i++) {
 		int ii, ind = -1, fpji = fpj[i] - 1,
 		    row = Gp[j] + fpji * ncj,
 		    fpki = fpk[i] - 1,
-		    lastind = Apk[fpki + 1];
-		for (ii = Apk[fpki]; ii < lastind; ii++) {
+		    lastind = Apk[fpki*nck + 1];
+		for (ii = Apk[fpki*nck]; ii < lastind; ii++) {
 		    if (Ai[ii] == row) {
 			ind = ii;
 			break;
 		    }
 		}
 		if (ind < 0) error("logic error in ssclme_update_mm");
-		if (Ncj || nck > 1) {
-				/* FIXME: run a loop to update */
-		    error("code not yet written");
-		} else {	/* update scalars directly */
+		if (scalar) {	/* update scalars directly */
 		    Ax[ind] += Zj[i] * Zk[i];
+		} else {
+		    int jj, offset = ind - Apk[fpki * nck];
+		    F77_CALL(dgemm)("T", "N", &ncj, &nck, &ione, &one,
+				    Zj + i, &nobs, Zk + i, &nobs,
+				    &zero, work, &ncj);
+		    for (jj = 0; jj < nck; jj++) {
+			ind = Apk[fpki * nck + jj] + offset;
+			if (Ai[ind] != row)
+			    error("logic error in ssclme_update_mm");
+			for (ii = 0; ii < ncj; ii++) {
+			    Ax[ind++] += work[jj * ncj + ii];
+			}
+		    }
 		}
 	    }
+	    if (!scalar) Free(work);
 	}
     }
     Free(Z);
@@ -721,6 +733,7 @@ SEXP ldl_inverse(SEXP x)
 			"Rank deficient variance matrix at group %d, level %d",
 			i + 1, j + 1);
 	    }
+	    Free(tmp);
 	}
 	return R_NilValue;
     }
