@@ -8,7 +8,7 @@ void cscBlocked_mm(char side, char transa, int m, int n, int k,
 		   double alpha, int nr, int nc,
 		   const int ap[], const int ai[],
 		   const double ax[],
-		   double b[], int ldb,
+		   const double b[], int ldb,
 		   double beta, double c[], int ldc);
 
 #endif

@@ -625,8 +625,8 @@ copy_ZZx_to_L(int nf, const int nc[], SEXP ZZxP, SEXP LP)
 	for (k = 0; k < i; k++) {
 	    int ind = Lind(i, k), j, nck = nc[k], sz = nci * nck;
 	    SEXP Lpt = VECTOR_ELT(LP, ind),
-		Zind = VECTOR_ELT(ZZxP, ind),
-		LpP = GET_SLOT(Lpt, Matrix_pSym);
+		Zind = VECTOR_ELT(ZZxP, ind);
+	    SEXP LpP = GET_SLOT(Lpt, Matrix_pSym);
 	    int *Lp = INTEGER(LpP),
 		*Li = INTEGER(GET_SLOT(Lpt, Matrix_iSym)),
 		*Zp = INTEGER(GET_SLOT(Zind, Matrix_pSym)),
@@ -644,7 +644,7 @@ copy_ZZx_to_L(int nf, const int nc[], SEXP ZZxP, SEXP LP)
 		    if (ii < zi) { /* zero this block */
 			memset(Lx + ii * sz, 0, sizeof(double) * sz);
 		    } else if (ii == zi) { /* copy this block */
-			Memcpy(Lx + ii * sz, Zx + zi * sz, sz);
+			Memcpy(Lx + j * sz, Zx + zpj * sz, sz);
 			zpj++;
 			zi = (zpj < Z2) ? Zi[zpj] : INT_MAX;
 		    } else
@@ -673,12 +673,14 @@ update_D_L(int i, const int nc[], SEXP LP, SEXP DP)
     for (k = 0; k < i; k++) {
 	int nck = nc[k], ncksq = nck * nck, sz = nci * nck;
 	SEXP Lpt = VECTOR_ELT(LP, Lind(i,k));
-	int *colptr = INTEGER(GET_SLOT(Lpt, Matrix_pSym)),
+	SEXP LpP = GET_SLOT(Lpt, Matrix_pSym);
+	int *colptr = INTEGER(LpP),
 	    *rowind = INTEGER(GET_SLOT(Lpt, Matrix_iSym));
+	int ncol = length(LpP) - 1;
 	double *Dk = REAL(VECTOR_ELT(DP, k)),
 	    *Lx = REAL(GET_SLOT(Lpt, Matrix_xSym));
 	
-	for (j = 0; j < nck; j++) {
+	for (j = 0; j < ncol; j++) {
 	    int j1 = colptr[j], j2 = colptr[j + 1];
 	    if ((j2 - j1) > 1) offdiag = 1;
 	    for (jj = j1; jj < j2; jj++) {
@@ -688,7 +690,6 @@ update_D_L(int i, const int nc[], SEXP LP, SEXP DP)
 		F77_CALL(dsyrk)("U", "N", &nci, &nck,
 				&minus1, Lx + jj * sz, &nci,
 				&one, Di + ii * ncisq, &nci);
-/* FIXME: Probably a dimension problem in the next call */
 		F77_CALL(dtrsm)("R", "U", "N", "N", &nci, &nck, &one,
 				Dk + j * ncksq, &nck, Lx + jj * sz, &nci);
 	    }
@@ -715,6 +716,7 @@ SEXP lmeRep_factor(SEXP x)
 	SEXP
 	    DP = GET_SLOT(x, Matrix_DSym),
 	    LP = GET_SLOT(x, Matrix_LSym),
+	    Linv = GET_SLOT(x, Matrix_LinvSym),
 	    RZXsl = GET_SLOT(x, Matrix_RZXSym),
 	    ZZxP = GET_SLOT(x, Matrix_ZZxSym),
 	    levs = GET_SLOT(x, R_LevelsSymbol);
@@ -730,23 +732,19 @@ SEXP lmeRep_factor(SEXP x)
 	    minus1 = -1., one = 1.;
 
 
-	Memcpy(RZX, REAL(GET_SLOT(x, Matrix_ZtXSym)), dims[0] * dims[1]);
 	copy_ZZx_to_L(nf, nc, ZZxP, LP);
 	lmeRep_inflate(nf, nc, ZZxP, GET_SLOT(x, Matrix_OmegaSym),
 		       levs, DP, dcmp);
 	for (i = 0; i < nf; i++) {
 	    int jj, nci = nc[i], ncisqr = nci * nci,
-		nlev = length(VECTOR_ELT(levs, i)),
-		RZXrows = nlev * nci;
+		nlev = length(VECTOR_ELT(levs, i));
 	    double
 		*D = REAL(VECTOR_ELT(DP, i));
 	
 	    if (i) update_D_L(i, nc, LP, DP);
 	    if (nci == 1) {
-		for (j = 0; j < nlev; j++) {
+		for (j = 0; j < nlev; j++)
 		    dcmp[0] += 2. * log(D[j]);
-		    for (jj = 0; jj < dims[1]; jj++) RZX[j + jj*dims[0]] /= D[j];
-		}
 	    } else {
 		for (j = 0; j < nlev; j++) {
 		    double *Dj = D + j * ncisqr;
@@ -755,17 +753,28 @@ SEXP lmeRep_factor(SEXP x)
 			error("D[ , , %d] is not positive definite", j + 1);
 		    for (jj = 0; jj < nci; jj++) /* accumulate determinant */
 			dcmp[0] += 2. * log(Dj[jj * (nci + 1)]);
-/* FIXME: Do the RZX update externally to this loop */
-				/* Update RZX */
-		    F77_CALL(dtrsm)("L", "U", "T", "N", &nci, dims + 1,
-				    &one, Dj, &nci, RZX + j * nci, dims);
 		}
+	    }
+	}
+				/* solve for RZX */
+	Memcpy(RZX, REAL(GET_SLOT(x, Matrix_ZtXSym)),
+	       dims[0] * dims[1]);
+	lmeRep_L_sm(nf, LP, Linv, RZXsl);
+	for (i = 0; i < nf; i++) {
+	    int nci = nc[i], ncisqr = nci * nci,
+		nlev = length(VECTOR_ELT(levs, i)),
+		RZXrows = nlev * nci;
+	    double
+		*D = REAL(VECTOR_ELT(DP, i));
+	    for (j = 0; j < nlev; j++) {
+		F77_CALL(dtrsm)("L", "U", "T", "N", &nci, dims + 1,
+				&one, D + j * ncisqr, &nci,
+				RZX + j * nci, dims);
 	    }
 	    RZX += RZXrows;
 	}
-				/* downdate and factor X'X */
+				/* downdate and factor XtX */
 	Memcpy(RXX, REAL(GET_SLOT(x, Matrix_XtXSym)), dims[1] * dims[1]);
-	lmeRep_L_sm(nf, LP, Linv, RZXsl);
 	F77_CALL(dsyrk)("U", "T", dims + 1, dims,
 			&minus1, REAL(RZXsl), dims,
 			&one, RXX, dims + 1);
