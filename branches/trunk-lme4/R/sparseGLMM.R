@@ -59,7 +59,12 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
                    method, na.action, control, model, x, ...)
       {
 
-          ##print("got here")
+
+
+          debug <- TRUE ## check if fitted() works. Remove all such code later
+
+
+
 
           if (missing(model))
               model = TRUE
@@ -128,11 +133,14 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
           ## get initial estimates
           fm.glm <- glm(formula, family, data)
           coefFixed <- c(coef(fm.glm), 0)
-          ## what happens for more than one random effect ?
-          coefRanef <-
-              lapply(facs,
-                     function(x) numeric(nlevels(x)))
 
+
+          if (debug)
+          {
+              coefRanef <-
+                  lapply(facs,
+                         function(x) numeric(nlevels(x)))
+          }
 
 
           mmats <- mmats.unadjusted
@@ -141,24 +149,36 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
           firstIter <- TRUE
           devold <- 0 ## deviance for convergence check
 
+          ## initial 'fitted' values on linear scale
+          eta <- drop(mmats.unadjusted$.Xy %*% coefFixed)
+
 
           for (iter in seq(length = niter))
           {
-              eta <- mmats.unadjusted$.Xy %*% coefFixed
-              for (facname in names(facs))
+              if (debug)
               {
-                  eta <- eta + mmats.unadjusted[[facname]] * 
-                      coefRanef[[facname]][facs[[facname]]]
+                  eta.check <- mmats.unadjusted$.Xy %*% coefFixed
+                  for (facname in names(facs))
+                  {
+                      eta.check <- eta.check + mmats.unadjusted[[facname]] * 
+                          coefRanef[[facname]][facs[[facname]]]
+                  }
+
+                  if (any(eta.check != eta)) {
+                      warning("fitted() does not match calculation, diff: ",
+                              sum(((eta.check - eta)^2)))
+                  }
               }
+
+
               mu <- family$linkinv(eta)
-              deta.dmu <- 1 / family$mu.eta(eta)
-
+              dmu.deta <- family$mu.eta(eta)
               ## adjusted response
-              z <- eta + (mmats.unadjusted$.Xy[, responseIndex] - mu) * deta.dmu
-              ## weights (needs sqrt ? Yes!)
-              w <- 1 / (deta.dmu * sqrt(family$variance(mu)))
+              z <- eta + (mmats.unadjusted$.Xy[, responseIndex] - mu) / dmu.deta
+              ## weights
+              w <- dmu.deta / sqrt(family$variance(mu))
 
-              plot(z, mmats$.Xy[, responseIndex])
+plot(z, mmats$.Xy[, responseIndex])
 
               ## Does this prevent overwriting of components ?
               for (facname in names(facs))
@@ -168,25 +188,30 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
               mmats$.Xy[] <- mmats$.Xy * w
 
               .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
-
-### ssclme_initial should only be called on the first iteration
-
+              ## ssclme_initial should only be called on the first iteration
               if (firstIter) .Call("ssclme_initial", obj, PACKAGE="Matrix")
+              .Call("ssclme_EMsteps", obj, controlvals$niterEM,
+                    method == "REML", controlvals$EMverbose, PACKAGE = "Matrix")
+              LMEoptimize(obj) = controlvals
+              eta[] <- .Call("ssclme_fitted", obj, facs, mmats.unadjusted, PACKAGE = "Matrix")
+
+
+
+              if (debug)
+              {
+                  coefFixed <- c(.Call("ssclme_fixef", obj, PACKAGE = "Matrix"), 0)
+                  coefRanef <- .Call("ssclme_ranef", obj, PACKAGE = "Matrix")
+                  if (!is.null(names(coefRanef))) print("time to modify code here")
+                  names(coefRanef) <- names(facs)
+              }
+
+
 
 ### May want to adjust number of EMiterations on second and subsequent
 ### iterations.  Probably one or two iterations will suffice
-              .Call("ssclme_EMsteps", obj, controlvals$niterEM,
-                    method == "REML", controlvals$EMverbose, PACKAGE = "Matrix")
 
 ### Do you want to call LMEoptimize(obj) = controlvals here?  Probably
 ### set number of iterations low.
-
-              LMEoptimize(obj) = controlvals
-
-              coefFixed <- c(.Call("ssclme_fixef", obj, PACKAGE = "Matrix"), 0)
-              coefRanef <- .Call("ssclme_ranef", obj, PACKAGE = "Matrix")
-              if (!is.null(names(coefRanef))) print("time to modify code here")
-              names(coefRanef) <- names(facs)
 
               if (firstIter) {
                   controlvals$niterEM <- 2
@@ -199,15 +224,16 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
               print(dev)
               if (abs(dev - devold)/(0.1 + abs(dev)) < controlvals$tolerance) {
                   conv <- TRUE
-                  break ## breaks to where ?
+                  break
               }
               devold <- dev
           }
+          if (!conv) warning("IRLS iterations for glmm did not converge")
 
           new("lme", call = match.call(), facs = facs,
               x = if(x) mmats else list(),
               model = if(model) data else data.frame(list()),
-              REML = method == "REML", rep = obj)
+              REML = method == "REML", rep = obj, fitted = eta)
       })
 
 
