@@ -3,7 +3,7 @@
 ### contains = "dMatrix"
 
 setAs("dgCMatrix", "dgTMatrix",
-      function(from) .Call("csc_to_dgTMatrix", from))
+      function(from) .Call("compressed_to_dgTMatrix", from, TRUE))
 
 setAs("dgCMatrix", "matrix",
       function(from) .Call("csc_to_matrix", from))
