@@ -1,0 +1,136 @@
+/* double (precision) Triangular Packed Matrices */
+
+#include "dtpMatrix.h"
+
+SEXP dtpMatrix_validate(SEXP obj)
+{
+    SEXP val;
+
+    if (isString(val = check_scalar_string(GET_SLOT(obj, Matrix_uploSym),
+					   "LU", "uplo"))) return val;
+    if (isString(val = check_scalar_string(GET_SLOT(obj, Matrix_diagSym),
+					   "NU", "diag"))) return val;
+    return ScalarLogical(1);
+}
+
+static
+double get_norm(SEXP obj, char *typstr)
+{
+    char typnm[] = {'\0', '\0'};
+    int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym));
+    double *work = (double *) NULL;
+
+    typnm[0] = norm_type(typstr);
+    if (*typnm == 'I') {
+	work = (double *) R_alloc(dims[0], sizeof(double));
+    }
+    return F77_CALL(dlantp)(typnm,
+			    CHAR(asChar(GET_SLOT(obj, Matrix_uploSym))),
+			    CHAR(asChar(GET_SLOT(obj, Matrix_diagSym))),
+			    dims, REAL(GET_SLOT(obj, Matrix_xSym)), work);
+}
+
+SEXP dtpMatrix_norm(SEXP obj, SEXP type)
+{
+    return ScalarReal(get_norm(obj, CHAR(asChar(type))));
+}
+
+static
+double set_rcond(SEXP obj, char *typstr)
+{
+    char typnm[] = {'\0', '\0'};
+    SEXP rcv = GET_SLOT(obj, Matrix_rcondSym);
+    double rcond = get_double_by_name(rcv, typnm);
+
+    typnm[0] = rcond_type(typstr);
+    if (R_IsNA(rcond)) {
+	int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym)), info;
+	F77_CALL(dtpcon)(typnm,
+			 CHAR(asChar(GET_SLOT(obj, Matrix_uploSym))),
+			 CHAR(asChar(GET_SLOT(obj, Matrix_diagSym))),
+			 dims, REAL(GET_SLOT(obj, Matrix_xSym)),
+			 &rcond,
+			 (double *) R_alloc(3*dims[0], sizeof(double)),
+			 (int *) R_alloc(dims[0], sizeof(int)), &info);
+	SET_SLOT(obj, Matrix_rcondSym,
+		 set_double_by_name(rcv, rcond, typnm));
+    }
+    return rcond;
+}
+
+SEXP dtpMatrix_rcond(SEXP obj, SEXP type)
+{
+    return ScalarReal(set_rcond(obj, CHAR(asChar(type))));
+}
+
+
+SEXP dtpMatrix_solve(SEXP a)
+{
+    SEXP val = PROTECT(duplicate(a));
+    int info, *Dim = INTEGER(GET_SLOT(val, Matrix_DimSym));
+    F77_CALL(dtptri)(CHAR(asChar(GET_SLOT(val, Matrix_uploSym))),
+		     CHAR(asChar(GET_SLOT(val, Matrix_diagSym))),
+		     Dim, REAL(GET_SLOT(val, Matrix_xSym)), &info);
+    UNPROTECT(1);
+    return val;
+}
+
+SEXP dtpMatrix_matrix_solve(SEXP a, SEXP b)
+{
+    SEXP val = PROTECT(duplicate(b));
+    int *Dim = INTEGER(GET_SLOT(a, Matrix_DimSym)),
+	*bDim = INTEGER(getAttrib(val, R_DimSymbol));
+    int ione = 1, j;
+
+    if (bDim[0] != Dim[1])
+	error(_("Dimensions of a (%d,%d) and b (%d,%d) do not conform"),
+	      Dim[0], Dim[1], bDim[0], bDim[1]);
+    for (j = 0; j < bDim[1]; j++)
+	F77_CALL(dtpsv)(CHAR(asChar(GET_SLOT(val, Matrix_uploSym))),
+			"N", CHAR(asChar(GET_SLOT(val, Matrix_diagSym))),
+			bDim, REAL(GET_SLOT(a, Matrix_xSym)), 
+			REAL(val) + j * bDim[0], &ione);
+    UNPROTECT(1);
+    return val;
+}
+
+SEXP dtpMatrix_as_dtrMatrix(SEXP from)
+{
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dtrMatrix"))),
+	uplo = GET_SLOT(from, Matrix_uploSym),
+	diag = GET_SLOT(from, Matrix_diagSym),
+	dimP = GET_SLOT(from, Matrix_DimSym);
+    int n = *INTEGER(dimP);
+
+    SET_SLOT(val, Matrix_rcondSym,
+	     duplicate(GET_SLOT(from, Matrix_rcondSym)));
+    SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
+    SET_SLOT(val, Matrix_diagSym, duplicate(diag));
+    SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
+    packed_to_full(REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, n*n)),
+		   REAL(GET_SLOT(from, Matrix_xSym)), n,
+		   *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW);
+    UNPROTECT(1);
+    return val;
+}
+
+SEXP dtrMatrix_as_dtpMatrix(SEXP from)
+{
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dtpMatrix"))),
+	uplo = GET_SLOT(from, Matrix_uploSym),
+	diag = GET_SLOT(from, Matrix_diagSym),
+	dimP = GET_SLOT(from, Matrix_DimSym);
+    int n = *INTEGER(dimP);
+
+    SET_SLOT(val, Matrix_rcondSym,
+	     duplicate(GET_SLOT(from, Matrix_rcondSym)));
+    SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
+    SET_SLOT(val, Matrix_diagSym, duplicate(diag));
+    SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
+    full_to_packed(REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, (n*(n+1))/2)),
+		   REAL(GET_SLOT(from, Matrix_xSym)), n,
+		   *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW,
+		   *CHAR(STRING_ELT(diag, 0)) == 'U' ? UNT : NUN);
+    UNPROTECT(1);
+    return val;
+}

@@ -18,6 +18,7 @@ SOURCES_C =  \
             dtCMatrix.c \
             dtTMatrix.c \
             dtrMatrix.c \
+            dtpMatrix.c \
             factorizations.c \
             sscCrosstab.c \
             ssclme.c \

@@ -11,6 +11,7 @@
 #include "dtCMatrix.h"
 #include "dtTMatrix.h"
 #include "dtrMatrix.h"
+#include "dtpMatrix.h"
 #include "factorizations.h"
 #include "lmer.h"
 #include "sscCrosstab.h"
@@ -82,6 +83,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dtTMatrix_as_dtrMatrix", (DL_FUNC) &dtTMatrix_as_dtrMatrix, 1},
     {"dtTMatrix_validate", (DL_FUNC) &dtTMatrix_validate, 1},
     {"dtrMatrix_as_dgeMatrix", (DL_FUNC) &dtrMatrix_as_dgeMatrix, 1},
+    {"dtrMatrix_as_dtpMatrix", (DL_FUNC) &dtrMatrix_as_dtpMatrix, 1},
     {"dtrMatrix_as_matrix", (DL_FUNC) &dtrMatrix_as_matrix, 1},
     {"dtrMatrix_dgeMatrix_mm", (DL_FUNC) &dtrMatrix_dgeMatrix_mm, 2},
     {"dtrMatrix_dgeMatrix_mm_R", (DL_FUNC) &dtrMatrix_dgeMatrix_mm_R, 2},
@@ -91,6 +93,12 @@ static R_CallMethodDef CallEntries[] = {
     {"dtrMatrix_rcond", (DL_FUNC) &dtrMatrix_rcond, 2},
     {"dtrMatrix_solve", (DL_FUNC) &dtrMatrix_solve, 1},
     {"dtrMatrix_validate", (DL_FUNC) &dtrMatrix_validate, 1},
+    {"dtpMatrix_as_dtrMatrix", (DL_FUNC) &dtpMatrix_as_dtrMatrix, 1},
+    {"dtpMatrix_matrix_solve", (DL_FUNC) &dtpMatrix_matrix_solve, 2},
+    {"dtpMatrix_norm", (DL_FUNC) &dtpMatrix_norm, 2},
+    {"dtpMatrix_rcond", (DL_FUNC) &dtpMatrix_rcond, 2},
+    {"dtpMatrix_solve", (DL_FUNC) &dtpMatrix_solve, 1},
+    {"dtpMatrix_validate", (DL_FUNC) &dtpMatrix_validate, 1},
     {"lapack_qr", (DL_FUNC) &lapack_qr, 2},
     {"lmer_Crosstab", (DL_FUNC) &lmer_Crosstab, 1},
     {"lmer_ECMEsteps", (DL_FUNC) &lmer_ECMEsteps, 4},
