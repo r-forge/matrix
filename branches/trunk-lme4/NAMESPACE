@@ -95,5 +95,6 @@ exportMethods(
               "residuals",
               "show",
               "summary",
-              "update"
+              "update",
+              "vcov"
               )
