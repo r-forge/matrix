@@ -32,15 +32,16 @@
   the gradient of the criterion being optimized.
   
   The sparse matrix methods that we employ have both a symbolic phase,
-  in which the number and positions of the off-diagonal elements
-  are determined, and a numeric phase, in which the actual numeric
-  values are determined.  The symbolic phase need only be done once
-  and it can be accomplished knowing only the grouping factors with
-  which the random effects are associated. An important part of the
-  symbolic phase is determination of a fill-minimizing permutation of
-  the rows and columns of the sparse semidefinite matrix.  This matrix
-  have a special structure in the linear mixed-effects problem and we
-  provide a new fill-minimizing algorithm tuned to this structure.
+  in which the number and the positions of nonzero elements in the
+  result are determined, and a numeric phase, in which the actual
+  numeric values are determined.  The symbolic phase need only be done
+  once and it can be accomplished knowing only the grouping factors
+  with which the random effects are associated. An important part of
+  the symbolic phase is determination of a fill-minimizing permutation
+  of the rows and columns of the sparse semidefinite matrix.  This
+  matrix have a special structure in the linear mixed-effects problem
+  and we provide a new fill-minimizing algorithm tuned to this
+  structure.
 
 \end{abstract}
 <<preliminaries,echo=FALSE,print=FALSE>>=
@@ -73,7 +74,7 @@ symmetric matrix.
 
 Many implementations of the Cholesky decomposition of sparse,
 symmetric, semidefinite matrices have both a symbolic phase, in which
-the number and positions of the off-diagonal elements are determined,
+the number and the positions of nonzero elements in the result are determined,
 and a numeric phase, in which the actual numeric values are
 determined.  In \S\ref{sec:Symbolic} we show that the symbolic
 analysis for the matrices we consider need only be done once and can
@@ -204,7 +205,7 @@ the \var{primary} and secondary (\var{second}) schools attended by
 
 The grouping factors for the random effects are \var{primary} (148
 distinct schools) and \var{second} (19 distinct schools).  
-The locations of the non-zeros in the $167\times 167$ matrix
+The locations of the nonzeros in the $167\times 167$ matrix
 $\bZ\trans\bZ$ are shown in Figure~\ref{fig:ZtZ}
 \begin{figure}[tbp]
   \centering
@@ -214,7 +215,7 @@ ctab = sscCrosstab(list(ScotsSec$primary, ScotsSec$second), FALSE)
 print(image(ctab, aspect='xy', xlim = c(-0.5,166.5),
            ylim = c(166.5, -0.5), colorkey = FALSE))
 @   
-\caption{Location of non-zero elements in
+\caption{Location of nonzero elements in
   $\bZ\trans\bZ$ for a variance components model for the
   \var{ScotsSec} data.  Darker squares indicate larger magnitudes.
   Rows and columns are numbered from zero.  The first 148 rows and
@@ -234,10 +235,10 @@ model where some of the $\bZ_i$ can have multiple columns, the
 structure of $\bZ\trans\bZ$ can be derived from the structure of the
 pairwise crosstabulation matrix.  Both $\bZ\trans\bZ$ and the pairwise
 crosstabulation can be divided into a $k\times k$ grid of blocks.  The
-pattern of non-zeros in the $(i,j)$ block of $\bZ\trans\bZ$ is
-obtained by replacing each non-zero in the $(i,j)$ block of the
+pattern of nonzeros in the $(i,j)$ block of $\bZ\trans\bZ$ is
+obtained by replacing each nonzero in the $(i,j)$ block of the
 crosstabulation by a $q_i\times q_j$ matrix.  Notice that we can
-determine the patterns of non-zeros in $\bZ\trans\bZ$ knowing only the
+determine the patterns of nonzeros in $\bZ\trans\bZ$ knowing only the
 $q_i,i=1,\dots,k$ and the pairwise crosstabulation of the grouping
 factors.
 
@@ -312,10 +313,10 @@ We use functions from the LDL package to solve for $\RZX$ in
   \bD^{1/2}\bL\trans\RZX=\bZ\trans\bX
 \end{equation}
 Having solved for $\RZX$ we can downdate $\bX\trans\bX$ and determine
-the dense Cholesky factor $\RXX$ in
+the dense upper triangular Cholesky factor $\RXX$ satisfying
 \begin{equation}
   \label{eq:RXX}
-  \bX\trans\bX-\RZX\trans\RZX=\RXX\trans\RXX
+  \RXX\trans\RXX=\bX\trans\bX-\RZX\trans\RZX
 \end{equation}
 Similar relationships are used to determine $\rZy$, $\rXy$, and
 $\ryy$.  In fact, in our implementation we append $\by$ to $\bX$ when
@@ -438,17 +439,16 @@ iterations is the sparse Cholesky decomposition (\ref{eq:CrossProdGen}).
 
 Although the decomposition (\ref{eq:CrossProdGen}) will be performed
 many times for different trial values of $\btheta$, the structure of
-$\bZ\trans\bZ+\bOmega$ -- in particular, the number and positions of
-the non-zeros in $\bZ\trans\bZ+\bOmega$ and in $\bL$ -- will be the
-same for each evaluation.  Because the LDL package provides one C
-function to perform the symbolic analysis that determines the number
-and position of the non-zeros in $\bL$ and another C function that
+$\bZ\trans\bZ+\bOmega$ -- in particular, the number and the positions of
+nonzeros in $\bZ\trans\bZ+\bOmega$ and in $\bL$ -- will be the
+same for each evaluation.  Because the LDL package provides one
+function to perform the symbolic analysis and another function that
 determines the numerical values in the decomposition, we can do
 the symbolic analysis separately.
 
 The number and the positions of the nonzeros in $\bL$ depend on the
 positions of the nonzeros in $\bZ\trans\bZ$. Any nonzero position in
-the lower triangle of $\bZ\trans\bZ$ is potentially nonzero in $\bL$.
+the lower triangle of $\bZ\trans\bZ$ can be nonzero in $\bL$.
 However other positions in $\bL$ can become nonzero during the course
 of the decomposition.  This is called ``fill-in''.  The extent of the
 fill-in can be altered by reordering the components of $\bb$ and,
@@ -456,7 +456,7 @@ correspondingly, the columns of $\bZ$.
 
 Although there are general approaches, such as approximate minimal
 degree~\citep{Davis:1996} or graph-partitioning
-algorithms\citep{Metis}, for determining a fill-minimizing
+algorithms~\citep{Metis}, for determining a fill-minimizing
 permutation, it is more effective for us to exploit the special
 structure of $\bZ\trans\bZ$ in searching for such a permutation.
 
@@ -507,21 +507,22 @@ order and consider only permutations of the last 19 columns.
 We obtain the matrix to determine the permutation of the second and
 subsequent groups by ``projecting'' the first $m_1$ columns onto the
 last $q-m_1$ columns.  If there are only two
-grouping factors we record as potentially non-zero the positions $(i,k)$
-with $i,k>m_1$ and both $(i,j)$ and $(k,j)$ non-zero for some
+grouping factors we record as potentially nonzero the positions $(i,k)$
+with $i,k>m_1$ and both $(i,j)$ and $(k,j)$ nonzero for some
 $j\le m_1$.  If there are more than two grouping factors we
 record all these positions plus any of the original nonzeros below the
 $m_1$st row and to the right of the $m_1$st column.
 
 In the case of two nested grouping factors there will only be one
-nonzero element below the diagonal in the first $m_1$ columns, hence
-there is no fill-in.  For more than two nested grouping factors, any
-pair of nonzeros occuring in the first $m_1$ columns must be in rows
-that correspond to different grouping factors and that off-diagonal in
-the projected matrix must already be nonzero.  That is, nested
+nonzero element below the diagonal in each of the first $m_1$ columns,
+hence there is no fill-in.  For more than two nested grouping factors,
+any pair of nonzeros occuring in the first $m_1$ columns must be in
+rows associated with different grouping factors and, furthermore, the
+nonzero off-diagonal that would be generated in the projected matrix
+for that combination must already be nonzero.  That is, nested
 grouping factors do not generate any fill-in.  Not only can the matrix
 $\bL$ be created ``in place'' (that is, with exactly the same
-positions of nonzero off-diagonal elements as in $\bZ\trans\bZ$) but
+positions of nonzeros as in the lower triangle of $\bZ\trans\bZ$) but
 also $\bL^{-1}$ has the same pattern of nonzeros.  This is unusual.
 In most cases $\bL^{-1}$ has many more nonzeros than does $\bL$.
 
@@ -570,9 +571,9 @@ print(levelplot(x ~ j + i | type, data = df,
   \caption{Projection of the pairwise crosstabulation for the Scottish
     secondary school data onto the $19\times 19$ lower right block for
     the \var{second} factor.  The ``Projected'' panel shows the
-    original (black squares) and projected (gray squares) non-zero
+    original (black squares) and projected (gray squares) nonzero
     positions.  The ``L'' panel shows the implicit diagonal (black
-    squares) and the non-zero off-diagonal (gray squares) for this
+    squares) and the nonzero off-diagonal (gray squares) for this
     ordering of the levels of the factor.  The ``Permuted'' panel
     shows the symmetric matrix after permuting the rows and columns
     according to the fill-reducing permutation determined by the Metis
@@ -581,8 +582,8 @@ print(levelplot(x ~ j + i | type, data = df,
   \label{fig:ScotsProj}
 \end{figure}
 We also show the patterns of nonzeros in $\bL$ from the LDL
-decomposition of this block in the original order for the rows and
-columns; the symmetric block with its rows and columns permuted
+decomposition of this block (using the original ordering of the rows and
+columns); the symmetric block with its rows and columns permuted
 according to a fill-reducing permutation determined by
 Metis~\citep{Metis}; and the nonzeros in the $\bL$ matrix from the
 decomposition of the permuted symmetric matrix.
@@ -593,19 +594,37 @@ the matrix which would have 171 elements below the diagonal.
 Without the fill-minimizing permutation there are 154 off-diagonal
 nonzeros in $\bL$.  With the permutation there are 131.
 
-However, in other cases the savings in the amount of storage required
-for this block of $\bL$, and in the number of floating point
-operations in solving linear systems of equations based on $\bL$, can
-be substantial.  We have used these methods to analyze 378,047 test
-scores of 134,713 students in 3722 schools.  There are 377,111 nonredundant
-elements in the pairwise crosstabulation (138435 diagonals and
-238,676 below the diagonal).  The projection of the $(2,1)$ block
-into the $(2,2)$ block produces a symmetric $3722\times 3722$ matrix
-with 49,305 nonredundant elements (3722 diagonals and 45,583 below the
-diagonals).   Without the fill-reducing permutation the $\bL$
-matrix has 4,469,124 off-diagonal elements or 64.5\% of the maximum
-possible number (6,924,781). With the permutation the
-number of off-diagonals is reduced to 193,562 (2.8\% of the maximum).
+Even so, only 470 floating point values are required to store
+$\bZ\trans\bZ$ and a total of 601 for the decomposition (167 for $\bD$
+and 434 for $\bL$).  Dense storage of the $(2,1)$ block of
+$\bZ\trans\bZ$, as suggested in \citep{MLwiN:2002}, would require 2812
+floating point locations for that block alone, plus a similar number
+for the decomposition.  In this example it is the sparse storage, more
+than the fill-reducing permutation, the reduces both the space and the
+computational time required, relative to previous methods.
+
+In other cases, however, the storage savings from the fill-reducing
+permutation can be substantial.  We have used these
+methods to analyze 378,047 test scores of 134,713 students in 3722
+schools.  There are 377,111 nonredundant nonzeros in the pairwise crosstabulation
+(138435 diagonals and 238,676 off-diagonals).  The
+projection of the $(2,1)$ block into the $(2,2)$ block produces a
+symmetric $3722\times 3722$ matrix with 49,305 non-redundant nonzeros
+(3722 diagonals and 45,583 off-diagonals).  Without the fill-reducing
+permutation the $\bL$ matrix has 4,469,124 nonzero off-diagonals or
+64.5\% of the maximum possible number (6,924,781). With the
+permutation the number of nonzero off-diagonals is reduced to 193,562 or 2.8\%
+of the maximum.
+
+Fitting linear mixed models to data, such as these, that have a large
+number of levels in one or more of a set of partially crossed grouping
+factors has been very difficult, if not impossible, with existing
+multilevel modeling software.  Using a dense representation of the
+$(2,1)$ block (over $5\times 10^8$ floating point values or 4 GB per
+copy, in double precision) is impractical on most current computers.  A
+sparse matrix representation combined with a fill-reducing permutation
+makes it practical to perform multilevel analysis of such data, which is
+becoming common~\citep{Rnews:Lockwood+Doran+Mccaffrey:2003}.
 
 \section{Generalizations of linear mixed models}
 \label{sec:Generalizations}
@@ -714,28 +733,60 @@ The techniques described in \S\ref{sec:LinearMixed} and
 methods for generalized linear mixed models are currently implemented
 in the \code{lme4} package for R~\cite{R-2.0.0}.  In future versions
 of this package we will incorporate the adaptive Gauss-Hermite method
-for GLMMs and the Laplace and adaptive Gauss-Hermite methods for NMMs.
+for GLMMs and the PQL, Laplace, and adaptive Gauss-Hermite methods for
+NMMs.
 
+Because both R and the \code{lme4} package are open source software,
+they provide a reference implementation of these methods against which
+other methods can be compared.  However, the package is more than a
+``reference implementation''; it is carefully implemented and is
+suitable as a production system.  As part of the package we provide a
+``vignette'' (a code/documentation combination for literate data
+analysis) that fits the models from the examples in the comparative
+reviews of multilevel modeling software
+(\url{http://multilevel.ioe.ac.uk/softrev/}).  These examples show
+that the \code{lme} function in the \code{lme4} package is fast and
+reliable on what would currently be considered typical multilevel
+modeling examples.  However, the sparse matrix representation and the
+ease of model specification allows it to go far beyond currently
+available software.  We know of no other software that can fit models
+with partially crossed grouping factors to data sets with $10^6$ or
+more observations, such as the longitudinal analysis of over 300,000
+test scores described in \S\ref{ssec:ProjectionEx} incorporating
+random effects for student and school and allowing for student
+migration between schools.
 
-\section{Conclusions}
-\label{sec:Conclusions}
+\section{Summary}
+\label{sec:Summary}
 
-As shown in \citet{bate:debr:2004} the profiled log-likelihood or
-log-restricted-likelihood for a linear mixed model can be conveniently
-calculated from the solution to a penalized least squares problem.
-Furthermore, the calculations for the conditional estimates of the
-fixed-effects and variance parameters, the conditional modes of the
-random effects, ECME iterations, and the gradient and Hessian of the
-profiled objective function can all be expressed using these
-solutions.  
+We have presented a specification of linear mixed models using model
+matrices and grouping factors, a computational representation based
+this specification, computational methods using the representation,
+and, in passing, an implementation of the specification,
+representation, and computational methods.  Furthermore, we show that
+the specification, representation, methods, and implementation can be
+extended to generalizations of the linear mixed model including GLMMs
+and NMMs.
 
-In this paper we have described a 
-a representation of linear mixed models where a sparse symmetric
-matrix and several dense matrices are generated from grouping
-factors and the model matrices associated with the random effects and
-the model matrix for the fixed effects.
-symmetric sparse matrices a
+In many implementations of linear mixed models it can be awkward to
+specify the structure of the random effects.  We contend that by
+concentrating on the grouping factors in the data and model matrices
+associated with these grouping factors, the specification of linear
+mixed models is made much easier.  Nesting or crossing of grouping
+factors can be determined from the data, rather than having to be
+specified as part of the model.  Common forms of linear mixed models
+(certainly all those in the comparative review of multilevel modeling
+software) can be specified without using specialized forms of the
+precision matrices $\bOmega_i, i=1,\dots,k$.  We only require these
+matrices to be symmetric, positive semidefinite.  The structure and
+interaction of the random effects is determined by the grouping
+factors, not by esoteric forms of precision matrices (or
+variance-covariance matrices) for the random effects.
 
+A pairwise crosstabulation of the grouping factors, which we store as
+a sparse symmetric matrix, is the basis for all the symbolic
+analysis.  If we order the grouping factors so that $m1\ge
+m2\ge\dots\ge m_k$ we can ``project out'' the 
 
 
 \section{Acknowledgements}
@@ -763,7 +814,7 @@ packages.
 \label{sec:SparseM}
 
 The simplest representation of a sparse matrix $\bX$ is to store a
-triplet $(i,j,x_{ij})$ for each non-zero element.  If the triplets are
+triplet $(i,j,x_{ij})$ for each nonzero element.  If the triplets are
 sorted, say by column order, the column indices will occur in blocks
 of equal values.  In the \emph{compressed, sparse, column-oriented}
 format the entries are sorted in increasing column order and a set of
@@ -786,8 +837,8 @@ diff(m1@p)
 @ 
 We see that the \var{p} slot in a \var{cscMatrix} with 4 columns has 5
 elements.  The first element is always zero and the successive differences
-are the numbers of non-zero elements in each column.  The total number
-of non-zero elements is the value of the last element of the \var{p}
+are the numbers of nonzero elements in each column.  The total number
+of nonzero elements is the value of the last element of the \var{p}
 slot.  This is also the length of the vector of row indices in the
 \var{i} slot.
 
@@ -819,9 +870,9 @@ factor $\bL$ instead of the right factor $\bR$.
 
 For a sparse, symmetric, semidefinite matrix reordering the columns
 (and, correspondingly, the rows) of $\bA$ can change the number of
-non-zero elements in the Cholesky factor.  The number of elements in
-the Cholesky factor is at least the number of non-zero elements in the
-lower triangle of $\bA$.  Additional non-zeros can be generated during
+nonzero elements in the Cholesky factor.  The number of elements in
+the Cholesky factor is at least the number of nonzero elements in the
+lower triangle of $\bA$.  Additional nonzeros can be generated during
 the decomposition.  This process is called ``fill-in''.  Various
 methods of determining a fill-minimizing order have been proposed.  We
 use a graph-based method implemented in the Metis package.
@@ -841,7 +892,7 @@ as(chol(m2, pivot = FALSE), "matrix")
 @ 
 In this example the fill-reducing permutation reverses the order of
 the columns and rows of \var{m2} before taking the decomposition.  It
-results in two fewer non-zero elements in the decomposition than when
+results in two fewer nonzero elements in the decomposition than when
 we suppress the permutation.
 
 \subsection{Symbolic versus numeric computation}
@@ -849,10 +900,10 @@ we suppress the permutation.
 
 Calculation of the fill-reducing ordering is an example of a symbolic
 computation on sparse matrices in that it is based only on the
-positions of the non-zero elements, not upon their values.  Frequently
+positions of the nonzero elements, not upon their values.  Frequently
 a sparse-matrix computation has both a symbolic phase, which typically
-determines the number and positions of the non-zero entries in the
-result, and a numeric phase that actually calculates these non-zero
+determines the number and positions of the nonzero entries in the
+result, and a numeric phase that actually calculates these nonzero
 elements.
 
 Evaluation of the profiled log-likelihood or profiled
@@ -866,9 +917,9 @@ concise Cholesky factorization of the form $\bA=\bL\bD\bL\trans$ where
 $\bL$ is a unit lower triangular matrix (i.e. all the diagonal
 elements are unity) and $\bD$ is diagonal and stored as a single
 vector.  This representation is particularly convenient for us because
-the diagonal elements (which must be non-zero when $\bA$ is positive
+the diagonal elements (which must be nonzero when $\bA$ is positive
 definite) often constitute a substantial portion of the total number
-of non-zero elements in the Cholesky factor and, in this
+of nonzero elements in the Cholesky factor and, in this
 representations, we do not encounter the extra indexing overhead when
 accessing these elements.  Also the determinant of $\bA$ (or, for our
 purposes, the determinants of leading diagonal submatrices of $\bA$)
@@ -927,7 +978,7 @@ It is symmetric and can be divided into $k\times k$ ``outer blocks'',
 corresponding to the $k$ grouping factors. The $(i,j)$ outer block, of
 size $m_i q_i\times m_j q_j$, is further subdivided into $m_i\times
 m_j$ inner blocks, each of size $q_i\times q_j$.  The $(m,n)$'th inner
-block in the $(i,j)$'th outer block will be non-zero only if level $m$
+block in the $(i,j)$'th outer block will be nonzero only if level $m$
 of $\bff_i$ occurs with level $n$ of $\bff_j$.  In particular, a
 diagonal outer block is block-diagonal with the diagonal consisting of
 $m_i$ (possibly different) blocks of size $q_i\times q_i$.
@@ -1070,9 +1121,9 @@ symmetric, column-oriented representation.  Only the upper triangle or
 the lower triangle of this symmetric matrix need be stored.  Because
 we will use the methods implemented in Tim Davis' LDL package
 \citep{Davis:2004} which requires the upper triangle to be stored, we
-do so.  There are a total of 404 non-zero elements in the upper
+do so.  There are a total of 404 nonzero elements in the upper
 triangle.  We store these in increasing column order and, within each
-column, in order of increasing row index.  In addition to the non-zero
+column, in order of increasing row index.  In addition to the nonzero
 value we must store the row indices and the column indices.  However,
 the column indices are in increasing order and we can compress this
 vector by storing only the information on where each column
@@ -1150,7 +1201,7 @@ in decreasing order of the number of levels.
 As shown in \citet{Liu:1990} and as implemented in the LDL package,
 the number and positions of the off-diagonal elements in $\bL$ and in
 $\bL^{-1}$ can be determined from the elimination tree of the matrix,
-which depends only on the position of the first non-zero in each
+which depends only on the position of the first nonzero in each
 column of the strict lower triangle of $\bZ\trans\bZ$.  Because
 nonzeros in the strict lower triangle only occur in rows corresponding
 to the second factor, there is no need to permute the levels of the
@@ -1183,22 +1234,22 @@ As shown in the previous section, we store $\bZ\trans\bZ$ and
 decompose $\bZ\trans\bZ+\bOmega=\bL\bD\bL\trans$ using sparse matrix
 representations and the LDL package.  Many methods for
 sparse matrices have both a symbolic phase, where the pattern of the
-non-zero entries in the result is determined, and a numeric phase,
+nonzero entries in the result is determined, and a numeric phase,
 where the numerical results are determined.  In the LDL package these
 are performed in different functions, which is a great advantage for
 us because the symbolic phase need only be done once while the numeric
 phase is repeated many times.
 
-The number and positions of the non-zero elements in $\bZ\trans\bZ$,
+The number and positions of the nonzero elements in $\bZ\trans\bZ$,
 $\bL$ and $\bL^{-1}$ can be determined from the pairwise
-crosstabulations of the grouping factors and the $q_i,i=1,\dots,k$.
+cross-tabulations of the grouping factors and the $q_i,i=1,\dots,k$.
 We also determine the ordering of the levels within the groups, as
 described in the next section, during the symbolic phase.  Once the
 symbolic analysis is complete all the storage needed for intermediate
 results can be allocated.  Only then are the model matrices $\bZ_i, i =
 1,\dots,k$ and $\bX$ formed and expressions such as $\bZ\trans\bZ$ and
 $\bZ\trans\bX$ evaluated.  Note that because the locations of the
-non-zero elements in the products are known in advance, it is possible
+nonzero elements in the products are known in advance, it is possible
 to evaluate the $\bZ_i$ and $\bX$ row-wise (or in blocks of rows),
 update the matrix products, and then discard the rows.  When $n$ is
 very large and $p$ is moderate, sequential evaluation by rows could
