@@ -6,7 +6,7 @@ assert.EQ.mat <- function(M, m, tol = 1e-15)
 
 m1 <- Matrix(c(1,0,1,1), nc = 2)
 e1 <- expm(m1)
-assert.EQ.mat(e1, {e <- exp(1); cbind(c(e,0), e)})
+assert.EQ.mat(e1, cbind(c(exp(1),0), exp(1)))
 
 m2 <- Matrix(c(-49, -64, 24, 31), nc = 2)
 e2 <- expm(m2)
