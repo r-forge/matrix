@@ -535,7 +535,7 @@ setMethod("lme1", signature(formula = "formula", data = "groupedData",
                    subset, weights, na.action, offset,
                    model = TRUE, x = FALSE, y = FALSE,...)
       {
-          nCall = mCall = match.call()
+          nCall <- mCall <- match.call()
           nCall$data <- data@data
           .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
                 mCall, PACKAGE = "Matrix")
@@ -549,34 +549,33 @@ setMethod("lme1", signature(formula = "formula",
                    subset, weights, na.action, offset,
                    model = TRUE, x = FALSE, y = FALSE, ...)
       {
-          method = match.arg(method)
-          random = lapply(random, formula) # formula function, not the argument
-          controlvals = do.call("lmeControl", control)
-          controlvals$REML = method == "REML"
-          data <- eval(lme4:::make.mf.call(match.call(expand.dots = FALSE),
+          method <- match.arg(method)
+          random <- lapply(random, formula) # formula function, not the argument
+          controlvals <- do.call("lme1Control", control)
+          controlvals$REML <- method == "REML"
+          data <- eval(make.mf.call(match.call(expand.dots = FALSE),
                                            formula, random), parent.frame())
-          facs = lapply(names(random),
+          facs <- lapply(names(random),
                          function(x) eval(as.name(x), envir = data))
-          names(facs) = names(random)
-          facs =                        # order by decreasing number of levels
+          names(facs) <- names(random)
+          facs <-                        # order by decreasing number of levels
               facs[rev(order(sapply(facs, function(fac)
                                     length(levels(fac)))))]
           mmats <- c(lapply(random,
                             function(x) model.matrix(formula(x), data = data)),
                      list(.Xy = cbind(model.matrix(formula, data = data),
                           .response = model.response(data))))
-          obj = .Call("lmeRep_create", facs, sapply(mmats, ncol),
+          obj <- .Call("lmeRep_create", facs, sapply(mmats, ncol),
                        PACKAGE = "Matrix")
           .Call("lmeRep_update_mm", obj, facs, mmats, PACKAGE="Matrix")
           .Call("lmeRep_initial", obj, PACKAGE="Matrix")
           .Call("lmeRep_ECMEsteps", obj, 
-                                        #controlvals$niterEM,
-                100,
+                controlvals$niterEM,
                 controlvals$REML,
-                                        #controlvals$EMverbose,
+                controlvals$EMverbose,
                 TRUE,
                 PACKAGE = "Matrix")
-          LMEoptimize(obj) = controlvals
+          LMEoptimize(obj) <- controlvals
           #fitted = .Call("ssclme_fitted", obj, facs, mmats, TRUE, PACKAGE = "Matrix")
           #residuals = mmats$.Xy[,".response"] - fitted
           #if (as.logical(x)[1]) x = mmats else x = list()
