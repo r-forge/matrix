@@ -47,7 +47,11 @@ if (!isGeneric("getResponse")) {
 }
 
 setGeneric("lme",
-           function(formula, data, random, ...)
+          function(formula, data, random,
+                   method = c("REML", "ML"),
+                   control = list(),
+                   subset, weights, na.action, offset,
+                   model = TRUE, x = FALSE, y = FALSE,...)
            standardGeneric("lme"))
 
 if (!isGeneric("LMEoptimize<-")) {
@@ -104,7 +108,14 @@ if (!isGeneric("lmList")) {
 
 if (!isGeneric("GLMM")) {
     setGeneric("GLMM",
-               function(formula, family, data, random, ...)
+               function(formula, family, data, random,
+                        method = c("PQL", "Laplace"),
+                        control = list(),
+                        subset,
+                        weights,
+                        na.action,
+                        offset,
+                        model = TRUE, x = FALSE, y = FALSE, ...)
                standardGeneric("GLMM"))
 }
 

@@ -1,10 +1,11 @@
 facshuffle = function(sslm, facs)       # unexported utility
 {
-    if (!length(sslm[[2]])) return(facs)
+    s2 = sslm[[2]]
+    if (all(s2 == (seq(a = s2) - 1))) return(facs)
     if (getOption("verbose")) cat(" Non-trivial permutation\n")
     s1 = sslm[[1]]
-    s2 = sslm[[2]]
     lens = diff(s1@Gp)
+    lens = lens/(s1@nc[seq(a = lens)])
     ff = vector("list", length(facs))
     for (i in seq(along = lens)) {
         sq = seq(lens[i])
@@ -83,7 +84,11 @@ lmeControl =                            # Control parameters for lme
 }
 
 setMethod("lme", signature(formula = "missing"),
-          function(formula, data, random, ...)
+          function(formula, data, random,
+                   method = c("REML", "ML"),
+                   control = list(),
+                   subset, weights, na.action, offset,
+                   model = TRUE, x = FALSE, y = FALSE,...)
       {
           nCall = mCall = match.call()
           resp = getResponseFormula(data)[[2]]
@@ -95,7 +100,11 @@ setMethod("lme", signature(formula = "missing"),
 
 setMethod("lme", signature(formula = "formula", data = "groupedData",
                            random = "missing"),
-          function(formula, data, random, ...)
+          function(formula, data, random,
+                   method = c("REML", "ML"),
+                   control = list(),
+                   subset, weights, na.action, offset,
+                   model = TRUE, x = FALSE, y = FALSE,...)
       {
           nCall = mCall = match.call()
           cov = formula[[3]]
@@ -106,7 +115,11 @@ setMethod("lme", signature(formula = "formula", data = "groupedData",
       })
 
 setMethod("lme", signature(random = "formula"),
-          function(formula, data, random, ...)
+          function(formula, data, random,
+                   method = c("REML", "ML"),
+                   control = list(),
+                   subset, weights, na.action, offset,
+                   model = TRUE, x = FALSE, y = FALSE,...)
       {
           nCall = mCall = match.call()
           cov = getCovariateFormula(random)
@@ -118,7 +131,11 @@ setMethod("lme", signature(random = "formula"),
 
 setMethod("lme", signature(formula = "formula", data = "groupedData",
                            random = "list"),
-          function(formula, data, random, ...)
+          function(formula, data, random,
+                   method = c("REML", "ML"),
+                   control = list(),
+                   subset, weights, na.action, offset,
+                   model = TRUE, x = FALSE, y = FALSE,...)
       {
           nCall = mCall = match.call()
           nCall$data <- data@data
