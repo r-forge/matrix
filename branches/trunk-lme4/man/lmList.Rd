@@ -56,7 +56,7 @@ lmList(formula, data, level, subset, na.action, pool)
 \code{\link[base:lm]{lm}}
 }
 \examples{
-data(Orthodont)
+data(Orthodont, package = "MEMSS")
 fm1 <- lmList(distance ~ age | Subject, Orthodont)
 fm1
 }

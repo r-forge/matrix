@@ -95,7 +95,7 @@ pseudo-likelihood approach.
   \code{\link{lme}}
 }
 \examples{
-data(guImmun)
+data(guImmun, package = 'mlmRev')
 fm1 <-
     GLMM(immun ~ kid2p + mom25p + ord + ethn +
                  momEd + husEd + momWork + rural + pcInd81,
