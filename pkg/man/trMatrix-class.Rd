@@ -1,25 +1,25 @@
-\name{trMatrix-class}
+\name{dtrMatrix-class}
 \docType{class}
-\alias{\%*\%,geMatrix,trMatrix-method}
-\alias{\%*\%,trMatrix,geMatrix-method}
-\alias{coerce,trMatrix,geMatrix-method}
-\alias{coerce,trMatrix,matrix-method}
-\alias{crossprod,trMatrix,missing-method}
-\alias{determinant,trMatrix,logical-method}
-\alias{determinant,trMatrix,missing-method}
-\alias{norm,trMatrix,character-method}
-\alias{norm,trMatrix,missing-method}
-\alias{rcond,trMatrix,character-method}
-\alias{rcond,trMatrix,missing-method}
-\alias{solve,trMatrix,matrix-method}
-\alias{solve,trMatrix,missing-method}
-\alias{t,trMatrix-method}
-\alias{trMatrix-class}
+\alias{\%*\%,dgeMatrix,dtrMatrix-method}
+\alias{\%*\%,dtrMatrix,dgeMatrix-method}
+\alias{coerce,dtrMatrix,dgeMatrix-method}
+\alias{coerce,dtrMatrix,matrix-method}
+\alias{crossprod,dtrMatrix,missing-method}
+\alias{determinant,dtrMatrix,logical-method}
+\alias{determinant,dtrMatrix,missing-method}
+\alias{norm,dtrMatrix,character-method}
+\alias{norm,dtrMatrix,missing-method}
+\alias{rcond,dtrMatrix,character-method}
+\alias{rcond,dtrMatrix,missing-method}
+\alias{solve,dtrMatrix,matrix-method}
+\alias{solve,dtrMatrix,missing-method}
+\alias{t,dtrMatrix-method}
+\alias{dtrMatrix-class}
 \title{Triangular, dense, non-packed, real matrices}
-\description{The \code{"trMatrix"} class is the class of triangular
+\description{The \code{"dtrMatrix"} class is the class of triangular
   matrices in dense, non-packed storage.}
 \section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("trMatrix", ...)}.
+Objects can be created by calls of the form \code{new("dtrMatrix", ...)}.
 }
 \section{Slots}{
   \describe{
@@ -47,23 +47,23 @@ Objects can be created by calls of the form \code{new("trMatrix", ...)}.
   }
 }
 \section{Extends}{
-Class \code{"geMatrix"}, directly.
-Class \code{"Matrix"}, by class \code{"geMatrix"}.
+Class \code{"dgeMatrix"}, directly.
+Class \code{"Matrix"}, by class \code{"dgeMatrix"}.
 }
 \section{Methods}{
   \describe{
-    \item{coerce}{\code{signature(from = "trMatrix", to = "geMatrix")}}
-    \item{coerce}{\code{signature(from = "trMatrix", to = "matrix")}}
-    \item{norm}{\code{signature(x = "trMatrix", type = "character")}}
-    \item{rcond}{\code{signature(x = "trMatrix", type = "character")}}    
-    \item{solve}{\code{signature(a = "trMatrix", b = "missing")}}
-    \item{solve}{\code{signature(a = "trMatrix", b = "matrix")}}
+    \item{coerce}{\code{signature(from = "dtrMatrix", to = "dgeMatrix")}}
+    \item{coerce}{\code{signature(from = "dtrMatrix", to = "matrix")}}
+    \item{norm}{\code{signature(x = "dtrMatrix", type = "character")}}
+    \item{rcond}{\code{signature(x = "dtrMatrix", type = "character")}}    
+    \item{solve}{\code{signature(a = "dtrMatrix", b = "missing")}}
+    \item{solve}{\code{signature(a = "dtrMatrix", b = "matrix")}}
   }
 }
 %\references{}
 %\author{}
 \seealso{
-  \code{\link{geMatrix-class}}, \code{\link{Matrix-class}}
+  \code{\link{dgeMatrix-class}}, \code{\link{Matrix-class}}
 }
 %\examples{}
 \keyword{classes}

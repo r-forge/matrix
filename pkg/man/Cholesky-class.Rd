@@ -13,26 +13,26 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{uplo}:}{inherited from the \code{"trMatrix"} class.}
-    \item{\code{diag}:}{inherited from the \code{"trMatrix"} class.}
-    \item{\code{x}:}{inherited from the \code{"trMatrix"} class.}
-    \item{\code{Dim}:}{inherited from the \code{"trMatrix"} class.}
-    \item{\code{rcond}:}{inherited from the \code{"trMatrix"} class.}
-    \item{\code{factors}:}{inherited from the \code{"trMatrix"}
+    \item{\code{uplo}:}{inherited from the \code{"dtrMatrix"} class.}
+    \item{\code{diag}:}{inherited from the \code{"dtrMatrix"} class.}
+    \item{\code{x}:}{inherited from the \code{"dtrMatrix"} class.}
+    \item{\code{Dim}:}{inherited from the \code{"dtrMatrix"} class.}
+    \item{\code{rcond}:}{inherited from the \code{"dtrMatrix"} class.}
+    \item{\code{factors}:}{inherited from the \code{"dtrMatrix"}
       class.  For this class the \code{factors} slot is always an
       empty list.}
   }
 }
 \section{Extends}{
-Class \code{"trMatrix"}, directly.
-Class \code{"geMatrix"}, by class \code{"trMatrix"}.
-Class \code{"Matrix"}, by class \code{"trMatrix"}.
+Class \code{"dtrMatrix"}, directly.
+Class \code{"dgeMatrix"}, by class \code{"dtrMatrix"}.
+Class \code{"Matrix"}, by class \code{"dtrMatrix"}.
 }
 \section{Methods}{
 No methods defined with class "Cholesky" in the signature.
 }
 \seealso{
-  \code{\link{trMatrix-class}}, \code{chol}, \code{poMatrix-class}
+  \code{\link{dtrMatrix-class}}, \code{chol}, \code{poMatrix-class}
 }
 \examples{
 print(pm <- crossprod(Matrix(rnorm(18), nrow = 6, ncol = 3)))

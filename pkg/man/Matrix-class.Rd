@@ -15,7 +15,7 @@
 \author{Douglas Bates \email{bates@stat.wisc.edu}}
 %\note{}
 \seealso{
-  \code{\link{geMatrix-class}}, \code{\link{cscMatrix-class}}
+  \code{\link{dgeMatrix-class}}, \code{\link{dgCMatrix-class}}
 }
 %\examples{}
 \keyword{classes}

@@ -10,8 +10,8 @@
   Objects can be created by calls of the form \code{new("LU", ...)}.
   More commonly the objects are created explicitly from calls of the form
   \code{lu(mm)} where \code{mm} is an object that inherits from the
-  \code{"geMatrix"} class or as a side-effect of other functions applied
-  to \code{"geMatrix"} objects.
+  \code{"dgeMatrix"} class or as a side-effect of other functions applied
+  to \code{"dgeMatrix"} objects.
 }
 \section{Slots}{
   \describe{
@@ -38,7 +38,7 @@
 % \author{}
 % \note{}
 \seealso{
-  \code{\link{geMatrix-class}}, \code{\link{lu}}, \code{\link{expand}}
+  \code{\link{dgeMatrix-class}}, \code{\link{lu}}, \code{\link{expand}}
 }
 \examples{
 mm = Matrix(rnorm(9), nrow = 3, ncol = 3)

@@ -1,16 +1,16 @@
-\name{tscMatrix-class}
+\name{dtCMatrix-class}
 \docType{class}
-\alias{tscMatrix-class}
-\alias{t,tscMatrix-method}
-\alias{coerce,tscMatrix,tripletMatrix-method}
-\alias{coerce,tscMatrix,geMatrix-method}
+\alias{dtCMatrix-class}
+\alias{t,dtCMatrix-method}
+\alias{coerce,dtCMatrix,dgTMatrix-method}
+\alias{coerce,dtCMatrix,dgeMatrix-method}
 \title{Triangular, compressed, sparse column matrices}
-\description{The \code{sscMatrix} class is a class of triangular, sparse
+\description{The \code{dsCMatrix} class is a class of triangular, sparse
   matrices in the compressed, column-oriented format.  In this
   implementation the non-zero elements in the columns are sorted into
   increasing row order.}
 \section{Objects from the Class}{
-  Objects can be created by calls of the form \code{new("tscMatrix", ...)}.
+  Objects can be created by calls of the form \code{new("dtCMatrix", ...)}.
 }
 \section{Slots}{
   \describe{
@@ -33,13 +33,13 @@
   }
 }
 \section{Extends}{
-  Class \code{"cscMatrix"}, directly.
+  Class \code{"dgCMatrix"}, directly.
 }
 \section{Methods}{
   \describe{
-    \item{coerce}{\code{signature(from = "tscMatrix", to = "tripletMatrix")}}
-    \item{coerce}{\code{signature(from = "tscMatrix", to = "geMatrix")}}
-    \item{t}{\code{signature(x = "tscMatrix")}: returns the transpose of
+    \item{coerce}{\code{signature(from = "dtCMatrix", to = "dgTMatrix")}}
+    \item{coerce}{\code{signature(from = "dtCMatrix", to = "dgeMatrix")}}
+    \item{t}{\code{signature(x = "dtCMatrix")}: returns the transpose of
       \code{x}}
   }
 }
@@ -47,8 +47,8 @@
 %\author{}
 %\note{}
 \seealso{
-  \code{\link{cscMatrix-class}}, \code{\link{tripletMatrix-class}},
-  \code{\link{geMatrix-class}}
+  \code{\link{dgCMatrix-class}}, \code{\link{dgTMatrix-class}},
+  \code{\link{dgeMatrix-class}}
 }
 %\examples{}
 \keyword{classes}

@@ -5,7 +5,7 @@
 \description{
   A model matrix used in an example by Koenker and Ng.  This is a sparse
   matrix with 1850 rows and 712 columns but only 8758 non-zero entries.
-  It is a \code{"cscMatrix"} object.
+  It is a \code{"dgCMatrix"} object.
 }
 \usage{data(mm)}
 %\details{}
