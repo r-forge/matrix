@@ -29,7 +29,7 @@ nlme_replaceSlot(SEXP obj, SEXP names, SEXP value)
 
 SEXP nlme_weight_matrix_list(SEXP MLin, SEXP wts, SEXP adjst, SEXP MLout)
 {
-    int i, n, nf;
+    int i, j, n, nf;
     SEXP lastM;
     
     if (!(isNewList(MLin) && isReal(wts) && isReal(adjst) && isNewList(MLout)))
@@ -44,7 +44,7 @@ SEXP nlme_weight_matrix_list(SEXP MLin, SEXP wts, SEXP adjst, SEXP MLout)
     for (i = 0; i < nf; i++) {
 	SEXP Min = VECTOR_ELT(MLin, i),
 	    Mout = VECTOR_ELT(MLout, i);
-	int *din, *dout, j, k, nc;
+	int *din, *dout, k, nc;
 
 	if (!(isMatrix(Min) && isReal(Min)))
 	    error("component %d of MLin is not a numeric matrix", i + 1);
