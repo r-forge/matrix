@@ -180,7 +180,8 @@ cscb_syrk(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE trans,
 
 		if (K < 0) error("cscb_syrk: C[%d,%d] not defined", ii, ii);
 		if (scalar) Cx[K] += alpha * Ax[k] * Ax[k];
-		else F77_CALL(dsyrk)((uplo == UPP)?"U":"L", "N", cdims, adims + 1,
+		else F77_CALL(dsyrk)((uplo == UPP) ? "U" : "L", "N",
+				     cdims, adims + 1,
 				     &alpha, Ax + k * asz, adims,
 				     &one, Cx + K * csz, cdims);
 		for (kk = k+1; kk < k2; kk++) {
@@ -189,9 +190,10 @@ cscb_syrk(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE trans,
 			check_csc_index(Cp, Ci, jj, ii, 0);
 
 		    if (scalar) Cx[K] += alpha * Ax[k] * Ax[kk];
-		    else F77_CALL(dgemm)("N", "T", cdims, cdims + 1, adims + 1,
-					 &alpha, Ax + ((uplo==UPP)?k:kk) * asz, adims,
-					 Ax + ((uplo==UPP)?kk:k) * asz, adims,
+		    else F77_CALL(dgemm)("N", "T", cdims, cdims + 1,
+					 adims + 1, &alpha,
+					 Ax+((uplo==UPP)?k:kk)*asz, adims,
+					 Ax+((uplo==UPP)?kk:k)*asz, adims,
 					 &one, Cx + K * csz, cdims);
 		}
 	    }
@@ -269,10 +271,11 @@ cscb_ldl(SEXP A, const int Parent[], SEXP L, SEXP D)
 	    p2 = Ap[k+1];
 	    for (p = Ap[k]; p < p2; p++) {
 		i = Ai[p];	/* get A[i,k] */
-		if (i <= k) {	/* [i,k] in upper triangle? Should always be true */
+		if (i <= k) {	/* [i,k] in upper triangle? Should be true */
 				/* copy A(i,k) into Y */ 
 		    Memcpy(Y + i * ncisqr, Ax + p * ncisqr, ncisqr); 
-		    /* follow path from i to root of etree, stop at flagged node */
+		    /* follow path from i to root of etree,
+		     * stop at flagged node */
 		    for (len = 0; Flag[i] != k; i = Parent[i]) {
 			Pattern[len++] = i; /* L[k,i] is nonzero */
 			Flag[i] = k; /* mark i as visited */
@@ -283,7 +286,8 @@ cscb_ldl(SEXP A, const int Parent[], SEXP L, SEXP D)
 		}
 	    }
 	    /* Pattern [top ... n-1] now contains nonzero pattern of L[,k] */
-	    /* compute numerical values in kth row of L (a sparse triangular solve) */
+	    /* compute numerical values in kth row of L
+	     * (a sparse triangular solve) */
 	    Memcpy(Dx + k * ncisqr, Y + k * ncisqr, ncisqr); /* get D[,,k] */
 	    AZERO(Y + k*ncisqr, ncisqr); /* clear Y[,,k] */
 	    for (; top < n; top++) {
@@ -296,7 +300,7 @@ cscb_ldl(SEXP A, const int Parent[], SEXP L, SEXP D)
 				    Lx + p*ncisqr, &nci, Yi, &nci,
 				    &one, Y + Li[p]*ncisqr, &nci);
 		}
-		/* FIXME: Check that this is the correct order and transposition */
+		/* FIXME: Is this the correct order and transposition? */
 		F77_CALL(dtrsm)("R", "U", "T", "N", &nci, &nci,
 				&one, Dx + i*ncisqr, &nci, Yi, &nci);
 		F77_CALL(dsyrk)("U", "N", &nci, &nci, &minus1, Yi, &nci,
