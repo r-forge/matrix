@@ -85,7 +85,7 @@ setClass("dpoMatrix", contains = "dsyMatrix",
          )
 
 # numeric, dense, packed, postive-definite, symmetric matrices
-setClass("dpoMatrix", contains = "dspMatrix",
+setClass("dppMatrix", contains = "dspMatrix",
          validity = function(object) .Call("dppMatrix_validate", object)
          )
 
@@ -104,9 +104,9 @@ setClass("dtTMatrix",
          )
 
 # numeric, sparse, triplet symmetric matrices
-setClass("dtTMatrix",
+setClass("dsTMatrix",
          representation(uplo = "character"),
-         contains = "dsTMatrix",
+         contains = "dgTMatrix",
          validity = function(object) .Call("dsTMatrix_validate", object)
          )
 
