@@ -42,5 +42,6 @@ exportMethods(
               "show",
               "summary",
               "update",
-              "vcov"
+              "vcov",
+              "with"
               )
