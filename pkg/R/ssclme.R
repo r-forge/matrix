@@ -6,9 +6,12 @@ setReplaceMethod("coef", signature(object = "ssclme", value = "numeric"),
 
 setAs("ssclme", "sscMatrix",
       function(from)
-      .Call("ssclme_asSscMatrix", from, PACKAGE = "Matrix"))
+      new("sscMatrix", i = from@i, p = from@p, Dim = from@Dim, x = from@x,
+          uplo = "U"))
 
 setAs("ssclme", "tscMatrix",
       function(from)
-      .Call("ssclme_asTscMatrix", from, PACKAGE = "Matrix"))
+      new("sscMatrix", i = from@Li, p = from@Lp, Dim = from@Dim, x = from@Lx,
+          uplo = "L"))
+
 
