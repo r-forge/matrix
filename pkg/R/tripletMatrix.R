@@ -1,17 +1,11 @@
 setAs("tripletMatrix", "cscMatrix",
-      function(from)
-      .Call("triplet_to_csc", from)
-      )
+      function(from) .Call("triplet_to_csc", from) )
 
 setAs("tripletMatrix", "geMatrix",
-      function(from)
-      .Call("triplet_to_geMatrix", from)
-      )
+      function(from) .Call("triplet_to_geMatrix", from) )
 
 setAs("tripletMatrix", "matrix",
-      function(from)
-      .Call("triplet_to_matrix", from)
-      )
+      function(from) .Call("triplet_to_matrix", from) )
 
 setMethod("image", "tripletMatrix",
           function(x,
@@ -34,7 +28,7 @@ setMethod("image", "tripletMatrix",
                 {
                     x <- as.numeric(x[subscripts])
                     y <- as.numeric(y[subscripts])
-                    
+
                     numcol <- length(at) - 1
                     numcol.r <- length(col.regions)
                     col.regions <-
@@ -46,16 +40,17 @@ setMethod("image", "tripletMatrix",
                     for (i in seq(along = col.regions))
                         zcol[!is.na(x) & !is.na(y) & !is.na(z) &
                              z>=at[i] & z<at[i+1]] <- i
-                    
+
                     zcol <- as.numeric(zcol[subscripts])
                     if (any(subscripts))
-                        grid.rect(x = x, y = y, width = 1, height = 1, 
+                        grid.rect(x = x, y = y, width = 1, height = 1,
                                   default.units = "native",
                                   gp = gpar(fill = col.regions[zcol],
                                   col = NULL))
                 }, ...)
       })
 
+## MM: probably rather use groupGeneric "Arith" here -- or for "geMatrix" !
 setMethod("+", signature(e1 = "tripletMatrix", e2 = "tripletMatrix"),
           function(e1, e2) {
               if (any(e1@Dim != e2@Dim))
@@ -75,7 +70,7 @@ setMethod("isSymmetric", signature(object = "tripletMatrix"),
               j <- object@j
               all(sort(paste(i, j, sep=':')) == sort(paste(j, i, sep=':')))
           })
-          
+
 setAs("tripletMatrix", "sscMatrix",
       function(from) {
           i <- from@i
