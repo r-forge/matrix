@@ -521,6 +521,7 @@ setMethod("lme1", signature(formula = "formula",
                 controlvals$EMverbose,
                 PACKAGE = "Matrix")
           LMEoptimize(obj) <- controlvals
+          obj@call <- match.call()
           #fitted = .Call("ssclme_fitted", obj, facs, mmats, TRUE, PACKAGE = "Matrix")
           #residuals = mmats$.Xy[,".response"] - fitted
           #if (as.logical(x)[1]) x = mmats else x = list()
