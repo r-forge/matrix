@@ -19,20 +19,17 @@ importFrom("Matrix",
            "pdFactor",
            "pdMatrix"
            )
-
-
 importClassesFrom("Matrix",
                   "corrmatrix",
-                  "lmer",
                   "pdfactor",
                   "pdmatrix",
                   "ssclme"
                   )
+
 importMethodsFrom("Matrix",
                   "crossprod",
                   "dim"
                   )
-
 export(
        "BIC",
        "GLMM",
@@ -60,26 +57,20 @@ export(
 exportClasses(
               "GLMM",
               "VarCorr",
-##              "groupedData",
               "lmList",
               "lme",
               "lmer",
               "summary.GLMM",
               "summary.lme",
+              "summary.lmer",
               "summary.ssclme"
               )
 
 exportMethods(
-#              "$",
-#              "$<-",
               "BIC",
               "GLMM",
-#              "[",
-#              "[<-",
-#              "[[",
               "anova",
               "coef",
-#              "coerce",
               "deviance",
               "fitted",
               "fixef",

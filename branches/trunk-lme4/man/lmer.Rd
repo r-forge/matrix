@@ -4,10 +4,8 @@
 \alias{lmer,formula-method}
 \title{Fit linear mixed-effects models}
 \description{
-  This generic function fits a linear mixed-effects model in the
-  formulation described in Laird and Ware (1982) but allowing for nested
-  random effects. The within-group errors are allowed to be correlated
-  and/or have unequal variances. 
+  This generic function fits a linear mixed-effects model with nested or
+  crossed grouping factors for the random effects.
 }
 \synopsis{
 lmer(formula, data, method = c("REML", "ML"),
@@ -33,7 +31,7 @@ lmer(formula, data, \dots)
   \code{nlme} package.
   
   Additional standard arguments to model-fitting functions can be passed
-  to \code{lme} or \code{lme1}.
+  to \code{lmer}.
   \describe{
     \item{subset}{an optional expression indicating the subset of the rows of
       \code{data} that should be used in the fit. This can be a logical
@@ -48,7 +46,7 @@ lmer(formula, data, \dots)
       \code{lme} to print an error message and terminate if there are any
       incomplete observations.}
     \item{control}{a list of control values for the estimation algorithm to
-      replace the default values returned by the function \code{lmeControl}.
+      replace the default values returned by the function \code{lmerControl}.
       Defaults to an empty list.}
     \item{model, x}{logicals.  If \code{TRUE} the corresponding
       components of the fit (the model frame, the model matrices)
@@ -56,12 +54,12 @@ lmer(formula, data, \dots)
   }
 }
 \value{
-  An \code{\link{lme-class}{lmer}} object.
+  An \code{\link[Matrix]{lme-class}{lmer}} object.
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{}
 %\note{}
-\seealso{\code{\link{lme-class}}, \code{\link[stats]{lm}}}
+\seealso{\code{\link[Matrix]{lmer-class}}, \code{\link[stats]{lm}}}
 \examples{
 (fm <- lmer(langPOST ~
            IQ.ver.cen + avg.IQ.ver.cen + (IQ.ver.cen | schoolNR),

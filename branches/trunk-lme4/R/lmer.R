@@ -1,7 +1,6 @@
 contr.SAS <- function(n, contrasts = TRUE)
 {
-    if (is.numeric(n) && length(n) == 1) contr.treatment(n, n, contrasts)
-    else contr.treatment(n, length(n), contrasts)
+    contr.treatment(n, if (is.numeric(n) && length(n) == 1) n else length(n), contrasts)
 }
 
 lmerControl <-                            # Control parameters for lmer
@@ -38,12 +37,12 @@ setMethod("lmer", signature(formula = "formula"),
                    model = TRUE, x = FALSE, y = FALSE, ...)
       {
                                         # match and check parameters
-          method <- match.arg(method)
+          REML <- match.arg(method) == "REML"
           controlvals <- do.call("lmerControl", control)
-          controlvals$REML <- method == "REML"
+          controlvals$REML <- REML
           if (length(formula) < 3) stop("formula must be a two-sided formula")
-                                        # create the model frame as frm
-          mf <- match.call()
+
+          mf <- match.call()           # create the model frame as frm
           m <- match(c("data", "subset", "weights", "na.action", "offset"),
                      names(mf), 0)
           mf <- mf[c(1, m)]
@@ -53,7 +52,7 @@ setMethod("lmer", signature(formula = "formula"),
           mf$formula <- frame.form
           mf$drop.unused.levels <- TRUE
           frm <- eval(mf, parent.frame())
-
+          
           ## grouping factors and model matrices for random effects
           bars <- findbars(formula[[3]])
           random <-
@@ -64,18 +63,18 @@ setMethod("lmer", signature(formula = "formula"),
                                       eval(substitute(as.factor(fac),
                                                       list(fac = x[[3]])), frm)))
           names(random) <- unlist(lapply(bars, function(x) deparse(x[[3]])))
-
+          
           ## order factor list by decreasing number of levels
-          ford <- rev(order(sapply(random, function(x) length(levels(x[[2]])))))
-          if (any(ford != seq(a = random))) { # re-order both facs and random
-              random <- random[ford]
+          nlev <- sapply(random, function(x) length(levels(x[[2]])))
+          if (any(diff(nlev) < 0)) {
+              random <- random[rev(order(nlev))]
           }
           mmats <- c(lapply(random, "[[", 1),
                      .fixed = list(cbind(model.matrix(nobars(formula), frm),
                      .response = model.response(frm))))
           obj <- .Call("lmer_create", lapply(random, "[[", 2), mmats, PACKAGE = "Matrix")
           obj@call <- match.call()
-          obj@REML <- method == "REML"
+          obj@REML <- REML
           .Call("lmer_initial", obj, PACKAGE="Matrix")
           .Call("lmer_ECMEsteps", obj, 
                 controlvals$niterEM,
@@ -83,9 +82,9 @@ setMethod("lmer", signature(formula = "formula"),
                 controlvals$EMverbose,
                 PACKAGE = "Matrix")
           LMEoptimize(obj) <- controlvals
-          #fitted = .Call("ssclme_fitted", obj, facs, mmats, TRUE, PACKAGE = "Matrix")
-          #residuals = mmats$.Xy[,".response"] - fitted
-          #if (as.logical(x)[1]) x = mmats else x = list()
+          #fitted <- .Call("ssclme_fitted", obj, facs, mmats, TRUE, PACKAGE = "Matrix")
+          #residuals <- mmats$.Xy[,".response"] - fitted
+          #if (as.logical(x)[1]) x <- mmats else x = list()
           #rm(mmats)
           obj
       })
@@ -121,12 +120,6 @@ setReplaceMethod("LMEoptimize", signature(x="lmer", value="list"),
                  return(x)
              })
 
-setMethod("deviance", signature(object = "lmer"),
-          function(object, REML = FALSE, ...) {
-              .Call("lmer_factor", object, PACKAGE = "Matrix")
-              object@deviance[ifelse(REML, 2, 1)]
-          })
-
 setMethod("ranef", signature(object = "lmer"),
           function(object, ...) {
               .Call("lmer_ranef", object, PACKAGE = "Matrix")
@@ -139,22 +132,6 @@ setMethod("fixef", signature(object = "lmer"),
               val[-length(val)]
           })
 
-setMethod("vcov", signature(object = "lmer"),
-          function(object, REML = TRUE, useScale = TRUE,...) {
-              ## force an "lmer_invert"
-              sc <- .Call("lmer_sigma", object, REML, PACKAGE = "Matrix")
-              rr <- object@RXX
-              nms <- object@cnames[[".fixed"]]
-              dimnames(rr) <- list(nms, nms)
-              nr <- nrow(rr)
-              rr <- rr[-nr, -nr, drop = FALSE]
-              rr <- rr %*% t(rr)
-              if (useScale) {
-                  rr = sc^2 * rr
-              }
-              rr
-          })
-
 setMethod("VarCorr", signature(x = "lmer"),
           function(x, REML = TRUE, useScale = TRUE, ...) {
               val = .Call("lmer_variances", x, PACKAGE = "Matrix")
@@ -163,61 +140,102 @@ setMethod("VarCorr", signature(x = "lmer"),
                   val[[i]] = as(as(val[[i]], "pdmatrix"), "corrmatrix")
               }
               new("VarCorr",
-                  scale = .Call("lmer_sigma", x, REML),
+                  scale = .Call("lmer_sigma", x, REML, PACKAGE = "Matrix"),
                   reSumry = val,
                   useScale = useScale)
           })
 
 setMethod("gradient", signature(x = "lmer"),
           function(x, REML, unconst, ...)
-          .Call("lmer_gradient", x, REML, unconst))
+          .Call("lmer_gradient", x, REML, unconst, PACKAGE = "Matrix"))
 
-setMethod("summary", "lmer",
-          function(object, REML = TRUE, useScale = TRUE, ...) {
-              fcoef <- fixef(object)
-              corF <- as(as(vcov(object, REML, useScale), "pdmatrix"),
-                         "corrmatrix")
-              DF <- getFixDF(object)
-              coefs <- cbind(fcoef, corF@stdDev, DF)
-              nc <- object@nc
-              dimnames(coefs) <-
-                  list(names(fcoef), c("Estimate", "Std. Error", "DF"))
-              new("summary.lmer",
-                  coefficients = as.matrix(coefs),
-                  scale = .Call("lmer_sigma", object, REML),
-                  denomDF = as.integer(DF),
-                  REML = REML,
-                  ngrps = unlist(lapply(object@flist,
-                                        function(x) length(levels(x)))),
-                  nobs = nc[length(nc)],
-                  corFixed = corF,
-                  VarCorr = VarCorr(object, REML, useScale),
-                  useScale = useScale,
-                  showCorrelation = FALSE)
-          })
+setMethod("summary", signature(object = "lmer"),
+          function(object, ...)
+          new("summary.lmer", object, useScale = TRUE, showCorrelation = TRUE))
 
-setMethod("show", "lmer",
+setMethod("show", signature(object = "lmer"),
+          function(object)
+          show(new("summary.lmer", object, useScale = TRUE, showCorrelation = FALSE))
+          )
+
+setMethod("show", "summary.lmer",
           function(object) {
               fcoef <- fixef(object)
-              corF <- as(as(vcov(object, REML = TRUE, useScale = TRUE), "pdmatrix"),
+              useScale <- object@useScale
+              corF <- as(as(vcov(object, useScale = useScale), "pdmatrix"),
                          "corrmatrix")
               DF <- getFixDF(object)
               coefs <- cbind(fcoef, corF@stdDev, DF)
               nc <- object@nc
               dimnames(coefs) <-
                   list(names(fcoef), c("Estimate", "Std. Error", "DF"))
-              new("summary.ssclme",
-                  coefficients = as.matrix(coefs),
-                  scale = .Call("lmer_sigma", object, REML = TRUE),
-                  denomDF = as.integer(DF),
-                  REML = TRUE,
-                  ngrps = unlist(lapply(object@flist,
-                                        function(x) length(levels(x)))),
-                  nobs = nc[length(nc)],
-                  corFixed = corF,
-                  VarCorr = VarCorr(object, REML = TRUE, useScale = TRUE),
-                  useScale = TRUE,
-                  showCorrelation = FALSE)
+                            digits <- max(3, getOption("digits") - 2)
+              REML <- length(object@REML) > 0 && object@REML[1]
+              llik <- logLik(object)
+              dev <- object@deviance
+              
+              rdig <- 5
+              cat("Linear mixed-effects model fit by ")
+              cat(ifelse(object@REML, "REML\n", "maximum likelihood\n") )
+              if (!is.null(object@call$formula)) {
+                  cat("Formula:", deparse(object@call$formula),"\n")
+              }
+              if (!is.null(object@call$data)) {
+                  cat("   Data:", deparse(object@call$data), "\n")
+              }
+              if (!is.null(object@call$subset)) {
+                  cat(" Subset:",
+                      deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
+              }
+              print(data.frame(AIC = AIC(llik), BIC = BIC(llik),
+                               logLik = c(llik),
+                               MLdeviance = dev["ML"],
+                               REMLdeviance = dev["REML"],
+                               row.names = ""))
+              cat("Random effects:\n")
+              show(VarCorr(object))
+              ngrps <- lapply(object@flist, function(x) length(levels(x)))
+              cat(sprintf("# of obs: %d, groups: ", object@nc[length(object@nc)]))
+              cat(paste(paste(names(ngrps), ngrps, sep = ", "), collapse = "; "))
+              cat("\n")
+              if (!useScale)
+                  cat("\nEstimated scale (compare to 1) ",
+                      .Call("lmer_sigma", object, object@REML, PACKAGE = "Matrix"),
+                      "\n")
+              if (nrow(coefs) > 0) {
+                  if (useScale) {
+                      stat <- coefs[,1]/coefs[,2]
+                      pval <- 2*pt(abs(stat), coefs[,3], lower = FALSE)
+                      nms <- colnames(coefs)
+                      coefs <- cbind(coefs, stat, pval)
+                      colnames(coefs) <- c(nms, "t value", "Pr(>|t|)")
+                  } else {
+                      coefs <- coefs[, 1:2, drop = FALSE]
+                      stat <- coefs[,1]/coefs[,2]
+                      pval <- 2*pnorm(abs(stat), lower = FALSE)
+                      nms <- colnames(coefs)
+                      coefs <- cbind(coefs, stat, pval)
+                      colnames(coefs) <- c(nms, "z value", "Pr(>|z|)")
+                  }
+                  cat("\nFixed effects:\n")
+                  printCoefmat(coefs, tst.ind = 4, zap.ind = 3)
+                  if (length(object@showCorrelation) > 0 && object@showCorrelation[1]) {
+                      rn <- rownames(coefs)
+                      dimnames(corF) <- list(
+                                               abbreviate(rn, minlen=11),
+                                               abbreviate(rn, minlen=6))
+                      if (!is.null(corF)) {
+                          p <- NCOL(corF)
+                          if (p > 1) {
+                              cat("\nCorrelation of Fixed Effects:\n")
+                              corF <- format(round(corF, 3), nsmall = 3)
+                              corF[!lower.tri(corF)] <- ""
+                              print(corF[-1, -p, drop=FALSE], quote = FALSE)
+                          }
+                      }
+                  }
+              }
+              invisible(object)
           })
 
 ## calculates degrees of freedom for fixed effects Wald tests
@@ -234,15 +252,6 @@ setMethod("getFixDF", signature(object="lmer"),
           rep(n-p, p)
       })
 
-setMethod("fitted", signature(object="lmer"),
-          function(object, ...)
-      {
-          object@fitted
-      })
-
-setMethod("residuals", signature(object="lmer"),
-          function(object, ...) object@residuals )
-
 setMethod("logLik", signature(object="lmer"),
           function(object, REML = object@REML, ...) {
               val <- -deviance(object, REML = REML)/2
@@ -253,48 +262,6 @@ setMethod("logLik", signature(object="lmer"),
               class(val) <- "logLik"
               val
           })
-
-# setMethod("summary", signature(object="lme"),
-#           function(object, ...) {
-#               llik <- logLik(object)
-#               resd <- residuals(object, type="pearson")
-#               if (length(resd) > 5) {
-#                   resd <- quantile(resd)
-#                   names(resd) <- c("Min","Q1","Med","Q3","Max")
-#               }
-#               new("summary.lme",
-#                   call = object@call,
-#                   logLik = llik,
-#                   re = summary(object@rep, REML = object@REML,
-#                                useScale = TRUE),
-#                   residuals = resd)
-#           })
-
-# setMethod("show", signature(object = "summary.lme"),
-#           function(object)
-#       {
-#           rdig <- 5
-#           cat("Linear mixed-effects model fit by ")
-#           cat(ifelse(object@re@REML, "REML\n", "maximum likelihood\n") )
-#           if (!is.null(object@call$formula)) {
-#               cat("Fixed:", deparse(object@call$formula),"\n")
-#           }
-#           if (!is.null(object@call$data)) {
-#               cat(" Data:", deparse(object@call$data), "\n")
-#           }
-#           if (!is.null(object@call$subset)) {
-#               cat(" Subset:",
-#                   deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
-#           }
-#           llik <- object@logLik
-#           print(data.frame(AIC = AIC(llik), BIC = BIC(llik),
-#                            logLik = c(object@logLik), row.names = ""))
-#           cat("\n")
-#           object@re@useScale <- TRUE
-#           object@re@showCorrelation <- TRUE
-#           show(object@re)
-#           invisible(object)
-#       })
 
 setMethod("anova", signature(object = "lmer"),
           function(object, ...)
@@ -344,7 +311,7 @@ setMethod("anova", signature(object = "lmer"),
           foo <- object
           foo@status["factored"] <- FALSE
           .Call("lmer_factor", foo, PACKAGE="Matrix")
-          dfr <- lme4:::getFixDF(foo)
+          dfr <- getFixDF(foo)
           rcol <- ncol(foo@RXX)
           ss <- foo@RXX[ , rcol]^2
           ssr <- ss[[rcol]]
@@ -367,12 +334,6 @@ setMethod("anova", signature(object = "lmer"),
 
           }
       })
-
-setMethod("formula", "lmer", function(x, ...) x@call$formula)
-
-setMethod("plot", signature(x = "lmer"),
-          function(x, y, ...)
-          cat("plot method for lmer not yet implemented\n"))
 
 setMethod("update", signature(object = "lmer"),
           function(object, formula., ..., evaluate = TRUE)
@@ -412,10 +373,54 @@ setMethod("confint", signature(object = "lmer"),
           ci <- array(NA, dim = c(length(parm), 2),
                       dimnames = list(pnames[parm], pct))
           ses <- sqrt(diag(vcov(object)))[parm]
-          ci[] <- cf[parm] + ses * t(outer(a, getFixDF(object@rep)[parm], qt))
+          ci[] <- cf[parm] + ses * t(outer(a, getFixDF(object)[parm], qt))
           ci
       })
 
+setReplaceMethod("coef", signature(object = "lmer", value = "numeric"),
+                 function(object, unconst = FALSE, ..., value)
+                 .Call("lmer_coefGets", object, as.double(value),
+                       unconst, PACKAGE = "Matrix"))
 
+setMethod("coef", signature(object = "lmer"),
+          function(object, unconst = FALSE, ...) {
+              .Call("lmer_coef", object, unconst, PACKAGE = "Matrix")
+          })
 
+setMethod("deviance", "lmer",
+          function(object, REML = NULL, ...) {
+              .Call("lmer_factor", object, PACKAGE = "Matrix")
+              if (is.null(REML))
+                  REML <- if (length(oR <- object@REML)) oR else FALSE
+              object@deviance[[ifelse(REML, "REML", "ML")]]
+          })
+
+setMethod("chol", signature(x = "lmer"),
+          function(x, pivot = FALSE, LINPACK = pivot) {
+              x@status["factored"] <- FALSE # force a decomposition
+              .Call("lmer_factor", x, PACKAGE = "Matrix")
+          })
+
+setMethod("solve", signature(a = "lmer", b = "missing"),
+          function(a, b, ...)
+          .Call("lmer_invert", a)
+          )
+
+setMethod("formula", "lmer", function(x, ...) x@call$formula)
+
+setMethod("vcov", signature(object = "lmer"),
+          function(object, REML = object@REML, useScale = TRUE,...) {
+              ## force an "lmer_invert"
+              sc <- .Call("lmer_sigma", object, REML, PACKAGE = "Matrix")
+              rr <- object@RXX
+              nms <- object@cnames[[".fixed"]]
+              dimnames(rr) <- list(nms, nms)
+              nr <- nrow(rr)
+              rr <- rr[-nr, -nr, drop = FALSE]
+              rr <- rr %*% t(rr)
+              if (useScale) {
+                  rr = sc^2 * rr
+              }
+              rr
+          })
 

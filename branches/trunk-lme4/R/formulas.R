@@ -67,7 +67,7 @@ setMethod("getGroups", signature(object="data.frame", form="formula"),
 
 findbars <- function(term)
 {
-    if (is.name(term)) return(NULL)
+    if (is.name(term) || is.numeric(term)) return(NULL)
     if (term[[1]] == as.name("(")) return(findbars(term[[2]]))
     if (!is.call(term)) stop("term must be of class call")
     if (term[[1]] == as.name('|')) return(term)
@@ -79,6 +79,8 @@ findbars <- function(term)
 
 nobars <- function(term)
 {
+    # FIXME: is the is.name in the condition redundant?
+    #   A name won't satisfy the first condition.
     if (!('|' %in% all.names(term)) || is.name(term)) return(term)
     if (is.call(term) && term[[1]] == as.name('|')) return(NULL)
     if (length(term) == 2) {
