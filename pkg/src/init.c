@@ -103,7 +103,7 @@ static R_CallMethodDef CallEntries[] = {
     {"ssclme_gradient", (DL_FUNC) &ssclme_gradient, 3},
     {"ssclme_Hessian", (DL_FUNC) &ssclme_Hessian, 3},
     {"ssclme_collapse", (DL_FUNC) &ssclme_collapse, 1},
-    {"ssclme_to_lme", (DL_FUNC) &ssclme_to_lme, 8},
+    {"ssclme_to_lme", (DL_FUNC) &ssclme_to_lme, 11},
     {"syMatrix_validate", (DL_FUNC) &syMatrix_validate, 1},
     {"syMatrix_norm", (DL_FUNC) &syMatrix_norm, 2},
     {"syMatrix_rcond", (DL_FUNC) &syMatrix_rcond, 2},
