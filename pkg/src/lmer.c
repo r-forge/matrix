@@ -928,7 +928,7 @@ SEXP lmer_ranef(SEXP x)
 static
 SEXP lmer_firstDer(SEXP x, SEXP val)
 {
-    SEXP D = PROTECT(duplicate(GET_SLOT(x, Matrix_DSym))),
+    SEXP D = GET_SLOT(x, Matrix_DSym),
 	LinvP = GET_SLOT(x, Matrix_LinvSym),
 	ZZOP = GET_SLOT(x, Matrix_ZZpOSym),
 	Omega = GET_SLOT(x, Matrix_OmegaSym),
@@ -940,7 +940,7 @@ SEXP lmer_firstDer(SEXP x, SEXP val)
 	*b = REAL(RZXsl) + dims[0] * p;
 
     lmer_invert(x);
-    for (i = nf - 1; i >= 0; i++) {
+    for (i = nf - 1; i >= 0; i--) {
 	SEXP DiP = VECTOR_ELT(D, i);
 	int *ddims = INTEGER(getAttrib(DiP, R_DimSymbol)), j;
 	int nci = ddims[0], nlev = ddims[2];
@@ -991,7 +991,6 @@ SEXP lmer_firstDer(SEXP x, SEXP val)
 	}
 	Free(tmp);
     }
-    UNPROTECT(1);
     return val;
 }
 
