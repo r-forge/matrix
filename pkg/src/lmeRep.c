@@ -1,8 +1,8 @@
 #include "lmeRep.h"
 
 /** 
- * Calculate the length of the parameter vector, which is called coef
- * for historical reasons.
+ * Calculate the length of the parameter vector (historically called "coef"
+ * even though these are not coefficients).
  * 
  * @param nf number of factors
  * @param nc number of columns in the model matrices for each factor
@@ -624,8 +624,8 @@ lmeRep_Lt_sm(int nf, SEXP LP, SEXP Linv, SEXP mm)
 }
 
 /** 
- * Copy the diagonal blocks from ZZx to D and inflate with Omega.  Update
- * dcmp[1] in the process.
+ * Copy the diagonal blocks from ZZx to D, inflate by Omega and factor.
+ * Update dcmp[1] in the process.
  * 
  * @param nf number of grouping factors
  * @param ZZxP pointer to the ZZx list
@@ -650,7 +650,7 @@ lmeRep_inflate(int nf, const int nc[], SEXP ZZxP, SEXP OmegaP, SEXP levelsP,
 	if (nci == 1) {
 	    dcmp[1] += nlev * log(Omega[0]);
 	    for (j = 0; j < nlev; j++) { /* inflate and factor */
-		D[j] = sqrt(ZZx[j] + Omega[0]);
+		D[j] = ZZx[j] + Omega[0];
 	    }
 	} else {
 	    double *tmp = Memcpy(Calloc(ncisqr, double), Omega, ncisqr);
@@ -671,12 +671,10 @@ lmeRep_inflate(int nf, const int nc[], SEXP ZZxP, SEXP OmegaP, SEXP levelsP,
 		    *ZZxj = ZZx + j * ncisqr;
 		
 		for (jj = 0; jj < nci; jj++) { /* Copy ZZx to Dj and inflate */
-		    for (ii = 0; ii <= jj; ii++) {
-			Dj[ii + jj * nci]
-			    = ZZxj[ii + jj * nci] + Omega[ii + jj * nci];
+		    for (ii = 0; ii < nci; ii++) { /* upper triangle only */
+			Dj[ii + jj * nci] = (ii > jj) ? 0. :
+			    ZZxj[ii + jj * nci] + Omega[ii + jj * nci];
 		    }
-		    for (ii = jj + 1; ii < nci; ii++)
-			Dj[ii + jj * nci] = 0.;
 		}
 	    }
 	}
@@ -839,8 +837,10 @@ SEXP lmeRep_factor(SEXP x)
 	
 	    if (i) update_D_L(i, nc, LP, DP);
 	    if (nci == 1) {
-		for (j = 0; j < nlev; j++)
+		for (j = 0; j < nlev; j++) {
+		    D[j] = sqrt(D[j]);
 		    dcmp[0] += 2. * log(D[j]);
+		}
 	    } else {
 		for (j = 0; j < nlev; j++) {
 		    double *Dj = D + j * ncisqr;
@@ -878,7 +878,7 @@ SEXP lmeRep_factor(SEXP x)
 	F77_CALL(dpotrf)("U", dims + 1, RXX, dims + 1, &j);
 	if (j) {
 	    warning("Leading minor of size %d of downdated X'X is indefinite",
-		    j + 1);
+		    j);
 	    dcmp[2] = dcmp[3] = deviance[0] = deviance[1] = NA_REAL;
 	} else {
 	    for (j = 0; j < (dims[1] - 1); j++) /* 2 logDet(RXX) */
