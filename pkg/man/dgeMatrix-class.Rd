@@ -24,8 +24,9 @@
 \title{General S4 Matrix class}
 \description{A general, numeric matrix in the S4 Matrix representation}
 \section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("dgeMatrix", ...)}
-or, more commonly, by coercion from the \code{matrix} class.
+  Objects can be created by calls of the form \code{new("dgeMatrix", ...)}
+  or, more commonly, by coercion from the \code{Matrix} class (see
+  \link{Matrix-class}).
 }
 \section{Slots}{
   \describe{
@@ -47,7 +48,6 @@ or, more commonly, by coercion from the \code{matrix} class.
     \item{Schur}{\code{signature(x = "dgeMatrix", vectors = "missing")}: ... }
     \item{coerce}{\code{signature(from = "dgeMatrix", to = "matrix")}: ... }
     \item{coerce}{\code{signature(from = "matrix", to = "dgeMatrix")}: ... }
-    \item{coerce}{\code{signature(from = "matrix", to = "dgeMatrix")}}
     \item{crossprod}{\code{signature(x = "dgeMatrix", y = "dgeMatrix")}: ... }
     \item{crossprod}{\code{signature(x = "dgeMatrix", y = "matrix")}: ... }
     \item{crossprod}{\code{signature(x = "dgeMatrix", y = "missing")}: ... }
