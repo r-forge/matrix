@@ -207,38 +207,6 @@ setClass("LU", representation(x = "numeric",
                               perm = "integer"),
          validity = function(object) .Call("LU_validate", object))
 
-setClass("sscCrosstab", representation =
-         representation(Gp = "integer", perm = "integer"),
-         contains = "dsCMatrix",
-         validity = function(object) .Call("sscCrosstab_validate", object))
-
-setClass("ssclme", representation =
-         representation(
-                        D = "numeric",  # Diagonal of D in LDL'
-                        DIsqrt = "numeric", # inverse square root of D
-                        Dim = "integer", # Dimensions of Z'Z and LDL'
-                        Gp = "integer", # Pointers to groups of columns of Z
-                        Li = "integer", # Row indices of L
-                        Lp = "integer", # Column pointers of L
-                        Lx = "numeric", # Non-zero, off-diagonals of L
-                        Omega = "list", # List of symmetric matrices
-                        Parent = "integer", # Elimination tree of L
-                        RXX = "matrix", # Augmented RXX component or inverse
-                        RZX = "matrix", # Augmented RZX component or inverse
-                        XtX = "matrix", # Original X'X matrix
-                        ZtX = "matrix", # Original Z'X matrix
-                        bVar = "list",  # Diagonal blocks on (Z'Z+W)^{-1}
-                        deviance = "numeric", # Current deviance (ML and REML)
-                        devComp = "numeric", # Components of deviance
-                        i = "integer",  # Row indices of Z'Z
-                        nc = "integer", # number of columns in model matrices
-                        p = "integer",  # Pointers to columns of Z'Z
-                        status = "logical", # record if factored, if inverted
-                        x = "numeric"   # Non-zeroes in upper triangle of Z'Z
-                        ),
-         validity = function(object)
-         .Call("ssclme_validate", object))
-
 ## Deprecated:
                        # positive-definite symmetric matrices as matrices
 setClass("pdmatrix", contains="matrix")
