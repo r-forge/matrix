@@ -20,7 +20,7 @@
 **************************************************************************/
 void MocInit2WayPartition(CtrlType *ctrl, GraphType *graph, float *tpwgts, float ubfactor) 
 {
-  int i, dbglvl;
+  int/*  i, */ dbglvl;
 
   dbglvl = ctrl->dbglvl;
   IFSET(ctrl->dbglvl, DBG_REFINE, ctrl->dbglvl -= DBG_REFINE);
