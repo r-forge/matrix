@@ -26,6 +26,28 @@ SEXP cscBlocked_validate(SEXP x)
     return ScalarLogical(1);
 }
 
+static int*
+expand_column_pointers(int ncol, const int mp[], int mj[])
+{
+    int j;
+    for (j = 0; j < ncol; j++) {
+	int j2 = mp[j+1], jj;
+	for (jj = mp[j]; jj < j2; jj++) mj[jj] = j;
+    }
+    return mj;
+}
+
+static R_INLINE
+int Tind(const int rowind[], const int colptr[], int i, int j)
+{
+    int k, k2 = colptr[j + 1];
+    for (k = colptr[j]; k < k2; k++)
+	if (rowind[k] == i) return k;
+    error("row %d and column %d not defined in rowind and colptr",
+	  i, j);
+    return -1;			/* -Wall */
+}
+
 /** 
  * Perform one of the matrix operations 
  *  C := alpha*op(A)*B + beta*C
@@ -289,6 +311,7 @@ void cscb_syrk(char uplo, char trans, double alpha, SEXP A, double beta, SEXP C)
 	j, k;
     double *Ax = REAL(AxP), *Cx = REAL(CxP), one = 1.;
     int scalar = (adims[0] == 1 && adims[1] == 1),
+	anc = length(ApP) - 1,
 	asz = adims[0] * adims[1],
 	csz = cdims[0] * cdims[1];
 
@@ -313,7 +336,7 @@ void cscb_syrk(char uplo, char trans, double alpha, SEXP A, double beta, SEXP C)
 	if (beta != 1.)
 	    for (j = 0; j < csz * cdims[2]; j++) Cx[j] *= beta;
 				/* individual products */
-	for (j = 0; j < adims[2]; j++) {
+	for (j = 0; j < anc; j++) {
 	    int k, kk, k2 = Ap[j+1];
 	    for (k = Ap[j]; k < k2; k++) {
 		int ii = Ai[k], K = Ind(ii, ii, Cp, Ci);
@@ -357,27 +380,98 @@ cscb_ldl(SEXP A, const int Parent[], SEXP L, SEXP D)
     SEXP ApP = GET_SLOT(A, Matrix_pSym),
 	AxP = GET_SLOT(A, Matrix_xSym);
     int *adims = INTEGER(getAttrib(AxP, R_DimSymbol)),
-	diag, j, n = length(ApP) - 1;
+	diag, info, j, k, n = length(ApP) - 1;
     int *Ai = INTEGER(GET_SLOT(A, Matrix_iSym)),
 	*Ap = INTEGER(ApP),
 	*Li = INTEGER(GET_SLOT(L, Matrix_iSym)),
-	*Lp = INTEGER(GET_SLOT(L, Matrix_pSym));
+	*Lp = INTEGER(GET_SLOT(L, Matrix_pSym)), nci = adims[0];
     double *Lx = REAL(GET_SLOT(L, Matrix_xSym)),
-	*Ax = REAL(AxP), *Dx = REAL(D);
+	*Ax = REAL(AxP), *Dx = REAL(D), minus1 = -1., one = 1.;
     
+    if (adims[1] != nci || nci < 1)
+	error("cscb_ldl: dim(A) is [%d, %d, %d]", adims[0], adims[1], adims[2]);
     for (j = 0, diag = 1; j < n; j++) { /* check for trivial structure */
 	if (Parent[j] >= 0) {diag = 0; break;}
     }
     if (diag) {
-	Memcpy(REAL(D), Ax, adims[0] * adims[1] * adims[2]);
+	int ncisqr = nci * nci;
+	Memcpy(Dx, Ax, ncisqr * n);
+	for (j = 0; j < n; j++) { /* form D_i^{1/2} */
+	    F77_CALL(dpotrf)("U", &nci, Dx + j * ncisqr, &nci, &k);
+	    if (k) error("D[ , , %d], level %d, is not positive definite",
+			 j + 1);
+	}
 	return n;
     }
-    if (adims[0] == 1 && adims[1] == 1) {
-	return R_ldl_numeric(n, Ap, Ai, Ax, Lp, Parent, Li, Lx, Dx,
-			     (int *) NULL, (int *) NULL);
-    } else {
+    if (nci == 1) {
+	k = R_ldl_numeric(n, Ap, Ai, Ax, Lp, Parent, Li, Lx, Dx,
+			  (int *) NULL, (int *) NULL);
+	if (k < n) error("cscb_ldl: error code %k from R_ldl_numeric", k);
+	for (j = 0; j < n; j++) Dx[j] = sqrt(Dx[j]);
+	return n;
+    } else {		   /* Copy of ldl_numeric from the LDL package
+			    * modified for blocked sparse matrices */ 
+	int i, k, p, p2, len, nci = adims[0], ncisqr = adims[0]*adims[0], top;
+	int *Lnz = Calloc(n, int),
+	    *Pattern = Calloc(n, int),
+	    *Flag = Calloc(n, int);
+	double *Y = Calloc(n * ncisqr, double), *Yi = Calloc(ncisqr, double);
 
-	error("code for nontrivial blocked L not yet written");
+	for (k = 0; k < n; k++) {
+	    /* compute nonzero Pattern of kth row of L, in topological order */
+	    AZERO(Y + k*ncisqr, ncisqr); /* Y[,,0:k] is now all zero */
+	    top = n;		/* stack for pattern is empty */
+	    Flag[k] = k;	/* mark node k as visited */
+	    Lnz[k] = 0;		/* count of nonzeros in column k of L */
+	    p2 = Ap[k+1];
+	    for (p = Ap[k]; p < p2; p++) {
+		i = Ai[p];	/* get A[i,k] */
+		if (i <= k) {	/* [i,k] in upper triangle? Should always be true */
+				/* copy A(i,k) into Y */ 
+		    Memcpy(Y + i * ncisqr, Ax + p * ncisqr, ncisqr); 
+		    /* follow path from i to root of etree, stop at flagged node */
+		    for (len = 0; Flag[i] != k; i = Parent[i]) {
+			Pattern[len++] = i; /* L[k,i] is nonzero */
+			Flag[i] = k; /* mark i as visited */
+		    }
+		    while (len > 0) { /* push path on top of stack */
+			Pattern[--top] = Pattern[--len];
+		    }
+		}
+	    }
+	    /* Pattern [top ... n-1] now contains nonzero pattern of L[,k] */
+	    /* compute numerical values in kth row of L (a sparse triangular solve) */
+	    Memcpy(Dx + k * ncisqr, Y + k * ncisqr, ncisqr); /* get D[,,k] */
+	    AZERO(Y + k*ncisqr, ncisqr); /* clear Y[,,k] */
+	    for (; top < n; top++) {
+		i = Pattern[top];
+		Memcpy(Yi, Y + i*ncisqr, ncisqr); /* copy Y[,,i] */
+		AZERO(Y + i*ncisqr, ncisqr); /* clear Y[,,i] */
+		p2 = Lp[i] + Lnz[i];
+		for (p = Lp[i]; p < p2; p++) {
+		    F77_CALL(dgemm)("N", "N", &nci, &nci, &nci, &minus1,
+				    Lx + p*ncisqr, &nci, Yi, &nci,
+				    &one, Y + Li[p]*ncisqr, &nci);
+		}
+		/* FIXME: Check that this is the correct order and transposition */
+		F77_CALL(dtrsm)("L", "U", "N", "N", &nci, &nci,
+				&one, Dx + i*ncisqr, &nci, Yi, &nci);
+		F77_CALL(dsyrk)("U", "N", &nci, &nci, &minus1, Yi, &nci,
+				&one, Dx + k*ncisqr, &nci);
+		F77_CALL(dtrsm)("L", "U", "T", "N", &nci, &nci,
+				&one, Dx + i*ncisqr, &nci, Yi, &nci);
+		Li[p] = k;	/* store L[k,i] in column form of L */
+		Memcpy(Lx + p * ncisqr, Yi, ncisqr);
+		Lnz[i]++;	/* increment count of nonzeros in col i */
+	    }
+	    F77_CALL(dpotrf)("U", &nci, Dx + k*ncisqr, &nci, &info);
+	    if (info) {
+		Free(Y); Free(Yi); Free(Pattern); Free(Flag); Free(Lnz); 
+		return k;	    /* failure, D[,,k] is not positive definite */
+	    }
+	}
+	Free(Y); Free(Yi); Free(Pattern); Free(Flag); Free(Lnz);
+	return n;	/* success, diagonal of D is all nonzero */
     }
     return -1;			/* keep -Wall happy */
 }
@@ -426,6 +520,65 @@ void cscb_trmm(char side, char uplo, char transa, char diag,
 }
 
 /** 
+ * Solve a triangular system of the form op(A)*X = alpha*B where A
+ * is a cscBlocked triangular matrix and B is a dense matrix.
+ * 
+ * @param uplo 'U' or 'L' for upper or lower
+ * @param trans 'T' or 'N' for transpose or no transpose
+ * @param diag 'U' or 'N' for unit diagonal or non-unit
+ * @param A pointer to a triangular cscBlocked object
+ * @param B pointer to the contents of the matrix B
+ * @param m number of rows in B
+ * @param n number of columns in B
+ * @param ldb leading dimension of B as declared in the calling function
+ */
+void cscb_trsm(char uplo, char transa, char diag,
+	       double alpha, SEXP A, double B[], int m, int n, int ldb)
+{
+    int iup = (uplo == 'U' || uplo == 'u'),
+	itr = (transa == 'T' || transa == 't'),
+	iunit = (diag == 'U' || diag == 'u');
+    SEXP ApP = GET_SLOT(A, Matrix_pSym),
+	AxP = GET_SLOT(A, Matrix_xSym);
+    int *Ai = INTEGER(GET_SLOT(A, Matrix_iSym)),
+	*Ap = INTEGER(ApP),
+	*xdims = INTEGER(getAttrib(AxP, R_DimSymbol)),
+	i, j, nb = length(ApP) - 1;
+    double *Ax = REAL(GET_SLOT(A, Matrix_xSym));
+    
+    if (xdims[0] != xdims[1])
+	error("Argument A to cscb_trsm is not triangular");
+    if (ldb < m || ldb <= 0 || n <= 0)
+	error("cscb_trsm: inconsistent dims m = %d, n = %d, ldb = %d",
+	      m, n, ldb);
+    if (m != (nb * xdims[0]))
+	error("cscb_trsm: inconsistent dims m = %d, A[%d,%d,]x%d",
+	      m, xdims[0], xdims[1], xdims[2]);
+    if (alpha != 1.0) {
+	for (j = 0; j < n; j++) { /* scale by alpha */
+	    for (i = 0; i < m; i++)
+		B[i + j * ldb] *= alpha;
+	}
+    }
+    if (iunit) {
+	if (xdims[2] < 1) return; /* A is the identity */
+	if (xdims[0] == 1) {
+	    if (iup) error("Code for upper triangle not yet written");
+	    if (itr) {
+		for (j = 0; j < n; j++)
+		    R_ldl_ltsolve(m, B + j * ldb, Ap, Ai, Ax);
+	    } else {
+		for (j = 0; j < n; j++)
+		    R_ldl_lsolve(m, B + j * ldb, Ap, Ai, Ax);
+	    }
+	    return;
+	}
+	error("Code for non-scalar cscBlocked objects not yet written");
+    }
+    error("Code for non-unit cases of cscb_trsm not yet written");
+}
+
+/** 
  * Perform one of the operations B := alpha*op(A)*B or
  * B := alpha*B*op(A) where A and B are both cscBlocked.
  * 
@@ -467,6 +620,102 @@ void cscb_trcbm(char side, char uplo, char transa, char diag,
     }
     if (iunit && axdims[2] < 1) return; /* A is the identity */
     error("Code for non-trivial cscb_trcbm not yet written");
+}
+
+/** 
+ * Expand a column of a compressed, sparse, column-oriented matrix.
+ * 
+ * @param dest array to hold the result
+ * @param m number of rows in the matrix
+ * @param j index (0-based) of column to expand
+ * @param Ap array of column pointers
+ * @param Ai array of row indices
+ * @param Ax array of non-zero values
+ * 
+ * @return dest
+ */
+static
+double *expand_column(double *dest, int m, int j,
+		      const int Ap[], const int Ai[], const double Ax[])
+{
+    int k, k2 = Ap[j + 1];
+
+    for (k = 0; k < m; k++) dest[k] = 0.;
+    for (k = Ap[j]; k < k2; k++) dest[Ai[k]] = Ax[k];
+    return dest;
+}
+
+/** 
+ * Solve one of the systems op(A)*X = alpha*B or
+ * X*op(A) = alpha*B where A cscBlocked triangular and B is cscBlocked.
+ * 
+ * @param side 'L' or 'R' for left or right
+ * @param uplo 'U' or 'L' for upper or lower
+ * @param transa 'T' or 'N' for transpose or no transpose
+ * @param diag 'U' or 'N' for unit diagonal or non-unit
+ * @param alpha scalar multiplier
+ * @param A pointer to a triangular cscBlocked object
+ * @param B pointer to a general cscBlocked matrix
+ */
+void cscb_trcbsm(char side, char uplo, char transa, char diag,
+		 double alpha, SEXP A, const int Parent[], SEXP B)
+{
+    int ileft = (side == 'L' || side == 'l'),
+	iup = (uplo == 'U' || uplo == 'u'),
+	itr = (transa == 'T' || transa == 't'),
+	iunit = (diag == 'U' || diag == 'u');
+    SEXP ApP = GET_SLOT(A, Matrix_pSym),
+	AxP = GET_SLOT(A, Matrix_xSym),
+	BpP = GET_SLOT(B, Matrix_pSym),
+	BxP = GET_SLOT(B, Matrix_xSym);
+    int *Ai = INTEGER(GET_SLOT(A, Matrix_iSym)),
+	*Ap = INTEGER(ApP),
+	*Bi = INTEGER(GET_SLOT(B, Matrix_iSym)),
+	*Bp = INTEGER(BpP),
+	*axdims = INTEGER(getAttrib(AxP, R_DimSymbol)),
+	*bxdims = INTEGER(getAttrib(BxP, R_DimSymbol)),
+	ncbA = length(ApP) - 1,
+	ncbB = length(BpP) - 1;
+    int i, j, nbx = bxdims[0] * bxdims[1] * bxdims[2];
+    double *Ax = REAL(AxP), *Bx = REAL(BxP);
+
+    if (axdims[0] != axdims[1])
+	error("Argument A to cscb_trcbm is not triangular");
+    if (alpha != 1.0) {
+	for (i = 0; i < nbx; i++) { /* scale by alpha */
+	    REAL(BxP)[i] *= alpha;
+	}
+    }
+    if (iunit && axdims[2] < 1) return;	/* A is the identity */
+    if (iunit && axdims[0] == 1) { /* can use R_ldl code */
+	if (!ileft && itr) {	/* case required for lmer */
+	    int *BTp, nnz = bxdims[2], nrbB;
+	    int *tmp = expand_column_pointers(ncbB, Bp, Calloc(nnz, int));
+	    int *BTi = Calloc(nnz, int);
+	    double *BTx = Calloc(nnz, double), *rhs;
+
+				/* transpose B */
+	    for (i = 0, nrbB = -1; i < nnz; i++) if (Bi[i] > nrbB) nrbB = Bi[i];
+	    BTp = Calloc(nrbB, int);
+	    triplet_to_col(ncbB, nrbB, nnz, tmp, Bi, Bx, BTp, BTi, BTx);
+				/* sanity check */
+	    if (BTp[nrbB] != nnz) error("cscb_trcbsm: transpose operation failed");
+	    Free(tmp);
+				/* Solve one column at a time */
+	    rhs = Calloc(ncbB, double);
+	    AZERO(Bx, nnz);	/* zero the result */
+	    for (i = 0; i < nrbB; i++) {
+		R_ldl_lsolve(ncbB, expand_column(rhs, ncbB, i, BTp, BTi, BTx),
+			     Ap, Ai, Ax);
+		for (j = 0; j < ncbB; j++) { /* write non-zeros in sol'n into B */
+		    if (BTx[j]) Bx[Tind(Bi, Bp, j, i)] = BTx[j];
+		}
+		Free(rhs); Free(BTp); Free(BTx); Free(BTi);
+	    }
+	}
+	error("cscb_trcbsm: method not yet written");
+    }
+    error("cscb_trcbsm: method not yet written");
 }
 
 /** 
