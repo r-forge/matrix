@@ -456,7 +456,6 @@ SEXP lmer_factor(SEXP x)
 
 	dcmp[0] = dcmp[1] = dcmp[2] = dcmp[3] = 0.;
 	Memcpy(RZX, REAL(GET_SLOT(x, Matrix_ZtXSym)), dims[0] * dims[1]);
-	Memcpy(RXX, REAL(GET_SLOT(x, Matrix_XtXSym)), dims[1] * dims[1]);
 	lmer_inflate(x);	/* initialize ZZpO and L */
 	for (i = 0; i < nf; i++) {
 	    SEXP ZZOiP = VECTOR_ELT(ZZOP, i);
@@ -533,6 +532,7 @@ SEXP lmer_factor(SEXP x)
 	    Free(Pari);
 	}
 				/* downdate and factor XtX */
+	Memcpy(RXX, REAL(GET_SLOT(x, Matrix_XtXSym)), dims[1] * dims[1]);
 	F77_CALL(dsyrk)("U", "T", dims + 1, dims,
 			&minus1, RZX, dims, &one, RXX, dims + 1);
 	F77_CALL(dpotrf)("U", dims + 1, RXX, dims + 1, &j);
