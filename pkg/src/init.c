@@ -95,6 +95,7 @@ static R_CallMethodDef CallEntries[] = {
     {"lmer_firstDer", (DL_FUNC) &lmer_firstDer, 2},
     {"lmer_fixef", (DL_FUNC) &lmer_fixef, 1},
     {"lmer_gradient", (DL_FUNC) &lmer_gradient, 3},
+    {"lmer_inflate", (DL_FUNC) &lmer_inflate, 1},
     {"lmer_initial", (DL_FUNC) &lmer_initial, 1},
     {"lmer_invert", (DL_FUNC) &lmer_invert, 1},
     {"lmer_ranef", (DL_FUNC) &lmer_ranef, 1},
