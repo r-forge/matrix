@@ -21,6 +21,7 @@ importFrom("Matrix",
            )
 importClassesFrom("Matrix",
                   "corrmatrix",
+                  "dsyMatrix",
                   "pdfactor",
                   "pdmatrix",
                   "ssclme"
