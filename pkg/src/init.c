@@ -164,6 +164,7 @@ void R_init_Matrix(DllInfo *dll)
     Matrix_DIsqrtSym = install("DIsqrt");
     Matrix_DSym = install("D");
     Matrix_DimSym = install("Dim");
+    Matrix_DimNamesSym = install("Dimnames");
     Matrix_GpSym = install("Gp");
     Matrix_LSym = install("L");
     Matrix_LiSym = install("Li");
