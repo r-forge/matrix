@@ -10,44 +10,29 @@ setAs("tripletMatrix", "geMatrix",
 
 setMethod("image", "tripletMatrix",
           function(x,
-                   xlim = c(-1, matdim[2]),
-                   ylim = c(matdim[1], -1),
+                   xlim = c(-0.5, matdim[2]-0.5),
+                   ylim = c(matdim[1]-0.5, -0.5),
                    sub = sprintf("Dimensions: %d x %d", matdim[1], matdim[2]),
                    xlab = "Column", ylab = "Row",
                    cuts = 20,
                    col.regions = grey(seq(from = 0.7, to = 0, length = 100)),
                    ...)
       {
-          ##require("lattice", character = TRUE, quietly = TRUE)
-          
+          if(!require("lattice", character = TRUE, quietly = TRUE))
+              stop("image methods require the lattice package")
+
           matdim <- x@Dim
           lattice::levelplot(abs(x@x) ~ x@j * x@i,
                              sub = sub,
                              xlab = xlab, ylab = ylab,
                              xlim = xlim, ylim = ylim,
                              col.regions = col.regions,
-                             par.settings = list(background = list(col = "transparent")),
-
-
-### panel function that worked with R 1.9.1:
-
-#                              panel = function(x, y, z, zcol, subscripts, ..., col.regions) {
-#                                  x <- as.numeric(x[subscripts])
-#                                  y <- as.numeric(y[subscripts])
-#                                  zcol <- as.numeric(zcol[subscripts])
-#                                  if (any(subscripts))
-#                                      grid::grid.rect(x = x, y = y, width = 1, height = 1, 
-#                                                      default.units = "native",
-#                                                      gp = grid::gpar(fill = col.regions[zcol], col = NULL))
-#                              },
-
-
-### panel function that works with R 2.0.0 -- seems to work in 1.9.1 as well:
-
+                             par.settings =
+                             list(background = list(col = "transparent")),
                              panel = function(x, y, z, subscripts, at, ..., col.regions) {
                                  x <- as.numeric(x[subscripts])
                                  y <- as.numeric(y[subscripts])
-
+                                 
                                  numcol <- length(at) - 1
                                  numcol.r <- length(col.regions)
                                  col.regions <-
@@ -63,11 +48,7 @@ setMethod("image", "tripletMatrix",
                                      grid::grid.rect(x = x, y = y, width = 1, height = 1, 
                                                      default.units = "native",
                                                      gp = grid::gpar(fill = col.regions[zcol], col = NULL))
-                             },
-
-
-
-                             ...)
+                             }, ...)
       })
 
 
