@@ -1,3 +1,12 @@
+2004-12-13  Douglas Bates  <bates@bates1-home>
+
+	* src/R_ldl.c: Created an R-specific version of the ldl.[ch] files
+	with dynamic allocation of scratch arrays.
+
+	* src/ssclme.c (ssclme_copy_ctab): Fixed bug in creation of ZtZ
+	for multivariate random effects with multiple grouping factors.
+	Fixes part but not all of #15.
+
 2004-12-03  Douglas Bates  <bates@bates1-home>
 
 	* src/lmeRep.c (lmeRep_factor): order of operations for multiple
