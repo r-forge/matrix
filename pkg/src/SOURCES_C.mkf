@@ -8,6 +8,7 @@ SOURCES_C =  \
             Mutils.c \
             bCrosstab.c \
             dense.c \
+            dCholCMatrix.c \
             dgCMatrix.c \
             dgTMatrix.c \
             dgeMatrix.c \

@@ -18,3 +18,7 @@
   according to class (e.g. dgeMatrix.R, dgeMatrix.h, dgeMatrix.c).  Is
   there a better way?
 
+- Fix the calculation of the Dim slot for the crossprod method for
+  dgCMatrix objects (too tired to do that now).
+
+

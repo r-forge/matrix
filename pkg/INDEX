@@ -18,7 +18,8 @@ dgCMatrix-class         Class "dgCMatrix" compressed, sparse, column
 dgTMatrix-class         Class "dgTMatrix" sparse matrices in triplet
                         form
 dgeMatrix-class         General S4 Matrix class
-dpoMatrix-class         Positive semi-definite, dense, real matrices
+dpoMatrix-class         Positive semi-definite, dense, numeric
+                        matrices
 dsCMatrix-class         Symmetric, compressed, sparse column matrices
 dsyMatrix-class         Symmetric, dense matrices
 dtCMatrix-class         Triangular, compressed, sparse column matrices
