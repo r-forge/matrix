@@ -12,14 +12,15 @@ prMatrix <- function(object) {
     d <- dim(object)
     cl <- class(object)
     cat(sprintf('%d x %d Matrix of class "%s"\n', d[1], d[2], cl))
-    if(cl == "Matrix") { ## have no data slot
-        cat("Dim = ", d)
-        if(any(sapply(object@Dimnames,length) > 0)) {
-            cat("; Dimnames = ")
-            str(object@Dimnames)
-        }
-        cat("\n")
-    } else { # not "Matrix", hence have data 'x' slot
+##- no longer needed: have no objects of virtual classes:
+##     if(cl == "Matrix") { ## have no data slot
+##         cat("Dim = ", d)
+##         if(any(sapply(object@Dimnames,length) > 0)) {
+##             cat("; Dimnames = ")
+##             str(object@Dimnames)
+##         }
+##         cat("\n")
+##     } else { # not "Matrix", hence have data 'x' slot
         m <- as(object, "matrix")
         maxp <- getOption("max.print")
         if(prod(d) <= maxp) print(m)
@@ -31,17 +32,39 @@ prMatrix <- function(object) {
             print(tail(m, max(1, nr - n2)))
         }
         ## DEBUG: cat("str(.):\n") ; str(object)
-    }
-    invisible()
+##    }
+    invisible(object)# as print() S3 methods do
 }
 
 setMethod("show", signature(object = "ddenseMatrix"), prMatrix)
+
+setMethod("show", signature(object = "sparseMatrix"),
+   function(object) {
+       d <- dim(object)
+       cl <- class(object)
+       cat(sprintf('%d x %d sparse Matrix of class "%s"\n', d[1], d[2], cl))
+
+       maxp <- getOption("max.print")
+       if(prod(d) <= maxp) print(as(object, "matrix"))
+       else { ## d[1] > maxp / d[2] >= nr :
+           cat("\n Not printing large sparse matrix -- maybe increase options(max.print)\n")
+           if(FALSE) { ### need storage economic "[,]" method for sparse!!
+               nr <- maxp %/% d[2]
+               n2 <- ceiling(nr / 2)
+               print(head(m, max(1, n2)))
+               cat("\n ..........\n\n")
+               print(tail(m, max(1, nr - n2)))
+           }
+       }
+        ## DEBUG: cat("str(.):\n") ; str(object)
+       invisible(object)
+   })
+
 ## this may go away {since sparse matrices need something better!} :
 setMethod("show", signature(object = "Matrix"), prMatrix)
 
-## Is this sufficient for all subclasses?
+## should propagate to all subclasses:
 setMethod("as.matrix", signature(x = "Matrix"), function(x) as(x, "matrix"))
-
 
 setMethod("dim", signature(x = "Matrix"),
           function(x) x@Dim, valueClass = "integer")
