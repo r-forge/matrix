@@ -1,6 +1,7 @@
 facshuffle = function(sslm, facs)       # unexported utility
 {
     if (!length(sslm[[2]])) return(facs)
+    cat(" Non-trivial permutation\n")
     s1 = sslm[[1]]
     s2 = sslm[[2]]
     lens = diff(s1@Gp)
@@ -114,6 +115,17 @@ setMethod("lme", signature(formula = "formula", data = "groupedData",
                 mCall, PACKAGE = "lme4")
       })
           
+setMethod("lme", signature(formula = "formula", data = "data.frame",
+                           random = "list"),
+          function(formula, data, random, correlation, weights, subset,
+                   method, na.action, control, model, x)
+      {
+          nCall = mCall = match.call()
+          nCall$data <- as.list(data)
+          .Call("nlme_replaceSlot", eval(nCall, parent.frame()), "call",
+                mCall, PACKAGE = "lme4")
+      })
+
 setMethod("lme", signature(formula = "formula", data = "list",
                            random = "list"),
           function(formula, data, random, correlation, weights, subset,
@@ -158,7 +170,9 @@ setMethod("lme", signature(formula = "formula", data = "list",
                          function(x) eval(as.name(x), envir = data))
           names(facs) = names(random)
           facs =                        # order in decreasing number of levels
-              facs[rev(order(lapply(facs, function(fac) length(levels(fac)))))]
+              facs[rev(order(unlist(lapply(facs,
+                                           function(fac)
+                                           length(levels(fac))))))]
           mmats <- c(lapply(random,
                             function(x) model.matrix(formula(x), data = data)),
                      list(.Xy = cbind(model.matrix(formula, data = data),
@@ -279,9 +293,9 @@ setMethod("fixef", signature(object = "lme"),
 
 setMethod("formula", "lme", function(x, ...) x@call$formula)
 
-setMethod("intervals", signature(object = "lme", level = "ANY"),
-          function(object, level = 0.95, ...)
-          cat("intervals method for lme not yet implemented\n"))
+#setMethod("intervals", signature(object = "lme", level = "ANY"),
+#          function(object, level = 0.95, ...)
+#          cat("intervals method for lme not yet implemented\n"))
 
 setMethod("plot", signature(x = "lme"),
           function(x, y, ...)

@@ -364,10 +364,8 @@ LaplaceLikelihood <-
         mu <- family$linkinv(eta)
         dmu.deta <- family$mu.eta(eta)
 
-
-
         ## adjusted response (how does offset get involved ?)
-        z <- eta + (mmats.unadjusted$.Xy[, responseIndex] - mu) / dmu.deta + offset
+        z <- eta + (mmats.unadjusted$.Xy[, responseIndex] - mu) / dmu.deta
         ## weights
         w <- dmu.deta / sqrt(family$variance(mu))
 
@@ -379,26 +377,18 @@ LaplaceLikelihood <-
         mmats$.Xy[] <- mmats$.Xy * w
 
 
-
-
-
-
-
         ## the following needs to be changed, not sure how
 
         .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
+
+
+
         if (firstIter) .Call("ssclme_initial", obj, PACKAGE="Matrix")
-        .Call("ssclme_EMsteps", obj,
-              controlvals$niterEM,
-              FALSE, #controlvals$REML,
-              controlvals$EMverbose,
-              PACKAGE = "Matrix")
-        LMEoptimize(obj) = controlvals
+        etaold <- eta
         eta[] <-
             .Call("ssclme_fitted", obj, facs,
-                  mmats.unadjusted, PACKAGE = "Matrix")
+                  mmats.unadjusted, PACKAGE = "Matrix") + offset
 
-        
 
         if (FALSE) ## converged
         {
