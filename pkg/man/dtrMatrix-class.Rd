@@ -15,9 +15,11 @@
 \alias{solve,dtrMatrix,missing-method}
 \alias{t,dtrMatrix-method}
 \alias{dtrMatrix-class}
-\title{Triangular, dense, non-packed, real matrices}
-\description{The \code{"dtrMatrix"} class is the class of triangular
-  matrices in dense, non-packed storage.}
+\alias{dtpMatrix-class}
+\title{Triangular, dense, numeric matrices}
+\description{The \code{"dtrMatrix"} class is the class of triangular,
+  dense, numeric matrices in nonpacked storage.  The \code{"dtpMatrix"}
+  class is the same except in packed storage.}
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("dtrMatrix", ...)}.
 }
@@ -34,11 +36,6 @@ Objects can be created by calls of the form \code{new("dtrMatrix", ...)}.
     \item{\code{Dim}:}{Object of class \code{"integer"}. The dimensions
       of the matrix which must be a two-element vector of non-negative
       integers.}
-    \item{\code{norm}:}{Object of class \code{"numeric"}. A named
-      numeric vector of norms of the matrix.  Some possible components
-      are \code{"O"}, the one norm; \code{"I"}, the infinity norm;
-      \code{"F"}, the Frobenius norm; and \code{"M"}, the maximum
-      absolute value.}
     \item{\code{rcond}:}{Object of class \code{"numeric"}. A named
       numeric vector of reciprocal condition numbers in either the
       1-norm \code{"O"} or the infinity norm \code{"I"}.}

@@ -3,14 +3,16 @@
 \alias{\%*\%,dgeMatrix,dsyMatrix-method}
 \alias{\%*\%,dsyMatrix,dgeMatrix-method}
 \alias{dsyMatrix-class}
+\alias{dspMatrix-class}
 \alias{coerce,dsyMatrix,dgeMatrix-method}
 \alias{coerce,dsyMatrix,matrix-method}
 \alias{norm,dsyMatrix,character-method}
 \alias{norm,dsyMatrix,missing-method}
 \alias{t,dsyMatrix-method}
-\title{Class "dsyMatrix" of symmetric matrices}
-\description{The \code{"dsyMatrix"} class is the class of symmetric
-  matrices in non-packed storage.  Only the upper triangle or the lower
+\title{Symmetric, dense matrices}
+\description{The \code{"dsyMatrix"} class is the class of symmetric, dense
+  matrices in non-packed storage and \code{"dsyMatrix"} is the class of
+  symmetric dense matrices in packed storage.  Only the upper triangle or the lower
   triangle is stored.}
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("dsyMatrix", ...)}.
@@ -24,11 +26,6 @@ Objects can be created by calls of the form \code{new("dsyMatrix", ...)}.
     \item{\code{Dim}:}{Object of class \code{"integer"}. The dimensions
       of the matrix which must be a two-element vector of non-negative
       integers.}
-    \item{\code{norm}:}{Object of class \code{"numeric"}. A named
-      numeric vector of norms of the matrix.  Some possible components
-      are \code{"O"}, the one norm; \code{"I"}, the infinity norm;
-      \code{"F"}, the Frobenius norm; and \code{"M"}, the maximum
-      absolute value.}
     \item{\code{rcond}:}{Object of class \code{"numeric"}. A named
       numeric vector of reciprocal condition numbers in either the
       1-norm \code{"O"} or the infinity norm \code{"I"}.}
