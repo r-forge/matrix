@@ -1,23 +1,23 @@
-setMethod("solve", signature(a = "sscMatrix", b = "matrix"),
+setMethod("solve", signature(a = "dsCMatrix", b = "matrix"),
           function(a, b, ...)
-          .Call("sscMatrix_matrix_solve", a, b))
+          .Call("dsCMatrix_matrix_solve", a, b))
 
-setMethod("chol", signature(x = "sscMatrix", pivot = "missing"),
+setMethod("chol", signature(x = "dsCMatrix", pivot = "missing"),
           function(x, pivot, LINPACK)
-          .Call("sscMatrix_chol", x, TRUE))
+          .Call("dsCMatrix_chol", x, TRUE))
 
-setMethod("chol", signature(x = "sscMatrix", pivot = "logical"),
+setMethod("chol", signature(x = "dsCMatrix", pivot = "logical"),
           function(x, pivot, LINPACK)
-          .Call("sscMatrix_chol", x, pivot))
+          .Call("dsCMatrix_chol", x, pivot))
 
-setMethod("t", signature(x = "sscMatrix"),
+setMethod("t", signature(x = "dsCMatrix"),
           function(x) .Call("ssc_transpose", x),
-          valueClass = "sscMatrix")
+          valueClass = "dsCMatrix")
 
-setMethod("determinant", signature(x = "sscMatrix", logarithm = "missing"),
+setMethod("determinant", signature(x = "dsCMatrix", logarithm = "missing"),
           function(x, logarithm, ...) determinant(x, TRUE))
 
-setMethod("determinant", signature(x = "sscMatrix", logarithm = "logical"),
+setMethod("determinant", signature(x = "dsCMatrix", logarithm = "logical"),
           function(x, logarithm, ...)
       {
           ldet <- sum(log(chol(x)@D))
@@ -28,12 +28,12 @@ setMethod("determinant", signature(x = "sscMatrix", logarithm = "logical"),
           val
       })
 
-setAs("sscMatrix", "dgTMatrix",
-      function(from) .Call("sscMatrix_to_dgTMatrix", from))
+setAs("dsCMatrix", "dgTMatrix",
+      function(from) .Call("dsCMatrix_to_dgTMatrix", from))
 
-setAs("sscMatrix", "dgeMatrix",
+setAs("dsCMatrix", "dgeMatrix",
       function(from) as(as(from, "dgTMatrix"), "dgeMatrix"))
 
-setAs("sscMatrix", "matrix",
+setAs("dsCMatrix", "matrix",
       function(from) as(as(from, "dgTMatrix"), "matrix"))
 

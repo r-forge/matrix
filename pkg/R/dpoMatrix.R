@@ -1,34 +1,34 @@
-setMethod("chol", signature(x = "poMatrix"),
+setMethod("chol", signature(x = "dpoMatrix"),
           function(x, pivot, LINPACK)
-          .Call("poMatrix_chol", x))
+          .Call("dpoMatrix_chol", x))
 
-setMethod("rcond", signature(x = "poMatrix", type = "character"),
+setMethod("rcond", signature(x = "dpoMatrix", type = "character"),
           function(x, type, ...)
-          .Call("poMatrix_rcond", x, type),
+          .Call("dpoMatrix_rcond", x, type),
           valueClass = "numeric")
 
-setMethod("rcond", signature(x = "poMatrix", type = "missing"),
+setMethod("rcond", signature(x = "dpoMatrix", type = "missing"),
           function(x, type, ...)
-          .Call("poMatrix_rcond", x, "O"),
+          .Call("dpoMatrix_rcond", x, "O"),
           valueClass = "numeric")
 
-setMethod("solve", signature(a = "poMatrix", b = "missing"),
+setMethod("solve", signature(a = "dpoMatrix", b = "missing"),
           function(a, b, ...)
-          .Call("poMatrix_solve", a),
-          valueClass = "poMatrix")
+          .Call("dpoMatrix_solve", a),
+          valueClass = "dpoMatrix")
 
-setMethod("solve", signature(a = "poMatrix", b = "dgeMatrix"),
+setMethod("solve", signature(a = "dpoMatrix", b = "dgeMatrix"),
           function(a, b, ...)
-          .Call("poMatrix_dgeMatrix_solve", a, b),
+          .Call("dpoMatrix_dgeMatrix_solve", a, b),
           valueClass = "dgeMatrix")
 
-setMethod("solve", signature(a = "poMatrix", b = "matrix"),
+setMethod("solve", signature(a = "dpoMatrix", b = "matrix"),
           function(a, b, ...)
-          .Call("poMatrix_matrix_solve", a, b),
+          .Call("dpoMatrix_matrix_solve", a, b),
           valueClass = "matrix")
 
-setMethod("solve", signature(a = "poMatrix", b = "numeric"),
+setMethod("solve", signature(a = "dpoMatrix", b = "numeric"),
           function(a, b, ...)
-          as.numeric(.Call("poMatrix_matrix_solve",
+          as.numeric(.Call("dpoMatrix_matrix_solve",
                            a, as.matrix(b))),
           valueClass = "numeric")

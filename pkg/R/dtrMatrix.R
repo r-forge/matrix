@@ -14,7 +14,7 @@ setMethod("%*%", signature(x = "dgeMatrix", y = "dtrMatrix"),
 
 setMethod("crossprod", signature(x = "dtrMatrix", y = "missing"),
 	  function(x, y = NULL) crossprod(as(x, "dgeMatrix")),
-	  valueClass = "poMatrix")
+	  valueClass = "dpoMatrix")
 
 setMethod("determinant", signature(x = "dtrMatrix", logarithm = "missing"),
 	  function(x, logarithm, ...) determinant(x, TRUE))

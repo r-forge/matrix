@@ -27,7 +27,7 @@ setMethod("rcond", signature(x = "dgeMatrix", type = "character"),
 setMethod("crossprod", signature(x = "dgeMatrix", y = "missing"),
           function(x, y = NULL)
           .Call("dgeMatrix_crossprod", x),
-          valueClass = "poMatrix")
+          valueClass = "dpoMatrix")
 
 setMethod("crossprod", signature(x = "dgeMatrix", y = "dgeMatrix"),
           function(x, y = NULL)
