@@ -3,8 +3,7 @@ import("stats", "Matrix")
 export(
        "BIC",
        "GLMM",
-#       "Names",
-#       "Names<-",
+       "GLMM1",
        "VarCorr",
        "contr.SAS",
        "fixef",
@@ -39,6 +38,7 @@ exportClasses(
 exportMethods(
               "BIC",
               "GLMM",
+              "GLMM1",
               "anova",
               "coef",
               "coerce",
