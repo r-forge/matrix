@@ -17,7 +17,7 @@ setAs("dgCMatrix", "dgBCMatrix",
 
 setAs("matrix", "dgCMatrix",
       function(from) {
-          storage.mode(from) = "double"
+          storage.mode(from) <- "double"
           .Call("matrix_to_csc", from)
       })
 

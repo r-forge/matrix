@@ -164,19 +164,29 @@ setMethod("crossprod", signature(x = "numeric", y = "dgeMatrix"),
           valueClass = "dgeMatrix")
 
 setMethod("%*%", signature(x = "dgeMatrix", y = "dgeMatrix"),
-          function(x, y) .Call("dgeMatrix_dgeMatrix_mm", x, y))
+          function(x, y) .Call("dgeMatrix_matrix_mm", x, y, TRUE, FALSE),
+          valueClass = "dgeMatrix")
 
 ## dgeMatrix <-> matrix ("matrix" dispatches before "numeric" since R 2.1.0)
 setMethod("%*%", signature(x = "dgeMatrix", y = "matrix"),
-          function(x, y) callGeneric(x, as(y, "dgeMatrix")))
+          function(x, y) .Call("dgeMatrix_matrix_mm", x, y, FALSE, FALSE),
+          valueClass = "dgeMatrix")
+
 
 setMethod("%*%", signature(x = "matrix", y = "dgeMatrix"),
-          function(x, y) callGeneric(as(x, "dgeMatrix"), y))
+          function(x, y) .Call("dgeMatrix_matrix_mm", y, x, FALSE, TRUE),
+          valueClass = "dgeMatrix")
 
 ## dgeMatrix <-> numeric : uses the "matrix" one
-setMethod("%*%", signature(x = "dgeMatrix", y = "numeric"), .M.n)
-setMethod("%*%", signature(x = "numeric", y = "dgeMatrix"), .n.M)
+setMethod("%*%", signature(x = "dgeMatrix", y = "numeric"),
+          function(x, y)
+          .Call("dgeMatrix_matrix_mm", x, as.matrix(y), FALSE, FALSE),
+          valueClass = "dgeMatrix")
 
+setMethod("%*%", signature(x = "numeric", y = "dgeMatrix"),
+          function(x, y)
+          .Call("dgeMatrix_matrix_mm", y, rbind(x), FALSE, TRUE),
+          valueClass = "dgeMatrix")
 
 setMethod("diag", signature(x = "dgeMatrix"),
           function(x = 1, nrow, ncol = n)
@@ -190,19 +200,27 @@ setMethod("diag", signature(x = "dgeMatrix"),
 ## setMethod("dimnames<-", signature(x = "dgeMatrix", value = "list"),
 ##           dimnamesGets)
 
-setMethod("chol", signature(x = "dgeMatrix", pivot = "ANY"), cholMat)
+## DB - I don't think this is a good idea without first checking symmetry
+#setMethod("chol", signature(x = "dgeMatrix", pivot = "ANY"), cholMat)
 
 setMethod("solve", signature(a = "dgeMatrix", b = "missing"),
-          function(a, b, ...) .Call("dgeMatrix_solve", a)
-          )
+          function(a, b, ...) .Call("dgeMatrix_solve", a),
+          valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dgeMatrix", b = "matrix"),
-          function(a, b, ...)
-          .Call("dgeMatrix_matrix_solve", a, b)
-          )
+          function(a, b, ...) .Call("dgeMatrix_matrix_solve", a, b, FALSE),
+          valueClass = "dgeMatrix")
+
+setMethod("solve", signature(a = "dgeMatrix", b = "dgeMatrix"),
+          function(a, b, ...) .Call("dgeMatrix_matrix_solve", a, b, TRUE),
+          valueClass = "dgeMatrix")
+
+setMethod("solve", signature(a = "dgeMatrix", b = "numeric"),
+          function(a, b, ...) .Call("dgeMatrix_matrix_solve", a, as.matrix(b), TRUE),
+          valueClass = "dgeMatrix")
 
 setMethod("lu", signature(x = "dgeMatrix"),
-          function(x, ...) .Call("dgeMatrix_LU", x))
+          function(x, ...) .Call("dgeMatrix_LU", x), valueClass = "LU")
 
 setMethod("determinant", signature(x = "dgeMatrix", logarithm = "missing"),
           function(x, logarithm, ...) determinant(x, TRUE))

@@ -20,10 +20,22 @@ setMethod("rcond", signature(x = "dspMatrix", type = "missing"),
           valueClass = "numeric")
 
 setMethod("%*%", signature(x = "dspMatrix", y = "dgeMatrix"),
-          function(x, y) .Call("dspMatrix_dgeMatrix_mm", x, y) )
+          function(x, y) .Call("dspMatrix_matrix_mm", x, y, TRUE),
+          valueClass = "dgeMatrix")
 
 setMethod("%*%", signature(x = "dspMatrix", y = "matrix"),
-          function(x, y) .Call("dspMatrix_matrix_mm", x, y) )
+          function(x, y) .Call("dspMatrix_matrix_mm", x, y, FALSE),
+          valueClass = "dgeMatrix")
+
+setMethod("%*%", signature(x = "dspMatrix", y = "numeric"),
+          function(x, y) .Call("dspMatrix_matrix_mm", x, as.matrix(y), FALSE),
+          valueClass = "dgeMatrix")
+
+setMethod("%*%", signature(x = "dspMatrix", y = "integer"),
+          function(x, y) {
+              storage.mode(y) <- "double"
+              .Call("dspMatrix_matrix_mm", x, as.matrix(y), FALSE)
+          }, valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dspMatrix", b = "missing"),
           function(a, b, ...) .Call("dspMatrix_solve", a),
@@ -31,13 +43,24 @@ setMethod("solve", signature(a = "dspMatrix", b = "missing"),
 
 setMethod("solve", signature(a = "dspMatrix", b = "matrix"),
           function(a, b, ...)
-          .Call("dspMatrix_matrix_solve", a, b),
-          valueClass = "matrix")
+          .Call("dspMatrix_matrix_solve", a, b, FALSE),
+          valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dspMatrix", b = "dgeMatrix"),
           function(a, b, ...)
-          .Call("dspMatrix_dgeMatrix_solve", a, b),
+          .Call("dspMatrix_dgeMatrix_solve", a, b, TRUE),
           valueClass = "dgeMatrix")
+
+setMethod("solve", signature(a = "dspMatrix", b = "numeric"),
+          function(a, b, ...)
+          .Call("dspMatrix_dgeMatrix_solve", a, as.matrix(b), TRUE),
+          valueClass = "dgeMatrix")
+
+setMethod("solve", signature(a = "dspMatrix", b = "integer"),
+          function(a, b, ...) {
+              storage.mode(b) <- "double"
+              .Call("dspMatrix_dgeMatrix_solve", a, as.matrix(b), TRUE)
+          }, valueClass = "dgeMatrix")
 
 setMethod("norm", signature(x = "dspMatrix", type = "character"),
           function(x, type, ...) .Call("dspMatrix_norm", x, type),
@@ -47,11 +70,16 @@ setMethod("norm", signature(x = "dspMatrix", type = "missing"),
           function(x, type, ...) .Call("dspMatrix_norm", x, "O"),
           valueClass = "numeric")
 
-#setMethod("t", signature(x = "dsyMatrix"), # need a t method for dsyMatrix
-#          function(x) as(t(as(x, "dsyMatrix")), "dspMatrix"),
-#          valueClass = "dspMatrix")
+setMethod("t", signature(x = "dsyMatrix"), # need a t method for dsyMatrix
+          function(x) as(t(as(x, "dsyMatrix")), "dspMatrix"),
+          valueClass = "dspMatrix")
 
 setMethod("unpack", signature(x = "dspMatrix"),
           function(x, ...) as(x, "dsyMatrix"),
           valueClass = "dsyMatrix")
+
+setIs("dspMatrix", "dppMatrix",
+      test = function(obj)
+          "try-error" != class(try(.Call("dppMatrix_chol", obj), TRUE))
+      )
 

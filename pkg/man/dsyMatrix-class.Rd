@@ -2,7 +2,9 @@
 \docType{class}
 \alias{\%*\%,dgeMatrix,dsyMatrix-method}
 \alias{\%*\%,dspMatrix,dgeMatrix-method}
+\alias{\%*\%,dspMatrix,integer-method}
 \alias{\%*\%,dspMatrix,matrix-method}
+\alias{\%*\%,dspMatrix,numeric-method}
 \alias{\%*\%,dsyMatrix,dgeMatrix-method}
 \alias{coerce,dspMatrix,dgeMatrix-method}
 \alias{coerce,dspMatrix,dsyMatrix-method}
@@ -21,8 +23,10 @@
 \alias{rcond,dsyMatrix,character-method}
 \alias{rcond,dsyMatrix,missing-method}
 \alias{solve,dspMatrix,dgeMatrix-method}
+\alias{solve,dspMatrix,integer-method}
 \alias{solve,dspMatrix,matrix-method}
 \alias{solve,dspMatrix,missing-method}
+\alias{solve,dspMatrix,numeric-method}
 \alias{solve,dsyMatrix,dgeMatrix-method}
 \alias{solve,dsyMatrix,matrix-method}
 \alias{solve,dsyMatrix,missing-method}

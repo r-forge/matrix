@@ -19,3 +19,6 @@ options(digits=4)
 stopifnot(all.equal(as(h9, "matrix"),
                     as(cf9,"matrix"), tol= 1e-15))
 
+str(hp9 <- as(h9, "dppMatrix"))
+(s9 <- solve(hp9, seq(nrow(hp9))))
+hp9 %*% s9

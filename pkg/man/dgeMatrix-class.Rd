@@ -46,6 +46,8 @@
 \alias{rcond,dgeMatrix,missing-method}
 \alias{rcond,dgeMatrix,character-method}
 \alias{solve,dgeMatrix,matrix-method}
+\alias{solve,dgeMatrix,numeric-method}
+\alias{solve,dgeMatrix,dgeMatrix-method}
 \alias{solve,dgeMatrix,missing-method}
 \alias{t,dgeMatrix-method}
 %

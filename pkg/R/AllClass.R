@@ -202,7 +202,7 @@ setClass("determinant",
                         call = "call"))
 
 setClass("LU", representation(x = "numeric",
-                              pivot = "integer"),
+                              perm = "integer"),
          validity = function(object) .Call("LU_validate", object))
 
 setClass("sscCrosstab", representation =

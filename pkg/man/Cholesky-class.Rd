@@ -1,12 +1,15 @@
 \name{Cholesky-class}
 \docType{class}
 \alias{Cholesky-class}
+\alias{pCholesky-class}
 \alias{BunchKaufman-class}
+\alias{pBunchKaufman-class}
 \title{Cholesky and Bunch-Kaufman Decompositions}
 \description{The \code{"Cholesky"} class is the class of Cholesky
   decompositions of positive-semidefinite, real matrices.  The
   \code{"BunchKaufman"} class is the class of Bunch-Kaufman
-  decompositions of symmetric, real matrices.
+  decompositions of symmetric, real matrices.  The \code{"pCholesky"}
+  and \code{"pBunchKaufman"} classes are their packed storage versions.
 }
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("Cholesky",
@@ -31,6 +34,7 @@
   }
   A Bunch-Kaufman decomposition also extends the \code{"dtrMatrix"}
   class and has a \code{perm} slot representing a permutation matrix.
+  The packed versions extend the \code{"dtpMatrix"} class.
 }
 \section{Extends}{
   Class \code{"dtrMatrix"}, directly.
