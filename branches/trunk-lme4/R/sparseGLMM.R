@@ -139,10 +139,11 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
           niter <- 20
           conv <- FALSE
           firstIter <- TRUE
+          devold <- 0 ## deviance for convergence check
+
 
           for (iter in seq(length = niter))
           {
-              if (conv) break
               eta <- mmats.unadjusted$.Xy %*% coefFixed
               for (facname in names(facs))
               {
@@ -194,8 +195,13 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
               }
 
               ## use this to determine convergence
-              print(deviance(obj, REML = controlvals$REML))
-
+              dev <- deviance(obj, REML = controlvals$REML)
+              print(dev)
+              if (abs(dev - devold)/(0.1 + abs(dev)) < controlvals$tolerance) {
+                  conv <- TRUE
+                  break ## breaks to where ?
+              }
+              devold <- dev
           }
 
           new("lme", call = match.call(), facs = facs,
@@ -222,6 +228,9 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
 #             dev <- sum(dev.resids(y, mu, weights))
 #             if (control$trace)
 #                 cat("Deviance =", dev, "Iterations -", iter, "\n")
+
+
+
 #             ## check for divergence
 #             boundary <- FALSE
 #             if (!is.finite(dev)) {
@@ -242,6 +251,9 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
 #                 if (control$trace)
 #                     cat("Step halved: new deviance =", dev, "\n")
 #             }
+
+
+
 #             ## check for fitted values outside domain.
 #             if (!(valideta(eta) && validmu(mu))) {
 #                 warning("Step size truncated: out of bounds", call. = FALSE)
@@ -259,6 +271,10 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
 #                 if (control$trace)
 #                     cat("Step halved: new deviance =", dev, "\n")
 #             }
+
+
+
+
 #             ## check for convergence
 #             if (abs(dev - devold)/(0.1 + abs(dev)) < control$epsilon) {
 #                 conv <- TRUE
