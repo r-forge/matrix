@@ -2,6 +2,10 @@
 
 #include "dtrMatrix.h"
 
+/* FIXME: dtrMatrix_as_dgeMatrix()  {below}
+ * -----  is called *before* the following - presumably in order to
+ *        apply the higher level validation first
+*/
 SEXP dtrMatrix_validate(SEXP obj)
 {
     SEXP uplo = GET_SLOT(obj, Matrix_uploSym),
@@ -141,6 +145,9 @@ SEXP dtrMatrix_as_dgeMatrix(SEXP from)
     SET_SLOT(val, Matrix_rcondSym,
 	     duplicate(GET_SLOT(from, Matrix_rcondSym)));
     SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(from, Matrix_xSym)));
+    /* Dim < 2 can give a seg.fault problem in make_array_triangular(): */
+    if (LENGTH(GET_SLOT(from, Matrix_DimSym)) < 2)
+	error("'Dim' slot has length less than two");
     SET_SLOT(val, Matrix_DimSym,
 	     duplicate(GET_SLOT(from, Matrix_DimSym)));
     SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
