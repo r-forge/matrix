@@ -34,7 +34,7 @@ setMethod("GLMM", signature(random = "formula"),
 
 setMethod("GLMM", signature(formula = "formula",
                             data = "groupedData",
-                           random = "list"),
+                            random = "list"),
           function(formula, family, data, random, ...)
       {
           nCall = mCall = match.call()
@@ -53,8 +53,11 @@ setMethod("GLMM",
                    model = TRUE, x = FALSE, ...)
       {
           if (is.name(family)) family = substitute(family())
+          if (is.character(family)) family = get(family)
+          if (is.function(family)) family = family()
           random <-
-              lapply(get("formula", pos = parent.frame(), mode = "function"))
+              lapply(random,
+                     get("formula", pos = parent.frame(), mode = "function"))
           controlvals <- do.call("lmeControl", control)
           controlvals$REML <- FALSE
           data <- eval(make.mf.call(match.call(expand.dots = FALSE),
@@ -82,8 +85,6 @@ setMethod("GLMM",
           obj = obj[[1]]
           ## get initial estimates from glm
           coefFixef <- c(coef(glm(formula, family, data)), 0)
-
-
 
           mmats <- mmats.unadjusted
           mmats[[1]][1,1] <- 1 # to force a copy
@@ -162,6 +163,15 @@ setMethod("GLMM",
           ## reduced ssclme
 
           reducedObj <- .Call("ssclme_collapse", obj, PACKAGE = "Matrix")
+          reducedMmats.unadjusted <- mmats.unadjusted
+          reducedMmats.unadjusted$.Xy <-
+              reducedMmats.unadjusted$.Xy[, responseIndex, drop = FALSE]
+
+          reducedMmats <- mmats
+          reducedMmats$.Xy <-
+              reducedMmats$.Xy[, responseIndex, drop = FALSE]
+          .Call("ssclme_update_mm", reducedObj, facs, reducedMmats, PACKAGE="Matrix")
+
 
 
 
@@ -169,13 +179,6 @@ setMethod("GLMM",
 
 
 
-
-          reducedMmats.unadjusted <- mmats.unadjusted
-          reducedMmats.unadjusted$.Xy <-
-              reducedMmats.unadjusted$.Xy[, responseIndex, drop = FALSE]
-          reducedMmats <- reducedMmats.unadjusted
-
-          reducedMmats[[1]][1,1] <- 1 ## again, force a copy
 
 
 
