@@ -110,13 +110,17 @@ lmeRep_create(SEXP facs, SEXP ncv)
     int *nc, I = length(facs), i, nzcol;
     SEXP fac, levs, nms, tmp;
 
-    if (!isNewList(facs) || length(facs) != 1)
-	error("Argument facs must be a list of length 1");
-    if (!isInteger(ncv) || length(ncv) != 2)
-	error("Argument ncv must be an integer vector of length 2");
-    if (INTEGER(ncv)[0] <= 0 || INTEGER(ncv)[1] <= 0)
-	error("Number of columns in model matrices must be positive");
+    if (!isNewList(facs))
+	error("Argument facs must be a list");
+    if (!isInteger(ncv) || length(ncv) != (I + 1))
+	error("Argument ncv must be an integer vector of length %d", I + 1);
+    for (i = 0; i <= I; i++)
+	if (INTEGER(ncv)[i] <= 0)
+	    error("Number of columns in model matrices must be positive");
 
+    SET_SLOT(val, Matrix_TSym, lmeRep_crosstab(facs));
+    /* FIXME: Add names to this slot */
+    SET_SLOT(val, Matrix_LSym, duplicate(GET_SLOT(val, Matrix_TSym)));
     SET_SLOT(val, Matrix_ncSym, allocVector(INTSXP, I + 2));
     nc = INTEGER(GET_SLOT(val, Matrix_ncSym));
     for (i = 0; i <= I; i++) nc[i] = INTEGER(ncv)[i];
@@ -138,8 +142,6 @@ lmeRep_create(SEXP facs, SEXP ncv)
     UNPROTECT(1);
     SET_SLOT(val, Matrix_DSym, allocVector(VECSXP, I));
     setAttrib(GET_SLOT(val, Matrix_DSym), R_NamesSymbol, duplicate(nms));
-    SET_SLOT(val, Matrix_DIsqrtSym, allocVector(VECSXP, 0));
-/*     setAttrib(GET_SLOT(val, Matrix_DIsqrtSym), R_NamesSymbol, duplicate(nms)); */
     SET_SLOT(val, Matrix_OmegaSym, allocVector(VECSXP, I));
     setAttrib(GET_SLOT(val, Matrix_OmegaSym), R_NamesSymbol, duplicate(nms));
     SET_SLOT(val, Matrix_ZZxSym, allocVector(VECSXP, (I * (I + 1))/2));
