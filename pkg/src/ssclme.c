@@ -1201,12 +1201,75 @@ SEXP ssclme_EMsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP verb)
 	    F77_CALL(dpotrf)("U", &nci, vali, &nci, &info);
 	    if (info) error("DPOTRF returned error code %d", info);
 	    F77_CALL(dpotri)("U", &nci, vali, &nci, &info);
-	    if (info) error("DPOTRF returned error code %d", info);
+	    if (info) error("DPOTRI returned error code %d", info);
 	}
 	status[0] = status[1] = 0;
     }
     ssclme_factor(x);
     return R_NilValue;
+}
+
+SEXP ssclme_gradient(SEXP x, SEXP REMLp)
+{
+    SEXP
+	RZXsl = GET_SLOT(x, Matrix_RZXSym),
+	ans = PROTECT(duplicate(GET_SLOT(x, Matrix_OmegaSym))),
+	ncsl = GET_SLOT(x, Matrix_ncSym),
+	bVar = GET_SLOT(x, Matrix_bVarSym);
+    int
+	*Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	*dims = INTEGER(getAttrib(RZXsl, R_DimSymbol)),
+	*nc = INTEGER(ncsl),
+	REML = asLogical(REMLp),
+	i, info,
+	n = dims[0],
+	nf = length(ncsl) - 2,
+	nobs = nc[nf + 1],
+	p,
+	pp1 = dims[1];
+    double
+	*RZX = REAL(RZXsl),
+	*b,
+        alpha,
+	one = 1.;
+
+    p = pp1 - 1;
+    b = RZX + p * n;
+    ssclme_invert(x);
+    for (i = 0; i < nf; i++) {
+	int ki = Gp[i+1] - Gp[i],
+	    nci = nc[i],
+	    mi = ki/nci;
+	double
+	    *vali = REAL(VECTOR_ELT(ans, i));
+	    
+	F77_CALL(dpotrf)("U", &nci, vali, &nci, &info);
+	if (info)
+	    error("DPOTRF returned error code %d for component %d of Omega",
+		  info, i + 1);
+	F77_CALL(dpotri)("U", &nci, vali, &nci, &info);
+	if (info)
+	    error("DPOTRI returned error code %d for component %d of Omega",
+		  info, i + 1);
+	alpha = (double) -mi;
+	F77_CALL(dsyrk)("U", "N", &nci, &ki,
+			&one, REAL(VECTOR_ELT(bVar, i)), &nci,
+			&alpha, vali, &nci);
+	alpha = ((double)(REML?(nobs-p):nobs));
+	F77_CALL(dsyrk)("U", "N", &nci, &mi,
+			&alpha, b + Gp[i], &nci,
+			&one, vali, &nci);
+	if (REML) {
+	    int j;
+	    for (j = 0; j < p; j++) { 
+		F77_CALL(dsyrk)("U", "N", &nci, &mi,
+				&one, RZX + Gp[i] + j*n, &nci,
+				&one, vali, &nci);
+	    }
+	}
+    }
+    UNPROTECT(1);
+    return ans;
 }
 
 SEXP ssclme_fitted(SEXP x, SEXP facs, SEXP mmats)
@@ -1286,3 +1349,4 @@ SEXP ssclme_variances(SEXP x, SEXP REML)
     UNPROTECT(2);
     return val;
 }
+
