@@ -58,7 +58,7 @@ lme(formula, data, random, \dots)
   A new version of the function called \code{lme1} is in the development
   versions of this package.  The \code{lme1} function has the same
   argument sequence as \code{lme} but produces an object with an
-  \code{\link[Matrix]{lmeRep}} representation of the model.  The object
+  \code{\link[Matrix]{lmer}} representation of the model.  The object
   produced by \code{lme} uses the \code{\link[Matrix]{ssclme}}
   representation.
   
