@@ -1,4 +1,4 @@
-bCrosstab <- function(flist) {
+bCrosstab <- function(flist, reorder = TRUE) {
     ind <- function(i,j) ((i-1) * i)/2 + j # index in rowwise lower triangle
     ## Coerce flist to a list of factors with no unused levels
     flist <- lapply(as.list(flist), function (x) as.factor(x)[drop = TRUE])
@@ -10,14 +10,13 @@ bCrosstab <- function(flist) {
     if (any(lapply(flist, length) != nobs))
         stop("all factors in flist must have the same length")
     ones <- rep(1, nobs)
-    ## Order the factors by non-increasing length(levels(el))
     nlev <- unlist(lapply(flist, function(x) length(levels(x))))
     ord <- rev(order(nlev))
-    if (any(ord != seq(along = ord))) {
+    if (reorder && any(ord != seq(along = ord))) {
         nlev <- nlev[ord]
         flist <- flist[ord]
     }
-                                        # establish output list and names
+                                          # establish output list and names
     lst <- vector("list", choose(nfac + 1, 2))
     if (is.null(nms <- names(flist))) nms <- paste("V", 1:nfac, sep = "")
     nmat <- outer(nms, nms, FUN = "paste", sep = ":")
@@ -29,7 +28,7 @@ bCrosstab <- function(flist) {
             lst[[IND]] <- as(new("tripletMatrix",
                                  i = zb[[i]], j = zb[[j]],
                                  x = ones, Dim = nlev[c(i,j)]),
-                             "cscMatrix")
+                             ifelse(j != i,"cscMatrix","sscMatrix"))
             nms[ind(i,j)] <- nmat[i, j]
         }
     }
