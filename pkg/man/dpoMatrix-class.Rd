@@ -3,13 +3,21 @@
 \alias{dpoMatrix-class}
 \alias{dppMatrix-class}
 \alias{rcond,dpoMatrix,character-method}
+\alias{rcond,dppMatrix,character-method}
 \alias{rcond,dpoMatrix,missing-method}
+\alias{rcond,dppMatrix,missing-method}
 \alias{chol,dpoMatrix-method}
+\alias{chol,dppMatrix-method}
 \alias{chol,dpoMatrix,ANY-method}
+\alias{chol,dppMatrix,ANY-method}
 \alias{determinant,dpoMatrix,logical-method}
+\alias{determinant,dppMatrix,logical-method}
 \alias{solve,dpoMatrix,dgeMatrix-method}
+\alias{solve,dppMatrix,dgeMatrix-method}
 \alias{solve,dpoMatrix,matrix-method}
+\alias{solve,dppMatrix,matrix-method}
 \alias{solve,dpoMatrix,missing-method}
+\alias{solve,dppMatrix,missing-method}
 \alias{solve,dpoMatrix,numeric-method}
 \title{Positive semi-definite, dense, numeric matrices}
 \description{The \code{"dpoMatrix"} class is the class of
