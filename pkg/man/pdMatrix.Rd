@@ -8,7 +8,7 @@
 \description{This generic function extracts the positive-definite matrix
   represented by \code{object}.
 
-  This function is deprecated.  Use coersion to the \code{pdmatrix}
+  This function is deprecated.  Use coercion to the \code{pdmatrix}
   class instead.
 }
 \usage{
