@@ -110,7 +110,7 @@ setMethod("lme", signature(formula = "formula", random = "list"),
           if (missing(model))
               model = TRUE
           if (missing(x))
-              x = TRUE
+              x = FALSE
           random = lapply(as(random, "list"),
                    get("formula", pos = parent.frame(), mode = "function"))
                    #lapply(random, function(x)
@@ -123,7 +123,7 @@ setMethod("lme", signature(formula = "formula", random = "list"),
           mCall[[1]] <- as.name("model.frame")
           names(mCall)[2] <- "formula"
           mCall$random <- mCall$correlation <- mCall$method <-
-              mCall$control <- NULL
+              mCall$control <- mCall$model <- mCall$x <- NULL
           form <- formula
           form[[3]] <- (~a+b)[[2]]
           form[[3]][[2]] <- formula[[3]]
@@ -158,8 +158,10 @@ setMethod("lme", signature(formula = "formula", random = "list"),
           .Call("ssclme_factor", obj, PACKAGE = "Matrix")
           .Call("ssclme_EMstepsGets", obj, controlvals$niterEM,
                 method == "REML", controlvals$EMverbose, PACKAGE = "Matrix")
-          new("lme", call = match.call(), facs = facs, mmats = mmats,
-              model = data, REML = method == "REML", rep = obj)
+          new("lme", call = match.call(), facs = facs,
+              x = if(x) mmats else list(),
+              model = if(model) data else data.frame(list()),
+              REML = method == "REML", rep = obj)
       })
 
 setMethod("fitted", signature=c(object="lme"),

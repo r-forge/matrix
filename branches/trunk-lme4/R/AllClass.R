@@ -26,7 +26,7 @@ setClass("summary.pdMat", representation(cor = "corrmatrix",
 
 setClass("lme", representation(call = "call",
                                facs = "list",
-                               mmats = "list",
+                               x = "list",
                                model = "data.frame",
                                REML = "logical",
                                rep = "ssclme"))
