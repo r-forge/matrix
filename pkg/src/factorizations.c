@@ -10,7 +10,17 @@ SEXP BunchKaufman_validate(SEXP obj)
     return ScalarLogical(1);
 }
 
+SEXP pBunchKaufman_validate(SEXP obj)
+{
+    return ScalarLogical(1);
+}
+
 SEXP Cholesky_validate(SEXP obj)
+{
+    return ScalarLogical(1);
+}
+
+SEXP pCholesky_validate(SEXP obj)
 {
     return ScalarLogical(1);
 }
