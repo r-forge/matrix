@@ -169,9 +169,16 @@ if (!isGeneric("pooledSD")) {
 }
 
 if (!isGeneric("VarCorr")) {
-    setGeneric("VarCorr", function(x) standardGeneric("VarCorr"))
+    setGeneric("VarCorr", function(x, ...) standardGeneric("VarCorr"))
 }
 
 if (!isGeneric("gradient")) {           # not exported
     setGeneric("gradient", function(x, ...) standardGeneric("gradient"))
+}
+
+if (!isGeneric("getFixDF")) {           # not exported
+    ## Return the formula(s) for the groups associated with object.
+    ## The result is a one-sided formula unless asList is TRUE in which case
+    ## it is a list of formulas, one for each level.
+    setGeneric("getFixDF", function(object) standardGeneric("getFixDF"))
 }
