@@ -86,9 +86,6 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
       {
 
 
-
-
-
           debug <- FALSE ## check if fitted() works. Remove all such code later
 
 
@@ -161,14 +158,13 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
           names(facs) = names(random)
 
           obj = obj[[1]]
-          ##.Call("ssclme_initial", obj, PACKAGE="Matrix")
 
 
-          ## get initial estimates
-          fm.glm <- glm(formula, family, data)
-          coefFixef <- c(coef(fm.glm), 0)
+          ## get initial estimates from glm
+          coefFixef <- c(coef(glm(formula, family, data)), 0)
 
 
+          ## debugging code, remove later *******************
           if (debug)
           {
               coefRanef <-
@@ -181,26 +177,25 @@ setMethod("sparseGLMM", signature(formula = "formula", family = "family", random
                              ncol = ncol(mmats.unadjusted[[facname]]))
               }
           }
+          ## **********************************************
+
 
 
           mmats <- mmats.unadjusted
           conv <- FALSE
           firstIter <- TRUE
 
-
-
           ## initial 'fitted' values on linear scale
           eta <- drop(mmats.unadjusted$.Xy %*% coefFixef)
           etaold <- eta
 
-#print(str(mmats.unadjusted))
           for (iter in seq(length = controlvals$glmmMaxIter))
           {
 
-cat(paste("\n\n\nIteration", iter, "\n"))
+              cat(paste("\n\n\nIteration", iter, "\n"))
 
 
-
+              ## debugging code, remove later *******************
               if (debug)
               {
                   eta.check <- mmats.unadjusted$.Xy %*% coefFixef
@@ -219,6 +214,10 @@ cat(paste("\n\n\nIteration", iter, "\n"))
                   else print("fitted values match")
                   #eta <- drop(eta.check)
               }
+              ## *************************************************
+
+
+
 
 
               mu <- family$linkinv(eta)
@@ -227,8 +226,7 @@ cat(paste("\n\n\nIteration", iter, "\n"))
               z <- eta + (mmats.unadjusted$.Xy[, responseIndex] - mu) / dmu.deta
               ## weights
               w <- dmu.deta / sqrt(family$variance(mu))
-#w <- 1#rep(c(.9, 1.1), length = length(w))
-print(summary(w))
+
 #plot(z, mmats$.Xy[, responseIndex])
 
               ## Does this prevent overwriting of components ?
@@ -244,11 +242,8 @@ print(summary(w))
 
 #print(summary(data.frame(eta = eta, z, w, zw = z * w)))
               .Call("ssclme_update_mm", obj, facs, mmats, PACKAGE="Matrix")
-return(obj)
-## ssclme_initial should only be called on the first iteration
               if (firstIter) .Call("ssclme_initial", obj, PACKAGE="Matrix")
-print(3)
-print(str(obj@Omega))
+#print(str(obj@Omega))
               .Call("ssclme_EMsteps", obj, controlvals$niterEM,
                     method == "REML", controlvals$EMverbose, PACKAGE = "Matrix")
               LMEoptimize(obj) = controlvals
@@ -269,12 +264,13 @@ print(max(abs(eta - etaold)) / (0.1 + max(abs(eta))))
 
 
 
+              ## debugging code, remove later *******************
               if (debug)
               {
                   coefFixef <- c(fixef(obj), 0)
                   coefRanef <- ranef(obj)
               }
-
+              ## *********************************************
 
 
 ### May want to adjust number of EMiterations on second and subsequent
