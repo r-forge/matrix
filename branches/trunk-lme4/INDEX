@@ -4,19 +4,14 @@ BIC                     Bayesian Information Criterion
 BodyWeight              Rat weight over time for different diets
 Cefamandole             Pharmacokinetics of Cefamandole
 Dialyzer                High-Flux Hemodialyzer
-EMsteps<-               Perform EM iterations
-EMupdate<-              Update an object in the EM algorithm
 Earthquake              Earthquake Intensity
 Fatigue                 Cracks caused by metal fatigue
-GLMM                    Fit Generalized Linear Mixed Models via PQL
 Gasoline                Refinery yield of gasoline
 Glucose                 Glucose levels over time
 Glucose2                Glucose Levels Following Alcohol Ingestion
 Gun                     Methods for firing naval guns
 Hsb82                   High School and Beyond - 1982
 IGF                     Radioimmunoassay of IGF-I Protein
-LMEgradient             The gradient and Hessian in lme
-                        optimization-method
 LMEoptimize<-           Optimize linear mixed-effects
 Machines                Productivity Scores for Machines and Workers
 MathAchSchool           School demographic data for MathAchieve
@@ -54,9 +49,6 @@ ergoStool               Ergometrics experiment with stool types
 family-class            Class "family"
 fixed.effects           Extract Fixed Effects
 getCovariate            Utilities for formulas
-getFixDF                Internal nlme functions
-glmm-class              Class "glmm"
-glmmStruct              Create a glmm object
 groupedData             Creation of groupedData objects
 groupedData-class       Class "groupedData"
 guImmun                 Immunization in Guatemala
@@ -67,26 +59,15 @@ lmList-class            Class "lmList"
 lme                     Fit linear mixed-effects models
 lme-class               Class "lme"
 lmeControl              Control values for lme
-lmeLevel                Construct an lmeLevel object
-lmeLevel-class          Class "lmeLevel"
-lmeLevelList-class      Some internal classes
-logDet                  Logarithm of the determinant
-model.matrix<-          Assign the model.matrix
 nfGroupedData-class     Class "nfGroupedData"
 nffGroupedData-class    Class "nffGroupedData"
 nfnGroupedData-class    Class "nfnGroupedData"
 nmGroupedData-class     Class "nmGroupedData"
-pdgradient              Evaluated the pdmatrix gradient
 pooledSD                Extract pooled standard deviation
 random.effects          Extract Random Effects
-reStruct                Create an reStruct object
-reStruct-class          Class "reStruct"
-response<-              Modify the response
 s3bbx                   Covariates in the Rodriguez and Goldman
                         simulation
 s3bby                   Responses simulated by Rodriguez and Goldman
 solve-methods           Methods for Function solve
 sparseGLMM              Fit Generalized Linear Mixed Models via PQL
-summary.reStruct-class
-                        Class "summary.reStruct"
-weighted<-              Modify the weights
+summary.lme-class       Class "summary.lme"

@@ -3,7 +3,7 @@
 \alias{getCovariate}
 \alias{getCovariateFormula}
 \alias{getGroups}
-\alias{getGroups,data.frame,formula,ANY,ANY,ANY-method}
+\alias{getGroups,data.frame,formula-method}
 \alias{getGroupsFormula}
 \alias{getGroupsFormula,ANY-method}
 \alias{getResponse}

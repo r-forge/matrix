@@ -29,19 +29,6 @@ setClass("lme", representation(call = "call",
                                fitted = "numeric",
                                residuals = "numeric"))
 
-setOldClass("family")
-
-## Structure for fitting glmm classes
-setClass("glmm",
-         representation(family="family", # The glm family
-                        origy="numeric",
-                        n="numeric",
-                        prior.weights="numeric",
-                        init.weights="numeric",
-                        init.y="numeric",
-                        method="character"),
-         contains = "lme")
-
 setClass("lmList",
          representation(call = "call",
                         pool = "logical"),
@@ -82,7 +69,5 @@ setClass("summary.lme",
                         re = "summary.ssclme",
                         residuals = "numeric"))
 
-#setClass("summary.glmm", representation(method="character",
-#                                        family="character",
-#                                        link="character"),
-#         contains="summary.lme")
+setOldClass("family")
+

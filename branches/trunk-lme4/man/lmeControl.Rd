@@ -7,6 +7,17 @@
   list with all possible arguments is returned. The returned list is
   used as the \code{control} argument in the \code{lme} function.
 }
+\synopsis{
+lmeControl(maxIter = 50, msMaxIter = 50, tolerance =
+                 sqrt((.Machine$double.eps)), niterEM = 25, msTol =
+                 sqrt(.Machine$double.eps), msScale, msVerbose =
+                 FALSE, glmmMaxIter = 20, returnObject = FALSE,
+                 gradHess = TRUE, apVar = TRUE, .relStep =
+                 (.Machine$double.eps)^(1/3), minAbsParApVar = 0.05,
+                 nlmStepMax = NULL, natural = TRUE, optimizer = "nlm",
+                 EMverbose = FALSE, analyticGradient = TRUE,
+                 analyticHessian = FALSE)
+}
 \usage{
 lmeControl(maxIter, msMaxIter, tolerance, niterEM, msTol,
            msScale, msVerbose, returnObject, gradHess, apVar,

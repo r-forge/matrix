@@ -6,7 +6,7 @@
   Family objects describe the error distributions and link functions
   used in generalized linear models and its extensions. It is used by
   functions such as \code{\link[base:glm]{glm}} and 
-  \code{\link{GLMM}}.
+  \code{\link{sparseGLMM}}.
 }
 \section{Objects from the Class}{This is an S3 style class. No objects
   may be created from it using \code{new}.}
