@@ -7,12 +7,12 @@
   This generic function generates a correlation matrix from an object of
   a suitable class.
 
-  This function is deprecated.  Use coersion to the \code{corrmatrix}
+  This function is deprecated.  Use coercion to the \code{corrmatrix}
   class instead.
 }
 \usage{
 corMatrix(object, ...)
-} 
+}
 \arguments{
   \item{object}{An object of a suitable class}
   \item{\dots}{Some methods for this generic take additional, optional
