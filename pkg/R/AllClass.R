@@ -5,7 +5,7 @@
 
 ## ------------- Virtual Classes ----------------------------------------
 
-# Virtual class of all Matrix objects
+# Mother class of all Matrix objects
 setClass("Matrix", representation(Dim = "integer", Dimnames = "list",
                                   "VIRTUAL"),
          prototype = prototype(Dim = integer(2), Dimnames = list(NULL,NULL)),
@@ -42,6 +42,12 @@ setClass("zMatrix", # letter 'z' is as in the names of Lapack subroutines
 setClass("ddenseMatrix",
          representation(rcond = "numeric", factors = "list", "VIRTUAL"),
          contains = "dMatrix")
+
+## virtual SPARSE ------------
+
+setClass("sparseMatrix", contains = "Matrix")# "VIRTUAL"
+
+setClass("dsparseMatrix", contains = c("dMatrix", "sparseMatrix"))# "VIRTUAL"
 
 ## ------------------ Proper (non-virtual) Classes ----------------------------
 
@@ -96,12 +102,12 @@ setClass("dppMatrix", contains = "dspMatrix",
          validity = function(object) .Call("dppMatrix_validate", object)
          )
 
-##-------------------- S P A R S E ----------------------------------------
+##-------------------- S P A R S E (non-virtual) --------------------------
 
 # numeric, sparse, triplet general matrices
 setClass("dgTMatrix",
          representation(i = "integer", j = "integer", factors = "list"),
-         contains = "dMatrix",
+         contains = "dsparseMatrix",
          validity = function(object) .Call("dgTMatrix_validate", object)
          )
 
@@ -122,7 +128,7 @@ setClass("dsTMatrix",
 # numeric, sparse, sorted compressed sparse column-oriented general matrices
 setClass("dgCMatrix",
          representation(i = "integer", p = "integer", factors = "list"),
-         contains = "dMatrix",
+         contains = "dsparseMatrix",
          validity = function(object) .Call("dgCMatrix_validate", object)
          )
 
@@ -143,7 +149,7 @@ setClass("dsCMatrix",
 # numeric, sparse, sorted compressed sparse row-oriented general matrices
 setClass("dgRMatrix",
          representation(j = "integer", p = "integer", factors = "list"),
-         contains = "dMatrix",
+         contains = "dsparseMatrix",
          validity = function(object) .Call("dgRMatrix_validate", object)
          )
 

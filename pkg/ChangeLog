@@ -1,3 +1,13 @@
+2005-03-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllClass.R: add two virtual sparse classes ``on top''
+
+2005-03-24  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllClass.R (setClass): use "VIRTUAL" for the virtual classes;
+		correspondingly fix examples and tests/ since new()
+		doesn't work for virtual classes.
+
 2005-03-17  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Matrix.R (as.matrix): method and one for unname()
