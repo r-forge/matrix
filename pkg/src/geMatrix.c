@@ -79,8 +79,9 @@ SEXP geMatrix_crossprod(SEXP x)
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("poMatrix")));
     int *Dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	*vDims;
-    int n = Dims[1];
-    double one = 1.0, zero = 0.0;
+    int i, n = Dims[1];
+    int nsqr = n * n;
+    double one = 1.0, *xvals, zero = 0.0;
 
     SET_SLOT(val, Matrix_factorization, allocVector(VECSXP, 0));
     SET_SLOT(val, Matrix_rcondSym, allocVector(REALSXP, 0));
@@ -89,16 +90,13 @@ SEXP geMatrix_crossprod(SEXP x)
     vDims = INTEGER(GET_SLOT(val, Matrix_DimSym));
     vDims[0] = vDims[1] = n;
     SET_SLOT(val, Matrix_xSym, allocVector(REALSXP, n * n));
+    xvals = REAL(GET_SLOT(val, Matrix_xSym));
+    for (i = 0; i < nsqr; i++) xvals[i] = 0.; /* keep valgrind happy */
     if (Dims[0] > 0) {
 	F77_CALL(dsyrk)("U", "T", vDims, Dims,
 			&one, REAL(GET_SLOT(x, Matrix_xSym)), Dims,
 			&zero, REAL(GET_SLOT(val, Matrix_xSym)), vDims);
-    } else {
-	int i, nsqr = n * n;
-	double *xvals = REAL(GET_SLOT(val, Matrix_xSym));
-	for (i = 0; i < nsqr; i++) xvals[i] = 0.;
     }
-    
     UNPROTECT(1);
     return val;
 }
