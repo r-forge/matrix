@@ -13,5 +13,3 @@ setAs("ssclme", "tscMatrix",
       function(from)
       new("tscMatrix", i = from@Li, p = from@Lp, Dim = from@Dim, x = from@Lx,
           uplo = "L", diag = "U"))
-
-
