@@ -11,7 +11,7 @@ setMethod("GLMM1", signature(formula = "formula"),
           controlvals$REML <- FALSE
           if (length(formula) < 3) stop("formula must be a two-sided formula")
 
-          ## initial glm fit and evaluation of model frame
+          ## initial glm fit
           mf <- match.call()            
           m <- match(c("family", "data", "subset", "weights",
                        "na.action", "offset"),
@@ -25,14 +25,14 @@ setMethod("GLMM1", signature(formula = "formula"),
           mf$x <- mf$model <- mf$y <- TRUE
           glm.fit <- eval(mf, parent.frame())
           family <- glm.fit$family
+          ## Note: offset is on the linear scale
           offset <- glm.fit$offset
           if (is.null(offset)) offset <- 0
           weights <- sqrt(abs(glm.fit$prior.weights))
           ## initial 'fitted' values on linear scale
-          eta <- glm.fit$linear.predictors
-          etaold <- eta
-          ## Note: offset is on the linear scale
+          etaold <- eta <- glm.fit$linear.predictors
           
+          ## evaluation of model frame
           mf$x <- mf$model <- mf$y <- mf$family <- NULL
           mf$drop.unused.levels <- TRUE
           this.form <- subbars(formula)
@@ -69,9 +69,11 @@ setMethod("GLMM1", signature(formula = "formula"),
           rm(glm.fit)
           .Call("lmer_initial", obj, PACKAGE="Matrix")
           mmats.unadjusted <- mmats
+          mmats[[1]][1,1] <- mmats[[1]][1,1]
           conv <- FALSE
           firstIter <- TRUE
           msMaxIter.orig <- controlvals$msMaxIter
+          responseIndex <- ncol(mmats$.fixed)
 
           for (iter in seq(length = controlvals$PQLmaxIt))
           {
@@ -80,10 +82,10 @@ setMethod("GLMM1", signature(formula = "formula"),
               ## weights (note: weights is already square-rooted)
               w <- weights * dmu.deta / sqrt(family$variance(mu))
               ## adjusted response (should be comparable to X \beta, not including offset
-              z <- eta - offset + (mmats.unadjusted$.Xy[, responseIndex] - mu) / dmu.deta
+              z <- eta - offset + (mmats.unadjusted$.fixed[, responseIndex] - mu) / dmu.deta
               .Call("nlme_weight_matrix_list",
                     mmats.unadjusted, w, z, mmats, PACKAGE="Matrix")
-              .Call("lmer_update_mm", obj, facs, mmats, PACKAGE="Matrix")
+              .Call("lmer_update_mm", obj, mmats, PACKAGE="Matrix")
               if (firstIter) {
                   .Call("lmer_initial", obj, PACKAGE="Matrix")
                   if (gVerb) cat(" PQL iterations convergence criterion\n")
@@ -94,6 +96,27 @@ setMethod("GLMM1", signature(formula = "formula"),
                     controlvals$EMverbose,
                     PACKAGE = "Matrix")
               LMEoptimize(obj) <- controlvals
+              eta[] <- offset + ## FIXME: should the offset be here ?
+                  .Call("lmer_fitted", obj,
+                        mmats.unadjusted, TRUE, PACKAGE = "Matrix")
+              crit <- max(abs(eta - etaold)) / (0.1 + max(abs(eta)))
+              if (gVerb) cat(sprintf("%03d: %#11g\n", as.integer(iter), crit))
+              ## use this to determine convergence
+              if (crit < controlvals$tolerance) {
+                  conv <- TRUE
+                  break
+              }
+              etaold[] <- eta
+
+              ## Changing number of iterations on second and
+              ## subsequent iterations.
+              if (firstIter)
+              {
+                  controlvals$niterEM <- 2
+                  controlvals$msMaxIter <- 10
+                  firstIter <- FALSE
+              }
           }
+          if (!conv) warning("IRLS iterations for glmm did not converge")
           obj
       })
