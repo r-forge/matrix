@@ -474,11 +474,11 @@ SEXP lmer_factor(SEXP x)
 		    dcmp[0] += 2. * log(Dj[jj * (nci + 1)]);
 	    }
 	    /* Solve L_{i,i} %*% RZX_i := RZX_i */
-	    cscb_trsm(LFT, NTR, UNT, 1., LiP, RZX + Gp[i],
-		      Gp[i+1] - Gp[i], dims[1], dims[0]);
+	    cscb_trsm(LOW, NTR, UNT, 1., LiP,
+		      Gp[i+1] - Gp[i], dims[1], RZX + Gp[i], dims[0]);
 	    /* Solve D_i^{T/2} %*% RZX_i := RZX_i */
 	    for (jj = 0; jj < nlev; jj++) {
-		F77_CALL(dtrsm)("L", "U", "T", "N", &nci, dims + 1,
+		F77_CALL(dtrsm)("L", "U", "T", "N", &nci, &dims[1],
 				&one, D + jj * ncisqr, &nci,
 				RZX + Gp[i] + jj * nci, dims);
 	    }
@@ -499,7 +499,8 @@ SEXP lmer_factor(SEXP x)
 					&one, D + jj * ncisqr, &nci,
 					L + k * ntot, xdims);
 		}
-		/* RZX_j := RZX_j - L_{j,i} %*% RZX_i */
+		/* RZX_j := RZX_j - (L_{j,i} %*% D_i^{T/2}) %*% RZX_i */
+		/* At this point Lji contains L_{j,i} %*% D_i^{T/2} */
 		cscb_mm(LFT, NTR, Gp[j + 1] - Gp[j], dims[1], Gp[i+1] - Gp[i],
 			-1.0, Lji, RZX + Gp[i], dims[0],
 			1.0, RZX + Gp[j], dims[0]);
@@ -580,7 +581,7 @@ lmer_sm(char side, char trans, int nf, const int Gp[], int n,
 		int nrj = Gp[j + 1] - Gp[j];
 
 		cscb_trsm(LOW, TRN, UNT, alpha, VECTOR_ELT(L, Lind(j, j)),
-			   B + Gp[j], nrj, n, ldb);
+			  nrj, n, B + Gp[j], ldb);
 		for (k = 0; k < j; k++) {
 		    cscb_mm(LFT, TRN, Gp[k + 1] - Gp[k], n, nrj,
 			    -1., VECTOR_ELT(L, Lind(j, k)),
