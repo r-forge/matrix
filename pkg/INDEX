@@ -1,15 +1,20 @@
+Cholesky-class          Cholesky and Bunch-Kaufman Decompositions
+Hilbert                 Generate a Hilbert matrix
+LU-class                LU Matrix Decompositions
+Matrix                  Construct a Classed Matrix
+Matrix-class            (Virtual) Class "Matrix" Class of Matrices
+Schur                   Schur Decomposition of a Matrix
 bCrosstab               Create pairwise crosstabulation
-Cholesky-class          Cholesky Decompositions
 coef<-                  Assign parameters
 corrmatrix-class        Class "corrmatrix"
 dCholCMatrix-class      Cholesky Decompositions of dsCMatrix Objects
+dMatrix-class           (Virtual) Class "dMatrix" of "double" Matrices
 dgBCMatrix-class        Class "dgBCMatrix" Real Sparse Blocked Column
                         Compressed Matrix
 dgCMatrix-class         Compressed, sparse, column-oriented numeric
                         matrices
-dgeMatrix-class         General S4 Matrix class
 dgTMatrix-class         Sparse matrices in triplet form
-dMatrix-class           (Virtual) Class "dMatrix" of "double" Matrices
+dgeMatrix-class         General S4 Matrix class
 dpoMatrix-class         Positive semi-definite, dense, numeric
                         matrices
 dsCMatrix-class         Symmetric, compressed, sparse column matrices
@@ -20,16 +25,11 @@ dtrMatrix-class         Triangular, dense, numeric matrices
 expand                  Expand a Decomposition into Factors
 expm                    Matrix exponential
 facmul                  Multiplication by Decomposition Factors
-Hilbert                 Generate a Hilbert matrix
 lu                      Triangular Decomposition of a Square Matrix
-LU-class                LU Matrix Decompositions
-Matrix                  Construct a Classed Matrix
-Matrix-class            (Virtual) Class "Matrix" Class of Matrices
 mm                      A sample sparse model matrix
 norm                    Norm of a Matrix
 pdmatrix-class          Positive-definite matrices
 rcond                   Estimate the Reciprocal Condition Number
-Schur                   Schur Decomposition of a Matrix
 sscCrosstab             Create pairwise crosstabulation
 sscCrosstab-class       Pairwise crosstabulations
 ssclme-class            lme models as sparse, symmetric matrices

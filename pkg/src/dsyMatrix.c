@@ -187,3 +187,33 @@ SEXP dsyMatrix_dgeMatrix_mm_R(SEXP a, SEXP b)
     return val;
 }
 
+SEXP dsyMatrix_trf(SEXP x)
+{
+    SEXP val = get_factors(x, "BunchKaufman"),
+	dimP = GET_SLOT(x, Matrix_DimSym),
+	uploP = GET_SLOT(x, Matrix_uploSym);
+    int *dims = INTEGER(dimP), *perm, info;
+    int lwork = -1, n = dims[0];
+    char *uplo = CHAR(STRING_ELT(uploP, 0));
+    double tmp, *vx, *work;
+
+    if (val != R_NilValue) return val;
+    dims = INTEGER(dimP);
+    val = PROTECT(NEW_OBJECT(MAKE_CLASS("BunchKaufman")));
+    SET_SLOT(val, Matrix_uploSym, duplicate(uploP));
+    SET_SLOT(val, Matrix_diagSym, mkString("N"));
+    SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
+    vx = REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, n * n));
+    AZERO(vx, n * n);
+    F77_CALL(dlacpy)(uplo, &n, &n, REAL(GET_SLOT(x, Matrix_xSym)), &n, vx, &n);
+    perm = INTEGER(ALLOC_SLOT(val, Matrix_permSym, INTSXP, n));
+    F77_CALL(dsytrf)(uplo, &n, vx, &n, perm, &tmp, &lwork, &info);
+    lwork = (int) tmp;
+    work = Calloc(lwork, double);
+    F77_CALL(dsytrf)(uplo, &n, vx, &n, perm, work, &lwork, &info);
+    if (info) error(_("Lapack routine dsytrf returned error code %d"), info);
+    UNPROTECT(1);
+    Free(work);
+    return set_factors(x, val, "BunchKaufman");
+}
+

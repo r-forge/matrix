@@ -21,6 +21,7 @@
 #include "Syms.h"
 
 static R_CallMethodDef CallEntries[] = {
+    {"BunchKaufman_validate", (DL_FUNC) &BunchKaufman_validate, 1},
     {"Cholesky_validate", (DL_FUNC) &Cholesky_validate, 1},
     {"LU_expand", (DL_FUNC) &LU_expand, 1},
     {"LU_validate", (DL_FUNC) &LU_validate, 1},
@@ -80,6 +81,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dsyMatrix_norm", (DL_FUNC) &dsyMatrix_norm, 2},
     {"dsyMatrix_rcond", (DL_FUNC) &dsyMatrix_rcond, 2},
     {"dsyMatrix_solve", (DL_FUNC) &dsyMatrix_solve, 1},
+    {"dsyMatrix_trf", (DL_FUNC) &dsyMatrix_trf, 1},
     {"dsyMatrix_validate", (DL_FUNC) &dsyMatrix_validate, 1},
     {"dtTMatrix_as_dtrMatrix", (DL_FUNC) &dtTMatrix_as_dtrMatrix, 1},
     {"dtTMatrix_validate", (DL_FUNC) &dtTMatrix_validate, 1},

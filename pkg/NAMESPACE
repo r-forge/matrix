@@ -31,7 +31,8 @@ export(
        )
 
 exportClasses(
-	      "Cholesky",
+	      "BunchKaufman",
+              "Cholesky",
 	      "LU",
               "Matrix",
               ## also intermediate `virtual' ones:

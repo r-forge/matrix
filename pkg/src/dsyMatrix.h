@@ -14,5 +14,6 @@ SEXP dsyMatrix_as_dgeMatrix(SEXP from);
 SEXP dsyMatrix_as_matrix(SEXP from);
 SEXP dsyMatrix_dgeMatrix_mm(SEXP a, SEXP b);
 SEXP dsyMatrix_dgeMatrix_mm_R(SEXP a, SEXP b);
+SEXP dsyMatrix_trf(SEXP x);
 
 #endif
