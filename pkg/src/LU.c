@@ -9,10 +9,7 @@ SEXP LU_expand(SEXP x)
 	nms = PROTECT(allocVector(STRSXP, 2)),
 	lux = GET_SLOT(x, Matrix_xSym),
 	dd = GET_SLOT(x, Matrix_DimSym);
-    int i, n;
-    double *lx;
 
-    n = *INTEGER(dd);
     SET_STRING_ELT(nms, 0, mkChar("L"));
     SET_STRING_ELT(nms, 1, mkChar("U"));
     setAttrib(val, R_NamesSymbol, nms);
