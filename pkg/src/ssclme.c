@@ -97,16 +97,16 @@ void ssclme_copy_ctab(int nf, const int nc[], SEXP ctab, SEXP ssc)
 		    AiOut[pos++] = map[ii];
 		    if (ii < j) {	/* above the diagonal */
 			for (jj = 1; jj < ncci; jj++) {
-			    AiOut[pos+1] = AiOut[pos] + 1;
+			    AiOut[pos] = AiOut[pos-1] + 1;
 			    pos++;
 			}
 		    }
-		    for (jj = 1; jj < nci; jj++) { /* repeat the column adding 
-						    * another diagonal element */
-			int mjj = mj + jj, pj = ApOut[mjj], pjm1 = ApOut[mjj-1];
-			Memcpy(AiOut + pj, AiOut + pjm1, pj - pjm1);
-			AiOut[ApOut[mjj + 1] - 1] = mjj;
-		    }
+		}
+		for (jj = 1; jj < nci; jj++) { /* repeat the column adding 
+						* another diagonal element */
+		    int mjj = mj + jj, pj = ApOut[mjj], pjm1 = ApOut[mjj-1];
+		    Memcpy(AiOut + pj, AiOut + pjm1, pj - pjm1);
+		    AiOut[ApOut[mjj + 1] - 1] = mjj;
 		}
 	    }
 	}
