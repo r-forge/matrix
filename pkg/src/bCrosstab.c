@@ -77,29 +77,6 @@ make_upper_triangular(int i[], int j[], int nnz)
 }
 
 /** 
- * Create a named vector of type TYP
- * 
- * @param TYP a vector SEXP type (e.g. REALSXP)
- * @param names names of list elements with null string appended
- * 
- * @return pointer to a named vector of type TYP
- */
-static SEXP
-make_named(int TYP, char **names)
-{
-    SEXP ans, nms;
-    int i, n;
-
-    for (n = 0; strlen(names[n]) > 0; n++) {}
-    ans = PROTECT(allocVector(TYP, n));
-    nms = PROTECT(allocVector(STRSXP, n));
-    for (i = 0; i < n; i++) SET_STRING_ELT(nms, i, mkChar(names[i]));
-    setAttrib(ans, R_NamesSymbol, nms);
-    UNPROTECT(2);
-    return ans;
-}
-
-/** 
  * Check for the existence of the (row, col) pair in a csc structure.
  * 
  * @param p vector of column pointers
@@ -474,8 +451,8 @@ lmer_populate(SEXP val)
 	*pnms[] = {"index", "block", ""};
 	
     /* Allocate fixed-sized slots */
-    SET_SLOT(val, Matrix_statusSym, make_named(LGLSXP, statnms ));
-    SET_SLOT(val, Matrix_devianceSym, make_named(REALSXP, devnms));
+    SET_SLOT(val, Matrix_statusSym, Matrix_make_named(LGLSXP, statnms ));
+    SET_SLOT(val, Matrix_devianceSym, Matrix_make_named(REALSXP, devnms));
     SET_SLOT(val, Matrix_devCompSym, allocVector(REALSXP, 4));
     /* Allocate slots that are lists of length nf */
     SET_SLOT(val, Matrix_ZZpOSym, allocVector(VECSXP, nf));
@@ -527,7 +504,7 @@ lmer_populate(SEXP val)
 	    ncj = length(cpp) - 1,
 	    nnz = length(cip);
 				
-	SET_VECTOR_ELT(Parent, j, make_named(VECSXP, pnms));
+	SET_VECTOR_ELT(Parent, j, Matrix_make_named(VECSXP, pnms));
 	parent = VECTOR_ELT(Parent, j);
 	SET_VECTOR_ELT(parent, 0, allocVector(INTSXP, ncj));
 	SET_VECTOR_ELT(parent, 1, allocVector(INTSXP, ncj));
