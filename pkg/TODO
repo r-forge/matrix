@@ -7,9 +7,6 @@
   ?Math.data.frame  and the examples in
   ?SetGeneric
 
-- check to see if the .onLoad function to require the methods package
-  (in the AllClass.R file) is needed
-
 - Should the uplo and diag slots continue to be stored as character?
   An alternative is to use a factor as in the enum values for the
   cblas.
