@@ -1283,23 +1283,29 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
 	    REAL(ans)[cind++] = *tmp *
 		(uncst ? *REAL(VECTOR_ELT(Omega, i)) : 1.);
 	} else {
-	    int odind = cind + nci;
+	    int k, odind = cind + nci;
 	    if (uncst) {
-		int kk;
+		int ione = 1, kk;
+		double *rr = Calloc(nci, double);
 		nlme_symmetrize(tmp, nci);
 		for (j = 0; j < nci; j++, cind++) {
-		    double *dder = REAL(ans) + cind;
-		    *dder = 0.;
+		    for (k = 0; k < nci; k++) rr[k] = chol[j + k*nci];
+		    REAL(ans)[cind] = 0.;
 		    for (k = j; k < nci; k++) {
 			for (kk = j; kk < nci; kk++) {
-			    *dder += chol[k*nci + j] * chol[kk*nci + j] *
+			    REAL(ans)[cind] += rr[k] * rr[kk] *
 				tmp[kk * nci + k];
 			}
 		    }
+		    for (k = 0; k < nci; k++) rr[k] *= rr[j];
 		    for (k = j + 1; k < nci; k++) {
-			REAL(ans)[odind++] = -1.;
+			REAL(ans)[odind++] =
+			    F77_CALL(ddot)(&nci, rr, &ione, tmp + k, &nci) +
+			    F77_CALL(ddot)(&nci, rr, &ione,
+					   tmp + k*nci, &ione);
 		    }			
 		}
+		Free(rr);
 	    } else {
 		for (j = 0; j < nci; j++) {
 		    REAL(ans)[cind++] = tmp[j * ncip1];
