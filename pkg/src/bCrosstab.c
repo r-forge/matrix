@@ -120,6 +120,17 @@ check_csc_index(const int p[], const int i[], int row, int col)
     return -1;
 }
 
+static int*
+expand_column_pointers(int ncol, const int mp[], int mj[])
+{
+    int j;
+    for (j = 0; j < ncol; j++) {
+	int j2 = mp[j+1], jj;
+	for (jj = mp[j]; jj < j2; jj++) mj[jj] = j;
+    }
+    return mj;
+}
+
 /** 
  * Replace the structure of C by the structure of CA
  * 
@@ -144,10 +155,10 @@ symbolic_right_unit_mm(SEXP A, SEXP C)
 	cnr, cnz = length(cip),
 	i, j;
 
-    if ((length(cpp) - 1) != anc)
+    if ((length(cpp) - 1) != anc) /* A is square so can compare no of cols */
 	error("No. of rows in A (%d) does not match no. of cols in C (%d)",
-	      anc, length(cpp) - 1);
-    if (anz < 1) return;	/* C is the identity */
+	      anc, length(cpp) - 1); 
+    if (anz < 1) return;	/* A is the identity */
     cnr = -1;			/* number of rows in C is max(ci + 1) */
     for (i = 0; i < cnz; i++) {
 	int ri = ci[i] + 1;
@@ -198,6 +209,70 @@ symbolic_right_unit_mm(SEXP A, SEXP C)
 	Memcpy(cp, ncp, anc + 1);
     }	
     Free(Flag); Free(ncp);
+}
+
+/** 
+ * Replace the structure of C by the structure of CA'
+ * 
+ * @param A a unit lower triangular cscBlocked object
+ * @param C a cscBlocked object to be updated
+ */
+static void
+symbolic_right_unit_mm_trans(SEXP A, SEXP C)
+{
+    SEXP aip = GET_SLOT(A, Matrix_iSym),
+	app = GET_SLOT(A, Matrix_pSym),
+	cip = GET_SLOT(C, Matrix_iSym),
+	cpp = GET_SLOT(C, Matrix_pSym);
+    int *ai = INTEGER(aip),
+	*ap = INTEGER(app),
+	*ci = INTEGER(cip),
+	*cp = INTEGER(cpp),
+	anc = length(app) - 1, 
+	anz = length(aip),
+	cnz = length(cip),
+	j, nextra = 0;
+
+    if ((length(cpp) - 1) != anc)
+	error("No. of cols in A (%d) does not match no. of cols in C (%d)",
+	      anc, length(cpp) - 1);
+    if (anz < 1) return;	/* A is the identity */
+    for (j = 0; j < anc; j++) { /* bound the number of extra triplets */
+	int aj2 = ap[j + 1], cj2 = cp[j + 1], ka, kc;
+	for (ka = ap[j]; ka < aj2; ka++) {
+	    for (kc = cp[j]; kc < cj2; kc++) {
+		if (check_csc_index(cp, ci, ai[ka], ci[kc]) < 0) nextra++;
+	    }
+	}
+    }
+    if (nextra) {
+	int cnr, ntot = cnz + nextra, pos;
+	int *dims = INTEGER(getAttrib(GET_SLOT(C, Matrix_xSym), R_DimSymbol)),
+	    *Ti = Memcpy((int *) Calloc(ntot, int), ci, cnz),
+	    *Tj = expand_column_pointers(anc, cp, Calloc(ntot, int)),
+	    *Ci = Calloc(ntot, int);
+
+	for (j = 0, pos = cnz; j < anc; j++) {
+	    int aj2 = ap[j + 1], cj2 = cp[j + 1], ka, kc;
+	    for (ka = ap[j]; ka < aj2; ka++) {
+		for (kc = cp[j]; kc < cj2; kc++) {
+		    if (check_csc_index(cp, ci, ci[kc], ai[ka]) < 0) {
+			Tj[pos] = ai[ka];
+			Ti[pos] = ci[kc];
+			pos++;
+		    }
+		}
+	    }
+	}
+	for (j = 0, cnr = -1; j < cnz; j++) {int rr = ci[j]; if (rr > cnr) cnr = rr;}
+	cnr++;			/* maximum index is 1 less than number of rows */
+	triplet_to_col(cnr, anc, ntot, Ti, Tj, (double *) NULL,
+		       INTEGER(cpp), Ci, (double *) NULL);
+	cnz = cp[anc];
+	SET_SLOT(C, Matrix_iSym, allocVector(INTSXP, cnz));
+	SET_SLOT(C, Matrix_xSym, alloc3Darray(REALSXP, dims[0], dims[1], cnz));
+	Free(Ti); Free(Tj); Free(Ci);
+    }
 }
     
 /** 
@@ -289,17 +364,6 @@ block_update(SEXP ctab, int j, int k, int i)
     }
 }
 
-static int*
-expand_column_pointers(int ncol, int nnz, const int mp[], int mj[])
-{
-    int j;
-    for (j = 0; j < ncol; j++) {
-	int j2 = mp[j+1], jj;
-	for (jj = mp[j]; jj < j2; jj++) mj[jj] = j;
-    }
-    return mj;
-}
-
 /** 
  * Permute the levels of one of the grouping factors in a bCrosstab object
  * 
@@ -324,7 +388,7 @@ bCrosstab_permute(SEXP ctab, int nf, int jj, const int nlev[],
 	int *cp = INTEGER(GET_SLOT(cscb, Matrix_pSym)),
 	    nnz = length(cscbi);
 	double *cx = REAL(GET_SLOT(cscb, Matrix_xSym));
-	int *mj = expand_column_pointers(ncol, nnz, cp, Calloc(nnz, int));
+	int *mj = expand_column_pointers(ncol, cp, Calloc(nnz, int));
 	int *mi = Memcpy(Calloc(nnz, int), INTEGER(cscbi), nnz);
 	double *mx = Memcpy(Calloc(nnz, double), cx, nnz);
 
@@ -497,7 +561,7 @@ lmer_populate(SEXP val)
 	dtmp = REAL(GET_SLOT(Linvj, Matrix_xSym));
 	for (i = 0; i < nnz; i++) dtmp[i] = 1.;
 	for (k = j+1; k < nf; k++) { /* Update other blocks in this column */
-	    symbolic_right_unit_mm(Linvj, VECTOR_ELT(ZZpO, Lind(k,j)));
+	    symbolic_right_unit_mm_trans(Linvj, VECTOR_ELT(ZZpO, Lind(k,j)));
 	}
 	for (k = j+1; k < nf; k++) { /* Update remaining columns */
 	    for (i = k; i < nf; i++) block_update(ZZpO, j, k, i);

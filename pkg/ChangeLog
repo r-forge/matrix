@@ -1,3 +1,7 @@
+2005-01-03  Douglas Bates  <bates@bates1-home>
+
+	* src/lmeRep.c (lmer_variances): change from lmeRep to lmer
+
 2004-12-23  Douglas Bates  <bates@bates1-home>
 
 	* src/init.c (R_init_Matrix): Reorder calls to R_registerRoutines
