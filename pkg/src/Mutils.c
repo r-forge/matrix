@@ -246,7 +246,7 @@ SEXP triple_as_SEXP(int nrow, int ncol, int nz,
 }
 
 /* Create the components of the transpose of a csc matrix from its components */
- 
+
 void csc_compTr(int m, int n, int nnz,
 		const int xp[], const int xi[],
 		const double xx[],
@@ -488,14 +488,14 @@ Matrix_make_named(int TYP, char **names)
     return ans;
 }
 
-/** 
+/**
  * Allocate a 3-dimensional array
- * 
+ *
  * @param mode The R mode (e.g. INTSXP)
  * @param nrow number of rows
  * @param ncol number of columns
  * @param nface number of faces
- * 
+ *
  * @return A 3-dimensional array of the indicated dimensions and mode
  */
 SEXP alloc3Darray(SEXPTYPE mode, int nrow, int ncol, int nface)
@@ -518,16 +518,16 @@ SEXP alloc3Darray(SEXPTYPE mode, int nrow, int ncol, int nface)
     return s;
 }
 
-/** 
+/**
  * Expand a column of a compressed, sparse, column-oriented matrix.
- * 
+ *
  * @param dest array to hold the result
  * @param m number of rows in the matrix
  * @param j index (0-based) of column to expand
  * @param Ap array of column pointers
  * @param Ai array of row indices
  * @param Ax array of non-zero values
- * 
+ *
  * @return dest
  */
 double *expand_csc_column(double *dest, int m, int j,
@@ -545,38 +545,37 @@ double *expand_csc_column(double *dest, int m, int j,
 SEXP check_scalar_string(SEXP sP, char *vals, char *nm)
 {
     SEXP val = ScalarLogical(1);
-    char *buf = Calloc(Matrix_Error_Bufsiz, char), *str;
+    char *buf, *str;
+    /* only allocate when needed: in good case, none is needed */
+#define SPRINTF buf = Calloc(Matrix_Error_Bufsiz, char); sprintf
 
     if (length(sP) != 1) {
-	sprintf(buf, _("'%s' slot must have length 1"), nm);
-	val = mkString(buf);
+	SPRINTF(buf, _("'%s' slot must have length 1"), nm);
     } else {
 	str = CHAR(STRING_ELT(sP, 0));
 	if (strlen(str) != 1) {
-	    sprintf(buf, _("'%s' must have string length 1"), nm);
-	    val = mkString(buf);
+	    SPRINTF(buf, _("'%s' must have string length 1"), nm);
 	} else {
 	    int i, len, match;
-
 	    for (i = 0, len = strlen(vals), match = 0; i < len; i++) {
-		if (str[0] == vals[i]) {
-		    match = 1;
-		    break;
-		}
+		if (str[0] == vals[i])
+		    return R_NilValue;
 	    }
-	    sprintf(buf, _("'%s' must be in '%s'"), nm, vals);
-	    val = match ? R_NilValue : mkString(buf);
+	    SPRINTF(buf, _("'%s' must be in '%s'"), nm, vals);
 	}
     }
+    /* 'error' returns : */
+    val = mkString(buf);
     Free(buf);
     return val;
+#undef SPRINTF
 }
 
 double *packed_to_full(double *dest, const double *src, int n,
 		       enum CBLAS_UPLO uplo)
 {
     int i, j, pos = 0;
-    
+
     AZERO(dest, n*n);
     for (j = 0; j < n; j++) {
 	switch(uplo) {
@@ -615,19 +614,19 @@ double *full_to_packed(double *dest, const double *src, int n,
     return dest;
 }
 
-/** 
+/**
  * Copy the diagonal elements of the packed array x to dest
- * 
+ *
  * @param dest vector of length ncol(x)
  * @param x pointer to an object representing a packed array
- * 
+ *
  * @return dest
  */
 double *packed_getDiag(double *dest, SEXP x)
 {
     int j, n = *INTEGER(GET_SLOT(x, Matrix_DimSym)), pos;
     double *xx = REAL(GET_SLOT(x, Matrix_xSym));
-    
+
     if (*CHAR(STRING_ELT(GET_SLOT(x, Matrix_uploSym), 0)) == 'U') {
 	for (pos = 0, j = 0; j < n; pos += ++j) dest[j] = xx[pos];
     } else {
