@@ -196,12 +196,12 @@ plot(z, mmats$.Xy[, responseIndex])
               LMEoptimize(obj) = controlvals
               eta[] <- .Call("ssclme_fitted", obj, facs, mmats.unadjusted, PACKAGE = "Matrix")
 
-print(sqrt(max((eta - etaold)^2)) /
-                  (0.1 + sqrt(max(eta^2))))
+print(max(abs(eta - etaold)) /
+                  (0.1 + max(abs(eta))))
 
               ## use this to determine convergence
-              if (sqrt(max((eta - etaold)^2)) /
-                  (0.1 + sqrt(max(eta^2))) <
+              if (max(abs(eta - etaold)) /
+                  (0.1 + max(abs(eta))) <
                   controlvals$tolerance) {
                   conv <- TRUE
                   break
