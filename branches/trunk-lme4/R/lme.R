@@ -319,4 +319,8 @@ setMethod("vcov", signature(object = "lme"),
               callGeneric()
           })
 
-          
+setMethod("VarCorr", signature(x = "lme"),
+          function(x) {
+              x = x@rep
+              callGeneric()
+          })
