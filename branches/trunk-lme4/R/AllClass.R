@@ -6,8 +6,7 @@
                    "To attach lme4 you must restart R without package nlme."))
     }
     require("methods", quietly = TRUE)
-    require("stats4", quietly = TRUE)
-    #require("lattice", quietly = TRUE)
+    #require("stats4", quietly = TRUE)
     require("Matrix", quietly = TRUE)
 }
 
@@ -26,6 +25,10 @@ setClass("lme", representation(call = "call",
                                rep = "ssclme",
                                fitted = "numeric",
                                residuals = "numeric"))
+
+setClass("GLMM", representation(logLik = "numeric",
+                                fixef = "numeric"),
+         contains = "lme")
 
 setClass("lmList",
          representation(call = "call",

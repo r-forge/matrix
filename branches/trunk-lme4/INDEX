@@ -10,6 +10,7 @@ Earthquake              Earthquake Intensity
 Exam                    Exam scores from inner London
 Fatigue                 Cracks caused by metal fatigue
 GLMM                    Fit Generalized Linear Mixed Models via PQL
+GLMM-class              Class "GLMM"
 Gasoline                Refinery yield of gasoline
 Gcsemv                  GCSE exam score
 Glucose                 Glucose levels over time
