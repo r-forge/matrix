@@ -125,10 +125,11 @@ SEXP sscCrosstab_L_LI_sizes(SEXP ctab, SEXP permexp)
   * @param n number of columns in the matrix
   * @param Ap column pointers in Ai (modified)
   * @param Ai row indices (modified)
-  * @param iperm on return contains the inverse permutation
+  * @param perm on return contains the permutation of the rows
+  * @param useL when more than one row matches maxrc, use last match
   */
 static
-void pair_perm(int m, int n, int Ap[], int Ai[], int iperm[])
+void pair_perm(int m, int n, int Ap[], int Ai[], int iperm[], int useL)
 {
     int *cc = Calloc(n, int),	/* column counts */
 	ii, j,
@@ -158,13 +159,13 @@ void pair_perm(int m, int n, int Ap[], int Ai[], int iperm[])
 	maxrc = -1;		/* find last row with rc[i] == max(rc) */
 	for (i = 0; i < m; i++) {
 	    int ic = rc[i];
-	    if (ic >= maxrc) {
+	    if (ic > maxrc || (useL && ic == maxrc)) {
 		maxrc = ic;
 		rr = i;
 	    }
 	}
 
-	iperm[ii] = rr;
+	iperm[rr] = ii;
 
 	p1 = p3 = 0;		/* update cc, Ap and Ai */
 	for (j = 0; j < n; j++) {
@@ -185,7 +186,7 @@ void pair_perm(int m, int n, int Ap[], int Ai[], int iperm[])
     Free(cc); Free(rc);
 }
 
-SEXP sscCrosstab_groupedPerm(SEXP ctab)
+SEXP sscCrosstab_groupedPerm(SEXP ctab, SEXP useLast)
 {
     SEXP
 	GpSlot = GET_SLOT(ctab, Matrix_GpSym),
@@ -194,19 +195,19 @@ SEXP sscCrosstab_groupedPerm(SEXP ctab)
     int *Ai = INTEGER(iSlot),
 	*Ap = INTEGER(pSlot),
 	*Gp = INTEGER(GpSlot),
+	useL = asLogical(useLast),
 	i,
 	n = length(pSlot) - 1,	/* number of columns */
 	nf = length(GpSlot) - 1, /* number of factors */
 	*np = Calloc(n + 1, int), /* column pointers */
 	*ni = Calloc(length(iSlot) - n, int); /* row indices */
     SEXP ans = PROTECT(allocVector(INTSXP, n));
-    int *iperm = Calloc(n, int);
 
     if (toupper(*CHAR(STRING_ELT(GET_SLOT(ctab, Matrix_uploSym), 0))) != 'L')
 	error("Lower triangle required in sscCrosstab object");
 
     for (i = 0; i < n; i++) {
-	iperm[i] = i;    /* initialize inverse permutation to identity */
+	INTEGER(ans)[i] = i;    /* initialize permutation to identity */
     }
     np[0] = 0;
 
@@ -223,14 +224,11 @@ SEXP sscCrosstab_groupedPerm(SEXP ctab)
 	    }
 	    np[j + 1 - p1] = p0;
 	}
-	pair_perm(p3 - p2, p2 - p1, np, ni, iperm + p2);
-	for (j = p2; j < p3; j++) iperm[j] += p2;
+	pair_perm(p3 - p2, p2 - p1, np, ni, INTEGER(ans) + p2, useL);
+	for (j = p2; j < p3; j++) INTEGER(ans)[j] += p2;
     }
-    
-    for(i = 0; i < n; i++) {	/* invert the permutation */
-	INTEGER(ans)[iperm[i]] = i;
-    }
-    Free(np); Free(ni); Free(iperm);
+
+    Free(np); Free(ni);
     UNPROTECT(1);
     return ans;
 }
