@@ -1,11 +1,9 @@
-\name{fixed.effects}
+\name{fixef}
 \docType{genericFunction}
-\alias{fixed.effects}
 \alias{fixef}
+\alias{fixedeffects}
 \alias{fixef,ANY-method}
-\alias{fixef,ssclme-method}
 \alias{fixef,lmer-method}
-\alias{fixef,lme-method}
 \title{Extract Fixed Effects}
 \description{
   Extract the estimates of the fixed effects parameters from a fitted model.
