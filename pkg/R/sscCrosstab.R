@@ -24,5 +24,13 @@ sscCrosstab =
         p1 = c(p1, setdiff(ni, names(ti)))
         ni = names(ti)
     }
-    c(p1,p2)
+    iperm = perm = as.integer(c(p1,p2))
+    iperm[perm+1] = seq(along=perm) - 1
+    as.integer(iperm)
 }
+
+setMethod("image", signature(x = "sscCrosstab"),
+          function(x, ...) {
+              x = as(x, "tripletMatrix")
+              callGeneric()
+          })
