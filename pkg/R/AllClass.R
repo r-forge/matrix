@@ -212,6 +212,7 @@ setClass("ssclme", representation =
          validity = function(object)
          .Call("ssclme_validate", object))
 
+## Deprecated:
                        # positive-definite symmetric matrices as matrices
 setClass("pdmatrix", contains="matrix")
 
