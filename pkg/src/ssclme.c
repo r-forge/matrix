@@ -52,7 +52,7 @@ int ctab_isNested(int n, int nf, int upper,
  * 
  * @return pointer to an integer R vector.
  */
-static
+
 SEXP ctab_permute(SEXP ctab)
 {
     SEXP val, GpSl = GET_SLOT(ctab, Matrix_GpSym);
@@ -65,7 +65,6 @@ SEXP ctab_permute(SEXP ctab)
 	j,
 	n = INTEGER(GET_SLOT(ctab, Matrix_DimSym))[1],
 	nf = length(GpSl) - 1,
-	nz = Ap[n],		/* number of non-zeros */
 	pos;
 
     if (ctab_isNested(n, nf, 1, Ap, Ai, Gp))
@@ -73,7 +72,7 @@ SEXP ctab_permute(SEXP ctab)
     val =  allocVector(INTSXP, n);
     perm = INTEGER(val);
     work = (int *) R_alloc(n, sizeof(int));
-    ssc_metis_order(n, nz, Ap, Ai, work, perm);	/* perm gets inverse perm */
+    ssc_metis_order(n, Ap, Ai, work, perm);	/* perm gets inverse perm */
     /* work now contains desired permutation but with groups scrambled */
 
     /* copy work into perm preserving the order of the groups */
@@ -1285,4 +1284,40 @@ SEXP ssclme_variances(SEXP x, SEXP REML)
     }
     UNPROTECT(2);
     return val;
+}
+
+SEXP ssclme_L_LI_sizes(SEXP facs)
+{
+    SEXP ans = PROTECT(allocVector(INTSXP, 4)),
+	ctab;
+    int *Ai, *Ap, *Lp, *Parent, *aa = INTEGER(ans), *dims, *perm,
+	nzcol;
+				/* Pairwise cross-tabulation */
+    ctab = PROTECT(sscCrosstab(facs, ScalarLogical(1)));
+    Ai = INTEGER(GET_SLOT(ctab, Matrix_iSym));
+    Ap = INTEGER(GET_SLOT(ctab, Matrix_pSym));
+    dims = INTEGER(GET_SLOT(ctab, Matrix_DimSym));
+    nzcol = dims[1];
+    Lp = Calloc(nzcol + 1, int);
+    Parent = Calloc(nzcol, int);
+    ldl_symbolic(nzcol, Ap, Ai, Lp, Parent,
+		 (int *) R_alloc(nzcol, sizeof(int)), /* Lnz */
+		 (int *) R_alloc(nzcol, sizeof(int)), /* Flag */
+		 (int *) NULL, (int *) NULL); /* P & Pinv */
+    aa[0] = Lp[nzcol];
+    ssclme_fill_LIp(nzcol, Parent, Lp);
+    aa[1] = Lp[nzcol];
+    perm = Calloc(nzcol, int);
+    ssc_metis_order(nzcol, Ap, Ai, perm, Parent);
+    ssc_symbolic_permute(nzcol, 1, Parent, Ap, Ai);
+    ldl_symbolic(nzcol, Ap, Ai, Lp, Parent,
+		 (int *) R_alloc(nzcol, sizeof(int)), /* Lnz */
+		 (int *) R_alloc(nzcol, sizeof(int)), /* Flag */
+		 (int *) NULL, (int *) NULL); /* P & Pinv */
+    aa[2] = Lp[nzcol];
+    ssclme_fill_LIp(nzcol, Parent, Lp);
+    aa[3] = Lp[nzcol];
+    Free(perm); Free(Parent); Free(Lp);
+    UNPROTECT(2);
+    return ans;
 }
