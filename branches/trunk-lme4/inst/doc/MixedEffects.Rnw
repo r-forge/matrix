@@ -8,7 +8,7 @@
 \begin{document}
 \SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=5,height=3,strip.white=TRUE}
 \setkeys{Gin}{width=\textwidth}
-\title{Spare Matrix Representations of Linear Mixed Models}
+\title{Sparse Matrix Representations of Linear Mixed Models}
 \author{Douglas Bates\\R Development Core Team\\\email{Douglas.Bates@R-project.org}}
 \date{\today}
 \maketitle
@@ -23,6 +23,570 @@
   augmented sparse representation.  Additionally, we can use
   information from this representation to evaluate ECME updates and
   the gradient and Hessian of the criterion being optimized.
+\end{abstract}
+<<preliminaries, echo=FALSE,print=FALSE>>=
+options(width=75)
+library(lme4)
+@
+
+\section{Introduction}
+\label{sec:Intro}
+
+Linear mixed-effects models, described in \citet{pinh:bate:2000}, are
+a widely-used class of statistical models.  In chapter 3 of that book
+we provide details of computational methods suitable for mixed models
+with a single grouping factor for the random effects or with multiple,
+nested grouping factors.  Those methods are based on
+orthogonal-triangular (or ``QR'') decompositions.  Later, in
+\citet{bate:debr:2004} we generalized and extended these QR-based
+methods to provide the gradient and the Hessian of the
+criteria that are optimized by the parameter estimates.
+
+In this report we formulate a general approach to linear mixed model
+calculations using sparse matrix methods.  For an important class
+of mixed model problems, those with partially crossed grouping
+factors, the sparse matrix methods are superior to any existing
+methods in terms of the amount of storage required and computational
+speed.  Even for the problems with simpler structure, either a single
+grouping factor or nested grouping factors, an efficient
+implementation of the sparse-matrix-based methods is competitive with
+the best current methods.
+
+In \S\ref{sec:LinearMixed} we review some of the results from
+\citet{bate:debr:2004} to establish the basic operations to be
+performed and we introduce a moderate-sized example with partially
+crossed random effects.  Details of the implementation are considered
+in \S\ref{sec:Implementation} and opportunities for further
+enhancements are considered in \S\ref{sec:Further}.  Throughout we
+illustrate these methods with the implementation provided by the
+\code{lme4} and \code{Matrix} packages for R~\citep{R-1.9.0}.
+
+\section{Linear mixed models}
+\label{sec:LinearMixed}
+
+For ease of reference we will restate some of the results derived in
+\citet{bate:debr:2004}.  The reader should refer to that paper for
+details of the derivations.  
+
+We consider linear mixed-effects models that can be written as
+\begin{equation}
+  \label{eq:lmeGeneral}
+  \by=\bX\bbeta+\bZ\bb+\beps\quad
+  \beps\sim\mathcal{N}(\bzer,\sigma^2\bI),
+  \bb\sim\mathcal{N}(\bzer,\sigma^2\bOmega^{-1}),
+  \beps\perp\bb
+\end{equation}
+where $\by$ is the $n$-dimensional response vector, $\bX$ is an
+$n\times p$ model matrix for the $p$-dimensional fixed-effects vector
+$\bbeta$, $\bZ$ is the $n\times q$ model matrix for the
+$q$-dimensional random-effects vector $\bb$ that has a Gaussian
+distribution with mean $\bzer$ and relative precision matrix $\bOmega$
+(i.e., $\bOmega$ is the precision of $\bb$ relative to the precision
+of $\beps$), and $\beps$ is the random noise assumed to have a
+spherical Gaussian distribution.  The symbol $\perp$ indicates
+independence of random variables.  We assume that $\bX$ has full
+column rank and that $\bOmega$, which is a function of an
+(unconstrained) parameter vector $\btheta$, is positive definite.
+
+Given the observed responses $\by$ model matrices $\bX$ and $\bZ$, we
+wish to determine the values of the parameters $\btheta$, $\bbeta$,
+and $\sigma^2$ that maximize either the likelihood or the restricted
+likelihood. Because the conditional estimates of $\bbeta$ and
+$\sigma^2$, given a value of $\btheta$, can be determined from a
+penalized least squares problem we can reduce the optimization problem
+to one involving $\btheta$ only.  This reduction of the
+dimension of the optimization problem is called \emph{profiling}.
+
+The conditional, penalized least squares problem can be expressed and
+solved using the Cholesky decomposition
+\begin{equation}
+  \label{eq:CrossProdGen}
+  \begin{bmatrix}
+    \bZ\trans\bZ+\bOmega & \bZ\trans\bX  & \bZ\trans\by \\
+    \bX\trans\bZ         & \bX\trans\bX  & \bX\trans\by \\
+    \by\trans\bZ         & \by\trans\bX  & \by\trans\by
+  \end{bmatrix}=\bR\trans\bR\quad\text{where}\quad\bR=
+  \begin{bmatrix}
+    \RZZ & \RZX & \rZy \\
+    \bzer    & \RXX & \rXy \\
+    \bzer    & \bzer    & \ryy
+  \end{bmatrix} .
+\end{equation}
+The matrices $\RZZ$ and $\RXX$ are upper triangular of dimension
+$q\times q$ and $p\times p$ respectively.  The corresponding vectors,
+$\rZy$ and $\rXy$, are of dimension $q$ and $p$, and $\ryy$ is a
+scalar.  The conditions that $\bOmega$ be positive definite and $\bX$
+have full column rank ensure that $\RZZ$ and $\RXX$ are nonsingular.
+
+The conditional estimates of $\bbeta$ satisfy
+\begin{equation}
+  \label{eq:betaHat}
+  \RXX\widehat{\bbeta}(\btheta)=\rXy
+\end{equation}
+and the conditional estimate of $\sigma^2$ is
+$\widehat{\sigma^2}(\btheta)=\ryy^2/n$ for maximum likelihood (ML) or
+$\widehat{\sigma^2}_R(\btheta)=\ryy^2/(n-p)$ for restricted (or
+residual) maximum likelihood (REML).  The conditional modes of the
+random effects satisfy
+\begin{equation}
+  \label{eq:ConditionalExp}
+  \RZZ\widehat{\bb}(\btheta)=\rZy-\RZX\widehat{\bbeta}
+\end{equation}
+
+The profiled optimization problem, expressed in terms of the
+deviance, is
+\begin{equation}
+  \label{eq:ProfiledLogLik}
+  \begin{aligned}
+    \widehat{\btheta}&=\arg\min_{\btheta} -2\tilde{\ell}(\btheta)\\
+    &=\arg\min_{\btheta}\left\{\log\left(\frac{\left|\bZ\trans\bZ+\bOmega\right|}
+      {\left|\bOmega\right|}\right)
+    + n\left[1+\log\left(\frac{2\pi\ryy^2}{n}\right)\right]\right\}
+  \end{aligned}
+\end{equation}
+\begin{equation}
+  \label{eq:ProfiledLogRestLik}
+  \begin{aligned}
+    \widehat{\btheta_R}&=\arg\min_{\btheta} -2\tilde{\ell_R}(\btheta)\\
+    &=\arg\min_{\btheta}\left\{\log\left(\frac{\left|\bZ\trans\bZ+\bOmega\right|\left|\RXX\right|^2}
+      {\left|\bOmega\right|}\right)
+    +  (n-p)\left[1+\log\left(\frac{2\pi\ryy^2}{n-p}\right)\right]\right\}
+  \end{aligned}
+\end{equation}
+for ML and REML estimation, respectively.  The gradients of these
+criteria are
+\begin{align}
+  \label{eq:gradDev}
+  \nabla(-2\tilde\ell)&=\tr\left[\der\bOmega\left(
+      (\bZ\trans\bZ+\bOmega)^{-1}-\bOmega^{-1}+
+      \frac{\hat{\bb}}{\widehat{\sigma}}
+      \frac{\hat{\bb}}{\widehat{\sigma}}\trans\right)\right]\\
+  \label{eq:gradDevRest}
+  \nabla(-2\tilde\ell_R)&=\tr\left[\der\bOmega\left(
+      \vb-\bOmega^{-1}+
+      \frac{\hat{\bb}}{\widehat{\sigma}_R}
+      \frac{\hat{\bb}}{\widehat{\sigma}_R}\trans\right)\right]
+\end{align}
+where $\vb$ is the upper-left $q\times q$ submatrix of
+$\left(\bR\trans\bR\right)^{-1}$,
+\begin{equation}
+  \label{eq:vbDef}
+  \vb=\RZZ^{-1}\left(\bI+\RZX\RXX^{-1}\RXX\invtrans
+    \RZX\trans\right)\RZZ\invtrans
+\end{equation}
+and $\der$ denotes the Frechet derivative.  Terms in the Hessian can
+be expressed as
+\begin{align}
+  \label{eq:HessDev}
+  \derj\deri(-2\tilde{\ell})&=\tr\left[\derj(\deri\bOmega)\left(
+      (\bZ\trans\bZ+\bOmega)^{-1}-\bOmega^{-1}+
+      \frac{\hat{\bb}}{\widehat{\sigma}}
+      \frac{\hat{\bb}}{\widehat{\sigma}}\trans\right)\right]\\
+  \nonumber
+  &\quad-\tr\left[\derj\bOmega
+    (\bZ\trans\bZ+\bOmega)^{-1}\deri\bOmega(\bZ\trans\bZ+
+    \bOmega)^{-1}\right]\\
+  \nonumber
+  &\quad+\tr\left(\derj\bOmega\bOmega^{-1}\deri\bOmega\bOmega^{-1}\right)
+  -2\frac{\hat{\bb}}{\widehat{\sigma}}\trans\derj\bOmega\vb\deri\bOmega
+  \frac{\hat{\bb}}{\widehat{\sigma}}\\
+  \nonumber
+  &\quad-\frac{1}{n}
+  \left(\frac{\hat{\bb}}{\widehat{\sigma}}\trans\derj\bOmega
+    \frac{\hat{\bb}}{\widehat{\sigma}}\right)
+  \left(\frac{\hat{\bb}}{\widehat{\sigma}}\trans\deri\bOmega
+    \frac{\hat{\bb}}{\widehat{\sigma}}\right)\\
+  \label{eq:HessDevRest}
+  \derj\deri(-2\tilde{\ell_R})&=\tr\left[\derj(\deri\bOmega)\left(
+      \vb-\bOmega^{-1}+
+      \frac{\hat{\bb}}{\widehat{\sigma}_R}
+      \frac{\hat{\bb}}{\widehat{\sigma}_R}\trans\right)\right]\\
+  \nonumber
+  &\quad-\tr\left[\derj\bOmega \vb\deri\bOmega\vb\right]\\
+  \nonumber
+  &\quad+\tr\left(\derj\bOmega\bOmega^{-1}\deri\bOmega\bOmega^{-1}\right)
+  -2\frac{\hat{\bb}}{\widehat{\sigma}_R}\trans\derj\bOmega\vb\deri\bOmega
+  \frac{\hat{\bb}}{\widehat{\sigma}_R}\\
+  \nonumber
+  &\quad-\frac{1}{n-p}
+  \left(\frac{\hat{\bb}}{\widehat{\sigma}_R}\trans\derj\bOmega
+    \frac{\hat{\bb}}{\widehat{\sigma}_R}\right)
+  \left(\frac{\hat{\bb}}{\widehat{\sigma}_R}\trans\deri\bOmega
+    \frac{\hat{\bb}}{\widehat{\sigma}_R}\right)
+\end{align}
+where $\deri$ and $\derj$
+represent differentiation with respect to elements $i$ and $j$ of
+$\btheta$, respectively.
+
+If good starting estimates of $\btheta$ are not available, the initial
+Newton iterations for (\ref{eq:ProfiledLogLik}) or
+(\ref{eq:ProfiledLogRestLik}) can be unstable.  We can refine our
+initial estimates with a moderate number of ECME steps
+for which $\btheta_{i+1}$ satisfies
+\begin{equation}
+  \label{eq:theta1}
+  \tr\left[\der\bOmega\left(
+      \frac{\hat{\bb}(\btheta_i)}{\sigma_{i+1}}
+      \frac{\hat{\bb}(\btheta_i)\trans}{\sigma_{i+1}}+
+      \left(\bZ\trans\bZ+\bOmega(\btheta_{i})\right)^{-1}
+      -\bOmega(\btheta_{i+1})^{-1}\right)\right]=\bzer
+\end{equation}
+for ML estimates or
+\begin{equation}
+  \label{eq:theta1R}
+  \tr\left[\der\bOmega\left(
+      \frac{\hat{\bb}(\btheta_{i})}{\sigma_R}
+      \frac{\hat{\bb}(\btheta_{i})\trans}{\sigma_R}+
+      \vb(\btheta_{i})
+      -\bOmega(\btheta_{i+1})^{-1}\right)\right]=\bzer
+\end{equation}
+for REML.
+
+At this point it is easy to formulate a general method of obtaining ML
+or REML estimates for a linear mixed model:
+\begin{enumerate}
+\item Given the data $\by$ and the model matrices $\bX$ and $\bZ$,
+  formulate initial estimates $\btheta_0$.  Some heuristics for doing
+  so are given in \citet[ch.~3]{pinh:bate:2000}.
+\item Use a moderate number of ECME steps, (\ref{eq:theta1}) or
+  (\ref{eq:theta1R}), to refine these starting estimates.  Each ECME
+  step requires evaluating $\bOmega(\btheta)$ followed by the
+  decomposition (\ref{eq:CrossProdGen}) and the solutions to
+  (\ref{eq:betaHat}) and (\ref{eq:ConditionalExp}).
+\item Use a Newton method to optimize the criterion
+  (\ref{eq:ProfiledLogLik}) or (\ref{eq:ProfiledLogRestLik}) with
+  gradient (\ref{eq:gradDev}) or (\ref{eq:gradDevRest}) (and possibly
+  using analytic Hessians defined by (\ref{eq:HessDev}) or
+  (\ref{eq:HessDevRest})).  Each evaluation of the criterion
+  requires  evaluating $\bOmega(\btheta)$ followed by the
+  decomposition (\ref{eq:CrossProdGen}).  Gradient evaluations require
+  the solutions to (\ref{eq:betaHat}) and (\ref{eq:ConditionalExp}).
+\end{enumerate}
+In \citet{bate:debr:2004} we show that the criteria are bounded below
+in the parameter space and that the behavior at the extremes of the
+parameter space can be characterized.
+
+In terms of equations the estimation problem can be succinctly
+stated.  In terms of computation there is one complicating factor ---
+in practice the matrices $\bZ\trans\bZ$ and $\bOmega$ are sparse and
+patterned and can be extremely large.  Forming the decomposition
+(\ref{eq:CrossProdGen}) and solving the system
+(\ref{eq:ConditionalExp}) is not trivial.
+
+\subsection{Sparsity in the model matrices}
+\label{sec:Sparsity}
+
+The random effects vector $\bb$ is typically composed of blocks
+associated with grouping factors $\bff_i,i=1,\dots,k$.  Each grouping
+factor is of length $n$ (the length of $\by$ and the number of rows in
+$\bX$ and $\bZ$) and assumes exactly $m_i$ distinct values.  In the
+general form of the model there are model matrices $\bZ_i$ of size
+$n\times q_i$, $i=1,\dots,k$ associated with the grouping factors.
+However, a simpler form of the model, called a \emph{variance
+components} model, for which all of the $\bZ_i,i=1,\dots,k$ consist of
+a single column of 1's, is widely used and we will illustrate this
+model first.
+
+Returning to the general form for a moment, the dimension of the
+random effects vector $\bb$ is $q=\sum_{i=1}^k m_i q_i$ and we
+partition this vector into $k$ outer blocks where the i'th outer block
+is of size $m_i q_i$.  The columns of $\bZ$ and the rows and columns
+of $\bZ\trans\bZ$ and $\bOmega$ are similarly partitioned.  Each of
+the outer blocks is further subdivided into $m_i$ inner blocks, each
+of size $q_i$.  The grouping factors determine the outer blocks and
+the levels of each grouping factor determine the inner blocks.
+
+We consider models in which $\bOmega$ is block diagonal, these blocks
+corresponding to the outer blocks associated with the grouping
+factors, and each of these blocks is itself block diagonal consisting
+of $m_i$ repetitions of a $q_i\times q_i$ matrix $\bOmega_i$, $i=1,\dots,k$.
+
+
+\subsection{Scottish secondary school student scores}
+\label{sec:Scottish}
+
+An example may help clarify these concepts.
+
+Data on achievement scores of Scottish secondary school students,
+as described in \citet{Paterson:1991} and are analyzed in
+\citet[ch.~18]{MLwiN:2002} and other references.  In the \code{Matrix}
+package for \RR{} these are available as the data set \var{ScotsSec}
+containing the achievement scores (\var{attain}), some
+demographic data (sex and social class), a verbal reasoning score
+based on tests taken at entry to secondary school, and the primary and
+secondary schools attended by 3435 students.  There are 148 distinct
+primary schools and 19 distinct secondary schools represented in these
+data.
+
+<<ScotsSec>>=
+data(ScotsSec, package = "Matrix")
+dim(ScotsSec)
+summary(ScotsSec[,c("attain", "verbal", "sex", "primary", "second")])
+@ 
+
+In common models for such data
+\citep{Rnews:Lockwood+Doran+Mccaffrey:2003}, the random effects are
+associated with the primary school and the secondary school that the
+student attended, which is to say that \var{primary}, with 148
+distinct levels, and \var{second}, with 19 distinct levels, are the
+grouping factors.  In a variance components model $q_1=q_2=1$ and each
+element of $\bZ_1=\bZ_2$ is 1.  The matrices $\bOmega_1$ and
+$\bOmega_2$ are $1\times 1$ positive definite matrices, which we will
+write as positive scalars $\omega_1>0$ and $\omega_2>0$.  The
+$167\times 167$ matrix $\Omega$ is a diagonal matrix consisting of 148
+repetitions of $\omega_1$ followed by 19 repetitions of $\omega_2$.
+We can define a two-dimensional unconstrained parameter vector to be
+$\btheta=\left(\log\omega_1,\log\omega_2\right)\trans$.
+
+Incorporating the student's verbal score and sex and the interaction
+of these two covariates in the fixed effects part of the model (the
+model matrix $\bX$ and the coefficients $\bbeta$) leads us to the
+specification of a linear mixed-effects model as
+<<fm1>>=
+fm1 = lme(attain~verbal*sex, data = ScotsSec, random = list(primary=~1,second=~1))
+@ 
+
+We see that $\Omega$ has a very simple structure.  The matrix
+$\bZ\trans\bZ$ is sparse but not as simple.  To determine its
+structure we must first examine $\bZ$ which has 3435 rows
+(corresponding to students) and 167 columns.  The first 148 columns
+are the indicators of the primary schools.  That is, if student $i$
+attended primary school $j$ then
+\begin{equation}
+  \label{eq:bZik}
+  \{\bZ\}_{ik}=
+  \begin{cases}
+    1&k=j\\
+    0&k\ne j
+  \end{cases}
+\end{equation}
+The last 19 columns are the indicators of the secondary schools.
+The diagonal elements of $\bZ\trans\bZ$ are the tabulation of the
+number of students attending each primary school followed by the
+number of students attending each secondary school.  Part of this
+tabulation is given in the output of the \var{summary} function above.
+Here we give the full tabulation of the secondary schools and part of
+the crosstabulation of the primary and secondary schools.
+<<xtabs>>=
+xtabs(~second, ScotsSec)
+xtabs(~primary + second, ScotsSec)[1:4,]
+@ 
+
+For the purposes of this study each student is classified as attending
+only one primary school and one secondary school.  Primary school $i$
+can occur with secondary school $j$ but not all of these combinations
+do 
+one prim
+but one of these columns, the column corresponding to the primary school
+There is a corresponding grouping of the columns of the matrix $\bZ$
+into $m_1\times q_1$ columns associated with the first grouping factor
+$\bff_1$, $m_2\times q_2$ columns associated with the second grouping
+factor $\bff_2$, and so on.  A given observation, corresponding to a
+row of $\bZ$, is associated with exactly one level of $\bff_1$, one
+level of $\bff_2$, and so on and all the elements of that row of $\bZ$
+will be zero except for the corresponding $q_1$ columns in the first
+group, the corresponding $q_2$ columns in the second group, and so on.
+
+This structure in $\bZ$ induces a special structure in $\bZ\trans\bZ$.
+It is symmetric and can be divided into $k\times k$ ``outer blocks'',
+corresponding to the $k$ grouping factors. The $(i,j)$ outer block, of
+size $m_i q_i\times m_j q_j$, is further subdivided into $m_i\times
+m_j$ inner blocks, each of size $q_i\times q_j$.  The $(m,n)$'th inner
+block in the $(i,j)$'th outer block will be non-zero only if level $m$
+of $\bff_i$ occurs with level $n$ of $\bff_j$.  In particular, a
+diagonal outer block is block-diagonal with the diagonal consisting of
+$m_i$ (possibly different) blocks of size $q_i\times q_i$.
+
+As discussed later, $\bOmega$ has a block diagonal structure and its
+determinant is easily evaluated.  The determinant
+$\left|\bZ\trans\bZ+\bOmega\right|$ is the product of the elements of
+$\dZ$ and $\left|\LXX\right|^2$ is the product of the elements of $\dX$.
+
+The other results given in \citet{bate:debr:2004} can be calculated
+from $\bL$ and $\bD$.  To make all this feasible the structure and, in
+particular, the sparsity of $\bZ$ and $\bOmega$ must be exploited.
+
+Sparsity in $\bZ$ (and $\bOmega$) occurs when the random effects
+vector $\bb$ is divided into small components associated with one or
+more factors that group the observations.  It is easiest to illustrate
+this with some examples.
+
+\subsection{Examples}
+\label{ssec:Examples}
+
+Data on achievement scores of Scottish secondary school students,
+as described in \citet{Paterson:1991} and \citet[ch.~18]{MLwiN:2002},
+are available as the data set \var{ScotsSec}. 
+
+This data set contains the achievement scores (\var{attain}), some
+demographic data (sex and social class), a verbal reasoning score
+based on tests taken at entry to secondary school, and the primary and
+secondary schools attended for 3435 students.  There are 148 distinct
+primary schools and 19 distinct secondary schools represented in these
+data.
+<<ScotsSec>>=
+data(ScotsSec, package = "Matrix")
+dim(ScotsSec)
+summary(ScotsSec[,c("attain", "verbal", "sex", "primary", "second")])
+@ 
+
+In common models for such data
+\citep{Rnews:Lockwood+Doran+Mccaffrey:2003}, there would be one or
+more coefficients in $\bb$ associated with each school (i.e.
+\var{primary} and \var{second} are the grouping factors for the random
+effects).  Let's start with a simple model in which the random effects
+for the primary school and the random effects for the secondary school
+are both simple additive effects.  This means that the first 148
+columns of $\bZ$ are indicators of the primary school and the last 19
+columns are indicators of the secondary school.  We incorporate the
+student's verbal score and sex and their interaction in the fixed
+effects part of the model (the model matrix $\bX$ and the coefficients
+$\bbeta$).
+
+<<fm1>>=
+fm1 = lme(attain~verbal*sex,ScotsSec,list(primary=~1,second=~1))
+@ 
+
+We calculate and store the upper triangle of the symmetric
+$167\times 167$ matrix $\bZ\trans\bZ$.  The locations of the non-zeros
+are shown in Figure~\ref{fig:ZtZ}.
+\begin{figure}[htbp]
+  \centering
+\setkeys{Gin}{width=3in}
+<<FigZtZ,fig=TRUE,echo=FALSE,height=5,width=5>>=
+print(image(as(fm1@rep, "sscMatrix")))
+@   
+  \caption{Location of non-zero elements in the upper triangle of
+    $\bZ\trans\bZ$ for model \var{fm1} fit to the \var{ScotsSec}
+    data.}
+  \label{fig:ZtZ}
+\end{figure}
+
+\section{Implementation}
+\label{sec:Implementation}
+
+
+
+\section{Further enhancements}
+\label{sec:Further}
+
+
+\section{Acknowledgements}
+\label{sec:Ack}
+
+The \code{Matrix} package for R is based on code from the LDL, TAUCS,
+and Metis packages.  
+
+\bibliography{lme4}
+\end{document}
+Yesterday I spoke with Deepayan Sarkar, a graduate student with whom I
+work, on ways for structuring the calculations for linear
+mixed-effects models using sparse matrix representations and Tim
+Davis's LDL decomposition code.  I described to Deepayan a plan A and
+a plan B.  On thinking about the calculations more yesterday evening I
+formulated a plan AB, which is what I think I will use.
+
+One purpose of writing this note is so I can get the steps clear in my
+mind.
+
+The critical part of the calculation is determining the Cholesky
+decomposition of a matrix of the form
+
+ Z'Z+W Z'X Z'y
+  X'Z  X'X X'y   for different matrices W that depend upon parameters r
+  y'Z  y'X y'y
+
+Statistically the role of y is very different from X but, as far as
+the calculation goes, I can work with the augmented matrix [X,y] as if
+it were a single matrix, which, at the risk of some confusion, I will
+henceforth call X.  We will not refer to y again.
+
+Matrices Z and X are n by q and n by p respectively with n >= q.
+Generally, q >> p, Z is sparse, W is block diagonal (and the blocks
+are of small dimension) and X is dense.  The matrix Z is generated
+from a set of k grouping factors, each of length n, and corresponding
+model matrices M1, M2, ..., Mk where Mi is n by qi.  The i'th grouping
+factors, gi, only assume values in the range 1,...,mi and takes each
+value in that range at least once.
+
+Generally the qi, i = 1,...,k are very small (values of 1 or 2 are
+common) but the mi can be large.  In the Scottish secondary school
+data the grouping factors are the primary school attended and the
+secondary school attended with m1=148 and m2=19 levels respectively.
+Each observation corresponds to a student. The total number of
+observations is n = 3435.  We would usually start our modeling with a
+so-called ``variance components'' model for which q1 = q2 = 1 and
+M1(=M2) is the 3435 by 1 matrix, all of whose entries are 1.  The
+corresponding 167 by 167 matrix W will consist of two diagonal blocks
+of sizes 148 by 148 and 19 by 19 respectively where each of these
+blocks is a (positive) multiple of an identity matrix.
+
+The matrix X has at least 2 columns (recall that the response is the
+rightmost column of this X).  In keeping with the design of the LDL
+package we will store the upper triangle of Z'Z as a compressed,
+sparse, column-oriented matrix and Z'X and X'X as dense matrices.
+
+In the variance components model the matrix Z is the concatenation of
+k groups of columns, where the i'th group of columns is the mi
+indicator columns for grouping factor gi.  In the Scottish secondary
+students data Z = [Z1, Z2] where Z1, of size 3435 by 148, is the
+indicators of the primary school for each student and Z2, of size 3435 by
+19, is the indicators of the secondary school.  Matrices Z1'Z1 and
+Z2'Z2 are diagonal with non-negative integers (the number of students
+who attended that school) on the diagonal.  The matrix Z1'Z2 can be sparse.
+
+Nested grouping factors:
+
+If the levels of g1 are nested within the levels of g2 then each
+column of Z1'Z2 has exactly one non-zero entry.  That is, each level
+of g1 occurs with exactly one level of g2.  If the grouping factors
+form a nested sequence, in the sense that gi is nested within gi+1 for
+i = 1,...,k-1, then Z'Z has an especially simple structure in that the
+Cholesky decomposition does not generate any ``fill-in''.  That is,
+the Cholesky decomposition of Z'Z+W can be calculated in place and the
+Cholesky factor can be inverted in place.  Because nested sequences of
+grouping factors do not generate any fill-in it is unnecessary to
+search for a fill-minimizing permutation of the levels of the factors.
+
+A single grouping factor trivially forms a nested sequence of grouping
+factors.
+
+We detect and exploit this structure when it is present.
+
+Pairwise cross-tabulation:
+
+We will refer to the Z'Z matrix for the variance components form of
+the model as the pairwise cross-tabulation of the factors.  This
+matrix can be used to check for nested grouping factors and to
+calculate fill-reducing permutations for non-nested factors.  Even
+when some of the model matrices associated with grouping factors have
+multiple columns, the pattern of non-zero elements in Z'Z, and the
+fill-reducing permutation of the levels within the groups can be
+determined from the pairwise cross-tabulation.
+
+Our general algorithm is:
+
+  determine the pairwise cross-tabulation of the grouping factors
+  check for a sequence of nested grouping factors (trivially
+    satisfied by a single grouping factor)
+  if (non-nested) {
+     determine fill-reducing permutation
+     separate the groups within this permutation
+  }
+  if (any qi > 1) {
+     re-evaluate Z'Z
+  }
+  create Z'X and X'X
+  use ldl_symbolic to determine Lp (and hence the size of Li and Lx)
+
+  given the diagonal blocks of W
+    form Z'Z+W from a copy of Z'Z
+    ldl_symbolic of Z'Z+W
+    solve LY = Z'X for Y
+    Cholesky decomposition (dpotrf) of X'X-(Z'X)'D^{-1}Y
+    save D^{-1}Y
+
+
   
   The ordering of the columns (and, correspondingly, the rows) of a
   positive semidefinite, symmetric sparse matrix can have a
@@ -39,13 +603,7 @@
   the columns are grouped.  We show that we can reorder the columns
   while preserving the grouping and still attain acceptable levels of
   fill-in. 
-\end{abstract}
-<<preliminaries, echo=FALSE>>=
-options(width=75)
-@
 
-\section{Introduction}
-\label{sec:Intro}
 
 This report is directed at two audiences: sparse matrix researchers
 and mixed-effects model researchers.  To make the ideas accessible to
@@ -53,28 +611,6 @@ both audiences I will need to introduce a formulation of mixed models
 for the sparse matrix researchers and also to introduce sparse matrix
 representation for the mixed model researchers.
 
-Linear mixed-effects models are described in detail in
-\citet{pinh:bate:2000}.  In chapter 3 of that book we provide details
-of computational methods suitable for mixed models with a single level
-of random effects or with multiple, nested levels of random effects.
-(Detailed descriptions of terms like ``levels'' of ``random effects''
-and ``nesting'' are given later.)  Those methods were based on
-orthogonal-triangular (also called QR) decompositions.  Later, in
-\citet{bate:debr:2004} we generalized these computational methods and
-showed that all of the important results can be calculated from the
-Cholesky decomposition of a large, sparse, positive definite,
-symmetric matrix.  We also provide additional computational results for
-the specific cases considered in \citet[ch.~3]{pinh:bate:2000}.  
-
-In this report I formulate a general approach to linear mixed model
-calculations using sparse matrix techniques.  For an important class
-of mixed model problems, those with partially crossed grouping
-factors, the sparse matrix methods will be competitive with, and
-probably quite superior to, any existing methods.  I believe that even
-for the problems with simpler structure, either a single grouping
-factor or nested grouping factors, an efficient implementation of the
-sparse-matrix-based methods will be competitive with the best
-current methods.  
 
 Opportunities for efficiency exist because we must repeatedly perform
 Cholesky decompositions of matrices with the same pattern of non-zero
@@ -100,39 +636,10 @@ has been used to illustrate other methods, and a very large example
 that can show the savings available with sparse matrix methods.  In
 \S\ref{sec:Examples} I introduce sparse matrix storage schemes and
 computational methods and show how they can be applied to the
-examples.  Throughout we illustrate these methods using the
-\code{Matrix} package for R~\citep{R-1.9.0}, which provides an
-implementation of sparse matrix methods for linear mixed-effects
-models.  This R package is based on code from the LDL, TAUCS, Metis,
-and UMFPACK packages.
+examples. 
 
 
-\section{Linear mixed models}
-\label{sec:LinearMixed}
-
-As described in \citet{bate:debr:2004} a linear mixed-effects model
-can be written as
-\begin{equation}
-  \label{eq:lmeGeneral}
-  \by=\bX\bbeta+\bZ\bb+\beps\quad
-  \beps\sim\mathcal{N}(\bzer,\sigma^2\bI),
-  \bb\sim\mathcal{N}(\bzer,\sigma^2\bOmega^{-1}),
-  \beps\perp\bb
-\end{equation}
-where $\by$ is the $n$-dimensional response vector, $\bX$ is an
-$n\times p$ model matrix for the $p$-dimensional fixed-effects vector
-$\bbeta$, $\bZ$ is the $n\times q$ model matrix for the
-$q$-dimensional random-effects vector $\bb$ that has a Gaussian
-distribution with mean $\bzer$ and relative precision matrix $\bOmega$
-(i.e., $\bOmega$ is the precision of $\bb$ relative to the precision
-of $\beps$), and $\beps$ is the random noise assumed to have a
-spherical Gaussian distribution.  The symbol $\perp$ indicates
-independence of random variables.  We assume that $\bX$ has full
-column rank and that $\bOmega$ is positive definite.  Furthermore
-$\bOmega$ is a function of an (unconstrained) parameter vector $\btheta$.
-
-Generally $p$, the dimension of $\bbeta$, is moderate but $q$, the
-dimension of $\bb$ can be huge.  Using the response and the model
+Using the response and the model
 matrices, $\by$, $\bX$ and $\bZ$, which are evaluated from the
 observed data, we determine the estimates of the model parameters;
 $\bbeta$, $\btheta$, and $\sigma^2$, as those values that optimize the
@@ -143,98 +650,30 @@ the log-restricted-likelihood, are generally easier to evaluate and
 provide a better quadratic approximation for optimization than the
 original functions, so we work on the log-likelihood scale.
 
-The dimension of $\btheta$ is typically very small.  Even in complex,
-``real-world'' models applied to data sets with millions of
-observations the dimension of $\btheta$ can be as small as two or
-three.  Conditional on a value of $\btheta$, the optimal values of
-$\bbeta$ and $\sigma^2$ can be determined from a penalized least
-squares problem based on $\by$, $\bX$, $\bZ$, and $\bOmega$
-\begin{equation}
-  \label{eq:bPhi}
-  \min_{\bb,\bbeta}\left\|\tilde{\by}-\bPhi(\btheta)
-    \begin{bmatrix}
-      \bb\\\bbeta
-    \end{bmatrix}\right\|^2\text{ where }
-  \bPhi(\btheta)=
-  \begin{bmatrix}
-    \bZ              & \bX \\
-    \bDelta(\btheta) & \bzer 
-  \end{bmatrix},
-  \tilde{\by}=
-  \begin{bmatrix}
-    \by \\ \bzer
-  \end{bmatrix},
-\end{equation}
-and $\bDelta(\btheta)\trans\bDelta(\btheta)=\bOmega$.
-One way to solve problem~(\ref{eq:bPhi}) is form
-$\bL_e$ and $\bD_e$, the
-LDL form of the Cholesky decomposition,
-\begin{equation}
-  \label{eq:CrossProdGen}
-  \begin{bmatrix}
-    \bZ\trans\bZ+\bOmega & \bZ\trans\bX  & \bZ\trans\by \\
-    \bX\trans\bZ         & \bX\trans\bX  & \bX\trans\by \\
-    \by\trans\bZ         & \by\trans\bX  & \by\trans\by
-  \end{bmatrix}=
-  \bL\bD\bL\trans\text{ where }
-  \bL=
-  \begin{bmatrix}
-    \LZZ & \bzer & \bzer \\
-    \LXZ & \LXX  & \bzer \\
-    \lyZ & \lyZ  & 1
-  \end{bmatrix}
-\end{equation}
-and $\bD$ is diagonal with non-negative diagonal elements.  The matrix
-$\bL$ is unit lower triangular (i.e.{} it is lower triangular and its
-diagonal elements are all unity).
-
-We divide the diagonal of $\bD$ into three components; $\dZ$ of length
-$q$, $\dX$ of length $p$, and the scalar $\dy$.  Our assumptions that
-$\bOmega$ be positive definite and that $\bX$ have full column rank ensure
-that the elements of $\dZ$ and $\dX$ are positive.  Because the only
-cases where $\dy=0$ are trivial cases with exact fits to the response,
-we will assume that $\dy>0$.
-
-In \citet{bate:debr:2004} we wrote the Cholesky decomposition
-(\ref{eq:CrossProdGen}) as $\bR\trans\bR$ where $\bR$ is upper
-triangular and, from that, derived expressions for the profiled
-log-likelihood $\tilde{\ell}(\btheta)$ and the profiled
-log-restricted-likelihood, $\tilde{\ell}_R(\btheta)$.  These
-``profiled'' functions are
-functions of $\btheta$ only.  They are the values of the corresponding
-objective function at the conditionally optimal values of the other
-parameters, $\bbeta$ and $\sigma^2$.  Translating from the
-representation in \citet{bate:debr:2004} to the
-representation used here provides
-\begin{align}
-  \label{eq:profiledLogLik}
-  -2\tilde{\ell}(\btheta)&
-  = \log\left(\frac{\left|\bZ\trans\bZ+\bOmega\right|}
-    {\left|\bOmega\right|}\right)
-  + n\left[1+\log\left(\frac{2\pi\dy}{n}\right)\right]\\
-  -2\tilde{\ell}_R(\btheta)&
-  = \log\left(\frac{\left|\bZ\trans\bZ+\bOmega\right|\left|\LXX\right|^2}
-    {\left|\bOmega\right|}\right)
-  + (n-p)\left[1+\log\left(\frac{2\pi\dy}{n-p}\right)\right]
-\end{align}
-
-As discussed later, $\bOmega$ has a block diagonal structure and its
-determinant is easily evaluated.  The determinant
-$\left|\bZ\trans\bZ+\bOmega\right|$ is the product of the elements of
-$\dZ$ and $\left|\LXX\right|^2$ is the product of the elements of $\dX$.
-
-The other results given in \citet{bate:debr:2004} can be calculated
-from $\bL$ and $\bD$.  To make all this feasible the structure and, in
-particular, the sparsity of $\bZ$ and $\bOmega$ must be exploited.
-
-Sparsity in $\bZ$ (and $\bOmega$) occurs when the random effects
-vector $\bb$ is divided into small components associated with one or
-more factors that group the observations.  It is easiest to illustrate
-this with some examples.
 
 
-\section{Examples of mixed-effects models}
-\label{sec:examples}
+
+
+
+When the random effects are grouped according to more than one
+grouping factors, as here, it is important to determine if the
+grouping factors are \emph{crossed} (every level of factor 1 occurs
+with every level of factor 2) or nested (each level of factor 1 occurs
+with only one level of factor 2) or partially crossed, which is how we
+describe grouping factors that are neither (fully) crossed nor
+strictly nested.
+
+In this case the grouping factors \var{primary} and \var{second} are
+partially crossed.  We can express this graphically through the image
+of the cross-tabulation of the grouping factors.  We can generate such
+a cross-tabulation as a symmetric, sparse, compressed column matrix
+with the \var{sscCrosstab} function and use \var{image} to show the
+non-zero elements graphically.  (Only the non-zero elements in the
+lower triangle are shown.)
+<<ctab>>=
+ctab = sscCrosstab(ScotsSec[, c("primary", "second")])
+str(ctab)
+@ 
 
 
 \subsection{A simple variance components model}
@@ -450,158 +889,35 @@ fill-reducing orderings and sizes of Cholesky factors of the matrices
 that we wish to decompose by considering first the pairwise
 cross-tabulations of the grouping factors.
 
-\section{Some examples}
-\label{sec:Examples}
 
-Data on achievement scores of Scottish secondary school students is
-described in \citet{Paterson:1991} and included as the data set
-\var{ScotsSec} in the \var{mlmrev} package for R that provides the
-data sets from the multilevel modelling software review.
+\begin{equation}
+  \label{eq:qtot}
+\end{equation}
+Generally $p$, the dimension of $\bbeta$, is moderate but $q$, the
+dimension of $\bb$, and $n$, the number of observations in $\by$,
+which is also the number of rows in $bX$ and $\bZ$, can
+be extremely large.  The $n\times q$ matrix $\bZ$ and the $q\times q$
+matrices $\bZ\trans\bZ$ and $\bOmega$ can be prohibitively large but
+they are sparse (i.e. most of the elements of these matrices are zero)
+and, especially in the case of $\bOmega$, highly structured.
 
-<<ScotsSec>>=
-data(ScotsSec, package = "Matrix")
-dim(ScotsSec)
-summary(ScotsSec)
-@ 
+The dimension of $\btheta$ is typically very small.  Even in complex,
+``real-world'' models applied to data sets where $n$ can be in the
+millions, the dimension of $\btheta$ can be as small as three or less.
+As described in \citet{bate:debr:2004}, the general problem we
+consider is determining the values of the parameters $\bbeta$,
+$\btheta$, and $\sigma^2$, in model (\ref{eq:lmeGeneral}) that
+optimize the likelihood function, providing the maximum likelihood or
+ML estimates, or, more commonly, a modified version called the
+restricted likelihood, providing the REML estimates. 
 
-These data contain the achievement scores (\var{attain}) of 3435
-secondary school students in Scotland.  Along with demographic data
-(sex and social class) and a verbal reasoning score based on tests
-taken at entry to secondary school, the primary school and the
-secondary school that the student attended are recorded.
-
-There are 148 distinct primary schools and 19 distinct secondary
-schools represented in these data and, in common models for such data
-\citep{Rnews:Lockwood+Doran+Mccaffrey:2003}, there would be one or
-more coefficients in $\bb$ associated with each school.  We say that
-\var{primary} and \var{second} are \emph{grouping factors} for the
-random effects.
-
-When the random effects are grouped according to more than one
-grouping factors, as here, it is important to determine if the
-grouping factors are \emph{crossed} (every level of factor 1 occurs
-with every level of factor 2) or nested (each level of factor 1 occurs
-with only one level of factor 2) or partially crossed, which is how we
-describe grouping factors that are neither (fully) crossed nor
-strictly nested.
-
-In this case the grouping factors \var{primary} and \var{second} are
-partially crossed.  We can express this graphically through the image
-of the cross-tabulation of the grouping factors.  We can generate such
-a cross-tabulation as a symmetric, sparse, compressed column matrix
-with the \var{sscCrosstab} function and use \var{image} to show the
-non-zero elements graphically.  (Only the non-zero elements in the
-lower triangle are shown.)
-<<ctab>>=
-ctab = sscCrosstab(ScotsSec[, c("primary", "second")])
-str(ctab)
-@ 
-
-\bibliography{Matrix}
-\end{document}
-Yesterday I spoke with Deepayan Sarkar, a graduate student with whom I
-work, on ways for structuring the calculations for linear
-mixed-effects models using sparse matrix representations and Tim
-Davis's LDL decomposition code.  I described to Deepayan a plan A and
-a plan B.  On thinking about the calculations more yesterday evening I
-formulated a plan AB, which is what I think I will use.
-
-One purpose of writing this note is so I can get the steps clear in my
-mind.
-
-The critical part of the calculation is determining the Cholesky
-decomposition of a matrix of the form
-
- Z'Z+W Z'X Z'y
-  X'Z  X'X X'y   for different matrices W that depend upon parameters r
-  y'Z  y'X y'y
-
-Statistically the role of y is very different from X but, as far as
-the calculation goes, I can work with the augmented matrix [X,y] as if
-it were a single matrix, which, at the risk of some confusion, I will
-henceforth call X.  We will not refer to y again.
-
-Matrices Z and X are n by q and n by p respectively with n >= q.
-Generally, q >> p, Z is sparse, W is block diagonal (and the blocks
-are of small dimension) and X is dense.  The matrix Z is generated
-from a set of k grouping factors, each of length n, and corresponding
-model matrices M1, M2, ..., Mk where Mi is n by qi.  The i'th grouping
-factors, gi, only assume values in the range 1,...,mi and takes each
-value in that range at least once.
-
-Generally the qi, i = 1,...,k are very small (values of 1 or 2 are
-common) but the mi can be large.  In the Scottish secondary school
-data the grouping factors are the primary school attended and the
-secondary school attended with m1=148 and m2=19 levels respectively.
-Each observation corresponds to a student. The total number of
-observations is n = 3435.  We would usually start our modeling with a
-so-called ``variance components'' model for which q1 = q2 = 1 and
-M1(=M2) is the 3435 by 1 matrix, all of whose entries are 1.  The
-corresponding 167 by 167 matrix W will consist of two diagonal blocks
-of sizes 148 by 148 and 19 by 19 respectively where each of these
-blocks is a (positive) multiple of an identity matrix.
-
-The matrix X has at least 2 columns (recall that the response is the
-rightmost column of this X).  In keeping with the design of the LDL
-package we will store the upper triangle of Z'Z as a compressed,
-sparse, column-oriented matrix and Z'X and X'X as dense matrices.
-
-In the variance components model the matrix Z is the concatenation of
-k groups of columns, where the i'th group of columns is the mi
-indicator columns for grouping factor gi.  In the Scottish secondary
-students data Z = [Z1, Z2] where Z1, of size 3435 by 148, is the
-indicators of the primary school for each student and Z2, of size 3435 by
-19, is the indicators of the secondary school.  Matrices Z1'Z1 and
-Z2'Z2 are diagonal with non-negative integers (the number of students
-who attended that school) on the diagonal.  The matrix Z1'Z2 can be sparse.
-
-Nested grouping factors:
-
-If the levels of g1 are nested within the levels of g2 then each
-column of Z1'Z2 has exactly one non-zero entry.  That is, each level
-of g1 occurs with exactly one level of g2.  If the grouping factors
-form a nested sequence, in the sense that gi is nested within gi+1 for
-i = 1,...,k-1, then Z'Z has an especially simple structure in that the
-Cholesky decomposition does not generate any ``fill-in''.  That is,
-the Cholesky decomposition of Z'Z+W can be calculated in place and the
-Cholesky factor can be inverted in place.  Because nested sequences of
-grouping factors do not generate any fill-in it is unnecessary to
-search for a fill-minimizing permutation of the levels of the factors.
-
-A single grouping factor trivially forms a nested sequence of grouping
-factors.
-
-We detect and exploit this structure when it is present.
-
-Pairwise cross-tabulation:
-
-We will refer to the Z'Z matrix for the variance components form of
-the model as the pairwise cross-tabulation of the factors.  This
-matrix can be used to check for nested grouping factors and to
-calculate fill-reducing permutations for non-nested factors.  Even
-when some of the model matrices associated with grouping factors have
-multiple columns, the pattern of non-zero elements in Z'Z, and the
-fill-reducing permutation of the levels within the groups can be
-determined from the pairwise cross-tabulation.
-
-Our general algorithm is:
-
-  determine the pairwise cross-tabulation of the grouping factors
-  check for a sequence of nested grouping factors (trivially
-    satisfied by a single grouping factor)
-  if (non-nested) {
-     determine fill-reducing permutation
-     separate the groups within this permutation
-  }
-  if (any qi > 1) {
-     re-evaluate Z'Z
-  }
-  create Z'X and X'X
-  use ldl_symbolic to determine Lp (and hence the size of Li and Lx)
-
-  given the diagonal blocks of W
-    form Z'Z+W from a copy of Z'Z
-    ldl_symbolic of Z'Z+W
-    solve LY = Z'X for Y
-    Cholesky decomposition (dpotrf) of X'X-(Z'X)'D^{-1}Y
-    save D^{-1}Y
+Sparsity in $\bZ$, $\bZ\trans\bZ$ and $\bOmega$ occurs when the random
+effects vector $\bb$ is divided into small components associated with
+$k$ factors that group the observations and the random effects
+associated with each grouping factor are independent between groups
+and are i.i.d. (independent and identically distributed) within
+groups.  The size of the components in each group is $q_i$ and the
+number of distinct levels of each grouping factor is $m_i, i =
+1,\dots,k$.  Then $\bOmega$ is block diagonal with $k$ blocks and
+block $i$ is itself block diagonal with the diagonal consisting of
+$m_i$ repetitions of a $q_i\times q_i$ matrix $\bOmega_i$.  
