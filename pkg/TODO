@@ -1,6 +1,2 @@
-- Fix up the image method for the csc classes so the xlim and ylim are at half-integers
-
-- Check whether the xtmp and atmp arguments are needed in the triplet_to_col call in lmeRep.c
-
 - Report the problem in the Linux ldexp manual page.  The second and
   third calls in the Synopsis should be to ldexpf and ldexpl.

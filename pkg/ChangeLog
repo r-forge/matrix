@@ -1,4 +1,14 @@
+2004-12-14  Douglas Bates  <bates@bates1-home>
+
+	* R/sscMatrix.R: Add determinant methods
+
+	* src/triplet.[ch],src/init.c (triplet_to_matrix): Add a coercion
+	for tripletMatrix to matrix.
+
 2004-12-13  Douglas Bates  <bates@bates1-home>
+
+	* R/AllClass.R (.onLoad): Eliminate the bbCrosstab class, which is
+	no longer used.
 
 	* src/R_ldl.c: Created an R-specific version of the ldl.[ch] files
 	with dynamic allocation of scratch arrays.
