@@ -708,7 +708,7 @@ SEXP ldl_inverse(SEXP x)
 	    }
 	    tmp = Calloc(nr * nci, double); /* scratch storage */
 	    nr1 = nr + 1;
-				/* initialize bVi to zero (cosmetic) */
+				/* initialize bVi to zero */
 	    memset(bVi, 0, sizeof(double) * (G2 - G1) * nci);
 	    for (j = G1; j < G2; j += nci) {
 		memset(tmp, 0, sizeof(double) * nr * nci);
@@ -724,9 +724,9 @@ SEXP ldl_inverse(SEXP x)
 			tmp[k * nr + kk] *= DIsqrt[LIi[LIp[j] + kk - 1]];
 		    }
 		}
-		F77_CALL(dsyrk)("U", "T", &nci, &rr, &one, tmp, &nr,
+		F77_CALL(dsyrk)("L", "T", &nci, &rr, &one, tmp, &nr,
 				&zero, bVi + (j - G1) * nci, &nci);
-		F77_CALL(dpotrf)("U", &nci, bVi + (j - G1) * nci,
+		F77_CALL(dpotrf)("L", &nci, bVi + (j - G1) * nci,
 				 &nci, &kk);
 		if (kk)		/* should never happen */
 		    error(
@@ -790,9 +790,9 @@ SEXP ldl_inverse(SEXP x)
 			tmp[k * nr + kk] *= DIsqrt[ind[kk]];
 		    }
 		}
-		F77_CALL(dsyrk)("U", "T", &nci, &nr, &one, tmp, &nr,
+		F77_CALL(dsyrk)("L", "T", &nci, &nr, &one, tmp, &nr,
 				&zero, mpt + (j - Gp[i])*nci, &nci);
-		F77_CALL(dpotrf)("U", &nci, mpt + (j - Gp[i])*nci,
+		F77_CALL(dpotrf)("L", &nci, mpt + (j - Gp[i])*nci,
 				 &nci, &info);
 		if (info)	/* should never happen */
 		    error(
@@ -1246,7 +1246,7 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
 	REML = asLogical(REMLp),
 	cind, i, n = dims[0],
 	nf = length(Omega),
-	nobs, odind, p, pp1 = dims[1],
+	nobs, p, pp1 = dims[1],
 	uncst = asLogical(Uncp);
     double
 	*RZX = REAL(RZXsl),
