@@ -34,6 +34,7 @@
 <<preliminaries,echo=FALSE,print=FALSE>>=
 options(width=75)
 library(lme4)
+data(ScotsSec, package = "Matrix")
 @
 
 \section{Introduction}
@@ -95,14 +96,14 @@ independence of random variables.  We assume that $\bX$ has full
 column rank and that $\bOmega$, which is a function of an
 (unconstrained) parameter vector $\btheta$, is positive definite.
 
-Given the observed responses $\by$ model matrices $\bX$ and $\bZ$, we
-wish to determine the values of the parameters $\btheta$, $\bbeta$,
-and $\sigma^2$ that maximize either the likelihood or the restricted
-likelihood. Because the conditional estimates of $\bbeta$ and
-$\sigma^2$, given a value of $\btheta$, can be determined from a
+Given the observed responses $\by$ and the model matrices $\bX$ and
+$\bZ$, we wish to determine the values of the parameters $\btheta$,
+$\bbeta$, and $\sigma^2$ that maximize either the likelihood or the
+restricted likelihood. Because the conditional estimates of $\bbeta$
+and $\sigma^2$, given a value of $\btheta$, can be determined from a
 penalized least squares problem we can reduce the optimization problem
-to one involving $\btheta$ only.  This reduction of the
-dimension of the optimization problem is called \emph{profiling}.
+to one involving $\btheta$ only.  This reduction of the dimension of
+the optimization problem is called \emph{profiling}.
 
 The conditional, penalized least squares problem can be solved using
 the Cholesky decomposition
@@ -121,11 +122,11 @@ the Cholesky decomposition
 \end{equation}
 The matrices $\RZZ$ and $\RXX$ are upper triangular of dimension
 $q\times q$ and $p\times p$ respectively.  Because these matrices are
-triangular it is easy to evaluate the determinants $\|\RZZ\|^2$ and
-$\|\RXX\|^2$.  (Because the signs of the diagonal elements of $\RZZ$
-and $\RXX$ are not uniquely determined, $\|RZZ\|$ and $\|\RXX\|$ are
-not well-defined.  However the squares of these determinants are
-well-defined.) The corresponding vectors, $\rZy$ and $\rXy$, are of
+triangular it is easy to evaluate the squares of the determinants
+$|\RZZ|^2$ and $|\RXX|^2$.  (Because the signs of the diagonal
+elements of $\RZZ$ and $\RXX$ are not uniquely determined, $|RZZ|$ and
+$\|\RXX\|$ are not well-defined but their magnitudes are
+well-defined.)  The corresponding vectors, $\rZy$ and $\rXy$, are of
 dimension $q$ and $p$, and $\ryy$ is a scalar.  The conditions that
 $\bOmega$ be positive definite and $\bX$ have full column rank ensure
 that $\RZZ$ and $\RXX$ are nonsingular.
@@ -300,24 +301,23 @@ fact, in one common form of the model, called a \emph{variance
 components} model, $q_1=q_2=\dots=q_k=1$ and each of the
 $\bZ_i,i=1,\dots,k$ consist of a single column of 1's.
 
-In the general form, the dimension of the random effects vector $\bb$
-is $q=\sum_{i=1}^k m_i q_i$ and it is partitioned into $k$ ``outer
-blocks'' where the i'th outer block is of size $m_i q_i,i=1,\dots,k$.
-The columns of $\bZ$ and the rows and columns of $\bZ\trans\bZ$ and
+In the general form, the random effects vector $\bb$, of length
+$q=\sum_{i=1}^k m_i q_i$, is partitioned into $k$ ``outer blocks''
+where the i'th outer block is of size $m_i q_i,i=1,\dots,k$.  The
+columns of $\bZ$ and the rows and columns of $\bZ\trans\bZ$ and
 $\bOmega$ are similarly partitioned.  Each of the outer blocks is
-further subdivided into $m_i$ inner blocks, each of size $q_i$.  The
+further subdivided into $m_i$ inner blocks of size $q_i$.  The
 grouping factors determine the outer blocks and the levels of each
 grouping factor determine the inner blocks.
 
 In the models that we will consider, the random effects associated
-with different grouping factors are independent.  As a consequence
-$\bOmega$ can be partitioned into a block-diagonal matrix with $k$
-diagonal blocks of sizes $m_i q_i\times m_i q_i,i=1,\dots,k$.
-Furthermore the random effects associated with the levels of a given
-blocking factor are independent and identically distributed.  That is,
-the $i$'th diagonal block in $\bOmega$ is itself block diagonal and
-these diagonal blocks are $m_i$ repetitions of a $q_i\times q_i$
-matrix $\bOmega_i$, $i=1,\dots,k$.
+with different grouping factors are independent.  That is to say that
+$\bOmega$ is block-diagonal consisting of $k$ diagonal blocks of sizes
+$m_i q_i\times m_i q_i,i=1,\dots,k$.  Furthermore the random effects
+associated with the levels of a given blocking factor are independent
+and identically distributed.  That is, the $i$'th diagonal block in
+$\bOmega$ is itself block diagonal and these diagonal blocks are $m_i$
+repetitions of a $q_i\times q_i$ matrix $\bOmega_i$, $i=1,\dots,k$.
 
 For a variance components model the matrices $\bOmega_i,i=1,\dots,k$
 are $1\times 1$ positive definite matrices which we can consider as
@@ -325,16 +325,16 @@ positive scalars $\omega_i,i=1,\dots,k$.  The matrix $\bOmega$ is
 block-diagonal of size $\sum_{i=1}^k m_i$ and the diagonal blocks are
 $\omega_i\bI_{m_i}$ where $\bI_{m_i}$ is the $m_i\times m_i$ identity
 matrix.  Thus $\left\|\bOmega\right\|=\sum_{i=1}^k m_i\omega_i$. The
-vector $\btheta$ with $\theta_i=\log\omega_i,i=1,\dots,k$ can be used
+vector $\btheta$ where $\theta_i=\log\omega_i,i=1,\dots,k$ can be used
 as the unconstrained parameter vector.
 
 The columns of the matrix $\bZ$ are similarly divided into blocks.
 For the variance components model the $i$th block is the set of
 indicator columns for the $m_i$ levels of $\bff_i,i=1,\dots,k$.
-Because each block is a set of indicators, the corresponding diagonal
-blocks in $\bZ\trans\bZ$ are diagonal.  However, unlike the
+Because each block is a set of indicators, the diagonal
+blocks of $\bZ\trans\bZ$ are diagonal.  However, unlike the
 corresponding blocks in $\bOmega$, these blocks are not necessarily a
-multiple of the identity.  In fact, the diagonal elements of the $i$th
+multiple of the identity.  The diagonal elements of the $i$th
 diagonal block are the $m_i$ frequencies of occurence of each the
 levels of the $i$th grouping factor in the data.  (Because all the
 elements of $\bZ$ are zero or one, the diagonals of $\bZ\trans\bZ$ are
@@ -348,154 +348,175 @@ factors.
 \subsection{Scottish secondary school student scores}
 \label{sec:Scottish}
 
-An example may help clarify these concepts.
+An example may help to clarify these descriptions.
 
-Data on achievement scores of Scottish secondary school students,
-as described in \citet{Paterson:1991} and are analyzed in
+Data on achievement scores of Scottish secondary school students are
+described in \citet{Paterson:1991} and are analyzed in
 \citet[ch.~18]{MLwiN:2002} and other references.  In the \code{Matrix}
 package for \RR{} these are available as the data set \var{ScotsSec}
-containing the achievement scores (\var{attain}), some
-demographic data (sex and social class), a verbal reasoning score
-based on tests taken at entry to secondary school, and the primary and
-secondary schools attended by 3435 students.  There are 148 distinct
-primary schools and 19 distinct secondary schools represented in these
-data.
+containing the achievement scores (\var{attain}), some demographic
+data (\var{sex} and \var{social} class), a \var{verbal} reasoning
+score based on tests taken at entry to secondary school, and the
+\var{primary} and secondary (\var{second}) schools attended by 3435
+students.  
 
-<<ScotsSec>>=
-data(ScotsSec, package = "Matrix")
-summary(ScotsSec[,c("sex", "primary", "second")])
+The grouping factors for the random effects are \var{primary} (148
+distinct schools) and \var{second} (19 distinct schools).  The
+summary of these variables each give the counts for the six schools
+with the greatest number of students in the study.  A cross-tabulation
+of \var{primary} and \var{second} (we show only the first five rows),
+shows that on some occasions students from the same primary school
+have attended different secondary schools.
+<<ScotsSecsummary>>=
+summary(ScotsSec[,c("primary", "second")])
+xtabs(~primary + second, ScotsSec)[1:5,]
 @ 
 
-In common models for such data
-\citep{Rnews:Lockwood+Doran+Mccaffrey:2003}, the random effects are
-associated with the primary school and the secondary school that the
-student attended, which is to say that \var{primary}, with 148
-distinct levels, and \var{second}, with 19 distinct levels, are the
-grouping factors.  
+If all the students from a given primary school attended the same
+secondary school we would say that \var{primary} is \emph{nested
+  within} \var{second}.  That is no the case here.  There is a
+moderate amount of \emph{crossing} of these two grouping factors.
 
-Incorporating the student's verbal score and sex and the interaction
-of these two covariates in the fixed effects part of the model (the
-model matrix $\bX$ and the coefficients $\bbeta$) leads us to the
-specification of a linear mixed-effects model as
+We begin with a variance components model that incorporates the
+student's sex and their verbal pre-test score and the interaction 
+of these two covariates in the fixed effects.
 <<fm1>>=
 fm1 = lme(attain~verbal*sex, data = ScotsSec, random = list(primary=~1,second=~1))
 @ 
 
-We see that $\Omega$ has a very simple structure.  The matrix
-$\bZ\trans\bZ$ is sparse but not as simple.  To determine its
-structure we must first examine $\bZ$ which has 3435 rows
-(corresponding to students) and 167 columns.  The first 148 columns
-are the indicators of the primary schools.  That is, if student $i$
-attended primary school $j$ then
-\begin{equation}
-  \label{eq:bZik}
-  \{\bZ\}_{ik}=
-  \begin{cases}
-    1&k=j\\
-    0&k\ne j
-  \end{cases}
-\end{equation}
-The last 19 columns are the indicators of the secondary schools.
-The diagonal elements of $\bZ\trans\bZ$ are the tabulation of the
-number of students attending each primary school followed by the
-number of students attending each secondary school.  Part of this
-tabulation is given in the output of the \var{summary} function above.
-Here we give the full tabulation of the secondary schools and part of
-the crosstabulation of the primary and secondary schools.
-<<xtabs>>=
-xtabs(~second, ScotsSec)
-xtabs(~primary + second, ScotsSec)[1:4,]
-@ 
-
-For the purposes of this study each student is classified as attending
-only one primary school and one secondary school.  Primary school $i$
-can occur with secondary school $j$ but not all of these combinations
-do 
-one prim
-but one of these columns, the column corresponding to the primary school
-There is a corresponding grouping of the columns of the matrix $\bZ$
-into $m_1\times q_1$ columns associated with the first grouping factor
-$\bff_1$, $m_2\times q_2$ columns associated with the second grouping
-factor $\bff_2$, and so on.  A given observation, corresponding to a
-row of $\bZ$, is associated with exactly one level of $\bff_1$, one
-level of $\bff_2$, and so on and all the elements of that row of $\bZ$
-will be zero except for the corresponding $q_1$ columns in the first
-group, the corresponding $q_2$ columns in the second group, and so on.
-
-This structure in $\bZ$ induces a special structure in $\bZ\trans\bZ$.
-It is symmetric and can be divided into $k\times k$ ``outer blocks'',
-corresponding to the $k$ grouping factors. The $(i,j)$ outer block, of
-size $m_i q_i\times m_j q_j$, is further subdivided into $m_i\times
-m_j$ inner blocks, each of size $q_i\times q_j$.  The $(m,n)$'th inner
-block in the $(i,j)$'th outer block will be non-zero only if level $m$
-of $\bff_i$ occurs with level $n$ of $\bff_j$.  In particular, a
-diagonal outer block is block-diagonal with the diagonal consisting of
-$m_i$ (possibly different) blocks of size $q_i\times q_i$.
-
-As discussed later, $\bOmega$ has a block diagonal structure and its
-determinant is easily evaluated.  The determinant
-$\left|\bZ\trans\bZ+\bOmega\right|$ is the product of the elements of
-$\dZ$ and $\left|\LXX\right|^2$ is the product of the elements of $\dX$.
-
-The other results given in \citet{bate:debr:2004} can be calculated
-from $\bL$ and $\bD$.  To make all this feasible the structure and, in
-particular, the sparsity of $\bZ$ and $\bOmega$ must be exploited.
-
-Sparsity in $\bZ$ (and $\bOmega$) occurs when the random effects
-vector $\bb$ is divided into small components associated with one or
-more factors that group the observations.  It is easiest to illustrate
-this with some examples.
-
-\subsection{Examples}
-\label{ssec:Examples}
-
-Data on achievement scores of Scottish secondary school students,
-as described in \citet{Paterson:1991} and \citet[ch.~18]{MLwiN:2002},
-are available as the data set \var{ScotsSec}. 
-
-This data set contains the achievement scores (\var{attain}), some
-demographic data (sex and social class), a verbal reasoning score
-based on tests taken at entry to secondary school, and the primary and
-secondary schools attended for 3435 students.  There are 148 distinct
-primary schools and 19 distinct secondary schools represented in these
-data.
-<<ScotsSec>>=
-data(ScotsSec, package = "Matrix")
-dim(ScotsSec)
-summary(ScotsSec[,c("attain", "verbal", "sex", "primary", "second")])
-@ 
-
-In common models for such data
-\citep{Rnews:Lockwood+Doran+Mccaffrey:2003}, there would be one or
-more coefficients in $\bb$ associated with each school (i.e.
-\var{primary} and \var{second} are the grouping factors for the random
-effects).  Let's start with a simple model in which the random effects
-for the primary school and the random effects for the secondary school
-are both simple additive effects.  This means that the first 148
-columns of $\bZ$ are indicators of the primary school and the last 19
-columns are indicators of the secondary school.  We incorporate the
-student's verbal score and sex and their interaction in the fixed
-effects part of the model (the model matrix $\bX$ and the coefficients
-$\bbeta$).
-
-<<fm1>>=
-fm1 = lme(attain~verbal*sex,ScotsSec,list(primary=~1,second=~1))
-@ 
-
-We calculate and store the upper triangle of the symmetric
-$167\times 167$ matrix $\bZ\trans\bZ$.  The locations of the non-zeros
-are shown in Figure~\ref{fig:ZtZ}.
+The locations of the non-zeros in the $167\times 167$ matrix
+$\bZ\trans\bZ$ are shown in Figure~\ref{fig:ZtZ}.
 \begin{figure}[htbp]
   \centering
-\setkeys{Gin}{width=3in}
-<<FigZtZ,fig=TRUE,echo=FALSE,height=5,width=5>>=
-print(image(as(fm1@rep, "sscMatrix")))
+\setkeys{Gin}{width=\textwidth}
+<<FigZtZ,fig=TRUE,echo=FALSE,height=8,width=8>>=
+print(image(as(fm1@rep, "sscMatrix"), aspect='xy', colorkey = FALSE))
 @   
-  \caption{Location of non-zero elements in the upper triangle of
+  \caption{Location of non-zero elements in
     $\bZ\trans\bZ$ for model \var{fm1} fit to the \var{ScotsSec}
     data.}
   \label{fig:ZtZ}
 \end{figure}
+Darker greys indicate larger magnitudes.  As can be expected the
+largest magnitudes occur on the diagonal of the secondary school block.
+Figure~\ref{fig:ZtZ} corresponds to a re-ordering of the levels of the
+\var{primary} and \var{second} grouping factors, as described in the
+next section.
+
+The matrix $\bZ\trans\bZ$ is stored in the compressed, sorted, sparse,
+symmetric, column-oriented representation.  Only the upper triangle or
+the lower triangle of this symmetric matrix need be stored.  Because
+we will use the methods implemented in Tim Davis' LDL package
+\citep{Davis:2004} which requires the upper triangle to be stored, we
+do so.  There are a total of 404 non-zero elements in the upper
+triangle.  We store these in increasing column order and, within each
+column, in order of increasing row index.  In addition to the non-zero
+value we must store the row indices and the column indices, but the
+column indices are in increasing order and we can compress this vector
+by storing only the information on where each column begins. This is a
+standard representation for sparse matrices, as described in
+\citet{Davis:2004}.
+
+The matrix $\bOmega$ is implicitly defined by the number of levels in
+each of the grouping factors and by the values of $\omega_1$ and
+$\omega_2$ (shown below).  We store the matrix $\bZ\trans\bX$ and the
+vector $\bZ\trans\by$ as a single dense matrix of size $167\times 5$.
+Similarly $\bX\trans\bX$, $\bX\trans\by$ and $\by\trans\by$ are stored
+in a single dense matrix of size $5\times 5$ (only the upper triangle
+of this symmetric matrix is stored).
+<<fm1Pieces>>=
+unlist(fm1@rep@Omega)
+dim(fm1@rep@ZtX)
+fm1@rep@ZtX[1:4,]
+fm1@rep@XtX
+@ 
+
+\subsection{Cholesky decomposition of the sparse matrices}
+\label{sec:Fill-reducing}
+
+For each value of $(\omega_1,\omega_2)$, code from the LDL package is
+used to factor
+\begin{equation}
+  \label{eq:LDLdef}
+  \bZ\trans\bZ+\bOmega=\bL\bD\bL\trans
+\end{equation}
+where $\bL$ is a unit, lower triangular $q\times q$ matrix and $\bD$
+is diagonal with positive diagonal elements.  Because the diagonal
+elements of the unit triangular matrix $\bL$ are, by definition,
+unity, they do not need to be stored explicitly.
+
+The number of nonzero offdiagonal elements in $\bL$ depends on the
+order of the rows and columns in $\bZ\trans\bZ+\bOmega$ because of
+what is described as ``fill-in'' during the course of the
+decomposition algorithm.  There are several methods available for
+determining a fill-reducing permutation of the rows and columns.  We
+use an algorithm based on graph partitioning and implemented in
+Metis~citep{Metis}.  However, the fill-reducing permutation from Metis
+does not preserve separation of the grouping factors.  That is, the
+permutation returned by Metis can, and usually does, intermingle the
+rows and columns associated with different grouping factors.
+
+To avoid this undesirable intermingling of the grouping factors, we
+take the permutation returned by Metis and reorder it to separate the
+factors.  We have not encountered any situations where this generates
+substantial extra fill-in.
+
+For the Scottish secondary school data the number of non-zero
+off-diagonal elements in $\bL$ is 464.  The total amount of storage
+required for $\bD$ and $\bL$ is 167 numeric elements in $\bD$ and 464
+numeric elements in $\bL$.  We also need 632 integer elements for the
+indices in $\bL$ (168 for the $q+1$ column pointers
+and 464 for the row indices of the nonzero offdiagonals).
+
+The positions of the nonzero elements in the last 19 rows of $\bL$ are
+shown in Figure~\ref{fig:Lnonzero} (the first 148 rows of $\bL$ are an
+identity matrix augmented with 19 columns of zeros)
+\begin{figure}[htbp]
+  \centering
+\setkeys{Gin}{width=\textwidth}
+<<FigLnonzero,fig=TRUE,echo=FALSE,height=2.5,width=8>>=
+print(image(as(fm1@rep, "tscMatrix"),ylim=c(167,149),
+            colorkey=FALSE,aspect='xy'))
+@   
+  \caption{Location of non-zero elements in the last 19 rows of
+    $\bL$ for model \var{fm1} fit to the \var{ScotsSec} data.}
+  \label{fig:Lnonzero}
+\end{figure}
+
+If the grouping factors are a nested sequence of factors there will
+not be any fill-in.  In fact, the inverse of $\bL$ will have exactly
+the same pattern of nonzeros as does $\bL$.  We check for a nested
+sequence of grouping factors before seeking a fill-reducing
+permutation.  The case $k=1$ (the random effects are determined by a
+single grouping factor) is trivially a nested sequence.
+
+When the grouping factors are not in a strictly nested sequence, the
+number of nonzeros in $\bL^{-1}$ can be much greater than the number
+in $\bL$.  The positions of the nonzeros in the last 19 rows of
+$\bL^{-1}$ (again, the first 148 rows are an identity matrix augmented
+with 19 columns of zeros) are shown in Figure~\ref{fig:LInonz}.
+\begin{figure}[htbp]
+  \centering
+\setkeys{Gin}{width=\textwidth}
+<<FigLInonz,fig=TRUE,echo=FALSE,height=2.5,width=8>>=
+fmr = fm1@rep
+LI = as(new("tscMatrix", i = fmr@LIi, p = fmr@LIp, Dim=fmr@Dim,
+         x = fmr@LIx, uplo = "L", diag = "U"), "tripletMatrix")
+print(image(LI, ylim=c(167,149),
+            colorkey=FALSE,aspect='xy'))
+@   
+  \caption{Location of non-zero elements in the last 19 rows of
+    $\bL^{-1}$ for model \var{fm1} fit to the \var{ScotsSec} data.}
+  \label{fig:LInonz}
+\end{figure}
+There are 2200 nonzero off-diagonal elements in $\bL^{-1}$ for this
+example.  However, even this count is less than the number of cells
+required in MLwiN (2812, according to \citet{MLwiN:2002}) to
+store the off-diagonal part of $\bZ\trans\bZ$.
+
+The small overhead incurred for index storage with sparse matrices is
+repaid many times in the savings from not storing elements that are zero.
+
 
 \section{Implementation}
 \label{sec:Implementation}
@@ -517,8 +538,13 @@ position, policy or decision unless so designated by other
 documentation. 
 
 I would like to thank Deepayan Sarkar and Tim Davis for helpful
-discussions and suggestions.  The \code{Matrix} package for \RR{} is based on code from the LDL~\citep{Davis:2004}, TAUCS~\citep{Taucs},
-and Metis~\citep{Metis} packages.  
+discussions and suggestions.  I also would like to thank Harold Doran
+for his suggestion of using sparse matrix techniques with linear
+mixed-effects models.
+
+The \code{Matrix} package for \RR{} is based on code from the
+LDL~\citep{Davis:2004}, TAUCS~\citep{Taucs}, and Metis~\citep{Metis}
+packages.
 
 \bibliography{lme4}
 \end{document}
@@ -964,3 +990,112 @@ number of distinct levels of each grouping factor is $m_i, i =
 1,\dots,k$.  Then $\bOmega$ is block diagonal with $k$ blocks and
 block $i$ is itself block diagonal with the diagonal consisting of
 $m_i$ repetitions of a $q_i\times q_i$ matrix $\bOmega_i$.  
+
+
+In common models for such data
+\citep{Rnews:Lockwood+Doran+Mccaffrey:2003}, the random effects are
+associated with the primary school and the secondary school that the
+student attended, which is to say that \var{primary}, with 148
+distinct levels, and \var{second}, with 19 distinct levels, are the
+grouping factors.  
+
+
+We see that $\Omega$ has a very simple structure.  The matrix
+$\bZ\trans\bZ$ is sparse but not as simple.  To determine its
+structure we must first examine $\bZ$ which has 3435 rows
+(corresponding to students) and 167 columns.  The first 148 columns
+are the indicators of the primary schools.  That is, if student $i$
+attended primary school $j$ then
+\begin{equation}
+  \label{eq:bZik}
+  \{\bZ\}_{ik}=
+  \begin{cases}
+    1&k=j\\
+    0&k\ne j
+  \end{cases}
+\end{equation}
+The last 19 columns are the indicators of the secondary schools.
+The diagonal elements of $\bZ\trans\bZ$ are the tabulation of the
+number of students attending each primary school followed by the
+number of students attending each secondary school.  Part of this
+tabulation is given in the output of the \var{summary} function above.
+Here we give the full tabulation of the secondary schools and part of
+the crosstabulation of the primary and secondary schools.
+<<xtabs>>=
+xtabs(~second, ScotsSec)
+@ 
+
+For the purposes of this study each student is classified as attending
+only one primary school and one secondary school.  Primary school $i$
+can occur with secondary school $j$ but not all of these combinations
+do 
+one prim
+but one of these columns, the column corresponding to the primary school
+There is a corresponding grouping of the columns of the matrix $\bZ$
+into $m_1\times q_1$ columns associated with the first grouping factor
+$\bff_1$, $m_2\times q_2$ columns associated with the second grouping
+factor $\bff_2$, and so on.  A given observation, corresponding to a
+row of $\bZ$, is associated with exactly one level of $\bff_1$, one
+level of $\bff_2$, and so on and all the elements of that row of $\bZ$
+will be zero except for the corresponding $q_1$ columns in the first
+group, the corresponding $q_2$ columns in the second group, and so on.
+
+This structure in $\bZ$ induces a special structure in $\bZ\trans\bZ$.
+It is symmetric and can be divided into $k\times k$ ``outer blocks'',
+corresponding to the $k$ grouping factors. The $(i,j)$ outer block, of
+size $m_i q_i\times m_j q_j$, is further subdivided into $m_i\times
+m_j$ inner blocks, each of size $q_i\times q_j$.  The $(m,n)$'th inner
+block in the $(i,j)$'th outer block will be non-zero only if level $m$
+of $\bff_i$ occurs with level $n$ of $\bff_j$.  In particular, a
+diagonal outer block is block-diagonal with the diagonal consisting of
+$m_i$ (possibly different) blocks of size $q_i\times q_i$.
+
+As discussed later, $\bOmega$ has a block diagonal structure and its
+determinant is easily evaluated.  The determinant
+$\left|\bZ\trans\bZ+\bOmega\right|$ is the product of the elements of
+$\dZ$ and $\left|\LXX\right|^2$ is the product of the elements of $\dX$.
+
+The other results given in \citet{bate:debr:2004} can be calculated
+from $\bL$ and $\bD$.  To make all this feasible the structure and, in
+particular, the sparsity of $\bZ$ and $\bOmega$ must be exploited.
+
+Sparsity in $\bZ$ (and $\bOmega$) occurs when the random effects
+vector $\bb$ is divided into small components associated with one or
+more factors that group the observations.  It is easiest to illustrate
+this with some examples.
+
+\subsection{Examples}
+\label{ssec:Examples}
+
+Data on achievement scores of Scottish secondary school students,
+as described in \citet{Paterson:1991} and \citet[ch.~18]{MLwiN:2002},
+are available as the data set \var{ScotsSec}. 
+
+This data set contains the achievement scores (\var{attain}), some
+demographic data (sex and social class), a verbal reasoning score
+based on tests taken at entry to secondary school, and the primary and
+secondary schools attended for 3435 students.  There are 148 distinct
+primary schools and 19 distinct secondary schools represented in these
+data.
+<<ScotsSec>>=
+data(ScotsSec, package = "Matrix")
+dim(ScotsSec)
+summary(ScotsSec[,c("attain", "verbal", "sex", "primary", "second")])
+@ 
+
+In common models for such data
+\citep{Rnews:Lockwood+Doran+Mccaffrey:2003}, there would be one or
+more coefficients in $\bb$ associated with each school (i.e.
+\var{primary} and \var{second} are the grouping factors for the random
+effects).  Let's start with a simple model in which the random effects
+for the primary school and the random effects for the secondary school
+are both simple additive effects.  This means that the first 148
+columns of $\bZ$ are indicators of the primary school and the last 19
+columns are indicators of the secondary school.  We incorporate the
+student's verbal score and sex and their interaction in the fixed
+effects part of the model (the model matrix $\bX$ and the coefficients
+$\bbeta$).
+
+<<fm1>>=
+fm1 = lme(attain~verbal*sex,ScotsSec,list(primary=~1,second=~1))
+@ 
