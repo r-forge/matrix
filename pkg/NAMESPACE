@@ -48,9 +48,11 @@ exportClasses(
               "dpoMatrix",
               "dppMatrix",
               "dsCMatrix",
+              "dsTMatrix",
               "dspMatrix",
               "dsyMatrix",
               "dtCMatrix",
+              "dtTMatrix",
               "dtpMatrix",
               "dtrMatrix",
 
