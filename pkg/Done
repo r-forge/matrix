@@ -16,3 +16,8 @@
 - Fix the calculation of the Dim slot for the crossprod method for
   dgCMatrix objects (too tired to do that now).
   -- Done
+
+- spelling style: Should "coersion" be "coercion" ?
+  -- Yes.  Watch for this.
+
+
