@@ -224,7 +224,6 @@ setClass("lmer",
                         D = "list",     # list of diagonal factors (upper triangle)
                         bVar = "list",  # list of conditional variance factors (upper triangle)
                         L = "list",     # list of blocks of L
-                        Linv = "list",  # list of diagonal blocks of L^{-1}
                         ZZpO = "list",  # list of diagonal blocks of Z'Z+Omega
                         Omega = "list", # list of relative precision matrices
                         REML = "logical", 
