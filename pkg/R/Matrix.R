@@ -39,6 +39,10 @@ setMethod("show", signature(object = "ddenseMatrix"), prMatrix)
 ## this may go away {since sparse matrices need something better!} :
 setMethod("show", signature(object = "Matrix"), prMatrix)
 
+## Is this sufficient for all subclasses?
+setMethod("as.matrix", signature(x = "Matrix"), function(x) as(x, "matrix"))
+
+
 setMethod("dim", signature(x = "Matrix"),
           function(x) x@Dim, valueClass = "integer")
 setMethod("dimnames", signature(x = "Matrix"), function(x) x@Dimnames)
@@ -57,6 +61,8 @@ dimnamesGets <- function (x, value) {
 setMethod("dimnames<-", signature(x = "Matrix", value = "list"),
           dimnamesGets)
 
+setMethod("unname", signature("Matrix", force="missing"),
+          function(obj) { obj@Dimnames <- list(NULL,NULL); obj})
 
 Matrix <-
     function (data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL)
