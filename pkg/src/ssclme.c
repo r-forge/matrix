@@ -1250,3 +1250,40 @@ SEXP ssclme_fitted(SEXP x, SEXP facs, SEXP mmats)
     UNPROTECT(2);
     return val;
 }
+
+SEXP ssclme_variances(SEXP x, SEXP REML)
+{
+    SEXP Omega = GET_SLOT(x, Matrix_OmegaSym),
+	val = PROTECT(allocVector(VECSXP, length(Omega) + 1));
+    int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	i, nf = length(Omega);
+    double *sig, sigmasq;
+    
+    SET_VECTOR_ELT(val, nf, ssclme_sigma(x, REML));
+    sig = REAL(VECTOR_ELT(val, nf));
+    sigmasq = (*sig) * (*sig);
+    *sig = sigmasq;
+    for (i = 0; i < nf; i++) {
+	SEXP vari = duplicate(VECTOR_ELT(Omega, i));
+	double *mm = REAL(vari);
+	int j, k, nci = nc[i], ncip1 = nci+1;
+
+	SET_VECTOR_ELT(val, i, vari);
+	F77_CALL(dpotrf)("U", &nci, mm, &nci, &j);
+	if (j)			/* shouldn't happen */
+	    error("DPOTRF returned error code %d on Omega[%d]",
+		  j, i + 1);
+	F77_CALL(dpotri)("U", &nci, mm, &nci, &j);
+	if (j)			/* shouldn't happen */
+	    error("DTRTRI returned error code %d on Omega[%d]",
+		  j, i + 1);
+	for (j = 0; j < nci; j++) {
+	    mm[j * ncip1] *= sigmasq;
+	    for (k = 0; k < j; k++) {
+		mm[j + k * nci] = (mm[k + j * nci] *= sigmasq);
+	    }
+	}
+    }
+    UNPROTECT(1);
+    return val;
+}
