@@ -665,9 +665,10 @@ SEXP ldl_inverse(SEXP x)
 	    int ci = LIp[i+1] - LIp[i];
 	    if (ci > maxod) maxod = ci;
 	}
+/* FIXME: Don't bother storing LIp, store maxod only */
 	
 	for (i = 0; i < nf; i++) {
-	    int j, jj, k, kk, nci = nc[i], nr, p, p2, pp,
+	    int j, jj, k, kk, nci = nc[i], nr, p, p2, pj, pp,
 		m = maxod + 1,
 		*ind = Calloc(m, int);
 	    double
@@ -675,7 +676,7 @@ SEXP ldl_inverse(SEXP x)
 		*mpt = REAL(VECTOR_ELT(bVar, i));
 	    
 	    for (j = Gp[i]; j < Gp[i+1]; j += nci) {
-		kk = 0;		/* ind holds indices of non-zeros */
+		kk = 0;		/* ind gets indices of non-zeros */
 		jj = j;		/* in this block of columns */
 		while (jj >= 0) {
 		    ind[kk++] = jj;
@@ -691,21 +692,12 @@ SEXP ldl_inverse(SEXP x)
 		    ccol[k] = 1.; /* initialize from unit diagonal */
 		    for (jj = j + k; jj >= 0; jj = Parent[jj]) {
 			p2 = Lp[jj+1];
-			pp = k;
+			pp = pj = ldl_update_ind(jj, 0, ind);
 			for (p = Lp[jj]; p < p2; p++) {
 			    pp = ldl_update_ind(Li[p], pp, ind);
-			    ccol[pp] -= Lx[p] * ccol[jj];
+			    ccol[pp] -= Lx[p] * ccol[pj];
 			}
 		    }
-
-/* 		    for (j = k + 1; j < nr; j++) {  */
-/* 			jj = ind[j]; p2 = Lp[jj+1]; */
-/* 			pp = k; */
-/* 			for (p = Lp[jj]; p < p2; p++) { */
-/* 			    pp = ldl_update_ind(Li[p], pp, ind); */
-/* 			    ccol[pp] -= Lx[p]*ccol[j]; */
-/* 			} */
-/* 		    } */
 		}
 				
 		for (kk = 0; kk < nr; kk++) { /* scale rows */
