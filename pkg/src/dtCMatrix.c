@@ -3,6 +3,12 @@
 
 SEXP tsc_validate(SEXP x)
 {
+    SEXP val;
+
+    if (isString(val = check_scalar_string(GET_SLOT(x, Matrix_uploSym),
+					   "LU", "uplo"))) return val;
+    if (isString(val = check_scalar_string(GET_SLOT(x, Matrix_diagSym),
+					   "NU", "diag"))) return val;
     return ScalarLogical(1);
 }
 
