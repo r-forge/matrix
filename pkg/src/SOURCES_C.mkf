@@ -2,7 +2,7 @@ SOURCES_C =  \
 	    LU.c \
 	    Metis_utils.c \
 	    R_ldl.c \
-	    cscBlocked.c \
+	    dgBCMatrix.c \
 	    init.c \
 	    lmer.c \
             Mutils.c \
@@ -10,7 +10,6 @@ SOURCES_C =  \
             dense.c \
             dgCMatrix.c \
             dgTMatrix.c \
-            dgTMatrix_to_dgCMatrix.c \
             dgeMatrix.c \
             dpoMatrix.c \
             dsCMatrix.c \
@@ -20,4 +19,5 @@ SOURCES_C =  \
             factorizations.c \
             sscCrosstab.c \
             ssclme.c \
+            triplet_to_col.c \
             # flame.c

@@ -28,7 +28,7 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
 	lo = toupper(CHAR(asChar(GET_SLOT(x, Matrix_uploSym)))[0]) == 'L',
 	n = length(pSlot)-1,
 	nnz, piv = asLogical(pivot);
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("sscChol")));
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dCholCMatrix")));
     int *P = (int *) NULL, *Pinv = (int *) NULL;
     double *Ax;
 
@@ -59,7 +59,7 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
 	Ai = Calloc(nnz, int);
 	Ax = Calloc(nnz, double);
 	Ap = Calloc(n + 1, int);
-	dgTMatrix_to_dgCMatrix(n, n, nnz, INTEGER(Ti),
+	triplet_to_col(n, n, nnz, INTEGER(Ti),
 		       INTEGER(GET_SLOT(trip, Matrix_jSym)),
 		       REAL(GET_SLOT(trip, Matrix_xSym)),
 		       Ap, Ai, Ax);

@@ -2,37 +2,37 @@ LU.o: LU.c LU.h dtrMatrix.h
 Metis_utils.o: Metis_utils.c \
   Metis/struct.h Metis/macros.h Metis/rename.h Metis/proto.h \
   Metis_utils.h
-Mutils.o: Mutils.c Mutils.h dgTMatrix_to_dgCMatrix.h
+Mutils.o: Mutils.c Mutils.h triplet_to_col.h
 R_ldl.o: R_ldl.c R_ldl.h
 bCrosstab.o: bCrosstab.c bCrosstab.h Mutils.h \
   cblas.h Syms.h dgCMatrix.h \
-  R_ldl.h dgTMatrix_to_dgCMatrix.h Metis_utils.h dsCMatrix.h dtCMatrix.h
-cscBlocked.o: cscBlocked.c cscBlocked.h Mutils.h \
-  cblas.h Syms.h R_ldl.h dgTMatrix_to_dgCMatrix.h
+  R_ldl.h triplet_to_col.h Metis_utils.h dsCMatrix.h dtCMatrix.h
+dgBCMatrix.o: dgBCMatrix.c dgBCMatrix.h Mutils.h \
+  cblas.h Syms.h R_ldl.h triplet_to_col.h
 dense.o: dense.c dense.h Mutils.h cblas.h Syms.h
 dgCMatrix.o: dgCMatrix.c dgCMatrix.h Mutils.h cblas.h Syms.h R_ldl.h \
-  dgTMatrix_to_dgCMatrix.h
+  triplet_to_col.h
 dgTMatrix.o: dgTMatrix.c dgTMatrix.h Mutils.h cblas.h Syms.h
-dgTMatrix_to_dgCMatrix.o: dgTMatrix_to_dgCMatrix.c
+triplet_to_col.o: triplet_to_col.c triplet_to_col.h
 dgeMatrix.o: dgeMatrix.c dgeMatrix.h cblas.h Syms.h
 dpoMatrix.o: dpoMatrix.c dpoMatrix.h cblas.h Syms.h
 dsCMatrix.o: dsCMatrix.c dsCMatrix.h Mutils.h cblas.h Syms.h R_ldl.h \
-  dgTMatrix_to_dgCMatrix.h
+  triplet_to_col.h
 dsyMatrix.o: dsyMatrix.c dsyMatrix.h dgeMatrix.h cblas.h Syms.h
 dtCMatrix.o: dtCMatrix.c dtCMatrix.h Mutils.h cblas.h Syms.h dgCMatrix.h \
-  R_ldl.h dgTMatrix_to_dgCMatrix.h
+  R_ldl.h triplet_to_col.h
 dtrMatrix.o: dtrMatrix.c dtrMatrix.h cblas.h Syms.h
 factorizations.o: factorizations.c factorizations.h Mutils.h cblas.h Syms.h
-init.o: init.c LU.h dtrMatrix.h cblas.h Syms.h cscBlocked.h \
-  R_ldl.h dgTMatrix_to_dgCMatrix.h dgCMatrix.h dense.h factorizations.h \
+init.o: init.c LU.h dtrMatrix.h cblas.h Syms.h dgBCMatrix.h \
+  R_ldl.h triplet_to_col.h dgCMatrix.h dense.h factorizations.h \
   dgeMatrix.h lmer.h bCrosstab.h Metis_utils.h dsCMatrix.h dtCMatrix.h \
   dpoMatrix.h sscCrosstab.h ssclme.h dsyMatrix.h dgTMatrix.h
 lmer.o: lmer.c lmer.h Mutils.h cblas.h Syms.h \
-  dgTMatrix_to_dgCMatrix.h cscBlocked.h R_ldl.h \
+  triplet_to_col.h dgBCMatrix.h R_ldl.h \
   bCrosstab.h dgCMatrix.h Metis_utils.h dsCMatrix.h dtCMatrix.h
 sscChol.o: sscChol.c sscChol.h dtCMatrix.h Mutils.h cblas.h Syms.h dgCMatrix.h \
-  R_ldl.h dgTMatrix_to_dgCMatrix.h
+  R_ldl.h triplet_to_col.h
 sscCrosstab.o: sscCrosstab.c sscCrosstab.h Mutils.h cblas.h Syms.h R_ldl.h \
-  dgTMatrix_to_dgCMatrix.h
+  triplet_to_col.h
 ssclme.o: ssclme.c ssclme.h sscCrosstab.h Mutils.h cblas.h Syms.h R_ldl.h \
-  dgTMatrix_to_dgCMatrix.h
+  triplet_to_col.h

@@ -9,7 +9,7 @@
 
 #include <R_ext/RS.h>
 
-void dgTMatrix_to_dgCMatrix
+void triplet_to_col
 (
     int n_row,
     int n_col,

@@ -1,6 +1,6 @@
 #include "dgCMatrix.h"
 
-SEXP csc_validate(SEXP x)
+SEXP dgCMatrix_validate(SEXP x)
 {
     SEXP pslot = GET_SLOT(x, Matrix_pSym),
 	islot = GET_SLOT(x, Matrix_iSym),
@@ -146,7 +146,7 @@ SEXP csc_tcrossprod(SEXP x)
     SET_SLOT(ans, Matrix_pSym, allocVector(INTSXP, nrow + 1));
     ansp = INTEGER(GET_SLOT(ans, Matrix_pSym));
     itmp = Calloc(ntrip, int); xtmp = Calloc(ntrip, double);
-    dgTMatrix_to_dgCMatrix(nrow, nrow, ntrip, iVal, jVal, xVal,
+    triplet_to_col(nrow, nrow, ntrip, iVal, jVal, xVal,
 		   ansp, itmp, xtmp);
     nnz = ansp[nrow];
     SET_SLOT(ans, Matrix_uploSym, ScalarString(mkChar("L")));
