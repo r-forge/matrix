@@ -3,7 +3,6 @@
 \alias{cscBlocked-class}
 \alias{coerce,cscBlocked,cscMatrix-method}
 \alias{coerce,cscBlocked,tripletMatrix-method}
-\alias{coerce,cscMatrix,cscBlocked-method}
 \title{Class "cscBlocked" compressed, sparse, blocked Matrix }
 \description{The \code{cscMatrix} class is a class of sparse matrices in
   the compressed, sparse, column-oriented format.  In this
