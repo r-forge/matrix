@@ -1,23 +1,23 @@
 SOURCES_C =  \
 	    LU.c \
-            Mutils.c \
 	    Metis_utils.c \
 	    R_ldl.c \
-            bCrosstab.c \
 	    cscBlocked.c \
-            cscMatrix.c \
-            dense.c \
-            factorizations.c \
-            geMatrix.c \
 	    init.c \
 	    lmer.c \
-            poMatrix.c \
+            Mutils.c \
+            bCrosstab.c \
+            dense.c \
+            dgCMatrix.c \
+            dgTMatrix.c \
+            dgTMatrix_to_dgCMatrix.c \
+            dgeMatrix.c \
+            dpoMatrix.c \
+            dsCMatrix.c \
+            dsyMatrix.c \
+            dtCMatrix.c \
+            dtrMatrix.c \
+            factorizations.c \
             sscCrosstab.c \
-            sscMatrix.c \
             ssclme.c \
-            syMatrix.c \
-            trMatrix.c \
-            triplet.c \
-            triplet_to_col.c \
-            tscMatrix.c \
             # flame.c
