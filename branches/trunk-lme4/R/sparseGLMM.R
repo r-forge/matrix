@@ -1,32 +1,17 @@
-
-
-
-if (!isGeneric("GLMM")) {
-    setGeneric("sparseGLMM",
-               function(formula, family, data, random,
-                        subset, method, na.action, control, model, x, ...)
-               standardGeneric("GLMM"))
-}
-
-
 setMethod("GLMM",
           signature(formula = "formula",
                     family = "family",
                     random = "list"),
-          function(formula, family, data, random, subset,
-                   method, na.action, control, model, x, ...)
+          function(formula, family, data, random,
+                   method = match.arg(c("PQL", "Laplace")),
+                   control = list(),
+                   subset, weights, na.action, offset,
+                   model = TRUE, x = FALSE, ...)
       {
-          if (missing(method)) method <- "PQL" # FIXME: see glmm.R 
-          if (missing(model))
-              model <- TRUE
-          if (missing(x))
-              x <- FALSE
           random <-
               lapply(as(random, "list"),
                      get("formula", pos = parent.frame(), mode = "function"))
-          controlvals <- 
-              if (missing(control)) lmeControl()
-              else do.call("lmeControl", control)
+          controlvals <- do.call("lmeControl", control)
           controlvals$REML <- FALSE
           data <- eval(make.mf.call(match.call(expand.dots = FALSE),
                                     formula, random), parent.frame())
