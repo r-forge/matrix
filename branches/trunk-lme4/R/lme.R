@@ -157,7 +157,7 @@ setMethod("lme", signature(formula = "formula", random = "list"),
           .Call("ssclme_initial", obj, PACKAGE="Matrix")
           .Call("ssclme_factor", obj, PACKAGE = "Matrix")
           .Call("ssclme_EMstepsGets", obj, controlvals$niterEM,
-                method == "REML", PACKAGE = "Matrix")
+                method == "REML", controlvals$EMverbose, PACKAGE = "Matrix")
           new("lme", call = match.call(), facs = facs, mmats = mmats,
               model = data, REML = method == "REML", rep = obj)
       })
