@@ -12,6 +12,9 @@ setAs("dtpMatrix", "matrix",
 setMethod("%*%", signature(x = "dtpMatrix", y = "dgeMatrix"),
 	  function(x, y) .Call("dtpMatrix_dgeMatrix_mm", x, y))
 
+setMethod("%*%", signature(x = "dtpMatrix", y = "matrix"),
+	  function(x, y) .Call("dtpMatrix_matrix_mm", x, y))
+
 setMethod("determinant", signature(x = "dtpMatrix", logarithm = "missing"),
 	  function(x, logarithm, ...) determinant(x, TRUE))
 

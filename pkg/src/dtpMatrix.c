@@ -128,8 +128,28 @@ SEXP dtpMatrix_dgeMatrix_mm(SEXP x, SEXP y)
 	error(_("Dimensions of a (%d,%d) and b (%d,%d) do not conform"),
 	      xDim[0], xDim[1], yDim[0], yDim[1]);
     for (j = 0; j < yDim[1]; j++)
-	F77_CALL(dtpsv)(uplo, "N", diag, yDim, xx,
+	F77_CALL(dtpmv)(uplo, "N", diag, yDim, xx,
 			vx + j * yDim[0], &ione);
+    UNPROTECT(1);
+    return val;
+}
+
+SEXP dtpMatrix_matrix_mm(SEXP x, SEXP y)
+{
+    SEXP val = PROTECT(duplicate(y));
+    int *xDim = INTEGER(GET_SLOT(x, Matrix_DimSym)),
+	*yDim = INTEGER(getAttrib(y, R_DimSymbol));
+    int ione = 1, j;
+    char *uplo = CHAR(STRING_ELT(GET_SLOT(x, Matrix_uploSym), 0)),
+	*diag = CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0));
+    double *xx = REAL(GET_SLOT(x, Matrix_xSym));
+
+    if (yDim[0] != xDim[1])
+	error(_("Dimensions of a (%d,%d) and b (%d,%d) do not conform"),
+	      xDim[0], xDim[1], yDim[0], yDim[1]);
+    for (j = 0; j < yDim[1]; j++)
+	F77_CALL(dtpmv)(uplo, "N", diag, yDim, xx,
+			REAL(val) + j * yDim[0], &ione);
     UNPROTECT(1);
     return val;
 }
