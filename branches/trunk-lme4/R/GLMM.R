@@ -201,7 +201,7 @@ setMethod("GLMM",
               LMEoptimize(obj) = controlvals
               eta[] <-
                   .Call("ssclme_fitted", obj, facs,
-                        mmats.unadjusted, PACKAGE = "Matrix")
+                        mmats.unadjusted, TRUE, PACKAGE = "Matrix")
               cat(paste("Iteration", iter,"Termination Criterion:",
                         format(max(abs(eta - etaold)) /
                         (0.1 + max(abs(eta)))), "\n"))
@@ -299,7 +299,7 @@ setMethod("GLMM",
 
                   eta <- off + 
                       .Call("ssclme_fitted", reducedObj, facs,
-                            reducedMmats.unadjusted, PACKAGE = "Matrix")
+                            reducedMmats.unadjusted, TRUE, PACKAGE = "Matrix")
 #                  eta <-
 #                      .Call("ssclme_fitted", obj, facs,
 #                            mmats.unadjusted, PACKAGE = "Matrix")
@@ -322,7 +322,7 @@ setMethod("GLMM",
                             PACKAGE="Matrix")
                       eta[] <- off + 
                           .Call("ssclme_fitted", reducedObj, facs,
-                                reducedMmats.unadjusted,
+                                reducedMmats.unadjusted, TRUE,
                                 PACKAGE = "Matrix")
 #print(mean(eta), digits = 12)
                       ##cat(paste("bhat Criterion:", max(abs(eta - etaold)) /
