@@ -568,6 +568,7 @@ update_D_L(int i, const int nc[], SEXP ZZxP, SEXP LP, SEXP DP)
 	    error("code for off-diagonal updates not yet written");
     }
 }
+
 /** 
  * If status[["factored"]] is FALSE, create and factor Z'Z+Omega, then
  * create RZX and RXX, the deviance components, and the value of the
