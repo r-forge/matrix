@@ -217,17 +217,8 @@ setMethod("formula",
           "groupedData",
           function(x, ...) x@formula)
 
-
-#setMethod("getData",
-#          "groupedData",
-#          function(x, ...) x@data)
-
-
 setAs("groupedData", "data.frame",
       function(from) from@data)
-
-
-
 
 collectorPlot <-
     function(formula, data, displayfunction,

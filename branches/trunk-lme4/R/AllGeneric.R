@@ -46,17 +46,9 @@ if (!isGeneric("getResponse")) {
                standardGeneric("getResponse"))
 }
 
-# FIXME: pare down the argument list
 setGeneric("lme",
-           function(formula, data, random, correlation, weights, subset,
-                    method, na.action, control, model, x, ...)
+           function(formula, data, random, ...)
            standardGeneric("lme"))
-
-# FIXME: Remove this generic
-if (!isGeneric("EMsteps<-")) {
-    setGeneric("EMsteps<-",
-               function(x, ..., value) standardGeneric("EMsteps<-"))
-}
 
 if (!isGeneric("LMEoptimize<-")) {
     setGeneric("LMEoptimize<-", function(x, ..., value)
@@ -112,8 +104,7 @@ if (!isGeneric("lmList")) {
 
 if (!isGeneric("GLMM")) {
     setGeneric("GLMM",
-               function(formula, family, data, random, control, niter,
-                        method, verbose, ...)
+               function(formula, family, data, random, ...)
                standardGeneric("GLMM"))
 }
 
