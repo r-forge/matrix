@@ -18,11 +18,14 @@ stopifnot(names(h9@factors) == "Cholesky",
 str(h9)# has 'rcond' and 'factors'
 options(digits=4)
 (cf9 <- crossprod(f9))# looks the same as  h9 :
-stopifnot(all.equal(as(h9, "matrix"),
-                    as(cf9,"matrix"), tol= 1e-15))
+stopifnot(all.equal(as.matrix(h9),
+                    as.matrix(cf9), tol= 1e-15))
 
 str(hp9 <- as(h9, "dppMatrix"))
 
-(s9 <- solve(hp9, seq(nrow(hp9))))
+s9 <- solve(hp9, seq(nrow(hp9)))
+signif(t(s9)/10000, 4)# only rounded numbers are platform-independent
 hp9 %*% s9
-
+## Works in 2.1.0, but not earlier:
+## stopifnot(all.equal(cbind(1:9), as.matrix(hp9 %*% s9)))
+stopifnot(all.equal(1:9, (hp9 %*% s9)@x))
