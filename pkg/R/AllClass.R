@@ -65,10 +65,10 @@ setClass("cscMatrix",
 
 # Sparse triangular matrix in sorted compressed sparse column format
 setClass("tscMatrix",
-         representation(uplo = "character"),
+         representation(uplo = "character", diag = "character"),
          prototype = prototype(p = as.integer(0), i = integer(0),
                         x = numeric(0), Dim = as.integer(c(0, 0)),
-                        uplo = 'L'),
+                        uplo = 'L', diag = 'N'),
          contains = "cscMatrix",
          validity = function(object)
                     .Call("tsc_validate", object, PACKAGE="Matrix"))
