@@ -21,8 +21,7 @@
 \maketitle
 \begin{abstract}
   We describe a representation of linear mixed-effects models using a
-  positive semidefinite, symmetric, compressed, column-oriented,
-  sparse matrix.  This representation provides for efficient
+  sparse semidefinite matrix.  This representation provides for efficient
   evaluation of the profiled log-likelihood or profiled restricted
   log-likelihood of the model, given the relative precision parameters
   for the random effects.  The evaluation is based upon the
@@ -39,7 +38,7 @@
   with which the random effects are associated. An important part of
   the symbolic phase is determination of a fill-minimizing permutation
   of the rows and columns of the sparse semidefinite matrix.  This
-  matrix have a special structure in the linear mixed-effects problem
+  matrix has a special structure in the linear mixed-effects problem
   and we provide a new fill-minimizing algorithm tuned to this
   structure.
 
@@ -85,7 +84,7 @@ suitably ordering the grouping factors and by restricting ourselves to
 permutations that correspond to reorderings of the levels within the
 grouping factors we can determine effective fill-reducing orderings.
 
-Finally, in \S\ref{sec:Extensions} we show how these methods can be
+Finally, in \S\ref{sec:Generalizations} we show how these methods can be
 used to implement general penalized least squares approaches to models
 such as the GLMM and the NMM and then to implement more accurate
 approximations to the marginal likelihood using Laplacian integration
@@ -100,7 +99,7 @@ using the LDL form of the Cholesky decomposition of a sparse,
 semidefinite matrix.
 
 \subsection{Form of the model}
-\label{sec:ModelForm}
+\label{ssec:ModelForm}
 
 We consider linear mixed-effects models that can be written as
 \begin{equation}
@@ -137,16 +136,16 @@ of the model, a model matrix $\bZ_i$ of size $n\times q_i$ is
 associated with grouping factor $\bff_i$, $i=1,\dots,k$.  Typically
 the $q_i$ are very small.  In fact, in one common form of the model,
 called a \emph{variance components} model, $q_1=q_2=\dots=q_k=1$ and
-each of the $\bZ_i,i=1,\dots,k$ consist of a single column of 1's.
+each of the $\bZ_i,i=1,\dots,k$ is a single column of 1's.
 
 In the general form, the random effects vector $\bb$, of length
-$q=\sum_{i=1}^k m_i q_i$, is partitioned into $k$ ``outer blocks''
+$q=\sum_{i=1}^k m_i q_i$, is partitioned into $k$ ``outer blocks'',
 where the i'th outer block is of size $m_i q_i,i=1,\dots,k$.  The
 columns of $\bZ$ and the rows and columns of $\bZ\trans\bZ$ and
 $\bOmega$ are similarly partitioned.  The $i$th outer block is further
 subdivided into $m_i$ inner blocks of size $q_i$.  Note that the
-grouping factors determine the outer blocks and the levels of each
-grouping factor determine the inner blocks.
+grouping factors determine the outer blocks and the levels of the
+grouping factors determine the inner blocks.
 
 In the models that we will consider, the random effects associated
 with different grouping factors are independent.  That is,
@@ -189,7 +188,7 @@ factors.
 
 
 \subsubsection{The Scottish secondary school example}
-\label{sec:Scottish}
+\label{ssec:Scottish}
 
 An example may help to clarify these descriptions.
 
@@ -227,11 +226,11 @@ print(image(ctab, aspect='xy', xlim = c(-0.5,166.5),
 for a variance components model using these grouping factors.
 
 \subsubsection{General structure of the sparse matrix}
-\label{sec:Sparse}
+\label{ssec:Sparse}
 
 For the variance components model $\bZ\trans\bZ$ is based on the
 pairwise crosstabulation of the grouping factors.  In the more general
-model where some of the $\bZ_i$ can have multiple columns, the
+model, where some of the $\bZ_i$ can have multiple columns, the
 structure of $\bZ\trans\bZ$ can be derived from the structure of the
 pairwise crosstabulation matrix.  Both $\bZ\trans\bZ$ and the pairwise
 crosstabulation can be divided into a $k\times k$ grid of blocks.  The
@@ -258,7 +257,7 @@ factors like these, which are neither nested nor fully crossed, are
 said to be \emph{partially crossed}.
 
 \subsection{Estimation criteria and related quantities}
-\label{sec:ModelCriteria}
+\label{ssec:ModelCriteria}
 
 For ease of reference we restate some of the results from
 \citet{bate:debr:2004} in the form in which they will be calculated.
@@ -350,7 +349,7 @@ deviance, is
   \end{aligned}
 \end{equation}
 \begin{equation}
-`  \label{eq:ProfiledLogRestLik}
+  \label{eq:ProfiledLogRestLik}
   \begin{aligned}
     \widehat{\btheta_R}&=\arg\min_{\btheta} -2\tilde{\ell_R}(\btheta)\\
     &=\arg\min_{\btheta}\left\{\log\left(\frac{\left|\bD\right|\left|\RXX\right|^2}
@@ -442,8 +441,8 @@ many times for different trial values of $\btheta$, the structure of
 $\bZ\trans\bZ+\bOmega$ -- in particular, the number and the positions of
 nonzeros in $\bZ\trans\bZ+\bOmega$ and in $\bL$ -- will be the
 same for each evaluation.  Because the LDL package provides one
-function to perform the symbolic analysis and another function that
-determines the numerical values in the decomposition, we can do
+function to perform the symbolic analysis and another function to
+determine the numerical values in the decomposition, we can do
 the symbolic analysis separately.
 
 The number and the positions of the nonzeros in $\bL$ depend on the
@@ -451,8 +450,8 @@ positions of the nonzeros in $\bZ\trans\bZ$. Any nonzero position in
 the lower triangle of $\bZ\trans\bZ$ can be nonzero in $\bL$.
 However other positions in $\bL$ can become nonzero during the course
 of the decomposition.  This is called ``fill-in''.  The extent of the
-fill-in can be altered by reordering the components of $\bb$ and,
-correspondingly, the columns of $\bZ$.
+fill-in can be altered by reordering the components of $\bb$ (and
+correspondingly the columns of $\bZ$).
 
 Although there are general approaches, such as approximate minimal
 degree~\citep{Davis:1996} or graph-partitioning
@@ -530,12 +529,11 @@ Notice that a single grouping factor is, trivially, a nested sequence.
 
 
 \subsection{Examples}
-\label{sec:ProjectionEx}
+\label{ssec:ProjectionEx}
 
-In Figure~\ref{fig:ScotsProj} we show the projection of the pairwise
-crosstabulation of \var{primary} and \var{second} in the
-\var{ScotsSec} data, as shown in Figure~\ref{fig:ZtZ}, onto the
-$19\times19$ block for the \var{second} factor.
+In Figure~\ref{fig:ScotsProj} we show the projection of the symmetric
+matrix in Figure~\ref{fig:ZtZ} onto the $19\times19$ block for the
+\var{second} factor.
 \begin{figure}[tbp]
   \centering
 \setkeys{Gin}{width=\textwidth}
@@ -597,24 +595,23 @@ nonzeros in $\bL$.  With the permutation there are 131.
 Even so, only 470 floating point values are required to store
 $\bZ\trans\bZ$ and a total of 601 for the decomposition (167 for $\bD$
 and 434 for $\bL$).  Dense storage of the $(2,1)$ block of
-$\bZ\trans\bZ$, as suggested in \citep{MLwiN:2002}, would require 2812
+$\bZ\trans\bZ$, as suggested in \citet{MLwiN:2002}, would require 2812
 floating point locations for that block alone, plus a similar number
 for the decomposition.  In this example it is the sparse storage, more
-than the fill-reducing permutation, the reduces both the space and the
+than the fill-reducing permutation, that reduces both the space and the
 computational time required, relative to previous methods.
 
 In other cases, however, the storage savings from the fill-reducing
-permutation can be substantial.  We have used these
-methods to analyze 378,047 test scores of 134,713 students in 3722
-schools.  There are 377,111 nonredundant nonzeros in the pairwise crosstabulation
-(138435 diagonals and 238,676 off-diagonals).  The
-projection of the $(2,1)$ block into the $(2,2)$ block produces a
-symmetric $3722\times 3722$ matrix with 49,305 non-redundant nonzeros
-(3722 diagonals and 45,583 off-diagonals).  Without the fill-reducing
-permutation the $\bL$ matrix has 4,469,124 nonzero off-diagonals or
-64.5\% of the maximum possible number (6,924,781). With the
-permutation the number of nonzero off-diagonals is reduced to 193,562 or 2.8\%
-of the maximum.
+permutation can be substantial.  We have used these methods to analyze
+378,047 test scores of 134,713 students in 3722 schools.  There are
+377,111 nonredundant nonzeros in the pairwise crosstabulation (138,435
+diagonals and 238,676 off-diagonals).  The projection of the $(2,1)$
+block into the $(2,2)$ block produces a symmetric $3722\times 3722$
+matrix with 49,305 non-redundant nonzeros (3722 diagonals and 45,583
+off-diagonals).  Without the fill-reducing permutation the $\bL$
+matrix has 4,469,124 nonzero off-diagonals or 64.5\% of the maximum
+possible number (6,924,781). With the permutation the number of
+nonzero off-diagonals is reduced to 193,562 or 2.8\% of the maximum.
 
 Fitting linear mixed models to data, such as these, that have a large
 number of levels in one or more of a set of partially crossed grouping
@@ -687,8 +684,8 @@ the random effects
 are required.
 
 The conditional modes can be determined by a penalized IRLS algorithm
-implemented using the techniques described in \S\ref{sec:LinearMixed}
-and \S\ref{sec:Symbolic}.
+implemented using the representations and decompositions described in
+\S\ref{sec:LinearMixed} and \S\ref{sec:Symbolic}.
 
 
 \subsection{Nonlinear mixed models}
@@ -717,13 +714,18 @@ For a fixed value of $\btheta$ we can express the conditional
 estimates of the fixed effects $\bbeta$ and the condtional modes of
 the random effects as the solution to a penalized nonlinear least
 squares (PNLS) problem.  The algorithm proposed in
-\citet{lind:bate:1990} is essentially the PQL algorithm with the PIRLS
+\citet{lind:bate:1990} is essentially the the same as the PQL algorithm for generalized linear models but with the PIRLS
 step replaced by PNLS.  Just like PQL this algorithm will generally
 get close to the MLEs but does not produce the exact MLEs except in
-special circumstances.  Again, we use the techniques described in
-\S\ref{sec:LinearMixed} and \S\ref{sec:Symbolic} in the PQL step and
-in determining the conditional modes of the random effects for the
-Laplace and adaptive Gauss-Hermite methods.
+special circumstances.  
+
+Estimates obtained by maximizing the Laplacian approximation or an
+adaptive Gauss-Hermite approximation to the marginal likelihood should
+be closer to the MLEs.  As in the case of the GLMM these
+approximations require the conditional modes of the random effects.
+These are the solutions to a penalized nonlinear least squares problem
+for which the representation and decompositions described in
+\S\ref{sec:LinearMixed} and \S\ref{sec:Symbolic} can be used.
 
 \section{Implementation}
 \label{sec:Implementation}
@@ -731,7 +733,7 @@ Laplace and adaptive Gauss-Hermite methods.
 The techniques described in \S\ref{sec:LinearMixed} and
 \S\ref{sec:Symbolic} for linear mixed models, and the PQL and Laplace
 methods for generalized linear mixed models are currently implemented
-in the \code{lme4} package for R~\cite{R-2.0.0}.  In future versions
+in the \code{lme4} package for R~\citep{R-2.0.0}.  In future versions
 of this package we will incorporate the adaptive Gauss-Hermite method
 for GLMMs and the PQL, Laplace, and adaptive Gauss-Hermite methods for
 NMMs.
@@ -750,13 +752,13 @@ reliable on what would currently be considered typical multilevel
 modeling examples.  However, the sparse matrix representation and the
 ease of model specification allows it to go far beyond currently
 available software.  We know of no other software that can fit models
-with partially crossed grouping factors to data sets with $10^6$ or
+with partially crossed grouping factors to data sets with $10^5$ or
 more observations, such as the longitudinal analysis of over 300,000
 test scores described in \S\ref{ssec:ProjectionEx} incorporating
 random effects for student and school and allowing for student
 migration between schools.
 
-\section{Summary}
+\section{Conclusions}
 \label{sec:Summary}
 
 We have presented a specification of linear mixed models using model
@@ -771,19 +773,19 @@ mixed model including GLMMs and NMMs.
 Specification of the model is important.  In many software
 implementations of methods for fitting linear mixed models it can be
 awkward to specify the structure of the random effects.  We contend
-that by concentrating on the grouping factors in the data and model
-matrices associated with these grouping factors, the specification of
-linear mixed models is made much easier.  Nesting or crossing of
-grouping factors can be determined from the data, rather than having
-to be specified as part of the model.  Common forms of linear mixed
-models (including all those in the comparative review of multilevel
-modeling software, \url{http://multilevel.ioe.ac.uk/softrev/}) can be
-specified without using specialized forms of the precision matrices
-$\bOmega_i, i=1,\dots,k$.  We only require that these matrices are
-symmetric and positive semidefinite, which makes the implementation
-much much simpler because we do not need to work with esoteric forms
-of precision matrices, or variance-covariance matrices, for the random
-effects.
+that by concentrating on the grouping factors in the data and on the
+model matrices associated with these grouping factors, the
+specification of linear mixed models is made much easier.  Nesting or
+crossing of grouping factors can be determined from the data, rather
+than having to be specified as part of the model.  Common forms of
+linear mixed models (including all those in the comparative review of
+multilevel modeling software,
+\url{http://multilevel.ioe.ac.uk/softrev/}) can be specified without
+using specialized forms of the precision matrices $\bOmega_i,
+i=1,\dots,k$.  We only require that these matrices are symmetric and
+positive definite, which makes the implementation much simpler because
+we do not need to work with esoteric forms of precision matrices, or
+variance-covariance matrices, for the random effects.
 
 A pairwise crosstabulation of the grouping factors, which we store as
 a sparse symmetric matrix, is the basis of all the symbolic analysis.
@@ -795,12 +797,12 @@ decomposition is determined during the symbolic analysis we can
 allocate all the storage needed for later calculations immediately
 after this stage.
 
-If we order the grouping factors so that $m1\ge m2\ge\dots\ge m_k$ we
-can ``project out'' the effect of the first grouping factor on the
+We can ``project out'' the effect of the first grouping factor on the
 reordering of the columns of the matrix $\bZ$.  Because it is common
 for the number of levels in one of the grouping factors to be
-comparable to the number of observations, this can simplify the
-symbolic analysis considerably.
+comparable to the number of observations, ordering the grouping
+factors so that $m1\ge m2\ge\dots\ge m_k$ can simplify the symbolic
+analysis considerably.
 
 The representation provided by the sparse symmetric storage of
 $\bZ\trans\bZ$ and the dense storage of $\bZ\trans\bX$ and
@@ -808,8 +810,8 @@ $\bX\trans\bX$ (where $\bX$ actually contains both $\bX$ and $\by$),
 provides a remarkably efficient means of evaluating the profiled
 log-likelihood and restricted log-likelihood.  ECME
 iterative steps can be efficiently implemented with this
-representation.  After a moderate number of ECME steps it is a good
-idea to switch to a Newton or quasi-Newton optimization method, for
+representation.  After a moderate number of ECME steps it is advantageous
+to switch to a Newton or quasi-Newton optimization method, for
 which the gradient and, optionally, the Hessian of the objective can
 be evaluated.
 
