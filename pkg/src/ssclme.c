@@ -915,30 +915,55 @@ int coef_length(int nf, const int nc[])
  * @return numeric vector of the values in the upper triangles of the
  * Omega matrices
  */
-SEXP ssclme_coef(SEXP x)
+SEXP ssclme_coef(SEXP x, SEXP Unconstr)
 {
     SEXP Omega = GET_SLOT(x, Matrix_OmegaSym);
     int	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
-	i, nf = length(Omega), vind;
+	i, nf = length(Omega), unc = asLogical(Unconstr), vind;
     SEXP val = PROTECT(allocVector(REALSXP, coef_length(nf, nc)));
     double *vv = REAL(val);
 
-    vind = 0;
+    vind = 0;			/* index in vv */
     for (i = 0; i < nf; i++) {
-	int nci = nc[i];
+	int nci = nc[i], ncip1 = nci + 1;
 	if (nci == 1) {
-	    vv[vind++] = REAL(VECTOR_ELT(Omega, i))[0];
+	    vv[vind++] = (unc ?
+			  log(REAL(VECTOR_ELT(Omega, i))[0]) :
+			  REAL(VECTOR_ELT(Omega, i))[0]);
 	} else {
-	    int j, k, odind = vind + nci, ncip1 = nci + 1;
-	    double *omgi = REAL(VECTOR_ELT(Omega, i));
-	    
-	    for (j = 0; j < nci; j++) {
-		vv[vind++] = omgi[j * ncip1];
-		for (k = j + 1; k < nci; k++) {
-		    vv[odind++] = omgi[k*nci + j];
+	    if (unc) {		/* L log(D) L' factor of Omega[i,,] */
+		int j, k, ncisq = nci * nci;
+		double *tmp = Memcpy(Calloc(ncisq, double), 
+				     REAL(VECTOR_ELT(Omega, i)), ncisq);
+		F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
+		if (j)		/* should never happen */
+		    error("DPOTRF returned error code %d on Omega[[%d]]",
+			  j, i+1);
+		for (j = 0; j < nci; j++) {
+		    double diagj = tmp[j * ncip1];
+		    vv[vind++] = 2. * log(diagj);
+		    for (k = j + 1; k < nci; k++) {
+			tmp[j + k * nci] /= diagj;
+		    }
 		}
+		for (j = 0; j < nci; j++) {
+		    for (k = j + 1; k < nci; k++) {
+			vv[vind++] = tmp[j + k * nci];
+		    }
+		}
+		Free(tmp);
+	    } else {		/* upper triangle of Omega[i,,] */
+		int j, k, odind = vind + nci;
+		double *omgi = REAL(VECTOR_ELT(Omega, i));
+
+		for (j = 0; j < nci; j++) {
+		    vv[vind++] = omgi[j * ncip1];
+		    for (k = j + 1; k < nci; k++) {
+			vv[odind++] = omgi[k*nci + j];
+		    }
+		}
+		vind = odind;
 	    }
-	    vind = odind;
 	}
     }
     UNPROTECT(1);
@@ -1058,12 +1083,13 @@ SEXP ssclme_coefGetsUnc(SEXP x, SEXP coef)
  * 
  * @return R_NilValue
  */
-SEXP ssclme_coefGets(SEXP x, SEXP coef)
+SEXP ssclme_coefGets(SEXP x, SEXP coef, SEXP Unc)
 {
     SEXP Omega = GET_SLOT(x, Matrix_OmegaSym);
     int	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	*status = LOGICAL(GET_SLOT(x, Matrix_statusSym)),
 	cind, i, nf = length(Omega),
-	*status = LOGICAL(GET_SLOT(x, Matrix_statusSym));
+	unc = asLogical(Unc);
     double *cc = REAL(coef);
 
     if (length(coef) != coef_length(nf, nc) || !isReal(coef))
@@ -1073,15 +1099,37 @@ SEXP ssclme_coefGets(SEXP x, SEXP coef)
     for (i = 0; i < nf; i++) {
 	int nci = nc[i];
 	if (nci == 1) {
-	    REAL(VECTOR_ELT(Omega, i))[0] = cc[cind++];
+	    REAL(VECTOR_ELT(Omega, i))[0] = (unc ?
+					     exp(cc[cind++]) :
+					     cc[cind++]);
 	} else {
-	    int j, k, odind = cind + nci, ncip1 = nci + 1;
-	    double *omgi = REAL(VECTOR_ELT(Omega, i));
-	
-	    for (j = 0; j < nci; j++) {
-		omgi[j * ncip1] = cc[cind++];
-		for (k = j + 1; k < nci; k++) {
-		    omgi[k*nci + j] = cc[odind++];
+	    int odind = cind + nci, /* off-diagonal index */
+		j, k,
+		ncip1 = nci + 1,
+		ncisq = nci * nci;
+	    double
+		*omgi = REAL(VECTOR_ELT(Omega, i));
+	    if (unc) {
+		double
+		    *tmp = Calloc(ncisq, double),
+		    diagj, one = 1., zero = 0.;
+
+		memset(omgi, 0, sizeof(double) * ncisq);
+		for (j = 0; j < nci; j++) {
+		    tmp[j * ncip1] = diagj = exp(cc[cind++]/2.);
+		    for (k = j + 1; k < nci; k++) {
+			tmp[k*nci + j] = cc[odind++] * diagj;
+		    }
+		}
+		F77_CALL(dsyrk)("U", "T", &nci, &nci, &one,
+				tmp, &nci, &zero, omgi, &nci);
+		Free(tmp);
+	    } else {
+		for (j = 0; j < nci; j++) {
+		    omgi[j * ncip1] = cc[cind++];
+		    for (k = j + 1; k < nci; k++) {
+			omgi[k*nci + j] = cc[odind++];
+		    }
 		}
 	    }
 	    cind = odind;
@@ -1143,10 +1191,30 @@ common_ECME_gradient(SEXP x, int REML, SEXP val)
 }
 
 /** 
- * Perform a number of ECME steps for the REML or ML criterion.
+ * Print the verbose output in the ECME iterations
  * 
  * @param x pointer to an ssclme object
- * @param nsteps pointer to an integer scalar giving the number of ECME steps to perform
+ * @param iter iteration number
+ * @param REML indicator of whether REML is being used
+ */
+static void EMsteps_verbose_print(SEXP x, int iter, int REML)
+{
+    SEXP coef = PROTECT(ssclme_coef(x, ScalarLogical(0)));
+    int lc = length(coef); double *cc = REAL(coef);
+
+    ssclme_factor(x);
+    if (iter == 0) Rprintf("  EM iterations\n");
+    Rprintf("%3d %.3f", iter, dev[REML ? 1 : 0]);
+    for (i = 0; i < lc; i++) Rprintf(" %#8g", cc[i]);
+    Rprintf("\n");
+    UNPROTECT(1);
+}
+    
+/** 
+ * Perform ECME steps for the REML or ML criterion.
+ * 
+ * @param x pointer to an ssclme object
+ * @param nsteps pointer to an integer scalar - the number of ECME steps to perform
  * @param REMLp pointer to a logical scalar indicating if REML is to be used
  * @param verb pointer to a logical scalar indicating verbose mode
  * 
@@ -1167,17 +1235,7 @@ SEXP ssclme_EMsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP verb)
     double
 	*dev = REAL(GET_SLOT(x, Matrix_devianceSym));
 
-    if (verbose) {
-	SEXP coef = PROTECT(ssclme_coef(x));
-	int lc = length(coef); double *cc = REAL(coef);
-
-	ssclme_factor(x);
-	Rprintf("  EM iterations\n");
-	Rprintf("%3d %.3f", 0, dev[REML ? 1 : 0]);
-	for (i = 0; i < lc; i++) Rprintf(" %#8g", cc[i]);
-	Rprintf("\n");
-	UNPROTECT(1);
-    }
+    if (verbose) EMsteps_verbose_print(x, 0, REML);
     for (iter = 0; iter < nEM; iter++) {
 	common_ECME_gradient(x, REML, Omega);
 	status[0] = status[1] = 0;
@@ -1193,16 +1251,7 @@ SEXP ssclme_EMsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP verb)
 		error("DPOTRI returned error code %d in Omega[[%d]] update",
 		      info, i + 1);
 	}
-	if (verbose) {
-	    SEXP coef = PROTECT(ssclme_coef(x));
-	    int lc = length(coef); double *cc = REAL(coef);
-
-	    ssclme_factor(x);
-	    Rprintf("%3d %.3f", iter + 1, dev[REML ? 1 : 0]);
-	    for (i = 0; i < lc; i++) Rprintf(" %#8g", cc[i]);
-	    Rprintf("\n");
-	    UNPROTECT(1);
-	}
+	if (verbose) EMsteps_verbose_print(x, iter + 1, REML);
     }
     ssclme_factor(x);
     return R_NilValue;
@@ -1248,9 +1297,8 @@ static void indicator_gradient(SEXP x, int REML, SEXP val)
  * Overwrite a gradient with respect to positions in Omega[[i]] by the
  * gradient with respect to the unconstrained parameters.
  * 
- * @param grad pointer to a gradient wrt positions.  Overwritten.
- * @param Omega pointer to a list of symmetric (upper storage)
- * matrices Omega[[i]].
+ * @param grad pointer to a gradient wrt positions.  Contents are overwritten.
+ * @param Omega pointer to a list of symmetric matrices (upper storage).
  */
 static void unconstrained_gradient(SEXP grad, SEXP Omega)
 {
@@ -1277,38 +1325,69 @@ static void unconstrained_gradient(SEXP grad, SEXP Omega)
 	/* full symmetric product gives diagonals */
 	F77_CALL(dtrmm)("R", "U", "T", "N", &nci, &nci, &one, chol, &nci,
 			Memcpy(ai, tmp, ncisq), &nci);
-	/* overwrite lower triangle with gradients for positions in L; */
+	/* overwrite upper triangle with gradients for positions in L' */
 	for (ii = 1; ii < nci; ii++) { 
 	    for (j = 0; j < ii; j++) {
-		ai[ii + j*nci] = 2. * chol[j*ncip1] * tmp[j + ii*nci];
-		ai[j + ii*nci] = 0.;
+		ai[j + ii*nci] = 2. * chol[j*ncip1] * tmp[j + ii*nci];
+		ai[ii + j*nci] = 0.;
 	    }
 	}
 	Free(chol); Free(tmp);
     }
 }
 
-SEXP ssclme_grad(SEXP x, SEXP REMLp, SEXP Uncst)
+/** 
+ * Fills cvec with unlist(lapply(mList, function(el) el[upper.tri(el, strict = FALSE)]))
+ * 
+ * @param mList pointer to a list of REAL matrices
+ * @param nc number of columns in each matrix
+ * @param cvec pointer to REAL vector to receive the result
+ */
+static void upperTriList_to_vector(SEXP mList, int *nc, SEXP cvec)
 {
-    SEXP ans = PROTECT(duplicate(GET_SLOT(x, Matrix_OmegaSym)));
+    int i, ii, j, nf = length(mList), pos = 0;
 
-    indicator_gradient(x, asLogical(REMLp), ans);
-    if (asLogical(Uncst))
-	unconstrained_gradient(ans, GET_SLOT(x, Matrix_OmegaSym));
-    UNPROTECT(1);
-    return ans;
+    pos = 0;			/* position in vector */
+    for (i = 0; i < nf; i++) {
+	SEXP omgi = VECTOR_ELT(mList, i);
+	int nci = nc[i];
+	for (j = 0; j < nci; j++) {
+	    for (ii = 0; ii <= j; ii++) {
+		REAL(cvec)[pos++] = REAL(omgi)[ii + j * nci];
+	    }
+	}
+    }
 }
-
-
+    
 /** 
  * Return the gradient of the ML or REML deviance.
  * 
  * @param x pointer to an ssclme object
  * @param REMLp pointer to a logical scalar indicating if REML is to be used
  * @param Uncp pointer to a logical scalar indicating if the unconstrained parameterization is to be used
+ * @param Uncp pointer to a logical scalar indicating if result should be a single vector
  * 
- * @return pointer to a numeric vector of the gradient.
+ * @return pointer to the gradient as a list of matrices or as a vector.
  */
+SEXP ssclme_grad(SEXP x, SEXP REMLp, SEXP Unc, SEXP OneVector)
+{
+    SEXP ans = PROTECT(duplicate(GET_SLOT(x, Matrix_OmegaSym)));
+
+    indicator_gradient(x, asLogical(REMLp), ans);
+    if (asLogical(Unc))
+	unconstrained_gradient(ans, GET_SLOT(x, Matrix_OmegaSym));
+    if (asLogical(OneVector)) {
+	int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym));
+	SEXP val = PROTECT(allocVector(REALSXP, coef_length(length(ans), nc)));
+	
+	upperTri_as_vector(ans, nc, val);
+	UNPROTECT(2);
+	return val;
+    }
+    UNPROTECT(1);
+    return ans;
+}
+
 SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
 {
     SEXP
@@ -1434,7 +1513,7 @@ SEXP ssclme_Hessian(SEXP x, SEXP REMLp, SEXP Uncp)
 			       INTEGER(GET_SLOT(x, Matrix_ncSym))),
 	unc = asLogical(Uncp);
     SEXP ans = PROTECT(allocMatrix(REALSXP, ncoef, ncoef)),
-	base = PROTECT(unc ? ssclme_coefUnc(x) : ssclme_coef(x)),
+	base = PROTECT(ssclme_coef(x, Uncp)),
 	current = PROTECT(duplicate(base)),
 	gradient;
 
@@ -1444,27 +1523,18 @@ SEXP ssclme_Hessian(SEXP x, SEXP REMLp, SEXP Uncp)
 
 	for (i = 0; i < ncoef; i++) REAL(current)[i] = REAL(base)[i];
 	REAL(current)[j] += delta/2.;
-	if (unc) {
-	    ssclme_coefGetsUnc(x, current);
-	} else {
-	    ssclme_coefGets(x, current);
-	}
+	ssclme_coefGets(x, current, Uncp);
 	PROTECT(gradient = ssclme_gradient(x, REMLp, Uncp));
 	for (i = 0; i < ncoef; i++) REAL(ans)[j * ncoef + i] = REAL(gradient)[i];
 	UNPROTECT(1);
 	REAL(current)[j] -= delta;
-	if (unc) {
-	    ssclme_coefGetsUnc(x, current);
-	} else {
-	    ssclme_coefGets(x, current);
-	}
+	ssclme_coefGets(x, current, Uncp);
 	PROTECT(gradient = ssclme_gradient(x, REMLp, Uncp));
 	for (i = 0; i < ncoef; i++)
-	    REAL(ans)[j * ncoef + i] = (REAL(ans)[j * ncoef + i] - REAL(gradient)[i])/
-		delta;
+	    REAL(ans)[j * ncoef + i] =
+		(REAL(ans)[j * ncoef + i] - REAL(gradient)[i])/ delta;
 	UNPROTECT(1);
-	/* symmetrize */
-	for (i = 0; i < j; i++) {
+	for (i = 0; i < j; i++) { /* symmetrize */
 	    REAL(ans)[j * ncoef + i] = REAL(ans)[i * ncoef + j] =
 		(REAL(ans)[j * ncoef + i] + REAL(ans)[i * ncoef + j])/2.;
 	}
