@@ -1,5 +1,5 @@
 setAs("dgBCMatrix", "dgCMatrix",
-      function(from) .Call("cscBlocked_2cscMatrix", from))
+      function(from) .Call("dgBCMatrix_to_dgCMatrix", from))
           
 ##           if (any(dim(from@x)[1:2] != 1))
 ##               stop("code not yet written for nr > 1 or nc > 1")
