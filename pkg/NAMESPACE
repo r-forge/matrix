@@ -8,7 +8,7 @@ importFrom("stats", "deviance", "formula", "coef")
 export(
        "Hilbert",
        "Matrix",
-       "bbCrosstab",
+       "bCrosstab",
        "coef<-",
        "corFactor",
        "corMatrix",
@@ -29,7 +29,7 @@ exportClasses(
 	      "Cholesky",
 	      "LU",
               "Matrix",
-              "bbCrosstab",
+              #"bbCrosstab",
               "corrmatrix",
               "cscBlocked",
               "cscMatrix",
