@@ -1224,7 +1224,6 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
     SEXP
 	Omega = GET_SLOT(x, Matrix_OmegaSym),
 	RZXsl = GET_SLOT(x, Matrix_RZXSym),
-	ans,
 	ncsl = GET_SLOT(x, Matrix_ncSym),
 	bVar = GET_SLOT(x, Matrix_bVarSym);
     int
@@ -1233,7 +1232,7 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
 	*nc = INTEGER(ncsl),
 	REML = asLogical(REMLp),
 	cind, i, n = dims[0],
-	nf = length(ncsl) - 2,
+	nf = length(Omega),
 	nobs, odind, p, pp1 = dims[1],
 	uncst = asLogical(Uncp);
     double
@@ -1241,24 +1240,27 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
 	*b,
         alpha,
 	one = 1.;
+    SEXP ans = PROTECT(allocVector(REALSXP, coef_length(nf, nc)));
 
     nobs = nc[nf + 1];
     p = pp1 - 1;
     b = RZX + p * n;
-    ans = PROTECT(allocVector(REALSXP, coef_length(nf, nc)));
     ssclme_invert(x);
     cind = 0;
     for (i = 0; i < nf; i++) {
 	int j, ki = Gp[i+1] - Gp[i],
-	    nci = nc[i],
+	    nci = nc[i], ncip1 = nci + 1, ncisq = nci * nci,
 	    mi = ki/nci;
 	double
-	    *tmp = Memcpy(Calloc(nci * nci, double),
-			  REAL(VECTOR_ELT(Omega, i)), nci * nci);
+	    *chol = Memcpy(Calloc(ncisq, double),
+			   REAL(VECTOR_ELT(Omega, i)), ncisq),
+	    *tmp = Calloc(ncisq, double);
+	
 	    
-	F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
+	F77_CALL(dpotrf)("U", &nci, chol, &nci, &j);
 	if (j)
 	    error("DPOTRF gave error code %d on Omega[[%d]]", j, i + 1);
+	Memcpy(tmp, chol, ncisq);
 	F77_CALL(dpotri)("U", &nci, tmp, &nci, &j);
 	if (j)
 	    error("DPOTRI gave error code %d on Omega[[%d]]", j, i + 1);
@@ -1281,20 +1283,34 @@ SEXP ssclme_gradient(SEXP x, SEXP REMLp, SEXP Uncp)
 	    REAL(ans)[cind++] = *tmp *
 		(uncst ? *REAL(VECTOR_ELT(Omega, i)) : 1.);
 	} else {
+	    int odind = cind + nci;
 	    if (uncst) {
-		error("Code not written yet");
+		int kk;
+		nlme_symmetrize(tmp, nci);
+		for (j = 0; j < nci; j++, cind++) {
+		    double *dder = REAL(ans) + cind;
+		    *dder = 0.;
+		    for (k = j; k < nci; k++) {
+			for (kk = j; kk < nci; kk++) {
+			    *dder += chol[k*nci + j] * chol[kk*nci + j] *
+				tmp[kk * nci + k];
+			}
+		    }
+		    for (k = j + 1; k < nci; k++) {
+			REAL(ans)[odind++] = -1.;
+		    }			
+		}
 	    } else {
-		int k, ncip1 = nci + 1, odind = cind + nci;
 		for (j = 0; j < nci; j++) {
 		    REAL(ans)[cind++] = tmp[j * ncip1];
 		    for (k = j + 1; k < nci; k++) {
 			REAL(ans)[odind++] = tmp[k*nci + j] * 2.;
 		    }
 		}
-		cind = odind;
 	    }
+	    cind = odind;
 	}
-	Free(tmp);
+	Free(tmp); Free(chol);
     }
     UNPROTECT(1);
     return ans;
