@@ -3,7 +3,7 @@
 
 #include <Rdefines.h>
 #include "Mutils.h"
-#include "ldl.h"
+#include "R_ldl.h"
 
 SEXP csc_crossprod(SEXP x);
 SEXP csc_matrix_crossprod(SEXP x, SEXP y);
