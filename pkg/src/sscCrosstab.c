@@ -181,7 +181,7 @@ SEXP sscCrosstab_project(SEXP ctab)
     int *Ai = INTEGER(iSlot),
 	*Ap = INTEGER(pSlot),
 	*Gp = INTEGER(GpSlot),
-	i, j, j0, j1, i2,
+	j, j0, j1, i2,
 	n = length(pSlot) - 1,	/* number of columns */
 	nf = length(GpSlot) - 1, /* number of factors */
 	nz, up;
