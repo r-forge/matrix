@@ -43,15 +43,14 @@ double set_rcond_sy(SEXP obj, char *typstr)
     typnm[0] = rcond_type(typstr);
     rcond = get_double_by_name(rcv, typnm);
 
-/* FIXME: Need a factorization here. */
     if (R_IsNA(rcond)) {
+	SEXP trf = dsyMatrix_trf(obj);
 	int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym)), info;
 	double anorm = get_norm_sy(obj, "O");
 
-	error(_("Code for set_rcond_sy not yet written"));
-	F77_CALL(dsycon)(CHAR(asChar(GET_SLOT(obj, Matrix_uploSym))),
-			 dims, REAL(GET_SLOT(obj, Matrix_xSym)),
-			 dims, INTEGER(GET_SLOT(obj, install("pivot"))),
+	F77_CALL(dsycon)(CHAR(asChar(GET_SLOT(trf, Matrix_uploSym))),
+			 dims, REAL(GET_SLOT(trf, Matrix_xSym)),
+			 dims, INTEGER(GET_SLOT(trf, Matrix_permSym)),
 			 &anorm, &rcond,
 			 (double *) R_alloc(2*dims[0], sizeof(double)),
 			 (int *) R_alloc(dims[0], sizeof(int)), &info);
@@ -63,9 +62,7 @@ double set_rcond_sy(SEXP obj, char *typstr)
 
 SEXP dsyMatrix_rcond(SEXP obj, SEXP type)
 {
-/* FIXME: This is a stub */
-/*     return ScalarReal(set_rcond_sy(obj, CHAR(asChar(type)))); */
-    return ScalarReal(NA_REAL);
+    return ScalarReal(set_rcond_sy(obj, CHAR(asChar(type))));
 }
 
 static
@@ -89,16 +86,64 @@ void make_symmetric(double *to, SEXP from, int n)
 
 SEXP dsyMatrix_solve(SEXP a)
 {
-/* FIXME: Write the code */
-    error(_("code for dsyMatrix_solve not yet written"));
-    return R_NilValue;
+    SEXP trf = dsyMatrix_trf(a);
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dsyMatrix")));
+    int *dims = INTEGER(GET_SLOT(trf, Matrix_DimSym)), info;
+
+    SET_SLOT(val, Matrix_uploSym, duplicate(GET_SLOT(trf, Matrix_uploSym)));
+    SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(trf, Matrix_xSym)));
+    SET_SLOT(val, Matrix_DimSym, duplicate(GET_SLOT(trf, Matrix_DimSym)));
+    SET_SLOT(val, Matrix_rcondSym, duplicate(GET_SLOT(a, Matrix_rcondSym)));
+    F77_CALL(dsytri)(CHAR(asChar(GET_SLOT(val, Matrix_uploSym))),
+		     dims, REAL(GET_SLOT(val, Matrix_xSym)), dims,
+		     INTEGER(GET_SLOT(trf, Matrix_permSym)),
+		     (double *) R_alloc((long) dims[0], sizeof(double)),
+		     &info);
+    UNPROTECT(1);
+    return val;
+}
+
+SEXP dsyMatrix_dgeMatrix_solve(SEXP a, SEXP b)
+{
+    SEXP trf = dsyMatrix_trf(a),
+	val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
+    int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
+	*bdims = INTEGER(GET_SLOT(b, Matrix_DimSym)),
+	info;
+
+    if (*adims != *bdims || bdims[1] < 1 || *adims < 1)
+	error(_("Dimensions of system to be solved are inconsistent"));
+    SET_SLOT(val, Matrix_DimSym, duplicate(GET_SLOT(b, Matrix_DimSym)));
+    SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(b, Matrix_xSym)));
+    F77_CALL(dsytrs)(CHAR(asChar(GET_SLOT(trf, Matrix_uploSym))),
+		     adims, bdims + 1,
+		     REAL(GET_SLOT(trf, Matrix_xSym)), adims,
+		     INTEGER(GET_SLOT(trf, Matrix_permSym)),
+		     REAL(GET_SLOT(val, Matrix_xSym)),
+		     bdims, &info);
+    UNPROTECT(1);
+    return val;
 }
 
 SEXP dsyMatrix_matrix_solve(SEXP a, SEXP b)
 {
-/* FIXME: Write the code */
-    error(_("code for dsyMatrix_matrix_solve not yet written"));
-    return R_NilValue;
+    SEXP trf = dsyMatrix_trf(a),
+	val = PROTECT(duplicate(b));
+    int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
+	*bdims = INTEGER(getAttrib(b, R_DimSymbol)),
+	info;
+
+    if (!(isReal(b) && isMatrix(b)))
+	error(_("Argument b must be a numeric matrix"));
+    if (*adims != *bdims || bdims[1] < 1 || *adims < 1)
+	error(_("Dimensions of system to be solved are inconsistent"));
+    F77_CALL(dsytrs)(CHAR(asChar(GET_SLOT(trf, Matrix_uploSym))),
+		     adims, bdims + 1,
+		     REAL(GET_SLOT(trf, Matrix_xSym)), adims,
+		     INTEGER(GET_SLOT(trf, Matrix_permSym)),
+		     REAL(val), bdims, &info);
+    UNPROTECT(1);
+    return val;
 }
 
 SEXP dsyMatrix_as_dgeMatrix(SEXP from)
@@ -217,3 +262,20 @@ SEXP dsyMatrix_trf(SEXP x)
     return set_factors(x, val, "BunchKaufman");
 }
 
+SEXP dsyMatrix_as_dspMatrix(SEXP from)
+{
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dspMatrix"))),
+	uplo = GET_SLOT(from, Matrix_uploSym),
+	dimP = GET_SLOT(from, Matrix_DimSym);
+    int n = *INTEGER(dimP);
+
+    SET_SLOT(val, Matrix_rcondSym,
+	     duplicate(GET_SLOT(from, Matrix_rcondSym)));
+    SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
+    SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
+    full_to_packed(REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, (n*(n+1))/2)),
+		   REAL(GET_SLOT(from, Matrix_xSym)), n,
+		   *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW, NUN);
+    UNPROTECT(1);
+    return val;
+}

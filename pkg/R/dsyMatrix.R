@@ -6,11 +6,38 @@ setAs("dsyMatrix", "dgeMatrix",
 setAs("dsyMatrix", "matrix",
       function(from) .Call("dsyMatrix_as_matrix", from) )
 
+setAs("dsyMatrix", "dspMatrix",
+      function(from) .Call("dsyMatrix_as_dspMatrix", from) )
+
+setMethod("rcond", signature(x = "dsyMatrix", type = "character"),
+          function(x, type, ...)
+          .Call("dsyMatrix_rcond", x, type),
+          valueClass = "numeric")
+
+setMethod("rcond", signature(x = "dsyMatrix", type = "missing"),
+          function(x, type, ...)
+          .Call("dsyMatrix_rcond", x, "O"),
+          valueClass = "numeric")
+
 setMethod("%*%", signature(x = "dsyMatrix", y = "dgeMatrix"),
           function(x, y) .Call("dsyMatrix_dgeMatrix_mm", x, y) )
 
 setMethod("%*%", signature(x = "dgeMatrix", y = "dsyMatrix"),
           function(x, y) .Call("dsyMatrix_dgeMatrix_mm_R", y, x) )
+
+setMethod("solve", signature(a = "dsyMatrix", b = "missing"),
+          function(a, b, ...) .Call("dsyMatrix_solve", a),
+          valueClass = "dsyMatrix")
+
+setMethod("solve", signature(a = "dsyMatrix", b = "matrix"),
+          function(a, b, ...)
+          .Call("dsyMatrix_matrix_solve", a, b),
+          valueClass = "matrix")
+
+setMethod("solve", signature(a = "dsyMatrix", b = "dgeMatrix"),
+          function(a, b, ...)
+          .Call("dsyMatrix_dgeMatrix_solve", a, b),
+          valueClass = "dgeMatrix")
 
 setMethod("norm", signature(x = "dsyMatrix", type = "character"),
           function(x, type, ...) .Call("dsyMatrix_norm", x, type),
@@ -26,13 +53,25 @@ setMethod("norm", signature(x = "dsyMatrix", type = "missing"),
 ##WAS setMethod("t", signature(x = "dsyMatrix"), function(x) x)
 setMethod("t", signature(x = "dsyMatrix"),
 	  function(x) {
-	      x@uplo <- if (x@uplo == "U") "L" else "U"
-	      x })
+	      new("dsyMatrix",
+                  Dim = x@Dim[2:1], Dimnames = x@Dimnames[2:1],
+                  x = as.vector(t(as(x, "matrix"))),
+                  uplo = if (x@uplo == "U") "L" else "U",
+                  rcond = x@rcond)
+          }, valueClass = "dsyMatrix")
 
-setMethod("chol", signature(x = "dsyMatrix", pivot = "ANY"), cholMat)
+## DB: I think it would be better to use a conditional setIs than to
+## define a 'chol' method.
+#setMethod("chol", signature(x = "dsyMatrix", pivot = "ANY"), cholMat)
+
+setIs("dsyMatrix", "dpoMatrix",
+      test = function(obj)
+          "try-error" != class(try(.Call("dpoMatrix_chol", obj), TRUE))
+      )
 
 ## Now that we have "chol", we can define  "determinant" methods,
 ## exactly like in ./dsCMatrix.R
+## DB - Probably figure out how to use the BunchKaufman decomposition instead
 ## {{FIXME: Shouldn't it be possible to have "determinant" work by
 ## default automatically for "Matrix"es  when there's a "chol" method available?
 ## -- not have to define showMethod("determinant", ...) for all classes
