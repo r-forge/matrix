@@ -1,3 +1,9 @@
+contr.SAS <- function(n, contrasts = TRUE)
+{
+    if (is.numeric(n) && length(n) == 1) contr.treatment(n, n, contrasts)
+    else contr.treatment(n, length(n), contrasts)
+}
+
 lmerControl <-                            # Control parameters for lmer
   function(maxIter = 50,
            msMaxIter = 50,
@@ -68,6 +74,8 @@ setMethod("lmer", signature(formula = "formula"),
                      .fixed = list(cbind(model.matrix(nobars(formula), frm),
                      .response = model.response(frm))))
           obj <- .Call("lmer_create", lapply(random, "[[", 2), mmats, PACKAGE = "Matrix")
+          obj@call <- match.call()
+          obj@REML <- method == "REML"
           .Call("lmer_initial", obj, PACKAGE="Matrix")
           .Call("lmer_ECMEsteps", obj, 
                 controlvals$niterEM,
@@ -75,7 +83,6 @@ setMethod("lmer", signature(formula = "formula"),
                 controlvals$EMverbose,
                 PACKAGE = "Matrix")
           LMEoptimize(obj) <- controlvals
-          obj@call <- match.call()
           #fitted = .Call("ssclme_fitted", obj, facs, mmats, TRUE, PACKAGE = "Matrix")
           #residuals = mmats$.Xy[,".response"] - fitted
           #if (as.logical(x)[1]) x = mmats else x = list()
@@ -175,7 +182,7 @@ setMethod("summary", "lmer",
               nc <- object@nc
               dimnames(coefs) <-
                   list(names(fcoef), c("Estimate", "Std. Error", "DF"))
-              new("summary.ssclme",
+              new("summary.lmer",
                   coefficients = as.matrix(coefs),
                   scale = .Call("lmer_sigma", object, REML),
                   denomDF = as.integer(DF),
@@ -227,15 +234,120 @@ setMethod("getFixDF", signature(object="lmer"),
           rep(n-p, p)
       })
 
-setMethod("anova", signature(object="lmer"),
+setMethod("fitted", signature(object="lmer"),
           function(object, ...)
       {
+          object@fitted
+      })
+
+setMethod("residuals", signature(object="lmer"),
+          function(object, ...) object@residuals )
+
+setMethod("logLik", signature(object="lmer"),
+          function(object, REML = object@REML, ...) {
+              val <- -deviance(object, REML = REML)/2
+              nc <- object@nc[-seq(a = object@Omega)]
+              attr(val, "nall") <- attr(val, "nobs") <- nc[2]
+              attr(val, "df") <- nc[1] + length(coef(object))
+              attr(val, "REML") <- REML 
+              class(val) <- "logLik"
+              val
+          })
+
+# setMethod("summary", signature(object="lme"),
+#           function(object, ...) {
+#               llik <- logLik(object)
+#               resd <- residuals(object, type="pearson")
+#               if (length(resd) > 5) {
+#                   resd <- quantile(resd)
+#                   names(resd) <- c("Min","Q1","Med","Q3","Max")
+#               }
+#               new("summary.lme",
+#                   call = object@call,
+#                   logLik = llik,
+#                   re = summary(object@rep, REML = object@REML,
+#                                useScale = TRUE),
+#                   residuals = resd)
+#           })
+
+# setMethod("show", signature(object = "summary.lme"),
+#           function(object)
+#       {
+#           rdig <- 5
+#           cat("Linear mixed-effects model fit by ")
+#           cat(ifelse(object@re@REML, "REML\n", "maximum likelihood\n") )
+#           if (!is.null(object@call$formula)) {
+#               cat("Fixed:", deparse(object@call$formula),"\n")
+#           }
+#           if (!is.null(object@call$data)) {
+#               cat(" Data:", deparse(object@call$data), "\n")
+#           }
+#           if (!is.null(object@call$subset)) {
+#               cat(" Subset:",
+#                   deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
+#           }
+#           llik <- object@logLik
+#           print(data.frame(AIC = AIC(llik), BIC = BIC(llik),
+#                            logLik = c(object@logLik), row.names = ""))
+#           cat("\n")
+#           object@re@useScale <- TRUE
+#           object@re@showCorrelation <- TRUE
+#           show(object@re)
+#           invisible(object)
+#       })
+
+setMethod("anova", signature(object = "lmer"),
+          function(object, ...)
+      {
+          mCall <- match.call(expand.dots = TRUE)
+          dots <- list(...)
+          modp <- logical(0)
+          if (length(dots))
+              modp <- sapply(dots, inherits, "lmer") | sapply(dots, inherits, "lm")
+          if (any(modp)) {              # multiple models - form table
+              opts <- dots[!modp]
+              mods <- c(list(object), dots[modp])
+              names(mods) <- sapply(as.list(mCall)[c(FALSE, TRUE, modp)], as.character)
+              mods <- mods[order(sapply(lapply(mods, logLik, REML = FALSE), attr, "df"))]
+              calls <- lapply(mods, slot, "call")
+              data <- lapply(calls, "[[", "data")
+              if (any(data != data[[1]])) stop("all models must be fit to the same data object")
+              header <- paste("Data:", data[[1]])
+              subset <- lapply(calls, "[[", "subset")
+              if (any(subset != subset[[1]])) stop("all models must use the same subset")
+              if (!is.null(subset[[1]]))
+                  header <-
+                      c(header, paste("Subset", deparse(subset[[1]]), sep = ": "))
+              llks <- lapply(mods, logLik, REML = FALSE)
+              Df <- sapply(llks, attr, "df")
+              llk <- unlist(llks)
+              chisq <- 2 * pmax(0, c(NA, diff(llk)))
+              dfChisq <- c(NA, diff(Df))
+              val <- data.frame(Df = Df,
+                                AIC = sapply(llks, AIC),
+                                BIC = sapply(llks, BIC),
+                                logLik = llk,
+                                "Chisq" = chisq,
+                                "Chi Df" = dfChisq,
+                                "Pr(>Chisq)" = pchisq(chisq, dfChisq, lower = FALSE),
+                                check.names = FALSE)
+              class(val) <- c("anova", class(val))
+              attr(val, "heading") <-
+                  c(header, "", "Models:",
+                    paste(names(mods),
+                          unlist(lapply(lapply(calls, "[[", "formula"), deparse)),
+                          sep = ": "),"")
+              return(val)
+          } else {
+#               mCall$terms <- object@terms
+#               mCall$assign <- object@assign
           foo <- object
           foo@status["factored"] <- FALSE
           .Call("lmer_factor", foo, PACKAGE="Matrix")
-          dfr <- getFixDF(foo)
-          ss <- foo@RXX[ , ".response"]^2
-          ssr <- ss[[".response"]]
+          dfr <- lme4:::getFixDF(foo)
+          rcol <- ncol(foo@RXX)
+          ss <- foo@RXX[ , rcol]^2
+          ssr <- ss[[rcol]]
           ss <- ss[seq(along = dfr)]
           names(ss) <- object@cnames[[".fixed"]][seq(along = dfr)]
           # FIXME: This only gives single degree of freedom tests
@@ -252,4 +364,58 @@ setMethod("anova", signature(object="lmer"),
           attr(table, "heading") <- "Analysis of Variance Table"
           class(table) <- c("anova", "data.frame")
           table
+
+          }
       })
+
+setMethod("formula", "lmer", function(x, ...) x@call$formula)
+
+setMethod("plot", signature(x = "lmer"),
+          function(x, y, ...)
+          cat("plot method for lmer not yet implemented\n"))
+
+setMethod("update", signature(object = "lmer"),
+          function(object, formula., ..., evaluate = TRUE)
+      {
+          call <- object@call
+          if (is.null(call))
+              stop("need an object with call component")
+          extras <- match.call(expand.dots = FALSE)$...
+          if (!missing(formula.))
+              call$formula <- update.formula(formula(object), formula.)
+          if (length(extras) > 0) {
+              existing <- !is.na(match(names(extras), names(call)))
+              for (a in names(extras)[existing]) call[[a]] <- extras[[a]]
+              if (any(!existing)) {
+                  call <- c(as.list(call), extras[!existing])
+                  call <- as.call(call)
+              }
+          }
+          if (evaluate)
+              eval(call, parent.frame())
+          else call
+      })
+
+
+setMethod("confint", signature(object = "lmer"),
+          function (object, parm, level = 0.95, ...) 
+      {
+          cf <- fixef(object)
+          pnames <- names(cf)
+          if (missing(parm)) 
+              parm <- seq(along = pnames)
+          else if (is.character(parm)) 
+              parm <- match(parm, pnames, nomatch = 0)
+          a <- (1 - level)/2
+          a <- c(a, 1 - a)
+          pct <- paste(round(100 * a, 1), "%")
+          ci <- array(NA, dim = c(length(parm), 2),
+                      dimnames = list(pnames[parm], pct))
+          ses <- sqrt(diag(vcov(object)))[parm]
+          ci[] <- cf[parm] + ses * t(outer(a, getFixDF(object@rep)[parm], qt))
+          ci
+      })
+
+
+
+

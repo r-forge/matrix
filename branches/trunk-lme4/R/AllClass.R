@@ -59,5 +59,21 @@ setClass("summary.lme",
                         re = "summary.ssclme",
                         residuals = "numeric"))
 
+setClass("summary.lmer",
+         representation(call = "call",
+                        logLik = "logLik",
+                        residuals = "numeric",
+                        coefficients="matrix",
+                        scale="numeric",
+                        denomDF="integer",
+                        REML="logical",
+                        ngrps="integer",
+                        nobs="integer",
+                        corFixed="corrmatrix",
+                        VarCorr="VarCorr",
+                        useScale="logical",
+                        showCorrelation="logical"
+                        ))
+
 setClass("summary.GLMM", representation(family = "family"),
          contains = "summary.lme")
