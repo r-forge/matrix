@@ -19,7 +19,7 @@ if (!isGeneric("Names<-")) {
 if (!isGeneric("getGroups")) {
     ## Return the groups associated with object according to form.
     setGeneric("getGroups",
-               function(object, form, level, data, sep)
+               function(object, form, level, data, sep, ...)
                standardGeneric("getGroups"))
 }
 
@@ -137,12 +137,8 @@ if (!isGeneric("getFixDF")) {           # not exported
 
 if (!isGeneric("gsummary")) {
     setGeneric("gsummary",
-               function (object,
-                         FUN = function(x) mean(x, na.rm = TRUE),
-                         omitGroupingFactor = FALSE, 
-                         form = formula(object),
-                         level,
-                         groups = getGroups(object, form, level),
-                         invariantsOnly = FALSE, ...)
+          function (object, FUN, form, level, groups,
+                    omitGroupingFactor = FALSE, 
+                    invariantsOnly = FALSE, ...)
                standardGeneric("gsummary"))
 }

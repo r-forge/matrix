@@ -262,6 +262,12 @@ setMethod("show", signature(object = "summary.lme"),
           invisible(object)
       })
 
+setMethod("coef", signature(object = "summary.lme"),
+          function(object, ...)
+      {
+          coef(object@re)
+      })
+
 setMethod("show", signature(object = "lme"),
           function(object)
       {
@@ -290,7 +296,48 @@ setMethod("show", signature(object = "lme"),
 
 setMethod("anova", signature(object = "lme"),
           function(object, ...)
-          cat("anova method for lme not yet implemented\n"))
+      {
+          dots <- list(...)
+          mCall <- match.call(expand.dots = TRUE)
+          modp <- sapply(dots, inherits, "lme") | sapply(dots, inherits, "lm")
+          if (!any(modp))
+              stop("single argument anova for lme objects not yet implemented")
+          opts <- dots[!modp]
+          mods <- c(list(object), dots[modp])
+          names(mods) <- sapply(as.list(mCall)[c(FALSE, TRUE, modp)], as.character)
+          mods <- mods[order(sapply(lapply(mods, logLik, REML = FALSE), attr, "df"))]
+          calls <- lapply(mods, slot, "call")
+          data <- lapply(calls, "[[", "data")
+          if (any(data != data[[1]])) stop("all models must be fit to the same data object")
+          header <- paste("Data:", data[[1]])
+          subset <- lapply(calls, "[[", "subset")
+          if (any(subset != subset[[1]])) stop("all models must use the same subset")
+          if (!is.null(subset[[1]]))
+              header <-
+                  c(header,
+                    paste("Subset", deparse(subset[[1]], forDisplay = TRUE), sep = ": "))
+          llks <- lapply(mods, logLik, REML = FALSE)
+          Df <- sapply(llks, attr, "df")
+          llk <- unlist(llks)
+          chisq <- 2 * pmax(0, c(NA, diff(llk)))
+          dfChisq <- c(NA, diff(Df))
+          val <- data.frame(Df = Df,
+                            AIC = sapply(llks, AIC),
+                            BIC = sapply(llks, BIC),
+                            logLik = llk,
+                            "Chisq" = chisq,
+                            "Chi Df" = dfChisq,
+                            "Pr(>Chisq)" = pchisq(chisq, dfChisq, lower = FALSE),
+                            check.names = FALSE)
+          class(val) <- c("anova", class(val))
+          attr(val, "heading") <-
+              c(header, "", "Models: <fixed>: <random>",
+                paste(names(mods),
+                      unlist(lapply(lapply(calls, "[[", "formula"), deparse, forDisplay = TRUE)),
+                      unlist(lapply(lapply(calls, "[[", "random"), deparse, forDisplay = TRUE)),
+                      sep = ": "),"")
+          val
+      })
 
 setMethod("fixef", signature(object = "lme"),
           function(object, ...)
