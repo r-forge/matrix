@@ -10,6 +10,10 @@ setAs("dtrMatrix", "dtpMatrix",
 setAs("dtrMatrix", "matrix",
       function(from) .Call("dtrMatrix_as_matrix", from) )
 
+## Group Methods:
+## TODO: carefully check for the cases where the result remains triangular
+## instead : inherit them from "dgeMatrix" via definition in ./dMatrix.R
+
 setMethod("%*%", signature(x = "dtrMatrix", y = "dgeMatrix"),
 	  function(x, y) .Call("dtrMatrix_dgeMatrix_mm", x, y))
 
