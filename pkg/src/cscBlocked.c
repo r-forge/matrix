@@ -2,7 +2,9 @@
 /* TODO
  *  - code for trans = 'T' in cscb_syrk
  *  - code for non-trivial cscb_trmm and cscb_ldl
+ *  - replace calls to Ind by calls to Tind (unless the error checking is different)
  */
+
 SEXP cscBlocked_validate(SEXP x)
 {
     SEXP pp = GET_SLOT(x, Matrix_pSym),
@@ -77,25 +79,25 @@ int Tind(const int rowind[], const int colptr[], int i, int j)
  *        routine
  */
 void
-cscBlocked_mm(char side, char transa, int m, int n, int k,
+cscBlocked_mm(enum CBLAS_SIDE side, enum CBLAS_TRANSPOSE transa, int m, int n, int k,
 	      double alpha, int nr, int nc,
 	      const int ap[], const int ai[],
 	      const double ax[],
 	      const double b[], int ldb,
 	      double beta, double c[], int ldc)
 {
-    int j, kk, lside = (side == 'L' || side == 'l');
-    int ncb, nrb, sz = nr * nc, tra = (transa == 'T' || transa == 't');
+    int j, kk;
+    int ncb, nrb, sz = nr * nc;
 
     if (nr < 1 || nc < 1 || m < 0 || n < 0 || k < 0)
 	error("improper dims m=%d, n=%d, k=%d, nr=%d, nc=%d",
 		  m, n, k, nr, nc);
     if (ldc < n) error("incompatible dims n=%d, ldc=%d", n, ldc);
-    if (lside) {
+    if (side == LFT) {
 	if (ldb < k)
 	    error("incompatible L dims k=%d, ldb=%d, n=%d, nr=%d, nc=%d",
 		  k, ldb, n, nr, nc);
-	if (tra) {
+	if (transa == TRN) {
 	    if (m % nc || k % nr)
 		error("incompatible LT dims m=%d, k = %d, nr=%d, nc=%d",
 		      m, k, nr, nc);
@@ -112,7 +114,7 @@ cscBlocked_mm(char side, char transa, int m, int n, int k,
 		int ii = ai[kk];
 		if (ii < 0 || ii >= nrb)
 		    error("improper row index ii=%d, nrb=%d", ii, nrb);
-		if (tra) {
+		if (transa == TRN) {
 		    F77_CALL(dgemm)("T", "N", &nc, &n, &nr,
 				    &alpha, ax + kk * sz, &nr,
 				    b + ii * nr, &ldb,
@@ -155,13 +157,11 @@ cscBlocked_mm(char side, char transa, int m, int n, int k,
  *        routine
  */
 void
-cscb_mm(char side, char transa, int m, int n, int k,
-	double alpha, SEXP A,
-	const double B[], int ldb,
-	double beta, double C[], int ldc)
+cscb_mm(enum CBLAS_SIDE side, enum CBLAS_TRANSPOSE transa,
+	int m, int n, int k, double alpha, SEXP A,
+	const double B[], int ldb, double beta, double C[], int ldc)
 {
-    int lside = (side == 'L' || side == 'l'),
-	tra = (transa == 'T' || transa == 't');
+    int lside = (side == LFT);
     SEXP AxP = GET_SLOT(A, Matrix_xSym),
 	ApP = GET_SLOT(A, Matrix_pSym);
     int *adims = INTEGER(getAttrib(AxP, R_DimSymbol)),
@@ -179,13 +179,13 @@ cscb_mm(char side, char transa, int m, int n, int k,
 	if (ldb < k)
 	    error("incompatible L dims k=%d, ldb=%d, n=%d, nr=%d, nc=%d",
 		  k, ldb, n, adims[0], adims[1]);
-	if (tra) {
+	if (transa == TRN) {
 	    if (m % adims[1] || k % adims[0])
 		error("incompatible LT dims m=%d, k = %d, nr=%d, nc=%d",
 		      m, k, adims[0], adims[1]);
 	    if (ancb != m/adims[1])
 		error("incompatible LT dims m=%d, ancb=%d, adims=[%d,%d,%d]",
-		      m, ancb, adims[0], adims[1], adims[3]);
+		      m, ancb, adims[0], adims[1], adims[2]);
 	    anrb = k/adims[0];
 	} else {
 	    if (m % adims[0] || k % adims[1])
@@ -193,7 +193,7 @@ cscb_mm(char side, char transa, int m, int n, int k,
 		      m, k, adims[0], adims[1]);
 	    if (ancb != k/adims[1])
 		error("incompatible LN dims k=%d, ancb=%d, adims=[%d,%d,%d]",
-		      k, ancb, adims[0], adims[1], adims[3]);
+		      k, ancb, adims[0], adims[1], adims[2]);
 	    anrb = m/adims[0];
 	}
 	for (j = 0; j < ancb; j++) {
@@ -202,7 +202,7 @@ cscb_mm(char side, char transa, int m, int n, int k,
 		int ii = Ai[kk];
 		if (ii < 0 || ii >= anrb)
 		    error("improper row index ii=%d, anrb=%d", ii, anrb);
-		if (tra) {
+		if (transa == TRN) {
 		    F77_CALL(dgemm)("T", "N", adims+1, &n, adims,
 				    &alpha, Ax + kk * absz, adims,
 				    B + ii * adims[0], &ldb,
@@ -210,7 +210,7 @@ cscb_mm(char side, char transa, int m, int n, int k,
 		} else {
 		    F77_CALL(dgemm)("N", "N", adims, &n, adims+1,
 				    &alpha, Ax + kk * absz, adims,
-				    B + j*adims[1], &ldb,
+				    B + j * adims[1], &ldb,
 				    &beta, C + ii * adims[0], &ldc);
 		}
 	    }
@@ -219,45 +219,6 @@ cscb_mm(char side, char transa, int m, int n, int k,
 	/* B is of size m by k */
 	error("Call to cscb_mm must have side == 'L'");
     }
-}
-
-/** 
- * Invert a triangular sparse blocked matrix.  This is not done in
- * place because the number of non-zero blocks in A-inverse can be
- * different than the number of non-zero blocks in A.
- * 
- * @param upper 'U' indicates upper triangular, 'L' lower
- * @param unit 'U' indicates unit diagonal, 'N' non-unit
- * @param A Pointer to a triangular cscBlocked object
- * @param Ai Pointer to a triangular cscBlocked object
- */
-void
-cscb_tri(char upper, char unit, SEXP A, const int Parent[], SEXP AI)
-{
-    SEXP ApP = GET_SLOT(A, Matrix_pSym),
-	AxP = GET_SLOT(A, Matrix_xSym),
-	AIpP = GET_SLOT(AI, Matrix_pSym),
-	AIxP = GET_SLOT(AI, Matrix_xSym);
-    int *Ai = INTEGER(GET_SLOT(A, Matrix_iSym)),
-	*Ap = INTEGER(ApP),
-	*AIi = INTEGER(GET_SLOT(AI, Matrix_iSym)),
-	*AIp = INTEGER(AIpP),
-	*adim = INTEGER(getAttrib(AxP, R_DimSymbol)),
-	*aidim = INTEGER(getAttrib(AxP, R_DimSymbol)),
-	ancb = length(ApP) - 1,
-	aincb = length(AIpP) - 1,
-	iup = (upper == 'U' || upper == 'u'),
-	iunit = (unit == 'U' || unit == 'u');
-
-    if (aidim[0] != adim[0] || aidim[1] != adim[1] || aidim[2] != adim[2] ||
-	adim[0] != adim[1] || ancb != aincb)
-	error("Incompatible dimensions A[%d,%d,%d]x%d; AI[%d,%d,%d]x%d",
-	      adim[0], adim[1], adim[2], ancb, 
-	      aidim[0], aidim[1], aidim[2], aincb);
-    if (!iunit)
-	error("Code for non-unit triangular matrices not yet written");
-    if (adim[2] > 0)
-	error("Code for non-trivial unit inverse not yet written");
 }
 
 /** 
@@ -294,7 +255,10 @@ int Ind(int row, int col, const int cp[], const int ci[])
  * @param beta scalar multiplier of c
  * @param C compressed sparse blocked symmetric matrix to be updated
  */
-void cscb_syrk(char uplo, char trans, double alpha, SEXP A, double beta, SEXP C)
+void
+cscb_syrk(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE trans,
+	  double alpha, SEXP A,
+	  double beta, SEXP C)
 {
     SEXP AxP = GET_SLOT(A, Matrix_xSym),
 	ApP = GET_SLOT(A, Matrix_pSym),
@@ -343,10 +307,9 @@ void cscb_syrk(char uplo, char trans, double alpha, SEXP A, double beta, SEXP C)
 
 		if (K < 0) error("cscb_syrk: C[%d,%d] not defined", ii, ii);
 		if (scalar) Cx[K] += alpha * Ax[k] * Ax[k];
-		else F77_CALL(dsyrk)(&uplo, "N", cdims, adims + 1,
+		else F77_CALL(dsyrk)((uplo == UPP)?"U":"L", "N", cdims, adims + 1,
 				     &alpha, Ax + k * asz, adims,
 				     &one, Cx + K * csz, cdims);
-
 		for (kk = k+1; kk < k2; kk++) {
 		    int jj = Ai[kk];
 		    K = (iup) ? Ind(ii, jj, Cp, Ci) : Ind(jj, ii, Cp, Ci);
@@ -493,13 +456,15 @@ cscb_ldl(SEXP A, const int Parent[], SEXP L, SEXP D)
  * @param n number of columns in B
  * @param ldb leading dimension of B as declared in the calling function
  */
-void cscb_trmm(char side, char uplo, char transa, char diag,
-	       double alpha, SEXP A, double B[], int m, int n, int ldb)
+void
+cscb_trmm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
+	  enum CBLAS_TRANSPOSE transa, enum CBLAS_DIAG diag,
+	  double alpha, SEXP A, double B[], int m, int n, int ldb)
 {
-    int ileft = (side == 'L' || side == 'l'),
-	iup = (uplo == 'U' || uplo == 'u'),
-	itr = (transa == 'T' || transa == 't'),
-	iunit = (diag == 'U' || diag == 'u');
+    int ileft = (side == LFT),
+	iup = (uplo == UPP),
+	itr = (transa == TRN),
+	iunit = (diag == UNT);
     SEXP ApP = GET_SLOT(A, Matrix_pSym),
 	AxP = GET_SLOT(A, Matrix_xSym);
     int *Ai = INTEGER(GET_SLOT(A, Matrix_iSym)),
@@ -535,12 +500,13 @@ void cscb_trmm(char side, char uplo, char transa, char diag,
  * @param n number of columns in B
  * @param ldb leading dimension of B as declared in the calling function
  */
-void cscb_trsm(char uplo, char transa, char diag,
-	       double alpha, SEXP A, double B[], int m, int n, int ldb)
+void
+cscb_trsm(enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE transa, enum CBLAS_DIAG diag,
+	  double alpha, SEXP A, double B[], int m, int n, int ldb)
 {
-    int iup = (uplo == 'U' || uplo == 'u'),
-	itr = (transa == 'T' || transa == 't'),
-	iunit = (diag == 'U' || diag == 'u');
+    int iup = (uplo == UPP),
+	itr = (transa == TRN),
+	iunit = (diag == UNT);
     SEXP ApP = GET_SLOT(A, Matrix_pSym),
 	AxP = GET_SLOT(A, Matrix_xSym);
     int *Ai = INTEGER(GET_SLOT(A, Matrix_iSym)),
@@ -593,13 +559,14 @@ void cscb_trsm(char uplo, char transa, char diag,
  * @param A pointer to a triangular cscBlocked object
  * @param B pointer to a general cscBlocked matrix
  */
-void cscb_trcbm(char side, char uplo, char transa, char diag,
-		double alpha, SEXP A, SEXP B)
+void
+cscb_trcbm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE transa, enum CBLAS_DIAG diag,
+	   double alpha, SEXP A, SEXP B)
 {
-    int ileft = (side == 'L' || side == 'l'),
-	iup = (uplo == 'U' || uplo == 'u'),
-	itr = (transa == 'T' || transa == 't'),
-	iunit = (diag == 'U' || diag == 'u');
+    int ileft = (side == LFT),
+	iup = (uplo == UPP),
+	itr = (transa == TRN),
+	iunit = (diag == UNT);
     SEXP ApP = GET_SLOT(A, Matrix_pSym),
 	AxP = GET_SLOT(A, Matrix_xSym),
 	BpP = GET_SLOT(B, Matrix_pSym),
@@ -660,13 +627,14 @@ double *expand_column(double *dest, int m, int j,
  * @param A pointer to a triangular cscBlocked object
  * @param B pointer to a general cscBlocked matrix
  */
-void cscb_trcbsm(char side, char uplo, char transa, char diag,
-		 double alpha, SEXP A, const int Parent[], SEXP B)
+void
+cscb_trcbsm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo, enum CBLAS_TRANSPOSE transa, enum CBLAS_DIAG diag,
+	    double alpha, SEXP A, const int Parent[], SEXP B)
 {
-    int ileft = (side == 'L' || side == 'l'),
-	iup = (uplo == 'U' || uplo == 'u'),
-	itr = (transa == 'T' || transa == 't'),
-	iunit = (diag == 'U' || diag == 'u');
+    int ileft = (side == LFT),
+	iup = (uplo == UPP),
+	itr = (transa == TRN),
+	iunit = (diag == UNT);
     SEXP ApP = GET_SLOT(A, Matrix_pSym),
 	AxP = GET_SLOT(A, Matrix_xSym),
 	BpP = GET_SLOT(B, Matrix_pSym),
@@ -734,11 +702,10 @@ void cscb_trcbsm(char side, char uplo, char transa, char diag,
  * @param beta scalar multiplier
  * @param C pointer to a cscBlocked object
  */
-void cscb_cscbm(char transa, char transb, double alpha, SEXP A, SEXP B,
-	     double beta, SEXP C)
+void
+cscb_cscbm(enum CBLAS_TRANSPOSE transa, enum CBLAS_TRANSPOSE transb,
+	   double alpha, SEXP A, SEXP B, double beta, SEXP C)
 {
-    int ta = (transa == 'T' || transa == 't') ? 1 : 0,
-	tb = (transb == 'T' || transb == 't') ? 1 : 0;
     SEXP ApP = GET_SLOT(A, Matrix_pSym),
 	AxP = GET_SLOT(A, Matrix_xSym),
 	BpP = GET_SLOT(B, Matrix_pSym),
@@ -763,7 +730,7 @@ void cscb_cscbm(char transa, char transb, double alpha, SEXP A, SEXP B,
 	*Cx = REAL(CxP),
 	one = 1.0;
 
-    if ((!ta) && tb) {		/* transposed crossproduct */
+    if ((transa == NTR) && transb == TRN) {		/* transposed crossproduct */
 	int jj;
 
 	if (adims[1] != bdims[1] ||

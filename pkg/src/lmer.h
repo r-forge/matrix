@@ -5,7 +5,6 @@
 #include "triplet_to_col.h"
 #include "cscBlocked.h"
 #include "bCrosstab.h"
-#include "R_ldl.h"
 #include <R_ext/Lapack.h>
 #include <R_ext/Constants.h>
 
