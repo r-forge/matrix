@@ -22,6 +22,7 @@ lmeControl <-
   function(maxIter = 50, msMaxIter = 50, tolerance =
            sqrt((.Machine$double.eps)), niterEM = 25,
            msTol = sqrt(.Machine$double.eps), msScale, msVerbose = FALSE,
+           glmmMaxIter = 20,
            returnObject = FALSE, gradHess = TRUE, apVar = TRUE,
            .relStep = (.Machine$double.eps)^(1/3), minAbsParApVar = 0.05,
            nlmStepMax = NULL,
@@ -43,7 +44,9 @@ lmeControl <-
     }
     list(maxIter = maxIter, msMaxIter = msMaxIter, tolerance = tolerance,
          niterEM = niterEM, msTol = msTol, msScale = msScale,
-         msVerbose = msVerbose, returnObject = returnObject,
+         msVerbose = msVerbose,
+         glmmMaxIter = glmmMaxIter,
+         returnObject = returnObject,
          gradHess = gradHess , apVar = apVar, .relStep = .relStep,
          nlmStepMax = nlmStepMax,
          minAbsParApVar = minAbsParApVar, natural = natural,
