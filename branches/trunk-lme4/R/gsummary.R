@@ -1,37 +1,54 @@
-setMethod("gsummary", signature(object = "data.frame", groups = "factor"),
-          function (object,
-                    FUN = function(x) mean(x, na.rm = TRUE),
+setMethod("gsummary", signature(groups = "missing"),
+          function (object, FUN, form, level, groups,
                     omitGroupingFactor = FALSE, 
-                    form = formula(object),
-                    level,
-                    groups = getGroups(object, form, level),
                     invariantsOnly = FALSE, ...)
       {
-          groups <- drop(groups)
+          gCall <- nCall <- match.call()
+          gCall[[1]] <- as.name("getGroups")
+          nCall$groups <- eval(gCall, parent.frame())
+          eval(nCall, parent.frame())
+      })
+
+setMethod("gsummary",
+          signature(object = "groupedData", groups = "factor"),
+          function (object, FUN, form, level, groups,
+                    omitGroupingFactor = FALSE, 
+                    invariantsOnly = FALSE, ...)
+      {
+          nCall <- match.call()
+          nCall$object <- substitute(object@data, list(object = nCall$object))
+          eval(nCall, parent.frame())
+      })
+          
+setMethod("gsummary", signature(object = "data.frame", groups = "factor"),
+          function (object, FUN, form, level, groups,
+                    omitGroupingFactor = FALSE, 
+                    invariantsOnly = FALSE, ...)
+      {
+          if (missing(FUN)) FUN <- function(x) mean(x, na.rm = TRUE)
+          groups <- groups[drop = TRUE]
           gunique <- levels(groups)
           firstInGroup <- match(gunique, groups)
           asFirst <- firstInGroup[match(groups, gunique)]
           value <- as.data.frame(object[firstInGroup, , drop = FALSE])
           row.names(value) <- as.character(gunique)
-          value <- value[as.character(sort(gunique)), , drop = FALSE]
-          varying <- unlist(lapply(object, function(column, frst) {
-              aux <- as.character(column)
-              any(!identical(aux, aux[frst]))
-          }, frst = asFirst))
+          varying <-
+              unlist(lapply(object,
+                            function(x, first) any(!identical(x, x[first])),
+                            first = asFirst))
           if (any(varying) && (!invariantsOnly)) {
               Mode <- function(x) names(which.max(table(x)))
               if (is(FUN, "function")) {
                   FUN <- list(numeric = FUN, ordered = Mode, factor = Mode)
               }
               else {
-                  if (!(is.list(FUN) && all(sapply(FUN, data.class) == 
-                                            "function"))) {
+                  if (!(is.list(FUN) &&
+                        all(sapply(FUN, class) == "function")))
                       stop("FUN can only be a function or a list of functions")
-                  }
-                  auxFUN <- list(numeric = mean, ordered = Mode, factor = Mode)
-                  aux <- names(auxFUN)[is.na(match(names(auxFUN), names(FUN)))]
-                  if (length(aux) > 0) 
-                      FUN[aux] <- auxFUN[aux]
+                  FF <- FUN
+                  FUN <- list(numeric = function(x) mean(x, na.rm = TRUE),
+                              ordered = Mode, factor = Mode)
+                  FUN[names(FF)] <- FF
               }
               for (nm in names(object)[varying]) {
                   dClass <- data.class(object[[nm]])

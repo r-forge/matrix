@@ -244,3 +244,29 @@ setMethod("show", signature(object="summary.ssclme"),
 
           })
 
+
+setMethod("coef", signature(object="summary.ssclme"),
+          function(object, ...)
+      {
+          digits = max(3, getOption("digits") - 2)
+          useScale = length(object@useScale) > 0 && object@useScale[1]
+          cm = object@coefficients
+          if (nrow(cm) > 0) {
+              if (useScale) {
+                  stat = cm[,1]/cm[,2]
+                  pval = 2*pt(abs(stat), cm[,3], lower = FALSE)
+                  nms = colnames(cm)
+                  cm = cbind(cm, stat, pval)
+                  colnames(cm) = c(nms, "t value", "Pr(>|t|)")
+              } else {
+                  cm = cm[, 1:2, drop = FALSE]
+                  stat = cm[,1]/cm[,2]
+                  pval = 2*pnorm(abs(stat), lower = FALSE)
+                  nms = colnames(cm)
+                  cm = cbind(cm, stat, pval)
+                  colnames(cm) = c(nms, "z value", "Pr(>|z|)")
+              }
+              printCoefmat(cm, tst.ind = 4, zap.ind = 3)
+          }
+      })
+
