@@ -129,14 +129,13 @@ setMethod("ranef", signature(object = "lmer"),
 
 setMethod("fixef", signature(object = "lmer"),
           function(object, ...) {
-              val = .Call("lmer_fixef", object, PACKAGE = "Matrix")
-              names(val) = object@cnames[[".fixed"]]
+              val <- .Call("lmer_fixef", object, PACKAGE = "Matrix")
               val[-length(val)]
           })
 
 setMethod("VarCorr", signature(x = "lmer"),
           function(x, REML = TRUE, useScale = TRUE, ...) {
-              val = .Call("lmer_variances", x, PACKAGE = "Matrix")
+              val <- .Call("lmer_variances", x, PACKAGE = "Matrix")
               for (i in seq(along = val)) {
                   dimnames(val[[i]]) = list(x@cnames[[i]], x@cnames[[i]])
                   val[[i]] = as(as(val[[i]], "pdmatrix"), "corrmatrix")
@@ -157,7 +156,8 @@ setMethod("summary", signature(object = "lmer"),
 
 setMethod("show", signature(object = "lmer"),
           function(object)
-          show(new("summary.lmer", object, useScale = TRUE, showCorrelation = FALSE))
+          show(new("summary.lmer", object, useScale = TRUE,
+                   showCorrelation = FALSE))
           )
 
 setMethod("show", "summary.lmer",
@@ -333,7 +333,6 @@ setMethod("anova", signature(object = "lmer"),
           attr(table, "heading") <- "Analysis of Variance Table"
           class(table) <- c("anova", "data.frame")
           table
-
           }
       })
 
@@ -475,3 +474,29 @@ Dhalf <- function(from) {
     }
     res
 }
+
+## Extract the L matrix 
+setAs("lmer", "dtTMatrix",
+      function(from)
+  {
+      ## force a refactorization if the factors have been inverted
+      if (from@status["inverted"]) from@status["factored"] <- FALSE
+      .Call("lmer_factor", from, PACKAGE = "Matrix")
+      L <- lapply(from@L, as, "dgTMatrix")
+      nf <- length(from@D)
+      Gp <- from@Gp
+      nL <- Gp[nf + 1]
+      Zi <- integer(0)
+      Zj <- integer(0)
+      Zx <- double(0)
+      for (i in 1:nf) {
+          for (j in 1:i) {
+              Lij <- L[[Lind(i, j)]]
+              Zi <- c(Zi, Lij@i + Gp[i])
+              Zj <- c(Zj, Lij@j + Gp[j])
+              Zx <- c(Zx, Lij@x)
+          }
+      }
+      new("dtTMatrix", Dim = as.integer(c(nL, nL)), i = Zi, j = Zj, x = Zx,
+          uplo = "L", diag = "U")
+  })
