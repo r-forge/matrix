@@ -1,5 +1,5 @@
 #include "Mutils.h"
-#include "triplet_to_col.h"
+#include "dgTMatrix_to_dgCMatrix.h"
 #include <R_ext/Lapack.h>
 
 char norm_type(char *typstr)
@@ -139,7 +139,7 @@ SEXP set_factors(SEXP obj, SEXP val, char *nm)
     return val;
 }
 
-SEXP cscMatrix_set_Dim(SEXP x, int nrow)
+SEXP dgCMatrix_set_Dim(SEXP x, int nrow)
 {
     int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
 
@@ -205,9 +205,9 @@ void csc_sort_columns(int ncol, const int p[], int i[], double x[])
 
 /** 
  * Check for sorted columns in an object that inherits from the
- * cscMatrix class.  Resort the columns if necessary.
+ * dgCMatrix class.  Resort the columns if necessary.
  * 
- * @param m pointer to an object that inherits from the cscMatrix class
+ * @param m pointer to an object that inherits from the dgCMatrix class
  * 
  * @return m with the columns sorted by increasing row index
  */
@@ -233,7 +233,7 @@ SEXP triple_as_SEXP(int nrow, int ncol, int nz,
     SET_SLOT(val, Matrix_pSym, allocVector(INTSXP, ncol + 1));
     Ap = INTEGER(GET_SLOT(val, Matrix_pSym));
     Ai = Calloc(nz, int); Ax = Calloc(nz, double);
-    triplet_to_col(nrow, ncol, nz, Ti, Tj, Tx, Ap, Ai, Ax);
+    dgTMatrix_to_dgCMatrix(nrow, ncol, nz, Ti, Tj, Tx, Ap, Ai, Ax);
     nz = Ap[ncol];
     SET_SLOT(val, Matrix_iSym, allocVector(INTSXP, nz));
     Memcpy(INTEGER(GET_SLOT(val, Matrix_iSym)), Ai, nz); Free(Ai);
@@ -241,7 +241,7 @@ SEXP triple_as_SEXP(int nrow, int ncol, int nz,
     Memcpy(REAL(GET_SLOT(val, Matrix_xSym)), Ax, nz); Free(Ax);
     SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     UNPROTECT(1);
-    return cscMatrix_set_Dim(val, nrow);
+    return dgCMatrix_set_Dim(val, nrow);
 }    
 
 void csc_components_transpose(int m, int n, int nnz,

@@ -1,6 +1,6 @@
-#include "trMatrix.h"
+#include "dtrMatrix.h"
 
-SEXP trMatrix_validate(SEXP obj)
+SEXP dtrMatrix_validate(SEXP obj)
 {
     SEXP uplo = GET_SLOT(obj, Matrix_uploSym),
 	diag = GET_SLOT(obj, Matrix_diagSym);
@@ -43,7 +43,7 @@ double get_norm(SEXP obj, char *typstr)
 }
 
 
-SEXP trMatrix_norm(SEXP obj, SEXP type)
+SEXP dtrMatrix_norm(SEXP obj, SEXP type)
 {
     return ScalarReal(get_norm(obj, CHAR(asChar(type))));
 }
@@ -71,12 +71,12 @@ double set_rcond(SEXP obj, char *typstr)
     return rcond;
 }
 
-SEXP trMatrix_rcond(SEXP obj, SEXP type)
+SEXP dtrMatrix_rcond(SEXP obj, SEXP type)
 {
     return ScalarReal(set_rcond(obj, CHAR(asChar(type))));
 }
 
-SEXP trMatrix_solve(SEXP a)
+SEXP dtrMatrix_solve(SEXP a)
 {
     SEXP val = PROTECT(duplicate(a));
     int info, *Dim = INTEGER(GET_SLOT(val, Matrix_DimSym));
@@ -87,7 +87,7 @@ SEXP trMatrix_solve(SEXP a)
     return val;
 }
 
-SEXP trMatrix_matrix_solve(SEXP a, SEXP b)
+SEXP dtrMatrix_matrix_solve(SEXP a, SEXP b)
 {
     SEXP val = PROTECT(duplicate(b));
     int *Dim = INTEGER(GET_SLOT(a, Matrix_DimSym)),
@@ -132,9 +132,9 @@ void make_array_triangular(double *to, SEXP from)
     }
 }
     
-SEXP trMatrix_as_geMatrix(SEXP from)
+SEXP dtrMatrix_as_dgeMatrix(SEXP from)
 {
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("geMatrix")));
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
     
     SET_SLOT(val, Matrix_rcondSym,
 	     duplicate(GET_SLOT(from, Matrix_rcondSym)));
@@ -147,7 +147,7 @@ SEXP trMatrix_as_geMatrix(SEXP from)
     return val;
 }
 
-SEXP trMatrix_as_matrix(SEXP from)
+SEXP dtrMatrix_as_matrix(SEXP from)
 {
     int *Dim = INTEGER(GET_SLOT(from, Matrix_DimSym));
     int m = Dim[0], n = Dim[1];
@@ -160,7 +160,7 @@ SEXP trMatrix_as_matrix(SEXP from)
     return val;
 }
 
-SEXP trMatrix_getDiag(SEXP x)
+SEXP dtrMatrix_getDiag(SEXP x)
 {
     int i, n = INTEGER(GET_SLOT(x, Matrix_DimSym))[0];
     SEXP ret = PROTECT(allocVector(REALSXP, n)),
@@ -177,7 +177,7 @@ SEXP trMatrix_getDiag(SEXP x)
     return ret;
 }
     
-SEXP trMatrix_geMatrix_mm(SEXP a, SEXP b)
+SEXP dtrMatrix_dgeMatrix_mm(SEXP a, SEXP b)
 {
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(b, Matrix_DimSym)),
@@ -198,7 +198,7 @@ SEXP trMatrix_geMatrix_mm(SEXP a, SEXP b)
     return val;
 }
 
-SEXP trMatrix_geMatrix_mm_R(SEXP a, SEXP b)
+SEXP dtrMatrix_dgeMatrix_mm_R(SEXP a, SEXP b)
 {
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(b, Matrix_DimSym)),

@@ -583,7 +583,7 @@ cscb_trcbsm(enum CBLAS_SIDE side, enum CBLAS_UPLO uplo,
 				/* transpose B */
 	    for (i = 0, nrbB = -1; i < nnz; i++) if (Bi[i] > nrbB) nrbB = Bi[i];
 	    BTp = Calloc(nrbB, int);
-	    triplet_to_col(ncbB, nrbB, nnz, tmp, Bi, Bx, BTp, BTi, BTx);
+	    dgTMatrix_to_dgCMatrix(ncbB, nrbB, nnz, tmp, Bi, Bx, BTp, BTi, BTx);
 				/* sanity check */
 	    if (BTp[nrbB] != nnz) error("cscb_trcbsm: transpose operation failed");
 	    Free(tmp);
@@ -677,9 +677,9 @@ cscb_cscbm(enum CBLAS_TRANSPOSE transa, enum CBLAS_TRANSPOSE transb,
     error("Code not yet written");
 }
 
-SEXP cscBlocked_2cscMatrix(SEXP A)
+SEXP cscBlocked_2dgCMatrix(SEXP A)
 {
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("cscMatrix"))),
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix"))),
 	ApP = GET_SLOT(A, Matrix_pSym),
 	AiP = GET_SLOT(A, Matrix_iSym),
 	AxP = GET_SLOT(A, Matrix_xSym);

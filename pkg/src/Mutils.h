@@ -25,7 +25,7 @@ SEXP set_double_by_name(SEXP obj, double val, char *nm);
 SEXP as_det_obj(double val, int log, int sign);
 SEXP get_factors(SEXP obj, char *nm);
 SEXP set_factors(SEXP obj, SEXP val, char *nm);
-SEXP cscMatrix_set_Dim(SEXP x, int nrow);
+SEXP dgCMatrix_set_Dim(SEXP x, int nrow);
 int csc_unsorted_columns(int ncol, const int p[], const int i[]);
 void csc_sort_columns(int ncol, const int p[], int i[], double x[]);
 SEXP triple_as_SEXP(int nrow, int ncol, int nz,

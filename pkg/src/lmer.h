@@ -2,7 +2,7 @@
 #define MATRIX_LMEUTILS_H
 
 #include "Mutils.h"
-#include "triplet_to_col.h"
+#include "dgTMatrix_to_dgCMatrix.h"
 #include "cscBlocked.h"
 #include "bCrosstab.h"
 #include <R_ext/Lapack.h>

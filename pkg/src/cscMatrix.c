@@ -1,4 +1,4 @@
-#include "cscMatrix.h"
+#include "dgCMatrix.h"
 
 SEXP csc_validate(SEXP x)
 {
@@ -41,7 +41,7 @@ SEXP csc_validate(SEXP x)
 SEXP csc_crossprod(SEXP x)
 {
     SEXP pslot = GET_SLOT(x, Matrix_pSym),
-	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("sscMatrix"))), tmp;
+	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dsCMatrix"))), tmp;
     int *xp = INTEGER(pslot),
 	*xi = INTEGER(GET_SLOT(x, Matrix_iSym));
     double *xx = REAL(GET_SLOT(x, Matrix_xSym));
@@ -98,13 +98,13 @@ SEXP csc_crossprod(SEXP x)
     SET_SLOT(ans, Matrix_xSym, allocVector(REALSXP, nnz));
     Memcpy(REAL(GET_SLOT(ans, Matrix_xSym)), xVal, nnz);
     Free(iVal); Free(xVal); UNPROTECT(1);
-    return cscMatrix_set_Dim(ans, ncol);
+    return dgCMatrix_set_Dim(ans, ncol);
 }
 
 SEXP csc_tcrossprod(SEXP x)
 {
     SEXP pslot = GET_SLOT(x, Matrix_pSym),
-	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("sscMatrix")));
+	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dsCMatrix")));
     int *xp = INTEGER(pslot),
 	*xi = INTEGER(GET_SLOT(x, Matrix_iSym)),
 	*dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
@@ -146,7 +146,7 @@ SEXP csc_tcrossprod(SEXP x)
     SET_SLOT(ans, Matrix_pSym, allocVector(INTSXP, nrow + 1));
     ansp = INTEGER(GET_SLOT(ans, Matrix_pSym));
     itmp = Calloc(ntrip, int); xtmp = Calloc(ntrip, double);
-    triplet_to_col(nrow, nrow, ntrip, iVal, jVal, xVal,
+    dgTMatrix_to_dgCMatrix(nrow, nrow, ntrip, iVal, jVal, xVal,
 		   ansp, itmp, xtmp);
     nnz = ansp[nrow];
     SET_SLOT(ans, Matrix_uploSym, ScalarString(mkChar("L")));
@@ -191,10 +191,10 @@ SEXP csc_matrix_crossprod(SEXP x, SEXP y)
     return ans;
 }
 
-SEXP csc_to_triplet(SEXP x)
+SEXP csc_to_dgTMatrix(SEXP x)
 {
     SEXP
-	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("tripletMatrix"))),
+	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgTMatrix"))),
 	dimslot = GET_SLOT(x, Matrix_DimSym),
 	islot = GET_SLOT(x, Matrix_iSym), 
 	pslot = GET_SLOT(x, Matrix_pSym);
@@ -238,9 +238,9 @@ SEXP csc_to_matrix(SEXP x)
     return ans;
 }
 
-SEXP csc_to_geMatrix(SEXP x)
+SEXP csc_to_dgeMatrix(SEXP x)
 {
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("geMatrix"))),
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
 	Dimslot = GET_SLOT(x, Matrix_DimSym);
     int *dims = INTEGER(Dimslot),
 	*xp = INTEGER(GET_SLOT(x, Matrix_pSym)),
@@ -266,7 +266,7 @@ SEXP csc_to_geMatrix(SEXP x)
 
 SEXP matrix_to_csc(SEXP A)
 {
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("cscMatrix")));
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix")));
     int *adims = INTEGER(getAttrib(A, R_DimSymbol)), j,
 	maxnz, nrow, ncol, nnz, *vp, *vi;
     
@@ -300,15 +300,15 @@ SEXP matrix_to_csc(SEXP A)
     Memcpy(REAL(GET_SLOT(val, Matrix_xSym)), vx, nnz);
     Free(vi); Free(vx);
     UNPROTECT(1);
-    return cscMatrix_set_Dim(val, nrow);
+    return dgCMatrix_set_Dim(val, nrow);
 }
 
     
-SEXP triplet_to_csc(SEXP triplet)
+SEXP dgTMatrix_to_csc(SEXP dgTMatrix)
 {
-    SEXP Tisl = GET_SLOT(triplet, Matrix_iSym);
+    SEXP Tisl = GET_SLOT(dgTMatrix, Matrix_iSym);
     int *Ti = INTEGER(Tisl),
-	*Tj = INTEGER(GET_SLOT(triplet, Matrix_jSym)),
+	*Tj = INTEGER(GET_SLOT(dgTMatrix, Matrix_jSym)),
 	i, nrow, ncol,
 	nz = length(Tisl);
 
@@ -318,8 +318,8 @@ SEXP triplet_to_csc(SEXP triplet)
 	if (Tj[i] > ncol) ncol = Tj[i];
     }
     return triple_as_SEXP(nrow + 1, ncol + 1, nz, Ti, Tj,
-			  REAL(GET_SLOT(triplet, Matrix_xSym)),
-			  "cscMatrix");
+			  REAL(GET_SLOT(dgTMatrix, Matrix_xSym)),
+			  "dgCMatrix");
 }
 
 SEXP csc_getDiag(SEXP x)
@@ -350,7 +350,7 @@ SEXP csc_getDiag(SEXP x)
 SEXP csc_transpose(SEXP x)
 {
     SEXP
-	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("cscMatrix"))),
+	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix"))),
 	islot = GET_SLOT(x, Matrix_iSym);
     int nnz = length(islot),
 	*adims = INTEGER(GET_SLOT(ans, Matrix_DimSym)),
@@ -404,7 +404,7 @@ SEXP csc_matrix_mm(SEXP a, SEXP b)
 
 SEXP csc_col_permute(SEXP x, SEXP perm)
 {
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("cscMatrix"))), tmp;
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix"))), tmp;
     int *iperm, *prm, *vi, *vp, *xi, *xp, j, k, ncol, pos;
     double *vx, *xx;
 

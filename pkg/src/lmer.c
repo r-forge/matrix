@@ -146,7 +146,7 @@ lmer_crosstab(SEXP flist, int nobs, const int nc[])
 	    ZZij = VECTOR_ELT(val, ind);
 	    SET_SLOT(ZZij, Matrix_pSym, allocVector(INTSXP, nlevs[j] + 1));
 	    ijp = INTEGER(GET_SLOT(ZZij, Matrix_pSym));
-	    triplet_to_col(nlevs[i], nlevs[j], nobs, zb[i], zb[j], ones,
+	    dgTMatrix_to_dgCMatrix(nlevs[i], nlevs[j], nobs, zb[i], zb[j], ones,
 			   ijp, Ti, Tx);
 	    nnz = ijp[nlevs[j]];
 	    SET_SLOT(ZZij, Matrix_iSym, allocVector(INTSXP, nnz));

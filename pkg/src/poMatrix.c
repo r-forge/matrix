@@ -1,6 +1,6 @@
-#include "poMatrix.h"
+#include "dpoMatrix.h"
 
-SEXP poMatrix_chol(SEXP x)
+SEXP dpoMatrix_chol(SEXP x)
 {
     SEXP val = get_factors(x, "Cholesky"),
 	dimP = GET_SLOT(x, Matrix_DimSym),
@@ -31,7 +31,7 @@ double set_rcond(SEXP obj, char *typstr)
     double rcond = get_double_by_name(rcv, typnm);
 
     if (R_IsNA(rcond)) {
-        SEXP Chol = poMatrix_chol(obj);
+        SEXP Chol = dpoMatrix_chol(obj);
 	int *dims = INTEGER(GET_SLOT(Chol, Matrix_DimSym)), info;
 	double anorm = get_norm_sy(obj, typnm);
 
@@ -46,15 +46,15 @@ double set_rcond(SEXP obj, char *typstr)
     return rcond;
 }
 
-SEXP poMatrix_rcond(SEXP obj, SEXP type)
+SEXP dpoMatrix_rcond(SEXP obj, SEXP type)
 {
   return ScalarReal(set_rcond(obj, CHAR(asChar(type))));
 }
 
-SEXP poMatrix_solve(SEXP x)
+SEXP dpoMatrix_solve(SEXP x)
 {
-    SEXP Chol = poMatrix_chol(x);
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("poMatrix")));
+    SEXP Chol = dpoMatrix_chol(x);
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dpoMatrix")));
     int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym)), info;
 
     SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
@@ -68,10 +68,10 @@ SEXP poMatrix_solve(SEXP x)
     return val;
 }
 
-SEXP poMatrix_geMatrix_solve(SEXP a, SEXP b)
+SEXP dpoMatrix_dgeMatrix_solve(SEXP a, SEXP b)
 {
-    SEXP Chol = poMatrix_chol(a),
-	val = PROTECT(NEW_OBJECT(MAKE_CLASS("geMatrix")));
+    SEXP Chol = dpoMatrix_chol(a),
+	val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(b, Matrix_DimSym)),
 	info;
@@ -91,9 +91,9 @@ SEXP poMatrix_geMatrix_solve(SEXP a, SEXP b)
     return val;
 }
 
-SEXP poMatrix_matrix_solve(SEXP a, SEXP b)
+SEXP dpoMatrix_matrix_solve(SEXP a, SEXP b)
 {
-    SEXP Chol = poMatrix_chol(a),
+    SEXP Chol = dpoMatrix_chol(a),
 	val = PROTECT(duplicate(b));
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(getAttrib(b, R_DimSymbol)),

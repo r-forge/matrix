@@ -3,8 +3,8 @@
 
 #include "Mutils.h"
 
-SEXP triplet_validate(SEXP x);
-SEXP triplet_to_geMatrix(SEXP x);
-SEXP triplet_to_matrix(SEXP x);
+SEXP dgTMatrix_validate(SEXP x);
+SEXP dgTMatrix_to_dgeMatrix(SEXP x);
+SEXP dgTMatrix_to_matrix(SEXP x);
 
 #endif
