@@ -106,3 +106,12 @@ setMethod("vcov", signature(object = "ssclme"),
               sigma^2 * rr %*% t(rr)
           })
 
+setMethod("VarCorr", signature(x = "ssclme"),
+          function(x) {
+              val = .Call("ssclme_variances", x, PACKAGE = "Matrix")
+              omg = x@Omega
+              names(val) = c(names(omg), "Residual")
+              for (i in seq(along = omg))
+                  dimnames(val[[i]]) = dimnames(omg[[i]])
+              val
+          })
