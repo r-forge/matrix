@@ -3,32 +3,32 @@
 \alias{lme-class}
 \alias{VarCorr,lme-method}
 \alias{VarCorr,ssclme-method}
-\alias{VarCorr,lmeRep-method}
+\alias{VarCorr,lmer-method}
 \alias{anova,lme-method}
 \alias{anova,ssclme-method}
-\alias{anova,lmeRep-method}
+\alias{anova,lmer-method}
 \alias{coef,lme-method}
 \alias{deviance,lme-method}
 \alias{deviance,ssclme-method}
-\alias{deviance,lmeRep-method}
+\alias{deviance,lmer-method}
 \alias{fitted,lme-method}
 \alias{formula,lme-method}
 \alias{logLik,lme-method}
 \alias{plot,lme-method}
 \alias{ranef,lme-method}
 \alias{ranef,ssclme-method}
-\alias{ranef,lmeRep-method}
+\alias{ranef,lmer-method}
 \alias{residuals,lme-method}
 \alias{show,lme-method}
 \alias{show,ssclme-method}
-\alias{show,lmeRep-method}
+\alias{show,lmer-method}
 \alias{summary,lme-method}
 \alias{summary,ssclme-method}
-\alias{summary,lmeRep-method}
+\alias{summary,lmer-method}
 \alias{update,lme-method}
 \alias{vcov,lme-method}
 \alias{vcov,ssclme-method}
-\alias{vcov,lmeRep-method}
+\alias{vcov,lmer-method}
 \title{Class "lme"}
 \description{A fitted linear mixed-effects model.}
 \section{Objects from the Class}{
