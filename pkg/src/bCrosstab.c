@@ -1,9 +1,3 @@
-/* TODO: 1) combine diag_update and offdiag_update - DONE
-         2) Move Parent_inverse from tscMatrix to here
-         3) Modify the creation of the L diagonals to include a call
-	 to ldl_numeric to get Li.
-*/
-
 #include "bCrosstab.h"
 
 /** 
@@ -332,12 +326,13 @@ SEXP bCrosstab_convert(SEXP bCtab)
 	int dind = Lind(j, j), i, k;
 	SEXP ctd = VECTOR_ELT(ctab, dind); /* diagonal in crosstab */
 	SEXP Dimslot = GET_SLOT(ctd, Matrix_DimSym),
-	    Ljj, cpp = GET_SLOT(ctd, Matrix_pSym),
+	    Linvj, Ljj, cpp = GET_SLOT(ctd, Matrix_pSym),
 	    cip = GET_SLOT(ctd, Matrix_iSym);
-	int *Lp, *Perm, *cp = INTEGER(cpp),
+	int *Lp, *Linvp, *Perm, *cp = INTEGER(cpp),
 	    *ci = INTEGER(cip), *parent,
 	    ncj = length(cpp) - 1,
 	    nnz = length(cip);
+	double *dtmp;
 				
 	SET_VECTOR_ELT(Parent, j, allocVector(INTSXP, ncj));
 	parent = INTEGER(VECTOR_ELT(Parent, j));
@@ -345,34 +340,46 @@ SEXP bCrosstab_convert(SEXP bCtab)
 	Perm = INTEGER(VECTOR_ELT(perm, j));
 	SET_VECTOR_ELT(L, dind, NEW_OBJECT(MAKE_CLASS("cscMatrix")));
 	Ljj = VECTOR_ELT(L, dind);
+	SET_VECTOR_ELT(Linv, j, NEW_OBJECT(MAKE_CLASS("cscMatrix")));
+	Linvj = VECTOR_ELT(Linv, j);
 	SET_SLOT(Ljj, Matrix_DimSym, duplicate(Dimslot));
+	SET_SLOT(Linvj, Matrix_DimSym, duplicate(Dimslot));
 	SET_SLOT(Ljj, Matrix_factorization, allocVector(VECSXP, 0));
+	SET_SLOT(Linvj, Matrix_factorization, allocVector(VECSXP, 0));
 	SET_SLOT(Ljj, Matrix_pSym, allocVector(INTSXP, ncj + 1));
+	SET_SLOT(Linvj, Matrix_pSym, allocVector(INTSXP, ncj + 1));
 	Lp = INTEGER(GET_SLOT(Ljj, Matrix_pSym));
+	Linvp = INTEGER(GET_SLOT(Linvj, Matrix_pSym));
 	if (nnz > ncj) {	/* calculate fill-reducing permutation */
-	    int *iPerm = Calloc(ncj, int),
-		*Lnz = Calloc(ncj, int);
-	    double *Lx;
+	    int *Li, *Lnz = Calloc(ncj, int), *tmp = Calloc(ncj, int), info;
 
-	    ssc_metis_order(ncj, cp, ci, Perm, iPerm);
+	    ssc_metis_order(ncj, cp, ci, Perm, tmp);
 				/* apply to the crosstabulation */
-	    bCrosstab_permute(ctab, nf, j, Perm, iPerm);
+	    bCrosstab_permute(ctab, nf, j, Perm, tmp);
 				/* apply to the factor */
 	    factor_levels_permute(VECTOR_ELT(fcp, j),
-				  VECTOR_ELT(flist, j), Perm, iPerm);
+				  VECTOR_ELT(flist, j), Perm, tmp);
 				/* symbolic analysis to get Parent */
-	    ldl_symbolic(ncj, cp, ci, Lp, /* iPerm used as scratch */
-			 parent, Lnz, iPerm,
+	    ldl_symbolic(ncj, cp, ci, Lp, parent, Lnz, tmp,
 			 (int *) NULL, (int *) NULL);
+				/* decompose the identity to get the row pointers */
+	    dtmp = REAL(GET_SLOT(ctd, Matrix_xSym));
+	    for (i = 0; i < nnz; i++) dtmp[i] = 0.; /* initialize */
+				/* diagonal el is last element in the column */
+	    for (i = 0; i < ncj; i++) dtmp[cp[i+1] - 1] = 1.;
 	    nnz = Lp[ncj];
-	    Free(iPerm); Free(Lnz);
 	    SET_SLOT(Ljj, Matrix_iSym, allocVector(INTSXP, nnz));
 	    SET_SLOT(Ljj, Matrix_xSym, allocVector(REALSXP, nnz));
-	    Lnz = INTEGER(GET_SLOT(Ljj, Matrix_iSym));
-	    Lx = REAL(GET_SLOT(Ljj, Matrix_xSym));
-	    for (i = 0; i < nnz; i++) {
-		Lnz[i] = 0; Lx[i] = 0.;
-	    }
+	    info = ldl_numeric(ncj, cp, ci, dtmp, Lp, parent, Lnz,
+			       INTEGER(GET_SLOT(Ljj, Matrix_iSym)),
+			       REAL(GET_SLOT(Ljj, Matrix_xSym)),
+			       (double *) R_alloc(ncj, sizeof(double)),	/* D */
+			       (double *) R_alloc(ncj, sizeof(double)),	/* Y */
+			       (int *) R_alloc(ncj, sizeof(int)),	/* Pattern */
+			       (int *) R_alloc(ncj, sizeof(int)),	/* Flag */
+			       (int *) NULL, (int *) NULL);
+	    if (info < ncj) error("identity matrix is not positive definite?");
+	    Free(Lnz); Free(tmp);
 	} else {
 	    for (i = 0; i <= ncj; i++) {
 		Lp[i] = 0;
@@ -382,9 +389,13 @@ SEXP bCrosstab_convert(SEXP bCtab)
 	    SET_SLOT(Ljj, Matrix_iSym, allocVector(INTSXP, 0));
 	    SET_SLOT(Ljj, Matrix_xSym, allocVector(REALSXP, 0));
 	}
-	SET_VECTOR_ELT(Linv, j,
-		       Parent_inverse(VECTOR_ELT(Parent, j),
-				      ScalarLogical(1)));
+				/* Derive the diagonal block of Linv */
+	nnz = parent_inv_ap(ncj, 0, parent, Linvp);
+	SET_SLOT(Linvj, Matrix_iSym, allocVector(INTSXP, nnz));
+	parent_inv_ai(ncj, 0, parent, INTEGER(GET_SLOT(Linvj, Matrix_iSym)));
+	SET_SLOT(Linvj, Matrix_xSym, allocVector(REALSXP, nnz));
+	dtmp = REAL(GET_SLOT(Linvj, Matrix_xSym));
+	for (i = 0; i < nnz; i++) dtmp[i] = 1.;
 /* FIXME: Update any blocks below the diagonal in this column if necessary*/
 	for (k = j+1; k < nf; k++) { /* update remaining columns, if any */
 	    for (i = k; i < nf; i++) block_update(ctab, j, k, i);
