@@ -146,17 +146,17 @@ SEXP sscCrosstab_groupedPerm(SEXP ctab)
     for (j = 0; j < n; j++) perm[j] = j; /* initialize permutation to identity */
 
     if (nf > 1) {
-	nl2 = Gp[2];
-	icounts = Calloc(nl2 - nl1, int);
+	nl2 = Gp[2] - nl1;	/* number of levels of factor 2 */
+	icounts = Calloc(nl2, int);
 	np[0] = 0;
 	for (j = 0; j < nl1; j++) jcounts[j] = 0;
 	p1 = 0;			/* copy off-diagonals from first nl1 cols */
-	for (j = 0; j < nl1; j++) { /* and nl1 <= row < nl2 */
+	for (j = 0; j < nl1; j++) { /* and 0 <= row - nl1 < nl2 */
 	    int p3 = Ap[j + 1];
 	    for (jj = Ap[j]; jj < p3; jj++) {
-		int i = Ai[jj];
-		if (nl1 <= i && i < nl2) {
-		    ni[p1++] = i - nl1;	
+		int i = Ai[jj] - nl1;
+		if (0 <= i && i < nl2) {
+		    ni[p1++] = i;	
 		    jcounts[j]++;
 		}
 	    }
@@ -177,7 +177,7 @@ SEXP sscCrosstab_groupedPerm(SEXP ctab)
 		    for (i = np[j]; i < p2; i++) icounts[ni[i]]++;
 		}
 	    }
-				/* find the last row whose count in max(icount) */
+			/* find the last row with count==max(icount) */
 	    maxrc = -1;
 	    for (i = 0; i < nl2; i++) {
 		int ic = icounts[i];
@@ -186,7 +186,7 @@ SEXP sscCrosstab_groupedPerm(SEXP ctab)
 		    rr = i;
 		}
 	    }
-	    perm[nl1 + nl2 - ii] = rr;
+	    perm[nl1 + nl2 - ii] = rr + nl1;
 				/* update icounts, np and ni */
 	    p1 = p3 = 0; 
 	    for (j = 0; j < nl1; j++) {
@@ -198,7 +198,7 @@ SEXP sscCrosstab_groupedPerm(SEXP ctab)
 		    }
 		}
 		np[j] = p3;
-		p3 = p1;	/* save the count */
+		p3 = p1;	/* save the count for the next iteration */
 	    }
 	}
 	Free(icounts);
