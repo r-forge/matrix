@@ -1,3 +1,18 @@
+2005-04-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dgTMatrix.R: add "[" method for triplet matrices
+	* R/sparseMatrix.R: and other sparse ones; --> add show() for sparse
+
+2005-03-31  Douglas Bates  <bates@bates1-home>
+
+	* DESCRIPTION (Version): release 0.95-5 to CRAN
+
+	* R/dMatrix.R: add %*%, crossprod and solve "fallback" methods
+	* R/sparseMatrix.R: %*%, crossprod()
+	* R/dgeMatrix.R: more "fallback" methods for numeric/dense matrices
+	* man/*.Rd: move method definitions to 'Matrix' and 'dMatrix'
+	* src/lmer.c (lmer_fitted): fix thinko
+
 2005-03-26  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/AllClass.R: add two virtual sparse classes ``on top''
