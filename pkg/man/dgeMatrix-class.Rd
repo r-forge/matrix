@@ -23,6 +23,7 @@
 \alias{\%*\%,numeric,dgeMatrix-method}
 \alias{Schur,dgeMatrix,logical-method}
 \alias{Schur,dgeMatrix,missing-method}
+\alias{chol,dgeMatrix,ANY-method}
 \alias{coerce,matrix,dgeMatrix-method}
 \alias{coerce,dgeMatrix,matrix-method}
 \alias{crossprod,dgeMatrix,dgeMatrix-method}
@@ -86,6 +87,8 @@
       combinations, see \code{showMethods("\%*\%", class = "dgeMatrix")}.}
     \item{Schur}{\code{signature(x = "dgeMatrix", vectors = "logical")}: ... }
     \item{Schur}{\code{signature(x = "dgeMatrix", vectors = "missing")}: ... }
+    \item{chol}{\code{signature(x = "dgeMatrix")}: works via
+      \code{"dpoMatrix"}, see \code{\link{dpoMatrix-class}}.}
     \item{coerce}{\code{signature(from = "dgeMatrix", to = "matrix")}: ... }
     \item{coerce}{\code{signature(from = "matrix", to = "dgeMatrix")}: ... }
     \item{crossprod}{\code{signature(x = "dgeMatrix", y = "dgeMatrix")}:

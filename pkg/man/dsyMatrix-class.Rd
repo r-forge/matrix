@@ -6,6 +6,7 @@
 \alias{dspMatrix-class}
 \alias{coerce,dsyMatrix,dgeMatrix-method}
 \alias{coerce,dsyMatrix,matrix-method}
+\alias{chol,dsyMatrix,ANY-method}
 \alias{norm,dsyMatrix,character-method}
 \alias{norm,dsyMatrix,missing-method}
 \alias{t,dsyMatrix-method}
@@ -41,6 +42,8 @@ Class \code{"Matrix"}, by class \code{"dgeMatrix"}.
   \describe{
     \item{coerce}{\code{signature(from = "dsyMatrix", to = "dgeMatrix")}}
     \item{coerce}{\code{signature(from = "dsyMatrix", to = "matrix")}}
+    \item{chol}{\code{signature(x = "dsyMatrix")}: works via coercion to
+      positive definite matrix, see \code{\link{dpoMatrix-class}}.}
     \item{norm}{\code{signature(x = "dsyMatrix", type = "character")}}
   }
 }
@@ -49,5 +52,15 @@ Class \code{"Matrix"}, by class \code{"dgeMatrix"}.
 \seealso{
   \code{\link{dgeMatrix-class}}, \code{\link{Matrix-class}}
 }
-%\examples{}
+\examples{
+## Only upper triangular part matters (when uplo == "U" as per default)
+(sy2 <- new("dsyMatrix", Dim = as.integer(c(2,2)), x = c(14, NA,32,77)))
+(c2 <- chol(sy2))
+str(c2)
+
+## An example where chol() can't work
+(sy3 <- new("dsyMatrix", Dim = as.integer(c(2,2)), x = c(14, -1, 2, -7)))
+validObject(as(sy3, "dpoMatrix"), test=TRUE) # >> is not pos.def.
+try(chol(sy3)) ## Error: not pos.def
+}
 \keyword{classes}
