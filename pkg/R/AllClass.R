@@ -165,6 +165,9 @@ setClass("dgBCMatrix",
 
 setClass("Cholesky", contains = "dtrMatrix")
 
+setClass("BunchKaufman", representation(perm = "integer"), contains = "dtrMatrix",
+         validity = function(object) .Call("BunchKaufman_validate", object));
+
 setClass("dCholCMatrix",
          representation(perm = "integer", Parent = "integer", D = "numeric"),
          contains = "dtCMatrix",

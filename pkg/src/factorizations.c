@@ -5,6 +5,11 @@ SEXP LU_validate(SEXP obj)
     return ScalarLogical(1);
 }
 
+SEXP BunchKaufman_validate(SEXP obj)
+{
+    return ScalarLogical(1);
+}
+
 SEXP Cholesky_validate(SEXP obj)
 {
     return ScalarLogical(1);
