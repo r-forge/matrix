@@ -74,6 +74,10 @@ setMethod("%*%", signature(x = "geMatrix", y = "geMatrix"),
           function(x, y)
           .Call("geMatrix_geMatrix_mm", x, y))
 
+setMethod("expm", signature(x = "geMatrix"),
+          function(x) .Call("geMatrix_exp", x),
+          valueClass = "geMatrix")
+
 Hermitian.test <- function(x)
 {
     if ((!inherits(x, "Matrix") && !is.matrix(x)) ||
