@@ -66,3 +66,43 @@ setReplaceMethod("LMEoptimize", signature(x="ssclme", value="list"),
                  }
                  return(x)
              })
+
+setMethod("deviance", signature(object = "ssclme"),
+          function(object, REML = FALSE, ...) {
+              .Call("ssclme_factor", object, PACKAGE = "Matrix")
+              object@deviance[ifelse(REML, 2, 1)]
+          })
+
+setMethod("coef", signature(object = "ssclme"),
+          function(object, ...) {
+              .Call("ssclme_coef", object, PACKAGE = "Matrix")
+          })
+
+setMethod("ranef", signature(object = "ssclme"),
+          function(object, ...) {
+              val = .Call("ssclme_ranef", object, PACKAGE = "Matrix")
+              bv = object@bVar
+              names(val) = names(bv)
+              for (i in seq(along = val)) {
+                  dimnames(val[[i]]) = dimnames(bv[[i]])[-1]
+              }
+              lapply(val, t)
+          })
+
+
+setMethod("fixef", signature(object = "ssclme"),
+          function(object, ...) {
+              val = .Call("ssclme_fixef", object, PACKAGE = "Matrix")
+              names(val) = dimnames(object@XtX)[[2]][seq(along = val)]
+              val
+          })
+
+setMethod("vcov", signature(object = "ssclme"),
+          function(object, ...) {
+              sigma = .Call("ssclme_sigma", object, PACKAGE = "Matrix")
+              rr = object@RXX
+              nr = nrow(rr)
+              rr = rr[-nr, -nr, drop = FALSE]
+              sigma^2 * rr %*% t(rr)
+          })
+
