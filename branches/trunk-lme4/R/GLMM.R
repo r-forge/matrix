@@ -362,7 +362,7 @@ setMethod("GLMM",
                                               )))
 
                   ## the constant terms from the r.e. and the final
-                  ## Laplacian integral cancle out both being:
+                  ## Laplacian integral cancel out both being:
                   ## ranef.loglik.constant <- 0.5 * length(ranefs[[i]]) * log(2 * base::pi)
 
                   ans <- ans + ranef.loglik + log.jacobian
