@@ -52,7 +52,7 @@ lmeControl <-                            # Control parameters for lme
            niterEM = 20,
            msTol = sqrt(.Machine$double.eps),
            msScale,
-           msVerbose = getOption("verbose"),
+           msVerbose = as.integer(getOption("verbose")),
            PQLmaxIt = 20,
            .relStep = (.Machine$double.eps)^(1/3),
            nlmStepMax = NULL,
