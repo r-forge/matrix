@@ -325,7 +325,7 @@ setMethod("VarCorr", signature(x = "lme"),
               callGeneric()
           })
 
-setmethod("gradient", signature(x = "lme"),
+setMethod("gradient", signature(x = "lme"),
           function(x, ...) {
               x = x@rep
               callGeneric()
