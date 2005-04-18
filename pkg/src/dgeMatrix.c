@@ -183,8 +183,10 @@ SEXP dgeMatrix_LU(SEXP x)
 		     dims,
 		     INTEGER(ALLOC_SLOT(val, Matrix_permSym, INTSXP, npiv)),
 		     &info);
-    if (info)
+    if (info < 0)
 	error(_("Lapack routine %s returned error code %d"), "dgetrf", info);
+    else if (info > 0)
+	warning(_("Exact singularity detected during LU decomposition."));
     UNPROTECT(1);
     return set_factors(x, val, "LU");
 }
