@@ -173,13 +173,17 @@ setMethod("%*%", signature(x = "dgeMatrix", y = "dgeMatrix"),
 
 ## dgeMatrix <-> matrix ("matrix" dispatches before "numeric" since R 2.1.0)
 setMethod("%*%", signature(x = "dgeMatrix", y = "matrix"),
-          function(x, y) .Call("dgeMatrix_matrix_mm", x, y, FALSE, FALSE),
-          valueClass = "dgeMatrix")
+          function(x, y) {
+              storage.mode(y) <- "double"
+              .Call("dgeMatrix_matrix_mm", x, y, FALSE, FALSE)
+          }, valueClass = "dgeMatrix")
 
 
 setMethod("%*%", signature(x = "matrix", y = "dgeMatrix"),
-          function(x, y) .Call("dgeMatrix_matrix_mm", y, x, FALSE, TRUE),
-          valueClass = "dgeMatrix")
+          function(x, y) {
+              storage.mode(x) <- "double"
+              .Call("dgeMatrix_matrix_mm", y, x, FALSE, TRUE)
+          }, valueClass = "dgeMatrix")
 
 ## dgeMatrix <-> numeric : uses the "matrix" one
 ##setMethod("%*%", signature(x = "dgeMatrix", y = "numeric"),
@@ -212,8 +216,10 @@ setMethod("solve", signature(a = "dgeMatrix", b = "missing"),
           valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dgeMatrix", b = "matrix"),
-          function(a, b, ...) .Call("dgeMatrix_matrix_solve", a, b, FALSE),
-          valueClass = "dgeMatrix")
+          function(a, b, ...) {
+              storage.mode(b) <- "double"
+              .Call("dgeMatrix_matrix_solve", a, b, FALSE)
+          }, valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dgeMatrix", b = "dgeMatrix"),
           function(a, b, ...) .Call("dgeMatrix_matrix_solve", a, b, TRUE),
