@@ -257,7 +257,7 @@ SEXP dgeMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
     if (*adims != *bdims || bdims[1] < 1 || *adims < 1 || *adims != adims[1])
 	error(_("Dimensions of system to be solved are inconsistent"));
     Memcpy(INTEGER(ALLOC_SLOT(val, Matrix_DimSym, INTSXP, 2)), bdims, 2);
-    F77_CALL(dgetrs)("N", &n, &nrhs, REAL(GET_SLOT(val, Matrix_xSym)), &n,
+    F77_CALL(dgetrs)("N", &n, &nrhs, REAL(GET_SLOT(lu, Matrix_xSym)), &n,
 		     INTEGER(GET_SLOT(lu, Matrix_permSym)),
 		     Memcpy(REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, sz)),
 			    REAL(cl ? GET_SLOT(b, Matrix_xSym):b), sz),
