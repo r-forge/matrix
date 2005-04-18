@@ -82,8 +82,8 @@ SEXP dgeMatrix_crossprod(SEXP x, SEXP trans)
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dpoMatrix")));
     int *Dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	*vDims = INTEGER(ALLOC_SLOT(val, Matrix_DimSym, INTSXP, 2));
-    int i, k = tr ? Dims[1] : Dims[0], n = tr ? Dims[0] : Dims[1];
-    double one = 1.0, *xvals, zero = 0.0;
+    int k = tr ? Dims[1] : Dims[0], n = tr ? Dims[0] : Dims[1];
+    double one = 1.0, zero = 0.0;
 
     SET_SLOT(val, Matrix_uploSym, mkString("U"));
     vDims[0] = vDims[1] = n;
