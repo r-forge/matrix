@@ -148,6 +148,11 @@ static R_CallMethodDef CallEntries[] = {
     {"lmer_update_mm", (DL_FUNC) &lmer_update_mm, 2},
     {"lmer_validate", (DL_FUNC) &lmer_validate, 1},
     {"lmer_variances", (DL_FUNC) &lmer_variances, 1},
+
+    /* added by deepayan */
+    {"lmer_collapse", (DL_FUNC) &lmer_collapse, 1},
+
+
     {"lsq_dense_Chol", (DL_FUNC) &lsq_dense_Chol, 2},
     {"lsq_dense_QR", (DL_FUNC) &lsq_dense_QR, 2},
     {"matrix_to_csc", (DL_FUNC) &matrix_to_csc, 1},
@@ -227,4 +232,11 @@ void R_init_Matrix(DllInfo *dll)
     Matrix_uploSym = install("uplo");
     Matrix_xSym = install("x");
     Matrix_zSym = install("z");
+
+    /* added by deepayan */
+
+    Matrix_REMLSym = install("REML");
+
+
+
 }

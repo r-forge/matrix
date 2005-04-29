@@ -36,4 +36,8 @@ SEXP
     Matrix_statusSym,
     Matrix_uploSym,
     Matrix_xSym,
-    Matrix_zSym;
+    Matrix_zSym,
+
+    /* added by deepayan */
+    Matrix_REMLSym;
+
