@@ -7,6 +7,10 @@
  *   allocation of temporary storage once only.
  */
 
+
+#define slot_dup(dest, src, sym)  SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
+
+
 /**
  * Calculate the length of the parameter vector (historically called "coef"
  * even though these are not coefficients).
@@ -1518,7 +1522,7 @@ SEXP lmer_Crosstab(SEXP flist)
 /** 
  * Calculate and return the fitted values.
  * 
- * @param x pointer to an ssclme object
+ * @param x pointer to an lmer object
  * @param mmats list of model matrices
  * @param useRf pointer to a logical scalar indicating if the random
  * effects should be used
@@ -1568,3 +1572,90 @@ SEXP lmer_fitted(SEXP x, SEXP mmats, SEXP useRf)
     UNPROTECT(1);
     return val;
 }
+
+
+
+
+
+
+
+
+
+/*   EXPERIMENTAL!   EXPERIMENTAL!   EXPERIMENTAL!  */
+
+/** 
+ * Copy an lmer object collapsing the fixed effects slots to the response only.
+ * 
+ * @param x pointer to an lmer object
+ * 
+ * @return a duplicate of x with the fixed effects slots collapsed to the response only
+ */
+SEXP lmer_collapse(SEXP x)
+{
+    SEXP 
+        ans = PROTECT(NEW_OBJECT(MAKE_CLASS("lmer"))),
+	Omega = GET_SLOT(x, Matrix_OmegaSym),
+/*         Dim = GET_SLOT(x, Matrix_DimSym);  won't work, no longer exists */
+	Dim = getAttrib(GET_SLOT(x, Matrix_ZtXSym), R_DimSymbol);
+    int 
+        nf = length(Omega), 
+/*         nz = INTEGER(Dim)[1];  ???   */
+        nz = INTEGER(Dim)[0]; /*  ???   */
+
+
+
+    slot_dup(ans, x, Matrix_flistSym);
+    slot_dup(ans, x, Matrix_permSym);
+    slot_dup(ans, x, Matrix_ParentSym);
+    slot_dup(ans, x, Matrix_DSym);
+    slot_dup(ans, x, Matrix_bVarSym);
+    slot_dup(ans, x, Matrix_LSym);
+    slot_dup(ans, x, Matrix_ZZpOSym);
+    slot_dup(ans, x, Matrix_OmegaSym);
+    slot_dup(ans, x, Matrix_REMLSym);
+
+    slot_dup(ans, x, Matrix_ZtZSym);
+
+    slot_dup(ans, x, Matrix_cnamesSym);
+    slot_dup(ans, x, Matrix_devCompSym);
+    slot_dup(ans, x, Matrix_devianceSym);
+    slot_dup(ans, x, Matrix_ncSym);
+    slot_dup(ans, x, Matrix_GpSym);
+    slot_dup(ans, x, Matrix_statusSym);
+
+    slot_dup(ans, x, install("call"));
+    slot_dup(ans, x, install("terms"));
+    slot_dup(ans, x, install("assign"));
+    slot_dup(ans, x, install("fitted"));
+    slot_dup(ans, x, install("residuals"));
+    slot_dup(ans, x, install("frame"));
+
+/*     Not in ssclme version: */
+/*         RXX = "matrix",  */
+/*         RZX = "matrix",  */
+/*         XtX = "matrix",  */
+/*         ZtX = "matrix",  */
+
+
+/*     So, removing from lmer version as well: */
+
+/*     slot_dup(ans, x, Matrix_RXXSym); */
+/*     slot_dup(ans, x, Matrix_RZXSym); */
+/*     slot_dup(ans, x, Matrix_XtXSym); */
+/*     slot_dup(ans, x, Matrix_ZtXSym); */
+
+/*     What about ZtZ ? */
+
+    INTEGER(GET_SLOT(ans, Matrix_ncSym))[nf] = 1;
+    SET_SLOT(ans, Matrix_XtXSym, allocMatrix(REALSXP, 1, 1));
+    REAL(GET_SLOT(ans, Matrix_XtXSym))[0] = NA_REAL;
+    SET_SLOT(ans, Matrix_RXXSym, allocMatrix(REALSXP, 1, 1));
+    REAL(GET_SLOT(ans, Matrix_RXXSym))[0] = NA_REAL;
+    SET_SLOT(ans, Matrix_ZtXSym, allocMatrix(REALSXP, nz, 1));
+    SET_SLOT(ans, Matrix_RZXSym, allocMatrix(REALSXP, nz, 1));
+    LOGICAL(GET_SLOT(ans, Matrix_statusSym))[0] = 0;
+    UNPROTECT(1);
+    return ans;
+}
+
+
