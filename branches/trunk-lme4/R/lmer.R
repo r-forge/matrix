@@ -282,6 +282,7 @@ setMethod("show", "summary.lmer",
               invisible(object)
           })
 
+
 setMethod("lmer", signature(formula = "formula"),
           function(formula, family, data,
                    method = c("REML", "ML", "PQL", "Laplace", "AGQ"),
@@ -299,8 +300,10 @@ setMethod("lmer", signature(formula = "formula"),
                                 'for a generalized linear mixed model.',
                                 '\nUsing method = "PQL".\n'))
           }
-          if (method %in% c("Laplace", "AGQ"))
-              stop("Laplace and AGQ methods not yet implemented")
+##           if (method %in% c("Laplace", "AGQ"))
+##               stop("Laplace and AGQ methods not yet implemented")
+          if (method %in% c("AGQ"))
+              stop("AGQ method not yet implemented")
           gVerb <- getOption("verbose")
                                         # match and check parameters
           controlvals <- do.call("lmerControl", control)
@@ -418,242 +421,270 @@ setMethod("lmer", signature(formula = "formula"),
           controlvals$msMaxIter <- msMaxIter.orig
 
 
-          if (FALSE) ## Laplace
+###          if (TRUE) ## Laplace
+###          {
+          ## Need to optimize L(theta, beta) using Laplace approximation
+
+          ## Things needed for that:
+          ##
+          ## 1. reduced ssclme object, offset, weighted model matrices
+          ## 2. facs, reduced model matrices
+
+          ## Of these, those in 2 will be fixed given theta and beta,
+          ## and can be thought of arguments to the L(theta, beta)
+          ## function. However, the ones in 1 will have the same
+          ## structure. So the plan is to pre-allocate them and pass
+          ## them in too so they can be used without creating/copying
+          ## them more than once
+
+
+          ## reduced ssclme
+
+          reducedObj <- .Call("lmer_collapse", obj, PACKAGE = "Matrix")
+          reducedMmats.unadjusted <- mmats.unadjusted
+          reducedMmats.unadjusted$.fixed <-
+              reducedMmats.unadjusted$.fixed[, responseIndex, drop = FALSE]
+          reducedMmats <- mmats
+          reducedMmats$.fixed <-
+              reducedMmats$.fixed[, responseIndex, drop = FALSE]
+
+          ## define function that calculates bhats given theta and beta 
+
+          bhat <- 
+              function(pars = NULL) # 1:(responseIndex-1) - beta, rest - theta
+              {
+                  if (is.null(pars))
+                  {
+                      off <- drop(mmats.unadjusted$.fixed %*%
+                                  c(fixef(obj), 0)) + offset
+                  }
+                  else
+                  {
+                      .Call("lmer_coefGets",
+                            reducedObj,
+                            as.double(pars[responseIndex:length(pars)]),
+                            TRUE,
+                            PACKAGE = "Matrix")
+                      off <- drop(mmats.unadjusted$.fixed %*%
+                                  c(pars[1:(responseIndex-1)], 0)) + offset
+                  }
+                  niter <- 20
+                  conv <- FALSE
+
+                  eta <- offset + 
+                      .Call("lmer_fitted",
+                            obj, mmats.unadjusted, TRUE,
+                            PACKAGE = "Matrix")
+                  etaold <- eta
+                  
+                  for (iter in seq(length = niter))
+                  {
+                      mu <- family$linkinv(eta)
+                      dmu.deta <- family$mu.eta(eta)
+                      w <- weights * dmu.deta / sqrt(family$variance(mu))
+                      z <- eta - off + (reducedMmats.unadjusted$.fixed[, 1]
+                                        - mu) / dmu.deta 
+                      .Call("nlme_weight_matrix_list",
+                            reducedMmats.unadjusted, w, z, reducedMmats,
+                            PACKAGE="Matrix")
+                      .Call("lmer_update_mm",
+                            reducedObj, reducedMmats,
+                            PACKAGE="Matrix")
+                      eta[] <- off + 
+                          .Call("lmer_fitted", reducedObj, 
+                                reducedMmats.unadjusted, TRUE,
+                                PACKAGE = "Matrix")
+                      ##cat(paste("bhat Criterion:", max(abs(eta - etaold)) /
+                      ##          (0.1 + max(abs(eta))), "\n"))
+                      ## use this to determine convergence
+                      if (max(abs(eta - etaold)) <
+                          (0.1 + max(abs(eta))) * controlvals$tolerance)
+                      {
+                          conv <- TRUE
+                          break
+                      }
+                      etaold[] <- eta
+                      
+                  }
+                  if (!conv) warning("iterations for bhat did not converge")
+
+                  ## bhat doesn't really need to return anything, we
+                  ## just want the side-effect of modifying reducedObj
+                  ## In particular, we are interested in
+                  ## ranef(reducedObj) and reducedObj@bVar (?). But
+                  ## the mu-scale response will be useful for log-lik
+                  ## calculations later, so return them anyway
+
+                  invisible(family$linkinv(eta)) 
+              }
+
+          ## function that calculates log likelihood (the thing that
+          ## needs to get evaluated at each Gauss-Hermite location)
+          
+          ## log scale ? worry about details later, get the pieces in place
+          
+          ## this is for the Laplace approximation only. GH is more
+          ## complicated 
+
+          devLaplace <- function(pars = NULL)
           {
-              ## Need to optimize L(theta, beta) using Laplace approximation
+              ## FIXME: This actually returns half the deviance.
+              
+              ## gets correct values of bhat and bvars. As a side
+              ## effect, mu now has fitted values
+              mu <- bhat(pars = pars)
 
-              ## Things needed for that:
-              ##
-              ## 1. reduced ssclme object, offset, weighted model matrices
-              ## 2. facs, reduced model matrices
+              ## GLM family log likelihood (upto constant ?)(log scale)
+              ## FIXME: need to adjust for sigma^2 for appropriate models (not trivial!)
 
-              ## Of these, those in 2 will be fixed given theta and beta,
-              ## and can be thought of arguments to the L(theta, beta)
-              ## function. However, the ones in 1 will have the same
-              ## structure. So the plan is to pre-allocate them and pass
-              ## them in too so they can be used without creating/copying
-              ## them more than once
+              ## Keep everything on (log) likelihood scale
+              
+              ## log lik from observations given fixed and random effects
+              ## get deviance, then multiply by -1/2 (since deviance = -2 log lik)
+              ans <- -sum(family$dev.resids(y = mmats.unadjusted$.fixed[, responseIndex],
+                                            mu = mu,
+                                            wt = weights^2))/2
+              
+              ranefs <- ranef(reducedObj)
+              ## ans <- ans + reducedObj@devComp[2]/2 # log-determinant of Omega
+              Omega <- reducedObj@Omega
+              for (i in seq(along = ranefs))
+              {
+                  ## contribution for random effects (get it working,
+                  ## optimize later) 
+                  ## symmetrize RE variance
+                  Omega[[i]] <- Omega[[i]] + t(Omega[[i]])
+                  diag(Omega[[i]]) <- diag(Omega[[i]]) / 2
 
+                  ## want log of `const det(Omega) exp(-1/2 b'
+                  ## Omega b )` i.e., const + log det(Omega) - .5
+                  ## * (b' Omega b)
 
-              ## reduced ssclme
+                  ## FIXME: need to adjust for sigma^2 for
+                  ## appropriate models (easy).  These are all the
+                  ## b'Omega b, summed as they eventually need to
+                  ## be.  Think of this as
+                  ## sum(rowSums((ranefs[[i]] %*% Omega[[i]]) *
+                  ## ranefs[[i]]))
 
-              reducedObj <- .Call("lmer_collapse", obj, PACKAGE = "Matrix")
-              reducedMmats.unadjusted <- mmats.unadjusted
-              reducedMmats.unadjusted$.fixed <-
-                  reducedMmats.unadjusted$.fixed[, responseIndex, drop = FALSE]
-              reducedMmats <- mmats
-              reducedMmats$.fixed <-
-                  reducedMmats$.fixed[, responseIndex, drop = FALSE]
+                  ranef.loglik.det <- nrow(ranefs[[i]]) *
+                      determinant(Omega[[i]], logarithm = TRUE)$modulus/2
+                  ranef.loglik.re <-
+                      -sum(( as.matrix(ranefs[[i]]) %*% Omega[[i]]) *
+                           as.matrix(ranefs[[i]]))/2
+                  ranef.loglik <- ranef.loglik.det + ranef.loglik.re
 
-              ## define function that calculates bhats given theta and beta 
+                  ## Jacobian adjustment
+                  log.jacobian <-
+                      sum(log(abs(apply(reducedObj@bVar[[i]],
+                                        3,
 
-              bhat <- 
-                  function(pars = NULL) # 1:(responseIndex-1) - beta, rest - theta
-                  {
-                      if (is.null(pars))
-                      {
-                          off <- drop(mmats.unadjusted$.fixed %*%
-                                      c(fixef(obj), 0)) + offset
-                      }
-                      else
-                      {
-                          .Call("lmer_coefGets",
-                                reducedObj,
-                                as.double(pars[responseIndex:length(pars)]),
+                                        ## next line depends on
+                                        ## whether bVars are
+                                        ## variances or Cholesly
+                                        ## factors
+
+                                        ## function(x) sum(diag(x)))
+                                        function(x) sum(diag( La.chol( x ) )))
+                                  )))
+
+                  ## the constant terms from the r.e. and the final
+                  ## Laplacian integral cancel out both being:
+                  ## ranef.loglik.constant <- 0.5 * length(ranefs[[i]]) * log(2 * base::pi)
+
+                  ans <- ans + ranef.loglik + log.jacobian
+              }
+              ## ans is (up to some constant) log of the Laplacian
+              ## approximation of the likelihood. Return it's negative
+              ## to be minimized
+
+              ##              cat("Parameters: ")
+              ##              print(pars)
+
+              ##              cat("Value: ")
+              ##              print(as.double(-ans))
+
+              -ans 
+          }
+
+          if (method == "Laplace")
+          {
+              ##Rprof() # trying to figure out if C-ifying bhat is worthwhile
+              ## no analytic gradients or hessians
+              optimRes <-
+                  optim(fn = devLaplace,
+                        par =
+                        c(fixef(obj),
+                          .Call("lmer_coef",
+                                obj,
                                 TRUE,
-                                PACKAGE = "Matrix")
-                          off <- drop(mmats.unadjusted$.fixed %*%
-                                      c(pars[1:(responseIndex-1)], 0)) + offset
-                      }
-                      niter <- 20
-                      conv <- FALSE
-
-                      eta <- offset + 
-                          .Call("lmer_fitted",
-                                obj, mmats.unadjusted, TRUE,
-                                PACKAGE = "Matrix")
-                      etaold <- eta
-                      
-                      for (iter in seq(length = niter))
-                      {
-                          mu <- family$linkinv(eta)
-                          dmu.deta <- family$mu.eta(eta)
-                          w <- weights * dmu.deta / sqrt(family$variance(mu))
-                          z <- eta - off + (reducedMmats.unadjusted$.fixed[, 1]
-                                            - mu) / dmu.deta 
-                          .Call("nlme_weight_matrix_list",
-                                reducedMmats.unadjusted, w, z, reducedMmats,
-                                PACKAGE="Matrix")
-                          .Call("lmer_update_mm",
-                                reducedObj, reducedMmats,
-                                PACKAGE="Matrix")
-                          eta[] <- off + 
-                              .Call("lmer_fitted", reducedObj, 
-                                    reducedMmats.unadjusted, TRUE,
-                                    PACKAGE = "Matrix")
-                          ##cat(paste("bhat Criterion:", max(abs(eta - etaold)) /
-                          ##          (0.1 + max(abs(eta))), "\n"))
-                          ## use this to determine convergence
-                          if (max(abs(eta - etaold)) <
-                              (0.1 + max(abs(eta))) * controlvals$tolerance)
-                          {
-                              conv <- TRUE
-                              break
-                          }
-                          etaold[] <- eta
-                          
-                      }
-                      if (!conv) warning("iterations for bhat did not converge")
-
-                      ## bhat doesn't really need to return anything, we
-                      ## just want the side-effect of modifying reducedObj
-                      ## In particular, we are interested in
-                      ## ranef(reducedObj) and reducedObj@bVar (?). But
-                      ## the mu-scale response will be useful for log-lik
-                      ## calculations later, so return them anyway
-
-                      invisible(family$linkinv(eta)) 
-                  }
-
-              ## function that calculates log likelihood (the thing that
-              ## needs to get evaluated at each Gauss-Hermite location)
+                                PACKAGE = "Matrix")),
+                        ## WAS: coef(obj, unconst = TRUE)),
+                        method = "BFGS", hessian = TRUE,
+                        control = list(trace = getOption("verbose"),
+                        reltol = controlvals$msTol,
+                        maxit = controlvals$msMaxIter))
+              if (optimRes$convergence != 0)
+                  warning("optim failed to converge")
+              optpars <- optimRes$par
+              Hessian <- optimRes$hessian
               
-              ## log scale ? worry about details later, get the pieces in place
-              
-              ## this is for the Laplace approximation only. GH is more
-              ## complicated 
-
-              devLaplace <- function(pars = NULL)
-              {
-                  ## FIXME: This actually returns half the deviance.
+              ##fixef(obj) <- optimRes$par[seq(length = responseIndex - 1)]
+              if (getOption("verbose")) {
+                  cat(paste("optim convergence code",
+                            optimRes$convergence, "\n"))
+                  cat("Fixed effects:\n")
+                  print(fixef(obj))
+                  print(optimRes$par[seq(length = responseIndex - 1)])
+                  cat("(Unconstrained) variance coefficients:\n")
                   
-                  ## gets correct values of bhat and bvars. As a side
-                  ## effect, mu now has fitted values
-                  mu <- bhat(pars = pars)
-
-                  ## GLM family log likelihood (upto constant ?)(log scale)
-                  ## FIXME: need to adjust for sigma^2 for appropriate models (not trivial!)
-
-                  ## Keep everything on (log) likelihood scale
-                  
-                  ## log lik from observations given fixed and random effects
-                  ## get deviance, then multiply by -1/2 (since deviance = -2 log lik)
-                  ans <- -sum(family$dev.resids(y = mmats.unadjusted$.fixed[, responseIndex],
-                                                mu = mu,
-                                                wt = weights^2))/2
-                  
-                  ranefs <- ranef(reducedObj)
-                  ## ans <- ans + reducedObj@devComp[2]/2 # log-determinant of Omega
-                  Omega <- reducedObj@Omega
-                  for (i in seq(along = ranefs))
-                  {
-                      ## contribution for random effects (get it working,
-                      ## optimize later) 
-                      ## symmetrize RE variance
-                      Omega[[i]] <- Omega[[i]] + t(Omega[[i]])
-                      diag(Omega[[i]]) <- diag(Omega[[i]]) / 2
-
-                      ## want log of `const det(Omega) exp(-1/2 b' Omega b )`
-                      ## i.e., const + log det(Omega) - .5 * (b' Omega b)
-                      ## FIXME: need to adjust for sigma^2 for appropriate models (easy)
-                      ## these are all the b'Omega b, summed as they eventually need to be
-                      ## think of this as sum(rowSums((ranefs[[i]] %*% Omega[[i]]) * ranefs[[i]]))
-                      
-                      ranef.loglik.det <- nrow(ranefs[[i]]) *
-                          determinant(Omega[[i]], logarithm = TRUE)$modulus/2
-                      ranef.loglik.re <-
-                          -sum(( as.matrix(ranefs[[i]]) %*% Omega[[i]]) *
-                               as.matrix(ranefs[[i]]))/2
-                      ranef.loglik <- ranef.loglik.det + ranef.loglik.re
-
-                      ## Jacobian adjustment
-                      log.jacobian <-
-                          sum(log(abs(apply(reducedObj@bVar[[i]],
-                                            3,
-                                            function(x) sum(diag(x)))
-                                      )))
-
-                      ## the constant terms from the r.e. and the final
-                      ## Laplacian integral cancel out both being:
-                      ## ranef.loglik.constant <- 0.5 * length(ranefs[[i]]) * log(2 * base::pi)
-
-                      ans <- ans + ranef.loglik + log.jacobian
-                  }
-                  ## ans is (up to some constant) log of the Laplacian
-                  ## approximation of the likelihood. Return it's negative
-                  ## to be minimized
-
-                  ##              cat("Parameters: ")
-                  ##              print(pars)
-
-                  ##              cat("Value: ")
-                  ##              print(as.double(-ans))
-
-                  -ans 
-              }
-
-              if (method == "Laplace")
-              {
-                  ## no analytic gradients or hessians
-                  optimRes <-
-                      optim(fn = devLaplace,
-                            par = c(fixef(obj), coef(obj, unconst = TRUE)),
-                            method = "BFGS", hessian = TRUE,
-                            control = list(trace = getOption("verbose"),
-                            reltol = controlvals$msTol,
-                            maxit = controlvals$msMaxIter))
-                  if (optimRes$convergence != 0)
-                      warning("optim failed to converge")
-                  optpars <- optimRes$par
-                  Hessian <- optimRes$hessian
-                  
-                  ##fixef(obj) <- optimRes$par[seq(length = responseIndex - 1)]
-                  if (getOption("verbose")) {
-                      cat(paste("optim convergence code",
-                                optimRes$convergence, "\n"))
-                      cat("Fixed effects:\n")
-                      print(fixef(obj))
-                      print(optimRes$par[seq(length = responseIndex - 1)])
-                      cat("(Unconstrained) variance coefficients:\n")
-                      print(coef(obj, unconst = TRUE))
-                      coef(obj, unconst = TRUE) <-
-                          optimRes$par[responseIndex:length(optimRes$par)]
-                      print(coef(obj, unconst = TRUE))
-                  }
-                  
-                  ## need to calculate likelihood also need to store new
-                  ## estimates of fixed effects somewhere (probably cannot
-                  ## update standard errors)
-              }
-              else
-              {
-                  optpars <-
-                      c(fixef(obj),
+                  print(
                         .Call("lmer_coef",
                               obj,
                               TRUE,
                               PACKAGE = "Matrix"))
-                  Hessian <- new("matrix")
+
+                  ##coef(obj, unconst = TRUE) <-
+                  ##    optimRes$par[responseIndex:length(optimRes$par)]
+                  ##print(coef(obj, unconst = TRUE))
+                  print( optimRes$par[responseIndex:length(optimRes$par)] )
               }
-
-
-              ## Before finishing, we need to call devLaplace with the
-              ## optimum pars to get the final log likelihood (still need
-              ## to make sure it's the actual likelihood and not a
-              ## multiple). This would automatically call bhat() and hence
-              ## have the 'correct' random effects in reducedObj.
-
-              loglik <- devLaplace(optpars)
-              print(loglik)
-              ff <- optpars[1:(responseIndex-1)]
-              names(ff) <- names(fixef(obj))
-
-              if (!x) mmats <- list()
-
+                  
+              ## need to calculate likelihood.  also need to store
+              ## new estimates of fixed effects somewhere
+              ## (probably cannot update standard errors)
+                                        #Rprof(NULL)
           }
+          else
+          {
+              optpars <-
+                  c(fixef(obj),
+                    .Call("lmer_coef",
+                          obj,
+                          TRUE,
+                          PACKAGE = "Matrix"))
+              Hessian <- new("matrix")
+          }
+
+
+          ## Before finishing, we need to call devLaplace with the
+          ## optimum pars to get the final log likelihood (still need
+          ## to make sure it's the actual likelihood and not a
+          ## multiple). This would automatically call bhat() and hence
+          ## have the 'correct' random effects in reducedObj.
+
+          loglik <- devLaplace(optpars)
+          ##print(loglik)
+          ff <- optpars[1:(responseIndex-1)]
+          names(ff) <- names(fixef(obj))
+
+          if (!x) mmats <- list()
+
+###      }
 
           obj
       })
+
 
 ## calculates degrees of freedom for fixed effects Wald tests
 ## This is a placeholder.  The answers are generally wrong.  It will
