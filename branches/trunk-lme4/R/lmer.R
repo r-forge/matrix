@@ -545,7 +545,7 @@ setMethod("lmer", signature(formula = "formula"),
                                             mu = mu,
                                             wt = weights^2))/2
               
-              ranefs <- ranef(reducedObj)
+              ranefs <- .Call("lmer_ranef", reducedObj, PACKAGE = "Matrix")
               ## ans <- ans + reducedObj@devComp[2]/2 # log-determinant of Omega
               Omega <- reducedObj@Omega
               for (i in seq(along = ranefs))
@@ -570,8 +570,7 @@ setMethod("lmer", signature(formula = "formula"),
                   ranef.loglik.det <- nrow(ranefs[[i]]) *
                       determinant(Omega[[i]], logarithm = TRUE)$modulus/2
                   ranef.loglik.re <-
-                      -sum(( as.matrix(ranefs[[i]]) %*% Omega[[i]]) *
-                           as.matrix(ranefs[[i]]))/2
+                      -sum((ranefs[[i]] %*% Omega[[i]]) * ranefs[[i]])/2
                   ranef.loglik <- ranef.loglik.det + ranef.loglik.re
 
                   ## Jacobian adjustment
@@ -609,7 +608,7 @@ setMethod("lmer", signature(formula = "formula"),
 
           if (method == "Laplace")
           {
-              ##Rprof() # trying to figure out if C-ifying bhat is worthwhile
+### Rprof() # trying to figure out if C-ifying bhat is worthwhile
               ## no analytic gradients or hessians
               optimRes <-
                   optim(fn = devLaplace,
@@ -653,7 +652,7 @@ setMethod("lmer", signature(formula = "formula"),
               ## need to calculate likelihood.  also need to store
               ## new estimates of fixed effects somewhere
               ## (probably cannot update standard errors)
-                                        #Rprof(NULL)
+### Rprof(NULL)
           }
           else
           {
