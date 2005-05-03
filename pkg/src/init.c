@@ -151,6 +151,7 @@ static R_CallMethodDef CallEntries[] = {
 
     /* added by deepayan */
     {"lmer_collapse", (DL_FUNC) &lmer_collapse, 1},
+    {"lmer_laplace_devComp", (DL_FUNC) &lmer_laplace_devComp, 1},
 
 
     {"lsq_dense_Chol", (DL_FUNC) &lsq_dense_Chol, 2},
@@ -236,7 +237,11 @@ void R_init_Matrix(DllInfo *dll)
     /* added by deepayan */
 
     Matrix_REMLSym = install("REML");
-
-
+    Matrix_callSym = install("call");
+    Matrix_termsSym = install("terms");
+    Matrix_assignSym = install("assign");
+    Matrix_fittedSym = install("fitted");
+    Matrix_residualsSym = install("residuals");
+    Matrix_frameSym = install("frame");
 
 }

@@ -39,5 +39,11 @@ SEXP
     Matrix_zSym,
 
     /* added by deepayan */
-    Matrix_REMLSym;
+    Matrix_REMLSym,
+    Matrix_callSym,
+    Matrix_termsSym,
+    Matrix_assignSym,
+    Matrix_fittedSym,
+    Matrix_residualsSym,
+    Matrix_frameSym;
 

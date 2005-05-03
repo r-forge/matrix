@@ -29,6 +29,6 @@ SEXP lmer_firstDer(SEXP x, SEXP val);
 
 /*   EXPERIMENTAL!   EXPERIMENTAL!   EXPERIMENTAL!  */
 SEXP lmer_collapse(SEXP x);
-
+SEXP lmer_laplace_devComp(SEXP x);
 
 #endif
