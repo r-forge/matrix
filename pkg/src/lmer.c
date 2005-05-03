@@ -1623,12 +1623,12 @@ SEXP lmer_collapse(SEXP x)
     slot_dup(ans, x, Matrix_GpSym);
     slot_dup(ans, x, Matrix_statusSym);
 
-    slot_dup(ans, x, install("call"));
-    slot_dup(ans, x, install("terms"));
-    slot_dup(ans, x, install("assign"));
-    slot_dup(ans, x, install("fitted"));
-    slot_dup(ans, x, install("residuals"));
-    slot_dup(ans, x, install("frame"));
+    slot_dup(ans, x, Matrix_callSym);
+    slot_dup(ans, x, Matrix_termsSym);
+    slot_dup(ans, x, Matrix_assignSym);
+    slot_dup(ans, x, Matrix_fittedSym);
+    slot_dup(ans, x, Matrix_residualsSym);
+    slot_dup(ans, x, Matrix_frameSym);
 
 /*     Not in ssclme version: */
 /*         RXX = "matrix",  */
@@ -1659,3 +1659,150 @@ SEXP lmer_collapse(SEXP x)
 }
 
 
+
+/** 
+ * Compute certain components of the Laplace likelihood approximation 
+ * 
+ * @param x pointer to an lmer object
+ * 
+ * @return log likelihood
+ */
+SEXP lmer_laplace_devComp(SEXP x) {
+    SEXP 
+        ranef = lmer_ranef(x),
+        ans = PROTECT(allocVector(REALSXP, 1)),
+        bVar = GET_SLOT(x, Matrix_bVarSym),
+        Omg = GET_SLOT(x, Matrix_OmegaSym);
+    int 
+        *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	*Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+        i, j, k, l, nci, ncisqr, nlev, nf = length(Omg);
+    double 
+        *Omega, *bVi, *rani, *tmp, tmp2,
+        *dcmp = REAL(ans);
+
+    dcmp[0] = 0;
+
+
+
+    for (i = 0; i < nf; i++) {
+        nci = nc[i];
+        ncisqr = nci * nci;
+        nlev = (Gp[i + 1] - Gp[i]) / nci;
+
+        rani = REAL(VECTOR_ELT(ranef, i));
+        bVi = REAL(VECTOR_ELT(bVar, i));
+        Omega = REAL(VECTOR_ELT(Omg, i));
+        tmp = Memcpy(Calloc(ncisqr, double), Omega, ncisqr);
+
+        F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
+        if (j)
+            error(_("Leading %d minor of Omega[[%d]] not positive definite"),
+                  j, i + 1);
+        for (j = 0; j < nci; j++) { /* nlev * logDet(Omega_i) */
+            dcmp[0] += 0.5 * nlev * log(tmp[j * (nci + 1)]);
+        }
+
+        /* Also need 
+           \sum b' Omega b = (b' tmp)^2, 
+           where b = rows of rani. b is nlev x nci (FIXME: check)
+
+           Is there a LAPACK call that does this? Couldn't find one,
+           so I'll hand-code it for now.
+
+           The calculation boils down to (for k=1:nlev)
+
+           dcmp[0] += sum(( tmp %*% b[k,] )^2)
+
+           This way, we can re-use Omega = tmp' tmp
+
+
+           Alternative: 
+           The calculation boils down to (for k=1:nlev)
+
+           dcmp[0] += \sum_j=1^nci b[k,j]^2 * Omega[j,j];
+           dcmp[0] += 2 \sum_{j<l} b[k,j] * b[k,l] * Omega[j,l];
+        */
+
+        for (k = 0; k < nlev; k++) {
+            for (j = 0; j < nci; j++) {
+                tmp2 = 0;
+                for (l = j; l < nci; l++) {
+                    tmp2 += tmp[l * nci + j] * rani[l * nlev + k];
+                }
+                dcmp[0] += tmp2 * tmp2;
+            }
+        }
+
+        for (k = 0; k < nlev; k++) {
+            Memcpy(tmp, bVi + k * ncisqr, ncisqr);
+            F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
+            if (j)
+                error(_("Leading %d minor of bVar[[%d]][,,%d] not positive definite"),
+                      j, i + 1, k + 1);
+            tmp2 = 0;
+            for (j = 0; j < nci; j++) {
+                tmp2 += log(tmp[j * (nci + 1)]);
+            }
+            dcmp[0] += log(abs(tmp2));
+        }
+        Free(tmp);
+    }
+
+
+
+
+    /*
+  ranefs <- .Call("lmer_ranef", reducedObj, PACKAGE = "Matrix")
+  ## ans <- ans + reducedObj@devComp[2]/2 # log-determinant of Omega
+
+  Omega <- reducedObj@Omega
+  for (i in seq(along = ranefs))
+  {
+      ## contribution for random effects (get it working,
+      ## optimize later) 
+      ## symmetrize RE variance
+      Omega[[i]] <- Omega[[i]] + t(Omega[[i]])
+      diag(Omega[[i]]) <- diag(Omega[[i]]) / 2
+
+      ## want log of `const det(Omega) exp(-1/2 b'
+      ## Omega b )` i.e., const + log det(Omega) - .5
+      ## * (b' Omega b)
+
+      ## FIXME: need to adjust for sigma^2 for appropriate
+      ## models (easy).  These are all the b'Omega b,
+      ## summed as they eventually need to be.  Think of
+      ## this as sum(rowSums((ranefs[[i]] %*% Omega[[i]])
+      ## * ranefs[[i]]))
+
+      ranef.loglik.det <- nrow(ranefs[[i]]) *
+          determinant(Omega[[i]], logarithm = TRUE)$modulus/2
+      ranef.loglik.re <-
+          -sum((ranefs[[i]] %*% Omega[[i]]) * ranefs[[i]])/2
+      ranef.loglik <- ranef.loglik.det + ranef.loglik.re
+
+      ## Jacobian adjustment
+      log.jacobian <-
+          sum(log(abs(apply(reducedObj@bVar[[i]],
+            3,
+
+            ## next line depends on
+            ## whether bVars are variances
+            ## or Cholesly factors
+
+            ## function(x) sum(diag(x)))
+            function(x) sum(diag( La.chol( x ) )))
+      )))
+
+      ## the constant terms from the r.e. and the final
+      ## Laplacian integral cancel out both being:
+      ## ranef.loglik.constant <- 0.5 * length(ranefs[[i]]) * log(2 * base::pi)
+
+      ans <- ans + ranef.loglik + log.jacobian
+  }
+
+    */
+
+    UNPROTECT(1);
+    return ans;
+}
