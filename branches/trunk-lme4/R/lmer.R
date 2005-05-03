@@ -545,53 +545,62 @@ setMethod("lmer", signature(formula = "formula"),
                                             mu = mu,
                                             wt = weights^2))/2
               
-              ranefs <- .Call("lmer_ranef", reducedObj, PACKAGE = "Matrix")
-              ## ans <- ans + reducedObj@devComp[2]/2 # log-determinant of Omega
-              Omega <- reducedObj@Omega
-              for (i in seq(along = ranefs))
+
+              if (is.null(getOption("laplaceinC"))) 
               {
-                  ## contribution for random effects (get it working,
-                  ## optimize later) 
-                  ## symmetrize RE variance
-                  Omega[[i]] <- Omega[[i]] + t(Omega[[i]])
-                  diag(Omega[[i]]) <- diag(Omega[[i]]) / 2
+                  ranefs <- .Call("lmer_ranef", reducedObj, PACKAGE = "Matrix")
+                  ## ans <- ans + reducedObj@devComp[2]/2 # log-determinant of Omega
 
-                  ## want log of `const det(Omega) exp(-1/2 b'
-                  ## Omega b )` i.e., const + log det(Omega) - .5
-                  ## * (b' Omega b)
+                  Omega <- reducedObj@Omega
+                  for (i in seq(along = ranefs))
+                  {
+                      ## contribution for random effects (get it working,
+                      ## optimize later) 
+                      ## symmetrize RE variance
+                      Omega[[i]] <- Omega[[i]] + t(Omega[[i]])
+                      diag(Omega[[i]]) <- diag(Omega[[i]]) / 2
 
-                  ## FIXME: need to adjust for sigma^2 for
-                  ## appropriate models (easy).  These are all the
-                  ## b'Omega b, summed as they eventually need to
-                  ## be.  Think of this as
-                  ## sum(rowSums((ranefs[[i]] %*% Omega[[i]]) *
-                  ## ranefs[[i]]))
+                      ## want log of `const det(Omega) exp(-1/2 b'
+                      ## Omega b )` i.e., const + log det(Omega) - .5
+                      ## * (b' Omega b)
 
-                  ranef.loglik.det <- nrow(ranefs[[i]]) *
-                      determinant(Omega[[i]], logarithm = TRUE)$modulus/2
-                  ranef.loglik.re <-
-                      -sum((ranefs[[i]] %*% Omega[[i]]) * ranefs[[i]])/2
-                  ranef.loglik <- ranef.loglik.det + ranef.loglik.re
+                      ## FIXME: need to adjust for sigma^2 for appropriate
+                      ## models (easy).  These are all the b'Omega b,
+                      ## summed as they eventually need to be.  Think of
+                      ## this as sum(rowSums((ranefs[[i]] %*% Omega[[i]])
+                      ## * ranefs[[i]]))
 
-                  ## Jacobian adjustment
-                  log.jacobian <-
-                      sum(log(abs(apply(reducedObj@bVar[[i]],
-                                        3,
+                      ranef.loglik.det <- nrow(ranefs[[i]]) *
+                          determinant(Omega[[i]], logarithm = TRUE)$modulus/2
+                      ranef.loglik.re <-
+                          -sum((ranefs[[i]] %*% Omega[[i]]) * ranefs[[i]])/2
+                      ranef.loglik <- ranef.loglik.det + ranef.loglik.re
 
-                                        ## next line depends on
-                                        ## whether bVars are
-                                        ## variances or Cholesly
-                                        ## factors
+                      ## Jacobian adjustment
+                      log.jacobian <-
+                          sum(log(abs(apply(reducedObj@bVar[[i]],
+                                            3,
 
-                                        ## function(x) sum(diag(x)))
-                                        function(x) sum(diag( La.chol( x ) )))
-                                  )))
+                                            ## next line depends on
+                                            ## whether bVars are variances
+                                            ## or Cholesly factors
 
-                  ## the constant terms from the r.e. and the final
-                  ## Laplacian integral cancel out both being:
-                  ## ranef.loglik.constant <- 0.5 * length(ranefs[[i]]) * log(2 * base::pi)
+                                            ## function(x) sum(diag(x)))
+                                            function(x) sum(diag( La.chol( x ) )))
+                                      )))
 
-                  ans <- ans + ranef.loglik + log.jacobian
+                      ## the constant terms from the r.e. and the final
+                      ## Laplacian integral cancel out both being:
+                      ## ranef.loglik.constant <- 0.5 * length(ranefs[[i]]) * log(2 * base::pi)
+
+                      ans <- ans + ranef.loglik + log.jacobian
+                  }
+              }
+              else
+              {
+                  ans <- ans +
+                      .Call("lmer_laplace_devComp", reducedObj,
+                            PACKAGE = "Matrix")
               }
               ## ans is (up to some constant) log of the Laplacian
               ## approximation of the likelihood. Return it's negative
