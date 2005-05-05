@@ -545,8 +545,13 @@ setMethod("lmer", signature(formula = "formula"),
                                             mu = mu,
                                             wt = weights^2))/2
               
-
-              if (is.null(getOption("laplaceinC"))) 
+              if (is.null(getOption("laplaceinR"))) 
+              {
+                  ans <- ans +
+                      .Call("lmer_laplace_devComp", reducedObj,
+                            PACKAGE = "Matrix")
+              }
+              else
               {
                   ranefs <- .Call("lmer_ranef", reducedObj, PACKAGE = "Matrix")
                   ## ans <- ans + reducedObj@devComp[2]/2 # log-determinant of Omega
@@ -572,12 +577,18 @@ setMethod("lmer", signature(formula = "formula"),
 
                       ranef.loglik.det <- nrow(ranefs[[i]]) *
                           determinant(Omega[[i]], logarithm = TRUE)$modulus/2
+
+#                      print(ranef.loglik.det)
+
                       ranef.loglik.re <-
                           -sum((ranefs[[i]] %*% Omega[[i]]) * ranefs[[i]])/2
+
+#                      print(ranef.loglik.re)
+                      
                       ranef.loglik <- ranef.loglik.det + ranef.loglik.re
 
                       ## Jacobian adjustment
-                      log.jacobian <-
+                      log.jacobian <- 
                           sum(log(abs(apply(reducedObj@bVar[[i]],
                                             3,
 
@@ -586,8 +597,12 @@ setMethod("lmer", signature(formula = "formula"),
                                             ## or Cholesly factors
 
                                             ## function(x) sum(diag(x)))
-                                            function(x) sum(diag( La.chol( x ) )))
+## Was this a bug?                          function(x) sum(diag( La.chol( x ) )))
+                                            function(x) prod(diag( La.chol( x ) )))
                                       )))
+
+#                      print(log.jacobian)
+
 
                       ## the constant terms from the r.e. and the final
                       ## Laplacian integral cancel out both being:
@@ -595,12 +610,6 @@ setMethod("lmer", signature(formula = "formula"),
 
                       ans <- ans + ranef.loglik + log.jacobian
                   }
-              }
-              else
-              {
-                  ans <- ans +
-                      .Call("lmer_laplace_devComp", reducedObj,
-                            PACKAGE = "Matrix")
               }
               ## ans is (up to some constant) log of the Laplacian
               ## approximation of the likelihood. Return it's negative
@@ -682,7 +691,7 @@ setMethod("lmer", signature(formula = "formula"),
           ## have the 'correct' random effects in reducedObj.
 
           loglik <- devLaplace(optpars)
-          ##print(loglik)
+          print(loglik)
           ff <- optpars[1:(responseIndex-1)]
           names(ff) <- names(fixef(obj))
 
