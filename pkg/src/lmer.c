@@ -1669,21 +1669,22 @@ SEXP lmer_collapse(SEXP x)
  */
 SEXP lmer_laplace_devComp(SEXP x) {
     SEXP 
-        ranef = lmer_ranef(x),
-        ans = PROTECT(allocVector(REALSXP, 1)),
+        ranef = PROTECT(lmer_ranef(x)),
         bVar = GET_SLOT(x, Matrix_bVarSym),
         Omg = GET_SLOT(x, Matrix_OmegaSym);
     int 
         *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	*Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+        ione = 1, ntot,
         i, j, k, l, nci, ncisqr, nlev, nf = length(Omg);
     double 
-        *Omega, *bVi, *rani, *tmp, tmp2,
-        *dcmp = REAL(ans);
+	*Omega, *bVi, *rani, *tmp, *tmp2, 
+        ans = 0, one = 1, 
+/*         tmp3,  */
+        zero = 0;
 
-    dcmp[0] = 0;
 
-
+/*     Rprintf("1. ans = %f\n", ans); */
 
     for (i = 0; i < nf; i++) {
         nci = nc[i];
@@ -1699,9 +1700,13 @@ SEXP lmer_laplace_devComp(SEXP x) {
         if (j)
             error(_("Leading %d minor of Omega[[%d]] not positive definite"),
                   j, i + 1);
-        for (j = 0; j < nci; j++) { /* nlev * logDet(Omega_i) */
-            dcmp[0] += 0.5 * nlev * log(tmp[j * (nci + 1)]);
+        for (j = 0; j < nci; j++) { /* 0.5 * nlev * logDet(Omega_i) */
+            ans += nlev * log(tmp[j * (nci + 1)]); /* (2 * 0.5) since factoring */
         }
+
+
+/*         Rprintf("2. ans = %f\n", ans); */
+
 
         /* Also need 
            \sum b' Omega b = (b' tmp)^2, 
@@ -1712,7 +1717,7 @@ SEXP lmer_laplace_devComp(SEXP x) {
 
            The calculation boils down to (for k=1:nlev)
 
-           dcmp[0] += sum(( tmp %*% b[k,] )^2)
+           ans += sum(( tmp %*% b[k,] )^2)
 
            This way, we can re-use Omega = tmp' tmp
 
@@ -1720,19 +1725,28 @@ SEXP lmer_laplace_devComp(SEXP x) {
            Alternative: 
            The calculation boils down to (for k=1:nlev)
 
-           dcmp[0] += \sum_j=1^nci b[k,j]^2 * Omega[j,j];
-           dcmp[0] += 2 \sum_{j<l} b[k,j] * b[k,l] * Omega[j,l];
+           ans += \sum_j=1^nci b[k,j]^2 * Omega[j,j];
+           ans += 2 \sum_{j<l} b[k,j] * b[k,l] * Omega[j,l];
         */
+	ntot = nlev * nci;
+	tmp2 = Calloc(ntot, double);
+	F77_CALL(dgemm)("N", "T", &nlev, &nci, &nci, &one, rani, &nlev,
+			tmp, &nci, &zero, tmp2, &nlev);
+        ans -= 0.5 * F77_CALL(ddot)(&ntot, tmp2, &ione, tmp2, &ione);
+        Free(tmp2);
 
-        for (k = 0; k < nlev; k++) {
-            for (j = 0; j < nci; j++) {
-                tmp2 = 0;
-                for (l = j; l < nci; l++) {
-                    tmp2 += tmp[l * nci + j] * rani[l * nlev + k];
-                }
-                dcmp[0] += tmp2 * tmp2;
-            }
-        }
+/*         Rprintf("3. ans = %f\n", ans); */
+
+
+/*         for (k = 0; k < nlev; k++) { */
+/*             for (j = 0; j < nci; j++) { */
+/*                 tmp2 = 0; */
+/*                 for (l = j; l < nci; l++) { */
+/*                     tmp2 += tmp[l * nci + j] * rani[l * nlev + k]; */
+/*                 } */
+/*                 ans += tmp2 * tmp2; */
+/*             } */
+/*         } */
 
         for (k = 0; k < nlev; k++) {
             Memcpy(tmp, bVi + k * ncisqr, ncisqr);
@@ -1740,15 +1754,22 @@ SEXP lmer_laplace_devComp(SEXP x) {
             if (j)
                 error(_("Leading %d minor of bVar[[%d]][,,%d] not positive definite"),
                       j, i + 1, k + 1);
-            tmp2 = 0;
+/*             tmp3 = 0; */
             for (j = 0; j < nci; j++) {
-                tmp2 += log(tmp[j * (nci + 1)]);
+/*                 Rprintf("\t5. tmp[%d] = %f\n",  */
+/*                         j * (nci + 1), */
+/*                         tmp[j * (nci + 1)]); */
+/*                 tmp3 += log(tmp[j * (nci + 1)]); */
+                ans += log(tmp[j * (nci + 1)]);
             }
-            dcmp[0] += log(abs(tmp2));
+/*             ans += log(fabs(tmp3)); */
+/*             ans += tmp3; */
+/*             Rprintf("4. ans = %f (tmp3 = %f)\n", ans, tmp3); */
         }
         Free(tmp);
     }
-
+    UNPROTECT(1);
+    return ScalarReal(ans);
 
 
 
@@ -1791,7 +1812,8 @@ SEXP lmer_laplace_devComp(SEXP x) {
             ## or Cholesly factors
 
             ## function(x) sum(diag(x)))
-            function(x) sum(diag( La.chol( x ) )))
+### bug?            function(x) sum(diag( La.chol( x ) )))
+            function(x) prod(diag( La.chol( x ) )))
       )))
 
       ## the constant terms from the r.e. and the final
@@ -1803,6 +1825,4 @@ SEXP lmer_laplace_devComp(SEXP x) {
 
     */
 
-    UNPROTECT(1);
-    return ans;
 }
