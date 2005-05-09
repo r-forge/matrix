@@ -1,13 +1,18 @@
 \name{lgCMatrix-class}
 \docType{class}
 \alias{lgCMatrix-class}
+\alias{ltCMatrix-class}
+\alias{lsCMatrix-class}
 \alias{\%*\%,lgCMatrix,lgCMatrix-method}
 \alias{coerce,matrix,lgCMatrix-method}
 \alias{t,lgCMatrix-method}
 \title{Compressed, sparse, column-oriented logical matrices}
-\description{The \code{dgCMatrix} class is a class of sparse logical
-  matrices in the compressed, sparse, column-oriented format.  In this
-  implementation the non-zero elements in the columns are sorted into
+\description{The \code{lgCMatrix} class is a class of general, sparse,
+  logical matrices in the compressed, sparse, column-oriented format.
+  \code{lsCMatrix} and \code{ltCMatrix} are similar classes representing
+  symmetric and triangular matrices respectively.
+
+  In this implementation the non-zero elements in the columns are sorted into
   increasing row order.  There is no \code{x} slot in this class because
   the only non-zero value stored is \code{TRUE}.}
 \section{Objects from the Class}{
@@ -15,6 +20,15 @@
 }
 \section{Slots}{
   \describe{
+    \item{\code{uplo}:}{Object of class \code{"character"}. Must be
+      either "U", for upper triangular, and "L", for lower
+      triangular. Present in the triangular and symmetric classes but not
+      in the general class.}
+    \item{\code{diag}:}{Object of class \code{"character"}. Must be
+      either \code{"U"}, for unit triangular (diagonal is all ones), or
+      \code{"N"} for non-unit.  The implicit diagonal elements are not
+      explicitly stored when \code{diag} is \code{"U"}.  Present in the
+      triangular classes only.}
     \item{\code{p}:}{Object of class \code{"integer"} of pointers, one
       for each column, to the initial (zero-based) index of elements in
       the column.}
@@ -45,8 +59,7 @@
   matrices.
 }
 \seealso{
-  \code{\link{dgCMatrix-class}}, \code{\link{ltCMatrix-class}},
-    \code{\link{lsCMatrix-class}}
+  \code{\link{dgCMatrix-class}}
 }
 %\examples{}
 \keyword{classes}
