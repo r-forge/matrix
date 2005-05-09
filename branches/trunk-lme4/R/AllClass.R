@@ -67,3 +67,17 @@ setClass("lmer.ranef.confint", contains = "list")
 setClass("lmer.coef", representation(varFac = "list", stdErr =
                                       "numeric"),
          contains = "list")
+
+
+
+
+## Representation of a generalized linear mixed effects model
+setClass("glmer",
+         contains = "lmer",
+         representation(family = "family",
+                        glmmll = "numeric",
+                        method = "character",
+                        fixed = "numeric"))
+
+
+

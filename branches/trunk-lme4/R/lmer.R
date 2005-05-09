@@ -175,6 +175,11 @@ setMethod("fixef", signature(object = "lmer"),
               val[-length(val)]
           })
 
+setMethod("fixef", signature(object = "glmer"),
+          function(object, ...) {
+              object@fixed
+          })
+
 setMethod("VarCorr", signature(x = "lmer"),
           function(x, REML = TRUE, useScale = TRUE, ...) {
               val <- .Call("lmer_variances", x, PACKAGE = "Matrix")
@@ -196,9 +201,20 @@ setMethod("summary", signature(object = "lmer"),
           function(object, ...)
           new("summary.lmer", object, useScale = TRUE, showCorrelation = TRUE))
 
+## FIXME: glmm-s with scale not handled 
+setMethod("summary", signature(object = "glmer"),
+          function(object, ...)
+          new("summary.lmer", object, useScale = FALSE, showCorrelation = TRUE))
+
+
 setMethod("show", signature(object = "lmer"),
           function(object)
           show(new("summary.lmer", object, useScale = TRUE,
+                   showCorrelation = FALSE))
+          )
+setMethod("show", signature(object = "glmer"),
+          function(object)
+          show(new("summary.lmer", object, useScale = FALSE,
                    showCorrelation = FALSE))
           )
 
@@ -690,7 +706,7 @@ setMethod("lmer", signature(formula = "formula"),
           ## multiple). This would automatically call bhat() and hence
           ## have the 'correct' random effects in reducedObj.
 
-          loglik <- devLaplace(optpars)
+          loglik <- -devLaplace(optpars)
           ##print(loglik)
           ff <- optpars[1:(responseIndex-1)]
           names(ff) <- names(fixef(obj))
@@ -699,7 +715,13 @@ setMethod("lmer", signature(formula = "formula"),
 
 ###      }
 
-          obj
+          ##obj
+
+          new("glmer", obj,
+              family = family,
+              glmmll = loglik,
+              method = method,
+              fixed = ff)
       })
 
 
@@ -724,6 +746,17 @@ setMethod("logLik", signature(object="lmer"),
               attr(val, "nall") <- attr(val, "nobs") <- nc[2]
               attr(val, "df") <- nc[1] + length(ccoef(object))
               attr(val, "REML") <- REML 
+              class(val) <- "logLik"
+              val
+          })
+
+setMethod("logLik", signature(object="glmer"),
+          function(object, ...) {
+              val <- object@glmmll
+              nc <- object@nc[-seq(a = object@Omega)]
+              attr(val, "nall") <- attr(val, "nobs") <- nc[2]
+              attr(val, "df") <- nc[1] + length(ccoef(object))
+              ## attr(val, "REML") <- REML 
               class(val) <- "logLik"
               val
           })
@@ -855,6 +888,12 @@ setMethod("deviance", "lmer",
               if (is.null(REML))
                   REML <- if (length(oR <- object@REML)) oR else FALSE
               object@deviance[[ifelse(REML, "REML", "ML")]]
+          })
+
+
+setMethod("deviance", "glmer",
+          function(object, ...) {
+              -2 * object@glmmll
           })
 
 setMethod("chol", signature(x = "lmer"),
