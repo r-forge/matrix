@@ -1676,7 +1676,7 @@ SEXP lmer_laplace_devComp(SEXP x) {
         *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	*Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
         ione = 1, ntot,
-        i, j, k, l, nci, ncisqr, nlev, nf = length(Omg);
+        i, j, k, nci, ncisqr, nlev, nf = length(Omg);
     double 
 	*Omega, *bVi, *rani, *tmp, *tmp2, 
         ans = 0, one = 1, 
