@@ -12,6 +12,8 @@
 \alias{lsTMatrix-class}
 \alias{\%*\%,lgCMatrix,lgCMatrix-method}
 \alias{coerce,dgCMatrix,lgCMatrix-method}
+\alias{coerce,lgCMatrix,dgCMatrix-method}
+\alias{coerce,lsCMatrix,dsCMatrix-method}
 \alias{crossprod,lgCMatrix,missing-method}
 \alias{t,lgCMatrix-method}
 \alias{tcrossprod,lgCMatrix-method}
