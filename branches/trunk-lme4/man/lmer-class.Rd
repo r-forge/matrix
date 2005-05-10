@@ -1,6 +1,7 @@
 \name{lmer-class}
 \docType{class}
 \alias{lmer-class}
+\alias{glmer-class}
 \alias{VarCorr,lmer-method}
 \alias{anova,lmer-method}
 \alias{coerce,lmer,dsTMatrix-method}
@@ -8,13 +9,17 @@
 \alias{coef,lmer-method}
 \alias{confint,lmer-method}
 \alias{deviance,lmer-method}
+\alias{deviance,glmer-method}
 \alias{formula,lmer-method}
 \alias{fitted,lmer-method}
 \alias{logLik,lmer-method}
+\alias{logLik,glmer-method}
 \alias{residuals,lmer-method}
 \alias{resid,lmer-method}
 \alias{show,lmer-method}
+\alias{show,glmer-method}
 \alias{summary,lmer-method}
+\alias{summary,glmer-method}
 \alias{update,lmer-method}
 \alias{vcov,lmer-method}
 \alias{plot,lmer.ranef-method}
