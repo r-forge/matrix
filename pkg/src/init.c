@@ -129,6 +129,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dtrMatrix_solve", (DL_FUNC) &dtrMatrix_solve, 1},
     {"dtrMatrix_validate", (DL_FUNC) &dtrMatrix_validate, 1},
     {"lapack_qr", (DL_FUNC) &lapack_qr, 2},
+    {"lgCMatrix_crossprod", (DL_FUNC) &lgCMatrix_crossprod, 2},
     {"lgCMatrix_lgCMatrix_mm", (DL_FUNC) &lgCMatrix_lgCMatrix_mm, 2},
     {"lgCMatrix_trans", (DL_FUNC) &lgCMatrix_trans, 1},
     {"lgCMatrix_validate", (DL_FUNC) &lgCMatrix_validate, 1},

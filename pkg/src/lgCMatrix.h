@@ -12,5 +12,8 @@ SEXP Matrix_lgClgCmm(int tra, int trb, int m, int n, int k,
 		     int beta, SEXP CIP, int cp[]);
 SEXP lgCMatrix_lgCMatrix_mm(SEXP a, SEXP b);
 SEXP lgCMatrix_trans(SEXP x);
+SEXP Matrix_lgCsyrk(int up, int tra, int n, int k, const int ai[],
+		    const int ap[], int beta, SEXP CIP, int cp[]);
+SEXP lgCMatrix_crossprod(SEXP x, SEXP trans);
 
 #endif
