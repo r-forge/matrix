@@ -199,28 +199,46 @@ setMethod("gradient", signature(x = "lmer"),
 
 setMethod("summary", signature(object = "lmer"),
           function(object, ...)
-          new("summary.lmer", object, useScale = TRUE, showCorrelation = TRUE))
+          new("summary.lmer", object, useScale = TRUE,
+              showCorrelation = TRUE,
+              method = if (object@REML) "REML" else "ML",
+              family = gaussian(),
+              logLik = logLik(object),
+              fixed = fixef(object)))
 
 ## FIXME: glmm-s with scale not handled 
 setMethod("summary", signature(object = "glmer"),
           function(object, ...)
-          new("summary.lmer", object, useScale = FALSE, showCorrelation = TRUE))
-
+          new("summary.lmer", object, useScale = FALSE,
+              showCorrelation = TRUE,
+              method = object@method,
+              family = object@family,
+              logLik = logLik(object),
+              fixed = fixef(object)))
 
 setMethod("show", signature(object = "lmer"),
           function(object)
           show(new("summary.lmer", object, useScale = TRUE,
-                   showCorrelation = FALSE))
+                   showCorrelation = FALSE,
+                   method = if (object@REML) "REML" else "ML",
+                   family = gaussian(),
+                   logLik = logLik(object),
+                   fixed = fixef(object)))
           )
+
 setMethod("show", signature(object = "glmer"),
           function(object)
           show(new("summary.lmer", object, useScale = FALSE,
-                   showCorrelation = FALSE))
+                   showCorrelation = FALSE,
+                   method = object@method,
+                   family = object@family,
+                   logLik = logLik(object),
+                   fixed = fixef(object)))
           )
 
 setMethod("show", "summary.lmer",
           function(object) {
-              fcoef <- fixef(object)
+              fcoef <- object@fixed
               useScale <- object@useScale
               corF <- as(as(vcov(object, useScale = useScale), "pdmatrix"),
                          "corrmatrix")
@@ -231,12 +249,17 @@ setMethod("show", "summary.lmer",
                   list(names(fcoef), c("Estimate", "Std. Error", "DF"))
                             digits <- max(3, getOption("digits") - 2)
               REML <- length(object@REML) > 0 && object@REML[1]
-              llik <- logLik(object)
+              llik <- object@logLik
               dev <- object@deviance
               
               rdig <- 5
-              cat("Linear mixed-effects model fit by ")
-              cat(ifelse(object@REML, "REML\n", "maximum likelihood\n") )
+              if (glz <- !(object@method %in% c("REML", "ML"))) {
+                  cat(paste("Generalized linear mixed model fit using",
+                            object@method, "\n"))
+              } else {
+                  cat("Linear mixed-effects model fit by ")
+                  cat(if(object@REML) "REML\n" else "maximum likelihood\n")
+              }
               if (!is.null(object@call$formula)) {
                   cat("Formula:", deparse(object@call$formula),"\n")
               }
@@ -247,11 +270,20 @@ setMethod("show", "summary.lmer",
                   cat(" Subset:",
                       deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
               }
-              print(data.frame(AIC = AIC(llik), BIC = BIC(llik),
+              if (glz) {
+                  cat(" Family:", object@family$family, "(",
+                      object@family$link, "link)\n")
+                  print(data.frame(AIC = AIC(llik), BIC = BIC(llik),
                                logLik = c(llik),
-                               MLdeviance = dev["ML"],
+                               deviance = -2*llik,
+                               row.names = ""))
+              } else {
+                  print(data.frame(AIC = AIC(llik), BIC = BIC(llik),
+                               logLik = c(llik),
+                               deviance = dev["ML"],
                                REMLdeviance = dev["REML"],
                                row.names = ""))
+              }
               cat("Random effects:\n")
               show(VarCorr(object))
               ngrps <- lapply(object@flist, function(x) length(levels(x)))
