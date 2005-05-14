@@ -8,6 +8,7 @@
 #include "R_ldl.h"
 #include "dsCMatrix.h"
 #include "dtCMatrix.h"
+#include "lgCMatrix.h"
 
 void lmer_populate(SEXP bCtab);
 
