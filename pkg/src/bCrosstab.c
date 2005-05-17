@@ -1,8 +1,6 @@
 #include "bCrosstab.h"
 /* TODO:
- * - Only do a fill-reducing permutation on the first non-nested factor
- * - Alternatively: change the algorithm for the fill-reducing
- *   permutation to a greedy or a picky algorithm.
+ * - Only do a fill-reducing permutation on the first non-nested factor?
  */
 
 
@@ -46,8 +44,7 @@ symbolic_right_unit_sm_trans(int anc, const int Parent[], SEXP C)
     }
     if (nextra) {
 	int cnr, ntot = cnz + nextra, pos;
-	int
-	    *dims = INTEGER(getAttrib(GET_SLOT(C, Matrix_xSym), R_DimSymbol)),
+	int *dims = INTEGER(getAttrib(GET_SLOT(C, Matrix_xSym), R_DimSymbol)),
 	    *Ti = Memcpy((int *) Calloc(ntot, int), ci, cnz),
 	    *Tj = expand_cmprPt(anc, cp, Calloc(ntot, int)),
 	    *Ci = Calloc(ntot, int);
@@ -83,44 +80,38 @@ symbolic_right_unit_sm_trans(int anc, const int Parent[], SEXP C)
  * @param db pointer to the diagonal block
  * @param odb pointer to the off-diagonal block
  */
-static void
-diag_update(SEXP db, SEXP odb)
+static R_INLINE void
+diag_update(SEXP db, SEXP odb, int n, int k)
 {
-    SEXP dbpP = GET_SLOT(db, Matrix_pSym),
-	odbpP = GET_SLOT(odb, Matrix_pSym);
-
     SET_SLOT(db, Matrix_iSym,
-	     Matrix_lgCsyrk(1, 0, length(dbpP) - 1, length(odbpP) - 1,
+	     Matrix_lgCsyrk(1, 0, n, k,
 			    INTEGER(GET_SLOT(odb, Matrix_iSym)),
-			    INTEGER(odbpP), 1,
+			    INTEGER(GET_SLOT(odb, Matrix_pSym)),
+			    1,
 			    GET_SLOT(db, Matrix_iSym),
-			    INTEGER(dbpP)));
+			    INTEGER(GET_SLOT(db, Matrix_pSym))));
 }
 
 /** 
  * Update an off-diagonal block of L from the blocked crosstabulation
  * 
- * @param A upper block
- * @param B lower block
+ * @param A lower block
+ * @param B upper block
  * @param C product block
  * @param nrA number of rows in A
  */
-static void
-offdiag_update(SEXP A, SEXP B, SEXP C, int nrA)
+static R_INLINE void
+offdiag_update(SEXP A, SEXP B, SEXP C, int m, int n, int k)
 {
-    SEXP ApP = GET_SLOT(A, Matrix_pSym),
-	CpP = GET_SLOT(C, Matrix_pSym);
-
     SET_SLOT(C, Matrix_iSym,
-	     Matrix_lgClgCmm(0, 1, nrA, length(CpP) - 1,
-			     length(ApP) - 1,
+	     Matrix_lgClgCmm(0, 1, m, n, k,
 			     INTEGER(GET_SLOT(A, Matrix_iSym)),
-			     INTEGER(ApP),
+			     INTEGER(GET_SLOT(A, Matrix_pSym)),
 			     INTEGER(GET_SLOT(B, Matrix_iSym)),
 			     INTEGER(GET_SLOT(B, Matrix_pSym)),
 			     1,
 			     GET_SLOT(C, Matrix_iSym),
-			     INTEGER(CpP)));
+			     INTEGER(GET_SLOT(C, Matrix_pSym))));
 }
 
 	/* check dimensions of x slots and modify if necessary */
@@ -342,12 +333,13 @@ lmer_populate(SEXP val)
 					 VECTOR_ELT(L, Lind(k,j)));
 	}
 	for (k = j+1; k < nf; k++) { /* Update remaining columns */
-	    diag_update(VECTOR_ELT(ZZpO, k), VECTOR_ELT(L, Lind(k, j)));
+	    diag_update(VECTOR_ELT(ZZpO, k), VECTOR_ELT(L, Lind(k, j)),
+			nlev[k], nlev[j]);
 	    for (i = k + 1; i < nf; i++)
-		offdiag_update(VECTOR_ELT(L, Lind(k, j)),
-			       VECTOR_ELT(L, Lind(i, j)),
+		offdiag_update(VECTOR_ELT(L, Lind(i, j)),
+			       VECTOR_ELT(L, Lind(k, j)),
 			       VECTOR_ELT(L, Lind(i, k)),
-			       nlev[k]);
+			       nlev[i], nlev[k], nlev[j]);
 	}
 	check_x_slot_dim(VECTOR_ELT(ZZpO, j));
     }
