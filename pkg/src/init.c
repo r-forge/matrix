@@ -15,8 +15,11 @@
 #include "dtrMatrix.h"
 #include "dtpMatrix.h"
 #include "factorizations.h"
+#include "lCholCMatrix.h"
 #include "lgCMatrix.h"
 #include "lgTMatrix.h"
+#include "lsCMatrix.h"
+#include "ltCMatrix.h"
 #include "lmer.h"
 #include "sscCrosstab.h"
 #include "ssclme.h"
@@ -31,6 +34,7 @@ static R_CallMethodDef CallEntries[] = {
     {"pCholesky_validate", (DL_FUNC) &pCholesky_validate, 1},
     {"LU_expand", (DL_FUNC) &LU_expand, 1},
     {"LU_validate", (DL_FUNC) &LU_validate, 1},
+    {"Matrix_expand_pointers", (DL_FUNC) &Matrix_expand_pointers, 1},
     {"SVD_validate", (DL_FUNC) &SVD_validate, 1},
     {"csc_check_column_sorting", (DL_FUNC) &csc_check_column_sorting, 1},
     {"csc_crossprod", (DL_FUNC) &csc_crossprod, 1},
@@ -129,10 +133,15 @@ static R_CallMethodDef CallEntries[] = {
     {"dtrMatrix_solve", (DL_FUNC) &dtrMatrix_solve, 1},
     {"dtrMatrix_validate", (DL_FUNC) &dtrMatrix_validate, 1},
     {"lapack_qr", (DL_FUNC) &lapack_qr, 2},
-    {"lgCMatrix_crossprod", (DL_FUNC) &lgCMatrix_crossprod, 2},
+    {"lCholCMatrix_solve", (DL_FUNC) &lCholCMatrix_solve, 1},
+    {"lCholCMatrix_lgCMatrix_solve", (DL_FUNC) &lCholCMatrix_lgCMatrix_solve, 2},
+    {"lCholCMatrix_validate", (DL_FUNC) &lCholCMatrix_validate, 1},
+    {"lgCMatrix_crossprod", (DL_FUNC) &lgCMatrix_crossprod, 3},
     {"lgCMatrix_lgCMatrix_mm", (DL_FUNC) &lgCMatrix_lgCMatrix_mm, 2},
+    {"lgCMatrix_picky_column", (DL_FUNC) &lgCMatrix_picky_column, 1},
     {"lgCMatrix_trans", (DL_FUNC) &lgCMatrix_trans, 1},
     {"lgCMatrix_validate", (DL_FUNC) &lgCMatrix_validate, 1},
+    {"lgTMatrix_as_lgCMatrix", (DL_FUNC) &lgTMatrix_as_lgCMatrix, 1},
     {"lgTMatrix_validate", (DL_FUNC) &lgTMatrix_validate, 1},
     {"lmer_Crosstab", (DL_FUNC) &lmer_Crosstab, 1},
     {"lmer_ECMEsteps", (DL_FUNC) &lmer_ECMEsteps, 4},
@@ -157,7 +166,11 @@ static R_CallMethodDef CallEntries[] = {
     {"lmer_collapse", (DL_FUNC) &lmer_collapse, 1},
     {"lmer_laplace_devComp", (DL_FUNC) &lmer_laplace_devComp, 1},
 
-
+    {"lsCMatrix_chol", (DL_FUNC) &lsCMatrix_chol, 2},
+    {"lsCMatrix_trans", (DL_FUNC) &lsCMatrix_trans, 1},
+    {"lsCMatrix_validate", (DL_FUNC) &lsCMatrix_validate, 1},
+    {"ltCMatrix_trans", (DL_FUNC) &ltCMatrix_trans, 1},
+    {"ltCMatrix_validate", (DL_FUNC) &ltCMatrix_validate, 1},
     {"lsq_dense_Chol", (DL_FUNC) &lsq_dense_Chol, 2},
     {"lsq_dense_QR", (DL_FUNC) &lsq_dense_QR, 2},
     {"matrix_to_csc", (DL_FUNC) &matrix_to_csc, 1},
