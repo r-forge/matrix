@@ -9,8 +9,7 @@
 SEXP lCholCMatrix_validate(SEXP x);
 SEXP lCholCMatrix_solve(SEXP x);
 SEXP lCholClgCsm(enum CBLAS_SIDE side, enum CBLAS_TRANSPOSE transa, int m,
-		 int n, const int Parent[], const int bi[], const int bp[],
-		 SEXP CIP, int cp[]);
+		 int n, const int Parent[], SEXP BIP, int bp[]);
 SEXP lCholCMatrix_lgCMatrix_solve(SEXP a, SEXP b);
 
 #endif

@@ -82,11 +82,8 @@ lmer_crosstab(SEXP flist, int nobs, const int nc[])
 			   ijp, Ti, Tx);
 	    nnz = ijp[nlevs[j]];
 	    Memcpy(INTEGER(ALLOC_SLOT(ZZij, Matrix_iSym, INTSXP, nnz)), Ti, nnz);
-	    SET_SLOT(ZZij, Matrix_xSym, alloc3Darray(REALSXP, nc[i], nc[j], nnz));
-	    /* The crosstab counts are copied into the first nnz elements */
-	    /* of the x slot.  These aren't the correct array positions */
-	    /* unless nc[i] == nc[j] == 1 but we don't use them. */
-	    Memcpy(REAL(GET_SLOT(ZZij, Matrix_xSym)), Tx, nnz);
+/* 	    SET_SLOT(ZZij, Matrix_xSym, alloc3Darray(REALSXP, nc[i], nc[j], nnz)); */
+/* 	    Memcpy(REAL(GET_SLOT(ZZij, Matrix_xSym)), Tx, nnz); */
 	}
     }
 
@@ -97,119 +94,14 @@ lmer_crosstab(SEXP flist, int nobs, const int nc[])
 }
 
 /** 
- * Replace the structure of C by the structure of CA^{-T}
+ * Allocate the x slot in an dgBCMatrix object
  * 
- * @param anc number of column blocks in A
- * @param Parent parent array for column blocks of A
- * @param C a dgBCMatrix object to be updated
+ * mm Pointer to a dgBCMatrix object
+ * nr number of rows per block
+ * nc number of columns per block
  */
-static void
-symbolic_right_unit_sm_trans(int anc, const int Parent[], SEXP C)
-{
-    SEXP cip = GET_SLOT(C, Matrix_iSym),
-	cpp = GET_SLOT(C, Matrix_pSym), tmp;
-    int *ci = INTEGER(cip), *cj, *Ti, *Tp,
-	*cp = INTEGER(cpp), cnr,
-	cnz = length(cip),
-	i, j;
+#define ALLOC_X_SLOT(mm, nr, nc) SET_SLOT(mm, Matrix_xSym, alloc3Darray(REALSXP, nr, nc, length(GET_SLOT(mm, Matrix_iSym))))
 
-    if ((length(cpp) - 1) != anc)
-	error(_("No. of cols in A (%d) does not match no. of cols in C (%d)"),
-	      anc, length(cpp) - 1);
-
-    i = 1;			/* check for A being the identity */
-    for (j = 0; j < anc; j++) {
-	if (Parent[j] >= 0) {
-	    i = 0;
-	    break;
-	}
-    }
-    if (i) return;		/* A is the identity */
-
-				/* determine number of rows in C */
-    cnr = -1;
-    for (i = 0; i < cnz; i++) {
-	int cii = ci[i];
-	if (cii > cnr) cnr = cii;
-    }
-    cnr++;			/* max 0-based index is one less the
-				 * no. of rows */
-				
-    cj = expand_cmprPt(anc, cp, Calloc(cnz, int));
-    Ti = Calloc(cnz, int);
-    Tp = Calloc(cnr, int);	/* transpose C */
-    triplet_to_col(anc, cnr, cnz, cj, ci, (double *) NULL,
-		   Tp, Ti, (double *) NULL);
-    cj = Realloc(cj, cnr, int);	/* Create column pointers for empty matrix */
-    for (i = 0; i < cnr; i++) cj[i] = 0;
-    PROTECT(tmp = lCholClgCsm(LFT, NTR, anc, cnr, Parent, Ti, Tp, cip, cj));
-				/* transpose the result */
-    cnz = cj[cnr];
-    Free(Tp);
-    Tp = expand_cmprPt(cnr, cj, Calloc(cnz, int));
-    triplet_to_col(cnr, anc, cnz, Tp, INTEGER(tmp), (double *) NULL,
-		   cp, INTEGER(ALLOC_SLOT(C, Matrix_iSym, INTSXP, cnz)),
-		   (double *) NULL);
-    UNPROTECT(1);
-}
-    
-/** 
- * Update a diagonal block of ZZpO in the blocked crosstabulation
- * 
- * @param db pointer to the diagonal block
- * @param odb pointer to the off-diagonal block
- */
-static R_INLINE void
-diag_update(SEXP db, SEXP odb, int n, int k)
-{
-    SET_SLOT(db, Matrix_iSym,
-	     Matrix_lgCsyrk(1, 0, n, k,
-			    INTEGER(GET_SLOT(odb, Matrix_iSym)),
-			    INTEGER(GET_SLOT(odb, Matrix_pSym)),
-			    1,
-			    GET_SLOT(db, Matrix_iSym),
-			    INTEGER(GET_SLOT(db, Matrix_pSym))));
-}
-
-/** 
- * Update an off-diagonal block of L from the blocked crosstabulation
- * 
- * @param A lower block
- * @param B upper block
- * @param C product block
- * @param nrA number of rows in A
- */
-static R_INLINE void
-offdiag_update(SEXP A, SEXP B, SEXP C, int m, int n, int k)
-{
-    SET_SLOT(C, Matrix_iSym,
-	     Matrix_lgClgCmm(0, 1, m, n, k,
-			     INTEGER(GET_SLOT(A, Matrix_iSym)),
-			     INTEGER(GET_SLOT(A, Matrix_pSym)),
-			     INTEGER(GET_SLOT(B, Matrix_iSym)),
-			     INTEGER(GET_SLOT(B, Matrix_pSym)),
-			     1,
-			     GET_SLOT(C, Matrix_iSym),
-			     INTEGER(GET_SLOT(C, Matrix_pSym))));
-}
-
-	/* check dimensions of x slots and modify if necessary */
-/** 
- * Check the dimensions of the x slot and modify if necessary
- * 
- * @param mm Pointer to a dgBCMatrix object
- */
-static R_INLINE void
-check_x_slot_dim(SEXP mm)
-{
-    SEXP xP = GET_SLOT(mm, Matrix_xSym);
-    int *dims = INTEGER(getAttrib(xP, R_DimSymbol)),
-	nnz = length(GET_SLOT(mm, Matrix_iSym));
-
-    if (dims[2] != nnz)
-	SET_SLOT(mm, Matrix_xSym,
-		 alloc3Darray(REALSXP, dims[0], dims[1], nnz));
-}
 
 /** 
  * Permute the levels of one of the grouping factors in a bCrosstab object
@@ -384,8 +276,8 @@ lmer_populate(SEXP val)
 		    (INTEGER(VECTOR_ELT(parent, 0))[i] < 0) ? -1 : j;
 	    nnz = Lp[ncj];
 	    SET_SLOT(Ljj, Matrix_iSym, allocVector(INTSXP, nnz));
-	    SET_SLOT(Ljj, Matrix_xSym,
-		     alloc3Darray(REALSXP, nc[j], nc[j], nnz));
+/* 	    SET_SLOT(Ljj, Matrix_xSym, */
+/* 		     alloc3Darray(REALSXP, nc[j], nc[j], nnz)); */
 	    Free(iPerm); UNPROTECT(1);
 	} else {
 	    for (i = 0; i < ncj; i++) {
@@ -396,25 +288,47 @@ lmer_populate(SEXP val)
 	    }
 	    Lp[ncj] = 0;
 	    SET_SLOT(Ljj, Matrix_iSym, allocVector(INTSXP, 0));
-	    SET_SLOT(Ljj, Matrix_xSym,
-		     alloc3Darray(REALSXP, nc[j], nc[j], 0));
+/* 	    SET_SLOT(Ljj, Matrix_xSym, */
+/* 		     alloc3Darray(REALSXP, nc[j], nc[j], 0)); */
 	}
 	for (k = j+1; k < nf; k++) { /* Update other blocks in this column */
-	    symbolic_right_unit_sm_trans(ncj, INTEGER(VECTOR_ELT(parent, 0)),
-					 VECTOR_ELT(L, Lind(k,j)));
+	    SEXP Lkj = VECTOR_ELT(L, Lind(k,j));
+	    SET_SLOT(Lkj, Matrix_iSym,
+		     lCholClgCsm(RGT, TRN, nlev[k], nlev[j],
+				 INTEGER(VECTOR_ELT(parent, 0)),
+				 GET_SLOT(Lkj, Matrix_iSym),
+				 INTEGER(GET_SLOT(Lkj, Matrix_pSym))));
 	}
-	for (k = j+1; k < nf; k++) { /* Update remaining columns */
-	    diag_update(VECTOR_ELT(ZZpO, k), VECTOR_ELT(L, Lind(k, j)),
-			nlev[k], nlev[j]);
-	    for (i = k + 1; i < nf; i++)
-		offdiag_update(VECTOR_ELT(L, Lind(i, j)),
-			       VECTOR_ELT(L, Lind(k, j)),
-			       VECTOR_ELT(L, Lind(i, k)),
-			       nlev[i], nlev[k], nlev[j]);
+	for (k = j + 1; k < nf; k++) { /* Update remaining columns */
+	    SEXP db = VECTOR_ELT(ZZpO, k), Lkj = VECTOR_ELT(L, Lind(k, j));
+	    int *Lkji = INTEGER(GET_SLOT(Lkj, Matrix_iSym)),
+		*Lkjp = INTEGER(GET_SLOT(Lkj, Matrix_pSym));
+	    SET_SLOT(db, Matrix_iSym,
+		     Matrix_lgCsyrk(1, 0, nlev[k], nlev[j], Lkji, Lkjp,
+				    1, GET_SLOT(db, Matrix_iSym),
+				    INTEGER(GET_SLOT(db, Matrix_pSym))));
+	    for (i = k + 1; i < nf; i++) {
+		SEXP Lij = VECTOR_ELT(L, Lind(i, j)),
+		    Lik = VECTOR_ELT(L, Lind(i, k));
+		SET_SLOT(Lik, Matrix_iSym,
+			 Matrix_lgClgCmm(0, 1, nlev[i], nlev[k], nlev[j],
+					 INTEGER(GET_SLOT(Lij, Matrix_iSym)),
+					 INTEGER(GET_SLOT(Lij, Matrix_pSym)),
+					 Lkji, Lkjp,
+					 1, GET_SLOT(Lik, Matrix_iSym),
+					 INTEGER(GET_SLOT(Lik, Matrix_pSym))));
+	    }
 	}
-	check_x_slot_dim(VECTOR_ELT(ZZpO, j));
     }
-
+				
+    for (j = 0; j < nf; j++) {	/* allocate x slots in dgBCMatrix objects */
+	ALLOC_X_SLOT(VECTOR_ELT(ZZpO, j), nc[j], nc[j]);
+	for (k = j; k < nf; k++) {
+	    int indkj = Lind(k,j);
+	    ALLOC_X_SLOT(VECTOR_ELT(L, indkj), nc[k], nc[j]);
+	    ALLOC_X_SLOT(VECTOR_ELT(ZtZ, indkj), nc[k], nc[j]);
+	}
+    }
     /* Convert blockwise Parent arrays to extended Parent arrays */
     for (j = 0; j < (nf - 1); j++) { /* Parent[nf] does not need conversion */
 	SEXP Ljp1j = VECTOR_ELT(L, Lind(j + 1, j)),

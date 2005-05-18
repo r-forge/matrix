@@ -65,26 +65,35 @@ SEXP lCholCMatrix_solve(SEXP x)
  * Solve  one  of the matrix equations  op(A)*C = B, or * C*op(A) = B
  * where A is an lCholCMatrix object and B and C are lgCMatrix 
  * objects.
+ *
+ * An early check is done to see if A is the identity, in which case
+ * BIP is returned and bp is unmodified.
  * 
  * @param side LFT or RGT
  * @param transa TRN or NTR
  * @param m number of rows in B and C
  * @param n number of columns in B and C
  * @param Parent Parent array of A
- * @param bi array of row indices of B
- * @param bp array of column pointers of B
- * @param CIP pointer to the row indices for C
- * @param cp array of column pointers for C
+ * @param BIP pointer to the row indices for B
+ * @param bp array of column pointers for B (may be overwritten)
  *
  * @return Pointer to the updated row indices for C.  The column
- * pointers may also be overwritten.
+ * pointers bp are overwritten with cp.
  */
 SEXP
 lCholClgCsm(enum CBLAS_SIDE side, enum CBLAS_TRANSPOSE transa, int m,
-	    int n, const int Parent[], const int bi[], const int bp[],
-	    SEXP CIP, int cp[])
+	    int n, const int Parent[], SEXP BIP, int bp[])
 {
-    int *ci = INTEGER(CIP), cnz, extra, i, j, pari, pos;
+    int *bi = INTEGER(BIP), bnz, extra, ident, j, pari, pos;
+    int nca = (transa == TRN) ? n : m;
+
+    ident = 1;
+    for (j = 0; j < nca; j++)
+	if (Parent[j] >= 0) {
+	    ident = 0;
+	    break;
+	}
+    if (ident) return BIP;
 
     extra = 0;
     if (side == LFT) {
@@ -96,79 +105,73 @@ lCholClgCsm(enum CBLAS_SIDE side, enum CBLAS_TRANSPOSE transa, int m,
 	    for (j = 0; j < n; j++) {
 		int ii, ii2 = bp[j + 1];
 		for (ii = bp[j]; ii < ii2; ii++)
-		    for (pari = bi[ii]; pari >= 0; pari = Parent[pari])
-			if (check_csc_index(cp, ci, pari, j, -1) < 0) extra++;
+		    for (pari = Parent[bi[ii]]; pari >= 0;
+			 pari = Parent[pari]) extra++;
 	    }
-/* This is not quite right.  C may contain more elements than in the solution. */
-	    if (!extra) return CIP;
 
-	    cnz = cp[n];
-	    ntot = cnz + extra;
-	    Ti = Memcpy(Calloc(ntot, int), ci, cnz);
-	    Tj = expand_cmprPt(n, cp, Calloc(ntot, int));
+	    bnz = bp[n];
+	    ntot = bnz + extra;
+	    Ti = Memcpy(Calloc(ntot, int), bi, bnz);
+	    Tj = expand_cmprPt(n, bp, Calloc(ntot, int));
 	    Tci = Calloc(ntot, int);
 
-	    pos = cnz;
+	    pos = bnz;
 	    for (j = 0; j < n; j++) {
 		int ii, ii2 = bp[j + 1];
 		for (ii = bp[j]; ii < ii2; ii++)
-		    for (pari = bi[ii]; pari >= 0; pari = Parent[pari])
-			if (check_csc_index(cp, ci, pari, j, -1) < 0) {
+		    for (pari = Parent[bi[ii]]; pari >= 0;
+			 pari = Parent[pari]) {
 			    Ti[pos] = pari;
 			    Tj[pos] = j;
 			    pos++;
 			}
 	    }
 	    triplet_to_col(m, n, ntot, Ti, Tj, (double *) NULL,
-			   cp, Tci, (double *) NULL);
+			   bp, Tci, (double *) NULL);
 
-	    cnz = cp[n];
-	    CIP = PROTECT(allocVector(INTSXP, cnz));
-	    Memcpy(INTEGER(CIP), Tci, cnz);
+	    bnz = bp[n];
+	    BIP = PROTECT(allocVector(INTSXP, bnz));
+	    Memcpy(INTEGER(BIP), Tci, bnz);
 	    
 	    Free(Tci); Free(Ti); Free(Tj);
 	    UNPROTECT(1);
-	    return CIP;
+	    return BIP;
 	}
     } else {
 	if (transa == TRN) {
 	    int *Tci, *Tj, *Ti, ntot;
 	    for (j = 0; j < n; j++) {
 		int ii, ii2 = bp[j + 1];
-		for (pari = j; pari >= 0; pari = Parent[pari]) {
-		    for (ii = bp[j]; ii < ii2; ii++)
-			if (check_csc_index(cp, ci, ii, pari, -1) < 0) extra++;
+		for (pari = Parent[j]; pari >= 0; pari = Parent[pari])
+		    for (ii = bp[j]; ii < ii2; ii++) extra++;
 	    }
-/* This is not quite right.  C may contain more elements than in the solution. */
-	    if (!extra) return CIP;
 
-	    cnz = cp[n];
-	    ntot = cnz + extra;
-	    Ti = Memcpy(Calloc(ntot, int), ci, cnz);
-	    Tj = expand_cmprPt(n, cp, Calloc(ntot, int));
+	    bnz = bp[n];
+	    ntot = bnz + extra;
+	    Ti = Memcpy(Calloc(ntot, int), bi, bnz);
+	    Tj = expand_cmprPt(n, bp, Calloc(ntot, int));
 	    Tci = Calloc(ntot, int);
 
-	    pos = cnz;
+	    pos = bnz;
 	    for (j = 0; j < n; j++) {
 		int ii, ii2 = bp[j + 1];
-		for (pari = j; pari >= 0; pari = Parent[pari]) {
-		    for (ii = bp[j]; ii < ii2; ii++)
-			if (check_csc_index(cp, ci, ii, pari, -1) < 0) {
-			    Ti[pos] = ii;
-			    Tj[pos] = pari;
-			    pos++;
-			}
+		for (pari = Parent[j]; pari >= 0; pari = Parent[pari]) {
+		    for (ii = bp[j]; ii < ii2; ii++) {
+			Ti[pos] = bi[ii];
+			Tj[pos] = pari;
+			pos++;
+		    }
+		}
 	    }
 	    triplet_to_col(m, n, ntot, Ti, Tj, (double *) NULL,
-			   cp, Tci, (double *) NULL);
-
-	    cnz = cp[n];
-	    CIP = PROTECT(allocVector(INTSXP, cnz));
-	    Memcpy(INTEGER(CIP), Tci, cnz);
+			   bp, Tci, (double *) NULL);
+	    bnz = bp[n];
+	    BIP = PROTECT(allocVector(INTSXP, bnz));
+	    Memcpy(INTEGER(BIP), Tci, bnz);
 	    
 	    Free(Tci); Free(Ti); Free(Tj);
 	    UNPROTECT(1);
-	    return CIP;
+	    return BIP;
 	} else {
 	    error(_("code not yet written"));
 	    return R_NilValue;
@@ -188,8 +191,6 @@ SEXP lCholCMatrix_lgCMatrix_solve(SEXP a, SEXP b)
     SET_SLOT(ans, Matrix_iSym,
 	     lCholClgCsm(LFT, NTR, bdims[0], bdims[1],
 			 INTEGER(GET_SLOT(a, Matrix_ParentSym)),
-			 INTEGER(GET_SLOT(b, Matrix_iSym)),
-			 INTEGER(GET_SLOT(b, Matrix_pSym)),
 			 GET_SLOT(ans, Matrix_iSym),
 			 INTEGER(GET_SLOT(ans, Matrix_pSym))));
     UNPROTECT(1);
