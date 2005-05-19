@@ -851,7 +851,7 @@ alloc_tmp_ind(int nf, const int nc[], const int nlevs[], SEXP Parent,
 	
 	if (nc[j] > maxnc) maxnc = nc[j];
 	for (val = -1, i = nlevs[j] - 1; i >= 0; i--) {
-	    int thisnnz = (INTEGER(blk)[i] != j) ? 0 : nfj[INTEGER(par)[j]] + 1;
+	    int thisnnz = (INTEGER(blk)[i] != j) ? 0 : nfj[INTEGER(par)[i]] + 1;
 	    if (thisnnz > val) val = thisnnz;
 	    nfj[i] = thisnnz;
 	}
@@ -996,7 +996,7 @@ SEXP lmer_invert(SEXP x)
 		    double *Lkix = REAL(GET_SLOT(Lki, Matrix_xSym));
 		    int kk, sz = nc[i] * nc[k];
 		    
-		    AZERO(tmp[kk], sz * nnz[k]);
+		    AZERO(tmp[k], sz * nnz[k]);
 		    /* initialize tmp from jth column of (k,i)th block */
 		    /* - sign in sol'n incorporated in dtrmm call below */
 		    for (kk = Lkip[j]; kk < Lkip[j + 1]; kk++)
