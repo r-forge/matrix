@@ -332,6 +332,10 @@ lmer_populate(SEXP val)
 	    ALLOC_X_SLOT(VECTOR_ELT(ZtZ, indkj), nc[k], nc[j]);
 	}
     }
+/* FIXME: Use these macros from Tim Davis instead */
+#define EMPTY -1
+#define FLIP(i) (-(i)-2)
+#define UNFLIP(i) (((i) < EMPTY) ? FLIP(i) : (i))
     /* Convert blockwise Parent arrays to extended Parent arrays */
     for (j = 0; j < (nf - 1); j++) { /* Parent[nf] does not need conversion */
 	SEXP Ljp1j = VECTOR_ELT(L, Lind(j + 1, j)),
@@ -771,9 +775,9 @@ SEXP lmer_factor(SEXP x)
 	}
 				/* downdate and factor XtX */
 	Memcpy(RXX, REAL(GET_SLOT(x, Matrix_XtXSym)), dims[1] * dims[1]);
-	F77_CALL(dsyrk)("U", "T", dims + 1, dims,
-			&minus1, RZX, dims, &one, RXX, dims + 1);
-	F77_CALL(dpotrf)("U", dims + 1, RXX, dims + 1, &j);
+	F77_CALL(dsyrk)("U", "T", &dims[1], &dims[0],
+			&minus1, RZX, &dims[0], &one, RXX, dims + 1);
+	F77_CALL(dpotrf)("U", &dims[1], RXX, &dims[1], &j);
 	if (j) {
 	    warning("Leading minor of size %d of downdated X'X is indefinite",
 		    j);
@@ -851,11 +855,10 @@ alloc_tmp_ind(int nf, const int nc[], const int nlevs[], SEXP Parent,
 	
 	if (nc[j] > maxnc) maxnc = nc[j];
 	for (val = -1, i = nlevs[j] - 1; i >= 0; i--) {
-	    int thisnnz = (INTEGER(blk)[i] != j) ? 0 : nfj[INTEGER(par)[i]] + 1;
+	    int thisnnz = (INTEGER(blk)[i] != j) ? 1 : nfj[INTEGER(par)[i]] + 1;
 	    if (thisnnz > val) val = thisnnz;
 	    nfj[i] = thisnnz;
 	}
-	val++;			/* extra 1 from previous levels */
 	ind[j] = Calloc(val, int);
 	tmp[j] = Calloc(val * nc[j] * maxnc, double);
 	Free(nfj);
@@ -936,14 +939,14 @@ SEXP lmer_invert(SEXP x)
 	    minus1 = -1., one = 1., zero = 0.;
 
 	/* RXX := RXX^{-1} */
-	F77_CALL(dtrtri)("U", "N", dims + 1, RXX, dims + 1, &i);
+	F77_CALL(dtrtri)("U", "N", &dims[1], RXX, &dims[1], &i);
 	if (i)
 	    error(_("Leading minor of size %d of downdated X'X,is indefinite"),
 		  i + 1);
 
 	/* RZX := - RZX %*% RXX */
-	F77_CALL(dtrmm)("R", "U", "N", "N", dims, dims + 1, &minus1,
-			RXX, dims + 1, RZX, dims);
+	F77_CALL(dtrmm)("R", "U", "N", "N", &dims[0], &dims[1], &minus1,
+			RXX, &dims[1], RZX, dims);
 	for(i = 0; i < nf; i++) {
 	    int info, j, jj, nci = nc[i];
 	    int ncisqr = nci * nci;
@@ -963,7 +966,7 @@ SEXP lmer_invert(SEXP x)
 		    F77_CALL(dtrtri)("U", "N", &nci, Di + j * ncisqr, &nci, &info);
 		    if (info)
 			error(_("D[,,%d] for factor %d is singular"), j + 1, i + 1);
-		    F77_CALL(dtrmm)("L", "U", "N", "N", &nci, dims + 1, &one,
+		    F77_CALL(dtrmm)("L", "U", "N", "N", &nci, &dims[1], &one,
 				    Di + j * ncisqr, &nci, RZXi + j * nci, dims);
 		}
 	    }

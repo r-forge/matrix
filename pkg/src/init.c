@@ -21,8 +21,6 @@
 #include "lsCMatrix.h"
 #include "ltCMatrix.h"
 #include "lmer.h"
-#include "sscCrosstab.h"
-#include "ssclme.h"
 #include <R_ext/Rdynload.h>
 
 #include "Syms.h"
@@ -176,32 +174,7 @@ static R_CallMethodDef CallEntries[] = {
     {"matrix_to_csc", (DL_FUNC) &matrix_to_csc, 1},
     {"nlme_replaceSlot", (DL_FUNC) &nlme_replaceSlot, 3},
     {"nlme_weight_matrix_list", (DL_FUNC) &nlme_weight_matrix_list, 4},
-    {"sscCrosstab", (DL_FUNC) &sscCrosstab, 2},
-    {"sscCrosstab_groupedPerm", (DL_FUNC) &sscCrosstab_groupedPerm, 1},
-    {"sscCrosstab_project2", (DL_FUNC) &sscCrosstab_project2, 1},
     {"ssc_transpose", (DL_FUNC) &ssc_transpose, 1},
-    {"ssclme_EMsteps", (DL_FUNC) &ssclme_EMsteps, 4},
-    {"ssclme_Hessian", (DL_FUNC) &ssclme_Hessian, 3},
-    {"ssclme_coef", (DL_FUNC) &ssclme_coef, 2},
-    {"ssclme_coefGets", (DL_FUNC) &ssclme_coefGets, 3},
-    {"ssclme_coefGetsUnc", (DL_FUNC) &ssclme_coefGetsUnc, 2},
-    {"ssclme_coefUnc", (DL_FUNC) &ssclme_coefUnc, 1},
-    {"ssclme_collapse", (DL_FUNC) &ssclme_collapse, 1},
-    {"ssclme_create", (DL_FUNC) &ssclme_create, 2},
-    {"ssclme_factor", (DL_FUNC) &ssclme_factor, 1},
-    {"ssclme_fitted", (DL_FUNC) &ssclme_fitted, 4},
-    {"ssclme_fixef", (DL_FUNC) &ssclme_fixef, 1},
-    {"ssclme_grad", (DL_FUNC) &ssclme_grad, 4},
-    {"ssclme_gradient", (DL_FUNC) &ssclme_gradient, 3},
-    {"ssclme_inflate_and_factor", (DL_FUNC) &ssclme_inflate_and_factor, 1},
-    {"ssclme_initial", (DL_FUNC) &ssclme_initial, 1},
-    {"ssclme_invert", (DL_FUNC) &ssclme_invert, 1},
-    {"ssclme_ranef", (DL_FUNC) &ssclme_ranef, 1},
-    {"ssclme_sigma", (DL_FUNC) &ssclme_sigma, 2},
-    {"ssclme_to_lme", (DL_FUNC) &ssclme_to_lme, 10},
-    {"ssclme_transfer_dimnames", (DL_FUNC) &ssclme_transfer_dimnames, 3},
-    {"ssclme_update_mm", (DL_FUNC) &ssclme_update_mm, 3},
-    {"ssclme_variances", (DL_FUNC) &ssclme_variances, 1},
     {"tsc_to_dgTMatrix", (DL_FUNC) &tsc_to_dgTMatrix, 1},
     {"tsc_transpose", (DL_FUNC) &tsc_transpose, 1},
     {"tsc_validate", (DL_FUNC) &tsc_validate, 1},
