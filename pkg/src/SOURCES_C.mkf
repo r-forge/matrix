@@ -26,6 +26,4 @@ SOURCES_C =  \
 	    lgTMatrix.c \
 	    lsCMatrix.c \
 	    ltCMatrix.c \
-            sscCrosstab.c \
-            ssclme.c \
             triplet_to_col.c
