@@ -131,25 +131,38 @@ setReplaceMethod("LMEoptimize", signature(x="lmer", value="list"),
                  nc <- nc[1:(length(nc) - 2)]
                  constr <- unlist(lapply(nc, function(k) 1:((k*(k+1))/2) <= k))
                  fn <- function(pars) {
-                     ccoef(x) <- pars
+                     .Call("lmer_coefGets", x, pars, FALSE)
+                     #ccoef(x) <- pars
                      deviance(x, REML = value$REML)
                  }
                  gr <- if (value$analyticGradient)
                      function(pars) {
-                         if (!identical(TRUE,all.equal(pars, ccoef(x)))) ccoef(x) <- pars
-                         grad <- gradient(x, REML = value$REML, unconst = TRUE)
-                         grad[constr] <- -grad[constr]/pars[constr]
-                         grad
+                         if (!isTRUE(all.equal(pars, ccoef(x))))
+                             .Call("lmer_coefGets", x, pars, FALSE)
+                             #ccoef(x) <- pars
+                         #grad <- gradient(x, REML = value$REML, unconst = TRUE)
+                         gradient(x, REML = value$REML, unconst = FALSE)
+                         #grad[constr] <- -grad[constr]/pars[constr]
+                         #grad
                      } else NULL
-                 optimRes <- optim(st, fn, gr,
-                                   method = "L-BFGS-B",
-                                   lower = ifelse(constr, 1e-10, -Inf),
-                                   control = list(maxit = value$msMaxIter,
-                                   trace = as.integer(value$msVerbose)))
+                 if (require("port", quietly = TRUE)) {
+                     optimRes <- portOptim(.Call("lmer_coef", x, FALSE),
+                                           fn, gr,
+                                           lower = ifelse(constr, 1e-10, -Inf),
+                                           control = list(maxit = value$msMaxIter,
+                                           trace = as.integer(value$msVerbose)))
+                     .Call("lmer_coefGets", x, optimRes$par, FALSE)
+                 } else {
+                     optimRes <- optim(ccoef(x), fn, gr,
+                                       method = "L-BFGS-B",
+                                       lower = ifelse(constr, 1e-10, -Inf),
+                                       control = list(maxit = value$msMaxIter,
+                                       trace = as.integer(value$msVerbose)))
+                     ccoef(x) <- optimRes$par 
+                 }
                  if (optimRes$convergence != 0) {
                      warning(paste("optim returned message",optimRes$message,"\n"))
                  }
-                 ccoef(x) <- optimRes$par
                  return(x)
              })
 
@@ -674,26 +687,37 @@ setMethod("lmer", signature(formula = "formula"),
 
           if (method == "Laplace")
           {
-###Rprof("/tmp/Laplace-profile.out") # trying to figure out if C-ifying bhat is worthwhile
-              ## no analytic gradients or hessians
-              optimRes <-
-                  optim(fn = devLaplace,
-                        par =
-                        c(fixef(obj),
-                          .Call("lmer_coef",
-                                obj,
-                                TRUE,
-                                PACKAGE = "Matrix")),
+              if (require("port")) {
+                  optimRes <-
+                      portOptim(fn = devLaplace,
+                                par =
+                                c(fixef(obj),
+                                  .Call("lmer_coef",
+                                        obj,
+                                        TRUE,
+                                        PACKAGE = "Matrix")),
                         ## WAS: coef(obj, unconst = TRUE)),
-                        method = "BFGS", hessian = TRUE,
+                        method = "BFGS", #hessian = TRUE,
                         control = list(trace = getOption("verbose"),
                         reltol = controlvals$msTol,
                         maxit = controlvals$msMaxIter))
+                  optpars <- optimRes$par
+              } else {
+                  optimRes <-
+                      optim(fn = 
+                            c(fixef(obj), .Call("lmer_coef", obj, TRUE,
+                                                PACKAGE = "Matrix")),
+                            devLaplace,
+                            method = "BFGS", hessian = TRUE,
+                            control = list(trace = getOption("verbose"),
+                            reltol = controlvals$msTol,
+                            maxit = controlvals$msMaxIter))
+                  optpars <- optimRes$par
+                  Hessian <- optimRes$hessian
+              }
               if (optimRes$convergence != 0)
                   warning("optim failed to converge")
-              optpars <- optimRes$par
-              Hessian <- optimRes$hessian
-              
+
               ##fixef(obj) <- optimRes$par[seq(length = responseIndex - 1)]
               if (getOption("verbose")) {
                   cat(paste("optim convergence code",
