@@ -28,7 +28,7 @@ lmerControl <-                            # Control parameters for lmer
   function(maxIter = 50,
            msMaxIter = 50,
            tolerance = sqrt((.Machine$double.eps)),
-           niterEM = 20,
+           niterEM = 15,
            msTol = sqrt(.Machine$double.eps),
            msVerbose = getOption("verbose"),
            PQLmaxIt = 20,
@@ -126,40 +126,36 @@ setReplaceMethod("LMEoptimize", signature(x="lmer", value="list"),
                  function(x, value)
              {
                  if (value$msMaxIter < 1) return(x)
-                 st <- ccoef(x)         # starting values
                  nc <- x@nc
                  nc <- nc[1:(length(nc) - 2)]
                  constr <- unlist(lapply(nc, function(k) 1:((k*(k+1))/2) <= k))
-                 fn <- function(pars) {
-                     .Call("lmer_coefGets", x, pars, FALSE)
-                     #ccoef(x) <- pars
-                     deviance(x, REML = value$REML)
-                 }
+                 fn <- function(pars)
+                     deviance(.Call("lmer_coefGets", x, pars,
+                                    2, PACKAGE = "Matrix"),
+                              REML = value$REML)
                  gr <- if (value$analyticGradient)
                      function(pars) {
-                         if (!isTRUE(all.equal(pars, ccoef(x))))
-                             .Call("lmer_coefGets", x, pars, FALSE)
-                             #ccoef(x) <- pars
-                         #grad <- gradient(x, REML = value$REML, unconst = TRUE)
-                         gradient(x, REML = value$REML, unconst = FALSE)
-                         #grad[constr] <- -grad[constr]/pars[constr]
-                         #grad
+                         if (!isTRUE(all.equal(pars,
+                                               .Call("lmer_coef", x, 2))))
+                             .Call("lmer_coefGets", x, pars, 2)
+                         .Call("lmer_gradient", x, value$REML, 2)
                      } else NULL
-                 if (require("port", quietly = TRUE)) {
-                     optimRes <- portOptim(.Call("lmer_coef", x, FALSE),
-                                           fn, gr,
-                                           lower = ifelse(constr, 1e-10, -Inf),
-                                           control = list(maxit = value$msMaxIter,
-                                           trace = as.integer(value$msVerbose)))
-                     .Call("lmer_coefGets", x, optimRes$par, FALSE)
+                 RV <- lapply(R.Version()[c("major", "minor")], as.numeric)
+                 if ((RV$major > 1 && RV$minor >= 2.0) ||
+                     require("port", quietly = TRUE)) {
+                     optimRes <- nlminb(.Call("lmer_coef", x, 2),
+                                        fn, gr,
+                                        lower = ifelse(constr, 1e-10, -Inf),
+                                        control = list(iter.max = value$msMaxIter,
+                                        trace = as.integer(value$msVerbose)))
                  } else {
-                     optimRes <- optim(ccoef(x), fn, gr,
+                     optimRes <- optim(.Call("lmer_coef", x, 2), fn, gr,
                                        method = "L-BFGS-B",
                                        lower = ifelse(constr, 1e-10, -Inf),
                                        control = list(maxit = value$msMaxIter,
                                        trace = as.integer(value$msVerbose)))
-                     ccoef(x) <- optimRes$par 
                  }
+                 .Call("lmer_coefGets", x, optimRes$par, 2)
                  if (optimRes$convergence != 0) {
                      warning(paste("optim returned message",optimRes$message,"\n"))
                  }
@@ -687,20 +683,15 @@ setMethod("lmer", signature(formula = "formula"),
 
           if (method == "Laplace")
           {
-              if (require("port")) {
+              RV <- lapply(R.Version()[c("major", "minor")], as.numeric)
+              if ((RV$major > 1 && RV$minor >= 2.0) ||
+                  require("port", quietly = TRUE)) {
                   optimRes <-
-                      portOptim(fn = devLaplace,
-                                par =
-                                c(fixef(obj),
-                                  .Call("lmer_coef",
-                                        obj,
-                                        TRUE,
-                                        PACKAGE = "Matrix")),
-                        ## WAS: coef(obj, unconst = TRUE)),
-                        method = "BFGS", #hessian = TRUE,
-                        control = list(trace = getOption("verbose"),
-                        reltol = controlvals$msTol,
-                        maxit = controlvals$msMaxIter))
+                      nlminb(c(fixef(obj),
+                               .Call("lmer_coef", obj, TRUE, PACKAGE = "Matrix")),
+                             devLaplace,
+                             control = list(trace = getOption("verbose"),
+                             iter.max = controlvals$msMaxIter))
                   optpars <- optimRes$par
               } else {
                   optimRes <-
@@ -800,7 +791,8 @@ setMethod("logLik", signature(object="lmer"),
               val <- -deviance(object, REML = REML)/2
               nc <- object@nc[-seq(a = object@Omega)]
               attr(val, "nall") <- attr(val, "nobs") <- nc[2]
-              attr(val, "df") <- nc[1] + length(ccoef(object))
+              attr(val, "df") <-
+                  nc[1] + length(.Call("lmer_coef", object, 2))
               attr(val, "REML") <- REML 
               class(val) <- "logLik"
               val
@@ -811,8 +803,8 @@ setMethod("logLik", signature(object="glmer"),
               val <- object@glmmll
               nc <- object@nc[-seq(a = object@Omega)]
               attr(val, "nall") <- attr(val, "nobs") <- nc[2]
-              attr(val, "df") <- nc[1] + length(ccoef(object))
-              ## attr(val, "REML") <- REML 
+              attr(val, "df") <-
+                  nc[1] + length(.Call("lmer_coef", object, 2))
               class(val) <- "logLik"
               val
           })
