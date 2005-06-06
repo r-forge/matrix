@@ -40,7 +40,7 @@ SEXP lmer_validate(SEXP x)
  * @param nc number of columns in the model matrices.
  *
  * @return the pairwise crosstabulation in the form of the ZtZ array.
- * The current version does not fill in the counts as they are not needed.
+ * This version does not fill in the counts as they are not needed.
  */
 static SEXP
 lmer_crosstab(SEXP flist, int nobs, const int nc[])
@@ -455,9 +455,9 @@ SEXP lmer_update_mm(SEXP x, SEXP mmats)
  *
  * @return pointer to an lmer object
  */
-SEXP lmer_create(SEXP flist, SEXP mmats)
+SEXP lmer_create(SEXP flist, SEXP mmats, SEXP method)
 {
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("lmer")));
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("mer")));
     SEXP ZtZ, cnames, fnms, nms;
     int *nc, i, nf = length(flist), nobs;
 
@@ -493,6 +493,7 @@ SEXP lmer_create(SEXP flist, SEXP mmats)
     }   /* Arguments have now been checked for type, dimension, etc. */
 				/* Create pairwise crosstabulation in ZtZ */
     SET_SLOT(val, Matrix_ZtZSym, lmer_crosstab(flist, nobs, nc));
+    SET_SLOT(val, Matrix_methodSym, duplicate(method));
     lmer_populate(val);
     ZtZ = GET_SLOT(val, Matrix_ZtZSym);
     /* FIXME: Check for possible reordering of the factors to maximize the
@@ -1499,20 +1500,19 @@ void EMsteps_verbose_print(SEXP x, int iter, int REML, SEXP firstDer, SEXP val)
  *
  * @param x pointer to an ssclme object
  * @param nsteps pointer to an integer scalar - the number of ECME steps to perform
- * @param REMLp pointer to a logical scalar indicating if REML is to be used
  * @param Verbp pointer to a logical scalar indicating verbose output
  *
  * @return R_NilValue if verb == FALSE, otherwise a list of iteration
  *numbers, deviances, parameters, and gradients.
  */
-SEXP lmer_ECMEsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP Verbp)
+SEXP lmer_ECMEsteps(SEXP x, SEXP nsteps, SEXP Verbp)
 {
     SEXP Omega = GET_SLOT(x, Matrix_OmegaSym),
 	flist = GET_SLOT(x, Matrix_flistSym),
 	val = R_NilValue;
     int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	*status = LOGICAL(GET_SLOT(x, Matrix_statusSym)),
-	REML = asLogical(REMLp),
+	REML = !strcmp(CHAR(asChar(GET_SLOT(x, Matrix_methodSym))), "REML"),
 	i, ifour = 4, info, ione = 1, iter,
 	nEM = asInteger(nsteps),
 	nf = length(Omega),
@@ -1560,7 +1560,15 @@ SEXP lmer_ECMEsteps(SEXP x, SEXP nsteps, SEXP REMLp, SEXP Verbp)
     return val;
 }
 
-SEXP lmer_gradient(SEXP x, SEXP REMLp, SEXP pType)
+/** 
+ * Evaluate the gradient vector
+ * 
+ * @param x Pointer to an lmer object
+ * @param pType Pointer to an integer indicator of the parameterization being used
+ * 
+ * @return pointer to a gradient vector
+ */
+SEXP lmer_gradient(SEXP x, SEXP pType)
 {
     SEXP Omega = GET_SLOT(x, Matrix_OmegaSym);
     int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
@@ -1571,7 +1579,8 @@ SEXP lmer_gradient(SEXP x, SEXP REMLp, SEXP pType)
 	val = PROTECT(allocVector(REALSXP, coef_length(nf, nc)));
     double
 	*cc = EM_grad_lc(Calloc(4, double), 0,
-			 asInteger(REMLp), nc + nf),
+			 !strcmp(CHAR(asChar(GET_SLOT(x, Matrix_methodSym))),
+				 "REML"), nc + nf),
 	one = 1.0, zero = 0.0;
 
     dind = 0;			/* index into val for diagonals */
@@ -1769,28 +1778,6 @@ SEXP lmer_variances(SEXP x)
     return Omg;
 }
 
-SEXP lmer_Crosstab(SEXP flist)
-{
-    SEXP val;
-    int i, nf = length(flist), nobs;
-    int *nc = Calloc(nf, int);
-
-    if (!(nf > 0 && isNewList(flist)))
-	error(_("flist must be a non-empty list"));
-    nobs = length(VECTOR_ELT(flist, 0));
-    if (nobs < 1) error(_("flist[[1]] must be a non-null factor"));
-    for (i = 0; i < nf; i++) {
-	SEXP fi = VECTOR_ELT(flist, i);
-	if (!(isFactor(fi) && length(fi) == nobs))
-	    error(_("flist[[%d]] must be a factor of length %d"),
-		  i + 1, nobs);
-	nc[i] = 1;
-    }
-    val = lmer_crosstab(flist, nobs, nc);
-    Free(nc);
-    return val;
-}
-
 /** 
  * Calculate and return the fitted values.
  * 
@@ -1845,16 +1832,6 @@ SEXP lmer_fitted(SEXP x, SEXP mmats, SEXP useRf)
     return val;
 }
 
-
-
-
-
-
-
-
-
-/*   EXPERIMENTAL!   EXPERIMENTAL!   EXPERIMENTAL!  */
-
 /** 
  * Copy an lmer object collapsing the fixed effects slots to the response only.
  * 
@@ -1867,14 +1844,10 @@ SEXP lmer_collapse(SEXP x)
     SEXP 
         ans = PROTECT(NEW_OBJECT(MAKE_CLASS("lmer"))),
 	Omega = GET_SLOT(x, Matrix_OmegaSym),
-/*         Dim = GET_SLOT(x, Matrix_DimSym);  won't work, no longer exists */
 	Dim = getAttrib(GET_SLOT(x, Matrix_ZtXSym), R_DimSymbol);
     int 
         nf = length(Omega), 
-/*         nz = INTEGER(Dim)[1];  ???   */
-        nz = INTEGER(Dim)[0]; /*  ???   */
-
-
+        nz = INTEGER(Dim)[0];
 
     slot_dup(ans, x, Matrix_flistSym);
     slot_dup(ans, x, Matrix_permSym);
@@ -1884,8 +1857,7 @@ SEXP lmer_collapse(SEXP x)
     slot_dup(ans, x, Matrix_LSym);
     slot_dup(ans, x, Matrix_ZZpOSym);
     slot_dup(ans, x, Matrix_OmegaSym);
-    slot_dup(ans, x, Matrix_REMLSym);
-
+    slot_dup(ans, x, Matrix_methodSym);
     slot_dup(ans, x, Matrix_ZtZSym);
 
     slot_dup(ans, x, Matrix_cnamesSym);
@@ -1895,28 +1867,12 @@ SEXP lmer_collapse(SEXP x)
     slot_dup(ans, x, Matrix_GpSym);
     slot_dup(ans, x, Matrix_statusSym);
 
-    slot_dup(ans, x, Matrix_callSym);
-    slot_dup(ans, x, Matrix_termsSym);
-    slot_dup(ans, x, Matrix_assignSym);
-    slot_dup(ans, x, Matrix_fittedSym);
-    slot_dup(ans, x, Matrix_residualsSym);
-    slot_dup(ans, x, Matrix_frameSym);
-
-/*     Not in ssclme version: */
-/*         RXX = "matrix",  */
-/*         RZX = "matrix",  */
-/*         XtX = "matrix",  */
-/*         ZtX = "matrix",  */
-
-
-/*     So, removing from lmer version as well: */
-
-/*     slot_dup(ans, x, Matrix_RXXSym); */
-/*     slot_dup(ans, x, Matrix_RZXSym); */
-/*     slot_dup(ans, x, Matrix_XtXSym); */
-/*     slot_dup(ans, x, Matrix_ZtXSym); */
-
-/*     What about ZtZ ? */
+/*     slot_dup(ans, x, Matrix_callSym); */
+/*     slot_dup(ans, x, Matrix_termsSym); */
+/*     slot_dup(ans, x, Matrix_assignSym); */
+/*     slot_dup(ans, x, Matrix_fittedSym); */
+/*     slot_dup(ans, x, Matrix_residualsSym); */
+/*     slot_dup(ans, x, Matrix_frameSym); */
 
     INTEGER(GET_SLOT(ans, Matrix_ncSym))[nf] = 1;
     SET_SLOT(ans, Matrix_XtXSym, allocMatrix(REALSXP, 1, 1));
@@ -1930,7 +1886,45 @@ SEXP lmer_collapse(SEXP x)
     return ans;
 }
 
+/* Gauss-Hermite Quadrature x positions */
+static const double
+    GHQ_x1[1] = {0},
+    GHQ_w1[1] = {1},
+    GHQ_x2[1] = {1},
+    GHQ_w2[1] = {0.5},
+    GHQ_x3[2] = {1.7320507779261, 0},
+    GHQ_w3[2] = {0.166666666666667, 0.666666666666667},
+    GHQ_x4[2] = {2.3344141783872, 0.74196377160456},
+    GHQ_w4[2] = {0.0458758533899086, 0.454124131589555},
+    GHQ_x5[3] = {2.85696996497785, 1.35562615677371, 0},
+    GHQ_w5[3] = {0.0112574109895360, 0.222075915334214, 0.533333317311434},
+    GHQ_x6[3] = {3.32425737665988, 1.88917584542184, 0.61670657963811},
+    GHQ_w6[3] = {0.00255578432527774, 0.0886157433798025, 0.408828457274383},
+    GHQ_x7[4] = {3.7504396535397, 2.36675937022918, 1.15440537498316, 0},
+    GHQ_w7[4] = {0.000548268839501628, 0.0307571230436095, 0.240123171391455,
+		 0.457142843409801},
+    GHQ_x8[4] = {4.14454711519499, 2.80248581332504, 1.63651901442728,
+		 0.539079802125417},
+    GHQ_w8[4] = {0.000112614534992306, 0.0096352198313359, 0.117239904139746,
+		 0.373012246473389},
+    GHQ_x9[5] = {4.51274578616743, 3.20542894799789, 2.07684794313409,
+		 1.02325564627686, 0},
+    GHQ_w9[5] = {2.23458433364535e-05, 0.00278914123744297, 0.0499164052656755,
+		 0.244097495561989, 0.406349194142045},
+    GHQ_x10[5] = {4.85946274516615, 3.58182342225163, 2.48432579912153,
+		  1.46598906930182, 0.484935699216176},
+    GHQ_w10[5] = {4.31065250122166e-06, 0.000758070911538954, 0.0191115799266379,
+		  0.135483698910192, 0.344642324578594},
+    GHQ_x11[6] = {5.18800113558601, 3.93616653976536, 2.86512311160915,
+		  1.87603498804787, 0.928868981484148, 0},
+    GHQ_w11[6] = {8.12184954622583e-07, 0.000195671924393029, 0.0067202850336527,
+		  0.066138744084179, 0.242240292596812, 0.36940835831095};
 
+static const double
+    *GHQ_x[12] = {(double *) NULL, GHQ_x1, GHQ_x2, GHQ_x3, GHQ_x4, GHQ_x5,
+		  GHQ_x6, GHQ_x7, GHQ_x8, GHQ_x9, GHQ_x10, GHQ_x11},
+    *GHQ_w[12] = {(double *) NULL, GHQ_w1, GHQ_w2, GHQ_w3, GHQ_w4, GHQ_w5,
+		  GHQ_w6, GHQ_w7, GHQ_w8, GHQ_w9, GHQ_w10, GHQ_w11};
 
 /** 
  * Compute certain components of the Laplace likelihood approximation 
@@ -1947,78 +1941,30 @@ SEXP lmer_laplace_devComp(SEXP x) {
     int 
         *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	*Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
-        ione = 1, ntot,
-        i, j, k, nci, ncisqr, nlev, nf = length(Omg);
-    double 
-	*Omega, *bVi, *rani, *tmp, *tmp2, 
-        ans = 0, one = 1, 
-/*         tmp3,  */
-        zero = 0;
-
-
-/*     Rprintf("1. ans = %f\n", ans); */
+        i, ione = 1, nf = length(Omg);
+    double ans = 0, one = 1, zero = 0;
 
     for (i = 0; i < nf; i++) {
-        nci = nc[i];
-        ncisqr = nci * nci;
-        nlev = (Gp[i + 1] - Gp[i]) / nci;
-
-        rani = REAL(VECTOR_ELT(ranef, i));
-        bVi = REAL(VECTOR_ELT(bVar, i));
-        Omega = REAL(VECTOR_ELT(Omg, i));
-        tmp = Memcpy(Calloc(ncisqr, double), Omega, ncisqr);
+        int j, k, nci = nc[i];
+        int ncip1 = nci + 1, ncisqr = nci * nci,
+	    nlev = (Gp[i + 1] - Gp[i])/nci;
+	int ntot = nlev * nci;
+	double *bVi = REAL(VECTOR_ELT(bVar, i)),
+	    *tmp = Memcpy(Calloc(ncisqr, double),
+			  REAL(VECTOR_ELT(Omg, i)), ncisqr),
+	    *tmp2 = Calloc(ntot, double);
 
         F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
         if (j)
             error(_("Leading %d minor of Omega[[%d]] not positive definite"),
                   j, i + 1);
         for (j = 0; j < nci; j++) { /* 0.5 * nlev * logDet(Omega_i) */
-            ans += nlev * log(tmp[j * (nci + 1)]); /* (2 * 0.5) since factoring */
+            ans += nlev * log(tmp[j * ncip1]); /* (2 * 0.5) since factoring */
         }
-
-
-/*         Rprintf("2. ans = %f\n", ans); */
-
-
-        /* Also need 
-           \sum b' Omega b = (b' tmp)^2, 
-           where b = rows of rani. b is nlev x nci (FIXME: check)
-
-           Is there a LAPACK call that does this? Couldn't find one,
-           so I'll hand-code it for now.
-
-           The calculation boils down to (for k=1:nlev)
-
-           ans += sum(( tmp %*% b[k,] )^2)
-
-           This way, we can re-use Omega = tmp' tmp
-
-
-           Alternative: 
-           The calculation boils down to (for k=1:nlev)
-
-           ans += \sum_j=1^nci b[k,j]^2 * Omega[j,j];
-           ans += 2 \sum_{j<l} b[k,j] * b[k,l] * Omega[j,l];
-        */
-	ntot = nlev * nci;
-	tmp2 = Calloc(ntot, double);
-	F77_CALL(dgemm)("N", "T", &nlev, &nci, &nci, &one, rani, &nlev,
+	F77_CALL(dgemm)("N", "T", &nlev, &nci, &nci, &one,
+			REAL(VECTOR_ELT(ranef, i)), &nlev,
 			tmp, &nci, &zero, tmp2, &nlev);
         ans -= 0.5 * F77_CALL(ddot)(&ntot, tmp2, &ione, tmp2, &ione);
-        Free(tmp2);
-
-/*         Rprintf("3. ans = %f\n", ans); */
-
-
-/*         for (k = 0; k < nlev; k++) { */
-/*             for (j = 0; j < nci; j++) { */
-/*                 tmp2 = 0; */
-/*                 for (l = j; l < nci; l++) { */
-/*                     tmp2 += tmp[l * nci + j] * rani[l * nlev + k]; */
-/*                 } */
-/*                 ans += tmp2 * tmp2; */
-/*             } */
-/*         } */
 
         for (k = 0; k < nlev; k++) {
             Memcpy(tmp, bVi + k * ncisqr, ncisqr);
@@ -2026,75 +1972,36 @@ SEXP lmer_laplace_devComp(SEXP x) {
             if (j)
                 error(_("Leading %d minor of bVar[[%d]][,,%d] not positive definite"),
                       j, i + 1, k + 1);
-/*             tmp3 = 0; */
             for (j = 0; j < nci; j++) {
-/*                 Rprintf("\t5. tmp[%d] = %f\n",  */
-/*                         j * (nci + 1), */
-/*                         tmp[j * (nci + 1)]); */
-/*                 tmp3 += log(tmp[j * (nci + 1)]); */
-                ans += log(tmp[j * (nci + 1)]);
+                ans += log(tmp[j * ncip1]);
             }
-/*             ans += log(fabs(tmp3)); */
-/*             ans += tmp3; */
-/*             Rprintf("4. ans = %f (tmp3 = %f)\n", ans, tmp3); */
         }
-        Free(tmp);
+        Free(tmp); Free(tmp2);
     }
     UNPROTECT(1);
     return ScalarReal(ans);
+}
+				 
+/* R-callable drivers to test some utilities */
 
+SEXP lmer_Crosstab(SEXP flist)
+{
+    SEXP val;
+    int i, nf = length(flist), nobs;
+    int *nc = Calloc(nf, int);
 
-
-    /*
-  ranefs <- .Call("lmer_ranef", reducedObj, PACKAGE = "Matrix")
-  ## ans <- ans + reducedObj@devComp[2]/2 # log-determinant of Omega
-
-  Omega <- reducedObj@Omega
-  for (i in seq(along = ranefs))
-  {
-      ## contribution for random effects (get it working,
-      ## optimize later) 
-      ## symmetrize RE variance
-      Omega[[i]] <- Omega[[i]] + t(Omega[[i]])
-      diag(Omega[[i]]) <- diag(Omega[[i]]) / 2
-
-      ## want log of `const det(Omega) exp(-1/2 b'
-      ## Omega b )` i.e., const + log det(Omega) - .5
-      ## * (b' Omega b)
-
-      ## FIXME: need to adjust for sigma^2 for appropriate
-      ## models (easy).  These are all the b'Omega b,
-      ## summed as they eventually need to be.  Think of
-      ## this as sum(rowSums((ranefs[[i]] %*% Omega[[i]])
-      ## * ranefs[[i]]))
-
-      ranef.loglik.det <- nrow(ranefs[[i]]) *
-          determinant(Omega[[i]], logarithm = TRUE)$modulus/2
-      ranef.loglik.re <-
-          -sum((ranefs[[i]] %*% Omega[[i]]) * ranefs[[i]])/2
-      ranef.loglik <- ranef.loglik.det + ranef.loglik.re
-
-      ## Jacobian adjustment
-      log.jacobian <-
-          sum(log(abs(apply(reducedObj@bVar[[i]],
-            3,
-
-            ## next line depends on
-            ## whether bVars are variances
-            ## or Cholesly factors
-
-            ## function(x) sum(diag(x)))
-### bug?            function(x) sum(diag( La.chol( x ) )))
-            function(x) prod(diag( La.chol( x ) )))
-      )))
-
-      ## the constant terms from the r.e. and the final
-      ## Laplacian integral cancel out both being:
-      ## ranef.loglik.constant <- 0.5 * length(ranefs[[i]]) * log(2 * base::pi)
-
-      ans <- ans + ranef.loglik + log.jacobian
-  }
-
-    */
-
+    if (!(nf > 0 && isNewList(flist)))
+	error(_("flist must be a non-empty list"));
+    nobs = length(VECTOR_ELT(flist, 0));
+    if (nobs < 1) error(_("flist[[1]] must be a non-null factor"));
+    for (i = 0; i < nf; i++) {
+	SEXP fi = VECTOR_ELT(flist, i);
+	if (!(isFactor(fi) && length(fi) == nobs))
+	    error(_("flist[[%d]] must be a factor of length %d"),
+		  i + 1, nobs);
+	nc[i] = 1;
+    }
+    val = lmer_crosstab(flist, nobs, nc);
+    Free(nc);
+    return val;
 }
