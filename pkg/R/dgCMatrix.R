@@ -69,6 +69,17 @@ setMethod("image", "dgCMatrix",
           })
 
 setMethod("%*%", signature(x = "dgCMatrix", y = "dgeMatrix"),
-          function(x, y) .Call("dgCMatrix_matrix_mm", x, y, TRUE, FALSE),
+          function(x, y) .Call("csc_matrix_mm", x, y, TRUE, FALSE),
           valueClass = "dgeMatrix")
 
+setMethod("%*%", signature(x = "dgCMatrix", y = "matrix"),
+          function(x, y) .Call("csc_matrix_mm", x, y, FALSE, FALSE),
+          valueClass = "dgeMatrix")
+
+setMethod("%*%", signature(x = "dgeMatrix", y = "dgCMatrix"),
+          function(x, y) .Call("csc_matrix_mm", y, x, TRUE, TRUE),
+          valueClass = "dgeMatrix")
+
+setMethod("%*%", signature(x = "matrix", y = "dgCMatrix"),
+          function(x, y) .Call("csc_matrix_mm", y, x, FALSE, TRUE),
+          valueClass = "dgeMatrix")
