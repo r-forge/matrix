@@ -19,8 +19,7 @@ options(show.signif.stars = FALSE)
              OrchardSprays, poisson()))
 
 ## Laplace approximation
-if (FALSE) {
-    (fm4 <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
-                 OrchardSprays, poisson(), method = "Laplace",
-                 control = list(niterEM=30)))
-}
+(fm4 <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
+             OrchardSprays, poisson(), method = "Laplace",
+             control = list(msMaxIter=200)))
+

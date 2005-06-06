@@ -3,7 +3,7 @@
 \alias{fixef}
 \alias{fixed.effects}
 \alias{fixef,ANY-method}
-\alias{fixef,lmer-method}
+\alias{fixef,mer-method}
 \alias{fixef,glmer-method}
 \title{Extract Fixed Effects}
 \description{
