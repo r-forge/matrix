@@ -182,7 +182,7 @@ int csc_unsorted_columns(int ncol, const int p[], const int i[])
 void csc_sort_columns(int ncol, const int p[], int i[], double x[])
 {
     int j, maxdiff, *ord;
-    double *dd;
+    double *dd = (double *) NULL;
 
     maxdiff = -1;
     for (j = 0; j < ncol; j++) {
