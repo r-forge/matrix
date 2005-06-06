@@ -2,6 +2,7 @@
 \docType{class}
 \alias{glmer-class}
 \alias{lmer-class}
+\alias{mer-class}
 \alias{summary.glmer-class}
 \alias{summary.lmer-class}
 \alias{VarCorr,lmer-method}
@@ -11,11 +12,11 @@
 \alias{coerce,lmer,dtTMatrix-method}
 \alias{confint,lmer-method}
 \alias{deviance,glmer-method}
-\alias{deviance,lmer-method}
+\alias{deviance,mer-method}
 \alias{fitted,lmer-method}
 \alias{formula,lmer-method}
 \alias{logLik,glmer-method}
-\alias{logLik,lmer-method}
+\alias{logLik,mer-method}
 \alias{plot,lmer.coef-method}
 \alias{plot,lmer.ranef-method}
 \alias{resid,lmer-method}

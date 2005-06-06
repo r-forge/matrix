@@ -16,6 +16,9 @@ setClass("VarCorr",
                         useScale="logical"),
          prototype = list(scale = 1.0, useScale = TRUE))
 
+## FIXME: change the REML slot in mer to a character method slot
+##        remove the method slot from glmer
+
 ## mixed effects representation
 setClass("mer",
          representation(
@@ -27,7 +30,7 @@ setClass("mer",
                         L = "list",     # list of blocks of L
                         ZZpO = "list",  # list of diagonal blocks of Z'Z+Omega
                         Omega = "list", # list of relative precision matrices
-                        REML = "logical", 
+                        method = "character", # parameter estimation method
                         RXX = "matrix", # Augmented RXX component or its inverse
                         RZX = "matrix", # Augmented RZX component or its inverse
                         XtX = "matrix", # Original X'X matrix
@@ -54,8 +57,7 @@ setClass("lmer",
                                 
 ## Representation of a generalized linear mixed effects model
 setClass("glmer",
-         representation(family = "family", glmmll = "numeric",
-                        method = "character", fixed = "numeric"),
+         representation(family = "family", glmmll = "numeric", fixed = "numeric"),
          contains = "lmer")
 
 setClass("summary.lmer",

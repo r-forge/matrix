@@ -1,8 +1,7 @@
 \name{lmer}
 \docType{genericFunction}
 \alias{lmer}
-\alias{lmer,formula,ANY,ANY-method}
-\alias{lmer,formula,ANY,missing-method}
+\alias{lmer,formula-method}
 \title{Fit linear mixed-effects models}
 \description{
   This generic function fits a linear mixed-effects model with nested or
