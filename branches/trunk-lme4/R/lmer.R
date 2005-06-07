@@ -1,4 +1,4 @@
-## Methods for lmer and for the objects that it produces
+# Methods for lmer and for the objects that it produces
 
 ## Some utilities
 
@@ -7,22 +7,22 @@ Lind <- function(i,j) {
     ((i - 1) * i)/2 + j
 }
 
-Dhalf <- function(from) {
-    D <- from@D
-    nf <- length(D)
-    Gp <- from@Gp
-    res <- array(0, rep(Gp[nf+1],2))
-    for (i in 1:nf) {
-        DD <- D[[i]]
-        dd <- dim(DD)
-        for (k in 1:dd[3]) {
-            mm <- array(DD[ , , k], dd[1:2])
-            base <- Gp[i] + (k - 1)*dd[1]
-            res[cbind(c(base + row(mm)), c(base + col(mm)))] <- c(mm)
-        }
-    }
-    res
-}
+##Dhalf <- function(from) {
+##    D <- from@D
+##    nf <- length(D)
+##    Gp <- from@Gp
+##    res <- array(0, rep(Gp[nf+1],2))
+##    for (i in 1:nf) {
+##        DD <- D[[i]]
+##        dd <- dim(DD)
+##        for (k in 1:dd[3]) {
+##            mm <- array(DD[ , , k], dd[1:2])
+##            base <- Gp[i] + (k - 1)*dd[1]
+##            res[cbind(c(base + row(mm)), c(base + col(mm)))] <- c(mm)
+##        }
+##    }
+##    res
+##}
 
 lmerControl <-                            # Control parameters for lmer
   function(maxIter = 50,
@@ -83,13 +83,16 @@ setMethod("lmer", signature(formula = "formula"),
           mf <- mf[c(1, m)]
           frame.form <- subbars(formula) # substitute `+' for `|'
           fixed.form <- nobars(formula)  # remove any terms with `|'
-          if (inherits(fixed.form, "name")) # RHS is empty - add a constant
+          if (inherits(fixed.form, "name")) # RHS is empty - use a constant
               fixed.form <- substitute(foo ~ 1, list(foo = fixed.form))
           environment(fixed.form) <- environment(frame.form) <- environment(formula)
           mf$formula <- fixed.form
           mf$x <- mf$model <- mf$y <- TRUE
           mf[[1]] <- as.name("glm")
           glm.fit <- eval(mf, parent.frame())
+          family <- glm.fit$family
+          x <- glm.fit$x
+          y <- as.double(glm.fit$y)
 
           ## evaluate a model frame for fixed and random effects
           mf$formula <- frame.form
@@ -114,56 +117,63 @@ setMethod("lmer", signature(formula = "formula"),
           if (any(diff(nlev) > 0)) {
               random <- random[rev(order(nlev))]
           }
-          ## Create the model matrices and a mixed-effects representation
+
+          ## Create the model matrices and a mixed-effects representation (mer)
           mmats <- c(lapply(random, "[[", 1),
                      .fixed = list(cbind(glm.fit$x, .response = glm.fit$y)))
           mer <- .Call("lmer_create", lapply(random, "[[", 2),
                        mmats, method, PACKAGE = "Matrix")
-          if (lmm) {
+          if (lmm) {                    ## linear mixed model
               .Call("lmer_initial", mer, PACKAGE="Matrix")
               .Call("lmer_ECMEsteps", mer, cv$niterEM, cv$EMverbose, PACKAGE = "Matrix")
               LMEoptimize(mer) <- cv
               fits <- .Call("lmer_fitted", mer, mmats, TRUE, PACKAGE = "Matrix")
-              return(new("lmer", mer, frame = glm.fit$model,
+              return(new("lmer",
+                         mer, frame = if (frame) frm else data.frame(),
                          terms = glm.fit$terms,
-                         assign = attr(glm.fit$x, "assign"), call = match.call(),
+                         assign = attr(x, "assign"),
+                         call = match.call(),
                          residuals = unname(model.response(frm) - fits),
                          fitted = fits))
           }
 
           ## The rest of the function applies to generalized linear mixed models
           gVerb <- getOption("verbose")
-          family <- glm.fit$family
+          etaold <- eta <- glm.fit$linear.predictors
+          wts <- glm.fit$prior.weights
+          offset <- glm.fit$offset
+          if (is.null(offset)) offset <- numeric(length(eta))
+
+          dev.resids <- quote(family$dev.resids(y, mu, wts))
+          linkinv <- quote(family$linkinv(eta))
+          mu.eta <- quote(family$mu.eta(eta))
+          variance <- quote(family$variance(mu))
+
           mmo <- mmats
           mmats[[1]][1,1] <- mmats[[1]][1,1]
           conv <- FALSE
           firstIter <- TRUE
           msMaxIter.orig <- cv$msMaxIter
-          responseIndex <- ncol(mmats$.fixed)
-          etaold <- eta <- glm.fit$linear.predictors
-          weights <- glm.fit$prior.weights
-          offset <- glm.fit$offset
-          if (is.null(offset)) offset <- numeric(length(eta))
 
           for (iter in seq(length = cv$PQLmaxIt))
           {
-              mu <- family$linkinv(eta)
-              dmu.deta <- family$mu.eta(eta)
-              ## weights (note: weights is already square-rooted)
-              w <- weights * dmu.deta / sqrt(family$variance(mu))
-              ## adjusted response (should be comparable to X \beta, not including offset
-              z <- eta - offset + (mmo$.fixed[, responseIndex] - mu) / dmu.deta
-              .Call("nlme_weight_matrix_list",
-                    mmo, w, z, mmats, PACKAGE="Matrix")
+              mu <- eval(linkinv) # family$linkinv(eta)
+              dmu.deta <- eval(mu.eta) # family$mu.eta(eta)
+              ## weights (note: wts is already square-rooted)
+              .Call("glmer_weight_matrix_list", mmo,
+                    wts * dmu.deta / sqrt(eval(variance)), ## weights 
+                    eta - offset + (y - mu) / dmu.deta, ## working residual
+                    mmats, PACKAGE="Matrix")
               .Call("lmer_update_mm", mer, mmats, PACKAGE="Matrix")
               if (firstIter) {
                   .Call("lmer_initial", mer, PACKAGE="Matrix")
                   if (gVerb) cat(" PQL iterations convergence criterion\n")
               }
-              .Call("lmer_ECMEsteps", mer, cv$niterEM, cv$EMverbose, PACKAGE = "Matrix")
+              .Call("lmer_ECMEsteps", mer, cv$niterEM, cv$EMverbose,
+                    PACKAGE = "Matrix")
               LMEoptimize(mer) <- cv
-              eta[] <- offset + .Call("lmer_fitted", mer,
-                                      mmo, TRUE, PACKAGE = "Matrix")
+              eta <- offset + .Call("lmer_fitted", mer, mmo, TRUE,
+                                    PACKAGE = "Matrix")
               crit <- max(abs(eta - etaold)) / (0.1 + max(abs(eta)))
               if (gVerb) cat(sprintf("%03d: %#11g\n", as.integer(iter), crit))
               ## use this to determine convergence
@@ -181,63 +191,53 @@ setMethod("lmer", signature(formula = "formula"),
           if (!conv) warning("IRLS iterations for glmm did not converge")
           cv$msMaxIter <- msMaxIter.orig
 
-          reducedObj <- .Call("lmer_collapse", mer, PACKAGE = "Matrix")
-          reducedMmats.unadjusted <- mmo
-          reducedMmats.unadjusted$.fixed <-
-              reducedMmats.unadjusted$.fixed[, responseIndex, drop = FALSE]
-          reducedMmats <- mmats
-          reducedMmats$.fixed <-
-              reducedMmats$.fixed[, responseIndex, drop = FALSE]
+          rdobj <- .Call("lmer_collapse", mer, PACKAGE = "Matrix")
+          unwtd <- mmo
+          unwtd$.fixed <- as.matrix(y)
+          wtd <- unwtd
+          wtd[[1]][1,1] <- wtd[[1]][1,1]
           fixInd <- seq(along = fixef(mer))
-
-          bhat <- function(pars = NULL) { # 1:(responseIndex-1) - beta, rest - theta
-              if (is.null(pars)) {
-                  off <- drop(glm.fit$x %*% fixef(mer)) + offset
+          env <- environment()
+          bhat <- function(pars) { #pars[fixInd] == beta, pars[-fixInd] == theta
+              if (cv$analyticHessian) {
+                  .Call("glmer_bhat_iterate", pars, cv$tolerance,
+                        env, PACKAGE = "Matrix")
               } else {
-                  .Call("lmer_coefGets", reducedObj,
-                        as.double(pars[responseIndex:length(pars)]),
+                  etaold <- off <- eta <- drop(glm.fit$x %*% pars[fixInd]) + offset
+                  .Call("lmer_coefGets", rdobj, as.double(pars[-fixInd]),
                         2, PACKAGE = "Matrix")
-                  off <- drop(glm.fit$x %*% pars[fixInd]) + offset
-              }
-              niter <- 20
-              conv <- FALSE
-              
-              eta <- offset + .Call("lmer_fitted", mer, mmo, TRUE, PACKAGE = "Matrix")
-              etaold <- eta
-              
-              for (iter in seq(length = niter)) {
-                  mu <- family$linkinv(eta)
-                  dmu.deta <- family$mu.eta(eta)
-                  w <- weights * dmu.deta / sqrt(family$variance(mu))
-                  z <- eta - off + (reducedMmats.unadjusted$.fixed[, 1]
-                                    - mu) / dmu.deta 
-                  .Call("nlme_weight_matrix_list",
-                        reducedMmats.unadjusted, w, z, reducedMmats,
-                        PACKAGE="Matrix")
-                  .Call("lmer_update_mm", reducedObj, reducedMmats,
-                        PACKAGE="Matrix")
-                  eta[] <-
-                      off + .Call("lmer_fitted", reducedObj, 
-                                  reducedMmats.unadjusted, TRUE,
-                                  PACKAGE = "Matrix")
-                  if (max(abs(eta - etaold)) <
-                      (0.1 + max(abs(eta))) * cv$tolerance) {
-                      conv <- TRUE
-                      break
+                  niter <- 20
+                  conv <- FALSE
+                  for (iter in seq(length = niter)) {
+                      mu <- eval(linkinv)
+                      dmu.deta <- eval(mu.eta)
+                      .Call("glmer_weight_matrix_list", unwtd,
+                            wts * dmu.deta / sqrt(eval(variance)),
+                            eta - off + (y - mu)/dmu.deta, wtd,
+                            PACKAGE="Matrix")
+                      .Call("lmer_update_mm", rdobj, wtd,
+                            PACKAGE="Matrix")
+                      eta <- off + .Call("lmer_fitted", rdobj,
+                                         unwtd, TRUE, PACKAGE = "Matrix")
+                      if (max(abs(eta - etaold)) <
+                          (0.1 + max(abs(eta))) * cv$tolerance) {
+                          conv <- TRUE
+                          break
+                      }
+                      etaold <- eta
                   }
-                  etaold[] <- eta
+                  if (!conv) warning("iterations for bhat did not converge")
               }
-              if (!conv) warning("iterations for bhat did not converge")
-              
               ## bhat doesn't really need to return anything, we
-              ## just want the side-effect of modifying reducedObj
+              ## just want the side-effect of modifying rdobj
               ## In particular, we are interested in
-              ## ranef(reducedObj) and reducedObj@bVar (?). But
+              ## ranef(rdobj) and rdobj@bVar (?). But
               ## the mu-scale response will be useful for log-lik
               ## calculations later, so return them anyway
               
-              invisible(family$linkinv(eta)) 
+              invisible(eval(linkinv))
           }
+
 
           ## function that calculates log likelihood (the thing that
           ## needs to get evaluated at each Gauss-Hermite location)
@@ -247,12 +247,9 @@ setMethod("lmer", signature(formula = "formula"),
           ## this is for the Laplace approximation only. GH is more
           ## complicated 
 
-          devLaplace <- function(pars = NULL) {
-              ## FIXME: This actually returns half the deviance.
-              mu <- bhat(pars = pars)
-              ## gets correct values of bhat and bvars. As a side
-              ## effect, mu now has fitted values
-          
+          devLaplace <- function(pars) {
+              mu <- bhat(pars)
+
               ## GLM family log likelihood (upto constant ?)(log scale)
               ## FIXME: need to adjust for sigma^2 for appropriate models (not trivial!)
 
@@ -260,9 +257,12 @@ setMethod("lmer", signature(formula = "formula"),
               
               ## log lik from observations given fixed and random effects
               ## get deviance, then multiply by -1/2 (since deviance = -2 log lik)
-              sum(family$dev.resids(y = glm.fit$y,
-                                    mu = mu, wt = weights(glm.fit)^2))/2 -
-                  .Call("lmer_laplace_devComp", reducedObj, PACKAGE = "Matrix")
+              ## FIXME: This actually returns half the deviance.
+              dev <- sum(family$dev.resids(y = glm.fit$y,
+                                           mu = mu, wt = wts^2))/2
+              lap <- .Call("glmer_Laplace_devComp", rdobj, PACKAGE = "Matrix")
+              if (gVerb) cat(sprintf("  %#11g %#11g\n", dev, lap))
+              dev - lap
           }
 
           if (method == "Laplace") {
@@ -299,11 +299,11 @@ setMethod("lmer", signature(formula = "formula"),
                   cat(paste("optim convergence code",
                             optimRes$convergence, "\n"))
                   cat("Fixed effects:\n")
-                  print(fixef(mer))
-                  print(optimRes$par[seq(length = responseIndex - 1)])
-                  cat("(Box constrained) variance coefficients:\n")
-                  print(.Call("lmer_coef", mer, 2, PACKAGE = "Matrix"))
-                  print(optimRes$par[responseIndex:length(optimRes$par)] )
+                  #print(fixef(mer))  ## no longer correct values
+                  print(optimRes$par[fixInd])
+                  cat("(box constrained) variance coefficients:\n")
+                  #print(.Call("lmer_coef", mer, 2, PACKAGE = "Matrix"))
+                  print(optimRes$par[-fixInd])
               }
           } else {
               optpars <- c(fixef(mer),
@@ -868,3 +868,40 @@ setMethod("with", signature(data = "lmer"),
 
 setMethod("terms", signature(x = "lmer"),
           function(x, ...) x@terms)
+
+setMethod("show", signature(object="VarCorr"),
+          function(object)
+      {
+          digits <- max(3, getOption("digits") - 2)
+          useScale <- length(object@useScale) > 0 && object@useScale[1]
+          sc <- ifelse(useScale, object@scale,  1.)
+          reStdDev <- c(lapply(object@reSumry,
+                               function(x, sc)
+                               sc*x@stdDev,
+                               sc = sc), list(Residual = sc))
+          reLens <- unlist(c(lapply(reStdDev, length)))
+          reMat <- array('', c(sum(reLens), 4),
+          list(rep('', sum(reLens)),
+               c("Groups", "Name", "Variance", "Std.Dev.")))
+          reMat[1+cumsum(reLens)-reLens, 1] <- names(reLens)
+          reMat[,2] <- c(unlist(lapply(reStdDev, names)), "")
+          reMat[,3] <- format(unlist(reStdDev)^2, digits = digits)
+          reMat[,4] <- format(unlist(reStdDev), digits = digits)
+          if (any(reLens > 1)) {
+              maxlen <- max(reLens)
+              corr <-
+                  do.call("rbind",
+                          lapply(object@reSumry,
+                                 function(x, maxlen) {
+                                     cc <- format(round(x, 3), nsmall = 3)
+                                     cc[!lower.tri(cc)] <- ""
+                                     nr <- dim(cc)[1]
+                                     if (nr >= maxlen) return(cc)
+                                     cbind(cc, matrix("", nr, maxlen-nr))
+                                 }, maxlen))
+              colnames(corr) <- c("Corr", rep("", maxlen - 1))
+              reMat <- cbind(reMat, rbind(corr, rep("", ncol(corr))))
+          }
+          if (!useScale) reMat <- reMat[-nrow(reMat),]
+          print(reMat, quote = FALSE)
+      })
