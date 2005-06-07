@@ -33,6 +33,8 @@ SEXP lmer_variances(SEXP x);
 SEXP lmer_Crosstab(SEXP flist);
 SEXP lmer_firstDer(SEXP x, SEXP val);
 SEXP lmer_collapse(SEXP x);
-SEXP lmer_laplace_devComp(SEXP x);
+SEXP glmer_Laplace_devComp(SEXP x);
+SEXP glmer_bhat_iterate(SEXP pars, SEXP tolp, SEXP rho);
+SEXP glmer_weight_matrix_list(SEXP unwt, SEXP w, SEXP z, SEXP wtd);
 
 #endif
