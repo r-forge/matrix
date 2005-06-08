@@ -2,10 +2,7 @@ import("stats", "Matrix")
 importFrom("graphics", "plot")
 
 export(
-       "BIC",
-       "VarCorr",
        "convertFromS3groupedData",
-       "fixef",
        "getCovariateFormula",
        "getGroups",
        "getGroupsFormula",
@@ -14,13 +11,8 @@ export(
        "groupedData",
        "gsummary",
        "lmList",
-       "lmer",
-       "lmerControl",
-       "pooledSD",
-       "ranef"
+       "pooledSD"
        )
-
-exportClasses("VarCorr", "glmer", "lmList", "lmer", "mer", "summary.lmer")
 
 exportMethods(
               "BIC",
