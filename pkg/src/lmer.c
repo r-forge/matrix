@@ -1803,34 +1803,35 @@ SEXP lmer_variances(SEXP x)
 }
 
 /** 
- * Calculate and return the fitted values.
+ * Calculate the fitted values.
  * 
  * @param x pointer to an lmer object
  * @param mmats list of model matrices
- * @param useRf pointer to a logical scalar indicating if the random
+ * @param useRand logical scalar indicating if the random
  * effects should be used
+ * @param val array to hold the fitted values
  * 
  * @return pointer to a numeric array of fitted values
  */
-SEXP lmer_fitted(SEXP x, SEXP mmats, SEXP useRf)
+static double*
+lmer_fits(SEXP x, SEXP mmats, int useRand, double val[])
 {
     SEXP flist = GET_SLOT(x, Matrix_flistSym);
     int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)), ione = 1,
 	nf = length(flist), nobs = length(VECTOR_ELT(flist, 0));
     int p = nc[nf] - 1;
-    SEXP val = PROTECT(allocVector(REALSXP, nobs));
     double one = 1.0, zero = 0.0;
 
     if (p > 0) {
 	F77_CALL(dgemm)("N", "N", &nobs, &ione, &p, &one,
 			REAL(VECTOR_ELT(mmats, nf)), &nobs,
 			REAL(PROTECT(lmer_fixef(x))), &p,
-			&zero, REAL(val), &nobs);
+			&zero, val, &nobs);
 	UNPROTECT(1);
     } else {
-	AZERO(REAL(val), nobs);
+	AZERO(val, nobs);
     }
-    if (asLogical(useRf)) {
+    if (useRand) {
 	int i;
 	SEXP b = PROTECT(lmer_ranef(x));
 	for (i = 0; i < nf; i++) {
@@ -1846,13 +1847,12 @@ SEXP lmer_fitted(SEXP x, SEXP mmats, SEXP useRf)
 		F77_CALL(dgemm)("N", "T", &nn, &ione, &nci,
 				&one, mm + j, &nobs,
 				REAL(bi) + (lev - 1), &mi,
-				&one, REAL(val) + j, &nobs);
+				&one, &val[j], &nobs);
 		j += nn;
 	    }
 	}
 	UNPROTECT(1);
     }
-    UNPROTECT(1);
     return val;
 }
 
@@ -1999,30 +1999,6 @@ SEXP glmer_Laplace_devComp(SEXP x) {
     return ScalarReal(ans);
 }
 				 
-/* R-callable drivers to test some utilities */
-
-SEXP lmer_Crosstab(SEXP flist)
-{
-    SEXP val;
-    int i, nf = length(flist), nobs;
-    int *nc = Calloc(nf, int);
-
-    if (!(nf > 0 && isNewList(flist)))
-	error(_("flist must be a non-empty list"));
-    nobs = length(VECTOR_ELT(flist, 0));
-    if (nobs < 1) error(_("flist[[1]] must be a non-null factor"));
-    for (i = 0; i < nf; i++) {
-	SEXP fi = VECTOR_ELT(flist, i);
-	if (!(isFactor(fi) && length(fi) == nobs))
-	    error(_("flist[[%d]] must be a factor of length %d"),
-		  i + 1, nobs);
-	nc[i] = 1;
-    }
-    val = lmer_crosstab(flist, nobs, nc);
-    Free(nc);
-    return val;
-}
-
 static void
 glmer_wt_lst(SEXP MLin, double *wts, double *adjst, int n, SEXP MLout)
 {
@@ -2061,35 +2037,6 @@ glmer_wt_lst(SEXP MLin, double *wts, double *adjst, int n, SEXP MLout)
     for (i = 0; i < n; i++)
 	REAL(lastM)[j*n + i] = adjst[i] * wts[i];
 }    
-
-/**
- * Produce a weighted copy of the matrices in MLin in the storage
- * allocated to MLout
- *
- * @param MLin input matrix list
- * @param wts real vector of weights
- * @param adjst adjusted response
- * @param MLout On input a list of matrices of the same dimensions as MLin.
- *
- * @return MLout with its contents overwritten by a weighted copy of
- * MLin according to wts with adjst overwriting the response.
- */
-SEXP glmer_weight_matrix_list(SEXP MLin, SEXP wts, SEXP adjst, SEXP MLout)
-{
-    int n, nf;
-    
-    if (!(isNewList(MLin) && isReal(wts) && isReal(adjst) && isNewList(MLout)))
-	error(_("Incorrect argument type"));
-    nf = LENGTH(MLin);
-    if (LENGTH(MLout) != nf)
-	error(_("Lengths of MLin (%d) and MLout (%d) must match"), nf,
-	      LENGTH(MLout));
-    n = LENGTH(wts);
-    if (LENGTH(adjst) != n)
-	error(_("Expected adjst to have length %d, got %d"), n, LENGTH(adjst));
-    glmer_wt_lst(MLin, REAL(wts), REAL(adjst), n, MLout);
-    return MLout;
-}
 
 static
 SEXP find_and_check(SEXP rho, SEXP nm, SEXPTYPE mode, int len)
@@ -2226,4 +2173,80 @@ SEXP glmer_bhat_iterate(SEXP pars, SEXP tolp, SEXP rho)
     if (!conv) warning(_("iterations for bhat did not converge"));
     Free(etaold); Free(off); Free(w); Free(z);
     return R_NilValue;
+}
+
+/* R-callable drivers to test some utilities */
+
+SEXP lmer_Crosstab(SEXP flist)
+{
+    SEXP val;
+    int i, nf = length(flist), nobs;
+    int *nc = Calloc(nf, int);
+
+    if (!(nf > 0 && isNewList(flist)))
+	error(_("flist must be a non-empty list"));
+    nobs = length(VECTOR_ELT(flist, 0));
+    if (nobs < 1) error(_("flist[[1]] must be a non-null factor"));
+    for (i = 0; i < nf; i++) {
+	SEXP fi = VECTOR_ELT(flist, i);
+	if (!(isFactor(fi) && length(fi) == nobs))
+	    error(_("flist[[%d]] must be a factor of length %d"),
+		  i + 1, nobs);
+	nc[i] = 1;
+    }
+    val = lmer_crosstab(flist, nobs, nc);
+    Free(nc);
+    return val;
+}
+
+/**
+ * Produce a weighted copy of the matrices in MLin in the storage
+ * allocated to MLout
+ *
+ * @param MLin input matrix list
+ * @param wts real vector of weights
+ * @param adjst adjusted response
+ * @param MLout On input a list of matrices of the same dimensions as MLin.
+ *
+ * @return MLout with its contents overwritten by a weighted copy of
+ * MLin according to wts with adjst overwriting the response.
+ */
+SEXP glmer_weight_matrix_list(SEXP MLin, SEXP wts, SEXP adjst, SEXP MLout)
+{
+    int n, nf;
+    
+    if (!(isNewList(MLin) && isReal(wts) && isReal(adjst) && isNewList(MLout)))
+	error(_("Incorrect argument type"));
+    nf = LENGTH(MLin);
+    if (LENGTH(MLout) != nf)
+	error(_("Lengths of MLin (%d) and MLout (%d) must match"), nf,
+	      LENGTH(MLout));
+    n = LENGTH(wts);
+    if (LENGTH(adjst) != n)
+	error(_("Expected adjst to have length %d, got %d"), n, LENGTH(adjst));
+    glmer_wt_lst(MLin, REAL(wts), REAL(adjst), n, MLout);
+    return MLout;
+}
+
+/** 
+ * Return the fitted values.
+ * 
+ * @param x pointer to an lmer object
+ * @param mmats list of model matrices
+ * @param useRf pointer to a logical scalar indicating if the random
+ * effects should be used
+ * 
+ * @return pointer to a numeric array of fitted values
+ */
+
+SEXP lmer_fitted(SEXP x, SEXP mmats, SEXP useRf)
+{
+    SEXP ans = 
+	PROTECT(allocVector(REALSXP,
+			    LENGTH(VECTOR_ELT(GET_SLOT(x, Matrix_flistSym),
+					      0))));
+
+    lmer_fits(x, mmats, asLogical(useRf), REAL(ans));
+    UNPROTECT(1);
+    return ans;
 }

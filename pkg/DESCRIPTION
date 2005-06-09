@@ -7,7 +7,7 @@ Maintainer: Douglas Bates <bates@stat.wisc.edu>
 Description: Classes and methods for numerical linear algebra
     using Lapack, LDL, and Metis.
 Depends: R (>= 2.1.0), methods
-Imports: graphics, lattice, grid
+Imports: graphics, lattice, grid, stats
 LazyLoad: yes
 LazyData: yes
 License: GPL version 2 or later.
