@@ -47,12 +47,3 @@ if (!isGeneric("gsummary")) {
                standardGeneric("gsummary"))
 }
 
-##if (!isGeneric("param")) {              # not exported
-##    setGeneric("param", function(object, ...) standardGeneric("param"))
-##}
-
-##if (!isGeneric("param<-")) {              # not exported
-##    setGeneric("param<-", function(object, ..., value)
-##               standardGeneric("param<-"))
-##}
-
