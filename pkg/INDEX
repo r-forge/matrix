@@ -28,7 +28,6 @@ fixef                   Extract Fixed Effects
 Hilbert                 Generate a Hilbert matrix
 lmer                    Fit linear mixed-effects models
 lmer-class              Mixed model representations
-lmerControl             Control values for lme
 lsparseMatrix-class     Sparse logical matrices
 lu                      Triangular Decomposition of a Square Matrix
 LU-class                LU Matrix Decompositions

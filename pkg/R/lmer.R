@@ -270,9 +270,9 @@ setMethod("lmer", signature(formula = "formula"),
           }
 
           devLaplace <- function(pars) {
-              mu <- bhat(pars)
               ## FIXME: This actually returns half the deviance.
-              dev <- sum(eval(dev.resids))/2
+              bhat(pars)
+              dev <- sum(family$dev.resids(y, mu, wts*wts))/2
               lap <- .Call("glmer_Laplace_devComp", rdobj, PACKAGE = "Matrix")
               if (gVerb) cat(sprintf("  %#11g %#11g\n", dev, lap))
               dev - lap
@@ -309,8 +309,7 @@ setMethod("lmer", signature(formula = "formula"),
               }
 
               if (getOption("verbose")) {
-                  cat(paste("optim convergence code",
-                            optimRes$convergence, "\n"))
+                  cat(paste("convergence message", optimRes$message, "\n"))
                   cat("Fixed effects:\n")
                   print(optimRes$par[fixInd])
                   cat("(box constrained) variance coefficients:\n")

@@ -28,7 +28,7 @@ export(
        )
 
 ## lmer-related
-export("BIC", "VarCorr", "fixef", "lmer", "lmerControl")
+export("lmer")
 
 exportClasses(
 	      "BunchKaufman",
@@ -119,6 +119,6 @@ exportMethods(
 	      )
 
 ## lmer-related
-exportMethods("BIC", "anova", "confint", "deviance", "fitted", "fixef",
-              "formula", "logLik", "plot", "ranef", "residuals", "resid",
-              "summary", "update", "vcov", "with")
+exportMethods("BIC", "anova", "coef", "confint", "deviance", "fitted", "fixef",
+              "formula", "lmer", "logLik", "plot", "ranef", "residuals", "resid",
+              "summary", "update", "vcov", "VarCorr", "with")
