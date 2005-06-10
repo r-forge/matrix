@@ -179,10 +179,11 @@ setMethod("lmer", signature(formula = "formula"),
           gVerb <- getOption("verbose")
           etaold <- eta <- glm.fit$linear.predictors
           wts <- glm.fit$prior.weights
+          wtssqr <- wts * wts
           offset <- glm.fit$offset
           if (is.null(offset)) offset <- numeric(length(eta))
 
-          dev.resids <- quote(family$dev.resids(y, mu, wts*wts))
+          dev.resids <- quote(family$dev.resids(y, mu, wtssqr))
           linkinv <- quote(family$linkinv(eta))
           mu.eta <- quote(family$mu.eta(eta))
           variance <- quote(family$variance(mu))
@@ -229,66 +230,26 @@ setMethod("lmer", signature(formula = "formula"),
           if (!conv) warning("IRLS iterations for glmm did not converge")
           cv$msMaxIter <- msMaxIter.orig
 
-          rdobj <- .Call("lmer_collapse", mer, PACKAGE = "Matrix")
-          unwtd <- mmo
-          unwtd$.fixed <- as.matrix(y)
-          wtd <- unwtd
-          wtd[[1]][1,1] <- wtd[[1]][1,1]
-          fixInd <- seq(along = fixef(mer))
+          fixInd <- seq(ncol(x))
+          ## pars[fixInd] == beta, pars[-fixInd] == theta
+          PQLpars <- c(fixef(mer),
+                       .Call("lmer_coef", mer, 2, PACKAGE = "Matrix"))
           env <- environment()
-          bhat <- function(pars) { #pars[fixInd] == beta, pars[-fixInd] == theta
-#              if (cv$analyticHessian) {
-                  .Call("glmer_bhat_iterate", pars, cv$tolerance,
-                        env, PACKAGE = "Matrix")
-##              } else {
-##                  etaold <- off <- eta <- drop(glm.fit$x %*% pars[fixInd]) + offset
-##                  .Call("lmer_coefGets", rdobj, as.double(pars[-fixInd]),
-##                        2, PACKAGE = "Matrix")
-##                  niter <- 20
-##                  conv <- FALSE
-##                  for (iter in seq(length = niter)) {
-##                      mu <- eval(linkinv)
-##                      dmu.deta <- eval(mu.eta)
-##                      .Call("glmer_weight_matrix_list", unwtd,
-##                            wts * dmu.deta / sqrt(eval(variance)),
-##                            eta - off + (y - mu)/dmu.deta, wtd,
-##                            PACKAGE="Matrix")
-##                      .Call("lmer_update_mm", rdobj, wtd,
-##                            PACKAGE="Matrix")
-##                      eta <- off + .Call("lmer_fitted", rdobj,
-##                                         unwtd, TRUE, PACKAGE = "Matrix")
-##                      if (max(abs(eta - etaold)) <
-##                          (0.1 + max(abs(eta))) * cv$tolerance) {
-##                          conv <- TRUE
-##                          break
-##                      }
-##                      etaold <- eta
-##                  }
-##                  if (!conv) warning("iterations for bhat did not converge")
-##              }
-##              invisible(eval(linkinv))
-          }
 
-          devLaplace <- function(pars) {
-              ## FIXME: This actually returns half the deviance.
-              bhat(pars)
-              dev <- sum(family$dev.resids(y, mu, wts*wts))/2
-              lap <- .Call("glmer_Laplace_devComp", rdobj, PACKAGE = "Matrix")
-              if (gVerb) cat(sprintf("  %#11g %#11g\n", dev, lap))
-              dev - lap
-          }
+          devLaplace <- function(pars)
+              .Call("lmer_devLaplace", pars, cv$tolerance, env, PACKAGE = "Matrix")
 
           if (method == "Laplace") {
               nc <- mer@nc
-              const <- c(rep(FALSE, length(fixef(mer))),
+              const <- c(rep(FALSE, length(fixInd)),
                          unlist(lapply(nc[1:(length(nc) - 2)],
                                        function(k) 1:((k*(k+1))/2) <= k)))
+              ## set flag to skip fixed-effects in subsequent mer computations
+              mer@nc[length(mmats)] <- -mer@nc[length(mmats)]
               RV <- lapply(R.Version()[c("major", "minor")], as.numeric)
               if (RV$major == 2 && RV$minor >= 2.0) {
                   optimRes <-
-                      nlminb(c(fixef(mer),
-                               .Call("lmer_coef", mer, 2, PACKAGE = "Matrix")),
-                             devLaplace,
+                      nlminb(PQLpars, devLaplace,
                              lower = ifelse(const, 5e-10, -Inf),
                              control = list(trace = getOption("verbose"),
                              iter.max = cv$msMaxIter))
@@ -297,9 +258,7 @@ setMethod("lmer", signature(formula = "formula"),
                       warning("nlminb failed to converge")
               } else {
                   optimRes <-
-                      optim(c(fixef(mer),
-                              .Call("lmer_coef", mer, 2, PACKAGE = "Matrix")),
-                            devLaplace, method = "L-BFGS-B",
+                      optim(PQLpars, devLaplace, method = "L-BFGS-B",
                             lower = ifelse(const, 5e-10, -Inf),
                             control = list(trace = getOption("verbose"),
                                  reltol = cv$msTol, maxit = cv$msMaxIter))
@@ -308,26 +267,27 @@ setMethod("lmer", signature(formula = "formula"),
                       warning("optim failed to converge")
               }
 
-              if (getOption("verbose")) {
+              if (gVerb) {
                   cat(paste("convergence message", optimRes$message, "\n"))
                   cat("Fixed effects:\n")
                   print(optimRes$par[fixInd])
                   cat("(box constrained) variance coefficients:\n")
                   print(optimRes$par[-fixInd])
-              }
+              } 
+              loglik <- -optimRes$objective/2
+              fxd <- optpars[fixInd]
+              names(fxd) <- names(PQLpars)[fixInd]
+              ## reset flag to skip fixed-effects in mer computations
+              mer@nc[length(mmats)] <- -mer@nc[length(mmats)]
           } else {
-              optpars <- c(fixef(mer),
-                           .Call("lmer_coef", mer, 2, PACKAGE = "Matrix"))
+              loglik <- -devLaplace(PQLpars)/2
+              fxd <- PQLpars[fixInd]
           }
 
-          loglik <- -devLaplace(optpars)
           attributes(loglik) <- attributes(logLik(mer))
-          ff <- optpars[fixInd]
-          names(ff) <- names(fixef(mer))
-          .Call("lmer_coefGets", mer, optpars[-fixInd], 2, PACKAGE = "Matrix")
           new("lmer", mer, frame = frm, terms = glm.fit$terms,
               assign = attr(glm.fit$x, "assign"), call = match.call(),
-              family = family, logLik = loglik, fixed = ff)
+              family = family, logLik = loglik, fixed = fxd)
       })
 
 setReplaceMethod("LMEoptimize", signature(x="mer", value="list"),
@@ -387,10 +347,9 @@ setMethod("ranef", signature(object = "lmer"),
           })
 
 setMethod("fixef", signature(object = "mer"),
-          function(object, ...) {
-              val <- .Call("lmer_fixef", object, PACKAGE = "Matrix")
-              val[-length(val)]
-          })
+          function(object, ...)
+              .Call("lmer_fixef", object, PACKAGE = "Matrix"))
+
 
 setMethod("fixef", signature(object = "lmer"),
           function(object, ...) object@fixed)
