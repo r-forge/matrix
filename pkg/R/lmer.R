@@ -2,13 +2,13 @@
 
 ## Some utilities
 
+## Return the index into the packed lower triangle
 Lind <- function(i,j) {
     if (i < j) stop(paste("Index i=", i,"must be >= index j=", j))
     ((i - 1) * i)/2 + j
 }
 
-# Return the pairs of expressions separated by vertical bars
-
+## Return the pairs of expressions separated by vertical bars
 findbars <- function(term)
 {
     if (is.name(term) || is.numeric(term)) return(NULL)
@@ -19,8 +19,8 @@ findbars <- function(term)
     c(findbars(term[[2]]), findbars(term[[3]]))
 }
 
-# Return the formula omitting the pairs of expressions separated by vertical bars
-
+## Return the formula omitting the pairs of expressions
+## that are separated by vertical bars
 nobars <- function(term)
 {
     # FIXME: is the is.name in the condition redundant?
@@ -42,8 +42,7 @@ nobars <- function(term)
     term
 }
 
-# Substitute the '+' function for the '|' function
-
+## Substitute the '+' function for the '|' function
 subbars <- function(term)
 {
     if (is.name(term) || is.numeric(term)) return(term)
@@ -58,7 +57,8 @@ subbars <- function(term)
     term
 }
     
-lmerControl <-                            # Control parameters for lmer
+## Control parameters for lmer
+lmerControl <-
   function(maxIter = 50,
            msMaxIter = 200,
            tolerance = sqrt((.Machine$double.eps)),
@@ -68,18 +68,18 @@ lmerControl <-                            # Control parameters for lmer
            PQLmaxIt = 30,
            EMverbose = getOption("verbose"),
            analyticGradient = TRUE,
-           analyticHessian=FALSE)
+           analyticHessian = FALSE)
 {
-    list(maxIter = maxIter,
-         msMaxIter = msMaxIter,
-         tolerance = tolerance,
-         niterEM = niterEM,
-         msTol = msTol,
-         msVerbose = msVerbose,
-         PQLmaxIt = PQLmaxIt,
-         EMverbose=EMverbose,
-         analyticHessian=analyticHessian,
-         analyticGradient=analyticGradient)
+    list(maxIter = as.integer(maxIter),
+         msMaxIter = as.integer(msMaxIter),
+         tolerance = as.double(tolerance),
+         niterEM = as.integer(niterEM),
+         msTol = as.double(msTol),
+         msVerbose = as.logical(msVerbose),
+         PQLmaxIt = as.integer(PQLmaxIt),
+         EMverbose = as.logical(EMverbose),
+         analyticGradient = as.logical(analyticGradient),
+         analyticHessian = as.logical(analyticHessian))
 }
 
 setMethod("lmer", signature(formula = "formula"),
@@ -185,67 +185,34 @@ setMethod("lmer", signature(formula = "formula"),
 
           dev.resids <- quote(family$dev.resids(y, mu, wtssqr))
           linkinv <- quote(family$linkinv(eta))
+          mu <- eval(linkinv)
           mu.eta <- quote(family$mu.eta(eta))
           variance <- quote(family$variance(mu))
+          LMEopt <- get("LMEoptimize<-")
+          doLMEopt <- quote(LMEopt(x = mer, value = cv))
 
-          mmo <- mmats
-          mmats[[1]][1,1] <- mmats[[1]][1,1]
-          conv <- FALSE
-          firstIter <- TRUE
-          msMaxIter.orig <- cv$msMaxIter
-
-          for (iter in seq(length = cv$PQLmaxIt))
-          {
-              mu <- eval(linkinv) # family$linkinv(eta)
-              dmu.deta <- eval(mu.eta) # family$mu.eta(eta)
-              ## weights (note: wts is already square-rooted)
-              .Call("glmer_weight_matrix_list", mmo,
-                    wts * dmu.deta / sqrt(eval(variance)), ## weights 
-                    eta - offset + (y - mu) / dmu.deta, ## working residual
-                    mmats, PACKAGE="Matrix")
-              .Call("lmer_update_mm", mer, mmats, PACKAGE="Matrix")
-              if (firstIter) {
-                  .Call("lmer_initial", mer, PACKAGE="Matrix")
-                  if (gVerb) cat(" PQL iterations convergence criterion\n")
-              }
-              .Call("lmer_ECMEsteps", mer, cv$niterEM, cv$EMverbose,
-                    PACKAGE = "Matrix")
-              LMEoptimize(mer) <- cv
-              eta <- offset + .Call("lmer_fitted", mer, mmo, TRUE,
-                                    PACKAGE = "Matrix")
-              crit <- max(abs(eta - etaold)) / (0.1 + max(abs(eta)))
-              if (gVerb) cat(sprintf("%03d: %#11g\n", as.integer(iter), crit))
-              ## use this to determine convergence
-              if (crit < cv$tolerance) {
-                  conv <- TRUE
-                  break
-              }
-              etaold[] <- eta
-              if (firstIter) {          # Change the number of EM and optimization 
-                  cv$niterEM <- 2       # iterations for subsequent PQL iterations.
-                  cv$msMaxIter <- 10
-                  firstIter <- FALSE
-              }
-          }
-          if (!conv) warning("IRLS iterations for glmm did not converge")
-          cv$msMaxIter <- msMaxIter.orig
+          GSpt <- .Call("glmer_init", environment())
+          .Call("glmer_PQL", GSpt)  # obtain PQL estimates
 
           fixInd <- seq(ncol(x))
           ## pars[fixInd] == beta, pars[-fixInd] == theta
           PQLpars <- c(fixef(mer),
                        .Call("lmer_coef", mer, 2, PACKAGE = "Matrix"))
-          env <- environment()
+          ## set flag to skip fixed-effects in subsequent calls
+          mer@nc[length(mmats)] <- -mer@nc[length(mmats)]
+          
+          nAGQ <- 0
+          if (method == "Laplace") nAGQ <- 1
 
           devLaplace <- function(pars)
-              .Call("lmer_devLaplace", pars, cv$tolerance, env, PACKAGE = "Matrix")
+              .Call("glmer_devLaplace", pars, GSpt, PACKAGE = "Matrix")
 
           if (method == "Laplace") {
               nc <- mer@nc
               const <- c(rep(FALSE, length(fixInd)),
                          unlist(lapply(nc[1:(length(nc) - 2)],
                                        function(k) 1:((k*(k+1))/2) <= k)))
-              ## set flag to skip fixed-effects in subsequent mer computations
-              mer@nc[length(mmats)] <- -mer@nc[length(mmats)]
+
               RV <- lapply(R.Version()[c("major", "minor")], as.numeric)
               if (RV$major == 2 && RV$minor >= 2.0) {
                   optimRes <-
@@ -277,12 +244,13 @@ setMethod("lmer", signature(formula = "formula"),
               loglik <- -optimRes$objective/2
               fxd <- optpars[fixInd]
               names(fxd) <- names(PQLpars)[fixInd]
-              ## reset flag to skip fixed-effects in mer computations
-              mer@nc[length(mmats)] <- -mer@nc[length(mmats)]
           } else {
               loglik <- -devLaplace(PQLpars)/2
               fxd <- PQLpars[fixInd]
           }
+
+          ## reset flag to skip fixed-effects in subsequent calls
+          mer@nc[length(mmats)] <- -mer@nc[length(mmats)]
 
           attributes(loglik) <- attributes(logLik(mer))
           new("lmer", mer, frame = frm, terms = glm.fit$terms,

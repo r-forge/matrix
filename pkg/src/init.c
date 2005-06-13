@@ -130,8 +130,9 @@ static R_CallMethodDef CallEntries[] = {
     {"dtrMatrix_rcond", (DL_FUNC) &dtrMatrix_rcond, 2},
     {"dtrMatrix_solve", (DL_FUNC) &dtrMatrix_solve, 1},
     {"dtrMatrix_validate", (DL_FUNC) &dtrMatrix_validate, 1},
-    {"glmer_Laplace_devComp", (DL_FUNC) &glmer_Laplace_devComp, 1},
-    {"glmer_weight_matrix_list", (DL_FUNC) &glmer_weight_matrix_list, 4},
+    {"glmer_devLaplace", (DL_FUNC) &glmer_devLaplace, 2},
+    {"glmer_init", (DL_FUNC) &glmer_init, 1},
+    {"glmer_PQL", (DL_FUNC) &glmer_PQL, 1},
     {"lapack_qr", (DL_FUNC) &lapack_qr, 2},
     {"lCholCMatrix_solve", (DL_FUNC) &lCholCMatrix_solve, 1},
     {"lCholCMatrix_lgCMatrix_solve", (DL_FUNC) &lCholCMatrix_lgCMatrix_solve, 2},
@@ -148,7 +149,6 @@ static R_CallMethodDef CallEntries[] = {
     {"lmer_coef", (DL_FUNC) &lmer_coef, 2},
     {"lmer_coefGets", (DL_FUNC) &lmer_coefGets, 3},
     {"lmer_create", (DL_FUNC) &lmer_create, 3},
-    {"lmer_devLaplace", (DL_FUNC) &lmer_devLaplace, 3},
     {"lmer_factor", (DL_FUNC) &lmer_factor, 1},
     {"lmer_firstDer", (DL_FUNC) &lmer_firstDer, 2},
     {"lmer_fitted", (DL_FUNC) &lmer_fitted, 3},
@@ -162,7 +162,6 @@ static R_CallMethodDef CallEntries[] = {
     {"lmer_update_mm", (DL_FUNC) &lmer_update_mm, 2},
     {"lmer_validate", (DL_FUNC) &lmer_validate, 1},
     {"lmer_variances", (DL_FUNC) &lmer_variances, 1},
-    {"lmer_collapse", (DL_FUNC) &lmer_collapse, 1},
     {"lsCMatrix_chol", (DL_FUNC) &lsCMatrix_chol, 2},
     {"lsCMatrix_trans", (DL_FUNC) &lsCMatrix_trans, 1},
     {"lsCMatrix_validate", (DL_FUNC) &lsCMatrix_validate, 1},
@@ -221,11 +220,4 @@ void R_init_Matrix(DllInfo *dll)
     Matrix_uploSym = install("uplo");
     Matrix_xSym = install("x");
     Matrix_zSym = install("z");
-    Matrix_REMLSym = install("REML");
-    Matrix_callSym = install("call");
-    Matrix_termsSym = install("terms");
-    Matrix_assignSym = install("assign");
-    Matrix_fittedSym = install("fitted");
-    Matrix_residualsSym = install("residuals");
-    Matrix_frameSym = install("frame");
 }
