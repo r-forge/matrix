@@ -32,7 +32,8 @@ SEXP lmer_gradient(SEXP x, SEXP pType);
 SEXP lmer_variances(SEXP x);
 SEXP lmer_Crosstab(SEXP flist);
 SEXP lmer_firstDer(SEXP x, SEXP val);
-SEXP glmer_devLaplace(SEXP pars, SEXP GSpt);
+SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp);
+SEXP glmer_finalize(SEXP GSpt);
 SEXP glmer_init(SEXP rho);
 SEXP glmer_PQL(SEXP GSp);
 
