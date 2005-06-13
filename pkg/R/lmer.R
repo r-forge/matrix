@@ -177,15 +177,16 @@ setMethod("lmer", signature(formula = "formula"),
 
           ## The rest of the function applies to generalized linear mixed models
           gVerb <- getOption("verbose")
-          etaold <- eta <- glm.fit$linear.predictors
+          eta <- glm.fit$linear.predictors
           wts <- glm.fit$prior.weights
           wtssqr <- wts * wts
           offset <- glm.fit$offset
           if (is.null(offset)) offset <- numeric(length(eta))
+          off <- numeric(length(eta))
+          mu <- numeric(length(eta))
 
           dev.resids <- quote(family$dev.resids(y, mu, wtssqr))
           linkinv <- quote(family$linkinv(eta))
-          mu <- eval(linkinv)
           mu.eta <- quote(family$mu.eta(eta))
           variance <- quote(family$variance(mu))
           LMEopt <- get("LMEoptimize<-")
@@ -202,12 +203,15 @@ setMethod("lmer", signature(formula = "formula"),
           mer@nc[length(mmats)] <- -mer@nc[length(mmats)]
           
           nAGQ <- 0
-          if (method == "Laplace") nAGQ <- 1
 
           devLaplace <- function(pars)
-              .Call("glmer_devLaplace", pars, GSpt, PACKAGE = "Matrix")
+              .Call("glmer_devAGQ", pars, GSpt, 1, PACKAGE = "Matrix")
+
+          devAGQ <- function(pars)
+              .Call("glmer_devAGQ", pars, GSpt, nAGQ, PACKAGE = "Matrix")
 
           if (method == "Laplace") {
+              nAGQ <- 1
               nc <- mer@nc
               const <- c(rep(FALSE, length(fixInd)),
                          unlist(lapply(nc[1:(length(nc) - 2)],
@@ -223,15 +227,17 @@ setMethod("lmer", signature(formula = "formula"),
                   optpars <- optimRes$par
                   if (optimRes$convergence != 0)
                       warning("nlminb failed to converge")
+                  loglik <- -optimRes$objective/2
               } else {
                   optimRes <-
                       optim(PQLpars, devLaplace, method = "L-BFGS-B",
                             lower = ifelse(const, 5e-10, -Inf),
                             control = list(trace = getOption("verbose"),
-                                 reltol = cv$msTol, maxit = cv$msMaxIter))
+                                           maxit = cv$msMaxIter))
                   optpars <- optimRes$par
                   if (optimRes$convergence != 0)
                       warning("optim failed to converge")
+                  loglik <- -optimRes$value
               }
 
               if (gVerb) {
@@ -241,7 +247,6 @@ setMethod("lmer", signature(formula = "formula"),
                   cat("(box constrained) variance coefficients:\n")
                   print(optimRes$par[-fixInd])
               } 
-              loglik <- -optimRes$objective/2
               fxd <- optpars[fixInd]
               names(fxd) <- names(PQLpars)[fixInd]
           } else {
@@ -249,6 +254,8 @@ setMethod("lmer", signature(formula = "formula"),
               fxd <- PQLpars[fixInd]
           }
 
+          .Call("glmer_finalize", GSpt, PACKAGE = "Matrix")
+          
           ## reset flag to skip fixed-effects in subsequent calls
           mer@nc[length(mmats)] <- -mer@nc[length(mmats)]
 
