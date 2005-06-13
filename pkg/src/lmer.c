@@ -974,7 +974,7 @@ SEXP lmer_invert(SEXP x)
 	    error(_("Leading minor of size %d of downdated X'X,is indefinite"),
 		  i + 1);
 
-	/* RZX := - RZX %*% RXX */
+				/* RZX := - RZX %*% RXX */
 	F77_CALL(dtrmm)("R", "U", "N", "N", &dims[0], &ncX, &minus1,
 			RXX, &ncX, RZX, &dims[0]);
 	for(i = 0; i < nf; i++) {
@@ -984,7 +984,7 @@ SEXP lmer_invert(SEXP x)
 		*RZXi = RZX + Gp[i];
 
 	    nlevs[i] = (Gp[i+1] - Gp[i])/nci;
-	    /* D_i := D_i^{-1}; RZX_i := D_i %*% RZX_i */
+				/* D_i := D_i^{-1}; RZX_i := D_i %*% RZX_i */
 	    if (nci == 1) {
 		for (j = 0; j < nlevs[i]; j++) {
 		    Di[j] = 1./Di[j];
@@ -1002,7 +1002,7 @@ SEXP lmer_invert(SEXP x)
 	    }
 	}
 
-	/* RZX := L^{-T} %*% RZX */
+				/* RZX := L^{-T} %*% RZX */
 	internal_sm(LFT, TRN, nf, Gp, ncX, 1.0, LP, RZX, dims[0]);
 
 	alloc_tmp_ind(nf, nc, nlevs, ParP, tmp, ind);
@@ -1858,6 +1858,34 @@ SEXP lmer_variances(SEXP x)
     return Omg;
 }
 
+static double*
+fitted_ranef(SEXP flist, SEXP mmats, SEXP b,
+	     const int nc[], double val[])
+{
+    int i, ione = 1, nf = LENGTH(flist),
+	nobs = LENGTH(VECTOR_ELT(flist, 0));
+    double one = 1;
+    
+    for (i = 0; i < nf; i++) {
+	SEXP bi = VECTOR_ELT(b, i);
+	int mi = INTEGER(getAttrib(bi, R_DimSymbol))[0];
+	int *ff = INTEGER(VECTOR_ELT(flist, i)), j, nci = nc[i];
+	double *mm = REAL(VECTOR_ELT(mmats, i));
+
+	for (j = 0; j < nobs; ) {
+	    int nn = 1, lev = ff[j];
+	    /* check for adjacent rows with same factor level */
+	    while ((j + nn) < nobs && ff[j + nn] == lev) nn++; 
+	    F77_CALL(dgemm)("N", "T", &nn, &ione, &nci,
+			    &one, mm + j, &nobs,
+			    REAL(bi) + (lev - 1), &mi,
+			    &one, &val[j], &nobs);
+	    j += nn;
+	}
+    }
+    return val;
+}
+    
 /** 
  * Calculate the fitted values.
  * 
@@ -1884,25 +1912,8 @@ internal_fitted(SEXP x, SEXP mmats, int useRand, double val[])
 			   REAL(fixef), &p, &zero, val, &nobs);
     else AZERO(val, nobs);
     if (useRand) {
-	int i;
-	SEXP b = PROTECT(lmer_ranef(x));
-	for (i = 0; i < nf; i++) {
-	    SEXP bi = VECTOR_ELT(b, i);
-	    int mi = INTEGER(getAttrib(bi, R_DimSymbol))[0];
-	    int *ff = INTEGER(VECTOR_ELT(flist, i)), j, nci = nc[i];
-	    double *mm = REAL(VECTOR_ELT(mmats, i));
-
-	    for (j = 0; j < nobs; ) {
-		int nn = 1, lev = ff[j];
-		/* check for adjacent rows with same factor level */
-		while ((j + nn) < nobs && ff[j + nn] == lev) nn++; 
-		F77_CALL(dgemm)("N", "T", &nn, &ione, &nci,
-				&one, mm + j, &nobs,
-				REAL(bi) + (lev - 1), &mi,
-				&one, &val[j], &nobs);
-		j += nn;
-	    }
-	}
+	fitted_ranef(flist, mmats, PROTECT(lmer_ranef(x)),
+		     nc, val);
 	UNPROTECT(1);
     }
     UNPROTECT(1);
@@ -1910,7 +1921,7 @@ internal_fitted(SEXP x, SEXP mmats, int useRand, double val[])
 }
 
 /** 
- * Return the fitted values.
+ * Return the fitted values as an SEXP
  * 
  * @param x pointer to an lmer object
  * @param mmats list of model matrices
@@ -1926,53 +1937,6 @@ SEXP lmer_fitted(SEXP x, SEXP mmats, SEXP useRf)
     SEXP ans = PROTECT(allocVector(REALSXP, nobs));
 
     internal_fitted(x, mmats, asLogical(useRf), REAL(ans));
-    UNPROTECT(1);
-    return ans;
-}
-
-/** 
- * Copy an lmer object collapsing the fixed effects slots to the response only.
- * 
- * @param x pointer to an lmer object
- * 
- * @return a duplicate of x with the fixed effects slots collapsed to the response only
- */
-SEXP lmer_collapse(SEXP x)
-{
-    SEXP 
-        ans = PROTECT(NEW_OBJECT(MAKE_CLASS("lmer"))),
-	Omega = GET_SLOT(x, Matrix_OmegaSym),
-	Dim = getAttrib(GET_SLOT(x, Matrix_ZtXSym), R_DimSymbol);
-    int 
-        nf = length(Omega), 
-        nz = INTEGER(Dim)[0];
-
-    slot_dup(ans, x, Matrix_flistSym);
-    slot_dup(ans, x, Matrix_permSym);
-    slot_dup(ans, x, Matrix_ParentSym);
-    slot_dup(ans, x, Matrix_DSym);
-    slot_dup(ans, x, Matrix_bVarSym);
-    slot_dup(ans, x, Matrix_LSym);
-    slot_dup(ans, x, Matrix_ZZpOSym);
-    slot_dup(ans, x, Matrix_OmegaSym);
-    slot_dup(ans, x, Matrix_methodSym);
-    slot_dup(ans, x, Matrix_ZtZSym);
-
-    slot_dup(ans, x, Matrix_cnamesSym);
-    slot_dup(ans, x, Matrix_devCompSym);
-    slot_dup(ans, x, Matrix_devianceSym);
-    slot_dup(ans, x, Matrix_ncSym);
-    slot_dup(ans, x, Matrix_GpSym);
-    slot_dup(ans, x, Matrix_statusSym);
-
-    INTEGER(GET_SLOT(ans, Matrix_ncSym))[nf] = 1;
-    SET_SLOT(ans, Matrix_XtXSym, allocMatrix(REALSXP, 1, 1));
-    REAL(GET_SLOT(ans, Matrix_XtXSym))[0] = NA_REAL;
-    SET_SLOT(ans, Matrix_RXXSym, allocMatrix(REALSXP, 1, 1));
-    REAL(GET_SLOT(ans, Matrix_RXXSym))[0] = NA_REAL;
-    SET_SLOT(ans, Matrix_ZtXSym, allocMatrix(REALSXP, nz, 1));
-    SET_SLOT(ans, Matrix_RZXSym, allocMatrix(REALSXP, nz, 1));
-    LOGICAL(GET_SLOT(ans, Matrix_statusSym))[0] = 0;
     UNPROTECT(1);
     return ans;
 }
@@ -2074,7 +2038,7 @@ SEXP glmer_Laplace_devComp(SEXP x) {
 }
 				 
 static void
-glmer_wt_lst(SEXP MLin, double *wts, double *adjst, int n, SEXP MLout)
+internal_weight_list(SEXP MLin, double *wts, double *adjst, int n, SEXP MLout)
 {
     int i, j, nf = LENGTH(MLin);
     SEXP lastM;
@@ -2152,9 +2116,8 @@ SEXP eval_check_store(SEXP fcn, SEXP rho, SEXP vv)
     return vv;
 }
 
-static
-SEXP eval_check(SEXP fcn, SEXP rho, SEXPTYPE mode, int len)
-{
+static SEXP
+eval_check(SEXP fcn, SEXP rho, SEXPTYPE mode, int len) {
     SEXP v = PROTECT(eval(fcn, rho));
     if (TYPEOF(v) != mode || LENGTH(v) != len)
 	error(_("fcn produced mode %d, length %d - wanted mode %d, length %d"),
@@ -2163,16 +2126,317 @@ SEXP eval_check(SEXP fcn, SEXP rho, SEXPTYPE mode, int len)
     return v;
 }
 
-#define BHAT_NITER 20
+static SEXP
+get_named_list_element(SEXP list, char *str) {
+    SEXP names = getAttrib(list, R_NamesSymbol);
+    int i;
 
-SEXP lmer_devLaplace(SEXP pars, SEXP tolp, SEXP rho)
+    for (i = 0; i < LENGTH(list); i++)
+	if(strcmp(CHAR(STRING_ELT(names, i)), str) == 0)
+	    return(VECTOR_ELT(list, i));
+    return R_NilValue;
+}
+
+typedef struct glmer_struct
 {
-    SEXP dev_resids, eta, linkinv, mu, mu_eta, offset, rdobj,
-	unwtd, variance, wts, wtd, x, y;
-    int conv, i, ii, ione = 1, n, *nc, nf, p;
+    SEXP cv;         /* control values */
+    SEXP mer;	     /* mixed-effects representation */
+    SEXP rho;        /* where to evaluate the calls */
+    SEXP y;          /* response vector (REALSXP) */
+    SEXP eta;        /* linear predictor */
+    SEXP mu;         /* mean vector */
+    SEXP wts;        /* prior weights */
+    SEXP offset;     /* offset for original glm problem */
+    SEXP off;        /* offset for random effects only */
+    SEXP unwtd;      /* unweighted model matrices */
+    SEXP wtd;        /* weighted model matrices */
+    SEXP linkinv;    /* expression for inverse link evaluation */
+    SEXP mu_eta;     /* expression for dmu/deta evaluation */
+    SEXP LMEopt;     /* expression for LME optimization */
+    SEXP dev_resids; /* expression for deviance residuals */
+    SEXP var;        /* expression for variance evaluation */
+    SEXP x;          /* fixed-effects model matrix */
+    int n;	     /* length of the response vector */
+    int p;	     /* length of fixed effects vector */
+    int nf;	     /* number of grouping factors */
+} glmer_struct, *GlmerStruct;
+
+SEXP glmer_init(SEXP rho) {
+    GlmerStruct GS;
+    int *dims;
+    SEXP wtdSym = install("wtd"), offSym = install("off");
+    
+    GS = (GlmerStruct) R_alloc(1, sizeof(glmer_struct));
+    if (!isEnvironment(rho))
+	error(_("`rho' must be an environment"));
+    GS->rho = rho;
+    GS->y = find_and_check(rho, install("y"), REALSXP, 0);
+    if ((GS->n = LENGTH(GS->y)) < 1)
+	error(_("`%s' must be a nonempty, numeric vector"),
+	      "y");
+    GS->mer = find_and_check(rho, install("mer"), VECSXP, 0);
+    GS->nf = LENGTH(GET_SLOT(GS->mer, Matrix_flistSym));
+    GS->cv = find_and_check(rho, install("cv"), VECSXP, 0);
+    GS->mu = find_and_check(rho, install("mu"), REALSXP, GS->n);
+    GS->offset = find_and_check(rho, install("offset"),
+				REALSXP, GS->n);
+    defineVar(offSym, duplicate(GS->offset), rho);
+    GS->off = find_and_check(rho, install("off"), REALSXP, GS->n);
+    GS->x = find_and_check(rho, install("x"), REALSXP, 0);
+    if (!isMatrix(GS->x))
+	error(_("%s must be a model matrix"), "x");
+    dims = INTEGER(getAttrib(GS->x, R_DimSymbol));
+    if (dims[0] != GS->n)
+	error(_("nrow(%s) must be %d"), "x", GS->n);
+    GS->p = dims[1];
+    GS->eta = find_and_check(rho, install("eta"),
+			     REALSXP, GS->n);
+    GS->unwtd = find_and_check(rho, install("mmats"),
+			       VECSXP, GS->nf + 1);
+    defineVar(wtdSym, duplicate(GS->unwtd), rho);
+    GS->wtd = find_and_check(rho, wtdSym, VECSXP, GS->nf + 1);
+    GS->wts = find_and_check(rho, install("wts"), REALSXP, GS->n);
+    GS->linkinv = find_and_check(rho, install("linkinv"),
+				 LANGSXP, 0);
+    GS->mu_eta = find_and_check(rho, install("mu.eta"),
+				LANGSXP, 0);
+    GS->var = find_and_check(rho, install("variance"),
+			     LANGSXP, 0);
+    GS->LMEopt = find_and_check(rho, install("doLMEopt"),
+				LANGSXP, 0);
+    GS->dev_resids = find_and_check(rho, install("dev.resids"),
+				    LANGSXP, 0);
+    return ScalarInteger((int) GS);
+}
+
+static void
+reweight_update(GlmerStruct GS) {
+    SEXP dmu_deta, var;
+    int i;
+    double *w = Calloc(GS->n, double),
+	*z = Calloc(GS->n, double);
+				/* reweight mer */
+    eval_check_store(GS->linkinv, GS->rho, GS->mu);
+    dmu_deta = PROTECT(eval_check(GS->mu_eta, GS->rho,
+				  REALSXP, GS->n));
+    var = PROTECT(eval_check(GS->var, GS->rho,
+			     REALSXP, GS->n));
+    for (i = 0; i < GS->n; i++) {
+	w[i] = REAL(GS->wts)[i] *
+	    REAL(dmu_deta)[i]/sqrt(REAL(var)[i]);
+	z[i] = REAL(GS->eta)[i] - REAL(GS->off)[i] +
+	    (REAL(GS->y)[i] - REAL(GS->mu)[i]) /
+	    REAL(dmu_deta)[i];
+    }
+    internal_weight_list(GS->unwtd, w, z, GS->n, GS->wtd);
+    lmer_update_mm(GS->mer, GS->wtd);
+    UNPROTECT(2);
+    Free(w); Free(z);
+}
+
+/* update eta and etaold and evaluate convergence criterion */
+static double
+conv_crit(GlmerStruct GS, double etaold[]) {
+    double *fitted = Calloc(GS->n, double),
+	max_eta = -1, max_diff = -1;
+    int i;
+
+    internal_fitted(GS->mer, GS->unwtd, 1, fitted);
+    for (i = 0; i < GS->n; i++) {
+	double abs_eta, abs_diff;
+	    
+	REAL(GS->eta)[i] = REAL(GS->off)[i] + fitted[i];
+	abs_eta = fabs(REAL(GS->eta)[i]);
+	if (abs_eta > max_eta) max_eta = abs_eta;
+	abs_diff = fabs(REAL(GS->eta)[i] - etaold[i]);
+	if (abs_diff > max_diff) max_diff = abs_diff;
+	etaold[i] = REAL(GS->eta)[i];
+    }
+    Free(fitted);
+
+    return max_diff / (0.1 + max_eta);
+}
+
+SEXP glmer_PQL(SEXP GSp)
+{
+    SEXP niterEM, EMverbose;
+    int conv, i, maxiter;
+    double *etaold, tol;
+    GlmerStruct GS = (GlmerStruct) asInteger(GSp);
+	
+    niterEM = get_named_list_element(GS->cv, "niterEM");
+    EMverbose = get_named_list_element(GS->cv, "EMverbose");
+    tol = asReal(get_named_list_element(GS->cv, "tolerance"));
+    maxiter = asInteger(get_named_list_element(GS->cv, "maxIter"));
+
+    etaold = Memcpy(Calloc(GS->n, double), REAL(GS->eta), GS->n);
+    for (i = 0, conv = 0; i < maxiter && !conv; i++) {
+	reweight_update(GS);
+				/* in the first fit initialize */
+	if (!i) lmer_initial(GS->mer); 
+				/* solve the PQL problem */
+	lmer_ECMEsteps(GS->mer, niterEM, EMverbose);
+	if (!i) *INTEGER(niterEM) = 2; /* fewer EM after first fit */
+	eval(GS->LMEopt, GS->rho);
+				/* check for convergence */
+	conv = conv_crit(GS, etaold) < tol;
+    }
+    if (!conv)
+	warning(_("IRLS iterations for PQL did not converge"));
+
+    Free(etaold);
+    return R_NilValue;
+}
+
+SEXP glmer_devLaplace(SEXP pars, SEXP GSp)
+{
+    SEXP devr;
+    int conv, i, ione = 1, maxiter, verb;
+    double *etaold, ans, crit, one = 1, tol, zero = 0;
+    GlmerStruct GS = (GlmerStruct) asInteger(GSp);
+	
+    if (!isReal(pars) || LENGTH(pars) < 1)
+	error(_("`%s' must be a nonempty, numeric vector"),
+	      "pars");
+    tol = asReal(get_named_list_element(GS->cv, "tolerance"));
+    maxiter = asInteger(get_named_list_element(GS->cv,
+					       "maxIter"));
+    verb = asLogical(get_named_list_element(GS->cv, "msVerbose"));
+    F77_CALL(dgemv)("N", &(GS->n), &(GS->p), &one,
+		    REAL(GS->x), &(GS->n), REAL(pars),
+		    &ione, &zero, REAL(GS->off), &ione);
+    for (i = 0; i < GS->n; i++)
+	REAL(GS->eta)[i] =
+	    (REAL(GS->off)[i] += REAL(GS->offset)[i]);
+    internal_coefGets(GS->mer, REAL(pars) + GS->p, 2);
+    etaold = Memcpy(Calloc(GS->n, double), REAL(GS->eta), GS->n);
+
+    for (i = 0, conv = 0; i < maxiter && !conv; i++) {
+	reweight_update(GS);
+	crit = conv_crit(GS, etaold);
+	if (verb) Rprintf("%3d %#12g\n", i + 1, crit);
+	conv = crit < tol;
+    }
+    if (!conv) warning(_("iterations for bhat did not converge"));
+    Free(etaold);
+
+    devr = PROTECT(eval_check(GS->dev_resids, GS->rho,
+			      REALSXP, GS->n));
+    for (i = 0, ans = 0; i < GS->n; i++) ans += REAL(devr)[i];
+    UNPROTECT(1);
+
+    return ScalarReal(ans - 2 *
+		      asReal(glmer_Laplace_devComp(GS->mer)));
+}
+
+/** 
+ * Evaluate half the determinant of the variance-covariance matrix of
+ * the conditional modes 
+ * 
+ * @param mer pointer to a mixed-effects representation
+ * @param nc number of columns per level
+ * @param Gp group pointers
+ * 
+ * @return half the determinant of the variance-covariance matrix of
+ * the conditional modes 
+ */
+static double
+bVar_det(SEXP mer, const int nc[], const int Gp[]) {
+    SEXP bVar = GET_SLOT(mer, Matrix_bVarSym);
+    int i, nf = LENGTH(bVar);
+    double ans;
+
+    lmer_invert(mer);
+    for (i = 0, ans = 0; i < nf; i++) {
+        int j, k, nci = nc[i];
+        int ncip1 = nci + 1, ncisqr = nci * nci,
+	    nlev = (Gp[i + 1] - Gp[i])/nci;
+	double *bVi = REAL(VECTOR_ELT(bVar, i)),
+	    *tmp = Calloc(ncisqr, double);
+
+        for (k = 0; k < nlev; k++) {
+            Memcpy(tmp, bVi + k * ncisqr, ncisqr);
+            F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
+            if (j)
+                error(_("Leading %d minor of bVar[[%d]][,,%d] not positive definite"),
+                      j, i + 1, k + 1);
+            for (j = 0; j < nci; j++) ans += log(tmp[j * ncip1]);
+        }
+	Free(tmp);
+    }
+    return ans;
+}
+
+/** 
+ * Evaluate components of the integrand in the Gauss-Hermite quadrature
+ * 
+ * @param ranef pointer to a list of random effects
+ * @param mer pointer to a mixed-effects representation
+ * @param nf number of factors
+ * @param nc number of columns
+ * @param Gp group pointers
+ * @param intComp integral components
+ * 
+ * @return intComp
+ */
+static double*
+eval_intComp(SEXP ranef, GlmerStruct GS, double intComp[])
+{
+    SEXP bVar = GET_SLOT(GS->mer, Matrix_bVarSym),
+        Omg = GET_SLOT(GS->mer, Matrix_OmegaSym);
+    int *nc = INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)),
+	*Gp = INTEGER(GET_SLOT(GS->mer, Matrix_GpSym));
+    int i, ione = 1, nf = length(Omg);
+    double one = 1, zero = 0;
+
+    lmer_invert(GS->mer);
+    for (i = 0; i < GS->nf; i++) {
+        int j, k, nci = nc[i];
+        int ncip1 = nci + 1, ncisqr = nci * nci,
+	    nlev = (Gp[i + 1] - Gp[i])/nci;
+	int ntot = nlev * nci;
+	double *bVi = REAL(VECTOR_ELT(bVar, i)),
+	    *tmp = Memcpy(Calloc(ncisqr, double),
+			  REAL(VECTOR_ELT(Omg, i)), ncisqr),
+	    *tmp2 = Calloc(ntot, double);
+
+        F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
+        if (j)
+            error(_("Leading %d minor of Omega[[%d]] not positive definite"),
+                  j, i + 1);
+        for (j = 0; j < nci; j++) { /* 0.5 * nlev * logDet(Omega_i) */
+            intComp[1] -= nlev * log(tmp[j * ncip1]); /* (2 * 0.5) because factoring */
+        }
+	F77_CALL(dgemm)("N", "T", &nlev, &nci, &nci, &one,
+			REAL(VECTOR_ELT(ranef, i)), &nlev,
+			tmp, &nci, &zero, tmp2, &nlev);
+        intComp[2] -= 0.5 * F77_CALL(ddot)(&ntot, tmp2, &ione, tmp2, &ione);
+
+        for (k = 0; k < nlev; k++) {
+            Memcpy(tmp, bVi + k * ncisqr, ncisqr);
+            F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
+            if (j)
+                error(_("Leading %d minor of bVar[[%d]][,,%d] not positive definite"),
+                      j, i + 1, k + 1);
+            for (j = 0; j < nci; j++) intComp[4] += log(tmp[j * ncip1]);
+        }
+        Free(tmp); Free(tmp2);
+    }
+    return intComp;
+
+}
+
+#if 0
+SEXP lmer_devAGQ(SEXP pars, SEXP nAGQp, SEXP rho)
+{
+    SEXP bhat, beval, cv, delb, dev_resids, eta, linkinv,
+	mer, mu, mu_eta, offset, unwtd, variance,
+	wts, wtd, x, y;
+    int conv, i, ii, ione = 1, n, nAGQ = asInteger(nAGQp),
+	*nc, nf, p;
     SEXP dmu_deta, var, devr;
-    double *etaold, *fitted, *off, *w, *z, ans,
-	one = 1, tol = asReal(tolp), zero = 0;
+    double *intComp = Calloc(5, double), *etaold, *fitted,
+	*off, *w, *z, ans, one = 1, tol, zero = 0;
 	
     if (!isReal(pars) || LENGTH(pars) < 1)
 	error(_("`%s' must be a nonempty, numeric vector"), "pars");
@@ -2186,9 +2450,9 @@ SEXP lmer_devLaplace(SEXP pars, SEXP tolp, SEXP rho)
     off = Calloc(n, double);
     w = Calloc(n, double);
     z = Calloc(n, double);
-    rdobj = find_and_check(rho, install("mer"), VECSXP, 0);
-    nc = INTEGER(GET_SLOT(rdobj, Matrix_ncSym));
-    nf = LENGTH(GET_SLOT(rdobj, Matrix_flistSym));
+    mer = find_and_check(rho, install("mer"), VECSXP, 0);
+    nc = INTEGER(GET_SLOT(mer, Matrix_ncSym));
+    nf = LENGTH(GET_SLOT(mer, Matrix_flistSym));
     p = LENGTH(pars) - coef_length(nf, nc);
     mu = find_and_check(rho, install("mu"), REALSXP, n);
     offset = find_and_check(rho, install("offset"), REALSXP, n);
@@ -2207,11 +2471,10 @@ SEXP lmer_devLaplace(SEXP pars, SEXP tolp, SEXP rho)
 		    REAL(pars), &ione, &zero, off, &ione);
     for (ii = 0; ii < n; ii++)
 	REAL(eta)[ii] = (off[ii] += REAL(offset)[ii]);
-    internal_coefGets(rdobj, REAL(pars) + p, 2);
-    conv = 0;
-    
     Memcpy(etaold, REAL(eta), n);
-    for (i = 0; i < BHAT_NITER && !conv; i++) {
+    internal_coefGets(mer, REAL(pars) + p, 2);
+    
+    for (i = 0, conv = 0; i < BHAT_NITER && !conv; i++) {
 	double max_eta, max_diff;
 
 	eval_check_store(linkinv, rho, mu);
@@ -2223,9 +2486,9 @@ SEXP lmer_devLaplace(SEXP pars, SEXP tolp, SEXP rho)
 		(REAL(y)[ii] - REAL(mu)[ii])/REAL(dmu_deta)[ii];
 	}
 	UNPROTECT(2);
-	glmer_wt_lst(unwtd, w, z, n, wtd);
-	lmer_update_mm(rdobj, wtd);
-	internal_fitted(rdobj, unwtd, 1, fitted);
+	internal_weight_list(unwtd, w, z, n, wtd);
+	lmer_update_mm(mer, wtd);
+	internal_fitted(mer, unwtd, 1, fitted);
 	max_eta = max_diff = -1.;
 	for (ii = 0; ii < n; ii++) {
 	    double abs_eta, abs_diff;
@@ -2237,45 +2500,24 @@ SEXP lmer_devLaplace(SEXP pars, SEXP tolp, SEXP rho)
 	    if (abs_diff > max_diff) max_diff = abs_diff;
 	    etaold[ii] = REAL(eta)[ii];
 	}
-	if (max_diff < (0.1 + max_eta) * tol) {
-	    conv = 1;
-	    break;
-	}
+	if (max_diff < (0.1 + max_eta) * tol) conv = 1;
     }
     if (!conv) warning(_("iterations for bhat did not converge"));
-    Free(etaold); Free(fitted); Free(off); Free(w); Free(z);
+    Free(etaold); Free(off); Free(w); Free(z);
+
+    bhat = PROTECT(lmer_ranef(mer));
+    beval = PROTECT(duplicate(bhat));
+    delb = PROTECT(duplicate(bhat));
+
     devr = PROTECT(eval_check(dev_resids, rho, REALSXP, n));
     ans = 0;
     for (ii = 0; ii < n; ii++) ans += REAL(devr)[ii];
     UNPROTECT(1);
-    return ScalarReal(ans - 2 * asReal(glmer_Laplace_devComp(rdobj)));
+
+    UNPROTECT(3);
+    Free(fitted);
+    return ScalarReal(ans - 2 * asReal(glmer_Laplace_devComp(mer)));
 }
 
-/**
- * Produce a weighted copy of the matrices in MLin in the storage
- * allocated to MLout
- *
- * @param MLin input matrix list
- * @param wts real vector of weights
- * @param adjst adjusted response
- * @param MLout On input a list of matrices of the same dimensions as MLin.
- *
- * @return MLout with its contents overwritten by a weighted copy of
- * MLin according to wts with adjst overwriting the response.
- */
-SEXP glmer_weight_matrix_list(SEXP MLin, SEXP wts, SEXP adjst, SEXP MLout)
-{
-    int n, nf;
-    
-    if (!(isNewList(MLin) && isReal(wts) && isReal(adjst) && isNewList(MLout)))
-	error(_("Incorrect argument type"));
-    nf = LENGTH(MLin);
-    if (LENGTH(MLout) != nf)
-	error(_("Lengths of MLin (%d) and MLout (%d) must match"), nf,
-	      LENGTH(MLout));
-    n = LENGTH(wts);
-    if (LENGTH(adjst) != n)
-	error(_("Expected adjst to have length %d, got %d"), n, LENGTH(adjst));
-    glmer_wt_lst(MLin, REAL(wts), REAL(adjst), n, MLout);
-    return MLout;
-}
+#endif
+
