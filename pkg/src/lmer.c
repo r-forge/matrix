@@ -1632,7 +1632,7 @@ internal_ECMEsteps(SEXP x, int nEM, int verb)
 
     lmer_firstDer(x, firstDer);
     if (verb)
-	EMsteps_verbose_print(x, iter, REML, firstDer);
+	EMsteps_verbose_print(x, 0, REML, firstDer);
     for (iter = 0; iter < nEM; iter++) {
 	for (i = 0; i < nf; i++) {
 	    int nci = nc[i], ncisqr = nci * nci;
@@ -1655,7 +1655,7 @@ internal_ECMEsteps(SEXP x, int nEM, int verb)
 	status[0] = status[1] = 0;
 	lmer_firstDer(x, firstDer);
 	if (verb)
-	    EMsteps_verbose_print(x, iter, REML, firstDer);
+	    EMsteps_verbose_print(x, iter + 1, REML, firstDer);
     }
     lmer_factor(x);
     Free(cc);
@@ -1999,7 +1999,7 @@ SEXP lmer_fitted(SEXP x, SEXP mmats, SEXP useRf)
     return ans;
 }
 
-/* Gauss-Hermite Quadrature x positions */
+/* Gauss-Hermite Quadrature x positions and weights */
 static const double
     GHQ_x1[1] = {0},
     GHQ_w1[1] = {1},
@@ -2050,6 +2050,7 @@ static const double
 		  GHQ_w5, GHQ_w6, GHQ_w7, GHQ_w8, GHQ_w9, GHQ_w10,
 		  GHQ_w11};
 
+#if 0
 /** 
  * Compute certain components of the Laplace likelihood approximation 
  * 
@@ -2105,6 +2106,8 @@ SEXP glmer_Laplace_devComp(SEXP x) {
     UNPROTECT(1);
     return ScalarReal(ans);
 }
+
+#endif
 				 
 static void
 internal_weight_list(SEXP MLin, double *wts, double *adjst, int n,
@@ -2198,12 +2201,12 @@ eval_check(SEXP fcn, SEXP rho, SEXPTYPE mode, int len) {
 }
 
 static SEXP
-getElement(SEXP list, char *str) {
+getElement(SEXP list, char *nm) {
     SEXP names = getAttrib(list, R_NamesSymbol);
     int i;
 
     for (i = 0; i < LENGTH(list); i++)
-	if(strcmp(CHAR(STRING_ELT(names, i)), str) == 0)
+	if (!strcmp(CHAR(STRING_ELT(names, i)), nm))
 	    return(VECTOR_ELT(list, i));
     return R_NilValue;
 }
@@ -2421,7 +2424,8 @@ Sigma_bVar_det(GlmerStruct GS) {
             error(_("Leading %d minor of Omega[[%d]] not positive definite"),
                   j, i + 1);
         for (j = 0; j < nci; j++) { /* nlev * logDet(Omega_i) */
-            ans += nlev * log(Omgi[j * ncip1]); /* because inverted */
+            ans += nlev * log(Omgi[j * ncip1]);
+            /* Note: we are adding because Omega has been inverted */
         }
         for (k = 0; k < nlev; k++) {
 	    double *bVik = bVi + k * ncisqr;
