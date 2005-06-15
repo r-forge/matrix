@@ -2490,30 +2490,32 @@ b_qf(GlmerStruct GS, SEXP b, SEXP delb) {
     for (i = 0, ans = 0; i < GS->nf; i++) {
 	int nci = nc[i], ntot = Gp[i + 1] - Gp[i];
 	int nlev = ntot/nci;
-	double *tmp = Calloc(ntot, double),
-	    *delbi = REAL(VECTOR_ELT(delb, i));
+	double *tmp = Calloc(ntot, double);
 
 	F77_CALL(dgemm)("N", "T", &nlev, &nci, &nci, &one,
 			REAL(VECTOR_ELT(b, i)), &nlev,
 			REAL(VECTOR_ELT(Omega, i)), &nci,
 			&zero, tmp, &nlev);
         ans += F77_CALL(ddot)(&ntot, tmp, &ione, tmp, &ione);
-	ans -= F77_CALL(ddot)(&ntot, delbi, &ione, delbi, &ione);
+	if (delb != R_NilValue) {
+	    double *delbi = REAL(VECTOR_ELT(delb, i));
+	    ans -= F77_CALL(ddot)(&ntot, delbi, &ione, delbi, &ione);
+	}
     }
     return ans;
 }
 	
 /** 
- * Evaluate the marginal deviance, given a value of the random
+ * Evaluate the conditional deviance, given a value of the random
  * effects
  * 
  * @param GS a GlmerStruct object
  * @param b random effects
  * 
- * @return the quadratic form
+ * @return the conditional deviance
  */
 static double
-marginal_deviance(GlmerStruct GS, SEXP b) {
+cond_dev(GlmerStruct GS, SEXP b) {
     SEXP devr;
     int i;
     double ans = 0;
@@ -2530,48 +2532,75 @@ marginal_deviance(GlmerStruct GS, SEXP b) {
 }
 
 /** 
- * Evaluate the relative likelihood
+ * Evaluate the deviance at b/delb relative to that at bhat/0
  * 
  * @param GS a GlmerStruct object
  * @param b random effects
  * @param delb change from bhat on the delb scale
  * @param cnst additive constant
  * 
- * @return the relative likelihood
+ * @return the relative deviance
  */
 static R_INLINE double
-relLik(GlmerStruct GS, SEXP b, SEXP delb, double cnst)
+relDev(GlmerStruct GS, SEXP b, SEXP delb, double cnst)
 {
-    return exp(cnst -
-	       (marginal_deviance(GS, b) + b_qf(GS, b, delb))/2);
+    return cond_dev(GS, b) + b_qf(GS, b, delb) - cnst;
 }
 	
+static void
+update_delb_b(double x, int nc, int nlev, const double bvFac[],
+	      const double bhat[], double delb[], double bt[])
+{
+    int i;
+    if (nc != 1) error("code not yet written");
+    for (i = 0; i < nlev; i++)
+	bt[i] = bhat[i] + (delb[i] = x * bvFac[i]);
+}
+
 SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
 {
-    SEXP bhat, btrial, delb;
+    SEXP bhat;
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
-    double *x, *wt, cnst, liklhd;
-    int i, n2, nAGQ = asInteger(nAGQp);
+    double bvd, cnst, deviance, rmlik;
+    int nAGQ = asInteger(nAGQp);
 	
     if (!isReal(pars) || LENGTH(pars) != GS->npar)
 	error(_("`%s' must be a numeric vector of length %d"),
 	      "pars", GS->npar);
     glmer_bhat(REAL(pars), GS);
+    bvd = -2 * Sigma_bVar_det(GS); /* also factors Omega and bVar */
     bhat = PROTECT(lmer_ranef(GS->mer));
-    delb = PROTECT(duplicate(bhat));
-    for (i = 0; i < GS->nf; i++) {
-	SEXP delbi = VECTOR_ELT(delb, i);
-	AZERO(REAL(delbi), LENGTH(delbi));
-    }
-    cnst = Sigma_bVar_det(GS);
-    liklhd = relLik(GS, bhat, delb, cnst);
+    deviance = cnst = cond_dev(GS, bhat) + b_qf(GS, bhat, R_NilValue);
+    rmlik = 1;			/* relative marginal likelihood */
     if (nAGQ > 1) {
+	SEXP delb = PROTECT(duplicate(bhat)), btrial = PROTECT(duplicate(bhat));
+	SEXP bvFac, delb0, btrial0, bhat0;
+	int *dims, i, odd = nAGQ % 2;
+	int n2 = (nAGQ + odd)/2;
+
+	rmlik = 0;
 	if (GS->nf > 1)
 	    error(_("AGQ available only for a single grouping factor"));
-	n2 = (nAGQ + 1)/2;
-	wt = Calloc(nAGQ, double);
+	bvFac = VECTOR_ELT(GET_SLOT(GS->mer, Matrix_bVarSym), 0);
+	delb0 = VECTOR_ELT(delb, 0);
+	bhat0 = VECTOR_ELT(bhat, 0);
+	btrial0 = VECTOR_ELT(btrial, 0);
+	dims = INTEGER(getAttrib(bhat0, R_DimSymbol));
+	for (i = 0; i < n2; i++) {
+	    update_delb_b(GHQ_x[nAGQ][i], dims[1], dims[0], REAL(bvFac),
+			  REAL(bhat0), REAL(delb0), REAL(btrial0));
+	    rmlik += GHQ_w[nAGQ][i] * exp(-relDev(GS, btrial, delb, cnst)/2);
+	    if (GS->EMverbose) Rprintf("%10g ", rmlik);
+	}
+	for (i = (n2 - 1) - odd; i >= 0; i--) {
+	    update_delb_b(-GHQ_x[nAGQ][i], dims[1], dims[0], REAL(bvFac),
+			  REAL(bhat0), REAL(delb0), REAL(btrial0));
+	    rmlik += GHQ_w[nAGQ][i] * exp(-relDev(GS, btrial, delb, cnst)/2);
+	    if (GS->EMverbose) Rprintf("%10g ", rmlik);
+	}
+	if (GS->EMverbose) Rprintf("\n", rmlik);
+	UNPROTECT(2);
     }
-    UNPROTECT(2);
-    return ScalarReal(-2 * log(liklhd));
+    UNPROTECT(1);
+    return ScalarReal(deviance - 2*log(rmlik) + bvd);
 }
-
