@@ -122,7 +122,6 @@ setMethod("lmer", signature(formula = "formula"),
           mf$x <- mf$model <- mf$y <- TRUE
           mf[[1]] <- as.name("glm")
           glm.fit <- eval(mf, parent.frame())
-          family <- glm.fit$family
           x <- glm.fit$x
           y <- as.double(glm.fit$y)
           family <- glm.fit$family
