@@ -2344,7 +2344,7 @@ reweight_update(GlmerStruct GS) {
  */
 static double
 conv_crit(GlmerStruct GS, double etaold[], double fitted[]) {
-    double max_eta = -1, max_diff = -1;
+    double max_abs_eta = -1, max_abs_diff = -1;
     int i;
 
     for (i = 0; i < GS->n; i++) {
@@ -2352,12 +2352,12 @@ conv_crit(GlmerStruct GS, double etaold[], double fitted[]) {
 	    
 	REAL(GS->eta)[i] = REAL(GS->off)[i] + fitted[i];
 	abs_eta = fabs(REAL(GS->eta)[i]);
-	if (abs_eta > max_eta) max_eta = abs_eta;
+	if (abs_eta > max_abs_eta) max_abs_eta = abs_eta;
 	abs_diff = fabs(REAL(GS->eta)[i] - etaold[i]);
-	if (abs_diff > max_diff) max_diff = abs_diff;
+	if (abs_diff > max_abs_diff) max_abs_diff = abs_diff;
 	etaold[i] = REAL(GS->eta)[i];
     }
-    return max_diff / (0.1 + max_eta);
+    return max_abs_diff / (0.1 + max_abs_eta);
 }
 
 /** 
@@ -2540,11 +2540,11 @@ cond_dev(GlmerStruct GS, SEXP b) {
 static R_INLINE double
 relDev(GlmerStruct GS, SEXP b, SEXP delb, double cnst)
 {
-    SEXP condd = PROTECT(cond_dev(GS, b));
     int i;
-    double ans = 0;
+    double ans;
+    SEXP condd = PROTECT(cond_dev(GS, b));
     
-    for (i = 0; i < GS->n; i++) ans += REAL(condd)[i];
+    for (i = 0, ans = 0; i < GS->n; i++) ans += REAL(condd)[i];
     UNPROTECT(1);
     return ans + b_qf(GS, b, delb) - cnst;
 }
@@ -2575,10 +2575,12 @@ SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
     condd = PROTECT(cond_dev(GS, bhat));
     for (i = 0, cnst = b_qf(GS, bhat, R_NilValue); i < GS->n; i++)
 	cnst += REAL(condd)[i];
+    UNPROTECT(1);
     deviance = cnst;
     rmlik = 1;			/* relative marginal likelihood */
     if (nAGQ > 1) {
-	SEXP delb = PROTECT(duplicate(bhat)), btrial = PROTECT(duplicate(bhat));
+	SEXP delb = PROTECT(duplicate(bhat)),
+	  btrial = PROTECT(duplicate(bhat));
 	SEXP bvFac, delb0, btrial0, bhat0;
 	int *dims, i, odd = nAGQ % 2;
 	int n2 = (nAGQ + odd)/2;
@@ -2610,23 +2612,28 @@ SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
     return ScalarReal(deviance - 2*log(rmlik) + bvd);
 }
 
-SEXP glmer_bhat(SEXP pars, SEXP GSp)
+SEXP glmer_bhat(SEXP GSp, SEXP fixed, SEXP varc)
 {
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
+    int nvarc = GS->npar - GS->p;
 
-    if (!isReal(pars) || LENGTH(pars) != GS->npar)
+    if (!isReal(fixed) || LENGTH(fixed) != GS->p)
 	error(_("`%s' must be a numeric vector of length %d"),
-	      "pars", GS->npar);
+	      "fixed", GS->p);
+    if (!isReal(varc) || LENGTH(varc) != nvarc)
+	error(_("`%s' must be a numeric vector of length %d"),
+	      "varc", nvarc);
     if (INTEGER(GET_SLOT(GS->mer, Matrix_ncSym))[GS->nf] > 0)
 	error(_("the mer component of the GlmerStruct must be configured to omit fixed effects"));
-    internal_bhat(REAL(pars), GS);
+    internal_coefGets(GS->mer, REAL(varc), 2);
+    internal_bhat(REAL(fixed), GS);
     return R_NilValue;
 }
 
-SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP pars)
+SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed)
 {
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
-    SEXP dmu_deta, var;
+    SEXP dmu_deta, var, ans = PROTECT(duplicate(fixed));
     int conv, i, ione = 1, it, j, lwork = -1;
     double *etaold = Calloc(GS->n, double),
 	*w = Calloc(GS->n, double), *work,
@@ -2634,9 +2641,10 @@ SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP pars)
 	*z = Calloc(GS->n, double),
 	one = 1, tmp, zero = 0;
     
+    AZERO(z, GS->n);		/* -Wall */
 				/* calculate optimal size of work array */
-    F77_CALL(dgels)("N", &(GS->n), &(GS->p), &ione, wtd, &(GS->n), REAL(pars),
-		    &(GS->p), &tmp, &lwork, &j);
+    F77_CALL(dgels)("N", &(GS->n), &(GS->p), &ione, wtd, &(GS->n),
+		    z,  &(GS->n), &tmp, &lwork, &j);
     if (j)			/* shouldn't happen */
 	error(_("%s returned error code %d"), "dgels", j);
     lwork = (int) tmp;
@@ -2650,7 +2658,7 @@ SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP pars)
     for (it = 0, conv = 0; it < GS->maxiter && !conv; it++) {
 				/* fitted values from current beta */
 	F77_CALL(dgemv)("N", &(GS->n), &(GS->p), &one,
-			REAL(GS->x), &(GS->n), REAL(pars),
+			REAL(GS->x), &(GS->n), REAL(ans),
 			&ione, &zero, REAL(GS->eta), &ione);
 				/* add in random effects and offset */
 	for (i = 0; i < GS->n; i++) REAL(GS->eta)[i] += REAL(GS->off)[i];
@@ -2676,9 +2684,11 @@ SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP pars)
 		wtd[i + j * GS->n] = REAL(GS->x)[i + j * GS->n] * w[i];
 				/* weighted least squares solution */
 	F77_CALL(dgels)("N", &(GS->n), &(GS->p), &ione, wtd, &(GS->n),
-			REAL(pars), &(GS->p), work, &lwork, &j);
+			z, &(GS->n), work, &lwork, &j);
 	if (j) error(_("%s returned error code %d"), "dgels", j);
+	Memcpy(REAL(ans), z, GS->p);
     }
     Free(etaold); Free(w); Free(work); Free(wtd); Free(z);
-    return R_NilValue;
+    UNPROTECT(1);
+    return ans;
 }

@@ -465,7 +465,7 @@ setMethod("logLik", signature(object="mer"),
               val <- -deviance(object, REML = REML)/2
               nc <- object@nc[-seq(a = object@Omega)]
               attr(val, "nall") <- attr(val, "nobs") <- nc[2]
-              attr(val, "df") <- nc[1] +
+              attr(val, "df") <- abs(nc[1]) +
                   length(.Call("lmer_coef", object, 0, PACKAGE = "Matrix"))
               attr(val, "REML") <- REML 
               class(val) <- "logLik"
@@ -806,7 +806,7 @@ setMethod("show", signature(object="VarCorr"),
           print(reMat, quote = FALSE)
       })
 
-glmmMCMC <- function(obj, method = c("full"), nsamp = 1000)
+glmmMCMC <- function(obj, method = c("full"), nsamp = 1)
 {
     if (!inherits(obj, "lmer")) stop("obj must be of class `lmer'")
     if (obj@family$family == "gaussian" && obj@family$link == "identity")
@@ -859,8 +859,15 @@ glmmMCMC <- function(obj, method = c("full"), nsamp = 1000)
     varc <- .Call("lmer_coef", mer, 2, PACKAGE = "Matrix")
     b <- ranef(obj)
     for (i in 1:nsamp) {
-        ## update fixed
-        .Call("glmer_fixed_update", GSpt, PACKAGE = "Matrix")
+        ## conditional means and variances of fixed effects
+        print(fixed <- .Call("glmer_fixed_update", GSpt, b, fixed, PACKAGE = "Matrix"))
+        ## sample from the conditional distribution of beta given b and y
+        ## conditional means and variances of random_effects
+        .Call("glmer_bhat", GSpt, fixed, varc, PACKAGE = "Matrix")
+        print(bhat <- ranef(mer))
+        ## sample from the conditional distribution of b given beta and y
+        ## sample from the conditional distribution of varc given b
     }
+    fixed
 }
 
