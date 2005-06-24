@@ -806,3 +806,61 @@ setMethod("show", signature(object="VarCorr"),
           print(reMat, quote = FALSE)
       })
 
+glmmMCMC <- function(obj, method = c("full"), nsamp = 1000)
+{
+    if (!inherits(obj, "lmer")) stop("obj must be of class `lmer'")
+    if (obj@family$family == "gaussian" && obj@family$link == "identity")
+        warn("glmmMCMC not indended for Gaussian family with identity link")
+    cv <- Matrix:::lmerControl()
+    family <- obj@family
+    frm <- obj@frame
+    fixed.form <- Matrix:::nobars(obj@call$formula)
+    if (inherits(fixed.form, "name")) # RHS is empty - use a constant
+        fixed.form <- substitute(foo ~ 1, list(foo = fixed.form))
+    glm.fit <- glm(eval(fixed.form), family, frm, x = TRUE,
+                   y = TRUE)
+    x <- glm.fit$x
+    y <- as.double(glm.fit$y)
+    bars <- Matrix:::findbars(obj@call$formula[[3]])
+    random <-
+        lapply(bars,
+               function(x) list(model.matrix(eval(substitute(~term,
+                                                             list(term=x[[2]]))),
+                                             frm),
+                                eval(substitute(as.factor(fac)[,drop = TRUE],
+                                                list(fac = x[[3]])), frm)))
+    names(random) <- unlist(lapply(bars, function(x) deparse(x[[3]])))
+    if (any(names(random) != names(obj@flist)))
+        random <- random[names(obj@flist)]
+    mmats <- c(lapply(random, "[[", 1),
+               .fixed = list(cbind(glm.fit$x, .response = glm.fit$y)))
+    mer <- as(obj, "mer")
+
+    eta <- glm.fit$linear.predictors # perhaps later change this to obj@fitted?
+    wts <- glm.fit$prior.weights
+    wtssqr <- wts * wts
+    offset <- glm.fit$offset
+    if (is.null(offset)) offset <- numeric(length(eta))
+    off <- numeric(length(eta))
+    mu <- numeric(length(eta))
+
+    dev.resids <- quote(family$dev.resids(y, mu, wtssqr))
+    linkinv <- quote(family$linkinv(eta))
+    mu.eta <- quote(family$mu.eta(eta))
+    variance <- quote(family$variance(mu))
+    LMEopt <- getAnywhere("LMEoptimize<-")
+    doLMEopt <- quote(LMEopt(x = mer, value = cv))
+
+    GSpt <- .Call("glmer_init", environment())
+    ans <- list(fixed = matrix(0, nr = length(obj@fixed), nc = nsamp),
+                varc = matrix(0, nr = length(obj@fixed), nc = nsamp))
+    nf <- length(obj@flist)
+    fixed <- obj@fixed
+    varc <- .Call("lmer_coef", mer, 2, PACKAGE = "Matrix")
+    b <- ranef(obj)
+    for (i in 1:nsamp) {
+        ## update fixed
+        .Call("glmer_fixed_update", GSpt, PACKAGE = "Matrix")
+    }
+}
+
