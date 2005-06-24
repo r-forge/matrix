@@ -33,10 +33,10 @@ SEXP lmer_variances(SEXP x);
 SEXP lmer_Crosstab(SEXP flist);
 SEXP lmer_firstDer(SEXP x, SEXP val);
 SEXP glmer_PQL(SEXP GSp);
-SEXP glmer_bhat(SEXP pars, SEXP GSp);
+SEXP glmer_bhat(SEXP GSp, SEXP fixed, SEXP varc);
 SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp);
 SEXP glmer_finalize(SEXP GSpt);
-SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP pars);
+SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed);
 SEXP glmer_init(SEXP rho);
 
 #endif
