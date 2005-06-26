@@ -2641,7 +2641,18 @@ SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed)
 	*z = Calloc(GS->n, double),
 	one = 1, tmp, zero = 0;
     
+    if (!isNewList(b) || LENGTH(b) != GS->nf)
+	error(_("%s must be a %s of length %d"), "b", "list", GS->nf);
+    for (i = 0; i < GS->nf; i++) {
+	SEXP bi = VECTOR_ELT(b, i);
+	if (!isReal(bi) || !isMatrix(bi))
+	    error(_("b[[%d]] must be a numeric matrix"), i);
+    }
+    if (!isReal(fixed) || LENGTH(fixed) != GS->p)
+	error(_("%s must be a %s of length %d"), "fixed",
+		"numeric vector", GS->p);
     AZERO(z, GS->n);		/* -Wall */
+
 				/* calculate optimal size of work array */
     F77_CALL(dgels)("N", &(GS->n), &(GS->p), &ione, wtd, &(GS->n),
 		    z,  &(GS->n), &tmp, &lwork, &j);
@@ -2649,13 +2660,17 @@ SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed)
 	error(_("%s returned error code %d"), "dgels", j);
     lwork = (int) tmp;
     work = Calloc(lwork, double);
-				/* fitted values from random effects */
+				
+    AZERO(REAL(GS->off), GS->n); /* fitted values from random effects */
     fitted_ranef(GET_SLOT(GS->mer, Matrix_flistSym), GS->unwtd, b,
 		 INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)), REAL(GS->off));
     for (i = 0; i < GS->n; i++)
 	etaold[i] = (REAL(GS->off)[i] += REAL(GS->offset)[i]);
     
     for (it = 0, conv = 0; it < GS->maxiter && !conv; it++) {
+	Rprintf("%2d ", it);
+	for (j = 0; j < GS->p; j++) Rprintf("%#10g ", REAL(ans)[j]);
+	Rprintf("\n");
 				/* fitted values from current beta */
 	F77_CALL(dgemv)("N", &(GS->n), &(GS->p), &one,
 			REAL(GS->x), &(GS->n), REAL(ans),
@@ -2673,9 +2688,9 @@ SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed)
 	for (i = 0; i < GS->n; i++) {
 	    w[i] = REAL(GS->wts)[i] *
 		REAL(dmu_deta)[i]/sqrt(REAL(var)[i]);
-	    z[i] = REAL(GS->eta)[i] - REAL(GS->off)[i] +
-		(REAL(GS->y)[i] - REAL(GS->mu)[i]) /
-		REAL(dmu_deta)[i];
+	    z[i] = w[i] * (REAL(GS->eta)[i] - REAL(GS->off)[i] +
+			   (REAL(GS->y)[i] - REAL(GS->mu)[i]) /
+			   REAL(dmu_deta)[i]);
 	}
 	UNPROTECT(2);
 				/* weighted copy of the model matrix */

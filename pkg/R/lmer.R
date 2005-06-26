@@ -852,22 +852,24 @@ glmmMCMC <- function(obj, method = c("full"), nsamp = 1)
     doLMEopt <- quote(LMEopt(x = mer, value = cv))
 
     GSpt <- .Call("glmer_init", environment())
-    ans <- list(fixed = matrix(0, nr = length(obj@fixed), nc = nsamp),
-                varc = matrix(0, nr = length(obj@fixed), nc = nsamp))
     nf <- length(obj@flist)
     fixed <- obj@fixed
     varc <- .Call("lmer_coef", mer, 2, PACKAGE = "Matrix")
-    b <- ranef(obj)
+    b <- .Call("lmer_ranef", mer, PACKAGE = "Matrix")
+    ans <- list(fixed = matrix(0, nr = length(fixed), nc = nsamp),
+                varc = matrix(0, nr = length(varc), nc = nsamp))
     for (i in 1:nsamp) {
         ## conditional means and variances of fixed effects
-        print(fixed <- .Call("glmer_fixed_update", GSpt, b, fixed, PACKAGE = "Matrix"))
+        fixed <- .Call("glmer_fixed_update", GSpt, b, fixed, PACKAGE = "Matrix")
+        ans$fixed[,i] <- fixed
         ## sample from the conditional distribution of beta given b and y
         ## conditional means and variances of random_effects
         .Call("glmer_bhat", GSpt, fixed, varc, PACKAGE = "Matrix")
-        print(bhat <- ranef(mer))
+        print(bhat <- .Call("lmer_ranef", mer, PACKAGE = "Matrix"))
         ## sample from the conditional distribution of b given beta and y
         ## sample from the conditional distribution of varc given b
+        ans$varc[,i] <- varc
     }
-    fixed
+    ans
 }
 
