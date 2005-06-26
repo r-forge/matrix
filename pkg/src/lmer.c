@@ -2448,19 +2448,19 @@ Sigma_bVar_det(GlmerStruct GS) {
  * @param GS a GlmerStruct object
  */
 static void
-internal_bhat(double pars[], GlmerStruct GS)
+internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
 {
     int conv, i, ione = 1;
     double *etaold = Calloc(GS->n, double),
 	*fitted = Calloc(GS->n, double), one = 1, zero = 0;
 	
     F77_CALL(dgemv)("N", &(GS->n), &(GS->p), &one,
-		    REAL(GS->x), &(GS->n), pars,
+		    REAL(GS->x), &(GS->n), fixed,
 		    &ione, &zero, REAL(GS->off), &ione);
     for (i = 0; i < GS->n; i++)
 	REAL(GS->eta)[i] =
 	    (REAL(GS->off)[i] += REAL(GS->offset)[i]);
-    internal_coefGets(GS->mer, pars + GS->p, 2);
+    internal_coefGets(GS->mer, varc, 2);
     etaold = Memcpy(etaold, REAL(GS->eta), GS->n);
 
     for (i = 0, conv = 0; i < GS->maxiter && !conv; i++) {
@@ -2569,7 +2569,7 @@ SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
     if (!isReal(pars) || LENGTH(pars) != GS->npar)
 	error(_("`%s' must be a numeric vector of length %d"),
 	      "pars", GS->npar);
-    internal_bhat(REAL(pars), GS);
+    internal_bhat(GS, REAL(pars), REAL(pars) + (GS->p));
     bvd = -2 * Sigma_bVar_det(GS); /* also factors Omega and bVar */
     bhat = PROTECT(lmer_ranef(GS->mer));
     condd = PROTECT(cond_dev(GS, bhat));
@@ -2624,9 +2624,8 @@ SEXP glmer_bhat(SEXP GSp, SEXP fixed, SEXP varc)
 	error(_("`%s' must be a numeric vector of length %d"),
 	      "varc", nvarc);
     if (INTEGER(GET_SLOT(GS->mer, Matrix_ncSym))[GS->nf] > 0)
-	error(_("the mer component of the GlmerStruct must be configured to omit fixed effects"));
-    internal_coefGets(GS->mer, REAL(varc), 2);
-    internal_bhat(REAL(fixed), GS);
+	error(_("the mer object must be set to skip fixed effects"));
+    internal_bhat(GS, REAL(fixed), REAL(varc));
     return R_NilValue;
 }
 
@@ -2676,8 +2675,9 @@ SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed)
 			REAL(GS->x), &(GS->n), REAL(ans),
 			&ione, &zero, REAL(GS->eta), &ione);
 				/* add in random effects and offset */
-	for (i = 0; i < GS->n; i++) REAL(GS->eta)[i] += REAL(GS->off)[i];
-				/* calculate convergence criterion */
+	for (i = 0; i < GS->n; i++)
+	    REAL(GS->eta)[i] += REAL(GS->off)[i];
+				/* check for convergence */
 	conv = conv_crit(GS, etaold, REAL(GS->eta)) < GS->tol;
 				/* obtain mu, dmu_deta, var */
 	eval_check_store(GS->linkinv, GS->rho, GS->mu);
