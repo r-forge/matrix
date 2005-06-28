@@ -2475,8 +2475,7 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
 }
 
 /** 
- * Evaluate the difference in the quadratic form in the
- * random effects and the delb's.
+ * Evaluate the quadratic form in b (multiple grouping factors)
  * 
  * @param GS a GlmerStruct object
  * @param b random effects
@@ -2484,7 +2483,7 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
  * @return the quadratic form
  */
 static double
-b_qf(GlmerStruct GS, SEXP b, SEXP delb) {
+b_qf(GlmerStruct GS, SEXP b) {
     SEXP Omega = GET_SLOT(GS->mer, Matrix_OmegaSym);
     int *nc = INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)),
 	*Gp = INTEGER(GET_SLOT(GS->mer, Matrix_GpSym)),
@@ -2501,10 +2500,6 @@ b_qf(GlmerStruct GS, SEXP b, SEXP delb) {
 			REAL(VECTOR_ELT(Omega, i)), &nci,
 			&zero, tmp, &nlev);
         ans += F77_CALL(ddot)(&ntot, tmp, &ione, tmp, &ione);
-	if (delb != R_NilValue) {
-	    double *delbi = REAL(VECTOR_ELT(delb, i));
-	    ans -= F77_CALL(ddot)(&ntot, delbi, &ione, delbi, &ione);
-	}
     }
     return ans;
 }
@@ -2528,6 +2523,71 @@ cond_dev(GlmerStruct GS, SEXP b) {
 }
 
 /** 
+ * Evaluate the conditional deviance, given a value of the random
+ * effects, for a single grouping factor
+ * 
+ * @param GS a GlmerStruct object
+ * @param b random effects
+ * 
+ * @return the conditional deviance
+ */
+static void
+cond_dev_1(GlmerStruct GS, SEXP b, double devcmp[]) {
+    SEXP devs, flist = GET_SLOT(GS->mer, Matrix_flistSym);
+    int *fv = INTEGER(VECTOR_ELT(flist, 0)), i,
+	nc = INTEGER(GET_SLOT(GS->mer, Matrix_ncSym))[0];
+    int nlev = INTEGER(GET_SLOT(GS->mer, Matrix_GpSym))[1]/nc;
+
+    Memcpy(REAL(GS->eta), REAL(GS->off), GS->n);
+    fitted_ranef(flist, GS->unwtd, b, &nc, REAL(GS->eta));
+    eval_check_store(GS->linkinv, GS->rho, GS->mu);
+    devs = PROTECT(eval_check(GS->dev_resids, GS->rho, REALSXP, GS->n));
+    AZERO(devcmp, nlev);
+    for (i = 0; i < GS->n; i++)
+	devcmp[fv[i] - 1] += REAL(devs)[i];
+    UNPROTECT(1);
+}
+
+/** 
+ * Add the quadratic form components in b and delb (single grouping factor)
+ * 
+ * @param GS a GlmerStruct object
+ * @param b random effects
+ * @param delb scaled deviations in random effects from bhat
+ * 
+ * @return the quadratic form
+ */
+static void
+b_qf_1(GlmerStruct GS, double b[], double delb[], double devcmp[]) {
+    int i, nc = INTEGER(GET_SLOT(GS->mer, Matrix_ncSym))[0], 
+	ntot = INTEGER(GET_SLOT(GS->mer, Matrix_GpSym))[1];
+    int nlev = ntot/nc;
+    double *omg = REAL(VECTOR_ELT(GET_SLOT(GS->mer, Matrix_OmegaSym), 0));
+
+    if (nc == 1) {
+	for (i = 0; i < nlev; i++) {
+	    double tmp = *omg * b[i];
+	    devcmp[i] += tmp * tmp;
+	    if (delb) devcmp[i] -= delb[i] * delb[i];
+	}
+    } else {
+	double *tmp = Calloc(nc, double), one = 1, zero = 0;
+	int ione = 1;
+
+	for (i = 0; i < nlev; i++) {
+	    
+	    F77_CALL(dgemm)("N", "T", &ione, &nc, &nc, &one,
+			    b + i, &nlev, omg, &nc, &zero, tmp, &nc);
+	    devcmp[i] += F77_CALL(ddot)(&nc, tmp, &ione, tmp, &ione);
+	    if (delb)
+		devcmp[i] -= F77_CALL(ddot)(&nc, delb + i, &nlev,
+					    delb + i, &nlev);
+	}
+    }
+}
+
+#if 0
+/** 
  * Evaluate the deviance at b/delb relative to that at bhat/0
  * 
  * @param GS a GlmerStruct object
@@ -2548,7 +2608,8 @@ relDev(GlmerStruct GS, SEXP b, SEXP delb, double cnst)
     UNPROTECT(1);
     return ans + b_qf(GS, b, delb) - cnst;
 }
-	
+#endif
+
 static void
 update_delb_b(double x, int nc, int nlev, const double bvFac[],
 	      const double bhat[], double delb[], double bt[])
@@ -2563,21 +2624,34 @@ SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
 {
     SEXP bhat, condd;
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
-    double bvd, cnst, deviance, rmlik;
-    int i, nAGQ = asInteger(nAGQp);
+    double *f0, ans, LaplaceDev;
+    int *dims, i, nc, nlev, nAGQ = asInteger(nAGQp);
 	
     if (!isReal(pars) || LENGTH(pars) != GS->npar)
 	error(_("`%s' must be a numeric vector of length %d"),
 	      "pars", GS->npar);
     internal_bhat(GS, REAL(pars), REAL(pars) + (GS->p));
-    bvd = -2 * Sigma_bVar_det(GS); /* also factors Omega and bVar */
+    LaplaceDev = -2 * Sigma_bVar_det(GS); /* also factors Omega and bVar */
     bhat = PROTECT(lmer_ranef(GS->mer));
-    condd = PROTECT(cond_dev(GS, bhat));
-    for (i = 0, cnst = b_qf(GS, bhat, R_NilValue); i < GS->n; i++)
-	cnst += REAL(condd)[i];
+    if (GS->nf > 1) {
+	if (nAGQ > 1)
+	    warning(_("AGQ not available for multiple grouping factors - using Laplace"));
+	LaplaceDev += b_qf(GS, bhat);
+	condd = PROTECT(cond_dev(GS, bhat));
+	for (i = 0; i < GS->n; i++) LaplaceDev += REAL(condd)[i];
+	UNPROTECT(2);
+	return ScalarLogical(LaplaceDev);
+    }
+    dims = INTEGER(getAttrib(VECTOR_ELT(bhat, 0), R_DimSymbol));
+    nlev = dims[0]; nc = dims[1];
+    f0 = Calloc(nlev, double);
+    cond_dev_1(GS, bhat, f0);
+    b_qf_1(GS, REAL(VECTOR_ELT(bhat, 0)), (double *) NULL, f0);
+    for (i = 0; i < nlev; i++) LaplaceDev += f0[i];
+    Free(f0);
     UNPROTECT(1);
-    deviance = cnst;
-    rmlik = 1;			/* relative marginal likelihood */
+    return ScalarLogical(LaplaceDev);
+#if 0
     if (nAGQ > 1) {
 	SEXP delb = PROTECT(duplicate(bhat)),
 	  btrial = PROTECT(duplicate(bhat));
@@ -2586,8 +2660,6 @@ SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
 	int n2 = (nAGQ + odd)/2;
 
 	rmlik = 0;
-	if (GS->nf > 1)
-	    error(_("AGQ available only for a single grouping factor"));
 	bvFac = VECTOR_ELT(GET_SLOT(GS->mer, Matrix_bVarSym), 0);
 	delb0 = VECTOR_ELT(delb, 0);
 	bhat0 = VECTOR_ELT(bhat, 0);
@@ -2609,7 +2681,8 @@ SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
 	UNPROTECT(2);
     }
     UNPROTECT(1);
-    return ScalarReal(deviance - 2*log(rmlik) + bvd);
+    return ScalarReal(LaplaceDev - 2*log(rmlik) + bvd);
+#endif
 }
 
 SEXP glmer_bhat(SEXP GSp, SEXP fixed, SEXP varc)
