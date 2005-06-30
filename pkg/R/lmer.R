@@ -179,7 +179,6 @@ setMethod("lmer", signature(formula = "formula"),
           wtssqr <- wts * wts
           offset <- glm.fit$offset
           if (is.null(offset)) offset <- numeric(length(eta))
-          off <- numeric(length(eta))
           mu <- numeric(length(eta))
 
           dev.resids <- quote(family$dev.resids(y, mu, wtssqr))

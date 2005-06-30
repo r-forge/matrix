@@ -2265,7 +2265,7 @@ SEXP glmer_init(SEXP rho) {
     GS->offset = find_and_check(rho, install("offset"),
 				REALSXP, GS->n);
     defineVar(offSym, duplicate(GS->offset), rho);
-    GS->off = find_and_check(rho, install("off"), REALSXP, GS->n);
+    GS->off = find_and_check(rho, offSym, REALSXP, GS->n);
     GS->x = find_and_check(rho, install("x"), REALSXP, 0);
     if (!isMatrix(GS->x))
 	error(_("%s must be a model matrix"), "x");
@@ -2394,6 +2394,44 @@ SEXP glmer_PQL(SEXP GSp)
 }
 
 /** 
+ * Establish off, the effective offset for the fixed effects, and
+ * iterate to determine the conditional modes.  Factor Omega and bVar
+ * and return the difference in the log-determinants.
+ * 
+ * @param pars parameter vector
+ * @param GS a GlmerStruct object
+ */
+static void
+internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
+{
+    int i, ione = 1;
+    double *etaold = Calloc(GS->n, double),
+	*fitted = Calloc(GS->n, double),
+	crit, one = 1, zero = 0;
+	
+    internal_coefGets(GS->mer, varc, 2);
+
+    F77_CALL(dgemv)("N", &(GS->n), &(GS->p), &one,
+		    REAL(GS->x), &(GS->n), fixed,
+		    &ione, &zero, REAL(GS->off), &ione);
+    for (i = 0; i < GS->n; i++)
+	REAL(GS->eta)[i] =
+	    (REAL(GS->off)[i] += REAL(GS->offset)[i]);
+    Memcpy(etaold, REAL(GS->eta), GS->n);
+
+    for (i = 0, crit = GS->tol + 1;
+	 i < GS->maxiter && crit > GS->tol; i++) {
+	reweight_update(GS);
+	crit = conv_crit(GS, etaold,
+			 internal_fitted(GS->mer, GS->unwtd, 1,
+					 fitted));
+    }
+    if (crit > GS->tol)
+	warning(_("iterations for bhat did not converge"));
+    Free(etaold);
+}
+
+/** 
  * Evaluate half the difference of the logarithm of the
  * determinant of Sigma and the log determinant of bVar.
  * This function has a side effect of factoring Sigma and the
@@ -2437,41 +2475,6 @@ Sigma_bVar_det(GlmerStruct GS) {
         }
     }
     return ans;
-}
-
-/** 
- * Establish off, the effective offset for the fixed effects, and
- * iterate to determine the conditional modes.  Factor Omega and bVar
- * and return the difference in the log-determinants.
- * 
- * @param pars parameter vector
- * @param GS a GlmerStruct object
- */
-static void
-internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
-{
-    int conv, i, ione = 1;
-    double *etaold = Calloc(GS->n, double),
-	*fitted = Calloc(GS->n, double), one = 1, zero = 0;
-	
-    F77_CALL(dgemv)("N", &(GS->n), &(GS->p), &one,
-		    REAL(GS->x), &(GS->n), fixed,
-		    &ione, &zero, REAL(GS->off), &ione);
-    for (i = 0; i < GS->n; i++)
-	REAL(GS->eta)[i] =
-	    (REAL(GS->off)[i] += REAL(GS->offset)[i]);
-    internal_coefGets(GS->mer, varc, 2);
-    etaold = Memcpy(etaold, REAL(GS->eta), GS->n);
-
-    for (i = 0, conv = 0; i < GS->maxiter && !conv; i++) {
-	reweight_update(GS);
-	conv =
-	    conv_crit(GS, etaold,
-		      internal_fitted(GS->mer, GS->unwtd, 1,
-				      fitted)) < GS->tol;
-    }
-    if (!conv) warning(_("iterations for bhat did not converge"));
-    Free(etaold);
 }
 
 /** 
@@ -2640,7 +2643,7 @@ SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
 	condd = PROTECT(cond_dev(GS, bhat));
 	for (i = 0; i < GS->n; i++) LaplaceDev += REAL(condd)[i];
 	UNPROTECT(2);
-	return ScalarLogical(LaplaceDev);
+	return ScalarReal(LaplaceDev);
     }
     dims = INTEGER(getAttrib(VECTOR_ELT(bhat, 0), R_DimSymbol));
     nlev = dims[0]; nc = dims[1];
@@ -2650,7 +2653,7 @@ SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
     for (i = 0; i < nlev; i++) LaplaceDev += f0[i];
     Free(f0);
     UNPROTECT(1);
-    return ScalarLogical(LaplaceDev);
+    return ScalarReal(LaplaceDev);
 #if 0
     if (nAGQ > 1) {
 	SEXP delb = PROTECT(duplicate(bhat)),
