@@ -22,29 +22,25 @@ options(show.signif.stars = FALSE)
 (fm4 <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
              OrchardSprays, poisson(), method = "Laplace"))
 
-## Adaptive Gauss-Hermite quadrature
-(fm5 <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
-             OrchardSprays, poisson(), method = "Laplace"))
-
 if (isTRUE(try(data(Contraception, package = 'mlmRev')) ==
            'Contraception')) {
-    (fm1 <- lmer(use ~ urban + age + livch + (1 | district),
+    print(fm1 <- lmer(use ~ urban + age + livch + (1 | district),
+                      Contraception, binomial))
+    print(system.time(fm1 <- lmer(use ~ urban + age + livch + (1 | district),
+                                  Contraception, binomial), gc = TRUE))
+    print(fm2 <- lmer(use ~ urban + age + livch + (1 | district),
+                      Contraception, binomial, method = 'Laplace'))
+    print(system.time(fm2 <- lmer(use ~ urban + age + livch + (1 | district),
+                                  Contraception, binomial, method = 'Laplace'),
+                      gc = TRUE))
+    print(fm2a <- lmer(use ~ urban + age + livch + (1 | district),
+                       Contraception, binomial, method = 'AGQ'))
+    print(system.time(fm2a <- lmer(use ~ urban + age + livch + (1 | district),
+                                   Contraception, binomial, method = 'AGQ'),
+                      gc = TRUE))
+    print(fm3 <- lmer(use ~ urban + age + livch + (urban | district),
                  Contraception, binomial))
-    system.time(fm1 <- lmer(use ~ urban + age + livch + (1 | district),
-                            Contraception, binomial), gc = TRUE)
-    (fm2 <- lmer(use ~ urban + age + livch + (1 | district),
-                 Contraception, binomial, method = 'Laplace'))
-    system.time(fm2 <- lmer(use ~ urban + age + livch + (1 | district),
-                            Contraception, binomial, method = 'Laplace'),
-                gc = TRUE)
-    (fm2a <- lmer(use ~ urban + age + livch + (1 | district),
-                  Contraception, binomial, method = 'AGQ'))
-    system.time(fm2a <- lmer(use ~ urban + age + livch + (1 | district),
-                             Contraception, binomial, method = 'AGQ'),
-                gc = TRUE)
-    (fm3 <- lmer(use ~ urban + age + livch + (urban | district),
-                 Contraception, binomial))
-    (fm4 <- lmer(use ~ urban + age + livch + (urban | district),
+    print(fm4 <- lmer(use ~ urban + age + livch + (urban | district),
                  Contraception, binomial, method = 'Laplace'))
 }
 if (require('MASS', quietly = TRUE)) {
@@ -52,17 +48,17 @@ if (require('MASS', quietly = TRUE)) {
     contrasts(bacteria$trt) <-
         structure(contr.sdif(3),
                   dimnames = list(NULL, c("diag", "encourage")))
-    (fm5 <- lmer(y ~ trt + wk2 + (1|ID), bacteria, binomial))
-    system.time(fm5 <- lmer(y ~ trt + wk2 + (1|ID), bacteria, binomial),
-                gc = TRUE)
-    (fm6 <- lmer(y ~ trt + wk2 + (1|ID), bacteria, binomial,
+    print(fm5 <- lmer(y ~ trt + wk2 + (1|ID), bacteria, binomial))
+    print(system.time(fm5 <- lmer(y ~ trt + wk2 + (1|ID), bacteria, binomial),
+                      gc = TRUE))
+    print(fm6 <- lmer(y ~ trt + wk2 + (1|ID), bacteria, binomial,
                  method = 'Laplace'))
-    system.time(fm6 <- lmer(y ~ trt + wk2 + (1|ID), bacteria, binomial,
-                            method = 'Laplace'), gc = TRUE)
-    (fm6a <- lmer(y ~ trt + wk2 + (1|ID), bacteria, binomial,
+    print(system.time(fm6 <- lmer(y ~ trt + wk2 + (1|ID), bacteria, binomial,
+                                  method = 'Laplace'), gc = TRUE))
+    print(fm6a <- lmer(y ~ trt + wk2 + (1|ID), bacteria, binomial,
                   method = 'AGQ'))
-    system.time(fm6a <- lmer(y ~ trt + wk2 + (1|ID), bacteria, binomial,
-                             method = 'AGQ'), gc = TRUE)
+    print(system.time(fm6a <- lmer(y ~ trt + wk2 + (1|ID), bacteria, binomial,
+                                   method = 'AGQ'), gc = TRUE))
 }
 q('no')
 
