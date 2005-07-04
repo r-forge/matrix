@@ -1,3 +1,8 @@
+2005-07-03  Douglas Bates  <bates@bates1-home>
+
+	* src/lmer.c (glmer_devAGQ): Added AGQ for single grouping factor,
+	unidimensional case.
+
 2005-06-08  Douglas Bates  <bates@bates1-home>
 
 	* DESCRIPTION (Version): 0.96-1
