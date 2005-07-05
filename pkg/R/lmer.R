@@ -59,7 +59,7 @@ subbars <- function(term)
     
 ## Control parameters for lmer
 lmerControl <-
-  function(maxIter = 50,
+  function(maxIter = 200,
            msMaxIter = 200,
            tolerance = sqrt((.Machine$double.eps)),
            niterEM = 15,
@@ -215,9 +215,13 @@ setMethod("lmer", signature(formula = "formula"),
               nAGQ <- 1
               if (method == "AGQ") {    # determine nAGQ at PQL estimates
                   dev11 <- devAGQ(PQLpars, 11)
+                  ## FIXME: Should this be an absolute or a relative tolerance?
                   devTol <- sqrt(.Machine$double.eps) * abs(dev11)
-                  for (nAGQ in c(11, 9, 7, 5, 3))
+                  for (nAGQ in c(9, 7, 5, 3, 1))
                       if (abs(dev11 - devAGQ(PQLpars, nAGQ - 2)) > devTol) break
+                  nAGQ <- nAGQ + 2
+                  if (gVerb)
+                      cat(paste("Using", nAGQ, "quadrature points per column\n"))
               }
               obj <- function(pars)
                   .Call("glmer_devAGQ", pars, GSpt, nAGQ, PACKAGE = "Matrix")
