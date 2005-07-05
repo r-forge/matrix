@@ -2371,112 +2371,35 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
 }
 
 /** 
- * Evaluate half the difference of the logarithm of the
- * determinant of Sigma and the log determinant of bVar.
- * This function has a side effect of factoring Sigma and the
- * matrices in bVar.
+ * Determine the deviance components associated with each of the
+ * levels of a grouping factor at the conditional modes or an value
+ * offset from the conditional modes by delb.
  * 
- * @param GS a GlmerStruct object
- * @param b a random-effects object
+ * @param GS pointer to a GlmerStruct
+ * @param b pointer to the conditional modes of the random effects 
+ * @param nlev number of levels of the kth grouping factor
+ * @param nc number of columns in the model matrix for the kth
+ * grouping factor
+ * @param k index (0-based) of the grouping factor
+ * @param delb vector of length nc giving the changes in the
+ * orthonormalized random effects 
+ * @param OmgFac Cholesky factor of the inverse of the penalty matrix
+ * for this grouping factor 
+ * @param bVfac 3-dimensional array holding the factors of the
+ * conditional variance-covariance matrix of the random effects 
+ * @param devcmp array to hold the deviance components
  * 
- * @return difference of log determinants
+ * @return devcmp
  */
-/* FIXME: This should not factor the components in place.  Dangerous practice. */
-static double
-Sigma_bVar_det(GlmerStruct GS) {
-    SEXP Omega = GET_SLOT(GS->mer, Matrix_OmegaSym),
-	bVar = GET_SLOT(GS->mer, Matrix_bVarSym);
-    int *nc = INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)),
-	*Gp = INTEGER(GET_SLOT(GS->mer, Matrix_GpSym)), i;
-    double ans;
-
-    for (i = 0, ans = 0; i < GS->nf; i++) {
-        int j, k, nci = nc[i];
-        int ncip1 = nci + 1, ncisqr = nci * nci,
-	    nlev = (Gp[i + 1] - Gp[i])/nci;
-	double *bVi = REAL(VECTOR_ELT(bVar, i)),
-	    *Omgi = REAL(VECTOR_ELT(Omega, i));
-
-        F77_CALL(dpotrf)("U", &nci, Omgi, &nci, &j);
-        if (j)
-            error(_("Leading %d minor of Omega[[%d]] not positive definite"),
-                  j, i + 1);
-        for (j = 0; j < nci; j++) { /* nlev * logDet(Omega_i) */
-            ans += nlev * log(Omgi[j * ncip1]);
-            /* Note: we are adding because Omega has been inverted */
-        }
-        for (k = 0; k < nlev; k++) {
-	    double *bVik = bVi + k * ncisqr;
-            F77_CALL(dpotrf)("U", &nci, bVik, &nci, &j);
-            if (j)
-                error(_("Leading %d minor of bVar[[%d]][,,%d] not positive definite"),
-                      j, i + 1, k + 1);
-            for (j = 0; j < nci; j++) ans += log(bVik[j * ncip1]);
-        }
-    }
-    return ans;
-}
-
-/** 
- * Evaluate the quadratic form in b (multiple grouping factors)
- * 
- * @param GS a GlmerStruct object
- * @param b random effects
- * 
- * @return the quadratic form
- */
-static double
-b_qf(GlmerStruct GS, SEXP b) {
-    SEXP Omega = GET_SLOT(GS->mer, Matrix_OmegaSym);
-    int *nc = INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)),
-	*Gp = INTEGER(GET_SLOT(GS->mer, Matrix_GpSym)),
-	i, ione = 1;
-    double ans = 0, one = 1, zero = 0;
-    
-    for (i = 0; i < GS->nf; i++) {
-	int nci = nc[i], ntot = Gp[i + 1] - Gp[i];
-	int nlev = ntot/nci;
-	double *tmp = Calloc(ntot, double);
-
-	F77_CALL(dgemm)("N", "T", &nlev, &nci, &nci, &one,
-			REAL(VECTOR_ELT(b, i)), &nlev,
-			REAL(VECTOR_ELT(Omega, i)), &nci,
-			&zero, tmp, &nlev);
-        ans += F77_CALL(ddot)(&ntot, tmp, &ione, tmp, &ione);
-    }
-    return ans;
-}
-	
-/** 
- * Evaluate the conditional deviance, given a value of the random
- * effects
- * 
- * @param GS a GlmerStruct object
- * @param b random effects
- * 
- * @return the conditional deviance
- */
-static SEXP
-cond_dev(GlmerStruct GS, SEXP b) {
-    fitted_ranef(GET_SLOT(GS->mer, Matrix_flistSym), GS->unwtd, b,
-		 INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)),
-		 Memcpy(REAL(GS->eta), REAL(GS->off), GS->n));
-    eval_check_store(GS->linkinv, GS->rho, GS->mu);
-    return eval_check(GS->dev_resids, GS->rho, REALSXP, GS->n); 
-}
-
 static double*
 rel_dev_1(GlmerStruct GS, SEXP b, int nlev, int nc, int k,
-	  const double delb[], double devcmp[])
+	  const double delb[], const double OmgFac[],
+	  const double bVfac[], double devcmp[])
 {
     SEXP devs, flist = GET_SLOT(GS->mer, Matrix_flistSym);
     int *fv = INTEGER(VECTOR_ELT(flist, k)), i, ione = 1,
 	j, ntot = nlev * nc;
-    double *bb = REAL(VECTOR_ELT(b, k)), *bcp = (double *) NULL,
-	*OmgFac = REAL(VECTOR_ELT(GET_SLOT(GS->mer,
-					   Matrix_OmegaSym), k)),
-	*bVfac = REAL(VECTOR_ELT(GET_SLOT(GS->mer,
-					  Matrix_bVarSym), k));
+    double *bb = REAL(VECTOR_ELT(b, k)), *bcp = (double *) NULL;
 
     AZERO(devcmp, nlev);
     if (delb) {
@@ -2531,153 +2454,118 @@ rel_dev_1(GlmerStruct GS, SEXP b, int nlev, int nc, int k,
     return devcmp;
 }
 
-#if 0
-/** 
- * Evaluate the conditional deviance, given a value of the random
- * effects, for a single grouping factor
- * 
- * @param GS a GlmerStruct object
- * @param b random effects
- * 
- * @return the conditional deviance
- */
-/* FIXME: Combine this function and b_qf_1 */
-static double*
-cond_dev_1(GlmerStruct GS, SEXP b, double devcmp[]) {
-    SEXP devs, flist = GET_SLOT(GS->mer, Matrix_flistSym);
-    int *fv = INTEGER(VECTOR_ELT(flist, 0)), i,
-	nc = INTEGER(GET_SLOT(GS->mer, Matrix_ncSym))[0];
-    int nlev = INTEGER(GET_SLOT(GS->mer, Matrix_GpSym))[1]/nc;
-
-    Memcpy(REAL(GS->eta), REAL(GS->off), GS->n);
-    fitted_ranef(flist, GS->unwtd, b, &nc, REAL(GS->eta));
-    eval_check_store(GS->linkinv, GS->rho, GS->mu);
-    devs = PROTECT(eval_check(GS->dev_resids, GS->rho, REALSXP, GS->n));
-    AZERO(devcmp, nlev);
-    for (i = 0; i < GS->n; i++)
-	devcmp[fv[i] - 1] += REAL(devs)[i];
-    UNPROTECT(1);
-    return devcmp;
-}
 
 /** 
- * Add the quadratic form components in b and delb (single grouping factor)
+ * Compute the approximation to the deviance using adaptive
+ * Gauss-Hermite quadrature (AGQ).  When nAGQ == 1 this is the Laplace
+ * approximation.
  * 
- * @param GS a GlmerStruct object
- * @param b random effects
- * @param delb scaled deviations in random effects from bhat
+ * @param pars pointer to a numeric vector of parameters
+ * @param GSp pointer to a GlmerStruct object
+ * @param nAGQp pointer to a scalar integer representing the number of points in AGQ to use
  * 
- * @return the quadratic form
+ * @return the approximation to the deviance as computed using AGQ
  */
-static void
-b_qf_1(GlmerStruct GS, double b[], double delb[], double devcmp[]) {
-    int i, j, nc = INTEGER(GET_SLOT(GS->mer, Matrix_ncSym))[0], 
-	ntot = INTEGER(GET_SLOT(GS->mer, Matrix_GpSym))[1];
-    int nlev = ntot/nc;
-    double *omg = REAL(VECTOR_ELT(GET_SLOT(GS->mer,
-					   Matrix_OmegaSym), 0));
-
-    if (nc == 1) {
-	for (i = 0; i < nlev; i++) {
-	    double tmp = *omg * b[i];
-	    devcmp[i] += tmp * tmp;
-	    if (delb) devcmp[i] -= delb[i] * delb[i];
-	}
-    } else {
-	double *tmp = Calloc(nc, double);
-	int ione = 1;
-
-	for (i = 0; i < nlev; i++) {
-	    for (j = 0; j < nc; j++) tmp[j] = b[i + j * nlev];
-	    F77_CALL(dtrmv)("U", "N", "N", &nc, omg, &nc,
-			    tmp, &ione);
-	    for (j = 0; j < nc; j++) 
-		devcmp[i] += tmp[j] * tmp[j];
-	    if (delb)
-		for (j = 0; j < nc; j++) {
-		    double val = delb[i + j * nlev];
-		    devcmp[i] -= val * val;
-		}
-	}
-    }
-}
-
-/* FIXME delb is a constant.  Only bt gets multiplied by bvFacb */
-static R_INLINE void
-update_delb_b(double x, int nc, int nlev, const double bvFac[],
-	      const double bhat[], double delb[], double bt[])
-{
-    int i;
-    if (nc != 1) error("code not yet written");
-    for (i = 0; i < nlev; i++)
-	bt[i] = bhat[i] + (delb[i] = x * bvFac[i]);
-}
-#endif
-
 SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
 {
-    SEXP bhat, condd;
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
-    double *f0, LaplaceDev, AGQadjst = 0;
-    int *dims, i, nc, nlev, nAGQ = asInteger(nAGQp);
+    SEXP bhat, Omega, bVar;
+    int i, j, k, nAGQ = asInteger(nAGQp);
+    int n2 = (nAGQ + 1)/2;
+    double *f0, LaplaceDev = 0, AGQadjst = 0;
 	
     if (!isReal(pars) || LENGTH(pars) != GS->npar)
 	error(_("`%s' must be a numeric vector of length %d"),
 	      "pars", GS->npar);
+    if (GS->nf > 1 && nAGQ > 1) {
+	warning(_("AGQ not available for multiple grouping factors - using Laplace"));
+	nAGQ = 1;
+    }
     internal_bhat(GS, REAL(pars), REAL(pars) + (GS->p));
-    LaplaceDev = -2 * Sigma_bVar_det(GS); /* also factors Omega and bVar */
-    bhat = PROTECT(lmer_ranef(GS->mer));
-    if (GS->nf > 1) {
-/* FIXME: Rewrite this so it works one grouping factor at a time */
-	if (nAGQ > 1)
-	    warning(_("AGQ not available for multiple grouping factors - using Laplace"));
-	LaplaceDev += b_qf(GS, bhat);
-	condd = PROTECT(cond_dev(GS, bhat));
-	for (i = 0; i < GS->n; i++) LaplaceDev += REAL(condd)[i];
-	UNPROTECT(2);
-	return ScalarReal(LaplaceDev);
-    }
-    dims = INTEGER(getAttrib(VECTOR_ELT(bhat, 0), R_DimSymbol));
-    nlev = dims[0]; nc = dims[1];
-    f0 = Calloc(nlev, double);
-    rel_dev_1(GS, bhat, nlev, nc, 0, (double *) NULL, f0);
-    for (i = 0; i < nlev; i++) LaplaceDev += f0[i];
-    if (nAGQ > 1) {
-	int i, j, odd = nAGQ % 2;
-	int n2 = (nAGQ + odd)/2;
-	double *fx = Calloc(nlev, double),
-	    *rellik = Calloc(nlev, double),
-	    *delb = Calloc(nc, double);
+    bhat = PROTECT(lmer_ranef(GS->mer)); /* forces an inversion of GS->mer */
+    bVar = GET_SLOT(GS->mer, Matrix_bVarSym);
+    Omega = GET_SLOT(GS->mer, Matrix_OmegaSym);
 
-	if (nc > 1) error(_("code not yet written"));
-	AZERO(rellik, nlev);	/* zero accumulator */
-	for (i = 0; i < n2; i++) {	
-	    delb[0] = GHQ_x[nAGQ][i];
-	    if (delb[0]) {
-		rel_dev_1(GS, bhat, nlev, nc, 0, delb, fx);
-		for (j = 0; j < nlev; j++) {
-		    rellik[j] += GHQ_w[nAGQ][i] *
-			exp(-(fx[j] - f0[j])/2);
+    for (i = 0; i < GS->nf; i++) {
+	int *dims = INTEGER(getAttrib(VECTOR_ELT(bVar, i),
+				      R_DimSymbol));
+	int nci = dims[0], nlev = dims[2];
+	int ncip1 = nci + 1, ncisqr = nci * nci;
+	double *omg = Memcpy(Calloc(ncisqr, double),
+			     REAL(VECTOR_ELT(Omega, i)), ncisqr),
+	    *bvar = Memcpy(Calloc(ncisqr * nlev, double),
+			   REAL(VECTOR_ELT(bVar, i)), ncisqr * nlev);
+
+	LaplaceDev = 0;
+				/* Calculate difference of determinants */
+        F77_CALL(dpotrf)("U", &nci, omg, &nci, &j);
+        if (j)
+            error(_("Leading %d minor of Omega[[%d]] not positive definite"),
+                  j, i + 1);
+        for (j = 0; j < nci; j++) { /* nlev * logDet(Omega_i) */
+            /* Note: we subtract because Omega has been inverted */
+            LaplaceDev -= 2 * nlev * log(omg[j * ncip1]);
+        }
+        for (k = 0; k < nlev; k++) {
+	    double *bVik = bvar + k * ncisqr;
+            F77_CALL(dpotrf)("U", &nci, bVik, &nci, &j);
+            if (j)
+                error(_("Leading %d minor of bVar[[%d]][,,%d] not positive definite"),
+                      j, i + 1, k + 1);
+            for (j = 0; j < nci; j++) LaplaceDev -= 2 * log(bVik[j * ncip1]);
+        }
+
+	f0 = Calloc(nlev, double);
+	rel_dev_1(GS, bhat, nlev, nci, i, (double *) NULL,
+		  omg, bvar, f0);
+	for (k = 0; k < nlev; k++) LaplaceDev += f0[k];
+	if (nAGQ > 1) {
+	    double *fx = Calloc(nlev, double),
+		*rellik = Calloc(nlev, double),
+		*delb = Calloc(nci, double);
+
+	    if (nci > 1) error(_("code not yet written"));
+	    AZERO(rellik, nlev);	/* zero accumulator */
+	    for (k = 0; k < n2; k++) {	
+		delb[0] = GHQ_x[nAGQ][k];
+		if (delb[0]) {
+		    rel_dev_1(GS, bhat, nlev, nci, i, delb,
+			      omg, bvar, fx);
+		    for (j = 0; j < nlev; j++) {
+			rellik[j] += GHQ_w[nAGQ][k] *
+			    exp(-(fx[j] - f0[j])/2);
+		    }
+		    delb[0] *= -1;
+		    rel_dev_1(GS, bhat, nlev, nci, i, delb,
+			      omg, bvar, fx);
+		    for (j = 0; j < nlev; j++) {
+			rellik[j] += GHQ_w[nAGQ][k] *
+			    exp(-(fx[j] - f0[j])/2);
+		    }
+		} else {
+		    for (j = 0; j < nlev; j++)
+			rellik[j] += GHQ_w[nAGQ][k];
 		}
-		delb[0] *= -1;
-		rel_dev_1(GS, bhat, nlev, nc, 0, delb, fx);
-		for (j = 0; j < nlev; j++) {
-		    rellik[j] += GHQ_w[nAGQ][i] *
-			exp(-(fx[j] - f0[j])/2);
-		}
-	    } else {
-		for (j = 0; j < nlev; j++)
-		    rellik[j] += GHQ_w[nAGQ][i];
 	    }
+	    for (j = 0; j < nlev; j++)
+		AGQadjst -= 2 * log(rellik[j]);
+	    Free(fx); Free(rellik);
 	}
-	for (j = 0; j < nlev; j++) AGQadjst -= 2 * log(rellik[j]);
-	Free(fx); Free(rellik);
+	Free(f0); Free(omg); Free(bvar);
     }
-    Free(f0);
     UNPROTECT(1);
     return ScalarReal(LaplaceDev + AGQadjst);
 }
 
+/** 
+ * Evaluate the conditional modes of the random effects.
+ * 
+ * @param GSp pointer to a GlmerStruct
+ * @param fixed pointer to a numeric vector of the fixed effects
+ * @param varc pointer to a numeric vector of the variance components
+ * 
+ * @return R_NilValue.  As a side effect it evaluates bhat.
+ */
 SEXP glmer_bhat(SEXP GSp, SEXP fixed, SEXP varc)
 {
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
@@ -2695,6 +2583,16 @@ SEXP glmer_bhat(SEXP GSp, SEXP fixed, SEXP varc)
     return R_NilValue;
 }
 
+/** 
+ * Update the fixed effects vector to the conditional modes given the
+ * data and the current random effects.
+ * 
+ * @param GSp pointer to a GlmerStruct
+ * @param b list of random effects
+ * @param fixed current value of the fixed effects
+ * 
+ * @return updated value of the fixed effects
+ */
 SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed)
 {
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
