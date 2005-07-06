@@ -817,6 +817,7 @@ glmmMCMC <- function(obj, method = c("full"), nsamp = 1)
     if (obj@family$family == "gaussian" && obj@family$link == "identity")
         warn("glmmMCMC not indended for Gaussian family with identity link")
     cv <- Matrix:::lmerControl()
+    cv$msVerbose <- 1
     family <- obj@family
     frm <- obj@frame
     fixed.form <- Matrix:::nobars(obj@call$formula)
@@ -865,8 +866,9 @@ glmmMCMC <- function(obj, method = c("full"), nsamp = 1)
                 varc = matrix(0, nr = length(varc), nc = nsamp))
     for (i in 1:nsamp) {
         ## conditional means and variances of fixed effects
-        fupd <- .Call("glmer_fixed_update", GSpt, b, fixed, PACKAGE = "Matrix")
-        ans$fixed[,i] <- fixed <- fupd$fixed
+        print(fixed <- .Call("glmer_fixed_update", GSpt, b,
+                             fixed, PACKAGE = "Matrix"))
+        ans$fixed[,i] <- fixed
         ## sample from the conditional distribution of beta given b and y
         ## conditional means and variances of random_effects
         .Call("glmer_bhat", GSpt, fixed, varc, PACKAGE = "Matrix")
