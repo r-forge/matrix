@@ -2337,7 +2337,9 @@ SEXP glmer_PQL(SEXP GSp)
  * @param pars parameter vector
  * @param GS a GlmerStruct object
  */
-static void
+/* FIXME: Return an indicator of failure to converge and use this in
+ * glmer_devAGQ to return a large value */
+static int
 internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
 {
     SEXP flist = GET_SLOT(GS->mer, Matrix_flistSym);
@@ -2365,9 +2367,8 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
 	vecSum(REAL(GS->eta), REAL(GS->off), fitted, GS->n);
 	crit = conv_crit(etaold, REAL(GS->eta), GS->n);
     }
-    if (crit > GS->tol)
-	warning(_("iterations for bhat did not converge"));
     Free(etaold); Free(fitted);
+    return (crit > GS->tol) ? 0 : 1;
 }
 
 /** 
@@ -2481,7 +2482,8 @@ SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
 	warning(_("AGQ not available for multiple grouping factors - using Laplace"));
 	nAGQ = 1;
     }
-    internal_bhat(GS, REAL(pars), REAL(pars) + (GS->p));
+    if (!internal_bhat(GS, REAL(pars), REAL(pars) + (GS->p)))
+	return ScalarReal(R_PosInf);
     bhat = PROTECT(lmer_ranef(GS->mer)); /* forces an inversion of GS->mer */
     bVar = GET_SLOT(GS->mer, Matrix_bVarSym);
     Omega = GET_SLOT(GS->mer, Matrix_OmegaSym);
@@ -2558,7 +2560,13 @@ SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
 }
 
 /** 
- * Evaluate the conditional modes of the random effects.
+ * Determine the conditional modes and the conditional variance of the
+ * random effects given the data and the current fixed effects and
+ * variance components.
+ *
+ * Create a Metropolis-Hasting proposal step from the multivariate
+ * normal density, determine the acceptance probability and return the
+ * current value or the proposed value.
  * 
  * @param GSp pointer to a GlmerStruct
  * @param fixed pointer to a numeric vector of the fixed effects
@@ -2566,7 +2574,7 @@ SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
  * 
  * @return R_NilValue.  As a side effect it evaluates bhat.
  */
-SEXP glmer_bhat(SEXP GSp, SEXP fixed, SEXP varc)
+SEXP glmer_ranef_update(SEXP GSp, SEXP fixed, SEXP varc, SEXP b)
 {
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
     int nvarc = GS->npar - GS->p;
@@ -2579,16 +2587,20 @@ SEXP glmer_bhat(SEXP GSp, SEXP fixed, SEXP varc)
 	      "varc", nvarc);
     if (INTEGER(GET_SLOT(GS->mer, Matrix_ncSym))[GS->nf] > 0)
 	error(_("the mer object must be set to skip fixed effects"));
-    internal_bhat(GS, REAL(fixed), REAL(varc));
-    return R_NilValue;
+				/* Don't check for convergence failure
+				 * in internal_bhat.  It's just a
+				 * proposal density. */
+    internal_bhat(GS, REAL(fixed), REAL(varc)); 
+    return lmer_ranef(GS->mer);
 }
 
 /** 
- * Evaluate the normal kernel (x-mn)'A'A(x-mn)
+ * Evaluate the quadratic form (x-mn)'A'A(x-mn) from the multivariate
+ * normal kernel.
  * 
  * @param n dimension of random variate
  * @param mn mean vector
- * @param a upper Cholesky factor of the inverse of the variance-covariance matrix
+ * @param a upper Cholesky factor of the precision matrix
  * @param lda leading dimension of A
  * @param x vector at which to evaluate the kernel
  * 
@@ -2608,8 +2620,16 @@ normal_kernel(int n, const double mn[],
     return ans;
 }  
 
+/** 
+ * Evaluate the conditional deviance for a given set of fixed effects.
+ * 
+ * @param GS Pointer to a GlmerStruct
+ * @param fixed value of the fixed effects
+ * 
+ * @return conditional deviance
+ */
 static double
-fixed_deviance(GlmerStruct GS, const double fixed[])
+fixed_effects_deviance(GlmerStruct GS, const double fixed[])
 {
     SEXP devs;
     int i, ione = 1;
@@ -2628,8 +2648,11 @@ fixed_deviance(GlmerStruct GS, const double fixed[])
 }
     
 /** 
- * Update the fixed effects vector to the conditional modes given the
- * data and the current random effects.
+ * Determine the conditional modes and the conditional variance of the
+ * fixed effects given the data and the current random effects.
+ * Create a Metropolis-Hasting proposal step from the multivariate
+ * normal density, determine the acceptance probability and return the
+ * current value or the proposed value.
  * 
  * @param GSp pointer to a GlmerStruct
  * @param b list of random effects
@@ -2714,9 +2737,10 @@ SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed)
 	if (j) error(_("%s returned error code %d"), "dgels", j);
 	Memcpy(md, z, GS->p);
     }
-				/* wtd now contains the Cholesky factor */
+				/* wtd contains the Cholesky factor of
+				 * the precision matrix */
     devr = normal_kernel(GS->p, md, wtd, GS->n, REAL(fixed));
-    devr -= fixed_deviance(GS, REAL(fixed));
+    devr -= fixed_effects_deviance(GS, REAL(fixed));
     GetRNGstate();
     for (i = 0; i < GS->p; i++) {
 	double var = norm_rand();
@@ -2725,7 +2749,7 @@ SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed)
     }
     F77_CALL(dtrsv)("U", "N", "N", &(GS->p), wtd, &(GS->n), REAL(ans), &ione);
     for (i = 0; i < GS->p; i++) REAL(ans)[i] += md[i];
-    devr += fixed_deviance(GS, REAL(ans));
+    devr += fixed_effects_deviance(GS, REAL(ans));
     crit = exp(-0.5 * devr);	/* acceptance probability */
     tmp = unif_rand();
     PutRNGstate();
