@@ -206,7 +206,7 @@ setMethod("lmer", signature(formula = "formula"),
               .Call("glmer_devAGQ", pars, GSpt, n, PACKAGE = "Matrix")
           
           deviance <- devAGQ(PQLpars, 1)
-### FIXME: Change this to an AGQ evaluation once when nf == 1.  Needs
+### FIXME: For nf == 1 change this to an AGQ evaluation.  Needs
 ### AGQ for nc > 1 first.
           fxd <- PQLpars[fixInd]
           loglik <- logLik(mer)
@@ -865,15 +865,13 @@ glmmMCMC <- function(obj, method = c("full"), nsamp = 1)
     ans <- list(fixed = matrix(0, nr = length(fixed), nc = nsamp),
                 varc = matrix(0, nr = length(varc), nc = nsamp))
     for (i in 1:nsamp) {
-        ## conditional means and variances of fixed effects
-        print(fixed <- .Call("glmer_fixed_update", GSpt, b,
-                             fixed, PACKAGE = "Matrix"))
-        ans$fixed[,i] <- fixed
         ## sample from the conditional distribution of beta given b and y
-        ## conditional means and variances of random_effects
-        .Call("glmer_bhat", GSpt, fixed, varc, PACKAGE = "Matrix")
-        print(bhat <- .Call("lmer_ranef", mer, PACKAGE = "Matrix"))
-        ## sample from the conditional distribution of b given beta and y
+        fixed <- .Call("glmer_fixed_update", GSpt, b,
+                            fixed, PACKAGE = "Matrix")
+        ans$fixed[ ,i] <- fixed
+        ## sample from the conditional distribution of b given beta, varc and y.
+        b <- .Call("glmer_ranef_update", GSpt, fixed, varc,
+                   b, PACKAGE = "Matrix")
         ## sample from the conditional distribution of varc given b
         ans$varc[,i] <- varc
     }
