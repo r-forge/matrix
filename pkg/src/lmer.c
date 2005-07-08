@@ -2560,6 +2560,68 @@ SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
 }
 
 /** 
+ * Evaluate the conditional deviance for a given set of fixed effects.
+ * 
+ * @param GS Pointer to a GlmerStruct
+ * @param fixed value of the fixed effects
+ * 
+ * @return conditional deviance
+ */
+static double
+random_effects_deviance(GlmerStruct GS, SEXP b)
+{
+    SEXP devs;
+    int i;
+    double ans;
+
+    Memcpy(REAL(GS->eta), REAL(GS->off), GS->n);
+    fitted_ranef(GET_SLOT(GS->mer, Matrix_flistSym), GS->unwtd, b,
+		 INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)), REAL(GS->eta));
+    eval_check_store(GS->linkinv, GS->rho, GS->mu);
+    devs = PROTECT(eval_check(GS->dev_resids, GS->rho, REALSXP, GS->n));
+    for (i = 0, ans = 0; i < GS->n; i++) ans += REAL(devs)[i];
+    UNPROTECT(1);
+    return ans;
+}
+
+#if 0
+static double
+ranef_normal_kernel(int nf, SEXP mn, SEXP var, SEXP b)
+{
+    int i, ione = 1, j, k;
+    double ans = 0;
+
+    for (i = 0; i < nf; i++) {
+	SEXP Bi = VECTOR_ELT(b, i);
+	int *dims = INTEGER(getAttrib(Bi, R_DimSymbol));
+	int nlev = dims[0], nci = dims[1];
+	int ncisqr = nci * nci;
+	double *bi = REAL(Bi),
+	    *chol = Calloc(ncisqr, double),
+	    *delta = Calloc(nci, double),
+	    *mni = REAL(VECTOR_ELT(mn, i)),
+	    *vari = REAL(VECTOR_ELT(var, i));
+
+	for (k = 0; k < nlev; k++) {
+	    for (j = 0; j < nci; j++)
+		delta[j] = bi[k + j * nlev] - mni[k + j * nlev];
+	    Memcpy(chol, &(vari[k * ncisqr]), ncisqr);
+	    F77_CALL(dpotrf)("U", &nci, chol, &nci, &j);
+	    if (j)
+		error(_("Leading %d minor of bVar[[%d]][,,%d] not positive definite"),
+                      j, i + 1, k + 1);
+	    F77_CALL(dtrsv)("U", "T", "N", &nci, chol, &nci,
+			    delta, &ione);
+	    for (j = 0; j < nci; j++)
+		ans += delta[j] * delta[j];
+	}
+	Free(chol); Free(delta);
+    }
+    return ans;
+}
+#endif
+
+/** 
  * Determine the conditional modes and the conditional variance of the
  * random effects given the data and the current fixed effects and
  * variance components.
@@ -2577,7 +2639,11 @@ SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
 SEXP glmer_ranef_update(SEXP GSp, SEXP fixed, SEXP varc, SEXP b)
 {
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
-    int nvarc = GS->npar - GS->p;
+    SEXP bhat, bprop = PROTECT(duplicate(b)), 
+	bVar = GET_SLOT(GS->mer, Matrix_bVarSym),
+	Omega = GET_SLOT(GS->mer, Matrix_OmegaSym);
+    int i, ione = 1, j, k, nvarc = GS->npar - GS->p;
+    double devr, one = 1;
 
     if (!isReal(fixed) || LENGTH(fixed) != GS->p)
 	error(_("`%s' must be a numeric vector of length %d"),
@@ -2591,7 +2657,68 @@ SEXP glmer_ranef_update(SEXP GSp, SEXP fixed, SEXP varc, SEXP b)
 				 * in internal_bhat.  It's just a
 				 * proposal density. */
     internal_bhat(GS, REAL(fixed), REAL(varc)); 
-    return lmer_ranef(GS->mer);
+    bhat = PROTECT(lmer_ranef(GS->mer)); /* inverts Omega */
+
+    GetRNGstate();
+    devr = -random_effects_deviance(GS, b);
+    for (i = 0; i < GS->nf; i++) {
+	SEXP Bi = VECTOR_ELT(b, i);
+	int *dims = INTEGER(getAttrib(Bi, R_DimSymbol));
+	int nlev = dims[0], nci = dims[1];
+	int ncisqr = nci * nci, ntot = nlev * nci;
+	double *bcopy = Calloc(ntot, double),
+	    *bi = REAL(Bi),
+	    *bhati = REAL(VECTOR_ELT(bhat, i)),
+	    *bpropi = REAL(VECTOR_ELT(bprop, i)),
+	    *bVari = REAL(VECTOR_ELT(bVar, i)),
+	    *chol = Calloc(ncisqr, double),
+	    *delta = Calloc(nci, double),
+	    *omgfac = Memcpy(Calloc(ncisqr, double),
+			     REAL(VECTOR_ELT(Omega, i)),
+			     ncisqr);
+
+	F77_CALL(dpotrf)("U", &nci, omgfac, &nci, &j);
+	Memcpy(bcopy, bi, ntot);
+	F77_CALL(dtrmm)("R", "U", "T", "N", &nlev, &nci, &one,
+			omgfac, &nci, bcopy, &nlev);
+	for (k = 0; k < ntot; k++) devr -= bcopy[k] * bcopy[k];
+	for (k = 0; k < nlev; k++) {
+				/* quadratic form at b */
+	    for (j = 0; j < nci; j++)
+		delta[j] = bi[k + j * nlev] - bhati[k + j * nlev];
+	    Memcpy(chol, &(bVari[k * ncisqr]), ncisqr);
+	    F77_CALL(dpotrf)("U", &nci, chol, &nci, &j);
+	    if (j)
+		error(_("Leading %d minor of bVar[[%d]][,,%d] not positive definite"),
+                      j, i + 1, k + 1);
+	    F77_CALL(dtrsv)("U", "T", "N", &nci, chol, &nci,
+			    delta, &ione);
+	    for (j = 0; j < nci; j++) {
+		double nrm = norm_rand();
+		devr += delta[j] * delta[j] - nrm * nrm;
+		delta[j] = nrm; /* proposal deviate */
+	    }
+				/* scale by Cholesky transpose */
+	    F77_CALL(dtrmv)("U", "T", "N", &nci, chol, &nci,
+			    delta, &ione);
+				/* add mean */
+	    for (j = 0; j < nci; j++)
+		bpropi[k + j * nlev] = bhati[k + j * nlev] + delta[j];
+	}
+	Memcpy(bcopy, bprop, ntot);
+	F77_CALL(dtrmm)("R", "U", "T", "N", &nlev, &nci, &one,
+			omgfac, &nci, bcopy, &nlev);
+	for (k = 0; k < ntot; k++) devr += bcopy[k] * bcopy[k];
+	Free(bcopy); Free(chol); Free(delta); Free(omgfac);
+    }
+    devr += random_effects_deviance(GS, bprop);
+    j = unif_rand() < exp(-0.5 * devr);	/* acceptance probability */
+    PutRNGstate();
+    if (asLogical(getElement(GS->cv, "msVerbose"))) {
+	Rprintf("%.3g\n", exp(-0.5 * devr));
+    }
+    UNPROTECT(2);
+    return (j ? bprop : b);
 }
 
 /** 
