@@ -811,13 +811,16 @@ setMethod("show", signature(object="VarCorr"),
           print(reMat, quote = FALSE)
       })
 
-glmmMCMC <- function(obj, method = c("full"), nsamp = 1)
+glmmMCMC <- function(obj, nsamp = 1, alpha = 1, beta = 1, burnIn =
+                     100, thining = 5, method = c("full"), verbose = FALSE)
 {
     if (!inherits(obj, "lmer")) stop("obj must be of class `lmer'")
     if (obj@family$family == "gaussian" && obj@family$link == "identity")
         warn("glmmMCMC not indended for Gaussian family with identity link")
-    cv <- Matrix:::lmerControl()
-    cv$msVerbose <- 1
+    if (length(obj@Omega) > 1 || obj@nc[1] > 1)
+        stop("glmmMCMC currently defined for models with a single variance component")
+    cv <- lmerControl()
+    if (verbose) cv$msVerbose <- 1
     family <- obj@family
     frm <- obj@frame
     fixed.form <- Matrix:::nobars(obj@call$formula)
@@ -864,6 +867,9 @@ glmmMCMC <- function(obj, method = c("full"), nsamp = 1)
     b <- .Call("lmer_ranef", mer, PACKAGE = "Matrix")
     ans <- list(fixed = matrix(0, nr = length(fixed), nc = nsamp),
                 varc = matrix(0, nr = length(varc), nc = nsamp))
+    shape <- nrow(b[[1]])/2 + alpha
+    betainv <- 1/beta
+    ## FIXME: Adjust this for burnIn and thinning
     for (i in 1:nsamp) {
         ## sample from the conditional distribution of beta given b and y
         fixed <- .Call("glmer_fixed_update", GSpt, b,
@@ -873,6 +879,8 @@ glmmMCMC <- function(obj, method = c("full"), nsamp = 1)
         b <- .Call("glmer_ranef_update", GSpt, fixed, varc,
                    b, PACKAGE = "Matrix")
         ## sample from the conditional distribution of varc given b
+        varc <- 1/rgamma(1, shape = shape,
+                         scale = 1/(sum(b[[1]]^2)/2 + betainv))
         ans$varc[,i] <- varc
     }
     ans

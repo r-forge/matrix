@@ -2633,8 +2633,9 @@ ranef_normal_kernel(int nf, SEXP mn, SEXP var, SEXP b)
  * @param GSp pointer to a GlmerStruct
  * @param fixed pointer to a numeric vector of the fixed effects
  * @param varc pointer to a numeric vector of the variance components
+ * @param varc pointer to current values of b
  * 
- * @return R_NilValue.  As a side effect it evaluates bhat.
+ * @return updated b from the Metropolis-Hastings step
  */
 SEXP glmer_ranef_update(SEXP GSp, SEXP fixed, SEXP varc, SEXP b)
 {
@@ -2657,9 +2658,10 @@ SEXP glmer_ranef_update(SEXP GSp, SEXP fixed, SEXP varc, SEXP b)
 				 * in internal_bhat.  It's just a
 				 * proposal density. */
     internal_bhat(GS, REAL(fixed), REAL(varc)); 
-    bhat = PROTECT(lmer_ranef(GS->mer)); /* inverts Omega */
+    bhat = PROTECT(lmer_ranef(GS->mer));
 
     GetRNGstate();
+				/* subtract deviance at b */
     devr = -random_effects_deviance(GS, b);
     for (i = 0; i < GS->nf; i++) {
 	SEXP Bi = VECTOR_ELT(b, i);
@@ -2677,13 +2679,19 @@ SEXP glmer_ranef_update(SEXP GSp, SEXP fixed, SEXP varc, SEXP b)
 			     REAL(VECTOR_ELT(Omega, i)),
 			     ncisqr);
 
+				/* subtract quadratic form in
+				 * Omega[[i]] at b  */
 	F77_CALL(dpotrf)("U", &nci, omgfac, &nci, &j);
+	if (j)
+	    error(_("Leading %d minor of Omega[[%d]] not positive definite"),
+                      j, i + 1);
 	Memcpy(bcopy, bi, ntot);
 	F77_CALL(dtrmm)("R", "U", "T", "N", &nlev, &nci, &one,
 			omgfac, &nci, bcopy, &nlev);
 	for (k = 0; k < ntot; k++) devr -= bcopy[k] * bcopy[k];
+				/* form bprop and proposal density */
 	for (k = 0; k < nlev; k++) {
-				/* quadratic form at b */
+				/* proposal density at b */
 	    for (j = 0; j < nci; j++)
 		delta[j] = bi[k + j * nlev] - bhati[k + j * nlev];
 	    Memcpy(chol, &(bVari[k * ncisqr]), ncisqr);
@@ -2694,28 +2702,36 @@ SEXP glmer_ranef_update(SEXP GSp, SEXP fixed, SEXP varc, SEXP b)
 	    F77_CALL(dtrsv)("U", "T", "N", &nci, chol, &nci,
 			    delta, &ione);
 	    for (j = 0; j < nci; j++) {
-		double nrm = norm_rand();
+		double nrm = norm_rand(); /* proposal deviate */
 		devr += delta[j] * delta[j] - nrm * nrm;
-		delta[j] = nrm; /* proposal deviate */
+		delta[j] = nrm;
 	    }
-				/* scale by Cholesky transpose */
+				/* scale by Cholesky inverse */
 	    F77_CALL(dtrmv)("U", "T", "N", &nci, chol, &nci,
 			    delta, &ione);
 				/* add mean */
 	    for (j = 0; j < nci; j++)
 		bpropi[k + j * nlev] = bhati[k + j * nlev] + delta[j];
 	}
-	Memcpy(bcopy, bprop, ntot);
+				/* add quadratic form in
+				 * Omega[[i]] at bprop  */
+	Memcpy(bcopy, bpropi, ntot);
 	F77_CALL(dtrmm)("R", "U", "T", "N", &nlev, &nci, &one,
 			omgfac, &nci, bcopy, &nlev);
 	for (k = 0; k < ntot; k++) devr += bcopy[k] * bcopy[k];
+
 	Free(bcopy); Free(chol); Free(delta); Free(omgfac);
     }
+				/* add deviance at bprop */
     devr += random_effects_deviance(GS, bprop);
+
     j = unif_rand() < exp(-0.5 * devr);	/* acceptance probability */
     PutRNGstate();
     if (asLogical(getElement(GS->cv, "msVerbose"))) {
-	Rprintf("%.3g\n", exp(-0.5 * devr));
+	double *b0 = REAL(VECTOR_ELT(bprop, 0));
+	Rprintf("%5.3f:", exp(-0.5 * devr));
+	for (j = 0; j < 5; j++) Rprintf("%#10g ", b0[j]);
+	Rprintf("\n");
     }
     UNPROTECT(2);
     return (j ? bprop : b);
@@ -2827,11 +2843,11 @@ SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed)
     
     for (it = 0, crit = GS->tol + 1;
 	 it < GS->maxiter && crit > GS->tol; it++) {
-	if (asLogical(getElement(GS->cv, "msVerbose"))) {
-	    Rprintf("%2d ", it);
-	    for (j = 0; j < GS->p; j++) Rprintf("%#10g ", md[j]);
-	    Rprintf("\n");
-	}
+/* 	if (asLogical(getElement(GS->cv, "msVerbose"))) { */
+/* 	    Rprintf("%2d ", it); */
+/* 	    for (j = 0; j < GS->p; j++) Rprintf("%#10g ", md[j]); */
+/* 	    Rprintf("\n"); */
+/* 	} */
 				/* fitted values from current beta */
 	F77_CALL(dgemv)("N", &(GS->n), &(GS->p), &one,
 			REAL(GS->x), &(GS->n), md,
@@ -2881,7 +2897,7 @@ SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed)
     tmp = unif_rand();
     PutRNGstate();
     if (asLogical(getElement(GS->cv, "msVerbose"))) {
-	Rprintf("%.3g: ", crit);
+	Rprintf("%5.3f: ", crit);
 	for (j = 0; j < GS->p; j++) Rprintf("%#10g ", REAL(ans)[j]);
 	Rprintf("\n");
     }
