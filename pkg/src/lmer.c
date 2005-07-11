@@ -1,4 +1,5 @@
 #include "lmer.h"
+#include <float.h>
 
 /**
  * Check validity of an lmer object.
@@ -2483,7 +2484,7 @@ SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
 	nAGQ = 1;
     }
     if (!internal_bhat(GS, REAL(pars), REAL(pars) + (GS->p)))
-	return ScalarReal(R_PosInf);
+	return ScalarReal(DBL_MAX);
     bhat = PROTECT(lmer_ranef(GS->mer)); /* forces an inversion of GS->mer */
     bVar = GET_SLOT(GS->mer, Matrix_bVarSym);
     Omega = GET_SLOT(GS->mer, Matrix_OmegaSym);
