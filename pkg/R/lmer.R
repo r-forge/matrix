@@ -811,8 +811,29 @@ setMethod("show", signature(object="VarCorr"),
       })
 
 glmmMCMC <- function(obj, nsamp = 1, alpha = 1, beta = 1, burnIn =
-                     100, thining = 5, method = c("full"), verbose = FALSE)
+                     100, thinning = 5, b = FALSE, verbose = FALSE)
 {
+    ## Perform N cycles of the chain.  This function is defined here
+    ## so it has access to objects in the environment
+    Ncycles <- function(state, N) {
+        fixed <- state$fixed
+        varc <- state$varc
+        b <- state$b
+        for (i in seq(len = N)) {
+            ## sample from the conditional distribution of beta given b and y
+            fixed <- .Call("glmer_fixed_update", GSpt, b,
+                           fixed, PACKAGE = "Matrix")
+            ## sample from the conditional distribution of b given beta, varc and y.
+            b <- .Call("glmer_ranef_update", GSpt, fixed, varc,
+                       b, PACKAGE = "Matrix")
+            ## sample from the conditional distribution of varc given b
+            varc <- 1/rgamma(1, shape = shape,
+                             scale = 1/(sum(b[[1]]^2)/2 + betainv))
+        }
+        list(fixed = fixed, varc = varc, b = b)
+    }
+
+    ## Check arguments
     if (!inherits(obj, "lmer")) stop("obj must be of class `lmer'")
     if (obj@family$family == "gaussian" && obj@family$link == "identity")
         warn("glmmMCMC not indended for Gaussian family with identity link")
@@ -822,6 +843,8 @@ glmmMCMC <- function(obj, nsamp = 1, alpha = 1, beta = 1, burnIn =
     if (verbose) cv$msVerbose <- 1
     family <- obj@family
     frm <- obj@frame
+
+    ## recreate model matrices
     fixed.form <- Matrix:::nobars(obj@call$formula)
     if (inherits(fixed.form, "name")) # RHS is empty - use a constant
         fixed.form <- substitute(foo ~ 1, list(foo = fixed.form))
@@ -844,6 +867,7 @@ glmmMCMC <- function(obj, nsamp = 1, alpha = 1, beta = 1, burnIn =
                .fixed = list(cbind(glm.fit$x, .response = glm.fit$y)))
     mer <- as(obj, "mer")
 
+    ## establish the GS object
     eta <- glm.fit$linear.predictors # perhaps later change this to obj@fitted?
     wts <- glm.fit$prior.weights
     wtssqr <- wts * wts
@@ -851,37 +875,36 @@ glmmMCMC <- function(obj, nsamp = 1, alpha = 1, beta = 1, burnIn =
     if (is.null(offset)) offset <- numeric(length(eta))
     off <- numeric(length(eta))
     mu <- numeric(length(eta))
-
     dev.resids <- quote(family$dev.resids(y, mu, wtssqr))
     linkinv <- quote(family$linkinv(eta))
     mu.eta <- quote(family$mu.eta(eta))
     variance <- quote(family$variance(mu))
     LMEopt <- getAnywhere("LMEoptimize<-")
     doLMEopt <- quote(LMEopt(x = mer, value = cv))
-
     GSpt <- .Call("glmer_init", environment(), PACKAGE = "Matrix")
-    nf <- length(obj@flist)
-    fixed <- obj@fixed
-    varc <- .Call("lmer_coef", mer, 2, PACKAGE = "Matrix")
-    b <- .Call("lmer_ranef", mer, PACKAGE = "Matrix")
-    ans <- list(fixed = matrix(0, nr = length(fixed), nc = nsamp),
-                varc = matrix(0, nr = length(varc), nc = nsamp))
-    shape <- nrow(b[[1]])/2 + alpha
+    ## FIXME: The definition of shape is not general
+    shape <- length(levels(mer@flist[[1]]))/2 + alpha
     betainv <- 1/beta
-    ## FIXME: Adjust this for burnIn and thinning
+
+    ## Perform burnIn cycles and establish the results matrix
+    state <- Ncycles(list(fixed = obj@fixed,
+                          varc = .Call("lmer_coef", mer, 2,
+                          PACKAGE = "Matrix"),
+                          b = .Call("lmer_ranef", mer,
+                          PACKAGE = "Matrix")),
+                     burnIn)
+    ans <- matrix(0, nrow = nsamp,
+                  ncol = length(state$fixed) +
+                  length(state$varc) +
+                  if (b) length(unlist(state$b,
+                                       recursive = TRUE)) else 0)
     for (i in 1:nsamp) {
-        ## sample from the conditional distribution of beta given b and y
-        fixed <- .Call("glmer_fixed_update", GSpt, b,
-                            fixed, PACKAGE = "Matrix")
-        ans$fixed[ ,i] <- fixed
-        ## sample from the conditional distribution of b given beta, varc and y.
-        b <- .Call("glmer_ranef_update", GSpt, fixed, varc,
-                   b, PACKAGE = "Matrix")
-        ## sample from the conditional distribution of varc given b
-        varc <- 1/rgamma(1, shape = shape,
-                         scale = 1/(sum(b[[1]]^2)/2 + betainv))
-        ans$varc[,i] <- varc
+        state <- Ncycles(state, thinning)
+        ans[i,] <-
+            c(state$fixed, state$varc,
+              if (b) unlist(state$b, recursive = TRUE) else numeric(0))
     }
+    class(ans) <- "mcmc"
     ans
 }
 
