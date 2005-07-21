@@ -898,3 +898,5 @@ glmmMCMC <- function(obj, nsamp = 1, alpha = 1, beta = 1, saveb = FALSE, verbose
     ans
 }
 
+rWishart <- function(n, df, invScal)
+  .Call("Matrix_rWishart", n, df, invScal)
