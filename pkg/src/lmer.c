@@ -1133,6 +1133,59 @@ int coef_length(int nf, const int nc[])
     return ans;
 }
 
+static double *
+internal_coef(SEXP x, int ptyp, double ans[])
+{
+    SEXP Omega = GET_SLOT(x, Matrix_OmegaSym);
+    int	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	i, nf = length(Omega), vind;
+
+    vind = 0;			/* index in ans */
+    for (i = 0; i < nf; i++) {
+	int nci = nc[i], ncip1 = nci + 1;
+	if (nci == 1) {
+	    double dd = REAL(VECTOR_ELT(Omega, i))[0];
+	    ans[vind++] = ptyp ? ((ptyp == 1) ? log(dd) : 1./dd) : dd;
+	} else {
+	    if (ptyp) {	/* L log(D) L' factor of Omega[,,i] */
+		int j, k, ncisq = nci * nci;
+		double *tmp = Memcpy(Calloc(ncisq, double),
+				     REAL(VECTOR_ELT(Omega, i)), ncisq);
+		F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
+		if (j)		/* should never happen */
+		    error(_("DPOTRF returned error code %d on Omega[[%d]]"),
+			  j, i+1);
+		for (j = 0; j < nci; j++) {
+		    double diagj = tmp[j * ncip1];
+		    ans[vind++] = (ptyp == 1) ? (2. * log(diagj)) :
+			1./(diagj * diagj);
+		    for (k = j + 1; k < nci; k++) {
+			tmp[j + k * nci] /= diagj;
+		    }
+		}
+		for (j = 0; j < nci; j++) {
+		    for (k = j + 1; k < nci; k++) {
+			ans[vind++] = tmp[j + k * nci];
+		    }
+		}
+		Free(tmp);
+	    } else {		/* upper triangle of Omega[,,i] */
+		int j, k, odind = vind + nci;
+		double *omgi = REAL(VECTOR_ELT(Omega, i));
+
+		for (j = 0; j < nci; j++) {
+		    ans[vind++] = omgi[j * ncip1];
+		    for (k = j + 1; k < nci; k++) {
+			ans[odind++] = omgi[k*nci + j];
+		    }
+		}
+		vind = odind;
+	    }
+	}
+    }
+    return ans;
+}
+
 /**
  * Extract parameters from the Omega matrices.  These aren't
  * "coefficients" but the extractor is called coef for historical
@@ -1156,55 +1209,11 @@ int coef_length(int nf, const int nc[])
  */
 SEXP lmer_coef(SEXP x, SEXP pType)
 {
-    SEXP Omega = GET_SLOT(x, Matrix_OmegaSym);
     int	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
-	i, nf = length(Omega), ptyp = asInteger(pType), vind;
+	nf = LENGTH(GET_SLOT(x, Matrix_OmegaSym));
     SEXP val = PROTECT(allocVector(REALSXP, coef_length(nf, nc)));
-    double *vv = REAL(val);
 
-    vind = 0;			/* index in vv */
-    for (i = 0; i < nf; i++) {
-	int nci = nc[i], ncip1 = nci + 1;
-	if (nci == 1) {
-	    double dd = REAL(VECTOR_ELT(Omega, i))[0];
-	    vv[vind++] = ptyp ? ((ptyp == 1) ? log(dd) : 1./dd) : dd;
-	} else {
-	    if (ptyp) {	/* L log(D) L' factor of Omega[,,i] */
-		int j, k, ncisq = nci * nci;
-		double *tmp = Memcpy(Calloc(ncisq, double),
-				     REAL(VECTOR_ELT(Omega, i)), ncisq);
-		F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
-		if (j)		/* should never happen */
-		    error(_("DPOTRF returned error code %d on Omega[[%d]]"),
-			  j, i+1);
-		for (j = 0; j < nci; j++) {
-		    double diagj = tmp[j * ncip1];
-		    vv[vind++] = (ptyp == 1) ? (2. * log(diagj)) :
-			1./(diagj * diagj);
-		    for (k = j + 1; k < nci; k++) {
-			tmp[j + k * nci] /= diagj;
-		    }
-		}
-		for (j = 0; j < nci; j++) {
-		    for (k = j + 1; k < nci; k++) {
-			vv[vind++] = tmp[j + k * nci];
-		    }
-		}
-		Free(tmp);
-	    } else {		/* upper triangle of Omega[,,i] */
-		int j, k, odind = vind + nci;
-		double *omgi = REAL(VECTOR_ELT(Omega, i));
-
-		for (j = 0; j < nci; j++) {
-		    vv[vind++] = omgi[j * ncip1];
-		    for (k = j + 1; k < nci; k++) {
-			vv[odind++] = omgi[k*nci + j];
-		    }
-		}
-		vind = odind;
-	    }
-	}
-    }
+    internal_coef(x, asInteger(pType), REAL(val));
     UNPROTECT(1);
     return val;
 }
@@ -2349,8 +2358,10 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
     double *etaold = Calloc(GS->n, double),
 	*fitted = Calloc(GS->n, double),
 	crit, one = 1, zero = 0;
-	
-    internal_coefGets(GS->mer, varc, 2);
+
+    /* skip this step if varc == (double*) NULL */	
+    if (varc)			
+	internal_coefGets(GS->mer, varc, 2);
 
     F77_CALL(dgemv)("N", &(GS->n), &(GS->p), &one,
 		    REAL(GS->x), &(GS->n), fixed,
@@ -2650,15 +2661,19 @@ SEXP glmer_ranef_update(SEXP GSp, SEXP fixed, SEXP varc, SEXP b)
     if (!isReal(fixed) || LENGTH(fixed) != GS->p)
 	error(_("`%s' must be a numeric vector of length %d"),
 	      "fixed", GS->p);
-    if (!isReal(varc) || LENGTH(varc) != nvarc)
-	error(_("`%s' must be a numeric vector of length %d"),
-	      "varc", nvarc);
     if (INTEGER(GET_SLOT(GS->mer, Matrix_ncSym))[GS->nf] > 0)
 	error(_("the mer object must be set to skip fixed effects"));
-				/* Don't check for convergence failure
-				 * in internal_bhat.  It's just a
-				 * proposal density. */
-    internal_bhat(GS, REAL(fixed), REAL(varc)); 
+    if (varc != R_NilValue) {
+	if (!isReal(varc) || LENGTH(varc) != nvarc)
+	    error(_("`%s' must be a numeric vector of length %d"),
+		  "varc", nvarc);
+	internal_bhat(GS, REAL(fixed), REAL(varc));
+    } else {
+	internal_bhat(GS, REAL(fixed), (double *) NULL);
+    }
+
+    /* Don't check for convergence failure in internal_bhat.
+     * It's just a proposal density. */
     bhat = PROTECT(lmer_ranef(GS->mer));
 
     GetRNGstate();
@@ -2910,7 +2925,7 @@ SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed)
 
 /** 
  * Simulate the Cholesky factor of a standardized Wishart variate with
- * of dimension p with df degrees of freedom.
+ * dimension p and df degrees of freedom.
  * 
  * @param df degrees of freedom
  * @param p dimension of the Wishart distribution
@@ -2972,6 +2987,52 @@ internal_Omega_update(SEXP x, SEXP bnew)
 	Free(tmp);
     }
 }
+
+SEXP 
+glmer_MCMCsamp(SEXP GSpt, SEXP b, SEXP fixedp, SEXP varcp,
+	       SEXP savebp, SEXP nsampp) 
+{ 
+    GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSpt);
+    int i, j, nf = LENGTH(b), nsamp = asInteger(nsampp),
+	p = LENGTH(fixedp), q = LENGTH(varcp),
+	saveb = asLogical(savebp);
+    int nc = p + q;
+    SEXP ans;
+    
+    if (nsamp <= 0) nsamp = 1;
+    nc = p + q;
+    if (saveb)
+	for (i = 0; i < nf; i++) {
+	    int *dims = INTEGER(getAttrib(VECTOR_ELT(b, i),
+					  R_DimSymbol));
+	    nc += dims[0] * dims[1];
+	}
+    ans = PROTECT(allocMatrix(REALSXP, nsamp, nc));
+    for (i = 0; i < nsamp; i++) {
+	fixedp = glmer_fixed_update(GSpt, b, fixedp);
+	b = glmer_ranef_update(GSpt, fixedp, R_NilValue, b);
+	internal_Omega_update(GS->mer, b);
+	internal_coef(GS->mer, 2, REAL(varcp));
+	for (j = 0; j < p; j++)
+	    REAL(ans)[i + j * nsamp] = REAL(fixedp)[j];
+	for (j = 0; j < q; j++)
+	    REAL(ans)[i + (j + p) * nsamp] = REAL(varcp)[j];
+	if (saveb) {
+	    int base = p + q, k;
+	    for (k = 0; k < nf; k++) {
+		SEXP bk = VECTOR_ELT(b, k);
+		int *dims = INTEGER(getAttrib(bk, R_DimSymbol));
+		int klen = dims[0] * dims[1];
+
+		for (j = 0; j < klen; j++)
+		    REAL(ans)[i + (j + base) * nsamp] = REAL(bk)[j];
+		base += klen;
+	    }
+	}
+    }
+    UNPROTECT(1);
+    return ans;
+} 
 
 SEXP
 Matrix_rWishart(SEXP ns, SEXP dfp, SEXP scal)

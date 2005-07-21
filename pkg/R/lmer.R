@@ -878,21 +878,25 @@ glmmMCMC <- function(obj, nsamp = 1, alpha = 1, beta = 1, saveb = FALSE, verbose
                                      paste("b", 1:blen, sep = ''))))
     }
 
-    ## create the samples
-    for (i in 1:nsamp) {
-        ## sample from the conditional distribution of beta given b and y
-        fixed <- .Call("glmer_fixed_update", GSpt, b,
+    ans <- .Call("glmer_MCMCsamp", GSpt, b, fixed, varc, saveb, nsamp, 
+          PACKAGE = "Matrix") 
+    if (FALSE) {
+        ## create the samples
+        for (i in 1:nsamp) {
+            ## sample from the conditional distribution of beta given b and y
+            fixed <- .Call("glmer_fixed_update", GSpt, b,
                            fixed, PACKAGE = "Matrix")
-        ## sample from the conditional distribution of b given beta, varc and y.
-        b <- .Call("glmer_ranef_update", GSpt, fixed, varc,
-                   b, PACKAGE = "Matrix")
-        ## sample from the conditional distribution of varc given b
-        varc <- 1/rgamma(1, shape = shape,
-                         scale = 1/(sum(b[[1]]^2)/2 + betainv))
-        if (saveb) 
-            ans[i,] <- c(fixed, varc, unlist(b, recursive = TRUE))
-        else
-            ans[i,] <- c(fixed, varc)
+            ## sample from the conditional distribution of b given beta, varc and y.
+            b <- .Call("glmer_ranef_update", GSpt, fixed, varc,
+                       b, PACKAGE = "Matrix")
+            ## sample from the conditional distribution of varc given b
+            varc <- 1/rgamma(1, shape = shape,
+                             scale = 1/(sum(b[[1]]^2)/2 + betainv))
+            if (saveb) 
+                ans[i,] <- c(fixed, varc, unlist(b, recursive = TRUE))
+            else
+                ans[i,] <- c(fixed, varc)
+        }
     }
     class(ans) <- "mcmc"
     ans
