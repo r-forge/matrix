@@ -2906,3 +2906,107 @@ SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed)
     UNPROTECT(1);
     return (tmp < crit) ? ans : fixed;
 }
+
+
+/** 
+ * Simulate the Cholesky factor of a standardized Wishart variate with
+ * of dimension p with df degrees of freedom.
+ * 
+ * @param df degrees of freedom
+ * @param p dimension of the Wishart distribution
+ * @param ans array of size p * p to hold the result
+ * 
+ * @return ans
+ */
+static double*
+std_rWishart_factor(double df, int p, double ans[])
+{
+    int i, j, pp1 = p + 1;
+
+    if (df < (double) p || p <= 0)
+	error("inconsistent degrees of freedom and dimension");
+    for (j = 0; j < p; j++) {	/* jth column */
+	ans[j * pp1] = sqrt(rchisq((double) (df - j)));
+	for (i = 0; i < j; i++) ans[i + j * p] = norm_rand();
+    }
+    return ans;
+}
+
+/** 
+ * Simulate Omega in an mer object from a Wishart distribution with
+ * scale given by the new values of the random effects.
+ * 
+ * @param x Pointer to an mer object
+ * @param bnew Pointer to the new values of the random effects in the
+ * chain
+ */
+static void
+internal_Omega_update(SEXP x, SEXP bnew)
+{
+    SEXP Omega = GET_SLOT(x, Matrix_OmegaSym);
+    int i, info, nf = LENGTH(bnew);
+    double one = 1, zero = 0;
+
+    for (i = 0; i < nf; i++) {
+	SEXP bobj = VECTOR_ELT(bnew, i);
+	int *dims = INTEGER(getAttrib(bobj, R_DimSymbol));
+	int ncisq = dims[1] * dims[1];
+	double *tmp = Calloc(ncisq, double),
+	    *omgi = REAL(VECTOR_ELT(Omega, i));
+	
+	AZERO(tmp, ncisq);
+	F77_CALL(dsyrk)("U", "T", &(dims[1]), &(dims[0]),
+			&one, REAL(bobj), &(dims[0]),
+			&zero, omgi, &(dims[1]));
+	F77_CALL(dpotrf)("U", &(dims[1]), omgi, &(dims[1]), 
+			 &info);
+	if (info)
+	    error(_("Singular random effects varcov at level %d"), i + 1);
+	std_rWishart_factor((double) (dims[0] - dims[1] + 1),
+			    dims[1], tmp);
+	F77_CALL(dtrsm)("R", "U", "T", "N", &(dims[1]), &(dims[1]),
+			&one, omgi, &(dims[1]), tmp, &(dims[1]));
+	F77_CALL(dsyrk)("U", "T", &(dims[1]), &(dims[1]),
+			&one, tmp, &(dims[1]),
+			&zero, omgi, &(dims[1]));
+	Free(tmp);
+    }
+}
+
+SEXP
+Matrix_rWishart(SEXP ns, SEXP dfp, SEXP scal)
+{
+    SEXP ans;
+    int *dims = INTEGER(getAttrib(scal, R_DimSymbol)), j,
+	n = asInteger(ns), psqr;
+    double *scCp, *tmp, df = asReal(dfp), one = 1, zero = 0;
+
+    if (!isMatrix(scal) || !isReal(scal) || dims[0] != dims[1])
+	error("scal must be a square, real matrix");
+    if (n <= 0) n = 1;
+    psqr = dims[0] * dims[0];
+    tmp = Calloc(psqr, double);
+    AZERO(tmp, psqr);
+    scCp = Memcpy(Calloc(psqr, double), REAL(scal), psqr);
+    F77_CALL(dpotrf)("U", &(dims[0]), scCp, &(dims[0]), &j);
+    if (j)
+	error("scal matrix is not positive-definite");
+    PROTECT(ans = alloc3Darray(REALSXP, dims[0], dims[0], n));
+  
+    GetRNGstate();
+    for (j = 0; j < n; j++) {
+	double *ansj = REAL(ans) + j * psqr;
+	std_rWishart_factor(df, dims[0], tmp);
+	F77_CALL(dtrmm)("R", "U", "N", "N", dims, dims,
+			&one, scCp, dims, tmp, dims);
+	F77_CALL(dsyrk)("U", "T", &(dims[1]), &(dims[1]),
+			&one, tmp, &(dims[1]),
+			&zero, ansj, &(dims[1]));
+	internal_symmetrize(ansj, dims[0]);
+	}
+
+    PutRNGstate();
+    Free(scCp); Free(tmp);
+    UNPROTECT(1);
+    return ans;
+}

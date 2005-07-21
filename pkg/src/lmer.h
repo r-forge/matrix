@@ -11,9 +11,11 @@
 #include "dtCMatrix.h"
 #include "lgCMatrix.h"
 #include "lCholCMatrix.h"
+#include "Rmath.h"
 #include <R_ext/Lapack.h>
 #include <R_ext/Constants.h>
 
+SEXP Matrix_rWishart(SEXP ns, SEXP df, SEXP scal);
 SEXP lmer_validate(SEXP x);
 SEXP lmer_update_mm(SEXP x, SEXP mmats);
 SEXP lmer_create(SEXP flist, SEXP mmats, SEXP method);
