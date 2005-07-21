@@ -867,38 +867,11 @@ glmmMCMC <- function(obj, nsamp = 1, alpha = 1, beta = 1, saveb = FALSE, verbose
     fixed <- obj@fixed
     varc <- .Call("lmer_coef", mer, 2, PACKAGE = "Matrix")
     b <- .Call("lmer_ranef", mer, PACKAGE = "Matrix")
-    ans <- array(0, c(nsamp, length(fixed) + length(varc)),
-                 list(NULL,
-                      c(names(fixed),
-                        paste("varc", seq(along = varc), sep = ''))))
-    if (saveb) {
-        blen <- length(unlist(b, recursive = TRUE))
-        ans <- cbind(ans, array(0, c(nsamp, blen),
-                                list(NULL,
-                                     paste("b", 1:blen, sep = ''))))
-    }
-
     ans <- .Call("glmer_MCMCsamp", GSpt, b, fixed, varc, saveb, nsamp, 
           PACKAGE = "Matrix") 
-    if (FALSE) {
-        ## create the samples
-        for (i in 1:nsamp) {
-            ## sample from the conditional distribution of beta given b and y
-            fixed <- .Call("glmer_fixed_update", GSpt, b,
-                           fixed, PACKAGE = "Matrix")
-            ## sample from the conditional distribution of b given beta, varc and y.
-            b <- .Call("glmer_ranef_update", GSpt, fixed, varc,
-                       b, PACKAGE = "Matrix")
-            ## sample from the conditional distribution of varc given b
-            varc <- 1/rgamma(1, shape = shape,
-                             scale = 1/(sum(b[[1]]^2)/2 + betainv))
-            if (saveb) 
-                ans[i,] <- c(fixed, varc, unlist(b, recursive = TRUE))
-            else
-                ans[i,] <- c(fixed, varc)
-        }
-    }
+    .Call("glmer_finalize", GSpt, PACKAGE = "Matrix");
     class(ans) <- "mcmc"
+    attr(ans, "mcpar") <- c(1, nsamp, 1)
     ans
 }
 
