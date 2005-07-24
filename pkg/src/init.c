@@ -150,6 +150,7 @@ static R_CallMethodDef CallEntries[] = {
     {"lgTMatrix_as_lgCMatrix", (DL_FUNC) &lgTMatrix_as_lgCMatrix, 1},
     {"lgTMatrix_validate", (DL_FUNC) &lgTMatrix_validate, 1},
     {"lmer_Crosstab", (DL_FUNC) &lmer_Crosstab, 1},
+    {"lmer_MCMCsamp", (DL_FUNC) &lmer_MCMCsamp, 3},
     {"lmer_ECMEsteps", (DL_FUNC) &lmer_ECMEsteps, 3},
     {"lmer_coef", (DL_FUNC) &lmer_coef, 2},
     {"lmer_coefGets", (DL_FUNC) &lmer_coefGets, 3},

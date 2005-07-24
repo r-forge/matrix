@@ -16,6 +16,7 @@
 #include <R_ext/Constants.h>
 
 SEXP Matrix_rWishart(SEXP ns, SEXP df, SEXP scal);
+SEXP lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp);
 SEXP lmer_validate(SEXP x);
 SEXP lmer_update_mm(SEXP x, SEXP mmats);
 SEXP lmer_create(SEXP flist, SEXP mmats, SEXP method);
