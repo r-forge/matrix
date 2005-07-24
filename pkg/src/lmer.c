@@ -2813,7 +2813,6 @@ internal_glmer_fixef_update(GlmerStruct GS, SEXP b,
 				 * the precision matrix */
     devr = normal_kernel(GS->p, md, wtd, GS->n, fixed);
     devr -= fixed_effects_deviance(GS, fixed);
-    GetRNGstate();
     for (i = 0; i < GS->p; i++) {
 	double var = norm_rand();
 	ans[i] = var;
@@ -2824,7 +2823,6 @@ internal_glmer_fixef_update(GlmerStruct GS, SEXP b,
     devr += fixed_effects_deviance(GS, ans);
     crit = exp(-0.5 * devr);	/* acceptance probability */
     tmp = unif_rand();
-    PutRNGstate();
     if (asLogical(getElement(GS->cv, "msVerbose"))) {
 	Rprintf("%5.3f: ", crit);
 	for (j = 0; j < GS->p; j++) Rprintf("%#10g ", ans[j]);
@@ -2886,6 +2884,8 @@ std_rWishart_factor(double df, int p, double ans[])
     return ans;
 }
 
+/* FIXME: Combine this and lmer_Omega_update.  Consider changing the
+ * internal storage of b in glmer_MCMCsamp to a single vector. */
 /** 
  * Simulate Omega in an mer object from a Wishart distribution with
  * scale given by the new values of the random effects.
@@ -2947,6 +2947,7 @@ glmer_MCMCsamp(SEXP GSpt, SEXP b, SEXP fixed, SEXP varc,
 	    nc += dims[0] * dims[1];
 	}
     ans = PROTECT(allocMatrix(REALSXP, nsamp, nc));
+    GetRNGstate();
     for (i = 0; i < nsamp; i++) {
 	internal_glmer_fixef_update(GS, b, REAL(fixed));
 	internal_bhat(GS, REAL(fixed), REAL(varc));
@@ -2970,6 +2971,7 @@ glmer_MCMCsamp(SEXP GSpt, SEXP b, SEXP fixed, SEXP varc,
 	    }
 	}
     }
+    PutRNGstate();
     UNPROTECT(1);
     return ans;
 } 
@@ -3008,6 +3010,131 @@ Matrix_rWishart(SEXP ns, SEXP dfp, SEXP scal)
 
     PutRNGstate();
     Free(scCp); Free(tmp);
+    UNPROTECT(1);
+    return ans;
+}
+
+/** 
+ * Update the relative precision matrices by sampling from a Wishart
+ * distribution with scale factor determined by the current sample of
+ * random effects.
+ * 
+ * @param x pointer to an mer object
+ * @param b current sample from the random effects
+ * @param sigma current value of sigma
+ */
+static void
+lmer_Omega_update(SEXP Omega, const double b[], double sigmasqr, int nf,
+		  const int nc[], const int Gp[])
+{
+    int i, info;
+    double one = 1, zero = 0;
+
+    for (i = 0; i < nf; i++) {
+	int nci = nc[i];
+	int nlev = (Gp[i + 1] - Gp[i])/nci, ncisqr = nci * nci;
+	double *omgi = REAL(VECTOR_ELT(Omega, i)),
+	    *tmp = Calloc(ncisqr, double);
+	
+	AZERO(tmp, ncisqr);
+	F77_CALL(dsyrk)("U", "N", &nci, &nlev, &one, b + Gp[i], &nci,
+			&zero, omgi, &nci);
+	F77_CALL(dpotrf)("U", &nci, omgi, &nci, &info);
+	if (info)
+	    error(_("Singular random effects varcov at level %d"), i + 1);
+	std_rWishart_factor((double) (nlev - nci + 1), nci, tmp);
+	F77_CALL(dtrsm)("R", "U", "T", "N", &nci, &nci,
+			&one, omgi, &nci, tmp, &nci);
+	F77_CALL(dsyrk)("U", "T", &nci, &nci, &sigmasqr, tmp, &nci,
+			&zero, omgi, &nci);
+	Free(tmp);
+    }
+}
+
+/** 
+ * Generate a Markov-Chain Monte Carlo sample from a fitted
+ * linear mixed model.
+ * 
+ * @param mer pointer to a mixed-effects representation object
+ * @param savebp pointer to a logical scalar indicating if the
+ * random-effects should be saved
+ * @param nsampp pointer to an integer scalar of the number of samples
+ * to generate
+ * 
+ * @return a matrix
+ */
+SEXP
+lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp) 
+{
+    SEXP ans, DP = GET_SLOT(x, Matrix_DSym),
+	LP = GET_SLOT(x, Matrix_LSym),
+	Omega = GET_SLOT(x, Matrix_OmegaSym), 
+	RXXsl = GET_SLOT(x, Matrix_RXXSym),
+	RZXsl = GET_SLOT(x, Matrix_RZXSym);
+    int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	*dims = INTEGER(getAttrib(RZXsl, R_DimSymbol)),
+	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	REML = !strcmp(CHAR(asChar(GET_SLOT(x, Matrix_methodSym))),
+		       "REML"),
+	i, ione = 1, j, nf = LENGTH(Omega),
+	nsamp = asInteger(nsampp),
+	saveb = asLogical(savebp);
+    int ncol = coef_length(nf, nc) + dims[1] + (saveb ? dims[0] : 0),
+	nobs = nc[nf + 1],
+	p = dims[1] - 1, pp1 = dims[1];
+    double *bcol = REAL(RZXsl) + dims[0] * p,
+	*betacol = REAL(RXXsl) + pp1 * p,
+	*bnew = Calloc(dims[0], double),
+	*betanew = Calloc(p, double), one = 1,
+	sqrtdf = sqrt((double)(REML ? nobs + 1 - pp1 : nobs));
+    
+    if (nsamp <= 0) nsamp = 1;
+    ans = PROTECT(allocMatrix(REALSXP, nsamp, ncol));
+    GetRNGstate();
+    for (i = 0; i < nsamp; i++) {
+/* FIXME: need to distinguish between sampled sigma and this ryy value */
+	double sigmasqr, ryyinv; /* ryy-inverse */
+
+	lmer_invert(x);
+	for (j = 0; j < p; j++) betanew[j] = norm_rand()/sqrtdf;
+	for (j = 0; j < dims[0]; j++) bnew[j] = norm_rand()/sqrtdf;
+				/* bnew := D^{-1/2} %*% bnew */
+	for (j = 0; j < nf; j++) {
+	    int k, ncj = nc[j];
+	    int ncjsqr = ncj * ncj,
+		nlev = (Gp[j+1] - Gp[j])/ncj;
+	    double *Dj = REAL(VECTOR_ELT(DP, j)), *bj = bnew + Gp[j];
+
+	    for (k = 0; k < nlev; k++)
+		F77_CALL(dtrmv)("U", "N", "N", &ncj, Dj + k * ncjsqr,
+				&ncj, bj + k * ncj, &ione);
+	}
+				/* bnew := L^{-T} %*% bnew */
+	internal_sm(LFT, TRN, nf, Gp, 1, 1.0, LP, bnew, dims[0]);
+				/* bnew := bnew + RZX %*% betanew*/
+	F77_CALL(dgemv)("N", dims, &(dims[1]), &one, REAL(RXXsl), dims,
+			betanew, &ione, &one, bnew, &ione);
+				/* betanew := RXX^{-1} %*% betanew */
+	F77_CALL(dtrmv)("U", "N", "N", &(dims[1]), REAL(RXXsl),
+			&(dims[1]), betanew, &ione);
+	ryyinv = REAL(RXXsl)[pp1 * pp1 - 1];
+	for (j = 0; j < p; j++) {
+	    betanew[j] -= betacol[j];
+	    REAL(ans)[i + j * nsamp] = (betanew[j] /= ryyinv);
+	}
+	for (j = 0; j < dims[0]; j++) {
+	    bnew[j] -= bcol[j];
+	    bnew[j] /= ryyinv;
+	}
+	sigmasqr = 1./(ryyinv * sqrtdf);
+	REAL(ans)[i + p * nsamp] = (sigmasqr = sigmasqr * sigmasqr);
+	lmer_Omega_update(Omega, bnew, sigmasqr, nf, nc, Gp);
+/* FIXME: store the values of the variance components here */
+/*  - maybe simulate the variances first then convert to
+    relative precision */
+    }
+    PutRNGstate();
+    Free(betanew); Free(bnew);
     UNPROTECT(1);
     return ans;
 }
