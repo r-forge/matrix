@@ -1,3 +1,8 @@
+2005-07-13  Douglas Bates  <bates@bates1-home>
+
+	* R/lmList.R: lmList now uses the standard non-standard evaluation
+	scheme for the model frame.
+
 2005-05-19  Douglas Bates  <bates@bates1-home>
 
 	* R/lmer.R (fn): Restored the ML in name MLdeviance from summary.
