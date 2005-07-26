@@ -3025,16 +3025,18 @@ Matrix_rWishart(SEXP ns, SEXP dfp, SEXP scal)
  */
 static void
 lmer_Omega_update(SEXP Omega, const double b[], double sigmasqr, int nf,
-		  const int nc[], const int Gp[])
+		  const int nc[], const int Gp[], double *bi, int nsamp)
 {
-    int i, info;
+    int i, j, k, info;
     double one = 1, zero = 0;
 
     for (i = 0; i < nf; i++) {
 	int nci = nc[i];
-	int nlev = (Gp[i + 1] - Gp[i])/nci, ncisqr = nci * nci;
+	int nlev = (Gp[i + 1] - Gp[i])/nci, ncip1 = nci + 1,
+	    ncisqr = nci * nci;
 	double *omgi = REAL(VECTOR_ELT(Omega, i)),
-	    *tmp = Calloc(ncisqr, double);
+	    *tmp = Calloc(ncisqr, double),
+	    *var = Calloc(ncisqr, double);
 	
 	AZERO(tmp, ncisqr);
 	F77_CALL(dsyrk)("U", "N", &nci, &nlev, &one, b + Gp[i], &nci,
@@ -3047,7 +3049,24 @@ lmer_Omega_update(SEXP Omega, const double b[], double sigmasqr, int nf,
 			&one, omgi, &nci, tmp, &nci);
 	F77_CALL(dsyrk)("U", "T", &nci, &nci, &sigmasqr, tmp, &nci,
 			&zero, omgi, &nci);
-	Free(tmp);
+				/* Calculate variances */
+	F77_CALL(dtrtri)("U", "N", &nci, tmp, &nci, &info);
+	if (info)
+	    error(_("Singular random effects varcov at level %d"), i + 1);
+	AZERO(var, ncisqr);
+	F77_CALL(dsyrk)("U", "N", &nci, &nci, &one, tmp, &nci,
+			&zero, var, &nci);
+	for (j = 0; j < nci; j++) {
+	    *bi = var[j * ncip1];
+	    bi += nsamp;
+	}
+	for (j = 1; j < nci; j++) {
+	    for (k = 0; k < j; k++) {
+		*bi = var[k + j * nci];
+		bi += nsamp;
+	    }
+	}
+	Free(tmp); Free(var);
     }
 }
 
@@ -3086,13 +3105,13 @@ lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp)
 	*betacol = REAL(RXXsl) + pp1 * p,
 	*bnew = Calloc(dims[0], double),
 	*betanew = Calloc(p, double), one = 1,
-	sqrtdf = sqrt((double)(REML ? nobs + 1 - pp1 : nobs));
+	df = (double)(REML ? nobs + 1 - pp1 : nobs);
+    double sqrtdf = sqrt(df);
     
     if (nsamp <= 0) nsamp = 1;
     ans = PROTECT(allocMatrix(REALSXP, nsamp, ncol));
     GetRNGstate();
     for (i = 0; i < nsamp; i++) {
-/* FIXME: need to distinguish between sampled sigma and this ryy value */
 	double sigmasqr, ryyinv; /* ryy-inverse */
 
 	lmer_invert(x);
@@ -3112,11 +3131,11 @@ lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp)
 				/* bnew := L^{-T} %*% bnew */
 	internal_sm(LFT, TRN, nf, Gp, 1, 1.0, LP, bnew, dims[0]);
 				/* bnew := bnew + RZX %*% betanew*/
-	F77_CALL(dgemv)("N", dims, &(dims[1]), &one, REAL(RXXsl), dims,
+	F77_CALL(dgemv)("N", dims, &p, &one, REAL(RZXsl), dims,
 			betanew, &ione, &one, bnew, &ione);
 				/* betanew := RXX^{-1} %*% betanew */
-	F77_CALL(dtrmv)("U", "N", "N", &(dims[1]), REAL(RXXsl),
-			&(dims[1]), betanew, &ione);
+	F77_CALL(dtrmv)("U", "N", "N", &p, REAL(RXXsl), &pp1,
+			betanew, &ione);
 	ryyinv = REAL(RXXsl)[pp1 * pp1 - 1];
 	for (j = 0; j < p; j++) {
 	    betanew[j] -= betacol[j];
@@ -3127,11 +3146,10 @@ lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp)
 	    bnew[j] /= ryyinv;
 	}
 	sigmasqr = 1./(ryyinv * sqrtdf);
-	REAL(ans)[i + p * nsamp] = (sigmasqr = sigmasqr * sigmasqr);
-	lmer_Omega_update(Omega, bnew, sigmasqr, nf, nc, Gp);
-/* FIXME: store the values of the variance components here */
-/*  - maybe simulate the variances first then convert to
-    relative precision */
+	sigmasqr = sigmasqr * sigmasqr * rchisq(df) / df;
+	REAL(ans)[i + p * nsamp] = sigmasqr;
+	lmer_Omega_update(Omega, bnew, sigmasqr, nf, nc, Gp,
+			  REAL(ans) + i + (p + 1) * nsamp, nsamp);
     }
     PutRNGstate();
     Free(betanew); Free(bnew);
