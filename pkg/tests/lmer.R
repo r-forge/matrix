@@ -19,8 +19,8 @@ options(show.signif.stars = FALSE)
              OrchardSprays, poisson()))
 
 ## Laplace approximation
-(fm4 <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
-             OrchardSprays, poisson(), method = "Laplace"))
+#(fm4 <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
+#             OrchardSprays, poisson(), method = "Laplace"))
 
 if (isTRUE(try(data(Contraception, package = 'mlmRev')) ==
            'Contraception')) {
