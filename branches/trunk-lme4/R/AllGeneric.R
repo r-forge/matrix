@@ -31,7 +31,8 @@ if (!isGeneric("getResponse")) {
 
 if (!isGeneric("lmList")) {
     setGeneric("lmList",
-               function(formula, data, level, subset, na.action, pool)
+               function(formula, data, family, subset, weights,
+                        na.action, offset, pool, ...)
                standardGeneric("lmList"))
 }
 
