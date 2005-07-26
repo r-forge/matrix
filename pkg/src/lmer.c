@@ -1057,8 +1057,8 @@ SEXP lmer_invert(SEXP x)
 						Lkix + k1 * szk, &nc[k],
 						tmp[kk] + kj * szkk, &nc[kk],
 						&one, tmp[k] +
-						fsrch(Lkii[k1],ind[k],nnz[k])*sz,
-						&nc[k]);
+						fsrch(Lkii[k1],ind[k],nnz[k]) *
+						sz, &nc[k]);
 			    }
 			}
 		    }
@@ -1338,7 +1338,8 @@ SEXP lmer_fixef(SEXP x)
  *
  * @param x Pointer to an lme object
  *
- * @return a list of matrices containing the conditional modes of the random effects
+ * @return a list of matrices containing the conditional modes of the
+ * random effects
  */
 SEXP lmer_ranef(SEXP x)
 {
@@ -1405,7 +1406,8 @@ SEXP lmer_firstDer(SEXP x, SEXP val)
 	*b = REAL(RZXP) + dims[0] * p;
 
     lmer_invert(x);
-    /* FIXME: Why is this loop run backwards?  It appears it could run forwards. */
+    /* FIXME: Why is this loop run backwards?
+       It appears it could run forwards. */
     for (i = nf - 1; i >= 0; i--) {
 	SEXP bVPi = VECTOR_ELT(bVarP, i);
 	int *ddims = INTEGER(getAttrib(bVPi, R_DimSymbol)), j, k;
@@ -1510,8 +1512,10 @@ double *EM_grad_lc(double *cc, int EM, int REML, int ns[])
  * @param x pointer to an ssclme object
  * @param iter iteration number
  * @param REML non-zero for REML, zero for ML
- * @param firstDer arrays for calculating ECME steps and the first derivative
- * @param val Pointer to a list of arrays to receive the calculated values
+ * @param firstDer arrays for calculating ECME steps and the first
+ * derivative
+ * @param val Pointer to a list of arrays to receive the calculated
+ * values
  */
 static void
 EMsteps_verbose_print(SEXP x, int iter, int REML, SEXP firstDer)
@@ -1612,11 +1616,11 @@ internal_ECMEsteps(SEXP x, int nEM, int verb)
  * Perform ECME steps for the REML or ML criterion.
  *
  * @param x pointer to an mer object
- * @param nsteps pointer to an integer scalar - the number of ECME steps to perform
+ * @param nsteps pointer to an integer scalar - the number of ECME
+ * steps to perform
  * @param Verbp pointer to a logical scalar indicating verbose output
  *
- * @return R_NilValue if verb == FALSE, otherwise a list of iteration
- *numbers, deviances, parameters, and gradients.
+ * @return R_NilValue
  */
 SEXP lmer_ECMEsteps(SEXP x, SEXP nsteps, SEXP Verbp)
 {
@@ -1628,7 +1632,8 @@ SEXP lmer_ECMEsteps(SEXP x, SEXP nsteps, SEXP Verbp)
  * Evaluate the gradient vector
  * 
  * @param x Pointer to an lmer object
- * @param pType Pointer to an integer indicator of the parameterization being used
+ * @param pType Pointer to an integer indicator of the
+ * parameterization being used
  * 
  * @return pointer to a gradient vector
  */
@@ -1680,9 +1685,9 @@ SEXP lmer_gradient(SEXP x, SEXP pType)
 		F77_CALL(dsymm)("R", "U", &nci, &nci, &one, tmp, &nci,
 				chol, &nci, &zero, tmp2, &nci);
 		/* full symmetric product gives diagonals */
-		F77_CALL(dtrmm)("R", "U", "T", "N", &nci, &nci, &one, chol, &nci,
-				Memcpy(tmp, tmp2, ncisqr), &nci);
-		/* overwrite upper triangle with gradients for positions in L' */
+		F77_CALL(dtrmm)("R", "U", "T", "N", &nci, &nci, &one, chol,
+				&nci, Memcpy(tmp, tmp2, ncisqr), &nci);
+		/* overwrite upper triangle with gradients for L' */
 		for (ii = 1; ii < nci; ii++) {
 		    for (j = 0; j < ii; j++) {
 			tmp[j + ii*nci] = chol[j*ncip1] * tmp2[j + ii*nci];
@@ -1862,6 +1867,17 @@ SEXP lmer_variances(SEXP x)
     return Omg;
 }
 
+/** 
+ * Add the contribution from the random effects to the fitted values
+ * 
+ * @param flist pointer to a list of factors
+ * @param mmats pointer to a list of model matrices
+ * @param b pointer to a list of random effects matrices
+ * @param nc number of columns per model matrix
+ * @param val fitted values that are incremented
+ * 
+ * @return val (updated)
+ */
 static double*
 fitted_ranef(SEXP flist, SEXP mmats, SEXP b,
 	     const int nc[], double val[])
@@ -1944,58 +1960,16 @@ SEXP lmer_fitted(SEXP x, SEXP mmats, SEXP useRf)
     UNPROTECT(1);
     return ans;
 }
-
-/* Gauss-Hermite Quadrature x positions and weights */
-static const double
-    GHQ_x1[1] = {0},
-    GHQ_w1[1] = {1},
-    GHQ_x2[1] = {1},
-    GHQ_w2[1] = {0.5},
-    GHQ_x3[2] = {1.7320507779261, 0},
-    GHQ_w3[2] = {0.166666666666667, 0.666666666666667},
-    GHQ_x4[2] = {2.3344141783872, 0.74196377160456},
-    GHQ_w4[2] = {0.0458758533899086, 0.454124131589555},
-    GHQ_x5[3] = {2.85696996497785, 1.35562615677371, 0},
-    GHQ_w5[3] = {0.0112574109895360, 0.222075915334214,
-		 0.533333317311434},
-    GHQ_x6[3] = {3.32425737665988, 1.88917584542184,
-		 0.61670657963811},
-    GHQ_w6[3] = {0.00255578432527774, 0.0886157433798025,
-		 0.408828457274383},
-    GHQ_x7[4] = {3.7504396535397, 2.36675937022918,
-		 1.15440537498316, 0},
-    GHQ_w7[4] = {0.000548268839501628, 0.0307571230436095,
-		 0.240123171391455, 0.457142843409801},
-    GHQ_x8[4] = {4.14454711519499, 2.80248581332504,
-		 1.63651901442728, 0.539079802125417},
-    GHQ_w8[4] = {0.000112614534992306, 0.0096352198313359,
-		 0.117239904139746, 0.373012246473389},
-    GHQ_x9[5] = {4.51274578616743, 3.20542894799789,
-		 2.07684794313409, 1.02325564627686, 0},
-    GHQ_w9[5] = {2.23458433364535e-05, 0.00278914123744297,
-		 0.0499164052656755, 0.244097495561989,
-		 0.406349194142045},
-    GHQ_x10[5] = {4.85946274516615, 3.58182342225163,
-		  2.48432579912153, 1.46598906930182,
-		  0.484935699216176},
-    GHQ_w10[5] = {4.31065250122166e-06, 0.000758070911538954,
-		  0.0191115799266379, 0.135483698910192,
-		  0.344642324578594},
-    GHQ_x11[6] = {5.18800113558601, 3.93616653976536,
-		  2.86512311160915, 1.87603498804787,
-		  0.928868981484148, 0},
-    GHQ_w11[6] = {8.12184954622583e-07, 0.000195671924393029,
-		  0.0067202850336527, 0.066138744084179,
-		  0.242240292596812, 0.36940835831095};
-
-static const double
-    *GHQ_x[12] = {(double *) NULL, GHQ_x1, GHQ_x2, GHQ_x3, GHQ_x4,
-		  GHQ_x5, GHQ_x6, GHQ_x7, GHQ_x8, GHQ_x9, GHQ_x10,
-		  GHQ_x11},
-    *GHQ_w[12] = {(double *) NULL, GHQ_w1, GHQ_w2, GHQ_w3, GHQ_w4,
-		  GHQ_w5, GHQ_w6, GHQ_w7, GHQ_w8, GHQ_w9, GHQ_w10,
-		  GHQ_w11};
 				 
+/** 
+ * Apply weights to a list of model matrices
+ * 
+ * @param MLin Input list of model matrices
+ * @param wts Weights to be applied
+ * @param adjst Working residual to be appended to the last model matrix
+ * @param n number of observations
+ * @param MLout Output list of model matrices
+ */
 static void
 internal_weight_list(SEXP MLin, double *wts, double *adjst, int n,
 		     SEXP MLout)
@@ -2036,6 +2010,17 @@ internal_weight_list(SEXP MLin, double *wts, double *adjst, int n,
 	REAL(lastM)[j*n + i] = adjst[i] * wts[i];
 }    
 
+/** 
+ * Find a variable of a given name in a given environment and check
+ * that its length and mode are correct.
+ * 
+ * @param rho Environment in which to find the variable
+ * @param nm Name of the variable to find
+ * @param mode Desired mode
+ * @param len Desired length
+ * 
+ * @return 
+ */
 static
 SEXP find_and_check(SEXP rho, SEXP nm, SEXPTYPE mode, int len)
 {    
@@ -2053,6 +2038,16 @@ SEXP find_and_check(SEXP rho, SEXP nm, SEXPTYPE mode, int len)
     return ans;
 }
 
+/** 
+ * Evaluate an expression in an environment, check that the length and
+ * mode are as expected and store the result.
+ * 
+ * @param fcn expression to evaluate
+ * @param rho environment in which to evaluate it
+ * @param vv position to store the result
+ * 
+ * @return vv with new contents
+ */
 static
 SEXP eval_check_store(SEXP fcn, SEXP rho, SEXP vv)
 {
@@ -2077,6 +2072,17 @@ SEXP eval_check_store(SEXP fcn, SEXP rho, SEXP vv)
     return vv;
 }
 
+/** 
+ * Evaluate an expression in an environment, check that the length and
+ * mode are as expected and return the result.
+ * 
+ * @param fcn expression to evaluate
+ * @param rho environment in which to evaluate it
+ * @param mode desired mode
+ * @param len desired length
+ * 
+ * @return evaluated expression
+ */
 static SEXP
 eval_check(SEXP fcn, SEXP rho, SEXPTYPE mode, int len) {
     SEXP v = PROTECT(eval(fcn, rho));
@@ -2087,6 +2093,14 @@ eval_check(SEXP fcn, SEXP rho, SEXPTYPE mode, int len) {
     return v;
 }
 
+/** 
+ * Return the element of a given name from a named list
+ * 
+ * @param list 
+ * @param nm name of desired element
+ * 
+ * @return element of list with name nm
+ */
 static SEXP
 getElement(SEXP list, char *nm) {
     SEXP names = getAttrib(list, R_NamesSymbol);
@@ -2127,6 +2141,14 @@ typedef struct glmer_struct
     double tol;      /* convergence tolerance for IRLS iterations */
 } glmer_struct, *GlmerStruct;
 
+/** 
+ * Return an external pointer object to a GlmerStruct created in
+ * environment rho
+ * 
+ * @param rho An environment
+ * 
+ * @return An external pointer to a GlmerStruct
+ */
 SEXP glmer_init(SEXP rho) {
     GlmerStruct GS;
     int *dims;
@@ -2182,6 +2204,13 @@ SEXP glmer_init(SEXP rho) {
     return R_MakeExternalPtr(GS, R_NilValue, GS->mer);
 }
 
+/** 
+ * Release the storage for a GlmerStruct
+ * 
+ * @param GSp External pointer to a  GlmerStruct
+ * 
+ * @return R_NilValue
+ */
 SEXP glmer_finalize(SEXP GSp) {
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
     
@@ -2282,11 +2311,12 @@ SEXP glmer_PQL(SEXP GSp)
     
 /** 
  * Establish off, the effective offset for the fixed effects, and
- * iterate to determine the conditional modes.  Factor Omega and
- * bVar then return the difference in the log-determinants.
+ * iterate to determine the conditional modes.
  * 
  * @param pars parameter vector
  * @param GS a GlmerStruct object
+ * 
+ * @return An indicator of whether the iterations converged
  */
 static int
 internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
@@ -2407,6 +2437,57 @@ rel_dev_1(GlmerStruct GS, SEXP b, int nlev, int nc, int k,
 }
 
 
+/* Gauss-Hermite Quadrature x positions and weights */
+static const double
+    GHQ_x1[1] = {0},
+    GHQ_w1[1] = {1},
+    GHQ_x2[1] = {1},
+    GHQ_w2[1] = {0.5},
+    GHQ_x3[2] = {1.7320507779261, 0},
+    GHQ_w3[2] = {0.166666666666667, 0.666666666666667},
+    GHQ_x4[2] = {2.3344141783872, 0.74196377160456},
+    GHQ_w4[2] = {0.0458758533899086, 0.454124131589555},
+    GHQ_x5[3] = {2.85696996497785, 1.35562615677371, 0},
+    GHQ_w5[3] = {0.0112574109895360, 0.222075915334214,
+		 0.533333317311434},
+    GHQ_x6[3] = {3.32425737665988, 1.88917584542184,
+		 0.61670657963811},
+    GHQ_w6[3] = {0.00255578432527774, 0.0886157433798025,
+		 0.408828457274383},
+    GHQ_x7[4] = {3.7504396535397, 2.36675937022918,
+		 1.15440537498316, 0},
+    GHQ_w7[4] = {0.000548268839501628, 0.0307571230436095,
+		 0.240123171391455, 0.457142843409801},
+    GHQ_x8[4] = {4.14454711519499, 2.80248581332504,
+		 1.63651901442728, 0.539079802125417},
+    GHQ_w8[4] = {0.000112614534992306, 0.0096352198313359,
+		 0.117239904139746, 0.373012246473389},
+    GHQ_x9[5] = {4.51274578616743, 3.20542894799789,
+		 2.07684794313409, 1.02325564627686, 0},
+    GHQ_w9[5] = {2.23458433364535e-05, 0.00278914123744297,
+		 0.0499164052656755, 0.244097495561989,
+		 0.406349194142045},
+    GHQ_x10[5] = {4.85946274516615, 3.58182342225163,
+		  2.48432579912153, 1.46598906930182,
+		  0.484935699216176},
+    GHQ_w10[5] = {4.31065250122166e-06, 0.000758070911538954,
+		  0.0191115799266379, 0.135483698910192,
+		  0.344642324578594},
+    GHQ_x11[6] = {5.18800113558601, 3.93616653976536,
+		  2.86512311160915, 1.87603498804787,
+		  0.928868981484148, 0},
+    GHQ_w11[6] = {8.12184954622583e-07, 0.000195671924393029,
+		  0.0067202850336527, 0.066138744084179,
+		  0.242240292596812, 0.36940835831095};
+
+static const double
+    *GHQ_x[12] = {(double *) NULL, GHQ_x1, GHQ_x2, GHQ_x3, GHQ_x4,
+		  GHQ_x5, GHQ_x6, GHQ_x7, GHQ_x8, GHQ_x9, GHQ_x10,
+		  GHQ_x11},
+    *GHQ_w[12] = {(double *) NULL, GHQ_w1, GHQ_w2, GHQ_w3, GHQ_w4,
+		  GHQ_w5, GHQ_w6, GHQ_w7, GHQ_w8, GHQ_w9, GHQ_w10,
+		  GHQ_w11};
+
 /** 
  * Compute the approximation to the deviance using adaptive
  * Gauss-Hermite quadrature (AGQ).  When nAGQ == 1 this is the Laplace
@@ -2414,7 +2495,8 @@ rel_dev_1(GlmerStruct GS, SEXP b, int nlev, int nc, int k,
  * 
  * @param pars pointer to a numeric vector of parameters
  * @param GSp pointer to a GlmerStruct object
- * @param nAGQp pointer to a scalar integer representing the number of points in AGQ to use
+ * @param nAGQp pointer to a scalar integer representing the number of
+ * points in AGQ to use
  * 
  * @return the approximation to the deviance as computed using AGQ
  */
@@ -2833,6 +2915,7 @@ internal_glmer_fixef_update(GlmerStruct GS, SEXP b,
     Free(work); Free(wtd); Free(z);
     return fixed;
 }
+
 /** 
  * Determine the conditional modes and the conditional variance of the
  * fixed effects given the data and the current random effects.
@@ -2859,7 +2942,6 @@ SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed)
     return fixed;
 }
 
-
 /** 
  * Simulate the Cholesky factor of a standardized Wishart variate with
  * dimension p and df degrees of freedom.
@@ -2878,14 +2960,16 @@ std_rWishart_factor(double df, int p, double ans[])
     if (df < (double) p || p <= 0)
 	error("inconsistent degrees of freedom and dimension");
     for (j = 0; j < p; j++) {	/* jth column */
-	ans[j * pp1] = sqrt(rchisq((double) (df - j)));
+	ans[j * pp1] = sqrt(rchisq(df - (double) j));
 	for (i = 0; i < j; i++) ans[i + j * p] = norm_rand();
     }
     return ans;
 }
 
 /* FIXME: Combine this and lmer_Omega_update.  Consider changing the
- * internal storage of b in glmer_MCMCsamp to a single vector. */
+ * internal storage of b in glmer_MCMCsamp to a single vector.
+ */
+
 /** 
  * Simulate Omega in an mer object from a Wishart distribution with
  * scale given by the new values of the random effects.
@@ -2927,6 +3011,21 @@ internal_Omega_update(SEXP x, SEXP bnew)
     }
 }
 
+/** 
+ * Create a Markov Chain Monte Carlo sample from a fitted generalized
+ * linear mixed model
+ * 
+ * @param GSpt External pointer to a GlmerStruct
+ * @param b Conditional modes of the random effects at the parameter
+ * estimates
+ * @param fixed Estimates of the fixed effects
+ * @param varc Estimates of the variance components
+ * @param savebp Logical indicator of whether or not to save the
+ * random effects in the MCMC sample
+ * @param nsampp Integer value of the number of samples to generate
+ * 
+ * @return 
+ */
 SEXP 
 glmer_MCMCsamp(SEXP GSpt, SEXP b, SEXP fixed, SEXP varc,
 	       SEXP savebp, SEXP nsampp) 
@@ -2935,8 +3034,8 @@ glmer_MCMCsamp(SEXP GSpt, SEXP b, SEXP fixed, SEXP varc,
     int i, j, nf = LENGTH(b), nsamp = asInteger(nsampp),
 	p = LENGTH(fixed), q = LENGTH(varc),
 	saveb = asLogical(savebp);
-    int nc = p + q;
-    SEXP ans;
+    int *mcpar, nc = p + q;
+    SEXP ans, mcparSym = install("mcpar");
     
     if (nsamp <= 0) nsamp = 1;
     nc = p + q;
@@ -2973,9 +3072,25 @@ glmer_MCMCsamp(SEXP GSpt, SEXP b, SEXP fixed, SEXP varc,
     }
     PutRNGstate();
     UNPROTECT(1);
+				/* set (S3) class and mcpar attribute */
+    setAttrib(ans, R_ClassSymbol, mkString("mcmc"));
+    setAttrib(ans, mcparSym, allocVector(INTSXP, 3));
+    mcpar = INTEGER(getAttrib(ans, mcparSym));
+    mcpar[0] = mcpar[2] = 1;
+    mcpar[1] = nsamp;
+
     return ans;
 } 
 
+/** 
+ * Simulate a sample of random matrices from a Wishart distribution
+ * 
+ * @param ns Number of samples to generate
+ * @param dfp Degrees of freedom
+ * @param scal Positive-definite scale matrix
+ * 
+ * @return 
+ */
 SEXP
 Matrix_rWishart(SEXP ns, SEXP dfp, SEXP scal)
 {
@@ -3024,7 +3139,7 @@ Matrix_rWishart(SEXP ns, SEXP dfp, SEXP scal)
  * @param sigma current value of sigma
  */
 static void
-lmer_Omega_update(SEXP Omega, const double b[], double sigmasqr, int nf,
+lmer_Omega_update(SEXP Omega, const double b[], double sigma, int nf,
 		  const int nc[], const int Gp[], double *bi, int nsamp)
 {
     int i, j, k, info;
@@ -3034,27 +3149,29 @@ lmer_Omega_update(SEXP Omega, const double b[], double sigmasqr, int nf,
 	int nci = nc[i];
 	int nlev = (Gp[i + 1] - Gp[i])/nci, ncip1 = nci + 1,
 	    ncisqr = nci * nci;
-	double *omgi = REAL(VECTOR_ELT(Omega, i)),
+	double
+	    *scal = Calloc(ncisqr, double), /* factor of scale matrix */
 	    *tmp = Calloc(ncisqr, double),
-	    *var = Calloc(ncisqr, double);
-	
-	AZERO(tmp, ncisqr);
+	    *var = Calloc(ncisqr, double), /* simulated variance-covariance */
+	    *wfac = Calloc(ncisqr, double); /* factor of Wishart variate */
+
+	/* generate and factor the scale matrix */
+	AZERO(scal, ncisqr);
 	F77_CALL(dsyrk)("U", "N", &nci, &nlev, &one, b + Gp[i], &nci,
-			&zero, omgi, &nci);
-	F77_CALL(dpotrf)("U", &nci, omgi, &nci, &info);
+			&zero, scal, &nci);
+	F77_CALL(dpotrf)("U", &nci, scal, &nci, &info);
 	if (info)
 	    error(_("Singular random effects varcov at level %d"), i + 1);
-	std_rWishart_factor((double) (nlev - nci + 1), nci, tmp);
-	F77_CALL(dtrsm)("R", "U", "T", "N", &nci, &nci,
-			&one, omgi, &nci, tmp, &nci);
-	F77_CALL(dsyrk)("U", "T", &nci, &nci, &sigmasqr, tmp, &nci,
-			&zero, omgi, &nci);
-				/* Calculate variances */
-	F77_CALL(dtrtri)("U", "N", &nci, tmp, &nci, &info);
-	if (info)
-	    error(_("Singular random effects varcov at level %d"), i + 1);
-	AZERO(var, ncisqr);
-	F77_CALL(dsyrk)("U", "N", &nci, &nci, &one, tmp, &nci,
+
+	/* generate a random factor from a standard Wishart distribution */
+	AZERO(wfac, ncisqr);
+	std_rWishart_factor((double) (nlev - nci + 1), nci, wfac);
+
+	/* form the variance-covariance matrix and store elements */
+	Memcpy(tmp, scal, ncisqr);
+	F77_CALL(dtrsm)("L", "U", "T", "N", &nci, &nci,
+			&one, wfac, &nci, tmp, &nci);
+	F77_CALL(dsyrk)("U", "T", &nci, &nci, &one, tmp, &nci,
 			&zero, var, &nci);
 	for (j = 0; j < nci; j++) {
 	    *bi = var[j * ncip1];
@@ -3066,7 +3183,14 @@ lmer_Omega_update(SEXP Omega, const double b[], double sigmasqr, int nf,
 		bi += nsamp;
 	    }
 	}
-	Free(tmp); Free(var);
+
+	/* calculate and store the relative precision matrix */
+	Memcpy(tmp, wfac, ncisqr);
+	F77_CALL(dtrsm)("R", "U", "T", "N", &nci, &nci,
+			&sigma, scal, &nci, tmp, &nci);
+	F77_CALL(dsyrk)("U", "T", &nci, &nci, &one, tmp, &nci,
+			&zero, REAL(VECTOR_ELT(Omega, i)), &nci);
+	Free(scal); Free(tmp); Free(wfac); Free(var); 
     }
 }
 
@@ -3089,10 +3213,13 @@ lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp)
 	LP = GET_SLOT(x, Matrix_LSym),
 	Omega = GET_SLOT(x, Matrix_OmegaSym), 
 	RXXsl = GET_SLOT(x, Matrix_RXXSym),
-	RZXsl = GET_SLOT(x, Matrix_RZXSym);
+	RZXsl = GET_SLOT(x, Matrix_RZXSym),
+	mcparSym = install("mcpar");
     int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
 	*dims = INTEGER(getAttrib(RZXsl, R_DimSymbol)),
+	*mcpar,
 	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	*status = LOGICAL(GET_SLOT(x, Matrix_statusSym)),
 	REML = !strcmp(CHAR(asChar(GET_SLOT(x, Matrix_methodSym))),
 		       "REML"),
 	i, ione = 1, j, nf = LENGTH(Omega),
@@ -3112,9 +3239,10 @@ lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp)
     ans = PROTECT(allocMatrix(REALSXP, nsamp, ncol));
     GetRNGstate();
     for (i = 0; i < nsamp; i++) {
-	double sigmasqr, ryyinv; /* ryy-inverse */
+	double sigma, ryyinv; /* ryy-inverse */
 
-	lmer_invert(x);
+	status[0] = status[1] = 0;
+	lmer_invert(x);		/* decompose and invert */
 	for (j = 0; j < p; j++) betanew[j] = norm_rand()/sqrtdf;
 	for (j = 0; j < dims[0]; j++) bnew[j] = norm_rand()/sqrtdf;
 				/* bnew := D^{-1/2} %*% bnew */
@@ -3145,14 +3273,20 @@ lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp)
 	    bnew[j] -= bcol[j];
 	    bnew[j] /= ryyinv;
 	}
-	sigmasqr = 1./(ryyinv * sqrtdf);
-	sigmasqr = sigmasqr * sigmasqr * rchisq(df) / df;
-	REAL(ans)[i + p * nsamp] = sigmasqr;
-	lmer_Omega_update(Omega, bnew, sigmasqr, nf, nc, Gp,
+	sigma = 1/(ryyinv * sqrt(rchisq(df)));
+	REAL(ans)[i + p * nsamp] = sigma * sigma;
+	lmer_Omega_update(Omega, bnew, sigma, nf, nc, Gp,
 			  REAL(ans) + i + (p + 1) * nsamp, nsamp);
     }
     PutRNGstate();
     Free(betanew); Free(bnew);
+				/* set (S3) class and mcpar attribute */
+    setAttrib(ans, R_ClassSymbol, mkString("mcmc"));
+    setAttrib(ans, mcparSym, allocVector(INTSXP, 3));
+    mcpar = INTEGER(getAttrib(ans, mcparSym));
+    mcpar[0] = mcpar[2] = 1;
+    mcpar[1] = nsamp;
+
     UNPROTECT(1);
     return ans;
 }
