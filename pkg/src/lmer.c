@@ -3228,12 +3228,12 @@ lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp)
     int ncol = coef_length(nf, nc) + dims[1] + (saveb ? dims[0] : 0),
 	nobs = nc[nf + 1],
 	p = dims[1] - 1, pp1 = dims[1];
-    double *bcol = REAL(RZXsl) + dims[0] * p,
-	*betacol = REAL(RXXsl) + pp1 * p,
+    double 
+	*bhat = Calloc(dims[0], double),
+	*betahat = Calloc(p, double), one = 1,
 	*bnew = Calloc(dims[0], double),
-	*betanew = Calloc(p, double), one = 1,
+	*betanew = Calloc(p, double),
 	df = (double)(REML ? nobs + 1 - pp1 : nobs);
-    double sqrtdf = sqrt(df);
     
     if (nsamp <= 0) nsamp = 1;
     ans = PROTECT(allocMatrix(REALSXP, nsamp, ncol));
@@ -3241,11 +3241,26 @@ lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp)
     for (i = 0; i < nsamp; i++) {
 	double sigma, ryyinv; /* ryy-inverse */
 
+	/* decompose and invert the mer object */
 	status[0] = status[1] = 0;
-	lmer_invert(x);		/* decompose and invert */
-	for (j = 0; j < p; j++) betanew[j] = norm_rand()/sqrtdf;
-	for (j = 0; j < dims[0]; j++) bnew[j] = norm_rand()/sqrtdf;
-				/* bnew := D^{-1/2} %*% bnew */
+	lmer_invert(x);
+
+	/* simulate and store new value of sigma */
+	ryyinv = REAL(RXXsl)[pp1 * pp1 - 1];
+	sigma = 1/(ryyinv * sqrt(rchisq(df)));
+	REAL(ans)[i + p * nsamp] = sigma * sigma;
+
+	/* determine bhat and betahat */
+	Memcpy(bhat, REAL(RZXsl) + dims[0] * p, dims[0]);
+	for (j = 0; j < dims[0]; j++) bhat[j] /= -ryyinv;
+	Memcpy(betahat, REAL(RXXsl) + pp1 * (pp1 - 1), p);
+	for (j = 0; j < p; j++) betahat[j] /= -ryyinv;
+
+	/* simulate scaled, independent normals */
+	for (j = 0; j < p; j++) betanew[j] = sigma * norm_rand();
+	for (j = 0; j < dims[0]; j++) bnew[j] = sigma * norm_rand();
+
+	/* bnew := D^{-1/2} %*% bnew */
 	for (j = 0; j < nf; j++) {
 	    int k, ncj = nc[j];
 	    int ncjsqr = ncj * ncj,
@@ -3256,25 +3271,25 @@ lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp)
 		F77_CALL(dtrmv)("U", "N", "N", &ncj, Dj + k * ncjsqr,
 				&ncj, bj + k * ncj, &ione);
 	}
-				/* bnew := L^{-T} %*% bnew */
+
+	/* bnew := L^{-T} %*% bnew */
 	internal_sm(LFT, TRN, nf, Gp, 1, 1.0, LP, bnew, dims[0]);
-				/* bnew := bnew + RZX %*% betanew*/
+
+	/* bnew := bnew + RZX %*% betanew*/
 	F77_CALL(dgemv)("N", dims, &p, &one, REAL(RZXsl), dims,
 			betanew, &ione, &one, bnew, &ione);
-				/* betanew := RXX^{-1} %*% betanew */
+
+	/* betanew := RXX^{-1} %*% betanew */
 	F77_CALL(dtrmv)("U", "N", "N", &p, REAL(RXXsl), &pp1,
 			betanew, &ione);
-	ryyinv = REAL(RXXsl)[pp1 * pp1 - 1];
+
+	/* Add conditional modes and store */
 	for (j = 0; j < p; j++) {
-	    betanew[j] -= betacol[j];
-	    REAL(ans)[i + j * nsamp] = (betanew[j] /= ryyinv);
+	    REAL(ans)[i + j * nsamp] = (betanew[j] += betahat[j]);
 	}
-	for (j = 0; j < dims[0]; j++) {
-	    bnew[j] -= bcol[j];
-	    bnew[j] /= ryyinv;
-	}
-	sigma = 1/(ryyinv * sqrt(rchisq(df)));
-	REAL(ans)[i + p * nsamp] = sigma * sigma;
+	for (j = 0; j < dims[0]; j++) bnew[j] += bhat[j];
+
+	/* Update and store variance-covariance of the random effects */
 	lmer_Omega_update(Omega, bnew, sigma, nf, nc, Gp,
 			  REAL(ans) + i + (p + 1) * nsamp, nsamp);
     }
