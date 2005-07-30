@@ -8,14 +8,16 @@
   This generic function fits a linear mixed-effects model with nested or
   crossed grouping factors for the random effects.
 }
-\synopsis{
-lmer(formula, data, family, method = c("REML", "ML", "PQL", "Laplace", "AGQ"),
-    control = list(), subset, weights, na.action, offset,
-    model = TRUE, x = FALSE, y = FALSE, \dots)
-}
 \usage{
 lmer(formula, data, family,
-     method = c("REML", "ML", "PQL", "Laplace", "AGQ"),\dots)
+     method = c("REML", "ML", "PQL", "Laplace", "AGQ"),
+     control = list(), subset, weights, na.action, offset,
+     model = TRUE, x = FALSE, y = FALSE, \dots)
+
+\S4method{lmer}{formula}(formula, data, family,
+    method = c("REML", "ML", "PQL", "Laplace", "AGQ"),
+    control = list(), subset, weights, na.action, offset,
+    model = TRUE, x = FALSE, y = FALSE, \dots)
 }
 \arguments{
   \item{formula}{a two-sided linear formula object describing the
@@ -45,7 +47,14 @@ lmer(formula, data, family,
     \code{"Laplace"} method is intermediate in speed and accuracy.
     The \code{"AGQ"} method is the most accurate but can be
     considerably slower than the others.}
-  \item{\dots}{Optional arguments for methods.  Currently none are used.}
+  \item{control}{a \code{list} as returned from \code{\link{lmerControl}()}.}
+  \item{subset, weights, na.action, offset}{further model specification
+    arguments as in \code{\link[stats]{lm}}; see there for details.}
+  \item{model, x, y}{logicals indicating if the corresponding model component
+    should be returned.  Note that \code{x} and \code{y} are not yet
+    implemented.}
+  \item{\dots}{potentially further arguments for methods.  Currently
+    none are used.}
   }
 }
 \details{
