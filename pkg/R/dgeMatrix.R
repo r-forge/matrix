@@ -148,6 +148,12 @@ setMethod("crossprod", signature(x = "dgeMatrix", y = "missing"),
 setMethod("tcrossprod", signature(x = "dgeMatrix"),
 	  function(x) .Call("dgeMatrix_crossprod", x, TRUE),
 	  valueClass = "dpoMatrix")
+setMethod("tcrossprod", signature(x = "matrix"),
+	  function(x) .Call("dgeMatrix_crossprod", as(x, "dgeMatrix"), TRUE),
+	  valueClass = "dpoMatrix")
+setMethod("tcrossprod", signature(x = "numeric"),
+	  function(x) callGeneric(as.matrix(as.double(x))))
+
 
 setMethod("crossprod", signature(x = "dgeMatrix", y = "dgeMatrix"),
 	  function(x, y = NULL) .Call("dgeMatrix_dgeMatrix_crossprod", x, y),
