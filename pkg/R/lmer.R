@@ -56,7 +56,19 @@ subbars <- function(term)
     term[[3]] <- subbars(term[[3]])
     term
 }
-    
+
+abbrvNms <- function(gnm, cnms)
+{
+    ans <- paste(abbreviate(gnm), abbreviate(cnms), sep = '.')
+    if (length(cnms) > 1) {
+        anms <- lapply(cnms, abbreviate, minlength = 3)
+        nmmat <- outer(anms, anms, paste, sep = '.')
+        ans <- c(ans, paste(abbreviate(gnm, minlength = 3),
+                            nmmat[upper.tri(nmmat)], sep = '.'))
+    }
+    ans
+}
+
 ## Control parameters for lmer
 lmerControl <-
   function(maxIter = 200,
@@ -811,11 +823,12 @@ setMethod("show", signature(object="VarCorr"),
       })
 
 setMethod("mcmcsamp", signature(obj = "lmer"),
-          function(obj, nsamp = 1, verbose = FALSE, saveb = FALSE, ...)
+          function(obj, nsamp = 1, verbose = FALSE, saveb = FALSE,
+                   trans = TRUE, ...)
       {
           if (obj@family$family == "gaussian" &&
               obj@family$link == "identity") {
-              ans <- .Call("lmer_MCMCsamp", obj, saveb, nsamp,
+              ans <- .Call("lmer_MCMCsamp", obj, saveb, nsamp, trans,
                             PACKAGE = "Matrix")
           } else {
               ## Check arguments
@@ -871,11 +884,12 @@ setMethod("mcmcsamp", signature(obj = "lmer"),
                            PACKAGE = "Matrix") 
               .Call("glmer_finalize", GSpt, PACKAGE = "Matrix");
           }
-          cn <- as.character(seq(len = ncol(ans)))
-          fxd <- fixef(obj)
-          cn[seq(along = fxd)] <- names(fxd)
-          cn[length(fxd) + 1] <- "sigma^2"
-          colnames(ans) <- cn
+          gnms <- names(obj@flist)
+          cnms <- obj@cnames
+          colnames(ans) <- c(names(fixef(obj)), "sigma^2",
+                             unlist(lapply(seq(along = gnms),
+                                           function(i)
+                                           abbrvNms(gnms[i],cnms[[i]]))))
           ans
       })
 
