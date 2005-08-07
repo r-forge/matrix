@@ -20,6 +20,12 @@ readMM(filename)
 }
 \references{
   \url{http://math.nist.gov/MatrixMarket}
+
+  \url{http://www.cise.ufl.edu/research/sparse/matrices}
+}
+\examples{
+str(pores <- readMM(system.file("external/pores_1.mtx", package = "Matrix")))
+str(utm <- readHB(system.file("external/utm300.rua", package = "Matrix")))
 }
 \keyword{IO}
 \keyword{algebra}
