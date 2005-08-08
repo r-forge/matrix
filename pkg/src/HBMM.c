@@ -56,11 +56,11 @@ SEXP Matrix_readMatrixMarket(SEXP filename)
     }
 
     if (nz = mm_read_banner(conn, &code)) {
-	close(conn);
+	fclose(conn);
 	error("mm_read_banner returned code %d", nz);
     }
     if (!mm_is_valid(code)) {
-	close(conn);
+	fclose(conn);
 	error("Invalid code: %s", mm_typecode_to_str(code));
     }
 
@@ -124,7 +124,7 @@ SEXP Matrix_readMatrixMarket(SEXP filename)
     dims = INTEGER(GET_SLOT(ans, Matrix_DimSym));
     dims[0] = M; dims[1] = N;
 
-    close(conn);
+    fclose(conn);
     UNPROTECT(1);
     return ans;
 }
@@ -135,7 +135,6 @@ SEXP Matrix_writeHarwellBoeing(SEXP obj, SEXP file, SEXP typep)
     int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym)), *ii, *pp;
     int M = dims[0], N = dims[1], nz;
     double *xx;
-    FILE *out;
 
     if (type[2] == 'C' || type[2] == 'T') {
 	SEXP islot = GET_SLOT(obj, Matrix_iSym);
