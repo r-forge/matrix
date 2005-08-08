@@ -48,7 +48,7 @@ mcmcsamp(obj, nsamp, verbose, \dots)
 \examples{
 require("lattice", quietly = TRUE, character = TRUE)
 (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
-samp1 <- mcmcsamp(fm1, nsamp = 10000)
+samp1 <- mcmcsamp(fm1, nsamp = 1000)
 frm <-
     data.frame(vals = c(samp1), iter = rep(1:nrow(samp1), ncol(samp1)),
     par = factor(rep(1:ncol(samp1), each = nrow(samp1)),labels = colnames(samp1)))
