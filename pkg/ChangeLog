@@ -1,6 +1,35 @@
+2005-08-07  Douglas Bates <bates@localhost.localdomain>
+
+	* DESCRIPTION (Version): 0.98-2
+
+	* R/HBMM.R (readHB), (readMM): read Matrix Market formats
+
+	* R/lmer.R (abbrvNms): new
+	* R/lmer.R (mcmcsamp): allow transformed parameters
+
+2005-08-04  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* man/dtrMatrix-class.Rd: add examples
+	* man/dtpMatrix-class.Rd: dito; plus note about PROBLEM
+
+	* TODO: note the dtpMatrix (docu) bug
+
+	* R/zzz.R (.onLoad): assignInNamespace("as.matrix", *, "base")
+	in order to ensure that new as.matrix() is used by old functions,
+	e.g., svd(), qr(), eigen(), dist(),..;
+	      apply(), also matplot() or pairs().
+
+
+2005-08-03  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/lmer.R: add 'fixme' comments and move the linear vs glm check;
+	  add comments about 'control' / lmerControl() arguments
+
 2005-07-27  Douglas Bates  <bates@localhost.localdomain>
 
-	* man/sleep.Rd: Added the sleep data set.
+	* DESCRIPTION (Version): 0.98-1  released to CRAN
+
+	* man/sleepstudy.Rd: Added the sleep data set.
 
 2005-07-12  Douglas Bates  <bates@localhost.localdomain>
 
