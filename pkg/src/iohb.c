@@ -216,14 +216,47 @@ Fri Aug 15 16:29:47 EDT 1997
 /*---------------------------------------------------------------------*/
 
 #include "iohb.h"
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-#include<math.h>
-#include<malloc.h>
+#include <Rinternals.h>
 
-char* substr(const char* S, const int pos, const int len);
-void upcase(char* S);
+void
+IOHBTerminate(char* message) 
+{
+    error(message);
+}
+
+static char*
+substr(const char* S, const int pos, const int len)
+{
+    int i;
+    char *SubS;
+
+    if ( pos+len <= strlen(S)) {
+	SubS = (char *)malloc(len+1);
+	if ( SubS == NULL ) IOHBTerminate("Insufficient memory for SubS.");
+	for (i=0;i<len;i++) SubS[i] = S[pos+i];
+	SubS[len] = (char) NULL;
+    } else {
+	SubS = NULL;
+    }
+    return SubS;
+}
+
+/** 
+ * Convert string S to upper case
+ * 
+ * @param S string to be converted
+ * 
+ * @return S, after conversion
+ */
+static char*
+upcase(char* S)
+{
+    int i, len = strlen(S);
+
+    for (i = 0; i < len; i++) S[i] = toupper(S[i]);
+    return S;
+}
+
 void IOHBTerminate(char* message);
 
 int readHB_info(const char* filename, int* M, int* N, int* nz, char** Type, 
@@ -288,8 +321,6 @@ int readHB_info(const char* filename, int* M, int* N, int* nz, char** Type,
     return 1;
 
 }
-
-
 
 int readHB_header(FILE* in_file, char* Title, char* Key, char* Type, 
                     int* Nrow, int* Ncol, int* Nnzero, int* Nrhs,
@@ -757,6 +788,7 @@ int writeHB_mat_double(const char* filename, int M, int N,
     int Valperline, Valwidth, Valprec;
     int Valflag;           /* Indicates 'E','D', or 'F' float format */
     char pformat[16],iformat[16],vformat[19],rformat[19];
+    char diform[7] = "(8I10)", ddform[10] = "(4E20.13)";
 
     if ( Type[0] == 'C' ) {
          nvalentries = 2*nz;
@@ -773,20 +805,20 @@ int writeHB_mat_double(const char* filename, int M, int N,
        }
     } else out_file = stdout;
 
-    if ( Ptrfmt == NULL ) Ptrfmt = "(8I10)";
+    if ( Ptrfmt == NULL ) Ptrfmt = diform;
     ParseIfmt(Ptrfmt,&Ptrperline,&Ptrwidth);
     sprintf(pformat,"%%%dd",Ptrwidth);
     ptrcrd = (N+1)/Ptrperline;
     if ( (N+1)%Ptrperline != 0) ptrcrd++;
    
-    if ( Indfmt == NULL ) Indfmt =  Ptrfmt;
+    if ( Indfmt == NULL ) Indfmt =  diform;
     ParseIfmt(Indfmt,&Indperline,&Indwidth);
     sprintf(iformat,"%%%dd",Indwidth);
     indcrd = nz/Indperline;
     if ( nz%Indperline != 0) indcrd++;
 
     if ( Type[0] != 'P' ) {          /* Skip if pattern only  */
-      if ( Valfmt == NULL ) Valfmt = "(4E20.13)";
+      if ( Valfmt == NULL ) Valfmt = ddform;
       ParseRfmt(Valfmt,&Valperline,&Valwidth,&Valprec,&Valflag);
       if (Valflag == 'D') *strchr(Valfmt,'D') = 'E';
       if (Valflag == 'F')
@@ -798,7 +830,7 @@ int writeHB_mat_double(const char* filename, int M, int N,
     } else valcrd = 0;
 
     if ( Nrhs > 0 ) {
-       if ( Rhsfmt == NULL ) Rhsfmt = Valfmt;
+       if ( Rhsfmt == NULL ) Rhsfmt = ddform;
        ParseRfmt(Rhsfmt,&Rhsperline,&Rhswidth,&Rhsprec, &Rhsflag);
        if (Rhsflag == 'F')
           sprintf(rformat,"%% %d.%df",Rhswidth,Rhsprec);
@@ -1571,36 +1603,5 @@ int ParseRfmt(char* fmt, int* perline, int* width, int* prec, int* flag)
       tmp = substr(fmt,tmp - fmt + 1, strchr(fmt,')') - tmp - 1);
     }
     return *width = atoi(tmp);
-}
-
-char* substr(const char* S, const int pos, const int len)
-{
-    int i;
-    char *SubS;
-    if ( pos+len <= strlen(S)) {
-    SubS = (char *)malloc(len+1);
-    if ( SubS == NULL ) IOHBTerminate("Insufficient memory for SubS.");
-    for (i=0;i<len;i++) SubS[i] = S[pos+i];
-    SubS[len] = (char) NULL;
-    } else {
-      SubS = NULL;
-    }
-    return SubS;
-}
-
-#include<ctype.h>
-void upcase(char* S)
-{
-/*  Convert S to uppercase     */
-    int i,len;
-    len = strlen(S);
-    for (i=0;i< len;i++)
-       S[i] = toupper(S[i]);
-}
-
-void IOHBTerminate(char* message) 
-{
-   fprintf(stderr,message);
-   exit(1);
 }
 

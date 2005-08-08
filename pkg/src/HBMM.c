@@ -170,9 +170,8 @@ SEXP Matrix_writeHarwellBoeing(SEXP obj, SEXP file, SEXP typep)
     
     writeHB_mat_double(CHAR(asChar(file)), M, N, nz, pp, ii, xx, 0,
 		       (double *)NULL, (double *)NULL, (double *)NULL, 
-		       "", "", Type, (char *) NULL,
-		       (char *) NULL,  (char *) NULL,  (char *) NULL,
-		       "RUA");
+		       "", "", Type, (char*)NULL, (char*)NULL,
+		       (char*)NULL, (char*)NULL, "RUA"); 
 
     if (type[2] == 'T') {Free(ii); Free(pp); Free(xx);}
     return R_NilValue;
