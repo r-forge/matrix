@@ -37,6 +37,8 @@ static R_CallMethodDef CallEntries[] = {
     {"Matrix_readHarwellBoeing", (DL_FUNC) &Matrix_readHarwellBoeing, 1},
     {"Matrix_readMatrixMarket", (DL_FUNC) &Matrix_readMatrixMarket, 1},
     {"Matrix_rWishart", (DL_FUNC) &Matrix_rWishart, 3},
+    {"Matrix_writeHarwellBoeing", (DL_FUNC) &Matrix_writeHarwellBoeing, 3},
+    {"Matrix_writeMatrixMarket", (DL_FUNC) &Matrix_writeMatrixMarket, 3},
     {"SVD_validate", (DL_FUNC) &SVD_validate, 1},
     {"csc_check_column_sorting", (DL_FUNC) &csc_check_column_sorting, 1},
     {"csc_crossprod", (DL_FUNC) &csc_crossprod, 1},

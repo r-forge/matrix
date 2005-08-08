@@ -24,8 +24,14 @@ readMM(filename)
   \url{http://www.cise.ufl.edu/research/sparse/matrices}
 }
 \examples{
-str(pores <- readMM(system.file("external/pores_1.mtx", package = "Matrix")))
-str(utm <- readHB(system.file("external/utm300.rua", package = "Matrix")))
+str(pores <- readMM(system.file("external/pores_1.mtx",
+                                package = "Matrix")))
+str(utm <- readHB(system.file("external/utm300.rua",
+                               package = "Matrix")))
+str(lundA <- readMM(system.file("external/lund_a.mtx",
+                                package = "Matrix")))
+str(lundA <- readHB(system.file("external/lund_a.rsa",
+                                package = "Matrix")))
 }
 \keyword{IO}
 \keyword{algebra}

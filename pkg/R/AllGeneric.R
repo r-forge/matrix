@@ -40,6 +40,14 @@ if (!isGeneric("unpack"))
 if (!isGeneric("expm"))
     setGeneric("expm", function(x) standardGeneric("expm"))
 
+if (!isGeneric("writeHB"))
+    setGeneric("writeHB", function(obj, file, ...)
+               standardGeneric("writeHB"))
+
+if (!isGeneric("writeMM"))
+    setGeneric("writeMM", function(obj, file, ...)
+               standardGeneric("writeMM"))
+
 ## ----------------------- lmer-related Generics ---------------------------
 
 ## Hmm: If this does not match *exactly* the "formula" - method in ./lmer.R
