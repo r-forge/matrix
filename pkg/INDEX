@@ -53,4 +53,5 @@ tcrossprod              Cross-product of transpose
 unpack                  Full Storage Representation of Packed Matrices
 VarCorr                 Extract variance and correlation components
 VarCorr-class           Class "VarCorr"
+writeHB                 Write Harwell-Boeing or MatrixMarket formats
 y                       A sample response vector
