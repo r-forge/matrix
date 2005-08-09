@@ -55,7 +55,7 @@ SEXP Matrix_readMatrixMarket(SEXP filename)
 	error("non-string values not presently accepted");
     }
 
-    if (nz = mm_read_banner(conn, &code)) {
+    if ((nz = mm_read_banner(conn, &code))) {
 	fclose(conn);
 	error("mm_read_banner returned code %d", nz);
     }
@@ -140,6 +140,18 @@ SEXP Matrix_writeHarwellBoeing(SEXP obj, SEXP file, SEXP typep)
 	SEXP islot = GET_SLOT(obj, Matrix_iSym);
 	nz = LENGTH(islot);
 	ii = INTEGER(islot);
+	if (type[2] == 'T') {	/* create column pointers */
+	    int *i1 = Calloc(nz, int);
+	    double *x1 = Calloc(nz, double);
+	    
+	    pp = Calloc(N + 1, int);
+	    triplet_to_col(M, N, nz, ii,
+			   INTEGER(GET_SLOT(obj, Matrix_jSym)), xx,
+			   pp, i1, x1);
+	    nz = pp[N];
+	    xx = x1;
+	    ii = i1;
+	} else pp = INTEGER(GET_SLOT(obj, Matrix_pSym));
     } else error("Only types 'C' and 'T' allowed");
 
     if (type[0] == 'D') {
@@ -155,19 +167,6 @@ SEXP Matrix_writeHarwellBoeing(SEXP obj, SEXP file, SEXP typep)
 	Type[1] = 'S';
     }
 
-    if (type[2] == 'T') {
-	int *i1 = Calloc(nz, int);
-	double *x1 = Calloc(nz, double);
-	    
-	pp = Calloc(N + 1, int);
-	triplet_to_col(M, N, nz, ii,
-		       INTEGER(GET_SLOT(obj, Matrix_jSym)), xx,
-		       pp, i1, x1);
-	nz = pp[N];
-	xx = x1;
-	ii = i1;
-    }
-    
     writeHB_mat_double(CHAR(asChar(file)), M, N, nz, pp, ii, xx, 0,
 		       (double *)NULL, (double *)NULL, (double *)NULL, 
 		       "", "", Type, (char*)NULL, (char*)NULL,
