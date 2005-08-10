@@ -80,7 +80,7 @@ lmerControl <-
            msVerbose = getOption("verbose"),
            niterEM = 15,
            EMverbose = getOption("verbose"),
-           PQLmaxIt = 30,# unused _FIXME_
+           PQLmaxIt = 30,# FIXME: unused; PQL currently uses 'maxIter' instead
            analyticGradient = TRUE,
            analyticHessian = FALSE # unused _FIXME_
            )
