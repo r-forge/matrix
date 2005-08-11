@@ -53,4 +53,3 @@
 showClass("ddenseMatrix")
 }
 \keyword{classes}
-

@@ -96,3 +96,12 @@ setMethod("crossprod", signature(x = "numeric", y = "Matrix"),
 
 setMethod("solve", signature(a = "Matrix", b = "numeric"),
 	  function(a, b, ...) callGeneric(a, as.matrix(b)))
+
+if(FALSE) ## The following can't work as long as cbind is function(..., *)
+setMethod("cbind", signature(a = "Matrix", b = "Matrix"),
+          function(a, b, ...) {
+              da <- Dim(a)
+              db <- Dim(b)
+              if(da[1] != db[1])
+                  stop("Matrices must have same number of rows for cbind()ing")
+          })
