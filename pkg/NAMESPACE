@@ -45,12 +45,17 @@ exportClasses(
 	      ## also intermediate `virtual' ones:
 	      "dMatrix",
               "lMatrix",
+	      "denseMatrix",
 	      "sparseMatrix",
 	      "dsparseMatrix",
               "lsparseMatrix",
-	      ## not yet:   "iMatrix", "zMatrix",
 
 	      "ddenseMatrix",
+	      ## not yet used, but as sub-classes;
+              ## need to provide them for 'hierarchy-analysis':
+              "iMatrix",
+              "zMatrix",
+              "ldenseMatrix",
 
 	      "dgBCMatrix",
 	      "dgCMatrix",

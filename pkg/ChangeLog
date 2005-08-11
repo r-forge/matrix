@@ -1,4 +1,13 @@
+2005-08-11  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllClass.R: intermediate virtual class "denseMatrix"
+	* man/denseMatrix-class.Rd
+	* NAMESPACE: export it, and also export
+	* man/unused-classes.Rd: "iMatrix", "zMatrix" and "ldenseMatrix"
+
 2005-08-10  Douglas Bates  <bates@wisc.edu>
+
+	* DESCRIPTION (Version): 0.98-3 to CRAN
 
 	* src/dtrMatrix.c (dtrMatrix_validate): fixed up validation and
 	matrix_solve code (which was really, really wrong).

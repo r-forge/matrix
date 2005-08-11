@@ -39,23 +39,29 @@ setClass("lMatrix", representation("VIRTUAL"), contains = "Matrix")
 setClass("zMatrix", # letter 'z' is as in the names of Lapack subroutines
          representation(x = "complex", "VIRTUAL"), contains = "Matrix")
 
+# Virtual class of dense matrices
+setClass("denseMatrix", representation("VIRTUAL"), contains = "Matrix")
+
 # Virtual class of dense, numeric matrices
 setClass("ddenseMatrix",
          representation(rcond = "numeric", factors = "list", "VIRTUAL"),
-         contains = "dMatrix")
+         contains = c("dMatrix", "denseMatrix"))
 
 # Virtual class of dense, logical matrices
 setClass("ldenseMatrix",
          representation(x = "logical", factors = "list", "VIRTUAL"),
-         contains = "lMatrix")
+         contains = c("lMatrix", "denseMatrix"))
 
 ## virtual SPARSE ------------
 
-setClass("sparseMatrix", contains = "Matrix")# "VIRTUAL"
+setClass("sparseMatrix", representation("VIRTUAL"),
+         contains = "Matrix")
 
-setClass("dsparseMatrix", contains = c("dMatrix", "sparseMatrix"))# "VIRTUAL"
+setClass("dsparseMatrix", representation("VIRTUAL"),
+         contains = c("dMatrix", "sparseMatrix"))
 
-setClass("lsparseMatrix", contains = c("lMatrix", "sparseMatrix"))# "VIRTUAL"
+setClass("lsparseMatrix", representation("VIRTUAL"),
+         contains = c("lMatrix", "sparseMatrix"))
 
 ## ------------------ Proper (non-virtual) Classes ----------------------------
 
@@ -113,7 +119,7 @@ setClass("dppMatrix", contains = "dspMatrix",
 ##-------------------- S P A R S E (non-virtual) --------------------------
 
 ##---------- numeric sparse matrix classes --------------------------------
-    
+
 # numeric, sparse, triplet general matrices
 setClass("dgTMatrix",
          representation(i = "integer", j = "integer", factors = "list"),
@@ -180,7 +186,7 @@ setClass("dsRMatrix",
 ##---------- logical sparse matrix classes --------------------------------
 
 ## these classes are used in symbolic analysis to determine the
-## locations of non-zero entries 
+## locations of non-zero entries
 
 # logical, sparse, triplet general matrices
 setClass("lgTMatrix",
@@ -359,7 +365,7 @@ setClass("lmer",
                         logLik = "logLik", residuals = "numeric",
                         terms = "terms"),
          contains = "mer")
-                                
+
 ## Representation of a generalized linear mixed effects model
 ##setClass("glmer",
 ##         representation(family = "family", glmmll = "numeric", fixed = "numeric"),
