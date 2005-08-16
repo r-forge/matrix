@@ -1,4 +1,5 @@
 \name{dsCMatrix-class}
+\title{Symmetric, compressed, sparse column matrices}
 \docType{class}
 \alias{dsCMatrix-class}
 \alias{dsTMatrix-class}
@@ -18,7 +19,6 @@
 \alias{coerce,dsTMatrix,dsyMatrix-method}
 \alias{determinant,dsCMatrix,missing-method}
 \alias{determinant,dsCMatrix,logical-method}
-\title{Symmetric, compressed, sparse column matrices}
 \description{The \code{dsCMatrix} class is a class of symmetric, sparse
   matrices in the compressed, column-oriented format.  In this
   implementation the non-zero elements in the columns are sorted into
@@ -43,7 +43,7 @@
     \item{\code{j}:}{Object of class \code{"integer"} of length nnzero
       (number of non-zero elements).  These are the column numbers for
       each non-zero element in the matrix. (Only present in the
-      \code{dsTMatrix} class.)} 
+      \code{dsTMatrix} class.)}
     \item{\code{x}:}{Object of class \code{"numeric"} - the non-zero
       elements of the matrix.}
     \item{\code{factors}:}{Object of class \code{"list"} - a list
