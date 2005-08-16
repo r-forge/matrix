@@ -166,7 +166,7 @@ setClass("dsCMatrix",
 setClass("dgRMatrix",
          representation(j = "integer", p = "integer", factors = "list"),
          contains = "dsparseMatrix",
-         validity = function(object) .Call("dgRMatrix_validate", object)
+         ##TODO: validity = function(object) .Call("dgRMatrix_validate", object)
          )
 
 # numeric, sparse, sorted compressed sparse row-oriented triangular matrices
@@ -180,7 +180,7 @@ setClass("dtRMatrix",
 setClass("dsRMatrix",
          representation(uplo = "character"),
          contains = "dgRMatrix",
-         validity = function(object) .Call("dsRMatrix_validate", object)
+         ##TODO: validity = function(object) .Call("dsRMatrix_validate", object)
          )
 
 ##---------- logical sparse matrix classes --------------------------------

@@ -59,15 +59,18 @@ exportClasses(
 
 	      "dgBCMatrix",
 	      "dgCMatrix",
+	      "dgRMatrix",# unused
 	      "dgTMatrix",
 	      "dgeMatrix",
 	      "dpoMatrix",
 	      "dppMatrix",
 	      "dsCMatrix",
+	      "dsRMatrix",# unused
 	      "dsTMatrix",
 	      "dspMatrix",
 	      "dsyMatrix",
 	      "dtCMatrix",
+	      "dtRMatrix",# unused
 	      "dtTMatrix",
 	      "dtpMatrix",
 	      "dtrMatrix",
