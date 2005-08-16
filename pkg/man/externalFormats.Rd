@@ -61,8 +61,8 @@ str(lundA <- readHB(system.file("external/lund_a.rsa",
 \dontrun{
 ## NOTE: The following examples take quite some time
 ## ----  even on a fast internet connection:
-str(andr <-
- readHB(gzcon(url("http://www.cise.ufl.edu/research/sparse/HBformat/Andrews/Andrews.rsa.gz"))))
+str(sm <-
+ readHB(gzcon(url("http://www.cise.ufl.edu/research/sparse/HBformat/Boeing/msc00726.rsa.gz"))))
 str(jgl009 <-
  readMM(gzcon(url("ftp://math.nist.gov/pub/MatrixMarket2/Harwell-Boeing/counterx/jgl009.mtx.gz"))))
 }
