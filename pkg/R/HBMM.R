@@ -1,35 +1,27 @@
 ## Utilities for the Harwell-Boeing and MatrixMarket formats
 
-readI <- function(conn, nlines, nvals, fmt)
+readone <- function(ln, iwd, nper, conv)
 {
-    if (!grep("\\\([[:digit:]]+I[[:digit:]]+\\\)", fmt))
-        stop("Not a valid integer format")
-    Iind <- regexpr('I', fmt)
-    nper <- as.integer(substr(fmt, regexpr('\\\(', fmt) + 1, Iind - 1))
-    iwd <- as.integer(substr(fmt, Iind + 1, regexpr('\\\)', fmt) - 1))
-    strng <- paste(substr(readLines(conn, nlines, ok = FALSE),
-                          1, nper * iwd), collapse = '')
-    inds <- seq(0, by = iwd, length = nvals + 1)
-    ans <- integer(nvals)
-    for (i in seq(along = ans))
-        ans[i] <- as.integer(substr(strng, 1 + inds[i], inds[i + 1]))
-    ans
+    inds <- seq(0, by = iwd, length = nper + 1)
+    (conv)(substring(ln, 1 + inds[-length(inds)], inds[-1]))
 }
 
-readF <- function(conn, nlines, nvals, fmt)
+readmany <- function(conn, nlines, nvals, fmt, conv)
 {
-    if (!grep("\\\([[:digit:]]+[DEFG][[:digit:]]+\\\.[[:digit:]]+\\\)", fmt))
-        stop("Not a valid floating point format")
-    Iind <- regexpr('[DEFG]', fmt)
-    nper <- as.integer(substr(fmt, regexpr('\\\(', fmt) + 1, Iind - 1))
-    iwd <- as.integer(substr(fmt, Iind + 1, regexpr('\\\.', fmt) - 1)) 
-    strng <- paste(substr(readLines(conn, nlines, ok = FALSE),
-                          1, nper * iwd), collapse = '')
-    inds <- seq(0, by = iwd, length = nvals + 1)
-    ans <- numeric(nvals)
-    for (i in seq(along = ans))
-        ans[i] <- as.numeric(substr(strng, 1 + inds[i], inds[i + 1]))
-    ans
+    if (!grep("[[:digit:]]+[DEFGI][[:digit:]]+", fmt))
+        stop("Not a valid format")
+    Iind <- regexpr('[DEFGI]', fmt)
+    nper <- as.integer(substr(fmt, regexpr('[[:digit:]]+[DEFGI]', fmt), Iind - 1))
+    iwd <- as.integer(substr(fmt, Iind + 1, regexpr('[\\\.\\\)]', fmt) - 1)) 
+    rem <- nvals %% nper
+    full <- nvals %/% nper
+    ans <- vector("list", nvals %/% nper)
+    for (i in seq(len = full))
+        ans[[i]] <- readone(readLines(conn, 1, ok = FALSE),
+                            iwd, nper, conv)
+    if (!rem) return(unlist(ans))
+    c(unlist(ans),
+      readone(readLines(conn, 1, ok = FALSE), iwd, rem, conv))
 }
 
 readHB <- function(file)
@@ -69,12 +61,12 @@ readHB <- function(file)
     indfmt <- toupper(sub('[[:space:]]+$', '', substr(hdr[4], 17, 32)))
     valfmt <- toupper(sub('[[:space:]]+$', '', substr(hdr[4], 33, 52)))
     rhsfmt <- toupper(sub('[[:space:]]+$', '', substr(hdr[4], 53, 72)))
-    if (rhsln > 0) {
+    if (!is.na(rhsln) && rhsln > 0) {
         h5 <- readLines(file, 1, ok = FALSE)
     }        
-    ptr <- readI(file, ptrln, nc + 1, ptrfmt)
-    ind <- readI(file, indln, nz, indfmt)
-    vals <- readF(file, valln, nz, valfmt)
+    ptr <- readmany(file, ptrln, nc + 1, ptrfmt, as.integer)
+    ind <- readmany(file, indln, nz, indfmt, as.integer)
+    vals <- readmany(file, valln, nz, valfmt, as.numeric)
     if (t2 == 'S')
         new("dsCMatrix", uplo = "L", p = ptr - 1:1,
             i = ind - 1:1, x = vals, Dim = c(nr, nc))
