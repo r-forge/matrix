@@ -70,6 +70,7 @@ m0 <- new("dtRMatrix")
 ## FIXME: show() fails
 m2 <- new("dtRMatrix", x = 1:4, Dim = as.integer(c(2,2)))
 str(m2)
+if(FALSE)# FIXME: missing coerce
 str(m3 <- as(Matrix(diag(2)), "dtRMatrix"))
 }
 \keyword{classes}
