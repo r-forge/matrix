@@ -173,7 +173,7 @@ setClass("dgRMatrix",
 setClass("dtRMatrix",
          representation(uplo = "character", diag = "character"),
          contains = "dgRMatrix",
-         validity = function(object) .Call("dtRMatrix_validate", object)
+         ##TODO: validity = function(object) .Call("dtRMatrix_validate", object)
          )
 
 # numeric, sparse, sorted compressed sparse row-oriented symmetric matrices

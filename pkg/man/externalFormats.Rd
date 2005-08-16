@@ -59,6 +59,8 @@ str(lundA <- readMM(system.file("external/lund_a.mtx",
 str(lundA <- readHB(system.file("external/lund_a.rsa",
                                 package = "Matrix")))
 \dontrun{
+## NOTE: The following examples take quite some time
+## ----  even on a fast internet connection:
 str(andr <-
  readHB(gzcon(url("http://www.cise.ufl.edu/research/sparse/HBformat/Andrews/Andrews.rsa.gz"))))
 str(jgl009 <-
