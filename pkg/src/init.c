@@ -34,8 +34,8 @@ static R_CallMethodDef CallEntries[] = {
     {"LU_expand", (DL_FUNC) &LU_expand, 1},
     {"LU_validate", (DL_FUNC) &LU_validate, 1},
     {"Matrix_expand_pointers", (DL_FUNC) &Matrix_expand_pointers, 1},
-    {"Matrix_readHarwellBoeing", (DL_FUNC) &Matrix_readHarwellBoeing, 1},
-    {"Matrix_readMatrixMarket", (DL_FUNC) &Matrix_readMatrixMarket, 1},
+/*     {"Matrix_readHarwellBoeing", (DL_FUNC) &Matrix_readHarwellBoeing, 1}, */
+/*     {"Matrix_readMatrixMarket", (DL_FUNC) &Matrix_readMatrixMarket, 1}, */
     {"Matrix_rWishart", (DL_FUNC) &Matrix_rWishart, 3},
     {"Matrix_writeHarwellBoeing", (DL_FUNC) &Matrix_writeHarwellBoeing, 3},
     {"Matrix_writeMatrixMarket", (DL_FUNC) &Matrix_writeMatrixMarket, 3},
