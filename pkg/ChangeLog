@@ -1,3 +1,15 @@
+2005-08-15  Douglas Bates  <bates@localhost.localdomain>
+
+	* man/externalFormats.Rd: move documentation for writeHB and
+	writeMM here.
+
+	* src/mmio.c: replace inclusion of <malloc.h> by <stdlib.h>
+	(suggested by Paul Roecker).
+
+	* tests/validObj.R (assertError): Comment out test that is failing
+	after recent changes in r-devel.
+	
+
 2005-08-11  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/AllClass.R: intermediate virtual class "denseMatrix"

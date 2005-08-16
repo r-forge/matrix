@@ -5,6 +5,8 @@ corrmatrix-class        Class "corrmatrix"
 dCholCMatrix-class      Cholesky Decompositions of dsCMatrix Objects
 ddenseMatrix-class      Virtual Class "ddenseMatrix" of Numeric Dense
                         Matrices
+denseMatrix-class       Virtual Class "denseMatrix" of All Dense
+                        Matrices
 dgBCMatrix-class        Class "dgBCMatrix" Real Sparse Blocked Column
                         Compressed Matrix
 dgCMatrix-class         Compressed, sparse, column-oriented numeric
@@ -28,6 +30,7 @@ expm                    Matrix exponential
 facmul                  Multiplication by Decomposition Factors
 fixef                   Extract Fixed Effects
 Hilbert                 Generate a Hilbert matrix
+ldenseMatrix-class      Virtual Classes Not Yet Used
 lmer                    Fit (Generalized) Linear Mixed-Effects Models
 lmer-class              Mixed model representations
 lsparseMatrix-class     Sparse logical matrices
@@ -53,5 +56,4 @@ tcrossprod              Cross-product of transpose
 unpack                  Full Storage Representation of Packed Matrices
 VarCorr                 Extract variance and correlation components
 VarCorr-class           Class "VarCorr"
-writeHB                 Write Harwell-Boeing or MatrixMarket formats
 y                       A sample response vector
