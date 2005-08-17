@@ -24,3 +24,19 @@ cat("\n\n")
 ## are the "coerce" methods showing more than the 'Extends' output above?
 cat("All (S4) methods in the 'Matrix' package:\n")
 showMethods(where="package:Matrix")
+
+
+### Show sparse logical matrices:
+mM <- Matrix(1:4 >= 4, 2,2)
+for(cl in getClass("lsparseMatrix")@subclasses) {
+    clNam <- cl@subClass
+    cat(clNam,"; new(..):")
+    m <- new(clNam)
+## FAILS e.g. for ''lgCMatrix'
+    if(FALSE) ## FIXME
+    cat("valid:", validObject(m), "as(*, dge*):")
+    if(FALSE) { ## FIXME
+        m2 <- as(mM, clNam)
+        cat("valid:", validObject(m2))
+    }
+}
