@@ -36,11 +36,11 @@
   elements that are \code{TRUE} are stored.  These can be stored in the
   ``triplet'' form (classes \code{lgTMatrix}, \code{lsTMatrix}, and
   \code{ltTMatrix} which really contain pairs, not triplets) or in
-  compressed column-oriented form (classes \code{lgCMatrix}, \code{lsCMatrix}, and
-  \code{ltCMatrix}) or in compressed row-oriented form (classes \code{lgRMatrix}, \code{lsRMatrix}, and
-  \code{ltRMatrix}).  The second
-  letter in the name of these non-virtual classes indicates
-  \code{g}eneral, \code{s}ymmetric, or \code{t}riangular.
+  compressed column-oriented form (classes \code{lgCMatrix},
+  \code{lsCMatrix}, and \code{ltCMatrix}) or in compressed row-oriented
+  form (classes \code{lgRMatrix}, \code{lsRMatrix}, and
+  \code{ltRMatrix}).  The second letter in the name of these non-virtual
+  classes indicates \code{g}eneral, \code{s}ymmetric, or \code{t}riangular.
 }
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("lgCMatrix",
@@ -95,6 +95,11 @@
 \seealso{
   \code{\link{dgCMatrix-class}}
 }
-%\examples{}
+\examples{
+ m <- new("lgTMatrix", i=0:0, j = 1:1, Dim = c(2:2,2:2))
+ str(m)
+ if(FALSE) # FIXME
+   m
+}
 \keyword{classes}
 \keyword{algebra}
