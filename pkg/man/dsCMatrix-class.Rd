@@ -17,6 +17,7 @@
 \alias{coerce,dsTMatrix,dgeMatrix-method}
 \alias{coerce,dsTMatrix,dsCMatrix-method}
 \alias{coerce,dsTMatrix,dsyMatrix-method}
+\alias{coerce,graphNEL,dsCMatrix-method}
 \alias{determinant,dsCMatrix,missing-method}
 \alias{determinant,dsCMatrix,logical-method}
 \description{The \code{dsCMatrix} class is a class of symmetric, sparse

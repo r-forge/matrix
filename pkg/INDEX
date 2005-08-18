@@ -21,10 +21,12 @@ dpoMatrix-class         Positive semi-definite, dense, numeric
 dsCMatrix-class         Symmetric, compressed, sparse column matrices
 dsparseMatrix-class     Virtual Class "dsparseMatrix" of Numeric
                         Sparse Matrices
+dsRMatrix-class         Symmetric Sparse Compressed Row Matrices
 dsyMatrix-class         Symmetric, dense matrices
 dtCMatrix-class         Triangular, compressed, sparse column matrices
 dtpMatrix-class         Packed triangular dense matrices
 dtrMatrix-class         Triangular, dense, numeric matrices
+dtRMatrix-class         Triangular Sparse Compressed Row Matrices
 expand                  Expand a Decomposition into Factors
 expm                    Matrix exponential
 facmul                  Multiplication by Decomposition Factors
