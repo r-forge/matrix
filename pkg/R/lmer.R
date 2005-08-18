@@ -845,7 +845,7 @@ setMethod("mcmcsamp", signature(obj = "lmer"),
           } else {
               glmer <- TRUE
               if (trans)
-                  warn("trans option not currently allowed for generalized models")
+                  warning("trans option not currently allowed for generalized models")
               trans <- FALSE
               ## Check arguments
               if (length(obj@Omega) > 1 || obj@nc[1] > 1)
