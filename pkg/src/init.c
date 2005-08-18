@@ -31,6 +31,7 @@ static R_CallMethodDef CallEntries[] = {
     {"pBunchKaufman_validate", (DL_FUNC) &pBunchKaufman_validate, 1},
     {"Cholesky_validate", (DL_FUNC) &Cholesky_validate, 1},
     {"pCholesky_validate", (DL_FUNC) &pCholesky_validate, 1},
+    {"graphNEL_as_dgTMatrix", (DL_FUNC) &graphNEL_as_dgTMatrix, 1},
     {"LU_expand", (DL_FUNC) &LU_expand, 1},
     {"LU_validate", (DL_FUNC) &LU_validate, 1},
     {"Matrix_expand_pointers", (DL_FUNC) &Matrix_expand_pointers, 1},

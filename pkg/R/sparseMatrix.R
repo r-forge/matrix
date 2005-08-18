@@ -15,6 +15,12 @@ setMethod("crossprod", signature(x = "sparseMatrix", y = "ddenseMatrix"),
 setMethod("crossprod", signature(x = "ddenseMatrix", y = "sparseMatrix"),
           function(x, y = NULL) callGeneric(as(x, "dgeMatrix"), y))
 
+setAs("graphNEL", "sparseMatrix",
+      function(from) {
+          if (from@edgemode == "undirected")
+              return(.Call("graphNEL_as_dsTMatrix", from))
+          error("directed graphs not currently allowed")
+      })
 
 
 setMethod("[", signature(x = "dsparseMatrix",
