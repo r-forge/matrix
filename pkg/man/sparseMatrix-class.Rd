@@ -6,6 +6,7 @@
 \alias{\%*\%,ddenseMatrix,sparseMatrix-method}
 \alias{crossprod,sparseMatrix,ddenseMatrix-method}
 \alias{crossprod,ddenseMatrix,sparseMatrix-method}
+\alias{coerce,graphNEL,sparseMatrix-method}
 \title{Virtual Class "sparseMatrix" --- Mother of Sparse Matrices}
 \description{Virtual Mother Class of All Sparse Matrices}
 \section{Slots}{
