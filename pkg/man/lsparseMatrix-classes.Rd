@@ -16,7 +16,9 @@
 \alias{coerce,dgCMatrix,lgCMatrix-method}
 \alias{coerce,lgCMatrix,dgCMatrix-method}
 \alias{coerce,lgCMatrix,lgTMatrix-method}
+\alias{coerce,lgCMatrix,matrix-method}
 \alias{coerce,lgTMatrix,lgCMatrix-method}
+\alias{coerce,lgTMatrix,matrix-method}
 \alias{coerce,lsCMatrix,dsCMatrix-method}
 \alias{coerce,ltCMatrix,dtCMatrix-method}
 \alias{crossprod,lgCMatrix,missing-method}
@@ -96,10 +98,10 @@
   \code{\link{dgCMatrix-class}}
 }
 \examples{
- m <- new("lgTMatrix", i=0:0, j = 1:1, Dim = c(2:2,2:2))
- str(m)
- if(FALSE) # FIXME
-   m
+m <- Matrix(c(0,0,2:0), 3,5, dimnames=list(LETTERS[1:3],NULL))
+(dm <- as(m, "dgCMatrix"))# no dimnames for sparse here
+(lm <- as(dm, "lgCMatrix"))
+str(lm)
 }
 \keyword{classes}
 \keyword{algebra}

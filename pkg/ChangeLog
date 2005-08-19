@@ -1,3 +1,16 @@
+2005-08-19  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/lgCMatrix.c (lcsc_to_matrix): new; need for
+		as( <logical>, "matrix")
+
+	* R/pMatrix.R: coercion to "lgTMatrix"
+
+	* R/gTMatrix.R: new virtual class to define "[" methods for.
+	* man/gTMatrix-class.Rd:
+	* General slight re-organization of where "[" methods are defined.
+	  more to come.
+
+
 2005-08-18  Douglas Bates  <bates@localhost.localdomain>
 
 	* R/lmer.R: Corrected naming scheme in mcmcsamp to work with lmer
