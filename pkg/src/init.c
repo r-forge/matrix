@@ -148,6 +148,7 @@ static R_CallMethodDef CallEntries[] = {
     {"lCholCMatrix_solve", (DL_FUNC) &lCholCMatrix_solve, 1},
     {"lCholCMatrix_lgCMatrix_solve", (DL_FUNC) &lCholCMatrix_lgCMatrix_solve, 2},
     {"lCholCMatrix_validate", (DL_FUNC) &lCholCMatrix_validate, 1},
+    {"lcsc_to_matrix", (DL_FUNC) &lcsc_to_matrix, 1},
     {"lgCMatrix_crossprod", (DL_FUNC) &lgCMatrix_crossprod, 3},
     {"lgCMatrix_lgCMatrix_mm", (DL_FUNC) &lgCMatrix_lgCMatrix_mm, 2},
     {"lgCMatrix_picky_column", (DL_FUNC) &lgCMatrix_picky_column, 1},
@@ -193,7 +194,7 @@ static R_CallMethodDef CallEntries[] = {
 void R_init_Matrix(DllInfo *dll)
 {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
-    R_useDynamicSymbols(dll, FALSE); 
+    R_useDynamicSymbols(dll, FALSE);
     Matrix_DIsqrtSym = install("DIsqrt");
     Matrix_DSym = install("D");
     Matrix_DimSym = install("Dim");
