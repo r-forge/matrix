@@ -26,7 +26,14 @@ cat("All (S4) methods in the 'Matrix' package:\n")
 showMethods(where="package:Matrix")
 
 
-### Show sparse logical matrices:
+### Sparse Logical:
+m <- Matrix(c(0,0,2:0), 3,5)
+mT <- as(mC <- as(m, "dgCMatrix"), "dgTMatrix")
+stopifnot(identical(as(mT,"dgCMatrix"), mC))
+as(as(as(mT[1:2, 2:3], "dgCMatrix"), "lgCMatrix"),"ltCMatrix")
+
+### Test all classes:
+
 mM <- Matrix(1:4 >= 4, 2,2)
 for(cl in getClass("lsparseMatrix")@subclasses) {
     clNam <- cl@subClass

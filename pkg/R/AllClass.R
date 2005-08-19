@@ -54,8 +54,11 @@ setClass("ldenseMatrix",
 
 ## virtual SPARSE ------------
 
-setClass("sparseMatrix", representation("VIRTUAL"),
-         contains = "Matrix")
+setClass("sparseMatrix", representation("VIRTUAL"), contains = "Matrix")
+
+## general Triplet Matrices (dgT, lgT, ..):
+setClass("gTMatrix", representation(i = "integer", j = "integer", "VIRTUAL"),
+         contains = "sparseMatrix")
 
 setClass("dsparseMatrix", representation("VIRTUAL"),
          contains = c("dMatrix", "sparseMatrix"))
@@ -122,8 +125,8 @@ setClass("dppMatrix", contains = "dspMatrix",
 
 # numeric, sparse, triplet general matrices
 setClass("dgTMatrix",
-         representation(i = "integer", j = "integer", factors = "list"),
-         contains = "dsparseMatrix",
+         representation(factors = "list"),
+         contains = c("gTMatrix", "dsparseMatrix"),
          validity = function(object) .Call("dgTMatrix_validate", object)
          )
 
@@ -190,8 +193,7 @@ setClass("dsRMatrix",
 
 # logical, sparse, triplet general matrices
 setClass("lgTMatrix",
-         representation(i = "integer", j = "integer"),
-         contains = "lsparseMatrix",
+         contains = c("gTMatrix", "lsparseMatrix"),
          validity = function(object) .Call("lgTMatrix_validate", object)
          )
 
