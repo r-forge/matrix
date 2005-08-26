@@ -37,9 +37,9 @@
       either "U", for upper triangular, and "L", for lower triangular.}
     \item{\code{diag}:}{Object of class \code{"character"}. Must be
       either \code{"U"}, for unit triangular (diagonal is all ones), or
-      \code{"N"} for non-unit.  The implicit diagonal elements are not
-      explicitly stored when \code{diag} is \code{"U"}.}
-%%% FIXME: The above is not true -- they *are* stored (but values not considered)
+      \code{"N"} for non-unit.  The diagonal elements are not
+      accessed internally when \code{diag} is \code{"U"} (but need to be
+      allocated, i.e., \code{length(x)} does not depend on \code{diag}).}
     \item{\code{x}:}{Object of class \code{"numeric"}. The numeric
       values that constitute the matrix, stored in column-major order.}
     \item{\code{Dim}:}{Object of class \code{"integer"}. The dimensions
