@@ -41,3 +41,7 @@
   because it does not provide the permutation.
 
 - tcrossprod() now works: C code now "exported" via init.c
+
+- FIXME: dtpMatrix(... diag = "U") (i.e., unit-diagonal packed triangular)
+  -----  *does* need 'x' entries for the diagonal but these are never looked at.
+    -> changed doc -- Lapack also says they are not referenced but assumed 1.
