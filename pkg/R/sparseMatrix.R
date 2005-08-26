@@ -27,12 +27,40 @@ setMethod("crossprod", signature(x = "sparseMatrix", y = "ddenseMatrix"),
 setMethod("crossprod", signature(x = "ddenseMatrix", y = "sparseMatrix"),
           function(x, y = NULL) callGeneric(as(x, "dgeMatrix"), y))
 
+## "graph" coercions -- this needs the graph package which is currently
+##  -----               *not* required on purpose
+
+## Note: 'undirected' graph <==> 'symmetric' matrix
+
 setAs("graphNEL", "sparseMatrix",
       function(from) {
           if (from@edgemode == "undirected")
+### FIXME: Missing C code for this:
               return(.Call("graphNEL_as_dsTMatrix", from))
-          error("directed graphs not currently allowed")
+          else
+              return(.Call("graphNEL_as_dgTMatrix", from))
       })
+setAs("graph", "sparseMatrix",
+      function(from) as(as(from,"graphNEL"), "sparseMatrix"))
+
+if(FALSE) {##--- not yet
+
+setAs("sparseMatrix", "graph", function(from) as(from, "graphNEL"))
+setAs("sparseMatrix", "graphNEL",
+      function(from) as(as(from, "dgTMatrix"), "graphNEL"))
+setAs("dgTMatrix", "graphNEL",
+      function(from) {
+          d <- Dim(from)
+          if(d[1] != d[2])
+              stop("only square matrices can be used as incidence matrices for grphs")
+          n <- d[1]
+          if(n == 0) return(new("graphNEL"))
+          stop("'dgTMatrix -> 'graphNEL' method is not yet implemented")
+          ## new("graphNEL", nodes = paste(1:n) , edgeL = ...)
+      })
+
+}#--not_yet
+
 
 
 ### Subsetting -- basic things (drop = "missing") are done in ./Matrix.R
