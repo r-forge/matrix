@@ -97,13 +97,15 @@ setMethod("crossprod", signature(x = "numeric", y = "Matrix"),
 setMethod("solve", signature(a = "Matrix", b = "numeric"),
 	  function(a, b, ...) callGeneric(a, as.matrix(b)))
 
-## Subsetting : The "missing" cases can be dealt with here, "at the top":
+### --------------------------------------------------------------------------
+###
+### Subsetting "["  and
+### SubAssign  "[<-" : The "missing" cases can be dealt with here, "at the top":
 
 ## "x[]":
 setMethod("[", signature(x = "Matrix",
 			 i = "missing", j = "missing", drop = "ANY"),
 	  function (x, i, j, drop) x)
-
 ## missing 'drop' --> 'drop = TRUE'
 ##                     -----------
 ## select rows
@@ -118,11 +120,23 @@ setMethod("[", signature(x = "Matrix", i = "numeric", j = "numeric",
                          drop = "missing"),
 	  function(x,i,j, drop) callGeneric(x, i=i, j=j, drop= TRUE))
 
-
 ## "FIXME:"
 ## How can we get at   A[ ij ]	where ij is (i,j) 2-column matrix?
 ##  and                A[ LL ]	where LL is a logical *vector*
 
+
+
+### "[<-" : -----------------
+
+## x[] <- value :
+setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
+                                value = "vector"),##  double/logical/...
+	  function (x, value) { x@x <- value ; validObject(x); x })
+
+## Otherwise (value is not "vector"): bail out
+setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
+                                value = "ANY"),
+	  function (x, i, j, value) stop("RHS 'value' must be of class \"vector\""))
 
 
 
@@ -134,6 +148,3 @@ setMethod("cbind", signature(a = "Matrix", b = "Matrix"),
               if(da[1] != db[1])
                   stop("Matrices must have same number of rows for cbind()ing")
           })
-
-
-

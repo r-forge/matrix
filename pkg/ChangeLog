@@ -1,3 +1,16 @@
+2005-08-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R:  added first "[<-" methods; not yet functional
+	* R/denseMatrix.R: dito
+	* man/Subassign-methods.Rd: new help file for these
+
+2005-08-25  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.98-6
+
+	* R/denseMatrix.R: new file for "[" fallback methods for all dense
+	matrices.
+
 2005-08-19  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/lgCMatrix.c (lcsc_to_matrix): new; need for
@@ -10,6 +23,12 @@
 	* General slight re-organization of where "[" methods are defined.
 	  more to come.
 
+2005-08-18  Douglas Bates  <bates@wisc.edu>
+
+	* DESCRIPTION (Version): 0.98-5  released to CRAN
+
+	* src/dgTMatrix.c (graphNEL_as_dgTMatrix): add first graphNEL methods
+	* .....
 
 2005-08-18  Douglas Bates  <bates@localhost.localdomain>
 

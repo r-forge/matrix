@@ -8,6 +8,10 @@
 \alias{[,Matrix,numeric,missing,missing-method}
 \alias{[,Matrix,numeric,numeric,missing-method}
 %
+\alias{[,denseMatrix,numeric,missing,logical-method}
+\alias{[,denseMatrix,numeric,numeric,logical-method}
+\alias{[,denseMatrix,missing,numeric,logical-method}
+%
 \alias{[,gTMatrix,numeric,missing,logical-method}
 \alias{[,gTMatrix,missing,numeric,logical-method}
 \alias{[,gTMatrix,numeric,numeric,logical-method}
@@ -45,18 +49,24 @@
   }
 }
 \seealso{
+  \code{\link{[<--methods}} for sub\emph{assign}ment to \code{"Matrix"}
+  objects.
   \code{\link{Extract}} about the standard extraction.
 }
 \examples{
 str(m <- Matrix(round(rnorm(7*4),2), nrow = 7))
 stopifnot(identical(m, m[]))
-\dontshow{
- if(FALSE) {## FIXME: still all fail
-   m[2,3]
-   m[1,]
-   m[,2]
- }
-}
+m[2, 3]   # simple number
+m[2, 3:4] # simple numeric of length 2
+
+m[2, 3:4, drop=FALSE] # sub matrix of class 'dgeMatrix'
+m[-(4:7), 3:4]        # dito; the upper right corner of 'm'
+
+## rows or columns only:
+m[1,]     # first row, as simple numeric vector
+m[,2]     # 2nd column
+m[,1:2]   # sub matrix of first two columns
+m[-(1:6),, drop=FALSE] # not the first 6 rows, i.e. only the 7th
 }
 \keyword{methods}
 \keyword{array}

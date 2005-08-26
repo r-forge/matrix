@@ -10,7 +10,7 @@ setAs("dgTMatrix", "matrix",
 setAs("dgeMatrix", "dgTMatrix",
       function(from) as(as(from, "dgCMatrix"), "dgTMatrix"))
 
-## "[" methods now in
+## "[" methods are now in ./gTMatrix.R
 
 setMethod("crossprod", signature(x = "dgTMatrix", y = "missing"),
           function(x, y = NULL)
