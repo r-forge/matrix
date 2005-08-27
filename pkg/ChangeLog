@@ -1,3 +1,10 @@
+2005-08-29  Douglas Bates  <bates@wisc.edu>
+
+	* src/dgTMatrix.c (graphNEL_as_dgTMatrix): Corrected the position
+	indicator pos not being updated.  Also enforced upper triangular
+	for symmetric case.  Need to coerce edges component of elements of
+	edge list - grr! (Why don't they define their classes cleanly?)
+
 2005-08-26  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Matrix.R:  added first "[<-" methods; not yet functional

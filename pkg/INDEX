@@ -31,6 +31,8 @@ expand                  Expand a Decomposition into Factors
 expm                    Matrix exponential
 facmul                  Multiplication by Decomposition Factors
 fixef                   Extract Fixed Effects
+gTMatrix-class          Class "gTMatrix" of General Sparse Matrices in
+                        Triplet Form
 Hilbert                 Generate a Hilbert matrix
 ldenseMatrix-class      Virtual Classes Not Yet Used
 lmer                    Fit (Generalized) Linear Mixed-Effects Models
@@ -41,8 +43,10 @@ LU-class                LU Matrix Decompositions
 Matrix                  Construct a Classed Matrix
 Matrix-class            Virtual Class "Matrix" Class of Matrices
 mcmcsamp                Generate and MCMC sample
+[<--methods             Methods for "[<-" - Assigning to Subsets for
+                        'Matrix'
 [-methods               Methods for "[": Extraction or Subsetting in
-                        Package 'Matrix'.
+                        Package 'Matrix'
 mm                      A sample sparse model matrix
 norm                    Norm of a Matrix
 pdmatrix-class          Positive-definite matrices
