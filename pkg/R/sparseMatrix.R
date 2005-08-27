@@ -29,16 +29,14 @@ setMethod("crossprod", signature(x = "ddenseMatrix", y = "sparseMatrix"),
 
 ## "graph" coercions -- this needs the graph package which is currently
 ##  -----               *not* required on purpose
-
 ## Note: 'undirected' graph <==> 'symmetric' matrix
 
 setAs("graphNEL", "sparseMatrix",
       function(from) {
-          if (from@edgemode == "undirected")
-### FIXME: Missing C code for this:
-              return(.Call("graphNEL_as_dsTMatrix", from))
-          else
-              return(.Call("graphNEL_as_dgTMatrix", from))
+          .Call("graphNEL_as_dgTMatrix",
+                from,
+                symmetric = (from@edgemode == "undirected"))
+
       })
 setAs("graph", "sparseMatrix",
       function(from) as(as(from,"graphNEL"), "sparseMatrix"))
