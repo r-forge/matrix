@@ -105,14 +105,16 @@ SEXP dgTMatrix_to_matrix(SEXP x)
     return ans;
 }
 
-SEXP graphNEL_as_dgTMatrix(SEXP x)
+SEXP graphNEL_as_dgTMatrix(SEXP x, SEXP symmetric)
 {
     SEXP nodes = GET_SLOT(x, install("nodes")),
 	edgeL = GET_SLOT(x, install("edgeL")),
-	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dsTMatrix")));
+	ans = PROTECT(NEW_OBJECT(MAKE_CLASS(LOGICAL(symmetric)[0]
+					    ? "dsTMatrix"
+					    : "dgTMatrix")));
     int *ii, *jj, *dims, i, j, nnd = LENGTH(nodes), pos, totl;
     double *xx;
-    
+
     totl = 0;
     for (i = 0; i < nnd; i++)
 	totl += LENGTH(Matrix_getElement(VECTOR_ELT(edgeL, i), "edges"));
@@ -133,7 +135,7 @@ SEXP graphNEL_as_dgTMatrix(SEXP x)
 	    weights = Matrix_getElement(edg, "weights");
 	int *edgs = INTEGER(edges), nedg = LENGTH(edges);
 	double *wts = REAL(weights);
-	
+
 	for (j = 0; j < nedg; j++) {
 	    ii[pos] = i;
 	    jj[pos] = edgs[j] - 1;
