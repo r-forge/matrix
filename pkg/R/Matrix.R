@@ -102,6 +102,9 @@ setMethod("solve", signature(a = "Matrix", b = "numeric"),
 ### Subsetting "["  and
 ### SubAssign  "[<-" : The "missing" cases can be dealt with here, "at the top":
 
+## Using "vector" for indices should allow
+## integer (numeric), logical, or character (names!) indices :
+
 ## "x[]":
 setMethod("[", signature(x = "Matrix",
 			 i = "missing", j = "missing", drop = "ANY"),
@@ -109,16 +112,21 @@ setMethod("[", signature(x = "Matrix",
 ## missing 'drop' --> 'drop = TRUE'
 ##                     -----------
 ## select rows
-setMethod("[", signature(x = "Matrix", i = "numeric", j = "missing",
+setMethod("[", signature(x = "Matrix", i = "vector", j = "missing",
 			 drop = "missing"),
 	  function(x,i,j, drop) callGeneric(x, i=i, drop= TRUE))
 ## select columns
-setMethod("[", signature(x = "Matrix", i = "missing", j = "numeric",
+setMethod("[", signature(x = "Matrix", i = "missing", j = "vector",
 			 drop = "missing"),
 	  function(x,i,j, drop) callGeneric(x, j=j, drop= TRUE))
-setMethod("[", signature(x = "Matrix", i = "numeric", j = "numeric",
+setMethod("[", signature(x = "Matrix", i = "vector", j = "vector",
                          drop = "missing"),
 	  function(x,i,j, drop) callGeneric(x, i=i, j=j, drop= TRUE))
+
+## bail out if any of (i,j,drop) is "non-sense"
+setMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY", drop = "ANY"),
+	  function(x,i,j, drop)
+          stop("invalid or not-yet-implemented 'Matrix' subsetting"))
 
 ## "FIXME:"
 ## How can we get at   A[ ij ]	where ij is (i,j) 2-column matrix?
@@ -136,7 +144,11 @@ setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
 ## Otherwise (value is not "vector"): bail out
 setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
                                 value = "ANY"),
-	  function (x, i, j, value) stop("RHS 'value' must be of class \"vector\""))
+	  function (x, i, j, value)
+                 if(!is(value,"vector"))
+                 stop("RHS 'value' must be of class \"vector\"")
+                 else stop("unimplemented 'Matrix[<-' method"))
+
 
 
 
