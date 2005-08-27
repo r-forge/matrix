@@ -50,6 +50,7 @@ stopifnot(identical(dimnames(t34N),
 
 ## "dpo"
 chk.matrix(cm <- crossprod(m1))
+chk.matrix(cp <- as(cm, "dppMatrix"))# 'dpp'
 chk.matrix(as(cm, "dsyMatrix"))
 chk.matrix(dcm <- as(cm, "dgeMatrix"))
 chk.matrix(mcm <- as(cm, "dMatrix"))
