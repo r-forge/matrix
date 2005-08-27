@@ -140,6 +140,7 @@ setClass("dtTMatrix",
 # numeric, sparse, triplet symmetric matrices
 setClass("dsTMatrix",
          representation(uplo = "character"),
+         prototype = prototype(uplo = "U"),
          contains = "dgTMatrix",
          validity = function(object) .Call("dsTMatrix_validate", object)
          )
