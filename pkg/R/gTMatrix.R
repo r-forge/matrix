@@ -1,4 +1,15 @@
-## "gTMatrix" : Virtual class of general sparse matrices in triplet-format
+#### "gTMatrix" : Virtual class of general sparse matrices in triplet-format
+
+### "[" :
+### -----
+
+## FIXME: The following is just for numeric indices.
+
+## Want to allow 'logical' (and 'character' with dimnames; but
+## that will be less common for sparse matrices) as well!
+## Consider s/numeric/vector/ and then test for numeric/logical/character
+## method-*internally* ; this is not strictly OO, but may lead
+## to much more compact code
 
 ## Select rows
 setMethod("[", signature(x = "gTMatrix", i = "numeric", j = "missing",
