@@ -116,3 +116,8 @@ if (!isGeneric("mcmcsamp")) {
     setGeneric("mcmcsamp", function(obj, nsamp = 1, verbose =
     FALSE, ...) standardGeneric("mcmcsamp"))
 }
+
+if (!isGeneric("simulate")) {
+    setGeneric("simulate", function(obj, nsamp = 1, verbose =
+    FALSE, ...) standardGeneric("simulate"))
+}

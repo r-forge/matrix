@@ -929,3 +929,35 @@ setMethod("mcmcsamp", signature(obj = "lmer"),
 rWishart <- function(n, df, invScal)
   .Call("Matrix_rWishart", n, df, invScal)
 
+setMethod("simulate", signature(obj = "lmer"),
+          function(obj, nsamp = 1, verbose = FALSE, ...)
+      {
+          family <- obj@family
+          if (family$family != "gaussian" ||
+              family$link != "identity") 
+              stop("simulation of generalized linear mixed models not implemented yet")
+          ## create the mean from the fixed effects
+          frm <- obj@frame
+          n <- nrow(frm)
+          fixed.form <- Matrix:::nobars(obj@call$formula)
+          if (inherits(fixed.form, "name")) # RHS is empty - use a constant
+              fixed.form <- substitute(foo ~ 1, list(foo = fixed.form))
+          glm.fit <- glm(eval(fixed.form), family, frm, x = TRUE, y = TRUE)
+          fxd <- drop(glm.fit$x %*% fixef(obj))
+          bars <- Matrix:::findbars(obj@call$formula[[3]])
+          random <-
+              lapply(bars,
+                     function(x) list(model.matrix(eval(substitute(~term,
+                                                                   list(term=x[[2]]))),
+                                                   frm),
+                                      eval(substitute(as.factor(fac)[,drop = TRUE],
+                                                      list(fac = x[[3]])), frm)))
+          names(random) <- unlist(lapply(bars, function(x) deparse(x[[3]])))
+          ## re-order the random effects pairs if necessary
+          if (any(names(random) != names(obj@flist)))
+              random <- random[names(obj@flist)]
+          rmmats <- c(lapply(random, "[[", 1))
+          vc <- VarCorr(obj)
+          ans <- fxd + matrix(rnorm(n * nsamp, sd = vc@scale), nr = n)
+          ans
+      })

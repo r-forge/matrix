@@ -2948,8 +2948,9 @@ std_rWishart_factor(double df, int p, double ans[])
     return ans;
 }
 
-/* FIXME: Combine this and lmer_Omega_update.  Consider changing the
- * internal storage of b in glmer_MCMCsamp to a single vector.
+/* FIXME: Combine internal_Omega_update and lmer_Omega_update.
+ * Consider changing the internal storage of b in glmer_MCMCsamp to a
+ * single vector.
  */
 
 /** 
