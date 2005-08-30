@@ -113,11 +113,12 @@ if (!isGeneric("getFixDF")) {           # not exported
 }
 
 if (!isGeneric("mcmcsamp")) {
-    setGeneric("mcmcsamp", function(obj, nsamp = 1, verbose =
+    setGeneric("mcmcsamp", function(object, n = 1, verbose =
     FALSE, ...) standardGeneric("mcmcsamp"))
 }
 
 if (!isGeneric("simulate")) {
-    setGeneric("simulate", function(obj, nsamp = 1, verbose =
-    FALSE, ...) standardGeneric("simulate"))
+    setGeneric("simulate",
+               function(object, n = 1, ...)
+               standardGeneric("simulate"))
 }

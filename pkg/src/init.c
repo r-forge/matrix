@@ -35,8 +35,6 @@ static R_CallMethodDef CallEntries[] = {
     {"LU_expand", (DL_FUNC) &LU_expand, 1},
     {"LU_validate", (DL_FUNC) &LU_validate, 1},
     {"Matrix_expand_pointers", (DL_FUNC) &Matrix_expand_pointers, 1},
-/*     {"Matrix_readHarwellBoeing", (DL_FUNC) &Matrix_readHarwellBoeing, 1}, */
-/*     {"Matrix_readMatrixMarket", (DL_FUNC) &Matrix_readMatrixMarket, 1}, */
     {"Matrix_rWishart", (DL_FUNC) &Matrix_rWishart, 3},
     {"Matrix_writeHarwellBoeing", (DL_FUNC) &Matrix_writeHarwellBoeing, 3},
     {"Matrix_writeMatrixMarket", (DL_FUNC) &Matrix_writeMatrixMarket, 3},
@@ -173,6 +171,7 @@ static R_CallMethodDef CallEntries[] = {
     {"lmer_ranef", (DL_FUNC) &lmer_ranef, 1},
     {"lmer_secondDer", (DL_FUNC) &lmer_secondDer, 1},
     {"lmer_sigma", (DL_FUNC) &lmer_sigma, 2},
+    {"lmer_simulate", (DL_FUNC) &lmer_simulate, 5},
     {"lmer_update_mm", (DL_FUNC) &lmer_update_mm, 2},
     {"lmer_validate", (DL_FUNC) &lmer_validate, 1},
     {"lmer_variances", (DL_FUNC) &lmer_variances, 1},
