@@ -1,11 +1,11 @@
 				/* Sparse triangular logical matrices */
 #include "ltCMatrix.h"
 
-/** 
+/**
  * Check the validity of the slots of an ltCMatrix object
- * 
+ *
  * @param x Pointer to an ltCMatrix object
- * 
+ *
  * @return an SEXP that is either TRUE or a character string
  * describing the way in which the object failed the validity check
  */
@@ -19,16 +19,16 @@ SEXP ltCMatrix_validate(SEXP x)
     if (isString(val = check_scalar_string(GET_SLOT(x, Matrix_diagSym),
 					   "NU", "diag"))) return val;
     if (Dim[0] != Dim[1])
-	return mkString(_("Symmetric matrix must be square"));
+	return mkString(_("Triangular matrix must be square"));
     csc_check_column_sorting(x);
     return ScalarLogical(1);
 }
 
-/** 
+/**
  * Transpose an ltCMatrix
- * 
+ *
  * @param x Pointer to an ltCMatrix object
- * 
+ *
  * @return the transpose of x.  It represents the same matrix but is
  * stored in the opposite triangle.
  */
@@ -59,11 +59,11 @@ SEXP ltCMatrix_trans(SEXP x)
     return ans;
 }
 
-/** 
+/**
  * Solve  one  of the matrix equations  op(A)*C = B, or
  * C*op(A) = B where A is a square ltCMatrix and B and C are lgCMatrix
  * objects.
- * 
+ *
  * @param side LFT or RGT
  * @param transa TRN or NTR
  * @param A pointer to an ltCMatrix object
