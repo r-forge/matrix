@@ -54,6 +54,15 @@ SEXP lsCMatrix_trans(SEXP x)
     return ans;
 }
 
+/** 
+ * Create the symbolic Cholesky decomposition of an lsCMatrix object
+ * 
+ * @param x Pointer to an lsCMatrix object
+ * @param pivot Pointer to a scalar logical indicating if a
+ * fill-reducing permutation should be determined
+ * 
+ * @return an lCholCMatrix object
+ */
 SEXP lsCMatrix_chol(SEXP x, SEXP pivot)
 {
     int piv = asLogical(pivot);
