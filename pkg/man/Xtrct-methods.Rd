@@ -4,34 +4,27 @@
 \title{Methods for "[": Extraction or Subsetting in Package 'Matrix'}
 %
 \alias{[,Matrix,missing,missing,ANY-method}
-\alias{[,Matrix,missing,vector,missing-method}
-\alias{[,Matrix,vector,missing,missing-method}
-\alias{[,Matrix,vector,vector,missing-method}
+\alias{[,Matrix,missing,index,missing-method}
+\alias{[,Matrix,index,missing,missing-method}
+\alias{[,Matrix,index,index,missing-method}
 \alias{[,Matrix,ANY,ANY,ANY-method}% bail out if no explicit method
 %
-\alias{[,denseMatrix,vector,missing,logical-method}
-\alias{[,denseMatrix,vector,vector,logical-method}
-\alias{[,denseMatrix,missing,vector,logical-method}
+\alias{[,denseMatrix,index,missing,logical-method}
+\alias{[,denseMatrix,index,index,logical-method}
+\alias{[,denseMatrix,missing,index,logical-method}
 %
-\alias{[,gTMatrix,numeric,missing,logical-method}
-\alias{[,gTMatrix,missing,numeric,logical-method}
-\alias{[,gTMatrix,numeric,numeric,logical-method}
+% \alias{[,gTMatrix,missing,missing,ANY-method}
+\alias{[,gTMatrix,index,missing,logical-method}
+\alias{[,gTMatrix,missing,index,logical-method}
+\alias{[,gTMatrix,index,index,logical-method}
 %
-\alias{[,dgTMatrix,missing,missing,ANY-method}
-\alias{[,dgTMatrix,missing,numeric,logical-method}
-\alias{[,dgTMatrix,missing,numeric,missing-method}
-\alias{[,dgTMatrix,numeric,missing,logical-method}
-\alias{[,dgTMatrix,numeric,missing,missing-method}
-\alias{[,dgTMatrix,numeric,numeric,logical-method}
-\alias{[,dgTMatrix,numeric,numeric,missing-method}
+\alias{[,dsparseMatrix,missing,index,logical-method}
+\alias{[,dsparseMatrix,index,missing,logical-method}
+\alias{[,dsparseMatrix,index,index,logical-method}
 %
-\alias{[,dsparseMatrix,missing,numeric,logical-method}
-\alias{[,dsparseMatrix,numeric,missing,logical-method}
-\alias{[,dsparseMatrix,numeric,numeric,logical-method}
-%
-\alias{[,lsparseMatrix,missing,numeric,logical-method}
-\alias{[,lsparseMatrix,numeric,missing,logical-method}
-\alias{[,lsparseMatrix,numeric,numeric,logical-method}
+\alias{[,lsparseMatrix,missing,index,logical-method}
+\alias{[,lsparseMatrix,index,missing,logical-method}
+\alias{[,lsparseMatrix,index,index,logical-method}
 %-------
 \description{
   Methods for \code{"["}, i.e., extraction or subsetting mostly of

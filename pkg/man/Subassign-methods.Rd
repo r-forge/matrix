@@ -1,18 +1,19 @@
 \name{[<--methods}
 \docType{methods}
 \alias{[<--methods}
-\alias{Subassign-methods}
+\alias{Subassign-methods}% <- nicer to use in \link{.}
+%
 \title{Methods for "[<-" - Assigning to Subsets for 'Matrix'}
 % in ../R/Matrix.R
 \alias{[<-,Matrix,ANY,ANY,ANY-method}
-\alias{[<-,Matrix,missing,missing,vector-method}
+\alias{[<-,Matrix,missing,missing,index-method}
 % \alias{[<-,Matrix,missing,numeric,missing-method}
 % \alias{[<-,Matrix,numeric,missing,missing-method}
 % \alias{[<-,Matrix,numeric,numeric,missing-method}
 % in ../R/denseMatrix.R
-\alias{[<-,denseMatrix,vector,missing,numeric-method}
-\alias{[<-,denseMatrix,vector,vector,numeric-method}
-\alias{[<-,denseMatrix,missing,vector,numeric-method}
+\alias{[<-,denseMatrix,index,missing,numeric-method}
+\alias{[<-,denseMatrix,index,index,numeric-method}
+\alias{[<-,denseMatrix,missing,index,numeric-method}
 %
 % \alias{[<-,gTMatrix,numeric,missing,logical-method}
 % \alias{[<-,gTMatrix,missing,numeric,logical-method}
@@ -41,18 +42,19 @@
 \section{Methods}{
   There are more than these:
   \describe{
-    \item{x = "Matrix", i = "missing", j = "missing", value= "vector"}{
+    \item{x = "Matrix", i = "missing", j = "missing", value= "index"}{
       is currently a simple fallback method implementation.}
     \item{x = "Matrix", i = "ANY", j = "ANY", value= "ANY"}{ currently
       gives an error }
 
-    \item{x = "denseMatrix", i = "vector", j = "missing", value= "numeric"}{ ... }
-    \item{x = "denseMatrix", i = "vector", j = "vector", value= "numeric"}{ ... }
-    \item{x = "denseMatrix", i = "missing", j = "vector", value= "numeric"}{ ... }
+    \item{x = "denseMatrix", i = "index", j = "missing", value= "numeric"}{ ... }
+    \item{x = "denseMatrix", i = "index", j = "index", value= "numeric"}{ ... }
+    \item{x = "denseMatrix", i = "missing", j = "index", value= "numeric"}{ ... }
   }
 }
 \seealso{
-  \code{\link{[-methods}} for subsetting \code{"Matrix"} objects.
+  \code{\link{[-methods}} for subsetting \code{"Matrix"} objects;
+  \code{\link{index-class}};
   \code{\link{Extract}} about the standard subset assignment (and extraction).
 }
 \examples{

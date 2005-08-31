@@ -1,3 +1,13 @@
+2005-08-31  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllClass.R: new "index" class for "[" and "[<-":
+		First cut at "symmetricMatrix" and "triangularMatrix"
+	* R/gTMatrix.R (.ind.prep): new function;
+	        Logical and character indexing now work too.
+	* R/Matrix.R: cheap "[<-" methods for denseMatrix now work
+	* tests/indexing.R: new, including *.Rout.save
+	* tests/dgTMatrix.R: new
+
 2005-08-29  Douglas Bates  <bates@wisc.edu>
 
 	* src/dgTMatrix.c (graphNEL_as_dgTMatrix): Corrected the position

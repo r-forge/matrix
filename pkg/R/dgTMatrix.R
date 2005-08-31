@@ -92,7 +92,7 @@ setMethod("isSymmetric", signature(object = "dgTMatrix"),
 setAs("dgTMatrix", "dsCMatrix",
       function(from) {
           if (!isSymmetric(from))
-              stop("cannot coerce non-symmetric matrix to dsCMatrix class")
+              stop("cannot coerce non-symmetric dgTMatrix to dsCMatrix class")
           upper <- from@i <= from@j
           uC <- as(new("dgTMatrix", Dim = from@Dim, i = from@i[upper],
                        j = from@j[upper], x = from@x[upper]), "dgCMatrix")
