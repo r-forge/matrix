@@ -64,34 +64,34 @@ setAs("dgTMatrix", "graphNEL",
 ### Subsetting -- basic things (drop = "missing") are done in ./Matrix.R
 
 ## 1)  dsparse -> dgT
-setMethod("[", signature(x = "dsparseMatrix", i = "numeric", j = "missing",
+setMethod("[", signature(x = "dsparseMatrix", i = "index", j = "missing",
 			 drop = "logical"),
 	  function (x, i, j, drop)
           callGeneric(x = as(x, "dgTMatrix"), i=i, drop=drop))
 
-setMethod("[", signature(x = "dsparseMatrix", i = "missing", j = "numeric",
+setMethod("[", signature(x = "dsparseMatrix", i = "missing", j = "index",
 			 drop = "logical"),
 	  function (x, i, j, drop)
           callGeneric(x = as(x, "dgTMatrix"), j=j, drop=drop))
 
 setMethod("[", signature(x = "dsparseMatrix",
-			 i = "numeric", j = "numeric", drop = "logical"),
+			 i = "index", j = "index", drop = "logical"),
 	  function (x, i, j, drop)
           callGeneric(x = as(x, "dgTMatrix"), i=i, j=j, drop=drop))
 
 ## 2)  lsparse -> lgT
-setMethod("[", signature(x = "lsparseMatrix", i = "numeric", j = "missing",
+setMethod("[", signature(x = "lsparseMatrix", i = "index", j = "missing",
 			 drop = "logical"),
 	  function (x, i, j, drop)
           callGeneric(x = as(x, "lgTMatrix"), i=i, drop=drop))
 
-setMethod("[", signature(x = "lsparseMatrix", i = "missing", j = "numeric",
+setMethod("[", signature(x = "lsparseMatrix", i = "missing", j = "index",
 			 drop = "logical"),
 	  function (x, i, j, drop)
           callGeneric(x = as(x, "lgTMatrix"), j=j, drop=drop))
 
 setMethod("[", signature(x = "lsparseMatrix",
-			 i = "numeric", j = "numeric", drop = "logical"),
+			 i = "index", j = "index", drop = "logical"),
 	  function (x, i, j, drop)
           callGeneric(x = as(x, "lgTMatrix"), i=i, j=j, drop=drop))
 
@@ -148,3 +148,22 @@ setMethod("show", signature(object = "sparseMatrix"),
            invisible(object)
        }
    })
+
+
+## not exported:
+setMethod("isSymmetric", signature(object = "sparseMatrix"),
+	  function(object, ...) {
+	      ## pretest: is it square?
+	      d <- dim(object)
+	      if(d[1] != d[2]) return(FALSE)
+	      ## else slower test
+	      if (is(object("dMatrix")))
+		  ## use gC; "T" (triplet) is *not* unique!
+		  isTRUE(all.equal(as(object, "dgCMatrix"),
+				   as(t(object), "dgCMatrix"), ...))
+	      else if (is(object("lMatrix")))
+		  ## test for exact equality; FIXME(?): identical() too strict?
+		  identical(as(object, "lgCMatrix"),
+			    as(t(object), "lgCMatrix"))
+	      else stop("not yet implemented")
+	  })

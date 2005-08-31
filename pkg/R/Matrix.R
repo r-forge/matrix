@@ -40,6 +40,13 @@ setMethod("show", signature(object = "Matrix"), prMatrix)
 ## should propagate to all subclasses:
 setMethod("as.matrix", signature(x = "Matrix"), function(x) as(x, "matrix"))
 
+## Note that isSymmetric is *not* exported
+setMethod("isSymmetric", signature(object = "symmetricMatrix"),
+          function(object) TRUE)
+setMethod("isSymmetric", signature(object = "triangularMatrix"),
+          ## FIXME: 'TRUE' if *diagonal*, i.e. return(isDiagonal(object))
+          function(object) FALSE)
+
 setMethod("dim", signature(x = "Matrix"),
 	  function(x) x@Dim, valueClass = "integer")
 setMethod("dimnames", signature(x = "Matrix"), function(x) x@Dimnames)
@@ -102,7 +109,7 @@ setMethod("solve", signature(a = "Matrix", b = "numeric"),
 ### Subsetting "["  and
 ### SubAssign  "[<-" : The "missing" cases can be dealt with here, "at the top":
 
-## Using "vector" for indices should allow
+## Using "index" for indices should allow
 ## integer (numeric), logical, or character (names!) indices :
 
 ## "x[]":
@@ -112,14 +119,14 @@ setMethod("[", signature(x = "Matrix",
 ## missing 'drop' --> 'drop = TRUE'
 ##                     -----------
 ## select rows
-setMethod("[", signature(x = "Matrix", i = "vector", j = "missing",
+setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
 			 drop = "missing"),
 	  function(x,i,j, drop) callGeneric(x, i=i, drop= TRUE))
 ## select columns
-setMethod("[", signature(x = "Matrix", i = "missing", j = "vector",
+setMethod("[", signature(x = "Matrix", i = "missing", j = "index",
 			 drop = "missing"),
 	  function(x,i,j, drop) callGeneric(x, j=j, drop= TRUE))
-setMethod("[", signature(x = "Matrix", i = "vector", j = "vector",
+setMethod("[", signature(x = "Matrix", i = "index", j = "index",
                          drop = "missing"),
 	  function(x,i,j, drop) callGeneric(x, i=i, j=j, drop= TRUE))
 
@@ -131,22 +138,22 @@ setMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY", drop = "ANY"),
 ## "FIXME:"
 ## How can we get at   A[ ij ]	where ij is (i,j) 2-column matrix?
 ##  and                A[ LL ]	where LL is a logical *vector*
-
+## -> [.data.frame uses nargs() - can we do this in the *generic* ?
 
 
 ### "[<-" : -----------------
 
 ## x[] <- value :
 setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
-                                value = "vector"),##  double/logical/...
+                                value = "index"),##  double/logical/...
 	  function (x, value) { x@x <- value ; validObject(x); x })
 
-## Otherwise (value is not "vector"): bail out
+## Otherwise (value is not "index"): bail out
 setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
                                 value = "ANY"),
 	  function (x, i, j, value)
-                 if(!is(value,"vector"))
-                 stop("RHS 'value' must be of class \"vector\"")
+                 if(!is(value,"index"))
+                 stop("RHS 'value' must be of class \"index\"")
                  else stop("unimplemented 'Matrix[<-' method"))
 
 

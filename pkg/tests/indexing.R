@@ -27,7 +27,21 @@ stopifnot(identical(m[2,3], m[(1:nrow(m)) == 2, (1:ncol(m)) == 3]),
           identical(m[2,], m[(1:nrow(m)) == 2, ]),
           identical(m[,3:4], m[, (1:4) >= 3]))
 
-## dimnames index (TODO)
+## dimnames indexing:
+mn <- m
+dimnames(mn) <- list(paste("r",letters[1:nrow(mn)],sep=""),
+                     LETTERS[1:ncol(mn)])
+mn["rd", "D"]
+stopifnot(identical(mn["rc", "D"], mn[3,4]),
+          identical(mn[, "A"], mn[,1]),
+          identical(mn[c("re", "rb"), "B"], mn[c(5,2), 2])
+          )
+
+mo <- m
+m[2,3] <- 100
+m[1:2, 4] <- 200
+m[, 1] <- -1
+m[1:3,]
 
 ## TODO: more --- particularly once we have "m > 10" working!
 
@@ -59,4 +73,6 @@ stopifnot(identical3(mm[,1], mC[,1], mT[,1]),
 	  identical3(as(mC[c(3,7), 2:4],"matrix"), mm[c(3,7), 2:4],
 		     as(mT[c(3,7), 2:4],"matrix")))
 
-
+## At least these now give a nicely understandable error:
+try(mT[1, 4] <- -99)
+try(mT[2:3, ] <- 0)
