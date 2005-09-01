@@ -3349,7 +3349,8 @@ SEXP lmer_simulate(SEXP x, SEXP np, SEXP fxd, SEXP mmats, SEXP useScale)
 	    error(_("Leading %d minor of Omega[[%d]] not positive definite"),
 		  ii, i + 1);
 	for (ii = 0; ii < ntot; ii++) rev[ii] = norm_rand();
-	F77_CALL(dtrsm)("L", "U", "N", "N", &nci, &ncol, &scale, Rmat, &nci, rev, &nci);
+	F77_CALL(dtrsm)("L", "U", "N", "N", &nci, &ncol, &scale, Rmat, &nci,
+			rev, &nci);
 	for (ii = 0; ii < nobs; ii++) /* loop over rows */
 	    F77_CALL(dgemm)("N", "N", &ione, &n, &nci, &one, mm + ii, &nobs,
 			    rev + (fv[ii] - 1) * bsz, &nci, &one, aa + ii, &nobs);
@@ -3359,4 +3360,68 @@ SEXP lmer_simulate(SEXP x, SEXP np, SEXP fxd, SEXP mmats, SEXP useScale)
     PutRNGstate();
     UNPROTECT(1);
     return ans;
+}
+
+/** 
+ * Update only the response in an mer object.
+ * 
+ * @param x Pointer to an mer object
+ * @param y Numeric vector of responses
+ * @param mmats List of model matrices.  Only the first p columns from
+ * the fixed-effects model matrix are used.
+ * 
+ * @return x, updated for the new response vector
+ */
+SEXP lmer_update_y(SEXP x, SEXP y, SEXP mmats)
+{
+    SEXP ZtXP = GET_SLOT(x, Matrix_ZtXSym),
+	XtXP = GET_SLOT(x, Matrix_XtXSym),
+	flist = GET_SLOT(x, Matrix_flistSym);
+    int *dims = INTEGER(getAttrib(ZtXP, R_DimSymbol)),
+	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	*Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	*status = LOGICAL(GET_SLOT(x, Matrix_statusSym)),
+	i, ione = 1, nf = LENGTH(flist);
+    int nfp1 = nf + 1, nobs = nc[nf + 1], p = dims[1] - 1;
+    double *X = REAL(VECTOR_ELT(mmats, nf)),
+	*ycol = REAL(ZtXP) + dims[0] * p,
+	one = 1, zero = 0;
+    
+    if (!isReal(y) || LENGTH(y) != nobs)
+	error(_("Argument `y' must be a numeric vector of length %d"),
+		nobs);
+    if (!isNewList(mmats) || LENGTH(mmats) != nfp1)
+	error(_("mmats must be a list of %d model matrices"), nfp1);
+    if (!isMatrix(VECTOR_ELT(mmats, nf)) || !isReal(VECTOR_ELT(mmats, nf)))
+	error(_("mmats[[%d]] is not a numeric matrix"), nf + 1);
+				/* Update XtX */
+    F77_CALL(dgemv)("T", &nobs, &p, &one, X, &nobs, REAL(y), &ione,
+		    &zero, REAL(XtXP) + p * dims[1], &ione);
+    REAL(XtXP)[dims[1] * dims[1] - 1] =
+	F77_CALL(ddot)(&nobs, REAL(y), &ione, REAL(y), &ione);
+				/* Update ZtX */
+    AZERO(ycol, Gp[nf]);	/* Zero the accumulator */
+    for (i = 0; i < nf; i++) {
+	SEXP mmat = VECTOR_ELT(mmats, i);
+	int *mdims = INTEGER(getAttrib(mmat, R_DimSymbol)),
+	    *fac = INTEGER(VECTOR_ELT(flist, i)),
+	    j, k, nci = nc[i];
+	double *yy = ycol + Gp[i], *Z = REAL(mmat);
+
+	if (!isMatrix(mmat) || !isReal(mmat))
+	    error(_("mmats[[%d]] is not a numeric matrix"), i + 1);
+	if (nobs != mdims[0])
+	    error(_("Expected %d rows in mmats[[%d]]. Got %d"),
+		  nobs, i+1, mdims[0]);
+	if (nc[i] != mdims[1])
+	    error(_("Expected %d columns in mmats[[%d]]. Got %d"),
+		  nc[i], i+1, mdims[1]);
+
+	for (j = 0; j < nobs; j++) {
+	    double *yp = yy + (fac[j] - 1) * nci, yv = REAL(y)[j];
+	    for (k = 0; k < nci; k++) yp[k] += Z[j + nobs * k] * yv;
+	}
+    }
+    status[0] = status[1] = 0;
+    return R_NilValue;
 }

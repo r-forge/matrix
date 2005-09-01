@@ -36,8 +36,6 @@ SEXP lmer_variances(SEXP x);
 SEXP lmer_Crosstab(SEXP flist);
 SEXP lmer_firstDer(SEXP x, SEXP val);
 SEXP lmer_secondDer(SEXP x);
-SEXP lmer_simulate(SEXP x, SEXP np, SEXP fxdp, SEXP mmats,
-		   SEXP useScP);
 SEXP glmer_MCMCsamp(SEXP GSpt, SEXP b, SEXP fixedp, SEXP varcp,
 		    SEXP savebp, SEXP nsampp);
 SEXP glmer_PQL(SEXP GSp);
@@ -46,5 +44,7 @@ SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp);
 SEXP glmer_finalize(SEXP GSpt);
 SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed);
 SEXP glmer_init(SEXP rho);
-
+SEXP lmer_simulate(SEXP x, SEXP np, SEXP fxdp, SEXP mmats,
+		   SEXP useScP);
+SEXP lmer_update_y(SEXP x, SEXP y, SEXP mm);
 #endif

@@ -139,3 +139,4 @@ exportMethods("BIC", "anova", "coef", "confint", "deviance", "fitted",
 	      "fixef", "formula", "lmer", "logLik", "mcmcsamp",
 	      "plot", "ranef", "residuals", "resid", "simulate",
 	      "summary", "update", "vcov", "VarCorr", "with")
+

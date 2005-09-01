@@ -10,19 +10,20 @@
   a test statistic.
 }
 \usage{
-simulate(object, n, \dots)
+simulate(object, nsim, seed, \dots)
 }
 \arguments{
-  \item{object}{An object of a suitable class - usually an
-    \code{\link{lmer-class}{lmer}} object. 
-  }
-  \item{n}{integer - number of samples to simulate. Defaults to 1.}
-  \item{\dots}{Some methods for this generic function may take
-    additional, optional arguments.}
+  \item{object}{an object representing a fitted model.}
+  \item{nsim}{number of response vectors to simulate.  Defaults to 1.}
+  \item{seed}{an integer that will be used in a call to \code{set.seed}
+    before simulating the response vectors.  The value is saved as an
+    attribute named \code{"seed"} in the returned value.  Defaults to a
+    random integer between \code{0} and \code{.Machine$integer.max}.
+  \item{\dots}{additional optional arguments.}
 }
 \value{
-  A matrix of dimension \code{(nobs, n)} where \code{nobs} is the number
-  of observations in the fitted model \code{object}.
+  A data frame with \code{nsim} columns and \code{nobs}, the number
+  of observations in the fitted model \code{object}, rows.
 }
 \section{Methods}{
   \describe{
@@ -31,7 +32,7 @@ simulate(object, n, \dots)
 }
 \examples{
 (fm2 <- lmer(Reaction ~ Days + (1|Subject) + (0 + Days|Subject), sleepstudy))
-sim2 <- simulate(fm2, n = 4)
+sim2 <- simulate(fm2, nsim = 4)
 head(sim2)
 tail(sim2)
 }
