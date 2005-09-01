@@ -18,7 +18,7 @@ simulate(object, nsim, seed, \dots)
   \item{seed}{an integer that will be used in a call to \code{set.seed}
     before simulating the response vectors.  The value is saved as an
     attribute named \code{"seed"} in the returned value.  Defaults to a
-    random integer between \code{0} and \code{.Machine$integer.max}.
+    random integer between \code{0} and \code{.Machine$integer.max}.}
   \item{\dots}{additional optional arguments.}
 }
 \value{
