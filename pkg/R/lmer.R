@@ -73,7 +73,7 @@ abbrvNms <- function(gnm, cnms)
 ## Control parameters for lmer
 lmerControl <-
   function(maxIter = 200, # used in ../src/lmer.c only
-           tolerance = sqrt(.Machine$double.eps),# dito
+           tolerance = sqrt(.Machine$double.eps),# ditto
            msMaxIter = 200,
            ## msTol = sqrt(.Machine$double.eps),
            ## FIXME:  should be able to pass tolerances to nlminb()
@@ -473,9 +473,6 @@ setMethod("show", "summary.lmer",
               }
               invisible(object)
           })
-
-
-
 
 ## calculates degrees of freedom for fixed effects Wald tests
 ## This is a placeholder.  The answers are generally wrong.  It will
@@ -929,20 +926,18 @@ setMethod("mcmcsamp", signature(object = "lmer"),
 rWishart <- function(n, df, invScal)
   .Call("Matrix_rWishart", n, df, invScal)
 
-setMethod("simulate", signature(object = "lmer"),
-          function(object, n = 1, ...)
+
+setMethod("model.matrix", signature(object = "lmer"),
+          function(object, ...)
       {
-          family <- object@family
-          if (family$family != "gaussian" ||
-              family$link != "identity") 
-              stop("simulation of generalized linear mixed models not implemented yet")
-          ## create the mean from the fixed effects
           frm <- object@frame
           fixed.form <- Matrix:::nobars(object@call$formula)
           if (inherits(fixed.form, "name")) # RHS is empty - use a constant
               fixed.form <- substitute(foo ~ 1, list(foo = fixed.form))
-          glm.fit <- glm(eval(fixed.form), family, frm, x = TRUE, y = TRUE)
+          glm.fit <- glm(eval(fixed.form), object@family, frm, x = TRUE, y = TRUE)
           fxd <- unname(drop(glm.fit$x %*% fixef(object)))
+
+          ## Create the random effects model matrices
           bars <- Matrix:::findbars(object@call$formula[[3]])
           random <-
               lapply(bars,
@@ -955,14 +950,45 @@ setMethod("simulate", signature(object = "lmer"),
           ## re-order the random effects pairs if necessary
           if (any(names(random) != names(object@flist)))
               random <- random[names(object@flist)]
-          mer <- as(object, "mer")
+          c(lapply(random, "[[", 1),
+            .fixed = list(cbind(glm.fit$x, .response = glm.fit$y)))
+      })
+
+setMethod("simulate", signature(object = "lmer"),
+          function(object, nsim = 1,
+                   seed = runif(1, 0, .Machine$integer.max),
+                   ...)
+      {
+          runif(1) ## to initialize the RNG if necessary
+          RNGstate <- .Random.seed
+          set.seed(seed)
+
+          family <- object@family
+          if (family$family != "gaussian" ||
+              family$link != "identity") 
+              stop("simulation of generalized linear mixed models not yet implemented")
+
+          ## pieces we will need later
+          scale <- .Call("lmer_sigma", object, object@method == "REML",
+                         PACKAGE = "Matrix")
+          mmats <- model.matrix(object)
+          ff <- fixef(object)
+
+###_FIXME: If the factor levels have been permuted, has the
+###        permutation been applied in the stored frame?  Otherwise we
+###        need to check this.
+
           ## similate the linear predictors
-          lpred <- .Call("lmer_simulate", mer, n, fxd,
-                         lapply(random, "[[", 1), TRUE, PACKAGE = "Matrix")
+          lpred <- .Call("lmer_simulate", as(object, "mer"), nsim,
+                         unname(drop(mmats[[length(mmats)]][,seq(a = ff)] %*% ff)),
+                         mmats, TRUE, PACKAGE = "Matrix")
           ## add per-observation noise term
-          lpred + rnorm(prod(dim(lpred)),
-                        sd = .Call("lmer_sigma", mer,
-                        object@method == "REML", PACKAGE = "Matrix"))
+          lpred <- as.data.frame(lpred + rnorm(prod(dim(lpred)), sd = scale))
+
+          ## save the seed and restore the RNG state
+          attr(lpred, "seed") <- seed
+          assign(".Random.seed", RNGstate, envir = .GlobalEnv)
+          lpred
       })
 
 simulate2 <- function(object, n = 1, ...)
@@ -1023,16 +1049,21 @@ simulate2 <- function(object, n = 1, ...)
 
 refdist <- function(fm1, fm2, n, ...)
 {
-    frm <- fm1@frame
+    cv <- lmerControl()
+    obs <- deviance(fm2) - deviance(fm1)
     newy <- simulate(fm2, n)
+    mm1 <- model.matrix(fm1)
+    mm2 <- model.matrix(fm2)
     ref <- numeric(n)
-    f1 <- eval(fm1@call$formula)
-    f2 <- eval(fm2@call$formula)
-    nm <- as.character(as.name(f1[[2]]))
+    mer1 <- as(fm1, "mer")
+    mer2 <- as(fm2, "mer")
     for (j in 1:n) {
-        frm[[nm]] <- newy[, j]
-        ref[j] <- deviance(lmer(f2, frm)) - deviance(lmer(f1, frm))
+        .Call("lmer_update_y", mer2, newy[[j]], mm2, PACKAGE = "Matrix")
+        LMEoptimize(mer2) <- cv
+        .Call("lmer_update_y", mer1, newy[[j]], mm1, PACKAGE = "Matrix")
+        LMEoptimize(mer1) <- cv
+        ref[j] <- deviance(mer2) - deviance(mer1)
     }
-    attr(ref, "observed") <- deviance(fm2) - deviance(fm1)
+    attr(ref, "observed") <- obs
     ref
 }

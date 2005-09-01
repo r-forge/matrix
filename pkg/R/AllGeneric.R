@@ -117,8 +117,10 @@ if (!isGeneric("mcmcsamp")) {
     FALSE, ...) standardGeneric("mcmcsamp"))
 }
 
-if (!isGeneric("simulate")) {
+if (!exists("simulate", mode = "function")) {
     setGeneric("simulate",
-               function(object, n = 1, ...)
+               function(object, nsim = 1,
+                        seed = as.integer(runif(1, 0, .Machine$integer.max)),
+                        ...)
                standardGeneric("simulate"))
 }

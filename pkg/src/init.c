@@ -173,6 +173,7 @@ static R_CallMethodDef CallEntries[] = {
     {"lmer_sigma", (DL_FUNC) &lmer_sigma, 2},
     {"lmer_simulate", (DL_FUNC) &lmer_simulate, 5},
     {"lmer_update_mm", (DL_FUNC) &lmer_update_mm, 2},
+    {"lmer_update_y", (DL_FUNC) &lmer_update_y, 3},
     {"lmer_validate", (DL_FUNC) &lmer_validate, 1},
     {"lmer_variances", (DL_FUNC) &lmer_variances, 1},
     {"lsCMatrix_chol", (DL_FUNC) &lsCMatrix_chol, 2},
