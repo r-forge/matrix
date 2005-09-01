@@ -188,6 +188,8 @@ static R_CallMethodDef CallEntries[] = {
     {"tsc_to_dgTMatrix", (DL_FUNC) &tsc_to_dgTMatrix, 1},
     {"tsc_transpose", (DL_FUNC) &tsc_transpose, 1},
     {"tsc_validate", (DL_FUNC) &tsc_validate, 1},
+    {"triangularMatrix_validate", (DL_FUNC) &triangularMatrix_validate, 1},
+    {"symmetricMatrix_validate", (DL_FUNC) &symmetricMatrix_validate, 1},
     {NULL, NULL, 0}
 };
 
