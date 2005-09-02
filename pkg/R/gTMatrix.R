@@ -12,17 +12,18 @@
 .ind.prep <- function(xi, i, margin, di, dn)
 {
     ## Purpose: do the ``common things'' for "*gTMatrix" indexing
+    ##		for 1 dimension, 'margin' ,
     ##          and return match(.,.) + li = length of corresponding dimension
     ##
     ## i is "index";  xi = "x@i";  margin in {1,2};
-    ## di = dim(x)      { when i is "logical" }
-    ## dn = dimnames(x)
+    ## di = dim(x)      { used when i is "logical" }
+    ## dn = dimnames(x) { used when i is character }
 
     dn <- dn[[margin]]
     has.dn <- is.character(dn)
     if(is(i, "numeric")) {
         storage.mode(i) <- "integer"
-        i0 <- i - 1:1 # tranform to 0-indexing
+        i0 <- i - 1:1 # transform to 0-indexing
         if(has.dn) dn <- dn[i]
     }
     else if (is(i, "logical")) {
