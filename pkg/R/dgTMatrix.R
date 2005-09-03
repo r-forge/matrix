@@ -101,12 +101,12 @@ setAs("dgTMatrix", "dsCMatrix",
 
 setAs("matrix", "dgTMatrix",
       function(from) {
-          x <- as.double(from)
-          nz <- as.logical(x)
-          new("dgTMatrix", Dim = dim(from),
-              i = as.integer(row(from) - 1)[nz] ,
-              j = as.integer(col(from) - 1)[nz],
-              x = x[nz])
+	  x <- as.double(from)
+	  nz <- as.logical(x)
+	  new("dgTMatrix", Dim = dim(from),
+	      i = row(from)[nz] - 1:1,
+	      j = col(from)[nz] - 1:1,
+	      x = x[nz])
       })
 
 setMethod("kronecker", signature(X = "dgTMatrix", Y = "dgTMatrix"),
