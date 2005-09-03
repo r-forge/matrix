@@ -4,7 +4,7 @@
 SEXP tsc_validate(SEXP x)
 {
     return triangularMatrix_validate(x);
-    /* see ./dtpMatrix.c as example to do more testing here */
+    /* see ./dsCMatrix.c or ./dtpMatrix.c  on how to do more testing here */
 }
 
 SEXP tsc_transpose(SEXP x)

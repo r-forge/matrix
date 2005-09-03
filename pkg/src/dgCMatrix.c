@@ -29,9 +29,9 @@ SEXP dgCMatrix_validate(SEXP x)
 	if (xi[j] < 0 || xi[j] >= nrow)
 	    return mkString(_("all row indices must be between 0 and nrow-1"));
     }
-    if (csc_unsorted_columns(ncol, xp, xi)) {
+    if (csc_unsorted_columns(ncol, xp, xi))
 	csc_sort_columns(ncol, xp, xi, REAL(xslot));
-    }
+
     return ScalarLogical(1);
 }
 

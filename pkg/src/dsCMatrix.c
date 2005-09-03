@@ -1,11 +1,14 @@
 #include "dsCMatrix.h"
 
+/* 'ssc' [symmetric sparse compressed] is an "alias" for our "dsC" */
+
 SEXP dsCMatrix_validate(SEXP obj)
 {
     SEXP val = symmetricMatrix_validate(obj);
     if(isString(val))
 	return(val);
     else {
+	/* FIXME needed? dsC* inherits from dgC* which does this in validate*/
 	csc_check_column_sorting(obj);
 	return ScalarLogical(1);
     }
