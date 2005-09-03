@@ -36,7 +36,8 @@
 %\author{Martin Maechler}
 \seealso{
   \code{\link{[-methods}}, and
-  \code{\link{Subassign-methods}}, also for examples.
+  %% FIXME: bug in Rdconv needs '[Matrix]' below:
+  \code{\link[Matrix]{Subassign-methods}}, also for examples.
 }
 \examples{
 showClass("index")

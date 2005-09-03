@@ -20,7 +20,8 @@
       \code{"N"} for non-unit.  The diagonal elements are not
       accessed internally when \code{diag} is \code{"U"} (but need to be
       allocated, i.e., \code{length(x)} does not depend on \code{diag}).}
-    \item{\code{Dim},\code{Dimnames}:}{The dimension (a length-2
+    %% below {Dim, Dimnames} work around Slot parsing buglet (< 2.2.0)
+    \item{\code{Dim, Dimnames}:}{The dimension (a length-2
       \code{"integer"}) and corresponding names (or \code{NULL}),
       inherited from the \code{\link{Matrix-class}}, see there.}
   }

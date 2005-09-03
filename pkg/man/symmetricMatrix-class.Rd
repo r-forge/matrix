@@ -15,7 +15,9 @@
   \describe{
     \item{\code{uplo}:}{Object of class \code{"character"}.  Must be
       either "U", for upper triangular, and "L", for lower triangular.}
-    \item{\code{Dim},\code{Dimnames}:}{The dimension (a length-2
+    %% below {Dim, Dimnames} work around Slot parsing buglet (< 2.2.0)
+    %% \item{\code{Dim},\code{Dimnames}:}{The dimension (a length-2
+    \item{\code{Dim, Dimnames}:}{The dimension (a length-2
       \code{"integer"}) and corresponding names (or \code{NULL}),
       inherited from the \code{\link{Matrix-class}}, see there.}
   }
