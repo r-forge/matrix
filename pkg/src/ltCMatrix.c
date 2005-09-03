@@ -11,17 +11,22 @@
  */
 SEXP ltCMatrix_validate(SEXP x)
 {
-    SEXP val = check_scalar_string(GET_SLOT(x, Matrix_uploSym),
-				   "LU", "uplo");
-    int *Dim = INTEGER(GET_SLOT(x, Matrix_DimSym));
+    SEXP val = triangularMatrix_validate(x);
+    if(isString(val))
+	return(val);
+    else {
+	/* FIXME needed? ltC* inherits from lgC* which does this in validate*/
+	SEXP pslot = GET_SLOT(x, Matrix_pSym),
+	    islot = GET_SLOT(x, Matrix_iSym);
+	int
+	    ncol = length(pslot) - 1,
+	    *xp = INTEGER(pslot),
+	    *xi = INTEGER(islot);
 
-    if (isString(val)) return val;
-    if (isString(val = check_scalar_string(GET_SLOT(x, Matrix_diagSym),
-					   "NU", "diag"))) return val;
-    if (Dim[0] != Dim[1])
-	return mkString(_("Triangular matrix must be square"));
-    csc_check_column_sorting(x);
-    return ScalarLogical(1);
+	if (csc_unsorted_columns(ncol, xp, xi))
+	    csc_sort_columns(ncol, xp, xi, (double *) NULL);
+	return ScalarLogical(1);
+    }
 }
 
 /**
