@@ -574,6 +574,44 @@ SEXP lmer_initial(SEXP x)
 }
 
 /**
+ * Create and insert initial values for Omega.
+ *
+ * @param x pointer to an lmer object
+ *
+ * @return NULL
+ */
+SEXP lmer_set_initial(SEXP x, SEXP iv)
+{
+    SEXP Omg = GET_SLOT(x, Matrix_OmegaSym);
+    int	*status = LOGICAL(GET_SLOT(x, Matrix_statusSym)), i, nf = LENGTH(Omg);
+
+    if (!isNewList(iv) || LENGTH(iv) != nf)
+	error(_("Initial values must be a list of length %d"), nf);
+    for (i = 0; i < nf; i++) {
+	SEXP Omgi = VECTOR_ELT(Omg, i), ivi = VECTOR_ELT(iv, i);
+	int *dims = INTEGER(getAttrib(ivi, R_DimSymbol)), j, k,
+	    nci = *INTEGER(getAttrib(Omgi, R_DimSymbol));  
+	int ncisqr = nci * nci;
+	double *Omega = REAL(Omgi), *Ivi = REAL(ivi);
+
+	if (!isMatrix(ivi) || !isReal(ivi) || dims[0] != nci ||
+	    dims[1] != nci)
+	    error(_("iv[[%d]] must be a real %d by %d matrix"),
+		  i + 1, nci, nci);
+	AZERO(Omega, nci * nci);
+	for (j = 0; j < nci; j++) {
+	    for (k = 0; k <= j; k++) {
+		int ind = k + j * nci;
+		Omega[ind] += Ivi[ind];
+	    }
+	}
+    }
+    status[0] = status[1] = 0;
+    return R_NilValue;
+}
+
+
+/**
  * Copy ZtZ to ZZpO and L.  Inflate diagonal blocks of ZZpO by Omega.
  * Update devComp[1].
  *

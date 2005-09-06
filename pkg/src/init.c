@@ -170,6 +170,7 @@ static R_CallMethodDef CallEntries[] = {
     {"lmer_invert", (DL_FUNC) &lmer_invert, 1},
     {"lmer_ranef", (DL_FUNC) &lmer_ranef, 1},
     {"lmer_secondDer", (DL_FUNC) &lmer_secondDer, 1},
+    {"lmer_set_initial", (DL_FUNC) &lmer_set_initial, 2},
     {"lmer_sigma", (DL_FUNC) &lmer_sigma, 2},
     {"lmer_simulate", (DL_FUNC) &lmer_simulate, 5},
     {"lmer_update_mm", (DL_FUNC) &lmer_update_mm, 2},
