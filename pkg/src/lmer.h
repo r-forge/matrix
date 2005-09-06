@@ -47,4 +47,6 @@ SEXP glmer_init(SEXP rho);
 SEXP lmer_simulate(SEXP x, SEXP np, SEXP fxdp, SEXP mmats,
 		   SEXP useScP);
 SEXP lmer_update_y(SEXP x, SEXP y, SEXP mm);
+SEXP lmer_set_initial(SEXP x, SEXP iv);
+
 #endif

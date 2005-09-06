@@ -100,7 +100,7 @@ lmerControl <-
 setMethod("lmer", signature(formula = "formula"),
           function(formula, data, family,
                    method = c("REML", "ML", "PQL", "Laplace", "AGQ"),
-                   control = list(),
+                   control = list(), start,
                    subset, weights, na.action, offset,
                    model = TRUE, x = FALSE, y = FALSE , ...)
           ## x, y : not dealt with at all -- FIXME ? .NotYetImplemented(
@@ -180,7 +180,8 @@ setMethod("lmer", signature(formula = "formula"),
           mer <- .Call("lmer_create", lapply(random, "[[", 2),
                        mmats, method, PACKAGE = "Matrix")
           if (lmm) {                    ## linear mixed model
-              .Call("lmer_initial", mer, PACKAGE="Matrix")
+              if (missing(start)) .Call("lmer_initial", mer, PACKAGE="Matrix")
+              else .Call("lmer_set_initial", mer, start, PACKAGE = "Matrix")  
               .Call("lmer_ECMEsteps", mer, cv$niterEM, cv$EMverbose, PACKAGE = "Matrix")
               LMEoptimize(mer) <- cv
               fits <- .Call("lmer_fitted", mer, mmats, TRUE, PACKAGE = "Matrix")
