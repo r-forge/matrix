@@ -353,6 +353,8 @@ setMethod("fixef", signature(object = "lmer"),
           function(object, ...) object@fixed)
 
 setMethod("VarCorr", signature(x = "lmer"),
+##FIXME - change this for reasonable defaults of useScale according to
+          ##the family slot.
           function(x, REML = TRUE, useScale = TRUE, ...) {
               val <- .Call("lmer_variances", x, PACKAGE = "Matrix")
               for (i in seq(along = val)) {
