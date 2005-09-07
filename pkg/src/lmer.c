@@ -591,7 +591,6 @@ SEXP lmer_set_initial(SEXP x, SEXP iv)
 	SEXP Omgi = VECTOR_ELT(Omg, i), ivi = VECTOR_ELT(iv, i);
 	int *dims = INTEGER(getAttrib(ivi, R_DimSymbol)), j, k,
 	    nci = *INTEGER(getAttrib(Omgi, R_DimSymbol));  
-	int ncisqr = nci * nci;
 	double *Omega = REAL(Omgi), *Ivi = REAL(ivi);
 
 	if (!isMatrix(ivi) || !isReal(ivi) || dims[0] != nci ||
