@@ -2,25 +2,7 @@ library(Matrix)
 
 ### Do all kinds of object creation and coercion
 
-chk.matrix <- function(M) {
-    ## check object; including coercion to "matrix" :
-    cl <- class(M)
-    cat("class ", dQuote(cl), " [",nrow(M)," x ",ncol(M),"]; slots (",
-	paste(slotNames(M), collapse=","), ")\n", sep='')
-    stopifnot(validObject(M),
-	      dim(M) == c(nrow(M), ncol(M)),
-	      identical(dim(m <- as(M, "matrix")), dim(M))
-	      )
-}
-
-## Make sure errors are signaled
-assertError <- function(expr) {
-    d.expr <- deparse(substitute(expr))
-    t.res <- try(expr, silent = TRUE)
-    if(!inherits(t.res, "try-error"))
-	stop(d.expr, "\n\t did not give an error", call. = FALSE)
-    invisible(t.res)
-}
+source(system.file("test-tools.R", package = "Matrix"))
 
 ## the empty ones:
 chk.matrix(new("dgeMatrix"))

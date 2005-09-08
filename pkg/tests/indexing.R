@@ -2,8 +2,7 @@
 
 library(Matrix)
 
-identical3 <- function(x,y,z)	identical(x,y) && identical (y,z)
-identical4 <- function(a,b,c,d) identical(a,b) && identical3(b,c,d)
+source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 
 ### Dense Matrices
 

@@ -18,4 +18,12 @@ if(require(graph)) {
     str(sgU)## 'dgT' with dimnames
     validObject(sgU)
     sgU # should now show the Dimnames!
+
+    ### Reverse :  sparseMatrix -> graph
+    if(FALSE) { ## not yet (FIXME!)
+        gmg  <- as(sm.g, "graph")
+        gmg2 <- as(sm.g, "graphNEL")
+        gmgU <- as(sgU, "graph")
+        gmgU <- as(sgU, "graphNEL")
+    }
 }

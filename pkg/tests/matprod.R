@@ -2,14 +2,7 @@ library(Matrix)
 
 ### Matrix Products including  cross products
 
-## checking;  'show' is for convenience of the developer
-assert.EQ.mat <- function(M, m, tol = if(show) 0 else 1e-15, show=FALSE) {
-    MM <- as(M, "matrix")
-    if(is.logical(MM)) storage.mode(MM) <- "integer"
-    attr(MM, "dimnames") <- attr(m, "dimnames") <- NULL
-    if(show) all.equal(MM, m, tol = tol)
-    else stopifnot(all.equal(MM, m, tol = tol))
-}
+source(system.file("test-tools.R", package = "Matrix"))
 
 m5 <- 1 + as(diag(-1:4)[-5,], "dgeMatrix")
 ## named dimnames:
