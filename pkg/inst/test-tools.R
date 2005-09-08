@@ -41,12 +41,14 @@ is.all.equal4 <- function(x,y,z,u, tol = .Machine$double.eps^0.5)
 
 ## checking;  'show' is for convenience of the developer
 assert.EQ.mat <- function(M, m, tol = if(show) 0 else 1e-15, show=FALSE) {
-    ## temporary fix for R-2.0.1
     MM <- as(M, "matrix")
-    attr(MM, "dimnames") <- NULL
+    if(is.logical(MM)) storage.mode(MM) <- "integer"
+    attr(MM, "dimnames") <- attr(m, "dimnames") <- NULL
     if(show) all.equal(MM, m, tol = tol)
     else stopifnot(all.equal(MM, m, tol = tol))
 }
+
+
 ## The relative error typically returned by all.equal:
 relErr <- function(target, current)
     mean(abs(target - current)) / mean(abs(target))

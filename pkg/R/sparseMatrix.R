@@ -36,28 +36,40 @@ setAs("graphNEL", "sparseMatrix",
           .Call("graphNEL_as_dgTMatrix",
                 from,
                 symmetric = (from@edgemode == "undirected"))
-
       })
 setAs("graph", "sparseMatrix",
       function(from) as(as(from,"graphNEL"), "sparseMatrix"))
 
-if(FALSE) {##--- not yet
+##! if(FALSE) {##--- not yet
 
 setAs("sparseMatrix", "graph", function(from) as(from, "graphNEL"))
 setAs("sparseMatrix", "graphNEL",
       function(from) as(as(from, "dgTMatrix"), "graphNEL"))
 setAs("dgTMatrix", "graphNEL",
       function(from) {
-          d <- Dim(from)
+          d <- dim(from)
           if(d[1] != d[2])
               stop("only square matrices can be used as incidence matrices for grphs")
           n <- d[1]
           if(n == 0) return(new("graphNEL"))
+          if(is.null(rn <- dimnames(from)[[1]]))
+              rn <- as.character(1:n)
+          if(isSymmetric(from)) { # because it's "dsTMatrix" or otherwise
+              ## Need to 'uniquify' the triplets!
+              upper <- from@i <= from@j
+              graph::ftM2graphNEL(cbind(from@i + 1:1, from@j + 1:1),
+                                  W = from@x, V=rn, edgemode="undirected")
+
+          } else { ## not symmetric
+
+              graph::ftM2graphNEL(cbind(from@i + 1:1, from@j + 1:1),
+                                  W = from@x, V=rn, edgemode="directed")
+          }
           stop("'dgTMatrix -> 'graphNEL' method is not yet implemented")
           ## new("graphNEL", nodes = paste(1:n) , edgeL = ...)
       })
 
-}#--not_yet
+##! }#--not_yet
 
 
 

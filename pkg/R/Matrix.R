@@ -158,12 +158,32 @@ setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
 
 
 
+## NOTE: the following only works for R 2.2.x (and later) ---
+## ----  *and* 'Matrix' must have been *installed* by R >= 2.2.x
 
-if(FALSE) ## The following can't work as long as cbind is function(..., *)
-setMethod("cbind", signature(a = "Matrix", b = "Matrix"),
-          function(a, b, ...) {
-              da <- Dim(a)
-              db <- Dim(b)
-              if(da[1] != db[1])
-                  stop("Matrices must have same number of rows for cbind()ing")
-          })
+if(paste(R.version$major, R.version$minor, sep=".") >= "2.2") {
+
+    ## The trivial methods :
+    setMethod("cbind2", signature(x = "Matrix", y = "NULL"),
+	      function(x, y) x)
+    setMethod("cbind2", signature(x = "Matrix", y = "missing"),
+	      function(x, y) x)
+    setMethod("cbind2", signature(x = "NULL", y="Matrix"),
+	      function(x, y) x)
+
+    ## Makes sure one gets x decent error message for the unimplemented cases:
+    setMethod("cbind2", signature(x = "Matrix", y = "Matrix"),
+              function(x, y) {
+                  rowCheck(x,y)
+                  stop(gettextf("cbind2() method for (%s,%s) not-yet defined",
+                                class(x), class(y)))
+              })
+
+    if (isGeneric("rbind2"))
+    setMethod("rbind2", signature(x = "Matrix", y = "Matrix"),
+              function(x, y) {
+                  colCheck(x,y)
+                  stop(gettextf("rbind2() method for (%s,%s) not-yet defined",
+                                class(x), class(y)))
+              })
+}## R-2.2.x and newer

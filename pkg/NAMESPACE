@@ -134,6 +134,14 @@ exportMethods(
 	      "tcrossprod"
 	      )
 
+## only for R >= 2.2:
+if(paste(R.version$major, R.version$minor, sep=".") >= "2.2") {
+
+exportMethods("cbind2")
+
+}
+
+
 ## lmer-related
 exportMethods("BIC", "anova", "coef", "confint", "deviance", "fitted",
 	      "fixef", "formula", "lmer", "logLik", "mcmcsamp",
