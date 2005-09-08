@@ -1,6 +1,7 @@
 
 R : Copyright 2005, The R Foundation for Statistical Computing
-Version 2.1.1 Patched (2005-08-31), ISBN 3-900051-07-0
+Version 2.2.0 Under development (unstable) (2005-09-07 r35516)
+ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -18,8 +19,7 @@ Type 'q()' to quit R.
 > 
 > library(Matrix)
 > 
-> identical3 <- function(x,y,z)	identical(x,y) && identical (y,z)
-> identical4 <- function(a,b,c,d) identical(a,b) && identical3(b,c,d)
+> source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 > 
 > ### Dense Matrices
 > 
