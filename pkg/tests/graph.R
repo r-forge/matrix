@@ -1,8 +1,9 @@
-library(Matrix)
-if(FALSE)
-library(Matrix, lib="/u/maechler/R/Pkgs/Matrix.Rcheck") ; library(graph)
-
 if(require(graph)) {
+
+    library(Matrix)
+    if(FALSE)## for ease of developer:
+        library(Matrix, lib="/u/maechler/R/Pkgs/Matrix.Rcheck")
+
     example("graphNEL-class", echo = FALSE)
     nodes(gR)
 
@@ -26,4 +27,5 @@ if(require(graph)) {
         gmgU <- as(sgU, "graph")
         gmgU <- as(sgU, "graphNEL")
     }
+
 }
