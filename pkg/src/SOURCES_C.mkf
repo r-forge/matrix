@@ -2,6 +2,7 @@ SOURCES_C =  \
 	    HBMM.c \
 	    Metis_utils.c \
 	    R_ldl.c \
+	    Pattern.c \
 	    dgBCMatrix.c \
 	    init.c \
 	    lmer.c \
