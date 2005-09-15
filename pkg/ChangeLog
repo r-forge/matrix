@@ -1,3 +1,17 @@
+2005-09-15  Douglas Bates  <bates@localhost.localdomain>
+
+	* src/chm_common.h: header file required by all C sources that
+	call CHOLMOD functions.  It defines a cholmod_common structure
+	called 'c' whose address is passed as the last argument to
+	(virtually) every CHOLMOD function.
+
+	* src/Pattern.c: Simple example of the use of CHOLMOD.
+
+	* src/init.c: initialize and finalize the cholmod_common structure.
+
+	* src/Makefile: Added source packages CHOLMOD UMFPACK AMD COLAMD
+	LDL and CCOLAMD from the U. of Florida sparse matrix library.
+
 2005-09-08  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* inst/test-tools.R: new file collecting the utility functions used

@@ -1,7 +1,6 @@
 #
 pkg = Matrix
 
-#PKG_CFLAGS = -I./Metis
 PKG_LIBS = ${LAPACK_LIBS} ${BLAS_LIBS}
 include SOURCES_C.mkf
 OBJECTS = $(SOURCES_C:.c=.o)
