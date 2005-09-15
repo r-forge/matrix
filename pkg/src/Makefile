@@ -1,12 +1,12 @@
 #
 pkg = Matrix
 
-PKG_CFLAGS = -I./Metis
+#PKG_CFLAGS = -I./Metis
 PKG_LIBS = ${LAPACK_LIBS} ${BLAS_LIBS}
 include SOURCES_C.mkf
 OBJECTS = $(SOURCES_C:.c=.o)
 SHLIB = $(pkg)$(SHLIB_EXT)
-SUBDIRS = Metis
+SUBDIRS = CHOLMOD UMFPACK Metis AMD COLAMD LDL CCOLAMD
 SUBLIBS = $(SUBDIRS:=.a)
 SUBSTAMP = $(SUBDIRS:=.stamp)
 
