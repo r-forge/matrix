@@ -48,6 +48,7 @@ static R_CallMethodDef CallEntries[] = {
     {"csc_matrix_mm", (DL_FUNC) &csc_matrix_mm, 4},
     {"csc_tcrossprod", (DL_FUNC) &csc_tcrossprod, 1},
     {"compressed_to_dgTMatrix", (DL_FUNC) &compressed_to_dgTMatrix, 2},
+    {"compressed_non_0_ij", (DL_FUNC) &compressed_non_0_ij, 2},
     {"csc_to_dgeMatrix", (DL_FUNC) &csc_to_dgeMatrix, 1},
     {"csc_to_matrix", (DL_FUNC) &csc_to_matrix, 1},
     {"csc_transpose", (DL_FUNC) &csc_transpose, 1},
@@ -243,7 +244,7 @@ void R_init_Matrix(DllInfo *dll)
     Matrix_zSym = install("z");
 }
 
-R_unload_Matrix(DllInfo *dll)
+void R_unload_Matrix(DllInfo *dll)
 {
     cholmod_finish(&c);
 }

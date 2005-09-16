@@ -216,6 +216,29 @@ SEXP compressed_to_dgTMatrix(SEXP x, SEXP colP)
     return ans;
 }
 
+SEXP compressed_non_0_ij(SEXP x, SEXP colP)
+{
+    int col = asLogical(colP); /* 1 if "C"olumn compressed;  0 if "R"ow */
+    SEXP ans, indSym = col ? Matrix_iSym : Matrix_jSym;
+    SEXP indP = GET_SLOT(x, indSym),
+	pP = GET_SLOT(x, Matrix_pSym);
+    int n_el = length(indP), i, *ij;
+
+    ij = INTEGER(ans = PROTECT(allocMatrix(INTSXP, n_el, 2)));
+    /* expand the compressed margin to 'i' or 'j' : */
+    expand_cmprPt(length(pP) - 1, INTEGER(pP), &ij[col ? n_el : 0]);
+    /* and copy the other one: */
+    if (col)
+	for(i = 0; i < n_el; i++)
+	    ij[i] = INTEGER(indP)[i];
+    else /* row compressed */
+	for(i = 0; i < n_el; i++)
+	    ij[i + n_el] = INTEGER(indP)[i];
+
+    UNPROTECT(1);
+    return ans;
+}
+
 SEXP csc_to_matrix(SEXP x)
 {
     SEXP ans, pslot = GET_SLOT(x, Matrix_pSym);
