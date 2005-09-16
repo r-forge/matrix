@@ -7,6 +7,7 @@ SOURCES_C =  \
 	    init.c \
 	    lmer.c \
             Mutils.c \
+	    chm_common.c \
             dense.c \
             dCholCMatrix.c \
             dgCMatrix.c \
