@@ -17,12 +17,13 @@ SEXP triangularMatrix_validate(SEXP obj)
     return ScalarLogical(1);
 }
 
-/* FIXME: validObject(.) works "funny": dtrMatrix_as_dgeMatrix()  {below}
- * -----  is called *before* the following - presumably in order to
- *        apply the higher level validation first.
+/* FIXME? validObject(.) works "unexpectedly": dtrMatrix_as_dgeMatrix()  {below}
+ * -----  is called *before* the following - in order to
+ *        apply the higher level validation first, since dtr* contains dge*
 */
 SEXP dtrMatrix_validate(SEXP obj)
 {
+    /* FIXME: Is the following unnecessary, since "dtr" inherits from "triangular" ? */
     return triangularMatrix_validate(obj);
 }
 

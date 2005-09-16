@@ -12,6 +12,7 @@ SEXP csc_tcrossprod(SEXP x);
 SEXP csc_matrix_crossprod(SEXP x, SEXP y, SEXP classed);
 SEXP dgCMatrix_validate(SEXP x);
 SEXP compressed_to_dgTMatrix(SEXP x, SEXP colP);
+SEXP compressed_non_0_ij(SEXP x, SEXP colP);
 SEXP csc_to_matrix(SEXP x);
 SEXP csc_to_dgeMatrix(SEXP x);
 SEXP matrix_to_csc(SEXP A);
