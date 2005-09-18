@@ -1,7 +1,9 @@
 #include "Mutils.h"
 #include "HBMM.h"
 #include "chm_common.h"
+#include "Csparse.h"
 #include "Pattern.h"
+#include "Tsparse.h"
 #include "dense.h"
 #include "dgBCMatrix.h"
 #include "dgCMatrix.h"
@@ -31,6 +33,10 @@
 static R_CallMethodDef CallEntries[] = {
     {"BunchKaufman_validate", (DL_FUNC) &BunchKaufman_validate, 1},
     {"pBunchKaufman_validate", (DL_FUNC) &pBunchKaufman_validate, 1},
+    {"Csparse_validate", (DL_FUNC) &Csparse_validate, 1},
+    {"Csparse_Csparse_prod", (DL_FUNC) &Csparse_Csparse_prod, 2},
+    {"Csparse_dense_prod", (DL_FUNC) &Csparse_dense_prod, 2},
+    {"Csparse_to_Tsparse", (DL_FUNC) &Csparse_to_Tsparse, 2},
     {"Cholesky_validate", (DL_FUNC) &Cholesky_validate, 1},
     {"pCholesky_validate", (DL_FUNC) &pCholesky_validate, 1},
     {"graphNEL_as_dgTMatrix", (DL_FUNC) &graphNEL_as_dgTMatrix, 2},
@@ -41,7 +47,10 @@ static R_CallMethodDef CallEntries[] = {
     {"Matrix_writeHarwellBoeing", (DL_FUNC) &Matrix_writeHarwellBoeing, 3},
     {"Matrix_writeMatrixMarket", (DL_FUNC) &Matrix_writeMatrixMarket, 3},
     {"SVD_validate", (DL_FUNC) &SVD_validate, 1},
+    {"Tsparse_validate", (DL_FUNC) &Tsparse_validate, 1},
+    {"Tsparse_to_Csparse", (DL_FUNC) &Tsparse_to_Csparse, 1},
     {"csc_check_column_sorting", (DL_FUNC) &csc_check_column_sorting, 1},
+    {"Tsparse_validate", (DL_FUNC) &Tsparse_validate, 1},
     {"csc_crossprod", (DL_FUNC) &csc_crossprod, 1},
     {"csc_getDiag", (DL_FUNC) &csc_getDiag, 1},
     {"csc_matrix_crossprod", (DL_FUNC) &csc_matrix_crossprod, 3},
@@ -93,6 +102,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dsCMatrix_ldl_symbolic", (DL_FUNC) &dsCMatrix_ldl_symbolic, 2},
     {"dsCMatrix_matrix_solve", (DL_FUNC) &dsCMatrix_matrix_solve, 3},
     {"dsCMatrix_to_dgTMatrix", (DL_FUNC) &dsCMatrix_to_dgTMatrix, 1},
+    {"dsCMatrix_to_dgCMatrix", (DL_FUNC) &dsCMatrix_to_dgCMatrix, 1},
     {"dsCMatrix_validate", (DL_FUNC) &dsCMatrix_validate, 1},
     {"dsTMatrix_as_dsCMatrix", (DL_FUNC) &dsTMatrix_as_dsCMatrix, 1},
     {"dsTMatrix_as_dsyMatrix", (DL_FUNC) &dsTMatrix_as_dsyMatrix, 1},

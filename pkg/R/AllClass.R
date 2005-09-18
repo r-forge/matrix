@@ -62,11 +62,17 @@ setClass("ldenseMatrix",
 
 ## virtual SPARSE ------------
 
-setClass("sparseMatrix", representation("VIRTUAL"), contains = "Matrix")
+setClass("sparseMatrix", representation(factors = "list", "VIRTUAL"), contains = "Matrix")
 
-## general Triplet Matrices (dgT, lgT, ..):
-setClass("gTMatrix", representation(i = "integer", j = "integer", "VIRTUAL"),
-	 contains = "sparseMatrix")
+## sparse matrices in Triplet representation (dgT, lgT, ..):
+setClass("TsparseMatrix", representation(i = "integer", j = "integer", "VIRTUAL"),
+         contains = "sparseMatrix")
+
+setClass("CsparseMatrix", representation(i = "integer", p = "integer", "VIRTUAL"),
+         contains = "sparseMatrix")
+
+setClass("RsparseMatrix", representation(p = "integer", j = "integer", "VIRTUAL"),
+         contains = "sparseMatrix")
 
 setClass("dsparseMatrix", representation("VIRTUAL"),
 	 contains = c("dMatrix", "sparseMatrix"))
@@ -129,43 +135,52 @@ setClass("dppMatrix", contains = "dspMatrix",
 
 # numeric, sparse, triplet general matrices
 setClass("dgTMatrix",
-	 representation(factors = "list"),
-	 contains = c("gTMatrix", "dsparseMatrix"),
+	 contains = c("TsparseMatrix", "dsparseMatrix"),
 	 validity = function(object) .Call("dgTMatrix_validate", object)
 	 )
 
+## Should not have dtTMatrix inherit from dgTMatrix because a dtTMatrix could
+# be less than fully stored if diag = "U".  Methods for the dgTMatrix
+# class would not produce correct results even though all the slots
+# are present.
+
 # numeric, sparse, triplet triangular matrices
 setClass("dtTMatrix",
-	 contains = c("dgTMatrix", "triangularMatrix"),
+	 contains = c("TsparseMatrix", "dsparseMatrix", "triangularMatrix"),
 	 prototype = prototype(uplo = "U", diag = "N"),
 	 validity = function(object) .Call("dtTMatrix_validate", object)
 	 )
 
+## Should not have dsTMatrix inherit from dgTMatrix because a dsTMatrix
+# is not fully stored.  Methods for the dgTMatrix class would not
+# produce correct results even though all the slots are present.
+
 # numeric, sparse, triplet symmetric matrices
 setClass("dsTMatrix",
-	 contains = c("dgTMatrix", "symmetricMatrix"),
+	 contains = c("TsparseMatrix", "dsparseMatrix", "symmetricMatrix"),
 	 prototype = prototype(uplo = "U"),
 	 validity = function(object) .Call("dsTMatrix_validate", object)
 	 )
 
 # numeric, sparse, sorted compressed sparse column-oriented general matrices
 setClass("dgCMatrix",
-	 representation(i = "integer", p = "integer", factors = "list"),
-	 contains = "dsparseMatrix",
+	 contains = c("CsparseMatrix", "dsparseMatrix"),
 	 prototype = prototype(p = 0:0),# to be valid
 	 validity = function(object) .Call("dgCMatrix_validate", object)
 	 )
 
+## see comments for dtTMatrix above
 # numeric, sparse, sorted compressed sparse column-oriented triangular matrices
 setClass("dtCMatrix",
-	 contains = c("dgCMatrix", "triangularMatrix"),
+	 contains = c("CsparseMatrix", "dsparseMatrix", "triangularMatrix"),
 	 prototype = prototype(p = 0:0, uplo = "U", diag = "N"),# to be valid
 	 validity = function(object) .Call("tsc_validate", object)
 	 )
 
+## see comments for dsTMatrix above
 # numeric, sparse, sorted compressed sparse column-oriented symmetric matrices
 setClass("dsCMatrix",
-	 contains = c("dgCMatrix", "symmetricMatrix"),
+	 contains = c("CsparseMatrix", "dsparseMatrix", "symmetricMatrix"),
 	 prototype = prototype(p = 0:0, uplo = "U"),# to be valid
 	 validity = function(object) .Call("dsCMatrix_validate", object)
 	 )
@@ -196,40 +211,39 @@ setClass("dsRMatrix",
 
 # logical, sparse, triplet general matrices
 setClass("lgTMatrix",
-	 contains = c("gTMatrix", "lsparseMatrix"),
+	 contains = c("TsparseMatrix", "lsparseMatrix"),
 	 validity = function(object) .Call("lgTMatrix_validate", object)
 	 )
 
 # logical, sparse, triplet triangular matrices
 setClass("ltTMatrix",
-	 contains = c("lgTMatrix", "triangularMatrix"),
+	 contains = c("TsparseMatrix", "lsparseMatrix", "triangularMatrix"),
 	 validity = function(object) .Call("ltTMatrix_validate", object)
 	 )
 
 # logical, sparse, triplet symmetric matrices
 setClass("lsTMatrix",
-	 contains = c("lgTMatrix", "symmetricMatrix"),
+	 contains = c("TsparseMatrix", "lsparseMatrix", "symmetricMatrix"),
 	 validity = function(object) .Call("lsTMatrix_validate", object)
 	 )
 
 # logical, sparse, sorted compressed sparse column-oriented general matrices
 setClass("lgCMatrix",
-	 representation(i = "integer", p = "integer"),
-	 contains = "lsparseMatrix",
+	 contains = c("lsparseMatrix", "CsparseMatrix"),
 	 prototype = prototype(p = 0:0),# to be valid
 	 validity = function(object) .Call("lgCMatrix_validate", object)
 	 )
 
 # logical, sparse, sorted compressed sparse column-oriented triangular matrices
 setClass("ltCMatrix",
-	 contains = c("lgCMatrix", "triangularMatrix"),
+	 contains = c("lsparseMatrix", "CsparseMatrix", "triangularMatrix"),
 	 prototype = prototype(p = 0:0, uplo = "U", diag = "N"),# to be valid
 	 validity = function(object) .Call("ltCMatrix_validate", object)
 	 )
 
 # logical, sparse, sorted compressed sparse column-oriented symmetric matrices
 setClass("lsCMatrix",
-	 contains = c("lgCMatrix", "symmetricMatrix"),
+	 contains = c("lsparseMatrix", "CsparseMatrix", "symmetricMatrix"),
 	 prototype = prototype(p = 0:0, uplo = "U"),# to be valid
 	 validity = function(object) .Call("lsCMatrix_validate", object)
 	 )
