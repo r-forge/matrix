@@ -53,6 +53,8 @@ exportClasses(
               "triangularMatrix",
 	      "dsparseMatrix",
 	      "lsparseMatrix",
+	      "TsparseMatrix",
+	      "CsparseMatrix",
 	      "ddenseMatrix",
 	      ## not yet used, but as sub-classes;
 	      ## need to provide them for 'hierarchy-analysis':

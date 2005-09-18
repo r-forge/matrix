@@ -85,23 +85,29 @@ SEXP Csparse_dense_prod(SEXP a, SEXP b)
 
     cholmod_sdmult(cha, 0, &alpha, &beta, chb, chc, &c);
     Free(cha); Free(chb);
-    return chm_sparse_to_SEXP(chc, 1);
+    return chm_dense_to_SEXP(chc, 1);
 #else
     error("General multiplication requires CHOLMOD");
     return R_NilValue;		/* -Wall */
 #endif	/* USE_CHOLMOD */
 }
     
-SEXP Csparse_tcrossprod(SEXP x)
+SEXP Csparse_crossprod(SEXP x, SEXP trans)
 {
 #ifdef USE_CHOLMOD
-    cholmod_sparse *chx = as_cholmod_sparse(x);
-    cholmod_sparse *chxt = cholmod_aat(chx, (int *) NULL, 0, chx->xtype, &c);
+    int tr = asLogical(trans);	/* gets reversed because _aat is trcrossprod */
+    cholmod_sparse *chx = as_cholmod_sparse(x), *chcp, *chxt;
+
+    if (!tr)
+	chxt = cholmod_transpose(chx, (int) chx->xtype, &c);
+    chcp = cholmod_aat((tr) ? chxt : chx, (int *) NULL, 0, chx->xtype, &c);
 
     Free(chx);
-    return chm_sparse_to_SEXP(chxt, 1);
+    if (!tr) cholmod_free_sparse(&chxt, &c);
+    return chm_sparse_to_SEXP(chcp, 1);
 #else
     error("General transpose requires CHOLMOD");
     return R_NilValue;		/* -Wall */
 #endif	/* USE_CHOLMOD */
 }
+

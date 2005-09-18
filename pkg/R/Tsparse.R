@@ -48,7 +48,7 @@
 
 
 ## Select rows
-setMethod("[", signature(x = "gTMatrix", i = "index", j = "missing",
+setMethod("[", signature(x = "TsparseMatrix", i = "index", j = "missing",
 			 drop = "logical"),
 	  function (x, i, j, ..., drop) { ## select rows
               ip <- .ind.prep(x@i, i, 1, dim(x), dimnames(x))
@@ -57,13 +57,13 @@ setMethod("[", signature(x = "gTMatrix", i = "index", j = "missing",
 	      sel <- ip$m > 0
 	      x@i <- ip$m[sel] - 1:1
 	      x@j <- x@j[sel]
-	      x@x <- x@x[sel]
+	      if (!is(x, "lsparseMatrix")) x@x <- x@x[sel]
 	      if (drop && any(x@Dim == 1:1)) drop(as(x,"matrix")) else x
 	  })
 
 
 ## Select columns
-setMethod("[", signature(x = "gTMatrix", i = "missing", j = "index",
+setMethod("[", signature(x = "TsparseMatrix", i = "missing", j = "index",
 			 drop = "logical"),
 	  function (x, i, j, ..., drop) { ## select columns
               ip <- .ind.prep(x@j, j, 2, dim(x), dimnames(x))
@@ -72,14 +72,14 @@ setMethod("[", signature(x = "gTMatrix", i = "missing", j = "index",
 	      sel <- ip$m > 0
 	      x@i <- x@i[sel]
 	      x@j <- ip$m[sel] - 1:1
-	      x@x <- x@x[sel]
+              if (!is(x, "lsparseMatrix")) x@x <- x@x[sel]
 	      if (drop && any(x@Dim == 1:1)) drop(as(x,"matrix")) else x
 	  })
 
 
 ## [.data.frame has : drop = if (missing(i)) TRUE else length(cols) == 1)
 
-setMethod("[", signature(x = "gTMatrix",
+setMethod("[", signature(x = "TsparseMatrix",
 			 i = "index", j = "index", drop = "logical"),
 	  function (x, i, j, ..., drop)
       {
@@ -93,6 +93,14 @@ setMethod("[", signature(x = "gTMatrix",
           sel <- ip1$m > 0:0  &  ip2$m > 0:0
           x@i <- ip1$m[sel] - 1:1
           x@j <- ip2$m[sel] - 1:1
-          x@x <- x@x[sel]
+          if (!is(x, "lsparseMatrix")) x@x <- x@x[sel]
 	  if (drop && any(nd == 1)) drop(as(x,"matrix")) else x
       })
+
+setMethod("crossprod", signature(x = "TsparseMatrix", y = "missing"),
+          function(x, y = NULL)
+          callGeneric(.Call("Tsparse_to_Csparse", x, PACKAGE = "Matrix"), y))
+
+setMethod("tcrossprod", signature(x = "TsparseMatrix"),
+          function(x)
+          callGeneric(.Call("Tsparse_to_Csparse", x, PACKAGE = "Matrix")))

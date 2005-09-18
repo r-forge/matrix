@@ -26,18 +26,18 @@ uniqify_gT <- function(x)
     ##		by having (i,j) sorted and unique
     ## ----------------------------------------------------------------------
     ## Arguments: a "gT" Matrix
-    stopifnot(is(x, "gTMatrix"))
+    stopifnot(is(x, "TsparseMatrix"))
     ii <- order(x@i, x@j)
     x@i <- x@i[ii]
     x@j <- x@j[ii]
-    x@x <- x@x[ii]
+    if (!is(x, "lsparseMatrix")) x@x <- x@x[ii]
     if(any(duplicated(cbind(x@i, x@j))))
         sum.the.x.etc() ## UNFINISHED - FIXME
     ### We should use an exported utility for this which uses  .Call(.)
 }
 
 uniq2 <- function(x) {
-    stopifnot(is(x, "gTMatrix"))
+    stopifnot(is(x, "TsparseMatrix"))
     if(is(x,"dgTMatrix")) as(as(x, "dgCMatrix"), "dgTMatrix")
     else if(is(x,"lgTMatrix")) as(as(x, "lgCMatrix"), "lgTMatrix")
     else stop("not implemented for class", class(x))
