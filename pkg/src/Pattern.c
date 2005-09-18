@@ -20,7 +20,7 @@ cholmod_sparse *factor_to_pattern(SEXP fact)
 SEXP factor_prod(SEXP f1, SEXP f2)
 {
     SEXP ans = PROTECT(allocVector(VECSXP, 3));
-    int *dims, n = LENGTH(f1), i, nl1, nl2, nmax, nnz, super;
+    int *dims, n = LENGTH(f1), i, nl1, nl2, nmax, super;
     cholmod_triplet *A;
     cholmod_sparse *B;
     cholmod_factor *F;

@@ -1,5 +1,9 @@
 #include "dgCMatrix.h"
 
+#ifdef USE_CHOLMOD
+#include "chm_common.h"
+#endif
+
 SEXP dgCMatrix_validate(SEXP x)
 {
     SEXP pslot = GET_SLOT(x, Matrix_pSym),
@@ -102,6 +106,15 @@ SEXP csc_crossprod(SEXP x)
 
 SEXP csc_tcrossprod(SEXP x)
 {
+#ifdef USE_CHOLMOD
+    cholmod_sparse *cha = cholmod_aat(as_cholmod_sparse(x),
+	(int *) NULL, 0, 1, &c);
+    
+    cha->stype = -1;		/* set the symmetry */
+    cholmod_sort(cha, &c);	/* drop redundant entries */
+    return chm_sparse_to_SEXP(cha, -1);
+#else
+    
     SEXP pslot = GET_SLOT(x, Matrix_pSym),
 	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dsCMatrix")));
     int *xp = INTEGER(pslot),
@@ -159,6 +172,7 @@ SEXP csc_tcrossprod(SEXP x)
     Free(itmp); Free(xtmp); Free(iVal); Free(jVal); Free(xVal);
     UNPROTECT(1);
     return ans;
+#endif /* USE_CHOLMOD */
 }
 
 SEXP csc_matrix_crossprod(SEXP x, SEXP y, SEXP classed)
@@ -372,6 +386,13 @@ SEXP csc_getDiag(SEXP x)
 
 SEXP csc_transpose(SEXP x)
 {
+#ifdef USE_CHOLMOD
+    cholmod_sparse *chx = as_cholmod_sparse(x);
+    SEXP ans =
+	chm_sparse_to_SEXP(cholmod_transpose(chx, 1, &c), 1);
+    Free(chx);
+    return ans;
+#else
     SEXP xi = GET_SLOT(x, Matrix_iSym);
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix")));
     int *adims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2)),
@@ -394,6 +415,7 @@ SEXP csc_transpose(SEXP x)
     Free(xj);
     UNPROTECT(1);
     return ans;
+#endif /* USE_CHOLMOD */
 }
 
 SEXP csc_matrix_mm(SEXP a, SEXP b, SEXP classed, SEXP right)

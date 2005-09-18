@@ -3,7 +3,8 @@
 ### contains = "dgCMatrix"
 
 setAs("dsCMatrix", "dgTMatrix",
-      function(from) .Call("dsCMatrix_to_dgTMatrix", from))
+      function(from)
+      .Call("dsCMatrix_to_dgTMatrix", from, PACKAGE = "Matrix"))
 
 setAs("dsCMatrix", "dgeMatrix",
       function(from) as(as(from, "dgTMatrix"), "dgeMatrix"))
@@ -15,6 +16,10 @@ setAs("dsCMatrix", "lsCMatrix",
       function(from) new("lsCMatrix", i = from@i, p = from@p, uplo = from@uplo,
                          Dim = from@Dim, Dimnames = from@Dimnames))
 
+setAs("dsCMatrix", "dgCMatrix",
+      function(from)
+      .Call("dsCMatrix_to_dgCMatrix", from, PACKAGE = "Matrix"))
+
 setAs("dsCMatrix", "dsTMatrix",
       function(from)
       new("dsTMatrix", i = from@i,
@@ -24,6 +29,9 @@ setAs("dsCMatrix", "dsTMatrix",
 
 setAs("dsCMatrix", "dsyMatrix",
       function(from) as(as(from, "dsTMatrix"), "dsyMatrix"))
+
+setMethod("image", "dsCMatrix",
+          function(x, ...) image(as(x, "dgTMatrix"), ...))
 
 setMethod("solve", signature(a = "dsCMatrix", b = "dgeMatrix"),
           function(a, b, ...)

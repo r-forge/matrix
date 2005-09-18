@@ -1,7 +1,9 @@
 SOURCES_C =  \
+	    Csparse.c \
 	    HBMM.c \
 	    Metis_utils.c \
 	    R_ldl.c \
+	    Tsparse.c \
 	    Pattern.c \
 	    dgBCMatrix.c \
 	    init.c \

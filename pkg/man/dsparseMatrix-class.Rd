@@ -9,9 +9,10 @@
   \describe{
     \item{\code{Dim}:}{the matrix dimension, see \link{Matrix-class}.}
     \item{\code{Dimnames}:}{see the "Matrix" class.}
-
     \item{\code{x}:}{a \code{\link{numeric}} vector containing the
       (non-zero) matrix entries.}
+    \item{\code{factors}:}{Object of class \code{"list"} - a list
+      of factorizations of the matrix. }
   }
 }
 \section{Extends}{

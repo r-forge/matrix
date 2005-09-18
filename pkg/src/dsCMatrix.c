@@ -1,4 +1,7 @@
 #include "dsCMatrix.h"
+#ifdef USE_CHOLMOD
+#include "chm_common.h"
+#endif /* USE_CHOLMOD */
 
 /* 'ssc' [symmetric sparse compressed] is an "alias" for our "dsC" */
 
@@ -268,3 +271,11 @@ SEXP dsCMatrix_metis_perm(SEXP x)
     return ans;
 }
 
+SEXP dsCMatrix_to_dgCMatrix(SEXP x)
+{
+    cholmod_sparse *chx = as_cholmod_sparse(x);
+    cholmod_sparse *ans = cholmod_copy(x, 0, 1, &c);
+
+    Free(chx);
+    return chm_sparse_to_SEXP(ans, 1);
+}
