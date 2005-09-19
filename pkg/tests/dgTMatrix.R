@@ -18,35 +18,5 @@ stopifnot(!isTRUE(all.equal(m1, m2)),
           all.equal(crossprod(m1), crossprod(m2), tol=1e-15),
           identical(mc, as(m2, "dgCMatrix")))
 
-
-if(FALSE)
-uniqify_gT <- function(x)
-{
-    ## Purpose: produce a *unique* triplet representation:
-    ##		by having (i,j) sorted and unique
-    ## ----------------------------------------------------------------------
-    ## Arguments: a "gT" Matrix
-    stopifnot(is(x, "TsparseMatrix"))
-    ii <- order(x@i, x@j)
-    x@i <- x@i[ii]
-    x@j <- x@j[ii]
-    if (!is(x, "lsparseMatrix")) x@x <- x@x[ii]
-    if(any(duplicated(cbind(x@i, x@j))))
-        sum.the.x.etc() ## UNFINISHED - FIXME
-    ### We should use an exported utility for this which uses  .Call(.)
-}
-
-uniq2 <- function(x) {
-    stopifnot(is(x, "TsparseMatrix"))
-    if(is(x,"dgTMatrix")) as(as(x, "dgCMatrix"), "dgTMatrix")
-    else if(is(x,"lgTMatrix")) as(as(x, "lgCMatrix"), "lgTMatrix")
-    else stop("not implemented for class", class(x))
-}
-
-(t2 <- system.time(um2 <- uniq2(m1)))
-
-if(FALSE) {
- t1 <- system.time(um1 <- uniqify_gT(m1))
- stopifnot(identical(um1, m2),
-           identical(um2, m2))
-}
+### -> uniq* functions now in ../R/Auxiliaries.R
+(t2 <- system.time(um2 <- Matrix:::uniq(m1)))

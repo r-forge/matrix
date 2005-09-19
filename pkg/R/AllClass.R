@@ -93,7 +93,7 @@ setClass("dgeMatrix", contains = "ddenseMatrix",
 
 # numeric, dense, non-packed, triangular matrices
 setClass("dtrMatrix",
-	 contains = c("dgeMatrix","triangularMatrix"),
+	 contains = c("dgeMatrix", "triangularMatrix"),
 	 prototype = prototype(uplo = "U", diag = "N"),
 	 validity = function(object) .Call("dtrMatrix_validate", object)
 	 )
@@ -127,6 +127,43 @@ setClass("dpoMatrix", contains = "dsyMatrix",
 # numeric, dense, packed, positive-definite, symmetric matrices
 setClass("dppMatrix", contains = "dspMatrix",
 	 validity = function(object) .Call("dppMatrix_validate", object)
+	 )
+
+##----- logical dense Matrices -- e.g. as result of <ddenseMatrix>  COMPARISON
+
+# numeric, dense, general matrices
+setClass("lgeMatrix", contains = "ldenseMatrix",
+	 ## checks that length( @ x) == prod( @ Dim):
+	 validity = function(object) .Call("lgeMatrix_validate", object)
+	 )
+## i.e. "lgeMatrix" cannot be packed, but "ldenseMatrix" can ..
+
+# numeric, dense, non-packed, triangular matrices
+setClass("ltrMatrix",
+	 contains = c("lgeMatrix", "triangularMatrix"),
+	 prototype = prototype(uplo = "U", diag = "N"),
+	 validity = function(object) .Call("ltrMatrix_validate", object)
+	 )
+
+# numeric, dense, packed, triangular matrices
+setClass("ltpMatrix",
+	 contains = c("ldenseMatrix", "triangularMatrix"),
+	 prototype = prototype(uplo = "U", diag = "N"),
+	 validity = function(object) .Call("ltpMatrix_validate", object)
+	 )
+
+# numeric, dense, non-packed symmetric matrices
+setClass("lsyMatrix",
+	 contains = c("lgeMatrix", "symmetricMatrix"),
+	 prototype = prototype(uplo = "U"),
+	 validity = function(object) .Call("lsyMatrix_validate", object)
+	 )
+
+# numeric, dense, packed symmetric matrices
+setClass("lspMatrix",
+	 prototype = prototype(uplo = "U"),
+	 contains = c("ldenseMatrix", "symmetricMatrix"),
+	 validity = function(object) .Call("lspMatrix_validate", object)
 	 )
 
 ##-------------------- S P A R S E (non-virtual) --------------------------

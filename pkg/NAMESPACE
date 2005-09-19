@@ -24,13 +24,22 @@ export(
        "rcond",
        "readHB",
        "readMM",
-       "round", # "Math2" group (needs explicit setGeneric(.))
-       "signif",#  {ditto}
        "tcrossprod",
        "unpack",
        "writeHB",
        "writeMM"
        )
+
+export( ## workaround S4-Group(generic|method) quirks:
+
+       "log", # "Math" fails for non-Primitives
+       "gamma",
+       "lgamma",
+
+       "round", # "Math2" group (needs explicit setGeneric(.))
+       "signif" #  {ditto}
+)
+
 
 ## lmer-related
 export("lmer", "mcmcsamp", "simulate")
@@ -139,6 +148,7 @@ exportMethods(
 ## only for R >= 2.2:
 if(paste(R.version$major, R.version$minor, sep=".") >= "2.2") {
 
+exportMethods("rbind2")
 exportMethods("cbind2")
 
 }

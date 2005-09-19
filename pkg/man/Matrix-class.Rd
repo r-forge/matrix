@@ -3,12 +3,18 @@
 \alias{Matrix-class}
 \alias{\%*\%,Matrix,numeric-method}
 \alias{\%*\%,numeric,Matrix-method}
+\alias{\%*\%,Matrix,Matrix-method}
 % "[" are in ./Xtrct-methods.Rd
 \alias{cbind2,Matrix,Matrix-method}
 \alias{cbind2,Matrix,NULL-method}
 \alias{cbind2,Matrix,missing-method}
 \alias{cbind2,NULL,Matrix-method}
+\alias{rbind2,Matrix,Matrix-method}
+\alias{rbind2,Matrix,NULL-method}
+\alias{rbind2,Matrix,missing-method}
+\alias{rbind2,NULL,Matrix-method}
 \alias{crossprod,Matrix,numeric-method}
+\alias{crossprod,Matrix,ANY-method}
 \alias{crossprod,numeric,Matrix-method}
 \alias{solve,Matrix,numeric-method}
 \alias{dim,Matrix-method}

@@ -1,6 +1,16 @@
-### Simple fallback methods for all dense matrices:
+### Simple fallback methods for all dense matrices
 ### These are "cheap" to program, but potentially far from efficient;
 ### Methods for specific subclasses will overwrite these:
+
+## dense to sparse: as() will take the ``closest'' match
+setAs("denseMatrix", "dsparseMatrix",
+      function(from) as(as(from, "dgeMatrix"), "dsparseMatrix"))
+
+## setAs("denseMatrix", "dgCMatrix",
+##       function(from) as(as(from, "dgeMatrix"), "dgCMatrix"))
+## setAs("denseMatrix", "dgTMatrix",
+##       function(from) as(as(from, "dgeMatrix"), "dgTMatrix"))
+
 
 ## Using "index" for indices should allow
 ## integer (numeric), logical, or character (names!) indices :

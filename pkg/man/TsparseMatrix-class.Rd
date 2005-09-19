@@ -2,7 +2,10 @@
 \title{Class "TsparseMatrix" of Sparse Matrices in Triplet Form}
 \docType{class}
 \alias{TsparseMatrix-class}
+%% Methods:
 % "[" are in ./Xtrct-methods.Rd
+\alias{crossprod,TsparseMatrix,missing-method}
+\alias{tcrossprod,TsparseMatrix-method}
 %
 \description{The \code{"TsparseMatrix"} class is the virtual class of
   all sparse matrices coded in triplet form.  Since it is a virtual class,
@@ -11,9 +14,13 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{Dim}:}{class \code{"integer"} of length 2, as for
-      \code{\link{Matrix-class}}.}
-    \item{\code{Dimnames}:}{class \code{"list"} as in the \code{"Matrix"} class.}
+    \item{\code{Dim}, \code{Dimnames}:}{from the \code{"Matrix"} class,}
+    \item{\code{factors}:}{from class \code{"sparseMatrix"}, see
+      \code{\link{sparseMatrix-class}}.}
+    \item{\code{i}:}{Object of class \code{"integer"} - the row indices
+      of non-zero entries.}
+    \item{\code{j}:}{Object of class \code{"integer"} - the column
+      indices of non-zero entries.  Must be the same length as slot \code{i}.}
   }
 }
 \section{Extends}{

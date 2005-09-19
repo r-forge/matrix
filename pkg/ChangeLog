@@ -1,3 +1,18 @@
+2005-09-18  Douglas Bates  <bates@wisc.edu>
+
+	* R/AllClass.R (TsparseMatrix), CsparseM* and RsparseM*
+	* R/Tsparse.R: instead of R/gTMatrix.R
+	* R/Csparse.R: new
+	* src/Tsparse.c (Tsparse_to_Csparse): new; -> cholmod_()
+	* src/Tsparse.c: new; many trivial methods calling cholmod_()
+	* src/Csparse.c (Csparse_to_Tsparse), transpose, (mat|cross)prod:
+			via cholmod
+
+2005-09-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (non0ind): new function using new C code
+	* src/dgCMatrix.c (compressed_non_0_ij): new utility
+
 2005-09-15  Douglas Bates  <bates@localhost.localdomain>
 
 	* src/chm_common.h: header file required by all C sources that

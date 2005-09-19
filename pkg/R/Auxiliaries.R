@@ -86,15 +86,15 @@ non0ind <- function(x) {
     ## else return a (i,j) matrix of non-zero-indices
 
     stopifnot(is(x, "sparseMatrix"))
-    if(is(x, "gTMatrix"))
+    if(is(x, "TsparseMatrix"))
         stop("'x' must be column- or row-compressed  'sparseMatrix'")
     isCol <- function(M) any("i" == slotNames(M))
     .Call("compressed_non_0_ij", x, isCol(x), PACKAGE = "Matrix")
 }
 
-### These are currently tests in ../tests/dgTMatrix.R !!!
+### There is a test on this in ../tests/dgTMatrix.R !
 uniq <- function(x) {
-    if(is(x, "gTMatrix")) {
+    if(is(x, "TsparseMatrix")) {
         ## Purpose: produce a *unique* triplet representation:
         ##		by having (i,j) sorted and unique
         ## -----------------------------------------------------------

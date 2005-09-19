@@ -1,31 +1,16 @@
 ### Define Methods that can be inherited for all subclasses
 
-## An idea: Coercion between *VIRTUAL* classes
-## -- making sure that result is *actual*!
-
+### Idea: Coercion between *VIRTUAL* classes -- as() chooses "closest" classes
+### ----  should also work e.g. for  dense-triangular --> sparse-triangular !
 ## setAs("denseMatrix", "sparseMatrix",
-##       function(from) {
-##       })
+##        function(from) {
+##            as(as(from, "dgeMatrix")
+##        })
 
 ## setAs("dMatrix", "lMatrix",
 ##       function(from) {
 ##       })
 
-
-## For multiplication operations, sparseMatrix overrides other method
-## selections.  Coerce a ddensematrix argument to a dgeMatrix.
-
-setMethod("%*%", signature(x = "sparseMatrix", y = "ddenseMatrix"),
-          function(x, y) callGeneric(x, as(y, "dgeMatrix")))
-
-setMethod("%*%", signature(x = "ddenseMatrix", y = "sparseMatrix"),
-          function(x, y) callGeneric(as(x, "dgeMatrix"), y))
-
-setMethod("crossprod", signature(x = "sparseMatrix", y = "ddenseMatrix"),
-          function(x, y = NULL) callGeneric(x, as(y, "dgeMatrix")))
-
-setMethod("crossprod", signature(x = "ddenseMatrix", y = "sparseMatrix"),
-          function(x, y = NULL) callGeneric(as(x, "dgeMatrix"), y))
 
 ## "graph" coercions -- this needs the graph package which is currently
 ##  -----               *not* required on purpose
@@ -75,37 +60,37 @@ setAs("dgTMatrix", "graphNEL",
 
 ### Subsetting -- basic things (drop = "missing") are done in ./Matrix.R
 
-## 1)  dsparse -> dgT
-setMethod("[", signature(x = "dsparseMatrix", i = "index", j = "missing",
-			 drop = "logical"),
-	  function (x, i, j, drop)
-          callGeneric(x = as(x, "dgTMatrix"), i=i, drop=drop))
+### FIXME : we defer to the "*gT" -- conveniently, but not efficient for gC !
 
-setMethod("[", signature(x = "dsparseMatrix", i = "missing", j = "index",
-			 drop = "logical"),
-	  function (x, i, j, drop)
-          callGeneric(x = as(x, "dgTMatrix"), j=j, drop=drop))
+## [dl]sparse -> [dl]gT   -- treat both in one via superclass
+##                        -- more useful when have "z" (complex) and even more
 
-setMethod("[", signature(x = "dsparseMatrix",
+setMethod("[", signature(x = "sparseMatrix", i = "index", j = "missing",
+			 drop = "logical"),
+	  function (x, i, j, drop) {
+              cl <- class(x)
+              viaCl <- if(is(x,"dMatrix")) "dgTMatrix" else "lgTMatrix"
+              x <- callGeneric(x = as(x, viaCl), i=i, drop=drop)
+              if(!is(x,"Matrix")) x else as(x, cl)
+          })
+
+setMethod("[", signature(x = "sparseMatrix", i = "missing", j = "index",
+			 drop = "logical"),
+	  function (x, i, j, drop) {
+              cl <- class(x)
+              viaCl <- if(is(x,"dMatrix")) "dgTMatrix" else "lgTMatrix"
+              x <- callGeneric(x = as(x, viaCl), j=j, drop=drop)
+              if(!is(x,"Matrix")) x else as(x, cl)
+          })
+
+setMethod("[", signature(x = "sparseMatrix",
 			 i = "index", j = "index", drop = "logical"),
-	  function (x, i, j, drop)
-          callGeneric(x = as(x, "dgTMatrix"), i=i, j=j, drop=drop))
-
-## 2)  lsparse -> lgT
-setMethod("[", signature(x = "lsparseMatrix", i = "index", j = "missing",
-			 drop = "logical"),
-	  function (x, i, j, drop)
-          callGeneric(x = as(x, "lgTMatrix"), i=i, drop=drop))
-
-setMethod("[", signature(x = "lsparseMatrix", i = "missing", j = "index",
-			 drop = "logical"),
-	  function (x, i, j, drop)
-          callGeneric(x = as(x, "lgTMatrix"), j=j, drop=drop))
-
-setMethod("[", signature(x = "lsparseMatrix",
-			 i = "index", j = "index", drop = "logical"),
-	  function (x, i, j, drop)
-          callGeneric(x = as(x, "lgTMatrix"), i=i, j=j, drop=drop))
+	  function (x, i, j, drop) {
+              cl <- class(x)
+              viaCl <- if(is(x,"dMatrix")) "dgTMatrix" else "lgTMatrix"
+              x <- callGeneric(x = as(x, viaCl), i=i, j=j, drop=drop)
+              if(!is(x,"Matrix")) x else as(x, cl)
+          })
 
 
 
@@ -179,3 +164,5 @@ setMethod("isSymmetric", signature(object = "sparseMatrix"),
 			    as(t(object), "lgCMatrix"))
 	      else stop("not yet implemented")
 	  })
+
+

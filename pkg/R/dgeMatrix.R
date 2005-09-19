@@ -94,6 +94,11 @@ setMethod("Arith",
 	      } else stop ("length of 1st arg does not match dimension of 2nd")
 	  })
 
+## Workaround on "Math" only working for dispatching of "Primitives"
+setGeneric("log", group="Math")
+setGeneric("gamma", group="Math")
+setGeneric("lgamma", group="Math")
+
 setMethod("Math",
 	  signature(x = "dgeMatrix"),
 	  function(x) {

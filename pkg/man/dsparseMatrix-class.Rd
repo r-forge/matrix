@@ -1,6 +1,29 @@
 \name{dsparseMatrix-class}
 \docType{class}
 \alias{dsparseMatrix-class}
+\alias{cbind2,dsparseMatrix,dsparseMatrix-method}
+\alias{cbind2,dsparseMatrix,matrix-method}
+\alias{cbind2,matrix,dsparseMatrix-method}
+\alias{cbind2,dsparseMatrix,numeric-method}
+\alias{cbind2,numeric,dsparseMatrix-method}
+\alias{rbind2,dsparseMatrix,dsparseMatrix-method}
+\alias{rbind2,dsparseMatrix,matrix-method}
+\alias{rbind2,matrix,dsparseMatrix-method}
+\alias{rbind2,dsparseMatrix,numeric-method}
+\alias{rbind2,numeric,dsparseMatrix-method}
+\alias{coerce,denseMatrix,dsparseMatrix-method}
+\alias{\%*\%,dsparseMatrix,ddenseMatrix-method}
+\alias{\%*\%,ddenseMatrix,dsparseMatrix-method}
+\alias{crossprod,dsparseMatrix,ddenseMatrix-method}
+\alias{crossprod,ddenseMatrix,dsparseMatrix-method}
+\alias{\%*\%,dsparseMatrix,dgeMatrix-method}
+\alias{\%*\%,dgeMatrix,dsparseMatrix-method}
+\alias{crossprod,dsparseMatrix,dgeMatrix-method}
+\alias{crossprod,dgeMatrix,dsparseMatrix-method}
+%% group methods
+\alias{Math2,dsparseMatrix,numeric-method}
+\alias{Math,dsparseMatrix-method}
+%
 \title{Virtual Class "dsparseMatrix" of Numeric Sparse Matrices}
 \description{The Class \code{"dsparseMatrix"} is the virtual (super) class of
   all numeric sparse matrices.
