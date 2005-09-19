@@ -84,7 +84,7 @@ cholmod_sparse *as_cholmod_sparse(SEXP x)
 SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int free)
 {
     SEXP ans;
-    char *cl;
+    char *cl = "";		/* -Wall */
     int *dims, nnz = cholmod_nnz(a, &c);
 				/* ensure a is sorted and packed */
     if (!a->sorted || !a->packed) cholmod_sort(a, &c);
@@ -208,7 +208,7 @@ cholmod_triplet *as_cholmod_triplet(SEXP x)
 SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int free)
 {
     SEXP ans;
-    char *cl;
+    char *cl = "";		/* -Wall */
     int *dims;
 				/* determine the class of the result */
     switch(a->xtype){
