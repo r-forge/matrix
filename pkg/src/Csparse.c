@@ -107,12 +107,16 @@ SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet)
 	chxt = cholmod_transpose(chx, (int) chx->xtype, &c);
     chcp = cholmod_aat((!tr) ? chxt : chx, (int *) NULL, 0, chx->xtype, &c);
 
-    Free(trip ? cht : chx);
-    if (trip) cholmod_free_sparse(&chx, &c);
+    if (trip) {
+	cholmod_free_sparse(&chx, &c);
+	Free(cht);
+    } else {
+	Free(chx);
+    }
     if (!tr) cholmod_free_sparse(&chxt, &c);
     return chm_sparse_to_SEXP(chcp, 1);
 #else
-    error("General transpose requires CHOLMOD");
+    error("General crossproduct requires CHOLMOD");
     return R_NilValue;		/* -Wall */
 #endif	/* USE_CHOLMOD */
 }
