@@ -36,7 +36,7 @@ static R_CallMethodDef CallEntries[] = {
     {"Cholesky_validate", (DL_FUNC) &Cholesky_validate, 1},
     {"Csparse_Csparse_prod", (DL_FUNC) &Csparse_Csparse_prod, 2},
     {"Csparse_dense_prod", (DL_FUNC) &Csparse_dense_prod, 2},
-    {"Csparse_crossprod", (DL_FUNC) &Csparse_crossprod, 2},
+    {"Csparse_crossprod", (DL_FUNC) &Csparse_crossprod, 3},
     {"Csparse_to_Tsparse", (DL_FUNC) &Csparse_to_Tsparse, 1},
     {"Csparse_transpose", (DL_FUNC) &Csparse_transpose, 1},
     {"Csparse_validate", (DL_FUNC) &Csparse_validate, 1},

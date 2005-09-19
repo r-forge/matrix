@@ -54,8 +54,6 @@ assert.EQ.mat(sM %*% sM,        sm %*% sm)
 all.equal(as(t(sM) %*% sM, "matrix"),
           (t(sm) %*% sm) > 0, tol=0)
 
-## should these be different???
-if(FALSE) ## FIXME: something's wrong in crossprod method dispatch:
 crossprod(sM)
 t(sM) %*% sM
 

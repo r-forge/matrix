@@ -2,6 +2,8 @@ bCrosstab               Create pairwise crosstabulation
 BIC                     Bayesian Information Criterion
 Cholesky-class          Cholesky and Bunch-Kaufman Decompositions
 corrmatrix-class        Class "corrmatrix"
+CsparseMatrix-class     Class "CsparseMatrix" of Sparse Matrices in
+                        Column-compressed Form
 dCholCMatrix-class      Cholesky Decompositions of dsCMatrix Objects
 ddenseMatrix-class      Virtual Class "ddenseMatrix" of Numeric Dense
                         Matrices
@@ -30,8 +32,6 @@ expand                  Expand a Decomposition into Factors
 expm                    Matrix exponential
 facmul                  Multiplication by Decomposition Factors
 fixef                   Extract Fixed Effects
-gTMatrix-class          Class "gTMatrix" of General Sparse Matrices in
-                        Triplet Form
 Hilbert                 Generate a Hilbert matrix
 index-class             Virtual Class "index" - Simple Class for Matrix
                         Indices
@@ -66,6 +66,8 @@ tcrossprod              Cross-product of transpose
 triangularMatrix-class
                         Virtual Class of Triangular Matrices in
                         package:Matrix
+TsparseMatrix-class     Class "TsparseMatrix" of Sparse Matrices in
+                        Triplet Form
 unpack                  Full Storage Representation of Packed Matrices
 VarCorr                 Extract variance and correlation components
 VarCorr-class           Class "VarCorr"
