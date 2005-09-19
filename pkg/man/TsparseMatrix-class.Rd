@@ -1,11 +1,14 @@
-\name{gTMatrix-class}
-\title{Class "gTMatrix" of General Sparse Matrices in Triplet Form}
+\name{TsparseMatrix-class}
+\title{Class "TsparseMatrix" of Sparse Matrices in Triplet Form}
 \docType{class}
-\alias{gTMatrix-class}
+\alias{TsparseMatrix-class}
 % "[" are in ./Xtrct-methods.Rd
 %
-\description{  ~~ A concise (1-5 lines) description of what the class is.  ~~}
-\section{Objects from the Class}{A virtual Class: No objects may be created from it.}
+\description{The \code{"TsparseMatrix"} class is the virtual class of
+  all sparse matrices coded in triplet form.  Since it is a virtual class,
+  no objects may be created from it.  See
+  \code{showClass("TsparseMatrix")} for its subclasses.
+}
 \section{Slots}{
   \describe{
     \item{\code{Dim}:}{class \code{"integer"} of length 2, as for
@@ -26,6 +29,9 @@ Class \code{"Matrix"}, by class \code{"sparseMatrix"}.
   its superclass, \code{\link{sparseMatrix-class}}, and
   \code{\link{dgTMatrix-class}} for the  links to other classes
 }
-% \examples{
-% }
+\examples{
+showClass("TsparseMatrix")
+## or just the subclasses' names
+names(getClass("TsparseMatrix")@subclasses)
+}
 \keyword{classes}
