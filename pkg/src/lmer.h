@@ -1,5 +1,5 @@
-#ifndef MATRIX_LMEUTILS_H
-#define MATRIX_LMEUTILS_H
+#ifndef MATRIX_LMER_H
+#define MATRIX_LMER_H
 
 #include "Mutils.h"
 #include "triplet_to_col.h"
