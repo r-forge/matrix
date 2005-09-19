@@ -274,7 +274,7 @@ SEXP dsCMatrix_metis_perm(SEXP x)
 SEXP dsCMatrix_to_dgCMatrix(SEXP x)
 {
     cholmod_sparse *chx = as_cholmod_sparse(x);
-    cholmod_sparse *ans = cholmod_copy(x, 0, 1, &c);
+    cholmod_sparse *ans = cholmod_copy(chx, 0, 1, &c);
 
     Free(chx);
     return chm_sparse_to_SEXP(ans, 1);
