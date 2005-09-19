@@ -56,6 +56,8 @@ all.equal(as(t(sM) %*% sM, "matrix"),
 
 crossprod(sM)
 t(sM) %*% sM
+all.equal(crossprod(sM), t(sM) %*% sM)
+if (FALSE) assert.EQ.mat(crossprod(sM), t(sM) %*% sM) ## Why isn't this TRUE?
 
 ## These two are *not* TRUE !
 ## assert.EQ.mat(crossprod(sM),    crossprod(sm))
