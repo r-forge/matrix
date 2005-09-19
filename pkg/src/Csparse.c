@@ -92,17 +92,23 @@ SEXP Csparse_dense_prod(SEXP a, SEXP b)
 #endif	/* USE_CHOLMOD */
 }
 
-SEXP Csparse_crossprod(SEXP x, SEXP trans)
+SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet)
 {
 #ifdef USE_CHOLMOD
-    int tr = asLogical(trans);	/* gets reversed because _aat is trcrossprod */
-    cholmod_sparse *chx = as_cholmod_sparse(x), *chcp, *chxt;
+    int trip = asLogical(triplet);
+    cholmod_triplet
+	*cht = trip ? as_cholmod_triplet(x) : (cholmod_triplet*) NULL;
+    cholmod_sparse *chcp, *chxt,
+	*chx = trip ? cholmod_triplet_to_sparse(cht, cht->nnz, &c)
+	: as_cholmod_sparse(x);
+    int tr = asLogical(trans);	/* gets reversed because _aat is tcrossprod */
 
     if (!tr)
 	chxt = cholmod_transpose(chx, (int) chx->xtype, &c);
-    chcp = cholmod_aat((tr) ? chxt : chx, (int *) NULL, 0, chx->xtype, &c);
+    chcp = cholmod_aat((!tr) ? chxt : chx, (int *) NULL, 0, chx->xtype, &c);
 
-    Free(chx);
+    Free(trip ? cht : chx);
+    if (trip) cholmod_free_sparse(&chx, &c);
     if (!tr) cholmod_free_sparse(&chxt, &c);
     return chm_sparse_to_SEXP(chcp, 1);
 #else
