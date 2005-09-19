@@ -12,6 +12,7 @@
 \alias{coerce,dsyMatrix,dgeMatrix-method}
 \alias{coerce,dsyMatrix,dspMatrix-method}
 \alias{coerce,dsyMatrix,matrix-method}
+\alias{show,dsyMatrix-method}
 \alias{dspMatrix-class}
 \alias{dsyMatrix-class}
 \alias{norm,dspMatrix,character-method}

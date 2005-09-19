@@ -1,4 +1,4 @@
-				/* Sparse matrices in compress column-oriented form */
+			/* Sparse matrices in compress column-oriented form */
 #include "Csparse.h"
 #ifdef USE_CHOLMOD
 #include "chm_common.h"
@@ -34,7 +34,7 @@ SEXP Csparse_validate(SEXP x)
 SEXP Csparse_to_Tsparse(SEXP x)
 {
 #ifdef USE_CHOLMOD
-    cholmod_sparse *chxs = as_cholmod_sparse(x); 
+    cholmod_sparse *chxs = as_cholmod_sparse(x);
     cholmod_triplet *chxt = cholmod_sparse_to_triplet(chxs, &c);
 
     Free(chxs);
@@ -91,7 +91,7 @@ SEXP Csparse_dense_prod(SEXP a, SEXP b)
     return R_NilValue;		/* -Wall */
 #endif	/* USE_CHOLMOD */
 }
-    
+
 SEXP Csparse_crossprod(SEXP x, SEXP trans)
 {
 #ifdef USE_CHOLMOD

@@ -1,4 +1,4 @@
-#### "gTMatrix" : Virtual class of general sparse matrices in triplet-format
+#### "TsparseMatrix" : Virtual class of sparse matrices in triplet-format
 
 ### "[" :
 ### -----
@@ -23,16 +23,21 @@
     has.dn <- is.character(dn)
     if(is(i, "numeric")) {
         storage.mode(i) <- "integer"
-        i0 <- i - 1:1 # transform to 0-indexing
-        if(has.dn) dn <- dn[i]
+	if(any(ineg <- i < 0:0)) {
+	    if(any(i > 0:0))
+		stop("you cannot mix negative and positive indices")
+	    i0 <- (0:(di[margin]-1:1))[i]
+	} else	{
+	    i0 <- i - 1:1 # transform to 0-indexing
+	}
+	if(has.dn) dn <- dn[i]
     }
     else if (is(i, "logical")) {
         i0 <- (0:(di[margin]-1:1))[i]
         if(has.dn) dn <- dn[i]
     } else { ## character
         if(!has.dn)
-            stop(gettextf(
-                          "no 'dimnames[[%d]]': cannot use character indexing"),
+            stop(gettextf("no 'dimnames[[%d]]': cannot use character indexing"),
                  margin, domain = NA)
         i0 <- match(i, dn, nomatch=0)
         dn <- dn[i0]

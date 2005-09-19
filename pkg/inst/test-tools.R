@@ -52,3 +52,5 @@ assert.EQ.mat <- function(M, m, tol = if(show) 0 else 1e-15, show=FALSE) {
 ## The relative error typically returned by all.equal:
 relErr <- function(target, current)
     mean(abs(target - current)) / mean(abs(target))
+
+is.R22 <- (paste(R.version$major, R.version$minor, sep=".") >= "2.2")

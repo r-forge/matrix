@@ -7,6 +7,7 @@
 \alias{coerce,dtTMatrix,dgeMatrix-method}
 \alias{coerce,dtTMatrix,dtrMatrix-method}
 \alias{coerce,dtTMatrix,matrix-method}
+\alias{image,dtCMatrix-method}
 \alias{t,dtCMatrix-method}
 \alias{t,dtTMatrix-method}
 \title{Triangular, (compressed) sparse column matrices}

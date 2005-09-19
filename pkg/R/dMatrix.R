@@ -10,6 +10,14 @@ if(paste(R.version$major, R.version$minor, sep=".") < "2.0.1") {
 setAs("dMatrix", "matrix",
       function(from) as(as(from, "dgeMatrix"), "matrix"))
 
+### Idea: Coercion between *VIRTUAL* classes -- as() chooses "closest" classes
+### ----  should also work e.g. for  triangular --> triangular !
+##
+## setAs("dMatrix", "lMatrix",
+##       function(from) {
+##       })
+
+
 ## Methods for operations where one argument is integer
 ## No longer made use of (and confusing hence) since R version 2.1.0
 ## where "integer" goes as part of "numeric"
@@ -37,7 +45,7 @@ setAs("dMatrix", "matrix",
 ## -----
 
 ## Cheap version: work via "dgeMatrix" and use the group methods there:
-
+## NOTA BENE: Improved by doing some of these for dsparse* !
 setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
           signature(e1 = "dMatrix", e2 = "dMatrix"),
           function(e1, e2) callGeneric(as(e1, "dgeMatrix"),

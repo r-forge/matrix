@@ -7,26 +7,8 @@ setAs(from = "ddenseMatrix", to = "matrix",
 	  array(from@x, dim = d, dimnames = dimnames(from))
       })
 
-## private function to be used as show() method possibly more than once
-prMatrix <- function(object) {
-    d <- dim(object)
-    cl <- class(object)
-    cat(sprintf('%d x %d Matrix of class "%s"\n', d[1], d[2], cl))
-    m <- as(object, "matrix")
-    maxp <- getOption("max.print")
-    if(prod(d) <= maxp) print(m)
-    else { ## d[1] > maxp / d[2] >= nr :
-	nr <- maxp %/% d[2]
-	n2 <- ceiling(nr / 2)
-	print(head(m, max(1, n2)))
-	cat("\n ..........\n\n")
-	print(tail(m, max(1, nr - n2)))
-    }
-    ## DEBUG: cat("str(.):\n") ; str(object)
-    invisible(object)# as print() S3 methods do
-}
-
-setMethod("show", signature(object = "ddenseMatrix"), prMatrix)
+setMethod("show", signature(object = "ddenseMatrix"),
+          function(object) prMatrix(object))
 
 ##- ## FIXME: The following is only for the "dMatrix" objects that are not
 ##- ##	      "dense" nor "sparse" -- i.e. "packed" ones :
@@ -35,7 +17,8 @@ setMethod("show", signature(object = "ddenseMatrix"), prMatrix)
 ##- ## and improve this as well:
 ##- setMethod("show", signature(object = "pMatrix"), prMatrix)
 ##- ## this should now be superfluous [keep for safety for the moment]:
-setMethod("show", signature(object = "Matrix"), prMatrix)
+setMethod("show", signature(object = "Matrix"),
+          function(object) prMatrix(object))
 
 ## should propagate to all subclasses:
 setMethod("as.matrix", signature(x = "Matrix"), function(x) as(x, "matrix"))
@@ -46,6 +29,11 @@ setMethod("isSymmetric", signature(object = "symmetricMatrix"),
 setMethod("isSymmetric", signature(object = "triangularMatrix"),
           ## FIXME: 'TRUE' if *diagonal*, i.e. return(isDiagonal(object))
           function(object) FALSE)
+setMethod("isDiagonal", signature(object = "sparseMatrix"),
+          function(object) {
+              gT <- as(object, "TsparseMatrix")
+              all(gT@i == gT@j)
+          })
 
 setMethod("dim", signature(x = "Matrix"),
 	  function(x) x@Dim, valueClass = "integer")
@@ -104,6 +92,17 @@ setMethod("crossprod", signature(x = "numeric", y = "Matrix"),
 setMethod("solve", signature(a = "Matrix", b = "numeric"),
 	  function(a, b, ...) callGeneric(a, as.matrix(b)))
 
+## bail-out methods in order to get better error messages
+setMethod("%*%", signature(x = "Matrix", y = "Matrix"),
+	  function (x, y)
+          stop(gettextf('not-yet-implemented method for <%s> %%*%% <%s>',
+                        class(x), class(y))))
+setMethod("crossprod", signature(x = "Matrix", y = "ANY"),
+	  function (x, y = NULL)
+          stop(gettextf('not-yet-implemented method for crossprod(<%s>, <%s>)',
+                        class(x), class(y))))
+
+
 ### --------------------------------------------------------------------------
 ###
 ### Subsetting "["  and
@@ -154,7 +153,7 @@ setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
 	  function (x, i, j, value)
                  if(!is(value,"index"))
                  stop("RHS 'value' must be of class \"index\"")
-                 else stop("unimplemented 'Matrix[<-' method"))
+                 else stop("not-yet-implemented 'Matrix[<-' method"))
 
 
 
@@ -171,6 +170,13 @@ if(paste(R.version$major, R.version$minor, sep=".") >= "2.2") {
     setMethod("cbind2", signature(x = "NULL", y="Matrix"),
 	      function(x, y) x)
 
+    setMethod("rbind2", signature(x = "Matrix", y = "NULL"),
+	      function(x, y) x)
+    setMethod("rbind2", signature(x = "Matrix", y = "missing"),
+	      function(x, y) x)
+    setMethod("rbind2", signature(x = "NULL", y="Matrix"),
+	      function(x, y) x)
+
     ## Makes sure one gets x decent error message for the unimplemented cases:
     setMethod("cbind2", signature(x = "Matrix", y = "Matrix"),
               function(x, y) {
@@ -179,7 +185,6 @@ if(paste(R.version$major, R.version$minor, sep=".") >= "2.2") {
                                 class(x), class(y)))
               })
 
-    if (isGeneric("rbind2"))
     setMethod("rbind2", signature(x = "Matrix", y = "Matrix"),
               function(x, y) {
                   colCheck(x,y)

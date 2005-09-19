@@ -1,5 +1,6 @@
 \name{dgCMatrix-class}
 \docType{class}
+\title{Compressed, sparse, column-oriented numeric matrices}
 \alias{dgCMatrix-class}
 \alias{\%*\%,dgCMatrix,dgeMatrix-method}
 \alias{\%*\%,dgCMatrix,matrix-method}
@@ -18,7 +19,18 @@
 \alias{dim,dgCMatrix-method}
 \alias{image,dgCMatrix-method}
 \alias{t,dgCMatrix-method}
-\title{Compressed, sparse, column-oriented numeric matrices}
+%% Group methods --------- FIXME: These are not tested yet (or documented)
+\alias{Arith,numeric,dgCMatrix-method}
+\alias{Arith,dgCMatrix,numeric-method}
+\alias{Math2,dgCMatrix,numeric-method}
+\alias{Math,dgCMatrix-method}
+% for silly reasons, need these 2+3 as well:
+\alias{round,dgCMatrix,numeric-method}
+\alias{signif,dgCMatrix,numeric-method}
+\alias{log,dgCMatrix-method}
+\alias{gamma,dgCMatrix-method}
+\alias{lgamma,dgCMatrix-method}
+%
 \description{The \code{dgCMatrix} class is a class of sparse numeric
   matrices in the compressed, sparse, column-oriented format.  In this
   implementation the non-zero elements in the columns are sorted into
@@ -28,16 +40,11 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{p}:}{Object of class \code{"integer"} of pointers, one
-      for each column, to the initial (zero-based) index of elements in
-      the column.}
-    \item{\code{i}:}{Object of class \code{"integer"} of length nnzero
-      (number of non-zero elements).  These are the row numbers for
-      each non-zero element in the matrix.}
     \item{\code{x}:}{Object of class \code{"numeric"} - the non-zero
       elements of the matrix.}
-    \item{\code{nrow}:}{Object of class \code{"integer"} - the number of
-      rows in the matrix.}
+    \item{\dots}{all other slots are inherited from the superclasse
+      \code{"CsparseMatrix"}, see \code{\link{CsparseMatrix-class}}.
+    }
   }
 }
 \section{Methods}{

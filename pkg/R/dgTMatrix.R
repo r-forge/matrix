@@ -10,7 +10,7 @@ setAs("dgTMatrix", "matrix",
 setAs("dgeMatrix", "dgTMatrix",
       function(from) as(as(from, "dgCMatrix"), "dgTMatrix"))
 
-## "[" methods are now in ./gTMatrix.R
+## "[" methods are now in ./TsparseMatrix.R
 
 setMethod("crossprod", signature(x = "dgTMatrix", y = "missing"),
           function(x, y = NULL)
@@ -131,6 +131,3 @@ setMethod("writeHB", signature(obj = "dgTMatrix"),
 setMethod("writeMM", signature(obj = "dgTMatrix"),
           function(obj, file, ...)
           .Call("Matrix_writeMatrixMarket", obj, as.character(file), "DGT"))
-
-
-

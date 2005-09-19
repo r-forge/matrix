@@ -19,6 +19,21 @@ stopifnot(validObject(xpx),
           validObject(xpy),
           validObject(dd))
 
+## "Math" also, for log() and [l]gamma() which need special treatment
+stopifnot(identical(exp(res)@x, exp(res@x)),
+          identical(log(abs(res))@x, log(abs((res@x)))),
+          identical(lgamma(res)@x, lgamma(res@x)))
+
+
+###--- sparse matrices ---------
+
+m <- Matrix(c(0,0,2:0), 3,5)
+(mC <- as(m, "dgCMatrix"))
+sm <- sin(mC)
+stopifnot(class(sm) == class(mC),
+          dim(sm) == dim(mC),
+          class(0 + 100*mC) == class(mC),
+          all.equal(0.1 * ((0 + 100*mC)/10), mC),
+          all.equal(sqrt(mC ^ 2), mC))
+
 proc.time() # for ``statistical reasons''
-
-

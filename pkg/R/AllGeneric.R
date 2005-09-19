@@ -1,5 +1,5 @@
-#### Define those generics that we need, if they don't exist
-
+#### Define those generics that we need, if they don't exist;
+#### not all will be exported
 
 if (!isGeneric("expand"))
     setGeneric("expand", function(x, ...) standardGeneric("expand"))
@@ -7,9 +7,17 @@ if (!isGeneric("expand"))
 if (!isGeneric("tcrossprod"))
     setGeneric("tcrossprod", function(x) standardGeneric("tcrossprod"))
 
+if (!isGeneric("isDiagonal"))
+    setGeneric("isDiagonal", function(object, ...)
+               standardGeneric("isDiagonal"))
+
 if (!isGeneric("isSymmetric"))
     setGeneric("isSymmetric", function(object, ...)
                standardGeneric("isSymmetric"))
+
+if (!isGeneric("isTriangular"))
+    setGeneric("isTriangular", function(object, ...)
+               standardGeneric("isTriangular"))
 
 if (!isGeneric("isNested"))
     setGeneric("isNested", function(object, ...) standardGeneric("isNested"))

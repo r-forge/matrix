@@ -3,11 +3,24 @@
 setAs("dsyMatrix", "dgeMatrix",
       function(from) .Call("dsyMatrix_as_dgeMatrix", from) )
 
+## I can't get this to work - at least inside Namespace -- FIXME
+## setIs("dgeMatrix", "dsyMatrix",
+##       ## R BUG:  test() doesn't see Matrix-internal functions
+##       test = function(from) Matrix:::isSymmetric(from),
+##       replace = function(obj, value) ## copy all slots
+##       for(n in slotnames(obj)) slot(obj, n) <- slot(value, n)
+##       )
+
 setAs("dsyMatrix", "matrix",
       function(from) .Call("dsyMatrix_as_matrix", from) )
 
 setAs("dsyMatrix", "dspMatrix",
       function(from) .Call("dsyMatrix_as_dspMatrix", from) )
+
+## Note: Just *because* we have an explicit  dtr -> dge coercion,
+##       show( <ddenseMatrix> ) is not okay, and we need our own:
+setMethod("show", "dsyMatrix", function(object) prMatrix(object))
+
 
 setMethod("rcond", signature(x = "dsyMatrix", type = "character"),
           function(x, type, ...)
@@ -60,17 +73,17 @@ setMethod("t", signature(x = "dsyMatrix"),
                   rcond = x@rcond)
           }, valueClass = "dsyMatrix")
 
+
+## The following has the severe effect of making
+## "dsyMatrix" a subclass of "dpoMatrix" and since the reverse is
+## by definition of "dpoMatrix", the class-hierarchy gets a *cycle* !
+##
 setIs("dsyMatrix", "dpoMatrix",
       test = function(obj)
           "try-error" != class(try(.Call("dpoMatrix_chol", obj), TRUE)),
-      replace = function(obj, value) {
-          obj@uplo <- value@uplo
-          obj@rcond <- value@rcond
-          obj@factors <- value@factors
-          obj@x <- value@x
-          obj@Dim <- value@Dim
-          obj@Dimnames <- value@Dimnames
-          obj}
+      ## MM: The following is necessary -- but shouldn't it be the default in such a case ??
+      replace = function(obj, value) ## copy all slots
+      for(n in slotnames(obj)) slot(obj, n) <- slot(value, n)
       )
 
 ## Now that we have "chol", we can define  "determinant" methods,

@@ -11,9 +11,13 @@
 \alias{Arith,numeric,dMatrix-method}
 \alias{Math,dMatrix-method}
 \alias{Math2,dMatrix,numeric-method}% Math2 = round + signif, but
-% for silly reasons, need these 2 as well:
+% for silly reasons, need these 2+3 as well:
 \alias{round,dMatrix,numeric-method}
 \alias{signif,dMatrix,numeric-method}
+\alias{log,dMatrix-method}
+\alias{gamma,dMatrix-method}
+\alias{lgamma,dMatrix-method}
+%
 % operations with one argument from the "integer" class
 \alias{crossprod,dMatrix,integer-method}
 \alias{crossprod,integer,dMatrix-method}

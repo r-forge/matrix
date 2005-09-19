@@ -9,12 +9,13 @@
 \alias{chol,dsCMatrix,logical-method}
 \alias{t,dsCMatrix-method}
 \alias{t,dsTMatrix-method}
+\alias{coerce,dsCMatrix,dgCMatrix-method}
 \alias{coerce,dsCMatrix,dgTMatrix-method}
+\alias{coerce,dsCMatrix,dgeMatrix-method}
 \alias{coerce,dsCMatrix,dsTMatrix-method}
 \alias{coerce,dsCMatrix,dsyMatrix-method}
-\alias{coerce,dsCMatrix,dgeMatrix-method}
-\alias{coerce,dsCMatrix,matrix-method}
 \alias{coerce,dsCMatrix,lsCMatrix-method}
+\alias{coerce,dsCMatrix,matrix-method}
 \alias{coerce,dsTMatrix,matrix-method}
 \alias{coerce,dsTMatrix,dgeMatrix-method}
 \alias{coerce,dsTMatrix,dsCMatrix-method}
@@ -22,6 +23,7 @@
 \alias{coerce,graphNEL,dsCMatrix-method}
 \alias{determinant,dsCMatrix,missing-method}
 \alias{determinant,dsCMatrix,logical-method}
+\alias{image,dsCMatrix-method}
 \description{The \code{dsCMatrix} class is a class of symmetric, sparse
   matrices in the compressed, column-oriented format.  In this
   implementation the non-zero elements in the columns are sorted into
