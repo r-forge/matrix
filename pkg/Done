@@ -50,3 +50,26 @@
 - in lmer.c check all instances of the use of ZtX and XtX and change
   them so that having a negative last element of nc means use the
   response only (but look for it in the right place).
+
+- Solved:
+
+   Currently the show() method fail sometime after coercion:
+   e.g. 'sy' show()s wrongly, even though it "str()" fine :
+
+      (po <- crossprod(Matrix(0:3, 2))) # ok
+      (ge <- as(po, "dgeMatrix")) # ok
+      (sy <- as(po, "dsyMatrix")) # BAD
+      str(sy) # looks fine
+
+  or
+      example(expand) # -> ex$L and ex$U look bad, however
+      as(ex$L, "dgeMatrix") # `works'
+
+  {Of course, we don't need a workaround but must understand
+   and solve the problem}
+
+
+- arithmetic for sparse matrices:
+     done for    <sparseMatrix>  o  <scalar>
+  {more needed: see TODO}
+
