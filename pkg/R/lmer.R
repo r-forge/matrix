@@ -124,9 +124,9 @@ setMethod("lmer", signature(formula = "formula"),
           glm.fit <- eval(mf, parent.frame())
           x <- glm.fit$x
           y <- as.double(glm.fit$y)
-          lmm <- missing(family) # => linear mixed model
           family <- glm.fit$family
-
+          ## check for a linear mixed model
+          lmm <- family$family == "gaussian" && family$link == "identity"
           if (lmm) { # linear mixed model
               method <- match.arg(method)
               if (method %in% c("PQL", "Laplace", "AGQ")) {
@@ -139,15 +139,11 @@ setMethod("lmer", signature(formula = "formula"),
               if (missing(method)) method <- "PQL"
               else {
                   method <- match.arg(method)
-
-                  ## <FIXME>: only
-                  ## if( !(family == "gaussian" && link == "identity") ) {
                   if (method == "ML") method <- "PQL"
                   if (method == "REML")
                       warning('Argument method = "REML" is not meaningful ',
                               'for a generalized linear mixed model.',
                               '\nUsing method = "PQL".\n')
-                  ## } </FIXME>
               }
           }
 
