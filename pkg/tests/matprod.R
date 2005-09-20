@@ -50,18 +50,14 @@ sM  <- new("lgTMatrix", i = rowi, j=coli, Dim=as.integer(c(N,N)))
 sM # nice
 
 sm <- as(sM, "matrix")
+sM %*% sM
 assert.EQ.mat(sM %*% sM,        sm %*% sm)
-all.equal(as(t(sM) %*% sM, "matrix"),
-          (t(sm) %*% sm) > 0, tol=0)
-
+assert.EQ.mat(t(sM) %*% sM,
+              (t(sm) %*% sm) > 0, tol=0)
 crossprod(sM)
-t(sM) %*% sM
-all.equal(crossprod(sM), t(sM) %*% sM)
-if (FALSE) assert.EQ.mat(crossprod(sM), t(sM) %*% sM) ## Why isn't this TRUE?
+stopifnot(identical(crossprod(sM), t(sM) %*% sM))
 
-## These two are *not* TRUE !
-## assert.EQ.mat(crossprod(sM),    crossprod(sm))
-## assert.EQ.mat(tcrossprod(sM),   tcrossprod(sm))
-
+assert.EQ.mat( crossprod(sM),  crossprod(sm) > 0)
+assert.EQ.mat(tcrossprod(sM), as(tcrossprod(sm),"matrix") > 0)
 
 proc.time() # for ``statistical reasons''
