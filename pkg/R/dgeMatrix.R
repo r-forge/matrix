@@ -94,11 +94,6 @@ setMethod("Arith",
 	      } else stop ("length of 1st arg does not match dimension of 2nd")
 	  })
 
-## Workaround on "Math" only working for dispatching of "Primitives"
-setGeneric("log", group="Math")
-setGeneric("gamma", group="Math")
-setGeneric("lgamma", group="Math")
-
 setMethod("Math",
 	  signature(x = "dgeMatrix"),
 	  function(x) {
@@ -106,16 +101,15 @@ setMethod("Math",
 	      x
 	  })
 
-## help(Math2)	mentions this uglyness:
-setGeneric("round",  group="Math2")
-setGeneric("signif", group="Math2")
-
 setMethod("Math2",
 	  signature(x = "dgeMatrix", digits = "numeric"),
 	  function(x, digits) {
 	      x@x <- callGeneric(x@x, digits = digits)
 	      x
 	  })
+
+## "Summary"
+
 
 ## TODO :  "Compare" -> returning  logical Matrices
 
