@@ -25,32 +25,9 @@
 - consider moving alloc3Darray from ./src/Mutils.c to
   $(RSRC)/src/base/array.c
 
-- data/ : names 'mm' and even more 'y' are  ``too short''.
-	If we really want to keep them, don't use "LazyData"
-	(such that one needs  data(*) explicitly);
-	But MM would rather want something like  ex.mm and ex.y
-
 -  slot "factors" maybe should move up to "Matrix"
 
 -------
-
-We have a (at least one) basic problem :
-   Currently the show() method fail sometime after coercion:
-   e.g. 'sy' show()s wrongly, even though it "str()" fine :
-
-      (po <- crossprod(Matrix(0:3, 2))) # ok
-      (ge <- as(po, "dgeMatrix")) # ok
-      (sy <- as(po, "dsyMatrix")) # BAD
-      str(sy) # looks fine
-
-  or
-      example(expand) # -> ex$L and ex$U look bad, however
-      as(ex$L, "dgeMatrix") # `works'
-
-  {Of course, we don't need a workaround but must understand
-   and solve the problem}
-
----
 
 - provide methods for "dspMatrix" and "dppMatrix"!
 
@@ -79,12 +56,17 @@ BUG: rcond() of a singular dpoMatrix gives a LaPack error instead of just 0:
 - add more comprehensive examples / tests for Schur decomposition
 
 - arithmetic for sparse matrices:
-	     <sparseMatrix>  o  { <scalar> | <same-dim-sparseMatrix> }
+	     <sparseMatrix>  o  <same-dim-sparseMatrix>
   should return a sparse matrix  for at least "+" and "*" , also %%,
   and "/" and "%/%" at least when the RHS is non-zero a scalar.
+  Challenge: nice implementation (``common non-0''; but Tsparse* is not uniq).
 
 ---
 
 - Create a Harwell-Boeing version of the matrix mm and the response
   vector y in inst/external and remove them from the data directory.
   Modify any examples that use them and modify the Comparisons vignette.
+
+- "Math2" , "Math", "Arith":
+   keep triangular and symmetric Matrices when appropriate:
+   particularly desirable for  "Math2": round(), signif()
