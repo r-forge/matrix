@@ -30,14 +30,26 @@ export(
        "writeMM"
        )
 
-export( ## workaround S4-Group(generic|method) quirks:
-
-       "log", # "Math" fails for non-Primitives
+## workaround S4-Group(generic|method) quirk: R/AllGeneric.R
+## needs setGeneric(*, group=) and this for all non-Primitives :
+export(
+       ## "Math"
+       "log",
        "gamma",
        "lgamma",
 
-       "round", # "Math2" group (needs explicit setGeneric(.))
-       "signif" #  {ditto}
+       ## "Math2"
+       "round",
+       "signif",
+
+       ## "Summary"
+       "max",
+       "min",
+       "range",
+       "prod",
+       "sum",
+       "any",
+       "all"
 )
 
 
