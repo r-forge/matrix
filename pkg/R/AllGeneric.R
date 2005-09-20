@@ -132,3 +132,25 @@ if (!exists("simulate", mode = "function")) {
                         ...)
                standardGeneric("simulate"))
 }
+
+###---- Group Generics ----
+## The following are **WORKAROUND** s currently needed for all non-Primitives:
+
+##  "Math"
+setGeneric("log", group="Math")
+setGeneric("gamma", group="Math")
+setGeneric("lgamma", group="Math")
+
+## "Math2"
+setGeneric("round",  group="Math2")
+setGeneric("signif", group="Math2")
+
+## "Summary"
+setGeneric("max", group="Summary")
+setGeneric("min", group="Summary")
+setGeneric("range", group="Summary")
+setGeneric("prod",group="Summary")
+setGeneric("sum", group="Summary")
+setGeneric("any", group="Summary")
+setGeneric("all", group="Summary")
+
