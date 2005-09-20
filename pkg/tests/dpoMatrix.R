@@ -7,9 +7,9 @@ h9 <- Hilbert(9)
 stopifnot(c(0,0) == dim(Hilbert(0)),
           c(9,9) == h9)
 str(h9)
-all.equal(determinant(h9)$modulus, -96.7369450737858, tol= 1e-15)
-##-> TRUE only on some platforms; seen relative difference of 10^-8
+all.equal(determinant(h9)$modulus, -96.7369456, tol= 2e-8)
 stopifnot(0 == length(h9@factors))# nothing yet
+(ch9 <- chol(h9)) # FIXME: round() should preserve 'triangular'
 str(f9 <- as(chol(h9), "dtrMatrix"))
 ## h9 now has factorization
 stopifnot(names(h9@factors) == "Cholesky",
@@ -28,3 +28,4 @@ signif(t(s9)/10000, 4)# only rounded numbers are platform-independent
 (I9 <- hp9 %*% s9)
 stopifnot(all.equal(cbind(1:9), as.matrix(I9), tol = 2e-9))
 
+proc.time() # "stats"

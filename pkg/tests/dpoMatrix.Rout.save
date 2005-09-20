@@ -1,6 +1,7 @@
 
 R : Copyright 2005, The R Foundation for Statistical Computing
-Version 2.1.1 Patched (2005-09-01), ISBN 3-900051-07-0
+Version 2.2.0 alpha (2005-09-19 r35612)
+ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -32,10 +33,31 @@ Formal class 'dpoMatrix' [package "Matrix"] with 6 slots
   .. ..$ : NULL
   .. ..$ : NULL
   ..@ uplo    : chr "U"
-> all.equal(determinant(h9)$modulus, -96.7369450737858, tol= 1e-15)
-[1] "Mean relative  difference: 1.043917e-08"
-> ##-> TRUE only on some platforms; seen relative difference of 10^-8
+> all.equal(determinant(h9)$modulus, -96.7369456, tol= 2e-8)
+[1] TRUE
 > stopifnot(0 == length(h9@factors))# nothing yet
+> (ch9 <- chol(h9)) # FIXME: round() should preserve 'triangular'
+9 x 9 Matrix of class "Cholesky"
+      [,1]      [,2]      [,3]       [,4]        [,5]        [,6]         [,7]
+ [1,]    1 0.5000000 0.3333333 0.25000000 0.200000000 0.166666667 0.1428571429
+ [2,]    0 0.2886751 0.2886751 0.25980762 0.230940108 0.206196525 0.1855768722
+ [3,]    0 0.0000000 0.0745356 0.11180340 0.127775313 0.133099284 0.1330992844
+ [4,]    0 0.0000000 0.0000000 0.01889822 0.037796447 0.052495066 0.0629940788
+ [5,]    0 0.0000000 0.0000000 0.00000000 0.004761905 0.011904762 0.0194805195
+ [6,]    0 0.0000000 0.0000000 0.00000000 0.000000000 0.001196474 0.0035894208
+ [7,]    0 0.0000000 0.0000000 0.00000000 0.000000000 0.000000000 0.0003001624
+ [8,]    0 0.0000000 0.0000000 0.00000000 0.000000000 0.000000000 0.0000000000
+ [9,]    0 0.0000000 0.0000000 0.00000000 0.000000000 0.000000000 0.0000000000
+              [,8]         [,9]
+ [1,] 1.250000e-01 1.111111e-01
+ [2,] 1.683938e-01 1.539601e-01
+ [3,] 1.304373e-01 1.264847e-01
+ [4,] 7.015250e-02 7.482933e-02
+ [5,] 2.651515e-02 3.263403e-02
+ [6,] 6.764678e-03 1.030808e-02
+ [7,] 1.050569e-03 2.241213e-03
+ [8,] 7.523277e-05 3.009311e-04
+ [9,] 0.000000e+00 1.884502e-05
 > str(f9 <- as(chol(h9), "dtrMatrix"))
 Formal class 'dtrMatrix' [package "Matrix"] with 7 slots
   ..@ rcond   : num(0) 
@@ -129,4 +151,6 @@ Formal class 'dppMatrix' [package "Matrix"] with 6 slots
  [9,]    9
 > stopifnot(all.equal(cbind(1:9), as.matrix(I9), tol = 2e-9))
 > 
+> proc.time() # "stats"
+[1] 4.29 0.15 5.48 0.00 0.00
 > 
