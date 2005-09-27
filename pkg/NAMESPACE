@@ -54,7 +54,7 @@ export(
 
 
 ## lmer-related
-export("lmer", "mcmcsamp", "simulate")
+export("lmer", "mcmcsamp", "mer2")
 
 exportClasses(
 	      "index",
@@ -119,7 +119,7 @@ exportClasses(
 	      )
 
 ## lmer-related
-exportClasses("VarCorr", "lmer", "mer", "summary.lmer")
+exportClasses("VarCorr", "lmer", "mer", "mer2", "summary.lmer")
 
 
 exportMethods(
