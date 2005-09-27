@@ -1066,3 +1066,85 @@ refdist <- function(fm1, fm2, n, ...)
     attr(ref, "observed") <- obs
     ref
 }
+
+mer2 <-
+    function(formula, data, family,
+             method = c("REML", "ML", "PQL", "Laplace", "AGQ"),
+             control = list(), start,
+             subset, weights, na.action, offset,
+             model = TRUE, x = FALSE, y = FALSE , ...)
+          ## x, y : not dealt with at all -- FIXME ? .NotYetImplemented(
+{
+    ## match and check parameters
+    if (length(formula) < 3) stop("formula must be a two-sided formula")
+    ## cv <- do.call("Matrix:::lmerControl", control)
+    cv <- control
+    ## evaluate glm.fit, a generalized linear fit of fixed effects only
+    mf <- match.call()
+    m <- match(c("family", "data", "subset", "weights",
+                 "na.action", "offset"), names(mf), 0)
+    mf <- mf[c(1, m)]
+    frame.form <- subbars(formula) # substitute `+' for `|'
+    fixed.form <- nobars(formula)  # remove any terms with `|'
+    if (inherits(fixed.form, "name")) # RHS is empty - use a constant
+        fixed.form <- substitute(foo ~ 1, list(foo = fixed.form))
+    environment(fixed.form) <- environment(frame.form) <- environment(formula)
+    mf$formula <- fixed.form
+    mf$x <- mf$model <- mf$y <- TRUE
+    mf[[1]] <- as.name("glm")
+    glm.fit <- eval(mf, parent.frame())
+    x <- glm.fit$x
+    y <- as.double(glm.fit$y)
+    family <- glm.fit$family
+    ## check for a linear mixed model
+    lmm <- family$family == "gaussian" && family$link == "identity"
+    if (lmm) { # linear mixed model
+        method <- match.arg(method)
+        if (method %in% c("PQL", "Laplace", "AGQ")) {
+            warning(paste('Argument method = "', method,
+                          '" is not meaningful for a linear mixed model.\n',
+                          'Using method = "REML".\n', sep = ''))
+            method <- "REML"
+        }
+    } else { # generalized linear mixed model
+        if (missing(method)) method <- "PQL"
+        else {
+            method <- match.arg(method)
+            if (method == "ML") method <- "PQL"
+            if (method == "REML")
+                warning('Argument method = "REML" is not meaningful ',
+                        'for a generalized linear mixed model.',
+                        '\nUsing method = "PQL".\n')
+        }
+    }
+    
+    ## evaluate a model frame for fixed and random effects
+    mf$formula <- frame.form
+    mf$x <- mf$model <- mf$y <- mf$family <- NULL
+    mf$drop.unused.levels <- TRUE
+    mf[[1]] <- as.name("model.frame")
+    frm <- eval(mf, parent.frame())
+    
+    ## grouping factors and model matrices for random effects
+    bars <- findbars(formula[[3]])
+    random <-
+        lapply(bars, function(x)
+               list(model.matrix(eval(substitute(~ T, list(T = x[[2]]))),
+                                 frm),
+                    eval(substitute(as.factor(fac)[,drop = TRUE],
+                                    list(fac = x[[3]])), frm)))
+    names(random) <- unlist(lapply(bars, function(x) deparse(x[[3]])))
+    
+    ## order factor list by decreasing number of levels
+    nlev <- sapply(random, function(x) length(levels(x[[2]])))
+    if (any(diff(nlev) > 0)) {
+        random <- random[rev(order(nlev))]
+    }
+    
+    ## Create the model matrices and a mixed-effects representation (mer)
+    mmats <- c(lapply(random, "[[", 1),
+               .fixed = list(cbind(glm.fit$x, .response = glm.fit$y)))
+    mer <- .Call("mer2_create", lapply(random, "[[", 2),
+                       mmats, method, PACKAGE = "Matrix")
+    mer
+}

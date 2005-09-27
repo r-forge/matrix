@@ -419,6 +419,28 @@ setClass("mer",
 	     .Call("lmer_validate", object, PACKAGE = "Matrix")
 	 })
 
+setClass("mer2",
+	 representation(
+			flist = "list", # list of grouping factors
+			perm = "list",	# list of permutations of levels (0-based)
+			Parent = "integer",# elimination tree
+			bVar = "list",	# list of conditional variance factors (upper triangle)
+			L = "list",	# list of blocks of L
+			ZZpO = "dsCMatrix", # Z'Z + Omega
+			Omega = "list", # list of relative precision matrices
+			method = "character", # parameter estimation method
+			cnames = "list",# column names of model matrices
+			devComp = "numeric", # Components of deviance
+			deviance = "numeric", # Current deviance (ML and REML)
+			nc = "integer", # number of columns in (augmented)
+					# model matrices and number of observations
+			Gp = "integer", # Pointers to groups of rows in RZX
+			status = "logical"
+			),
+	 validity = function(object) {
+	     .Call("lmer_validate", object, PACKAGE = "Matrix")
+	 })
+
 ## Representation of a linear or generalized linear mixed effects model
 setClass("lmer",
 	 representation(assign = "integer", call = "call",

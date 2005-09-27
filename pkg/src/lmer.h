@@ -12,6 +12,7 @@
 #include "lgCMatrix.h"
 #include "lCholCMatrix.h"
 #include "Rmath.h"
+#include "chm_common.h"
 #include <R_ext/Lapack.h>
 #include <R_ext/Constants.h>
 
@@ -48,5 +49,6 @@ SEXP lmer_simulate(SEXP x, SEXP np, SEXP fxdp, SEXP mmats,
 		   SEXP useScP);
 SEXP lmer_update_y(SEXP x, SEXP y, SEXP mm);
 SEXP lmer_set_initial(SEXP x, SEXP iv);
+SEXP mer2_create(SEXP flist, SEXP mmats, SEXP method);
 
 #endif

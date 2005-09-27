@@ -3462,3 +3462,169 @@ SEXP lmer_update_y(SEXP x, SEXP y, SEXP mmats)
     status[0] = status[1] = 0;
     return R_NilValue;
 }
+
+static
+cholmod_sparse *factor_to_pattern(SEXP fact)
+{
+    int *vals = INTEGER(fact), i, n = LENGTH(fact),
+	nlev = LENGTH(getAttrib(fact, R_LevelsSymbol));
+    cholmod_sparse *A;
+
+    if (!isFactor(fact))
+	error("`fact' must be a factor");
+    A = cholmod_allocate_sparse((size_t) nlev, (size_t) n, (size_t) n,
+				TRUE, TRUE, 0, CHOLMOD_PATTERN, &c);
+    for (i = 0; i <= n; i++) ((int *) (A->p))[i] = i;
+    for (i = 0; i < n; i++) ((int *) (A->i))[i] = vals[i] - 1;
+    return A;
+}
+
+static
+cholmod_sparse *factor_mmat_to_sparse(SEXP fact, SEXP mm)
+{
+    int *vals = INTEGER(fact), i, j, n = LENGTH(fact),
+	nlev = LENGTH(getAttrib(fact, R_LevelsSymbol)),
+	*dims = INTEGER(getAttrib(mm, R_DimSymbol));
+    int nc = dims[1];
+    cholmod_sparse *A;
+
+    if (dims[0] != n)
+	error(_("all mmats[[%d]] must have %d rows"), n);
+    A = cholmod_allocate_sparse((size_t) nlev * nc, (size_t) n,
+				(size_t) n * nc,
+				TRUE, TRUE, 0, CHOLMOD_REAL, &c);
+    for (i = 0; i <= n; i++) ((int *) (A->p))[i] = i * nc;
+    for (i = 0; i < n; i++) {
+	int base = nc * (vals[i] - 1);
+	for (j = 0; j < nc; j++) {
+	    ((int *) (A->i))[i * nc + j] = base + j;
+	    ((double *) (A->x))[i * nc + j] = REAL(mm)[i + j * dims[0]];
+	}
+    }
+    return A;
+}
+
+/**
+ * Create an mer2 object from a list of grouping factors and a list of model
+ * matrices.  There is one more model matrix than grouping factor.  The last
+ * model matrix is the fixed effects and the response.
+ *
+ * @param flist pointer to a list of grouping factors
+ * @param mmats pointer to a list of model matrices
+ *
+ * @return pointer to an mer2 object
+ */
+SEXP mer2_create(SEXP flist, SEXP mmats, SEXP method)
+{
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("mer2")));
+    SEXP fl, perms;
+    int *nc, *Gp, *Perm, i, j, nf = length(flist), nobs;
+    cholmod_sparse **fmats = Calloc(nf, cholmod_sparse*);
+    cholmod_sparse *ZZ, *Zt, *Xt;
+    cholmod_dense *X;
+    cholmod_factor *F;
+				/* Check validity of flist */
+    if (!(nf > 0 && isNewList(flist)))
+	error(_("flist must be a non-empty list"));
+    nobs = length(VECTOR_ELT(flist, 0));
+    if (nobs < 1) error(_("flist[[0]] must be a non-null factor"));
+    fl = ALLOC_SLOT(val, Matrix_flistSym, VECSXP, nf);
+    perms = ALLOC_SLOT(val, Matrix_permSym, VECSXP, nf);
+    for (i = 0; i < nf; i++) {	/* Determine permutations */
+	int *iperm, *perm, nlev;
+	cholmod_sparse *A;
+	SEXP fi = VECTOR_ELT(flist, i);
+
+	if (!(isFactor(fi) && length(fi) == nobs))
+	    error(_("flist[[%d]] must be a factor of length %d"),
+		  i + 1, nobs);
+	nlev = (fmats[i] = factor_to_pattern(fi))->nrow;
+	SET_VECTOR_ELT(perms, i, allocVector(INTSXP, nlev));
+	perm = INTEGER(VECTOR_ELT(perms, i));
+	if (!i) {
+	    for (j = 0; j < nlev; j++) perm[j] = j;
+	} else {
+	    A = cholmod_allocate_sparse(nlev, 0, 0, 1, 1, 0,
+					CHOLMOD_PATTERN, &c);	
+	    for (j = 0; j < i; j++) {
+		cholmod_sparse *Bt = cholmod_transpose(fmats[j], 0, &c);
+		cholmod_sparse *Aj = cholmod_ssmult(fmats[i], Bt, 0, 0, 0, &c);
+		cholmod_sparse *Acp = cholmod_copy_sparse(A, &c);
+		
+		cholmod_free_sparse(&A, &c);
+		A = cholmod_horzcat(Acp, Aj, 0, &c);
+		cholmod_free_sparse(&Bt, &c);
+		cholmod_free_sparse(&Acp, &c);
+		cholmod_free_sparse(&Aj, &c);
+	    }
+	    j = c.supernodal;
+	    c.supernodal = CHOLMOD_SIMPLICIAL;
+	    F = cholmod_analyze(A, &c);
+	    c.supernodal = j;
+	    cholmod_free_sparse(&A, &c);
+	    Memcpy(perm, (int *)F->Perm, nlev);
+	    cholmod_free_factor(&F, &c);
+	}
+	iperm = Calloc(nlev, int);
+	for (j = 0; j < nlev; j++) iperm[perm[j]] = j;
+	SET_VECTOR_ELT(fl, i, duplicate(fi));
+	factor_levels_permute(VECTOR_ELT(fl, i), fi, perm, iperm);
+	Free(iperm);
+    }
+    for (i = 0; i < nf; i++) cholmod_free_sparse(&(fmats[i]), &c);
+    Free(fmats);
+				/* Check mmats; allocate and populate nc and Gp */
+    Zt = cholmod_allocate_sparse(0, nobs, 0, 1, 1, 0, CHOLMOD_REAL, &c);
+    if (!(isNewList(mmats) && length(mmats) == (nf + 1)))
+	error(_("mmats must be a list of length %d"), nf + 1);
+    nc = INTEGER(ALLOC_SLOT(val, Matrix_ncSym, INTSXP, nf + 2));
+    Gp = INTEGER(ALLOC_SLOT(val, Matrix_ncSym, INTSXP, nf + 2));
+    nc[nf + 1] = nobs;
+    Gp[0] = 0;
+    for (i = 0; i < nf; i++) {
+	cholmod_sparse *Ztcp = cholmod_copy_sparse(Zt, &c),
+	    *Zi = factor_mmat_to_sparse(VECTOR_ELT(fl, i), VECTOR_ELT(mmats, i));
+
+	Gp[i + 1] = Gp[i] + Zi->nrow;
+	nc[i] = INTEGER(getAttrib(VECTOR_ELT(mmats, i), R_DimSymbol))[1];
+	cholmod_free_sparse(&Zt, &c);
+	Zt = cholmod_vertcat(Ztcp, Zi, 1, &c);
+	cholmod_free_sparse(&Ztcp, &c);
+	cholmod_free_sparse(&Zi, &c);
+    }
+/* FIXME: pass the transpose of the model matrices in rather than doing the transposition here */
+#if 0
+				/* add X' as the last horizontal layer */
+    X = as_cholmod_dense(VECTOR_ELT(mmats, nf));
+    ZZ = cholmod_dense_to_sparse(X, 1, &c);
+    Free(X);
+    Xt = cholmod_transpose(ZZ, 1, &c);
+    cholmod_free_sparse(&ZZ, &c);
+    ZZ = cholmod_copy_sparse(Zt, &c);
+    Zt = cholmod_vertcat(ZZ, Xt, 1, &c);
+    cholmod_free_sparse(&ZZ, &c);
+    cholmod_free_sparse(&Xt, &c);
+#endif
+    
+    ZZ = cholmod_aat(Zt, (int *) NULL, (size_t) 0, 1, &c);
+    cholmod_free_sparse(&Zt, &c);
+    Zt = cholmod_copy(ZZ, 1, 1, &c);
+    cholmod_free_sparse(&ZZ, &c);
+    
+/* FIXME: Find a better way to do this */
+    Perm = Calloc(Zt->nrow, int);
+    for (i = 0; i < Zt->nrow; i++) Perm[i] = i;
+    j = c.supernodal;
+    c.supernodal = CHOLMOD_SUPERNODAL;
+    F = cholmod_analyze_p(Zt, Perm, (int *) NULL, 0, &c);
+    c.supernodal = j;
+    Free(Perm);
+    j = c.print;
+    c.print = 4;
+    cholmod_print_factor(F, "foo", &c);
+    cholmod_free_factor(&F, &c);
+    
+    SET_SLOT(val, Matrix_ZZpOSym, chm_sparse_to_SEXP(Zt, 1));
+    UNPROTECT(1);
+    return val;
+}
