@@ -158,6 +158,7 @@ SEXP ssc_transpose(SEXP x)
     return ans;
 }
 
+/* TODO: still needed with Csparse_to_Tsparse()  [ which does dsC -> dsT ] */
 SEXP dsCMatrix_to_dgTMatrix(SEXP x)
 {
     SEXP
@@ -271,10 +272,11 @@ SEXP dsCMatrix_metis_perm(SEXP x)
     return ans;
 }
 
-SEXP dsCMatrix_to_dgCMatrix(SEXP x)
+SEXP sCMatrix_to_gCMatrix(SEXP x)
 {
     cholmod_sparse *chx = as_cholmod_sparse(x);
-    cholmod_sparse *ans = cholmod_copy(chx, 0, 1, &c);
+    cholmod_sparse *ans = cholmod_copy(chx, /* stype: */ 0, chx->xtype, &c);
+    /* xtype: pattern, "real", complex or .. */
 
     Free(chx);
     return chm_sparse_to_SEXP(ans, 1);

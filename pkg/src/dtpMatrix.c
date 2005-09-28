@@ -14,6 +14,8 @@ SEXP dtpMatrix_validate(SEXP obj)
 	if (dims[0] != packed_ncol(length(GET_SLOT(obj, Matrix_xSym))))
 	    return(mkString(_("Incorrect length of 'x' slot")));
 	return ScalarLogical(1);
+
+
     }
 }
 

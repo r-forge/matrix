@@ -20,6 +20,7 @@
 #include "dtrMatrix.h"
 #include "dtpMatrix.h"
 #include "factorizations.h"
+#include "ldense.h"
 #include "lCholCMatrix.h"
 #include "lgCMatrix.h"
 #include "lgTMatrix.h"
@@ -104,8 +105,9 @@ static R_CallMethodDef CallEntries[] = {
     {"dsCMatrix_ldl_symbolic", (DL_FUNC) &dsCMatrix_ldl_symbolic, 2},
     {"dsCMatrix_matrix_solve", (DL_FUNC) &dsCMatrix_matrix_solve, 3},
     {"dsCMatrix_to_dgTMatrix", (DL_FUNC) &dsCMatrix_to_dgTMatrix, 1},
-    {"dsCMatrix_to_dgCMatrix", (DL_FUNC) &dsCMatrix_to_dgCMatrix, 1},
+    {"sCMatrix_to_gCMatrix", (DL_FUNC) &sCMatrix_to_gCMatrix, 1},
     {"dsCMatrix_validate", (DL_FUNC) &dsCMatrix_validate, 1},
+    {"dsTMatrix_as_dgTMatrix", (DL_FUNC) &dsTMatrix_as_dgTMatrix, 1},
     {"dsTMatrix_as_dsCMatrix", (DL_FUNC) &dsTMatrix_as_dsCMatrix, 1},
     {"dsTMatrix_as_dsyMatrix", (DL_FUNC) &dsTMatrix_as_dsyMatrix, 1},
     {"dsTMatrix_validate", (DL_FUNC) &dsTMatrix_validate, 1},
@@ -130,6 +132,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dspMatrix_trf", (DL_FUNC) &dspMatrix_trf, 1},
     {"dspMatrix_validate", (DL_FUNC) &dspMatrix_validate, 1},
     {"dtTMatrix_as_dtrMatrix", (DL_FUNC) &dtTMatrix_as_dtrMatrix, 1},
+    {"dtTMatrix_as_dtCMatrix", (DL_FUNC) &dtTMatrix_as_dtCMatrix, 1},
     {"dtTMatrix_validate", (DL_FUNC) &dtTMatrix_validate, 1},
     {"dtpMatrix_as_dtrMatrix", (DL_FUNC) &dtpMatrix_as_dtrMatrix, 1},
     {"dtpMatrix_dgeMatrix_mm", (DL_FUNC) &dtpMatrix_dgeMatrix_mm, 2},
@@ -158,6 +161,7 @@ static R_CallMethodDef CallEntries[] = {
     {"glmer_init", (DL_FUNC) &glmer_init, 1},
     {"glmer_ranef_update", (DL_FUNC) &glmer_ranef_update, 4},
     {"lapack_qr", (DL_FUNC) &lapack_qr, 2},
+
     {"lCholCMatrix_solve", (DL_FUNC) &lCholCMatrix_solve, 1},
     {"lCholCMatrix_lgCMatrix_solve", (DL_FUNC) &lCholCMatrix_lgCMatrix_solve, 2},
     {"lCholCMatrix_validate", (DL_FUNC) &lCholCMatrix_validate, 1},
@@ -169,6 +173,12 @@ static R_CallMethodDef CallEntries[] = {
     {"lgCMatrix_validate", (DL_FUNC) &lgCMatrix_validate, 1},
     {"lgTMatrix_as_lgCMatrix", (DL_FUNC) &lgTMatrix_as_lgCMatrix, 1},
     {"lgTMatrix_validate", (DL_FUNC) &lgTMatrix_validate, 1},
+
+    {"lspMatrix_as_lsyMatrix", (DL_FUNC) &lspMatrix_as_lsyMatrix, 1},
+    {"lsyMatrix_as_lspMatrix", (DL_FUNC) &lsyMatrix_as_lspMatrix, 1},
+    {"ltpMatrix_as_ltrMatrix", (DL_FUNC) &ltpMatrix_as_ltrMatrix, 1},
+    {"ltrMatrix_as_ltpMatrix", (DL_FUNC) &ltrMatrix_as_ltpMatrix, 1},
+
     {"lmer_Crosstab", (DL_FUNC) &lmer_Crosstab, 1},
     {"lmer_MCMCsamp", (DL_FUNC) &lmer_MCMCsamp, 4},
     {"lmer_ECMEsteps", (DL_FUNC) &lmer_ECMEsteps, 3},
