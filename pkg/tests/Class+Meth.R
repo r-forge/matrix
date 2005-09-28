@@ -1,4 +1,5 @@
 library(Matrix)
+source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 
 #### Automatically display the class inheritance structure
 #### possibly augmented with methods
@@ -53,11 +54,14 @@ no.show.classes <- paste(c("dgR", # only stub implementation
 			   "dtR", #  "
                            ## if(!is.R22) # format(<0-length-matrix>) bug
                            ## c("dtr", "dtp"),
-                           ## FIXME: since 2005-09-18 inheritance change;
-                           ## as(*, "matrix") gives infinite recursion :
-                           "lsC",
-                           "ltC",
+                           "lsp",
 			   ), "Matrix", sep='')
+
+no.t.classes <- paste(c("dgR", # only stub implementation
+                        "dsR", # dito
+                        "dtR", #  "
+                        ), "Matrix", sep='')
+
 
 mM <- Matrix(1:4 >= 4, 2,2)
 mm <- as(mM, "matrix")
@@ -66,15 +70,22 @@ for(cl in getClass("Matrix")@subclasses) {
     cat(clNam)
     if(isVirtualClass(clNam)) {
 	cat(" - is virtual\n")
-    }
-    else {
+    } else {
 	cat("; new(..):")
 	m <- new(clNam)
+
 	if(any(clNam == not.ok.classes)) {
 	    cat(" in 'stop list' - no validity\n")
-	}
-	else {
-	    cat("valid: ", validObject(m), "\n")
+	} else {
+	    cat("valid: ", validObject(m))
+
+            if(any(clNam == no.t.classes)) {
+                cat(" in t()-'stop list'\n")
+            } else {
+                cat("; t(t(m)) ==?== m :")
+                stopifnot(Qidentical(m, t(t(m))))
+                cat(" ok\n")
+            }
 
 	    ## The show() method implicitly tests
 	    ##	as( <obj> , "matrix")
@@ -94,6 +105,13 @@ for(cl in getClass("Matrix")@subclasses) {
 		    cat("valid:", validObject(m3), "\n")
 		}
 	    }
+
+            if(is(m, "dsparseMatrix")) {
+                ## make sure that we can coerce to  dgT* -- is needed, e.g. for "image"
+                cat("as dgT* ")
+                mgT <- as(m, "dgTMatrix")
+                cat("; valid dgT* coercion: ", validObject(mgT), "\n")
+            }
 	}
     }
 }
