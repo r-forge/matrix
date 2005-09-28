@@ -47,3 +47,31 @@ setMethod("t", signature(x = "ltpMatrix"),
           function(x) as(callGeneric(as(x, "ltrMatrix")), "ltpMatrix"))
 setMethod("t", signature(x = "lspMatrix"),
           function(x) as(callGeneric(as(x, "lsyMatrix")), "lspMatrix"))
+
+setMethod("!", "ltrMatrix",
+          function(e1) {
+              e1@x <- !e1@x
+              ## And now we must fill in the '!FALSE' results :
+
+              ## FIXME: the following should be .Call using
+              ##        a variation of make_array_triangular:
+              r <- as(e1, "lgeMatrix")
+              n <- e1@Dim[1]
+              coli <- rep(1:n, each=n)
+              rowi <- rep(1:n, n)
+              Udiag <- e1@diag == "U"
+              log.i <-
+                  if(e1@uplo == "U") {
+                      if(Udiag) rowi >= coli else rowi > coli
+                  } else {
+                      if(Udiag) rowi <= coli else rowi < coli
+                  }
+              r[log.i] <- TRUE
+              r
+          })
+
+setMethod("!", "ltpMatrix", function(e1) !as(x, "ltrMatrix"))
+
+## for the other ldense* ones:
+setMethod("!", "ldenseMatrix",
+          function(e1) { e1@x <- !e1@x ; e1 })

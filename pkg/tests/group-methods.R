@@ -36,4 +36,4 @@ stopifnot(class(sm) == class(mC),
           all.equal(0.1 * ((0 + 100*mC)/10), mC),
           all.equal(sqrt(mC ^ 2), mC))
 
-proc.time() # for ``statistical reasons''
+cat('Time elapsed: ', proc.time(),'\n') # "stats"
