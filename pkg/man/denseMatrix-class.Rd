@@ -19,6 +19,8 @@
   %%   or ./sparseMatrix-class.Rd  ???
   exactly those of its superclass \code{"Matrix"}, i.e.,
   \describe{
+    \item{\code{factors}:}{Object of class \code{"list"} - a list
+      of factorizations of the matrix.}
     \item{\code{Dim}:}{length 2 \code{"integer"}}
     \item{\code{Dimnames}:}{\code{"list"} of length 2,}
   }
@@ -34,7 +36,8 @@
   see \code{\link{[-methods}}.%-> ./Xtrct-methods.Rd
 }
 \seealso{
-  \code{\link{Matrix-class}},
+  Its superclass \code{\link{Matrix-class}},
+  and main subclasses,
   \code{\link{ddenseMatrix-class}}
   \code{\link{sparseMatrix-class}}
 }

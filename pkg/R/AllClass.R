@@ -6,8 +6,9 @@
 ## ------------- Virtual Classes ----------------------------------------
 
 ## Mother class of all Matrix objects
-setClass("Matrix", representation(Dim = "integer", Dimnames = "list",
-				  "VIRTUAL"),
+setClass("Matrix",
+	 representation(Dim = "integer", Dimnames = "list", factors = "list",
+			"VIRTUAL"),
 	 prototype = prototype(Dim = integer(2), Dimnames = list(NULL,NULL)),
 	 validity = function(object) {
 	     Dim <- object@Dim
@@ -48,21 +49,20 @@ setClass("zMatrix", # letter 'z' is as in the names of Lapack subroutines
 	 representation(x = "complex", "VIRTUAL"), contains = "Matrix")
 
 ## Virtual class of dense matrices
-setClass("denseMatrix", representation("VIRTUAL"), contains = "Matrix")
+setClass("denseMatrix", representation("VIRTUAL"),
+         contains = "Matrix")
 
 ## Virtual class of dense, numeric matrices
-setClass("ddenseMatrix",
-	 representation(rcond = "numeric", factors = "list", "VIRTUAL"),
+setClass("ddenseMatrix", representation(rcond = "numeric", "VIRTUAL"),
 	 contains = c("dMatrix", "denseMatrix"))
 
 ## Virtual class of dense, logical matrices
-setClass("ldenseMatrix",
-	 representation(x = "logical", factors = "list", "VIRTUAL"),
+setClass("ldenseMatrix", representation(x = "logical", "VIRTUAL"),
 	 contains = c("lMatrix", "denseMatrix"))
 
 ## virtual SPARSE ------------
 
-setClass("sparseMatrix", representation(factors = "list", "VIRTUAL"), contains = "Matrix")
+setClass("sparseMatrix", representation("VIRTUAL"), contains = "Matrix")
 
 ## sparse matrices in Triplet representation (dgT, lgT, ..):
 setClass("TsparseMatrix", representation(i = "integer", j = "integer", "VIRTUAL"),
@@ -93,10 +93,11 @@ setClass("dgeMatrix", contains = "ddenseMatrix",
 
 ## numeric, dense, non-packed, triangular matrices
 setClass("dtrMatrix",
-         ## 'ddense*' before 'dge*' so it can use d* or ddense* methods
-         ## WITHOUT a coerce to dge* (losing triangularity)
-         ##-- gives error from callNextMethod() in crossprod() dispatch {R bug ??}
-	 ##-- contains = c("ddenseMatrix", "dgeMatrix", "triangularMatrix"),
+         ## FIXME?
+         ##> 'ddense*' before 'dge*' so it can use d* or ddense* methods
+         ##> WITHOUT a coerce to dge* (losing triangularity)
+         ##> gives error from callNextMethod() in crossprod() dispatch {R bug?}
+	 ##> contains = c("ddenseMatrix", "dgeMatrix", "triangularMatrix"),
 	 contains = c("dgeMatrix", "triangularMatrix"),
 	 prototype = prototype(uplo = "U", diag = "N"),
 	 validity = function(object) .Call("dtrMatrix_validate", object)
@@ -111,10 +112,11 @@ setClass("dtpMatrix",
 
 ## numeric, dense, non-packed symmetric matrices
 setClass("dsyMatrix",
-         ## 'ddense*' before 'dge*' so it can use d* or ddense* methods
-         ## WITHOUT a coerce to dge* (losing triangularity)
-         ##-- gives error in crossprod() dispatch
-	 ##-- contains = c("ddenseMatrix", "dgeMatrix", "symmetricMatrix"),
+         ## FIXME?
+         ##> 'ddense*' before 'dge*' so it can use d* or ddense* methods
+         ##> WITHOUT a coerce to dge* (losing triangularity)
+         ##> gives error in crossprod() dispatch
+	 ##> contains = c("ddenseMatrix", "dgeMatrix", "symmetricMatrix"),
 	 contains = c("dgeMatrix", "symmetricMatrix"),
 	 prototype = prototype(uplo = "U"),
 	 validity = function(object) .Call("dsyMatrix_validate", object)
@@ -231,7 +233,7 @@ setClass("dsCMatrix",
 
 ## numeric, sparse, sorted compressed sparse row-oriented general matrices
 setClass("dgRMatrix",
-	 representation(j = "integer", p = "integer", factors = "list"),
+	 representation(j = "integer", p = "integer"),
 	 contains = "dsparseMatrix",
 	 ##TODO: validity = function(object) .Call("dgRMatrix_validate", object)
 	 )
@@ -340,12 +342,12 @@ setClass("lCholCMatrix",
 
 ##-------------------- permutation ----------------------------------------
 
-setClass("pMatrix", representation(perm = "integer"), contains = "Matrix",
+setClass("pMatrix", representation(perm = "integer"),
+         contains = "sparseMatrix",
 	 validity = function(object) {
-	     dd <- object@Dim
-	     n <- dd[1]
+	     d <- object@Dim
+	     if (d[2] != (n <- d[1])) return("pMatrix must be square")
 	     perm <- object@perm
-	     if (dd[2] != n) return("pMatrix must be symmetric")
 	     if (length(perm) != n)
 		 return(paste("length of 'perm' slot must be", n))
 	     if(n > 0 &&
@@ -353,6 +355,12 @@ setClass("pMatrix", representation(perm = "integer"), contains = "Matrix",
 		 return("'perm' slot is not a valid permutation")
 	     TRUE
 	 })
+
+### Class Union :  no inheritance, but is(*, <class>) :
+setClassUnion("packedMatrix",
+              members = c("dspMatrix", "dppMatrix", "dtpMatrix",
+               "lspMatrix", "ltpMatrix"))
+
 
 ## --------------------- non-"Matrix" Classes --------------------------------
 

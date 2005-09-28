@@ -68,6 +68,7 @@
   {Of course, we don't need a workaround but must understand
    and solve the problem}
 
+-  slot "factors" maybe should move up to "Matrix" -- done, 2005-09-28
 
 - arithmetic for sparse matrices:
      done for    <sparseMatrix>  o  <scalar>
