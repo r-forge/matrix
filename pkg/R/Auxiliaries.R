@@ -8,6 +8,15 @@
 .has.DN <- ## has non-trivial Dimnames slot?
     function(x) !identical(list(NULL,NULL), x@Dimnames)
 
+.bail.out.1 <- function(fun, cl) {
+    stop(gettextf('not-yet-implemented method for %s(<%s>)', fun, cl),
+         call. = FALSE)
+}
+.bail.out.2 <- function(fun, cl1, cl2) {
+    stop(gettextf('not-yet-implemented method for %s(<%s>, <%s>)',
+                  fun, cl1, cl2), call. = FALSE)
+}
+
 ## chol() via "dpoMatrix"
 cholMat <- function(x, pivot, LINPACK) {
     px <- as(x, "dpoMatrix")

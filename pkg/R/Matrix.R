@@ -98,16 +98,6 @@ setMethod("%*%", signature(x = "Matrix", y = "Matrix"),
           stop(gettextf('not-yet-implemented method for <%s> %%*%% <%s>',
                         class(x), class(y))))
 
-## Move this to ./Auxiliaries.R
-.bail.out.1 <- function(fun, cl) {
-    stop(gettextf('not-yet-implemented method for %s(<%s>)', fun, cl),
-         call. = FALSE)
-}
-.bail.out.2 <- function(fun, cl1, cl2) {
-    stop(gettextf('not-yet-implemented method for %s(<%s>, <%s>)',
-                  fun, cl1, cl2), call. = FALSE)
-}
-
 setMethod("crossprod", signature(x = "Matrix", y = "ANY"),
 	  function (x, y = NULL) .bail.out.2(.Generic, class(x), class(y)))
 
