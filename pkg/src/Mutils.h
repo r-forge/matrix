@@ -61,12 +61,22 @@ void ssc_symbolic_permute(int n, int upper, const int perm[],
 			  int Ap[], int Ai[]);
 SEXP Matrix_make_named(int TYP, char **names);
 SEXP check_scalar_string(SEXP sP, char *vals, char *nm);
-double *packed_to_full(double *dest, const double *src, int n,
-		       enum CBLAS_UPLO uplo);
-double *full_to_packed(double *dest, const double *src, int n,
-		       enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
 double *packed_getDiag(double *dest, SEXP x);
 SEXP Matrix_getElement(SEXP list, char *nm);
+
+#define PACKED_TO_FULL(TYPE)						\
+TYPE *packed_to_full_ ## TYPE(TYPE *dest, const TYPE *src,		\
+			     int n, enum CBLAS_UPLO uplo)
+PACKED_TO_FULL(double);
+PACKED_TO_FULL(int);
+#undef PACKED_TO_FULL
+
+#define FULL_TO_PACKED(TYPE)						\
+TYPE *full_to_packed_ ## TYPE(TYPE *dest, const TYPE *src, int n,	\
+			      enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag)
+FULL_TO_PACKED(double);
+FULL_TO_PACKED(int);
+#undef FULL_TO_PACKED
 
 
 extern	 /* stored pointers to symbols initialized in R_init_Matrix */

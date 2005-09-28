@@ -274,9 +274,10 @@ SEXP dsyMatrix_as_dspMatrix(SEXP from)
 	     duplicate(GET_SLOT(from, Matrix_rcondSym)));
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
     SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
-    full_to_packed(REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, (n*(n+1))/2)),
-		   REAL(GET_SLOT(from, Matrix_xSym)), n,
-		   *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW, NUN);
+    full_to_packed_double(
+	REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, (n*(n+1))/2)),
+	REAL(GET_SLOT(from, Matrix_xSym)), n,
+	*CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW, NUN);
     UNPROTECT(1);
     return val;
 }

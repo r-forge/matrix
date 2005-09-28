@@ -12,9 +12,9 @@ SEXP lspMatrix_as_lsyMatrix(SEXP from)
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
     SET_SLOT(val, Matrix_DimNamesSym, duplicate(dmnP));
     SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
-    packed_to_full(LOGICAL(ALLOC_SLOT(val, Matrix_xSym, LGLSXP, n*n)),
-		   LOGICAL( GET_SLOT(from, Matrix_xSym)), n,
-		   *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW);
+    packed_to_full_int(LOGICAL(ALLOC_SLOT(val, Matrix_xSym, LGLSXP, n*n)),
+		       LOGICAL( GET_SLOT(from, Matrix_xSym)), n,
+		       *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW);
     UNPROTECT(1);
     return val;
 }
@@ -29,9 +29,10 @@ SEXP lsyMatrix_as_lspMatrix(SEXP from)
 
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
     SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
-    full_to_packed(LOGICAL(ALLOC_SLOT(val, Matrix_xSym, LGLSXP, (n*(n+1))/2)),
-		   LOGICAL( GET_SLOT(from, Matrix_xSym)), n,
-		   *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW, NUN);
+    full_to_packed_int(
+	LOGICAL(ALLOC_SLOT(val, Matrix_xSym, LGLSXP, (n*(n+1))/2)),
+	LOGICAL( GET_SLOT(from, Matrix_xSym)), n,
+	*CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW, NUN);
     UNPROTECT(1);
     return val;
 }
@@ -50,9 +51,9 @@ SEXP ltpMatrix_as_ltrMatrix(SEXP from)
     SET_SLOT(val, Matrix_DimNamesSym, duplicate(dmnP));
     SET_SLOT(val, Matrix_diagSym, duplicate(diag));
     SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
-    packed_to_full(LOGICAL(ALLOC_SLOT(val, Matrix_xSym, LGLSXP, n*n)),
-		   LOGICAL(GET_SLOT(from, Matrix_xSym)), n,
-		   *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW);
+    packed_to_full_int(LOGICAL(ALLOC_SLOT(val, Matrix_xSym, LGLSXP, n*n)),
+		       LOGICAL(GET_SLOT(from, Matrix_xSym)), n,
+		       *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW);
     UNPROTECT(1);
     return val;
 }
@@ -69,10 +70,11 @@ SEXP ltrMatrix_as_ltpMatrix(SEXP from)
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
     SET_SLOT(val, Matrix_diagSym, duplicate(diag));
     SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
-    full_to_packed(LOGICAL(ALLOC_SLOT(val, Matrix_xSym, LGLSXP, (n*(n+1))/2)),
-		   LOGICAL(GET_SLOT(from, Matrix_xSym)), n,
-		   *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW,
-		   *CHAR(STRING_ELT(diag, 0)) == 'U' ? UNT : NUN);
+    full_to_packed_int(
+	LOGICAL(ALLOC_SLOT(val, Matrix_xSym, LGLSXP, (n*(n+1))/2)),
+	LOGICAL(GET_SLOT(from, Matrix_xSym)), n,
+	*CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW,
+	*CHAR(STRING_ELT(diag, 0)) == 'U' ? UNT : NUN);
     UNPROTECT(1);
     return val;
 }
