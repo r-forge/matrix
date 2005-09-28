@@ -24,6 +24,16 @@ cholMat <- function(x, pivot, LINPACK) {
     else stop("'x' is not positive definite -- chol() undefined.")
 }
 
+dimCheck <- function(a, b) {
+    da <- dim(a)
+    db <- dim(b)
+    if(any(da != db))
+	stop(gettextf("Matrices must have same dimensions in %s",
+		      deparse(sys.call(sys.parent()))),
+	     call. = FALSE)
+    da
+}
+
 rowCheck <- function(a, b) {
     da <- dim(a)
     db <- dim(b)
@@ -96,7 +106,8 @@ non0ind <- function(x) {
 
     stopifnot(is(x, "sparseMatrix"))
     if(is(x, "TsparseMatrix"))
-        stop("'x' must be column- or row-compressed  'sparseMatrix'")
+	return(unique(cbind(x@i,x@j)))
+
     isCol <- function(M) any("i" == slotNames(M))
     .Call("compressed_non_0_ij", x, isCol(x), PACKAGE = "Matrix")
 }

@@ -25,3 +25,7 @@ setMethod("crossprod", signature(x = "lsparseMatrix", y = "lsparseMatrix"),
           function(x, y = NULL)
           callGeneric(as(x, "lgCMatrix"), as(y, "lgCMatrix")))
 
+setMethod("!", "lsparseMatrix",
+          ## turns FALSE to TRUE --> dense matrix
+          function(e1) !as(e1, "lgeMatrix"))
+

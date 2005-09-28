@@ -1,3 +1,8 @@
+2005-09-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R (Matrix): get logical argument 'sparse' with a smart
+	default.
+
 2005-09-26  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* tests/Class+Meth.R: new tests; t(t(m)) == m

@@ -57,19 +57,41 @@ setMethod("unname", signature("Matrix", force="missing"),
 	  function(obj) { obj@Dimnames <- list(NULL,NULL); obj})
 
 Matrix <-
-    function (data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL)
+    function (data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL,
+              sparse = NULL)
 {
-    if (is(data, "Matrix")) return(data)
-    if (is.matrix(data)) { val <- data }
-    else { ## cut & paste from "base::matrix" :
+    sparseDefault <- function(m)
+        prod(dim(m)) > 2*sum(as(m, "matrix") != 0)
+
+    i.M <- is(data, "Matrix")
+    if(is.null(sparse) && (i.M || is(data, "matrix")))
+        sparse <- sparseDefault(data)
+
+    if (i.M) {
+        sM <- is(data,"sparseMatrix")
+        if((sparse && sM) || (!sparse && !sM))
+            return(data)
+        ## else : convert  dense <-> sparse -> at end
+    }
+    else if (!is.matrix(data)) { ## cut & paste from "base::matrix" :
 	if (missing(nrow))
 	    nrow <- ceiling(length(data)/ncol)
 	else if (missing(ncol))
 	    ncol <- ceiling(length(data)/nrow)
-	val <- .Internal(matrix(data, nrow, ncol, byrow))
-	dimnames(val) <- dimnames
+	data <- .Internal(matrix(data, nrow, ncol, byrow))
+        if(is.null(sparse))
+            sparse <- sparseDefault(data)
+	dimnames(data) <- dimnames
     }
-    as(val, "dgeMatrix")
+
+    ## 'data' is now a "matrix" or "Matrix"
+    ## FIXME: consider it's type (logical,....)
+    ## ctype <- substr(class(data), 1,1) # "d", "l", ...
+    ## FIXME(2): check for symmetric / triangular / ...
+    if(sparse)
+        as(data, "dgCMatrix")
+    else
+        as(data, "dgeMatrix")
 }
 
 ## Methods for operations where one argument is numeric
@@ -106,7 +128,10 @@ setMethod("t", signature(x = "Matrix"),
 
 ## Group Methods (bail-out)
 setMethod("Compare", signature(e1 = "Matrix", e2 = "Matrix"),
-          function(e1, e2) .bail.out.2(.Generic, class(e1), class(e2)))
+          function(e1, e2) {
+              d <- dimCheck(e1,e2)
+              .bail.out.2(.Generic, class(e1), class(e2))
+          })
 setMethod("Compare", signature(e1 = "Matrix", e2 = "ANY"),
           function(e1, e2) .bail.out.2(.Generic, class(e1), class(e2)))
 setMethod("Compare", signature(e1 = "ANY", e2 = "Matrix"),

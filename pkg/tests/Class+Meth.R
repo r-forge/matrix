@@ -33,7 +33,7 @@ mT <- as(mC <- as(m, "dgCMatrix"), "dgTMatrix")
 stopifnot(identical(as(mT,"dgCMatrix"), mC))
 (mlC <- as(as(mT[1:2, 2:3], "dgCMatrix"), "lgCMatrix"))
 
-if(FALSE) ## ltC no longer extends lgC -- but need coercion possibility FIXME
+if(FALSE) ## ltC no longer extends lgC -- want coercion possibility FIXME
 as(mlC,"ltCMatrix")
 
 
@@ -52,16 +52,9 @@ not.ok.classes <- paste(c("lgR", # only stub implementation
 no.show.classes <- paste(c("dgR", # only stub implementation
 			   "dsR", # dito
 			   "dtR", #  "
-                           ## if(!is.R22) # format(<0-length-matrix>) bug
-                           ## c("dtr", "dtp"),
-                           "lsp",
 			   ), "Matrix", sep='')
 
-no.t.classes <- paste(c("dgR", # only stub implementation
-                        "dsR", # dito
-                        "dtR", #  "
-                        ), "Matrix", sep='')
-
+no.t.classes <- no.show.classes # for the moment
 
 mM <- Matrix(1:4 >= 4, 2,2)
 mm <- as(mM, "matrix")
@@ -87,8 +80,7 @@ for(cl in getClass("Matrix")@subclasses) {
                 cat(" ok\n")
             }
 
-	    ## The show() method implicitly tests
-	    ##	as( <obj> , "matrix")
+	    ## The show() method implicitly tests as( <obj> , "matrix"):
 	    if(all(clNam != no.show.classes))
 		show(m)
 	    else cat("	-- no show() yet \n")
@@ -105,6 +97,15 @@ for(cl in getClass("Matrix")@subclasses) {
 		    cat("valid:", validObject(m3), "\n")
 		}
 	    }
+
+##             if(is(m, "denseMatrix")) {
+##                 ## .........
+##                 cat("as dsparse* ")
+##                 msp <- as(m, "dsparseMatrix")
+##                 cat("; valid coercion: ", validObject(msp), "\n")
+##             } else if(is(m, "sparseMatrix")) {
+
+##             } else cat("-- not dense nor sparse -- should not happen(!?)\n")
 
             if(is(m, "dsparseMatrix")) {
                 ## make sure that we can coerce to  dgT* -- is needed, e.g. for "image"

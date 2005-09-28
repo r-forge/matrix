@@ -33,7 +33,6 @@ setMethod("image", "dsparseMatrix",
           function(x, ...) image(as(x, "dgTMatrix"), ...))
 
 
-
 ## Group Methods, see ?Arith (e.g.)
 ## -----
 
