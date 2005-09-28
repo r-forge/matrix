@@ -70,7 +70,7 @@ setMethod("norm", signature(x = "dspMatrix", type = "missing"),
           function(x, type, ...) .Call("dspMatrix_norm", x, "O"),
           valueClass = "numeric")
 
-setMethod("t", signature(x = "dsyMatrix"), # need a t method for dsyMatrix
+setMethod("t", signature(x = "dspMatrix"),
           function(x) as(t(as(x, "dsyMatrix")), "dspMatrix"),
           valueClass = "dspMatrix")
 

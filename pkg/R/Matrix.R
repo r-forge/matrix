@@ -97,10 +97,31 @@ setMethod("%*%", signature(x = "Matrix", y = "Matrix"),
 	  function (x, y)
           stop(gettextf('not-yet-implemented method for <%s> %%*%% <%s>',
                         class(x), class(y))))
+
+## Move this to ./Auxiliaries.R
+.bail.out.1 <- function(fun, cl) {
+    stop(gettextf('not-yet-implemented method for %s(<%s>)', fun, cl),
+         call. = FALSE)
+}
+.bail.out.2 <- function(fun, cl1, cl2) {
+    stop(gettextf('not-yet-implemented method for %s(<%s>, <%s>)',
+                  fun, cl1, cl2), call. = FALSE)
+}
+
 setMethod("crossprod", signature(x = "Matrix", y = "ANY"),
-	  function (x, y = NULL)
-          stop(gettextf('not-yet-implemented method for crossprod(<%s>, <%s>)',
-                        class(x), class(y))))
+	  function (x, y = NULL) .bail.out.2(.Generic, class(x), class(y)))
+
+setMethod("t", signature(x = "Matrix"),
+	  function(x) .bail.out.1(.Generic, class(x)))
+
+## Group Methods (bail-out)
+setMethod("Compare", signature(e1 = "Matrix", e2 = "Matrix"),
+          function(e1, e2) .bail.out.2(.Generic, class(e1), class(e2)))
+setMethod("Compare", signature(e1 = "Matrix", e2 = "ANY"),
+          function(e1, e2) .bail.out.2(.Generic, class(e1), class(e2)))
+setMethod("Compare", signature(e1 = "ANY", e2 = "Matrix"),
+          function(e1, e2) .bail.out.2(.Generic, class(e1), class(e2)))
+
 
 
 ### --------------------------------------------------------------------------

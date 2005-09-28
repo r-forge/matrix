@@ -29,6 +29,11 @@ setMethod("crossprod", signature(x = "dsparseMatrix", y = "dgeMatrix"),
 setMethod("crossprod", signature(x = "dgeMatrix", y = "dsparseMatrix"),
           function(x, y = NULL) callGeneric(x, as(y, "dgCMatrix")))
 
+setMethod("image", "dsparseMatrix",
+          function(x, ...) image(as(x, "dgTMatrix"), ...))
+
+
+
 ## Group Methods, see ?Arith (e.g.)
 ## -----
 
@@ -45,12 +50,19 @@ setMethod("crossprod", signature(x = "dgeMatrix", y = "dsparseMatrix"),
 ##           function(e1, e2) callGeneric(e1, as(e2, "dgCMatrix")))
 
 setMethod("Math",
-          signature(x = "dsparseMatrix"),
-          function(x) callGeneric(as(x, "dgCMatrix")))
+	  signature(x = "dsparseMatrix"),
+	  function(x) {
+	      r <- callGeneric(as(x, "dgCMatrix"))
+	      if(is(r, "dsparseMatrix")) as(r, class(x))
+	  })
 
+if(FALSE) ## unneeded with "Math2" in ./dMatrix.R
 setMethod("Math2",
-          signature(x = "dsparseMatrix", digits = "numeric"),
-          function(x, digits) callGeneric(as(x, "dgCMatrix"), digits = digits))
+	  signature(x = "dsparseMatrix", digits = "numeric"),
+	  function(x, digits) {
+	      r <- callGeneric(as(x, "dgCMatrix"), digits = digits)
+	      if(is(r, "dsparseMatrix")) as(r, class(x))
+	  })
 
 
 ### cbind2 / rbind2

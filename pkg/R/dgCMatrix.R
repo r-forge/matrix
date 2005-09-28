@@ -156,6 +156,7 @@ setMethod("Math",
 	      }
 	  })
 
+if(FALSE) ## unneeded with "Math2" in ./dMatrix.R
 setMethod("Math2",
 	  signature(x = "dgCMatrix", digits = "numeric"),
 	  function(x, digits) {

@@ -8,7 +8,7 @@ setAs("dsyMatrix", "dgeMatrix",
 ##       ## R BUG:  test() doesn't see Matrix-internal functions
 ##       test = function(from) Matrix:::isSymmetric(from),
 ##       replace = function(obj, value) ## copy all slots
-##       for(n in slotnames(obj)) slot(obj, n) <- slot(value, n)
+##       for(n in slotNames(obj)) slot(obj, n) <- slot(value, n)
 ##       )
 
 setAs("dsyMatrix", "matrix",
@@ -16,6 +16,17 @@ setAs("dsyMatrix", "matrix",
 
 setAs("dsyMatrix", "dspMatrix",
       function(from) .Call("dsyMatrix_as_dspMatrix", from) )
+
+setAs("dsyMatrix", "dsTMatrix",
+      function(from) {
+          ## This is not very efficient (FIXME)
+          ij <- which(as(from,"matrix") != 0, arr.ind = TRUE)
+          new("dsTMatrix", i = ij[,1], j = ij[,2],
+              Dim = from@Dim, Dimnames = from@Dimnames)
+      })
+setAs("dsyMatrix", "dsCMatrix",
+      function(from) callGeneric(as(from, "dsTMatrix")))
+
 
 ## Note: Just *because* we have an explicit  dtr -> dge coercion,
 ##       show( <ddenseMatrix> ) is not okay, and we need our own:
@@ -64,15 +75,8 @@ setMethod("norm", signature(x = "dsyMatrix", type = "missing"),
 ## and vice-versa?
 ## MM: I think yes, since the other part can be filled arbitrarily (wrongly)
 ##WAS setMethod("t", signature(x = "dsyMatrix"), function(x) x)
-setMethod("t", signature(x = "dsyMatrix"),
-	  function(x) {
-	      new("dsyMatrix",
-                  Dim = x@Dim[2:1], Dimnames = x@Dimnames[2:1],
-                  x = as.vector(t(as(x, "matrix"))),
-                  uplo = if (x@uplo == "U") "L" else "U",
-                  rcond = x@rcond)
-          }, valueClass = "dsyMatrix")
-
+setMethod("t", signature(x = "dsyMatrix"), t_trMatrix,
+          valueClass = "dsyMatrix")
 
 ## The following has the severe effect of making
 ## "dsyMatrix" a subclass of "dpoMatrix" and since the reverse is
@@ -83,7 +87,7 @@ setIs("dsyMatrix", "dpoMatrix",
           "try-error" != class(try(.Call("dpoMatrix_chol", obj), TRUE)),
       ## MM: The following is necessary -- but shouldn't it be the default in such a case ??
       replace = function(obj, value) ## copy all slots
-      for(n in slotnames(obj)) slot(obj, n) <- slot(value, n)
+      for(n in slotNames(obj)) slot(obj, n) <- slot(value, n)
       )
 
 ## Now that we have "chol", we can define  "determinant" methods,

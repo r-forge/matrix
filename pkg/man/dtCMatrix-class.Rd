@@ -4,7 +4,9 @@
 \alias{dtTMatrix-class}
 \alias{coerce,dtCMatrix,dgTMatrix-method}
 \alias{coerce,dtCMatrix,dgeMatrix-method}
+\alias{coerce,dtTMatrix,dgTMatrix-method}
 \alias{coerce,dtTMatrix,dgeMatrix-method}
+\alias{coerce,dtTMatrix,dtCMatrix-method}
 \alias{coerce,dtTMatrix,dtrMatrix-method}
 \alias{coerce,dtTMatrix,matrix-method}
 \alias{image,dtCMatrix-method}
@@ -76,6 +78,11 @@
 showClass("dtCMatrix")
 
 showClass("dtTMatrix")
+t1 <- new("dtTMatrix", x= c(3,7), i= 0:1, j=3:2, Dim= as.integer(c(4,4)))
+t1
+## from  0-diagonal to unit-diagonal {low-level step}:
+tu <- t1 ; tu@diag <- "U"
+tu
 }
 \keyword{classes}
 \keyword{algebra}
