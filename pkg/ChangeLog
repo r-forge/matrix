@@ -1,3 +1,14 @@
+2005-09-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/Class+Meth.R: new tests; t(t(m)) == m
+
+	* src/dtCMatrix.c (tsc_transpose): add forgotten "diag" slot
+
+	* src/dsTMatrix.c (dsTMatrix_as_dsCMatrix): bad typo (segfault!)
+	* src/dtTMatrix.c (dtTMatrix_as_dtCMatrix): new
+
+	* R/dspMatrix.R: typo in "t" method
+
 2005-09-18  Douglas Bates  <bates@wisc.edu>
 
 	* R/AllClass.R (TsparseMatrix), CsparseM* and RsparseM*
