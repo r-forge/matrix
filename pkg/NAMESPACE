@@ -101,14 +101,20 @@ exportClasses(
 	      "dtpMatrix",
 	      "dtrMatrix",
 
+	      "lgeMatrix",
+	      "lspMatrix",
+	      "lsyMatrix",
+	      "ltpMatrix",
+	      "ltrMatrix",
+
 	      "lgCMatrix",
-	      "lsCMatrix",
-	      "ltCMatrix",
 	      "lgRMatrix",
-	      "lsRMatrix",
-	      "ltRMatrix",
 	      "lgTMatrix",
+	      "lsCMatrix",
+	      "lsRMatrix",# unused
 	      "lsTMatrix",
+	      "ltCMatrix",
+	      "ltRMatrix",# unused
 	      "ltTMatrix",
 
 	      "corrmatrix",
@@ -127,6 +133,8 @@ exportMethods(
 	      "Arith",
 	      "Math",
 	      "Math2",
+	      "Summary",
+	      "Compare",
 
 	      "+",# for dgT(Matrix) only
 	      "%*%",

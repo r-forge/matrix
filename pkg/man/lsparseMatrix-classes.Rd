@@ -10,6 +10,7 @@
 \alias{lgTMatrix-class}
 \alias{ltTMatrix-class}
 \alias{lsTMatrix-class}
+%
 \alias{\%*\%,lgCMatrix,lgCMatrix-method}
 \alias{\%*\%,lsparseMatrix,lsparseMatrix-method}
 \alias{\%*\%,lsparseMatrix,ldenseMatrix-method}
@@ -20,11 +21,17 @@
 \alias{coerce,lgCMatrix,dgCMatrix-method}
 \alias{coerce,lgCMatrix,lgTMatrix-method}
 \alias{coerce,lgCMatrix,matrix-method}
-\alias{coerce,lgTMatrix,lgCMatrix-method}
 \alias{coerce,lgTMatrix,dgTMatrix-method}
+\alias{coerce,lgTMatrix,lgCMatrix-method}
 \alias{coerce,lgTMatrix,matrix-method}
+\alias{coerce,lsCMatrix,dgTMatrix-method}
 \alias{coerce,lsCMatrix,dsCMatrix-method}
+\alias{coerce,lsCMatrix,lgCMatrix-method}
+\alias{coerce,lsCMatrix,lsTMatrix-method}
+\alias{coerce,lsCMatrix,matrix-method}
 \alias{coerce,ltCMatrix,dtCMatrix-method}
+\alias{coerce,ltCMatrix,matrix-method}
+%
 \alias{crossprod,lgCMatrix,missing-method}
 \alias{crossprod,lgTMatrix,missing-method}
 \alias{crossprod,lsparseMatrix-method}

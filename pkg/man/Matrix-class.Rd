@@ -22,8 +22,13 @@
 \alias{dimnames<-,Matrix,list-method}
 \alias{show,Matrix-method}
 \alias{as.matrix,Matrix-method}
+\alias{t,Matrix-method}
 \alias{unname,Matrix-method}
 %\alias{coerce,Matrix,matrix-method}
+\alias{Compare,Matrix,Matrix-method}
+\alias{Compare,Matrix,ANY-method}
+\alias{Compare,ANY,Matrix-method}
+%
 \title{Virtual Class "Matrix" Class of Matrices}
 \description{
   The \code{Matrix} class is a class contained by all actual

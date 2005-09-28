@@ -62,13 +62,38 @@ setMethod("Math",
           function(x) callGeneric(as(x, "dgeMatrix")))
 
 setMethod("Math2",
+          ## Assume that  Generic(u, k) |--> u for u in {0,1}
+          ## which is true for round(), signif() ==> all structure maintained
           signature(x = "dMatrix", digits = "numeric"),
-          function(x, digits) callGeneric(as(x, "dgeMatrix"), digits = digits))
+	  function(x, digits) {
+              x@x <- callGeneric(x@x, digits = digits)
+              x
+          })
 
-## This doesn't work yet because of an R bug (2005-08-26):
+## This needs extra work in ./AllGeneric.R :
 setMethod("Summary", signature(x = "dMatrix", na.rm = "ANY"),
-          function(x, ..., na.rm) callGeneric(x = x@x))
+          function(x, ..., na.rm) callGeneric(x@x, ..., na.rm = na.rm))
 
 ## TODO :  "Compare" -> returning  logical Matrices
+setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
+	  function(e1, e2) {
+	      lClass <- sub("^d", "l", class(e1))
+	      cat("Compare", class(e1), "|-> ",lClass, "\n")
+	      r <- callGeneric(e1@x, e2)
+	      if(is(e1, "denseMatrix")) {
+		  r <- new(lClass, x = r, Dim = dim(e1), Dimnames = dimnames(e1))
+	      } else { ## sparseMatrix
+
+		  stop("'Compare' for sparse dMatrix not yet implemented")
+
+		  if(identical(FALSE, r0 <- callGeneric(0, e2))) {
+		      ## return (potentially even more) sparse logical Matrix
+		      r <- new(lClass, Dim = dim(e1), Dimnames = dimnames(e1))
+
+		  } else { ## non sparse result
+
+		  }
+	      }
+	  })
 
 ## -- end{group generics} -----------------------

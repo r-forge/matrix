@@ -1,8 +1,9 @@
 \name{dsCMatrix-class}
-\title{Symmetric, compressed, sparse column matrices}
+\title{Numeric Symmetric Sparse (column compressed) Matrices}
 \docType{class}
 \alias{dsCMatrix-class}
 \alias{dsTMatrix-class}
+%
 \alias{solve,dsCMatrix,matrix-method}
 \alias{solve,dsCMatrix,dgeMatrix-method}
 \alias{chol,dsCMatrix,missing-method}
@@ -16,19 +17,24 @@
 \alias{coerce,dsCMatrix,dsyMatrix-method}
 \alias{coerce,dsCMatrix,lsCMatrix-method}
 \alias{coerce,dsCMatrix,matrix-method}
-\alias{coerce,dsTMatrix,matrix-method}
+\alias{coerce,dsTMatrix,dgTMatrix-method}
 \alias{coerce,dsTMatrix,dgeMatrix-method}
 \alias{coerce,dsTMatrix,dsCMatrix-method}
 \alias{coerce,dsTMatrix,dsyMatrix-method}
+\alias{coerce,dsTMatrix,matrix-method}
+\alias{coerce,dsyMatrix,dsCMatrix-method}
+\alias{coerce,dsyMatrix,dsTMatrix-method}
 \alias{coerce,graphNEL,dsCMatrix-method}
 \alias{determinant,dsCMatrix,missing-method}
 \alias{determinant,dsCMatrix,logical-method}
 \alias{image,dsCMatrix-method}
 \description{The \code{dsCMatrix} class is a class of symmetric, sparse
-  matrices in the compressed, column-oriented format.  In this
+  numeric matrices in the compressed, column-oriented format.  In this
   implementation the non-zero elements in the columns are sorted into
-  increasing row order. The \code{dsTMatrix} class is a class of
-  symmetric, sparse matrices in triplet format.}
+  increasing row order.
+  The \code{dsTMatrix} class is the class of
+  symmetric, sparse numeric matrices in triplet format.
+}
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("dsCMatrix",
     ...)} or \code{new("dsTMatrix", ...)}

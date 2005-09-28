@@ -1,5 +1,5 @@
 \name{dgeMatrix-class}
-\title{General S4 Matrix class}
+\title{Class "dgeMatrix" of Dense Numeric (S4 Class) Matrices}
 \docType{class}
 \alias{dgeMatrix-class}
 % METHODS:
@@ -8,7 +8,7 @@
 \alias{Arith,dgeMatrix,numeric-method}
 \alias{Arith,numeric,dgeMatrix-method}
 \alias{Math,dgeMatrix-method}
-\alias{Math2,dgeMatrix,numeric-method}
+%\alias{Math2,dgeMatrix,numeric-method}
 % Others
 %
 \alias{\%*\%,dgeMatrix,dgeMatrix-method}
@@ -49,7 +49,9 @@
 \alias{t,dgeMatrix-method}
 \alias{tcrossprod,dgeMatrix-method}
 %
-\description{A general, numeric matrix in the S4 Matrix representation}
+\description{A general numeric dense matrix in the S4 Matrix
+  representation.
+}
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("dgeMatrix", ...)}
   or, more commonly, by coercion from the \code{Matrix} class (see

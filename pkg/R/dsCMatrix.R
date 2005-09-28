@@ -2,8 +2,12 @@
 
 ### contains = "dgCMatrix"
 
-setAs("dsCMatrix", "dgTMatrix",
-      function(from)
+setAs("dsCMatrix", "dsTMatrix",
+      function(from) ## Cholmod:
+      .Call("Csparse_to_Tsparse", from, PACKAGE = "Matrix"))
+
+setAs("dsCMatrix", "dgTMatrix", # needed for image()
+      function(from) ## pre-Cholmod:
       .Call("dsCMatrix_to_dgTMatrix", from, PACKAGE = "Matrix"))
 
 setAs("dsCMatrix", "dgeMatrix",
@@ -17,8 +21,7 @@ setAs("dsCMatrix", "lsCMatrix",
                          Dim = from@Dim, Dimnames = from@Dimnames))
 
 setAs("dsCMatrix", "dgCMatrix",
-      function(from)
-      .Call("dsCMatrix_to_dgCMatrix", from, PACKAGE = "Matrix"))
+      function(from) .Call("sCMatrix_to_gCMatrix", from, PACKAGE = "Matrix"))
 
 setAs("dsCMatrix", "dsTMatrix",
       function(from)
@@ -29,9 +32,6 @@ setAs("dsCMatrix", "dsTMatrix",
 
 setAs("dsCMatrix", "dsyMatrix",
       function(from) as(as(from, "dsTMatrix"), "dsyMatrix"))
-
-setMethod("image", "dsCMatrix",
-          function(x, ...) image(as(x, "dgTMatrix"), ...))
 
 setMethod("solve", signature(a = "dsCMatrix", b = "dgeMatrix"),
           function(a, b, ...)

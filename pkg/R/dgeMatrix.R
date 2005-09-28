@@ -101,6 +101,7 @@ setMethod("Math",
 	      x
 	  })
 
+if(FALSE) ## unneeded with "Math2" in ./dMatrix.R
 setMethod("Math2",
 	  signature(x = "dgeMatrix", digits = "numeric"),
 	  function(x, digits) {
@@ -133,12 +134,7 @@ setMethod("rcond", signature(x = "dgeMatrix", type = "character"),
 	  .Call("dgeMatrix_rcond", x, type),
 	  valueClass = "numeric")
 
-setMethod("t", signature(x = "dgeMatrix"),
-	  function(x) {
-	      x@x <- as.vector(t(array(x@x, dim = x@Dim)))# no dimnames here!
-	      x@Dim <- x@Dim[2:1]
-	      x@Dimnames <- x@Dimnames[2:1]
-	      x })
+setMethod("t", signature(x = "dgeMatrix"), t_geMatrix)
 
 setMethod("crossprod", signature(x = "dgeMatrix", y = "missing"),
 	  function(x, y = NULL) .Call("dgeMatrix_crossprod", x, FALSE),

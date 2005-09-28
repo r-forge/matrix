@@ -129,3 +129,20 @@ uniq_gT <- function(x)
 
 }
 
+t_geMatrix <- function(x) {
+    x@x <- as.vector(t(array(x@x, dim = x@Dim))) # no dimnames here
+    x@Dim <- x@Dim[2:1]
+    x@Dimnames <- x@Dimnames[2:1]
+    ## FIXME: how to set factors?
+    x
+}
+
+## t( [dl]trMatrix ) and  t( [dl]syMatrix ) :
+t_trMatrix <- function(x) {
+    x@x <- as.vector(t(as(x, "matrix")))
+    x@Dim <- x@Dim[2:1]
+    x@Dimnames <- x@Dimnames[2:1]
+    x@uplo <- if (x@uplo == "U") "L" else "U"
+    # and keep x@diag
+    x
+}

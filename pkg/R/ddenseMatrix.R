@@ -18,8 +18,9 @@ setMethod("rcond", signature(x = "ddenseMatrix", type = "missing"),
 setMethod("rcond", signature(x = "ddenseMatrix", type = "character"),
           function(x, type, ...) callGeneric(as(x, "dgeMatrix"), type))
 
-setMethod("t", signature(x = "ddenseMatrix"),
-	  function(x) callGeneric(as(x, "dgeMatrix")))
+## Not really useful; now require *identical* class for result:
+## setMethod("t", signature(x = "ddenseMatrix"),
+## 	  function(x) callGeneric(as(x, "dgeMatrix")))
 
 setMethod("tcrossprod", signature(x = "ddenseMatrix"),
 	  function(x) callGeneric(as(x, "dgeMatrix")))
