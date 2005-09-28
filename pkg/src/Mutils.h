@@ -81,6 +81,10 @@ extern	 /* stored pointers to symbols initialized in R_init_Matrix */
 /* duplicate the slot with name given by sym from src to dest */
 #define slot_dup(dest, src, sym)  SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
 
+#define uplo_P(_x_) CHAR(STRING_ELT(GET_SLOT(_x_, Matrix_uploSym), 0))
+#define diag_P(_x_) CHAR(STRING_ELT(GET_SLOT(_x_, Matrix_diagSym), 0))
+
+
 /**
  * Check for valid length of a packed triangular array and return the
  * corresponding number of columns

@@ -30,10 +30,8 @@ double get_norm(SEXP obj, char *typstr)
     if (*typnm == 'I') {
 	work = (double *) R_alloc(dims[0], sizeof(double));
     }
-    return F77_CALL(dlantp)(typnm,
-			    CHAR(asChar(GET_SLOT(obj, Matrix_uploSym))),
-			    CHAR(asChar(GET_SLOT(obj, Matrix_diagSym))),
-			    dims, REAL(GET_SLOT(obj, Matrix_xSym)), work);
+    return F77_CALL(dlantp)(typnm, uplo_P(obj), diag_P(obj), dims,
+			    REAL(GET_SLOT(obj, Matrix_xSym)), work);
 }
 
 SEXP dtpMatrix_norm(SEXP obj, SEXP type)
@@ -51,11 +49,8 @@ double set_rcond(SEXP obj, char *typstr)
     typnm[0] = rcond_type(typstr);
     if (R_IsNA(rcond)) {
 	int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym)), info;
-	F77_CALL(dtpcon)(typnm,
-			 CHAR(asChar(GET_SLOT(obj, Matrix_uploSym))),
-			 CHAR(asChar(GET_SLOT(obj, Matrix_diagSym))),
-			 dims, REAL(GET_SLOT(obj, Matrix_xSym)),
-			 &rcond,
+	F77_CALL(dtpcon)(typnm, uplo_P(obj), diag_P(obj), dims,
+			 REAL(GET_SLOT(obj, Matrix_xSym)), &rcond,
 			 (double *) R_alloc(3*dims[0], sizeof(double)),
 			 (int *) R_alloc(dims[0], sizeof(int)), &info);
 	SET_SLOT(obj, Matrix_rcondSym,
@@ -73,9 +68,8 @@ SEXP dtpMatrix_solve(SEXP a)
 {
     SEXP val = PROTECT(duplicate(a));
     int info, *Dim = INTEGER(GET_SLOT(val, Matrix_DimSym));
-    F77_CALL(dtptri)(CHAR(asChar(GET_SLOT(val, Matrix_uploSym))),
-		     CHAR(asChar(GET_SLOT(val, Matrix_diagSym))),
-		     Dim, REAL(GET_SLOT(val, Matrix_xSym)), &info);
+    F77_CALL(dtptri)(uplo_P(val), diag_P(val), Dim,
+		     REAL(GET_SLOT(val, Matrix_xSym)), &info);
     UNPROTECT(1);
     return val;
 }
@@ -85,7 +79,7 @@ SEXP dtpMatrix_getDiag(SEXP x)
     int n = *INTEGER(GET_SLOT(x, Matrix_DimSym));
     SEXP val = PROTECT(allocVector(REALSXP, n));
 
-    if (*CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0)) == 'U') {
+    if (*diag_P(x) == 'U') {
 	int j;
 	for (j = 0; j < n; j++) REAL(val)[j] = 1.;
     } else {
@@ -100,8 +94,7 @@ SEXP dtpMatrix_matrix_solve(SEXP a, SEXP b)
     SEXP val = PROTECT(duplicate(b));
     int *Dim = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bDim = INTEGER(getAttrib(val, R_DimSymbol));
-    char *uplo = CHAR(STRING_ELT(GET_SLOT(a, Matrix_uploSym), 0)),
-	*diag = CHAR(STRING_ELT(GET_SLOT(a, Matrix_diagSym), 0));
+    char *uplo = uplo_P(a), *diag = diag_P(a);
     double *ax = REAL(GET_SLOT(a, Matrix_xSym));
     int ione = 1, j;
 
@@ -122,8 +115,7 @@ SEXP dtpMatrix_dgeMatrix_mm(SEXP x, SEXP y)
     int *xDim = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	*yDim = INTEGER(GET_SLOT(y, Matrix_DimSym));
     int ione = 1, j;
-    char *uplo = CHAR(STRING_ELT(GET_SLOT(x, Matrix_uploSym), 0)),
-	*diag = CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0));
+    char *uplo = uplo_P(x), *diag = diag_P(x);
     double *xx = REAL(GET_SLOT(x, Matrix_xSym)),
 	*vx = REAL(GET_SLOT(val, Matrix_xSym));
 
@@ -144,8 +136,7 @@ SEXP dgeMatrix_dtpMatrix_mm(SEXP x, SEXP y)
     int *xDim = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	*yDim = INTEGER(GET_SLOT(y, Matrix_DimSym));
     int i;
-    char *uplo = CHAR(STRING_ELT(GET_SLOT(y, Matrix_uploSym), 0)),
-	 *diag = CHAR(STRING_ELT(GET_SLOT(y, Matrix_diagSym), 0));
+    char *uplo = uplo_P(y), *diag = diag_P(y);
     double *yx = REAL(GET_SLOT(y, Matrix_xSym)),
  	*vx = REAL(GET_SLOT(val, Matrix_xSym));
 
@@ -166,8 +157,7 @@ SEXP dtpMatrix_matrix_mm(SEXP x, SEXP y)
     int *xDim = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	*yDim = INTEGER(getAttrib(y, R_DimSymbol));
     int ione = 1, j;
-    char *uplo = CHAR(STRING_ELT(GET_SLOT(x, Matrix_uploSym), 0)),
-	*diag = CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0));
+    char *uplo = uplo_P(x), *diag = diag_P(x);
     double *xx = REAL(GET_SLOT(x, Matrix_xSym));
 
     if (yDim[0] != xDim[1])
