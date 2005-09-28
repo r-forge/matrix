@@ -23,7 +23,7 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
     int *Ai = INTEGER(GET_SLOT(x, Matrix_iSym)),
 	*Ap = INTEGER(pSlot),
 	*Lp, *Parent, info,
-	lo = CHAR(asChar(GET_SLOT(x, Matrix_uploSym)))[0] == 'L',
+	lo = uplo_P(x)[0] == 'L',
 	n = length(pSlot)-1,
 	nnz, piv = asLogical(pivot);
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dCholCMatrix")));
@@ -144,7 +144,7 @@ SEXP ssc_transpose(SEXP x)
 
     adims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
     adims[0] = xdims[1]; adims[1] = xdims[0];
-    if (CHAR(asChar(GET_SLOT(x, Matrix_uploSym)))[0] == 'U')
+    if (uplo_P(x)[0] == 'U')
 	SET_SLOT(ans, Matrix_uploSym, mkString("L"));
     else
 	SET_SLOT(ans, Matrix_uploSym, mkString("U"));
@@ -213,7 +213,7 @@ SEXP dsCMatrix_ldl_symbolic(SEXP x, SEXP doPerm)
 	*P = (int *) NULL, *Pinv = (int *) NULL;
 
 
-    if (CHAR(asChar(GET_SLOT(x, Matrix_uploSym)))[0] == 'L') {
+    if (uplo_P(x)[0] == 'L') {
 	x = PROTECT(ssc_transpose(x));
     } else {
 	x = PROTECT(duplicate(x));

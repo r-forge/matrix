@@ -1,4 +1,4 @@
-				/* Sparse triangular matrices in triplet format */
+			/* Sparse triangular matrices in triplet format */
 #include "dtTMatrix.h"
 
 SEXP dtTMatrix_validate(SEXP x)
