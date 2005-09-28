@@ -109,12 +109,12 @@ SEXP csc_tcrossprod(SEXP x)
 #ifdef USE_CHOLMOD
     cholmod_sparse *cha = cholmod_aat(as_cholmod_sparse(x),
 	(int *) NULL, 0, 1, &c);
-    
+
     cha->stype = -1;		/* set the symmetry */
     cholmod_sort(cha, &c);	/* drop redundant entries */
     return chm_sparse_to_SEXP(cha, -1);
 #else
-    
+
     SEXP pslot = GET_SLOT(x, Matrix_pSym),
 	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dsCMatrix")));
     int *xp = INTEGER(pslot),
@@ -221,7 +221,7 @@ SEXP compressed_to_dgTMatrix(SEXP x, SEXP colP)
     int npt = length(pP) - 1;
 
     SET_SLOT(ans, Matrix_DimSym, duplicate(GET_SLOT(x, Matrix_DimSym)));
-    SET_SLOT(ans, Matrix_xSym, duplicate(GET_SLOT(x, Matrix_xSym)));
+    SET_SLOT(ans, Matrix_xSym,  duplicate(GET_SLOT(x, Matrix_xSym)));
     SET_SLOT(ans, indSym, duplicate(indP));
     expand_cmprPt(npt, INTEGER(pP),
 		  INTEGER(ALLOC_SLOT(ans, col ? Matrix_jSym : Matrix_iSym,

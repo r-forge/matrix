@@ -9,8 +9,7 @@ SEXP tsc_validate(SEXP x)
 
 SEXP tsc_transpose(SEXP x)
 {
-    SEXP
-	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dtCMatrix"))),
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dtCMatrix"))),
 	islot = GET_SLOT(x, Matrix_iSym);
     int nnz = length(islot),
 	*adims, *xdims = INTEGER(GET_SLOT(x, Matrix_DimSym));
@@ -18,7 +17,11 @@ SEXP tsc_transpose(SEXP x)
 
     adims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
     adims[0] = xdims[1]; adims[1] = xdims[0];
+
+    if(diag_value(x) == 'U')
+	SET_SLOT(ans, Matrix_diagSym, duplicate(GET_SLOT(x, Matrix_diagSym)));
     SET_SLOT(ans, Matrix_uploSym, mkString(up ? "L" : "U"));
+
     csc_compTr(xdims[0], xdims[1], nnz,
 	       INTEGER(GET_SLOT(x, Matrix_pSym)), INTEGER(islot),
 	       REAL(GET_SLOT(x, Matrix_xSym)),

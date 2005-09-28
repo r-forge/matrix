@@ -2,33 +2,35 @@
 # Makefile for the LDL mexFunction
 #-------------------------------------------------------------------------------
 
+LIB = ../LDL.a
+
 #default: all
 default: lib
 
 include ../UFconfig/UFconfig.mk
 
-all: intro libldl.a ldlsimple ldlmain ldlamd
+all: intro $(LIB) ldlsimple ldlmain ldlamd
 
 #-------------------------------------------------------------------------------
 # the ldl library:
 #-------------------------------------------------------------------------------
 
-libldl.a: ldl.c ldl.h
+$(LIB): ldl.c ldl.h
 	$(CC) -c -O ldl.c -o ldl.o
-	$(AR) libldl.a ldl.o
-	- $(RANLIB) libldl.a
-
-lib: libldl.a
-	- cp libldl.a ../LDL.a
+	$(AR) $(LIB) ldl.o
+	- $(RANLIB) $(LIB)
+lib: $(LIB)
+	@touch lib
 
 #-------------------------------------------------------------------------------
 # clean-up:
 #-------------------------------------------------------------------------------
 
 distclean: purge
+	- 'rm' $(LIB)
 
 purge: clean
-	- 'rm' ldl.mex* ldl.dll libldl.a ldlmain ldlamd ldlsimple
+	- 'rm' ldl.mex* ldl.dll ldlmain ldlamd ldlsimple
 	- 'rm' my_ldlmain.out my_ldlamd.out my_ldlsimple.out
 	- 'rm' ldlmain.mex* ldlamd.mex* ldlmain.dll ldlamd.dll
 	- 'rm' ldlsymbol.mex* ldlsymbol.dll

@@ -1,5 +1,6 @@
 #include "dspMatrix.h"
 
+/* Note:  also used for lspMatrix */
 SEXP dspMatrix_validate(SEXP obj)
 {
     SEXP val = symmetricMatrix_validate(obj);

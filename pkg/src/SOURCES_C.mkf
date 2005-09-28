@@ -26,6 +26,7 @@ SOURCES_C =  \
             dtpMatrix.c \
             factorizations.c \
 	    iohb.c \
+	    ldense.c \
 	    lCholCMatrix.c \
 	    lgCMatrix.c \
 	    lgTMatrix.c \
