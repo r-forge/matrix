@@ -218,10 +218,11 @@ SEXP dtrMatrix_as_dtpMatrix(SEXP from)
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
     SET_SLOT(val, Matrix_diagSym, duplicate(diag));
     SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
-    full_to_packed(REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, (n*(n+1))/2)),
-		   REAL(GET_SLOT(from, Matrix_xSym)), n,
-		   *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW,
-		   *CHAR(STRING_ELT(diag, 0)) == 'U' ? UNT : NUN);
+    full_to_packed_double(
+	REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, (n*(n+1))/2)),
+	REAL(GET_SLOT(from, Matrix_xSym)), n,
+	*CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW,
+	*CHAR(STRING_ELT(diag, 0)) == 'U' ? UNT : NUN);
     UNPROTECT(1);
     return val;
 }

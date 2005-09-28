@@ -321,8 +321,14 @@ void ssc_symbolic_permute(int n, int upper, const int perm[],
     Free(Aj); Free(ord); Free(ii);
 }
 
+/* FIXME: make this work for double/logical/int/complex
+ *        maybe checking CHAR(asChar(getAttrib(x, R_ClassSymbol)))[0]
+ *        for 'd', 'l', 'i', or 'z' */
 void make_array_triangular(double *to, SEXP from)
 {
+/* fill in the "trivial remainder" in  n*m  array ;
+ *  typically the 'x' slot of a "dtrMatrix" : */
+
     int i, j, *dims = INTEGER(GET_SLOT(from, Matrix_DimSym));
     int n = dims[0], m = dims[1];
 
@@ -453,48 +459,59 @@ SEXP check_scalar_string(SEXP sP, char *vals, char *nm)
 #undef SPRINTF
 }
 
-double *packed_to_full(double *dest, const double *src, int n,
-		       enum CBLAS_UPLO uplo)
-{
-    int i, j, pos = 0;
 
-    AZERO(dest, n*n);
-    for (j = 0; j < n; j++) {
-	switch(uplo) {
-	case UPP:
-	    for (i = 0; i <= j; i++) dest[i + j * n] = src[pos++];
-	    break;
-	case LOW:
-	    for (i = j; i < n; i++) dest[i + j * n] = src[pos++];
-	    break;
-	default:
-	    error(_("'uplo' must be UPP or LOW"));
-	}
-    }
-    return dest;
+#define PACKED_TO_FULL(TYPE)						\
+TYPE *packed_to_full_ ## TYPE(TYPE *dest, const TYPE *src,		\
+		        int n, enum CBLAS_UPLO uplo)			\
+{									\
+    int i, j, pos = 0;							\
+									\
+    AZERO(dest, n*n);							\
+    for (j = 0; j < n; j++) {						\
+	switch(uplo) {							\
+	case UPP:							\
+	    for (i = 0; i <= j; i++) dest[i + j * n] = src[pos++];	\
+	    break;							\
+	case LOW:							\
+	    for (i = j; i < n; i++) dest[i + j * n] = src[pos++];	\
+	    break;							\
+	default:							\
+	    error(_("'uplo' must be UPP or LOW"));			\
+	}								\
+    }									\
+    return dest;							\
 }
 
-double *full_to_packed(double *dest, const double *src, int n,
-		       enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag)
-{
-    int i, j, pos = 0;
+PACKED_TO_FULL(double)
+PACKED_TO_FULL(int)
 
-    for (j = 0; j < n; j++) {
-	switch(uplo) {
-	case UPP:
-	    for (i = 0; i <= j; i++)
-		dest[pos++] = (i == j && diag == UNT) ? 1. : src[i + j * n];
-	    break;
-	case LOW:
-	    for (i = j; i < n; i++)
-		dest[pos++] = (i == j && diag == UNT) ? 1. : src[i + j * n];
-	    break;
-	default:
-	    error(_("'uplo' must be UPP or LOW"));
-	}
-    }
-    return dest;
+#define FULL_TO_PACKED(TYPE)						\
+TYPE *full_to_packed_ ## TYPE(TYPE *dest, const TYPE *src, int n,	\
+		      enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag)	\
+{									\
+    int i, j, pos = 0;							\
+									\
+    for (j = 0; j < n; j++) {						\
+	switch(uplo) {							\
+	case UPP:							\
+	    for (i = 0; i <= j; i++)					\
+		dest[pos++] = (i == j && diag== UNT) ? 1 : src[i + j*n]; \
+	    break;							\
+	case LOW:							\
+	    for (i = j; i < n; i++)					\
+		dest[pos++] = (i == j && diag== UNT) ? 1 : src[i + j*n]; \
+	    break;							\
+	default:							\
+	    error(_("'uplo' must be UPP or LOW"));			\
+	}								\
+    }									\
+    return dest;							\
 }
+
+FULL_TO_PACKED(double)
+FULL_TO_PACKED(int)
+
+
 
 /**
  * Copy the diagonal elements of the packed array x to dest
