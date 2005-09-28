@@ -321,12 +321,22 @@ void ssc_symbolic_permute(int n, int upper, const int perm[],
     Free(Aj); Free(ord); Free(ii);
 }
 
+char uplo_value(SEXP x)
+{
+    return CHAR(STRING_ELT(GET_SLOT(x, Matrix_uploSym), 0))[0];
+}
+
+char diag_value(SEXP x)
+{
+    return CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0))[0];
+}
+
 void make_array_triangular(double *to, SEXP from)
 {
     int i, j, *dims = INTEGER(GET_SLOT(from, Matrix_DimSym));
     int n = dims[0], m = dims[1];
 
-    if (*CHAR(asChar(GET_SLOT(from, Matrix_uploSym))) == 'U') {
+    if (uplo_value(from) == 'U') {
 	for (j = 0; j < n; j++) {
 	    for (i = j+1; i < m; i++) {
 		to[i + j*m] = 0.;
@@ -339,7 +349,7 @@ void make_array_triangular(double *to, SEXP from)
 	    }
 	}
     }
-    if (*CHAR(asChar(GET_SLOT(from, Matrix_diagSym))) == 'U') {
+    if (diag_value(from) == 'U') {
 	j = (n < m) ? n : m;
 	for (i = 0; i < j; i++) {
 	    to[i * (m + 1)] = 1.;
@@ -509,7 +519,7 @@ double *packed_getDiag(double *dest, SEXP x)
     int j, n = *INTEGER(GET_SLOT(x, Matrix_DimSym)), pos;
     double *xx = REAL(GET_SLOT(x, Matrix_xSym));
 
-    if (*CHAR(STRING_ELT(GET_SLOT(x, Matrix_uploSym), 0)) == 'U') {
+    if (uplo_value(x) == 'U') {
 	for (pos = 0, j = 0; j < n; pos += ++j) dest[j] = xx[pos];
     } else {
 	for (pos = 0, j = 0; j < n; pos += (n - j), j++) dest[j] = xx[pos];

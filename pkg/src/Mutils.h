@@ -45,6 +45,9 @@ SEXP as_det_obj(double val, int log, int sign);
 SEXP get_factors(SEXP obj, char *nm);
 SEXP set_factors(SEXP obj, SEXP val, char *nm);
 SEXP dgCMatrix_set_Dim(SEXP x, int nrow);
+char uplo_value(SEXP x);
+char diag_value(SEXP x);
+
 int csc_unsorted_columns(int ncol, const int p[], const int i[]);
 void csc_sort_columns(int ncol, const int p[], int i[], double x[]);
 SEXP triple_as_SEXP(int nrow, int ncol, int nz,
