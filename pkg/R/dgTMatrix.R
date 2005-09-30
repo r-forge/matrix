@@ -74,8 +74,7 @@ setMethod("image", "dgTMatrix",
 ## Uses the triplet convention of *adding* entries with same (i,j):
 setMethod("+", signature(e1 = "dgTMatrix", e2 = "dgTMatrix"),
           function(e1, e2) {
-              if (any(e1@Dim != e2@Dim))
-                  stop("Dimensions not compatible for addition")
+              dimCheck(e1, e2)
               new("dgTMatrix", i = c(e1@i, e2@i), j = c(e1@j, e2@j),
                   x = c(e1@x, e2@x), Dim = e1@Dim)
           })

@@ -4,6 +4,8 @@
 #include "chm_common.h"
 #endif
 
+/* FIXME -- we "forget" about dimnames almost everywhere : */
+
 SEXP dgCMatrix_validate(SEXP x)
 {
     SEXP pslot = GET_SLOT(x, Matrix_pSym),
@@ -300,17 +302,13 @@ SEXP csc_to_dgeMatrix(SEXP x)
     return ans;
 }
 
-SEXP matrix_to_csc(SEXP A)
+SEXP double_to_csc(double *a, int *dim_a)
 {
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix")));
-    int *adims = INTEGER(getAttrib(A, R_DimSymbol)), j,
-	maxnz, nrow, ncol, nnz, *vp, *vi;
-
+    int j, maxnz, nrow, ncol, nnz, *vp, *vi;
     double *vx;
 
-    if (!(isMatrix(A) && isReal(A)))
-	error(_("A must be a numeric matrix"));
-    nrow = adims[0]; ncol = adims[1];
+    nrow = dim_a[0]; ncol = dim_a[1];
     SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(val, Matrix_DimSym, allocVector(INTSXP, 2));
     SET_SLOT(val, Matrix_pSym, allocVector(INTSXP, ncol + 1));
@@ -322,7 +320,7 @@ SEXP matrix_to_csc(SEXP A)
 	int i;
 	vp[j] = nnz;
 	for (i = 0; i < nrow; i++) {
-	    double val = REAL(A)[i + j * nrow];
+	    double val = a[i + j * nrow];
 	    if (val != 0.) {
 		vi[nnz] = i;
 		vx[nnz] = val;
@@ -339,6 +337,21 @@ SEXP matrix_to_csc(SEXP A)
     UNPROTECT(1);
     return dgCMatrix_set_Dim(val, nrow);
 }
+
+SEXP matrix_to_csc(SEXP A)
+{
+    if (!(isMatrix(A) && isReal(A)))
+	error(_("A must be a numeric matrix"));
+    return double_to_csc(REAL(A),
+			 INTEGER(getAttrib(A, R_DimSymbol)));
+}
+
+SEXP dgeMatrix_to_csc(SEXP x)
+{
+    return double_to_csc(   REAL(GET_SLOT(x, Matrix_xSym)),
+			 INTEGER(GET_SLOT(x, Matrix_DimSym)));
+}
+
 
 
 SEXP dgTMatrix_to_csc(SEXP dgTMatrix)

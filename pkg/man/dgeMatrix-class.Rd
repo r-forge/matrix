@@ -16,9 +16,11 @@
 \alias{\%*\%,matrix,dgeMatrix-method}
 \alias{\%*\%,dgeMatrix,numeric-method}
 \alias{\%*\%,numeric,dgeMatrix-method}
+\alias{as.vector,dgeMatrix,missing-method}
 \alias{chol,dgeMatrix,ANY-method}
 \alias{coerce,matrix,dgeMatrix-method}
 \alias{coerce,dgeMatrix,matrix-method}
+\alias{coerce,dgeMatrix,lgeMatrix-method}
 \alias{colMeans,dgeMatrix-method}
 \alias{colSums,dgeMatrix-method}
 \alias{crossprod,dgeMatrix,dgeMatrix-method}
@@ -70,7 +72,7 @@
       of the reciprocal of the condition number, if it has been computed
       at some point.}
     \item{\code{factors}:}{Object of class \code{"list"} - a list
-      of factorizations of the matrix. }
+      of factorizations of the matrix.}
   }
 }
 \section{Methods}{

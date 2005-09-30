@@ -11,13 +11,15 @@
 \alias{ltTMatrix-class}
 \alias{lsTMatrix-class}
 %
+\alias{-,lsparseMatrix,missing-method}
+\alias{!,lsparseMatrix-method}
 \alias{\%*\%,lgCMatrix,lgCMatrix-method}
 \alias{\%*\%,lsparseMatrix,lsparseMatrix-method}
 \alias{\%*\%,lsparseMatrix,ldenseMatrix-method}
 \alias{\%*\%,ldenseMatrix,lsparseMatrix-method}
 \alias{chol,lsCMatrix,logical-method}
 \alias{chol,lsCMatrix,missing-method}
-\alias{coerce,dgCMatrix,lgCMatrix-method}
+
 \alias{coerce,lgCMatrix,dgCMatrix-method}
 \alias{coerce,lgCMatrix,lgTMatrix-method}
 \alias{coerce,lgCMatrix,matrix-method}
@@ -119,6 +121,11 @@ m <- Matrix(c(0,0,2:0), 3,5, dimnames=list(LETTERS[1:3],NULL))
 (dm <- as(m, "dgCMatrix"))# no dimnames for sparse here
 (lm <- as(dm, "lgCMatrix"))
 str(lm)
+
+data(mm)
+lmm <- as(mm, "lgCMatrix")
+xlx <- crossprod(lmm)
+image(xlx, main=paste("crossprod(lmm) : Sparse", class(xlx)))
 }
 \keyword{classes}
 \keyword{algebra}

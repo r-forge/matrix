@@ -36,4 +36,12 @@ stopifnot(class(sm) == class(mC),
           all.equal(0.1 * ((0 + 100*mC)/10), mC),
           all.equal(sqrt(mC ^ 2), mC))
 
+x <- Matrix(rbind(0,cbind(0, 0:3,0,0,-1:2,0),0))
+x
+x + 10*t(x) # should be sparse {FIXME}
+(px <- Matrix(x^x - 1))#-> sparse again
+stopifnot(px@i == c(3,4,1,4),
+          px@x == c(3,26,-2,3))
+
+
 cat('Time elapsed: ', proc.time(),'\n') # "stats"

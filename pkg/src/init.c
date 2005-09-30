@@ -68,6 +68,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dgBCMatrix_to_dgTMatrix", (DL_FUNC) &dgBCMatrix_to_dgTMatrix, 1},
     {"dgBCMatrix_validate", (DL_FUNC) &dgBCMatrix_validate, 1},
     {"dgCMatrix_validate", (DL_FUNC) &dgCMatrix_validate, 1},
+    {"dgeMatrix_to_csc", (DL_FUNC) &dgeMatrix_to_csc, 1},
     {"dgTMatrix_to_csc", (DL_FUNC) &dgTMatrix_to_csc, 1},
     {"dgTMatrix_to_dgCMatrix", (DL_FUNC) &dgTMatrix_to_dgCMatrix, 1},
     {"dgTMatrix_to_dgeMatrix", (DL_FUNC) &dgTMatrix_to_dgeMatrix, 1},

@@ -1,9 +1,8 @@
 \name{denseMatrix-class}
 \docType{class}
-\alias{denseMatrix-class}
 \title{Virtual Class "denseMatrix" of All Dense Matrices}
-%% not yet any Methods:
-%\alias{show,denseMatrix-method}
+\alias{denseMatrix-class}
+\alias{show,denseMatrix-method}
 %
 \description{This is the virtual class of all dense (S4) matrices.
   It is the direct superclass of

@@ -12,7 +12,9 @@
 \alias{Math,dMatrix-method}
 \alias{Math2,dMatrix,numeric-method}% Math2 = round + signif, but
 \alias{Summary,dMatrix-method}
+\alias{Compare,dMatrix,dMatrix-method}
 \alias{Compare,dMatrix,numeric-method}
+\alias{Compare,numeric,dMatrix-method}
 % for silly reasons, need these 2+3 as well:
 \alias{round,dMatrix,numeric-method}
 \alias{signif,dMatrix,numeric-method}

@@ -27,27 +27,23 @@ setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
 	      if (!eqD[1])
 		  stop("Matrices must have same number of rows for arithmetic")
 	      same.dim <- eqD[2]
-	      if (same.dim)
+	      if (same.dim) {
 		  d <- d1
+		  dn <- dimNamesCheck(e1, e2)
+	      }
 	      else { # nrows differ
 		  if(d2[2] %% d1[2] == 0) { # nrow(e2) is a multiple
 		      e1@x <- rep.int(e1@x, d2[2] %/% d1[2])
 		      d <- d2
+		      dn <- e2@Dimnames
 		  } else if(d1[2] %% d2[2] == 0) { # nrow(e1) is a multiple
 		      e2@x <- rep.int(e2@x, d1[2] %/% d2[2])
 		      d <- d1
-		  }
-		  else
+		      dn <- e1@Dimnames
+		  } else
 		      stop("number of rows are not compatible for arithmetic")
 	      }
-	      dn0 <- list(NULL,NULL)
-	      if(identical(dn0, dn <- e1@Dimnames))
-		  dn <- e2@Dimnames
-	      else if(!identical(dn0, e2@Dimnames) &&
-		      !identical(dn,  e2@Dimnames)) {
-		  dn <- dn0
-		  warning("not using incompatible 'Dimnames' in arithmetical result")
-	      }
+
 	      ## be smart and preserve, e.g., triangular, or symmetric
 	      ## but this sucks: For these,
 	      ## 'uplo' and 'diag' also must coincide or be dealt with properly
@@ -117,6 +113,8 @@ setMethod("Math2",
 
 ## -- end{group generics} -----------------------
 
+setMethod("as.vector", signature(x = "dgeMatrix", mode = "missing"),
+          function(x) x@x)
 
 setMethod("norm", signature(x = "dgeMatrix", type = "missing"),
 	  function(x, type, ...) norm(x, type = "O", ...))

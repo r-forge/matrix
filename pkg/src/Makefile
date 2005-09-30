@@ -23,12 +23,12 @@ $(SUBLIBS): $(SUBSTAMP)
 	  touch $${d}.stamp; \
 	done
 
-$(SUBSTAMP): 
+$(SUBSTAMP):
 	touch $(SUBSTAMP)
 
 clean:
 	@-rm -rf .libs _libs
-	@-rm -f *.o *.so *.a
+	@-rm -f *.o *.so *.a $(SUBSTAMP)
 	@for d in $(SUBDIRS); do \
 	  (cd $${d} && $(MAKE) clean) || exit 1; \
 	  rm -f $${d}.stamp; \

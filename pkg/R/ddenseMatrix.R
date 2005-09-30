@@ -1,5 +1,11 @@
 ### Define Methods that can be inherited for all subclasses
 
+setAs("dgeMatrix", "lgeMatrix", d2l_Matrix)
+setAs("dtrMatrix", "ltrMatrix", d2l_Matrix)
+setAs("dtpMatrix", "ltpMatrix", d2l_Matrix)
+setAs("dsyMatrix", "lsyMatrix", d2l_Matrix)
+setAs("dspMatrix", "lspMatrix", d2l_Matrix)
+
 ## -- see also ./Matrix.R  e.g., for a show() method
 
 ## These methods are the 'fallback' methods for all dense numeric

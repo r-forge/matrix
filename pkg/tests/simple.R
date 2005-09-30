@@ -59,12 +59,12 @@ stopifnot(identical(i6, as(cbind(c(-4, rep(1,5))), "dgeMatrix")),
 ###-- row- and column operations  {was ./rowcolOps.R }
 
 set.seed(321)
-mm <- Matrix(round(rnorm(1000), 2), 50, 20)
-m1 <- as(mm, "matrix")
-stopifnot(all.equal(colMeans(mm), colMeans(m1)),
-          all.equal(colSums(mm), colSums(m1)),
-          all.equal(rowMeans(mm), rowMeans(m1)),
-          all.equal(rowSums(mm), rowSums(m1)))
+m1k <- Matrix(round(rnorm(1000), 2), 50, 20)
+m.m <- as(m1k, "matrix")
+stopifnot(all.equal(colMeans(m1k), colMeans(m.m)),
+          all.equal(colSums (m1k), colSums (m.m)),
+          all.equal(rowMeans(m1k), rowMeans(m.m)),
+          all.equal(rowSums (m1k), rowSums (m.m)))
 
 ###-- Testing expansions of factorizations {was ./expand.R }
 
@@ -72,6 +72,55 @@ stopifnot(all.equal(colMeans(mm), colMeans(m1)),
 (lul <- expand(lu(m1)))
 stopifnot(all.equal(as(m1, "matrix"),
                     as(lul$P %*% (lul$L %*% lul$U), "matrix")))
+
+
+###-- kronecker for nonsparse uses Matrix(.):
+stopifnot(is(kr <- kronecker(m1, m6), "Matrix"))
+assert.EQ.mat(kr,
+              kronecker(as(m1, "matrix"),
+                        as(m6, "matrix")),
+              tol = 0)
+## sparse:
+(kt1 <- kronecker(t1, tu))
+kt2 <- kronecker(t1c, cu)
+ktf <- kronecker(as.matrix(t1), as.matrix(tu))
+
+assert.EQ.mat(kt1, ktf, tol= 0)
+assert.EQ.mat(kt2, ktf, tol= 0)
+## but kt1 and kt2, both "dgT" are different since entries are not ordered!
+
+
+###-- logical sparse : ----------
+
+(lkt <- as(as(kt1, "dgCMatrix"), "lgCMatrix"))# ok
+(clt <- crossprod(lkt))
+if(FALSE) ## FIXME: This gives CHOLMOD errors and a *seg.fault* !!!
+    crossprod(clt)
+## CHOLMOD error: matrix cannot be symmetric
+## CHOLMOD error: argument missing
+
+### "d" <-> "l"  for (symmetric) sparse :
+data(mm)
+xpx <- crossprod(mm)
+lxpx <- as(xpx, "lsCMatrix")
+if(FALSE)
+    show(lxpx) ## gives error about "lsC" -> "lgT" coercion ..
+## The bug is actually from *subsetting* the large matrix:
+if(FALSE) ## FIXME
+    r <- lxpx[1:2,]
+
+lmm <- as(mm, "lgCMatrix")
+xlx <- crossprod(lmm)
+## now xlx and lxpx should really be the same -- at least `as matrix':
+m1 <- as(xlx,  "matrix")
+m2 <- as(lxpx, "matrix")
+if(FALSE) ## BUG -- FIXME -- these should be equal!
+    stopifnot(identical(m1,m2))
+## bug :
+table(m1 == m2)
+##  FALSE   TRUE
+##     78 506866
+
 
 
 proc.time()

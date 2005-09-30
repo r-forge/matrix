@@ -1,6 +1,7 @@
 \name{ldenseMatrix-class}
 \docType{class}
 \alias{ldenseMatrix-class}
+\alias{!,ldenseMatrix-method}
 \alias{coerce,matrix,ldenseMatrix-method}
 \alias{coerce,ldenseMatrix,matrix-method}
 %%-- These are already in ./lsparseMatrix-classes.Rd :

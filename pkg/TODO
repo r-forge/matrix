@@ -68,3 +68,15 @@ BUG: rcond() of a singular dpoMatrix gives a LaPack error instead of just 0:
 - "Math2" , "Math", "Arith":
    keep triangular and symmetric Matrices when appropriate:
    particularly desirable for  "Math2": round(), signif()
+
+- "d" <-> "l" coercion for all "[TCR]" sparse matrices is really trivial:
+  "d" -> "l" : drops the 'x' slot
+  "l" -> "d" : construct an 'x' slot of all '1'
+  We currently have many of these conversions explicitly, e.g.
+   setAs("dsTMatrix", "lsTMatrix",
+      function(from) new("lsTMatrix", i = from@i, j = from@j, uplo = from@uplo,
+                         Dim = from@Dim, Dimnames = from@Dimnames))
+  but I would rather want to automatically construct all these coercion
+  methods at once by a ``method constructor'', i.e.,
+  for all  "dsparse*" -> "lsparse*" and vice versa.
+  How can one do this {in a documented way} ?

@@ -25,8 +25,8 @@ setAs("matrix", "dgCMatrix",
           .Call("matrix_to_csc", from)
       })
 
-setAs("dgeMatrix", "dgCMatrix", # dgeM* is "double":
-      function(from) .Call("matrix_to_csc", as(from, "matrix")))
+setAs("dgeMatrix", "dgCMatrix",
+      function(from) .Call("dgeMatrix_to_csc", from))
 
 
 setMethod("crossprod", signature(x = "dgCMatrix", y = "missing"),
@@ -89,11 +89,32 @@ setMethod("%*%", signature(x = "matrix", y = "dgCMatrix"),
 
 ### TODO:
 
-##- setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
-##-	      signature(e1 = "dgCMatrix", e2 = "dgCMatrix"),
-##-	      function(e1, e2) {
-##-		  stopifnot((d <- e1@Dim) == e2@Dim)
-##-	      })
+if(FALSE) ## FIXME
+setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
+          signature(e1 = "dgCMatrix", e2 = "dgCMatrix"),
+          function(e1, e2) {
+              d <- dimCheck(e1, e2)
+              dn <- dimNamesCheck(e1, e2)
+              ij1 <- non0ind(e1)
+              ij2 <- non0ind(e2)
+              switch(.Generic,
+                     "+" =, "-" =, "*" =
+                     new("dgTMatrix", Dim = d, Dimnames = dn,
+                         i = c(ij1[,1], ij2[,1]),
+                         j = c(ij1[,2], ij2[,2]),
+                         x = c(callGeneric(e1@x, 0), callGeneric(0, e2@x)))
+                     ,
+                     "^" = { ## X^0 |-> 1 (also for X=0)
+                         r <- new("dgTMatrix", Dim = d, Dimnames = dn,
+                                  i = c(ij1[,1], ij2[,1]),
+                                  j = c(ij1[,2], ij2[,2]),
+                                  x = c(rep.int(1, nrow(ij1)), 0 ^ e2@x))
+                         ...
+                     },
+                     "%%" = , "%/%" = , "/" = {## 0 op 0  |-> NaN
+                         ...
+                     })
+          })
 
 setMethod("Arith",
 	  signature(e1 = "dgCMatrix", e2 = "numeric"),

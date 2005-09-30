@@ -1,6 +1,7 @@
 \name{pMatrix-class}
 \docType{class}
 \alias{pMatrix-class}
+\alias{-,pMatrix,missing-method}
 \alias{\%*\%,matrix,pMatrix-method}
 \alias{\%*\%,pMatrix,matrix-method}
 \alias{\%*\%,pMatrix,pMatrix-method}
