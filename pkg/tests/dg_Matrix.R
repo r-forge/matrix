@@ -29,12 +29,16 @@ stopifnot(validObject(tmm), dim(tmm) == dm[2:1],
 set.seed(101)
 for(i in 1:10) {
     A <- matrix(rnorm(400), nrow = 100, ncol = 4)
-    A[A < +1] <- 0
-    Acsc <- as(A, "dgCMatrix")
-    A <- as(A, "dgeMatrix")
+    A[A < +1] <- 0 ; Am <- A
+    Acsc <- as(Am, "dgCMatrix")
+    A    <- as(Am, "dgeMatrix")
     b <- matrix(rnorm(400), nrow = 4, ncol = 100)
     B <- as(b, "dgeMatrix")
-    stopifnot(is.all.equal4(A %*% B, Acsc %*% B,
+    assert.EQ.mat(A %*% B, Am %*%  b, tol=0)
+    assert.EQ.mat(B %*% A,  b %*% Am, tol=0)
+    stopifnot(identical(A, as(Acsc, "dgeMatrix")),
+              identical(Acsc, as(A, "dgCMatrix")),
+              is.all.equal4(A %*% B, Acsc %*% B,
                             A %*% b, Acsc %*% b),
               is.all.equal4(b %*% A, b %*% Acsc,
                             B %*% A, B %*% Acsc))

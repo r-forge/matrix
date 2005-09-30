@@ -1,23 +1,3 @@
-l2d_Matrix <- function(from) {
-    stopifnot(is(from, "lMatrix"))
-    newCl <- sub("^l", "d", class(from))
-    r <- new(newCl, x = as.double(from@x),
-             Dim = from@Dim, Dimnames = from@Dimnames,
-             factors = list()) ## FIXME: treat 'factors' smartly
-    if(is(r, "triangularMatrix")) {
-        r@uplo <- from@uplo
-        r@diag <- from@diag
-    } else if(is(r, "symmetricMatrix")) {
-        r@uplo <- from@uplo
-    }
-    r
-}
-
-dummy_meth <- function(x) {
-    cl <- class(x)
-    as(callGeneric(as(x, sub("^l", "d", cl))), cl)
-}
-
 setAs("lgeMatrix", "dgeMatrix", l2d_Matrix)
 setAs("ltrMatrix", "dtrMatrix", l2d_Matrix)
 setAs("ltpMatrix", "dtpMatrix", l2d_Matrix)

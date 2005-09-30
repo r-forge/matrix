@@ -15,10 +15,14 @@ setAs("lgeMatrix", "matrix",
 
 
 ## dense |-> compressed :
-setAs("lgeMatrix", "lgTmatrix",
+setAs("lgeMatrix", "lgTMatrix",
       function(from) {
           ##  cheap but not so efficient:
-          ij <- which(as(from,"matrix"), arr.ind = TRUE)
+          ij <- which(as(from,"matrix"), arr.ind = TRUE) - 1:1
           new("lgTMatrix", i = ij[,1], j = ij[,2],
-              Dim = from@Dim, Dimnames = from@Dimnames)
+              Dim = from@Dim, Dimnames = from@Dimnames,
+              factors = from@factors)
       })
+
+setMethod("as.vector", signature(x = "lgeMatrix", mode = "missing"),
+          function(x) x@x)

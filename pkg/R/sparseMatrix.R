@@ -93,17 +93,15 @@ setMethod("[", signature(x = "sparseMatrix",
           })
 
 
-
+setMethod("-", signature(e1 = "sparseMatrix", e2 = "missing"),
+          function(e1) { e1@x <- -e1@x ; e1 })
+## with the following exceptions:
+setMethod("-", signature(e1 = "lsparseMatrix", e2 = "missing"),
+          function(e1) callGeneric(as(e1, "dgCMatrix")))
+setMethod("-", signature(e1 = "pMatrix", e2 = "missing"),
+          function(e1) callGeneric(as(e1, "lgTMatrix")))
 
 ### --- show() method ---
-
-emptyColnames <- function(x)
-{
-    ## Useful for compact printing of (parts) of sparse matrices
-    ## possibly  dimnames(x) "==" NULL :
-    dimnames(x) <- list(dimnames(x)[[1]], rep("", dim(x)[2]))
-    x
-}
 
 prSpMatrix <- function(object, zero.print = ".")
 {

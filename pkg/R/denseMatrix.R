@@ -12,6 +12,17 @@ setAs("denseMatrix", "dsparseMatrix",
 ##       function(from) as(as(from, "dgeMatrix"), "dgTMatrix"))
 
 
+setMethod("show", signature(object = "denseMatrix"),
+          function(object) prMatrix(object))
+##- ## FIXME: The following is only for the "dMatrix" objects that are not
+##- ##	      "dense" nor "sparse" -- i.e. "packed" ones :
+##- ## But these could be printed better -- "." for structural zeros.
+##- setMethod("show", signature(object = "dMatrix"), prMatrix)
+##- ## and improve this as well:
+##- setMethod("show", signature(object = "pMatrix"), prMatrix)
+##- ## this should now be superfluous [keep for safety for the moment]:
+
+
 ## Using "index" for indices should allow
 ## integer (numeric), logical, or character (names!) indices :
 
@@ -65,7 +76,6 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "index", j = "index",
                      r[i, j] <- value
                      as(r, class(x))
                  })
-
 
 
 ## not exported:

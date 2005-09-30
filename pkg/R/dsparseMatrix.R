@@ -32,6 +32,10 @@ setMethod("crossprod", signature(x = "dgeMatrix", y = "dsparseMatrix"),
 setMethod("image", "dsparseMatrix",
           function(x, ...) image(as(x, "dgTMatrix"), ...))
 
+setMethod("kronecker", signature(X = "dsparseMatrix", Y = "dsparseMatrix"),
+          function (X, Y, FUN = "*", make.dimnames = FALSE, ...)
+          callGeneric(as(X, "dgTMatrix"),as(Y, "dgTMatrix")))
+
 
 ## Group Methods, see ?Arith (e.g.)
 ## -----

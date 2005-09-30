@@ -4,12 +4,13 @@
 \alias{dtTMatrix-class}
 \alias{coerce,dtCMatrix,dgTMatrix-method}
 \alias{coerce,dtCMatrix,dgeMatrix-method}
+\alias{coerce,dtCMatrix,ltCMatrix-method}
 \alias{coerce,dtTMatrix,dgTMatrix-method}
 \alias{coerce,dtTMatrix,dgeMatrix-method}
 \alias{coerce,dtTMatrix,dtCMatrix-method}
 \alias{coerce,dtTMatrix,dtrMatrix-method}
+\alias{coerce,dtTMatrix,ltTMatrix-method}
 \alias{coerce,dtTMatrix,matrix-method}
-\alias{image,dtCMatrix-method}
 \alias{t,dtCMatrix-method}
 \alias{t,dtTMatrix-method}
 \title{Triangular, (compressed) sparse column matrices}

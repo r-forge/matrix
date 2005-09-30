@@ -48,7 +48,7 @@ setMethod("expm", signature(x = "dMatrix"),
 ## -----
 
 ## Cheap version: work via "dgeMatrix" and use the group methods there:
-## NOTA BENE: Improved by doing some of these for dsparse* !
+## FIXME: To improve by doing some of these for dsparse* !
 setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
           signature(e1 = "dMatrix", e2 = "dMatrix"),
           function(e1, e2) callGeneric(as(e1, "dgeMatrix"),

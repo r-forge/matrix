@@ -16,6 +16,8 @@ SEXP compressed_non_0_ij(SEXP x, SEXP colP);
 SEXP csc_to_matrix(SEXP x);
 SEXP csc_to_dgeMatrix(SEXP x);
 SEXP matrix_to_csc(SEXP A);
+SEXP double_to_csc(double *a, int *dim_a);
+SEXP dgeMatrix_to_csc(SEXP x);
 SEXP dgTMatrix_to_csc(SEXP dgTMatrix);
 SEXP csc_getDiag(SEXP x);
 SEXP csc_transpose(SEXP x);

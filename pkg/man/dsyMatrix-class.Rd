@@ -8,9 +8,11 @@
 \alias{\%*\%,dsyMatrix,dgeMatrix-method}
 \alias{coerce,dspMatrix,dgeMatrix-method}
 \alias{coerce,dspMatrix,dsyMatrix-method}
+\alias{coerce,dspMatrix,lspMatrix-method}
 \alias{coerce,dspMatrix,matrix-method}
 \alias{coerce,dsyMatrix,dgeMatrix-method}
 \alias{coerce,dsyMatrix,dspMatrix-method}
+\alias{coerce,dsyMatrix,lsyMatrix-method}
 \alias{coerce,dsyMatrix,matrix-method}
 \alias{show,dsyMatrix-method}
 \alias{dspMatrix-class}

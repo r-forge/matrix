@@ -3,6 +3,8 @@
 \alias{ltpMatrix-class}
 \alias{ltrMatrix-class}
 %
+\alias{!,ltpMatrix-method}
+\alias{!,ltrMatrix-method}
 \alias{coerce,ltpMatrix,dtpMatrix-method}
 \alias{coerce,ltpMatrix,ltrMatrix-method}
 \alias{coerce,ltrMatrix,dtrMatrix-method}

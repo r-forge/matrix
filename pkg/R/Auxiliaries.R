@@ -34,6 +34,32 @@ dimCheck <- function(a, b) {
     da
 }
 
+dimNamesCheck <- function(a, b) {
+    ## assume dimCheck() has happened before
+    nullDN <- list(NULL,NULL)
+    h.a <- !identical(nullDN, dna <- dimnames(a))
+    h.b <- !identical(nullDN, dnb <- dimnames(b))
+    if(h.a || h.b) {
+	if (!h.b) h.a
+	else if(!h.a) h.b
+	else { ## both have non-trivial dimnames
+	    r <- dna # "default" result
+	    for(j in 1:2) {
+		dn <- dnb[[j]]
+		if(is.null(r[[j]]))
+		    r[[j]] <- dn
+		else if (!is.null(dn) && any(r[[j]] != dn))
+		    warning(gettextf("dimnames [%d] mismatch in %s", j,
+				     deparse(sys.call(sys.parent()))),
+			    call. = FALSE)
+	    }
+	    r
+	}
+    }
+    else
+	nullDN
+}
+
 rowCheck <- function(a, b) {
     da <- dim(a)
     db <- dim(b)
@@ -56,6 +82,13 @@ colCheck <- function(a, b) {
     da[2]
 }
 
+emptyColnames <- function(x)
+{
+    ## Useful for compact printing of (parts) of sparse matrices
+    ## possibly  dimnames(x) "==" NULL :
+    dimnames(x) <- list(dimnames(x)[[1]], rep("", dim(x)[2]))
+    x
+}
 
 prTriang <- function(x, digits = getOption("digits"),
                      justify = "none", right = TRUE)
@@ -165,4 +198,39 @@ t_trMatrix <- function(x) {
     x@uplo <- if (x@uplo == "U") "L" else "U"
     # and keep x@diag
     x
+}
+
+fixupDense <- function(m, from) {
+    if(is(m, "triangularMatrix")) {
+        m@uplo <- from@uplo
+        m@diag <- from@diag
+    } else if(is(m, "symmetricMatrix")) {
+        m@uplo <- from@uplo
+    }
+    m
+}
+
+## -> ./ldenseMatrix.R :
+l2d_Matrix <- function(from) {
+    stopifnot(is(from, "lMatrix"))
+    fixupDense(new(sub("^l", "d", class(from)),
+                   x = as.double(from@x),
+                   Dim = from@Dim, Dimnames = from@Dimnames,
+                   factors = list()), ## FIXME: treat 'factors' smartly
+               from)
+}
+
+if(FALSE)# unused
+l2d_meth <- function(x) {
+    cl <- class(x)
+    as(callGeneric(as(x, sub("^l", "d", cl))), cl)
+}
+
+## -> ./ddenseMatrix.R :
+d2l_Matrix <- function(from) {
+    stopifnot(is(from, "dMatrix"))
+    fixupDense(new(sub("^d", "l", class(from)),
+                   Dim = from@Dim, Dimnames = from@Dimnames,
+                   factors = list()), ## FIXME: treat 'factors' smartly
+               from)
 }

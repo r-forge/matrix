@@ -136,11 +136,14 @@ exportMethods(
 	      "Summary",
 	      "Compare",
 
+	      "!",
 	      "+",# for dgT(Matrix) only
 	      "%*%",
 
 	      "Schur",
+	      "as.array",
 	      "as.matrix",
+	      "as.vector",
 	      "chol",
 	      "colMeans",
 	      "colSums",

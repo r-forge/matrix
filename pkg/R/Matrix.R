@@ -1,27 +1,21 @@
 #### Toplevel ``virtual'' class "Matrix"
 
-## probably not needed eventually:
-setAs(from = "ddenseMatrix", to = "matrix",
-      function(from) {
-	  if(length(d <- dim(from)) != 2) stop("dim(.) has not length 2")
-	  array(from@x, dim = d, dimnames = dimnames(from))
-      })
-
-setMethod("show", signature(object = "ddenseMatrix"),
-          function(object) prMatrix(object))
-
-##- ## FIXME: The following is only for the "dMatrix" objects that are not
-##- ##	      "dense" nor "sparse" -- i.e. "packed" ones :
-##- ## But these could be printed better -- "." for structural zeros.
-##- setMethod("show", signature(object = "dMatrix"), prMatrix)
-##- ## and improve this as well:
-##- setMethod("show", signature(object = "pMatrix"), prMatrix)
-##- ## this should now be superfluous [keep for safety for the moment]:
-setMethod("show", signature(object = "Matrix"),
-          function(object) prMatrix(object))
+## ## probably not needed eventually:
+## setAs(from = "ddenseMatrix", to = "matrix",
+##       function(from) {
+## 	  if(length(d <- dim(from)) != 2) stop("dim(.) has not length 2")
+## 	  array(from@x, dim = d, dimnames = dimnames(from))
+##       })
 
 ## should propagate to all subclasses:
 setMethod("as.matrix", signature(x = "Matrix"), function(x) as(x, "matrix"))
+## for 'Matrix' objects, as.array() should be equivalent:
+setMethod("as.array",  signature(x = "Matrix"), function(x) as(x, "matrix"))
+
+## slow "fall back" method {subclasses should have faster ones}:
+setMethod("as.vector", signature(x = "Matrix", mode = "missing"),
+          function(x) as.vector(as(x, "matrix")))
+
 
 ## Note that isSymmetric is *not* exported
 setMethod("isSymmetric", signature(object = "symmetricMatrix"),
@@ -122,11 +116,33 @@ setMethod("%*%", signature(x = "Matrix", y = "Matrix"),
 
 setMethod("crossprod", signature(x = "Matrix", y = "ANY"),
 	  function (x, y = NULL) .bail.out.2(.Generic, class(x), class(y)))
+setMethod("crossprod", signature(x = "ANY", y = "Matrix"),
+	  function (x, y = NULL) .bail.out.2(.Generic, class(x), class(y)))
+
+## There are special sparse methods; this is a "fall back":
+setMethod("kronecker", signature(X = "Matrix", Y = "ANY",
+                                 FUN = "ANY", make.dimnames = "ANY"),
+          function(X, Y, FUN, make.dimnames, ...) {
+              X <- as(X, "matrix") ; Matrix(callGeneric()) })
+setMethod("kronecker", signature(X = "ANY", Y = "Matrix",
+                                 FUN = "ANY", make.dimnames = "ANY"),
+          function(X, Y, FUN, make.dimnames, ...) {
+              Y <- as(Y, "matrix") ; Matrix(callGeneric()) })
+
 
 setMethod("t", signature(x = "Matrix"),
 	  function(x) .bail.out.1(.Generic, class(x)))
 
-## Group Methods (bail-out)
+## Group Methods
+setMethod("+", signature(e1 = "Matrix", e2 = "missing"), function(e1) e1)
+## "fallback":
+setMethod("-", signature(e1 = "Matrix", e2 = "missing"),
+          function(e1) {
+              warning("inefficient method used for \"- e1\"")
+              0-e1
+          })
+
+## bail-outs:
 setMethod("Compare", signature(e1 = "Matrix", e2 = "Matrix"),
           function(e1, e2) {
               d <- dimCheck(e1,e2)
@@ -221,10 +237,12 @@ if(paste(R.version$major, R.version$minor, sep=".") >= "2.2") {
                                 class(x), class(y)))
               })
 
+    ## Use a working fall back {particularly useful for sparse}:
+    ## FIXME: implement rbind2 via "cholmod" for C* and Tsparse ones
     setMethod("rbind2", signature(x = "Matrix", y = "Matrix"),
               function(x, y) {
                   colCheck(x,y)
-                  stop(gettextf("rbind2() method for (%s,%s) not-yet defined",
-                                class(x), class(y)))
+                  t(cbind2(t(x), t(y)))
               })
+
 }## R-2.2.x and newer
