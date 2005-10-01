@@ -94,10 +94,10 @@ assert.EQ.mat(kt2, ktf, tol= 0)
 
 (lkt <- as(as(kt1, "dgCMatrix"), "lgCMatrix"))# ok
 (clt <- crossprod(lkt))
-if(FALSE) ## FIXME: This gives CHOLMOD errors and a *seg.fault* !!!
+if(FALSE)
     crossprod(clt)
 ## CHOLMOD error: matrix cannot be symmetric
-## CHOLMOD error: argument missing
+
 
 ### "d" <-> "l"  for (symmetric) sparse :
 data(mm)
@@ -111,16 +111,12 @@ if(FALSE) ## FIXME
 
 lmm <- as(mm, "lgCMatrix")
 xlx <- crossprod(lmm)
-## now xlx and lxpx should really be the same -- at least `as matrix':
-m1 <- as(xlx,  "matrix")
-m2 <- as(lxpx, "matrix")
-if(FALSE) ## BUG -- FIXME -- these should be equal!
-    stopifnot(identical(m1,m2))
-## bug :
-table(m1 == m2)
-##  FALSE   TRUE
-##     78 506866
-
-
+## now A = lxpx and B = xlx should be close, but not quite the same
+## since <x,y> = 0 is well possible when x!=0 and y!=0 .
+## However,  A[i,j] != 0 ==> B[i,j] != 0:
+A <- as(as(lxpx, "lgCMatrix"), "lgTMatrix")
+B <- as(as(xlx,  "lgCMatrix"), "lgTMatrix")
+ij <- function(a) a@i + ncol(a) * a@j
+stopifnot(all(ij(A) %in% ij(B)))
 
 proc.time()
