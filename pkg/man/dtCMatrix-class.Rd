@@ -2,6 +2,7 @@
 \docType{class}
 \alias{dtCMatrix-class}
 \alias{dtTMatrix-class}
+\alias{coerce,dtCMatrix,dgCMatrix-method}
 \alias{coerce,dtCMatrix,dgTMatrix-method}
 \alias{coerce,dtCMatrix,dgeMatrix-method}
 \alias{coerce,dtCMatrix,ltCMatrix-method}
@@ -84,6 +85,8 @@ t1
 ## from  0-diagonal to unit-diagonal {low-level step}:
 tu <- t1 ; tu@diag <- "U"
 tu
+(cu <- as(tu, "dtCMatrix"))
+str(cu)# only two entries in @i and @x
 }
 \keyword{classes}
 \keyword{algebra}
