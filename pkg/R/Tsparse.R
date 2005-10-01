@@ -103,10 +103,12 @@ setMethod("[", signature(x = "TsparseMatrix",
       })
 
 setMethod("crossprod", signature(x = "TsparseMatrix", y = "missing"),
-          function(x, y = NULL)
-          .Call("Csparse_crossprod", x, FALSE, TRUE, PACKAGE = "Matrix"))
+	  function(x, y = NULL)
+	  .Call("Csparse_crossprod", x, trans = FALSE, triplet = TRUE,
+		PACKAGE = "Matrix"))
 
 setMethod("tcrossprod", signature(x = "TsparseMatrix"),
-          function(x)
-          .Call("Csparse_crossprod", x, TRUE, TRUE, PACKAGE = "Matrix"))
+	  function(x)
+	  .Call("Csparse_crossprod", x, trans = TRUE, triplet = TRUE,
+		PACKAGE = "Matrix"))
 
