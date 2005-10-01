@@ -10,7 +10,7 @@ check_class(char *class, char **valid)
 	if (!strcmp(class, valid[ans])) return ans;
     }
 }
-	
+
 cholmod_sparse *as_cholmod_sparse(SEXP x)
 {
     cholmod_sparse *ans = (cholmod_sparse*) malloc(sizeof(cholmod_sparse));
@@ -66,19 +66,19 @@ cholmod_sparse *as_cholmod_sparse(SEXP x)
 	    (!strcmp(CHAR(asChar(getAttrib(x, Matrix_uploSym))), "U")) ?
 	    1 : -1;
 	break;
-    case 2: error("triangular matrices not yet mapped");
+    case 2: error("triangular matrices not yet mapped to CHOLMOD");
     }
-    
+
     return ans;
 }
 
-/** 
+/**
  * Copy the contents of a to an appropriate TsparseMatrix object and,
  * optionally, free a or free both a and its the pointers to its contents.
- * 
+ *
  * @param a matrix to be converted
  * @param free 0 - don't free a; > 0 cholmod_free a; < 0 Free a
- * 
+ *
  * @return SEXP containing a copy of a
  */
 SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int free)
@@ -118,7 +118,7 @@ SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int free)
 /* 	Memcpy(COMPLEX(ALLOC_SLOT(ans, Matrix_xSym, CPLXSXP, nnz)), */
 /* 	       (complex *) a->x, nnz); */
 				/* set symmetry attributes */
-    if (a->stype) 
+    if (a->stype)
 	SET_SLOT(ans, Matrix_uploSym,
 		 mkString((a->stype > 0) ? "U" : "L"));
     if (free > 0) cholmod_free_sparse(&a, &c);
@@ -127,15 +127,15 @@ SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int free)
     return ans;
 }
 
-/** 
+/**
  * Create a cholmod_triplet object with the contents of x.  Note that
  * the result should *not* be freed with cholmod_triplet_free.  Use
  * free or Free on the result.
- * 
+ *
  * @param x pointer to an object that inherits from TsparseMatrix
- * 
+ *
  * @return pointer to a cholmod_triplet object that contains pointers
- * to the slots of x. 
+ * to the slots of x.
  */
 cholmod_triplet *as_cholmod_triplet(SEXP x)
 {
@@ -190,19 +190,19 @@ cholmod_triplet *as_cholmod_triplet(SEXP x)
 	    (!strcmp(CHAR(asChar(getAttrib(x, Matrix_uploSym))), "U")) ?
 	    1 : -1;
 	break;
-    case 2: error("triangular matrices not yet mapped");
+    case 2: error("triangular matrices not yet mapped to CHOLMOD");
     }
-    
+
     return ans;
 }
 
-/** 
+/**
  * Copy the contents of a to an appropriate TsparseMatrix object and,
  * optionally, free a or free both a and its the pointers to its contents.
- * 
+ *
  * @param a matrix to be converted
  * @param free 0 - don't free a; > 0 cholmod_free a; < 0 Free a
- * 
+ *
  * @return SEXP containing a copy of a
  */
 SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int free)
@@ -240,7 +240,7 @@ SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int free)
 /* 	Memcpy(COMPLEX(ALLOC_SLOT(ans, Matrix_xSym, CPLXSXP, a->nnz)), */
 /* 	       (complex *) a->x, a->nz); */
 				/* set symmetry attributes */
-    if (a->stype) 
+    if (a->stype)
 	SET_SLOT(ans, Matrix_uploSym,
 		 mkString((a->stype > 0) ? "U" : "L"));
     if (free > 0) cholmod_free_triplet(&a, &c);
@@ -249,15 +249,15 @@ SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int free)
     return ans;
 }
 
-/** 
+/**
  * Create a cholmod_dense object with the contents of x.  Note that
  * the result should *not* be freed with cholmod_dense_free.  Use
  * free or Free on the result.
- * 
+ *
  * @param x pointer to an object that inherits from ddenseMatrix
- * 
+ *
  * @return pointer to a cholmod_dense object that contains a pointer
- * to the contents of x. 
+ * to the contents of x.
  */
 cholmod_dense *as_cholmod_dense(SEXP x)
 {
@@ -304,17 +304,17 @@ cholmod_dense *as_cholmod_dense(SEXP x)
 	ans->x = (void *) COMPLEX(GET_SLOT(x, Matrix_xSym));
 	break;
     }
-    
+
     return ans;
 }
 
-/** 
+/**
  * Copy the contents of a to an appropriate denseMatrix object and,
  * optionally, free a or free both a and its pointer to its contents.
- * 
+ *
  * @param a matrix to be converted
  * @param free 0 - don't free a; > 0 cholmod_free a; < 0 Free a
- * 
+ *
  * @return SEXP containing a copy of a
  */
 SEXP chm_dense_to_SEXP(cholmod_dense *a, int free)
