@@ -210,7 +210,7 @@ static R_CallMethodDef CallEntries[] = {
     {"ltCMatrix_validate", (DL_FUNC) &ltCMatrix_validate, 1},
     {"lsq_dense_Chol", (DL_FUNC) &lsq_dense_Chol, 2},
     {"lsq_dense_QR", (DL_FUNC) &lsq_dense_QR, 2},
-    {"mer2_create", (DL_FUNC) &mer2_create, 3},
+    {"mer2_create", (DL_FUNC) &mer2_create, 4},
     {"matrix_to_csc", (DL_FUNC) &matrix_to_csc, 1},
     {"ssc_transpose", (DL_FUNC) &ssc_transpose, 1},
     {"tsc_to_dgTMatrix", (DL_FUNC) &tsc_to_dgTMatrix, 1},
