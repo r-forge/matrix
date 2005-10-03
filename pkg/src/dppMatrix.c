@@ -28,6 +28,13 @@ SEXP dppMatrix_chol(SEXP x)
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
     SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(x, Matrix_xSym)));
     F77_CALL(dpptrf)(uplo, dims, REAL(GET_SLOT(val, Matrix_xSym)), &info);
+    if (info) {
+	if(info > 0) /* e.g. x singular */
+	    error(_("the leading minor of order %d is not positive definite"),
+		    info);
+	else /* should never happen! */
+	    error(_("Lapack routine %s returned error code %d"), "dpptrf", info);
+    }
     UNPROTECT(1);
     return set_factors(x, val, "pCholesky");
 }
