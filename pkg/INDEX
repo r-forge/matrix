@@ -13,17 +13,19 @@ dgBCMatrix-class        Class "dgBCMatrix" Real Sparse Blocked Column
                         Compressed Matrix
 dgCMatrix-class         Compressed, sparse, column-oriented numeric
                         matrices
-dgeMatrix-class         General S4 Matrix class
+dgeMatrix-class         Class "dgeMatrix" of Dense Numeric (S4 Class)
+                        Matrices
 dgRMatrix-class         Compressed, sparse, row-oriented numeric
                         matrices
 dgTMatrix-class         Sparse matrices in triplet form
 dMatrix-class           (Virtual) Class "dMatrix" of "double" Matrices
-dpoMatrix-class         Positive semi-definite, dense, numeric matrices
-dsCMatrix-class         Symmetric, compressed, sparse column matrices
+dpoMatrix-class         Positive Semi-definite Dense Numeric Matrices
+dsCMatrix-class         Numeric Symmetric Sparse (column compressed)
+                        Matrices
 dsparseMatrix-class     Virtual Class "dsparseMatrix" of Numeric Sparse
                         Matrices
 dsRMatrix-class         Symmetric Sparse Compressed Row Matrices
-dsyMatrix-class         Symmetric, dense matrices
+dsyMatrix-class         Symmetric Dense Numeric Matrices
 dtCMatrix-class         Triangular, (compressed) sparse column matrices
 dtpMatrix-class         Packed triangular dense matrices
 dtrMatrix-class         Triangular, dense, numeric matrices
@@ -33,12 +35,18 @@ expm                    Matrix exponential
 facmul                  Multiplication by Decomposition Factors
 fixef                   Extract Fixed Effects
 Hilbert                 Generate a Hilbert matrix
+iMatrix-class           Virtual Classes Not Yet Used
 index-class             Virtual Class "index" - Simple Class for Matrix
                         Indices
-ldenseMatrix-class      Virtual Classes Not Yet Used
+ldenseMatrix-class      Virtual Class "ldenseMatrix" of Dense Logical
+                        Matrices
+lgeMatrix-class         Class "lgeMatrix" of General Dense Logical
+                        Matrices
 lmer                    Fit (Generalized) Linear Mixed-Effects Models
 lmer-class              Mixed model representations
 lsparseMatrix-class     Sparse logical matrices
+lsyMatrix-class         Symmetric Dense Logical Matrices
+ltrMatrix-class         Triangular Dense Logical Matrices
 lu                      Triangular Decomposition of a Square Matrix
 LU-class                LU Matrix Decompositions
 Matrix                  Construct a Classed Matrix

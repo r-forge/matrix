@@ -1129,8 +1129,9 @@ mer2 <-
     bars <- findbars(formula[[3]])
     random <-
         lapply(bars, function(x)
-               list(model.matrix(eval(substitute(~ T, list(T = x[[2]]))),
-                                 frm),
+               list(t(model.matrix(eval(substitute(~ expr,
+                                                   list(expr = x[[2]]))),
+                                   frm)),
                     eval(substitute(as.factor(fac)[,drop = TRUE],
                                     list(fac = x[[3]])), frm)))
     names(random) <- unlist(lapply(bars, function(x) deparse(x[[3]])))
@@ -1142,9 +1143,6 @@ mer2 <-
     }
     
     ## Create the model matrices and a mixed-effects representation (mer)
-    mmats <- c(lapply(random, "[[", 1),
-               .fixed = list(cbind(glm.fit$x, .response = glm.fit$y)))
-    mer <- .Call("mer2_create", lapply(random, "[[", 2),
-                       mmats, method, PACKAGE = "Matrix")
+    mer <- .Call("mer2_create", random, x, y, method, PACKAGE = "Matrix")
     mer
 }

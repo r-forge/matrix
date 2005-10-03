@@ -295,6 +295,8 @@ vecSum(double dest[], const double src1[], const double src2[],
     return dest;
 }
 
+SEXP alloc_real_classed_matrix(char *class, int nrow, int ncol);
+
 #ifdef __cplusplus
 }
 #endif

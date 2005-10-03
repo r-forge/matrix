@@ -564,3 +564,22 @@ Matrix_getElement(SEXP list, char *nm) {
 	    return(VECTOR_ELT(list, i));
     return R_NilValue;
 }
+
+/** 
+ * Allocate a real classed matrix
+ * 
+ * @param class character string of the type of Matrix to allocate
+ * @param nrow number of rows
+ * @param ncol number of columns
+ * 
+ * @return pointer to a classed real matrix
+ */
+SEXP alloc_real_classed_matrix(char *class, int nrow, int ncol)
+{
+    SEXP val = NEW_OBJECT(MAKE_CLASS(class));
+    int *dims = INTEGER(ALLOC_SLOT(val, Matrix_DimSym, INTSXP, 2));
+    
+    dims[0] = nrow; dims[1] = ncol;
+    ALLOC_SLOT(val, Matrix_xSym, REALSXP, nrow * ncol);
+    return val;
+}

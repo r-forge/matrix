@@ -262,46 +262,39 @@ SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int free)
 cholmod_dense *as_cholmod_dense(SEXP x)
 {
     cholmod_dense *ans = (cholmod_dense*) malloc(sizeof(cholmod_dense));
-    char *valid[] = {"matrix", "dgeMatrix", "lgeMatrix", "zgeMatrix",
-		     ""};
-    int *dims, ctype = check_class(CHAR(asChar(getAttrib(x, R_ClassSymbol))),
-				   valid);
+    char *valid[] = {"dmatrix", "dgeMatrix",
+		     "lmatrix", "lgeMatrix",
+		     "zmatrix", "zgeMatrix", ""},
+	*cl = CHAR(asChar(getAttrib(x, R_ClassSymbol)));
+    int *dims, ctype = check_class(cl, valid);
 
-    if (ctype < 0) error("invalid class of object to as_cholmod_dense");
+    if (ctype < 0 && isMatrix(x))
+	ctype = (isReal(x) ? 0 :
+		 (isLogical(x) ? 2 :
+		  (isComplex(x) ? 4 : -1)));
+   if (ctype < 0) error("invalid class of object to as_cholmod_dense");
 				/* characteristics of the system */
     ans->dtype = CHOLMOD_DOUBLE;
     ans->x = ans->z = (void *) NULL;
 				/* dimensions and nzmax */
-    dims = ctype ? INTEGER(GET_SLOT(x, Matrix_DimSym)) :
+    dims = (ctype % 2) ? INTEGER(GET_SLOT(x, Matrix_DimSym)) :
 	INTEGER(getAttrib(x, R_DimSymbol));
     ans->d = ans->nrow = dims[0];
     ans->ncol = dims[1];
     ans->nzmax = dims[0] * dims[1];
 				/* set the xtype and any elements */
-    switch(ctype) {
+    switch(ctype / 2) {
     case 0:
-	if (isReal(x)) {
-	    ans->xtype = CHOLMOD_REAL;
-	    ans->x = (void *) REAL(x);
-	} else if (isLogical(x)){
-	    ans->xtype = CHOLMOD_PATTERN;
-	    ans->x = (void *) LOGICAL(x);
-	} else if (isComplex(x)) {
-	    ans->xtype = CHOLMOD_COMPLEX;
-	    ans->x = (void *) COMPLEX(x);
-	} else error("type not supported");
+	ans->xtype = CHOLMOD_REAL;
+	ans->x = (void *) REAL((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x);
 	break;
     case 1:
-	ans->xtype = CHOLMOD_REAL;
-	ans->x = (void *) REAL(GET_SLOT(x, Matrix_xSym));
-	break;
-    case 2:
 	ans->xtype = CHOLMOD_PATTERN;
-	ans->x = (void *) LOGICAL(GET_SLOT(x, Matrix_xSym));
+	ans->x = (void *) LOGICAL((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x);
 	break;
     case 3:
 	ans->xtype = CHOLMOD_COMPLEX;
-	ans->x = (void *) COMPLEX(GET_SLOT(x, Matrix_xSym));
+	ans->x = (void *) COMPLEX((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x);
 	break;
     }
 

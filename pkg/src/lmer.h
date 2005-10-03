@@ -49,6 +49,6 @@ SEXP lmer_simulate(SEXP x, SEXP np, SEXP fxdp, SEXP mmats,
 		   SEXP useScP);
 SEXP lmer_update_y(SEXP x, SEXP y, SEXP mm);
 SEXP lmer_set_initial(SEXP x, SEXP iv);
-SEXP mer2_create(SEXP flist, SEXP mmats, SEXP method);
+SEXP mer2_create(SEXP random, SEXP Xp, SEXP yp, SEXP method);
 
 #endif

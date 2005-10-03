@@ -437,11 +437,12 @@ setClass("mer",
 setClass("mer2",
 	 representation(
 			flist = "list", # list of grouping factors
-			perm = "list",	# list of permutations of levels (0-based)
-			Parent = "integer",# elimination tree
-			bVar = "list",	# list of conditional variance factors (upper triangle)
-			L = "list",	# list of blocks of L
-			ZZpO = "dsCMatrix", # Z'Z + Omega
+                        L = "list",     # lower Cholesky factor of Z'Z + Omega
+			RXX = "dgeMatrix", # Augmented RXX component or its inverse
+			RZX = "dtrMatrix", # Augmented RZX component or its inverse
+			XtX = "dpoMatrix", # Original X'X matrix
+			ZtZ = "dsCMatrix", # Original Z'Z
+			ZtX = "dgeMatrix", # Original Z'X matrix
 			Omega = "list", # list of relative precision matrices
 			method = "character", # parameter estimation method
 			cnames = "list",# column names of model matrices
@@ -451,10 +452,8 @@ setClass("mer2",
 					# model matrices and number of observations
 			Gp = "integer", # Pointers to groups of rows in RZX
 			status = "logical"
-			),
-	 validity = function(object) {
-	     .Call("lmer_validate", object, PACKAGE = "Matrix")
-	 })
+			)
+	)
 
 ## Representation of a linear or generalized linear mixed effects model
 setClass("lmer",
