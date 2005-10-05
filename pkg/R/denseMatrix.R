@@ -47,12 +47,13 @@ setMethod("[", signature(x = "denseMatrix", i = "index", j = "index",
               if(is.null(dim(r))) r else as(r, class(x))
           })
 
-## Now the "[<-" ones :
-
-## see also those in ./Matrix.R
+## Now the "[<-" ones --- see also those in ./Matrix.R
 ## It's recommended to use setReplaceMethod() rather than setMethod("[<-",.)
 ## even though the former is currently just a wrapper for the latter
 
+## FIXME: 1) These are far from efficient
+## -----  2) value = "numeric" is only ok for "ddense*"
+##        3) as(<matrix>, class(x)) can be very wrong for symmetric, triangular..
 setReplaceMethod("[", signature(x = "denseMatrix", i = "index", j = "missing",
                                 value = "numeric"),
                  function (x, i, value) {
