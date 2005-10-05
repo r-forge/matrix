@@ -82,6 +82,7 @@ Matrix <-
     ## FIXME: consider it's type (logical,....)
     ## ctype <- substr(class(data), 1,1) # "d", "l", ...
     ## FIXME(2): check for symmetric / triangular / ...
+### TODO: Compare with as.Matrix() and its tests in ./dgeMatrix.R
     if(sparse)
         as(data, "dgCMatrix")
     else
