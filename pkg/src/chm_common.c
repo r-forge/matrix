@@ -326,7 +326,7 @@ SEXP chm_dense_to_SEXP(cholmod_dense *a, int free)
     dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
     dims[0] = a->nrow; dims[1] = a->ncol;
     ntot = dims[0] * dims[1];
-    if (a->d == a->ncol) {	/* copy data slot if present */
+    if (a->d == a->nrow) {	/* copy data slot if present */
 	if (a->xtype == CHOLMOD_REAL)
 	    Memcpy(REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, ntot)),
 		   (double *) a->x, ntot);
