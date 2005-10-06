@@ -438,11 +438,15 @@ setClass("mer2",
 	 representation(
 			flist = "list", # list of grouping factors
                         L = "list",     # lower Cholesky factor of Z'Z + Omega
-			RXX = "dgeMatrix", # Augmented RXX component or its inverse
-			RZX = "dtrMatrix", # Augmented RZX component or its inverse
+			RXX = "dtrMatrix", # RXX component
+			RZX = "dgeMatrix", # RZX component
 			XtX = "dpoMatrix", # Original X'X matrix
 			ZtZ = "dsCMatrix", # Original Z'Z
 			ZtX = "dgeMatrix", # Original Z'X matrix
+                        Zty = "numeric", # Original Z'y vector
+                        Xty = "numeric", # Original X'y vector
+                        rZy = "numeric", 
+                        rXy = "numeric",
 			Omega = "list", # list of relative precision matrices
 			method = "character", # parameter estimation method
 			cnames = "list",# column names of model matrices
