@@ -211,6 +211,7 @@ static R_CallMethodDef CallEntries[] = {
     {"lsq_dense_Chol", (DL_FUNC) &lsq_dense_Chol, 2},
     {"lsq_dense_QR", (DL_FUNC) &lsq_dense_QR, 2},
     {"mer2_create", (DL_FUNC) &mer2_create, 4},
+    {"mer2_factor", (DL_FUNC) &mer2_factor, 1},
     {"matrix_to_csc", (DL_FUNC) &matrix_to_csc, 1},
     {"ssc_transpose", (DL_FUNC) &ssc_transpose, 1},
     {"tsc_to_dgTMatrix", (DL_FUNC) &tsc_to_dgTMatrix, 1},
@@ -241,10 +242,12 @@ void R_init_Matrix(DllInfo *dll)
     Matrix_RXXSym = install("RXX");
     Matrix_RZXSym = install("RZX");
     Matrix_XtXSym = install("XtX");
+    Matrix_XtySym = install("Xty");
     Matrix_ZZxSym = install("ZZx");
     Matrix_ZZpOSym = install("ZZpO");
     Matrix_ZtXSym = install("ZtX");
     Matrix_ZtZSym = install("ZtZ");
+    Matrix_ZtySym = install("Zty");
     Matrix_bVarSym = install("bVar");
     Matrix_cnamesSym = install("cnames");
     Matrix_devCompSym = install("devComp");
@@ -261,6 +264,8 @@ void R_init_Matrix(DllInfo *dll)
     Matrix_pSym = install("p");
     Matrix_permSym = install("perm");
     Matrix_rcondSym = install("rcond");
+    Matrix_rXySym = install("rXy");
+    Matrix_rZySym = install("rZy");
     Matrix_statusSym = install("status");
     Matrix_uploSym = install("uplo");
     Matrix_xSym = install("x");

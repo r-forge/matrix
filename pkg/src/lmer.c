@@ -3524,6 +3524,58 @@ list_to_sparse(SEXP rand, int nobs, int *nc, int *Gp, SEXP flist)
     return A;
 }
 
+static cholmod_dense
+*numeric_as_chm_dense(double *v, int n)
+{
+    cholmod_dense *ans = Calloc(1, cholmod_dense);
+    
+    ans->d = ans->nzmax = ans->nrow = n;
+    ans->ncol = 1;
+    ans->x = (void *) v;
+    ans->xtype = CHOLMOD_REAL;
+    ans->dtype = CHOLMOD_DOUBLE;
+    return ans;
+}
+
+static R_INLINE
+SEXP alloc_dgeMatrix(int m, int n)
+{
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
+    int *dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
+
+    dims[0] = m; dims[1] = n;
+    ALLOC_SLOT(ans, Matrix_xSym, REALSXP, m * n);
+    UNPROTECT(1);
+    return ans;
+}
+
+static R_INLINE
+SEXP alloc_dsyMatrix(int n, char *uplo)
+{
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dsyMatrix")));
+    int *dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
+
+    dims[0] = dims[1] = n;
+    ALLOC_SLOT(ans, Matrix_xSym, REALSXP, n * n);
+    SET_SLOT(ans, Matrix_uploSym, mkString(uplo));
+    UNPROTECT(1);
+    return ans;
+}
+
+static R_INLINE
+SEXP alloc_dtrMatrix(int n, char *uplo, char *diag)
+{
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dtrMatrix")));
+    int *dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
+
+    dims[0] = dims[1] = n;
+    ALLOC_SLOT(ans, Matrix_xSym, REALSXP, n * n);
+    SET_SLOT(ans, Matrix_uploSym, mkString(uplo));
+    SET_SLOT(ans, Matrix_diagSym, mkString(diag));
+    UNPROTECT(1);
+    return ans;
+}
+
 /**
  * Create an mer2 object from a list of grouping factors and a list of model
  * matrices.  There is one more model matrix than grouping factor.  The last
@@ -3536,12 +3588,16 @@ list_to_sparse(SEXP rand, int nobs, int *nc, int *Gp, SEXP flist)
  */
 SEXP mer2_create(SEXP random, SEXP Xp, SEXP yp, SEXP method)
 {
-    SEXP fl, LL, val = PROTECT(NEW_OBJECT(MAKE_CLASS("mer2"))), XtXp, ZtXp;
+    SEXP LL, Omega, XtXp, ZtXp, fl,
+	fnms = getAttrib(random, R_NamesSymbol), tt,
+	val = PROTECT(NEW_OBJECT(MAKE_CLASS("mer2")));
     cholmod_sparse *Zt, *ZtZ, *A;
-    cholmod_dense *X = as_cholmod_dense(Xp), *ZtX;
+    cholmod_dense *X = as_cholmod_dense(Xp), *ZtX, *tmp1, *tmp2;
     cholmod_factor *F;
-    int *nc, *Gp, *xdims, j, nf = LENGTH(random), nobs = LENGTH(yp), p, q;
+    int *nc, *Gp, *xdims, ione = 1, j, nf = LENGTH(random), nobs = LENGTH(yp), p, q;
     double *XtX, one = 1, zero = 0;
+    char *statnms[] = {"factored", "inverted", ""},
+	*devnms[] = {"ML", "REML", ""};
 
     if (!isReal(yp)) error(_("yp must be a real vector"));
     if (!isMatrix(Xp) || !isReal(Xp))
@@ -3556,37 +3612,214 @@ SEXP mer2_create(SEXP random, SEXP Xp, SEXP yp, SEXP method)
     Gp = INTEGER(ALLOC_SLOT(val, Matrix_GpSym, INTSXP, nf + 1));
 				/* check random, create Zt and ZtZ */
     Zt = list_to_sparse(random, nobs, nc, Gp, fl);
-				/* FIXME: Is it better to analyze Zt or ZtZ? */
+				/* analyze ZtZ */
     q = Zt->nrow;
     j = c.supernodal;
     c.supernodal = CHOLMOD_SUPERNODAL;
     F = cholmod_analyze(Zt, &c);
     c.supernodal = j;
-    j = c.print;
-    c.print = 4;
-    cholmod_print_factor(F, "L", &c);
-    c.print = j;
     LL = ALLOC_SLOT(val, Matrix_LSym, VECSXP, 1);
+/* FIXME: Need to set up a finalizer for F.  Right now that storage is not being released. */
     SET_VECTOR_ELT(LL, 0, R_MakeExternalPtr(F, R_NilValue, val));
     A = cholmod_aat(Zt, (int *) NULL, (size_t) 0, 1/* mode */, &c);
     ZtZ = cholmod_copy(A, 1/* stype */, 1/* mode */, &c);
     cholmod_free_sparse(&A, &c);
     SET_SLOT(val, Matrix_ZtZSym, chm_sparse_to_SEXP(ZtZ, 1));
-				/* create ZtX, XtX */
-    ZtXp = alloc_real_classed_matrix("dgeMatrix", q, p);
+				/* create ZtX, RZX, XtX, RXX */
+    ZtXp = alloc_dgeMatrix(q, p);
     SET_SLOT(val, Matrix_ZtXSym, ZtXp);
     ZtX = as_cholmod_dense(ZtXp);
     if (!cholmod_sdmult(Zt, 0, &one, &zero, X, ZtX, &c))
 	error(_("cholmod_sdmult failed"));
-    XtXp = alloc_real_classed_matrix("dsyMatrix", p, p);
-    SET_SLOT(XtXp, Matrix_uploSym, mkString("U"));
+    SET_SLOT(val, Matrix_RZXSym, duplicate(ZtXp));
+    XtXp = alloc_dsyMatrix(p, "U");
+    SET_SLOT(val, Matrix_XtXSym, XtXp);
     XtX = REAL(GET_SLOT(XtXp, Matrix_xSym));
     AZERO(XtX, p * p);
-    SET_SLOT(val, Matrix_XtXSym, XtXp);
     F77_CALL(dsyrk)("U", "T", &p, &nobs, &one, REAL(Xp), &nobs,
 		    &zero, XtX, &p);
+    XtXp = alloc_dtrMatrix(p, "U", "N");
+    SET_SLOT(val, Matrix_RXXSym, XtXp);
+    AZERO(REAL(GET_SLOT(XtXp, Matrix_xSym)), p * p);
+				/* create Zty, rZy, Xty, rXy */
+    tmp1 = numeric_as_chm_dense(REAL(yp), nobs);
+    tmp2 = numeric_as_chm_dense(REAL(ALLOC_SLOT(val, Matrix_ZtySym,
+						REALSXP, q)), q);
+    if (!cholmod_sdmult(Zt, 0, &one, &zero, tmp1, tmp2, &c))
+	error(_("cholmod_sdmult failed"));
+    Free(tmp1); Free(tmp2); 
+
+    SET_SLOT(val, Matrix_rZySym,
+	     duplicate(GET_SLOT(val, Matrix_ZtySym)));
+    tt = ALLOC_SLOT(val, Matrix_XtySym, REALSXP, p);
+    F77_CALL(dgemm)("T", "N", &p, &ione, &nobs, &one, REAL(Xp), &nobs,
+		    REAL(yp), &nobs, &zero, REAL(tt), &p);
+    SET_SLOT(val, Matrix_rXySym, duplicate(tt));
+				/* allocate other slots */
+    SET_SLOT(val, Matrix_devianceSym, Matrix_make_named(REALSXP, devnms));
+    SET_SLOT(val, Matrix_statusSym, Matrix_make_named(LGLSXP, statnms));
+    LOGICAL(GET_SLOT(val, Matrix_statusSym))[0] = 0;
+    tt = ALLOC_SLOT(val, Matrix_devCompSym, REALSXP, 5);
+				/* save y'y */
+    REAL(tt)[0] = F77_CALL(ddot)(&nobs, REAL(yp), &ione, REAL(yp), &ione);
+				/* allocate and populate Omega */
+    Omega = ALLOC_SLOT(val, Matrix_OmegaSym, VECSXP, nf);
+    setAttrib(Omega, R_NamesSymbol, duplicate(fnms));
+    for (j = 0; j < nf; j++)
+	SET_VECTOR_ELT(Omega, j, alloc_dsyMatrix(nc[j], "U"));
     
-    Free(X); Free(ZtX);
+    Free(X); Free(ZtX); cholmod_free_sparse(&Zt, &c);
     UNPROTECT(1);
     return val;
+}
+
+/**
+ * Create and insert initial values for Omega.
+ *
+ * @param x pointer to an mer2 object
+ *
+ * @return NULL
+ */
+SEXP mer2_initial(SEXP x)
+{
+    SEXP Omg = GET_SLOT(x, Matrix_OmegaSym),
+	ZtZ = GET_SLOT(x, Matrix_ZtZSym);
+    int	*Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	*ii = INTEGER(GET_SLOT(ZtZ, Matrix_iSym)),
+	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	*p = INTEGER(GET_SLOT(ZtZ, Matrix_pSym)),
+	*status = LOGICAL(GET_SLOT(x, Matrix_statusSym)),
+	i, nf = length(Omg);
+    double *xx = REAL(GET_SLOT(ZtZ, Matrix_xSym));
+
+    for (i = 0; i < nf; i++) {
+	double *omgi = REAL(GET_SLOT(VECTOR_ELT(Omg, i),
+				     Matrix_xSym));
+	int j, nci = nc[i];
+    }
+    return R_NilValue;
+}
+
+/** 
+ * Create a copy of ZtZ with the diagonal blocks inflated according to Omega
+ * 
+ * @param zz cholmod_sparse version of ZtZ
+ * @param nf number of factors
+ * @param Omega Omega list
+ * @param nc number of columns in model matrices
+ * @param Gp group pointers
+ * 
+ * @return a freshly allocated cholmod_sparse version of the sum
+ */
+static cholmod_sparse *
+ZZ_inflate(cholmod_sparse *zz, int nf, SEXP Omega, int *nc, int *Gp)
+{
+    cholmod_sparse *Omg, *ans;
+    int *omp, *nnz = Calloc(nf + 1, int), i;
+    double one = 1;
+
+    for (nnz[0] = 0, i = 0; i < nf; i++)
+	nnz[i + 1] = nnz[i] + (Gp[i + 1] - Gp[i])*(nc[i] + 1)/2;
+    Omg = cholmod_allocate_sparse(zz->nrow, zz->ncol, (size_t) nnz[nf],
+				  TRUE, TRUE, 1, CHOLMOD_REAL, &c);
+    omp = (int *) Omg->p;
+    for (i = 0; i < nf; i++) {
+	int bb = Gp[i], j, jj, k, nci = nc[i];
+	int nlev = (Gp[i + 1] - bb)/nci;
+	double *Omgi = REAL(GET_SLOT(VECTOR_ELT(Omega, i), Matrix_xSym));
+
+	for (j = 0; j < nlev; j++) { /* column of result */
+	    int col0 = bb + j * nci; /* absolute column number */
+
+	    for (jj = 0; jj < nci; jj++) { /* column of Omega_i */
+		int coljj = col0 + jj;
+
+		omp[coljj + 1] = omp[coljj] + jj + 1;
+		for (k = 0; k <= jj; k++) { /* row of Omega_i */
+		    int ind = omp[coljj];
+		    ((int *)Omg->i)[ind + k] = col0 + k;
+		    ((double *)Omg->x)[ind + k] = Omgi[jj * nci + k];
+		}
+	    }
+	}
+    }
+    i = c.print;
+    c.print = 5;
+    cholmod_print_sparse(Omg, "Omg", &c);
+    ans = cholmod_add(zz, Omg, &one, &one, TRUE, TRUE, &c);
+    c.print = i;
+
+    Free(nnz); cholmod_free_sparse(&Omg, &c);
+    return ans;
+}
+
+/**
+ * If status[["factored"]] is FALSE, create and factor Z'Z+Omega.  Also
+ * create RZX and RXX, the deviance components, and the value of the
+ * deviance for both ML and REML.
+ *
+ * @param x pointer to an lmer object
+ *
+ * @return NULL
+ */
+SEXP mer2_factor(SEXP x)
+{
+    int *status = LOGICAL(GET_SLOT(x, Matrix_statusSym));
+
+    if (!status[0]) {
+	SEXP Gpp = GET_SLOT(x, Matrix_GpSym);
+	cholmod_sparse *A,
+	    *zz = as_cholmod_sparse(GET_SLOT(x, Matrix_ZtZSym));
+	cholmod_factor *L = (cholmod_factor *)
+	    R_ExternalPtrAddr(VECTOR_ELT(GET_SLOT(x, Matrix_LSym), 0));
+	cholmod_dense *ZtX = as_cholmod_dense(GET_SLOT(x, Matrix_ZtXSym)),
+	    *Zty = numeric_as_chm_dense(REAL(GET_SLOT(x, Matrix_ZtySym)), L->n),
+	    *rZy, *RZX;
+	int info, ione = 1, p = ZtX->ncol, q = L->n;
+	double *RXX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym)),
+	    *XtX = REAL(GET_SLOT(GET_SLOT(x, Matrix_XtXSym), Matrix_xSym)),
+	    *Xty = REAL(GET_SLOT(x, Matrix_XtySym)),
+	    *rXy = REAL(GET_SLOT(x, Matrix_rXySym)),
+	    *devComp = REAL(GET_SLOT(x, Matrix_devCompSym)),
+	    *dev = REAL(GET_SLOT(x, Matrix_devianceSym)),
+	    one = 1, minus1 = -1;
+	    
+	A = ZZ_inflate(zz, LENGTH(Gpp) - 1,
+		       GET_SLOT(x, Matrix_OmegaSym),
+		       INTEGER(GET_SLOT(x, Matrix_ncSym)),
+		       INTEGER(Gpp));
+	Free(zz);
+	if (!cholmod_factorize(A, L, &c))
+	    error(_("rank_deficient Z'Z+Omega"));
+	info = c.print;
+	c.print = 5;
+	cholmod_print_sparse(A, "A", &c);
+	cholmod_print_factor(L, "L", &c);
+	cholmod_free_sparse(&A, &c);
+				/* calculate and store RZX and rZy */
+	RZX = cholmod_solve(CHOLMOD_L, L, ZtX, &c);
+	rZy = cholmod_solve(CHOLMOD_L, L, Zty, &c);
+	cholmod_print_dense(RZX, "RZX", &c);
+	cholmod_print_dense(rZy, "rZy", &c);
+	c.print = info;
+	Free(ZtX); Free(Zty);
+	Memcpy(REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXSym), Matrix_xSym)),
+	       (double *) RZX->x, q * p);
+	Memcpy(REAL(GET_SLOT(x, Matrix_rZySym)), (double *) rZy->x, q);
+				/* downdate XtX and factor */
+	Memcpy(RXX, XtX, p * p);
+	F77_CALL(dsyrk)("U", "T", &p, &q, &minus1, (double*)RZX->x,
+			&q, &one, RXX, &p);
+	F77_CALL(dpotrf)("U", &p, RXX, &p, &info);
+	if (info)
+	    error(_("Leading minor of order %d in downdated X'X is not positive definite"),
+		  info);
+				/* solve for rXy  and ryy^2 */
+	Memcpy(rXy, Xty, p);
+	F77_CALL(dtrsv)("U", "T", "N", &p, RXX, &p, rXy, &ione);
+	devComp[1] = devComp[0] - F77_CALL(ddot)(&p, rXy, &ione, rXy, &ione)
+	    - F77_CALL(ddot)(&q, (double*)rZy->x, &ione, (double*)rZy->x, &ione);
+
+    }
+    return R_NilValue;
 }
