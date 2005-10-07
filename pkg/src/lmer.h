@@ -51,5 +51,6 @@ SEXP lmer_update_y(SEXP x, SEXP y, SEXP mm);
 SEXP lmer_set_initial(SEXP x, SEXP iv);
 SEXP mer2_create(SEXP random, SEXP Xp, SEXP yp, SEXP method);
 SEXP mer2_factor(SEXP x);
+SEXP mer2_initial(SEXP x);
 
 #endif
