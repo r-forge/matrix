@@ -3624,7 +3624,11 @@ SEXP mer2_create(SEXP random, SEXP Xp, SEXP yp, SEXP method)
     A = cholmod_aat(Zt, (int *) NULL, (size_t) 0, 1/* mode */, &c);
     ZtZ = cholmod_copy(A, 1/* stype */, 1/* mode */, &c);
     cholmod_free_sparse(&A, &c);
-    SET_SLOT(val, Matrix_ZtZSym, chm_sparse_to_SEXP(ZtZ, 1));
+    /* generally ZtZ is indefinite but we want to call cholmod_solve
+     * below and we need F->xtype == CHOLMOD_REAL.  The factorization
+     * fails harmlessly. */
+    cholmod_factorize(ZtZ, F, &c);
+    SET_SLOT(val, Matrix_ZtZSym, chm_sparse_to_SEXP(ZtZ, 1)); /* frees ZtZ */
 				/* create ZtX, RZX, XtX, RXX */
     tmp1 = cholmod_allocate_dense(q, p, q, CHOLMOD_REAL, &c);
     if (!cholmod_sdmult(Zt, 0, &one, &zero, X, tmp1, &c))
