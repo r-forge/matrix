@@ -107,6 +107,12 @@ Class \code{"dgCMatrix"}, directly.
   \code{\link{dgCMatrix-class}}, \code{\link{dgTMatrix-class}},
   \code{\link{dgeMatrix-class}}
 }
-%\examples{}
+\examples{
+## First a "dgCMatrix"
+mm <- Matrix(toeplitz(c(10, 0, 1, 0, 3)), sparse = TRUE)
+mT <- as(mm, "dgTMatrix")
+(symM <- as(mT, "dsCMatrix"))
+str(symM)
+}
 \keyword{classes}
 \keyword{algebra}

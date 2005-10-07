@@ -37,7 +37,8 @@
   implementation the non-zero elements in the columns are sorted into
   increasing row order.}
 \section{Objects from the Class}{
-  Objects can be created by calls of the form \code{new("dgCMatrix", ...)}.
+  Objects can be created by calls of the form \code{new("dgCMatrix", ...)} or
+  often more easily via \code{\link{Matrix}(*, sparse = TRUE)}.
 }
 \section{Slots}{
   \describe{
@@ -73,10 +74,9 @@
   \code{\link{dsCMatrix-class}}, \code{\link{dtCMatrix-class}}
 }
 \examples{
-m <- Matrix(c(0,0,2:0), 3,5)
-(mC <- as(m, "dgCMatrix"))
-str(mC)
-mC[,1]
+(m <- Matrix(c(0,0,2:0), 3,5))
+str(m)
+m[,1]
 }
 \keyword{classes}
 \keyword{algebra}
