@@ -261,15 +261,17 @@ setMethod("rowMeans", signature(x = "dgeMatrix"),
 
 ## utilities for Matrix.class() :
 
+## FIXME  base::eigen() has a more sensible test for Hermitian/symmetry !
 Hermitian.test <- function(x)
 {
-    if ((!inherits(x, "Matrix") && !is.matrix(x)) ||
-	(nrow(x) != ncol(x))) return(Inf)
-    if (is.complex(x)) return(max(Mod(x - t(Conj(x)))))
-    max(x - t(x))
+    ## Includes Symmetry test for non-complex 'x'
+    if ((!inherits(x, "Matrix") && !is.matrix(x)) || (nrow(x) != ncol(x)))
+        return(Inf)
+    if (is.complex(x))
+        max(Mod(x - t(Conj(x))))
+    else
+        max(abs(x - t(x)))
 }
-
-is.Hermitian <- function(x, tol = 0) { Hermitian.test(x) <= tol }
 
 LowerTriangular.test <- function(x)
 {
@@ -288,40 +290,38 @@ UpperTriangular.test <- function(x)
     max(if (is.complex(x)) abs(x[i]) else Mod(x[i]))
 }
 
-is.LowerTriangular <- function(x, tol = 0) { LowerTriangular.test(x) <= tol }
-
-is.UpperTriangular <- function(x, tol = 0) { UpperTriangular.test(x) <= tol }
-
 Orthogonal.test <- function(x, byrow = FALSE, normal = TRUE)
 {
     if ((!inherits(x, "Matrix") && !is.matrix(x))) return(Inf)
     if (byrow) { x <- t(x) }
     xx <- crossprod(x)
-    if (normal) {			# check for orthonormal
-	return(max(Mod(xx[row(xx) > col(xx)]), Mod(diag(xx) - 1)))
-    }
-    max(Mod(xx[row(xx) > col(xx)]))
+    if (normal) # check for orthonormal
+	max(Mod(xx[row(xx) > col(xx)]), Mod(diag(xx) - 1))
+    else
+        max(Mod(xx[row(xx) > col(xx)]))
 }
 
 Orthonormal.test <- function(x, byrow = FALSE)
-{
-    Orthogonal.test(x, byrow, normal = TRUE)
-}
+{ Orthogonal.test(x, byrow, normal = TRUE) }
+
+is.Hermitian <- function(x, tol = 0) { Hermitian.test(x) <= tol }
+
+is.LowerTriangular <- function(x, tol = 0) { LowerTriangular.test(x) <= tol }
+
+is.UpperTriangular <- function(x, tol = 0) { UpperTriangular.test(x) <= tol }
 
 is.ColOrthonormal <- function(x, tol = sqrt(.Machine$double.eps))
-{
-    Orthonormal.test(x, byrow = FALSE) <= tol
-}
+{ Orthonormal.test(x, byrow = FALSE) <= tol }
 
 is.RowOrthonormal <- function(x, tol = sqrt(.Machine$double.eps))
-{
-    Orthonormal.test(x, byrow = TRUE) <= tol
-}
+{ Orthonormal.test(x, byrow = TRUE) <= tol }
 
 is.Orthonormal <- function(x, tol = sqrt(.Machine$double.eps), byrow = FALSE)
 {
-    if (byrow) return(is.RowOrthonormal(x, tol))
-    is.ColOrthonormal(x, tol)
+    if (byrow)
+	is.RowOrthonormal(x, tol)
+    else
+	is.ColOrthonormal(x, tol)
 }
 
 
@@ -370,10 +370,19 @@ Matrix.class <- function(x, tol = 0, symmetry = TRUE, unit.diagonal = TRUE,
 }
 
 
-as.Matrix <- function(x, tol = .Machine$double.eps)
+as.Matrix <- function(x, tol = .Machine$double.eps,
+                      integer.max = .Machine$integer.max)
 {
     if(is(x, "Matrix")) return(x)
     ## else
-    as(if(is.matrix(x)) x else as.matrix(x),
-       Matrix.class(x, tol = tol))
+    if(!is.matrix(x)) x <- as.matrix(x)
+    mc <- Matrix.class(x, tol = tol) ## a character *vector*
+    xmode <-
+        if(is.logical(x)) "l" else if(is.complex(x)) "z"
+        else if(is.numeric(x)) {
+            if(is.integer(x) || all(abs(x) < integer.max)) "i" else "d"
+        }
+        else stop("invalid data type")
+    ## .... .... fixme
+    as(x, smartFunction(mc))
 }
