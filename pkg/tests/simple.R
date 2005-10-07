@@ -89,6 +89,10 @@ assert.EQ.mat(kt1, ktf, tol= 0)
 assert.EQ.mat(kt2, ktf, tol= 0)
 ## but kt1 and kt2, both "dgT" are different since entries are not ordered!
 
+##--- symmetric -> pos.def. needs valid test:
+if(FALSE) # this happily "works" but MM thinks it shouldn't:
+assertError(as(as(Matrix(diag(5)-1), "dsyMatrix"), "dpoMatrix"))
+
 
 ###-- logical sparse : ----------
 
@@ -119,4 +123,8 @@ B <- as(as(xlx,  "lgCMatrix"), "lgTMatrix")
 ij <- function(a) a@i + ncol(a) * a@j
 stopifnot(all(ij(A) %in% ij(B)))
 
-proc.time()
+
+
+
+cat('Time elapsed: ', proc.time(),'\n') # "stats"
+
