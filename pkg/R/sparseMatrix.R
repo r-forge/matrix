@@ -71,7 +71,9 @@ setMethod("[", signature(x = "sparseMatrix", i = "index", j = "missing",
               cl <- class(x)
               viaCl <- if(is(x,"dMatrix")) "dgTMatrix" else "lgTMatrix"
               x <- callGeneric(x = as(x, viaCl), i=i, drop=drop)
-              if(!is(x,"Matrix")) x else as(x, cl)
+              ## try_as(x, c(cl, sub("T","C", viaCl)))
+              if(is(x, "Matrix") && extends(cl, "CsparseMatrix"))
+                  as(x, sub("T","C", viaCl)) else x
           })
 
 setMethod("[", signature(x = "sparseMatrix", i = "missing", j = "index",
@@ -80,7 +82,9 @@ setMethod("[", signature(x = "sparseMatrix", i = "missing", j = "index",
               cl <- class(x)
               viaCl <- if(is(x,"dMatrix")) "dgTMatrix" else "lgTMatrix"
               x <- callGeneric(x = as(x, viaCl), j=j, drop=drop)
-              if(!is(x,"Matrix")) x else as(x, cl)
+              ## try_as(x, c(cl, sub("T","C", viaCl)))
+              if(is(x, "Matrix") && extends(cl, "CsparseMatrix"))
+                  as(x, sub("T","C", viaCl)) else x
           })
 
 setMethod("[", signature(x = "sparseMatrix",
@@ -89,7 +93,9 @@ setMethod("[", signature(x = "sparseMatrix",
               cl <- class(x)
               viaCl <- if(is(x,"dMatrix")) "dgTMatrix" else "lgTMatrix"
               x <- callGeneric(x = as(x, viaCl), i=i, j=j, drop=drop)
-              if(!is(x,"Matrix")) x else as(x, cl)
+              ## try_as(x, c(cl, sub("T","C", viaCl)))
+              if(is(x, "Matrix") && extends(cl, "CsparseMatrix"))
+                  as(x, sub("T","C", viaCl)) else x
           })
 
 
@@ -146,21 +152,19 @@ setMethod("show", signature(object = "sparseMatrix"),
 
 
 ## not exported:
-setMethod("isSymmetric", signature(object = "sparseMatrix"),
-	  function(object, ...) {
+setMethod("isSymmetric", signature(object = "sparseMatrix", tol = "ANY"),
+	  function(object, tol = 100*.Machine$double.eps) {
 	      ## pretest: is it square?
 	      d <- dim(object)
 	      if(d[1] != d[2]) return(FALSE)
 	      ## else slower test
-	      if (is(object("dMatrix")))
+	      if (is(object, "dMatrix"))
 		  ## use gC; "T" (triplet) is *not* unique!
 		  isTRUE(all.equal(as(object, "dgCMatrix"),
-				   as(t(object), "dgCMatrix"), ...))
-	      else if (is(object("lMatrix")))
+				   as(t(object), "dgCMatrix"), tol = tol))
+	      else if (is(object, "lMatrix"))
 		  ## test for exact equality; FIXME(?): identical() too strict?
 		  identical(as(object, "lgCMatrix"),
 			    as(t(object), "lgCMatrix"))
 	      else stop("not yet implemented")
 	  })
-
-

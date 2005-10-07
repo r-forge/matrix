@@ -17,12 +17,14 @@ setMethod("as.vector", signature(x = "Matrix", mode = "missing"),
           function(x) as.vector(as(x, "matrix")))
 
 
-## Note that isSymmetric is *not* exported
-setMethod("isSymmetric", signature(object = "symmetricMatrix"),
-          function(object) TRUE)
-setMethod("isSymmetric", signature(object = "triangularMatrix"),
+## Note that isSymmetric is *not* exported ---
+### but also note that "base" eigen may get an isSymmetric() that *would* be exported!
+setMethod("isSymmetric", signature(object = "symmetricMatrix", tol="ANY"),
+          function(object,tol) TRUE)
+setMethod("isSymmetric", signature(object = "triangularMatrix", tol="ANY"),
           ## FIXME: 'TRUE' if *diagonal*, i.e. return(isDiagonal(object))
-          function(object) FALSE)
+          function(object,tol) FALSE)
+
 setMethod("isDiagonal", signature(object = "sparseMatrix"),
           function(object) {
               gT <- as(object, "TsparseMatrix")

@@ -12,6 +12,13 @@
     ##  "x <- as.matrix(x)" or  "X <- as.array(X)"
     ## will work for 'Matrix'-matrices
 
+    ## kronecker() / %x% -- in principle should re-assigne base::kronecker
+    ## -----------> ?? performance hit ?? in mantelhaen.test() ??
+    ##
+    ## This is formally identical to the base definition, but should use the
+    ## generic kronecker
+    assignInNamespace("%x%", function (X, Y) kronecker(X, Y), ns = "base")
+
     if(paste(R.version$major, R.version$minor, sep=".") >= "2.2")
         methods:::bind_activation(TRUE)
 }

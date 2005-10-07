@@ -177,7 +177,7 @@ setMethod("lmer", signature(formula = "formula"),
                        mmats, method, PACKAGE = "Matrix")
           if (lmm) {                    ## linear mixed model
               if (missing(start)) .Call("lmer_initial", mer, PACKAGE="Matrix")
-              else .Call("lmer_set_initial", mer, start, PACKAGE = "Matrix")  
+              else .Call("lmer_set_initial", mer, start, PACKAGE = "Matrix")
               .Call("lmer_ECMEsteps", mer, cv$niterEM, cv$EMverbose, PACKAGE = "Matrix")
               LMEoptimize(mer) <- cv
               fits <- .Call("lmer_fitted", mer, mmats, TRUE, PACKAGE = "Matrix")
@@ -954,17 +954,22 @@ setMethod("model.matrix", signature(object = "lmer"),
       })
 
 setMethod("simulate", signature(object = "lmer"),
-          function(object, nsim = 1,
-                   seed = runif(1, 0, .Machine$integer.max),
-                   ...)
+          function(object, nsim = 1, seed = NULL, ...)
       {
-          runif(1) ## to initialize the RNG if necessary
-          RNGstate <- .Random.seed
-          set.seed(seed)
+          if(!exists(".Random.seed", envir = .GlobalEnv))
+              runif(1)               # initialize the RNG if necessary
+          if(is.null(seed))
+              RNGstate <- .Random.seed
+          else {
+              R.seed <- .Random.seed
+              set.seed(seed)
+              RNGstate <- structure(seed, kind = as.list(RNGkind()))
+              on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+          }
 
           family <- object@family
           if (family$family != "gaussian" ||
-              family$link != "identity") 
+              family$link != "identity")
               stop("simulation of generalized linear mixed models not yet implemented")
 
           ## pieces we will need later
@@ -984,9 +989,8 @@ setMethod("simulate", signature(object = "lmer"),
           ## add per-observation noise term
           lpred <- as.data.frame(lpred + rnorm(prod(dim(lpred)), sd = scale))
 
-          ## save the seed and restore the RNG state
-          attr(lpred, "seed") <- seed
-          assign(".Random.seed", RNGstate, envir = .GlobalEnv)
+          ## save the seed
+          attr(lpred, "seed") <- RNGstate
           lpred
       })
 
@@ -994,7 +998,7 @@ simulate2 <- function(object, n = 1, ...)
 {
     family <- object@family
     if (family$family != "gaussian" ||
-        family$link != "identity") 
+        family$link != "identity")
         stop("simulation of generalized linear mixed models not implemented yet")
 
     ## create the mean from the fixed effects
@@ -1020,7 +1024,7 @@ simulate2 <- function(object, n = 1, ...)
     if (any(names(random) != names(flist)))
         random <- random[names(flist)]
     mmats <- lapply(random, "[[", 1)
-    
+
     ## simulate the random effects
     scale <- .Call("lmer_sigma", object, object@method == "REML",
                    PACKAGE = "Matrix")
@@ -1117,14 +1121,14 @@ mer2 <-
                         '\nUsing method = "PQL".\n')
         }
     }
-    
+
     ## evaluate a model frame for fixed and random effects
     mf$formula <- frame.form
     mf$x <- mf$model <- mf$y <- mf$family <- NULL
     mf$drop.unused.levels <- TRUE
     mf[[1]] <- as.name("model.frame")
     frm <- eval(mf, parent.frame())
-    
+
     ## grouping factors and model matrices for random effects
     bars <- findbars(formula[[3]])
     random <-
@@ -1135,13 +1139,13 @@ mer2 <-
                     eval(substitute(as.factor(fac)[,drop = TRUE],
                                     list(fac = x[[3]])), frm)))
     names(random) <- unlist(lapply(bars, function(x) deparse(x[[3]])))
-    
+
     ## order factor list by decreasing number of levels
     nlev <- sapply(random, function(x) length(levels(x[[2]])))
     if (any(diff(nlev) > 0)) {
         random <- random[rev(order(nlev))]
     }
-    
+
     ## Create the model matrices and a mixed-effects representation (mer)
     mer <- .Call("mer2_create", random, x, y, method, PACKAGE = "Matrix")
     mer

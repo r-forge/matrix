@@ -83,11 +83,6 @@ setMethod("t", signature(x = "dgTMatrix"),
           function(x)
           new("dgTMatrix", i = x@j, j = x@i, x = x@x, Dim = rev(x@Dim)))
 
-setMethod("isSymmetric", signature(object = "dgTMatrix"),
-          function(object, ...)
-              isTRUE(all.equal(as(object, "dgCMatrix"),
-                               as(t(object), "dgCMatrix"))))
-
 setAs("dgTMatrix", "dsCMatrix",
       function(from) {
           if (!isSymmetric(from))

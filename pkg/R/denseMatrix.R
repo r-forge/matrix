@@ -80,16 +80,16 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "index", j = "index",
 
 
 ## not exported:
-setMethod("isSymmetric", signature(object = "denseMatrix"),
-	  function(object, ...) {
+setMethod("isSymmetric", signature(object = "denseMatrix", tol = "ANY"),
+	  function(object, tol = 100*.Machine$double.eps) {
 	      ## pretest: is it square?
 	      d <- dim(object)
 	      if(d[1] != d[2]) return(FALSE)
 	      ## else slower test
-	      if (is(object("dMatrix")))
+	      if (is(object,"dMatrix"))
 		  isTRUE(all.equal(as(object, "dgeMatrix"),
-				   as(t(object), "dgeMatrix"), ...))
-	      else if (is(object("lMatrix")))# not possible currently
+				   as(t(object), "dgeMatrix"), tol = tol))
+	      else if (is(object, "lMatrix"))# not possible currently
 		  ## test for exact equality; FIXME(?): identical() too strict?
 		  identical(as(object, "lgeMatrix"),
 			    as(t(object), "lgeMatrix"))

@@ -234,3 +234,28 @@ d2l_Matrix <- function(from) {
                    factors = list()), ## FIXME: treat 'factors' smartly
                from)
 }
+
+
+try_as <- function(x, classes, tryAnyway = FALSE) {
+    if(!tryAnyway && !is(x, "Matrix"))
+        return(x)
+    ## else
+    ok <- canCoerce(x, classes[1])
+    while(!ok && length(classes <- classes[-1])) {
+        ok <- canCoerce(x, classes[1])
+    }
+    if(ok) as(x, classes[1]) else x
+}
+
+## MM thinks the following should become part of 'methods' :
+canCoerce <- function(object, Class) {
+  ## Purpose:  test if 'object' is coercable to 'Class', i.e.,
+  ##	       as(object, Class) will {typically} work
+  ## ----------------------------------------------------------------------
+  ## Author: John Chambers, Date:  6 Oct 2005
+   is(object, Class) ||
+   !is.null(selectMethod("coerce", c(class(object), Class),
+			 optional = TRUE,
+			 useInherited = c(from = TRUE, to = FALSE)))
+}
+
