@@ -13,15 +13,6 @@
 
 - [,] indexing: for sparse "works", but not yet for negative indices!
 
-- group generics: "Arith" (partly done),
-  but also "Compare", "Math" etc;
-  see ?Math  and the examples in ?SetGeneric
-
-- methods for rbind and cbind where they make sense
-  (Kurt is particularly interested in dgCMatrix ones, for pkg 'arules')
-  ****> UNFEASIBLE as long cbind is function(..., *) !!!! <*******
-    --> follow John's proposition  cbind(x, ...) via Generic cbind2(x,y)?
-
 - consider moving alloc3Darray from ./src/Mutils.c to
   $(RSRC)/src/base/array.c
 
@@ -38,10 +29,13 @@
 - implement diagonal Matrix class  "ddiMatrix" etc
   using constructor function Diagonal() or Diag().
 
-BUG: rcond() of a singular dpoMatrix gives a LaPack error instead of just 0:
+- rcond() of a singular dpoMatrix gives a LaPack error instead of just 0:
   MM <- crossprod(M <- Matrix(c(1:4,9:6), 2,4)) ; rcond(MM)
   ##> Error in rcond(MM) : Lapack routine dpotrf returned error code 4
+  It's .Call("dpoMatrix_rcond") --> set_rcond() in src/dpoMatrix.c
+  and in src/dppMatrix.c similarly.
 
+  Done(2005-10-03): The error message is more helpful now.
 
 ---
 

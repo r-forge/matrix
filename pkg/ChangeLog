@@ -1,3 +1,8 @@
+2005-10-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (try_as): new utility
+	* R/sparseMatrix.R: use try_as() in coercion to original class
+
 2005-09-30  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/dgCMatrix.c (double_to_csc): and dgeMatrix_to_csc()
