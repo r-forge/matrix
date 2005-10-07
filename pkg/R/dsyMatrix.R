@@ -84,8 +84,9 @@ setMethod("t", signature(x = "dsyMatrix"), t_trMatrix,
 ##
 setIs("dsyMatrix", "dpoMatrix",
       test = function(obj)
-          "try-error" != class(try(.Call("dpoMatrix_chol", obj), TRUE)),
-      ## MM: The following is necessary -- but shouldn't it be the default in such a case ??
+          "try-error" != class(try(.Call("dpoMatrix_chol", obj), silent=TRUE)),
+      ## MM: The following copying is necessary
+      ## -- but shouldn't it be the default in such a case ??
       replace = function(obj, value) ## copy all slots
       for(n in slotNames(obj)) slot(obj, n) <- slot(value, n)
       )

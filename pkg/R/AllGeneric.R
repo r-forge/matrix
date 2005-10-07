@@ -12,8 +12,10 @@ if (!isGeneric("isDiagonal"))
                standardGeneric("isDiagonal"))
 
 if (!isGeneric("isSymmetric"))
-    setGeneric("isSymmetric", function(object, ...)
-               standardGeneric("isSymmetric"))
+    ## no "..." here at the moment; must match isSymmetric()
+    ## R 2.3.x base/R/eigen.R
+    setGeneric("isSymmetric", function(object, tol)
+	       standardGeneric("isSymmetric"))
 
 if (!isGeneric("isTriangular"))
     setGeneric("isTriangular", function(object, ...)
@@ -126,10 +128,7 @@ if (!isGeneric("mcmcsamp")) {
 }
 
 if (!exists("simulate", mode = "function")) {
-    setGeneric("simulate",
-               function(object, nsim = 1,
-                        seed = as.integer(runif(1, 0, .Machine$integer.max)),
-                        ...)
+    setGeneric("simulate", function(object, nsim = 1, seed = NULL, ...)
                standardGeneric("simulate"))
 }
 
