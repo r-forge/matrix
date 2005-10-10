@@ -1083,6 +1083,9 @@ mer2 <-
     if (length(formula) < 3) stop("formula must be a two-sided formula")
     ## cv <- do.call("Matrix:::lmerControl", control)
     cv <- control
+    cv$analyticGradient <- FALSE
+    cv$msMaxIter <- as.integer(200)
+    if (is.null(cv$msVerbose)) cv$msVerbose <- as.integer(1)
     ## evaluate glm.fit, a generalized linear fit of fixed effects only
     mf <- match.call()
     m <- match(c("family", "data", "subset", "weights",
@@ -1148,5 +1151,53 @@ mer2 <-
 
     ## Create the model matrices and a mixed-effects representation (mer)
     mer <- .Call("mer2_create", random, x, y, method, PACKAGE = "Matrix")
+    LMEoptimize(mer) <- cv
     mer
 }
+
+## Extract the permutation
+setAs("mer2", "pMatrix", function(from) .Call("mer2_pMatrix", from))
+
+## Extract the L matrix
+setAs("mer2", "dtCMatrix", function(from) .Call("mer2_dtCMatrix", from))
+
+## Optimization for mer2 objects
+setReplaceMethod("LMEoptimize", signature(x="mer2", value="list"),
+                 function(x, value)
+             {
+                 if (value$msMaxIter < 1) return(x)
+                 nc <- x@nc
+                 constr <- unlist(lapply(nc[1:(length(nc) - 2)],
+                                         function(k) 1:((k*(k+1))/2) <= k))
+                 fn <- function(pars)
+                     deviance(.Call("mer2_coefGets", x, pars, 2, PACKAGE = "Matrix"))
+                 gr <- NULL  ## No gradient yet
+##                     if (value$analyticGradient)
+##                         function(pars) {
+##                             if (!isTRUE(all.equal(pars,
+##                                                   .Call("lmer_coef", x,
+##                                                         2, PACKAGE = "Matrix"))))
+##                                 .Call("lmer_coefGets", x, pars, 2, PACKAGE = "Matrix")
+##                             .Call("lmer_gradient", x, 2, PACKAGE = "Matrix")
+##                         }
+		 ## else NULL
+		 optimRes <- nlminb(.Call("mer2_coef", x, 2, PACKAGE = "Matrix"),
+                                    fn, gr,
+                                    lower = ifelse(constr, 5e-10, -Inf),
+                                    control = list(iter.max = value$msMaxIter,
+                                    trace = as.integer(value$msVerbose)))
+                 .Call("mer2_coefGets", x, optimRes$par, 2, PACKAGE = "Matrix")
+                 if (optimRes$convergence != 0) {
+                     warning(paste("nlminb returned message",
+                                   optimRes$message,"\n"))
+                 }
+                 return(x)
+             })
+
+setMethod("deviance", "mer2",
+          function(object, REML = NULL, ...) {
+              .Call("mer2_factor", object, PACKAGE = "Matrix")
+              if (is.null(REML))
+                  REML <- object@method == "REML"
+              object@deviance[[ifelse(REML, "REML", "ML")]]
+          })
