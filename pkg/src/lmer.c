@@ -4019,7 +4019,7 @@ internal_mer2_coef(SEXP x, int ptyp, double ans[])
  *   2 - box constrained - also from the LDL' decomposition - inverses
  *       of the diagonal elements of D
  *
- * @param x pointer to an lme object
+ * @param x pointer to an mer2 object
  * @param pType pointer to an integer scalar indicating the form of the 
  *        parameters to be returned.
  *
