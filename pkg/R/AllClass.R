@@ -454,7 +454,7 @@ setClass("mer2",
 			deviance = "numeric", # Current deviance (ML and REML)
 			nc = "integer", # number of columns in (augmented)
 					# model matrices and number of observations
-			Gp = "integer", # Pointers to groups of rows in RZX
+			Gp = "integer", # Pointers to groups of columns in ZtZ
 			status = "logical"
 			)
 	)

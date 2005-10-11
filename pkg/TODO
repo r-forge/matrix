@@ -1,3 +1,32 @@
+- Migration of lmer from the mer representation to the mer2
+   representation and the use of the CHOLMOD code for the sparse
+   matrix decomposition.  Some of the things that need to be done.
+
+   - Matrices in the mer2 representation are classed matrices, in the
+   mer representation they were unclassed.  Any parts inside the C
+   code that would access, for example,
+    REAL(GET_SLOT(x, Matrix_RXXSym))
+   need to be modified to access
+    REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym))
+   This is especially important for Omega but I think I have done
+   those changes already.
+
+   - The components named *X* in an mer object refer to an augmented
+   design matrix of p+1 columns.  In the mer2 object there are
+   separate slots for rZy and rXy.  The scalar y'y is the first
+   element of devComp.
+
+   - Presently nc is of length nf+1 and the last element is n, the
+   number of observations.  This value should be moved to devComp and
+   nc made of length nf.
+
+   - The slot L is a list of length 1 that contains an ExternalPointer
+   to a cholmod_factor object.  This contains a permutation which is
+   most easily accessible through cholmod_solve(CHOLMOD_P,...) or
+   cholmod_solve(CHOLMOD_Pt,...).  The ZtX, Zty, RZX and rZy slots actually
+   contain P%*%RZX and P%*%rZy
+
+------
 - Sparse matrix methods can now be based on the CHOLMOD package.  We
    will need to migrate from the current code to CHOLMOD-based code
    using #ifdef USE_CHOLMOD.  Some of the things to be done

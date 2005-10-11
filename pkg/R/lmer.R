@@ -1195,7 +1195,7 @@ setReplaceMethod("LMEoptimize", signature(x="mer2", value="list"),
              {
                  if (value$msMaxIter < 1) return(x)
                  nc <- x@nc
-                 constr <- unlist(lapply(nc[1:(length(nc) - 2)],
+                 constr <- unlist(lapply(nc[1:(length(nc) - 1)],
                                          function(k) 1:((k*(k+1))/2) <= k))
                  fn <- function(pars)
                      deviance(.Call("mer2_coefGets", x, pars, 2, PACKAGE = "Matrix"))
