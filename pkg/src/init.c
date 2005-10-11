@@ -2,7 +2,6 @@
 #include "HBMM.h"
 #include "chm_common.h"
 #include "Csparse.h"
-#include "Pattern.h"
 #include "Tsparse.h"
 #include "dense.h"
 #include "dgBCMatrix.h"
