@@ -7,13 +7,6 @@ chm_common.o: chm_common.c chm_common.h CHOLMOD/Include/cholmod.h \
   CHOLMOD/Include/cholmod_matrixops.h CHOLMOD/Include/cholmod_modify.h \
   Mutils.h Syms.h
 Csparse.o: Csparse.c Csparse.h Mutils.h Syms.h
-Pattern.o: Pattern.c Pattern.h chm_common.h \
-  CHOLMOD/Include/cholmod.h CHOLMOD/Include/cholmod_config.h \
-  CHOLMOD/Include/cholmod_core.h CHOLMOD/Include/cholmod_check.h \
-  CHOLMOD/Include/cholmod_cholesky.h CHOLMOD/Include/cholmod_partition.h \
-  CHOLMOD/Include/cholmod_supernodal.h \
-  CHOLMOD/Include/cholmod_matrixops.h CHOLMOD/Include/cholmod_modify.h \
-  Mutils.h Syms.h
 mmio.o: mmio.c mmio.h
 HBMM.o: HBMM.c HBMM.h Mutils.h Syms.h triplet_to_col.h iohb.h mmio.h
 iohb.o: iohb.c iohb.h 
@@ -66,7 +59,7 @@ init.o: init.c Mutils.h Syms.h \
   CHOLMOD/Include/cholmod_partition.h \
   CHOLMOD/Include/cholmod_supernodal.h \
   CHOLMOD/Include/cholmod_matrixops.h CHOLMOD/Include/cholmod_modify.h \
-  Csparse.h Pattern.h Tsparse.h dense.h \
+  Csparse.h Tsparse.h dense.h \
   dgBCMatrix.h R_ldl.h \
   dgCMatrix.h dgTMatrix.h dgeMatrix.h dpoMatrix.h dppMatrix.h dsCMatrix.h \
   dsTMatrix.h dspMatrix.h dsyMatrix.h dtCMatrix.h dtTMatrix.h dtrMatrix.h \
