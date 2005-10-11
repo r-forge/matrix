@@ -41,11 +41,14 @@ SEXP factor_prod(SEXP f1, SEXP f2)
     if (n < nmax) nmax = n;
     B = cholmod_triplet_to_sparse(A, nmax, &c);
     cholmod_free_triplet(&A, &c);
-				/*  force a simplicial factorization */
+				/*  force a supernodal factorization */
     super = c.supernodal;
-    c.supernodal = CHOLMOD_SIMPLICIAL;
+    c.supernodal = CHOLMOD_SUPERNODAL;
     F = cholmod_analyze(B, &c); 
     c.supernodal = super;
+    c.print = 5;
+    cholmod_print_factor(F, "Factor", &c);
+    c.print = 3;
 
     SET_VECTOR_ELT(ans, 0, allocVector(INTSXP, 2));
     dims = INTEGER(VECTOR_ELT(ans, 0));
@@ -56,6 +59,8 @@ SEXP factor_prod(SEXP f1, SEXP f2)
     Memcpy(INTEGER(VECTOR_ELT(ans, 2)), (int *) F->ColCount, nl1);
     Rprintf("Ordering used: %d\n", F->ordering);
     Rprintf("is_super: %d\n", F->is_super);
+    Rprintf("Number of super nodes: %d\n", F->nsuper);
+    Rprintf("Ssize: %d\n", F->ssize);
     
     cholmod_free_sparse(&B, &c);
     cholmod_free_factor(&F, &c);

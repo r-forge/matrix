@@ -58,6 +58,25 @@ subbars <- function(term)
     term
 }
 
+## Expand an expression with colons to the sum of the lhs
+## and the current expression
+
+colExpand <- function(term)
+{
+    if (is.name(term) || is.numeric(term)) return(term)
+    if (length(term) == 2) {
+        term[[2]] <- colExpand(term[[2]])
+        return(term)
+    }
+    stopifnot(length(term) == 3)
+    if (is.call(term) && term[[1]] == as.name(':')) {
+        return(substitute(A+B, list(A = term, B = colExpand(term[[2]]))))
+    }
+    term[[2]] <- colExpand(term[[2]])
+    term[[3]] <- colExpand(term[[3]])
+    term
+}
+
 abbrvNms <- function(gnm, cnms)
 {
     ans <- paste(abbreviate(gnm), abbreviate(cnms), sep = '.')
@@ -1086,6 +1105,9 @@ mer2 <-
     cv$analyticGradient <- FALSE
     cv$msMaxIter <- as.integer(200)
     if (is.null(cv$msVerbose)) cv$msVerbose <- as.integer(1)
+## FIXME: Need to evaluate the model frame first and then fit the glm
+##  in that frame.  Otherwise missing values in the grouping factors
+##  cause problems.
     ## evaluate glm.fit, a generalized linear fit of fixed effects only
     mf <- match.call()
     m <- match(c("family", "data", "subset", "weights",
