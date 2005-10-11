@@ -1105,26 +1105,39 @@ mer2 <-
     cv$analyticGradient <- FALSE
     cv$msMaxIter <- as.integer(200)
     if (is.null(cv$msVerbose)) cv$msVerbose <- as.integer(1)
-## FIXME: Need to evaluate the model frame first and then fit the glm
-##  in that frame.  Otherwise missing values in the grouping factors
-##  cause problems.
+
+    ## Must evaluate the model frame first and then fit the glm using
+    ## that frame.  Otherwise missing values in the grouping factors
+    ## cause inconsistent numbers of observations.
+    
     ## evaluate glm.fit, a generalized linear fit of fixed effects only
     mf <- match.call()
     m <- match(c("family", "data", "subset", "weights",
                  "na.action", "offset"), names(mf), 0)
-    mf <- mf[c(1, m)]
+    mf <- fe <- mf[c(1, m)]
     frame.form <- subbars(formula) # substitute `+' for `|'
     fixed.form <- nobars(formula)  # remove any terms with `|'
     if (inherits(fixed.form, "name")) # RHS is empty - use a constant
         fixed.form <- substitute(foo ~ 1, list(foo = fixed.form))
     environment(fixed.form) <- environment(frame.form) <- environment(formula)
-    mf$formula <- fixed.form
-    mf$x <- mf$model <- mf$y <- TRUE
-    mf[[1]] <- as.name("glm")
-    glm.fit <- eval(mf, parent.frame())
+
+    ## evaluate a model frame for fixed and random effects
+    mf$formula <- frame.form
+    mf$family <- NULL
+    mf$drop.unused.levels <- TRUE
+    mf[[1]] <- as.name("model.frame")
+    frm <- eval(mf, parent.frame())
+
+    ## fit a glm model to the fixed formula
+    fe$formula <- fixed.form
+    fe$data <- frm
+    fe$x <- fe$model <- fe$y <- TRUE
+    fe[[1]] <- as.name("glm")
+    glm.fit <- eval(fe, parent.frame())
     x <- glm.fit$x
     y <- as.double(glm.fit$y)
     family <- glm.fit$family
+
     ## check for a linear mixed model
     lmm <- family$family == "gaussian" && family$link == "identity"
     if (lmm) { # linear mixed model
@@ -1146,13 +1159,6 @@ mer2 <-
                         '\nUsing method = "PQL".\n')
         }
     }
-
-    ## evaluate a model frame for fixed and random effects
-    mf$formula <- frame.form
-    mf$x <- mf$model <- mf$y <- mf$family <- NULL
-    mf$drop.unused.levels <- TRUE
-    mf[[1]] <- as.name("model.frame")
-    frm <- eval(mf, parent.frame())
 
     ## grouping factors and model matrices for random effects
     bars <- findbars(formula[[3]])
