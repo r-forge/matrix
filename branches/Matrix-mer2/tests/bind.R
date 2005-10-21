@@ -1,0 +1,54 @@
+#### Testing  cbind() & rbind()
+
+library(Matrix)
+
+source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
+
+if(paste(R.version$major, R.version$minor, sep=".") < "2.2")
+ q('no')
+
+## else : R 2.2.0 and later --- and when Matrix was built with R >= 2.2.0:
+
+
+### --- Dense Matrices ---
+
+m1 <- m2 <- m <- Matrix(1:12, 3,4)
+dimnames(m2) <- list(LETTERS[1:3],
+                     letters[1:4])
+dimnames(m1) <- list(NULL,letters[1:4])
+
+stopifnot(identical(cbind ( m, 10*m) -> R,
+                    cbind2( m, 10*m))); R
+stopifnot(identical(cbind (m1,100+m1) -> R,
+                    cbind2(m1,100+m1))); R
+stopifnot(identical(cbind (m1, 10*m2) -> R,
+                    cbind2(m1, 10*m2))); R
+
+## TODO: m1+m2 "warning" - improve dimnames() automatism
+stopifnot(identical(cbind (m2, m1+m2) -> R,
+                    cbind2(m2, m1+m2))); R
+
+cbind(m2, 10*m2[nrow(m2):1 ,])# keeps the rownames from the first
+
+(im <- cbind(I = 100, m))
+str(im)
+(mi <- cbind(m2, I = 1000))
+str(mi)
+(m1m <- cbind(m,I=100,m2))
+
+### --- Sparse Matrices ---
+
+m <- Matrix(c(0, 0, 2:0), 3, 5)
+(mC <- as(m, "dgCMatrix"))
+(mT <- as(m, "dgTMatrix"))
+stopifnot(identical(mT, as(mC, "dgTMatrix")))
+cbind(0, mC)
+cbind(0, mT)
+cbind(diag(3), mT)
+(cc <- cbind(mC, 0,7,0, diag(3), 0))
+stopifnot(identical3(cc, cbind(mT, 0,7,0, diag(3), 0),
+                     as( cbind(m, 0,7,0, diag(3), 0), "dgCMatrix")))
+
+cbind(mC, 1, 100*mC, 0, 0:2)
+if(FALSE) ## FIXME:  cbind2() method for (dgTMatrix,dgeMatrix)
+cbind(mT, 1, 0, mT+10*mT, 0, 0:2)
