@@ -1,0 +1,85 @@
+- check to see if the .onLoad function to require the methods package
+  (in the AllClass.R file) is needed
+  -- no, it is not:  "Depends: " in DESCRIPTION suffices.
+
+- Should the uplo and diag slots continue to be stored as character?
+  An alternative is to use a factor as in the enum values for the
+  cblas.
+  -- Leave as character but use care in determining the default cases
+  -- E.g. Checks for diag slot should check for 'U' or 'u' vs. anything else
+
+- Organization of the source code files - right now they are organized
+  according to class (e.g. dgeMatrix.R, dgeMatrix.h, dgeMatrix.c).  Is
+  there a better way?
+  -- This seems ok.
+
+- Fix the calculation of the Dim slot for the crossprod method for
+  dgCMatrix objects (too tired to do that now).
+  -- Done
+
+- spelling style: Should "coersion" be "coercion" ?
+  -- Yes.  Watch for this.
+
+- src/Metis/ : one of the two Makefiles needs fixing, as changing
+	     src/Metis/*.c  does not lead to recompilation.
+  --DB - it seems both Makefiles need fixing.  I think I have the
+	     src/Metis/Makefile fixed but not src/Makefile
+  --DB - now have both working, I believe.
+
+- man/Matrix.Rd :  has example with dimnames, but we just drop them!
+		MM thinks dimnames should be supported (but then ...)
+  -- added 'Dimnames' slot (2005-02-10)
+
+- bCrosstab(): yes, we really do want the diagonal "V:V" crosstabs.
+   -- explained a bit more in man/bCrosstab.Rd
+
+- Clean up vestigial functions (pdFactor, pdMatrix, matrix<-) from the
+  nlme package.
+
+- create a class of permutation matrices for use in expand.  The
+  current expand method for the LU factorization is not complete
+  because it does not provide the permutation.
+
+- tcrossprod() now works: C code now "exported" via init.c
+
+- Fixed: dtpMatrix(... diag = "U") (i.e., unit-diagonal packed triangular)
+         *does* need 'x' entries for the diagonal but these are never looked at.
+    -> changed doc -- Lapack also says they are not referenced but assumed 1.
+
+
+- in lmer.c check all instances of the use of ZtX and XtX and change
+  them so that having a negative last element of nc means use the
+  response only (but look for it in the right place).
+
+- Solved:
+
+   Currently the show() method fail sometime after coercion:
+   e.g. 'sy' show()s wrongly, even though it "str()" fine :
+
+      (po <- crossprod(Matrix(0:3, 2))) # ok
+      (ge <- as(po, "dgeMatrix")) # ok
+      (sy <- as(po, "dsyMatrix")) # BAD
+      str(sy) # looks fine
+
+  or
+      example(expand) # -> ex$L and ex$U look bad, however
+      as(ex$L, "dgeMatrix") # `works'
+
+  {Of course, we don't need a workaround but must understand
+   and solve the problem}
+
+- slot "factors" maybe should move up to "Matrix" -- done, 2005-09-28
+
+- group generics: "Arith", also "Compare", "Math" etc;
+  see ?Math  and the examples in ?SetGeneric
+
+- methods for rbind and cbind where they make sense:
+  R 2.2.0 (and newer) provide cbind2() and rbind2() generics and default
+  methods [following John Chambers's proposition], and we have implemented
+  methods for them.
+
+- arithmetic for sparse matrices:
+     done for    <sparseMatrix>  o  <scalar>
+  {more needed: see TODO}
+
+

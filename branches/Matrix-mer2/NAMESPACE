@@ -1,0 +1,185 @@
+useDynLib(Matrix)
+
+importFrom("graphics",image)
+importFrom("graphics",plot)		## lmer-related
+importFrom("lattice", levelplot)
+importFrom("grid",    grid.rect, gpar, grob)
+import("stats")				## lmer-related
+
+## Currently, group generics need to be explicitly imported (Bug?):
+importFrom("methods", Arith, Compare, Math, Math2, Summary, Complex)
+
+## Generics and functions defined in this package
+export(
+       "Hilbert",
+       "Matrix",
+       "Schur",
+       "bCrosstab",
+       "expand",
+       "expm",
+       "facmul",
+       #not on purpose: "isSymmetric",
+       "lu",
+       "norm",
+       "rcond",
+       "readHB",
+       "readMM",
+       "tcrossprod",
+       "unpack",
+       "writeHB",
+       "writeMM"
+       )
+
+## workaround S4-Group(generic|method) quirk: R/AllGeneric.R
+## needs setGeneric(*, group=) and this for all non-Primitives :
+export(
+       ## "Math"
+       "log",
+       "gamma",
+       "lgamma",
+
+       ## "Math2"
+       "round",
+       "signif",
+
+       ## "Summary"
+       "max",
+       "min",
+       "range",
+       "prod",
+       "sum",
+       "any",
+       "all"
+)
+
+
+## lmer-related
+export("lmer", "mcmcsamp", "mer2")
+
+exportClasses(
+	      "index",
+
+	      "BunchKaufman",
+	      "pBunchKaufman",
+	      "Cholesky",
+	      "pCholesky",
+	      "LU",
+	      "Matrix",
+	      ## also intermediate `virtual' ones:
+	      "dMatrix",
+	      "lMatrix",
+	      "denseMatrix",
+	      "sparseMatrix",
+              "symmetricMatrix",
+              "triangularMatrix",
+	      "dsparseMatrix",
+	      "lsparseMatrix",
+	      "TsparseMatrix",
+	      "CsparseMatrix",
+	      "ddenseMatrix",
+	      ## not yet used, but as sub-classes;
+	      ## need to provide them for 'hierarchy-analysis':
+	      "iMatrix",
+	      "zMatrix",
+	      "ldenseMatrix",
+
+	      "dgBCMatrix",
+	      "dgCMatrix",
+	      "dgRMatrix",# unused
+	      "dgTMatrix",
+	      "dgeMatrix",
+	      "dpoMatrix",
+	      "dppMatrix",
+	      "dsCMatrix",
+	      "dsRMatrix",# unused
+	      "dsTMatrix",
+	      "dspMatrix",
+	      "dsyMatrix",
+	      "dtCMatrix",
+	      "dtRMatrix",# unused
+	      "dtTMatrix",
+	      "dtpMatrix",
+	      "dtrMatrix",
+
+	      "lgeMatrix",
+	      "lspMatrix",
+	      "lsyMatrix",
+	      "ltpMatrix",
+	      "ltrMatrix",
+
+	      "lgCMatrix",
+	      "lgRMatrix",
+	      "lgTMatrix",
+	      "lsCMatrix",
+	      "lsRMatrix",# unused
+	      "lsTMatrix",
+	      "ltCMatrix",
+	      "ltRMatrix",# unused
+	      "ltTMatrix",
+
+	      "corrmatrix",
+	      "pMatrix",
+	      "pdmatrix",
+	      "dCholCMatrix",
+	      "lCholCMatrix"
+	      )
+
+## lmer-related
+exportClasses("VarCorr", "lmer", "mer", "mer2", "summary.lmer")
+
+
+exportMethods(
+	      ## Group Methods
+	      "Arith",
+	      "Math",
+	      "Math2",
+	      "Summary",
+	      "Compare",
+
+	      "!",
+	      "+",# for dgT(Matrix) only
+	      "%*%",
+
+	      "Schur",
+	      "as.array",
+	      "as.matrix",
+	      "as.vector",
+	      "chol",
+	      "colMeans",
+	      "colSums",
+	      "coerce",
+	      "crossprod",
+	      "determinant",
+	      "diag",
+	      "dim",
+	      "dimnames",
+	      "dimnames<-",
+	      "expand",
+	      "expm",
+	      "kronecker",
+	      "image",
+	      "norm",
+	      "rcond",
+	      "rowMeans",
+	      "rowSums",
+	      "show",
+	      "solve",
+	      "t",
+	      "tcrossprod"
+	      )
+
+## only for R >= 2.2:
+if(paste(R.version$major, R.version$minor, sep=".") >= "2.2") {
+
+exportMethods("rbind2")
+exportMethods("cbind2")
+
+}
+
+
+## lmer-related
+exportMethods("BIC", "anova", "coef", "confint", "deviance", "fitted",
+	      "fixef", "formula", "lmer", "logLik", "mcmcsamp",
+	      "plot", "ranef", "residuals", "resid", "simulate",
+	      "summary", "update", "vcov", "VarCorr", "with")
+
