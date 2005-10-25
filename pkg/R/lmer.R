@@ -1003,7 +1003,7 @@ setMethod("simulate", signature(object = "lmer"),
 
           ## similate the linear predictors
           lpred <- .Call("lmer_simulate", as(object, "mer"), nsim,
-                         unname(drop(mmats[[length(mmats)]][,seq(a = ff)] %*% ff)),
+                         unname(drop(mmats[[length(mmats)]][,seq(a = ff),drop = FALSE] %*% ff)),
                          mmats, TRUE, PACKAGE = "Matrix")
           ## add per-observation noise term
           lpred <- as.data.frame(lpred + rnorm(prod(dim(lpred)), sd = scale))
