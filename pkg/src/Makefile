@@ -17,11 +17,15 @@ SUBSTAMP = $(SUBDIRS:=.stamp)
 $(SHLIB): $(OBJECTS) $(SUBLIBS)
 	$(SHLIB_LINK) -o $@ $(OBJECTS) $(SUBLIBS) $(ALL_LIBS)
 
+UFconfig.stamp:
+	cp UFconfig/UFconfig_unix.mk UFconfig/UFconfig.mk
+	touch UFconfig.stamp
+
 all: $(SHLIB)
 
 mostlyclean: clean
 
-$(SUBLIBS): $(SUBSTAMP)
+$(SUBLIBS): UFconfig.stamp $(SUBSTAMP)
 	@for d in $(SUBDIRS); do \
 	  (cd $${d} && $(MAKE) lib) || exit 1; \
 	  touch $${d}.stamp; \
@@ -30,7 +34,7 @@ $(SUBLIBS): $(SUBSTAMP)
 $(SUBSTAMP):
 	touch $(SUBSTAMP)
 
-clean:
+clean: UFconfig.stamp
 	@-rm -rf .libs _libs
 	@-rm -f *.o *.so *.a $(SUBSTAMP)
 	@for d in $(SUBDIRS); do \
