@@ -1003,7 +1003,7 @@ setMethod("simulate", signature(object = "lmer"),
 
           ## similate the linear predictors
           lpred <- .Call("lmer_simulate", as(object, "mer"), nsim,
-                         unname(drop(mmats[[length(mmats)]][,seq(a = ff)] %*% ff)),
+                         unname(drop(mmats[[length(mmats)]][,seq(a = ff),drop=FALSE] %*% ff)),
                          mmats, TRUE, PACKAGE = "Matrix")
           ## add per-observation noise term
           lpred <- as.data.frame(lpred + rnorm(prod(dim(lpred)), sd = scale))
@@ -1188,6 +1188,16 @@ setAs("mer2", "pMatrix", function(from) .Call("mer2_pMatrix", from))
 
 ## Extract the L matrix
 setAs("mer2", "dtCMatrix", function(from) .Call("mer2_dtCMatrix", from))
+
+## Extract the fixed effects
+setMethod("fixef", signature(object = "mer2"),
+          function(object, ...)
+              .Call("mer2_fixef", object, PACKAGE = "Matrix"))
+
+## Extract the random effects
+setMethod("ranef", signature(object = "mer2"),
+          function(object, ...)
+              .Call("mer2_ranef", object, PACKAGE = "Matrix"))
 
 ## Optimization for mer2 objects
 setReplaceMethod("LMEoptimize", signature(x="mer2", value="list"),
