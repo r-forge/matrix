@@ -4108,3 +4108,104 @@ SEXP mer2_coefGets(SEXP x, SEXP coef, SEXP pType)
     internal_mer2_coefGets(x, REAL(coef), asInteger(pType));
     return x;
 }
+
+static double*
+internal_fixef2(SEXP x, double beta[])
+{
+    SEXP rXyP = GET_SLOT(x, Matrix_rXySym);
+    int ione = 1, p = LENGTH(rXyP);
+
+    mer2_factor(x);
+    Memcpy(beta, REAL(rXyP), p);
+    F77_CALL(dtrsv)("U", "N", "N", &p,
+		    REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym),
+				  Matrix_xSym)), &p, beta, &ione);
+    return beta;
+}
+
+/**
+ * Extract the conditional estimates of the fixed effects
+ *
+ * @param x Pointer to an mer2 object
+ *
+ * @return a numeric vector containing the conditional estimates of
+ * the fixed effects
+ */
+SEXP mer2_fixef(SEXP x)
+{
+    int p = LENGTH(GET_SLOT(x, Matrix_rXySym));
+    SEXP ans = PROTECT(allocVector(REALSXP, p));
+		
+    internal_fixef2(x, REAL(ans));
+    UNPROTECT(1);
+    return ans;
+}
+
+static double*
+internal_ranef2(SEXP x, double b[])
+{
+    SEXP RZXP = GET_SLOT(x, Matrix_RZXSym);
+    int *dims = INTEGER(getAttrib(RZXP, Matrix_DimSym)),
+	ione = 1;
+    double *rZy = Memcpy(Calloc(dims[0], double),
+			 REAL(GET_SLOT(x, Matrix_rZySym)), dims[0]),
+	*beta = Calloc(dims[1], double),
+	one[2] = {1, 0}, m1[2] = {-1, 0};
+    cholmod_factor *L = (cholmod_factor *)
+	R_ExternalPtrAddr(VECTOR_ELT(GET_SLOT(x, Matrix_LSym), 0));
+    cholmod_dense *chb, *chPb, *chrZy = numeric_as_chm_dense(rZy, dims[0]);
+
+    internal_fixef2(x, beta);	/* forces an mer2_factor */
+    F77_CALL(dgemv)("N", dims, dims + 1, m1, REAL(GET_SLOT(RZXP, Matrix_xSym)),
+		    dims, beta, &ione, one, rZy, &ione);
+    chPb = cholmod_solve(CHOLMOD_Lt, L, chrZy, &c);
+    chb = cholmod_solve(CHOLMOD_Pt, L, chPb, &c);
+    Memcpy(b, (double *)(chb->x), dims[0]);
+    Free(beta); Free(chrZy); Free(rZy);
+    cholmod_free_dense(&chPb, &c);
+    cholmod_free_dense(&chb, &c);
+    return b;
+}
+
+/**
+ * Extract the conditional modes of the random effects.
+ *
+ * @param x Pointer to an mer2 object
+ *
+ * @return a list of matrices containing the conditional modes of the
+ * random effects
+ */
+SEXP mer2_ranef(SEXP x)
+{
+    SEXP flist = GET_SLOT(x, Matrix_flistSym);
+    int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	i, ii, jj,
+	nf = length(flist);
+    SEXP val = PROTECT(allocVector(VECSXP, nf));
+    double *b = Calloc(Gp[nf], double);
+
+    setAttrib(val, R_NamesSymbol,
+	      duplicate(getAttrib(flist, R_NamesSymbol)));
+    internal_ranef2(x, b);
+    for (i = 0; i < nf; i++) {
+	SEXP nms, rnms = getAttrib(VECTOR_ELT(flist, i), R_LevelsSymbol);
+	int nci = nc[i], mi = length(rnms);
+	double *bi = b + Gp[i], *mm;
+
+	SET_VECTOR_ELT(val, i, allocMatrix(REALSXP, mi, nci));
+	setAttrib(VECTOR_ELT(val, i), R_DimNamesSymbol, allocVector(VECSXP, 2));
+	nms = getAttrib(VECTOR_ELT(val, i), R_DimNamesSymbol);
+	SET_VECTOR_ELT(nms, 0, duplicate(rnms));
+	SET_VECTOR_ELT(nms, 1, R_NilValue);
+/* FIXME: Revert when cnames have been preserved */
+	/* SET_VECTOR_ELT(nms, 1, duplicate(VECTOR_ELT(cnames, i))); */
+	mm = REAL(VECTOR_ELT(val, i));
+	for (jj = 0; jj < nci; jj++)
+	    for(ii = 0; ii < mi; ii++)
+		mm[ii + jj * mi] = bi[jj + ii * nci];
+    }
+    Free(b);
+    UNPROTECT(1);
+    return val;
+}
