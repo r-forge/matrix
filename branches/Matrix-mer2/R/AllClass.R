@@ -434,31 +434,6 @@ setClass("mer",
 	     .Call("lmer_validate", object, PACKAGE = "Matrix")
 	 })
 
-setClass("mer2",
-	 representation(
-			flist = "list", # list of grouping factors
-                        L = "list",     # lower Cholesky factor of Z'Z + Omega
-			RXX = "dtrMatrix", # RXX component
-			RZX = "dgeMatrix", # RZX component
-			XtX = "dpoMatrix", # Original X'X matrix
-			ZtZ = "dsCMatrix", # Original Z'Z
-			ZtX = "dgeMatrix", # Original Z'X matrix
-                        Zty = "numeric", # Original Z'y vector
-                        Xty = "numeric", # Original X'y vector
-                        rZy = "numeric", 
-                        rXy = "numeric",
-			Omega = "list", # list of relative precision matrices
-			method = "character", # parameter estimation method
-			cnames = "list",# column names of model matrices
-			devComp = "numeric", # Components of deviance
-			deviance = "numeric", # Current deviance (ML and REML)
-			nc = "integer", # number of columns in (augmented)
-					# model matrices and number of observations
-			Gp = "integer", # Pointers to groups of columns in ZtZ
-			status = "logical"
-			)
-	)
-
 ## Representation of a linear or generalized linear mixed effects model
 setClass("lmer",
 	 representation(assign = "integer", call = "call",
@@ -488,3 +463,27 @@ setClass("lmer.coef",
 	 representation(varFac = "list", stdErr = "numeric"),
 	 contains = "list")
 
+
+setClass("mer2",
+	 representation(
+			flist = "list", # list of grouping factors
+                        L = "list",     # lower Cholesky factor of Z'Z + Omega
+			RXX = "dtrMatrix", # RXX component
+			RZX = "dgeMatrix", # RZX component
+			XtX = "dpoMatrix", # Original X'X matrix
+			ZtZ = "dsCMatrix", # Original Z'Z
+			ZtX = "dgeMatrix", # Original Z'X matrix
+                        Zty = "numeric", # Original Z'y vector
+                        Xty = "numeric", # Original X'y vector
+                        rZy = "numeric", 
+                        rXy = "numeric",
+			Omega = "list", # list of relative precision matrices
+			method = "character", # parameter estimation method
+			cnames = "list",# column names of model matrices
+			devComp = "numeric", # Components of deviance
+			deviance = "numeric", # Current deviance (ML and REML)
+			nc = "integer", # dimensions of blocks in Omega
+			Gp = "integer", # Pointers to groups of columns in ZtZ
+			status = "logical"
+			)
+	)
