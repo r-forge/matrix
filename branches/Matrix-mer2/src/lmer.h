@@ -58,5 +58,6 @@ SEXP mer2_fixef(SEXP x);
 SEXP mer2_initial(SEXP x);
 SEXP mer2_pMatrix(SEXP x);
 SEXP mer2_ranef(SEXP x);
+SEXP mer2_sigma(SEXP x, SEXP REML);
 
 #endif

@@ -4209,3 +4209,28 @@ SEXP mer2_ranef(SEXP x)
     UNPROTECT(1);
     return val;
 }
+
+static double
+internal_mer2_sigma(SEXP x, int REML)
+{
+    double *dcmp = REAL(GET_SLOT(x, Matrix_devCompSym));
+    int p = *INTEGER(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_DimSym)),
+	n = INTEGER(GET_SLOT(x, Matrix_ncSym))[length(GET_SLOT(x, Matrix_OmegaSym))];
+
+/* FIXME: Move n and p from nc to devComp */
+    mer2_factor(x);
+    return exp(dcmp[2]/2)/sqrt((double)(nobs - (REML? p : 0)));
+}
+
+/**
+ * Extract the ML or REML conditional estimate of sigma
+ *
+ * @param x pointer to an mer2 object
+ * @param REML logical scalar - TRUE if REML estimates are requested
+ *
+ * @return pointer to a numeric scalar
+ */
+SEXP mer2_sigma(SEXP x, SEXP REML)
+{
+    return ScalarReal(internal_mer2_sigma(x, asLogical(REML)));
+}
