@@ -398,6 +398,7 @@ setOldClass("data.frame")
 setOldClass("family")
 setOldClass("logLik")
 setOldClass("terms")
+setOldClass("externalptr")
 
 setClass("VarCorr",
 	 representation(scale = "numeric",
@@ -465,25 +466,31 @@ setClass("lmer.coef",
 
 
 setClass("mer2",
-	 representation(
+	 representation(## original data
 			flist = "list", # list of grouping factors
-                        L = "list",     # lower Cholesky factor of Z'Z + Omega
-			RXX = "dtrMatrix", # RXX component
-			RZX = "dgeMatrix", # RZX component
-			XtX = "dpoMatrix", # Original X'X matrix
-			ZtZ = "dsCMatrix", # Original Z'Z
-			ZtX = "dgeMatrix", # Original Z'X matrix
-                        Zty = "numeric", # Original Z'y vector
-                        Xty = "numeric", # Original X'y vector
-                        rZy = "numeric", 
-                        rXy = "numeric",
-			Omega = "list", # list of relative precision matrices
+                        Zt = "dgCMatrix",  # sparse representation of Z'
+                        X = "matrix",      # X
+                        y = "numeric",     # y
 			method = "character", # parameter estimation method
-			cnames = "list",# column names of model matrices
+			cnames = "list",   # column names of model matrices
+                        ## derived quantities
+			XtX = "dpoMatrix", # X'X
+			ZtZ = "dsCMatrix", # Z'Z
+			ZtX = "dgeMatrix", # Z'X
+                        Zty = "numeric",   # Z'y 
+                        Xty = "numeric",   # X'y 
+			nc = "integer",    # dimensions of blocks in Omega
+			Gp = "integer",    # Pointers to groups of rows in Zt
+                        ## slots that vary during the optimization
+			Omega = "list", # list of relative precision matrices
 			devComp = "numeric", # Components of deviance
 			deviance = "numeric", # Current deviance (ML and REML)
-			nc = "integer", # dimensions of blocks in Omega
-			Gp = "integer", # Pointers to groups of columns in ZtZ
-			status = "logical"
+			status = "logical",
+                        ## components of the Cholesky factor of augmented [Z:X:y]'[Z:X:y]
+                        L = "externalptr",        # sparse Cholesky factor of Z'Z + Omega
+			RZX = "dgeMatrix",
+			RXX = "dtrMatrix",
+                        rZy = "numeric",
+                        rXy = "numeric"
 			)
 	)
