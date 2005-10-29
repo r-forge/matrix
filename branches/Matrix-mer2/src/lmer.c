@@ -3881,7 +3881,7 @@ SEXP mer2_factor(SEXP x)
 	    F77_CALL(dgemv)("T", &q, &p, m1, (double*) RZX->x, &q,
 			    (double*) rZy->x, &ione, one, rXy, &ione);
 	    F77_CALL(dtrsv)("U", "T", "N", &p, RXX, &p, rXy, &ione);
-	    dcmp[3] = log(dcmp[2]	/* dcmp[2] = log(ryy^2); dcmp[0] = y'y; */
+	    dcmp[3] = log(dcmp[2] /* dcmp[3] = log(ryy^2); dcmp[2] = y'y; */
 			  - F77_CALL(ddot)(&p, rXy, &ione, rXy, &ione)
 			  - F77_CALL(ddot)(&q, (double*)rZy->x, &ione,
 					   (double*)rZy->x, &ione));
@@ -4113,7 +4113,7 @@ SEXP mer2_coefGets(SEXP x, SEXP coef, SEXP pType)
 }
 
 static double*
-internal_fixef2(SEXP x, double beta[])
+internal_mer2_fixef(SEXP x, double beta[])
 {
     SEXP rXyP = GET_SLOT(x, Matrix_rXySym);
     int ione = 1, p = LENGTH(rXyP);
@@ -4140,7 +4140,7 @@ SEXP mer2_fixef(SEXP x)
 	p = LENGTH(GET_SLOT(x, Matrix_rXySym));
     SEXP ans = PROTECT(allocVector(REALSXP, p));
 		
-    internal_fixef2(x, REAL(ans));
+    internal_mer2_fixef(x, REAL(ans));
     setAttrib(ans, R_NamesSymbol,
 	      duplicate(VECTOR_ELT(GET_SLOT(x, Matrix_cnamesSym), nf)));
     UNPROTECT(1);
@@ -4148,7 +4148,7 @@ SEXP mer2_fixef(SEXP x)
 }
 
 static double*
-internal_ranef2(SEXP x, double b[])
+internal_mer2_ranef(SEXP x, double b[])
 {
     SEXP RZXP = GET_SLOT(x, Matrix_RZXSym);
     int *dims = INTEGER(getAttrib(RZXP, Matrix_DimSym)),
@@ -4161,7 +4161,7 @@ internal_ranef2(SEXP x, double b[])
 	R_ExternalPtrAddr(VECTOR_ELT(GET_SLOT(x, Matrix_LSym), 0));
     cholmod_dense *chb, *chPb, *chrZy = numeric_as_chm_dense(rZy, dims[0]);
 
-    internal_fixef2(x, beta);	/* forces an mer2_factor */
+    internal_mer2_fixef(x, beta);	/* forces an mer2_factor */
     F77_CALL(dgemv)("N", dims, dims + 1, m1, REAL(GET_SLOT(RZXP, Matrix_xSym)),
 		    dims, beta, &ione, one, rZy, &ione);
     chPb = cholmod_solve(CHOLMOD_Lt, L, chrZy, &c);
@@ -4194,7 +4194,7 @@ SEXP mer2_ranef(SEXP x)
 
     setAttrib(val, R_NamesSymbol,
 	      duplicate(getAttrib(flist, R_NamesSymbol)));
-    internal_ranef2(x, b);
+    internal_mer2_ranef(x, b);
     for (i = 0; i < nf; i++) {
 	SEXP nms, rnms = getAttrib(VECTOR_ELT(flist, i), R_LevelsSymbol);
 	int nci = nc[i], mi = length(rnms);
@@ -4236,3 +4236,241 @@ SEXP mer2_sigma(SEXP x, SEXP REML)
 {
     return ScalarReal(internal_mer2_sigma(x, asLogical(REML)));
 }
+
+/** 
+ * Update the relative precision matrices by sampling from a Wishart
+ * distribution with scale factor determined by the current sample of
+ * random effects.
+ * 
+ * @param Omega pointer to the list of relative precision matrices
+ * @param b current sample from the random effects
+ * @param sigma current value of sigma
+ * @param nf number of grouping factors
+ * @param nc number columns per grouping factor
+ * @param Gp integer vector pointing to the beginning of each outer
+ * group of columns
+ * @param vals vector in which to store values
+ * @param trans logical value indicating if variance components are
+ * stored in the transformed scale.
+ */
+static void
+mer2_Omega_update(SEXP Omega, const double b[], double sigma, int nf,
+		  const int nc[], const int Gp[], double *vals, int trans)
+{
+    int i, j, k, info;
+    double one = 1, zero = 0;
+
+    for (i = 0; i < nf; i++) {
+	int nci = nc[i];
+	int nlev = (Gp[i + 1] - Gp[i])/nci, ncip1 = nci + 1,
+	    ncisqr = nci * nci;
+	double
+	    *scal = Calloc(ncisqr, double), /* factor of scale matrix */
+	    *tmp = Calloc(ncisqr, double),
+	    *var = Calloc(ncisqr, double), /* simulated variance-covariance */
+	    *wfac = Calloc(ncisqr, double); /* factor of Wishart variate */
+
+	/* generate and factor the scale matrix */
+	AZERO(scal, ncisqr);
+	F77_CALL(dsyrk)("U", "N", &nci, &nlev, &one, b + Gp[i], &nci,
+			&zero, scal, &nci);
+	F77_CALL(dpotrf)("U", &nci, scal, &nci, &info);
+	if (info)
+	    error(_("Singular random effects varcov at level %d"), i + 1);
+
+	/* generate a random factor from a standard Wishart distribution */
+	AZERO(wfac, ncisqr);
+	std_rWishart_factor((double) (nlev - nci + 1), nci, wfac);
+
+	/* form the variance-covariance matrix and store elements */
+	Memcpy(tmp, scal, ncisqr);
+	F77_CALL(dtrsm)("L", "U", "T", "N", &nci, &nci,
+			&one, wfac, &nci, tmp, &nci);
+	F77_CALL(dsyrk)("U", "T", &nci, &nci, &one, tmp, &nci,
+			&zero, var, &nci);
+	for (j = 0; j < nci; j++) {
+	    *vals++ = (trans ? log(var[j * ncip1]) : var[j * ncip1]);
+	}
+	for (j = 1; j < nci; j++) {
+	    for (k = 0; k < j; k++) {
+		*vals++ = (trans ? atanh(var[k + j * nci]/
+				     sqrt(var[j * ncip1] * var[k * ncip1]))
+		       : var[k + j * nci]);
+	    }
+	}
+	/* calculate and store the relative precision matrix */
+	Memcpy(tmp, wfac, ncisqr);
+	F77_CALL(dtrsm)("R", "U", "T", "N", &nci, &nci,
+			&sigma, scal, &nci, tmp, &nci);
+	F77_CALL(dsyrk)("U", "T", &nci, &nci, &one, tmp, &nci, &zero,
+			REAL(GET_SLOT(VECTOR_ELT(Omega, i), Matrix_xSym)),
+			&nci);
+	Free(scal); Free(tmp); Free(wfac); Free(var); 
+    }
+}
+
+/** 
+ * Generate a Markov-Chain Monte Carlo sample from a fitted
+ * linear mixed model.
+ * 
+ * @param mer pointer to an mer2 object
+ * @param savebp pointer to a logical scalar indicating if the
+ * random-effects should be saved
+ * @param nsampp pointer to an integer scalar of the number of samples
+ * to generate
+ * @param transp pointer to an logical scalar indicating if the
+ * variance components should be transformed.
+ * 
+ * @return a matrix
+ */
+SEXP
+mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp)
+{
+    SEXP ans, 
+	RZXsl = GET_SLOT(x, Matrix_RZXSym),
+	Omega = GET_SLOT(x, Matrix_OmegaSym),
+	Omegacp = PROTECT(duplicate(Omega));
+    cholmod_factor *L = (cholmod_factor *)
+	R_ExternalPtrAddr(VECTOR_ELT(GET_SLOT(x, Matrix_LSym), 0));
+    int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	*dims = INTEGER(getAttrib(RZXsl, Matrix_DimSym)),
+	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	*status = LOGICAL(GET_SLOT(x, Matrix_statusSym)),
+	REML = !strcmp(CHAR(asChar(GET_SLOT(x, Matrix_methodSym))),
+		       "REML"),
+	i, ione = 1, j, nf = LENGTH(Omega),
+	nsamp = asInteger(nsampp),
+	saveb = asLogical(savebp),
+	trans = asLogical(transp);
+    double 
+	*RXX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym)),
+	*RZX = REAL(GET_SLOT(RZXsl, Matrix_xSym)),
+	*bhat = Calloc(dims[0], double),
+	*betahat = Calloc(dims[1], double), one = 1, m1 = -1,
+	*bnew = Calloc(dims[0], double),
+	*betanew = Calloc(dims[1], double),
+	*dcmp = REAL(GET_SLOT(x, Matrix_devCompSym)),
+	df = dcmp[0] - (REML ? dcmp[1] : 0);
+    int nrbase = dims[1] + 1 + coef_length(nf, nc), /* rows always included */
+	p = dims[1];
+    int nrtot = nrbase + (saveb ? dims[0] : 0);
+    cholmod_dense *chb, *chbnew = numeric_as_chm_dense(bnew, dims[0]);
+    
+    if (nsamp <= 0) nsamp = 1;
+    ans = PROTECT(allocMatrix(REALSXP, nrtot, nsamp));
+    GetRNGstate();
+    for (i = 0; i < nsamp; i++) {
+	double *col = REAL(ans) + i * nrtot, sigma;
+				/* factor the mer2 object */
+	status[0] = 0; mer2_factor(x);
+				/* simulate and store new value of sigma */
+	sigma = exp(dcmp[3]/2)/sqrt(rchisq(df));
+	col[p] = (trans ? 2 * log(sigma) : sigma * sigma);
+				/* determine betahat and bhat */
+	internal_mer2_fixef(x, betahat);
+	internal_mer2_ranef(x, bhat);
+				/* simulate scaled, independent normals */
+	for (j = 0; j < p; j++) betanew[j] = sigma * norm_rand();
+	for (j = 0; j < dims[0]; j++) bnew[j] = sigma * norm_rand();
+				/* betanew := RXX^{-1} %*% betanew */
+	F77_CALL(dtrsv)("U", "N", "N", &p, RXX, &p, betanew, &ione);
+				/* bnew := bnew - RZX %*% betanew */
+	F77_CALL(dgemv)("N", dims, &p, &m1, RZX, dims,
+			betanew, &ione, &one, bnew, &ione);
+				/* bnew := L^{-T} %*% bnew */
+	chb = cholmod_solve(CHOLMOD_Lt, L, chbnew, &c);
+				/* Copy chb to bnew and free chb */
+	Memcpy(bnew, (double *)(chb->x), dims[0]);
+ 	cholmod_free_dense(&chb, &c);
+				/* Add conditional modes and store beta */
+	for (j = 0; j < p; j++) {
+	    col[j] = (betanew[j] += betahat[j]);
+	}
+				/* Add conditional modes and
+				 * optionally store b */
+	for (j = 0; j < dims[0]; j++) {
+	    bnew[j] += bhat[j];
+	    if (saveb) col[nrbase + j] = bnew[j];
+	}
+	/* Update and store variance-covariance of the random effects */
+	mer2_Omega_update(Omega, bnew, sigma, nf, nc, Gp, col + p + 1, trans);
+    }
+    PutRNGstate();
+    Free(betanew); Free(bnew); Free(chbnew);
+				/* Restore original Omega */
+    SET_SLOT(x, Matrix_OmegaSym, Omegacp);
+    status[0] = status[1] = 0;
+    mer2_factor(x);
+
+    UNPROTECT(2);
+    return ans;
+}
+
+/** 
+ * Simulate a set of linear predictors from an mer2 object
+ * 
+ * @param x Pointer to an mer2 object
+ * @param np Pointer to an integer giving the number of values to simulate
+ * @param fxd Pointer to the fixed-effects prediction
+ * @param mmats Pointer to a list of model matrices
+ * @param useScale Logical indicator of whether to use the scale
+ * 
+ * @return a matrix of simulated linear predictors
+ */
+SEXP mer2_simulate(SEXP x, SEXP np, SEXP fxd, SEXP mmats, SEXP useScale)
+{
+    int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	*Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	i, ii, ione = 1, n = asInteger(np), nobs = LENGTH(fxd);
+    SEXP ans = PROTECT(allocMatrix(REALSXP, nobs, n)),
+	flist = GET_SLOT(x, Matrix_flistSym),
+	Omega = GET_SLOT(x, Matrix_OmegaSym);
+    double *aa = REAL(ans),
+	one = 1.,
+	scale = (asLogical(useScale)
+		 ? internal_sigma(x,
+				  !strcmp(CHAR(asChar(GET_SLOT(x, Matrix_methodSym))),
+					  "REML"))
+		 : 1.);
+
+    GetRNGstate();
+
+    /* initialize the columns to the fixed effects prediction */
+    if (!isReal(fxd))
+	error(_("fxd must be a numeric vector"));
+    for (ii = 0; ii < n; ii++) Memcpy(aa + ii * nobs, REAL(fxd), nobs);
+
+				/* simulate and add random effects */
+    for (i = 0; i < LENGTH(flist); i++) {
+	SEXP mmi = VECTOR_ELT(mmats, i);
+	int *fv = INTEGER(VECTOR_ELT(flist, i)), 
+	    *dims = INTEGER(getAttrib(mmi, R_DimSymbol)),
+	    nci = nc[i], relen = Gp[i + 1] - Gp[i];
+	int ncisqr = nci * nci, ntot = relen * n;
+	int ncol = ntot/nci, bsz = n * nci;
+	double *mm = REAL(mmi),
+	    *rev = Calloc(ntot, double),
+	    *Rmat = Memcpy(Calloc(ncisqr, double),
+			   REAL(VECTOR_ELT(Omega, i)), ncisqr);
+	
+	if (!isMatrix(mmi) || !isReal(mmi) || dims[0] != nobs || dims[1] != nci)
+	    error(_("mmats[[%d]] must be a numeric matrix of dimension %d by %d"),
+		    i + 1, nobs, nci);
+	F77_CALL(dpotrf)("U", &nci, Rmat, &nci, &ii);
+	if (ii)
+	    error(_("Leading %d minor of Omega[[%d]] not positive definite"),
+		  ii, i + 1);
+	for (ii = 0; ii < ntot; ii++) rev[ii] = norm_rand();
+	F77_CALL(dtrsm)("L", "U", "N", "N", &nci, &ncol, &scale, Rmat, &nci,
+			rev, &nci);
+	for (ii = 0; ii < nobs; ii++) /* loop over rows */
+	    F77_CALL(dgemm)("N", "N", &ione, &n, &nci, &one, mm + ii, &nobs,
+			    rev + (fv[ii] - 1) * bsz, &nci, &one, aa + ii, &nobs);
+	Free(rev); Free(Rmat); 
+    }
+
+    PutRNGstate();
+    UNPROTECT(1);
+    return ans;
+}
+

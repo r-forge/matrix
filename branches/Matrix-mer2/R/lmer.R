@@ -1232,10 +1232,45 @@ setReplaceMethod("LMEoptimize", signature(x="mer2", value="list"),
                  return(x)
              })
 
-setMethod("deviance", "mer2",
+setMethod("deviance", signature(object = "mer2"),
           function(object, REML = NULL, ...) {
               .Call("mer2_factor", object, PACKAGE = "Matrix")
               if (is.null(REML))
                   REML <- object@method == "REML"
               object@deviance[[ifelse(REML, "REML", "ML")]]
           })
+
+setMethod("mcmcsamp", signature(object = "mer2"),
+          function(object, n = 1, verbose = FALSE, saveb = FALSE,
+                   trans = TRUE, ...)
+      {
+          ans <- t(.Call("mer2_MCMCsamp", object, saveb, n,
+                         trans, PACKAGE = "Matrix"))
+          attr(ans, "mcpar") <- as.integer(c(1, n, 1))
+          class(ans) <- "mcmc"
+          glmer <- FALSE
+          gnms <- names(object@flist)
+          cnms <- object@cnames
+          ff <- fixef(object)
+          colnms <- c(names(ff), if (glmer) character(0) else "sigma^2",
+                    unlist(lapply(seq(along = gnms),
+                                  function(i)
+                                  abbrvNms(gnms[i],cnms[[i]]))))
+          if (trans) {
+              ## parameter type: 0 => fixed effect, 1 => variance,
+              ##                 2 => covariance
+              ptyp <- c(integer(length(ff)), if (glmer) integer(0) else 1:1,
+                        unlist(lapply(seq(along = gnms),
+                                      function(i)
+                                  {
+                                      k <- length(cnms[[i]])
+                                      rep(1:2, c(k, (k*(k-1))/2))
+                                  })))
+              colnms[ptyp == 1] <-
+                  paste("log(", colnms[ptyp == 1], ")", sep = "")
+              colnms[ptyp == 2] <-
+                  paste("atanh(", colnms[ptyp == 2], ")", sep = "")
+          }
+          colnames(ans) <- colnms
+          ans
+      })
