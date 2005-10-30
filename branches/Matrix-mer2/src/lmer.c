@@ -4505,4 +4505,70 @@ SEXP mer2_simulate(SEXP x, SEXP np, SEXP fxd, SEXP mmats, SEXP useScale)
     UNPROTECT(1);
     return ans;
 }
+    
+/** 
+ * Calculate the fitted values.
+ * 
+ * @param x pointer to an mer2 object
+ * @param useFixed logical scalar indicating if the fixed
+ * effects should be used
+ * @param useRand logical scalar indicating if the random
+ * effects should be used
+ * @param val array to hold the fitted values
+ * 
+ * @return pointer to a numeric array of fitted values
+ */
+static double*
+internal_mer2_fitted(SEXP x, int useFixed, int useRand, double val[])
+{
+    double *dcmp = REAL(GET_SLOT(x, Matrix_devCompSym));
+    int n = (int) dcmp[0];
 
+    AZERO(val, n);
+    if (useFixed) {
+	int ione = 1, p = (int) dcmp[1];
+	double *beta = Calloc(p, double), one = 1.0;
+
+	internal_mer2_fixef(x, beta);
+	F77_CALL(dgemv)("N", &n, &p, &one,
+			REAL(GET_SLOT(x, Matrix_XSym)),
+			&n, beta, &ione, &one, val, &ione);
+	Free(beta);
+    }
+    if (useRand) {
+	int nf = LENGTH(GET_SLOT(x, Matrix_flistSym));
+	int q = INTEGER(GET_SLOT(x, Matrix_GpSym))[nf];
+	double *b = Calloc(q, double), one[2] = {1,0};
+	cholmod_sparse *Zt = as_cholmod_sparse(GET_SLOT(x, Matrix_ZtSym));
+	cholmod_dense *chb = numeric_as_chm_dense(b, q),
+	    *chv = numeric_as_chm_dense(val, n);
+
+	internal_mer2_ranef(x, b);
+	if (!cholmod_sdmult(Zt, 1, one, one, chb, chv, &c))
+	    error(_("Error return from sdmult"));
+	Free(chv); Free(chb); Free(b); Free(Zt);
+    }
+    return val;
+}
+
+/** 
+ * Return the fitted values as an SEXP
+ * 
+ * @param x pointer to an mer2 object
+ * @param useFe pointer to a logical scalar indicating if the fixed
+ * effects should be used
+ * @param useRe pointer to a logical scalar indicating if the random
+ * effects should be used
+ * 
+ * @return pointer to a numeric array of fitted values
+ */
+
+SEXP mer2_fitted(SEXP x, SEXP useFe, SEXP useRe)
+{
+    int n = LENGTH(VECTOR_ELT(GET_SLOT(x, Matrix_flistSym), 0));
+    SEXP ans = PROTECT(allocVector(REALSXP, n));
+
+    internal_mer2_fitted(x, asLogical(useFe), asLogical(useRe), REAL(ans));
+    UNPROTECT(1);
+    return ans;
+}
