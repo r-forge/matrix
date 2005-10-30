@@ -54,6 +54,7 @@ SEXP mer2_coefGets(SEXP x, SEXP coef, SEXP pType);
 SEXP mer2_create(SEXP random, SEXP Xp, SEXP yp, SEXP method);
 SEXP mer2_dtCMatrix(SEXP x);
 SEXP mer2_factor(SEXP x);
+SEXP mer2_fitted(SEXP x, SEXP useFe, SEXP useRe);
 SEXP mer2_fixef(SEXP x);
 SEXP mer2_initial(SEXP x);
 SEXP mer2_pMatrix(SEXP x);

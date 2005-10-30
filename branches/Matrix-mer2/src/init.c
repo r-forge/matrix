@@ -214,6 +214,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer2_create", (DL_FUNC) &mer2_create, 4},
     {"mer2_dtCMatrix", (DL_FUNC) &mer2_dtCMatrix, 1},
     {"mer2_factor", (DL_FUNC) &mer2_factor, 1},
+    {"mer2_fitted", (DL_FUNC) &mer2_fitted, 3},
     {"mer2_fixef", (DL_FUNC) &mer2_fixef, 1},
     {"mer2_initial", (DL_FUNC) &mer2_initial, 1},
     {"mer2_MCMCsamp", (DL_FUNC) &mer2_MCMCsamp, 4},
