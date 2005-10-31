@@ -1159,26 +1159,27 @@ mer2 <-
                         '\nUsing method = "PQL".\n')
         }
     }
-
-    ## grouping factors and model matrices for random effects
+    ## create factor list for the random effects
     bars <- findbars(formula[[3]])
-    random <-
-        lapply(bars, function(x)
-               list(t(model.matrix(eval(substitute(~ expr,
-                                                   list(expr = x[[2]]))),
-                                   frm)),
-                    eval(substitute(as.factor(fac)[,drop = TRUE],
-                                    list(fac = x[[3]])), frm)))
-    names(random) <- unlist(lapply(bars, function(x) deparse(x[[3]])))
-
+    names(bars) <- unlist(lapply(bars, function(x) deparse(x[[3]])))
+    fl <- lapply(bars,
+                 function(x)
+                 eval(substitute(as.factor(fac)[,drop = TRUE],
+                                 list(fac = x[[3]])), frm))
     ## order factor list by decreasing number of levels
-    nlev <- sapply(random, function(x) length(levels(x[[2]])))
+    nlev <- sapply(fl, function(x) length(levels(x)))
     if (any(diff(nlev) > 0)) {
-        random <- random[rev(order(nlev))]
+        ord <- rev(order(nlev))
+        bars <- bars[ord]
+        fl <- fl[ord]
     }
-
-    ## Create the model matrices and a mixed-effects representation (mer)
-    mer <- .Call("mer2_create", random, x, y, method, PACKAGE = "Matrix")
+    ## Create the mixed-effects representation (mer) object
+    mer <- .Call("mer2_create", fl,
+                 lapply(bars, function(x) # model matrices
+                        t(model.matrix(eval(substitute(~ expr,
+                                                       list(expr = x[[2]]))),
+                                            frm))),
+                 x, y, method, PACKAGE = "Matrix")
     LMEoptimize(mer) <- cv
     mer
 }
@@ -1273,4 +1274,33 @@ setMethod("mcmcsamp", signature(object = "mer2"),
           }
           colnames(ans) <- colnms
           ans
+      })
+
+setMethod("simulate", signature(object = "mer2"),
+          function(object, nsim = 1, seed = NULL, ...)
+      {
+          if(!exists(".Random.seed", envir = .GlobalEnv))
+              runif(1)               # initialize the RNG if necessary
+          if(is.null(seed))
+              RNGstate <- .Random.seed
+          else {
+              R.seed <- .Random.seed
+              set.seed(seed)
+              RNGstate <- structure(seed, kind = as.list(RNGkind()))
+              on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+          }
+
+          family <- object@family
+          if (family$family != "gaussian" ||
+              family$link != "identity")
+              stop("simulation of generalized linear mixed models not yet implemented")
+          ## similate the linear predictors
+          lpred <- .Call("mer2_simulate", as(object, "mer"), nsim,
+                          TRUE, PACKAGE = "Matrix")
+          ## add per-observation noise term
+          lpred <- as.data.frame(lpred + rnorm(prod(dim(lpred)), sd = scale))
+
+          ## save the seed
+          attr(lpred, "seed") <- RNGstate
+          lpred
       })
