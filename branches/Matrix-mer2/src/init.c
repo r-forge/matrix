@@ -213,6 +213,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer2_coefGets", (DL_FUNC) &mer2_coefGets, 3},
     {"mer2_create", (DL_FUNC) &mer2_create, 5},
     {"mer2_dtCMatrix", (DL_FUNC) &mer2_dtCMatrix, 1},
+    {"mer2_dtCMatrix_inv", (DL_FUNC) &mer2_dtCMatrix_inv, 1},
     {"mer2_factor", (DL_FUNC) &mer2_factor, 1},
     {"mer2_fitted", (DL_FUNC) &mer2_fitted, 3},
     {"mer2_fixef", (DL_FUNC) &mer2_fixef, 1},
