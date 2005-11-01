@@ -4545,3 +4545,47 @@ SEXP mer2_simulate(SEXP x, SEXP np, SEXP fxd, SEXP mmats, SEXP useScale)
     UNPROTECT(1);
     return ans;
 }
+
+/** 
+ * Return L^{-1} as a dtCMatrix object
+ * 
+ * @param x pointer to an mer2 object
+ * 
+ * @return L^{-1} as an dtCMatrix object
+ */
+SEXP mer2_dtCMatrix_inv(SEXP x)
+{
+    cholmod_factor
+	*L = (cholmod_factor *) R_ExternalPtrAddr(GET_SLOT(x, Matrix_LSym));
+    cholmod_sparse
+	*b = cholmod_allocate_sparse(L->n, L->n, L->n, 1, 1,
+				     0, CHOLMOD_REAL, &c),
+	*Linv;
+    double *bx = (double *)(b->x);
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dtCMatrix")));
+    int *bi = (int *) (b->i), *bp = (int *) (b->p),
+	*dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2)),
+	j, nz, q;
+
+    mer2_factor(x);
+    dims[0] = dims[1] = q = (int)(L->n);
+    for (j = 0; j < q; j++) {
+	bp[j] = bi[j] = j;
+	bx[j] = 1;
+    }
+    bp[q] = q;
+    Linv = cholmod_spsolve(CHOLMOD_L, L, b, &c);
+    cholmod_free_sparse(&b, &c);
+    SET_SLOT(ans, Matrix_uploSym, mkString("L"));
+    SET_SLOT(ans, Matrix_diagSym, mkString("N"));
+    Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_pSym, INTSXP, q + 1)),
+	   (int *) Linv->p, q + 1);
+    nz = ((int *)(Linv->p))[q];
+    Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_iSym, INTSXP, nz)),
+	   (int *) Linv->i, nz);
+    Memcpy(REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, nz)),
+	   (double *) Linv->x, nz);
+    cholmod_free_sparse(&Linv, &c);
+    UNPROTECT(1);
+    return ans;
+}
