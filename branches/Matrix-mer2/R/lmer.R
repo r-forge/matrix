@@ -1180,6 +1180,7 @@ mer2 <-
                                                        list(expr = x[[2]]))),
                                             frm))),
                  x, y, method, PACKAGE = "Matrix")
+    .Call("mer2_IPLSiter", mer, 15, PACKAGE = "Matrix")
     LMEoptimize(mer) <- cv
     mer
 }
@@ -1206,8 +1207,7 @@ setReplaceMethod("LMEoptimize", signature(x="mer2", value="list"),
              {
                  if (value$msMaxIter < 1) return(x)
                  nc <- x@nc
-                 constr <- unlist(lapply(nc[1:(length(nc) - 1)],
-                                         function(k) 1:((k*(k+1))/2) <= k))
+                 constr <- unlist(lapply(nc, function(k) 1:((k*(k+1))/2) <= k))
                  fn <- function(pars)
                      deviance(.Call("mer2_coefGets", x, pars, 2, PACKAGE = "Matrix"))
                  gr <- NULL  ## No gradient yet

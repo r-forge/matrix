@@ -49,6 +49,7 @@ SEXP lmer_simulate(SEXP x, SEXP np, SEXP fxdp, SEXP mmats,
 		   SEXP useScP);
 SEXP lmer_update_y(SEXP x, SEXP y, SEXP mm);
 SEXP lmer_set_initial(SEXP x, SEXP iv);
+SEXP mer2_IPLSiter(SEXP x, SEXP nitP);
 SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp);
 SEXP mer2_coef(SEXP x, SEXP pType);
 SEXP mer2_coefGets(SEXP x, SEXP coef, SEXP pType);
