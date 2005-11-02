@@ -4589,3 +4589,54 @@ SEXP mer2_dtCMatrix_inv(SEXP x)
     UNPROTECT(1);
     return ans;
 }
+
+/** 
+ * Iterated penalized least squares update of an mer2 object
+ * 
+ * @param x pointer to an mer2 object
+ * @param nitP pointer to the number of iterations to run
+ * 
+ * @return NULL
+ */
+SEXP mer2_IPLSiter(SEXP x, SEXP nitP)
+{
+    SEXP ncP = GET_SLOT(x, Matrix_ncSym),
+	Omega = GET_SLOT(x, Matrix_OmegaSym);
+    int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	*nc = INTEGER(ncP),
+	*status = INTEGER(GET_SLOT(x, Matrix_statusSym)),
+	i, j, k, nf = LENGTH(ncP), nit = asInteger(nitP),
+	REML = !strcmp(CHAR(asChar(GET_SLOT(x, Matrix_methodSym))),
+		       "REML");
+    double *b = Calloc(Gp[nf], double), one = 1, zero = 0,
+	*dev = REAL(GET_SLOT(x, Matrix_devianceSym));
+
+    for (k = 0; k < nit; k++) {
+	double sigma = internal_mer2_sigma(x, REML);
+	internal_mer2_ranef(x, b);
+	Rprintf("%10g\n", dev[REML ? 1 : 0]);    
+
+	for (i = 0; i < nf; i++) {
+	    int nci = nc[i];
+	    int ncisq = nci*nci, nlev = (Gp[i + 1] - Gp[i])/nci;
+	    double *tmp = Calloc(ncisq, double),
+		*Omegai = REAL(GET_SLOT(VECTOR_ELT(Omega, i), Matrix_xSym)),
+		mult = sigma*sigma*((double)(nlev - nci - 1)/(double)nlev);
+
+	    AZERO(tmp, ncisq);
+	    F77_CALL(dsyrk)("U", "N", &nci, &nlev,
+			    &one, b + Gp[i], &nci, &zero, tmp, &nci);
+	    F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
+	    if (j)
+		error(_("Singular r.e. cross-product at level %d"), i + 1);
+	    F77_CALL(dpotri)("U", &nci, tmp, &nci, &j);
+	    if (j)
+		error(_("Singular r.e. cross-product at level %d"), i + 1);
+	    for (j = 0; j < ncisq; j++) Omegai[j] = mult * tmp[j];
+	    status[0] = status[1] = 0;
+	    Free(tmp);
+	}
+    }
+    Free(b);
+    return R_NilValue;
+}
