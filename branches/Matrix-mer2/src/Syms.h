@@ -24,6 +24,7 @@ SEXP
     Matrix_diagSym,
     Matrix_factorSym,
     Matrix_flistSym,
+    Matrix_gradCompSym,
     Matrix_iSym,
     Matrix_jSym,
     Matrix_methodSym,

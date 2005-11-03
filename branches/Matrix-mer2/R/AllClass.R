@@ -472,25 +472,30 @@ setClass("mer2",
                         X = "matrix",      # X
                         y = "numeric",     # y
 			method = "character", # parameter estimation method
+                        ## invariants derived from data structure
 			cnames = "list",   # column names of model matrices
-                        ## derived quantities
+			nc = "integer",    # dimensions of blocks in Omega
+			Gp = "integer",    # Pointers to groups of rows in Zt
+			devComp = "numeric", # Components of deviance
+			deviance = "numeric", # Current deviance (ML and REML)
+			status = "logical", # factored? inverted?
+                        ## quantities that vary when Z, X or y are updated
 			XtX = "dpoMatrix", # X'X
 			ZtZ = "dsCMatrix", # Z'Z
 			ZtX = "dgeMatrix", # Z'X
                         Zty = "numeric",   # Z'y 
                         Xty = "numeric",   # X'y 
-			nc = "integer",    # dimensions of blocks in Omega
-			Gp = "integer",    # Pointers to groups of rows in Zt
                         ## slots that vary during the optimization
 			Omega = "list", # list of relative precision matrices
-			devComp = "numeric", # Components of deviance
-			deviance = "numeric", # Current deviance (ML and REML)
-			status = "logical",
-                        ## components of the Cholesky factor of augmented [Z:X:y]'[Z:X:y]
-                        L = "externalptr",        # sparse Cholesky factor of Z'Z + Omega
+                        ## Cholesky factor of inflated [Z:X:y]'[Z:X:y]
+                        L = "externalptr", # sparse Cholesky factor of Z'Z + Omega
 			RZX = "dgeMatrix",
 			RXX = "dtrMatrix",
                         rZy = "numeric",
-                        rXy = "numeric"
+                        rXy = "numeric",
+                        ## lists of arrays
+                        bVar = "list",
+                        gradComp = "list",
+                        HessComp = "list"
 			)
 	)

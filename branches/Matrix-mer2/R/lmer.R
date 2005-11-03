@@ -1180,7 +1180,6 @@ mer2 <-
                                                        list(expr = x[[2]]))),
                                             frm))),
                  x, y, method, PACKAGE = "Matrix")
-    .Call("mer2_IPLSiter", mer, 15, PACKAGE = "Matrix")
     LMEoptimize(mer) <- cv
     mer
 }

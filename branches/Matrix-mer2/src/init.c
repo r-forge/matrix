@@ -264,6 +264,7 @@ void R_init_Matrix(DllInfo *dll)
     Matrix_diagSym = install("diag");
     Matrix_factorSym = install("factors");
     Matrix_flistSym = install("flist");
+    Matrix_gradCompSym = install("gradComp");
     Matrix_iSym = install("i");
     Matrix_jSym = install("j");
     Matrix_methodSym = install("method");
