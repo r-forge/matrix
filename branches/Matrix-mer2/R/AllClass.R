@@ -322,6 +322,10 @@ setClass("dgBCMatrix",
 
 setClass("Cholesky", contains = "dtrMatrix")
 
+setClass("LDL", contains = "dtrMatrix")
+
+setClass("correlation", representation(sd = "numeric"), contains = "dpoMatrix")
+
 setClass("pCholesky", contains = "dtpMatrix")
 
 setClass("BunchKaufman", representation(perm = "integer"), contains = "dtrMatrix",
@@ -495,7 +499,6 @@ setClass("mer2",
                         rXy = "numeric",
                         ## lists of arrays
                         bVar = "list",
-                        gradComp = "list",
-                        HessComp = "list"
+                        gradComp = "list"
 			)
 	)
