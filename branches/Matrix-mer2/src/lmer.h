@@ -6,6 +6,7 @@
 #include "dgBCMatrix.h"
 #include "dgCMatrix.h"
 #include "Metis_utils.h"
+#include "dpoMatrix.h"
 #include "R_ldl.h"
 #include "dsCMatrix.h"
 #include "dtCMatrix.h"
@@ -53,7 +54,8 @@ SEXP mer2_IPLSiter(SEXP x, SEXP nitP);
 SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp);
 SEXP mer2_coef(SEXP x, SEXP pType);
 SEXP mer2_coefGets(SEXP x, SEXP coef, SEXP pType);
-SEXP mer2_create(SEXP fl, SEXP Ztl, SEXP Xp, SEXP yp, SEXP method);
+SEXP mer2_create(SEXP fl, SEXP Zt, SEXP Xp, SEXP yp, SEXP method,
+		 SEXP nc, SEXP cnames, SEXP useS);
 SEXP mer2_dtCMatrix(SEXP x);
 SEXP mer2_dtCMatrix_inv(SEXP x);
 SEXP mer2_factor(SEXP x);
@@ -64,5 +66,6 @@ SEXP mer2_pMatrix(SEXP x);
 SEXP mer2_ranef(SEXP x);
 SEXP mer2_sigma(SEXP x, SEXP REML);
 SEXP mer2_simulate(SEXP x, SEXP np, SEXP fxdp, SEXP mmats, SEXP useScP);
+SEXP Zt_create(SEXP fl, SEXP Ztl);
 
 #endif
