@@ -476,6 +476,7 @@ setClass("mer2",
                         X = "matrix",      # X
                         y = "numeric",     # y
 			method = "character", # parameter estimation method
+                        useScale = "logical", # should scale factor be included
                         ## invariants derived from data structure
 			cnames = "list",   # column names of model matrices
 			nc = "integer",    # dimensions of blocks in Omega

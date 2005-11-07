@@ -3,6 +3,11 @@
 setAs("dpoMatrix", "dppMatrix",
       function(from) as(as(from, "dspMatrix"), "dppMatrix"))
 
+setAs("dpoMatrix", "correlation",
+      function(from) {
+          sd <- sqrt(diag(from))
+          new("correlation", as(t(from/sd)/sd, "dpoMatrix"), sd = sd)
+      })
 
 setMethod("chol", signature(x = "dpoMatrix"),
           function(x, pivot, LINPACK)
@@ -38,3 +43,4 @@ setMethod("solve", signature(a = "dpoMatrix", b = "matrix"),
 ##          as.numeric(.Call("dpoMatrix_matrix_solve",
 ##                           a, as.matrix(b))),
 ##          valueClass = "numeric")
+

@@ -1173,22 +1173,29 @@ mer2 <-
         bars <- bars[ord]
         fl <- fl[ord]
     }
+    ## create list of transposed model matrices for random effects
+    Ztl <- lapply(bars, function(x) # model matrices
+                  t(model.matrix(eval(substitute(~ expr,
+                                                 list(expr = x[[2]]))),
+                                 frm)))
     ## Create the mixed-effects representation (mer) object
     mer <- .Call("mer2_create", fl,
-                 lapply(bars, function(x) # model matrices
-                        t(model.matrix(eval(substitute(~ expr,
-                                                       list(expr = x[[2]]))),
-                                            frm))),
-                 x, y, method, PACKAGE = "Matrix")
+                 .Call("Zt_create", fl, Ztl, PACKAGE = "Matrix"),
+                 x, y, method, sapply(Ztl, nrow),
+                 c(lapply(Ztl, rownames), list(.fixed = colnames(x))),
+                 !(family$family %in% c("binomial", "poisson")),
+                 PACKAGE = "Matrix")
     LMEoptimize(mer) <- cv
     mer
 }
 
 ## Extract the permutation
-setAs("mer2", "pMatrix", function(from) .Call("mer2_pMatrix", from))
+setAs("mer2", "pMatrix", function(from)
+      .Call("mer2_pMatrix", from))
 
 ## Extract the L matrix
-setAs("mer2", "dtCMatrix", function(from) .Call("mer2_dtCMatrix", from))
+setAs("mer2", "dtCMatrix", function(from)
+      .Call("mer2_dtCMatrix", from))
 
 ## Extract the fixed effects
 setMethod("fixef", signature(object = "mer2"),
@@ -1302,4 +1309,132 @@ setMethod("simulate", signature(object = "mer2"),
           ## save the seed
           attr(lpred, "seed") <- RNGstate
           lpred
+      })
+
+vCor <- function(obj) {
+    scale <- 1
+    if (obj@useScale)
+        scale <- .Call("mer2_sigma", obj,
+                       obj@method == "REML",
+                       PACKAGE = "Matrix")^2
+    lapply(obj@Omega, function(el) scale * solve(el))
+}
+
+setMethod("show", "mer2",
+          function(object) {
+              fcoef <- .Call("mer2_fixef", object, PACKAGE = "Matrix")
+              useScale <- object@useScale
+              corF <- vcov(object)@factors$correlation
+              DF <- getFixDF(object)
+              coefs <- cbind(fcoef, corF@sd, DF)
+              nc <- object@nc
+              dimnames(coefs) <-
+                  list(names(fcoef), c("Estimate", "Std. Error", "DF"))
+                            digits <- max(3, getOption("digits") - 2)
+              REML <- object@method == "REML"
+              llik <- logLik(object, REML)
+              dev <- deviance(object, REML)
+
+              rdig <- 5
+              if (glz <- !(object@method %in% c("REML", "ML"))) {
+                  cat(paste("Generalized linear mixed model fit using",
+                            object@method, "\n"))
+              } else {
+                  cat("Linear mixed-effects model fit by ")
+                  cat(if(REML) "REML\n" else "maximum likelihood\n")
+              }
+              if (0) {
+              if (!is.null(object@call$formula)) {
+                  cat("Formula:", deparse(object@call$formula),"\n")
+              }
+              if (!is.null(object@call$data)) {
+                  cat("   Data:", deparse(object@call$data), "\n")
+              }
+              if (!is.null(object@call$subset)) {
+                  cat(" Subset:",
+                      deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
+              }
+              if (glz) {
+                  cat(" Family: ", object@family$family, "(",
+                      object@family$link, " link)\n", sep = "")
+                  print(data.frame(AIC = AIC(llik), BIC = BIC(llik),
+                               logLik = c(llik),
+                               deviance = -2*llik,
+                               row.names = ""))
+              } else {
+                  print(data.frame(AIC = AIC(llik), BIC = BIC(llik),
+                               logLik = c(llik),
+                               MLdeviance = dev["ML"],
+                               REMLdeviance = dev["REML"],
+                               row.names = ""))
+              }
+          }
+              cat("Random effects:\n")
+              show(VarCorr(object, useScale = useScale))
+              ngrps <- lapply(object@flist, function(x) length(levels(x)))
+              cat(sprintf("# of obs: %d, groups: ", object@nc[length(object@nc)]))
+              cat(paste(paste(names(ngrps), ngrps, sep = ", "), collapse = "; "))
+              cat("\n")
+              if (!useScale)
+                  cat("\nEstimated scale (compare to 1) ",
+                      .Call("lmer_sigma", object, FALSE, PACKAGE = "Matrix"),
+                      "\n")
+              if (nrow(coefs) > 0) {
+                  if (useScale) {
+                      stat <- coefs[,1]/coefs[,2]
+                      pval <- 2*pt(abs(stat), coefs[,3], lower = FALSE)
+                      nms <- colnames(coefs)
+                      coefs <- cbind(coefs, stat, pval)
+                      colnames(coefs) <- c(nms, "t value", "Pr(>|t|)")
+                  } else {
+                      coefs <- coefs[, 1:2, drop = FALSE]
+                      stat <- coefs[,1]/coefs[,2]
+                      pval <- 2*pnorm(abs(stat), lower = FALSE)
+                      nms <- colnames(coefs)
+                      coefs <- cbind(coefs, stat, pval)
+                      colnames(coefs) <- c(nms, "z value", "Pr(>|z|)")
+                  }
+                  cat("\nFixed effects:\n")
+                  printCoefmat(coefs, tst.ind = 4, zap.ind = 3)
+                  if (length(object@showCorrelation) > 0 && object@showCorrelation[1]) {
+                      rn <- rownames(coefs)
+                      dimnames(corF) <- list(
+                                               abbreviate(rn, minlen=11),
+                                               abbreviate(rn, minlen=6))
+                      if (!is.null(corF)) {
+                          p <- NCOL(corF)
+                          if (p > 1) {
+                              cat("\nCorrelation of Fixed Effects:\n")
+                              corF <- format(round(corF, 3), nsmall = 3)
+                              corF[!lower.tri(corF)] <- ""
+                              print(corF[-1, -p, drop=FALSE], quote = FALSE)
+                          }
+                      }
+                  }
+              }
+              invisible(object)
+          })
+
+setMethod("vcov", signature(object = "mer2"),
+          function(object, REML = object@method == "REML",
+                   useScale = object@useScale,...) {
+              sc <- if (object@useScale) {
+                  .Call("mer2_sigma", object, REML, PACKAGE = "Matrix")
+              } else { 1 }
+              rr <- as(sc^2 * tcrossprod(solve(object@RXX)), "dpoMatrix")
+              rr@factors$correlation <- as(rr, "correlation")
+              rr
+          })
+
+
+## calculates degrees of freedom for fixed effects Wald tests
+## This is a placeholder.  The answers are generally wrong.  It will
+## be very tricky to decide what a 'right' answer should be with
+## crossed random effects.
+
+setMethod("getFixDF", signature(object="mer2"),
+          function(object, ...)
+      {
+          devc <- object@devComp
+          rep(as.integer(devc[1]- devc[2]), devc[2])
       })

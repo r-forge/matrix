@@ -121,7 +121,8 @@ exportClasses(
 	      "pMatrix",
 	      "pdmatrix",
 	      "dCholCMatrix",
-	      "lCholCMatrix"
+	      "lCholCMatrix",
+              "correlation"
 	      )
 
 ## lmer-related
