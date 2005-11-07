@@ -53,6 +53,7 @@ static R_CallMethodDef CallEntries[] = {
     {"Tsparse_to_Csparse", (DL_FUNC) &Tsparse_to_Csparse, 1},
     {"csc_check_column_sorting", (DL_FUNC) &csc_check_column_sorting, 1},
     {"Tsparse_validate", (DL_FUNC) &Tsparse_validate, 1},
+    {"Zt_create", (DL_FUNC) &Zt_create, 2},
     {"csc_crossprod", (DL_FUNC) &csc_crossprod, 1},
     {"csc_getDiag", (DL_FUNC) &csc_getDiag, 1},
     {"csc_matrix_crossprod", (DL_FUNC) &csc_matrix_crossprod, 3},
@@ -213,7 +214,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer2_MCMCsamp", (DL_FUNC) &mer2_MCMCsamp, 4},
     {"mer2_coef", (DL_FUNC) &mer2_coef, 2},
     {"mer2_coefGets", (DL_FUNC) &mer2_coefGets, 3},
-    {"mer2_create", (DL_FUNC) &mer2_create, 5},
+    {"mer2_create", (DL_FUNC) &mer2_create, 8},
     {"mer2_dtCMatrix", (DL_FUNC) &mer2_dtCMatrix, 1},
     {"mer2_dtCMatrix_inv", (DL_FUNC) &mer2_dtCMatrix_inv, 1},
     {"mer2_factor", (DL_FUNC) &mer2_factor, 1},
@@ -276,6 +277,7 @@ void R_init_Matrix(DllInfo *dll)
     Matrix_rcondSym = install("rcond");
     Matrix_statusSym = install("status");
     Matrix_uploSym = install("uplo");
+    Matrix_useScaleSym = install("useScale");
     Matrix_xSym = install("x");
     Matrix_ySym = install("y");
     Matrix_zSym = install("z");

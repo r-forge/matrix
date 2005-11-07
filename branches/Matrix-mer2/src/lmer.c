@@ -3463,56 +3463,67 @@ SEXP lmer_update_y(SEXP x, SEXP y, SEXP mmats)
     return R_NilValue;
 }
 
-/* FIXME: Set this up so that there is the ability to update without reanalyzing */
-
-static SEXP
-list_to_sparse(SEXP fl, SEXP Ztl, int nobs, int *nc, int *Gp, SEXP cnames)
+/** 
+ * Create the sparse Zt matrix from a factor list and list of model matrices
+ * 
+ * @param fl list of factors
+ * @param Ztl list of transposes of model matrices
+ * 
+ * @return a freshly created sparse Zt object
+ */
+SEXP Zt_create(SEXP fl, SEXP Ztl)
 {
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix")));
-    int *dims, *p, *ii, i, nctot = 0, nf = LENGTH(fl);
-    int *offset = Calloc(nf + 1, int);
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix"))), fi, tmmat;
+    int *dims, *p, *ii, i, nrtot = 0, nf = LENGTH(fl), nobs;
+    int *Gp = Calloc(nf + 1, int), *nr = Calloc(nf, int),
+	*offset = Calloc(nf + 1, int);
     double *x;
     
+    if (!isNewList(fl) || nf < 1)
+	error(_("fl must be a non-null list"));
+    if (!isNewList(Ztl) || LENGTH(Ztl) != nf)
+	error(_("Ztl must be a list of length %d"), nf);
+    fi = VECTOR_ELT(fl, 0);
+    nobs = LENGTH(fi);
+    if (!isFactor(fi) || nobs < 1)
+	error(_("fl[[1]] must be a non-empty factor"));
     offset[0] = Gp[0] = 0;
     for (i = 0; i < nf; i++) {	/* check consistency and establish dimensions */
-	SEXP tmmat = VECTOR_ELT(Ztl, i);
-				/* transpose of model matrix */
+	fi = VECTOR_ELT(fl, i);	/* grouping factor */
+	if (!isFactor(fi) || LENGTH(fi) != nobs)
+	    error(_("fl[[%d]] must be a factor of length %d"), i + 1, nobs);
+	tmmat = VECTOR_ELT(Ztl, i); /* transpose of model matrix */
 	if (!isMatrix(tmmat) || !isReal(tmmat))
 	    error(_("Ztl[[%d]] must be real matrix"), i + 1);
-	SET_VECTOR_ELT(cnames, i,
-		       duplicate(VECTOR_ELT(getAttrib(tmmat, R_DimNamesSymbol),
-					    0)));
 	dims = INTEGER(getAttrib(tmmat, R_DimSymbol));
-	nctot += (nc[i] = dims[0]); /* matrix has been transposed */
 	if (dims[1] != nobs)
 	    error(_("Ztl[[%d]] must have %d columns"), i + 1, nobs);
-				/* grouping factor */
-	Gp[i + 1] = Gp[i] + nc[i] *
-	    LENGTH(getAttrib(VECTOR_ELT(fl, i), R_LevelsSymbol));
-	offset[i + 1] = offset[i] + nc[i];
+	nrtot += (nr[i] = dims[0]);
+	offset[i + 1] = offset[i] + nr[i];
+	Gp[i + 1] = Gp[i] + dims[0] * LENGTH(getAttrib(fi, R_LevelsSymbol));
     }
     dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
     dims[0] = Gp[nf]; dims[1] = nobs;
     p = INTEGER(ALLOC_SLOT(ans, Matrix_pSym, INTSXP, nobs + 1));
-    ii = INTEGER(ALLOC_SLOT(ans, Matrix_iSym, INTSXP, nctot * nobs));
-    x = REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, nctot * nobs));
-    p[0] = 0; for(i = 0; i < nobs; i++) p[i + 1] = p[i] + nctot;
+    ii = INTEGER(ALLOC_SLOT(ans, Matrix_iSym, INTSXP, nrtot * nobs));
+    x = REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, nrtot * nobs));
+    p[0] = 0; for(i = 0; i < nobs; i++) p[i + 1] = p[i] + nrtot;
 
     for (i = 0; i < nf; i++) {	/* fill ans */
 	int *vals = INTEGER(VECTOR_ELT(fl, i)), j;
 	double *xvals = REAL(VECTOR_ELT(Ztl, i));
 
 	for (j = 0; j < nobs; j++) {
-	    int jbase = Gp[i] + nc[i] * (vals[j] - 1), k;
-	    for (k = 0; k < nc[i]; k++) {
-		int ind = j * nctot + offset[i] + k;
+	    int jbase = Gp[i] + nr[i] * (vals[j] - 1), k;
+	    for (k = 0; k < nr[i]; k++) {
+		int ind = j * nrtot + offset[i] + k;
 		ii[ind] = jbase + k;
-		x[ind] = xvals[j * nc[i] + k];
+		x[ind] = xvals[j * nr[i] + k];
 	    }
 	}
     }
 
-    Free(offset);
+    Free(offset); Free(Gp); Free(nr);
     UNPROTECT(1);
     return ans;
 }
@@ -3628,6 +3639,7 @@ SEXP mer2_initial(SEXP x)
 		omgi[k * ncip1] += xx[p[base + k + 1] - 1];
 	}
 	for (k = 0; k < nci; k++) omgi[k * ncip1] *= 0.375/nlev;
+	dpoMatrix_chol(VECTOR_ELT(Omg, i));
     }
     status[0] = status[1] = FALSE;
     return R_NilValue;
@@ -3774,17 +3786,11 @@ static double Omega_log_det(SEXP Omega, int nf, int *nc, int *Gp)
     int i;
 
     for (i = 0; i < nf; i++) {
-	int j, nci = nc[i], ncip1 = nc[i] + 1, ncisq = nc[i] * nc[i],
-	    nlev = (Gp[i + 1] - Gp[i])/nc[i];
-	double *omgi = Memcpy(Calloc(ncisq, double),
-			      REAL(GET_SLOT(VECTOR_ELT(Omega, i), Matrix_xSym)),
-			      ncisq);
-	F77_CALL(dpotrf)("U", &nci, omgi, &nci, &j);
-	if (j)
-	    error(_("Leading minor of size %d in Omega[[%d]] is not positive definite"),
-		  j, i + 1);
+	int j, nci = nc[i], ncip1 = nc[i] + 1, nlev = (Gp[i + 1] - Gp[i])/nc[i];
+	double *omgi = REAL(GET_SLOT(dpoMatrix_chol(VECTOR_ELT(Omega, i)),
+				     Matrix_xSym));
+
 	for (j = 0; j < nci; j++) ans += 2. * nlev * log(fabs(omgi[j * ncip1]));
-	Free(omgi);
     }
     return ans;
 }
@@ -3879,20 +3885,20 @@ SEXP mer2_factor(SEXP x)
  *
  * @return pointer to an mer2 object
  */
-SEXP mer2_create(SEXP fl, SEXP Ztl, SEXP Xp, SEXP yp, SEXP method)
+SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
+		 SEXP ncp, SEXP cnames, SEXP useS)
 {
-    SEXP Omega, bVar, cnames, gradComp, ZZt,
-	fnms = getAttrib(fl, R_NamesSymbol),
+    SEXP Omega, bVar, gradComp, fnms = getAttrib(fl, R_NamesSymbol),
 	val = PROTECT(NEW_OBJECT(MAKE_CLASS("mer2"))), xnms;
     cholmod_sparse *ts1, *ts2, *Zt;
     cholmod_factor *F;
-    int *nc, *Gp, *xdims, i, nf = LENGTH(fl), nobs = LENGTH(yp), p, q;
+    int *nc = INTEGER(ncp), *Gp, *xdims, i,
+	nf = LENGTH(fl), nobs = LENGTH(yp), p, q;
     char *devCmpnms[] = {"n", "p", "yty", "logryy2", "logDetL2",
 			 "logDetOmega", "logDetRXX", ""};
     char *devnms[] = {"ML", "REML", ""};
     char *statnms[] = {"factored", "inverted", ""};	    
     double *dcmp;
-	    
 				/* Check arguments to be duplicated */
     if (!isReal(yp)) error(_("yp must be a real vector"));
     SET_SLOT(val, Matrix_ySym, duplicate(yp));
@@ -3901,6 +3907,7 @@ SEXP mer2_create(SEXP fl, SEXP Ztl, SEXP Xp, SEXP yp, SEXP method)
     xdims = INTEGER(getAttrib(Xp, R_DimSymbol));
     if (xdims[0] != nobs) error(_("Xp must have %d rows"), nobs);
     p = xdims[1];
+    xnms = VECTOR_ELT(getAttrib(Xp, R_DimNamesSymbol), 1);
     SET_SLOT(val, Matrix_XSym, duplicate(Xp));
     if (!isNewList(fl) || nf < 1) error(_("fl must be a nonempty list"));
     for (i = 0; i < nf; i++) {
@@ -3912,18 +3919,26 @@ SEXP mer2_create(SEXP fl, SEXP Ztl, SEXP Xp, SEXP yp, SEXP method)
     if (!isString(method) || LENGTH(method) != 1)
 	error(_("method must be a character vector of length 1"));
     SET_SLOT(val, Matrix_methodSym, duplicate(method));
-				/* process Ztl */
-    if (!isNewList(Ztl) || LENGTH(Ztl) != nf)
-	error(_("Ztl must be a list of length %d"), nf);
-    cnames = ALLOC_SLOT(val, Matrix_cnamesSym, VECSXP, nf + 1);
-    xnms = VECTOR_ELT(getAttrib(Xp, R_DimNamesSymbol), 1);
-    SET_VECTOR_ELT(cnames, nf, duplicate(xnms));
-    nc = INTEGER(ALLOC_SLOT(val, Matrix_ncSym, INTSXP, nf));
+    if (!isLogical(useS) || LENGTH(useS) != 1)
+	error(_("useS must be a logical vector of length 1"));
+    SET_SLOT(val, Matrix_useScaleSym, duplicate(useS));
+    if (!isNewList(cnames) || LENGTH(cnames) != nf + 1)
+	error(_("cnames must be a list of length %d"), nf + 1);
+    SET_SLOT(val, Matrix_cnamesSym, duplicate(cnames));
+    if (!isInteger(ncp) || LENGTH(ncp) != nf)
+	error(_("ncp must be an integer vector of length %d"), nf);
+    SET_SLOT(val, Matrix_ncSym, duplicate(ncp));
     Gp = INTEGER(ALLOC_SLOT(val, Matrix_GpSym, INTSXP, nf + 1));
-				/* create Zt, fill in nc, Gp and cnames */
-    ZZt = list_to_sparse(fl, Ztl, nobs, nc, Gp, cnames);
-    SET_SLOT(val, Matrix_ZtSym, ZZt);
-    Zt = as_cholmod_sparse(ZZt);
+    Gp[0] = 0;
+    if (!isNewList(fl) || nf < 1) error(_("fl must be a nonempty list"));
+    for (i = 0; i < nf; i++) {
+	SEXP fli = VECTOR_ELT(fl, i);
+	if (!isFactor(fli) || LENGTH(fli) != nobs)
+	    error(_("fl[[%d] must be a factor of length %d"), i+1, nobs);
+
+    }
+    SET_SLOT(val, Matrix_ZtSym, duplicate(ZZt));
+    Zt = as_cholmod_sparse(GET_SLOT(val, Matrix_ZtSym));
 				/* analyze Zt */
     q = Zt->nrow;
     i = c.supernodal;
@@ -3958,13 +3973,14 @@ SEXP mer2_create(SEXP fl, SEXP Ztl, SEXP Xp, SEXP yp, SEXP method)
     setAttrib(gradComp, R_NamesSymbol, duplicate(fnms));
     for (i = 0; i < nf; i++) {
 	int nci = nc[i];
-	int nlev = (Gp[i + 1] - Gp[i])/nci;
+	int nlev = LENGTH(getAttrib(VECTOR_ELT(fl, i), R_LevelsSymbol));
 	SET_VECTOR_ELT(Omega, i,
 		       alloc_dpoMatrix(nci, "U",
 				       VECTOR_ELT(cnames, i),
 				       VECTOR_ELT(cnames, i)));
 	SET_VECTOR_ELT(bVar, i, alloc3Darray(REALSXP, nci, nci, nlev));
 	SET_VECTOR_ELT(gradComp, i, alloc3Darray(REALSXP, nci, nci, 4));
+	Gp[i + 1] = Gp[i] + nlev * nci;
     }
 				/* create ZtX, RZX, XtX, RXX */
     SET_SLOT(val, Matrix_ZtXSym, alloc_dgeMatrix(q, p, R_NilValue, xnms));
@@ -4135,19 +4151,19 @@ void internal_mer2_coefGets(SEXP x, const double cc[], int ptyp)
 
     cind = 0;
     for (i = 0; i < nf; i++) {
-	int nci = nc[i];
+	SEXP Omegai = VECTOR_ELT(Omega, i);
+	int j, k, nci = nc[i], ncisq = nc[i] * nc[i];
+	double *choli, *omgi = REAL(GET_SLOT(Omegai, Matrix_xSym));
+
 	if (nci == 1) {
 	    double dd = cc[cind++];
-	    REAL(GET_SLOT(VECTOR_ELT(Omega, i), Matrix_xSym))[0] =
-		ptyp ? ((ptyp == 1) ? exp(dd) : 1./dd) : dd;
+	    *omgi = ptyp ? ((ptyp == 1) ? exp(dd) : 1./dd) : dd;
 	} else {
 	    int odind = cind + nci, /* off-diagonal index */
-		j, k,
-		ncip1 = nci + 1,
-		ncisq = nci * nci;
-	    double
-		*omgi = REAL(GET_SLOT(VECTOR_ELT(Omega, i), Matrix_xSym));
+		ncip1 = nci + 1;
+
 	    if (ptyp) {
+		/* FIXME: Write this as an LDL decomposition */
 		double *tmp = Calloc(ncisq, double),
 		    diagj, one = 1., zero = 0.;
 
@@ -4173,6 +4189,11 @@ void internal_mer2_coefGets(SEXP x, const double cc[], int ptyp)
 	    }
 	    cind = odind;
 	}
+	choli = REAL(GET_SLOT(dpoMatrix_chol(Omegai), Matrix_xSym));
+	Memcpy(choli, omgi, ncisq);
+	F77_CALL(dpotrf)("U", &nci, choli, &nci, &j);
+	if (j)
+	    error(_("Omega[[%d]] is not positive definite"), i + 1);
     }
     status[0] = status[1] = 0;
 }
@@ -4392,6 +4413,7 @@ mer2_Omega_update(SEXP Omega, const double b[], double sigma, int nf,
 	F77_CALL(dsyrk)("U", "T", &nci, &nci, &one, tmp, &nci, &zero,
 			REAL(GET_SLOT(VECTOR_ELT(Omega, i), Matrix_xSym)),
 			&nci);
+	dpoMatrix_chol(VECTOR_ELT(Omega, i));
 	Free(scal); Free(tmp); Free(wfac); Free(var); 
     }
 }
@@ -4590,6 +4612,7 @@ SEXP mer2_simulate(SEXP x, SEXP np, SEXP fxd, SEXP mmats, SEXP useScale)
 
     GetRNGstate();
 
+/* FIXME: This has not been adapted to the mer2 formulation yet */
     /* initialize the columns to the fixed effects prediction */
     if (!isReal(fxd))
 	error(_("fxd must be a numeric vector"));
