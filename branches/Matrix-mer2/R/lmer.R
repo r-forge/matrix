@@ -60,7 +60,6 @@ subbars <- function(term)
 
 ## Expand an expression with colons to the sum of the lhs
 ## and the current expression
-
 colExpand <- function(term)
 {
     if (is.name(term) || is.numeric(term)) return(term)
@@ -1184,6 +1183,7 @@ mer2 <-
                  x, y, method, sapply(Ztl, nrow),
                  c(lapply(Ztl, rownames), list(.fixed = colnames(x))),
                  !(family$family %in% c("binomial", "poisson")),
+                 match.call(), family,
                  PACKAGE = "Matrix")
     LMEoptimize(mer) <- cv
     mer
@@ -1311,14 +1311,6 @@ setMethod("simulate", signature(object = "mer2"),
           lpred
       })
 
-vCor <- function(obj) {
-    scale <- 1
-    if (obj@useScale)
-        scale <- .Call("mer2_sigma", obj,
-                       obj@method == "REML",
-                       PACKAGE = "Matrix")^2
-    lapply(obj@Omega, function(el) scale * solve(el))
-}
 
 setMethod("show", "mer2",
           function(object) {
@@ -1327,13 +1319,13 @@ setMethod("show", "mer2",
               corF <- vcov(object)@factors$correlation
               DF <- getFixDF(object)
               coefs <- cbind(fcoef, corF@sd, DF)
-              nc <- object@nc
               dimnames(coefs) <-
                   list(names(fcoef), c("Estimate", "Std. Error", "DF"))
                             digits <- max(3, getOption("digits") - 2)
               REML <- object@method == "REML"
               llik <- logLik(object, REML)
-              dev <- deviance(object, REML)
+              dev <- object@deviance
+              devc <- object@devComp
 
               rdig <- 5
               if (glz <- !(object@method %in% c("REML", "ML"))) {
@@ -1343,7 +1335,6 @@ setMethod("show", "mer2",
                   cat("Linear mixed-effects model fit by ")
                   cat(if(REML) "REML\n" else "maximum likelihood\n")
               }
-              if (0) {
               if (!is.null(object@call$formula)) {
                   cat("Formula:", deparse(object@call$formula),"\n")
               }
@@ -1368,11 +1359,10 @@ setMethod("show", "mer2",
                                REMLdeviance = dev["REML"],
                                row.names = ""))
               }
-          }
               cat("Random effects:\n")
               show(VarCorr(object, useScale = useScale))
               ngrps <- lapply(object@flist, function(x) length(levels(x)))
-              cat(sprintf("# of obs: %d, groups: ", object@nc[length(object@nc)]))
+              cat(sprintf("# of obs: %d, groups: ", devc[1]))
               cat(paste(paste(names(ngrps), ngrps, sep = ", "), collapse = "; "))
               cat("\n")
               if (!useScale)
@@ -1396,19 +1386,18 @@ setMethod("show", "mer2",
                   }
                   cat("\nFixed effects:\n")
                   printCoefmat(coefs, tst.ind = 4, zap.ind = 3)
-                  if (length(object@showCorrelation) > 0 && object@showCorrelation[1]) {
-                      rn <- rownames(coefs)
-                      dimnames(corF) <- list(
-                                               abbreviate(rn, minlen=11),
-                                               abbreviate(rn, minlen=6))
-                      if (!is.null(corF)) {
-                          p <- NCOL(corF)
-                          if (p > 1) {
-                              cat("\nCorrelation of Fixed Effects:\n")
-                              corF <- format(round(corF, 3), nsmall = 3)
-                              corF[!lower.tri(corF)] <- ""
-                              print(corF[-1, -p, drop=FALSE], quote = FALSE)
-                          }
+                  rn <- rownames(coefs)
+                  dimnames(corF) <- list(
+                                         abbreviate(rn, minlen=11),
+                                         abbreviate(rn, minlen=6))
+                  if (!is.null(corF)) {
+                      p <- ncol(corF)
+                      if (p > 1) {
+                          cat("\nCorrelation of Fixed Effects:\n")
+                          corF <- matrix(format(round(corF@x, 3), nsmall = 3),
+                                         nc = p)
+                          corF[!lower.tri(corF)] <- ""
+                          print(corF[-1, -p, drop=FALSE], quote = FALSE)
                       }
                   }
               }
@@ -1437,4 +1426,29 @@ setMethod("getFixDF", signature(object="mer2"),
       {
           devc <- object@devComp
           rep(as.integer(devc[1]- devc[2]), devc[2])
+      })
+
+setMethod("logLik", signature(object="mer2"),
+          function(object, REML = object@method == "REML", ...) {
+              val <- -deviance(object, REML = REML)/2
+              devc <- as.integer(object@devComp[1:2])
+              attr(val, "nall") <- attr(val, "nobs") <- devc[1]
+              attr(val, "df") <- abs(devc[2]) +
+                  length(.Call("mer2_coef", object, 0, PACKAGE = "Matrix"))
+              attr(val, "REML") <- REML
+              class(val) <- "logLik"
+              val
+          })
+
+setMethod("VarCorr", signature(x = "mer2"),
+          function(x, REML = x@method == "REML", useScale = x@useScale, ...)
+      {
+          sc <- 1
+          if (useScale)
+              sc <- .Call("mer2_sigma", x, REML, PACKAGE = "Matrix")^2
+          lapply(x@Omega, function(el) {
+              el <- as(sc * solve(el), "dpoMatrix")
+              el@factors$correlation <- as(el, "correlation")
+              el
+          })
       })
