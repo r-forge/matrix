@@ -55,7 +55,8 @@ SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp);
 SEXP mer2_coef(SEXP x, SEXP pType);
 SEXP mer2_coefGets(SEXP x, SEXP coef, SEXP pType);
 SEXP mer2_create(SEXP fl, SEXP Zt, SEXP Xp, SEXP yp, SEXP method,
-		 SEXP nc, SEXP cnames, SEXP useS);
+		 SEXP nc, SEXP cnames, SEXP useS, SEXP call,
+		 SEXP family);
 SEXP mer2_dtCMatrix(SEXP x);
 SEXP mer2_dtCMatrix_inv(SEXP x);
 SEXP mer2_factor(SEXP x);

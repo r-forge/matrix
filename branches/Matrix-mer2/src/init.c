@@ -214,7 +214,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer2_MCMCsamp", (DL_FUNC) &mer2_MCMCsamp, 4},
     {"mer2_coef", (DL_FUNC) &mer2_coef, 2},
     {"mer2_coefGets", (DL_FUNC) &mer2_coefGets, 3},
-    {"mer2_create", (DL_FUNC) &mer2_create, 8},
+    {"mer2_create", (DL_FUNC) &mer2_create, 10},
     {"mer2_dtCMatrix", (DL_FUNC) &mer2_dtCMatrix, 1},
     {"mer2_dtCMatrix_inv", (DL_FUNC) &mer2_dtCMatrix_inv, 1},
     {"mer2_factor", (DL_FUNC) &mer2_factor, 1},
@@ -259,11 +259,13 @@ void R_init_Matrix(DllInfo *dll)
     Matrix_ZtZSym = install("ZtZ");
     Matrix_ZtySym = install("Zty");
     Matrix_bVarSym = install("bVar");
+    Matrix_callSym = install("call");
     Matrix_cnamesSym = install("cnames");
     Matrix_devCompSym = install("devComp");
     Matrix_devianceSym = install("deviance");
     Matrix_diagSym = install("diag");
     Matrix_factorSym = install("factors");
+    Matrix_familySym = install("family");
     Matrix_flistSym = install("flist");
     Matrix_gradCompSym = install("gradComp");
     Matrix_iSym = install("i");

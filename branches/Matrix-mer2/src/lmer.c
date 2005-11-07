@@ -3886,7 +3886,8 @@ SEXP mer2_factor(SEXP x)
  * @return pointer to an mer2 object
  */
 SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
-		 SEXP ncp, SEXP cnames, SEXP useS)
+		 SEXP ncp, SEXP cnames, SEXP useS, SEXP call,
+		 SEXP family)
 {
     SEXP Omega, bVar, gradComp, fnms = getAttrib(fl, R_NamesSymbol),
 	val = PROTECT(NEW_OBJECT(MAKE_CLASS("mer2"))), xnms;
@@ -3927,6 +3928,8 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
     SET_SLOT(val, Matrix_cnamesSym, duplicate(cnames));
     if (!isInteger(ncp) || LENGTH(ncp) != nf)
 	error(_("ncp must be an integer vector of length %d"), nf);
+    SET_SLOT(val, Matrix_callSym, duplicate(call));
+    SET_SLOT(val, Matrix_familySym, duplicate(family));
     SET_SLOT(val, Matrix_ncSym, duplicate(ncp));
     Gp = INTEGER(ALLOC_SLOT(val, Matrix_GpSym, INTSXP, nf + 1));
     Gp[0] = 0;
