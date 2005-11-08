@@ -4,7 +4,7 @@
 
 default: ../Lib/libumfpack.a
 
-include ../../UFconfig/UFconfig.mk
+include ${RHOME}/etc/Makeconf
 
 C = $(CC) $(CFLAGS) $(UMFPACK_CONFIG) -I../Include -I../../AMD/Include -I../../AMD/Source
 
