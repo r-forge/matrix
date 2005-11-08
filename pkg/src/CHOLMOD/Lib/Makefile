@@ -1,7 +1,7 @@
 #===============================================================================
 # CHOLOMD/Lib/Makefile: for compiling the CHOLMOD library
 #===============================================================================
-include ${R_HOME}/etc/Makeconf
+include ${MkInclude}
 
 default: lib
 

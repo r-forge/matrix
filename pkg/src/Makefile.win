@@ -1,5 +1,7 @@
 # -*- Makefile -*- for Windows
-include $(RHOME)/src/gnuwin32/MkRules
+MkInclude=$(RHOME)/src/gnuwin32/MkRules
+
+include $(MkInclude)
 BLAS_LIBS=-lRblas
 LAPACK_LIBS=-L$(RHOME)/lib -lRlapack
 CPPFLAGS=$(PKG_CPPFLAGS) -I$(RHOME)/include
@@ -30,16 +32,12 @@ all: $(SHLIB)
 
 mostlyclean: clean
 
-UFconfig.stamp: 
-	@$(CP) UFconfig/UFconfig_win.mk UFconfig/UFconfig.mk 
-	@$(CP) Metis/Makefile.win Metis/Makefile
-
-$(SUBLIBS): UFconfig.stamp
+$(SUBLIBS): 
 	@for d in $(SUBDIRS); do \
 	  (cd $${d} && $(MAKE) lib) || exit 1; \
 	done
 
-clean: UFconfig.stamp
+clean: 
 	@-rm -rf .libs _libs
 	@-rm -f *.o
 
