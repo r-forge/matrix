@@ -10,9 +10,14 @@ SOURCES_F = zpotf2.f zpotrf.f zherk.f
 
 OBJECTS = $(SOURCES_C:.c=.o) $(SOURCES_F:.f=.o)
 SHLIB = $(pkg)$(SHLIB_EXT)
-SUBDIRS = CHOLMOD UMFPACK Metis AMD COLAMD LDL CCOLAMD
+SUBDIRS = CHOLMOD UMFPACK COLAMD CCOLAMD AMD Metis LDL
 SUBLIBS = $(SUBDIRS:=.a)
 SUBSTAMP = $(SUBDIRS:=.stamp)
+
+## Variables that had been defined in UFconfig/UFconfig.mk
+
+BLAS = ${BLAS_LIBS}
+LAPACK = ${LAPACK_LIBS}
 
 $(SHLIB): $(OBJECTS) $(SUBLIBS)
 	$(SHLIB_LINK) -o $@ $(OBJECTS) $(SUBLIBS) $(ALL_LIBS)
@@ -23,14 +28,14 @@ mostlyclean: clean
 
 $(SUBLIBS): $(SUBSTAMP)
 	@for d in $(SUBDIRS); do \
-	  (cd $${d} && $(MAKE) lib) || exit 1; \
+	  (cd $${d} && MkInclude=$(R_HOME)/etc/Makeconf $(MAKE) lib) || exit 1; \
 	  touch $${d}.stamp; \
 	done
 
 $(SUBSTAMP):
 	touch $(SUBSTAMP)
 
-clean:
+clean: 
 	@-rm -rf .libs _libs
 	@-rm -f *.o *.so *.a $(SUBSTAMP)
 	@for d in $(SUBDIRS); do \
