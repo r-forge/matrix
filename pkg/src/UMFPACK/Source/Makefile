@@ -1,12 +1,12 @@
-#-------------------------------------------------------------------------------
-# UMFPACK Makefile for compiling on Unix systems (for GNU Make)
-#-------------------------------------------------------------------------------
+include ${R_HOME}/etc/Makeconf
 
-default: ../Lib/libumfpack.a
+LIB = ../../UMFPACK.a
 
-include ${RHOME}/etc/Makeconf
+lib: $(LIB)
 
-C = $(CC) $(CFLAGS) $(UMFPACK_CONFIG) -I../Include -I../../AMD/Include -I../../AMD/Source
+PKG_CFLAGS =  -I../Include -I../../AMD/Include -I../../AMD/Source
+
+C = $(CC) $(PKG_FLAGS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) 
 
 #-------------------------------------------------------------------------------
 # source files
@@ -237,19 +237,11 @@ umfpack_zl_%.o: umfpack_%.c $(INC)
 umfpack_gn_%.o: umfpack_%.c $(INC)
 	$(C) -c $< -o $@
 
-#-------------------------------------------------------------------------------
-# Create the libumfpack.a library
-#-------------------------------------------------------------------------------
+$(LIB): $(I) $(GN) $(DI) $(ZI) 
+	$(AR) -rucs $(LIB) $^
 
-#../Lib/libumfpack.a: $(I) $(L) $(GN) $(DI) $(DL) $(ZI) $(ZL)
-../Lib/libumfpack.a: $(I) $(GN) $(DI) $(ZI) 
-	$(AR) ../Lib/libumfpack.a $^
-	- $(RANLIB) ../Lib/libumfpack.a
-	- cp ../Lib/libumfpack.a ../../UMFPACK.a
+mostlyclean: clean
 
-#-------------------------------------------------------------------------------
-# Remove all but the files in the original distribution
-#-------------------------------------------------------------------------------
-
-purge: clean
-	- $(RM) ../Lib/libumfpack.a
+clean:
+	@-rm -rf .libs _libs $(LIB)
+	@-rm -f *.o 

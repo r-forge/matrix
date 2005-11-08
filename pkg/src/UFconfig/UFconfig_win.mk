@@ -214,9 +214,8 @@ CHOLMOD_CONFIG =
 # remove object files and profile output
 #------------------------------------------------------------------------------
 include ${R_HOME}/src/gnuwin32/MkRules
-BLAS = -lRblas
-LAPACK = -L$(RHOME)/lib -lRlapack
-#CHOLMOD_CONFIG = ${CPICFLAGS}
+CFLAGS = -O2
+AR = ar -crs
 
 clean:
 	- $(RM) *.o *.obj *.ln *.bb *.bbg *.da *.tcov *.gcov gmon.out *.bak *.d
