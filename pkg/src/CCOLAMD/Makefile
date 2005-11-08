@@ -1,4 +1,4 @@
-include ${R_HOME}/etc/Makeconf
+include $(MkInclude)
 
 OBJS = ccolamd_global.o ccolamd.o
 
