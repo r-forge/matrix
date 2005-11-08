@@ -6,12 +6,12 @@ CPPFLAGS=$(PKG_CPPFLAGS) -I$(RHOME)/include
 CFLAGS=$(CPPFLAGS) $(DEBUGFLAG) -O2 $(PKG_CFLAGS)
 CXXFLAGS=$(CPPFLAGS) $(DEBUGFLAG) -O2 $(PKG_CXXFLAGS)
 
-DLLLIBS=-L$(RHOME)/src/gnuwin32 $(PKG_LIBS) $(FLIBS) -lR
+DLLLIBS= $(PKG_LIBS) $(FLIBS) -lR
 
 pkg = Matrix
 
 PKG_CFLAGS = -DUSE_CHOLMOD
-PKG_LIBS = ${LAPACK_LIBS} ${BLAS_LIBS}
+PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS)
 include SOURCES_C.mkf
 
 ## zherk.f is part of BLAS, but not of R's BLAS sources
@@ -32,6 +32,7 @@ mostlyclean: clean
 
 UFconfig.stamp: 
 	@$(CP) UFconfig/UFconfig_win.mk UFconfig/UFconfig.mk 
+	@$(CP) Metis/Makefile.win Metis/Makefile
 
 $(SUBLIBS): UFconfig.stamp
 	@for d in $(SUBDIRS); do \
