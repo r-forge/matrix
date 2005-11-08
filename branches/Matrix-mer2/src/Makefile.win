@@ -1,19 +1,25 @@
 # -*- Makefile -*- for Windows
-include $(RHOME)/src/gnuwin32/MkRules
+MkInclude=$(RHOME)/src/gnuwin32/MkRules
+
+include $(MkInclude)
 BLAS_LIBS=-lRblas
 LAPACK_LIBS=-L$(RHOME)/lib -lRlapack
 CPPFLAGS=$(PKG_CPPFLAGS) -I$(RHOME)/include
 CFLAGS=$(CPPFLAGS) $(DEBUGFLAG) -O2 $(PKG_CFLAGS)
 CXXFLAGS=$(CPPFLAGS) $(DEBUGFLAG) -O2 $(PKG_CXXFLAGS)
 
-DLLLIBS=-L$(RHOME)/src/gnuwin32 $(PKG_LIBS) $(FLIBS) -lR
+DLLLIBS= $(PKG_LIBS) $(FLIBS) -lR
 
 pkg = Matrix
 
 PKG_CFLAGS = -DUSE_CHOLMOD
-PKG_LIBS = ${LAPACK_LIBS} ${BLAS_LIBS}
+PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS)
 include SOURCES_C.mkf
-OBJECTS = $(SOURCES_C:.c=.o)
+
+## zherk.f is part of BLAS, but not of R's BLAS sources
+SOURCES_F = zpotf2.f zpotrf.f zherk.f
+
+OBJECTS = $(SOURCES_C:.c=.o) $(SOURCES_F:.f=.o)
 SHLIB = $(pkg)$(SHLIB_EXT)
 SUBDIRS = CHOLMOD UMFPACK Metis AMD COLAMD LDL CCOLAMD
 SUBLIBS = $(SUBDIRS:=.a)
@@ -26,12 +32,12 @@ all: $(SHLIB)
 
 mostlyclean: clean
 
-$(SUBLIBS):
+$(SUBLIBS): 
 	@for d in $(SUBDIRS); do \
-	  (cd $${d} && $(MAKE) -f Makefile.win lib) || exit 1; \
+	  (cd $${d} && MkInclude=$(RHOME)/src/gnuwin32/MkRules $(MAKE) lib) || exit 1; \
 	done
 
-clean:
+clean: 
 	@-rm -rf .libs _libs
 	@-rm -f *.o
 
