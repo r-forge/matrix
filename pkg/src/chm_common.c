@@ -13,7 +13,7 @@ check_class(char *class, char **valid)
 
 cholmod_sparse *as_cholmod_sparse(SEXP x)
 {
-    cholmod_sparse *ans = (cholmod_sparse*) malloc(sizeof(cholmod_sparse));
+    cholmod_sparse *ans = Calloc(1, cholmod_sparse);
     char *valid[] = {"dgCMatrix", "dsCMatrix", "dtCMatrix",
 		     "lgCMatrix", "lsCMatrix", "ltCMatrix",
 		     "zgCMatrix", "zsCMatrix", "ztCMatrix",
@@ -139,7 +139,7 @@ SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int free)
  */
 cholmod_triplet *as_cholmod_triplet(SEXP x)
 {
-    cholmod_triplet *ans = (cholmod_triplet*) malloc(sizeof(cholmod_triplet));
+    cholmod_triplet *ans = Calloc(1, cholmod_triplet);
     char *valid[] = {"dgTMatrix", "dsTMatrix", "dtTMatrix",
 		     "lgTMatrix", "lsTMatrix", "ltTMatrix",
 		     "zgTMatrix", "zsTMatrix", "ztTMatrix",
@@ -261,7 +261,7 @@ SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int free)
  */
 cholmod_dense *as_cholmod_dense(SEXP x)
 {
-    cholmod_dense *ans = (cholmod_dense*) malloc(sizeof(cholmod_dense));
+    cholmod_dense *ans = Calloc(1, cholmod_dense);
     char *valid[] = {"dmatrix", "dgeMatrix",
 		     "lmatrix", "lgeMatrix",
 		     "zmatrix", "zgeMatrix", ""},
