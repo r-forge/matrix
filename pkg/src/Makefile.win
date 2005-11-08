@@ -34,7 +34,7 @@ mostlyclean: clean
 
 $(SUBLIBS): 
 	@for d in $(SUBDIRS); do \
-	  (cd $${d} && $(MAKE) lib) || exit 1; \
+	  (cd $${d} && MkInclude=$(RHOME)/src/gnuwin32/MkRules $(MAKE) lib) || exit 1; \
 	done
 
 clean: 
