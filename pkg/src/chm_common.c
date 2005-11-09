@@ -1,6 +1,8 @@
 #include "chm_common.h"
 #include "Mutils.h"
 
+cholmod_common c;
+
 static R_INLINE int
 check_class(char *class, char **valid)
 {
@@ -13,7 +15,7 @@ check_class(char *class, char **valid)
 
 cholmod_sparse *as_cholmod_sparse(SEXP x)
 {
-    cholmod_sparse *ans = Calloc(1, cholmod_sparse);
+    cholmod_sparse *ans = (cholmod_sparse*) malloc(sizeof(cholmod_sparse));
     char *valid[] = {"dgCMatrix", "dsCMatrix", "dtCMatrix",
 		     "lgCMatrix", "lsCMatrix", "ltCMatrix",
 		     "zgCMatrix", "zsCMatrix", "ztCMatrix",
@@ -81,7 +83,7 @@ cholmod_sparse *as_cholmod_sparse(SEXP x)
  *
  * @return SEXP containing a copy of a
  */
-SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int free)
+SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int dofree)
 {
     SEXP ans;
     char *cl = "";		/* -Wall */
@@ -121,8 +123,8 @@ SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int free)
     if (a->stype)
 	SET_SLOT(ans, Matrix_uploSym,
 		 mkString((a->stype > 0) ? "U" : "L"));
-    if (free > 0) cholmod_free_sparse(&a, &c);
-    if (free < 0) Free(a);
+    if (dofree > 0) cholmod_free_sparse(&a, &c);
+    if (dofree < 0) free(a);
     UNPROTECT(1);
     return ans;
 }
@@ -139,7 +141,7 @@ SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int free)
  */
 cholmod_triplet *as_cholmod_triplet(SEXP x)
 {
-    cholmod_triplet *ans = Calloc(1, cholmod_triplet);
+    cholmod_triplet *ans = (cholmod_triplet*) malloc(sizeof(cholmod_triplet));
     char *valid[] = {"dgTMatrix", "dsTMatrix", "dtTMatrix",
 		     "lgTMatrix", "lsTMatrix", "ltTMatrix",
 		     "zgTMatrix", "zsTMatrix", "ztTMatrix",
@@ -205,7 +207,7 @@ cholmod_triplet *as_cholmod_triplet(SEXP x)
  *
  * @return SEXP containing a copy of a
  */
-SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int free)
+SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int dofree)
 {
     SEXP ans;
     char *cl = "";		/* -Wall */
@@ -243,8 +245,8 @@ SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int free)
     if (a->stype)
 	SET_SLOT(ans, Matrix_uploSym,
 		 mkString((a->stype > 0) ? "U" : "L"));
-    if (free > 0) cholmod_free_triplet(&a, &c);
-    if (free < 0) Free(a);
+    if (dofree > 0) cholmod_free_triplet(&a, &c);
+    if (dofree < 0) free(a);
     UNPROTECT(1);
     return ans;
 }
@@ -261,7 +263,7 @@ SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int free)
  */
 cholmod_dense *as_cholmod_dense(SEXP x)
 {
-    cholmod_dense *ans = Calloc(1, cholmod_dense);
+    cholmod_dense *ans = (cholmod_dense*) malloc(sizeof(cholmod_dense));
     char *valid[] = {"dmatrix", "dgeMatrix",
 		     "lmatrix", "lgeMatrix",
 		     "zmatrix", "zgeMatrix", ""},
@@ -310,7 +312,7 @@ cholmod_dense *as_cholmod_dense(SEXP x)
  *
  * @return SEXP containing a copy of a
  */
-SEXP chm_dense_to_SEXP(cholmod_dense *a, int free)
+SEXP chm_dense_to_SEXP(cholmod_dense *a, int dofree)
 {
     SEXP ans;
     char *cl;
@@ -336,8 +338,8 @@ SEXP chm_dense_to_SEXP(cholmod_dense *a, int free)
 /* 	       (complex *) a->x, a->nz); */
     } else error("code for cholmod_dense with holes not yet written");
 
-    if (free > 0) cholmod_free_dense(&a, &c);
-    if (free < 0) Free(a);
+    if (dofree > 0) cholmod_free_dense(&a, &c);
+    if (dofree < 0) free(a);
     UNPROTECT(1);
     return ans;
 }
