@@ -1,9 +1,12 @@
 # -*- Makefile -*- for Windows
-MkInclude=$(RHOME)/src/gnuwin32/MkRules
+PKG_HOME=$(shell $(RHOME)/src/gnuwin32/Rpwd.exe .)
+MkInclude=$(PKG_HOME)/Win.mk
 
-include $(MkInclude)
+include Win.mk
+#       |-> gnuwin32/MkRules
+
 BLAS_LIBS=-lRblas
-LAPACK_LIBS=-L$(RHOME)/lib -lRlapack
+LAPACK_LIBS=-L$(RHOME)/lib -L$(RHOME)/src/gnuwin32 -lRlapack
 CPPFLAGS=$(PKG_CPPFLAGS) -I$(RHOME)/include
 CFLAGS=$(CPPFLAGS) $(DEBUGFLAG) -O2 $(PKG_CFLAGS)
 CXXFLAGS=$(CPPFLAGS) $(DEBUGFLAG) -O2 $(PKG_CXXFLAGS)
@@ -20,25 +23,28 @@ include SOURCES_C.mkf
 SOURCES_F = zpotf2.f zpotrf.f zherk.f
 
 OBJECTS = $(SOURCES_C:.c=.o) $(SOURCES_F:.f=.o)
-SHLIB = $(pkg)$(SHLIB_EXT)
-SUBDIRS = CHOLMOD UMFPACK Metis AMD COLAMD LDL CCOLAMD
+SHLIB = $(pkg).dll
+SUBDIRS = CHOLMOD UMFPACK COLAMD CCOLAMD AMD Metis LDL
 SUBLIBS = $(SUBDIRS:=.a)
 SUBSTAMP = $(SUBDIRS:=.stamp)
 
 $(SHLIB): $(OBJECTS) $(SUBLIBS)
-	gcc --shared -s -o Matrix.dll $(OBJECTS) $(SUBLIBS) $(ALL_LIBS) $(DLLLIBS)
+	$(DLL) --shared -s -o $@ $(OBJECTS) $(SUBLIBS) $(DLLLIBS)
 
 all: $(SHLIB)
 
 mostlyclean: clean
 
-$(SUBLIBS): 
+$(SUBLIBS):
 	@for d in $(SUBDIRS); do \
-	  (cd $${d} && MkInclude=$(RHOME)/src/gnuwin32/MkRules $(MAKE) lib) || exit 1; \
+	  (cd $${d} && MkInclude=$(MkInclude) $(MAKE) lib) || exit 1; \
 	done
 
-clean: 
+clean:
 	@-rm -rf .libs _libs
-	@-rm -f *.o
+	@-rm -f *.o *.dll
+	@for d in $(SUBDIRS); do \
+	  (cd $${d} && $(MAKE) clean) || exit 1; \
+	done
 
 include DEPS.mkf
