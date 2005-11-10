@@ -16,6 +16,7 @@
 #include "chm_common.h"
 #include <R_ext/Lapack.h>
 #include <R_ext/Constants.h>
+#include <R_ext/Utils.h>
 
 SEXP Matrix_rWishart(SEXP ns, SEXP df, SEXP scal);
 SEXP lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp);

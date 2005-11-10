@@ -941,7 +941,7 @@ setMethod("mcmcsamp", signature(object = "lmer"),
       })
 
 rWishart <- function(n, df, invScal)
-  .Call("Matrix_rWishart", n, df, invScal)
+  .Call("Matrix_rWishart", n, df, invScal, PACKAGE = "Matrix")
 
 
 setMethod("model.matrix", signature(object = "lmer"),
@@ -1191,11 +1191,11 @@ mer2 <-
 
 ## Extract the permutation
 setAs("mer2", "pMatrix", function(from)
-      .Call("mer2_pMatrix", from))
+      .Call("mer2_pMatrix", from, PACKAGE = "Matrix"))
 
 ## Extract the L matrix
 setAs("mer2", "dtCMatrix", function(from)
-      .Call("mer2_dtCMatrix", from))
+      .Call("mer2_dtCMatrix", from, PACKAGE = "Matrix"))
 
 ## Extract the fixed effects
 setMethod("fixef", signature(object = "mer2"),
@@ -1313,96 +1313,132 @@ setMethod("simulate", signature(object = "mer2"),
 
 
 setMethod("show", "mer2",
-          function(object) {
-              fcoef <- .Call("mer2_fixef", object, PACKAGE = "Matrix")
-              useScale <- object@useScale
-              corF <- vcov(object)@factors$correlation
-              DF <- getFixDF(object)
-              coefs <- cbind(fcoef, corF@sd, DF)
-              dimnames(coefs) <-
-                  list(names(fcoef), c("Estimate", "Std. Error", "DF"))
-                            digits <- max(3, getOption("digits") - 2)
-              REML <- object@method == "REML"
-              llik <- logLik(object, REML)
-              dev <- object@deviance
-              devc <- object@devComp
-
-              rdig <- 5
-              if (glz <- !(object@method %in% c("REML", "ML"))) {
-                  cat(paste("Generalized linear mixed model fit using",
-                            object@method, "\n"))
-              } else {
-                  cat("Linear mixed-effects model fit by ")
-                  cat(if(REML) "REML\n" else "maximum likelihood\n")
+          function(object)
+      {
+          vcShow <- function(varc, useScale)
+          {
+              digits <- max(3, getOption("digits") - 2)
+              sc <- attr(varc, "sc")
+              reStdDev <- c(lapply(varc,
+                                   function(el)
+                                   el@factors$correlation@sd),
+                            list(Residual = sc))
+              reLens <- unlist(c(lapply(reStdDev, length)))
+              reMat <- array('', c(sum(reLens), 4),
+                             list(rep('', sum(reLens)),
+                                  c("Groups", "Name", "Variance", "Std.Dev.")))
+              reMat[1+cumsum(reLens)-reLens, 1] <- names(reLens)
+              reMat[,2] <- c(unlist(lapply(reStdDev, names)), "")
+              reMat[,3] <- format(unlist(reStdDev)^2, digits = digits)
+              reMat[,4] <- format(unlist(reStdDev), digits = digits)
+              if (any(reLens > 1)) {
+                  maxlen <- max(reLens)
+                  corr <-
+                      do.call("rbind",
+                              lapply(object@reSumry,
+                                     function(x, maxlen) {
+                                         cc <- format(round(x, 3), nsmall = 3)
+                                         cc[!lower.tri(cc)] <- ""
+                                         nr <- dim(cc)[1]
+                                         if (nr >= maxlen) return(cc)
+                                         cbind(cc, matrix("", nr, maxlen-nr))
+                                     }, maxlen))
+                  colnames(corr) <- c("Corr", rep("", maxlen - 1))
+                  reMat <- cbind(reMat, rbind(corr, rep("", ncol(corr))))
               }
-              if (!is.null(object@call$formula)) {
-                  cat("Formula:", deparse(object@call$formula),"\n")
-              }
-              if (!is.null(object@call$data)) {
-                  cat("   Data:", deparse(object@call$data), "\n")
-              }
-              if (!is.null(object@call$subset)) {
-                  cat(" Subset:",
-                      deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
-              }
-              if (glz) {
-                  cat(" Family: ", object@family$family, "(",
-                      object@family$link, " link)\n", sep = "")
-                  print(data.frame(AIC = AIC(llik), BIC = BIC(llik),
+              if (!useScale) reMat <- reMat[-nrow(reMat),]
+              print(reMat, quote = FALSE)
+          }
+          
+          fcoef <- .Call("mer2_fixef", object, PACKAGE = "Matrix")
+          useScale <- object@useScale
+          corF <- vcov(object)@factors$correlation
+          DF <- getFixDF(object)
+          coefs <- cbind(fcoef, corF@sd, DF)
+          dimnames(coefs) <-
+              list(names(fcoef), c("Estimate", "Std. Error", "DF"))
+          digits <- max(3, getOption("digits") - 2)
+          REML <- object@method == "REML"
+          llik <- logLik(object, REML)
+          dev <- object@deviance
+          devc <- object@devComp
+          
+          rdig <- 5
+          if (glz <- !(object@method %in% c("REML", "ML"))) {
+              cat(paste("Generalized linear mixed model fit using",
+                        object@method, "\n"))
+          } else {
+              cat("Linear mixed-effects model fit by ")
+              cat(if(REML) "REML\n" else "maximum likelihood\n")
+          }
+          if (!is.null(object@call$formula)) {
+              cat("Formula:", deparse(object@call$formula),"\n")
+          }
+          if (!is.null(object@call$data)) {
+              cat("   Data:", deparse(object@call$data), "\n")
+          }
+          if (!is.null(object@call$subset)) {
+              cat(" Subset:",
+                  deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
+          }
+          if (glz) {
+              cat(" Family: ", object@family$family, "(",
+                  object@family$link, " link)\n", sep = "")
+              print(data.frame(AIC = AIC(llik), BIC = BIC(llik),
                                logLik = c(llik),
                                deviance = -2*llik,
                                row.names = ""))
-              } else {
-                  print(data.frame(AIC = AIC(llik), BIC = BIC(llik),
+          } else {
+              print(data.frame(AIC = AIC(llik), BIC = BIC(llik),
                                logLik = c(llik),
                                MLdeviance = dev["ML"],
                                REMLdeviance = dev["REML"],
                                row.names = ""))
+          }
+          cat("Random effects:\n")
+          vcshow(VarCorr(object, useScale = useScale))
+          ngrps <- lapply(object@flist, function(x) length(levels(x)))
+          cat(sprintf("# of obs: %d, groups: ", devc[1]))
+          cat(paste(paste(names(ngrps), ngrps, sep = ", "), collapse = "; "))
+          cat("\n")
+          if (!useScale)
+              cat("\nEstimated scale (compare to 1) ",
+                  .Call("lmer_sigma", object, FALSE, PACKAGE = "Matrix"),
+                  "\n")
+          if (nrow(coefs) > 0) {
+              if (useScale) {
+                  stat <- coefs[,1]/coefs[,2]
+                  pval <- 2*pt(abs(stat), coefs[,3], lower = FALSE)
+                  nms <- colnames(coefs)
+                  coefs <- cbind(coefs, stat, pval)
+                  colnames(coefs) <- c(nms, "t value", "Pr(>|t|)")
+              } else {
+                  coefs <- coefs[, 1:2, drop = FALSE]
+                  stat <- coefs[,1]/coefs[,2]
+                  pval <- 2*pnorm(abs(stat), lower = FALSE)
+                  nms <- colnames(coefs)
+                  coefs <- cbind(coefs, stat, pval)
+                  colnames(coefs) <- c(nms, "z value", "Pr(>|z|)")
               }
-              cat("Random effects:\n")
-              show(VarCorr(object, useScale = useScale))
-              ngrps <- lapply(object@flist, function(x) length(levels(x)))
-              cat(sprintf("# of obs: %d, groups: ", devc[1]))
-              cat(paste(paste(names(ngrps), ngrps, sep = ", "), collapse = "; "))
-              cat("\n")
-              if (!useScale)
-                  cat("\nEstimated scale (compare to 1) ",
-                      .Call("lmer_sigma", object, FALSE, PACKAGE = "Matrix"),
-                      "\n")
-              if (nrow(coefs) > 0) {
-                  if (useScale) {
-                      stat <- coefs[,1]/coefs[,2]
-                      pval <- 2*pt(abs(stat), coefs[,3], lower = FALSE)
-                      nms <- colnames(coefs)
-                      coefs <- cbind(coefs, stat, pval)
-                      colnames(coefs) <- c(nms, "t value", "Pr(>|t|)")
-                  } else {
-                      coefs <- coefs[, 1:2, drop = FALSE]
-                      stat <- coefs[,1]/coefs[,2]
-                      pval <- 2*pnorm(abs(stat), lower = FALSE)
-                      nms <- colnames(coefs)
-                      coefs <- cbind(coefs, stat, pval)
-                      colnames(coefs) <- c(nms, "z value", "Pr(>|z|)")
-                  }
-                  cat("\nFixed effects:\n")
-                  printCoefmat(coefs, tst.ind = 4, zap.ind = 3)
-                  rn <- rownames(coefs)
-                  dimnames(corF) <- list(
-                                         abbreviate(rn, minlen=11),
-                                         abbreviate(rn, minlen=6))
-                  if (!is.null(corF)) {
-                      p <- ncol(corF)
-                      if (p > 1) {
-                          cat("\nCorrelation of Fixed Effects:\n")
-                          corF <- matrix(format(round(corF@x, 3), nsmall = 3),
-                                         nc = p)
-                          corF[!lower.tri(corF)] <- ""
-                          print(corF[-1, -p, drop=FALSE], quote = FALSE)
-                      }
+              cat("\nFixed effects:\n")
+              printCoefmat(coefs, tst.ind = 4, zap.ind = 3)
+              rn <- rownames(coefs)
+              dimnames(corF) <- list(
+                                     abbreviate(rn, minlen=11),
+                                     abbreviate(rn, minlen=6))
+              if (!is.null(corF)) {
+                  p <- ncol(corF)
+                  if (p > 1) {
+                      cat("\nCorrelation of Fixed Effects:\n")
+                      corF <- matrix(format(round(corF@x, 3), nsmall = 3),
+                                     nc = p)
+                      corF[!lower.tri(corF)] <- ""
+                      print(corF[-1, -p, drop=FALSE], quote = FALSE)
                   }
               }
-              invisible(object)
-          })
+          }
+          invisible(object)
+      })
 
 setMethod("vcov", signature(object = "mer2"),
           function(object, REML = object@method == "REML",
@@ -1445,10 +1481,13 @@ setMethod("VarCorr", signature(x = "mer2"),
       {
           sc <- 1
           if (useScale)
-              sc <- .Call("mer2_sigma", x, REML, PACKAGE = "Matrix")^2
-          lapply(x@Omega, function(el) {
-              el <- as(sc * solve(el), "dpoMatrix")
+              sc <- .Call("mer2_sigma", x, REML, PACKAGE = "Matrix")
+          sc2 <- sc * sc
+          ans <- lapply(x@Omega, function(el) {
+              el <- as(sc2 * solve(el), "dpoMatrix")
               el@factors$correlation <- as(el, "correlation")
               el
           })
+          attr(ans, "sc") <- sc
+          ans
       })
