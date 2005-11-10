@@ -4768,45 +4768,71 @@ SEXP mer2_IPLSiter(SEXP x, SEXP nitP)
  */
 SEXP mer2_gradComp(SEXP x)
 {
-    cholmod_factor
-	*L = (cholmod_factor *) R_ExternalPtrAddr(GET_SLOT(x, Matrix_LSym));
     SEXP bVarP = GET_SLOT(x, Matrix_bVarSym),
 	OmegaP = GET_SLOT(x, Matrix_OmegaSym),
 	RZXP = GET_SLOT(x, Matrix_RZXSym),
 	gradComp = GET_SLOT(x, Matrix_gradCompSym);
-    int *dims = INTEGER(getAttrib(RZXP, Matrix_DimSym)),
-	*Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
-	i, nf = length(OmegaP);
+    cholmod_factor
+	*L = (cholmod_factor *) R_ExternalPtrAddr(GET_SLOT(x, Matrix_LSym));
+    cholmod_dense *RZX = as_cholmod_dense(RZXP), *tmp1;
+    int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	*Perm = (int *)(L->Perm),
+	*dims = INTEGER(getAttrib(RZXP, Matrix_DimSym)),
+	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	i, j, k, nf = length(OmegaP);
     int q = dims[0], p = dims[1];
-    cholmod_dense *RZX = as_cholmod_dense(RZXP), *tmp1, *tmp2;
     double *b = Calloc(q, double), m1[] = {-1, 0};
 
     internal_mer2_ranef(x, b);
     tmp1 = cholmod_solve(CHOLMOD_Lt, L, RZX, &c); free(RZX);
-    tmp2 = cholmod_solve(CHOLMOD_Pt, L, tmp1, &c);
-    cholmod_free_dense(&tmp1, &c);
     F77_CALL(dtrsm)("R", "U", "N", "N", &q, &p, m1,
 		    REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym),
 				  Matrix_xSym)), &p,
-		    (double *)(tmp2->x), &q);
-    Free(b);
-    return chm_dense_to_SEXP(tmp2, 1);
-    for (i = nf - 1; i >= 0; i--) {
+		    (double *)(tmp1->x), &q);
+    for (i = 0; i < nf; i++) {
 	SEXP bVPi = VECTOR_ELT(bVarP, i);
-	int *ddims = INTEGER(getAttrib(bVPi, R_DimSymbol)), j, k;
-	int nci = ddims[0];
-	int ncisqr = nci * nci, RZXrows = Gp[i + 1] - Gp[i];
-	int nlev = RZXrows/nci;
-	double *RZXi = RZX + Gp[i], *bVi = REAL(bVPi),
+	int nci = nc[i], RZXrows = Gp[i + 1] - Gp[i];
+	cholmod_sparse
+	    *sm = cholmod_allocate_sparse(q, nci, nci, TRUE, TRUE, 0,
+					  CHOLMOD_REAL, &c),
+	    *tsm1, *tsm2, *tsm3;
+	int *si = (int*)(sm->i), *sp = (int*)(sm->p),
+	    ncisq = nci * nci, nlev = RZXrows/nci;
+	double *bVi = REAL(bVPi),
 	    *bi = b + Gp[i], *mm = REAL(VECTOR_ELT(gradComp, i)),
-	    *tmp = Memcpy(Calloc(ncisqr, double),
-			  REAL(VECTOR_ELT(OmegaP, i)), ncisqr),
+	    *sx = (double*)(sm->x),
+	    *tmp = Memcpy(Calloc(ncisq, double),
+			  REAL(GET_SLOT(dpoMatrix_chol(VECTOR_ELT(OmegaP, i)),
+			       Matrix_xSym)), ncisq),
+	    *RZXi = (double *)(tmp1->x) + Gp[i],
 	    dlev = (double) nlev,
-	    one = 1., zero = 0.;
+	    one[] = {1,0}, zero[] = {0,0};
 
+	for (j = 0; j < nci; j++) {
+	    sp[j] = j;
+	    sx[j] = 1;
+	}
+	sp[nci] = nci;
+	
+	for (k = 0; k < nlev; k++) {
+	    int rk0 = Gp[i] + k * nci, nnz;
+	    /* FIXME: permutation or inverse permutation? */
+	    for (j = 0; j < nci; j++) si[j] = Perm[rk0 + j];
+	    tsm1 = cholmod_spsolve(CHOLMOD_Lt, L, sm, &c);
+	    nnz = cholmod_nnz(tsm1, &c);
+	    if (nci == 1) {
+		double *xp = (double*)(tsm1->x);
+		int ione = 1;
+		bVi[k] = F77_CALL(ddot)(&nnz, xp, &ione, xp, &ione);
+	    } else {
+		tsm2 = cholmod_transpose(tsm1, 1, &c);
+		tsm3 = cholmod_aat(tsm2, (int*) NULL, 0, 1, &c);
+		/* Now copy the contents to bVi */
+	    }
+	}
  	if (nci == 1) {
 	    int ione = 1;
- 	    mm[0] = ((double) nlev)/tmp[0];
+ 	    mm[0] = ((double) nlev)/(tmp[0] * tmp[0]);
  	    mm[1] = F77_CALL(ddot)(&nlev, bi, &ione, bi, &ione);
 	    mm[2] = 0.;
 	    for (k = 0; k < nlev; k++) mm[2] += bVi[k];
@@ -4816,28 +4842,25 @@ SEXP mer2_gradComp(SEXP x)
 					RZXi + j * dims[0], &ione);
   	    }
  	} else {
-	    AZERO(mm, 4 * ncisqr);
-	    F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
-	    if (j)
-		error(_("Omega[[%d]] is not positive definite"), i + 1);
+	    AZERO(mm, 4 * ncisq);
 	    F77_CALL(dtrtri)("U", "N", &nci, tmp, &nci, &j);
 	    if (j)
 		error(_("Omega[[%d]] is not positive definite"), i + 1);
 	    F77_CALL(dsyrk)("U", "N", &nci, &nci, &dlev, tmp, &nci,
-			    &zero, mm, &nci);
-	    mm += ncisqr;	/* \bB_i term */
-	    F77_CALL(dsyrk)("U", "N", &nci, &nlev, &one, bi, &nci,
-			    &zero, mm, &nci);
-	    mm += ncisqr;     /* Sum of diagonal blocks of the inverse
+			    zero, mm, &nci);
+	    mm += ncisq;	/* \bB_i term */
+	    F77_CALL(dsyrk)("U", "N", &nci, &nlev, one, bi, &nci,
+			    zero, mm, &nci);
+	    mm += ncisq;     /* Sum of diagonal blocks of the inverse
 			       * (Z'Z+Omega)^{-1} */
-	    for (j = 0; j < ncisqr; j++) {
-		for (k = 0; k < nlev; k++) mm[j] += bVi[j + k*ncisqr];
+	    for (j = 0; j < ncisq; j++) {
+		for (k = 0; k < nlev; k++) mm[j] += bVi[j + k*ncisq];
 	    }
-	    mm += ncisqr;	/* Extra term for \vb */
+	    mm += ncisq;	/* Extra term for \vb */
 	    for (j = 0; j < p; j++) {
-		F77_CALL(dsyrk)("U", "N", &nci, &nlev, &one,
+		F77_CALL(dsyrk)("U", "N", &nci, &nlev, one,
 				RZXi + j * dims[0], &nci,
-				&one, mm, &nci);
+				one, mm, &nci);
 	    }
 	}
 	Free(tmp);
