@@ -210,7 +210,7 @@ static R_CallMethodDef CallEntries[] = {
     {"ltCMatrix_validate", (DL_FUNC) &ltCMatrix_validate, 1},
     {"lsq_dense_Chol", (DL_FUNC) &lsq_dense_Chol, 2},
     {"lsq_dense_QR", (DL_FUNC) &lsq_dense_QR, 2},
-    {"mer2_IPLSiter", (DL_FUNC) &mer2_IPLSiter, 2},
+/*     {"mer2_IPLSiter", (DL_FUNC) &mer2_IPLSiter, 2}, */
     {"mer2_MCMCsamp", (DL_FUNC) &mer2_MCMCsamp, 4},
     {"mer2_coef", (DL_FUNC) &mer2_coef, 2},
     {"mer2_coefGets", (DL_FUNC) &mer2_coefGets, 3},
@@ -220,6 +220,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer2_factor", (DL_FUNC) &mer2_factor, 1},
     {"mer2_fitted", (DL_FUNC) &mer2_fitted, 3},
     {"mer2_fixef", (DL_FUNC) &mer2_fixef, 1},
+    {"mer2_gradComp", (DL_FUNC) &mer2_gradComp, 1},
     {"mer2_initial", (DL_FUNC) &mer2_initial, 1},
     {"mer2_pMatrix", (DL_FUNC) &mer2_pMatrix, 1},
     {"mer2_ranef", (DL_FUNC) &mer2_ranef, 1},

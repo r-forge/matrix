@@ -4074,13 +4074,9 @@ internal_mer2_coef(SEXP x, int ptyp, double ans[])
 	} else {
 	    if (ptyp) {	/* L log(D) L' factor of Omega[,,i] */
 		int j, k, ncisq = nci * nci;
-		double *tmp = Memcpy(Calloc(ncisq, double),
-				     REAL(GET_SLOT(VECTOR_ELT(Omega, i), Matrix_xSym)),
-				     ncisq);
-		F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
-		if (j)		/* should never happen */
-		    error(_("DPOTRF returned error code %d on Omega[[%d]]"),
-			  j, i+1);
+	        double *tmp = Memcpy(Calloc(ncisq, double),
+				     REAL(GET_SLOT(dpoMatrix_chol(VECTOR_ELT(Omega, i)),
+						   Matrix_xSym)), ncisq);
 		for (j = 0; j < nci; j++) {
 		    double diagj = tmp[j * ncip1];
 		    ans[vind++] = (ptyp == 1) ? (2. * log(diagj)) :
@@ -4195,6 +4191,9 @@ void internal_mer2_coefGets(SEXP x, const double cc[], int ptyp)
 	choli = REAL(GET_SLOT(dpoMatrix_chol(Omegai), Matrix_xSym));
 	Memcpy(choli, omgi, ncisq);
 	F77_CALL(dpotrf)("U", &nci, choli, &nci, &j);
+	/* Yes, you really do need to do that decomposition.
+	   The contents of choli before the decomposition are
+	   from the previous value of Omegai. */
 	if (j)
 	    error(_("Omega[[%d]] is not positive definite"), i + 1);
     }
@@ -4699,6 +4698,8 @@ SEXP mer2_dtCMatrix_inv(SEXP x)
     return ans;
 }
 
+#if 0
+/* This doesn't work well */
 /** 
  * Iterated penalized least squares update of an mer2 object
  * 
@@ -4745,6 +4746,101 @@ SEXP mer2_IPLSiter(SEXP x, SEXP nitP)
 	    status[0] = status[1] = 0;
 	    Free(tmp);
 	}
+    }
+    Free(b);
+    return R_NilValue;
+}
+#endif
+
+/**
+ * Fill in the gradComp and bVar slots.  Each component in the gradComp slot
+ * consists of four symmetric matrices used to generate the gradient or the ECME
+ * step.  They are
+ *  1) -m_i\bOmega_i^{-1}
+ *  2) \bB_i\bB_i\trans
+ *  3) \tr\left[\der_{\bOmega_i}\bOmega\left(\bZ\trans\bZ+\bOmega\right)\inv\right]
+ *  4) The term added to 3) to get \tr\left[\der_{\bOmega_i}\bOmega\vb\right]
+ *
+ * @param x pointer to an mer object
+ * @param val pointer to a list of matrices of the correct sizes
+ *
+ * @return NULL
+ */
+SEXP mer2_gradComp(SEXP x)
+{
+    cholmod_factor
+	*L = (cholmod_factor *) R_ExternalPtrAddr(GET_SLOT(x, Matrix_LSym));
+    SEXP bVarP = GET_SLOT(x, Matrix_bVarSym),
+	OmegaP = GET_SLOT(x, Matrix_OmegaSym),
+	RZXP = GET_SLOT(x, Matrix_RZXSym),
+	gradComp = GET_SLOT(x, Matrix_gradCompSym);
+    int *dims = INTEGER(getAttrib(RZXP, Matrix_DimSym)),
+	*Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	i, nf = length(OmegaP);
+    int q = dims[0], p = dims[1];
+    cholmod_dense *RZX = as_cholmod_dense(RZXP), *tmp1, *tmp2;
+    double *b = Calloc(q, double), m1[] = {-1, 0};
+
+    internal_mer2_ranef(x, b);
+    tmp1 = cholmod_solve(CHOLMOD_Lt, L, RZX, &c); free(RZX);
+    tmp2 = cholmod_solve(CHOLMOD_Pt, L, tmp1, &c);
+    cholmod_free_dense(&tmp1, &c);
+    F77_CALL(dtrsm)("R", "U", "N", "N", &q, &p, m1,
+		    REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym),
+				  Matrix_xSym)), &p,
+		    (double *)(tmp2->x), &q);
+    Free(b);
+    return chm_dense_to_SEXP(tmp2, 1);
+    for (i = nf - 1; i >= 0; i--) {
+	SEXP bVPi = VECTOR_ELT(bVarP, i);
+	int *ddims = INTEGER(getAttrib(bVPi, R_DimSymbol)), j, k;
+	int nci = ddims[0];
+	int ncisqr = nci * nci, RZXrows = Gp[i + 1] - Gp[i];
+	int nlev = RZXrows/nci;
+	double *RZXi = RZX + Gp[i], *bVi = REAL(bVPi),
+	    *bi = b + Gp[i], *mm = REAL(VECTOR_ELT(gradComp, i)),
+	    *tmp = Memcpy(Calloc(ncisqr, double),
+			  REAL(VECTOR_ELT(OmegaP, i)), ncisqr),
+	    dlev = (double) nlev,
+	    one = 1., zero = 0.;
+
+ 	if (nci == 1) {
+	    int ione = 1;
+ 	    mm[0] = ((double) nlev)/tmp[0];
+ 	    mm[1] = F77_CALL(ddot)(&nlev, bi, &ione, bi, &ione);
+	    mm[2] = 0.;
+	    for (k = 0; k < nlev; k++) mm[2] += bVi[k];
+	    mm[3] = 0.;
+  	    for (j = 0; j < p; j++) {
+  		mm[3] += F77_CALL(ddot)(&RZXrows, RZXi + j * dims[0], &ione,
+					RZXi + j * dims[0], &ione);
+  	    }
+ 	} else {
+	    AZERO(mm, 4 * ncisqr);
+	    F77_CALL(dpotrf)("U", &nci, tmp, &nci, &j);
+	    if (j)
+		error(_("Omega[[%d]] is not positive definite"), i + 1);
+	    F77_CALL(dtrtri)("U", "N", &nci, tmp, &nci, &j);
+	    if (j)
+		error(_("Omega[[%d]] is not positive definite"), i + 1);
+	    F77_CALL(dsyrk)("U", "N", &nci, &nci, &dlev, tmp, &nci,
+			    &zero, mm, &nci);
+	    mm += ncisqr;	/* \bB_i term */
+	    F77_CALL(dsyrk)("U", "N", &nci, &nlev, &one, bi, &nci,
+			    &zero, mm, &nci);
+	    mm += ncisqr;     /* Sum of diagonal blocks of the inverse
+			       * (Z'Z+Omega)^{-1} */
+	    for (j = 0; j < ncisqr; j++) {
+		for (k = 0; k < nlev; k++) mm[j] += bVi[j + k*ncisqr];
+	    }
+	    mm += ncisqr;	/* Extra term for \vb */
+	    for (j = 0; j < p; j++) {
+		F77_CALL(dsyrk)("U", "N", &nci, &nlev, &one,
+				RZXi + j * dims[0], &nci,
+				&one, mm, &nci);
+	    }
+	}
+	Free(tmp);
     }
     Free(b);
     return R_NilValue;
