@@ -2,7 +2,7 @@
 pkg = Matrix
 
 PKG_CFLAGS = -DUSE_CHOLMOD
-PKG_LIBS = ${LAPACK_LIBS} ${BLAS_LIBS}
+PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS)
 include SOURCES_C.mkf
 
 ## zherk.f is part of BLAS, but not of R's BLAS sources
@@ -15,9 +15,9 @@ SUBLIBS = $(SUBDIRS:=.a)
 SUBSTAMP = $(SUBDIRS:=.stamp)
 
 ## Variables that had been defined in UFconfig/UFconfig.mk
-
-BLAS = ${BLAS_LIBS}
-LAPACK = ${LAPACK_LIBS}
+## (but MM thinks are nowhere used)
+BLAS = $(BLAS_LIBS)
+LAPACK = $(LAPACK_LIBS)
 
 $(SHLIB): $(OBJECTS) $(SUBLIBS)
 	$(SHLIB_LINK) -o $@ $(OBJECTS) $(SUBLIBS) $(ALL_LIBS)
@@ -35,7 +35,7 @@ $(SUBLIBS): $(SUBSTAMP)
 $(SUBSTAMP):
 	touch $(SUBSTAMP)
 
-clean: 
+clean:
 	@-rm -rf .libs _libs
 	@-rm -f *.o *.so *.a $(SUBSTAMP)
 	@for d in $(SUBDIRS); do \
