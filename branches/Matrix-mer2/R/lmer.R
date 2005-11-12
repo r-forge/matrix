@@ -1319,10 +1319,8 @@ setMethod("show", "mer2",
           {
               digits <- max(3, getOption("digits") - 2)
               sc <- attr(varc, "sc")
-              reStdDev <- c(lapply(varc,
-                                   function(el)
-                                   el@factors$correlation@sd),
-                            list(Residual = sc))
+              recorr <- lapply(varc, function(el) el@factors$correlation)
+              reStdDev <- c(lapply(recorr, slot, "sd"), list(Residual = sc))
               reLens <- unlist(c(lapply(reStdDev, length)))
               reMat <- array('', c(sum(reLens), 4),
                              list(rep('', sum(reLens)),
@@ -1335,8 +1333,9 @@ setMethod("show", "mer2",
                   maxlen <- max(reLens)
                   corr <-
                       do.call("rbind",
-                              lapply(object@reSumry,
+                              lapply(recorr,
                                      function(x, maxlen) {
+                                         x <- as(x, "matrix")
                                          cc <- format(round(x, 3), nsmall = 3)
                                          cc[!lower.tri(cc)] <- ""
                                          nr <- dim(cc)[1]
@@ -1396,14 +1395,14 @@ setMethod("show", "mer2",
                                row.names = ""))
           }
           cat("Random effects:\n")
-          vcshow(VarCorr(object, useScale = useScale))
+          vcShow(VarCorr(object), useScale)
           ngrps <- lapply(object@flist, function(x) length(levels(x)))
           cat(sprintf("# of obs: %d, groups: ", devc[1]))
           cat(paste(paste(names(ngrps), ngrps, sep = ", "), collapse = "; "))
           cat("\n")
           if (!useScale)
               cat("\nEstimated scale (compare to 1) ",
-                  .Call("lmer_sigma", object, FALSE, PACKAGE = "Matrix"),
+                  .Call("mer2_sigma", object, FALSE, PACKAGE = "Matrix"),
                   "\n")
           if (nrow(coefs) > 0) {
               if (useScale) {
@@ -1423,15 +1422,15 @@ setMethod("show", "mer2",
               cat("\nFixed effects:\n")
               printCoefmat(coefs, tst.ind = 4, zap.ind = 3)
               rn <- rownames(coefs)
-              dimnames(corF) <- list(
-                                     abbreviate(rn, minlen=11),
-                                     abbreviate(rn, minlen=6))
               if (!is.null(corF)) {
                   p <- ncol(corF)
                   if (p > 1) {
                       cat("\nCorrelation of Fixed Effects:\n")
                       corF <- matrix(format(round(corF@x, 3), nsmall = 3),
                                      nc = p)
+                      dimnames(corF) <- list(
+                                             abbreviate(rn, minlen=11),
+                                             abbreviate(rn, minlen=6))
                       corF[!lower.tri(corF)] <- ""
                       print(corF[-1, -p, drop=FALSE], quote = FALSE)
                   }
