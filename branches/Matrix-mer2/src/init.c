@@ -225,7 +225,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer2_pMatrix", (DL_FUNC) &mer2_pMatrix, 1},
     {"mer2_ranef", (DL_FUNC) &mer2_ranef, 1},
     {"mer2_sigma", (DL_FUNC) &mer2_sigma, 2},
-    {"mer2_simulate", (DL_FUNC) &mer2_simulate, 5},
+    {"mer2_simulate", (DL_FUNC) &mer2_simulate, 3},
     {"matrix_to_csc", (DL_FUNC) &matrix_to_csc, 1},
     {"ssc_transpose", (DL_FUNC) &ssc_transpose, 1},
     {"tsc_to_dgTMatrix", (DL_FUNC) &tsc_to_dgTMatrix, 1},
