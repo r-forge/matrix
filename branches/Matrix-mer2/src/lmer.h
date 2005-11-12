@@ -68,7 +68,7 @@ SEXP mer2_initial(SEXP x);
 SEXP mer2_pMatrix(SEXP x);
 SEXP mer2_ranef(SEXP x);
 SEXP mer2_sigma(SEXP x, SEXP REML);
-SEXP mer2_simulate(SEXP x, SEXP np, SEXP fxdp, SEXP mmats, SEXP useScP);
+SEXP mer2_simulate(SEXP x, SEXP np, SEXP useScP);
 SEXP Zt_create(SEXP fl, SEXP Ztl);
 
 #endif
