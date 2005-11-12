@@ -6,7 +6,9 @@ setAs("dpoMatrix", "dppMatrix",
 setAs("dpoMatrix", "correlation",
       function(from) {
           sd <- sqrt(diag(from))
-          new("correlation", as(t(from/sd)/sd, "dpoMatrix"), sd = sd)
+          ans <- new("correlation", as(t(from/sd)/sd, "dpoMatrix"), sd = sd)
+          ans@Dimnames <- from@Dimnames
+          ans
       })
 
 setMethod("chol", signature(x = "dpoMatrix"),
