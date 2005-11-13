@@ -4,7 +4,7 @@ source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 #### Automatically display the class inheritance structure
 #### possibly augmented with methods
 
-allCl <- getClasses("package:Matrix")
+allCl <- getClasses("package:Matrix.new")
 
 ## Really nice would be to construct an inheritance graph and display
 ## it.  The following is just a cheap first step.
@@ -24,7 +24,7 @@ cat("\n\n")
 ## One could extend the `display' by using (something smarter than)
 ## are the "coerce" methods showing more than the 'Extends' output above?
 cat("All (S4) methods in the 'Matrix' package:\n")
-showMethods(where="package:Matrix")
+showMethods(where="package:Matrix.new")
 
 
 ### Sparse Logical:

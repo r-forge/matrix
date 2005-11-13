@@ -3,8 +3,10 @@
 \docType{class}
 \alias{dpoMatrix-class}
 \alias{dppMatrix-class}
+\alias{correlation-class}
 %
 \alias{coerce,dpoMatrix,dppMatrix-method}
+\alias{coerce,dpoMatrix,correlation-method}
 \alias{coerce,dppMatrix,dpoMatrix-method}
 \alias{rcond,dpoMatrix,character-method}
 \alias{rcond,dppMatrix,character-method}
