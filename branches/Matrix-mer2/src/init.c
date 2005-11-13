@@ -197,6 +197,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_initial", (DL_FUNC) &mer_initial, 1},
     {"mer_pMatrix", (DL_FUNC) &mer_pMatrix, 1},
     {"mer_ranef", (DL_FUNC) &mer_ranef, 1},
+    {"mer_secondary", (DL_FUNC) &mer_secondary, 1},
     {"mer_sigma", (DL_FUNC) &mer_sigma, 2},
     {"mer_simulate", (DL_FUNC) &mer_simulate, 3},
     {"mer_update_ZXy", (DL_FUNC) &mer_update_ZXy, 1},
@@ -226,6 +227,7 @@ void R_init_Matrix(DllInfo *dll)
     Matrix_ParentSym = install("Parent");
     Matrix_RXXSym = install("RXX");
     Matrix_RZXSym = install("RZX");
+    Matrix_RZXinvSym = install("RZXinv");
     Matrix_XSym = install("X");
     Matrix_XtXSym = install("XtX");
     Matrix_XtySym = install("Xty");
@@ -243,6 +245,7 @@ void R_init_Matrix(DllInfo *dll)
     Matrix_diagSym = install("diag");
     Matrix_factorSym = install("factors");
     Matrix_familySym = install("family");
+    Matrix_fixefSym = install("fixef");
     Matrix_flistSym = install("flist");
     Matrix_gradCompSym = install("gradComp");
     Matrix_iSym = install("i");
@@ -253,8 +256,8 @@ void R_init_Matrix(DllInfo *dll)
     Matrix_permSym = install("perm");
     Matrix_rXySym = install("rXy");
     Matrix_rZySym = install("rZy");
+    Matrix_ranefSym = install("ranef");
     Matrix_rcondSym = install("rcond");
-    Matrix_statusSym = install("status");
     Matrix_uploSym = install("uplo");
     Matrix_useScaleSym = install("useScale");
     Matrix_xSym = install("x");

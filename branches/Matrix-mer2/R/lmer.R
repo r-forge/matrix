@@ -193,8 +193,6 @@ setMethod("lmer", signature(formula = "formula"),
           ## Must evaluate the model frame first and then fit the glm using
           ## that frame.  Otherwise missing values in the grouping factors
           ## cause inconsistent numbers of observations.
-          
-          ## evaluate glm.fit, a generalized linear fit of fixed effects only
           mf <- match.call()
           m <- match(c("family", "data", "subset", "weights",
                        "na.action", "offset"), names(mf), 0)
