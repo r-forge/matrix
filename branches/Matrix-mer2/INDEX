@@ -1,4 +1,3 @@
-bCrosstab               Create pairwise crosstabulation
 BIC                     Bayesian Information Criterion
 Cholesky-class          Cholesky and Bunch-Kaufman Decompositions
 corrmatrix-class        Class "corrmatrix"
@@ -9,8 +8,6 @@ ddenseMatrix-class      Virtual Class "ddenseMatrix" of Numeric Dense
                         Matrices
 denseMatrix-class       Virtual Class "denseMatrix" of All Dense
                         Matrices
-dgBCMatrix-class        Class "dgBCMatrix" Real Sparse Blocked Column
-                        Compressed Matrix
 dgCMatrix-class         Compressed, sparse, column-oriented numeric
                         matrices
 dgeMatrix-class         Class "dgeMatrix" of Dense Numeric (S4 Class)
@@ -58,7 +55,6 @@ mcmcsamp                Generate an MCMC sample
                         Package 'Matrix'
 mm                      A sample sparse model matrix
 norm                    Norm of a Matrix
-pdmatrix-class          Positive-definite matrices
 pMatrix-class           Permutation matrices
 ranef                   Extract Random Effects
 rcond                   Estimate the Reciprocal Condition Number

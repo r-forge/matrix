@@ -14,7 +14,6 @@ export(
        "Hilbert",
        "Matrix",
        "Schur",
-       "bCrosstab",
        "expand",
        "expm",
        "facmul",
@@ -54,7 +53,7 @@ export(
 
 
 ## lmer-related
-export("lmer", "mcmcsamp", "mer2")
+export("lmer", "mcmcsamp")
 
 exportClasses(
 	      "index",
@@ -83,7 +82,6 @@ exportClasses(
 	      "zMatrix",
 	      "ldenseMatrix",
 
-	      "dgBCMatrix",
 	      "dgCMatrix",
 	      "dgRMatrix",# unused
 	      "dgTMatrix",
@@ -116,17 +114,15 @@ exportClasses(
 	      "ltCMatrix",
 	      "ltRMatrix",# unused
 	      "ltTMatrix",
-
-	      "corrmatrix",
-	      "pMatrix",
-	      "pdmatrix",
+              "pMatrix",
+              
 	      "dCholCMatrix",
 	      "lCholCMatrix",
               "correlation"
 	      )
 
 ## lmer-related
-exportClasses("VarCorr", "lmer", "mer", "mer2", "summary.lmer")
+exportClasses("lmer", "mer")
 
 
 exportMethods(
