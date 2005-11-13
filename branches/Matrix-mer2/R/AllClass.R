@@ -440,16 +440,14 @@ setClass("mer",
 			cnames = "list",   # column names of model matrices
 			nc = "integer",    # dimensions of blocks in Omega
 			Gp = "integer",    # Pointers to groups of rows in Zt
-			devComp = "numeric", # Components of deviance
-			deviance = "numeric", # Current deviance (ML and REML)
-			status = "logical", # factored? inverted?
                         ## quantities that vary when Z, X or y are updated
 			XtX = "dpoMatrix", # X'X
 			ZtZ = "dsCMatrix", # Z'Z
 			ZtX = "dgeMatrix", # Z'X
                         Zty = "numeric",   # Z'y 
                         Xty = "numeric",   # X'y 
-                        ## slots that vary during the optimization
+                        ## primary slots that vary during the optimization
+                        ## When Omega is updated, these are updated
 			Omega = "list", # list of relative precision matrices
                         ## Cholesky factor of inflated [Z:X:y]'[Z:X:y]
                         L = "externalptr", # sparse Cholesky factor of Z'Z + Omega
@@ -457,7 +455,14 @@ setClass("mer",
 			RXX = "dtrMatrix",
                         rZy = "numeric",
                         rXy = "numeric",
-                        ## lists of arrays
+			devComp = "numeric", # Components of deviance
+			deviance = "numeric", # Current deviance (ML and REML)
+                        ## Secondary slots only evaluated when requested.
+                        ## The sentinel is length(fixef) - if > 0 then
+                        ## info is current.
+                        fixef = "numeric", 
+                        ranef = "numeric",
+                        RZXinv = "dgeMatrix",
                         bVar = "list",
                         gradComp = "list"
 			)
