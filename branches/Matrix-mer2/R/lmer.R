@@ -388,9 +388,13 @@ setMethod("simulate", signature(object = "mer"),
           ## similate the linear predictors
           lpred <- .Call("mer_simulate", as(object, "mer"), nsim,
                          TRUE, PACKAGE = "Matrix")
+          REML <- object@method == "REML"
+          sc <- 1
+          if (object@useScale) 
+              sc <- .Call("mer_sigma", object, REML, PACKAGE = "Matrix")
           ## add per-observation noise term
-          lpred <- as.data.frame(lpred + rnorm(prod(dim(lpred)), sd = scale))
-
+          lpred <- as.data.frame(lpred + drop(object@X %*% fixef(object)) +
+                                 rnorm(prod(dim(lpred)), sd = sc))
           ## save the seed
           attr(lpred, "seed") <- RNGstate
           lpred
@@ -614,3 +618,16 @@ setMethod("update", signature(object = "mer"),
           )
 
 
+simss <- function(fm0, fma, nsim)
+{
+    ysim <- simulate(fm0, nsim)
+    cv <- list(analyticGradient = FALSE, msMaxIter = 200:200,
+               msVerbose = 0:0)
+    sapply(ysim, function(yy) {
+        .Call("mer_update_y", fm0, yy, PACKAGE = "Matrix")
+        LMEoptimize(fm0) <- cv
+        .Call("mer_update_y", fm1, yy, PACKAGE = "Matrix")
+        LMEoptimize(fm0) <- cv
+        exp(c(H0 = fm0@devComp$logryy2, Ha = fma@devComp$logryy2))
+    })
+}
