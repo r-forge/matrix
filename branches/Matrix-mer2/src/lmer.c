@@ -1723,34 +1723,30 @@ SEXP mer_Hessian(SEXP x)
 SEXP
 mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp)
 {
-    SEXP ans, 
-	RZXsl = GET_SLOT(x, Matrix_RZXSym),
-	Omega = GET_SLOT(x, Matrix_OmegaSym),
+    SEXP ans, Omega = GET_SLOT(x, Matrix_OmegaSym),
 	Omegacp = PROTECT(duplicate(Omega));
     cholmod_factor *L =
       (cholmod_factor *) R_ExternalPtrAddr(GET_SLOT(x, Matrix_LSym));
     int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
-	*dims = INTEGER(getAttrib(RZXsl, Matrix_DimSym)),
 	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
-	REML = !strcmp(CHAR(asChar(GET_SLOT(x, Matrix_methodSym))),
-		       "REML"),
-	i, ione = 1, j, nf = LENGTH(Omega),
-	nsamp = asInteger(nsampp),
+	REML = !strcmp(CHAR(asChar(GET_SLOT(x, Matrix_methodSym))), "REML"),
+	i, ione = 1, j, n = LENGTH(GET_SLOT(x, Matrix_ySym)),
+	nf = LENGTH(Omega), nsamp = asInteger(nsampp),
+	p = LENGTH(GET_SLOT(x, Matrix_rXySym)),
+	q = LENGTH(GET_SLOT(x, Matrix_rZySym)),
 	saveb = asLogical(savebp),
 	trans = asLogical(transp);
     double 
 	*RXX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym)),
-	*RZX = REAL(GET_SLOT(RZXsl, Matrix_xSym)),
+	*RZX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXSym), Matrix_xSym)),
 	*bhat = REAL(GET_SLOT(x, Matrix_ranefSym)),
-	*betahat = REAL(GET_SLOT(x, Matrix_fixefSym)), one = 1, m1 = -1,
-	*bnew = Calloc(dims[0], double),
-	*betanew = Calloc(dims[1], double),
+	*betahat = REAL(GET_SLOT(x, Matrix_fixefSym)), 
+	*bnew = Calloc(q, double), *betanew = Calloc(p, double),
 	*dcmp = REAL(GET_SLOT(x, Matrix_devCompSym)),
-	df = dcmp[0] - (REML ? dcmp[1] : 0);
-    int nrbase = dims[1] + 1 + coef_length(nf, nc), /* rows always included */
-	p = dims[1];
-    int nrtot = nrbase + (saveb ? dims[0] : 0);
-    cholmod_dense *chb, *chbnew = numeric_as_chm_dense(bnew, dims[0]);
+	df = n - (REML ? p : 0), m1[] = {-1,0}, one[] = {1,0};
+    int nrbase = p + 1 + coef_length(nf, nc); /* rows always included */
+    int nrtot = nrbase + (saveb ? q : 0);
+    cholmod_dense *chb, *chbnew = numeric_as_chm_dense(bnew, q);
     
     if (nsamp <= 0) nsamp = 1;
     ans = PROTECT(allocMatrix(REALSXP, nrtot, nsamp));
@@ -1758,22 +1754,23 @@ mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp)
     for (i = 0; i < nsamp; i++) {
 	double *col = REAL(ans) + i * nrtot, sigma;
 				/* factor x and get secondary values */
-	mer_factor(x); mer_secondary(x);
+	mer_factor(x);
+	mer_secondary(x);
 				/* simulate and store new value of sigma */
 	sigma = exp(dcmp[3]/2)/sqrt(rchisq(df));
 	col[p] = (trans ? 2 * log(sigma) : sigma * sigma);
 				/* simulate scaled, independent normals */
 	for (j = 0; j < p; j++) betanew[j] = sigma * norm_rand();
-	for (j = 0; j < dims[0]; j++) bnew[j] = sigma * norm_rand();
+	for (j = 0; j < q; j++) bnew[j] = sigma * norm_rand();
 				/* betanew := RXX^{-1} %*% betanew */
 	F77_CALL(dtrsv)("U", "N", "N", &p, RXX, &p, betanew, &ione);
 				/* bnew := bnew - RZX %*% betanew */
-	F77_CALL(dgemv)("N", dims, &p, &m1, RZX, dims,
-			betanew, &ione, &one, bnew, &ione);
-				/* bnew := L^{-T} %*% bnew */
+	F77_CALL(dgemv)("N", &q, &p, m1, RZX, &q, betanew, &ione,
+			one, bnew, &ione);
+				/* chb := L^{-T} %*% bnew */
 	chb = cholmod_solve(CHOLMOD_Lt, L, chbnew, &c);
 				/* Copy chb to bnew and free chb */
-	Memcpy(bnew, (double *)(chb->x), dims[0]);
+	Memcpy(bnew, (double *)(chb->x), q);
  	cholmod_free_dense(&chb, &c);
 				/* Add conditional modes and store beta */
 	for (j = 0; j < p; j++) {
@@ -1781,7 +1778,7 @@ mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp)
 	}
 				/* Add conditional modes and
 				 * optionally store b */
-	for (j = 0; j < dims[0]; j++) {
+	for (j = 0; j < q; j++) {
 	    bnew[j] += bhat[j];
 	    if (saveb) col[nrbase + j] = bnew[j];
 	}
@@ -1789,7 +1786,7 @@ mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp)
 	internal_Omega_update(Omega, bnew, sigma, nf, nc, Gp, col + p + 1, trans);
     }
     PutRNGstate();
-    Free(betanew); Free(bnew); Free(chbnew);
+    Free(betanew); Free(bnew); free(chbnew);
 				/* Restore original Omega */
     SET_SLOT(x, Matrix_OmegaSym, Omegacp);
     mer_factor(x);
