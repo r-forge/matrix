@@ -248,6 +248,7 @@ typedef struct glmer_struct
     SEXP dev_resids; /* expression for deviance residuals */
     SEXP var;        /* expression for variance evaluation */
     SEXP x;          /* fixed-effects model matrix */
+    SEXP Zt;         /* transpose of random-effects model matrix */
     int n;	     /* length of the response vector */
     int p;	     /* length of fixed effects vector */
     int nf;	     /* number of grouping factors */
@@ -429,12 +430,6 @@ void internal_mer_coefGets(SEXP x, const double cc[], int ptyp)
     mer_factor(x);
 }
 
-static void
-internal_weight_ZXy(SEXP x, const double w[], SEXP Zt,
-		    const double X[], const double y)
-{
-}
-
 static double
 internal_mer_sigma(SEXP x, int REML)
 {
@@ -517,6 +512,31 @@ internal_Omega_update(SEXP Omega, const double b[], double sigma, int nf,
     }
 }
 
+static void
+internal_weight_ZXy(SEXP mer, const double X[], SEXP Zt,
+		    const double y[], const double w[], const double z[])
+{
+    SEXP mZt = GET_SLOT(mer, Matrix_ZtSym);
+    int *Zp = INTEGER(GET_SLOT(mZt, Matrix_pSym));
+    int i, j,
+	n = LENGTH(GET_SLOT(mer, Matrix_ySym)), 
+	p = LENGTH(GET_SLOT(mer, Matrix_rXySym)),
+	q = LENGTH(GET_SLOT(mer, Matrix_rZySym));
+    double *mX = REAL(GET_SLOT(mer, Matrix_XSym)),
+	*my = REAL(GET_SLOT(mer, Matrix_ySym)),
+	*mZx = REAL(GET_SLOT(mZt, Matrix_xSym)),
+	*Zx = REAL(GET_SLOT(Zt, Matrix_xSym));
+
+    for (j = 0; j < p; j++) {
+	for (i = 0; i < n; i++) mX[i + j * n] = X[i + j * n] * w[i];
+    }
+    for (i = 0; i < n; i++) my[i] = z[i] * w[i];
+    for (j = 0; j < n; j++) {
+	int i2 = Zp[j + 1];
+	for (i = Zp[j]; i < i2; i++) mZx[i] = Zx[i] * w[j];
+    }
+}
+
 /** 
  * Evaluate new weights and working residuals, apply the weights to a
  * copy of the model matrices and update the mer object.
@@ -542,7 +562,7 @@ reweight_update(GlmerStruct GS) {
 	    (REAL(GS->y)[i] - REAL(GS->mu)[i]) /
 	    REAL(dmu_deta)[i];
     }
-/*     internal_weight_ZXy(x, GS->unwtd, w, z, GS->n, GS->wtd); */
+    internal_weight_ZXy(GS->mer, REAL(GS->x), GS->Zt, GS->y, w, z);
     mer_update_ZXy(GS->mer);
     UNPROTECT(2);
     Free(w); Free(z);
@@ -1292,7 +1312,6 @@ Matrix_rWishart(SEXP ns, SEXP dfp, SEXP scal)
     return ans;
 }
 
-
 /** 
  * Perform the PQL optimization
  * 
@@ -1308,6 +1327,7 @@ SEXP glmer_PQL(SEXP GSp)
 			    REAL(GS->eta), GS->n),
 	*fitted = Calloc(GS->n, double), crit;
 
+    return R_NilValue;
     for (i = 0, crit = GS->tol + 1;
 	 i < GS->maxiter && crit > GS->tol; i++) {
 	reweight_update(GS);
@@ -1481,45 +1501,38 @@ SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed)
  */
 SEXP glmer_init(SEXP rho) {
     GlmerStruct GS;
-    int *dims;
-    SEXP wtdSym = install("wtd"), offSym = install("off");
+    SEXP devc;
+    
     
     GS = (GlmerStruct) Calloc(1, glmer_struct);
     if (!isEnvironment(rho))
 	error(_("`rho' must be an environment"));
     GS->rho = rho;
-    GS->y = find_and_check(rho, install("y"), REALSXP, 0);
-    if ((GS->n = LENGTH(GS->y)) < 1)
-	error(_("`%s' must be a nonempty, numeric vector"),
-	      "y");
     GS->mer = find_and_check(rho, install("mer"), VECSXP, 0);
-    GS->nf = LENGTH(GET_SLOT(GS->mer, Matrix_flistSym));
+    defineVar(install("Xcp"),
+	      GS->x = duplicate(GET_SLOT(GS->mer, Matrix_XSym)), rho);
+    defineVar(install("Ztcp"),
+	      GS->Zt = duplicate(GET_SLOT(GS->mer, Matrix_ZtSym)), rho);
+    defineVar(install("ycp"),
+	      GS->y = duplicate(GET_SLOT(GS->mer, Matrix_ySym)), rho);
+    GS->mu = find_and_check(rho, install("mu"), REALSXP, GS->n);
+    GS->offset = find_and_check(rho, install("offset"),
+				REALSXP, GS->n);
+    
+    defineVar(install("off"), GS->off = duplicate(GS->y), rho);
+    devc = GET_SLOT(GS->mer, Matrix_devCompSym);
+    GS->n = (int)REAL(devc)[0]; GS->p = (int)REAL(devc)[1];
+
     GS->cv = find_and_check(rho, install("cv"), VECSXP, 0);
     GS->niterEM = asInteger(Matrix_getElement(GS->cv, "niterEM"));
     GS->EMverbose = asLogical(Matrix_getElement(GS->cv, "EMverbose"));
     GS->tol = asReal(Matrix_getElement(GS->cv, "tolerance"));
     GS->maxiter = asInteger(Matrix_getElement(GS->cv, "maxIter"));
 
-    GS->mu = find_and_check(rho, install("mu"), REALSXP, GS->n);
-    GS->offset = find_and_check(rho, install("offset"),
-				REALSXP, GS->n);
-    defineVar(offSym, duplicate(GS->offset), rho);
-    GS->off = find_and_check(rho, offSym, REALSXP, GS->n);
-    GS->x = find_and_check(rho, install("x"), REALSXP, 0);
-    if (!isMatrix(GS->x))
-	error(_("%s must be a model matrix"), "x");
-    dims = INTEGER(getAttrib(GS->x, R_DimSymbol));
-    if (dims[0] != GS->n)
-	error(_("nrow(%s) must be %d"), "x", GS->n);
-    GS->p = dims[1];
-    GS->npar = dims[1] +
+    GS->npar = GS->p +
 	coef_length(GS->nf, INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)));
     GS->eta = find_and_check(rho, install("eta"),
 			     REALSXP, GS->n);
-    GS->unwtd = find_and_check(rho, install("mmats"),
-			       VECSXP, GS->nf + 1);
-    defineVar(wtdSym, duplicate(GS->unwtd), rho);
-    GS->wtd = find_and_check(rho, wtdSym, VECSXP, GS->nf + 1);
     GS->wts = find_and_check(rho, install("wts"), REALSXP, GS->n);
     GS->linkinv = find_and_check(rho, install("linkinv"),
 				 LANGSXP, 0);
@@ -2053,7 +2066,6 @@ SEXP mer_dtCMatrix(SEXP x)
     int *dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2)),
 	nz, q;
 
-    mer_factor(x);
     L = cholmod_copy_factor((cholmod_factor *)
 			    R_ExternalPtrAddr(GET_SLOT(x, Matrix_LSym)),
 			    &c);
@@ -2094,7 +2106,6 @@ SEXP mer_dtCMatrix_inv(SEXP x)
 	*dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2)),
 	j, nz, q;
 
-    mer_factor(x);
     dims[0] = dims[1] = q = (int)(L->n);
     for (j = 0; j < q; j++) {
 	bp[j] = bi[j] = j;
@@ -2146,14 +2157,14 @@ SEXP mer_factor(SEXP x)
     double nml = dcmp[0], nreml = dcmp[0] - dcmp[1];
 	    
     dcmp[5] = Omega_log_det(Omega, nf, nc, Gp); /* logDet(Omega) */
-    A = ZZ_inflate(zz, nf, Omega, nc, Gp); Free(zz);
+    A = ZZ_inflate(zz, nf, Omega, nc, Gp); free(zz);
     if (!cholmod_factorize(A, L, &c))
 	error(_("rank_deficient Z'Z+Omega"));
     cholmod_free_sparse(&A, &c);
     dcmp[4] = 2 * chm_log_abs_det(L); /* 2 * logDet(L) */
 				/* calculate and store RZX and rZy */
-    RZX = cholmod_solve(CHOLMOD_L, L, ZtX, &c); Free(ZtX);
-    rZy = cholmod_solve(CHOLMOD_L, L, Zty, &c); Free(Zty);
+    RZX = cholmod_solve(CHOLMOD_L, L, ZtX, &c); free(ZtX);
+    rZy = cholmod_solve(CHOLMOD_L, L, Zty, &c); free(Zty);
     Memcpy(REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXSym), Matrix_xSym)),
 	   (double *) RZX->x, q * p);
     Memcpy(REAL(GET_SLOT(x, Matrix_rZySym)), (double *) rZy->x, q);

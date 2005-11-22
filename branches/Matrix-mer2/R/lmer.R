@@ -17,9 +17,7 @@ findbars <- function(term)
 ## that are separated by vertical bars
 nobars <- function(term)
 {
-    # FIXME: is the is.name in the condition redundant?
-    #   A name won't satisfy the first condition.
-    if (!('|' %in% all.names(term)) || is.name(term)) return(term)
+    if (!('|' %in% all.names(term))) return(term)
     if (is.call(term) && term[[1]] == as.name('|')) return(NULL)
     if (length(term) == 2) {
         nb <- nobars(term[[2]])
@@ -268,9 +266,90 @@ setMethod("lmer", signature(formula = "formula"),
                        !(family$family %in% c("binomial", "poisson")),
                        match.call(), family,
                        PACKAGE = "Matrix")
-          LMEoptimize(mer) <- cv
-          mer
+          if (lmm) {
+              LMEoptimize(mer) <- cv
+              return(mer)
+          }
+
+          ## The rest of the function applies to generalized linear mixed models
+          gVerb <- getOption("verbose")
+          eta <- glm.fit$linear.predictors
+          wts <- glm.fit$prior.weights
+          wtssqr <- wts * wts
+          offset <- glm.fit$offset
+          if (is.null(offset)) offset <- numeric(length(eta))
+          mu <- numeric(length(eta))
+
+          dev.resids <- quote(family$dev.resids(y, mu, wtssqr))
+          linkinv <- quote(family$linkinv(eta))
+          mu.eta <- quote(family$mu.eta(eta))
+          variance <- quote(family$variance(mu))
+          LMEopt <- get("LMEoptimize<-")
+          doLMEopt <- quote(LMEopt(x = mer, value = cv))
+
+          GSpt <- .Call("glmer_init", environment(), PACKAGE = "Matrix")
+          .Call("glmer_PQL", GSpt, PACKAGE = "Matrix")  # obtain PQL estimates
+          .Call("glmer_finalize", GSpt, PACKAGE = "Matrix")
+          return(mer)
+          fixInd <- seq(ncol(x))
+          ## pars[fixInd] == beta, pars[-fixInd] == theta
+          PQLpars <- c(fixef(mer),
+                       .Call("lmer_coef", mer, 2, PACKAGE = "Matrix"))
+          ## set flag to skip fixed-effects in subsequent calls
+          mer@nc[length(mmats)] <- -mer@nc[length(mmats)]
+          ## indicator of constrained parameters
+          const <- c(rep(FALSE, length(fixInd)),
+                     unlist(lapply(mer@nc[seq(along = random)],
+                                   function(k) 1:((k*(k+1))/2) <= k)
+                            ))
+          devAGQ <- function(pars, n)
+              .Call("glmer_devAGQ", pars, GSpt, n, PACKAGE = "Matrix")
+
+          deviance <- devAGQ(PQLpars, 1)
+### FIXME: For nf == 1 change this to an AGQ evaluation.  Needs
+### AGQ for nc > 1 first.
+          fxd <- PQLpars[fixInd]
+          loglik <- logLik(mer)
+
+          if (method %in% c("Laplace", "AGQ")) {
+              nAGQ <- 1
+              if (method == "AGQ") {    # determine nAGQ at PQL estimates
+                  dev11 <- devAGQ(PQLpars, 11)
+                  ## FIXME: Should this be an absolute or a relative tolerance?
+                  devTol <- sqrt(.Machine$double.eps) * abs(dev11)
+                  for (nAGQ in c(9, 7, 5, 3, 1))
+                      if (abs(dev11 - devAGQ(PQLpars, nAGQ - 2)) > devTol) break
+                  nAGQ <- nAGQ + 2
+                  if (gVerb)
+                      cat(paste("Using", nAGQ, "quadrature points per column\n"))
+              }
+              obj <- function(pars)
+                  .Call("glmer_devAGQ", pars, GSpt, nAGQ, PACKAGE = "Matrix")
+              optimRes <-
+                  nlminb(PQLpars, obj,
+                         lower = ifelse(const, 5e-10, -Inf),
+                         control = list(trace = getOption("verbose"),
+                         iter.max = cv$msMaxIter))
+              optpars <- optimRes$par
+              if (optimRes$convergence != 0)
+                  warning("nlminb failed to converge")
+              deviance <- optimRes$objective
+              if (gVerb)
+                  cat(paste("convergence message", optimRes$message, "\n"))
+              fxd[] <- optpars[fixInd]  ## preserve the names
+              .Call("lmer_coefGets", mer, optpars[-fixInd], 2, PACKAGE = "Matrix")
+          }
+
+          .Call("glmer_finalize", GSpt, PACKAGE = "Matrix")
+          loglik[] <- -deviance/2
+          new("lmer", mer,
+              frame = if (model) frm else data.frame(),
+              terms = glm.fit$terms,
+              assign = attr(glm.fit$x, "assign"),
+              call = match.call(), family = family,
+              logLik = loglik, fixed = fxd)
       })
+
 
 ## Extract the permutation
 setAs("mer", "pMatrix", function(from)
