@@ -430,12 +430,27 @@ void internal_mer_coefGets(SEXP x, const double cc[], int ptyp)
     mer_factor(x);
 }
 
+/** 
+ * Evaluate current estimate of sigma from an mer object
+ * 
+ * @param x pointer to an mer object
+ * @param REML indicator of whether to use REML.
+ *           < 0  -> determine REML or ML from x@method
+ *           == 0 -> use ML unconditionally
+ *           > 0  -> use REML unconditionally
+ * 
+ * @return 
+ */
 static double
 internal_mer_sigma(SEXP x, int REML)
 {
     double *dcmp = REAL(GET_SLOT(x, Matrix_devCompSym));
 
-    mer_factor(x);
+    if (REML < 0)		/* get REML from x */
+	REML = !strcmp(CHAR(asChar(GET_SLOT(x,
+					    Matrix_methodSym))),
+		       "REML");
+/*     mer_factor(x); */ 
     return exp(dcmp[3]/2)/sqrt(dcmp[0] - (REML ? dcmp[1] : 0));
 }
 
@@ -2598,7 +2613,10 @@ SEXP mer_secondary(SEXP x)
  */
 SEXP mer_sigma(SEXP x, SEXP REML)
 {
-    return ScalarReal(internal_mer_sigma(x, asLogical(REML)));
+    return ScalarReal(
+	internal_mer_sigma(x,
+			   (REML == R_NilValue) ? -1 :
+			   (asLogical(REML))));
 }
 
 /** 
@@ -2611,25 +2629,26 @@ SEXP mer_sigma(SEXP x, SEXP REML)
  * 
  * @return a matrix of simulated linear predictors
  */
-SEXP mer_simulate(SEXP x, SEXP np, SEXP useScale)
+SEXP mer_simulate(SEXP x, SEXP nsimP)
 {
     int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	*Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
 	REML = !strcmp(CHAR(asChar(GET_SLOT(x, Matrix_methodSym))),"REML"),
-	i, ii, j, n = asInteger(np),
+	i, ii, j, nsim = asInteger(nsimP),
 	nf = LENGTH(GET_SLOT(x, Matrix_OmegaSym)),
-	nobs = LENGTH(GET_SLOT(x, Matrix_ySym)),
+	n = LENGTH(GET_SLOT(x, Matrix_ySym)),
 	q = LENGTH(GET_SLOT(x, Matrix_ZtySym));
-    SEXP ans = PROTECT(allocMatrix(REALSXP, nobs, n)),
+    SEXP ans = PROTECT(allocMatrix(REALSXP, n, nsim)),
 	Omega = GET_SLOT(x, Matrix_OmegaSym);
-    cholmod_dense *chb = cholmod_allocate_dense(q, n, q, CHOLMOD_REAL, &c),
-	*cha = as_cholmod_dense(ans);
+    cholmod_dense *cha = as_cholmod_dense(ans),
+	*chb = cholmod_allocate_dense(q, nsim, q, CHOLMOD_REAL, &c);
     double one[] = {1,0}, zero[] = {0,0},
-	scale = (asLogical(useScale) ? internal_mer_sigma(x, REML) : 1);
+	scale = (asLogical(GET_SLOT(x, Matrix_useScaleSym)) ?
+		 internal_mer_sigma(x, REML) : 1);
     cholmod_sparse *Zt = as_cholmod_sparse(GET_SLOT(x, Matrix_ZtSym));
 	
     GetRNGstate();
-    for (ii = 0; ii < n; ii++) {
+    for (ii = 0; ii < nsim; ii++) {
 	for (i = 0; i < nf; i++) {
 	    int nci = nc[i], relen = Gp[i + 1] - Gp[i];
 	    int nlev = relen/nci;
