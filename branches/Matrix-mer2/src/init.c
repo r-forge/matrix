@@ -199,7 +199,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_ranef", (DL_FUNC) &mer_ranef, 1},
     {"mer_secondary", (DL_FUNC) &mer_secondary, 1},
     {"mer_sigma", (DL_FUNC) &mer_sigma, 2},
-    {"mer_simulate", (DL_FUNC) &mer_simulate, 3},
+    {"mer_simulate", (DL_FUNC) &mer_simulate, 2},
     {"mer_update_ZXy", (DL_FUNC) &mer_update_ZXy, 1},
     {"mer_update_y", (DL_FUNC) &mer_update_y, 2},
 

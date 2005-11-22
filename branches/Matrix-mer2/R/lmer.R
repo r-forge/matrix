@@ -465,13 +465,12 @@ setMethod("simulate", signature(object = "mer"),
               family$link != "identity")
               stop("simulation of generalized linear mixed models not yet implemented")
           ## similate the linear predictors
-          lpred <- .Call("mer_simulate", as(object, "mer"), nsim,
-                         TRUE, PACKAGE = "Matrix")
-          REML <- object@method == "REML"
+          lpred <- .Call("mer_simulate", object, nsim, PACKAGE = "Matrix")
           sc <- 1
           if (object@useScale) 
-              sc <- .Call("mer_sigma", object, REML, PACKAGE = "Matrix")
-          ## add per-observation noise term
+              sc <- .Call("mer_sigma", object, object@method == "REML",
+                          PACKAGE = "Matrix")
+          ## add fixed-effects contribution and per-observation noise term
           lpred <- as.data.frame(lpred + drop(object@X %*% fixef(object)) +
                                  rnorm(prod(dim(lpred)), sd = sc))
           ## save the seed
@@ -705,8 +704,9 @@ simss <- function(fm0, fma, nsim)
     sapply(ysim, function(yy) {
         .Call("mer_update_y", fm0, yy, PACKAGE = "Matrix")
         LMEoptimize(fm0) <- cv
-        .Call("mer_update_y", fm1, yy, PACKAGE = "Matrix")
-        LMEoptimize(fm0) <- cv
-        exp(c(H0 = fm0@devComp$logryy2, Ha = fma@devComp$logryy2))
+        .Call("mer_update_y", fma, yy, PACKAGE = "Matrix")
+        LMEoptimize(fma) <- cv
+        exp(c(H0 = fm0@devComp[["logryy2"]],
+              Ha = fma@devComp[["logryy2"]]))
     })
 }
