@@ -112,3 +112,5 @@ setMethod("tcrossprod", signature(x = "TsparseMatrix"),
 	  .Call("Csparse_crossprod", x, trans = TRUE, triplet = TRUE,
 		PACKAGE = "Matrix"))
 
+setAs("TsparseMatrix", "CsparseMatrix",
+      function(from) .Call("Tsparse_to_Csparse", x, PACKAGE = "Matrix"))

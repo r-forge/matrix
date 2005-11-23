@@ -1,7 +1,6 @@
 #
 pkg = Matrix
 
-PKG_CFLAGS = -DUSE_CHOLMOD
 PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS)
 include SOURCES_C.mkf
 
