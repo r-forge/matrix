@@ -1,6 +1,10 @@
 \name{CsparseMatrix-class}
 \docType{class}
 \alias{CsparseMatrix-class}
+\alias{\%*\%,CsparseMatrix,CsparseMatrix-method}
+\alias{\%*\%,CsparseMatrix,denseMatrix-method}
+\alias{coerce,CsparseMatrix,TsparseMatrix-method}
+\alias{coerce,CsparseMatrix,denseMatrix-method}
 \alias{crossprod,CsparseMatrix,missing-method}
 \alias{t,CsparseMatrix-method}
 \alias{tcrossprod,CsparseMatrix-method}
@@ -32,6 +36,9 @@ Class \code{"Matrix"}, by class \code{"sparseMatrix"}.
     \item{crossprod}{\code{signature(x = "CsparseMatrix", y = "missing")}: ... }
     \item{t}{\code{signature(x = "CsparseMatrix")}: ... }
     \item{tcrossprod}{\code{signature(x = "CsparseMatrix")}: ... }
+    \item{\%*\%}{\code{signature(x = "CsparseMatrix", y =
+	"CsparseMatrix")}: ...}
+    \item{\%*\%}{\code{signature(x = "CsparseMatrix", y = "denseMatrix")}: ...}
   }
 }
 \seealso{
