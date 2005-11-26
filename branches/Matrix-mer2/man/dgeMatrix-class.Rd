@@ -87,7 +87,7 @@
   and other matrix methods available:
   \describe{
     \item{\%*\%}{\code{signature(x = "dgeMatrix", y = "dgeMatrix")}:
-      Matrix multiplication; dito for several other signature
+      Matrix multiplication; ditto for several other signature
       combinations, see \code{showMethods("\%*\%", class = "dgeMatrix")}.}
     \item{Schur}{\code{signature(x = "dgeMatrix", vectors = "logical")}: ... }
     \item{Schur}{\code{signature(x = "dgeMatrix", vectors = "missing")}: ... }

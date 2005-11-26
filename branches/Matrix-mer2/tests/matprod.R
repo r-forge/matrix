@@ -29,7 +29,7 @@ assert.EQ.mat(pd2, diag(10:6) %*% as(m5,"matrix"))
 
 
 M <- mm[1:500, 1:200]
-
+cpr <- t(mm) %*% mm
 showMethods("%*%", class=class(M))
 
 v1 <- rep(1, ncol(M))

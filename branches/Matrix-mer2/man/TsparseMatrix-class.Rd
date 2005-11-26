@@ -3,6 +3,7 @@
 \docType{class}
 \alias{TsparseMatrix-class}
 %% Methods:
+\alias{coerce,TsparseMatrix,CsparseMatrix-method}
 % "[" are in ./Xtrct-methods.Rd
 \alias{crossprod,TsparseMatrix,missing-method}
 \alias{tcrossprod,TsparseMatrix-method}
