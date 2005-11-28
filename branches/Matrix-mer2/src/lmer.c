@@ -233,13 +233,11 @@ typedef struct glmer_struct
 {
     SEXP cv;         /* control values */
     SEXP mer;	     /* mixed-effects representation */
-    SEXP rho;        /* where to evaluate the calls */
-    SEXP y;          /* response vector (REALSXP) */
+    SEXP rho;        /* environment in which to evaluate the calls */
     SEXP eta;        /* linear predictor */
     SEXP mu;         /* mean vector */
     SEXP wts;        /* prior weights */
     SEXP offset;     /* offset for original glm problem */
-    SEXP off;        /* offset for random effects only */
     SEXP unwtd;      /* unweighted model matrices */
     SEXP wtd;        /* weighted model matrices */
     SEXP linkinv;    /* expression for inverse link evaluation */
@@ -247,8 +245,10 @@ typedef struct glmer_struct
     SEXP LMEopt;     /* expression for LME optimization */
     SEXP dev_resids; /* expression for deviance residuals */
     SEXP var;        /* expression for variance evaluation */
-    SEXP x;          /* fixed-effects model matrix */
-    SEXP Zt;         /* transpose of random-effects model matrix */
+    double *off;     /* offset for random effects only */
+    double *x;	     /* copy of fixed-effects model matrix */
+    double *y;       /* copy of response vector */
+    double *Zt;      /* copy of x slot in transpose of random-effects model matrix */
     int n;	     /* length of the response vector */
     int p;	     /* length of fixed effects vector */
     int nf;	     /* number of grouping factors */
@@ -528,19 +528,17 @@ internal_Omega_update(SEXP Omega, const double b[], double sigma, int nf,
 }
 
 static void
-internal_weight_ZXy(SEXP mer, const double X[], SEXP Zt,
+internal_weight_ZXy(SEXP mer, const double X[], const double Zt[],
 		    const double y[], const double w[], const double z[])
 {
     SEXP mZt = GET_SLOT(mer, Matrix_ZtSym);
     int *Zp = INTEGER(GET_SLOT(mZt, Matrix_pSym));
     int i, j,
 	n = LENGTH(GET_SLOT(mer, Matrix_ySym)), 
-	p = LENGTH(GET_SLOT(mer, Matrix_rXySym)),
-	q = LENGTH(GET_SLOT(mer, Matrix_rZySym));
+	p = LENGTH(GET_SLOT(mer, Matrix_rXySym));
     double *mX = REAL(GET_SLOT(mer, Matrix_XSym)),
 	*my = REAL(GET_SLOT(mer, Matrix_ySym)),
-	*mZx = REAL(GET_SLOT(mZt, Matrix_xSym)),
-	*Zx = REAL(GET_SLOT(Zt, Matrix_xSym));
+	*mZx = REAL(GET_SLOT(mZt, Matrix_xSym));
 
     for (j = 0; j < p; j++) {
 	for (i = 0; i < n; i++) mX[i + j * n] = X[i + j * n] * w[i];
@@ -548,7 +546,7 @@ internal_weight_ZXy(SEXP mer, const double X[], SEXP Zt,
     for (i = 0; i < n; i++) my[i] = z[i] * w[i];
     for (j = 0; j < n; j++) {
 	int i2 = Zp[j + 1];
-	for (i = Zp[j]; i < i2; i++) mZx[i] = Zx[i] * w[j];
+	for (i = Zp[j]; i < i2; i++) mZx[i] = Zt[i] * w[j];
     }
 }
 
@@ -573,11 +571,10 @@ reweight_update(GlmerStruct GS) {
     for (i = 0; i < GS->n; i++) {
 	w[i] = REAL(GS->wts)[i] *
 	    REAL(dmu_deta)[i]/sqrt(REAL(var)[i]);
-	z[i] = REAL(GS->eta)[i] - REAL(GS->off)[i] +
-	    (REAL(GS->y)[i] - REAL(GS->mu)[i]) /
-	    REAL(dmu_deta)[i];
+	z[i] = REAL(GS->eta)[i] - (GS->off)[i] +
+	    ((GS->y)[i] - REAL(GS->mu)[i])/REAL(dmu_deta)[i];
     }
-    internal_weight_ZXy(GS->mer, REAL(GS->x), GS->Zt, GS->y, w, z);
+    internal_weight_ZXy(GS->mer, GS->x, GS->Zt, GS->y, w, z);
     mer_update_ZXy(GS->mer);
     UNPROTECT(2);
     Free(w); Free(z);
@@ -651,10 +648,10 @@ fixed_effects_deviance(GlmerStruct GS, const double fixed[])
     double ans, one = 1, zero = 0;
 
     F77_CALL(dgemv)("N", &(GS->n), &(GS->p), &one,
-		    REAL(GS->x), &(GS->n), fixed,
+		    GS->x, &(GS->n), fixed,
 		    &ione, &zero, REAL(GS->eta), &ione);
 				/* add in random effects and offset */
-    vecIncrement(REAL(GS->eta), REAL(GS->off), GS->n);
+    vecIncrement(REAL(GS->eta), GS->off, GS->n);
     eval_check_store(GS->linkinv, GS->rho, GS->mu);
     devs = PROTECT(eval_check(GS->dev_resids, GS->rho, REALSXP, GS->n));
     for (i = 0, ans = 0; i < GS->n; i++) ans += REAL(devs)[i];
@@ -684,10 +681,10 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
 	internal_mer_coefGets(GS->mer, varc, 2);
 
     F77_CALL(dgemv)("N", &(GS->n), &(GS->p), &one,
-		    REAL(GS->x), &(GS->n), fixed,
-		    &ione, &zero, REAL(GS->off), &ione);
-    vecIncrement(REAL(GS->off), REAL(GS->offset), GS->n);
-    Memcpy(REAL(GS->eta), REAL(GS->off), GS->n);
+		    GS->x, &(GS->n), fixed,
+		    &ione, &zero, GS->off, &ione);
+    vecIncrement(GS->off, REAL(GS->offset), GS->n);
+    Memcpy(REAL(GS->eta), (GS->off), GS->n);
     Memcpy(etaold, REAL(GS->eta), GS->n);
 
     for (i = 0, crit = GS->tol + 1;
@@ -695,7 +692,7 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
 	reweight_update(GS);
 	AZERO(fitted, GS->n);
 /*      internal_mer_fitted(GS->mer, 0, 1, fitted); */
-	vecSum(REAL(GS->eta), REAL(GS->off), fitted, GS->n);
+	vecSum(REAL(GS->eta), (GS->off), fitted, GS->n);
 	crit = conv_crit(etaold, REAL(GS->eta), GS->n);
     }
     Free(etaold); Free(fitted);
@@ -918,7 +915,7 @@ rel_dev_1(GlmerStruct GS, SEXP b, int nlev, int nc, int k,
 	}
 	for (i = 0; i < nlev; i++) devcmp[i] = -sumsq;
     }
-    Memcpy(REAL(GS->eta), REAL(GS->off), GS->n);
+    Memcpy(REAL(GS->eta), GS->off, GS->n);
 /*     fitted_ranef(flist, GS->unwtd, b, &nc, REAL(GS->eta)); */
     eval_check_store(GS->linkinv, GS->rho, GS->mu);
     devs = PROTECT(eval_check(GS->dev_resids, GS->rho, REALSXP, GS->n));
@@ -1013,7 +1010,7 @@ random_effects_deviance(GlmerStruct GS, SEXP b)
     int i;
     double ans;
 
-    Memcpy(REAL(GS->eta), REAL(GS->off), GS->n);
+    Memcpy(REAL(GS->eta), GS->off, GS->n);
 /*     fitted_ranef(GET_SLOT(GS->mer, Matrix_flistSym), GS->unwtd, b, */
 /* 		 INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)), REAL(GS->eta)); */
     eval_check_store(GS->linkinv, GS->rho, GS->mu);
@@ -1162,20 +1159,20 @@ internal_glmer_fixef_update(GlmerStruct GS, SEXP b,
     lwork = (int) tmp;
     work = Calloc(lwork, double);
 				
-    AZERO(REAL(GS->off), GS->n); /* fitted values from random effects */
+    AZERO(GS->off, GS->n); /* fitted values from random effects */
 /*     fitted_ranef(GET_SLOT(GS->mer, Matrix_flistSym), GS->unwtd, b, */
-/* 		 INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)), REAL(GS->off)); */
+/* 		 INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)), GS->off); */
     for (i = 0; i < GS->n; i++)
-	etaold[i] = (REAL(GS->off)[i] += REAL(GS->offset)[i]);
+	etaold[i] = ((GS->off)[i] += REAL(GS->offset)[i]);
     
     for (it = 0, crit = GS->tol + 1;
 	 it < GS->maxiter && crit > GS->tol; it++) {
 				/* fitted values from current beta */
 	F77_CALL(dgemv)("N", &(GS->n), &(GS->p), &one,
-			REAL(GS->x), &(GS->n), md,
+			GS->x, &(GS->n), md,
 			&ione, &zero, REAL(GS->eta), &ione);
 				/* add in random effects and offset */
-	vecIncrement(REAL(GS->eta), REAL(GS->off), GS->n);
+	vecIncrement(REAL(GS->eta), (GS->off), GS->n);
 				/* check for convergence */
 	crit = conv_crit(etaold, REAL(GS->eta), GS->n);
 				/* obtain mu, dmu_deta, var */
@@ -1187,15 +1184,15 @@ internal_glmer_fixef_update(GlmerStruct GS, SEXP b,
 	for (i = 0; i < GS->n; i++) {
 	    w[i] = REAL(GS->wts)[i] *
 		REAL(dmu_deta)[i]/sqrt(REAL(var)[i]);
-	    z[i] = w[i] * (REAL(GS->eta)[i] - REAL(GS->off)[i] +
-			   (REAL(GS->y)[i] - REAL(GS->mu)[i]) /
+	    z[i] = w[i] * (REAL(GS->eta)[i] - (GS->off)[i] +
+			   ((GS->y)[i] - REAL(GS->mu)[i]) /
 			   REAL(dmu_deta)[i]);
 	}
 	UNPROTECT(2);
 				/* weighted copy of the model matrix */
 	for (j = 0; j < GS->p; j++)
 	    for (i = 0; i < GS->n; i++)
-		wtd[i + j * GS->n] = REAL(GS->x)[i + j * GS->n] * w[i];
+		wtd[i + j * GS->n] = GS->x[i + j * GS->n] * w[i];
 				/* weighted least squares solution */
 	F77_CALL(dgels)("N", &(GS->n), &(GS->p), &ione, wtd, &(GS->n),
 			z, &(GS->n), work, &lwork, &j);
@@ -1350,7 +1347,7 @@ SEXP glmer_PQL(SEXP GSp)
 	internal_ECMEsteps(GS->mer, i ? 2 : GS->niterEM,
 			   GS->EMverbose);
 	eval(GS->LMEopt, GS->rho);
-	vecSum(REAL(GS->eta), REAL(GS->off), 
+	vecSum(REAL(GS->eta), (GS->off), 
 	       internal_mer_fitted(GS->mer, TRUE, TRUE, fitted),
 	       GS->n);
 	crit = conv_crit(etaold, REAL(GS->eta), GS->n);
@@ -1476,6 +1473,7 @@ SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
 SEXP glmer_finalize(SEXP GSp) {
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
     
+    Free(GS->x); Free(GS->y); Free(GS->Zt); Free(GS->off);
     Free(GS);
     return R_NilValue;
 }
@@ -1516,7 +1514,7 @@ SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed)
  */
 SEXP glmer_init(SEXP rho) {
     GlmerStruct GS;
-    SEXP devc;
+    SEXP y, Ztx;
     
     
     GS = (GlmerStruct) Calloc(1, glmer_struct);
@@ -1524,20 +1522,17 @@ SEXP glmer_init(SEXP rho) {
 	error(_("`rho' must be an environment"));
     GS->rho = rho;
     GS->mer = find_and_check(rho, install("mer"), VECSXP, 0);
-    defineVar(install("Xcp"),
-	      GS->x = duplicate(GET_SLOT(GS->mer, Matrix_XSym)), rho);
-    defineVar(install("Ztcp"),
-	      GS->Zt = duplicate(GET_SLOT(GS->mer, Matrix_ZtSym)), rho);
-    defineVar(install("ycp"),
-	      GS->y = duplicate(GET_SLOT(GS->mer, Matrix_ySym)), rho);
+    y = GET_SLOT(GS->mer, Matrix_ySym);
+    GS->n = LENGTH(y);
+    GS->p = LENGTH(GET_SLOT(GS->mer, Matrix_rXySym));
+    GS->x = Memcpy(Calloc(GS->n * GS->p, double),
+		   REAL(GET_SLOT(GS->mer, Matrix_XSym)), GS->n * GS->p);
+    GS->y = Memcpy(Calloc(GS->n, double), REAL(y), GS->n);
+    Ztx = GET_SLOT(GET_SLOT(GS->mer, Matrix_ZtSym), Matrix_xSym);
+    GS->Zt = Memcpy(Calloc(LENGTH(Ztx), double), REAL(Ztx), LENGTH(Ztx));
     GS->mu = find_and_check(rho, install("mu"), REALSXP, GS->n);
-    GS->offset = find_and_check(rho, install("offset"),
-				REALSXP, GS->n);
-    
-    defineVar(install("off"), GS->off = duplicate(GS->y), rho);
-    devc = GET_SLOT(GS->mer, Matrix_devCompSym);
-    GS->n = (int)REAL(devc)[0]; GS->p = (int)REAL(devc)[1];
-
+    GS->offset = find_and_check(rho, install("offset"), REALSXP, GS->n);
+    GS->off = Calloc(GS->n, double);
     GS->cv = find_and_check(rho, install("cv"), VECSXP, 0);
     GS->niterEM = asInteger(Matrix_getElement(GS->cv, "niterEM"));
     GS->EMverbose = asLogical(Matrix_getElement(GS->cv, "EMverbose"));
