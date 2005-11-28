@@ -79,6 +79,19 @@ SEXP Csparse_dense_prod(SEXP a, SEXP b)
     return chm_dense_to_SEXP(chc, 1);
 }
 
+SEXP Csparse_dense_crossprod(SEXP a, SEXP b)
+{
+    cholmod_sparse *cha = as_cholmod_sparse(a);
+    cholmod_dense *chb = as_cholmod_dense(b);
+    cholmod_dense *chc = cholmod_allocate_dense(cha->ncol, chb->ncol,
+						cha->ncol, chb->xtype, &c);
+    double alpha = 1, beta = 0;
+
+    cholmod_sdmult(cha, 1, &alpha, &beta, chb, chc, &c);
+    Free(cha); Free(chb);
+    return chm_dense_to_SEXP(chc, 1);
+}
+
 SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet)
 {
     int trip = asLogical(triplet),
