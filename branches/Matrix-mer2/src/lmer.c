@@ -275,13 +275,12 @@ typedef struct glmer_struct
 static double*
 internal_mer_fitted(SEXP x, int useFixed, int useRand, double val[])
 {
-    double *dcmp = REAL(GET_SLOT(x, Matrix_devCompSym));
-    int n = (int) dcmp[0];
+    int n = LENGTH(GET_SLOT(x, Matrix_ySym));
 
     mer_secondary(x);
 
     if (useFixed) {
-	int ione = 1, p = (int) dcmp[1];
+	int ione = 1, p = LENGTH(GET_SLOT(x, Matrix_rXySym));
 	double one = 1.0, zero = 0.;
 
 	F77_CALL(dgemv)("N", &n, &p, &one,
@@ -305,6 +304,51 @@ internal_mer_fitted(SEXP x, int useFixed, int useRand, double val[])
     return val;
 }
 
+/** 
+ * Calculate the fitted values for an mer object from unweighted
+ * versions of the model matrices
+ * 
+ * @param x pointer to an mer object
+ * @param X  indicating if the fixed
+ * effects should be used
+ * @param useRand logical scalar indicating if the random
+ * effects should be used
+ * @param val array to hold the fitted values
+ * 
+ * @return pointer to a numeric array of fitted values
+ */
+static double *
+internal_unwtd_mer_fitted(SEXP x, double X[], double Ztx[], double val[])
+{
+    int n = LENGTH(GET_SLOT(x, Matrix_ySym));
+
+    mer_secondary(x);
+    if (X) {
+	int ione = 1, p = LENGTH(GET_SLOT(x, Matrix_rXySym));
+	double one = 1.0, zero = 0.;
+
+	F77_CALL(dgemv)("N", &n, &p, &one, X, &n,
+			REAL(GET_SLOT(x, Matrix_fixefSym)),
+			&ione, &zero, val, &ione);
+    } else AZERO(val, n);
+    if (Ztx) {
+	SEXP ranef = GET_SLOT(x, Matrix_ranefSym);
+	int q = LENGTH(ranef);
+	double one[] = {1,0};
+	cholmod_sparse *Zt = as_cholmod_sparse(GET_SLOT(x, Matrix_ZtSym));
+	cholmod_dense *chv = numeric_as_chm_dense(val, n),
+	    *chb = numeric_as_chm_dense(REAL(ranef),q);
+	cholmod_sparse *Ztcp = cholmod_copy_sparse(Zt, &c);
+
+	free(Zt);
+	if (Ztx != (double *)(Zt->x)) Memcpy((double *)(Ztcp->x), Ztx, n);
+	if (!cholmod_sdmult(Ztcp, 1, one, one, chb, chv, &c))
+	    error(_("Error return from sdmult"));
+	Free(chv); Free(chb); cholmod_free_sparse(&Ztcp, &c);
+    }
+    return val;
+}
+    
 /** 
  * Extract the coefficients
  * 
@@ -798,6 +842,8 @@ internal_ECMEsteps(SEXP x, int nEM, int verb)
 	*cc = EM_grad_lc(Calloc(4, double), 1, REML, nc + nf),
 	zero = 0.0;
 
+/* FIXME: This is currently a stub. */
+    return;
     mer_gradComp(x);
     if (verb)
 	EMsteps_verbose_print(x, 0, REML);
@@ -1339,7 +1385,6 @@ SEXP glmer_PQL(SEXP GSp)
 			    REAL(GS->eta), GS->n),
 	*fitted = Calloc(GS->n, double), crit;
 
-    return R_NilValue;
     for (i = 0, crit = GS->tol + 1;
 	 i < GS->maxiter && crit > GS->tol; i++) {
 	reweight_update(GS);
@@ -1348,7 +1393,7 @@ SEXP glmer_PQL(SEXP GSp)
 			   GS->EMverbose);
 	eval(GS->LMEopt, GS->rho);
 	vecSum(REAL(GS->eta), (GS->off), 
-	       internal_mer_fitted(GS->mer, TRUE, TRUE, fitted),
+	       internal_unwtd_mer_fitted(GS->mer, GS->x, GS->Zt, fitted),
 	       GS->n);
 	crit = conv_crit(etaold, REAL(GS->eta), GS->n);
     }
@@ -2222,7 +2267,7 @@ SEXP mer_factor(SEXP x)
 
 SEXP mer_fitted(SEXP x, SEXP useFe, SEXP useRe)
 {
-    int n = LENGTH(VECTOR_ELT(GET_SLOT(x, Matrix_flistSym), 0));
+    int n = LENGTH(GET_SLOT(x, Matrix_ySym));
     SEXP ans = PROTECT(allocVector(REALSXP, n));
 
     internal_mer_fitted(x, asLogical(useFe), asLogical(useRe), REAL(ans));
@@ -2566,7 +2611,7 @@ SEXP mer_secondary(SEXP x)
 	SEXP rXy = GET_SLOT(x, Matrix_rXySym),
 	    RZXP = GET_SLOT(x, Matrix_RZXSym),
 	    ranef = GET_SLOT(x, Matrix_ranefSym);
-	int i, ione = 1, p = LENGTH(rXy), q = LENGTH(ranef);
+	int ione = 1, p = LENGTH(rXy), q = LENGTH(ranef);
 	cholmod_factor *L =
 	    (cholmod_factor *) R_ExternalPtrAddr(GET_SLOT(x, Matrix_LSym));
 	cholmod_dense *td1, *td2,
