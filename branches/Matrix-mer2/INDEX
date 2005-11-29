@@ -60,7 +60,6 @@ ranef                   Extract Random Effects
 rcond                   Estimate the Reciprocal Condition Number
 readHB                  Read and write external matrix formats
 Schur                   Schur Decomposition of a Matrix
-simulate                Simulate responses from a fitted model
 sleepstudy              Reaction times in a sleep deprivation study
 sparseMatrix-class      Virtual Class "sparseMatrix" -- Mother of
                         Sparse Matrices
