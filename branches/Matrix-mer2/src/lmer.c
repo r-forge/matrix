@@ -259,7 +259,7 @@ typedef struct glmer_struct
     double tol;      /* convergence tolerance for IRLS iterations */
 } glmer_struct, *GlmerStruct;
 
-
+#if 0
 /** 
  * Calculate the fitted values for an mer object.
  * 
@@ -303,22 +303,21 @@ internal_mer_fitted(SEXP x, int useFixed, int useRand, double val[])
     }
     return val;
 }
+#endif
 
 /** 
- * Calculate the fitted values for an mer object from unweighted
- * versions of the model matrices
+ * Calculate the fitted values for an mer object using the (possibly
+ * externally stored) contents of the model matrices.
  * 
  * @param x pointer to an mer object
- * @param X  indicating if the fixed
- * effects should be used
- * @param useRand logical scalar indicating if the random
- * effects should be used
+ * @param X contents of the X model matrix or (double *) NULL
+ * @param Zt values of non-zeros in the Zt model matrix or (double *) NULL
  * @param val array to hold the fitted values
  * 
  * @return pointer to a numeric array of fitted values
  */
 static double *
-internal_unwtd_mer_fitted(SEXP x, double X[], double Ztx[], double val[])
+internal_mer_fitted(SEXP x, double X[], double Ztx[], double val[])
 {
     int n = LENGTH(GET_SLOT(x, Matrix_ySym));
 
@@ -735,7 +734,7 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
 	 i < GS->maxiter && crit > GS->tol; i++) {
 	reweight_update(GS);
 	AZERO(fitted, GS->n);
-/*      internal_mer_fitted(GS->mer, 0, 1, fitted); */
+	internal_mer_fitted(GS->mer, (double *) NULL, GS->Zt, fitted);
 	vecSum(REAL(GS->eta), (GS->off), fitted, GS->n);
 	crit = conv_crit(etaold, REAL(GS->eta), GS->n);
     }
@@ -1393,7 +1392,7 @@ SEXP glmer_PQL(SEXP GSp)
 			   GS->EMverbose);
 	eval(GS->LMEopt, GS->rho);
 	vecSum(REAL(GS->eta), (GS->off), 
-	       internal_unwtd_mer_fitted(GS->mer, GS->x, GS->Zt, fitted),
+	       internal_mer_fitted(GS->mer, GS->x, GS->Zt, fitted),
 	       GS->n);
 	crit = conv_crit(etaold, REAL(GS->eta), GS->n);
     }
@@ -2270,7 +2269,14 @@ SEXP mer_fitted(SEXP x, SEXP useFe, SEXP useRe)
     int n = LENGTH(GET_SLOT(x, Matrix_ySym));
     SEXP ans = PROTECT(allocVector(REALSXP, n));
 
-    internal_mer_fitted(x, asLogical(useFe), asLogical(useRe), REAL(ans));
+    internal_mer_fitted(x,
+			(asLogical(useFe)
+			 ? REAL(GET_SLOT(x, Matrix_XSym))
+			 : (double *) NULL),
+			(asLogical(useRe)
+			 ? REAL(GET_SLOT(GET_SLOT(x, Matrix_ZtSym), Matrix_xSym))
+			 : (double *) NULL),
+			REAL(ans));
     UNPROTECT(1);
     return ans;
 }
