@@ -182,11 +182,9 @@ setMethod("lmer", signature(formula = "formula"),
       {
           ## match and check parameters
           if (length(formula) < 3) stop("formula must be a two-sided formula")
-          ## cv <- do.call("Matrix:::lmerControl", control)
-          cv <- control
+          cv <- do.call("lmerControl", control)
           cv$analyticGradient <- FALSE
           cv$msMaxIter <- as.integer(200)
-          if (is.null(cv$msVerbose)) cv$msVerbose <- as.integer(1)
 
           ## Must evaluate the model frame first and then fit the glm using
           ## that frame.  Otherwise missing values in the grouping factors
@@ -667,7 +665,7 @@ setMethod("confint", signature(object = "mer"),
 
 setMethod("fitted", signature(object = "mer"),
           function(object, ...)
-          stop("not yet implemented")
+          .Call("mer_fitted", object, TRUE, TRUE, PACKAGE = "Matrix")
           )
 
 setMethod("formula", signature(x = "mer"),
