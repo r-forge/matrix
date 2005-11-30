@@ -276,25 +276,24 @@ setMethod("lmer", signature(formula = "formula"),
           wtssqr <- wts * wts
           offset <- glm.fit$offset
           if (is.null(offset)) offset <- numeric(length(eta))
-          mu <- numeric(length(eta))
-
-          dev.resids <- quote(family$dev.resids(y, mu, wtssqr))
           linkinv <- quote(family$linkinv(eta))
           mu.eta <- quote(family$mu.eta(eta))
           variance <- quote(family$variance(mu))
+          mu <- eval(linkinv)
+
+          dev.resids <- quote(family$dev.resids(y, mu, wtssqr))
           LMEopt <- get("LMEoptimize<-")
           doLMEopt <- quote(LMEopt(x = mer, value = cv))
 
           GSpt <- .Call("glmer_init", environment(), PACKAGE = "Matrix")
           .Call("glmer_PQL", GSpt, PACKAGE = "Matrix")  # obtain PQL estimates
-          .Call("glmer_finalize", GSpt, PACKAGE = "Matrix")
           return(mer)
           fixInd <- seq(ncol(x))
           ## pars[fixInd] == beta, pars[-fixInd] == theta
           PQLpars <- c(fixef(mer),
-                       .Call("lmer_coef", mer, 2, PACKAGE = "Matrix"))
-          ## set flag to skip fixed-effects in subsequent calls
-          mer@nc[length(mmats)] <- -mer@nc[length(mmats)]
+                       .Call("mer_coef", mer, 2, PACKAGE = "Matrix"))
+          .Call("glmer_devAGQ", PQLpars, GSpt, 1, PACKAGE = "Matrix")
+          .Call("glmer_finalize", GSpt, PACKAGE = "Matrix")
           ## indicator of constrained parameters
           const <- c(rep(FALSE, length(fixInd)),
                      unlist(lapply(mer@nc[seq(along = random)],
