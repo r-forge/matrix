@@ -287,13 +287,13 @@ setMethod("lmer", signature(formula = "formula"),
 
           GSpt <- .Call("glmer_init", environment(), PACKAGE = "Matrix")
           .Call("glmer_PQL", GSpt, PACKAGE = "Matrix")  # obtain PQL estimates
-          return(mer)
           fixInd <- seq(ncol(x))
           ## pars[fixInd] == beta, pars[-fixInd] == theta
           PQLpars <- c(fixef(mer),
                        .Call("mer_coef", mer, 2, PACKAGE = "Matrix"))
           .Call("glmer_devAGQ", PQLpars, GSpt, 1, PACKAGE = "Matrix")
           .Call("glmer_finalize", GSpt, PACKAGE = "Matrix")
+          return(mer)
           ## indicator of constrained parameters
           const <- c(rep(FALSE, length(fixInd)),
                      unlist(lapply(mer@nc[seq(along = random)],
@@ -401,12 +401,9 @@ setReplaceMethod("LMEoptimize", signature(x="mer", value="list"),
              })
 
 setMethod("deviance", signature(object = "mer"),
-          function(object, REML = NULL, ...) {
-              .Call("mer_factor", object, PACKAGE = "Matrix")
-              if (is.null(REML))
-                  REML <- object@method == "REML"
-              object@deviance[[ifelse(REML, "REML", "ML")]]
-          })
+          function(object, ...)
+              object@deviance[[ifelse(object@method == "REML", "REML", "ML")]]
+          )
 
 setMethod("mcmcsamp", signature(object = "mer"),
           function(object, n = 1, verbose = FALSE, saveb = FALSE,
