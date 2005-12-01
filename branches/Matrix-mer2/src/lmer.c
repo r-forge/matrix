@@ -2296,6 +2296,7 @@ SEXP mer_fixef(SEXP x)
     UNPROTECT(1);
     return ans;
 }
+
 /**
  * Fill in the gradComp and bVar slots.  Each component in the gradComp slot
  * consists of four symmetric matrices used to generate the gradient or the ECME
@@ -2337,15 +2338,13 @@ SEXP mer_gradComp(SEXP x)
 				  Matrix_xSym)), &p,
 		    (double *)(tmp1->x), &q);
     for (i = 0; i < nf; i++) {
-	SEXP bVPi = VECTOR_ELT(bVarP, i);
 	int nci = nc[i], RZXrows = Gp[i + 1] - Gp[i];
-	cholmod_sparse
+	cholmod_sparse *tsm1,
 	    *sm = cholmod_allocate_sparse(q, nci, nci, TRUE, TRUE, 0,
-					  CHOLMOD_REAL, &c),
-	    *tsm1, *tsm2, *tsm3;
+					  CHOLMOD_REAL, &c);
 	int *si = (int*)(sm->i), *sp = (int*)(sm->p),
 	    ncisq = nci * nci, nlev = RZXrows/nci;
-	double *bVi = REAL(bVPi),
+	double *bVi = REAL(VECTOR_ELT(bVarP, i)),
 	    *bi = b + Gp[i], *mm = REAL(VECTOR_ELT(gradComp, i)),
 	    *sx = (double*)(sm->x),
 	    *tmp = Memcpy(Calloc(ncisq, double),
@@ -2355,6 +2354,7 @@ SEXP mer_gradComp(SEXP x)
 	    dlev = (double) nlev,
 	    one[] = {1,0}, zero[] = {0,0};
 
+	AZERO(bVi, nci * RZXrows);
 	for (j = 0; j < nci; j++) {
 	    sp[j] = j;
 	    sx[j] = 1;
@@ -2371,11 +2371,9 @@ SEXP mer_gradComp(SEXP x)
 		int ione = 1;
 		bVi[k] = F77_CALL(ddot)(&nnz, xp, &ione, xp, &ione);
 	    } else {
-		/* FIXME: Create a cholmod_ata that uses dsyrk and an array to hold the i indices. */
-		tsm2 = cholmod_transpose(tsm1, 1, &c);
-		tsm3 = cholmod_aat(tsm2, (int*) NULL, 0, 1, &c);
-		/* Now copy the contents to bVi */
+		cholmod_ata(tsm1, bVi + k * ncisq, "U", 1.0, 0.0);
 	    }
+	    cholmod_free_sparse(&tsm1, &c);
 	}
  	if (nci == 1) {
 	    int ione = 1;
@@ -2410,8 +2408,10 @@ SEXP mer_gradComp(SEXP x)
 				one, mm, &nci);
 	    }
 	}
-	Free(tmp);
+	Free(tmp); cholmod_free_sparse(&sm, &c);
     }
+    Free(iperm);
+    cholmod_free_dense(&tmp1, &c);
     return R_NilValue;
 }
 
