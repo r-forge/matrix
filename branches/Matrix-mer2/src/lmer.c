@@ -131,14 +131,15 @@ SEXP alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms)
 
 static double *
 cholmod_ata(cholmod_sparse *A, double val[], const char uplo[],
-	    double alpha, double beta);
+	    double alpha, double beta)
 {
     int nnz = cholmod_nnz(A, &c);
     int *ai = (int*)(A->i), *ap = (int*)(A->p),
 	*ind = Calloc(nnz, int), i, j, k, nr;
     double *ax = (double*)(A->x),
-	*tmp = AZERO(Calloc(nnz * A->ncol, double), nnz * A->ncol);
+	*tmp = Calloc(nnz * A->ncol, double);
 
+    AZERO(tmp, A->ncol * nnz);
     nr = ap[1];
     Memcpy(ind, ai, nr);
     Memcpy(tmp, ax, nr);
@@ -159,8 +160,8 @@ cholmod_ata(cholmod_sparse *A, double val[], const char uplo[],
 	    }
 	}
     }
-    F77_CALL(dsyrk)(uplo, "T", &(A->ncol), &nr, &alpha, tmp, &nnz,
-		    &beta, val, &(A->ncol));
+    F77_CALL(dsyrk)(uplo, "T", (int*)&(A->ncol), &nr, &alpha, tmp, &nnz,
+		    &beta, val, (int*)&(A->ncol));
     Free(ind); Free(tmp);
     return val;
 }
