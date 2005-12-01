@@ -129,6 +129,42 @@ SEXP alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms)
 
 /* Internally used utilities */
 
+static double *
+cholmod_ata(cholmod_sparse *A, double val[], const char uplo[],
+	    double alpha, double beta);
+{
+    int nnz = cholmod_nnz(A, &c);
+    int *ai = (int*)(A->i), *ap = (int*)(A->p),
+	*ind = Calloc(nnz, int), i, j, k, nr;
+    double *ax = (double*)(A->x),
+	*tmp = AZERO(Calloc(nnz * A->ncol, double), nnz * A->ncol);
+
+    nr = ap[1];
+    Memcpy(ind, ai, nr);
+    Memcpy(tmp, ax, nr);
+    for (j = 1; j < A->ncol; j++) {
+	for (i = ap[j]; i < ap[j + 1]; i++) {
+	    int ii = ai[i];
+	    for (k = 0; k < nr; k++) {
+		if (ii == ind[k]) {
+		    tmp[k + j * nnz] = ax[i];
+		    ii = -1;
+		    break;
+		}
+	    }
+	    if (ii >= 0) {	/* did not find the row index */
+		ind[nr] = ii;
+		tmp[nr + j * nnz] = ax[i];
+		nr++;
+	    }
+	}
+    }
+    F77_CALL(dsyrk)(uplo, "T", &(A->ncol), &nr, &alpha, tmp, &nnz,
+		    &beta, val, &(A->ncol));
+    Free(ind); Free(tmp);
+    return val;
+}
+
 /**
  * Calculate the length of the parameter vector (historically called "coef"
  * even though these are not coefficients).
