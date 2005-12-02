@@ -2497,7 +2497,7 @@ SEXP mer_gradient(SEXP x, SEXP pType)
 	}
 	Free(tmp);
     }
-    UNPROTECT(2);
+    UNPROTECT(1);
     Free(cc);
     return val;
 }

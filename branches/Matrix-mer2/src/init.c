@@ -196,6 +196,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_fitted", (DL_FUNC) &mer_fitted, 3},
     {"mer_fixef", (DL_FUNC) &mer_fixef, 1},
     {"mer_gradComp", (DL_FUNC) &mer_gradComp, 1},
+    {"mer_gradient", (DL_FUNC) &mer_gradient, 2},
     {"mer_initial", (DL_FUNC) &mer_initial, 1},
     {"mer_pMatrix", (DL_FUNC) &mer_pMatrix, 1},
     {"mer_ranef", (DL_FUNC) &mer_ranef, 1},
