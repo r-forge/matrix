@@ -183,7 +183,6 @@ setMethod("lmer", signature(formula = "formula"),
           ## match and check parameters
           if (length(formula) < 3) stop("formula must be a two-sided formula")
           cv <- do.call("lmerControl", control)
-          cv$analyticGradient <- FALSE
           cv$msMaxIter <- as.integer(200)
 
           ## Must evaluate the model frame first and then fit the glm using
@@ -377,16 +376,15 @@ setReplaceMethod("LMEoptimize", signature(x="mer", value="list"),
                  constr <- unlist(lapply(nc, function(k) 1:((k*(k+1))/2) <= k))
                  fn <- function(pars)
                      deviance(.Call("mer_coefGets", x, pars, 2, PACKAGE = "Matrix"))
-                 gr <- NULL  ## No gradient yet
-                 ##                     if (value$analyticGradient)
-                 ##                         function(pars) {
-                 ##                             if (!isTRUE(all.equal(pars,
-                 ##                                                   .Call("lmer_coef", x,
-                 ##                                                         2, PACKAGE = "Matrix"))))
-                 ##                                 .Call("lmer_coefGets", x, pars, 2, PACKAGE = "Matrix")
-                 ##                             .Call("lmer_gradient", x, 2, PACKAGE = "Matrix")
-                 ##                         }
-		 ## else NULL
+                 gr <- if (value$analyticGradient)
+                     function(pars) {
+                         if (!isTRUE(all.equal(pars,
+                                               .Call("mer_coef", x,
+                                                     2, PACKAGE = "Matrix"))))
+                             .Call("mer_coefGets", x, pars, 2, PACKAGE = "Matrix")
+                         .Call("mer_gradient", x, 2, PACKAGE = "Matrix")
+                     }
+                 else NULL
 		 optimRes <- nlminb(.Call("mer_coef", x, 2, PACKAGE = "Matrix"),
                                     fn, gr,
                                     lower = ifelse(constr, 5e-10, -Inf),
