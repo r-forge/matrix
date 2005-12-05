@@ -186,6 +186,7 @@ static R_CallMethodDef CallEntries[] = {
     {"lsq_dense_Chol", (DL_FUNC) &lsq_dense_Chol, 2},
     {"lsq_dense_QR", (DL_FUNC) &lsq_dense_QR, 2},
 
+    {"mer_ECMEsteps", (DL_FUNC) &mer_ECMEsteps, 3},
     {"mer_MCMCsamp", (DL_FUNC) &mer_MCMCsamp, 4},
     {"mer_coef", (DL_FUNC) &mer_coef, 2},
     {"mer_coefGets", (DL_FUNC) &mer_coefGets, 3},
