@@ -731,28 +731,6 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
 }
 
 /**
- * Fill in the 4-dimensional vector of linear combinations of the
- * gradComp array according to whether ECME steps or the gradient are
- * needed and to whether or not REML is being used.
- *
- * @param cc coefficient vector to be filled in
- * @param EM non-zero for ECME steps, zero for gradient
- * @param REML non-zero for REML, zero for ML
- * @param ns ns[0] is p+1, ns[1] is n
- *
- * @return cc with the coefficients filled in
- */
-static R_INLINE
-double *EM_grad_lc(double *cc, int EM, int REML, int ns[])
-{
-    cc[0] = EM ? 0. : -1.;
-    cc[1] = (double)(ns[1] - (REML ? ns[0] - 1 : 0));
-    cc[2] = 1.;
-    cc[3] = REML ? 1. : 0.;
-    return cc;
-}
-
-/**
  * Print the verbose output in the ECME iterations
  *
  * @param x pointer to an ssclme object
@@ -765,9 +743,10 @@ EMsteps_verbose_print(SEXP x, int iter, int REML)
     SEXP Omega = GET_SLOT(x, Matrix_OmegaSym),
 	gradComp = GET_SLOT(x, Matrix_gradCompSym);
     int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
-	i, ifour = 4, ii, ione = 1, jj, nf = LENGTH(Omega);
+	i, ifour = 4, ii, ione = 1, jj,
+	nf = LENGTH(Omega);
     double
-	*cc = EM_grad_lc(Calloc(4, double), 0, REML, nc + nf),
+	cc[] = {0, 1, 1, REML ? 1 : 0},
 	*dev = REAL(GET_SLOT(x, Matrix_devianceSym)),
 	one = 1., zero = 0.;
 
@@ -804,7 +783,6 @@ EMsteps_verbose_print(SEXP x, int iter, int REML)
 	Free(Grad);
     }
     Rprintf("\n");
-    Free(cc);
 }
 
 /** 
@@ -818,47 +796,45 @@ static void
 internal_ECMEsteps(SEXP x, int nEM, int verb)
 {
     SEXP Omega = GET_SLOT(x, Matrix_OmegaSym),
-	flist = GET_SLOT(x, Matrix_flistSym),
 	gradComp = GET_SLOT(x, Matrix_gradCompSym);
-    int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+    int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	REML = !strcmp(CHAR(asChar(GET_SLOT(x, Matrix_methodSym))),
 		       "REML"),
 	i, ifour = 4, info, ione = 1, iter,
 	nf = LENGTH(Omega);
     double
-	*cc = EM_grad_lc(Calloc(4, double), 1, REML, nc + nf),
+	cc[] = {0, 1, 1, REML ? 1 : 0},
 	zero = 0.0;
 
-/* FIXME: This is currently a stub. */
-    return;
     mer_gradComp(x);
     if (verb)
 	EMsteps_verbose_print(x, 0, REML);
     for (iter = 0; iter < nEM; iter++) {
 	for (i = 0; i < nf; i++) {
-	    int nci = nc[i], ncisqr = nci * nci;
-	    double *Omgi = REAL(VECTOR_ELT(Omega, i)),
-		mult = 1./
-		((double) length(getAttrib(VECTOR_ELT(flist, i),
-				 R_LevelsSymbol)));
+	    SEXP Omgi = VECTOR_ELT(Omega, i);
+	    int nci = nc[i], ncisqr = nci * nci,
+		nlev = (Gp[i + 1] - Gp[i])/nci;
+	    double *Omgx = REAL(GET_SLOT(Omgi, Matrix_xSym)),
+		mult = 1./((double) nlev);
 
 	    F77_CALL(dgemm)("N", "N", &ncisqr, &ione, &ifour, &mult,
 			    REAL(VECTOR_ELT(gradComp, i)), &ncisqr,
-			    cc, &ifour, &zero, Omgi, &ncisqr);
-	    F77_CALL(dpotrf)("U", &nci, Omgi, &nci, &info);
+			    cc, &ifour, &zero, Omgx, &ncisqr);
+	    F77_CALL(dpotrf)("U", &nci, Omgx, &nci, &info);
 	    if (info)
 		error(_("DPOTRF in ECME update gave code %d"),
 		      info);
-	    F77_CALL(dpotri)("U", &nci, Omgi, &nci, &info);
+	    F77_CALL(dpotri)("U", &nci, Omgx, &nci, &info);
 	    if (info)
 		error(_("Matrix inverse in ECME update gave code %d"), info);
+	    SET_SLOT(Omgi, Matrix_factorSym, allocVector(VECSXP, 0));
+	    mer_factor(x);
+	    mer_gradComp(x);
 	}
-	mer_gradComp(x);
 	if (verb)
 	    EMsteps_verbose_print(x, iter + 1, REML);
     }
-    mer_factor(x);
-    Free(cc);
     UNPROTECT(1);
 }
 
@@ -1668,13 +1644,13 @@ SEXP mer_Hessian(SEXP x)
 	D = GET_SLOT(x, Matrix_DSym),
 	Omega = GET_SLOT(x, Matrix_OmegaSym),
 	RZXP = GET_SLOT(x, Matrix_RZXSym),
+	gradComp = GET_SLOT(x, Matrix_gradCompSym),
 	val;
     int *dRZX = INTEGER(getAttrib(RZXP, R_DimSymbol)),
 	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	*Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
 	Q, Qsqr, RZXpos, facepos,
 	i, ione = 1, j, nf = length(Omega), p = dRZX[1] - 1, pos;
-    SEXP gradComp = mer_gradComp(x);
     double
 	*RZX = REAL(RZXP),
 	*b = REAL(RZXP) + dRZX[0] * p,
@@ -1682,6 +1658,7 @@ SEXP mer_Hessian(SEXP x)
 	one = 1.,
 	zero = 0.;
 
+    mer_gradComp(x);
     Q = 0;			/* number of rows and columns in the result */
     for (i = 0; i < nf; i++) Q += nc[i] * nc[i];
     Qsqr = Q * Q;
@@ -2327,11 +2304,14 @@ SEXP mer_gradComp(SEXP x)
 	*iperm = Calloc(q, int),
 	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	i, j, k, nf = length(OmegaP);
-    double *b = REAL(GET_SLOT(x, Matrix_ranefSym)), m1[] = {-1, 0};
-
+    double *b = REAL(GET_SLOT(x, Matrix_ranefSym)), m1[] = {-1, 0}, alpha;
+    
+    alpha = 1./internal_mer_sigma(x, -1);
+    alpha = alpha * alpha;
     for (j = 0; j < q; j++) iperm[Perm[j]] = j;
     mer_secondary(x);
     /* FIXME: Store this array (and perhaps calculate it as part of mer_secondary) */
+    /* FIXME: This array does not have the permutations accounted for properly */
     tmp1 = cholmod_solve(CHOLMOD_Lt, L, RZX, &c); free(RZX);
     F77_CALL(dtrsm)("R", "U", "N", "N", &q, &p, m1,
 		    REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym),
@@ -2362,13 +2342,13 @@ SEXP mer_gradComp(SEXP x)
 	sp[nci] = nci;
 	
 	for (k = 0; k < nlev; k++) {
-	    int rk0 = Gp[i] + k * nci, nnz;
+	    int rk0 = Gp[i] + k * nci;
+
 	    for (j = 0; j < nci; j++) si[j] = iperm[rk0 + j];
-	    tsm1 = cholmod_spsolve(CHOLMOD_Lt, L, sm, &c);
-	    nnz = cholmod_nnz(tsm1, &c);
+	    tsm1 = cholmod_spsolve(CHOLMOD_L, L, sm, &c);
 	    if (nci == 1) {
 		double *xp = (double*)(tsm1->x);
-		int ione = 1;
+		int ione = 1, nnz = cholmod_nnz(tsm1, &c);
 		bVi[k] = F77_CALL(ddot)(&nnz, xp, &ione, xp, &ione);
 	    } else {
 		cholmod_ata(tsm1, bVi + k * ncisq, "U", 1.0, 0.0);
@@ -2378,7 +2358,7 @@ SEXP mer_gradComp(SEXP x)
  	if (nci == 1) {
 	    int ione = 1;
  	    mm[0] = ((double) nlev)/(tmp[0] * tmp[0]);
- 	    mm[1] = F77_CALL(ddot)(&nlev, bi, &ione, bi, &ione);
+ 	    mm[1] = alpha * F77_CALL(ddot)(&nlev, bi, &ione, bi, &ione);
 	    mm[2] = 0.;
 	    for (k = 0; k < nlev; k++) mm[2] += bVi[k];
 	    mm[3] = 0.;
@@ -2394,7 +2374,7 @@ SEXP mer_gradComp(SEXP x)
 	    F77_CALL(dsyrk)("U", "N", &nci, &nci, &dlev, tmp, &nci,
 			    zero, mm, &nci);
 	    mm += ncisq;	/* \bB_i term */
-	    F77_CALL(dsyrk)("U", "N", &nci, &nlev, one, bi, &nci,
+	    F77_CALL(dsyrk)("U", "N", &nci, &nlev, &alpha, bi, &nci,
 			    zero, mm, &nci);
 	    mm += ncisq;     /* Sum of diagonal blocks of the inverse
 			       * (Z'Z+Omega)^{-1} */
@@ -2427,47 +2407,42 @@ SEXP mer_gradComp(SEXP x)
 SEXP mer_gradient(SEXP x, SEXP pType)
 {
     SEXP Omega = GET_SLOT(x, Matrix_OmegaSym);
+    SEXP gradComp = GET_SLOT(x, Matrix_gradCompSym);
     int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
-	dind, i, ifour = 4, info, ione = 1, nf = length(Omega),
+	dind, i, ifour = 4, ione = 1, nf = length(Omega),
 	odind, ptyp = asInteger(pType);
-    SEXP
-	gradComp = mer_gradComp(x),
-	val = PROTECT(allocVector(REALSXP, coef_length(nf, nc)));
-    double
-	*cc = EM_grad_lc(Calloc(4, double), 0,
-			 !strcmp(CHAR(asChar(GET_SLOT(x, Matrix_methodSym))),
-				 "REML"), nc + nf),
+    int REML =
+	!strcmp(CHAR(asChar(GET_SLOT(x, Matrix_methodSym))), "REML");
+    SEXP val = PROTECT(allocVector(REALSXP, coef_length(nf, nc)));
+    double cc[] = {-1, 1, 1, REML ? 1 : 0},
 	one = 1.0, zero = 0.0;
 
+    mer_gradComp(x);
     dind = 0;			/* index into val for diagonals */
     for (i = 0; i < nf; i++) {
+	SEXP Omgi = VECTOR_ELT(Omega, i);
 	int nci = nc[i], ncisqr = nci * nci;
-	double
-	    *Omgi = REAL(VECTOR_ELT(Omega, i)),
-	    *tmp = Calloc(ncisqr, double);
+	double *tmp = Calloc(ncisqr, double);
 
 	F77_CALL(dgemm)("N", "N", &ncisqr, &ione, &ifour, &one,
 			REAL(VECTOR_ELT(gradComp, i)), &ncisqr,
 			cc, &ifour, &zero, tmp, &ncisqr);
 	if (nci == 1) {
+	    double omg = *REAL(GET_SLOT(Omgi, Matrix_xSym));
 	    REAL(val)[dind++] =
-		(ptyp?((ptyp == 1)?Omgi[0]: -Omgi[0] * Omgi[0]) : 1) * tmp[0];
+		(ptyp?((ptyp == 1)? omg : -omg * omg) : 1) * tmp[0];
 	} else {
 	    int ii, j, ncip1 = nci + 1;
 
 	    odind = dind + nci; /* index into val for off-diagonals */
 	    if (ptyp) {
-		double *chol = Memcpy(Calloc(ncisqr, double),
-				      REAL(VECTOR_ELT(Omega, i)), ncisqr),
+		double *chol = REAL(GET_SLOT(dpoMatrix_chol(Omgi), Matrix_xSym)),
 		    *tmp2 = Calloc(ncisqr, double);
 
 		/* Overwrite the gradient with respect to positions in
 		 * Omega[[i]] by the gradient with respect to the
 		 * unconstrained parameters.*/
 
-		F77_CALL(dpotrf)("U", &nci, chol, &nci, &info);
-		if (info)
-		    error(_("Omega[[%d]] is not positive definite"), i + 1);
 		/* tmp2 := chol %*% tmp using only upper triangle of tmp */
 		F77_CALL(dsymm)("R", "U", &nci, &nci, &one, tmp, &nci,
 				chol, &nci, &zero, tmp2, &nci);
@@ -2498,7 +2473,6 @@ SEXP mer_gradient(SEXP x, SEXP pType)
 	Free(tmp);
     }
     UNPROTECT(1);
-    Free(cc);
     return val;
 }
 
@@ -2520,8 +2494,8 @@ SEXP mer_initial(SEXP x)
     double *xx = REAL(GET_SLOT(ZtZ, Matrix_xSym));
 
     for (i = 0; i < nf; i++) {
-	double *omgi = REAL(GET_SLOT(VECTOR_ELT(Omg, i),
-				     Matrix_xSym));
+	SEXP Omgi = VECTOR_ELT(Omg, i);
+	double *omgi = REAL(GET_SLOT(Omgi, Matrix_xSym));
 	int bb = Gp[i], j, k, nci = nc[i];
 	int ncip1 = nci + 1, nlev = (Gp[i + 1] - bb)/nci;
 
@@ -2533,7 +2507,8 @@ SEXP mer_initial(SEXP x)
 		omgi[k * ncip1] += xx[p[base + k + 1] - 1];
 	}
 	for (k = 0; k < nci; k++) omgi[k * ncip1] *= 0.375/nlev;
-	dpoMatrix_chol(VECTOR_ELT(Omg, i));
+	SET_SLOT(Omgi, Matrix_factorSym, allocVector(VECSXP, 0));
+	dpoMatrix_chol(Omgi);
     }
     mer_factor(x);
     return R_NilValue;
