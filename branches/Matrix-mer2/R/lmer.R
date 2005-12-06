@@ -183,7 +183,6 @@ setMethod("lmer", signature(formula = "formula"),
           ## match and check parameters
           if (length(formula) < 3) stop("formula must be a two-sided formula")
           cv <- do.call("lmerControl", control)
-          cv$msMaxIter <- as.integer(200)
 
           ## Must evaluate the model frame first and then fit the glm using
           ## that frame.  Otherwise missing values in the grouping factors
@@ -251,7 +250,7 @@ setMethod("lmer", signature(formula = "formula"),
               fl <- fl[ord]
           }
           ## create list of transposed model matrices for random effects
-          Ztl <- lapply(bars, function(x) # model matrices
+          Ztl <- lapply(bars, function(x)
                         t(model.matrix(eval(substitute(~ expr,
                                                        list(expr = x[[2]]))),
                                        frm)))
@@ -264,6 +263,7 @@ setMethod("lmer", signature(formula = "formula"),
                        match.call(), family,
                        PACKAGE = "Matrix")
           if (lmm) {
+              .Call("mer_ECMEsteps", mer, cv$niterEM, cv$EMverbose, PACKAGE = "Matrix")
               LMEoptimize(mer) <- cv
               return(mer)
           }
