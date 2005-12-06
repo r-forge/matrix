@@ -464,7 +464,9 @@ setClass("mer",
                         ranef = "numeric",
                         RZXinv = "dgeMatrix",
                         bVar = "list",
-                        gradComp = "list"
+                        gradComp = "list",
+                        ## status indicator
+                        status = "logical"
 			)
 	)
 

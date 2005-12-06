@@ -39,6 +39,7 @@ SEXP
     Matrix_rZySym,
     Matrix_ranefSym,
     Matrix_rcondSym,
+    Matrix_statusSym,
     Matrix_uploSym,
     Matrix_useScaleSym,
     Matrix_xSym,
