@@ -1629,7 +1629,8 @@ SEXP glmer_ranef_update(SEXP GSp, SEXP fixed, SEXP varc, SEXP b)
  */
 SEXP mer_ECMEsteps(SEXP x, SEXP nsteps, SEXP Verbp)
 {
-    internal_ECMEsteps(x, asInteger(nsteps), asLogical(Verbp));
+    int nstp = asInteger(nsteps);
+    if (nstp > 0) internal_ECMEsteps(x, nstp, asLogical(Verbp));
     return R_NilValue;
 }
 
@@ -2311,10 +2312,11 @@ SEXP mer_gradComp(SEXP x)
 	    RZXP = GET_SLOT(x, Matrix_RZXSym),
 	    gradComp = GET_SLOT(x, Matrix_gradCompSym),
 	    ranefP = GET_SLOT(x, Matrix_ranefSym);
+	int q = LENGTH(ranefP), p = LENGTH(GET_SLOT(x, Matrix_rXySym));
 	cholmod_factor
 	    *L = (cholmod_factor *) R_ExternalPtrAddr(GET_SLOT(x, Matrix_LSym));
+	cholmod_sparse *eye = cholmod_speye(q, q, CHOLMOD_REAL, &c), *Linv;
 	cholmod_dense *RZX = as_cholmod_dense(RZXP), *tmp1;
-	int q = LENGTH(ranefP), p = LENGTH(GET_SLOT(x, Matrix_rXySym));
 	int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
 	    *Perm = (int *)(L->Perm),
 	    *iperm = Calloc(q, int),
@@ -2328,13 +2330,21 @@ SEXP mer_gradComp(SEXP x)
 	alpha = alpha * alpha;
 	for (j = 0; j < q; j++) iperm[Perm[j]] = j;
 	mer_secondary(x);
-	/* FIXME: This array does not have the permutations accounted for properly */
 	tmp1 = cholmod_solve(CHOLMOD_Lt, L, RZX, &c); free(RZX);
-	Memcpy(RZXinv, (double *)(tmp1->x), q * p);
+	/* copy columns of tmp1 to RZXinv applying the inverse permutation */
+	for (j = 0; j < p; j++) {
+	    double *dest = RZXinv + j * q, *src = ((double*)(tmp1->x)) + j * q;
+	    for (i = 0; i < q; i++) dest[i] = src[iperm[i]];
+	}
 	cholmod_free_dense(&tmp1, &c);
 	F77_CALL(dtrsm)("R", "U", "N", "N", &q, &p, m1,
 			REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym)),
 			&p, RZXinv, &q);
+	/* apply the inverse permutation to the identity matrix */
+	for (i = 0; i < q; i++) ((int *)(eye->i))[i] = iperm[i];
+	Linv = cholmod_spsolve(CHOLMOD_L, L, eye, &c);
+	cholmod_free_sparse(&eye, &c);
+
 	for (i = 0; i < nf; i++) {
 	    int nci = nc[i], RZXrows = Gp[i + 1] - Gp[i];
 	    cholmod_sparse *tsm1,
@@ -2408,6 +2418,7 @@ SEXP mer_gradComp(SEXP x)
 	    }
 	    Free(tmp); cholmod_free_sparse(&sm, &c);
 	}
+	cholmod_free_sparse(&Linv, &c);
 	Free(iperm);
 	status[2] = 1; status[3] = 0;
     }
