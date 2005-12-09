@@ -7,7 +7,7 @@
 \alias{coerce,CsparseMatrix,denseMatrix-method}
 \alias{crossprod,CsparseMatrix,missing-method}
 \alias{t,CsparseMatrix-method}
-\alias{tcrossprod,CsparseMatrix-method}
+\alias{tcrossprod,CsparseMatrix,missing-method}
 \title{Class "CsparseMatrix" of Sparse Matrices in Column-compressed Form}
 \description{The \code{"CsparseMatrix"} class is the virtual class of
   all sparse matrices coded in sorted compressed column-oriented form.
@@ -35,7 +35,7 @@ Class \code{"Matrix"}, by class \code{"sparseMatrix"}.
   \describe{
     \item{crossprod}{\code{signature(x = "CsparseMatrix", y = "missing")}: ... }
     \item{t}{\code{signature(x = "CsparseMatrix")}: ... }
-    \item{tcrossprod}{\code{signature(x = "CsparseMatrix")}: ... }
+    \item{tcrossprod}{\code{signature(x = "CsparseMatrix", y = "missing")}: ... }
     \item{\%*\%}{\code{signature(x = "CsparseMatrix", y =
 	"CsparseMatrix")}: ...}
     \item{\%*\%}{\code{signature(x = "CsparseMatrix", y = "denseMatrix")}: ...}
