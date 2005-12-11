@@ -131,41 +131,55 @@ SEXP alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms)
 
 #define flag_not_factored(x) *LOGICAL(GET_SLOT(x, Matrix_statusSym)) = 0
 
-static double *
-cholmod_ata(cholmod_sparse *A, double val[], const char uplo[],
-	    double alpha, double beta)
+static void
+Linv_to_bVar(cholmod_sparse *Linv, int nf, const int Gp[], const int nc[],
+	     SEXP bVar, const char uplo[])
 {
-    int nnz = cholmod_nnz(A, &c);
-    int *ai = (int*)(A->i), *ap = (int*)(A->p),
-	*ind = Calloc(nnz, int), i, j, k, nr;
-    double *ax = (double*)(A->x),
-	*tmp = Calloc(nnz * A->ncol, double);
+    int *Lii = (int*)(Linv->i), *Lip = (int*)(Linv->p), i;
+    double *Lix = (double*)(Linv->x), one[] = {1,0}, zero[] = {0,0};
+    
+    for (i = 0; i < nf; i++) {
+	int *ind, j, nci = nc[i], maxnnz = 0;
+	int ncisqr = nci * nci, nlev = (Gp[i + 1] - Gp[i])/nci;
+	double *bVi = REAL(VECTOR_ELT(bVar, i)), *tmp;
 
-    AZERO(tmp, A->ncol * nnz);
-    nr = ap[1];
-    Memcpy(ind, ai, nr);
-    Memcpy(tmp, ax, nr);
-    for (j = 1; j < A->ncol; j++) {
-	for (i = ap[j]; i < ap[j + 1]; i++) {
-	    int ii = ai[i];
-	    for (k = 0; k < nr; k++) {
-		if (ii == ind[k]) {
-		    tmp[k + j * nnz] = ax[i];
-		    ii = -1;
-		    break;
+	AZERO(bVi, nlev * ncisqr);
+	for (j = 0; j < nlev; j++) {
+	    int nzm = Lip[Gp[i] + (j + 1) * nci] - Lip[Gp[i] + j * nci];
+	    if (nzm > maxnnz) maxnnz = nzm;
+	}
+	ind = Calloc(maxnnz, int);
+	tmp = Calloc(maxnnz * nci, double);
+	for (j = 0; j < nlev; j++) {
+	    int jj, k, kk;
+	    int *ap = Lip + Gp[i] + j * nci;
+	    int nr = ap[1] - ap[0];
+
+	    AZERO(tmp, maxnnz * nci);
+	    Memcpy(ind, Lii + ap[0], nr);
+	    Memcpy(tmp, Lix + ap[0], nr);
+	    for (jj = 1; jj < nci; jj++) {
+		for (k = ap[jj]; k < ap[jj + 1]; k++) {
+		    int aik = Lii[k];
+		    for (kk = 0; kk < nr; kk++) {
+			if (aik == ind[kk]) {
+			    tmp[kk + jj * maxnnz] = Lix[k];
+			    aik = -1;
+			    break;
+			}
+		    }
+		    if (aik >= 0) {	/* did not find the row index */
+			ind[nr] = aik;
+			tmp[nr + jj * maxnnz] = Lix[k];
+			nr++;
+		    }
 		}
 	    }
-	    if (ii >= 0) {	/* did not find the row index */
-		ind[nr] = ii;
-		tmp[nr + j * nnz] = ax[i];
-		nr++;
-	    }
+	    F77_CALL(dsyrk)(uplo, "T", &nci, &nr, one, tmp, &maxnnz,
+			    zero, bVi + j * ncisqr, &nci);
 	}
+	Free(ind); Free(tmp);
     }
-    F77_CALL(dsyrk)(uplo, "T", (int*)&(A->ncol), &nr, &alpha, tmp, &nnz,
-		    &beta, val, (int*)&(A->ncol));
-    Free(ind); Free(tmp);
-    return val;
 }
 
 /**
@@ -2328,8 +2342,9 @@ SEXP mer_gradComp(SEXP x)
     
 	alpha = 1./internal_mer_sigma(x, -1);
 	alpha = alpha * alpha;
-	for (j = 0; j < q; j++) iperm[Perm[j]] = j;
-	mer_secondary(x);
+				
+	for (j = 0; j < q; j++) iperm[Perm[j]] = j; /* create the inverse permutation */
+				/* form RZXinv, the section of R^{-1} from RZX */
 	tmp1 = cholmod_solve(CHOLMOD_Lt, L, RZX, &c); free(RZX);
 	/* copy columns of tmp1 to RZXinv applying the inverse permutation */
 	for (j = 0; j < p; j++) {
@@ -2340,21 +2355,18 @@ SEXP mer_gradComp(SEXP x)
 	F77_CALL(dtrsm)("R", "U", "N", "N", &q, &p, m1,
 			REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym)),
 			&p, RZXinv, &q);
+				/* Create Linv */
 	/* apply the inverse permutation to the identity matrix */
 	for (i = 0; i < q; i++) ((int *)(eye->i))[i] = iperm[i];
 	Linv = cholmod_spsolve(CHOLMOD_L, L, eye, &c);
 	cholmod_free_sparse(&eye, &c);
+	Linv_to_bVar(Linv, nf, Gp, nc, bVarP, "U");
 
 	for (i = 0; i < nf; i++) {
 	    int nci = nc[i], RZXrows = Gp[i + 1] - Gp[i];
-	    cholmod_sparse *tsm1,
-		*sm = cholmod_allocate_sparse(q, nci, nci, TRUE, TRUE, 0,
-					      CHOLMOD_REAL, &c);
-	    int *si = (int*)(sm->i), *sp = (int*)(sm->p),
-		ncisq = nci * nci, nlev = RZXrows/nci;
+	    int ncisq = nci * nci, nlev = RZXrows/nci;
 	    double *bVi = REAL(VECTOR_ELT(bVarP, i)),
 		*bi = b + Gp[i], *mm = REAL(VECTOR_ELT(gradComp, i)),
-		*sx = (double*)(sm->x),
 		*tmp = Memcpy(Calloc(ncisq, double),
 			      REAL(GET_SLOT(dpoMatrix_chol(VECTOR_ELT(OmegaP, i)),
 					    Matrix_xSym)), ncisq),
@@ -2362,27 +2374,6 @@ SEXP mer_gradComp(SEXP x)
 		dlev = (double) nlev,
 		one[] = {1,0}, zero[] = {0,0};
 
-	    AZERO(bVi, nci * RZXrows);
-	    for (j = 0; j < nci; j++) {
-		sp[j] = j;
-		sx[j] = 1;
-	    }
-	    sp[nci] = nci;
-	
-	    for (k = 0; k < nlev; k++) {
-		int rk0 = Gp[i] + k * nci;
-
-		for (j = 0; j < nci; j++) si[j] = iperm[rk0 + j];
-		tsm1 = cholmod_spsolve(CHOLMOD_L, L, sm, &c);
-		if (nci == 1) {
-		    double *xp = (double*)(tsm1->x);
-		    int ione = 1, nnz = cholmod_nnz(tsm1, &c);
-		    bVi[k] = F77_CALL(ddot)(&nnz, xp, &ione, xp, &ione);
-		} else {
-		    cholmod_ata(tsm1, bVi + k * ncisq, "U", 1.0, 0.0);
-		}
-		cholmod_free_sparse(&tsm1, &c);
-	    }
 	    if (nci == 1) {
 		int ione = 1;
 		mm[0] = ((double) nlev)/(tmp[0] * tmp[0]);
@@ -2416,7 +2407,7 @@ SEXP mer_gradComp(SEXP x)
 				    one, mm, &nci);
 		}
 	    }
-	    Free(tmp); cholmod_free_sparse(&sm, &c);
+	    Free(tmp);
 	}
 	cholmod_free_sparse(&Linv, &c);
 	Free(iperm);

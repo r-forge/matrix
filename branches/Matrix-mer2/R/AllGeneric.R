@@ -5,7 +5,7 @@ if (!isGeneric("expand"))
     setGeneric("expand", function(x, ...) standardGeneric("expand"))
 
 if (!isGeneric("tcrossprod"))
-    setGeneric("tcrossprod", function(x) standardGeneric("tcrossprod"))
+    setGeneric("tcrossprod", function(x, y = NULL) standardGeneric("tcrossprod"))
 
 if (!isGeneric("isDiagonal"))
     setGeneric("isDiagonal", function(object, ...)
