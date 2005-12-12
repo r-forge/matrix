@@ -1,3 +1,8 @@
+2005-12-12  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllGeneric.R (tcrossprod): 2-argument version; here, and for
+	all methods (and help files).
+
 2005-12-09  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Auxiliaries.R (dimNamesCheck): fixed thinko -> bug
