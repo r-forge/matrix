@@ -290,18 +290,25 @@ setMethod("lmer", signature(formula = "formula"),
           ## pars[fixInd] == beta, pars[-fixInd] == theta
           PQLpars <- c(fixef(mer),
                        .Call("mer_coef", mer, 2, PACKAGE = "Matrix"))
+          print(.Call("glmer_bhat", PQLpars, GSpt, PACKAGE = "Matrix"))
           print(.Call("glmer_devLaplace", PQLpars, GSpt, PACKAGE = "Matrix"))
-          .Call("glmer_finalize", GSpt, PACKAGE = "Matrix")
-          return(mer)
           ## indicator of constrained parameters
           const <- c(rep(FALSE, length(fixInd)),
-                     unlist(lapply(mer@nc[seq(along = random)],
+                     unlist(lapply(mer@nc[seq(along = fl)],
                                    function(k) 1:((k*(k+1))/2) <= k)
                             ))
-          devAGQ <- function(pars, n)
-              .Call("glmer_devAGQ", pars, GSpt, n, PACKAGE = "Matrix")
+          devLaplace <- function(pars)
+              .Call("glmer_devLaplace", pars, GSpt, PACKAGE = "Matrix")
 
+          optimRes <-
+              nlminb(PQLpars, devLaplace,
+                     lower = ifelse(const, 5e-10, -Inf),
+                     control = list(trace = getOption("verbose"),
+                     iter.max = cv$msMaxIter))
+          .Call("glmer_finalize", GSpt, PACKAGE = "Matrix")
+          return(mer)
           deviance <- devAGQ(PQLpars, 1)
+
 ### FIXME: For nf == 1 change this to an AGQ evaluation.  Needs
 ### AGQ for nc > 1 first.
           fxd <- PQLpars[fixInd]

@@ -372,7 +372,7 @@ internal_mer_bVar(SEXP x)
     Linv = cholmod_spsolve(CHOLMOD_L, L, eye, &c);
     cholmod_free_sparse(&eye, &c);
     Linv_to_bVar(Linv, INTEGER(GET_SLOT(x, Matrix_GpSym)),
-		 INTEGER(GET_SLOT(x, Matrix_GpSym)), 
+		 INTEGER(GET_SLOT(x, Matrix_ncSym)), 
 		 GET_SLOT(x, Matrix_bVarSym), "U");
     cholmod_free_sparse(&Linv, &c);
 }
@@ -794,6 +794,7 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
 		    GS->X, &(GS->n), fixed,
 		    &ione, &one, GS->off, &ione);
     Memcpy(REAL(GS->eta), GS->off, GS->n);
+    internal_mer_fitted(GS->mer, (double *) NULL, GS->Zt, REAL(GS->eta));
     Memcpy(GS->etaold, REAL(GS->eta), GS->n);
 
     for (i = 0, crit = GS->tol + 1;
@@ -1481,6 +1482,25 @@ SEXP glmer_PQL(SEXP GSp)
     return R_NilValue;
 }
 
+SEXP glmer_bhat(SEXP pars, SEXP GSp)
+{
+    GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
+    SEXP Omega = GET_SLOT(GS->mer, Matrix_OmegaSym);
+    int *Gp = INTEGER(GET_SLOT(GS->mer, Matrix_GpSym)),
+	*nc = INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)),
+	q = LENGTH(GET_SLOT(GS->mer, Matrix_rZySym));
+    cholmod_factor *L =
+	(cholmod_factor *) R_ExternalPtrAddr(GET_SLOT(GS->mer, Matrix_LSym));
+    double *bhat = REAL(GET_SLOT(GS->mer, Matrix_ranefSym));
+
+    if (!isReal(pars) || LENGTH(pars) != GS->npar)
+	error(_("`%s' must be a numeric vector of length %d"),
+	      "pars", GS->npar);
+    if (!internal_bhat(GS, REAL(pars), REAL(pars) + (GS->p)))
+	warning(_("internal_bhat did not converge"));
+    return R_NilValue;
+}    
+
 /** 
  * Compute the approximation to the deviance using adaptive
  * Gauss-Hermite quadrature (AGQ).  When nAGQ == 1 this is the Laplace
@@ -1496,22 +1516,23 @@ SEXP glmer_PQL(SEXP GSp)
 SEXP glmer_devLaplace(SEXP pars, SEXP GSp)
 {
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
-    SEXP bVar = GET_SLOT(GS->mer, Matrix_bVarSym),
-	Omega = GET_SLOT(GS->mer, Matrix_OmegaSym);
+    SEXP Omega = GET_SLOT(GS->mer, Matrix_OmegaSym);
     int *Gp = INTEGER(GET_SLOT(GS->mer, Matrix_GpSym)),
 	*nc = INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)),
-	i, j, k;
+	q = LENGTH(GET_SLOT(GS->mer, Matrix_rZySym));
+    cholmod_factor *L =
+	(cholmod_factor *) R_ExternalPtrAddr(GET_SLOT(GS->mer, Matrix_LSym));
     double *bhat = REAL(GET_SLOT(GS->mer, Matrix_ranefSym));
-
+    
     if (!isReal(pars) || LENGTH(pars) != GS->npar)
 	error(_("`%s' must be a numeric vector of length %d"),
 	      "pars", GS->npar);
     if (!internal_bhat(GS, REAL(pars), REAL(pars) + (GS->p)))
 	return ScalarReal(DBL_MAX);
-    internal_mer_bVar(GS->mer);
-    return ScalarReal(Omega_log_det(Omega, LENGTH(Omega), nc, Gp) +
+    return ScalarReal(2 * chm_log_abs_det(L) +
 		      random_effects_deviance(GS, bhat) +
-		      b_quadratic(bhat, Omega, Gp, nc));
+		      b_quadratic(bhat, Omega, Gp, nc) -
+		      q * log(2. * PI));
 }
 
 /** 
