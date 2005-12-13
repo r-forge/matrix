@@ -21,6 +21,7 @@ SEXP glmer_MCMCsamp(SEXP GSpt, SEXP b, SEXP fixedp, SEXP varcp,
 		    SEXP savebp, SEXP nsampp);
 SEXP glmer_PQL(SEXP GSp);
 SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp);
+SEXP glmer_devLaplace(SEXP pars, SEXP GSp);
 SEXP glmer_finalize(SEXP GSpt);
 SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed);
 SEXP glmer_init(SEXP rho);

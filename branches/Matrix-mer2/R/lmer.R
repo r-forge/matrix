@@ -290,7 +290,7 @@ setMethod("lmer", signature(formula = "formula"),
           ## pars[fixInd] == beta, pars[-fixInd] == theta
           PQLpars <- c(fixef(mer),
                        .Call("mer_coef", mer, 2, PACKAGE = "Matrix"))
-          .Call("glmer_devAGQ", PQLpars, GSpt, 1, PACKAGE = "Matrix")
+          print(.Call("glmer_devLaplace", PQLpars, GSpt, PACKAGE = "Matrix"))
           .Call("glmer_finalize", GSpt, PACKAGE = "Matrix")
           return(mer)
           ## indicator of constrained parameters
@@ -363,8 +363,7 @@ setMethod("fixef", signature(object = "mer"),
 ## Extract the random effects
 setMethod("ranef", signature(object = "mer"),
           function(object, ...)
-          new("lmer.ranef",
-              .Call("mer_ranef", object, PACKAGE = "Matrix"))
+              .Call("mer_ranef", object, PACKAGE = "Matrix")
           )
 
 ## Optimization for mer objects

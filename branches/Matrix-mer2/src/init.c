@@ -155,6 +155,7 @@ static R_CallMethodDef CallEntries[] = {
     {"glmer_MCMCsamp", (DL_FUNC) &glmer_MCMCsamp, 6},
     {"glmer_PQL", (DL_FUNC) &glmer_PQL, 1},
     {"glmer_devAGQ", (DL_FUNC) &glmer_devAGQ, 3},
+    {"glmer_devLaplace", (DL_FUNC) &glmer_devLaplace, 2},
     {"glmer_finalize", (DL_FUNC) &glmer_finalize, 1},
     {"glmer_fixed_update", (DL_FUNC) &glmer_fixed_update, 3},
     {"glmer_init", (DL_FUNC) &glmer_init, 1},
