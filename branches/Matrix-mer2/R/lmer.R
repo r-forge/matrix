@@ -290,7 +290,8 @@ setMethod("lmer", signature(formula = "formula"),
           ## pars[fixInd] == beta, pars[-fixInd] == theta
           PQLpars <- c(fixef(mer),
                        .Call("mer_coef", mer, 2, PACKAGE = "Matrix"))
-          print(.Call("glmer_bhat", PQLpars, GSpt, PACKAGE = "Matrix"))
+          .Call("glmer_bhat", PQLpars, GSpt, PACKAGE = "Matrix")
+          print(mer@ranef)
           print(.Call("glmer_devLaplace", PQLpars, GSpt, PACKAGE = "Matrix"))
           ## indicator of constrained parameters
           const <- c(rep(FALSE, length(fixInd)),
