@@ -143,19 +143,19 @@ setMethod("coef", signature(object = "lmer"),
 ##                  splom(~ gf | .grp, ...))
 ##       })
 
-setMethod("plot", signature(x = "lmer.ranef"),
-          function(x, y, ...)
-      {
-          lapply(x, function(x) {
-              cn <- lapply(colnames(x), as.name)
-              switch(min(ncol(x), 3),
-                     qqmath(eval(substitute(~ x, list(x = cn[[1]]))), x, ...),
-                     xyplot(eval(substitute(y ~ x,
-                                            list(y = cn[[1]],
-                                                 x = cn[[2]]))), x, ...),
-                     splom(~ x, ...))
-          })
-      })
+## setMethod("plot", signature(x = "lmer.ranef"),
+##           function(x, y, ...)
+##       {
+##           lapply(x, function(x) {
+##               cn <- lapply(colnames(x), as.name)
+##               switch(min(ncol(x), 3),
+##                      qqmath(eval(substitute(~ x, list(x = cn[[1]]))), x, ...),
+##                      xyplot(eval(substitute(y ~ x,
+##                                             list(y = cn[[1]],
+##                                                  x = cn[[2]]))), x, ...),
+##                      splom(~ x, ...))
+##           })
+##       })
 
 setMethod("with", signature(data = "lmer"),
           function(data, expr, ...) {

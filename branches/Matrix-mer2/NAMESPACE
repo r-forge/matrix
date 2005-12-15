@@ -1,7 +1,7 @@
 useDynLib(Matrix)
 
 importFrom("graphics",image)
-importFrom("graphics",plot)		## lmer-related
+#importFrom("graphics",plot)		## lmer-related
 importFrom("lattice", levelplot)
 importFrom("grid",    grid.rect, gpar, grob)
 import("stats")				## lmer-related
@@ -177,6 +177,7 @@ exportMethods("cbind2")
 ## lmer-related
 exportMethods("BIC", "anova", "coef", "confint", "deviance", "fitted",
 	      "fixef", "formula", "lmer", "logLik", "mcmcsamp",
-	      "plot", "ranef", "residuals", "resid", "simulate",
+	      # "plot",
+              "ranef", "residuals", "resid", "simulate",
 	      "summary", "update", "vcov", "VarCorr", "with")
 
