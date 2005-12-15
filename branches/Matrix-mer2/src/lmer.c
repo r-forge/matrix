@@ -216,7 +216,7 @@ b_quadratic(const double b[], SEXP Omega, const int Gp[], const int nc[])
 	double *bcp = Memcpy(Calloc(ntot, double), b + Gp[i], ntot),
 	    *omgf = REAL(GET_SLOT(dpoMatrix_chol(VECTOR_ELT(Omega, i)), Matrix_xSym));
 
-	F77_CALL(dtrsm)("L", "U", "T", "N", &nci, &nlev, one, omgf, &nci, bcp, &nci);
+	F77_CALL(dtrmm)("L", "U", "N", "N", &nci, &nlev, one, omgf, &nci, bcp, &nci);
 	ans += F77_CALL(ddot)(&ntot, bcp, &ione, bcp, &ione);
 	Free(bcp);
     }
@@ -570,6 +570,71 @@ internal_mer_sigma(SEXP x, int REML)
 }
 
 /** 
+ * Inflate Z'Z to Z'Z+Omega and factor. Form RZX and rZy.
+ * 
+ * @param x pointer to an mer object.
+ */
+static void
+internal_mer_Zfactor(SEXP x)
+{
+    SEXP Omega = GET_SLOT(x, Matrix_OmegaSym),
+	rZyP = GET_SLOT(x, Matrix_rZySym);
+    int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	nf = LENGTH(Omega), q = LENGTH(rZyP),
+	p = LENGTH(GET_SLOT(x, Matrix_rXySym));
+    cholmod_sparse *A, *Omg,
+	*zz = as_cholmod_sparse(GET_SLOT(x, Matrix_ZtZSym));
+    cholmod_factor *L =
+	(cholmod_factor *) R_ExternalPtrAddr(GET_SLOT(x, Matrix_LSym));
+    cholmod_dense *ZtX = as_cholmod_dense(GET_SLOT(x, Matrix_ZtXSym)),
+	*Zty = numeric_as_chm_dense(REAL(GET_SLOT(x, Matrix_ZtySym)), q),
+	*rZy, *RZX;
+    int *omp, *nnz = Calloc(nf + 1, int), i;
+    double one = 1;
+
+    for (nnz[0] = 0, i = 0; i < nf; i++)
+	nnz[i + 1] = nnz[i] + ((Gp[i + 1] - Gp[i])*(nc[i] + 1))/2;
+    Omg = cholmod_allocate_sparse(zz->nrow, zz->ncol, (size_t) nnz[nf],
+				  TRUE, TRUE, 1, CHOLMOD_REAL, &c);
+    omp = (int *) Omg->p;
+    for (i = 0; i < nf; i++) {
+	int bb = Gp[i], j, jj, k, nci = nc[i];
+	int nlev = (Gp[i + 1] - bb)/nci;
+	double *Omgi = REAL(GET_SLOT(VECTOR_ELT(Omega, i), Matrix_xSym));
+
+	for (j = 0; j < nlev; j++) { /* column of result */
+	    int col0 = bb + j * nci; /* absolute column number */
+
+	    for (jj = 0; jj < nci; jj++) { /* column of Omega_i */
+		int coljj = col0 + jj;
+
+		omp[coljj + 1] = omp[coljj] + jj + 1;
+		for (k = 0; k <= jj; k++) { /* row of Omega_i */
+		    int ind = omp[coljj];
+		    ((int *)Omg->i)[ind + k] = col0 + k;
+		    ((double *)Omg->x)[ind + k] = Omgi[jj * nci + k];
+		}
+	    }
+	}
+    }
+    Free(nnz);
+    A = cholmod_add(zz, Omg, &one, &one, TRUE, TRUE, &c);
+    free(zz); cholmod_free_sparse(&Omg, &c);
+    if (!cholmod_factorize(A, L, &c))
+	error(_("rank_deficient Z'Z+Omega"));
+    cholmod_free_sparse(&A, &c);
+				/* calculate and store RZX and rZy */
+    RZX = cholmod_solve(CHOLMOD_L, L, ZtX, &c); free(ZtX);
+    rZy = cholmod_solve(CHOLMOD_L, L, Zty, &c); free(Zty);
+    Memcpy(REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXSym), Matrix_xSym)),
+	   (double *) RZX->x, q * p);
+    Memcpy(REAL(rZyP), (double *) rZy->x, q);
+    cholmod_free_dense(&rZy, &c);
+    cholmod_free_dense(&RZX, &c);
+}
+
+/** 
  * Update the relative precision matrices by sampling from a Wishart
  * distribution with scale factor determined by the current sample of
  * random effects.
@@ -769,6 +834,34 @@ fixed_effects_deviance(GlmerStruct GS, const double fixed[])
     return ans;
 }
 
+static double*
+internal_mer_bhat(SEXP x)
+{
+	SEXP RZXP = GET_SLOT(x, Matrix_RZXSym),
+	    fixef = GET_SLOT(x, Matrix_fixefSym),
+	    ranef = GET_SLOT(x, Matrix_ranefSym);
+	int ione = 1, p = LENGTH(fixef), q = LENGTH(ranef);
+	cholmod_factor *L =
+	    (cholmod_factor *) R_ExternalPtrAddr(GET_SLOT(x, Matrix_LSym));
+	cholmod_dense *td1, *td2,
+	    *chRZX = as_cholmod_dense(RZXP),
+	    *chranef = numeric_as_chm_dense(REAL(ranef), q);
+	double *RZX = REAL(GET_SLOT(RZXP, Matrix_xSym)),
+	    m1[] = {-1,0}, one[] = {1,0};
+
+	Memcpy(REAL(ranef), REAL(GET_SLOT(x, Matrix_rZySym)), q);
+				/* ranef, RZXinv */
+	F77_CALL(dgemv)("N", &q, &p, m1, RZX, &q, REAL(fixef), &ione,
+			one, REAL(ranef), &ione);
+	td1 = cholmod_solve(CHOLMOD_Lt, L, chranef, &c);
+	td2 = cholmod_solve(CHOLMOD_Pt, L, td1, &c);
+	Memcpy(REAL(ranef), (double *)(td2->x), q);
+	free(chranef); free(chRZX);
+	cholmod_free_dense(&td1, &c);
+	cholmod_free_dense(&td2, &c);
+	return REAL(ranef);
+}
+
 /** 
  * Establish off, the effective offset for the fixed effects, and
  * iterate to determine the conditional modes.
@@ -782,13 +875,13 @@ fixed_effects_deviance(GlmerStruct GS, const double fixed[])
 static int
 internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
 {
+    SEXP fixef = GET_SLOT(GS->mer, Matrix_fixefSym);
     int i, ione = 1;
-    
     double crit, one = 1;
 
     if (varc)	  /* skip this step if varc == (double*) NULL */	
 	internal_mer_coefGets(GS->mer, varc, 2);
-
+    Memcpy(REAL(fixef), fixed, LENGTH(fixef));
     Memcpy(GS->off, GS->offset, GS->n);
     F77_CALL(dgemv)("N", &(GS->n), &(GS->p), &one,
 		    GS->X, &(GS->n), fixed,
@@ -802,8 +895,8 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
 	internal_weights(GS);
 	internal_weight_ZXy(GS->mer, (double *) NULL, GS->Zt, GS->w, GS->z);
 	mer_update_ZXy(GS->mer);
-	mer_factor(GS->mer);
-	mer_secondary(GS->mer);
+	internal_mer_Zfactor(GS->mer);
+	internal_mer_bhat(GS->mer);
 	Memcpy(REAL(GS->eta), GS->off, GS->n);
 	internal_mer_fitted(GS->mer, (double *) NULL, GS->Zt, REAL(GS->eta));
 	crit = conv_crit(GS->etaold, REAL(GS->eta), GS->n);
@@ -936,12 +1029,12 @@ static double chm_log_abs_det(cholmod_factor *F)
 }
 
 static double
-Omega_log_det(SEXP Omega, int nf, int *nc, int *Gp)
+Omega_log_det(SEXP Omega, int *nc, int *Gp)
 {
     double ans = 0;
     int i;
 
-    for (i = 0; i < nf; i++) {
+    for (i = 0; i < LENGTH(Omega); i++) {
 	int j, nci = nc[i], ncip1 = nc[i] + 1, nlev = (Gp[i + 1] - Gp[i])/nc[i];
 	double *omgi = REAL(GET_SLOT(dpoMatrix_chol(VECTOR_ELT(Omega, i)),
 				     Matrix_xSym));
@@ -1048,54 +1141,6 @@ rel_dev_1(GlmerStruct GS, const double b[], int nlev, int nc, int k,
     return devcmp;
 }
 
-/** 
- * Create a copy of ZtZ with the diagonal blocks inflated according to Omega
- * 
- * @param zz cholmod_sparse version of ZtZ
- * @param nf number of factors
- * @param Omega Omega list
- * @param nc number of columns in model matrices
- * @param Gp group pointers
- * 
- * @return a freshly allocated cholmod_sparse version of the sum
- */
-static cholmod_sparse *
-ZZ_inflate(cholmod_sparse *zz, int nf, SEXP Omega, int *nc, int *Gp)
-{
-    cholmod_sparse *Omg, *ans;
-    int *omp, *nnz = Calloc(nf + 1, int), i;
-    double one = 1;
-
-    for (nnz[0] = 0, i = 0; i < nf; i++)
-	nnz[i + 1] = nnz[i] + (Gp[i + 1] - Gp[i])*(nc[i] + 1)/2;
-    Omg = cholmod_allocate_sparse(zz->nrow, zz->ncol, (size_t) nnz[nf],
-				  TRUE, TRUE, 1, CHOLMOD_REAL, &c);
-    omp = (int *) Omg->p;
-    for (i = 0; i < nf; i++) {
-	int bb = Gp[i], j, jj, k, nci = nc[i];
-	int nlev = (Gp[i + 1] - bb)/nci;
-	double *Omgi = REAL(GET_SLOT(VECTOR_ELT(Omega, i), Matrix_xSym));
-
-	for (j = 0; j < nlev; j++) { /* column of result */
-	    int col0 = bb + j * nci; /* absolute column number */
-
-	    for (jj = 0; jj < nci; jj++) { /* column of Omega_i */
-		int coljj = col0 + jj;
-
-		omp[coljj + 1] = omp[coljj] + jj + 1;
-		for (k = 0; k <= jj; k++) { /* row of Omega_i */
-		    int ind = omp[coljj];
-		    ((int *)Omg->i)[ind + k] = col0 + k;
-		    ((double *)Omg->x)[ind + k] = Omgi[jj * nci + k];
-		}
-	    }
-	}
-    }
-    ans = cholmod_add(zz, Omg, &one, &one, TRUE, TRUE, &c);
-
-    Free(nnz); cholmod_free_sparse(&Omg, &c);
-    return ans;
-}
 
 /** 
  * Evaluate the conditional deviance for a given set of random effects.
@@ -1120,29 +1165,6 @@ random_effects_deviance(GlmerStruct GS, const double b[])
     UNPROTECT(1);
     return ans;
 }
-
-/** 
- * Return the components of the deviance corresponding to the levels
- * of a single grouping factor.
- * 
- * @param GS 
- * @param f 
- * 
- * @return 
- */
-static double*
-glmer_dev_comp_1d(GlmerStruct GS, double f[])
-{
-    SEXP devs;
-    int i, *fl1 = INTEGER(VECTOR_ELT(GET_SLOT(GS->mer, Matrix_flistSym), 0));
-
-    Memcpy(REAL(GS->eta), GS->off, GS->n);
-    eval_check_store(GS->linkinv, GS->rho, GS->mu);
-    devs = PROTECT(eval_check(GS->dev_resids, GS->rho, REALSXP, GS->n));
-    for (i = 0; i < GS->n; i++) f[fl1[i] - 1] += REAL(devs)[i];
-    return f;
-}
-
     
 static void
 internal_glmer_ranef_update(GlmerStruct GS, SEXP b)
@@ -1485,13 +1507,6 @@ SEXP glmer_PQL(SEXP GSp)
 SEXP glmer_bhat(SEXP pars, SEXP GSp)
 {
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
-    SEXP Omega = GET_SLOT(GS->mer, Matrix_OmegaSym);
-    int *Gp = INTEGER(GET_SLOT(GS->mer, Matrix_GpSym)),
-	*nc = INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)),
-	q = LENGTH(GET_SLOT(GS->mer, Matrix_rZySym));
-    cholmod_factor *L =
-	(cholmod_factor *) R_ExternalPtrAddr(GET_SLOT(GS->mer, Matrix_LSym));
-    double *bhat = REAL(GET_SLOT(GS->mer, Matrix_ranefSym));
 
     if (!isReal(pars) || LENGTH(pars) != GS->npar)
 	error(_("`%s' must be a numeric vector of length %d"),
@@ -1518,8 +1533,7 @@ SEXP glmer_devLaplace(SEXP pars, SEXP GSp)
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
     SEXP Omega = GET_SLOT(GS->mer, Matrix_OmegaSym);
     int *Gp = INTEGER(GET_SLOT(GS->mer, Matrix_GpSym)),
-	*nc = INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)),
-	q = LENGTH(GET_SLOT(GS->mer, Matrix_rZySym));
+	*nc = INTEGER(GET_SLOT(GS->mer, Matrix_ncSym));
     cholmod_factor *L =
 	(cholmod_factor *) R_ExternalPtrAddr(GET_SLOT(GS->mer, Matrix_LSym));
     double *bhat = REAL(GET_SLOT(GS->mer, Matrix_ranefSym));
@@ -1532,7 +1546,7 @@ SEXP glmer_devLaplace(SEXP pars, SEXP GSp)
     return ScalarReal(2 * chm_log_abs_det(L) +
 		      random_effects_deviance(GS, bhat) +
 		      b_quadratic(bhat, Omega, Gp, nc) -
-		      q * log(2. * PI));
+		      Omega_log_det(Omega, nc, Gp));
 }
 
 /** 
@@ -2328,39 +2342,28 @@ SEXP mer_factor(SEXP x)
 {
     int *status = LOGICAL(GET_SLOT(x, Matrix_statusSym));
     if (!status[0]) {
-	SEXP Omega = GET_SLOT(x, Matrix_OmegaSym);
-	cholmod_sparse *A,
-	    *zz = as_cholmod_sparse(GET_SLOT(x, Matrix_ZtZSym));
-	cholmod_factor *L =
-	    (cholmod_factor *) R_ExternalPtrAddr(GET_SLOT(x, Matrix_LSym));
-	cholmod_dense *ZtX = as_cholmod_dense(GET_SLOT(x, Matrix_ZtXSym)),
-	    *Zty = numeric_as_chm_dense(REAL(GET_SLOT(x, Matrix_ZtySym)), L->n),
-	    *rZy, *RZX;
+	SEXP Omega = GET_SLOT(x, Matrix_OmegaSym),
+	    rXyP = GET_SLOT(x, Matrix_rXySym),
+	    rZyP = GET_SLOT(x, Matrix_rZySym);
 	int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
 	    *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)), i, info, ione = 1,
-	    nf = LENGTH(Omega), p = ZtX->ncol, q = L->n;
+	    p = LENGTH(rXyP), q = LENGTH(rZyP);
+	cholmod_factor *L =
+	    (cholmod_factor *) R_ExternalPtrAddr(GET_SLOT(x, Matrix_LSym));
 	double *RXX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym)),
-	    *rXy = REAL(GET_SLOT(x, Matrix_rXySym)),
+	    *RZX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXSym), Matrix_xSym)),
+	    *rXy = REAL(rXyP), *rZy = REAL(rZyP),
 	    *dcmp = REAL(GET_SLOT(x, Matrix_devCompSym)),
 	    *dev = REAL(GET_SLOT(x, Matrix_devianceSym)),
 	    one[2] = {1, 0}, m1[2] = {-1, 0};
 	double nml = dcmp[0], nreml = dcmp[0] - dcmp[1];
 	
-	dcmp[5] = Omega_log_det(Omega, nf, nc, Gp); /* logDet(Omega) */
-	A = ZZ_inflate(zz, nf, Omega, nc, Gp); free(zz);
-	if (!cholmod_factorize(A, L, &c))
-	    error(_("rank_deficient Z'Z+Omega"));
-	cholmod_free_sparse(&A, &c);
+	dcmp[5] = Omega_log_det(Omega, nc, Gp); /* logDet(Omega) */
+	internal_mer_Zfactor(x); /* inflate Z'Z to Z'Z+Omega and factor. Form RZX and rZy. */
 	dcmp[4] = 2 * chm_log_abs_det(L); /* 2 * logDet(L) */
-	/* calculate and store RZX and rZy */
-	RZX = cholmod_solve(CHOLMOD_L, L, ZtX, &c); free(ZtX);
-	rZy = cholmod_solve(CHOLMOD_L, L, Zty, &c); free(Zty);
-	Memcpy(REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXSym), Matrix_xSym)),
-	       (double *) RZX->x, q * p);
-	Memcpy(REAL(GET_SLOT(x, Matrix_rZySym)), (double *) rZy->x, q);
-	/* downdate XtX and factor */
+				/* downdate XtX and factor */
 	Memcpy(RXX, REAL(GET_SLOT(GET_SLOT(x, Matrix_XtXSym), Matrix_xSym)), p * p);
-	F77_CALL(dsyrk)("U", "T", &p, &q, m1, (double*)RZX->x, &q, one, RXX, &p);
+	F77_CALL(dsyrk)("U", "T", &p, &q, m1, RZX, &q, one, RXX, &p);
 	F77_CALL(dpotrf)("U", &p, RXX, &p, &info);
 	if (info) {
 	    error(_("Leading minor of order %d in downdated X'X is not positive definite"),
@@ -2369,23 +2372,19 @@ SEXP mer_factor(SEXP x)
 	} else {
 	    for (dcmp[6] = 0, i = 0; i < p; i++) /* 2 * logDet(RXX) */
 		dcmp[6] += 2. * log(RXX[i * (p + 1)]);
-	    /* solve for rXy  and ryy^2 */
+				/* solve for rXy  and ryy^2 */
 	    Memcpy(rXy, REAL(GET_SLOT(x, Matrix_XtySym)), p);
-	    F77_CALL(dgemv)("T", &q, &p, m1, (double*) RZX->x, &q,
-			    (double*) rZy->x, &ione, one, rXy, &ione);
+	    F77_CALL(dgemv)("T", &q, &p, m1, RZX, &q, rZy, &ione, one, rXy, &ione);
 	    F77_CALL(dtrsv)("U", "T", "N", &p, RXX, &p, rXy, &ione);
 	    dcmp[3] = log(dcmp[2] /* dcmp[3] = log(ryy^2); dcmp[2] = y'y; */
 			  - F77_CALL(ddot)(&p, rXy, &ione, rXy, &ione)
-			  - F77_CALL(ddot)(&q, (double*)rZy->x, &ione,
-					   (double*)rZy->x, &ione));
-	    /* evaluate ML and REML deviance */
+			  - F77_CALL(ddot)(&q, rZy, &ione, rZy, &ione));
+				/* evaluate ML and REML deviance */
 	    dev[0] = dcmp[4] - dcmp[5] +
 		nml*(1.+dcmp[3]+log(2.*PI/nml));
 	    dev[1] = dcmp[4] - dcmp[5] + dcmp[6] +
 		nreml*(1.+dcmp[3]+log(2.*PI/nreml));
 	}
-	
-	cholmod_free_dense(&RZX, &c); cholmod_free_dense(&rZy, &c);
 				/* signal that secondary slots are not valid */
 	status[0] = 1;
 	status[1] = status[2] = status[3] = 0;
