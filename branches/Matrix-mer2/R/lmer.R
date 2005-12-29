@@ -707,3 +707,96 @@ simss <- function(fm0, fma, nsim)
               Ha = fma@devComp[["logryy2"]]))
     })
 }
+
+glmerChk <- function(formula, data, family, pars, control = list())
+{
+    ## match and check parameters
+    if (length(formula) < 3) stop("formula must be a two-sided formula")
+    cv <- Matrix.new:::lmerControl()
+
+    ## Must evaluate the model frame first and then fit the glm using
+    ## that frame.  Otherwise missing values in the grouping factors
+    ## cause inconsistent numbers of observations.
+    mf <- match.call()
+    m <- match(c("family", "data", "subset", "weights",
+                 "na.action", "offset"), names(mf), 0)
+    mf <- fe <- mf[c(1, m)]
+    frame.form <- Matrix.new:::subbars(formula) # substitute `+' for `|'
+    fixed.form <- Matrix.new:::nobars(formula)  # remove any terms with `|'
+    if (inherits(fixed.form, "name")) # RHS is empty - use a constant
+        fixed.form <- substitute(foo ~ 1, list(foo = fixed.form))
+    environment(fixed.form) <- environment(frame.form) <- environment(formula)
+
+    ## evaluate a model frame for fixed and random effects
+    mf$formula <- frame.form
+    mf$family <- NULL
+    mf$drop.unused.levels <- TRUE
+    mf[[1]] <- as.name("model.frame")
+    frm <- eval(mf, parent.frame())
+
+    ## fit a glm model to the fixed formula
+    fe$formula <- fixed.form
+    fe$data <- frm
+    fe$x <- fe$model <- fe$y <- TRUE
+    fe[[1]] <- as.name("glm")
+    glm.fit <- eval(fe, parent.frame())
+    x <- glm.fit$x
+    y <- as.double(glm.fit$y)
+    family <- glm.fit$family
+
+    ## check for a linear mixed model
+    lmm <- family$family == "gaussian" && family$link == "identity"
+    method <- "Laplace"
+    ## create factor list for the random effects
+    bars <- Matrix.new:::findbars(formula[[3]])
+    names(bars) <- unlist(lapply(bars, function(x) deparse(x[[3]])))
+    fl <- lapply(bars,
+                 function(x)
+                 eval(substitute(as.factor(fac)[,drop = TRUE],
+                                 list(fac = x[[3]])), frm))
+    ## order factor list by decreasing number of levels
+    nlev <- sapply(fl, function(x) length(levels(x)))
+    if (any(diff(nlev) > 0)) {
+        ord <- rev(order(nlev))
+        bars <- bars[ord]
+        fl <- fl[ord]
+    }
+    ## create list of transposed model matrices for random effects
+    Ztl <- lapply(bars, function(x)
+                  t(model.matrix(eval(substitute(~ expr,
+                                                 list(expr = x[[2]]))),
+                                 frm)))
+    ## Create the mixed-effects representation (mer) object
+    mer <- .Call("mer_create", fl,
+                 .Call("Zt_create", fl, Ztl, PACKAGE = "Matrix"),
+                 x, y, method, sapply(Ztl, nrow),
+                 c(lapply(Ztl, rownames), list(.fixed = colnames(x))),
+                 !(family$family %in% c("binomial", "poisson")),
+                 match.call(), family,
+                 PACKAGE = "Matrix")
+    if (lmm) {
+        .Call("mer_ECMEsteps", mer, cv$niterEM, cv$EMverbose, PACKAGE = "Matrix")
+        LMEoptimize(mer) <- cv
+        return(mer)
+    }
+
+    ## The rest of the function applies to generalized linear mixed models
+    gVerb <- getOption("verbose")
+    eta <- glm.fit$linear.predictors
+    wts <- glm.fit$prior.weights
+    wtssqr <- wts * wts
+    offset <- glm.fit$offset
+    if (is.null(offset)) offset <- numeric(length(eta))
+    linkinv <- quote(family$linkinv(eta))
+    mu.eta <- quote(family$mu.eta(eta))
+    mu <- family$linkinv(eta)
+    variance <- quote(family$variance(mu))
+    dev.resids <- quote(family$dev.resids(y, mu, wtssqr))
+    LMEopt <- getAnywhere("LMEoptimize<-")
+    doLMEopt <- quote(LMEopt(x = mer, value = cv))
+
+    GSpt <- .Call("glmer_init", environment(), PACKAGE = "Matrix")
+    ans <- .Call("glmer_devLaplace", pars, GSpt, PACKAGE = "Matrix")
+    .Call("glmer_finalize", GSpt, PACKAGE = "Matrix")
+    ans
+}

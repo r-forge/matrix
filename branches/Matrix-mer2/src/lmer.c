@@ -965,7 +965,7 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
 	internal_mer_coefGets(GS->mer, varc, 2);
     Memcpy(REAL(fixef), fixed, LENGTH(fixef));
     Memcpy(REAL(GS->eta), GS->offset, GS->n);
-    internal_mer_fitted(GS->mer, GS->X, (double *) NULL, REAL(GS->eta));
+    internal_mer_fitted(GS->mer, GS->X, GS->Zt, REAL(GS->eta));
     Memcpy(GS->etaold, REAL(GS->eta), GS->n);
     
     for (i = 0; i < GS->maxiter && crit > GS->tol; i++) {
