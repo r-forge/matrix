@@ -277,9 +277,8 @@ setMethod("lmer", signature(formula = "formula"),
           if (is.null(offset)) offset <- numeric(length(eta))
           linkinv <- quote(family$linkinv(eta))
           mu.eta <- quote(family$mu.eta(eta))
+          mu <- family$linkinv(eta)
           variance <- quote(family$variance(mu))
-          mu <- eval(linkinv)
-
           dev.resids <- quote(family$dev.resids(y, mu, wtssqr))
           LMEopt <- get("LMEoptimize<-")
           doLMEopt <- quote(LMEopt(x = mer, value = cv))
@@ -290,9 +289,7 @@ setMethod("lmer", signature(formula = "formula"),
           ## pars[fixInd] == beta, pars[-fixInd] == theta
           PQLpars <- c(fixef(mer),
                        .Call("mer_coef", mer, 2, PACKAGE = "Matrix"))
-          .Call("glmer_bhat", PQLpars, GSpt, PACKAGE = "Matrix")
-          print(mer@ranef)
-          print(.Call("glmer_devLaplace", PQLpars, GSpt, PACKAGE = "Matrix"))
+          .Call("glmer_devLaplace", PQLpars, GSpt, PACKAGE = "Matrix")
           ## indicator of constrained parameters
           const <- c(rep(FALSE, length(fixInd)),
                      unlist(lapply(mer@nc[seq(along = fl)],
@@ -406,9 +403,10 @@ setReplaceMethod("LMEoptimize", signature(x="mer", value="list"),
              })
 
 setMethod("deviance", signature(object = "mer"),
-          function(object, ...)
+          function(object, ...) {
+              .Call("mer_factor", object, PACKAGE = "Matrix")
               object@deviance[[ifelse(object@method == "REML", "REML", "ML")]]
-          )
+          })
 
 setMethod("mcmcsamp", signature(object = "mer"),
           function(object, n = 1, verbose = FALSE, saveb = FALSE,
