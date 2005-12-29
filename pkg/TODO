@@ -104,4 +104,5 @@
   for all  "dsparse*" -> "lsparse*" and vice versa.
   How can one do this {in a documented way} ?
 
-- tcrossprod(x, y) : do provide methods for y != NULL  -- at least dummy ones!
+- tcrossprod(x, y) : do provide methods for y != NULL
+  calling Lapack's DGEMM for "dense"
