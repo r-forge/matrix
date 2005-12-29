@@ -127,12 +127,12 @@ SEXP dgeMatrix_dgeMatrix_crossprod(SEXP x, SEXP y, SEXP trans)
 SEXP dgeMatrix_matrix_crossprod(SEXP x, SEXP y, SEXP trans)
 {
     int tr = asLogical(trans);/* trans=TRUE: tcrossprod(x,y) */
-/*==== FIXME:  implement  'tr' aka 'trans' !! =========*/
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
     int *xDims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	*yDims = INTEGER(getAttrib(y, R_DimSymbol)),
 	*vDims;
-    int m = xDims[1], n = yDims[1];
+    int m  = xDims[!tr],  n = yDims[!tr];/* -> result dim */
+    int xd = xDims[ tr], yd = yDims[ tr];/* the conformable dims */
     double one = 1.0, zero = 0.0;
 
     if (!(isMatrix(y) && isReal(y)))
@@ -141,16 +141,16 @@ SEXP dgeMatrix_matrix_crossprod(SEXP x, SEXP y, SEXP trans)
     SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(val, Matrix_DimSym, allocVector(INTSXP, 2));
     vDims = INTEGER(GET_SLOT(val, Matrix_DimSym));
-    if ((*xDims) > 0 && (*yDims) > 0 && n > 0 && m > 0) {
-	if (*xDims != *yDims)
-	    error(_("Dimensions of x and y are not compatible for crossprod"));
+    if (xd > 0 && yd > 0 && n > 0 && m > 0) {
+	if (xd != yd)
+	    error(_("Dimensions of x and y are not compatible for %s"),
+		  tr ? "tcrossprod" : "crossprod");
 	vDims[0] = m; vDims[1] = n;
 	SET_SLOT(val, Matrix_xSym, allocVector(REALSXP, m * n));
-	F77_CALL(dgemm)("T", "N", xDims + 1, yDims + 1, xDims, &one,
+	F77_CALL(dgemm)(tr ? "N" : "T", tr ? "T" : "N", &m, &n, &xd, &one,
 			REAL(GET_SLOT(x, Matrix_xSym)), xDims,
 			REAL(y), yDims,
-			&zero, REAL(GET_SLOT(val, Matrix_xSym)),
-			xDims + 1);
+			&zero, REAL(GET_SLOT(val, Matrix_xSym)), &m);
     }
     UNPROTECT(1);
     return val;
