@@ -154,7 +154,9 @@ static R_CallMethodDef CallEntries[] = {
     {"dtrMatrix_validate", (DL_FUNC) &dtrMatrix_validate, 1},
     {"glmer_MCMCsamp", (DL_FUNC) &glmer_MCMCsamp, 6},
     {"glmer_PQL", (DL_FUNC) &glmer_PQL, 1},
+#if 0
     {"glmer_bhat", (DL_FUNC) &glmer_bhat, 2},
+#endif
     {"glmer_devAGQ", (DL_FUNC) &glmer_devAGQ, 3},
     {"glmer_devLaplace", (DL_FUNC) &glmer_devLaplace, 2},
     {"glmer_finalize", (DL_FUNC) &glmer_finalize, 1},

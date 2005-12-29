@@ -20,7 +20,9 @@ SEXP Matrix_rWishart(SEXP ns, SEXP df, SEXP scal);
 SEXP glmer_MCMCsamp(SEXP GSpt, SEXP b, SEXP fixedp, SEXP varcp,
 		    SEXP savebp, SEXP nsampp);
 SEXP glmer_PQL(SEXP GSp);
+#if 0
 SEXP glmer_bhat(SEXP pars, SEXP GSp);
+#endif
 SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp);
 SEXP glmer_devLaplace(SEXP pars, SEXP GSp);
 SEXP glmer_finalize(SEXP GSpt);
