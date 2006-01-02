@@ -39,15 +39,6 @@ is.all.equal4 <- function(x,y,z,u, tol = .Machine$double.eps^0.5)
     is.all.equal3(x,y,z, tol=tol) && isTRUE(all.equal(z,u, tol=tol))
 
 
-## checking;  'show' is for convenience of the developer
-assert.EQ.mat <- function(M, m, tol = if(show) 0 else 1e-15, show=FALSE) {
-    MM <- as(M, "matrix")
-    if(is.logical(MM)) storage.mode(MM) <- "integer"
-    attr(MM, "dimnames") <- attr(m, "dimnames") <- NULL
-    if(show) all.equal(MM, m, tol = tol)
-    else stopifnot(all.equal(MM, m, tol = tol))
-}
-
 Qidentical <- function(x,y) {
     ## quasi-identical:
     if(class(x) != class(y)) return(FALSE)
