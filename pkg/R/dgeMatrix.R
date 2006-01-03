@@ -408,3 +408,4 @@ as.Matrix <- function(x, tol = .Machine$double.eps,
     ## .... .... fixme
     as(x, smartFunction(mc))
 }
+
