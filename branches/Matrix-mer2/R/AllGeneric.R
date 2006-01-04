@@ -4,8 +4,11 @@
 if (!isGeneric("expand"))
     setGeneric("expand", function(x, ...) standardGeneric("expand"))
 
-if (!isGeneric("tcrossprod"))
-    setGeneric("tcrossprod", function(x, y = NULL) standardGeneric("tcrossprod"))
+## if (!isGeneric("tcrossprod"))
+##   setGeneric("tcrossprod", function(x, y = NULL) standardGeneric("tcrossprod"))
+if (!exists("tcrossprod"))# R <= 2.2.x :
+    tcrossprod <- function(x, y = NULL) x %*% t(if(is.null(y)) x else y)
+## will become generic by setMethod(..)
 
 if (!isGeneric("isDiagonal"))
     setGeneric("isDiagonal", function(object, ...)
@@ -14,7 +17,7 @@ if (!isGeneric("isDiagonal"))
 if (!isGeneric("isSymmetric"))
     ## no "..." here at the moment; must match isSymmetric()
     ## R 2.3.x base/R/eigen.R
-    setGeneric("isSymmetric", function(object, tol)
+    setGeneric("isSymmetric", function(object, ...)# no 'tol' in generic
 	       standardGeneric("isSymmetric"))
 
 if (!isGeneric("isTriangular"))

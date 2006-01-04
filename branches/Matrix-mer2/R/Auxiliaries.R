@@ -142,7 +142,7 @@ non0ind <- function(x) {
 	return(unique(cbind(x@i,x@j)))
 
     isCol <- function(M) any("i" == slotNames(M))
-    .Call("compressed_non_0_ij", x, isCol(x), PACKAGE = "Matrix")
+    .Call("compressed_non_0_ij", x, isCol(x), PACKAGE = "Matrix.new")
 }
 
 ### There is a test on this in ../tests/dgTMatrix.R !
