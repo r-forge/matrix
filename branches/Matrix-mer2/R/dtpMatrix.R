@@ -1,7 +1,7 @@
 #### Triangular Packed Matrices -- Coercion and Methods
 
 setAs("dtpMatrix", "dtrMatrix",
-      function(from) .Call("dtpMatrix_as_dtrMatrix", from, PACKAGE = "Matrix"))
+      function(from) .Call("dtpMatrix_as_dtrMatrix", from, PACKAGE = "Matrix.new"))
 
 setAs("dtpMatrix", "dgeMatrix",
       function(from) as(as(from, "dtrMatrix"), "dgeMatrix"))
@@ -13,9 +13,9 @@ setAs("matrix", "dtpMatrix",
 
 
 setMethod("%*%", signature(x = "dtpMatrix", y = "dgeMatrix"),
-	  function(x, y) .Call("dtpMatrix_dgeMatrix_mm", x, y, PACKAGE = "Matrix"))
+	  function(x, y) .Call("dtpMatrix_dgeMatrix_mm", x, y, PACKAGE = "Matrix.new"))
 setMethod("%*%", signature(x = "dgeMatrix", y = "dtpMatrix"),
-	  function(x, y) .Call("dgeMatrix_dtpMatrix_mm", x, y, PACKAGE = "Matrix"))
+	  function(x, y) .Call("dgeMatrix_dtpMatrix_mm", x, y, PACKAGE = "Matrix.new"))
 ## %*% should always work for  <fooMatrix> %*% <fooMatrix>
 setMethod("%*%", signature(x = "dtpMatrix", y = "dtpMatrix"),
           function(x, y)
@@ -56,37 +56,37 @@ setMethod("determinant", signature(x = "dtpMatrix", logarithm = "logical"),
 	  })
 
 setMethod("diag", signature(x = "dtpMatrix"),
-          function(x = 1, nrow, ncol = n) .Call("dtpMatrix_getDiag", x, PACKAGE = "Matrix"),
+          function(x = 1, nrow, ncol = n) .Call("dtpMatrix_getDiag", x, PACKAGE = "Matrix.new"),
           valueClass = "numeric")
 
 setMethod("norm", signature(x = "dtpMatrix", type = "character"),
 	  function(x, type, ...)
-	  .Call("dtpMatrix_norm", x, type, PACKAGE = "Matrix"),
+	  .Call("dtpMatrix_norm", x, type, PACKAGE = "Matrix.new"),
 	  valueClass = "numeric")
 
 setMethod("norm", signature(x = "dtpMatrix", type = "missing"),
 	  function(x, type, ...)
-	  .Call("dtpMatrix_norm", x, "O", PACKAGE = "Matrix"),
+	  .Call("dtpMatrix_norm", x, "O", PACKAGE = "Matrix.new"),
 	  valueClass = "numeric")
 
 setMethod("rcond", signature(x = "dtpMatrix", type = "character"),
 	  function(x, type, ...)
-	  .Call("dtpMatrix_rcond", x, type, PACKAGE = "Matrix"),
+	  .Call("dtpMatrix_rcond", x, type, PACKAGE = "Matrix.new"),
 	  valueClass = "numeric")
 
 setMethod("rcond", signature(x = "dtpMatrix", type = "missing"),
 	  function(x, type, ...)
-	  .Call("dtpMatrix_rcond", x, "O", PACKAGE = "Matrix"),
+	  .Call("dtpMatrix_rcond", x, "O", PACKAGE = "Matrix.new"),
 	  valueClass = "numeric")
 
 setMethod("solve", signature(a = "dtpMatrix", b="missing"),
 	  function(a, b, ...)
-	  .Call("dtpMatrix_solve", a, PACKAGE = "Matrix"),
+	  .Call("dtpMatrix_solve", a, PACKAGE = "Matrix.new"),
 	  valueClass = "dtpMatrix")
 
 setMethod("solve", signature(a = "dtpMatrix", b="matrix"),
 	  function(a, b, ...)
-	  .Call("dtpMatrix_matrix_solve", a, b, PACKAGE = "Matrix"),
+	  .Call("dtpMatrix_matrix_solve", a, b, PACKAGE = "Matrix.new"),
 	  valueClass = "matrix")
 
 setMethod("t", signature(x = "dtpMatrix"),

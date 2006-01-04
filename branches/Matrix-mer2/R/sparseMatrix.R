@@ -21,7 +21,7 @@ setAs("graphNEL", "sparseMatrix",
           .Call("graphNEL_as_dgTMatrix",
                 from,
                 symmetric = (from@edgemode == "undirected"),
-                PACKAGE = "Matrix")
+                PACKAGE = "Matrix.new")
       })
 setAs("graph", "sparseMatrix",
       function(from) as(as(from,"graphNEL"), "sparseMatrix"))
@@ -153,7 +153,7 @@ setMethod("show", signature(object = "sparseMatrix"),
 
 
 ## not exported:
-setMethod("isSymmetric", signature(object = "sparseMatrix", tol = "ANY"),
+setMethod("isSymmetric", signature(object = "sparseMatrix"),
 	  function(object, tol = 100*.Machine$double.eps) {
 	      ## pretest: is it square?
 	      d <- dim(object)

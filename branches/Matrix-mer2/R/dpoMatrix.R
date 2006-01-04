@@ -13,36 +13,36 @@ setAs("dpoMatrix", "correlation",
 
 setMethod("chol", signature(x = "dpoMatrix"),
           function(x, pivot, LINPACK)
-          .Call("dpoMatrix_chol", x, PACKAGE = "Matrix"))
+          .Call("dpoMatrix_chol", x, PACKAGE = "Matrix.new"))
 
 setMethod("rcond", signature(x = "dpoMatrix", type = "character"),
           function(x, type, ...)
-          .Call("dpoMatrix_rcond", x, type, PACKAGE = "Matrix"),
+          .Call("dpoMatrix_rcond", x, type, PACKAGE = "Matrix.new"),
           valueClass = "numeric")
 
 setMethod("rcond", signature(x = "dpoMatrix", type = "missing"),
           function(x, type, ...)
-          .Call("dpoMatrix_rcond", x, "O", PACKAGE = "Matrix"),
+          .Call("dpoMatrix_rcond", x, "O", PACKAGE = "Matrix.new"),
           valueClass = "numeric")
 
 setMethod("solve", signature(a = "dpoMatrix", b = "missing"),
           function(a, b, ...)
-          .Call("dpoMatrix_solve", a, PACKAGE = "Matrix"),
+          .Call("dpoMatrix_solve", a, PACKAGE = "Matrix.new"),
           valueClass = "dpoMatrix")
 
 setMethod("solve", signature(a = "dpoMatrix", b = "dgeMatrix"),
           function(a, b, ...)
-          .Call("dpoMatrix_dgeMatrix_solve", a, b, PACKAGE = "Matrix"),
+          .Call("dpoMatrix_dgeMatrix_solve", a, b, PACKAGE = "Matrix.new"),
           valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dpoMatrix", b = "matrix"),
           function(a, b, ...)
-          .Call("dpoMatrix_matrix_solve", a, b, PACKAGE = "Matrix"),
+          .Call("dpoMatrix_matrix_solve", a, b, PACKAGE = "Matrix.new"),
           valueClass = "matrix")
 
 ##setMethod("solve", signature(a = "dpoMatrix", b = "numeric"),
 ##          function(a, b, ...)
 ##          as.numeric(.Call("dpoMatrix_matrix_solve",
-##                           a, as.matrix(b), PACKAGE = "Matrix")),
+##                           a, as.matrix(b), PACKAGE = "Matrix.new")),
 ##          valueClass = "numeric")
 

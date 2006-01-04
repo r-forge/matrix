@@ -48,7 +48,7 @@ setClass("lMatrix", representation("VIRTUAL"), contains = "Matrix")
 setClass("zMatrix", # letter 'z' is as in the names of Lapack subroutines
 	 representation(x = "complex", "VIRTUAL"), contains = "Matrix")
 
-## Virtual class of dense matrices
+## Virtual class of dense matrices (including "packed")
 setClass("denseMatrix", representation("VIRTUAL"),
          contains = "Matrix")
 
@@ -59,6 +59,22 @@ setClass("ddenseMatrix", representation(rcond = "numeric", "VIRTUAL"),
 ## Virtual class of dense, logical matrices
 setClass("ldenseMatrix", representation(x = "logical", "VIRTUAL"),
 	 contains = c("lMatrix", "denseMatrix"))
+
+## diagonal: has 'diag' slot;  diag = "U"  <--> have identity matrix
+setClass("diagonalMatrix", representation(diag = "character", "VIRTUAL"),
+         contains = "denseMatrix",
+         validity = function(object) {
+             d <- object@Dim
+             if(d[1] != (n <- d[2])) return("matrix is not square")
+             lx <- length(object@x)
+             if(object@diag == "U" && lx != 0)
+                 return("diag = \"U\" (identity matrix) requires empty 'x' slot")
+             if(object@diag == "N" && lx != n)
+                 return("diagonal matrix has 'x' slot of length != 'n'")
+             TRUE
+         },
+	 prototype = prototype(diag = "N")
+         )
 
 ## virtual SPARSE ------------
 
@@ -183,6 +199,13 @@ setClass("lspMatrix",
          ## "dsp" and "lsp" have the same validate
 	 )
 
+## 'diagonalMatrix' already has validity checking
+## diagonal, numeric matrices;      "d*" has 'x' slot :
+setClass("ddiMatrix", contains = c("diagonalMatrix", "dMatrix"))
+## diagonal, logical matrices; "ldense*" has 'x' slot :
+setClass("ldiMatrix", contains = c("diagonalMatrix", "ldenseMatrix"))
+
+
 ##-------------------- S P A R S E (non-virtual) --------------------------
 
 ##---------- numeric sparse matrix classes --------------------------------
@@ -279,6 +302,7 @@ setClass("lgTMatrix",
 ## logical, sparse, triplet triangular matrices
 setClass("ltTMatrix",
 	 contains = c("TsparseMatrix", "lsparseMatrix", "triangularMatrix"),
+	 prototype = prototype(uplo = "U", diag = "N"),
 	 validity =
          function(object) .Call("ltTMatrix_validate", object, PACKAGE = "Matrix")
 	 )
@@ -336,13 +360,14 @@ setClass("lsRMatrix",
          function(object) .Call("lsRMatrix_validate", object, PACKAGE = "Matrix")
 	 )
 
+## Compressed sparse column matrix in blocks
+
+setClass("dgBCMatrix",
+	 representation(p = "integer", i = "integer", x = "array"))
+
 ## Factorization classes
 
 setClass("Cholesky", contains = "dtrMatrix")
-
-setClass("LDL", contains = "dtrMatrix")
-
-setClass("correlation", representation(sd = "numeric"), contains = "dpoMatrix")
 
 setClass("pCholesky", contains = "dtpMatrix")
 
@@ -417,67 +442,109 @@ setClass("LU",
 	 validity = function(object) .Call("LU_validate", object, PACKAGE = "Matrix")
          )
 
+## Deprecated:
+		       ## positive-definite symmetric matrices as matrices
+setClass("pdmatrix", contains = "matrix")
+
+##			 # factors of positive-definite symmetric matrices
+## setClass("pdfactor", representation("matrix", logDet = "numeric"))
+
+		       ## correlation matrices and standard deviations
+setClass("corrmatrix", representation("matrix", stdDev = "numeric"))
+
 ## -------------------- lmer-related Classes --------------------------------
 
 setOldClass("data.frame")
 setOldClass("family")
 setOldClass("logLik")
 setOldClass("terms")
-setOldClass("externalptr")
+
+setClass("VarCorr",
+	 representation(scale = "numeric",
+			reSumry = "list",
+			useScale = "logical"),
+	 prototype = list(scale = 1.0, useScale = TRUE))
 
 ## mixed effects representation
 setClass("mer",
-	 representation(## original data
+	 representation(
 			flist = "list", # list of grouping factors
-                        Zt = "dgCMatrix",  # sparse representation of Z'
-                        X = "matrix",      # X
-                        y = "numeric",     # y
-			method = "character", # parameter estimation method
-                        useScale = "logical", # should scale factor be included
-                        family = "family", # glm family
-                        call = "call",     # call to model-fitting function
-                        ## invariants derived from data structure
-			cnames = "list",   # column names of model matrices
-			nc = "integer",    # dimensions of blocks in Omega
-			Gp = "integer",    # Pointers to groups of rows in Zt
-                        ## quantities that vary when Z, X or y are updated
-			XtX = "dpoMatrix", # X'X
-			ZtZ = "dsCMatrix", # Z'Z
-			ZtX = "dgeMatrix", # Z'X
-                        Zty = "numeric",   # Z'y 
-                        Xty = "numeric",   # X'y 
-                        ## primary slots that vary during the optimization
-                        ## When Omega is updated, these are updated
+			perm = "list",	# list of permutations of levels (0-based)
+			Parent = "list",# list of Parent arrays for ZZpO
+			D = "list",	# list of diagonal factors (upper triangle)
+			bVar = "list",	# list of conditional variance factors (upper triangle)
+			L = "list",	# list of blocks of L
+			ZZpO = "list",	# list of diagonal blocks of Z'Z+Omega
 			Omega = "list", # list of relative precision matrices
-                        ## Cholesky factor of inflated [Z:X:y]'[Z:X:y]
-                        L = "externalptr", # sparse Cholesky factor of Z'Z + Omega
-			RZX = "dgeMatrix",
-			RXX = "dtrMatrix",
-                        rZy = "numeric",
-                        rXy = "numeric",
+			method = "character", # parameter estimation method
+			RXX = "matrix", # Augmented RXX component or its inverse
+			RZX = "matrix", # Augmented RZX component or its inverse
+			XtX = "matrix", # Original X'X matrix
+			ZtZ = "list",	# list of blocks of Z'Z
+			ZtX = "matrix", # Original Z'X matrix
+			cnames = "list",# column names of model matrices
 			devComp = "numeric", # Components of deviance
 			deviance = "numeric", # Current deviance (ML and REML)
-                        ## Secondary slots only evaluated when requested.
-                        ## The sentinel is length(fixef) - if > 0 then
-                        ## info is current.
-                        fixef = "numeric", 
-                        ranef = "numeric",
-                        RZXinv = "dgeMatrix",
-                        bVar = "list",
-                        gradComp = "list",
-                        ## status indicator
-                        status = "logical"
+			nc = "integer", # number of columns in (augmented)
+					## model matrices and number of observations
+			Gp = "integer", # Pointers to groups of rows in RZX
+			status = "logical"
+			),
+	 validity = function(object) {
+	     .Call("lmer_validate", object, PACKAGE = "Matrix")
+	 })
+
+setClass("mer2",
+	 representation(
+			flist = "list", # list of grouping factors
+                        L = "list",     # lower Cholesky factor of Z'Z + Omega
+			RXX = "dtrMatrix", # RXX component
+			RZX = "dgeMatrix", # RZX component
+			XtX = "dpoMatrix", # Original X'X matrix
+			ZtZ = "dsCMatrix", # Original Z'Z
+			ZtX = "dgeMatrix", # Original Z'X matrix
+                        Zty = "numeric", # Original Z'y vector
+                        Xty = "numeric", # Original X'y vector
+                        rZy = "numeric",
+                        rXy = "numeric",
+			Omega = "list", # list of relative precision matrices
+			method = "character", # parameter estimation method
+			cnames = "list",# column names of model matrices
+			devComp = "numeric", # Components of deviance
+			deviance = "numeric", # Current deviance (ML and REML)
+			nc = "integer", # number of columns in (augmented)
+					# model matrices and number of observations
+			Gp = "integer", # Pointers to groups of columns in ZtZ
+			status = "logical"
 			)
 	)
 
 ## Representation of a linear or generalized linear mixed effects model
 setClass("lmer",
-	 representation(assign = "integer", fitted = "numeric",
+	 representation(assign = "integer", call = "call",
+			family = "family", fitted = "numeric",
 			fixed = "numeric", frame = "data.frame",
 			logLik = "logLik", residuals = "numeric",
 			terms = "terms"),
 	 contains = "mer")
 
-setClass("lmer,ranef", contains = "list")
+## Representation of a generalized linear mixed effects model
+##setClass("glmer",
+##	   representation(family = "family", glmmll = "numeric", fixed = "numeric"),
+##	   contains = "lmer")
 
+setClass("summary.lmer",
+	 representation(useScale = "logical",
+			showCorrelation = "logical"),
+	 contains = "lmer")
+
+setClass("lmer.ranef",
+	 representation(varFac = "list", stdErr = "numeric"),
+	 contains = "list")
+
+setClass("lmer.ranef.confint", contains = "list")
+
+setClass("lmer.coef",
+	 representation(varFac = "list", stdErr = "numeric"),
+	 contains = "list")
 

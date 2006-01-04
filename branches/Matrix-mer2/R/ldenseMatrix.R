@@ -6,19 +6,19 @@ setAs("lspMatrix", "dspMatrix", l2d_Matrix)
 
 setAs("lspMatrix", "lsyMatrix",
       function(from)
-      .Call("lspMatrix_as_lsyMatrix", from, PACKAGE = "Matrix"))
+      .Call("lspMatrix_as_lsyMatrix", from, PACKAGE = "Matrix.new"))
 
 setAs("lsyMatrix", "lspMatrix",
       function(from)
-      .Call("lsyMatrix_as_lspMatrix", from, PACKAGE = "Matrix"))
+      .Call("lsyMatrix_as_lspMatrix", from, PACKAGE = "Matrix.new"))
 
 setAs("ltpMatrix", "ltrMatrix",
       function(from)
-      .Call("ltpMatrix_as_ltrMatrix", from, PACKAGE = "Matrix"))
+      .Call("ltpMatrix_as_ltrMatrix", from, PACKAGE = "Matrix.new"))
 
 setAs("ltrMatrix", "ltpMatrix",
       function(from)
-      .Call("ltrMatrix_as_ltpMatrix", from, PACKAGE = "Matrix"))
+      .Call("ltrMatrix_as_ltpMatrix", from, PACKAGE = "Matrix.new"))
 
 setAs("ldenseMatrix", "matrix",
       function(from) as(as(from, sub("^l", "d", class(from))), "matrix"))
