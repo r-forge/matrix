@@ -384,17 +384,21 @@ internal_mer_bVar(SEXP x)
  * @param x pointer to an mer object
  * @param X contents of the X model matrix or (double *) NULL
  * @param Zt values of non-zeros in the Zt model matrix or (double *) NULL
+ * @param initial initial values (i.e. an offset) or (double *) NULL
  * @param val array to hold the fitted values
  * 
  * @return pointer to a numeric array of fitted values
  */
 static double *
-internal_mer_fitted(SEXP x, double X[], double Ztx[], double val[])
+internal_mer_fitted(SEXP x, const double X[], const double Ztx[],
+		    const double initial[], double val[])
 {
     int ione = 1, n = LENGTH(GET_SLOT(x, Matrix_ySym));
     double one[] = {1,0};
     
     mer_secondary(x);
+    if (initial) Memcpy(val, initial, n);
+    else AZERO(val, n);
     if (X) {
 	SEXP fixef = GET_SLOT(x, Matrix_fixefSym);
 	int p = LENGTH(fixef);
@@ -748,39 +752,23 @@ internal_Omega_update(SEXP Omega, const double b[], double sigma, int nf,
     }
 }
 
-static void
-internal_weight_ZXy(SEXP mer, const double X[], const double Zt[],
-		    const double w[], const double z[])
-{
-    SEXP mZt = GET_SLOT(mer, Matrix_ZtSym);
-    int *Zp = INTEGER(GET_SLOT(mZt, Matrix_pSym));
-    int i, j,
-	n = LENGTH(GET_SLOT(mer, Matrix_ySym)), 
-	p = LENGTH(GET_SLOT(mer, Matrix_rXySym));
-    double *mX = REAL(GET_SLOT(mer, Matrix_XSym)),
-	*my = REAL(GET_SLOT(mer, Matrix_ySym)),
-	*mZx = REAL(GET_SLOT(mZt, Matrix_xSym));
-
-    for (i = 0; i < n; i++) my[i] = z[i] * w[i];
-    if (X) 
-	for (j = 0; j < p; j++)
-	    for (i = 0; i < n; i++) mX[i + j * n] = X[i + j * n] * w[i];
-    if (Zt)
-	for (j = 0; j < n; j++) {
-	    int i2 = Zp[j + 1];
-	    for (i = Zp[j]; i < i2; i++) mZx[i] = Zt[i] * w[j];
-	}
-}
-
 /** 
  * Evaluate new weights and working residuals.
  * 
  * @param GS a GlmerStruct object
  */
 static void
-internal_weights(GlmerStruct GS) {
-    SEXP dmu_deta, var;
-    int i;
+internal_glmer_reweight(GlmerStruct GS) {
+    SEXP dmu_deta, var,
+	mZt = GET_SLOT(GS->mer, Matrix_ZtSym);
+    int *Zp = INTEGER(GET_SLOT(mZt, Matrix_pSym));
+    int i, j,
+	n = LENGTH(GET_SLOT(GS->mer, Matrix_ySym)), 
+	p = LENGTH(GET_SLOT(GS->mer, Matrix_rXySym));
+    double *mX = REAL(GET_SLOT(GS->mer, Matrix_XSym)),
+	*my = REAL(GET_SLOT(GS->mer, Matrix_ySym)),
+	*mZx = REAL(GET_SLOT(mZt, Matrix_xSym));
+
 				/* reweight mer */
     eval_check_store(GS->linkinv, GS->rho, GS->mu);
     dmu_deta = PROTECT(eval_check(GS->mu_eta, GS->rho,
@@ -794,6 +782,15 @@ internal_weights(GlmerStruct GS) {
 	    (GS->y[i] - REAL(GS->mu)[i])/REAL(dmu_deta)[i];
     }
     UNPROTECT(2);
+    for (i = 0; i < n; i++) my[i] = GS->z[i] * GS->w[i];
+    for (j = 0; j < p; j++)
+	for (i = 0; i < n; i++) mX[i + j * n] =
+				    GS->X[i + j * n] * GS->w[i];
+    for (j = 0; j < n; j++) {
+	int i2 = Zp[j + 1];
+	for (i = Zp[j]; i < i2; i++) mZx[i] = GS->Zt[i] * GS->w[j];
+    }
+    mer_update_ZXy(GS->mer);
 }
 
 /** 
@@ -964,18 +961,17 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
     if (varc)	  /* skip this step if varc == (double*) NULL */	
 	internal_mer_coefGets(GS->mer, varc, 2);
     Memcpy(REAL(fixef), fixed, LENGTH(fixef));
-    Memcpy(REAL(GS->eta), GS->offset, GS->n);
-    internal_mer_fitted(GS->mer, GS->X, GS->Zt, REAL(GS->eta));
+    internal_mer_Zfactor(GS->mer);
+    internal_mer_ranef(GS->mer);
+    internal_mer_fitted(GS->mer, GS->X, GS->Zt, GS->offset, REAL(GS->eta));
     Memcpy(GS->etaold, REAL(GS->eta), GS->n);
     
     for (i = 0; i < GS->maxiter && crit > GS->tol; i++) {
-	internal_weights(GS);
-	internal_weight_ZXy(GS->mer, GS->X, GS->Zt, GS->w, GS->z);
-	mer_update_ZXy(GS->mer);
+	internal_glmer_reweight(GS);
 	internal_mer_Zfactor(GS->mer);
 	internal_mer_ranef(GS->mer);
-	Memcpy(REAL(GS->eta), GS->offset, GS->n);
-	internal_mer_fitted(GS->mer, GS->X, GS->Zt, REAL(GS->eta));
+	internal_mer_fitted(GS->mer, GS->X, GS->Zt, GS->offset,
+			    REAL(GS->eta));
 	crit = conv_crit(GS->etaold, REAL(GS->eta), GS->n);
     }
     Rprintf("in internal_bhat: i = %d, crit = %g\n", i, crit);
@@ -1149,11 +1145,10 @@ rel_dev_1(GlmerStruct GS, const double b[], int nlev, int nc, int k,
 	for (i = 0; i < nlev; i++) devcmp[i] = -sumsq;
     }
 #endif
-    Memcpy(REAL(GS->eta), GS->off, GS->n);
     internal_mer_fitted(
 	GS->mer, (double *) NULL,
 	REAL(GET_SLOT(GET_SLOT(GS->mer, Matrix_ZtSym), Matrix_xSym)),
-	REAL(GS->eta));
+	GS->off, REAL(GS->eta));
     eval_check_store(GS->linkinv, GS->rho, GS->mu);
     devs = PROTECT(eval_check(GS->dev_resids, GS->rho, REALSXP, GS->n));
     for (i = 0; i < GS->n; i++)
@@ -1187,7 +1182,7 @@ rel_dev_1(GlmerStruct GS, const double b[], int nlev, int nc, int k,
 
 
 /** 
- * Evaluate the conditional deviance for a given set of random effects.
+ * Evaluate the conditional deviance for the stored random effects.
  * 
  * @param GS Pointer to a GlmerStruct
  * @param fixed value of the fixed effects
@@ -1195,14 +1190,13 @@ rel_dev_1(GlmerStruct GS, const double b[], int nlev, int nc, int k,
  * @return conditional deviance
  */
 static double
-random_effects_deviance(GlmerStruct GS, const double b[])
+random_effects_deviance(GlmerStruct GS)
 {
     SEXP devs;
     int i;
     double ans;
 
-    Memcpy(REAL(GS->eta), GS->offset, GS->n);
-    internal_mer_fitted(GS->mer, GS->X, GS->Zt, REAL(GS->eta));
+    internal_mer_fitted(GS->mer, GS->X, GS->Zt, GS->offset, REAL(GS->eta));
     eval_check_store(GS->linkinv, GS->rho, GS->mu);
     devs = PROTECT(eval_check(GS->dev_resids, GS->rho, REALSXP, GS->n));
     for (i = 0, ans = 0; i < GS->n; i++) ans += REAL(devs)[i];
@@ -1528,15 +1522,12 @@ SEXP glmer_PQL(SEXP GSp)
     Memcpy(GS->etaold, REAL(GS->eta), GS->n);
     for (i = 0, crit = GS->tol + 1;
 	 i < GS->maxiter && crit > GS->tol; i++) {
-	internal_weights(GS);
-	internal_weight_ZXy(GS->mer, GS->X, GS->Zt, GS->w, GS->z);
-	mer_update_ZXy(GS->mer);
+	internal_glmer_reweight(GS);
 	if (!i) mer_initial(GS->mer); /* initialize first fit */
 	internal_ECMEsteps(GS->mer, i ? 2 : GS->niterEM,
 			   GS->EMverbose);
 	eval(GS->LMEopt, GS->rho);
-	Memcpy(REAL(GS->eta), GS->offset, GS->n);
-	internal_mer_fitted(GS->mer, GS->X, GS->Zt, REAL(GS->eta));
+	internal_mer_fitted(GS->mer, GS->X, GS->Zt, GS->offset, REAL(GS->eta));
 	crit = conv_crit(GS->etaold, REAL(GS->eta), GS->n);
     }
     if (crit > GS->tol)
@@ -1582,7 +1573,7 @@ SEXP glmer_devLaplace(SEXP pars, SEXP GSp)
 	      "pars", GS->npar);
     if (!internal_bhat(GS, REAL(pars), REAL(pars) + (GS->p)))
 	return ScalarReal(DBL_MAX);
-    dev[0] = dcmp[4] - dcmp[5] + random_effects_deviance(GS, bhat) +
+    dev[0] = dcmp[4] - dcmp[5] + random_effects_deviance(GS) +
 	b_quadratic(bhat, Omega, Gp, nc);
     dev[1] = NA_REAL;
     return ScalarReal(dev[0]);
@@ -2440,7 +2431,6 @@ SEXP mer_fitted(SEXP x, SEXP useFe, SEXP useRe)
     int n = LENGTH(GET_SLOT(x, Matrix_ySym));
     SEXP ans = PROTECT(allocVector(REALSXP, n));
 
-    AZERO(REAL(ans), n);
     internal_mer_fitted(x,
 			(asLogical(useFe)
 			 ? REAL(GET_SLOT(x, Matrix_XSym))
@@ -2448,7 +2438,7 @@ SEXP mer_fitted(SEXP x, SEXP useFe, SEXP useRe)
 			(asLogical(useRe)
 			 ? REAL(GET_SLOT(GET_SLOT(x, Matrix_ZtSym), Matrix_xSym))
 			 : (double *) NULL),
-			REAL(ans));
+			(double *) NULL, REAL(ans));
     UNPROTECT(1);
     return ans;
 }
