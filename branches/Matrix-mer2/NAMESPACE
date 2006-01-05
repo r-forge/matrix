@@ -1,4 +1,4 @@
-useDynLib(Matrix.new)
+useDynLib(Matrix, .registration=TRUE)
 
 importFrom("graphics",image)
 #importFrom("graphics",plot)		## lmer-related
@@ -120,8 +120,8 @@ exportClasses(
               "pMatrix",
               
 	      "dCholCMatrix",
-	      "lCholCMatrix",
-              "correlation"
+	      "lCholCMatrix"
+              # "correlation" # unused
 	      )
 
 ## lmer-related
