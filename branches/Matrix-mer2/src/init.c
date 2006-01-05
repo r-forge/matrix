@@ -121,7 +121,6 @@ static R_CallMethodDef CallEntries[] = {
     {"dsyMatrix_rcond", (DL_FUNC) &dsyMatrix_rcond, 2},
     {"dsyMatrix_solve", (DL_FUNC) &dsyMatrix_solve, 1},
     {"dsyMatrix_validate", (DL_FUNC) &dsyMatrix_validate, 1},
-    {"dspMatrix_trf", (DL_FUNC) &dspMatrix_trf, 1},
     {"dspMatrix_as_dsyMatrix", (DL_FUNC) &dspMatrix_as_dsyMatrix, 1},
     {"dspMatrix_matrix_mm", (DL_FUNC) &dspMatrix_matrix_mm, 3},
     {"dspMatrix_matrix_solve", (DL_FUNC) &dspMatrix_matrix_solve, 3},
@@ -221,7 +220,11 @@ static R_CallMethodDef CallEntries[] = {
     {NULL, NULL, 0}
 };
 
-void R_init_Matrix(DllInfo *dll)
+void 
+#ifdef HAVE_VISIBILITY_ATTRIBUTE
+__attribute__ ((visibility ("default")))
+#endif
+R_init_Matrix(DllInfo *dll)
 {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
