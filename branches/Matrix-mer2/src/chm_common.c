@@ -13,7 +13,7 @@ check_class(char *class, char **valid)
 
 cholmod_sparse *as_cholmod_sparse(SEXP x)
 {
-    cholmod_sparse *ans = (cholmod_sparse*) malloc(sizeof(cholmod_sparse));
+    cholmod_sparse *ans = Calloc(1, cholmod_sparse);
     char *valid[] = {"dgCMatrix", "dsCMatrix", "dtCMatrix",
 		     "lgCMatrix", "lsCMatrix", "ltCMatrix",
 		     "zgCMatrix", "zsCMatrix", "ztCMatrix",
@@ -139,7 +139,7 @@ SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int free)
  */
 cholmod_triplet *as_cholmod_triplet(SEXP x)
 {
-    cholmod_triplet *ans = (cholmod_triplet*) malloc(sizeof(cholmod_triplet));
+    cholmod_triplet *ans = Calloc(1, cholmod_triplet);
     char *valid[] = {"dgTMatrix", "dsTMatrix", "dtTMatrix",
 		     "lgTMatrix", "lsTMatrix", "ltTMatrix",
 		     "zgTMatrix", "zsTMatrix", "ztTMatrix",
@@ -261,24 +261,25 @@ SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int free)
  */
 cholmod_dense *as_cholmod_dense(SEXP x)
 {
-    cholmod_dense *ans = (cholmod_dense*) malloc(sizeof(cholmod_dense));
+    cholmod_dense *ans = Calloc(1, cholmod_dense);
     char *valid[] = {"dmatrix", "dgeMatrix",
 		     "lmatrix", "lgeMatrix",
 		     "zmatrix", "zgeMatrix", ""},
 	*cl = CHAR(asChar(getAttrib(x, R_ClassSymbol)));
-    int *dims, ctype = check_class(cl, valid);
+    int dims[2], ctype = check_class(cl, valid);
 
-    if (ctype < 0 && isMatrix(x))
+    if (ctype < 0) {
 	ctype = (isReal(x) ? 0 :
 		 (isLogical(x) ? 2 :
 		  (isComplex(x) ? 4 : -1)));
-   if (ctype < 0) error("invalid class of object to as_cholmod_dense");
+	if (isMatrix(x)) Memcpy(dims, INTEGER(getAttrib(x, R_DimSymbol)), 2);
+	else {dims[0] = LENGTH(x); dims[1] = 1;}
+    } else Memcpy(dims, INTEGER(GET_SLOT(x, Matrix_DimSym)), 2);
+    if (ctype < 0) error("invalid class of object to as_cholmod_dense");
 				/* characteristics of the system */
     ans->dtype = CHOLMOD_DOUBLE;
     ans->x = ans->z = (void *) NULL;
 				/* dimensions and nzmax */
-    dims = (ctype % 2) ? INTEGER(GET_SLOT(x, Matrix_DimSym)) :
-	INTEGER(getAttrib(x, R_DimSymbol));
     ans->d = ans->nrow = dims[0];
     ans->ncol = dims[1];
     ans->nzmax = dims[0] * dims[1];
@@ -338,6 +339,65 @@ SEXP chm_dense_to_SEXP(cholmod_dense *a, int free)
 
     if (free > 0) cholmod_free_dense(&a, &c);
     if (free < 0) Free(a);
+    UNPROTECT(1);
+    return ans;
+}
+
+/**
+ * Create a cholmod_factor object from the contents of x.  Note that
+ * the result should *not* be freed with cholmod_dense_free.  Use
+ * Free on the result.
+ *
+ * @param x pointer to an object that inherits from ddenseMatrix
+ *
+ * @return pointer to a cholmod_dense object that contains a pointer
+ * to the contents of x.
+ */
+cholmod_factor *as_cholmod_factor(SEXP x)
+{
+    cholmod_factor *ans = Calloc(1, cholmod_factor);
+    char *valid[] = {"dCHOLMODfactor", ""};
+    int n, ctype = check_class(CHAR(asChar(getAttrib(x, R_ClassSymbol))),
+				   valid);
+    SEXP tmp;
+
+    if (ctype < 0) error("invalid class of object to as_cholmod_factor");
+				/* characteristics of the system */
+    ans->itype = CHOLMOD_INT;
+    ans->dtype = CHOLMOD_DOUBLE;
+    ans->xtype = CHOLMOD_REAL;
+    ans->z = (void *) NULL;
+				/* dimensions and nzmax */
+    tmp = GET_SLOT(x, Matrix_permSym);
+    ans->n = LENGTH(tmp); ans->Perm = INTEGER(tmp);
+    ans->x = REAL(GET_SLOT(x, Matrix_xSym));
+    return ans;
+}
+
+/**
+ * Copy the contents of a to an appropriate denseMatrix object and,
+ * optionally, free a or free both a and its pointer to its contents.
+ *
+ * @param a matrix to be converted
+ * @param free 0 - don't free a; > 0 cholmod_free a; < 0 Free a
+ *
+ * @return SEXP containing a copy of a
+ */
+SEXP chm_factor_to_SEXP(cholmod_factor *f, int free)
+{
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dCHOLMODfactor")));
+    int ntot;
+
+    if (f->xtype != CHOLMOD_REAL)
+	error(_("cholmod_factor must have xtype of REAL"));
+    if (f->minor < f->n)
+	error(_("CHOLMOD factorization was unsuccessful"));
+				/* copy components that are always present */
+    Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_permSym, INTSXP, f->n)),
+	   (int*)f->Perm, f->n);
+
+    if (free > 0) cholmod_free_factor(&f, &c);
+    if (free < 0) Free(f);
     UNPROTECT(1);
     return ans;
 }
