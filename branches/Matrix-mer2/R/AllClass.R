@@ -399,6 +399,16 @@ setClass("lCholCMatrix",
          function(object) .Call("lCholCMatrix_validate", object, PACKAGE = "Matrix")
          )
 
+setClass("dCHOLMODfactor",             # CHOLMOD factorization
+	 representation(perm = "integer", colcount = "integer",
+                        p = "integer", i = "integer", x = "numeric",
+                        nz = "integer", nxt = "integer", prv = "integer",
+                        super = "integer", pi = "integer", px = "integer",
+                        s = "integer", ordering = "integer"),
+	 validity =
+         function(object) .Call("dCHOLMOD_factor_validate", object, PACKAGE = "Matrix")
+         )
+
 ##-------------------- permutation ----------------------------------------
 
 setClass("pMatrix", representation(perm = "integer"),
