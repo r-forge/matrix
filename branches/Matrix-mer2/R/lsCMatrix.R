@@ -6,10 +6,10 @@ setAs("lsCMatrix", "matrix",
       function(from) as(as(from, "lgCMatrix"), "matrix"))
 
 setAs("lsCMatrix", "lgCMatrix",
-      function(from) .Call("sCMatrix_to_gCMatrix", from, PACKAGE = "Matrix.new"))
+      function(from) .Call("sCMatrix_to_gCMatrix", from, PACKAGE = "Matrix"))
 
 setAs("lsCMatrix", "lsTMatrix",
-      function(from) .Call("Csparse_to_Tsparse", from, PACKAGE = "Matrix.new"))
+      function(from) .Call("Csparse_to_Tsparse", from, PACKAGE = "Matrix"))
 
 setAs("lsCMatrix", "dsCMatrix",
       function(from) new("dsCMatrix", i = from@i, p = from@p,
@@ -28,13 +28,13 @@ setMethod("image", "lsCMatrix",
 
 setMethod("chol", signature(x = "lsCMatrix", pivot = "missing"),
           function(x, pivot, LINPACK)
-          .Call("lsCMatrix_chol", x, TRUE, PACKAGE = "Matrix.new"))
+          .Call("lsCMatrix_chol", x, TRUE, PACKAGE = "Matrix"))
 
 setMethod("chol", signature(x = "lsCMatrix", pivot = "logical"),
           function(x, pivot, LINPACK)
-          .Call("lsCMatrix_chol", x, pivot, PACKAGE = "Matrix.new"))
+          .Call("lsCMatrix_chol", x, pivot, PACKAGE = "Matrix"))
 
 setMethod("t", signature(x = "lsCMatrix"),
           function(x)
-          .Call("lsCMatrix_trans", x, PACKAGE = "Matrix.new"),
+          .Call("lsCMatrix_trans", x, PACKAGE = "Matrix"),
           valueClass = "lsCMatrix")
