@@ -97,4 +97,4 @@ setMethod("isSymmetric", signature(object = "denseMatrix"),
 	  })
 
 setAs("denseMatrix", "CsparseMatrix",
-      function(from) .Call("dense_to_Csparse", from, PACKAGE = "Matrix.new"))
+      function(from) .Call("dense_to_Csparse", from, PACKAGE = "Matrix"))

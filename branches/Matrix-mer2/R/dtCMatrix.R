@@ -1,5 +1,5 @@
 setMethod("t", signature(x = "dtCMatrix"),
-          function(x) .Call("tsc_transpose", x, PACKAGE = "Matrix.new"),
+          function(x) .Call("tsc_transpose", x, PACKAGE = "Matrix"),
           valueClass = "dtCMatrix")
 
 setAs("dtCMatrix", "ltCMatrix",
@@ -21,7 +21,7 @@ setAs("dtCMatrix", "dgCMatrix",
 
 setAs("dtCMatrix", "dgTMatrix",
       function(from)
-      .Call("tsc_to_dgTMatrix", from, PACKAGE = "Matrix.new"))
+      .Call("tsc_to_dgTMatrix", from, PACKAGE = "Matrix"))
 
 setAs("dtCMatrix", "dgeMatrix",
       function(from) as(as(from, "dgTMatrix"), "dgeMatrix"))

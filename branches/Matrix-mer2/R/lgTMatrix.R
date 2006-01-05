@@ -5,7 +5,7 @@
 
 setAs("lgTMatrix", "lgCMatrix",
       function(from)
-      .Call("lgTMatrix_as_lgCMatrix", from, PACKAGE = "Matrix.new"))
+      .Call("lgTMatrix_as_lgCMatrix", from, PACKAGE = "Matrix"))
 
 setAs("lgTMatrix", "matrix",
       function(from) as(as(from, "lgCMatrix"), "matrix"))

@@ -21,7 +21,7 @@ setAs("graphNEL", "sparseMatrix",
           .Call("graphNEL_as_dgTMatrix",
                 from,
                 symmetric = (from@edgemode == "undirected"),
-                PACKAGE = "Matrix.new")
+                PACKAGE = "Matrix")
       })
 setAs("graph", "sparseMatrix",
       function(from) as(as(from,"graphNEL"), "sparseMatrix"))
