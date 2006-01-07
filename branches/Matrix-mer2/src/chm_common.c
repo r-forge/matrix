@@ -345,7 +345,7 @@ SEXP chm_dense_to_SEXP(cholmod_dense *a, int free)
 
 /**
  * Create a cholmod_factor object from the contents of x.  Note that
- * the result should *not* be freed with cholmod_dense_free.  Use
+ * the result should *not* be freed with cholmod_free_factor.  Use
  * Free on the result.
  *
  * @param x pointer to an object that inherits from ddenseMatrix
@@ -356,9 +356,9 @@ SEXP chm_dense_to_SEXP(cholmod_dense *a, int free)
 cholmod_factor *as_cholmod_factor(SEXP x)
 {
     cholmod_factor *ans = Calloc(1, cholmod_factor);
-    char *valid[] = {"dCHOLMODfactor", ""};
-    int n, ctype = check_class(CHAR(asChar(getAttrib(x, R_ClassSymbol))),
-				   valid);
+    char *valid[] = {"dCHMfactor", ""};
+    int *type = INTEGER(GET_SLOT(x, install("type"))),
+	ctype = check_class(CHAR(asChar(getAttrib(x, R_ClassSymbol))), valid);
     SEXP tmp;
 
     if (ctype < 0) error("invalid class of object to as_cholmod_factor");
@@ -367,16 +367,53 @@ cholmod_factor *as_cholmod_factor(SEXP x)
     ans->dtype = CHOLMOD_DOUBLE;
     ans->xtype = CHOLMOD_REAL;
     ans->z = (void *) NULL;
-				/* dimensions and nzmax */
+				/* unravel the type */
+    ans->ordering = type[0];
+    ans->is_ll = (type[1] ? 1 : 0);
+    ans->is_super = (type[2] ? 1 : 0);
+    ans->is_monotonic = (type[3] ? 1 : 0);
+				/* check for consistency */
+    if ((!(ans->is_ll)) && ans->is_super)
+	error(_("Supernodal LDL' decomposition not available"));
+				/* slots always present */
     tmp = GET_SLOT(x, Matrix_permSym);
-    ans->n = LENGTH(tmp); ans->Perm = INTEGER(tmp);
-    ans->x = REAL(GET_SLOT(x, Matrix_xSym));
+    ans->minor = ans->n = LENGTH(tmp); ans->Perm = INTEGER(tmp);
+    tmp = GET_SLOT(x, Matrix_xSym);
+    ans->x = REAL(tmp);
+    if (ans->is_super) {	/* supernodal factorization */
+	ans->xsize = LENGTH(tmp);
+	ans->maxcsize = type[4]; ans->maxesize = type[5];
+	ans->i = (int*)NULL;
+	tmp = GET_SLOT(x, install("super"));
+	ans->nsuper = LENGTH(tmp) - 1; ans->super = INTEGER(tmp);
+	/* Move these checks to the dCHMfactor_validate function */
+	if (ans->nsuper < 1)
+	    error(_("Number of supernodes must be positive when is_super is TRUE"));
+	tmp = GET_SLOT(x, install("pi"));
+	if (LENGTH(tmp) != ans->nsuper + 1)
+	    error(_("Lengths of super and pi must be equal"));
+	ans->pi = INTEGER(tmp);
+	tmp = GET_SLOT(x, install("px"));
+	if (LENGTH(tmp) != ans->nsuper + 1)
+	    error(_("Lengths of super and px must be equal"));
+	ans->px = INTEGER(tmp);
+	tmp = GET_SLOT(x, install("s"));
+	ans->ssize = LENGTH(tmp); ans->s = INTEGER(tmp);
+    } else {
+	ans->nzmax = LENGTH(tmp);
+	ans->p = INTEGER(GET_SLOT(x, Matrix_pSym));
+	ans->i = INTEGER(GET_SLOT(x, Matrix_iSym));
+	ans->ColCount = INTEGER(GET_SLOT(x, install("colcount")));
+	ans->nz = INTEGER(GET_SLOT(x, install("nz")));
+	ans->next = INTEGER(GET_SLOT(x, install("nxt")));
+	ans->prev = INTEGER(GET_SLOT(x, install("prv")));
+    }
     return ans;
 }
 
 /**
- * Copy the contents of a to an appropriate denseMatrix object and,
- * optionally, free a or free both a and its pointer to its contents.
+ * Copy the contents of f to an appropriate dCHMfactor object and,
+ * optionally, free f or free both f and its pointer to its contents.
  *
  * @param a matrix to be converted
  * @param free 0 - don't free a; > 0 cholmod_free a; < 0 Free a
@@ -385,20 +422,47 @@ cholmod_factor *as_cholmod_factor(SEXP x)
  */
 SEXP chm_factor_to_SEXP(cholmod_factor *f, int free)
 {
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dCHOLMODfactor")));
-    int ntot;
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dCHMfactor")));
+    int *type;
 
     if (f->xtype != CHOLMOD_REAL)
 	error(_("cholmod_factor must have xtype of REAL"));
     if (f->minor < f->n)
 	error(_("CHOLMOD factorization was unsuccessful"));
-				/* copy components that are always present */
+				/* copy component of known length */
     Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_permSym, INTSXP, f->n)),
 	   (int*)f->Perm, f->n);
-
+    type = INTEGER(ALLOC_SLOT(ans, install("type"), INTSXP, f->is_super ? 6 : 4));
+    type[0] = f->ordering; type[1] = f->is_ll;
+    type[2] = f->is_super; type[3] = f->is_monotonic;
+    if (f->is_super) {
+	type[4] = f->maxcsize; type[5] = f->maxesize;
+	Memcpy(INTEGER(ALLOC_SLOT(ans, install("super"), INTSXP, f->nsuper + 1)),
+	       (int*)f->super, f->nsuper+1);
+	Memcpy(INTEGER(ALLOC_SLOT(ans, install("pi"), INTSXP, f->nsuper + 1)),
+	       (int*)f->pi, f->nsuper + 1);
+	Memcpy(INTEGER(ALLOC_SLOT(ans, install("px"), INTSXP, f->nsuper + 1)),
+	       (int*)f->px, f->nsuper + 1);
+	Memcpy(INTEGER(ALLOC_SLOT(ans, install("s"), INTSXP, f->ssize)),
+	       (int*)f->s, f->ssize);
+	Memcpy(REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, f->xsize)),
+	       (double*)f->x, f->xsize);
+    } else {
+	Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_iSym, INTSXP, f->nzmax)),
+	   (int*)f->i, f->nzmax);
+	Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_pSym, INTSXP, f->n + 1)),
+	   (int*)f->p, f->n + 1);
+	Memcpy(REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, f->nzmax)),
+	       (double*)f->x, f->nzmax);
+	Memcpy(INTEGER(ALLOC_SLOT(ans, install("colcount"), INTSXP, f->n)),
+	       (int*)f->ColCount, f->n);
+	Memcpy(INTEGER(ALLOC_SLOT(ans, install("nxt"), INTSXP, f->n + 2)),
+	       (int*)f->next, f->n + 2);
+	Memcpy(INTEGER(ALLOC_SLOT(ans, install("prv"), INTSXP, f->n + 2)),
+	       (int*)f->prev, f->n + 2);
+    }	
     if (free > 0) cholmod_free_factor(&f, &c);
     if (free < 0) Free(f);
     UNPROTECT(1);
     return ans;
 }
-
