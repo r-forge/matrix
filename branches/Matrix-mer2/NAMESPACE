@@ -120,7 +120,8 @@ exportClasses(
               "pMatrix",
               
 	      "dCholCMatrix",
-	      "lCholCMatrix"
+	      "lCholCMatrix",
+              "dCHMfactor"
               # "correlation" # unused
 	      )
 
