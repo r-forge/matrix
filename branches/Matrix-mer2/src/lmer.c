@@ -194,7 +194,7 @@ Linv_to_bVar(cholmod_sparse *Linv, const int Gp[], const int nc[],
 }
 
 /** 
- * Evaluate the quadratic form in b defined by Omega^{-1}
+ * Evaluate the quadratic form in b defined by Omega
  * 
  * @param b vector of random effects
  * @param Omega - list of dpoMatrix objects defining the pattern for Omega
@@ -413,7 +413,7 @@ internal_mer_fitted(SEXP x, const double X[], const double Ztx[],
 	    *chb = as_cholmod_dense(ranef);
 	cholmod_sparse *Ztcp = cholmod_copy_sparse(Zt, &c);
 
-	if (Ztx != (double *)(Zt->x)) Memcpy((double *)(Ztcp->x), Ztx, n);
+	if (Ztx != (double*)(Zt->x)) Memcpy((double*)(Ztcp->x), Ztx, cholmod_nnz(Zt, &c));
 	Free(Zt);
 	if (!cholmod_sdmult(Ztcp, 1, one, one, chb, chv, &c))
 	    error(_("Error return from sdmult"));
@@ -615,7 +615,7 @@ internal_mer_update_ZXy(SEXP x, int *perm)
 	error(_("Number of nonzeros in Z'Z has changed - was %d, now %d"),
 	      LENGTH(ZtZx), nnz);
     Memcpy(INTEGER(ZtZi), (int*)(ts2->i), nnz);
-    Memcpy(REAL(ZtZx), (double *)(ts2->x), nnz);
+    Memcpy(REAL(ZtZx), (double*)(ts2->x), nnz);
     cholmod_free_sparse(&ts1, &c); cholmod_free_sparse(&ts2, &c);
 				/* PZ'X into ZtX */
     td1 = cholmod_allocate_dense(q, p, q, CHOLMOD_REAL, &c);
@@ -623,7 +623,7 @@ internal_mer_update_ZXy(SEXP x, int *perm)
 	error(_("cholmod_sdmult failed"));
     for (j = 0; j < p; j++) { 	/* apply the permutation to each column */
 	double *dcol = ZtX + j * q,
-	    *scol = (double *)(td1->x) + j * q;
+	    *scol = (double*)(td1->x) + j * q;
 	for (i = 0; i < q; i++) dcol[i] = scol[perm[i]];
     }
     cholmod_free_dense(&td1, &c); Free(Xd);
@@ -1043,7 +1043,6 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
 			    REAL(GS->eta));
 	crit = conv_crit(GS->etaold, REAL(GS->eta), GS->n);
     }
-    Rprintf("in internal_bhat: i = %d, crit = %g\n", i, crit);
     Free(L);
     return (crit > GS->tol) ? 0 : i;
 }
@@ -2925,7 +2924,7 @@ SEXP mer_simulate(SEXP x, SEXP nsimP)
 SEXP mer_update_ZXy(SEXP x)
 {
     internal_mer_update_ZXy(x,
-			    INTEGER(GET_SLOT(GET_SLOT(x, Matrix_xSym),
+			    INTEGER(GET_SLOT(GET_SLOT(x, Matrix_LSym),
 					     Matrix_permSym)));
     return R_NilValue;
 }
