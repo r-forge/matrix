@@ -356,7 +356,7 @@ SEXP chm_dense_to_SEXP(cholmod_dense *a, int free)
 cholmod_factor *as_cholmod_factor(SEXP x)
 {
     cholmod_factor *ans = Calloc(1, cholmod_factor);
-    char *valid[] = {"dCHMfactor", ""};
+    char *valid[] = {"dCHMsuper", "dCHMsimpl", "lCHMsuper", "lCHMsimpl", ""};
     int *type = INTEGER(GET_SLOT(x, install("type"))),
 	ctype = check_class(CHAR(asChar(getAttrib(x, R_ClassSymbol))), valid);
     SEXP tmp;
@@ -365,8 +365,9 @@ cholmod_factor *as_cholmod_factor(SEXP x)
 				/* characteristics of the system */
     ans->itype = CHOLMOD_INT;
     ans->dtype = CHOLMOD_DOUBLE;
-    ans->xtype = CHOLMOD_REAL;
     ans->z = (void *) NULL;
+    ans->xtype = (ctype < 2) ? CHOLMOD_REAL : CHOLMOD_PATTERN;
+
 				/* unravel the type */
     ans->ordering = type[0];
     ans->is_ll = (type[1] ? 1 : 0);
@@ -375,11 +376,15 @@ cholmod_factor *as_cholmod_factor(SEXP x)
 				/* check for consistency */
     if ((!(ans->is_ll)) && ans->is_super)
 	error(_("Supernodal LDL' decomposition not available"));
+    if ((!type[2]) ^ (ctype % 2))
+	error(_("Supernodal/simplicial class inconsistent with type flags"));
 				/* slots always present */
     tmp = GET_SLOT(x, Matrix_permSym);
     ans->minor = ans->n = LENGTH(tmp); ans->Perm = INTEGER(tmp);
-    tmp = GET_SLOT(x, Matrix_xSym);
-    ans->x = REAL(tmp);
+    if (ctype < 2) {
+	tmp = GET_SLOT(x, Matrix_xSym);
+	ans->x = REAL(tmp);
+    } else ans->x = (void*)NULL;
     if (ans->is_super) {	/* supernodal factorization */
 	ans->xsize = LENGTH(tmp);
 	ans->maxcsize = type[4]; ans->maxesize = type[5];
@@ -422,11 +427,21 @@ cholmod_factor *as_cholmod_factor(SEXP x)
  */
 SEXP chm_factor_to_SEXP(cholmod_factor *f, int free)
 {
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dCHMfactor")));
+    SEXP ans;
     int *type;
+    char *class = (char*) NULL;	/* -Wall */
 
-    if (f->xtype != CHOLMOD_REAL)
-	error(_("cholmod_factor must have xtype of REAL"));
+    switch(f->xtype) {
+    case CHOLMOD_REAL:
+	class = f->is_super ? "dCHMsuper" : "dCHMsimpl";
+	break;
+    case CHOLMOD_PATTERN:
+	class = f->is_super ? "dCHMsuper" : "dCHMsimpl";
+	break;
+    default:
+	error(_("f->xtype of %d not recognized"), f->xtype);
+    }
+    ans = PROTECT(NEW_OBJECT(MAKE_CLASS(class)));
     if (f->minor < f->n)
 	error(_("CHOLMOD factorization was unsuccessful"));
 				/* copy component of known length */
@@ -465,4 +480,19 @@ SEXP chm_factor_to_SEXP(cholmod_factor *f, int free)
     if (free < 0) Free(f);
     UNPROTECT(1);
     return ans;
+}
+
+SEXP CHMfactor_validate(SEXP obj) /* placeholder */
+{
+    return ScalarLogical(1);
+}
+
+SEXP CHMsimpl_validate(SEXP obj) /* placeholder */
+{
+    return ScalarLogical(1);
+}
+
+SEXP CHMsuper_validate(SEXP obj) /* placeholder */
+{
+    return ScalarLogical(1);
 }

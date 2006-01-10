@@ -16,4 +16,7 @@ SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int free);
 SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int free);
 SEXP chm_dense_to_SEXP(cholmod_dense *a, int free);
 
+SEXP CHMfactor_validate(SEXP obj);
+SEXP CHMsimpl_validate(SEXP obj);
+SEXP CHMsuper_validate(SEXP obj);
 #endif
