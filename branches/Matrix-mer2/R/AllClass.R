@@ -398,15 +398,34 @@ setClass("lCholCMatrix",
          function(object) .Call("lCholCMatrix_validate", object, PACKAGE = "Matrix")
          )
 
-setClass("dCHMfactor",            # cholmod_factor struct as S4 object
-	 representation(perm = "integer", colcount = "integer",
-                        p = "integer", i = "integer", x = "numeric",
-                        nz = "integer", nxt = "integer", prv = "integer",
-                        super = "integer", pi = "integer", px = "integer",
-                        s = "integer", type = "integer"),
+setClass("CHMfactor",            # cholmod_factor struct as S4 object
+	 representation(perm = "integer", type = "integer", "VIRTUAL"),
 	 validity =
-         function(object) .Call("dCHMfactor_validate", object, PACKAGE = "Matrix")
+         function(object) .Call("CHMfactor_validate", object, PACKAGE = "Matrix")
          )
+
+setClass("CHMsuper",                   # supernodal cholmod_factor
+         representation(super = "integer", pi = "integer", px = "integer",
+                        s = "integer", "VIRTUAL"),
+         contains = "CHMfactor",
+	 validity =
+         function(object) .Call("CHMsuper_validate", object, PACKAGE = "Matrix"))
+
+setClass("CHMsimpl",                   # simplicial cholmod_factor
+         representation(colcount = "integer", p = "integer", i = "integer",
+                        nz = "integer", nxt = "integer", prv = "integer", "VIRTUAL"),
+         contains = "CHMfactor",
+	 validity =
+         function(object) .Call("CHMsuper_validate", object, PACKAGE = "Matrix"))
+
+setClass("dCHMsuper", representation(x = "numeric"), contains = "CHMsuper")
+
+setClass("lCHMsuper", contains = "CHMsuper")
+
+setClass("dCHMsimpl", representation(x = "numeric"), contains = "CHMsimpl")
+
+setClass("lCHMsimpl", contains = "CHMsimpl")
+
 
 ##-------------------- permutation ----------------------------------------
 
@@ -483,7 +502,7 @@ setClass("mer",
                         ## When Omega is updated, these are updated
 			Omega = "list", # list of relative precision matrices
                         ## Cholesky factor of inflated [Z:X:y]'[Z:X:y]
-                        L = "dCHMfactor", # sparse Cholesky factor of Z'Z + Omega
+                        L = "dCHMsuper", # sparse Cholesky factor of Z'Z + Omega
 			RZX = "dgeMatrix",
 			RXX = "dtrMatrix",
                         rZy = "numeric",
@@ -491,8 +510,6 @@ setClass("mer",
 			devComp = "numeric", # Components of deviance
 			deviance = "numeric", # Current deviance (ML and REML)
                         ## Secondary slots only evaluated when requested.
-                        ## The sentinel is length(fixef) - if > 0 then
-                        ## info is current.
                         fixef = "numeric", 
                         ranef = "numeric",
                         RZXinv = "dgeMatrix",

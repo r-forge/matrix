@@ -121,7 +121,8 @@ exportClasses(
               
 	      "dCholCMatrix",
 	      "lCholCMatrix",
-              "dCHMfactor"
+              "dCHMsuper",
+              "dCHMsimpl"
               # "correlation" # unused
 	      )
 
