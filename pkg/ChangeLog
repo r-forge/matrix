@@ -1,4 +1,4 @@
-2006-01-07  Douglas Bates  <bates@bates4.stat.wisc.edu>
+2006-01-07  Douglas Bates  <bates@stat.wisc.edu>
 
 	* src/dgBCMatrix.c (cscb_trcbsm): Fix due to Peter Dalgaard for
 	segfault in cases with multiple non-nested grouping factors.
