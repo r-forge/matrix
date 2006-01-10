@@ -3,7 +3,7 @@
 \usepackage[authoryear,round]{natbib}
 \bibliographystyle{plainnat}
 %%\VignetteIndexEntry{Comparisons of Least Squares calculation speeds}
-%%\VignetteDepends{Matrix.new}
+%%\VignetteDepends{Matrix}
 \begin{document}
 \SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=5,height=3,strip.white=TRUE}
 \setkeys{Gin}{width=\textwidth}
