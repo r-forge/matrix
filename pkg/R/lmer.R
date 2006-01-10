@@ -238,7 +238,7 @@ setMethod("lmer", signature(formula = "formula"),
           ## set flag to skip fixed-effects in subsequent calls
           mer@nc[length(mmats)] <- -mer@nc[length(mmats)]
           ## indicator of constrained parameters
-          const <- c(rep(FALSE, length(fixInd)),
+          const <- c(rep.int(FALSE, length(fixInd)),
                      unlist(lapply(mer@nc[seq(along = random)],
                                    function(k) 1:((k*(k+1))/2) <= k)
                             ))
@@ -506,7 +506,7 @@ setMethod("getFixDF", signature(object="lmer"),
           nc <- object@nc[-seq(along = object@Omega)]
           p <- abs(nc[1]) - 1
           n <- nc[2]
-          rep(n-p, p)
+          rep.int(n-p, p)
       })
 
 setMethod("logLik", signature(object="mer"),
@@ -760,7 +760,7 @@ setMethod("coef", signature(object = "lmer"),
           fef <- data.frame(rbind(object@fixed), check.names = FALSE)
           ref <- as(ranef(object), "list")
           names(ref) <- names(object@flist)
-          val <- lapply(ref, function(x) fef[rep(1, nrow(x)),])
+          val <- lapply(ref, function(x) fef[rep.int(1, nrow(x)), , drop=FALSE])
           for (i in seq(a = val)) {
               refi <- ref[[i]]
               row.names(val[[i]]) <- row.names(refi)
@@ -770,6 +770,13 @@ setMethod("coef", signature(object = "lmer"),
           }
           new("lmer.coef", val)
       })
+
+
+## maybe wanted:
+## setMethod("show", signature(object="lmer.coef"),
+##           function(object)
+##       {
+##       })
 
 setMethod("plot", signature(x = "lmer.coef"),
           function(x, y, ...)
@@ -825,12 +832,11 @@ setMethod("show", signature(object="VarCorr"),
           useScale <- length(object@useScale) > 0 && object@useScale[1]
           sc <- ifelse(useScale, object@scale,  1.)
           reStdDev <- c(lapply(object@reSumry,
-                               function(x, sc)
-                               sc*x@stdDev,
-                               sc = sc), list(Residual = sc))
+                               function(x, sc) sc*x@stdDev, sc = sc),
+                        list(Residual = sc))
           reLens <- unlist(c(lapply(reStdDev, length)))
           reMat <- array('', c(sum(reLens), 4),
-          list(rep('', sum(reLens)),
+          list(rep.int('', sum(reLens)),
                c("Groups", "Name", "Variance", "Std.Dev.")))
           reMat[1+cumsum(reLens)-reLens, 1] <- names(reLens)
           reMat[,2] <- c(unlist(lapply(reStdDev, names)), "")
@@ -848,8 +854,8 @@ setMethod("show", signature(object="VarCorr"),
                                      if (nr >= maxlen) return(cc)
                                      cbind(cc, matrix("", nr, maxlen-nr))
                                  }, maxlen))
-              colnames(corr) <- c("Corr", rep("", maxlen - 1))
-              reMat <- cbind(reMat, rbind(corr, rep("", ncol(corr))))
+              colnames(corr) <- c("Corr", rep.int("", maxlen - 1))
+              reMat <- cbind(reMat, rbind(corr, rep.int("", ncol(corr))))
           }
           if (!useScale) reMat <- reMat[-nrow(reMat),]
           print(reMat, quote = FALSE)
@@ -1096,4 +1102,3 @@ refdist <- function(fm1, fm2, n, ...)
     attr(ref, "observed") <- obs
     ref
 }
-

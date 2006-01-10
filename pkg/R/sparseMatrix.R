@@ -135,7 +135,6 @@ setMethod("show", signature(object = "sparseMatrix"),
        d <- dim(object)
        cl <- class(object)
        cat(sprintf('%d x %d sparse Matrix of class "%s"\n', d[1], d[2], cl))
-
        maxp <- getOption("max.print")
        if(prod(d) <= maxp)
 	   prSpMatrix(object)

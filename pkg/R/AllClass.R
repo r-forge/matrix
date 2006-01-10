@@ -538,6 +538,8 @@ setClass("summary.lmer",
 			showCorrelation = "logical"),
 	 contains = "lmer")
 
+## These are currently *private* classes
+## Note that consequently, they print "ugly" w/o an explicit show() method
 setClass("lmer.ranef",
 	 representation(varFac = "list", stdErr = "numeric"),
 	 contains = "list")

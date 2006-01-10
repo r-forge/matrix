@@ -129,7 +129,7 @@ exportClasses(
 
 ## lmer-related
 exportClasses("VarCorr", "lmer", "mer", "summary.lmer")
-
+## "lmer.coef" etc are private on purpose
 
 exportMethods(
 	      ## Group Methods
@@ -185,4 +185,3 @@ exportMethods("BIC", "anova", "coef", "confint", "deviance", "fitted",
 	      "fixef", "formula", "lmer", "logLik", "mcmcsamp",
 	      "plot", "ranef", "residuals", "resid", "simulate",
 	      "summary", "update", "vcov", "VarCorr", "with")
-
