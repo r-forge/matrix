@@ -24,6 +24,11 @@ SUBDIRS = CHOLMOD UMFPACK COLAMD CCOLAMD AMD Metis LDL
 SUBLIBS = $(SUBDIRS:=.a)
 SUBSTAMP = $(SUBDIRS:=.stamp)
 
+## Variables that had been defined in UFconfig/UFconfig.mk
+
+BLAS = ${BLAS_LIBS}
+LAPACK = ${LAPACK_LIBS}
+
 $(SHLIB): $(OBJECTS) $(SUBLIBS)
 	$(SHLIB_LINK) -o $@ $(OBJECTS) $(SUBLIBS) $(ALL_LIBS)
 
@@ -40,7 +45,7 @@ $(SUBLIBS): $(SUBSTAMP)
 $(SUBSTAMP):
 	touch $(SUBSTAMP)
 
-clean:
+clean: 
 	@-rm -rf .libs _libs
 	@-rm -f *.o *.so *.a $(SUBSTAMP)
 	@for d in $(SUBDIRS); do \
