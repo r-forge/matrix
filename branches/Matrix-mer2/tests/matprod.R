@@ -19,6 +19,13 @@ assert.EQ.mat(tcrossprod(m5, m5), mm5)
 assert.EQ.mat(tcrossprod(m5, as(m5,"matrix")), mm5)
 assert.EQ.mat(tcrossprod(as(m5,"matrix"), m5), mm5)
 
+## simple cases with 'scalars' treated as 1x1 matrices:
+d <- Matrix(1:5)
+d %*% 2
+10 %*% t(d)
+assertError(3 %*% d)             # must give an error , similar to
+assertError(5 %*% as.matrix(d))  # -> error
+
 ## right and left "numeric" and "matrix" multiplication:
 (p1 <- m5 %*% c(10, 2:6))
 (p2 <- c(10, 2:5) %*% m5)
