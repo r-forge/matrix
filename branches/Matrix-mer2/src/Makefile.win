@@ -1,7 +1,10 @@
 # -*- Makefile -*- for Windows
-MkInclude=$(RHOME)/src/gnuwin32/MkRules
+PKG_HOME=$(shell $(RHOME)/src/gnuwin32/Rpwd.exe .)
+MkInclude=$(PKG_HOME)/Win.mk
 
-include $(MkInclude)
+include Win.mk
+#       |-> gnuwin32/MkRules
+
 BLAS_LIBS=-lRblas
 LAPACK_LIBS=-L$(RHOME)/lib -L$(RHOME)/src/gnuwin32 -lRlapack
 CPPFLAGS=$(PKG_CPPFLAGS) -I$(RHOME)/include
@@ -31,12 +34,12 @@ all: $(SHLIB)
 
 mostlyclean: clean
 
-$(SUBLIBS): 
+$(SUBLIBS):
 	@for d in $(SUBDIRS); do \
 	  (cd $${d} && MkInclude=$(MkInclude) $(MAKE) lib) || exit 1; \
 	done
 
-clean: 
+clean:
 	@-rm -rf .libs _libs
 	@-rm -f *.o *.dll
 	@for d in $(SUBDIRS); do \
