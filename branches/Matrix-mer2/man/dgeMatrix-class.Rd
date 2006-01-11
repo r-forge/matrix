@@ -49,7 +49,12 @@
 \alias{solve,dgeMatrix,missing-method}
 \alias{solve,dgeMatrix,numeric-method}
 \alias{t,dgeMatrix-method}
-\alias{tcrossprod,dgeMatrix-method}
+\alias{tcrossprod,dgeMatrix,missing-method}
+\alias{tcrossprod,dgeMatrix,dgeMatrix-method}
+\alias{tcrossprod,dgeMatrix,matrix-method}
+\alias{tcrossprod,dgeMatrix,numeric-method}
+\alias{tcrossprod,matrix,dgeMatrix-method}
+\alias{tcrossprod,numeric,dgeMatrix-method}
 %
 \description{A general numeric dense matrix in the S4 Matrix
   representation.
