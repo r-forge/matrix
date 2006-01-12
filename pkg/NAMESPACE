@@ -1,7 +1,7 @@
-useDynLib(Matrix)
+useDynLib(Matrix, .registration=TRUE)
 
 importFrom("graphics",image)
-importFrom("graphics",plot)		## lmer-related
+#importFrom("graphics",plot)		## lmer-related
 importFrom("lattice", levelplot)
 importFrom("grid",    grid.rect, gpar, grob)
 import("stats")				## lmer-related
@@ -14,7 +14,6 @@ export("Diagonal",
        "Hilbert",
        "Matrix",
        "Schur",
-       "bCrosstab",
        "expand",
        "expm",
        "facmul",
@@ -84,7 +83,6 @@ exportClasses(
 	      "zMatrix",
 	      "ldenseMatrix",
 
-	      "dgBCMatrix",
 	      "dgCMatrix",
 	      "dgRMatrix",# unused
 	      "dgTMatrix",
@@ -119,17 +117,18 @@ exportClasses(
 	      "ltCMatrix",
 	      "ltRMatrix",# unused
 	      "ltTMatrix",
-
-	      "corrmatrix",
-	      "pMatrix",
-	      "pdmatrix",
+              "pMatrix",
+              
 	      "dCholCMatrix",
-	      "lCholCMatrix"
+	      "lCholCMatrix",
+              "dCHMsuper",
+              "dCHMsimpl"
+              # "correlation" # unused
 	      )
 
 ## lmer-related
-exportClasses("VarCorr", "lmer", "mer", "summary.lmer")
-## "lmer.coef" etc are private on purpose
+exportClasses("lmer", "mer")
+
 
 exportMethods(
 	      ## Group Methods
@@ -183,5 +182,7 @@ exportMethods("cbind2")
 ## lmer-related
 exportMethods("BIC", "anova", "coef", "confint", "deviance", "fitted",
 	      "fixef", "formula", "lmer", "logLik", "mcmcsamp",
-	      "plot", "ranef", "residuals", "resid", "simulate",
+	      # "plot",
+              "ranef", "residuals", "resid", "simulate",
 	      "summary", "update", "vcov", "VarCorr", "with")
+
