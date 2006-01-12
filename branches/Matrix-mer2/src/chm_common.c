@@ -77,11 +77,11 @@ cholmod_sparse *as_cholmod_sparse(SEXP x)
  * optionally, free a or free both a and its the pointers to its contents.
  *
  * @param a matrix to be converted
- * @param free 0 - don't free a; > 0 cholmod_free a; < 0 Free a
+ * @param dofree 0 - don't free a; > 0 cholmod_free a; < 0 Free a
  *
  * @return SEXP containing a copy of a
  */
-SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int free)
+SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int dofree)
 {
     SEXP ans;
     char *cl = "";		/* -Wall */
@@ -121,8 +121,8 @@ SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int free)
     if (a->stype)
 	SET_SLOT(ans, Matrix_uploSym,
 		 mkString((a->stype > 0) ? "U" : "L"));
-    if (free > 0) cholmod_free_sparse(&a, &c);
-    if (free < 0) Free(a);
+    if (dofree > 0) cholmod_free_sparse(&a, &c);
+    if (dofree < 0) Free(a);
     UNPROTECT(1);
     return ans;
 }
@@ -201,11 +201,11 @@ cholmod_triplet *as_cholmod_triplet(SEXP x)
  * optionally, free a or free both a and its the pointers to its contents.
  *
  * @param a matrix to be converted
- * @param free 0 - don't free a; > 0 cholmod_free a; < 0 Free a
+ * @param dofree 0 - don't free a; > 0 cholmod_free a; < 0 Free a
  *
  * @return SEXP containing a copy of a
  */
-SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int free)
+SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int dofree)
 {
     SEXP ans;
     char *cl = "";		/* -Wall */
@@ -243,8 +243,8 @@ SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int free)
     if (a->stype)
 	SET_SLOT(ans, Matrix_uploSym,
 		 mkString((a->stype > 0) ? "U" : "L"));
-    if (free > 0) cholmod_free_triplet(&a, &c);
-    if (free < 0) Free(a);
+    if (dofree > 0) cholmod_free_triplet(&a, &c);
+    if (dofree < 0) Free(a);
     UNPROTECT(1);
     return ans;
 }
@@ -307,11 +307,11 @@ cholmod_dense *as_cholmod_dense(SEXP x)
  * optionally, free a or free both a and its pointer to its contents.
  *
  * @param a matrix to be converted
- * @param free 0 - don't free a; > 0 cholmod_free a; < 0 Free a
+ * @param dofree 0 - don't free a; > 0 cholmod_free a; < 0 Free a
  *
  * @return SEXP containing a copy of a
  */
-SEXP chm_dense_to_SEXP(cholmod_dense *a, int free)
+SEXP chm_dense_to_SEXP(cholmod_dense *a, int dofree)
 {
     SEXP ans;
     char *cl;
@@ -337,8 +337,8 @@ SEXP chm_dense_to_SEXP(cholmod_dense *a, int free)
 /* 	       (complex *) a->x, a->nz); */
     } else error("code for cholmod_dense with holes not yet written");
 
-    if (free > 0) cholmod_free_dense(&a, &c);
-    if (free < 0) Free(a);
+    if (dofree > 0) cholmod_free_dense(&a, &c);
+    if (dofree < 0) Free(a);
     UNPROTECT(1);
     return ans;
 }
@@ -421,11 +421,11 @@ cholmod_factor *as_cholmod_factor(SEXP x)
  * optionally, free f or free both f and its pointer to its contents.
  *
  * @param a matrix to be converted
- * @param free 0 - don't free a; > 0 cholmod_free a; < 0 Free a
+ * @param dofree 0 - don't free a; > 0 cholmod_free a; < 0 Free a
  *
  * @return SEXP containing a copy of a
  */
-SEXP chm_factor_to_SEXP(cholmod_factor *f, int free)
+SEXP chm_factor_to_SEXP(cholmod_factor *f, int dofree)
 {
     SEXP ans;
     int *type;
@@ -476,8 +476,8 @@ SEXP chm_factor_to_SEXP(cholmod_factor *f, int free)
 	Memcpy(INTEGER(ALLOC_SLOT(ans, install("prv"), INTSXP, f->n + 2)),
 	       (int*)f->prev, f->n + 2);
     }	
-    if (free > 0) cholmod_free_factor(&f, &c);
-    if (free < 0) Free(f);
+    if (dofree > 0) cholmod_free_factor(&f, &c);
+    if (dofree < 0) Free(f);
     UNPROTECT(1);
     return ans;
 }
