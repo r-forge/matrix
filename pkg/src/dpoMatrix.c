@@ -82,9 +82,11 @@ SEXP dpoMatrix_solve(SEXP x)
     SET_SLOT(val, Matrix_uploSym, duplicate(GET_SLOT(Chol, Matrix_uploSym)));
     SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(Chol, Matrix_xSym)));
     SET_SLOT(val, Matrix_DimSym, duplicate(GET_SLOT(Chol, Matrix_DimSym)));
+    SET_SLOT(val, Matrix_DimNamesSym,
+	     duplicate(GET_SLOT(x, Matrix_DimNamesSym)));
+    SET_SLOT(val, Matrix_rcondSym, duplicate(GET_SLOT(x, Matrix_rcondSym)));
     F77_CALL(dpotri)(uplo_P(val), dims,
 		     REAL(GET_SLOT(val, Matrix_xSym)), dims, &info);
-    SET_SLOT(val, Matrix_rcondSym, duplicate(GET_SLOT(x, Matrix_rcondSym)));
     UNPROTECT(1);
     return val;
 }
