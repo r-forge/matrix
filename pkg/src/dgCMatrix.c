@@ -337,8 +337,9 @@ SEXP csc_getDiag(SEXP x)
 SEXP csc_transpose(SEXP x)
 {
     cholmod_sparse *chx = as_cholmod_sparse(x);
-    SEXP ans = chm_sparse_to_SEXP(cholmod_transpose(chx, 1, &c), 1);
-    free(chx);/* since as_cholmod_sparse() malloc()s */
+    SEXP ans =
+	chm_sparse_to_SEXP(cholmod_transpose(chx, 1, &c), 1);
+    Free(chx);
     return ans;
 }
 

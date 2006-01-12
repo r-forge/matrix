@@ -250,6 +250,6 @@ SEXP dense_to_Csparse(SEXP x)
     cholmod_dense *chxd = as_cholmod_dense(x);
     cholmod_sparse *chxs = cholmod_dense_to_sparse(chxd, 1, &c);
 
-    free(chxd);
+    Free(chxd);
     return chm_sparse_to_SEXP(chxs, 1);
 }
