@@ -42,6 +42,8 @@ SEXP
     Matrix_statusSym,
     Matrix_uploSym,
     Matrix_useScaleSym,
+    Matrix_wrkresSym,
+    Matrix_wtsSym,
     Matrix_xSym,
     Matrix_ySym,
     Matrix_zSym;
