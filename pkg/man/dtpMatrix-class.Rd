@@ -84,9 +84,11 @@
 \examples{
 showClass("dtrMatrix")
 
-example("dtrMatrix-class")
-(p1 <- as(T3, "dtpMatrix"))
-str(p1)
-(pp <- as(T, "dtpMatrix"))
+if (0) {
+  example("dtrMatrix-class")
+  (p1 <- as(T3, "dtpMatrix"))
+  str(p1)
+  (pp <- as(T, "dtpMatrix"))
+}
 }
 \keyword{classes}

@@ -80,11 +80,13 @@ Class \code{"Matrix"} and others, by class \code{"dgeMatrix"}.
 \examples{
 (m <- rbind(2:3, 0:-1))
 (M <- as(m, "dgeMatrix"))
-(T <- as(M, "dtrMatrix")) ## upper triangular is default
-## hence this may surprise at first:
-(T2 <- as(t(M), "dtrMatrix"))# is factually diagonal
-## and different from
-(T3 <- t(T)) # which is *lower* triangular:
-str(T3)
+if (0) {
+  (T <- as(M, "dtrMatrix")) ## upper triangular is default
+  ## hence this may surprise at first:
+  (T2 <- as(t(M), "dtrMatrix"))# is factually diagonal
+  ## and different from
+  (T3 <- t(T)) # which is *lower* triangular:
+  str(T3)
+}
 }
 \keyword{classes}
