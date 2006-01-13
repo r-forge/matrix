@@ -39,10 +39,11 @@ setMethod("%*%", signature(x = "matrix", y = "dtrMatrix"),
           valueClass = "dgeMatrix")
 
 setMethod("%*%", signature(x = "dtrMatrix", y = "dtrMatrix"),
-	  function(x, y) callNextMethod())
+	  function(x, y) callGeneric(x = x, y = as(y, "dgeMatrix")),
+          valueClass = "dgeMatrix")
 
 setMethod("crossprod", signature(x = "dtrMatrix", y = "missing"),
-	  function(x, y = NULL) callNextMethod(),
+	  function(x, y = NULL) callGeneric(x = as(x, "dgeMatrix")),
 	  valueClass = "dpoMatrix")
 
 setMethod("determinant", signature(x = "dtrMatrix", logarithm = "missing"),

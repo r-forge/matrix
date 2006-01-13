@@ -27,13 +27,18 @@ setClass("Matrix",
 setClass("compMatrix",  representation(factors = "list", "VIRTUAL"),
          contains = "Matrix")
 
+## Virtual classes of Matrices determined by above/below diagonal relationships
+
+setClass("generalMatrix", contains = "compMatrix")
+
 setClass("symmetricMatrix",
 	 representation(uplo = "character", "VIRTUAL"),
-	 contains = "Matrix")
+	 contains = "compMatrix")
 
 setClass("triangularMatrix",
-	 representation(uplo = "character", diag = "character",
-			"VIRTUAL"), contains = "Matrix")
+	 representation(uplo = "character", diag = "character", "VIRTUAL"),
+         contains = "Matrix")
+
 
 ## Virtual class of numeric matrices
 setClass("dMatrix",
