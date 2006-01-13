@@ -1,12 +1,12 @@
 Package: Matrix
 Version: 0.995-1
-Date: 2006-01-12
+Date: 2006-01-15
 Title: A Matrix package for R
 Author: Douglas Bates <bates@stat.wisc.edu> and Martin Maechler <maechler@stat.math.ethz.ch>
 Maintainer: Douglas Bates <bates@stat.wisc.edu>
 Description: Classes and methods for numerical linear algebra
     using Lapack, LDL, and Metis.
-Depends: R (>= 2.3.0), methods, utils
+Depends: R (>= 2.2.1), methods, utils
 Imports: graphics, lattice, grid, stats
 Suggests: mlmRev, MASS, coda
 SystemRequirements: GNU make
