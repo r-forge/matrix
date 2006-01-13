@@ -1,14 +1,11 @@
 library(Matrix)
 options(show.signif.stars = FALSE)
 
-(fm1 <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
-             OrchardSprays))
-(fm2 <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
-             OrchardSprays, method = "ML"))
+(fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
+(fm2 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy, method = "ML"))
 
 ## should produce a warning but fit by REML
-(fm1b <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
-              OrchardSprays, method = "AGQ"))
+(fm1b <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy, method = "AGQ"))
 
 ## generalized linear mixed model
 (fm3 <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
@@ -32,8 +29,7 @@ y <- rnorm (n, a.group[group.id], 1)
 ## fit and summarize the model
 fit.1 <- lmer (y ~ 1 + (1 | group.id))
 coef (fit.1)# failed in Matrix 0.99-6 -- FIXME: should get a show() method
-summary(fit.1)
-
+try(summary(fit.1)) # FIXME: add a summary method
 
 ## Many family = binomial cases
 if (isTRUE(try(data(Contraception, package = 'mlmRev')) ==

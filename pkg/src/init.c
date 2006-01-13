@@ -151,14 +151,14 @@ static R_CallMethodDef CallEntries[] = {
     {"dtrMatrix_rcond", (DL_FUNC) &dtrMatrix_rcond, 2},
     {"dtrMatrix_solve", (DL_FUNC) &dtrMatrix_solve, 1},
     {"dtrMatrix_validate", (DL_FUNC) &dtrMatrix_validate, 1},
-    {"glmer_MCMCsamp", (DL_FUNC) &glmer_MCMCsamp, 6},
+/*     {"glmer_MCMCsamp", (DL_FUNC) &glmer_MCMCsamp, 6}, */
     {"glmer_PQL", (DL_FUNC) &glmer_PQL, 1},
-    {"glmer_devAGQ", (DL_FUNC) &glmer_devAGQ, 3},
+/*     {"glmer_devAGQ", (DL_FUNC) &glmer_devAGQ, 3}, */
     {"glmer_devLaplace", (DL_FUNC) &glmer_devLaplace, 2},
     {"glmer_finalize", (DL_FUNC) &glmer_finalize, 1},
-    {"glmer_fixed_update", (DL_FUNC) &glmer_fixed_update, 3},
+/*     {"glmer_fixed_update", (DL_FUNC) &glmer_fixed_update, 3}, */
     {"glmer_init", (DL_FUNC) &glmer_init, 1},
-    {"glmer_ranef_update", (DL_FUNC) &glmer_ranef_update, 4},
+/*     {"glmer_ranef_update", (DL_FUNC) &glmer_ranef_update, 4}, */
     {"lapack_qr", (DL_FUNC) &lapack_qr, 2},
 
     {"lCholCMatrix_solve", (DL_FUNC) &lCholCMatrix_solve, 1},
@@ -194,12 +194,11 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_dtCMatrix", (DL_FUNC) &mer_dtCMatrix, 1},
     {"mer_dtCMatrix_inv", (DL_FUNC) &mer_dtCMatrix_inv, 1},
     {"mer_factor", (DL_FUNC) &mer_factor, 1},
-    {"mer_fitted", (DL_FUNC) &mer_fitted, 3},
+    {"mer_fitted", (DL_FUNC) &mer_fitted, 1},
     {"mer_fixef", (DL_FUNC) &mer_fixef, 1},
     {"mer_gradComp", (DL_FUNC) &mer_gradComp, 1},
     {"mer_gradient", (DL_FUNC) &mer_gradient, 2},
     {"mer_initial", (DL_FUNC) &mer_initial, 1},
-    {"mer_pMatrix", (DL_FUNC) &mer_pMatrix, 1},
     {"mer_ranef", (DL_FUNC) &mer_ranef, 1},
     {"mer_secondary", (DL_FUNC) &mer_secondary, 1},
     {"mer_sigma", (DL_FUNC) &mer_sigma, 2},

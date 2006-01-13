@@ -343,6 +343,18 @@ SEXP chm_dense_to_SEXP(cholmod_dense *a, int dofree)
     return ans;
 }
 
+cholmod_dense *numeric_as_chm_dense(double *v, int n)
+{
+    cholmod_dense *ans = Calloc(1, cholmod_dense);
+    
+    ans->d = ans->nzmax = ans->nrow = n;
+    ans->ncol = 1;
+    ans->x = (void *) v;
+    ans->xtype = CHOLMOD_REAL;
+    ans->dtype = CHOLMOD_DOUBLE;
+    return ans;
+}
+
 /**
  * Create a cholmod_factor object from the contents of x.  Note that
  * the result should *not* be freed with cholmod_free_factor.  Use
@@ -496,3 +508,4 @@ SEXP CHMsuper_validate(SEXP obj) /* placeholder */
 {
     return ScalarLogical(1);
 }
+
