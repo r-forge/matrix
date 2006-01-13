@@ -735,7 +735,7 @@ setMethod("confint", signature(object = "mer"),
 
 setMethod("fitted", signature(object = "mer"),
           function(object, ...)
-          .Call("mer_fitted", object, TRUE, TRUE, PACKAGE = "Matrix")
+          .Call("mer_fitted", object, PACKAGE = "Matrix")
           )
 
 setMethod("formula", signature(x = "mer"),

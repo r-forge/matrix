@@ -47,85 +47,6 @@ std_rWishart_factor(double df, int p, double ans[])
     return ans;
 }
 
-/* These should be moved to other source files such as chm_common.c */
-static cholmod_dense
-*numeric_as_chm_dense(double *v, int n)
-{
-    cholmod_dense *ans = Calloc(1, cholmod_dense);
-    
-    ans->d = ans->nzmax = ans->nrow = n;
-    ans->ncol = 1;
-    ans->x = (void *) v;
-    ans->xtype = CHOLMOD_REAL;
-    ans->dtype = CHOLMOD_DOUBLE;
-    return ans;
-}
-
-static
-SEXP alloc_dgeMatrix(int m, int n, SEXP rownms, SEXP colnms)
-{
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))), dn;
-    int *dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
-
-    dims[0] = m; dims[1] = n;
-    ALLOC_SLOT(ans, Matrix_xSym, REALSXP, m * n);
-    dn = GET_SLOT(ans, Matrix_DimNamesSym);
-    SET_VECTOR_ELT(dn, 0, duplicate(rownms));
-    SET_VECTOR_ELT(dn, 1, duplicate(colnms));
-    UNPROTECT(1);
-    return ans;
-}
-
-static
-SEXP alloc_dpoMatrix(int n, char *uplo, SEXP rownms, SEXP colnms)
-{
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dpoMatrix"))), dn;
-    int *dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
-
-    dims[0] = dims[1] = n;
-    ALLOC_SLOT(ans, Matrix_xSym, REALSXP, n * n);
-    SET_SLOT(ans, Matrix_uploSym, mkString(uplo));
-    dn = GET_SLOT(ans, Matrix_DimNamesSym);
-    SET_VECTOR_ELT(dn, 0, duplicate(rownms));
-    SET_VECTOR_ELT(dn, 1, duplicate(colnms));
-    UNPROTECT(1);
-    return ans;
-}
-
-static
-SEXP alloc_dtrMatrix(int n, char *uplo, char *diag, SEXP rownms, SEXP colnms)
-{
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dtrMatrix"))), dn;
-    int *dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
-
-    dims[0] = dims[1] = n;
-    ALLOC_SLOT(ans, Matrix_xSym, REALSXP, n * n);
-    SET_SLOT(ans, Matrix_uploSym, mkString(uplo));
-    SET_SLOT(ans, Matrix_diagSym, mkString(diag));
-    dn = GET_SLOT(ans, Matrix_DimNamesSym);
-    SET_VECTOR_ELT(dn, 0, duplicate(rownms));
-    SET_VECTOR_ELT(dn, 1, duplicate(colnms));
-    UNPROTECT(1);
-    return ans;
-}
-
-static
-SEXP alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms)
-{
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dsCMatrix"))), dn;
-    int *dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
-
-    dims[0] = dims[1] = n;
-    ALLOC_SLOT(ans, Matrix_xSym, REALSXP, nz);
-    ALLOC_SLOT(ans, Matrix_iSym, INTSXP, nz);
-    ALLOC_SLOT(ans, Matrix_pSym, INTSXP, n + 1);
-    SET_SLOT(ans, Matrix_uploSym, mkString(uplo));
-    dn = GET_SLOT(ans, Matrix_DimNamesSym);
-    SET_VECTOR_ELT(dn, 0, duplicate(rownms));
-    SET_VECTOR_ELT(dn, 1, duplicate(colnms));
-    UNPROTECT(1);
-    return ans;
-}
 
 /* Internally used utilities */
 
@@ -191,6 +112,27 @@ Linv_to_bVar(cholmod_sparse *Linv, const int Gp[], const int nc[],
 	}
 	Free(ind); Free(tmp);
     }
+}
+
+static void
+internal_mer_bVar(SEXP x)
+{
+    int q = LENGTH(GET_SLOT(x, Matrix_rZySym));
+    cholmod_factor *L = as_cholmod_factor(GET_SLOT(x, Matrix_LSym));
+    cholmod_sparse *eye = cholmod_speye(q, q, CHOLMOD_REAL, &c), *Linv;
+    int *Perm = (int *)(L->Perm), *iperm = Calloc(q, int), i;
+				/* create the inverse permutation */
+    for (i = 0; i < q; i++) iperm[Perm[i]] = i;
+				/* apply iperm to the identity matrix */
+    for (i = 0; i < q; i++) ((int*)(eye->i))[i] = iperm[i];
+				/* Create Linv */
+    Linv = cholmod_spsolve(CHOLMOD_L, L, eye, &c);
+    cholmod_free_sparse(&eye, &c);
+    Linv_to_bVar(Linv, INTEGER(GET_SLOT(x, Matrix_GpSym)),
+		 INTEGER(GET_SLOT(x, Matrix_ncSym)), 
+		 GET_SLOT(x, Matrix_bVarSym), "U");
+    cholmod_free_sparse(&Linv, &c);
+    Free(L);
 }
 
 /** 
@@ -330,21 +272,14 @@ typedef struct glmer_struct
     SEXP rho;        /* environment in which to evaluate the calls */
     SEXP eta;        /* linear predictor */
     SEXP mu;         /* mean vector */
-    SEXP unwtd;      /* unweighted model matrices */
-    SEXP wtd;        /* weighted model matrices */
     SEXP linkinv;    /* expression for inverse link evaluation */
     SEXP mu_eta;     /* expression for dmu/deta evaluation */
     SEXP LMEopt;     /* expression for LME optimization */
     SEXP dev_resids; /* expression for deviance residuals */
     SEXP var;        /* expression for variance evaluation */
-    double *off;     /* offset for random effects only */
     double *offset;  /* offset for GLM */
     double *wts;     /* prior weights for GLM */
-    double *w;	     /* vector of weights */
-    double *X;	     /* copy of fixed-effects model matrix */
     double *y;       /* copy of response vector */
-    double *z;       /* working residual */
-    double *Zt;      /* copy of x slot in transpose of random-effects model matrix */
     double *etaold;  /* previous value of eta for evaluating  */
     int n;	     /* length of the response vector */
     int p;	     /* length of fixed effects vector */
@@ -356,69 +291,33 @@ typedef struct glmer_struct
     double tol;      /* convergence tolerance for IRLS iterations */
 } glmer_struct, *GlmerStruct;
 
-static void
-internal_mer_bVar(SEXP x)
-{
-    int q = LENGTH(GET_SLOT(x, Matrix_rZySym));
-    cholmod_factor *L = as_cholmod_factor(GET_SLOT(x, Matrix_LSym));
-    cholmod_sparse *eye = cholmod_speye(q, q, CHOLMOD_REAL, &c), *Linv;
-    int *Perm = (int *)(L->Perm), *iperm = Calloc(q, int), i;
-				/* create the inverse permutation */
-    for (i = 0; i < q; i++) iperm[Perm[i]] = i;
-				/* apply iperm to the identity matrix */
-    for (i = 0; i < q; i++) ((int*)(eye->i))[i] = iperm[i];
-				/* Create Linv */
-    Linv = cholmod_spsolve(CHOLMOD_L, L, eye, &c);
-    cholmod_free_sparse(&eye, &c);
-    Linv_to_bVar(Linv, INTEGER(GET_SLOT(x, Matrix_GpSym)),
-		 INTEGER(GET_SLOT(x, Matrix_ncSym)), 
-		 GET_SLOT(x, Matrix_bVarSym), "U");
-    cholmod_free_sparse(&Linv, &c);
-    Free(L);
-}
-
 /** 
- * Increment the fitted values from an mer object using the (possibly
- * externally stored) contents of the model matrices.
+ * Calculate fitted values for the current fixed and random effects.
  * 
  * @param x pointer to an mer object
- * @param X contents of the X model matrix or (double *) NULL
- * @param Zt values of non-zeros in the Zt model matrix or (double *) NULL
  * @param initial initial values (i.e. an offset) or (double *) NULL
  * @param val array to hold the fitted values
  * 
  * @return pointer to a numeric array of fitted values
  */
 static double *
-internal_mer_fitted(SEXP x, const double X[], const double Ztx[],
-		    const double initial[], double val[])
+internal_mer_fitted(SEXP x, const double initial[], double val[])
 {
-    int ione = 1, n = LENGTH(GET_SLOT(x, Matrix_ySym));
-    double one[] = {1,0};
+    SEXP fixef = GET_SLOT(x, Matrix_fixefSym),
+	ranef = GET_SLOT(x, Matrix_ranefSym);
+    int ione = 1, n = LENGTH(GET_SLOT(x, Matrix_ySym)), p = LENGTH(fixef);
+    double *X = REAL(GET_SLOT(x, Matrix_XSym)), one[] = {1,0};
+    cholmod_sparse *Zt = as_cholmod_sparse(GET_SLOT(x, Matrix_ZtSym));
+    cholmod_dense *chv = numeric_as_chm_dense(val, n),
+	*chb = as_cholmod_dense(ranef);
     
     mer_secondary(x);
     if (initial) Memcpy(val, initial, n);
     else AZERO(val, n);
-    if (X) {
-	SEXP fixef = GET_SLOT(x, Matrix_fixefSym);
-	int p = LENGTH(fixef);
-
-	F77_CALL(dgemv)("N", &n, &p, one, X, &n, REAL(fixef),
-			&ione, one, val, &ione);
-    }
-    if (Ztx) {
-	SEXP ranef = GET_SLOT(x, Matrix_ranefSym);
-	cholmod_sparse *Zt = as_cholmod_sparse(GET_SLOT(x, Matrix_ZtSym));
-	cholmod_dense *chv = numeric_as_chm_dense(val, n),
-	    *chb = as_cholmod_dense(ranef);
-	cholmod_sparse *Ztcp = cholmod_copy_sparse(Zt, &c);
-
-	if (Ztx != (double*)(Zt->x)) Memcpy((double*)(Ztcp->x), Ztx, cholmod_nnz(Zt, &c));
-	Free(Zt);
-	if (!cholmod_sdmult(Ztcp, 1, one, one, chb, chv, &c))
-	    error(_("Error return from sdmult"));
-	Free(chv); Free(chb); cholmod_free_sparse(&Ztcp, &c);
-    }
+    F77_CALL(dgemv)("N", &n, &p, one, X, &n, REAL(fixef), &ione, one, val, &ione);
+    if (!cholmod_sdmult(Zt, 1, one, one, chb, chv, &c))
+	error(_("Error return from sdmult"));
+    Free(chv); Free(chb); Free(Zt);
     return val;
 }
     
@@ -844,15 +743,11 @@ internal_Omega_update(SEXP Omega, const double b[], double sigma, int nf,
  */
 static void
 internal_glmer_reweight(GlmerStruct GS) {
-    SEXP dmu_deta, var,
-	mZt = GET_SLOT(GS->mer, Matrix_ZtSym);
-    int *Zp = INTEGER(GET_SLOT(mZt, Matrix_pSym));
-    int i, j,
-	n = LENGTH(GET_SLOT(GS->mer, Matrix_ySym)), 
-	p = LENGTH(GET_SLOT(GS->mer, Matrix_rXySym));
-    double *mX = REAL(GET_SLOT(GS->mer, Matrix_XSym)),
-	*my = REAL(GET_SLOT(GS->mer, Matrix_ySym)),
-	*mZx = REAL(GET_SLOT(mZt, Matrix_xSym));
+    SEXP dmu_deta, var;
+    int i;
+    double *w = REAL(GET_SLOT(GS->mer, Matrix_wtsSym)),
+	*y = REAL(GET_SLOT(GS->mer, Matrix_ySym)),
+	*z = REAL(GET_SLOT(GS->mer, Matrix_wrkresSym));
 
 				/* reweight mer */
     eval_check_store(GS->linkinv, GS->rho, GS->mu);
@@ -861,20 +756,12 @@ internal_glmer_reweight(GlmerStruct GS) {
     var = PROTECT(eval_check(GS->var, GS->rho,
 			     REALSXP, GS->n));
     for (i = 0; i < GS->n; i++) {
-	GS->w[i] = GS->wts[i] *
+	w[i] = GS->wts[i] *
 	    REAL(dmu_deta)[i]/sqrt(REAL(var)[i]);
-	GS->z[i] = REAL(GS->eta)[i] - GS->offset[i] +
-	    (GS->y[i] - REAL(GS->mu)[i])/REAL(dmu_deta)[i];
+	z[i] = REAL(GS->eta)[i] - GS->offset[i] +
+	    (y[i] - REAL(GS->mu)[i])/REAL(dmu_deta)[i];
     }
     UNPROTECT(2);
-    for (i = 0; i < n; i++) my[i] = GS->z[i] * GS->w[i];
-    for (j = 0; j < p; j++)
-	for (i = 0; i < n; i++) mX[i + j * n] =
-				    GS->X[i + j * n] * GS->w[i];
-    for (j = 0; j < n; j++) {
-	int i2 = Zp[j + 1];
-	for (i = Zp[j]; i < i2; i++) mZx[i] = GS->Zt[i] * GS->w[j];
-    }
     mer_update_ZXy(GS->mer);
 }
 
@@ -902,59 +789,6 @@ conv_crit(double etaold[], double eta[], int n) {
 	etaold[i] = eta[i];
     }
     return max_abs_diff / (0.1 + max_abs_eta);
-}
-
-/** 
- * Evaluate the quadratic form (x-mn)'A'A(x-mn) from the multivariate
- * normal kernel.
- * 
- * @param n dimension of random variate
- * @param mn mean vector
- * @param a upper Cholesky factor of the precision matrix
- * @param lda leading dimension of A
- * @param x vector at which to evaluate the kernel
- * 
- * @return value of the normal kernel
- */
-static double
-normal_kernel(int n, const double mn[],
-	      const double a[], int lda, const double x[])
-{
-    int i, ione = 1;
-    double *tmp = Calloc(n, double), ans;
-    
-    for (i = 0; i < n; i++) tmp[i] = x[i] - mn[i];
-    F77_CALL(dtrmv)("U", "N", "N", &n, a, &lda, tmp, &ione);
-    for (i = 0, ans = 0; i < n; i++) ans += tmp[i] * tmp[i];
-    Free(tmp);
-    return ans;
-}  
-
-/** 
- * Evaluate the conditional deviance for a given set of fixed effects.
- * 
- * @param GS Pointer to a GlmerStruct
- * @param fixed value of the fixed effects
- * 
- * @return conditional deviance
- */
-static double
-fixed_effects_deviance(GlmerStruct GS, const double fixed[])
-{
-    SEXP devs;
-    int i, ione = 1;
-    double ans, one = 1, zero = 0;
-
-    F77_CALL(dgemv)("N", &(GS->n), &(GS->p), &one,
-		    GS->X, &(GS->n), fixed,
-		    &ione, &zero, REAL(GS->eta), &ione);
-				/* add in random effects and offset */
-    vecIncrement(REAL(GS->eta), GS->off, GS->n);
-    eval_check_store(GS->linkinv, GS->rho, GS->mu);
-    devs = PROTECT(eval_check(GS->dev_resids, GS->rho, REALSXP, GS->n));
-    for (i = 0, ans = 0; i < GS->n; i++) ans += REAL(devs)[i];
-    UNPROTECT(1);
-    return ans;
 }
 
 /** 
@@ -1027,8 +861,7 @@ internal_mer_fixef(SEXP x)
 }
 
 /** 
- * Establish off, the effective offset for the fixed effects, and
- * iterate to determine the conditional modes of the random effects.
+ * Iterate to determine the conditional modes of the random effects.
  * 
  * @param GS a GlmerStruct object
  * @param fixed vector of fixed effects
@@ -1049,15 +882,14 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
     Memcpy(REAL(fixef), fixed, LENGTH(fixef));
     internal_mer_Zfactor(GS->mer, L);
     internal_mer_ranef(GS->mer);
-    internal_mer_fitted(GS->mer, GS->X, GS->Zt, GS->offset, REAL(GS->eta));
+    internal_mer_fitted(GS->mer, GS->offset, REAL(GS->eta));
     Memcpy(GS->etaold, REAL(GS->eta), GS->n);
     
     for (i = 0; i < GS->maxiter && crit > GS->tol; i++) {
 	internal_glmer_reweight(GS);
 	internal_mer_Zfactor(GS->mer, L);
 	internal_mer_ranef(GS->mer);
-	internal_mer_fitted(GS->mer, GS->X, GS->Zt, GS->offset,
-			    REAL(GS->eta));
+	internal_mer_fitted(GS->mer, GS->offset, REAL(GS->eta));
 	crit = conv_crit(GS->etaold, REAL(GS->eta), GS->n);
     }
     Free(L);
@@ -1170,103 +1002,6 @@ internal_ECMEsteps(SEXP x, int nEM, int verb)
     }
 }
 
-/* FIXME: Separate the calculation of the offset random effects from
- * the calculation of the deviance contributions. */
-
-/** 
- * Determine the deviance components associated with each of the
- * levels of a grouping factor at the conditional modes or a value
- * offset from the conditional modes by delb.
- * 
- * @param GS pointer to a GlmerStruct
- * @param b conditional modes of the random effects 
- * @param Gp group pointers
- * @param nc number of columns in the model matrix for the kth
- * grouping factor
- * @param k index (0-based) of the grouping factor
- * @param delb vector of length nc giving the changes in the
- * orthonormalized random effects 
- * @param OmgFac Cholesky factor of the inverse of the penalty matrix
- * for this grouping factor 
- * @param bVfac 3-dimensional array holding the factors of the
- * conditional variance-covariance matrix of the random effects 
-FIXME: This is wrong.  It is bVar[[i]] not bVfac that is being passed.
-This only affects the AGQ method.
- * @param devcmp array to hold the deviance components
- * 
- * @return devcmp
- */
-static double*
-rel_dev_1(GlmerStruct GS, const double b[], int nlev, int nc, int k,
-	  const double delb[], const double OmgFac[],
-	  const double bVfac[], double devcmp[])
-{
-    SEXP devs;
-    int *fv = INTEGER(VECTOR_ELT(GET_SLOT(GS->mer, Matrix_flistSym), k)),
-	i, j;
-/*     double *bcp = (double *) NULL; */
-
-    AZERO(devcmp, nlev);
-#if 0
-    if (delb) {
-	int ione = 1, ntot = nlev * nc;
-	double sumsq = 0;
-				/* copy the contents of b */
-	bcp = Memcpy(Calloc(ntot, double), b, ntot);
-	if (nc == 1) {
-	    sumsq = delb[0] * delb[0];
-	    for (i = 0; i < nlev; i++) b[i] += delb[0] * bVfac[i];
-	} else {
-	    int ncsq = nc * nc;
-	    double *tmp = Calloc(nc, double);
-	    for (i = 0; i < nlev; i++) {
-		Memcpy(tmp, delb, nc);
-		F77_CALL(dtrmv)("U", "N", "N", &nc, &(bVfac[i * ncsq]),
-				&nc, tmp, &ione);
-		for (j = 0; j < nc; j++) b[i + j * nc] = tmp[j];
-	    }
-				/* sum of squares of delb */
-	    for (j = 0; j < nc; j++) sumsq += delb[j] * delb[j];
-	}
-	for (i = 0; i < nlev; i++) devcmp[i] = -sumsq;
-    }
-#endif
-    internal_mer_fitted(
-	GS->mer, (double *) NULL,
-	REAL(GET_SLOT(GET_SLOT(GS->mer, Matrix_ZtSym), Matrix_xSym)),
-	GS->off, REAL(GS->eta));
-    eval_check_store(GS->linkinv, GS->rho, GS->mu);
-    devs = PROTECT(eval_check(GS->dev_resids, GS->rho, REALSXP, GS->n));
-    for (i = 0; i < GS->n; i++)
-	devcmp[fv[i] - 1] += REAL(devs)[i];
-    UNPROTECT(1);
-    if (nc == 1) {
-	for (i = 0; i < nlev; i++) {
-	    double tmp = *OmgFac * b[i];
-	    devcmp[i] += tmp * tmp;
-	}
-    } else {
-	double *tmp = Calloc(nc, double);
-	int ione = 1;
-	
-	for (i = 0; i < nlev; i++) {
-	    for (j = 0; j < nc; j++) tmp[j] = b[i + j * nlev];
-	    F77_CALL(dtrmv)("U", "N", "N", &nc, OmgFac, &nc,
-			    tmp, &ione);
-	    for (j = 0; j < nc; j++) 
-		devcmp[i] += tmp[j] * tmp[j];
-	}
-    }
-#if 0
-    if (delb) {
-	Memcpy(b, bcp, ntot);
-	Free(bcp);
-    }
-#endif
-    return devcmp;
-}
-
-
 /** 
  * Evaluate the conditional deviance for the stored random effects.
  * 
@@ -1282,267 +1017,13 @@ random_effects_deviance(GlmerStruct GS)
     int i;
     double ans;
 
-    internal_mer_fitted(GS->mer, GS->X, GS->Zt, GS->offset, REAL(GS->eta));
+    internal_mer_fitted(GS->mer, GS->offset, REAL(GS->eta));
     eval_check_store(GS->linkinv, GS->rho, GS->mu);
     devs = PROTECT(eval_check(GS->dev_resids, GS->rho, REALSXP, GS->n));
     for (i = 0, ans = 0; i < GS->n; i++) ans += REAL(devs)[i];
     UNPROTECT(1);
     return ans;
 }
-    
-static void
-internal_glmer_ranef_update(GlmerStruct GS, SEXP b)
-{
-    SEXP bhat, bprop = PROTECT(duplicate(b)), 
-	bVar = GET_SLOT(GS->mer, Matrix_bVarSym),
-	Omega = GET_SLOT(GS->mer, Matrix_OmegaSym);
-    int i, ione = 1, j, k;
-/*     double *b = REAL(GET_SLOT(GS->mer, Matrix_ranefSym); */
-    double devr, one = 1;
-
-    bhat = R_NilValue;
-				/* subtract deviance at b */
-/*     devr = -random_effects_deviance(GS, b); */
-     for (i = 0; i < GS->nf; i++) {
- 	SEXP Bi = VECTOR_ELT(b, i);
- 	int *dims = INTEGER(getAttrib(Bi, R_DimSymbol));
- 	int nlev = dims[0], nci = dims[1];
- 	int ncisqr = nci * nci, ntot = nlev * nci;
- 	double *bcopy = Calloc(ntot, double),
- 	    *bi = REAL(Bi),
- 	    *bhati = REAL(VECTOR_ELT(bhat, i)),
- 	    *bpropi = REAL(VECTOR_ELT(bprop, i)),
- 	    *bVari = REAL(VECTOR_ELT(bVar, i)),
- 	    *chol = Calloc(ncisqr, double),
- 	    *delta = Calloc(nci, double),
- 	    *omgfac = Memcpy(Calloc(ncisqr, double),
- 			     REAL(VECTOR_ELT(Omega, i)),
- 			     ncisqr);
-
- 				/* subtract quadratic form in */
- 				/* Omega[[i]] at b  */
- 	F77_CALL(dpotrf)("U", &nci, omgfac, &nci, &j);
- 	if (j)
- 	    error(_("Leading %d minor of Omega[[%d]] not positive definite"),
-                       j, i + 1);
- 	Memcpy(bcopy, bi, ntot);
- 	F77_CALL(dtrmm)("R", "U", "T", "N", &nlev, &nci, &one,
- 			omgfac, &nci, bcopy, &nlev);
- 	for (k = 0; k < ntot; k++) devr -= bcopy[k] * bcopy[k];
- 				/* form bprop and proposal density */
- 	for (k = 0; k < nlev; k++) {
- 				/* proposal density at b */
- 	    for (j = 0; j < nci; j++)
- 		delta[j] = bi[k + j * nlev] - bhati[k + j * nlev];
- 	    Memcpy(chol, &(bVari[k * ncisqr]), ncisqr);
- 	    F77_CALL(dpotrf)("U", &nci, chol, &nci, &j);
- 	    if (j)
- 		error(_("Leading %d minor of bVar[[%d]][,,%d] not positive definite"),
-                       j, i + 1, k + 1);
- 	    F77_CALL(dtrsv)("U", "T", "N", &nci, chol, &nci,
- 			    delta, &ione);
- 	    for (j = 0; j < nci; j++) {
- 		double nrm = norm_rand(); /* proposal deviate */
- 		devr += delta[j] * delta[j] - nrm * nrm;
- 		delta[j] = nrm;
- 	    }
- 				/* scale by Cholesky inverse */
- 	    F77_CALL(dtrmv)("U", "T", "N", &nci, chol, &nci,
- 			    delta, &ione);
- 				/* add mean */
- 	    for (j = 0; j < nci; j++)
- 		bpropi[k + j * nlev] = bhati[k + j * nlev] + delta[j];
- 	}
- 				/* add quadratic form in */
- 				/* Omega[[i]] at bprop  */
- 	Memcpy(bcopy, bpropi, ntot);
- 	F77_CALL(dtrmm)("R", "U", "T", "N", &nlev, &nci, &one,
- 			omgfac, &nci, bcopy, &nlev);
- 	for (k = 0; k < ntot; k++) devr += bcopy[k] * bcopy[k];
-
- 	Free(bcopy); Free(chol); Free(delta); Free(omgfac);
-     }
- 				/* add deviance at bprop */
-/*     devr += random_effects_deviance(GS, bprop); */
-
-    if (unif_rand() < exp(-0.5 * devr))
-	for (i = 0; i < GS->nf; i++) { /* copy each face of b */
-	    SEXP Bi = VECTOR_ELT(b, i);
-	    int *dims = INTEGER(getAttrib(Bi, R_DimSymbol));
-
-	    Memcpy(REAL(Bi), REAL(VECTOR_ELT(bprop, i)),
-		   dims[0] * dims[1]);
-	}
-    
-    if (asLogical(Matrix_getElement(GS->cv, "msVerbose"))) {
-	double *b0 = REAL(VECTOR_ELT(bprop, 0));
-	Rprintf("%5.3f:", exp(-0.5 * devr));
-	for (k = 0; k < 5; k++) Rprintf("%#10g ", b0[k]);
-	Rprintf("\n");
-    }
-	
-    UNPROTECT(2);
-}
-
-    
-/** 
- * Determine the conditional modes and the conditional variance of the
- * fixed effects given the data and the current random effects.
- * Create a Metropolis-Hasting proposal step from the multivariate
- * normal density, determine the acceptance probability and, if the
- * step is to be accepted, overwrite the contents of fixed with the
- * new contents.
- * 
- * @param GS a GlmerStruct
- * @param b list of random effects
- * @param fixed current value of the fixed effects
- * 
- * @return updated value of the fixed effects
- */
-static double *
-internal_glmer_fixef_update(GlmerStruct GS, SEXP b,
-			    double fixed[])
-{
-    SEXP dmu_deta, var;
-    int i, ione = 1, it, j, lwork = -1;
-    double *ans = Calloc(GS->p, double), /* proposal point */
-	*md = Calloc(GS->p, double), /* conditional modes */
-	*w = Calloc(GS->n, double), *work,
-	*wtd = Calloc(GS->n * GS->p, double),
-	*z = Calloc(GS->n, double),
-	crit, devr, one = 1, tmp, zero = 0;
-    
-    if (!isNewList(b) || LENGTH(b) != GS->nf)
-	error(_("%s must be a %s of length %d"), "b", "list", GS->nf);
-    for (i = 0; i < GS->nf; i++) {
-	SEXP bi = VECTOR_ELT(b, i);
-	if (!isReal(bi) || !isMatrix(bi))
-	    error(_("b[[%d]] must be a numeric matrix"), i);
-    }
-    AZERO(z, GS->n);		/* -Wall */
-    Memcpy(md, fixed, GS->p);
-				/* calculate optimal size of work array */
-    F77_CALL(dgels)("N", &(GS->n), &(GS->p), &ione, wtd, &(GS->n),
-		    z,  &(GS->n), &tmp, &lwork, &j);
-    if (j)			/* shouldn't happen */
-	error(_("%s returned error code %d"), "dgels", j);
-    lwork = (int) tmp;
-    work = Calloc(lwork, double);
-				
-    AZERO(GS->off, GS->n); /* fitted values from random effects */
-/*     fitted_ranef(GET_SLOT(GS->mer, Matrix_flistSym), GS->unwtd, b, */
-/* 		 INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)), GS->off); */
-    for (i = 0; i < GS->n; i++)
-	(GS->etaold)[i] = ((GS->off)[i] += (GS->offset)[i]);
-    
-    for (it = 0, crit = GS->tol + 1;
-	 it < GS->maxiter && crit > GS->tol; it++) {
-				/* fitted values from current beta */
-	F77_CALL(dgemv)("N", &(GS->n), &(GS->p), &one,
-			GS->X, &(GS->n), md,
-			&ione, &zero, REAL(GS->eta), &ione);
-				/* add in random effects and offset */
-	vecIncrement(REAL(GS->eta), (GS->off), GS->n);
-				/* check for convergence */
-	crit = conv_crit(GS->etaold, REAL(GS->eta), GS->n);
-				/* obtain mu, dmu_deta, var */
-	eval_check_store(GS->linkinv, GS->rho, GS->mu);
-	dmu_deta = PROTECT(eval_check(GS->mu_eta, GS->rho,
-				      REALSXP, GS->n));
-	var = PROTECT(eval_check(GS->var, GS->rho, REALSXP, GS->n));
-				/* calculate weights and working residual */
-	for (i = 0; i < GS->n; i++) {
-	    w[i] = GS->wts[i] * REAL(dmu_deta)[i]/sqrt(REAL(var)[i]);
-	    z[i] = w[i] * (REAL(GS->eta)[i] - (GS->off)[i] +
-			   ((GS->y)[i] - REAL(GS->mu)[i]) /
-			   REAL(dmu_deta)[i]);
-	}
-	UNPROTECT(2);
-				/* weighted copy of the model matrix */
-	for (j = 0; j < GS->p; j++)
-	    for (i = 0; i < GS->n; i++)
-		wtd[i + j * GS->n] = GS->X[i + j * GS->n] * w[i];
-				/* weighted least squares solution */
-	F77_CALL(dgels)("N", &(GS->n), &(GS->p), &ione, wtd, &(GS->n),
-			z, &(GS->n), work, &lwork, &j);
-	if (j) error(_("%s returned error code %d"), "dgels", j);
-	Memcpy(md, z, GS->p);
-    }
-				/* wtd contains the Cholesky factor of
-				 * the precision matrix */
-    devr = normal_kernel(GS->p, md, wtd, GS->n, fixed);
-    devr -= fixed_effects_deviance(GS, fixed);
-    for (i = 0; i < GS->p; i++) {
-	double var = norm_rand();
-	ans[i] = var;
-	devr -= var * var;
-    }
-    F77_CALL(dtrsv)("U", "N", "N", &(GS->p), wtd, &(GS->n), ans, &ione);
-    for (i = 0; i < GS->p; i++) ans[i] += md[i];
-    devr += fixed_effects_deviance(GS, ans);
-    crit = exp(-0.5 * devr);	/* acceptance probability */
-    tmp = unif_rand();
-    if (asLogical(Matrix_getElement(GS->cv, "msVerbose"))) {
-	Rprintf("%5.3f: ", crit);
-	for (j = 0; j < GS->p; j++) Rprintf("%#10g ", ans[j]);
-	Rprintf("\n");
-    }
-    if (tmp < crit) Memcpy(fixed, ans, GS->p);
-    Free(ans); Free(md); Free(w);
-    Free(work); Free(wtd); Free(z);
-    return fixed;
-}
-
-/* Gauss-Hermite Quadrature x positions and weights */
-static const double
-    GHQ_x1[1] = {0},
-    GHQ_w1[1] = {1},
-    GHQ_x2[1] = {1},
-    GHQ_w2[1] = {0.5},
-    GHQ_x3[2] = {1.7320507779261, 0},
-    GHQ_w3[2] = {0.166666666666667, 0.666666666666667},
-    GHQ_x4[2] = {2.3344141783872, 0.74196377160456},
-    GHQ_w4[2] = {0.0458758533899086, 0.454124131589555},
-    GHQ_x5[3] = {2.85696996497785, 1.35562615677371, 0},
-    GHQ_w5[3] = {0.0112574109895360, 0.222075915334214,
-		 0.533333317311434},
-    GHQ_x6[3] = {3.32425737665988, 1.88917584542184,
-		 0.61670657963811},
-    GHQ_w6[3] = {0.00255578432527774, 0.0886157433798025,
-		 0.408828457274383},
-    GHQ_x7[4] = {3.7504396535397, 2.36675937022918,
-		 1.15440537498316, 0},
-    GHQ_w7[4] = {0.000548268839501628, 0.0307571230436095,
-		 0.240123171391455, 0.457142843409801},
-    GHQ_x8[4] = {4.14454711519499, 2.80248581332504,
-		 1.63651901442728, 0.539079802125417},
-    GHQ_w8[4] = {0.000112614534992306, 0.0096352198313359,
-		 0.117239904139746, 0.373012246473389},
-    GHQ_x9[5] = {4.51274578616743, 3.20542894799789,
-		 2.07684794313409, 1.02325564627686, 0},
-    GHQ_w9[5] = {2.23458433364535e-05, 0.00278914123744297,
-		 0.0499164052656755, 0.244097495561989,
-		 0.406349194142045},
-    GHQ_x10[5] = {4.85946274516615, 3.58182342225163,
-		  2.48432579912153, 1.46598906930182,
-		  0.484935699216176},
-    GHQ_w10[5] = {4.31065250122166e-06, 0.000758070911538954,
-		  0.0191115799266379, 0.135483698910192,
-		  0.344642324578594},
-    GHQ_x11[6] = {5.18800113558601, 3.93616653976536,
-		  2.86512311160915, 1.87603498804787,
-		  0.928868981484148, 0},
-    GHQ_w11[6] = {8.12184954622583e-07, 0.000195671924393029,
-		  0.0067202850336527, 0.066138744084179,
-		  0.242240292596812, 0.36940835831095};
-
-static const double
-    *GHQ_x[12] = {(double *) NULL, GHQ_x1, GHQ_x2, GHQ_x3, GHQ_x4,
-		  GHQ_x5, GHQ_x6, GHQ_x7, GHQ_x8, GHQ_x9, GHQ_x10,
-		  GHQ_x11},
-    *GHQ_w[12] = {(double *) NULL, GHQ_w1, GHQ_w2, GHQ_w3, GHQ_w4,
-		  GHQ_w5, GHQ_w6, GHQ_w7, GHQ_w8, GHQ_w9, GHQ_w10,
-		  GHQ_w11};
 
 /* Externally accessible functions */
 
@@ -1613,7 +1094,7 @@ SEXP glmer_PQL(SEXP GSp)
 	internal_ECMEsteps(GS->mer, i ? 2 : GS->niterEM,
 			   GS->EMverbose);
 	eval(GS->LMEopt, GS->rho);
-	internal_mer_fitted(GS->mer, GS->X, GS->Zt, GS->offset, REAL(GS->eta));
+	internal_mer_fitted(GS->mer, GS->offset, REAL(GS->eta));
 	crit = conv_crit(GS->etaold, REAL(GS->eta), GS->n);
     }
     if (crit > GS->tol)
@@ -1621,20 +1102,6 @@ SEXP glmer_PQL(SEXP GSp)
 
     return R_NilValue;
 }
-
-#if 0
-SEXP glmer_bhat(SEXP pars, SEXP GSp)
-{
-    GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
-
-    if (!isReal(pars) || LENGTH(pars) != GS->npar)
-	error(_("`%s' must be a numeric vector of length %d"),
-	      "pars", GS->npar);
-    if (!internal_bhat(GS, REAL(pars), REAL(pars) + (GS->p)))
-	warning(_("internal_bhat did not converge"));
-    return R_NilValue;
-}
-#endif
 
 /** 
  * Compute the Laplace approximation to the deviance.
@@ -1666,101 +1133,6 @@ SEXP glmer_devLaplace(SEXP pars, SEXP GSp)
 }
 
 /** 
- * Compute the approximation to the deviance using adaptive
- * Gauss-Hermite quadrature (AGQ).  When nAGQ == 1 this is the Laplace
- * approximation.
- * 
- * @param pars pointer to a numeric vector of parameters
- * @param GSp pointer to a GlmerStruct object
- * @param nAGQp pointer to a scalar integer representing the number of
- * points in AGQ to use
- * 
- * @return the approximation to the deviance as computed using AGQ
- */
-SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
-{
-    GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
-    SEXP Omega = GET_SLOT(GS->mer, Matrix_OmegaSym),
-	bVar = GET_SLOT(GS->mer, Matrix_bVarSym);
-    int i, j, k, nAGQ = asInteger(nAGQp);
-    int n2 = (nAGQ + 1)/2,
-	*Gp = INTEGER(GET_SLOT(GS->mer, Matrix_GpSym)),
-	*nc = INTEGER(GET_SLOT(GS->mer, Matrix_ncSym));
-    double *f0, LaplaceDev = 0, AGQadjst = 0,
-	*bhat = REAL(GET_SLOT(GS->mer, Matrix_ranefSym));
-	
-    if (!isReal(pars) || LENGTH(pars) != GS->npar)
-	error(_("`%s' must be a numeric vector of length %d"),
-	      "pars", GS->npar);
-    if (GS->nf > 1 && nAGQ > 1) {
-	warning(_("AGQ not available for multiple grouping factors - using Laplace"));
-	nAGQ = 1;
-    }
-    if (!internal_bhat(GS, REAL(pars), REAL(pars) + (GS->p)))
-	return ScalarReal(DBL_MAX);
-
-    for (i = 0; i < GS->nf; i++) {
-	int nci = nc[i];
-	int ncip1 = nci + 1, ncisqr = nci * nci,
-	    nlev = (Gp[i + 1] - Gp[i])/nci;
-	double *omgf = REAL(GET_SLOT(dpoMatrix_chol(VECTOR_ELT(Omega, i)), Matrix_xSym)),
-	    *bVi = Memcpy(Calloc(ncisqr * nlev, double),
-			   REAL(VECTOR_ELT(bVar, i)), ncisqr * nlev);
-
-        for (j = 0; j < nci; j++) { /* nlev * logDet(Omega_i) */
-            LaplaceDev += 2 * nlev * log(omgf[j * ncip1]);
-        }
-        for (k = 0; k < nlev; k++) {
-	    double *bVik = bVi + k * ncisqr;
-            F77_CALL(dpotrf)("U", &nci, bVik, &nci, &j);
-            if (j)
-                error(_("Leading %d minor of bVar[[%d]][,,%d] not positive definite"),
-                      j, i + 1, k + 1);
-            for (j = 0; j < nci; j++) LaplaceDev -= 2 * log(bVik[j * ncip1]);
-        }
-
-	f0 = Calloc(nlev, double);
-	rel_dev_1(GS, bhat, nlev, nci, i, (double *) NULL,
-		  omgf, bVi, f0);
-	for (k = 0; k < nlev; k++) LaplaceDev += f0[k];
-	if (nAGQ > 1) {
-	    double *fx = Calloc(nlev, double),
-		*rellik = Calloc(nlev, double),
-		*delb = Calloc(nci, double);
-
-	    if (nci > 1) error(_("code not yet written"));
-	    AZERO(rellik, nlev);	/* zero accumulator */
-	    for (k = 0; k < n2; k++) {	
-		delb[0] = GHQ_x[nAGQ][k];
-		if (delb[0]) {
-		    rel_dev_1(GS, bhat, nlev, nci, i, delb,
-			      omgf, bVi, fx);
-		    for (j = 0; j < nlev; j++) {
-			rellik[j] += GHQ_w[nAGQ][k] *
-			    exp(-(fx[j] - f0[j])/2);
-		    }
-		    delb[0] *= -1;
-		    rel_dev_1(GS, bhat, nlev, nci, i, delb,
-			      omgf, bVi, fx);
-		    for (j = 0; j < nlev; j++) {
-			rellik[j] += GHQ_w[nAGQ][k] *
-			    exp(-(fx[j] - f0[j])/2);
-		    }
-		} else {
-		    for (j = 0; j < nlev; j++)
-			rellik[j] += GHQ_w[nAGQ][k];
-		}
-	    }
-	    for (j = 0; j < nlev; j++)
-		AGQadjst -= 2 * log(rellik[j]);
-	    Free(fx); Free(rellik);
-	}
-	Free(f0); Free(bVi);
-    }
-    return ScalarReal(LaplaceDev + AGQadjst);
-}
-
-/** 
  * Release the storage for a GlmerStruct
  * 
  * @param GSp External pointer to a  GlmerStruct
@@ -1770,37 +1142,9 @@ SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
 SEXP glmer_finalize(SEXP GSp) {
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
     
-    Free(GS->w); Free(GS->X); Free(GS->y); Free(GS->z);
-    Free(GS->Zt); Free(GS->off); Free(GS->offset); Free(GS->wts);
-    Free(GS->etaold);
+    Free(GS->offset); Free(GS->wts); Free(GS->etaold);
     Free(GS);
     return R_NilValue;
-}
-
-/** 
- * Determine the conditional modes and the conditional variance of the
- * fixed effects given the data and the current random effects.
- * Create a Metropolis-Hasting proposal step from the multivariate
- * normal density, determine the acceptance probability and return the
- * current value or the proposed value.
- * 
- * @param GSp pointer to a GlmerStruct
- * @param b list of random effects
- * @param fixed current value of the fixed effects
- * 
- * @return updated value of the fixed effects
- */
-SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed)
-{
-    GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
- 
-    if (!isReal(fixed) || LENGTH(fixed) != GS->p)
-	error(_("%s must be a %s of length %d"), "fixed",
-		"numeric vector", GS->p);
-    GetRNGstate();
-    internal_glmer_fixef_update(GS, b, REAL(fixed));
-    PutRNGstate();
-    return fixed;
 }
 
 /** 
@@ -1824,19 +1168,13 @@ SEXP glmer_init(SEXP rho) {
     y = GET_SLOT(GS->mer, Matrix_ySym);
     GS->n = LENGTH(y);
     GS->p = LENGTH(GET_SLOT(GS->mer, Matrix_rXySym));
-    GS->X = Memcpy(Calloc(GS->n * GS->p, double),
-		   REAL(GET_SLOT(GS->mer, Matrix_XSym)), GS->n * GS->p);
     GS->y = Memcpy(Calloc(GS->n, double), REAL(y), GS->n);
-    GS->w = Calloc(GS->n, double);
-    GS->z = Calloc(GS->n, double);
     Ztx = GET_SLOT(GET_SLOT(GS->mer, Matrix_ZtSym), Matrix_xSym);
-    GS->Zt = Memcpy(Calloc(LENGTH(Ztx), double), REAL(Ztx), LENGTH(Ztx));
     GS->mu = find_and_check(rho, install("mu"), REALSXP, GS->n);
     tmp = find_and_check(rho, install("offset"), REALSXP, GS->n);
     GS->offset = Memcpy(Calloc(GS->n, double), REAL(tmp), GS->n);
     tmp = find_and_check(rho, install("wts"), REALSXP, GS->n);
     GS->wts = Memcpy(Calloc(GS->n, double), REAL(tmp), GS->n);
-    GS->off = Calloc(GS->n, double);
     GS->etaold = Calloc(GS->n, double);
     GS->cv = find_and_check(rho, install("cv"), VECSXP, 0);
     GS->niterEM = asInteger(Matrix_getElement(GS->cv, "niterEM"));
@@ -1859,49 +1197,6 @@ SEXP glmer_init(SEXP rho) {
     GS->dev_resids = find_and_check(rho, install("dev.resids"),
 				    LANGSXP, 0);
     return R_MakeExternalPtr(GS, R_NilValue, GS->mer);
-}
-
-/** 
- * Determine the conditional modes and the conditional variance of the
- * random effects given the data and the current fixed effects and
- * variance components.
- *
- * Create a Metropolis-Hasting proposal step from a multivariate
- * normal density centered at bhat with variance-covariance matrix
- * from bVar, determine the acceptance probability and return the
- * current value or the proposed value.
- * 
- * @param GSp pointer to a GlmerStruct
- * @param fixed pointer to a numeric vector of the fixed effects
- * @param varc pointer to a numeric vector of the variance components
- * @param varc pointer to current values of b
- * 
- * @return updated b from the Metropolis-Hastings step
- */
-SEXP glmer_ranef_update(SEXP GSp, SEXP fixed, SEXP varc, SEXP b)
-{
-    GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
-    int nvarc = GS->npar - GS->p;
-
-    if (!isReal(fixed) || LENGTH(fixed) != GS->p)
-	error(_("`%s' must be a numeric vector of length %d"),
-	      "fixed", GS->p);
-    if (INTEGER(GET_SLOT(GS->mer, Matrix_ncSym))[GS->nf] > 0)
-	error(_("the mer object must be set to skip fixed effects"));
-    if (!isReal(varc) || LENGTH(varc) != nvarc)
-	error(_("`%s' must be a numeric vector of length %d"),
-	      "varc", nvarc);
-
-    GetRNGstate();
-    /* Don't check for convergence failure after internal_bhat.
-     * It is determining the mean of the proposal density and
-     * does not need exact convergence. */
-    internal_bhat(GS, REAL(fixed), REAL(varc));
-    internal_glmer_ranef_update(GS, b);
-    PutRNGstate();
-
-    UNPROTECT(1);
-    return b;
 }
 
 /**
@@ -2111,77 +1406,6 @@ mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp)
     return ans;
 }
 
-/** 
- * Create a Markov Chain Monte Carlo sample from a fitted generalized
- * linear mixed model
- * 
- * @param GSpt External pointer to a GlmerStruct
- * @param b Conditional modes of the random effects at the parameter
- * estimates
- * @param fixed Estimates of the fixed effects
- * @param varc Estimates of the variance components
- * @param savebp Logical indicator of whether or not to save the
- * random effects in the MCMC sample
- * @param nsampp Integer value of the number of samples to generate
- * 
- * @return 
- */
-SEXP 
-glmer_MCMCsamp(SEXP GSpt, SEXP b, SEXP fixed, SEXP varc,
-	       SEXP savebp, SEXP nsampp) 
-{ 
-    GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSpt);
-    int i, j, nf = LENGTH(b), nsamp = asInteger(nsampp),
-	p = LENGTH(fixed), q = LENGTH(varc),
-	saveb = asLogical(savebp);
-    int *mcpar, nc = p + q;
-    SEXP ans, mcparSym = install("mcpar");
-    
-    if (nsamp <= 0) nsamp = 1;
-    nc = p + q;
-    if (saveb)
-	for (i = 0; i < nf; i++) {
-	    int *dims = INTEGER(getAttrib(VECTOR_ELT(b, i),
-					  R_DimSymbol));
-	    nc += dims[0] * dims[1];
-	}
-    ans = PROTECT(allocMatrix(REALSXP, nsamp, nc));
-    GetRNGstate();
-    for (i = 0; i < nsamp; i++) {
-	internal_glmer_fixef_update(GS, b, REAL(fixed));
-	internal_bhat(GS, REAL(fixed), REAL(varc));
-	internal_glmer_ranef_update(GS, b);
-/* 	internal_Omega_update(GS->mer, b); */
-	internal_mer_coef(GS->mer, 2, REAL(varc));
-	for (j = 0; j < p; j++)
-	    REAL(ans)[i + j * nsamp] = REAL(fixed)[j];
-	for (j = 0; j < q; j++)
-	    REAL(ans)[i + (j + p) * nsamp] = REAL(varc)[j];
-	if (saveb) {
-	    int base = p + q, k;
-	    for (k = 0; k < nf; k++) {
-		SEXP bk = VECTOR_ELT(b, k);
-		int *dims = INTEGER(getAttrib(bk, R_DimSymbol));
-		int klen = dims[0] * dims[1];
-
-		for (j = 0; j < klen; j++)
-		    REAL(ans)[i + (j + base) * nsamp] = REAL(bk)[j];
-		base += klen;
-	    }
-	}
-    }
-    PutRNGstate();
-    UNPROTECT(1);
-				/* set (S3) class and mcpar attribute */
-    setAttrib(ans, R_ClassSymbol, mkString("mcmc"));
-    setAttrib(ans, mcparSym, allocVector(INTSXP, 3));
-    mcpar = INTEGER(getAttrib(ans, mcparSym));
-    mcpar[0] = mcpar[2] = 1;
-    mcpar[1] = nsamp;
-
-    return ans;
-} 
-
 /**
  * Create an mer object from a list of grouping factors and a list of model
  * matrices. 
@@ -2381,7 +1605,6 @@ SEXP mer_coefGets(SEXP x, SEXP coef, SEXP pType)
     return x;
 }
 
-
 /** 
  * Return L as a dtCMatrix object
  * 
@@ -2524,19 +1747,12 @@ SEXP mer_factor(SEXP x)
  * @return pointer to a numeric array of fitted values
  */
 
-SEXP mer_fitted(SEXP x, SEXP useFe, SEXP useRe)
+SEXP mer_fitted(SEXP x)
 {
     int n = LENGTH(GET_SLOT(x, Matrix_ySym));
     SEXP ans = PROTECT(allocVector(REALSXP, n));
 
-    internal_mer_fitted(x,
-			(asLogical(useFe)
-			 ? REAL(GET_SLOT(x, Matrix_XSym))
-			 : (double *) NULL),
-			(asLogical(useRe)
-			 ? REAL(GET_SLOT(GET_SLOT(x, Matrix_ZtSym), Matrix_xSym))
-			 : (double *) NULL),
-			(double *) NULL, REAL(ans));
+    internal_mer_fitted(x, (double*) NULL, REAL(ans));
     UNPROTECT(1);
     return ans;
 }
@@ -2786,27 +2002,6 @@ SEXP mer_initial(SEXP x)
     }
     flag_not_factored(x);
     return R_NilValue;
-}
-
-/** 
- * Return the permutation of the columns of Z as a pMatrix object
- * 
- * @param x pointer to an mer object
- * 
- * @return the permutation as an pMatrix object
- */
-SEXP mer_pMatrix(SEXP x)
-{
-    cholmod_factor *L = as_cholmod_factor(GET_SLOT(x, Matrix_LSym));
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("pMatrix")));
-    int *dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2)),
-	*perm = INTEGER(ALLOC_SLOT(ans, Matrix_permSym, INTSXP, L->n)), i;
-
-    dims[0] = dims[1] = (int) L->n;
-    for (i = 0; i < (int) L->n; i++) perm[i] = ((int *)(L->Perm))[i] + 1;
-    Free(L);
-    UNPROTECT(1);
-    return ans;
 }
 
 /**
@@ -3086,3 +2281,656 @@ SEXP Zt_create(SEXP fl, SEXP Ztl)
     UNPROTECT(1);
     return ans;
 }
+
+#if 0
+
+/* Gauss-Hermite Quadrature x positions and weights */
+static const double
+    GHQ_x1[1] = {0},
+    GHQ_w1[1] = {1},
+    GHQ_x2[1] = {1},
+    GHQ_w2[1] = {0.5},
+    GHQ_x3[2] = {1.7320507779261, 0},
+    GHQ_w3[2] = {0.166666666666667, 0.666666666666667},
+    GHQ_x4[2] = {2.3344141783872, 0.74196377160456},
+    GHQ_w4[2] = {0.0458758533899086, 0.454124131589555},
+    GHQ_x5[3] = {2.85696996497785, 1.35562615677371, 0},
+    GHQ_w5[3] = {0.0112574109895360, 0.222075915334214,
+		 0.533333317311434},
+    GHQ_x6[3] = {3.32425737665988, 1.88917584542184,
+		 0.61670657963811},
+    GHQ_w6[3] = {0.00255578432527774, 0.0886157433798025,
+		 0.408828457274383},
+    GHQ_x7[4] = {3.7504396535397, 2.36675937022918,
+		 1.15440537498316, 0},
+    GHQ_w7[4] = {0.000548268839501628, 0.0307571230436095,
+		 0.240123171391455, 0.457142843409801},
+    GHQ_x8[4] = {4.14454711519499, 2.80248581332504,
+		 1.63651901442728, 0.539079802125417},
+    GHQ_w8[4] = {0.000112614534992306, 0.0096352198313359,
+		 0.117239904139746, 0.373012246473389},
+    GHQ_x9[5] = {4.51274578616743, 3.20542894799789,
+		 2.07684794313409, 1.02325564627686, 0},
+    GHQ_w9[5] = {2.23458433364535e-05, 0.00278914123744297,
+		 0.0499164052656755, 0.244097495561989,
+		 0.406349194142045},
+    GHQ_x10[5] = {4.85946274516615, 3.58182342225163,
+		  2.48432579912153, 1.46598906930182,
+		  0.484935699216176},
+    GHQ_w10[5] = {4.31065250122166e-06, 0.000758070911538954,
+		  0.0191115799266379, 0.135483698910192,
+		  0.344642324578594},
+    GHQ_x11[6] = {5.18800113558601, 3.93616653976536,
+		  2.86512311160915, 1.87603498804787,
+		  0.928868981484148, 0},
+    GHQ_w11[6] = {8.12184954622583e-07, 0.000195671924393029,
+		  0.0067202850336527, 0.066138744084179,
+		  0.242240292596812, 0.36940835831095};
+
+static const double
+    *GHQ_x[12] = {(double *) NULL, GHQ_x1, GHQ_x2, GHQ_x3, GHQ_x4,
+		  GHQ_x5, GHQ_x6, GHQ_x7, GHQ_x8, GHQ_x9, GHQ_x10,
+		  GHQ_x11},
+    *GHQ_w[12] = {(double *) NULL, GHQ_w1, GHQ_w2, GHQ_w3, GHQ_w4,
+		  GHQ_w5, GHQ_w6, GHQ_w7, GHQ_w8, GHQ_w9, GHQ_w10,
+		  GHQ_w11};
+
+/** 
+ * Evaluate the conditional deviance for a given set of fixed effects.
+ * 
+ * @param GS Pointer to a GlmerStruct
+ * @param fixed value of the fixed effects
+ * 
+ * @return conditional deviance
+ */
+static double
+fixed_effects_deviance(GlmerStruct GS, const double fixed[])
+{
+    SEXP devs;
+    int i, ione = 1;
+    double ans, one = 1, zero = 0;
+
+    F77_CALL(dgemv)("N", &(GS->n), &(GS->p), &one,
+		    GS->X, &(GS->n), fixed,
+		    &ione, &zero, REAL(GS->eta), &ione);
+				/* add in random effects and offset */
+    vecIncrement(REAL(GS->eta), GS->off, GS->n);
+    eval_check_store(GS->linkinv, GS->rho, GS->mu);
+    devs = PROTECT(eval_check(GS->dev_resids, GS->rho, REALSXP, GS->n));
+    for (i = 0, ans = 0; i < GS->n; i++) ans += REAL(devs)[i];
+    UNPROTECT(1);
+    return ans;
+}
+
+
+/** 
+ * Evaluate the quadratic form (x-mn)'A'A(x-mn) from the multivariate
+ * normal kernel.
+ * 
+ * @param n dimension of random variate
+ * @param mn mean vector
+ * @param a upper Cholesky factor of the precision matrix
+ * @param lda leading dimension of A
+ * @param x vector at which to evaluate the kernel
+ * 
+ * @return value of the normal kernel
+ */
+static double
+normal_kernel(int n, const double mn[],
+	      const double a[], int lda, const double x[])
+{
+    int i, ione = 1;
+    double *tmp = Calloc(n, double), ans;
+    
+    for (i = 0; i < n; i++) tmp[i] = x[i] - mn[i];
+    F77_CALL(dtrmv)("U", "N", "N", &n, a, &lda, tmp, &ione);
+    for (i = 0, ans = 0; i < n; i++) ans += tmp[i] * tmp[i];
+    Free(tmp);
+    return ans;
+}  
+
+/* FIXME: Separate the calculation of the offset random effects from
+ * the calculation of the deviance contributions. */
+
+/** 
+ * Determine the deviance components associated with each of the
+ * levels of a grouping factor at the conditional modes or a value
+ * offset from the conditional modes by delb.
+ * 
+ * @param GS pointer to a GlmerStruct
+ * @param b conditional modes of the random effects 
+ * @param Gp group pointers
+ * @param nc number of columns in the model matrix for the kth
+ * grouping factor
+ * @param k index (0-based) of the grouping factor
+ * @param delb vector of length nc giving the changes in the
+ * orthonormalized random effects 
+ * @param OmgFac Cholesky factor of the inverse of the penalty matrix
+ * for this grouping factor 
+ * @param bVfac 3-dimensional array holding the factors of the
+ * conditional variance-covariance matrix of the random effects 
+FIXME: This is wrong.  It is bVar[[i]] not bVfac that is being passed.
+This only affects the AGQ method.
+ * @param devcmp array to hold the deviance components
+ * 
+ * @return devcmp
+ */
+static double*
+rel_dev_1(GlmerStruct GS, const double b[], int nlev, int nc, int k,
+	  const double delb[], const double OmgFac[],
+	  const double bVfac[], double devcmp[])
+{
+    SEXP devs;
+    int *fv = INTEGER(VECTOR_ELT(GET_SLOT(GS->mer, Matrix_flistSym), k)),
+	i, j;
+    double *bcp = (double *) NULL; 
+
+    AZERO(devcmp, nlev);
+    if (delb) {
+	int ione = 1, ntot = nlev * nc;
+	double sumsq = 0;
+				/* copy the contents of b */
+	bcp = Memcpy(Calloc(ntot, double), b, ntot);
+	if (nc == 1) {
+	    sumsq = delb[0] * delb[0];
+	    for (i = 0; i < nlev; i++) b[i] += delb[0] * bVfac[i];
+	} else {
+	    int ncsq = nc * nc;
+	    double *tmp = Calloc(nc, double);
+	    for (i = 0; i < nlev; i++) {
+		Memcpy(tmp, delb, nc);
+		F77_CALL(dtrmv)("U", "N", "N", &nc, &(bVfac[i * ncsq]),
+				&nc, tmp, &ione);
+		for (j = 0; j < nc; j++) b[i + j * nc] = tmp[j];
+	    }
+				/* sum of squares of delb */
+	    for (j = 0; j < nc; j++) sumsq += delb[j] * delb[j];
+	}
+	for (i = 0; i < nlev; i++) devcmp[i] = -sumsq;
+    }
+    internal_mer_fitted(GS->mer, GS->offset, REAL(GS->eta));
+    eval_check_store(GS->linkinv, GS->rho, GS->mu);
+    devs = PROTECT(eval_check(GS->dev_resids, GS->rho, REALSXP, GS->n));
+    for (i = 0; i < GS->n; i++)
+	devcmp[fv[i] - 1] += REAL(devs)[i];
+    UNPROTECT(1);
+    if (nc == 1) {
+	for (i = 0; i < nlev; i++) {
+	    double tmp = *OmgFac * b[i];
+	    devcmp[i] += tmp * tmp;
+	}
+    } else {
+	double *tmp = Calloc(nc, double);
+	int ione = 1;
+	
+	for (i = 0; i < nlev; i++) {
+	    for (j = 0; j < nc; j++) tmp[j] = b[i + j * nlev];
+	    F77_CALL(dtrmv)("U", "N", "N", &nc, OmgFac, &nc,
+			    tmp, &ione);
+	    for (j = 0; j < nc; j++) 
+		devcmp[i] += tmp[j] * tmp[j];
+	}
+    }
+    if (delb) {
+	Memcpy(b, bcp, ntot);
+	Free(bcp);
+    }
+    return devcmp;
+}
+
+
+/** 
+ * Create a Markov Chain Monte Carlo sample from a fitted generalized
+ * linear mixed model
+ * 
+ * @param GSpt External pointer to a GlmerStruct
+ * @param b Conditional modes of the random effects at the parameter
+ * estimates
+ * @param fixed Estimates of the fixed effects
+ * @param varc Estimates of the variance components
+ * @param savebp Logical indicator of whether or not to save the
+ * random effects in the MCMC sample
+ * @param nsampp Integer value of the number of samples to generate
+ * 
+ * @return 
+ */
+SEXP 
+glmer_MCMCsamp(SEXP GSpt, SEXP b, SEXP fixed, SEXP varc,
+	       SEXP savebp, SEXP nsampp) 
+{ 
+    GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSpt);
+    int i, j, nf = LENGTH(b), nsamp = asInteger(nsampp),
+	p = LENGTH(fixed), q = LENGTH(varc),
+	saveb = asLogical(savebp);
+    int *mcpar, nc = p + q;
+    SEXP ans, mcparSym = install("mcpar");
+    
+    if (nsamp <= 0) nsamp = 1;
+    nc = p + q;
+    if (saveb)
+	for (i = 0; i < nf; i++) {
+	    int *dims = INTEGER(getAttrib(VECTOR_ELT(b, i),
+					  R_DimSymbol));
+	    nc += dims[0] * dims[1];
+	}
+    ans = PROTECT(allocMatrix(REALSXP, nsamp, nc));
+    GetRNGstate();
+    for (i = 0; i < nsamp; i++) {
+	internal_glmer_fixef_update(GS, b, REAL(fixed));
+	internal_bhat(GS, REAL(fixed), REAL(varc));
+	internal_glmer_ranef_update(GS, b);
+ 	internal_Omega_update(GS->mer, b);
+	internal_mer_coef(GS->mer, 2, REAL(varc));
+	for (j = 0; j < p; j++)
+	    REAL(ans)[i + j * nsamp] = REAL(fixed)[j];
+	for (j = 0; j < q; j++)
+	    REAL(ans)[i + (j + p) * nsamp] = REAL(varc)[j];
+	if (saveb) {
+	    int base = p + q, k;
+	    for (k = 0; k < nf; k++) {
+		SEXP bk = VECTOR_ELT(b, k);
+		int *dims = INTEGER(getAttrib(bk, R_DimSymbol));
+		int klen = dims[0] * dims[1];
+
+		for (j = 0; j < klen; j++)
+		    REAL(ans)[i + (j + base) * nsamp] = REAL(bk)[j];
+		base += klen;
+	    }
+	}
+    }
+    PutRNGstate();
+    UNPROTECT(1);
+				/* set (S3) class and mcpar attribute */
+    setAttrib(ans, R_ClassSymbol, mkString("mcmc"));
+    setAttrib(ans, mcparSym, allocVector(INTSXP, 3));
+    mcpar = INTEGER(getAttrib(ans, mcparSym));
+    mcpar[0] = mcpar[2] = 1;
+    mcpar[1] = nsamp;
+
+    return ans;
+} 
+
+/** 
+ * Determine the conditional modes and the conditional variance of the
+ * fixed effects given the data and the current random effects.
+ * Create a Metropolis-Hasting proposal step from the multivariate
+ * normal density, determine the acceptance probability and return the
+ * current value or the proposed value.
+ * 
+ * @param GSp pointer to a GlmerStruct
+ * @param b list of random effects
+ * @param fixed current value of the fixed effects
+ * 
+ * @return updated value of the fixed effects
+ */
+SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed)
+{
+    GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
+ 
+    if (!isReal(fixed) || LENGTH(fixed) != GS->p)
+	error(_("%s must be a %s of length %d"), "fixed",
+		"numeric vector", GS->p);
+    GetRNGstate();
+    internal_glmer_fixef_update(GS, b, REAL(fixed));
+    PutRNGstate();
+    return fixed;
+}
+
+SEXP glmer_bhat(SEXP pars, SEXP GSp)
+{
+    GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
+
+    if (!isReal(pars) || LENGTH(pars) != GS->npar)
+	error(_("`%s' must be a numeric vector of length %d"),
+	      "pars", GS->npar);
+    if (!internal_bhat(GS, REAL(pars), REAL(pars) + (GS->p)))
+	warning(_("internal_bhat did not converge"));
+    return R_NilValue;
+}
+
+
+    
+/** 
+ * Determine the conditional modes and the conditional variance of the
+ * fixed effects given the data and the current random effects.
+ * Create a Metropolis-Hasting proposal step from the multivariate
+ * normal density, determine the acceptance probability and, if the
+ * step is to be accepted, overwrite the contents of fixed with the
+ * new contents.
+ * 
+ * @param GS a GlmerStruct
+ * @param b list of random effects
+ * @param fixed current value of the fixed effects
+ * 
+ * @return updated value of the fixed effects
+ */
+static double *
+internal_glmer_fixef_update(GlmerStruct GS, SEXP b,
+			    double fixed[])
+{
+    SEXP dmu_deta, var;
+    int i, ione = 1, it, j, lwork = -1;
+    double *ans = Calloc(GS->p, double), /* proposal point */
+	*md = Calloc(GS->p, double), /* conditional modes */
+	*w = Calloc(GS->n, double), *work,
+	*wtd = Calloc(GS->n * GS->p, double),
+	*z = Calloc(GS->n, double),
+	crit, devr, one = 1, tmp, zero = 0;
+    
+    if (!isNewList(b) || LENGTH(b) != GS->nf)
+	error(_("%s must be a %s of length %d"), "b", "list", GS->nf);
+    for (i = 0; i < GS->nf; i++) {
+	SEXP bi = VECTOR_ELT(b, i);
+	if (!isReal(bi) || !isMatrix(bi))
+	    error(_("b[[%d]] must be a numeric matrix"), i);
+    }
+    AZERO(z, GS->n);		/* -Wall */
+    Memcpy(md, fixed, GS->p);
+				/* calculate optimal size of work array */
+    F77_CALL(dgels)("N", &(GS->n), &(GS->p), &ione, wtd, &(GS->n),
+		    z,  &(GS->n), &tmp, &lwork, &j);
+    if (j)			/* shouldn't happen */
+	error(_("%s returned error code %d"), "dgels", j);
+    lwork = (int) tmp;
+    work = Calloc(lwork, double);
+				
+    AZERO(GS->off, GS->n); /* fitted values from random effects */
+/*     fitted_ranef(GET_SLOT(GS->mer, Matrix_flistSym), GS->unwtd, b, */
+/* 		 INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)), GS->off); */
+    for (i = 0; i < GS->n; i++)
+	(GS->etaold)[i] = ((GS->off)[i] += (GS->offset)[i]);
+    
+    for (it = 0, crit = GS->tol + 1;
+	 it < GS->maxiter && crit > GS->tol; it++) {
+				/* fitted values from current beta */
+	F77_CALL(dgemv)("N", &(GS->n), &(GS->p), &one,
+			GS->X, &(GS->n), md,
+			&ione, &zero, REAL(GS->eta), &ione);
+				/* add in random effects and offset */
+	vecIncrement(REAL(GS->eta), (GS->off), GS->n);
+				/* check for convergence */
+	crit = conv_crit(GS->etaold, REAL(GS->eta), GS->n);
+				/* obtain mu, dmu_deta, var */
+	eval_check_store(GS->linkinv, GS->rho, GS->mu);
+	dmu_deta = PROTECT(eval_check(GS->mu_eta, GS->rho,
+				      REALSXP, GS->n));
+	var = PROTECT(eval_check(GS->var, GS->rho, REALSXP, GS->n));
+				/* calculate weights and working residual */
+	for (i = 0; i < GS->n; i++) {
+	    w[i] = GS->wts[i] * REAL(dmu_deta)[i]/sqrt(REAL(var)[i]);
+	    z[i] = w[i] * (REAL(GS->eta)[i] - (GS->off)[i] +
+			   ((GS->y)[i] - REAL(GS->mu)[i]) /
+			   REAL(dmu_deta)[i]);
+	}
+	UNPROTECT(2);
+				/* weighted copy of the model matrix */
+	for (j = 0; j < GS->p; j++)
+	    for (i = 0; i < GS->n; i++)
+		wtd[i + j * GS->n] = GS->X[i + j * GS->n] * w[i];
+				/* weighted least squares solution */
+	F77_CALL(dgels)("N", &(GS->n), &(GS->p), &ione, wtd, &(GS->n),
+			z, &(GS->n), work, &lwork, &j);
+	if (j) error(_("%s returned error code %d"), "dgels", j);
+	Memcpy(md, z, GS->p);
+    }
+				/* wtd contains the Cholesky factor of
+				 * the precision matrix */
+    devr = normal_kernel(GS->p, md, wtd, GS->n, fixed);
+    devr -= fixed_effects_deviance(GS, fixed);
+    for (i = 0; i < GS->p; i++) {
+	double var = norm_rand();
+	ans[i] = var;
+	devr -= var * var;
+    }
+    F77_CALL(dtrsv)("U", "N", "N", &(GS->p), wtd, &(GS->n), ans, &ione);
+    for (i = 0; i < GS->p; i++) ans[i] += md[i];
+    devr += fixed_effects_deviance(GS, ans);
+    crit = exp(-0.5 * devr);	/* acceptance probability */
+    tmp = unif_rand();
+    if (asLogical(Matrix_getElement(GS->cv, "msVerbose"))) {
+	Rprintf("%5.3f: ", crit);
+	for (j = 0; j < GS->p; j++) Rprintf("%#10g ", ans[j]);
+	Rprintf("\n");
+    }
+    if (tmp < crit) Memcpy(fixed, ans, GS->p);
+    Free(ans); Free(md); Free(w);
+    Free(work); Free(wtd); Free(z);
+    return fixed;
+}
+    
+static void
+internal_glmer_ranef_update(GlmerStruct GS, SEXP b)
+{
+    SEXP bhat, bprop = PROTECT(duplicate(b)), 
+	bVar = GET_SLOT(GS->mer, Matrix_bVarSym),
+	Omega = GET_SLOT(GS->mer, Matrix_OmegaSym);
+    int i, ione = 1, j, k;
+    double *b = REAL(GET_SLOT(GS->mer, Matrix_ranefSym);
+    double devr, one = 1;
+
+    bhat = R_NilValue;
+				/* subtract deviance at b */
+    devr = -random_effects_deviance(GS, b);
+     for (i = 0; i < GS->nf; i++) {
+ 	SEXP Bi = VECTOR_ELT(b, i);
+ 	int *dims = INTEGER(getAttrib(Bi, R_DimSymbol));
+ 	int nlev = dims[0], nci = dims[1];
+ 	int ncisqr = nci * nci, ntot = nlev * nci;
+ 	double *bcopy = Calloc(ntot, double),
+ 	    *bi = REAL(Bi),
+ 	    *bhati = REAL(VECTOR_ELT(bhat, i)),
+ 	    *bpropi = REAL(VECTOR_ELT(bprop, i)),
+ 	    *bVari = REAL(VECTOR_ELT(bVar, i)),
+ 	    *chol = Calloc(ncisqr, double),
+ 	    *delta = Calloc(nci, double),
+ 	    *omgfac = Memcpy(Calloc(ncisqr, double),
+ 			     REAL(VECTOR_ELT(Omega, i)),
+ 			     ncisqr);
+
+ 				/* subtract quadratic form in */
+ 				/* Omega[[i]] at b  */
+ 	F77_CALL(dpotrf)("U", &nci, omgfac, &nci, &j);
+ 	if (j)
+ 	    error(_("Leading %d minor of Omega[[%d]] not positive definite"),
+                       j, i + 1);
+ 	Memcpy(bcopy, bi, ntot);
+ 	F77_CALL(dtrmm)("R", "U", "T", "N", &nlev, &nci, &one,
+ 			omgfac, &nci, bcopy, &nlev);
+ 	for (k = 0; k < ntot; k++) devr -= bcopy[k] * bcopy[k];
+ 				/* form bprop and proposal density */
+ 	for (k = 0; k < nlev; k++) {
+ 				/* proposal density at b */
+ 	    for (j = 0; j < nci; j++)
+ 		delta[j] = bi[k + j * nlev] - bhati[k + j * nlev];
+ 	    Memcpy(chol, &(bVari[k * ncisqr]), ncisqr);
+ 	    F77_CALL(dpotrf)("U", &nci, chol, &nci, &j);
+ 	    if (j)
+ 		error(_("Leading %d minor of bVar[[%d]][,,%d] not positive definite"),
+                       j, i + 1, k + 1);
+ 	    F77_CALL(dtrsv)("U", "T", "N", &nci, chol, &nci,
+ 			    delta, &ione);
+ 	    for (j = 0; j < nci; j++) {
+ 		double nrm = norm_rand(); /* proposal deviate */
+ 		devr += delta[j] * delta[j] - nrm * nrm;
+ 		delta[j] = nrm;
+ 	    }
+ 				/* scale by Cholesky inverse */
+ 	    F77_CALL(dtrmv)("U", "T", "N", &nci, chol, &nci,
+ 			    delta, &ione);
+ 				/* add mean */
+ 	    for (j = 0; j < nci; j++)
+ 		bpropi[k + j * nlev] = bhati[k + j * nlev] + delta[j];
+ 	}
+ 				/* add quadratic form in */
+ 				/* Omega[[i]] at bprop  */
+ 	Memcpy(bcopy, bpropi, ntot);
+ 	F77_CALL(dtrmm)("R", "U", "T", "N", &nlev, &nci, &one,
+ 			omgfac, &nci, bcopy, &nlev);
+ 	for (k = 0; k < ntot; k++) devr += bcopy[k] * bcopy[k];
+
+ 	Free(bcopy); Free(chol); Free(delta); Free(omgfac);
+     }
+ 				/* add deviance at bprop */
+/*     devr += random_effects_deviance(GS, bprop); */
+
+    if (unif_rand() < exp(-0.5 * devr))
+	for (i = 0; i < GS->nf; i++) { /* copy each face of b */
+	    SEXP Bi = VECTOR_ELT(b, i);
+	    int *dims = INTEGER(getAttrib(Bi, R_DimSymbol));
+
+	    Memcpy(REAL(Bi), REAL(VECTOR_ELT(bprop, i)),
+		   dims[0] * dims[1]);
+	}
+    
+    if (asLogical(Matrix_getElement(GS->cv, "msVerbose"))) {
+	double *b0 = REAL(VECTOR_ELT(bprop, 0));
+	Rprintf("%5.3f:", exp(-0.5 * devr));
+	for (k = 0; k < 5; k++) Rprintf("%#10g ", b0[k]);
+	Rprintf("\n");
+    }
+	
+    UNPROTECT(2);
+}
+
+
+/** 
+ * Compute the approximation to the deviance using adaptive
+ * Gauss-Hermite quadrature (AGQ).  When nAGQ == 1 this is the Laplace
+ * approximation.
+ * 
+ * @param pars pointer to a numeric vector of parameters
+ * @param GSp pointer to a GlmerStruct object
+ * @param nAGQp pointer to a scalar integer representing the number of
+ * points in AGQ to use
+ * 
+ * @return the approximation to the deviance as computed using AGQ
+ */
+SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp)
+{
+    GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
+    SEXP Omega = GET_SLOT(GS->mer, Matrix_OmegaSym),
+	bVar = GET_SLOT(GS->mer, Matrix_bVarSym);
+    int i, j, k, nAGQ = asInteger(nAGQp);
+    int n2 = (nAGQ + 1)/2,
+	*Gp = INTEGER(GET_SLOT(GS->mer, Matrix_GpSym)),
+	*nc = INTEGER(GET_SLOT(GS->mer, Matrix_ncSym));
+    double *f0, LaplaceDev = 0, AGQadjst = 0,
+	*bhat = REAL(GET_SLOT(GS->mer, Matrix_ranefSym));
+	
+    if (!isReal(pars) || LENGTH(pars) != GS->npar)
+	error(_("`%s' must be a numeric vector of length %d"),
+	      "pars", GS->npar);
+    if (GS->nf > 1 && nAGQ > 1) {
+	warning(_("AGQ not available for multiple grouping factors - using Laplace"));
+	nAGQ = 1;
+    }
+    if (!internal_bhat(GS, REAL(pars), REAL(pars) + (GS->p)))
+	return ScalarReal(DBL_MAX);
+
+    for (i = 0; i < GS->nf; i++) {
+	int nci = nc[i];
+	int ncip1 = nci + 1, ncisqr = nci * nci,
+	    nlev = (Gp[i + 1] - Gp[i])/nci;
+	double *omgf = REAL(GET_SLOT(dpoMatrix_chol(VECTOR_ELT(Omega, i)), Matrix_xSym)),
+	    *bVi = Memcpy(Calloc(ncisqr * nlev, double),
+			   REAL(VECTOR_ELT(bVar, i)), ncisqr * nlev);
+
+        for (j = 0; j < nci; j++) { /* nlev * logDet(Omega_i) */
+            LaplaceDev += 2 * nlev * log(omgf[j * ncip1]);
+        }
+        for (k = 0; k < nlev; k++) {
+	    double *bVik = bVi + k * ncisqr;
+            F77_CALL(dpotrf)("U", &nci, bVik, &nci, &j);
+            if (j)
+                error(_("Leading %d minor of bVar[[%d]][,,%d] not positive definite"),
+                      j, i + 1, k + 1);
+            for (j = 0; j < nci; j++) LaplaceDev -= 2 * log(bVik[j * ncip1]);
+        }
+
+	f0 = Calloc(nlev, double);
+	rel_dev_1(GS, bhat, nlev, nci, i, (double *) NULL,
+		  omgf, bVi, f0);
+	for (k = 0; k < nlev; k++) LaplaceDev += f0[k];
+	if (nAGQ > 1) {
+	    double *fx = Calloc(nlev, double),
+		*rellik = Calloc(nlev, double),
+		*delb = Calloc(nci, double);
+
+	    if (nci > 1) error(_("code not yet written"));
+	    AZERO(rellik, nlev);	/* zero accumulator */
+	    for (k = 0; k < n2; k++) {	
+		delb[0] = GHQ_x[nAGQ][k];
+		if (delb[0]) {
+		    rel_dev_1(GS, bhat, nlev, nci, i, delb,
+			      omgf, bVi, fx);
+		    for (j = 0; j < nlev; j++) {
+			rellik[j] += GHQ_w[nAGQ][k] *
+			    exp(-(fx[j] - f0[j])/2);
+		    }
+		    delb[0] *= -1;
+		    rel_dev_1(GS, bhat, nlev, nci, i, delb,
+			      omgf, bVi, fx);
+		    for (j = 0; j < nlev; j++) {
+			rellik[j] += GHQ_w[nAGQ][k] *
+			    exp(-(fx[j] - f0[j])/2);
+		    }
+		} else {
+		    for (j = 0; j < nlev; j++)
+			rellik[j] += GHQ_w[nAGQ][k];
+		}
+	    }
+	    for (j = 0; j < nlev; j++)
+		AGQadjst -= 2 * log(rellik[j]);
+	    Free(fx); Free(rellik);
+	}
+	Free(f0); Free(bVi);
+    }
+    return ScalarReal(LaplaceDev + AGQadjst);
+}
+
+
+/** 
+ * Determine the conditional modes and the conditional variance of the
+ * random effects given the data and the current fixed effects and
+ * variance components.
+ *
+ * Create a Metropolis-Hasting proposal step from a multivariate
+ * normal density centered at bhat with variance-covariance matrix
+ * from bVar, determine the acceptance probability and return the
+ * current value or the proposed value.
+ * 
+ * @param GSp pointer to a GlmerStruct
+ * @param fixed pointer to a numeric vector of the fixed effects
+ * @param varc pointer to a numeric vector of the variance components
+ * @param varc pointer to current values of b
+ * 
+ * @return updated b from the Metropolis-Hastings step
+ */
+SEXP glmer_ranef_update(SEXP GSp, SEXP fixed, SEXP varc, SEXP b)
+{
+    GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
+    int nvarc = GS->npar - GS->p;
+
+    if (!isReal(fixed) || LENGTH(fixed) != GS->p)
+	error(_("`%s' must be a numeric vector of length %d"),
+	      "fixed", GS->p);
+    if (INTEGER(GET_SLOT(GS->mer, Matrix_ncSym))[GS->nf] > 0)
+	error(_("the mer object must be set to skip fixed effects"));
+    if (!isReal(varc) || LENGTH(varc) != nvarc)
+	error(_("`%s' must be a numeric vector of length %d"),
+	      "varc", nvarc);
+
+    GetRNGstate();
+    /* Don't check for convergence failure after internal_bhat.
+     * It is determining the mean of the proposal density and
+     * does not need exact convergence. */
+    internal_bhat(GS, REAL(fixed), REAL(varc));
+    internal_glmer_ranef_update(GS, b);
+    PutRNGstate();
+
+    UNPROTECT(1);
+    return b;
+}
+
+
+#endif

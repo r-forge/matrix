@@ -17,18 +17,16 @@
 #include <R_ext/Utils.h>
 
 SEXP Matrix_rWishart(SEXP ns, SEXP df, SEXP scal);
-SEXP glmer_MCMCsamp(SEXP GSpt, SEXP b, SEXP fixedp, SEXP varcp,
-		    SEXP savebp, SEXP nsampp);
+/* SEXP glmer_MCMCsamp(SEXP GSpt, SEXP b, SEXP fixedp, SEXP varcp, */
+/* 		    SEXP savebp, SEXP nsampp); */
 SEXP glmer_PQL(SEXP GSp);
-#if 0
-SEXP glmer_bhat(SEXP pars, SEXP GSp);
-#endif
-SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp);
+/* SEXP glmer_bhat(SEXP pars, SEXP GSp); */
+/* SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp); */
 SEXP glmer_devLaplace(SEXP pars, SEXP GSp);
 SEXP glmer_finalize(SEXP GSpt);
-SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed);
+/* SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed); */
 SEXP glmer_init(SEXP rho);
-SEXP glmer_ranef_update(SEXP GSp, SEXP fixed, SEXP varc, SEXP b);
+/* SEXP glmer_ranef_update(SEXP GSp, SEXP fixed, SEXP varc, SEXP b); */
 SEXP mer_ECMEsteps(SEXP x, SEXP nsteps, SEXP Verbp);
 SEXP mer_Hessian(SEXP x);
 SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp);
@@ -40,12 +38,11 @@ SEXP mer_create(SEXP fl, SEXP Zt, SEXP Xp, SEXP yp, SEXP method,
 SEXP mer_dtCMatrix(SEXP x);
 SEXP mer_dtCMatrix_inv(SEXP x);
 SEXP mer_factor(SEXP x);
-SEXP mer_fitted(SEXP x, SEXP useFe, SEXP useRe);
+SEXP mer_fitted(SEXP x);
 SEXP mer_fixef(SEXP x);
 SEXP mer_gradComp(SEXP x);
 SEXP mer_gradient(SEXP x, SEXP pType);
 SEXP mer_initial(SEXP x);
-SEXP mer_pMatrix(SEXP x);
 SEXP mer_ranef(SEXP x);
 SEXP mer_secondary(SEXP x);
 SEXP mer_sigma(SEXP x, SEXP REML);
