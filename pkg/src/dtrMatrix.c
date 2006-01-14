@@ -17,14 +17,10 @@ SEXP triangularMatrix_validate(SEXP obj)
     return ScalarLogical(1);
 }
 
-/* FIXME? validObject(.) works "unexpectedly": dtrMatrix_as_dgeMatrix()  {below}
- * -----  is called *before* the following - in order to
- *        apply the higher level validation first, since dtr* contains dge*
-*/
 SEXP dtrMatrix_validate(SEXP obj)
 {
-    /* FIXME: Is the following unnecessary, since "dtr" inherits from "triangular" ? */
-    return triangularMatrix_validate(obj);
+    /* since "dtr" inherits from "triangular", and "dMatrix", only need this:*/
+    return dense_nonpacked_validate(obj);
 }
 
 
@@ -144,10 +140,6 @@ SEXP dtrMatrix_as_dgeMatrix(SEXP from)
 
     SET_SLOT(val, Matrix_rcondSym, duplicate(GET_SLOT(from, Matrix_rcondSym)));
     SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(from, Matrix_xSym)));
-    /* Dim < 2 can give a seg.fault problem in make_array_triangular(),
-     * by new("dtrMatrix", Dim = 2:2, x=as.double(1:4)) )# length(Dim) !=2 */
-    if (LENGTH(GET_SLOT(from, Matrix_DimSym)) < 2)
-	error(_("'Dim' slot has length less than two"));
     SET_SLOT(val, Matrix_DimSym, duplicate(GET_SLOT(from, Matrix_DimSym)));
     SET_SLOT(val, Matrix_DimNamesSym, duplicate(GET_SLOT(from, Matrix_DimNamesSym)));
     SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));

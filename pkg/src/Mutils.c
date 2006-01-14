@@ -459,6 +459,14 @@ SEXP check_scalar_string(SEXP sP, char *vals, char *nm)
 #undef SPRINTF
 }
 
+SEXP dense_nonpacked_validate(SEXP obj)
+{
+    int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym));
+    if ((dims[0] * dims[1]) != length(GET_SLOT(obj, Matrix_xSym)))
+	return mkString(_("length of x slot != prod(Dim)"));
+    return ScalarLogical(1);
+}
+
 
 #define PACKED_TO_FULL(TYPE)						\
 TYPE *packed_to_full_ ## TYPE(TYPE *dest, const TYPE *src,		\
@@ -565,20 +573,20 @@ Matrix_getElement(SEXP list, char *nm) {
     return R_NilValue;
 }
 
-/** 
+/**
  * Allocate a real classed matrix
- * 
+ *
  * @param class character string of the type of Matrix to allocate
  * @param nrow number of rows
  * @param ncol number of columns
- * 
+ *
  * @return pointer to a classed real matrix
  */
 SEXP alloc_real_classed_matrix(char *class, int nrow, int ncol)
 {
     SEXP val = NEW_OBJECT(MAKE_CLASS(class));
     int *dims = INTEGER(ALLOC_SLOT(val, Matrix_DimSym, INTSXP, 2));
-    
+
     dims[0] = nrow; dims[1] = ncol;
     ALLOC_SLOT(val, Matrix_xSym, REALSXP, nrow * ncol);
     return val;

@@ -14,8 +14,8 @@ SEXP symmetricMatrix_validate(SEXP obj)
 
 SEXP dsyMatrix_validate(SEXP obj)
 {
-    return symmetricMatrix_validate(obj);
-    /* see ./dspMatrix.c  for how to do further checks */
+    /* since "dsy" inherits from "symmetric", and "dMatrix", only need this:*/
+    return dense_nonpacked_validate(obj);
 }
 
 double get_norm_sy(SEXP obj, char *typstr)
