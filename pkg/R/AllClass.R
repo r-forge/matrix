@@ -29,7 +29,7 @@ setClass("compMatrix",  representation(factors = "list", "VIRTUAL"),
 
 ## Virtual classes of Matrices determined by above/below diagonal relationships
 
-setClass("generalMatrix", contains = "compMatrix")
+setClass("generalMatrix", representation = "VIRTUAL", contains = "compMatrix")
 
 setClass("symmetricMatrix",
 	 representation(uplo = "character", "VIRTUAL"),
@@ -37,12 +37,17 @@ setClass("symmetricMatrix",
 
 setClass("triangularMatrix",
 	 representation(uplo = "character", diag = "character", "VIRTUAL"),
-         contains = "Matrix")
+         contains = "Matrix",
+         validity =
+        function(object) .Call("triangularMatrix_validate", object, PACKAGE = "Matrix")
+         )
 
 
 ## Virtual class of numeric matrices
 setClass("dMatrix",
-	 representation(x = "numeric", "VIRTUAL"), contains = "Matrix")
+	 representation(x = "numeric", "VIRTUAL"), contains = "Matrix",
+         validity = function(object)
+         .Call("dMatrix_validate", object, PACKAGE = "Matrix"))
 
 ## Virtual class of integer matrices
 setClass("iMatrix",
@@ -110,7 +115,7 @@ setClass("lsparseMatrix", representation("VIRTUAL"),
 ##----------------------  DENSE	 -----------------------------------------
 
 ## numeric, dense, general matrices
-setClass("dgeMatrix", contains = c("ddenseMatrix", "compMatrix"),
+setClass("dgeMatrix", contains = c("ddenseMatrix", "generalMatrix"),
 	 ## checks that length( @ x) == prod( @ Dim):
 	 validity =
          function(object) .Call("dgeMatrix_validate", object, PACKAGE = "Matrix")
@@ -119,11 +124,6 @@ setClass("dgeMatrix", contains = c("ddenseMatrix", "compMatrix"),
 
 ## numeric, dense, non-packed, triangular matrices
 setClass("dtrMatrix",
-         ## FIXME?
-         ##> 'ddense*' before 'dge*' so it can use d* or ddense* methods
-         ##> WITHOUT a coerce to dge* (losing triangularity)
-         ##> gives error from callNextMethod() in crossprod() dispatch {R bug?}
-	 ##> contains = c("ddenseMatrix", "dgeMatrix", "triangularMatrix"),
 	 contains = c("ddenseMatrix", "triangularMatrix"),
 	 prototype = prototype(uplo = "U", diag = "N"),
 	 validity =
@@ -142,7 +142,7 @@ setClass("dtpMatrix",
 setClass("dsyMatrix",
          ## FIXME?
          ##> 'ddense*' before 'dge*' so it can use d* or ddense* methods
-         ##> WITHOUT a coerce to dge* (losing triangularity)
+         ##> WITHOUT a coerce to dge* (losing symmetry)
          ##> gives error in crossprod() dispatch
 	 ##> contains = c("ddenseMatrix", "dgeMatrix", "symmetricMatrix"),
 	 contains = c("dgeMatrix", "symmetricMatrix"),
@@ -154,7 +154,7 @@ setClass("dsyMatrix",
 ## numeric, dense, packed symmetric matrices
 setClass("dspMatrix",
 	 prototype = prototype(uplo = "U"),
-	 contains = c("ddenseMatrix", "compMatrix", "symmetricMatrix"),
+	 contains = c("ddenseMatrix", "symmetricMatrix"),
 	 validity =
          function(object) .Call("dspMatrix_validate", object, PACKAGE = "Matrix")
 	 )
@@ -174,7 +174,7 @@ setClass("dppMatrix", contains = "dspMatrix",
 ##----- logical dense Matrices -- e.g. as result of <ddenseMatrix>  COMPARISON
 
 ## numeric, dense, general matrices
-setClass("lgeMatrix", contains = c("ldenseMatrix", "compMatrix"),
+setClass("lgeMatrix", contains = c("ldenseMatrix", "generalMatrix"),
 	 ## checks that length( @ x) == prod( @ Dim):
 	 validity = function(object) stopifnot(length(object@x) == prod(object@Dim))
 	 )
@@ -202,7 +202,7 @@ setClass("lsyMatrix",
 ## numeric, dense, packed symmetric matrices
 setClass("lspMatrix",
 	 prototype = prototype(uplo = "U"),
-	 contains = c("ldenseMatrix", "compMatrix", "symmetricMatrix"),
+	 contains = c("ldenseMatrix", "symmetricMatrix"),
          validity = function(object)
          .Call("dspMatrix_validate", object, PACKAGE = "Matrix")
          ## "dsp" and "lsp" have the same validate
@@ -221,7 +221,7 @@ setClass("ldiMatrix", contains = c("diagonalMatrix", "ldenseMatrix"))
 
 ## numeric, sparse, triplet general matrices
 setClass("dgTMatrix",
-	 contains = c("TsparseMatrix", "dsparseMatrix", "compMatrix"),
+	 contains = c("TsparseMatrix", "dsparseMatrix", "generalMatrix"),
 	 validity =
          function(object) .Call("dgTMatrix_validate", object, PACKAGE = "Matrix")
 	 )
@@ -245,7 +245,7 @@ setClass("dtTMatrix",
 
 ## numeric, sparse, triplet symmetric matrices
 setClass("dsTMatrix",
-	 contains = c("TsparseMatrix", "dsparseMatrix", "symmetricMatrix", "compMatrix"),
+	 contains = c("TsparseMatrix", "dsparseMatrix", "symmetricMatrix"),
 	 prototype = prototype(uplo = "U"),
 	 validity =
          function(object) .Call("dsTMatrix_validate", object, PACKAGE = "Matrix")
@@ -253,7 +253,7 @@ setClass("dsTMatrix",
 
 ## numeric, sparse, sorted compressed sparse column-oriented general matrices
 setClass("dgCMatrix",
-	 contains = c("CsparseMatrix", "dsparseMatrix", "compMatrix"),
+	 contains = c("CsparseMatrix", "dsparseMatrix", "generalMatrix"),
 	 prototype = prototype(p = 0:0),# to be valid
 	 validity =
          function(object) .Call("dgCMatrix_validate", object, PACKAGE = "Matrix")
@@ -271,7 +271,7 @@ setClass("dtCMatrix",
 ## see comments for dsTMatrix above
 ## numeric, sparse, sorted compressed sparse column-oriented symmetric matrices
 setClass("dsCMatrix",
-	 contains = c("CsparseMatrix", "dsparseMatrix", "symmetricMatrix", "compMatrix"),
+	 contains = c("CsparseMatrix", "dsparseMatrix", "symmetricMatrix"),
 	 prototype = prototype(p = 0:0, uplo = "U"),# to be valid
 	 validity =
          function(object) .Call("dsCMatrix_validate", object, PACKAGE = "Matrix")
@@ -280,13 +280,16 @@ setClass("dsCMatrix",
 ## numeric, sparse, sorted compressed sparse row-oriented general matrices
 setClass("dgRMatrix",
 	 representation(j = "integer", p = "integer"),
-	 contains = c("dsparseMatrix", "compMatrix"),
+	 contains = c("dsparseMatrix", "generalMatrix"),
+	 prototype = prototype(p = 0:0),
 	 ##TODO: validity = function(object) .Call("dgRMatrix_validate", object, PACKAGE = "Matrix")
 	 )
 
 ## numeric, sparse, sorted compressed sparse row-oriented triangular matrices
 setClass("dtRMatrix",
 	 contains = c("dgRMatrix", "triangularMatrix"),
+	 prototype = prototype(p = 0:0, uplo = "U", diag = "N"),# to be valid
+
 	 ##TODO: validity = function(object) .Call("dtRMatrix_validate", object, PACKAGE = "Matrix")
          ##TODO: Should this contain dgRMatrix or dsparseMatrix?
 	 )
@@ -294,6 +297,7 @@ setClass("dtRMatrix",
 ## numeric, sparse, sorted compressed sparse row-oriented symmetric matrices
 setClass("dsRMatrix",
 	 contains = c("dgRMatrix", "symmetricMatrix"),
+	 prototype = prototype(p = 0:0, uplo = "U"),# to be valid
 	 ##TODO: validity = function(object) .Call("dsRMatrix_validate", object, PACKAGE = "Matrix")
 	 )
 
@@ -304,7 +308,7 @@ setClass("dsRMatrix",
 
 ## logical, sparse, triplet general matrices
 setClass("lgTMatrix",
-	 contains = c("TsparseMatrix", "lsparseMatrix", "compMatrix"),
+	 contains = c("TsparseMatrix", "lsparseMatrix", "generalMatrix"),
 	 validity =
          function(object) .Call("lgTMatrix_validate", object, PACKAGE = "Matrix")
 	 )
@@ -319,14 +323,14 @@ setClass("ltTMatrix",
 
 ## logical, sparse, triplet symmetric matrices
 setClass("lsTMatrix",
-	 contains = c("TsparseMatrix", "lsparseMatrix", "symmetricMatrix", "compMatrix"),
+	 contains = c("TsparseMatrix", "lsparseMatrix", "symmetricMatrix"),
 	 validity =
          function(object) .Call("lsTMatrix_validate", object, PACKAGE = "Matrix")
 	 )
 
 ## logical, sparse, sorted compressed sparse column-oriented general matrices
 setClass("lgCMatrix",
-	 contains = c("lsparseMatrix", "CsparseMatrix", "compMatrix"),
+	 contains = c("lsparseMatrix", "CsparseMatrix", "generalMatrix"),
 	 prototype = prototype(p = 0:0),# to be valid
 	 validity =
          function(object) .Call("lgCMatrix_validate", object, PACKAGE = "Matrix")
@@ -342,7 +346,7 @@ setClass("ltCMatrix",
 
 ## logical, sparse, sorted compressed sparse column-oriented symmetric matrices
 setClass("lsCMatrix",
-	 contains = c("lsparseMatrix", "CsparseMatrix", "symmetricMatrix", "compMatrix"),
+	 contains = c("lsparseMatrix", "CsparseMatrix", "symmetricMatrix"),
 	 prototype = prototype(p = 0:0, uplo = "U"),# to be valid
 	 validity =
          function(object) .Call("lsCMatrix_validate", object, PACKAGE = "Matrix")
@@ -508,8 +512,8 @@ setClass("mer",
 			XtX = "dpoMatrix", # X'X
 			ZtZ = "dsCMatrix", # Z'Z
 			ZtX = "dgeMatrix", # Z'X
-                        Zty = "numeric",   # Z'y 
-                        Xty = "numeric",   # X'y 
+                        Zty = "numeric",   # Z'y
+                        Xty = "numeric",   # X'y
                         ## primary slots that vary during the optimization
                         ## When Omega is updated, these are updated
 			Omega = "list", # list of relative precision matrices
@@ -522,7 +526,7 @@ setClass("mer",
 			devComp = "numeric", # Components of deviance
 			deviance = "numeric", # Current deviance (ML and REML)
                         ## Secondary slots only evaluated when requested.
-                        fixef = "numeric", 
+                        fixef = "numeric",
                         ranef = "numeric",
                         RZXinv = "dgeMatrix",
                         bVar = "list",

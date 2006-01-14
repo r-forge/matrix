@@ -79,7 +79,7 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "index", j = "index",
                  })
 
 
-## not exported:
+## not yet exported (from R 2.3.0)
 setMethod("isSymmetric", signature(object = "denseMatrix"),
 	  function(object, tol = 100*.Machine$double.eps) {
 	      ## pretest: is it square?
@@ -93,7 +93,27 @@ setMethod("isSymmetric", signature(object = "denseMatrix"),
 		  ## test for exact equality; FIXME(?): identical() too strict?
 		  identical(as(object, "lgeMatrix"),
 			    as(t(object), "lgeMatrix"))
-	      else stop("not yet implemented")
+	      else if (is(object, "zMatrix"))
+                  stop("'zMatrix' not yet implemented")
+	      else if (is(object, "iMatrix"))
+                  stop("'iMatrix' not yet implemented")
+	  })
+
+setMethod("isTriangular", signature(object = "triangularMatrix"),
+          function(object) TRUE)
+
+setMethod("isTriangular", signature(object = "denseMatrix"),
+	  function(object, upper) {
+	      ## pretest: is it square?
+	      d <- dim(object)
+	      if(d[1] != d[2]) return(FALSE)
+	      ## else slower test
+              m <- as(object,"matrix")
+              ## == 0 even works for logical & complex:
+              if(upper)
+                  all(m[lower.tri(m)] == 0)
+              else
+                  all(m[upper.tri(m)] == 0)
 	  })
 
 setAs("denseMatrix", "CsparseMatrix",

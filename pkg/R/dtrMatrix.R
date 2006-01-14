@@ -3,6 +3,20 @@
 setAs("dtrMatrix", "dgeMatrix",
       function(from) .Call("dtrMatrix_as_dgeMatrix", from, PACKAGE = "Matrix"))
 
+## or rather setIs() {since test can fail ?}
+setAs("dgeMatrix", "dtrMatrix",
+      function(from) {
+          ## FIXME: also check for unit-diagonal: 'diag = "U"'
+	  if(isTriangular(from, upper = TRUE))
+	      new("dtrMatrix", x = from@x, Dim = from@Dim, uplo = "U",
+		  Dimnames = from@Dimnames)
+	  else if(isTriangular(from, upper = FALSE))
+	      new("dtrMatrix", x = from@x, Dim = from@Dim, uplo = "L",
+		  Dimnames = from@Dimnames)
+	  else stop("not a triangular matrix")
+      })
+
+
 setAs("dtrMatrix", "dtpMatrix",
       function(from) .Call("dtrMatrix_as_dtpMatrix", from, PACKAGE = "Matrix"))
 

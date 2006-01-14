@@ -465,7 +465,7 @@ setMethod("simulate", signature(object = "mer"),
           ## similate the linear predictors
           lpred <- .Call("mer_simulate", object, nsim, PACKAGE = "Matrix")
           sc <- 1
-          if (object@useScale) 
+          if (object@useScale)
               sc <- .Call("mer_sigma", object, object@method == "REML",
                           PACKAGE = "Matrix")
           ## add fixed-effects contribution and per-observation noise term
@@ -512,7 +512,7 @@ setMethod("show", "mer",
                   if (!useScale) reMat <- reMat[-nrow(reMat),]
                   print(reMat, quote = FALSE)
               }
-              
+
               fcoef <- .Call("mer_fixef", object, PACKAGE = "Matrix")
               useScale <- object@useScale
               corF <- vcov(object)@factors$correlation
@@ -525,7 +525,7 @@ setMethod("show", "mer",
               llik <- logLik(object, REML)
               dev <- object@deviance
               devc <- object@devComp
-              
+
               rdig <- 5
               if (glz <- !(object@method %in% c("REML", "ML"))) {
                   cat(paste("Generalized linear mixed model fit using",
@@ -730,7 +730,7 @@ setMethod("anova", signature(object = "mer"),
 
 setMethod("confint", signature(object = "mer"),
           function(object, parm, level = 0.95, ...)
-          stop("not yet implemented")
+          .NotYetImplemented()
           )
 
 setMethod("fitted", signature(object = "mer"),
@@ -745,22 +745,22 @@ setMethod("formula", signature(x = "mer"),
 
 setMethod("residuals", signature(object = "mer"),
           function(object, ...)
-          stop("not yet implemented")
+          .NotYetImplemented()
           )
 
 setMethod("resid", signature(object = "mer"),
           function(object, ...)
-          stop("not yet implemented")
+          .NotYetImplemented()
           )
 
 setMethod("summary", signature(object = "mer"),
           function(object, ...)
-          stop("not yet implemented")
+          .NotYetImplemented()
           )
 
 setMethod("update", signature(object = "mer"),
           function(object, ...)
-          stop("not yet implemented")
+          .NotYetImplemented()
           )
 
 
