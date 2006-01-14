@@ -1,6 +1,6 @@
 
 R : Copyright 2006, The R Foundation for Statistical Computing
-Version 2.3.0 Under development (unstable) (2006-01-02 r36956)
+Version 2.2.1 Patched (2006-01-14 r37083)
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -49,14 +49,13 @@ Formal class 'dpoMatrix' [package "Matrix"] with 6 slots
  [8,]     .     .     .     .     .     .     . 0.000 0.000
  [9,]     .     .     .     .     .     .     .     . 0.000
 > str(f9 <- as(chol(h9), "dtrMatrix"))
-Formal class 'dtrMatrix' [package "Matrix"] with 7 slots
+Formal class 'dtrMatrix' [package "Matrix"] with 6 slots
   ..@ rcond   : num(0) 
   ..@ x       : num [1:81] 1 0 0 0 0 0 0 0 0 0.5 ...
   ..@ Dim     : int [1:2] 9 9
   ..@ Dimnames:List of 2
   .. ..$ : NULL
   .. ..$ : NULL
-  ..@ factors : list()
   ..@ uplo    : chr "U"
   ..@ diag    : chr "N"
 > ## h9 now has factorization
@@ -73,14 +72,13 @@ Formal class 'dpoMatrix' [package "Matrix"] with 6 slots
   .. ..$ : NULL
   .. ..$ : NULL
   ..@ factors :List of 1
-  .. ..$ Cholesky:Formal class 'Cholesky' [package "Matrix"] with 7 slots
+  .. ..$ Cholesky:Formal class 'Cholesky' [package "Matrix"] with 6 slots
   .. .. .. ..@ rcond   : num(0) 
   .. .. .. ..@ x       : num [1:81] 1 0 0 0 0 0 0 0 0 0.5 ...
   .. .. .. ..@ Dim     : int [1:2] 9 9
   .. .. .. ..@ Dimnames:List of 2
   .. .. .. .. ..$ : NULL
   .. .. .. .. ..$ : NULL
-  .. .. .. ..@ factors : list()
   .. .. .. ..@ uplo    : chr "U"
   .. .. .. ..@ diag    : chr "N"
   ..@ uplo    : chr "U"
@@ -109,18 +107,17 @@ Formal class 'dppMatrix' [package "Matrix"] with 6 slots
   ..@ Dimnames:List of 2
   .. ..$ : NULL
   .. ..$ : NULL
+  ..@ uplo    : chr "U"
   ..@ factors :List of 1
-  .. ..$ pCholesky:Formal class 'pCholesky' [package "Matrix"] with 7 slots
+  .. ..$ pCholesky:Formal class 'pCholesky' [package "Matrix"] with 6 slots
   .. .. .. ..@ rcond   : num(0) 
   .. .. .. ..@ x       : num [1:45] 1.000 0.500 0.289 0.333 0.289 ...
   .. .. .. ..@ Dim     : int [1:2] 9 9
   .. .. .. ..@ Dimnames:List of 2
   .. .. .. .. ..$ : NULL
   .. .. .. .. ..$ : NULL
-  .. .. .. ..@ factors : list()
   .. .. .. ..@ uplo    : chr "U"
   .. .. .. ..@ diag    : chr "N"
-  ..@ uplo    : chr "U"
 > 
 > s9 <- solve(hp9, seq(nrow(hp9)))
 > signif(t(s9)/10000, 4)# only rounded numbers are platform-independent
@@ -143,6 +140,6 @@ Formal class 'dppMatrix' [package "Matrix"] with 6 slots
 > stopifnot(all.equal(m9, as.matrix(I9), tol = 2e-9))
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # "stats"
-Time elapsed:  8.44 0.06 8.5 0 0 
+Time elapsed:  8.36 0.07 8.66 0 0 
 > 
 > 
