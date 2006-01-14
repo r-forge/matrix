@@ -65,6 +65,9 @@ static R_CallMethodDef CallEntries[] = {
     {"csc_to_matrix", (DL_FUNC) &csc_to_matrix, 1},
     {"csc_transpose", (DL_FUNC) &csc_transpose, 1},
     {"dense_to_Csparse", (DL_FUNC) &dense_to_Csparse, 1},
+    {"dense_nonpacked_validate", (DL_FUNC) &dense_nonpacked_validate, 1},
+    {"dMatrix_validate", (DL_FUNC) &dMatrix_validate, 1},
+
     {"dgCMatrix_validate", (DL_FUNC) &dgCMatrix_validate, 1},
     {"dgeMatrix_to_csc", (DL_FUNC) &dgeMatrix_to_csc, 1},
     {"dgTMatrix_to_csc", (DL_FUNC) &dgTMatrix_to_csc, 1},
@@ -216,7 +219,7 @@ static R_CallMethodDef CallEntries[] = {
     {NULL, NULL, 0}
 };
 
-void 
+void
 #ifdef HAVE_VISIBILITY_ATTRIBUTE
 __attribute__ ((visibility ("default")))
 #endif

@@ -1,11 +1,9 @@
 #include "dgeMatrix.h"
 
-SEXP dgeMatrix_validate(SEXP obj)
+SEXP dMatrix_validate(SEXP obj)
 {
     SEXP x = GET_SLOT(obj, Matrix_xSym),
-	Dim = GET_SLOT(obj, Matrix_DimSym),
-	fact = GET_SLOT(obj, Matrix_factorSym),
-	rc = GET_SLOT(obj, Matrix_rcondSym);
+	Dim = GET_SLOT(obj, Matrix_DimSym);
     int m, n;
 
     if (length(Dim) != 2)
@@ -13,10 +11,20 @@ SEXP dgeMatrix_validate(SEXP obj)
     m = INTEGER(Dim)[0]; n = INTEGER(Dim)[1];
     if (m < 0 || n < 0)
 	return mkString(_("Negative value(s) in Dim"));
-    if (length(x) != m * n)
-	return mkString(_("length of x slot != prod(Dim)"));
     if (!isReal(x))
 	return mkString(_("x slot must be numeric \"double\""));
+    return ScalarLogical(1);
+}
+
+SEXP dgeMatrix_validate(SEXP obj)
+{
+    SEXP val,
+	fact = GET_SLOT(obj, Matrix_factorSym),
+	rc = GET_SLOT(obj, Matrix_rcondSym);
+
+    if (isString(val = dense_nonpacked_validate(obj)))
+	return(val);
+
     if (length(fact) > 0 && getAttrib(fact, R_NamesSymbol) == R_NilValue)
 	return mkString(_("factors slot must be named list"));
     if (length(rc) > 0 && getAttrib(rc, R_NamesSymbol) == R_NilValue)
