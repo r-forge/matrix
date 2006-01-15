@@ -1,5 +1,7 @@
 BIC                     Bayesian Information Criterion
 Cholesky-class          Cholesky and Bunch-Kaufman Decompositions
+compMatrix-class        Class "compMatrix" of Composite (Factorizable)
+                        Matrices
 corrmatrix-class        Class "corrmatrix"
 CsparseMatrix-class     Class "CsparseMatrix" of Sparse Matrices in
                         Column-compressed Form
@@ -35,6 +37,7 @@ expand                  Expand a Decomposition into Factors
 expm                    Matrix exponential
 facmul                  Multiplication by Decomposition Factors
 fixef                   Extract Fixed Effects
+generalMatrix-class     Class "generalMatrix" of General Matrices
 Hilbert                 Generate a Hilbert matrix
 iMatrix-class           Virtual Classes Not Yet Used
 index-class             Virtual Class "index" - Simple Class for Matrix

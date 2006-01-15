@@ -3,7 +3,7 @@
 useDynLib(Matrix)
 
 importFrom("graphics",image)
-#importFrom("graphics",plot)		## lmer-related
+importFrom("graphics",plot)		## lmer-related
 importFrom("lattice", levelplot)
 importFrom("grid",    grid.rect, gpar, grob)
 import("stats")				## lmer-related
@@ -135,7 +135,7 @@ exportClasses(
 	      )
 
 ## lmer-related
-exportClasses("lmer", "mer")
+exportClasses("lmer", "lmer.ranef", "mer")
 
 
 exportMethods(
