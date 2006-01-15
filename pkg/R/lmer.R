@@ -91,8 +91,8 @@ lmerControl <-
            niterEM = 15,
            EMverbose = getOption("verbose"),
            PQLmaxIt = 30,# FIXME: unused; PQL currently uses 'maxIter' instead
-           analyticGradient = TRUE,
-           analyticHessian = FALSE # unused _FIXME_
+           gradient = TRUE,
+           Hessian = FALSE # unused _FIXME_
            )
 {
     list(maxIter = as.integer(maxIter),
@@ -103,26 +103,29 @@ lmerControl <-
          niterEM = as.integer(niterEM),
          EMverbose = as.logical(EMverbose),
          PQLmaxIt = as.integer(PQLmaxIt),
-         analyticGradient = as.logical(analyticGradient),
-         analyticHessian = as.logical(analyticHessian))
+         gradient = as.logical(gradient),
+         Hessian = as.logical(Hessian))
 }
 
-setMethod("coef", signature(object = "lmer"),
+rWishart <- function(n, df, invScal)
+    .Call("Matrix_rWishart", n, df, invScal, PACKAGE = "Matrix")
+
+setMethod("coef", signature(object = "mer"),
           function(object, ...)
       {
-          fef <- data.frame(rbind(object@fixed), check.names = FALSE)
-          ref <- as(ranef(object), "list")
-          names(ref) <- names(object@flist)
-          val <- lapply(ref, function(x) fef[rep(1, nrow(x)),])
-          for (i in seq(a = val)) {
-              refi <- ref[[i]]
-              row.names(val[[i]]) <- row.names(refi)
-              if (!all(names(refi) %in% names(fef)))
-                  stop("unable to align random and fixed effects")
-              val[[i]][ , names(refi)] <- val[[i]][ , names(refi)] + refi
-          }
-          new("lmer.coef", val)
-      })
+           fef <- data.frame(rbind(fixef(object)), check.names = FALSE)
+           ref <- ranef(object)
+           val <- lapply(ref, function(x) fef[rep(1, nrow(x)),,drop = FALSE])
+           for (i in seq(a = val)) {
+               refi <- ref[[i]]
+               row.names(val[[i]]) <- row.names(refi)
+               nmsi <- colnames(refi)
+               if (!all(nmsi %in% names(fef)))
+                   stop("unable to align random and fixed effects")
+               for (nm in nmsi) val[[i]][[nm]] <- val[[i]][[nm]] + refi[,nm]
+           }
+           val
+       })
 
 ## setMethod("plot", signature(x = "lmer.coef"),
 ##           function(x, y, ...)
@@ -143,19 +146,19 @@ setMethod("coef", signature(object = "lmer"),
 ##                  splom(~ gf | .grp, ...))
 ##       })
 
-## setMethod("plot", signature(x = "lmer.ranef"),
-##           function(x, y, ...)
-##       {
-##           lapply(x, function(x) {
-##               cn <- lapply(colnames(x), as.name)
-##               switch(min(ncol(x), 3),
-##                      qqmath(eval(substitute(~ x, list(x = cn[[1]]))), x, ...),
-##                      xyplot(eval(substitute(y ~ x,
-##                                             list(y = cn[[1]],
-##                                                  x = cn[[2]]))), x, ...),
-##                      splom(~ x, ...))
-##           })
-##       })
+setMethod("plot", signature(x = "lmer.ranef"),
+          function(x, y, ...)
+      {
+          lapply(x, function(x) {
+              cn <- lapply(colnames(x), as.name)
+              switch(min(ncol(x), 3),
+                     qqmath(eval(substitute(~ x, list(x = cn[[1]]))), x, ...),
+                     xyplot(eval(substitute(y ~ x,
+                                            list(y = cn[[1]],
+                                                 x = cn[[2]]))), x, ...),
+                     splom(~ x, ...))
+          })
+      })
 
 setMethod("with", signature(data = "lmer"),
           function(data, expr, ...) {
@@ -168,9 +171,6 @@ setMethod("with", signature(data = "lmer"),
 
 setMethod("terms", signature(x = "lmer"),
           function(x, ...) x@terms)
-
-rWishart <- function(n, df, invScal)
-    .Call("Matrix_rWishart", n, df, invScal, PACKAGE = "Matrix")
 
 
 setMethod("lmer", signature(formula = "formula"),
@@ -236,6 +236,8 @@ setMethod("lmer", signature(formula = "formula"),
                               '\nUsing method = "PQL".\n')
               }
           }
+          if (method == "AGQ")
+              stop('method = "AGQ" not yet implemented for supernodal representation')
           ## create factor list for the random effects
           bars <- findbars(formula[[3]])
           names(bars) <- unlist(lapply(bars, function(x) deparse(x[[3]])))
@@ -266,7 +268,9 @@ setMethod("lmer", signature(formula = "formula"),
           if (lmm) {
               .Call("mer_ECMEsteps", mer, cv$niterEM, cv$EMverbose, PACKAGE = "Matrix")
               LMEoptimize(mer) <- cv
-              return(mer)
+              return(new("lmer", mer,
+                         frame = if (model) frm else data.frame(),
+                         terms = glm.fit$terms))
           }
 
           ## The rest of the function applies to generalized linear mixed models
@@ -286,11 +290,18 @@ setMethod("lmer", signature(formula = "formula"),
 
           GSpt <- .Call("glmer_init", environment(), PACKAGE = "Matrix")
           .Call("glmer_PQL", GSpt, PACKAGE = "Matrix")  # obtain PQL estimates
-          fixInd <- seq(ncol(x))
-          ## pars[fixInd] == beta, pars[-fixInd] == theta
           PQLpars <- c(fixef(mer),
                        .Call("mer_coef", mer, 2, PACKAGE = "Matrix"))
-          .Call("glmer_devLaplace", PQLpars, GSpt, PACKAGE = "Matrix")
+          if (method == "PQL") {
+              .Call("glmer_devLaplace", PQLpars, GSpt, PACKAGE = "Matrix")
+              .Call("glmer_finalize", GSpt, PACKAGE = "Matrix")
+              return(new("lmer", mer,
+                         frame = if (model) frm else data.frame(),
+                         terms = glm.fit$terms))
+          }
+
+          fixInd <- seq(ncol(x))
+          ## pars[fixInd] == beta, pars[-fixInd] == theta
           ## indicator of constrained parameters
           const <- c(rep(FALSE, length(fixInd)),
                      unlist(lapply(mer@nc[seq(along = fl)],
@@ -302,60 +313,14 @@ setMethod("lmer", signature(formula = "formula"),
           optimRes <-
               nlminb(PQLpars, devLaplace,
                      lower = ifelse(const, 5e-10, -Inf),
-                     control = list(trace = getOption("verbose"),
+                     control = list(trace = cv$msVerbose,
                      iter.max = cv$msMaxIter))
           .Call("glmer_finalize", GSpt, PACKAGE = "Matrix")
-          return(mer)
-          deviance <- devAGQ(PQLpars, 1)
+          return(new("lmer", mer,
+                     frame = if (model) frm else data.frame(),
+                     terms = glm.fit$terms))
 
-### FIXME: For nf == 1 change this to an AGQ evaluation.  Needs
-### AGQ for nc > 1 first.
-          fxd <- PQLpars[fixInd]
-          loglik <- logLik(mer)
-
-          if (method %in% c("Laplace", "AGQ")) {
-              nAGQ <- 1
-              if (method == "AGQ") {    # determine nAGQ at PQL estimates
-                  dev11 <- devAGQ(PQLpars, 11)
-                  ## FIXME: Should this be an absolute or a relative tolerance?
-                  devTol <- sqrt(.Machine$double.eps) * abs(dev11)
-                  for (nAGQ in c(9, 7, 5, 3, 1))
-                      if (abs(dev11 - devAGQ(PQLpars, nAGQ - 2)) > devTol) break
-                  nAGQ <- nAGQ + 2
-                  if (gVerb)
-                      cat(paste("Using", nAGQ, "quadrature points per column\n"))
-              }
-              obj <- function(pars)
-                  .Call("glmer_devAGQ", pars, GSpt, nAGQ, PACKAGE = "Matrix")
-              optimRes <-
-                  nlminb(PQLpars, obj,
-                         lower = ifelse(const, 5e-10, -Inf),
-                         control = list(trace = getOption("verbose"),
-                         iter.max = cv$msMaxIter))
-              optpars <- optimRes$par
-              if (optimRes$convergence != 0)
-                  warning("nlminb failed to converge")
-              deviance <- optimRes$objective
-              if (gVerb)
-                  cat(paste("convergence message", optimRes$message, "\n"))
-              fxd[] <- optpars[fixInd]  ## preserve the names
-              .Call("lmer_coefGets", mer, optpars[-fixInd], 2, PACKAGE = "Matrix")
-          }
-
-          .Call("glmer_finalize", GSpt, PACKAGE = "Matrix")
-          loglik[] <- -deviance/2
-          new("lmer", mer,
-              frame = if (model) frm else data.frame(),
-              terms = glm.fit$terms,
-              assign = attr(glm.fit$x, "assign"),
-              call = match.call(), family = family,
-              logLik = loglik, fixed = fxd)
       })
-
-
-## Extract the permutation
-setAs("mer", "pMatrix", function(from)
-      .Call("mer_pMatrix", from, PACKAGE = "Matrix"))
 
 ## Extract the L matrix
 setAs("mer", "dtCMatrix", function(from)
@@ -369,7 +334,7 @@ setMethod("fixef", signature(object = "mer"),
 ## Extract the random effects
 setMethod("ranef", signature(object = "mer"),
           function(object, ...)
-              .Call("mer_ranef", object, PACKAGE = "Matrix")
+              new("lmer.ranef", .Call("mer_ranef", object, PACKAGE = "Matrix"))
           )
 
 ## Optimization for mer objects
@@ -381,7 +346,7 @@ setReplaceMethod("LMEoptimize", signature(x="mer", value="list"),
                  constr <- unlist(lapply(nc, function(k) 1:((k*(k+1))/2) <= k))
                  fn <- function(pars)
                      deviance(.Call("mer_coefGets", x, pars, 2, PACKAGE = "Matrix"))
-                 gr <- if (value$analyticGradient)
+                 gr <- if (value$gradient)
                      function(pars) {
                          if (!isTRUE(all.equal(pars,
                                                .Call("mer_coef", x,
@@ -516,10 +481,10 @@ setMethod("show", "mer",
               fcoef <- .Call("mer_fixef", object, PACKAGE = "Matrix")
               useScale <- object@useScale
               corF <- vcov(object)@factors$correlation
-              DF <- getFixDF(object)
-              coefs <- cbind(fcoef, corF@sd, DF)
+              #DF <- getFixDF(object)
+              coefs <- cbind(fcoef, corF@sd)#, DF)
               dimnames(coefs) <-
-                  list(names(fcoef), c("Estimate", "Std. Error", "DF"))
+                  list(names(fcoef), c("Estimate", "Std. Error"))#, "DF"))
               digits <- max(3, getOption("digits") - 2)
               REML <- object@method == "REML"
               llik <- logLik(object, REML)
@@ -571,10 +536,10 @@ setMethod("show", "mer",
               if (nrow(coefs) > 0) {
                   if (useScale) {
                       stat <- coefs[,1]/coefs[,2]
-                      pval <- 2*pt(abs(stat), coefs[,3], lower = FALSE)
+                      #pval <- 2*pt(abs(stat), coefs[,3], lower = FALSE)
                       nms <- colnames(coefs)
-                      coefs <- cbind(coefs, stat, pval)
-                      colnames(coefs) <- c(nms, "t value", "Pr(>|t|)")
+                      coefs <- cbind(coefs, stat) #, pval)
+                      colnames(coefs) <- c(nms, "t value")#, "Pr(>|t|)")
                   } else {
                       coefs <- coefs[, 1:2, drop = FALSE]
                       stat <- coefs[,1]/coefs[,2]
@@ -584,7 +549,7 @@ setMethod("show", "mer",
                       colnames(coefs) <- c(nms, "z value", "Pr(>|z|)")
                   }
                   cat("\nFixed effects:\n")
-                  printCoefmat(coefs, tst.ind = 4, zap.ind = 3)
+                  printCoefmat(coefs, zap.ind = 3)#, tst.ind = 4)
                   rn <- rownames(coefs)
                   if (!is.null(corF)) {
                       p <- ncol(corF)
@@ -660,7 +625,7 @@ setMethod("anova", signature(object = "mer"),
           dots <- list(...)
           modp <- logical(0)
           if (length(dots))
-              modp <- sapply(dots, inherits, "mer") | sapply(dots, inherits, "lm")
+              modp <- sapply(dots, is, "mer") | sapply(dots, is, "lm")
           if (any(modp)) {              # multiple models - form table
               opts <- dots[!modp]
               mods <- c(list(object), dots[modp])
@@ -697,14 +662,13 @@ setMethod("anova", signature(object = "mer"),
               return(val)
           } else {
               foo <- object
-              foo@status["factored"] <- FALSE
-              .Call("mer_factor", foo, PACKAGE="Matrix")
-              dfr <- getFixDF(foo)
+              #foo@status["factored"] <- FALSE
+              #.Call("mer_factor", foo, PACKAGE="Matrix")
+              #dfr <- getFixDF(foo)
               ss <- foo@rXy^2
               ssr <- exp(foo@devComp["logryy2"])
-              ss <- ss[seq(along = dfr)]
-              names(ss) <- object@cnames[[".fixed"]][seq(along = dfr)]
-              asgn <- foo@assign
+              names(ss) <- object@cnames[[".fixed"]]
+              asgn <- attr(foo@X, "assign")
               terms <- foo@terms
               nmeffects <- attr(terms, "term.labels")
               if ("(Intercept)" %in% names(ss))
@@ -721,7 +685,7 @@ setMethod("anova", signature(object = "mer"),
                   list(nmeffects,
 #                       c("Df", "Sum Sq", "Mean Sq", "Denom", "F value", "Pr(>F)"))
                        c("Df", "Sum Sq", "Mean Sq"))
-              if ("(Intercept)" %in% nmeffects) table <- table[-1,]
+              if ("(Intercept)" %in% nmeffects) table <- table[-match("(Intercept)", nmeffects), ]
               attr(table, "heading") <- "Analysis of Variance Table"
               class(table) <- c("anova", "data.frame")
               table
@@ -754,8 +718,7 @@ setMethod("resid", signature(object = "mer"),
           )
 
 setMethod("summary", signature(object = "mer"),
-          function(object, ...)
-          .NotYetImplemented()
+          function(object, ...) object
           )
 
 setMethod("update", signature(object = "mer"),
@@ -767,7 +730,7 @@ setMethod("update", signature(object = "mer"),
 simss <- function(fm0, fma, nsim)
 {
     ysim <- simulate(fm0, nsim)
-    cv <- list(analyticGradient = FALSE, msMaxIter = 200:200,
+    cv <- list(gradient = FALSE, msMaxIter = 200:200,
                msVerbose = 0:0)
     sapply(ysim, function(yy) {
         .Call("mer_update_y", fm0, yy, PACKAGE = "Matrix")
@@ -778,3 +741,43 @@ simss <- function(fm0, fma, nsim)
               Ha = fma@devComp[["logryy2"]]))
     })
 }
+
+## Some leftover code from the old AGQ method in lmer.
+if (FALSE) {
+### FIXME: For nf == 1 change this to an AGQ evaluation.  Needs
+### AGQ for nc > 1 first.
+    fxd <- PQLpars[fixInd]
+    loglik <- logLik(mer)
+    
+    if (method %in% c("Laplace", "AGQ")) {
+        nAGQ <- 1
+        if (method == "AGQ") {    # determine nAGQ at PQL estimates
+            dev11 <- devAGQ(PQLpars, 11)
+            ## FIXME: Should this be an absolute or a relative tolerance?
+            devTol <- sqrt(.Machine$double.eps) * abs(dev11)
+            for (nAGQ in c(9, 7, 5, 3, 1))
+                if (abs(dev11 - devAGQ(PQLpars, nAGQ - 2)) > devTol) break
+            nAGQ <- nAGQ + 2
+            if (gVerb)
+                cat(paste("Using", nAGQ, "quadrature points per column\n"))
+        }
+        obj <- function(pars)
+            .Call("glmer_devAGQ", pars, GSpt, nAGQ, PACKAGE = "Matrix")
+        optimRes <-
+            nlminb(PQLpars, obj,
+                   lower = ifelse(const, 5e-10, -Inf),
+                   control = list(trace = getOption("verbose"),
+                   iter.max = cv$msMaxIter))
+        optpars <- optimRes$par
+        if (optimRes$convergence != 0)
+            warning("nlminb failed to converge")
+        deviance <- optimRes$objective
+        if (gVerb)
+            cat(paste("convergence message", optimRes$message, "\n"))
+        fxd[] <- optpars[fixInd]  ## preserve the names
+        .Call("lmer_coefGets", mer, optpars[-fixInd], 2, PACKAGE = "Matrix")
+    }
+    
+    .Call("glmer_finalize", GSpt, PACKAGE = "Matrix")
+    loglik[] <- -deviance/2
+}    

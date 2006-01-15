@@ -29,11 +29,10 @@ y <- rnorm (n, a.group[group.id], 1)
 ## fit and summarize the model
 fit.1 <- lmer (y ~ 1 + (1 | group.id))
 coef (fit.1)# failed in Matrix 0.99-6 -- FIXME: should get a show() method
-try(summary(fit.1)) # FIXME: add a summary method
+try(summary(fit.1))
 
 ## Many family = binomial cases
-if (isTRUE(try(data(Contraception, package = 'mlmRev')) ==
-           'Contraception') && exists("nlminb", mode = "function")) {
+if (isTRUE(try(data(Contraception, package = 'mlmRev')) == 'Contraception')) {
     print(fm.1 <- lmer(use ~ urban + age + livch + (1 | district),
                        Contraception, binomial))
     print(system.time(fm1 <- lmer(use ~ urban + age + livch + (1 | district),
@@ -43,17 +42,17 @@ if (isTRUE(try(data(Contraception, package = 'mlmRev')) ==
     print(system.time(lmer(use ~ urban + age + livch + (1 | district),
                            Contraception, binomial, method = 'Laplace'),
                       gc = TRUE))
-    print(fm.2a <- lmer(use ~ urban + age + livch + (1 | district),
-                        Contraception, binomial, method = 'AGQ'))
-    print(system.time(lmer(use ~ urban + age + livch + (1 | district),
-                           Contraception, binomial, method = 'AGQ'),
-                      gc = TRUE))
+##     print(fm.2a <- lmer(use ~ urban + age + livch + (1 | district),
+##                         Contraception, binomial, method = 'AGQ'))
+##     print(system.time(lmer(use ~ urban + age + livch + (1 | district),
+##                            Contraception, binomial, method = 'AGQ'),
+##                       gc = TRUE))
     print(fm.3 <- lmer(use ~ urban + age + livch + (urban | district),
                        Contraception, binomial))
     print(fm.4 <- lmer(use ~ urban + age + livch + (urban | district),
                        Contraception, binomial, method = 'Laplace'))
 }
-if (require('MASS', quietly = TRUE) && exists("nlminb", mode = "function")) {
+if (require('MASS', quietly = TRUE)) {
     bacteria$wk2 <- bacteria$week > 2
     contrasts(bacteria$trt) <-
         structure(contr.sdif(3),
@@ -65,10 +64,10 @@ if (require('MASS', quietly = TRUE) && exists("nlminb", mode = "function")) {
                       method = 'Laplace'))
     print(system.time(lmer(y ~ trt + wk2 + (1|ID), bacteria, binomial,
                            method = 'Laplace'), gc = TRUE))
-    print(fm6a <- lmer(y ~ trt + wk2 + (1|ID), bacteria, binomial,
-                       method = 'AGQ'))
-    print(system.time(lmer(y ~ trt + wk2 + (1|ID), bacteria, binomial,
-                           method = 'AGQ'), gc = TRUE))
+##     print(fm6a <- lmer(y ~ trt + wk2 + (1|ID), bacteria, binomial,
+##                        method = 'AGQ'))
+##     print(system.time(lmer(y ~ trt + wk2 + (1|ID), bacteria, binomial,
+##                            method = 'AGQ'), gc = TRUE))
 }
 
 proc.time() # for ``statistical reasons''

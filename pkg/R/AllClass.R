@@ -67,7 +67,7 @@ setClass("denseMatrix", representation("VIRTUAL"),
          contains = "Matrix")
 
 ## Virtual class of dense, numeric matrices
-setClass("ddenseMatrix", representation(rcond = "numeric", "VIRTUAL"),
+setClass("ddenseMatrix", representation("VIRTUAL"),
 	 contains = c("dMatrix", "denseMatrix"))
 
 ## Virtual class of dense, logical matrices
@@ -538,12 +538,10 @@ setClass("mer",
 
 ## Representation of a linear or generalized linear mixed effects model
 setClass("lmer",
-	 representation(assign = "integer", fitted = "numeric",
-			fixed = "numeric", frame = "data.frame",
-			logLik = "logLik", residuals = "numeric",
+	 representation(assign = "integer", frame = "data.frame", 
 			terms = "terms"),
 	 contains = "mer")
 
-setClass("lmer,ranef", contains = "list")
+setClass("lmer.ranef", contains = "list")
 
 
