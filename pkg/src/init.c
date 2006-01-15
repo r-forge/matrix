@@ -267,7 +267,6 @@ R_init_Matrix(DllInfo *dll)
     Matrix_rXySym = install("rXy");
     Matrix_rZySym = install("rZy");
     Matrix_ranefSym = install("ranef");
-    Matrix_rcondSym = install("rcond");
     Matrix_statusSym = install("status");
     Matrix_uploSym = install("uplo");
     Matrix_useScaleSym = install("useScale");
