@@ -240,7 +240,7 @@ SEXP lapack_qr(SEXP Xin, SEXP tl)
 	SET_VECTOR_ELT(Gcpy, i, VECTOR_ELT(Givens, i));
     SET_VECTOR_ELT(ans, 1, ScalarInteger(rank));
     setAttrib(ans, install("useLAPACK"), ScalarLogical(1));
-    setAttrib(ans, Matrix_rcondSym, ScalarReal(rcond));
+    setAttrib(ans, install("rcond"), ScalarReal(rcond));
     UNPROTECT(2);
     return ans;
 }
