@@ -27,8 +27,6 @@
     \item{\code{p}:}{Object of class \code{"integer"} of pointers, one
       for each row, to the initial (zero-based) index of elements in
       the row. (Only present in the \code{dsRMatrix} class.)}
-    \item{\code{factors}:}{Object of class \code{"list"} - a list
-      of factorizations of the matrix. }
     \item{\code{x}:}{Object of class \code{"numeric"} - the non-zero
       elements of the matrix.}
     \item{\code{Dim}:}{The dimension (a length-2 \code{"integer"})}

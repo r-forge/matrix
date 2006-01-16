@@ -11,6 +11,21 @@ setAs("denseMatrix", "dsparseMatrix",
 ## setAs("denseMatrix", "dgTMatrix",
 ##       function(from) as(as(from, "dgeMatrix"), "dgTMatrix"))
 
+setAs("denseMatrix", "CsparseMatrix",
+      function(from) {
+	  if(!is(from, "generalMatrix")) { ## e.g. for triangular | symmetric
+              ## FIXME: this is a *waste* in the case of packed matrices!
+	      if     (is(from, "dMatrix")) from <- as(from, "dgeMatrix")
+	      else if(is(from, "lMatrix")) from <- as(from, "lgeMatrix")
+	      else if(is(from, "zMatrix")) from <- as(from, "zgeMatrix")
+	      else stop("undefined method for class ", class(from))
+	  }
+	  .Call("dense_to_Csparse", from, PACKAGE = "Matrix")
+      })
+
+setAs("denseMatrix", "TsparseMatrix",
+      function(from) as(as(from, "CsparseMatrix"), "TsparseMatrix"))
+
 
 setMethod("show", signature(object = "denseMatrix"),
           function(object) prMatrix(object))
@@ -102,19 +117,6 @@ setMethod("isSymmetric", signature(object = "denseMatrix"),
 setMethod("isTriangular", signature(object = "triangularMatrix"),
           function(object) TRUE)
 
-setMethod("isTriangular", signature(object = "denseMatrix"),
-	  function(object, upper) {
-	      ## pretest: is it square?
-	      d <- dim(object)
-	      if(d[1] != d[2]) return(FALSE)
-	      ## else slower test
-              m <- as(object,"matrix")
-              ## == 0 even works for logical & complex:
-              if(upper)
-                  all(m[lower.tri(m)] == 0)
-              else
-                  all(m[upper.tri(m)] == 0)
-	  })
+setMethod("isTriangular", signature(object = "denseMatrix"), .is.triangular)
 
-setAs("denseMatrix", "CsparseMatrix",
-      function(from) .Call("dense_to_Csparse", from, PACKAGE = "Matrix"))
+setMethod("isDiagonal", signature(object = "denseMatrix"), .is.diagonal)

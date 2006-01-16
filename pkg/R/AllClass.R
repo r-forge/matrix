@@ -287,16 +287,15 @@ setClass("dgRMatrix",
 
 ## numeric, sparse, sorted compressed sparse row-oriented triangular matrices
 setClass("dtRMatrix",
-	 contains = c("dgRMatrix", "triangularMatrix"),
+	 contains = c("RsparseMatrix", "dsparseMatrix", "triangularMatrix"),
 	 prototype = prototype(p = 0:0, uplo = "U", diag = "N"),# to be valid
-
 	 ##TODO: validity = function(object) .Call("dtRMatrix_validate", object, PACKAGE = "Matrix")
-         ##TODO: Should this contain dgRMatrix or dsparseMatrix?
+
 	 )
 
 ## numeric, sparse, sorted compressed sparse row-oriented symmetric matrices
 setClass("dsRMatrix",
-	 contains = c("dgRMatrix", "symmetricMatrix"),
+	 contains = c("RsparseMatrix", "dsparseMatrix", "symmetricMatrix"),
 	 prototype = prototype(p = 0:0, uplo = "U"),# to be valid
 	 ##TODO: validity = function(object) .Call("dsRMatrix_validate", object, PACKAGE = "Matrix")
 	 )
@@ -538,7 +537,7 @@ setClass("mer",
 
 ## Representation of a linear or generalized linear mixed effects model
 setClass("lmer",
-	 representation(assign = "integer", frame = "data.frame", 
+	 representation(assign = "integer", frame = "data.frame",
 			terms = "terms"),
 	 contains = "mer")
 
