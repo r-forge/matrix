@@ -45,11 +45,6 @@
     \item{\code{Dim}:}{Object of class \code{"integer"}. The dimensions
       of the matrix which must be a two-element vector of non-negative
       integers.}
-    \item{\code{rcond}:}{Object of class \code{"numeric"}. A named
-      numeric vector of reciprocal condition numbers in either the
-      1-norm \code{"O"} or the infinity norm \code{"I"}.}
-    \item{\code{factors}:}{Object of class \code{"list"}.  A named
-      list of factorizations that have been computed for the matrix.}
   }
 }
 \section{Extends}{
