@@ -378,7 +378,7 @@ setMethod("mcmcsamp", signature(object = "mer"),
           function(object, n = 1, verbose = FALSE, saveb = FALSE,
                    trans = TRUE, ...)
       {
-          family <- object$family
+          family <- object@family
           lmm <- family$family == "gaussian" && family$link == "identity"
           if (!lmm)
               stop("mcmcsamp for GLMMs not yet implemented in supernodal representation")
