@@ -12,6 +12,9 @@ setAs("dgeMatrix", "dsyMatrix",
 	  else stop("not a symmetric matrix")
       })
 
+setAs("matrix", "dsyMatrix",
+      function(from) as(as(from, "dgeMatrix"), "dsyMatrix"))
+
 
 setAs("dsyMatrix", "matrix",
       function(from) .Call("dsyMatrix_as_matrix", from, PACKAGE = "Matrix"))

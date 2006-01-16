@@ -254,7 +254,7 @@ SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int dofree)
  * the result should *not* be freed with cholmod_dense_free.  Use
  * free or Free on the result.
  *
- * @param x pointer to an object that inherits from ddenseMatrix
+ * @param x pointer to an object that inherits from (denseMatrix ^ generalMatrix)
  *
  * @return pointer to a cholmod_dense object that contains a pointer
  * to the contents of x.
@@ -346,7 +346,7 @@ SEXP chm_dense_to_SEXP(cholmod_dense *a, int dofree)
 cholmod_dense *numeric_as_chm_dense(double *v, int n)
 {
     cholmod_dense *ans = Calloc(1, cholmod_dense);
-    
+
     ans->d = ans->nzmax = ans->nrow = n;
     ans->ncol = 1;
     ans->x = (void *) v;
@@ -487,7 +487,7 @@ SEXP chm_factor_to_SEXP(cholmod_factor *f, int dofree)
 	       (int*)f->next, f->n + 2);
 	Memcpy(INTEGER(ALLOC_SLOT(ans, install("prv"), INTSXP, f->n + 2)),
 	       (int*)f->prev, f->n + 2);
-    }	
+    }
     if (dofree > 0) cholmod_free_factor(&f, &c);
     if (dofree < 0) Free(f);
     UNPROTECT(1);
