@@ -609,11 +609,14 @@ setMethod("VarCorr", signature(x = "mer"),
           if (useScale)
               sc <- .Call("mer_sigma", x, REML, PACKAGE = "Matrix")
           sc2 <- sc * sc
-          ans <- lapply(x@Omega, function(el) {
-              el <- as(sc2 * solve(el), "dpoMatrix")
+          cnames <- x@cnames
+          ans <- x@Omega
+          for (i in seq(a=ans)) {
+              el <- as(sc2 * solve(ans[[i]]), "dpoMatrix")
+              el@Dimnames <- list(cnames[[i]], cnames[[i]])
               el@factors$correlation <- as(el, "correlation")
-              el
-          })
+              ans[[i]] <- el
+          }
           attr(ans, "sc") <- sc
           ans
       })
