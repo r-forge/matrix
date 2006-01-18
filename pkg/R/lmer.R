@@ -307,14 +307,13 @@ setMethod("lmer", signature(formula = "formula"),
           ## The rest of the function applies to generalized linear mixed models
           gVerb <- getOption("verbose")
           eta <- glm.fit(X, Y, weights = weights, offset = offset, family = family,
-                         intercept = attr(mt, "intercept") > 0))$fitted.values
+                         intercept = attr(mt, "intercept") > 0)$fitted.values
           wtssqr <- weights * weights
-          if (is.null(offset)) offset <- numeric(length(eta))
           linkinv <- quote(family$linkinv(eta))
           mu.eta <- quote(family$mu.eta(eta))
           mu <- family$linkinv(eta)
           variance <- quote(family$variance(mu))
-          dev.resids <- quote(family$dev.resids(y, mu, wtssqr))
+          dev.resids <- quote(family$dev.resids(Y, mu, wtssqr))
           LMEopt <- get("LMEoptimize<-")
           doLMEopt <- quote(LMEopt(x = mer, value = cv))
 
