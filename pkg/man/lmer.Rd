@@ -10,7 +10,7 @@
 }
 \usage{
 lmer(formula, data, family, method, control, start,
-     subset, weights, na.action, offset, contrasts
+     subset, weights, na.action, offset, contrasts,
      model, x, y, \dots)
 
 \S4method{lmer}{formula}(formula, data, family, method,

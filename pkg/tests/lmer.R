@@ -16,8 +16,8 @@ options(show.signif.stars = FALSE)
              OrchardSprays, family = poisson()))
 
 ## Laplace approximation {takes time}
-## (fm4 <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
-##              OrchardSprays, poisson(), method = "Laplace"))
+(fm4 <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
+              OrchardSprays, poisson(), method = "Laplace"))
 
 ## Simple example by Andrew Gelman (2006-01-10) ----
 n.groups <- 10 ; n.reps <- 2
