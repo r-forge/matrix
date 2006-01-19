@@ -1,6 +1,4 @@
 import("Matrix")
-#importFrom("graphics","plot")
-#import("stats")
 
 export("gsummary", "lmList", "pooledSD")
 
