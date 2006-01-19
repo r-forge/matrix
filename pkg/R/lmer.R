@@ -288,15 +288,15 @@ setMethod("lmer", signature(formula = "formula"),
                         t(model.matrix(eval(substitute(~ expr,
                                                        list(expr = x[[2]]))),
                                        mf)))
-          ## Create the mixed-effects representation (mer) object
-          mer <- .Call("mer_create", fl,
-                       .Call("Zt_create", fl, Ztl, PACKAGE = "Matrix"),
-                       X, Y, method, sapply(Ztl, nrow),
-                       c(lapply(Ztl, rownames), list(.fixed = colnames(X))),
-                       !(family$family %in% c("binomial", "poisson")),
-                       match.call(), family,
-                       PACKAGE = "Matrix")
           if (lmm) {
+              ## Create the mixed-effects representation (mer) object
+              mer <- .Call("mer_create", fl,
+                           .Call("Zt_create", fl, Ztl, PACKAGE = "Matrix"),
+                           X, Y, method, sapply(Ztl, nrow),
+                           c(lapply(Ztl, rownames), list(.fixed = colnames(X))),
+                           !(family$family %in% c("binomial", "poisson")),
+                           match.call(), family,
+                           PACKAGE = "Matrix")
               .Call("mer_ECMEsteps", mer, cv$niterEM, cv$EMverbose, PACKAGE = "Matrix")
               LMEoptimize(mer) <- cv
               return(new("lmer", mer,
@@ -306,8 +306,10 @@ setMethod("lmer", signature(formula = "formula"),
 
           ## The rest of the function applies to generalized linear mixed models
           gVerb <- getOption("verbose")
-          eta <- glm.fit(X, Y, weights = weights, offset = offset, family = family,
-                         intercept = attr(mt, "intercept") > 0)$fitted.values
+          glmFit <- glm.fit(X, Y, weights = weights, offset = offset, family = family,
+                            intercept = attr(mt, "intercept") > 0)
+          eta <- glmFit$linear.predictors
+          Y <- as.double(glmFit$y)
           wtssqr <- weights * weights
           linkinv <- quote(family$linkinv(eta))
           mu.eta <- quote(family$mu.eta(eta))
@@ -316,6 +318,13 @@ setMethod("lmer", signature(formula = "formula"),
           dev.resids <- quote(family$dev.resids(Y, mu, wtssqr))
           LMEopt <- get("LMEoptimize<-")
           doLMEopt <- quote(LMEopt(x = mer, value = cv))
+          mer <- .Call("mer_create", fl,
+                       .Call("Zt_create", fl, Ztl, PACKAGE = "Matrix"),
+                       X, Y, method, sapply(Ztl, nrow),
+                       c(lapply(Ztl, rownames), list(.fixed = colnames(X))),
+                       !(family$family %in% c("binomial", "poisson")),
+                       match.call(), family,
+                       PACKAGE = "Matrix")
 
           GSpt <- .Call("glmer_init", environment(), PACKAGE = "Matrix")
           .Call("glmer_PQL", GSpt, PACKAGE = "Matrix")  # obtain PQL estimates
@@ -329,7 +338,7 @@ setMethod("lmer", signature(formula = "formula"),
                          terms = mt))
           }
 
-          fixInd <- seq(ncol(x))
+          fixInd <- seq(ncol(X))
           ## pars[fixInd] == beta, pars[-fixInd] == theta
           ## indicator of constrained parameters
           const <- c(rep(FALSE, length(fixInd)),
@@ -758,10 +767,26 @@ setMethod("summary", signature(object = "mer"),
           )
 
 setMethod("update", signature(object = "mer"),
-          function(object, ...)
-          .NotYetImplemented()
-          )
-
+          function(object, formula., ..., evaluate = TRUE)
+      {
+          call <- object@call
+          if (is.null(call))
+              stop("need an object with call slot")
+          extras <- match.call(expand.dots = FALSE)$...
+          if (!missing(formula.))
+              call$formula <- update.formula(formula(object), formula.)
+          if (length(extras) > 0) {
+              existing <- !is.na(match(names(extras), names(call)))
+              for (a in names(extras)[existing]) call[[a]] <- extras[[a]]
+              if (any(!existing)) {
+                  call <- c(as.list(call), extras[!existing])
+                  call <- as.call(call)
+              }
+          }
+          if (evaluate)
+              eval(call, parent.frame())
+          else call
+      })
 
 simss <- function(fm0, fma, nsim)
 {
