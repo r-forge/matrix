@@ -270,7 +270,7 @@ cholmod_dense *as_cholmod_dense(SEXP x)
 	*cl = CHAR(asChar(getAttrib(x, R_ClassSymbol)));
     int dims[2], ctype = check_class(cl, valid);
 
-    if (ctype < 0 && isMatrix(x)) {
+    if (ctype < 0) {
 	ctype = (isReal(x) ? 0 :
 		 (isLogical(x) ? 2 :
 		  (isComplex(x) ? 4 : -1)));
