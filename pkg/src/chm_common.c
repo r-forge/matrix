@@ -1,6 +1,8 @@
 #include "chm_common.h"
 #include "Mutils.h"
 
+cholmod_common c;
+
 static R_INLINE int
 check_class(char *class, char **valid)
 {
@@ -268,7 +270,7 @@ cholmod_dense *as_cholmod_dense(SEXP x)
 	*cl = CHAR(asChar(getAttrib(x, R_ClassSymbol)));
     int dims[2], ctype = check_class(cl, valid);
 
-    if (ctype < 0) {
+    if (ctype < 0 && isMatrix(x))
 	ctype = (isReal(x) ? 0 :
 		 (isLogical(x) ? 2 :
 		  (isComplex(x) ? 4 : -1)));
