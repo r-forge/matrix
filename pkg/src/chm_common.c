@@ -13,6 +13,16 @@ check_class(char *class, char **valid)
     }
 }
 
+/**
+ * Create a cholmod_sparse object with the contents of x.  Note that
+ * the result should *not* be freed with cholmod_sparse_free.  Use
+ * Free on the result.
+ *
+ * @param x pointer to an object that inherits from TsparseMatrix
+ *
+ * @return pointer to a cholmod_triplet object that contains pointers
+ * to the slots of x.
+ */
 cholmod_sparse *as_cholmod_sparse(SEXP x)
 {
     cholmod_sparse *ans = Calloc(1, cholmod_sparse);
@@ -132,7 +142,7 @@ SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int dofree)
 /**
  * Create a cholmod_triplet object with the contents of x.  Note that
  * the result should *not* be freed with cholmod_triplet_free.  Use
- * free or Free on the result.
+ * Free on the result.
  *
  * @param x pointer to an object that inherits from TsparseMatrix
  *
@@ -254,7 +264,7 @@ SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int dofree)
 /**
  * Create a cholmod_dense object with the contents of x.  Note that
  * the result should *not* be freed with cholmod_dense_free.  Use
- * free or Free on the result.
+ * Free on the result.
  *
  * @param x pointer to an object that inherits from (denseMatrix ^ generalMatrix)
  *
