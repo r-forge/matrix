@@ -1,4 +1,4 @@
- ### Coercion and Methods for Symmetric Matrices
+### Coercion and Methods for Dense Numeric Symmetric Matrices
 
 setAs("dsyMatrix", "dgeMatrix",
       function(from) .Call("dsyMatrix_as_dgeMatrix", from, PACKAGE = "Matrix"))

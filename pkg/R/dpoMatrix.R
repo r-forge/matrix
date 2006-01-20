@@ -12,6 +12,10 @@ setAs("dpoMatrix", "correlation",
           ans
       })
 
+setAs("dgeMatrix", "dpoMatrix",
+      function(from) as(as(from, "dsyMatrix"), "dpoMatrix"))
+
+
 setMethod("chol", signature(x = "dpoMatrix"),
           function(x, pivot, LINPACK)
           .Call("dpoMatrix_chol", x, PACKAGE = "Matrix"))
@@ -41,7 +45,8 @@ setMethod("solve", signature(a = "dpoMatrix", b = "matrix"),
           .Call("dpoMatrix_matrix_solve", a, b, PACKAGE = "Matrix"),
           valueClass = "matrix")
 
-##setMethod("solve", signature(a = "dpoMatrix", b = "numeric"),
+## Is this usable / necessary?  -- FIXME!
+## setMethod("solve", signature(a = "dpoMatrix", b = "numeric"),
 ##          function(a, b, ...)
 ##          as.numeric(.Call("dpoMatrix_matrix_solve",
 ##                           a, as.matrix(b), PACKAGE = "Matrix")),
