@@ -145,7 +145,7 @@ setClass("dsyMatrix",
          ##> WITHOUT a coerce to dge* (losing symmetry)
          ##> gives error in crossprod() dispatch
 	 ##> contains = c("ddenseMatrix", "dgeMatrix", "symmetricMatrix"),
-	 contains = c("dgeMatrix", "symmetricMatrix"),
+	 contains = c("ddenseMatrix", "symmetricMatrix"),
 	 prototype = prototype(uplo = "U"),
 	 validity =
          function(object) .Call("dsyMatrix_validate", object, PACKAGE = "Matrix")
@@ -457,9 +457,12 @@ setClass("pMatrix", representation(perm = "integer"),
 	 })
 
 ### Class Union :  no inheritance, but is(*, <class>) :
+
+## Definition  Packed := dense with length( . @x) < prod( . @Dim)
+##             ~~~~~~
 setClassUnion("packedMatrix",
               members = c("dspMatrix", "dppMatrix", "dtpMatrix",
-               "lspMatrix", "ltpMatrix"))
+               "lspMatrix", "ltpMatrix", "diagonalMatrix"))
 
 
 ## --------------------- non-"Matrix" Classes --------------------------------
