@@ -112,7 +112,7 @@ SEXP csc_tcrossprod(SEXP x)
 
     Free(chx);
     cholmod_free_sparse(&cha, &c);
-    return chm_sparse_to_SEXP(chas, -1);
+    return chm_sparse_to_SEXP(chas, 1);
 }
 
 SEXP csc_matrix_crossprod(SEXP x, SEXP y, SEXP classed)
