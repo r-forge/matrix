@@ -97,9 +97,10 @@ SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int dofree)
 {
     SEXP ans;
     char *cl = "";		/* -Wall */
-    int *dims, nnz = cholmod_nnz(a, &c);
+    int *dims, nnz;
 				/* ensure a is sorted and packed */
     if (!a->sorted || !a->packed) cholmod_sort(a, &c);
+    nnz = cholmod_nnz(a, &c);
 				/* determine the class of the result */
     switch(a->xtype){
     case CHOLMOD_PATTERN:
