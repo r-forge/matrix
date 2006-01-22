@@ -71,6 +71,7 @@ SEXP LU_expand(SEXP x)
     }
 				/* invert the inverse */
     for (i = 0; i < n; i++) perm[iperm[i] - 1] = i + 1;
+    Free(iperm);
     UNPROTECT(1);
     return val;
 }
