@@ -17,7 +17,7 @@ setAs("lsCMatrix", "dsCMatrix",
                          Dim = from@Dim, Dimnames = from@Dimnames))
 
 setAs("lsCMatrix", "dgTMatrix",
-      function(from) callGeneric(as(x, "dsCMatrix")))
+      function(from) as(as(x, "dsCMatrix"), "dgTMatrix"))
 
 ## FIXME: generalize to "lsparseMatrix" or (class union)  "symmetric sparse"
 setMethod("image", "lsCMatrix",

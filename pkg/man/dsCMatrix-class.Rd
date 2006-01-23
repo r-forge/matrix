@@ -10,6 +10,7 @@
 \alias{chol,dsCMatrix,logical-method}
 \alias{t,dsCMatrix-method}
 \alias{t,dsTMatrix-method}
+\alias{coerce,dgeMatrix,dsCMatrix-method}
 \alias{coerce,dsCMatrix,dgCMatrix-method}
 \alias{coerce,dsCMatrix,dgTMatrix-method}
 \alias{coerce,dsCMatrix,dgeMatrix-method}
@@ -17,6 +18,7 @@
 \alias{coerce,dsCMatrix,dsyMatrix-method}
 \alias{coerce,dsCMatrix,lsCMatrix-method}
 \alias{coerce,dsCMatrix,matrix-method}
+\alias{coerce,dgeMatrix,dsTMatrix-method}
 \alias{coerce,dsTMatrix,dgTMatrix-method}
 \alias{coerce,dsTMatrix,dgeMatrix-method}
 \alias{coerce,dsTMatrix,dsCMatrix-method}
