@@ -28,6 +28,7 @@
 \alias{coerce,dsyMatrix,dsCMatrix-method}
 \alias{coerce,dsyMatrix,dsTMatrix-method}
 \alias{coerce,matrix,dsCMatrix-method}
+\alias{coerce,matrix,dsTMatrix-method}
 \alias{coerce,graphNEL,dsCMatrix-method}
 \alias{determinant,dsCMatrix,missing-method}
 \alias{determinant,dsCMatrix,logical-method}

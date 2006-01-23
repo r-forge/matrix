@@ -1,9 +1,9 @@
 #### Logical Sparse Triangular Matrices in Compressed column-oriented format
 
-### contains = "lsparseMatrix"
-
 setAs("ltCMatrix", "matrix",
       function(from) as(as(from, "lgCMatrix"), "matrix"))
+setAs("matrix", "ltCMatrix",
+      function(from) as(as(from, "dtCMatrix"), "ltCMatrix"))
 
 setAs("ltCMatrix", "lgCMatrix",
       function(from) new("lgCMatrix", i = from@i, p = from@p,
