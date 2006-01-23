@@ -2,9 +2,10 @@ setMethod("t", signature(x = "dtCMatrix"),
           function(x) .Call("tsc_transpose", x, PACKAGE = "Matrix"),
           valueClass = "dtCMatrix")
 
-setAs("dtCMatrix", "ltCMatrix",
+setAs("dtCMatrix", "ltCMatrix", # just drop 'x' slot:
       function(from) new("ltCMatrix", i = from@i, p = from@p,
                          uplo = from@uplo, diag = from@diag,
+                         ## FIXME?: use from@factors smartly
                          Dim = from@Dim, Dimnames = from@Dimnames))
 
 setAs("matrix", "dtCMatrix",
