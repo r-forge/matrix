@@ -25,11 +25,9 @@
   profiled log-restricted-likelihood of a linear mixed model, the
   gradients and Hessians of these criteria, and update steps for an
   ECME algorithm to optimize these criteria are given in Bates and
-  DebRoy (2004).  A representation of linear mixed models using
-  positive semidefinite symmetric matrices and dense matrices is given
-  in Bates (2004).  In this paper we present details of that
-  representation and those computational methods in the \code{lme4}
-  package for R.
+  DebRoy (2004). In this paper we generalize those formulae and
+  describe the representation of mixed-effects models using sparse
+  matrix methods available in the \code{Matrix} package.
 \end{abstract}
 
 <<preliminaries,echo=FALSE,print=FALSE>>=
@@ -75,7 +73,7 @@ We consider linear mixed models of the form
   \label{eq:lmeGeneral}
   \by=\bX\bbeta+\bZ\bb+\beps\quad
   \beps\sim\mathcal{N}(\bzer,\sigma^2\bI),
-  \bb\sim\mathcal{N}(\bzer,\sigma^2\bOmega^{-1}),
+  \bb\sim\mathcal{N}(\bzer,\sigma^2\bSigma^{-1}),
   \beps\perp\bb
 \end{equation}
 where $\by$ is the $n$-dimensional response vector, $\bX$ is an
@@ -86,8 +84,120 @@ distribution with mean $\bzer$ and relative precision matrix $\bOmega$
 (i.e., $\bOmega$ is the precision of $\bb$ relative to the precision
 of $\beps$), and $\beps$ is the random noise assumed to have a
 spherical Gaussian distribution.  The symbol $\perp$ indicates
-independence of random variables.  The matrix $\bX$ has full
-column rank and $\bOmega$ is positive definite.
+independence of random variables.  
+
+We will assume that $\bX$ has full column rank and that $\bSigma$ is
+positive definite.
+
+
+\subsection{Structure of $\bSigma$}
+\label{sec:sigmaStructure}
+
+Components of the random effects vector $\bb$ and portions of its
+variance-covariance matrix $\bSigma$ are associated with $k$ grouping
+factors $\bbf_i, i=1,\dots,k$, each of length $n$, and with the $n_i,
+i = 1,\dots,k$ levels of each of the grouping factors.  In general
+there are $q_i$ components of $\bb$ associated with each of the $n_i$
+levels the grouping factor $\bbf_i, i = 1,\dots,k$.  Thus
+\begin{equation}
+  \label{eq:qdef}
+  q = \sum_{i=1}^k n_i q_i 
+\end{equation}
+
+We assume that the components of $\bb$ and the rows and columns of
+$\bSigma$ are ordered according to the $k$ grouping factors and,
+within the block for the $i$th grouping factor, according to the $n_i$
+levels of the grouping factor.
+
+Random effects associated with different grouping factors are
+independent.  This implies that $\bSigma$ is block-diagonal with $k$
+diagonal blocks of orders $n_i q_i, i=1,\dots,k$.
+
+Random effects associated with different levels of the same grouping
+factor are independent.  This implies that the $i$th (outer) diagonal
+block of $\bSigma$ is itself block diagonal in $n_i$ blocks of order $q_i$.
+We say that the structure of $\bSigma$ is block/block diagonal.
+
+Finally, the variance-covariance matrix within each of the
+$q_i$-dimensional subvectors of $\bb$ associated with one of the $n_i$
+levels of grouping factor $\bbf_i, i=1,\dots,k$ is a constant (but
+unknown) positive-definite symmetric $q_i\times q_i$ matrix
+$\bSigma_i,i=1,\dots,k$.  This implies that each of the $n_i$ inner
+diagonal blocks of order $q_i$ is a copy of $\bSigma_i$.  We say that
+$\bSigma$ has a \emph{repeated block/block diagonal} structure.
+
+\subsection{The relative precision matrix}
+\label{sec:relativePrecision}
+
+Many of the computational formulae are more conveniently expressed in
+terms of $\bSigma^{-1}$, which is called the
+\emph{precision} matrix of the random effects, instead of $\bSigma$.
+In fact, the formulae are most conveniently expressed in terms of the
+\emph{relative precision matrix} $\sigma^2\bSigma^{-1}$ which we write
+as $\bOmega$.  That is,
+\begin{equation}
+  \label{eq:relPrec}
+  \bOmega = \sigma^2\bSigma^{-1}
+\end{equation}
+
+This called the ``relative'' precision because it is precision of
+$\bb$ ($\bSigma^{-1}$) relative to the precision of $\beps$
+($\bI/\left(\sigma^2\right)$).
+
+It is easy to establish that $\bOmega$ will have a repeated
+block/block diagonal structure like that of $\bSigma$.  That is,
+$\bOmega$ consists of $k$ outer diagonal blocks of sizes $n_i q_i, i =
+1,\dots,k$ and the $i$th outer diagonal block is itself block diagonal
+with $n_i$ inner blocks of size $q_i\times q_i$.  Furthermore, each of
+the inner diagonal blocks in the $i$th outer block is a copy of the
+$q_i\times q_i$ positive-definite, symmetric matrix $\bOmega_i$.
+
+Because $\bOmega$ has a repeated block/block structure we define
+the entire matrix if we specify the symmetric matrices $\bOmega_i, i =
+1,\dots,k$ and, because of the symmetry, $\bOmega_i$ has at most
+$q_i(q_i+1)/2$ distinct elements.  We will write $\btheta$ for a
+parameter vector of length at most $\sum_{i=1}^{k}q_i(q_i+1)/2$ that
+determines $\bOmega$.  For example, we could use the non-redundant
+elements in the $\bOmega_i$ as the components of $\btheta$.  In fact
+we use a different, but equivalent, parameterization for reasons to be
+discussed later.
+
+We only need to store the matrices $\bOmega_i,i=1,\dots,k$ and the
+number of levels in the grouping factors to be able create $\bOmega$.
+The matrices $\bOmega_i$ are stored in the \code{Omega} slot of an
+object of class \code{"lmer"}. The values of $k$ and $n_i,
+i=1,\dots,k$ can be determined from the list of the grouping factors
+themselves, stored as the \code{flist} slot, or from the dimensions
+$q_i,i=1,\dots,k$, stored in the \code{nc} slot, and the group
+pointers, stored in the \code{Gp} slot.  Successive differences of the
+group pointers are the total number of components of $\bb$ associated
+with the $i$th grouping factor.  That is, these differences are $n_i
+q_i,i=1,\dots,k$.
+
+
+\subsection{Examples}
+\label{sec:OmegaExamp}
+
+Consider the fitted models
+<<fmi>>=
+Sm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
+data(Chem97, package = "mlmRev")
+Cm1 <- lmer(score ~ gcsescore + (1|school) + (1|lea), Chem97,
+            control = list(niterEM = 0, gradient = FALSE))
+data(star, package = "mlmRev")
+Mm1 <- lmer(math ~ gr+sx*eth+cltype+(yrs|id)+(1|tch)+(yrs|sch), star,
+            control = list(niterEM = 0, gradient = FALSE))
+@ 
+Model \code{Sm1} has a single grouping factor with $18$ levels
+
+
+\section{Likelihood and restricted likelihood}
+\label{sec:likelihood}
+
+given grouping factor have the same  variance-covariance matrix, say 
+For convenience we assume that components of $\bb$ are ordered 
+the components associated with grouping factor $\bbf_i$ are first,
+then those associated with grouping $\bbf_2$ are next, and so on.
 
 The random effects vector $\bb$ and the columns of $\bZ$ are divided
 into $k$ outer blocks associated with grouping factors $\bff_i,
