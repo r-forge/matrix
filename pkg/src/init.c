@@ -178,7 +178,9 @@ static R_CallMethodDef CallEntries[] = {
 
     {"lspMatrix_as_lsyMatrix", (DL_FUNC) &lspMatrix_as_lsyMatrix, 1},
     {"lsyMatrix_as_lspMatrix", (DL_FUNC) &lsyMatrix_as_lspMatrix, 1},
+    {"lsyMatrix_as_lgeMatrix", (DL_FUNC) &lsyMatrix_as_lgeMatrix, 1},
     {"ltpMatrix_as_ltrMatrix", (DL_FUNC) &ltpMatrix_as_ltrMatrix, 1},
+    {"ltrMatrix_as_lgeMatrix", (DL_FUNC) &ltrMatrix_as_lgeMatrix, 1},
     {"ltrMatrix_as_ltpMatrix", (DL_FUNC) &ltrMatrix_as_ltpMatrix, 1},
 
     {"lsCMatrix_chol", (DL_FUNC) &lsCMatrix_chol, 2},
