@@ -54,6 +54,12 @@ Matrix(0, 3, 2, sparse=FALSE)# forced 'dense'
 Matrix(1:6, 3, 2)           # a 3 by 2 matrix
 Matrix(1:6, nrow=3)
 Matrix(1:6, ncol=2)
+Matrix(diag(4) >= 0)# -> "lsyMatrix"
+Matrix(diag(4) >  0)# -> "ldiMatrix" with diag = "U"
+\dontshow{
+if(FALSE) ## FIXME --- does not yet work:
+Matrix(upper.tri(matrix(,4,4)))# needs "matrix" to "ltCMatrix"
+}
 Matrix(1:9, nrow=3,
        dimnames = list(c("a", "b", "c"), c("A", "B", "C")))
 (I3 <- Matrix(diag(3)))# identity, i.e., unit "diagonalMatrix"

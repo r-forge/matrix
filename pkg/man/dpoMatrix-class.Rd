@@ -6,6 +6,7 @@
 \alias{correlation-class}
 %
 \alias{coerce,dgeMatrix,dpoMatrix-method}
+\alias{coerce,dgeMatrix,dppMatrix-method}
 \alias{coerce,dpoMatrix,dppMatrix-method}
 \alias{coerce,dpoMatrix,correlation-method}
 \alias{coerce,dppMatrix,dpoMatrix-method}

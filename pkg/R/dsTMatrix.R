@@ -30,6 +30,8 @@ setAs("dsTMatrix", "dsyMatrix",
 
 setAs("dsTMatrix", "dgeMatrix",
       function(from) as(as(from, "dsyMatrix"), "dgeMatrix"))
+setAs("dgeMatrix", "dsTMatrix",
+      function(from) as(as(from, "dsyMatrix"), "dsTMatrix"))
 
 setAs("dsTMatrix", "matrix",
       function(from) as(as(from, "dsyMatrix"), "matrix"))
