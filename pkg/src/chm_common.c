@@ -78,7 +78,8 @@ cholmod_sparse *as_cholmod_sparse(SEXP x)
 	    (!strcmp(CHAR(asChar(getAttrib(x, Matrix_uploSym))), "U")) ?
 	    1 : -1;
 	break;
-    case 2: error("triangular matrices not yet mapped to CHOLMOD");
+    case 2: ans->stype = 0; break; /* Note that triangularity property is lost */
+/* 	error("triangular matrices not yet mapped to CHOLMOD"); */
     }
 
     return ans;
@@ -203,7 +204,8 @@ cholmod_triplet *as_cholmod_triplet(SEXP x)
 	    (!strcmp(CHAR(asChar(getAttrib(x, Matrix_uploSym))), "U")) ?
 	    1 : -1;
 	break;
-    case 2: error("triangular matrices not yet mapped to CHOLMOD");
+    case 2: ans->stype = 0; break; /* Note that triangularity property is lost */
+/* 	error("triangular matrices not yet mapped to CHOLMOD"); */
     }
 
     return ans;
