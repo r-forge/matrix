@@ -185,3 +185,5 @@ tstMatrixClass("Matrix")
 if(FALSE)## or just a sub class
 tstMatrixClass("triangularMatrix")
 
+
+cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''

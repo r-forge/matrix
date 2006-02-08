@@ -44,4 +44,4 @@ stopifnot(px@i == c(3,4,1,4),
           px@x == c(3,26,-2,3))
 
 
-cat('Time elapsed: ', proc.time(),'\n') # "stats"
+cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''

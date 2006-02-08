@@ -69,4 +69,4 @@ stopifnot(!isTRUE(all.equal(m1, m2)),
 
 
 
-proc.time() # for ``statistical reasons''
+cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
