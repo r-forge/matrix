@@ -79,4 +79,5 @@ stopifnot(identical( crossprod(sM), t(sM) %*%   sM),
 assert.EQ.mat( crossprod(sM),  crossprod(sm) > 0)
 assert.EQ.mat(tcrossprod(sM), as(tcrossprod(sm),"matrix") > 0)
 
-proc.time() # for ``statistical reasons''
+cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
+
