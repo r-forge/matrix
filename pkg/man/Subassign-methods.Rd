@@ -19,6 +19,7 @@
 % \alias{[<-,TsparseTMatrix,missing,numeric,logical-method}
 % \alias{[<-,TsparseTMatrix,numeric,numeric,logical-method}
 % %
+\alias{[<-,dgTMatrix,index,index,numeric-method}% temporary
 % \alias{[<-,dgTMatrix,missing,missing,ANY-method}
 % \alias{[<-,dgTMatrix,missing,numeric,logical-method}
 % \alias{[<-,dgTMatrix,missing,numeric,missing-method}
