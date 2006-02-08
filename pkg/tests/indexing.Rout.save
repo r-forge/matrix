@@ -1,6 +1,6 @@
 
 R : Copyright 2006, The R Foundation for Statistical Computing
-Version 2.2.1 Patched (2006-01-15 r37092)
+Version 2.2.1 Patched (2006-02-07 r37287)
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -211,11 +211,17 @@ Formal class 'dgTMatrix' [package "Matrix"] with 6 slots
 > ## mixing of negative and positive must give error
 > assertError(mT[-1:1,])
 > 
+> 
+> # now works
+> mT[1, 4] <- -99
+> mT[1:2, 1:7]
+2 x 7 sparse Matrix of class "dgTMatrix"
+                         
+[1,] . .  . -99 . .   241
+[2,] . 42 . .   . 202 .  
 > ## At least these now give a nicely understandable error:
-> try(mT[1, 4] <- -99)
-Error in "[<-"(`*tmp*`, 1, 4, value = -99) : 
-	not-yet-implemented 'Matrix[<-' method
 > try(mT[2:3, ] <- 0)
 Error in "[<-"(`*tmp*`, 2:3, , value = 0) : 
 	not-yet-implemented 'Matrix[<-' method
+> 
 > 

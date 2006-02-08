@@ -88,6 +88,10 @@ stopifnot(identical4(mc[-(1:4), -(2:4)], mC[5, c(1,5:7)],
 ## mixing of negative and positive must give error
 assertError(mT[-1:1,])
 
+
+# now works
+mT[1, 4] <- -99
+mT[1:2, 1:7]
 ## At least these now give a nicely understandable error:
-try(mT[1, 4] <- -99)
 try(mT[2:3, ] <- 0)
+

@@ -40,6 +40,84 @@ setAs("matrix", "dgTMatrix",
 
 ## "[" methods are now in ./Tsparse.R
 
+## FIXME? -- should these be moved to /Tsparse.R -- for *all* Tsparse ones?
+
+## setReplaceMethod("[", signature(x = "dgTMatrix", i = "index", j = "missing",
+##                                 value = "numeric"),
+##                  function (x, i, value) {
+
+##                      stop("NOT YET")
+
+##                      as(r, class(x))
+##                  })
+
+## setReplaceMethod("[", signature(x = "dgTMatrix", i = "missing", j = "index",
+##                                 value = "numeric"),
+##                  function (x, j, value) {
+
+##                      stop("NOT YET")
+
+##                      as(r, class(x))
+##                  })
+
+setReplaceMethod("[", signature(x = "dgTMatrix", i = "index", j = "index",
+                                value = "numeric"),
+                 function (x, i, j, value)
+             {
+                 di <- dim(x)
+                 dn <- dimnames(x)
+                 ## FIXME: .ind.prep() is not sufficient;
+                 ## ----- since we need to "know" which (i,j) have a match
+                 ##       and which have *not*
+                 ip1 <- .ind.prep(x@i, i, 1, di, dn)
+                 ip2 <- .ind.prep(x@j, j, 2, di, dn)
+                 sel <- ip1$m > 0:0  &  ip2$m > 0:0
+                 ## the simplest case
+                 if(all(value == 0)) { ## just drop the non-zero entries
+                     if(any(sel)) { ## non-zero there
+                         x@i <- x@i[!sel]
+                         x@j <- x@j[!sel]
+                         x@x <- x@x[!sel]
+                     }
+                     return(x)
+                 }
+
+                 ## else --  some( value != 0 ) --
+
+                 ## another simple, typical case:
+                 if(is.numeric(i) && length(i) == 1 &&
+                    is.numeric(j) && length(j) == 1) {
+                     if(length(value) != 1) {
+                         if(length(value == 0))
+                             stop("nothing to replace")
+                         else
+                             stop("too many replacement values")
+                     }
+                     if(any(sel)) { ## non-zero there
+                         x@x[sel] <- value
+                     } else {
+                         x@i <- c(x@i, as.integer(i - 1))
+                         x@j <- c(x@j, as.integer(j - 1))
+                         x@x <- c(x@x, value)
+                     }
+                     return(x)
+                 }
+
+                 ## 1) replace those that are already non-zero
+
+                 ## 2) add     those that were structural 0
+
+                 stop("not-yet-implemented 'dgTMatrix[<-' method")
+
+                 if(any(sel)) { ## non-zero there
+                     x@x[sel] <- value
+                 }
+
+             })
+
+
+
+
 setMethod("crossprod", signature(x = "dgTMatrix", y = "missing"),
           function(x, y = NULL)
           .Call("csc_crossprod", as(x, "dgCMatrix"), PACKAGE = "Matrix"))
