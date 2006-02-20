@@ -114,3 +114,4 @@ setMethod("tcrossprod", signature(x = "TsparseMatrix", y = "missing"),
 
 setAs("TsparseMatrix", "CsparseMatrix",
       function(from) .Call("Tsparse_to_Csparse", x, PACKAGE = "Matrix"))
+
