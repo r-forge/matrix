@@ -100,6 +100,7 @@ lmer(formula, data, family, method, control, start,
 	\item{\code{EMverbose}:}{a logical value indicating if verbose output
 	  should be produced during the EM iterations.  Default is
 	  \code{getOption("verbose")}.}
+
 	\item{\code{PQLmaxIt}:}{maximum number of iterations for the PQL
 	  algorithm when fitting generalized linear mixed models.
 	  Default is 30.}%% unused currently?
@@ -126,11 +127,14 @@ lmer(formula, data, family, method, control, start,
 }
 \value{
   An object of class \code{"\link[Matrix:lmer-class]{lmer}"}.
+  There are many methods applicable to \code{"lmer"} objects, see the
+  above help page. %% Hmm.. or \code{\link{showMethods}(class = "lmer")}
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{}
 %\note{}
-\seealso{\code{\link[Matrix]{lmer-class}}, \code{\link[stats]{lm}}}
+\seealso{\code{\link[Matrix]{lmer-class}}, \code{\link[stats]{lm}}
+}
 \examples{
 (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
 (fm2 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), sleepstudy))
