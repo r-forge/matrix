@@ -120,14 +120,17 @@ $\bSigma_i,i=1,\dots,k$.  This implies that each of the $n_i$ inner
 diagonal blocks of order $q_i$ is a copy of $\bSigma_i$.  We say that
 $\bSigma$ has a \emph{repeated block/block diagonal} structure.
 
+In the notation of the Kronecker product, the $i$th outer diagonal
+block of $\bSigma$ is $\bI_{n_i}\otimes\bSigma_i$.
+
 \subsection{The relative precision matrix}
 \label{sec:relativePrecision}
 
-Many of the computational formulae are more conveniently expressed in
-terms of $\bSigma^{-1}$, which is called the \emph{precision} matrix
-of the random effects, than in terms of $\bSigma$, the
-variance-covariance matrix.  In fact, the formulae are most
-conveniently expressed in terms of the \emph{relative precision
+Many of the computational formulae that follow are more conveniently
+expressed in terms of $\bSigma^{-1}$, which is called the
+\emph{precision} matrix of the random effects, than in terms of
+$\bSigma$, the variance-covariance matrix.  In fact, the formulae are
+most conveniently expressed in terms of the \emph{relative precision
   matrix} $\sigma^2\bSigma^{-1}$ which we write as $\bOmega$.  That
 is,
 \begin{equation}
@@ -153,22 +156,26 @@ the entire matrix by specifying the symmetric matrices $\bOmega_i, i =
 $q_i(q_i+1)/2$ distinct elements.  We will write a parameter vector of
 length at most $\sum_{i=1}^{k}q_i(q_i+1)/2$ that determines $\bOmega$
 as $\btheta$.  For example, we could define $\btheta$ to be the
-non-redundant elements in the $\bOmega_i$.  In fact we use a
-different, but equivalent, parameterization for reasons to be
-discussed later.
+non-redundant elements in the $\bOmega_i$, although in the actual
+computations we use a different, but equivalent, parameterization for
+reasons to be discussed later.
 
 We only need to store the matrices $\bOmega_i,i=1,\dots,k$ and the
-number of levels in the grouping factors to be able create $\bOmega$.
+number of levels in the grouping factors to be able to create $\bOmega$.
 The matrices $\bOmega_i$ are stored in the \code{Omega} slot of an
 object of class \code{"lmer"}. The values of $k$ and $n_i,
 i=1,\dots,k$ can be determined from the list of the grouping factors
 themselves, stored as the \code{flist} slot, or from the dimensions
 $q_i,i=1,\dots,k$, stored in the \code{nc} slot, and the group
-pointers, stored in the \code{Gp} slot.  Successive differences of the
-group pointers are the total number of components of $\bb$ associated
-with the $i$th grouping factor.  That is, these differences are $n_i
-q_i,i=1,\dots,k$.  The first element of the \code{Gp} slot is always 0.
+pointers, stored in the \code{Gp} slot.  The group pointers are the
+(0-based) indices of the first component of $\bb$ associated with the
+$i$th grouping factor.  The last element of \code{Gp} is the number of
+elements in $\bb$.
 
+Thus successive differences of the group pointers are the total number
+of components of $\bb$ associated with the $i$th grouping factor.
+That is, these differences are $n_i q_i,i=1,\dots,k$.  The first
+element of the \code{Gp} slot is always 0.
 
 \subsection{Examples}
 \label{sec:OmegaExamp}
@@ -184,9 +191,9 @@ Mm1 <- lmer(math ~ gr+sx*eth+cltype+(yrs|id)+(1|tch)+(yrs|sch), star,
             control = list(niterEM = 0, gradient = FALSE))
 @ 
 
-Model \code{Sm1} has a single grouping factor with $18$ levels.  The
-\code{Omega} slot is a list of length one containing a $2\times 2$
-symmetric matrix.
+Model \code{Sm1} has a single grouping factor with $18$ levels and
+$q_1=2$.  The \code{Omega} slot is a list of length one containing a
+$2\times 2$ symmetric matrix.  There are $36$ elements in $\bb$.
 <<Sm1grp>>=
 str(Sm1@flist)
 show(Sm1@Omega)
@@ -272,10 +279,10 @@ particular, we want to obtain the Cholesky factorization of
 $\bZ\trans\bZ+\bOmega(\btheta)$ for different values of $\btheta$.
 
 Sparse matrix operations are typically performed in two phases: a
-\emph{symbolic phase} in which the number of non-zero elements in the
-result and their positions are determined followed by a \emph{numeric
-  phase} in which the actual numeric values are calculated.  Advanced
-sparse Cholesky factorization routines, such as the CHOLMOD library
+\emph{symbolic phase}, in which the number of non-zero elements in the
+result and their positions are determined, followed by a \emph{numeric
+  phase}, in which the actual numeric values are calculated.  Advanced
+sparse Cholesky factorization software, such as the CHOLMOD library
 (Davis, 2005) that we use, allow for calculation of a fill-reducing
 permutation of the rows and columns during the symbolic phase.  In
 fact the CHOLMOD code allows for evaluation of both a fill-reducing
@@ -285,8 +292,8 @@ techniques to be used on these blocks of columns or ``super-nodes''.
 Such a decomposition is called a \emph{supernodal} Cholesky
 factorization.
 
-Because the number and positions of the nonzeros in $\bOmega(\btheta)$
-do not change with $\btheta$ and the nonzeros in $\bOmega(\btheta)$
+Because the number of nonzeros in $\bOmega(\btheta)$ and their positions
+do not change with $\btheta$ and because the nonzeros in $\bOmega(\btheta)$
 are a subset of the nonzeros in $\bZ\trans\bZ$, we need only perform
 the symbolic phase once and we can do on $\bZ\trans$ (the CHOLMOD
 library has a module that calculates the permutation for a super-nodal
@@ -318,7 +325,7 @@ matrices $\bZ$, $\bZ\trans\bZ$ and $\bL$ in our examples.
   \centering
   \begin{tabular}{r r r r r r r r r r r}
     \hline
-    &&&&\multicolumn{2}{c}{$\bZ$}&\multicolumn{2}{c}{$\bZ\trans\bZ$}&
+    &&&\multicolumn{2}{c}{$\bZ$}&\multicolumn{2}{c}{$\bZ\trans\bZ$}&
     \multicolumn{2}{c}{$\bL$}\\
     \multicolumn{1}{c}{Name}&\multicolumn{1}{c}{$n$}&
     \multicolumn{1}{c}{$q$}&
@@ -336,7 +343,7 @@ matrices $\bZ$, $\bZ\trans\bZ$ and $\bL$ in our examples.
     $\bL$ in the examples.  The notation $\nz{}$ indicates the number
     of nonzeros in the matrix and $\spr{}$ indicates the sparsity
     index (the fraction of the elements in the matrix that are
-    non-zero). Because $\bZ\trans\bZ$ is symmetric only the nonzeros
+    non-zero). Because $\bZ\trans\bZ$ is symmetric, only the nonzeros
     in the upper triangle are counted and the sparsity index is
     relative to the total number of elements in the upper triangle.}
     \label{tbl:sparse}
@@ -392,7 +399,7 @@ where $f_{\by|\bbeta,\sigma^2,\btheta}(\by|\bbeta,\sigma^2,\btheta)$
 is the marginal probability density for $\by$ given the parameters.
 
 Because we will need to write several different marginal and
-conditional probability densities in this section and expressions like
+conditional probability densities in this section, and because expressions like
 $f_{\by|\bbeta,\sigma^2,\btheta}(\by|\bbeta,\sigma^2,\btheta)$ are
 difficult to read, we will adopt a convention sometimes used in the
 Bayesian inference literature that a conditional expression in square
@@ -511,9 +518,9 @@ which we do with a change of variable
 \[
 \bv=\bL\bP\bb
 \]
-with Jacobian
+for which the Jacobian is
 \[
-\left|\frac{d\bv}{d\bb}\right|=\left||\bL\bP|\right|=
+\left|\frac{d\bv}{d\bb}\right|=\sqrt{|\bL\bP|^2}=
 \sqrt{|\bL|^2}=|\bL\bL\trans|^{1/2}=|\bZ\trans\bZ+\bOmega|^{1/2}
 \]
 Thus
@@ -547,11 +554,51 @@ write the \emph{log-likelihood}
 and even easier to write the result on
 the \emph{deviance} scale as
 \begin{multline}
+  \label{eq:mldeviance}
   -2\ell(\bbeta,\sigma^2,\btheta|\by)\\
   =\log\left(\frac{|\bZ\trans\bZ+\bOmega|}{|\bOmega|}\right)+\frac{\ryy^2}{\sigma^2}+
     \frac{\|\rXy-\RXX\bbeta\|^2}{\sigma^2}+n\log(2\pi\sigma^2)
 \end{multline}
 
+The maximum likelihood estimators
+$[\widehat{\btheta},\widehat{\bbeta},\widehat{\sigma^2}]$ minimize the
+deviance expression (\ref{eq:mldeviance}), which has some properties
+that can be used to simplify the optimization process.  In particular,
+\begin{enumerate}
+\item The conditional estimates of $\bbeta$ satisfy
+  \begin{equation}
+    \label{eq:mlbetahat}
+    \RXX\widehat{\bbeta}(\btheta)=\rXy .
+  \end{equation}
+\item The conditional modes (which are also the means) of the random
+  effects $\bb$ satisfy
+  \begin{equation}
+    \label{eq:mlbhattheta}
+    \bL\trans\bP\widehat{\bb}(\btheta,\bbeta)=\rZy-\RZX\bbeta . 
+  \end{equation}
+  Usually we want to evaluate these at $\btheta$ and
+  $\widehat{\bbeta(\btheta)}$, which we write as
+  $\widehat{\bb}(\btheta)=\widehat{\bb}\left(\btheta,\bbeta(\btheta)\right)$.
+\item The conditional ML estimate of $\sigma^2$ is
+  \begin{equation}
+    \label{eq:mlsigma}
+    \widehat{\sigma^2}(\btheta)=\ryy^2/n .
+  \end{equation}
+\item The profiled ML deviance, which is a function of $\btheta$ only
+  produced by plugging in the conditional estimates for $\bbeta$ and $\sigma^2$, is
+  \begin{equation}
+    \label{eq:profiledmldev}
+    \log\left(\frac{\left|\bL\right|^2}
+      {\left|\bOmega\right|}\right)
+    + n\left[1+\log\left(\frac{2\pi\ryy^2}{n}\right)\right]
+  \end{equation}
+\item The profiled REML deviance is
+  \begin{displaymath}
+    \log\left(\frac{\left|\bD\right|\left|\RXX\right|^2}
+      {\left|\bOmega\right|}\right)
+    +(n-p)\left[1+\log\left(\frac{2\pi\ryy^2}{n-p}\right)\right]
+  \end{displaymath}
+\end{enumerate}
 
 \bibliography{lme4}
 \end{document}
