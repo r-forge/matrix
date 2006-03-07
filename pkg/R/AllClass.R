@@ -543,6 +543,23 @@ setClass("lmer",
 			terms = "terms"),
 	 contains = "mer")
 
+setClass("summary.mer", # the "mer" result ``enhanced'' :
+	 representation(
+			isG   = "logical",
+			methTitle = "character",
+			logLik= "logLik",
+			ngrps = "integer",
+			sigma = "numeric", # scale, non-negative number
+			coefs = "matrix",
+			vcov = "dpoMatrix",
+			REmat = "matrix",
+			AICtab= "data.frame"
+			),
+	 contains = "mer")
+
+setClass("summary.lmer", contains = c("summary.mer", "lmer"))
+
+
 setClass("lmer.ranef", contains = "list")
 
 

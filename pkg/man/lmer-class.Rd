@@ -3,6 +3,8 @@
 \docType{class}
 \alias{lmer-class}
 \alias{mer-class}
+\alias{summary.mer-class}
+\alias{summary.lmer-class}
 \alias{lmer.ranef-class}
 % Methods
 \alias{anova,mer-method}
@@ -30,12 +32,17 @@
 \alias{update,mer-method}
 \alias{vcov,mer-method}
 \alias{with,lmer-method}
+%
+\alias{deviance,summary.mer-method}
+\alias{logLik,summary.mer-method}
+\alias{vcov,summary.mer-method}
+\alias{summary,summary.mer-method}
 \description{
   The \code{mer} class is mixed-effects representation using a
   blocked, sparse, symmetric, column-oriented matrix and dense
   matrices.  The \code{lmer} class extends \code{mer} to represent a
-  fitted linear mixed-effects model.  The \code{summary.lmer} class
-  represents summaries of these objects.
+  fitted linear mixed-effects model.  The \code{summary.mer} and
+  \code{summary.lmer} classes represent summaries of these objects.
 }
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("lmer", ...)}
@@ -96,6 +103,21 @@
       display the correlation of the fixed-effects estimates when
       showing the object. Only present in the \code{summary.lmer} class.}
   }
+  The \code{"summary.mer"} and \code{"summary.lmer"} classes \emph{contain}
+  the \code{"mer"} and \code{"lmer"} classes respectively and have
+  additional slots,
+  \describe{
+    \item{\code{isG}:}{logical indicating if we have a
+      \bold{g}eneralized linear mixed effects model.}
+    \item{\code{methTitle}:}{character string specifying a method title}
+    \item{\code{logLik}:}{the same as \code{\link{logLik}(object)}.}
+    \item{\code{ngrps}:}{...}% FIXME
+    \item{\code{sigma}:}{the scale ...}% FIXME
+    \item{\code{coefs}:}{the coefficients matrix...}% FIXME
+    \item{\code{vcov}:}{the same as \code{\link{vcov}(object)}.}
+    \item{\code{REmat}:}{the formatted Random-Effects matrix}
+    \item{\code{AICtab}:}{...}% FIXME
+  }% summary slots
 }
 \usage{
 \S4method{logLik}{mer}(object, REML = object@method == "REML", \dots)
