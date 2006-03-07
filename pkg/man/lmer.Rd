@@ -11,11 +11,11 @@
 \usage{
 lmer(formula, data, family, method, control, start,
      subset, weights, na.action, offset, contrasts,
-     model, x, y, \dots)
+     model, \dots)
 
 \S4method{lmer}{formula}(formula, data, family, method,
     control, start, subset, weights, na.action, offset, contrasts,
-    model, x, y, \dots)
+    model, \dots)
 }
 \arguments{
   \item{formula}{a two-sided linear formula object describing the
@@ -53,9 +53,8 @@ lmer(formula, data, family, method, control, start,
   \item{subset, weights, na.action, offset, contrasts}{further model
     specification arguments as in \code{\link[stats]{lm}}; see there for
     details.}
-  \item{model, x, y}{logicals indicating if the corresponding model component
-    should be returned.  Note that \code{x} and \code{y} default to
-    \code{TRUE} for these models.  Changing either of these would be unwise.}
+  \item{model}{logical indicating if the model component
+    should be returned (in slot \code{frame}).}
   \item{\dots}{potentially further arguments for methods.  Currently
     none are used.}
   }

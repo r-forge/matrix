@@ -15,9 +15,11 @@ options(show.signif.stars = FALSE)
 (fm3 <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
              OrchardSprays, family = poisson(), method = "PQL"))
 
-## should use PQL
-(fm3 <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
-             OrchardSprays, family = poisson()))
+## PQL is used per default:
+fm3. <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
+             OrchardSprays, family = poisson())
+fm3.@call <- fm3@call
+stopifnot(all.equal(fm3, fm3., tol = 0))
 
 ## Laplace approximation {takes time}
 (fm4 <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
@@ -32,8 +34,8 @@ a.group <- rnorm(n.groups, 1, 2)
 y <- rnorm (n, a.group[group.id], 1)
 ## fit and summarize the model
 fit.1 <- lmer (y ~ 1 + (1 | group.id))
-coef (fit.1)# failed in Matrix 0.99-6 -- FIXME: should get a show() method
-try(summary(fit.1))
+coef (fit.1)# failed in Matrix 0.99-6
+(sf1 <- summary(fit.1)) # show() is as without summary()
 
 ## Many family = binomial cases
 if (isTRUE(try(data(Contraception, package = 'mlmRev')) == 'Contraception')) {
@@ -94,6 +96,7 @@ x <- (1:20)^2
 group <- gl(2,10)
 M1 <- lmer (y ~ 1 + (1 | group)) # << MM: why is the "1 + " needed ?
 mcmcsamp (M1, n = 2, saveb=TRUE) # fine
+
 M2 <- lmer (y ~ 1 + x + (1 + x | group)) # false convergence
 ## should be identical (and is)
 M2 <- lmer (y ~ x + ( x | group))#  false convergence -> simulation doesn't work:
