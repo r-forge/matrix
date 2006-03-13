@@ -38,8 +38,8 @@ setClass("symmetricMatrix",
 setClass("triangularMatrix",
 	 representation(uplo = "character", diag = "character", "VIRTUAL"),
          contains = "Matrix",
-         validity =
-        function(object) .Call("triangularMatrix_validate", object, PACKAGE = "Matrix")
+         validity = function(object)
+         .Call("triangularMatrix_validate", object, PACKAGE = "Matrix")
          )
 
 

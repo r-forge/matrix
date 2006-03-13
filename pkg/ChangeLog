@@ -1,3 +1,20 @@
+2006-03-11  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dgCMatrix.R (replCmat): "[<-" methods for dgCMatrix
+
+	* tests/indexing.R: tests for new [<- methods for sparse matrices.
+
+2006-03-10  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dgTMatrix.R (replTmat): "[<-" methods for dgTMatrix
+
+	* R/Tsparse.R (.ind.prep): fix out-of-range indexing
+
+2006-03-08  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dMatrix.R: enable things like  M [ M < 10 ]
+	* R/dgeMatrix.R: implement it
+
 2006-03-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/AllClass.R: define "summary.mer" and "*.lmer"

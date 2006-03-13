@@ -40,17 +40,16 @@ setMethod("kronecker", signature(X = "dsparseMatrix", Y = "dsparseMatrix"),
 ## Group Methods, see ?Arith (e.g.)
 ## -----
 
-## NOT YET (first need 'dgCMatrix' method):
-## setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
-##           signature(e1 = "dsparseMatrix", e2 = "dsparseMatrix"),
-##           function(e1, e2) callGeneric(as(e1, "dgCMatrix"),
-##                                        as(e2, "dgCMatrix")))
-## setMethod("Arith",
-##           signature(e1 = "dsparseMatrix", e2 = "numeric"),
-##           function(e1, e2) callGeneric(as(e1, "dgCMatrix"), e2))
-## setMethod("Arith",
-##           signature(e1 = "numeric", e2 = "dsparseMatrix"),
-##           function(e1, e2) callGeneric(e1, as(e2, "dgCMatrix")))
+setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
+          signature(e1 = "dsparseMatrix", e2 = "dsparseMatrix"),
+          function(e1, e2) callGeneric(as(e1, "dgCMatrix"),
+                                       as(e2, "dgCMatrix")))
+setMethod("Arith",
+          signature(e1 = "dsparseMatrix", e2 = "numeric"),
+          function(e1, e2) callGeneric(as(e1, "dgCMatrix"), e2))
+setMethod("Arith",
+          signature(e1 = "numeric", e2 = "dsparseMatrix"),
+          function(e1, e2) callGeneric(e1, as(e2, "dgCMatrix")))
 
 setMethod("Math",
 	  signature(x = "dsparseMatrix"),
@@ -122,8 +121,10 @@ if(paste(R.version$major, R.version$minor, sep=".") >= "2.2") {
 	      function(x, y) {
 		  nr <- rowCheck(x,y)
 		  ## beware of (packed) triangular, symmetric, ...
-		  hasDN <- !all(lapply(c(dnx <- dimnames(x), dny <- dimnames(y)), is.null))
-                  ans <- .Call("Csparse_horzcat", as(x, "dgCMatrix"), as(y, "dgCMatrix"))
+		  hasDN <- !all(lapply(c(dnx <- dimnames(x),
+                                         dny <- dimnames(y)), is.null))
+                  ans <- .Call("Csparse_horzcat",
+                               as(x, "dgCMatrix"), as(y, "dgCMatrix"))
 		  if(hasDN) {
 		      ## R and S+ are different in which names they take
 		      ## if they differ -- but there's no warning in any case
@@ -141,8 +142,10 @@ if(paste(R.version$major, R.version$minor, sep=".") >= "2.2") {
 	      function(x, y) {
 		  nr <- colCheck(x,y)
 		  ## beware of (packed) triangular, symmetric, ...
-		  hasDN <- !all(lapply(c(dnx <- dimnames(x), dny <- dimnames(y)), is.null))                  
-                  ans <- .Call("Csparse_vertcat", as(x, "dgCMatrix"), as(y, "dgCMatrix"))
+		  hasDN <- !all(lapply(c(dnx <- dimnames(x),
+                                         dny <- dimnames(y)), is.null))
+                  ans <- .Call("Csparse_vertcat",
+                               as(x, "dgCMatrix"), as(y, "dgCMatrix"))
 		  if(hasDN) {
 		      ## R and S+ are different in which names they take
 		      ## if they differ -- but there's no warning in any case
