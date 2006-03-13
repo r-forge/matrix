@@ -123,4 +123,7 @@
    cholmod_solve(CHOLMOD_Pt,...).  The ZtX, Zty, RZX and rZy slots actually
    contain P%*%RZX and P%*%rZy
 
+- "[<-"  Methods for dgC*  and  dgT* the former building on the latter
+	 using   j = .Call("Matrix_expand_pointers", x@p, PACKAGE = "Matrix")
+	 where needed
 
