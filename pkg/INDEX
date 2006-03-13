@@ -62,7 +62,7 @@ ldiMatrix-class         Class "ldiMatrix" of Diagonal Logical Matrices
 lgeMatrix-class         Class "lgeMatrix" of General Dense Logical
                         Matrices
 lmer                    Fit (Generalized) Linear Mixed-Effects Models
-lmer-class              Mixed model representations
+lmer-class              Mixed Model Representations and *mer Methods
 lsparseMatrix-class     Sparse logical matrices
 lsyMatrix-class         Symmetric Dense Logical Matrices
 ltrMatrix-class         Triangular Dense Logical Matrices

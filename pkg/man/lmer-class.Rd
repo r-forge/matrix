@@ -53,47 +53,108 @@
 
 \section{Slots}{
   \describe{
-    \item{\code{flist}:}{The list of (possibly permuted) grouping
-      factors for the random effects.}
-    \item{\code{perm}:}{A list of permutation vectors applied to the
-      grouping factors.}
-    \item{\code{Parent}:}{The extended parent array for the diagonal
-      elements of \code{L}.}
-    \item{\code{bVar}:}{A list of the diagonal inner blocks (upper
-      triangles only) of the positive-definite matrices on the diagonal
-      of the inverse of Z'Z+W.}
-    \item{\code{L}:}{The blocked sparse representation of the unit lower
-      triangular matrix in the LDL' factorization of Z'Z+W.}
-    \item{\code{ZZpO}:}{Object of class \code{"list"} ~~ }
-    \item{\code{Omega}:}{A list of numeric matrices providing the
-      components of symmetric, positive-definite matrix Omega.  Only the
-      upper triangle of each component is used and stored.}
-    \item{\code{D}:}{A list of the diagonal factors (upper triangle) in the
-      LDL' decomposition of Z'Z+W.}
-    \item{\code{RXX}:}{A matrix which is the (augmented) RXX component
-      or the corresponding component from the inverse of Z'Z+W}
-    \item{\code{RZX}:}{A matrix which is the (augmented) RZX component
-      or the corresponding component from the inverse of Z'Z+W}
-    \item{\code{ZtZ}:}{The blocks in the blocked sparse symmetric
-      representation of the original Z'Z matrix}
-    \item{\code{XtX}:}{The original X'X matrix}
-    \item{\code{ZtX}:}{The original Z'X matrix}
-    \item{\code{cnames}:}{Column names of the model matrices.}
-    \item{\code{devComp}:}{Numeric vector of length 4 giving the
-      components used to calculate the deviance. This slot's contents
-      are current if \code{status$factored} is \code{TRUE}.}
+    \item{\code{flist}:}{The list of grouping factors for the random
+      effects.}
+    \item{\code{Zt}:}{The transpose of the model matrix for the random
+      effects stored as a \code{\link[dgCMatrix-class]{dgCMatrix}}.}
+    \item{\code{X}:}{Model matrix for the fixed effects.}
+    \item{\code{y}:}{Numeric response vector.}
+    \item{\code{wts}:}{Numeric weights vector.}
+    \item{\code{wrkres}:}{Numeric vector of working residuals.}
+    \item{\code{method}:}{Character vector of length 1 containing
+      \code{"ML"}, for maximum likelihood, or \code{"REML"}, for
+      restricted maximum likelihood, or \code{"PQL"}, for penalized
+      quasi-likelihood, or \code{"Laplace"}, for the Laplacian
+      approximation, or \code{"AGQ"}, for adaptive Gauss-Hermite
+      quadrature.}
+    \item{\code{useScale}:}{logical indicating if variance-covariance
+      matrices include a scale factor.  This is \code{FALSE} for the
+      glmm families \code{binomial} and \code{poisson}, otherwise
+      \code{TRUE}.}
+    \item{\code{family}:}{a copy of the glm family.}
+    \item{\code{call}:}{a copy of the call to the model-fitting
+	function.}
+    \item{\code{cnames}:}{a list of character vectors of column names
+      of the random-effects variance-covariance matrix associated with
+      each grouping factor and the fixed-effects model matrix.}
+    \item{\code{nc}:}{integer vector giving the number of columns the
+      variance-covariance matrix associated with each grouping factor.}
+    \item{\code{Gp}:}{integer vector of group pointers within the random
+      effects and the rows of the transposed model matrix in the
+      \code{Zt} slot.  The elements of \code{Gp} are the 0-based index
+      of the first element corresponding to each grouping factor.  Thus
+      the first element is always 0.  The last element is the total
+      length of the random effects vector (also the total number of rows
+      in the matrix in the \code{Zt} slot).}
+    \item{\code{XtX}:}{The crossproduct matrix of the model matrix in
+      the \code{X} slot, stored as a
+      \code{\link{dpoMatrix-class}{"dpoMatrix"}} object.}
+    \item{\code{ZtZ}:}{The crossproduct matrix of the model matrix for
+      the random effects, stored as a \code{\link{dpoMatrix-class}{"dpoMatrix"}} object.
+      representation of the original Z'Z matrix.}
+    \item{\code{ZtX}:}{The original Z'X matrix, stored as a
+      \code{\link{dgeMatrix-class}{"dgeMatrix"}} object.}
+    \item{\code{Zty}:}{The numeric vector Z'y.}
+    \item{\code{Xty}:}{The numeric vector X'y.}
+    \item{\code{Omega}:}{A list of positive-definite matrices stored as
+      \code{\link{dpoMatrix-class}{"dpoMatrix"}} objects that are the
+      relative precision matrices of the random effects associated with
+      each of the grouping factors.}
+    \item{\code{L}:}{The sparse, supernodal lower Cholesky factor of
+      Z'Z+Omega, stored as a \code{\link[CHMfactor-class]{"dCHMsuper"}} object.}
+    \item{\code{RZX}:}{An rectangular matrix, stored as a
+      \code{\link[dgeMatrix-class]{"dgeMatrix"}} object, which is the RZX
+	component of the Cholesky factor of \code{Z'Z+Omega} at the
+	current values of the parameters.}
+    \item{\code{RXX}:}{An upper triangular matrix, stored as a
+      \code{\link[dtrMatrix-class]{"dtrMatrix"}} object, which is the RXX
+	component of the Cholesky factor of \code{Z'Z+Omega} at the
+	current values of the parameters.}
+    \item{\code{rZy}:}{A numeric vector - the rZy
+	component of the Cholesky factor of \code{Z'Z+Omega} at the
+	current values of the parameters.}
+    \item{\code{rXy}:}{A numeric vector - the rXy
+	component of the Cholesky factor of \code{Z'Z+Omega} at the
+	current values of the parameters.}
+    \item{\code{devComp}:}{Numeric vector of components from which the
+      deviance can be calculated.  The named components are: \code{"n"},
+      the number of observations (length of the \code{"y"} slot),
+      \code{"p"}, the length of the fixed-effects vector (number of
+      columns of the matrix in the \code{"X"} slot), \code{"yty"}, the
+      sum of squares of the \code{y},\code{"logryy2"}, the logarithm of
+      the penalized residual sum of squares, \code{"logDetL2"}, the
+      logarithm of the square of the determinant of \code{L},
+      \code{"logDetOmega"}, the logarithm of the determinant of
+      \code{Omega}, and \code{"logDetRXX"}, the logarithm of the
+      determinant of the triangular matrix in the \code{"RXX"} slot.
+      This slot's contents are current if \code{status$factored} is \code{TRUE}.}
     \item{\code{deviance}:}{Numeric vector of length 2 containing the
       deviance corresponding to the maximum likelihood (ML) and REML
       criteria.  This slot's contents are current if
       \code{status$factored} is \code{TRUE}.}
-    \item{\code{nc}:}{Integer vector of the number of columns in
-      (augmented) model matrices and the number of observations in the
-      model frame.}
-    \item{\code{Gp}:}{Integer vector of 0-based row numbers of the
-      \code{ZtX} and \code{RZX} matrices where new groups begin.}
-    \item{\code{status}:}{Logical vector of length 2 indicating if the
-      object has been factored and if the factorization has been
-      inverted.}
+    \item{\code{fixef}:}{Numeric vector containing the conditional estimates
+      of the fixed effects.  This slot's contents are current if
+      \code{status$secondary} is \code{TRUE}.}
+    \item{\code{ranef}:}{Numeric vector containing the conditional modes
+      of the random effects.  This slot's contents are current if
+      \code{status$secondary} is \code{TRUE}.}
+    \item{\code{RZXinv}:}{An rectangular matrix, stored as a
+      \code{\link[dgeMatrix-class]{"dgeMatrix"}} object, which is the RZX
+	component of the inverse of the Cholesky factor of
+	\code{Z'Z+Omega} at the current values of the parameters. This
+	slot's contents are current if \code{status$gradComp} is
+	\code{TRUE}.}
+    \item{\code{bVar}:}{A list of the diagonal inner blocks (upper
+      triangles only) of the positive-definite matrices on the diagonal
+      of the inverse of \code{ZtZ+Omega}. With the appropriate scale
+      factor (and conversion to a symmetric matrix) these are the
+      conditional variance-covariance matrices of the random effects.}
+    \item{\code{gradComp}:}{A list of three-dimensional arrays each with four
+      faces.  See the code for the documentation of these components.}
+    \item{\code{status}:}{Logical vector of length 4 indicating if the
+      object has been factored, if the secondary slots have been
+      evaluated, if the gradient components have been evaluated and if
+      the Hessian components have been evaluated.}
     \item{\code{call}:}{A copy of the matched call to the function that
       created the object.}
     \item{\code{useScale}:}{logical indicator of the use of the scale
