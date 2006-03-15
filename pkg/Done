@@ -127,3 +127,5 @@
 	 using   j = .Call("Matrix_expand_pointers", x@p, PACKAGE = "Matrix")
 	 where needed
 
+- Put the matrix 'mm' and the response vector 'y' into 'KNex', a list.
+  Modified all examples and tests that used them and the Comparisons vignette.

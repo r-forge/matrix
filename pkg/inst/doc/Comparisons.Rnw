@@ -89,9 +89,9 @@ described in \citet{koen:ng:2003}, the literal translation of
 (\ref{eq:XPX}) does not perform well.
 <<KoenNg>>=
 library(Matrix)
-data(mm, package = "Matrix")
-data(y, package = "Matrix")
-mm <- as(mm, "matrix")
+data(KNex, package = "Matrix")
+ y <- KNex$y
+mm <- as(KNex$mm, "matrix")
 dim(mm)
 system.time(naive.sol <- solve(t(mm) %*% mm) %*% t(mm) %*% y)
 @
@@ -156,8 +156,7 @@ dense storage, created by the \code{Matrix} function, has class
 The \code{solve} methods for the \code{"dpoMatrix"} class use the
 Cholesky decomposition.
 <<MatrixKoenNg>>=
-data(mm, package = "Matrix")
-mm <- as(mm, "dgeMatrix")
+mm <- as(KNex$mm, "dgeMatrix")
 class(crossprod(mm))
 system.time(Mat.sol <- solve(crossprod(mm), crossprod(mm, y)))
 all.equal(naive.sol, unname(as(Mat.sol, "matrix")))
@@ -178,7 +177,7 @@ The model matrix \code{mm} is sparse; that is, most of the elements of
 methods for sparse matrices, which produce the fastest results of all.
 
 <<SparseKoenNg>>=
-data(mm, package = "Matrix")
+mm <- KNex$mm
 class(mm)
 system.time(sparse.sol <- solve(crossprod(mm), crossprod(mm, y)))
 all.equal(naive.sol, as(sparse.sol, "matrix"))

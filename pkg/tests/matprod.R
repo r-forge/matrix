@@ -39,6 +39,7 @@ assert.EQ.mat(pd1, as(m5,"matrix") %*% diag(1:6))
 assert.EQ.mat(pd2, diag(10:6) %*% as(m5,"matrix"))
 
 
+data(KNex); mm <- KNex$mm
 M <- mm[1:500, 1:200]
 cpr <- t(mm) %*% mm
 showMethods("%*%", class=class(M))
