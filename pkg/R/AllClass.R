@@ -459,9 +459,10 @@ setClass("pMatrix", representation(perm = "integer"),
 
 ## Definition  Packed := dense with length( . @x) < prod( . @Dim)
 ##             ~~~~~~
-setClassUnion("packedMatrix",
-              members = c("dspMatrix", "dppMatrix", "dtpMatrix",
-               "lspMatrix", "ltpMatrix", "diagonalMatrix"))
+## REPLACED the following with  isPacked() in ./Auxiliaries.R :
+## setClassUnion("packedMatrix",
+##               members = c("dspMatrix", "dppMatrix", "dtpMatrix",
+##                "lspMatrix", "ltpMatrix", "diagonalMatrix"))
 
 
 ## --------------------- non-"Matrix" Classes --------------------------------
