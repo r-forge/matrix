@@ -1,3 +1,12 @@
+2006-03-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.995-6  -- to be released to CRAN
+
+	* data/KNex.rda: replacing 'mm' and 'y' by KNex <- list(mm=mm, y=y)
+	* man/KNex.Rd: and other help files
+	* tests/*.R: several ones needed adaption
+	* inst/doc/Comparisons.Rnw: dito
+
 2006-03-11  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/dgCMatrix.R (replCmat): "[<-" methods for dgCMatrix

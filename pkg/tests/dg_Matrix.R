@@ -2,7 +2,7 @@ library(Matrix)
 
 source(system.file("test-tools.R", package = "Matrix"))
 
-data(mm)
+data(KNex) ; mm <- KNex$mm
 stopifnot(##is(mm) == c("dgCMatrix", "dMatrix", "Matrix"),
           dim(mm) == (dm <- c(1850, 712)),
           identical(dimnames(mm), list(NULL,NULL)))

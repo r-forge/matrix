@@ -45,10 +45,6 @@
 
 ---
 
-- Create a Harwell-Boeing version of the matrix mm and the response
-  vector y in inst/external and remove them from the data directory.
-  Modify any examples that use them and modify the Comparisons vignette.
-
 - "Math2" , "Math", "Arith":
    keep triangular and symmetric Matrices when appropriate:
    particularly desirable for  "Math2": round(), signif()
