@@ -93,7 +93,7 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
 	      r  <- callGeneric(e1@x, e2)
               r0 <- callGeneric(0, e2)
 	      if(is(e1, "denseMatrix")) {
-                  full <- !is(e1, "packedMatrix")
+                  full <- !isPacked(e1)
                   if(full || identical(r0, FALSE) || is(e1, "symmetricMatrix"))
                       r <- new(lClass, x = r,
                                Dim = dim(e1), Dimnames = dimnames(e1))

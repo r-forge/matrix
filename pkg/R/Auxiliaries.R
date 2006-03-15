@@ -82,6 +82,12 @@ colCheck <- function(a, b) {
     da[2]
 }
 
+isPacked <- function(x)
+{
+    ## Is 'x' a packed (dense) matrix ?
+    is(x,"Matrix") && !is.null(x@x) && length(x@x) < prod(dim(x))
+}
+
 emptyColnames <- function(x)
 {
     ## Useful for compact printing of (parts) of sparse matrices
