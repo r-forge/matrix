@@ -1,3 +1,10 @@
+2006-03-20  Douglas Bates  <bates@stat.wisc.edu>
+
+	* R/lmer.R (resid and ranef methods):  Added methods for the
+	"residuals" and "resid" generic but only for linear mixed model
+	fits.  Changed the ranef method to return a list of data frames so
+	that the plot methods now work.
+
 2006-03-16  Douglas Bates  <bates@bates2>
 
 	* src/dpoMatrix.c (dpoMatrix_chol): Require n > 0 in call to

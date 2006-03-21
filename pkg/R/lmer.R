@@ -381,9 +381,13 @@ setMethod("fixef", signature(object = "mer"),
 
 ## Extract the random effects
 setMethod("ranef", signature(object = "mer"),
-	  function(object, ...)
-	      new("lmer.ranef", .Call("mer_ranef", object, PACKAGE = "Matrix"))
-	  )
+	  function(object, ...) {
+	      ans <- new("lmer.ranef",
+                         lapply(.Call("mer_ranef", object, PACKAGE = "Matrix"),
+                                data.frame, check.names = FALSE))
+              names(ans) <- names(object@flist)
+              ans
+	  })
 
 ## Optimization for mer objects
 setReplaceMethod("LMEoptimize", signature(x="mer", value="list"),
@@ -729,16 +733,24 @@ setMethod("formula", signature(x = "mer"),
 	  x@call$formula
 	  )
 
-## FIXME -- residuals *are* wanted
 setMethod("residuals", signature(object = "mer"),
-	  function(object, ...)
-	  .NotYetImplemented()
-	  )
+	  function(object, ...) {
+              fam <- object@family
+              if (fam$family == "gaussian" && fam$link == "identity")
+                  return(object@y - fitted(object))
+              .NotYetImplemented()
+	  })
 
+## FIXME: There should not be two identical methods like this but I'm not
+##        sure how to pass the ... argument to a method for another generic
+##        cleanly.
 setMethod("resid", signature(object = "mer"),
-	  function(object, ...)
-	  .NotYetImplemented()
-	  )
+	  function(object, ...) {
+              fam <- object@family
+              if (fam$family == "gaussian" && fam$link == "identity")
+                  return(object@y - fitted(object))
+              .NotYetImplemented()
+	  })
 
 setMethod("summary", signature(object = "mer"),
 	  function(object, ...) {
