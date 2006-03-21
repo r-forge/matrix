@@ -126,29 +126,29 @@ setMethod("coef", signature(object = "mer"),
 		   stop("unable to align random and fixed effects")
 	       for (nm in nmsi) val[[i]][[nm]] <- val[[i]][[nm]] + refi[,nm]
 	   }
-	   val
+	   new("coef.lmer", val)
        })
 
-## setMethod("plot", signature(x = "lmer.coef"),
-##	     function(x, y, ...)
-##	 {
-##	     varying <- unique(do.call("c",
-##				       lapply(x, function(el)
-##					      names(el)[sapply(el,
-##							       function(col)
-##							       any(col != col[1]))])))
-##	     gf <- do.call("rbind", lapply(x, "[", j = varying))
-##	     gf$.grp <- factor(rep(names(x), sapply(x, nrow)))
-##	     switch(min(length(varying), 3),
-##		    qqmath(eval(substitute(~ x | .grp,
-##					   list(x = as.name(varying[1])))), gf, ...),
-##		    xyplot(eval(substitute(y ~ x | .grp,
-##					   list(y = as.name(varying[1]),
-##						x = as.name(varying[2])))), gf, ...),
-##		    splom(~ gf | .grp, ...))
-##	 })
+setMethod("plot", signature(x = "coef.lmer"),
+          function(x, y, ...)
+      {
+          varying <- unique(do.call("c",
+                                    lapply(x, function(el)
+                                           names(el)[sapply(el,
+                                                            function(col)
+                                                            any(col != col[1]))])))
+          gf <- do.call("rbind", lapply(x, "[", j = varying))
+          gf$.grp <- factor(rep(names(x), sapply(x, nrow)))
+          switch(min(length(varying), 3),
+                 qqmath(eval(substitute(~ x | .grp,
+                                        list(x = as.name(varying[1])))), gf, ...),
+                 xyplot(eval(substitute(y ~ x | .grp,
+                                        list(y = as.name(varying[1]),
+                                             x = as.name(varying[2])))), gf, ...),
+                 splom(~ gf | .grp, ...))
+      })
 
-setMethod("plot", signature(x = "lmer.ranef"),
+setMethod("plot", signature(x = "ranef.lmer"),
 	  function(x, y, ...)
       {
 	  lapply(x, function(x) {
@@ -382,7 +382,7 @@ setMethod("fixef", signature(object = "mer"),
 ## Extract the random effects
 setMethod("ranef", signature(object = "mer"),
 	  function(object, ...) {
-	      ans <- new("lmer.ranef",
+	      ans <- new("ranef.lmer",
                          lapply(.Call("mer_ranef", object, PACKAGE = "Matrix"),
                                 data.frame, check.names = FALSE))
               names(ans) <- names(object@flist)

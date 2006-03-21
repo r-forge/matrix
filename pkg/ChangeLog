@@ -1,3 +1,9 @@
+2006-03-21  Douglas Bates  <bates@stat.wisc.edu>
+
+	* R/AllClass.R,lmer.R: Change the name of the lmer.ranef class to
+	ranef.lmer (like summary.lmer).  Add the coef.lmer class and
+	update the plot methods.
+
 2006-03-20  Douglas Bates  <bates@stat.wisc.edu>
 
 	* R/lmer.R (resid and ranef methods):  Added methods for the
