@@ -1,4 +1,6 @@
 -----
+Check for DimNames propagation in coercion and other operations.
+-----
 - Revive the "lmer" and "glmer" classes.  Slots like "family" should
   be in "glmer" only.  Many methods for "lmer" can be simplified as,
   for example, they will always use the scale factor.

@@ -1,3 +1,9 @@
+2006-03-23  Douglas Bates  <bates@stat.wisc.edu>
+
+	* src/dsyMatrix.c (dsyMatrix_as_dspMatrix): Propagate DimNames
+	(problem report from Franklin Parlamis).  This should be done
+	generally. 
+
 2006-03-21  Douglas Bates  <bates@stat.wisc.edu>
 
 	* R/AllClass.R,lmer.R: Change the name of the lmer.ranef class to
