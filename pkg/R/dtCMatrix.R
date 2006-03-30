@@ -27,6 +27,9 @@ setAs("dtCMatrix", "dgCMatrix",
                   Dim = from@Dim, Dimnames = from@Dimnames)
       })
 
+setAs("dgCMatrix", "dtCMatrix", # to triangular:
+      function(from) as(as(as(from, "dgTMatrix"), "dtTMatrix"), "dtCMatrix"))
+
 setAs("dtCMatrix", "dgTMatrix",
       function(from)
       .Call("tsc_to_dgTMatrix", from, PACKAGE = "Matrix"))
