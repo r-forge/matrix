@@ -13,7 +13,7 @@
 \format{
   This is a \eqn{72 \times 72}{72 * 72} symmetric matrix with 216
   non-zero entries in five bands, stored as sparse matrix of class
-  \code{\link[dgCMatrix-class]{dgCMatrix}}.
+  \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}}.
 }
 \details{
   In some versions of \R, \code{\link{eigen}(CAex)} fell into an
@@ -29,5 +29,9 @@ str(CAex) # of class "dgCMatrix"
 image(CAex)# -> it's a simple band matrix with 5 bands
 ## and the eigen values are basically 1 (42 times) and 0 (30 x):
 zapsmall(ev <- eigen(CAex, EISPACK=TRUE, only.values=TRUE)$values)
+## i.e., the matrix is symmetric, hence
+sCA <- as(CAex, "dsCMatrix")
+## and
+stopifnot(as(sCA, "matrix") == as(CAex, "matrix"))
 }
 \keyword{datasets}
