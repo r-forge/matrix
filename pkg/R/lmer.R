@@ -115,6 +115,10 @@ rWishart <- function(n, df, invScal)
 setMethod("coef", signature(object = "mer"),
 	  function(object, ...)
       {
+          if (length(list(...)))
+              warning(paste('arguments named "',
+                            paste(names(list(...)), collapse = ", "),
+                                  '" ignored'))
           fef <- data.frame(rbind(fixef(object)), check.names = FALSE)
           ref <- ranef(object)
           val <- lapply(ref, function(x) fef[rep(1, nrow(x)),,drop = FALSE])
