@@ -194,7 +194,7 @@ exportMethods("cbind2")
 
 ## lmer-related
 exportMethods("BIC", "anova", "coef", "confint", "deviance", "fitted",
-	      "fixef", "formula", "lmer", "logLik", "mcmcsamp",
-              "plot", "ranef", "residuals", "resid", "simulate",
-	      "summary", "terms", "update", "vcov", "VarCorr", "with")
-
+              "fixef", "formula", "lmer", "logLik", "mcmcsamp",
+              "plot", "postVar", "qqmath", "ranef", "residuals",
+              "resid", "simulate", "summary", "terms", "update",
+              "vcov", "VarCorr", "with") 
