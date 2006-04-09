@@ -1,4 +1,6 @@
 BIC                     Bayesian Information Criterion
+CAex                    Albers' example Matrix with "Difficult" Eigen
+                        Factorization
 Cholesky-class          Cholesky and Bunch-Kaufman Decompositions
 CsparseMatrix-class     Class "CsparseMatrix" of Sparse Matrices in
                         Column-compressed Form

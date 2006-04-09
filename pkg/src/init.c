@@ -206,6 +206,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_gradComp", (DL_FUNC) &mer_gradComp, 1},
     {"mer_gradient", (DL_FUNC) &mer_gradient, 2},
     {"mer_initial", (DL_FUNC) &mer_initial, 1},
+    {"mer_postVar", (DL_FUNC) &mer_postVar, 1},
     {"mer_ranef", (DL_FUNC) &mer_ranef, 1},
     {"mer_secondary", (DL_FUNC) &mer_secondary, 1},
     {"mer_sigma", (DL_FUNC) &mer_sigma, 2},

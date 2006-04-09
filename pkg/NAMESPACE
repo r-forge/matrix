@@ -4,9 +4,10 @@ useDynLib(Matrix)
 
 importFrom("graphics",image)
 importFrom("graphics",plot)		## lmer-related
-importFrom("lattice", levelplot)
+#importFrom("lattice", levelplot)
+import("stats", "lattice")		## lmer-related
 importFrom("grid",    grid.rect, gpar, grob)
-import("stats")				## lmer-related
+
 
 ## Currently, group generics need to be explicitly imported (Bug?):
 importFrom("methods", Arith, Compare, Math, Math2, Summary, Complex)

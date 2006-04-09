@@ -385,11 +385,16 @@ setMethod("fixef", signature(object = "mer"),
 
 ## Extract the random effects
 setMethod("ranef", signature(object = "mer"),
-	  function(object, ...) {
+	  function(object, postVar = FALSE, ...) {
 	      ans <- new("ranef.lmer",
                          lapply(.Call("mer_ranef", object, PACKAGE = "Matrix"),
                                 data.frame, check.names = FALSE))
               names(ans) <- names(object@flist)
+              if (postVar) {
+                  pV <- .Call("mer_postVar", object, PACKAGE = "Matrix")
+                  for (i in seq(along = ans))
+                      attr(ans[[i]], "postVar") <- pV[[i]]
+              }
               ans
 	  })
 
@@ -437,12 +442,47 @@ setReplaceMethod("LMEoptimize", signature(x="mer", value="list"),
 
 setMethod("qqmath", signature(x = "ranef.lmer"),
           function(x, data, ...) {
-              f <- function(x) qqmath(~values|ind, stack(x),
-                                      scales = list(y =
-                                      list(relation = "free")),
-                                      xlab = "Standard normal quantiles",
-                                      ylab = NULL,
-                                      ...)
+              prepanel.ci <- function(x, y, se, subscripts, ...) {
+                  y <- as.numeric(y)
+                  se <- as.numeric(se[subscripts])
+                  hw <- 1.96 * se
+                  list(ylim = range(y - hw, y + hw, finite = TRUE))
+              }
+              panel.ci <- function(x, y, se, subscripts, pch = 16, ...)  {
+                  x <- as.numeric(x)
+                  y <- as.numeric(y)
+                  se <- as.numeric(se[subscripts])
+                  ly <- y - 1.96 * se
+                  uy <- y + 1.96 * se              
+                  panel.segments(x, y - 1.96*se, x, y + 1.96 * se,
+                                 col = 'black')
+                  panel.xyplot(x, y, pch = pch, ...)
+              }
+              f <- function(x) {
+                  if (!is.null(attr(x, "postVar"))) {
+                      require("lattice", quietly = TRUE)
+                      pv <- attr(x, "postVar")
+                      cols <- 1:(dim(pv)[1])
+                      se <- unlist(lapply(cols, function(i) sqrt(pv[i, i, ])))
+                      nr <- nrow(x)
+                      nc <- ncol(x)
+                      ord <- unlist(lapply(x, order)) +
+                          rep((0:(nc - 1)) * nr, each = nr)
+                      rr <- 1:nr
+                      ind <- gl(ncol(x), nrow(x), labels = names(x))
+                      xyplot(unlist(x)[ord] ~
+                             rep(qnorm((rr - 0.5)/nr), ncol(x)) | ind[ord],
+                             se = se, prepanel = prepanel.ci, panel = panel.ci,
+                             scales = list(y = list(relation = "free")),
+                             xlab = "Standard normal quantiles",
+                             ylab = NULL, aspect = 1, ...)
+                  } else {
+                      qqmath(~values|ind, stack(x),
+                             scales = list(y = list(relation = "free")),
+                             xlab = "Standard normal quantiles",
+                             ylab = NULL, ...)
+                  }
+              }
               lapply(x, f)
           })
               
