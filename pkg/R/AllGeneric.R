@@ -117,6 +117,11 @@ if (!isGeneric("VarCorr")) {
     setGeneric("VarCorr", function(x, ...) standardGeneric("VarCorr"))
 }
 
+if (!isGeneric("postVar")) {            # posterior variances
+    setGeneric("postVar", function(object, ...)
+               standardGeneric("postVar"))
+}
+
 if (!isGeneric("gradient")) {           # not exported
     setGeneric("gradient", function(x, ...) standardGeneric("gradient"))
 }

@@ -1,4 +1,10 @@
 -----
+Modify the one-argument form of the anova method for lmer objects (yet
+  again) to calculate the F ratios.  It is the df, not the ratio that
+  is controversial.
+Should there be an extractor function for the mean square error?  If
+so, 
+-----
 Check for DimNames propagation in coercion and other operations.
 -----
 - Revive the "lmer" and "glmer" classes.  Slots like "family" should

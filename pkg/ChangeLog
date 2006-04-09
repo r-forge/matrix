@@ -1,3 +1,11 @@
+2006-04-03  Douglas Bates  <bates@dyn-51-232.uwnet.wisc.edu>
+
+	* R/lmer.R (qqmath,ranef.lmer-method): added a qqmath method for
+	the ranef.lmer class.
+
+	* R/AllClass.R, NAMESPACE, R/lmer.R: Added a postVar generic and
+	methods to extract the posterior variances from the bVar slot.
+
 2006-03-30  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/dtCMatrix.R: allow coercion from  dgC* to triangular (dtC*)
