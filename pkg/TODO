@@ -90,3 +90,15 @@ Check for DimNames propagation in coercion and other operations.
   ## and the same in a similar situation involving  "dpo", "dpp"
 
 - "Compare" for dgC & dgT  --- want to be able to do  M[M > 10]  etc
+
+- Things like  M[upper.tri(M)] are not really most useful for  sparse
+  matrices.  --> provide generic functions
+  upperTriMatrix(), lowerTriMatrix()  both with argument  'diag = TRUE'
+  (which can be set to FALSE of course) which are used to extract a
+  triangle from an arbitrary sparse matrix and  return a  "dtCMatrix".
+
+- Factorizations: LU [ -> solve() ] and Schur()  for  *sparse*  Matrices.
+  -----------------  LU-sparse is the purpose of all of ./src/UMFPACK/
+  	-->  ./inst/doc/UFsparse/*
+  And then, possibly eigen(), svd(), qr(), ... for sparse
+  {probably base some on the fast  chol() of CHOLMOD}.
