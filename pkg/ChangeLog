@@ -1,4 +1,4 @@
-2006-04-03  Douglas Bates  <bates@dyn-51-232.uwnet.wisc.edu>
+2006-04-03  Douglas Bates  <bates@stat.wisc.edu>
 
 	* R/lmer.R (qqmath,ranef.lmer-method): added a qqmath method for
 	the ranef.lmer class.
