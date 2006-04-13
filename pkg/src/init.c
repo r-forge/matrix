@@ -134,6 +134,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dspMatrix_solve", (DL_FUNC) &dspMatrix_solve, 1},
     {"dspMatrix_trf", (DL_FUNC) &dspMatrix_trf, 1},
     {"dspMatrix_validate", (DL_FUNC) &dspMatrix_validate, 1},
+    {"dtCMatrix_solve", (DL_FUNC) &dtCMatrix_solve, 1},
     {"dtTMatrix_as_dtrMatrix", (DL_FUNC) &dtTMatrix_as_dtrMatrix, 1},
     {"dtTMatrix_as_dgCMatrix", (DL_FUNC) &dtTMatrix_as_dgCMatrix, 1},
     {"dtTMatrix_validate", (DL_FUNC) &dtTMatrix_validate, 1},
