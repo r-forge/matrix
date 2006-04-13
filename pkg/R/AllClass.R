@@ -564,4 +564,26 @@ setClass("ranef.lmer", contains = "list")
 
 setClass("coef.lmer", contains = "list")
 
+setClass("pedigree", representation = list(sire = "factor", dam = "factor"),
+         validity = function(object) {
+             n <- length(object@sire)
+             if (length(object@dam) != n)
+                 return("sire and dam slots must be the same length")
+             nms <- levels(object@sire)
+             nmd <- levels(object@dam)
+             if (!(all(nms == nmd) && length(nms) == n))
+                 return(paste(
+                              "levels of sire and dam factors must be identical and of length", n))
+             sire <- as.integer(object@sire)
+             dam <- as.integer(object@dam)
+             animal <- 1:n
+             snmiss <- !is.na(sire)
+             dnmiss <- !is.na(dam)
+             if (any(sire[snmiss] >= animal[snmiss]) ||
+                 any(dam[dnmiss] >= animal[dnmiss]))
+                 return("the sire and dam must precede the offspring")
+             TRUE
+         })
+
+
 
