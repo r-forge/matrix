@@ -49,5 +49,32 @@ setAs("dtCMatrix", "dtTMatrix",
       })
 
 setAs("dtCMatrix", "TsparseMatrix", function(from) as(from, "dtTMatrix"))
+
 setAs("dtCMatrix", "dtrMatrix",
       function(from) as(as(from, "dtTMatrix"), "dtrMatrix"))
+
+setMethod("solve", signature(a = "dtCMatrix", b = "missing"),
+	  function(a, b, ...) {
+              if (a@diag == "U") a <- as(as(a, "dtTMatrix"), "dtCMatrix")
+              .Call("dtCMatrix_solve", a, PACKAGE = "Matrix")
+          }, valueClass = "dtCMatrix")
+
+setMethod("solve", signature(a = "dtCMatrix", b = "dgeMatrix"),
+	  function(a, b, ...) {
+              if (a@diag == "U") a <- as(as(a, "dtTMatrix"), "dtCMatrix")
+              .Call("dtCMatrix_matrix_solve", a, b, TRUE, PACKAGE = "Matrix")
+          }, valueClass = "dgeMatrix")
+
+setMethod("solve", signature(a = "dtCMatrix", b = "matrix"),
+	  function(a, b, ...) {
+              if (a@diag == "U") a <- as(as(a, "dtTMatrix"), "dtCMatrix")
+	      storage.mode(b) <- "double"
+	      .Call("dtCMatrix_matrix_solve", a, b, FALSE, PACKAGE = "Matrix")
+	  }, valueClass = "dgeMatrix")
+
+setMethod("solve", signature(a = "dtCMatrix", b = "numeric"),
+	  function(a, b, ...) {
+              if (a@diag == "U") a <- as(as(a, "dtTMatrix"), "dtCMatrix")
+              .Call("dtCMatrix_matrix_solve", a, as.matrix(as.double(b)),
+                    FALSE, PACKAGE = "Matrix")
+          }, valueClass = "dgeMatrix")
