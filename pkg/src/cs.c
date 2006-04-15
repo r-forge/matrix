@@ -16,7 +16,7 @@ int cs_utsolve (const cs *U, double *x)
     }
     return (1) ;
 }
-#include "cs.h"
+
 /* allocate a sparse matrix (triplet form or compressed-column form) */
 cs *cs_spalloc (int m, int n, int nzmax, int values, int triplet)
 {
@@ -134,7 +134,7 @@ csd *cs_ddone (csd *D, cs *C, void *w, int ok)
     cs_free (w) ;			/* free workspace */
     return (ok ? D : cs_dfree (D)) ;	/* return result if OK, else free it */
 }
-#include "cs.h"
+
 /* solve Ux=b where x and b are dense.  x=b on input, solution on output. */
 int cs_usolve (const cs *U, double *x)
 {
@@ -152,7 +152,7 @@ int cs_usolve (const cs *U, double *x)
     }
     return (1) ;
 }
-#include "cs.h"
+
 /* sparse Cholesky update/downdate, L*L' + sigma*w*w' (sigma = +1 or -1) */
 int cs_updown (cs *L, int sigma, const cs *C, const int *parent)
 {
@@ -189,7 +189,7 @@ int cs_updown (cs *L, int sigma, const cs *C, const int *parent)
     cs_free (w) ;
     return (beta2 > 0) ;
 }
-#include "cs.h"
+
 /* C = compressed-column form of a triplet matrix T */
 cs *cs_triplet (const cs *T)
 {
@@ -211,7 +211,7 @@ cs *cs_triplet (const cs *T)
     }
     return (cs_done (C, w, NULL, 1)) ;	    /* success; free w and return C */
 }
-#include "cs.h"
+
 /* C = A' */
 cs *cs_transpose (const cs *A, int values)
 {
@@ -236,7 +236,7 @@ cs *cs_transpose (const cs *A, int values)
     }
     return (cs_done (C, w, NULL, 1)) ;	/* success; free w and return C */
 }
-#include "cs.h"
+
 /* depth-first search and postorder of a tree rooted at node j */
 int cs_tdfs (int j, int k, int *head, const int *next, int *post, int *stack)
 {
@@ -260,7 +260,7 @@ int cs_tdfs (int j, int k, int *head, const int *next, int *post, int *stack)
     }
     return (k) ;
 }
-#include "cs.h"
+
 /* C = A(p,p) where A and C are symmetric the upper part stored, Pinv not P */
 cs *cs_symperm (const cs *A, const int *Pinv, int values)
 {
@@ -299,7 +299,7 @@ cs *cs_symperm (const cs *A, const int *Pinv, int values)
     }
     return (cs_done (C, w, NULL, 1)) ;	/* success; free workspace, return C */
 }
-#include "cs.h"
+
 /* compute vnz, Pinv, leftmost, m2 from A and parent */
 static int *cs_vcount (const cs *A, const int *parent, int *m2, int *vnz)
 {
@@ -381,7 +381,7 @@ css *cs_sqr (const cs *A, int order, int qr)
     }
     return (ok ? S : cs_sfree (S)) ;
 }
-#include "cs.h"
+
 /* solve Lx=b(:,k), leaving pattern in xi[top..n-1], values scattered in x. */
 int cs_splsolve (cs *L, const cs *B, int k, int *xi, double *x, const int *Pinv)
 {
@@ -405,7 +405,7 @@ int cs_splsolve (cs *L, const cs *B, int k, int *xi, double *x, const int *Pinv)
     }
     return (top) ;				/* return top of stack */
 }
-#include "cs.h"
+
 /* ordering and symbolic analysis for a Cholesky factorization */
 css *cs_schol (const cs *A, int order)
 {
@@ -431,7 +431,7 @@ css *cs_schol (const cs *A, int order)
     cs_free (c) ;
     return ((S->lnz >= 0) ? S : cs_sfree (S)) ;
 }
-#include "cs.h"
+
 /* find the strongly connected components of a square matrix */
 csd *cs_scc (cs *A)	/* matrix A temporarily modified, then restored */
 {
@@ -466,7 +466,7 @@ csd *cs_scc (cs *A)	/* matrix A temporarily modified, then restored */
     D->nb = R [n+1] = b = n-b ;	/* b = # of strongly connected components */
     return (cs_ddone (D, AT, xi, 1)) ;
 }
-#include "cs.h"
+
 /* x = x + beta * A(:,j), where x is a dense vector and A(:,j) is sparse */
 int cs_scatter (const cs *A, int j, double beta, int *w, double *x, int mark,
     cs *C, int nz)
@@ -488,7 +488,7 @@ int cs_scatter (const cs *A, int j, double beta, int *w, double *x, int mark,
     }
     return (nz) ;
 }
-#include "cs.h"
+
 /* xi [top...n-1] = nodes reachable from graph of L*P' via nodes in B(:,k).
  * xi [n...2n-1] used as workspace */
 int cs_reach (cs *L, const cs *B, int k, int *xi, const int *Pinv)
@@ -507,7 +507,7 @@ int cs_reach (cs *L, const cs *B, int k, int *xi, const int *Pinv)
     for (p = top ; p < n ; p++) CS_MARK (Lp, xi [p]) ;	/* restore L */
     return (top) ;
 }
-#include "cs.h"
+
 /* x=A\b where A can be rectangular; b overwritten with solution */
 int cs_qrsol (const cs *A, double *b, int order)
 {
@@ -560,7 +560,7 @@ int cs_qrsol (const cs *A, double *b, int order)
     cs_spfree (AT) ;
     return (ok) ;
 }
-#include "cs.h"
+
 /* sparse QR factorization [V,beta,p,R] = qr (A) */
 csn *cs_qr (const cs *A, const css *S)
 {
@@ -634,7 +634,7 @@ csn *cs_qr (const cs *A, const css *S)
     Vp [n] = vnz ;			    /* finalize V */
     return (cs_ndone (N, NULL, w, x, 1)) ;  /* success */
 }
-#include "cs.h"
+
 /* x = b(P), for dense vectors x and b; P=NULL denotes identity */
 int cs_pvec (int n, const int *P, const double *b, double *x)
 {
@@ -643,7 +643,7 @@ int cs_pvec (int n, const int *P, const double *b, double *x)
     for (k = 0 ; k < n ; k++) x [k] = b [P ? P [k] : k] ;
     return (1) ;
 }
-#include "cs.h"
+
 /* print a sparse matrix */
 int cs_print (const cs *A, int brief)
 {
@@ -679,7 +679,7 @@ int cs_print (const cs *A, int brief)
     }
     return (1) ;
 }
-#include "cs.h"
+
 /* post order a forest */
 int *cs_post (int n, const int *parent)
 {
@@ -703,7 +703,7 @@ int *cs_post (int n, const int *parent)
     }
     return (cs_idone (post, NULL, w, 1)) ;  /* success; free w, return post */
 }
-#include "cs.h"
+
 /* Pinv = P', or P = Pinv' */
 int *cs_pinv (int const *P, int n)
 {
@@ -714,7 +714,7 @@ int *cs_pinv (int const *P, int n)
     for (k = 0 ; k < n ; k++) Pinv [P [k]] = k ;/* invert the permutation */
     return (Pinv) ;				/* return result */
 }
-#include "cs.h"
+
 /* C = A(P,Q) where P and Q are permutations of 0..m-1 and 0..n-1. */
 cs *cs_permute (const cs *A, const int *Pinv, const int *Q, int values)
 {
@@ -739,7 +739,7 @@ cs *cs_permute (const cs *A, const int *Pinv, const int *Q, int values)
     Cp [n] = nz ;			/* finalize the last column of C */
     return (cs_done (C, NULL, NULL, 1)) ;
 }
-#include "cs.h"
+
 /* 1-norm of a sparse matrix = max (sum (abs (A))), largest column sum */
 double cs_norm (const cs *A)
 {
@@ -754,7 +754,7 @@ double cs_norm (const cs *A)
     }
     return (norm) ;
 }
-#include "cs.h"
+
 /* C = A*B */
 cs *cs_multiply (const cs *A, const cs *B)
 {
@@ -788,7 +788,7 @@ cs *cs_multiply (const cs *A, const cs *B)
     cs_sprealloc (C, 0) ;		/* remove extra space from C */
     return (cs_done (C, w, x, 1)) ;	/* success; free workspace, return C */
 }
-#include "cs.h"
+
 /* find an augmenting path starting at column k and extend the match if found */
 static void cs_augment (int k, const cs *A, int *jmatch, int *cheap, int *w,
 	int *js, int *is, int *ps)
@@ -862,7 +862,7 @@ int *cs_maxtrans (const cs *A)   /* returns jmatch [0..m-1]; imatch [0..n-1] */
     for (i = 0 ; i < m ; i++) if (jmatch [i] >= 0) imatch [jmatch [i]] = i ;
     return (cs_idone (jimatch, (m2 < n2) ? C : NULL, w, 1)) ;
 }
-#include "cs.h"
+
 #ifdef MATLAB_MEX_FILE
 #define malloc mxMalloc
 #define free mxFree
@@ -899,7 +899,7 @@ void *cs_realloc (void *p, int n, size_t size, int *ok)
     *ok = (p2 != NULL) ;
     return ((*ok) ? p2 : p) ;		    /* return original p if failure */
 }
-#include "cs.h"
+
 /* x=A\b where A is unsymmetric; b overwritten with solution */
 int cs_lusol (const cs *A, double *b, int order, double tol)
 {
@@ -925,7 +925,7 @@ int cs_lusol (const cs *A, double *b, int order, double tol)
     cs_nfree (N) ;
     return (ok) ;
 }
-#include "cs.h"
+
 /* [L,U,Pinv]=lu(A, [Q lnz unz]). lnz and unz can be guess */
 csn *cs_lu (const cs *A, const css *S, double tol)
 {
@@ -1011,7 +1011,7 @@ csn *cs_lu (const cs *A, const css *S, double tol)
     cs_sprealloc (U, 0) ;
     return (cs_ndone (N, NULL, xi, x, 1)) ;	/* success */
 }
-#include "cs.h"
+
 /* solve L'x=b where x and b are dense.  x=b on input, solution on output. */
 int cs_ltsolve (const cs *L, double *x)
 {
@@ -1029,7 +1029,7 @@ int cs_ltsolve (const cs *L, double *x)
     }
     return (1) ;
 }
-#include "cs.h"
+
 /* solve Lx=b where x and b are dense.  x=b on input, solution on output. */
 int cs_lsolve (const cs *L, double *x)
 {
@@ -1062,7 +1062,7 @@ cs *cs_load (FILE *f)
     }
     return (T) ;
 }
-#include "cs.h"
+
 /* x(P) = b, for dense vectors x and b; P=NULL denotes identity */
 int cs_ipvec (int n, const int *P, const double *b, double *x)
 {
@@ -1071,7 +1071,7 @@ int cs_ipvec (int n, const int *P, const double *b, double *x)
     for (k = 0 ; k < n ; k++) x [P ? P [k] : k] = b [k] ;
     return (1) ;
 }
-#include "cs.h"
+
 /* create a Householder reflection [v,beta,s]=house(x), overwrite x with v,
  * where (I-beta*v*v')*x = s*x.  See Algo 5.1.1, Golub & Van Loan, 3rd ed. */
 double cs_house (double *x, double *beta, int n)
@@ -1094,7 +1094,7 @@ double cs_house (double *x, double *beta, int n)
     }
     return (s) ;
 }
-#include "cs.h"
+
 /* apply the ith Householder vector to x */
 int cs_happly (const cs *V, int i, double beta, double *x)
 {
@@ -1113,7 +1113,7 @@ int cs_happly (const cs *V, int i, double beta, double *x)
     }
     return (1) ;
 }
-#include "cs.h"
+
 /* y = A*x+y */
 int cs_gaxpy (const cs *A, const double *x, double *y)
 {
@@ -1130,7 +1130,7 @@ int cs_gaxpy (const cs *A, const double *x, double *y)
     }
     return (1) ;
 }
-#include "cs.h"
+
 /* drop entries for which fkeep(A(i,j)) is false; return nz if OK, else -1 */
 int cs_fkeep (cs *A, int (*fkeep) (int, int, double, void *), void *other)
 {
@@ -1153,7 +1153,7 @@ int cs_fkeep (cs *A, int (*fkeep) (int, int, double, void *), void *other)
     }
     return (Ap [n] = nz) ;		    /* finalize A and return nnz(A) */
 }
-#include "cs.h"
+
 /* compute the etree of A (using triu(A), or A'A without forming A'A */
 int *cs_etree (const cs *A, int ata)
 {
@@ -1183,7 +1183,7 @@ int *cs_etree (const cs *A, int ata)
     }
     return (cs_idone (parent, NULL, w, 1)) ;
 }
-#include "cs.h"
+
 /* add an entry to a triplet matrix; return 1 if ok, 0 otherwise */
 int cs_entry (cs *T, int i, int j, double x)
 {
@@ -1195,7 +1195,7 @@ int cs_entry (cs *T, int i, int j, double x)
     T->n = CS_MAX (T->n, j+1) ;
     return (1) ;
 }
-#include "cs.h"
+
 /* remove duplicate entries from A */
 int cs_dupl (cs *A)
 {
@@ -1229,7 +1229,7 @@ int cs_dupl (cs *A)
     cs_free (w) ;				/* free workspace */
     return (cs_sprealloc (A, 0)) ;		/* remove extra space from A */
 }
-#include "cs.h"
+
 static int cs_nonzero (int i, int j, double aij, void *other)
 {
     return (aij != 0) ;
@@ -1238,7 +1238,7 @@ int cs_dropzeros (cs *A)
 {
     return (cs_fkeep (A, &cs_nonzero, NULL)) ;	/* keep all nonzero entries */
 }
-#include "cs.h"
+
 static int cs_tol (int i, int j, double aij, void *tol)
 {
     return (fabs (aij) > *((double *) tol)) ;
@@ -1247,7 +1247,7 @@ int cs_droptol (cs *A, double tol)
 {
     return (cs_fkeep (A, &cs_tol, &tol)) ;    /* keep all large entries */
 }
-#include "cs.h"
+
 /* breadth-first search for coarse decomposition (C0,C1,R1 or R0,R3,C3) */
 static int cs_bfs (const cs *A, int n, int *wi, int *wj, int *queue,
     const int *imatch, const int *jmatch, int mark)
@@ -1391,7 +1391,7 @@ csd *cs_dmperm (const cs *A)
     cs_dfree (scc) ;
     return (cs_ddone (D, C, NULL, 1)) ;
 }
-#include "cs.h"
+
 /* depth-first-search of the graph of a matrix, starting at node j */
 int cs_dfs (int j, cs *L, int top, int *xi, int *pstack, const int *Pinv)
 {
@@ -1427,7 +1427,7 @@ int cs_dfs (int j, cs *L, int top, int *xi, int *pstack, const int *Pinv)
     }
     return (top) ;
 }
-#include "cs.h"
+
 /* p [0..n] = cumulative sum of c [0..n-1], and then copy p [0..n-1] into c */
 int cs_cumsum (int *p, int *c, int n)
 {
@@ -1442,7 +1442,7 @@ int cs_cumsum (int *p, int *c, int n)
     p [n] = nz ;
     return (nz) ;		    /* return sum (c [0..n-1]) */
 }
-#include "cs.h"
+
 /* process edge (j,i) of the matrix */
 static void cs_cedge (int j, int i, const int *first, int *maxfirst, int *delta,
     int *prevleaf, int *ancestor)
@@ -1528,7 +1528,7 @@ int *cs_counts (const cs *A, const int *parent, const int *post, int ata)
     }
     return (cs_idone (colcount, AT, w, 1)) ;	/* success: free workspace */
 }
-#include "cs.h"
+
 /* x=A\b where A is symmetric positive definite; b overwritten with solution */
 int cs_cholsol (const cs *A, double *b, int order)
 {
@@ -1554,7 +1554,7 @@ int cs_cholsol (const cs *A, double *b, int order)
     cs_nfree (N) ;
     return (ok) ;
 }
-#include "cs.h"
+
 /* compute nonzero pattern of L(k,:) */
 static
 int cs_ereach (const cs *A, int k, const int *parent, int *s, int *w,
@@ -1629,7 +1629,7 @@ csn *cs_chol (const cs *A, const css *S)
     Lp [n] = cp [n] ;		    /* finalize L */
     return (cs_ndone (N, E, w, x, 1)) ; /* success: free E,w,x; return N */
 }
-#include "cs.h"
+
 /* clear w */
 static int cs_wclear (int mark, int lemax, int *w, int n)
 {
