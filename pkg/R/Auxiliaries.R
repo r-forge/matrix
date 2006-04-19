@@ -367,9 +367,18 @@ isTriC <- function(x, upper = NA) {
     }
 }
 
-
 .is.diagonal <- function(object) {
     d <- dim(object)
     if(d[1] != (n <- d[2])) FALSE
     else all(object[rep(c(FALSE, rep.int(TRUE,n)), length = n^2)] == 0)
+}
+
+diagU2N <- function(x)
+{
+    ## Purpose: Transform a *unit diagonal* triangular matrix
+    ##	into one with explicit diagonal entries '1'
+    xT <- as(x, "dgTMatrix")
+    ## leave it as  T* - the caller can always coerce to C* if needed:
+    new("dtTMatrix", x = xT@x, i = xT@i, j = xT@j, Dim = x@Dim,
+	Dimnames = x@Dimnames, uplo = x@uplo, diag = "N")
 }

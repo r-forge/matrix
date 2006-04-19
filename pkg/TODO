@@ -3,7 +3,7 @@ Modify the one-argument form of the anova method for lmer objects (yet
   again) to calculate the F ratios.  It is the df, not the ratio that
   is controversial.
 Should there be an extractor function for the mean square error?  If
-so, 
+so,
 -----
 Check for DimNames propagation in coercion and other operations.
 -----
@@ -102,3 +102,7 @@ Check for DimNames propagation in coercion and other operations.
   	-->  ./inst/doc/UFsparse/*
   And then, possibly eigen(), svd(), qr(), ... for sparse
   {probably base some on the fast  chol() of CHOLMOD}.
+
+  2006-04-15 : now with 'CSparse' { src/cs.c }, have at least solve( <dtC*> )
+
+- pedigree examples and tests
