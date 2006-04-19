@@ -1,3 +1,15 @@
+2006-04-19  Douglas Bates  <bates@stat.wisc.edu>
+
+	* R/lmer.R, R/AllGeneric.R, NAMESPACE: Remove the postVar generic
+	and methods.  This is now an option to the ranef method for the
+	mer class.
+
+	* src/cs_utils.c: Ensure that the nz component is -1 for a
+	compressed column-oriented matrix.  Minor formatting cleanup.
+
+	* man/lmer-class.Rd: Document the qqmath method for ranef.lmer
+	objects.
+
 2006-04-19  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Auxiliaries.R (diagU2N): new for the solve() methods in
