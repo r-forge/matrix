@@ -42,10 +42,9 @@ check_class(char *class, char **valid)
 cs *Matrix_as_cs(SEXP x)
 {
     cs *ans = Calloc(1, cs);
-    char *valid[] = {"dgCMatrix", "dsCMatrix", "dtCMatrix",
-		     ""};
-    int *dims, ctype = check_class(CHAR(asChar(getAttrib(x, R_ClassSymbol))),
-				   valid);
+    char *valid[] = {"dgCMatrix", "dsCMatrix", "dtCMatrix", ""};
+    int *dims,
+	ctype = check_class(CHAR(asChar(getAttrib(x, R_ClassSymbol))), valid);
     SEXP islot;
 
     if (ctype < 0) error("invalid class of object to Matrix_as_cs");
@@ -53,7 +52,8 @@ cs *Matrix_as_cs(SEXP x)
     dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
     ans->m = dims[0]; ans->n = dims[1];
     islot = GET_SLOT(x, Matrix_iSym);
-    ans->nz = ans->nzmax = LENGTH(islot);
+    ans->nz = -1;		/* indicates compressed column storage */
+    ans->nzmax = LENGTH(islot);
     ans->i = INTEGER(islot);
     ans->p = INTEGER(GET_SLOT(x, Matrix_pSym));
     ans->x = REAL(GET_SLOT(x, Matrix_xSym));
