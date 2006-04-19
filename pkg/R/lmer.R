@@ -397,18 +397,6 @@ setMethod("ranef", signature(object = "mer"),
               }
               ans
 	  })
-
-## Extract the posterior variances
-setMethod("postVar", signature(object = "mer"),
-	  function(object, ...) {
-              .Call("mer_gradComp", object, PACKAGE = "Matrix")
-              sc <- 1
-              if (object@useScale)
-                  sc <- .Call("mer_sigma", object, object@method == "REML",
-                              PACKAGE = "Matrix")^2
-              sc * object@bVar
-	  })
-
 ## Optimization for mer objects
 setReplaceMethod("LMEoptimize", signature(x="mer", value="list"),
 		 function(x, value)
