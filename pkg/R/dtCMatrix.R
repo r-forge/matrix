@@ -42,10 +42,15 @@ setAs("dtCMatrix", "dgeMatrix",
 setAs("dtCMatrix", "dtTMatrix",
       function(from) {# and this is not elegant:
           x <- as(from, "dgTMatrix")
-          ## FIXME: if(from@diag == "U") should drop diagonal entries:
-          new("dtTMatrix", x = x@x, i = x@i, j = x@j,
-              Dim = x@Dim, Dimnames = x@Dimnames,
-              uplo = from@uplo, diag = "N")
+	  if (from@diag == "U") { ## drop diagonal entries '1':
+	      i <- x@i; j <- x@j
+	      nonD <- i != j
+	      xx <- x@x[nonD] ; i <- i[nonD] ; j <- j[nonD]
+	  } else {
+	      xx <- x@x; i <- x@i; j <- x@j
+	  }
+	  new("dtTMatrix", x = xx, i = i, j = j, Dim = x@Dim,
+	      Dimnames = x@Dimnames, uplo = from@uplo, diag = from@diag)
       })
 
 setAs("dtCMatrix", "TsparseMatrix", function(from) as(from, "dtTMatrix"))
@@ -53,28 +58,29 @@ setAs("dtCMatrix", "TsparseMatrix", function(from) as(from, "dtTMatrix"))
 setAs("dtCMatrix", "dtrMatrix",
       function(from) as(as(from, "dtTMatrix"), "dtrMatrix"))
 
+## using  diagU2N() from ./Auxiliaries.R :
 setMethod("solve", signature(a = "dtCMatrix", b = "missing"),
 	  function(a, b, ...) {
-              if (a@diag == "U") a <- as(as(a, "dtTMatrix"), "dtCMatrix")
-              .Call("dtCMatrix_solve", a, PACKAGE = "Matrix")
-          }, valueClass = "dtCMatrix")
+	      if (a@diag == "U") a <- as(diagU2N(a), "dtCMatrix")
+	      .Call("dtCMatrix_solve", a, PACKAGE = "Matrix")
+	  }, valueClass = "dtCMatrix")
 
 setMethod("solve", signature(a = "dtCMatrix", b = "dgeMatrix"),
 	  function(a, b, ...) {
-              if (a@diag == "U") a <- as(as(a, "dtTMatrix"), "dtCMatrix")
-              .Call("dtCMatrix_matrix_solve", a, b, TRUE, PACKAGE = "Matrix")
-          }, valueClass = "dgeMatrix")
+	      if (a@diag == "U") a <- as(diagU2N(a), "dtCMatrix")
+	      .Call("dtCMatrix_matrix_solve", a, b, TRUE, PACKAGE = "Matrix")
+	  }, valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dtCMatrix", b = "matrix"),
 	  function(a, b, ...) {
-              if (a@diag == "U") a <- as(as(a, "dtTMatrix"), "dtCMatrix")
+	      if (a@diag == "U") a <- as(diagU2N(a), "dtCMatrix")
 	      storage.mode(b) <- "double"
 	      .Call("dtCMatrix_matrix_solve", a, b, FALSE, PACKAGE = "Matrix")
 	  }, valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dtCMatrix", b = "numeric"),
 	  function(a, b, ...) {
-              if (a@diag == "U") a <- as(as(a, "dtTMatrix"), "dtCMatrix")
-              .Call("dtCMatrix_matrix_solve", a, as.matrix(as.double(b)),
-                    FALSE, PACKAGE = "Matrix")
-          }, valueClass = "dgeMatrix")
+	      if (a@diag == "U") a <- as(diagU2N(a), "dtCMatrix")
+	      .Call("dtCMatrix_matrix_solve", a, as.matrix(as.double(b)),
+		    FALSE, PACKAGE = "Matrix")
+	  }, valueClass = "dgeMatrix")

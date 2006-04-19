@@ -27,8 +27,11 @@ assert.EQ.mat(t1, as(t1c, "matrix"))
 tu <- t1 ; tu@diag <- "U"
 tu
 stopifnot(validObject(cu <- as(tu, "dtCMatrix")),
-          validObject(t(cu)),
-          validObject(t(tu)))
+	  validObject(tu. <- as(cu, "dtTMatrix")),
+          ## NOT: identical(tu, tu.), # since T* is not unique!
+	  identical(cu, as(tu., "dtCMatrix")),
+	  validObject(t(cu)),
+	  validObject(t(tu)))
 assert.EQ.mat(cu, as(tu,"matrix"), tol=0)
 
 

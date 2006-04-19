@@ -1,3 +1,8 @@
+2006-04-19  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (diagU2N): new for the solve() methods in
+	* R/dtCMatrix.R: where dgC -> dgT coercion now preserves diag = "U".
+
 2006-04-15  Douglas Bates  <bates@stat.wisc.edu>
 
 	* src/cs.[ch],src/cs_utils.[ch] : Added Tim Davis' CSparse library
@@ -5,7 +10,7 @@
 
 	* R/dtCMatrix.R, src/dtCMatrix.[ch] : CSparse-based solve methods
 	for the dtCMatrix class.
-	
+
 2006-04-12  Douglas Bates  <bates@stat.wisc.edu>
 
 	* R/pedigree.R, R/AllClass.R, NAMESPACE: added a pedigree class
