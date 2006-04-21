@@ -26,6 +26,7 @@ export("Diagonal",
 #        "isSymmetric" is in R 2.3.0
        "lu",
        "norm",
+       "pedigree",
        "rcond",
        "readHB",
        "readMM",
@@ -198,4 +199,4 @@ exportMethods("BIC", "anova", "coef", "confint", "deviance", "fitted",
               "fixef", "formula", "head", "lmer", "logLik", "mcmcsamp",
               "plot", "qqmath", "ranef", "residuals",
               "resid", "simulate", "summary", "tail", "terms", "update",
-              "vcov", "VarCorr", "with") 
+              "vcov", "VarCorr", "with")
