@@ -74,7 +74,8 @@ lu                      Triangular Decomposition of a Square Matrix
 mcmcsamp                Generate an MCMC sample
 norm                    Norm of a Matrix
 pMatrix-class           Permutation matrices
-pedigree-class          The "pedigree" class
+pedigree                Pedigree Constructor
+pedigree-class          Class "pedigree"
 ranef                   Extract Random Effects
 rcond                   Estimate the Reciprocal Condition Number
 readHB                  Read and write external matrix formats
