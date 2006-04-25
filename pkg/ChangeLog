@@ -1,3 +1,8 @@
+2006-04-25  Douglas Bates  <bates@stat.wisc.edu>
+
+	* R/dtCMatrix.R: avoid coercion of dtCMatrix object to dgCMatrix
+	in method for "t" so as not to lose the unit diagonal property.
+
 2006-04-19  Douglas Bates  <bates@stat.wisc.edu>
 
 	* R/lmer.R, R/AllGeneric.R, NAMESPACE: Remove the postVar generic

@@ -1,7 +1,7 @@
 setMethod("t", signature(x = "dtCMatrix"),
           function(x) {
-              tg <- t(as(x, "dgCMatrix"))
-              new("dtCMatrix", Dim = tg@Dim, Dimnames = tg@Dimnames,
+              tg <- .Call("csc_transpose", x, PACKAGE = "Matrix")
+              new("dtCMatrix", Dim = tg@Dim, Dimnames = x@Dimnames[2:1],
                   p = tg@p, i = tg@i, x = tg@x, diag = x@diag,
                   uplo = ifelse(x@uplo == "U", "L", "U"))
           }, valueClass = "dtCMatrix")
