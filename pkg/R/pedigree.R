@@ -45,3 +45,12 @@ setMethod("head", "pedigree", function(x, ...)
 
 setMethod("tail", "pedigree", function(x, ...)
 	  do.call("tail", list(x = ped2DF(x), ...)))
+
+setMethod("chol", "pedigree",
+          function(x, pivot, LINPACK) {
+              ttrans <- solve(t(as(x, "dtCMatrix")))
+              .Call("pedigree_chol", x,
+                    as(diagU2N(t(ttrans)), "dtCMatrix"),
+                    PACKAGE = "Matrix")
+          })
+
