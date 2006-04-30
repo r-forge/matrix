@@ -260,3 +260,48 @@ SEXP dtCMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
     UNPROTECT(1);
     return ans;
 }
+
+SEXP dtCMatrix_upper_solve(SEXP a)
+{
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dtCMatrix")));
+    int lo = uplo_P(a)[0] == 'L', unit = diag_P(a)[0] == 'U',
+	n = INTEGER(GET_SLOT(a, Matrix_DimSym))[0], nnz,
+	*ai = INTEGER(GET_SLOT(a,Matrix_iSym)),
+	*ap = INTEGER(GET_SLOT(a, Matrix_pSym)), *bi,
+	*bp = INTEGER(ALLOC_SLOT(ans, Matrix_pSym, INTSXP, n + 1));
+    int bnz = 10 * ap[n];	  /* initial estimate of nnz in b */
+    int *ti = Calloc(bnz, int), j, nz;
+    double *ax = REAL(GET_SLOT(a, Matrix_xSym)), *tx = Calloc(bnz, double),
+	*tmp = Calloc(n, double);
+    
+    if (lo || (!unit)) error(_("Code written for unit upper triangular unit matrices"));
+    bp[0] = 0;
+    for (j = 0; j < n; j++) {
+	int i, i1 = ap[j + 1];
+	AZERO(tmp, n);
+	for (i = ap[j]; i < i1; i++) {
+	    int ii = ai[i], k;
+	    if (unit) tmp[ii] -= ax[i];
+	    for (k = bp[ii]; k < bp[ii + 1]; k++) tmp[ti[k]] -= ax[i] * tx[k];
+	}
+	for (i = 0, nz = 0; i < n; i++) if (tmp[i]) nz++;
+	bp[j + 1] = bp[j] + nz;
+	if (bp[j + 1] > bnz) {
+	    while (bp[j + 1] > bnz) bnz *= 2;
+	    ti = Realloc(ti, bnz, int);
+	    tx = Realloc(tx, bnz, double);
+	}
+	i1 = bp[j];
+	for (i = 0; i < n; i++) if (tmp[i]) {ti[i1] = i; tx[i1] = tmp[i]; i1++;}
+    }
+    nz = bp[n];
+    Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_iSym, INTSXP, nz)), ti, nz);
+    Memcpy(REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, nz)), tx, nz);
+    Free(tmp); Free(tx); Free(ti);
+    SET_SLOT(ans, Matrix_DimSym, duplicate(GET_SLOT(a, Matrix_DimSym)));
+    SET_SLOT(ans, Matrix_DimNamesSym, duplicate(GET_SLOT(a, Matrix_DimNamesSym)));
+    SET_SLOT(ans, Matrix_uploSym, duplicate(GET_SLOT(a, Matrix_uploSym)));
+    SET_SLOT(ans, Matrix_diagSym, duplicate(GET_SLOT(a, Matrix_diagSym)));
+    UNPROTECT(1);
+    return ans;
+}
