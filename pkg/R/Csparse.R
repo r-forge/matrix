@@ -49,3 +49,15 @@ setAs("CsparseMatrix", "denseMatrix",
 	  }
           .Call("Csparse_to_dense", from, PACKAGE = "Matrix")
       })
+
+setMethod("lowerTriMatrix", "CsparseMatrix",
+          function(x, diag = TRUE, ...) {
+              dd <- dim(x)
+              .Call("Csparse_band", x, -dd[1], if (diag[1]) 0 else -1)
+          })
+
+setMethod("upperTriMatrix", "CsparseMatrix",
+          function(x, diag = TRUE, ...) {
+              dd <- dim(x)
+              .Call("Csparse_band", x, if (diag[1]) 0 else 1, dd[2])
+          })
