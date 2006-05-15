@@ -100,9 +100,9 @@ setAs("TsparseMatrix", "CsparseMatrix",
 setMethod("[", signature(x = "TsparseMatrix", i = "index", j = "missing",
 			 drop = "logical"),
 	  function (x, i, j, ..., drop) { ## select rows
-              ip <- .ind.prep(x@i, i, 1, dim(x), dimnames(x))
+	      ip <- .ind.prep(x@i, i, 1, dim(x), dimnames(x))
 	      x@Dim[1] <- ip$li
-              x@Dimnames[1] <- ip$dn
+	      if(!is.null(ip$dn)) x@Dimnames[[1]] <- ip$dn
 	      sel <- ip$m > 0
 	      x@i <- ip$m[sel] - 1:1
 	      x@j <- x@j[sel]
@@ -115,13 +115,13 @@ setMethod("[", signature(x = "TsparseMatrix", i = "index", j = "missing",
 setMethod("[", signature(x = "TsparseMatrix", i = "missing", j = "index",
 			 drop = "logical"),
 	  function (x, i, j, ..., drop) { ## select columns
-              ip <- .ind.prep(x@j, j, 2, dim(x), dimnames(x))
+	      ip <- .ind.prep(x@j, j, 2, dim(x), dimnames(x))
 	      x@Dim[2] <- ip$li
-              x@Dimnames[2] <- ip$dn
+	      if(!is.null(ip$dn)) x@Dimnames[[2]] <- ip$dn
 	      sel <- ip$m > 0
 	      x@i <- x@i[sel]
 	      x@j <- ip$m[sel] - 1:1
-              if (!is(x, "lsparseMatrix")) x@x <- x@x[sel]
+	      if (!is(x, "lsparseMatrix")) x@x <- x@x[sel]
 	      if (drop && any(x@Dim == 1:1)) drop(as(x,"matrix")) else x
 	  })
 

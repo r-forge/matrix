@@ -1,3 +1,8 @@
+2006-05-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Tsparse.R ("["): column or row subsetting; @Dimnames[k] got
+	erased when it was NULL.  This led to invalid subselections!
+
 2006-04-25  Douglas Bates  <bates@stat.wisc.edu>
 
 	* R/dtCMatrix.R: avoid coercion of dtCMatrix object to dgCMatrix
