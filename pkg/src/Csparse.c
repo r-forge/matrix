@@ -137,3 +137,12 @@ SEXP Csparse_vertcat(SEXP x, SEXP y)
     Free(chx); Free(chy);
     return chm_sparse_to_SEXP(ans, 1);
 }
+
+SEXP Csparse_band(SEXP x, SEXP k1, SEXP k2)
+{
+    cholmod_sparse *chx = as_cholmod_sparse(x), *ans;
+
+    ans = cholmod_band(chx, asInteger(k1), asInteger(k2), chx->xtype, &c);
+    Free(chx);
+    return chm_sparse_to_SEXP(ans, 1);
+}

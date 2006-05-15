@@ -61,6 +61,14 @@ if (!isGeneric("writeMM"))
     setGeneric("writeMM", function(obj, file, ...)
                standardGeneric("writeMM"))
 
+if (!isGeneric("lowerTriMatrix"))
+    setGeneric("lowerTriMatrix", function(x, diag = TRUE, ...)
+               standardGeneric("lowerTriMatrix"))
+
+if (!isGeneric("upperTriMatrix"))
+    setGeneric("upperTriMatrix", function(x, diag = TRUE, ...)
+               standardGeneric("upperTriMatrix"))
+
 ## ----------------------- lmer-related Generics ---------------------------
 
 ## Hmm: If this does not match *exactly* the "formula" - method in ./lmer.R
@@ -115,6 +123,11 @@ setMethod("BIC", "logLik",
 
 if (!isGeneric("VarCorr")) {
     setGeneric("VarCorr", function(x, ...) standardGeneric("VarCorr"))
+}
+
+if (!isGeneric("postVar")) {            # posterior variances
+    setGeneric("postVar", function(object, ...)
+               standardGeneric("postVar"))
 }
 
 if (!isGeneric("gradient")) {           # not exported

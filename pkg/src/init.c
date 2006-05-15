@@ -35,6 +35,7 @@ static R_CallMethodDef CallEntries[] = {
     {"pBunchKaufman_validate", (DL_FUNC) &pBunchKaufman_validate, 1},
     {"Cholesky_validate", (DL_FUNC) &Cholesky_validate, 1},
     {"Csparse_Csparse_prod", (DL_FUNC) &Csparse_Csparse_prod, 2},
+    {"Csparse_band", (DL_FUNC) &Csparse_band, 3},
     {"Csparse_crossprod", (DL_FUNC) &Csparse_crossprod, 3},
     {"Csparse_dense_crossprod", (DL_FUNC) &Csparse_dense_crossprod, 2},
     {"Csparse_dense_prod", (DL_FUNC) &Csparse_dense_prod, 2},

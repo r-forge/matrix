@@ -1,3 +1,10 @@
+2006-05-15  Douglas Bates  <bates@stat.wisc.edu>
+
+	* R/AllGeneric.R (lowerTriMatrix): Added (but did not export)
+	generics lowerTriMatrix and upperTriMatrix along with methods for
+	the Csparse virtual class.  Also added a C function Csparse_band
+	that implements these methods by calling cholmod_band.
+
 2006-05-15  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Tsparse.R ("["): column or row subsetting; @Dimnames[k] got
