@@ -579,5 +579,9 @@ setClass("pedigree", representation =
 	     if (any(sire[snmiss] >= animal[snmiss]) ||
 		 any(dam[dnmiss] >= animal[dnmiss]))
 		 return("the sire and dam must precede the offspring")
+             if (any(sire[snmiss] < 1 | sire[snmiss] > n |
+                     dam[dnmiss] < 1 | dam[dnmiss] > n))
+                 return(paste("Non-missing sire or dam must be in [1,",
+                              n, "]", sep = ''))
 	     TRUE
 	 })
