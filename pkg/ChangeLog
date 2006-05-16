@@ -1,3 +1,12 @@
+2006-05-16  Douglas Bates  <bates@stat.wisc.edu>
+
+	* R/pedigree.R (pedigree): Replace sire and dam values outside the
+	allowable range with NAs. Added a corresponding check in the
+	validity check for the pedigree class.
+
+	* R/[CT]sparse.R ([t]crossprod): The result of single-argument
+	crossprod methods now inherits from symmetricMatrix.
+
 2006-05-15  Douglas Bates  <bates@stat.wisc.edu>
 
 	* R/AllGeneric.R (lowerTriMatrix): Added (but did not export)
