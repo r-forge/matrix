@@ -61,13 +61,18 @@ if (!isGeneric("writeMM"))
     setGeneric("writeMM", function(obj, file, ...)
                standardGeneric("writeMM"))
 
-if (!isGeneric("lowerTriMatrix"))
-    setGeneric("lowerTriMatrix", function(x, diag = TRUE, ...)
-               standardGeneric("lowerTriMatrix"))
+if (!isGeneric("tril"))
+    setGeneric("tril", function(x, k = 0, ...)
+               standardGeneric("tril"))
 
-if (!isGeneric("upperTriMatrix"))
-    setGeneric("upperTriMatrix", function(x, diag = TRUE, ...)
-               standardGeneric("upperTriMatrix"))
+if (!isGeneric("triu"))
+    setGeneric("triu", function(x, k = 0, ...)
+               standardGeneric("triu"))
+
+if (!isGeneric("band"))
+    setGeneric("band", function(x, k1, k2, ...)
+               standardGeneric("band"))
+
 
 ## ----------------------- lmer-related Generics ---------------------------
 

@@ -18,6 +18,7 @@ export("Diagonal",
        "Hilbert",
        "Matrix",
        "Schur",
+       "band",
        "expand",
        "expm",
        "facmul",
@@ -31,6 +32,8 @@ export("Diagonal",
        "readHB",
        "readMM",
        "tcrossprod",
+       "tril",
+       "triu",
        "unpack",
        "writeHB",
        "writeMM"
@@ -159,6 +162,7 @@ exportMethods(
 	      "as.array",
 	      "as.matrix",
 	      "as.vector",
+              "band",
 	      "chol",
 	      "colMeans",
 	      "colSums",
@@ -183,7 +187,9 @@ exportMethods(
 	      "show",
 	      "solve",
 	      "t",
-	      "tcrossprod"
+	      "tcrossprod",
+              "tril",
+              "triu"
 	      )
 
 ## only for R >= 2.2:

@@ -1,3 +1,9 @@
+2006-05-17  Douglas Bates  <bates@stat.wisc.edu>
+
+	*  R/{AllGeneric.R,Csparse.R},man/band.Rd,NAMESPACE: changed name
+	of lowerTriMatrix generic and methods to tril (also upper to triu)
+	and added a general band extractor.
+
 2006-05-16  Douglas Bates  <bates@stat.wisc.edu>
 
 	* R/pedigree.R (pedigree): Replace sire and dam values outside the
