@@ -1,3 +1,10 @@
+2006-05-17  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R: Matrix <-> graph methods: can no longer use
+	the C code depending on a slot structure that's no longer valid.
+	* src/dgTMatrix.c: dito (also: src/init.c src/dgTMatrix.h)
+
+
 2006-05-17  Douglas Bates  <bates@stat.wisc.edu>
 
 	*  R/{AllGeneric.R,Csparse.R},man/band.Rd,NAMESPACE: changed name
