@@ -148,26 +148,26 @@ setMethod("[", signature(x = "TsparseMatrix",
 
 setMethod("crossprod", signature(x = "TsparseMatrix", y = "missing"),
 	  function(x, y = NULL) {
-              a <- .Call("Csparse_crossprod", x, trans = FALSE, triplet = TRUE,
-                         PACKAGE = "Matrix")
-              switch(substr(class(a)[1], 1, 1),
-                     "d" = new("dsCMatrix", i = a@i, p = a@p, x = a@x,
-                     Dim = a@Dim, Dimnames = a@Dimnames, uplo = "U",
-                     factors = list()),
-                     "l" = new("lsCMatrix", i = a@i, p = a@p,
-                     Dim = a@Dim, Dimnames = a@Dimnames, uplo = "U",
-                     factors = list()))
-          })
+	      a <- .Call("Csparse_crossprod", x, trans = FALSE, triplet = TRUE,
+			 PACKAGE = "Matrix")
+	      switch(substr(class(a)[1], 1, 1),
+		     "d" ={ new("dsCMatrix", i = a@i, p = a@p, x = a@x,
+				Dim = a@Dim, Dimnames = a@Dimnames, uplo = "U",
+				factors = list()) },
+		     "l" ={ new("lsCMatrix", i = a@i, p = a@p,
+				Dim = a@Dim, Dimnames = a@Dimnames, uplo = "U",
+				factors = list())})
+	  })
 
 setMethod("tcrossprod", signature(x = "TsparseMatrix", y = "missing"),
 	  function(x, y = NULL) {
-              a <- .Call("Csparse_crossprod", x, trans = TRUE, triplet = TRUE,
-                         PACKAGE = "Matrix")
-              switch(substr(class(a)[1], 1, 1),
-                     "d" = new("dsCMatrix", i = a@i, p = a@p, x = a@x,
-                     Dim = a@Dim, Dimnames = a@Dimnames, uplo = "L",
-                     factors = list()),
-                     "l" = new("lsCMatrix", i = a@i, p = a@p,
-                     Dim = a@Dim, Dimnames = a@Dimnames, uplo = "L",
-                     factors = list()))
-          })
+	      a <- .Call("Csparse_crossprod", x, trans = TRUE, triplet = TRUE,
+			 PACKAGE = "Matrix")
+	      switch(substr(class(a)[1], 1, 1),
+		     "d" ={ new("dsCMatrix", i = a@i, p = a@p, x = a@x,
+				Dim = a@Dim, Dimnames = a@Dimnames, uplo = "L",
+				factors = list()) },
+		     "l" ={ new("lsCMatrix", i = a@i, p = a@p,
+				Dim = a@Dim, Dimnames = a@Dimnames, uplo = "L",
+				factors = list()) })
+	  })
