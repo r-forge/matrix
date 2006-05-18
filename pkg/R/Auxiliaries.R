@@ -186,6 +186,13 @@ WhichintersectInd <- function(ij1, ij2, nrow) {
 
 ### There is a test on this in ../tests/dgTMatrix.R !
 uniq <- function(x) {
+
+### Note: maybe, using
+### ----    xj <- .Call("Matrix_expand_pointers", x@p)
+### would be slightly more efficient than as( <dgC> , "dgTMatrix")
+### but really efficient would be to use only one .Call(.) for uniq(.) !
+### Try to do it particularly fast for the case where 'x' is already a 'uniq' <dgT>
+
     if(is(x, "TsparseMatrix")) {
 	## Purpose: produce a *unique* triplet representation:
 	##		by having (i,j) sorted and unique

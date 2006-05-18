@@ -61,6 +61,7 @@ if (isTRUE(try(data(Contraception, package = 'mlmRev')) == 'Contraception')) {
                        Contraception, binomial))
     print(system.time(fm1 <- lmer(use ~ urban + age + livch + (1 | district),
                                   Contraception, binomial), gc = TRUE))
+    ## same model, using  "Laplace" :
     print(fm.2 <- lmer(use ~ urban + age + livch + (1 | district),
                        Contraception, binomial, method = 'Laplace'))
     print(system.time(lmer(use ~ urban + age + livch + (1 | district),
@@ -71,6 +72,8 @@ if (isTRUE(try(data(Contraception, package = 'mlmRev')) == 'Contraception')) {
 ##     print(system.time(lmer(use ~ urban + age + livch + (1 | district),
 ##                            Contraception, binomial, method = 'AGQ'),
 ##                       gc = TRUE))
+
+    ## model + random intercept, with and w/o using  "Laplace" :
     print(fm.3 <- lmer(use ~ urban + age + livch + (urban | district),
                        Contraception, binomial))
     print(fm.4 <- lmer(use ~ urban + age + livch + (urban | district),
