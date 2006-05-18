@@ -2,14 +2,17 @@
 \docType{class}
 \title{Virtual Class "sparseMatrix" --- Mother of Sparse Matrices}
 \alias{sparseMatrix-class}
-
 \alias{-,sparseMatrix,missing-method}
 \alias{show,sparseMatrix-method}
+% graph stuff
 \alias{coerce,graph,sparseMatrix-method}
+\alias{coerce,graphAM,sparseMatrix-method}
 \alias{coerce,graphNEL,sparseMatrix-method}
 \alias{coerce,sparseMatrix,graph-method}
 \alias{coerce,sparseMatrix,graphNEL-method}
+\alias{coerce,TsparseMatrix,graphNEL-method}
 \alias{coerce,dgTMatrix,graphNEL-method}
+%
 \description{Virtual Mother Class of All Sparse Matrices}
 \section{Slots}{
   \describe{
