@@ -35,6 +35,7 @@ SEXP mer_coefGets(SEXP x, SEXP coef, SEXP pType);
 SEXP mer_create(SEXP fl, SEXP Zt, SEXP Xp, SEXP yp, SEXP method,
 		 SEXP nc, SEXP cnames, SEXP useS, SEXP call,
 		 SEXP family);
+SEXP mer_denom_df(SEXP x);
 SEXP mer_dtCMatrix(SEXP x);
 SEXP mer_dtCMatrix_inv(SEXP x);
 SEXP mer_factor(SEXP x);

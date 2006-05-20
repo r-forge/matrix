@@ -114,6 +114,34 @@ Linv_to_bVar(cholmod_sparse *Linv, const int Gp[], const int nc[],
     }
 }
 
+static double
+internal_denom_df(SEXP x)
+{
+    SEXP Zt = GET_SLOT(x, Matrix_ZtSym);
+    cholmod_factor *L = as_cholmod_factor(GET_SLOT(x, Matrix_LSym));
+    int *Zti = INTEGER(GET_SLOT(Zt, Matrix_iSym)),
+	*Ztp = INTEGER(GET_SLOT(Zt, Matrix_pSym)), i, j,
+	n = INTEGER(GET_SLOT(Zt, Matrix_DimSym))[1],
+	p = LENGTH(GET_SLOT(x, Matrix_rXySym)),
+	q = LENGTH(GET_SLOT(x, Matrix_rZySym));
+    cholmod_dense *zrow = cholmod_allocate_dense(q, 1, q, CHOLMOD_REAL, &c);
+    double *Xcp = Memcpy(Calloc(n * p, double),
+			 REAL(GET_SLOT(x, Matrix_XSym)), n * p),
+	*RXX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym)),
+	*RZX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXSym), Matrix_xSym)),
+	*Ztx = REAL(GET_SLOT(Zt, Matrix_xSym)),
+	*wrk = (double*)(zrow->x), tr;
+    
+    for (j = 0, tr = 0; j < n; j++) { /* j'th column of Zt */
+	AZERO(wrk, q);
+	for (i = Ztp[j]; i < Ztp[j + 1]; i++) wrk[Zti[i]] = Ztx[i];
+	cholmod_solve(CHOLMOD_L, L, zrow, &c);
+	for (i = 0; i < q; i++) tr += wrk[i] * wrk[i];
+    }
+    cholmod_free_dense(zrow, &c); Free(Xcp);
+    return (n - tr);
+}
+
 static void
 internal_mer_bVar(SEXP x)
 {
@@ -1627,6 +1655,12 @@ SEXP mer_coefGets(SEXP x, SEXP coef, SEXP pType)
 	error(_("coef must be a numeric vector of length %d"), clen);
     internal_mer_coefGets(x, REAL(coef), asInteger(pType));
     return x;
+}
+
+SEXP mer_denom_df(SEXP x)
+{
+    mer_factor(x);
+    return ScalarReal(internal_denom_df(x));
 }
 
 /**

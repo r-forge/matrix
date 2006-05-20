@@ -205,6 +205,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_coef", (DL_FUNC) &mer_coef, 2},
     {"mer_coefGets", (DL_FUNC) &mer_coefGets, 3},
     {"mer_create", (DL_FUNC) &mer_create, 10},
+    {"mer_denom_df", (DL_FUNC) &mer_denom_df, 1},
     {"mer_dtCMatrix", (DL_FUNC) &mer_dtCMatrix, 1},
     {"mer_dtCMatrix_inv", (DL_FUNC) &mer_dtCMatrix_inv, 1},
     {"mer_factor", (DL_FUNC) &mer_factor, 1},
