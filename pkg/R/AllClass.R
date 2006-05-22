@@ -411,7 +411,8 @@ setClass("lCholCMatrix",
 	 )
 
 setClass("CHMfactor",		 # cholmod_factor struct as S4 object
-	 representation(perm = "integer", type = "integer", "VIRTUAL"),
+	 representation(colcount = "integer", perm = "integer",
+                        type = "integer", "VIRTUAL"),
 	 validity =
 	 function(object) .Call("CHMfactor_validate", object, PACKAGE = "Matrix")
 	 )
@@ -424,7 +425,7 @@ setClass("CHMsuper",		       # supernodal cholmod_factor
 	 function(object) .Call("CHMsuper_validate", object, PACKAGE = "Matrix"))
 
 setClass("CHMsimpl",		       # simplicial cholmod_factor
-	 representation(colcount = "integer", p = "integer", i = "integer",
+	 representation(p = "integer", i = "integer",
 			nz = "integer", nxt = "integer", prv = "integer", "VIRTUAL"),
 	 contains = "CHMfactor",
 	 validity =
