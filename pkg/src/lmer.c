@@ -1,6 +1,15 @@
 #include "lmer.h"
 #include <float.h>
 
+/* TODO: */
+/* - change the status vector to a scalar.  The steps are
+ * cumulative so there is no need for a vector of flags. */
+/* - Consider the steps in reimplementing AGQ.  First you need to
+     find bhat, then evaluate the posterior variances, then step out
+     according to the posterior variance, evaluate the integrand 
+     relative to the step */
+/* However, AGQ will only work when the response vector can be split
+ * into sections that are conditionally independent. */
 /* These should be moved to the R sources */
 
 /**
@@ -114,33 +123,6 @@ Linv_to_bVar(cholmod_sparse *Linv, const int Gp[], const int nc[],
     }
 }
 
-static double
-internal_denom_df(SEXP x)
-{
-    SEXP Zt = GET_SLOT(x, Matrix_ZtSym);
-    cholmod_factor *L = as_cholmod_factor(GET_SLOT(x, Matrix_LSym));
-    int *Zti = INTEGER(GET_SLOT(Zt, Matrix_iSym)),
-	*Ztp = INTEGER(GET_SLOT(Zt, Matrix_pSym)), i, j,
-	n = INTEGER(GET_SLOT(Zt, Matrix_DimSym))[1],
-	p = LENGTH(GET_SLOT(x, Matrix_rXySym)),
-	q = LENGTH(GET_SLOT(x, Matrix_rZySym));
-    cholmod_dense *zrow = cholmod_allocate_dense(q, 1, q, CHOLMOD_REAL, &c);
-    double *Xcp = Memcpy(Calloc(n * p, double),
-			 REAL(GET_SLOT(x, Matrix_XSym)), n * p),
-	*RXX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym)),
-	*RZX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXSym), Matrix_xSym)),
-	*Ztx = REAL(GET_SLOT(Zt, Matrix_xSym)),
-	*wrk = (double*)(zrow->x), tr;
-    
-    for (j = 0, tr = 0; j < n; j++) { /* j'th column of Zt */
-	AZERO(wrk, q);
-	for (i = Ztp[j]; i < Ztp[j + 1]; i++) wrk[Zti[i]] = Ztx[i];
-	cholmod_solve(CHOLMOD_L, L, zrow, &c);
-	for (i = 0; i < q; i++) tr += wrk[i] * wrk[i];
-    }
-    cholmod_free_dense(zrow, &c); Free(Xcp);
-    return (n - tr);
-}
 
 static void
 internal_mer_bVar(SEXP x)
@@ -1659,8 +1641,40 @@ SEXP mer_coefGets(SEXP x, SEXP coef, SEXP pType)
 
 SEXP mer_denom_df(SEXP x)
 {
+    SEXP Zt = GET_SLOT(x, Matrix_ZtSym);
+    cholmod_factor *L = as_cholmod_factor(GET_SLOT(x, Matrix_LSym));
+    int *Zti = INTEGER(GET_SLOT(Zt, Matrix_iSym)),
+	*Ztp = INTEGER(GET_SLOT(Zt, Matrix_pSym)), i, ione = 1, j,
+	n = INTEGER(GET_SLOT(Zt, Matrix_DimSym))[1],
+	p = LENGTH(GET_SLOT(x, Matrix_rXySym)),
+	q = LENGTH(GET_SLOT(x, Matrix_rZySym));
+    double *Xcp = Memcpy(Calloc(n * p, double),
+			 REAL(GET_SLOT(x, Matrix_XSym)), n * p),
+	*RXX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym)),
+	*RZX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXSym), Matrix_xSym)),
+	*Ztx = REAL(GET_SLOT(Zt, Matrix_xSym)),
+	*wrk = Calloc(q, double), *xrow = Calloc(p, double),
+	one = 1, tr, zero = 0;
+    cholmod_dense *zrow = numeric_as_chm_dense(wrk, q);
+    
     mer_factor(x);
-    return ScalarReal(internal_denom_df(x));
+    for (j = 0, tr = 0; j < n; j++) { /* j'th column of Zt */
+	cholmod_dense *sol; double *sx;
+	for (i = 0; i < q; i++) wrk[i] = 0;
+	for (i = Ztp[j]; i < Ztp[j + 1]; i++) wrk[Zti[i]] = Ztx[i];
+	sol = cholmod_solve(CHOLMOD_L, L, zrow, &c);
+	sx = (double*)(sol->x);
+	for (i = 0; i < q; i++) tr += sx[i] * sx[i];
+	F77_CALL(dgemv)("T", &q, &p, &one, RZX, &q, sx, &ione,
+			&zero, xrow, &ione);
+	for (i = 0; i < p; i++) Xcp[j + i * n] -= xrow[i];
+	cholmod_free_dense(&sol, &c);
+    }
+    F77_CALL(dtrsm)("R", "U", "N", "N", &n, &p, &one, RXX, &p, Xcp, &n);
+    for (i = 0; i < n * p; i++) tr += Xcp[i] * Xcp[i];
+
+    Free(zrow); Free(Xcp); 
+    return ScalarReal(n - tr);
 }
 
 /**
