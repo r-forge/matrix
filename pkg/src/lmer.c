@@ -301,6 +301,7 @@ typedef struct glmer_struct
     double tol;      /* convergence tolerance for IRLS iterations */
 } glmer_struct, *GlmerStruct;
 
+
 /**
  * Calculate fitted values for the current fixed and random effects.
  *
@@ -329,6 +330,49 @@ internal_mer_fitted(SEXP x, const double initial[], double val[])
 	error(_("Error return from sdmult"));
     Free(chv); Free(chb); Free(Zt);
     return val;
+}
+
+static R_INLINE
+int sparse_col_nz(const int p[], int i)
+{
+    return (p[i + 1] - pi[])
+}
+
+/**
+ * Check the ZtZ matrix to see if it is a simple design from a nested
+ * sequence of grouping factors.
+ *
+ * @param x pointer to an mer object
+ *
+ * @return 1 for a simple nested sequence, 0 otherwise.
+ */
+static int
+internal_mer_isNested(SEXP x)
+{
+    cholmod_sparse *ZtZ = as_cholmod_sparse(GET_SLOT(x, Matrix_ZtZSym));
+    cholmod_sparse *ZtZl = cholmod_transpose(ZtZ, (int) ZtZ->xtype, &c);
+    SEXP ncp = GET_SLOT(x, Matrix_ncSym);
+    int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	*nc = INTEGER(ncp), *pos,
+	ans = 1, i, j, nf = LENGTH(ncp);
+    int **cnz = Calloc(nf, int*);
+    
+    for (i = 0, nct = 0; i < nf; i++) cnz[i] = Calloc(nc[i], int);
+    for (i = 0; i < nf; i++)	/* target number of nonzeros per column */
+	for (j = 0; j < nc[i]; j++)
+	    cnz[i][j] = sparse_col_nz(ZtZl->p, Gp[i] + j);
+    for (i = 0; i < nf && ans; i++) { /* check for consistent nonzeros*/
+	int nlev = (Gp[i + 1] - Gp[i])/nc[i];
+	for (j = 0; j < nlev && ans; j++)
+	    for (k = 0; k < nc[i] && ans; k++)
+		if (sparse_col_nz(ZtZl->p, Gp[i] + j * nc[i] + k)
+		    != cnz[i][k]) ans = 0;
+    }
+    for (i = 0; i < nf && ans; i++) { /* check actual numbers of nonzeros */
+    }
+    for (i = 0, nct = 0; i < nf; i++) Free(cnz[i]);
+    Free(cnz); Free(ZtZ); cholmod_free_sparse(&ZtZl, &c); 
+    return ans;
 }
 
 /**
