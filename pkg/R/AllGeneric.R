@@ -61,6 +61,10 @@ if (!isGeneric("writeMM"))
     setGeneric("writeMM", function(obj, file, ...)
                standardGeneric("writeMM"))
 
+if (!isGeneric("qqmath"))
+    setGeneric("qqmath", function(x, data, ...)
+               standardGeneric("qqmath"))
+
 if (!isGeneric("tril"))
     setGeneric("tril", function(x, k = 0, ...)
                standardGeneric("tril"))
