@@ -13,9 +13,9 @@ setAs("ltpMatrix", "dtpMatrix", l2d_Matrix)
 ## all need be coercable to "lgeMatrix":
 
 setAs("lsyMatrix", "lgeMatrix",  function(from)
-      .Call("lsyMatrix_as_lgeMatrix", from, PACKAGE = "Matrix"))
+      .Call(lsyMatrix_as_lgeMatrix, from))
 setAs("ltrMatrix", "lgeMatrix",  function(from)
-      .Call("ltrMatrix_as_lgeMatrix", from, PACKAGE = "Matrix"))
+      .Call(ltrMatrix_as_lgeMatrix, from))
 setAs("ltpMatrix", "lgeMatrix",
       function(from) as(as(from, "ltrMatrix"), "lgeMatrix"))
 setAs("lspMatrix", "lgeMatrix",
@@ -25,19 +25,19 @@ setAs("lspMatrix", "lgeMatrix",
 
 setAs("lspMatrix", "lsyMatrix",
       function(from)
-      .Call("lspMatrix_as_lsyMatrix", from, PACKAGE = "Matrix"))
+      .Call(lspMatrix_as_lsyMatrix, from))
 
 setAs("lsyMatrix", "lspMatrix",
       function(from)
-      .Call("lsyMatrix_as_lspMatrix", from, PACKAGE = "Matrix"))
+      .Call(lsyMatrix_as_lspMatrix, from))
 
 setAs("ltpMatrix", "ltrMatrix",
       function(from)
-      .Call("ltpMatrix_as_ltrMatrix", from, PACKAGE = "Matrix"))
+      .Call(ltpMatrix_as_ltrMatrix, from))
 
 setAs("ltrMatrix", "ltpMatrix",
       function(from)
-      .Call("ltrMatrix_as_ltpMatrix", from, PACKAGE = "Matrix"))
+      .Call(ltrMatrix_as_ltpMatrix, from))
 
 
 ### -> symmetric :

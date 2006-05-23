@@ -1,7 +1,7 @@
 #### "TsparseMatrix" : Virtual class of sparse matrices in triplet-format
 
 setAs("TsparseMatrix", "CsparseMatrix",
-      function(from) .Call("Tsparse_to_Csparse", from, PACKAGE = "Matrix"))
+      function(from) .Call(Tsparse_to_Csparse, from))
 
 ### "[" :
 ### -----
@@ -148,7 +148,7 @@ setMethod("[", signature(x = "TsparseMatrix",
 
 setMethod("crossprod", signature(x = "TsparseMatrix", y = "missing"),
 	  function(x, y = NULL) {
-	      a <- .Call("Csparse_crossprod", x, trans = FALSE, triplet = TRUE,
+	      a <- .Call(Csparse_crossprod, x, trans = FALSE, triplet = TRUE,
 			 PACKAGE = "Matrix")
 	      switch(substr(class(a)[1], 1, 1),
 		     "d" ={ new("dsCMatrix", i = a@i, p = a@p, x = a@x,
@@ -161,7 +161,7 @@ setMethod("crossprod", signature(x = "TsparseMatrix", y = "missing"),
 
 setMethod("tcrossprod", signature(x = "TsparseMatrix", y = "missing"),
 	  function(x, y = NULL) {
-	      a <- .Call("Csparse_crossprod", x, trans = TRUE, triplet = TRUE,
+	      a <- .Call(Csparse_crossprod, x, trans = TRUE, triplet = TRUE,
 			 PACKAGE = "Matrix")
 	      switch(substr(class(a)[1], 1, 1),
 		     "d" ={ new("dsCMatrix", i = a@i, p = a@p, x = a@x,

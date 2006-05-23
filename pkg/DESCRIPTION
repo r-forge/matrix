@@ -6,7 +6,7 @@ Author: Douglas Bates <bates@stat.wisc.edu> and Martin Maechler <maechler@stat.m
 Maintainer: Douglas Bates <bates@stat.wisc.edu>
 Description: Classes and methods for numerical linear algebra
     using Lapack, LDL, and Metis.
-Depends: R (>= 2.2.0), methods, utils
+Depends: R (>= 2.3.0), methods, utils
 Imports: graphics, lattice, grid, stats
 Suggests: mlmRev, MASS, coda
 SystemRequirements: GNU make
