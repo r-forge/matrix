@@ -1,6 +1,4 @@
-## Needs R-2.3.0 or later
-#useDynLib(Matrix, .registration=TRUE)
-useDynLib(Matrix)
+useDynLib(Matrix, .registration=TRUE)# <-> R 2.3.0 or later
 
 importFrom("graphics",image)
 importFrom("graphics",plot)		## lmer-related

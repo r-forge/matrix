@@ -17,7 +17,7 @@ setAs("denseMatrix", "CsparseMatrix",
 	      else if(is(from, "zMatrix")) from <- as(from, "zgeMatrix")
 	      else stop("undefined method for class ", class(from))
 	  }
-	  .Call("dense_to_Csparse", from, PACKAGE = "Matrix")
+	  .Call(dense_to_Csparse, from)
       })
 
 setAs("denseMatrix", "TsparseMatrix",

@@ -148,7 +148,7 @@ non0ind <- function(x) {
 	return(unique(cbind(x@i,x@j)))
     ## else:
     isC <- any("i" == slotNames(x))# is Csparse (not Rsparse)
-    .Call("compressed_non_0_ij", x, isC, PACKAGE = "Matrix")
+    .Call(compressed_non_0_ij, x, isC)
 }
 
 ## nr= nrow: since  i in {0,1,.., nrow-1}  these are 1:1 "decimal" encodings:
@@ -188,7 +188,7 @@ WhichintersectInd <- function(ij1, ij2, nrow) {
 uniq <- function(x) {
 
 ### Note: maybe, using
-### ----    xj <- .Call("Matrix_expand_pointers", x@p)
+### ----    xj <- .Call(Matrix_expand_pointers, x@p)
 ### would be slightly more efficient than as( <dgC> , "dgTMatrix")
 ### but really efficient would be to use only one .Call(.) for uniq(.) !
 ### Try to do it particularly fast for the case where 'x' is already a 'uniq' <dgT>

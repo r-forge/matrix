@@ -110,7 +110,7 @@ lmerControl <-
 }
 
 rWishart <- function(n, df, invScal)
-    .Call("Matrix_rWishart", n, df, invScal, PACKAGE = "Matrix")
+    .Call(Matrix_rWishart, n, df, invScal)
 
 setMethod("coef", signature(object = "mer"),
 	  function(object, ...)
@@ -298,14 +298,14 @@ setMethod("lmer", signature(formula = "formula"),
 				       mf)))
 	  if (lmm) {
 	      ## Create the mixed-effects representation (mer) object
-	      mer <- .Call("mer_create", fl,
-			   .Call("Zt_create", fl, Ztl, PACKAGE = "Matrix"),
+	      mer <- .Call(mer_create, fl,
+			   .Call(Zt_create, fl, Ztl),
 			   X, Y, method, sapply(Ztl, nrow),
 			   c(lapply(Ztl, rownames), list(.fixed = colnames(X))),
 			   !(family$family %in% c("binomial", "poisson")),
 			   match.call(), family,
 			   PACKAGE = "Matrix")
-	      .Call("mer_ECMEsteps", mer, cv$niterEM, cv$EMverbose, PACKAGE = "Matrix")
+	      .Call(mer_ECMEsteps, mer, cv$niterEM, cv$EMverbose)
 	      LMEoptimize(mer) <- cv
 	      return(new("lmer", mer,
 			 frame = if (model) mf else data.frame(),
@@ -327,26 +327,26 @@ setMethod("lmer", signature(formula = "formula"),
 	  dev.resids <- quote(family$dev.resids(Y, mu, wtssqr))
 	  LMEopt <- get("LMEoptimize<-")
 	  doLMEopt <- quote(LMEopt(x = mer, value = cv))
-	  mer <- .Call("mer_create", fl,
-		       .Call("Zt_create", fl, Ztl, PACKAGE = "Matrix"),
+	  mer <- .Call(mer_create, fl,
+		       .Call(Zt_create, fl, Ztl),
 		       X, Y, method, sapply(Ztl, nrow),
 		       c(lapply(Ztl, rownames), list(.fixed = colnames(X))),
 		       !(family$family %in% c("binomial", "poisson")),
 		       match.call(), family,
 		       PACKAGE = "Matrix")
 
-	  GSpt <- .Call("glmer_init", environment(), PACKAGE = "Matrix")
+	  GSpt <- .Call(glmer_init, environment())
 	  if (cv$usePQL) {
-	      .Call("glmer_PQL", GSpt, PACKAGE = "Matrix")  # obtain PQL estimates
+	      .Call(glmer_PQL, GSpt)  # obtain PQL estimates
 	      PQLpars <- c(fixef(mer),
-			   .Call("mer_coef", mer, 2, PACKAGE = "Matrix"))
+			   .Call(mer_coef, mer, 2))
 	  } else {
 	      PQLpars <- c(coef(glmFit),
-			   .Call("mer_coef", mer, 2, PACKAGE = "Matrix"))
+			   .Call(mer_coef, mer, 2))
 	  }
 	  if (method == "PQL") {
-	      .Call("glmer_devLaplace", PQLpars, GSpt, PACKAGE = "Matrix")
-	      .Call("glmer_finalize", GSpt, PACKAGE = "Matrix")
+	      .Call(glmer_devLaplace, PQLpars, GSpt)
+	      .Call(glmer_finalize, GSpt)
 	      return(new("lmer", mer,
 			 frame = if (model) mf else data.frame(),
 			 terms = mt))
@@ -360,14 +360,14 @@ setMethod("lmer", signature(formula = "formula"),
 				   function(k) 1:((k*(k+1))/2) <= k)
 			    ))
 	  devLaplace <- function(pars)
-	      .Call("glmer_devLaplace", pars, GSpt, PACKAGE = "Matrix")
+	      .Call(glmer_devLaplace, pars, GSpt)
 
 	  optimRes <-
 	      nlminb(PQLpars, devLaplace,
 		     lower = ifelse(const, 5e-10, -Inf),
 		     control = list(trace = cv$msVerbose,
 		     iter.max = cv$msMaxIter))
-	  .Call("glmer_finalize", GSpt, PACKAGE = "Matrix")
+	  .Call(glmer_finalize, GSpt)
 	  return(new("lmer", mer,
 		     frame = if (model) mf else data.frame(),
 		     terms = mt))
@@ -376,22 +376,22 @@ setMethod("lmer", signature(formula = "formula"),
 
 ## Extract the L matrix
 setAs("mer", "dtCMatrix", function(from)
-      .Call("mer_dtCMatrix", from, PACKAGE = "Matrix"))
+      .Call(mer_dtCMatrix, from))
 
 ## Extract the fixed effects
 setMethod("fixef", signature(object = "mer"),
 	  function(object, ...)
-	  .Call("mer_fixef", object, PACKAGE = "Matrix"))
+	  .Call(mer_fixef, object))
 
 ## Extract the random effects
 setMethod("ranef", signature(object = "mer"),
 	  function(object, postVar = FALSE, ...) {
 	      ans <- new("ranef.lmer",
-                         lapply(.Call("mer_ranef", object, PACKAGE = "Matrix"),
+                         lapply(.Call(mer_ranef, object),
                                 data.frame, check.names = FALSE))
               names(ans) <- names(object@flist)
               if (postVar) {
-                  pV <- .Call("mer_postVar", object, PACKAGE = "Matrix")
+                  pV <- .Call(mer_postVar, object)
                   for (i in seq(along = ans))
                       attr(ans[[i]], "postVar") <- pV[[i]]
               }
@@ -405,22 +405,22 @@ setReplaceMethod("LMEoptimize", signature(x="mer", value="list"),
 		 nc <- x@nc
 		 constr <- unlist(lapply(nc, function(k) 1:((k*(k+1))/2) <= k))
 		 fn <- function(pars)
-		     deviance(.Call("mer_coefGets", x, pars, 2, PACKAGE = "Matrix"))
+		     deviance(.Call(mer_coefGets, x, pars, 2))
 		 gr <- if (value$gradient)
 		     function(pars) {
 			 if (!isTRUE(all.equal(pars,
-					       .Call("mer_coef", x,
-						     2, PACKAGE = "Matrix"))))
-			     .Call("mer_coefGets", x, pars, 2, PACKAGE = "Matrix")
-			 .Call("mer_gradient", x, 2, PACKAGE = "Matrix")
+					       .Call(mer_coef, x,
+						     2))))
+			     .Call(mer_coefGets, x, pars, 2)
+			 .Call(mer_gradient, x, 2)
 		     }
 		 else NULL
-		 optimRes <- nlminb(.Call("mer_coef", x, 2, PACKAGE = "Matrix"),
+		 optimRes <- nlminb(.Call(mer_coef, x, 2),
 				    fn, gr,
 				    lower = ifelse(constr, 5e-10, -Inf),
 				    control = list(iter.max = value$msMaxIter,
 				    trace = as.integer(value$msVerbose)))
-		 .Call("mer_coefGets", x, optimRes$par, 2, PACKAGE = "Matrix")
+		 .Call(mer_coefGets, x, optimRes$par, 2)
 		 if (optimRes$convergence != 0) {
 		     warning(paste("nlminb returned message",
 				   optimRes$message,"\n"))
@@ -441,7 +441,7 @@ setMethod("qqmath", signature(x = "ranef.lmer"),
                   y <- as.numeric(y)
                   se <- as.numeric(se[subscripts])
                   ly <- y - 1.96 * se
-                  uy <- y + 1.96 * se              
+                  uy <- y + 1.96 * se
                   panel.segments(x, y - 1.96*se, x, y + 1.96 * se,
                                  col = 'black')
                   panel.xyplot(x, y, pch = pch, ...)
@@ -473,10 +473,10 @@ setMethod("qqmath", signature(x = "ranef.lmer"),
               }
               lapply(x, f)
           })
-              
+
 setMethod("deviance", signature(object = "mer"),
 	  function(object, ...) {
-	      .Call("mer_factor", object, PACKAGE = "Matrix")
+	      .Call(mer_factor, object)
 	      object@deviance[[ifelse(object@method == "REML", "REML", "ML")]]
 	  })
 
@@ -488,8 +488,8 @@ setMethod("mcmcsamp", signature(object = "mer"),
 	  lmm <- family$family == "gaussian" && family$link == "identity"
 	  if (!lmm)
 	      stop("mcmcsamp for GLMMs not yet implemented in supernodal representation")
-	  ans <- t(.Call("mer_MCMCsamp", object, saveb, n,
-			 trans, PACKAGE = "Matrix"))
+	  ans <- t(.Call(mer_MCMCsamp, object, saveb, n,
+			 trans))
 	  attr(ans, "mcpar") <- as.integer(c(1, n, 1))
 	  class(ans) <- "mcmc"
 	  glmer <- FALSE
@@ -540,10 +540,10 @@ setMethod("simulate", signature(object = "mer"),
 	      family$link != "identity")
 	      stop("simulation of generalized linear mixed models not yet implemented")
 	  ## similate the linear predictors
-	  lpred <- .Call("mer_simulate", object, nsim, PACKAGE = "Matrix")
+	  lpred <- .Call(mer_simulate, object, nsim)
 	  sc <- 1
 	  if (object@useScale)
-	      sc <- .Call("mer_sigma", object, object@method == "REML",
+	      sc <- .Call(mer_sigma, object, object@method == "REML",
 			  PACKAGE = "Matrix")
 	  ## add fixed-effects contribution and per-observation noise term
 	  lpred <- as.data.frame(lpred + drop(object@X %*% fixef(object)) +
@@ -644,7 +644,7 @@ setMethod("vcov", signature(object = "mer"),
 	  function(object, REML = object@method == "REML",
 		   useScale = object@useScale,...) {
 	      sc <- if (object@useScale) {
-		  .Call("mer_sigma", object, REML, PACKAGE = "Matrix")
+		  .Call(mer_sigma, object, REML)
 	      } else { 1 }
 	      rr <- as(sc^2 * tcrossprod(solve(object@RXX)), "dpoMatrix")
 	      rr@factors$correlation <- as(rr, "correlation")
@@ -669,7 +669,7 @@ setMethod("logLik", signature(object="mer"),
 	      devc <- as.integer(object@devComp[1:2])
 	      attr(val, "nall") <- attr(val, "nobs") <- devc[1]
 	      attr(val, "df") <- abs(devc[2]) +
-		  length(.Call("mer_coef", object, 0, PACKAGE = "Matrix"))
+		  length(.Call(mer_coef, object, 0))
 	      attr(val, "REML") <- REML
 	      class(val) <- "logLik"
 	      val
@@ -679,7 +679,7 @@ setMethod("VarCorr", signature(x = "mer"),
 	  function(x, REML = x@method == "REML", useScale = x@useScale, ...)
       {
 	  sc <- if (useScale)
-	      .Call("mer_sigma", x, REML, PACKAGE = "Matrix") else 1
+	      .Call(mer_sigma, x, REML) else 1
 	  sc2 <- sc * sc
 	  cnames <- x@cnames
 	  ans <- x@Omega
@@ -742,7 +742,7 @@ setMethod("anova", signature(object = "mer"),
 	  else { ## ------ single model ---------------------
 	      foo <- object
 	      #foo@status["factored"] <- FALSE
-	      #.Call("mer_factor", foo, PACKAGE="Matrix")
+	      #.Call(mer_factor, foo)
 	      #dfr <- getFixDF(foo)
 	      ss <- foo@rXy^2
 	      ssr <- exp(foo@devComp["logryy2"])
@@ -779,7 +779,7 @@ setMethod("confint", signature(object = "mer"),
 
 setMethod("fitted", signature(object = "mer"),
 	  function(object, ...)
-	  .Call("mer_fitted", object, PACKAGE = "Matrix")
+	  .Call(mer_fitted, object)
 	  )
 
 setMethod("formula", signature(x = "mer"),
@@ -809,7 +809,7 @@ setMethod("resid", signature(object = "mer"),
 setMethod("summary", signature(object = "mer"),
 	  function(object, ...) {
 
-	      fcoef <- .Call("mer_fixef", object, PACKAGE = "Matrix")
+	      fcoef <- .Call(mer_fixef, object)
 	      useScale <- object@useScale
 	      vcov <- vcov(object)
 	      corF <- vcov@factors$correlation
@@ -863,7 +863,7 @@ setMethod("summary", signature(object = "mer"),
 		  methTitle = methTitle,
 		  logLik = llik,
 		  ngrps = sapply(object@flist, function(x) length(levels(x))),
-		  sigma = .Call("mer_sigma", object, REML, PACKAGE = "Matrix"),
+		  sigma = .Call(mer_sigma, object, REML),
 		  coefs = coefs,
 		  vcov = vcov,
 		  REmat = REmat,
@@ -909,9 +909,9 @@ simss <- function(fm0, fma, nsim)
     cv <- list(gradient = FALSE, msMaxIter = 200:200,
 	       msVerbose = 0:0)
     sapply(ysim, function(yy) {
-	.Call("mer_update_y", fm0, yy, PACKAGE = "Matrix")
+	.Call(mer_update_y, fm0, yy)
 	LMEoptimize(fm0) <- cv
-	.Call("mer_update_y", fma, yy, PACKAGE = "Matrix")
+	.Call(mer_update_y, fma, yy)
 	LMEoptimize(fma) <- cv
 	exp(c(H0 = fm0@devComp[["logryy2"]],
 	      Ha = fma@devComp[["logryy2"]]))
@@ -938,7 +938,7 @@ if (FALSE) {
 		cat(paste("Using", nAGQ, "quadrature points per column\n"))
 	}
 	obj <- function(pars)
-	    .Call("glmer_devAGQ", pars, GSpt, nAGQ, PACKAGE = "Matrix")
+	    .Call(glmer_devAGQ, pars, GSpt, nAGQ)
 	optimRes <-
 	    nlminb(PQLpars, obj,
 		   lower = ifelse(const, 5e-10, -Inf),
@@ -951,9 +951,9 @@ if (FALSE) {
 	if (gVerb)
 	    cat(paste("convergence message", optimRes$message, "\n"))
 	fxd[] <- optpars[fixInd]  ## preserve the names
-	.Call("lmer_coefGets", mer, optpars[-fixInd], 2, PACKAGE = "Matrix")
+	.Call(lmer_coefGets, mer, optpars[-fixInd], 2)
     }
 
-    .Call("glmer_finalize", GSpt, PACKAGE = "Matrix")
+    .Call(glmer_finalize, GSpt)
     loglik[] <- -deviance/2
 }
