@@ -6,7 +6,7 @@
  * cumulative so there is no need for a vector of flags. */
 /* - Consider the steps in reimplementing AGQ.  First you need to
      find bhat, then evaluate the posterior variances, then step out
-     according to the posterior variance, evaluate the integrand 
+     according to the posterior variance, evaluate the integrand
      relative to the step */
 /* However, AGQ will only work when the response vector can be split
  * into sections that are conditionally independent. */
@@ -335,7 +335,7 @@ internal_mer_fitted(SEXP x, const double initial[], double val[])
 static R_INLINE
 int sparse_col_nz(const int p[], int i)
 {
-    return (p[i + 1] - pi[])
+    return (p[i + 1] - p[i]); /* << FIXME ? */
 }
 
 /**
@@ -353,25 +353,28 @@ internal_mer_isNested(SEXP x)
     cholmod_sparse *ZtZl = cholmod_transpose(ZtZ, (int) ZtZ->xtype, &c);
     SEXP ncp = GET_SLOT(x, Matrix_ncSym);
     int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
-	*nc = INTEGER(ncp), *pos,
-	ans = 1, i, j, nf = LENGTH(ncp);
+	*nc = INTEGER(ncp), /* *pos, */
+	ans = 1, i, j, nct, nf = LENGTH(ncp);
     int **cnz = Calloc(nf, int*);
-    
+
     for (i = 0, nct = 0; i < nf; i++) cnz[i] = Calloc(nc[i], int);
     for (i = 0; i < nf; i++)	/* target number of nonzeros per column */
 	for (j = 0; j < nc[i]; j++)
 	    cnz[i][j] = sparse_col_nz(ZtZl->p, Gp[i] + j);
     for (i = 0; i < nf && ans; i++) { /* check for consistent nonzeros*/
 	int nlev = (Gp[i + 1] - Gp[i])/nc[i];
-	for (j = 0; j < nlev && ans; j++)
+	for (j = 0; j < nlev && ans; j++) {
+	    int k;
 	    for (k = 0; k < nc[i] && ans; k++)
 		if (sparse_col_nz(ZtZl->p, Gp[i] + j * nc[i] + k)
 		    != cnz[i][k]) ans = 0;
+	}
     }
     for (i = 0; i < nf && ans; i++) { /* check actual numbers of nonzeros */
+	/* ............ FIXME ............. */
     }
     for (i = 0, nct = 0; i < nf; i++) Free(cnz[i]);
-    Free(cnz); Free(ZtZ); cholmod_free_sparse(&ZtZl, &c); 
+    Free(cnz); Free(ZtZ); cholmod_free_sparse(&ZtZl, &c);
     return ans;
 }
 
@@ -1700,7 +1703,7 @@ SEXP mer_denom_df(SEXP x)
 	*wrk = Calloc(q, double), *xrow = Calloc(p, double),
 	one = 1, tr, zero = 0;
     cholmod_dense *zrow = numeric_as_chm_dense(wrk, q);
-    
+
     mer_factor(x);
     for (j = 0, tr = 0; j < n; j++) { /* j'th column of Zt */
 	cholmod_dense *sol; double *sx;
@@ -1717,7 +1720,7 @@ SEXP mer_denom_df(SEXP x)
     F77_CALL(dtrsm)("R", "U", "N", "N", &n, &p, &one, RXX, &p, Xcp, &n);
     for (i = 0; i < n * p; i++) tr += Xcp[i] * Xcp[i];
 
-    Free(zrow); Free(Xcp); 
+    Free(zrow); Free(Xcp);
     return ScalarReal(n - tr);
 }
 
