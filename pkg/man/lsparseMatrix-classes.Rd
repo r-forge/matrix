@@ -35,6 +35,8 @@
 \alias{coerce,ltCMatrix,dMatrix-method}
 \alias{coerce,ltCMatrix,lgCMatrix-method}
 \alias{coerce,ltCMatrix,matrix-method}
+\alias{coerce,matrix,lgCMatrix-method}
+\alias{coerce,matrix,lgTMatrix-method}
 \alias{coerce,matrix,ltCMatrix-method}
 %
 \alias{coerce,ltTMatrix,dtTMatrix-method}

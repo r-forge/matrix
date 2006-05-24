@@ -62,10 +62,10 @@ Objects can be created by calls of the form \code{new("dgTMatrix", ...)}.
   Class \code{\linkS4class{dgCMatrix}}
 }
 \examples{
-m <- Matrix(1:28, nrow = 4)
-##FIXME: m[c()...] <- 0
+m <- Matrix(0+1:28, nrow = 4)
+m[-3,c(2,4:5,7)] <- m[ 3, 1:4] <- m[1:3, 6] <- 0
 (mT <- as(m, "dgTMatrix"))
-
+str(mT)
 mT[1,]
 mT[4, drop = FALSE]
 }

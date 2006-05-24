@@ -10,6 +10,19 @@ setAs("lgTMatrix", "lgCMatrix",
 setAs("lgTMatrix", "matrix",
       function(from) as(as(from, "lgCMatrix"), "matrix"))
 
+setAs("matrix", "lgTMatrix",
+      function(from) {
+	  stopifnot(is.logical(from))
+	  ij <- which(from, arr.ind = TRUE) - 1:1
+	  new("lgTMatrix",
+	      i = ij[,1],
+	      j = ij[,2],
+	      Dim = as.integer(dim(from)),
+	      Dimnames =
+	      if(!is.null(dn <- dimnames(from))) dn else list(NULL,NULL)
+	      )
+	  })
+
 setAs("lgTMatrix", "dgTMatrix",
       function(from)
       ## more efficient than
