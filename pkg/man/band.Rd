@@ -34,7 +34,7 @@ triu(x, k = 0, \dots)
 }
 \value{
   An object of an appropriate matrix class.  The class of the value of
-  \code{tril} or \code{triu} inherits from \code{\link{triangularMatrix-class}}.
+  \code{tril} or \code{triu} inherits from \code{\linkS4class{triangularMatrix}}.
 }
 \section{Methods}{
   \describe{

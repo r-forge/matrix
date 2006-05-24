@@ -31,9 +31,8 @@ Class \code{"Matrix"}, by class \code{"denseMatrix"} and class \code{"lMatrix"}.
 % }
 % \references{ ~put references to the literature/web site here ~ }
 \seealso{
-  \code{\link{ddiMatrix-class}},
-  \code{\link{diagonalMatrix-class}};
-  \code{\link{Diagonal}}
+  Classes \code{\linkS4class{ddiMatrix}} and
+  \code{\linkS4class{diagonalMatrix}}; function \code{\link{Diagonal}}.
 }
 \examples{
 (lM <- Diagonal(x = c(TRUE,FALSE,FALSE)))

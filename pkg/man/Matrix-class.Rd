@@ -86,7 +86,8 @@
 %\references{}
 \author{Douglas Bates \email{bates@stat.wisc.edu} and Martin Maechler}
 \seealso{
-  \code{\link{dgeMatrix-class}}, \code{\link{dgCMatrix-class}}, and
+  the classes \code{\linkS4class{dgeMatrix}},
+  \code{\linkS4class{dgCMatrix}}, and function
   \code{\link{Matrix}} for construction (and examples).
 }
 \examples{

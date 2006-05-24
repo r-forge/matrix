@@ -24,7 +24,7 @@
       for each column, to the initial (zero-based) index of elements in
       the column.}
     \item{\code{factors}, \code{Dim}, \code{Dimnames}:}{inherited from
-      the superclass, see \code{\link{sparseMatrix-class}}.}
+      the superclass, see the \code{\linkS4class{sparseMatrix}} class.}
   }
 }
 \section{Extends}{
@@ -42,8 +42,8 @@ Class \code{"Matrix"}, by class \code{"sparseMatrix"}.
   }
 }
 \seealso{
-  its superclass, \code{\link{sparseMatrix-class}}, and, e.g.,
-  \code{\link{dgCMatrix-class}} for the links to other classes.
+  its superclass, \code{\linkS4class{sparseMatrix}}, and, e.g.,
+  class \code{\linkS4class{dgCMatrix}} for the links to other classes.
 }
 \examples{
 showClass("CsparseMatrix")

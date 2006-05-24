@@ -35,8 +35,7 @@ Class \code{"Matrix"}, by class \code{"denseMatrix"} and class \code{"dMatrix"}.
 	 }
 }
 \seealso{
-  \code{\link{diagonalMatrix-class}};
-  \code{\link{Diagonal}}
+  Class \code{\linkS4class{diagonalMatrix}} and function \code{\link{Diagonal}}.
 }
 \examples{
 (d2 <- Diagonal(x = c(10,1)))
