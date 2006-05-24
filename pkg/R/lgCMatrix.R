@@ -33,6 +33,9 @@ setAs("lgCMatrix", "lgTMatrix",
 
 setAs("lgCMatrix", "matrix",
       function(from) .Call(lcsc_to_matrix, from))
+## TODO (maybe): write  matrix_to_lcsc()  in ../src/lgCMatrix.c
+setAs("matrix", "lgCMatrix",
+      function(from) as(as(from, "lgTMatrix"), "lgCMatrix"))
 
 
 setMethod("image", "lgCMatrix",
