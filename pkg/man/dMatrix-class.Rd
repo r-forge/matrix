@@ -64,8 +64,8 @@
 %\references{}
 % Martin + Doug\author{Douglas Bates \email{bates@stat.wisc.edu}}
 \seealso{
-  \code{\link{dgeMatrix-class}}, \code{\link{dgCMatrix-class}}, and
-  \code{\link{Matrix-class}}.
+  The classes \code{\linkS4class{dgeMatrix}},
+  \code{\linkS4class{dgCMatrix}}, and \code{\linkS4class{Matrix}}.
 }
 \examples{
  showClass("dMatrix")

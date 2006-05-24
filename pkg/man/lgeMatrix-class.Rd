@@ -20,7 +20,7 @@
       values that constitute the matrix, stored in column-major order.}
     \item{\code{Dim},\code{Dimnames}:}{The dimension (a length-2
       \code{"integer"}) and corresponding names (or \code{NULL}), see the
-      \code{\link{Matrix-class}}.}
+      \code{\linkS4class{Matrix}} class.}
     \item{\code{factors}:}{Object of class \code{"list"}.  A named
       list of factorizations that have been computed for the matrix.}
   }
@@ -38,9 +38,9 @@ Class \code{"Matrix"}, by class \code{"ldenseMatrix"}.
   \code{\link{showMethods}(class="lgeMatrix")} for details.
 }
 \seealso{
-  Non-general logical dense classes such as
-  \code{\link{ltrMatrix-class}}, or \code{\link{lsyMatrix-class}};
-  \emph{sparse} logical matrices such as \code{\link{lgCMatrix-class}}.
+  Non-general logical dense matrix classes such as
+  \code{\linkS4class{ltrMatrix}}, or \code{\linkS4class{lsyMatrix}};
+  \emph{sparse} logical classes such as \code{\linkS4class{lgCMatrix}}.
 }
 \examples{
 showClass("lgeMatrix")

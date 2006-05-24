@@ -20,7 +20,7 @@
      of the matrix - must be an integer vector with exactly two
      non-negative values.}
     \item{\code{Dimnames}:}{a list of length two - inherited from class
-      \code{Matrix}, see \code{\link{Matrix-class}}.}
+      \code{Matrix}, see \code{\linkS4class{Matrix}}.}
     \item{\code{factors}:}{Object of class \code{"list"} - a list
       of factorizations of the matrix. }
   }

@@ -13,14 +13,14 @@ mcmcsamp(object, n, verbose, \dots)
 }
 \arguments{
   \item{object}{An object of a suitable class - usually an
-    \code{\link{lmer-class}{lmer}} object. 
+    \code{\linkS4class{lmer}} object.
   }
   \item{n}{integer - number of samples to generate. Defaults to 1.}
   \item{verbose}{logical - if \code{TRUE} verbose output is printed.
     Defaults to \code{FALSE}.}
   \item{\dots}{Some methods for this generic function may take
     additional, optional arguments.  The method for
-    \code{\link{lmer-class}{lmer}} objects takes the optional argument
+    \code{\linkS4class{lmer}} objects takes the optional argument 
     \code{saveb} which, if \code{TRUE}, causes the values of the random
     effects in each sample to be saved.  Note that this can result in
     very large objects being saved.  Use with caution. A second optional

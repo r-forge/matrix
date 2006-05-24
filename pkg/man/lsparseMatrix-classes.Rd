@@ -122,7 +122,7 @@
 %\author{}
 %\note{}
 \seealso{
-  \code{\link{dgCMatrix-class}}
+  the class \code{\linkS4class{dgCMatrix}}
 }
 \examples{
 m <- Matrix(c(0,0,2:0), 3,5, dimnames=list(LETTERS[1:3],NULL))

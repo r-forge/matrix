@@ -59,7 +59,7 @@ Objects can be created by calls of the form \code{new("dgTMatrix", ...)}.
 \note{Triplet matrices are a convenient form in which to construct sparse
   matrices after which they can be coerced to \code{dgCMatrix} objects.}
 \seealso{
-  \code{\link{dgCMatrix-class}}
+  Class \code{\linkS4class{dgCMatrix}}
 }
 \examples{
 m <- Matrix(1:28, nrow = 4)

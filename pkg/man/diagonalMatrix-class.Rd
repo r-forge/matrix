@@ -48,8 +48,8 @@
 	 }
 }
 \seealso{
-  \code{\link{ddiMatrix-class}} and \code{\link{ldiMatrix-class}} are
-  \dQuote{actual} classes extending \code{"diagonalMatrix"}
+  \code{\linkS4class{ddiMatrix}} and \code{\linkS4class{ldiMatrix}} are
+  \dQuote{actual} classes extending \code{"diagonalMatrix"}.
 }
 % \examples{
 % }
