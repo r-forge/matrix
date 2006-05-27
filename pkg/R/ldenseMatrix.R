@@ -123,6 +123,9 @@ setAs("lgeMatrix", "lgTMatrix",
               factors = from@factors)
       })
 
+setAs("lgeMatrix", "lgCMatrix",
+      function(from) as(as(from, "lgTMatrix"), "lgCMatrix"))
+
 ###----------------------------------------------------------------------
 
 

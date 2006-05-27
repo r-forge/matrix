@@ -6,6 +6,7 @@
 \alias{coerce,matrix,lgeMatrix-method}
 \alias{coerce,lgeMatrix,dgeMatrix-method}
 \alias{coerce,lgeMatrix,matrix-method}
+\alias{coerce,lgeMatrix,lgCMatrix-method}
 \alias{coerce,lgeMatrix,lgTMatrix-method}
 \alias{coerce,lgeMatrix,lsyMatrix-method}
 \alias{coerce,lgeMatrix,ltrMatrix-method}
@@ -51,9 +52,6 @@ set.seed(1)
 (lM <- Matrix(matrix(rnorm(28), 4,7) > 0))# a simple random lgeMatrix
 set.seed(11)
 (lC <- Matrix(matrix(rnorm(28), 4,7) > 0))# a simple random lgCMatrix
-\dontshow{
-if(FALSE) ## FIXME
 as(lM, "lgCMatrix")
-}
 }
 \keyword{classes}

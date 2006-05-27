@@ -31,6 +31,11 @@ setAs("lgCMatrix", "lgTMatrix",
                          j = .Call(Matrix_expand_pointers, from@p),
                          Dim = from@Dim, Dimnames = from@Dimnames))
 
+setAs("lgCMatrix", "lgeMatrix",
+      function(from)
+	  new("lgeMatrix", x = c(as(from, "matrix")), # is fast,
+	      Dim = from@Dim, Dimnames = from@Dimnames))
+
 setAs("lgCMatrix", "matrix",
       function(from) .Call(lcsc_to_matrix, from))
 ## TODO (maybe): write  matrix_to_lcsc()  in ../src/lgCMatrix.c
