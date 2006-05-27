@@ -5,7 +5,7 @@
 ## Return the pairs of expressions separated by vertical bars
 findbars <- function(term)
 {
-    if (is.name(term) || is.numeric(term)) return(NULL)
+    if (is.name(term) || !is.language(term)) return(NULL)
     if (term[[1]] == as.name("(")) return(findbars(term[[2]]))
     if (!is.call(term)) stop("term must be of class call")
     if (term[[1]] == as.name('|')) return(term)
@@ -37,7 +37,7 @@ nobars <- function(term)
 ## Substitute the '+' function for the '|' function
 subbars <- function(term)
 {
-    if (is.name(term) || is.numeric(term)) return(term)
+    if (is.name(term) || !is.language(term)) return(term)
     if (length(term) == 2) {
 	term[[2]] <- subbars(term[[2]])
 	return(term)
@@ -54,7 +54,7 @@ subbars <- function(term)
 ## and the current expression
 colExpand <- function(term)
 {
-    if (is.name(term) || is.numeric(term)) return(term)
+    if (is.name(term) || !is.language(term)) return(term)
     if (length(term) == 2) {
 	term[[2]] <- colExpand(term[[2]])
 	return(term)
