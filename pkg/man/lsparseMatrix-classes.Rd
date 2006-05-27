@@ -22,6 +22,7 @@
 
 \alias{coerce,lgCMatrix,dgCMatrix-method}
 \alias{coerce,lgCMatrix,lgTMatrix-method}
+\alias{coerce,lgCMatrix,lgeMatrix-method}
 \alias{coerce,lgCMatrix,matrix-method}
 \alias{coerce,lgTMatrix,dgTMatrix-method}
 \alias{coerce,lgTMatrix,lgCMatrix-method}
@@ -130,7 +131,8 @@
 m <- Matrix(c(0,0,2:0), 3,5, dimnames=list(LETTERS[1:3],NULL))
 (dm <- as(m, "dgCMatrix"))# no dimnames for sparse here
 (lm <- as(dm, "lgCMatrix"))
-str(lm)
+str(lm) # no 'x' slot
+!lm     # no longer sparse
 
 data(KNex)
 lmm <- as(KNex $ mm, "lgCMatrix")

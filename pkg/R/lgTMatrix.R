@@ -7,7 +7,7 @@ setAs("lgTMatrix", "lgCMatrix",
       function(from)
       .Call(lgTMatrix_as_lgCMatrix, from))
 
-setAs("lgTMatrix", "matrix",
+setAs("lgTMatrix", "matrix", # go via fast C code:
       function(from) as(as(from, "lgCMatrix"), "matrix"))
 
 setAs("matrix", "lgTMatrix",

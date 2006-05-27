@@ -82,6 +82,8 @@ colCheck <- function(a, b) {
     da[2]
 }
 
+## Note: !isPacked(.)  i.e. `full' still contains
+## ----  "*sy" and "*tr" which have "undefined" lower or upper part
 isPacked <- function(x)
 {
     ## Is 'x' a packed (dense) matrix ?
