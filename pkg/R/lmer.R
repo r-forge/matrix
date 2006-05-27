@@ -957,3 +957,44 @@ if (FALSE) {
     .Call(glmer_finalize, GSpt)
     loglik[] <- -deviance/2
 }
+
+setMethod("isNested", "mer",
+          function(x, ...) !(x@L@type[1]),
+          valueClass = "logical")
+
+setMethod("denomDF", "mer",
+          function(x, ...)
+      {
+          mm <- x@X
+          aa <- attr(mm, "assign")
+          tt <- x@terms
+          if (!isNested(x))
+              return(list(coef = as.numeric(rep(NA, length(x@fixef))),
+                          terms = as.numeric(rep(NA,
+                          length(attr(tt, "order"))))))
+          hasintercept <- attr(tt, "intercept") > 0
+          ## check which variables vary within levels of grouping factors
+          vars <- eval(attr(tt, "variables"), x@frame)
+          fl <- x@flist
+          vv <- matrix(0:0, nrow = length(vars), ncol = length(fl),
+                        dimnames = list(NULL, names(fl)))
+          ## replace this loop by C code.
+          for (i in 1:nrow(ans))        # check if variables vary within factors
+              for (j in 1:ncol(ans))
+                  ans[i,j] <- all(tapply(vars[[i]], fl[[j]],
+                                         function(x) length(unique(x)) == 1))
+          ## which terms vary within levels of which grouping factors?
+          tv <- crossprod(attr(tt, "factors"), !ans)
+          ## maximum level at which the term is constant
+          ml <- apply(tv, 1, function(rr) max(0, which(as.logical(rr))))
+          ## unravel assignment applied to terms
+          ll <- attr(tt, "term.labels")
+          if (hasintercept)
+              ll <- c("(Intercept)", ll)
+          aaa <- factor(aa, labels = ll)
+          asgn <- split(order(aa), aaa)
+          nco <- lapply(asgn, length)   # number of coefficients per term
+          nlev <- lapply(fl, function(x) length(levels(x)))
+          if (hasintercept) asgn$"(Intercept)" <- NULL
+          list(ml = ml, nco = nco, nlev = nlev)
+      })
