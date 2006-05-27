@@ -332,49 +332,41 @@ internal_mer_fitted(SEXP x, const double initial[], double val[])
     return val;
 }
 
-static R_INLINE
-int sparse_col_nz(const int p[], int i)
-{
-    return (p[i + 1] - p[i]); /* << FIXME ? */
-}
-
 /**
  * Check the ZtZ matrix to see if it is a simple design from a nested
  * sequence of grouping factors.
  *
- * @param x pointer to an mer object
+ * @param nf number of factors
+ * @param nc[] number of columns per factor
+ * @param Gp[] group pointers
+ * @param p[] column pointers for the lower triangle of ZtZ
  *
  * @return 1 for a simple nested sequence, 0 otherwise.
  */
 static int
-internal_mer_isNested(SEXP x)
+internal_mer_isNested(int nf, const int nc[], const int Gp[], const int p[])
 {
-    cholmod_sparse *ZtZ = as_cholmod_sparse(GET_SLOT(x, Matrix_ZtZSym));
-    cholmod_sparse *ZtZl = cholmod_transpose(ZtZ, (int) ZtZ->xtype, &c);
-    SEXP ncp = GET_SLOT(x, Matrix_ncSym);
-    int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
-	*nc = INTEGER(ncp), /* *pos, */
-	ans = 1, i, j, nct, nf = LENGTH(ncp);
-    int **cnz = Calloc(nf, int*);
-
-    for (i = 0, nct = 0; i < nf; i++) cnz[i] = Calloc(nc[i], int);
-    for (i = 0; i < nf; i++)	/* target number of nonzeros per column */
-	for (j = 0; j < nc[i]; j++)
-	    cnz[i][j] = sparse_col_nz(ZtZl->p, Gp[i] + j);
+    int **cnz = Calloc(nf, int*), ans = 1, i, j, k, nct;
+    
+    for (i = 0, nct = 0; i < nf; i++) { /* total number of columns */
+	nct += nc[i];
+	cnz[i] = Calloc(nc[i], int);
+    }
+    for (i = 0; i < nf; i++) {	/* target number of nonzeros per column */
+	for (j = 0; j < nc[i]; j++) cnz[i][j] = nct - j;
+	nct -= nc[i];
+    }
     for (i = 0; i < nf && ans; i++) { /* check for consistent nonzeros*/
 	int nlev = (Gp[i + 1] - Gp[i])/nc[i];
 	for (j = 0; j < nlev && ans; j++) {
-	    int k;
-	    for (k = 0; k < nc[i] && ans; k++)
-		if (sparse_col_nz(ZtZl->p, Gp[i] + j * nc[i] + k)
-		    != cnz[i][k]) ans = 0;
+	    for (k = 0; k < nc[i] && ans; k++) {
+		int jj =  Gp[i] + j * nc[i] + k; /* column in ZtZ */
+		if ((p[jj + 1] - p[jj]) != cnz[i][k]) ans = 0;
+	    }
 	}
     }
-    for (i = 0; i < nf && ans; i++) { /* check actual numbers of nonzeros */
-	/* ............ FIXME ............. */
-    }
     for (i = 0, nct = 0; i < nf; i++) Free(cnz[i]);
-    Free(cnz); Free(ZtZ); cholmod_free_sparse(&ZtZl, &c);
+    Free(cnz);
     return ans;
 }
 
@@ -1507,7 +1499,7 @@ SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
 	val = PROTECT(NEW_OBJECT(MAKE_CLASS("mer"))), xnms;
     cholmod_sparse *ts1, *ts2, *Zt;
     cholmod_factor *F;
-    int *nc = INTEGER(ncp), *Gp, *xdims, i,
+    int *nc = INTEGER(ncp), *Gp, *xdims, i, nested,
 	nf = LENGTH(fl), nobs = LENGTH(yp), p, q;
     char *devCmpnms[] = {"n", "p", "yty", "logryy2", "logDetL2",
 			 "logDetOmega", "logDetRXX", ""};
@@ -1557,19 +1549,7 @@ SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
     }
     SET_SLOT(val, Matrix_ZtSym, duplicate(ZZt));
     Zt = as_cholmod_sparse(GET_SLOT(val, Matrix_ZtSym));
-				/* analyze Zt */
     q = Zt->nrow;
-    i = c.supernodal;
-    c.supernodal = CHOLMOD_SUPERNODAL; /* force a supernodal decomposition */
-    F = cholmod_analyze(Zt, &c);
-    c.supernodal = i;
-    ts1 = cholmod_aat(Zt, (int*)NULL/* fset */,(size_t)0,
-		      CHOLMOD_PATTERN, &c);
-    ts2 = cholmod_copy(ts1, 1/*upper triangle*/, CHOLMOD_PATTERN, &c);
-    SET_SLOT(val, Matrix_ZtZSym,
-	     alloc_dsCMatrix(q, cholmod_nnz(ts2, &c), "U", R_NilValue,
-			     R_NilValue));
-    cholmod_free_sparse(&ts1, &c); cholmod_free_sparse(&ts2, &c);
 				/* allocate other slots */
     SET_SLOT(val, Matrix_devianceSym, Matrix_make_named(REALSXP, devnms));
     SET_SLOT(val, Matrix_devCompSym, Matrix_make_named(REALSXP, devCmpnms));
@@ -1597,6 +1577,27 @@ SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
 	SET_VECTOR_ELT(gradComp, i, alloc3Darray(REALSXP, nci, nci, 4));
 	Gp[i + 1] = Gp[i] + nlev * nci;
     }
+				/* analyze Zt and ZtZ */
+    ts1 = cholmod_aat(Zt, (int*)NULL/* fset */,(size_t)0,
+		      CHOLMOD_PATTERN, &c);
+    ts2 = cholmod_copy(ts1, -1/*lower triangle*/, CHOLMOD_PATTERN, &c);
+    SET_SLOT(val, Matrix_ZtZSym,
+	     alloc_dsCMatrix(q, cholmod_nnz(ts2, &c), "U", R_NilValue,
+			     R_NilValue));
+    i = c.supernodal;
+    c.supernodal = CHOLMOD_SUPERNODAL; /* force a supernodal decomposition */
+    nested = internal_mer_isNested(nf, nc, Gp, (int*)(ts2->p));
+    if (nested) {		/* require identity permutation */
+	int nmethods = c.nmethods, ord0 = c.method[0].ordering;
+	c.nmethods = 1;
+	c.method[0].ordering = CHOLMOD_NATURAL;
+	c.postorder = FALSE;
+	F = cholmod_analyze(Zt, &c);
+	c.nmethods = nmethods; c.method[0].ordering = ord0;
+	c.postorder = TRUE;
+    } else F = cholmod_analyze(Zt, &c);
+    c.supernodal = i;		/* restore previous setting */
+    cholmod_free_sparse(&ts1, &c); cholmod_free_sparse(&ts2, &c);
 				/* create ZtX, RZX, XtX, RXX */
     SET_SLOT(val, Matrix_ZtXSym, alloc_dgeMatrix(q, p, R_NilValue, xnms));
     SET_SLOT(val, Matrix_RZXSym, alloc_dgeMatrix(q, p, R_NilValue, xnms));
@@ -2120,6 +2121,26 @@ SEXP mer_initial(SEXP x)
     }
     flag_not_factored(x);
     return R_NilValue;
+}
+
+/**
+ * Externally callable check on nesting
+ *
+ * @param x Pointer to an mer object
+ *
+ * @return a scalar logical value indicating if ZtZ corresponds to a 
+ * simple nested structure.
+ */
+SEXP mer_isNested(SEXP x)
+{
+    cholmod_sparse *ZtZ = as_cholmod_sparse(GET_SLOT(x, Matrix_ZtZSym));
+    cholmod_sparse *ZtZl = cholmod_transpose(ZtZ, (int) ZtZ->xtype, &c);
+    SEXP ncp = GET_SLOT(x, Matrix_ncSym);
+    int ans = internal_mer_isNested(LENGTH(ncp), INTEGER(ncp),
+				    INTEGER(GET_SLOT(x, Matrix_GpSym)),
+				    ZtZl->p);
+    Free(ZtZ); cholmod_free_sparse(&ZtZl, &c);
+    return ScalarLogical(ans);
 }
 
 /**

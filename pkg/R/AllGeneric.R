@@ -24,9 +24,6 @@ if (!isGeneric("isTriangular"))
     setGeneric("isTriangular", function(object, ...) ## 'upper = NA'
                standardGeneric("isTriangular"))
 
-if (!isGeneric("isNested"))
-    setGeneric("isNested", function(object, ...) standardGeneric("isNested"))
-
 if (!isGeneric("facmul"))
     setGeneric("facmul",
                function(x, factor, y, transpose, left, ...)
@@ -90,6 +87,8 @@ setGeneric("lmer",
 		    ...)
 	   standardGeneric("lmer"))
 
+if (!isGeneric("isNested"))
+    setGeneric("isNested", function(x, ...) standardGeneric("isNested"))
 
 if (!isGeneric("LMEoptimize<-")) {
     setGeneric("LMEoptimize<-", function(x, ..., value)
@@ -98,6 +97,10 @@ if (!isGeneric("LMEoptimize<-")) {
 
 if (!isGeneric("fixef")) {
     setGeneric("fixef", function(object, ...) standardGeneric("fixef"))
+}
+
+if (!isGeneric("denomDF")) {
+    setGeneric("denomDF", function(x, ...) standardGeneric("denomDF"))
 }
 
 fixed.effects <- function(object, ...) {
