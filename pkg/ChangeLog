@@ -1,3 +1,12 @@
+2006-05-27  Douglas Bates  <bates@.stat.wisc.edu>
+
+	* R/lmer.R (findbars and others): Change check of is.numeric to
+	!is.language to resolve the bug reported by Jacob Wegelin.
+
+	* src/pedigree.c (pedigree_inbreeding): Initial implementation of
+	code to evaluate inbreeding coefficients without calculating T,
+	based on code in Sargolzaei and Iwaisaki's paper.
+
 2006-05-27  Douglas Bates  <bates@stat.wisc.edu>
 
 	* R/{lmer.R,AllGeneric.R}, src/{init.c,lmer.[ch]}: Added local
