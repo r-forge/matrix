@@ -1,5 +1,9 @@
 # Methods for lmer and for the objects that it produces
 
+## To Do: Check if it would be worthwhile using a few ECME iterations
+##   to stabilize the variance parameters at the beginning a Laplace
+##   fit.
+
 ## Some utilities
 
 ## Return the pairs of expressions separated by vertical bars
@@ -50,23 +54,55 @@ subbars <- function(term)
     term
 }
 
-## Expand an expression with colons to the sum of the lhs
-## and the current expression
-colExpand <- function(term)
-{
-    if (is.name(term) || !is.language(term)) return(term)
-    if (length(term) == 2) {
-	term[[2]] <- colExpand(term[[2]])
-	return(term)
-    }
-    stopifnot(length(term) == 3)
-    if (is.call(term) && term[[1]] == as.name(':')) {
-	return(substitute(A+B, list(A = term, B = colExpand(term[[2]]))))
-    }
-    term[[2]] <- colExpand(term[[2]])
-    term[[3]] <- colExpand(term[[3]])
-    term
+## Return the list of '/'-separated terms in an expression that
+## contains slashes
+slashTerms <- function(x) {
+    if (!("/" %in% all.names(x))) return(x)
+    if (x[[1]] != as.name("/"))
+        stop("unparseable formula for grouping factor")
+    list(slashTerms(x[[2]]), slashTerms(x[[3]]))
 }
+
+## from a list of length 2 return recursive interaction terms
+makeInteraction <- function(x) {
+    if (length(x) < 2) return(x)
+    trm1 <- makeInteraction(x[[1]])
+    trm11 <- if(is.list(trm1)) trm1[[1]] else trm1
+    list(substitute(foo:bar, list(foo=x[[2]], bar = trm11)), trm1)
+}
+
+## expand any slashes in the grouping factors returned by findbars
+expandSlash <- function(bb) {
+    ## I really do mean lapply(unlist(... - unlist returns a
+    ## flattened list in this case
+    unlist(lapply(bb, function(x) {
+        if (is.list(trms <- slashTerms(x[[3]])))
+            return(lapply(unlist(makeInteraction(trms)),
+                          function(trm) substitute(foo|bar,
+                                                   list(foo = x[[2]],
+                                                        bar = trm))))
+        x
+    }))
+}
+    
+## Expand an expression with colons to the sum of the lhs
+## and the current expression.
+## FIXME: This function apparently isn't used.
+## colExpand <- function(term)
+## {
+##     if (is.name(term) || !is.language(term)) return(term)
+##     if (length(term) == 2) {
+## 	term[[2]] <- colExpand(term[[2]])
+## 	return(term)
+##     }
+##     stopifnot(length(term) == 3)
+##     if (is.call(term) && term[[1]] == as.name(':')) {
+## 	return(substitute(A+B, list(A = term, B = colExpand(term[[2]]))))
+##     }
+##     term[[2]] <- colExpand(term[[2]])
+##     term[[3]] <- colExpand(term[[3]])
+##     term
+## }
 
 abbrvNms <- function(gnm, cnms)
 {
@@ -278,7 +314,7 @@ setMethod("lmer", signature(formula = "formula"),
 	  if (method == "AGQ")
 	      stop('method = "AGQ" not yet implemented for supernodal representation')
 	  ## create factor list for the random effects
-	  bars <- findbars(formula[[3]])
+	  bars <- expandSlash(findbars(formula[[3]]))
 	  names(bars) <- unlist(lapply(bars, function(x) deparse(x[[3]])))
 	  fl <- lapply(bars,
 		       function(x)
