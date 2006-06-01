@@ -473,6 +473,8 @@ setMethod("qqmath", signature(x = "ranef.lmer"),
                   list(ylim = range(y - hw, y + hw, finite = TRUE))
               }
               panel.ci <- function(x, y, se, subscripts, pch = 16, ...)  {
+                  panel.grid(h = -1,v = -1)
+                  panel.abline(h = 0)
                   x <- as.numeric(x)
                   y <- as.numeric(y)
                   se <- as.numeric(se[subscripts])

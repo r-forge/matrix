@@ -1,3 +1,8 @@
+2006-06-01  Douglas Bates  <bates@stat.wisc.edu>
+
+	* R/lmer.R (panel.ci): Add a reference line at zero and a
+	background grid to the qqmath plot of ranef.lmer.
+
 2006-05-30  Douglas Bates  <bates@stat.wisc.edu>
 
 	* R/lmer.R (expandSlash): Functions (non-exported) to allow nested
