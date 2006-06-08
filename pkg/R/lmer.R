@@ -486,7 +486,7 @@ setMethod("qqmath", signature(x = "ranef.lmer"),
               }
               f <- function(x) {
                   if (!is.null(attr(x, "postVar"))) {
-                      require("lattice", quietly = TRUE)
+               #       require("lattice", quietly = TRUE)
                       pv <- attr(x, "postVar")
                       cols <- 1:(dim(pv)[1])
                       se <- unlist(lapply(cols, function(i) sqrt(pv[i, i, ])))
@@ -555,7 +555,7 @@ setMethod("mcmcsamp", signature(object = "mer"),
 	  }
 	  if(saveb) ## maybe better colnames, "RE.1","RE.2", ... ?
 	      colnms <- c(colnms, rep.int("", length(object@rZy)))
-	  colnames(ans) <- colnms
+	  colnames(ans) <- c("deviance", colnms)
 	  ans
       })
 
