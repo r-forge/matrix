@@ -10,7 +10,15 @@
      relative to the step */
 /* However, AGQ will only work when the response vector can be split
  * into sections that are conditionally independent. */
-/* These should be moved to the R sources */
+
+/* MCMCsamp for generalized linear mixed models.  1) Detect if there
+ * is a scale factor or not. 2) Sample beta and b according to the
+ * normal approximation 3) Evaluate the Metropolis-Hastings ratio and
+ * accept or reject 4) If step is accepted then reweight/update 5)
+ * Sample from the Wishart for the variance matrix. 6) If necessary,
+ * sample from the scale factor distribution. */
+
+/* Some of these utility functions should be moved to the R sources */
 
 /**
  * Symmetrize a matrix by copying the strict upper triangle into the
@@ -123,7 +131,40 @@ Linv_to_bVar(cholmod_sparse *Linv, const int Gp[], const int nc[],
     }
 }
 
-
+/**
+ * Re-evaluate the factorization of the components of Omega and the
+ * factorization of the crossproduct matrix - usually after an update.
+ *
+ * @param x pointer to an mer object
+ */
+/* NOTE: The factorization of the Omega components should be made
+ * part of mer_factor.  Add an argument to mer_factor called force. */
+static void
+internal_mer_refactor(SEXP x)
+{
+    SEXP Omega = GET_SLOT(x, Matrix_OmegaSym);
+    int *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	i, info, nf = LENGTH(GET_SLOT(x, Matrix_flistSym));
+    for (i = 0; i < nf; i++) {
+	SEXP omgi = VECTOR_ELT(Omega, i);
+	int nci = nc[i];
+	double *choli;
+	
+/* NOTE: This operation depends on dpoMatrix_chol returning the
+   Cholesky component of the factor slot, not a duplicate of it */
+	choli = REAL(GET_SLOT(dpoMatrix_chol(omgi), Matrix_xSym));
+	Memcpy(choli, REAL(GET_SLOT(omgi, Matrix_xSym)), nci * nci);
+	F77_CALL(dpotrf)("U", &nci, choli, &nci, &info);
+	/* Yes, you really do need to do that decomposition.
+	   The contents of choli before the decomposition can be
+	   from the previous value of Omegai. */
+	if (info)
+	    error(_("Omega[[%d]] is not positive definite"), i + 1);
+    }
+    flag_not_factored(x);
+    mer_factor(x);
+}
+    
 static void
 internal_mer_bVar(SEXP x)
 {
@@ -154,7 +195,7 @@ internal_mer_bVar(SEXP x)
  * @param Gp - group pointers
  * @param nc - number of columns per factor
  *
- * @return
+ * @return value of the quadratic form in b
  */
 static double
 b_quadratic(const double b[], SEXP Omega, const int Gp[], const int nc[])
@@ -166,13 +207,48 @@ b_quadratic(const double b[], SEXP Omega, const int Gp[], const int nc[])
 	int nci = nc[i], ntot = Gp[i + 1] - Gp[i];
 	int nlev = ntot/nci;
 	double *bcp = Memcpy(Calloc(ntot, double), b + Gp[i], ntot),
-	    *omgf = REAL(GET_SLOT(dpoMatrix_chol(VECTOR_ELT(Omega, i)), Matrix_xSym));
+	    *omgf = REAL(GET_SLOT(dpoMatrix_chol(VECTOR_ELT(Omega, i)),
+				  Matrix_xSym));
 
-	F77_CALL(dtrmm)("L", "U", "N", "N", &nci, &nlev, one, omgf, &nci, bcp, &nci);
+	F77_CALL(dtrmm)("L", "U", "N", "N", &nci, &nlev, one, omgf,
+			&nci, bcp, &nci);
 	ans += F77_CALL(ddot)(&ntot, bcp, &ione, bcp, &ione);
 	Free(bcp);
     }
     return ans;
+}
+
+/**
+ * Calculate the deviance for a linear mixed model at arbitrary
+ * parameter values.  REML is not used - I don't think it applies.
+ *
+ * @param x a mixed-effects model representation
+ * @param sigma standard deviation of per-observation noise
+ * @param beta fixed-effects parameter vector
+ *
+ * @return deviance
+ */
+static
+double lmm_deviance(SEXP x, double sigma, const double beta[])
+{
+    SEXP rXyp = GET_SLOT(x, Matrix_rXySym);
+    int i, j, ione = 1, p = LENGTH(rXyp);
+    double *dcmp = REAL(GET_SLOT(x, Matrix_devCompSym)),
+	*betacp = Memcpy(Calloc(p, double), beta, p),
+	sprss;			/* scaled penalized rss */
+    
+    mer_factor(x);
+    F77_CALL(dtrmv)("U", "N", "N", &p, 
+		    REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym)),
+		    &p, betacp, &ione);
+    sprss = exp(dcmp[3])/(sigma * sigma);
+    for (i = 0; i < p; i++) {
+	double ri = (REAL(rXyp)[i] - betacp[i])/sigma;
+	sprss += ri * ri;
+    }
+    Free(betacp);
+
+    return dcmp[4] - dcmp[5] + dcmp[0] * log(2.*PI*sigma*sigma) + sprss;
 }
 
 /**
@@ -447,7 +523,7 @@ void internal_mer_coefGets(SEXP x, const double cc[], int ptyp)
     for (i = 0; i < nf; i++) {
 	SEXP Omegai = VECTOR_ELT(Omega, i);
 	int j, k, nci = nc[i], ncisq = nc[i] * nc[i];
-	double *choli, *omgi = REAL(GET_SLOT(Omegai, Matrix_xSym));
+	double *omgi = REAL(GET_SLOT(Omegai, Matrix_xSym));
 
 	if (nci == 1) {
 	    double dd = cc[cind++];
@@ -483,16 +559,8 @@ void internal_mer_coefGets(SEXP x, const double cc[], int ptyp)
 	    }
 	    cind = odind;
 	}
-	choli = REAL(GET_SLOT(dpoMatrix_chol(Omegai), Matrix_xSym));
-	Memcpy(choli, omgi, ncisq);
-	F77_CALL(dpotrf)("U", &nci, choli, &nci, &j);
-	/* Yes, you really do need to do that decomposition.
-	   The contents of choli before the decomposition are
-	   from the previous value of Omegai. */
-	if (j)
-	    error(_("Omega[[%d]] is not positive definite"), i + 1);
     }
-    flag_not_factored(x);
+    internal_mer_refactor(x);
 }
 
 /**
@@ -734,7 +802,24 @@ static int internal_mer_Xfactor(SEXP x)
     return info;
 }
 
+static void
+safe_pd_matrix(double x[], const char uplo[], int n, double thresh)
+{
+    int info, lwork = 3 * n, nm1 = n - 1;
+    double *work = Calloc(3 * n, double),
+	*w = Calloc(n, double),
+	*xcp = Memcpy(Calloc(n * n, double), x, n * n);
 
+    F77_CALL(dsyev)("N", uplo, &n, xcp, &n, w, work, &lwork, &info);
+    if (info) error(_("dsyev returned %d"), info);
+    if (w[nm1] <= 0) error(_("no positive eigenvalues!"));
+    if ((w[0]/w[nm1]) < thresh) {
+	int i, np1 = n + 1;
+	double incr = w[nm1] * thresh;
+	for (i = 0; i < n; i++) x[i * np1] += incr;
+    }
+    Free(work); Free(w); Free(xcp);
+}
 /**
  * Update the relative precision matrices by sampling from a Wishart
  * distribution with scale factor determined by the current sample of
@@ -755,28 +840,29 @@ static void
 internal_Omega_update(SEXP Omega, const double b[], double sigma, int nf,
 		  const int nc[], const int Gp[], double *vals, int trans)
 {
+    SEXP chol;
     int i, j, k, info;
     double one = 1, zero = 0;
 
     for (i = 0; i < nf; i++) {
+	SEXP omgi = VECTOR_ELT(Omega, i);
 	int nci = nc[i];
 	int nlev = (Gp[i + 1] - Gp[i])/nci, ncip1 = nci + 1,
 	    ncisqr = nci * nci;
 	double
+	    *omgx = REAL(GET_SLOT(omgi, Matrix_xSym)),
 	    *scal = Calloc(ncisqr, double), /* factor of scale matrix */
 	    *tmp = Calloc(ncisqr, double),
 	    *var = Calloc(ncisqr, double), /* simulated variance-covariance */
 	    *wfac = Calloc(ncisqr, double); /* factor of Wishart variate */
-
-	/* generate and factor the scale matrix */
+				/* create and factor the scale matrix */
 	AZERO(scal, ncisqr);
 	F77_CALL(dsyrk)("U", "N", &nci, &nlev, &one, b + Gp[i], &nci,
 			&zero, scal, &nci);
+	if (nci > 1) safe_pd_matrix(scal, "U", nci, 1e-7);
 	F77_CALL(dpotrf)("U", &nci, scal, &nci, &info);
-	if (info)
-	    error(_("Singular random effects varcov at level %d"), i + 1);
-
-	/* generate a random factor from a standard Wishart distribution */
+	if (info) error("Matrix is not pd after safe_pd_matrix!");
+				/* generate random factor from std Wishart */
 	AZERO(wfac, ncisqr);
 	std_rWishart_factor((double) (nlev - nci + 1), nci, wfac);
 
@@ -801,11 +887,52 @@ internal_Omega_update(SEXP Omega, const double b[], double sigma, int nf,
 	F77_CALL(dtrsm)("R", "U", "T", "N", &nci, &nci,
 			&sigma, scal, &nci, tmp, &nci);
 	F77_CALL(dsyrk)("U", "T", &nci, &nci, &one, tmp, &nci, &zero,
-			REAL(GET_SLOT(VECTOR_ELT(Omega, i), Matrix_xSym)),
-			&nci);
-	dpoMatrix_chol(VECTOR_ELT(Omega, i));
+			omgx, &nci);
+
 	Free(scal); Free(tmp); Free(wfac); Free(var);
     }
+}
+
+/**
+ * Update the fixed and random effects vectors by sampling from a
+ * multivariate normal distribution with scale factor sigma, means
+ * betahat and bhat, and variance-covariance matrix determined by L,
+ * RZX and RXX
+ *
+ * @param p dimension of fixed effects vector
+ * @param q dimension of random effects vector
+ * @param sigma current value of sigma
+ * @param L lower Cholesky factor of random-effects part of system matrix 
+ * @param RZX rectangular part of Cholesky factor of system matrix
+ * @param RXX fixed-effectgs part of Cholesky factor of system matrix
+ * @param betahat conditional mle of fixed effects
+ * @param bhat conditional modes of random effects
+ * @param betanew overwritten with proposal point
+ * @param bnew overwritten with proposal point
+ */
+static void
+internal_betab_update(int p, int q, double sigma, cholmod_factor *L,
+		      double RZX[], double RXX[], double betahat[],
+		      double bhat[], double betanew[], double bnew[])
+{
+    cholmod_dense *chb, *chbnew = numeric_as_chm_dense(bnew, q);
+    int j, ione = 1;
+    double m1[] = {-1,0}, one[] = {1,0};
+				/* simulate scaled, independent normals */
+    for (j = 0; j < p; j++) betanew[j] = sigma * norm_rand();
+    for (j = 0; j < q; j++) bnew[j] = sigma * norm_rand();
+				/* betanew := RXX^{-1} %*% betanew */
+    F77_CALL(dtrsv)("U", "N", "N", &p, RXX, &p, betanew, &ione);
+				/* bnew := bnew - RZX %*% betanew */
+    F77_CALL(dgemv)("N", &q, &p, m1, RZX, &q, betanew, &ione,
+		    one, bnew, &ione);
+    for (j = 0; j < p; j++) betanew[j] += betahat[j];
+				/* chb := L^{-T} %*% bnew */
+    chb = cholmod_solve(CHOLMOD_Lt, L, chbnew, &c);
+				/* Copy chb to bnew and free chb */
+    for (j = 0; j < q; j++) bnew[j] = ((double*)(chb->x))[j] + bhat[j];
+    cholmod_free_dense(&chb, &c);
+    Free(chbnew);
 }
 
 /**
@@ -1273,6 +1400,96 @@ SEXP glmer_init(SEXP rho) {
 }
 
 /**
+ * Generate a Markov-Chain Monte Carlo sample from a fitted
+ * generalized linear mixed model.
+ *
+ * @param GSp External pointer to a  GlmerStruct
+ * @param savebp pointer to a logical scalar indicating if the
+ * random-effects should be saved
+ * @param nsampp pointer to an integer scalar of the number of samples
+ * to generate
+ * @param transp pointer to an logical scalar indicating if the
+ * variance components should be transformed.
+ *
+ * @return a matrix
+ */
+SEXP
+glmer_MCMCsamp(SEXP GSp, SEXP savebp, SEXP nsampp, SEXP transp)
+{
+    GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
+    SEXP ans, 
+	Omega = GET_SLOT(GS->mer, Matrix_OmegaSym),
+	Omegacp = PROTECT(duplicate(Omega));
+    cholmod_factor *L = as_cholmod_factor(GET_SLOT(GS->mer, Matrix_LSym));
+    int *Gp = INTEGER(GET_SLOT(GS->mer, Matrix_GpSym)),
+	*nc = INTEGER(GET_SLOT(GS->mer, Matrix_ncSym)),
+	i, ione = 1, j, n = LENGTH(GET_SLOT(GS->mer, Matrix_ySym)),
+	nf = LENGTH(Omega), nsamp = asInteger(nsampp),
+	p = LENGTH(GET_SLOT(GS->mer, Matrix_rXySym)),
+	q = LENGTH(GET_SLOT(GS->mer, Matrix_rZySym)),
+	saveb = asLogical(savebp),
+	trans = asLogical(transp);
+    double
+	*RXX = REAL(GET_SLOT(GET_SLOT(GS->mer, Matrix_RXXSym), Matrix_xSym)),
+	*RZX = REAL(GET_SLOT(GET_SLOT(GS->mer, Matrix_RZXSym), Matrix_xSym)),
+	*bhat = REAL(GET_SLOT(GS->mer, Matrix_ranefSym)),
+	*betahat = REAL(GET_SLOT(GS->mer, Matrix_fixefSym)),
+	*bnew = Calloc(q, double), *betanew = Calloc(p, double),
+	*dcmp = REAL(GET_SLOT(GS->mer, Matrix_devCompSym)),
+	df = n, m1[] = {-1,0}, one[] = {1,0};
+    int nrbase = p + 1 + coef_length(nf, nc); /* rows always included */
+    int nrtot = nrbase + (saveb ? q : 0);
+    cholmod_dense *chb, *chbnew = numeric_as_chm_dense(bnew, q);
+
+    if (nsamp <= 0) nsamp = 1;
+    ans = PROTECT(allocMatrix(REALSXP, nrtot, nsamp));
+    GetRNGstate();
+    for (i = 0; i < nsamp; i++) {
+	double *col = REAL(ans) + i * nrtot, sigma;
+				/* factor x and get secondary values */
+	mer_secondary(GS->mer);
+				/* simulate and store new value of sigma */
+	sigma = exp(dcmp[3]/2)/sqrt(rchisq(df));
+	col[p] = (trans ? 2 * log(sigma) : sigma * sigma);
+				/* simulate scaled, independent normals */
+	for (j = 0; j < p; j++) betanew[j] = sigma * norm_rand();
+	for (j = 0; j < q; j++) bnew[j] = sigma * norm_rand();
+				/* betanew := RXX^{-1} %*% betanew */
+	F77_CALL(dtrsv)("U", "N", "N", &p, RXX, &p, betanew, &ione);
+				/* bnew := bnew - RZX %*% betanew */
+	F77_CALL(dgemv)("N", &q, &p, m1, RZX, &q, betanew, &ione,
+			one, bnew, &ione);
+				/* chb := L^{-T} %*% bnew */
+	chb = cholmod_solve(CHOLMOD_Lt, L, chbnew, &c);
+				/* Copy chb to bnew and free chb */
+	Memcpy(bnew, (double *)(chb->x), q);
+ 	cholmod_free_dense(&chb, &c);
+				/* Add conditional modes and store beta */
+	for (j = 0; j < p; j++) {
+	    col[j] = (betanew[j] += betahat[j]);
+	}
+				/* Add conditional modes and
+				 * optionally store b */
+	for (j = 0; j < q; j++) {
+	    bnew[j] += bhat[j];
+	    if (saveb) col[nrbase + j] = bnew[j];
+	}
+	/* Update and store variance-covariance of the random effects */
+	internal_Omega_update(Omega, bnew, sigma, nf, nc, Gp, col + p + 1, trans);
+	internal_mer_refactor(GS->mer);
+    }
+    PutRNGstate();
+    Free(betanew); Free(bnew); Free(chbnew);
+				/* Restore original Omega */
+    SET_SLOT(GS->mer, Matrix_OmegaSym, Omegacp);
+    internal_mer_refactor(GS->mer);
+
+    Free(L);
+    UNPROTECT(2);
+    return ans;
+}
+
+/**
  * Perform ECME steps for the REML or ML criterion.
  *
  * @param x pointer to an mer object
@@ -1404,16 +1621,16 @@ SEXP mer_Hessian(SEXP x)
  *
  * @return a matrix
  */
-SEXP
-mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp)
+SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp)
 {
     SEXP ans, Omega = GET_SLOT(x, Matrix_OmegaSym),
 	Omegacp = PROTECT(duplicate(Omega));
     cholmod_factor *L = as_cholmod_factor(GET_SLOT(x, Matrix_LSym));
     int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
 	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
+	*status = LOGICAL(GET_SLOT(x, Matrix_statusSym)),
 	REML = !strcmp(CHAR(asChar(GET_SLOT(x, Matrix_methodSym))), "REML"),
-	i, ione = 1, j, n = LENGTH(GET_SLOT(x, Matrix_ySym)),
+	i, j, n = LENGTH(GET_SLOT(x, Matrix_ySym)),
 	nf = LENGTH(Omega), nsamp = asInteger(nsampp),
 	p = LENGTH(GET_SLOT(x, Matrix_rXySym)),
 	q = LENGTH(GET_SLOT(x, Matrix_rZySym)),
@@ -1427,52 +1644,39 @@ mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp)
 	*bnew = Calloc(q, double), *betanew = Calloc(p, double),
 	*dcmp = REAL(GET_SLOT(x, Matrix_devCompSym)),
 	df = n - (REML ? p : 0), m1[] = {-1,0}, one[] = {1,0};
-    int nrbase = p + 1 + coef_length(nf, nc); /* rows always included */
+    int nrbase = p + 2 + coef_length(nf, nc); /* rows always included */
     int nrtot = nrbase + (saveb ? q : 0);
     cholmod_dense *chb, *chbnew = numeric_as_chm_dense(bnew, q);
 
     if (nsamp <= 0) nsamp = 1;
     ans = PROTECT(allocMatrix(REALSXP, nrtot, nsamp));
+    for (i = 0; i < nrtot * nsamp; i++) REAL(ans)[i] = NA_REAL;
     GetRNGstate();
     for (i = 0; i < nsamp; i++) {
-	double *col = REAL(ans) + i * nrtot, sigma;
-				/* factor x and get secondary values */
-	mer_factor(x);
-	mer_secondary(x);
+	double *col = REAL(ans) + 1 + i * nrtot, sigma;
 				/* simulate and store new value of sigma */
 	sigma = exp(dcmp[3]/2)/sqrt(rchisq(df));
 	col[p] = (trans ? 2 * log(sigma) : sigma * sigma);
-				/* simulate scaled, independent normals */
-	for (j = 0; j < p; j++) betanew[j] = sigma * norm_rand();
-	for (j = 0; j < q; j++) bnew[j] = sigma * norm_rand();
-				/* betanew := RXX^{-1} %*% betanew */
-	F77_CALL(dtrsv)("U", "N", "N", &p, RXX, &p, betanew, &ione);
-				/* bnew := bnew - RZX %*% betanew */
-	F77_CALL(dgemv)("N", &q, &p, m1, RZX, &q, betanew, &ione,
-			one, bnew, &ione);
-				/* chb := L^{-T} %*% bnew */
-	chb = cholmod_solve(CHOLMOD_Lt, L, chbnew, &c);
-				/* Copy chb to bnew and free chb */
-	Memcpy(bnew, (double *)(chb->x), q);
- 	cholmod_free_dense(&chb, &c);
-				/* Add conditional modes and store beta */
-	for (j = 0; j < p; j++) {
-	    col[j] = (betanew[j] += betahat[j]);
-	}
-				/* Add conditional modes and
-				 * optionally store b */
-	for (j = 0; j < q; j++) {
-	    bnew[j] += bhat[j];
-	    if (saveb) col[nrbase + j] = bnew[j];
-	}
-	/* Update and store variance-covariance of the random effects */
-	internal_Omega_update(Omega, bnew, sigma, nf, nc, Gp, col + p + 1, trans);
+				/* simulate new fixed and random effects */
+	internal_betab_update(p, q, sigma, L, RZX, RXX, betahat, bhat,
+			      betanew, bnew);
+				/* Store beta */
+	for (j = 0; j < p; j++) col[j] = betanew[j];
+				/* Optionally store b */
+	if (saveb) for (j = 0; j < q; j++) col[nrbase + j] = bnew[j];
+				/* Update and store Omega */
+	internal_Omega_update(Omega, bnew, sigma, nf, nc, Gp,
+				     col + p + 1, trans);
+	internal_mer_refactor(x);
+	mer_secondary(x);
+
+	col[-1] = lmm_deviance(x, sigma, betanew); /* store deviance */
     }
     PutRNGstate();
     Free(betanew); Free(bnew); Free(chbnew);
 				/* Restore original Omega */
     SET_SLOT(x, Matrix_OmegaSym, Omegacp);
-    mer_factor(x);
+    internal_mer_refactor(x);
 
     Free(L);
     UNPROTECT(2);
