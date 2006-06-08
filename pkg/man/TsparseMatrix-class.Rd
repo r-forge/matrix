@@ -7,6 +7,10 @@
 % "[" are in ./Xtrct-methods.Rd
 \alias{crossprod,TsparseMatrix,missing-method}
 \alias{tcrossprod,TsparseMatrix,missing-method}
+\alias{colMeans,TsparseMatrix-method}
+\alias{colSums,TsparseMatrix-method}
+\alias{rowMeans,TsparseMatrix-method}
+\alias{rowSums,TsparseMatrix-method}
 %
 \description{The \code{"TsparseMatrix"} class is the virtual class of
   all sparse matrices coded in triplet form.  Since it is a virtual class,

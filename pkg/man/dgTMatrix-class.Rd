@@ -1,4 +1,5 @@
 \name{dgTMatrix-class}
+\title{Sparse matrices in triplet form}
 \docType{class}
 \alias{dgTMatrix-class}
 \alias{+,dgTMatrix,dgTMatrix-method}
@@ -16,7 +17,10 @@
 \alias{image,dgTMatrix-method}
 \alias{kronecker,dgTMatrix,dgTMatrix-method}
 \alias{t,dgTMatrix-method}
-\title{Sparse matrices in triplet form}
+\alias{colMeans,dgTMatrix-method}
+\alias{colSums,dgTMatrix-method}
+\alias{rowMeans,dgTMatrix-method}
+\alias{rowSums,dgTMatrix-method}
 \description{The \code{"dgTMatrix"} class is the class of sparse
   matrices stored as (possibly redundant) triplets.}
 \section{Objects from the Class}{

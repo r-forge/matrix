@@ -267,3 +267,11 @@ setMethod("isDiagonal", signature(object = "sparseMatrix"),
 	      all(gT@i == gT@j)
 	  })
 
+
+## .as.dgT.Fun is in ./Tsparse.R
+setMethod("colSums",  signature(x = "sparseMatrix"), .as.dgT.Fun)
+setMethod("colMeans", signature(x = "sparseMatrix"), .as.dgT.Fun)
+## .as.dgC.Fun is in ./Csparse.R
+setMethod("rowSums", signature(x = "sparseMatrix"), .as.dgC.Fun)
+setMethod("rowMeans", signature(x = "sparseMatrix"),.as.dgC.Fun)
+

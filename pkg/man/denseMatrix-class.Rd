@@ -5,6 +5,10 @@
 \alias{show,denseMatrix-method}
 \alias{coerce,denseMatrix,CsparseMatrix-method}
 \alias{coerce,denseMatrix,TsparseMatrix-method}
+\alias{colMeans,denseMatrix-method}
+\alias{colSums,denseMatrix-method}
+\alias{rowMeans,denseMatrix-method}
+\alias{rowSums,denseMatrix-method}
 %
 \description{This is the virtual class of all dense (S4) matrices.
   It is the direct superclass of

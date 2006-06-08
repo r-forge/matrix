@@ -171,3 +171,17 @@ setMethod("tcrossprod", signature(x = "TsparseMatrix", y = "missing"),
 				Dim = a@Dim, Dimnames = a@Dimnames, uplo = "L",
 				factors = list()) })
 	  })
+
+.as.dgT.Fun <- function(x, na.rm = FALSE, dims = 1) {
+    x <- as(x, "dgTMatrix")
+    callGeneric()
+}
+
+setMethod("colSums", signature(x = "TsparseMatrix"), .as.dgT.Fun,
+	  valueClass = "numeric")
+setMethod("colMeans", signature(x = "TsparseMatrix"), .as.dgT.Fun,
+	  valueClass = "numeric")
+setMethod("rowSums", signature(x = "TsparseMatrix"), .as.dgT.Fun,
+	  valueClass = "numeric")
+setMethod("rowMeans", signature(x = "TsparseMatrix"), .as.dgT.Fun,
+	  valueClass = "numeric")

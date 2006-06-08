@@ -8,6 +8,10 @@
 \alias{crossprod,CsparseMatrix,missing-method}
 \alias{t,CsparseMatrix-method}
 \alias{tcrossprod,CsparseMatrix,missing-method}
+\alias{colMeans,CsparseMatrix-method}
+\alias{colSums,CsparseMatrix-method}
+\alias{rowMeans,CsparseMatrix-method}
+\alias{rowSums,CsparseMatrix-method}
 \title{Class "CsparseMatrix" of Sparse Matrices in Column-compressed Form}
 \description{The \code{"CsparseMatrix"} class is the virtual class of
   all sparse matrices coded in sorted compressed column-oriented form.

@@ -22,6 +22,10 @@
 \alias{dim,dgCMatrix-method}
 \alias{image,dgCMatrix-method}
 \alias{t,dgCMatrix-method}
+\alias{colMeans,dgCMatrix-method}
+\alias{colSums,dgCMatrix-method}
+\alias{rowMeans,dgCMatrix-method}
+\alias{rowSums,dgCMatrix-method}
 %% Group methods --------- FIXME: These are not tested yet (or documented)
 \alias{Arith,numeric,dgCMatrix-method}
 \alias{Arith,dgCMatrix,numeric-method}
