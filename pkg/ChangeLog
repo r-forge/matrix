@@ -1,3 +1,9 @@
+2006-06-08  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dgTMatrix.R (colSums): etc. All four of
+	colSums(), rowSums(), colMeans(), rowMeans() now should work for
+	all "Matrices".
+
 2006-06-01  Douglas Bates  <bates@stat.wisc.edu>
 
 	* R/lmer.R (panel.ci): Add a reference line at zero and a

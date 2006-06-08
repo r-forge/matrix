@@ -391,3 +391,13 @@ diagU2N <- function(x)
     new("dtTMatrix", x = xT@x, i = xT@i, j = xT@j, Dim = x@Dim,
 	Dimnames = x@Dimnames, uplo = x@uplo, diag = "N")
 }
+
+### Fast much simplified version of tapply()
+tapply1 <- function (X, INDEX, FUN = NULL, ..., simplify = TRUE) {
+    sapply(split(X, INDEX), FUN, ..., simplify = simplify, USE.NAMES = FALSE)
+}
+
+## tapply.x <- function (X, n, INDEX, FUN = NULL, ..., simplify = TRUE) {
+##     tapply1(X, factor(INDEX, 0:(n-1)), FUN = FUN, ..., simplify = simplify)
+## }
+

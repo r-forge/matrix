@@ -242,3 +242,22 @@ setMethod("writeHB", signature(obj = "dgTMatrix"),
 setMethod("writeMM", signature(obj = "dgTMatrix"),
           function(obj, file, ...)
           .Call(Matrix_writeMatrixMarket, obj, as.character(file), "DGT"))
+
+
+setMethod("colSums", signature(x = "dgTMatrix"),
+	  function(x, na.rm = FALSE, dims = 1)
+          tapply1(x@x, factor(x@j, 0:(x@Dim[2]-1)), sum, na.rm = na.rm),
+	  valueClass = "numeric")
+setMethod("colMeans", signature(x = "dgTMatrix"),
+	  function(x, na.rm = FALSE, dims = 1)
+          tapply1(x@x, factor(x@j, 0:(x@Dim[2]-1)), mean, na.rm = na.rm),
+	  valueClass = "numeric")
+
+setMethod("rowSums", signature(x = "dgTMatrix"),
+	  function(x, na.rm = FALSE, dims = 1)
+          tapply1(x@x, factor(x@i, 0:(x@Dim[1]-1)), sum, na.rm = na.rm),
+	  valueClass = "numeric")
+setMethod("rowMeans", signature(x = "dgTMatrix"),
+	  function(x, na.rm = FALSE, dims = 1)
+          tapply1(x@x, factor(x@i, 0:(x@Dim[1]-1)), mean, na.rm = na.rm),
+	  valueClass = "numeric")

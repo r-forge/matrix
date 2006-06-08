@@ -25,7 +25,11 @@ stopifnot(c(43, 43) == dim(as.matrix(d <- dist(USJudgeRatings))))
 
 m <- Matrix(0:5, 3, 2)
 (m2 <- Matrix(diag(c(3,1))))
-(m3 <- crossprod(t(m)))
+(m3 <- crossprod(t(m))) # <- that's an S4 method; nothing "base"
+
+svd(m)
+eigen(m3)
+
 ### outer()  used to work thanks to  as.array() -- up to R 2.2.1
 ##  no longer, because the definition of outer has changed
 ##stopifnot(identical(outer(m, m2),

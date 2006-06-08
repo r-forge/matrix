@@ -4,6 +4,10 @@
 \alias{sparseMatrix-class}
 \alias{-,sparseMatrix,missing-method}
 \alias{show,sparseMatrix-method}
+\alias{colMeans,sparseMatrix-method}
+\alias{colSums,sparseMatrix-method}
+\alias{rowMeans,sparseMatrix-method}
+\alias{rowSums,sparseMatrix-method}
 % graph stuff
 \alias{coerce,graph,sparseMatrix-method}
 \alias{coerce,graphAM,sparseMatrix-method}

@@ -283,3 +283,30 @@ setMethod("writeHB", signature(obj = "dgCMatrix"),
 setMethod("writeMM", signature(obj = "dgCMatrix"),
           function(obj, file, ...)
           .Call(Matrix_writeMatrixMarket, obj, as.character(file), "DGC"))
+
+
+## TODO (in C):
+## setMethod("colSums", signature(x = "dgCMatrix"),
+## 	  function(x, na.rm = FALSE, dims = 1)
+##           .Call(dgCMatrix_colsums, x, na.rm, TRUE, FALSE),
+## 	  valueClass = "numeric")
+
+## setMethod("colMeans", signature(x = "dgCMatrix"),
+## 	  function(x, na.rm = FALSE, dims = 1)
+##           .Call(dgCMatrix_colsums, x, na.rm, TRUE, TRUE),
+## 	  valueClass = "numeric")
+
+## Instead (.as.dgT.Fun is in ./Tsparse.R ) :
+setMethod("colSums",  signature(x = "dgCMatrix"), .as.dgT.Fun)
+setMethod("colMeans", signature(x = "dgCMatrix"), .as.dgT.Fun)
+
+setMethod("rowSums", signature(x = "dgCMatrix"),
+	  function(x, na.rm = FALSE, dims = 1)
+          tapply1(x@x, factor(x@i, 0:(x@Dim[1]-1)), sum, na.rm = na.rm),
+	  valueClass = "numeric")
+
+setMethod("rowMeans", signature(x = "dgCMatrix"),
+	  function(x, na.rm = FALSE, dims = 1)
+          tapply1(x@x, factor(x@i, 0:(x@Dim[1]-1)), mean, na.rm = na.rm),
+	  valueClass = "numeric")
+
