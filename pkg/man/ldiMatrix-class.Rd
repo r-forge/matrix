@@ -2,6 +2,8 @@
 \docType{class}
 \alias{ldiMatrix-class}
 \alias{!,ldiMatrix-method}
+\alias{coerce,ldiMatrix,lgCMatrix-method}
+\alias{coerce,ldiMatrix,lgTMatrix-method}
 
 \title{Class "ldiMatrix" of Diagonal Logical Matrices}
 \description{The class \code{"ldiMatrix"} of logical diagonal matrices.

@@ -1,11 +1,5 @@
 ### Define Methods that can be inherited for all subclasses
 
-if(paste(R.version$major, R.version$minor, sep=".") < "2.0.1") {
-    ## for R 2.0.0 (and earlier)
-    setAs("dMatrix", "dgeMatrix",
-	  function(from) new("dgeMatrix", x = from@x,
-			     Dim = from@Dim, Dimnames = from@Dimnames))
-}
 
 setAs("dMatrix", "matrix",
       function(from) as(as(from, "dgeMatrix"), "matrix"))
@@ -17,6 +11,7 @@ setAs("dMatrix", "matrix",
 ##       function(from) {
 ##       })
 
+setAs("dMatrix", "sparseMatrix", function(from) as(from, "dgCMatrix"))
 
 ## Methods for operations where one argument is integer
 ## No longer made use of (and confusing hence) since R version 2.1.0

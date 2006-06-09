@@ -1,12 +1,13 @@
 \name{ddiMatrix-class}
+\title{Class "ddiMatrix" of Diagonal Numeric Matrices}
 \docType{class}
 \alias{ddiMatrix-class}
 \alias{coerce,ddiMatrix,dgeMatrix-method}
+\alias{coerce,ddiMatrix,dgCMatrix-method}
+\alias{coerce,ddiMatrix,dgTMatrix-method}
 \alias{\%*\%,ddiMatrix,ddiMatrix-method}
 \alias{crossprod,ddiMatrix,ddiMatrix-method}
 \alias{tcrossprod,ddiMatrix,ddiMatrix-method}
-
-\title{Class "ddiMatrix" of Diagonal Numeric Matrices}
 \description{The class \code{"ddiMatrix"} of numerical diagonal matrices.
   %% FIXME add more
 }
@@ -40,6 +41,8 @@ Class \code{"Matrix"}, by class \code{"denseMatrix"} and class \code{"dMatrix"}.
 \examples{
 (d2 <- Diagonal(x = c(10,1)))
 str(d2)
+## slightly larger:
+str(as(d2, "sparseMatrix"))
 
 M <- Matrix(cbind(1,2:4))
 M \%*\% d2 #> `fast' multiplication

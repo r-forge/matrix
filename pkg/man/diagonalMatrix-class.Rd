@@ -1,22 +1,28 @@
 \name{diagonalMatrix-class}
+\title{Class "diagonalMatrix" of Diagonal Matrices}
 \docType{class}
 \alias{diagonalMatrix-class}
 \alias{coerce,matrix,diagonalMatrix-method}
 \alias{coerce,diagonalMatrix,generalMatrix-method}
 \alias{coerce,diagonalMatrix,triangularMatrix-method}
 \alias{coerce,diagonalMatrix,matrix-method}
+\alias{coerce,diagonalMatrix,sparseMatrix-method}
 \alias{coerce,Matrix,diagonalMatrix-method}
 \alias{t,diagonalMatrix-method}
 \alias{diag,diagonalMatrix-method}
 \alias{show,diagonalMatrix-method}
 \alias{\%*\%,dgeMatrix,diagonalMatrix-method}
+\alias{\%*\%,sparseMatrix,diagonalMatrix-method}
 \alias{\%*\%,matrix,diagonalMatrix-method}
 \alias{\%*\%,diagonalMatrix,matrix-method}
 \alias{\%*\%,diagonalMatrix,dgeMatrix-method}
+\alias{\%*\%,diagonalMatrix,sparseMatrix-method}
 \alias{crossprod,diagonalMatrix,matrix-method}
 \alias{crossprod,diagonalMatrix,dgeMatrix-method}
-
-\title{Class "diagonalMatrix" of Diagonal Matrices}
+\alias{crossprod,sparseMatrix,diagonalMatrix-method}
+\alias{crossprod,diagonalMatrix,sparseMatrix-method}
+\alias{tcrossprod,sparseMatrix,diagonalMatrix-method}
+\alias{tcrossprod,diagonalMatrix,sparseMatrix-method}
 \description{
   Class "diagonalMatrix" is the virtual class of all diagonal matrices.
 }

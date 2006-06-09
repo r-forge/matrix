@@ -5,6 +5,7 @@
 \alias{show,dMatrix-method}
 \alias{coerce,dMatrix,matrix-method}
 \alias{coerce,dMatrix,dgeMatrix-method}
+\alias{coerce,dMatrix,sparseMatrix-method}
 \alias{[,dMatrix,lMatrix,missing,ANY-method}
 \alias{[,dMatrix,logical,missing,ANY-method}
 % Group methods

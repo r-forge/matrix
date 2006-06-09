@@ -296,7 +296,6 @@ setMethod("writeMM", signature(obj = "dgCMatrix"),
 ##           .Call(dgCMatrix_colsums, x, na.rm, TRUE, TRUE),
 ## 	  valueClass = "numeric")
 
-## Instead (.as.dgT.Fun is in ./Tsparse.R ) :
 setMethod("colSums",  signature(x = "dgCMatrix"), .as.dgT.Fun)
 setMethod("colMeans", signature(x = "dgCMatrix"), .as.dgT.Fun)
 
