@@ -1,3 +1,8 @@
+2006-06-09  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/diagMatrix.R (setAs): define coercion methods to sparse matrix
+	classes.
+
 2006-06-08  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/dgTMatrix.R (colSums): etc. All four of

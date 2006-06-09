@@ -93,11 +93,6 @@ setMethod("band", "CsparseMatrix",
               .Call(Csparse_band, x, k1, k2)
           })
 
-.as.dgC.Fun <- function(x, na.rm = FALSE, dims = 1) {
-    x <- as(x, "dgCMatrix")
-    callGeneric()
-}
-
 setMethod("colSums", signature(x = "CsparseMatrix"), .as.dgC.Fun,
 	  valueClass = "numeric")
 setMethod("colMeans", signature(x = "CsparseMatrix"), .as.dgC.Fun,

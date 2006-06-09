@@ -2,14 +2,8 @@
 
 ### Idea: Coercion between *VIRTUAL* classes -- as() chooses "closest" classes
 ### ----  should also work e.g. for  dense-triangular --> sparse-triangular !
-## setAs("denseMatrix", "sparseMatrix",
-##        function(from) {
-##            as(as(from, "dgeMatrix")
-##        })
 
-## setAs("dMatrix", "lMatrix",
-##       function(from) {
-##       })
+##-> see  ./dMatrix.R  and  ./lMatrix.R
 
 
 ## "graph" coercions -- this needs the graph package which is currently

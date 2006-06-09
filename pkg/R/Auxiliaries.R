@@ -311,18 +311,6 @@ try_as <- function(x, classes, tryAnyway = FALSE) {
     if(ok) as(x, classes[1]) else x
 }
 
-if(paste(R.version$major, R.version$minor, sep=".") < "2.3")
-    ## This will be in R 2.3.0
-canCoerce <- function(object, Class) {
-  ## Purpose:  test if 'object' is coercable to 'Class', i.e.,
-  ##	       as(object, Class) will {typically} work
-  ## ----------------------------------------------------------------------
-  ## Author: John Chambers, Date:  6 Oct 2005
-   is(object, Class) ||
-   !is.null(selectMethod("coerce", c(class(object), Class),
-			 optional = TRUE,
-			 useInherited = c(from = TRUE, to = FALSE)))
-}
 
 ## For *dense* matrices
 isTriMat <- function(object, upper = NA) {
@@ -391,6 +379,17 @@ diagU2N <- function(x)
     new("dtTMatrix", x = xT@x, i = xT@i, j = xT@j, Dim = x@Dim,
 	Dimnames = x@Dimnames, uplo = x@uplo, diag = "N")
 }
+
+.as.dgC.Fun <- function(x, na.rm = FALSE, dims = 1) {
+    x <- as(x, "dgCMatrix")
+    callGeneric()
+}
+
+.as.dgT.Fun <- function(x, na.rm = FALSE, dims = 1) {
+    x <- as(x, "dgTMatrix")
+    callGeneric()
+}
+
 
 ### Fast much simplified version of tapply()
 tapply1 <- function (X, INDEX, FUN = NULL, ..., simplify = TRUE) {
