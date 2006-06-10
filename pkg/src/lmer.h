@@ -34,7 +34,6 @@ SEXP mer_coefGets(SEXP x, SEXP coef, SEXP pType);
 SEXP mer_create(SEXP fl, SEXP Zt, SEXP Xp, SEXP yp, SEXP method,
 		 SEXP nc, SEXP cnames, SEXP useS, SEXP call,
 		 SEXP family);
-SEXP mer_denom_df(SEXP x);
 SEXP mer_dtCMatrix(SEXP x);
 SEXP mer_dtCMatrix_inv(SEXP x);
 SEXP mer_factor(SEXP x);
@@ -42,6 +41,8 @@ SEXP mer_fitted(SEXP x);
 SEXP mer_fixef(SEXP x);
 SEXP mer_gradComp(SEXP x);
 SEXP mer_gradient(SEXP x, SEXP pType);
+SEXP mer_hat_trace(SEXP x);
+SEXP mer_hat_trace2(SEXP x);
 SEXP mer_initial(SEXP x);
 SEXP mer_isNested(SEXP x);
 SEXP mer_postVar(SEXP x);

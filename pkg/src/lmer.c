@@ -232,7 +232,7 @@ static
 double lmm_deviance(SEXP x, double sigma, const double beta[])
 {
     SEXP rXyp = GET_SLOT(x, Matrix_rXySym);
-    int i, j, ione = 1, p = LENGTH(rXyp);
+    int i, ione = 1, p = LENGTH(rXyp);
     double *dcmp = REAL(GET_SLOT(x, Matrix_devCompSym)),
 	*betacp = Memcpy(Calloc(p, double), beta, p),
 	sprss;			/* scaled penalized rss */
@@ -840,7 +840,6 @@ static void
 internal_Omega_update(SEXP Omega, const double b[], double sigma, int nf,
 		  const int nc[], const int Gp[], double *vals, int trans)
 {
-    SEXP chol;
     int i, j, k, info;
     double one = 1, zero = 0;
 
@@ -1628,7 +1627,6 @@ SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp)
     cholmod_factor *L = as_cholmod_factor(GET_SLOT(x, Matrix_LSym));
     int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
 	*nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
-	*status = LOGICAL(GET_SLOT(x, Matrix_statusSym)),
 	REML = !strcmp(CHAR(asChar(GET_SLOT(x, Matrix_methodSym))), "REML"),
 	i, j, n = LENGTH(GET_SLOT(x, Matrix_ySym)),
 	nf = LENGTH(Omega), nsamp = asInteger(nsampp),
@@ -1643,17 +1641,17 @@ SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp)
 	*betahat = REAL(GET_SLOT(x, Matrix_fixefSym)),
 	*bnew = Calloc(q, double), *betanew = Calloc(p, double),
 	*dcmp = REAL(GET_SLOT(x, Matrix_devCompSym)),
-	df = n - (REML ? p : 0), m1[] = {-1,0}, one[] = {1,0};
+	df = n - (REML ? p : 0);
     int nrbase = p + 2 + coef_length(nf, nc); /* rows always included */
     int nrtot = nrbase + (saveb ? q : 0);
-    cholmod_dense *chb, *chbnew = numeric_as_chm_dense(bnew, q);
+    cholmod_dense *chbnew = numeric_as_chm_dense(bnew, q);
 
     if (nsamp <= 0) nsamp = 1;
     ans = PROTECT(allocMatrix(REALSXP, nrtot, nsamp));
     for (i = 0; i < nrtot * nsamp; i++) REAL(ans)[i] = NA_REAL;
     GetRNGstate();
     for (i = 0; i < nsamp; i++) {
-	double *col = REAL(ans) + 1 + i * nrtot, sigma;
+	double *col = REAL(ans) + i * nrtot, sigma;
 				/* simulate and store new value of sigma */
 	sigma = exp(dcmp[3]/2)/sqrt(rchisq(df));
 	col[p] = (trans ? 2 * log(sigma) : sigma * sigma);
@@ -1670,7 +1668,7 @@ SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp)
 	internal_mer_refactor(x);
 	mer_secondary(x);
 
-	col[-1] = lmm_deviance(x, sigma, betanew); /* store deviance */
+	col[nrbase - 1] = lmm_deviance(x, sigma, betanew); /* store deviance */
     }
     PutRNGstate();
     Free(betanew); Free(bnew); Free(chbnew);
@@ -1891,7 +1889,15 @@ SEXP mer_coefGets(SEXP x, SEXP coef, SEXP pType)
     return x;
 }
 
-SEXP mer_denom_df(SEXP x)
+/**
+ * The naive way of calculating the trace of the hat matrix
+ *
+ * @param x pointer to an mer object
+ *
+ * @return trace of the hat matrix
+ */
+
+SEXP mer_hat_trace(SEXP x)
 {
     SEXP Zt = GET_SLOT(x, Matrix_ZtSym);
     cholmod_factor *L = as_cholmod_factor(GET_SLOT(x, Matrix_LSym));
@@ -1926,7 +1932,70 @@ SEXP mer_denom_df(SEXP x)
     for (i = 0; i < n * p; i++) tr += Xcp[i] * Xcp[i];
 
     Free(zrow); Free(Xcp);
-    return ScalarReal(n - tr);
+    return ScalarReal(tr);
+}
+
+/**
+ * Fast calculation of the trace of the hat matrix (due to Jialiang Li)
+ *
+ * @param x pointer to an mer object
+ *
+ * @return trace of the hat matrix
+ */
+
+SEXP mer_hat_trace2(SEXP x)
+{
+    SEXP Omega = GET_SLOT(x, Matrix_OmegaSym),
+	ncp = GET_SLOT(x, Matrix_ncSym);
+    cholmod_factor *L = as_cholmod_factor(GET_SLOT(x, Matrix_LSym));
+    int *nc = INTEGER(ncp), *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	nf = LENGTH(ncp), i, j, k,
+	p = LENGTH(GET_SLOT(x, Matrix_rXySym)),
+	q = LENGTH(GET_SLOT(x, Matrix_rZySym));
+    double
+	*RZXicp = Memcpy(Calloc(q * p, double),
+			 REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXinvSym),
+				       Matrix_xSym)), q * p),
+	one = 1, tr = p + q;
+
+    mer_secondary(x);
+    for (i = 0; i < nf; i++) {
+	int nci = nc[i];
+	int nlev = (Gp[i + 1] - Gp[i])/nci, ntri = (nci * (nci + 1))/2;
+	double *deli = REAL(GET_SLOT(dpoMatrix_chol(VECTOR_ELT(Omega, i)),
+				     Matrix_xSym));
+	cholmod_sparse *sol, 
+	    *rhs = cholmod_allocate_sparse(q, nci, ntri, TRUE, TRUE, 0,
+					   CHOLMOD_REAL, &c);
+	int *rhi = (int *)(rhs->i), *rhp = (int *)(rhs->p);
+	double *rhx = (double *)(rhs->x);
+
+	rhp[0] = 0; /* create the rhs as deli' */
+	for (j = 0; j < nci; j++) {
+	    rhp[j+1] = rhp[j] + nci - j;
+	    for (k = 0; k < nci - j; k++) {
+		rhi[rhp[j] + k] = Gp[i] + k + j;
+		rhx[rhp[j] + k] = deli[(k + j) * nci + j];
+	    }
+	}
+	for (j = 0; j < nlev; j++) {
+				/* next nci rows of Delta RZXinv */
+	    F77_CALL(dtrmm)("L", "U", "N", "N", &nci, &p, &one, deli, &nci,
+			    RZXicp + Gp[i] + j * nci, &q);
+				/* Solve nci columns of L^{-1} Delta' */
+	    sol = cholmod_spsolve(CHOLMOD_L, L, rhs, &c);
+	    for (k = 0; k < ((int*)(sol->p))[nci]; k++) {
+		double sxk = ((double*)(sol->x))[k];
+		tr -= sxk * sxk;
+	    }
+	    cholmod_free_sparse(&sol, &c);
+	    for (k = 0; k < ntri; k++) rhi[k] += nci;
+	}
+	cholmod_free_sparse(&rhs, &c);
+    }
+    for (i = 0; i < q * p; i++) tr -= RZXicp[i] * RZXicp[i];
+    Free(RZXicp);
+    return ScalarReal(tr);
 }
 
 /**
