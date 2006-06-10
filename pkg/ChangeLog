@@ -1,3 +1,7 @@
+2006-06-10  Douglas Bates  <bates@R-project.org>
+
+	* R/lmer.R (simulestimate): added
+
 2006-06-09  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/diagMatrix.R (setAs): define coercion methods to sparse matrix
