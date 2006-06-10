@@ -273,16 +273,6 @@ setMethod("lmer", signature(formula = "formula"),
 	  if (is.null(weights)) weights <- rep.int(1, NROW(Y))
 	  if (is.null(offset)) offset <- numeric(NROW(Y))
 
-	  ## fit a glm model to the fixed formula
-##	     fe$formula <- fixed.form
-##	     fe$subset <- NULL		   # subset has already been created in call to data.frame
-##	     fe$data <- frm
-##	     fe$x <- fe$model <- fe$y <- TRUE
-##	     fe[[1]] <- as.name("glm")
-##	     glmFit <- eval(fe, parent.frame())
-##	     x <- glmFit$x
-##	     y <- as.double(glmFit$y)
-
 	  if(is.character(family))
 	      family <- get(family, mode = "function", envir = parent.frame())
 	  if(is.function(family)) family <- family()
@@ -591,6 +581,54 @@ setMethod("simulate", signature(object = "mer"),
 	  lpred
       })
 
+simulestimate <- function(x, FUN, nsim = 1, seed = NULL, control = list())
+{
+    FUN <- match.fun(FUN)
+    nsim <- as.integer(nsim[1])
+    stopifnot(nsim > 0)
+    if(!exists(".Random.seed", envir = .GlobalEnv))
+        runif(1)		     # initialize the RNG if necessary
+    if(is.null(seed))
+        RNGstate <- .Random.seed
+    else {
+        R.seed <- .Random.seed
+        set.seed(seed)
+        RNGstate <- structure(seed, kind = as.list(RNGkind()))
+        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+    }
+    
+    family <- x@family
+    if (family$family != "gaussian" ||
+        family$link != "identity")
+        stop("simulation of generalized linear mixed models not yet implemented")
+    ## similate the linear predictors
+    lpred <- .Call(mer_simulate, x, nsim)
+    sc <- 1
+    if (x@useScale)
+        sc <- .Call(mer_sigma, x, x@method == "REML")
+    ## add fixed-effects contribution and per-observation noise term
+    lpred <- lpred + drop(x@X %*% fixef(x)) + rnorm(prod(dim(lpred)), sd = sc)
+
+    cv <- do.call(lmerControl, control)
+    Omega <- x@Omega
+    x@wrkres <- x@y <- lpred[,1]
+    .Call(mer_update_ZXy, x)
+    LMEoptimize(x) <- cv
+    template <- FUN(x)
+    if (!is.numeric(template))
+        stop("simulestimate currently only handles functions that return numeric vectors")
+    ans <- matrix(template, nr = nsim, nc = length(template), byrow = TRUE)
+    colnames(ans) <- names(template)
+    for (i in 1:nsim) {
+        x@wrkres <- x@y <- lpred[,i]
+        x@Omega <- Omega
+        .Call(mer_update_ZXy, x)
+        LMEoptimize(x) <- cv
+        foo <- try(FUN(x))
+        ans[i,] <- if (inherits(foo, "try-error")) NA else foo
+    }
+    ans
+}    
 
 formatVC <- function(varc, digits = max(3, getOption("digits") - 2))
 {  ## "format()" the 'VarCorr'	matrix of the random effects -- for show()ing
