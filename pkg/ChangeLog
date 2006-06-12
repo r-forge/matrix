@@ -1,6 +1,12 @@
+2006-06-12  Douglas Bates  <bates@R-project.org>
+
+	* R/lmer.R (mcmcsamp method): Corrected arrangments of names on
+	the output from mcmcsamp.
+
 2006-06-10  Douglas Bates  <bates@R-project.org>
 
-	* R/lmer.R (simulestimate): added
+	* R/lmer.R (simulestimate): added C code for calculating the trace
+	of the hat matrix.
 
 2006-06-09  Martin Maechler  <maechler@stat.math.ethz.ch>
 
