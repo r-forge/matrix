@@ -85,25 +85,6 @@ expandSlash <- function(bb) {
     }))
 }
 
-## Expand an expression with colons to the sum of the lhs
-## and the current expression.
-## FIXME: This function apparently isn't used.
-## colExpand <- function(term)
-## {
-##     if (is.name(term) || !is.language(term)) return(term)
-##     if (length(term) == 2) {
-## 	term[[2]] <- colExpand(term[[2]])
-## 	return(term)
-##     }
-##     stopifnot(length(term) == 3)
-##     if (is.call(term) && term[[1]] == as.name(':')) {
-## 	return(substitute(A+B, list(A = term, B = colExpand(term[[2]]))))
-##     }
-##     term[[2]] <- colExpand(term[[2]])
-##     term[[3]] <- colExpand(term[[3]])
-##     term
-## }
-
 abbrvNms <- function(gnm, cnms)
 {
     ans <- paste(abbreviate(gnm), abbreviate(cnms), sep = '.')
@@ -543,9 +524,17 @@ setMethod("mcmcsamp", signature(object = "mer"),
 	      colnms[ptyp == 2] <-
 		  paste("atanh(", colnms[ptyp == 2], ")", sep = "")
 	  }
-	  if(saveb) ## maybe better colnames, "RE.1","RE.2", ... ?
-	      colnms <- c(colnms, rep.int("", length(object@rZy)))
-	  colnames(ans) <- c(colnms, "deviance")
+	  colnms <- c(colnms, "deviance")
+	  if(saveb) {## maybe better colnames, "RE.1","RE.2", ... ?
+              rZy <- object@rZy
+	      colnms <- c(colnms,
+                          paste("b", sprintf(paste("%0",
+                                                   1+floor(log(length(rZy),10)),
+                                                      "d", sep = ''),
+                                             seq(along = rZy)),
+                                sep = '.'))
+          }
+          colnames(ans) <- colnms
 	  ans
       })
 
