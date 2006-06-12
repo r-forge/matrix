@@ -84,7 +84,7 @@ expandSlash <- function(bb) {
         x
     }))
 }
-    
+
 ## Expand an expression with colons to the sum of the lhs
 ## and the current expression.
 ## FIXME: This function apparently isn't used.
@@ -545,7 +545,7 @@ setMethod("mcmcsamp", signature(object = "mer"),
 	  }
 	  if(saveb) ## maybe better colnames, "RE.1","RE.2", ... ?
 	      colnms <- c(colnms, rep.int("", length(object@rZy)))
-	  colnames(ans) <- c("deviance", colnms)
+	  colnames(ans) <- c(colnms, "deviance")
 	  ans
       })
 
@@ -596,7 +596,7 @@ simulestimate <- function(x, FUN, nsim = 1, seed = NULL, control = list())
         RNGstate <- structure(seed, kind = as.list(RNGkind()))
         on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
     }
-    
+
     family <- x@family
     if (family$family != "gaussian" ||
         family$link != "identity")
@@ -628,7 +628,7 @@ simulestimate <- function(x, FUN, nsim = 1, seed = NULL, control = list())
         ans[i,] <- if (inherits(foo, "try-error")) NA else foo
     }
     ans
-}    
+}
 
 formatVC <- function(varc, digits = max(3, getOption("digits") - 2))
 {  ## "format()" the 'VarCorr'	matrix of the random effects -- for show()ing
