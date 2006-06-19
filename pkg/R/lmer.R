@@ -293,6 +293,9 @@ setMethod("lmer", signature(formula = "formula"),
 				       list(fac = x[[3]])), mf))
 	  ## order factor list by decreasing number of levels
 	  nlev <- sapply(fl, function(x) length(levels(x)))
+	  if(any(nlev == 0))
+	      stop("resulting factor(s) with 0 levels in random effects part:\n ",
+		   names(nlev[nlev == 0]))
 	  if (any(diff(nlev) > 0)) {
 	      ord <- rev(order(nlev))
 	      bars <- bars[ord]
