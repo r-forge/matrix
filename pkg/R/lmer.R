@@ -4,6 +4,9 @@
 ##   to stabilize the variance parameters at the beginning a Laplace
 ##   fit.
 
+## To Do: Determine why the names of the components of the values of
+##   the ranef and coef extractor methods are not printed.
+
 ## Some utilities
 
 ## Return the pairs of expressions separated by vertical bars
@@ -313,8 +316,7 @@ setMethod("lmer", signature(formula = "formula"),
 			   X, Y, method, sapply(Ztl, nrow),
 			   c(lapply(Ztl, rownames), list(.fixed = colnames(X))),
 			   !(family$family %in% c("binomial", "poisson")),
-			   match.call(), family,
-			   PACKAGE = "Matrix")
+			   match.call(), family)
 	      .Call(mer_ECMEsteps, mer, cv$niterEM, cv$EMverbose)
 	      LMEoptimize(mer) <- cv
 	      return(new("lmer", mer,
@@ -487,9 +489,10 @@ setMethod("qqmath", signature(x = "ranef.lmer"),
           })
 
 setMethod("deviance", signature(object = "mer"),
-	  function(object, ...) {
+	  function(object, REML = NULL, ...) {
+              if (is.null(REML)) REML <- object@method == "REML"
 	      .Call(mer_factor, object)
-	      object@deviance[[ifelse(object@method == "REML", "REML", "ML")]]
+	      object@deviance[[ifelse(REML, "REML", "ML")]]
 	  })
 
 setMethod("mcmcsamp", signature(object = "mer"),
