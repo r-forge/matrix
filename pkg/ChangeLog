@@ -4,10 +4,10 @@
 	initialization.  This function is not currently being used and is
 	not fully tested.
 
-	* NAMESPACE, R/{AllClass.R,lmer.R}, src/lmer.c: Introduced the
-	glmer class.  Added code for mcmcmsamp on glmer objects.
-	Modified validity check on pedigree objects to account for
-	nonparallel patterns of missingness of parents.
+	* NAMESPACE, R/{AllClass.R,lmer.R}, src/{init.c,lmer.c}:
+	Introduced the glmer class.  Added code for mcmcmsamp on glmer
+	objects.  Modified validity check on pedigree objects to account
+	for nonparallel patterns of missingness of parents.
 
 2006-06-12  Douglas Bates  <bates@R-project.org>
 
