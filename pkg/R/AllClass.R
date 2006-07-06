@@ -505,7 +505,7 @@ setClass("mer",
 			wrkres = "numeric",# working residuals (copy of y for LMMs)
 			method = "character", # parameter estimation method
 			useScale = "logical", # should scale factor be included
-			family = "family", # glm family
+                        family = "family",
 			call = "call",	   # call to model-fitting function
 			## invariants derived from data structure
 			cnames = "list",   # column names of model matrices
@@ -539,10 +539,17 @@ setClass("mer",
 			)
 	)
 
-## Representation of a linear or generalized linear mixed effects model
+## Representation of linear and generalized linear mixed effects model
 setClass("lmer",
-	 representation(assign = "integer", frame = "data.frame",
+	 representation(frame = "data.frame",
 			terms = "terms"),
+	 contains = "mer")
+
+setClass("glmer",
+	 representation(#family = "family", # glm family - move here later
+                        frame = "data.frame",
+			terms = "terms",
+                        weights = "numeric"),
 	 contains = "mer")
 
 setClass("summary.mer", # the "mer" result ``enhanced'' :
@@ -580,8 +587,8 @@ setClass("pedigree", representation =
 	     if (any(sire[snmiss] >= animal[snmiss]) ||
 		 any(dam[dnmiss] >= animal[dnmiss]))
 		 return("the sire and dam must precede the offspring")
-             if (any(sire[snmiss] < 1 | sire[snmiss] > n |
-                     dam[dnmiss] < 1 | dam[dnmiss] > n))
+             if (any(sire[snmiss] < 1 | sire[snmiss] > n) |
+                 any(dam[dnmiss] < 1 | dam[dnmiss] > n))
                  return(paste("Non-missing sire or dam must be in [1,",
                               n, "]", sep = ''))
 	     TRUE

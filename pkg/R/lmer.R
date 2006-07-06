@@ -359,9 +359,9 @@ setMethod("lmer", signature(formula = "formula"),
 	  if (method == "PQL") {
 	      .Call(glmer_devLaplace, PQLpars, GSpt)
 	      .Call(glmer_finalize, GSpt)
-	      return(new("lmer", mer,
+	      return(new("glmer", mer,
 			 frame = if (model) mf else data.frame(),
-			 terms = mt))
+			 terms = mt, weights = weights))
 	  }
 
 	  fixInd <- seq(ncol(X))
@@ -380,9 +380,10 @@ setMethod("lmer", signature(formula = "formula"),
 		     control = list(trace = cv$msVerbose,
 		     iter.max = cv$msMaxIter))
 	  .Call(glmer_finalize, GSpt)
-	  return(new("lmer", mer,
+	  return(new("glmer", mer,
 		     frame = if (model) mf else data.frame(),
-		     terms = mt))
+		     terms = mt,
+                     weights = weights))
 
       })
 
@@ -495,53 +496,81 @@ setMethod("deviance", signature(object = "mer"),
 	      object@deviance[[ifelse(REML, "REML", "ML")]]
 	  })
 
-setMethod("mcmcsamp", signature(object = "mer"),
+## Mangle the names of the columns of the mcmcsamp result ans
+## This operation is common to the methods for "lmer" and "glmer"
+mcmccompnames <- function(ans, object, saveb, trans, glmer)
+{
+    gnms <- names(object@flist)
+    cnms <- object@cnames
+    ff <- fixef(object)
+    colnms <- c(names(ff), if (glmer) character(0) else "sigma^2",
+                unlist(lapply(seq(along = gnms),
+                              function(i)
+                              abbrvNms(gnms[i],cnms[[i]]))))
+    if (trans) {
+        ## parameter type: 0 => fixed effect, 1 => variance,
+        ##		 2 => covariance
+        ptyp <- c(integer(length(ff)), if (glmer) integer(0) else 1:1,
+                  unlist(lapply(seq(along = gnms),
+                                function(i)
+                            {
+                                k <- length(cnms[[i]])
+                                rep(1:2, c(k, (k*(k-1))/2))
+                            })))
+        colnms[ptyp == 1] <-
+            paste("log(", colnms[ptyp == 1], ")", sep = "")
+        colnms[ptyp == 2] <-
+            paste("atanh(", colnms[ptyp == 2], ")", sep = "")
+    }
+    colnms <- c(colnms, "deviance")
+    if(saveb) {## maybe better colnames, "RE.1","RE.2", ... ?
+        rZy <- object@rZy
+        colnms <- c(colnms,
+                    paste("b", sprintf(paste("%0",
+                                             1+floor(log(length(rZy),10)),
+                                             "d", sep = ''),
+                                       seq(along = rZy)),
+                          sep = '.'))
+    }
+    colnames(ans) <- colnms
+    ans
+}
+                          
+setMethod("mcmcsamp", signature(object = "lmer"),
 	  function(object, n = 1, verbose = FALSE, saveb = FALSE,
 		   trans = TRUE, ...)
       {
-	  family <- object@family
-	  lmm <- family$family == "gaussian" && family$link == "identity"
-	  if (!lmm)
-	      stop("mcmcsamp for GLMMs not yet implemented in supernodal representation")
-	  ans <- t(.Call(mer_MCMCsamp, object, saveb, n,
-			 trans))
+          ans <- t(.Call(mer_MCMCsamp, object, saveb, n, trans))
 	  attr(ans, "mcpar") <- as.integer(c(1, n, 1))
 	  class(ans) <- "mcmc"
-	  glmer <- FALSE
-	  gnms <- names(object@flist)
-	  cnms <- object@cnames
-	  ff <- fixef(object)
-	  colnms <- c(names(ff), if (glmer) character(0) else "sigma^2",
-		      unlist(lapply(seq(along = gnms),
-				    function(i)
-				    abbrvNms(gnms[i],cnms[[i]]))))
-	  if (trans) {
-	      ## parameter type: 0 => fixed effect, 1 => variance,
-	      ##		 2 => covariance
-	      ptyp <- c(integer(length(ff)), if (glmer) integer(0) else 1:1,
-			unlist(lapply(seq(along = gnms),
-				      function(i)
-				  {
-				      k <- length(cnms[[i]])
-				      rep(1:2, c(k, (k*(k-1))/2))
-				  })))
-	      colnms[ptyp == 1] <-
-		  paste("log(", colnms[ptyp == 1], ")", sep = "")
-	      colnms[ptyp == 2] <-
-		  paste("atanh(", colnms[ptyp == 2], ")", sep = "")
-	  }
-	  colnms <- c(colnms, "deviance")
-	  if(saveb) {## maybe better colnames, "RE.1","RE.2", ... ?
-              rZy <- object@rZy
-	      colnms <- c(colnms,
-                          paste("b", sprintf(paste("%0",
-                                                   1+floor(log(length(rZy),10)),
-                                                      "d", sep = ''),
-                                             seq(along = rZy)),
-                                sep = '.'))
-          }
-          colnames(ans) <- colnms
-	  ans
+          mcmccompnames(ans, object, saveb, trans, FALSE)
+      })
+
+setMethod("mcmcsamp", signature(object = "glmer"),
+	  function(object, n = 1, verbose = FALSE, saveb = FALSE,
+		   trans = TRUE, ...)
+      {
+          family <- object@family
+          mer <- as(object, "mer")
+          weights <- object@weights
+          cv <- lmerControl()
+          eta <- .Call(mer_fitted, mer)
+          offset <- numeric(length(eta)) ## change this, save the offset in mer
+          Y <- object@y
+          wtssqr <- weights * weights
+          linkinv <- quote(family$linkinv(eta))
+          mu.eta <- quote(family$mu.eta(eta))
+          mu <- family$linkinv(eta)
+          variance <- quote(family$variance(mu))
+          dev.resids <- quote(family$dev.resids(Y, mu, wtssqr))
+          LMEopt <- get("LMEoptimize<-")
+          doLMEopt <- quote(LMEopt(x = mer, value = cv))
+          GSpt <- .Call(glmer_init, environment())
+          ans <- t(.Call(glmer_MCMCsamp, GSpt, saveb, n, trans))
+          .Call(glmer_finalize, GSpt)
+	  attr(ans, "mcpar") <- as.integer(c(1, n, 1))
+	  class(ans) <- "mcmc"
+          mcmccompnames(ans, object, saveb, trans, TRUE)
       })
 
 setMethod("simulate", signature(object = "mer"),
