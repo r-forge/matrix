@@ -9,6 +9,9 @@
 	objects.  Modified validity check on pedigree objects to account
 	for nonparallel patterns of missingness of parents.
 
+	* man/{lmer-class.Rd,mcmcsamp.Rd}: Update documentation for glmer
+	class.
+	
 2006-06-12  Douglas Bates  <bates@R-project.org>
 
 	* R/lmer.R (mcmcsamp method): Corrected arrangments of names on
