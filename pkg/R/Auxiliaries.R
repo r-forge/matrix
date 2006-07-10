@@ -148,6 +148,8 @@ non0ind <- function(x) {
     ## 0-based indices of non-zero entries  :
     if(is(x, "TsparseMatrix"))
 	return(unique(cbind(x@i,x@j)))
+    if(is(x, "pMatrix"))
+	return(cbind(seq(length=nrow(x)), x@perm) - 1:1)
     ## else:
     isC <- any("i" == slotNames(x))# is Csparse (not Rsparse)
     .Call(compressed_non_0_ij, x, isC)
@@ -340,7 +342,7 @@ isTriC <- function(x, upper = NA) {
     if(d[1] != d[2]) return(FALSE)
     ## else
     if(d[1] == 0) return(TRUE)
-    ni <- 1:d[1]
+    ni <- 1:d[2]
     ## the row indices split according to column:
     ilist <- split(x@i, factor(rep.int(ni, diff(x@p)), levels= ni))
     lil <- unlist(lapply(ilist, length), use.names = FALSE)
@@ -351,16 +353,17 @@ isTriC <- function(x, upper = NA) {
 	ilist <- ilist[pos]
 	ni <- ni[pos]
     }
+    ni0 <- ni - 1:1 # '0-based ni'
     if(is.na(upper)) {
-	if(all(sapply(ilist, max, USE.NAMES = FALSE) <= ni))
+	if(all(sapply(ilist, max, USE.NAMES = FALSE) <= ni0))
 	    structure(TRUE, kind = "U")
-	else if(all(sapply(ilist, min, USE.NAMES = FALSE) >= ni))
+	else if(all(sapply(ilist, min, USE.NAMES = FALSE) >= ni0))
 	    structure(TRUE, kind = "L")
 	else FALSE
     } else if(upper) {
-	all(sapply(ilist, max, USE.NAMES = FALSE) <= ni)
+	all(sapply(ilist, max, USE.NAMES = FALSE) <= ni0)
     } else { ## 'lower'
-	all(sapply(ilist, min, USE.NAMES = FALSE) >= ni)
+	all(sapply(ilist, min, USE.NAMES = FALSE) >= ni0)
     }
 }
 

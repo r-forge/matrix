@@ -96,7 +96,9 @@ setClass("sparseMatrix", representation("VIRTUAL"), contains = "Matrix")
 
 ## sparse matrices in Triplet representation (dgT, lgT, ..):
 setClass("TsparseMatrix", representation(i = "integer", j = "integer", "VIRTUAL"),
-	 contains = "sparseMatrix")
+	 contains = "sparseMatrix",
+	 validity = function(object) .Call(Tsparse_validate, object)
+         )
 
 setClass("CsparseMatrix", representation(i = "integer", p = "integer", "VIRTUAL"),
 	 contains = "sparseMatrix")
