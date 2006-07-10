@@ -14,6 +14,9 @@ dm4 <- Matrix(m4, sparse = FALSE)
 stopifnot(validObject(d4), validObject(z4), validObject(o4),
           validObject(m4), validObject(dm4))
 assert.EQ.mat(dm4, as(m4, "matrix"))
+## large sparse ones: these now directly "go sparse":
+str(m0 <- Matrix(0,     nrow=100, ncol = 1000))
+str(l0 <- Matrix(FALSE, nrow=100, ncol = 200))
 
 ###--  Sparse Triangular :
 

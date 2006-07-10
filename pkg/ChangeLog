@@ -1,3 +1,23 @@
+2006-07-10  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/dgCMatrix.c (dgCMatrix_validate): 'p' slot must have correct length.
+
+	* R/Auxiliaries.R (isTriC): fix buglet (we were 1-based!)
+
+2006-07-08  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/lgCMatrix.c (lgCMatrix_diag): new function
+	* R/lgCMatrix.R (diag): for new method
+
+	* R/AllClass.R (TsparseMatrix): do use Tsparse_validate
+	     ==> construction of illegal "*gTMatrix" via new() should
+	     now be much less easy:
+	* tests/Class+Meth.R: assertError() for some illegal "dgT*"
+
+	* R/Matrix.R (Matrix): Matrix(0, nrow,ncol) now "goes sparse"
+		directly.
+	* man/Matrix.Rd: documents it.
+
 2006-07-06  Douglas Bates  <bates@R-project.org>
 
 	* src/pedigree.c (pedigree_inbreeding): Correction in
@@ -11,7 +31,11 @@
 
 	* man/{lmer-class.Rd,mcmcsamp.Rd}: Update documentation for glmer
 	class.
-	
+
+2006-07-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/pMatrix.R: coercion pMatrix -> Tsparse
+
 2006-06-12  Douglas Bates  <bates@R-project.org>
 
 	* R/lmer.R (mcmcsamp method): Corrected arrangments of names on
@@ -26,6 +50,7 @@
 
 	* R/diagMatrix.R (setAs): define coercion methods to sparse matrix
 	classes.
+	* R/sparseMatrix.R etc: multiplication of diagonal and sparse
 
 2006-06-08  Martin Maechler  <maechler@stat.math.ethz.ch>
 
