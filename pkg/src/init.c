@@ -163,7 +163,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dtrMatrix_rcond", (DL_FUNC) &dtrMatrix_rcond, 2},
     {"dtrMatrix_solve", (DL_FUNC) &dtrMatrix_solve, 1},
     {"dtrMatrix_validate", (DL_FUNC) &dtrMatrix_validate, 1},
-    {"glmer_MCMCsamp", (DL_FUNC) &glmer_MCMCsamp, 4}, 
+    {"glmer_MCMCsamp", (DL_FUNC) &glmer_MCMCsamp, 4},
     {"glmer_PQL", (DL_FUNC) &glmer_PQL, 1},
 /*     {"glmer_devAGQ", (DL_FUNC) &glmer_devAGQ, 3}, */
     {"glmer_devLaplace", (DL_FUNC) &glmer_devLaplace, 2},
@@ -178,6 +178,7 @@ static R_CallMethodDef CallEntries[] = {
     {"lCholCMatrix_validate", (DL_FUNC) &lCholCMatrix_validate, 1},
     {"lcsc_to_matrix", (DL_FUNC) &lcsc_to_matrix, 1},
     {"lgCMatrix_crossprod", (DL_FUNC) &lgCMatrix_crossprod, 3},
+    {"lgCMatrix_diag", (DL_FUNC) &lgCMatrix_diag, 1},
     {"lgCMatrix_lgCMatrix_mm", (DL_FUNC) &lgCMatrix_lgCMatrix_mm, 2},
     {"lgCMatrix_picky_column", (DL_FUNC) &lgCMatrix_picky_column, 1},
     {"lgCMatrix_trans", (DL_FUNC) &lgCMatrix_trans, 1},
