@@ -1,3 +1,9 @@
+2006-07-11  Douglas Bates  <Douglas.Bates@R-project.org>
+
+	* src/dsTMatrix.c (dsTMatrix_as_dgTMatrix): Fix a case of INTEGER
+	being applied to the x slot (detected by Brian Ripley).  Possible
+	problem with copying the diagonal elements twice?
+
 2006-07-10  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/dgCMatrix.c (dgCMatrix_validate): 'p' slot must have correct length.
