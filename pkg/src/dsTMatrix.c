@@ -71,20 +71,24 @@ SEXP dsTMatrix_as_dgTMatrix(SEXP x)
     int i, nnz = length(xiP);
     int *vi = INTEGER(ALLOC_SLOT(val, Matrix_iSym, INTSXP, 2 * nnz)),
 	*vj = INTEGER(ALLOC_SLOT(val, Matrix_jSym, INTSXP, 2 * nnz)),
-	*vx = INTEGER(ALLOC_SLOT(val, Matrix_xSym,REALSXP, 2 * nnz));
+	*xi = INTEGER(GET_SLOT(x, Matrix_iSym)),
+	*xj = INTEGER(GET_SLOT(x, Matrix_jSym));
+    double *vx = REAL(ALLOC_SLOT(val, Matrix_xSym,REALSXP, 2 * nnz)),
+	*xx = REAL(GET_SLOT(x, Matrix_xSym));
 
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
 
     if(*CHAR(STRING_ELT(uplo, 0)) == 'U') { /* x stored in upper triangle */
 
-	Memcpy(&vi[nnz], INTEGER(GET_SLOT(x, Matrix_iSym)), nnz);
-	Memcpy(&vj[nnz], INTEGER(GET_SLOT(x, Matrix_jSym)), nnz);
-	Memcpy(&vx[nnz],    REAL(GET_SLOT(x, Matrix_xSym)), nnz);
+	Memcpy(&vi[nnz], xi, nnz);
+	Memcpy(&vj[nnz], xj, nnz);
+	Memcpy(&vx[nnz], xx, nnz);
 
 	for(i = 0; i < nnz; i++) { /* copy the other triangle */
-	    vi[i] = INTEGER(GET_SLOT(x, Matrix_jSym))[i];
-	    vj[i] = INTEGER(GET_SLOT(x, Matrix_iSym))[i];
-	    vx[i] = INTEGER(GET_SLOT(x, Matrix_xSym))[i];
+/* FIXME?: Shouldn't this loop skip the diagonal elements? */
+	    vi[i] = xj[i];
+	    vj[i] = xi[i];
+	    vx[i] = xx[i];
 	}
 
     }
