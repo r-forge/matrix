@@ -146,13 +146,23 @@ non0ind <- function(x) {
     stopifnot(is(x, "sparseMatrix"))
     ## return a 2-column (i,j) matrix of
     ## 0-based indices of non-zero entries  :
-    if(is(x, "TsparseMatrix"))
-	return(unique(cbind(x@i,x@j)))
-    if(is(x, "pMatrix"))
-	return(cbind(seq(length=nrow(x)), x@perm) - 1:1)
-    ## else:
-    isC <- any("i" == slotNames(x))# is Csparse (not Rsparse)
-    .Call(compressed_non_0_ij, x, isC)
+    non0.i <- function(M) {
+	if(is(M, "TsparseMatrix"))
+	    return(unique(cbind(M@i,M@j)))
+	if(is(M, "pMatrix"))
+	    return(cbind(seq(length=nrow(M)), M@perm) - 1:1)
+	## else:
+	isC <- any("i" == slotNames(M)) # is Csparse (not Rsparse)
+	.Call(compressed_non_0_ij, M, isC)
+    }
+
+    if(is(x, "symmetricMatrix")) { # also get "other" triangle
+	ij <- non0.i(x)
+	notdiag <- ij[,1] != ij[,2]# but not the diagonals again
+	rbind(ij, ij[notdiag, 2:1])
+    }
+    else
+	non0.i(x)
 }
 
 ## nr= nrow: since  i in {0,1,.., nrow-1}  these are 1:1 "decimal" encodings:
