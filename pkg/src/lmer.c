@@ -2090,6 +2090,9 @@ SEXP mer_factor(SEXP x)
 	if ((info = internal_mer_Xfactor(x))) { /* unable to factor downdated XtX */
 	    error(_("Leading minor of order %d in downdated X'X is not positive definite"),
 		  info);
+/* FIXME: Why are values being assigned after a call to error? I think
+ * this is vestigial.  At one point a warning was given but it got
+ * changed to an error. */
 	    dcmp[3] = dcmp[6] = dev[0] = dev[1] = NA_REAL;
 	} else {
 	    for (dcmp[6] = 0, i = 0; i < p; i++) /* 2 * logDet(RXX) */
