@@ -705,7 +705,7 @@ setMethod("show", "mer",
 	      if (!is.null(so@call$formula))
 		  cat("Formula:", deparse(so@call$formula),"\n")
 	      if (!is.null(so@call$data))
-		  cat("	  Data:", deparse(so@call$data), "\n")
+		  cat("Data:", deparse(so@call$data), "\n")
 	      if (!is.null(so@call$subset))
 		  cat(" Subset:",
 		      deparse(asOneSidedFormula(so@call$subset)[[2]]),"\n")
