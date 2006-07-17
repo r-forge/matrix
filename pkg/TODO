@@ -3,7 +3,7 @@ Modify the one-argument form of the anova method for lmer objects (yet
   again) to calculate the F ratios.  It is the df, not the ratio that
   is controversial.
 Should there be an extractor function for the mean square error?  If
-so,
+  so, what should it be called?
 -----
 Check for DimNames propagation in coercion and other operations.
 -----
