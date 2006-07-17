@@ -1,6 +1,7 @@
 #include "Mutils.h"
 #include "HBMM.h"
 #include "chm_common.h"
+#include "CHMfactor.h"
 #include "Csparse.h"
 #include "Tsparse.h"
 #include "dense.h"
@@ -33,6 +34,7 @@
 static R_CallMethodDef CallEntries[] = {
     {"BunchKaufman_validate", (DL_FUNC) &BunchKaufman_validate, 1},
     {"pBunchKaufman_validate", (DL_FUNC) &pBunchKaufman_validate, 1},
+    {"CHMfactor_to_sparse", (DL_FUNC) &CHMfactor_to_sparse, 1},
     {"Cholesky_validate", (DL_FUNC) &Cholesky_validate, 1},
     {"Csparse_Csparse_prod", (DL_FUNC) &Csparse_Csparse_prod, 2},
     {"Csparse_band", (DL_FUNC) &Csparse_band, 3},
