@@ -7,6 +7,10 @@
 ## To Do: Determine why the names of the components of the values of
 ##   the ranef and coef extractor methods are not printed.
 
+## To Do: Change the output format for lmer objects to always print
+##   the values of the log-likelihood and the
+##   restricted-log-likelihood.  Base AIC and BIC on the log-likelihood.
+
 ## Some utilities
 
 ## Return the pairs of expressions separated by vertical bars
