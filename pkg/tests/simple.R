@@ -111,7 +111,14 @@ tm[cbind(c(1,1,2,7,8),
 (tM <- Matrix(tm))                ## dtC
 (mM <- Matrix(m <- (tm + t(tm)))) ## dsC
 mT <- as(mM, "dsTMatrix")
+gC <- as(as(mT, "dgTMatrix"), "dgCMatrix")
+## Check that 'mT' and gC print properly :
+pr.mT <- capture.output(mT)
+nn <- unlist(strsplit(gsub(" +\\.", "", sub("^....", "", pr.mT[-(1:2)])), " "))
+stopifnot(as.numeric(nn[nn != ""]) == m[m != 0],
+          capture.output(gC)[-1] == pr.mT[-1])
 assert.EQ.mat(tM, tm, tol=0)
+assert.EQ.mat(gC, m,  tol=0)
 assert.EQ.mat(mT, m,  tol=0)
 stopifnot(is(mM, "dsCMatrix"), is(tM, "dtCMatrix"),
           ## coercions  general <-> symmetric

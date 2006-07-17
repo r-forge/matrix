@@ -1,8 +1,18 @@
+2006-07-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/simple.R: add check for correct dsT -> dgT coercion;
+		add check for correct printing of symmetric sparse matrices.
+
+	* R/Auxiliaries.R (non0ind): return *all* non-0 entry indices also
+	for sparse symmetric matrices.
+
+	* src/dsTMatrix.c (dsTMatrix_as_dgTMatrix): do not copy the
+	diagonal twice.
+
 2006-07-11  Douglas Bates  <Douglas.Bates@R-project.org>
 
 	* src/dsTMatrix.c (dsTMatrix_as_dgTMatrix): Fix a case of INTEGER
-	being applied to the x slot (detected by Brian Ripley).  Possible
-	problem with copying the diagonal elements twice?
+	being applied to the x slot (detected by Brian Ripley).
 
 2006-07-10  Martin Maechler  <maechler@stat.math.ethz.ch>
 
@@ -43,6 +53,8 @@
 	* R/pMatrix.R: coercion pMatrix -> Tsparse
 
 2006-06-12  Douglas Bates  <bates@R-project.org>
+
+	* DESCRIPTION (Version): 0.995-11 released to CRAN
 
 	* R/lmer.R (mcmcsamp method): Corrected arrangments of names on
 	the output from mcmcsamp.
