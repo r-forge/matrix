@@ -11,6 +11,20 @@
 setMethod("as.matrix", signature(x = "Matrix"), function(x) as(x, "matrix"))
 ## for 'Matrix' objects, as.array() should be equivalent:
 setMethod("as.array",  signature(x = "Matrix"), function(x) as(x, "matrix"))
+## head and tail apply to all Matrix objects for which subscripting is allowed
+setMethod("head", signature(x = "Matrix"),
+          function(x, n = 6, ...)
+          x[seq(len = min(n, nrow(x))), , drop = FALSE])
+setMethod("tail", signature(x = "Matrix"),
+          function (x, n = 6, addrownums = TRUE, ...) 
+      {
+          nrx <- nrow(x)
+          sel <- seq(to = nrx, length = min(n, nrx))
+          ans <- x[sel, , drop = FALSE]
+          if (addrownums && is.null(rownames(x))) 
+              rownames(ans) <- paste("[", sel, ",]", sep = "")
+          ans
+      })
 
 ## slow "fall back" method {subclasses should have faster ones}:
 setMethod("as.vector", signature(x = "Matrix", mode = "missing"),
