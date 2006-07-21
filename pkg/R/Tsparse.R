@@ -31,7 +31,7 @@ setAs("TsparseMatrix", "CsparseMatrix",
 		stop("you cannot mix negative and positive indices")
 	    i0 <- (0:(di[margin]-1:1))[i]
 	} else {
-	    if(max(i) > di[margin])
+	    if(length(i) && max(i) > di[margin])
 		stop("indexing out of range 0:",di[margin])
 	    if(any(z <- i == 0)) i <- i[!z]
 	    i0 <- i - 1:1 # transform to 0-indexing
@@ -72,7 +72,7 @@ setAs("TsparseMatrix", "CsparseMatrix",
 		stop("you cannot mix negative and positive indices")
 	    i0 <- (1:di[margin])[i]
 	} else	{
-	    if(max(i) > di[margin])
+	    if(length(i) && max(i) > di[margin])
 		stop("indexing out of range 0:",di[margin])
 	    if(any(z <- i == 0)) i <- i[!z]
 	    i0 <- i

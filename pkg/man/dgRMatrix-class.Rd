@@ -3,6 +3,7 @@
 \alias{dgRMatrix-class}
 \alias{coerce,matrix,dgRMatrix-method}
 \alias{coerce,dgRMatrix,dgTMatrix-method}
+\alias{coerce,dgRMatrix,dgCMatrix-method}
 \alias{coerce,dgRMatrix,matrix-method}
 \alias{coerce,dgRMatrix,dgeMatrix-method}
 \alias{diag,dgRMatrix-method}

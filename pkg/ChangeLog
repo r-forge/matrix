@@ -1,3 +1,37 @@
+2006-07-20  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R("["): disable ("Matrix", i = "logical", j = "missing"),
+		since that wrongly triggers also for M[ logi , ]
+
+	* R/denseMatrix.R: "[" methods now also work e.g. when indexing
+	a symmetric matrix that results in a non-symmetric one.
+	* R/Auxiliaries.R (as_geClass): new function used in "[" above.
+
+	* R/dMatrix.R: make round(M) work as round(M, 0)
+
+	* R/dgTMatrix.R (image): coordinate system and axis now use
+	1-based indices, not 0-based ones.
+
+	* R/Tsparse.R (.ind.prep for "["): get rid of max(<empty>) warning.
+	* tests/indexing.R: test it.
+
+	* NAMESPACE: export isSymmetric(); has been a generic in "base"	for a while;
+	* man/isSymmetric-methods.Rd: and document it.
+
+	* R/SparseM-conv.R: added coercion methods for some 'SparseM' matrices.
+	* man/SparseM-conv.Rd: docu them
+
+	* tests/other-pkgs.R: renamed from tests/graph.R and add example
+		for 'SparseM' conversions
+
+2006-07-17  Douglas Bates  <Douglas.Bates@R-project.org>
+
+	* R/Matrix.R (head): added head() and tail() methods.
+
+2006-07-17  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.995-12 released to CRAN
+
 2006-07-15  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* tests/simple.R: add check for correct dsT -> dgT coercion;

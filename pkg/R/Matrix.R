@@ -16,12 +16,12 @@ setMethod("head", signature(x = "Matrix"),
           function(x, n = 6, ...)
           x[seq(len = min(n, nrow(x))), , drop = FALSE])
 setMethod("tail", signature(x = "Matrix"),
-          function (x, n = 6, addrownums = TRUE, ...) 
+          function (x, n = 6, addrownums = TRUE, ...)
       {
           nrx <- nrow(x)
           sel <- seq(to = nrx, length = min(n, nrx))
           ans <- x[sel, , drop = FALSE]
-          if (addrownums && is.null(rownames(x))) 
+          if (addrownums && is.null(rownames(x)))
               rownames(ans) <- paste("[", sel, ",]", sep = "")
           ans
       })
@@ -281,12 +281,19 @@ setMethod("[", signature(x = "Matrix", i = "lMatrix", j = "missing",
 			 drop = "ANY"),
 	  function (x, i, j, drop) {
 	      as(x, geClass(x))@x[as.vector(i)]
-                                        # -> error when lengths don't match
+              ## -> error when lengths don't match
           })
 
+## FIXME: The following is good for    M [ <logical>   ]
+##        *BUT* it also triggers for   M [ <logical> , ] where it is *WRONG*
+##       using nargs() does not help: it gives '3' for both cases
+if(FALSE)
 setMethod("[", signature(x = "Matrix", i = "logical", j = "missing",
 			 drop = "ANY"),
-	  function (x, i, j, drop) as(x, geClass(x))@x[i])
+	  function (x, i, j, drop) {
+	      ## DEBUG
+	      cat("[(Matrix,i,..): nargs=", nargs(),"\n")
+	      as(x, geClass(x))@x[i] })
 
 
 ## "FIXME:"

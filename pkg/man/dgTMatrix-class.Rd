@@ -24,7 +24,8 @@
 \description{The \code{"dgTMatrix"} class is the class of sparse
   matrices stored as (possibly redundant) triplets.}
 \section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("dgTMatrix", ...)}.
+  Objects can be created by calls of the form \code{new("dgTMatrix",
+    ...)}, but more typically via \code{as(*, "dgTMatrix")}.
 }
 \section{Slots}{
   \describe{

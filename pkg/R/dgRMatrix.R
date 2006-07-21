@@ -5,6 +5,9 @@
 setAs("dgRMatrix", "dgTMatrix",
       function(from) .Call(compressed_to_dgTMatrix, from, FALSE))
 
+### FIXME: Activate the following with "little" change in ../src/dgCMatrix.c
+### -----  similar to compressed_to_dgTMatrix above       ~~~~~~~~~~~~~~~~~~
+
 ##setAs("dgRMatrix", "matrix",
 ##      function(from) .Call(csc_to_matrix, from))
 
@@ -19,6 +22,9 @@ setAs("dgRMatrix", "dgTMatrix",
 
 ##setMethod("diag", signature(x = "dgRMatrix"),
 ##          function(x = 1, nrow, ncol = n) .Call(csc_getDiag, x))
+
+setAs("dgRMatrix", "dgCMatrix",
+      function(from) as(as(from, "dgTMatrix"), "dgCMatrix"))
 
 ## try to define for "Matrix" -- once and for all -- but that fails -- why? __ FIXME __
 ## setMethod("dim", signature(x = "dgRMatrix"),

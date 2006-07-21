@@ -22,11 +22,15 @@
 \section{Slots}{
   \describe{
     \item{\code{i}:}{Object of class \code{"integer"} of length nnzero
-      (number of non-zero elements).  These are the row numbers for
-      each non-zero element in the matrix.}
-    \item{\code{p}:}{Object of class \code{"integer"} of pointers, one
+      (number of non-zero elements).  These are the \emph{0-based} row numbers for
+      each non-zero element in the matrix, i.e., \code{i} must be in
+      \code{0:(nrow(.)-1)}}.
+    \item{\code{p}:}{Object of class \code{"integer"} for providing pointers, one
       for each column, to the initial (zero-based) index of elements in
-      the column.}
+      the column.  \code{.@p} is of length \code{ncol(.) + 1}, with
+      \code{p[1] == 0} and \code{p[length(p)] == nnzero}, such that in
+      fact, \code{diff(.@p + 1)} are the number of non-zero elements for
+      each column.}
     \item{\code{factors}, \code{Dim}, \code{Dimnames}:}{inherited from
       the superclass, see the \code{\linkS4class{sparseMatrix}} class.}
   }

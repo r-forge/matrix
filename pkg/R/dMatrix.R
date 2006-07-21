@@ -68,6 +68,11 @@ setMethod("Math2",
               x
           })
 
+## round(x) == round(x, 0)  etc
+setMethod("Math2",
+	  signature(x = "dMatrix", digits = "missing"),
+	  function(x, digits) callGeneric(x, digits = 0))
+
 ## This needs extra work in ./AllGeneric.R :
 setMethod("Summary", signature(x = "dMatrix", na.rm = "ANY"),
           function(x, ..., na.rm) callGeneric(x@x, ..., na.rm = na.rm))
@@ -82,7 +87,7 @@ setMethod("Compare", signature(e1 = "numeric", e2 = "dMatrix"),
 
 setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
 	  function(e1, e2) {
-              lClass <- dClass2(class(e1), "l")
+              lClass <- class2(class(e1), "l")
               fullCl <- if(isSymmetric(e1)) "lsyMatrix" else "lgeMatrix"
 	      ## Dbg cat("Compare", class(e1), "|-> ",lClass, "\n")
 	      r  <- callGeneric(e1@x, e2)
@@ -125,7 +130,7 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
 setMethod("Compare", signature(e1 = "dMatrix", e2 = "dMatrix"),
           function(e1, e2) {
               d <- dimCheck(e1,e2)
-              lClass <- dClass2(class(e1), "l")
+              lClass <- class2(class(e1), "l")
 
               ## FIXME: if (the 'x' are slots compatible)
 	      r <- callGeneric(e1@x, e2@x)

@@ -19,6 +19,8 @@
 \alias{crossprod,Matrix,ANY-method}
 \alias{crossprod,numeric,Matrix-method}
 \alias{diag,Matrix-method}
+\alias{head,Matrix-method}
+\alias{tail,Matrix-method}
 \alias{solve,Matrix,numeric-method}
 \alias{dim,Matrix-method}
 \alias{dimnames,Matrix-method}
@@ -66,6 +68,10 @@
       \code{\link{dimnames<-}}.}
     \item{show}{\code{signature(object = "Matrix")}: \code{\link{show}}
       method for \code{\link{print}}ing.}
+    \item{head}{\code{signature(object = "Matrix")}: return only the
+      \emph{\dQuote{head}}, i.e., the first few rows.}
+    \item{tail}{\code{signature(object = "Matrix")}: return only the
+      \emph{\dQuote{tail}}, i.e., the last few rows of the respective matrix.}
     \cr %------------------------------------
     \item{as.matrix, as.array}{\code{signature(x = "Matrix")}: the same as
       \code{as(x, "matrix")}; see also the note below.}
