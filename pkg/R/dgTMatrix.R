@@ -167,8 +167,8 @@ setMethod("tcrossprod", signature(x = "dgTMatrix", y = "missing"),
 
 setMethod("image", "dgTMatrix",
           function(x,
-                   xlim = c(-0.5, matdim[2]-0.5),
-                   ylim = c(matdim[1]-0.5, -0.5),
+		   xlim = .5 + c(0, matdim[2]),
+		   ylim = .5 + c(matdim[1], 0),
                    sub = sprintf("Dimensions: %d x %d", matdim[1], matdim[2]),
                    xlab = "Column", ylab = "Row",
                    cuts = 20,
@@ -176,7 +176,7 @@ setMethod("image", "dgTMatrix",
                    ...)
       {
           matdim <- x@Dim
-          levelplot(abs(x@x) ~ x@j * x@i,
+          levelplot(abs(x@x) ~ (x@j + 1:1) * (x@i + 1:1),
                     sub = sub,
                     xlab = xlab, ylab = ylab,
                     xlim = xlim, ylim = ylim,
@@ -188,16 +188,15 @@ setMethod("image", "dgTMatrix",
                     y <- as.numeric(y[subscripts])
 
                     numcol <- length(at) - 1
-                    numcol.r <- length(col.regions)
-                    col.regions <-
-                        if (numcol.r <= numcol)
-                            rep(col.regions, length = numcol)
-                        else col.regions[floor(1+(1:numcol-1)*(numcol.r-1)/
-                                               (numcol-1))]
-                    zcol <- rep(NA, length(z)) #numeric(length(z))
+                    num.r <- length(col.regions)
+		    col.regions <-
+			if (num.r <= numcol)
+			    rep(col.regions, length = numcol)
+			else col.regions[1+ ((1:numcol-1)*(num.r-1)) %/% (numcol-1)]
+                    zcol <- rep.int(NA, length(z)) #numeric(length(z))
                     for (i in seq(along = col.regions))
                         zcol[!is.na(x) & !is.na(y) & !is.na(z) &
-                             z>=at[i] & z<at[i+1]] <- i
+                             at[i] <= z & z < at[i+1]] <- i
 
                     zcol <- as.numeric(zcol[subscripts])
                     if (any(subscripts))

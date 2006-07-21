@@ -287,19 +287,41 @@ l2d_meth <- function(x) {
     as(callGeneric(as(x, sub("^l", "d", cl))), cl)
 }
 
-dClass2 <- function(dClass, kind = "l") {
-    ## Find "corresponding" class for a dMatrix;
-    #  since pos.def. matrices have no pendant:
-    if(dClass == "dpoMatrix") paste(kind,"syMatrix", sep='')
-    else if(dClass == "dppMatrix") paste(kind,"spMatrix", sep='')
-    else sub("^d", kind, dClass)
+class2 <- function(cl, kind = "l", do.sub = TRUE) {
+    ## Find "corresponding" class; since pos.def. matrices have no pendant:
+    if	   (cl == "dpoMatrix") paste(kind, "syMatrix", sep='')
+    else if(cl == "dppMatrix") paste(kind, "spMatrix", sep='')
+    else if(do.sub) sub("^d", kind, cl)
+    else cl
 }
 
 geClass <- function(x) {
     if(is(x, "dMatrix")) "dgeMatrix"
     else if(is(x, "lMatrix")) "lgeMatrix"
-    else stop("general Matrix class not yet implemented for",
+    else stop("general Matrix class not yet implemented for ",
 	      class(x))
+}
+## Used, e.g. after subsetting: Try to use specific class -- if feasible :
+as_geClass <- function(x, cl) {
+    clx <- class(x)
+    kind <-
+	if(is.matrix(x)) { # 'old style matrix'
+	    if(is.numeric(x)) "d" else if(is.logical(x)) "l"
+	    else stop("general Matrix class not implemented for matrix w/ typeof ",
+		      typeof(x))
+	}
+	else if(extends(clx, "dMatrix")) "d"
+	else if(extends(clx, "lMatrix")) "l"
+	else
+	    stop("general Matrix class not yet implemented for ", clx)
+
+    clDia <- extends(cl, "diagonalMatrix")
+    clSym <- extends(cl, "symmetricMatrix")
+    clTri <- extends(cl, "triangularMatrix")
+    if	   (clDia && .is.diagonal(x)) as(x, cl)
+    else if(clSym &&  isSymmetric(x)) as(x, class2(cl, kind, do.sub= kind != "d"))
+    else if(clTri && isTriangular(x)) as(x, cl)
+    else as(x, paste(kind, "geMatrix", sep=''))
 }
 
 ## -> ./ddenseMatrix.R :

@@ -14,6 +14,7 @@
 \alias{Arith,numeric,dMatrix-method}
 \alias{Math,dMatrix-method}
 \alias{Math2,dMatrix,numeric-method}% Math2 = round + signif, but
+\alias{Math2,dMatrix,missing-method}
 \alias{Summary,dMatrix-method}
 \alias{Compare,dMatrix,dMatrix-method}
 \alias{Compare,dMatrix,numeric-method}
