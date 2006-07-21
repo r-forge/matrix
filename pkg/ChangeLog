@@ -1,3 +1,12 @@
+2006-07-21  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/lmer.c (mer_MCMCsamp, glmer_MCMCsamp): new 'verbose'
+	argument; in glmer_*(): print only if(verbose).
+
+	speed-optimize a few places by moving REAL(.) out of loops.
+
+	* src/lmer.h, src/init.h, R/lmer.R:  related to above.
+
 2006-07-20  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Matrix.R("["): disable ("Matrix", i = "logical", j = "missing"),
