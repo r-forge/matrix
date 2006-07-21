@@ -146,7 +146,7 @@ internal_mer_refactor(SEXP x)
 	SEXP omgi = VECTOR_ELT(Omega, i);
 	int nci = nc[i];
 	double *choli;
-	
+
 /* NOTE: This operation depends on dpoMatrix_chol returning the
    Cholesky component of the factor slot, not a duplicate of it */
 	choli = REAL(GET_SLOT(dpoMatrix_chol(omgi), Matrix_xSym));
@@ -161,7 +161,7 @@ internal_mer_refactor(SEXP x)
     flag_not_factored(x);
     mer_factor(x);
 }
-    
+
 static void
 internal_mer_bVar(SEXP x)
 {
@@ -228,19 +228,20 @@ b_quadratic(const double b[], SEXP Omega, const int Gp[], const int nc[])
 static
 double lmm_deviance(SEXP x, double sigma, const double beta[])
 {
-    SEXP rXyp = GET_SLOT(x, Matrix_rXySym);
-    int i, ione = 1, p = LENGTH(rXyp);
+    SEXP rXy = GET_SLOT(x, Matrix_rXySym);
+    int i, ione = 1, p = LENGTH(rXy);
     double *dcmp = REAL(GET_SLOT(x, Matrix_devCompSym)),
 	*betacp = Memcpy(Calloc(p, double), beta, p),
-	sprss;			/* scaled penalized rss */
-    
+	*rXyp = REAL(rXy),
+	sprss; /* scaled penalized rss */
+
     mer_factor(x);
-    F77_CALL(dtrmv)("U", "N", "N", &p, 
+    F77_CALL(dtrmv)("U", "N", "N", &p,
 		    REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym)),
 		    &p, betacp, &ione);
     sprss = exp(dcmp[3])/(sigma * sigma);
     for (i = 0; i < p; i++) {
-	double ri = (REAL(rXyp)[i] - betacp[i])/sigma;
+	double ri = (rXyp[i] - betacp[i])/sigma;
 	sprss += ri * ri;
     }
     Free(betacp);
@@ -420,7 +421,7 @@ static int
 internal_mer_isNested(int nf, const int nc[], const int Gp[], const int p[])
 {
     int **cnz = Calloc(nf, int*), ans = 1, i, j, k, nct;
-    
+
     for (i = 0, nct = 0; i < nf; i++) { /* total number of columns */
 	nct += nc[i];
 	cnz[i] = Calloc(nc[i], int);
@@ -898,7 +899,7 @@ internal_Omega_update(SEXP Omega, const double b[], double sigma, int nf,
  * @param p dimension of fixed effects vector
  * @param q dimension of random effects vector
  * @param sigma current value of sigma
- * @param L lower Cholesky factor of random-effects part of system matrix 
+ * @param L lower Cholesky factor of random-effects part of system matrix
  * @param RZX rectangular part of Cholesky factor of system matrix
  * @param RXX fixed-effectgs part of Cholesky factor of system matrix
  * @param betahat conditional mle of fixed effects
@@ -971,7 +972,7 @@ internal_Gaussian_deviance(int p, int q, cholmod_factor *L,
     Free(chb); Free(bb); Free(betab);
     return ans;
 }
-    
+
 
 /**
  * Evaluate new weights and working residuals.
@@ -992,9 +993,9 @@ internal_glmer_reweight(GlmerStruct GS) {
 				  REALSXP, GS->n));
     var = PROTECT(eval_check(GS->var, GS->rho,
 			     REALSXP, GS->n));
+    /* FIXME: speedup doing REAL(.) outside of loop :*/
     for (i = 0; i < GS->n; i++) {
-	w[i] = GS->wts[i] *
-	    REAL(dmu_deta)[i]/sqrt(REAL(var)[i]);
+	w[i] = GS->wts[i] * REAL(dmu_deta)[i]/sqrt(REAL(var)[i]);
 	z[i] = REAL(GS->eta)[i] - GS->offset[i] +
 	    (y[i] - REAL(GS->mu)[i])/REAL(dmu_deta)[i];
     }
@@ -1112,22 +1113,22 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
     SEXP fixef = GET_SLOT(GS->mer, Matrix_fixefSym);
     cholmod_factor *L = as_cholmod_factor(GET_SLOT(GS->mer, Matrix_LSym));
     int i;
-    double crit = GS->tol + 1;
+    double crit = GS->tol + 1, *etap = REAL(GS->eta);
 
     if (varc)	  /* skip this step if varc == (double*) NULL */
 	internal_mer_coefGets(GS->mer, varc, 2);
     Memcpy(REAL(fixef), fixed, LENGTH(fixef));
     internal_mer_Zfactor(GS->mer, L);
     internal_mer_ranef(GS->mer);
-    internal_mer_fitted(GS->mer, GS->offset, REAL(GS->eta));
-    Memcpy(GS->etaold, REAL(GS->eta), GS->n);
+    internal_mer_fitted(GS->mer, GS->offset, etap);
+    Memcpy(GS->etaold, etap, GS->n);
 
     for (i = 0; i < GS->maxiter && crit > GS->tol; i++) {
 	internal_glmer_reweight(GS);
 	internal_mer_Zfactor(GS->mer, L);
 	internal_mer_ranef(GS->mer);
-	internal_mer_fitted(GS->mer, GS->offset, REAL(GS->eta));
-	crit = conv_crit(GS->etaold, REAL(GS->eta), GS->n);
+	internal_mer_fitted(GS->mer, GS->offset, etap);
+	crit = conv_crit(GS->etaold, etap, GS->n);
     }
     internal_mer_Xfactor(GS->mer);
     Free(L);
@@ -1316,7 +1317,7 @@ Matrix_rWishart(SEXP ns, SEXP dfp, SEXP scal)
     SEXP ans;
     int *dims = INTEGER(getAttrib(scal, R_DimSymbol)), j,
 	n = asInteger(ns), psqr;
-    double *scCp, *tmp, df = asReal(dfp), one = 1, zero = 0;
+    double *scCp, *ansp, *tmp, df = asReal(dfp), one = 1, zero = 0;
 
     if (!isMatrix(scal) || !isReal(scal) || dims[0] != dims[1])
 	error("scal must be a square, real matrix");
@@ -1329,10 +1330,10 @@ Matrix_rWishart(SEXP ns, SEXP dfp, SEXP scal)
     if (j)
 	error("scal matrix is not positive-definite");
     PROTECT(ans = alloc3Darray(REALSXP, dims[0], dims[0], n));
-
+    ansp = REAL(ans);
     GetRNGstate();
     for (j = 0; j < n; j++) {
-	double *ansj = REAL(ans) + j * psqr;
+	double *ansj = ansp + j * psqr;
 	std_rWishart_factor(df, dims[0], tmp);
 	F77_CALL(dtrmm)("R", "U", "N", "N", dims, dims,
 			&one, scCp, dims, tmp, dims);
@@ -1358,9 +1359,9 @@ Matrix_rWishart(SEXP ns, SEXP dfp, SEXP scal)
 SEXP glmer_PQL(SEXP GSp)
 {
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
-    int i; double crit;
+    int i; double crit, *etap = REAL(GS->eta);
 
-    Memcpy(GS->etaold, REAL(GS->eta), GS->n);
+    Memcpy(GS->etaold, etap, GS->n);
     for (i = 0, crit = GS->tol + 1;
 	 i < GS->maxiter && crit > GS->tol; i++) {
 	internal_glmer_reweight(GS);
@@ -1368,8 +1369,8 @@ SEXP glmer_PQL(SEXP GSp)
 	internal_ECMEsteps(GS->mer, i ? 2 : GS->niterEM,
 			   GS->EMverbose);
 	eval(GS->LMEopt, GS->rho);
-	internal_mer_fitted(GS->mer, GS->offset, REAL(GS->eta));
-	crit = conv_crit(GS->etaold, REAL(GS->eta), GS->n);
+	internal_mer_fitted(GS->mer, GS->offset, etap);
+	crit = conv_crit(GS->etaold, etap, GS->n);
     }
     if (crit > GS->tol)
 	warning(_("IRLS iterations for PQL did not converge"));
@@ -1515,7 +1516,7 @@ SEXP mer_Hessian(SEXP x)
     double
 	*RZX = REAL(RZXP),
 	*b = REAL(RZXP) + dRZX[0] * p,
-	*bbface,		/* vec of second faces of gradComp elts */
+	*valp, *bbface,		/* vec of second faces of gradComp elts */
 	one = 1.,
 	zero = 0.;
 
@@ -1525,7 +1526,8 @@ SEXP mer_Hessian(SEXP x)
     Qsqr = Q * Q;
     bbface = Calloc(Q, double);
     val = PROTECT(alloc3Darray(REALSXP, Q, Q, 5));
-    AZERO(REAL(val), Qsqr * 5);
+    valp= REAL(val);
+    AZERO(valp, Qsqr * 5);
 
     pos = 0;
     for (i = 0; i < nf; i++) {
@@ -1538,13 +1540,13 @@ SEXP mer_Hessian(SEXP x)
 	/* outer product of the third face of gradComp on the diagonal
 	 * of the third face of val */
 	F77_CALL(dsyr)("U", &ncisqr, &mult, fDi + 2 * ncisqr, &ione,
-		       REAL(val) + 2 * Qsqr + pos * Q, &Q);
+		       valp + 2 * Qsqr + pos * Q, &Q);
 	pos += ncisqr;
     }
 				/* fifth face is outer product of bbface */
-    F77_CALL(dsyr)("U", &Q, &one, bbface, &ione, REAL(val) + 4 * Qsqr, &Q);
+    F77_CALL(dsyr)("U", &Q, &one, bbface, &ione, valp + 4 * Qsqr, &Q);
 				/* fourth face from \bb\trans\der\vb\der\bb */
-    AZERO(REAL(val) + 3 * Qsqr, Qsqr); /* zero accumulator */
+    AZERO(valp + 3 * Qsqr, Qsqr); /* zero accumulator */
     RZXpos = 0;
     facepos = 0;
     for (i = 0; i < nf; i++) {
@@ -1555,7 +1557,7 @@ SEXP mer_Hessian(SEXP x)
 	double
 	    *Di = REAL(VECTOR_ELT(D, i)),
 	    *arr = Calloc(ncisqr * maxpq, double), /* tmp 3Darray */
-	    *face = REAL(val) + 3 * Qsqr,
+	    *face = valp + 3 * Qsqr,
 	    *mat = Calloc(nci * maxpq, double); /* tmp matrix */
 
 	for (j = 0; j < nlev; j++) {
@@ -1606,7 +1608,7 @@ SEXP mer_Hessian(SEXP x)
  *
  * @return a matrix
  */
-SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp)
+SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbosep)
 {
     SEXP ans, Omega = GET_SLOT(x, Matrix_OmegaSym),
 	Omegacp = PROTECT(duplicate(Omega));
@@ -1619,7 +1621,8 @@ SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp)
 	p = LENGTH(GET_SLOT(x, Matrix_rXySym)),
 	q = LENGTH(GET_SLOT(x, Matrix_rZySym)),
 	saveb = asLogical(savebp),
-	trans = asLogical(transp);
+	trans = asLogical(transp),
+	verbose = asLogical(verbosep);/* currently unused */
     double
 	*RXX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym)),
 	*RZX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXSym), Matrix_xSym)),
@@ -1627,17 +1630,20 @@ SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp)
 	*betahat = REAL(GET_SLOT(x, Matrix_fixefSym)),
 	*bnew = Calloc(q, double), *betanew = Calloc(p, double),
 	*dcmp = REAL(GET_SLOT(x, Matrix_devCompSym)),
-	df = n - (REML ? p : 0);
+	*ansp, df = n - (REML ? p : 0);
     int nrbase = p + 2 + coef_length(nf, nc); /* rows always included */
     int nrtot = nrbase + (saveb ? q : 0);
     cholmod_dense *chbnew = numeric_as_chm_dense(bnew, q);
 
     if (nsamp <= 0) nsamp = 1;
     ans = PROTECT(allocMatrix(REALSXP, nrtot, nsamp));
-    for (i = 0; i < nrtot * nsamp; i++) REAL(ans)[i] = NA_REAL;
+    ansp = REAL(ans);
+    for (i = 0; i < nrtot * nsamp; i++) ansp[i] = NA_REAL;
     GetRNGstate();
+    if(verbose) Rprintf("%12s %14s\n", "sigma", "deviance");
+
     for (i = 0; i < nsamp; i++) {
-	double *col = REAL(ans) + i * nrtot, sigma;
+	double *col = ansp + i * nrtot, sigma, dev;
 				/* simulate and store new value of sigma */
 	sigma = exp(dcmp[3]/2)/sqrt(rchisq(df));
 	col[p] = (trans ? 2 * log(sigma) : sigma * sigma);
@@ -1654,7 +1660,9 @@ SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp)
 	internal_mer_refactor(x);
 	mer_secondary(x);
 
-	col[nrbase - 1] = lmm_deviance(x, sigma, betanew); /* store deviance */
+	dev = lmm_deviance(x, sigma, betanew);
+	col[nrbase - 1] = dev; /* store deviance */
+	if(verbose) Rprintf("%12.6g %14.8g\n", sigma, dev);
     }
     PutRNGstate();
     Free(betanew); Free(bnew); Free(chbnew);
@@ -1950,7 +1958,7 @@ SEXP mer_hat_trace2(SEXP x)
 	int nlev = (Gp[i + 1] - Gp[i])/nci, ntri = (nci * (nci + 1))/2;
 	double *deli = REAL(GET_SLOT(dpoMatrix_chol(VECTOR_ELT(Omega, i)),
 				     Matrix_xSym));
-	cholmod_sparse *sol, 
+	cholmod_sparse *sol,
 	    *rhs = cholmod_allocate_sparse(q, nci, ntri, TRUE, TRUE, 0,
 					   CHOLMOD_REAL, &c);
 	int *rhi = (int *)(rhs->i), *rhp = (int *)(rhs->p);
@@ -2285,6 +2293,7 @@ SEXP mer_gradient(SEXP x, SEXP pType)
 	!strcmp(CHAR(asChar(GET_SLOT(x, Matrix_methodSym))), "REML");
     SEXP val = PROTECT(allocVector(REALSXP, coef_length(nf, nc)));
     double cc[] = {-1, 1, 1, REML ? 1 : 0},
+      	*valp = REAL(val),
 	one = 1.0, zero = 0.0;
 
     mer_gradComp(x);
@@ -2299,7 +2308,7 @@ SEXP mer_gradient(SEXP x, SEXP pType)
 			cc, &ifour, &zero, tmp, &ncisqr);
 	if (nci == 1) {
 	    double omg = *REAL(GET_SLOT(Omgi, Matrix_xSym));
-	    REAL(val)[dind++] =
+	    valp[dind++] =
 		(ptyp?((ptyp == 1)? omg : -omg * omg) : 1) * tmp[0];
 	} else {
 	    int ii, j, ncip1 = nci + 1;
@@ -2335,9 +2344,9 @@ SEXP mer_gradient(SEXP x, SEXP pType)
 		Free(tmp2);
 	    }
 	    for (j = 0; j < nci; j++) {
-		REAL(val)[dind + j] = tmp[j * ncip1];
+		valp[dind + j] = tmp[j * ncip1];
 		for (ii = 0; ii < j; ii++) /* offdiagonals count twice */
-		    REAL(val)[odind++] = 2. * tmp[ii + j * nci];
+		    valp[odind++] = 2. * tmp[ii + j * nci];
 	    }
 	    dind = odind;
 	}
@@ -2390,7 +2399,7 @@ SEXP mer_initial(SEXP x)
  *
  * @param x Pointer to an mer object
  *
- * @return a scalar logical value indicating if ZtZ corresponds to a 
+ * @return a scalar logical value indicating if ZtZ corresponds to a
  * simple nested structure.
  */
 SEXP mer_isNested(SEXP x)
@@ -2721,13 +2730,15 @@ SEXP Zt_create(SEXP fl, SEXP Ztl)
     return ans;
 }
 
-/* MCMCsamp for generalized linear mixed models.  1) Detect if there
- * is a scale factor or not (not done yet). 2) Sample beta and b
- * according to the normal approximation 3) Evaluate the
- * Metropolis-Hastings ratio and accept or reject 4) If step is
- * accepted then reweight/update 5) Sample from the Wishart for the
- * variance matrix. 6) If necessary, sample from the scale factor
- * distribution (not done yet). */
+/* MCMCsamp for generalized linear mixed models.
+ *
+ * 1) Detect if there  is a scale factor or not (not done yet).
+ * 2) Sample beta and b according to the normal approximation
+ * 3) Evaluate the Metropolis-Hastings ratio and accept or reject
+ * 4) If step is accepted then reweight/update
+ * 5) Sample from the Wishart for the variance matrix.
+ * 6) If necessary, sample from the scale factor distribution (not done yet).
+*/
 
 /**
  * Create a Markov Chain Monte Carlo sample from a fitted generalized
@@ -2743,7 +2754,7 @@ SEXP Zt_create(SEXP fl, SEXP Ztl)
  * @return a matrix
  */
 SEXP
-glmer_MCMCsamp(SEXP GSpt, SEXP savebp, SEXP nsampp, SEXP transp)
+glmer_MCMCsamp(SEXP GSpt, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbosep)
 {
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSpt);
     SEXP ans, x = GS->mer;
@@ -2756,7 +2767,8 @@ glmer_MCMCsamp(SEXP GSpt, SEXP savebp, SEXP nsampp, SEXP transp)
 	p = LENGTH(GET_SLOT(x, Matrix_rXySym)),
 	q = LENGTH(GET_SLOT(x, Matrix_rZySym)),
 	saveb = asLogical(savebp),
-	trans = asLogical(transp);
+	trans = asLogical(transp),
+	verbose = asLogical(verbosep);
     double
 	*RXX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym)),
 	*RZX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXSym), Matrix_xSym)),
@@ -2764,19 +2776,21 @@ glmer_MCMCsamp(SEXP GSpt, SEXP savebp, SEXP nsampp, SEXP transp)
 	*betahat = REAL(GET_SLOT(x, Matrix_fixefSym)),
 	*bcur = Calloc(q, double), *betacur = Calloc(p, double), /* current */
 	*bnew = Calloc(q, double), *betanew = Calloc(p, double), /* proposed */
-	MHratio;
+	*ansp, MHratio;
     int nrbase = p + 1 + coef_length(nf, nc); /* rows always included */
     int nrtot = nrbase + (saveb ? q : 0);
 
     if (nsamp <= 0) nsamp = 1;
     ans = PROTECT(allocMatrix(REALSXP, nrtot, nsamp));
-    for (i = 0; i < nrtot * nsamp; i++) REAL(ans)[i] = NA_REAL;
+    ansp = REAL(ans);
+    for (i = 0; i < nrtot * nsamp; i++) ansp[i] = NA_REAL;
     GetRNGstate();
     /* initialize current values of b and beta to estimates */
     Memcpy(betacur, REAL(GET_SLOT(x, Matrix_fixefSym)), p);
     Memcpy(bcur, REAL(GET_SLOT(x, Matrix_ranefSym)), q);
+    if(verbose) Rprintf("%12s\n", "MHratio");
     for (i = 0; i < nsamp; i++) {
-	double *col = REAL(ans) + i * nrtot;
+	double *col = ansp + i * nrtot;
 				/* generate proposal for b and beta */
 				/* save Gaussian deviance at proposal */
 	MHratio = -internal_betab_update(p, q, 1, L, RZX, RXX,
@@ -2786,7 +2800,8 @@ glmer_MCMCsamp(SEXP GSpt, SEXP savebp, SEXP nsampp, SEXP transp)
 	    - glmm_deviance(GS, betacur, bcur)
 	    + internal_Gaussian_deviance(p, q, L, RZX, RXX, betahat, bhat,
 					 betacur, bcur);
-	MHratio = exp(-MHratio/2); Rprintf("%7.3\n", MHratio);
+	MHratio = exp(-MHratio/2);
+	if(verbose) Rprintf("%12.5f\n", MHratio);
 	/* Accept proposal with probability min(MHratio, 1) */
 	if (unif_rand() < MHratio) {
 	    Memcpy(betacur, betanew, p);
@@ -2804,7 +2819,7 @@ glmer_MCMCsamp(SEXP GSpt, SEXP savebp, SEXP nsampp, SEXP transp)
 	col[nrbase - 1] = glmm_deviance(GS, betacur, bcur); /* store deviance */
     }
     PutRNGstate();
-    Free(bcur); Free(betacur); Free(betanew); Free(bnew); 
+    Free(bcur); Free(betacur); Free(betanew); Free(bnew);
 				/* Restore original Omega */
     SET_SLOT(x, Matrix_OmegaSym, Omegacp);
     internal_mer_refactor(x);

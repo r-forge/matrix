@@ -539,12 +539,12 @@ mcmccompnames <- function(ans, object, saveb, trans, glmer)
     colnames(ans) <- colnms
     ans
 }
-                          
+
 setMethod("mcmcsamp", signature(object = "lmer"),
 	  function(object, n = 1, verbose = FALSE, saveb = FALSE,
 		   trans = TRUE, ...)
       {
-          ans <- t(.Call(mer_MCMCsamp, object, saveb, n, trans))
+          ans <- t(.Call(mer_MCMCsamp, object, saveb, n, trans, verbose))
 	  attr(ans, "mcpar") <- as.integer(c(1, n, 1))
 	  class(ans) <- "mcmc"
           mcmccompnames(ans, object, saveb, trans, FALSE)
@@ -570,7 +570,7 @@ setMethod("mcmcsamp", signature(object = "glmer"),
           LMEopt <- get("LMEoptimize<-")
           doLMEopt <- quote(LMEopt(x = mer, value = cv))
           GSpt <- .Call(glmer_init, environment())
-          ans <- t(.Call(glmer_MCMCsamp, GSpt, saveb, n, trans))
+          ans <- t(.Call(glmer_MCMCsamp, GSpt, saveb, n, trans, verbose))
           .Call(glmer_finalize, GSpt)
 	  attr(ans, "mcpar") <- as.integer(c(1, n, 1))
 	  class(ans) <- "mcmc"
