@@ -64,6 +64,7 @@ export("lmer", "mcmcsamp")
 
 exportClasses(
 	      "index",
+	      "replValue", # if we don't export it, things fail in dispatch
 
 	      "BunchKaufman",
 	      "pBunchKaufman",

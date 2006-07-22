@@ -17,7 +17,14 @@
 \alias{rbind2,NULL,Matrix-method}
 \alias{crossprod,Matrix,numeric-method}
 \alias{crossprod,Matrix,ANY-method}
+\alias{crossprod,Matrix,Matrix-method}
 \alias{crossprod,numeric,Matrix-method}
+\alias{tcrossprod,ANY,Matrix-method}
+\alias{tcrossprod,Matrix,numeric-method}
+\alias{tcrossprod,Matrix,ANY-method}
+\alias{tcrossprod,Matrix,Matrix-method}
+\alias{tcrossprod,numeric,Matrix-method}
+%
 \alias{diag,Matrix-method}
 \alias{head,Matrix-method}
 \alias{tail,Matrix-method}
@@ -32,6 +39,8 @@
 \alias{t,Matrix-method}
 \alias{unname,Matrix-method}
 %\alias{coerce,Matrix,matrix-method}
+\alias{coerce,Matrix,denseMatrix-method}
+\alias{coerce,Matrix,sparseMatrix-method}
 \alias{Compare,Matrix,Matrix-method}
 \alias{Compare,Matrix,ANY-method}
 \alias{Compare,ANY,Matrix-method}
