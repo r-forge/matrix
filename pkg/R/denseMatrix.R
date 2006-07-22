@@ -10,12 +10,14 @@ setAs("denseMatrix", "dsparseMatrix",
 
 setAs("denseMatrix", "CsparseMatrix",
       function(from) {
-	  if(!is(from, "generalMatrix")) { ## e.g. for triangular | symmetric
+          cl <- class(from)
+	  notGen <- !is(from, "generalMatrix")
+	  if (notGen) { ## e.g. for triangular | symmetric
               ## FIXME: this is a *waste* in the case of packed matrices!
-	      if     (is(from, "dMatrix")) from <- as(from, "dgeMatrix")
-	      else if(is(from, "lMatrix")) from <- as(from, "lgeMatrix")
-	      else if(is(from, "zMatrix")) from <- as(from, "zgeMatrix")
-	      else stop("undefined method for class ", class(from))
+	      if     (extends(cl, "dMatrix")) from <- as(from, "dgeMatrix")
+	      else if(extends(cl, "lMatrix")) from <- as(from, "lgeMatrix")
+	      else if(extends(cl, "zMatrix")) from <- as(from, "zgeMatrix")
+	      else stop("undefined method for class ", cl)
 	  }
 	  .Call(dense_to_Csparse, from)
       })

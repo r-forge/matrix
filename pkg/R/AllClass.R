@@ -475,6 +475,10 @@ setClass("pMatrix", representation(perm = "integer"),
 ## for 'i' in x[i] or A[i,] :
 setClassUnion("index", members =  c("numeric", "logical", "character"))
 
+### for 'value' in   x[..] <- value :
+setClassUnion("replValue", members =  c("numeric", "logical"))
+
+
 
 ## --- Matrix - related ----
 

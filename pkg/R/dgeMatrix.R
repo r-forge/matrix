@@ -97,13 +97,7 @@ setMethod("Math",
 	      x
 	  })
 
-if(FALSE) ## unneeded with "Math2" in ./dMatrix.R
-setMethod("Math2",
-	  signature(x = "dgeMatrix", digits = "numeric"),
-	  function(x, digits) {
-	      x@x <- callGeneric(x@x, digits = digits)
-	      x
-	  })
+##  "Math2" is in ./dMatrix.R
 
 ## "Summary"
 
@@ -179,13 +173,13 @@ setMethod("tcrossprod", signature(x = "dgeMatrix", y = "matrix"),
 	  valueClass = "dgeMatrix")
 setMethod("tcrossprod", signature(x = "dgeMatrix", y = "numeric"),
 	  function(x, y = NULL)
-	  .Call(dgeMatrix_matrix_crossprod, x, as.matrix(as.double(y)), TRUE),
+	  .Call(dgeMatrix_matrix_crossprod, x, rbind(as.double(y)), TRUE),
 	  valueClass = "dgeMatrix")
 setMethod("tcrossprod", signature(x = "matrix", y = "dgeMatrix"),
 	  function(x, y = NULL) callGeneric(as(x, "dgeMatrix"), y),
 	  valueClass = "dgeMatrix")
 setMethod("tcrossprod", signature(x = "numeric", y = "dgeMatrix"),
-	  function(x, y = NULL) callGeneric(as.matrix(as.double(x)), y),
+	  function(x, y = NULL) callGeneric(rbind(as.double(x)), y),
 	  valueClass = "dgeMatrix")
 
 

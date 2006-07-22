@@ -1,5 +1,11 @@
 #### Toplevel ``virtual'' class "Matrix"
 
+
+### Virtual coercions -- via smart "helpers" (-> ./Auxiliaries.R)
+
+setAs("Matrix", "sparseMatrix", function(from) as_Csparse(from))
+setAs("Matrix", "denseMatrix",  function(from) as_dense(from))
+
 ## ## probably not needed eventually:
 ## setAs(from = "ddenseMatrix", to = "matrix",
 ##       function(from) {
@@ -28,7 +34,7 @@ setMethod("tail", signature(x = "Matrix"),
 
 ## slow "fall back" method {subclasses should have faster ones}:
 setMethod("as.vector", signature(x = "Matrix", mode = "missing"),
-          function(x) as.vector(as(x, "matrix")))
+	  function(x) as.vector(as(x, "matrix")))
 
 
 ## Note that isSymmetric is *not* exported
@@ -188,9 +194,15 @@ setMethod("%*%", signature(x = "numeric", y = "Matrix"),
 
 setMethod("crossprod", signature(x = "Matrix", y = "numeric"),
 	  function(x, y = NULL) callGeneric(x, as.matrix(y)))
-
 setMethod("crossprod", signature(x = "numeric", y = "Matrix"),
-	  function(x, y = NULL)	 callGeneric(rbind(x), y))
+	  function(x, y = NULL)	 callGeneric(as.matrix(x), y))
+
+## The as.matrix() promotion seems illogical to MM,
+## but is according to help(tcrossprod, package = "base") :
+setMethod("tcrossprod", signature(x = "Matrix", y = "numeric"),
+	  function(x, y = NULL) callGeneric(x, as.matrix(y)))
+setMethod("tcrossprod", signature(x = "numeric", y = "Matrix"),
+	  function(x, y = NULL)	 callGeneric(as.matrix(x), y))
 
 setMethod("solve", signature(a = "Matrix", b = "numeric"),
 	  function(a, b, ...) callGeneric(a, as.matrix(b)))
@@ -205,6 +217,16 @@ setMethod("crossprod", signature(x = "Matrix", y = "ANY"),
 	  function (x, y = NULL) .bail.out.2(.Generic, class(x), class(y)))
 setMethod("crossprod", signature(x = "ANY", y = "Matrix"),
 	  function (x, y = NULL) .bail.out.2(.Generic, class(x), class(y)))
+setMethod("tcrossprod", signature(x = "Matrix", y = "ANY"),
+	  function (x, y = NULL) .bail.out.2(.Generic, class(x), class(y)))
+setMethod("tcrossprod", signature(x = "ANY", y = "Matrix"),
+	  function (x, y = NULL) .bail.out.2(.Generic, class(x), class(y)))
+
+## cheap fallbacks
+setMethod("crossprod", signature(x = "Matrix", y = "Matrix"),
+	  function(x, y = NULL) t(x) %*% y)
+setMethod("tcrossprod", signature(x = "Matrix", y = "Matrix"),
+	  function(x, y = NULL) x %*% t(y))
 
 ## There are special sparse methods; this is a "fall back":
 setMethod("kronecker", signature(X = "Matrix", Y = "ANY",

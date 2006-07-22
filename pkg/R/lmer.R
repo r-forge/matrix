@@ -348,8 +348,7 @@ setMethod("lmer", signature(formula = "formula"),
 		       X, Y, method, sapply(Ztl, nrow),
 		       c(lapply(Ztl, rownames), list(.fixed = colnames(X))),
 		       !(family$family %in% c("binomial", "poisson")),
-		       match.call(), family,
-		       PACKAGE = "Matrix")
+		       match.call(), family)
 
 	  GSpt <- .Call(glmer_init, environment())
 	  if (cv$usePQL) {
@@ -599,8 +598,8 @@ setMethod("simulate", signature(object = "mer"),
 	  lpred <- .Call(mer_simulate, object, nsim)
 	  sc <- 1
 	  if (object@useScale)
-	      sc <- .Call(mer_sigma, object, object@method == "REML",
-			  PACKAGE = "Matrix")
+	      sc <- .Call(mer_sigma, object, object@method == "REML")
+
 	  ## add fixed-effects contribution and per-observation noise term
 	  lpred <- as.data.frame(lpred + drop(object@X %*% fixef(object)) +
 				 rnorm(prod(dim(lpred)), sd = sc))
