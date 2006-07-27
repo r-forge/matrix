@@ -124,8 +124,8 @@ Matrix <-
 			if(is.logical(data)) "lgTMatrix" else
 			stop("invalid 'data'"),
 			Dim = as.integer(c(nrow,ncol)),
-			Dimnames = if(is.null(dimnames))
-			list(NULL,NULL) else dimnames)
+			Dimnames = if(is.null(dimnames)) list(NULL,NULL)
+			else dimnames)
 	} else { ## normal case
 	    data <- .Internal(matrix(data, nrow, ncol, byrow))
 	    if(is.null(sparse))

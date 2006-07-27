@@ -3,9 +3,7 @@ setAs("matrix", "dgeMatrix",
 	  new("dgeMatrix",
 	      x = as.double(from),
 	      Dim = as.integer(dim(from)),
-	      Dimnames =
-	      if(!is.null(dn <- dimnames(from))) dn else list(NULL,NULL)
-	      )
+	      Dimnames = .M.DN(from))
       })
 
 setAs("dgeMatrix", "matrix",
