@@ -5,6 +5,8 @@
 .M.v <- function(x, y) callGeneric(x, as.matrix(y))
 .v.M <- function(x, y) callGeneric(rbind(x), y)
 
+.M.DN <- function(x) if(!is.null(dn <- dimnames(x))) dn else list(NULL,NULL)
+
 .has.DN <- ## has non-trivial Dimnames slot?
     function(x) !identical(list(NULL,NULL), x@Dimnames)
 
