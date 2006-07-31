@@ -1,9 +1,22 @@
+2006-07-31  Douglas Bates  <bates@R-project.org>
+
+	* NAMESPACE, src/lmer.c, R/lmer.R (hatTrace):  Add the hatTrace
+	function which calls the C function mer_hat_trace2.
+	
+	* man/ranef.Rd: Include description of "postVar" argument.
+
 2006-07-31  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* NAMESPACE:    change  "correlation" to "corMatrix"
 	* R/AllClass.R: to avoid clash with S3 class in 'nlme'.
 	* R/dpoMatrix.R: dito
 	* R/lmer.R:	 dito
+
+2006-07-28  Douglas Bates  <bates@R-project.org>
+
+	* src/lmer.c (internal_mer_RZXinv): Split the calculation of the
+	RZXinv slot's contents into a separate internal function that can
+	be used in mer_hat_trace.
 
 2006-07-22  Martin Maechler  <maechler@stat.math.ethz.ch>
 
