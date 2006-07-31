@@ -163,6 +163,35 @@ internal_mer_refactor(SEXP x)
 }
 
 static void
+internal_mer_RZXinv(SEXP x)
+{
+    SEXP RZXP = GET_SLOT(x, Matrix_RZXSym);
+    cholmod_factor *L = as_cholmod_factor(GET_SLOT(x, Matrix_LSym));
+    cholmod_dense *RZX = as_cholmod_dense(RZXP), *tmp1;
+    int *dims = INTEGER(GET_SLOT(RZXP, Matrix_DimSym)),
+	*Perm = (int *)(L->Perm);
+    int i, j, p = dims[1], q = dims[0];
+    int *iperm = Calloc(q, int);
+    double *RZXinv = REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXinvSym),
+				   Matrix_xSym)), m1[2] = {-1, 0};
+
+				/* create the inverse permutation */
+    for (j = 0; j < q; j++) iperm[Perm[j]] = j;
+				/* solve system in L' */
+    tmp1 = cholmod_solve(CHOLMOD_Lt, L, RZX, &c); Free(RZX);
+    /* copy columns of tmp1 to RZXinv applying the inverse permutation */
+    for (j = 0; j < p; j++) {
+	double *dest = RZXinv + j * q, *src = ((double*)(tmp1->x)) + j * q;
+	for (i = 0; i < q; i++) dest[i] = src[iperm[i]];
+    }
+    cholmod_free_dense(&tmp1, &c);
+    F77_CALL(dtrsm)("R", "U", "N", "N", &q, &p, m1,
+		    REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym)),
+		    &p, RZXinv, &q);
+    Free(iperm);
+}
+
+static void
 internal_mer_bVar(SEXP x)
 {
     int q = LENGTH(GET_SLOT(x, Matrix_rZySym));
@@ -1900,16 +1929,18 @@ SEXP mer_hat_trace(SEXP x)
 	n = INTEGER(GET_SLOT(Zt, Matrix_DimSym))[1],
 	p = LENGTH(GET_SLOT(x, Matrix_rXySym)),
 	q = LENGTH(GET_SLOT(x, Matrix_rZySym));
-    double *Xcp = Memcpy(Calloc(n * p, double),
-			 REAL(GET_SLOT(x, Matrix_XSym)), n * p),
+    double *Xcp = Calloc(n * p, double),
 	*RXX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym)),
 	*RZX = REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXSym), Matrix_xSym)),
 	*Ztx = REAL(GET_SLOT(Zt, Matrix_xSym)),
-	*wrk = Calloc(q, double), *xrow = Calloc(p, double),
-	one = 1, tr, zero = 0;
+	*wrk = Calloc(q, double), m1 = -1, one = 1, tr;
     cholmod_dense *zrow = numeric_as_chm_dense(wrk, q);
 
     mer_factor(x);
+    Memcpy(Xcp, REAL(GET_SLOT(x, Matrix_XSym)), n * p);
+
+    /* Accumulate F-norm of L^{-1}Zt and downdate rows of Xcp */
+/* FIXME: Does this handle a non-trivial permutation properly? */
     for (j = 0, tr = 0; j < n; j++) { /* j'th column of Zt */
 	cholmod_dense *sol; double *sx;
 	for (i = 0; i < q; i++) wrk[i] = 0;
@@ -1917,9 +1948,9 @@ SEXP mer_hat_trace(SEXP x)
 	sol = cholmod_solve(CHOLMOD_L, L, zrow, &c);
 	sx = (double*)(sol->x);
 	for (i = 0; i < q; i++) tr += sx[i] * sx[i];
-	F77_CALL(dgemv)("T", &q, &p, &one, RZX, &q, sx, &ione,
-			&zero, xrow, &ione);
-	for (i = 0; i < p; i++) Xcp[j + i * n] -= xrow[i];
+				/* downdate jth row of Xcp */
+ 	F77_CALL(dgemv)("T", &q, &p, &m1, RZX, &q, sx, &ione, 
+ 			&one, Xcp + j, &n);
 	cholmod_free_dense(&sol, &c);
     }
     F77_CALL(dtrsm)("R", "U", "N", "N", &n, &p, &one, RXX, &p, Xcp, &n);
@@ -1930,7 +1961,7 @@ SEXP mer_hat_trace(SEXP x)
 }
 
 /**
- * Fast calculation of the trace of the hat matrix (due to Jialiang Li)
+ * Faster calculation of the trace of the hat matrix (due to Jialiang Li)
  *
  * @param x pointer to an mer object
  *
@@ -1942,48 +1973,55 @@ SEXP mer_hat_trace2(SEXP x)
     SEXP Omega = GET_SLOT(x, Matrix_OmegaSym),
 	ncp = GET_SLOT(x, Matrix_ncSym);
     cholmod_factor *L = as_cholmod_factor(GET_SLOT(x, Matrix_LSym));
-    int *nc = INTEGER(ncp), *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+    int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	*nc = INTEGER(ncp), 
 	nf = LENGTH(ncp), i, j, k,
 	p = LENGTH(GET_SLOT(x, Matrix_rXySym)),
 	q = LENGTH(GET_SLOT(x, Matrix_rZySym));
     double
-	*RZXicp = Memcpy(Calloc(q * p, double),
-			 REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXinvSym),
-				       Matrix_xSym)), q * p),
+	*RZXicp = Calloc(q * p, double),
 	one = 1, tr = p + q;
-
-    mer_secondary(x);
+				/* factor and evaluate RZXinv */
+    mer_factor(x);
+    internal_mer_RZXinv(x);
+    Memcpy(RZXicp, REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXinvSym),
+				 Matrix_xSym)), q * p);
     for (i = 0; i < nf; i++) {
 	int nci = nc[i];
-	int nlev = (Gp[i + 1] - Gp[i])/nci, ntri = (nci * (nci + 1))/2;
+	int ncisqr = nci * nci, nlev = (Gp[i + 1] - Gp[i])/nci;
 	double *deli = REAL(GET_SLOT(dpoMatrix_chol(VECTOR_ELT(Omega, i)),
 				     Matrix_xSym));
-	cholmod_sparse *sol,
-	    *rhs = cholmod_allocate_sparse(q, nci, ntri, TRUE, TRUE, 0,
-					   CHOLMOD_REAL, &c);
+	cholmod_sparse *sol, *Prhs,
+	    *rhs = cholmod_allocate_sparse(q, nci, ncisqr, TRUE, TRUE,
+					   0, CHOLMOD_REAL, &c);
 	int *rhi = (int *)(rhs->i), *rhp = (int *)(rhs->p);
 	double *rhx = (double *)(rhs->x);
 
-	rhp[0] = 0; /* create the rhs as deli' */
+	rhp[0] = 0;		/* Establish column pointers and value of rhs */
 	for (j = 0; j < nci; j++) {
-	    rhp[j+1] = rhp[j] + nci - j;
-	    for (k = 0; k < nci - j; k++) {
-		rhi[rhp[j] + k] = Gp[i] + k + j;
-		rhx[rhp[j] + k] = deli[(k + j) * nci + j];
+	    rhp[j+1] = rhp[j] + nci;
+	    for (k = 0; k < nci; k++) { /* transpose of deli */
+		rhx[j * nci + k] = deli[k * nci + j];
+		rhi[j * nci + k] = Gp[i] + k; /* initial row numbers */
 	    }
+	    /* zero the upper triangle (just in case) */
+	    for (k = 0; k < j; k++) rhx[j * nci + k] = 0;
 	}
 	for (j = 0; j < nlev; j++) {
-				/* next nci rows of Delta RZXinv */
+	    /* Evaluate nci rows of Delta RZXinv */
 	    F77_CALL(dtrmm)("L", "U", "N", "N", &nci, &p, &one, deli, &nci,
 			    RZXicp + Gp[i] + j * nci, &q);
-				/* Solve nci columns of L^{-1} Delta' */
-	    sol = cholmod_spsolve(CHOLMOD_L, L, rhs, &c);
+	    /* Solve for and accumulate nci columns of L^{-1} P Delta' */
+	    Prhs = cholmod_spsolve(CHOLMOD_P, L, rhs, &c);
+	    sol = cholmod_spsolve(CHOLMOD_L, L, Prhs, &c);
+	    cholmod_free_sparse(&Prhs, &c);
 	    for (k = 0; k < ((int*)(sol->p))[nci]; k++) {
 		double sxk = ((double*)(sol->x))[k];
 		tr -= sxk * sxk;
 	    }
 	    cholmod_free_sparse(&sol, &c);
-	    for (k = 0; k < ntri; k++) rhi[k] += nci;
+	    /* Update rhs for the next set of rows */
+	    for (k = 0; k < ncisqr; k++) rhi[k] += nci;
 	}
 	cholmod_free_sparse(&rhs, &c);
     }
@@ -2188,37 +2226,22 @@ SEXP mer_gradComp(SEXP x)
     if (!status[2]) {
 	SEXP bVarP = GET_SLOT(x, Matrix_bVarSym),
 	    OmegaP = GET_SLOT(x, Matrix_OmegaSym),
-	    RZXP = GET_SLOT(x, Matrix_RZXSym),
 	    gradComp = GET_SLOT(x, Matrix_gradCompSym),
 	    ranefP = GET_SLOT(x, Matrix_ranefSym);
 	int q = LENGTH(ranefP), p = LENGTH(GET_SLOT(x, Matrix_rXySym));
 	cholmod_factor *L = as_cholmod_factor(GET_SLOT(x, Matrix_LSym));
-	cholmod_dense *RZX = as_cholmod_dense(RZXP), *tmp1;
 	int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
-	    *Perm = (int *)(L->Perm),
-	    *iperm = Calloc(q, int),
 	    *nc = INTEGER(GET_SLOT(x, Matrix_ncSym)),
 	    i, j, k, nf = length(OmegaP);
 	double *b = REAL(GET_SLOT(x, Matrix_ranefSym)),
-	    *RZXinv = REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXinvSym), Matrix_xSym)),
-	    m1[] = {-1, 0}, alpha;
+	    *RZXinv = REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXinvSym),
+				    Matrix_xSym)),
+	    alpha;
 
 	alpha = 1./internal_mer_sigma(x, -1);
 	alpha = alpha * alpha;
 
-	for (j = 0; j < q; j++) iperm[Perm[j]] = j; /* create the inverse permutation */
-				/* form RZXinv, the section of R^{-1} from RZX */
-	tmp1 = cholmod_solve(CHOLMOD_Lt, L, RZX, &c); Free(RZX);
-	/* copy columns of tmp1 to RZXinv applying the inverse permutation */
-	for (j = 0; j < p; j++) {
-	    double *dest = RZXinv + j * q, *src = ((double*)(tmp1->x)) + j * q;
-	    for (i = 0; i < q; i++) dest[i] = src[iperm[i]];
-	}
-	cholmod_free_dense(&tmp1, &c);
-	F77_CALL(dtrsm)("R", "U", "N", "N", &q, &p, m1,
-			REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym)),
-			&p, RZXinv, &q);
-
+	internal_mer_RZXinv(x);
 	internal_mer_bVar(x);
 	for (i = 0; i < nf; i++) {
 	    int nci = nc[i], RZXrows = Gp[i + 1] - Gp[i];
@@ -2267,7 +2290,7 @@ SEXP mer_gradComp(SEXP x)
 	    }
 	    Free(tmp);
 	}
-	Free(iperm); Free(L);
+	Free(L);
 	status[2] = 1; status[3] = 0;
     }
     return R_NilValue;

@@ -613,21 +613,8 @@ simulestimate <- function(x, FUN, nsim = 1, seed = NULL, control = list())
     FUN <- match.fun(FUN)
     nsim <- as.integer(nsim[1])
     stopifnot(nsim > 0)
-    if(!exists(".Random.seed", envir = .GlobalEnv))
-        runif(1)		     # initialize the RNG if necessary
-    if(is.null(seed))
-        RNGstate <- .Random.seed
-    else {
-        R.seed <- .Random.seed
-        set.seed(seed)
-        RNGstate <- structure(seed, kind = as.list(RNGkind()))
-        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
-    }
-
-    family <- x@family
-    if (family$family != "gaussian" ||
-        family$link != "identity")
-        stop("simulation of generalized linear mixed models not yet implemented")
+    if (!is.null(seed)) set.seed(seed)
+    stopifnot(inherits(x, "lmer"))
     ## similate the linear predictors
     lpred <- .Call(mer_simulate, x, nsim)
     sc <- 1
@@ -656,6 +643,7 @@ simulestimate <- function(x, FUN, nsim = 1, seed = NULL, control = list())
     }
     ans
 }
+
 
 formatVC <- function(varc, digits = max(3, getOption("digits") - 2))
 {  ## "format()" the 'VarCorr'	matrix of the random effects -- for show()ing
@@ -704,7 +692,7 @@ setMethod("show", "mer",
 	      if (!is.null(so@call$formula))
 		  cat("Formula:", deparse(so@call$formula),"\n")
 	      if (!is.null(so@call$data))
-		  cat("Data:", deparse(so@call$data), "\n")
+		  cat("   Data:", deparse(so@call$data), "\n")
 	      if (!is.null(so@call$subset))
 		  cat(" Subset:",
 		      deparse(asOneSidedFormula(so@call$subset)[[2]]),"\n")
@@ -1101,3 +1089,9 @@ setMethod("denomDF", "mer",
           if (hasintercept) asgn$"(Intercept)" <- NULL
           list(ml = ml, nco = nco, nlev = nlev)
       })
+
+hatTrace <- function(x)
+{
+    stopifnot(is(x, "mer"))
+    .Call(mer_hat_trace2, x)
+}
