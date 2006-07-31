@@ -380,7 +380,7 @@ setClass("Cholesky", contains = "dtrMatrix")
 
 setClass("LDL", contains = "dtrMatrix")
 
-setClass("correlation", representation(sd = "numeric"), contains = "dpoMatrix")
+setClass("corMatrix", representation(sd = "numeric"), contains = "dpoMatrix")
 
 setClass("pCholesky", contains = "dtpMatrix")
 
