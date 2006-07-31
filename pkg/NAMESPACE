@@ -60,7 +60,7 @@ export(
 
 
 ## lmer-related
-export("lmer", "mcmcsamp")
+export("lmer", "mcmcsamp", "hatTrace")
 
 exportClasses(
 	      "index",
