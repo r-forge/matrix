@@ -137,7 +137,7 @@ exportClasses(
 	      "lCholCMatrix",
               "dCHMsuper",
               "dCHMsimpl",
-              "correlation" # unused
+              "corMatrix" # unused
 	      )
 
 ## lmer-related

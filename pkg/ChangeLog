@@ -1,3 +1,10 @@
+2006-07-31  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* NAMESPACE:    change  "correlation" to "corMatrix"
+	* R/AllClass.R: to avoid clash with S3 class in 'nlme'.
+	* R/dpoMatrix.R: dito
+	* R/lmer.R:	 dito
+
 2006-07-22  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Matrix.R: Coercions "Matrix" -> (sparse|dense)Matrix

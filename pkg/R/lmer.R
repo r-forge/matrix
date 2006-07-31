@@ -750,7 +750,7 @@ setMethod("vcov", signature(object = "mer"),
 		  .Call(mer_sigma, object, REML)
 	      } else { 1 }
 	      rr <- as(sc^2 * tcrossprod(solve(object@RXX)), "dpoMatrix")
-	      rr@factors$correlation <- as(rr, "correlation")
+	      rr@factors$correlation <- as(rr, "corMatrix")
 	      rr
 	  })
 
@@ -789,7 +789,7 @@ setMethod("VarCorr", signature(x = "mer"),
 	  for (i in seq(a = ans)) {
 	      el <- as(sc2 * solve(ans[[i]]), "dpoMatrix")
 	      el@Dimnames <- list(cnames[[i]], cnames[[i]])
-	      el@factors$correlation <- as(el, "correlation")
+	      el@factors$correlation <- as(el, "corMatrix")
 	      ans[[i]] <- el
 	  }
 	  attr(ans, "sc") <- sc
