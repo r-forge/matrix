@@ -1,9 +1,7 @@
-% $Id: random.effects.Rd,v 1.1 2002/11/27 22:49:45 bates Exp $
 \name{ranef}
 \docType{genericFunction}
 \docType{methods}
 \alias{ranef}
-\alias{random.effects}
 \alias{ranef-methods}
 \alias{ranef,ANY-method}
 \alias{ranef,lmer-method}
@@ -12,20 +10,19 @@
 \usage{
 ranef(object, \dots)
 \S4method{ranef}{lmer}(object, postVar, \dots)
-random.effects(object, \dots)   # deprecated
 }
 \description{
   A generic function to extract, and optionally accumulate, the random effects.
 }
 \arguments{
- \item{object}{an object of a class from which random effects
-   estimates can be extracted.}
- \item{postVar}{an optional logical argument indicating if the
-   conditional variance covariance matrices, also called the "posterior
-   variances", of the random effects should be included.  Default is
-   \code{FALSE}.}
- \item{\dots}{some methods for this generic function require additional
-   arguments.}
+  \item{object}{an object of a class from which random effects
+    estimates can be extracted.}
+  \item{postVar}{an optional logical argument indicating if the
+    conditional variance covariance matrices, also called the
+    \dQuote{posterior variances}, of the random effects should be
+    included.  Default is \code{FALSE}.}
+  \item{\dots}{some methods for this generic function require additional
+    arguments.}
 }
 \value{
   A list of data frames, one for each grouping factor for the random
@@ -53,7 +50,7 @@ random.effects(object, \dots)   # deprecated
   diagonal.
 }
 \note{
-  To produce a "caterpillar plot" of the random effects apply
+  To produce a \dQuote{caterpillar plot} of the random effects apply
   \code{\link[lattice]{qqmath}} to the result of \code{ranef} with
   \code{postVar = TRUE}.
 }
