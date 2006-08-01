@@ -2506,29 +2506,38 @@ SEXP mer_secondary(SEXP x)
 SEXP mer_postVar(SEXP x)
 {
     SEXP ans;
-    double sc = (asLogical(GET_SLOT(x, Matrix_useScaleSym))) ?
-	internal_mer_sigma(x, -1) : 1;
-    int i, ione = 1, nf;
+    double *RZXi = REAL(GET_SLOT(GET_SLOT(x, Matrix_RZXinvSym),
+				 Matrix_xSym)),
+	sc = (asLogical(GET_SLOT(x, Matrix_useScaleSym))) ?
+	internal_mer_sigma(x, -1) : 1, one = 1;
+    int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
+	i, ione = 1, nf,
+	p = LENGTH(GET_SLOT(x, Matrix_rXySym)),
+	q = LENGTH(GET_SLOT(x, Matrix_rZySym));
 
     sc = sc * sc;
     mer_gradComp(x);
     ans = PROTECT(duplicate(GET_SLOT(x, Matrix_bVarSym)));
     nf = LENGTH(ans);
     for (i = 0; i < nf; i++) {
-	SEXP vv = VECTOR_ELT(ans, i);
-	int *dims = INTEGER(getAttrib(vv, R_DimSymbol));
+	SEXP ansi = VECTOR_ELT(ans, i);
+	int *dims = INTEGER(getAttrib(ansi, R_DimSymbol));
 	int j, nc = dims[1], nlev = dims[2];
-	int ntot = dims[0] * nc * nlev;
+	int ncsqr = dims[0] * nc;
+	int ntot = ncsqr * nlev;
+	double *vv = REAL(ansi);
 
 	if (dims[0] != nc)
 	    error(_("rows and columns of element %d of bVar do not match"),
 		  i + 1);
-	if (sc != 1)
-	    F77_CALL(dscal)(&ntot, &sc, REAL(vv), &ione);
+	for (j = 0; j < nlev; j++)
+	    F77_CALL(dsyrk)("U", "N", &nc, &p,
+			    &one, RZXi + Gp[i] + j * nc, &q,
+			    &one, vv + j * ncsqr, &nc);
+	if (sc != 1) F77_CALL(dscal)(&ntot, &sc, vv, &ione);
 	if (nc > 1) {
-	    int ncsqr = dims[0] * dims[1];
 	    for (j = 0; j < nlev; j++)
-		internal_symmetrize(REAL(vv) + j * ncsqr, nc);
+		internal_symmetrize(vv + j * ncsqr, nc);
 	}
     }
     UNPROTECT(1);
