@@ -1,9 +1,20 @@
+2006-08-01  Douglas Bates  <bates@R-project.org>
+
+	* R/lmer.R (LMEoptimize method), tests/lmer.R,
+	inst/external/test3comp.rda: Added warnings for convergence on 
+	boundary and test cases.
+
+	* src/lmer.c (mer_postVar): Modified to return the variances that
+	are marginal to the fixed effects, not conditional on them (which
+	is what the bVar slot contents represent).
+
 2006-07-31  Douglas Bates  <bates@R-project.org>
 
 	* NAMESPACE, src/lmer.c, R/lmer.R (hatTrace):  Add the hatTrace
 	function which calls the C function mer_hat_trace2.
 	
-	* man/ranef.Rd: Include description of "postVar" argument.
+	* man/ranef.Rd: Include description of "postVar" argument and
+	producing a caterpillar plot.
 
 2006-07-31  Martin Maechler  <maechler@stat.math.ethz.ch>
 

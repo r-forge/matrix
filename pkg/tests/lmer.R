@@ -144,5 +144,15 @@ rG1k <- mcmcsamp(fm3., n = 1000)
 summary(rG1k)
 rG2 <- mcmcsamp(fm4, n = 3, verbose = TRUE)
 
+# convergence on boundary warnings
+load(system.file("external/test3comp.rda", package = "Matrix"))
+b3 <- lmer(Y3 ~ (1|Sample) + (1|Operator/Run), test3comp)
+if (isTRUE(try(data(Early, package = 'mlmRev')) == 'Early')) {
+    Early$tos <- Early$age - 0.5        # time on study
+    b1 <- lmer(cog ~ tos + trt:tos + (tos|id), Early,
+               control = list(msV = TRUE, nit=0))
+}
+
+
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
 

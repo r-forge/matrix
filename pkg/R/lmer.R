@@ -436,7 +436,30 @@ setReplaceMethod("LMEoptimize", signature(x="mer", value="list"),
 				    lower = ifelse(constr, 5e-10, -Inf),
 				    control = list(iter.max = value$msMaxIter,
 				    trace = as.integer(value$msVerbose)))
-		 .Call(mer_coefGets, x, optimRes$par, 2)
+                 estPar <- optimRes$par
+		 .Call(mer_coefGets, x, estPar, 2)
+                                        # check for convergence on boundary
+                 if (any(bd <- (estPar[constr] < 1e-9))) {
+                     bpar <- rep.int(FALSE, length(estPar))
+                     bpar[constr] <- bd
+                     bgrp <- split(bpar,
+                                   rep(seq(along = nc),
+                                       unlist(lapply(nc,
+                                                     function(k) (k*(k+1))/2))))
+                     bdd <- unlist(lapply(bgrp, any))
+                     lens <- unlist(lapply(bgrp, length))
+                     if (all(lens[bdd] == 1)) { # variance components only
+                         warning(paste("Estimated variance for factor(s)",
+                                       paste(names(x@flist)[bdd],
+                                             collapse = ","),
+                                       "is effectively zero\n"))
+                     } else {
+                         warning(paste("Estimated variance-covariance for factor(s)",
+                                       paste(names(x@flist)[bdd],
+                                             collapse = ","),
+                                       "is singular\n"))
+                     }
+                 }
 		 if (optimRes$convergence != 0) {
 		     warning(paste("nlminb returned message",
 				   optimRes$message,"\n"))
