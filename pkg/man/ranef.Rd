@@ -37,9 +37,32 @@ random.effects(object, \dots)   # deprecated
   attribute called \code{"postVar"} which is a three-dimensional array
   with symmetric faces.
 }
+\details{
+  If grouping factor i has k levels and j random effects per level the ith
+  component of the list returned by \code{ranef} is a data frame with k
+  rows and j columns.  If \code{postVar} is \code{TRUE} the
+  \code{"postVar"} attribute is an array of dimension j by j by k.  The
+  kth face of this array is a positive definite symmetric j by j
+  matrix.  If there is only one grouping factor in the model the
+  variance-covariance matrix for the entire random effects vector,
+  conditional on the estimates of the model parameters and on the data
+  will be block diagonal and this j by j matrix is the kth diagonal block.
+  With multiple grouping factors the faces of the \code{"postVar"}
+  attributes are still the diagonal blocks of this conditional
+  variance-covariance matrix but the matrix itself is no longer block
+  diagonal.
+}
+\note{
+  To produce a "caterpillar plot" of the random effects apply
+  \code{\link[lattice]{qqmath}} to the result of \code{ranef} with
+  \code{postVar = TRUE}.
+}
 \examples{
+fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
 fm2 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), sleepstudy)
-ranef(fm2)
+ranef(fm1)
+str(rr1 <- ranef(fm1, postVar = TRUE))
+qqmath(rr1)
 str(ranef(fm2, postVar = TRUE))
 }
 \keyword{models}
