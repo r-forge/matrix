@@ -78,6 +78,14 @@ makeInteraction <- function(x) {
     list(substitute(foo:bar, list(foo=x[[2]], bar = trm11)), trm1)
 }
 
+
+factorNames2char <- function(nms, collapse = ", ") {
+    ## utility in messages / print etc:
+    nms <- sQuote(nms)
+    if(length(nms) == 1) paste("factor", nms)
+    else paste("factors", paste(nms, collapse = collapse))
+}
+
 ## expand any slashes in the grouping factors returned by findbars
 expandSlash <- function(bb) {
     ## I really do mean lapply(unlist(... - unlist returns a
@@ -302,7 +310,7 @@ setMethod("lmer", signature(formula = "formula"),
 	  nlev <- sapply(fl, function(x) length(levels(x)))
 	  if(any(nlev == 0))
 	      stop("resulting factor(s) with 0 levels in random effects part:\n ",
-		   names(nlev[nlev == 0]))
+		   paste(sQuote(names(nlev[nlev == 0])), collapse=", "))
 	  if (any(diff(nlev) > 0)) {
 	      ord <- rev(order(nlev))
 	      bars <- bars[ord]
@@ -438,31 +446,29 @@ setReplaceMethod("LMEoptimize", signature(x="mer", value="list"),
 				    trace = as.integer(value$msVerbose)))
                  estPar <- optimRes$par
 		 .Call(mer_coefGets, x, estPar, 2)
-                                        # check for convergence on boundary
-                 if (any(bd <- (estPar[constr] < 1e-9))) {
-                     bpar <- rep.int(FALSE, length(estPar))
-                     bpar[constr] <- bd
-                     bgrp <- split(bpar,
-                                   rep(seq(along = nc),
-                                       unlist(lapply(nc,
-                                                     function(k) (k*(k+1))/2))))
-                     bdd <- unlist(lapply(bgrp, any))
-                     lens <- unlist(lapply(bgrp, length))
-                     if (all(lens[bdd] == 1)) { # variance components only
-                         warning(paste("Estimated variance for factor(s)",
-                                       paste(names(x@flist)[bdd],
-                                             collapse = ","),
-                                       "is effectively zero\n"))
-                     } else {
-                         warning(paste("Estimated variance-covariance for factor(s)",
-                                       paste(names(x@flist)[bdd],
-                                             collapse = ","),
-                                       "is singular\n"))
-                     }
-                 }
+
+                 ## check for convergence on boundary
+		 if (any(bd <- (estPar[constr] < 1e-9))) {
+		     bpar <- rep.int(FALSE, length(estPar))
+		     bpar[constr] <- bd
+		     bgrp <- split(bpar,
+				   rep(seq(along = nc),
+				       unlist(lapply(nc,
+						     function(k) (k*(k+1))/2))))
+		     bdd <- unlist(lapply(bgrp, any))
+		     lens <- unlist(lapply(bgrp, length))
+		     if (all(lens[bdd] == 1)) { # variance components only
+			 warning("Estimated variance for ",
+				 factorNames2char(names(x@flist)[bdd]),
+				 " is effectively zero\n")
+		     } else {
+			 warning("Estimated variance-covariance for ",
+				 factorNames2char(names(x@flist)[bdd]),
+				 " is singular\n")
+		     }
+		 }
 		 if (optimRes$convergence != 0) {
-		     warning(paste("nlminb returned message",
-				   optimRes$message,"\n"))
+		     warning("nlminb returned message ", optimRes$message,"\n")
 		 }
 		 return(x)
 	     })
@@ -619,9 +625,10 @@ setMethod("simulate", signature(object = "mer"),
 	      stop("simulation of generalized linear mixed models not yet implemented")
 	  ## similate the linear predictors
 	  lpred <- .Call(mer_simulate, object, nsim)
-	  sc <- 1
-	  if (object@useScale)
-	      sc <- .Call(mer_sigma, object, object@method == "REML")
+	  sc <-
+              if (object@useScale)
+                  .Call(mer_sigma, object, object@method == "REML")
+              else 1
 
 	  ## add fixed-effects contribution and per-observation noise term
 	  lpred <- as.data.frame(lpred + drop(object@X %*% fixef(object)) +
@@ -1070,7 +1077,7 @@ if (FALSE) {
 
     .Call(glmer_finalize, GSpt)
     loglik[] <- -deviance/2
-}
+}## end{leftover}
 
 setMethod("isNested", "mer",
           function(x, ...) !(x@L@type[1]),
