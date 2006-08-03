@@ -1,7 +1,17 @@
+2006-08-03  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.995-13 to be released to CRAN
+
+	* DESCRIPTION (Lazydata): no, instead of 'yes' because it fails for:
+	* data/CAex.R, inst/external/CAex_slots.rda: replacing data/CAex.rda
+	* data/KNex.R, inst/external/KNex_slots.rda: replacing data/KNex.rda
+	such that the S4 objects are always created by the current version
+	of R and 'Matrix' class definitions.
+
 2006-08-01  Douglas Bates  <bates@R-project.org>
 
 	* R/lmer.R (LMEoptimize method), tests/lmer.R,
-	inst/external/test3comp.rda: Added warnings for convergence on 
+	inst/external/test3comp.rda: Added warnings for convergence on
 	boundary and test cases.
 
 	* src/lmer.c (mer_postVar): Modified to return the variances that
@@ -12,7 +22,7 @@
 
 	* NAMESPACE, src/lmer.c, R/lmer.R (hatTrace):  Add the hatTrace
 	function which calls the C function mer_hat_trace2.
-	
+
 	* man/ranef.Rd: Include description of "postVar" argument and
 	producing a caterpillar plot.
 
