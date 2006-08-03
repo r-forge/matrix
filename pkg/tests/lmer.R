@@ -2,6 +2,7 @@ library(Matrix)# well, library(lme4), ...
 require(lattice)# (is there anyway)
 options(show.signif.stars = FALSE)
 
+data(sleepstudy)
 (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
 (fm1a <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy, method = "ML"))
 (fm2 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), sleepstudy))
@@ -152,6 +153,28 @@ if (isTRUE(try(data(Early, package = 'mlmRev')) == 'Early')) {
     b1 <- lmer(cog ~ tos + trt:tos + (tos|id), Early,
                control = list(msV = TRUE, nit=0))
 }
+
+## Spencer Graves' example (from a post to S-news, 2006-08-03): ----------------
+## FIXME?
+tstDF <- data.frame(group = letters[1:5], y = 1:5)
+var(tstDF$y) # == 2.5
+f.oops <- lmer(y ~ 1 + (1|group), data = tstDF)
+summary(f.oops) ## or print(Matrix:::formatVC(VarCorr(f.oops)), quote = FALSE)
+## ...
+##   Groups   Name        Variance Std.Dev.
+##   group    (Intercept) 1.81818  1.34840
+##   Residual             0.68182  0.82572
+## ...
+
+##SG> This is ... silly, because there are zero degrees of freedom
+##SG> to distinguish "group" from Residual.  It is comforting that the sum of
+##SG> the variances sum to the variance of "y", ......
+
+##SG> However, I would prefer to have the multilevel software catch this
+##SG> case and optionally return an error or drop the redundant group
+##SG> with a warning.
+
+
 
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
