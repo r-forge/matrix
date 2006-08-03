@@ -22,6 +22,7 @@ hatTrace(x)
   discussion)", \emph{Journal of the Royal Statistical Society, part B},
   \bold{64}, (4), 583-639.}
 \examples{
+data(sleepstudy)
 hatTrace(lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), sleepstudy))
 }
 \keyword{models}
