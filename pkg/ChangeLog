@@ -1,3 +1,10 @@
+2006-08-07  Douglas Bates  <bates@R-project.org>
+
+	* src/Csparse.c (Csparse_crossprod): Set stype on result to avoid
+	R-level conversion to a sparse symmetric class.
+	* R/Tsparse.R,R/Csparse.R (crossprod and tcrossprod methods):
+	Remove conversion to sparse symmetric classes (now done in C code).
+
 2006-08-07  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/dgCMatrix.R: disable old crossprod and tcrossprod methods
@@ -14,8 +21,8 @@
 
 	* R/Auxiliaries.R (as_Tsparse, as_Rsparse): new
 	* R/Tsparse.R (tril, triu, band): methods
-	* R/dgRMatrix.R (tril, ...):	dito
-	* man/band.Rd:			dito
+	* R/dgRMatrix.R (tril, ...):	ditto
+	* man/band.Rd:			ditto
 
 2006-08-04  Martin Maechler  <maechler@stat.math.ethz.ch>
 
@@ -54,8 +61,8 @@
 
 	* NAMESPACE:    change  "correlation" to "corMatrix"
 	* R/AllClass.R: to avoid clash with S3 class in 'nlme'.
-	* R/dpoMatrix.R: dito
-	* R/lmer.R:	 dito
+	* R/dpoMatrix.R: ditto
+	* R/lmer.R:	 ditto
 
 2006-07-28  Douglas Bates  <bates@R-project.org>
 
@@ -230,7 +237,7 @@
 
 	* R/sparseMatrix.R: Matrix <-> graph methods: can no longer use
 	the C code depending on a slot structure that's no longer valid.
-	* src/dgTMatrix.c: dito (also: src/init.c src/dgTMatrix.h)
+	* src/dgTMatrix.c: ditto (also: src/init.c src/dgTMatrix.h)
 
 
 2006-05-17  Douglas Bates  <bates@stat.wisc.edu>
@@ -353,7 +360,7 @@
 	* data/KNex.rda: replacing 'mm' and 'y' by KNex <- list(mm=mm, y=y)
 	* man/KNex.Rd: and other help files
 	* tests/*.R: several ones needed adaption
-	* inst/doc/Comparisons.Rnw: dito
+	* inst/doc/Comparisons.Rnw: ditto
 
 2006-03-11  Martin Maechler  <maechler@stat.math.ethz.ch>
 
@@ -557,7 +564,7 @@
 2005-08-26  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Matrix.R:  added first "[<-" methods; not yet functional
-	* R/denseMatrix.R: dito
+	* R/denseMatrix.R: ditto
 	* man/Subassign-methods.Rd: new help file for these
 
 2005-08-25  Martin Maechler  <maechler@stat.math.ethz.ch>
