@@ -166,16 +166,12 @@ summary(f.oops) ## or print(Matrix:::formatVC(VarCorr(f.oops)), quote = FALSE)
 ##   Residual             0.68182  0.82572
 ## ...
 
-##SG> This is ... silly, because there are zero degrees of freedom
+##SG>	 This is ... silly, because there are zero degrees of freedom
 ##SG> to distinguish "group" from Residual.  It is comforting that the sum of
 ##SG> the variances sum to the variance of "y", ......
-
-##SG> However, I would prefer to have the multilevel software catch this
+##SG>	 However, I would prefer to have the multilevel software catch this
 ##SG> case and optionally return an error or drop the redundant group
 ##SG> with a warning.
 
 
-
-
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
-
