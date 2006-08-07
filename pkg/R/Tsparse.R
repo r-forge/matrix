@@ -254,26 +254,12 @@ setReplaceMethod("[", signature(x = "TsparseMatrix", i = "index", j = "index",
 
 setMethod("crossprod", signature(x = "TsparseMatrix", y = "missing"),
 	  function(x, y = NULL) {
-	      a <- .Call(Csparse_crossprod, x, trans = FALSE, triplet = TRUE)
-	      switch(substr(class(a)[1], 1, 1),
-		     "d" ={ new("dsCMatrix", i = a@i, p = a@p, x = a@x,
-				Dim = a@Dim, Dimnames = a@Dimnames, uplo = "U",
-				factors = list()) },
-		     "l" ={ new("lsCMatrix", i = a@i, p = a@p,
-				Dim = a@Dim, Dimnames = a@Dimnames, uplo = "U",
-				factors = list())})
+	      .Call(Csparse_crossprod, x, trans = FALSE, triplet = TRUE)
 	  })
 
 setMethod("tcrossprod", signature(x = "TsparseMatrix", y = "missing"),
 	  function(x, y = NULL) {
-	      a <- .Call(Csparse_crossprod, x, trans = TRUE, triplet = TRUE)
-	      switch(substr(class(a)[1], 1, 1),
-		     "d" ={ new("dsCMatrix", i = a@i, p = a@p, x = a@x,
-				Dim = a@Dim, Dimnames = a@Dimnames, uplo = "L",
-				factors = list()) },
-		     "l" ={ new("lsCMatrix", i = a@i, p = a@p,
-				Dim = a@Dim, Dimnames = a@Dimnames, uplo = "L",
-				factors = list()) })
+	      .Call(Csparse_crossprod, x, trans = TRUE, triplet = TRUE)
 	  })
 
 setMethod("colSums", signature(x = "TsparseMatrix"), .as.dgT.Fun,
