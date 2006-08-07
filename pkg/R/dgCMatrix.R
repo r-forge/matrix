@@ -25,6 +25,7 @@ setAs("dgeMatrix", "dgCMatrix",
       function(from) .Call(dgeMatrix_to_csc, from))
 
 
+if(FALSE) # rather use code from ./Csparse.R
 setMethod("crossprod", signature(x = "dgCMatrix", y = "missing"),
           function(x, y = NULL) .Call(csc_crossprod, x),
           valueClass = "dsCMatrix")
@@ -47,6 +48,7 @@ setMethod("crossprod", signature(x = "dgCMatrix", y = "matrix"),
 ## setMethod("crossprod", signature(x = "dgCMatrix", y = "numeric"),
 ##           function(x, y = NULL) .Call(csc_matrix_crossprod, x, as.matrix(y)))
 
+if(FALSE) # rather use code from ./Csparse.R
 setMethod("tcrossprod", signature(x = "dgCMatrix", y = "missing"),
           function(x, y = NULL) .Call(csc_tcrossprod, x))
 

@@ -1,5 +1,10 @@
 2006-08-07  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* R/dgCMatrix.R: disable old crossprod and tcrossprod methods
+	* man/band.Rd:  adapt the \dontshow{} unit test.
+
+2006-08-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
 	* DESCRIPTION (Version): 0.995-14  for CRAN
 
 	* tests/other-pkgs.R: oops: library(Matrix) outside *if* !
