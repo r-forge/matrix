@@ -1,3 +1,7 @@
+2006-08-08  Douglas Bates  <bates@R-project.org>
+
+	* src/Csparse.c (Csparse_crossprod): tcrossprod result has stype = -1
+
 2006-08-07  Douglas Bates  <bates@R-project.org>
 
 	* src/Csparse.c (Csparse_crossprod): Set stype on result to avoid
