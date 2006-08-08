@@ -100,6 +100,13 @@ MM. <- tcrossprod(M)
 stopifnot(class(MM.) == "dsCMatrix",
           class(M.M) == "dsCMatrix")
 
+## even simpler
+m <- matrix(0, 4,7); m[c(1, 3, 6, 9, 11, 22, 27)] <- 1
+(mm <- Matrix(m))
+(cm <- Matrix(crossprod(m)))
+stopifnot(identical(crossprod(mm), cm))
+Matrix(tcrossprod(m)) #-> had bug in 'Matrix()' !
+tcrossprod(mm)
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
 
