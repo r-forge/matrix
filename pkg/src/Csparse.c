@@ -107,9 +107,8 @@ SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet)
     chcp = cholmod_aat((!tr) ? chxt : chx, (int *) NULL, 0, chx->xtype, &c);
     if(!chcp)
 	error("Csparse_crossprod(): error return from cholmod_aat()");
-    cholmod_band_inplace((tr) ? -(chcp->nrow) : 0, (tr) ? 0 : chcp->ncol,
-			 chcp->xtype, chcp, &c);
-    chcp->stype = (tr) ? -1 : 1;
+    cholmod_band_inplace(0, chcp->ncol, chcp->xtype, chcp, &c);
+    chcp->stype = 1;
     if (trip) {
 	cholmod_free_sparse(&chx, &c);
 	Free(cht);
