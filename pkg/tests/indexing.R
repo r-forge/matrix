@@ -46,9 +46,8 @@ m[1:3,]
 
 g10 <- m [ m > 10 ]
 stopifnot(18 == length(g10))
-if(paste(R.version$major, R.version$minor, sep=".") >= "2.3")
-    ## Buglet in R(<= 2.2.1)'s possibleExtends()
-    stopifnot(10 == length(m[ m <= 10 ]))
+## needs R >= 2.3.0 [Buglet in R(<= 2.2.1)'s possibleExtends()]:
+stopifnot(10 == length(m[ m <= 10 ]))
 
 
 ### Sparse Matrices --------------------------------------
@@ -95,8 +94,8 @@ x.x <- crossprod(mC)
 stopifnot(class(x.x) == "dsCMatrix",
           class(x.x. <- round(x.x / 10000)) == "dsCMatrix")
 head(x.x.) # Note the *non*-structural 0's printed as "0"
-if(paste(R.version$major, R.version$minor, sep=".") >= "2.4")
-    tail(x.x., -2) # the last two lines
+## FIXME (once we require 2.4.x or higher):
+##  tail(x.x., -2) # the last two lines
 
 lx.x <- as(x.x, "lsCMatrix") # FALSE only for "structural" 0
 if(FALSE) { ## FIXME: needs coercion  "lsCMatrix" to "lgTMatrix"
