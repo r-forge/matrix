@@ -277,5 +277,5 @@ SEXP sCMatrix_to_gCMatrix(SEXP x)
     /* xtype: pattern, "real", complex or .. */
 
     Free(chx);
-    return chm_sparse_to_SEXP(ans, 1);
+    return chm_sparse_to_SEXP(ans, 1, 0, "", R_NilValue);
 }

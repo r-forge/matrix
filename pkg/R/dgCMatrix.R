@@ -1,15 +1,19 @@
 #### Sparse Matrices in Compressed column-oriented format
 
-### contains = "dsparseMatrix"
+### contains = "dsparseMatrix", "CsparseMatrix"
+
+## Specific conversions, should they be necessary.  Better to convert as
+## as(x, "TsparseMatrix") or as(x, "denseMatrix")
 
 setAs("dgCMatrix", "dgTMatrix",
-      function(from) .Call(compressed_to_dgTMatrix, from, TRUE))
-
-setAs("dgCMatrix", "matrix",
-      function(from) .Call(csc_to_matrix, from))
+      function(from) .Call(Csparse_to_Tsparse, from, FALSE))
 
 setAs("dgCMatrix", "dgeMatrix",
-      function(from) .Call(csc_to_dgeMatrix, from))
+      function(from) .Call(Csparse_to_dense, from))
+
+## can use method in Csparse.R
+## setAs("dgCMatrix", "matrix",
+##       function(from) .Call(Csparse_to_matrix, from))
 
 setAs("dgCMatrix", "lgCMatrix",
       function(from) new("lgCMatrix", i = from@i, p = from@p,
@@ -30,11 +34,13 @@ setMethod("crossprod", signature(x = "dgCMatrix", y = "missing"),
           function(x, y = NULL) .Call(csc_crossprod, x),
           valueClass = "dsCMatrix")
 
+if(FALSE) # rather use code from ./Csparse.R
 setMethod("crossprod", signature(x = "dgCMatrix", y = "dgeMatrix"),
           function(x, y = NULL)
           .Call(csc_matrix_crossprod, x, y, TRUE),
           valueClass = "dgeMatrix")
 
+if(FALSE) # rather use code from ./Csparse.R
 setMethod("crossprod", signature(x = "dgCMatrix", y = "matrix"),
           function(x, y = NULL) {
 	      storage.mode(y) <- "double"

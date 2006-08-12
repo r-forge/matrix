@@ -42,18 +42,19 @@ setAs("dtCMatrix", "dgeMatrix",
 setAs("dtCMatrix", "dtTMatrix",
       function(from) {# and this is not elegant:
           x <- as(from, "dgTMatrix")
-	  if (from@diag == "U") { ## drop diagonal entries '1':
-	      i <- x@i; j <- x@j
-	      nonD <- i != j
-	      xx <- x@x[nonD] ; i <- i[nonD] ; j <- j[nonD]
-	  } else {
-	      xx <- x@x; i <- x@i; j <- x@j
-	  }
-	  new("dtTMatrix", x = xx, i = i, j = j, Dim = x@Dim,
-	      Dimnames = x@Dimnames, uplo = from@uplo, diag = from@diag)
+ 	  if (from@diag == "U") { ## drop diagonal entries '1':
+ 	      i <- x@i; j <- x@j
+ 	      nonD <- i != j
+ 	      xx <- x@x[nonD] ; i <- i[nonD] ; j <- j[nonD]
+ 	  } else {
+ 	      xx <- x@x; i <- x@i; j <- x@j
+ 	  }
+ 	  new("dtTMatrix", x = xx, i = i, j = j, Dim = x@Dim,
+ 	      Dimnames = x@Dimnames, uplo = from@uplo, diag = from@diag)
       })
 
-setAs("dtCMatrix", "TsparseMatrix", function(from) as(from, "dtTMatrix"))
+## Now that we support triangular matrices use the inherited method.
+## setAs("dtCMatrix", "TsparseMatrix", function(from) as(from, "dtTMatrix"))
 
 setAs("dtCMatrix", "dtrMatrix",
       function(from) as(as(from, "dtTMatrix"), "dtrMatrix"))
