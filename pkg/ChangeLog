@@ -1,3 +1,12 @@
+2006-08-12  Douglas Bates  <bates@R-project.org>
+
+	* src/chm_common.[ch],Csparse.[ch],Tsparse.[ch],CHMfactor.c,dtTMatrix.c,
+	  dgTMatrix.c,dgCMatrix.c,dsCMatrix.c,dtTMatrix.c, R/dsTMatrix.R,
+	  Tsparse.R,Csparse.R,dgTMatrix.R,dsCMatrix.R,lsCMatrix.R:
+	  generalize conversions between TsparseMatrix, CsparseMatrix,
+	  denseMatrix and matrix.  Preserve triangularity property and
+	  propagate Dimnames in the easy cases.
+
 2006-08-10  Douglas Bates  <bates@R-project.org>
 
 	* src/lmer.c: adjust checks in glmer_init for S4SXP
