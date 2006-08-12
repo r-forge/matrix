@@ -5,7 +5,10 @@
 \alias{\%*\%,CsparseMatrix,denseMatrix-method}
 \alias{coerce,CsparseMatrix,TsparseMatrix-method}
 \alias{coerce,CsparseMatrix,denseMatrix-method}
+\alias{coerce,CsparseMatrix,matrix-method}
 \alias{crossprod,CsparseMatrix,missing-method}
+\alias{crossprod,CsparseMatrix,dgeMatrix-method}
+\alias{crossprod,CsparseMatrix,matrix-method}
 \alias{t,CsparseMatrix-method}
 \alias{tcrossprod,CsparseMatrix,missing-method}
 \alias{colMeans,CsparseMatrix-method}
