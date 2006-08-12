@@ -2,21 +2,29 @@
 ####  "column compressed" format.
 #### -- many more specific things are e.g. in ./dgCMatrix.R
 
-## FIXME: the is(*,"generalMatrix") test at least makes these work,
-##        but they are still ``wrong'', since triangularity is lost  :
-
 setAs("CsparseMatrix", "TsparseMatrix",
-      function(from) {
-	  if(!is(from, "generalMatrix")) { ## e.g. for triangular | symmetric
-	      if     (is(from, "dMatrix")) from <- as(from, "dgCMatrix")
-	      else if(is(from, "lMatrix")) from <- as(from, "lgCMatrix")
-	      else if(is(from, "zMatrix")) from <- as(from, "zgCMatrix")
-	      else stop("undefined method for class ", class(from))
-	  }
-          .Call(Csparse_to_Tsparse, from) # ../src/Csparse.c
-          ## |-> cholmod_C -> cholmod_T -> chm_triplet_to_SEXP(* , 1)
-      })
+      function(from)
+          ## |-> cholmod_C -> cholmod_T -> chm_triplet_to_SEXP
+          ## modified to support triangular (../src/Csparse.c)
+          .Call(Csparse_to_Tsparse, from, is(from, "triangularMatrix")))
 
+##           if (is(from, "triangularMatrix")) {
+##               ## regenerate the matrix with the triangular properties
+##               ## FIXME: move this to the C code
+##               if (is(ans, "lMatrix"))
+##                   return(new("ltTMatrix", i = ans@i, j = ans@j,
+##                              Dim = ans@Dim, Dimnames = ans@Dimnames,
+##                              uplo = from@uplo, diag = from@diag))
+##               return(new(ifelse(is(ans, "dMatrix"), "dtTMatrix", "ztTMatrix"),
+##                          i = ans@i, j = ans@j, x = ans@x,
+##                          Dim = ans@Dim, Dimnames = ans@Dimnames,
+##                          uplo = from@uplo, diag = from@diag))
+##           }
+##           ans
+##       })
+
+## cholmod_sparse and cholmod_triplet flag symmetry - cholmod_dense doesn't
+## We use cholmod_sparse_to_dense here so must convert symmetric to general
 setAs("CsparseMatrix", "denseMatrix",
       function(from) {
 	  if(!is(from, "generalMatrix")) { ## e.g. for triangular | symmetric
@@ -26,6 +34,19 @@ setAs("CsparseMatrix", "denseMatrix",
 	      else stop("undefined method for class ", class(from))
 	  }
           .Call(Csparse_to_dense, from)
+      })
+
+## cholmod_sparse and cholmod_triplet flag symmetry - cholmod_dense doesn't
+## We use cholmod_sparse_to_dense here so must convert symmetric to general
+setAs("CsparseMatrix", "matrix",
+      function(from) {
+	  if(!is(from, "generalMatrix")) { ## e.g. for triangular | symmetric
+	      if     (is(from, "dMatrix")) from <- as(from, "dgCMatrix")
+	      else if(is(from, "lMatrix")) from <- as(from, "lgCMatrix")
+	      else if(is(from, "zMatrix")) from <- as(from, "zgCMatrix")
+	      else stop("undefined method for class ", class(from))
+	  }
+          .Call(Csparse_to_matrix, from)
       })
 
 ### Some group methods:
@@ -137,6 +158,13 @@ setMethod("crossprod", signature(x = "CsparseMatrix", y = "missing"),
 	      .Call(Csparse_crossprod, x, trans = FALSE, triplet = FALSE)
 	  })
 
+## FIXME: Generalize the class of y.  This specific method is to replace one
+##        in dgCMatrix.R
+setMethod("crossprod", signature(x = "CsparseMatrix", y = "dgeMatrix"),
+	  function(x, y = NULL) .Call(Csparse_dense_crossprod, x, y))
+
+setMethod("crossprod", signature(x = "CsparseMatrix", y = "matrix"),
+	  function(x, y = NULL) .Call(Csparse_dense_crossprod, x, y))
 
 setMethod("t", signature(x = "CsparseMatrix"),
 	  function(x)

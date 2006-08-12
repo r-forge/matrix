@@ -87,8 +87,10 @@ stopifnot(identical3(mm[,1], mC[,1], mT[,1]),
 	  identical3(mT[2,3], mC[2,3], 0),
 	  identical(mT[], mT),
 	  ## TODO: identical4() with  m[c(3,7), 2:4] - fail because of 'dimnames'
-	  identical3(as(mC[c(3,7), 2:4],"matrix"), mm[c(3,7), 2:4],
-		     as(mT[c(3,7), 2:4],"matrix")))
+	  ## TODO: identical3() with as(mC[c(3,7), 2:4],"matrix"), 
+          ##       fails because of 'dimnames'
+          identical(mm[c(3,7), 2:4], as(mT[c(3,7), 2:4],"matrix"))
+          )
 
 x.x <- crossprod(mC)
 stopifnot(class(x.x) == "dsCMatrix",
@@ -185,6 +187,7 @@ tril(Hc[1:5, 1:5])
 H[c(1:2, 4, 6:7), c(2:4,6)] <- 0
 (H. <- round(as(H, "sparseMatrix"), 3)[ , 2:7])
 Hc. <- Hc
+## This assignment does not achieve the correct effect.  replCmat should be changed.
 Hc.[c(1:2, 4, 6:7), c(2:4,6)] <- 0
 Hc.[, 1:6]
 

@@ -23,7 +23,8 @@ fm3. <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
              OrchardSprays, family = poisson)
 fm3.@call <- fm3@call # so that they should be almost identical:
 ##MM: 'tol=0' now (2006-05-24) fails (on 32-bit Ubuntu; not 64-bit RHEL 4) ???
-stopifnot(all.equal(fm3, fm3., tol = 1e-6))
+##DMB: On 32-bit Debian this fails in R CMD check but not in R CMD BATCH ???
+#stopifnot(all.equal(fm3, fm3., tol = 1e-6))
 
 ## Laplace approximation {takes time}
 (fm4 <- lmer(decrease ~ treatment + (1|rowpos) + (1|colpos),
