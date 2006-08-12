@@ -8,8 +8,10 @@ setAs("lsCMatrix", "matrix",
 setAs("lsCMatrix", "lgCMatrix",
       function(from) .Call(sCMatrix_to_gCMatrix, from))
 
+## Specific conversions, should they be necessary.  Better to convert as
+## as(x, "TsparseMatrix") or as(x, "denseMatrix")
 setAs("lsCMatrix", "lsTMatrix",
-      function(from) .Call(Csparse_to_Tsparse, from))
+      function(from) .Call(Csparse_to_Tsparse, from, FALSE))
 
 setAs("lsCMatrix", "dsCMatrix",
       function(from) new("dsCMatrix", i = from@i, p = from@p,

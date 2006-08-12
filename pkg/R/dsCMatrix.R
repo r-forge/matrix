@@ -7,9 +7,10 @@ setAs("dgCMatrix", "dsCMatrix",
 	      as(as(as(from, "dgTMatrix"), "dsTMatrix"), "dsCMatrix")
 	  else stop("not a symmetric matrix")})
 
+## Specific conversions, should they be necessary.  Better to convert as
+## as(x, "TsparseMatrix") or as(x, "denseMatrix")
 setAs("dsCMatrix", "dsTMatrix",
-      function(from) ## Cholmod:
-      .Call(Csparse_to_Tsparse, from))
+      function(from) .Call(Csparse_to_Tsparse, from, FALSE))
 
 setAs("dsCMatrix", "dgTMatrix", # needed for image()
       function(from) ## pre-Cholmod:

@@ -1,5 +1,5 @@
 setAs("dgTMatrix", "dgCMatrix",
-      function(from) .Call(dgTMatrix_to_dgCMatrix, from)
+      function(from) .Call(Tsparse_to_Csparse, from, FALSE)
       )
 
 setAs("dgTMatrix", "dgeMatrix",
@@ -58,13 +58,14 @@ setAs("matrix", "dgTMatrix",
 ## "[<-" methods { setReplaceMethod()s }  too ...
 
 
+## "crossprod" methods too ...
 ## setMethod("crossprod", signature(x = "dgTMatrix", y = "missing"),
 ##           function(x, y = NULL)
 ##           .Call(csc_crossprod, as(x, "dgCMatrix")))
 
-setMethod("crossprod", signature(x = "dgTMatrix", y = "matrix"),
-          function(x, y = NULL)
-          .Call(csc_matrix_crossprod, as(x, "dgCMatrix"), y))
+## setMethod("crossprod", signature(x = "dgTMatrix", y = "matrix"),
+##           function(x, y = NULL)
+##           .Call(csc_matrix_crossprod, as(x, "dgCMatrix"), y))
 
 ##setMethod("crossprod", signature(x = "dgTMatrix", y = "numeric"),
 ##          function(x, y = NULL)

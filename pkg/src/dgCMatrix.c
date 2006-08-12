@@ -111,7 +111,7 @@ SEXP csc_tcrossprod(SEXP x)
 
     Free(chx);
     cholmod_free_sparse(&cha, &c);
-    return chm_sparse_to_SEXP(chas, 1);
+    return chm_sparse_to_SEXP(chas, 1, 0, "", R_NilValue);
 }
 
 SEXP csc_matrix_crossprod(SEXP x, SEXP y, SEXP classed)
@@ -337,7 +337,7 @@ SEXP csc_transpose(SEXP x)
 {
     cholmod_sparse *chx = as_cholmod_sparse(x);
     SEXP ans =
-	chm_sparse_to_SEXP(cholmod_transpose(chx, 1, &c), 1);
+	chm_sparse_to_SEXP(cholmod_transpose(chx, 1, &c), 1, 0, "", R_NilValue);
     Free(chx);
     return ans;
 }
