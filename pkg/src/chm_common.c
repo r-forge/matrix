@@ -313,14 +313,18 @@ cholmod_dense *as_cholmod_dense(SEXP x)
 		     "lmatrix", "lgeMatrix",
 		     "zmatrix", "zgeMatrix", ""},
 	*cl = CHAR(asChar(getAttrib(x, R_ClassSymbol)));
-    int dims[2], ctype = check_class(cl, valid);
+    int dims[2], ctype = check_class(cl, valid), nprot = 0;
 
-    if (ctype < 0) {
+    if (ctype < 0) {		/* not a classed matrix */
+	if (isMatrix(x)) Memcpy(dims, INTEGER(getAttrib(x, R_DimSymbol)), 2);
+	else {dims[0] = LENGTH(x); dims[1] = 1;}
+	if (isInteger(x)) {
+	    x = PROTECT(coerceVector(x, REALSXP));
+	    nprot++;
+	}
 	ctype = (isReal(x) ? 0 :
 		 (isLogical(x) ? 2 :
 		  (isComplex(x) ? 4 : -1)));
-	if (isMatrix(x)) Memcpy(dims, INTEGER(getAttrib(x, R_DimSymbol)), 2);
-	else {dims[0] = LENGTH(x); dims[1] = 1;}
     } else Memcpy(dims, INTEGER(GET_SLOT(x, Matrix_DimSym)), 2);
     if (ctype < 0) error("invalid class of object to as_cholmod_dense");
 				/* characteristics of the system */
@@ -345,7 +349,7 @@ cholmod_dense *as_cholmod_dense(SEXP x)
 	ans->x = (void *) COMPLEX((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x);
 	break;
     }
-
+    UNPROTECT(nprot);
     return ans;
 }
 

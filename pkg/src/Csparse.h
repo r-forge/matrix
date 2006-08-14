@@ -11,7 +11,7 @@ SEXP Csparse_horzcat(SEXP x, SEXP y);
 SEXP Csparse_to_Tsparse(SEXP x, SEXP tri);
 SEXP Csparse_to_dense(SEXP x);
 SEXP Csparse_to_matrix(SEXP x);
-SEXP Csparse_transpose(SEXP x);
+SEXP Csparse_transpose(SEXP x, SEXP tri);
 SEXP Csparse_validate(SEXP x);
 SEXP Csparse_vertcat(SEXP x, SEXP y);
 SEXP Csparse_band(SEXP x, SEXP k1, SEXP k2);

@@ -47,7 +47,7 @@ static R_CallMethodDef CallEntries[] = {
     {"Csparse_to_dense", (DL_FUNC) &Csparse_to_dense, 1},
     {"Csparse_to_matrix", (DL_FUNC) &Csparse_to_matrix, 1},
     {"Csparse_submatrix", (DL_FUNC) &Csparse_submatrix, 3},
-    {"Csparse_transpose", (DL_FUNC) &Csparse_transpose, 1},
+    {"Csparse_transpose", (DL_FUNC) &Csparse_transpose, 2},
     {"Csparse_validate", (DL_FUNC) &Csparse_validate, 1},
     {"Csparse_vertcat", (DL_FUNC) &Csparse_vertcat, 2},
     {"pCholesky_validate", (DL_FUNC) &pCholesky_validate, 1},
@@ -66,22 +66,22 @@ static R_CallMethodDef CallEntries[] = {
     {"csc_check_column_sorting", (DL_FUNC) &csc_check_column_sorting, 1},
     {"Zt_create", (DL_FUNC) &Zt_create, 2},
 /*     {"csc_crossprod", (DL_FUNC) &csc_crossprod, 1}, */
-    {"csc_getDiag", (DL_FUNC) &csc_getDiag, 1},
-    {"csc_matrix_crossprod", (DL_FUNC) &csc_matrix_crossprod, 3},
+/*     {"csc_getDiag", (DL_FUNC) &csc_getDiag, 1}, */
+/*     {"csc_matrix_crossprod", (DL_FUNC) &csc_matrix_crossprod, 3}, */
     {"csc_matrix_mm", (DL_FUNC) &csc_matrix_mm, 4},
-    {"csc_tcrossprod", (DL_FUNC) &csc_tcrossprod, 1},
+/*     {"csc_tcrossprod", (DL_FUNC) &csc_tcrossprod, 1}, */
     {"compressed_to_dgTMatrix", (DL_FUNC) &compressed_to_dgTMatrix, 2},
     {"compressed_non_0_ij", (DL_FUNC) &compressed_non_0_ij, 2},
-    {"csc_to_dgeMatrix", (DL_FUNC) &csc_to_dgeMatrix, 1},
-    {"csc_to_matrix", (DL_FUNC) &csc_to_matrix, 1},
-    {"csc_transpose", (DL_FUNC) &csc_transpose, 1},
+/*     {"csc_to_dgeMatrix", (DL_FUNC) &csc_to_dgeMatrix, 1}, */
+/*     {"csc_to_matrix", (DL_FUNC) &csc_to_matrix, 1}, */
+/*     {"csc_transpose", (DL_FUNC) &csc_transpose, 1}, */
     {"dense_to_Csparse", (DL_FUNC) &dense_to_Csparse, 1},
     {"dense_nonpacked_validate", (DL_FUNC) &dense_nonpacked_validate, 1},
     {"dMatrix_validate", (DL_FUNC) &dMatrix_validate, 1},
 
     {"dgCMatrix_validate", (DL_FUNC) &dgCMatrix_validate, 1},
-    {"dgeMatrix_to_csc", (DL_FUNC) &dgeMatrix_to_csc, 1},
-    {"dgTMatrix_to_csc", (DL_FUNC) &dgTMatrix_to_csc, 1},
+/*     {"dgeMatrix_to_csc", (DL_FUNC) &dgeMatrix_to_csc, 1}, */
+/*     {"dgTMatrix_to_csc", (DL_FUNC) &dgTMatrix_to_csc, 1}, */
 /*    {"dgTMatrix_to_dgCMatrix", (DL_FUNC) &dgTMatrix_to_dgCMatrix, 1}, */
     {"dgTMatrix_to_dgeMatrix", (DL_FUNC) &dgTMatrix_to_dgeMatrix, 1},
     {"dgTMatrix_to_matrix", (DL_FUNC) &dgTMatrix_to_matrix, 1},
@@ -230,7 +230,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_update_ZXy", (DL_FUNC) &mer_update_ZXy, 1},
     {"mer_update_y", (DL_FUNC) &mer_update_y, 2},
 
-    {"matrix_to_csc", (DL_FUNC) &matrix_to_csc, 1},
+/*     {"matrix_to_csc", (DL_FUNC) &matrix_to_csc, 1}, */
     {"pedigree_chol", (DL_FUNC) &pedigree_chol, 2},
     {"ssc_transpose", (DL_FUNC) &ssc_transpose, 1},
     {"tsc_to_dgTMatrix", (DL_FUNC) &tsc_to_dgTMatrix, 1},
