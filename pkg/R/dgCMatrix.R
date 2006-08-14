@@ -5,11 +5,13 @@
 ## Specific conversions, should they be necessary.  Better to convert as
 ## as(x, "TsparseMatrix") or as(x, "denseMatrix")
 
-setAs("dgCMatrix", "dgTMatrix",
-      function(from) .Call(Csparse_to_Tsparse, from, FALSE))
+## Moved to ./Csparse.R
+## setAs("dgCMatrix", "dgTMatrix",
+##       function(from) .Call(Csparse_to_Tsparse, from, FALSE))
 
-setAs("dgCMatrix", "dgeMatrix",
-      function(from) .Call(Csparse_to_dense, from))
+## Moved to ./Csparse.R
+## setAs("dgCMatrix", "dgeMatrix",
+##       function(from) .Call(Csparse_to_dense, from))
 
 ## can use method in Csparse.R
 ## setAs("dgCMatrix", "matrix",
