@@ -1,3 +1,10 @@
+2006-08-14  Douglas Bates  <bates@R-project.org>
+
+	* R/dtCMatrix.R,dgCMatrix.R,Csparse.R src/init.c,dgCMatrix.[ch],
+	Csparse.[ch],chm_common.c,dense.c : Use CHOLMOD code and methods
+	for CsparseMatrix, TsparseMatrix, denseMatrix or matrix when
+	possible.
+
 2006-08-12  Douglas Bates  <bates@R-project.org>
 
 	* src/chm_common.[ch],Csparse.[ch],Tsparse.[ch],CHMfactor.c,dtTMatrix.c,
