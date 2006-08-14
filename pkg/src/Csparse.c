@@ -64,18 +64,24 @@ SEXP Csparse_to_Tsparse(SEXP x, SEXP tri)
 			       duplicate(GET_SLOT(x, Matrix_DimNamesSym)));
 }
 
-SEXP Csparse_transpose(SEXP x)
+SEXP Csparse_transpose(SEXP x, SEXP tri)
 {
     cholmod_sparse *chx = as_cholmod_sparse(x);
     cholmod_sparse *chxt = cholmod_transpose(chx, (int) chx->xtype, &c);
     SEXP dn = PROTECT(duplicate(GET_SLOT(x, Matrix_DimNamesSym))), tmp;
-    
+    int uploT = 0; char *diag = "";
+
     Free(chx);
     tmp = VECTOR_ELT(dn, 0);	/* swap the dimnames */
     SET_VECTOR_ELT(dn, 0, VECTOR_ELT(dn, 1));
     SET_VECTOR_ELT(dn, 1, tmp);
     UNPROTECT(1);
-    return chm_sparse_to_SEXP(chxt, 1, 0, "", dn);
+    if (asLogical(tri)) {	/* triangular sparse matrices */
+	uploT = (strcmp(CHAR(asChar(GET_SLOT(x, Matrix_uploSym))), "U")) ?
+	    1 : -1;		/* switch upper and lower for transpose */
+	diag = CHAR(asChar(GET_SLOT(x, Matrix_diagSym)));
+    }
+    return chm_sparse_to_SEXP(chxt, 1, uploT, diag, dn);
 }
 
 SEXP Csparse_Csparse_prod(SEXP a, SEXP b)

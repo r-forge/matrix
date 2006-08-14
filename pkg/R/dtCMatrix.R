@@ -1,10 +1,11 @@
-setMethod("t", signature(x = "dtCMatrix"),
-          function(x) {
-              tg <- .Call(csc_transpose, x)
-              new("dtCMatrix", Dim = tg@Dim, Dimnames = x@Dimnames[2:1],
-                  p = tg@p, i = tg@i, x = tg@x, diag = x@diag,
-                  uplo = ifelse(x@uplo == "U", "L", "U"))
-          }, valueClass = "dtCMatrix")
+## can use the method for x = "CsparseMatrix" in ./Csparse.R
+## setMethod("t", signature(x = "dtCMatrix"),
+##           function(x) {
+##               tg <- .Call(csc_transpose, x)
+##               new("dtCMatrix", Dim = tg@Dim, Dimnames = x@Dimnames[2:1],
+##                   p = tg@p, i = tg@i, x = tg@x, diag = x@diag,
+##                   uplo = ifelse(x@uplo == "U", "L", "U"))
+##           }, valueClass = "dtCMatrix")
 
 setAs("dtCMatrix", "ltCMatrix", # just drop 'x' slot:
       function(from) new("ltCMatrix", i = from@i, p = from@p,
