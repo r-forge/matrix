@@ -3,12 +3,14 @@
 \alias{CsparseMatrix-class}
 \alias{\%*\%,CsparseMatrix,CsparseMatrix-method}
 \alias{\%*\%,CsparseMatrix,denseMatrix-method}
+\alias{\%*\%,CsparseMatrix,matrix-method}
 \alias{coerce,CsparseMatrix,TsparseMatrix-method}
 \alias{coerce,CsparseMatrix,denseMatrix-method}
 \alias{coerce,CsparseMatrix,matrix-method}
 \alias{crossprod,CsparseMatrix,missing-method}
 \alias{crossprod,CsparseMatrix,dgeMatrix-method}
 \alias{crossprod,CsparseMatrix,matrix-method}
+\alias{diag,CsparseMatrix-method}
 \alias{t,CsparseMatrix-method}
 \alias{tcrossprod,CsparseMatrix,missing-method}
 \alias{colMeans,CsparseMatrix-method}
@@ -50,6 +52,7 @@ Class \code{"Matrix"}, by class \code{"sparseMatrix"}.
 \section{Methods}{
   \describe{
     \item{crossprod}{\code{signature(x = "CsparseMatrix", y = "missing")}: ... }
+    \item{diag}{\code{signature(x = "CsparseMatrix")}: ... }
     \item{t}{\code{signature(x = "CsparseMatrix")}: ... }
     \item{tcrossprod}{\code{signature(x = "CsparseMatrix", y = "missing")}: ... }
     \item{\%*\%}{\code{signature(x = "CsparseMatrix", y =
