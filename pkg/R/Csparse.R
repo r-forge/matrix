@@ -8,36 +8,32 @@ setAs("CsparseMatrix", "TsparseMatrix",
           ## modified to support triangular (../src/Csparse.c)
           .Call(Csparse_to_Tsparse, from, is(from, "triangularMatrix")))
 
-##           if (is(from, "triangularMatrix")) {
-##               ## regenerate the matrix with the triangular properties
-##               ## FIXME: move this to the C code
-##               if (is(ans, "lMatrix"))
-##                   return(new("ltTMatrix", i = ans@i, j = ans@j,
-##                              Dim = ans@Dim, Dimnames = ans@Dimnames,
-##                              uplo = from@uplo, diag = from@diag))
-##               return(new(ifelse(is(ans, "dMatrix"), "dtTMatrix", "ztTMatrix"),
-##                          i = ans@i, j = ans@j, x = ans@x,
-##                          Dim = ans@Dim, Dimnames = ans@Dimnames,
-##                          uplo = from@uplo, diag = from@diag))
-##           }
-##           ans
-##       })
+## special cases (when a specific "to" class is specified)
+setAs("dgCMatrix", "dgTMatrix",
+      function(from) .Call(Csparse_to_Tsparse, from, FALSE))
 
-## cholmod_sparse and cholmod_triplet flag symmetry - cholmod_dense doesn't
-## We use cholmod_sparse_to_dense here so must convert symmetric to general
+setAs("dsCMatrix", "dsTMatrix",
+      function(from) .Call(Csparse_to_Tsparse, from, FALSE))
+
+setAs("dtCMatrix", "dtTMatrix",
+      function(from) .Call(Csparse_to_Tsparse, from, TRUE))
+
+## Current code loses symmetry and triangularity properties.  With suitable
+## changes to chm_dense_to_SEXP (../src/chm_common.c) we can avoid this.
 setAs("CsparseMatrix", "denseMatrix",
       function(from) {
-	  if(!is(from, "generalMatrix")) { ## e.g. for triangular | symmetric
-	      if     (is(from, "dMatrix")) from <- as(from, "dgCMatrix")
-	      else if(is(from, "lMatrix")) from <- as(from, "lgCMatrix")
-	      else if(is(from, "zMatrix")) from <- as(from, "zgCMatrix")
-	      else stop("undefined method for class ", class(from))
-	  }
+          ## |-> cholmod_C -> cholmod_dense -> chm_dense_to_dense
+          if (is(from, "triangularMatrix") && from@diag == "U")
+              from <- .Call(Csparse_diagU2N, from)
           .Call(Csparse_to_dense, from)
       })
 
+## special cases (when a specific "to" class is specified)
+setAs("dgCMatrix", "dgeMatrix",
+      function(from) .Call(Csparse_to_dense, from))
+
 ## cholmod_sparse_to_dense converts symmetric storage to general
-## storage so symmetric classes are ok.
+## storage so symmetric classes are ok for conversion to matrix.
 ## unit triangular needs special handling
 setAs("CsparseMatrix", "matrix",
       function(from) {
