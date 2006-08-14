@@ -1,5 +1,12 @@
 2006-08-14  Douglas Bates  <bates@R-project.org>
 
+	* src/Csparse.[ch],init.c (Csparse_to_logical): Added utilities
+	Csparse_to_logical and Csparse_symmetric_to_general.
+	* R/dgCMatrix.R,dsCMatrix.R,Csparse.R : Consolidate general
+	coercion methods between CsparseMatrix and TsparseMatrix.	
+
+2006-08-14  Douglas Bates  <bates@R-project.org>
+
 	* R/dtCMatrix.R,dgCMatrix.R,Csparse.R src/init.c,dgCMatrix.[ch],
 	Csparse.[ch],chm_common.c,dense.c : Use CHOLMOD code and methods
 	for CsparseMatrix, TsparseMatrix, denseMatrix or matrix when
