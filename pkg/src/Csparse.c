@@ -38,6 +38,23 @@ SEXP Csparse_to_dense(SEXP x)
     return chm_dense_to_SEXP(chxd, 1);
 }
 
+SEXP Csparse_to_logical(SEXP x, SEXP tri)
+{
+    cholmod_sparse *chxs = as_cholmod_sparse(x);
+    cholmod_sparse
+	*chxcp = cholmod_copy(chxs, chxs->stype, CHOLMOD_PATTERN, &c);
+    int uploT = 0; char *diag = "";
+
+    Free(chxs);
+    if (asLogical(tri)) {	/* triangular sparse matrices */
+	uploT = (strcmp(CHAR(asChar(GET_SLOT(x, Matrix_uploSym))), "U")) ?
+	    -1 : 1;
+	diag = CHAR(asChar(GET_SLOT(x, Matrix_diagSym)));
+    }
+    return chm_sparse_to_SEXP(chxcp, 1, uploT, diag,
+				GET_SLOT(x, Matrix_DimNamesSym));
+}
+
 SEXP Csparse_to_matrix(SEXP x)
 {
     cholmod_sparse *chxs = as_cholmod_sparse(x);
@@ -61,7 +78,19 @@ SEXP Csparse_to_Tsparse(SEXP x, SEXP tri)
 	diag = CHAR(asChar(GET_SLOT(x, Matrix_diagSym)));
     }
     return chm_triplet_to_SEXP(chxt, 1, uploT, diag,
-			       duplicate(GET_SLOT(x, Matrix_DimNamesSym)));
+			       GET_SLOT(x, Matrix_DimNamesSym));
+}
+
+SEXP Csparse_symmetric_to_general(SEXP x)
+{
+    cholmod_sparse *chx = as_cholmod_sparse(x), *chgx;
+
+    if (!(chx->stype))
+	error(_("Nonsymmetric matrix in Csparse_symmeteric_to_general"));
+    chgx = cholmod_copy(chx, 0, chx->xtype, &c);
+    Free(chx);
+    return chm_sparse_to_SEXP(chgx, 1, 0, "",
+			      GET_SLOT(x, Matrix_DimNamesSym));
 }
 
 SEXP Csparse_transpose(SEXP x, SEXP tri)
