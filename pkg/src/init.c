@@ -75,17 +75,14 @@ static R_CallMethodDef CallEntries[] = {
 /*     {"csc_tcrossprod", (DL_FUNC) &csc_tcrossprod, 1}, */
     {"compressed_to_dgTMatrix", (DL_FUNC) &compressed_to_dgTMatrix, 2},
     {"compressed_non_0_ij", (DL_FUNC) &compressed_non_0_ij, 2},
-/*     {"csc_to_dgeMatrix", (DL_FUNC) &csc_to_dgeMatrix, 1}, */
-/*     {"csc_to_matrix", (DL_FUNC) &csc_to_matrix, 1}, */
-/*     {"csc_transpose", (DL_FUNC) &csc_transpose, 1}, */
     {"dense_to_Csparse", (DL_FUNC) &dense_to_Csparse, 1},
     {"dense_nonpacked_validate", (DL_FUNC) &dense_nonpacked_validate, 1},
     {"dMatrix_validate", (DL_FUNC) &dMatrix_validate, 1},
 
+    {"dgCMatrix_QR", (DL_FUNC) &dgCMatrix_QR, 2},
     {"dgCMatrix_validate", (DL_FUNC) &dgCMatrix_validate, 1},
-/*     {"dgeMatrix_to_csc", (DL_FUNC) &dgeMatrix_to_csc, 1}, */
-/*     {"dgTMatrix_to_csc", (DL_FUNC) &dgTMatrix_to_csc, 1}, */
-/*    {"dgTMatrix_to_dgCMatrix", (DL_FUNC) &dgTMatrix_to_dgCMatrix, 1}, */
+    {"dgCMatrix_lusol", (DL_FUNC) &dgCMatrix_lusol, 2},
+    {"dgCMatrix_qrsol", (DL_FUNC) &dgCMatrix_qrsol, 2},
     {"dgTMatrix_to_dgeMatrix", (DL_FUNC) &dgTMatrix_to_dgeMatrix, 1},
     {"dgTMatrix_to_matrix", (DL_FUNC) &dgTMatrix_to_matrix, 1},
     {"dgTMatrix_validate", (DL_FUNC) &dgTMatrix_validate, 1},

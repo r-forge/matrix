@@ -137,6 +137,7 @@ exportClasses(
 	      "lCholCMatrix",
               "dCHMsuper",
               "dCHMsimpl",
+              "sparseQR",
               "corMatrix" # unused
 	      )
 
