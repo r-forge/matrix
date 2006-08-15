@@ -5,21 +5,20 @@
 ## Specific conversions, should they be necessary.  Better to convert as
 ## as(x, "TsparseMatrix") or as(x, "denseMatrix")
 
-## Moved to ./Csparse.R
-## setAs("dgCMatrix", "dgTMatrix",
-##       function(from) .Call(Csparse_to_Tsparse, from, FALSE))
+## Moved to ./Csparse.R :
+## setAs("dgCMatrix", "dgTMatrix", ....
+## setAs("dgCMatrix", "dgeMatrix", ....
 
-## Moved to ./Csparse.R
-## setAs("dgCMatrix", "dgeMatrix",
-##       function(from) .Call(Csparse_to_dense, from))
+## Can use method in Csparse.R
+## setAs("dgCMatrix", "matrix", ....
 
-## can use method in Csparse.R
-## setAs("dgCMatrix", "matrix",
-##       function(from) .Call(Csparse_to_matrix, from))
-
+## rather use Csparse* to lsparse* in ./lsparseMatrix.R ,
+## but this is for "back-compatibility" (have had tests for it..):
 setAs("dgCMatrix", "lgCMatrix",
-      function(from) new("lgCMatrix", i = from@i, p = from@p,
-                         Dim = from@Dim, Dimnames = from@Dimnames))
+      function(from) .Call(Csparse_to_logical, from,
+                           is(from, "triangularMatrix")))
+##was:       function(from) new("lgCMatrix", i = from@i, p = from@p,
+##                               Dim = from@Dim, Dimnames = from@Dimnames)
 
 setAs("matrix", "dgCMatrix",
       function(from) .Call(dense_to_Csparse, from))
