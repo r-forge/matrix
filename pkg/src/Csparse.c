@@ -81,13 +81,15 @@ SEXP Csparse_to_Tsparse(SEXP x, SEXP tri)
 			       GET_SLOT(x, Matrix_DimNamesSym));
 }
 
+/* this use to be called  sCMatrix_to_gCMatrix(..)   [in ./dsCMatrix.c ]: */
 SEXP Csparse_symmetric_to_general(SEXP x)
 {
     cholmod_sparse *chx = as_cholmod_sparse(x), *chgx;
 
     if (!(chx->stype))
 	error(_("Nonsymmetric matrix in Csparse_symmeteric_to_general"));
-    chgx = cholmod_copy(chx, 0, chx->xtype, &c);
+    chgx = cholmod_copy(chx, /* stype: */ 0, chx->xtype, &c);
+    /* xtype: pattern, "real", complex or .. */
     Free(chx);
     return chm_sparse_to_SEXP(chgx, 1, 0, "",
 			      GET_SLOT(x, Matrix_DimNamesSym));
@@ -192,7 +194,7 @@ SEXP Csparse_horzcat(SEXP x, SEXP y)
 {
     cholmod_sparse *chx = as_cholmod_sparse(x),
 	*chy = as_cholmod_sparse(y), *ans;
-    
+
     ans = cholmod_horzcat(chx, chy, 1, &c);
     Free(chx); Free(chy);
     /* FIXME: currently drops dimnames */
@@ -203,7 +205,7 @@ SEXP Csparse_vertcat(SEXP x, SEXP y)
 {
     cholmod_sparse *chx = as_cholmod_sparse(x),
 	*chy = as_cholmod_sparse(y), *ans;
-    
+
     ans = cholmod_vertcat(chx, chy, 1, &c);
     Free(chx); Free(chy);
     /* FIXME: currently drops dimnames */
@@ -244,7 +246,7 @@ SEXP Csparse_submatrix(SEXP x, SEXP i, SEXP j)
     if (csize >= 0 && !isInteger(j))
 	error(_("Index j must be NULL or integer"));
     return chm_sparse_to_SEXP(cholmod_submatrix(chx, INTEGER(i), rsize,
-						INTEGER(j), csize, 
+						INTEGER(j), csize,
 						TRUE, TRUE, &c),
 			      1, 0, "", R_NilValue);
 }
