@@ -33,7 +33,7 @@ setAs("dsCMatrix", "lsCMatrix",
                          Dim = from@Dim, Dimnames = from@Dimnames))
 
 setAs("dsCMatrix", "dgCMatrix",
-      function(from) .Call(sCMatrix_to_gCMatrix, from))
+      function(from) .Call(Csparse_symmetric_to_general, from))
 
 if(FALSE) # have 'C' version above
 setAs("dsCMatrix", "dsTMatrix",

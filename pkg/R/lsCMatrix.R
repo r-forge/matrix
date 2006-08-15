@@ -6,7 +6,7 @@ setAs("lsCMatrix", "matrix",
       function(from) as(as(from, "lgCMatrix"), "matrix"))
 
 setAs("lsCMatrix", "lgCMatrix",
-      function(from) .Call(sCMatrix_to_gCMatrix, from))
+      function(from) .Call(Csparse_symmetric_to_general, from))
 
 ## Specific conversions, should they be necessary.  Better to convert as
 ## as(x, "TsparseMatrix") or as(x, "denseMatrix")
