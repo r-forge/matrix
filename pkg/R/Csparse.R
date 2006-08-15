@@ -15,6 +15,9 @@ setAs("dgCMatrix", "dgTMatrix",
 setAs("dsCMatrix", "dsTMatrix",
       function(from) .Call(Csparse_to_Tsparse, from, FALSE))
 
+setAs("dsCMatrix", "dgCMatrix",
+      function(from) .Call(Csparse_symmetric_to_general, from))
+
 setAs("dtCMatrix", "dtTMatrix",
       function(from) .Call(Csparse_to_Tsparse, from, TRUE))
 
@@ -110,14 +113,15 @@ replCmat <- function (x, i, j, value)
     if(lenV > lenRepl)
         stop("too many replacement values")
 
+    if(is(x, "symmetricMatrix")) ## only half the indices are there..
+	x <- .Call(Csparse_symmetric_to_general, x)
     clx <- c(class(x))
+
     xj <- .Call(Matrix_expand_pointers, x@p)
     sel <- (!is.na(match(x@i, i1)) &
             !is.na(match( xj, i2)))
-
     has.x <- any("x" == slotNames(x)) # i.e. *not* logical
-
-    if(sum(sel) == lenRepl) { ## all entries to be replaced are non-zero:
+    if(has.x && sum(sel) == lenRepl) { ## all entries to be replaced are non-zero:
         value <- rep(value, length = lenRepl)
         ## Ideally we only replace them where value != 0 and drop the value==0
         ## ones; but that would have to (?) go through dgT*
@@ -128,7 +132,7 @@ replCmat <- function (x, i, j, value)
         x@x[sel] <- value
         return(x)
     }
-    ## else go via Tsparse..
+    ## else go via Tsparse.. {FIXME "waste": we already have 'xj' ..}
     x <- as(x, "TsparseMatrix")
     x[i,j] <- value
     as_CspClass(x, clx)
