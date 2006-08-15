@@ -599,3 +599,19 @@ setClass("pedigree", representation =
                               n, "]", sep = ''))
 	     TRUE
 	 })
+
+setClass("csn_QR", representation(U = "dgCMatrix", L = "dgCMatrix",
+                                  beta = "numeric"))
+
+setClass("csn_LU", representation(U = "dgCMatrix", L = "dgCMatrix",
+                                  Pinv = "integer"))
+
+setClass("css_QR", representation(Pinv = "integer", Q = "integer",
+                                  parent = "integer", cp = "integer",
+                                  nz = "integer"))
+
+setClass("css_LU", representation(Q = "integer", nz = "integer"))
+
+setClass("sparseQR", representation(V = "dgCMatrix", beta = "numeric",
+                                    p = "integer", R = "dgCMatrix",
+                                    q = "integer"))
