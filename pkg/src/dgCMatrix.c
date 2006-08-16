@@ -173,31 +173,30 @@ SEXP dgCMatrix_QR(SEXP Ap, SEXP order)
     int m = A->m, n = A->n, *p;
 
     if (m < n) error("A must have # rows >= # columns") ;
-    S = cs_sqr (A, ord, 1);	/* symbolic QR ordering & analysis*/
-    N = cs_qr (A, S);		/* numeric QR factorization */
+    S = cs_sqr(A, ord, 1);	/* symbolic QR ordering & analysis*/
+    N = cs_qr(A, S);		/* numeric QR factorization */
     if (!N) error("cs_qr failed") ;
-    cs_dropzeros (N->L);		    /* drop zeros from V and sort */
-    D = cs_transpose (N->L, 1);
-    cs_spfree (N->L);
-    N->L = cs_transpose (D, 1);
-    cs_spfree (D);
-    cs_dropzeros (N->U);		    /* drop zeros from R and sort */
-    D = cs_transpose (N->U, 1);
-    cs_spfree (N->U) ;
-    N->U = cs_transpose (D, 1);
-    cs_spfree (D);
-    m = N->L->m;				    /* m may be larger now */
-    Rprintf("m = %d, n = %d\n", m, n);
-    p = cs_pinv (S->Pinv, m);			    /* p = pinv' */
-    SET_SLOT(ans, install("V"),			    /* return V */
+    cs_dropzeros(N->L);		/* drop zeros from V and sort */
+    D = cs_transpose(N->L, 1);
+    cs_spfree(N->L);
+    N->L = cs_transpose(D, 1);
+    cs_spfree(D);
+    cs_dropzeros(N->U);		/* drop zeros from R and sort */
+    D = cs_transpose(N->U, 1);
+    cs_spfree(N->U) ;
+    N->U = cs_transpose(D, 1);
+    cs_spfree(D);
+    m = N->L->m;		/* m may be larger now */
+    p = cs_pinv(S->Pinv, m);	/* p = pinv' */
+    SET_SLOT(ans, install("V"),
 	     Matrix_cs_to_SEXP(N->L, "dgCMatrix", 0));
-    Memcpy(REAL(ALLOC_SLOT(ans, install("beta"),    /* return beta */
+    Memcpy(REAL(ALLOC_SLOT(ans, install("beta"),
 			   REALSXP, n)), N->B, n);
-    Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_pSym,     /* return p */
+    Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_pSym,
 			      INTSXP, m)), p, m);
-    SET_SLOT(ans, install("R"),                     /* return R */
+    SET_SLOT(ans, install("R"),
 	     Matrix_cs_to_SEXP(N->U, "dgCMatrix", 0));
-    Memcpy(INTEGER(ALLOC_SLOT(ans, install("q"),    /* return q */
+    Memcpy(INTEGER(ALLOC_SLOT(ans, install("q"),
 			      INTSXP, n)), S->Q, n);
     cs_nfree(N);
     cs_sfree(S);

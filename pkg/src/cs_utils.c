@@ -146,28 +146,30 @@ csn *Matrix_as_csn(SEXP x)
  *
  * @return SEXP containing a copy of a
  */
-SEXP Matrix_cs_to_SEXP(cs *a, const char *cl, int dofree)
+SEXP Matrix_cs_to_SEXP(cs *a, char *cl, int dofree)
 {
     SEXP ans;
-    int *dims, sym = !strcmp(cl, "dsCMatrix"), tr = !strcmp(cl, "dtCMatrix");
+    char *valid[] = {"dgCMatrix", "dsCMatrix", "dtCMatrix", ""};
+    int *dims, ctype = check_class(cl, valid), nz;
     
+    if (ctype < 0)
+	error("invalid class of object to Matrix_cs_to_SEXP");
     ans = PROTECT(NEW_OBJECT(MAKE_CLASS(cl)));
 				/* allocate and copy common slots */
     dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
     dims[0] = a->m; dims[1] = a->n;
     Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_pSym, INTSXP, a->n + 1)),
 	   a->p, a->n + 1);
-    Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_iSym, INTSXP, a->nz)),
-	   a->i, a->nz);
-    Memcpy(REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, a->nz)),
-	   a->x, a->nz);
-    if (sym || tr) {
+    nz = a->p[a->n];
+    Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_iSym, INTSXP, nz)), a->i, nz);
+    Memcpy(REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, nz)), a->x, nz);
+    if (ctype > 0) {
 	int uplo = is_sym(a);
 	if (!uplo) error("cs matrix not compatible with class");
 	SET_SLOT(ans, Matrix_diagSym, mkString("N"));
 	SET_SLOT(ans, Matrix_uploSym, mkString(uplo < 0 ? "L" : "U"));
     }
-    if (dofree > 0) cs_free((void *) a);
+    if (dofree > 0) cs_spfree(a);
     if (dofree < 0) Free(a);
     UNPROTECT(1);
     return ans;
@@ -185,7 +187,7 @@ SEXP Matrix_cs_to_SEXP(cs *a, const char *cl, int dofree)
  *
  * @return SEXP containing a copy of S
  */
-SEXP Matrix_css_to_SEXP(css *S, const char *cl, int dofree, int m, int n)
+SEXP Matrix_css_to_SEXP(css *S, char *cl, int dofree, int m, int n)
 {
     SEXP ans;
     char *valid[] = {"css_LU", "css_QR", ""};
@@ -228,7 +230,7 @@ SEXP Matrix_css_to_SEXP(css *S, const char *cl, int dofree, int m, int n)
  *
  * @return SEXP containing a copy of S
  */
-SEXP Matrix_csn_to_SEXP(csn *N, const char *cl, int dofree)
+SEXP Matrix_csn_to_SEXP(csn *N, char *cl, int dofree)
 {
     SEXP ans;
     char *valid[] = {"csn_LU", "csn_QR", ""};
