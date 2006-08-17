@@ -1,3 +1,10 @@
+2006-08-17  Douglas Bates  <bates@R-project.org>
+
+	* src/dgCMatrix.[ch] (dgCMatrix_matrix_solve), src/init.c,
+	R/dgCMatrix.R: solve methods for dgCMatrix and dense RHS.
+	* src/dtCMatrix.c :Remove code that is no longer used
+	* R/dtCMatrix.R: Use C code for diagU2N in CsparseMatrix classes
+
 2006-08-14  Douglas Bates  <bates@R-project.org>
 
 	* src/Csparse.[ch],init.c (Csparse_to_logical): Added utilities
