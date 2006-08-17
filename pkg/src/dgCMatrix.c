@@ -23,7 +23,8 @@ SEXP dgCMatrix_validate(SEXP x)
     if (xp[0] != 0)
 	return mkString(_("first element of slot p must be zero"));
     if (length(islot) != xp[ncol])
-	return mkString(_("last element of slot p must match length of slots i and x"));
+	return
+	    mkString(_("last element of slot p must match length of slot i"));
     for (j = 0; j < ncol; j++) {
 	if (xp[j] > xp[j+1])
 	    return mkString(_("slot p must be non-decreasing"));
@@ -139,7 +140,7 @@ SEXP dgCMatrix_lusol(SEXP x, SEXP y)
 	error(_("dgCMatrix_lusol requires a square, non-empty matrix"));
     if (!isReal(ycp) || LENGTH(ycp) != xc->m)
 	error(_("Dimensions of system to be solved are inconsistent"));
-    if (!cs_lusol(xc, REAL(ycp), /*order*/ 1, /*tol*/ 1e-7))
+    if (!cs_lusol(/*order*/ 1, xc, REAL(ycp), /*tol*/ 1e-7))
 	error(_("cs_lusol failed"));
     Free(xc);
     UNPROTECT(1);
@@ -155,25 +156,25 @@ SEXP dgCMatrix_qrsol(SEXP x, SEXP y)
 	error(_("dgCMatrix_qrsol requires a 'tall' rectangular matrix"));
     if (!isReal(ycp) || LENGTH(ycp) != xc->m)
 	error(_("Dimensions of system to be solved are inconsistent"));
-    if (!cs_qrsol(xc, REAL(ycp), /*order*/ 1))
+    if (!cs_qrsol(/*order*/ 1, xc, REAL(ycp)))
 	error(_("cs_qrsol failed"));
     Free(xc);
     UNPROTECT(1);
     return ycp;
 }
 
-/* Patterned directly on Tim Davis's cs_qr_mex.c file for MATLAB */
+/* Modified version of Tim Davis's cs_qr_mex.c file for MATLAB */
 SEXP dgCMatrix_QR(SEXP Ap, SEXP order)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("sparseQR")));
     cs *A = Matrix_as_cs(Ap), *D;
     css *S;
     csn *N;
-    int ord = asLogical(order);
     int m = A->m, n = A->n, *p;
 
     if (m < n) error("A must have # rows >= # columns") ;
-    S = cs_sqr(A, ord, 1);	/* symbolic QR ordering & analysis*/
+				/* symbolic QR ordering & analysis*/
+    S = cs_sqr(asLogical(order) ? 1 : -1, A, 1);
     N = cs_qr(A, S);		/* numeric QR factorization */
     if (!N) error("cs_qr failed") ;
     cs_dropzeros(N->L);		/* drop zeros from V and sort */
@@ -187,7 +188,7 @@ SEXP dgCMatrix_QR(SEXP Ap, SEXP order)
     N->U = cs_transpose(D, 1);
     cs_spfree(D);
     m = N->L->m;		/* m may be larger now */
-    p = cs_pinv(S->Pinv, m);	/* p = pinv' */
+    p = cs_pinv(S->pinv, m);	/* p = pinv' */
     SET_SLOT(ans, install("V"),
 	     Matrix_cs_to_SEXP(N->L, "dgCMatrix", 0));
     Memcpy(REAL(ALLOC_SLOT(ans, install("beta"),
@@ -197,7 +198,7 @@ SEXP dgCMatrix_QR(SEXP Ap, SEXP order)
     SET_SLOT(ans, install("R"),
 	     Matrix_cs_to_SEXP(N->U, "dgCMatrix", 0));
     Memcpy(INTEGER(ALLOC_SLOT(ans, install("q"),
-			      INTSXP, n)), S->Q, n);
+			      INTSXP, n)), S->q, n);
     cs_nfree(N);
     cs_sfree(S);
     cs_free(p);
@@ -205,3 +206,48 @@ SEXP dgCMatrix_QR(SEXP Ap, SEXP order)
     return ans;
 }
 
+/* Modified version of Tim Davis's cs_qr_mex.c file for MATLAB */
+SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp)
+{
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("sparseLU")));
+    cs *A = Matrix_as_cs(Ap), *D;
+    css *S;
+    csn *N;
+    int n = A->n, order = asInteger(orderp), *p;
+    double tol = asReal(tolp);
+
+    if (A->m != n)
+	error("LU decomposition applies only to square matrices");
+    if (order) {		/* not using natural order */
+	order = (tol == 1) ? 2	/* amd(S'*S) w/dense rows or I */
+	    : 1;		/* amd (A+A'), or natural */
+    }
+    S = cs_sqr (order, A, 0) ;	/* symbolic ordering, no QR bound */
+    N = cs_lu (A, S, tol) ;	/* numeric factorization */
+    if (!N) error ("cs_lu failed (singular, or out of memory)") ;
+    cs_dropzeros (N->L) ;	/* drop zeros from L and sort it */
+    D = cs_transpose (N->L, 1) ;
+    cs_spfree (N->L) ;
+    N->L = cs_transpose (D, 1) ;
+    cs_spfree (D) ;
+    cs_dropzeros (N->U) ;	/* drop zeros from U and sort it */
+    D = cs_transpose (N->U, 1) ;
+    cs_spfree (N->U) ;
+    N->U = cs_transpose (D, 1) ;
+    cs_spfree (D) ;
+    p = cs_pinv (N->pinv, n) ;	/* p=pinv' */
+    SET_SLOT(ans, install("L"),
+	     Matrix_cs_to_SEXP(N->L, "dgCMatrix", 0));
+    SET_SLOT(ans, install("U"),
+	     Matrix_cs_to_SEXP(N->U, "dgCMatrix", 0));
+    Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_pSym,
+			      INTSXP, n)), p, n);
+    if (order)
+	Memcpy(INTEGER(ALLOC_SLOT(ans, install("q"),
+				  INTSXP, n)), S->q, n);
+    cs_nfree(N);
+    cs_sfree(S);
+    cs_free(p);
+    UNPROTECT(1);
+    return ans;
+}

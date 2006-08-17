@@ -21,6 +21,7 @@
 \alias{diag,dgCMatrix-method}
 \alias{dim,dgCMatrix-method}
 \alias{image,dgCMatrix-method}
+\alias{lu,dgCMatrix-method}
 \alias{t,dgCMatrix-method}
 \alias{colMeans,dgCMatrix-method}
 \alias{colSums,dgCMatrix-method}
@@ -75,13 +76,16 @@
       of \code{x}}
     \item{image}{\code{signature(x = "dgCMatrix")}: plots an image of
       \code{x} using the \code{\link[lattice]{levelplot}} function}
+    \item{lu}{\code{signature(x = "dgCMatrix")}: computes the LU
+      decomposition of a square \code{dgCMatrix} object}
   }
 }
 %\references{}
 %\author{}
 %\note{}
 \seealso{
-  Classes \code{\linkS4class{dsCMatrix}}, \code{\linkS4class{dtCMatrix}}
+  Classes \code{\linkS4class{dsCMatrix}},
+  \code{\linkS4class{dtCMatrix}}, \code{\link{lu}}
 }
 \examples{
 (m <- Matrix(c(0,0,2:0), 3,5))

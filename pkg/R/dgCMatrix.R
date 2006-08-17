@@ -252,3 +252,9 @@ setMethod("rowMeans", signature(x = "dgCMatrix"),
           tapply1(x@x, factor(x@i, 0:(x@Dim[1]-1)), mean, na.rm = na.rm),
 	  valueClass = "numeric")
 
+setMethod("qr", signature(x = "dgCMatrix"),
+          function(x, tol = 1e-07, LAPACK = FALSE)
+          .Call(dgCMatrix_QR, x, TRUE))
+
+setMethod("lu", signature(x = "dgCMatrix"),
+          function(x, ...) .Call(dgCMatrix_LU, x, TRUE, 1))

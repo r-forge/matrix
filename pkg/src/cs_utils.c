@@ -61,6 +61,7 @@ cs *Matrix_as_cs(SEXP x)
     return ans;
 }
 
+#if 0 				/* unused */
 /**
  * Create a css object with the contents of x.  Note that
  * the result should *not* be freed with cs_sfree.  Use
@@ -81,16 +82,16 @@ css *Matrix_as_css(SEXP x)
 	ctype = check_class(cl, valid);
 
     if (ctype < 0) error("invalid class of object to Matrix_as_css");
-    ans->Q = INTEGER(GET_SLOT(x, install("Q")));
+    ans->q = INTEGER(GET_SLOT(x, install("Q")));
     ans->m2 = nz[0]; ans->lnz = nz[1]; ans->unz = nz[2];
     switch(ctype) {
     case 0:			/* css_LU */
-	ans->Pinv = (int *) NULL;
+	ans->pinv = (int *) NULL;
 	ans->parent = (int *) NULL;
 	ans->cp = (int *) NULL;
 	break;
     case 1:			/* css_QR */
-	ans->Pinv = INTEGER(GET_SLOT(x, install("Pinv")));
+	ans->pinv = INTEGER(GET_SLOT(x, install("Pinv")));
 	ans->parent = INTEGER(GET_SLOT(x, install("parent")));
 	ans->cp = INTEGER(GET_SLOT(x, install("cp")));
 	break;
@@ -124,17 +125,18 @@ csn *Matrix_as_csn(SEXP x)
     switch(ctype) {
     case 0:
 	ans->B = (double*) NULL;
-	ans->Pinv = INTEGER(GET_SLOT(x, install("Pinv")));
+	ans->pinv = INTEGER(GET_SLOT(x, install("Pinv")));
 	break;
     case 1:
 	ans->B = REAL(GET_SLOT(x, install("beta")));
-	ans->Pinv = (int*) NULL;
+	ans->pinv = (int*) NULL;
 	break;
     default:
 	error("invalid class of object to Matrix_as_csn");
     }
     return ans;
 }
+#endif	/* unused */
 
 /**
  * Copy the contents of a to an appropriate CsparseMatrix object and,
@@ -175,6 +177,7 @@ SEXP Matrix_cs_to_SEXP(cs *a, char *cl, int dofree)
     return ans;
 }
 
+#if 0 				/* unused */
 /**
  * Copy the contents of S to a css_LU or css_QR object and,
  * optionally, free S or free both S and the pointers to its contents.
@@ -197,7 +200,7 @@ SEXP Matrix_css_to_SEXP(css *S, char *cl, int dofree, int m, int n)
 	error("Inappropriate class `%s' for Matrix_css_to_SEXP", cl);
     ans = PROTECT(NEW_OBJECT(MAKE_CLASS(cl)));
 				/* allocate and copy common slots */
-    Memcpy(INTEGER(ALLOC_SLOT(ans, install("Q"), INTSXP, n)), S->Q, n);
+    Memcpy(INTEGER(ALLOC_SLOT(ans, install("Q"), INTSXP, n)), S->q, n);
     nz = INTEGER(ALLOC_SLOT(ans, install("nz"), INTSXP, 3));
     nz[0] = S->m2; nz[1] = S->lnz; nz[2] = S->unz;
     switch(ctype) {
@@ -205,7 +208,7 @@ SEXP Matrix_css_to_SEXP(css *S, char *cl, int dofree, int m, int n)
 	break;
     case 1:
 	Memcpy(INTEGER(ALLOC_SLOT(ans, install("Pinv"), INTSXP, m)),
-	       S->Pinv, m);
+	       S->pinv, m);
 	Memcpy(INTEGER(ALLOC_SLOT(ans, install("parent"), INTSXP, n)),
 	       S->parent, n);
 	Memcpy(INTEGER(ALLOC_SLOT(ans, install("cp"), INTSXP, n)),
@@ -248,7 +251,7 @@ SEXP Matrix_csn_to_SEXP(csn *N, char *cl, int dofree)
     switch(ctype) {
     case 0:
 	Memcpy(INTEGER(ALLOC_SLOT(ans, install("Pinv"), INTSXP, n)),
-	       N->Pinv, n);
+	       N->pinv, n);
 	break;
     case 1:
 	Memcpy(REAL(ALLOC_SLOT(ans, install("beta"), REALSXP, n)),
@@ -265,3 +268,4 @@ SEXP Matrix_csn_to_SEXP(csn *N, char *cl, int dofree)
     return ans;
 }
 
+#endif	/* unused */

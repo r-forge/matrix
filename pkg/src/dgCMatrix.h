@@ -11,6 +11,7 @@ SEXP compressed_non_0_ij(SEXP x, SEXP colP);
 SEXP csc_matrix_mm(SEXP a, SEXP b, SEXP classed, SEXP right);
 SEXP dgCMatrix_lusol(SEXP x, SEXP y);
 SEXP dgCMatrix_qrsol(SEXP x, SEXP y);
-SEXP dgCMatrix_QR(SEXP A, SEXP order);
+SEXP dgCMatrix_QR(SEXP Ap, SEXP order);
+SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp);
 
 #endif
