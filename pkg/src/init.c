@@ -83,6 +83,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dgCMatrix_QR", (DL_FUNC) &dgCMatrix_QR, 2},
     {"dgCMatrix_validate", (DL_FUNC) &dgCMatrix_validate, 1},
     {"dgCMatrix_lusol", (DL_FUNC) &dgCMatrix_lusol, 2},
+    {"dgCMatrix_matrix_solve", (DL_FUNC) &dgCMatrix_matrix_solve, 3},
     {"dgCMatrix_qrsol", (DL_FUNC) &dgCMatrix_qrsol, 2},
     {"dgTMatrix_to_dgeMatrix", (DL_FUNC) &dgTMatrix_to_dgeMatrix, 1},
     {"dgTMatrix_to_matrix", (DL_FUNC) &dgTMatrix_to_matrix, 1},

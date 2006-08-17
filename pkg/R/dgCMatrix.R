@@ -258,3 +258,14 @@ setMethod("qr", signature(x = "dgCMatrix"),
 
 setMethod("lu", signature(x = "dgCMatrix"),
           function(x, ...) .Call(dgCMatrix_LU, x, TRUE, 1))
+
+setMethod("solve", signature(a = "dgCMatrix", b = "matrix"),
+          function(a, b, ...) {
+              storage.mode(b) <- "double"
+              .Call(dgCMatrix_matrix_solve, a, b, FALSE)
+          }, valueClass = "dgeMatrix")
+
+setMethod("solve", signature(a = "dgCMatrix", b = "dgeMatrix"),
+          function(a, b, ...) {
+              .Call(dgCMatrix_matrix_solve, a, b, TRUE)
+          }, valueClass = "dgeMatrix")
