@@ -137,6 +137,7 @@ exportClasses(
 	      "lCholCMatrix",
               "dCHMsuper",
               "dCHMsimpl",
+              "sparseLU",
               "sparseQR",
               "corMatrix" # unused
 	      )
@@ -180,6 +181,7 @@ exportMethods(
 ## 	       "isDiagonal",
 ## 	       "isTriangular",
 	      "norm",
+              "qr",
 	      "rcond",
 	      "rowMeans",
 	      "rowSums",

@@ -600,6 +600,7 @@ setClass("pedigree", representation =
 	     TRUE
 	 })
 
+if (FALSE) {                            # unused classes
 setClass("csn_QR", representation(U = "dgCMatrix", L = "dgCMatrix",
                                   beta = "numeric"))
 
@@ -611,7 +612,11 @@ setClass("css_QR", representation(Pinv = "integer", Q = "integer",
                                   nz = "integer"))
 
 setClass("css_LU", representation(Q = "integer", nz = "integer"))
+}
 
 setClass("sparseQR", representation(V = "dgCMatrix", beta = "numeric",
                                     p = "integer", R = "dgCMatrix",
                                     q = "integer"))
+
+setClass("sparseLU", representation(L = "dgCMatrix", U = "dgCMatrix",
+                                    p = "integer", q = "integer"))

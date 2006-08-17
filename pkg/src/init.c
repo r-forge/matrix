@@ -79,6 +79,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dense_nonpacked_validate", (DL_FUNC) &dense_nonpacked_validate, 1},
     {"dMatrix_validate", (DL_FUNC) &dMatrix_validate, 1},
 
+    {"dgCMatrix_LU", (DL_FUNC) &dgCMatrix_LU, 3},
     {"dgCMatrix_QR", (DL_FUNC) &dgCMatrix_QR, 2},
     {"dgCMatrix_validate", (DL_FUNC) &dgCMatrix_validate, 1},
     {"dgCMatrix_lusol", (DL_FUNC) &dgCMatrix_lusol, 2},
