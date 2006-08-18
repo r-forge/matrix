@@ -947,7 +947,7 @@ internal_betab_update(int p, int q, double sigma, cholmod_factor *L,
     int *perm = (int *)L->Perm;
     int j, ione = 1;
     double m1[] = {-1,0}, one[] = {1,0}, ans = 0;
-    
+
 				/* simulate scaled, independent normals */
     for (j = 0; j < p; j++) {
 	double nr = norm_rand();
@@ -1472,7 +1472,7 @@ SEXP glmer_init(SEXP rho) {
     if (!isEnvironment(rho))
 	error(_("`rho' must be an environment"));
     GS->rho = rho;
-#ifdef S4SXP
+#if defined(R_VERSION) && R_VERSION >= R_Version(2, 4, 0)
     GS->mer = find_and_check(rho, install("mer"), S4SXP, 0);
 #else
     GS->mer = find_and_check(rho, install("mer"), VECSXP, 0);
@@ -1957,7 +1957,7 @@ SEXP mer_hat_trace(SEXP x)
 	sx = (double*)(sol->x);
 	for (i = 0; i < q; i++) tr += sx[i] * sx[i];
 				/* downdate jth row of Xcp */
- 	F77_CALL(dgemv)("T", &q, &p, &m1, RZX, &q, sx, &ione, 
+ 	F77_CALL(dgemv)("T", &q, &p, &m1, RZX, &q, sx, &ione,
  			&one, Xcp + j, &n);
 	cholmod_free_dense(&sol, &c);
     }
@@ -1982,7 +1982,7 @@ SEXP mer_hat_trace2(SEXP x)
 	ncp = GET_SLOT(x, Matrix_ncSym);
     cholmod_factor *L = as_cholmod_factor(GET_SLOT(x, Matrix_LSym));
     int *Gp = INTEGER(GET_SLOT(x, Matrix_GpSym)),
-	*nc = INTEGER(ncp), 
+	*nc = INTEGER(ncp),
 	nf = LENGTH(ncp), i, j, k,
 	p = LENGTH(GET_SLOT(x, Matrix_rXySym)),
 	q = LENGTH(GET_SLOT(x, Matrix_rZySym));
