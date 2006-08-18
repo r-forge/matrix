@@ -43,12 +43,16 @@
   \code{\link{expand}}.
 }
 \examples{
-mm <- Matrix(round(rnorm(9),2), nrow = 3, ncol = 3)
+set.seed(1)
+mm <- Matrix(round(rnorm(9),2), nrow = 3)
 mm
 str(lum <- lu(mm))
 elu <- expand(lum)
 elu # three components: "L", "U", and "P", the permutation
 elu$L \%*\% elu$U
+(m2 <- with(elu, P \%*\% L \%*\% U)) # the same as 'mm'
+stopifnot(all.equal(as(mm, "matrix"),
+                    as(m2, "matrix")))
 }
 \keyword{classes}
 \keyword{algebra}
