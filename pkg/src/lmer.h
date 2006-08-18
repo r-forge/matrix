@@ -10,8 +10,9 @@
 #include "dtCMatrix.h"
 #include "lgCMatrix.h"
 #include "lCholCMatrix.h"
-#include "Rmath.h"
 #include "chm_common.h"
+#include "Rmath.h"
+#include <Rversion.h>
 #include <R_ext/Lapack.h>
 #include <R_ext/Constants.h>
 #include <R_ext/Utils.h>
