@@ -1,3 +1,15 @@
+2006-08-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllGeneric.R: add "qr" and "chol" generics; via 'trick' since
+	the base version has no "..." argument.
+
+	* R/sparseMatrix.R (prSpMatrix): fix the triangular unit diagonal case.
+
+	* R/Matrix.R: define and
+	* NAMESPACE: export as.numeric() and as.logical() methods.
+		Let's hope these do not badly slow down something...
+	Finally export the zapsmall() method.
+
 2006-08-17  Douglas Bates  <bates@R-project.org>
 
 	* src/dgCMatrix.[ch] (dgCMatrix_matrix_solve), src/init.c,
@@ -10,7 +22,7 @@
 	* src/Csparse.[ch],init.c (Csparse_to_logical): Added utilities
 	Csparse_to_logical and Csparse_symmetric_to_general.
 	* R/dgCMatrix.R,dsCMatrix.R,Csparse.R : Consolidate general
-	coercion methods between CsparseMatrix and TsparseMatrix.	
+	coercion methods between CsparseMatrix and TsparseMatrix.
 
 2006-08-14  Douglas Bates  <bates@R-project.org>
 
@@ -39,7 +51,7 @@
 	* src/Csparse.c (Csparse_crossprod): tcrossprod result has stype = -1.
 	Later modified to return the upper triangle only.
 	* R/dgTMatrix.R: Remove vestigial crossprod and tcrossprod methods.
-	
+
 2006-08-07  Douglas Bates  <bates@R-project.org>
 
 	* src/Csparse.c (Csparse_crossprod): Set stype on result to avoid

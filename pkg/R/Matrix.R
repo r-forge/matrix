@@ -19,12 +19,22 @@ setMethod("as.matrix", signature(x = "Matrix"), function(x) as(x, "matrix"))
 setMethod("as.array",  signature(x = "Matrix"), function(x) as(x, "matrix"))
 
 ## head and tail apply to all Matrix objects for which subscripting is allowed:
-setMethod("head", signature(x = "Matrix"), utils:::head.matrix)
-setMethod("tail", signature(x = "Matrix"), utils:::tail.matrix)
-
+if(paste(R.version$major, R.version$minor, sep=".") < "2.4") {
+    setMethod("head", signature(x = "Matrix"), utils:::head.matrix)
+    setMethod("tail", signature(x = "Matrix"), utils:::tail.matrix)
+} else { # R 2.4.0 and newer
+    setMethod("head", signature(x = "Matrix"), utils::head.matrix)
+    setMethod("tail", signature(x = "Matrix"), utils::tail.matrix)
+}
 ## slow "fall back" method {subclasses should have faster ones}:
 setMethod("as.vector", signature(x = "Matrix", mode = "missing"),
 	  function(x) as.vector(as(x, "matrix")))
+
+## mainly need these for "dMatrix" or "lMatrix" respectively, but why not general:
+setMethod("as.numeric", signature(x = "Matrix"),
+	  function(x, ...) as.numeric(as.vector(x)))
+setMethod("as.logical", signature(x = "Matrix"),
+	  function(x, ...) as.logical(as.vector(x)))
 
 
 ## Note that isSymmetric is *not* exported
