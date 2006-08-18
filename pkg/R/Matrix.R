@@ -19,13 +19,14 @@ setMethod("as.matrix", signature(x = "Matrix"), function(x) as(x, "matrix"))
 setMethod("as.array",  signature(x = "Matrix"), function(x) as(x, "matrix"))
 
 ## head and tail apply to all Matrix objects for which subscripting is allowed:
-if(paste(R.version$major, R.version$minor, sep=".") < "2.4") {
+## if(paste(R.version$major, R.version$minor, sep=".") < "2.4") {
     setMethod("head", signature(x = "Matrix"), utils:::head.matrix)
     setMethod("tail", signature(x = "Matrix"), utils:::tail.matrix)
-} else { # R 2.4.0 and newer
-    setMethod("head", signature(x = "Matrix"), utils::head.matrix)
-    setMethod("tail", signature(x = "Matrix"), utils::tail.matrix)
-}
+## } else { # R 2.4.0 and newer
+##     setMethod("head", signature(x = "Matrix"), utils::head.matrix)
+##     setMethod("tail", signature(x = "Matrix"), utils::tail.matrix)
+## }
+
 ## slow "fall back" method {subclasses should have faster ones}:
 setMethod("as.vector", signature(x = "Matrix", mode = "missing"),
 	  function(x) as.vector(as(x, "matrix")))

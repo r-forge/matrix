@@ -166,7 +166,7 @@ non0ind <- function(x) {
     }
     else if(is(x, "triangularMatrix")) { # check for "U" diag
 	if(x@diag == "U") {
-	    i <- seq(length = dim(x)[1])
+	    i <- seq(length = dim(x)[1]) - 1:1
 	    rbind(non0.i(x), cbind(i,i))
 	} else non0.i(x)
     }

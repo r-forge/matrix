@@ -202,7 +202,7 @@ prSpMatrix <- function(object, digits = getOption("digits"),
                        maxp = getOption("max.print"), zero.print = ".")
 {
     stopifnot(is(object, "sparseMatrix"))
-    d <- dim(x)
+    d <- dim(object)
     if(prod(d) > maxp) { # "Large" => will be "cut"
         ## only coerce to dense that part which won't be cut :
         nr <- maxp %/% d[2]
