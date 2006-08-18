@@ -47,7 +47,7 @@ mm <- Matrix(round(rnorm(9),2), nrow = 3, ncol = 3)
 mm
 str(lum <- lu(mm))
 elu <- expand(lum)
-elu
+elu # three components: "L", "U", and "P", the permutation
 elu$L \%*\% elu$U
 }
 \keyword{classes}
