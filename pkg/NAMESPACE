@@ -162,6 +162,8 @@ exportMethods(
 	      "as.array",
 	      "as.matrix",
 	      "as.vector",
+	      "as.numeric",
+	      "as.logical",
               "band",
 	      "chol",
 	      "colMeans",
@@ -190,7 +192,8 @@ exportMethods(
 	      "t",
 	      "tcrossprod",
               "tril",
-              "triu"
+              "triu",
+              "zapsmall"
 	      )
 
 ## only for R >= 2.2:

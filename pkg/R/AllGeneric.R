@@ -24,6 +24,14 @@ if (!isGeneric("facmul"))
 if (!isGeneric("lu"))
     setGeneric("lu", function(x, ...) standardGeneric("lu"))
 
+if (!isGeneric("chol"))
+    setGeneric("chol", def = function(x, pivot= FALSE,...) standardGeneric("chol"),
+               useAsDefault= function(x, pivot= FALSE,...) base::chol(x, pivot, ...))
+
+if (!isGeneric("qr"))
+    setGeneric("qr", def =   function(x, tol=1e-7,...) standardGeneric("qr"),
+               useAsDefault= function(x, tol=1e-7,...) base::qr(x, tol, ...))
+
 if (!isGeneric("norm"))
     setGeneric("norm", function(x, type, ...) standardGeneric("norm"))
 

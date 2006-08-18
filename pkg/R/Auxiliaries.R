@@ -101,10 +101,10 @@ emptyColnames <- function(x)
 }
 
 prTriang <- function(x, digits = getOption("digits"),
+                     maxp = getOption("max.print"),
 		     justify = "none", right = TRUE)
 {
     ## modeled along stats:::print.dist
-    diag <- TRUE
     upper <- x@uplo == "U"
 
     m <- as(x, "matrix")
@@ -113,15 +113,16 @@ prTriang <- function(x, digits = getOption("digits"),
 	cf[row(cf) > col(cf)] <- "."
     else
 	cf[row(cf) < col(cf)] <- "."
+## TODO (in R): print() should accept 'maxp'
     print(cf, quote = FALSE, right = right)
     invisible(x)
 }
 
-prMatrix <- function(x, digits = getOption("digits")) {
+prMatrix <- function(x, digits = getOption("digits"),
+                     maxp = getOption("max.print")) {
     d <- dim(x)
     cl <- class(x)
     cat(sprintf('%d x %d Matrix of class "%s"\n', d[1], d[2], cl))
-    maxp <- getOption("max.print")
     if(prod(d) <= maxp) {
 	if(is(x, "triangularMatrix"))
 	    prTriang(x, digits = digits)
@@ -162,6 +163,12 @@ non0ind <- function(x) {
 	ij <- non0.i(x)
 	notdiag <- ij[,1] != ij[,2]# but not the diagonals again
 	rbind(ij, ij[notdiag, 2:1])
+    }
+    else if(is(x, "triangularMatrix")) { # check for "U" diag
+	if(x@diag == "U") {
+	    i <- seq(length = dim(x)[1])
+	    rbind(non0.i(x), cbind(i,i))
+	} else non0.i(x)
     }
     else
 	non0.i(x)

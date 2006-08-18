@@ -196,10 +196,20 @@ setMethod("-", signature(e1 = "pMatrix", e2 = "missing"),
 
 ### --- show() method ---
 
-prSpMatrix <- function(object, zero.print = ".")
+## FIXME(?) -- ``merge this'' (at least ``synchronize'') with
+## - - -   prMatrix() from ./Auxiliaries.R
+prSpMatrix <- function(object, digits = getOption("digits"),
+                       maxp = getOption("max.print"), zero.print = ".")
 {
     stopifnot(is(object, "sparseMatrix"))
-    m <- as(object, "matrix")
+    d <- dim(x)
+    if(prod(d) > maxp) { # "Large" => will be "cut"
+        ## only coerce to dense that part which won't be cut :
+        nr <- maxp %/% d[2]
+	m <- as(object[1:max(1, nr), ,drop=FALSE], "Matrix")
+    } else {
+        m <- as(object, "matrix")
+    }
     logi <- is(object,"lsparseMatrix")
     if(logi)
 	x <- array(character(length(m)), dim(m), dimnames=dimnames(m))
@@ -233,7 +243,7 @@ setMethod("show", signature(object = "sparseMatrix"),
        cat(sprintf('%d x %d sparse Matrix of class "%s"\n', d[1], d[2], cl))
        maxp <- getOption("max.print")
        if(prod(d) <= maxp)
-	   prSpMatrix(object)
+	   prSpMatrix(object, maxp = maxp)
        else { ## d[1] > maxp / d[2] >= nr : -- this needs [,] working:
 	   nr <- maxp %/% d[2]
 	   n2 <- ceiling(nr / 2)
