@@ -13,6 +13,7 @@
 \alias{Arith,numeric,ddenseMatrix-method}
 \alias{Math,ddenseMatrix-method}
 %
+\alias{as.numeric,ddenseMatrix-method}
 \alias{cbind2,ddenseMatrix,ddenseMatrix-method}
 \alias{cbind2,ddenseMatrix,matrix-method}
 \alias{cbind2,matrix,ddenseMatrix-method}

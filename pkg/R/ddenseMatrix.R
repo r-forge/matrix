@@ -6,6 +6,9 @@ setAs("dtpMatrix", "ltpMatrix", d2l_Matrix)
 setAs("dsyMatrix", "lsyMatrix", d2l_Matrix)
 setAs("dspMatrix", "lspMatrix", d2l_Matrix)
 
+setMethod("as.numeric", signature(x = "ddenseMatrix"),
+	  function(x, ...) as(x, "dgeMatrix")@x)
+
 ## -- see also ./Matrix.R  e.g., for a show() method
 
 ## These methods are the 'fallback' methods for all dense numeric
