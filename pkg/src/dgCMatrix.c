@@ -170,11 +170,11 @@ SEXP dgCMatrix_QR(SEXP Ap, SEXP order)
     cs *A = Matrix_as_cs(Ap), *D;
     css *S;
     csn *N;
-    int m = A->m, n = A->n, *p;
+    int m = A->m, n = A->n, ord = asLogical(order) ? 3 : 0, *p;
 
     if (m < n) error("A must have # rows >= # columns") ;
-				/* symbolic QR ordering & analysis*/
-    S = cs_sqr(asLogical(order) ? 1 : -1, A, 1);
+    S = cs_sqr(ord, A, 1);	/* symbolic QR ordering & analysis*/
+    if (!S) error("cs_sqr failed");
     N = cs_qr(A, S);		/* numeric QR factorization */
     if (!N) error("cs_qr failed") ;
     cs_dropzeros(N->L);		/* drop zeros from V and sort */
@@ -197,8 +197,11 @@ SEXP dgCMatrix_QR(SEXP Ap, SEXP order)
 			      INTSXP, m)), p, m);
     SET_SLOT(ans, install("R"),
 	     Matrix_cs_to_SEXP(N->U, "dgCMatrix", 0));
-    Memcpy(INTEGER(ALLOC_SLOT(ans, install("q"),
-			      INTSXP, n)), S->q, n);
+    if (ord) 
+	Memcpy(INTEGER(ALLOC_SLOT(ans, install("q"),
+				  INTSXP, n)), S->q, n);
+    else
+	ALLOC_SLOT(ans, install("q"), INTSXP, 0);
     cs_nfree(N);
     cs_sfree(S);
     cs_free(p);
