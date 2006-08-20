@@ -677,4 +677,42 @@ SEXP alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms)
     return ans;
 }
 
+ /* FIXME: Modify this similar so it is not necessary to state whether
+  * the matrix is classed or not. The code in as_cholmod_dense
+  * (./chm_common.c) can be adapted. */ 
 
+/**  Duplicate a non-packed, non-symmetric dMatrix or a numeric matrix
+ *  as a dgeMatrix.
+ *  This is for the many *_matrix_{prod,crossprod,tcrossprod,etc.}
+ *  functions that work with both classed and unclassed matrices.
+ *
+ *
+ * @param A either a ddenseMatrix object or a matrix object
+ * @param classed logical indicating if the object is classed
+ *
+ * @return 0 if all columns are sorted, otherwise 1
+ */
+
+SEXP dup_mMatrix_as_dgeMatrix(SEXP A, SEXP classed)
+{
+    int cl = asLogical(classed);
+    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
+	ad = cl ? GET_SLOT(A, Matrix_DimSym) : getAttrib(A, R_DimSymbol),
+	an = cl ? GET_SLOT(A, Matrix_DimNamesSym) :
+	          getAttrib(A, R_DimNamesSymbol);
+    int *dims = INTEGER(ad);
+    int sz = dims[0] * dims[1], nprot = 1;
+
+    SET_SLOT(ans, Matrix_DimSym, duplicate(ad));
+    SET_SLOT(ans, Matrix_DimNamesSym, (LENGTH(an) == 2) ? duplicate(an) :
+	     allocVector(VECSXP, 2));
+    if (!cl && !isReal(A)) {
+	A = coerceVector(A, REALSXP);
+	nprot++;
+    }
+    Memcpy(REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, sz)),
+	   REAL(cl ? GET_SLOT(A, Matrix_xSym) : A), sz);
+    UNPROTECT(nprot);
+    return ans;
+}
+    
