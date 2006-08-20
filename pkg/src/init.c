@@ -27,6 +27,7 @@
 #include "ltCMatrix.h"
 #include "lmer.h"
 #include "pedigree.h"
+#include "sparseQR.h"
 #include <R_ext/Rdynload.h>
 
 #include "Syms.h"
@@ -234,6 +235,10 @@ static R_CallMethodDef CallEntries[] = {
 /*     {"matrix_to_csc", (DL_FUNC) &matrix_to_csc, 1}, */
     {"pedigree_chol", (DL_FUNC) &pedigree_chol, 2},
     {"ssc_transpose", (DL_FUNC) &ssc_transpose, 1},
+    {"sparseQR_validate", (DL_FUNC) &sparseQR_validate, 1},
+    {"sparseQR_qty", (DL_FUNC) &sparseQR_qty, 4},
+    {"sparseQR_coef", (DL_FUNC) &sparseQR_coef, 3},
+    {"sparseQR_resid_fitted", (DL_FUNC) &sparseQR_resid_fitted, 4},
     {"tsc_to_dgTMatrix", (DL_FUNC) &tsc_to_dgTMatrix, 1},
 /*     {"tsc_transpose", (DL_FUNC) &tsc_transpose, 1}, */
     {"tsc_validate", (DL_FUNC) &tsc_validate, 1},
