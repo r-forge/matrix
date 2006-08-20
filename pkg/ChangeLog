@@ -1,3 +1,11 @@
+2006-08-19  Douglas Bates  <bates@R-project.org>
+
+	* NAMESPACE, R/sparseQR.R, src/init.c,sparseQR.[ch],SOURCES_C.mkf:
+	Added methods for sparseQR for qr.qy, qr.qty, qr.coef, qr.resid
+	and qr.fitted.
+	* src/Mutils.[ch]: Added dup_mMatrix_as_dgeMatrix utility
+	* src/dgCMatrix.c: Check for ordering before storing q in dgCMatrix_QR
+
 2006-08-18  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/AllGeneric.R: add "qr" and "chol" generics; via 'trick' since
