@@ -114,7 +114,7 @@ SEXP sparseQR_resid_fitted(SEXP qr, SEXP y, SEXP classed, SEXP resid)
 
     /* apply row permutation and multiply by Q' */
     sparseQR_Qmult(V, beta, p, 1, ax, ydims);
-    for (j = 0; j < n; j++) {
+    for (j = 0; j < ydims[1]; j++) {
 	if (res)		/* zero first n rows */
 	    for (i = 0; i < n; i++) ax[i + j * m] = 0;
 	else 			/* zero last m - n rows */
@@ -124,10 +124,4 @@ SEXP sparseQR_resid_fitted(SEXP qr, SEXP y, SEXP classed, SEXP resid)
     sparseQR_Qmult(V, beta, p, 0, ax, ydims);
     UNPROTECT(1);
     return ans;
-}
-
-SEXP sparseQR_fitted(SEXP qr, SEXP y, SEXP classed)
-{
-    error("not yet written");
-    return R_NilValue;
 }
