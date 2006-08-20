@@ -305,6 +305,8 @@ SEXP alloc_dpoMatrix(int n, char *uplo, SEXP rownms, SEXP colnms);
 SEXP alloc_dtrMatrix(int n, char *uplo, char *diag, SEXP rownms, SEXP colnms);
 SEXP alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms);
 
+SEXP dup_mMatrix_as_dgeMatrix(SEXP A, SEXP classed);
+
 #ifdef __cplusplus
 }
 #endif
