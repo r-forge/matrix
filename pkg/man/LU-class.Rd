@@ -1,14 +1,17 @@
 \name{LU-class}
 \docType{class}
 \alias{LU-class}
-\alias{expand,LU-method}
-\title{LU Matrix Decompositions}
+\alias{denseLU-class}
+\alias{expand,denseLU-method}
+\title{LU (dense) Matrix Decompositions}
+%% FIXME --- update this page, by merging with result of  promptClass("LU")
 \description{
-  The \code{"LU"} class is the class of LU decompositions of
-  real matrices.
+  The \code{"LU"} class is the \emph{virtual} class of LU decompositions of
+  real matrices.  \code{"denseLU"} the class of LU decompositions of
+  dense real matrices.
 }
 \section{Objects from the Class}{
-  Objects can be created by calls of the form \code{new("LU", ...)}.
+  Objects can be created by calls of the form \code{new("denseLU", ...)}.
   More commonly the objects are created explicitly from calls of the form
   \code{lu(mm)} where \code{mm} is an object that inherits from the
   \code{"dgeMatrix"} class or as a side-effect of other functions applied
@@ -31,7 +34,7 @@
 }
 \section{Methods}{
   \describe{
-    \item{expand}{\code{signature(x = "LU")}: Produce the \code{"L"} and
+    \item{expand}{\code{signature(x = "denseLU")}: Produce the \code{"L"} and
       \code{"U"} factors as a named list of matrices.}
   }
 }
@@ -39,7 +42,9 @@
 % \author{}
 % \note{}
 \seealso{
-  class \code{\linkS4class{dgeMatrix}} and functions \code{\link{lu}},
+  class \code{\linkS4class{sparseLU}} for LU decompositions of
+  \emph{sparse} matrices;
+  further, class \code{\linkS4class{dgeMatrix}} and functions \code{\link{lu}},
   \code{\link{expand}}.
 }
 \examples{

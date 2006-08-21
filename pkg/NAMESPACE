@@ -71,6 +71,8 @@ exportClasses(
 	      "Cholesky",
 	      "pCholesky",
 	      "LU",
+              "denseLU",
+              "sparseLU",
 
 	      "Matrix",
 	      ## also intermediate `virtual' ones:
@@ -137,7 +139,6 @@ exportClasses(
 	      "lCholCMatrix",
               "dCHMsuper",
               "dCHMsimpl",
-              "sparseLU",
               "sparseQR",
               "corMatrix" # unused
 	      )

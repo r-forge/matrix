@@ -241,7 +241,7 @@ setMethod("solve", signature(a = "dgeMatrix", b = "numeric"),
 
 setMethod("lu", signature(x = "dgeMatrix"),
 	  function(x, ...) .Call(dgeMatrix_LU, x),
-          valueClass = "LU")
+	  valueClass = "denseLU")
 
 setMethod("determinant", signature(x = "dgeMatrix", logarithm = "missing"),
 	  function(x, logarithm, ...)

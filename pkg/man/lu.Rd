@@ -12,14 +12,14 @@ lu(x, \dots)
   \item{\dots}{further arguments passed to or from other methods.}
 }
 \value{
-  an object of class \code{"LU"}, see \code{\linkS4class{LU}}, or
-  \code{"sparseLU"}, see \code{\linS4class{sparseLU}}; this is
+  an object of class \code{"LU"}, i.e., \code{"\linkS4class{denseLU}"} or
+  \code{"sparseLU"}, see \code{\linkS4class{sparseLU}}; this is
   a representation of a triangular decomposition of \code{x}.
 }
 \details{
   This is a generic function with special methods for different types
-  of matrices.  Use \code{\link{methods}("lu")} to list all the methods
-  for the \code{lu} generic.
+  of matrices.  Use \code{\link{showMethods}("lu")} to list all the methods
+  for the \code{\link{lu}} generic.
 
   The method for class \code{\linkS4class{dgeMatrix}} is based on
   LAPACK's \code{"dgetrf"} subroutine.
@@ -31,6 +31,13 @@ lu(x, \dots)
   Golub, G., and Van Loan, C. F. (1989).
   \emph{Matrix Computations,}
   2nd edition, Johns Hopkins, Baltimore.
+
+  Tim Davis (2005)
+  \url{http://www.cise.ufl.edu/research/sparse/CSparse/}
+
+  Timothy A. Davis (2006)
+  \emph{Direct Methods for Sparse Linear Systems}, SIAM Series
+  \dQuote{Fundamentals of Algorithms}.
 }
 \seealso{
   Class definitions \code{\linkS4class{LU}} and \code{\linkS4class{sparseLU}}
@@ -40,8 +47,9 @@ lu(x, \dots)
 \examples{
 x <- Matrix(rnorm(9), 3, 3)
 lu(x)
-pm <- as(readMM(system.file("external/pores_1.mtx", package =
-  "Matrix")), "CsparseMatrix")
+pm <- as(readMM(system.file("external/pores_1.mtx",
+                            package = "Matrix")),
+         "CsparseMatrix")
 str(pmLU <- lu(pm))		# p is a 0-based permutation of the rows
                                 # q is a 0-based permutation of the columns
 ## permute rows and columns of original matrix
