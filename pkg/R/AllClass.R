@@ -441,6 +441,38 @@ setClass("dCHMsimpl", representation(x = "numeric"), contains = "CHMsimpl")
 
 setClass("lCHMsimpl", contains = "CHMsimpl")
 
+##--- LU ---
+
+setClass("LU", representation("VIRTUAL"))
+
+setClass("denseLU", contains = "LU",
+	 representation(x = "numeric", perm = "integer"),
+	 validity = function(object) .Call(LU_validate, object))
+
+setClass("sparseLU", contains = "LU",
+	 representation(L = "dgCMatrix", U = "dgCMatrix",
+			p = "integer", q = "integer"))
+
+##--- QR ---
+
+setClass("sparseQR",
+	 representation(V = "dgCMatrix", beta = "numeric",
+			p = "integer", R = "dgCMatrix", q = "integer"))
+
+if (FALSE) { ## unused classes
+setClass("csn_QR", representation(U = "dgCMatrix", L = "dgCMatrix",
+                                  beta = "numeric"))
+
+setClass("csn_LU", representation(U = "dgCMatrix", L = "dgCMatrix",
+                                  Pinv = "integer"))
+
+setClass("css_QR", representation(Pinv = "integer", Q = "integer",
+                                  parent = "integer", cp = "integer",
+                                  nz = "integer"))
+
+setClass("css_LU", representation(Q = "integer", nz = "integer"))
+}
+
 
 ##-------------------- permutation ----------------------------------------
 
@@ -479,8 +511,7 @@ setClassUnion("index", members =  c("numeric", "logical", "character"))
 setClassUnion("replValue", members =  c("numeric", "logical"))
 
 
-
-## --- Matrix - related ----
+## --- Matrix - related (but not "Matrix" nor "Decomposition/Factorization):
 
 setClass("determinant",
 	 representation(modulus = "numeric",
@@ -488,10 +519,7 @@ setClass("determinant",
 			sign = "integer",
 			call = "call"))
 
-setClass("LU",
-	 representation(x = "numeric", perm = "integer"),
-	 validity = function(object) .Call(LU_validate, object)
-	 )
+
 
 ## -------------------- lmer-related Classes --------------------------------
 
@@ -599,24 +627,3 @@ setClass("pedigree", representation =
                               n, "]", sep = ''))
 	     TRUE
 	 })
-
-if (FALSE) {                            # unused classes
-setClass("csn_QR", representation(U = "dgCMatrix", L = "dgCMatrix",
-                                  beta = "numeric"))
-
-setClass("csn_LU", representation(U = "dgCMatrix", L = "dgCMatrix",
-                                  Pinv = "integer"))
-
-setClass("css_QR", representation(Pinv = "integer", Q = "integer",
-                                  parent = "integer", cp = "integer",
-                                  nz = "integer"))
-
-setClass("css_LU", representation(Q = "integer", nz = "integer"))
-}
-
-setClass("sparseQR", representation(V = "dgCMatrix", beta = "numeric",
-                                    p = "integer", R = "dgCMatrix",
-                                    q = "integer"))
-
-setClass("sparseLU", representation(L = "dgCMatrix", U = "dgCMatrix",
-                                    p = "integer", q = "integer"))

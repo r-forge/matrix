@@ -30,7 +30,7 @@ setMethod("qr.qty", signature(qr = "sparseQR", y = "numeric"),
 
 setMethod("qr.coef", signature(qr = "sparseQR", y = "dgeMatrix"),
           function(qr, y)
-          .coef.trun(qr, .Call(sparseQR_coef, qr, y, TRUE)),
+          .coef.trunc(qr, .Call(sparseQR_coef, qr, y, TRUE)),
           valueClass = "dgeMatrix")
 
 setMethod("qr.coef", signature(qr = "sparseQR", y = "matrix"),

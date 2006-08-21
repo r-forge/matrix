@@ -174,12 +174,13 @@ SEXP dgeMatrix_LU(SEXP x)
     SEXP val = get_factors(x, "LU");
     int *dims, npiv, info;
 
-    if (val != R_NilValue) return val;
+    if (val != R_NilValue) /* nothing to do if it's there in 'factors' slot */
+	return val;
     dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
     if (dims[0] < 1 || dims[1] < 1)
 	error(_("Cannot factor a matrix with zero extents"));
     npiv = (dims[0] <dims[1]) ? dims[0] : dims[1];
-    val = PROTECT(NEW_OBJECT(MAKE_CLASS("LU")));
+    val = PROTECT(NEW_OBJECT(MAKE_CLASS("denseLU")));
     SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(x, Matrix_xSym)));
     SET_SLOT(val, Matrix_DimSym, duplicate(GET_SLOT(x, Matrix_DimSym)));
     F77_CALL(dgetrf)(dims, dims + 1, REAL(GET_SLOT(val, Matrix_xSym)),

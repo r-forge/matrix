@@ -4,7 +4,7 @@ library(Matrix)
 
 ###-- 1)  'graph' (from Bioconductor) ---------------------------
 ###-- ==  =======                     ---------------------------
-if(require(graph)) {
+if(isTRUE(try(require(graph)))) { # may be there and fail (with R-devel)
 
     if(packageDescription("graph")$Version <= "1.10.2") {
         ## graph 1.10.x for x <= 2 had too many problems  as(<graph>, "matrix")
