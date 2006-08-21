@@ -178,7 +178,7 @@ internal_mer_RZXinv(SEXP x)
 				/* create the inverse permutation */
     for (j = 0; j < q; j++) iperm[Perm[j]] = j;
 				/* solve system in L' */
-    tmp1 = cholmod_solve(CHOLMOD_Lt, L, RZX, &c); Free(RZX);
+    tmp1 = cholmod_solve(CHOLMOD_Lt, L, RZX, &c);
     /* copy columns of tmp1 to RZXinv applying the inverse permutation */
     for (j = 0; j < p; j++) {
 	double *dest = RZXinv + j * q, *src = ((double*)(tmp1->x)) + j * q;
@@ -188,7 +188,7 @@ internal_mer_RZXinv(SEXP x)
     F77_CALL(dtrsm)("R", "U", "N", "N", &q, &p, m1,
 		    REAL(GET_SLOT(GET_SLOT(x, Matrix_RXXSym), Matrix_xSym)),
 		    &p, RZXinv, &q);
-    Free(iperm);
+    Free(iperm); Free(RZX); Free(L);
 }
 
 static void
