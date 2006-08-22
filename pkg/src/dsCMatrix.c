@@ -15,6 +15,7 @@ SEXP dsCMatrix_validate(SEXP obj)
     }
 }
 
+#if 0				/* use CHOLMOD code instead of R_ldl */
 SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
 {
     SEXP pSlot = GET_SLOT(x, Matrix_pSym), xorig = x;
@@ -127,12 +128,57 @@ SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
     UNPROTECT(1);
     return val;
 }
+#endif
 
-SEXP dsCMatrix_inverse_factor(SEXP A)
+SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
 {
-    return R_NilValue;		/* FIXME: Write this function. */
+    SEXP Chol = get_factors(x, "Cholesky");
+    if (Chol != R_NilValue) return Chol;
+    else {
+	int piv = asLogical(pivot);
+	cholmod_sparse *A = as_cholmod_sparse(x);
+	cholmod_factor *L;
+	int super = c.supernodal, ll = c.final_ll;
+	
+	if (!A->stype) error("Non-symmetric matrix passed to dsCMatrix_chol");
+				/* require simplicial factorization */
+	c.supernodal = CHOLMOD_SIMPLICIAL; 
+	c.final_ll = TRUE;	/* leave as LL', not LDL' */
+	if (piv) {
+	    L = cholmod_analyze(A, &c); /* get fill-reducing permutation */
+	} else {		/* require identity permutation */
+	    int nmethods = c.nmethods, ord0 = c.method[0].ordering;
+	    c.nmethods = 1;
+	    c.method[0].ordering = CHOLMOD_NATURAL;
+	    c.postorder = FALSE;
+	    L = cholmod_analyze(A, &c);
+	    c.nmethods = nmethods; c.method[0].ordering = ord0;
+	    c.postorder = TRUE;
+	}
+	c.supernodal = super;	/* restore previous setting */
+	c.final_ll = ll;
+	if (!cholmod_factorize(A, L, &c))
+	    error(_("Cholesky factorization failed"));
+	Free(A);
+	return set_factors(x, chm_factor_to_SEXP(L, 1), "Cholesky");
+    }
 }
 
+SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
+{
+    SEXP Chol = get_factors(a, "Cholesky");
+    cholmod_factor *L;
+    cholmod_dense *cb = as_cholmod_dense(b), *cx;
+    
+    if (Chol == R_NilValue)
+	Chol = dsCMatrix_chol(a, ScalarLogical(0));
+    L = as_cholmod_factor(Chol);
+    cx = cholmod_solve(CHOLMOD_A, L, cb, &c);
+    Free(cb);
+    return chm_dense_to_SEXP(cx, 1);
+}
+
+#if 0				/* Csparse_transpose (./Csparse.c) instead */
 SEXP ssc_transpose(SEXP x)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dsCMatrix"))),
@@ -155,6 +201,7 @@ SEXP ssc_transpose(SEXP x)
     UNPROTECT(1);
     return ans;
 }
+#endif
 
 /* TODO: still needed with Csparse_to_Tsparse()  [ which does dsC -> dsT ] */
 SEXP dsCMatrix_to_dgTMatrix(SEXP x)
@@ -201,6 +248,7 @@ SEXP dsCMatrix_to_dgTMatrix(SEXP x)
     return ans;
 }
 
+#if 0
 SEXP dsCMatrix_ldl_symbolic(SEXP x, SEXP doPerm)
 {
     SEXP Ax, Dims = GET_SLOT(x, Matrix_DimSym),
@@ -269,3 +317,4 @@ SEXP dsCMatrix_metis_perm(SEXP x)
     UNPROTECT(1);
     return ans;
 }
+#endif
