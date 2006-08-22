@@ -307,6 +307,26 @@ SEXP alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms);
 
 SEXP dup_mMatrix_as_dgeMatrix(SEXP A, SEXP classed);
 
+
+/**
+ * Return the 0-based index of a string match in a vector of strings
+ * terminated by an empty string.  Returns -1 for no match.
+ *
+ * @param dest class string to match
+ * @param valid vector of possible matches terminated by an empty string
+ *
+ * @return index of match or -1 for no match
+ */
+static R_INLINE int
+Matrix_check_class(char *class, char **valid)
+{
+    int ans;
+    for (ans = 0; ; ans++) {
+	if (!strlen(valid[ans])) return -1;
+	if (!strcmp(class, valid[ans])) return ans;
+    }
+}
+
 #ifdef __cplusplus
 }
 #endif
