@@ -117,8 +117,8 @@ static R_CallMethodDef CallEntries[] = {
     {"dppMatrix_solve", (DL_FUNC) &dppMatrix_solve, 1},
     {"dppMatrix_validate", (DL_FUNC) &dppMatrix_validate, 1},
     {"dsCMatrix_chol", (DL_FUNC) &dsCMatrix_chol, 2},
-    {"dsCMatrix_inverse_factor", (DL_FUNC) &dsCMatrix_inverse_factor, 1},
-    {"dsCMatrix_ldl_symbolic", (DL_FUNC) &dsCMatrix_ldl_symbolic, 2},
+/*     {"dsCMatrix_inverse_factor", (DL_FUNC) &dsCMatrix_inverse_factor, 1}, */
+/*     {"dsCMatrix_ldl_symbolic", (DL_FUNC) &dsCMatrix_ldl_symbolic, 2}, */
     {"dsCMatrix_matrix_solve", (DL_FUNC) &dsCMatrix_matrix_solve, 3},
     {"dsCMatrix_to_dgTMatrix", (DL_FUNC) &dsCMatrix_to_dgTMatrix, 1},
     {"dsCMatrix_validate", (DL_FUNC) &dsCMatrix_validate, 1},
@@ -235,7 +235,7 @@ static R_CallMethodDef CallEntries[] = {
 
 /*     {"matrix_to_csc", (DL_FUNC) &matrix_to_csc, 1}, */
     {"pedigree_chol", (DL_FUNC) &pedigree_chol, 2},
-    {"ssc_transpose", (DL_FUNC) &ssc_transpose, 1},
+/*     {"ssc_transpose", (DL_FUNC) &ssc_transpose, 1}, */
     {"sparseQR_validate", (DL_FUNC) &sparseQR_validate, 1},
     {"sparseQR_qty", (DL_FUNC) &sparseQR_qty, 4},
     {"sparseQR_coef", (DL_FUNC) &sparseQR_coef, 3},
