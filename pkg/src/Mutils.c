@@ -695,23 +695,65 @@ SEXP alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms)
 
 SEXP dup_mMatrix_as_dgeMatrix(SEXP A, SEXP classed)
 {
-    int cl = asLogical(classed);
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
-	ad = cl ? GET_SLOT(A, Matrix_DimSym) : getAttrib(A, R_DimSymbol),
-	an = cl ? GET_SLOT(A, Matrix_DimNamesSym) :
-	          getAttrib(A, R_DimNamesSymbol);
-    int *dims = INTEGER(ad);
-    int sz = dims[0] * dims[1], nprot = 1;
+	ad = R_NilValue , an = R_NilValue;	/* -Wall */
+    char *cl = CHAR(asChar(getAttrib(A, R_ClassSymbol))),
+	*valid[] = {"dmatrix", "dgeMatrix", "dtrMatrix",
+		    "dsyMatrix", "dpoMatrix",
+		    /* "ddiMatrix", "dtpMatrix", "dspMatrix", "dppMatrix", */
+		    ""};
+    int ctype = Matrix_check_class(cl, valid), nprot = 1, sz;
+    double *ansx;
+
+    if (ctype > 0) {		/* a ddenseMatrix object */
+	ad = GET_SLOT(A, Matrix_DimSym);
+	an = GET_SLOT(A, Matrix_DimNamesSym);
+    }
+    if (ctype < 0) {		/* not a (recognized) classed matrix */
+	if (isMatrix(A)) {
+	    ad = getAttrib(A, R_DimSymbol);
+	    an = getAttrib(A, R_DimNamesSymbol);
+	} else {
+	    int *dd = INTEGER(ad = PROTECT(allocVector(INTSXP, 2)));
+
+	    nprot++;
+	    dd[0] = LENGTH(A); dd[1] = 1;
+	    an = R_NilValue;
+	}
+	if (isInteger(A) || isLogical(A)) {
+	    A = PROTECT(coerceVector(A, REALSXP));
+	    nprot++;
+	}
+	if (!isReal(A))
+	    error(_("invalid class `%s' to dup_mMatrix_as_dgeMatrix"), cl);
+	ctype = 0;
+    }
+    /* check that old calling sequence is consistent before changing */
+    if (asLogical(classed) && !ctype)
+	error(_("invalid class `%s' passed as classed"), cl);
 
     SET_SLOT(ans, Matrix_DimSym, duplicate(ad));
     SET_SLOT(ans, Matrix_DimNamesSym, (LENGTH(an) == 2) ? duplicate(an) :
 	     allocVector(VECSXP, 2));
-    if (!cl && !isReal(A)) {
-	A = coerceVector(A, REALSXP);
-	nprot++;
+    sz = INTEGER(ad)[0] * INTEGER(ad)[1];
+    ansx = REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, sz));
+    switch(ctype) {
+    case 0:			/* unclassed real matrix */
+	Memcpy(ansx, REAL(A), sz);
+	break;
+    case 1:			/* dgeMatrix */
+	Memcpy(ansx, REAL(GET_SLOT(A, Matrix_xSym)), sz);
+	break;
+    case 2:			/* dtrMatrix */
+	make_d_matrix_triangular(ansx, A);
+	break;
+    case 3:
+    case 4:
+	make_d_matrix_symmetric(ansx, A);
+	break;
+    default:
+	error(_("unexpected ctype = %d in dup_mMatrix_as_dgeMatrix"), ctype);
     }
-    Memcpy(REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, sz)),
-	   REAL(cl ? GET_SLOT(A, Matrix_xSym) : A), sz);
     UNPROTECT(nprot);
     return ans;
 }
