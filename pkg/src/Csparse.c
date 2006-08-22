@@ -73,9 +73,8 @@ SEXP Csparse_to_Tsparse(SEXP x, SEXP tri)
 
     Free(chxs);
     if (asLogical(tri)) {	/* triangular sparse matrices */
-	uploT = (strcmp(CHAR(asChar(GET_SLOT(x, Matrix_uploSym))), "U")) ?
-	    -1 : 1;
-	diag = CHAR(asChar(GET_SLOT(x, Matrix_diagSym)));
+	uploT = (*uplo_P(x) == 'U') ? -1 : 1;
+	diag = diag_P(x);
     }
     return chm_triplet_to_SEXP(chxt, 1, uploT, diag,
 			       GET_SLOT(x, Matrix_DimNamesSym));
@@ -108,9 +107,8 @@ SEXP Csparse_transpose(SEXP x, SEXP tri)
     SET_VECTOR_ELT(dn, 1, tmp);
     UNPROTECT(1);
     if (asLogical(tri)) {	/* triangular sparse matrices */
-	uploT = (strcmp(CHAR(asChar(GET_SLOT(x, Matrix_uploSym))), "U")) ?
-	    1 : -1;		/* switch upper and lower for transpose */
-	diag = CHAR(asChar(GET_SLOT(x, Matrix_diagSym)));
+	uploT = (*uplo_P(x) == 'U') ? -1 : 1;
+	diag = diag_P(x);
     }
     return chm_sparse_to_SEXP(chxt, 1, uploT, diag, dn);
 }
