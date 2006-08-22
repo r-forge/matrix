@@ -2,9 +2,14 @@
 
 	* src/Mutils.c (dup_mMatrix_as_dgeMatrix): updated for general
 	types of classed Matrices, matrices or numeric or logical vectors.
-	
 	* src/init.c: register dup_mMatrix_as_dgeMatrix for coercions.
-
+	* src/chm_common.c,Mutils.h (as_cholmod_factor): Move check_class
+	to Mutils.h (as an inline) and change name to Matrix_check_class;
+	fixes in as_cholmod_factor and chm_factor_to_SEXP.
+	* src/dsCMatrix.[ch]: Use CHOLMOD for dsCMatrix_chol and
+	dsCMatrix_matrix_solve.  Comment out vestigial functions.
+	* src/Csparse.c: use diag_P and uplo_P macros.
+	
 2006-08-21  Douglas Bates  <bates@R-project.org>
 
 	* src/lmer.c (internal_mer_RZXinv): Fix memory leak caught by
