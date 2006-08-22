@@ -11,6 +11,8 @@ SEXP sparseQR_validate(SEXP x)
 
     if (LENGTH(p) != V->m)
 	return mkString(_("length(p) must match nrow(V)"));
+    if (LENGTH(beta) != V->m)
+	return mkString(_("length(beta) must match nrow(V)"));
     if (lq && lq != R->n)
 	return mkString(_("length(q) must be zero or ncol(R)"));
     if (V->n != R->n)
@@ -81,7 +83,7 @@ SEXP sparseQR_coef(SEXP qr, SEXP y, SEXP classed)
 	*R = Matrix_as_cs(GET_SLOT(qr, install("R")));
     int *ydims = INTEGER(GET_SLOT(ans, Matrix_DimSym)),
 	*q = INTEGER(qslot),
-	j, k, lq = LENGTH(qslot), m = R->m, n = R->n;
+	j, lq = LENGTH(qslot), m = R->m, n = R->n;
     double *ax = REAL(GET_SLOT(ans, Matrix_xSym)),
 	*x = Calloc(m, double);
 
@@ -108,7 +110,7 @@ SEXP sparseQR_resid_fitted(SEXP qr, SEXP y, SEXP classed, SEXP resid)
     cs *V = Matrix_as_cs(GET_SLOT(qr, install("V")));
     int *ydims = INTEGER(GET_SLOT(ans, Matrix_DimSym)),
 	*p = INTEGER(GET_SLOT(qr, Matrix_pSym)),
-	i, j, k, m = V->m, n = V->n, res = asLogical(resid);
+	i, j, m = V->m, n = V->n, res = asLogical(resid);
     double *ax = REAL(GET_SLOT(ans, Matrix_xSym)),
 	*beta = REAL(GET_SLOT(qr, install("beta")));
 
