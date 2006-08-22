@@ -1,3 +1,9 @@
+2006-08-22  Douglas Bates  <bates@R-project.org>
+
+	* src/Mutils.c (dup_mMatrix_as_dgeMatrix): updated for general
+	types of classed Matrices, matrices or numeric or logical vectors.
+	* src/init.c: register dup_mMatrix_as_dgeMatrix for coercions.
+
 2006-08-21  Douglas Bates  <bates@R-project.org>
 
 	* src/lmer.c (internal_mer_RZXinv): Fix memory leak caught by
