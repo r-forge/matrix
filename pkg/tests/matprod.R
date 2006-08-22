@@ -46,6 +46,15 @@ assert.EQ.mat(p1, cbind(c(20,30,33,38,54)))
 assert.EQ.mat(pd1, as(m5,"matrix") %*% diag(1:6))
 assert.EQ.mat(pd2, diag(10:6) %*% as(m5,"matrix"))
 
+## check that 'solve' and '%*%' are inverses
+set.seed(1)
+A <- Matrix(rnorm(25), nc = 5)
+y <- rnorm(5)
+all.equal((A %*% solve(A, y))@x, y)
+Atr <- new("dtrMatrix", Dim = A@Dim, x = A@x, uplo = "U")
+all.equal((Atr %*% solve(Atr, y))@x, y)
+
+## sparse matrix products
 
 data(KNex); mm <- KNex$mm
 M <- mm[1:500, 1:200]
