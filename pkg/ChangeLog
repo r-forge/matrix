@@ -2,7 +2,13 @@
 
 	* src/lmer.c (internal_mer_RZXinv): Fix memory leak caught by
 	valgrind. 
-
+	* tests/matprod.R: Add tests to verify that 'solve' and '%*%' are
+	inverses.
+	* src/sparseQR.c (sparseQR_validate): add new validation test, fix
+	-Wall warnings.
+	* src/dppMatrix.c,dtrMatrix.c,dgCMatrix.c,dgeMatrix.c,dspMatrix.c:
+	Use dup_mMatrix_as_dgeMatrix.
+	
 2006-08-20  Douglas Bates  <bates@R-project.org>
 
 	* src/sparseQR.c: Fix thinko in sparseQR_resid_fitted.
