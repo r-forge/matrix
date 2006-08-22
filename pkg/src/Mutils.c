@@ -698,7 +698,7 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A, SEXP classed)
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
 	ad = R_NilValue , an = R_NilValue;	/* -Wall */
     char *cl = CHAR(asChar(getAttrib(A, R_ClassSymbol))),
-	*valid[] = {"dmatrix", "dgeMatrix", "dtrMatrix",
+	*valid[] = {"_NOT_A_CLASS_", "dgeMatrix", "dtrMatrix",
 		    "dsyMatrix", "dpoMatrix",
 		    /* "ddiMatrix", "dtpMatrix", "dspMatrix", "dppMatrix", */
 		    ""};
@@ -745,10 +745,12 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A, SEXP classed)
 	Memcpy(ansx, REAL(GET_SLOT(A, Matrix_xSym)), sz);
 	break;
     case 2:			/* dtrMatrix */
+	Memcpy(ansx, REAL(GET_SLOT(A, Matrix_xSym)), sz);
 	make_d_matrix_triangular(ansx, A);
 	break;
     case 3:
     case 4:
+	Memcpy(ansx, REAL(GET_SLOT(A, Matrix_xSym)), sz);
 	make_d_matrix_symmetric(ansx, A);
 	break;
     default:
