@@ -251,24 +251,18 @@ SEXP dgeMatrix_solve(SEXP a)
 
 SEXP dgeMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
 {
-    int cl = asLogical(classed);
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
-	lu = dgeMatrix_LU(a);
+    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b, classed)),
+	lu = PROTECT(dgeMatrix_LU(a));
     int *adims = INTEGER(GET_SLOT(lu, Matrix_DimSym)),
-	*bdims = INTEGER(cl ? GET_SLOT(b, Matrix_DimSym) :
-			 getAttrib(b, R_DimSymbol));
+	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym));
     int info, n = bdims[0], nrhs = bdims[1];
-    int sz = n * nrhs;
 
     if (*adims != *bdims || bdims[1] < 1 || *adims < 1 || *adims != adims[1])
 	error(_("Dimensions of system to be solved are inconsistent"));
-    Memcpy(INTEGER(ALLOC_SLOT(val, Matrix_DimSym, INTSXP, 2)), bdims, 2);
     F77_CALL(dgetrs)("N", &n, &nrhs, REAL(GET_SLOT(lu, Matrix_xSym)), &n,
 		     INTEGER(GET_SLOT(lu, Matrix_permSym)),
-		     Memcpy(REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, sz)),
-			    REAL(cl ? GET_SLOT(b, Matrix_xSym):b), sz),
-		     &n, &info);
-    UNPROTECT(1);
+		     REAL(GET_SLOT(val, Matrix_xSym)), &n, &info);
+    UNPROTECT(2);
     return val;
 }
 
