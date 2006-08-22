@@ -67,28 +67,20 @@ SEXP dspMatrix_solve(SEXP a)
     return val;
 }
 
-SEXP dspMatrix_matrix_solve(SEXP a, SEXP b, SEXP classedP)
+SEXP dspMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
 {
-    int classed = asLogical(classedP);
     SEXP trf = dspMatrix_trf(a),
-	val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
+	val = PROTECT(dup_mMatrix_as_dgeMatrix(b, classed));
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
-	*bdims = (classed ? INTEGER(GET_SLOT(b, Matrix_DimSym)) :
-		  INTEGER(getAttrib(b, R_DimSymbol)));
+	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym));
     int n = bdims[0], nrhs = bdims[1], info;
-    int sz = n * nrhs;
-    double *bx = (classed ? REAL(GET_SLOT(b, Matrix_xSym)) : REAL(b));
 
-    if (!classed && !(isReal(b) && isMatrix(b)))
-	error(_("Argument b must be a numeric matrix"));
     if (*adims != *bdims || bdims[1] < 1 || *adims < 1)
 	error(_("Dimensions of system to be solved are inconsistent"));
-    Memcpy(INTEGER(ALLOC_SLOT(val, Matrix_DimSym, INTSXP, 2)), bdims, 2);
     F77_CALL(dsptrs)(uplo_P(trf),
 		     &n, &nrhs, REAL(GET_SLOT(trf, Matrix_xSym)),
 		     INTEGER(GET_SLOT(trf, Matrix_permSym)),
-		     Memcpy(REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, sz)),
-			    bx, sz), &n, &info);
+		     REAL(GET_SLOT(val, Matrix_xSym)), &n, &info);
     UNPROTECT(1);
     return val;
 }

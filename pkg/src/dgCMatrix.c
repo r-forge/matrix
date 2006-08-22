@@ -267,35 +267,28 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp)
 
 SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP classed)
 {
-    int cl = asLogical(classed);
+    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(b, classed));
     SEXP lu = dgCMatrix_LU(Ap, ScalarLogical(1), ScalarReal(1));
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
     SEXP qslot = GET_SLOT(lu, install("q"));
     cs *L = Matrix_as_cs(GET_SLOT(lu, install("L"))),
 	*U = Matrix_as_cs(GET_SLOT(lu, install("U")));
-    int *bdims = INTEGER(cl ? GET_SLOT(b, Matrix_DimSym) :
-			 getAttrib(b, R_DimSymbol));
+    int *bdims = INTEGER(GET_SLOT(ans, classed));
     int j, n = bdims[0], nrhs = bdims[1];
     int *p = INTEGER(GET_SLOT(lu, Matrix_pSym)),
 	*q = LENGTH(qslot) ? INTEGER(qslot) : (int *) NULL;
-    double *bx, *x = Calloc(n, double);
+    double *ax = REAL(GET_SLOT(ans, Matrix_xSym)),
+	*x = Calloc(n, double);
 
     if (U->n != n || nrhs < 1 || n < 1)
 	error(_("Dimensions of system to be solved are inconsistent"));
-    if (!cl && !isReal(b))
-	error(_("Right hand side b must be numeric or a numeric matrix"));
-    /* copy dimnames or Dimnames as well */
-    SET_SLOT(ans, Matrix_DimSym, duplicate(GET_SLOT(b, Matrix_DimSym)));
-    bx = Memcpy(REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, n * nrhs)),
-		REAL(cl ? GET_SLOT(b, Matrix_xSym):b), n * nrhs);
     for (j = 0; j < nrhs; j++) {
-	cs_pvec(p, bx + j * n, x, n);  /* x = b(p) */
+	cs_pvec(p, ax + j * n, x, n);  /* x = b(p) */
 	cs_lsolve(L, x);	       /* x = L\x */
 	cs_usolve(U, x);	       /* x = U\x */
 	if (q)			       /* b(q) = x */
-	    cs_ipvec(q, x, bx + j * n, n); 
+	    cs_ipvec(q, x, ax + j * n, n); 
 	else
-	    Memcpy(bx + j * n, x, n);
+	    Memcpy(ax + j * n, x, n);
     }
     Free(L); Free(U); Free(x);
     UNPROTECT(1);
