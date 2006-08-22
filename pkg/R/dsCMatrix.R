@@ -87,7 +87,7 @@ setMethod("chol", signature(x = "dsCMatrix", pivot = "logical"),
           function(x, pivot, LINPACK) .Call(dsCMatrix_chol, x, pivot))
 
 setMethod("t", signature(x = "dsCMatrix"),
-          function(x) .Call(ssc_transpose, x),
+          function(x) .Call(Csparse_transpose, x, FALSE),
           valueClass = "dsCMatrix")
 
 setMethod("determinant", signature(x = "dsCMatrix", logarithm = "missing"),
