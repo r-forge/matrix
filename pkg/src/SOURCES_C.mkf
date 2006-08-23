@@ -12,7 +12,6 @@ SOURCES_C =  \
 	    cs.c \
 	    cs_utils.c \
             dense.c \
-            dCholCMatrix.c \
             dgCMatrix.c \
             dgTMatrix.c \
             dgeMatrix.c \
@@ -29,7 +28,6 @@ SOURCES_C =  \
             factorizations.c \
 	    iohb.c \
 	    ldense.c \
-	    lCholCMatrix.c \
 	    lgCMatrix.c \
 	    lgTMatrix.c \
 	    lsCMatrix.c \

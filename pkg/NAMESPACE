@@ -12,7 +12,8 @@ importFrom("grid",    grid.rect, gpar, grob)
 importFrom("methods", Arith, Compare, Math, Math2, Summary, Complex)
 
 ## Generics and functions defined in this package
-export("Diagonal",
+export("Cholesky",
+       "Diagonal",
        "Hilbert",
        "Matrix",
        "Schur",
@@ -135,8 +136,8 @@ exportClasses(
 	      "ltTMatrix",
               "pMatrix",
 
-	      "dCholCMatrix",
-	      "lCholCMatrix",
+##	      "dCholCMatrix",
+##	      "lCholCMatrix",
               "dCHMsuper",
               "dCHMsimpl",
               "sparseQR",
@@ -159,6 +160,7 @@ exportMethods(
 	      "+",# for dgT(Matrix) only
 	      "%*%",
 
+              "Cholesky",
 	      "Schur",
 	      "as.array",
 	      "as.matrix",

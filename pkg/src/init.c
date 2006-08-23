@@ -20,7 +20,7 @@
 #include "dtpMatrix.h"
 #include "factorizations.h"
 #include "ldense.h"
-#include "lCholCMatrix.h"
+/* #include "lCholCMatrix.h" */
 #include "lgCMatrix.h"
 #include "lgTMatrix.h"
 #include "lsCMatrix.h"
@@ -116,6 +116,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dppMatrix_rcond", (DL_FUNC) &dppMatrix_rcond, 2},
     {"dppMatrix_solve", (DL_FUNC) &dppMatrix_solve, 1},
     {"dppMatrix_validate", (DL_FUNC) &dppMatrix_validate, 1},
+    {"dsCMatrix_Cholesky", (DL_FUNC) &dsCMatrix_Cholesky, 4},
     {"dsCMatrix_chol", (DL_FUNC) &dsCMatrix_chol, 2},
 /*     {"dsCMatrix_inverse_factor", (DL_FUNC) &dsCMatrix_inverse_factor, 1}, */
 /*     {"dsCMatrix_ldl_symbolic", (DL_FUNC) &dsCMatrix_ldl_symbolic, 2}, */
@@ -181,9 +182,9 @@ static R_CallMethodDef CallEntries[] = {
 /*     {"glmer_ranef_update", (DL_FUNC) &glmer_ranef_update, 4}, */
     {"lapack_qr", (DL_FUNC) &lapack_qr, 2},
 
-    {"lCholCMatrix_solve", (DL_FUNC) &lCholCMatrix_solve, 1},
-    {"lCholCMatrix_lgCMatrix_solve", (DL_FUNC) &lCholCMatrix_lgCMatrix_solve, 2},
-    {"lCholCMatrix_validate", (DL_FUNC) &lCholCMatrix_validate, 1},
+/*     {"lCholCMatrix_solve", (DL_FUNC) &lCholCMatrix_solve, 1}, */
+/*     {"lCholCMatrix_lgCMatrix_solve", (DL_FUNC) &lCholCMatrix_lgCMatrix_solve, 2}, */
+/*     {"lCholCMatrix_validate", (DL_FUNC) &lCholCMatrix_validate, 1}, */
     {"lcsc_to_matrix", (DL_FUNC) &lcsc_to_matrix, 1},
     {"lgCMatrix_crossprod", (DL_FUNC) &lgCMatrix_crossprod, 3},
     {"lgCMatrix_diag", (DL_FUNC) &lgCMatrix_diag, 1},
@@ -201,7 +202,7 @@ static R_CallMethodDef CallEntries[] = {
     {"ltrMatrix_as_lgeMatrix", (DL_FUNC) &ltrMatrix_as_lgeMatrix, 1},
     {"ltrMatrix_as_ltpMatrix", (DL_FUNC) &ltrMatrix_as_ltpMatrix, 1},
 
-    {"lsCMatrix_chol", (DL_FUNC) &lsCMatrix_chol, 2},
+/*     {"lsCMatrix_chol", (DL_FUNC) &lsCMatrix_chol, 2}, */
     {"lsCMatrix_trans", (DL_FUNC) &lsCMatrix_trans, 1},
     {"lsCMatrix_validate", (DL_FUNC) &lsCMatrix_validate, 1},
     {"ltCMatrix_trans", (DL_FUNC) &ltCMatrix_trans, 1},
