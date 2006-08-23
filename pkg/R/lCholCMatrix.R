@@ -2,6 +2,9 @@
                                         # of sparse matrices in
                                         # compressed, column-oriented format
 
+## Remove this file once R CMD check has been run successfully.
+
+if (FALSE) {
 setMethod("t", signature(x = "lCholCMatrix"),
           function(x) {
               as(x, "ltCMatrix") <- t(as(x, "ltCMatrix"))
@@ -19,3 +22,4 @@ setMethod("solve", signature(a = "lCholCMatrix", b = "lgCMatrix"),
           .Call(lCholCMatrix_lgCMatrix_solve, a, b),
           valueClass = "lgCMatrix")
 
+}
