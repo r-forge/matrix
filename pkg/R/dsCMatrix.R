@@ -81,10 +81,17 @@ setMethod("solve", signature(a = "dsCMatrix", b = "matrix"),
 ##          valueClass = "dgeMatrix")
 
 setMethod("chol", signature(x = "dsCMatrix", pivot = "missing"),
-          function(x, pivot, LINPACK) .Call(dsCMatrix_chol, x, TRUE))
+          function(x, pivot, LINPACK) .Call(dsCMatrix_chol, x, FALSE),
+          valueClass = "dtCMatrix")
 
 setMethod("chol", signature(x = "dsCMatrix", pivot = "logical"),
-          function(x, pivot, LINPACK) .Call(dsCMatrix_chol, x, pivot))
+          function(x, pivot, LINPACK) .Call(dsCMatrix_chol, x, pivot),
+          valueClass = "dtCMatrix")
+
+setMethod("Cholesky", signature(A = "dsCMatrix"),
+          function(A, perm = TRUE, LDL = TRUE, super = FALSE, ...)
+          .Call(dsCMatrix_Cholesky, A, perm, LDL, super))
+
 
 setMethod("t", signature(x = "dsCMatrix"),
           function(x) .Call(Csparse_transpose, x, FALSE),
@@ -96,6 +103,7 @@ setMethod("determinant", signature(x = "dsCMatrix", logarithm = "missing"),
 setMethod("determinant", signature(x = "dsCMatrix", logarithm = "logical"),
           function(x, logarithm, ...)
       {
+          stop("Temporarily disabled until we work out the LDL factorization diagonal")
           ldet <- sum(log(chol(x)@D))
           modulus <- if (logarithm) ldet else exp(ldet)
           attr(modulus, "logarithm") <- logarithm
