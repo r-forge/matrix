@@ -679,7 +679,7 @@ SEXP alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms)
 
  /* FIXME: Modify this similar so it is not necessary to state whether
   * the matrix is classed or not. The code in as_cholmod_dense
-  * (./chm_common.c) can be adapted. */ 
+  * (./chm_common.c) can be adapted. */
 
 /**  Duplicate a non-packed, non-symmetric dMatrix or a numeric matrix
  *  as a dgeMatrix.
@@ -687,10 +687,8 @@ SEXP alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms)
  *  functions that work with both classed and unclassed matrices.
  *
  *
- * @param A either a ddenseMatrix object or a matrix object
+ * @param A	  either a ddenseMatrix object or a matrix object
  * @param classed logical indicating if the object is classed
- *
- * @return 0 if all columns are sorted, otherwise 1
  */
 
 SEXP dup_mMatrix_as_dgeMatrix(SEXP A, SEXP classed)
@@ -709,13 +707,12 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A, SEXP classed)
 	ad = GET_SLOT(A, Matrix_DimSym);
 	an = GET_SLOT(A, Matrix_DimNamesSym);
     }
-    if (ctype < 0) {		/* not a (recognized) classed matrix */
-	if (isMatrix(A)) {
+    else if (ctype < 0) {	/* not a (recognized) classed matrix */
+	if (isMatrix(A)) { /* "matrix" */
 	    ad = getAttrib(A, R_DimSymbol);
 	    an = getAttrib(A, R_DimNamesSymbol);
-	} else {
-	    int *dd = INTEGER(ad = PROTECT(allocVector(INTSXP, 2)));
-
+	} else { /* maybe "numeric" (incl "integer","logical") -->  (n x 1) */
+	    int* dd = INTEGER(ad = PROTECT(allocVector(INTSXP, 2)));
 	    nprot++;
 	    dd[0] = LENGTH(A); dd[1] = 1;
 	    an = R_NilValue;
@@ -748,8 +745,8 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A, SEXP classed)
 	Memcpy(ansx, REAL(GET_SLOT(A, Matrix_xSym)), sz);
 	make_d_matrix_triangular(ansx, A);
 	break;
-    case 3:
-    case 4:
+    case 3:			/* dsyMatrix */
+    case 4:			/* dpoMatrix */
 	Memcpy(ansx, REAL(GET_SLOT(A, Matrix_xSym)), sz);
 	make_d_matrix_symmetric(ansx, A);
 	break;
@@ -759,4 +756,3 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A, SEXP classed)
     UNPROTECT(nprot);
     return ans;
 }
-    
