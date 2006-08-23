@@ -62,6 +62,7 @@ SEXP lsCMatrix_trans(SEXP x)
     return ans;
 }
 
+#if 0
 /**
  * Create the symbolic Cholesky decomposition of an lsCMatrix object
  *
@@ -115,3 +116,4 @@ SEXP lsCMatrix_chol(SEXP x, SEXP pivot)
     UNPROTECT(1);
     return ans;
 }
+#endif

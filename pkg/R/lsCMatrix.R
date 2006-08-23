@@ -48,12 +48,12 @@ setMethod("image", "lsCMatrix",
           })
 
 setMethod("chol", signature(x = "lsCMatrix", pivot = "missing"),
-          function(x, pivot, LINPACK)
-          .Call(lsCMatrix_chol, x, TRUE))
+          function(x, pivot, LINPACK) stop("temporarily disabled"))
+##          .Call(lsCMatrix_chol, x, TRUE))
 
 setMethod("chol", signature(x = "lsCMatrix", pivot = "logical"),
-          function(x, pivot, LINPACK)
-          .Call(lsCMatrix_chol, x, pivot))
+          function(x, pivot, LINPACK) stop("temporarily disabled"))
+##          .Call(lsCMatrix_chol, x, pivot))
 
 setMethod("t", signature(x = "lsCMatrix"),
           function(x)
