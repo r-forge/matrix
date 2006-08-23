@@ -90,7 +90,7 @@ SEXP dgeMatrix_crossprod(SEXP x, SEXP trans)
     F77_CALL(dsyrk)("U", tr ? "N" : "T", &n, &k,
 		    &one, REAL(GET_SLOT(x, Matrix_xSym)), Dims,
 		    &zero, vx, &n);
-
+    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     UNPROTECT(1);
     return val;
 }
