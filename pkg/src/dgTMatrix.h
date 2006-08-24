@@ -2,7 +2,7 @@
 #define MATRIX_TRIPLET_H
 
 #include "Mutils.h"
-#include "triplet_to_col.h"
+/* #include "triplet_to_col.h" */
 
 SEXP dgTMatrix_validate(SEXP x);
 /* SEXP dgTMatrix_to_dgCMatrix(SEXP x); */  /* no longer used */

@@ -677,17 +677,32 @@ SEXP alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms)
     return ans;
 }
 
- /* FIXME:  The code in as_cholmod_dense
-  * (./chm_common.c) can be adapted. */
+/**
+ * Zero a square matrix of size nc then copy a vector to the diagonal
+ *
+ * @param dest destination array of length nc * nc
+ * @param src diagonal elements in an array of length nc
+ * @param nc number of columns (and rows) in the matrix
+ *
+ * @return dest
+ */
 
-/**  Duplicate a non-packed, non-symmetric dMatrix or a numeric matrix
+static double *
+install_diagonal(double *dest, const double *src, int nc)
+{
+    int i, ncp1 = nc + 1;
+    AZERO(dest, nc * nc);
+    for (i = 0; i < nc; i++) dest[i * ncp1] = src[i];
+    return dest;
+}
+
+/**  Duplicate a ddenseMatrix or a numeric matrix or vector
  *  as a dgeMatrix.
  *  This is for the many *_matrix_{prod,crossprod,tcrossprod,etc.}
  *  functions that work with both classed and unclassed matrices.
  *
  *
  * @param A	  either a ddenseMatrix object or a matrix object
- * @param classed logical indicating if the object is classed
  */
 
 SEXP dup_mMatrix_as_dgeMatrix(SEXP A)
@@ -707,7 +722,7 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A)
 	an = GET_SLOT(A, Matrix_DimNamesSym);
     }
     else if (ctype < 0) {	/* not a (recognized) classed matrix */
-	if (isMatrix(A)) { /* "matrix" */
+	if (isMatrix(A)) {	/* "matrix" */
 	    ad = getAttrib(A, R_DimSymbol);
 	    an = getAttrib(A, R_DimNamesSymbol);
 	} else { /* maybe "numeric" (incl "integer","logical") -->  (n x 1) */
@@ -745,6 +760,9 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A)
     case 4:			/* dpoMatrix */
 	Memcpy(ansx, REAL(GET_SLOT(A, Matrix_xSym)), sz);
 	make_d_matrix_symmetric(ansx, A);
+	break;
+    case 5:			/* ddiMatrix */
+	install_diagonal(ansx, REAL(GET_SLOT(A, Matrix_xSym)), INTEGER(ad)[0]);
 	break;
     default:
 	error(_("unexpected ctype = %d in dup_mMatrix_as_dgeMatrix"), ctype);
