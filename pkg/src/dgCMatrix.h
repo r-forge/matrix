@@ -13,6 +13,6 @@ SEXP dgCMatrix_lusol(SEXP x, SEXP y);
 SEXP dgCMatrix_qrsol(SEXP x, SEXP y);
 SEXP dgCMatrix_QR(SEXP Ap, SEXP order);
 SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp);
-SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP bp, SEXP classed);
+SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP bp);
 
 #endif

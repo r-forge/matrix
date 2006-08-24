@@ -249,9 +249,9 @@ SEXP dgeMatrix_solve(SEXP a)
     return val;
 }
 
-SEXP dgeMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
+SEXP dgeMatrix_matrix_solve(SEXP a, SEXP b)
 {
-    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b, classed)),
+    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b)),
 	lu = PROTECT(dgeMatrix_LU(a));
     int *adims = INTEGER(GET_SLOT(lu, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym));

@@ -226,18 +226,18 @@ setMethod("solve", signature(a = "dgeMatrix", b = "missing"),
 
 setMethod("solve", signature(a = "dgeMatrix", b = "dgeMatrix"),
 	  function(a, b, ...)
-          .Call(dgeMatrix_matrix_solve, a, b, TRUE),
+          .Call(dgeMatrix_matrix_solve, a, b),
 	  valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dgeMatrix", b = "matrix"),
 	  function(a, b, ...) {
 	      storage.mode(b) <- "double"
-	      .Call(dgeMatrix_matrix_solve, a, b, FALSE)
+	      .Call(dgeMatrix_matrix_solve, a, b)
 	  }, valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dgeMatrix", b = "numeric"),
 	  function(a, b, ...)
-	  .Call(dgeMatrix_matrix_solve, a, as.matrix(as.double(b)), FALSE))
+	  .Call(dgeMatrix_matrix_solve, a, as.matrix(as.double(b))))
 
 setMethod("lu", signature(x = "dgeMatrix"),
 	  function(x, ...) .Call(dgeMatrix_LU, x),

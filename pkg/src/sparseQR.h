@@ -5,8 +5,8 @@
 #include "cs_utils.h"
 
 SEXP sparseQR_validate(SEXP x);
-SEXP sparseQR_qty(SEXP qr, SEXP y, SEXP classed, SEXP trans);
-SEXP sparseQR_coef(SEXP qr, SEXP y, SEXP classed);
-SEXP sparseQR_resid_fitted(SEXP qr, SEXP y, SEXP classed, SEXP resid);
+SEXP sparseQR_qty(SEXP qr, SEXP y, SEXP trans);
+SEXP sparseQR_coef(SEXP qr, SEXP y);
+SEXP sparseQR_resid_fitted(SEXP qr, SEXP y, SEXP resid);
 
 #endif

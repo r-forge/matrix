@@ -398,7 +398,7 @@ setClass("pBunchKaufman",
 	 function(object) .Call(pBunchKaufman_validate, object)
 	 )
 
-if (FALSE) {
+if (FALSE) { # old
 setClass("dCholCMatrix",
 	 representation(perm = "integer", Parent = "integer", D = "numeric"),
 	 contains = "dtCMatrix",
@@ -412,7 +412,7 @@ setClass("lCholCMatrix",
 	 validity =
 	 function(object) .Call(lCholCMatrix_validate, object)
 	 )
-}
+}# end{old}
 
 setClass("CHMfactor",		 # cholmod_factor struct as S4 object
 	 representation(colcount = "integer", perm = "integer",
