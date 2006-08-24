@@ -1,7 +1,17 @@
-2006-08-23  Douglas Bates  <bates@dyn-51-128.uwnet.wisc.edu>
+2006-08-24  Douglas Bates  <bates@R-project.org>
 
-	* R/AllClass.R,src/SOURCES_C.mkf,init.c,NAMESPACE: Remove classes
-	lCholCMatrix and dCholCMatrix based on R_ldl code.
+	* src/lsCMatrix.c (lsCMatrix_trans): Remove lsCMatrix_chol based
+	on R_ldl.
+	* R/lCholCMatrix.R,
+	src/[dl]CholCMatrix.[ch],R_ldl.[ch],Metis_utils.[ch]: removed
+	* src/dsCMatrix.c (dsCMatrix_to_dgTMatrix): use CHOLMOD
+	* many files in ./R and ./src: Use more general version of
+	dup_mMatrix_as_dgeMatrix to simplify method definitions.
+	
+2006-08-23  Douglas Bates  <bates@R-project.org>
+
+	* R/AllClass.R,lCholCMatrix.R,src/SOURCES_C.mkf,init.c,NAMESPACE:
+	Remove classes lCholCMatrix and dCholCMatrix based on R_ldl code.
 	* src/dgeMatrix.c: Ensure 'factors' slot exists in result of
 	dgeMatrix_crossprod (may need to do this in other places).
 	* R/AllGeneric.R,dsCMatrix.R, src/dscMatrix.[ch]: Add Cholesky
