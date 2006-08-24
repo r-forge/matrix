@@ -50,15 +50,15 @@ char diag_value(SEXP x);
 
 int csc_unsorted_columns(int ncol, const int p[], const int i[]);
 void csc_sort_columns(int ncol, const int p[], int i[], double x[]);
-SEXP triple_as_SEXP(int nrow, int ncol, int nz,
-		    const int Ti [], const int Tj [], const double Tx [],
-		    char *Rclass);
+/* SEXP triple_as_SEXP(int nrow, int ncol, int nz, */
+/* 		    const int Ti [], const int Tj [], const double Tx [], */
+/* 		    char *Rclass); */
 SEXP csc_check_column_sorting(SEXP A);
-void csc_compTr(int m, int n, int nnz,
-		const int xp[], const int xi[], const double xx[],
-		int ap[], int ai[], double ax[]);
-void ssc_symbolic_permute(int n, int upper, const int perm[],
-			  int Ap[], int Ai[]);
+/* void csc_compTr(int m, int n, int nnz, */
+/* 		const int xp[], const int xi[], const double xx[], */
+/* 		int ap[], int ai[], double ax[]); */
+/* void ssc_symbolic_permute(int n, int upper, const int perm[], */
+/* 			  int Ap[], int Ai[]); */
 SEXP Matrix_make_named(int TYP, char **names);
 SEXP check_scalar_string(SEXP sP, char *vals, char *nm);
 double *packed_getDiag(double *dest, SEXP x);

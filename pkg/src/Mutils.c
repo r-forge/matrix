@@ -231,6 +231,7 @@ SEXP csc_check_column_sorting(SEXP m)
     return m;
 }
 
+#if 0				/* no longer used */
 SEXP triple_as_SEXP(int nrow, int ncol, int nz,
 		    const int Ti [], const int Tj [], const double Tx [],
 		    char *Rclass)
@@ -320,7 +321,7 @@ void ssc_symbolic_permute(int n, int upper, const int perm[],
     for (j = 0; j < n; j++) R_isort(Ai + Ap[j], Ap[j+1] - Ap[j]);
     Free(Aj); Free(ord); Free(ii);
 }
-
+#endif
 
 /* Fill in the "trivial remainder" in  n*m  array ;
  *  typically the 'x' slot of a "dtrMatrix" :
@@ -688,11 +689,15 @@ SEXP alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms)
  */
 
 static double *
-install_diagonal(double *dest, const double *src, int nc)
+install_diagonal(double *dest, SEXP A)
 {
-    int i, ncp1 = nc + 1;
+    int nc = INTEGER(GET_SLOT(A, Matrix_DimSym))[0];
+    int i, ncp1 = nc + 1, unit = *diag_P(A) == 'U';
+    double *ax = REAL(GET_SLOT(A, Matrix_xSym));
+    
     AZERO(dest, nc * nc);
-    for (i = 0; i < nc; i++) dest[i * ncp1] = src[i];
+    for (i = 0; i < nc; i++)
+	dest[i * ncp1] = (unit) ? 1. : ax[i];
     return dest;
 }
 
@@ -711,8 +716,8 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A)
 	ad = R_NilValue , an = R_NilValue;	/* -Wall */
     char *cl = CHAR(asChar(getAttrib(A, R_ClassSymbol))),
 	*valid[] = {"_NOT_A_CLASS_", "dgeMatrix", "dtrMatrix",
-		    "dsyMatrix", "dpoMatrix",
-		    /* "ddiMatrix", "dtpMatrix", "dspMatrix", "dppMatrix", */
+		    "dsyMatrix", "dpoMatrix", "ddiMatrix",
+		    "dtpMatrix", "dspMatrix", "dppMatrix",
 		    ""};
     int ctype = Matrix_check_class(cl, valid), nprot = 1, sz;
     double *ansx;
@@ -762,7 +767,20 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A)
 	make_d_matrix_symmetric(ansx, A);
 	break;
     case 5:			/* ddiMatrix */
-	install_diagonal(ansx, REAL(GET_SLOT(A, Matrix_xSym)), INTEGER(ad)[0]);
+	install_diagonal(ansx, A);
+	break;
+    case 6:			/* dtpMatrix */
+	packed_to_full_double(ansx, REAL(GET_SLOT(A, Matrix_xSym)),
+			      INTEGER(ad)[0],
+			      *uplo_P(A) == 'U' ? UPP : LOW);
+	make_d_matrix_triangular(ansx, A);
+	break;
+    case 7:			/* dspMatrix */
+    case 8:			/* dppMatrix */
+	packed_to_full_double(ansx, REAL(GET_SLOT(A, Matrix_xSym)),
+			      INTEGER(ad)[0],
+			      *uplo_P(A) == 'U' ? UPP : LOW);
+	make_d_matrix_symmetric(ansx, A);
 	break;
     default:
 	error(_("unexpected ctype = %d in dup_mMatrix_as_dgeMatrix"), ctype);
