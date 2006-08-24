@@ -20,7 +20,6 @@
 #include "dtpMatrix.h"
 #include "factorizations.h"
 #include "ldense.h"
-/* #include "lCholCMatrix.h" */
 #include "lgCMatrix.h"
 #include "lgTMatrix.h"
 #include "lsCMatrix.h"
@@ -124,7 +123,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dsCMatrix_to_dgTMatrix", (DL_FUNC) &dsCMatrix_to_dgTMatrix, 1},
     {"dsCMatrix_validate", (DL_FUNC) &dsCMatrix_validate, 1},
     {"dsTMatrix_as_dgTMatrix", (DL_FUNC) &dsTMatrix_as_dgTMatrix, 1},
-    {"dsTMatrix_as_dsCMatrix", (DL_FUNC) &dsTMatrix_as_dsCMatrix, 1},
+/*     {"dsTMatrix_as_dsCMatrix", (DL_FUNC) &dsTMatrix_as_dsCMatrix, 1}, */
     {"dsTMatrix_as_dsyMatrix", (DL_FUNC) &dsTMatrix_as_dsyMatrix, 1},
     {"dsTMatrix_validate", (DL_FUNC) &dsTMatrix_validate, 1},
     {"dsyMatrix_as_dgeMatrix", (DL_FUNC) &dsyMatrix_as_dgeMatrix, 1},
@@ -164,7 +163,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dtrMatrix_as_dgeMatrix", (DL_FUNC) &dtrMatrix_as_dgeMatrix, 1},
     {"dtrMatrix_as_dtpMatrix", (DL_FUNC) &dtrMatrix_as_dtpMatrix, 1},
     {"dtrMatrix_as_matrix", (DL_FUNC) &dtrMatrix_as_matrix, 1},
-    {"dtrMatrix_matrix_mm", (DL_FUNC) &dtrMatrix_matrix_mm, 4},
+    {"dtrMatrix_matrix_mm", (DL_FUNC) &dtrMatrix_matrix_mm, 3},
     {"dtrMatrix_getDiag", (DL_FUNC) &dtrMatrix_getDiag, 1},
     {"dtrMatrix_matrix_solve", (DL_FUNC) &dtrMatrix_matrix_solve, 2},
     {"dtrMatrix_norm", (DL_FUNC) &dtrMatrix_norm, 2},
@@ -238,9 +237,9 @@ static R_CallMethodDef CallEntries[] = {
     {"pedigree_chol", (DL_FUNC) &pedigree_chol, 2},
 /*     {"ssc_transpose", (DL_FUNC) &ssc_transpose, 1}, */
     {"sparseQR_validate", (DL_FUNC) &sparseQR_validate, 1},
-    {"sparseQR_qty", (DL_FUNC) &sparseQR_qty, 4},
-    {"sparseQR_coef", (DL_FUNC) &sparseQR_coef, 3},
-    {"sparseQR_resid_fitted", (DL_FUNC) &sparseQR_resid_fitted, 4},
+    {"sparseQR_qty", (DL_FUNC) &sparseQR_qty, 3},
+    {"sparseQR_coef", (DL_FUNC) &sparseQR_coef, 2},
+    {"sparseQR_resid_fitted", (DL_FUNC) &sparseQR_resid_fitted, 3},
     {"tsc_to_dgTMatrix", (DL_FUNC) &tsc_to_dgTMatrix, 1},
 /*     {"tsc_transpose", (DL_FUNC) &tsc_transpose, 1}, */
     {"tsc_validate", (DL_FUNC) &tsc_validate, 1},

@@ -37,19 +37,19 @@ setMethod("show", "dtrMatrix", function(object) prMatrix(object))
 
 
 setMethod("%*%", signature(x = "dtrMatrix", y = "dgeMatrix"),
-	  function(x, y) .Call(dtrMatrix_matrix_mm, x, y, TRUE, FALSE),
+	  function(x, y) .Call(dtrMatrix_matrix_mm, x, y, FALSE),
           valueClass = "dgeMatrix")
 
 setMethod("%*%", signature(x = "dtrMatrix", y = "matrix"),
-	  function(x, y) .Call(dtrMatrix_matrix_mm, x, y, FALSE, FALSE),
+	  function(x, y) .Call(dtrMatrix_matrix_mm, x, y, FALSE),
           valueClass = "dgeMatrix")
 
 setMethod("%*%", signature(x = "dgeMatrix", y = "dtrMatrix"),
-	  function(x, y) .Call(dtrMatrix_matrix_mm, y, x, TRUE, TRUE),
+	  function(x, y) .Call(dtrMatrix_matrix_mm, y, x, TRUE),
           valueClass = "dgeMatrix")
 
 setMethod("%*%", signature(x = "matrix", y = "dtrMatrix"),
-	  function(x, y) .Call(dtrMatrix_matrix_mm, y, x, FALSE, TRUE),
+	  function(x, y) .Call(dtrMatrix_matrix_mm, y, x, TRUE),
           valueClass = "dgeMatrix")
 
 setMethod("%*%", signature(x = "dtrMatrix", y = "dtrMatrix"),

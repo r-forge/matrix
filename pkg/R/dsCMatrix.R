@@ -35,15 +35,6 @@ setAs("dsCMatrix", "lsCMatrix",
 setAs("dsCMatrix", "dgCMatrix",
       function(from) .Call(Csparse_symmetric_to_general, from))
 
-if(FALSE) # have 'C' version above
-setAs("dsCMatrix", "dsTMatrix",
-      function(from)
-      new("dsTMatrix", i = from@i,
-          j = .Call(Matrix_expand_pointers, from@p),
-          x = from@x, uplo = from@uplo,
-          Dim= from@Dim, Dimnames = from@Dimnames)
-      )
-
 setAs("dsCMatrix", "dsyMatrix",
       function(from) as(as(from, "dsTMatrix"), "dsyMatrix"))
 
