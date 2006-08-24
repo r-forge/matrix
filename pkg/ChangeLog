@@ -7,6 +7,9 @@
 	* src/dsCMatrix.c (dsCMatrix_to_dgTMatrix): use CHOLMOD
 	* many files in ./R and ./src: Use more general version of
 	dup_mMatrix_as_dgeMatrix to simplify method definitions.
+	* src/Mutils.c (dup_mMatrix_as_dgeMatrix): Add ddiMatrix,
+	dtpMatrix, dspMatrix and dppMatrix conversions.
+
 	
 2006-08-23  Douglas Bates  <bates@R-project.org>
 
