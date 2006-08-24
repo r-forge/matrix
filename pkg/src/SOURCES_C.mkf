@@ -2,8 +2,6 @@ SOURCES_C =  \
 	    CHMfactor.c \
 	    Csparse.c \
 	    HBMM.c \
-	    Metis_utils.c \
-	    R_ldl.c \
 	    Tsparse.c \
 	    init.c \
 	    lmer.c \
