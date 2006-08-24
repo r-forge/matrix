@@ -35,6 +35,7 @@ SEXP dsTMatrix_as_dsyMatrix(SEXP x)
     return val;
 }
 
+#if 0
 /* FIXME: no longer needed, with Tsparse_to_Csparse() ! */
 SEXP dsTMatrix_as_dsCMatrix(SEXP x)
 {
@@ -60,6 +61,7 @@ SEXP dsTMatrix_as_dsCMatrix(SEXP x)
     UNPROTECT(1);
     return val;
 }
+#endif
 
 /* this corresponds to changing 'stype' of a cholmod_triplet; seems not available there */
 SEXP dsTMatrix_as_dgTMatrix(SEXP x)

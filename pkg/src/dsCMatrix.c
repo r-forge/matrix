@@ -128,48 +128,18 @@ SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
     return chm_dense_to_SEXP(cx, 1);
 }
 
-/* TODO: still needed with Csparse_to_Tsparse()  [ which does dsC -> dsT ] */
+/* Needed for printing dsCMatrix objects */
+/* FIXME: Create a more general version of this operation */
 SEXP dsCMatrix_to_dgTMatrix(SEXP x)
 {
-    SEXP
-	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgTMatrix"))),
-	islot = GET_SLOT(x, Matrix_iSym),
-	pslot = GET_SLOT(x, Matrix_pSym);
-    int *ai, *aj, *iv = INTEGER(islot),
-	j, jj, nnz = length(islot), nout,
-	n = length(pslot) - 1,
-	*p = INTEGER(pslot), pos;
-    double *ax, *xv = REAL(GET_SLOT(x, Matrix_xSym));
+    cholmod_sparse *A = as_cholmod_sparse(x);
+    cholmod_sparse *Afull = cholmod_copy(A, /*stype*/ 0, /*mode*/ 1, &c);
+    cholmod_triplet *At = cholmod_sparse_to_triplet(Afull, &c);
 
-    /* increment output count by number of off-diagonals */
-    nout = nnz;
-    for (j = 0; j < n; j++) {
-	int p2 = p[j+1];
-	for (jj = p[j]; jj < p2; jj++) {
-	    if (iv[jj] != j) nout++;
-	}
-    }
-    SET_SLOT(ans, Matrix_DimSym, duplicate(GET_SLOT(x, Matrix_DimSym)));
-    SET_SLOT(ans, Matrix_iSym, allocVector(INTSXP, nout));
-    ai = INTEGER(GET_SLOT(ans, Matrix_iSym));
-    SET_SLOT(ans, Matrix_jSym, allocVector(INTSXP, nout));
-    aj = INTEGER(GET_SLOT(ans, Matrix_jSym));
-    SET_SLOT(ans, Matrix_xSym, allocVector(REALSXP, nout));
-    ax = REAL(GET_SLOT(ans, Matrix_xSym));
-    pos = 0;
-    for (j = 0; j < n; j++) {
-	int p2 = p[j+1];
-	for (jj = p[j]; jj < p2; jj++) {
-	    int ii = iv[jj];
-	    double xx = xv[jj];
-
-	    ai[pos] = ii; aj[pos] = j; ax[pos] = xx; pos++;
-	    if (ii != j) {
-		aj[pos] = ii; ai[pos] = j; ax[pos] = xx; pos++;
-	    }
-	}
-    }
-    UNPROTECT(1);
-    return ans;
+    if (!A->stype)
+	error("Non-symmetric matrix passed to dsCMatrix_to_dgTMatrix");
+    Free(A); cholmod_free_sparse(&Afull, &c);
+    return chm_triplet_to_SEXP(At, 1, /*uploT*/ 0, "",
+			       GET_SLOT(x, Matrix_DimNamesSym));
 }
 
