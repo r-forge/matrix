@@ -69,9 +69,9 @@ SEXP dtrMatrix_solve(SEXP a)
     return val;
 }
 
-SEXP dtrMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
+SEXP dtrMatrix_matrix_solve(SEXP a, SEXP b)
 {
-    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(b, classed));
+    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(b));
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(ans, Matrix_DimSym));
     int n = bdims[0], nrhs = bdims[1];
@@ -88,9 +88,9 @@ SEXP dtrMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
 
 /* Because a must be square, the size of the answer is the same as the
  * size of b */
-SEXP dtrMatrix_matrix_mm(SEXP a, SEXP b, SEXP classed, SEXP right)
+SEXP dtrMatrix_matrix_mm(SEXP a, SEXP b, SEXP right)
 {
-    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b, classed));
+    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b));
     int rt = asLogical(right);
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym));

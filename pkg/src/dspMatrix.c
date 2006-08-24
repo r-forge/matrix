@@ -67,10 +67,10 @@ SEXP dspMatrix_solve(SEXP a)
     return val;
 }
 
-SEXP dspMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
+SEXP dspMatrix_matrix_solve(SEXP a, SEXP b)
 {
     SEXP trf = dspMatrix_trf(a),
-	val = PROTECT(dup_mMatrix_as_dgeMatrix(b, classed));
+	val = PROTECT(dup_mMatrix_as_dgeMatrix(b));
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym));
     int n = bdims[0], nrhs = bdims[1], info;

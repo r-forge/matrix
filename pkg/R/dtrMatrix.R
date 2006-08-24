@@ -107,12 +107,12 @@ setMethod("solve", signature(a = "dtrMatrix", b="missing"),
 
 setMethod("solve", signature(a = "dtrMatrix", b="dgeMatrix"),
 	  function(a, b, ...)
-          .Call(dtrMatrix_matrix_solve, a, b, TRUE),
+          .Call(dtrMatrix_matrix_solve, a, b),
 	  valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dtrMatrix", b="matrix"),
 	  function(a, b, ...)
-          .Call(dtrMatrix_matrix_solve, a, b, FALSE),
+          .Call(dtrMatrix_matrix_solve, a, b),
 	  valueClass = "dgeMatrix")
 
 setMethod("t", signature(x = "dtrMatrix"), t_trMatrix)

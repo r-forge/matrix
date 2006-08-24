@@ -197,7 +197,7 @@ SEXP dgCMatrix_QR(SEXP Ap, SEXP order)
 			      INTSXP, m)), p, m);
     SET_SLOT(ans, install("R"),
 	     Matrix_cs_to_SEXP(N->U, "dgCMatrix", 0));
-    if (ord) 
+    if (ord)
 	Memcpy(INTEGER(ALLOC_SLOT(ans, install("q"),
 				  INTSXP, n)), S->q, n);
     else
@@ -265,14 +265,14 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp)
     return set_factors(Ap, ans, "LU");
 }
 
-SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP classed)
+SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
 {
-    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(b, classed));
+    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(b));
     SEXP lu = dgCMatrix_LU(Ap, ScalarLogical(1), ScalarReal(1));
     SEXP qslot = GET_SLOT(lu, install("q"));
     cs *L = Matrix_as_cs(GET_SLOT(lu, install("L"))),
 	*U = Matrix_as_cs(GET_SLOT(lu, install("U")));
-    int *bdims = INTEGER(GET_SLOT(ans, classed));
+    int *bdims = INTEGER(GET_SLOT(ans, Matrix_DimSym));
     int j, n = bdims[0], nrhs = bdims[1];
     int *p = INTEGER(GET_SLOT(lu, Matrix_pSym)),
 	*q = LENGTH(qslot) ? INTEGER(qslot) : (int *) NULL;
@@ -286,7 +286,7 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP classed)
 	cs_lsolve(L, x);	       /* x = L\x */
 	cs_usolve(U, x);	       /* x = U\x */
 	if (q)			       /* b(q) = x */
-	    cs_ipvec(q, x, ax + j * n, n); 
+	    cs_ipvec(q, x, ax + j * n, n);
 	else
 	    Memcpy(ax + j * n, x, n);
     }

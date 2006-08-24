@@ -677,8 +677,7 @@ SEXP alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms)
     return ans;
 }
 
- /* FIXME: Modify this similar so it is not necessary to state whether
-  * the matrix is classed or not. The code in as_cholmod_dense
+ /* FIXME:  The code in as_cholmod_dense
   * (./chm_common.c) can be adapted. */
 
 /**  Duplicate a non-packed, non-symmetric dMatrix or a numeric matrix
@@ -691,7 +690,7 @@ SEXP alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms)
  * @param classed logical indicating if the object is classed
  */
 
-SEXP dup_mMatrix_as_dgeMatrix(SEXP A, SEXP classed)
+SEXP dup_mMatrix_as_dgeMatrix(SEXP A)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
 	ad = R_NilValue , an = R_NilValue;	/* -Wall */
@@ -725,9 +724,6 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A, SEXP classed)
 	    error(_("invalid class `%s' to dup_mMatrix_as_dgeMatrix"), cl);
 	ctype = 0;
     }
-    /* check that old calling sequence is consistent before changing */
-    if (asLogical(classed) && !ctype)
-	error(_("invalid class `%s' passed as classed"), cl);
 
     SET_SLOT(ans, Matrix_DimSym, duplicate(ad));
     SET_SLOT(ans, Matrix_DimNamesSym, (LENGTH(an) == 2) ? duplicate(an) :

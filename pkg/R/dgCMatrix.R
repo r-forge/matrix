@@ -262,10 +262,10 @@ setMethod("lu", signature(x = "dgCMatrix"),
 setMethod("solve", signature(a = "dgCMatrix", b = "matrix"),
           function(a, b, ...) {
               storage.mode(b) <- "double"
-              .Call(dgCMatrix_matrix_solve, a, b, FALSE)
+              .Call(dgCMatrix_matrix_solve, a, b)
           }, valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dgCMatrix", b = "dgeMatrix"),
           function(a, b, ...) {
-              .Call(dgCMatrix_matrix_solve, a, b, TRUE)
+              .Call(dgCMatrix_matrix_solve, a, b)
           }, valueClass = "dgeMatrix")

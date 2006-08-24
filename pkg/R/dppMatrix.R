@@ -28,23 +28,23 @@ setMethod("solve", signature(a = "dppMatrix", b = "missing"),
 
 setMethod("solve", signature(a = "dppMatrix", b = "dgeMatrix"),
           function(a, b, ...)
-          .Call(dppMatrix_matrix_solve, a, b, TRUE),
+          .Call(dppMatrix_matrix_solve, a, b),
           valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dppMatrix", b = "matrix"),
           function(a, b, ...)
-          .Call(dppMatrix_matrix_solve, a, b, FALSE),
+          .Call(dppMatrix_matrix_solve, a, b),
           valueClass = "dgeMatrix")
 
 ##setMethod("solve", signature(a = "dppMatrix", b = "numeric"),
 ##          function(a, b, ...)
-##          .Call(dppMatrix_matrix_solve, a, as.matrix(b), FALSE),
+##          .Call(dppMatrix_matrix_solve, a, as.matrix(b)),
 ##          valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dppMatrix", b = "integer"),
           function(a, b, ...) {
               storage.mode(b) <- "double"
-              .Call(dppMatrix_matrix_solve, a, as.matrix(b), FALSE)
+              .Call(dppMatrix_matrix_solve, a, as.matrix(b))
           }, valueClass = "dgeMatrix")
 
 setMethod("t", signature(x = "dppMatrix"),

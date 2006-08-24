@@ -59,9 +59,9 @@ void sparseQR_Qmult(cs *V, double *beta, int *p, int trans,
 }
 
 
-SEXP sparseQR_qty(SEXP qr, SEXP y, SEXP classed, SEXP trans)
+SEXP sparseQR_qty(SEXP qr, SEXP y, SEXP trans)
 {
-    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(y, classed));
+    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(y));
     cs *V = Matrix_as_cs(GET_SLOT(qr, install("V")));
 
     sparseQR_Qmult(V, REAL(GET_SLOT(qr, install("beta"))),
@@ -69,15 +69,15 @@ SEXP sparseQR_qty(SEXP qr, SEXP y, SEXP classed, SEXP trans)
 		   asLogical(trans),
 		   REAL(GET_SLOT(ans, Matrix_xSym)),
 		   INTEGER(GET_SLOT(ans, Matrix_DimSym)));
-    
+
     Free(V);
     UNPROTECT(1);
     return ans;
 }
 
-SEXP sparseQR_coef(SEXP qr, SEXP y, SEXP classed)
+SEXP sparseQR_coef(SEXP qr, SEXP y)
 {
-    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(y, classed)),
+    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(y)),
 	qslot = GET_SLOT(qr, install("q"));
     cs *V = Matrix_as_cs(GET_SLOT(qr, install("V"))),
 	*R = Matrix_as_cs(GET_SLOT(qr, install("R")));
@@ -104,9 +104,9 @@ SEXP sparseQR_coef(SEXP qr, SEXP y, SEXP classed)
     return ans;
 }
 
-SEXP sparseQR_resid_fitted(SEXP qr, SEXP y, SEXP classed, SEXP resid)
+SEXP sparseQR_resid_fitted(SEXP qr, SEXP y, SEXP resid)
 {
-    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(y, classed));
+    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(y));
     cs *V = Matrix_as_cs(GET_SLOT(qr, install("V")));
     int *ydims = INTEGER(GET_SLOT(ans, Matrix_DimSym)),
 	*p = INTEGER(GET_SLOT(qr, Matrix_pSym)),
