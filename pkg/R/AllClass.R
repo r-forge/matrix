@@ -163,14 +163,12 @@ setClass("dspMatrix",
 
 ## numeric, dense, non-packed, positive-definite, symmetric matrices
 setClass("dpoMatrix", contains = "dsyMatrix",
-	 validity =
-	 function(object) .Call(dpoMatrix_validate, object)
+	 validity = function(object) .Call(dpoMatrix_validate, object)
 	 )
 
 ## numeric, dense, packed, positive-definite, symmetric matrices
 setClass("dppMatrix", contains = "dspMatrix",
-	 validity =
-	 function(object) .Call(dppMatrix_validate, object)
+	 validity = function(object) .Call(dppMatrix_validate, object)
 	 )
 
 ##----- logical dense Matrices -- e.g. as result of <ddenseMatrix>  COMPARISON
@@ -215,6 +213,8 @@ setClass("lspMatrix",
 setClass("ddiMatrix", contains = c("diagonalMatrix", "ddenseMatrix"))# or "dMatrix"
 ## diagonal, logical matrices; "ldense*" has 'x' slot :
 setClass("ldiMatrix", contains = c("diagonalMatrix", "ldenseMatrix"))
+
+setClass("corMatrix", representation(sd = "numeric"), contains = "dpoMatrix")
 
 
 ##-------------------- S P A R S E (non-virtual) --------------------------
@@ -374,78 +374,81 @@ setClass("lsRMatrix",
 	 function(object) .Call(lsRMatrix_validate, object)
 	 )
 
+##-------------------- permutation ----------------------------------------
+
+setClass("pMatrix", representation(perm = "integer"),
+	 contains = "sparseMatrix",
+	 validity = function(object) {
+	     d <- object@Dim
+	     if (d[2] != (n <- d[1])) return("pMatrix must be square")
+	     perm <- object@perm
+	     if (length(perm) != n)
+		 return(paste("length of 'perm' slot must be", n))
+	     if(n > 0 &&
+		!(all(range(perm) == c(1, n)) && length(unique(perm)) == n))
+		 return("'perm' slot is not a valid permutation")
+	     TRUE
+	 })
+
+
 ### Factorization classes ---------------------------------------------
 
-setClass("Cholesky", contains = "dtrMatrix")
+## Mother class:
+setClass("MatrixFactorization", representation("VIRTUAL")) # not one slot...
 
-setClass("LDL", contains = "dtrMatrix")
+## -- Those (exceptions) inheriting from "Matrix" : ---
+setClass("Cholesky", contains = c("dtrMatrix", "MatrixFactorization"))
 
-setClass("corMatrix", representation(sd = "numeric"), contains = "dpoMatrix")
+setClass("LDL", contains = c("dtrMatrix", "MatrixFactorization"))
 
-setClass("pCholesky", contains = "dtpMatrix")
+setClass("pCholesky", contains = c("dtpMatrix", "MatrixFactorization"))
 
 setClass("BunchKaufman",
+	 contains = c("dtrMatrix", "MatrixFactorization"),
 	 representation(perm = "integer"),
-	 contains = "dtrMatrix",
 	 validity =
 	 function(object) .Call(BunchKaufman_validate, object)
 	 )
 
 setClass("pBunchKaufman",
+	 contains = c("dtpMatrix", "MatrixFactorization"),
 	 representation(perm = "integer"),
-	 contains = "dtpMatrix",
 	 validity =
 	 function(object) .Call(pBunchKaufman_validate, object)
 	 )
 
-if (FALSE) { # old
-setClass("dCholCMatrix",
-	 representation(perm = "integer", Parent = "integer", D = "numeric"),
-	 contains = "dtCMatrix",
-	 validity =
-	 function(object) .Call(dCholCMatrix_validate, object)
-	 )
-
-setClass("lCholCMatrix",
-	 representation(perm = "integer", Parent = "integer"),
-	 contains = "ltCMatrix",
-	 validity =
-	 function(object) .Call(lCholCMatrix_validate, object)
-	 )
-}# end{old}
+## -- the usual ``non-Matrix'' factorizations : ---------
 
 setClass("CHMfactor",		 # cholmod_factor struct as S4 object
+         contains = "MatrixFactorization",
 	 representation(colcount = "integer", perm = "integer",
                         type = "integer", "VIRTUAL"),
-	 validity =
-	 function(object) .Call(CHMfactor_validate, object)
+	 validity = function(object) .Call(CHMfactor_validate, object)
 	 )
 
 setClass("CHMsuper",		       # supernodal cholmod_factor
+	 contains = "CHMfactor",
 	 representation(super = "integer", pi = "integer", px = "integer",
 			s = "integer", "VIRTUAL"),
-	 contains = "CHMfactor",
-	 validity =
-	 function(object) .Call(CHMsuper_validate, object))
+	 validity = function(object) .Call(CHMsuper_validate, object))
 
 setClass("CHMsimpl",		       # simplicial cholmod_factor
+	 contains = "CHMfactor",
 	 representation(p = "integer", i = "integer",
 			nz = "integer", nxt = "integer", prv = "integer", "VIRTUAL"),
-	 contains = "CHMfactor",
-	 validity =
-	 function(object) .Call(CHMsuper_validate, object))
+	 validity = function(object) .Call(CHMsimpl_validate, object))
 
-setClass("dCHMsuper", representation(x = "numeric"), contains = "CHMsuper")
+setClass("dCHMsuper", contains = "CHMsuper", representation(x = "numeric"))
 
 setClass("lCHMsuper", contains = "CHMsuper")
 
-setClass("dCHMsimpl", representation(x = "numeric"), contains = "CHMsimpl")
+setClass("dCHMsimpl", contains = "CHMsimpl", representation(x = "numeric"))
 
 setClass("lCHMsimpl", contains = "CHMsimpl")
 
 ##--- LU ---
 
-setClass("LU", representation("VIRTUAL"))
+setClass("LU", contains = "MatrixFactorization", representation("VIRTUAL"))
 
 setClass("denseLU", contains = "LU",
 	 representation(x = "numeric", perm = "integer"),
@@ -457,7 +460,7 @@ setClass("sparseLU", contains = "LU",
 
 ##--- QR ---
 
-setClass("sparseQR",
+setClass("sparseQR", contains = "MatrixFactorization",
 	 representation(V = "dgCMatrix", beta = "numeric",
 			p = "integer", R = "dgCMatrix", q = "integer"))
 
@@ -475,22 +478,6 @@ setClass("css_QR", representation(Pinv = "integer", Q = "integer",
 setClass("css_LU", representation(Q = "integer", nz = "integer"))
 }
 
-
-##-------------------- permutation ----------------------------------------
-
-setClass("pMatrix", representation(perm = "integer"),
-	 contains = "sparseMatrix",
-	 validity = function(object) {
-	     d <- object@Dim
-	     if (d[2] != (n <- d[1])) return("pMatrix must be square")
-	     perm <- object@perm
-	     if (length(perm) != n)
-		 return(paste("length of 'perm' slot must be", n))
-	     if(n > 0 &&
-		!(all(range(perm) == c(1, n)) && length(unique(perm)) == n))
-		 return("'perm' slot is not a valid permutation")
-	     TRUE
-	 })
 
 ### Class Union :  no inheritance, but is(*, <class>) :
 
