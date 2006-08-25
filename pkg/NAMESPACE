@@ -139,6 +139,8 @@ exportClasses(
 
               ## --- 'MatrixFactorization' mother and all its daughters : ---
 
+              "MatrixFactorization",
+
 	      "LU",
               "denseLU",
               "sparseLU",

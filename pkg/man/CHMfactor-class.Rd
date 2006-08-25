@@ -27,11 +27,17 @@
   \code{\linkS4class{lsCMatrix}} objects.
 }
 \section{Slots}{
-  of the non virtual classes \dQuote{[dl]CHM(super|simpl)}:
+  of all \code{"CHMfactor"} and all classes inheriting from it:
   \describe{
     \item{\code{perm}:}{Object of class \code{"integer"} giving the
       permutation of the rows and columns chosen to reduce fill-in and
       for post-ordering.}
+    \item{\code{colcount}:}{Object of class \code{"integer"} .... }%% FIXME
+    \item{\code{type}:}{Object of class \code{"integer"} .... }
+  }
+
+  Slots of the non virtual classes \dQuote{[dl]CHM(super|simpl)}:
+  \describe{
     \item{\code{p}:}{Object of class \code{"integer"} of pointers, one
       for each column, to the initial (zero-based) index of elements in
       the column. Only present in classes that contain \code{"CHMsimpl"}.}
@@ -39,8 +45,8 @@
       (number of non-zero elements).  These are the row numbers for
       each non-zero element in the matrix. Only present in classes that
       contain \code{"CHMsimpl"}.}
-    \item{\code{x}:}{Object of class \code{"numeric"} - the non-zero
-      elements of the matrix.}
+    \item{\code{x}:}{For the \code{"d*"} classes: \code{"numeric"} - the
+      non-zero elements of the matrix.}
   }
 }
 \section{Methods}{
