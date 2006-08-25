@@ -397,21 +397,28 @@ setClass("pMatrix", representation(perm = "integer"),
 setClass("MatrixFactorization", representation("VIRTUAL")) # not one slot...
 
 ## -- Those (exceptions) inheriting from "Matrix" : ---
-setClass("Cholesky", contains = c("dtrMatrix", "MatrixFactorization"))
 
-setClass("LDL", contains = c("dtrMatrix", "MatrixFactorization"))
+## FIXME: not yet containing "MatrixFactorization" because of
+## -----  multiple-dispatch bug: show(<pCholesky>) would call the
+##  method of "MatrixFactorization" instead of the one for "dtpMatrix":
+setClass("Cholesky", contains = c("dtrMatrix" ##, "MatrixFactorization"
+                     ))
 
-setClass("pCholesky", contains = c("dtpMatrix", "MatrixFactorization"))
+setClass("LDL", contains = c("dtrMatrix" ##, "MatrixFactorization"
+                ))
+
+setClass("pCholesky", contains = c("dtpMatrix" ##, "MatrixFactorization"
+                      ))
 
 setClass("BunchKaufman",
-	 contains = c("dtrMatrix", "MatrixFactorization"),
+	 contains = c("dtrMatrix"), ##, "MatrixFactorization"),
 	 representation(perm = "integer"),
 	 validity =
 	 function(object) .Call(BunchKaufman_validate, object)
 	 )
 
 setClass("pBunchKaufman",
-	 contains = c("dtpMatrix", "MatrixFactorization"),
+	 contains = c("dtpMatrix"), ##, "MatrixFactorization"),
 	 representation(perm = "integer"),
 	 validity =
 	 function(object) .Call(pBunchKaufman_validate, object)
@@ -463,6 +470,8 @@ setClass("sparseLU", contains = "LU",
 setClass("sparseQR", contains = "MatrixFactorization",
 	 representation(V = "dgCMatrix", beta = "numeric",
 			p = "integer", R = "dgCMatrix", q = "integer"))
+
+## "denseQR" -- ?  (``a version of''  S3 class "qr")
 
 if (FALSE) { ## unused classes
 setClass("csn_QR", representation(U = "dgCMatrix", L = "dgCMatrix",
