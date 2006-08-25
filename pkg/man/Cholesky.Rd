@@ -11,7 +11,7 @@ Cholesky(A, perm, LDL, super, \dots)
   positive-definite matrix.
 }
 \arguments{
-  \item{A}{sparse symmetric matrix. No missing values or IEEE special
+  \item{A}{sparse symmetric matrix.  No missing values or IEEE special
     values are allowed.}
   \item{perm}{logical scalar indicating if a fill-reducing permutation
     should be computed and applied to the rows and columns of \code{A}.
@@ -30,8 +30,8 @@ Cholesky(A, perm, LDL, super, \dots)
 }
 \details{
   This is a generic function with special methods for different types
-  of matrices.  Use \code{\link{showMethods}("Cholesky")} to list all the methods
-  for the \code{\link{Cholesky}} generic.
+  of matrices.  Use \code{\link{showMethods}("Cholesky")} to list all
+  the methods for the \code{\link{Cholesky}} generic.
 
   The method for class \code{\linkS4class{dsCMatrix}} of sparse matrices
   is based on functions from the CHOLMOD library.
@@ -46,11 +46,14 @@ Cholesky(A, perm, LDL, super, \dots)
 }
 \seealso{
   Class definitions \code{\linkS4class{CHMfactor}} and \code{\linkS4class{dsCMatrix}}
-  and function \code{\link{expand}};
-  \code{\link{chol}}.
+  and function \code{\link{expand}}.
+
+  Note that \code{\link{chol}()} returns matrices (inheriting from
+  \code{"\linkS4class{Matrix}"}) whereas \code{Cholesky()} returns a
+  \code{"\linkS4class{CHMfactor}"} object.
 }
 \examples{
-data(KNex);
+data(KNex)
 mtm <- with(KNex, crossprod(mm))
 str(Cholesky(mtm))
 str(Cholesky(mtm, super = TRUE))

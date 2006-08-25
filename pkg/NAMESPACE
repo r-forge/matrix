@@ -67,14 +67,7 @@ exportClasses(
 	      "index",
 	      "replValue", # if we don't export it, things fail in dispatch
 
-	      "BunchKaufman",
-	      "pBunchKaufman",
-	      "Cholesky",
-	      "pCholesky",
-	      "LU",
-              "denseLU",
-              "sparseLU",
-
+              ## --- 'Matrix' mother and all its daughters : ---------------
 	      "Matrix",
 	      ## also intermediate `virtual' ones:
 	      "dMatrix",
@@ -136,12 +129,29 @@ exportClasses(
 	      "ltTMatrix",
               "pMatrix",
 
-##	      "dCholCMatrix",
-##	      "lCholCMatrix",
+              "corMatrix", # unused
+
+              ## --- inheriting "Matrix", but also factorizations:
+	      "BunchKaufman",
+	      "pBunchKaufman",
+	      "Cholesky",
+	      "pCholesky",
+
+              ## --- 'MatrixFactorization' mother and all its daughters : ---
+
+	      "LU",
+              "denseLU",
+              "sparseLU",
+
+              "CHMfactor",
+              "CHMsuper",
+              "CHMsimpl",
               "dCHMsuper",
               "dCHMsimpl",
-              "sparseQR",
-              "corMatrix" # unused
+              "lCHMsuper",# unused
+              "lCHMsimpl",# unused
+
+              "sparseQR"
 	      )
 
 ## lmer-related

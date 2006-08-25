@@ -1,25 +1,33 @@
 \name{CHMfactor-class}
+\title{CHOLMOD-based Cholesky factorizations}
 \docType{class}
+\alias{CHMfactor-class}% "mother" virtual
+\alias{CHMsimpl-class}% virtual
+\alias{CHMsuper-class}% virtual
 \alias{dCHMsimpl-class}
 \alias{lCHMsimpl-class}
 \alias{dCHMsuper-class}
 \alias{lCHMsuper-class}
+%
 \alias{coerce,CHMfactor,sparseMatrix-method}
-\title{CHOLMOD-based Cholesky factorizations}
-\description{The hidden class \code{"CHMfactor"} is a class of
+%
+\description{The virtual class \code{"CHMfactor"} is a class of
   CHOLMOD-based Cholesky factorizations of symmetric, sparse,
-  compressed, column-oriented matrices. Such a factorization is
-  simplicial (hidden class \code{"CHMsimpl"}) or supernodal (hidden
-  class \code{"CHMsuper"}).  Objects that inherit from these classes are either numeric
-  factorizations (classes \code{"dCHMsimpl"} and \code{"dCHMsuper"}) or
-  symbolic factorizations (classes \code{"dCHMsimpl"} and \code{"dCHMsuper"}).
+  compressed, column-oriented matrices.  Such a factorization is
+  simplicial (virtual class \code{"CHMsimpl"}) or supernodal (virtual
+  class \code{"CHMsuper"}).  Objects that inherit from these classes are
+  either numeric factorizations (classes \code{"dCHMsimpl"} and
+  \code{"dCHMsuper"}) or symbolic factorizations (classes
+  \code{"lCHMsimpl"} and \code{"lCHMsuper"}).
 }
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("dCHMsuper", ...)}
-  but are more commonly created from \code{chol} applied to
-  \code{dsCMatrix} or \code{lsCMatrix} objects.
+  but are more commonly created via \code{\link{Cholesky}()}.
+  applied to  \code{\linkS4class{dsCMatrix}} or
+  \code{\linkS4class{lsCMatrix}} objects.
 }
 \section{Slots}{
+  of the non virtual classes \dQuote{[dl]CHM(super|simpl)}:
   \describe{
     \item{\code{perm}:}{Object of class \code{"integer"} giving the
       permutation of the rows and columns chosen to reduce fill-in and
