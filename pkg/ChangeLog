@@ -1,3 +1,8 @@
+2006-08-25  Douglas Bates  <bates@R-project.org>
+
+	* R/lmer.R (qqmath method): Bug fix provided by Emmanuel Tillard
+	<tillard@cirad.fr> - ordering standard errors to match effects.
+
 2006-08-24  Douglas Bates  <bates@R-project.org>
 
 	* src/lsCMatrix.c (lsCMatrix_trans): Remove lsCMatrix_chol based
