@@ -126,7 +126,7 @@ static R_CallMethodDef CallEntries[] = {
 /*     {"dsTMatrix_as_dsCMatrix", (DL_FUNC) &dsTMatrix_as_dsCMatrix, 1}, */
     {"dsTMatrix_as_dsyMatrix", (DL_FUNC) &dsTMatrix_as_dsyMatrix, 1},
     {"dsTMatrix_validate", (DL_FUNC) &dsTMatrix_validate, 1},
-    {"dsyMatrix_as_dgeMatrix", (DL_FUNC) &dsyMatrix_as_dgeMatrix, 1},
+/*     {"dsyMatrix_as_dgeMatrix", (DL_FUNC) &dsyMatrix_as_dgeMatrix, 1}, */
     {"dsyMatrix_as_dspMatrix", (DL_FUNC) &dsyMatrix_as_dspMatrix, 1},
     {"dsyMatrix_as_matrix", (DL_FUNC) &dsyMatrix_as_matrix, 1},
     {"dsyMatrix_dgeMatrix_mm", (DL_FUNC) &dsyMatrix_dgeMatrix_mm, 2},
@@ -160,7 +160,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dtpMatrix_rcond", (DL_FUNC) &dtpMatrix_rcond, 2},
     {"dtpMatrix_solve", (DL_FUNC) &dtpMatrix_solve, 1},
     {"dtpMatrix_validate", (DL_FUNC) &dtpMatrix_validate, 1},
-    {"dtrMatrix_as_dgeMatrix", (DL_FUNC) &dtrMatrix_as_dgeMatrix, 1},
+/*     {"dtrMatrix_as_dgeMatrix", (DL_FUNC) &dtrMatrix_as_dgeMatrix, 1}, */
     {"dtrMatrix_as_dtpMatrix", (DL_FUNC) &dtrMatrix_as_dtpMatrix, 1},
     {"dtrMatrix_as_matrix", (DL_FUNC) &dtrMatrix_as_matrix, 1},
     {"dtrMatrix_matrix_mm", (DL_FUNC) &dtrMatrix_matrix_mm, 3},

@@ -3,6 +3,7 @@
 setAs("dtpMatrix", "dtrMatrix",
       function(from) .Call(dtpMatrix_as_dtrMatrix, from))
 
+if(FALSE) # now have faster  "ddense" -> "dge"
 setAs("dtpMatrix", "dgeMatrix",
       function(from) as(as(from, "dtrMatrix"), "dgeMatrix"))
 

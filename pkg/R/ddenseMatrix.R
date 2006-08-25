@@ -1,5 +1,12 @@
 ### Define Methods that can be inherited for all subclasses
 
+## This replaces many "d..Matrix" -> "dgeMatrix" ones
+## >> but << needs all sub(sub(sub)) classes of "ddenseMatrix" listed
+##   -----  in  ../src/Mutils.c
+setAs("ddenseMatrix", "dgeMatrix",
+      function(from) .Call(dup_mMatrix_as_dgeMatrix, from))
+
+## d(ouble) to l(ogical):
 setAs("dgeMatrix", "lgeMatrix", d2l_Matrix)
 setAs("dtrMatrix", "ltrMatrix", d2l_Matrix)
 setAs("dtpMatrix", "ltpMatrix", d2l_Matrix)

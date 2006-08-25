@@ -116,6 +116,7 @@ SEXP dsyMatrix_matrix_solve(SEXP a, SEXP b)
     return val;
 }
 
+#if 0				/* no longer used */
 SEXP dsyMatrix_as_dgeMatrix(SEXP from)
 {
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
@@ -130,6 +131,7 @@ SEXP dsyMatrix_as_dgeMatrix(SEXP from)
     UNPROTECT(1);
     return val;
 }
+#endif
 
 SEXP dsyMatrix_as_matrix(SEXP from)
 {

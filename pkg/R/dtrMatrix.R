@@ -1,8 +1,5 @@
 #### Triangular Matrices -- Coercion and Methods
 
-setAs("dtrMatrix", "dgeMatrix",
-      function(from) .Call(dtrMatrix_as_dgeMatrix, from))
-
 ## or rather setIs() {since test can fail }?
 setAs("dgeMatrix", "dtrMatrix",
       function(from) {

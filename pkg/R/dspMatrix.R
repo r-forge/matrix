@@ -4,10 +4,11 @@ setAs("dspMatrix", "dsyMatrix",
       function(from) .Call(dspMatrix_as_dsyMatrix, from))
 
 ## dge <--> dsp   via  dsy
-setAs("dspMatrix", "dgeMatrix",
-      function(from) as(as(from, "dsyMatrix"), "dgeMatrix"))
 setAs("dgeMatrix", "dspMatrix",
       function(from) as(as(from, "dsyMatrix"), "dspMatrix"))
+if(FALSE) # now have faster  "ddense" -> "dge"
+setAs("dspMatrix", "dgeMatrix",
+      function(from) as(as(from, "dsyMatrix"), "dgeMatrix"))
 
 ## S3-matrix <--> dsp   via  dsy
 setAs("dspMatrix", "matrix",
