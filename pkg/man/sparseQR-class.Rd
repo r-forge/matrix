@@ -79,8 +79,8 @@
   \code{beta} slots.
 
  The \code{"sparseQR"} methods for the \code{qr.*} functions return
- objects of class \code{"dgCMatrix"} (see
- \code{\linkS4class{dgCMatrix}}).  Results from \code{qr.coef},
+ objects of class \code{"dgeMatrix"} (see
+ \code{\linkS4class{dgeMatrix}}).  Results from \code{qr.coef},
  \code{qr.resid} and \code{qr.fitted} (when \code{k == ncol(R)}) are
  well-defined and should match those from the corresponding dense matrix
  calculations.  However, because the matrix \code{Q} is not uniquely
@@ -96,7 +96,7 @@
   \code{\link[base]{qr.R}}, \code{\link[base]{qr.fitted}},
   \code{\link[base]{qr.resid}}, \code{\link[base]{qr.coef}},
   \code{\link[base]{qr.qty}}, \code{\link[base]{qr.qy}},
-  \code{\linkS4class{dgCMatrix}}.
+  \code{\linkS4class{dgCMatrix}}, \code{\linkS4class{dgeMatrix}}.
 }
 \examples{
 data(KNex); mm <- KNex$mm
