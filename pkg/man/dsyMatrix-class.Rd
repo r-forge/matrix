@@ -6,14 +6,12 @@
 \alias{\%*\%,dspMatrix,matrix-method}
 \alias{\%*\%,dspMatrix,numeric-method}
 \alias{\%*\%,dsyMatrix,dgeMatrix-method}
-\alias{coerce,dspMatrix,dgeMatrix-method}
 \alias{coerce,dspMatrix,dsyMatrix-method}
 \alias{coerce,dspMatrix,lspMatrix-method}
 \alias{coerce,dspMatrix,matrix-method}
 \alias{coerce,dgeMatrix,dspMatrix-method}
 \alias{coerce,matrix,dspMatrix-method}
 \alias{coerce,dgeMatrix,dsyMatrix-method}% or rather setIs?
-\alias{coerce,dsyMatrix,dgeMatrix-method}
 \alias{coerce,dsyMatrix,dspMatrix-method}
 \alias{coerce,dsyMatrix,lsyMatrix-method}
 \alias{coerce,dsyMatrix,matrix-method}
@@ -73,8 +71,8 @@
 }
 \section{Methods}{
   \describe{
-    \item{coerce}{\code{signature(from = "dspMatrix", to = "dgeMatrix")}}
-    \item{coerce}{\code{signature(from = "dsyMatrix", to = "dgeMatrix")}}
+    \item{coerce}{\code{signature(from = "ddenseMatrix", to = "dgeMatrix")}}
+    %
     \item{coerce}{\code{signature(from = "dspMatrix", to = "matrix")}}
     \item{coerce}{\code{signature(from = "dsyMatrix", to = "matrix")}}
     \item{coerce}{\code{signature(from = "dsyMatrix", to = "dspMatrix")}}
@@ -85,8 +83,6 @@
     \item{norm}{\code{signature(x = "dsyMatrix", type = "missing")}}
     \item{solve}{\code{signature(a = "dspMatrix", b = "missing")}}
     \item{solve}{\code{signature(a = "dsyMatrix", b = "missing")}}
-    \item{solve}{\code{signature(a = "dspMatrix", b = "dgeMatrix")}}
-    \item{solve}{\code{signature(a = "dsyMatrix", b = "dgeMatrix")}}
     \item{solve}{\code{signature(a = "dspMatrix", b = "matrix")}}
     \item{solve}{\code{signature(a = "dsyMatrix", b = "matrix")}}
   }

@@ -694,7 +694,7 @@ install_diagonal(double *dest, SEXP A)
     int nc = INTEGER(GET_SLOT(A, Matrix_DimSym))[0];
     int i, ncp1 = nc + 1, unit = *diag_P(A) == 'U';
     double *ax = REAL(GET_SLOT(A, Matrix_xSym));
-    
+
     AZERO(dest, nc * nc);
     for (i = 0; i < nc; i++)
 	dest[i * ncp1] = (unit) ? 1. : ax[i];
@@ -718,6 +718,10 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A)
 	*valid[] = {"_NOT_A_CLASS_", "dgeMatrix", "dtrMatrix",
 		    "dsyMatrix", "dpoMatrix", "ddiMatrix",
 		    "dtpMatrix", "dspMatrix", "dppMatrix",
+		    /* sub classes of those above:*/
+		    /* dtr */ "Cholesky", "LDL", "BunchKaufman",
+		    /* dtp */ "pCholesky", "pBunchKaufman",
+		    /* dpo */ "corMatrix",
 		    ""};
     int ctype = Matrix_check_class(cl, valid), nprot = 1, sz;
     double *ansx;
@@ -757,19 +761,22 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A)
     case 1:			/* dgeMatrix */
 	Memcpy(ansx, REAL(GET_SLOT(A, Matrix_xSym)), sz);
 	break;
-    case 2:			/* dtrMatrix */
+    case 2:			/* dtrMatrix   and subclasses */
+    case 9: case 10: case 11:   /* ---	Cholesky, LDL, BunchKaufman */
 	Memcpy(ansx, REAL(GET_SLOT(A, Matrix_xSym)), sz);
 	make_d_matrix_triangular(ansx, A);
 	break;
     case 3:			/* dsyMatrix */
-    case 4:			/* dpoMatrix */
+    case 4:			/* dpoMatrix  + subclass */
+    case 14:	 		/* ---	corMatrix */
 	Memcpy(ansx, REAL(GET_SLOT(A, Matrix_xSym)), sz);
 	make_d_matrix_symmetric(ansx, A);
 	break;
     case 5:			/* ddiMatrix */
 	install_diagonal(ansx, A);
 	break;
-    case 6:			/* dtpMatrix */
+    case 6:			/* dtpMatrix  + subclasses */
+    case 12: case 13: 		/* ---	pCholesky, pBunchKaufman */
 	packed_to_full_double(ansx, REAL(GET_SLOT(A, Matrix_xSym)),
 			      INTEGER(ad)[0],
 			      *uplo_P(A) == 'U' ? UPP : LOW);

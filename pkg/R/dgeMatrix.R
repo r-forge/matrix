@@ -1,4 +1,7 @@
 setAs("matrix", "dgeMatrix",
+      function(from) .Call(dup_mMatrix_as_dgeMatrix, from))
+if(FALSE)## the above is MUCH faster than
+setAs("matrix", "dgeMatrix",
       function(from) {
 	  new("dgeMatrix",
 	      x = as.double(from),

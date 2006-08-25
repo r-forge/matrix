@@ -1,3 +1,11 @@
+2006-08-25  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Mutils.c (dup_mMatrix_as_dgeMatrix): added all subclasses of
+	subclasses of "ddenseMatrix"
+	* src/init.c et al: outcomment dtrM*_as_dge* and dsyM*_as_dge*_
+	* R/ddenseMatrix.R et al: setAs("ddenseMatrix", "dgeMatrix", ..)
+	instead of half dozen specialized ones.
+
 2006-08-25  Douglas Bates  <bates@R-project.org>
 
 	* R/lmer.R (qqmath method): Bug fix provided by Emmanuel Tillard
@@ -15,7 +23,7 @@
 	* src/Mutils.c (dup_mMatrix_as_dgeMatrix): Add ddiMatrix,
 	dtpMatrix, dspMatrix and dppMatrix conversions.
 
-	
+
 2006-08-23  Douglas Bates  <bates@R-project.org>
 
 	* R/AllClass.R,lCholCMatrix.R,src/SOURCES_C.mkf,init.c,NAMESPACE:
@@ -36,18 +44,18 @@
 	* src/dsCMatrix.[ch]: Use CHOLMOD for dsCMatrix_chol and
 	dsCMatrix_matrix_solve.  Comment out vestigial functions.
 	* src/Csparse.c: use diag_P and uplo_P macros.
-	
+
 2006-08-21  Douglas Bates  <bates@R-project.org>
 
 	* src/lmer.c (internal_mer_RZXinv): Fix memory leak caught by
-	valgrind. 
+	valgrind.
 	* tests/matprod.R: Add tests to verify that 'solve' and '%*%' are
 	inverses.
 	* src/sparseQR.c (sparseQR_validate): add new validation test, fix
 	-Wall warnings.
 	* src/dppMatrix.c,dtrMatrix.c,dgCMatrix.c,dgeMatrix.c,dspMatrix.c:
 	Use dup_mMatrix_as_dgeMatrix.
-	
+
 2006-08-20  Douglas Bates  <bates@R-project.org>
 
 	* src/sparseQR.c: Fix thinko in sparseQR_resid_fitted.

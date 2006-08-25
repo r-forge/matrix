@@ -8,7 +8,6 @@
 \alias{\%*\%,matrix,dtpMatrix-method}
 \alias{\%*\%,dtpMatrix,numeric-method}
 \alias{\%*\%,numeric,dtpMatrix-method}
-\alias{coerce,dtpMatrix,dgeMatrix-method}
 \alias{coerce,dtpMatrix,dtTMatrix-method}
 \alias{coerce,dtpMatrix,dtrMatrix-method}
 \alias{coerce,dtpMatrix,ltpMatrix-method}
@@ -59,7 +58,6 @@
       Matrix multiplication; dito for several other signature
       combinations, see \code{showMethods("\%*\%", class = "dtpMatrix")}.}
     \item{coerce}{\code{signature(from = "dtpMatrix", to = "dtrMatrix")}}
-    \item{coerce}{\code{signature(from = "dtpMatrix", to = "dgeMatrix")}}
     \item{coerce}{\code{signature(from = "dtpMatrix", to = "matrix")}}
     \item{determinant}{\code{signature(x = "dtpMatrix", logarithm = "missing")}: ... }
     \item{determinant}{\code{signature(x = "dtpMatrix", logarithm = "logical")}: ... }

@@ -6,7 +6,6 @@
 \alias{\%*\%,dtrMatrix,matrix-method}
 \alias{\%*\%,matrix,dtrMatrix-method}
 \alias{coerce,dgeMatrix,dtrMatrix-method}% or rather setIs?
-\alias{coerce,dtrMatrix,dgeMatrix-method}
 \alias{coerce,dtrMatrix,dtpMatrix-method}
 \alias{coerce,dtrMatrix,ltrMatrix-method}
 \alias{coerce,dtrMatrix,matrix-method}
@@ -57,10 +56,12 @@
     \item{\%*\%}{\code{signature(x = "dtrMatrix", y = "matrix")} and other
       signatures (use \code{showMethods("\%*\%", class="dtrMatrix")}):
       matrix multiplication.}
-    \item{coerce}{\code{signature(from = "dtrMatrix", to = "dgeMatrix")}}
-    \item{coerce}{\code{signature(from = "dtrMatrix", to = "dgeMatrix")}}
+    \item{coerce}{\code{signature(from = "dgeMatrix", to = "dtrMatrix")}}
     \item{coerce}{\code{signature(from = "dtrMatrix", to = "matrix")}}
-    \item{coerce}{\code{signature(from = "dtrMatrix", to = "dtpMatrix")}}
+    \item{coerce}{\code{signature(from = "dtrMatrix", to = "ltrMatrix")}}
+    \item{coerce}{\code{signature(from = "dtrMatrix", to = "matrix")}}
+    \item{coerce}{\code{signature(from = "matrix",    to = "dtrMatrix")}}
+
     \item{norm}{\code{signature(x = "dtrMatrix", type = "character")}}
     \item{rcond}{\code{signature(x = "dtrMatrix", type = "character")}}
     \item{solve}{\code{signature(a = "dtrMatrix", b = "missing")}}

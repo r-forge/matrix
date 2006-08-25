@@ -1,8 +1,5 @@
 ### Coercion and Methods for Dense Numeric Symmetric Matrices
 
-setAs("dsyMatrix", "dgeMatrix",
-      function(from) .Call(dsyMatrix_as_dgeMatrix, from))
-
 ## or rather setIs() {since test can fail ?}
 setAs("dgeMatrix", "dsyMatrix",
       function(from) {
