@@ -192,31 +192,33 @@ setMethod("%*%", signature(x = "CsparseMatrix", y = "matrix"),
 setMethod("tril", "CsparseMatrix",
 	  function(x, k = 0, ...) {
 	      k <- as.integer(k[1])
-	      dd <- dim(x)
+	      dd <- dim(x); sqr <- dd[1] == dd[2]
 	      stopifnot(-dd[1] <= k, k <= dd[1]) # had k <= 0
 	      r <- .Call(Csparse_band, x, -dd[1], k)
 	      ## return "lower triangular" if k <= 0
-	      if(k <= 0) as(r, paste(.M.kind(x), "tCMatrix", sep='')) else r
+	      if(sqr && k <= 0)
+		  as(r, paste(.M.kind(x), "tCMatrix", sep='')) else r
 	  })
 
 setMethod("triu", "CsparseMatrix",
 	  function(x, k = 0, ...) {
 	      k <- as.integer(k[1])
-	      dd <- dim(x)
+	      dd <- dim(x); sqr <- dd[1] == dd[2]
 	      stopifnot(-dd[1] <= k, k <= dd[1]) # had k >= 0
 	      r <- .Call(Csparse_band, x, k, dd[2])
 	      ## return "upper triangular" if k >= 0
-	      if(k >= 0) as(r, paste(.M.kind(x), "tCMatrix", sep='')) else r
+	      if(sqr && k >= 0)
+		  as(r, paste(.M.kind(x), "tCMatrix", sep='')) else r
 	  })
 
 setMethod("band", "CsparseMatrix",
 	  function(x, k1, k2, ...) {
 	      k1 <- as.integer(k1[1])
 	      k2 <- as.integer(k2[1])
-	      dd <- dim(x)
+	      dd <- dim(x); sqr <- dd[1] == dd[2]
 	      stopifnot(-dd[1] <= k1, k1 <= k2, k2 <= dd[1])
 	      r <- .Call(Csparse_band, x, k1, k2)
-	      if(k1 * k2 >= 0) ## triangular
+	      if(sqr && k1 * k2 >= 0) ## triangular
 		  as(r, paste(.M.kind(x), "tCMatrix", sep=''))
 	      else if (k1 < 0  &&  k1 == -k2  && isSymmetric(x)) ## symmetric
 		  as(r, paste(.M.kind(x), "sCMatrix", sep=''))
