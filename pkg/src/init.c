@@ -71,7 +71,7 @@ static R_CallMethodDef CallEntries[] = {
 /*     {"csc_crossprod", (DL_FUNC) &csc_crossprod, 1}, */
 /*     {"csc_getDiag", (DL_FUNC) &csc_getDiag, 1}, */
 /*     {"csc_matrix_crossprod", (DL_FUNC) &csc_matrix_crossprod, 3}, */
-    {"csc_matrix_mm", (DL_FUNC) &csc_matrix_mm, 4},
+/*     {"csc_matrix_mm", (DL_FUNC) &csc_matrix_mm, 4}, */
 /*     {"csc_tcrossprod", (DL_FUNC) &csc_tcrossprod, 1}, */
     {"compressed_to_dgTMatrix", (DL_FUNC) &compressed_to_dgTMatrix, 2},
     {"compressed_non_0_ij", (DL_FUNC) &compressed_non_0_ij, 2},
@@ -185,13 +185,13 @@ static R_CallMethodDef CallEntries[] = {
 /*     {"lCholCMatrix_lgCMatrix_solve", (DL_FUNC) &lCholCMatrix_lgCMatrix_solve, 2}, */
 /*     {"lCholCMatrix_validate", (DL_FUNC) &lCholCMatrix_validate, 1}, */
     {"lcsc_to_matrix", (DL_FUNC) &lcsc_to_matrix, 1},
-    {"lgCMatrix_crossprod", (DL_FUNC) &lgCMatrix_crossprod, 3},
-    {"lgCMatrix_diag", (DL_FUNC) &lgCMatrix_diag, 1},
-    {"lgCMatrix_lgCMatrix_mm", (DL_FUNC) &lgCMatrix_lgCMatrix_mm, 2},
-    {"lgCMatrix_picky_column", (DL_FUNC) &lgCMatrix_picky_column, 1},
-    {"lgCMatrix_trans", (DL_FUNC) &lgCMatrix_trans, 1},
+/*     {"lgCMatrix_crossprod", (DL_FUNC) &lgCMatrix_crossprod, 3}, */
+/*     {"lgCMatrix_diag", (DL_FUNC) &lgCMatrix_diag, 1}, */
+/*     {"lgCMatrix_lgCMatrix_mm", (DL_FUNC) &lgCMatrix_lgCMatrix_mm, 2}, */
+/*     {"lgCMatrix_picky_column", (DL_FUNC) &lgCMatrix_picky_column, 1}, */
+/*     {"lgCMatrix_trans", (DL_FUNC) &lgCMatrix_trans, 1}, */
     {"lgCMatrix_validate", (DL_FUNC) &lgCMatrix_validate, 1},
-    {"lgTMatrix_as_lgCMatrix", (DL_FUNC) &lgTMatrix_as_lgCMatrix, 1},
+/*     {"lgTMatrix_as_lgCMatrix", (DL_FUNC) &lgTMatrix_as_lgCMatrix, 1}, */
     {"lgTMatrix_validate", (DL_FUNC) &lgTMatrix_validate, 1},
 
     {"lspMatrix_as_lsyMatrix", (DL_FUNC) &lspMatrix_as_lsyMatrix, 1},
@@ -202,9 +202,9 @@ static R_CallMethodDef CallEntries[] = {
     {"ltrMatrix_as_ltpMatrix", (DL_FUNC) &ltrMatrix_as_ltpMatrix, 1},
 
 /*     {"lsCMatrix_chol", (DL_FUNC) &lsCMatrix_chol, 2}, */
-    {"lsCMatrix_trans", (DL_FUNC) &lsCMatrix_trans, 1},
+/*     {"lsCMatrix_trans", (DL_FUNC) &lsCMatrix_trans, 1}, */
     {"lsCMatrix_validate", (DL_FUNC) &lsCMatrix_validate, 1},
-    {"ltCMatrix_trans", (DL_FUNC) &ltCMatrix_trans, 1},
+/*     {"ltCMatrix_trans", (DL_FUNC) &ltCMatrix_trans, 1}, */
     {"ltCMatrix_validate", (DL_FUNC) &ltCMatrix_validate, 1},
     {"lsq_dense_Chol", (DL_FUNC) &lsq_dense_Chol, 2},
     {"lsq_dense_QR", (DL_FUNC) &lsq_dense_QR, 2},

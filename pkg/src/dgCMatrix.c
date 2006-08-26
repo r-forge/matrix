@@ -82,6 +82,7 @@ SEXP compressed_non_0_ij(SEXP x, SEXP colP)
     return ans;
 }
 
+#if 0				/* no longer used */
 SEXP csc_matrix_mm(SEXP a, SEXP b, SEXP classed, SEXP right)
 {
     int cl = asLogical(classed), rt = asLogical(right);
@@ -130,6 +131,7 @@ SEXP csc_matrix_mm(SEXP a, SEXP b, SEXP classed, SEXP right)
     UNPROTECT(1);
     return val;
 }
+#endif
 
 SEXP dgCMatrix_lusol(SEXP x, SEXP y)
 {

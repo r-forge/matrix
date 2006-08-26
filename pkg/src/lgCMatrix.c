@@ -64,6 +64,7 @@ SEXP matrix_to_lcsc(SEXP A)
 }
 #endif
 
+#if 0				/* no longer used */
 /**
  * C := op(A) %*% op(B) + beta ^ C for logical sparse column-oriented matrices
  *
@@ -381,12 +382,16 @@ SEXP lgCMatrix_crossprod(SEXP x, SEXP trans, SEXP C)
     return C;
 }
 
+
+
 /**
  * Special-purpose function that returns a permutation of the columns
  * of a lgTMatrix for which nrow(x) > ncol(x).  The ordering puts
  * columns with fewer entries on the left.  Once a column has been
  * moved to the left the rows in where that column is TRUE are removed
  * from the counts.
+ *
+ * This seemed like a good idea but wasn't.
  *
  * @param x Pointer to an lgTMatrix object
  *
@@ -438,3 +443,4 @@ SEXP lgCMatrix_picky_column(SEXP x)
     UNPROTECT(1);
     return ans;
 }
+#endif

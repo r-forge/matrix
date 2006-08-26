@@ -55,7 +55,8 @@ setMethod("chol", signature(x = "lsCMatrix", pivot = "logical"),
           function(x, pivot, LINPACK) stop("temporarily disabled"))
 ##          .Call(lsCMatrix_chol, x, pivot))
 
-setMethod("t", signature(x = "lsCMatrix"),
-          function(x)
-          .Call(lsCMatrix_trans, x),
-          valueClass = "lsCMatrix")
+## Use more general method from CsparseMatrix class
+## setMethod("t", signature(x = "lsCMatrix"),
+##           function(x)
+##           .Call(lsCMatrix_trans, x),
+##           valueClass = "lsCMatrix")
