@@ -1,7 +1,8 @@
 ### Coercion and Methods for Symmetric Triplet Matrices
 
-setAs("dsTMatrix", "dsCMatrix",
-      function(from) .Call(Tsparse_to_Csparse, from, FALSE))
+## Now in ./Tsparse.R
+## setAs("dsTMatrix", "dsCMatrix",
+##       function(from) .Call(Tsparse_to_Csparse, from, FALSE))
 
 setAs("dsTMatrix", "dgTMatrix",
       function(from) .Call(dsTMatrix_as_dgTMatrix, from))

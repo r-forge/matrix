@@ -29,6 +29,7 @@ SEXP lsCMatrix_validate(SEXP x)
     }
 }
 
+#if 0				/* no longer used */
 /**
  * Transpose an lsCMatrix
  *
@@ -61,3 +62,4 @@ SEXP lsCMatrix_trans(SEXP x)
     UNPROTECT(1);
     return ans;
 }
+#endif

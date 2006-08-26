@@ -3,9 +3,6 @@
 ### contains = "lsparseMatrix"
 ###             ============= ---> superclass methods in ./lsparseMatrix.R
 
-setAs("lgTMatrix", "lgCMatrix",
-      function(from)
-      .Call(lgTMatrix_as_lgCMatrix, from))
 
 setAs("lgTMatrix", "matrix", # go via fast C code:
       function(from) as(as(from, "lgCMatrix"), "matrix"))

@@ -4,6 +4,8 @@
 \alias{dgCMatrix-class}
 \alias{\%*\%,dgCMatrix,dgeMatrix-method}
 \alias{\%*\%,dgCMatrix,matrix-method}
+\alias{\%*\%,numeric,dgCMatrix-method}
+\alias{\%*\%,ddenseMatrix,dgCMatrix-method}
 \alias{\%*\%,dgeMatrix,dgCMatrix-method}
 \alias{\%*\%,matrix,dgCMatrix-method}
 \alias{coerce,matrix,dgCMatrix-method}

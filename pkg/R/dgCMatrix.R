@@ -93,15 +93,28 @@ setMethod("image", "dgCMatrix",
 
 ## FIXME: need to define more general methods for these, perhaps in
 ## ../src/Csparse.c
+setMethod("%*%", signature(x = "ddenseMatrix", y = "dgCMatrix"),
+          function(x, y)
+          t(.Call(Csparse_dense_crossprod, y,
+                  t(.Call(dup_mMatrix_as_dgeMatrix, x)))),
+          valueClass = "dgeMatrix")
+
 setMethod("%*%", signature(x = "dgeMatrix", y = "dgCMatrix"),
-          function(x, y) .Call(csc_matrix_mm, y, x, TRUE, TRUE),
+          function(x, y)
+          t(.Call(Csparse_dense_crossprod, y, t(x))),
           valueClass = "dgeMatrix")
 
 setMethod("%*%", signature(x = "matrix", y = "dgCMatrix"),
-          function(x, y) {
-	      storage.mode(x) <- "double"
-              .Call(csc_matrix_mm, y, x, FALSE, TRUE)
-          }, valueClass = "dgeMatrix")
+          function(x, y)
+          t(.Call(Csparse_dense_crossprod, y,
+                  t(.Call(dup_mMatrix_as_dgeMatrix, x)))),
+          valueClass = "dgeMatrix")
+
+setMethod("%*%", signature(x = "numeric", y = "dgCMatrix"),
+          function(x, y)
+          t(.Call(Csparse_dense_crossprod, y,
+                  .Call(dup_mMatrix_as_dgeMatrix, x))),
+          valueClass = "dgeMatrix")
 
 ## Group Methods, see ?Arith (e.g.)
 ## -----

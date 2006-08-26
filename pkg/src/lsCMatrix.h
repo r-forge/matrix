@@ -7,7 +7,7 @@
 /* #include "R_ldl.h" */
 
 SEXP lsCMatrix_validate(SEXP x);
-SEXP lsCMatrix_trans(SEXP x);
+/* SEXP lsCMatrix_trans(SEXP x); */
 /* SEXP lsCMatrix_chol(SEXP x, SEXP pivot); */
 
 #endif
