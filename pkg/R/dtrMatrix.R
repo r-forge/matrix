@@ -22,7 +22,7 @@ setAs("dtrMatrix", "matrix",
       function(from) .Call(dtrMatrix_as_matrix, from))
 
 setAs("matrix", "dtrMatrix",
-      function(from) as(as(from, "dgeMatrix"), "dtrMatrix"))
+      function(from) as(.Call(dup_mMatrix_as_dgeMatrix, from), "dtrMatrix"))
 
 ## Group Methods:
 ## TODO: carefully check for the cases where the result remains triangular
