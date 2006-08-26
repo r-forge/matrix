@@ -1,5 +1,4 @@
 #include "Mutils.h"
-#include "triplet_to_col.h"
 #include <R_ext/Lapack.h>
 
 char norm_type(char *typstr)
@@ -230,98 +229,6 @@ SEXP csc_check_column_sorting(SEXP m)
 	csc_sort_columns(ncol, mp, mi, REAL(GET_SLOT(m, Matrix_xSym)));
     return m;
 }
-
-#if 0				/* no longer used */
-SEXP triple_as_SEXP(int nrow, int ncol, int nz,
-		    const int Ti [], const int Tj [], const double Tx [],
-		    char *Rclass)
-{
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS(Rclass)));
-    int *Ai, *Ap;
-    double *Ax;
-
-    SET_SLOT(val, Matrix_pSym, allocVector(INTSXP, ncol + 1));
-    Ap = INTEGER(GET_SLOT(val, Matrix_pSym));
-    Ai = Calloc(nz, int); Ax = Calloc(nz, double);
-    triplet_to_col(nrow, ncol, nz, Ti, Tj, Tx, Ap, Ai, Ax);
-    nz = Ap[ncol];
-    SET_SLOT(val, Matrix_iSym, allocVector(INTSXP, nz));
-    Memcpy(INTEGER(GET_SLOT(val, Matrix_iSym)), Ai, nz); Free(Ai);
-    SET_SLOT(val, Matrix_xSym, allocVector(REALSXP, nz));
-    Memcpy(REAL(GET_SLOT(val, Matrix_xSym)), Ax, nz); Free(Ax);
-    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
-    UNPROTECT(1);
-    return dgCMatrix_set_Dim(val, nrow);
-}
-
-/* Create the components of the transpose of a csc matrix from its components */
-
-void csc_compTr(int m, int n, int nnz,
-		const int xp[], const int xi[],
-		const double xx[],
-		int ap[], int ai[], double ax[])
-{
-    int k, kk,
-	*ind = (int *) R_alloc(nnz, sizeof(int)),
-	*aj = (int *) R_alloc(nnz, sizeof(int));
-
-    Memcpy(aj, xi, nnz);	/* copy xi into aj and sort */
-    for (k = 0; k < nnz; k++) ind[k] = k;
-    R_qsort_int_I(aj, ind, 1, nnz);
-
-    ap[0] = 0; kk = 0;		/* generate ap from aj */
-    for (k = 1; k < m; k++) {
-	while (aj[kk] < k) kk++;
-	ap[k] = kk;
-    }
-    ap[m] = nnz;
-
-    for (k = 0; k < n; k++) { /* overwrite aj with (implicit) xj */
-	for (kk = xp[k]; kk < xp[k+1]; kk++) aj[kk] = k;
-    }
-    for (k = 0; k < nnz; k++) {	/* write ax and ai from xx and xj */
-	kk = ind[k];
-	ax[k] = xx[kk];
-	ai[k] = aj[kk];
-    }
-    if (csc_unsorted_columns(m, ap, ai)) csc_sort_columns(m, ap, ai, ax);
-}
-
-void ssc_symbolic_permute(int n, int upper, const int perm[],
-			  int Ap[], int Ai[])
-{
-    int
-	j, k,
-	nnz = Ap[n],
-	*Aj = Calloc(nnz, int),
-	*ord = Calloc(nnz, int),
-	*ii = Calloc(nnz, int);
-
-    for (j = 0; j < n; j++) {
-	int pj = perm[j];
-	for (k = Ap[j]; k < Ap[j+1]; k++) {
-	    Aj[k] = pj;
-	}
-    }
-    for (k = 0; k < nnz; k++) {
-	Ai[k] = perm[Ai[k]];
-	ord[k] = k;
-	if ((upper && Ai[k] > Aj[k]) || (!upper && Ai[k] < Aj[k])) {
-	    int tmp = Ai[k]; Ai[k] = Aj[k]; Aj[k] = tmp;
-	}
-    }
-    R_qsort_int_I(Aj, ord, 1, nnz); /* sort Aj carrying along ind */
-
-    k = nnz - 1;
-    for (j = n - 1; j >= 0; j--) {	/* generate new Ap */
-	for(; k >= 0 && Aj[k] >= j; k--) Ap[j] = k;
-    }
-    for (k = 0; k < nnz; k++) ii[k] = Ai[ord[k]];
-    Memcpy(Ai, ii, nnz);
-    for (j = 0; j < n; j++) R_isort(Ai + Ap[j], Ap[j+1] - Ap[j]);
-    Free(Aj); Free(ord); Free(ii);
-}
-#endif
 
 /* Fill in the "trivial remainder" in  n*m  array ;
  *  typically the 'x' slot of a "dtrMatrix" :
