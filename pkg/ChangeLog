@@ -1,3 +1,8 @@
+2006-08-27  Douglas Bates  <bates@R-project.org>
+
+	* src/dense.[ch],init.c, R/ddenseMatrix.R, man/band.Rd
+	(ddense_band): Added triu, tril and band for ddenseMatrix objects.
+
 2006-08-25  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/Mutils.c (dup_mMatrix_as_dgeMatrix): added all subclasses of
