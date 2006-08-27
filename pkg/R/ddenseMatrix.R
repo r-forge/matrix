@@ -195,3 +195,35 @@ setMethod("rbind2", signature(x = "ddenseMatrix", y = "ddenseMatrix"),
 	      new("dgeMatrix", Dim = c(nrx + nry, nc), Dimnames = dn,
 		  x = c(rbind2(as(x,"matrix"), as(y,"matrix"))))
 	  })
+## NB: have extra tril(), triu() methods for symmetric ["dsy" and "dsp"] and
+##     for triangular ["dtr" and "dtp"]
+setMethod("tril", "ddenseMatrix",
+	  function(x, k = 0, ...) {
+	      k <- as.integer(k[1])
+	      dd <- dim(x); sqr <- dd[1] == dd[2]
+	      stopifnot(-dd[1] <= k, k <= dd[1]) # had k <= 0
+	      ## returns "lower triangular" if k <= 0 && sqr
+	      .Call(ddense_band, x, -dd[1], k)
+	  })
+
+setMethod("triu", "ddenseMatrix",
+	  function(x, k = 0, ...) {
+	      k <- as.integer(k[1])
+	      dd <- dim(x); sqr <- dd[1] == dd[2]
+	      stopifnot(-dd[1] <= k, k <= dd[1]) # had k >= 0
+	      ## returns "upper triangular" if k >= 0
+	      .Call(ddense_band, x, k, dd[2])
+	  })
+
+setMethod("band", "ddenseMatrix",
+	  function(x, k1, k2, ...) {
+	      k1 <- as.integer(k1[1])
+	      k2 <- as.integer(k2[1])
+	      dd <- dim(x); sqr <- dd[1] == dd[2]
+	      stopifnot(-dd[1] <= k1, k1 <= k2, k2 <= dd[1])
+	      r <- .Call(ddense_band, x, k1, k2)
+	      if (k1 < 0  &&  k1 == -k2  && isSymmetric(x)) ## symmetric
+		  as(r, paste(.M.kind(x), "syMatrix", sep=''))
+	      else
+		  r
+	  })

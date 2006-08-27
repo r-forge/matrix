@@ -6,7 +6,6 @@
 
 SEXP dMatrix_validate(SEXP obj);
 
-SEXP dgeMatrix_band(SEXP x, SEXP k1, SEXP k2);
 SEXP dgeMatrix_validate(SEXP obj);
 SEXP dgeMatrix_norm(SEXP obj, SEXP norm);
 SEXP dgeMatrix_rcond(SEXP obj, SEXP type);

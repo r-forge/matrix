@@ -77,6 +77,7 @@ static R_CallMethodDef CallEntries[] = {
     {"compressed_non_0_ij", (DL_FUNC) &compressed_non_0_ij, 2},
     {"dense_to_Csparse", (DL_FUNC) &dense_to_Csparse, 1},
     {"dense_nonpacked_validate", (DL_FUNC) &dense_nonpacked_validate, 1},
+    {"ddense_band", (DL_FUNC) &ddense_band, 3},
     {"dMatrix_validate", (DL_FUNC) &dMatrix_validate, 1},
 
     {"dgCMatrix_LU", (DL_FUNC) &dgCMatrix_LU, 3},
@@ -90,7 +91,6 @@ static R_CallMethodDef CallEntries[] = {
     {"dgTMatrix_validate", (DL_FUNC) &dgTMatrix_validate, 1},
     {"dgeMatrix_LU", (DL_FUNC) &dgeMatrix_LU, 1},
     {"dgeMatrix_Schur", (DL_FUNC) &dgeMatrix_Schur, 2},
-    {"dgeMatrix_band", (DL_FUNC) &dgeMatrix_band, 3},
     {"dgeMatrix_colsums", (DL_FUNC) &dgeMatrix_colsums, 4},
     {"dgeMatrix_crossprod", (DL_FUNC) &dgeMatrix_crossprod, 2},
     {"dgeMatrix_determinant", (DL_FUNC) &dgeMatrix_determinant, 2},
