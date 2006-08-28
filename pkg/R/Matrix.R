@@ -98,7 +98,7 @@ setMethod("unname", signature("Matrix", force="missing"),
 
 Matrix <-
     function (data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL,
-	      sparse = NULL)
+	      sparse = NULL, forceCheck = FALSE)
 {
     sparseDefault <- function(m)
 	prod(dim(m)) > 2*sum(as(m, "matrix") != 0)
@@ -107,7 +107,8 @@ Matrix <-
     if(is.null(sparse) && (i.M || is(data, "matrix")))
 	sparse <- sparseDefault(data)
 
-    if (i.M) {
+    doDN <- TRUE
+    if (i.M && !forceCheck) {
 	sM <- is(data,"sparseMatrix")
 	if((sparse && sM) || (!sparse && !sM))
 	    return(data)
@@ -133,10 +134,11 @@ Matrix <-
 		sparse <- sparseDefault(data)
 	    dimnames(data) <- dimnames
 	}
-    } else if (!is.null(dimnames))
-	dimnames(data) <- dimnames
-
+        doDN <- FALSE
+    }
     ## 'data' is now a "matrix" or "Matrix"
+    if (doDN && !is.null(dimnames))
+	dimnames(data) <- dimnames
 
     ## check for symmetric / triangular / diagonal :
     isSym <- isSymmetric(data)
