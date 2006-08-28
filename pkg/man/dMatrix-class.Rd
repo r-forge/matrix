@@ -8,6 +8,7 @@
 \alias{[,dMatrix,lMatrix,missing,ANY-method}
 \alias{[,dMatrix,logical,missing,ANY-method}
 % Group methods
+\alias{Arith,dMatrix,dMatrix-method}
 \alias{Math2,dMatrix,numeric-method}% Math2 = round + signif, but
 \alias{Math2,dMatrix,missing-method}
 \alias{Summary,dMatrix-method}

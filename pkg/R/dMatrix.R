@@ -41,6 +41,16 @@ setMethod("expm", signature(x = "dMatrix"),
 
 ## Group Methods, see ?Arith (e.g.)
 ## -----
+## >>> More specific methods for sub-classes (sparse), use these as "catch-all":
+
+setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
+	  signature(e1 = "dMatrix", e2 = "dMatrix"),
+	  function(e1, e2) {
+	      d <- dimCheck(e1,e2)
+	      callGeneric(as(e1, "denseMatrix"),
+			  as(e2, "denseMatrix"))
+	  })
+
 
 setMethod("Math2",
           ## Assume that  Generic(u, k) |--> u for u in {0,1}
