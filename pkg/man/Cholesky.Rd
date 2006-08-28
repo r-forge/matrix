@@ -38,7 +38,9 @@ Cholesky(A, perm, LDL, super, \dots)
 }
 \references{
   Tim Davis (2005)
-  \url{http://www.cise.ufl.edu/research/sparse/CHOLMOD/}
+  \emph{{CHOLMOD}: sparse supernodal {Cholesky} factorization and
+    update/downdate}
+  \url{http://www.cise.ufl.edu/research/sparse/cholmod/}
 
   Timothy A. Davis (2006)
   \emph{Direct Methods for Sparse Linear Systems}, SIAM Series
