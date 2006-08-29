@@ -13,8 +13,8 @@
 %
 \alias{\%*\%,dgeMatrix,dgeMatrix-method}
 \alias{\%*\%,dgeMatrix,matrix-method}
-\alias{\%*\%,matrix,dgeMatrix-method}
 \alias{\%*\%,dgeMatrix,numeric-method}
+\alias{\%*\%,matrix,dgeMatrix-method}
 \alias{\%*\%,numeric,dgeMatrix-method}
 \alias{as.vector,dgeMatrix,missing-method}
 \alias{chol,dgeMatrix,ANY-method}
@@ -45,9 +45,8 @@
 \alias{rowMeans,dgeMatrix-method}
 \alias{rowSums,dgeMatrix-method}
 \alias{solve,dgeMatrix,matrix-method}
-\alias{solve,dgeMatrix,dgeMatrix-method}
+\alias{solve,dgeMatrix,ddenseMatrix-method}
 \alias{solve,dgeMatrix,missing-method}
-\alias{solve,dgeMatrix,numeric-method}
 \alias{t,dgeMatrix-method}
 \alias{tcrossprod,dgeMatrix,missing-method}
 \alias{tcrossprod,dgeMatrix,dgeMatrix-method}

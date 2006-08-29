@@ -81,7 +81,7 @@ SEXP dtrMatrix_matrix_solve(SEXP a, SEXP b)
 	error(_("Dimensions of system to be solved are inconsistent"));
     F77_CALL(dtrsm)("L", uplo_P(a), "N", diag_P(a),
 		    &n, &nrhs, &one, REAL(GET_SLOT(a, Matrix_xSym)), &n,
-		    REAL(GET_SLOT(b, Matrix_xSym)), &n);
+		    REAL(GET_SLOT(ans, Matrix_xSym)), &n);
     UNPROTECT(1);
     return ans;
 }

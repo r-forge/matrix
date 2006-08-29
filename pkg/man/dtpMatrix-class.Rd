@@ -1,13 +1,10 @@
 \name{dtpMatrix-class}
 \docType{class}
 \alias{dtpMatrix-class}
-\alias{\%*\%,dtpMatrix,dgeMatrix-method}
+\alias{\%*\%,dtpMatrix,ddenseMatrix-method}
 \alias{\%*\%,dgeMatrix,dtpMatrix-method}
-\alias{\%*\%,dtpMatrix,dtpMatrix-method}
 \alias{\%*\%,dtpMatrix,matrix-method}
 \alias{\%*\%,matrix,dtpMatrix-method}
-\alias{\%*\%,dtpMatrix,numeric-method}
-\alias{\%*\%,numeric,dtpMatrix-method}
 \alias{coerce,dtpMatrix,dtTMatrix-method}
 \alias{coerce,dtpMatrix,dtrMatrix-method}
 \alias{coerce,dtpMatrix,ltpMatrix-method}
@@ -22,6 +19,7 @@
 \alias{rcond,dtpMatrix,missing-method}
 \alias{solve,dtpMatrix,missing-method}
 \alias{solve,dtpMatrix,matrix-method}
+\alias{solve,dtpMatrix,ddenseMatrix-method}
 \alias{t,dtpMatrix-method}
 \alias{unpack,dtpMatrix-method}
 \title{Packed triangular dense matrices}

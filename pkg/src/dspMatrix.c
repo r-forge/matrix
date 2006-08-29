@@ -75,7 +75,7 @@ SEXP dspMatrix_matrix_solve(SEXP a, SEXP b)
 	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym));
     int n = bdims[0], nrhs = bdims[1], info;
 
-    if (*adims != *bdims || bdims[1] < 1 || *adims < 1)
+    if (adims[0] != n || nrhs < 1 || n < 1)
 	error(_("Dimensions of system to be solved are inconsistent"));
     F77_CALL(dsptrs)(uplo_P(trf),
 		     &n, &nrhs, REAL(GET_SLOT(trf, Matrix_xSym)),
@@ -103,29 +103,24 @@ SEXP dspMatrix_as_dsyMatrix(SEXP from)
     return val;
 }
 
-SEXP dspMatrix_matrix_mm(SEXP a, SEXP b, SEXP classedP)
+SEXP dspMatrix_matrix_mm(SEXP a, SEXP b)
 {
-    int classed = asLogical(classedP);
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
-	bdimP = (classed ? GET_SLOT(b, Matrix_DimSym) :
-		 getAttrib(b, R_DimSymbol));
-    int *bdims = INTEGER(bdimP);
+    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b));
+    int *bdims = INTEGER(GET_SLOT(val, Matrix_DimSym));
     int i, ione = 1, n = bdims[0], nrhs = bdims[1];
-    int sz = n * nrhs;
     char *uplo = uplo_P(a);
     double *ax = REAL(GET_SLOT(a, Matrix_xSym)), one = 1., zero = 0.,
-	*bx = (classed ? REAL(GET_SLOT(b, Matrix_xSym)) : REAL(b)),
-	*vx = REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, sz));
+	*vx = REAL(GET_SLOT(val, Matrix_xSym));
+    double *bx = Memcpy(Calloc(n * nrhs, double), vx, n * nrhs);
 
     if (bdims[0] != n)
 	error(_("Matrices are not conformable for multiplication"));
     if (nrhs < 1 || n < 1)
 	error(_("Matrices with zero extents cannot be multiplied"));
-
-    SET_SLOT(val, Matrix_DimSym, duplicate(bdimP));
     for (i = 0; i < nrhs; i++)
 	F77_CALL(dspmv)(uplo, &n, &one, ax, bx + i * n, &ione,
 			&zero, vx + i * n, &ione);
+    Free(bx);
     UNPROTECT(1);
     return val;
 }

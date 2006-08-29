@@ -266,13 +266,12 @@ SEXP dgeMatrix_matrix_solve(SEXP a, SEXP b)
     return val;
 }
 
-SEXP dgeMatrix_matrix_mm(SEXP a, SEXP b, SEXP classed, SEXP right)
+SEXP dgeMatrix_matrix_mm(SEXP a, SEXP bP, SEXP right)
 {
-    int cl = asLogical(classed);
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
+    SEXP b = PROTECT(mMatrix_as_dgeMatrix(bP)),
+	val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
-	*bdims = INTEGER(cl ? GET_SLOT(b, Matrix_DimSym) :
-			 getAttrib(b, R_DimSymbol)),
+	*bdims = INTEGER(GET_SLOT(b, Matrix_DimSym)),
 	*cdims = INTEGER(ALLOC_SLOT(val, Matrix_DimSym, INTSXP, 2));
     double one = 1., zero = 0.;
 
@@ -284,7 +283,7 @@ SEXP dgeMatrix_matrix_mm(SEXP a, SEXP b, SEXP classed, SEXP right)
 	    error(_("Matrices with zero extents cannot be multiplied"));
 	cdims[0] = m; cdims[1] = n;
 	F77_CALL(dgemm) ("N", "N", &m, &n, &k, &one,
-			 REAL(cl ? GET_SLOT(b, Matrix_xSym) : b), &m,
+			 REAL(GET_SLOT(b, Matrix_xSym)), &m,
 			 REAL(GET_SLOT(a, Matrix_xSym)), &k, &zero,
 			 REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, m * n)),
 			 &m);
@@ -298,10 +297,11 @@ SEXP dgeMatrix_matrix_mm(SEXP a, SEXP b, SEXP classed, SEXP right)
 	cdims[0] = m; cdims[1] = n;
 	F77_CALL(dgemm)
 	    ("N", "N", &m, &n, &k, &one, REAL(GET_SLOT(a, Matrix_xSym)),
-	     &m, REAL(cl ? GET_SLOT(b, Matrix_xSym) : b), &k, &zero,
+	     &m, REAL(GET_SLOT(b, Matrix_xSym)), &k, &zero,
 	     REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, m * n)), &m);
     }
-    UNPROTECT(1);
+    ALLOC_SLOT(val, Matrix_DimNamesSym, VECSXP, 2);
+    UNPROTECT(2);
     return val;
 }
 

@@ -7,8 +7,12 @@
 ## Should this method return 'from' without duplication when it has
 ## class dgeMatrix?
 setAs("ddenseMatrix", "dgeMatrix",
-      function(from) .Call(dup_mMatrix_as_dgeMatrix, from))
-
+      function(from) {
+          if (class(from) != "dgeMatrix")
+              from <- .Call(dup_mMatrix_as_dgeMatrix, from)
+          from
+      })
+      
 ## d(ouble) to l(ogical):
 setAs("dgeMatrix", "lgeMatrix", d2l_Matrix)
 setAs("dtrMatrix", "ltrMatrix", d2l_Matrix)
@@ -76,11 +80,19 @@ setMethod("crossprod", signature(x = "ddenseMatrix", y = "missing"),
 setMethod("diag", signature(x = "ddenseMatrix"),
           function(x = 1, nrow, ncol = n) callGeneric(as(x, "dgeMatrix")))
 
-setMethod("solve", signature(a = "ddenseMatrix", b = "missing"),
-          function(a, b, ...) callGeneric(as(a, "dgeMatrix")))
+## These methods cause an infinite loop in pre-2.4.0
+## setMethod("solve", signature(a = "ddenseMatrix", b = "missing"),
+##           function(a, b, ...) callGeneric(as(a, "dgeMatrix")))
 
-setMethod("solve", signature(a = "ddenseMatrix", b = "ANY"),
-          function(a, b, ...) callGeneric(as(a, "dgeMatrix"), b))
+## setMethod("solve", signature(a = "ddenseMatrix", b = "ANY"),
+##           function(a, b, ...) callGeneric(as(a, "dgeMatrix"), b))
+
+## General method for dense matrix multiplication in case specific methods
+## have not been defined.
+setMethod("%*%", signature(x = "ddenseMatrix", y = "ddenseMatrix"),
+          function(x, y) .Call(dgeMatrix_matrix_mm,
+                               .Call(dup_mMatrix_as_dgeMatrix, x), y, FALSE),
+          valueClass = "dgeMatrix")
 
 setMethod("lu", signature(x = "ddenseMatrix"),
           function(x, ...) callGeneric(as(x, "dgeMatrix")))

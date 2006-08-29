@@ -82,57 +82,6 @@ SEXP compressed_non_0_ij(SEXP x, SEXP colP)
     return ans;
 }
 
-#if 0				/* no longer used */
-SEXP csc_matrix_mm(SEXP a, SEXP b, SEXP classed, SEXP right)
-{
-    int cl = asLogical(classed), rt = asLogical(right);
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
-    int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
-	*ai = INTEGER(GET_SLOT(a, Matrix_iSym)),
-	*ap = INTEGER(GET_SLOT(a, Matrix_pSym)),
-	*bdims = INTEGER(cl ? GET_SLOT(b, Matrix_DimSym) :
-			 getAttrib(b, R_DimSymbol)),
-	*cdims = INTEGER(ALLOC_SLOT(val, Matrix_DimSym, INTSXP, 2)),
-	chk, ione = 1, j, jj, k, m, n;
-    double *ax = REAL(GET_SLOT(a, Matrix_xSym)),
-	*bx = REAL(cl ? GET_SLOT(b, Matrix_xSym) : b), *cx;
-
-    if (rt) {
-	m = bdims[0]; n = adims[1]; k = bdims[1]; chk = adims[0];
-    } else {
-	m = adims[0]; n = bdims[1]; k = adims[1]; chk = bdims[0];
-    }
-    if (chk != k)
-	error(_("Matrices are not conformable for multiplication"));
-    if (m < 1 || n < 1 || k < 1)
-	error(_("Matrices with zero extents cannot be multiplied"));
-    cx = REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, m * n));
-    AZERO(cx, m * n); /* zero the accumulators */
-    for (j = 0; j < n; j++) { /* across columns of c */
-	if (rt) {
-	    int kk, k2 = ap[j + 1];
-	    for (kk = ap[j]; kk < k2; kk++) {
-		F77_CALL(daxpy)(&m, &ax[kk], &bx[ai[kk]*m],
-				&ione, &cx[j*m], &ione);
-	    }
-	} else {
-	    double *ccol = cx + j * m,
-		*bcol = bx + j * k;
-
-	    for (jj = 0; jj < k; jj++) { /* across columns of a */
-		int kk, k2 = ap[jj + 1];
-		for (kk = ap[jj]; kk < k2; kk++) {
-		    ccol[ai[kk]] += ax[kk] * bcol[jj];
-		}
-	    }
-	}
-    }
-    cdims[0] = m; cdims[1] = n;
-    UNPROTECT(1);
-    return val;
-}
-#endif
-
 SEXP dgCMatrix_lusol(SEXP x, SEXP y)
 {
     SEXP ycp = PROTECT(duplicate(y));
@@ -211,7 +160,7 @@ SEXP dgCMatrix_QR(SEXP Ap, SEXP order)
     return ans;
 }
 
-/* Modified version of Tim Davis's cs_qr_mex.c file for MATLAB */
+/* Modified version of Tim Davis's cs_lu_mex.c file for MATLAB */
 SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp)
 {
     SEXP ans = get_factors(Ap, "LU");
