@@ -158,13 +158,21 @@ setMethod("crossprod", signature(x = "CsparseMatrix", y = "missing"),
 
 ## FIXME: Generalize the class of y.  This specific method is to replace one
 ##        in dgCMatrix.R
-setMethod("crossprod", signature(x = "CsparseMatrix", y = "dgeMatrix"),
-	  function(x, y = NULL) .Call(Csparse_dense_crossprod, x, y))
+setMethod("crossprod", signature(x = "CsparseMatrix", y = "ddenseMatrix"),
+	  function(x, y = NULL) {
+              if (class(y) != "dgeMatrix")
+                  y <- .Call(dup_mMatrix_as_dgeMatrix, y)
+              .Call(Csparse_dense_crossprod, x, y)
+          })
 
-## as_cholmod_dense handles different storage modes for y appropriately
 setMethod("crossprod", signature(x = "CsparseMatrix", y = "matrix"),
-	  function(x, y = NULL) .Call(Csparse_dense_crossprod, x, y))
+	  function(x, y = NULL) .Call(Csparse_dense_crossprod, x,
+                      .Call(dup_mMatrix_as_dgeMatrix, y)))
 
+setMethod("crossprod", signature(x = "CsparseMatrix", y = "numeric"),
+	  function(x, y = NULL) .Call(Csparse_dense_crossprod, x,
+                      .Call(dup_mMatrix_as_dgeMatrix, y)))
+          
 setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "missing"),
 	  function(x, y = NULL) {
               .Call(Csparse_crossprod, x, trans = TRUE, triplet = FALSE)
@@ -182,12 +190,40 @@ setMethod("t", signature(x = "CsparseMatrix"),
 setMethod("%*%", signature(x = "CsparseMatrix", y = "CsparseMatrix"),
           function(x, y) .Call(Csparse_Csparse_prod, x, y))
 
-setMethod("%*%", signature(x = "CsparseMatrix", y = "denseMatrix"),
-          function(x, y) .Call(Csparse_dense_prod, x, y))
+setMethod("%*%", signature(x = "CsparseMatrix", y = "ddenseMatrix"),
+          function(x, y) {
+              if (class(y) != "dgeMatrix")
+                  y <- .Call(dup_mMatrix_as_dgeMatrix, y)
+              .Call(Csparse_dense_prod, x, y)
+          })
 
 setMethod("%*%", signature(x = "CsparseMatrix", y = "matrix"),
-          function(x, y) .Call(Csparse_dense_prod, x, y))
+          function(x, y) .Call(Csparse_dense_prod, x,
+                               .Call(dup_mMatrix_as_dgeMatrix, y)))
 
+setMethod("%*%", signature(x = "CsparseMatrix", y = "numeric"),
+          function(x, y) .Call(Csparse_dense_prod, x,
+                               .Call(dup_mMatrix_as_dgeMatrix, y)))
+
+setMethod("%*%", signature(x = "ddenseMatrix", y = "CsparseMatrix"),
+          function(x, y) {
+              if (class(x) != "dgeMatrix")
+                  x <- .Call(dup_mMatrix_as_dgeMatrix, x)
+              t(.Call(Csparse_dense_crossprod, y, t(x)))
+          }, valueClass = "dgeMatrix")
+
+setMethod("%*%", signature(x = "matrix", y = "CsparseMatrix"),
+          function(x, y)
+          t(.Call(Csparse_dense_crossprod, y,
+                  t(.Call(dup_mMatrix_as_dgeMatrix, x)))),
+          valueClass = "dgeMatrix")
+
+setMethod("%*%", signature(x = "numeric", y = "CsparseMatrix"),
+          function(x, y)
+          t(.Call(Csparse_dense_crossprod, y,
+                  .Call(dup_mMatrix_as_dgeMatrix, x))),
+          valueClass = "dgeMatrix")
+          
 ## NB: have extra tril(), triu() methods for symmetric ["dsC" and "lsC"]
 setMethod("tril", "CsparseMatrix",
 	  function(x, k = 0, ...) {

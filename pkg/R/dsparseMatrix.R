@@ -1,11 +1,11 @@
 ## For multiplication operations, sparseMatrix overrides other method
 ## selections.  Coerce a ddensematrix argument to a dgeMatrix.
 
-setMethod("%*%", signature(x = "dsparseMatrix", y = "ddenseMatrix"),
-          function(x, y) callGeneric(x, as(y, "dgeMatrix")))
+## setMethod("%*%", signature(x = "dsparseMatrix", y = "ddenseMatrix"),
+##           function(x, y) callGeneric(x, as(y, "dgeMatrix")))
 
-setMethod("%*%", signature(x = "ddenseMatrix", y = "dsparseMatrix"),
-          function(x, y) callGeneric(as(x, "dgeMatrix"), y))
+## setMethod("%*%", signature(x = "ddenseMatrix", y = "dsparseMatrix"),
+##           function(x, y) callGeneric(as(x, "dgeMatrix"), y))
 
 setMethod("crossprod", signature(x = "dsparseMatrix", y = "ddenseMatrix"),
           function(x, y = NULL) callGeneric(x, as(y, "dgeMatrix")))
@@ -17,11 +17,11 @@ setMethod("diag", signature(x = "dsparseMatrix"),
 	  function(x, nrow, ncol = n) diag(as(x, "dgCMatrix")))
 
 ## and coerce dsparse* to dgC*
-setMethod("%*%", signature(x = "dsparseMatrix", y = "dgeMatrix"),
-          function(x, y) callGeneric(as(x, "dgCMatrix"), y))
+## setMethod("%*%", signature(x = "dsparseMatrix", y = "dgeMatrix"),
+##           function(x, y) callGeneric(as(x, "dgCMatrix"), y))
 
-setMethod("%*%", signature(x = "dgeMatrix", y = "dsparseMatrix"),
-          function(x, y) callGeneric(x, as(y, "dgCMatrix")))
+## setMethod("%*%", signature(x = "dgeMatrix", y = "dsparseMatrix"),
+##           function(x, y) callGeneric(x, as(y, "dgCMatrix")))
 
 setMethod("crossprod", signature(x = "dsparseMatrix", y = "dgeMatrix"),
           function(x, y = NULL) callGeneric(as(x, "dgCMatrix"), y))
