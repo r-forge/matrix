@@ -288,6 +288,9 @@ setMethod("tcrossprod", signature(x = "TsparseMatrix", y = "ANY"),
 setMethod("%*%", signature(x = "TsparseMatrix", y = "ANY"),
           function(x, y) callGeneric(as(x, "CsparseMatrix"), y))
 
+setMethod("%*%", signature(x = "ANY", y = "TsparseMatrix"),
+          function(x, y) callGeneric(x, as(y, "CsparseMatrix")))
+
 ## Not yet.  Don't have methods for y = "CsparseMatrix" and general x
 #setMethod("%*%", signature(x = "ANY", y = "TsparseMatrix"),
 #          function(x, y) callGeneric(x, as(y, "CsparseMatrix")))
