@@ -131,26 +131,28 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b)
 SEXP Csparse_dense_prod(SEXP a, SEXP b)
 {
     cholmod_sparse *cha = as_cholmod_sparse(a);
-    cholmod_dense *chb = as_cholmod_dense(b);
+    cholmod_dense *chb = as_cholmod_dense(PROTECT(mMatrix_as_dgeMatrix(b)));
     cholmod_dense *chc = 
 	cholmod_allocate_dense(cha->nrow, chb->ncol, cha->nrow, chb->xtype, &c);
     double alpha[] = {1,0}, beta[] = {0,0};
 
     cholmod_sdmult(cha, 0, alpha, beta, chb, chc, &c);
     Free(cha); Free(chb);
+    UNPROTECT(1);
     return chm_dense_to_SEXP(chc, 1);
 }
 
 SEXP Csparse_dense_crossprod(SEXP a, SEXP b)
 {
     cholmod_sparse *cha = as_cholmod_sparse(a);
-    cholmod_dense *chb = as_cholmod_dense(b);
+    cholmod_dense *chb = as_cholmod_dense(PROTECT(mMatrix_as_dgeMatrix(b)));
     cholmod_dense *chc =
 	cholmod_allocate_dense(cha->ncol, chb->ncol, cha->ncol, chb->xtype, &c);
     double alpha[] = {1,0}, beta[] = {0,0};
 
     cholmod_sdmult(cha, 1, alpha, beta, chb, chc, &c);
     Free(cha); Free(chb);
+    UNPROTECT(1);
     return chm_dense_to_SEXP(chc, 1);
 }
 

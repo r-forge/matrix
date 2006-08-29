@@ -115,7 +115,8 @@ SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b)
 {
     SEXP Chol = get_factor_pattern(a, "spdCholesky", 3);
     cholmod_factor *L;
-    cholmod_dense *cb = as_cholmod_dense(b), *cx;
+    cholmod_dense  *cx,
+	*cb = as_cholmod_dense(PROTECT(mMatrix_as_dgeMatrix(b)));
     
     if (Chol == R_NilValue)
 	Chol = dsCMatrix_Cholesky(a,
@@ -125,6 +126,7 @@ SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b)
     L = as_cholmod_factor(Chol);
     cx = cholmod_solve(CHOLMOD_A, L, cb, &c);
     Free(cb); Free(L);
+    UNPROTECT(1);
     return chm_dense_to_SEXP(cx, 1);
 }
 

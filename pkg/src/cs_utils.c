@@ -43,8 +43,7 @@ cs *Matrix_as_cs(SEXP x)
 {
     cs *ans = Calloc(1, cs);
     char *valid[] = {"dgCMatrix", "dsCMatrix", "dtCMatrix", ""};
-    int *dims,
-	ctype = check_class(CHAR(asChar(getAttrib(x, R_ClassSymbol))), valid);
+    int *dims, ctype = check_class(class_P(x), valid);
     SEXP islot;
 
     if (ctype < 0) error("invalid class of object to Matrix_as_cs");
@@ -115,9 +114,8 @@ css *Matrix_as_css(SEXP x)
 csn *Matrix_as_csn(SEXP x)
 {
     csn *ans = Calloc(1, csn);
-    char *cl = CHAR(asChar(getAttrib(x, R_ClassSymbol))),
-	*valid[] = {"csn_LU", "csn_QR", ""};
-    int ctype = check_class(cl, valid);
+    char *valid[] = {"csn_LU", "csn_QR", ""};
+    int ctype = check_class(class_P(x), valid);
 
     if (ctype < 0) error("invalid class of object to Matrix_as_csn");
     ans->U = Matrix_as_cs(GET_SLOT(x, install("U")));
