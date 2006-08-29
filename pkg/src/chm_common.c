@@ -20,9 +20,7 @@ cholmod_sparse *as_cholmod_sparse(SEXP x)
 		     "lgCMatrix", "lsCMatrix", "ltCMatrix",
 		     "zgCMatrix", "zsCMatrix", "ztCMatrix",
 		     ""};
-    int *dims,
-	ctype = Matrix_check_class(CHAR(asChar(getAttrib(x, R_ClassSymbol))),
-				   valid);
+    int *dims, ctype = Matrix_check_class(class_P(x), valid);
     SEXP islot;
 
     if (ctype < 0) error("invalid class of object to as_cholmod_sparse");
@@ -164,9 +162,7 @@ cholmod_triplet *as_cholmod_triplet(SEXP x)
 		     "lgTMatrix", "lsTMatrix", "ltTMatrix",
 		     "zgTMatrix", "zsTMatrix", "ztTMatrix",
 		     ""};
-    int *dims,
-	ctype = Matrix_check_class(CHAR(asChar(getAttrib(x, R_ClassSymbol))),
-				   valid);
+    int *dims, ctype = Matrix_check_class(class_P(x), valid);
     SEXP islot;
 
     if (ctype < 0) error("invalid class of object to as_cholmod_triplet");
@@ -303,9 +299,8 @@ cholmod_dense *as_cholmod_dense(SEXP x)
     cholmod_dense *ans = Calloc(1, cholmod_dense);
     char *valid[] = {"dmatrix", "dgeMatrix",
 		     "lmatrix", "lgeMatrix",
-		     "zmatrix", "zgeMatrix", ""},
-	*cl = CHAR(asChar(getAttrib(x, R_ClassSymbol)));
-    int dims[2], ctype = Matrix_check_class(cl, valid), nprot = 0;
+		     "zmatrix", "zgeMatrix", ""};
+    int dims[2], ctype = Matrix_check_class(class_P(x), valid), nprot = 0;
 
     if (ctype < 0) {		/* not a classed matrix */
 	if (isMatrix(x)) Memcpy(dims, INTEGER(getAttrib(x, R_DimSymbol)), 2);
@@ -455,8 +450,7 @@ cholmod_factor *as_cholmod_factor(SEXP x)
     cholmod_factor *ans = Calloc(1, cholmod_factor);
     char *valid[] = {"dCHMsuper", "dCHMsimpl", "lCHMsuper", "lCHMsimpl", ""};
     int *type = INTEGER(GET_SLOT(x, install("type"))),
-	ctype = Matrix_check_class(CHAR(asChar(getAttrib(x, R_ClassSymbol))),
-				   valid);
+	ctype = Matrix_check_class(class_P(x), valid);
     SEXP tmp;
 
     if (ctype < 0) error("invalid class of object to as_cholmod_factor");

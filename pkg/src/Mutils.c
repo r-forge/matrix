@@ -621,7 +621,7 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
 	ad = R_NilValue , an = R_NilValue;	/* -Wall */
-    char *cl = CHAR(asChar(getAttrib(A, R_ClassSymbol))),
+    char *cl = class_P(A),
 	*valid[] = {"_NOT_A_CLASS_", "dgeMatrix", "dtrMatrix",
 		    "dsyMatrix", "dpoMatrix", "ddiMatrix",
 		    "dtpMatrix", "dspMatrix", "dppMatrix",

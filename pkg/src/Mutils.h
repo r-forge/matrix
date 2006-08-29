@@ -85,7 +85,7 @@ extern	 /* stored pointers to symbols initialized in R_init_Matrix */
 
 #define uplo_P(_x_) CHAR(STRING_ELT(GET_SLOT(_x_, Matrix_uploSym), 0))
 #define diag_P(_x_) CHAR(STRING_ELT(GET_SLOT(_x_, Matrix_diagSym), 0))
-
+#define class_P(_x_) CHAR(asChar(getAttrib(_x_, R_ClassSymbol)))
 
 /**
  * Check for valid length of a packed triangular array and return the
@@ -299,6 +299,11 @@ SEXP alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms);
 
 SEXP dup_mMatrix_as_dgeMatrix(SEXP A);
 
+static R_INLINE SEXP
+mMatrix_as_dgeMatrix(SEXP A)
+{
+    return strcmp(class_P(A), "dgeMatrix") ? A : dup_mMatrix_as_dgeMatrix(A);
+}
 
 /**
  * Return the 0-based index of a string match in a vector of strings
