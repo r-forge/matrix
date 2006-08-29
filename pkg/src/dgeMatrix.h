@@ -20,7 +20,7 @@ SEXP dgeMatrix_determinant(SEXP x, SEXP logarithm);
 SEXP dgeMatrix_Schur(SEXP x, SEXP vectors);
 SEXP dgeMatrix_solve(SEXP a);
 SEXP dgeMatrix_matrix_solve(SEXP a, SEXP b);
-SEXP dgeMatrix_matrix_mm(SEXP a, SEXP b, SEXP classed, SEXP right);
+SEXP dgeMatrix_matrix_mm(SEXP a, SEXP b, SEXP right);
 SEXP dgeMatrix_svd(SEXP x, SEXP nu, SEXP nv);
 SEXP dgeMatrix_exp(SEXP x);
 SEXP dgeMatrix_colsums(SEXP x, SEXP naRmP, SEXP cols, SEXP mean);

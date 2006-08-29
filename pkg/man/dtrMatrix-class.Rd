@@ -2,7 +2,7 @@
 \docType{class}
 \alias{\%*\%,dtrMatrix,dtrMatrix-method}
 \alias{\%*\%,dgeMatrix,dtrMatrix-method}
-\alias{\%*\%,dtrMatrix,dgeMatrix-method}
+\alias{\%*\%,dtrMatrix,ddenseMatrix-method}
 \alias{\%*\%,dtrMatrix,matrix-method}
 \alias{\%*\%,matrix,dtrMatrix-method}
 \alias{coerce,dgeMatrix,dtrMatrix-method}% or rather setIs?
@@ -18,7 +18,7 @@
 \alias{rcond,dtrMatrix,character-method}
 \alias{rcond,dtrMatrix,missing-method}
 \alias{show,dtrMatrix-method}
-\alias{solve,dtrMatrix,dgeMatrix-method}
+\alias{solve,dtrMatrix,ddenseMatrix-method}
 \alias{solve,dtrMatrix,matrix-method}
 \alias{solve,dtrMatrix,missing-method}
 \alias{t,dtrMatrix-method}

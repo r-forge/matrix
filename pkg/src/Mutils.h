@@ -302,7 +302,7 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A);
 static R_INLINE SEXP
 mMatrix_as_dgeMatrix(SEXP A)
 {
-    return strcmp(class_P(A), "dgeMatrix") ? A : dup_mMatrix_as_dgeMatrix(A);
+    return strcmp(class_P(A), "dgeMatrix") ? dup_mMatrix_as_dgeMatrix(A) : A;
 }
 
 /**

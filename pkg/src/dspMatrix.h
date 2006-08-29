@@ -11,7 +11,7 @@ SEXP dspMatrix_rcond(SEXP obj, SEXP type);
 SEXP dspMatrix_solve(SEXP a);
 SEXP dspMatrix_matrix_solve(SEXP a, SEXP b);
 SEXP dspMatrix_as_dsyMatrix(SEXP from);
-SEXP dspMatrix_matrix_mm(SEXP a, SEXP b, SEXP classed);
+SEXP dspMatrix_matrix_mm(SEXP a, SEXP b);
 SEXP dspMatrix_trf(SEXP x);
 
 #endif

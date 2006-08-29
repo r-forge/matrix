@@ -5,6 +5,7 @@
 \alias{\%*\%,CsparseMatrix,ddenseMatrix-method}
 \alias{\%*\%,CsparseMatrix,matrix-method}
 \alias{\%*\%,CsparseMatrix,numeric-method}
+\alias{\%*\%,ddenseMatrix,CsparseMatrix-method}
 \alias{\%*\%,matrix,CsparseMatrix-method}
 \alias{\%*\%,numeric,CsparseMatrix-method}
 \alias{coerce,CsparseMatrix,lsparseMatrix-method}

@@ -32,8 +32,7 @@ setAs("matrix", "dtrMatrix",
 ##       show( <ddenseMatrix> ) is not okay, and we need our own:
 setMethod("show", "dtrMatrix", function(object) prMatrix(object))
 
-
-setMethod("%*%", signature(x = "dtrMatrix", y = "dgeMatrix"),
+setMethod("%*%", signature(x = "dtrMatrix", y = "ddenseMatrix"),
 	  function(x, y) .Call(dtrMatrix_matrix_mm, x, y, FALSE),
           valueClass = "dgeMatrix")
 
@@ -49,9 +48,10 @@ setMethod("%*%", signature(x = "matrix", y = "dtrMatrix"),
 	  function(x, y) .Call(dtrMatrix_matrix_mm, y, x, TRUE),
           valueClass = "dgeMatrix")
 
-setMethod("%*%", signature(x = "dtrMatrix", y = "dtrMatrix"),
-	  function(x, y) callGeneric(x = x, y = as(y, "dgeMatrix")),
-          valueClass = "dgeMatrix")
+## no longer needed
+## setMethod("%*%", signature(x = "dtrMatrix", y = "dtrMatrix"),
+## 	  function(x, y) callGeneric(x = x, y = as(y, "dgeMatrix")),
+##           valueClass = "dgeMatrix")
 
 setMethod("crossprod", signature(x = "dtrMatrix", y = "missing"),
 	  function(x, y = NULL) callGeneric(x = as(x, "dgeMatrix")),
@@ -102,7 +102,7 @@ setMethod("solve", signature(a = "dtrMatrix", b="missing"),
 	  .Call(dtrMatrix_solve, a),
 	  valueClass = "dtrMatrix")
 
-setMethod("solve", signature(a = "dtrMatrix", b="dgeMatrix"),
+setMethod("solve", signature(a = "dtrMatrix", b="ddenseMatrix"),
 	  function(a, b, ...)
           .Call(dtrMatrix_matrix_solve, a, b),
 	  valueClass = "dgeMatrix")
