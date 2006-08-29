@@ -67,7 +67,7 @@ triu(x, k = 0, \dots)
 set.seed(7)
 m <- matrix(0, 5, 5)
 m[sample(length(m), size = 14)] <- rep(1:9, length=14)
-(mm <- as(m, "dgCMatrix"))
+(mm <- as(m, "CsparseMatrix"))
 
 tril(mm)        # lower triangle
 tril(mm, -1)    # strict lower triangle

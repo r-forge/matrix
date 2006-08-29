@@ -8,6 +8,7 @@
 ## Moved to ./Csparse.R :
 ## setAs("dgCMatrix", "dgTMatrix", ....
 ## setAs("dgCMatrix", "dgeMatrix", ....
+## setAs("dgeMatrix", "dgCMatrix", ....
 
 ## Can use method in Csparse.R
 ## setAs("dgCMatrix", "matrix", ....
@@ -19,13 +20,6 @@ setAs("dgCMatrix", "lgCMatrix",
                            is(from, "triangularMatrix")))
 ##was:       function(from) new("lgCMatrix", i = from@i, p = from@p,
 ##                               Dim = from@Dim, Dimnames = from@Dimnames)
-
-setAs("matrix", "dgCMatrix",
-      function(from) .Call(dense_to_Csparse, from))
-
-setAs("dgeMatrix", "dgCMatrix",
-      function(from) .Call(dense_to_Csparse, from))
-
 
 ## can use method for CsparseMatrix
 ## setMethod("crossprod", signature(x = "dgCMatrix", y = "missing"),
@@ -91,30 +85,6 @@ setMethod("image", "dgCMatrix",
 ##               .Call(csc_matrix_mm, x, y, FALSE, FALSE)
 ##           }, valueClass = "dgeMatrix")
 
-## FIXME: need to define more general methods for these, perhaps in
-## ../src/Csparse.c
-setMethod("%*%", signature(x = "ddenseMatrix", y = "dgCMatrix"),
-          function(x, y)
-          t(.Call(Csparse_dense_crossprod, y,
-                  t(.Call(dup_mMatrix_as_dgeMatrix, x)))),
-          valueClass = "dgeMatrix")
-
-setMethod("%*%", signature(x = "dgeMatrix", y = "dgCMatrix"),
-          function(x, y)
-          t(.Call(Csparse_dense_crossprod, y, t(x))),
-          valueClass = "dgeMatrix")
-
-setMethod("%*%", signature(x = "matrix", y = "dgCMatrix"),
-          function(x, y)
-          t(.Call(Csparse_dense_crossprod, y,
-                  t(.Call(dup_mMatrix_as_dgeMatrix, x)))),
-          valueClass = "dgeMatrix")
-
-setMethod("%*%", signature(x = "numeric", y = "dgCMatrix"),
-          function(x, y)
-          t(.Call(Csparse_dense_crossprod, y,
-                  .Call(dup_mMatrix_as_dgeMatrix, x))),
-          valueClass = "dgeMatrix")
 
 ## Group Methods, see ?Arith (e.g.)
 ## -----

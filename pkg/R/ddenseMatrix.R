@@ -3,6 +3,9 @@
 ## This replaces many "d..Matrix" -> "dgeMatrix" ones
 ## >> but << needs all sub(sub(sub)) classes of "ddenseMatrix" listed
 ##   -----  in  ../src/Mutils.c
+
+## Should this method return 'from' without duplication when it has
+## class dgeMatrix?
 setAs("ddenseMatrix", "dgeMatrix",
       function(from) .Call(dup_mMatrix_as_dgeMatrix, from))
 
@@ -12,6 +15,32 @@ setAs("dtrMatrix", "ltrMatrix", d2l_Matrix)
 setAs("dtpMatrix", "ltpMatrix", d2l_Matrix)
 setAs("dsyMatrix", "lsyMatrix", d2l_Matrix)
 setAs("dspMatrix", "lspMatrix", d2l_Matrix)
+
+setAs("ddenseMatrix", "CsparseMatrix",
+      function(from) {
+          if (class(from) != "dgeMatrix")
+              from <- .Call(dup_mMatrix_as_dgeMatrix, from)
+          .Call(dense_to_Csparse, from)
+      })
+
+## special case
+setAs("dgeMatrix", "dgCMatrix",
+      function(from) .Call(dense_to_Csparse, from))
+
+setAs("matrix", "CsparseMatrix",
+      function(from)
+      .Call(dense_to_Csparse, .Call(dup_mMatrix_as_dgeMatrix, from)))
+
+## special case needed in the Matrix function
+setAs("matrix", "dgCMatrix",
+      function(from) {
+          storage.mode(from) <- "double"
+          .Call(dense_to_Csparse, from)
+      })
+
+setAs("numeric", "CsparseMatrix",
+      function(from)
+      .Call(dense_to_Csparse, .Call(dup_mMatrix_as_dgeMatrix, from)))
 
 setMethod("as.numeric", signature(x = "ddenseMatrix"),
 	  function(x, ...) as(x, "dgeMatrix")@x)

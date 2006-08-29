@@ -48,6 +48,7 @@ setMethod("tril", "dsCMatrix",
 		      x = x@x, Dim = x@Dim, Dimnames = x@Dimnames)
 	      else tril(as(x, "dgCMatrix"), k = k, ...)
 	  })
+
 setMethod("triu", "dsCMatrix",
 	  function(x, k = 0, ...) {
 	      if(x@uplo == "U" && k == 0)
@@ -57,14 +58,24 @@ setMethod("triu", "dsCMatrix",
 	      else triu(as(x, "dgCMatrix"), k = k, ...)
 	  })
 
-setMethod("solve", signature(a = "dsCMatrix", b = "dgeMatrix"),
-          function(a, b, ...)
-          .Call(dsCMatrix_matrix_solve, a, b, TRUE),
+setMethod("solve", signature(a = "dsCMatrix", b = "ddenseMatrix"),
+          function(a, b, ...) {
+              if (class(b) != "dgeMatrix")
+                  b <- .Call(dup_mMatrix_as_dgeMatrix, b)
+              .Call(dsCMatrix_matrix_solve, a, b)
+          },
           valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dsCMatrix", b = "matrix"),
           function(a, b, ...)
-          .Call(dsCMatrix_matrix_solve, a, b, FALSE),
+          .Call(dsCMatrix_matrix_solve, a,
+                .Call(dup_mMatrix_as_dgeMatrix, b)),
+          valueClass = "dgeMatrix")
+
+setMethod("solve", signature(a = "dsCMatrix", b = "numeric"),
+          function(a, b, ...)
+          .Call(dsCMatrix_matrix_solve, a,
+                .Call(dup_mMatrix_as_dgeMatrix, b)),
           valueClass = "dgeMatrix")
 
 ##setMethod("solve", signature(a = "dsCMatrix", b = "numeric"),
