@@ -6,8 +6,9 @@ setMethod("expand", "MatrixFactorization",
 
 setMethod("show", "MatrixFactorization",
 	  function(object) { ## cheap one -- can have better for sub-classes
-	      cl <- class(object)
-	      cat(sprintf("'MatrixFactorization' of class \"%s\"\n", cl))
+	      ## cl <- class(object)
+	      ## cat(sprintf("'MatrixFactorization' of class \"%s\"\n", cl))
+	      cat("'MatrixFactorization' of ")
 	      str(object)
 	      })
 
