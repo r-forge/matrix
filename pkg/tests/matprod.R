@@ -58,16 +58,20 @@ all.equal((Atr %*% solve(Atr, y))@x, y)
 
 data(KNex); mm <- KNex$mm
 M <- mm[1:500, 1:200]
+MT <- as(M, "TsparseMatrix")
 cpr <- t(mm) %*% mm
 showMethods("%*%", class=class(M))
 
 v1 <- rep(1, ncol(M))
 str(r <-  M %*% Matrix(v1))
+str(rT <- MT %*% Matrix(v1))
+stopifnot(identical(r, rT))
 str(r. <- M %*% cbind(v1))
-stopifnot(identical3(r, r., M %*% as(v1, "matrix")))
+stopifnot(identical4(r, r., rT, M %*% as(v1, "matrix")))
 
 v2 <- rep(1,nrow(M))
 r2 <- t(Matrix(v2)) %*% M
+r2T <- v2 %*% MT
 str(r2. <- v2 %*% M)
 stopifnot(identical4(r2, r2., rbind(v2) %*% M, t(as(v2, "matrix")) %*% M))
 
