@@ -111,7 +111,7 @@ SEXP get_factor_pattern(SEXP obj, char *pat, int offset)
     return R_NilValue;
 }
 
-SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
+SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b)
 {
     SEXP Chol = get_factor_pattern(a, "spdCholesky", 3);
     cholmod_factor *L;
