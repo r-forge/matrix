@@ -1,3 +1,18 @@
+2006-08-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dgCMatrix.R: aargh: "Arith(<dgC>, numeric)" was wrong because
+	of a 0-index which was used as 1-index (..hmm)
+
+	* R/sparseMatrix.R (prSpMatrix): fix printing an all-0 sparse Matrix
+
+	* R/Auxiliaries.R (all0, is0): for 0-testing in presence of NA's
+	* R/Auxiliaries.R (isTriMat): use all0() for 0-testing.
+	(.is.diagonal): dito
+
+	* R/lgTMatrix.R: as("matrix", "lgTMatrix"): warn about NA's
+
+	* R/Matrix.R (Matrix): also work for NA data
+
 2006-08-28  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Matrix.R (Matrix): + 'forceCheck' argument; dimnames setting

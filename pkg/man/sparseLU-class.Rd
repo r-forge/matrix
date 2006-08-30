@@ -11,19 +11,25 @@
   \code{\linkS4class{dgCMatrix}}.}
 }
 \section{Slots}{
-	 \describe{
-    \item{\code{L}:}{Object of class \code{"dgCMatrix"} The lower
+  \describe{
+    \item{\code{L}:}{Object of class \code{"\linkS4class{dgCMatrix}"} The lower
       triangular factor from the left.}
-    \item{\code{U}:}{Object of class \code{"dgCMatrix"} The upper
-      triangular factor }
+    \item{\code{U}:}{Object of class \code{"\linkS4class{dgCMatrix}"} The upper
+      triangular factor from the right.}
     \item{\code{p}:}{Object of class \code{"integer"} Permutation
       applied from the left. }
     \item{\code{q}:}{Object of class \code{"integer"} Permutation
       applied from the right.}
+    \item{\code{Dim}:}{the dimension of the original matrix; inherited
+      from class \code{\linkS4class{MatrixFactorization}}.}
   }
 }
+\section{Extends}{
+  Class \code{"\linkS4class{LU}"}, directly.
+  Class \code{"\linkS4class{MatrixFactorization}"}, by class \code{"LU"}.
+}
 \section{Methods}{
-No methods defined with class "sparseLU" in the signature.
+  No methods defined with class "sparseLU" in the signature.
 }
 %\references{}
 %\author{}

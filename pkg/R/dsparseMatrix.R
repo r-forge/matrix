@@ -37,7 +37,10 @@ setMethod("image", "dsparseMatrix",
 
 setMethod("kronecker", signature(X = "dsparseMatrix", Y = "dsparseMatrix"),
           function (X, Y, FUN = "*", make.dimnames = FALSE, ...)
-          callGeneric(as(X, "dgTMatrix"),as(Y, "dgTMatrix")))
+          callGeneric(as(X, "dgTMatrix"), as(Y, "dgTMatrix")))
+
+setMethod("lu", signature(x = "dsparseMatrix"),
+	  function(x, ...) callGeneric(as(x, "dgCMatrix")))
 
 
 ## Group Methods, see ?Arith (e.g.)
@@ -68,10 +71,6 @@ setMethod("Math",
 
 ##  "Math2" is in ./dMatrix.R
 
-
-### cbind2 / rbind2
-if(paste(R.version$major, R.version$minor, sep=".") >= "2.2") {
-    ## for R 2.2.x (and later):
 
 ### cbind2
     setMethod("cbind2", signature(x = "dsparseMatrix", y = "numeric"),
@@ -161,4 +160,3 @@ if(paste(R.version$major, R.version$minor, sep=".") >= "2.2") {
 		  ans
 	      })
 
-}## R-2.2.x ff

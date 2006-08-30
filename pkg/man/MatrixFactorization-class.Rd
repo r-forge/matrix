@@ -10,7 +10,15 @@
   (potentially) all matrix factorizations of matrices from package
   \pkg{Matrix}.
 }
-\section{Objects from the Class}{A virtual Class: No objects may be created from it.}
+\section{Objects from the Class}{A virtual Class: No objects may be
+  created from it.}
+\section{Slots}{
+  \describe{
+    \item{\code{Dim}:}{Object of class \code{"integer"} - the dimensions
+      of the original matrix - must be an integer vector with exactly two
+      non-negative values.}
+  }
+}
 \section{Methods}{
   \describe{
     \item{expand}{\code{signature(x = "MatrixFactorization")}: this has

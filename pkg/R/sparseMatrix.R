@@ -230,7 +230,7 @@ prSpMatrix <- function(object, digits = getOption("digits"),
 	## show only "structural" zeros as 'zero.print', not all of them..
 	## -> cannot use 'm'
 	iN0 <- 1:1 + encodeInd(non0ind(object), nr = nrow(x))
-	x[-iN0] <- zero.print
+	if(length(iN0)) x[-iN0] <- zero.print else x[] <- zero.print
     }
     print(noquote(x))
     invisible(object)
