@@ -24,6 +24,7 @@
 \alias{diag,dsparseMatrix-method}
 \alias{image,dsparseMatrix-method}
 \alias{kronecker,dsparseMatrix,dsparseMatrix-method}
+\alias{lu,dsparseMatrix-method}
 %% group methods
 \alias{Arith,dsparseMatrix,dsparseMatrix-method}
 \alias{Arith,dsparseMatrix,numeric-method}

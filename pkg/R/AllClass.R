@@ -394,7 +394,7 @@ setClass("pMatrix", representation(perm = "integer"),
 ### Factorization classes ---------------------------------------------
 
 ## Mother class:
-setClass("MatrixFactorization", representation("VIRTUAL")) # not one slot...
+setClass("MatrixFactorization", representation(Dim = "integer", "VIRTUAL"))
 
 ## -- Those (exceptions) inheriting from "Matrix" : ---
 

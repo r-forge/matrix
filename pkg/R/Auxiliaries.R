@@ -1,6 +1,10 @@
 #### "Namespace private" Auxiliaries  such as method functions
 #### (called from more than one place --> need to be defined early)
 
+## Need to consider NAs ;  "== 0" even works for logical & complex:
+is0  <- function(x) !is.na(x) & x == 0
+all0 <- function(x) !any(is.na(x)) && all(x == 0)
+
 ## For %*% (M = Matrix; v = vector (double or integer {complex maybe?}):
 .M.v <- function(x, y) callGeneric(x, as.matrix(y))
 .v.M <- function(x, y) callGeneric(rbind(x), y)
@@ -142,13 +146,14 @@ prMatrix <- function(x, digits = getOption("digits"),
 }
 
 ## For sparseness handling
+## return a 2-column (i,j) matrix of
+## 0-based indices of non-zero entries  :
 non0ind <- function(x) {
+
     if(is.numeric(x))
 	return(if((n <- length(x))) (0:(n-1))[x != 0] else integer(0))
     ## else
     stopifnot(is(x, "sparseMatrix"))
-    ## return a 2-column (i,j) matrix of
-    ## 0-based indices of non-zero entries  :
     non0.i <- function(M) {
 	if(is(M, "TsparseMatrix"))
 	    return(unique(cbind(M@i,M@j)))
@@ -427,17 +432,16 @@ isTriMat <- function(object, upper = NA) {
     ## else slower test
     if(!is.matrix(object))
 	object <- as(object,"matrix")
-    ## == 0 even works for logical & complex:
     if(is.na(upper)) {
-	if(all(object[lower.tri(object)] == 0))
+	if(all0(object[lower.tri(object)]))
 	    structure(TRUE, kind = "U")
-	else if(all(object[upper.tri(object)] == 0))
+	else if(all0(object[upper.tri(object)]))
 	    structure(TRUE, kind = "L")
 	else FALSE
     } else if(upper)
-	all(object[lower.tri(object)] == 0)
+	all0(object[lower.tri(object)])
     else ## upper is FALSE
-	all(object[upper.tri(object)] == 0)
+	all0(object[upper.tri(object)])
 }
 
 ## For Csparse matrices
@@ -478,10 +482,10 @@ isTriC <- function(x, upper = NA) {
     if(d[1] != (n <- d[2])) FALSE
     else if(is.matrix(object))
         ## requires that "vector-indexing" works for 'object' :
-        all(object[rep(c(FALSE, rep.int(TRUE,n)), length = n^2)] == 0)
+        all0(object[rep(c(FALSE, rep.int(TRUE,n)), length = n^2)])
     else ## "denseMatrix" -- packed or unpacked
         if(is(object, "generalMatrix")) # "dge", "lge", ...
-            all(object@x[rep(c(FALSE, rep.int(TRUE,n)), length = n^2)] == 0)
+            all0(object@x[rep(c(FALSE, rep.int(TRUE,n)), length = n^2)])
         else { ## "dense" but not {diag, general}, i.e. triangular or symmetric:
             ## -> has 'uplo'  differentiate between packed and unpacked
 
@@ -493,8 +497,7 @@ isTriC <- function(x, upper = NA) {
             }
 
 ### very cheap workaround
-	    all(as.matrix(object)[rep(c(FALSE, rep.int(TRUE,n)), length = n^2)]
-		== 0)
+	    all0(as.matrix(object)[rep(c(FALSE, rep.int(TRUE,n)), length = n^2)])
         }
 }
 

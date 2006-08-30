@@ -129,7 +129,7 @@ setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
                      ## r <- as(e2, "dgeMatrix")
                      ## ...
                      r <- as(e2, "matrix")
-                     Yis0 <- r == 0
+                     Yis0 <- is0(r)
                      r[complementInd(ij1, dim=d)] <- 0      ## 2)
                      r[1:1 + ij2[ii[[2]], , drop=FALSE]] <-
                          e1@x[ii[[1]]] ^ e2@x[ii[[2]]]      ## 3)
@@ -147,7 +147,7 @@ setMethod("Arith",
 	  function(e1, e2) {
 	      if(length(e2) == 1) { ## e.g.,  Mat ^ a
 		  f0 <- callGeneric(0, e2)
-                  if(!is.na(f0) && f0 == 0.) { # remain sparse
+		  if(is0(f0)) { # remain sparse
 		      e1@x <- callGeneric(e1@x, e2)
 		      e1
 		  } else { ## non-sparse, since '0 o e2' is not 0
@@ -158,7 +158,7 @@ setMethod("Arith",
 		      ##		  r[non0ind(e1)] <- callGeneric(e1@x, e2)
 		      r <- as(e1, "matrix")
 		      r[] <- f0
-		      r[non0ind(e1)] <- callGeneric(e1@x, e2)
+		      r[non0ind(e1) + 1:1] <- callGeneric(e1@x, e2)
 		      as(r, "dgeMatrix")
 		  }
 	      } else {
@@ -173,14 +173,14 @@ setMethod("Arith",
 	  function(e1, e2) {
 	      if(length(e1) == 1) {
 		  f0 <- callGeneric(e1, 0)
-                  if(!is.na(f0) && f0 == 0.) {
+                  if(is0(f0)) {
 		      e2@x <- callGeneric(e1, e2@x)
 		      e2
 		  } else {
 		      ## FIXME: dgeMatrix [cbind(i,j)] <- .. is not yet possible
 		      r <- as(e2, "matrix")
 		      r[] <- f0
-		      r[non0ind(e2)] <- callGeneric(e1, e2@x)
+		      r[non0ind(e2) + 1:1] <- callGeneric(e1, e2@x)
 		      as(r, "dgeMatrix")
 		  }
 	      } else {

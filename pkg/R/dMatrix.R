@@ -85,7 +85,15 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
 	      ## Dbg cat("Compare", class(e1), "|-> ",lClass, "\n")
 	      r  <- callGeneric(e1@x, e2)
               r0 <- callGeneric(0, e2)
-	      if(is(e1, "denseMatrix")) {
+              ## trivial case first
+              if(isTRUE(r0) && all(r)) {
+                  r <- new(fullCl)
+                  d <- e1@Dim
+                  r@Dim <- d
+                  r@Dimnames <- e1@Dimnames
+                  r@x <- rep.int(TRUE, prod(d))
+              }
+	      else if(is(e1, "denseMatrix")) {
                   full <- !isPacked(e1) # << both "dtr" and "dsy" are 'full'
                   if(full || identical(r0, FALSE) || is(e1, "symmetricMatrix"))
                       r <- new(lClass, x = r,
@@ -97,13 +105,14 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
                       dr[ind.0(e1)] <- r0
                   }
 	      }
-              else { ## dsparseMatrix
-                  r <- new(lClass, Dim = dim(e1), Dimnames = dimnames(e1),
-                           x = r)
-                  for(n in setdiff(c("i","j","p"), slotNames(r)))
-                      slot(r, n) <- slot(e1, n)
+              else { ## dsparseMatrix => lClass is "lsparse*"
 
-		  if(!identical(r0, FALSE)) {
+		  if(identical(r0, FALSE)) { ## things remain sparse
+                      r <- new(lClass, Dim = dim(e1), Dimnames = dimnames(e1))
+                      for(n in setdiff(c("i","j","p"), slotNames(r)))
+                          slot(r, n) <- slot(e1, n)
+
+		  } else {
                       warning("sparse to dense coercion in ",.Generic)
 
                       .bail.out.2(.Generic, class(e1), class(e2))
@@ -114,7 +123,7 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
                                if(isSymmetric(r))"lsyMatrix" else "lgeMatrix")
                       ## FIXME: implement this:
                       dr[ind.0(e1)] <- r0
-		  }
+                  }
 	      }
               r
 	  })

@@ -9,6 +9,7 @@ Description: Classes and methods for numerical linear algebra
 Depends: R (>= 2.3.1), stats, methods, utils, lattice
 Imports: graphics, lattice, grid, stats
 Suggests: mlmRev, MASS, coda
+CanUse: graph, SparseM
 SystemRequirements: GNU make
 LazyLoad: yes
 LazyData: no

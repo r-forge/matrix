@@ -38,33 +38,12 @@ setMethod("as.logical", signature(x = "Matrix"),
 	  function(x, ...) as.logical(as.vector(x)))
 
 
-## Note that isSymmetric is *not* exported
-## but that "base" has an isSymmetric() S3-generic since R 2.3.0
+## "base" has an isSymmetric() S3-generic since R 2.3.0
 setMethod("isSymmetric", signature(object = "symmetricMatrix"),
           function(object,tol) TRUE)
 setMethod("isSymmetric", signature(object = "triangularMatrix"),
           ## TRUE iff diagonal:
           function(object,tol) isDiagonal(object))
-
-if(paste(R.version$major, R.version$minor, sep=".") < "2.3")
-    ## need a "matrix" method as in R 2.3 and later
-    setMethod("isSymmetric", signature(object = "matrix"),
-	      function(object, tol = 100*.Machine$double.eps, ...)
-	  {
-	      ## pretest: is it square?
-	      d <- dim(object)
-	      if(d[1] != d[2]) return(FALSE)
-	      ## for `broken' all.equal in R <= 2.2.x:
-	      dn <- dimnames(object)
-	      if(!identical(dn[1], dn[2])) return(FALSE)
-	      test <-
-		  if(is.complex(object))
-		      all.equal.numeric(object, Conj(t(object)), tol = tol, ...)
-		  else		    # numeric, character, ..
-		      all.equal(object, t(object), tol = tol, ...)
-	      isTRUE(test)
-	  })
-
 
 setMethod("isTriangular", signature(object = "triangularMatrix"),
           function(object, ...) TRUE)
@@ -101,7 +80,7 @@ Matrix <-
 	      sparse = NULL, forceCheck = FALSE)
 {
     sparseDefault <- function(m)
-	prod(dim(m)) > 2*sum(as(m, "matrix") != 0)
+	prod(dim(m)) > 2*sum(is.na(m <- as(m, "matrix")) | m != 0)
 
     i.M <- is(data, "Matrix")
     if(is.null(sparse) && (i.M || is(data, "matrix")))
@@ -119,7 +98,9 @@ Matrix <-
 	    nrow <- ceiling(length(data)/ncol)
 	else if (missing(ncol))
 	    ncol <- ceiling(length(data)/nrow)
-	if(length(data) == 1 && data == 0 && !identical(sparse,FALSE)) {
+	if(length(data) == 1 && !is.na(data) && data == 0 &&
+           !identical(sparse, FALSE)) {
+
 	    if(is.null(sparse)) sparse <- TRUE
 	    ## will be sparse: do NOT construct full matrix!
 	    data <- new(if(is.numeric(data)) "dgTMatrix" else
