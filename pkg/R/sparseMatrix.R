@@ -59,7 +59,7 @@ setAs("graphAM", "sparseMatrix",
 	  }
       })
 
-setAs("graph", "sparseMatrix",
+setAs("graph", "CsparseMatrix",
       function(from) as(as(from, "graphNEL"), "sparseMatrix"))
 }
 
@@ -95,9 +95,6 @@ setAs("graphNEL", "CsparseMatrix",
           as(dtm, "CsparseMatrix")
 ## 	  }
       })
-
-setAs("graphNEL", "sparseMatrix", function(from) as(from, "CsparseMatrix"))
-
 
 setAs("sparseMatrix", "graph", function(from) as(from, "graphNEL"))
 setAs("sparseMatrix", "graphNEL",
