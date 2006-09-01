@@ -49,11 +49,16 @@ setAs("CsparseMatrix", "matrix",
 ### Some group methods:
 
 setMethod("Arith",
+	  signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
+	  function(e1, e2) callGeneric(as(e1, "dgCMatrix"),
+				       as(e2, "dgCMatrix")))
+
+setMethod("Arith",
 	  signature(e1 = "CsparseMatrix", e2 = "numeric"),
 	  function(e1, e2) {
 	      if(length(e2) == 1) { ## e.g.,  Mat ^ a
 		  f0 <- callGeneric(0, e2)
-		  if(!is.na(f0) && f0 == 0.) { # remain sparse, symm., tri.,...
+		  if(is0(f0)) { # remain sparse, symm., tri.,...
 		      e1@x <- callGeneric(e1@x, e2)
 		      return(e1)
 		  }
@@ -68,7 +73,7 @@ setMethod("Arith",
 	  function(e1, e2) {
 	      if(length(e1) == 1) {
 		  f0 <- callGeneric(e1, 0)
-		  if(!is.na(f0) && f0 == 0.) {
+		  if(is0(f0)) {
 		      e2@x <- callGeneric(e1, e2@x)
 		      return(e2)
 		  }
@@ -77,11 +82,12 @@ setMethod("Arith",
 	  })
 
 
+
 setMethod("Math",
 	  signature(x = "CsparseMatrix"),
 	  function(x) {
 	      f0 <- callGeneric(0.)
-	      if(!is.na(f0) && f0 == 0.) {
+	      if(is0(f0)) {
 		  ## sparseness, symm., triang.,... preserved
 		  x@x <- callGeneric(x@x)
 		  x
@@ -166,7 +172,7 @@ setMethod("crossprod", signature(x = "CsparseMatrix", y = "matrix"),
 
 setMethod("crossprod", signature(x = "CsparseMatrix", y = "numeric"),
 	  function(x, y = NULL) .Call(Csparse_dense_crossprod, x, y))
-          
+
 setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "missing"),
 	  function(x, y = NULL) {
               .Call(Csparse_crossprod, x, trans = TRUE, triplet = FALSE)
@@ -206,7 +212,7 @@ setMethod("%*%", signature(x = "matrix", y = "CsparseMatrix"),
 ##setMethod("%*%", signature(x = "numeric", y = "CsparseMatrix"),
 ##          function(x, y) t(.Call(Csparse_dense_crossprod, y, x)),
 ##          valueClass = "dgeMatrix")
-          
+
 ## NB: have extra tril(), triu() methods for symmetric ["dsC" and "lsC"]
 setMethod("tril", "CsparseMatrix",
 	  function(x, k = 0, ...) {

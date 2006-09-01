@@ -25,9 +25,10 @@
 \alias{colSums,CsparseMatrix-method}
 \alias{rowMeans,CsparseMatrix-method}
 \alias{rowSums,CsparseMatrix-method}
-%% Group methods --------- FIXME: These are not tested yet (or documented)
-\alias{Arith,numeric,CsparseMatrix-method}
+%% Group methods --------- FIXME: not tested yet (or documented)
+\alias{Arith,CsparseMatrix,CsparseMatrix-method}
 \alias{Arith,CsparseMatrix,numeric-method}
+\alias{Arith,numeric,CsparseMatrix-method}
 \alias{Math,CsparseMatrix-method}
 %
 \title{Class "CsparseMatrix" of Sparse Matrices in Column-compressed Form}

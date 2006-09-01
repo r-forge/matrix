@@ -282,30 +282,32 @@ setMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY", drop = "ANY"),
 	  function(x,i,j, drop)
           stop("invalid or not-yet-implemented 'Matrix' subsetting"))
 
-##  "logical *vector* indexing, such as  M [ M >= 10 ] :
+## logical indexing, such as M[ M >= 7 ] *BUT* also M[ M[,1] >= 3,],
+## The following is *both* for    M [ <logical>   ]
+##                 and also for   M [ <logical> , ]
+.M.sub.i.logical <- function (x, i, j, drop)
+{
+    nA <- nargs()
+    if(nA == 2) { ##  M [ M >= 7 ]
+	as(x, geClass(x))@x[as.vector(i)]
+	## -> error when lengths don't match
+    } else if(nA == 3) { ##  M [ M[,1, drop=FALSE] >= 7, ]
+	stop("not-yet-implemented 'Matrix' subsetting") ## FIXME
+
+    } else stop("nargs() = ", nA,
+		" should never happen; please report.")
+}
 setMethod("[", signature(x = "Matrix", i = "lMatrix", j = "missing",
 			 drop = "ANY"),
-	  function (x, i, j, drop) {
-	      as(x, geClass(x))@x[as.vector(i)]
-              ## -> error when lengths don't match
-          })
-
-## FIXME: The following is good for    M [ <logical>   ]
-##        *BUT* it also triggers for   M [ <logical> , ] where it is *WRONG*
-##       using nargs() does not help: it gives '3' for both cases
-if(FALSE)
+	  .M.sub.i.logical)
 setMethod("[", signature(x = "Matrix", i = "logical", j = "missing",
 			 drop = "ANY"),
-	  function (x, i, j, drop) {
-	      ## DEBUG
-	      cat("[(Matrix,i,..): nargs=", nargs(),"\n")
-	      as(x, geClass(x))@x[i] })
+	  .M.sub.i.logical)
 
 
 ## "FIXME:"
-## How can we get at   A[ ij ]	where ij is (i,j) 2-column matrix?
-##  and                A[ LL ]	where LL is a logical *vector*
-## -> [.data.frame uses nargs() - can we do this in the *generic* ?
+## ------ get at  A[ ij ]  where ij is (i,j) 2-column matrix?
+
 
 
 ### "[<-" : -----------------

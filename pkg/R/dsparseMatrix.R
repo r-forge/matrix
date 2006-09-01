@@ -13,9 +13,6 @@ setMethod("crossprod", signature(x = "dsparseMatrix", y = "ddenseMatrix"),
 setMethod("crossprod", signature(x = "ddenseMatrix", y = "dsparseMatrix"),
           function(x, y = NULL) callGeneric(as(x, "dgeMatrix"), y))
 
-setMethod("diag", signature(x = "dsparseMatrix"),
-	  function(x, nrow, ncol = n) diag(as(x, "dgCMatrix")))
-
 ## and coerce dsparse* to dgC*
 ## setMethod("%*%", signature(x = "dsparseMatrix", y = "dgeMatrix"),
 ##           function(x, y) callGeneric(as(x, "dgCMatrix"), y))
@@ -46,29 +43,7 @@ setMethod("lu", signature(x = "dsparseMatrix"),
 ## Group Methods, see ?Arith (e.g.)
 ## -----
 
-## Cheap version: work via "dgCMatrix" and use the group methods there:
-## NB: have also CsparseMatrix methods (-> ./Csparse.R )
-## which may preserve "symmetric", "triangular", ...
-## those must trigger *before* these [currently works via alphabetic order..!]
-setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
-          signature(e1 = "dsparseMatrix", e2 = "dsparseMatrix"),
-          function(e1, e2) callGeneric(as(e1, "dgCMatrix"),
-                                       as(e2, "dgCMatrix")))
-setMethod("Arith",
-          signature(e1 = "dsparseMatrix", e2 = "numeric"),
-          function(e1, e2) callGeneric(as(e1, "dgCMatrix"), e2))
-setMethod("Arith",
-          signature(e1 = "numeric", e2 = "dsparseMatrix"),
-          function(e1, e2) callGeneric(e1, as(e2, "dgCMatrix")))
-
-
-setMethod("Math",
-	  signature(x = "dsparseMatrix"),
-	  function(x) {
-	      r <- callGeneric(as(x, "dgCMatrix"))
-	      if(is(r, "dsparseMatrix")) as(r, class(x))
-	  })
-
+##-> now moved to ./Csparse.R (and 'up' to ./sparseMatrix.R):
 ##  "Math2" is in ./dMatrix.R
 
 
