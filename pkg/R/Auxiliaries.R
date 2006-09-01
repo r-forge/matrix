@@ -1,6 +1,8 @@
 #### "Namespace private" Auxiliaries  such as method functions
 #### (called from more than one place --> need to be defined early)
 
+.isR_24 <- (paste(R.version$major, R.version$minor, sep=".") >= "2.4")
+
 ## Need to consider NAs ;  "== 0" even works for logical & complex:
 is0  <- function(x) !is.na(x) & x == 0
 all0 <- function(x) !any(is.na(x)) && all(x == 0)
@@ -92,8 +94,9 @@ colCheck <- function(a, b) {
 ## ----  "*sy" and "*tr" which have "undefined" lower or upper part
 isPacked <- function(x)
 {
-    ## Is 'x' a packed (dense) matrix ? -- gives also TRUE for sparse
-    is(x,"Matrix") && !is.null(x@x) && length(x@x) < prod(dim(x))
+    ## Is 'x' a packed (dense) matrix ?
+    is(x, "denseMatrix") &&
+    any("x" == slotNames(x)) && length(x@x) < prod(dim(x))
 }
 
 emptyColnames <- function(x)
@@ -117,8 +120,9 @@ prTriang <- function(x, digits = getOption("digits"),
 	cf[row(cf) > col(cf)] <- "."
     else
 	cf[row(cf) < col(cf)] <- "."
-## TODO (in R): print() should accept 'maxp'
-    print(cf, quote = FALSE, right = right)
+    if(.isR_24)
+	 print(cf, quote = FALSE, right = right, max = maxp)
+    else print(cf, quote = FALSE, right = right)
     invisible(x)
 }
 
@@ -129,9 +133,12 @@ prMatrix <- function(x, digits = getOption("digits"),
     cat(sprintf('%d x %d Matrix of class "%s"\n', d[1], d[2], cl))
     if(prod(d) <= maxp) {
 	if(is(x, "triangularMatrix"))
-	    prTriang(x, digits = digits)
-	else
-	    print(as(x, "matrix"), digits = digits)
+	    prTriang(x, digits = digits, maxp = maxp)
+	else {
+	    if(.isR_24)
+		 print(as(x, "matrix"), digits = digits, max = maxp)
+	    else print(as(x, "matrix"), digits = digits)
+	}
     }
     else { ## d[1] > maxp / d[2] >= nr :
 	m <- as(x, "matrix")
@@ -232,7 +239,7 @@ uniqTsparse <- function(x, class.x = c(class(x))) {
 	   "lsTMatrix" = as(as(x, "lsCMatrix"), "lsTMatrix"),
 	   "ltTMatrix" = as(as(x, "ltCMatrix"), "ltTMatrix"),
 	   ## otherwise:
-	   stop("not yet implemented for class ", clx))
+	   stop("not yet implemented for class ", class.x))
 }
 
 ## Note: maybe, using
@@ -243,6 +250,10 @@ uniqTsparse <- function(x, class.x = c(class(x))) {
 uniq <- function(x) {
     if(is(x, "TsparseMatrix")) uniqTsparse(x) else x
     ## else:  not 'Tsparse', i.e. "uniquely" represented in any case
+}
+
+asTuniq <- function(x) {
+    if(is(x, "TsparseMatrix")) uniqTsparse(x) else as(x,"TsparseMatrix")
 }
 
 if(FALSE) ## try an "efficient" version

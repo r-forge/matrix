@@ -73,6 +73,7 @@ setMethod("Summary", signature(x = "dMatrix", na.rm = "ANY"),
 ## "Compare" -> returning  logical Matrices
 setMethod("Compare", signature(e1 = "numeric", e2 = "dMatrix"),
           function(e1,e2) {
+              ## "swap RHS and LHS" :
               switch(.Generic,
                      "==" =, "!=" = callGeneric(e2, e1),
                      "<" =, ">" =, "<=" =, ">=" = !callGeneric(e2, e1))
@@ -100,6 +101,7 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
                                Dim = dim(e1), Dimnames = dimnames(e1))
                   else { ## packed matrix with structural 0 and r0 is not FALSE:
                       ##--> result cannot be packed anymore
+                      .bail.out.2(.Generic, class(e1), class(e2))
                       dr <- as(r, fullCl)
                       ## FIXME: implement this:
                       dr[ind.0(e1)] <- r0
@@ -108,21 +110,37 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
               else { ## dsparseMatrix => lClass is "lsparse*"
 
 		  if(identical(r0, FALSE)) { ## things remain sparse
-                      r <- new(lClass, Dim = dim(e1), Dimnames = dimnames(e1))
-                      for(n in setdiff(c("i","j","p"), slotNames(r)))
-                          slot(r, n) <- slot(e1, n)
-
+		      if((Ar <- all(r)) || !any(r)) {
+			  r <- new(lClass, Dim= dim(e1), Dimnames= dimnames(e1))
+			  if(Ar) # 'TRUE' instead of 'x': same sparsity:
+			      for(n in intersect(c("i","j","p"), slotNames(r)))
+				  slot(r, n) <- slot(e1, n)
+			  ## else: all FALSE: keep empty 'r' matrix
+		      } else { # some TRUE, some FALSE: go via unique 'Tsparse'
+			  M <- asTuniq(e1)
+			  rx <- callGeneric(M@x, e2)
+                          ## FIXME! what if  any(is.na(rx))  ? !!!
+			  r <- new(class2(class(M), 'l'), # logical Tsparse
+				   i = M@i[rx], Dim = M@Dim,
+				   j = M@j[rx], Dimnames = M@Dimnames)
+			  if(is(e1, "CsparseMatrix"))
+			      r <- as(r, "CsparseMatrix")
+			  else if(is(e1, "RsparseMatrix"))
+			      r <- as(r, "RsparseMatrix")
+		      }
 		  } else {
-                      warning("sparse to dense coercion in ",.Generic)
+		      message(sprintf("sparse to dense coercion in '%s'",
+				      .Generic))
+                      r <- new(lClass, x = r,
+                               Dim = dim(e1), Dimnames = dimnames(e1))
 
-                      .bail.out.2(.Generic, class(e1), class(e2))
                       ## NOT YET:
+                      .bail.out.2(.Generic, class(e1), class(e2))
 
                       ## non sparse result
-                      dr <- as(r,
-                               if(isSymmetric(r))"lsyMatrix" else "lgeMatrix")
+
                       ## FIXME: implement this:
-                      dr[ind.0(e1)] <- r0
+                      r[ind.0(e1)] <- r0
                   }
 	      }
               r

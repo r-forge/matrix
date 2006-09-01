@@ -3,7 +3,9 @@
 ### Idea: Coercion between *VIRTUAL* classes -- as() chooses "closest" classes
 ### ----  should also work e.g. for  dense-triangular --> sparse-triangular !
 
-##-> see  ./dMatrix.R  and  ./lMatrix.R
+##-> see als ./dMatrix.R, ./ddenseMatrix.R  and  ./lMatrix.R
+
+setAs("ANY", "sparseMatrix", function(from) as(from, "CsparseMatrix"))
 
 
 ## "graph" coercions -- this needs the graph package which is currently
@@ -194,6 +196,28 @@ setMethod("-", signature(e1 = "lsparseMatrix", e2 = "missing"),
 setMethod("-", signature(e1 = "pMatrix", e2 = "missing"),
           function(e1) callGeneric(as(e1, "lgTMatrix")))
 
+## Group method  "Arith"
+
+## have CsparseMatrix methods (-> ./Csparse.R )
+## which may preserve "symmetric", "triangular" -- simply defer to those:
+
+setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
+	  signature(e1 = "sparseMatrix", e2 = "sparseMatrix"),
+	  function(e1, e2) callGeneric(as(e1, "CsparseMatrix"),
+				       as(e2, "CsparseMatrix")))
+setMethod("Arith",
+	  signature(e1 = "sparseMatrix", e2 = "numeric"),
+	  function(e1, e2) callGeneric(as(e1, "CsparseMatrix"), e2))
+setMethod("Arith",
+	  signature(e1 = "numeric", e2 = "sparseMatrix"),
+	  function(e1, e2) callGeneric(e1, as(e2, "CsparseMatrix")))
+
+setMethod("Math",
+	  signature(x = "sparseMatrix"),
+	  function(x) callGeneric(as(x, "CsparseMatrix")))
+
+
+
 ### --- show() method ---
 
 ## FIXME(?) -- ``merge this'' (at least ``synchronize'') with
@@ -286,6 +310,9 @@ setMethod("isDiagonal", signature(object = "sparseMatrix"),
 	      all(gT@i == gT@j)
 	  })
 
+
+setMethod("diag", signature(x = "sparseMatrix"),
+	  function(x, nrow, ncol = n) diag(as(x, "CsparseMatrix")))
 
 ## .as.dgT.Fun
 setMethod("colSums",  signature(x = "sparseMatrix"), .as.dgT.Fun)

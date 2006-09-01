@@ -1,3 +1,22 @@
+2006-09-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R: add coercion from "ANY" to "sparseMatrix"
+	* R/denseMatrix.R:  add coercion from "ANY" to "denseMatrix"
+
+	* R/Matrix.R ([): use nargs() to disambiguate M[i] and M[i,]
+
+2006-08-31  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (Arith): moved Arith group method one-level up
+	from "dsparse" to "sparse" and now go via "Csparse" instead of "dgC"
+	* R/dsparseMatrix.R: dito
+	* R/Csparse.R: dito
+
+2006-08-31  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dMatrix.R (Compare): improve availability of "<", etc
+	* R/Auxiliaries.R (asTuniq): new; also make use of R 2.4.x print(*,max)
+
 2006-08-30  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/dgCMatrix.R: aargh: "Arith(<dgC>, numeric)" was wrong because
