@@ -74,7 +74,6 @@ We assign 0 to some columns and rows to ``sparsify'' it,
 M2[, c(2,4:6)] <- 0
 M2[2, ] <- 0
 M2 <- rbind(0, M2, 0)
-M2
 @
 and then coerce it to a sparse matrix,
 @
@@ -88,8 +87,26 @@ but addition with a ``dense'' object does not.
 @
 <<add1>>=
 sM + 10
-sM + M2
+sM / 10  +  M2 %/% 2
 @ %def
+
+Operations on our classed matrices include
+(componentwise) arithmetic ($+$, $-$, $*$, $/$, etc) as partly seen above,
+comparison ($>$, $\le$, etc), e.g.,
+<<Comp1>>=
+str(sM > 2)
+@
+%% debug the above with
+%% trace(">", browser, exit=browser,signature=signature("dgCMatrix","numeric"))
+returning a logical sparse matrix.
+%
+Further, \code{"Math"}-operations (such as
+\Rfun{exp}, \Rfun{sin} or \Rfun{gamma}) and \code{"Math2"} (\Rfun{round} etc)
+and the \code{"Summary"} group of functions, \Rfun{min}, \Rfun{range},
+\Rfun{sum}, etc.  Note that all these are implemented via so called
+\emph{group methods}, see e.g., \code{?Arith} in \RR.
+
+\TODO{subsetting, subassign}
 
 
 \FIXME{2nd introduction -- maybe keep some?}
@@ -128,26 +145,25 @@ matrices, such as triangular matrices and symmetric matrices.
 %% fully developed as it could be.
 
 Also there is no direct support for sparse matrices in \RR{} although
-\citet{koen:ng:2003} have developed a contributed package for sparse
+\citet{koen:ng:2003} have developed the \pkg{SparseM} package for sparse
 matrices based on SparseKit.
 
 The \code{Matrix} package provides S4 classes and methods for dense
 and sparse matrices.  The methods for dense matrices use Lapack and
 BLAS.  The sparse matrix methods use
-CHOLMOD~\citep{Cholmod}, CSPARSE~\citep{Csparse} (which also use BLAS)
+CHOLMOD~\citep{Cholmod}, CSparse~\citep{Csparse} (which also use BLAS)
 \FIXME{}
 %%  and TAUCS~\citep{Taucs},
 %% UMFPACK~\citep{Umfpack}, and Metis~\citep{Metis}.
 
-\TODO{operations on classed matrices include
-  arithmetic,
-  subsetting, subassign}
 \TODO{\Rfun{triu}, \Rfun{tril}, \Rfun{diag}, ...
   and  \command{as(.,.)} , but of course only when they've seen a few
   different ones.}
 
 \TODO{matrix operators include \code{\%*\%}, \Rfun{crossprod},
   \Rfun{tcrossprod}, \Rfun{solve}}
+
+\TODO{\Rfun{expm} is the matrix exponential ... ...}
 
 \TODO{factorizations include \Rfun{Cholesky} (or \Rfun{chol}), \Rfun{lu}, \Rfun{qr} (not yet for dense)}
 
