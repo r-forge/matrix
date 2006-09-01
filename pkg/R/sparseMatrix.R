@@ -60,8 +60,7 @@ setAs("graphAM", "sparseMatrix",
       })
 
 setAs("graph", "CsparseMatrix",
-      function(from) as(as(from, "graphNEL"), "sparseMatrix"))
-}
+      function(from) as(as(from, "graphNEL"), "CsparseMatrix"))
 
 setAs("graphNEL", "CsparseMatrix",
       function(from) {
