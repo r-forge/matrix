@@ -269,7 +269,7 @@ SEXP ddense_band(SEXP x, SEXP k1P, SEXP k2P)
 	i, j, k1 = asInteger(k1P), k2 = asInteger(k2P);
     int m = adims[0], n = adims[1], sqr = (adims[0] == adims[1]),
 	tru = (k1 >= 0), trl = (k2 <= 0);
-    double *aax, *ax = REAL(GET_SLOT(ans, Matrix_xSym));
+    double *ax = REAL(GET_SLOT(ans, Matrix_xSym));
 
     if (k1 > k2)
 	error(_("Lower band %d > upper band %d"), k1, k2);
