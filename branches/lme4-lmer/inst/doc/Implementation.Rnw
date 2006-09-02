@@ -1,0 +1,604 @@
+\documentclass[12pt]{article}
+\usepackage{Sweave}
+\usepackage{myVignette}
+\usepackage[authoryear,round]{natbib}
+\bibliographystyle{plainnat}
+\DefineVerbatimEnvironment{Sinput}{Verbatim}
+{formatcom={\vspace{-2.5ex}},fontshape=sl,
+  fontfamily=courier,fontseries=b, fontsize=\scriptsize}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}
+{formatcom={\vspace{-2.5ex}},fontfamily=courier,fontseries=b,%
+  fontsize=\scriptsize}
+%%\VignetteIndexEntry{Implementation Details}
+%%\VignetteDepends{Matrix}
+%%\VignetteDepends{lattice}
+%%\VignetteDepends{lme4}
+\begin{document}
+\SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,strip.white=TRUE}
+\SweaveOpts{prefix=TRUE,prefix.string=figs/Example,include=FALSE}
+\setkeys{Gin}{width=\textwidth}
+\title{Linear mixed model implementation in lme4}
+\author{Douglas Bates\\Department of Statistics\\University of
+  Wisconsin -- Madison\\\email{Bates@wisc.edu}}
+\maketitle
+\begin{abstract}
+  Expressions for the evaluation of the profiled log-likelihood or
+  profiled log-restricted-likelihood of a linear mixed model, the
+  gradients and Hessians of these criteria, and update steps for an
+  ECME algorithm to optimize these criteria are given in Bates and
+  DebRoy (2004). In this paper we generalize those formulae and
+  describe the representation of mixed-effects models using sparse
+  matrix methods available in the \code{Matrix} package.
+\end{abstract}
+
+<<preliminaries,echo=FALSE,print=FALSE>>=
+library(lattice)
+library(Matrix)
+#library(lme4)
+#data("Early", package = "mlmRev")
+options(width=80, show.signif.stars = FALSE,
+        lattice.theme = function() canonical.theme("pdf", color = FALSE))
+@
+\section{Introduction}
+\label{sec:Intro}
+
+General formulae for the evaluation of the profiled log-likelihood and
+profiled log-restricted-likelihood in a linear mixed model are given
+in \citet{bate:debr:2004}.  Here we describe a more general
+formulation of the model using sparse matrix decompositions and
+describe the implementation of these methods in the \code{lmer}
+function for \RR{}.
+
+In \S\ref{sec:Form} we describe the form and representation of the
+model.  The calculation of the criteria to be optimized by the
+parameter estimates and related quantities is discussed in
+\S\ref{sec:likelihood}.
+
+% Details of the calculation of the ECME step and the
+% evaluation of the gradients of the criteria are given in
+% \S\ref{sec:ECME} and those of the Hessian in \S\ref{sec:Hessian}.  In
+% \S\ref{sec:Unconstrained} we give the details of an unconstrained
+% parameterization for the model and the transformation of our
+% results to this parameterization.
+
+\section{Form and representation of the model}
+\label{sec:Form}
+
+We consider linear mixed models of the form
+\begin{equation}
+  \label{eq:lmeGeneral}
+  \by=\bX\bbeta+\bZ\bb+\beps\quad
+  \beps\sim\mathcal{N}(\bzer,\sigma^2\bI),
+  \bb\sim\mathcal{N}(\bzer,\bSigma),
+  \beps\perp\bb
+\end{equation}
+where $\by$ is the $n$-dimensional response vector, $\bX$ is an
+$n\times p$ model matrix for the $p$ dimensional fixed-effects vector
+$\bbeta$, $\bZ$ is the $n\times q$ model matrix for the $q$
+dimensional random-effects vector $\bb$, which has a Gaussian
+distribution with mean $\bzer$ and variance-covariance matrix
+$\bSigma$, and $\beps$ is the random noise assumed to have a spherical
+Gaussian distribution.  The symbol $\perp$ indicates independence of
+random variables.
+
+We will assume that $\bX$ has full column rank and that $\bSigma$ is
+positive definite.
+
+\subsection{Structure of the variance-covariance matrix}
+\label{sec:sigmaStructure}
+
+Components of the random effects vector $\bb$ and portions of its
+variance-covariance matrix $\bSigma$ are associated with $k$ grouping
+factors $\bbf_i, i=1,\dots,k$, each of length $n$, and with the $n_i,
+i = 1,\dots,k$ levels of each of the grouping factors.  In general
+there are $q_i$ components of $\bb$ associated with each of the $n_i$
+levels the grouping factor $\bbf_i, i = 1,\dots,k$.  Thus
+\begin{equation}
+  \label{eq:qdef}
+  q = \sum_{i=1}^k n_i q_i 
+\end{equation}
+
+We assume that the components of $\bb$ and the rows and columns of
+$\bSigma$ are ordered according to the $k$ grouping factors and,
+within the block for the $i$th grouping factor, according to the $n_i$
+levels of the grouping factor.
+
+Random effects associated with different grouping factors are
+independent.  This implies that $\bSigma$ is block-diagonal with $k$
+diagonal blocks of orders $n_i q_i, i=1,\dots,k$.
+
+Random effects associated with different levels of the same grouping
+factor are independent.  This implies that the $i$th (outer) diagonal
+block of $\bSigma$ is itself block diagonal in $n_i$ blocks of order $q_i$.
+We say that the structure of $\bSigma$ is block/block diagonal.
+
+Finally, the variance-covariance matrix within each of the
+$q_i$-dimensional subvectors of $\bb$ associated with one of the $n_i$
+levels of grouping factor $\bbf_i, i=1,\dots,k$ is a constant (but
+unknown) positive-definite symmetric $q_i\times q_i$ matrix
+$\bSigma_i,i=1,\dots,k$.  This implies that each of the $n_i$ inner
+diagonal blocks of order $q_i$ is a copy of $\bSigma_i$.  We say that
+$\bSigma$ has a \emph{repeated block/block diagonal} structure.
+
+In the notation of the Kronecker product, the $i$th outer diagonal
+block of $\bSigma$ is $\bI_{n_i}\otimes\bSigma_i$.
+
+\subsection{The relative precision matrix}
+\label{sec:relativePrecision}
+
+Many of the computational formulae that follow are more conveniently
+expressed in terms of $\bSigma^{-1}$, which is called the
+\emph{precision} matrix of the random effects, than in terms of
+$\bSigma$, the variance-covariance matrix.  In fact, the formulae are
+most conveniently expressed in terms of the \emph{relative precision
+  matrix} $\sigma^2\bSigma^{-1}$ which we write as $\bOmega$.  That
+is,
+\begin{equation}
+  \label{eq:relPrec}
+  \bOmega = \sigma^2\bSigma^{-1}
+\end{equation}
+
+This called the ``relative'' precision because it is precision of
+$\bb$ (i.e.{} $\bSigma^{-1}$) relative to the precision of $\beps$
+(i.e.{} $\sigma^{-2}\bI$).
+
+It is easy to establish that $\bOmega$ will have a repeated
+block/block diagonal structure like that of $\bSigma$.  That is,
+$\bOmega$ consists of $k$ outer diagonal blocks of sizes $n_i q_i, i =
+1,\dots,k$ and the $i$th outer diagonal block is itself block diagonal
+with $n_i$ inner blocks of size $q_i\times q_i$.  Furthermore, each of
+the inner diagonal blocks in the $i$th outer block is a copy of the
+$q_i\times q_i$ positive-definite, symmetric matrix $\bOmega_i$.
+
+Because $\bOmega$ has a repeated block/block structure we can define
+the entire matrix by specifying the symmetric matrices $\bOmega_i, i =
+1,\dots,k$ and, because of the symmetry, $\bOmega_i$ has at most
+$q_i(q_i+1)/2$ distinct elements.  We will write a parameter vector of
+length at most $\sum_{i=1}^{k}q_i(q_i+1)/2$ that determines $\bOmega$
+as $\btheta$.  For example, we could define $\btheta$ to be the
+non-redundant elements in the $\bOmega_i$, although in the actual
+computations we use a different, but equivalent, parameterization for
+reasons to be discussed later.
+
+We only need to store the matrices $\bOmega_i,i=1,\dots,k$ and the
+number of levels in the grouping factors to be able to create $\bOmega$.
+The matrices $\bOmega_i$ are stored in the \code{Omega} slot of an
+object of class \code{"lmer"}. The values of $k$ and $n_i,
+i=1,\dots,k$ can be determined from the list of the grouping factors
+themselves, stored as the \code{flist} slot, or from the dimensions
+$q_i,i=1,\dots,k$, stored in the \code{nc} slot, and the group
+pointers, stored in the \code{Gp} slot.  The group pointers are the
+(0-based) indices of the first component of $\bb$ associated with the
+$i$th grouping factor.  The last element of \code{Gp} is the number of
+elements in $\bb$.
+
+Thus successive differences of the group pointers are the total number
+of components of $\bb$ associated with the $i$th grouping factor.
+That is, these differences are $n_i q_i,i=1,\dots,k$.  The first
+element of the \code{Gp} slot is always 0.
+
+\subsection{Examples}
+\label{sec:OmegaExamp}
+
+Consider the fitted models
+<<fmi>>=
+Sm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
+data(Chem97, package = "mlmRev")
+Cm1 <- lmer(score ~ gcsescore + (1|school) + (1|lea), Chem97,
+            control = list(niterEM = 0, gradient = FALSE))
+data(star, package = "mlmRev")
+Mm1 <- lmer(math ~ gr+sx*eth+cltype+(yrs|id)+(1|tch)+(yrs|sch), star,
+            control = list(niterEM = 0, gradient = FALSE))
+@ 
+
+Model \code{Sm1} has a single grouping factor with $18$ levels and
+$q_1=2$.  The \code{Omega} slot is a list of length one containing a
+$2\times 2$ symmetric matrix.  There are $36$ elements in $\bb$.
+<<Sm1grp>>=
+str(Sm1@flist)
+show(Sm1@Omega)
+show(Sm1@nc)
+show(Sm1@Gp)
+diff(Sm1@Gp)/Sm1@nc
+@ 
+
+Model \code{Cm1} has two grouping factors: the \code{school} factor
+with 2410 levels and the \code{lea} factor (local education authority
+- similar to a school district in the U.S.A.) with 131 levels.  It
+happens that the \code{school} factor is nested within the \code{lea}
+factor, a property that we discuss below. The \code{Omega} slot is a
+list of length two containing two $1\times 1$ symmetric matrices.
+<<Cm1grp>>=
+str(Cm1@flist)
+show(Cm1@Omega)
+show(Cm1@nc)
+show(Cm1@Gp)
+diff(Cm1@Gp)/Cm1@nc
+@ 
+
+Model \code{Mm1} has three grouping factors: \code{id} (student)
+with 10732 levels, \code{tch} (teacher) with 1374 levels and
+\code{sch} (school) with 80 levels. The \code{Omega} slot is a
+list of length three containing two $2\times 2$ symmetric matrices and
+one $1\times 1$ matrix.
+<<Mm1grp>>=
+str(Mm1@flist)
+show(Mm1@Omega)
+show(Mm1@nc)
+show(Mm1@Gp)
+diff(Mm1@Gp)/Mm1@nc
+@ 
+
+The last element of the \code{Gp} slot is the dimension of $\bb$.
+Notice that for model \code{Mm1} the dimension of $\bb$ is 22,998.
+This is also the order of the symmetric matrix $\bOmega$ although the
+contents of the matrix are determined by $\btheta$ which has a length
+of $3+1+3=7$ in this case.
+
+Table~\ref{tbl:dims} summarizes some of the dimensions in these examples.
+
+\begin{table}[tb]
+  \centering
+  \begin{tabular}{r r r r r r r r r r r c}
+    \hline
+    \multicolumn{1}{c}{Name}&\multicolumn{1}{c}{$n$}&\multicolumn{1}{c}{$p$}&
+    \multicolumn{1}{c}{$k$}&
+    \multicolumn{1}{c}{$n_1$}&\multicolumn{1}{c}{$q_1$}&
+    \multicolumn{1}{c}{$n_2$}&\multicolumn{1}{c}{$q_2$}&
+    \multicolumn{1}{c}{$n_3$}&\multicolumn{1}{c}{$q_3$}&
+    \multicolumn{1}{c}{$q$}&\multicolumn{1}{c}{$\#(\btheta)$}\\
+    \hline
+    \code{Sm1}&  180& 2&1&   18&2&    & &  & &   36&3\\
+    \code{Cm1}&31022& 2&2& 2410&1& 131&1&  & & 2541&2\\
+    \code{Mm1}&24578&17&3&10732&2&1374&1&80&2&22998&7\\
+    \hline
+  \end{tabular}
+  \caption{Dimensions of model matrices $\bX$ and $\bZ$ for example
+    model fits.  The model matrix $\bX$ is $n\times p$ and dense.  The
+    model matrix $\bZ$ is $n\times q$ and sparse.  The
+    variance-covariance matrix $\bSigma$ of the random effects $\bb$
+    is $q\times q$ and repeated block/block diagonal with $k$ outer
+    blocks of sizes $n_i q_i,i=1,\dots,k$ each consisting of $n_i$
+    inner blocks of size $q_i\times q_i$.  The matrix $\bSigma$ is
+    determined by a parameter $\btheta$ whose length is shown in the table.}
+  \label{tbl:dims}
+\end{table}
+
+\subsection{Permutation of the random-effects vector}
+\label{sec:permutation}
+
+For most mixed-effects model fits, the model matrix $\bZ$ for the
+random effects vector $\bb$ is large and sparse.  That is, most of the entries
+in $\bZ$ are zero (by design, not by accident).
+
+Numerical analysts have developed special techniques for representing
+and manipulating sparse matrices. Of particular importance to us are
+techniques for obtaining the left Cholesky factor $\bL$ of
+large, sparse, positive-definite, symmetric matrices.  In
+particular, we want to obtain the Cholesky factorization of
+$\bZ\trans\bZ+\bOmega(\btheta)$ for different values of $\btheta$.
+
+Sparse matrix operations are typically performed in two phases: a
+\emph{symbolic phase}, in which the number of non-zero elements in the
+result and their positions are determined, followed by a \emph{numeric
+  phase}, in which the actual numeric values are calculated.  Advanced
+sparse Cholesky factorization software, such as the CHOLMOD library
+(Davis, 2005) that we use, allow for calculation of a fill-reducing
+permutation of the rows and columns during the symbolic phase.  In
+fact the CHOLMOD code allows for evaluation of both a fill-reducing
+permutation and a post-ordering that groups together columns of $\bL$
+with identical patterns of nonzeros, thus allowing for dense matrix
+techniques to be used on these blocks of columns or ``super-nodes''.
+Such a decomposition is called a \emph{supernodal} Cholesky
+factorization.
+
+Because the number of nonzeros in $\bOmega(\btheta)$ and their positions
+do not change with $\btheta$ and because the nonzeros in $\bOmega(\btheta)$
+are a subset of the nonzeros in $\bZ\trans\bZ$, we need only perform
+the symbolic phase once and we can do on $\bZ\trans$ (the CHOLMOD
+library has a module that calculates the permutation for a super-nodal
+decomposition of $\bZ\trans\bZ$ from $\bZ\trans$). That is, using
+$\bZ\trans$ only we can determine the permutation matrix $\bP$ for all
+supernodal decompositions of the form
+\begin{equation}
+  \label{eq:Cholesky}
+  \bP\left[\bZ\trans\bZ+\bOmega(\btheta)\right]\bP\trans = \bL(\btheta)\bL(\btheta)\trans
+\end{equation}
+
+We revise (\ref{eq:lmeGeneral}) by incorporating the permutation to obtain
+\begin{equation}
+  \label{eq:lmePerm}
+  \by=\bX\bbeta+\bZ\bP\trans\bP\bb+\beps\quad
+  \beps\sim\mathcal{N}(\bzer,\sigma^2\bI),
+  \bb\sim\mathcal{N}(\bzer,\sigma^2\bSigma),
+  \beps\perp\bb
+\end{equation}
+
+
+\subsection{Extent of the sparsity}
+\label{sec:sparsity}
+
+Table~\ref{tbl:sparse} shows the extent of the sparsity of the
+matrices $\bZ$, $\bZ\trans\bZ$ and $\bL$ in our examples.  
+
+\begin{table}[tb]
+  \centering
+  \begin{tabular}{r r r r r r r r r r r}
+    \hline
+    &&&\multicolumn{2}{c}{$\bZ$}&\multicolumn{2}{c}{$\bZ\trans\bZ$}&
+    \multicolumn{2}{c}{$\bL$}\\
+    \multicolumn{1}{c}{Name}&\multicolumn{1}{c}{$n$}&
+    \multicolumn{1}{c}{$q$}&
+    \multicolumn{1}{c}{nz}&\multicolumn{1}{c}{sp}&
+    \multicolumn{1}{c}{nz}&\multicolumn{1}{c}{sp}&
+    \multicolumn{1}{c}{nz}&\multicolumn{1}{c}{sp}\\
+    \hline
+    \code{Sm1}&  180&   36&    360&0.0556&    54&0.0811&    54&0.0811\\
+    \code{Cm1}&31022& 2541&  62044&0.0008&  4951&0.0015& 13021&0.0040\\
+    \code{Mm1}&24578&22998&1222890&0.0002&130138&0.0005&187959&0.0007\\
+    \hline
+  \end{tabular}
+  \caption{Summary of the sparsity of the model matrix $\bZ$, its
+    crossproduct matrix $\bZ\trans\bZ$ and the left Cholesky factor
+    $\bL$ in the examples.  The notation $\nz{}$ indicates the number
+    of nonzeros in the matrix and $\spr{}$ indicates the sparsity
+    index (the fraction of the elements in the matrix that are
+    non-zero). Because $\bZ\trans\bZ$ is symmetric, only the nonzeros
+    in the upper triangle are counted and the sparsity index is
+    relative to the total number of elements in the upper triangle.}
+    \label{tbl:sparse}
+\end{table}
+
+The matrix $\bL$ is the supernodal representation of the left Cholesky
+factor of $\bP\left(\bZ\trans\bZ+\bOmega\right)\bP\trans$.  Because
+the fill-reducing permutation $\bP$ has been applied the number of
+nonzeros in $\bL$ will generally be less than the number of nonzeros
+in the left Cholesky factor of $\bZ\trans\bZ+\bOmega$.  However, when
+any supernodes of $\bL$ contain more than one column there will be
+elements above the diagonal of $\bL$ stored and these elements are
+necessarily zero.  They are stored in the supernodal factorization so
+that the diagonal block for a supernode can be treated as a dense
+rectangular matrix.  Although these elements are stored in the
+structure they are never used because any calculations involving the
+diagonal blocks take into account its being a lower triangular
+matrix.  We do not count these elements as nonzeros in computing the
+size of $\bL$ or the sparsity index.
+
+In model \code{Sm1} the number of nonzeros in $\bL$ is equal to the
+number of nonzeros in $\bZ\trans\bZ$.  That is, there is no fill-in.
+In model \code{Mm1} the number of nonzeros in $\bL$ is approximately
+144\% the number of nonzeros in $\bZ\trans\bZ$ representing a modest
+amount of fill-in.  For model \code{Cm1} the number of nonzeros in
+$\bL$ is apparently 263\% the number of nonzeros in $\bZ\trans\bZ$,
+which is still not dramatic.  However, it is misleading in that the
+extra ``nonzeros'' are, in fact, systematic zeros.  Models based on a
+nested sequence of grouping factors do not generate any fill-in but
+the pattern in the factor $\bL$ is not of the type that can be
+detected and accomodated by standard algorithms for sparse matrices.
+
+\section{Likelihood and restricted likelihood}
+\label{sec:likelihood}
+
+In general the \emph{maximum likelihood estimates} of the parameters
+in a statistical model are those values of the parameters that
+maximize the likelihood function, which is the same numerical value as
+the probability density of $\by$ given the parameters but regarded as
+a function of the parameters given $\by$, not as a function of $\by$
+given the parameters.
+
+For model (\ref{eq:lmePerm}) the parameters are
+$\bbeta$, $\sigma^2$ and $\btheta$ (as described in
+\S\ref{sec:relativePrecision}, $\btheta$ and $\sigma^2$ jointly
+determine $\bSigma$) so we evaluate the likelihood $L(\bbeta,
+\sigma^2, \btheta|\by)$ as
+\begin{equation}
+  \label{eq:Likelihood1}
+  L(\bbeta, \sigma^2, \btheta|\by) = f_{\by|\bbeta,\sigma^2,\btheta}(\by|\bbeta,\sigma^2,\btheta)
+\end{equation} 
+where $f_{\by|\bbeta,\sigma^2,\btheta}(\by|\bbeta,\sigma^2,\btheta)$
+is the marginal probability density for $\by$ given the parameters.
+
+Because we will need to write several different marginal and
+conditional probability densities in this section, and because expressions like
+$f_{\by|\bbeta,\sigma^2,\btheta}(\by|\bbeta,\sigma^2,\btheta)$ are
+difficult to read, we will adopt a convention sometimes used in the
+Bayesian inference literature that a conditional expression in square
+brackets indicates the probability density of the quantity on the left
+of the $|$ given the quantities on the right of the $|$.  That is
+\begin{equation}
+  \label{eq:Bayesnotation}
+  \left[\by|\bbeta,\sigma^2,\btheta\right]=f_{\by|\bbeta,\sigma^2,\btheta}(\by|\bbeta,\sigma^2,\btheta)
+\end{equation}
+
+Model (\ref{eq:lmePerm}) specifies the conditional distributions
+\begin{equation}
+  \label{eq:ycond}
+  \left[\by|\bbeta,\sigma^2,\bb\right]=
+  \frac{\exp\left\{-\|\by-\bX\bbeta-\bZ\bP\trans\bP\bb\|^2/\left(2\sigma^2\right)\right\}}
+  {\left(2\pi\sigma^2\right)^{n/2}}
+\end{equation}
+and
+\begin{equation}
+  \label{eq:bmarg}
+  \begin{split}
+    \left[\bb|\btheta,\sigma^2\right]&=
+    \frac{\exp\left\{-\bb\trans\bSigma^{-1}\bb/2\right\}}
+    {|\bSigma|^{1/2}\left(2\pi\right)^{q/2}}\\
+    &=\frac{|\bOmega|^{1/2}\exp\left\{-\bb\trans\bOmega\bb/\left(2\sigma^2\right)\right\}}
+    {\left(2\pi\sigma^2\right)^{q/2}}
+  \end{split}
+\end{equation}
+from which we can derive the marginal distribution
+\begin{multline}
+  \label{eq:ymarg}
+  \left[\by|\bbeta,\sigma^2,\btheta\right]=
+  \int_{\bb}\left[\by|\bbeta,\sigma^2,\bb\right]\left[\bb|\btheta,\sigma^2\right]\,d\bb\\
+  =\frac{|\bOmega|^{1/2}}{\left(2\pi\sigma^2\right)^{n/2}}
+  \int_{\bb}
+  \frac{\exp\left\{-\left[\|\by-\bX\bbeta-\bZ\bP\trans\bP\bb\|^2+\bb\trans\bOmega\bb\right]
+      /\left(2\sigma^2\right)\right\}}
+  {\left(2\pi\sigma^2\right)^{q/2}}\,d\bb .
+\end{multline}
+
+\subsection{A penalized least squares representation}
+\label{sec:penalized}
+
+To evaluate the integral in (\ref{eq:ymarg}) we expand the expression
+in the numerator of the exponent
+\begin{equation}
+  \label{eq:numerator}
+  \begin{split}
+    g(\bb,\bbeta|\bZ,\bX,\by,\bP)&=
+    \|\by-\bX\bbeta-\bZ\bP\trans\bP\bb\|^2+\bb\trans\bP\trans\bP\bOmega\bP\trans\bP\bb\\
+    &=\left\|\begin{bmatrix}\bZ\bP\trans&\bX&\by\end{bmatrix}
+    \begin{bmatrix}
+      -\bP\bb\\
+      -\bbeta\\
+      -1
+    \end{bmatrix}\right\|^2+\bb\trans\bP\trans\bP\bOmega\bP\trans\bP\bb\\
+    &=\begin{bmatrix}
+      -\bP\bb\\
+      -\bbeta\\
+      -1
+    \end{bmatrix}\trans
+    \begin{bmatrix}
+      \bP\left(\bZ\trans\bZ+\bOmega\right)\bP\trans & \bP\bZ\trans\bX
+      & \bP\bZ\trans\by \\
+      \bX\trans\bZ\bP\trans & \bX\trans\bX &\bX\trans\by\\
+      \by\trans\bZ\bP\trans & \by\trans\bX &\by\trans\by
+    \end{bmatrix}
+    \begin{bmatrix}
+      -\bP\bb\\
+      -\bbeta\\
+      -1
+    \end{bmatrix}
+  \end{split}
+\end{equation}
+from which we see that the expression is a quadratic form.  
+
+As we have already indicated, we simplify the quadratic form by taking
+a Cholesky decomposition of the positive-definite, symmetric matrix
+defining the form. We write this as
+\begin{multline}
+  \label{eq:Cholesky2}
+    \begin{bmatrix}
+      \bP\left(\bZ\trans\bZ+\bOmega\right)\bP\trans & \bP\bZ\trans\bX
+      & \bP\bZ\trans\by \\
+      \bX\trans\bZ\bP\trans & \bX\trans\bX &\bX\trans\by\\
+      \by\trans\bZ\bP\trans & \by\trans\bX &\by\trans\by
+    \end{bmatrix}\\
+    =
+    \begin{bmatrix}
+      \bL       &\bzer     &\bzer\\
+      \RZX\trans&\RXX\trans&\bzer\\
+      \rZy\trans&\rXy\trans&\ryy
+    \end{bmatrix}
+    \begin{bmatrix}
+      \bL\trans&\RZX &\rZy\\
+      \bzer    &\RXX &\rXy\\
+      \bzer    &\bzer&\ryy
+    \end{bmatrix}
+\end{multline}
+which gives
+\begin{equation}
+  \label{eq:numerator2}
+  g(\bb,\bbeta|\bZ,\bX,\by,\bP)=
+  \|\rZy-\RZX\bbeta-\bL\trans\bP\bb\|^2+\|\rXy-\RXX\bbeta\|^2+\ryy^2 .
+\end{equation}
+
+The last two terms in (\ref{eq:numerator2}) do not depend on $\bb$ so
+the integral in (\ref{eq:ymarg}) can be evaluated if we evaluate
+\[
+  \int_{\bb}
+  \frac{\exp\left\{-\|\rZy-\RZX\bbeta-\bL\trans\bP\bb\|^2
+      /\left(2\sigma^2\right)\right\}}
+  {\left(2\pi\sigma^2\right)^{q/2}}\,d\bb
+\]
+which we do with a change of variable
+\[
+\bv=\bL\bP\bb
+\]
+for which the Jacobian is
+\[
+\left|\frac{d\bv}{d\bb}\right|=\sqrt{|\bL\bP|^2}=
+\sqrt{|\bL|^2}=|\bL\bL\trans|^{1/2}=|\bZ\trans\bZ+\bOmega|^{1/2}
+\]
+Thus
+\begin{multline}
+  \label{eq:bintegral}
+  \int_{\bb}
+  \frac{\exp\left\{-\|\rZy-\RZX\bbeta-\bL\trans\bP\bb\|^2
+      /\left(2\sigma^2\right)\right\}}
+  {\left(2\pi\sigma^2\right)^{q/2}}\,d\bb\\
+  \begin{aligned}
+    &=\frac{1}{|\bZ\trans\bZ+\bOmega|^{1/2}}
+    \int_{\bv}
+    \frac{\exp\left\{-\|\rZy-\RZX\bbeta-\bv\|^2
+        /\left(2\sigma^2\right)\right\}}
+    {\left(2\pi\sigma^2\right)^{q/2}}\,d\bv\\
+    &=\frac{1}{|\bZ\trans\bZ+\bOmega|^{1/2}}
+  \end{aligned}
+\end{multline}
+because the integral with respect to $\bv$ is the integral of a
+$q$-dimensional multivariate normal density.
+
+
+\subsection{Likelihood results}
+\label{sec:likelihoodResults}
+
+Substituting (\ref{eq:numerator2}) and (\ref{eq:bintegral}) into
+(\ref{eq:ymarg}) we can evaluate the likelihood
+$L(\bbeta,\sigma^2,\btheta|\by)$.  As often happens, it is easier to
+write the \emph{log-likelihood}
+\[\ell(\bbeta,\sigma^2,\btheta|\by)=\log L(\bbeta,\sigma^2,\btheta|\by)\]
+and even easier to write the result on
+the \emph{deviance} scale as
+\begin{multline}
+  \label{eq:mldeviance}
+  -2\ell(\bbeta,\sigma^2,\btheta|\by)\\
+  =\log\left(\frac{|\bZ\trans\bZ+\bOmega|}{|\bOmega|}\right)+\frac{\ryy^2}{\sigma^2}+
+    \frac{\|\rXy-\RXX\bbeta\|^2}{\sigma^2}+n\log(2\pi\sigma^2)
+\end{multline}
+
+The maximum likelihood estimators
+$[\widehat{\btheta},\widehat{\bbeta},\widehat{\sigma^2}]$ minimize the
+deviance expression (\ref{eq:mldeviance}), which has some properties
+that can be used to simplify the optimization process.  In particular,
+\begin{enumerate}
+\item The conditional estimates of $\bbeta$ satisfy
+  \begin{equation}
+    \label{eq:mlbetahat}
+    \RXX\widehat{\bbeta}(\btheta)=\rXy .
+  \end{equation}
+\item The conditional modes (which are also the means) of the random
+  effects $\bb$ satisfy
+  \begin{equation}
+    \label{eq:mlbhattheta}
+    \bL\trans\bP\widehat{\bb}(\btheta,\bbeta)=\rZy-\RZX\bbeta . 
+  \end{equation}
+  Usually we want to evaluate these at $\btheta$ and
+  $\widehat{\bbeta(\btheta)}$, which we write as
+  $\widehat{\bb}(\btheta)=\widehat{\bb}\left(\btheta,\bbeta(\btheta)\right)$.
+\item The conditional ML estimate of $\sigma^2$ is
+  \begin{equation}
+    \label{eq:mlsigma}
+    \widehat{\sigma^2}(\btheta)=\ryy^2/n .
+  \end{equation}
+\item The profiled ML deviance, which is a function of $\btheta$ only
+  produced by plugging in the conditional estimates for $\bbeta$ and $\sigma^2$, is
+  \begin{equation}
+    \label{eq:profiledmldev}
+    \log\left(\frac{\left|\bL\right|^2}
+      {\left|\bOmega\right|}\right)
+    + n\left[1+\log\left(\frac{2\pi\ryy^2}{n}\right)\right]
+  \end{equation}
+\item The profiled REML deviance is
+  \begin{displaymath}
+    \log\left(\frac{\left|\bD\right|\left|\RXX\right|^2}
+      {\left|\bOmega\right|}\right)
+    +(n-p)\left[1+\log\left(\frac{2\pi\ryy^2}{n-p}\right)\right]
+  \end{displaymath}
+\end{enumerate}
+
+\bibliography{lme4}
+\end{document}

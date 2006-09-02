@@ -1,0 +1,2 @@
+- Determine what a "coef" function should do for multiple, possibly
+  non-nested, grouping  factors.

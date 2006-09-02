@@ -1,0 +1,4 @@
+gsummary                Summarize a data frame by group
+lmList                  List of lm Objects with a Common Model
+lmList-class            Class "lmList"
+pooledSD                Extract pooled standard deviation

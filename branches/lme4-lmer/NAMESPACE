@@ -1,0 +1,7 @@
+import("Matrix")
+
+export("gsummary", "lmList", "pooledSD")
+
+exportClasses("lmList")
+              
+exportMethods("coef", "confint", "formula", "gsummary", "plot", "show", "update")
