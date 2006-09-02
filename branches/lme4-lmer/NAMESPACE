@@ -1,7 +1,56 @@
 import("Matrix")
+importFrom("graphics",plot)		## lmer-related
+import("stats", "lattice")		## lmer-related
 
-export("gsummary", "lmList", "pooledSD")
+export(
+       "gsummary",
+       "hatTrace"
+       "lmList",
+       "lmer",
+       "mcmcsamp",
+       "pedigree",
+       "pooledSD"
+       )
 
-exportClasses("lmList")
-              
-exportMethods("coef", "confint", "formula", "gsummary", "plot", "show", "update")
+exportClasses(
+              "coef.lmer",
+              "glmer",
+              "lmList",
+              "lmer",
+              "mer",
+              "pedigree",
+              "ranef.lmer",
+              "summary.lmer"
+              "summary.mer",
+              )
+
+exportMethods(
+              "BIC",
+              "VarCorr",
+              "anova",
+              "coef",
+              "confint",
+              "deviance",
+              "fitted",
+              "fixef",
+              "formula",
+              "gsummary",
+              "head",
+              "lmer",
+              "logLik",
+              "mcmcsamp",
+              "plot",
+              "qqmath",
+              "ranef",
+              "resid",
+              "residuals",
+              "show",
+              "simulate",
+              "summary",
+              "tail",
+              "terms",
+              "update"
+              "update",
+              "vcov",
+              "with",
+              )

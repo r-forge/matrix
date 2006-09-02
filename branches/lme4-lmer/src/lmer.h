@@ -2,12 +2,7 @@
 #define MATRIX_LMER_H
 
 #include "Mutils.h"
-/* #include "dgCMatrix.h" */
 #include "dpoMatrix.h"
-/* #include "dsCMatrix.h" */
-/* #include "dtCMatrix.h" */
-/* #include "lgCMatrix.h" */
-/* #include "lCholCMatrix.h" */
 #include "chm_common.h"
 #include "Rmath.h"
 #include <Rversion.h>

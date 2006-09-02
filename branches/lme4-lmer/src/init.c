@@ -10,6 +10,7 @@ static R_CallMethodDef CallEntries[] = {
     {"glmer_devLaplace", (DL_FUNC) &glmer_devLaplace, 2},
     {"glmer_finalize", (DL_FUNC) &glmer_finalize, 1},
     {"glmer_init", (DL_FUNC) &glmer_init, 1},
+    {"Matrix_rWishart", (DL_FUNC) &Matrix_rWishart, 3},
     {"mer_ECMEsteps", (DL_FUNC) &mer_ECMEsteps, 3},
     {"mer_MCMCsamp", (DL_FUNC) &mer_MCMCsamp, 5},
     {"mer_coef", (DL_FUNC) &mer_coef, 2},
@@ -33,6 +34,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_simulate", (DL_FUNC) &mer_simulate, 2},
     {"mer_update_ZXy", (DL_FUNC) &mer_update_ZXy, 1},
     {"mer_update_y", (DL_FUNC) &mer_update_y, 2},
+    {"Zt_create", (DL_FUNC) &Zt_create, 2},
     {NULL, NULL, 0}
 };
 
