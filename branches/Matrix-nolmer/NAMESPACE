@@ -1,11 +1,7 @@
 useDynLib(Matrix, .registration=TRUE)# <-> R 2.3.0 or later
 
 importFrom("graphics",image)
-importFrom("graphics",plot)		## lmer-related
 #importFrom("lattice", levelplot)
-import("stats", "lattice")		## lmer-related
-importFrom("utils", "head", "tail")     ## lmer-related
-importFrom("grid",    grid.rect, gpar, grob)
 
 
 ## Currently, group generics need to be explicitly imported (Bug?):
@@ -58,10 +54,6 @@ export(
        "any",
        "all"
 )
-
-
-## lmer-related
-export("lmer", "mcmcsamp", "hatTrace")
 
 exportClasses(
 	      "index",
@@ -156,10 +148,6 @@ exportClasses(
               "sparseQR"
 	      )
 
-## lmer-related
-exportClasses("coef.lmer", "glmer", "lmer", "mer", "pedigree", "ranef.lmer",
-              "summary.mer", "summary.lmer")
-
 exportMethods(
 	      ## Group Methods
 	      "Arith",
@@ -223,10 +211,3 @@ exportMethods("rbind2")
 exportMethods("cbind2")
 
 }
-
-## lmer-related
-exportMethods("BIC", "anova", "coef", "confint", "deviance", "fitted",
-              "fixef", "formula", "head", "lmer", "logLik", "mcmcsamp",
-              "plot", "qqmath", "ranef", "residuals",
-              "resid", "simulate", "summary", "tail", "terms", "update",
-              "vcov", "VarCorr", "with")
