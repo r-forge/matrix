@@ -1,0 +1,120 @@
+-----
+Modify mcmcsamp to return the deviance in the sample only when the
+optional argument 'deviance' is TRUE (default FALSE).
+-----
+Replace the use of the unexported replacement function LMEoptimize<-
+in lmer.R by the function LMEopt, which always returns NULL but
+(in contradiction to the language specification) modifies its first argument.
+-----
+Modify the one-argument form of the anova method for lmer objects (yet
+  again) to calculate the F ratios.  It is the df, not the ratio that
+  is controversial.
+Should there be an extractor function for the mean square error?  If
+  so, what should it be called?
+-----
+Check for DimNames propagation in coercion and other operations.
+-----
+- Revive the "lmer" and "glmer" classes.  Slots like "family" should
+  be in "glmer" only.  Many methods for "lmer" can be simplified as,
+  for example, they will always use the scale factor.
+
+- Add a "pedigree" class and methods for it.  Allow a pedigree
+  argument in lmer.
+
+------
+- Sparse matrix methods can now be based on the CHOLMOD package.  We
+   will need to migrate from the current code to CHOLMOD-based code
+   using #ifdef USE_CHOLMOD.  Some of the things to be done
+
+   - Move documentation from subdirectories of src to inst/doc
+   - Write utilities to create a cholmod_sparse pointer from a
+   dgCMatrix or lgCMatrix (or zgCMatrix) object without copying and
+   allocating.
+   - Start adding simple S4 methods (rcond, %*%, +, cbind, t).
+
+- Report the problem in the Linux ldexp manual page.  The second and
+  third calls in the Synopsis should be to ldexpf and ldexpl.
+
+- [,] indexing: for sparse "works", but not yet for negative indices!
+
+- consider moving alloc3Darray from ./src/Mutils.c to
+  $(RSRC)/src/base/array.c
+
+-------
+
+- provide methods for "dspMatrix" and "dppMatrix"!
+
+- implement (more) methods for supporting "packed" (symmetric / triangular)
+  matrices; particularly something like pack() and unpack()  [to/from our
+  classes from/to "numeric"] --- have already man/unpack.Rd but no method yet!
+
+  (have some dtr* <-> dtp*)
+
+---
+
+- combine the C functions for multiplication by special forms and
+  solution wrt special forms by using a 'right' argument and a
+  'classed' argument.
+   [done with dgeMatrix_matrix_mm();  not yet for other classes;
+    and for _crossprod()]
+
+- add more comprehensive examples / tests for Schur decomposition
+
+- arithmetic for sparse matrices:
+	     <sparseMatrix>  o  <same-dim-sparseMatrix>
+  should return a sparse matrix  for at least "+" and "*" , also %%,
+  and "/" and "%/%" at least when the RHS is non-zero a scalar.
+  Challenge: nice implementation (``common non-0''; but Tsparse* is not uniq).
+
+---
+
+- "Math2" , "Math", "Arith":
+   keep triangular and symmetric Matrices when appropriate:
+   particularly desirable for  "Math2": round(), signif()
+
+- "d" <-> "l" coercion for all "[TCR]" sparse matrices is really trivial:
+  "d" -> "l" : drops the 'x' slot
+  "l" -> "d" : construct an 'x' slot of all '1'
+  We currently have many of these conversions explicitly, e.g.
+   setAs("dsTMatrix", "lsTMatrix",
+      function(from) new("lsTMatrix", i = from@i, j = from@j, uplo = from@uplo,
+                         Dim = from@Dim, Dimnames = from@Dimnames))
+  but I would rather want to automatically construct all these coercion
+  methods at once by a ``method constructor'', i.e.,
+  for all  "dsparse*" -> "lsparse*" and vice versa.
+  How can one do this {in a documented way} ?
+
+- tcrossprod(x, y) : do provide methods for y != NULL
+  calling Lapack's DGEMM for "dense"
+  [2005-12-xx: done for dgeMatrix at least]
+
+- "ltTmatrix" :
+  2) new("ltTMatrix", diag = "U", Dim = c(2:2, 2:2)) shows lack of ltTM*_validate
+
+- BUGlet:  Shouldn't lose factorization here:
+  h6 <- Hilbert(6); chol(h6) ; str(h6) # has factor
+  str(H6 <- as(h6, "dspMatrix"))       # has lost factor
+  ## and the same in a similar situation involving  "dpo", "dpp"
+
+- "Compare" for dgC & dgT  --- want to be able to do  M[M > 10]  etc
+
+- Things like  M[upper.tri(M)] are not really most useful for  sparse
+  matrices.  --> provide generic functions
+  upperTriMatrix(), lowerTriMatrix()  both with argument  'diag = TRUE'
+  (which can be set to FALSE of course) which are used to extract a
+  triangle from an arbitrary sparse matrix and  return a  "dtCMatrix".
+
+- Factorizations: LU [ -> solve() ] and Schur()  for  *sparse*  Matrices.
+  -----------------  LU-sparse is the purpose of all of ./src/UMFPACK/
+  	-->  ./inst/doc/UFsparse/*
+  Note that UMFPACK is a bit slow compared to TAUCS etc, according to
+  Gould et al.(2005)
+  And then, possibly eigen(), svd(), qr(), ... for sparse
+  {probably base some on the fast  chol() of CHOLMOD}.
+  ./man/lu.Rd notes that lu() is not yet available for sparse
+
+  2006-04-15 : now with 'CSparse' { src/cs.c }, have at least solve( <dtC*> )
+
+- nicer pedigree examples and tests
+
+- band(), triu(), tril() for *all*, not just sparse matrices
