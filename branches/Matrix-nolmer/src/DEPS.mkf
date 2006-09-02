@@ -27,7 +27,6 @@ ltCMatrix.o: ltCMatrix.c ltCMatrix.h Mutils.h Syms.h triplet_to_col.h
 factorizations.o: factorizations.c factorizations.h Mutils.h Syms.h
 dtCMatrix.o: dtCMatrix.c dtCMatrix.h Mutils.h Syms.h dgCMatrix.h \
   triplet_to_col.h
-lmer.o: lmer.c lmer.h Mutils.h Syms.h dpoMatrix.h chm_common.h
 dense.o: dense.c dense.h Mutils.h Syms.h
 R_ldl.o: R_ldl.c 
 dgeMatrix.o: dgeMatrix.c dgeMatrix.h \
@@ -57,7 +56,6 @@ init.o: init.c Mutils.h Syms.h \
   dgCMatrix.h dgTMatrix.h dgeMatrix.h dpoMatrix.h dppMatrix.h dsCMatrix.h \
   dsTMatrix.h dspMatrix.h dsyMatrix.h dtCMatrix.h dtTMatrix.h dtrMatrix.h \
   dtpMatrix.h factorizations.h lgCMatrix.h lgTMatrix.h \
-  lsCMatrix.h ltCMatrix.h lmer.h \
-  Syms.h
+  lsCMatrix.h ltCMatrix.h Syms.h
 dsCMatrix.o: dsCMatrix.c dsCMatrix.h Mutils.h Syms.h \
   triplet_to_col.h
