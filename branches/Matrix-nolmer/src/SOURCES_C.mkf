@@ -4,7 +4,6 @@ SOURCES_C =  \
 	    HBMM.c \
 	    Tsparse.c \
 	    init.c \
-	    lmer.c \
             Mutils.c \
 	    chm_common.c \
 	    cs.c \
