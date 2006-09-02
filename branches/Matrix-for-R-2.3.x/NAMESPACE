@@ -1,0 +1,232 @@
+useDynLib(Matrix, .registration=TRUE)# <-> R 2.3.0 or later
+
+importFrom("graphics",image)
+importFrom("graphics",plot)		## lmer-related
+#importFrom("lattice", levelplot)
+import("stats", "lattice")		## lmer-related
+importFrom("utils", "head", "tail")     ## lmer-related
+importFrom("grid",    grid.rect, gpar, grob)
+
+
+## Currently, group generics need to be explicitly imported (Bug?):
+importFrom("methods", Arith, Compare, Math, Math2, Summary, Complex)
+
+## Generics and functions defined in this package
+export("Cholesky",
+       "Diagonal",
+       "Hilbert",
+       "Matrix",
+       "Schur",
+       "band",
+       "expand",
+       "expm",
+       "facmul",
+#        "isTriangular",
+#        "isDiagonal",
+       "lu",
+       "norm",
+       "pedigree",
+       "rcond",
+       "readHB",
+       "readMM",
+       "tcrossprod",
+       "tril",
+       "triu",
+       "unpack",
+       "writeHB",
+       "writeMM"
+       )
+
+## workaround S4-Group(generic|method) quirk: R/AllGeneric.R
+## needs setGeneric(*, group=) and this for all non-Primitives :
+export(
+       ## "Math"
+       "log",
+       "gamma",
+       "lgamma",
+
+       ## "Math2"
+       "round",
+       "signif",
+
+       ## "Summary"
+       "max",
+       "min",
+       "range",
+       "prod",
+       "sum",
+       "any",
+       "all"
+)
+
+
+## lmer-related
+export("lmer", "mcmcsamp", "hatTrace")
+
+exportClasses(
+	      "index",
+	      "replValue", # if we don't export it, things fail in dispatch
+
+              ## --- 'Matrix' mother and all its daughters : ---------------
+	      "Matrix",
+	      ## also intermediate `virtual' ones:
+	      "dMatrix",
+	      "lMatrix",
+	      "denseMatrix",
+	      "sparseMatrix",
+
+              "diagonalMatrix",
+              "generalMatrix",
+              "symmetricMatrix",
+              "triangularMatrix",
+
+              "compMatrix",
+
+	      "dsparseMatrix",
+	      "lsparseMatrix",
+	      "TsparseMatrix",
+	      "CsparseMatrix",
+	      "RsparseMatrix",
+	      "ddenseMatrix",
+	      ## not yet used, but as sub-classes;
+	      ## need to provide them for 'hierarchy-analysis':
+	      "iMatrix",
+	      "zMatrix",
+	      "ldenseMatrix",
+
+	      "dgCMatrix",
+	      "dgRMatrix",# unused
+	      "dgTMatrix",
+	      "dgeMatrix",
+	      "dpoMatrix",
+	      "dppMatrix",
+	      "dsCMatrix",
+	      "dsRMatrix",# unused
+	      "dsTMatrix",
+	      "dspMatrix",
+	      "dsyMatrix",
+	      "dtCMatrix",
+	      "dtRMatrix",# unused
+	      "dtTMatrix",
+	      "dtpMatrix",
+	      "dtrMatrix",
+              "ddiMatrix",
+	      "lgeMatrix",
+	      "lspMatrix",
+	      "lsyMatrix",
+	      "ltpMatrix",
+	      "ltrMatrix",
+              "ldiMatrix",
+
+	      "lgCMatrix",
+	      "lgRMatrix",
+	      "lgTMatrix",
+	      "lsCMatrix",
+	      "lsRMatrix",# unused
+	      "lsTMatrix",
+	      "ltCMatrix",
+	      "ltRMatrix",# unused
+	      "ltTMatrix",
+              "pMatrix",
+
+              "corMatrix", # unused
+
+              ## --- inheriting "Matrix", but also factorizations:
+	      "BunchKaufman",
+	      "pBunchKaufman",
+	      "Cholesky",
+	      "pCholesky",
+
+              ## --- 'MatrixFactorization' mother and all its daughters : ---
+
+              "MatrixFactorization",
+
+	      "LU",
+              "denseLU",
+              "sparseLU",
+
+              "CHMfactor",
+              "CHMsuper",
+              "CHMsimpl",
+              "dCHMsuper",
+              "dCHMsimpl",
+              "lCHMsuper",# unused
+              "lCHMsimpl",# unused
+
+              "sparseQR"
+	      )
+
+## lmer-related
+exportClasses("coef.lmer", "glmer", "lmer", "mer", "pedigree", "ranef.lmer",
+              "summary.mer", "summary.lmer")
+
+exportMethods(
+	      ## Group Methods
+	      "Arith",
+	      "Math",
+	      "Math2",
+	      "Summary",
+	      "Compare",
+
+	      "!",
+	      "+",# for dgT(Matrix) only
+	      "%*%",
+
+              "Cholesky",
+	      "Schur",
+	      "as.array",
+	      "as.matrix",
+	      "as.vector",
+	      "as.numeric",
+	      "as.logical",
+              "band",
+	      "chol",
+	      "colMeans",
+	      "colSums",
+	      "coerce",
+	      "crossprod",
+	      "determinant",
+	      "diag",
+	      "dim",
+	      "dimnames",
+	      "dimnames<-",
+	      "expand",
+	      "expm",
+	      "kronecker",
+	      "image",
+              "isSymmetric",
+## 	       "isDiagonal",
+## 	       "isTriangular",
+	      "norm",
+              "qr",
+              "qr.qy",
+              "qr.qty",
+              "qr.coef",
+              "qr.resid",
+              "qr.fitted",
+	      "rcond",
+	      "rowMeans",
+	      "rowSums",
+	      "show",
+	      "solve",
+	      "t",
+	      "tcrossprod",
+              "tril",
+              "triu",
+              "zapsmall"
+	      )
+
+## only for R >= 2.2:
+if(paste(R.version$major, R.version$minor, sep=".") >= "2.2") {
+
+exportMethods("rbind2")
+exportMethods("cbind2")
+
+}
+
+## lmer-related
+exportMethods("BIC", "anova", "coef", "confint", "deviance", "fitted",
+              "fixef", "formula", "head", "lmer", "logLik", "mcmcsamp",
+              "plot", "qqmath", "ranef", "residuals",
+              "resid", "simulate", "summary", "tail", "terms", "update",
+              "vcov", "VarCorr", "with")
