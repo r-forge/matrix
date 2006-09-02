@@ -24,7 +24,6 @@
 #include "lgTMatrix.h"
 #include "lsCMatrix.h"
 #include "ltCMatrix.h"
-#include "lmer.h"
 #include "pedigree.h"
 #include "sparseQR.h"
 #include <R_ext/Rdynload.h>
@@ -60,14 +59,12 @@ static R_CallMethodDef CallEntries[] = {
     {"LU_expand", (DL_FUNC) &LU_expand, 1},
     {"LU_validate", (DL_FUNC) &LU_validate, 1},
     {"Matrix_expand_pointers", (DL_FUNC) &Matrix_expand_pointers, 1},
-    {"Matrix_rWishart", (DL_FUNC) &Matrix_rWishart, 3},
     {"Matrix_writeHarwellBoeing", (DL_FUNC) &Matrix_writeHarwellBoeing, 3},
     {"Matrix_writeMatrixMarket", (DL_FUNC) &Matrix_writeMatrixMarket, 3},
     {"SVD_validate", (DL_FUNC) &SVD_validate, 1},
     {"Tsparse_validate", (DL_FUNC) &Tsparse_validate, 1},
     {"Tsparse_to_Csparse", (DL_FUNC) &Tsparse_to_Csparse, 2},
     {"csc_check_column_sorting", (DL_FUNC) &csc_check_column_sorting, 1},
-    {"Zt_create", (DL_FUNC) &Zt_create, 2},
     {"compressed_to_dgTMatrix", (DL_FUNC) &compressed_to_dgTMatrix, 2},
     {"compressed_non_0_ij", (DL_FUNC) &compressed_non_0_ij, 2},
     {"dense_to_Csparse", (DL_FUNC) &dense_to_Csparse, 1},
@@ -159,11 +156,6 @@ static R_CallMethodDef CallEntries[] = {
     {"dtrMatrix_solve", (DL_FUNC) &dtrMatrix_solve, 1},
     {"dtrMatrix_validate", (DL_FUNC) &dtrMatrix_validate, 1},
     {"dup_mMatrix_as_dgeMatrix", (DL_FUNC) &dup_mMatrix_as_dgeMatrix, 1},
-    {"glmer_MCMCsamp", (DL_FUNC) &glmer_MCMCsamp, 5},
-    {"glmer_PQL", (DL_FUNC) &glmer_PQL, 1},
-    {"glmer_devLaplace", (DL_FUNC) &glmer_devLaplace, 2},
-    {"glmer_finalize", (DL_FUNC) &glmer_finalize, 1},
-    {"glmer_init", (DL_FUNC) &glmer_init, 1},
 
     {"lapack_qr", (DL_FUNC) &lapack_qr, 2},
 
@@ -182,40 +174,12 @@ static R_CallMethodDef CallEntries[] = {
     {"ltCMatrix_validate", (DL_FUNC) &ltCMatrix_validate, 1},
     {"lsq_dense_Chol", (DL_FUNC) &lsq_dense_Chol, 2},
     {"lsq_dense_QR", (DL_FUNC) &lsq_dense_QR, 2},
-
-    {"mer_ECMEsteps", (DL_FUNC) &mer_ECMEsteps, 3},
-    {"mer_MCMCsamp", (DL_FUNC) &mer_MCMCsamp, 5},
-    {"mer_coef", (DL_FUNC) &mer_coef, 2},
-    {"mer_coefGets", (DL_FUNC) &mer_coefGets, 3},
-    {"mer_create", (DL_FUNC) &mer_create, 10},
-    {"mer_dtCMatrix", (DL_FUNC) &mer_dtCMatrix, 1},
-    {"mer_dtCMatrix_inv", (DL_FUNC) &mer_dtCMatrix_inv, 1},
-    {"mer_factor", (DL_FUNC) &mer_factor, 1},
-    {"mer_fitted", (DL_FUNC) &mer_fitted, 1},
-    {"mer_fixef", (DL_FUNC) &mer_fixef, 1},
-    {"mer_gradComp", (DL_FUNC) &mer_gradComp, 1},
-    {"mer_gradient", (DL_FUNC) &mer_gradient, 2},
-    {"mer_hat_trace", (DL_FUNC) &mer_hat_trace, 1},
-    {"mer_hat_trace2", (DL_FUNC) &mer_hat_trace2, 1},
-    {"mer_initial", (DL_FUNC) &mer_initial, 1},
-    {"mer_isNested", (DL_FUNC) &mer_isNested, 1},
-    {"mer_postVar", (DL_FUNC) &mer_postVar, 1},
-    {"mer_ranef", (DL_FUNC) &mer_ranef, 1},
-    {"mer_secondary", (DL_FUNC) &mer_secondary, 1},
-    {"mer_sigma", (DL_FUNC) &mer_sigma, 2},
-    {"mer_simulate", (DL_FUNC) &mer_simulate, 2},
-    {"mer_update_ZXy", (DL_FUNC) &mer_update_ZXy, 1},
-    {"mer_update_y", (DL_FUNC) &mer_update_y, 2},
-
-/*     {"matrix_to_csc", (DL_FUNC) &matrix_to_csc, 1}, */
     {"pedigree_chol", (DL_FUNC) &pedigree_chol, 2},
-/*     {"ssc_transpose", (DL_FUNC) &ssc_transpose, 1}, */
     {"sparseQR_validate", (DL_FUNC) &sparseQR_validate, 1},
     {"sparseQR_qty", (DL_FUNC) &sparseQR_qty, 3},
     {"sparseQR_coef", (DL_FUNC) &sparseQR_coef, 2},
     {"sparseQR_resid_fitted", (DL_FUNC) &sparseQR_resid_fitted, 3},
     {"tsc_to_dgTMatrix", (DL_FUNC) &tsc_to_dgTMatrix, 1},
-/*     {"tsc_transpose", (DL_FUNC) &tsc_transpose, 1}, */
     {"tsc_validate", (DL_FUNC) &tsc_validate, 1},
     {"triangularMatrix_validate", (DL_FUNC) &triangularMatrix_validate, 1},
     {"symmetricMatrix_validate", (DL_FUNC) &symmetricMatrix_validate, 1},

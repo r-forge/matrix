@@ -1,8 +1,9 @@
 useDynLib(Matrix, .registration=TRUE)# <-> R 2.3.0 or later
 
-importFrom("graphics",image)
-#importFrom("lattice", levelplot)
-
+importFrom("lattice", levelplot)
+importFrom("graphics", image)
+importFrom("utils", head, tail)
+importFrom("grid", grid.rect, gpar, grob)
 
 ## Currently, group generics need to be explicitly imported (Bug?):
 importFrom("methods", Arith, Compare, Math, Math2, Summary, Complex)
@@ -21,7 +22,6 @@ export("Cholesky",
 #        "isDiagonal",
        "lu",
        "norm",
-       "pedigree",
        "rcond",
        "readHB",
        "readMM",
