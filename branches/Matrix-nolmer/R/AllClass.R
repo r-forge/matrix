@@ -267,7 +267,7 @@ setClass("dtCMatrix",
 	 contains = c("CsparseMatrix", "dsparseMatrix", "triangularMatrix"),
 	 prototype = prototype(p = 0:0, uplo = "U", diag = "N"),# to be valid
 	 validity =
-	 function(object) .Call(tsc_validate, object)
+	 function(object) .Call(dtCMatrix_validate, object)
 	 )
 
 ## see comments for dsTMatrix above
