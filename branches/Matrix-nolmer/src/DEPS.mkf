@@ -10,20 +10,13 @@ Csparse.o: Csparse.c Csparse.h Mutils.h Syms.h
 mmio.o: mmio.c mmio.h
 HBMM.o: HBMM.c HBMM.h Mutils.h Syms.h triplet_to_col.h iohb.h mmio.h
 iohb.o: iohb.c iohb.h 
-lgCMatrix.o: lgCMatrix.c lgCMatrix.h \
-  Mutils.h Syms.h triplet_to_col.h
-lCholCMatrix.o: lCholCMatrix.c lCholCMatrix.h \
-  Mutils.h Syms.h triplet_to_col.h R_ldl.h
+lgCMatrix.o: lgCMatrix.c lgCMatrix.h Mutils.h Syms.h
 dsyMatrix.o: dsyMatrix.c dsyMatrix.h dgeMatrix.h Mutils.h Syms.h
-dgCMatrix.o: dgCMatrix.c dgCMatrix.h Mutils.h \
-  Syms.h  triplet_to_col.h
-dCholCMatrix.o: dCholCMatrix.c dCholCMatrix.h dtCMatrix.h Mutils.h \
-  Syms.h dgCMatrix.h triplet_to_col.h
+dgCMatrix.o: dgCMatrix.c dgCMatrix.h Mutils.h Syms.h cs_utils.h
 dtTMatrix.o: dtTMatrix.c dtTMatrix.h Mutils.h Syms.h
-Mutils.o: Mutils.c Mutils.h Syms.h triplet_to_col.h
-dspMatrix.o: dspMatrix.c dspMatrix.h dgeMatrix.h \
-  Mutils.h Syms.h
-ltCMatrix.o: ltCMatrix.c ltCMatrix.h Mutils.h Syms.h triplet_to_col.h
+Mutils.o: Mutils.c Mutils.h Syms.h
+dspMatrix.o: dspMatrix.c dspMatrix.h dgeMatrix.h Mutils.h Syms.h
+ltCMatrix.o: ltCMatrix.c ltCMatrix.h Mutils.h Syms.h
 factorizations.o: factorizations.c factorizations.h Mutils.h Syms.h
 dtCMatrix.o: dtCMatrix.c dtCMatrix.h Mutils.h Syms.h dgCMatrix.h \
   triplet_to_col.h

@@ -8,7 +8,6 @@ Description: Classes and methods for numerical linear algebra
     using Lapack, LDL, and Metis.
 Depends: R (>= 2.4.0), stats, methods, utils, lattice
 Imports: graphics, lattice, grid, stats
-#Suggests: mlmRev, MASS, coda
 Enhances: graph, SparseM
 SystemRequirements: GNU make
 LazyLoad: yes

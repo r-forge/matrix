@@ -179,8 +179,6 @@ check_csc_index(const int p[], const int i[], int row, int col, int missing)
     return missing;
 }
 
-SEXP alloc3Darray(SEXPTYPE mode, int nrow, int ncol, int nface);
-
 /**
  * Calculate the zero-based index in a row-wise packed lower triangular matrix.
  * This is used for the arrays of blocked sparse matrices.
@@ -195,20 +193,6 @@ int Lind(int k, int i)
 {
     if (k < i) error("Lind(k = %d, i = %d) must have k >= i", k, i);
     return (k * (k + 1))/2 + i;
-}
-
-/**
- * Check for a complete match on matrix dimensions
- *
- * @param xd dimensions of first matrix
- * @param yd dimensions of second matrix
- *
- * @return 1 if dimensions match, otherwise 0
- */
-static R_INLINE
-int match_mat_dims(const int xd[], const int yd[])
-{
-    return xd[0] == yd[0] && xd[1] == yd[1];
 }
 
 double *expand_csc_column(double *dest, int m, int j,
@@ -291,7 +275,6 @@ vecSum(double dest[], const double src1[], const double src2[],
     return dest;
 }
 
-SEXP alloc_real_classed_matrix(char *class, int nrow, int ncol);
 SEXP alloc_dgeMatrix(int m, int n, SEXP rownms, SEXP colnms);
 SEXP alloc_dpoMatrix(int n, char *uplo, SEXP rownms, SEXP colnms);
 SEXP alloc_dtrMatrix(int n, char *uplo, char *diag, SEXP rownms, SEXP colnms);

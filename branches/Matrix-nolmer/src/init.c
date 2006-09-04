@@ -135,6 +135,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dtCMatrix_solve", (DL_FUNC) &dtCMatrix_solve, 1},
     {"dtCMatrix_matrix_solve", (DL_FUNC) &dtCMatrix_matrix_solve, 3},
     {"dtCMatrix_upper_solve", (DL_FUNC) &dtCMatrix_upper_solve, 1},
+    {"dtCMatrix_validate", (DL_FUNC) &dtCMatrix_validate, 1},
     {"dtTMatrix_as_dtrMatrix", (DL_FUNC) &dtTMatrix_as_dtrMatrix, 1},
     {"dtTMatrix_as_dgCMatrix", (DL_FUNC) &dtTMatrix_as_dgCMatrix, 1},
     {"dtTMatrix_validate", (DL_FUNC) &dtTMatrix_validate, 1},
@@ -179,8 +180,7 @@ static R_CallMethodDef CallEntries[] = {
     {"sparseQR_qty", (DL_FUNC) &sparseQR_qty, 3},
     {"sparseQR_coef", (DL_FUNC) &sparseQR_coef, 2},
     {"sparseQR_resid_fitted", (DL_FUNC) &sparseQR_resid_fitted, 3},
-    {"tsc_to_dgTMatrix", (DL_FUNC) &tsc_to_dgTMatrix, 1},
-    {"tsc_validate", (DL_FUNC) &tsc_validate, 1},
+/*     {"tsc_to_dgTMatrix", (DL_FUNC) &tsc_to_dgTMatrix, 1}, */
     {"triangularMatrix_validate", (DL_FUNC) &triangularMatrix_validate, 1},
     {"symmetricMatrix_validate", (DL_FUNC) &symmetricMatrix_validate, 1},
     {NULL, NULL, 0}
@@ -194,7 +194,45 @@ R_init_Matrix(DllInfo *dll)
 {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
+
+    R_RegisterCCallable("Matrix", "alloc_dgeMatrix", (DL_FUNC)alloc_dgeMatrix);
+    R_RegisterCCallable("Matrix", "alloc_dpoMatrix", (DL_FUNC)alloc_dpoMatrix);
+    R_RegisterCCallable("Matrix", "alloc_dtrMatrix", (DL_FUNC)alloc_dtrMatrix);
+    R_RegisterCCallable("Matrix", "alloc_dsCMatrix", (DL_FUNC)alloc_dsCMatrix);
+
+    R_RegisterCCallable("Matrix", "as_cholmod_dense", (DL_FUNC)as_cholmod_dense);
+    R_RegisterCCallable("Matrix", "as_cholmod_factor", (DL_FUNC)as_cholmod_factor);
+    R_RegisterCCallable("Matrix", "as_cholmod_sparse", (DL_FUNC)as_cholmod_sparse);
+    R_RegisterCCallable("Matrix", "chm_factor_to_SEXP", (DL_FUNC)chm_factor_to_SEXP);
+
+    R_RegisterCCallable("Matrix", "cholmod_aat", (DL_FUNC)cholmod_aat);
+    R_RegisterCCallable("Matrix", "cholmod_add", (DL_FUNC)cholmod_add);
+    R_RegisterCCallable("Matrix", "cholmod_allocate_dense", (DL_FUNC)cholmod_allocate_dense);
+    R_RegisterCCallable("Matrix", "cholmod_allocate_sparse", (DL_FUNC)cholmod_allocate_sparse);
+    R_RegisterCCallable("Matrix", "cholmod_analyze", (DL_FUNC)cholmod_analyze);
+    R_RegisterCCallable("Matrix", "cholmod_copy", (DL_FUNC)cholmod_copy);
+    R_RegisterCCallable("Matrix", "cholmod_copy_dense", (DL_FUNC)cholmod_copy_dense);
+    R_RegisterCCallable("Matrix", "cholmod_copy_factor", (DL_FUNC)cholmod_copy_factor);
+    R_RegisterCCallable("Matrix", "cholmod_copy_sparse", (DL_FUNC)cholmod_copy_sparse);
+    R_RegisterCCallable("Matrix", "cholmod_factor_to_sparse", (DL_FUNC)cholmod_factor_to_sparse);
+    R_RegisterCCallable("Matrix", "cholmod_factorize", (DL_FUNC)cholmod_factorize);
+    R_RegisterCCallable("Matrix", "cholmod_finish", (DL_FUNC)cholmod_finish);
+    R_RegisterCCallable("Matrix", "cholmod_free_dense", (DL_FUNC)cholmod_free_dense);
+    R_RegisterCCallable("Matrix", "cholmod_free_factor", (DL_FUNC)cholmod_free_sparse);
+    R_RegisterCCallable("Matrix", "cholmod_free_sparse", (DL_FUNC)cholmod_free_sparse);
+    R_RegisterCCallable("Matrix", "cholmod_nnz", (DL_FUNC)cholmod_nnz);
+    R_RegisterCCallable("Matrix", "cholmod_sdmult", (DL_FUNC)cholmod_sdmult);
+    R_RegisterCCallable("Matrix", "cholmod_solve", (DL_FUNC)cholmod_solve);
+    R_RegisterCCallable("Matrix", "cholmod_speye", (DL_FUNC)cholmod_speye);
+    R_RegisterCCallable("Matrix", "cholmod_spsolve", (DL_FUNC)cholmod_spsolve);
+    R_RegisterCCallable("Matrix", "cholmod_start", (DL_FUNC)cholmod_start);
+    R_RegisterCCallable("Matrix", "cholmod_transpose", (DL_FUNC)cholmod_transpose);
+
+    R_RegisterCCallable("Matrix", "dpoMatrix_chol", (DL_FUNC)dpoMatrix_chol);
+    R_RegisterCCallable("Matrix", "numeric_as_chm_dense", (DL_FUNC)numeric_as_chm_dense);
+
     cholmod_start(&c);
+
     Matrix_DimNamesSym = install("Dimnames");
     Matrix_DimSym = install("Dim");
     Matrix_diagSym = install("diag");
