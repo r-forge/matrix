@@ -34,7 +34,7 @@
 <<preliminaries,echo=FALSE,print=FALSE>>=
 library(lattice)
 library(Matrix)
-#library(lme4)
+library(lme4)
 #data("Early", package = "mlmRev")
 options(width=80, show.signif.stars = FALSE,
         lattice.theme = function() canonical.theme("pdf", color = FALSE))
