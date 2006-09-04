@@ -6,22 +6,19 @@
  * matrix from a pedigree.
  *
  * @param x a pedigree object
- * @param tinv the inverse of T, a unit lower dtCMatrix
- * @param ttrans the transpose of T, a unit upper dtCMatrix
  * @param ans T stored as a non-unit, lower dtCMatrix
- * the pedigree
  *
  * @return ans with elements modified to incorporate D
  */
 SEXP pedigree_chol(SEXP x, SEXP ans)
 {
     SEXP Sire = GET_SLOT(x, install("sire"));
-    int *ai = INTEGER(GET_SLOT(ans, Matrix_iSym)),
-	*ap = INTEGER(GET_SLOT(ans, Matrix_pSym)),
+    int *ai = INTEGER(GET_SLOT(ans, lme4_iSym)),
+	*ap = INTEGER(GET_SLOT(ans, lme4_pSym)),
 	*dam = INTEGER(GET_SLOT(x, install("dam"))),
 	*sire = INTEGER(Sire), 
 	i, j, n = LENGTH(Sire);
-    double *ax = REAL(GET_SLOT(ans, Matrix_xSym)), *F, Di, tmp;
+    double *ax = REAL(GET_SLOT(ans, lme4_xSym)), *F, Di, tmp;
 
     setAttrib(ans, install("F"), allocVector(REALSXP, n));
     F = REAL(getAttrib(ans, install("F")));

@@ -142,7 +142,7 @@ lmerControl <-
 }
 
 rWishart <- function(n, df, invScal)
-    .Call(Matrix_rWishart, n, df, invScal)
+    .Call(lme4_rWishart, n, df, invScal)
 
 setMethod("coef", signature(object = "mer"),
 	  function(object, ...)

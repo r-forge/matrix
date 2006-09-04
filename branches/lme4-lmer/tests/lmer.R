@@ -1,5 +1,4 @@
-library(Matrix)# well, library(lme4), ...
-require(lattice)# (is there anyway)
+library(lme4)
 options(show.signif.stars = FALSE)
 
 data(sleepstudy)

@@ -1,27 +1,23 @@
 #ifndef MATRIX_LMER_H
 #define MATRIX_LMER_H
 
-#include "Mutils.h"
-#include "dpoMatrix.h"
-#include "chm_common.h"
-#include "Rmath.h"
+#include "Matrix.h"
+#include <Rmath.h>
 #include <Rversion.h>
 #include <R_ext/Lapack.h>
 #include <R_ext/Constants.h>
-/* #include <R_ext/Utils.h> */
+#include <R_ext/Random.h>
 
-SEXP Matrix_rWishart(SEXP ns, SEXP df, SEXP scal);
 SEXP glmer_MCMCsamp(SEXP GSp, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbose);
 SEXP glmer_PQL(SEXP GSp);
-/* SEXP glmer_bhat(SEXP pars, SEXP GSp); */
-/* SEXP glmer_devAGQ(SEXP pars, SEXP GSp, SEXP nAGQp); */
 SEXP glmer_devLaplace(SEXP pars, SEXP GSp);
 SEXP glmer_finalize(SEXP GSpt);
-/* SEXP glmer_fixed_update(SEXP GSp, SEXP b, SEXP fixed); */
 SEXP glmer_init(SEXP rho);
-/* SEXP glmer_ranef_update(SEXP GSp, SEXP fixed, SEXP varc, SEXP b); */
+
+SEXP lme4_rWishart(SEXP ns, SEXP df, SEXP scal);
+
 SEXP mer_ECMEsteps(SEXP x, SEXP nsteps, SEXP Verbp);
-SEXP mer_Hessian(SEXP x);
+/* SEXP mer_Hessian(SEXP x);  not yet */
 SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbose);
 SEXP mer_coef(SEXP x, SEXP pType);
 SEXP mer_coefGets(SEXP x, SEXP coef, SEXP pType);
@@ -47,6 +43,7 @@ SEXP mer_simulate(SEXP x, SEXP nsimP);
 SEXP mer_update_ZXy(SEXP x);
 SEXP mer_update_y(SEXP x, SEXP ynew);
 SEXP mer_validate(SEXP x);
+
 SEXP Zt_create(SEXP fl, SEXP Ztl);
 
 #endif

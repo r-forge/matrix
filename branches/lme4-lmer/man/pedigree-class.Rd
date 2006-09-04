@@ -1,7 +1,7 @@
 \name{pedigree-class}
 \docType{class}
 \alias{pedigree-class}
-\alias{chol,pedigree-method}
+\alias{chol,pedigree,ANY-method}
 \alias{coerce,pedigree,dtCMatrix-method}
 \alias{coerce,pedigree,data.frame-method}
 \alias{head,pedigree-method}
@@ -34,7 +34,7 @@
   \describe{
     \item{chol}{\code{signature(x = "pedigree"}}: returns the
       lower-triangular, sparse matrix (a
-      \code{\linkS4class{dtCMatrix}} object) that is
+      \code{\link[Matrix:dtCMatrix-class]{dtCMatrix}} object) that is
       the left Cholesky factor of the relationship matrix of the pedigree.}
     \item{coerce}{\code{signature(from = "pedigree", to = "dtCMatrix")}: ... }
     \item{coerce}{\code{signature(from = "pedigree", to = "data.frame")}: ... }

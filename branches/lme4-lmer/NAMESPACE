@@ -1,10 +1,13 @@
+useDynLib(lme4, .registration=TRUE)
+
 import("Matrix")
-importFrom("graphics",plot)		## lmer-related
-import("stats", "lattice")		## lmer-related
+importFrom("graphics", plot)
+import("stats", "lattice")
+importFrom("utils", head, tail)
 
 export(
        "gsummary",
-       "hatTrace"
+       "hatTrace",
        "lmList",
        "lmer",
        "mcmcsamp",
@@ -20,15 +23,17 @@ exportClasses(
               "mer",
               "pedigree",
               "ranef.lmer",
-              "summary.lmer"
-              "summary.mer",
+              "summary.lmer",
+              "summary.mer"
               )
 
 exportMethods(
               "BIC",
               "VarCorr",
               "anova",
+              "chol",
               "coef",
+              "coerce",
               "confint",
               "deviance",
               "fitted",
@@ -49,8 +54,8 @@ exportMethods(
               "summary",
               "tail",
               "terms",
-              "update"
               "update",
               "vcov",
-              "with",
+              "with"
               )
+
