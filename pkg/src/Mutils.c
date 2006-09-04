@@ -308,36 +308,6 @@ Matrix_make_named(int TYP, char **names)
 }
 
 /**
- * Allocate a 3-dimensional array
- *
- * @param mode The R mode (e.g. INTSXP)
- * @param nrow number of rows
- * @param ncol number of columns
- * @param nface number of faces
- *
- * @return A 3-dimensional array of the indicated dimensions and mode
- */
-SEXP alloc3Darray(SEXPTYPE mode, int nrow, int ncol, int nface)
-{
-    SEXP s, t;
-    int n;
-
-    if (nrow < 0 || ncol < 0 || nface < 0)
-	error(_("negative extents to 3D array"));
-    if ((double)nrow * (double)ncol * (double)nface > INT_MAX)
-	error(_("alloc3Darray: too many elements specified"));
-    n = nrow * ncol * nface;
-    PROTECT(s = allocVector(mode, n));
-    PROTECT(t = allocVector(INTSXP, 3));
-    INTEGER(t)[0] = nrow;
-    INTEGER(t)[1] = ncol;
-    INTEGER(t)[2] = nface;
-    setAttrib(s, R_DimSymbol, t);
-    UNPROTECT(2);
-    return s;
-}
-
-/**
  * Expand a column of a compressed, sparse, column-oriented matrix.
  *
  * @param dest array to hold the result
@@ -502,25 +472,6 @@ Matrix_getElement(SEXP list, char *nm) {
 	if (!strcmp(CHAR(STRING_ELT(names, i)), nm))
 	    return(VECTOR_ELT(list, i));
     return R_NilValue;
-}
-
-/**
- * Allocate a real classed matrix
- *
- * @param class character string of the type of Matrix to allocate
- * @param nrow number of rows
- * @param ncol number of columns
- *
- * @return pointer to a classed real matrix
- */
-SEXP alloc_real_classed_matrix(char *class, int nrow, int ncol)
-{
-    SEXP val = NEW_OBJECT(MAKE_CLASS(class));
-    int *dims = INTEGER(ALLOC_SLOT(val, Matrix_DimSym, INTSXP, 2));
-
-    dims[0] = nrow; dims[1] = ncol;
-    ALLOC_SLOT(val, Matrix_xSym, REALSXP, nrow * ncol);
-    return val;
 }
 
 SEXP alloc_dgeMatrix(int m, int n, SEXP rownms, SEXP colnms)

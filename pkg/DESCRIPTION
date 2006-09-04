@@ -8,7 +8,6 @@ Description: Classes and methods for dense and sparse matrices and
     operations on them using Lapack, CSparse and CHOLMOD 
 Depends: R (>= 2.4.0), stats, methods, utils, lattice
 Imports: graphics, lattice, grid, stats
-Suggests: mlmRev, MASS, coda
 Enhances: graph, SparseM
 SystemRequirements: GNU make
 LazyLoad: yes
