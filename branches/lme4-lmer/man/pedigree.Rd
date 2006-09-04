@@ -18,8 +18,7 @@ pedigree(sire, dam, label)
       corresponding entry.}
 }
 \value{
-  an object of formal class \code{"pedigree"}, see
-  \code{\linkS4class{pedigree}}.
+  an object of formal class \code{"\linkS4class{pedigree}"}.
 }
 \seealso{\code{\linkS4class{pedigree}}}
 \examples{

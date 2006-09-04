@@ -51,6 +51,6 @@ setMethod("chol", "pedigree",
           function(x, pivot, LINPACK) {
               ttrans <- solve(t(as(x, "dtCMatrix")))
               .Call(pedigree_chol, x,
-                    as(diagU2N(t(ttrans)), "dtCMatrix"))
+                    as(.Call("Csparse_diagU2N", t(ttrans), PACKAGE = "Matrix"),
+                       "dtCMatrix"))
           })
-

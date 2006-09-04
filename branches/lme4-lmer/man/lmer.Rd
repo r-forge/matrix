@@ -132,7 +132,7 @@ lmer(formula, data, family, method, control, start,
 %\references{ ~put references to the literature/web site here ~ }
 %\author{}
 %\note{}
-\seealso{\code{\link[Matrix]{lmer-class}}, \code{\link[stats]{lm}}
+\seealso{\code{\linkS4class{lmer}}, \code{\link[stats]{lm}}
 }
 \examples{
 data(sleepstudy)

@@ -1,5 +1,7 @@
+#include <Rdefines.h>
 SEXP
     lme4_DSym,
+    lme4_DimSym,
     lme4_GpSym,
     lme4_LSym,
     lme4_OmegaSym,
@@ -10,7 +12,6 @@ SEXP
     lme4_XtXSym,
     lme4_XtySym,
     lme4_ZZpOSym,
-    lme4_ZZxSym,
     lme4_ZtSym,
     lme4_ZtXSym,
     lme4_ZtZSym,
@@ -26,14 +27,21 @@ SEXP
     lme4_fixefSym,
     lme4_flistSym,
     lme4_gradCompSym,
+    lme4_iSym,
     lme4_methodSym,
     lme4_ncSym,
+    lme4_pSym,
+    lme4_permSym,
     lme4_rXySym,
     lme4_rZySym,
     lme4_ranefSym,
     lme4_statusSym,
+    lme4_uploSym,
     lme4_useScaleSym,
     lme4_wrkresSym,
-    lme4_wtsSym;
+    lme4_wtsSym,
+    lme4_xSym,
+    lme4_ySym;
+
 
 
