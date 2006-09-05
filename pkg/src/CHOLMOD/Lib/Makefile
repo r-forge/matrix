@@ -5,8 +5,10 @@ include ${MkInclude}
 
 default: lib
 
-PKG_CFLAGS = -I../../AMD/Include -I../../AMD/Source -I../../COLAMD \
-	-I../../Metis -I../../CCOLAMD -I../Include
+PKG_CFLAGS = -I../../AMD/Include -I../../AMD/Source \
+        -I../../CAMD/Include -I../../CAMD/Source \
+        -I../../COLAMD  -I../../CCOLAMD \
+	-I../../Metis -I../Include -I../../UFconfig
 
 #-------------------------------------------------------------------------------
 # ../Include/ directory contains all include files:
@@ -48,7 +50,7 @@ MATRIXOPS = cholmod_drop.o cholmod_horzcat.o cholmod_norm.o \
 	cholmod_submatrix.o cholmod_vertcat.o
 
 PARTITION = cholmod_ccolamd.o cholmod_csymamd.o \
-	cholmod_metis.o cholmod_nesdis.o
+	cholmod_metis.o cholmod_nesdis.o cholmod_camd.o
 
 MODIFY = cholmod_rowadd.o cholmod_rowdel.o cholmod_updown.o
 
@@ -147,6 +149,8 @@ cholmod_csymamd.o: ../Partition/cholmod_csymamd.c
 cholmod_metis.o: ../Partition/cholmod_metis.c
 	$(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c $< -o $@
 cholmod_nesdis.o: ../Partition/cholmod_nesdis.c
+	$(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c $< -o $@
+cholmod_camd.o: ../Partition/cholmod_camd.c
 	$(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c $< -o $@
 
 #-------------------------------------------------------------------------------

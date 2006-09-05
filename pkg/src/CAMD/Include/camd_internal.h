@@ -1,31 +1,31 @@
 /* ========================================================================= */
-/* === amd_internal.h ====================================================== */
+/* === camd_internal.h ===================================================== */
 /* ========================================================================= */
 
 /* ------------------------------------------------------------------------- */
-/* AMD Version 1.2, Copyright (c) 2005 by Timothy A. Davis,		     */
+/* CAMD Version 2.1, Copyright (c) 2006 by Timothy A. Davis, Yanqing Chen,   */
 /* Patrick R. Amestoy, and Iain S. Duff.  See ../README.txt for License.     */
 /* email: davis at cise.ufl.edu    CISE Department, Univ. of Florida.        */
-/* web: http://www.cise.ufl.edu/research/sparse/amd                          */
+/* web: http://www.cise.ufl.edu/research/sparse/camd                         */
 /* ------------------------------------------------------------------------- */
 
-/* This file is for internal use in AMD itself, and does not normally need to
+/* This file is for internal use in CAMD itself, and does not normally need to
  * be included in user code (it is included in UMFPACK, however).   All others
- * should use amd.h instead.
+ * should use camd.h instead.
  *
- * The following compile-time definitions affect how AMD is compiled.
+ * The following compile-time definitions affect how CAMD is compiled.
  *
  *	-DNPRINT
  *
  *	    Disable all printing.  stdio.h will not be included.  Printing can
- *	    be re-enabled at run-time by setting the global pointer amd_printf
+ *	    be re-enabled at run-time by setting the global pointer camd_printf
  *	    to printf (or mexPrintf for a MATLAB mexFunction).
  *
  *	-DNMALLOC
  *
  *	    No memory manager is defined at compile-time.  You MUST define the
- *	    function pointers amd_malloc, amd_free, amd_realloc, and amd_calloc
- *	    at run-time for AMD to work properly.
+ *	    function pointers camd_malloc, camd_free, camd_realloc, and
+ *	    camd_calloc at run-time for CAMD to work properly.
  */
 
 /* ========================================================================= */
@@ -37,15 +37,15 @@
  * file, then debugging is always turned off, regardless of whether or not
  * -DNDEBUG is specified in your compiler options.
  *
- * If AMD is being compiled as a mexFunction, then MATLAB_MEX_FILE is defined,
+ * If CAMD is being compiled as a mexFunction, then MATLAB_MEX_FILE is defined,
  * and mxAssert is used instead of assert.  If debugging is not enabled, no
- * MATLAB include files or functions are used.  Thus, the AMD library libamd.a
+ * MATLAB include files or functions are used.  Thus, the CAMD library libcamd.a
  * can be safely used in either a stand-alone C program or in another
  * mexFunction, without any change.
  */
 
 /*
-    AMD will be exceedingly slow when running in debug mode.  The next three
+    CAMD will be exceedingly slow when running in debug mode.  The next three
     lines ensure that debugging is turned off.
 */
 #ifndef NDEBUG
@@ -54,8 +54,9 @@
 
 /*
     To enable debugging, uncomment the following line:
- #undef NDEBUG
+#undef NDEBUG
 */
+
 
 /* ------------------------------------------------------------------------- */
 /* ANSI include files */
@@ -152,57 +153,59 @@
 
 #define NULL 0
 
+/* largest value of size_t */
+#define SIZE_T_MAX ((size_t) (-1))
+
 /* ------------------------------------------------------------------------- */
-/* integer type for AMD: int or long */
+/* integer type for CAMD: int or UF_long */
 /* ------------------------------------------------------------------------- */
+
+/* define UF_long */
+#include "UFconfig.h"
 
 #if defined (DLONG) || defined (ZLONG)
 
-#define Int long
-#define ID "%ld"
-#define Int_MAX LONG_MAX
-#define Int_MIN LONG_MIN
+#define Int UF_long
+#define ID  UF_long_id
+#define Int_MAX UF_long_max
 
-#define AMD_order amd_l_order
-#define AMD_defaults amd_l_defaults
-#define AMD_control amd_l_control
-#define AMD_info amd_l_info
-#define AMD_1 amd_l1
-#define AMD_2 amd_l2
-#define AMD_valid amd_l_valid
-#define AMD_aat amd_l_aat
-#define AMD_postorder amd_l_postorder
-#define AMD_post_tree amd_l_post_tree
-#define AMD_dump amd_l_dump
-#define AMD_debug amd_l_debug
-#define AMD_debug_init amd_l_debug_init
-#define AMD_wpreprocess amd_l_wpreprocess
-#define AMD_preprocess amd_l_preprocess
-#define AMD_preprocess_valid amd_l_preprocess_valid
+#define CAMD_order camd_l_order
+#define CAMD_defaults camd_l_defaults
+#define CAMD_control camd_l_control
+#define CAMD_info camd_l_info
+#define CAMD_1 camd_l1
+#define CAMD_2 camd_l2
+#define CAMD_valid camd_l_valid
+#define CAMD_cvalid camd_l_cvalid
+#define CAMD_aat camd_l_aat
+#define CAMD_postorder camd_l_postorder
+#define CAMD_post_tree camd_l_post_tree
+#define CAMD_dump camd_l_dump
+#define CAMD_debug camd_l_debug
+#define CAMD_debug_init camd_l_debug_init
+#define CAMD_preprocess camd_l_preprocess
 
 #else
 
 #define Int int
 #define ID "%d"
 #define Int_MAX INT_MAX
-#define Int_MIN INT_MIN
 
-#define AMD_order amd_order
-#define AMD_defaults amd_defaults
-#define AMD_control amd_control
-#define AMD_info amd_info
-#define AMD_1 amd_1
-#define AMD_2 amd_2
-#define AMD_valid amd_valid
-#define AMD_aat amd_aat
-#define AMD_postorder amd_postorder
-#define AMD_post_tree amd_post_tree
-#define AMD_dump amd_dump
-#define AMD_debug amd_debug
-#define AMD_debug_init amd_debug_init
-#define AMD_wpreprocess amd_wpreprocess
-#define AMD_preprocess amd_preprocess
-#define AMD_preprocess_valid amd_preprocess_valid
+#define CAMD_order camd_order
+#define CAMD_defaults camd_defaults
+#define CAMD_control camd_control
+#define CAMD_info camd_info
+#define CAMD_1 camd_1
+#define CAMD_2 camd_2
+#define CAMD_valid camd_valid
+#define CAMD_cvalid camd_cvalid
+#define CAMD_aat camd_aat
+#define CAMD_postorder camd_postorder
+#define CAMD_post_tree camd_post_tree
+#define CAMD_dump camd_dump
+#define CAMD_debug camd_debug
+#define CAMD_debug_init camd_debug_init
+#define CAMD_preprocess camd_preprocess
 
 #endif
 
@@ -211,29 +214,29 @@
 /* ========================================================================= */
 
 /* All output goes through the PRINTF macro.  */
-#define PRINTF(params) { if (amd_printf != NULL) (void) amd_printf params ; }
+#define PRINTF(params) { if (camd_printf != NULL) (void) camd_printf params ; }
 
 /* ------------------------------------------------------------------------- */
-/* AMD routine definitions (user-callable) */
+/* CAMD routine definitions (user-callable) */
 /* ------------------------------------------------------------------------- */
 
-#include "amd.h"
+#include "camd.h"
 
 /* ------------------------------------------------------------------------- */
-/* AMD routine definitions (not user-callable) */
+/* CAMD routine definitions (not user-callable) */
 /* ------------------------------------------------------------------------- */
 
-GLOBAL Int AMD_aat
+GLOBAL size_t CAMD_aat
 (
     Int n,
     const Int Ap [ ],
     const Int Ai [ ],
     Int Len [ ],
-    Int Tp [ ],	
+    Int Tp [ ],
     double Info [ ]
 ) ;
 
-GLOBAL void AMD_1
+GLOBAL void CAMD_1
 (
     Int n,
     const Int Ap [ ],
@@ -244,35 +247,16 @@ GLOBAL void AMD_1
     Int slen,
     Int S [ ],
     double Control [ ],
-    double Info [ ]
+    double Info [ ],
+    const Int C [ ]
 ) ;
 
-GLOBAL void AMD_postorder
+GLOBAL Int CAMD_postorder
 (
-    Int nn,
-    Int Parent [ ],
-    Int Npiv [ ],
-    Int Fsize [ ],
-    Int Order [ ],
-    Int Child [ ],
-    Int Sibling [ ],
-    Int Stack [ ]
+    Int j, Int k, Int n, Int head [], Int next [], Int post [], Int stack []
 ) ;
 
-GLOBAL Int AMD_post_tree
-(
-    Int root,
-    Int k,
-    Int Child [ ],
-    const Int Sibling [ ],
-    Int Order [ ],
-    Int Stack [ ]
-#ifndef NDEBUG
-    , Int nn
-#endif
-) ;
-
-GLOBAL void AMD_wpreprocess
+GLOBAL void CAMD_preprocess
 (
     Int n,
     const Int Ap [ ],
@@ -281,13 +265,6 @@ GLOBAL void AMD_wpreprocess
     Int Ri [ ],
     Int W [ ],
     Int Flag [ ]
-) ;
-
-GLOBAL Int AMD_preprocess_valid
-(
-    Int n,
-    const Int Ap [ ],
-    const Int Ai [ ]
 ) ;
 
 /* ------------------------------------------------------------------------- */
@@ -299,11 +276,16 @@ GLOBAL Int AMD_preprocess_valid
 /* from assert.h:  assert macro */
 #include <assert.h>
 
-extern Int AMD_debug ;
+#ifndef EXTERN
+#define EXTERN extern
+#endif
 
-GLOBAL void AMD_debug_init ( char *s ) ;
+EXTERN Int CAMD_debug ;
 
-GLOBAL void AMD_dump (
+GLOBAL void CAMD_debug_init ( char *s ) ;
+
+GLOBAL void CAMD_dump
+(
     Int n,
     Int Pe [ ],
     Int Iw [ ],
@@ -317,34 +299,37 @@ GLOBAL void AMD_dump (
     Int Elen [ ],
     Int Degree [ ],
     Int W [ ],
-    Int nel
+    Int nel,
+    Int BucketSet [],
+    const Int C [],
+    Int Curc
 ) ;
 
 #ifdef ASSERT
 #undef ASSERT
 #endif
 
-/* Use mxAssert if AMD is compiled into a mexFunction */
+/* Use mxAssert if CAMD is compiled into a mexFunction */
 #ifdef MATLAB_MEX_FILE
 #define ASSERT(expression) (mxAssert ((expression), ""))
 #else
 #define ASSERT(expression) (assert (expression))
 #endif
 
-#define AMD_DEBUG0(params) { PRINTF (params) ; }
-#define AMD_DEBUG1(params) { if (AMD_debug >= 1) PRINTF (params) ; }
-#define AMD_DEBUG2(params) { if (AMD_debug >= 2) PRINTF (params) ; }
-#define AMD_DEBUG3(params) { if (AMD_debug >= 3) PRINTF (params) ; }
-#define AMD_DEBUG4(params) { if (AMD_debug >= 4) PRINTF (params) ; }
+#define CAMD_DEBUG0(params) { PRINTF (params) ; }
+#define CAMD_DEBUG1(params) { if (CAMD_debug >= 1) PRINTF (params) ; }
+#define CAMD_DEBUG2(params) { if (CAMD_debug >= 2) PRINTF (params) ; }
+#define CAMD_DEBUG3(params) { if (CAMD_debug >= 3) PRINTF (params) ; }
+#define CAMD_DEBUG4(params) { if (CAMD_debug >= 4) PRINTF (params) ; }
 
 #else
 
 /* no debugging */
 #define ASSERT(expression)
-#define AMD_DEBUG0(params)
-#define AMD_DEBUG1(params)
-#define AMD_DEBUG2(params)
-#define AMD_DEBUG3(params)
-#define AMD_DEBUG4(params)
+#define CAMD_DEBUG0(params)
+#define CAMD_DEBUG1(params)
+#define CAMD_DEBUG2(params)
+#define CAMD_DEBUG3(params)
+#define CAMD_DEBUG4(params)
 
 #endif

@@ -1,4 +1,4 @@
-CCOLAMD version 1.0: constrained column approximate minimum degree ordering
+CCOLAMD version 2.5: constrained column approximate minimum degree ordering
 Copyright (C) 2005, Univ. of Florida.  Authors: Timothy A. Davis,
 Sivasankaran Rajamanickam, and Stefan Larimore.  Closely based on COLAMD by
 Davis, Stefan Larimore, in collaboration with Esmond Ng, and John Gilbert.
@@ -13,6 +13,8 @@ CSYMAMD is a symmetric minimum degree ordering method based on CCOLAMD, also
 available as a MATLAB-callable function.  It constructs a matrix M such
 that M'*M has the same pattern as A, and then uses CCOLAMD to compute a column
 ordering of M.
+
+Requires UFconfig, in the ../UFconfig directory relative to this directory.
 
 To compile and test the colamd m-files and mexFunctions, just unpack the
 CCOLAMD/ directory from the CCOLAMD.tar.gz file, and run MATLAB from

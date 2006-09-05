@@ -1,6 +1,7 @@
 #ifndef CHM_COMMON_H
 #define CHM_COMMON_H
 
+#include "UFconfig/UFconfig.h"
 #include "CHOLMOD/Include/cholmod.h"
 #include "Mutils.h"
 

@@ -3,7 +3,7 @@
 /* ========================================================================== */
 
 /* ----------------------------------------------------------------------------
- * CCOLAMD version 1.0,
+ * CCOLAMD version 2.5,
  * Copyright (C) 2005, Univ. of Florida.  Authors: Timothy A. Davis,
  * Sivasankaran Rajamanickam, and Stefan Larimore
  * See License.txt for the Version 2.1 of the GNU Lesser General Public License
@@ -100,9 +100,10 @@
 /* === Description of user-callable routines ================================ */
 /* ========================================================================== */
 
-/* CCOLAMD includes both int and long versions of all its routines.  The
- * description below is for the int version.   For long, all int arguments
- * become long integers. */
+/* CCOLAMD includes both int and UF_long versions of all its routines.  The
+ * description below is for the int version.   For UF_long, all int arguments
+ * become UF_long integers.  UF_long is normally defined as long, except for
+ * WIN64 */
 
 /*  ----------------------------------------------------------------------------
  *  ccolamd_recommended:
@@ -111,12 +112,13 @@
  *	C syntax:
  *
  *	    #include "ccolamd.h"
- *	    int ccolamd_recommended (int nnz, int n_row, int n_col) ;
- *	    long ccolamd_l_recommended (long nnz, long n_row, long n_col) ;
+ *	    size_t ccolamd_recommended (int nnz, int n_row, int n_col) ;
+ *	    size_t ccolamd_l_recommended (UF_long nnz, UF_long n_row,
+ *		UF_long n_col) ;
  *
  *	Purpose:
  *
- *	    Returns recommended value of Alen for use by ccolamd.  Returns -1
+ *	    Returns recommended value of Alen for use by ccolamd.  Returns 0
  *	    if any input argument is negative.  The use of this routine
  *	    is optional.  Not needed for csymamd, which dynamically allocates
  *	    its own memory.
@@ -208,9 +210,9 @@
  *	    	double knobs [CCOLAMD_KNOBS], int stats [CCOLAMD_STATS],
  *		int *cmember) ;
  *
- *	    long ccolamd_l (long n_row, long n_col, long Alen, long *A, long *p,
- *	    	double knobs [CCOLAMD_KNOBS], long stats [CCOLAMD_STATS],
- *		long *cmember) ;
+ *	    UF_long ccolamd_l (UF_long n_row, UF_long n_col, UF_long Alen,
+ *		UF_long *A, UF_long *p, double knobs [CCOLAMD_KNOBS],
+ *		UF_long stats [CCOLAMD_STATS], UF_long *cmember) ;
  *
  *	Purpose:
  *
@@ -422,10 +424,10 @@
  *		void (*allocate) (size_t, size_t), void (*release) (void *),
  *		int *cmember, int stype) ;
  *
- *	    long csymamd_l (long n, long *A, long *p, long *perm,
- *	    	double knobs [CCOLAMD_KNOBS], long stats [CCOLAMD_STATS],
+ *	    UF_long csymamd_l (UF_long n, UF_long *A, UF_long *p, UF_long *perm,
+ *	    	double knobs [CCOLAMD_KNOBS], UF_long stats [CCOLAMD_STATS],
  *		void (*allocate) (size_t, size_t), void (*release) (void *),
- *		long *cmember, long stype) ;
+ *		UF_long *cmember, UF_long stype) ;
  *
  *	Purpose:
  *
@@ -561,7 +563,7 @@
  *
  *	    #include "ccolamd.h"
  *	    ccolamd_report (int stats [CCOLAMD_STATS]) ;
- *	    ccolamd_l_report (long stats [CCOLAMD_STATS]) ;
+ *	    ccolamd_l_report (UF_long stats [CCOLAMD_STATS]) ;
  *
  *	Purpose:
  *
@@ -582,7 +584,7 @@
  *
  *	    #include "ccolamd.h"
  *	    csymamd_report (int stats [CCOLAMD_STATS]) ;
- *	    csymamd_l_report (long stats [CCOLAMD_STATS]) ;
+ *	    csymamd_l_report (UF_long stats [CCOLAMD_STATS]) ;
  *
  *	Purpose:
  *
@@ -634,15 +636,18 @@
 #endif
 
 /* ========================================================================== */
-/* === int or long ========================================================== */
+/* === int or UF_long ======================================================= */
 /* ========================================================================== */
+
+/* define UF_long */
+#include "UFconfig.h"
 
 #ifdef DLONG
 
-#define Int long
-#define ID "%ld"
-#define Int_MAX LONG_MAX
-#define Int_MIN LONG_MIN
+#define Int UF_long
+#define ID  UF_long_id
+#define Int_MAX UF_long_max
+
 #define CCOLAMD_recommended ccolamd_l_recommended
 #define CCOLAMD_set_defaults ccolamd_l_set_defaults
 #define CCOLAMD_2 ccolamd2_l
@@ -660,7 +665,7 @@
 #define Int int
 #define ID "%d"
 #define Int_MAX INT_MAX
-#define Int_MIN INT_MIN
+
 #define CCOLAMD_recommended ccolamd_recommended
 #define CCOLAMD_set_defaults ccolamd_set_defaults
 #define CCOLAMD_2 ccolamd2
@@ -695,9 +700,9 @@ typedef struct CColamd_Col_struct
     } shared1 ;
     union
     {
-	Int score ;
+	Int score ;	
 	Int order ;
-    } shared2 ;
+    } shared2 ; 
     union
     {
 	Int headhash ;	/* head of a hash bucket, if col is at the head of */
@@ -743,12 +748,6 @@ typedef struct CColamd_Row_struct
 
 } CColamd_Row ;
 
-/* size of the Col and Row structures */
-#define CCOLAMD_C(n_col) \
-	((Int) (((n_col) + 1) * sizeof (CColamd_Col) / sizeof (Int)))
-#define CCOLAMD_R(n_row) \
-	((Int) (((n_row) + 1) * sizeof (CColamd_Row) / sizeof (Int)))
-
 /* ========================================================================== */
 /* === basic definitions ==================================================== */
 /* ========================================================================== */
@@ -758,9 +757,9 @@ typedef struct CColamd_Row_struct
 #define MIN(a,b) (((a) < (b)) ? (a) : (b))
 
 /* Routines are either PUBLIC (user-callable) or PRIVATE (not user-callable) */
-#define GLOBAL
+#define GLOBAL 
 #define PUBLIC
-#define PRIVATE static
+#define PRIVATE static 
 
 #define DENSE_DEGREE(alpha,n) \
     ((Int) MAX (16.0, (alpha) * sqrt ((double) (n))))
@@ -841,9 +840,9 @@ PRIVATE Int ccolamd_debug ;
 #endif
 
 PRIVATE void ccolamd_get_debug
-(
+(   
     char *method
-) ;
+) ; 
 
 PRIVATE void debug_mark
 (
@@ -1028,13 +1027,13 @@ PRIVATE void print_report
  *  The ccolamd_recommended routine returns the suggested size for Alen.  This
  *  value has been determined to provide good balance between the number of
  *  garbage collections and the memory requirements for ccolamd.  If any
- *  argument is negative, or if integer overflow occurs, a -1 is returned as
+ *  argument is negative, or if integer overflow occurs, a 0 is returned as
  *  an error condition.
  *
  *  2*nnz space is required for the row and column indices of the matrix
  *  (or 4*n_col, which ever is larger).
  *
- *  CCOLAMD_C (n_col) + COLAMD_R (n_row) space is required for the Col and Row
+ *  CCOLAMD_C (n_col) + CCOLAMD_R (n_row) space is required for the Col and Row
  *  arrays, respectively, which are internal to ccolamd.  This is equal to
  *  8*n_col + 6*n_row if the structures are not padded.
  *
@@ -1045,37 +1044,93 @@ PRIVATE void print_report
  *  for other workspace used in ccolamd which did not appear in colamd.
  */
 
+/* add two values of type size_t, and check for integer overflow */
+static size_t t_add (size_t a, size_t b, int *ok)
+{
+    (*ok) = (*ok) && ((a + b) >= MAX (a,b)) ;
+    return ((*ok) ? (a + b) : 0) ;
+}
+
+/* compute a*k where k is a small integer, and check for integer overflow */
+static size_t t_mult (size_t a, size_t k, int *ok)
+{
+    size_t i, s = 0 ;
+    for (i = 0 ; i < k ; i++)
+    {
+	s = t_add (s, a, ok) ;
+    }
+    return (s) ;
+}
+
+/* size of the Col and Row structures */
+#define CCOLAMD_C(n_col,ok) \
+    ((t_mult (t_add (n_col, 1, ok), sizeof (CColamd_Col), ok) / sizeof (Int)))
+
+#define CCOLAMD_R(n_row,ok) \
+    ((t_mult (t_add (n_row, 1, ok), sizeof (CColamd_Row), ok) / sizeof (Int)))
+
+/*
 #define CCOLAMD_RECOMMENDED(nnz, n_row, n_col) \
 	    MAX (2 * nnz, 4 * n_col) + \
 	    CCOLAMD_C (n_col) + CCOLAMD_R (n_row) + n_col + (nnz / 5) \
 	    + ((3 * n_col) + 1) + 5 * (n_col + 1) + n_row
+ */
 
-PUBLIC Int CCOLAMD_recommended	/* returns recommended value of Alen. */
+static size_t ccolamd_need (Int nnz, Int n_row, Int n_col, int *ok)
+{
+
+    /* ccolamd_need, compute the following, and check for integer overflow:
+	need = MAX (2*nnz, 4*n_col) + n_col +
+		Col_size + Row_size +
+		(3*n_col+1) + (5*(n_col+1)) + n_row ;
+    */
+    size_t s, c, r, t ;
+
+    /* MAX (2*nnz, 4*n_col) */
+    s = t_mult (nnz, 2, ok) ;	    /* 2*nnz */
+    t = t_mult (n_col, 4, ok) ;	    /* 4*n_col */
+    s = MAX (s,t) ;
+
+    s = t_add (s, n_col, ok) ;	    /* bare minimum elbow room */
+
+    /* Col and Row arrays */
+    c = CCOLAMD_C (n_col, ok) ;	    /* size of column structures */
+    r = CCOLAMD_R (n_row, ok) ;	    /* size of row structures */
+    s = t_add (s, c, ok) ;
+    s = t_add (s, r, ok) ;
+
+    c = t_mult (n_col, 3, ok) ;	    /* 3*n_col + 1 */
+    c = t_add (c, 1, ok) ;
+    s = t_add (s, c, ok) ;
+
+    c = t_add (n_col, 1, ok) ;	    /* 5 * (n_col + 1) */
+    c = t_mult (c, 5, ok) ;
+    s = t_add (s, c, ok) ;
+
+    s = t_add (s, n_row, ok) ;	    /* n_row */
+
+    return (ok ? s : 0) ;
+}
+
+PUBLIC size_t CCOLAMD_recommended	/* returns recommended value of Alen. */
 (
-    /* === Parameters ====================================================== */
+    /* === Parameters ======================================================= */
 
     Int nnz,			/* number of nonzeros in A */
     Int n_row,			/* number of rows in A */
     Int n_col			/* number of columns in A */
 )
 {
-    double xnz = nnz ;
-    double xncol = n_col ;
-    double xnrow = n_row ;
-    double x ;
-
+    size_t s ;
+    int ok = TRUE ;
     if (nnz < 0 || n_row < 0 || n_col < 0)
     {
-	return (-1) ;
+	return (0) ;
     }
-
-    x = CCOLAMD_RECOMMENDED (xnz, xnrow, xncol) ;
-    if (INT_OVERFLOW (x))
-    {
-	return (-1) ;
-    }
-
-    return (CCOLAMD_RECOMMENDED (nnz, n_row, n_col)) ;
+    s = ccolamd_need (nnz, n_row, n_col, &ok) ;	/* bare minimum needed */
+    s = t_add (s, nnz/5, &ok) ;			/* extra elbow room */
+    ok = ok && (s < Int_MAX) ;
+    return (ok ? s : 0) ;
 }
 
 
@@ -1144,7 +1199,7 @@ PUBLIC Int CSYMAMD_MAIN		/* return TRUE if OK, FALSE otherwise */
     Int *count ;		/* length of each column of M, and col pointer*/
     Int *mark ;			/* mark array for finding duplicate entries */
     Int *M ;			/* row indices of matrix M */
-    Int Mlen ;			/* length of M */
+    size_t Mlen ;		/* length of M */
     Int n_row ;			/* number of rows in M */
     Int nnz ;			/* number of entries in A */
     Int i ;			/* row index of A */
@@ -1336,15 +1391,15 @@ PUBLIC Int CSYMAMD_MAIN		/* return TRUE if OK, FALSE otherwise */
     n_row = mnz / 2 ;
     Mlen = CCOLAMD_recommended (mnz, n_row, n) ;
     M = (Int *) ((*allocate) (Mlen, sizeof (Int))) ;
-    DEBUG1 (("csymamd: M is "ID"-by-"ID" with "ID" entries, Mlen = "ID"\n",
-    	n_row, n, mnz, Mlen)) ;
+    DEBUG1 (("csymamd: M is "ID"-by-"ID" with "ID" entries, Mlen = %g\n",
+    	n_row, n, mnz, (double) Mlen)) ;
 
     if (!M)
     {
 	stats [CCOLAMD_STATUS] = CCOLAMD_ERROR_out_of_memory ;
 	(*release) ((void *) count) ;
 	(*release) ((void *) mark) ;
-	DEBUG1 (("csymamd: allocate M (size "ID") failed\n", Mlen)) ;
+	DEBUG1 (("csymamd: allocate M (size %g) failed\n", (double) Mlen)) ;
 	return (FALSE) ;
     }
 
@@ -1421,7 +1476,7 @@ PUBLIC Int CSYMAMD_MAIN		/* return TRUE if OK, FALSE otherwise */
 
     /* === Order the columns of M =========================================== */
 
-    (void) CCOLAMD_2 (n_row, n, Mlen, M, perm, cknobs, stats,
+    (void) CCOLAMD_2 (n_row, n, (Int) Mlen, M, perm, cknobs, stats,
              (Int *) NULL, (Int *) NULL, (Int *) NULL, (Int *) NULL,
              (Int *) NULL, (Int *) NULL, (Int *) NULL, cmember) ;
 
@@ -1509,9 +1564,9 @@ PUBLIC Int CCOLAMD_2	    /* returns TRUE if successful, FALSE otherwise */
 
     Int i ;			/* loop index */
     Int nnz ;			/* nonzeros in A */
-    Int Row_size ;		/* size of Row [ ], in integers */
-    Int Col_size ;		/* size of Col [ ], in integers */
-    Int need ;			/* minimum required length of A */
+    size_t Row_size ;		/* size of Row [ ], in integers */
+    size_t Col_size ;		/* size of Col [ ], in integers */
+    size_t need ;		/* minimum required length of A */
     CColamd_Row *Row ;		/* pointer into A of Row [0..n_row] array */
     CColamd_Col *Col ;		/* pointer into A of Col [0..n_col] array */
     Int n_col2 ;		/* number of non-dense, non-empty columns */
@@ -1538,6 +1593,8 @@ PUBLIC Int CCOLAMD_2	    /* returns TRUE if successful, FALSE otherwise */
     Int set1 ;
     Int set2 ;
     Int cs ;
+
+    int ok ;
 
 #ifndef NDEBUG
     ccolamd_get_debug ("ccolamd") ;
@@ -1618,16 +1675,21 @@ PUBLIC Int CCOLAMD_2	    /* returns TRUE if successful, FALSE otherwise */
 
     /* === Allocate workspace from array A ================================== */
 
-    Col_size = CCOLAMD_C (n_col) ;
-    Row_size = CCOLAMD_R (n_row) ;
+    ok = TRUE ;
+    Col_size = CCOLAMD_C (n_col, &ok) ;
+    Row_size = CCOLAMD_R (n_row, &ok) ;
 
     /* min size of A is 2nnz+ncol.  cset and cset_start are of size 2ncol+1 */
     /* Each of the 5 fronts is of size n_col + 1. InFront is of size nrow.  */
+
+    /*
     need = MAX (2*nnz, 4*n_col) + n_col +
     		Col_size + Row_size +
 		(3*n_col+1) + (5*(n_col+1)) + n_row ;
+    */
+    need = ccolamd_need (nnz, n_row, n_col, &ok) ;
 
-    if (need > Alen)
+    if (!ok || need > (size_t) Alen || need > Int_MAX)
     {
 	/* not enough space in array A to perform the ordering */
 	stats [CCOLAMD_STATUS] = CCOLAMD_ERROR_A_too_small ;
@@ -1637,6 +1699,7 @@ PUBLIC Int CCOLAMD_2	    /* returns TRUE if successful, FALSE otherwise */
 	return (FALSE) ;
     }
 
+    /* since integer overflow has been check, the following cannot overflow: */
     Alen -= Col_size + Row_size + (3*n_col + 1) + 5*(n_col+1) + n_row ;
 
     /* Size of A is now Alen >= MAX (2*nnz, 4*n_col) + n_col.  The ordering
@@ -3857,7 +3920,7 @@ GLOBAL void CCOLAMD_apply_order
 /* === CCOLAMD_fsize ======================================================== */
 /* ========================================================================== */
 
-/* Determine the largest frontal matrix size for each subtree.
+/* Determine the largest frontal matrix size for each subtree. 
  * Only required to sort the children of each
  * node prior to postordering the column elimination tree. */
 
@@ -3969,7 +4032,7 @@ GLOBAL void CCOLAMD_postorder
 		if (CMEMBER (Front_cols[parent]) == CMEMBER (Front_cols[j]))
 		{
 		    Child [parent] = j ;
-		}
+		}   
 	    }
 	}
     }
