@@ -102,7 +102,7 @@ setAs("sparseMatrix", "graphNEL",
 Tsp2grNEL <- function(from) {
     d <- dim(from)
     if(d[1] != d[2])
-	stop("only square matrices can be used as incidence matrices for grphs")
+	stop("only square matrices can be used as incidence matrices for graphs")
     n <- d[1]
     if(n == 0) return(new("graphNEL"))
     if(is.null(rn <- dimnames(from)[[1]]))
