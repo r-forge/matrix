@@ -3,7 +3,7 @@
 /* ========================================================================== */
 
 /* ----------------------------------------------------------------------------
- * CCOLAMD version 1.0.
+ * CCOLAMD version 2.5.
  * Copyright (C) 2005, Univ. of Florida.  Authors: Timothy A. Davis,
  * Sivasankaran Rajamanickam, and Stefan Larimore
  * See License.txt for the Version 2.1 of the GNU Lesser General Public License
@@ -44,10 +44,10 @@ extern "C" {
  *	#endif
  */
 
-#define CCOLAMD_DATE "Aug. 30, 2005"
+#define CCOLAMD_DATE "May 5, 2006"
 #define CCOLAMD_VERSION_CODE(main,sub) ((main) * 1000 + (sub))
-#define CCOLAMD_MAIN_VERSION 1
-#define CCOLAMD_SUB_VERSION 0
+#define CCOLAMD_MAIN_VERSION 2
+#define CCOLAMD_SUB_VERSION 5
 #define CCOLAMD_VERSION \
 	CCOLAMD_VERSION_CODE(CCOLAMD_MAIN_VERSION,CCOLAMD_SUB_VERSION)
 
@@ -113,20 +113,23 @@ extern "C" {
 /* === Prototypes of user-callable routines ================================= */
 /* ========================================================================== */
 
-int ccolamd_recommended		/* returns recommended value of Alen, */
-				/* or (-1) if input arguments are erroneous */
+/* define UF_long */
+#include "UFconfig.h"
+
+size_t ccolamd_recommended	/* returns recommended value of Alen, */
+				/* or 0 if input arguments are erroneous */
 (
     int nnz,			/* nonzeros in A */
     int n_row,			/* number of rows in A */
     int n_col			/* number of columns in A */
 ) ;
 
-long ccolamd_l_recommended	/* returns recommended value of Alen, */
-				/* or (-1) if input arguments are erroneous */
+size_t ccolamd_l_recommended	/* returns recommended value of Alen, */
+				/* or 0 if input arguments are erroneous */
 (
-    long nnz,			/* nonzeros in A */
-    long n_row,			/* number of rows in A */
-    long n_col			/* number of columns in A */
+    UF_long nnz,		/* nonzeros in A */
+    UF_long n_row,		/* number of rows in A */
+    UF_long n_col		/* number of columns in A */
 ) ;
 
 void ccolamd_set_defaults	/* sets default parameters */
@@ -151,16 +154,16 @@ int ccolamd			/* returns (1) if successful, (0) otherwise*/
     int cmember [ ]		/* Constraint set of A, of size n_col */
 ) ;
 
-long ccolamd_l			/* same as ccolamd, but with long integers */
+UF_long ccolamd_l		/* same as ccolamd, but with UF_long integers */
 (
-    long n_row,
-    long n_col,
-    long Alen,
-    long A [ ],
-    long p [ ],
+    UF_long n_row,
+    UF_long n_col,
+    UF_long Alen,
+    UF_long A [ ],
+    UF_long p [ ],
     double knobs [CCOLAMD_KNOBS],
-    long stats [CCOLAMD_STATS],
-    long cmember [ ]
+    UF_long stats [CCOLAMD_STATS],
+    UF_long cmember [ ]
 ) ;
 
 int csymamd			/* return (1) if OK, (0) otherwise */
@@ -179,18 +182,18 @@ int csymamd			/* return (1) if OK, (0) otherwise */
     int stype			/* 0: use both parts, >0: upper, <0: lower */
 ) ;
 
-long csymamd_l			/* same as csymamd, but with long integers */
+UF_long csymamd_l		/* same as csymamd, but with UF_long integers */
 (
-    long n,
-    long A [ ],
-    long p [ ],
-    long perm [ ],
+    UF_long n,
+    UF_long A [ ],
+    UF_long p [ ],
+    UF_long perm [ ],
     double knobs [CCOLAMD_KNOBS],
-    long stats [CCOLAMD_STATS],
+    UF_long stats [CCOLAMD_STATS],
     void * (*allocate) (size_t, size_t),
     void (*release) (void *),
-    long cmember [ ],
-    long stype
+    UF_long cmember [ ],
+    UF_long stype
 ) ;
 
 void ccolamd_report
@@ -200,7 +203,7 @@ void ccolamd_report
 
 void ccolamd_l_report
 (
-    long stats [CCOLAMD_STATS]
+    UF_long stats [CCOLAMD_STATS]
 ) ;
 
 void csymamd_report
@@ -210,7 +213,7 @@ void csymamd_report
 
 void csymamd_l_report
 (
-    long stats [CCOLAMD_STATS]
+    UF_long stats [CCOLAMD_STATS]
 ) ;
 
 
@@ -243,23 +246,23 @@ int ccolamd2
     int cmember [ ]		/* Constraint set of A */
 ) ;
 
-long ccolamd2_l			/* same as ccolamd2, but with long integers */
+UF_long ccolamd2_l	    /* same as ccolamd2, but with UF_long integers */
 (
-    long n_row,
-    long n_col,
-    long Alen,
-    long A [ ],
-    long p [ ],
+    UF_long n_row,
+    UF_long n_col,
+    UF_long Alen,
+    UF_long A [ ],
+    UF_long p [ ],
     double knobs [CCOLAMD_KNOBS],
-    long stats [CCOLAMD_STATS],
-    long Front_npivcol [ ],
-    long Front_nrows [ ],
-    long Front_ncols [ ],
-    long Front_parent [ ],
-    long Front_cols [ ],
-    long *p_nfr,
-    long InFront [ ],
-    long cmember [ ]
+    UF_long stats [CCOLAMD_STATS],
+    UF_long Front_npivcol [ ],
+    UF_long Front_nrows [ ],
+    UF_long Front_ncols [ ],
+    UF_long Front_parent [ ],
+    UF_long Front_cols [ ],
+    UF_long *p_nfr,
+    UF_long InFront [ ],
+    UF_long cmember [ ]
 ) ;
 
 void ccolamd_apply_order
@@ -273,11 +276,11 @@ void ccolamd_apply_order
 
 void ccolamd_l_apply_order
 (
-    long Front [ ],
-    const long Order [ ],
-    long Temp [ ],
-    long nn,
-    long nfr
+    UF_long Front [ ],
+    const UF_long Order [ ],
+    UF_long Temp [ ],
+    UF_long nn,
+    UF_long nfr
 ) ;
 
 
@@ -293,12 +296,12 @@ void ccolamd_fsize
 
 void ccolamd_l_fsize
 (
-    long nn,
-    long MaxFsize [ ],
-    long Fnrows [ ],
-    long Fncols [ ],
-    long Parent [ ],
-    long Npiv [ ]
+    UF_long nn,
+    UF_long MaxFsize [ ],
+    UF_long Fnrows [ ],
+    UF_long Fncols [ ],
+    UF_long Parent [ ],
+    UF_long Npiv [ ]
 ) ;
 
 void ccolamd_postorder
@@ -317,16 +320,16 @@ void ccolamd_postorder
 
 void ccolamd_l_postorder
 (
-    long nn,
-    long Parent [ ],
-    long Npiv [ ],
-    long Fsize [ ],
-    long Order [ ],
-    long Child [ ],
-    long Sibling [ ],
-    long Stack [ ],
-    long Front_cols [ ],
-    long cmember [ ]
+    UF_long nn,
+    UF_long Parent [ ],
+    UF_long Npiv [ ],
+    UF_long Fsize [ ],
+    UF_long Order [ ],
+    UF_long Child [ ],
+    UF_long Sibling [ ],
+    UF_long Stack [ ],
+    UF_long Front_cols [ ],
+    UF_long cmember [ ]
 ) ;
 
 int ccolamd_post_tree
@@ -339,17 +342,21 @@ int ccolamd_post_tree
     int Stack [ ]
 ) ;
 
-long ccolamd_l_post_tree
+UF_long ccolamd_l_post_tree
 (
-    long root,
-    long k,
-    long Child [ ],
-    const long Sibling [ ],
-    long Order [ ],
-    long Stack [ ]
+    UF_long root,
+    UF_long k,
+    UF_long Child [ ],
+    const UF_long Sibling [ ],
+    UF_long Order [ ],
+    UF_long Stack [ ]
 ) ;
 
-extern int (*ccolamd_printf) (const char *, ...) ;
+#ifndef EXTERN
+#define EXTERN extern
+#endif
+
+EXTERN int (*ccolamd_printf) (const char *, ...) ;
 
 #ifdef __cplusplus
 }
