@@ -1,7 +1,8 @@
 #
 pkg = Matrix
 
-PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS)
+## we use the BLAS and the LAPACK library:
+PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
 include SOURCES_C.mkf
 
 ## zherk.f and lsame.f are part of BLAS, but not of R's BLAS sources
