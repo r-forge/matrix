@@ -765,26 +765,27 @@ typedef struct cholmod_dense_struct
 
 } cholmod_dense ;
 
-int(*M_cholmod_start)(cholmod_common *Common);
-int(*M_cholmod_finish)(cholmod_common *Common);
+int M_cholmod_start(cholmod_common *Common);
+int M_cholmod_finish(cholmod_common *Common);
 
-cholmod_sparse*(*M_cholmod_allocate_sparse)
-    (size_t nrow, size_t ncol, size_t nzmax, int sorted, int packed,
-     int stype, int xtype, cholmod_common *Common);
-int(*M_cholmod_free_factor)(cholmod_factor **L, cholmod_common *Common);
-int(*M_cholmod_free_dense)(cholmod_dense **A, cholmod_common *Common);
-int(*M_cholmod_free_sparse)(cholmod_sparse **A, cholmod_common *Common);
+cholmod_sparse* M_cholmod_allocate_sparse(size_t nrow, size_t ncol,
+					  size_t nzmax, int sorted,
+					  int packed, int stype, int xtype,
+					  cholmod_common *Common);
+int M_cholmod_free_factor(cholmod_factor **L, cholmod_common *Common);
+int M_cholmod_free_dense(cholmod_dense **A, cholmod_common *Common);
+int M_cholmod_free_sparse(cholmod_sparse **A, cholmod_common *Common);
 
-long(*M_cholmod_nnz)(cholmod_sparse *A, cholmod_common *Common);
-cholmod_sparse*(*M_cholmod_speye)(size_t nrow, size_t ncol,
-				  int xtype, cholmod_common *Common);
-cholmod_sparse*(*M_cholmod_transpose)(cholmod_sparse *A, int values,
-				      cholmod_common *Common);
-cholmod_sparse*(*M_cholmod_copy)(cholmod_sparse *A, int stype,
-				 int mode, cholmod_common *Common);
-cholmod_sparse*(*M_cholmod_add)(cholmod_sparse *A, cholmod_sparse *B,
-				double alpha [2], double beta [2],
-				int values, int sorted, cholmod_common *Common);
+long M_cholmod_nnz(cholmod_sparse *A, cholmod_common *Common);
+cholmod_sparse* M_cholmod_speye(size_t nrow, size_t ncol,
+				int xtype, cholmod_common *Common);
+cholmod_sparse* M_cholmod_transpose(cholmod_sparse *A, int values,
+				    cholmod_common *Common);
+cholmod_sparse* M_cholmod_copy(cholmod_sparse *A, int stype,
+			       int mode, cholmod_common *Common);
+cholmod_sparse* M_cholmod_add(cholmod_sparse *A, cholmod_sparse *B,
+			      double alpha [2], double beta [2],
+			      int values, int sorted, cholmod_common *Common);
 
 #define CHOLMOD_A    0		/* solve Ax=b */
 #define CHOLMOD_LDLt 1		/* solve LDL'x=b */
@@ -796,27 +797,30 @@ cholmod_sparse*(*M_cholmod_add)(cholmod_sparse *A, cholmod_sparse *B,
 #define CHOLMOD_P    7		/* permute x=Px */
 #define CHOLMOD_Pt   8		/* permute x=P'x */
 
-cholmod_dense*(*M_cholmod_solve)(int sys, cholmod_factor *L, cholmod_dense *B,
-				 cholmod_common *Common);
-cholmod_sparse*(*M_cholmod_spsolve)(int sys, cholmod_factor *L,
-				    cholmod_sparse *B, cholmod_common *Common);
-int(*M_cholmod_sdmult)(cholmod_sparse *A, int transpose,
-		       double alpha [2], double beta [2],
-		       cholmod_dense *X, cholmod_dense *Y, cholmod_common *Common);
-int(*M_cholmod_factorize)(cholmod_sparse *A, cholmod_factor *L, cholmod_common *Common);
-cholmod_sparse*(*M_cholmod_copy_sparse)(cholmod_sparse *A, cholmod_common *Common);
-cholmod_dense*(*M_cholmod_copy_dense)(cholmod_dense *A, cholmod_common *Common);
-cholmod_sparse*(*M_cholmod_aat)(cholmod_sparse *A, int *fset, size_t fsize,
-			       int mode, cholmod_common *Common);
-cholmod_sparse*(*M_cholmod_add)(cholmod_sparse *A, cholmod_sparse *B,
-			       double alpha[2], double beta[2], int values,
-			       int sorted, cholmod_common *Common); 
-cholmod_dense*(*M_cholmod_allocate_dense)(size_t nrow, size_t ncol, size_t d,
-					  int xtype, cholmod_common *Common);
-cholmod_factor*(*M_cholmod_analyze)(cholmod_sparse *A, cholmod_common *Common);
-cholmod_factor*(*M_cholmod_copy_factor)(cholmod_factor *L,
-					cholmod_common *Common);
-cholmod_sparse*(*M_cholmod_factor_to_sparse)(cholmod_factor *L,
-					     cholmod_common *Common);
+cholmod_dense* M_cholmod_solve(int sys, cholmod_factor *L, cholmod_dense *B,
+			       cholmod_common *Common);
+cholmod_sparse* M_cholmod_spsolve(int sys, cholmod_factor *L,
+				  cholmod_sparse *B, cholmod_common *Common);
+int M_cholmod_sdmult(cholmod_sparse *A, int transpose,
+		     double alpha [2], double beta [2],
+		     cholmod_dense *X, cholmod_dense *Y,
+		     cholmod_common *Common);
+int M_cholmod_factorize(cholmod_sparse *A, cholmod_factor *L,
+			cholmod_common *Common);
+cholmod_sparse* M_cholmod_copy_sparse(cholmod_sparse *A,
+				      cholmod_common *Common);
+cholmod_dense* M_cholmod_copy_dense(cholmod_dense *A, cholmod_common *Common);
+cholmod_sparse* M_cholmod_aat(cholmod_sparse *A, int *fset, size_t fsize,
+			      int mode, cholmod_common *Common);
+cholmod_sparse* M_cholmod_add(cholmod_sparse *A, cholmod_sparse *B,
+			      double alpha[2], double beta[2], int values,
+			      int sorted, cholmod_common *Common); 
+cholmod_dense* M_cholmod_allocate_dense(size_t nrow, size_t ncol, size_t d,
+					int xtype, cholmod_common *Common);
+cholmod_factor* M_cholmod_analyze(cholmod_sparse *A, cholmod_common *Common);
+cholmod_factor* M_cholmod_copy_factor(cholmod_factor *L,
+				      cholmod_common *Common);
+cholmod_sparse* M_cholmod_factor_to_sparse(cholmod_factor *L,
+					   cholmod_common *Common);
 
 #endif /* LME4_CHOLMOD_H */
