@@ -3,7 +3,7 @@ useDynLib(lme4, .registration=TRUE)
 import("Matrix")
 importFrom("graphics", plot)
 import("stats", "lattice")
-importFrom("utils", head, tail)
+#importFrom("utils", head, tail)  ## already available in Matrix
 
 export(
        "gsummary",
