@@ -1,6 +1,6 @@
+#include "lme4_utils.h"
 #include "lmer.h"
 #include "pedigree.h"
-#include "Matrix.h"
 #include <R_ext/Rdynload.h>
 
 static R_CallMethodDef CallEntries[] = {
@@ -40,11 +40,10 @@ static R_CallMethodDef CallEntries[] = {
 
 cholmod_common c;
 
-void
 #ifdef HAVE_VISIBILITY_ATTRIBUTE
 __attribute__ ((visibility ("default")))
 #endif
-R_init_lme4(DllInfo *dll)
+void R_init_lme4(DllInfo *dll)
 {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
