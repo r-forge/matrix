@@ -1,7 +1,7 @@
 #ifndef MATRIX_LMER_H
 #define MATRIX_LMER_H
 
-#include "Matrix.h"
+#include "lme4_utils.h"
 #include <Rmath.h>
 #include <Rversion.h>
 #include <R_ext/Lapack.h>
