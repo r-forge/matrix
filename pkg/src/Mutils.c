@@ -307,28 +307,6 @@ Matrix_make_named(int TYP, char **names)
     return ans;
 }
 
-/**
- * Expand a column of a compressed, sparse, column-oriented matrix.
- *
- * @param dest array to hold the result
- * @param m number of rows in the matrix
- * @param j index (0-based) of column to expand
- * @param Ap array of column pointers
- * @param Ai array of row indices
- * @param Ax array of non-zero values
- *
- * @return dest
- */
-double *expand_csc_column(double *dest, int m, int j,
-			  const int Ap[], const int Ai[], const double Ax[])
-{
-    int k, k2 = Ap[j + 1];
-
-    for (k = 0; k < m; k++) dest[k] = 0.;
-    for (k = Ap[j]; k < k2; k++) dest[Ai[k]] = Ax[k];
-    return dest;
-}
-
 #define Matrix_Error_Bufsiz    4096
 
 SEXP check_scalar_string(SEXP sP, char *vals, char *nm)

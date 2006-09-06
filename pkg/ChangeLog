@@ -1,3 +1,7 @@
+2006-09-06  Douglas Bates  <bates@R-project.org>
+
+	* src/Mutils.h: Remove functions that are no longer used.
+
 2006-09-04  Douglas Bates  <bates@R-project.org>
 
 	* src/dtCMatrix.c (dtCMatrix_validate): rename functions.
