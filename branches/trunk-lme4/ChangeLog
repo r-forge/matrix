@@ -1,3 +1,8 @@
+2006-09-06  Douglas Bates  <bates@R-project.org>
+
+	* src/cholmod.h: Updates for CHOLMOD ver 1.2 installed in the
+	Matrix package
+
 2006-09-04  Douglas Bates  <bates@R-project.org>
 
 	* (many files): Move lmer files back to lme4.
