@@ -45,6 +45,7 @@ exportMethods(
               "logLik",
               "mcmcsamp",
               "plot",
+              "print",
               "qqmath",
               "ranef",
               "resid",

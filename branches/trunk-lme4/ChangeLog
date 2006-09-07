@@ -1,3 +1,8 @@
+2006-09-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/lmer.R (printMer): S4 method for print() needed
+	* NAMESPACE: and exported
+
 2006-09-06  Douglas Bates  <bates@R-project.org>
 
 	* src/cholmod.h: Updates for CHOLMOD ver 1.2 installed in the
@@ -51,7 +56,7 @@
 	* R/lmer.R: Update of the "with" method.
 	* : Removed humongous PDF file accidently included in tarball.
 	Created release 0.95-3.
-	
+
 
 2005-02-27  Douglas Bates  <bates@R-project.org>
 
@@ -71,7 +76,7 @@
 2005-01-24  Douglas Bates  <bates@R-project.org>
 
 	* man/{guPrenat.Rd,guImmun.Rd,s3bbx.Rd,s3bby.Rd}: Add
-	\encoding{latin1} per Kurt's request. 
+	\encoding{latin1} per Kurt's request.
 
 2005-01-23  Douglas Bates  <bates@R-project.org>
 
@@ -265,7 +270,7 @@
 2003-08-11  Douglas Bates  <bates@stat.wisc.edu>
 
 	* man/corMatrix.Rd: Add alias for method.
-	
+
 	* man/guImmun.Rd: docs for rural were missing
 
 	* DESCRIPTION: Version 0.3-4
@@ -368,7 +373,7 @@
 2003-06-30  Douglas Bates  <bates@stat.wisc.edu>
 
 	* DESCRIPTION (Version): 0.2-2
-	
+
 	* R/reStruct.R, src/reStruct.c: Move most of getFixDF method for
 	reStruct to C code.
 
@@ -546,13 +551,13 @@
 
 	* R/pdMat.R: Remove defaults in summary method arguments.
 	Build switch on noCorrelation into summary method for pdMat.
-	Remove summary method for other classes that inherit from pdMat. 
+	Remove summary method for other classes that inherit from pdMat.
 
 2003-06-03  Douglas Bates  <bates@stat.wisc.edu>
 
 	* DESCRIPTION (Version): Versions 0.1-17 and 0.1-18 for debugging
 	the methods package.
-	
+
 	* R/AllClass.R: remove the pdScalar class and definitions
 
 2003-05-23  Douglas Bates  <bates@stat.wisc.edu>
@@ -1196,11 +1201,11 @@
 
 	* R/pdMat.R, src/pdIdent.c, src/pdLogChol.c, R/AllClass.R,
 	R/pdDiag.R, R/pdIdent.R, R/pdLogChol.R:	Added slots to pdMat class
-	- removed them from inheriting classes 
+	- removed them from inheriting classes
 
 	* tests/pdCompSymm.R, tests/pdIdent.R, tests/pdNatural.R:
 	Adjustments for changes in slots.
-	
+
 	* tests/MathAchieve.R, tests/MathAchive.R: Corrected spelling of
 	file name.
 
@@ -1283,7 +1288,7 @@
 
 	* R/lme.R (lmeScale): drop unused levels in call to model frame.
 	Use the integer niterEM instead of the list in the replacement
-	EMsteps. 
+	EMsteps.
 
 2002-11-19  Saikat DebRoy  <saikat@stat.wisc.edu>
 

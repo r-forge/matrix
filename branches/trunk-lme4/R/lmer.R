@@ -705,13 +705,14 @@ formatVC <- function(varc, digits = max(3, getOption("digits") - 2))
     } else reMat
 }
 
-## use S3 print method -- which can have non-trivial arguments
-##     ^^ (such that print() remains S3 generic rather than S4)
+## We need to define an S4 print method, since using an S3 print
+## method fails as soon as you call print() explicitly, e.g. when
+## wanting to specify options.
 
 ## This is modeled a bit after  print.summary.lm :
-print.mer <- function(x, digits = max(3, getOption("digits") - 3),
-                      correlation = TRUE, symbolic.cor = x$symbolic.cor,
-                      signif.stars = getOption("show.signif.stars"), ...)
+printMer <- function(x, digits = max(3, getOption("digits") - 3),
+                     correlation = TRUE, symbolic.cor = x$symbolic.cor,
+                     signif.stars = getOption("show.signif.stars"), ...)
 {
     so <- summary(x)
     useScale <- so@useScale
@@ -772,7 +773,8 @@ print.mer <- function(x, digits = max(3, getOption("digits") - 3),
     invisible(x)
 }
 
-setMethod("show", "mer", function(object) print.mer(object))
+setMethod("print", "mer", printMer)
+setMethod("show", "mer", function(object) printMer(object))
 
 
 setMethod("vcov", signature(object = "mer"),
