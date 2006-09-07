@@ -8,44 +8,6 @@ SEXP dtCMatrix_validate(SEXP x)
     /* see ./dsCMatrix.c or ./dtpMatrix.c  on how to do more testing here */
 }
 
-#if 0				/* no longer used */
-SEXP tsc_to_dgTMatrix(SEXP x)
-{
-    SEXP ans;
-    if (*diag_P(x) != 'U')
-	ans = compressed_to_dgTMatrix(x, ScalarLogical(1));
-    else {			/* unit triangular matrix */
-	SEXP islot = GET_SLOT(x, Matrix_iSym),
-	    pslot = GET_SLOT(x, Matrix_pSym);
-	int *ai, *aj, j,
-	    n = length(pslot) - 1,
-	    nod = length(islot),
-	    nout = n + nod,
-	    *p = INTEGER(pslot);
-	double *ax;
-
-	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgTMatrix")));
-	SET_SLOT(ans, Matrix_DimSym, duplicate(GET_SLOT(x, Matrix_DimSym)));
-	SET_SLOT(ans, Matrix_iSym, allocVector(INTSXP, nout));
-	ai = INTEGER(GET_SLOT(ans, Matrix_iSym));
-	Memcpy(ai, INTEGER(islot), nod);
-	SET_SLOT(ans, Matrix_jSym, allocVector(INTSXP, nout));
-	aj = INTEGER(GET_SLOT(ans, Matrix_jSym));
-	SET_SLOT(ans, Matrix_xSym, allocVector(REALSXP, nout));
-	ax = REAL(GET_SLOT(ans, Matrix_xSym));
-	Memcpy(ax, REAL(GET_SLOT(x, Matrix_xSym)), nod);
-	for (j = 0; j < n; j++) {
-	    int jj, npj = nod + j,  p2 = p[j+1];
-	    aj[npj] = ai[npj] = j;
-	    ax[npj] = 1.;
-	    for (jj = p[j]; jj < p2; jj++) aj[jj] = j;
-	}
-	UNPROTECT(1);
-    }
-    return ans;
-}
-#endif
-
 /**
  * Derive the column pointer vector for the inverse of L from the parent array
  *
