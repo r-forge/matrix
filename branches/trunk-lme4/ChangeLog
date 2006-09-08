@@ -1,3 +1,7 @@
+2006-09-08  Douglas Bates  <bates@R-project.org>
+
+	* DESCRIPTION (Imports): Remove imports of utils and latticeExtra
+
 2006-09-07  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/lmer.R (printMer): S4 method for print() needed
@@ -5,7 +9,7 @@
 
 2006-09-06  Douglas Bates  <bates@R-project.org>
 
-	* src/cholmod.h: Updates for CHOLMOD ver 1.2 installed in the
+	* src/cholmod.[ch]: Updates for CHOLMOD ver 1.2 installed in the
 	Matrix package
 
 2006-09-04  Douglas Bates  <bates@R-project.org>

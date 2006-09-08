@@ -24,6 +24,7 @@
 \alias{logLik,mer-method}
 \alias{plot,coef.lmer-method}
 \alias{plot,ranef.lmer-method}
+\alias{print,mer-method}
 \alias{qqmath,ranef.lmer-method}
 \alias{resid,mer-method}
 \alias{residuals,mer-method}
