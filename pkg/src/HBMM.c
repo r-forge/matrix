@@ -4,29 +4,18 @@
 
 SEXP Matrix_writeHarwellBoeing(SEXP obj, SEXP file, SEXP typep)
 {
-    char *type = CHAR(asChar(typep)), Type[4] = "RUA";
+    char *type = CHAR(asChar(typep)), *Type = strdup("RUA");
     int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym)),
 	*ii = (int *) NULL, *pp = (int *) NULL;
     int M = dims[0], N = dims[1], nz = -1;
     double *xx = (double *) NULL;
 
-    if (type[2] == 'C' || type[2] == 'T') {
+    if (type[2] == 'C') {
 	SEXP islot = GET_SLOT(obj, Matrix_iSym);
 	nz = LENGTH(islot);
 	ii = INTEGER(islot);
-	if (type[2] == 'T') {	/* create column pointers */
-	    int *i1 = Calloc(nz, int);
-	    double *x1 = Calloc(nz, double);
-
-	    pp = Calloc(N + 1, int);
-	    triplet_to_col(M, N, nz, ii,
-			   INTEGER(GET_SLOT(obj, Matrix_jSym)), xx,
-			   pp, i1, x1);
-	    nz = pp[N];
-	    xx = x1;
-	    ii = i1;
-	} else pp = INTEGER(GET_SLOT(obj, Matrix_pSym));
-    } else error("Only types 'C' and 'T' allowed");
+	pp = INTEGER(GET_SLOT(obj, Matrix_pSym));
+    } else error("Only type 'C' allowed");
 
     if (type[0] == 'D') {
 	xx = REAL(GET_SLOT(obj, Matrix_xSym));
@@ -46,7 +35,7 @@ SEXP Matrix_writeHarwellBoeing(SEXP obj, SEXP file, SEXP typep)
 		       "", "", Type, (char*)NULL, (char*)NULL,
 		       (char*)NULL, (char*)NULL, "RUA");
 
-    if (type[2] == 'T') {Free(ii); Free(pp); Free(xx);}
+    Free(Type);
     return R_NilValue;
 }
 
