@@ -1,3 +1,14 @@
+2006-09-08  Douglas Bates  <bates@stat.wisc.edu>
+
+	* inst/include/Matrix_stubs.c,Matrix.h: Add declarations and stubs
+	for exported functions
+	* src/Makefile, src/CHOLMOD/Lib/Makefile, src/Metis,CAMD,CCOLAMD:
+	Remove partitioning algorithms for sparse matrix reordering.  The
+	copyright on the Metis code was problematic and the methods were
+	rarely used.
+	* src/triplet_to_col.[ch],MMHB.[ch]: Remove triplet_to_col.  Such
+	operations are now done entirely in CHOLMOD code.
+
 2006-09-06  Douglas Bates  <bates@R-project.org>
 
 	* src/Mutils.h: Remove functions that are no longer used.
