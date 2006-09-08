@@ -6,9 +6,10 @@ include ${MkInclude}
 default: lib
 
 PKG_CFLAGS = -I../../AMD/Include -I../../AMD/Source \
-        -I../../CAMD/Include -I../../CAMD/Source \
         -I../../COLAMD  -I../../CCOLAMD \
-	-I../../Metis -I../Include -I../../UFconfig
+	-I../Include -I../../UFconfig -DNPARTITION
+#        -I../../CAMD/Include -I../../CAMD/Source \
+#	-I../../Metis \
 
 #-------------------------------------------------------------------------------
 # ../Include/ directory contains all include files:
@@ -24,9 +25,9 @@ INC =   ../Include/cholmod.h \
 	../Include/cholmod_internal.h \
 	../Include/cholmod_matrixops.h \
 	../Include/cholmod_modify.h \
-	../Include/cholmod_partition.h \
 	../Include/cholmod_supernodal.h \
 	../Include/cholmod_template.h
+#	../Include/cholmod_partition.h \
 
 #-------------------------------------------------------------------------------
 # The 7 CHOLMOD library modules (int, double)
@@ -57,7 +58,7 @@ MODIFY = cholmod_rowadd.o cholmod_rowdel.o cholmod_updown.o
 SUPERNODAL = cholmod_super_numeric.o cholmod_super_solve.o \
 	cholmod_super_symbolic.o
 
-OBJS = $(CORE) $(CHOLESKY) $(MATRIXOPS) $(MODIFY) $(SUPERNODAL) $(PARTITION) $(CHECK)
+OBJS = $(CORE) $(CHOLESKY) $(MATRIXOPS) $(MODIFY) $(SUPERNODAL) $(CHECK) #$(PARTITION) 
 
 LIB = ../../CHOLMOD.a
 
