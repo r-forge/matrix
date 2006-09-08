@@ -14,9 +14,7 @@ LazyLoad: yes
 LazyData: no
 LazyDataNote: no longer available, since we use data/*.R
 License: GPL version 2 or later.
- This R package includes code from the Metis package and from NIST.
- This code is covered by separate copyrights; see the file Copyrights
- for details.  This R package includes code from the University of
- Florida sparse matrix library maintained by Tim Davis.  All sections
- of that code are covered by the GPL or LGPL licenses.  See the
- directory doc/UFsparse for details.
+ This R package includes libraries CHOLMOD, AMD, COLAMD and CSparse
+ from the University of Florida sparse matrix library maintained by Tim
+ Davis.  All sections of that code are covered by the GPL or LGPL
+ licenses.  See the directory doc/UFsparse for details.
