@@ -9,8 +9,8 @@
 # define attribute_hidden
 #endif
 
-attribute_hidden
-SEXP M_alloc_dgeMatrix(int m, int n, SEXP rownms,SEXP colnms)
+SEXP attribute_hidden
+M_alloc_dgeMatrix(int m, int n, SEXP rownms,SEXP colnms)
 {
     static SEXP(*fun)(int,int,SEXP,SEXP) = NULL;
     if(fun == NULL)
@@ -19,8 +19,8 @@ SEXP M_alloc_dgeMatrix(int m, int n, SEXP rownms,SEXP colnms)
     return fun(m, n, rownms, colnms);
 }
 
-attribute_hidden
-SEXP M_alloc_dpoMatrix(int n,char *uplo, SEXP rownms, SEXP colnms)
+SEXP attribute_hidden
+M_alloc_dpoMatrix(int n,char *uplo, SEXP rownms, SEXP colnms)
 {
     static SEXP(*fun)(int,char*,SEXP,SEXP) = NULL;
     if(fun == NULL)
@@ -29,7 +29,7 @@ SEXP M_alloc_dpoMatrix(int n,char *uplo, SEXP rownms, SEXP colnms)
     return fun(n, uplo, rownms, colnms);
 }
 
-attribute_hidden SEXP
+SEXP attribute_hidden
 M_alloc_dtrMatrix(int n, char *uplo, char *diag, SEXP rownms, SEXP colnms)
 {
     static SEXP(*fun)(int,char*,char*,SEXP,SEXP) = NULL;
@@ -49,8 +49,8 @@ M_alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms)
     return fun(n, nz, uplo, rownms, colnms);
 }
 
-attribute_hidden
-cholmod_dense* M_as_cholmod_dense(SEXP x)
+cholmod_dense attribute_hidden
+*M_as_cholmod_dense(SEXP x)
 {
     static cholmod_dense*(*fun)(SEXP) = NULL;
     if(fun == NULL)
@@ -59,8 +59,8 @@ cholmod_dense* M_as_cholmod_dense(SEXP x)
     return fun(x);
 }
 
-attribute_hidden
-cholmod_factor* M_as_cholmod_factor(SEXP x)
+cholmod_factor attribute_hidden
+*M_as_cholmod_factor(SEXP x)
 {
     static cholmod_factor*(*fun)(SEXP) = NULL;
     if(fun == NULL)
@@ -69,8 +69,8 @@ cholmod_factor* M_as_cholmod_factor(SEXP x)
     return fun(x);
 }
 
-attribute_hidden
-cholmod_sparse* M_as_cholmod_sparse(SEXP x)
+cholmod_sparse attribute_hidden
+*M_as_cholmod_sparse(SEXP x)
 {
     static cholmod_sparse*(*fun)(SEXP)= NULL;
     if(fun == NULL)
@@ -79,8 +79,8 @@ cholmod_sparse* M_as_cholmod_sparse(SEXP x)
     return fun(x);
 }
 
-attribute_hidden
-SEXP M_chm_factor_to_SEXP(cholmod_factor *f, int dofree)
+SEXP attribute_hidden
+M_chm_factor_to_SEXP(cholmod_factor *f, int dofree)
 {
     static SEXP(*fun)(cholmod_factor*,int) = NULL;
     if(fun == NULL)
@@ -89,9 +89,9 @@ SEXP M_chm_factor_to_SEXP(cholmod_factor *f, int dofree)
     return fun(f, dofree);
 }
 
-attribute_hidden
-cholmod_sparse* M_cholmod_aat(cholmod_sparse *A, int *fset, size_t fsize,
-			      int mode, cholmod_common *Common)
+cholmod_sparse attribute_hidden
+*M_cholmod_aat(cholmod_sparse *A, int *fset, size_t fsize,
+	       int mode, cholmod_common *Common)
 {
     static cholmod_sparse*(*fun)(cholmod_sparse*,int*,size_t,
 				 int,cholmod_common*) = NULL;
@@ -102,10 +102,10 @@ cholmod_sparse* M_cholmod_aat(cholmod_sparse *A, int *fset, size_t fsize,
     return fun(A, fset, fsize, mode, Common);
 }
 
-attribute_hidden
-cholmod_sparse* M_cholmod_add(cholmod_sparse *A, cholmod_sparse *B,
-			      double alpha[2], double beta[2], int values,
-			      int sorted, cholmod_common *Common)
+cholmod_sparse attribute_hidden
+*M_cholmod_add(cholmod_sparse *A, cholmod_sparse *B,
+	       double alpha[2], double beta[2], int values,
+	       int sorted, cholmod_common *Common)
 {
     static cholmod_sparse*(*fun)(cholmod_sparse*,cholmod_sparse*,
 				 double*,double*,int,int,
@@ -118,9 +118,9 @@ cholmod_sparse* M_cholmod_add(cholmod_sparse *A, cholmod_sparse *B,
     return fun(A, B, alpha, beta, values, sorted, Common);
 }
 
-attribute_hidden
-cholmod_dense* M_cholmod_allocate_dense(size_t nrow, size_t ncol, size_t d,
-					int xtype, cholmod_common *Common)
+cholmod_dense attribute_hidden
+*M_cholmod_allocate_dense(size_t nrow, size_t ncol, size_t d,
+			  int xtype, cholmod_common *Common)
 {
     static cholmod_dense*(*fun)(size_t,size_t,size_t,
 				int,cholmod_common*) = NULL;
@@ -131,9 +131,8 @@ cholmod_dense* M_cholmod_allocate_dense(size_t nrow, size_t ncol, size_t d,
     return fun(nrow, ncol, d, xtype, Common);
 }
 
-attribute_hidden
-cholmod_sparse*
-M_cholmod_allocate_sparse(size_t nrow, size_t ncol, size_t nzmax,
+cholmod_sparse attribute_hidden
+*M_cholmod_allocate_sparse(size_t nrow, size_t ncol, size_t nzmax,
 			  int sorted, int packed, int stype,
 			  int xtype, cholmod_common *Common)
 {
@@ -146,9 +145,8 @@ M_cholmod_allocate_sparse(size_t nrow, size_t ncol, size_t nzmax,
     return fun(nrow,ncol,nzmax,sorted,packed,stype,xtype,Common);
 }
 
-attribute_hidden
-cholmod_factor* M_cholmod_analyze(cholmod_sparse *A,
-				  cholmod_common *Common)
+cholmod_factor attribute_hidden
+*M_cholmod_analyze(cholmod_sparse *A, cholmod_common *Common)
 {
     static cholmod_factor*(*fun)(cholmod_sparse*,cholmod_common*) = NULL;
     if (fun == NULL)
@@ -157,8 +155,8 @@ cholmod_factor* M_cholmod_analyze(cholmod_sparse *A,
     return fun(A, Common);
 }
 
-attribute_hidden
-cholmod_sparse* M_cholmod_copy(cholmod_sparse *A, int stype,
+cholmod_sparse attribute_hidden
+*M_cholmod_copy(cholmod_sparse *A, int stype,
 			       int mode, cholmod_common *Common)
 {
     static cholmod_sparse*(*fun)
@@ -179,9 +177,8 @@ cholmod_dense* M_cholmod_copy_dense(cholmod_dense *A, cholmod_common *Common)
     return fun(A, Common);
 }
 
-attribute_hidden
-cholmod_factor* M_cholmod_copy_factor(cholmod_factor *L,
-				      cholmod_common *Common)
+cholmod_factor attribute_hidden
+*M_cholmod_copy_factor(cholmod_factor *L, cholmod_common *Common)
 {
     static cholmod_factor*(*fun)(cholmod_factor*,cholmod_common*) = NULL;
     if (fun == NULL)
@@ -190,9 +187,8 @@ cholmod_factor* M_cholmod_copy_factor(cholmod_factor *L,
     return fun(L, Common);
 }
 
-attribute_hidden
-cholmod_sparse* M_cholmod_copy_sparse(cholmod_sparse *A,
-				      cholmod_common *Common)
+cholmod_sparse attribute_hidden
+*M_cholmod_copy_sparse(cholmod_sparse *A, cholmod_common *Common)
 {
     static cholmod_sparse*(*fun)(cholmod_sparse*,cholmod_common*) = NULL;
     if (fun == NULL)
@@ -201,9 +197,8 @@ cholmod_sparse* M_cholmod_copy_sparse(cholmod_sparse *A,
     return fun(A, Common);
 }
 
-attribute_hidden
-cholmod_sparse* M_cholmod_factor_to_sparse(cholmod_factor *L,
-					   cholmod_common *Common)
+cholmod_sparse attribute_hidden
+*M_cholmod_factor_to_sparse(cholmod_factor *L, cholmod_common *Common)
 {
     static cholmod_sparse*(*fun)(cholmod_factor*,cholmod_common*) = NULL;
     if (fun == NULL)
@@ -212,9 +207,9 @@ cholmod_sparse* M_cholmod_factor_to_sparse(cholmod_factor *L,
     return fun(L, Common);
 }
 
-attribute_hidden
-int M_cholmod_factorize(cholmod_sparse *A, cholmod_factor *L,
-			cholmod_common *Common)
+int attribute_hidden
+M_cholmod_factorize(cholmod_sparse *A, cholmod_factor *L,
+		    cholmod_common *Common)
 {
     static int(*fun)(cholmod_sparse*,cholmod_factor*,cholmod_common*) = NULL;
     if (fun == NULL)
@@ -223,8 +218,8 @@ int M_cholmod_factorize(cholmod_sparse *A, cholmod_factor *L,
     return fun(A, L, Common);
 }
 
-attribute_hidden
-int M_cholmod_finish(cholmod_common *Common)
+int attribute_hidden
+M_cholmod_finish(cholmod_common *Common)
 {
 
     static int(*fun)(cholmod_common*) = NULL;
@@ -234,8 +229,8 @@ int M_cholmod_finish(cholmod_common *Common)
     return fun(Common);
 }
 
-attribute_hidden
-int M_cholmod_free_dense(cholmod_dense **A, cholmod_common *Common)
+int attribute_hidden
+M_cholmod_free_dense(cholmod_dense **A, cholmod_common *Common)
 {
     static int(*fun)(cholmod_dense**,cholmod_common*) = NULL;
     if (fun == NULL)
@@ -244,8 +239,8 @@ int M_cholmod_free_dense(cholmod_dense **A, cholmod_common *Common)
     return fun(A, Common);
 }
 
-attribute_hidden
-int M_cholmod_free_factor(cholmod_factor **L, cholmod_common *Common)
+int attribute_hidden
+M_cholmod_free_factor(cholmod_factor **L, cholmod_common *Common)
 {
     static int(*fun)(cholmod_factor**,cholmod_common*) = NULL;
     if (fun == NULL)
@@ -254,8 +249,8 @@ int M_cholmod_free_factor(cholmod_factor **L, cholmod_common *Common)
     return fun(L, Common);
 }
 
-attribute_hidden
-int M_cholmod_free_sparse(cholmod_sparse **A, cholmod_common *Common)
+int attribute_hidden
+M_cholmod_free_sparse(cholmod_sparse **A, cholmod_common *Common)
 {
     static int(*fun)(cholmod_sparse**,cholmod_common*) = NULL;
     if (fun == NULL)
@@ -264,8 +259,8 @@ int M_cholmod_free_sparse(cholmod_sparse **A, cholmod_common *Common)
     return fun(A, Common);
 }
 
-attribute_hidden
-long M_cholmod_nnz(cholmod_sparse *A, cholmod_common *Common)
+long attribute_hidden
+M_cholmod_nnz(cholmod_sparse *A, cholmod_common *Common)
 {
     static long(*fun)(cholmod_sparse*,cholmod_common*) = NULL;
     if (fun == NULL)
@@ -274,11 +269,11 @@ long M_cholmod_nnz(cholmod_sparse *A, cholmod_common *Common)
     return fun(A, Common);
 }
 
-attribute_hidden
-int M_cholmod_sdmult(cholmod_sparse *A, int transpose,
-		     double alpha [2], double beta [2],
-		     cholmod_dense *X, cholmod_dense *Y,
-		     cholmod_common *Common)
+int attribute_hidden
+M_cholmod_sdmult(cholmod_sparse *A, int transpose,
+		 double alpha [2], double beta [2],
+		 cholmod_dense *X, cholmod_dense *Y,
+		 cholmod_common *Common)
 {
     static int(*fun)(cholmod_sparse*,int,double*,double*,
 		     cholmod_dense*,cholmod_dense*,cholmod_common*) = NULL;
@@ -289,8 +284,8 @@ int M_cholmod_sdmult(cholmod_sparse *A, int transpose,
     return fun(A, transpose, alpha, beta, X, Y, Common);
 }
 
-attribute_hidden
-cholmod_dense* M_cholmod_solve(int sys, cholmod_factor *L,
+cholmod_dense attribute_hidden
+*M_cholmod_solve(int sys, cholmod_factor *L,
 			       cholmod_dense *B, cholmod_common *Common)
 {
     static cholmod_dense*(*fun)(int,cholmod_factor*,cholmod_dense*,
@@ -302,9 +297,9 @@ cholmod_dense* M_cholmod_solve(int sys, cholmod_factor *L,
     return fun(sys, L, B, Common);
 }
 
-attribute_hidden
-cholmod_sparse* M_cholmod_speye(size_t nrow, size_t ncol,
-				int xtype, cholmod_common *Common)
+cholmod_sparse attribute_hidden
+*M_cholmod_speye(size_t nrow, size_t ncol,
+		 int xtype, cholmod_common *Common)
 {
     static cholmod_sparse*(*fun)(size_t,size_t,int,cholmod_common*) = NULL;
     if (fun == NULL)
@@ -313,10 +308,9 @@ cholmod_sparse* M_cholmod_speye(size_t nrow, size_t ncol,
     return fun(nrow, ncol, xtype, Common);
 }
 
-attribute_hidden
-cholmod_sparse* M_cholmod_spsolve(int sys, cholmod_factor *L,
-				  cholmod_sparse *B,
-				  cholmod_common *Common)
+cholmod_sparse attribute_hidden
+*M_cholmod_spsolve(int sys, cholmod_factor *L,
+		   cholmod_sparse *B, cholmod_common *Common)
 {
     static cholmod_sparse*(*fun)(int,cholmod_factor*,
 				 cholmod_sparse*, cholmod_common*) = NULL;
@@ -327,8 +321,8 @@ cholmod_sparse* M_cholmod_spsolve(int sys, cholmod_factor *L,
     return fun(sys, L, B, Common);
 }
 
-attribute_hidden
-int M_cholmod_start(cholmod_common *Common)
+int attribute_hidden
+M_cholmod_start(cholmod_common *Common)
 {
     static int(*fun)(cholmod_common*) = NULL;
     if (fun == NULL)
@@ -337,9 +331,8 @@ int M_cholmod_start(cholmod_common *Common)
     return fun(Common);
 }
 
-attribute_hidden
-cholmod_sparse* M_cholmod_transpose(cholmod_sparse *A, int values,
-				    cholmod_common *Common)
+cholmod_sparse attribute_hidden
+*M_cholmod_transpose(cholmod_sparse *A, int values, cholmod_common *Common)
 {
     static cholmod_sparse*(*fun)(cholmod_sparse*,int,
 				 cholmod_common*) = NULL;
@@ -350,8 +343,8 @@ cholmod_sparse* M_cholmod_transpose(cholmod_sparse *A, int values,
     return fun(A, values, Common);
 }
 
-attribute_hidden
-SEXP M_dpoMatrix_chol(SEXP x)
+SEXP attribute_hidden
+M_dpoMatrix_chol(SEXP x)
 {
     static SEXP(*fun)(SEXP) = NULL;
     if (fun == NULL)
@@ -360,8 +353,8 @@ SEXP M_dpoMatrix_chol(SEXP x)
     return fun(x);
 }
 
-attribute_hidden
-cholmod_dense* M_numeric_as_chm_dense(double *v, int n)
+cholmod_dense attribute_hidden
+*M_numeric_as_chm_dense(double *v, int n)
 {
     static cholmod_dense*(*fun)(double*,int) = NULL;
     if (fun == NULL)
