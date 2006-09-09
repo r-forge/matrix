@@ -1,3 +1,8 @@
+2006-09-09  Douglas Bates  <bates@R-project.org>
+
+	* src/dsCMatrix.c (dsCMatrix_Cholesky): igoring LDL = FALSE now
+	fixed 
+
 2006-09-08  Douglas Bates  <bates@stat.wisc.edu>
 
 	* inst/include/Matrix_stubs.c,Matrix.h: Add declarations and stubs

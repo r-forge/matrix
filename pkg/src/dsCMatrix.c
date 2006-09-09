@@ -49,7 +49,7 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
 
 SEXP dsCMatrix_Cholesky(SEXP Ap, SEXP permP, SEXP LDLp, SEXP superP)
 {
-    char *fname = strdup("spdCholesky"); /* template for factorization name */
+    char fname[12] = "spdCholesky"; /* template for factorization name */
     int perm = asLogical(permP),
 	LDL = asLogical(LDLp),
 	super = asLogical(superP);
@@ -84,13 +84,12 @@ SEXP dsCMatrix_Cholesky(SEXP Ap, SEXP permP, SEXP LDLp, SEXP superP)
 	c.nmethods = nmethods; c.method[0].ordering = ord0;
 	c.postorder = postorder;
     }
-    c.supernodal = sup;	/* restore previous setting */
-    c.final_ll = ll;
     if (!cholmod_factorize(A, L, &c))
 	error(_("Cholesky factorization failed"));
+    c.supernodal = sup;	/* restore previous setting */
+    c.final_ll = ll;
     Free(A);
     Chol = set_factors(Ap, chm_factor_to_SEXP(L, 1), fname);
-    free(fname);		/* note, this must be free, not Free */
     return Chol;
 }
 
