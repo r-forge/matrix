@@ -118,11 +118,13 @@ Tsp2grNEL <- function(from) {
 	}
 	## every edge is there only once, either upper or lower triangle
 	ft1 <- cbind(from@i + 1:1, from@j + 1:1)
-	graph::ftM2graphNEL(ft1, W = from@x, V= rn, edgemode= "undirected")
+        ## not yet: graph::ftM2graphNEL(.........)
+	ftM2graphNEL(ft1, W = from@x, V= rn, edgemode= "undirected")
 
     } else { ## not symmetric
 
-	graph::ftM2graphNEL(cbind(from@i + 1:1, from@j + 1:1),
+        ## not yet: graph::ftM2graphNEL(.........)
+	ftM2graphNEL(cbind(from@i + 1:1, from@j + 1:1),
 			    W = from@x, V= rn, edgemode= "directed")
     }
 
