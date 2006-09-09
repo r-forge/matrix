@@ -566,10 +566,8 @@ SEXP chm_factor_to_SEXP(cholmod_factor *f, int dofree)
 	   (int*)f->p, f->n + 1);
 	Memcpy(REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, f->nzmax)),
 	       (double*)f->x, f->nzmax);
-	Memcpy(INTEGER(ALLOC_SLOT(ans, install("nz"), INTSXP, f->n + 1)),
-	       (int*)f->nz, f->n + 1);
-	Memcpy(INTEGER(ALLOC_SLOT(ans, install("colcount"), INTSXP, f->n)),
-	       (int*)f->ColCount, f->n);
+	Memcpy(INTEGER(ALLOC_SLOT(ans, install("nz"), INTSXP, f->n)),
+	       (int*)f->nz, f->n);
 	Memcpy(INTEGER(ALLOC_SLOT(ans, install("nxt"), INTSXP, f->n + 2)),
 	       (int*)f->next, f->n + 2);
 	Memcpy(INTEGER(ALLOC_SLOT(ans, install("prv"), INTSXP, f->n + 2)),
