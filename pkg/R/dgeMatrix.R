@@ -140,6 +140,7 @@ setMethod("tcrossprod", signature(x = "dgeMatrix", y = "missing"),
 	  function(x, y = NULL) .Call(dgeMatrix_crossprod, x, TRUE),
 	  valueClass = "dpoMatrix")
 
+if(FALSE) { ## this would mask 'base::tcrossprod'
 setMethod("tcrossprod", signature(x = "matrix", y = "missing"),
 	  function(x, y = NULL)
           .Call(dgeMatrix_crossprod, as(x, "dgeMatrix"), TRUE),
@@ -147,6 +148,7 @@ setMethod("tcrossprod", signature(x = "matrix", y = "missing"),
 
 setMethod("tcrossprod", signature(x = "numeric", y = "missing"),
 	  function(x, y = NULL) callGeneric(as.matrix(as.double(x))))
+}
 
 ## crossprod (x,y)
 setMethod("crossprod", signature(x = "dgeMatrix", y = "dgeMatrix"),
@@ -200,7 +202,7 @@ setMethod("%*%", signature(x = "matrix", y = "dgeMatrix"),
           valueClass = "dgeMatrix")
 
 ## DB: Should we retain these methods?  Does the shortcut save enough
-## to justify additional signatures? 
+## to justify additional signatures?
 ## dgeMatrix <-> numeric: conceptually dispatch to "matrix" one, but shortcut
 setMethod("%*%", signature(x = "dgeMatrix", y = "numeric"),
 	  function(x, y) .Call(dgeMatrix_matrix_mm, x, y, FALSE),
