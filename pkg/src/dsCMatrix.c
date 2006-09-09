@@ -22,7 +22,7 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
     cholmod_factor *Ncp = cholmod_copy_factor(N, &c);
     cholmod_sparse *L, *R;
     SEXP ans;
-    
+
     L = cholmod_factor_to_sparse(Ncp, &c); cholmod_free_factor(&Ncp, &c);
     R = cholmod_transpose(L, /*values*/ 1, &c); cholmod_free_sparse(&L, &c);
     ans = PROTECT(chm_sparse_to_SEXP(R, /*cholmod_free*/ 1,
@@ -31,7 +31,7 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
     if (asLogical(pivot)) {
 	SEXP piv = PROTECT(allocVector(INTSXP, N->n));
 	int *dest = INTEGER(piv), *src = (int*)N->Perm, i;
-	
+
 	for (i = 0; i < N->n; i++) dest[i] = src[i] + 1;
 	setAttrib(ans, install("pivot"), piv);
 	/* FIXME: Because of the cholmod_factor -> S4 obj ->
@@ -61,16 +61,16 @@ SEXP dsCMatrix_Cholesky(SEXP Ap, SEXP permP, SEXP LDLp, SEXP superP)
     if (super) fname[0] = 'S';
     if (perm) fname[1] = 'P';
     if (LDL) fname[2] = 'D';
-    Chol = get_factors(Ap, "fname");
+    Chol = get_factors(Ap, fname);
     if (Chol != R_NilValue) return Chol;
     A = as_cholmod_sparse(Ap);
     sup = c.supernodal;
     ll = c.final_ll;
-	
+
     if (!A->stype) error("Non-symmetric matrix passed to dsCMatrix_chol");
-    
+
     c.final_ll = !LDL;	/* leave as LL' or form LDL' */
-    c.supernodal = super ? CHOLMOD_SUPERNODAL : CHOLMOD_SIMPLICIAL; 
+    c.supernodal = super ? CHOLMOD_SUPERNODAL : CHOLMOD_SIMPLICIAL;
 
     if (perm) {
 	L = cholmod_analyze(A, &c); /* get fill-reducing permutation */
@@ -117,7 +117,7 @@ SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b)
     cholmod_factor *L;
     cholmod_dense  *cx,
 	*cb = as_cholmod_dense(PROTECT(mMatrix_as_dgeMatrix(b)));
-    
+
     if (Chol == R_NilValue)
 	Chol = dsCMatrix_Cholesky(a,
 				  ScalarLogical(1),  /* permuted */
