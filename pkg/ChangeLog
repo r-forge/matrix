@@ -1,7 +1,14 @@
 2006-09-09  Douglas Bates  <bates@R-project.org>
 
 	* src/dsCMatrix.c (dsCMatrix_Cholesky): igoring LDL = FALSE now
-	fixed 
+	fixed
+
+2006-09-09  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (Tsp2grNEL): do not yet use graph::foo()
+
+	* R/dgeMatrix.R: do not define tcrossprod() methods for "matrix"
+	* man/tcrossprod.Rd: dito
 
 2006-09-08  Douglas Bates  <bates@stat.wisc.edu>
 
