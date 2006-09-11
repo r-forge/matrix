@@ -252,21 +252,26 @@ setMethod("band", "CsparseMatrix",
 	  })
 
 setMethod("diag", "CsparseMatrix",
-          function(x, nrow, ncol = n) {
-              dm <- .Call(Csparse_band, x, 0, 0)
-              dlen <- min(dm@Dim)
-              ind1 <- dm@i + 1:1        # 1-based index vector
-              if (is(dm, "lMatrix")) {
-                  val <- rep.int(FALSE, dlen)
-                  val[ind1] <- TRUE
-                  return(val)
-              }
-              val <- rep.int(0, dlen)
-              ## cMatrix not yet active but for future expansion
-              if (is(dm, "cMatrix")) val <- as.complex(val)
-              val[ind1] <- dm@x
-              val
-          })
+	  function(x, nrow, ncol = n) {
+	      dm <- .Call(Csparse_band, x, 0, 0)
+	      dlen <- min(dm@Dim)
+	      ind1 <- dm@i + 1:1	# 1-based index vector
+	      if (is(dm, "nMatrix")) {
+		  val <- rep.int(FALSE, dlen)
+		  val[ind1] <- TRUE
+	      }
+	      else if (is(dm, "lMatrix")) {
+		  val <- rep.int(FALSE, dlen)
+		  val[ind1] <- as.logical(dm@x)
+	      }
+	      else {
+		  val <- rep.int(0, dlen)
+		  ## cMatrix not yet active but for future expansion
+		  if (is(dm, "cMatrix")) val <- as.complex(val)
+		  val[ind1] <- dm@x
+	      }
+	      val
+	  })
 
 
 setMethod("colSums", signature(x = "CsparseMatrix"), .as.dgC.Fun,

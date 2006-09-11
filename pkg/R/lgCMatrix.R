@@ -29,11 +29,11 @@
 
 setAs("lgCMatrix", "dgCMatrix",
       function(from) new("dgCMatrix", i = from@i, p = from@p,
-                         x = rep(1, length(from@i)),
+                         x = as.double(from@x),
                          Dim = from@Dim, Dimnames = from@Dimnames))
 
 setAs("lgCMatrix", "lgTMatrix",
-      function(from) new("lgTMatrix", i = from@i,
+      function(from) new("lgTMatrix", i = from@i, x = from@x,
                          j = .Call(Matrix_expand_pointers, from@p),
                          Dim = from@Dim, Dimnames = from@Dimnames))
 
@@ -42,8 +42,9 @@ setAs("lgCMatrix", "lgeMatrix",
 	  new("lgeMatrix", x = c(as(from, "matrix")), # is fast,
 	      Dim = from@Dim, Dimnames = from@Dimnames))
 
-setAs("lgCMatrix", "matrix",
+setAs("lgCMatrix", "matrix", ## FIXME: this is for ngC !
       function(from) .Call(lcsc_to_matrix, from))
+
 ## TODO (maybe): write  matrix_to_lcsc()  in ../src/lgCMatrix.c
 setAs("matrix", "lgCMatrix",
       function(from) as(as(from, "lgTMatrix"), "lgCMatrix"))

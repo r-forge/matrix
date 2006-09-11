@@ -5,7 +5,7 @@ Title: A Matrix package for R
 Author: Douglas Bates <bates@stat.wisc.edu> and Martin Maechler <maechler@stat.math.ethz.ch>
 Maintainer: Douglas Bates <bates@stat.wisc.edu>
 Description: Classes and methods for dense and sparse matrices and
-    operations on them using Lapack, CSparse and CHOLMOD 
+    operations on them using Lapack, CSparse and CHOLMOD
 Depends: R (>= 2.4.0), stats, methods, utils, lattice
 Imports: graphics, lattice, grid, stats
 Enhances: graph, SparseM

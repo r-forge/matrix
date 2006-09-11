@@ -85,6 +85,11 @@ extern	 /* stored pointers to symbols initialized in R_init_Matrix */
 #define diag_P(_x_) CHAR(STRING_ELT(GET_SLOT(_x_, Matrix_diagSym), 0))
 #define class_P(_x_) CHAR(asChar(getAttrib(_x_, R_ClassSymbol)))
 
+#define Real_kind(_x_)	(isReal(GET_SLOT(_x_, Matrix_xSym)) ? 0	:	\
+			 (isLogical(GET_SLOT(_x_, Matrix_xSym)) ? 1 :	\
+			  -1))
+
+
 /**
  * Check for valid length of a packed triangular array and return the
  * corresponding number of columns

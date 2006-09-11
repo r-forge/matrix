@@ -1,10 +1,17 @@
 #### Triangular Sparse Matrices in compressed column-oriented format
 
-setAs("dtCMatrix", "ltCMatrix", # just drop 'x' slot:
+setAs("dtCMatrix", "ltCMatrix",
       function(from) new("ltCMatrix", i = from@i, p = from@p,
-                         uplo = from@uplo, diag = from@diag,
-                         ## FIXME?: use from@factors smartly
-                         Dim = from@Dim, Dimnames = from@Dimnames))
+			 uplo = from@uplo, diag = from@diag,
+                         x = as.logical(from@x),
+			 ## FIXME?: use from@factors smartly
+			 Dim = from@Dim, Dimnames = from@Dimnames))
+setAs("dtCMatrix", "ntCMatrix", # just drop 'x' slot:
+      function(from) new("ntCMatrix", i = from@i, p = from@p,
+			 uplo = from@uplo, diag = from@diag,
+			 ## FIXME?: use from@factors smartly
+			 Dim = from@Dim, Dimnames = from@Dimnames))
+
 
 setAs("matrix", "dtCMatrix",
       function(from) as(as(from, "dtTMatrix"), "dtCMatrix"))

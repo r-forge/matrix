@@ -13,9 +13,18 @@
 ## rather use Csparse* to lsparse* in ./lsparseMatrix.R ,
 ## but this is for "back-compatibility" (have had tests for it..):
 
+setAs("dgCMatrix", "ngCMatrix",
+      function(from) .Call(Csparse_to_nz_pattern, from, FALSE))
+
 setAs("dgCMatrix", "lgCMatrix",
-      function(from) .Call(Csparse_to_logical, from,
-                           is(from, "triangularMatrix")))
+      function(from) { ## FIXME use .Call() too!
+	  r <- new("lgCMatrix")
+	  r@x <- as.logical(from@x)
+	  ## and copy the other slots
+	  for(nm in c("i", "p", "Dim", "Dimnames"))
+	      slot(r, nm) <- slot(from, nm)
+          r
+      })
 
 setMethod("image", "dgCMatrix",
           function(x, ...) {

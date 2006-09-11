@@ -10,12 +10,15 @@ setAs("lspMatrix", "dspMatrix", l2d_Matrix)
 setAs("ltrMatrix", "dtrMatrix", l2d_Matrix)
 setAs("ltpMatrix", "dtpMatrix", l2d_Matrix)
 
+### NOTA BENE: Much of this is *very* parallel to ./ndenseMatrix.R
+###						  ~~~~~~~~~~~~~~~~
+
 ## all need be coercable to "lgeMatrix":
 
 setAs("lsyMatrix", "lgeMatrix",  function(from)
-      .Call(lsyMatrix_as_lgeMatrix, from))
+      .Call(lsyMatrix_as_lgeMatrix, from, 0:0))
 setAs("ltrMatrix", "lgeMatrix",  function(from)
-      .Call(ltrMatrix_as_lgeMatrix, from))
+      .Call(ltrMatrix_as_lgeMatrix, from, 0:0))
 setAs("ltpMatrix", "lgeMatrix",
       function(from) as(as(from, "ltrMatrix"), "lgeMatrix"))
 setAs("lspMatrix", "lgeMatrix",
@@ -31,32 +34,28 @@ setAs("lgeMatrix", "lspMatrix",
 
 setAs("lspMatrix", "lsyMatrix",
       function(from)
-      .Call(lspMatrix_as_lsyMatrix, from))
+      .Call(lspMatrix_as_lsyMatrix, from, 0:0))
 
 setAs("lsyMatrix", "lspMatrix",
       function(from)
-      .Call(lsyMatrix_as_lspMatrix, from))
+      .Call(lsyMatrix_as_lspMatrix, from, 0:0))
 
 setAs("ltpMatrix", "ltrMatrix",
       function(from)
-      .Call(ltpMatrix_as_ltrMatrix, from))
+      .Call(ltpMatrix_as_ltrMatrix, from, 0:0))
 
 setAs("ltrMatrix", "ltpMatrix",
       function(from)
-      .Call(ltrMatrix_as_ltpMatrix, from))
+      .Call(ltrMatrix_as_ltpMatrix, from, 0:0))
 
 
 
 ### -> symmetric :
 
-if(FALSE) ## cannot easily work around R bug  -- FIXME --
+if(FALSE) ## not sure if this is a good idea ... -- FIXME?
 setIs("lgeMatrix", "lsyMatrix",
-### BUG in R: this fails, because isSymmetric() is namespace hidden and NOT found
-##B      test = function(obj) isSymmetric(obj),
-##B and this fails too:
-##B      test = function(obj) Matrix:::isSymmetric(obj),
-      replace = function(obj, value) {
-          ## copy all slots
+      test = function(obj) isSymmetric(obj),
+      replace = function(obj, value) { ## copy all slots
           for(n in slotNames(obj)) slot(obj, n) <- slot(value, n)
       })
 
@@ -162,9 +161,39 @@ setMethod("!", "ltrMatrix",
 
 setMethod("!", "ltpMatrix", function(e1) !as(e1, "ltrMatrix"))
 
-## for the other ldense* ones:
-setMethod("!", "ldenseMatrix",
+## for the other ldense* ones
+setMethod("!", "lgeMatrix",
           function(e1) { e1@x <- !e1@x ; e1 })
+## FIXME : this loses symmetry "lsy" and "lsp":
+setMethod("!", "ldenseMatrix",
+          function(e1) !as(e1, "lgeMatrix"))
+
+
+setMethod("|", signature(e1="lgeMatrix", e2="lgeMatrix"),
+	  function(e1,e2) {
+	      d <- dimCheck(e1, e2)
+	      e1@x <- e1@x | e2@x
+	      e1
+	  })
+setMethod("&", signature(e1="lgeMatrix", e2="lgeMatrix"),
+	  function(e1,e2) {
+	      d <- dimCheck(e1, e2)
+	      e1@x <- e1@x & e2@x
+	      e1
+	  })
+
+setMethod("|", signature(e1="ldenseMatrix", e2="ldenseMatrix"),
+	  function(e1,e2) {
+	      d <- dimCheck(e1, e2)
+	      as(e1, "lgeMatrix") | as(e2, "lgeMatrix")
+	  })
+
+setMethod("&", signature(e1="ldenseMatrix", e2="ldenseMatrix"),
+	  function(e1,e2) {
+	      d <- dimCheck(e1, e2)
+	      as(e1, "lgeMatrix") & as(e2, "lgeMatrix")
+	  })
+
 
 setMethod("as.vector", signature(x = "ldenseMatrix", mode = "missing"),
           function(x) as(x, "lgeMatrix")@x)

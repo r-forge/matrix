@@ -57,6 +57,7 @@ export(
 
 exportClasses(
 	      "index",
+## LOGIC      "logic",
 	      "replValue", # if we don't export it, things fail in dispatch
 
               ## --- 'Matrix' mother and all its daughters : ---------------
@@ -64,27 +65,30 @@ exportClasses(
 	      ## also intermediate `virtual' ones:
 	      "dMatrix",
 	      "lMatrix",
+	      "nMatrix",
+	      ## not yet used, but as sub-classes;
+	      ## must provide them for 'hierarchy-analysis':
+	      "iMatrix",
+	      "zMatrix",
+
 	      "denseMatrix",
 	      "sparseMatrix",
 
+              "compMatrix",
               "diagonalMatrix",
               "generalMatrix",
               "symmetricMatrix",
               "triangularMatrix",
 
-              "compMatrix",
-
 	      "dsparseMatrix",
 	      "lsparseMatrix",
+	      "nsparseMatrix",
 	      "TsparseMatrix",
 	      "CsparseMatrix",
 	      "RsparseMatrix",
 	      "ddenseMatrix",
-	      ## not yet used, but as sub-classes;
-	      ## need to provide them for 'hierarchy-analysis':
-	      "iMatrix",
-	      "zMatrix",
 	      "ldenseMatrix",
+	      "ndenseMatrix",
 
 	      "dgCMatrix",
 	      "dgRMatrix",# unused
@@ -109,6 +113,11 @@ exportClasses(
 	      "ltpMatrix",
 	      "ltrMatrix",
               "ldiMatrix",
+	      "ngeMatrix",
+	      "nspMatrix",
+	      "nsyMatrix",
+	      "ntpMatrix",
+	      "ntrMatrix",
 
 	      "lgCMatrix",
 	      "lgRMatrix",
@@ -119,6 +128,17 @@ exportClasses(
 	      "ltCMatrix",
 	      "ltRMatrix",# unused
 	      "ltTMatrix",
+
+	      "ngCMatrix",
+	      "ngRMatrix",
+	      "ngTMatrix",
+	      "nsCMatrix",
+	      "nsRMatrix",# unused
+	      "nsTMatrix",
+	      "ntCMatrix",
+	      "ntRMatrix",# unused
+	      "ntTMatrix",
+
               "pMatrix",
 
               "corMatrix", # unused
@@ -142,8 +162,8 @@ exportClasses(
               "CHMsimpl",
               "dCHMsuper",
               "dCHMsimpl",
-              "lCHMsuper",# unused
-              "lCHMsimpl",# unused
+              "nCHMsuper",# unused
+              "nCHMsimpl",# unused
 
               "sparseQR"
 	      )
@@ -206,10 +226,6 @@ exportMethods(
               "zapsmall"
 	      )
 
-## only for R >= 2.2:
-if(paste(R.version$major, R.version$minor, sep=".") >= "2.2") {
-
 exportMethods("rbind2")
 exportMethods("cbind2")
 
-}

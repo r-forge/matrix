@@ -1,3 +1,14 @@
+2006-09-11  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllClass.R ("nMatrix"): and subclasses for "nonzero pattern"
+		Matrices, since "lMatrix", also "lsparseM" can have NA
+	* R/ndenseMatrix.R, etc: new source files
+	* man/nsparseMatrix-classes.Rd, etc: new help files
+	* tests/: adaptions
+	* src/chm_common.c (chm_dense_to_SEXP): and others:
+		new 'Rkind' argument: "l*" and "d*" both use CHOLMOD_REAL
+	* src/Csparse.c, etc: dito
+
 2006-09-11  Douglas Bates  <bates@R-project.org>
 
 	* src/Mutils.[ch],init.c inst/include/*.h: Move the
@@ -9,6 +20,8 @@
 	fixed
 
 2006-09-09  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/lMatrix.R: new
 
 	* R/sparseMatrix.R (Tsp2grNEL): do not yet use graph::foo()
 
