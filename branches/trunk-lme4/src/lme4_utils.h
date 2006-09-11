@@ -55,4 +55,9 @@ int match_mat_dims(const int xd[], const int yd[])
     return xd[0] == yd[0] && xd[1] == yd[1];
 }
 
+SEXP alloc_dgeMatrix(int m, int n, SEXP rownms, SEXP colnms);
+SEXP alloc_dpoMatrix(int n, char *uplo, SEXP rownms, SEXP colnms);
+SEXP alloc_dtrMatrix(int n, char *uplo, char *diag, SEXP rownms, SEXP colnms);
+SEXP alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms);
+
 #endif
