@@ -2,6 +2,7 @@
 SEXP
     lme4_DSym,
     lme4_DimSym,
+    lme4_DimNamesSym,
     lme4_GpSym,
     lme4_LSym,
     lme4_OmegaSym,

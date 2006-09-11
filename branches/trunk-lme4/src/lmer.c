@@ -1875,7 +1875,7 @@ SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
 	int nci = nc[i];
 	int nlev = LENGTH(getAttrib(VECTOR_ELT(fl, i), R_LevelsSymbol));
 	SET_VECTOR_ELT(Omega, i,
-		       M_alloc_dpoMatrix(nci, "U",
+		       alloc_dpoMatrix(nci, "U",
 					 VECTOR_ELT(cnames, i),
 					 VECTOR_ELT(cnames, i)));
 	SET_VECTOR_ELT(bVar, i, alloc3Darray(REALSXP, nci, nci, nlev));
@@ -1887,7 +1887,7 @@ SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
 		      CHOLMOD_PATTERN, &c);
     ts2 = M_cholmod_copy(ts1, -1/*lower triangle*/, CHOLMOD_PATTERN, &c);
     SET_SLOT(val, lme4_ZtZSym,
-	     M_alloc_dsCMatrix(q, M_cholmod_nnz(ts2, &c), "U", R_NilValue,
+	     alloc_dsCMatrix(q, M_cholmod_nnz(ts2, &c), "U", R_NilValue,
 			       R_NilValue));
     i = c.supernodal;
     c.supernodal = CHOLMOD_SUPERNODAL; /* force a supernodal decomposition */
@@ -1904,10 +1904,10 @@ SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
     c.supernodal = i;		/* restore previous setting */
     M_cholmod_free_sparse(&ts1, &c); M_cholmod_free_sparse(&ts2, &c);
 				/* create ZtX, RZX, XtX, RXX */
-    SET_SLOT(val, lme4_ZtXSym, M_alloc_dgeMatrix(q, p, R_NilValue, xnms));
-    SET_SLOT(val, lme4_RZXSym, M_alloc_dgeMatrix(q, p, R_NilValue, xnms));
-    SET_SLOT(val, lme4_XtXSym, M_alloc_dpoMatrix(p, "U", xnms, xnms));
-    SET_SLOT(val, lme4_RXXSym, M_alloc_dtrMatrix(p, "U", "N", xnms, xnms));
+    SET_SLOT(val, lme4_ZtXSym, alloc_dgeMatrix(q, p, R_NilValue, xnms));
+    SET_SLOT(val, lme4_RZXSym, alloc_dgeMatrix(q, p, R_NilValue, xnms));
+    SET_SLOT(val, lme4_XtXSym, alloc_dpoMatrix(p, "U", xnms, xnms));
+    SET_SLOT(val, lme4_RXXSym, alloc_dtrMatrix(p, "U", "N", xnms, xnms));
     SET_SLOT(val, lme4_ZtySym, allocVector(REALSXP, q));
     SET_SLOT(val, lme4_rZySym, allocVector(REALSXP, q));
     SET_SLOT(val, lme4_XtySym, allocVector(REALSXP, p));
@@ -1922,7 +1922,7 @@ SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
 				/* secondary slots */
     SET_SLOT(val, lme4_ranefSym, allocVector(REALSXP, q));
     SET_SLOT(val, lme4_fixefSym, allocVector(REALSXP, p));
-    SET_SLOT(val, lme4_RZXinvSym, M_alloc_dgeMatrix(q, p, R_NilValue, xnms));
+    SET_SLOT(val, lme4_RZXinvSym, alloc_dgeMatrix(q, p, R_NilValue, xnms));
 				/* initialize */
     mer_initial(val);
     /* The next calls are simply to set up the L slot.  At present the

@@ -52,6 +52,7 @@ void R_init_lme4(DllInfo *dll)
     M_cholmod_start(&c);
     lme4_DSym = install("D");
     lme4_DimSym = install("Dim");
+    lme4_DimNamesSym = install("Dimnames");
     lme4_GpSym = install("Gp");
     lme4_LSym = install("L");
     lme4_OmegaSym = install("Omega");
