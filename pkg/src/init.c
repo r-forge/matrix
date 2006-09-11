@@ -193,11 +193,6 @@ R_init_Matrix(DllInfo *dll)
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 
-    R_RegisterCCallable("Matrix", "alloc_dgeMatrix", (DL_FUNC)alloc_dgeMatrix);
-    R_RegisterCCallable("Matrix", "alloc_dpoMatrix", (DL_FUNC)alloc_dpoMatrix);
-    R_RegisterCCallable("Matrix", "alloc_dtrMatrix", (DL_FUNC)alloc_dtrMatrix);
-    R_RegisterCCallable("Matrix", "alloc_dsCMatrix", (DL_FUNC)alloc_dsCMatrix);
-
     R_RegisterCCallable("Matrix", "as_cholmod_dense", (DL_FUNC)as_cholmod_dense);
     R_RegisterCCallable("Matrix", "as_cholmod_factor", (DL_FUNC)as_cholmod_factor);
     R_RegisterCCallable("Matrix", "as_cholmod_sparse", (DL_FUNC)as_cholmod_sparse);
