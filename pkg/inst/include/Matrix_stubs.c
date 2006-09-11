@@ -9,46 +9,6 @@
 # define attribute_hidden
 #endif
 
-SEXP attribute_hidden
-M_alloc_dgeMatrix(int m, int n, SEXP rownms,SEXP colnms)
-{
-    static SEXP(*fun)(int,int,SEXP,SEXP) = NULL;
-    if(fun == NULL)
-	fun = (SEXP(*)(int,int,SEXP,SEXP))
-	    R_GetCCallable("Matrix", "alloc_dgeMatrix");
-    return fun(m, n, rownms, colnms);
-}
-
-SEXP attribute_hidden
-M_alloc_dpoMatrix(int n,char *uplo, SEXP rownms, SEXP colnms)
-{
-    static SEXP(*fun)(int,char*,SEXP,SEXP) = NULL;
-    if(fun == NULL)
-	fun = (SEXP(*)(int,char*,SEXP,SEXP))
-	    R_GetCCallable("Matrix", "alloc_dpoMatrix");
-    return fun(n, uplo, rownms, colnms);
-}
-
-SEXP attribute_hidden
-M_alloc_dtrMatrix(int n, char *uplo, char *diag, SEXP rownms, SEXP colnms)
-{
-    static SEXP(*fun)(int,char*,char*,SEXP,SEXP) = NULL;
-    if(fun == NULL)
-	fun = (SEXP(*)(int,char*,char*,SEXP,SEXP))
-	    R_GetCCallable("Matrix", "alloc_dtrMatrix");
-    return fun(n, uplo, diag, rownms, colnms);
-}
-
-SEXP attribute_hidden
-M_alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms)
-{
-    static SEXP(*fun)(int,int,char*,SEXP,SEXP) = NULL;
-    if(fun == NULL)
-	fun = (SEXP(*)(int,int,char*,SEXP,SEXP))
-	    R_GetCCallable("Matrix", "alloc_dsCMatrix");
-    return fun(n, nz, uplo, rownms, colnms);
-}
-
 cholmod_dense attribute_hidden
 *M_as_cholmod_dense(SEXP x)
 {

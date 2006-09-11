@@ -157,12 +157,6 @@ void make_i_matrix_symmetric(   int *to, SEXP from);
 
 SEXP Matrix_expand_pointers(SEXP pP);
 
-/* Move these to the lme4 sources */
-SEXP alloc_dgeMatrix(int m, int n, SEXP rownms, SEXP colnms);
-SEXP alloc_dpoMatrix(int n, char *uplo, SEXP rownms, SEXP colnms);
-SEXP alloc_dtrMatrix(int n, char *uplo, char *diag, SEXP rownms, SEXP colnms);
-SEXP alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms);
-
 SEXP dup_mMatrix_as_dgeMatrix(SEXP A);
 
 static R_INLINE SEXP

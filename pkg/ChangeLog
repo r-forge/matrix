@@ -1,3 +1,8 @@
+2006-09-11  Douglas Bates  <bates@R-project.org>
+
+	* src/Mutils.[ch],init.c inst/include/*.h: Move the
+	alloc_d**Matrix functions to the lme4 package.
+
 2006-09-09  Douglas Bates  <bates@R-project.org>
 
 	* src/dsCMatrix.c (dsCMatrix_Cholesky): igoring LDL = FALSE now
