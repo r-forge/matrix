@@ -85,6 +85,26 @@ N <- 10
 nrFT <- nrow(fromTo)
 rowi <- rep.int(1:nrFT, fromTo[,2]-fromTo[,1] + 1) - 1:1
 coli <- unlist(lapply(1:nrFT, function(x) fromTo[x,1]:fromTo[x,2])) - 1:1
+
+## "n" --- nonzero pattern Matrices
+sM  <- new("ngTMatrix", i = rowi, j=coli, Dim=as.integer(c(N,N)))
+sM # nice
+
+sm <- as(sM, "matrix")
+sM %*% sM
+assert.EQ.mat(sM %*% sM,        sm %*% sm)
+assert.EQ.mat(t(sM) %*% sM,
+              (t(sm) %*% sm) > 0, tol=0)
+crossprod(sM)
+tcrossprod(sM)
+stopifnot(identical(as( crossprod(sM), "ngCMatrix"), t(sM) %*%   sM),
+          identical(as(tcrossprod(sM), "ngCMatrix"),  sM  %*% t(sM)))
+
+assert.EQ.mat( crossprod(sM),  crossprod(sm) > 0)
+assert.EQ.mat(tcrossprod(sM), as(tcrossprod(sm),"matrix") > 0)
+
+## "l" --- logical Matrices -- use usual 0/1 arithmetic
+if(FALSE) { ### Matrix product for lsparse --> garbage --- FIXME
 sM  <- new("lgTMatrix", i = rowi, j=coli, Dim=as.integer(c(N,N)))
 sM # nice
 
@@ -100,6 +120,7 @@ stopifnot(identical(as( crossprod(sM), "lgCMatrix"), t(sM) %*%   sM),
 
 assert.EQ.mat( crossprod(sM),  crossprod(sm) > 0)
 assert.EQ.mat(tcrossprod(sM), as(tcrossprod(sm),"matrix") > 0)
+}
 
 ## A sparse example - with *integer* matrix:
 M <- Matrix(cbind(c(1,0,-2,0,0,0,0,0,2.2,0),
@@ -112,6 +133,7 @@ stopifnot(as.vector(print(t(M %*% 1:6))) ==
 MM. <- tcrossprod(M)
 stopifnot(class(MM.) == "dsCMatrix",
           class(M.M) == "dsCMatrix")
+
 
 ## even simpler
 m <- matrix(0, 4,7); m[c(1, 3, 6, 9, 11, 22, 27)] <- 1

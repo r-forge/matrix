@@ -67,7 +67,10 @@ M[2, 1]
 M[4, ]
 @
 where the last two statements show customary matrix indexing, returning a
-simple numeric vector each.
+simple numeric vector each\footnote{because there's an additional default
+  argument to indexing, \Scode{drop = TRUE}.  If you add
+  \Scode{\ ,\ drop = FALSE} you will get submatrices instead simple
+  vectors.}
 We assign 0 to some columns and rows to ``sparsify'' it,
 @
 <<set0>>=
@@ -82,7 +85,7 @@ sM <- as(M2, "sparseMatrix")
 10 * sM
 identical(sM * 2, sM + sM)
 @ %def
-where we also see that multiplication by scalar keeps sparcity
+where we also see that multiplication by a scalar keeps sparcity,
 but addition with a ``dense'' object does not.
 @
 <<add1>>=
@@ -348,6 +351,12 @@ give   some glimpses of implementations at least on the \RR{} level ones?
 
  \TODO{Using Group Methods}
 
+
+\section{Session Info}
+
+<<sessionInfo, results=tex>>=
+toLatex(sessionInfo())
+@
 
 \bibliography{Matrix}
 

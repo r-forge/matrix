@@ -6,6 +6,9 @@
 setAs("Matrix", "sparseMatrix", function(from) as_Csparse(from))
 setAs("Matrix", "denseMatrix",  function(from) as_dense(from))
 
+setAs(from = "Matrix", to = "matrix", # do *not* call base::as.matrix() here:
+      function(from) .bail.out.2("coerce", class(from), class(to)))
+
 ## ## probably not needed eventually:
 ## setAs(from = "ddenseMatrix", to = "matrix",
 ##       function(from) {

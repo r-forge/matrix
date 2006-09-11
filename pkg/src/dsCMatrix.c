@@ -26,7 +26,7 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
     L = cholmod_factor_to_sparse(Ncp, &c); cholmod_free_factor(&Ncp, &c);
     R = cholmod_transpose(L, /*values*/ 1, &c); cholmod_free_sparse(&L, &c);
     ans = PROTECT(chm_sparse_to_SEXP(R, /*cholmod_free*/ 1,
-				     /*uploT*/ 1, /*diag*/ "N",
+				     /*uploT*/ 1, /*Rkind*/ 0, /*diag*/ "N",
 				     GET_SLOT(x, Matrix_DimNamesSym)));
     if (asLogical(pivot)) {
 	SEXP piv = PROTECT(allocVector(INTSXP, N->n));
@@ -126,7 +126,7 @@ SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b)
     cx = cholmod_solve(CHOLMOD_A, L, cb, &c);
     Free(cb); Free(L);
     UNPROTECT(1);
-    return chm_dense_to_SEXP(cx, 1);
+    return chm_dense_to_SEXP(cx, 1, 0);
 }
 
 /* Needed for printing dsCMatrix objects */
@@ -140,7 +140,7 @@ SEXP dsCMatrix_to_dgTMatrix(SEXP x)
     if (!A->stype)
 	error("Non-symmetric matrix passed to dsCMatrix_to_dgTMatrix");
     Free(A); cholmod_free_sparse(&Afull, &c);
-    return chm_triplet_to_SEXP(At, 1, /*uploT*/ 0, "",
+    return chm_triplet_to_SEXP(At, 1, /*uploT*/ 0, /*Rkind*/ 0, "",
 			       GET_SLOT(x, Matrix_DimNamesSym));
 }
 

@@ -55,7 +55,7 @@ setAs("graphAM", "sparseMatrix",
 	  }
 	  else { ## no weights: 0/1 matrix -> logical
 	      as(as(from, "matrix"),
-		 if(symm) "lsTMatrix" else "lgTMatrix")
+		 if(symm) "nsTMatrix" else "ngTMatrix")
 	  }
       })
 
@@ -85,10 +85,10 @@ setAs("graphNEL", "CsparseMatrix",
               flip <- i > j
               i[flip] <- j[flip]
               j[flip] <- tmp[flip]
-              dtm <- new("lsTMatrix", i = i, j = j, Dim = dm,
+              dtm <- new("nsTMatrix", i = i, j = j, Dim = dm,
                            Dimnames = list(nd, nd), uplo = "U")
           } else {
-	      dtm <- new("lgTMatrix", i = i, j = j, Dim = dm,
+	      dtm <- new("ngTMatrix", i = i, j = j, Dim = dm,
                            Dimnames = list(nd, nd))
           }
           as(dtm, "CsparseMatrix")
@@ -143,7 +143,7 @@ setMethod("[", signature(x = "sparseMatrix", i = "index", j = "missing",
 			 drop = "logical"),
 	  function (x, i, j, drop) {
               cl <- class(x)
-              viaCl <- if(is(x,"dMatrix")) "dgTMatrix" else "lgTMatrix"
+              viaCl <- paste(.M.kind(x,cl), "gTMatrix", sep='')
               x <- callGeneric(x = as(x, viaCl), i=i, drop=drop)
               ## try_as(x, c(cl, sub("T","C", viaCl)))
               if(is(x, "Matrix") && extends(cl, "CsparseMatrix"))
@@ -154,7 +154,7 @@ setMethod("[", signature(x = "sparseMatrix", i = "missing", j = "index",
 			 drop = "logical"),
 	  function (x, i, j, drop) {
               cl <- class(x)
-              viaCl <- if(is(x,"dMatrix")) "dgTMatrix" else "lgTMatrix"
+              viaCl <- paste(.M.kind(x,cl), "gTMatrix", sep='')
               x <- callGeneric(x = as(x, viaCl), j=j, drop=drop)
               ## try_as(x, c(cl, sub("T","C", viaCl)))
               if(is(x, "Matrix") && extends(cl, "CsparseMatrix"))
@@ -165,7 +165,7 @@ setMethod("[", signature(x = "sparseMatrix",
 			 i = "index", j = "index", drop = "logical"),
 	  function (x, i, j, drop) {
               cl <- class(x)
-              viaCl <- if(is(x,"dMatrix")) "dgTMatrix" else "lgTMatrix"
+              viaCl <- paste(.M.kind(x,cl), "gTMatrix", sep='')
               x <- callGeneric(x = as(x, viaCl), i=i, j=j, drop=drop)
               ## try_as(x, c(cl, sub("T","C", viaCl)))
               if(is(x, "Matrix") && extends(cl, "CsparseMatrix"))
@@ -204,10 +204,10 @@ setMethod("[", signature(x = "sparseMatrix",
 setMethod("-", signature(e1 = "sparseMatrix", e2 = "missing"),
           function(e1) { e1@x <- -e1@x ; e1 })
 ## with the following exceptions:
-setMethod("-", signature(e1 = "lsparseMatrix", e2 = "missing"),
+setMethod("-", signature(e1 = "nsparseMatrix", e2 = "missing"),
           function(e1) callGeneric(as(e1, "dgCMatrix")))
 setMethod("-", signature(e1 = "pMatrix", e2 = "missing"),
-          function(e1) callGeneric(as(e1, "lgTMatrix")))
+          function(e1) callGeneric(as(e1, "ngTMatrix")))
 
 ## Group method  "Arith"
 
@@ -247,7 +247,7 @@ prSpMatrix <- function(object, digits = getOption("digits"),
     } else {
         m <- as(object, "matrix")
     }
-    logi <- is(object,"lsparseMatrix")
+    logi <- is(object,"lsparseMatrix") || is(object,"nsparseMatrix")
     if(logi)
 	x <- array(character(length(m)), dim(m), dimnames=dimnames(m))
     else {
@@ -309,6 +309,10 @@ setMethod("isSymmetric", signature(object = "sparseMatrix"),
 		  ## test for exact equality; FIXME(?): identical() too strict?
 		  identical(as(object, "lgCMatrix"),
 			    as(t(object), "lgCMatrix"))
+	      else if (is(object, "nMatrix"))
+		  ## test for exact equality; FIXME(?): identical() too strict?
+		  identical(as(object, "ngCMatrix"),
+			    as(t(object), "ngCMatrix"))
 	      else stop("not yet implemented")
 	  })
 

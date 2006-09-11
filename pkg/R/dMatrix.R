@@ -4,14 +4,7 @@
 setAs("dMatrix", "matrix",
       function(from) as(as(from, "dgeMatrix"), "matrix"))
 
-### Idea: Coercion between *VIRTUAL* classes -- as() chooses "closest" classes
-### ----  should also work e.g. for  triangular --> triangular !
-##
-## setAs("dMatrix", "lMatrix",
-##       function(from) {
-##       })
-
-##-> this is now in ./Matrix.R
+##-> "dMatrix" <--> "lMatrix"   ---> ./lMatrix.R
 
 ## Methods for operations where one argument is integer
 ## No longer made use of (and confusing hence) since R version 2.1.0

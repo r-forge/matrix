@@ -1,28 +1,28 @@
-\name{lsyMatrix-class}
-\title{Symmetric Dense Logical Matrices}
+\name{nsyMatrix-class}
+\title{Symmetric Dense Nonzero-Pattern Matrices}
 \docType{class}
-\alias{lspMatrix-class}
-\alias{lsyMatrix-class}
+\alias{nspMatrix-class}
+\alias{nsyMatrix-class}
 %
-\alias{coerce,lspMatrix,dspMatrix-method}
-\alias{coerce,lspMatrix,lsyMatrix-method}
-\alias{coerce,lspMatrix,lgeMatrix-method}
-\alias{coerce,lsyMatrix,dsyMatrix-method}
-\alias{coerce,lsyMatrix,lgeMatrix-method}
-\alias{coerce,lsyMatrix,lspMatrix-method}
-\alias{coerce,matrix,lsyMatrix-method}
-\alias{coerce,matrix,lspMatrix-method}
-\alias{t,lspMatrix-method}
-\alias{t,lsyMatrix-method}
+\alias{coerce,nspMatrix,dspMatrix-method}
+\alias{coerce,nspMatrix,nsyMatrix-method}
+\alias{coerce,nspMatrix,ngeMatrix-method}
+\alias{coerce,nsyMatrix,dsyMatrix-method}
+\alias{coerce,nsyMatrix,ngeMatrix-method}
+\alias{coerce,nsyMatrix,nspMatrix-method}
+\alias{coerce,matrix,nsyMatrix-method}
+\alias{coerce,matrix,nspMatrix-method}
+\alias{t,nspMatrix-method}
+\alias{t,nsyMatrix-method}
 %
 \description{
-  The \code{"lsyMatrix"} class is the class of symmetric, dense logical
-  matrices in non-packed storage and \code{"lspMatrix"} is the class of
+  The \code{"nsyMatrix"} class is the class of symmetric, dense nonzero-pattern
+  matrices in non-packed storage and \code{"nspMatrix"} is the class of
   of these in packed storage.  Only the upper triangle or the
   lower triangle is stored.
 }
 \section{Objects from the Class}{
-  Objects can be created by calls of the form \code{new("lsyMatrix", ...)}.
+  Objects can be created by calls of the form \code{new("nsyMatrix", ...)}.
 }
 \section{Slots}{
   \describe{
@@ -38,12 +38,12 @@
   }
 }
 \section{Extends}{
-  \code{"lsyMatrix"} extends class \code{"lgeMatrix"}, directly, whereas\cr
-  \code{"lspMatrix"} extends class \code{"ldenseMatrix"}, directly.
+  \code{"nsyMatrix"} extends class \code{"ngeMatrix"}, directly, whereas\cr
+  \code{"nspMatrix"} extends class \code{"ndenseMatrix"}, directly.
 
   Both extend class \code{"symmetricMatrix"}, directly,
   and class \code{"Matrix"} and others, \emph{in}directly, use
-  \code{\link{showClass}("lsyMatrix")}, e.g., for details.
+  \code{\link{showClass}("nsyMatrix")}, e.g., for details.
 }
 \section{Methods}{
   Currently, mainly \code{\link{t}()} and coercion methods (for
@@ -53,15 +53,16 @@
 %\references{}
 %\author{}
 \seealso{
-  \code{\linkS4class{lgeMatrix}}, \code{\linkS4class{Matrix}},
+  \code{\linkS4class{ngeMatrix}}, \code{\linkS4class{Matrix}},
   \code{\link[base]{t}}
 }
 \examples{
+(s0 <- new("nsyMatrix"))
+
 (M2 <- Matrix(c(TRUE, NA,FALSE,FALSE), 2,2)) # logical dense (ltr)
-str(M2)
-# can
-(sM <- M2 | t(M2)) # "lge"
-as(sM, "lsyMatrix")
-str(sM <- as(sM, "lspMatrix")) # packed symmetric
+(sM <- M2 & t(M2))      # "lge"
+class(sM <- as(sM, "nMatrix")) # -> "nge"
+     (sM <- as(sM, "nsyMatrix")) # -> "nsy"
+str ( sM <- as(sM, "nspMatrix")) # -> "nsp": packed symmetric
 }
 \keyword{classes}
