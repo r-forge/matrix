@@ -18,8 +18,7 @@ pkg = Matrix
 
 include SOURCES_C.mkf
 
-## zherk.f is part of BLAS, but not of R's BLAS sources
-SOURCES_F = zpotf2.f zpotrf.f zherk.f
+SOURCES_F = zpotf2.f zpotrf.f
 
 OBJECTS = $(SOURCES_C:.c=.o) $(SOURCES_F:.f=.o)
 SHLIB = $(pkg).dll
