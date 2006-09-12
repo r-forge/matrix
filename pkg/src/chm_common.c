@@ -139,7 +139,7 @@ SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int dofree, int uploT, int Rkind,
 	    break;
 	case 1:
 	    Memcpy(LOGICAL(ALLOC_SLOT(ans, Matrix_xSym, LGLSXP, nnz)),
-		   (double *) a->x, nnz);
+		   (int *) a->x, nnz);
 	    break;
 	}
     if (a->xtype == CHOLMOD_COMPLEX)
@@ -265,7 +265,7 @@ SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int dofree, int uploT, int Rkind,
 	    break;
 	case 1:
 	    Memcpy(LOGICAL(ALLOC_SLOT(ans, Matrix_xSym, LGLSXP, a->nnz)),
-		   (double *) a->x, a->nnz);
+		   (int *) a->x, a->nnz);
 	    break;
 	}
     else if (a->xtype == CHOLMOD_COMPLEX)
@@ -329,10 +329,13 @@ cholmod_dense *as_cholmod_dense(SEXP x)
     ans->nzmax = dims[0] * dims[1];
 				/* set the xtype and any elements */
     switch(ctype / 2) {
-    case 0: /* "d" & "l" */
-    case 1:
+    case 0: /* "d" */
 	ans->xtype = CHOLMOD_REAL;
 	ans->x = (void *) REAL((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x);
+	break;
+    case 1: /* "l" */
+	ans->xtype = CHOLMOD_REAL;
+	ans->x = (void *) LOGICAL((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x);
 	break;
     case 2: /* "n" */
 	ans->xtype = CHOLMOD_PATTERN;
@@ -392,7 +395,7 @@ SEXP chm_dense_to_SEXP(cholmod_dense *a, int dofree, int Rkind)
 		break;
 	    case 1:
 		Memcpy(LOGICAL(ALLOC_SLOT(ans, Matrix_xSym, LGLSXP, ntot)),
-		       (double *) a->x, ntot);
+		       (int *) a->x, ntot);
 		break;
 	    }
 	else if (a->xtype == CHOLMOD_COMPLEX)
@@ -600,8 +603,10 @@ SEXP chm_factor_to_SEXP(cholmod_factor *f, int dofree)
 	       (int*)f->prev, f->n + 2);
 
     }
-    if (dofree > 0) cholmod_free_factor(&f, &c);
-    if (dofree < 0) Free(f);
+    if(dofree) {
+	if (dofree > 0) cholmod_free_factor(&f, &c);
+	else /* dofree < 0 */ Free(f);
+    }
     UNPROTECT(1);
     return ans;
 }
