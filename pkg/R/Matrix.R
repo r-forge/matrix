@@ -85,9 +85,9 @@ Matrix <-
 	sparse <- sparseDefault(data)
 
     doDN <- TRUE
-    if (i.M && !forceCheck) {
+    if (i.M) {
 	sM <- is(data,"sparseMatrix")
-	if((sparse && sM) || (!sparse && !sM))
+	if(!forceCheck && ((sparse && sM) || (!sparse && !sM)))
 	    return(data)
 	## else : convert  dense <-> sparse -> at end
     }

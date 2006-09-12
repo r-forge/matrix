@@ -37,7 +37,7 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
 	/* FIXME: Because of the cholmod_factor -> S4 obj ->
 	 * cholmod_factor conversions, the value of N->minor will
 	 * always be N->n.  Change as_cholmod_factor and
-	 * chm_factor_as_SEXP to keep track of Minor.
+	 * chm_factor_to_SEXP to keep track of Minor.
 	 */
 	setAttrib(ans, install("rank"), ScalarInteger((size_t) N->minor));
 	UNPROTECT(1);
