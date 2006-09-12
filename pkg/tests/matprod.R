@@ -104,11 +104,10 @@ assert.EQ.mat( crossprod(sM),  crossprod(sm) > 0)
 assert.EQ.mat(tcrossprod(sM), as(tcrossprod(sm),"matrix") > 0)
 
 ## "l" --- logical Matrices -- use usual 0/1 arithmetic
-if(FALSE) { ### Matrix product for lsparse --> garbage --- FIXME
 sM  <- new("lgTMatrix", i = rowi, j=coli, Dim=as.integer(c(N,N)))
 sM # nice
-
 sm <- as(sM, "matrix")
+if(FALSE) { ### Matrix product for lsparse --> garbage --- FIXME
 sM %*% sM
 assert.EQ.mat(sM %*% sM,        sm %*% sm)
 assert.EQ.mat(t(sM) %*% sM,

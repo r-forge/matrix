@@ -142,23 +142,16 @@ stopifnot(is(lm,"lsparseMatrix"))
 data(KNex)
 str(mmG.1 <- (KNex $ mm) > 0.1)# "lgC..."
 ## from logical to nz_pattern -- okay when there are no NA's :
-%%?%% %% FIXME:  has never NAs when run interactively, but has in R CMD check ???
-%%?%% if(any(is.na(mmG.1@x))) {
-%%?%%   table(mmG.1@x, exclude=NULL)
-%%?%% } else  {
-%%?%% nmG.1 <- as(mmG.1, "nMatrix")
-%%?%% ## from logical to "double"
-%%?%% if(FALSE) { ## NOT YET AVAILABLE%% FIXME -- want some way of "coercion"
-%%?%%   dmG.1 <- mmG.1 + 0
-%%?%%   dmG.1 <- as(mmG.1, "dMatrix")
-%%?%%   dmG.1 <- as(mmG.1, "dMatrix")
-%%?%% }
-%%?%% class(xnx <- crossprod(nmG.1))# "nsC.."
-%%?%% class(xlx <- crossprod(mmG.1))# "dsC.." : numeric
-%%?%% %% FIXME: 'xlx@x' is garbage
-%%?%% %% TODO: compare xlx & xnx
-%%?%% stopifnot(isSymmetric(xlx), isSymmetric(xnx))
-%%?%% } # end {else}
+nmG.1 <- as(mmG.1, "nMatrix")
+## from logical to "double"
+if(FALSE)  ## works, but gives garbage %% FIXME -- want some way of "coercion"
+  dmG.1 <- as(mmG.1, "dMatrix")
+
+class(xnx <- crossprod(nmG.1))# "nsC.."
+class(xlx <- crossprod(mmG.1))# "dsC.." : numeric
+%% FIXME: 'xlx@x' is garbage
+%% TODO: compare xlx & xnx
+stopifnot(isSymmetric(xlx), isSymmetric(xnx))
 }
 \keyword{classes}
 \keyword{algebra}

@@ -74,33 +74,33 @@ setMethod("Compare", signature(e1 = "numeric", e2 = "dMatrix"),
 
 setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
 	  function(e1, e2) {
-              lClass <- class2(class(e1), "l")
-              fullCl <- if(isSymmetric(e1)) "lsyMatrix" else "lgeMatrix"
+	      lClass <- class2(class(e1), "l")
+	      fullCl <- if(isSymmetric(e1)) "lsyMatrix" else "lgeMatrix"
 	      ## Dbg cat("Compare", class(e1), "|-> ",lClass, "\n")
-	      r  <- callGeneric(e1@x, e2)
-              r0 <- callGeneric(0, e2)
-              ## trivial case first
-              if(isTRUE(r0) && all(r)) {
-                  r <- new(fullCl)
-                  d <- e1@Dim
-                  r@Dim <- d
-                  r@Dimnames <- e1@Dimnames
-                  r@x <- rep.int(TRUE, prod(d))
-              }
-	      else if(is(e1, "denseMatrix")) {
-                  full <- !isPacked(e1) # << both "dtr" and "dsy" are 'full'
-                  if(full || identical(r0, FALSE) || is(e1, "symmetricMatrix"))
-                      r <- new(lClass, x = r,
-                               Dim = dim(e1), Dimnames = dimnames(e1))
-                  else { ## packed matrix with structural 0 and r0 is not FALSE:
-                      ##--> result cannot be packed anymore
-                      .bail.out.2(.Generic, class(e1), class(e2))
-                      dr <- as(r, fullCl)
-                      ## FIXME: implement this:
-                      dr[ind.0(e1)] <- r0
-                  }
+	      r	 <- callGeneric(e1@x, e2)
+	      r0 <- callGeneric(0, e2)
+	      ## trivial case first
+	      if(isTRUE(r0) && all(r)) {
+		  r <- new(fullCl)
+		  d <- e1@Dim
+		  r@Dim <- d
+		  r@Dimnames <- e1@Dimnames
+		  r@x <- rep.int(TRUE, prod(d))
 	      }
-              else { ## dsparseMatrix => lClass is "lsparse*"
+	      else if(is(e1, "denseMatrix")) {
+		  full <- !isPacked(e1) # << both "dtr" and "dsy" are 'full'
+		  if(full || identical(r0, FALSE) || is(e1, "symmetricMatrix"))
+		      r <- new(lClass, x = r,
+			       Dim = dim(e1), Dimnames = dimnames(e1))
+		  else { ## packed matrix with structural 0 and r0 is not FALSE:
+		      ##--> result cannot be packed anymore
+		      .bail.out.2(.Generic, class(e1), class(e2))
+		      dr <- as(r, fullCl)
+		      ## FIXME: implement this:
+		      dr[ind.0(e1)] <- r0
+		  }
+	      }
+	      else { ## dsparseMatrix => lClass is "lsparse*"
 
 		  if(identical(r0, FALSE)) { ## things remain sparse
 		      if((Ar <- all(r)) || !any(r)) {
@@ -112,8 +112,8 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
 		      } else { # some TRUE, some FALSE: go via unique 'Tsparse'
 			  M <- asTuniq(e1)
 			  rx <- callGeneric(M@x, e2)
-                          ## FIXME! what if  any(is.na(rx))  ? !!!
 			  r <- new(class2(class(M), 'l'), # logical Tsparse
+				   x = callGeneric(M@x, e2),
 				   i = M@i[rx], Dim = M@Dim,
 				   j = M@j[rx], Dimnames = M@Dimnames)
 			  if(is(e1, "CsparseMatrix"))
@@ -122,21 +122,21 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
 			      r <- as(r, "RsparseMatrix")
 		      }
 		  } else {
-		      message(sprintf("sparse to dense coercion in '%s'",
-				      .Generic))
-                      r <- new(lClass, x = r,
-                               Dim = dim(e1), Dimnames = dimnames(e1))
+		      message(sprintf("sparse to dense (%s) coercion in '%s'",
+				      lClass, .Generic))
+		      r <- new(lClass, x = r,
+			       Dim = dim(e1), Dimnames = dimnames(e1))
 
-                      ## NOT YET:
-                      .bail.out.2(.Generic, class(e1), class(e2))
+		      ## NOT YET:
+		      .bail.out.2(.Generic, class(e1), class(e2))
 
-                      ## non sparse result
+		      ## non sparse result
 
-                      ## FIXME: implement this:
-                      r[ind.0(e1)] <- r0
-                  }
+		      ## FIXME: implement this:
+		      r[ind.0(e1)] <- r0
+		  }
 	      }
-              r
+	      r
 	  })
 
 ## "dMatrix <-> work with 'x' slot
