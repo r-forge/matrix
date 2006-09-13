@@ -26,8 +26,9 @@ SEXP lgCMatrix_validate(SEXP x)
 	if (xi[j] < 0 || xi[j] >= nrow)
 	    return mkString(_("all row indices must be between 0 and nrow-1"));
     }
-    if (csc_unsorted_columns(ncol, xp, xi))
-	csc_sort_columns(ncol, xp, xi, (double *) NULL);
+    /* column sorting now done in Csparse_validate */
+/*     if (csc_unsorted_columns(ncol, xp, xi)) */
+/* 	csc_sort_columns(ncol, xp, xi, (double *) NULL); */
 
     return ScalarLogical(1);
 }

@@ -46,9 +46,9 @@ SEXP get_factors(SEXP obj, char *nm);
 SEXP set_factors(SEXP obj, SEXP val, char *nm);
 SEXP dgCMatrix_set_Dim(SEXP x, int nrow);
 
-int csc_unsorted_columns(int ncol, const int p[], const int i[]);
-void csc_sort_columns(int ncol, const int p[], int i[], double x[]);
-SEXP csc_check_column_sorting(SEXP A);
+/* int csc_unsorted_columns(int ncol, const int p[], const int i[]); */
+/* void csc_sort_columns(int ncol, const int p[], int i[], double x[]); */
+/* SEXP csc_check_column_sorting(SEXP A); */
 SEXP Matrix_make_named(int TYP, char **names);
 SEXP check_scalar_string(SEXP sP, char *vals, char *nm);
 double *packed_getDiag(double *dest, SEXP x);

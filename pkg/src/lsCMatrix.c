@@ -21,9 +21,9 @@ SEXP lsCMatrix_validate(SEXP x)
 	    ncol = length(pslot) - 1,
 	    *xp = INTEGER(pslot),
 	    *xi = INTEGER(islot);
-
-	if (csc_unsorted_columns(ncol, xp, xi))
-	    csc_sort_columns(ncol, xp, xi, (double *) NULL);
+	/* column sorting now done in Csparse_validate */
+/* 	if (csc_unsorted_columns(ncol, xp, xi)) */
+/* 	    csc_sort_columns(ncol, xp, xi, (double *) NULL); */
 
 	return ScalarLogical(1);
     }

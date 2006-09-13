@@ -151,7 +151,7 @@ SEXP dgCMatrix_set_Dim(SEXP x, int nrow)
 }
 
 
-
+#if 0
 /**  The following two csc_ functions are identically usable for rcs__
  *
  * Check for unsorted columns in the row indices
@@ -210,7 +210,9 @@ void csc_sort_columns(int ncol, const int p[], int i[], double x[])
     Free(ord);
     if (x) Free(dd);
 }
+#endif 
 
+#if 0
 /**
  * Check for sorted columns in an object that inherits from the
  * dgCMatrix class.  Resort the columns if necessary.
@@ -229,6 +231,7 @@ SEXP csc_check_column_sorting(SEXP m)
 	csc_sort_columns(ncol, mp, mi, REAL(GET_SLOT(m, Matrix_xSym)));
     return m;
 }
+#endif
 
 /* Fill in the "trivial remainder" in  n*m  array ;
  *  typically the 'x' slot of a "dtrMatrix" :
