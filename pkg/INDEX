@@ -74,7 +74,16 @@ lsparseMatrix-class     Sparse logical matrices
 lsyMatrix-class         Symmetric Dense Logical Matrices
 ltrMatrix-class         Triangular Dense Logical Matrices
 lu                      Triangular Decomposition of a Square Matrix
+nMatrix-class           Class "nMatrix" of Non-zero Pattern Matrices
+ndenseMatrix-class      Virtual Class "ndenseMatrix" of Dense Logical
+                        Matrices
+ndiMatrix-class         Class "ndiMatrix" of Diagonal Logical Matrices
+ngeMatrix-class         Class "ngeMatrix" of General Dense
+                        Nonzero-pattern Matrices
 norm                    Norm of a Matrix
+nsparseMatrix-class     Sparse logical matrices
+nsyMatrix-class         Symmetric Dense Nonzero-Pattern Matrices
+ntrMatrix-class         Triangular Dense Logical Matrices
 pMatrix-class           Permutation matrices
 qr-methods              Methods for the qr generic
 rcond                   Estimate the Reciprocal Condition Number
