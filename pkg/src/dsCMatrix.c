@@ -3,13 +3,8 @@
 SEXP dsCMatrix_validate(SEXP obj)
 {
     SEXP val = symmetricMatrix_validate(obj);
-    if(isString(val))
-	return(val);
-    else {
-	/* FIXME needed? dsC* inherits from dgC* which does this in validate*/
-	csc_check_column_sorting(obj);
-	return ScalarLogical(1);
-    }
+    if(isString(val)) return(val);
+    return ScalarLogical(1);
 }
 
 SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
