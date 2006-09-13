@@ -3,6 +3,7 @@
 \usepackage{myVignette}
 \usepackage[authoryear,round]{natbib}
 \bibliographystyle{plainnat}
+\newcommand{\noFootnote}[1]{{\small (\textit{#1})}}
 %%\VignetteIndexEntry{2nd Introduction to the Matrix Package}
 %%\VignetteDepends{Matrix}
 \SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=5,height=3,strip.white=TRUE}
@@ -67,10 +68,10 @@ M[2, 1]
 M[4, ]
 @
 where the last two statements show customary matrix indexing, returning a
-simple numeric vector each\footnote{because there's an additional default
-  argument to indexing, \Scode{drop = TRUE}.  If you add
-  \Scode{\ ,\ drop = FALSE} you will get submatrices instead simple
-  vectors.}
+simple numeric vector each \footnote{because there's an additional default
+  argument to indexing, \code{drop = TRUE}.  If you add
+  \hbox{``\code{\ ,\ drop = FALSE}\ ''} you will get submatrices instead of
+  simple vectors.}
 We assign 0 to some columns and rows to ``sparsify'' it,
 @
 <<set0>>=
@@ -97,11 +98,18 @@ Operations on our classed matrices include
 (componentwise) arithmetic ($+$, $-$, $*$, $/$, etc) as partly seen above,
 comparison ($>$, $\le$, etc), e.g.,
 <<Comp1>>=
-str(sM > 2)
+Mg2 <- (sM > 2)
+Mg2
 @
-%% debug the above with
-%% trace(">", browser, exit=browser,signature=signature("dgCMatrix","numeric"))
-returning a logical sparse matrix.
+returning a logical sparse matrix.  When interested in the internal
+\textbf{str}ucture, \Rfun{str} comes handy, and we have been using it
+ourselves more regulary than \Rfun{print}ing (or \Rfun{show}ing as it
+happens) our matrices,
+@
+<<str_mat>>=
+str(Mg2)
+@ %def
+
 %
 Further, \code{"Math"}-operations (such as
 \Rfun{exp}, \Rfun{sin} or \Rfun{gamma}) and \code{"Math2"} (\Rfun{round} etc)
