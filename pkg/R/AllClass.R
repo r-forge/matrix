@@ -112,7 +112,9 @@ setClass("TsparseMatrix", representation(i = "integer", j = "integer", "VIRTUAL"
          )
 
 setClass("CsparseMatrix", representation(i = "integer", p = "integer", "VIRTUAL"),
-	 contains = "sparseMatrix")
+	 contains = "sparseMatrix",
+         validity = function(object) .Call(Csparse_validate, object)
+         )
 
 setClass("RsparseMatrix", representation(p = "integer", j = "integer", "VIRTUAL"),
 	 contains = "sparseMatrix")
