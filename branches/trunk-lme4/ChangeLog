@@ -3,6 +3,11 @@
 	* src/lme4_utils.[ch]: Move the alloc_d**Matrix functions from the
 	Matrix package here.
 
+2006-09-09  Douglas Bates  <bates@R-project.org>
+
+	* R/lmer.R (expandSlash): Fix expansion of RHS when no fixed
+	effects terms are specified.
+
 2006-09-08  Douglas Bates  <bates@R-project.org>
 
 	* DESCRIPTION (Imports): Remove imports of utils and latticeExtra
