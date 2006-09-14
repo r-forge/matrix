@@ -12,7 +12,7 @@ else
 SOURCES_LAPACK = zpotf2.f zpotrf.f
 endif
 
-SOURCES_F = $(SOURCES_BLAS) $(SOURCES_LAPACK)
+SOURCES_F = $(SOURCES_LAPACK)
 
 OBJECTS = $(SOURCES_C:.c=.o) $(SOURCES_F:.f=.o)
 SHLIB = $(pkg)$(SHLIB_EXT)
