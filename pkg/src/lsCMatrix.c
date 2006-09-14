@@ -17,11 +17,11 @@ SEXP lsCMatrix_validate(SEXP x)
 	/* FIXME needed? ltC* inherits from lgC* which does this in validate*/
 	SEXP pslot = GET_SLOT(x, Matrix_pSym),
 	    islot = GET_SLOT(x, Matrix_iSym);
-	int
-	    ncol = length(pslot) - 1,
-	    *xp = INTEGER(pslot),
-	    *xi = INTEGER(islot);
 	/* column sorting now done in Csparse_validate */
+/* 	int */
+/* 	    ncol = length(pslot) - 1, */
+/* 	    *xp = INTEGER(pslot), */
+/* 	    *xi = INTEGER(islot); */
 /* 	if (csc_unsorted_columns(ncol, xp, xi)) */
 /* 	    csc_sort_columns(ncol, xp, xi, (double *) NULL); */
 
