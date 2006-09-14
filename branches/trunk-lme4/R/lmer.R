@@ -1,7 +1,7 @@
 # Methods for lmer and for the objects that it produces
 
 ## To Do: Check if it would be worthwhile using a few ECME iterations
-##   to stabilize the variance parameters at the beginning a Laplace
+##   to stabilize the variance parameters at the beginning of a Laplace
 ##   fit.
 
 ## To Do: Determine why the names of the components of the values of
@@ -88,10 +88,11 @@ factorNames2char <- function(nms, collapse = ", ") {
 
 ## expand any slashes in the grouping factors returned by findbars
 expandSlash <- function(bb) {
+    if (!is.list(bb)) return(expandSlash(list(bb)))
     ## I really do mean lapply(unlist(... - unlist returns a
     ## flattened list in this case
     unlist(lapply(bb, function(x) {
-        if (is.list(trms <- slashTerms(x[[3]])))
+        if (length(x) > 2 && is.list(trms <- slashTerms(x[[3]])))
             return(lapply(unlist(makeInteraction(trms)),
                           function(trm) substitute(foo|bar,
                                                    list(foo = x[[2]],
