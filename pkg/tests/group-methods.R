@@ -87,8 +87,16 @@ dsc + 1 # -> no longer sparse
 stopifnot(identical(dsc, Matrix((dsc + 1) -1))) # ok (exact arithmetic)
 
 str(lm1 <- dsc >= 1) # now ok (NA in proper place, however:
-lm1 ## NA is printed as ' ' currently
+lm1 ## NA used to print as ' ' , now 'N'
 (lm2 <- dsc == 1)# dito
+
+## Just for print "show":
+z <- round(rnorm(77), 2)
+z[sample(77,10)] <- NA
+(D <- Matrix(z, 7)) # dense
+z[sample(77,15)] <- 0
+(D <- Matrix(z, 7)) # sparse
+abs(D) >= 0.5       # logical sparse
 
 stopifnot(identical(
                     crossprod(lm1)# "lgC": here works!
