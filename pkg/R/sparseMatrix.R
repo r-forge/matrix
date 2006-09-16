@@ -253,7 +253,8 @@ prSpMatrix <- function(object, digits = getOption("digits"),
     }
     logi <- is(object,"lsparseMatrix") || is(object,"nsparseMatrix")
     if(logi)
-	x <- array(character(length(m)), dim(m), dimnames=dimnames(m))
+	x <- array("N", # or as.character(NA),
+		   dim(m), dimnames=dimnames(m))
     else {
 	x <- apply(m, 2, format)
 	if(is.null(dim(x))) {# e.g. in	1 x 1 case
@@ -273,7 +274,7 @@ prSpMatrix <- function(object, digits = getOption("digits"),
 	iN0 <- 1:1 + encodeInd(non0ind(object), nr = nrow(x))
 	if(length(iN0)) x[-iN0] <- zero.print else x[] <- zero.print
     }
-    print(noquote(x))
+    print(x, quote = FALSE, max = maxp)
     invisible(object)
 }
 

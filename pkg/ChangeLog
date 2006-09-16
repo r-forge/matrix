@@ -1,5 +1,8 @@
 2006-09-16  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* R/sparseMatrix.R (prSpMatrix): print logical NAs "visibly"
+		as 'N' (1-letter - Ok?)
+
 	* tests/group-methods.R: add test for logical + NAs
 
 	* R/dMatrix.R ("Compare"): fix to work with NA's
