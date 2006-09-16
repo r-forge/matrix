@@ -7,6 +7,10 @@
 is0  <- function(x) !is.na(x) & x == 0
 all0 <- function(x) !any(is.na(x)) && all(x == 0)
 
+allTrue  <- function(x) !any(is.na(x)) && all(x)
+allFalse <- function(x) !any(is.na(x)) && !any(x)
+
+
 ## For %*% (M = Matrix; v = vector (double or integer {complex maybe?}):
 .M.v <- function(x, y) callGeneric(x, as.matrix(y))
 .v.M <- function(x, y) callGeneric(rbind(x), y)
@@ -25,8 +29,17 @@ all0 <- function(x) !any(is.na(x)) && all(x == 0)
 		  fun, cl1, cl2), call. = FALSE)
 }
 
+## This should be done in C and be exported by 'methods':  [FIXME - ask JMC ]
+copyClass <- function(x, newCl, sNames =
+		      intersect(slotNames(newCl), slotNames(x))) {
+    r <- new(newCl)
+    for(n in sNames)
+	slot(r, n) <- slot(x, n)
+    r
+}
+
 ## chol() via "dpoMatrix"
-cholMat <- function(x, pivot, LINPACK) {
+cholMat <- function(x, pivot, ...) {
     px <- as(x, "dpoMatrix")
     if (isTRUE(validObject(px, test=TRUE))) chol(px)
     else stop("'x' is not positive definite -- chol() undefined.")

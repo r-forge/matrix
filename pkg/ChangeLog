@@ -1,6 +1,20 @@
+2006-09-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/group-methods.R: add test for logical + NAs
+
+	* R/dMatrix.R ("Compare"): fix to work with NA's
+
+	* R/AllClass.R: "Cholesky" etc now inherit from MatrixFactorization.
+
+	* src/lgCMatrix.c (ncsc_to_matrix): renamed from lcsc_to_matrix()
+		which is implemented.
+
 2006-09-15  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* tests/other-pkgs.R (graph): small extenion in "graph" checks.
+	* src/chm_common.c: coerce logical <-> double instead of
+	typecasting;  needed for "l" matrix handling in cholmod.
+
+	* tests/other-pkgs.R (graph): small extension in "graph" checks.
 
 	* R/sparseMatrix.R (graphNEL -> Tsparse): method for weight case.
 	(Tsp2grNEL): other fixes needed

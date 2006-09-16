@@ -83,12 +83,12 @@ setMethod("solve", signature(a = "dsCMatrix", b = "numeric"),
 ##          valueClass = "dgeMatrix")
 
 setMethod("chol", signature(x = "dsCMatrix", pivot = "missing"),
-          function(x, pivot, LINPACK) .Call(dsCMatrix_chol, x, FALSE),
-          valueClass = "dtCMatrix")
+	  function(x, pivot, ...) .Call(dsCMatrix_chol, x, FALSE),
+	  valueClass = "dtCMatrix")
 
 setMethod("chol", signature(x = "dsCMatrix", pivot = "logical"),
-          function(x, pivot, LINPACK) .Call(dsCMatrix_chol, x, pivot),
-          valueClass = "dtCMatrix")
+	  function(x, pivot, ...) .Call(dsCMatrix_chol, x, pivot),
+	  valueClass = "dtCMatrix")
 
 setMethod("Cholesky", signature(A = "dsCMatrix"),
           function(A, perm = TRUE, LDL = TRUE, super = FALSE, ...)

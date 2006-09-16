@@ -18,10 +18,10 @@ assert.EQ.mat( crossprod(rep(1,5), m.),  rbind( colSums(m5)))
 assert.EQ.mat( crossprod(m5, rep(1,5)),  cbind( colSums(m5)))
 assert.EQ.mat( crossprod(m., rep(1,5)),  cbind( colSums(m5)))
 
-## classes differ; but the 'dimnames' are *both* missing -- FIXME
-tc.m5 <- m5 %*% t(m5)
-(tcm5 <- tcrossprod(m5)) # "dpo*"
-assert.EQ.mat(tc.m5, mm5 <- as(tcm5, "matrix"))# missing dimnames - FIXME
+## classes differ
+tc.m5 <- m5 %*% t(m5)    # "dge*", no dimnames (FIXME)
+(tcm5 <- tcrossprod(m5)) # "dpo*"  w/ dimnames
+assert.EQ.mat(tc.m5, mm5 <- as(tcm5, "matrix"))
 ## tcrossprod(x,y) :
 assert.EQ.mat(tcrossprod(m5, m5), mm5)
 assert.EQ.mat(tcrossprod(m5, as(m5,"matrix")), mm5)
@@ -104,22 +104,21 @@ assert.EQ.mat( crossprod(sM),  crossprod(sm) > 0)
 assert.EQ.mat(tcrossprod(sM), as(tcrossprod(sm),"matrix") > 0)
 
 ## "l" --- logical Matrices -- use usual 0/1 arithmetic
-sM  <- new("lgTMatrix", i = rowi, j=coli, Dim=as.integer(c(N,N)))
-sM # nice
+nsM <- sM
+sM  <- as(sM, "lMatrix")
 sm <- as(sM, "matrix")
-if(FALSE) { ### Matrix product for lsparse --> garbage --- FIXME
+stopifnot(identical(sm, as.matrix(nsM)))
 sM %*% sM
 assert.EQ.mat(sM %*% sM,        sm %*% sm)
 assert.EQ.mat(t(sM) %*% sM,
-              (t(sm) %*% sm) > 0, tol=0)
+              t(sm) %*% sm, tol=0)
 crossprod(sM)
 tcrossprod(sM)
-stopifnot(identical(as( crossprod(sM), "lgCMatrix"), t(sM) %*%   sM),
-          identical(as(tcrossprod(sM), "lgCMatrix"),  sM  %*% t(sM)))
+stopifnot(identical( crossprod(sM), as(t(sM) %*% sM, "dsCMatrix")),
+          identical(tcrossprod(sM), as(sM %*% t(sM), "dsCMatrix")))
+assert.EQ.mat( crossprod(sM),  crossprod(sm))
+assert.EQ.mat(tcrossprod(sM), as(tcrossprod(sm),"matrix"))
 
-assert.EQ.mat( crossprod(sM),  crossprod(sm) > 0)
-assert.EQ.mat(tcrossprod(sM), as(tcrossprod(sm),"matrix") > 0)
-}
 
 ## A sparse example - with *integer* matrix:
 M <- Matrix(cbind(c(1,0,-2,0,0,0,0,0,2.2,0),

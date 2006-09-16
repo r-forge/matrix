@@ -103,19 +103,24 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
 	      else { ## dsparseMatrix => lClass is "lsparse*"
 
 		  if(identical(r0, FALSE)) { ## things remain sparse
-		      if((Ar <- all(r)) || !any(r)) {
+		      if(!any(is.na(r)) && ((Ar <- all(r)) || !any(r))) {
 			  r <- new(lClass, Dim= dim(e1), Dimnames= dimnames(e1))
-			  if(Ar) # 'TRUE' instead of 'x': same sparsity:
+			  if(Ar) { # 'TRUE' instead of 'x': same sparsity:
+			      r@x <- rep.int(TRUE, length(e1@x))
 			      for(n in intersect(c("i","j","p"), slotNames(r)))
 				  slot(r, n) <- slot(e1, n)
+                          }
 			  ## else: all FALSE: keep empty 'r' matrix
-		      } else { # some TRUE, some FALSE: go via unique 'Tsparse'
+		      } else { # some TRUE, FALSE, NA : go via unique 'Tsparse'
 			  M <- asTuniq(e1)
-			  rx <- callGeneric(M@x, e2)
-			  r <- new(class2(class(M), 'l'), # logical Tsparse
-				   x = callGeneric(M@x, e2),
-				   i = M@i[rx], Dim = M@Dim,
-				   j = M@j[rx], Dimnames = M@Dimnames)
+			  nCl <- class2(class(M), 'l') # logical Tsparse
+			  r <- new(nCl)
+			  r@x <- callGeneric(M@x, e2)
+			  ## copy "the other slots" (important for "tr"/"sym"):
+			  ## "%w/o%" <- function(x,y) x[is.na(match(x, y))]
+			  sN <- slotNames(nCl)
+			  for(n in sN[is.na(match(sN, "x"))])
+			      slot(r, n) <- slot(M, n)
 			  if(is(e1, "CsparseMatrix"))
 			      r <- as(r, "CsparseMatrix")
 			  else if(is(e1, "RsparseMatrix"))

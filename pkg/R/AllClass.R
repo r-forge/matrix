@@ -525,40 +525,32 @@ setClass("MatrixFactorization", representation(Dim = "integer", "VIRTUAL"))
 
 ## -- Those (exceptions) inheriting from "Matrix" : ---
 
-## FIXME: not yet containing "MatrixFactorization" because of
-## -----  multiple-dispatch bug: show(<pCholesky>) would call the
-##  method of "MatrixFactorization" instead of the one for "dtpMatrix":
-setClass("Cholesky", contains = c("dtrMatrix" ##, "MatrixFactorization"
-                     ))
+setClass("Cholesky",  contains = c("dtrMatrix", "MatrixFactorization"))
 
-setClass("LDL", contains = c("dtrMatrix" ##, "MatrixFactorization"
-                ))
+setClass("LDL",       contains = c("dtrMatrix", "MatrixFactorization"))
 
-setClass("pCholesky", contains = c("dtpMatrix" ##, "MatrixFactorization"
-                      ))
+setClass("pCholesky", contains = c("dtpMatrix", "MatrixFactorization"))
 
 setClass("BunchKaufman",
-	 contains = c("dtrMatrix"), ##, "MatrixFactorization"),
+	 contains = c("dtrMatrix", "MatrixFactorization"),
 	 representation(perm = "integer"),
 	 validity =
 	 function(object) .Call(BunchKaufman_validate, object)
 	 )
 
 setClass("pBunchKaufman",
-	 contains = c("dtpMatrix"), ##, "MatrixFactorization"),
+	 contains = c("dtpMatrix", "MatrixFactorization"),
 	 representation(perm = "integer"),
 	 validity =
-	 function(object) .Call(pBunchKaufman_validate, object)
-	 )
+	 function(object) .Call(pBunchKaufman_validate, object))
 
 ## -- the usual ``non-Matrix'' factorizations : ---------
 
 setClass("CHMfactor",		 # cholmod_factor struct as S4 object
-         contains = "MatrixFactorization",
+	 contains = "MatrixFactorization",
 	 representation(colcount = "integer", perm = "integer",
-                        type = "integer", "VIRTUAL"),
-	 validity = function(object) .Call(CHMfactor_validate, object)
-	 )
+			type = "integer", "VIRTUAL"),
+	 validity = function(object) .Call(CHMfactor_validate, object))
 
 setClass("CHMsuper",		       # supernodal cholmod_factor
 	 contains = "CHMfactor",
@@ -568,8 +560,8 @@ setClass("CHMsuper",		       # supernodal cholmod_factor
 
 setClass("CHMsimpl",		       # simplicial cholmod_factor
 	 contains = "CHMfactor",
-	 representation(p = "integer", i = "integer",
-			nz = "integer", nxt = "integer", prv = "integer", "VIRTUAL"),
+	 representation(p = "integer", i = "integer", nz = "integer",
+			nxt = "integer", prv = "integer", "VIRTUAL"),
 	 validity = function(object) .Call(CHMsimpl_validate, object))
 
 setClass("dCHMsuper", contains = "CHMsuper", representation(x = "numeric"))

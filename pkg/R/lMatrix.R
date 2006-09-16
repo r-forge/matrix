@@ -44,3 +44,7 @@ setAs("lMatrix", "dMatrix",
 	      slot(r, nm) <- slot(from, nm)
 	  r
       })
+
+## needed at least for lsparse* :
+setAs("lMatrix", "dgCMatrix",
+      function(from) as(as(from, "lgCMatrix"), "dgCMatrix"))
