@@ -50,7 +50,7 @@ cholmod_sparse *as_cholmod_sparse(SEXP x)
 	break;									\
     case 1: /* "l" */								\
 	ans->xtype = CHOLMOD_REAL;						\
-	ans->x = (void *) LOGICAL(GET_SLOT(x, Matrix_xSym));			\
+	ans->x = (void *) REAL(coerceVector(GET_SLOT(x, Matrix_xSym), REALSXP)); \
 	break;									\
     case 2: /* "n" */								\
 	ans->xtype = CHOLMOD_PATTERN;						\
@@ -131,18 +131,21 @@ SEXP chm_sparse_to_SEXP(cholmod_sparse *a, int dofree, int uploT, int Rkind,
     Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_iSym, INTSXP, nnz)),
 	   (int *) a->i, nnz);
 				/* copy data slot if present */
-    if (a->xtype == CHOLMOD_REAL)
+    if (a->xtype == CHOLMOD_REAL) {
+	int i, *m_x;
 	switch(Rkind) {
 	case 0:
 	    Memcpy(REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, nnz)),
 		   (double *) a->x, nnz);
 	    break;
 	case 1:
-	    Memcpy(LOGICAL(ALLOC_SLOT(ans, Matrix_xSym, LGLSXP, nnz)),
-		   (int *) a->x, nnz);
+	    m_x = LOGICAL(ALLOC_SLOT(ans, Matrix_xSym, LGLSXP, nnz));
+	    for (i=0; i < nnz; i++)
+		m_x[i] = (int) ((double *) a->x)[i];
 	    break;
 	}
-    if (a->xtype == CHOLMOD_COMPLEX)
+    }
+    else if (a->xtype == CHOLMOD_COMPLEX)
 	error("complex sparse matrix code not yet written");
 /* 	Memcpy(COMPLEX(ALLOC_SLOT(ans, Matrix_xSym, CPLXSXP, nnz)), */
 /* 	       (complex *) a->x, nnz); */
@@ -257,17 +260,22 @@ SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int dofree, int uploT, int Rkind,
     Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_jSym, INTSXP, a->nnz)),
 	   (int *) a->j, a->nnz);
 				/* copy data slot if present */
-    if (a->xtype == CHOLMOD_REAL)
+    if (a->xtype == CHOLMOD_REAL) {
+	int i, *m_x;
 	switch(Rkind) {
 	case 0:
 	    Memcpy(REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, a->nnz)),
 		   (double *) a->x, a->nnz);
 	    break;
 	case 1:
-	    Memcpy(LOGICAL(ALLOC_SLOT(ans, Matrix_xSym, LGLSXP, a->nnz)),
-		   (int *) a->x, a->nnz);
+	    m_x= LOGICAL(ALLOC_SLOT(ans, Matrix_xSym, LGLSXP, a->nnz));
+	    for (i=0; i < a->nnz; i++)
+		m_x[i] = (int) ((double *) a->x)[i];
+/* 	    Memcpy(LOGICAL(ALLOC_SLOT(ans, Matrix_xSym, LGLSXP, a->nnz)), */
+/* 		   (int *) a->x, a->nnz); */
 	    break;
 	}
+    }
     else if (a->xtype == CHOLMOD_COMPLEX)
 	error("complex sparse matrix code not yet written");
 /* 	Memcpy(COMPLEX(ALLOC_SLOT(ans, Matrix_xSym, CPLXSXP, a->nnz)), */
@@ -335,7 +343,9 @@ cholmod_dense *as_cholmod_dense(SEXP x)
 	break;
     case 1: /* "l" */
 	ans->xtype = CHOLMOD_REAL;
-	ans->x = (void *) LOGICAL((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x);
+	ans->x =
+	    (void *) REAL(coerceVector((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x,
+				       REALSXP));
 	break;
     case 2: /* "n" */
 	ans->xtype = CHOLMOD_PATTERN;
@@ -387,21 +397,26 @@ SEXP chm_dense_to_SEXP(cholmod_dense *a, int dofree, int Rkind)
     dims[0] = a->nrow; dims[1] = a->ncol;
     ntot = dims[0] * dims[1];
     if (a->d == a->nrow) {	/* copy data slot if present */
-	if (a->xtype == CHOLMOD_REAL)
+	if (a->xtype == CHOLMOD_REAL) {
+	    int i, *m_x;
 	    switch(Rkind) {
 	    case 0:
 		Memcpy(REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, ntot)),
 		       (double *) a->x, ntot);
 		break;
 	    case 1:
-		Memcpy(LOGICAL(ALLOC_SLOT(ans, Matrix_xSym, LGLSXP, ntot)),
-		       (int *) a->x, ntot);
+		m_x = LOGICAL(ALLOC_SLOT(ans, Matrix_xSym, LGLSXP, ntot));
+		for (i=0; i < ntot; i++)
+		    m_x[i] = (int) ((double *) a->x)[i];
+/* 		Memcpy(LOGICAL(ALLOC_SLOT(ans, Matrix_xSym, LGLSXP, ntot)), */
+/* 		       (int *) a->x, ntot); */
 		break;
 	    }
+	}
 	else if (a->xtype == CHOLMOD_COMPLEX)
 	    error("complex sparse matrix code not yet written");
-/*	Memcpy(COMPLEX(ALLOC_SLOT(ans, Matrix_xSym, CPLXSXP, a->nnz)), */
-/*	       (complex *) a->x, a->nz); */
+/*	Memcpy(COMPLEX(ALLOC_SLOT(ans, Matrix_xSym, CPLXSXP, ntot)), */
+/*	       (complex *) a->x, ntot); */
     } else error("code for cholmod_dense with holes not yet written");
 
     if (dofree > 0) cholmod_free_dense(&a, &c);
@@ -436,9 +451,9 @@ SEXP chm_dense_to_matrix(cholmod_dense *a, int dofree, SEXP dn)
     if (a->d == a->nrow) {	/* copy data slot if present */
 	if (a->xtype == CHOLMOD_REAL)
 	    Memcpy(REAL(ans), (double *) a->x, a->nrow * a->ncol);
-	if (a->xtype == CHOLMOD_COMPLEX)
+	else if (a->xtype == CHOLMOD_COMPLEX)
 	    error("complex sparse matrix code not yet written");
-	if (a->xtype == CHOLMOD_PATTERN)
+	else if (a->xtype == CHOLMOD_PATTERN)
 	    error("don't know if a dense pattern matrix makes sense");
 /* 	Memcpy(COMPLEX(ALLOC_SLOT(ans, Matrix_xSym, CPLXSXP, a->nnz)), */
 /* 	       (complex *) a->x, a->nz); */
