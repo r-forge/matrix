@@ -160,6 +160,7 @@ static R_CallMethodDef CallEntries[] = {
     {"lapack_qr", (DL_FUNC) &lapack_qr, 2},
 
     {"lcsc_to_matrix", (DL_FUNC) &lcsc_to_matrix, 1},
+    {"ncsc_to_matrix", (DL_FUNC) &ncsc_to_matrix, 1},
     {"lgCMatrix_validate", (DL_FUNC) &lgCMatrix_validate, 1},
     {"lgTMatrix_validate", (DL_FUNC) &lgTMatrix_validate, 1},
 

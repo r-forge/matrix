@@ -34,8 +34,28 @@ SEXP lgCMatrix_validate(SEXP x)
     return ScalarLogical(1);
 }
 
-/* very parallel to csc_to_matrix() in ./dgCMatrix.c */
 SEXP lcsc_to_matrix(SEXP x)
+{
+    SEXP ans, pslot = GET_SLOT(x, Matrix_pSym);
+    int j, ncol = length(pslot) - 1,
+	nrow = INTEGER(GET_SLOT(x, Matrix_DimSym))[0],
+	*xp = INTEGER(pslot),
+	*xi = INTEGER(GET_SLOT(x, Matrix_iSym));
+    int *xx = LOGICAL(GET_SLOT(x, Matrix_xSym)), *ax;
+
+    ax = LOGICAL(ans = PROTECT(allocMatrix(LGLSXP, nrow, ncol)));
+    for (j = 0; j < (nrow * ncol); j++) ax[j] = 0;
+    for (j = 0; j < ncol; j++) {
+	int ind;
+	for (ind = xp[j]; ind < xp[j+1]; ind++)
+	    ax[j * nrow + xi[ind]] = xx[ind];
+    }
+    UNPROTECT(1);
+    return ans;
+}
+
+/* as above,  '1' instead of 'x' slot: */
+SEXP ncsc_to_matrix(SEXP x)
 {
     SEXP ans, pslot = GET_SLOT(x, Matrix_pSym);
     int j, ncol = length(pslot) - 1,

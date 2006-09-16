@@ -43,7 +43,7 @@ setAs("ngCMatrix", "ngeMatrix",
 	      Dim = from@Dim, Dimnames = from@Dimnames))
 
 setAs("ngCMatrix", "matrix",
-      function(from) .Call(lcsc_to_matrix, from))
+      function(from) .Call(ncsc_to_matrix, from))
 ## TODO (maybe): write  matrix_to_lcsc()  in ../src/ngCMatrix.c
 setAs("matrix", "ngCMatrix",
       function(from) as(as(from, "ngTMatrix"), "ngCMatrix"))
@@ -54,4 +54,3 @@ setMethod("image", "ngCMatrix",
               x <- as(as(x, "dgCMatrix"), "dgTMatrix")
               callGeneric()
           })
-
