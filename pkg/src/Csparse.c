@@ -107,10 +107,10 @@ SEXP Csparse_symmetric_to_general(SEXP x)
 SEXP Csparse_transpose(SEXP x, SEXP tri)
 {
     cholmod_sparse *chx = as_cholmod_sparse(x);
+    int Rkind = (chx->xtype == CHOLMOD_REAL) ? Real_kind(x) : 0;
     cholmod_sparse *chxt = cholmod_transpose(chx, (int) chx->xtype, &c);
     SEXP dn = PROTECT(duplicate(GET_SLOT(x, Matrix_DimNamesSym))), tmp;
     int uploT = 0; char *diag = "";
-    int Rkind = (chx->xtype == CHOLMOD_REAL) ? Real_kind(x) : 0;
 
     Free(chx);
     tmp = VECTOR_ELT(dn, 0);	/* swap the dimnames */
