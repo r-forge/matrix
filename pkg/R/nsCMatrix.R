@@ -48,11 +48,11 @@ setMethod("image", "nsCMatrix",
           })
 
 setMethod("chol", signature(x = "nsCMatrix", pivot = "missing"),
-          function(x, pivot, LINPACK) stop("temporarily disabled"))
-##          .Call(nsCMatrix_chol, x, TRUE))
+	  function(x, pivot, ...) chol(x, pivot = FALSE))
+##          .Call(nsCMatrix_chol, x, FALSE))
 
 setMethod("chol", signature(x = "nsCMatrix", pivot = "logical"),
-          function(x, pivot, LINPACK) stop("temporarily disabled"))
+	  function(x, pivot, ...) stop("temporarily disabled"))## FIXME
 ##          .Call(nsCMatrix_chol, x, pivot))
 
 ## Use more general method from CsparseMatrix class
