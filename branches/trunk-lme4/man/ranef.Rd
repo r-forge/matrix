@@ -55,7 +55,6 @@ ranef(object, \dots)
   \code{postVar = TRUE}.
 }
 \examples{
-data(sleepstudy)
 fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
 fm2 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), sleepstudy)
 ranef(fm1)

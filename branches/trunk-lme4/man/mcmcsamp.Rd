@@ -54,25 +54,15 @@ mcmcsamp(object, n, verbose, \dots)
   }
 }
 \examples{
-require("lattice", quietly = TRUE, character = TRUE)
-data(sleepstudy)
 (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
 set.seed(101)
 samp1 <- mcmcsamp(fm1, n = 1000)
-frm <-
-    data.frame(vals = c(samp1), iter = rep(1:nrow(samp1), ncol(samp1)),
-    par = factor(rep(1:ncol(samp1), each = nrow(samp1)),labels = colnames(samp1)))
-densityplot(~ vals | par, frm, plot = FALSE,
-            scales = list(relation = 'free', x = list(axs='i')))
-xyplot(vals ~ iter | par, frm, layout = c(1, ncol(samp1)),
-       scales = list(x = list(axs = "i"), y = list(relation = "free")),
-       main = "Trace plot", xlab = "Iteration number", ylab = "",
-       type = "l")
-qqmath(~ vals | par, frm, type = 'l',
-       scales = list(y = list(relation = 'free')))
-if (require("coda", quietly = TRUE, character = TRUE)) {
-   print(summary(samp1))
-   print(autocorr.diag(samp1))
+if (require("coda", quietly = TRUE, character.only = TRUE)) {
+    densityplot(samp1)
+    qqmath(samp1)
+    xyplot(samp1, scales = list(x = list(axs = 'i')))
+    print(summary(samp1))
+    print(autocorr.diag(samp1))
 }
 (eDF <- mean(samp1[,"deviance"]) - deviance(fm1, REML=FALSE)) # potentially useful approximate D.F.
 \dontshow{
