@@ -1,3 +1,11 @@
+2006-09-18  Douglas Bates  <bates@stat.wisc.edu>
+
+	* R/[CT]sparse.R (crossprod and tcrossprod): Handle the cases for x
+	symmetric and y missing in R code using %*% (cholmod_aat doesn't
+	accept a symmetric matrix).
+	* tests/group-methods.R: Uncomment test of crossprod applied to
+	lsCMatrix objects.
+
 2006-09-18  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/AllClass.R (symmetricMatrix): add validity method (available

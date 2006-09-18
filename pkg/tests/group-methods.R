@@ -69,13 +69,8 @@ stopifnot(validObject(lm1), validObject(lm2),
           validObject(nm1), validObject(nm2),
           identical(dsc, as(dsc * as(lm1, "dMatrix"), "dsCMatrix")))
 
-if(FALSE) { ## FIXME
- crossprod(lm1) # lm1: "lsC*"
- ## CHOLMOD error: matrix cannot be symmetric
- ## Error in crossprod(lm1): Csparse_crossprod():error return from cholmod_aat()
-
- crossprod(nm1) # dito
-}
+crossprod(lm1) # lm1: "lsC*"
+crossprod(nm1) 
 
 dsc[2,3] <- NA ## now has an NA
 ##          ----- end "everything" is different

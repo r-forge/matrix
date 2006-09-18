@@ -265,11 +265,13 @@ setReplaceMethod("[", signature(x = "TsparseMatrix", i = "index", j = "index",
 				value = "replValue"),
                  replTmat)
 
-
-
-
 setMethod("crossprod", signature(x = "TsparseMatrix", y = "missing"),
 	  function(x, y = NULL) {
+              if (is(x, "symmetricMatrix")) {
+                  x <- as(x, "CsparseMatrix")
+                  warning("crossprod(x) calculated as x %*% x for sparse, symmetric x")
+                  return(x %*% x)
+              }
 	      .Call(Csparse_crossprod, x, trans = FALSE, triplet = TRUE)
 	  })
 
