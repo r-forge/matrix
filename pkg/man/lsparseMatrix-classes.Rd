@@ -137,7 +137,7 @@ str(m <- Matrix(c(0,0,2:0), 3,5, dimnames=list(LETTERS[1:3],NULL)))
 (lm <- (m > 1)) # lgC
 stopifnot(is(lm,"lsparseMatrix"))
 !lm     # no longer sparse
-%% FIXME:  m <= 1   -- not-yet-implemented
+%% FIXME:  m <= 1   -- unfinished implementation ( ../R/dMatrix.R )
 
 data(KNex)
 str(mmG.1 <- (KNex $ mm) > 0.1)# "lgC..."
@@ -150,9 +150,11 @@ stopifnot(validObject(lmG.1), identical(lmG.1, mmG.1))
 
 class(xnx <- crossprod(nmG.1))# "nsC.."
 class(xlx <- crossprod(mmG.1))# "dsC.." : numeric
-%% FIXME: 'xlx@x' is garbage
-%% TODO: compare xlx & xnx
-stopifnot(isSymmetric(xlx), isSymmetric(xnx))
+table(xlx@x != 0)# almost have are (non-structural!) 0
+stopifnot(isSymmetric(xlx), isSymmetric(xnx),
+          ## compare xnx and xlx :
+          sapply(slotNames(xnx),
+                 function(n) identical(slot(xnx, n), slot(xlx, n))))
 }
 \keyword{classes}
 \keyword{algebra}
