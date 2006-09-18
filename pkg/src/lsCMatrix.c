@@ -14,16 +14,13 @@ SEXP lsCMatrix_validate(SEXP x)
     if(isString(val))
 	return(val);
     else {
-	/* FIXME needed? ltC* inherits from lgC* which does this in validate*/
-	SEXP pslot = GET_SLOT(x, Matrix_pSym),
-	    islot = GET_SLOT(x, Matrix_iSym);
-	/* column sorting now done in Csparse_validate */
-/* 	int */
-/* 	    ncol = length(pslot) - 1, */
-/* 	    *xp = INTEGER(pslot), */
-/* 	    *xi = INTEGER(islot); */
-/* 	if (csc_unsorted_columns(ncol, xp, xi)) */
-/* 	    csc_sort_columns(ncol, xp, xi, (double *) NULL); */
+	/* Almost all is now done in Csparse_validate
+	 * *but* the checking of the 'x' slot */
+	SEXP islot = GET_SLOT(x, Matrix_iSym),
+	    xslot = GET_SLOT(x, Matrix_xSym);
+
+	if (length(islot) != length(xslot))
+	    return mkString(_("lengths of slots 'i' and 'x' must match"));
 
 	return ScalarLogical(1);
     }

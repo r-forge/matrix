@@ -2,34 +2,13 @@
 
 SEXP lgCMatrix_validate(SEXP x)
 {
-    /* All this is now done in Csparse_validate */
-/*     SEXP pslot = GET_SLOT(x, Matrix_pSym), */
-/* 	islot = GET_SLOT(x, Matrix_iSym); */
-/*     int j, */
-/* 	ncol = length(pslot) - 1, */
-/* 	*dims = INTEGER(GET_SLOT(x, Matrix_DimSym)), */
-/* 	nrow, */
-/* 	*xp = INTEGER(pslot), */
-/* 	*xi = INTEGER(islot); */
+    /* Almost all is now done in Csparse_validate
+     * *but* the checking of the 'x' slot */
+    SEXP islot = GET_SLOT(x, Matrix_iSym),
+	xslot = GET_SLOT(x, Matrix_xSym);
 
-/*     nrow = dims[0]; */
-/*     if (length(pslot) <= 0) */
-/* 	return mkString(_("slot p must have length > 0")); */
-/*     if (xp[0] != 0) */
-/* 	return mkString(_("first element of slot p must be zero")); */
-/*     if (length(islot) != xp[ncol]) */
-/* 	return mkString(_("last element of slot p must match length of slot i")); */
-/*     for (j = 0; j < ncol; j++) { */
-/* 	if (xp[j] > xp[j+1]) */
-/* 	    return mkString(_("slot p must be non-decreasing")); */
-/*     } */
-/*     for (j = 0; j < length(islot); j++) { */
-/* 	if (xi[j] < 0 || xi[j] >= nrow) */
-/* 	    return mkString(_("all row indices must be between 0 and nrow-1")); */
-/*     } */
-    /* column sorting now done in Csparse_validate */
-/*     if (csc_unsorted_columns(ncol, xp, xi)) */
-/* 	csc_sort_columns(ncol, xp, xi, (double *) NULL); */
+    if (length(islot) != length(xslot))
+	return mkString(_("lengths of slots 'i' and 'x' must match"));
 
     return ScalarLogical(1);
 }

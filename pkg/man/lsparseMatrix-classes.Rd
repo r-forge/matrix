@@ -144,8 +144,9 @@ str(mmG.1 <- (KNex $ mm) > 0.1)# "lgC..."
 ## from logical to nz_pattern -- okay when there are no NA's :
 nmG.1 <- as(mmG.1, "nMatrix")
 ## from logical to "double"
-if(FALSE)  ## works, but gives garbage %% FIXME -- want some way of "coercion"
-  dmG.1 <- as(mmG.1, "dMatrix")
+dmG.1 <- as(mmG.1, "dMatrix") # and back:
+lmG.1 <- as(dmG.1, "lMatrix")
+stopifnot(validObject(lmG.1), identical(lmG.1, mmG.1))
 
 class(xnx <- crossprod(nmG.1))# "nsC.."
 class(xlx <- crossprod(mmG.1))# "dsC.." : numeric

@@ -1,3 +1,18 @@
+2006-09-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllClass.R (symmetricMatrix): add validity method (available
+	in C for a long time). Many "n..Matrix": drop (wrong) validity arg.
+
+	* src/lgCMatrix.c (lgCMatrix_validate): check 'x' slot (!)
+
+	* tests/indexing.Rout.save:
+	* tests/indexing.R: additions, mainly for 'lsparse'
+
+	* R/diagMatrix.R (Diagonal) & coercion to lgTMatrix: fixes for NA
+	case.
+
+	* R/Auxiliaries.R (nz.NA): new utility now used in nnzero()
+
 2006-09-16  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/sparseMatrix.R (prSpMatrix): print logical NAs "visibly"

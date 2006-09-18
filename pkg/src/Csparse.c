@@ -4,6 +4,7 @@
 
 SEXP Csparse_validate(SEXP x)
 {
+    /* NB: we do *NOT* check a potential 'x' slot here, at all */
     cholmod_sparse *chx = as_cholmod_sparse(x);
     SEXP pslot = GET_SLOT(x, Matrix_pSym),
 	islot = GET_SLOT(x, Matrix_iSym);
