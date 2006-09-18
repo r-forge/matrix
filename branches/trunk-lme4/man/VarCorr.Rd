@@ -32,7 +32,6 @@
   the result class \code{\linkS4class{VarCorr}}.
 }
 \examples{
-data(sleepstudy)
 (fm2 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject),
              data = sleepstudy))
 (VC <- VarCorr(fm2))
