@@ -30,6 +30,10 @@ setAs("matrix", "dsCMatrix",
 
 setAs("dsCMatrix", "lsCMatrix",
       function(from) new("lsCMatrix", i = from@i, p = from@p, uplo = from@uplo,
+                         x = as.logical(from@x),
+                         Dim = from@Dim, Dimnames = from@Dimnames))
+setAs("dsCMatrix", "nsCMatrix",
+      function(from) new("nsCMatrix", i = from@i, p = from@p, uplo = from@uplo,
                          Dim = from@Dim, Dimnames = from@Dimnames))
 
 setAs("dsCMatrix", "dgCMatrix",

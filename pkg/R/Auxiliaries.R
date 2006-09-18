@@ -5,6 +5,7 @@
 
 ## Need to consider NAs ;  "== 0" even works for logical & complex:
 is0  <- function(x) !is.na(x) & x == 0
+isN0 <- function(x)  is.na(x) | x != 0
 all0 <- function(x) !any(is.na(x)) && all(x == 0)
 
 allTrue  <- function(x) !any(is.na(x)) && all(x)
@@ -165,11 +166,31 @@ prMatrix <- function(x, digits = getOption("digits"),
     invisible(x)# as print() S3 methods do
 }
 
+nonFALSE <- function(x) {
+    ## typically used for lMatrices:  (TRUE,NA,FALSE) |-> (TRUE,FALSE)
+    if(any(ix <- is.na(x))) x[ix] <- TRUE
+    x
+}
+
+nz.NA <- function(x, na.value) {
+    ## Non-Zeros of x
+    ## na.value: TRUE: NA's give TRUE, they are not 0
+    ##             NA: NA's are not known ==> result := NA
+    ##          FALSE: NA's give FALSE, could be 0
+    stopifnot(is.logical(na.value) && length(na.value) == 1)
+    if(is.na(na.value)) x != 0
+    else  if(na.value)	isN0(x)
+    else		x != 0 & !is.na(x)
+}
+
 ### FIXME? -- make this into a generic function (?)
-nnzero <- function(x) {
+nnzero <- function(x, na.counted = NA) {
+    ## na.counted: TRUE: NA's are counted, they are not 0
+    ##               NA: NA's are not known (0 or not) ==>  result := NA
+    ##            FALSE: NA's are omitted before counting
     cl <- class(x)
     if(!extends(cl, "Matrix"))
-	sum(x != 0)
+	sum(nz.NA(x, na.counted))
     else if(extends(cl, "sparseMatrix"))
 	## NOTA BENE: The number of *structural* non-zeros {could have other '0'}!
        switch(.sp.class(cl),
@@ -177,7 +198,7 @@ nnzero <- function(x) {
 	       "TsparseMatrix" = length(x@i),
 	       "RsparseMatrix" = length(x@j))
     else ## denseMatrix
-	sum(as_geClass(x)@x != 0)
+	sum(nz.NA(as_geClass(x, cl)@x, na.counted))
 }
 
 ## For sparseness handling
@@ -186,7 +207,7 @@ nnzero <- function(x) {
 non0ind <- function(x) {
 
     if(is.numeric(x))
-	return(if((n <- length(x))) (0:(n-1))[x != 0] else integer(0))
+	return(if((n <- length(x))) (0:(n-1))[isN0(x)] else integer(0))
     ## else
     stopifnot(is(x, "sparseMatrix"))
     non0.i <- function(M) {

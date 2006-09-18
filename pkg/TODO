@@ -118,3 +118,5 @@ Check for DimNames propagation in coercion and other operations.
 - nicer pedigree examples and tests
 
 - band(), triu(), tril() for *all*, not just sparse matrices
+
+- is.na() method for all our matrices [ ==> which(*, arr.ind=TRUE) might work ]
