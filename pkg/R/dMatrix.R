@@ -127,18 +127,17 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
 			      r <- as(r, "RsparseMatrix")
 		      }
 		  } else {
+		      ## non sparse result
 		      message(sprintf("sparse to dense (%s) coercion in '%s'",
 				      lClass, .Generic))
-		      r <- new(lClass, x = r,
-			       Dim = dim(e1), Dimnames = dimnames(e1))
-
 		      ## NOT YET:
 		      .bail.out.2(.Generic, class(e1), class(e2))
 
-		      ## non sparse result
-
 		      ## FIXME: implement this:
 		      r[ind.0(e1)] <- r0
+
+		      r <- new(lClass, x = r,
+			       Dim = dim(e1), Dimnames = dimnames(e1))
 		  }
 	      }
 	      r
