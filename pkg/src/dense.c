@@ -259,12 +259,12 @@ SEXP dense_to_Csparse(SEXP x)
 }
 
 
-/* Always returns a full matrix with entries outside the band zeroed
- * Class of the value can be dtrMatrix or dgeMatrix
- *
- */
+/* FIXME: generalize this to  dense_band() : */
 
 SEXP ddense_band(SEXP x, SEXP k1P, SEXP k2P)
+/* Always returns a full matrix with entries outside the band zeroed
+ * Class of the value can be dtrMatrix or dgeMatrix
+ */
 {
     SEXP aa, ans = PROTECT(dup_mMatrix_as_dgeMatrix(x));
     int *adims = INTEGER(GET_SLOT(ans, Matrix_DimSym)),

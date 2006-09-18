@@ -210,7 +210,7 @@ void csc_sort_columns(int ncol, const int p[], int i[], double x[])
     Free(ord);
     if (x) Free(dd);
 }
-#endif 
+#endif
 
 #if 0
 /**
@@ -487,6 +487,9 @@ install_diagonal(double *dest, SEXP A)
  * @param A	  either a ddenseMatrix object or a matrix object
  */
 
+/* FIXME: since we also use this for other things, e.g. band(),
+ * -----  should generalize to  "...as_geMatrix"
+ */
 SEXP dup_mMatrix_as_dgeMatrix(SEXP A)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
