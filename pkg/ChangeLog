@@ -1,3 +1,7 @@
+2006-09-19  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Date): ready to release 0.9975-0 to CRAN
+
 2006-09-18  Douglas Bates  <bates@stat.wisc.edu>
 
 	* R/[CT]sparse.R (crossprod and tcrossprod): Handle the cases for x
