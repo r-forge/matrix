@@ -54,7 +54,7 @@
 	* tests/: adaptions
 	* src/chm_common.c (chm_dense_to_SEXP): and others:
 		new 'Rkind' argument: "l*" and "d*" both use CHOLMOD_REAL
-	* src/Csparse.c, etc: dito
+	* src/Csparse.c, etc: ditto
 
 2006-09-11  Douglas Bates  <bates@R-project.org>
 
@@ -73,7 +73,7 @@
 	* R/sparseMatrix.R (Tsp2grNEL): do not yet use graph::foo()
 
 	* R/dgeMatrix.R: do not define tcrossprod() methods for "matrix"
-	* man/tcrossprod.Rd: dito
+	* man/tcrossprod.Rd: ditto
 
 2006-09-08  Douglas Bates  <bates@stat.wisc.edu>
 
@@ -116,8 +116,8 @@
 
 	* R/sparseMatrix.R (Arith): moved Arith group method one-level up
 	from "dsparse" to "sparse" and now go via "Csparse" instead of "dgC"
-	* R/dsparseMatrix.R: dito
-	* R/Csparse.R: dito
+	* R/dsparseMatrix.R: ditto
+	* R/Csparse.R: ditto
 
 2006-08-31  Martin Maechler  <maechler@stat.math.ethz.ch>
 
@@ -133,7 +133,7 @@
 
 	* R/Auxiliaries.R (all0, is0): for 0-testing in presence of NA's
 	* R/Auxiliaries.R (isTriMat): use all0() for 0-testing.
-	(.is.diagonal): dito
+	(.is.diagonal): ditto
 
 	* R/lgTMatrix.R: as("matrix", "lgTMatrix"): warn about NA's
 

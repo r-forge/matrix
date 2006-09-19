@@ -70,7 +70,7 @@ stopifnot(validObject(lm1), validObject(lm2),
           identical(dsc, as(dsc * as(lm1, "dMatrix"), "dsCMatrix")))
 
 crossprod(lm1) # lm1: "lsC*"
-crossprod(nm1) 
+crossprod(nm1)
 
 dsc[2,3] <- NA ## now has an NA
 ##          ----- end "everything" is different
@@ -83,7 +83,7 @@ stopifnot(identical(dsc, Matrix((dsc + 1) -1))) # ok (exact arithmetic)
 
 str(lm1 <- dsc >= 1) # now ok (NA in proper place, however:
 lm1 ## NA used to print as ' ' , now 'N'
-(lm2 <- dsc == 1)# dito
+(lm2 <- dsc == 1)# ditto
 
 ## Just for print "show":
 z <- round(rnorm(77), 2)
@@ -93,9 +93,7 @@ z[sample(77,15)] <- 0
 (D <- Matrix(z, 7)) # sparse
 abs(D) >= 0.5       # logical sparse
 
-stopifnot(identical(
-                    crossprod(lm1)# "lgC": here works!
-                    ,
+stopifnot(identical(crossprod(lm1),# "lgC": here works!
                     crossprod(as(lm1, "dMatrix"))
                     ))
 
