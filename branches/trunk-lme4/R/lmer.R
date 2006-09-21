@@ -211,7 +211,17 @@ setMethod("with", signature(data = "lmer"),
 setMethod("terms", signature(x = "lmer"),
 	  function(x, ...) x@terms)
 
-
+lmerFit <- function(fl, Zt, X, Y, method, nc, cnames, call, cv, model, mt, mf)
+{
+    mer <- .Call(mer_create, fl, Zt, X, Y, method, nc, cnames, TRUE)
+    .Call(mer_ECMEsteps, mer, cv$niterEM, cv$EMverbose)
+    LMEoptimize(mer) <- cv
+    return(new("lmer", mer,
+               frame = if (model) mf else data.frame(),
+               terms = mt,
+               call = call))
+}
+    
 setMethod("lmer", signature(formula = "formula"),
 	  function(formula, data, family = gaussian,
 		   method = c("REML", "ML", "PQL", "Laplace", "AGQ"),
@@ -277,29 +287,6 @@ setMethod("lmer", signature(formula = "formula"),
 	      print(family)
 	      stop("'family' not recognized")
 	  }
-	  ## check for a linear mixed model
-	  lmm <- family$family == "gaussian" && family$link == "identity"
-	  if (lmm) { # linear mixed model
-	      method <- match.arg(method)
-	      if (method %in% c("PQL", "Laplace", "AGQ")) {
-		  warning(paste('Argument method = "', method,
-				'" is not meaningful for a linear mixed model.\n',
-				'Using method = "REML".\n', sep = ''))
-		  method <- "REML"
-	      }
-	  } else { # generalized linear mixed model
-	      if (missing(method)) method <- "PQL"
-	      else {
-		  method <- match.arg(method)
-		  if (method == "ML") method <- "PQL"
-		  if (method == "REML")
-		      warning('Argument method = "REML" is not meaningful ',
-			      'for a generalized linear mixed model.',
-			      '\nUsing method = "PQL".\n')
-	      }
-	  }
-	  if (method == "AGQ")
-	      stop('method = "AGQ" not yet implemented for supernodal representation')
 	  ## create factor list for the random effects
 	  bars <- expandSlash(findbars(formula[[3]]))
 	  names(bars) <- unlist(lapply(bars, function(x) deparse(x[[3]])))
@@ -322,22 +309,34 @@ setMethod("lmer", signature(formula = "formula"),
 			t(model.matrix(eval(substitute(~ expr,
 						       list(expr = x[[2]]))),
 				       mf)))
-	  if (lmm) {
-	      ## Create the mixed-effects representation (mer) object
-	      mer <- .Call(mer_create, fl,
-			   .Call(Zt_create, fl, Ztl),
-			   X, Y, method, sapply(Ztl, nrow),
-			   c(lapply(Ztl, rownames), list(.fixed = colnames(X))),
-			   !(family$family %in% c("binomial", "poisson")),
-			   match.call(), family)
-	      .Call(mer_ECMEsteps, mer, cv$niterEM, cv$EMverbose)
-	      LMEoptimize(mer) <- cv
-	      return(new("lmer", mer,
-			 frame = if (model) mf else data.frame(),
-			 terms = mt))
-	  }
+          cnames <- c(lapply(Ztl, rownames), list(.fixed = colnames(X)))
+          Zt <- .Call(Zt_create, fl, Ztl)
+          nc <- sapply(Ztl, nrow)
+	  ## check for a linear mixed model
+	  if (family$family == "gaussian" && family$link == "identity") {
+	      method <- match.arg(method)
+	      if (method %in% c("PQL", "Laplace", "AGQ")) {
+		  warning(paste('Argument method = "', method,
+				'" is not meaningful for a linear mixed model.\n',
+				'Using method = "REML".\n', sep = ''))
+		  method <- "REML"
+	      }
+              return(lmerFit(fl, Zt, X, Y, method, nc, cnames, match.call(),
+                             cv, model, mt, mf))
+          }
 
 	  ## The rest of the function applies to generalized linear mixed models
+          if (missing(method)) method <- "PQL"
+          else {
+              method <- match.arg(method)
+              if (method == "ML") method <- "PQL"
+              if (method == "REML")
+                  warning('Argument method = "REML" is not meaningful ',
+                          'for a generalized linear mixed model.',
+                          '\nUsing method = "PQL".\n')
+          }
+	  if (method == "AGQ")
+	      stop('method = "AGQ" not yet implemented for supernodal representation')
 	  gVerb <- getOption("verbose")
 	  glmFit <- glm.fit(X, Y, weights = weights, offset = offset, family = family,
 			    intercept = attr(mt, "intercept") > 0)
@@ -352,12 +351,9 @@ setMethod("lmer", signature(formula = "formula"),
 	  dev.resids <- quote(family$dev.resids(Y, mu, wtssqr))
 	  LMEopt <- get("LMEoptimize<-")
 	  doLMEopt <- quote(LMEopt(x = mer, value = cv))
-	  mer <- .Call(mer_create, fl,
-		       .Call(Zt_create, fl, Ztl),
-		       X, Y, method, sapply(Ztl, nrow),
-		       c(lapply(Ztl, rownames), list(.fixed = colnames(X))),
-		       !(family$family %in% c("binomial", "poisson")),
-		       match.call(), family)
+	  mer <- .Call(mer_create, fl, Zt,
+		       X, Y, method, nc, cnames,
+		       !(family$family %in% c("binomial", "poisson")))
 
 	  GSpt <- .Call(glmer_init, environment())
 	  if (cv$usePQL) {
@@ -371,9 +367,12 @@ setMethod("lmer", signature(formula = "formula"),
 	  if (method == "PQL") {
 	      .Call(glmer_devLaplace, PQLpars, GSpt)
 	      .Call(glmer_finalize, GSpt)
-	      return(new("glmer", mer,
+	      return(new("glmer",
+                         new("lmer", mer,
 			 frame = if (model) mf else data.frame(),
-			 terms = mt, weights = weights))
+			 terms = mt, call = match.call()),
+                         weights = weights,
+                         family=family))
 	  }
 
 	  fixInd <- seq(ncol(X))
@@ -392,10 +391,12 @@ setMethod("lmer", signature(formula = "formula"),
 		     control = list(trace = cv$msVerbose,
 		     iter.max = cv$msMaxIter))
 	  .Call(glmer_finalize, GSpt)
-	  return(new("glmer", mer,
-		     frame = if (model) mf else data.frame(),
-		     terms = mt,
-                     weights = weights))
+          new("glmer",
+              new("lmer", mer,
+                  frame = if (model) mf else data.frame(),
+                  terms = mt, call = match.call()),
+              weights = weights,
+              family=family)
 
       })
 
@@ -995,7 +996,8 @@ setMethod("summary", signature(object = "mer"),
 		  }
 	      } ## else : append columns to 0-row matrix ...
 
-	      new(if(is(object, "lmer")) "summary.lmer" else "summary.mer",
+	      new(if(is(object, "glmer")) "summary.glmer" else
+                  {if(is(object, "lmer")) "summary.lmer" else "summary.mer"},
 		  object,
 		  isG = glz,
 		  methTitle = methTitle,

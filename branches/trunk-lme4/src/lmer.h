@@ -22,8 +22,7 @@ SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbose);
 SEXP mer_coef(SEXP x, SEXP pType);
 SEXP mer_coefGets(SEXP x, SEXP coef, SEXP pType);
 SEXP mer_create(SEXP fl, SEXP Zt, SEXP Xp, SEXP yp, SEXP method,
-		 SEXP nc, SEXP cnames, SEXP useS, SEXP call,
-		 SEXP family);
+		SEXP nc, SEXP cnames, SEXP useS);
 SEXP mer_dtCMatrix(SEXP x);
 SEXP mer_dtCMatrix_inv(SEXP x);
 SEXP mer_factor(SEXP x);

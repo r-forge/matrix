@@ -1,3 +1,8 @@
+2006-09-21  Douglas Bates  <bates@stat.wisc.edu>
+
+	* R/AllClass.R: remove family and call slots from the mer object.
+	Adjust mer_create (src/lmer.c) and associated files accordingly.
+
 2006-09-11  Douglas Bates  <bates@R-project.org>
 
 	* src/lme4_utils.[ch]: Move the alloc_d**Matrix functions from the
