@@ -14,7 +14,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_MCMCsamp", (DL_FUNC) &mer_MCMCsamp, 5},
     {"mer_coef", (DL_FUNC) &mer_coef, 2},
     {"mer_coefGets", (DL_FUNC) &mer_coefGets, 3},
-    {"mer_create", (DL_FUNC) &mer_create, 10},
+    {"mer_create", (DL_FUNC) &mer_create, 8},
     {"mer_dtCMatrix", (DL_FUNC) &mer_dtCMatrix, 1},
     {"mer_dtCMatrix_inv", (DL_FUNC) &mer_dtCMatrix_inv, 1},
     {"mer_factor", (DL_FUNC) &mer_factor, 1},
@@ -68,13 +68,11 @@ void R_init_lme4(DllInfo *dll)
     lme4_ZtZSym = install("ZtZ");
     lme4_ZtySym = install("Zty");
     lme4_bVarSym = install("bVar");
-    lme4_callSym = install("call");
     lme4_cnamesSym = install("cnames");
     lme4_devCompSym = install("devComp");
     lme4_devianceSym = install("deviance");
     lme4_diagSym = install("diag");
     lme4_factorSym = install("factor");
-    lme4_familySym = install("family");
     lme4_fixefSym = install("fixef");
     lme4_flistSym = install("flist");
     lme4_gradCompSym = install("gradComp");

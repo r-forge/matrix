@@ -25,8 +25,6 @@ setClass("mer",
 			wrkres = "numeric",# working residuals (copy of y for LMMs)
 			method = "character", # parameter estimation method
 			useScale = "logical", # should scale factor be included
-                        family = "family",
-			call = "call",	   # call to model-fitting function
 			## invariants derived from data structure
 			cnames = "list",   # column names of model matrices
 			nc = "integer",	   # dimensions of blocks in Omega
@@ -62,15 +60,14 @@ setClass("mer",
 ## Representation of linear and generalized linear mixed effects model
 setClass("lmer",
 	 representation(frame = "data.frame",
+                        call = "call",	   # call to model-fitting function
 			terms = "terms"),
 	 contains = "mer")
 
 setClass("glmer",
-	 representation(#family = "family", # glm family - move here later
-                        frame = "data.frame",
-			terms = "terms",
+	 representation(family = "family", # glm family - move here later
                         weights = "numeric"),
-	 contains = "mer")
+	 contains = "lmer")
 
 setClass("summary.mer", # the "mer" result ``enhanced'' :
 	 representation(
@@ -87,6 +84,8 @@ setClass("summary.mer", # the "mer" result ``enhanced'' :
 	 contains = "mer")
 
 setClass("summary.lmer", contains = c("summary.mer", "lmer"))
+
+setClass("summary.glmer", contains = c("summary.mer", "glmer"))
 
 setClass("ranef.lmer", contains = "list")
 
