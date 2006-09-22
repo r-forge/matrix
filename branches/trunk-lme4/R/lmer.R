@@ -213,7 +213,7 @@ setMethod("terms", signature(x = "lmer"),
 
 lmerFit <- function(fl, Zt, X, Y, method, nc, cnames, call, cv, model, mt, mf)
 {
-    mer <- .Call(mer_create, fl, Zt, X, Y, method, nc, cnames, TRUE)
+    mer <- .Call(mer_create, fl, Zt, X, Y, method, nc, cnames)
     .Call(mer_ECMEsteps, mer, cv$niterEM, cv$EMverbose)
     LMEoptimize(mer) <- cv
     return(new("lmer", mer,
@@ -352,8 +352,9 @@ setMethod("lmer", signature(formula = "formula"),
 	  LMEopt <- get("LMEoptimize<-")
 	  doLMEopt <- quote(LMEopt(x = mer, value = cv))
 	  mer <- .Call(mer_create, fl, Zt,
-		       X, Y, method, nc, cnames,
-		       !(family$family %in% c("binomial", "poisson")))
+		       X, Y, method, nc, cnames)
+          if (family$family %in% c("binomial", "poisson")) # set the constant scale
+              mer@devComp[8] <- -mean(weights)
 
 	  GSpt <- .Call(glmer_init, environment())
 	  if (cv$usePQL) {
@@ -625,10 +626,7 @@ setMethod("simulate", signature(object = "mer"),
 	      stop("simulation of generalized linear mixed models not yet implemented")
 	  ## similate the linear predictors
 	  lpred <- .Call(mer_simulate, object, nsim)
-	  sc <-
-              if (object@useScale)
-                  .Call(mer_sigma, object, object@method == "REML")
-              else 1
+	  sc <- abs(object@devComp[8])
 
 	  ## add fixed-effects contribution and per-observation noise term
 	  lpred <- as.data.frame(lpred + drop(object@X %*% fixef(object)) +
@@ -647,9 +645,7 @@ simulestimate <- function(x, FUN, nsim = 1, seed = NULL, control = list())
     stopifnot(inherits(x, "lmer"))
     ## similate the linear predictors
     lpred <- .Call(mer_simulate, x, nsim)
-    sc <- 1
-    if (x@useScale)
-        sc <- .Call(mer_sigma, x, x@method == "REML")
+    sc <- abs(x@devComp[8])
     ## add fixed-effects contribution and per-observation noise term
     lpred <- lpred + drop(x@X %*% fixef(x)) + rnorm(prod(dim(lpred)), sd = sc)
 
@@ -677,7 +673,7 @@ simulestimate <- function(x, FUN, nsim = 1, seed = NULL, control = list())
 
 formatVC <- function(varc, digits = max(3, getOption("digits") - 2))
 {  ## "format()" the 'VarCorr'	matrix of the random effects -- for show()ing
-    sc <- attr(varc, "sc")
+    sc <- unname(attr(varc, "sc"))
     recorr <- lapply(varc, function(el) el@factors$correlation)
     reStdDev <- c(lapply(recorr, slot, "sd"), list(Residual = sc))
     reLens <- unlist(c(lapply(reStdDev, length)))
@@ -717,7 +713,6 @@ printMer <- function(x, digits = max(3, getOption("digits") - 3),
                      signif.stars = getOption("show.signif.stars"), ...)
 {
     so <- summary(x)
-    useScale <- so@useScale
     REML <- so@method == "REML"
     llik <- so@logLik
     dev <- so@deviance
@@ -744,8 +739,8 @@ printMer <- function(x, digits = max(3, getOption("digits") - 3),
     cat(sprintf("number of obs: %d, groups: ", devc[1]))
     cat(paste(paste(names(ngrps), ngrps, sep = ", "), collapse = "; "))
     cat("\n")
-    if (!useScale)
-	cat("\nEstimated scale (compare to 1) ", so@sigma, "\n")
+    if (so@devComp[8] < 0)
+	cat("\nEstimated scale (compare to ", abs(so@devComp[8]), ") ", so@sigma, "\n")
     if (nrow(so@coefs) > 0) {
 	cat("\nFixed effects:\n")
 	printCoefmat(so@coefs, zap.ind = 3, #, tst.ind = 4
@@ -780,12 +775,8 @@ setMethod("show", "mer", function(object) printMer(object))
 
 
 setMethod("vcov", signature(object = "mer"),
-	  function(object, REML = object@method == "REML",
-		   useScale = object@useScale,...) {
-	      sc <- if (object@useScale) {
-		  .Call(mer_sigma, object, REML)
-	      } else { 1 }
-	      rr <- as(sc^2 * tcrossprod(solve(object@RXX)), "dpoMatrix")
+	  function(object, REML = object@method == "REML", ...) {
+	      rr <- as(object@devComp[8]^2 * tcrossprod(solve(object@RXX)), "dpoMatrix")
 	      rr@factors$correlation <- as(rr, "corMatrix")
 	      rr
 	  })
@@ -815,11 +806,9 @@ setMethod("logLik", signature(object="mer"),
 	  })
 
 setMethod("VarCorr", signature(x = "mer"),
-	  function(x, REML = x@method == "REML", useScale = x@useScale, ...)
+	  function(x, REML = x@method == "REML", ...)
       {
-	  sc <- if (useScale)
-	      .Call(mer_sigma, x, REML) else 1
-	  sc2 <- sc * sc
+	  sc2 <- x@devComp[8]^2
 	  cnames <- x@cnames
 	  ans <- x@Omega
 	  for (i in seq(a = ans)) {
@@ -828,7 +817,7 @@ setMethod("VarCorr", signature(x = "mer"),
 	      el@factors$correlation <- as(el, "corMatrix")
 	      ans[[i]] <- el
 	  }
-	  attr(ans, "sc") <- sc
+	  attr(ans, "sc") <- sqrt(sc2)
 	  ans
       })
 
@@ -949,7 +938,6 @@ setMethod("summary", signature(object = "mer"),
 	  function(object, ...) {
 
 	      fcoef <- .Call(mer_fixef, object)
-	      useScale <- object@useScale
 	      vcov <- vcov(object)
 	      corF <- vcov@factors$correlation
 	      ## DF <- getFixDF(object)
@@ -981,10 +969,10 @@ setMethod("summary", signature(object = "mer"),
 				 row.names = "")
 	      }
 	      REmat <- formatVC(VarCorr(object))
-	      if (!useScale) REmat <- REmat[-nrow(REmat), , drop = FALSE]
+	      if (object@devComp[8] < 0) REmat <- REmat[-nrow(REmat), , drop = FALSE]
 
 	      if (nrow(coefs) > 0) {
-		  if (useScale) {
+		  if (object@devComp[8] >= 0) {
 		      stat <- coefs[,1]/coefs[,2]
 		      ##pval <- 2*pt(abs(stat), coefs[,3], lower = FALSE)
 		      coefs <- cbind(coefs, "t value" = stat) #, "Pr(>|t|)" = pval)
