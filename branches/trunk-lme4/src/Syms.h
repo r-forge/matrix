@@ -36,7 +36,6 @@ SEXP
     lme4_ranefSym,
     lme4_statusSym,
     lme4_uploSym,
-    lme4_useScaleSym,
     lme4_wrkresSym,
     lme4_wtsSym,
     lme4_xSym,

@@ -1795,7 +1795,7 @@ SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbosep)
  * @return pointer to an mer object
  */
 SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
-		SEXP ncp, SEXP cnames, SEXP useS)
+		SEXP ncp, SEXP cnames)
 {
     SEXP Omega, bVar, gradComp, fnms = getAttrib(fl, R_NamesSymbol),
 	val = PROTECT(NEW_OBJECT(MAKE_CLASS("mer"))), xnms;
@@ -1804,7 +1804,7 @@ SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
     int *nc = INTEGER(ncp), *Gp, *xdims, i, nested,
 	nf = LENGTH(fl), nobs = LENGTH(yp), p, q;
     char *devCmpnms[] = {"n", "p", "yty", "logryy2", "logDetL2",
-			 "logDetOmega", "logDetRXX", ""};
+			 "logDetOmega", "logDetRXX", "scale", ""};
     char *devnms[] = {"ML", "REML", ""};
     char *statusnms[] =
 	{"factored", "secondary", "gradComp", "Hesscomp", ""};
@@ -1829,9 +1829,6 @@ SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
     if (!isString(method) || LENGTH(method) != 1)
 	error(_("method must be a character vector of length 1"));
     SET_SLOT(val, lme4_methodSym, duplicate(method));
-    if (!isLogical(useS) || LENGTH(useS) != 1)
-	error(_("useS must be a logical vector of length 1"));
-    SET_SLOT(val, lme4_useScaleSym, duplicate(useS));
     if (!isNewList(cnames) || LENGTH(cnames) != nf + 1)
 	error(_("cnames must be a list of length %d"), nf + 1);
     SET_SLOT(val, lme4_cnamesSym, duplicate(cnames));
@@ -1856,9 +1853,10 @@ SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
     SET_SLOT(val, lme4_statusSym, internal_make_named(LGLSXP, statusnms));
     AZERO(LOGICAL(GET_SLOT(val, lme4_statusSym)), 4);
     dcmp = REAL(GET_SLOT(val, lme4_devCompSym));
-    AZERO(dcmp, 7);		/* cosmetic */
+    AZERO(dcmp, 8);		/* cosmetic */
     dcmp[0] = (double) nobs;
     dcmp[1] = (double) p;
+    dcmp[7] = 1.;		/* initialize to a positive value */
 				/* allocate and populate list slots */
     Omega = ALLOC_SLOT(val, lme4_OmegaSym, VECSXP, nf);
     bVar = ALLOC_SLOT(val, lme4_bVarSym, VECSXP, nf);
@@ -2208,29 +2206,24 @@ SEXP mer_factor(SEXP x)
 	 * rZy. Update status flags, dcmp[4] and dcmp[5]. */
 	internal_mer_Zfactor(x, L);
 				/* downdate XtX and factor */
-	if ((info = internal_mer_Xfactor(x))) { /* unable to factor downdated XtX */
+	if ((info = internal_mer_Xfactor(x))) /* unable to factor downdated XtX */
 	    error(_("Leading minor of order %d in downdated X'X is not positive definite"),
 		  info);
-/* FIXME: Why are values being assigned after a call to error? I think
- * this is vestigial.  At one point a warning was given but it got
- * changed to an error. */
-	    dcmp[3] = dcmp[6] = dev[0] = dev[1] = NA_REAL;
-	} else {
-	    for (dcmp[6] = 0, i = 0; i < p; i++) /* 2 * logDet(RXX) */
-		dcmp[6] += 2. * log(RXX[i * (p + 1)]);
+	for (dcmp[6] = 0, i = 0; i < p; i++) /* 2 * logDet(RXX) */
+	    dcmp[6] += 2. * log(RXX[i * (p + 1)]);
 				/* solve for rXy  and ryy^2 */
-	    Memcpy(rXy, REAL(GET_SLOT(x, lme4_XtySym)), p);
-	    F77_CALL(dgemv)("T", &q, &p, m1, RZX, &q, rZy, &ione, one, rXy, &ione);
-	    F77_CALL(dtrsv)("U", "T", "N", &p, RXX, &p, rXy, &ione);
-	    dcmp[3] = log(dcmp[2] /* dcmp[3] = log(ryy^2); dcmp[2] = y'y; */
-			  - F77_CALL(ddot)(&p, rXy, &ione, rXy, &ione)
-			  - F77_CALL(ddot)(&q, rZy, &ione, rZy, &ione));
+	Memcpy(rXy, REAL(GET_SLOT(x, lme4_XtySym)), p);
+	F77_CALL(dgemv)("T", &q, &p, m1, RZX, &q, rZy, &ione, one, rXy, &ione);
+	F77_CALL(dtrsv)("U", "T", "N", &p, RXX, &p, rXy, &ione);
+	dcmp[3] = log(dcmp[2] /* dcmp[3] = log(ryy^2); dcmp[2] = y'y; */
+		      - F77_CALL(ddot)(&p, rXy, &ione, rXy, &ione)
+		      - F77_CALL(ddot)(&q, rZy, &ione, rZy, &ione));
 				/* evaluate ML and REML deviance */
-	    dev[0] = dcmp[4] - dcmp[5] +
-		nml*(1.+dcmp[3]+log(2.*PI/nml));
-	    dev[1] = dcmp[4] - dcmp[5] + dcmp[6] +
-		nreml*(1.+dcmp[3]+log(2.*PI/nreml));
-	}
+	dev[0] = dcmp[4] - dcmp[5] +
+	    nml*(1.+dcmp[3]+log(2.*PI/nml));
+	dev[1] = dcmp[4] - dcmp[5] + dcmp[6] +
+	    nreml*(1.+dcmp[3]+log(2.*PI/nreml));
+	if (dcmp[7] >= 0) dcmp[7] = internal_mer_sigma(x, -1);
 	Free(L);
     }
     return R_NilValue;
@@ -2581,16 +2574,14 @@ SEXP mer_secondary(SEXP x)
 SEXP mer_postVar(SEXP x)
 {
     SEXP ans;
-    double *RZXi = REAL(GET_SLOT(GET_SLOT(x, lme4_RZXinvSym),
-				 lme4_xSym)),
-	sc = (asLogical(GET_SLOT(x, lme4_useScaleSym))) ?
-	internal_mer_sigma(x, -1) : 1, one = 1;
+    double *RZXi = REAL(GET_SLOT(GET_SLOT(x, lme4_RZXinvSym), lme4_xSym)),
+	*dcmp = REAL(GET_SLOT(x, lme4_devCompSym)), one = 1, sc;
     int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym)),
 	i, ione = 1, nf,
 	p = LENGTH(GET_SLOT(x, lme4_rXySym)),
 	q = LENGTH(GET_SLOT(x, lme4_rZySym));
 
-    sc = sc * sc;
+    sc = dcmp[7] * dcmp[7];
     mer_gradComp(x);
     ans = PROTECT(duplicate(GET_SLOT(x, lme4_bVarSym)));
     nf = LENGTH(ans);
@@ -2641,7 +2632,6 @@ SEXP mer_sigma(SEXP x, SEXP REML)
  *
  * @param x Pointer to an mer object
  * @param np Pointer to an integer giving the number of values to simulate
- * @param useScale Logical indicator of whether to use the scale
  *
  * @return a matrix of simulated linear predictors
  */
@@ -2649,7 +2639,6 @@ SEXP mer_simulate(SEXP x, SEXP nsimP)
 {
     int *nc = INTEGER(GET_SLOT(x, lme4_ncSym)),
 	*Gp = INTEGER(GET_SLOT(x, lme4_GpSym)),
-	REML = !strcmp(CHAR(asChar(GET_SLOT(x, lme4_methodSym))),"REML"),
 	i, ii, j, nsim = asInteger(nsimP),
 	nf = LENGTH(GET_SLOT(x, lme4_OmegaSym)),
 	n = LENGTH(GET_SLOT(x, lme4_ySym)),
@@ -2658,9 +2647,9 @@ SEXP mer_simulate(SEXP x, SEXP nsimP)
 	Omega = GET_SLOT(x, lme4_OmegaSym);
     cholmod_dense *cha = M_as_cholmod_dense(ans),
 	*chb = M_cholmod_allocate_dense(q, nsim, q, CHOLMOD_REAL, &c);
-    double one[] = {1,0}, zero[] = {0,0},
-	scale = (asLogical(GET_SLOT(x, lme4_useScaleSym)) ?
-		 internal_mer_sigma(x, REML) : 1);
+    double *dcmp = REAL(GET_SLOT(x, lme4_devCompSym)),
+	one[] = {1,0}, zero[] = {0,0};
+    double scale = (dcmp[7] < 0) ? -dcmp[7] : dcmp[7];
     cholmod_sparse *Zt = M_as_cholmod_sparse(GET_SLOT(x, lme4_ZtSym));
 
     GetRNGstate();

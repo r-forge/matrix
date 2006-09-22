@@ -72,10 +72,6 @@
       quasi-likelihood, or \code{"Laplace"}, for the Laplacian
       approximation, or \code{"AGQ"}, for adaptive Gauss-Hermite
       quadrature.}
-    \item{\code{useScale}:}{logical indicating if variance-covariance
-      matrices include a scale factor.  This is \code{FALSE} for the
-      glmm families \code{binomial} and \code{poisson}, otherwise
-      \code{TRUE}.}
     \item{\code{family}:}{a copy of the glm family.}
     \item{\code{call}:}{a copy of the call to the model-fitting
 	function.}
@@ -163,9 +159,6 @@
       the Hessian components have been evaluated.}
     \item{\code{call}:}{A copy of the matched call to the function that
       created the object.}
-    \item{\code{useScale}:}{logical indicator of the use of the scale
-      factor when calculating variance-covariance objects.  Only present
-      in the \code{summary.lmer} class.}
     \item{\code{frame}:}{the model frame for the model or an empty data
       frame}
     \item{\code{terms}:}{the terms attribute of the model frame for the
@@ -194,14 +187,11 @@
 }
 \usage{
 \S4method{logLik}{mer}(object, REML = object@method == "REML", \dots)
-\S4method{vcov}{mer}(object, REML = object@method == "REML",
-       useScale = object@useScale, \dots)
+\S4method{vcov}{mer}(object, REML = object@method == "REML", \dots)
 }
 \arguments{
   \item{object}{object of class \code{mer} or \code{lmer}.}
   \item{REML}{logical indicating if REML should be used.}
-  \item{useScale}{logical indicating if a scale should be computed and
-    used; otherwise \code{sc <- 1} is used.}
   \item{\dots}{potential further arguments passed to methods.}
 }
 \section{Methods}{
