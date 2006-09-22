@@ -17,16 +17,13 @@ setOldClass("terms")
 ## mixed effects representation
 setClass("mer",
 	 representation(## original data
-			flist = "list", # list of grouping factors
+			flist = "list",    # list of grouping factors
 			Zt = "dgCMatrix",  # sparse representation of Z'
 			X = "matrix",	   # X
 			y = "numeric",	   # y
 			wts = "numeric",   # weights
                         ## do we need this for mer?
 			wrkres = "numeric",# working residuals (copy of y for LMMs)
-			method = "character", # parameter estimation method
-                           ## scale now included in devComp
-			   ## useScale = "logical", # should scale factor be included
 			## invariants derived from data structure
 			cnames = "list",   # column names of model matrices
 			nc = "integer",	   # dimensions of blocks in Omega
@@ -55,7 +52,7 @@ setClass("mer",
 			bVar = "list",
 			gradComp = "list",
 			## status indicator
-			status = "logical"
+			status = "integer"
 			)
 	)
 

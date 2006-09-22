@@ -8,6 +8,7 @@
 \alias{coef.lmer-class}
 \alias{summary.mer-class}
 \alias{summary.lmer-class}
+\alias{summary.glmer-class}
 \alias{ranef.lmer-class}
 % Methods
 \alias{anova,mer-method}
@@ -129,23 +130,22 @@
       \code{"logDetOmega"}, the logarithm of the determinant of
       \code{Omega}, and \code{"logDetRXX"}, the logarithm of the
       determinant of the triangular matrix in the \code{"RXX"} slot.
-      This slot's contents are current if \code{status$factored} is \code{TRUE}.}
+      This slot's contents are current if \code{status$stage > 0}.}
     \item{\code{deviance}:}{Numeric vector of length 2 containing the
       deviance corresponding to the maximum likelihood (ML) and REML
       criteria.  This slot's contents are current if
-      \code{status$factored} is \code{TRUE}.}
+      \code{status$stage > 0factored}.} 
     \item{\code{fixef}:}{Numeric vector containing the conditional estimates
       of the fixed effects.  This slot's contents are current if
-      \code{status$secondary} is \code{TRUE}.}
+      \code{status$stage > 1}.}
     \item{\code{ranef}:}{Numeric vector containing the conditional modes
       of the random effects.  This slot's contents are current if
-      \code{status$secondary} is \code{TRUE}.}
+      \code{status$stage > 1}.}
     \item{\code{RZXinv}:}{A rectangular matrix, stored as a
       \code{"\link[Matrix:dgeMatrix-class]{dgeMatrix}"} object, which is the RZX
 	component of the inverse of the Cholesky factor of
 	\eqn{Z'Z+\Omega} at the current values of the parameters. This
-	slot's contents are current if \code{status$gradComp} is
-	\code{TRUE}.}
+	slot's contents are current if \code{status$stage > 2}.}
     \item{\code{bVar}:}{A list of the diagonal inner blocks (upper
       triangles only) of the positive-definite matrices on the diagonal
       of the inverse of \code{ZtZ+Omega}. With the appropriate scale
@@ -153,10 +153,11 @@
       conditional variance-covariance matrices of the random effects.}
     \item{\code{gradComp}:}{A list of three-dimensional arrays each with four
       faces.  See the code for the documentation of these components.}
-    \item{\code{status}:}{Logical vector of length 4 indicating if the
-      object has been factored, if the secondary slots have been
-      evaluated, if the gradient components have been evaluated and if
-      the Hessian components have been evaluated.}
+    \item{\code{status}:}{Integer vector of length 4 indicating the
+      stage of the calculation at the current value of \code{Omega}, and
+      whether REML is being used.  The codes for the \code{"stage"}
+      element are 0 - unfactored, 1 - factored, 2 - secondary, 3 - gradComp
+      and 4 - HessComp.}
     \item{\code{call}:}{A copy of the matched call to the function that
       created the object.}
     \item{\code{frame}:}{the model frame for the model or an empty data
@@ -169,8 +170,9 @@
       display the correlation of the fixed-effects estimates when
       showing the object. Only present in the \code{summary.lmer} class.}
   }
-  The \code{"summary.mer"} and \code{"summary.lmer"} classes \emph{contain}
-  the \code{"mer"} and \code{"lmer"} classes respectively and have
+  The \code{"summary.mer"}, \code{"summary.lmer"} and
+  \code{"summary.glmer"} classes \emph{contain}
+  the \code{"mer"}, \code{"lmer"} and \code{"glmer"} classes respectively and have
   additional slots,
   \describe{
     \item{\code{isG}:}{logical indicating if we have a

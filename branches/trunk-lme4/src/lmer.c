@@ -2,8 +2,6 @@
 #include <float.h>
 
 /* TODO: */
-/* - change the status vector to a scalar.  The steps are
- * cumulative so there is no need for a vector of flags. */
 /* Consider the steps in reimplementing AGQ.  First you need to find
    bhat, then evaluate the posterior variances, then step out
    according to the posterior variance, evaluate the integrand
@@ -136,7 +134,7 @@ std_rWishart_factor(double df, int p, double ans[])
 
 /* Internally used utilities */
 
-#define flag_not_factored(x) *LOGICAL(GET_SLOT(x, lme4_statusSym)) = 0
+#define flag_not_factored(x) *INTEGER(GET_SLOT(x, lme4_statusSym)) = 0
 
 /**
  * Create the diagonal blocks of the variance-covariance matrix of the
@@ -667,7 +665,7 @@ void internal_mer_coefGets(SEXP x, const double cc[], int ptyp)
  *
  * @param x pointer to an mer object
  * @param REML indicator of whether to use REML.
- *           < 0  -> determine REML or ML from x@method
+ *           < 0  -> determine REML or ML from x@status
  *           == 0 -> use ML unconditionally
  *           > 0  -> use REML unconditionally
  *
@@ -679,9 +677,7 @@ internal_mer_sigma(SEXP x, int REML)
     double *dcmp = REAL(GET_SLOT(x, lme4_devCompSym));
 
     if (REML < 0)		/* get REML from x */
-	REML = !strcmp(CHAR(asChar(GET_SLOT(x,
-					    lme4_methodSym))),
-		       "REML");
+	REML = INTEGER(GET_SLOT(x, lme4_statusSym))[1];
     mer_factor(x);
     return exp(dcmp[3]/2)/sqrt(dcmp[0] - (REML ? dcmp[1] : 0));
 }
@@ -828,7 +824,7 @@ internal_mer_Zfactor(SEXP x, cholmod_factor *L)
 	*Zty = M_as_cholmod_dense(GET_SLOT(x, lme4_ZtySym)),
 	*rZy, *RZX;
     int *omp, *nnz = Calloc(nf + 1, int), i,
-	*status = LOGICAL(GET_SLOT(x, lme4_statusSym));
+	*status = INTEGER(GET_SLOT(x, lme4_statusSym));
     double *dcmp = REAL(GET_SLOT(x, lme4_devCompSym)), one[] = {1, 0};
 
 
@@ -876,7 +872,6 @@ internal_mer_Zfactor(SEXP x, cholmod_factor *L)
     M_cholmod_free_dense(&rZy, &c);
 				/* signal that secondary slots are not valid */
     status[0] = 1;
-    status[1] = status[2] = status[3] = 0;
 }
 
 
@@ -1146,12 +1141,12 @@ static double*
 internal_mer_ranef(SEXP x)
 {
     SEXP ranef = GET_SLOT(x, lme4_ranefSym);
-    int *status = LOGICAL(GET_SLOT(x, lme4_statusSym));
+    int *status = INTEGER(GET_SLOT(x, lme4_statusSym));
     if (!status[0]) {
 	error("Applying internal_mer_ranef without factoring");
 	return (double*)NULL;	/* -Wall */
     }
-    if (!status[1]) {
+    if (status[0] < 2) {
 	SEXP fixef = GET_SLOT(x, lme4_fixefSym),
 	    ranef = GET_SLOT(x, lme4_ranefSym);
 	int ione = 1, p = LENGTH(fixef), q = LENGTH(ranef);
@@ -1169,8 +1164,7 @@ internal_mer_ranef(SEXP x)
 	Free(chranef); M_cholmod_free_dense(&td1, &c);
 	Memcpy(REAL(ranef), (double *)(td2->x), q);
 	M_cholmod_free_dense(&td2, &c);
-	status[1] = 1;
-	status[2] = status[3] = 0;
+	status[0] = 2;
 	Free(L);
     }
     return REAL(ranef);
@@ -1187,12 +1181,12 @@ static double*
 internal_mer_fixef(SEXP x)
 {
     SEXP fixef = GET_SLOT(x, lme4_fixefSym);
-    int *status = LOGICAL(GET_SLOT(x, lme4_statusSym));
+    int *status = INTEGER(GET_SLOT(x, lme4_statusSym));
     if (!status[0]) {
 	error("Applying internal_mer_fixef without factoring");
 	return (double*)NULL;	/* -Wall */
     }
-    if (!status[1]) {
+    if (status[0] < 2) {
 	int ione = 1, p = LENGTH(fixef);
 	Memcpy(REAL(fixef), REAL(GET_SLOT(x, lme4_rXySym)), p);
 	F77_CALL(dtrsv)("U", "N", "N", &p,
@@ -1308,8 +1302,7 @@ internal_ECMEsteps(SEXP x, int nEM, int verb)
 	gradComp = GET_SLOT(x, lme4_gradCompSym);
     int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym)),
 	*nc = INTEGER(GET_SLOT(x, lme4_ncSym)),
-	REML = !strcmp(CHAR(asChar(GET_SLOT(x, lme4_methodSym))),
-		       "REML"),
+	REML = INTEGER(GET_SLOT(x, lme4_statusSym))[1],
 	i, ifour = 4, info, ione = 1, iter,
 	nf = LENGTH(Omega);
     double
@@ -1722,7 +1715,7 @@ SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbosep)
     cholmod_factor *L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
     int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym)),
 	*nc = INTEGER(GET_SLOT(x, lme4_ncSym)),
-	REML = !strcmp(CHAR(asChar(GET_SLOT(x, lme4_methodSym))), "REML"),
+	REML = INTEGER(GET_SLOT(x, lme4_statusSym))[1],
 	i, j, n = LENGTH(GET_SLOT(x, lme4_ySym)),
 	nf = LENGTH(Omega), nsamp = asInteger(nsampp),
 	p = LENGTH(GET_SLOT(x, lme4_rXySym)),
@@ -1787,27 +1780,29 @@ SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbosep)
  * matrices.
  *
  * @param fl named list of grouping factors
- * @param Ztl list of transposes of model matrices
+ * @param ZZt transpose of Z as a sparse matrix
  * @param Xp model matrix for the fixed effects
  * @param yp response vector
- * @param method character vector describing the estimation method
+ * @param REMLp logical scalar indicating if REML is to be used
+ * @param ncp integer vector of the number of random effects per level
+ *        of each grouping factors
  *
  * @return pointer to an mer object
  */
-SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
+SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP REMLp,
 		SEXP ncp, SEXP cnames)
 {
     SEXP Omega, bVar, gradComp, fnms = getAttrib(fl, R_NamesSymbol),
-	val = PROTECT(NEW_OBJECT(MAKE_CLASS("mer"))), xnms;
+	stat, val = PROTECT(NEW_OBJECT(MAKE_CLASS("mer"))), xnms;
     cholmod_sparse *ts1, *ts2, *Zt;
     cholmod_factor *F;
-    int *nc = INTEGER(ncp), *Gp, *xdims, i, nested,
-	nf = LENGTH(fl), nobs = LENGTH(yp), p, q;
+    int *nc = INTEGER(ncp), *Gp, *xdims, REML = asInteger(REMLp),
+	i, nested, nf = LENGTH(fl), nobs = LENGTH(yp), p, q;
     char *devCmpnms[] = {"n", "p", "yty", "logryy2", "logDetL2",
 			 "logDetOmega", "logDetRXX", "scale", ""};
     char *devnms[] = {"ML", "REML", ""};
     char *statusnms[] =
-	{"factored", "secondary", "gradComp", "Hesscomp", ""};
+	{"stage", "REML", "glmm", ""};
     double *dcmp, *wts, *wrkres, *y;
 				/* Check arguments to be duplicated */
     if (!isReal(yp)) error(_("yp must be a real vector"));
@@ -1826,9 +1821,6 @@ SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
 	    error(_("fl[[%d] must be a factor of length %d"), i+1, nobs);
     }
     SET_SLOT(val, lme4_flistSym, duplicate(fl));
-    if (!isString(method) || LENGTH(method) != 1)
-	error(_("method must be a character vector of length 1"));
-    SET_SLOT(val, lme4_methodSym, duplicate(method));
     if (!isNewList(cnames) || LENGTH(cnames) != nf + 1)
 	error(_("cnames must be a list of length %d"), nf + 1);
     SET_SLOT(val, lme4_cnamesSym, duplicate(cnames));
@@ -1850,8 +1842,10 @@ SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
 				/* allocate other slots */
     SET_SLOT(val, lme4_devianceSym, internal_make_named(REALSXP, devnms));
     SET_SLOT(val, lme4_devCompSym, internal_make_named(REALSXP, devCmpnms));
-    SET_SLOT(val, lme4_statusSym, internal_make_named(LGLSXP, statusnms));
-    AZERO(LOGICAL(GET_SLOT(val, lme4_statusSym)), 4);
+    SET_SLOT(val, lme4_statusSym, internal_make_named(INTSXP, statusnms));
+    stat = GET_SLOT(val, lme4_statusSym);
+    AZERO(INTEGER(stat), LENGTH(stat));
+    INTEGER(stat)[1] = REML;
     dcmp = REAL(GET_SLOT(val, lme4_devCompSym));
     AZERO(dcmp, 8);		/* cosmetic */
     dcmp[0] = (double) nobs;
@@ -1924,7 +1918,7 @@ SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP method,
     internal_mer_Zfactor(val, F);
     /* One side-effect of this call is to set the status as
      * factored.  We need to reset it */
-    LOGICAL(GET_SLOT(val, lme4_statusSym))[0] = 0;
+    INTEGER(GET_SLOT(val, lme4_statusSym))[0] = 0;
     /* Create the dCHMfactor object and store it in the L slot.  This
      * also frees the storage. */
     SET_SLOT(val, lme4_LSym, M_chm_factor_to_SEXP(F, 1));
@@ -2188,7 +2182,7 @@ SEXP mer_dtCMatrix_inv(SEXP x)
  */
 SEXP mer_factor(SEXP x)
 {
-    int *status = LOGICAL(GET_SLOT(x, lme4_statusSym));
+    int *status = INTEGER(GET_SLOT(x, lme4_statusSym));
     if (!status[0]) {
 	SEXP rXyP = GET_SLOT(x, lme4_rXySym),
 	    rZyP = GET_SLOT(x, lme4_rZySym);
@@ -2203,7 +2197,7 @@ SEXP mer_factor(SEXP x)
 	double nml = dcmp[0], nreml = dcmp[0] - dcmp[1];
 
 	/* Inflate Z'Z to Z'Z+Omega and factor to form L. Form RZX and
-	 * rZy. Update status flags, dcmp[4] and dcmp[5]. */
+	 * rZy. Update stage flag, dcmp[4] and dcmp[5]. */
 	internal_mer_Zfactor(x, L);
 				/* downdate XtX and factor */
 	if ((info = internal_mer_Xfactor(x))) /* unable to factor downdated XtX */
@@ -2288,10 +2282,10 @@ SEXP mer_fixef(SEXP x)
  */
 SEXP mer_gradComp(SEXP x)
 {
-    int *status = LOGICAL(GET_SLOT(x, lme4_statusSym));
+    int *status = INTEGER(GET_SLOT(x, lme4_statusSym));
 
     mer_secondary(x);
-    if (!status[2]) {
+    if (status[0] < 3) {
 	SEXP bVarP = GET_SLOT(x, lme4_bVarSym),
 	    OmegaP = GET_SLOT(x, lme4_OmegaSym),
 	    gradComp = GET_SLOT(x, lme4_gradCompSym),
@@ -2359,7 +2353,7 @@ SEXP mer_gradComp(SEXP x)
 	    Free(tmp);
 	}
 	Free(L);
-	status[2] = 1; status[3] = 0;
+	status[0] = 3;
     }
     return R_NilValue;
 }
@@ -2380,8 +2374,7 @@ SEXP mer_gradient(SEXP x, SEXP pType)
     int *nc = INTEGER(GET_SLOT(x, lme4_ncSym)),
 	dind, i, ifour = 4, ione = 1, nf = length(Omega),
 	odind, ptyp = asInteger(pType);
-    int REML =
-	!strcmp(CHAR(asChar(GET_SLOT(x, lme4_methodSym))), "REML");
+    int REML = INTEGER(GET_SLOT(x, lme4_statusSym))[1];
     SEXP val = PROTECT(allocVector(REALSXP, coef_length(nf, nc)));
     double cc[] = {-1, 1, 1, REML ? 1 : 0},
       	*valp = REAL(val),
@@ -2554,10 +2547,10 @@ SEXP mer_ranef(SEXP x)
  */
 SEXP mer_secondary(SEXP x)
 {
-    int *status = LOGICAL(GET_SLOT(x, lme4_statusSym));
+    int *status = INTEGER(GET_SLOT(x, lme4_statusSym));
 
     mer_factor(x);
-    if (!status[1]) {
+    if (status[0] < 2) {
 	internal_mer_fixef(x);
 	internal_mer_ranef(x);
     }
