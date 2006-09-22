@@ -1,5 +1,12 @@
 2006-09-22  Douglas Bates  <bates@stat.wisc.edu>
 
+	* src/lmer.c (mer_create and other functions and files): Change
+	the status vector to an integer vector and just record the stage
+	as 0 to 4.  Also record REML as an integer and glmm method as an
+	integer instead of strings.
+
+2006-09-22  Douglas Bates  <bates@stat.wisc.edu>
+
 	* R/AllClass.R (and many other files): delete the useScale slot in
 	an mer object and incorporate the scale in the devComp slot.  A
 	negative value indicates a fixed scale.

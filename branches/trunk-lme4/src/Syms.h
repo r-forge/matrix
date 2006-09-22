@@ -27,7 +27,6 @@ SEXP
     lme4_flistSym,
     lme4_gradCompSym,
     lme4_iSym,
-    lme4_methodSym,
     lme4_ncSym,
     lme4_pSym,
     lme4_permSym,

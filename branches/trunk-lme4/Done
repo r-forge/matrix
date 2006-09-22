@@ -1,5 +1,10 @@
+- change the status vector to an integer vertor.  The steps are
+  cumulative so we only keep track of the stage.  Also REML and glmm
+  are stored here.
+
 - anova method for lmer objects.  Will entail saving the terms
   attribute.
+
 - Move large data sets into a MEMSS or mlmRev package
 
 - Change Calloc/Free patterns in the calculation of bVar

@@ -77,7 +77,6 @@ void R_init_lme4(DllInfo *dll)
     lme4_flistSym = install("flist");
     lme4_gradCompSym = install("gradComp");
     lme4_iSym = install("i");
-    lme4_methodSym = install("method");
     lme4_ncSym = install("nc");
     lme4_pSym = install("p");
     lme4_permSym = install("perm");

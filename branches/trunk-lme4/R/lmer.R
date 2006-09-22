@@ -211,9 +211,9 @@ setMethod("with", signature(data = "lmer"),
 setMethod("terms", signature(x = "lmer"),
 	  function(x, ...) x@terms)
 
-lmerFit <- function(fl, Zt, X, Y, method, nc, cnames, call, cv, model, mt, mf)
+lmerFit <- function(fl, Zt, X, Y, REML, nc, cnames, call, cv, model, mt, mf)
 {
-    mer <- .Call(mer_create, fl, Zt, X, Y, method, nc, cnames)
+    mer <- .Call(mer_create, fl, Zt, X, Y, REML, nc, cnames)
     .Call(mer_ECMEsteps, mer, cv$niterEM, cv$EMverbose)
     LMEoptimize(mer) <- cv
     return(new("lmer", mer,
@@ -319,9 +319,8 @@ setMethod("lmer", signature(formula = "formula"),
 		  warning(paste('Argument method = "', method,
 				'" is not meaningful for a linear mixed model.\n',
 				'Using method = "REML".\n', sep = ''))
-		  method <- "REML"
 	      }
-              return(lmerFit(fl, Zt, X, Y, method, nc, cnames, match.call(),
+              return(lmerFit(fl, Zt, X, Y, method != "ML", nc, cnames, match.call(),
                              cv, model, mt, mf))
           }
 
@@ -352,10 +351,10 @@ setMethod("lmer", signature(formula = "formula"),
 	  LMEopt <- get("LMEoptimize<-")
 	  doLMEopt <- quote(LMEopt(x = mer, value = cv))
 	  mer <- .Call(mer_create, fl, Zt,
-		       X, Y, method, nc, cnames)
+		       X, Y, 0, nc, cnames)
           if (family$family %in% c("binomial", "poisson")) # set the constant scale
               mer@devComp[8] <- -mean(weights)
-
+          mer@status["glmm"] <- as.integer(switch(method, PQL = 1, Laplace = 2, AGQ = 3))
 	  GSpt <- .Call(glmer_init, environment())
 	  if (cv$usePQL) {
 	      .Call(glmer_PQL, GSpt)  # obtain PQL estimates
@@ -524,7 +523,7 @@ setMethod("qqmath", signature(x = "ranef.lmer"),
 
 setMethod("deviance", signature(object = "mer"),
 	  function(object, REML = NULL, ...) {
-              if (is.null(REML)) REML <- object@method == "REML"
+              if (is.null(REML)) REML <- object@status["REML"]
 	      .Call(mer_factor, object)
 	      object@deviance[[ifelse(REML, "REML", "ML")]]
 	  })
@@ -713,7 +712,7 @@ printMer <- function(x, digits = max(3, getOption("digits") - 3),
                      signif.stars = getOption("show.signif.stars"), ...)
 {
     so <- summary(x)
-    REML <- so@method == "REML"
+    REML <- so@status["REML"]
     llik <- so@logLik
     dev <- so@deviance
     devc <- so@devComp
@@ -775,7 +774,7 @@ setMethod("show", "mer", function(object) printMer(object))
 
 
 setMethod("vcov", signature(object = "mer"),
-	  function(object, REML = object@method == "REML", ...) {
+	  function(object, REML = object@status["REML"], ...) {
 	      rr <- as(object@devComp[8]^2 * tcrossprod(solve(object@RXX)), "dpoMatrix")
 	      rr@factors$correlation <- as(rr, "corMatrix")
 	      rr
@@ -794,7 +793,7 @@ setMethod("getFixDF", signature(object="mer"),
 	  })
 
 setMethod("logLik", signature(object="mer"),
-	  function(object, REML = object@method == "REML", ...) {
+	  function(object, REML = object@status["REML"], ...) {
 	      val <- -deviance(object, REML = REML)/2
 	      devc <- as.integer(object@devComp[1:2])
 	      attr(val, "nall") <- attr(val, "nobs") <- devc[1]
@@ -806,7 +805,7 @@ setMethod("logLik", signature(object="mer"),
 	  })
 
 setMethod("VarCorr", signature(x = "mer"),
-	  function(x, REML = x@method == "REML", ...)
+	  function(x, REML = x@status["REML"], ...)
       {
 	  sc2 <- x@devComp[8]^2
 	  cnames <- x@cnames
@@ -869,9 +868,6 @@ setMethod("anova", signature(object = "mer"),
 	  }
 	  else { ## ------ single model ---------------------
 	      foo <- object
-	      #foo@status["factored"] <- FALSE
-	      #.Call(mer_factor, foo)
-	      #dfr <- getFixDF(foo)
 	      ss <- foo@rXy^2
 	      ssr <- exp(foo@devComp["logryy2"])
 	      names(ss) <- object@cnames[[".fixed"]]
@@ -942,16 +938,17 @@ setMethod("summary", signature(object = "mer"),
 	      corF <- vcov@factors$correlation
 	      ## DF <- getFixDF(object)
 	      coefs <- cbind("Estimate" = fcoef, "Std. Error" = corF@sd) #, DF = DF)
-	      REML <- object@method == "REML"
+	      REML <- object@status["REML"]
 	      llik <- logLik(object, REML)
 	      dev <- object@deviance
 	      devc <- object@devComp
 
-	      glz <- !(object@method %in% c("REML", "ML"))
+	      glz <- is(object, "glmer")
 	      methTitle <-
 		  if (glz)
 		      paste("Generalized linear mixed model fit using",
-			    object@method)
+			    switch(object@status["glmm"],
+                                   "PQL", "Laplace", "AGQ"))
 		  else paste("Linear mixed-effects model fit by",
 			     if(REML) "REML" else "maximum likelihood")
 
