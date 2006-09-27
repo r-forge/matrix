@@ -42,7 +42,6 @@ exportMethods(
               "formula",
               "gsummary",
               "head",
-              "lmer",
               "logLik",
               "mcmcsamp",
               "plot",

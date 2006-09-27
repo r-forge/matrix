@@ -1,3 +1,10 @@
+2006-09-27  Douglas Bates  <bates@R-project.org>
+
+	* R/lmer.R (lmer): Moved argument checking and construction of
+	model matrices, etc. to auxillary functions for use with functions
+	to fit more general models.  Changed default method for GLMMs to
+	Laplace and default for usePQL to FALSE.
+
 2006-09-22  Douglas Bates  <bates@stat.wisc.edu>
 
 	* src/lmer.c (mer_create and other functions and files): Change
