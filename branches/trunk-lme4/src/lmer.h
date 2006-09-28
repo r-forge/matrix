@@ -43,5 +43,6 @@ SEXP mer_update_y(SEXP x, SEXP ynew);
 SEXP mer_validate(SEXP x);
 
 SEXP Zt_create(SEXP fl, SEXP Ztl);
+SEXP Zt_create_carryover(SEXP fl, SEXP Ztl, SEXP innernm, SEXP outernm);
 
 #endif

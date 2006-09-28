@@ -35,6 +35,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_update_y", (DL_FUNC) &mer_update_y, 2},
     {"pedigree_chol", (DL_FUNC) &pedigree_chol, 2},
     {"Zt_create", (DL_FUNC) &Zt_create, 2},
+    {"Zt_create_carryover", (DL_FUNC) &Zt_create, 4},
     {NULL, NULL, 0}
 };
 
