@@ -1,3 +1,28 @@
+2006-09-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.9975-1
+
+	* tests/simple.R: less checks fail; using NA, found that our
+		kronecker() is not base-compatible with NA's.
+
+	* R/dMatrix.R: "Compare" method now implemented for all cases
+
+	* R/Auxiliaries.R (indTri): == which([lower/upper].tri( * )) new utility
+
+	* man/dtpMatrix-class.Rd: mention length of 'x' slot
+
+	* src/dtpMatrix.c (dtpMatrix_validate): fix check
+	* src/dspMatrix.c (dspMatrix_validate): ditto
+
+	* R/dtTMatrix.R (gt2tT): fix ("l" -> "n")
+	  including coercion to [nl]tTMatrix.
+
+	* R/diagMatrix.R (show): print a header line as for other classes.
+
+2006-09-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Makefile.win (SUBDIRS): fix typo
+
 2006-09-19  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Date): ready to release 0.9975-0 to CRAN
