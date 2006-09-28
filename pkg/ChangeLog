@@ -1,3 +1,11 @@
+2006-09-28  Douglas Bates  <bates@R-project.org>
+
+	* src/dppMatrix.h: Ensure definition of dspMatrix_validate is
+	included.
+
+	* src/init.c, inst/include/{Matrix.h,Matrix_stubs.h,cholmod.h}:
+	Export C-callable functions used in Zt_create in lme4.
+
 2006-09-28  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.9975-1
