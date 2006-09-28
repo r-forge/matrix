@@ -316,15 +316,16 @@ cholmod_sparse attribute_hidden
 }
 
 cholmod_sparse attribute_hidden
-*M_cholmod_vertcat(cholmod_sparse *A, cholmod_sparse *B, cholmod_common *Common)
+*M_cholmod_vertcat(cholmod_sparse *A, cholmod_sparse *B,
+		   int values, cholmod_common *Common)
 {
     static cholmod_sparse*(*fun)(cholmod_sparse*, cholmod_sparse*,
-				 cholmod_common*) = NULL;
+				 int, cholmod_common*) = NULL;
     if (fun == NULL)
 	fun = (cholmod_sparse*(*)(cholmod_sparse*,cholmod_sparse*,
-				  cholmod_common*))
+				  int, cholmod_common*))
 	    R_GetCCallable("Matrix", "cholmod_vertcat");
-    return fun(A, B, Common);
+    return fun(A, B, values, Common);
 }
 
 SEXP attribute_hidden
