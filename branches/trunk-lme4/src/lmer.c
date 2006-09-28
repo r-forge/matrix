@@ -2753,6 +2753,32 @@ SEXP mer_validate(SEXP x)
     return ScalarLogical(1);
 }
 
+static
+cholmod_sparse *chm_Zt(int n, int ii, SEXP fi, SEXP tmmat)
+{
+    cholmod_sparse *ans;
+    int *dims, *fac, *i, *p, j, k, m;
+
+    if (!isFactor(fi) || LENGTH(fi) != n)
+	error(_("fl[[%d]] must be a factor of length %d"), ii + 1, n);
+    if (!isMatrix(tmmat) || !isReal(tmmat))
+	error(_("Ztl[[%d]] must be real matrix"), ii + 1);
+    dims = INTEGER(getAttrib(tmmat, R_DimSymbol));
+    if (dims[1] != n)
+	error(_("Ztl[[%d]] must have %d columns"), ii + 1, n);
+    m = dims[0];
+    ans = M_cholmod_allocate_sparse(m * LENGTH(getAttrib(fi, R_LevelsSymbol)),
+				    n, m * n, TRUE, TRUE, 0, CHOLMOD_REAL, &c);
+    i = (int *)(ans->i); p = (int *)(ans->p); fac = INTEGER(fi);
+
+    for (j = 0; j < n; j++) {
+	p[j] = m * j;
+	for (k = 0; k < m; k++) i[j * m + k] = (fac[j] - 1) * m + k;
+    }
+    Memcpy((double*)(ans->x), REAL(tmmat), m * n);
+    return ans;
+}
+
 /**
  * Create the sparse Zt matrix from a factor list and list of model matrices
  *
@@ -2762,6 +2788,41 @@ SEXP mer_validate(SEXP x)
  * @return a freshly created sparse Zt object
  */
 SEXP Zt_create(SEXP fl, SEXP Ztl)
+{
+    cholmod_sparse *ans, *cat, *cur;
+    SEXP f0;
+    int i, nf = LENGTH(fl), nobs;
+
+    if (!isNewList(fl) || nf < 1)
+	error(_("fl must be a non-null list"));
+    if (!isNewList(Ztl) || LENGTH(Ztl) != nf)
+	error(_("Ztl must be a list of length %d"), nf);
+    f0 = VECTOR_ELT(fl, 0);
+    nobs = LENGTH(f0);
+    if (!isFactor(f0) || nobs < 1)
+	error(_("fl[[1]] must be a non-empty factor"));
+    ans = chm_Zt(nobs, 0, f0, VECTOR_ELT(Ztl, 0));
+    for (i = 1; i < nf; i++) {	/* check consistency, create and rbind a layer */
+	cur = chm_Zt(nobs, i, VECTOR_ELT(fl, i), VECTOR_ELT(Ztl, i));
+	cat = M_cholmod_vertcat(ans, cur, TRUE, &c);
+	M_cholmod_free_sparse(&ans, &c); M_cholmod_free_sparse(&cur, &c);
+	ans = cat;
+    }
+    return M_chm_sparse_to_SEXP(ans, 1, 0, 0, "", R_NilValue);
+}
+
+/**
+ * Create the sparse Zt matrix with carry-over from a factor list and
+ * list of model matrices
+ *
+ * @param fl list of factors
+ * @param Ztl list of transposes of model matrices
+ * @param innernm  name of the inner factor
+ * @param outernm name of the outer factor
+ *
+ * @return a freshly created sparse Zt object
+ */
+SEXP Zt_create_carryover(SEXP fl, SEXP Ztl, SEXP innernm, SEXP outernm)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix"))), fi, tmmat;
     int *dims, *p, *ii, i, nrtot = 0, nf = LENGTH(fl), nobs;
