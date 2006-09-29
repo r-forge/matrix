@@ -86,12 +86,12 @@ sM <- as(M2, "sparseMatrix")
 10 * sM
 identical(sM * 2, sM + sM)
 @ %def
-where we also see that multiplication by a scalar keeps sparcity,
-but addition with a ``dense'' object does not.
+where we see above that multiplication by a scalar keeps sparcity,
+but addition with a ``dense'' object does not:
 @
 <<add1>>=
 sM + 10
-sM / 10  +  M2 %/% 2
+is(sM / 10  +  M2 %/% 2, "denseMatrix")
 @ %def
 
 Operations on our classed matrices include
@@ -117,7 +117,24 @@ and the \code{"Summary"} group of functions, \Rfun{min}, \Rfun{range},
 \Rfun{sum}, etc.  Note that all these are implemented via so called
 \emph{group methods}, see e.g., \code{?Arith} in \RR.
 
-\TODO{subsetting, subassign}
+These classed matrices can be ``indexed'' (more technically ``subset'') as
+normal ones, as partly seen above. This also includes the idiom
+\code{M [ M $\left\langle \mathit{cop} \right\rangle$]} which returns
+simple vectors,
+@
+<<sub_logi>>=
+sM[sM > 2]
+sml <- sM[sM <= 2]
+table(sml) # 39 entries of 0 and -10
+@ %def
+Similarly, we can \emph{``subassign''} normally,
+@
+<<sub_ass>>=
+sM[2,1] <- 0
+sM[5, ] <- 7 # a whole row
+sM
+@ %def
+
 
 
 \FIXME{2nd introduction -- maybe keep some?}
