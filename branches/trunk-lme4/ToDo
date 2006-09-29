@@ -22,5 +22,7 @@ Determine what a "coef" function should do for multiple, possibly
 - Add a "pedigree" class and methods for it.  Allow a pedigree
   argument in lmer.
 
+- add nicer (more realistic?) pedigree examples and tests
+
 - document print(<mer>) including an example  print(<lmer>, corr = FALSE)
 
