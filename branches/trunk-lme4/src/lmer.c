@@ -2771,6 +2771,7 @@ cholmod_sparse *chm_Zt(int n, int ii, SEXP fi, SEXP tmmat)
 				    n, m * n, TRUE, TRUE, 0, CHOLMOD_REAL, &c);
     i = (int *)(ans->i); p = (int *)(ans->p); fac = INTEGER(fi);
 
+    p[n] = m * n;
     for (j = 0; j < n; j++) {
 	p[j] = m * j;
 	for (k = 0; k < m; k++) i[j * m + k] = (fac[j] - 1) * m + k;
