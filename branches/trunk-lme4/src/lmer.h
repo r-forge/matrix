@@ -44,5 +44,6 @@ SEXP mer_validate(SEXP x);
 
 SEXP Zt_create(SEXP fl, SEXP Ztl);
 SEXP Zt_create1(SEXP fl, SEXP Ztl);
+SEXP Ztl_sparse(SEXP fl, SEXP Ztl);
 
 #endif

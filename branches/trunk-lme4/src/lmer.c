@@ -2754,6 +2754,31 @@ SEXP mer_validate(SEXP x)
 }
 
 static
+SEXP SEXP_Zt(int n, int ii, SEXP fi, SEXP tmmat)
+{
+    int *dims = INTEGER(getAttrib(tmmat, R_DimSymbol)), *fac =INTEGER(fi), j, k;
+    int m = dims[0], nlev = LENGTH(getAttrib(fi, R_LevelsSymbol));
+    SEXP ans = PROTECT(alloc_dgCMatrix(m * nlev, n, m * n, R_NilValue, R_NilValue));
+    int *i = INTEGER(GET_SLOT(ans, lme4_iSym)), *p = INTEGER(GET_SLOT(ans, lme4_pSym));
+    
+    if (!isFactor(fi) || LENGTH(fi) != n)
+	error(_("fl[[%d]] must be a factor of length %d"), ii + 1, n);
+    if (!isMatrix(tmmat) || !isReal(tmmat))
+	error(_("Ztl[[%d]] must be real matrix"), ii + 1);
+    if (dims[1] != n)
+	error(_("Ztl[[%d]] must have %d columns"), ii + 1, n);
+
+    p[n] = m * n;
+    for (j = 0; j < n; j++) {
+	p[j] = m * j;
+	for (k = 0; k < m; k++) i[j * m + k] = (fac[j] - 1) * m + k;
+    }
+    Memcpy(REAL(GET_SLOT(ans, lme4_xSym)), REAL(tmmat), m * n);
+    UNPROTECT(1);
+    return ans;
+}
+
+static
 cholmod_sparse *chm_Zt(int n, int ii, SEXP fi, SEXP tmmat)
 {
     cholmod_sparse *ans;
@@ -2779,6 +2804,27 @@ cholmod_sparse *chm_Zt(int n, int ii, SEXP fi, SEXP tmmat)
     Memcpy((double*)(ans->x), REAL(tmmat), m * n);
     return ans;
 }
+
+/**
+ * Create a list of sparse Zt matrices from a factor list and a list
+ * of dense, skinny model matrices
+ *
+ * @param fl list of factors
+ * @param Ztl list of transposes of model matrices
+ *
+ * @return a list of sparse (full) Zt matrices
+ */
+SEXP Ztl_sparse(SEXP fl, SEXP Ztl)
+{
+    int i, nf = LENGTH(fl), nobs = LENGTH(VECTOR_ELT(fl, 0));
+    SEXP ans = PROTECT(allocVector(VECSXP, nf));
+    
+    setAttrib(ans, R_NamesSymbol, duplicate(getAttrib(fl, R_NamesSymbol)));
+    for (i = 0; i < nf; i++)
+	SET_VECTOR_ELT(ans, i, SEXP_Zt(nobs, i, VECTOR_ELT(fl, i), VECTOR_ELT(Ztl, i)));
+    UNPROTECT(1);
+    return ans;
+}	
 
 /**
  * Create the sparse Zt matrix from a factor list and list of model matrices
