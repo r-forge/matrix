@@ -2788,7 +2788,7 @@ cholmod_sparse *chm_Zt(int n, int ii, SEXP fi, SEXP tmmat)
  *
  * @return a freshly created sparse Zt object
  */
-SEXP Zt_create(SEXP fl, SEXP Ztl)
+SEXP Zt_create1(SEXP fl, SEXP Ztl)
 {
     cholmod_sparse *ans, *cat, *cur;
     SEXP f0;
@@ -2818,12 +2818,10 @@ SEXP Zt_create(SEXP fl, SEXP Ztl)
  *
  * @param fl list of factors
  * @param Ztl list of transposes of model matrices
- * @param innernm  name of the inner factor
- * @param outernm name of the outer factor
  *
  * @return a freshly created sparse Zt object
  */
-SEXP Zt_create_carryover(SEXP fl, SEXP Ztl, SEXP innernm, SEXP outernm)
+SEXP Zt_create(SEXP fl, SEXP Ztl)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix"))), fi, tmmat;
     int *dims, *p, *ii, i, nrtot = 0, nf = LENGTH(fl), nobs;
