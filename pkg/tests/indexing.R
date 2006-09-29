@@ -179,9 +179,9 @@ mc # now shows a non-structural zeros
 mc[ii, jj] <- 1:6
 mc[c(2,5), c(3,5)] <- 3.2
 validObject(mc)
-(m. <- mc)
-if(FALSE)## FIXME:
- mc[4,] <- 0 # -> error -- another Bug
+m. <- mc
+mc[4,] <- 0
+mc
 
 H <- Hilbert(9)
 Hc <- as(round(H, 3), "dsCMatrix")# a sparse matrix with no 0 ...
