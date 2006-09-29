@@ -317,3 +317,16 @@ setMethod("triu", "TsparseMatrix",
 setMethod("band", "TsparseMatrix",
 	  function(x, k1, k2, ...)
 	  as_Tsparse(band(as_Csparse(x), k1 = k1, k2 = k2, ...)))
+
+setMethod("t", signature(x = "TsparseMatrix"),
+	  function(x) {
+	      r <- new(class(x))
+	      r@i <- x@j
+	      r@j <- x@i
+	      if(any("x" == slotNames(x)))
+		  r@x <- x@x
+	      r@Dim <- rev(x@Dim)
+	      r@Dimnames <- rev(x@Dimnames)
+	      r
+      })
+
