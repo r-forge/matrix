@@ -1,5 +1,7 @@
 2006-09-29  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* R/Csparse.R (replCmat): improve for missing i / j in non-simple cases
+
 	* R/lsTMatrix.R: new files w/ missing methods
 	* R/nsTMatrix.R:  "  'for completeness'
 
