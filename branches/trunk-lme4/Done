@@ -1,3 +1,10 @@
+- Revive the "lmer" and "glmer" classes.  Slots like "family" should
+  be in "glmer" only.  Many methods for "lmer" can be simplified as,
+  for example, they will always use the scale factor.
+
+- Add a "pedigree" class and methods for it.  Allow a pedigree
+  argument in lmer.
+
 - change the status vector to an integer vertor.  The steps are
   cumulative so we only keep track of the stage.  Also REML and glmm
   are stored here.
