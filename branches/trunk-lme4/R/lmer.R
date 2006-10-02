@@ -1186,6 +1186,10 @@ carryOver <- function(formula, data, carry, REML = TRUE, control = list(),
     Y <- fr$Y; X <- fr$X; weights <- fr$weights; offset <- fr$offset
     mf <- fr$mf; mt <- fr$mt
     
+    ## establish factor list and Ztl
+    FL <- lmerFactorList(formula, mf, X)
+    fl <- FL$fl
+
     ## parse the carry-over formula
     carry <- as.formula(carry)
     if (length(carry) != 3) stop("carry must be a two-sided formula")
@@ -1211,10 +1215,6 @@ carryOver <- function(formula, data, carry, REML = TRUE, control = list(),
         fl <- FL$fl
         outer <- outer[ord]
     }
-
-    ## establish factor list and Ztl
-    FL <- lmerFactorList(formula, mf, X)
-    fl <- FL$fl
 
     Ztsp <- .Call(Ztl_sparse, fl, FL$Ztl) 
 return(Ztsp)
