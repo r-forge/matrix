@@ -1,3 +1,7 @@
+2006-10-02  Douglas Bates  <bates@R-project.org>
+
+	* tests/dg_Matrix.R: Simplify test taking into account new code.
+
 2006-09-29  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Csparse.R (replCmat): improve for missing i / j in non-simple cases
