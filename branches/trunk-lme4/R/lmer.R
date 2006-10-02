@@ -1316,8 +1316,8 @@ mlirt <-
     .Call(glmer_finalize, GSpt)
     new("glmer",
         new("lmer", mer,
-            frame = if (model) mf else data.frame(),
-            terms = mt, call = match.call()),
+            frame =  data.frame(),
+            terms = fr$mt, call = match.call()),
         weights = weights,
         family=family)
 }
