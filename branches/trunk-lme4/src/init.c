@@ -34,8 +34,9 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_update_ZXy", (DL_FUNC) &mer_update_ZXy, 1},
     {"mer_update_y", (DL_FUNC) &mer_update_y, 2},
     {"pedigree_chol", (DL_FUNC) &pedigree_chol, 2},
-    {"Zt_create", (DL_FUNC) &Zt_create, 2},
-    {"Zt_create1", (DL_FUNC) &Zt_create1, 2},
+    {"Zt_carryOver", (DL_FUNC) &Zt_carryOver, 2},
+/*     {"Zt_create", (DL_FUNC) &Zt_create, 2}, */
+/*     {"Zt_create1", (DL_FUNC) &Zt_create1, 2}, */
     {"Ztl_sparse", (DL_FUNC) &Ztl_sparse, 2},
     {NULL, NULL, 0}
 };

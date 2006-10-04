@@ -70,7 +70,7 @@ SEXP alloc_dgCMatrix(int m, int n, int nz, SEXP rownms, SEXP colnms)
     dims[0] = m; dims[1] = n;
     ALLOC_SLOT(ans, lme4_xSym, REALSXP, nz);
     ALLOC_SLOT(ans, lme4_iSym, INTSXP, nz);
-    ALLOC_SLOT(ans, lme4_pSym, INTSXP, m + 1);
+    ALLOC_SLOT(ans, lme4_pSym, INTSXP, n + 1);
     dn = ALLOC_SLOT(ans, lme4_DimNamesSym, VECSXP, 2);
     SET_VECTOR_ELT(dn, 0, duplicate(rownms));
     SET_VECTOR_ELT(dn, 1, duplicate(colnms));

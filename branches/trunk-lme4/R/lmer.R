@@ -343,7 +343,9 @@ lmer <- function(formula, data, family = gaussian,
     FL <- lmerFactorList(formula, mf)
     cnames <- with(FL, c(lapply(Ztl, rownames), list(.fixed = colnames(X))))
     nc <- with(FL, sapply(Ztl, nrow))
-    Zt <- with(FL, .Call(Zt_create1, fl, FL$Ztl))
+    Ztl <- with(FL, .Call(Ztl_sparse, fl, Ztl))
+    ## FIXME: change this when rbind has been fixed.
+    Zt <- if (length(Ztl) == 1) Ztl[[1]] else do.call("rbind", Ztl)
     fl <- FL$fl
     
     ## check and evaluate the family argument
@@ -1187,7 +1189,7 @@ carryOver <- function(formula, data, carry, REML = TRUE, control = list(),
     mf <- fr$mf; mt <- fr$mt
     
     ## establish factor list and Ztl
-    FL <- lmerFactorList(formula, mf, X)
+    FL <- lmerFactorList(formula, mf)
     fl <- FL$fl
 
     ## parse the carry-over formula
@@ -1211,14 +1213,17 @@ carryOver <- function(formula, data, carry, REML = TRUE, control = list(),
                 " within ", as.character(op[[3]]), "\n")
         Y <- Y[ord]; X <- X[ord,]; mf <- mf[ord,]
         weights <- weights[ord]; offset <- offset[ord]
-        FL <- lmerFactorList(formula, mf, X)
+        FL <- lmerFactorList(formula, mf)
         fl <- FL$fl
         outer <- outer[ord]
     }
 
-    Ztsp <- .Call(Ztl_sparse, fl, FL$Ztl) 
-return(Ztsp)
-    mer <- .Call(mer_create, fl, Zt, X, Y, REML, FL$nc, FL$cnames)
+    Ztsp <- .Call(Ztl_sparse, fl, FL$Ztl)
+    innm <- as.character(op[[2]])
+    Ztsp[[innm]] <- .Call(Zt_carryOver, outer, Ztsp[[innm]])
+    mer <- with(FL, .Call(mer_create, fl, do.call("rbind", Ztsp), X, Y, REML,
+                          sapply(Ztl, nrow), # nc
+                          c(lapply(Ztl, rownames), list(.fixed = colnames(X)))))
     if (!is.null(start)) mer <- setOmega(mer, start)
     .Call(mer_ECMEsteps, mer, cv$niterEM, cv$EMverbose)
     LMEoptimize(mer) <- cv
@@ -1235,7 +1240,10 @@ mlirt <-
     formula <- as.formula(formula)
     if (length(formula) < 3) stop("formula must be a two-sided formula")
     cv <- do.call("lmerControl", control)
-    
+
+    ## Should difficulties be modeled as random effects?
+
+    ranDiff <- ".item" %in% all.vars(formula)
     ## Establish model frame and fixed-effects model matrix and terms
     mc <- match.call()
     fr <- lmerFrames(mc, formula, data, contrasts)
@@ -1250,7 +1258,9 @@ mlirt <-
     ## expand model frame etc according to the items
     ind <- rep.int(1:nr, nc)
     mf <- fr$mf[ind, ]
-    X <- cbind(fr$X[ind, ], contr.sum(nc)[rep(1:nc,each = nr),])
+    X <- fr$X[ind, ]
+    if (ranDiff) mf$.item <- gl(nc, nr)
+    else X <- cbind(X, -contr.sum(nc)[rep(1:nc,each = nr),])
     Y <- as.vector(Y)
     offset <- fr$offset[ind]
 
@@ -1260,7 +1270,9 @@ mlirt <-
     FL <- lmerFactorList(form, mf)
     cnames <- with(FL, c(lapply(Ztl, rownames), list(.fixed = colnames(X))))
     nc <- with(FL, sapply(Ztl, nrow))
-    Zt <- with(FL, .Call(Zt_create1, fl, Ztl))
+    Ztl <- with(FL, .Call(Ztl_sparse, fl, Ztl))
+    ## FIXME: change this when rbind has been fixed.
+    Zt <- if (length(Ztl) == 1) Ztl[[1]] else do.call("rbind", Ztl)
     fl <- FL$fl
 
     ## check and evaluate the family argument
