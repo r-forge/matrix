@@ -2778,6 +2778,93 @@ SEXP SEXP_Zt(int n, int ii, SEXP fi, SEXP tmmat)
     return ans;
 }
 
+/**
+ * Create a list of sparse Zt matrices from a factor list and a list
+ * of dense, skinny model matrices
+ *
+ * @param fl list of factors
+ * @param Ztl list of transposes of model matrices
+ *
+ * @return a list of sparse (full) Zt matrices
+ */
+SEXP Ztl_sparse(SEXP fl, SEXP Ztl)
+{
+    int i, nf = LENGTH(fl), nobs = LENGTH(VECTOR_ELT(fl, 0));
+    SEXP ans = PROTECT(allocVector(VECSXP, nf));
+    
+    setAttrib(ans, R_NamesSymbol, duplicate(getAttrib(fl, R_NamesSymbol)));
+    for (i = 0; i < nf; i++)
+	SET_VECTOR_ELT(ans, i, SEXP_Zt(nobs, i, VECTOR_ELT(fl, i), VECTOR_ELT(Ztl, i)));
+    UNPROTECT(1);
+    return ans;
+}
+
+/**
+ * Create a new sparse Zt matrix by carrying over elements for the same level of f
+ *
+ * @param f factor determining the carryover (e.g. student)
+ * @param Zt sparse model matrix for another factor (e.g. teacher)
+ *
+ * @return modified model matrix
+ */
+SEXP Zt_carryOver(SEXP fp, SEXP Zt)
+{
+    cholmod_sparse *ans, *chsz = M_as_cholmod_sparse(Zt);
+    cholmod_triplet *ant, *chtz = M_cholmod_sparse_to_triplet(chsz, &c);
+    int *cct, *p = (int*)(chsz->p), *f = INTEGER(fp);
+    int cmax, j, jj, k, last, n = LENGTH(fp), nlev, nnz, ntot, q = p[1] - p[0];
+    int *ii, *ij, *oi, *oj, ip, op;
+    double *ix, *ox;
+
+    Free(chsz);
+    if (!isFactor(fp)) error(_("f must be a factor"));
+    nlev = LENGTH(getAttrib(fp, R_LevelsSymbol));
+    cct = Calloc(nlev, int);
+    
+    if (chtz->ncol != n) error(_("ncol(Zt) must match length(fp)"));
+    for (j = 0; j < n; j++)	/* check consistency of p */
+	if (p[j+1] - p[j] != q) error(_("nonzeros per column in Zt must be constant"));
+				/* create column counts */
+    for (last = -1, j = 0; j < n; j++) {
+	int ll = f[j] - 1;
+	if (last > ll) error(_("f is not in increasing order"));
+	if (ll == last) cct[ll]++;
+	else {cct[ll] = 1; last = ll;};
+    }
+    if (nlev != f[n - 1]) error(_("number of levels of f is not consistent"));
+				/*  max column count and total nonzeros*/
+    for (cmax = -1, ntot = 0, k = 0; k < nlev; k++) {
+	cmax = (cct[k] > cmax) ? cct[k] : cmax;
+	ntot += (cct[k] * (cct[k] + 1))/2;
+    }
+    ant = M_cholmod_allocate_triplet(chtz->nrow, chtz->ncol, (size_t)(ntot*q), 
+				     0 /*stype*/, CHOLMOD_REAL, &c);
+    ip = 0; ii = (int*)(chtz->i); ij = (int*)(chtz->j); ix = (double*)(chtz->x);
+    op = 0; oi = (int*)(ant->i); oj = (int*)(ant->j); ox = (double*)(ant->x);
+    for (k = 0; k < nlev; k++) {
+	for (j = 0; j < cct[k]; j++) {
+	    for (jj = 0; jj < cct[k] - j; jj++) {
+		oi[op] = ii[ip]; oj[op] = ij[ip] + jj; ox[op] = ix[ip];
+		op++;
+	    }
+	    ip++;
+	}
+    }
+#if 0
+				/* fake it for the time being */
+    nnz = ant->nnz = chtz->nnz;
+    Memcpy((int*)(ant->i), (int*)(chtz->i), nnz);
+    Memcpy((int*)(ant->j), (int*)(chtz->j), nnz);
+    Memcpy((double*)(ant->x), (double*)(chtz->x), nnz);
+#endif
+    ans = M_cholmod_triplet_to_sparse(ant, nnz, &c);
+    M_cholmod_free_triplet(&chtz, &c);
+    M_cholmod_free_triplet(&ant, &c);
+    Free(cct);
+    return M_chm_sparse_to_SEXP(ans, 1, 0, 0, "", R_NilValue);
+}
+	
+#if 0
 static
 cholmod_sparse *chm_Zt(int n, int ii, SEXP fi, SEXP tmmat)
 {
@@ -2804,27 +2891,6 @@ cholmod_sparse *chm_Zt(int n, int ii, SEXP fi, SEXP tmmat)
     Memcpy((double*)(ans->x), REAL(tmmat), m * n);
     return ans;
 }
-
-/**
- * Create a list of sparse Zt matrices from a factor list and a list
- * of dense, skinny model matrices
- *
- * @param fl list of factors
- * @param Ztl list of transposes of model matrices
- *
- * @return a list of sparse (full) Zt matrices
- */
-SEXP Ztl_sparse(SEXP fl, SEXP Ztl)
-{
-    int i, nf = LENGTH(fl), nobs = LENGTH(VECTOR_ELT(fl, 0));
-    SEXP ans = PROTECT(allocVector(VECSXP, nf));
-    
-    setAttrib(ans, R_NamesSymbol, duplicate(getAttrib(fl, R_NamesSymbol)));
-    for (i = 0; i < nf; i++)
-	SET_VECTOR_ELT(ans, i, SEXP_Zt(nobs, i, VECTOR_ELT(fl, i), VECTOR_ELT(Ztl, i)));
-    UNPROTECT(1);
-    return ans;
-}	
 
 /**
  * Create the sparse Zt matrix from a factor list and list of model matrices
@@ -2923,6 +2989,7 @@ SEXP Zt_create(SEXP fl, SEXP Ztl)
     UNPROTECT(1);
     return ans;
 }
+#endif
 
 /* MCMCsamp for generalized linear mixed models.
  *
