@@ -6,6 +6,8 @@
 \title{Methods for "[<-" - Assigning to Subsets for 'Matrix'}
 % in ../R/Matrix.R
 \alias{[<-,Matrix,ANY,ANY,ANY-method}
+\alias{[<-,Matrix,ANY,ANY,Matrix-method}
+\alias{[<-,Matrix,ANY,ANY,matrix-method}
 \alias{[<-,Matrix,missing,missing,ANY-method}
 % \alias{[<-,Matrix,missing,numeric,missing-method}
 % \alias{[<-,Matrix,numeric,missing,missing-method}
