@@ -1,2 +1,0 @@
-"use ? for help()"
-"CRAN pkg announcements"
