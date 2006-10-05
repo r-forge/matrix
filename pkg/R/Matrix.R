@@ -314,18 +314,28 @@ setMethod("[", signature(x = "Matrix", i = "logical", j = "missing",
 setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
                                 value = "ANY"),## double/logical/...
 	  function (x, value) {
-              x@x <- value
-              validObject(x)# check if type and lengths above match
-              x
+	      ## Fails for 'nMatrix' ... FIXME : make sure have method there
+	      x@x <- value
+	      validObject(x)# check if type and lengths above match
+	      x
           })
 
-## Method for all 'Matrix' kinds (rather than incomprehensible error messages);
+setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
+				value = "Matrix"),
+		 function (x, i, j, value)
+		 callGeneric(x=x, i=i, j=j, value = as.vector(value)))
+setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
+				value = "matrix"),
+		 function (x, i, j, value)
+		 callGeneric(x=x, i=i, j=j, value = c(value)))
+
 ## (ANY,ANY,ANY) is used when no `real method' is implemented :
 setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
                                 value = "ANY"),
 	  function (x, i, j, value) {
               if(!is.atomic(value))
-                  stop("RHS 'value' must match matrix class ", class(x))
+		  stop(sprintf("RHS 'value' (class %s) matches 'ANY', but must match matrix class %s",
+			       class(value),class(x)))
               else stop("not-yet-implemented 'Matrix[<-' method")
           })
 
