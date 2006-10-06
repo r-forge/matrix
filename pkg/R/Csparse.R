@@ -115,9 +115,9 @@ replCmat <- function (x, i, j, value)
     }
     ## else: lenV := length(value)	 is > 0
     if(lenRepl %% lenV != 0)
-        stop("number of items to replace is not a multiple of replacement length")
+	stop("number of items to replace is not a multiple of replacement length")
     if(lenV > lenRepl)
-        stop("too many replacement values")
+	stop("too many replacement values")
 
     if(is(x, "symmetricMatrix")) ## only half the indices are there..
 	x <- .Call(Csparse_symmetric_to_general, x)

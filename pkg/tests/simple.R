@@ -179,6 +179,8 @@ B <- as(as(xlx,  "lMatrix"), "TsparseMatrix")
 ij <- function(a) a@i + ncol(a) * a@j
 stopifnot(all(ij(A) %in% ij(B)))
 
-
+l3 <- upper.tri(matrix(,3,3))
+(c3 <- as(l3, "CsparseMatrix"))
+stopifnot(validObject(c3), is(c3, "CsparseMatrix"), is(c3, "triangularMatrix"))
 
 cat('Time elapsed: ', proc.time(),'\n') # "stats"

@@ -6,8 +6,10 @@
 setAs("Matrix", "sparseMatrix", function(from) as_Csparse(from))
 setAs("Matrix", "denseMatrix",  function(from) as_dense(from))
 
+## Most of these work; this is a last resort:
 setAs(from = "Matrix", to = "matrix", # do *not* call base::as.matrix() here:
       function(from) .bail.out.2("coerce", class(from), class(to)))
+setAs(from = "matrix", to = "Matrix", function(from) Matrix(from))
 
 ## ## probably not needed eventually:
 ## setAs(from = "ddenseMatrix", to = "matrix",
@@ -81,7 +83,8 @@ Matrix <-
 	prod(dim(m)) > 2*sum(is.na(m <- as(m, "matrix")) | m != 0)
 
     i.M <- is(data, "Matrix")
-    if(is.null(sparse) && (i.M || is(data, "matrix")))
+
+    if(is.null(sparse1 <- sparse) && (i.M || is(data, "matrix")))
 	sparse <- sparseDefault(data)
 
     doDN <- TRUE
@@ -96,10 +99,9 @@ Matrix <-
 	    nrow <- ceiling(length(data)/ncol)
 	else if (missing(ncol))
 	    ncol <- ceiling(length(data)/nrow)
-	if(length(data) == 1 && !is.na(data) && data == 0 &&
-           !identical(sparse, FALSE)) {
-
-	    if(is.null(sparse)) sparse <- TRUE
+	if(length(data) == 1 && is0(data) && !identical(sparse, FALSE)) {
+            ## Matrix(0, ...) : always sparse unless "sparse = FALSE":
+	    if(is.null(sparse)) sparse1 <- sparse <- TRUE
 	    ## will be sparse: do NOT construct full matrix!
 	    data <- new(if(is.numeric(data)) "dgTMatrix" else
 			if(is.logical(data)) "lgTMatrix" else
@@ -127,11 +129,9 @@ Matrix <-
     if(isDiag)
 	isDiag <- isDiagonal(data)
 
-### TODO: Compare with as.Matrix() and its tests in ./dgeMatrix.R
-
     ## Find proper matrix class 'cl'
     cl <-
-	if(isDiag)
+	if(isDiag && !isTRUE(sparse1))
 	    "diagonalMatrix" # -> will automatically check for type
 	else {
 	    ## consider it's type
