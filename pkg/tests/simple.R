@@ -37,8 +37,8 @@ assert.EQ.mat(t1, as(t1c, "matrix"))
 ## from  0-diagonal to unit-diagonal {low-level step}:
 tu <- t1 ; tu@diag <- "U"
 tu
-stopifnot(validObject(cu <- as(tu, "dtCMatrix")),
-	  validObject(tu. <- as(cu, "dtTMatrix")),
+cu <- as(tu, "dtCMatrix")
+stopifnot(validObject(cu), validObject(tu. <- as(cu, "dtTMatrix")),
           ## NOT: identical(tu, tu.), # since T* is not unique!
 	  identical(cu, as(tu., "dtCMatrix")),
 	  validObject(t(cu)),

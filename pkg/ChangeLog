@@ -6,6 +6,8 @@
 	(sparse) matrices.
 	* man/bdiag.Rd: docu + examples
 
+	* R/Csparse.R (replCmat): calling new Csparse_drop() now.
+
 	* src/Csparse.c (Csparse_general_to_symmetric, Csparse_drop): new functions
 	* R/lsCMatrix.R: three more coercions to lsC (thanks to the above)
 

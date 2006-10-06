@@ -146,7 +146,16 @@ replCmat <- function (x, i, j, value)
 	x[i, ] <- value
     else
 	x[i,j] <- value
-    as_CspClass(x, clx)
+
+    ## Careful: 'Csparse_drop' also drops triangularity,...
+    ## .Call(Csparse_drop, as_CspClass(x, clx), 0)
+
+    if(any(is0(x@x))) { ## drop all values that "happen to be 0"
+	## FIXME: Csparse_drop should do this
+	as_CspClass(.Call(Csparse_drop, as_CspClass(x, clx), 0),
+		    clx)
+    }
+    else as_CspClass(x, clx)
 }
 
 setReplaceMethod("[", signature(x = "CsparseMatrix", i = "index", j = "missing",
