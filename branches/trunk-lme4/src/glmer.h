@@ -11,10 +11,11 @@ typedef struct glmer_struct
     SEXP eta;        /* linear predictor */
     SEXP mu;         /* mean vector */
     SEXP LMEopt;     /* expression for LME optimization */
-    SEXP dev_resids; /* expression for deviance residuals (if fltype == 0) */
+    SEXP dev_resfunc; /* expression for deviance residuals (if fltype == 0) */
     SEXP linkinv;    /* expression for inverse link evaluation (if fltype == 0) */
     SEXP mu_eta;     /* expression for dmu/deta evaluation (if fltype == 0) */
     SEXP vfunc;      /* expression for variance evaluation (if fltype == 0) */
+    double *dev_res; /* deviance residuals */
     double *dmu_deta;/* derivative vector */
     double *var;     /* variance vector */
     double *offset;  /* offset for GLM */
