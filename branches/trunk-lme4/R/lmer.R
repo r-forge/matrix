@@ -356,10 +356,18 @@ lmer <- function(formula, data, family = gaussian,
         print(family)
         stop("'family' not recognized")
     }
+    ## check for predefined families
+    fltype <- 0                         # not a predefined type
+    if (family$family == "gaussian" && family$link == "identity") fltype <- -1
+    if (family$family == "binomial" && family$link == "logit") fltype <- 1
+    if (family$family == "binomial" && family$link == "probit") fltype <- 2
+    if (family$family == "poisson" && family$link == "link") fltype <- 3
+    fltype <- as.integer(fltype)
+    
     method <- match.arg(method)
     
     ## quick return for a linear mixed model
-    if (family$family == "gaussian" && family$link == "identity") {
+    if (fltype < 0) {
         mer <- .Call(mer_create, fl, Zt, X, Y, method == "REML", nc, cnames)
         if (!is.null(start)) mer <- setOmega(mer, start)
         .Call(mer_ECMEsteps, mer, cv$niterEM, cv$EMverbose)
@@ -401,7 +409,7 @@ lmer <- function(formula, data, family = gaussian,
     if (family$family %in% c("binomial", "poisson")) # set the constant scale
         mer@devComp[8] <- -mean(weights)
     mer@status["glmm"] <- as.integer(switch(method, PQL = 1, Laplace = 2, AGQ = 3))
-    GSpt <- .Call(glmer_init, environment())
+    GSpt <- .Call(glmer_init, environment(), fltype)
     if (cv$usePQL) {
         .Call(glmer_PQL, GSpt)  # obtain PQL estimates
         PQLpars <- c(fixef(mer),
