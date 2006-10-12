@@ -1,5 +1,40 @@
 #include "glmer.h"
 
+static const double LTHRESH = 30.;
+static const double MLTHRESH = -30.;
+static const double PTHRESH = 8.;
+static const double MPTHRESH = 8.;
+static const double INVEPS = 1/DOUBLE_EPS;
+
+/** 
+ * Evaluate x/(1 - x). An inline function is used so that x is
+ * evaluated once only. 
+ * 
+ * @param x input in the range (0, 1)
+ * 
+ * @return x/(1 - x) 
+ */
+static R_INLINE double x_d_omx(double x) {
+    if (x < 0 || x > 1)
+	error(_("Value %d out of range (0, 1)"), x);
+    return x/(1 - x);
+}
+
+/** 
+ * Evaluate x/(1 + x). An inline function is used so that x is
+ * evaluated once only.
+ * 
+ * @param x input
+ * 
+ * @return x/(1 + x) 
+ */
+static R_INLINE double x_d_opx(double x) {return x/(1 + x);}
+
+static R_INLINE double y_log_y(double y, double mu)
+{
+    return (y) ? (y * log(y/mu)) : 0;
+}
+
 /**
  * Evaluate the quadratic form in b defined by Omega
  *
@@ -172,31 +207,171 @@ internal_Gaussian_deviance(int p, int q, cholmod_factor *L,
 }
 
 /**
+ * Evaluate the inverse link function at eta storing the result in mu
+ *
+ * @param GS a GlmerStruct object
+ */
+static void glmer_linkinv(GS)
+{
+    int i;
+    double *eta = REAL(GS->eta), *mu = REAL(GS->mu);
+
+    switch(GS->fltype) {
+    case 1: 			/* binomial with logit link */
+	for (i = 0; i < GS->n; i++) {
+	    double etai = eta[i], tmp;
+	    tmp = (etai < MLTHRESH) ? DOUBLE_EPS :
+		((etai > LTHRESH) ? INVEPS : exp(etai));
+	    mu[i] = x_d_opx(tmp);
+	}
+	break;
+    case 2:			/* binomial with probit link */
+	for (i = 0; i < GS->n; i++) {
+	    double etai = eta[i], tmp;
+	    tmp = (etai < MPTHRESH) ? DOUBLE_EPS :
+		((etai > PTHRESH) ? INVEPS : etai);
+	    mu[i] = pnorm5(etai, 0, 1, 1, 0);
+	}
+	break;
+    case 3:			/* Poisson with log link */
+	for (i = 0; i < GS->n; i++) {
+	    double tmp = exp(eta[i]);
+	    mu[i] = (tmp < DOUBLE_EPS) ? DOUBLE_EPS : tmp;
+	}
+	break;
+    default:
+	eval_check_store(GS->linkinv, GS->rho, GS->mu);
+    }
+}
+
+/**
+ * Evaluate the variance function for the link
+ *
+ * @param GS a GlmerStruct object
+ */
+static void glmer_var(GS)
+{
+    int i;
+    double mu = REAL(GS->mu);
+
+    switch(GS->fltype) {
+    case 1: 			/* binomial family with logit or probit link */
+    case 2:
+	for (i = 0; i < GS->n; i++) {
+	    double mui = mu[i];
+	    GS->var[i] = mui * (1 - mui);
+	}
+	break;
+    case 3:			/* Poisson with log link */
+	for (i = 0; i < GS->n; i++) {
+	    GS->var[i] = mu[i];
+	}
+	break;
+    default: {
+	SEXP ans = PROTECT(eval_check(GS->vfunc, GS->rho, REALSXP, GS->n));
+	Memcpy(GS->var, REAL(ans), GS->n);
+    }
+}
+
+/**
+ * Evaluate the derivative of mu wrt eta for the link
+ *
+ * @param GS a GlmerStruct object
+ */
+static void glmer_dmu_deta(GS)
+{
+    int i;
+    double eta = REAL(GS->eta);
+
+    switch(GS->fltype) {
+    case 1: 			/* binomial with logit link */
+	for (i = 0; i < GS->n; i++) {
+	    double etai = eta[i];
+	    double opexp = 1 + exp(etai);
+	    
+	    GS->dmu_deta[i] = (etai > THRESH || etai < MTHRESH) ? DOUBLE_EPS :
+		exp(etai)/(opexp * opexp);
+	}
+	break;
+    case 2:			/* binomial with probit link */
+	for (i = 0; i < GS->n; i++) {
+	    double tmp = dnorm(eta[i], 0, 1, 0);
+	    GS->dmu_deta[i] = (tmp < DOUBLE_EPS) ? DOUBLE_EPS : tmp;
+	}
+	break;
+    case 3:			/* Poisson with log link */
+	for (i = 0; i < GS->n; i++) {
+	    double tmp = exp(eta[i]);
+	    GS->dmu_deta[i] = (tmp < DOUBLE_EPS) ? DOUBLE_EPS : tmp;
+	}
+	break;
+    default: {
+	SEXP ans = PROTECT(eval_check(GS->mu_eta, GS->rho, REALSXP, GS->n));
+	Memcpy(GS->dmu_deta, REAL(ans), GS->n);
+	UNPROTECT(1);
+    }
+}
+
+/**
+ * Evaluate the deviance residuals
+ *
+ * @param GS a GlmerStruct object
+ */
+static void glmer_dev_resids(GS)
+{
+    int i;
+    double eta = REAL(GS->eta);
+
+    switch(GS->fltype) {
+    case 1: 			/* binomial with logit link */
+	for (i = 0; i < GS->n; i++) {
+	    double etai = eta[i];
+	    double opexp = 1 + exp(etai);
+	    
+	    GS->dmu_deta[i] = (etai > THRESH || etai < MTHRESH) ? DOUBLE_EPS :
+		exp(etai)/(opexp * opexp);
+	}
+	break;
+    case 2:			/* binomial with probit link */
+	for (i = 0; i < GS->n; i++) {
+	    double tmp = dnorm(eta[i], 0, 1, 0);
+	    GS->dmu_deta[i] = (tmp < DOUBLE_EPS) ? DOUBLE_EPS : tmp;
+	}
+	break;
+    case 3:			/* Poisson with log link */
+	for (i = 0; i < GS->n; i++) {
+	    double tmp = exp(eta[i]);
+	    GS->dmu_deta[i] = (tmp < DOUBLE_EPS) ? DOUBLE_EPS : tmp;
+	}
+	break;
+    default: {
+	SEXP ans = PROTECT(eval_check(GS->mu_eta, GS->rho, REALSXP, GS->n));
+	Memcpy(GS->dmu_deta, REAL(ans), GS->n);
+	UNPROTECT(1);
+    }
+}
+
+/**
  * Evaluate new weights and working residuals.
  *
  * @param GS a GlmerStruct object
  */
 static void
 internal_glmer_reweight(GlmerStruct GS) {
-    SEXP dmu_deta, var;
     int i;
-    double *w = REAL(GET_SLOT(GS->mer, lme4_wtsSym)),
+    double *eta = REAL(GS->eta), *mu = REAL(GS->mu),
+	*w = REAL(GET_SLOT(GS->mer, lme4_wtsSym)),
 	*y = REAL(GET_SLOT(GS->mer, lme4_ySym)),
 	*z = REAL(GET_SLOT(GS->mer, lme4_wrkresSym));
 
 				/* reweight mer */
-    eval_check_store(GS->linkinv, GS->rho, GS->mu);
-    dmu_deta = PROTECT(eval_check(GS->mu_eta, GS->rho,
-				  REALSXP, GS->n));
-    var = PROTECT(eval_check(GS->var, GS->rho,
-			     REALSXP, GS->n));
-    /* FIXME: speedup doing REAL(.) outside of loop :*/
+    glmer_linkinv(GS);
+    glmer_dmu_deta(GS);
+    glmer_var(GS);
     for (i = 0; i < GS->n; i++) {
-	w[i] = GS->wts[i] * REAL(dmu_deta)[i]/sqrt(REAL(var)[i]);
-	z[i] = REAL(GS->eta)[i] - GS->offset[i] +
-	    (y[i] - REAL(GS->mu)[i])/REAL(dmu_deta)[i];
+	w[i] = GS->wts[i] * GS->dmu_deta[i]/sqrt(GS->var[i]);
+	z[i] = eta[i] - GS->offset[i] + (y[i] - mu[i])/GS->dmu_deta[i];
     }
-    UNPROTECT(2);
     mer_update_ZXy(GS->mer);
 }
 
@@ -363,6 +538,7 @@ SEXP glmer_devLaplace(SEXP pars, SEXP GSp)
 SEXP glmer_finalize(SEXP GSp) {
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
 
+    Free(GS->dev_resids); Free(GS->dmu_deta); Free(GS->var);
     Free(GS->offset); Free(GS->wts); Free(GS->etaold);
     Free(GS);
     return R_NilValue;
@@ -376,27 +552,28 @@ SEXP glmer_finalize(SEXP GSp) {
  *
  * @return An external pointer to a GlmerStruct
  */
-SEXP glmer_init(SEXP rho) {
+SEXP glmer_init(SEXP rho, SEXP fltypep) {
     GlmerStruct GS;
     SEXP tmp, y, Ztx;
+    int fltype = asInteger(fltypep);
 
 
     GS = (GlmerStruct) Calloc(1, glmer_struct);
     if (!isEnvironment(rho))
 	error(_("`rho' must be an environment"));
     GS->rho = rho;
-#if defined(R_VERSION) && R_VERSION >= R_Version(2, 4, 0)
     GS->mer = find_and_check(rho, install("mer"), S4SXP, 0);
-#else
-    GS->mer = find_and_check(rho, install("mer"), VECSXP, 0);
-#endif /* S4SXP */
     y = GET_SLOT(GS->mer, lme4_ySym);
+    GS->fltype = fltype;
     GS->n = LENGTH(y);
     GS->p = LENGTH(GET_SLOT(GS->mer, lme4_rXySym));
     GS->y = Memcpy(Calloc(GS->n, double), REAL(y), GS->n);
     Ztx = GET_SLOT(GET_SLOT(GS->mer, lme4_ZtSym), lme4_xSym);
     GS->eta = find_and_check(rho, install("eta"), REALSXP, GS->n);
     GS->mu = find_and_check(rho, install("mu"), REALSXP, GS->n);
+    GS->dev_resids = Calloc(GS->n, double);
+    GS->dmu_deta = Calloc(GS->n, double);
+    GS->var = Calloc(GS->n, double);
     tmp = find_and_check(rho, install("offset"), REALSXP, GS->n);
     GS->offset = Memcpy(Calloc(GS->n, double), REAL(tmp), GS->n);
     tmp = find_and_check(rho, install("weights"), REALSXP, GS->n);
@@ -410,17 +587,18 @@ SEXP glmer_init(SEXP rho) {
     GS->nf = LENGTH(GET_SLOT(GS->mer, lme4_flistSym));
     GS->npar = GS->p +
 	coef_length(GS->nf, INTEGER(GET_SLOT(GS->mer, lme4_ncSym)));
-
+/*     if (!fltype) { */
     GS->linkinv = find_and_check(rho, install("linkinv"),
 				 LANGSXP, 0);
     GS->mu_eta = find_and_check(rho, install("mu.eta"),
 				LANGSXP, 0);
-    GS->var = find_and_check(rho, install("variance"),
+    GS->vfunc = find_and_check(rho, install("variance"),
 			     LANGSXP, 0);
-    GS->LMEopt = find_and_check(rho, install("doLMEopt"),
-				LANGSXP, 0);
     GS->dev_resids = find_and_check(rho, install("dev.resids"),
 				    LANGSXP, 0);
+/*     } else {GS->linkinv = GS->mu_eta = GS->vfunc = GS->dev_resids = (SEXP)NULL;} */
+
+    GS->LMEopt = find_and_check(rho, install("doLMEopt"), LANGSXP, 0);
     return R_MakeExternalPtr(GS, R_NilValue, GS->mer);
 }
 

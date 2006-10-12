@@ -8,7 +8,7 @@ static R_CallMethodDef CallEntries[] = {
     {"glmer_PQL", (DL_FUNC) &glmer_PQL, 1},
     {"glmer_devLaplace", (DL_FUNC) &glmer_devLaplace, 2},
     {"glmer_finalize", (DL_FUNC) &glmer_finalize, 1},
-    {"glmer_init", (DL_FUNC) &glmer_init, 1},
+    {"glmer_init", (DL_FUNC) &glmer_init, 2},
     {"lme4_rWishart", (DL_FUNC) &lme4_rWishart, 3},
     {"mer_ECMEsteps", (DL_FUNC) &mer_ECMEsteps, 3},
     {"mer_MCMCsamp", (DL_FUNC) &mer_MCMCsamp, 5},

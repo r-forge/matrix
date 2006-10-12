@@ -1,5 +1,8 @@
 2006-10-12  Douglas Bates  <bates@stat.wisc.edu>
 
+	* src/glmer.c: pass and store family-link type allowing internal
+	evaluation of link, linkinv, etc. for common families.
+
 	* src/lmer.[ch],Wishart.[ch],lme4_utils.[ch]: Move utility
 	functions from lmer.[ch] to make code structure cleaner.
 
