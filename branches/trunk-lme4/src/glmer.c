@@ -211,7 +211,7 @@ internal_Gaussian_deviance(int p, int q, cholmod_factor *L,
  *
  * @param GS a GlmerStruct object
  */
-static void glmer_linkinv(GS)
+static void glmer_linkinv(GlmerStruct GS)
 {
     int i;
     double *eta = REAL(GS->eta), *mu = REAL(GS->mu);
@@ -249,10 +249,10 @@ static void glmer_linkinv(GS)
  *
  * @param GS a GlmerStruct object
  */
-static void glmer_var(GS)
+static void glmer_var(GlmerStruct GS)
 {
     int i;
-    double mu = REAL(GS->mu);
+    double *mu = REAL(GS->mu);
 
     switch(GS->fltype) {
     case 1: 			/* binomial family with logit or probit link */
@@ -267,9 +267,12 @@ static void glmer_var(GS)
 	    GS->var[i] = mu[i];
 	}
 	break;
-    default: {
+    default:
+    {
 	SEXP ans = PROTECT(eval_check(GS->vfunc, GS->rho, REALSXP, GS->n));
 	Memcpy(GS->var, REAL(ans), GS->n);
+	UNPROTECT(1);
+    }
     }
 }
 
@@ -278,10 +281,10 @@ static void glmer_var(GS)
  *
  * @param GS a GlmerStruct object
  */
-static void glmer_dmu_deta(GS)
+static void glmer_dmu_deta(GlmerStruct GS)
 {
     int i;
-    double eta = REAL(GS->eta);
+    double *eta = REAL(GS->eta);
 
     switch(GS->fltype) {
     case 1: 			/* binomial with logit link */
@@ -289,8 +292,8 @@ static void glmer_dmu_deta(GS)
 	    double etai = eta[i];
 	    double opexp = 1 + exp(etai);
 	    
-	    GS->dmu_deta[i] = (etai > THRESH || etai < MTHRESH) ? DOUBLE_EPS :
-		exp(etai)/(opexp * opexp);
+	    GS->dmu_deta[i] = (etai > LTHRESH || etai < MLTHRESH) ?
+		DOUBLE_EPS : exp(etai)/(opexp * opexp);
 	}
 	break;
     case 2:			/* binomial with probit link */
@@ -310,6 +313,7 @@ static void glmer_dmu_deta(GS)
 	Memcpy(GS->dmu_deta, REAL(ans), GS->n);
 	UNPROTECT(1);
     }
+    }
 }
 
 /**
@@ -317,10 +321,10 @@ static void glmer_dmu_deta(GS)
  *
  * @param GS a GlmerStruct object
  */
-static void glmer_dev_resids(GS)
+static void glmer_dev_resids(GlmerStruct GS)
 {
     int i;
-    double eta = REAL(GS->eta);
+    double *eta = REAL(GS->eta);
 
     switch(GS->fltype) {
     case 1: 			/* binomial with logit link */
@@ -328,8 +332,8 @@ static void glmer_dev_resids(GS)
 	    double etai = eta[i];
 	    double opexp = 1 + exp(etai);
 	    
-	    GS->dmu_deta[i] = (etai > THRESH || etai < MTHRESH) ? DOUBLE_EPS :
-		exp(etai)/(opexp * opexp);
+	    GS->dmu_deta[i] = (etai > LTHRESH || etai < MLTHRESH) ?
+		DOUBLE_EPS : exp(etai)/(opexp * opexp);
 	}
 	break;
     case 2:			/* binomial with probit link */
@@ -348,6 +352,7 @@ static void glmer_dev_resids(GS)
 	SEXP ans = PROTECT(eval_check(GS->mu_eta, GS->rho, REALSXP, GS->n));
 	Memcpy(GS->dmu_deta, REAL(ans), GS->n);
 	UNPROTECT(1);
+    }
     }
 }
 
@@ -426,10 +431,9 @@ random_effects_deviance(GlmerStruct GS)
     double ans, *devs;
 
     internal_mer_fitted(GS->mer, GS->offset, REAL(GS->eta));
-    eval_check_store(GS->linkinv, GS->rho, GS->mu);
-    devs = REAL(PROTECT(eval_check(GS->dev_resids, GS->rho, REALSXP, GS->n)));
-    for (i = 0, ans = 0; i < GS->n; i++) ans += devs[i];
-    UNPROTECT(1);
+    glmer_linkinv(GS);
+    glmer_dev_resids(GS);
+    for (i = 0, ans = 0; i < GS->n; i++) ans += GS->dev_res[i];
     return ans;
 }
 
@@ -538,7 +542,7 @@ SEXP glmer_devLaplace(SEXP pars, SEXP GSp)
 SEXP glmer_finalize(SEXP GSp) {
     GlmerStruct GS = (GlmerStruct) R_ExternalPtrAddr(GSp);
 
-    Free(GS->dev_resids); Free(GS->dmu_deta); Free(GS->var);
+    Free(GS->dev_res); Free(GS->dmu_deta); Free(GS->var);
     Free(GS->offset); Free(GS->wts); Free(GS->etaold);
     Free(GS);
     return R_NilValue;
@@ -571,7 +575,7 @@ SEXP glmer_init(SEXP rho, SEXP fltypep) {
     Ztx = GET_SLOT(GET_SLOT(GS->mer, lme4_ZtSym), lme4_xSym);
     GS->eta = find_and_check(rho, install("eta"), REALSXP, GS->n);
     GS->mu = find_and_check(rho, install("mu"), REALSXP, GS->n);
-    GS->dev_resids = Calloc(GS->n, double);
+    GS->dev_res = Calloc(GS->n, double);
     GS->dmu_deta = Calloc(GS->n, double);
     GS->var = Calloc(GS->n, double);
     tmp = find_and_check(rho, install("offset"), REALSXP, GS->n);
@@ -594,9 +598,9 @@ SEXP glmer_init(SEXP rho, SEXP fltypep) {
 				LANGSXP, 0);
     GS->vfunc = find_and_check(rho, install("variance"),
 			     LANGSXP, 0);
-    GS->dev_resids = find_and_check(rho, install("dev.resids"),
+    GS->dev_resfunc = find_and_check(rho, install("dev.resids"),
 				    LANGSXP, 0);
-/*     } else {GS->linkinv = GS->mu_eta = GS->vfunc = GS->dev_resids = (SEXP)NULL;} */
+/*     } else {GS->linkinv = GS->mu_eta = GS->vfunc = GS->dev_resfunc = (SEXP)NULL;} */
 
     GS->LMEopt = find_and_check(rho, install("doLMEopt"), LANGSXP, 0);
     return R_MakeExternalPtr(GS, R_NilValue, GS->mer);
