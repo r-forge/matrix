@@ -5,7 +5,7 @@
 
 2006-10-06  Douglas Bates  <bates@stat.wisc.edu>
 
-	* R/dgCMatrix.R: deprecate the writeHB function.  Use writeMM instead.
+	* R/d[gs]CMatrix.R: deprecate the writeHB function.  Use writeMM instead.
 
 2006-10-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 
