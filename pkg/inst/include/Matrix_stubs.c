@@ -238,6 +238,16 @@ M_cholmod_finish(cholmod_common *Common)
 }
 
 int attribute_hidden
+M_cholmod_sort(cholmod_sparse *A, cholmod_common *Common)
+{
+    static int(*fun)(cholmod_sparse*,cholmod_common*) = NULL;
+    if (fun == NULL)
+	fun = (int(*)(cholmod_sparse*,cholmod_common*))
+	    R_GetCCallable("Matrix", "cholmod_sort");
+    return fun(A, Common);
+}
+
+int attribute_hidden
 M_cholmod_free_dense(cholmod_dense **A, cholmod_common *Common)
 {
     static int(*fun)(cholmod_dense**,cholmod_common*) = NULL;
