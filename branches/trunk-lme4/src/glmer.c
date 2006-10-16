@@ -427,13 +427,12 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
 static double
 random_effects_deviance(GlmerStruct GS)
 {
-    int i;
-    double ans, *devs;
+    double ans = 0;
 
     internal_mer_fitted(GS->mer, GS->offset, REAL(GS->eta));
     glmer_linkinv(GS);
     glmer_dev_resids(GS);
-    for (i = 0, ans = 0; i < GS->n; i++) ans += GS->dev_res[i];
+    for (int i = 0; i < GS->n; i++) ans += GS->dev_res[i];
     return ans;
 }
 
