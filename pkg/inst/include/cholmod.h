@@ -801,6 +801,7 @@ cholmod_sparse* M_cholmod_speye(size_t nrow, size_t ncol,
 				int xtype, cholmod_common *Common);
 cholmod_sparse* M_cholmod_transpose(cholmod_sparse *A, int values,
 				    cholmod_common *Common);
+int M_cholmod_sort(cholmod_sparse *A, cholmod_common *Common);
 cholmod_sparse* M_cholmod_vertcat(cholmod_sparse *A, cholmod_sparse *B,
 				  int values, cholmod_common *Common);
 cholmod_sparse* M_cholmod_copy(cholmod_sparse *A, int stype,
