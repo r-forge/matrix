@@ -368,6 +368,7 @@ lmer <- function(formula, data, family = gaussian,
         stop("'family' not recognized")
     }
     fltype <- mkFltype(family)
+    if (fltype == 1) fltype <- 0
     method <- match.arg(method)
     
     ## quick return for a linear mixed model
@@ -407,7 +408,7 @@ lmer <- function(formula, data, family = gaussian,
     mu.eta <- quote(family$mu.eta(eta))
     mu <- family$linkinv(eta)
     variance <- quote(family$variance(mu))
-    dev.resids <- quote(family$dev.resids(Y, mu, wtssqr))
+    dev.resids <- quote(family$dev.resids(Y, mu, weights))
     LMEopt <- get("LMEoptimize<-")
     doLMEopt <- quote(LMEopt(x = mer, value = cv))
     if (family$family %in% c("binomial", "poisson")) # set the constant scale
@@ -488,6 +489,8 @@ setReplaceMethod("LMEoptimize", signature(x="mer", value="list"),
 		 constr <- unlist(lapply(nc, function(k) 1:((k*(k+1))/2) <= k))
 		 fn <- function(pars)
 		     deviance(.Call(mer_coefGets, x, pars, 2))
+                 start <- .Call(mer_coef, x, 2) #starting values
+                 fval <- fn(start)
 		 gr <- if (value$gradient)
 		     function(pars) {
 			 if (!isTRUE(all.equal(pars,
@@ -501,7 +504,8 @@ setReplaceMethod("LMEoptimize", signature(x="mer", value="list"),
 				    fn, gr,
 				    lower = ifelse(constr, 5e-10, -Inf),
 				    control = list(iter.max = value$msMaxIter,
-				    trace = as.integer(value$msVerbose)))
+				    trace = as.integer(value$msVerbose),
+                                    rel.tol = abs(0.001/fval)))
                  estPar <- optimRes$par
 		 .Call(mer_coefGets, x, estPar, 2)
 
@@ -968,24 +972,20 @@ setMethod("formula", signature(x = "mer"),
 	  x@call$formula
 	  )
 
-setMethod("residuals", signature(object = "mer"),
-	  function(object, ...) {
-              fam <- object@family
-              if (fam$family == "gaussian" && fam$link == "identity")
-                  return(object@y - fitted(object))
-              .NotYetImplemented()
-	  })
+setMethod("residuals", signature(object = "glmer"),
+	  function(object, ...) .NotYetImplemented())
+
+setMethod("residuals", signature(object = "lmer"),
+	  function(object, ...) object@y - fitted(object))
 
 ## FIXME: There should not be two identical methods like this but I'm not
 ##        sure how to pass the ... argument to a method for another generic
 ##        cleanly.
-setMethod("resid", signature(object = "mer"),
-	  function(object, ...) {
-              fam <- object@family
-              if (fam$family == "gaussian" && fam$link == "identity")
-                  return(object@y - fitted(object))
-              .NotYetImplemented()
-	  })
+setMethod("resid", signature(object = "glmer"),
+	  function(object, ...) .NotYetImplemented())
+
+setMethod("resid", signature(object = "lmer"),
+	  function(object, ...) object@y - fitted(object))
 
 setMethod("summary", signature(object = "mer"),
 	  function(object, ...) {
@@ -1334,11 +1334,14 @@ mlirt <-
                              function(k) 1:((k*(k+1))/2) <= k)
                       ))
     devLaplace <- function(pars) .Call(glmer_devLaplace, pars, GSpt)
+    rel.tol <- abs(0.01/devLaplace(PQLpars))
+    cat(paste("relative tolerance set to", rel.tol, "\n"))
 
     optimRes <- nlminb(PQLpars, devLaplace,
                        lower = ifelse(const, 5e-10, -Inf),
                        control = list(trace = cv$msVerbose,
-                       iter.max = cv$msMaxIter))
+                       iter.max = cv$msMaxIter,
+                       rel.tol = rel.tol))
     .Call(glmer_finalize, GSpt)
     new("glmer",
         new("lmer", mer,
