@@ -306,6 +306,7 @@ lmerFactorList <- function(formula, mf)
 {
     ## create factor list for the random effects
     bars <- expandSlash(findbars(formula[[3]]))
+    if (!length(bars)) stop("No random effects terms specified in formula")
     names(bars) <- unlist(lapply(bars, function(x) deparse(x[[3]])))
     fl <- lapply(bars,
                  function(x)
