@@ -55,7 +55,7 @@ void R_init_lme4(DllInfo *dll)
     R_useDynamicSymbols(dll, FALSE);
 
 
-    M_cholmod_start(&c);
+    M_R_cholmod_start(&c);
     lme4_DSym = install("D");
     lme4_DimSym = install("Dim");
     lme4_DimNamesSym = install("Dimnames");
