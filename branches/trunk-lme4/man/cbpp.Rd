@@ -33,20 +33,21 @@
 }
 \source{
   Lesnoff, M., Laval, G., Bonnet, P., Abdicho, S., Workalemahu, A.,
-  Kifle, D., Peyraud, A., Lancelot, R., Thiaucourt, F., 2004
+  Kifle, D., Peyraud, A., Lancelot, R., Thiaucourt, F. (2004)
   Within-herd spread of contagious bovine pleuropneumonia in Ethiopian highlands.
   \emph{Preventive Veterinary Medicine} \bold{64}, 27--40.
 }
 \examples{
-data(cbpp)
 ## response as a matrix
 (m1 <- lmer(cbind(incidence, size - incidence) ~ period + (1 | herd),
             family = binomial, data = cbpp))
 
-if(FALSE) %% FIXME -- still fails!
 ## response as a vector of probabilities and usage of argument "weights"
-(m2 <- lmer(incidence / size ~ period, weights = size,
-            family = binomial, data = cbpp))
-%% TODO: summary(m1), summary(m2), "comparison", ..
+m2 <- lmer(incidence / size ~ period + (1 | herd), weights = size,
+           family = binomial, data = cbpp)
+
+## Confirm that these are equivalent:
+stopifnot(all.equal(coef(m1), coef(m2),
+          all.equal(ranef(m1), ranef(m2))
 }
 \keyword{datasets}
