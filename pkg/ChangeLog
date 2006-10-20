@@ -1,3 +1,12 @@
+2006-10-20  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllClass.R (corMatrix): add 'validity' check;
+		comment out unused "LDL" class definition
+	* NAMESPACE: mention, but do not export "LDL" class
+	* R/corMatrix.R: new (simple), needed for R-devel with
+	* tests/Class+Meth.R (tstMatrixClass): 1 exception for corMatrix
+	  coerce and t() exceptions for all 5 'Mat.MatFact' classes.
+
 2006-10-19  Douglas Bates  <bates@stat.wisc.edu>
 
 	* src/chm_common.h: Add R_cholmod_start to initialize cholmod to
