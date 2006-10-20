@@ -784,7 +784,8 @@ typedef struct cholmod_triplet_struct
 
 } cholmod_triplet ;
 
-int M_cholmod_start(cholmod_common *Common);
+int M_R_cholmod_start(cholmod_common *Common);
+void M_R_cholmod_error(int status, char *file, int line, char *message);
 int M_cholmod_finish(cholmod_common *Common);
 
 cholmod_sparse* M_cholmod_allocate_sparse(size_t nrow, size_t ncol,

@@ -349,14 +349,23 @@ cholmod_sparse attribute_hidden
     return fun(sys, L, B, Common);
 }
 
-int attribute_hidden
-M_cholmod_start(cholmod_common *Common)
+void M_R_cholmod_error(int status, char *file, int line, char *message)
 {
+        error("Cholmod error `%s' at file:%s, line %d", message, file, line);
+}
+    
+int attribute_hidden
+M_R_cholmod_start(cholmod_common *Common)
+{
+    int val;
     static int(*fun)(cholmod_common*) = NULL;
     if (fun == NULL)
 	fun = (int(*)(cholmod_common*))
 	    R_GetCCallable("Matrix", "cholmod_start");
-    return fun(Common);
+    val = fun(Common);
+    Common->print_function = Rprintf;
+    Common->error_handler = M_R_cholmod_error;
+    return val;
 }
 
 cholmod_sparse attribute_hidden

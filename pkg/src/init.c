@@ -233,7 +233,7 @@ R_init_Matrix(DllInfo *dll)
     R_RegisterCCallable("Matrix", "dpoMatrix_chol", (DL_FUNC)dpoMatrix_chol);
     R_RegisterCCallable("Matrix", "numeric_as_chm_dense", (DL_FUNC)numeric_as_chm_dense);
 
-    cholmod_start(&c);
+    R_cholmod_start(&c);
 
     Matrix_DimNamesSym = install("Dimnames");
     Matrix_DimSym = install("Dim");
