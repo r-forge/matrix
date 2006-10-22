@@ -1,3 +1,7 @@
+2006-10-20  Douglas Bates  <bates@stat.wisc.edu>
+
+	* src/init.c (R_init_Matrix): export more cholmod CCallable functions.
+
 2006-10-20  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/AllClass.R (corMatrix): add 'validity' check;

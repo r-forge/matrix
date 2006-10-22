@@ -153,6 +153,17 @@ cholmod_triplet attribute_hidden
     return fun(A, Common);
 }
 
+cholmod_dense attribute_hidden
+*M_cholmod_sparse_to_dense(cholmod_sparse *A, cholmod_common *Common)
+{
+    static cholmod_dense*(*fun)
+	(cholmod_sparse*,cholmod_common*) = NULL;
+    if (fun == NULL)
+	fun = (cholmod_dense*(*)(cholmod_sparse*,cholmod_common*))
+	    R_GetCCallable("Matrix", "cholmod_sparse_to_dense");
+    return fun(A, Common);
+}
+
 cholmod_factor attribute_hidden
 *M_cholmod_analyze(cholmod_sparse *A, cholmod_common *Common)
 {
@@ -349,7 +360,8 @@ cholmod_sparse attribute_hidden
     return fun(sys, L, B, Common);
 }
 
-void M_R_cholmod_error(int status, char *file, int line, char *message)
+void attribute_hidden
+M_R_cholmod_error(int status, char *file, int line, char *message)
 {
         error("Cholmod error `%s' at file:%s, line %d", message, file, line);
 }
