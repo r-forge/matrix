@@ -853,6 +853,9 @@ cholmod_sparse* M_cholmod_triplet_to_sparse(cholmod_triplet *T, int nzmax,
 cholmod_triplet* M_cholmod_sparse_to_triplet(cholmod_sparse *A,
 					     cholmod_common *Common);
 
+cholmod_dense* M_cholmod_sparse_to_dense(cholmod_sparse *A,
+					     cholmod_common *Common);
+
 cholmod_triplet* M_cholmod_allocate_triplet (size_t nrow, size_t ncol,
 					     size_t nzmax, int stype, int xtype,
 					     cholmod_common *Common);
