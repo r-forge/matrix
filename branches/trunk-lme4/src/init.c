@@ -38,7 +38,7 @@ static R_CallMethodDef CallEntries[] = {
 
     {"pedigree_chol", (DL_FUNC) &pedigree_chol, 2},
 
-    {"Zt_carryOver", (DL_FUNC) &Zt_carryOver, 2},
+    {"Zt_carryOver", (DL_FUNC) &Zt_carryOver, 4},
     {"Ztl_sparse", (DL_FUNC) &Ztl_sparse, 2},
 
     {NULL, NULL, 0}

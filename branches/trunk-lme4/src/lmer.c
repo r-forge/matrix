@@ -1370,6 +1370,7 @@ SEXP mer_postVar(SEXP x)
 	q = LENGTH(GET_SLOT(x, lme4_rZySym));
 
     sc = dcmp[7] * dcmp[7];
+    mer_factor(x);
     internal_mer_RZXinv(x);
     internal_mer_bVar(x);
     ans = PROTECT(duplicate(GET_SLOT(x, lme4_bVarSym)));
@@ -1595,22 +1596,32 @@ SEXP Ztl_sparse(SEXP fl, SEXP Ztl)
 }
 
 /**
- * Create a new sparse Zt matrix by carrying over elements for the same level of f
+ * Create a new sparse Zt matrix by carrying over elements for the
+ * same level of f
  *
  * @param f factor determining the carryover (e.g. student)
  * @param Zt sparse model matrix for another factor (e.g. teacher)
+ * @param disc numeric vector of discounting fractions
  *
  * @return modified model matrix
  */
-SEXP Zt_carryOver(SEXP fp, SEXP Zt)
+SEXP Zt_carryOver(SEXP fp, SEXP Zt, SEXP tvar, SEXP discount)
 {
     cholmod_sparse *ans, *chsz = M_as_cholmod_sparse(Zt);
     cholmod_triplet *ant, *chtz = M_cholmod_sparse_to_triplet(chsz, &c);
     int *cct, *p = (int*)(chsz->p), *f = INTEGER(fp);
     int cmax, j, jj, k, last, n = LENGTH(fp), nlev, nnz, ntot, q = p[1] - p[0];
-    int *ii, *ij, *oi, *oj, ip, op;
-    double *ix, *ox;
+    int *ii, *ij, *oi, *oj, dl = LENGTH(discount), ip, op;
+    double *ix, *ox, *disc, *tv;
 
+    if (!isReal(discount))
+	error(_("discount must be a numeric vector"));
+    if (!isReal(tvar))
+	error(_("tvar must be a numeric vector"));
+    if (LENGTH(tvar) != n)
+	error(_("tvar must have length %d"), n);
+    tv = REAL(tvar);
+    disc = REAL(discount);
     Free(chsz);
     if (!isFactor(fp)) error(_("f must be a factor"));
     nlev = LENGTH(getAttrib(fp, R_LevelsSymbol));
@@ -1618,7 +1629,8 @@ SEXP Zt_carryOver(SEXP fp, SEXP Zt)
 
     if (chtz->ncol != n) error(_("ncol(Zt) must match length(fp)"));
     for (j = 0; j < n; j++)	/* check consistency of p */
-	if (p[j+1] - p[j] != q) error(_("nonzeros per column in Zt must be constant"));
+	if (p[j+1] - p[j] != q)
+	    error(_("nonzeros per column in Zt must be constant"));
 				/* create column counts */
     for (last = -1, j = 0; j < n; j++) {
 	int ll = f[j] - 1;
@@ -1640,7 +1652,12 @@ SEXP Zt_carryOver(SEXP fp, SEXP Zt)
     for (k = 0; k < nlev; k++) {
 	for (j = 0; j < cct[k]; j++) {
 	    for (jj = 0; jj < cct[k] - j; jj++) {
-		oi[op] = ii[ip]; oj[op] = ij[ip] + jj; ox[op] = ix[ip];
+		int dj = (int)(tv[ip + jj] - tv[ip]);
+		if (dj > dl)
+		    error(_("diff(tvar) (= %d) > length(discount) (= %d)"),
+			  dj, dl);
+		oi[op] = ii[ip]; oj[op] = ij[ip] + jj;
+		ox[op] = ix[ip] * disc[dj];
 		op++;
 	    }
 	    ip++;

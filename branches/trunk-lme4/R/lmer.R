@@ -1187,7 +1187,8 @@ hatTrace <- function(x)
 }
 
 carryOver <- function(formula, data, carry, REML = TRUE, control = list(),
-                      start = NULL, subset, weights, na.action, offset,
+                      start = NULL, varycarry = TRUE,
+                      subset, weights, na.action, offset,
                       contrasts = NULL, model = TRUE, ...)
 {
     formula <- as.formula(formula)
@@ -1220,19 +1221,19 @@ carryOver <- function(formula, data, carry, REML = TRUE, control = list(),
     ## check the ordering
     ord <- order(outer, tvar)
     if (any(diff(ord) < 0)) {
-        warning("It is an advantage to have the data ordered by ",
-                as.character(op[[3]]), " then ", as.character(carry[[2]]),
-                " within ", as.character(op[[3]]), "\n")
         Y <- Y[ord]; X <- X[ord,]; mf <- mf[ord,]
         weights <- weights[ord]; offset <- offset[ord]
         FL <- lmerFactorList(formula, mf)
         fl <- FL$fl
         outer <- outer[ord]
+        tvar <- tvar[ord]
     }
+    nyr <- 1 + max(tapply(tvar, outer, function(x) diff(range(x))))
 
     Ztsp <- .Call(Ztl_sparse, fl, FL$Ztl)
     innm <- as.character(op[[2]])
-    Ztsp[[innm]] <- .Call(Zt_carryOver, outer, Ztsp[[innm]])
+    Ztsp[[innm]] <- .Call(Zt_carryOver, outer, Ztsp[[innm]], tvar,
+                          0.5^(0:(nyr-1)))
     mer <- with(FL, .Call(mer_create, fl, do.call("rbind", Ztsp), X, Y, REML,
                           sapply(Ztl, nrow), # nc
                           c(lapply(Ztl, rownames), list(.fixed = colnames(X)))))
