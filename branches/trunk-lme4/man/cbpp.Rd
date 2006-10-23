@@ -47,7 +47,7 @@ m2 <- lmer(incidence / size ~ period + (1 | herd), weights = size,
            family = binomial, data = cbpp)
 
 ## Confirm that these are equivalent:
-stopifnot(all.equal(coef(m1), coef(m2),
-          all.equal(ranef(m1), ranef(m2))
+stopifnot(all.equal(coef(m1), coef(m2)),
+          all.equal(ranef(m1), ranef(m2)))
 }
 \keyword{datasets}
