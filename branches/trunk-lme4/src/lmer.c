@@ -1385,11 +1385,11 @@ SEXP mer_postVar(SEXP x)
 	    error(_("rows and columns of element %d of bVar do not match"),
 		  i + 1);
 	for (j = 0; j < nlev; j++)
-	    F77_CALL(dsyrk)("U", "N", &nc, &p,
+	    F77_CALL(dsyrk)("U", "N", &nci, &p,
 			    &one, RZXi + Gp[i] + j * nci, &q,
-			    &one, vv + j * ncisqr, &nc);
+			    &one, vv + j * ncisqr, &nci);
 	if (sc != 1) F77_CALL(dscal)(&ntot, &sc, vv, &ione);
-	if (nc > 1) {
+	if (nci > 1) {
 	    for (j = 0; j < nlev; j++)
 		internal_symmetrize(vv + j * ncisqr, nci);
 	}
@@ -1555,7 +1555,7 @@ SEXP SEXP_Zt(int n, int ii, SEXP fi, SEXP tmmat)
     int m = dims[0], nlev = LENGTH(getAttrib(fi, R_LevelsSymbol));
     SEXP ans = PROTECT(alloc_dgCMatrix(m * nlev, n, m * n, R_NilValue, R_NilValue));
     int *i = INTEGER(GET_SLOT(ans, lme4_iSym)), *p = INTEGER(GET_SLOT(ans, lme4_pSym));
-    
+
     if (!isFactor(fi) || LENGTH(fi) != n)
 	error(_("fl[[%d]] must be a factor of length %d"), ii + 1, n);
     if (!isMatrix(tmmat) || !isReal(tmmat))
@@ -1586,7 +1586,7 @@ SEXP Ztl_sparse(SEXP fl, SEXP Ztl)
 {
     int i, nf = LENGTH(fl), nobs = LENGTH(VECTOR_ELT(fl, 0));
     SEXP ans = PROTECT(allocVector(VECSXP, nf));
-    
+
     setAttrib(ans, R_NamesSymbol, duplicate(getAttrib(fl, R_NamesSymbol)));
     for (i = 0; i < nf; i++)
 	SET_VECTOR_ELT(ans, i, SEXP_Zt(nobs, i, VECTOR_ELT(fl, i), VECTOR_ELT(Ztl, i)));
@@ -1615,7 +1615,7 @@ SEXP Zt_carryOver(SEXP fp, SEXP Zt)
     if (!isFactor(fp)) error(_("f must be a factor"));
     nlev = LENGTH(getAttrib(fp, R_LevelsSymbol));
     cct = Calloc(nlev, int);
-    
+
     if (chtz->ncol != n) error(_("ncol(Zt) must match length(fp)"));
     for (j = 0; j < n; j++)	/* check consistency of p */
 	if (p[j+1] - p[j] != q) error(_("nonzeros per column in Zt must be constant"));
@@ -1633,7 +1633,7 @@ SEXP Zt_carryOver(SEXP fp, SEXP Zt)
 	ntot += (cct[k] * (cct[k] + 1))/2;
     }
     nnz = ntot * q;
-    ant = M_cholmod_allocate_triplet(chtz->nrow, chtz->ncol, (size_t)(nnz), 
+    ant = M_cholmod_allocate_triplet(chtz->nrow, chtz->ncol, (size_t)(nnz),
 				     0 /*stype*/, CHOLMOD_REAL, &c);
     ip = 0; ii = (int*)(chtz->i); ij = (int*)(chtz->j); ix = (double*)(chtz->x);
     op = 0; oi = (int*)(ant->i); oj = (int*)(ant->j); ox = (double*)(ant->x);
@@ -1653,4 +1653,4 @@ SEXP Zt_carryOver(SEXP fp, SEXP Zt)
     Free(cct);
     return M_chm_sparse_to_SEXP(ans, 1, 0, 0, "", R_NilValue);
 }
-	
+
