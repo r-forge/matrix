@@ -1,3 +1,7 @@
+2006-10-23  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.9975-5 ready for release
+
 2006-10-20  Douglas Bates  <bates@stat.wisc.edu>
 
 	* src/init.c (R_init_Matrix): export more cholmod CCallable functions.
