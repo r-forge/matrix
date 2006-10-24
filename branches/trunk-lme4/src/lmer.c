@@ -1601,7 +1601,8 @@ SEXP Ztl_sparse(SEXP fl, SEXP Ztl)
  *
  * @param f factor determining the carryover (e.g. student)
  * @param Zt sparse model matrix for another factor (e.g. teacher)
- * @param disc numeric vector of discounting fractions
+ * @param tvar numeric vector of time values
+ * @param discount numeric vector of discounting fractions
  *
  * @return modified model matrix
  */
