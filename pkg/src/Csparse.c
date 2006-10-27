@@ -5,17 +5,17 @@
 SEXP Csparse_validate(SEXP x)
 {
     /* NB: we do *NOT* check a potential 'x' slot here, at all */
-    cholmod_sparse *chx = as_cholmod_sparse(x);
     SEXP pslot = GET_SLOT(x, Matrix_pSym),
 	islot = GET_SLOT(x, Matrix_iSym);
-    int j, k, ncol = length(pslot) - 1,
+    int j, k, ncol, nrow, sorted,
 	*dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
-	nrow, sorted, *xp = INTEGER(pslot),
+	*xp = INTEGER(pslot),
 	*xi = INTEGER(islot);
 
     nrow = dims[0];
-    if (length(pslot) <= 0)
-	return mkString(_("slot p must have length > 0"));
+    ncol = dims[1];
+    if (length(pslot) != dims[1] + 1)
+	return mkString(_("slot p must have length = ncol(.) + 1"));
     if (xp[0] != 0)
 	return mkString(_("first element of slot p must be zero"));
     if (length(islot) != xp[ncol])
@@ -32,8 +32,11 @@ SEXP Csparse_validate(SEXP x)
 	for (k = xp[j] + 1; k < xp[j + 1]; k++)
 	    if (xi[k] < xi[k - 1]) sorted = FALSE;
     }
-    if (!sorted) cholmod_sort(chx, &c);
-    Free(chx);
+    if (!sorted) {
+	cholmod_sparse *chx = as_cholmod_sparse(x);
+	cholmod_sort(chx, &c);
+	Free(chx);
+    }
     return ScalarLogical(1);
 }
 

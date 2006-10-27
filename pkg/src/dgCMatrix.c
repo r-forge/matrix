@@ -224,11 +224,12 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp)
 
 SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
 {
-    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(b));
     SEXP lu = dgCMatrix_LU(Ap, ScalarLogical(1), ScalarReal(1));
     SEXP qslot = GET_SLOT(lu, install("q"));
-    cs *L = Matrix_as_cs(GET_SLOT(lu, install("L"))),
+    cs  *L = Matrix_as_cs(GET_SLOT(lu, install("L"))),
 	*U = Matrix_as_cs(GET_SLOT(lu, install("U")));
+    SEXP ans = PROTECT( !isNull(b) ? dup_mMatrix_as_dgeMatrix(b)
+			: new_dgeMatrix(U->n, U->n));
     int *bdims = INTEGER(GET_SLOT(ans, Matrix_DimSym));
     int j, n = bdims[0], nrhs = bdims[1];
     int *p = INTEGER(GET_SLOT(lu, Matrix_pSym)),
@@ -239,7 +240,12 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
     if (U->n != n || nrhs < 1 || n < 1)
 	error(_("Dimensions of system to be solved are inconsistent"));
     for (j = 0; j < nrhs; j++) {
-	cs_pvec(p, ax + j * n, x, n);  /* x = b(p) */
+	if(!isNull(b))
+	    cs_pvec(p, ax + j * n, x, n);  /* x = b(p) */
+	else { /* solve(A):  b = I_n,  hence  x = e_j (j-th unit vector) */
+	    int i;
+	    for(i=0; i < n; i++) x[i] = (i == j) ? 1. : 0.;
+	}
 	cs_lsolve(L, x);	       /* x = L\x */
 	cs_usolve(U, x);	       /* x = U\x */
 	if (q)			       /* b(q) = x */

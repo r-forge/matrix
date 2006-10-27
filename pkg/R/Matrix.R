@@ -221,6 +221,12 @@ setMethod("kronecker", signature(X = "ANY", Y = "Matrix",
               Y <- as(Y, "matrix") ; Matrix(callGeneric()) })
 
 
+## FIXME: All of these should never be called
+setMethod("chol", signature(x = "Matrix"),
+	  function(x, pivot = FALSE) .bail.out.1(.Generic, class(x)))
+setMethod("determinant", signature(x = "Matrix"),
+	  function(x, logarithm = TRUE) .bail.out.1(.Generic, class(x)))
+
 setMethod("diag", signature(x = "Matrix"),
 	  function(x, nrow, ncol) .bail.out.1(.Generic, class(x)))
 setMethod("t", signature(x = "Matrix"),
@@ -235,15 +241,15 @@ setMethod("-", signature(e1 = "Matrix", e2 = "missing"),
               0-e1
           })
 
-## bail-outs:
-setMethod("Compare", signature(e1 = "Matrix", e2 = "Matrix"),
+## bail-outs -- on highest possible level, hence "Ops", not "Compare"/"Arith" :
+setMethod("Ops", signature(e1 = "Matrix", e2 = "Matrix"),
           function(e1, e2) {
               d <- dimCheck(e1,e2)
               .bail.out.2(.Generic, class(e1), class(e2))
           })
-setMethod("Compare", signature(e1 = "Matrix", e2 = "ANY"),
+setMethod("Ops", signature(e1 = "Matrix", e2 = "ANY"),
           function(e1, e2) .bail.out.2(.Generic, class(e1), class(e2)))
-setMethod("Compare", signature(e1 = "ANY", e2 = "Matrix"),
+setMethod("Ops", signature(e1 = "ANY", e2 = "Matrix"),
           function(e1, e2) .bail.out.2(.Generic, class(e1), class(e2)))
 
 

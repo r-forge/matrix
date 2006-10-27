@@ -82,3 +82,11 @@ stopifnot(identical(10 * tPt, tPt * 10),
 ## non-square triagonal Matrices --- are forbidden ---
 assertError(new("dtrMatrix", Dim = 2:3,
                 x=as.double(1:6), uplo="L", diag="U"))
+
+n <- 3:3
+assertError(new("dtCMatrix", Dim = c(n,n), diag = "U"))
+stopifnot(validObject(T <- new("dtTMatrix", Dim = c(n,n), diag = "U")),
+	  identical(as.mat(T), diag(n)),
+	  validObject(M <- new("dtCMatrix", Dim = c(n,n), diag = "U",
+			       p = rep.int(0:0, n+1)))
+	  )

@@ -8,6 +8,8 @@
 \alias{Arith,numeric,sparseMatrix-method}
 \alias{Math,sparseMatrix-method}
 %\alias{Math2,sparseMatrix,numeric-method}
+\alias{Ops,diagonalMatrix,sparseMatrix-method}
+\alias{Ops,sparseMatrix,diagonalMatrix-method}
 %
 \alias{coerce,ANY,sparseMatrix-method}
 \alias{-,sparseMatrix,missing-method}

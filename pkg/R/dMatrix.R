@@ -106,7 +106,9 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
 
 		  if(identical(r0, FALSE)) { ## things remain sparse
 		      if(!any(is.na(r)) && ((Ar <- all(r)) || !any(r))) {
-			  r <- new(lClass, Dim = d, Dimnames= dimnames(e1))
+			  r <- new(lClass)
+			  r@Dim <- d
+			  r@Dimnames <- dimnames(e1)
 			  if(Ar) { # 'TRUE' instead of 'x': same sparsity:
 			      r@x <- rep.int(TRUE, length(e1@x))
 			      for(n in intersect(c("i","j","p"), slotNames(r)))

@@ -162,3 +162,8 @@
 
 - M[i,j] <- "sub-Matrix"  now works.
 
+- "Compare" for dgC & dgT  --- to be able to do  M[M > 10]  etc
+
+-  new("ltTMatrix", diag = "U", Dim = c(2:2, 2:2))   now works
+
+

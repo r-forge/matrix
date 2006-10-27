@@ -290,7 +290,7 @@ setMethod("show", signature(object = "sparseMatrix"),
 	   nr <- maxp %/% d[2]
 	   n2 <- ceiling(nr / 2)
 	   nR <- d[1] # nrow
-	   prSpMatrix(object[seq(length = min(nR, max(1, n2))), drop = FALSE])
+	   prSpMatrix(object[seq_len(min(nR, max(1, n2))), drop = FALSE])
 	   cat("\n ..........\n\n")
 	   prSpMatrix(object[seq(to = nR, length = min(max(1, nr-n2), nR)),
                              drop = FALSE])

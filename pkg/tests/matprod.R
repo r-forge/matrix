@@ -144,8 +144,10 @@ m <- matrix(0, 4,7); m[c(1, 3, 6, 9, 11, 22, 27)] <- 1
 stopifnot(identical(crossprod(mm), cm))
 (tm1 <- Matrix(tcrossprod(m))) #-> had bug in 'Matrix()' !
 (tm2 <- tcrossprod(mm))
+Im2 <- solve(tm2[-4,-4])
 stopifnot(class(tm1) == class(tm2),
-	  class(tm1) == "dsCMatrix")# but they differ by "uplo"
-
+	  class(tm1) == "dsCMatrix",# but they differ by "uplo"
+          identical(Im2 %*% tm2[1:3,], Matrix(cbind(diag(3),0),sparse=FALSE))
+          )
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
 
