@@ -183,4 +183,12 @@ l3 <- upper.tri(matrix(,3,3))
 (c3 <- as(l3, "CsparseMatrix"))
 stopifnot(validObject(c3), is(c3, "CsparseMatrix"), is(c3, "triangularMatrix"))
 
+## diagonal, sparse & interactions
+stopifnot(is(X <- Diagonal(7) + 1.5 * tM[1:7,1:7], "sparseMatrix"))
+X
+(XX <- X - chol(crossprod(X)))
+XX <- as(Matrix:::drop0(XX), "dsCMatrix")
+stopifnot(identical(XX, Matrix(0, nrow(X), ncol(X))))
+
+
 cat('Time elapsed: ', proc.time(),'\n') # "stats"

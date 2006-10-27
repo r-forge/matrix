@@ -220,8 +220,7 @@ setMethod("diag", signature(x = "dgeMatrix"),
 setMethod("chol", signature(x = "dgeMatrix", pivot = "ANY"), cholMat)
 
 setMethod("solve", signature(a = "dgeMatrix", b = "missing"),
-	  function(a, b, ...)
-          .Call(dgeMatrix_solve, a),
+	  function(a, b, ...) .Call(dgeMatrix_solve, a),
 	  valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dgeMatrix", b = "ddenseMatrix"),

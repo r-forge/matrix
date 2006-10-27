@@ -22,11 +22,11 @@ allFalse <- function(x) !any(is.na(x)) && !any(x)
     function(x) !identical(list(NULL,NULL), x@Dimnames)
 
 .bail.out.1 <- function(fun, cl) {
-    stop(gettextf('not-yet-implemented method for %s(<%s>)', fun, cl),
+    stop(gettextf('not-yet-implemented method for %s(<%s>).\n ->>  Ask the package authors to implement the missing feature.', fun, cl),
 	 call. = FALSE)
 }
 .bail.out.2 <- function(fun, cl1, cl2) {
-    stop(gettextf('not-yet-implemented method for %s(<%s>, <%s>)',
+    stop(gettextf('not-yet-implemented method for %s(<%s>, <%s>).\n ->>  Ask the package authors to implement the missing feature.',
 		  fun, cl1, cl2), call. = FALSE)
 }
 
@@ -233,7 +233,7 @@ non0ind <- function(x) {
 	if(is(M, "TsparseMatrix"))
 	    return(unique(cbind(M@i,M@j)))
 	if(is(M, "pMatrix"))
-	    return(cbind(seq(length=nrow(M)), M@perm) - 1:1)
+	    return(cbind(seq_len(nrow(M)), M@perm) - 1:1)
 	## else:
 	isC <- any("i" == slotNames(M)) # is Csparse (not Rsparse)
 	.Call(compressed_non_0_ij, M, isC)
@@ -246,7 +246,7 @@ non0ind <- function(x) {
     }
     else if(is(x, "triangularMatrix")) { # check for "U" diag
 	if(x@diag == "U") {
-	    i <- seq(length = dim(x)[1]) - 1:1
+	    i <- seq_len(dim(x)[1]) - 1:1
 	    rbind(non0.i(x), cbind(i,i))
 	} else non0.i(x)
     }
@@ -319,9 +319,17 @@ uniqTsparse <- function(x, class.x = c(class(x))) {
 ## would be slightly more efficient than as( <dgC> , "dgTMatrix")
 ## but really efficient would be to use only one .Call(.) for uniq(.) !
 
+drop0 <- function(x, clx = c(class(x))) {
+    ## FIXME: Csparse_drop should do this (not losing symm./triang.):
+    ## Careful: 'Csparse_drop' also drops triangularity,...
+    ## .Call(Csparse_drop, as_CspClass(x, clx), 0)
+    as_CspClass(.Call(Csparse_drop, as_CspClass(x, clx), 0.),
+                clx)
+}
+
 uniq <- function(x) {
-    if(is(x, "TsparseMatrix")) uniqTsparse(x) else x
-    ## else:  not 'Tsparse', i.e. "uniquely" represented in any case
+    if(is(x, "TsparseMatrix")) uniqTsparse(x) else
+    if(is(x, "sparseMatrix")) drop0(x) else x
 }
 
 asTuniq <- function(x) {
@@ -505,10 +513,12 @@ as_geClass <- function(x, cl) {
 }
 
 as_CspClass <- function(x, cl) {
-    if ((extends(cl, "diagonalMatrix")	&& isDiagonal(x)) ||
-	(extends(cl, "symmetricMatrix") &&  isSymmetric(x)) ||
+    if (## diagonal is *not* sparse:
+	##(extends(cl, "diagonalMatrix") && isDiagonal(x)) ||
+	(extends(cl, "symmetricMatrix") && isSymmetric(x)) ||
 	(extends(cl, "triangularMatrix")&& isTriangular(x)))
 	as(x, cl)
+    else if(is(x, "CsparseMatrix")) x
     else as(x, paste(.M.kind(x), "gCMatrix", sep=''))
 }
 

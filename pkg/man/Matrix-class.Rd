@@ -25,6 +25,8 @@
 \alias{tcrossprod,Matrix,Matrix-method}
 \alias{tcrossprod,numeric,Matrix-method}
 %
+\alias{chol,Matrix,ANY-method}
+\alias{determinant,Matrix,ANY-method}
 \alias{diag,Matrix-method}
 \alias{head,Matrix-method}
 \alias{tail,Matrix-method}
@@ -44,9 +46,9 @@
 \alias{coerce,matrix,Matrix-method}
 \alias{coerce,Matrix,denseMatrix-method}
 \alias{coerce,Matrix,sparseMatrix-method}
-\alias{Compare,Matrix,Matrix-method}
-\alias{Compare,Matrix,ANY-method}
-\alias{Compare,ANY,Matrix-method}
+\alias{Ops,Matrix,Matrix-method}
+\alias{Ops,Matrix,ANY-method}
+\alias{Ops,ANY,Matrix-method}
 \alias{crossprod,ANY,Matrix-method}
 \alias{kronecker,ANY,Matrix-method}
 \alias{kronecker,Matrix,ANY-method}

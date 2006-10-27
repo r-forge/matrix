@@ -36,6 +36,13 @@ setMethod("kronecker", signature(X = "dsparseMatrix", Y = "dsparseMatrix"),
           function (X, Y, FUN = "*", make.dimnames = FALSE, ...)
           callGeneric(as(X, "dgTMatrix"), as(Y, "dgTMatrix")))
 
+setMethod("chol", signature(x = "dsparseMatrix", pivot = "ANY"),
+           function(x, pivot, ...) {
+               px <- as(x, "dsCMatrix")
+               if (isTRUE(validObject(px, test=TRUE))) chol(px, pivot)
+               else stop("'x' is not positive definite -- chol() undefined.")
+           })
+
 setMethod("lu", signature(x = "dsparseMatrix"),
 	  function(x, ...) callGeneric(as(x, "dgCMatrix")))
 

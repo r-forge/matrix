@@ -1,3 +1,36 @@
+2006-10-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dgCMatrix.R: solve(a, b="missing") based on
+	* src/dgCMatrix.c (dgCMatrix_matrix_solve): extend to work with
+	RHS = NULL.
+
+	* R/diagMatrix.R (diagdiagprod): extend %*% etc to ldiMatrix;
+	add more (needed) [t]crossprod() methods.
+
+	* man/ddiMatrix-class.Rd: more info, notably on 'diag'
+
+	* R/Auxiliaries.R (as_CspClass): cleanup
+	(drop0): internal utility for "Csparse_drop(*, 0)"
+	(.bail.out.2): encourage active feedback
+
+2006-10-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dMatrix.R(Compare): new(), then slots [no validity check]
+
+	* src/Csparse.c (Csparse_validate): fixed (and more efficient in
+	non-valid or 'sorted' case).
+
+	* R/dsparseMatrix.R: add "chol" method.
+	* R/ddenseMatrix.R: ditto
+
+	* R/diagMatrix.R (Ops): group methods for  <diagonal> o <sparse>
+	* NAMESPACE (Ops)
+	* R/diagMatrix.R (diag2T): simple utility used "higher level"
+	coercion; deprecating direct lower level coercions.
+
+	* R/*.R (seq): use seq_len() and seq_along() where possible.
+
+
 2006-10-23  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.9975-5 ready for release

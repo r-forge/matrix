@@ -48,6 +48,8 @@ setAs("CsparseMatrix", "matrix",
 
 ### Some group methods:
 
+## TODO : Consider going a level up, and do this for all "Ops"
+
 setMethod("Arith",
 	  signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 	  function(e1, e2) callGeneric(as(e1, "dgCMatrix"),
@@ -147,14 +149,8 @@ replCmat <- function (x, i, j, value)
     else
 	x[i,j] <- value
 
-    ## Careful: 'Csparse_drop' also drops triangularity,...
-    ## .Call(Csparse_drop, as_CspClass(x, clx), 0)
-
-    if(any(is0(x@x))) { ## drop all values that "happen to be 0"
-	## FIXME: Csparse_drop should do this
-	as_CspClass(.Call(Csparse_drop, as_CspClass(x, clx), 0),
-		    clx)
-    }
+    if(any(is0(x@x))) ## drop all values that "happen to be 0"
+	drop0(x, clx)
     else as_CspClass(x, clx)
 }
 

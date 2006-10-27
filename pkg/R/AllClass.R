@@ -532,6 +532,7 @@ setClass("Cholesky",  contains = c("dtrMatrix", "MatrixFactorization"))
 
 setClass("pCholesky", contains = c("dtpMatrix", "MatrixFactorization"))
 
+## These are currently only produced implicitly from *solve()
 setClass("BunchKaufman",
 	 contains = c("dtrMatrix", "MatrixFactorization"),
 	 representation(perm = "integer"),
