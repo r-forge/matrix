@@ -198,6 +198,10 @@ setMethod("solve", signature(a = "dgCMatrix", b = "matrix"),
 setMethod("solve", signature(a = "dgCMatrix", b = "ddenseMatrix"),
 	  function(a, b, ...) .Call(dgCMatrix_matrix_solve, a, b),
 	  valueClass = "dgeMatrix")
+setMethod("solve", signature(a = "dgCMatrix", b = "dsparseMatrix"),
+	  function(a, b, ...)
+	  .Call(dgCMatrix_matrix_solve, a, as(b, "denseMatrix")),
+	  valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dgCMatrix", b = "missing"),
 	  function(a, b, ...) .Call(dgCMatrix_matrix_solve, a, b=NULL),

@@ -80,6 +80,26 @@ str(r2. <- v2 %*% M)
 stopifnot(identical4(r2, r2., rbind(v2) %*% M, t(as(v2, "matrix")) %*% M))
 
 
+## Sparse Cov.matrices from  Harri Kiiveri @ CSIRO
+a <- matrix(0,5,5)
+a[1,2] <- a[2,3] <- a[3,4] <- a[4,5] <- 1
+a <- a + t(a) + 2*diag(5)
+b <- as(a, "dsCMatrix") ## ok, but we recommend to use Matrix() ``almost always'' :
+(b. <- Matrix(a, sparse = TRUE))
+stopifnot(identical(b, b.))
+
+## calculate conditional variance matrix ( vars 3 4 5 given 1 2 )
+B2 <- b[1:2, 1:2]
+bb <- b[1:2, 3:5]
+z. <- solve(B2, bb)
+z  <- solve( B2, as(bb,"dgeMatrix"))
+stopifnot(identical(z, z.))
+## finish calculating conditional variance matrix
+v <- b[3:5,3:5] - crossprod(bb,z)
+stopifnot(all.equal(as.mat(v),
+		    matrix(c(4/3, 1:0, 1,2,1, 0:2), 3), tol = 1e-14))
+
+
 ###--- "logical" Matrices : ---------------------
 
 ## Robert's Example, a bit more readable

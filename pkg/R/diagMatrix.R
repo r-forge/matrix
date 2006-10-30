@@ -86,6 +86,18 @@ setAs("diagonalMatrix", "matrix",
 setAs("diagonalMatrix", "generalMatrix", # prefer sparse:
       function(from) as(from, paste(.M.kind(from), "gCMatrix", sep='')))
 
+.diag.x <- function(m) {
+    if(m@diag == "U")
+	rep.int(if(is.numeric(m@x)) 1. else TRUE,
+		m@Dim[1])
+    else m@x
+}
+
+.diag.2N <- function(m) {
+    if(m@diag == "U") m@diag <- "N"
+    m
+}
+
 ## given the above, the following  4  coercions should be all unneeded;
 ## we prefer triangular to general:
 setAs("ddiMatrix", "dgTMatrix",
@@ -93,12 +105,11 @@ setAs("ddiMatrix", "dgTMatrix",
 	  .Deprecated("as(, \"sparseMatrix\")")
 	  n <- from@Dim[1]
 	  i <- seq_len(n) - 1:1
-	  new("dgTMatrix", i = i, j = i,
-	      x = if(from@diag == "U") rep(1,n) else from@x,
+	  new("dgTMatrix", i = i, j = i, x = .diag.x(from),
 	      Dim = c(n,n), Dimnames = from@Dimnames) })
 
 setAs("ddiMatrix", "dgCMatrix",
-      function(from) as(as(from, "dgTMatrix"), "dgCMatrix"))
+      function(from) as(as(from, "sparseMatrix"), "dgCMatrix"))
 
 setAs("ldiMatrix", "lgTMatrix",
       function(from) {
@@ -305,12 +316,48 @@ setMethod("%*%", signature(x = "dgeMatrix", y = "diagonalMatrix"),
 
 ### ---------------- diagonal  o  sparse  -----------------------------
 
+
+## Use function for several signatures, in order to evade
+## ambiguous dispatch for "ddi", since there's also Arith(ddense., ddense.)
+diagOdiag <- function(e1,e2) { # result should also be diagonal
+    r <- callGeneric(.diag.x(e1), .diag.x(e2)) # error if not "compatible"
+    if(is.numeric(r)) {
+        if(is.numeric(e2@x)) {
+            e2@x <- r; return(.diag.2N(e2)) }
+        if(!is.numeric(e1@x))
+            ## e.g. e1, e2 are logical;
+            e1 <- as(e1, "dMatrix")
+    }
+    else if(is.logical(r))
+        e1 <- as(e1, "lMatrix")
+    else stop("intermediate 'r' is of type", typeof(r))
+    e1@x <- r
+    .diag.2N(e1)
+}
+
+setMethod("Ops", signature(e1 = "diagonalMatrix", e2 = "diagonalMatrix"),
+          diagOdiag)
+## These two are just for method disambiguation:
+setMethod("Ops", signature(e1 = "ddiMatrix", e2 = "diagonalMatrix"),
+          diagOdiag)
+setMethod("Ops", signature(e1 = "diagonalMatrix", e2 = "ddiMatrix"),
+          diagOdiag)
+
+## For almost everything else, diag* shall be treated "as sparse" :
 ## These are cheap implementations via coercion
 
+## for disambiguation
 setMethod("Ops", signature(e1 = "diagonalMatrix", e2 = "sparseMatrix"),
 	  function(e1,e2) callGeneric(as(e1, "sparseMatrix"), e2))
 setMethod("Ops", signature(e1 = "sparseMatrix", e2 = "diagonalMatrix"),
 	  function(e1,e2) callGeneric(e1, as(e2, "sparseMatrix")))
+## in general:
+setMethod("Ops", signature(e1 = "diagonalMatrix", e2 = "ANY"),
+          function(e1,e2) callGeneric(as(e1,"sparseMatrix"), e2))
+setMethod("Ops", signature(e1 = "ANY", e2 = "diagonalMatrix"),
+          function(e1,e2) callGeneric(e1, as(e2,"sparseMatrix")))
+
+
 
 ## FIXME?: In theory, this can be done *FASTER*, in some cases, via tapply1()
 

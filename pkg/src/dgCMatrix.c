@@ -242,9 +242,9 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
     for (j = 0; j < nrhs; j++) {
 	if(!isNull(b))
 	    cs_pvec(p, ax + j * n, x, n);  /* x = b(p) */
-	else { /* solve(A):  b = I_n,  hence  x = e_j (j-th unit vector) */
+	else { /* solve(A): (RHS) B = I_n,  hence  b = e_j (j-th unit vector) */
 	    int i;
-	    for(i=0; i < n; i++) x[i] = (i == j) ? 1. : 0.;
+	    for(i=0; i < n; i++) x[i] = (p[i] == j) ? 1. : 0.;
 	}
 	cs_lsolve(L, x);	       /* x = L\x */
 	cs_usolve(U, x);	       /* x = U\x */

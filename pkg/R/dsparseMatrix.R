@@ -21,7 +21,8 @@ setMethod("crossprod", signature(x = "ddenseMatrix", y = "dsparseMatrix"),
 ##           function(x, y) callGeneric(x, as(y, "dgCMatrix")))
 
 setMethod("crossprod", signature(x = "dsparseMatrix", y = "dgeMatrix"),
-          function(x, y = NULL) callGeneric(as(x, "dgCMatrix"), y))
+## NB: using   callGeneric(.) here, leads to infinite recursion :
+          function(x, y = NULL) .Call(Csparse_dense_crossprod, as(x, "dgCMatrix"), y))
 
 ## NB: there's already
 ##     ("CsparseMatrix", "missing") and ("TsparseMatrix", "missing") methods
