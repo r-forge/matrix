@@ -1,4 +1,24 @@
+2006-10-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/matprod.R: add a variation of Harri's example
+
+	* R/dsparseMatrix.R: fix crossprod(<dsparse>, <dge>) to *not*
+	recursive infinitely.
+
+	* R/dgCMatrix.R: + solve(<sparse>, <sparse>)
+
+	* tests/indexing.R: add test for the "<" bug fixed 10-27 in R/dMatrix.R
+
+2006-10-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/Class+Meth.R (tstMatrixClass): more: use non-trivial
+	matrix if possible; test m+m == 2*m; now test dgRMatrix.
+	* R/dgRMatrix.R (.to.dgR): a few more coercions, in order to
+	satisfy the above test.
+
 2006-10-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R (Ops):  <Matrix> o <matrix>  method added
 
 	* R/dgCMatrix.R: solve(a, b="missing") based on
 	* src/dgCMatrix.c (dgCMatrix_matrix_solve): extend to work with

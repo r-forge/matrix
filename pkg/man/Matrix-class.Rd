@@ -49,6 +49,8 @@
 \alias{Ops,Matrix,Matrix-method}
 \alias{Ops,Matrix,ANY-method}
 \alias{Ops,ANY,Matrix-method}
+\alias{Ops,Matrix,matrix-method}
+\alias{Ops,matrix,Matrix-method}
 \alias{crossprod,ANY,Matrix-method}
 \alias{kronecker,ANY,Matrix-method}
 \alias{kronecker,Matrix,ANY-method}

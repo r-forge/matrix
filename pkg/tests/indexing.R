@@ -45,14 +45,17 @@ m[, 1] <- -1
 m[1:3,]
 
 ## testing operations on logical Matrices rather more than indexing:
+m. <- as.matrix(m)
 g10 <- m [ m > 10 ]
 stopifnot(18 == length(g10))
 stopifnot(10 == length(m[ m <= 10 ]))
 sel <- (20 <  m) & (m <  150)
+sel.<- (20 <  m.)& (m.<  150)
 nsel <-(20 >= m) | (m >= 150)
 (ssel <- as(sel, "sparseMatrix"))
 stopifnot(is(sel, "lMatrix"), is(ssel, "lsparseMatrix"),
-          identical3(!sel, !ssel, nsel), # !<sparse> is typically dense
+	  identical3(as.mat(sel.), as.mat(sel), as.mat(ssel)),
+	  identical3(!sel, !ssel, nsel), # !<sparse> is typically dense
 	  identical3(m[ sel],  m[ ssel], as.matrix(m)[as.matrix( ssel)]),
 	  identical3(m[!sel],  m[!ssel], as.matrix(m)[as.matrix(!ssel)])
 	  )

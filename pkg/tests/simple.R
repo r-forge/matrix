@@ -84,6 +84,19 @@ stopifnot(identical(i6, as(cbind(c(-4, rep(1,5))), "dgeMatrix")),
           identical(i6, solve(m6, matrix(c(1,2,3,4,5,6))))
           )
 
+## solve(<sparse>)
+(m <- t1+ t(t1) + Diagonal(4))
+i.m <- solve(as.mat(m))
+o4 <- (I1 <- m %*% i.m)@x ; o4 <- o4[o4 != 0]
+im <- solve(m)
+(I2 <- m %*% im)
+stopifnot(is(im, "Matrix"), is(I2, "Matrix"),
+          all.equal(I1, I2, tol = 1e-14),
+          all.equal(diag(4), as.mat(I2), tol = 1e-12),
+          ## solve(<sparse>, <sparse>):
+          all.equal(solve(m,m), I2, tol = 1e-14),
+          abs(o4 - 1) < 1e-14)
+
 ###-- row- and column operations  {was ./rowcolOps.R }
 
 set.seed(321)

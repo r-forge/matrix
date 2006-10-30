@@ -36,6 +36,7 @@ setMethod("expm", signature(x = "dMatrix"),
 ## -----
 ## >>> More specific methods for sub-classes (sparse), use these as "catch-all":
 
+## Going -> dense* (= ddense*) -> dgeMatrix
 setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
 	  signature(e1 = "dMatrix", e2 = "dMatrix"),
 	  function(e1, e2) {
@@ -65,12 +66,15 @@ setMethod("Summary", signature(x = "dMatrix", na.rm = "ANY"),
 
 ## "Compare" -> returning  logical Matrices
 setMethod("Compare", signature(e1 = "numeric", e2 = "dMatrix"),
-          function(e1,e2) {
-              ## "swap RHS and LHS" :
-              switch(.Generic,
-                     "==" =, "!=" = callGeneric(e2, e1),
-                     "<" =, ">" =, "<=" =, ">=" = !callGeneric(e2, e1))
-          })
+	  function(e1,e2) {
+	      ## "swap RHS and LHS" and use the method below:
+	      switch(.Generic,
+		     "==" =, "!=" = callGeneric(e2, e1),
+		     "<"  = e2 >  e1,
+		     "<=" = e2 >= e1,
+		     ">"  = e2 <  e1,
+		     ">=" = e2 <= e1)
+	  })
 
 setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
 	  function(e1, e2) {
@@ -145,6 +149,7 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
 	  })
 
 ## "dMatrix <-> work with 'x' slot
+## FIXME? use 'Ops' and not just 'Compare' :
 setMethod("Compare", signature(e1 = "dMatrix", e2 = "dMatrix"),
           function(e1, e2) {
               d <- dimCheck(e1,e2)
@@ -163,7 +168,7 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "dMatrix"),
 		      r <- new(lClass, x = r,
                                Dim = dim(e1), Dimnames = dimnames(e1))
 
-		  } else { ## non sparse result
+		  } else { ## r0 is NA or TRUE : non sparse result
 
 		  stop("'Compare' for sparse dMatrix not yet implemented for all cases")
 ### FIXME

@@ -241,6 +241,13 @@ setMethod("-", signature(e1 = "Matrix", e2 = "missing"),
               0-e1
           })
 
+## old-style matrices are made into new ones
+setMethod("Ops", signature(e1 = "Matrix", e2 = "matrix"),
+	  function(e1, e2) callGeneric(e1, Matrix(e2)))
+##	    callGeneric(e1, Matrix(e2, sparse=is(e1,"sparseMatrix"))))
+setMethod("Ops", signature(e1 = "matrix", e2 = "Matrix"),
+	  function(e1, e2) callGeneric(Matrix(e1), e2))
+
 ## bail-outs -- on highest possible level, hence "Ops", not "Compare"/"Arith" :
 setMethod("Ops", signature(e1 = "Matrix", e2 = "Matrix"),
           function(e1, e2) {
