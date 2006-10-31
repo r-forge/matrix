@@ -87,7 +87,8 @@ stopifnot(identical(i6, as(cbind(c(-4, rep(1,5))), "dgeMatrix")),
 ## solve(<sparse>)
 (m <- t1+ t(t1) + Diagonal(4))
 i.m <- solve(as.mat(m))
-o4 <- (I1 <- m %*% i.m)@x ; o4 <- o4[o4 != 0]
+I1 <- m %*% i.m
+o4 <- diag(I1)
 im <- solve(m)
 (I2 <- m %*% im)
 stopifnot(is(im, "Matrix"), is(I2, "Matrix"),
@@ -200,6 +201,7 @@ stopifnot(validObject(c3), is(c3, "CsparseMatrix"), is(c3, "triangularMatrix"))
 stopifnot(is(X <- Diagonal(7) + 1.5 * tM[1:7,1:7], "sparseMatrix"))
 X
 (XX <- X - chol(crossprod(X)))
+## hmm, if we use drop0() here, maybe we should export it ...
 XX <- as(Matrix:::drop0(XX), "dsCMatrix")
 stopifnot(identical(XX, Matrix(0, nrow(X), ncol(X))))
 
