@@ -507,7 +507,7 @@ cholmod_dense *numeric_as_chm_dense(double *v, int n)
  * the result should *not* be freed with cholmod_free_factor.  Use
  * Free on the result.
  *
- * @param x pointer to an object that inherits from ddenseMatrix
+ * @param x pointer to an object that inherits from CHMfactor
  *
  * @return pointer to a cholmod_dense object that contains a pointer
  * to the contents of x.

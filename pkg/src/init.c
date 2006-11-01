@@ -35,7 +35,7 @@ static R_CallMethodDef CallEntries[] = {
     {"CHMfactor_to_sparse", (DL_FUNC) &CHMfactor_to_sparse, 1},
     {"Cholesky_validate", (DL_FUNC) &Cholesky_validate, 1},
     {"Csparse_Csparse_prod", (DL_FUNC) &Csparse_Csparse_prod, 2},
-    {"Csparse_Csparse_crossprod", (DL_FUNC) &Csparse_Csparse_crossprod, 2},
+    {"Csparse_Csparse_crossprod", (DL_FUNC) &Csparse_Csparse_crossprod, 3},
     {"Csparse_band", (DL_FUNC) &Csparse_band, 3},
     {"Csparse_crossprod", (DL_FUNC) &Csparse_crossprod, 3},
     {"Csparse_dense_crossprod", (DL_FUNC) &Csparse_dense_crossprod, 2},
@@ -221,7 +221,7 @@ R_init_Matrix(DllInfo *dll)
     R_RegisterCCallable("Matrix", "cholmod_free_triplet", (DL_FUNC)cholmod_free_triplet);
     R_RegisterCCallable("Matrix", "cholmod_nnz", (DL_FUNC)cholmod_nnz);
     R_RegisterCCallable("Matrix", "cholmod_sdmult", (DL_FUNC)cholmod_sdmult);
-    R_RegisterCCallable("Matrix", "cholmod_solve", (DL_FUNC)cholmod_solve); 
+    R_RegisterCCallable("Matrix", "cholmod_solve", (DL_FUNC)cholmod_solve);
     R_RegisterCCallable("Matrix", "cholmod_sort", (DL_FUNC)cholmod_sort);
     R_RegisterCCallable("Matrix", "cholmod_sparse_to_dense", (DL_FUNC)cholmod_sparse_to_dense);
     R_RegisterCCallable("Matrix", "cholmod_sparse_to_triplet", (DL_FUNC)cholmod_sparse_to_triplet);

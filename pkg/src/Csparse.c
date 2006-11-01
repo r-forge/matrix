@@ -143,7 +143,8 @@ SEXP Csparse_transpose(SEXP x, SEXP tri)
 
 SEXP Csparse_Csparse_prod(SEXP a, SEXP b)
 {
-    cholmod_sparse *cha = as_cholmod_sparse(a),
+    cholmod_sparse
+	*cha = as_cholmod_sparse(a),
 	*chb = as_cholmod_sparse(b);
     cholmod_sparse *chc = cholmod_ssmult(cha, chb, 0, cha->xtype, 1, &c);
     SEXP dn = allocVector(VECSXP, 2);
@@ -156,19 +157,31 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b)
     return chm_sparse_to_SEXP(chc, 1, 0, 0, "", dn);
 }
 
-SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b)
+SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans)
 {
-    cholmod_sparse *cha = as_cholmod_sparse(a),
+    int tr = asLogical(trans);
+    cholmod_sparse
+	*cha = as_cholmod_sparse(a),
 	*chb = as_cholmod_sparse(b);
-    cholmod_sparse *chta = cholmod_transpose(cha, 1, &c);
-    cholmod_sparse *chc = cholmod_ssmult(chta, chb, 0, cha->xtype, 1, &c);
+    cholmod_sparse *chTr, *chc;
     SEXP dn = allocVector(VECSXP, 2);
 
-    Free(cha); Free(chb); cholmod_free_sparse(&chta, &c);
+/*     cholmod_sparse *chTr = cholmod_transpose(cha, 1, &c); */
+/*     cholmod_sparse *chc = cholmod_ssmult(chTr, chb, 0, cha->xtype, 1, &c); */
+
+    if (tr)
+	chTr = cholmod_transpose(chb, chb->xtype, &c);
+    else
+	chTr = cholmod_transpose(cha, cha->xtype, &c);
+    chc = cholmod_ssmult((tr) ? cha : chTr, (tr) ? chTr : chb,
+			 0, cha->xtype, 1, &c);
+
+    Free(cha); Free(chb); cholmod_free_sparse(&chTr, &c);
+
     SET_VECTOR_ELT(dn, 0,	/* establish dimnames */
-		   duplicate(VECTOR_ELT(GET_SLOT(a, Matrix_DimNamesSym), 1)));
+		   duplicate(VECTOR_ELT(GET_SLOT(a, Matrix_DimNamesSym), (tr) ? 0 : 1)));
     SET_VECTOR_ELT(dn, 1,
-		   duplicate(VECTOR_ELT(GET_SLOT(b, Matrix_DimNamesSym), 1)));
+		   duplicate(VECTOR_ELT(GET_SLOT(b, Matrix_DimNamesSym), (tr) ? 0 : 1)));
     return chm_sparse_to_SEXP(chc, 1, 0, 0, "", dn);
 }
 
@@ -200,6 +213,7 @@ SEXP Csparse_dense_crossprod(SEXP a, SEXP b)
     return chm_dense_to_SEXP(chc, 1, 0);
 }
 
+/* Computes   x'x  or  x x'  -- see Csparse_Csparse_crossprod above for  x'y and x y' */
 SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet)
 {
     int trip = asLogical(triplet),

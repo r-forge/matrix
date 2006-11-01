@@ -634,10 +634,17 @@ diagU2N <- function(x)
 	Dimnames = x@Dimnames, uplo = x@uplo, diag = "N")
 }
 
-## FIXME: this should probably be dropped / replaced by as_Csparse
+## Needed, e.g., in ./Csparse.R for colSums() etc:
 .as.dgC.Fun <- function(x, na.rm = FALSE, dims = 1) {
     x <- as(x, "dgCMatrix")
     callGeneric()
+}
+
+.as.dgC.0.factors <- function(x) {
+    if(!is(x, "dgCMatrix"))
+	as(x, "dgCMatrix") # will not have 'factors'
+    else ## dgCMatrix
+	if(!length(x@factors)) x else { x@factors <- list() ; x }
 }
 
 .as.dgT.Fun <- function(x, na.rm = FALSE, dims = 1) {
