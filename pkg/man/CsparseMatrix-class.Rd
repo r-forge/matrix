@@ -22,6 +22,7 @@
 \alias{crossprod,CsparseMatrix,numeric-method}
 \alias{diag,CsparseMatrix-method}
 \alias{t,CsparseMatrix-method}
+\alias{trossprod,CsparseMatrix,CsparseMatrix-method}
 \alias{tcrossprod,CsparseMatrix,missing-method}
 \alias{colMeans,CsparseMatrix-method}
 \alias{colSums,CsparseMatrix-method}

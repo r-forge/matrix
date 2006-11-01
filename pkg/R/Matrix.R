@@ -188,6 +188,9 @@ setMethod("tcrossprod", signature(x = "numeric", y = "Matrix"),
 
 setMethod("solve", signature(a = "Matrix", b = "numeric"),
 	  function(a, b, ...) callGeneric(a, as.matrix(b)))
+## when no sub-class method is found, bail out
+setMethod("solve", signature(a = "Matrix", b = "matrix"),
+	  function(a, b, ...) .bail.out.2("solve", class(a), "matrix"))
 
 ## bail-out methods in order to get better error messages
 setMethod("%*%", signature(x = "Matrix", y = "Matrix"),

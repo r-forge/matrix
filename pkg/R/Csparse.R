@@ -169,16 +169,20 @@ setReplaceMethod("[", signature(x = "CsparseMatrix", i = "index", j = "index",
 
 setMethod("crossprod", signature(x = "CsparseMatrix", y = "missing"),
 	  function(x, y = NULL) {
-              if (is(x, "symmetricMatrix")) {
-                  warning("crossprod(x) calculated as x %*% x for sparse, symmetric x")
-                  return(x %*% x)
-              }
+	      if (is(x, "symmetricMatrix")) {
+		  warning("crossprod(x) calculated as x %*% x for sparse, symmetric x")
+		  return(x %*% x)
+	      }
 	      .Call(Csparse_crossprod, x, trans = FALSE, triplet = FALSE)
 	  })
 
 setMethod("crossprod", signature(x = "CsparseMatrix", y = "CsparseMatrix"),
-          function(x, y = NULL)
-          .Call(Csparse_Csparse_crossprod, x, y))
+	  function(x, y = NULL)
+	  .Call(Csparse_Csparse_crossprod, x, y, trans = FALSE))
+
+setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "CsparseMatrix"),
+	  function(x, y = NULL)
+	  .Call(Csparse_Csparse_crossprod, x, y, trans = TRUE))
 
 ## FIXME: Generalize the class of y.  This specific method is to replace one
 ##        in dgCMatrix.R
@@ -202,12 +206,6 @@ setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "missing"),
 
 setMethod("t", signature(x = "CsparseMatrix"),
 	  function(x) .Call(Csparse_transpose, x, is(x, "triangularMatrix")))
-
-## FIXME (TODO):
-## setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "CsparseMatrix"),
-## 	  function(x, y)
-## 	  .Call(Csparse_crossprod_2, x, y, trans = TRUE, triplet = FALSE)
-
 
 setMethod("%*%", signature(x = "CsparseMatrix", y = "CsparseMatrix"),
           function(x, y) .Call(Csparse_Csparse_prod, x, y))

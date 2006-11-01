@@ -299,7 +299,6 @@ setMethod("show", signature(object = "sparseMatrix"),
    })
 
 
-## not exported:
 setMethod("isSymmetric", signature(object = "sparseMatrix"),
 	  function(object, tol = 100*.Machine$double.eps) {
 	      ## pretest: is it square?
@@ -308,8 +307,8 @@ setMethod("isSymmetric", signature(object = "sparseMatrix"),
 	      ## else slower test
 	      if (is(object, "dMatrix"))
 		  ## use gC; "T" (triplet) is *not* unique!
-		  isTRUE(all.equal(as(object, "dgCMatrix"),
-				   as(t(object), "dgCMatrix"), tol = tol))
+		  isTRUE(all.equal(.as.dgC.0.factors(  object),
+				   .as.dgC.0.factors(t(object)), tol = tol))
 	      else if (is(object, "lMatrix"))
 		  ## test for exact equality; FIXME(?): identical() too strict?
 		  identical(as(object, "lgCMatrix"),
@@ -322,6 +321,7 @@ setMethod("isSymmetric", signature(object = "sparseMatrix"),
 	  })
 
 
+## These two are not (yet?) exported:
 setMethod("isTriangular", signature(object = "sparseMatrix"),
 	  function(object, upper = NA)
               isTriC(as(object, "CsparseMatrix"), upper))

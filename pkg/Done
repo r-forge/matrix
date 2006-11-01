@@ -168,3 +168,7 @@
 
 - Diagonal(3) - toeplitz(c(0,1,0))  or
   Diagonal(4) >= 0		    now work
+
+- .Call(Csparse_Csparse_crossprod, ...)  for crossprod(x,y) {2-args}
+
+
