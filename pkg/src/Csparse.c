@@ -156,6 +156,22 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b)
     return chm_sparse_to_SEXP(chc, 1, 0, 0, "", dn);
 }
 
+SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b)
+{
+    cholmod_sparse *cha = as_cholmod_sparse(a),
+	*chb = as_cholmod_sparse(b);
+    cholmod_sparse *chta = cholmod_transpose(cha, 1, &c);
+    cholmod_sparse *chc = cholmod_ssmult(chta, chb, 0, cha->xtype, 1, &c);
+    SEXP dn = allocVector(VECSXP, 2);
+
+    Free(cha); Free(chb); cholmod_free_sparse(&chta, &c);
+    SET_VECTOR_ELT(dn, 0,	/* establish dimnames */
+		   duplicate(VECTOR_ELT(GET_SLOT(a, Matrix_DimNamesSym), 1)));
+    SET_VECTOR_ELT(dn, 1,
+		   duplicate(VECTOR_ELT(GET_SLOT(b, Matrix_DimNamesSym), 1)));
+    return chm_sparse_to_SEXP(chc, 1, 0, 0, "", dn);
+}
+
 SEXP Csparse_dense_prod(SEXP a, SEXP b)
 {
     cholmod_sparse *cha = as_cholmod_sparse(a);

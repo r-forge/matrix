@@ -16,6 +16,7 @@
 \alias{coerce,matrix,CsparseMatrix-method}
 \alias{coerce,numeric,CsparseMatrix-method}
 \alias{crossprod,CsparseMatrix,missing-method}
+\alias{crossprod,CsparseMatrix,CsparseMatrix-method}
 \alias{crossprod,CsparseMatrix,ddenseMatrix-method}
 \alias{crossprod,CsparseMatrix,matrix-method}
 \alias{crossprod,CsparseMatrix,numeric-method}

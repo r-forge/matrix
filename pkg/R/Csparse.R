@@ -176,6 +176,10 @@ setMethod("crossprod", signature(x = "CsparseMatrix", y = "missing"),
 	      .Call(Csparse_crossprod, x, trans = FALSE, triplet = FALSE)
 	  })
 
+setMethod("crossprod", signature(x = "CsparseMatrix", y = "CsparseMatrix"),
+          function(x, y = NULL)
+          .Call(Csparse_Csparse_crossprod, x, y))
+
 ## FIXME: Generalize the class of y.  This specific method is to replace one
 ##        in dgCMatrix.R
 setMethod("crossprod", signature(x = "CsparseMatrix", y = "ddenseMatrix"),
