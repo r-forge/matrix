@@ -64,6 +64,8 @@ data(KNex); mm <- KNex$mm
 M <- mm[1:500, 1:200]
 MT <- as(M, "TsparseMatrix")
 cpr <- t(mm) %*% mm
+cpr. <- crossprod(mm, mm)
+stopifnot(identical(cpr, cpr.))
 showMethods("%*%", class=class(M))
 
 v1 <- rep(1, ncol(M))

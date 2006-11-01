@@ -1,3 +1,9 @@
+2006-11-01  Douglas Bates  <bates@r-project.org>
+
+	* R/Csparse.R,src/Csparse.c,tests/matprod.R,
+	man/CsparseMatrix-class.Rd: crossprod(<CsparseMatrix>,
+	<CsparseMatrix>) added
+
 2006-10-30  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* tests/matprod.R: add a variation of Harri's example
