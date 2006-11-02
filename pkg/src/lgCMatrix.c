@@ -1,7 +1,7 @@
 #include "lgCMatrix.h"
 
 #include "dgCMatrix.h"
-/* validate: -> gCMatrix_validate() in ./dgCMatrix.c */
+/* validate: -> xCMatrix_validate() in ./dgCMatrix.c */
 
 SEXP lcsc_to_matrix(SEXP x)
 {

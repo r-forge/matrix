@@ -295,8 +295,7 @@ setClass("corMatrix", representation(sd = "numeric"), contains = "dpoMatrix",
 ## numeric, sparse, triplet general matrices
 setClass("dgTMatrix",
 	 contains = c("TsparseMatrix", "dsparseMatrix", "generalMatrix"),
-	 validity =
-	 function(object) .Call(dgTMatrix_validate, object)
+	 validity = function(object) .Call(xTMatrix_validate, object)
 	 )
 
 ## Should not have dtTMatrix inherit from dgTMatrix because a dtTMatrix could
@@ -308,8 +307,7 @@ setClass("dgTMatrix",
 setClass("dtTMatrix",
 	 contains = c("TsparseMatrix", "dsparseMatrix", "triangularMatrix"),
 	 prototype = prototype(uplo = "U", diag = "N"),
-	 validity =
-	 function(object) .Call(dtTMatrix_validate, object)
+	 validity = function(object) .Call(xTMatrix_validate, object)
 	 )
 
 ## Should not have dsTMatrix inherit from dgTMatrix because a dsTMatrix
@@ -320,15 +318,14 @@ setClass("dtTMatrix",
 setClass("dsTMatrix",
 	 contains = c("TsparseMatrix", "dsparseMatrix", "symmetricMatrix"),
 	 prototype = prototype(uplo = "U"),
-	 validity =
-	 function(object) .Call(dsTMatrix_validate, object)
+	 validity = function(object) .Call(xTMatrix_validate, object)
 	 )
 
 ## numeric, sparse, sorted compressed sparse column-oriented general matrices
 setClass("dgCMatrix",
 	 contains = c("CsparseMatrix", "dsparseMatrix", "generalMatrix"),
 	 prototype = prototype(p = 0:0),# to be valid
-	 validity = function(object) .Call(gCMatrix_validate, object)
+	 validity = function(object) .Call(xCMatrix_validate, object)
 	 )
 
 ## see comments for dtTMatrix above
@@ -336,8 +333,7 @@ setClass("dgCMatrix",
 setClass("dtCMatrix",
 	 contains = c("CsparseMatrix", "dsparseMatrix", "triangularMatrix"),
 	 prototype = prototype(p = 0:0, uplo = "U", diag = "N"),# to be valid
-	 validity =
-	 function(object) .Call(dtCMatrix_validate, object)
+	 validity = function(object) .Call(xCMatrix_validate, object)
 	 )
 
 ## see comments for dsTMatrix above
@@ -345,8 +341,7 @@ setClass("dtCMatrix",
 setClass("dsCMatrix",
 	 contains = c("CsparseMatrix", "dsparseMatrix", "symmetricMatrix"),
 	 prototype = prototype(p = 0:0, uplo = "U"),# to be valid
-	 validity =
-	 function(object) .Call(dsCMatrix_validate, object)
+	 validity = function(object) .Call(xCMatrix_validate, object)
 	 )
 
 ## numeric, sparse, sorted compressed sparse row-oriented general matrices
@@ -379,46 +374,42 @@ setClass("dsRMatrix",
 ## logical, sparse, triplet general matrices
 setClass("lgTMatrix",
 	 contains = c("TsparseMatrix", "lsparseMatrix", "generalMatrix"),
-	 validity =
-	 function(object) .Call(lgTMatrix_validate, object)
+	 validity = function(object) .Call(xTMatrix_validate, object)
 	 )
 
 ## logical, sparse, triplet triangular matrices
 setClass("ltTMatrix",
 	 contains = c("TsparseMatrix", "lsparseMatrix", "triangularMatrix"),
 	 prototype = prototype(uplo = "U", diag = "N"),
-	 validity =
-	 function(object) .Call(dtTMatrix_validate, object)
+	 validity = function(object) .Call(xTMatrix_validate, object)
 	 )
 
 ## logical, sparse, triplet symmetric matrices
 setClass("lsTMatrix",
 	 contains = c("TsparseMatrix", "lsparseMatrix", "symmetricMatrix"),
 	 prototype = prototype(uplo = "U"),
-	 validity = function(object) .Call(dsTMatrix_validate, object)
+	 validity = function(object) .Call(xTMatrix_validate, object)
 	 )
 
 ## logical, sparse, sorted compressed sparse column-oriented general matrices
 setClass("lgCMatrix",
 	 contains = c("CsparseMatrix", "lsparseMatrix", "generalMatrix"),
 	 prototype = prototype(p = 0:0),# to be valid
-	 validity = function(object) .Call(gCMatrix_validate, object)
+	 validity = function(object) .Call(xCMatrix_validate, object)
 	 )
 
 ## logical, sparse, sorted compressed sparse column-oriented triangular matrices
 setClass("ltCMatrix",
 	 contains = c("CsparseMatrix", "lsparseMatrix", "triangularMatrix"),
 	 prototype = prototype(p = 0:0, uplo = "U", diag = "N"),# to be valid
-	 validity =
-	 function(object) .Call(ltCMatrix_validate, object)
+	 validity = function(object) .Call(xCMatrix_validate, object)
 	 )
 
 ## logical, sparse, sorted compressed sparse column-oriented symmetric matrices
 setClass("lsCMatrix",
 	 contains = c("CsparseMatrix", "lsparseMatrix", "symmetricMatrix"),
 	 prototype = prototype(p = 0:0, uplo = "U"),# to be valid
-	 validity =
-	 function(object) .Call(lsCMatrix_validate, object)
+	 validity = function(object) .Call(xCMatrix_validate, object)
 	 )
 
 ## logical, sparse, sorted compressed sparse row-oriented general matrices

@@ -1,5 +1,11 @@
 2006-11-02  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+        * src/Tsparse.c: use xTsparse_validate() , and hence remove
+
+        * src/{ltC,lsC,lgT}Matrix.[ch]: removed
+
+2006-11-02  Martin Maechler  <maechler@stat.math.ethz.ch>
+
 	* R/AllClass.R (Matrix-class): check length of dimnames in validity.
 
 	* tests/simple.R: validObject() checking the above.

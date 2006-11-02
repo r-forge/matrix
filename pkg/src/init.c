@@ -21,9 +21,6 @@
 #include "factorizations.h"
 #include "ldense.h"
 #include "lgCMatrix.h"
-#include "lgTMatrix.h"
-#include "lsCMatrix.h"
-#include "ltCMatrix.h"
 #include "sparseQR.h"
 #include <R_ext/Rdynload.h>
 
@@ -80,7 +77,6 @@ static R_CallMethodDef CallEntries[] = {
     {"dgCMatrix_qrsol", (DL_FUNC) &dgCMatrix_qrsol, 2},
     {"dgTMatrix_to_dgeMatrix", (DL_FUNC) &dgTMatrix_to_dgeMatrix, 1},
     {"dgTMatrix_to_matrix", (DL_FUNC) &dgTMatrix_to_matrix, 1},
-    {"dgTMatrix_validate", (DL_FUNC) &dgTMatrix_validate, 1},
     {"dgeMatrix_LU", (DL_FUNC) &dgeMatrix_LU, 1},
     {"dgeMatrix_Schur", (DL_FUNC) &dgeMatrix_Schur, 2},
     {"dgeMatrix_colsums", (DL_FUNC) &dgeMatrix_colsums, 4},
@@ -112,10 +108,8 @@ static R_CallMethodDef CallEntries[] = {
     {"dsCMatrix_chol", (DL_FUNC) &dsCMatrix_chol, 2},
     {"dsCMatrix_matrix_solve", (DL_FUNC) &dsCMatrix_matrix_solve, 2},
     {"dsCMatrix_to_dgTMatrix", (DL_FUNC) &dsCMatrix_to_dgTMatrix, 1},
-    {"dsCMatrix_validate", (DL_FUNC) &dsCMatrix_validate, 1},
     {"dsTMatrix_as_dgTMatrix", (DL_FUNC) &dsTMatrix_as_dgTMatrix, 1},
     {"dsTMatrix_as_dsyMatrix", (DL_FUNC) &dsTMatrix_as_dsyMatrix, 1},
-    {"dsTMatrix_validate", (DL_FUNC) &dsTMatrix_validate, 1},
     {"dsyMatrix_as_dspMatrix", (DL_FUNC) &dsyMatrix_as_dspMatrix, 1},
     {"dsyMatrix_as_matrix", (DL_FUNC) &dsyMatrix_as_matrix, 1},
     {"dsyMatrix_matrix_mm", (DL_FUNC) &dsyMatrix_matrix_mm, 3},
@@ -135,10 +129,8 @@ static R_CallMethodDef CallEntries[] = {
     {"dtCMatrix_solve", (DL_FUNC) &dtCMatrix_solve, 1},
     {"dtCMatrix_matrix_solve", (DL_FUNC) &dtCMatrix_matrix_solve, 3},
     {"dtCMatrix_upper_solve", (DL_FUNC) &dtCMatrix_upper_solve, 1},
-    {"dtCMatrix_validate", (DL_FUNC) &dtCMatrix_validate, 1},
     {"dtTMatrix_as_dtrMatrix", (DL_FUNC) &dtTMatrix_as_dtrMatrix, 1},
     {"dtTMatrix_as_dgCMatrix", (DL_FUNC) &dtTMatrix_as_dgCMatrix, 1},
-    {"dtTMatrix_validate", (DL_FUNC) &dtTMatrix_validate, 1},
     {"dtpMatrix_as_dtrMatrix", (DL_FUNC) &dtpMatrix_as_dtrMatrix, 1},
     {"dtpMatrix_getDiag", (DL_FUNC) &dtpMatrix_getDiag, 1},
     {"dtpMatrix_matrix_mm", (DL_FUNC) &dtpMatrix_matrix_mm, 2},
@@ -159,13 +151,13 @@ static R_CallMethodDef CallEntries[] = {
     {"dup_mMatrix_as_dgeMatrix", (DL_FUNC) &dup_mMatrix_as_dgeMatrix, 1},
 
     /* for dgC* _and_ lgC* : */
-    {"gCMatrix_validate", (DL_FUNC) &gCMatrix_validate, 1},
+    {"xCMatrix_validate", (DL_FUNC) &xCMatrix_validate, 1},
+    {"xTMatrix_validate", (DL_FUNC) &xTMatrix_validate, 1},
 
     {"lapack_qr", (DL_FUNC) &lapack_qr, 2},
 
     {"lcsc_to_matrix", (DL_FUNC) &lcsc_to_matrix, 1},
     {"ncsc_to_matrix", (DL_FUNC) &ncsc_to_matrix, 1},
-    {"lgTMatrix_validate", (DL_FUNC) &lgTMatrix_validate, 1},
 
     {"lspMatrix_as_lsyMatrix", (DL_FUNC) &lspMatrix_as_lsyMatrix, 2},
     {"lsyMatrix_as_lspMatrix", (DL_FUNC) &lsyMatrix_as_lspMatrix, 2},
@@ -174,8 +166,6 @@ static R_CallMethodDef CallEntries[] = {
     {"ltrMatrix_as_lgeMatrix", (DL_FUNC) &ltrMatrix_as_lgeMatrix, 2},
     {"ltrMatrix_as_ltpMatrix", (DL_FUNC) &ltrMatrix_as_ltpMatrix, 2},
 
-    {"lsCMatrix_validate", (DL_FUNC) &lsCMatrix_validate, 1},
-    {"ltCMatrix_validate", (DL_FUNC) &ltCMatrix_validate, 1},
     {"lsq_dense_Chol", (DL_FUNC) &lsq_dense_Chol, 2},
     {"lsq_dense_QR", (DL_FUNC) &lsq_dense_QR, 2},
     {"sparseQR_validate", (DL_FUNC) &sparseQR_validate, 1},

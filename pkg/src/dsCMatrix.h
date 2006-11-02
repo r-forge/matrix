@@ -5,7 +5,6 @@
 #include "chm_common.h"
 
 SEXP dsCMatrix_Cholesky(SEXP A, SEXP perm, SEXP LDL, SEXP super);
-SEXP dsCMatrix_validate(SEXP x);
 SEXP dsCMatrix_chol(SEXP x, SEXP pivot);
 SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b);
 SEXP dsCMatrix_to_dgTMatrix(SEXP x);
