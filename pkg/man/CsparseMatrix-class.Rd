@@ -22,7 +22,7 @@
 \alias{crossprod,CsparseMatrix,numeric-method}
 \alias{diag,CsparseMatrix-method}
 \alias{t,CsparseMatrix-method}
-\alias{trossprod,CsparseMatrix,CsparseMatrix-method}
+\alias{tcrossprod,CsparseMatrix,CsparseMatrix-method}
 \alias{tcrossprod,CsparseMatrix,missing-method}
 \alias{colMeans,CsparseMatrix-method}
 \alias{colSums,CsparseMatrix-method}
@@ -88,6 +88,7 @@ Class \code{"Matrix"}, by class \code{"sparseMatrix"}.
     \item{coerce}{\code{signature(from = "denseMatrix", to = "CsparseMatrix")}: ... }
     \item{colMeans}{\code{signature(x = "CsparseMatrix")}: ... }
     \item{colSums}{\code{signature(x = "CsparseMatrix")}: ... }
+    \item{crossprod}{\code{signature(x = "CsparseMatrix", y = "CsparseMatrix")}: ... }
     \item{crossprod}{\code{signature(x = "CsparseMatrix", y = "missing")}: ... }
     \item{crossprod}{\code{signature(x = "CsparseMatrix", y = "dgeMatrix")}: ... }
     \item{crossprod}{\code{signature(x = "CsparseMatrix", y = "matrix")}: ... }
@@ -98,6 +99,7 @@ Class \code{"Matrix"}, by class \code{"sparseMatrix"}.
     \item{rowMeans}{\code{signature(x = "CsparseMatrix")}: ... }
     \item{rowSums}{\code{signature(x = "CsparseMatrix")}: ... }
     \item{t}{\code{signature(x = "CsparseMatrix")}: ... }
+    \item{tcrossprod}{\code{signature(x = "CsparseMatrix", y = "CsparseMatrix")}: ... }
     \item{tcrossprod}{\code{signature(x = "CsparseMatrix", y = "missing")}: ... }
     \item{tril}{\code{signature(x = "CsparseMatrix")}: ... }
     \item{triu}{\code{signature(x = "CsparseMatrix")}: ... }

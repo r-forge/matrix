@@ -1,6 +1,22 @@
+2006-11-02  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllClass.R (Matrix-class): check length of dimnames in validity.
+
+	* tests/simple.R: validObject() checking the above.
+
+	* src/dgCMatrix.c (gCMatrix_validate): new, small and simple,
+	replacing both dgCMatrix_validate and lgCM*.
+
+	* src/Csparse.c (Csparse_dense_prod, etc): do not lose dimnames;
+	fix dimnames setting in other places.
+	* src/chm_common.c (chm_dense_to_SEXP): now can pass dimnames
+
 2006-11-01  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* R/sparseMatrix.R (isSymmetric): drop 'factors' slot for symmetry test, via
+	* R/Csparse.R,src/Csparse.c, etc: tcrossprod(<CsparseM>,<CsparseM>)
+
+	* R/sparseMatrix.R (isSymmetric): drop 'factors' slot for
+	symmetry test, via
 	* R/Auxiliaries.R (.as.dgC.0.factors):
 
 2006-11-01  Douglas Bates  <bates@r-project.org>

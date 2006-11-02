@@ -21,6 +21,11 @@ setClass("Matrix",
 	     Dn <- object@Dimnames
 	     if (!is.list(Dn) || length(Dn) != 2)
 		 return("'Dimnames' slot must be list of length 2")
+	     lDn <- sapply(Dn, length)
+	     if (lDn[1] > 0 && lDn[1] != Dim[1])
+		 return("length(Dimnames[[1]])' must match Dim[1]")
+	     if (lDn[2] > 0 && lDn[2] != Dim[2])
+		 return("length(Dimnames[[2]])' must match Dim[2]")
 	     ## 'else'	ok :
 	     TRUE
 	 })
@@ -323,8 +328,7 @@ setClass("dsTMatrix",
 setClass("dgCMatrix",
 	 contains = c("CsparseMatrix", "dsparseMatrix", "generalMatrix"),
 	 prototype = prototype(p = 0:0),# to be valid
-	 validity =
-	 function(object) .Call(dgCMatrix_validate, object)
+	 validity = function(object) .Call(gCMatrix_validate, object)
 	 )
 
 ## see comments for dtTMatrix above
@@ -398,8 +402,7 @@ setClass("lsTMatrix",
 setClass("lgCMatrix",
 	 contains = c("CsparseMatrix", "lsparseMatrix", "generalMatrix"),
 	 prototype = prototype(p = 0:0),# to be valid
-	 validity =
-	 function(object) .Call(lgCMatrix_validate, object)
+	 validity = function(object) .Call(gCMatrix_validate, object)
 	 )
 
 ## logical, sparse, sorted compressed sparse column-oriented triangular matrices

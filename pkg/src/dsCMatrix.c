@@ -121,7 +121,7 @@ SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b)
     cx = cholmod_solve(CHOLMOD_A, L, cb, &c);
     Free(cb); Free(L);
     UNPROTECT(1);
-    return chm_dense_to_SEXP(cx, 1, 0);
+    return chm_dense_to_SEXP(cx, 1, 0, /*dimnames = */ R_NilValue);
 }
 
 /* Needed for printing dsCMatrix objects */

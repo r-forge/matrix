@@ -172,7 +172,7 @@ setMethod("%*%", signature(x = "Matrix", y = "numeric"),
 	  function(x, y) callGeneric(x, as.matrix(y)))
 
 setMethod("%*%", signature(x = "numeric", y = "Matrix"),
-	  function(x, y) callGeneric(rbind(x), y))
+	  function(x, y) callGeneric(matrix(x, nrow = 1, byrow=TRUE), y))
 
 setMethod("crossprod", signature(x = "Matrix", y = "numeric"),
 	  function(x, y = NULL) callGeneric(x, as.matrix(y)))
