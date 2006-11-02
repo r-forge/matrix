@@ -26,6 +26,15 @@ stopifnot(##length(sN@i) == 0, # all "FALSE"
 str(m0 <- Matrix(0,     nrow=100, ncol = 1000))
 str(l0 <- Matrix(FALSE, nrow=100, ncol = 200))
 
+## with dimnames:
+m. <- matrix(c(0, 0, 2:0), 3, 5)
+dimnames(m.) <- list(LETTERS[1:3], letters[1:5])
+(m <- Matrix(m.))
+m@Dimnames[[2]] <- m@Dimnames[[1]]
+## not valid anymore:
+(val <- validObject(m, test=TRUE))
+stopifnot(is.character(val))
+
 ###--  Sparse Triangular :
 
 (t1 <- new("dtTMatrix", x= c(3,7), i= 0:1, j=3:2,

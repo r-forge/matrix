@@ -4,46 +4,17 @@
 
 /* FIXME -- we "forget" about dimnames almost everywhere : */
 
-SEXP dgCMatrix_validate(SEXP x)
+/* for dgCMatrix  _and_ lgCMatrix  (but *not*  ngC...) : */
+SEXP gCMatrix_validate(SEXP x)
 {
-    /* FIXME? almost all is now done in Csparse_validate;
-       should only check xslot here!
-       ==> *identical*  to lgCMatrix_validate ==> call it 'gCMatrix_validate'
-     */
-    SEXP pslot = GET_SLOT(x, Matrix_pSym),
-	islot = GET_SLOT(x, Matrix_iSym),
-	xslot = GET_SLOT(x, Matrix_xSym);
-    int j,
-	*dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
-	nrow = dims[0],
-	ncol = dims[1],
-	*xp = INTEGER(pslot),
-	*xi = INTEGER(islot);
-
-    if (length(islot) != length(xslot))
-	return mkString(_("lengths of slots i and x must match"));
-    if (length(pslot) != ncol + 1)
-	return mkString(_("slot p must have length ncol + 1"));
-    if (xp[0] != 0)
-	return mkString(_("first element of slot p must be zero"));
-    if (length(islot) != xp[ncol])
-	return
-	    mkString(_("last element of slot p must match length of slot i"));
-    for (j = 0; j < ncol; j++) {
-	if (xp[j] > xp[j+1])
-	    return mkString(_("slot p must be non-decreasing"));
-    }
-    for (j = 0; j < length(islot); j++) {
-	if (xi[j] < 0 || xi[j] >= nrow)
-	    return mkString(_("all row indices must be between 0 and nrow-1"));
-    }
-    /* Checking column sorting now done in Csparse_validate */
-/*     if (csc_unsorted_columns(ncol, xp, xi)) */
-/* 	csc_sort_columns(ncol, xp, xi, REAL(xslot)); */
+    /* Almost everything now in Csparse_validate ( ./Csparse.c )
+     * *but* the checking of the 'x' slot : */
+    if (length(GET_SLOT(x, Matrix_iSym)) !=
+	length(GET_SLOT(x, Matrix_xSym)))
+	return mkString(_("lengths of slots 'i' and 'x' must match"));
 
     return ScalarLogical(1);
 }
-
 
 /* TODO: make this work also for "dsC" {where 'x' stores only triangle} */
 SEXP compressed_to_dgTMatrix(SEXP x, SEXP colP)

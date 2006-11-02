@@ -63,23 +63,41 @@ all.equal((Atr %*% solve(Atr, y))@x, y)
 data(KNex); mm <- KNex$mm
 M <- mm[1:500, 1:200]
 MT <- as(M, "TsparseMatrix")
-cpr <- t(mm) %*% mm
-cpr. <- crossprod(mm, mm)
-stopifnot(identical(cpr, cpr.))
+cpr   <- t(mm) %*% mm
+cpr.  <- crossprod(mm)
+cpr.. <- crossprod(mm, mm)
+stopifnot(is(cpr., "symmetricMatrix"),
+          identical3(cpr, as(cpr., class(cpr)), cpr..))
+## with dimnames:
+m <- Matrix(c(0, 0, 2:0), 3, 5)
+dimnames(m) <- list(LETTERS[1:3], letters[1:5])
+m
+p1 <- t(m) %*% m
+(p1. <- crossprod(m)) # FIXME: show() does not even show row names
+t1 <- m %*% t(m)
+(t1. <- tcrossprod(m))
+stopifnot(isSymmetric(p1.),
+          isSymmetric(t1.),
+          identical(p1, as(p1., class(p1))),
+          identical(t1, as(t1., class(t1))),
+          identical(dimnames(p1), dimnames(p1.)),
+          identical(dimnames(t1), dimnames(t1.))
+          )
+
 showMethods("%*%", class=class(M))
 
 v1 <- rep(1, ncol(M))
 str(r <-  M %*% Matrix(v1))
 str(rT <- MT %*% Matrix(v1))
 stopifnot(identical(r, rT))
-str(r. <- M %*% cbind(v1))
+str(r. <- M %*% as.matrix(v1))
 stopifnot(identical4(r, r., rT, M %*% as(v1, "matrix")))
 
 v2 <- rep(1,nrow(M))
 r2 <- t(Matrix(v2)) %*% M
 r2T <- v2 %*% MT
 str(r2. <- v2 %*% M)
-stopifnot(identical4(r2, r2., rbind(v2) %*% M, t(as(v2, "matrix")) %*% M))
+stopifnot(identical3(r2, r2., t(as(v2, "matrix")) %*% M))
 
 
 ## Sparse Cov.matrices from  Harri Kiiveri @ CSIRO

@@ -75,7 +75,6 @@ static R_CallMethodDef CallEntries[] = {
 
     {"dgCMatrix_LU", (DL_FUNC) &dgCMatrix_LU, 3},
     {"dgCMatrix_QR", (DL_FUNC) &dgCMatrix_QR, 2},
-    {"dgCMatrix_validate", (DL_FUNC) &dgCMatrix_validate, 1},
     {"dgCMatrix_lusol", (DL_FUNC) &dgCMatrix_lusol, 2},
     {"dgCMatrix_matrix_solve", (DL_FUNC) &dgCMatrix_matrix_solve, 2},
     {"dgCMatrix_qrsol", (DL_FUNC) &dgCMatrix_qrsol, 2},
@@ -159,11 +158,13 @@ static R_CallMethodDef CallEntries[] = {
     {"dtrMatrix_validate", (DL_FUNC) &dtrMatrix_validate, 1},
     {"dup_mMatrix_as_dgeMatrix", (DL_FUNC) &dup_mMatrix_as_dgeMatrix, 1},
 
+    /* for dgC* _and_ lgC* : */
+    {"gCMatrix_validate", (DL_FUNC) &gCMatrix_validate, 1},
+
     {"lapack_qr", (DL_FUNC) &lapack_qr, 2},
 
     {"lcsc_to_matrix", (DL_FUNC) &lcsc_to_matrix, 1},
     {"ncsc_to_matrix", (DL_FUNC) &ncsc_to_matrix, 1},
-    {"lgCMatrix_validate", (DL_FUNC) &lgCMatrix_validate, 1},
     {"lgTMatrix_validate", (DL_FUNC) &lgTMatrix_validate, 1},
 
     {"lspMatrix_as_lsyMatrix", (DL_FUNC) &lspMatrix_as_lsyMatrix, 2},

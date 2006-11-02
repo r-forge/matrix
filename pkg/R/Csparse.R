@@ -220,6 +220,7 @@ setMethod("%*%", signature(x = "CsparseMatrix", y = "matrix"),
 ##setMethod("%*%", signature(x = "CsparseMatrix", y = "numeric"),
 ##          function(x, y) .Call(Csparse_dense_prod, x, y))
 
+## FIXME(2): These two are sub-optimal : has  2 x  t(<dense>)  :
 setMethod("%*%", signature(x = "ddenseMatrix", y = "CsparseMatrix"),
           function(x, y) t(.Call(Csparse_dense_crossprod, y, t(x))),
           valueClass = "dgeMatrix")

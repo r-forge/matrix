@@ -7,13 +7,13 @@ SEXP Csparse_validate(SEXP x)
     /* NB: we do *NOT* check a potential 'x' slot here, at all */
     SEXP pslot = GET_SLOT(x, Matrix_pSym),
 	islot = GET_SLOT(x, Matrix_iSym);
-    int j, k, ncol, nrow, sorted,
+    int j, k, sorted,
 	*dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
+	nrow = dims[0],
+	ncol = dims[1],
 	*xp = INTEGER(pslot),
 	*xi = INTEGER(islot);
 
-    nrow = dims[0];
-    ncol = dims[1];
     if (length(pslot) != dims[1] + 1)
 	return mkString(_("slot p must have length = ncol(.) + 1"));
     if (xp[0] != 0)
@@ -46,7 +46,8 @@ SEXP Csparse_to_dense(SEXP x)
     cholmod_dense *chxd = cholmod_sparse_to_dense(chxs, &c);
 
     Free(chxs);
-    return chm_dense_to_SEXP(chxd, 1, Real_kind(x));
+    return chm_dense_to_SEXP(chxd, 1, Real_kind(x),
+			     GET_SLOT(x, Matrix_DimNamesSym));
 }
 
 SEXP Csparse_to_nz_pattern(SEXP x, SEXP tri)
@@ -188,29 +189,41 @@ SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans)
 SEXP Csparse_dense_prod(SEXP a, SEXP b)
 {
     cholmod_sparse *cha = as_cholmod_sparse(a);
-    cholmod_dense *chb = as_cholmod_dense(PROTECT(mMatrix_as_dgeMatrix(b)));
+    SEXP b_M = PROTECT(mMatrix_as_dgeMatrix(b));
+    cholmod_dense *chb = as_cholmod_dense(b_M);
     cholmod_dense *chc =
 	cholmod_allocate_dense(cha->nrow, chb->ncol, cha->nrow, chb->xtype, &c);
+    SEXP dn = allocVector(VECSXP, 2);
     double alpha[] = {1,0}, beta[] = {0,0};
 
     cholmod_sdmult(cha, 0, alpha, beta, chb, chc, &c);
     Free(cha); Free(chb);
     UNPROTECT(1);
-    return chm_dense_to_SEXP(chc, 1, 0);
+    SET_VECTOR_ELT(dn, 0,	/* establish dimnames */
+		   duplicate(VECTOR_ELT(GET_SLOT(a, Matrix_DimNamesSym), 0)));
+    SET_VECTOR_ELT(dn, 1,
+		   duplicate(VECTOR_ELT(GET_SLOT(b_M, Matrix_DimNamesSym), 1)));
+    return chm_dense_to_SEXP(chc, 1, 0, dn);
 }
 
 SEXP Csparse_dense_crossprod(SEXP a, SEXP b)
 {
     cholmod_sparse *cha = as_cholmod_sparse(a);
-    cholmod_dense *chb = as_cholmod_dense(PROTECT(mMatrix_as_dgeMatrix(b)));
+    SEXP b_M = PROTECT(mMatrix_as_dgeMatrix(b));
+    cholmod_dense *chb = as_cholmod_dense(b_M);
     cholmod_dense *chc =
 	cholmod_allocate_dense(cha->ncol, chb->ncol, cha->ncol, chb->xtype, &c);
+    SEXP dn = allocVector(VECSXP, 2);
     double alpha[] = {1,0}, beta[] = {0,0};
 
     cholmod_sdmult(cha, 1, alpha, beta, chb, chc, &c);
     Free(cha); Free(chb);
     UNPROTECT(1);
-    return chm_dense_to_SEXP(chc, 1, 0);
+    SET_VECTOR_ELT(dn, 0,	/* establish dimnames */
+		   duplicate(VECTOR_ELT(GET_SLOT(a, Matrix_DimNamesSym), 1)));
+    SET_VECTOR_ELT(dn, 1,
+		   duplicate(VECTOR_ELT(GET_SLOT(b_M, Matrix_DimNamesSym), 1)));
+    return chm_dense_to_SEXP(chc, 1, 0, dn);
 }
 
 /* Computes   x'x  or  x x'  -- see Csparse_Csparse_crossprod above for  x'y and x y' */
@@ -242,7 +255,7 @@ SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet)
 				/* create dimnames */
     SET_VECTOR_ELT(dn, 0,
 		   duplicate(VECTOR_ELT(GET_SLOT(x, Matrix_DimNamesSym),
-					(tr) ? 1 : 0)));
+					(tr) ? 0 : 1)));
     SET_VECTOR_ELT(dn, 1, duplicate(VECTOR_ELT(dn, 0)));
     UNPROTECT(1);
     return chm_sparse_to_SEXP(chcp, 1, 0, 0, "", dn);
