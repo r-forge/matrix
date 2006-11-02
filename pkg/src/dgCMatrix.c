@@ -4,8 +4,8 @@
 
 /* FIXME -- we "forget" about dimnames almost everywhere : */
 
-/* for dgCMatrix  _and_ lgCMatrix  (but *not*  ngC...) : */
-SEXP gCMatrix_validate(SEXP x)
+/* for dgCMatrix  _and_ lgCMatrix and others  (but *not*  ngC...) : */
+SEXP xCMatrix_validate(SEXP x)
 {
     /* Almost everything now in Csparse_validate ( ./Csparse.c )
      * *but* the checking of the 'x' slot : */
