@@ -375,7 +375,7 @@ void R_cholmod_error(int status, char *file, int line, char *message)
 int R_cholmod_start(cholmod_common *c)
 {
     int res;
-    if (!cholmod_start(c))
+    if (!(res = cholmod_start(c)))
 	error(_("Unable to initialize cholmod: error code %d"), res);
     c->print_function = Rprintf;
     c->error_handler = R_cholmod_error;
