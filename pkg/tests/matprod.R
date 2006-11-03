@@ -109,9 +109,13 @@ b <- as(a, "dsCMatrix") ## ok, but we recommend to use Matrix() ``almost always'
 stopifnot(identical(b, b.))
 
 ## calculate conditional variance matrix ( vars 3 4 5 given 1 2 )
-B2 <- b[1:2, 1:2]
+(B2 <- b[1:2, 1:2])
+stopifnot(is(B2, "dsCMatrix"))# symmetric indexing keeps symmetry
 bb <- b[1:2, 3:5]
-z. <- solve(B2, bb)
+stopifnot(identical(as.mat(bb), rbind(0, c(1,0,0))))
+if(FALSE)## FIXME: use fully-sparse cholmod_spsolve() based solution !!
+z.s <- solve(B2, bb)
+z. <- solve(as(B2, "dgCMatrix"), bb)
 z  <- solve( B2, as(bb,"dgeMatrix"))
 stopifnot(identical(z, z.))
 ## finish calculating conditional variance matrix

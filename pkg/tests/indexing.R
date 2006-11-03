@@ -96,10 +96,8 @@ stopifnot(identical3(mm[,1], mC[,1], mT[,1]),
 	  identical3(mm[3,], mC[3,], mT[3,]),
 	  identical3(mT[2,3], mC[2,3], 0),
 	  identical(mT[], mT),
-	  ## TODO: identical4() with  m[c(3,7), 2:4] - fail because of 'dimnames'
-	  ## TODO: identical3() with as(mC[c(3,7), 2:4],"matrix"),
-          ##       fails because of 'dimnames'
-          identical(mm[c(3,7), 2:4], as(mT[c(3,7), 2:4],"matrix"))
+          identical4(       mm[c(3,7), 2:4],  as.mat( m[c(3,7), 2:4]),
+                     as.mat(mT[c(3,7), 2:4]), as.mat(mC[c(3,7), 2:4]))
           )
 
 x.x <- crossprod(mC)
@@ -109,10 +107,16 @@ head(x.x.) # Note the *non*-structural 0's printed as "0"
 tail(x.x., -3) # all but the first three lines
 
 lx.x <- as(x.x, "lsCMatrix") # FALSE only for "structural" 0
-if(FALSE) { ## FIXME: needs coercion  "lsCMatrix" to "lgTMatrix"
-    lx.x[1:10, 1:10]
-    lx.x[1:3, ]
-}
+(l10 <- lx.x[1:10, 1:10])# "lsC"
+(l3 <-  lx.x[1:3, ])
+m.x <- as(x.x, "matrix")
+stopifnot(class(l10) == "lsCMatrix", # symmetric indexing -> symmetric !
+          identical(as.mat(lx.x), m.x != 0),
+          identical(as.logical(lx.x), as.logical(m.x)),
+          identical(as.mat(l10), m.x[1:10, 1:10] != 0),
+          identical(as.mat(l3 ), m.x[1:3, ] != 0)
+          )
+
 
 ## --- negative indices ----------
 mc <- mC[1:5, 1:7]

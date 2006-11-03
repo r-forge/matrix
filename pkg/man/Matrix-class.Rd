@@ -31,6 +31,7 @@
 \alias{head,Matrix-method}
 \alias{tail,Matrix-method}
 \alias{solve,Matrix,matrix-method}
+\alias{solve,Matrix,missing-method}
 \alias{solve,Matrix,numeric-method}
 \alias{dim,Matrix-method}
 \alias{dimnames,Matrix-method}

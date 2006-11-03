@@ -79,8 +79,7 @@ Matrix <-
     function (data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL,
 	      sparse = NULL, forceCheck = FALSE)
 {
-    sparseDefault <- function(m)
-	prod(dim(m)) > 2*sum(is.na(m <- as(m, "matrix")) | m != 0)
+    sparseDefault <- function(m) prod(dim(m)) > 2*sum(isN0(as(m, "matrix")))
 
     i.M <- is(data, "Matrix")
 
@@ -185,6 +184,10 @@ setMethod("tcrossprod", signature(x = "Matrix", y = "numeric"),
 	  function(x, y = NULL) callGeneric(x, as.matrix(y)))
 setMethod("tcrossprod", signature(x = "numeric", y = "Matrix"),
 	  function(x, y = NULL)	 callGeneric(as.matrix(x), y))
+
+## maybe not optimal
+setMethod("solve", signature(a = "Matrix", b = "missing"),
+	  function(a, b, ...) solve(a, Diagonal(nrow(a))))
 
 setMethod("solve", signature(a = "Matrix", b = "numeric"),
 	  function(a, b, ...) callGeneric(a, as.matrix(b)))

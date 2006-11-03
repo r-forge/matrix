@@ -168,13 +168,17 @@ setMethod("[", signature(x = "sparseMatrix", i = "missing", j = "index",
 setMethod("[", signature(x = "sparseMatrix",
 			 i = "index", j = "index", drop = "logical"),
 	  function (x, i, j, drop) {
-              cl <- class(x)
-              viaCl <- paste(.M.kind(x,cl), "gTMatrix", sep='')
-              x <- callGeneric(x = as(x, viaCl), i=i, j=j, drop=drop)
-              ## try_as(x, c(cl, sub("T","C", viaCl)))
-              if(is(x, "Matrix") && extends(cl, "CsparseMatrix"))
-                  as(x, sub("T","C", viaCl)) else x
-          })
+	      cl <- class(x)
+	      ## be smart to keep symmetric indexing of <symm.Mat.> symmetric:
+	      doSym <- (extends(cl, "symmetricMatrix") &&
+			length(i) == length(j) && all(i == j))
+	      viaCl <- paste(.M.kind(x,cl),
+			     if(doSym) "sTMatrix" else "gTMatrix", sep='')
+	      x <- callGeneric(x = as(x, viaCl), i=i, j=j, drop=drop)
+	      ## try_as(x, c(cl, sub("T","C", viaCl)))
+	      if(is(x, "Matrix") && extends(cl, "CsparseMatrix"))
+		  as(x, sub("T","C", viaCl)) else x
+	  })
 
 
 ## setReplaceMethod("[", signature(x = "sparseMatrix", i = "index", j = "missing",
@@ -204,7 +208,7 @@ setMethod("[", signature(x = "sparseMatrix",
 ##                  })
 
 
-
+## "Arith" short cuts / exceptions
 setMethod("-", signature(e1 = "sparseMatrix", e2 = "missing"),
           function(e1) { e1@x <- -e1@x ; e1 })
 ## with the following exceptions:
@@ -233,7 +237,42 @@ setMethod("Math",
 	  signature(x = "sparseMatrix"),
 	  function(x) callGeneric(as(x, "CsparseMatrix")))
 
+setMethod("Compare", signature(e1 = "sparseMatrix", e2 = "sparseMatrix"),
+	  function(e1, e2) {
+	      d <- dimCheck(e1,e2)
 
+	      ## NB non-diagonalMatrix := Union{ general, symmetric, triangular}
+	      gen1 <- is(e1, "generalMatrix")
+	      gen2 <- is(e2, "generalMatrix")
+	      sym1 <- !gen1 && is(e1, "symmetricMatrix")
+	      sym2 <- !gen2 && is(e2, "symmetricMatrix")
+	      tri1 <- !gen1 && !sym1
+	      tri2 <- !gen2 && !sym2
+
+	      if((G <- gen1 && gen2) ||
+		 (S <- sym1 && sym2 && e1@uplo == e2@uplo) ||
+		 (T <- tri1 && tri2 && e1@uplo == e2@uplo)) {
+
+		  if(T && e1@diag != e2@diag) {
+		      ## one is "U" the other "N"
+		      if(e1@diag == "U")
+			  e1 <- diagU2N(e1)
+		      else ## (e2@diag == "U"
+			  e2 <- diagU2N(e2)
+		  }
+
+	      }
+	      else { ## coerce to generalMatrix and go
+		  if(!gen1) e1 <- as(e1, "generalMatrix", strict = FALSE)
+		  if(!gen2) e2 <- as(e2, "generalMatrix", strict = FALSE)
+	      }
+
+	      ## now the 'x' slots *should* match
+
+	      new(class2(class(e1), "l"),
+		  x = callGeneric(e1@x, e2@x),
+		  Dim = d, Dimnames = dimnames(e1))
+	  })
 
 ### --- show() method ---
 

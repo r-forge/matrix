@@ -623,11 +623,15 @@ isTriC <- function(x, upper = NA) {
 }
 
 
-## FIXME? -- this should also work for "ltT", "ntT", ... :
 diagU2N <- function(x)
 {
     ## Purpose: Transform a *unit diagonal* sparse triangular matrix
     ##	into one with explicit diagonal entries '1'
+    if(is(x, "CsparseMatrix"))
+	return(.Call(Csparse_diagU2N, x))
+    ## else
+
+    ## FIXME! -- for "ltT", "ntT", ... :
     xT <- as(x, "dgTMatrix")
     ## leave it as  T* - the caller can always coerce to C* if needed:
     new("dtTMatrix", x = xT@x, i = xT@i, j = xT@j, Dim = x@Dim,
