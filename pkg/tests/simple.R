@@ -100,11 +100,21 @@ I1 <- m %*% i.m
 o4 <- diag(I1)
 im <- solve(m)
 (I2 <- m %*% im)
+(ms <- as(m, "dsCMatrix"))
+## solve(<sparse>, <sparse>):
+s.mm <-  solve(m,m)
+s.mms <- solve(m, ms)
+## these now work "fully-sparse"
+s.ms2 <- solve(ms, ms)
+s.msm <- solve(ms, m)
+I4c <- as(Matrix(diag(4),sparse=TRUE), "dgCMatrix")
 stopifnot(is(im, "Matrix"), is(I2, "Matrix"),
           all.equal(I1, I2, tol = 1e-14),
           all.equal(diag(4), as.mat(I2), tol = 1e-12),
-          ## solve(<sparse>, <sparse>):
-          all.equal(solve(m,m), I2, tol = 1e-14),
+          all.equal(s.mm,  I2, tol = 1e-14),
+          all.equal(s.mms, I2, tol = 1e-14),
+          all.equal(s.ms2, s.msm, tol = 4e-15),
+          all.equal(s.ms2, I4c  , tol = 4e-15),
           abs(o4 - 1) < 1e-14)
 
 ###-- row- and column operations  {was ./rowcolOps.R }

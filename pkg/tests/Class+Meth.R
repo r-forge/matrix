@@ -97,6 +97,11 @@ tstMatrixClass <-
         cat("\n")
         cat.(clNam)
         ##---------
+	genC <- extends(clNam, "generalMatrix")
+	symC <- extends(clNam, "symmetricMatrix")
+	triC <- extends(clNam, "triangularMatrix")
+	diaC <- extends(clNam, "diagonalMatrix")
+        ## - - - - -
         if(isVirtualClass(clNam)) {
             cat(" - is virtual\n")
             if(recursive) {
@@ -113,10 +118,12 @@ tstMatrixClass <-
                 cat.("----- end{class :", clNam, "}---------------------\n")
             }
         } else {
+            if(!(genC || symC || triC || diaC))
+                stop("does not extend one of 'general', 'symmetric', 'triangular', or 'diagonal'")
 	    cat("; new(..): ")
 	    m <- new(clNam)
 	    if(canCoerce(mm, clNam)) { ## replace 'm' by `non-empty' version
-                m0 <- if(extends(clNam, "triangularMatrix")) trm else mm
+                m0 <- if(triC) trm else mm
 		if(extends(clNam, "lMatrix") ||
 		   extends(clNam, "nMatrix"))
 		    storage.mode(m0) <- "logical"

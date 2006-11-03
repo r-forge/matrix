@@ -1,3 +1,30 @@
+2006-11-03  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/dsCMatrix.c (dsCMatrix_Csparse_solve): new
+	* R/dsCMatrix.R (solve): "fully-sparse" using the above.
+
+	* R/AllClass.R: "pMatrix" now also inherits from "generalMatrix"
+
+	* tests/Class+Meth.R (tstMatrixClass): now assure
+	the (important in method programming) property :
+
+		###>>  Every "Matrix" is either
+		###>>  "general*", "symmetric*", "triangular*" or "diagonal*"
+
+		(where "*" stands for "Matrix")
+
+	* R/Auxiliaries.R (diagU2N): now .Call()s Csparse_diagU2N for <Csparse>
+
+	* R/dMatrix.R (Compare(<dMatrix>,<dMatrix>): update and
+	* tests/validObj.R: checks for "comparison"
+
+	* R/sparseMatrix.R ([): improved indexing for sparse;
+		trying to keep <symmetric>[ n, n] symmmetric
+
+	* tests/indexing.R: indexing for logical sparse now ok
+
+
+
 2006-11-02  Martin Maechler  <maechler@stat.math.ethz.ch>
 
         * src/Tsparse.c: use xTsparse_validate() , and hence remove
@@ -10,7 +37,7 @@
 
 	* tests/simple.R: validObject() checking the above.
 
-	* src/dgCMatrix.c (gCMatrix_validate): new, small and simple,
+	* src/dgCMatrix.c (xCMatrix_validate): new, small and simple,
 	replacing both dgCMatrix_validate and lgCM*.
 
 	* src/Csparse.c (Csparse_dense_prod, etc): do not lose dimnames;

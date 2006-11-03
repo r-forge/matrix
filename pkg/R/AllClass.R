@@ -499,7 +499,7 @@ setClass("nsRMatrix",
 ##-------------------- permutation ----------------------------------------
 
 setClass("pMatrix", representation(perm = "integer"),
-	 contains = "sparseMatrix",
+	 contains = c("sparseMatrix", "generalMatrix"),
 	 validity = function(object) {
 	     d <- object@Dim
 	     if (d[2] != (n <- d[1])) return("pMatrix must be square")

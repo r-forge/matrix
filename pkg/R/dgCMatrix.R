@@ -119,7 +119,7 @@ setMethod("Arith",
 	  function(e1, e2) {
 	      if(length(e1) == 1) {
 		  f0 <- callGeneric(e1, 0)
-		  if(is0(f0)) {
+		  if(is0(f0)) { # stay sparse, even "dgC"
 		      e2@x <- callGeneric(e1, e2@x)
 		      e2
 		  } else {

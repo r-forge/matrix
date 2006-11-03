@@ -35,7 +35,8 @@
   }
 }
 \section{Extends}{
-  Class \code{"Matrix"}, directly.
+  Class \code{"\linkS4class{sparseMatrix}"} and
+  \code{"\linkS4class{generalMatrix}"}, directly.
 }
 \section{Methods}{
   \describe{

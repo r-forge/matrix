@@ -106,6 +106,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dppMatrix_validate", (DL_FUNC) &dppMatrix_validate, 1},
     {"dsCMatrix_Cholesky", (DL_FUNC) &dsCMatrix_Cholesky, 4},
     {"dsCMatrix_chol", (DL_FUNC) &dsCMatrix_chol, 2},
+    {"dsCMatrix_Csparse_solve",(DL_FUNC) &dsCMatrix_Csparse_solve, 2},
     {"dsCMatrix_matrix_solve", (DL_FUNC) &dsCMatrix_matrix_solve, 2},
     {"dsCMatrix_to_dgTMatrix", (DL_FUNC) &dsCMatrix_to_dgTMatrix, 1},
     {"dsTMatrix_as_dgTMatrix", (DL_FUNC) &dsTMatrix_as_dgTMatrix, 1},
