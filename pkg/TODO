@@ -92,7 +92,3 @@ Check for DimNames propagation in coercion and other operations.
 - chol() and determinant() should ``work'': proper result or "good" error
   message.
 
-- When 'x' is a symmetric matrix,
-  a)  x[i,i] should return a *symmetric* matrix too (when 'i' has length > 1)
-  b)  x[i,i] <- scalar_value  should ``keep x symmetric'', i.e. also return symmetricM*
-

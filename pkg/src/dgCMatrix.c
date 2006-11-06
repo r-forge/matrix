@@ -195,6 +195,7 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp)
 
 SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
 {
+    /* b is dense or NULL [ <--> solve(A) */
     SEXP lu = dgCMatrix_LU(Ap, ScalarLogical(1), ScalarReal(1));
     SEXP qslot = GET_SLOT(lu, install("q"));
     cs  *L = Matrix_as_cs(GET_SLOT(lu, install("L"))),

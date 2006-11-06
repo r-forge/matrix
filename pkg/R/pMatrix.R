@@ -63,3 +63,10 @@ setMethod("%*%", signature(x = "Matrix", y = "pMatrix"),
 
 setMethod("%*%", signature(x = "pMatrix", y = "Matrix"),
           function(x, y) y[x@perm , ])
+
+
+.pMat.nosense <- function (x, i, j, ..., value)
+    stop('partially replacing "pMatrix" entries is not sensible')
+setReplaceMethod("[", signature(x = "pMatrix", i = "index"), .pMat.nosense)
+setReplaceMethod("[", signature(x = "pMatrix", i = "missing", j = "index"),
+		 .pMat.nosense) ##   explicit  ^^^^^^^^^^^^ for disambiguation

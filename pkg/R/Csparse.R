@@ -121,24 +121,31 @@ replCmat <- function (x, i, j, value)
     if(lenV > lenRepl)
 	stop("too many replacement values")
 
-    if(is(x, "symmetricMatrix")) ## only half the indices are there..
+    clx <- c(class(x)) # keep "symmetry" if changed here:
+
+    x.sym <- is(x, "symmetricMatrix")
+    if(x.sym) { ## only half the indices are there..
+	x.sym <-
+	    (dind[1] == dind[2] && i1 == i2 &&
+	     (lenRepl == 1 || isSymmetric(array(value, dim=dind))))
+	## x.sym : result is *still* symmetric
 	x <- .Call(Csparse_symmetric_to_general, x)
-    clx <- c(class(x))
+    }
 
     xj <- .Call(Matrix_expand_pointers, x@p)
     sel <- (!is.na(match(x@i, i1)) &
-            !is.na(match( xj, i2)))
-    has.x <- any("x" == slotNames(x)) # i.e. *not* logical
+	    !is.na(match( xj, i2)))
+    has.x <- any("x" == slotNames(x)) # i.e. *not* nonzero-pattern
     if(has.x && sum(sel) == lenRepl) { ## all entries to be replaced are non-zero:
-        value <- rep(value, length = lenRepl)
-        ## Ideally we only replace them where value != 0 and drop the value==0
-        ## ones; but that would have to (?) go through dgT*
-        ## v0 <- 0 == value
-        ## if (lenRepl == 1) and v0 is TRUE, the following is not doing anything
-        ##-  --> ./dgTMatrix.R  and its  replTmat()
-        ## x@x[sel[!v0]] <- value[!v0]
-        x@x[sel] <- value
-        return(x)
+	value <- rep(value, length = lenRepl)
+	## Ideally we only replace them where value != 0 and drop the value==0
+	## ones; but that would have to (?) go through dgT*
+	## v0 <- 0 == value
+	## if (lenRepl == 1) and v0 is TRUE, the following is not doing anything
+	##-  --> ./dgTMatrix.R	and its	 replTmat()
+	## x@x[sel[!v0]] <- value[!v0]
+	x@x[sel] <- value
+	return(if(x.sym) as_CspClass(x, clx) else x)
     }
     ## else go via Tsparse.. {FIXME: a waste! - we already have 'xj' ..}
     x <- as(x, "TsparseMatrix")

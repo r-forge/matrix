@@ -2,6 +2,7 @@
 #### (called from more than one place --> need to be defined early)
 
 .isR_24 <- (paste(R.version$major, R.version$minor, sep=".") >= "2.4")
+.isR_25 <- (paste(R.version$major, R.version$minor, sep=".") >= "2.5")
 
 ## Need to consider NAs ;  "== 0" even works for logical & complex:
 is0  <- function(x) !is.na(x) & x == 0
@@ -434,6 +435,11 @@ l2d_meth <- function(x) {
     else if(extends(clx, "pMatrix")) "n" # permutation -> pattern
     else stop(" not yet be implemented for ", clx)
 }
+
+.type.kind <- c("d" = "double",
+                "l" = "logical",
+                "n" = "logical",
+                "z" = "complex")
 
 .M.shape <- function(x, clx = class(x)) {
     if(is.matrix(x)) { ## 'old style matrix'

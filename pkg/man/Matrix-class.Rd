@@ -56,8 +56,6 @@
 \alias{crossprod,ANY,Matrix-method}
 \alias{kronecker,ANY,Matrix-method}
 \alias{kronecker,Matrix,ANY-method}
-\alias{[,Matrix,lMatrix,missing,ANY-method}
-\alias{[,Matrix,logical,missing,ANY-method}
 %
 \title{Virtual Class "Matrix" Class of Matrices}
 \description{

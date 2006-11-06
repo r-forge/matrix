@@ -181,31 +181,11 @@ setMethod("[", signature(x = "sparseMatrix",
 	  })
 
 
-## setReplaceMethod("[", signature(x = "sparseMatrix", i = "index", j = "missing",
-##                                 value = "numeric"),
-##                  function (x, i, value) {
+## setReplaceMethod("[", .........)
+## -> ./Tsparse.R
+## &  ./Csparse.R
+## FIXME: also for RsparseMatrix
 
-##                      stop("NOT YET")
-
-##                      as(r, class(x))
-##                  })
-
-## setReplaceMethod("[", signature(x = "sparseMatrix", i = "missing", j = "index",
-##                                 value = "numeric"),
-##                  function (x, j, value) {
-
-##                      stop("NOT YET")
-
-##                      as(r, class(x))
-##                  })
-
-## setReplaceMethod("[", signature(x = "sparseMatrix", i = "index", j = "index",
-##                                 value = "numeric"),
-
-##                      stop("NOT YET")
-
-##                      as(r, class(x))
-##                  })
 
 
 ## "Arith" short cuts / exceptions
@@ -294,7 +274,7 @@ prSpMatrix <- function(object, digits = getOption("digits"),
     if(logi)
 	x <- array("N", # or as.character(NA),
 		   dim(m), dimnames=dimnames(m))
-    else {
+    else { ## numeric (or --not yet-- complex):
 	x <- apply(m, 2, format)
 	if(is.null(dim(x))) {# e.g. in	1 x 1 case
 	    dim(x) <- dim(m)
@@ -311,7 +291,11 @@ prSpMatrix <- function(object, digits = getOption("digits"),
 	## show only "structural" zeros as 'zero.print', not all of them..
 	## -> cannot use 'm'
 	iN0 <- 1:1 + encodeInd(non0ind(object), nr = nrow(x))
-	if(length(iN0)) x[-iN0] <- zero.print else x[] <- zero.print
+	if(length(iN0)) {
+            decP <- apply(m, 2, function(x) format.info(x)[2])
+	    x[-iN0] <- zero.print ## FIXME: ``format it'' such that columns align
+        }
+	else x[] <- zero.print
     }
     print(x, quote = FALSE, max = maxp)
     invisible(object)

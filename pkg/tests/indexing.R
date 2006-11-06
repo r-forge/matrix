@@ -6,8 +6,8 @@ source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 
 ### Dense Matrices
 
-m <- Matrix(1:28, nrow = 7)
-validObject(m) ; m@x <- as.double(m@x) ; validObject(m)
+m <- Matrix(1:28 +0, nrow = 7)
+validObject(m)
 stopifnot(identical(m, m[]),
           identical(m[2, 3],  16), # simple number
           identical(m[2, 3:4], c(16,23))) # simple numeric of length 2
@@ -44,8 +44,13 @@ m[1:2, 4] <- 200
 m[, 1] <- -1
 m[1:3,]
 
-## testing operations on logical Matrices rather more than indexing:
 m. <- as.matrix(m)
+
+## m[ cbind(i,j) ] indexing:
+ij <- cbind(1:6, 2:3)
+stopifnot(identical(m[ij], m.[ij]))
+
+## testing operations on logical Matrices rather more than indexing:
 g10 <- m [ m > 10 ]
 stopifnot(18 == length(g10))
 stopifnot(10 == length(m[ m <= 10 ]))
@@ -76,7 +81,8 @@ mC[,1]
 mC[1:2,]
 mC[7,  drop = FALSE]
 assert.EQ.mat(mC[1:2,], mm[1:2,])
-stopifnot(all.equal(mC[,3],   mm[,3]))
+stopifnot(all.equal(mC[,3], mm[,3]),
+	  identical(mC[ij], mm[ij]))
 assert.EQ.mat(mC[7, , drop=FALSE], mm[7, , drop=FALSE])
 
 stopifnot(dim(mC[numeric(0), ]) == c(0,20), # used to give warnings
@@ -102,7 +108,9 @@ stopifnot(identical3(mm[,1], mC[,1], mT[,1]),
 
 x.x <- crossprod(mC)
 stopifnot(class(x.x) == "dsCMatrix",
-          class(x.x. <- round(x.x / 10000)) == "dsCMatrix")
+          class(x.x. <- round(x.x / 10000)) == "dsCMatrix",
+          identical(x.x[cbind(2:6, 2:6)],
+                    diag(x.x [2:6, 2:6])))
 head(x.x.) # Note the *non*-structural 0's printed as "0"
 tail(x.x., -3) # all but the first three lines
 
@@ -202,5 +210,45 @@ Hc. <- Hc
 Hc.[i,j] <- 0 ## now "works", but setting "non-structural" 0s
 stopifnot(as.matrix(Hc.[i,j]) == 0)
 Hc.[, 1:6]
+
+## an example that failed long
+sy3 <- new("dsyMatrix", Dim = as.integer(c(2, 2)), x = c(14, -1, 2, -7))
+validObject(dm <- kronecker(Diagonal(2), sy3))
+(s2 <- as(dm, "sparseMatrix"))
+validObject(st <- as(s2, "TsparseMatrix"))
+validObject(s.32  <- st[1:3,1:2]) ## 3 x 2 - and *not* dsTMatrix
+validObject(s2.32 <- s2[1:3,1:2])
+I <- c(1,4:3)
+stopifnot(is(s2.32, "generalMatrix"),
+          is(s.32,  "generalMatrix"),
+          identical(as.mat(s.32), as.mat(s2.32)),
+          identical3(dm[1:3,-1], asD(s2[1:3,-1]), asD(st[1:3,-1])),
+          identical4(2, dm[4,3], s2[4,3], st[4,3]),
+          identical3(diag(dm), diag(s2), diag(st)),
+          is((cI <- s2[I,I]), "dsCMatrix"),
+          is((tI <- st[I,I]), "dsTMatrix"),
+          identical4(as.mat(dm)[I,I], as.mat(dm[I,I]), as.mat(tI), as.mat(cI))
+          )
+
+## now sub-assign  and check for consistency
+## symmetric subassign should keep symmetry
+st[I,I] <- 0; validObject(st); stopifnot(is(st,"symmetricMatrix"))
+s2[I,I] <- 0; validObject(s2); stopifnot(is(s2,"symmetricMatrix"))
+
+m <- as.mat(st)
+ m[2:1,2:1] <- 4:1
+st[2:1,2:1] <- 4:1
+s2[2:1,2:1] <- 4:1
+stopifnot(identical(m, as.mat(st)),
+	  1:4 == as.vector(s2[1:2,1:2]),
+	  identical(m, as.mat(s2)))
+
+## m[cbind(i,j)] <- value:
+m.[ cbind(3:5, 1:3) ] <- 1:3
+stopifnot(m.[3,1] == 1, m.[4,2] == 2)
+x.x[ cbind(2:6, 2:6)] <- 12:16
+validObject(x.x)
+stopifnot(class(x.x) == "dsCMatrix",
+	  12:16 == as.mat(x.x)[cbind(2:6, 2:6)])
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
