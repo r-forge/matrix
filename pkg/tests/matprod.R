@@ -115,6 +115,7 @@ bb <- b[1:2, 3:5]
 stopifnot(identical(as.mat(bb), rbind(0, c(1,0,0))))
 if(FALSE)## FIXME: use fully-sparse cholmod_spsolve() based solution !!
 z.s <- solve(B2, bb)
+## -> dense RHS and dense result
 z. <- solve(as(B2, "dgCMatrix"), bb)
 z  <- solve( B2, as(bb,"dgeMatrix"))
 stopifnot(identical(z, z.))

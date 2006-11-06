@@ -1,3 +1,22 @@
+2006-11-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Csparse.R (replCmat): symmetric indexing of symmetric matrix
+	now returns symmetric.
+
+	* R/zzz.R ("diag<-"): replace "diag<-" in base for R <= 2.4.x
+
+	* R/Matrix.R (.M.sub.i.2col):  new, for  M[ cbind(i,j) ] indexing.
+	* R/Matrix.R (.M.repl.i.2col): new, for  M[ cbind(i,j) ] <- value
+
+	* R/Auxiliaries.R (.type.kind): added
+
+2006-11-04  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/cs.[ch]: updated to CSparse Version 2.0.3 by simply
+	running src/CSparse_install.sh
+
+	* R/denseMatrix.R: "[": keep symmetric on symmetric indexing.
+
 2006-11-03  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/dsCMatrix.c (dsCMatrix_Csparse_solve): new
@@ -22,7 +41,6 @@
 		trying to keep <symmetric>[ n, n] symmmetric
 
 	* tests/indexing.R: indexing for logical sparse now ok
-
 
 
 2006-11-02  Martin Maechler  <maechler@stat.math.ethz.ch>

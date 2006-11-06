@@ -306,6 +306,7 @@ setMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY", drop = "ANY"),
 {
     nA <- nargs()
     if(nA == 2) { ##  M [ M >= 7 ]
+        ## FIXME: when both 'x' and 'i' are sparse, this can be very inefficient
 	as(x, geClass(x))@x[as.vector(i)]
 	## -> error when lengths don't match
     } else if(nA == 3) { ##  M [ M[,1, drop=FALSE] >= 7, ]
@@ -322,9 +323,30 @@ setMethod("[", signature(x = "Matrix", i = "logical", j = "missing",
 	  .M.sub.i.logical)
 
 
-## "FIXME:"
-## ------ get at  A[ ij ]  where ij is (i,j) 2-column matrix?
+## A[ ij ]  where ij is (i,j) 2-column matrix :
+.M.sub.i.2col <- function (x, i, j, drop)
+{
+    nA <- nargs()
+    if(nA == 2) { ##  M [ cbind(ii,jj) ]
+	if(!is.integer(nc <- ncol(i)))
+	    stop("'i' has no integer column number",
+		 " should never happen; please report")
+	if(is.logical(i))
+	    return(.M.sub.i.logical(x,i,j,drop))
+	else if(!is.numeric(i) || nc != 2)
+	    stop("such indexing must be by logical or 2-column numeric matrix")
+	m <- nrow(i)
+        if(m == 0) return(vector(mode = .type.kind[.M.kind(x)]))
+        ## else
+	i1 <- i[,1]
+	i2 <- i[,2]
+	## potentially inefficient -- FIXME --
+	unlist(lapply(seq_len(m), function(j) x[i1[j], i2[j]]))
 
+    } else stop("nargs() = ", nA, " should never happen; please report.")
+}
+setMethod("[", signature(x = "Matrix", i = "matrix", j = "missing"),# drop="ANY"
+	  .M.sub.i.2col)
 
 
 ### "[<-" : -----------------
@@ -338,6 +360,39 @@ setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
 	      validObject(x)# check if type and lengths above match
 	      x
           })
+
+## A[ ij ] <- value,  where ij is (i,j) 2-column matrix :
+.M.repl.i.2col <- function (x, i, j, value)
+{
+    nA <- nargs()
+    if(nA == 3) { ##  M [ cbind(ii,jj) ] <- value
+	if(!is.integer(nc <- ncol(i)))
+	    stop("'i' has no integer column number",
+		 " should never happen; please report")
+	if(is.logical(i)) {
+	    i <- c(i) # drop "matrix"
+	    return( callNextMethod() )
+	} else if(!is.numeric(i) || nc != 2)
+	    stop("such indexing must be by logical or 2-column numeric matrix")
+	m <- nrow(i)
+	mod.x <- .type.kind[.M.kind(x)]
+	if(length(value) > 0 && m %% length(value) != 0)
+	    warning("number of items to replace is not a multiple of replacement length")
+	## recycle:
+	value <- rep(value, length = m)
+	i1 <- i[,1]
+	i2 <- i[,2]
+	## inefficient -- FIXME -- (also loses "symmetry" unnecessarily)
+	for(k in seq_len(m))
+	    x[i1[k], i2[k]] <- value[k]
+	x
+
+    } else stop("nargs() = ", nA, " should never happen; please report.")
+}
+setReplaceMethod("[", signature(x = "Matrix", i = "matrix", j = "missing",
+				value = "replValue"),
+	  .M.repl.i.2col)
+
 
 setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
 				value = "Matrix"),
