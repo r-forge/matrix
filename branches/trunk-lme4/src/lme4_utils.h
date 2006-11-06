@@ -7,6 +7,8 @@
 #include <Rmath.h>
 #include <Rversion.h>
 #include "Matrix.h"
+
+extern
 #include "Syms.h"
 
 #ifdef ENABLE_NLS
