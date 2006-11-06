@@ -1,7 +1,6 @@
-## Optimize the profiled deviance with respect to the relative
-## variances and the discounting parameters
-##
-## Warning: this function modifies the value of the argument x
+## Preliminary version of a function to fit a model with carryover for
+## the effect of one grouping factor (e.g. teacher) on another
+## grouping factor (e.g. student)
 
 carryOver <- function(formula, data, carry, REML = TRUE, control = list(),
                       start = NULL, varycarry = TRUE,
