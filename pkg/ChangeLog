@@ -1,3 +1,7 @@
+2006-11-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Date): updated -> release 0.9975-6
+
 2006-11-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Csparse.R (replCmat): symmetric indexing of symmetric matrix
