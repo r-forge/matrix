@@ -359,7 +359,7 @@ lmer <- function(formula, data, family = gaussian,
     ## FIXME: change this when rbind has been fixed.
     Zt <- if (length(Ztl) == 1) Ztl[[1]] else do.call("rbind", Ztl)
     fl <- FL$fl
-    
+
     ## check and evaluate the family argument
     if(is.character(family))
         family <- get(family, mode = "function", envir = parent.frame())
@@ -371,7 +371,7 @@ lmer <- function(formula, data, family = gaussian,
     fltype <- mkFltype(family)
     if (fltype == 1) fltype <- 0
     method <- match.arg(method)
-    
+
     ## quick return for a linear mixed model
     if (fltype < 0) {
         mer <- .Call(mer_create, fl, Zt, X, Y, method == "REML", nc, cnames)
@@ -389,7 +389,7 @@ lmer <- function(formula, data, family = gaussian,
     if (method == "AGQ")
         stop('method = "AGQ" not yet implemented for supernodal representation')
     if (method == "PQL") cv$usePQL <- TRUE # have to use PQL for method == "PQL"
-    
+
     ## initial fit of a glm to the fixed-effects only.
     glmFit <- glm.fit(X, Y, weights = weights, offset = offset, family = family,
                       intercept = attr(mt, "intercept") > 0)
@@ -682,10 +682,8 @@ setMethod("simulate", signature(object = "mer"),
 	      on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
 	  }
 
-	  family <- object@family
-	  if (family$family != "gaussian" ||
-	      family$link != "identity")
-	      stop("simulation of generalized linear mixed models not yet implemented")
+          stopifnot((nsim <- as.integer(nsim[1])) > 0,
+                    inherits(object, "lmer"))
 	  ## similate the linear predictors
 	  lpred <- .Call(mer_simulate, object, nsim)
 	  sc <- abs(object@devComp[8])
@@ -698,13 +696,14 @@ setMethod("simulate", signature(object = "mer"),
 	  lpred
       })
 
+### "FIXME": the following has too(?) much cut & paste from above
+
 simulestimate <- function(x, FUN, nsim = 1, seed = NULL, control = list())
 {
     FUN <- match.fun(FUN)
-    nsim <- as.integer(nsim[1])
-    stopifnot(nsim > 0)
+    stopifnot((nsim <- as.integer(nsim[1])) > 0,
+	      inherits(x, "lmer"))
     if (!is.null(seed)) set.seed(seed)
-    stopifnot(inherits(x, "lmer"))
     ## similate the linear predictors
     lpred <- .Call(mer_simulate, x, nsim)
     sc <- abs(x@devComp[8])
