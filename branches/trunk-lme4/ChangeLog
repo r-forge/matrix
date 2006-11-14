@@ -1,3 +1,10 @@
+2006-11-14  Douglas Bates  <bates@stat.wisc.edu>
+
+	* R/carryOver.R (fn): Allow factors on the LHS of carry.
+
+	* src/lmer.c: Reset the status appropriately.
+	* src/lme4_utils: Reformat source code.
+
 2006-11-13  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version, Date): 0.9975-9
