@@ -6,7 +6,14 @@
 #include <Rdefines.h>
 #include <Rmath.h>
 #include <Rversion.h>
+#include <Rconfig.h>
 #include "Matrix.h"
+
+#ifdef HAVE_VISIBILITY_ATTRIBUTE
+# define attr_hidden __attribute__ ((visibility ("hidden")))
+#else
+# define attr_hidden
+#endif
 
 extern
 #include "Syms.h"
@@ -16,12 +23,6 @@ extern
 #define _(String) dgettext ("Matrix", String)
 #else
 #define _(String) (String)
-#endif
-
-#ifdef HAVE_VISIBILITY_ATTRIBUTE
-# define attr_hidden __attribute__ ((visibility ("hidden")))
-#else
-# define attr_hidden
 #endif
 
 extern cholmod_common c;
@@ -147,35 +148,58 @@ int coef_length(int nf, const int nc[])
     return ans;
 }
 
-SEXP attr_hidden alloc_dgeMatrix(int m, int n, SEXP rownms, SEXP colnms);
-SEXP attr_hidden alloc_dpoMatrix(int n, char *uplo, SEXP rownms, SEXP colnms);
-SEXP attr_hidden alloc_dtrMatrix(int n, char *uplo, char *diag, SEXP rownms, SEXP colnms);
-SEXP attr_hidden alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms);
-SEXP attr_hidden alloc_dgCMatrix(int m, int n, int nz, SEXP rownms, SEXP colnms);
-SEXP attr_hidden alloc3Darray(SEXPTYPE mode, int nrow, int ncol, int nface);
+SEXP attr_hidden
+alloc_dgeMatrix(int m, int n, SEXP rownms, SEXP colnms);
+
+SEXP attr_hidden
+alloc_dpoMatrix(int n, char *uplo, SEXP rownms, SEXP colnms);
+
+SEXP attr_hidden
+alloc_dtrMatrix(int n, char *uplo, char *diag, SEXP rownms, SEXP colnms);
+
+SEXP attr_hidden
+alloc_dsCMatrix(int n, int nz, char *uplo, SEXP rownms, SEXP colnms);
+
+SEXP attr_hidden
+alloc_dgCMatrix(int m, int n, int nz, SEXP rownms, SEXP colnms);
+
+SEXP attr_hidden
+alloc3Darray(SEXPTYPE mode, int nrow, int ncol, int nface);
 
 /* declared here but defined in lmer.c */
 SEXP mer_factor(SEXP x);
 SEXP mer_secondary(SEXP x);
 SEXP mer_gradComp(SEXP x);
 /* declared here but defined in Wishart.c */
-double attr_hidden *std_rWishart_factor(double df, int p, double ans[]);
+double attr_hidden
+*std_rWishart_factor(double df, int p, double ans[]);
 
 double attr_hidden
 internal_betab_update(int p, int q, double sigma, cholmod_factor *L,
 		      double RZX[], double RXX[], double betahat[],
 		      double bhat[], double betanew[], double bnew[]);
-double attr_hidden *internal_mer_fitted(SEXP x, const double initial[], double val[]);
-double attr_hidden *internal_mer_ranef(SEXP x);
+double attr_hidden
+*internal_mer_fitted(SEXP x, const double initial[], double val[]);
 
-int attr_hidden internal_mer_Xfactor(SEXP x);
+double attr_hidden
+*internal_mer_ranef(SEXP x);
 
-void attr_hidden internal_ECMEsteps(SEXP x, int nEM, int verb);
+int attr_hidden
+internal_mer_Xfactor(SEXP x);
+
+void attr_hidden
+internal_ECMEsteps(SEXP x, int nEM, int verb);
+
 void attr_hidden
 internal_Omega_update(SEXP Omega, const double b[], double sigma, int nf,
 		      const int nc[], const int Gp[], double *vals, int trans);
-void attr_hidden internal_mer_refactor(SEXP x);
-void attr_hidden internal_mer_coefGets(SEXP x, const double cc[], int ptyp);
-void attr_hidden internal_mer_Zfactor(SEXP x, cholmod_factor *L);
+void attr_hidden
+internal_mer_refactor(SEXP x);
+
+void attr_hidden
+internal_mer_coefGets(SEXP x, const double cc[], int ptyp);
+
+void attr_hidden
+internal_mer_Zfactor(SEXP x, cholmod_factor *L);
 
 #endif
