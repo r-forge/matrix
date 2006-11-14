@@ -33,6 +33,7 @@ carryOver <- function(formula, data, carry, REML = TRUE, control = list(),
     if (!all(match(lapply(op[2:3], as.character), names(fl), nomatch = 0)))
         stop("Variables on RHS of carry must be names of grouping factors")
     outer <- eval(op[[3]], mf)
+    if (is.factor(tvar)) tvar <- as.integer(tvar) - 1
 
     ## check the ordering
     ord <- order(outer, tvar)
