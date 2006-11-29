@@ -1,3 +1,9 @@
+2006-11-29  Douglas Bates  <bates@stat.wisc.edu>
+
+	* src/dgeMatrix.c (dgeMatrix_solve): Check error code from dgetri.
+	* tests/dg_Matrix.R: Add Barry Rowlingson's test of a matrix that
+	is exactly singular.
+
 2006-11-07  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Date): updated -> release 0.9975-6

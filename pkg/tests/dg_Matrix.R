@@ -69,6 +69,9 @@ stopifnot(!isTRUE(all.equal(m1, m2)),
 ### -> uniq* functions now in ../R/Auxiliaries.R
 (t2 <- system.time(um2 <- Matrix:::uniq(m1)))
 
-
+### -> error condition for solve of a singular matrix (Barry Rowlingson)
+(iM <- Matrix(1:16, nc = 4))
+try(solve(iM))   ## should give an error but cache the LU decomp
+str(iM)
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''

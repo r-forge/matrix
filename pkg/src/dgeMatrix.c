@@ -245,6 +245,8 @@ SEXP dgeMatrix_solve(SEXP a)
     F77_CALL(dgetri)(dims, x, dims, pivot,
 		     (double *) R_alloc((size_t) lwork, sizeof(double)),
 		     &lwork, &info);
+    if (info)
+	error(_("Lapack routine dgetri: system is exactly singular"));
     UNPROTECT(1);
     return val;
 }
