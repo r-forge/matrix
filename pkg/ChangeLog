@@ -1,3 +1,7 @@
+2006-11-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/diagMatrix.R (%*%): write a direct [diag o Csparse] method
+
 2006-11-29  Douglas Bates  <bates@stat.wisc.edu>
 
 	* src/dgeMatrix.c (dgeMatrix_solve): Check error code from dgetri.
