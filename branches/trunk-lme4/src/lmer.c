@@ -1674,33 +1674,15 @@ SEXP Zt_carryOver(SEXP fp, SEXP Zt, SEXP tvar, SEXP discount)
     return M_chm_sparse_to_SEXP(ans, 1, 0, 0, "", R_NilValue);
 }
 
-#if 0
-static void
-mer_diag_update(int b, int nci, const double *K,
-		const int *ap, double *ax, double *wrk)
-{
-    if (nci == 1) {
-	double *dd = &ax[ap[b + 1] - 1];
-	*dd *= K[0] * K[0];
-	*dd++;
-    } else {
-	int j;
-	AZERO(wrk, nci * nci);	/* zero the work array */
-	for (j = 0; j < nci; j++) { /* copy diagonal block */
-	}
-    }
-}
-	
-    
-
 /**
- * Update A as \tilde{K}'A\tilde{K} + [I,0;0,0] and evaluate its
+ * Update A as \tilde{D^{1/2}}]\tilde{L}'A\tilde{L}\tilde{D^{1/2}},
+ * inflate the first q elements of the diagonal and evaluate its
  * numeric factorization in F.
  *
  * @param nf number of grouping factors
  * @param nc length nf vector of number of random effects per factor
  * @param Gp length nf+3 vector of group pointers for the rows of A
- * @param Kl pointers to the nf lower Cholesky factors of the diagonal
+ * @param LDL pointers to the nf LDL factorizations of the diagonal
  *     elements of Sigma 
  * @param A symmetric matrix of size Gp[nf+2]
  * @param F factorization to be modified
@@ -1708,32 +1690,105 @@ mer_diag_update(int b, int nci, const double *K,
  * @return error code from cholmod_factor (0 indicates success)
  */
 int
-internal_K_update(int n, const int *nc, const int *Gp,
-		  double **Kl, const cholmod_sparse *A,
+internal_A_update(int nf, const int *nc, const int *Gp,
+		  double **LDL, const cholmod_sparse *A,
 		  cholmod_factor *F)
 {
     cholmod_sparse *Ac = M_cholmod_copy_sparse(A, &c);
-    int i, *ai = (int *)(Ac->i), *ap = (int *)(Ac->p);
-    double *ax = (double *)(Ac->x), one[] = {1, 0}, zero[] = {0, 0};
+    int *ai = (int *)(Ac->i), *ap = (int *)(Ac->p),
+	*dp = Calloc(nf + 1, int), i, ione = 1, nct;
+    double *ax = (double *)(Ac->x), *diags, one[] = {1, 0};
 
-    if (!Ac->sorted) M_cholmod_sort(Ac, &c);
+    if ((!Ac->sorted) || Ac->stype <= 0) {
+	M_cholmod_free_sparse(&Ac, &c);
+	error(_("A must be a sorted cholmod_sparse object with stype > 0"));
+    }
+
+    /* calculate number of unique diagonals in D and allocate diags and dp */
+    dp[0] = 0;
+    for (i = 0, nct = 0; i < nf; i++) {nct += nc[i]; dp[i+1] = dp[i]+nc[i];}
+    diags = Calloc(nct, double);
+
     for (i = 0; i < nf; i++) {
-	int base = Gp[i], j, nci = nc[i], nlev = (Gp[i + 1] - Gp[i])/nc[i];
+	int base = Gp[i], j, k, kk, nci = nc[i];
+	int nlev = (Gp[i + 1] - Gp[i])/nci;
 
-	for (j = 0; j < nlev; j++) {
-	    int cj = base + j * nci; /* first column in this group */
-	    int nnz = ap[cj + 1] - ap[cj]; /* nonzeros in first column */
-	    double *db = Calloc(nci * nci, double); /* diagonal blcok */
+	if (nci > 1) { 		/* evaluate ith section of AL */
+	    int maxrows = -1;
+	    double *db = Calloc(nci * nci, double), /* diagonal blcok */
+		*wrk = (double *) NULL;
 	    
-	    if (nnz > 1) {
+	    /* FIXME: calculate and store maxrows when building the mer object */
+	    if (nci > 2) {	/* calculate scratch storage size */
+		for (j = 0; j < nlev; j++) {
+		    int cj = base + j * nci; /* first column in this group */
+		    int nnzm1 = ap[cj + 1] - ap[cj] - 1;
+		    if (nnzm1 > maxrows) maxrows = nnzm1;
+		}
+		wrk = Calloc(maxrows * nci, double);
+	    }
+	    
+	    for (j = 0; j < nlev; j++) {
+		int cj = base + j * nci; /* first column in this block */
+		int nnz = ap[cj + 1] - ap[cj]; /* nonzeros in column cj */
 		int nnzm1 = nnz - 1;
-		/* Multiply nci columns starting at cj (excluding the
-		   diagonal block) by K on rt */
-		F77_CALL(dtrmm)("R", "L", "N", "N", &nnzm1, &nci, one,
-				Kl[i], &nci, ax + ap[cj], &nnz);
-		/* copy and update diagonal block */
+	    
+		if (nnzm1) {	/* elements above diagonal block to update */
+		    if (nci == 2)
+			F77_CALL(dtrmm)("R", "L", "N", "U", &nnzm1, &nci, one,
+					LDL[i], &nci, ax + ap[cj], &nnz);
+		    else {	
+			for (k = 0; k < nci; k++) /* copy columns to wrk */
+			    Memcpy(wrk + k * maxrows, ax + ap[cj + k], nnzm1);
+			F77_CALL(dtrmm)("R", "L", "N", "U", &nnzm1, &nci, one,
+					LDL[i], &nci, wrk, &maxrows);
+			for (k = 0; k < nci; k++) /* copy results back */
+			    Memcpy(ax + ap[cj + k], wrk + k * maxrows,  nnzm1);
+		    }
+		    /* evaluate L'A for rows and columns in this block */
+		    for (k = 0; k < nci; k++) {
+			for (kk = 0; kk < nnzm1;) {
+			    int ind = ap[cj + k] + kk;
+			    if (Gp[i] <= ai[ind]) {
+				F77_CALL(dtrmv)("L", "T", "U", &nci,
+						LDL[i], &nci, ax + ind, &ione);
+				kk += nci;
+			    } else kk++;
+			}
+		    }
+		}
+				/* update the diagonal block */
+		for (k = 0; k < nci; k++) /* copy upper triangle */
+		    Memcpy(db + k * nci, ax + ap[cj + k] + nnzm1, k + 1);
+		for (k = 1; k < nci; k++) /* symmetrize */
+		    for (kk = 0; kk < k; kk++) db[kk + k * nci] = db[k + kk * nci];
+		F77_CALL(dtrmm)("L", "L", "T", "U", &nci, &nci, one,
+				LDL[i], &nci, db, &nci);
+		F77_CALL(dtrmm)("R", "L", "N", "U", &nci, &nci, one,
+				LDL[i], &nci, db, &nci);
+		for (k = 0; k < nci; k++) /* restore updated upper triangle */
+		    Memcpy(ax + ap[cj + k] + nnzm1, db + k * nci, k + 1);
+	    }
+	    if (nci > 2) Free(wrk);
+				/* evaluate L'A for all blocks to the right */
+	    for (j = Gp[i+1]; j < Gp[nf + 3]; j++) {
+		for (k = ap[j]; k < ap[j + 1]; ) {
+		    if (ai[k] >= Gp[i + 1]) break;
+		    if (ai[k] < Gp[i]) {
+			k++;
+			continue;
+		    }
+		    F77_CALL(dtrmv)("L", "T", "U", &nci,
+				    LDL[i], &nci, ax + k, &ione);
+		    k += nci;
+		}
 	    }
 	}
+				/* install new elements in diags */
+	for (k = 0; k < nci; k++)
+	    diags[dp[i] + k] = sqrt(LDL[i][k * (nci + 1)]);
+	/* Update by D^{1/2} from right. Inflate diagonal by I. */
     }
+    Free(diags);
 }
-#endif
+
