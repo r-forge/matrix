@@ -251,6 +251,8 @@
 \examples{
 (fm2 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject),
              data = sleepstudy))
+print(fm2, digits = 10, corr = FALSE) # more precision; no corr.matrix
+
 logLik(fm2)
 (V2 <- vcov(fm2))
 str(resid(fm2))
