@@ -1191,3 +1191,46 @@ hatTrace <- function(x)
     .Call(mer_hat_trace2, x)
 }
 
+lmer2 <- function(formula, data, family = gaussian,
+                 method = c("REML", "ML", "PQL", "Laplace", "AGQ"),
+                 control = list(), start = NULL,
+                 subset, weights, na.action, offset, contrasts = NULL,
+                 model = TRUE, ...)
+{
+    method <- match.arg(method)
+    formula <- as.formula(formula)
+    if (length(formula) < 3) stop("formula must be a two-sided formula")
+    cv <- do.call("lmerControl", control)
+
+    ## Establish model frame and fixed-effects model matrix and terms
+    mc <- match.call()
+    fr <- lmerFrames(mc, formula, data, contrasts)
+    Y <- fr$Y; X <- fr$X; weights <- fr$weights; offset <- fr$offset
+    mf <- fr$mf; mt <- fr$mt
+
+    ## check and evaluate the family argument
+    if(is.character(family))
+        family <- get(family, mode = "function", envir = parent.frame())
+    if(is.function(family)) family <- family()
+    if(is.null(family$family)) {
+        print(family)
+        stop("'family' not recognized")
+    }
+    fltype <- mkFltype(family)
+
+    ## establish factor list and Ztl
+    FL <- lmerFactorList(formula, mf, fltype)
+    cnames <- with(FL, c(lapply(Ztl, rownames), list(.fixed = colnames(X))))
+    nc <- with(FL, sapply(Ztl, nrow))
+    Ztl <- with(FL, .Call(Ztl_sparse, fl, Ztl))
+    ## FIXME: change this when rbind has been fixed.
+    Zt <- if (length(Ztl) == 1) Ztl[[1]] else do.call("rbind", Ztl)
+    fl <- FL$fl
+
+    ## quick return for a linear mixed model
+    if (fltype < 0) {
+        return(mer <- .Call(mer2_create, fl, Zt, t(X), as.double(Y),
+                            method == "REML", nc, cnames, fr$offset,
+                            fr$weights))
+    }
+}
