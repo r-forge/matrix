@@ -56,6 +56,30 @@ setClass("mer",
 			)
 	)
 
+setClass("mer2",
+	 representation(## original data
+			flist = "list",    # list of grouping factors
+			ZXyt = "dgCMatrix",  # sparse form of [Z;X;-y]'
+			wts = "numeric",   # weights
+                        offset = "numeric",
+			## invariants derived from data structure
+			cnames = "list",   # column names of model matrices
+			nc = "integer",	   # dimensions of blocks in Omega
+			Gp = "integer",	   # Pointers to groups of rows in Zt
+			## quantities that vary when Z, X or y are updated
+			A = "dsCMatrix", # Z'Z
+			## primary slots that vary during the optimization
+			LDL = "list", # list of relative variance matrices
+			## Cholesky factor of inflated [Z:X:y]'[Z:X:y]
+			F = "CHMfactor", # sparse Cholesky factor of A*
+			devComp = "numeric", # Components of deviance
+			deviance = "numeric", # Current deviance (ML and REML)
+			## Secondary slots only evaluated when requested.
+			fixef = "numeric",
+			ranef = "numeric"
+			)
+         )
+
 ## Representation of linear and generalized linear mixed effects model
 setClass("lmer",
 	 representation(frame = "data.frame",

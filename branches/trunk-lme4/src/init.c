@@ -22,6 +22,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_coef", (DL_FUNC) &mer_coef, 2},
     {"mer_coefGets", (DL_FUNC) &mer_coefGets, 3},
     {"mer_create", (DL_FUNC) &mer_create, 7},
+    {"mer2_create", (DL_FUNC) &mer2_create, 9},
     {"mer_dtCMatrix", (DL_FUNC) &mer_dtCMatrix, 1},
     {"mer_dtCMatrix_inv", (DL_FUNC) &mer_dtCMatrix_inv, 1},
     {"mer_factor", (DL_FUNC) &mer_factor, 1},
@@ -40,6 +41,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_simulate", (DL_FUNC) &mer_simulate, 2},
     {"mer_update_ZXy", (DL_FUNC) &mer_update_ZXy, 1},
     {"mer_update_y", (DL_FUNC) &mer_update_y, 2},
+    {"mer2_update_K", (DL_FUNC) &mer2_update_K, 1},
 
     {"pedigree_chol", (DL_FUNC) &pedigree_chol, 2},
 

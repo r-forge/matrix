@@ -10,6 +10,8 @@ SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbose);
 SEXP mer_coef(SEXP x, SEXP pType);
 SEXP mer_coefGets(SEXP x, SEXP coef, SEXP pType);
 SEXP mer_create(SEXP fl, SEXP Zt, SEXP Xp, SEXP yp, SEXP REMLp, SEXP nc, SEXP cnames);
+SEXP mer2_create(SEXP fl, SEXP Zt, SEXP Xp, SEXP yp, SEXP REMLp,
+		SEXP nc, SEXP cnames, SEXP offset, SEXP wts);
 SEXP mer_dtCMatrix(SEXP x);
 SEXP mer_dtCMatrix_inv(SEXP x);
 SEXP mer_fitted(SEXP x);
@@ -26,6 +28,7 @@ SEXP mer_simulate(SEXP x, SEXP nsimP);
 SEXP mer_update_ZXy(SEXP x);
 SEXP mer_update_y(SEXP x, SEXP ynew);
 SEXP mer_validate(SEXP x);
+SEXP mer2_update_K(SEXP x);
 
 SEXP Ztl_sparse(SEXP fl, SEXP Ztl);
 SEXP Zt_carryOver(SEXP f, SEXP Zt, SEXP tvar, SEXP discount);
