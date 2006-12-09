@@ -85,6 +85,7 @@ cholmod_sparse *as_cholmod_sparse(SEXP x)
  * @param a matrix to be converted
  * @param dofree 0 - don't free a; > 0 cholmod_free a; < 0 Free a
  * @param uploT 0 - not triangular; > 0 upper triangular; < 0 lower
+ * @param Rkind - vector type to store, e.g. REALSXP
  * @param diag character string suitable for the diag slot of a
  *          triangular matrix (not accessed if uploT == 0).
  * @param dn either R_NilValue or an SEXP suitable for the Dimnames slot.
