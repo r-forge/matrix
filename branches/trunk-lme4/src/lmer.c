@@ -1692,8 +1692,7 @@ internal_mer2_effects(const cholmod_factor *K, const int *dims,
 
 	bx[nrm1] = x[(nc - 1) * (nr + 1)];
     } else {
-	bx[nrm1] = ((double *)(K->x))[((int *)(K->p))[nrm1]];
-	if (!(K->is_ll)) bx[nrm1] = sqrt(bx[nrm1]);
+	bx[nrm1] = (K->is_ll) ? ((double*)(K->x))[((int*)(K->p))[nrm1]] : 1;
     }
     if (!(X = M_cholmod_solve(CHOLMOD_Lt, K, B, &c)))
 	error(_("cholmod_solve (CHOLMOD_Lt) failed: status %d, minor %d from ncol %d"),
@@ -2053,8 +2052,6 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
     }
     internal_mer2_initial(ldl, nf, nc, Gp, ts2);
     				/* Create K  with user-specified perm */
-    i = c.final_ll;
-    c.final_ll = 1;
     K = M_cholmod_analyze_p(ts2, Perm, (int*)NULL, (size_t)0, &c);
     if (!K)
 	error(_("cholmod_analyze_p returned with status %d"), c.status);
@@ -2065,7 +2062,6 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
     M_cholmod_free_sparse(&ts2, &c);
     internal_mer2_effects(K, dims, fixef, ranef);
     SET_SLOT(val, install("K"), M_chm_factor_to_SEXP(K, 1));
-    c.final_ll = i;
 
     Free(Perm); Free(Zt);
     UNPROTECT(1);
