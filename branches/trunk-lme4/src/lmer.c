@@ -1674,12 +1674,91 @@ SEXP Zt_carryOver(SEXP fp, SEXP Zt, SEXP tvar, SEXP discount)
     return M_chm_sparse_to_SEXP(ans, 1, 0, 0, "", R_NilValue);
 }
 
+static void
+internal_mer2_effects(const cholmod_factor *K, const int *dims,
+		      double *fixef, double *ranef)
+{
+    int i, p = dims[2], q = dims[3], nrm1 = dims[2] + dims[3];
+    size_t nr = (size_t)(p + q + 1);
+    cholmod_dense *B = M_cholmod_allocate_dense(nr, 1, nr, CHOLMOD_REAL, &c), *X;
+    double *bx = (double *)(B->x);
+    
+    for (i = 0; i < nr; i++) bx[i] = 0;
+    if (K->is_super) {
+	int ns = (K->nsuper);
+	int nr = ((int *)(K->pi))[ns] - ((int *)(K->pi))[ns - 1],
+	    nc = ((int *)(K->super))[ns] - ((int *)(K->super))[ns - 1];
+	double *x = (double *)(K->x) + ((int *)(K->px))[ns - 1];
+
+	bx[nrm1] = x[(nc - 1) * (nr + 1)];
+    } else {
+	bx[nrm1] = ((double *)(K->x))[((int *)(K->p))[nrm1]];
+	if (!(K->is_ll)) bx[nrm1] = sqrt(bx[nrm1]);
+    }
+    if (!(X = M_cholmod_solve(CHOLMOD_Lt, K, B, &c)))
+	error(_("cholmod_solve (CHOLMOD_Lt) failed: status %d, minor %d from ncol %d"),
+	      c.status, K->minor, K->n);
+    M_cholmod_free_dense(&B, &c);
+    if (!(B = M_cholmod_solve(CHOLMOD_P, K, X, &c)))
+	error(_("cholmod_solve (CHOLMOD_P) failed: status %d, minor %d from ncol %d"),
+	      c.status, K->minor, K->n);
+    M_cholmod_free_dense(&X, &c);
+    Memcpy(ranef, (double*)(B->x), q);
+    Memcpy(fixef, (double*)(B->x) + q, p);
+    M_cholmod_free_dense(&B, &c);
+}
+
+static void
+chm_log_abs_det2(double *ans, int nans, const int *c, const cholmod_factor *F)
+{
+    int i, ii  = 0, jj = 0;
+    for (i = 0; i < nans; i++) ans[i] = 0;
+    if (F->is_super) {
+	for (i = 0; i < F->nsuper; i++) {
+	    int j, nrp1 = 1 + ((int *)(F->pi))[i + 1] - ((int *)(F->pi))[i],
+		nc = ((int *)(F->super))[i + 1] - ((int *)(F->super))[i];
+	    double *x = (double *)(F->x) + ((int *)(F->px))[i];
+
+	    for (j = 0; j < nc; j++) {
+		while ((j + jj) >= c[ii + 1] && ++ii < nans) {};
+		if (ii >= nans) break;
+		ans[ii] += log(fabs(x[j * nrp1]));
+	    }
+	    jj += nc;
+	}
+    } else {
+	int *fi = (int*)(F->i), *fp = (int*)(F->p), j, k;
+	double *fx = (double *)(F->x);
+	
+	for (j = 0; ii < nans && j < F->n; j++) {
+	    for (k = fp[j]; fi[k] != j && k < fp[j + 1]; k++) {};
+	    if (fi[k] != j) break; /* what happened to the diagonal element? */
+	    while (j >= c[ii + 1] && ++ii < nans) {};
+	    if (ii >= nans) break;
+	    ans[ii] += log(fx[k] * ((F->is_ll) ? fx[k] : 1.));
+	}
+    }
+}
+
+static void
+internal_deviance(double *d, const int *dims, const cholmod_factor *K)
+{
+    int n = dims[1], p = dims[2], q = dims[3];
+    int c[] = {0,  q, p + q, p + q + 1};
+    double dn = (double) n, dnmp = (double)(n - p);
+    
+    chm_log_abs_det2(d + 2, 3, c, K);
+    d[0] = d[2] + dn * (1. + d[4] + log(2. * PI / dn));
+    d[1] = d[2] + d[3] + dnmp * (1. + d[4] + log(2. * PI / dnmp));
+}
+
 /**
  * Update A as \tilde{D^{1/2}}]\tilde{L}'A\tilde{L}\tilde{D^{1/2}},
  * inflate the first q elements of the diagonal and evaluate its
  * numeric factorization in F.
  *
- * @param nf number of grouping factors
+ * @param deviance number of grouping factors
+ * @param dims number of grouping factors
  * @param nc length nf vector of number of random effects per factor
  * @param Gp length nf+3 vector of group pointers for the rows of A
  * @param LDL pointers to the nf LDL factorizations of the diagonal
@@ -1689,15 +1768,13 @@ SEXP Zt_carryOver(SEXP fp, SEXP Zt, SEXP tvar, SEXP discount)
  *
  * @return error code from cholmod_factorize (0 indicates success)
  */
-static int
-internal_update_K(double *devComp, double *deviance,
-		  int nf, const int *nc, const int *Gp,
-		  double **LDL, const cholmod_sparse *A,
-		  cholmod_factor *K)
+static void
+internal_update_K(double *deviance, int *dims, const int *nc, const int *Gp,
+		  double **LDL, const cholmod_sparse *A, cholmod_factor *K)
 {
     cholmod_sparse *Ac = M_cholmod_copy_sparse(A, &c);
-    int *ai = (int *)(Ac->i), *ap = (int *)(Ac->p),
-	*dp = Calloc(nf + 1, int), i, ione = 1, nct;
+    int *ai = (int *)(Ac->i), *ap = (int *)(Ac->p), nf = *dims;
+    int *dp = Calloc(nf + 1, int), i, ione = 1, nct;
     double *ax = (double *)(Ac->x), *diags, one[] = {1, 0};
 
     if ((!Ac->sorted) || Ac->stype <= 0) {
@@ -1774,7 +1851,7 @@ internal_update_K(double *devComp, double *deviance,
 	    }
 	    if (nci > 2) Free(wrk);
 				/* evaluate L'A for all blocks to the right */
-	    for (j = Gp[i+1]; j < Gp[nf + 3]; j++) {
+	    for (j = Gp[i+1]; j < Gp[nf + 2]; j++) {
 		for (k = ap[j]; k < ap[j + 1]; ) {
 		    if (ai[k] >= Gp[i + 1]) break;
 		    if (ai[k] < Gp[i]) {
@@ -1797,7 +1874,7 @@ internal_update_K(double *devComp, double *deviance,
 		for (kk = ap[j + k]; kk < ap[j + k + 1]; kk++)
 		    ax[kk] *= diags[dp[i] + k];
 				/* Multiply by D^{1/2} from left. */
-	for (j = Gp[i]; j < Gp[nf + 2]; j++)
+	for (j = Gp[i]; j < A->ncol; j++)
 	    for (k = ap[j]; k < ap[j+1]; k++) {
 		int row = ai[k];
 		if (row < Gp[i]) continue;
@@ -1807,29 +1884,12 @@ internal_update_K(double *devComp, double *deviance,
 	    }
     }
     Free(diags); Free(dp);
-    i = M_cholmod_factorize(Ac, K, &c);
+    if (!M_cholmod_factorize(Ac, K, &c)) { 
+	error(_("cholmod_factorize failed: status %d, minor %d from ncol %d"),
+	      c.status, K->minor, K->n);
+    }	
+    internal_deviance(deviance, dims, K);
     M_cholmod_free_sparse(&Ac, &c);
-    return i;
-}
-
-SEXP mer2_update_K(SEXP x)
-{
-    cholmod_sparse *A = M_as_cholmod_sparse(GET_SLOT(x, install("A")));
-    cholmod_factor *L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
-    SEXP LDL = GET_SLOT(x, install("LDL")), ncp = GET_SLOT(x, lme4_ncSym);
-    int i, nf = LENGTH(ncp);
-    double **ldl = Calloc(nf, double*);
-
-    for (i = 0; i < nf; i++)
-	ldl[i] = REAL(GET_SLOT(VECTOR_ELT(LDL, i), lme4_xSym));
-    i = internal_update_K(REAL(GET_SLOT(x, lme4_devCompSym)),
-			  REAL(GET_SLOT(x, lme4_devianceSym)),
-			  nf, INTEGER(ncp), INTEGER(GET_SLOT(x, lme4_GpSym)),
-			  ldl, A, L);
-    if (i) error(_("cholmod_factorize returned error code %d"), i);
-    /* FIXME: Add code for the calculation of deviance and devComp slot */
-    Free(A); Free(L); Free(ldl);
-    return R_NilValue;
 }
 
 static void
@@ -1872,40 +1932,45 @@ internal_mer2_initial(double **LDL, int nf, int *nc, int *Gp, cholmod_sparse *A)
  * @param REMLp logical scalar indicating if REML is to be used
  * @param ncp integer vector of the number of random effects per level
  *        of each grouping factors
- * @param cnames names (of something?)
+ * @param cnames list of column names of model matrices
+ * @param offset numeric vector of offsets
+ * @param weights numeric vector of prior weights
  *
  * @return pointer to an mer2 object
  */
 SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
 		 SEXP ncp, SEXP cnames, SEXP offset, SEXP wts)
 {
-    SEXP LDL, fnms = getAttrib(fl, R_NamesSymbol), stat,
+    SEXP LDL, fnms = getAttrib(fl, R_NamesSymbol),
 	val = PROTECT(NEW_OBJECT(MAKE_CLASS("mer2"))), xnms;
     cholmod_sparse *ts1, *ts2, *Zt;
     cholmod_dense *Xy;
-    cholmod_factor *F;
-    int *Perm, *Gp, *nc = INTEGER(ncp), *xdims, *zdims,
-	REML = asInteger(REMLp), i, j, nf = LENGTH(fl),
-	nobs = LENGTH(yp), p, q;
-    char *devCmpnms[] = {"n", "scale", ""};
-    char *devnms[] = {"ML", "REML", ""};
-    char *statusnms[] =	{"stage", "REML", "glmm", ""};
-    double **ldl = Calloc(nf, double*), *Xt, *dcmp, *offv, *wtv, *y;
+    cholmod_factor *K;
+    int *Perm, *Gp, *nc = INTEGER(ncp), *dims, *xdims, *zdims,
+	i, j, nf = LENGTH(fl), nobs = LENGTH(yp), p, q;
+    char *devnms[] = {"ML", "REML", "ldZ", "ldX", "lr2", ""};
+    char *dimnms[] = {"nf", "n", "p", "q", "REML", "glmm", ""};
+    double **ldl = Calloc(nf, double*), *Xt, *fixef, *offv, *ranef, *wtv, *y;
+				/* record dimensions */
+    SET_SLOT(val, install("dims"), internal_make_named(INTSXP, dimnms));
+    dims = INTEGER(GET_SLOT(val, install("dims")));
+    dims[0] = nf; dims[1] = nobs; dims[4] = asLogical(REMLp); dims[5] = 0;
 				/* Check arguments to be duplicated */
     if (!isReal(yp)) error(_("yp must be a real vector"));
     y = REAL(yp);
     if (!isReal(offset) || LENGTH(offset) != nobs)
 	error(_("offset must be a real vector of length %d"), nobs);
     SET_SLOT(val, install("offset"), duplicate(offset));
-    offv = REAL(offset);
+    offv = REAL(GET_SLOT(val, install("offset")));
     if (!isReal(wts) || LENGTH(wts) != nobs)
 	error(_("wts must be a real vector of length %d"), nobs);
-    SET_SLOT(val, install("wts"), duplicate(wts));
-    wtv = REAL(wts);
+    SET_SLOT(val, install("weights"), duplicate(wts));
+    wtv = REAL(GET_SLOT(val, install("weights")));
 				/*  check flist and create Gp*/
-    SET_SLOT(val, lme4_flistSym, duplicate(fl));
+    /* FIXME: Change the length of cnames to nf + 2 */
     if (!isNewList(cnames) || LENGTH(cnames) != nf + 1)
 	error(_("cnames must be a list of length %d"), nf + 1);
+    /* FIXME: Check the lengths of the components of cnames */
     SET_SLOT(val, lme4_cnamesSym, duplicate(cnames));
     if (!isInteger(ncp) || LENGTH(ncp) != nf)
 	error(_("ncp must be an integer vector of length %d"), nf);
@@ -1919,25 +1984,24 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
 	    error(_("fl[[%d] must be a factor of length %d"), i+1, nobs);
 	Gp[i + 1] = Gp[i] + LENGTH(getAttrib(fli, R_LevelsSymbol)) * nc[i];
     }
-				/* allocate and populate the LDL slot */
-    LDL = ALLOC_SLOT(val, install("LDL"), VECSXP, nf);
-    setAttrib(LDL, R_NamesSymbol, duplicate(fnms));
-    for (i = 0; i < nf; i++) {
-	SET_VECTOR_ELT(LDL, i, allocMatrix(REALSXP, nc[i], nc[i]));
-	ldl[i] = REAL(VECTOR_ELT(LDL, i));
-    }
+    SET_SLOT(val, lme4_flistSym, duplicate(fl));
 				/* construct ZXyt matrix */
     if (!isMatrix(Xtp) || !isReal(Xtp))
 	error(_("Xtp must be a real matrix"));
     xdims = INTEGER(getAttrib(Xtp, R_DimSymbol));
     if (xdims[1] != nobs) error(_("Xtp must have %d rows"), nobs);
-    p = xdims[0]; Xt = REAL(Xtp);
+    dims[2] = p = xdims[0]; Xt = REAL(Xtp);
+    fixef = REAL(ALLOC_SLOT(val, lme4_fixefSym, REALSXP, p));
+    AZERO(fixef, p);
     Gp[nf + 1] = Gp[nf] + p;	/* fixed effects */
-    Gp[nf + 2] = Gp[nf + 1]++;	/* response */
+    Gp[nf + 2] = Gp[nf + 1] + 1; /* response */
     xnms = VECTOR_ELT(getAttrib(Xtp, R_DimNamesSymbol), 0);
     zdims = INTEGER(GET_SLOT(ZZt, lme4_DimSym));
     if (zdims[1] != nobs) error(_("Zt must have %d columns"), nobs);
-    q = zdims[0];
+    dims[3] = q = zdims[0];
+    ranef = REAL(ALLOC_SLOT(val, lme4_ranefSym, REALSXP, q));
+    AZERO(ranef, q);
+				/* determine permutation */
     Perm = Calloc(q + p + 1, int);
     for (j = 0; j <= (p + q); j++) Perm[j] = j; /* initialize to identity */
     Zt = M_as_cholmod_sparse(ZZt);
@@ -1948,17 +2012,17 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
 	ts2 = M_cholmod_copy(ts1, -1/*lower triangle*/, CHOLMOD_PATTERN, &c);
 	M_cholmod_free_sparse(&ts1, &c);
 	if (internal_mer_isNested(nf, nc, Gp, (int*)(ts2->p))) {
-	    F = M_cholmod_analyze(Zt, &c);
-	    if (!F)
+	    K = M_cholmod_analyze(Zt, &c);
+	    if (!K)
 		error(_("cholmod_analyze returned with status %d"), c.status);
-	    Memcpy(Perm, (int*)(F->Perm), q);
-	    M_cholmod_free_factor(&F, &c);
+	    Memcpy(Perm, (int*)(K->Perm), q);
+	    M_cholmod_free_factor(&K, &c);
 	}
 	M_cholmod_free_sparse(&ts2, &c);
     }
 				/* create [X;-y]' */
     Xy = M_cholmod_allocate_dense(p + 1, nobs, p + 1, CHOLMOD_REAL, &c);
-    for (j = 0; j < nobs; j++) { /* FIXME: Incorporate wts and offset here */
+    for (j = 0; j < nobs; j++) {
 	Memcpy(((double*)(Xy->x)) + j * (p + 1), Xt + j * p, p);
 	((double*)(Xy->x))[j * (p + 1) + p] = -y[j];
     }
@@ -1968,6 +2032,7 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
     M_cholmod_free_sparse(&ts1, &c);
     SET_SLOT(val, install("ZXyt"),
 	     M_chm_sparse_to_SEXP(ts2, 0, 0, 0, "", R_NilValue));
+    /* FIXME: Add an internal_update_A that incorporates weights and offset */
 				/*  Create and store A */
     ts1 = M_cholmod_aat(ts2, (int*)NULL, (size_t)0, 1, &c);
     M_cholmod_free_sparse(&ts2, &c);
@@ -1979,28 +2044,47 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
     }
     SET_SLOT(val, install("A"),
 	     M_chm_sparse_to_SEXP(ts2, 0, 0, 0, "", R_NilValue));
-    				/* analyze with user-specified perm */
-    F = M_cholmod_analyze_p(ts2, Perm, (int*)NULL, (size_t)0, &c);
-    if (!F)
-	error(_("cholmod_analyze_p returned with status %d"), c.status);
-				/* allocate other slots */
-    SET_SLOT(val, lme4_devianceSym, internal_make_named(REALSXP, devnms));
-    SET_SLOT(val, lme4_devCompSym, internal_make_named(REALSXP, devCmpnms));
-    SET_SLOT(val, lme4_statusSym, internal_make_named(INTSXP, statusnms));
-    stat = GET_SLOT(val, lme4_statusSym);
-    AZERO(INTEGER(stat), LENGTH(stat));
-    INTEGER(stat)[1] = REML;
-    dcmp = REAL(GET_SLOT(val, lme4_devCompSym));
-    dcmp[0] = (double) nobs;
-    dcmp[1] = (double) p;
-    				/* initialize and store F */
+				/* allocate, populate and initialize LDL */
+    LDL = ALLOC_SLOT(val, install("LDL"), VECSXP, nf);
+    setAttrib(LDL, R_NamesSymbol, duplicate(fnms));
+    for (i = 0; i < nf; i++) {
+	SET_VECTOR_ELT(LDL, i, allocMatrix(REALSXP, nc[i], nc[i]));
+	ldl[i] = REAL(VECTOR_ELT(LDL, i));
+    }
     internal_mer2_initial(ldl, nf, nc, Gp, ts2);
-    i = internal_update_K(dcmp, REAL(GET_SLOT(val, lme4_devianceSym)),
-			  nf, nc, Gp, ldl, ts2, F);
-    SET_SLOT(val, install("K"), M_chm_factor_to_SEXP(F, 1));
+    				/* Create K  with user-specified perm */
+    i = c.final_ll;
+    c.final_ll = 1;
+    K = M_cholmod_analyze_p(ts2, Perm, (int*)NULL, (size_t)0, &c);
+    if (!K)
+	error(_("cholmod_analyze_p returned with status %d"), c.status);
+    				/* initialize and store K */
+    SET_SLOT(val, lme4_devianceSym, internal_make_named(REALSXP, devnms));
+    internal_update_K(REAL(GET_SLOT(val, lme4_devianceSym)),
+			  dims, nc, Gp, ldl, ts2, K);
     M_cholmod_free_sparse(&ts2, &c);
+    internal_mer2_effects(K, dims, fixef, ranef);
+    SET_SLOT(val, install("K"), M_chm_factor_to_SEXP(K, 1));
+    c.final_ll = i;
 
     Free(Perm); Free(Zt);
     UNPROTECT(1);
     return val;
 }
+
+SEXP mer2_update_K(SEXP x)
+{
+    cholmod_sparse *A = M_as_cholmod_sparse(GET_SLOT(x, install("A")));
+    cholmod_factor *K = M_as_cholmod_factor(GET_SLOT(x, install("K")));
+    SEXP LDL = GET_SLOT(x, install("LDL"));
+    int i, *dims = INTEGER(GET_SLOT(x, install("dims")));
+    double **ldl = Calloc(dims[0], double*);
+
+    for (i = 0; i < dims[0]; i++) ldl[i] = REAL(VECTOR_ELT(LDL, i));
+    internal_update_K(REAL(GET_SLOT(x, lme4_devianceSym)),
+			  dims, INTEGER(GET_SLOT(x, lme4_ncSym)),
+			  INTEGER(GET_SLOT(x, lme4_GpSym)), ldl, A, K);
+    Free(A); Free(K); Free(ldl);
+    return R_NilValue;
+}
+
