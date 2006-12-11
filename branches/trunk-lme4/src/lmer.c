@@ -1840,7 +1840,7 @@ internal_update_K(double *deviance, int *dims, const int *nc, const int *Gp,
 		    Memcpy(db + k * nci, ax + ap[cj + k] + nnzm1, k + 1);
 		for (k = 1; k < nci; k++) /* symmetrize */
 		    for (kk = 0; kk < k; kk++)
-			db[kk + k * nci] = db[k + kk * nci];
+			db[k + kk * nci] = db[kk + k * nci];
 		F77_CALL(dtrmm)("L", "L", "T", "U", &nci, &nci, one,
 				LDL[i], &nci, db, &nci);
 		F77_CALL(dtrmm)("R", "L", "N", "U", &nci, &nci, one,
