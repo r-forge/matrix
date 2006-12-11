@@ -2051,10 +2051,13 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
 	ldl[i] = REAL(VECTOR_ELT(LDL, i));
     }
     internal_mer2_initial(ldl, nf, nc, Gp, ts2);
+    i = c.nmethods;
+    c.nmethods = 1;		/* force user-specified permutation */
     				/* Create K  with user-specified perm */
     K = M_cholmod_analyze_p(ts2, Perm, (int*)NULL, (size_t)0, &c);
     if (!K)
 	error(_("cholmod_analyze_p returned with status %d"), c.status);
+    c.nmethods = i;
     				/* initialize and store K */
     SET_SLOT(val, lme4_devianceSym, internal_make_named(REALSXP, devnms));
     internal_update_K(REAL(GET_SLOT(val, lme4_devianceSym)),
@@ -2078,8 +2081,8 @@ SEXP mer2_update_K(SEXP x)
 
     for (i = 0; i < dims[0]; i++) ldl[i] = REAL(VECTOR_ELT(LDL, i));
     internal_update_K(REAL(GET_SLOT(x, lme4_devianceSym)),
-			  dims, INTEGER(GET_SLOT(x, lme4_ncSym)),
-			  INTEGER(GET_SLOT(x, lme4_GpSym)), ldl, A, K);
+		      dims, INTEGER(GET_SLOT(x, lme4_ncSym)),
+		      INTEGER(GET_SLOT(x, lme4_GpSym)), ldl, A, K);
     Free(A); Free(K); Free(ldl);
     return R_NilValue;
 }
