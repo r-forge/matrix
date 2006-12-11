@@ -63,6 +63,8 @@ void R_init_lme4(DllInfo *dll)
 
 
     M_R_cholmod_start(&c);
+    c.final_ll = 0;	    /* LDL form of simplicial factorization */
+
     lme4_DSym = install("D");
     lme4_DimSym = install("Dim");
     lme4_DimNamesSym = install("Dimnames");
