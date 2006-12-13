@@ -44,7 +44,6 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_simulate", (DL_FUNC) &mer_simulate, 2},
     {"mer_update_ZXy", (DL_FUNC) &mer_update_ZXy, 1},
     {"mer_update_y", (DL_FUNC) &mer_update_y, 2},
-    {"mer2_update_K", (DL_FUNC) &mer2_update_K, 1},
 
     {"pedigree_chol", (DL_FUNC) &pedigree_chol, 2},
 

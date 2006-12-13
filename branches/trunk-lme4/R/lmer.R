@@ -1229,8 +1229,24 @@ lmer2 <- function(formula, data, family = gaussian,
 
     ## quick return for a linear mixed model
     if (fltype < 0) {
-        return(mer <- .Call(mer2_create, fl, Zt, t(X), as.double(Y),
-                            method == "REML", nc, cnames, fr$offset,
-                            fr$weights))
+        mer <- .Call(mer2_create, fl, Zt, t(X), as.double(Y),
+                     method == "REML", nc, cnames, fr$offset,
+                     fr$weights)
+        ## indicator of constrained parameters
+        const <- unlist(lapply(mer@nc,
+                               function(n) rep(1:0, c(n, (n*(n - 1))/2))))
+        optimRes <- nlminb(.Call(mer2_getPars, mer),
+                           function (x)
+                           .Call(mer2_deviance,
+                                 .Call(mer2_setPars, mer, x), as.integer(0)),
+                           lower = ifelse(const, 0, -Inf),
+                           control = list(trace = cv$msVerbose,
+                           iter.max = cv$msMaxIter,
+                           rel.tol = abs(0.01/.Call(mer2_deviance, mer, 0))))
+        if (!optimRes$convergence)
+            warn(paste("nlminb failed to converge:", optimRes$message))
+        ## ensure mer parameters are at the converged value
+        .Call(mer2_setPars, optimRes$par)
     }
+    mer
 }
