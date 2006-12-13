@@ -2071,19 +2071,94 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
     return val;
 }
 
-SEXP mer2_update_K(SEXP x)
+/**
+ * Extract the parameters from the LDL slot of an mer2 object
+ *
+ * @param x an mer2 object
+ *
+ * @return pointer to a REAL vector
+ */
+SEXP mer2_getPars(SEXP x)
+{
+    SEXP LDL = GET_SLOT(x, install("LDL")), ans;
+    int *nc = INTEGER(GET_SLOT(x, lme4_ncSym)),
+	i, nf = LENGTH(LDL), ntot, pos;
+    double **ldl = Calloc(nc, double*), *par;
+
+    for (i = 0, ntot = 0; i < nf; i++) {
+	ntot += (nc[i] * (nc[i] + 1))/2;
+	ldl[i] = REAL(VECTOR_ELT(LDL, i));
+    }
+    ans = PROTECT(allocVector(REALSXP, ntot));
+    par = REAL(ans);
+    for (pos = 0, i = 0; i < nf; i++) {
+	int j, k, nci = nc[i], ncp1 = nc[i] + 1;
+
+	for (j = 0; j < nci; j++) par[pos++] = ldl[i][j * ncp1];
+	for (j = 0; j < (nci - 1); j++)
+	    for (k = j + 1; k < nci; k++)
+		par[pos++] = ldl[i][k + j * nci];
+    }
+
+    UNPROTECT(1); Free(ldl);
+    return ans;
+}
+
+/**
+ * Update the LDL slot of an mer2 object from a REAL vector of
+ * parameters and update the Cholesky factorization
+ *
+ * @param x an mer2 object
+ * @param pars a REAL vector of the appropriate length
+ *
+ * @return R_NilValue
+ */
+SEXP mer2_setPars(SEXP x, SEXP pars)
 {
     cholmod_sparse *A = M_as_cholmod_sparse(GET_SLOT(x, install("A")));
     cholmod_factor *K = M_as_cholmod_factor(GET_SLOT(x, install("K")));
     SEXP LDL = GET_SLOT(x, install("LDL"));
-    int i, *dims = INTEGER(GET_SLOT(x, install("dims")));
-    double **ldl = Calloc(dims[0], double*);
+    int *nc = INTEGER(GET_SLOT(x, lme4_ncSym)),
+	i, nf = LENGTH(LDL), ntot, pos;
+    double **ldl = Calloc(nf, double*), *par = REAL(pars);
 
-    for (i = 0; i < dims[0]; i++) ldl[i] = REAL(VECTOR_ELT(LDL, i));
+    for (i = 0, ntot = 0; i < nf; i++) {
+	ntot += (nc[i] * (nc[i] + 1))/2;
+	ldl[i] = REAL(VECTOR_ELT(LDL, i));
+    }
+    if (!isReal(pars) || LENGTH(pars) != ntot)
+	error(_("pars must be a real vector of length %d"), ntot);
+    for (pos = 0, i = 0; i < nf; i++) {
+	int j, k, nci = nc[i], ncp1 = nc[i] + 1;
+
+	for (j = 0; j < nci; j++) ldl[i][j * ncp1] = par[pos++];
+	for (j = 0; j < (nci - 1); j++)
+	    for (k = j + 1; k < nci; k++)
+		ldl[i][k + j * nci] = par[pos++];
+    }
     internal_update_K(REAL(GET_SLOT(x, lme4_devianceSym)),
-		      dims, INTEGER(GET_SLOT(x, lme4_ncSym)),
+		      INTEGER(GET_SLOT(x, install("dims"))), nc,
 		      INTEGER(GET_SLOT(x, lme4_GpSym)), ldl, A, K);
     Free(A); Free(K); Free(ldl);
     return R_NilValue;
 }
 
+/* FIXME: Should I start using the name "discrepancy" instead of
+   "deviance"? */
+/**
+ * Extract the deviance from an mer2 object
+ *
+ * @param x an mer2 object
+ * @param which scalar integer < 0 => REML, 0 => native, > 0 => ML
+ *
+ * @return scalar REAL value
+ */
+SEXP mer2_deviance(SEXP x, SEXP which)
+{
+    int w = asInteger(which);
+    int R = (w < 0 || (!w && isREML(x))); 
+
+    return ScalarReal(REAL(GET_SLOT(x, lme4_devianceSym))[R ? REML_pos : ML_pos]);
+}
+
+    
