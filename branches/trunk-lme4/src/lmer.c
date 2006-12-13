@@ -2111,7 +2111,7 @@ SEXP mer2_getPars(SEXP x)
  * @param x an mer2 object
  * @param pars a REAL vector of the appropriate length
  *
- * @return R_NilValue
+ * @return x
  */
 SEXP mer2_setPars(SEXP x, SEXP pars)
 {
@@ -2140,7 +2140,7 @@ SEXP mer2_setPars(SEXP x, SEXP pars)
 		      INTEGER(GET_SLOT(x, install("dims"))), nc,
 		      INTEGER(GET_SLOT(x, lme4_GpSym)), ldl, A, K);
     Free(A); Free(K); Free(ldl);
-    return R_NilValue;
+    return x;
 }
 
 /* FIXME: Should I start using the name "discrepancy" instead of

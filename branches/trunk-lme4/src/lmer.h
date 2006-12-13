@@ -50,7 +50,6 @@ SEXP mer_simulate(SEXP x, SEXP nsimP);
 SEXP mer_update_ZXy(SEXP x);
 SEXP mer_update_y(SEXP x, SEXP ynew);
 SEXP mer_validate(SEXP x);
-SEXP mer2_update_K(SEXP x);
 
 SEXP Ztl_sparse(SEXP fl, SEXP Ztl);
 SEXP Zt_carryOver(SEXP f, SEXP Zt, SEXP tvar, SEXP discount);
