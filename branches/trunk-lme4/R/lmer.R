@@ -1241,12 +1241,12 @@ lmer2 <- function(formula, data, family = gaussian,
                                  .Call(mer2_setPars, mer, x), as.integer(0)),
                            lower = ifelse(const, 0, -Inf),
                            control = list(trace = cv$msVerbose,
-                           iter.max = cv$msMaxIter,
-                           rel.tol = abs(0.01/.Call(mer2_deviance, mer, 0))))
-        if (!optimRes$convergence)
-            warn(paste("nlminb failed to converge:", optimRes$message))
+                           iter.max = cv$msMaxIter))
+#                           rel.tol = abs(0.01/.Call(mer2_deviance, mer, 0))))
+        if (optimRes$convergence)
+            warning(paste("nlminb failed to converge:", optimRes$message))
         ## ensure mer parameters are at the converged value
-        .Call(mer2_setPars, optimRes$par)
+        .Call(mer2_setPars, mer, optimRes$par)
     }
     mer
 }
