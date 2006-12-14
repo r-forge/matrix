@@ -1721,7 +1721,7 @@ chm_log_abs_det2(double *ans, int nans, const int *c, const cholmod_factor *F)
 	    for (j = 0; j < nc; j++) {
 		while ((j + jj) >= c[ii + 1] && ++ii < nans) {};
 		if (ii >= nans) break;
-		ans[ii] += log(fabs(x[j * nrp1]));
+		ans[ii] += 2 * log(fabs(x[j * nrp1]));
 	    }
 	    jj += nc;
 	}
