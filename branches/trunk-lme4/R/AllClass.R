@@ -85,6 +85,13 @@ setClass("lmer",
 			terms = "terms"),
 	 contains = "mer")
 
+## Representation of linear and generalized linear mixed effects model
+setClass("lmer2",
+	 representation(frame = "data.frame",
+                        call = "call",	   # call to model-fitting function
+			terms = "terms"),
+	 contains = "mer2")
+
 setClass("glmer",
 	 representation(family = "family", # glm family - move here later
                         weights = "numeric"),
@@ -104,7 +111,23 @@ setClass("summary.mer", # the "mer" result ``enhanced'' :
 			),
 	 contains = "mer")
 
+setClass("summary.mer2", # the "mer2" result ``enhanced'' :
+	 representation(
+			isG   = "logical",
+			methTitle = "character",
+			logLik= "logLik",
+			ngrps = "integer",
+			sigma = "numeric", # scale, non-negative number
+			coefs = "matrix",
+			vcov = "dpoMatrix",
+			REmat = "matrix",
+			AICtab= "data.frame"
+			),
+	 contains = "mer2")
+
 setClass("summary.lmer", contains = c("summary.mer", "lmer"))
+
+setClass("summary.lmer2", contains = c("summary.mer2", "lmer"))
 
 setClass("summary.glmer", contains = c("summary.mer", "glmer"))
 

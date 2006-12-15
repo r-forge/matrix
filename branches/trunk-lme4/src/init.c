@@ -41,9 +41,12 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_secondary", (DL_FUNC) &mer_secondary, 1},
     {"mer2_setPars", (DL_FUNC) &mer2_setPars, 2},
     {"mer_sigma", (DL_FUNC) &mer_sigma, 2},
+    {"mer2_sigma", (DL_FUNC) &mer2_sigma, 2},
     {"mer_simulate", (DL_FUNC) &mer_simulate, 2},
+    {"mer2_update_effects", (DL_FUNC) &mer2_update_effects, 1},
     {"mer_update_ZXy", (DL_FUNC) &mer_update_ZXy, 1},
     {"mer_update_y", (DL_FUNC) &mer_update_y, 2},
+    {"mer2_vcov", (DL_FUNC) &mer2_vcov, 1},
 
     {"pedigree_chol", (DL_FUNC) &pedigree_chol, 2},
 
