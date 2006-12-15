@@ -2162,3 +2162,90 @@ SEXP mer2_deviance(SEXP x, SEXP which)
 }
 
     
+/**
+ * Update the contents of the fixef and ranef slots
+ *
+ * @param x an mer2 object
+ *
+ * @return R_NilValue
+ */
+SEXP mer2_update_effects(SEXP x)
+{
+    cholmod_factor *K = M_as_cholmod_factor(GET_SLOT(x, install("K")));
+    internal_mer2_effects(K, INTEGER(GET_SLOT(x, install("dims"))),
+			  REAL(GET_SLOT(x, lme4_fixefSym)),
+			  REAL(GET_SLOT(x, lme4_ranefSym)));
+    /* FIXME: Are the contents of the ranef slot the b*'s or the b's?  */
+    /* They are the b*'s. They should be multiplied by S. */
+    Free(K);
+    return R_NilValue;
+}
+
+static R_INLINE double
+internal_mer2_sigma(int REML, const int* dims, const double* deviance)
+{
+    int denom = dims[n_pos] - ((REML) ? dims[p_pos] : 0);
+    return sqrt(exp(deviance[lr2_pos])/((double) denom));
+}
+    
+/**
+ * Extract the estimate of the scale factor from an mer2 object
+ *
+ * @param x an mer2 object
+ * @param which scalar integer (< 0 => REML, 0 => native, > 0 => ML)
+ *
+ * @return scalar REAL value
+ */
+SEXP mer2_sigma(SEXP x, SEXP which)
+{
+    int w = asInteger(which);
+
+    return ScalarReal(internal_mer2_sigma((w < 0 || (!w && isREML(x))),
+					  INTEGER(GET_SLOT(x, install("dims"))),
+					  REAL(GET_SLOT(x, lme4_devianceSym))));
+}
+
+/**
+ * Extract the unscaled lower Cholesky factor of the relative
+ * variance-covariance matrix for the fixed-effects in an mer2 object.
+ *
+ * @param x an mer2 object
+ *
+ * @return a REAL p by p lower triangular matrix (it's a matrix, not a Matrix)
+ */
+
+SEXP mer2_vcov(SEXP x)
+{
+    int *dims = INTEGER(GET_SLOT(x, install("dims"))), *select;
+    int i, p = dims[p_pos], q = dims[q_pos];
+    SEXP ans = PROTECT(allocMatrix(REALSXP, p, p));
+
+    if (p) {
+	cholmod_factor *K = M_as_cholmod_factor(GET_SLOT(x, install("K")));
+	 /* need a copy because factor_to_sparse changes 1st arg */
+	cholmod_factor *Kcp = M_cholmod_copy_factor(K, &c);
+	cholmod_sparse *Ksp, *Kred; /* sparse and reduced-size sparse */
+	cholmod_dense *Kd;
+
+	if (!(Kcp->is_ll))
+	    if (!M_cholmod_change_factor(Kcp->xtype, 1, 0, 1, 1, Kcp, &c))
+		error(_("cholmod_change_factor failed with status %d"), c.status);
+	Ksp = M_cholmod_factor_to_sparse(Kcp, &c);
+	M_cholmod_free_factor(&Kcp, &c);
+	select = Calloc(p, int);
+	for (i = 0; i < p; i++) select[i] = q + i;
+	Kred = M_cholmod_submatrix(Ksp, select, p, select, p,
+				 1 /* values */, 1 /* sorted */, &c);
+	M_cholmod_free_sparse(&Ksp, &c);
+	Kd = M_cholmod_sparse_to_dense(Kred, &c);
+	M_cholmod_free_sparse(&Kred, &c);
+	Memcpy(REAL(ans), (double*)(Kd->x), p * p);
+	M_cholmod_free_dense(&Kd, &c);
+	F77_CALL(dtrtri)("L", "N", &p, REAL(ans), &p, &i);
+	if (i)
+	    error(_("Lapack routine dtrtri returned error code %d"), i);
+	Free(K); Free(select);
+    }
+    UNPROTECT(1);
+    return ans;
+}

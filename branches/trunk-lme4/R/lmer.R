@@ -1057,6 +1057,10 @@ setMethod("summary", signature(object = "mer"),
 		  )
 	  })## summary()
 
+setMethod("print", "mer", printMer)
+setMethod("show", "mer", function(object) printMer(object))
+
+
 ## Methods for "summary.*" objects:
 setMethod("vcov", signature(object = "summary.mer"),
 	  function(object) object@vcov)
@@ -1247,6 +1251,228 @@ lmer2 <- function(formula, data, family = gaussian,
             warning(paste("nlminb failed to converge:", optimRes$message))
         ## ensure mer parameters are at the converged value
         .Call(mer2_setPars, mer, optimRes$par)
+        ## update the fixef and ranef slots
+        .Call(mer2_update_effects, mer)
+        return(new("lmer2", mer,
+                   frame = if (model) fr$mf else data.frame(),
+                   terms = mt,
+                   call = mc))
     }
     mer
 }
+
+## FIXME: The fixef and vcov methods should incorporate the permutation.
+## Extract the fixed effects
+setMethod("fixef", signature(object = "mer2"),
+          function(object, ...) {
+              ans <- object@fixef
+              names(ans) <- object@cnames$.fixed
+              ans
+          })
+
+## Extract the conditional variance-covariance matrix of the fixed effects
+setMethod("vcov", signature(object = "mer2"),
+	  function(object, REML = 0, ...) {
+	      rr <- as(.Call(mer2_sigma, object, REML)^2 *
+                       crossprod(.Call(mer2_vcov, object)), "dpoMatrix")
+              nms <- object@cnames[[".fixed"]]
+              dimnames(rr) <- list(nms, nms)
+	      rr@factors$correlation <- as(rr, "corMatrix")
+	      rr
+	  })
+
+## This is modeled a bit after  print.summary.lm :
+printMer2 <- function(x, digits = max(3, getOption("digits") - 3),
+                     correlation = TRUE, symbolic.cor = x$symbolic.cor,
+                     signif.stars = getOption("show.signif.stars"), ...)
+{
+    so <- summary(x)
+    REML <- so@dims["REML"]
+    llik <- so@logLik
+    dev <- so@deviance
+    dims <- x@dims
+    glz <- so@isG
+
+    cat(so@methTitle, "\n")
+    if (inherits(x, "lmer2") || inherits(x, "glmer2")) {
+        if (!is.null(x@call$formula))
+            cat("Formula:", deparse(x@call$formula),"\n")
+        if (!is.null(x@call$data))
+            cat("   Data:", deparse(x@call$data), "\n")
+        if (!is.null(x@call$subset))
+            cat(" Subset:",
+                deparse(asOneSidedFormula(x@call$subset)[[2]]),"\n")
+    }
+    if (inherits(x, "glmer2"))
+        cat(" Family: ", so@family$family, "(",
+            so@family$link, " link)\n", sep = "")
+    print(so@AICtab, digits = digits)
+
+    cat("Random effects:\n")
+    print(so@REmat, quote = FALSE, digits = digits, ...)
+
+    ngrps <- so@ngrps
+    cat(sprintf("Number of obs: %d, groups: ", dims["n"]))
+    cat(paste(paste(names(ngrps), ngrps, sep = ", "), collapse = "; "))
+    cat("\n")
+    if (is.na(so@sigma))
+	cat("\nEstimated scale (compare to 1):",
+            sqrt(exp(so@deviance["lr2"])/so@dims["n"]), "\n")
+    if (nrow(so@coefs) > 0) {
+	cat("\nFixed effects:\n")
+	printCoefmat(so@coefs, zap.ind = 3, #, tst.ind = 4
+		     digits = digits, signif.stars = signif.stars)
+	if(correlation) {
+	    rn <- rownames(so@coefs)
+	    corF <- so@vcov@factors$correlation
+	    if (!is.null(corF)) {
+		p <- ncol(corF)
+		if (p > 1) {
+		    cat("\nCorrelation of Fixed Effects:\n")
+		    if (is.logical(symbolic.cor) && symbolic.cor) {
+			print(symnum(as(corF, "matrix"), abbr.col = NULL))
+		    }
+		    else {
+			corF <- matrix(format(round(corF@x, 3), nsmall = 3),
+				       nc = p)
+			dimnames(corF) <- list(abbreviate(rn, minlen=11),
+					       abbreviate(rn, minlen=6))
+			corF[!lower.tri(corF)] <- ""
+			print(corF[-1, -p, drop=FALSE], quote = FALSE)
+		    }
+		}
+	    }
+	}
+    }
+    invisible(x)
+}
+
+setMethod("summary", signature(object = "mer2"),
+	  function(object, ...) {
+	      fcoef <- fixef(object)
+	      vcov <- vcov(object)
+	      corF <- vcov@factors$correlation
+              dims <- object@dims
+	      ## DF <- getFixDF(object)
+	      coefs <- cbind("Estimate" = fcoef, "Std. Error" = corF@sd) #, DF = DF)
+	      REML <- object@dims["REML"]
+	      llik <- logLik(object, REML)
+	      dev <- object@deviance
+              
+	      glz <- is(object, "glmer")
+	      methTitle <-
+		  if (glz)
+		      paste("Generalized linear mixed model fit using",
+			    switch(object@status["glmm"],
+                                   "PQL", "Laplace", "AGQ"))
+		  else paste("Linear mixed-effects model fit by",
+			     if(REML) "REML" else "maximum likelihood")
+
+	      AICframe <- {
+		  if (glz)
+		      data.frame(AIC = AIC(llik), BIC = BIC(llik),
+				 logLik = c(llik),
+				 deviance = -2*llik,
+				 row.names = "")
+		  else
+		      data.frame(AIC = AIC(llik), BIC = BIC(llik),
+				 logLik = c(llik),
+				 MLdeviance = dev["ML"],
+				 REMLdeviance = dev["REML"],
+				 row.names = "")
+	      }
+              varcor <- VarCorr(object)
+	      REmat <- formatVC(varcor)
+              if (is.na(attr(varcor, "sc")))
+                  REmat <- REmat[-nrow(REmat), , drop = FALSE]
+
+	      if (nrow(coefs) > 0) {
+		  if (dims["glmm"]) {
+		      coefs <- coefs[, 1:2, drop = FALSE]
+		      stat <- coefs[,1]/coefs[,2]
+		      pval <- 2*pnorm(abs(stat), lower = FALSE)
+		      coefs <- cbind(coefs, "z value" = stat, "Pr(>|z|)" = pval)
+		  } else {
+		      stat <- coefs[,1]/coefs[,2]
+		      ##pval <- 2*pt(abs(stat), coefs[,3], lower = FALSE)
+		      coefs <- cbind(coefs, "t value" = stat) #, "Pr(>|t|)" = pval)
+		  }
+	      } ## else : append columns to 0-row matrix ...
+
+	      new(if(is(object, "glmer")) "summary.glmer" else
+                  {if(is(object, "lmer")) "summary.lmer" else "summary.mer2"},
+		  object,
+		  isG = glz,
+		  methTitle = methTitle,
+		  logLik = llik,
+		  ngrps = sapply(object@flist, function(x) length(levels(x))),
+		  sigma = .Call(mer2_sigma, object, REML),
+		  coefs = coefs,
+		  vcov = vcov,
+		  REmat = REmat,
+		  AICtab= AICframe
+		  )
+	  })## summary()
+
+## Extract the log-likelihood or restricted log-likelihood
+setMethod("logLik", signature(object="mer2"),
+	  function(object, REML = NULL, ...) {
+	      dims <- object@dims
+              if (is.null(REML) || is.na(REML[1]))
+                  REML <- object@dims["REML"]
+	      val <- -deviance(object, REML = REML)/2
+	      attr(val, "nall") <- attr(val, "nobs") <- dims["n"]
+	      attr(val, "df") <-
+                  dims["p"] + length(.Call(mer2_getPars, object))
+	      attr(val, "REML") <-  as.logical(REML)
+	      class(val) <- "logLik"
+	      val
+	  })
+
+## Extract the deviance
+setMethod("deviance", signature(object="mer2"),
+	  function(object, REML = NULL, ...) {
+              if (missing(REML) || is.null(REML) || is.na(REML[1]))
+                  REML <- object@dims["REML"]
+              object@deviance[ifelse(REML, "REML", "ML")]
+          })
+
+# Create the VarCorr object of variances and covariances
+setMethod("VarCorr", signature(x = "mer2"),
+	  function(x, REML = NULL, ...)
+      {
+	  sc <- .Call(mer2_sigma, x, REML)
+	  cnames <- x@cnames
+	  ans <- x@LDL
+	  for (i in seq(a = ans)) {
+              ai <- ans[[i]]
+              dm <- dim(ai)
+              if (dm[1] < 2) {
+                  el <- sc ^2 * ai
+              } else {
+                  dd <- diag(x = diag(ai), nrow = dm[1], ncol = dm[2])
+                  tr <- new("dtrMatrix", x = c(ans[[i]]), uplo = "L", diag = "U",
+                            Dim = dm, Dimnames = vector("list", 2))
+                  el <- sc^2 * (tr %*% dd %*% t(tr))
+              }
+              el <- as(el, "dpoMatrix")
+              el@Dimnames <- list(cnames[[i]], cnames[[i]])
+	      el@factors$correlation <- as(el, "corMatrix")
+	      ans[[i]] <- el
+	  }
+	  attr(ans, "sc") <- sc
+	  ans
+      })
+
+setMethod("print", "mer2", printMer2)
+setMethod("show", "mer2", function(object) printMer2(object))
+
+## Methods for "summary.*" objects:
+setMethod("vcov", signature(object = "summary.mer2"),
+	  function(object) object@vcov)
+setMethod("logLik", signature(object = "summary.mer2"),
+	  function(object) object@logLik)
+setMethod("deviance", signature(object = "summary.mer2"),
+ 	  function(object) object@deviance)
+setMethod("summary", signature(object = "summary.mer2"),
+          function(object) object)

@@ -46,10 +46,13 @@ SEXP mer_postVar(SEXP x);
 SEXP mer_ranef(SEXP x);
 SEXP mer2_setPars(SEXP x, SEXP pars);
 SEXP mer_sigma(SEXP x, SEXP REML);
+SEXP mer2_sigma(SEXP x, SEXP which);
 SEXP mer_simulate(SEXP x, SEXP nsimP);
+SEXP mer2_update_effects(SEXP x);
 SEXP mer_update_ZXy(SEXP x);
 SEXP mer_update_y(SEXP x, SEXP ynew);
 SEXP mer_validate(SEXP x);
+SEXP mer2_vcov(SEXP x);
 
 SEXP Ztl_sparse(SEXP fl, SEXP Ztl);
 SEXP Zt_carryOver(SEXP f, SEXP Zt, SEXP tvar, SEXP discount);
