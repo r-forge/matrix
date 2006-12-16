@@ -1,3 +1,25 @@
+2006-12-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (prSpMatrix): "." alignment much improved:
+	align with proper position of "0", i.e., right for integers.
+	argument 'align' by default is "fancy".
+
+2006-12-14  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R: delegate "Compare" to "Csparse.."
+	* R/Csparse.R: and fix "Compare" for more cases.
+	* tests/Class+Meth.R: test some of these (m == m, m != m)
+
+2006-12-13  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/lsparseMatrix.R: all() and any() methods
+	* R/ldenseMatrix.R:	 ditto
+	* NAMESPACE, R/Matrix.R: ditto
+
+	* man/all-methods.Rd: document them minimally
+
+	* tests/simple.R: add a few examples for these
+
 2006-12-11  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Tsparse.R ([): fix long standing typo in symmetric case
