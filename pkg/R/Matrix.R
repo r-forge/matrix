@@ -445,6 +445,16 @@ setMethod("cbind2", signature(x = "Matrix", y = "missing"),
           function(x, y) x)
 setMethod("cbind2", signature(x = "NULL", y="Matrix"),
           function(x, y) x)
+setMethod("cbind2", signature(x = "Matrix", y = "numeric"),
+	  function(x, y) callGeneric(x, as.matrix(y)))
+setMethod("cbind2", signature(x = "numeric", y = "Matrix"),
+	  function(x, y) callGeneric(as.matrix(x), y))
+setMethod("cbind2", signature(x = "ANY", y = "Matrix"),
+	  function(x, y) .bail.out.2(.Generic, class(x), class(y)))
+setMethod("cbind2", signature(x = "Matrix", y = "ANY"),
+	  function(x, y) .bail.out.2(.Generic, class(x), class(y)))
+
+
 
 setMethod("rbind2", signature(x = "Matrix", y = "NULL"),
           function(x, y) x)
@@ -452,6 +462,14 @@ setMethod("rbind2", signature(x = "Matrix", y = "missing"),
           function(x, y) x)
 setMethod("rbind2", signature(x = "NULL", y="Matrix"),
           function(x, y) x)
+setMethod("rbind2", signature(x = "Matrix", y = "numeric"),
+	  function(x, y) callGeneric(x, matrix(y, nrow = 1)))
+setMethod("rbind2", signature(x = "numeric", y = "Matrix"),
+	  function(x, y) callGeneric(matrix(x, nrow = 1), y))
+setMethod("rbind2", signature(x = "ANY", y = "Matrix"),
+	  function(x, y) .bail.out.2(.Generic, class(x), class(y)))
+setMethod("rbind2", signature(x = "Matrix", y = "ANY"),
+	  function(x, y) .bail.out.2(.Generic, class(x), class(y)))
 
 ## Makes sure one gets x decent error message for the unimplemented cases:
 setMethod("cbind2", signature(x = "Matrix", y = "Matrix"),

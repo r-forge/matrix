@@ -20,6 +20,12 @@ stopifnot(identical(cbind (m1, 10*m2) -> R,
 stopifnot(identical(cbind (m2, m1+m2) -> R,
                     cbind2(m2, m1+m2))); R
 
+cbind(m1, MM = -1)
+rbind(R1 = 10:11, m1)
+cbind(0, Matrix(0+0:1, 1,2), 3:2)# FIXME? should warn - as with matrix()
+
+as(rbind(0, Matrix(0+0:1, 1,2), 3:2),
+   "sparseMatrix")
 cbind(m2, 10*m2[nrow(m2):1 ,])# keeps the rownames from the first
 
 (im <- cbind(I = 100, m))
