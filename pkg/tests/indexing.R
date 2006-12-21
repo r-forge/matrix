@@ -196,14 +196,22 @@ mc[1:2,4:3] <- 4:1; stopifnot(as.matrix(mc[1:2,4:3]) == 4:1)
 mc[-1, 3] <- -2:1 # 0 should not be entered; 'value' recycled
 mt[-1, 3] <- -2:1
 stopifnot(mc@x != 0, mt@x != 0,
-          mc[-1,3] == -2:1, mt[-1,3] == -2:1) ##--> BUG -- fixed
+	  mc[-1,3] == -2:1, mt[-1,3] == -2:1) ## failed earlier
 
-ev <- 1:5 %% 2 == 0
-mc[ev, 3] <- 0:1
-if(FALSE)## FIXME
- stopifnot(mc[ev, 3] == 0:1) ##-> BUG  {very peculiar; the 2nd time it works ...}
-validObject(mc)
-mc # now shows a non-structural zeros
+mc0 <- mc
+set.seed(1)
+for(i in 1:20) {
+    mc <- mc0
+    ev <- 1:5 %% 2 == round(runif(1))# 0 or 1
+    j <- sample(ncol(mc), 1 + round(runif(1)))
+    nv <- rpois(sum(ev) * length(j), lambda = 1)
+    mc[ev, j] <- nv
+    if(i < 5) print(mc[ev,j, drop = FALSE])
+    stopifnot(as.vector(mc[ev, j]) == nv) ## failed earlier...
+    validObject(mc)
+}
+
+mc # no longer has non-structural zeros
 mc[ii, jj] <- 1:6
 mc[c(2,5), c(3,5)] <- 3.2
 validObject(mc)

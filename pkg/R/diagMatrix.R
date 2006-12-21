@@ -387,6 +387,23 @@ setMethod("tcrossprod", signature(x = "sparseMatrix", y = "diagonalMatrix"),
 	  function(x, y = NULL) { y <- as(y, "sparseMatrix"); callGeneric() })
 
 
+## cbind/rbind:  preserve sparseness {not always optimal}
+
+## hack to suppress the obnoxious dispatch ambiguity warnings:
+diag2Sp <- function(x) suppressWarnings(as(x, "CsparseMatrix"))
+
+## in order to evade method dispatch ambiguity, but still remain "general"
+## we use this hack instead of signature  x = "diagonalMatrix"
+for(cls in names(getClass("diagonalMatrix")@subclasses)) {
+ setMethod("cbind2", signature(x = cls, y = "matrix"),
+	   function(x,y) cbind2(diag2Sp(x), as_Csparse(y)))
+ setMethod("cbind2", signature(x = "matrix", y = cls),
+	   function(x,y) cbind2(as_Csparse(x), diag2Sp(y)))
+ setMethod("rbind2", signature(x = cls, y = "matrix"),
+	   function(x,y) rbind2(diag2Sp(x), as_Csparse(y)))
+ setMethod("rbind2", signature(x = "matrix", y = cls),
+	   function(x,y) rbind2(as_Csparse(x), diag2Sp(y)))
+}
 
 
 ## similar to prTriang() in ./Auxiliaries.R :

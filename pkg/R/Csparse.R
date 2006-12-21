@@ -200,6 +200,7 @@ replCmat <- function (x, i, j, value)
 	return(if(x.sym) as_CspClass(x, clx) else x)
     }
     ## else go via Tsparse.. {FIXME: a waste! - we already have 'xj' ..}
+    ## and inside  Tsparse... the above i1, i2,..., sel  are *all* redone!
     x <- as(x, "TsparseMatrix")
     if(missing(i))
 	x[ ,j] <- value

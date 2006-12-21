@@ -422,7 +422,7 @@ l2d_meth <- function(x) {
 
 ## return "d" or "l" or "n" or "z"
 .M.kind <- function(x, clx = class(x)) {
-    if(is.matrix(x)) { ## 'old style matrix'
+    if(is.matrix(x) || is.atomic(x)) { ## 'old style' matrix or vector
 	if     (is.numeric(x)) "d"
 	else if(is.logical(x)) "l" ## FIXME ? "n" if no NA ??
 	else if(is.complex(x)) "z"
@@ -436,6 +436,7 @@ l2d_meth <- function(x) {
     else stop(" not yet be implemented for ", clx)
 }
 
+## typically used as .type.kind[.M.kind(x)]:
 .type.kind <- c("d" = "double",
                 "l" = "logical",
                 "n" = "logical",
@@ -463,6 +464,7 @@ class2 <- function(cl, kind = "l", do.sub = TRUE) {
     else cl
 }
 
+## see also as_geClass() below
 geClass <- function(x) {
     if     (is(x, "dMatrix")) "dgeMatrix"
     else if(is(x, "lMatrix")) "lgeMatrix"
@@ -506,6 +508,7 @@ as_Tsparse <- function(x) {
     as(x, paste(.M.kind(x), .sparse.prefixes[.M.shape(x)], "TMatrix", sep=''))
 }
 
+## smarter, (but sometimes too smart!) compared to geClass() above:
 as_geClass <- function(x, cl) {
     if	   (extends(cl, "diagonalMatrix")  && isDiagonal(x))
 	as(x, cl)
