@@ -54,13 +54,13 @@
 \alias{Ops,Matrix,matrix-method}
 \alias{Ops,matrix,Matrix-method}
 \alias{cbind2,Matrix,ANY-method}
-\alias{cbind2,Matrix,numeric-method}
+\alias{cbind2,Matrix,atomicVector-method}
 \alias{cbind2,ANY,Matrix-method}
-\alias{cbind2,numeric,Matrix-method}
+\alias{cbind2,atomicVector,Matrix-method}
 \alias{rbind2,Matrix,ANY-method}
-\alias{rbind2,Matrix,numeric-method}
+\alias{rbind2,Matrix,atomicVector-method}
 \alias{rbind2,ANY,Matrix-method}
-\alias{rbind2,numeric,Matrix-method}
+\alias{rbind2,atomicVector,Matrix-method}
 \alias{crossprod,ANY,Matrix-method}
 \alias{kronecker,ANY,Matrix-method}
 \alias{kronecker,Matrix,ANY-method}

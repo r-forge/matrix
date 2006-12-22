@@ -312,17 +312,22 @@ SEXP Csparse_band(SEXP x, SEXP k1, SEXP k2)
 
 SEXP Csparse_diagU2N(SEXP x)
 {
-    cholmod_sparse *chx = as_cholmod_sparse(x);
-    cholmod_sparse *eye = cholmod_speye(chx->nrow, chx->ncol, chx->xtype, &c);
-    double one[] = {1, 0};
-    cholmod_sparse *ans = cholmod_add(chx, eye, one, one, TRUE, TRUE, &c);
-    int uploT = (strcmp(CHAR(asChar(GET_SLOT(x, Matrix_uploSym))), "U")) ?
-	-1 : 1;
-    int Rkind = (chx->xtype == CHOLMOD_REAL) ? Real_kind(x) : 0;
+    if (*diag_P(x) != 'U') {/* "trivially fast" when there's no 'diag' slot at all */
+	return (x);
+    }
+    else {
+	cholmod_sparse *chx = as_cholmod_sparse(x);
+	cholmod_sparse *eye = cholmod_speye(chx->nrow, chx->ncol, chx->xtype, &c);
+	double one[] = {1, 0};
+	cholmod_sparse *ans = cholmod_add(chx, eye, one, one, TRUE, TRUE, &c);
+	int uploT = (strcmp(CHAR(asChar(GET_SLOT(x, Matrix_uploSym))), "U")) ?
+	    -1 : 1;
+	int Rkind = (chx->xtype == CHOLMOD_REAL) ? Real_kind(x) : 0;
 
-    Free(chx); cholmod_free_sparse(&eye, &c);
-    return chm_sparse_to_SEXP(ans, 1, uploT, Rkind, "N",
-			      duplicate(GET_SLOT(x, Matrix_DimNamesSym)));
+	Free(chx); cholmod_free_sparse(&eye, &c);
+	return chm_sparse_to_SEXP(ans, 1, uploT, Rkind, "N",
+				  duplicate(GET_SLOT(x, Matrix_DimNamesSym)));
+    }
 }
 
 SEXP Csparse_submatrix(SEXP x, SEXP i, SEXP j)
