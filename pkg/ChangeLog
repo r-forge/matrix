@@ -1,3 +1,13 @@
+2006-12-22  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (as_Csparse2, as_geSimpl): new functions;
+		also more general diagU2N().
+
+2006-12-21  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/bind2.R: new file for all cbind2(), rbind() methods moved here
+	from R/<foo>Matrix.R files. Better diagonal & improved sparse methods.
+
 2006-12-20  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* tests/bind.R: a few more cases

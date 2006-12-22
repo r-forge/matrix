@@ -141,8 +141,6 @@ setMethod("Math",
           function(x) callGeneric(as(x, "dgeMatrix")))
 
 
-##  "cbind2" / "rbind2" --> moved to  ./denseMatrix.R
-
 ### FIXME: band() et al should be extended from "ddense" to "dense" !
 ###        However, needs much work to generalize dup_mMatrix_as_dgeMatrix()
 

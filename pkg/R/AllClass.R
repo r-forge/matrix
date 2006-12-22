@@ -617,14 +617,20 @@ setClass("css_LU", representation(Q = "integer", nz = "integer"))
 
 ## --- "General" (not Matrix at all) ----
 
-## for 'i' in x[i] or A[i,] :
+## for 'i' in x[i] or A[i,] : (numeric = {double, integer})
 setClassUnion("index", members =  c("numeric", "logical", "character"))
 
-### for 'value' in   x[..] <- value :
-setClassUnion("replValue", members =  c("numeric", "logical"))
-
+## "atomic vectors" (-> ?is.atomic ) --
+## ---------------  those that we want to convert from old-style "matrix"
+setClassUnion("atomicVector", ## numeric = {integer, double} but all 3 should *directly* be atomic
+	      members = c("logical", "integer", "double", "numeric",
+			  "complex", "raw", "character"))
 
 ## --- Matrix - related (but not "Matrix" nor "Decomposition/Factorization):
+
+### for 'value' in  x[..] <- value hence for all "contents" of our Matrices:
+setClassUnion("replValue", members =  c("numeric", "logical", "complex", "raw"))
+
 
 setClass("determinant",
 	 representation(modulus = "numeric",

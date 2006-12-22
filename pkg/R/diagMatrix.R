@@ -173,8 +173,13 @@ setAs("Matrix", "diagonalMatrix",
               x = if(uni) x[FALSE] else x)
       })
 
+
+setMethod("diag", signature(x = "diagonalMatrix"),
+	  function(x = 1, nrow, ncol = n) .diag.x(x))
+
 ## When you assign to a diagonalMatrix, the result should be
-## diagonal or sparse
+## diagonal or sparse ---
+## FIXME: this now fails because the "denseMatrix" methods come first in dispatch
 setReplaceMethod("[", signature(x = "diagonalMatrix",
 				i = "ANY", j = "ANY", value = "ANY"),
 		 function(x, i, j, value) {
@@ -202,14 +207,6 @@ setMethod("chol", signature(x = "ddiMatrix"),# pivot = "ANY"
 	  })
 ## chol(L) is L for logical diagonal:
 setMethod("chol", signature(x = "ldiMatrix"), function(x, pivot) x)
-
-
-setMethod("diag", signature(x = "diagonalMatrix"),
-	  function(x = 1, nrow, ncol = n) {
-             if(x@diag == "U")
-                 rep.int(if(is.logical(x@x)) TRUE else 1, x@Dim[1])
-             else x@x
-          })
 
 setMethod("!", "ldiMatrix", function(e1) {
     if(e1@diag == "N")
@@ -385,25 +382,6 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "sparseMatrix"),
 
 setMethod("tcrossprod", signature(x = "sparseMatrix", y = "diagonalMatrix"),
 	  function(x, y = NULL) { y <- as(y, "sparseMatrix"); callGeneric() })
-
-
-## cbind/rbind:  preserve sparseness {not always optimal}
-
-## hack to suppress the obnoxious dispatch ambiguity warnings:
-diag2Sp <- function(x) suppressWarnings(as(x, "CsparseMatrix"))
-
-## in order to evade method dispatch ambiguity, but still remain "general"
-## we use this hack instead of signature  x = "diagonalMatrix"
-for(cls in names(getClass("diagonalMatrix")@subclasses)) {
- setMethod("cbind2", signature(x = cls, y = "matrix"),
-	   function(x,y) cbind2(diag2Sp(x), as_Csparse(y)))
- setMethod("cbind2", signature(x = "matrix", y = cls),
-	   function(x,y) cbind2(as_Csparse(x), diag2Sp(y)))
- setMethod("rbind2", signature(x = cls, y = "matrix"),
-	   function(x,y) rbind2(diag2Sp(x), as_Csparse(y)))
- setMethod("rbind2", signature(x = "matrix", y = cls),
-	   function(x,y) rbind2(as_Csparse(x), diag2Sp(y)))
-}
 
 
 ## similar to prTriang() in ./Auxiliaries.R :
