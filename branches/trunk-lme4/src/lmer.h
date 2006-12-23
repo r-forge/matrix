@@ -4,25 +4,31 @@
 #include "lme4_utils.h"
 #include "Wishart.h"
 				/* positions in the deviance vector */
-#define ML_pos   0
-#define REML_pos 1
-#define ldZ_pos  2
-#define ldX_pos  3
-#define lr2_pos  4
+extern const char attr_hidden *DEVIANCE_NAMES[];
+			 /* {"ML", "REML", "ldZ", "ldX", "lr2", ""} */
+#define ML_POS   0
+#define REML_POS 1
+#define ldZ_POS  2
+#define ldX_POS  3
+#define lr2_POS  4
 				/* positions in the dims vector */
-#define nf_pos     0
-#define n_pos      1
-#define p_pos      2
-#define q_pos      3
+extern const char attr_hidden *DIMS_NAMES[];
+	      /* {"nf", "n", "p", "q", "REML", "glmm", "bstar", ""} */
+#define nf_POS     0
+#define n_POS      1
+#define p_POS      2
+#define q_POS      3
 /* FIXME: change the next two codes to a single code "type" with
    values type < 0 => LMM & REML, type == 0 => LMM & ML,
    type == 1 => GLMM & Laplace, type == 2 => GLMM & AGQ
 */
-#define isREML_pos 4
-#define isGLMM_pos 5
+#define isREML_POS 4
+#define glmm_POS 5
+#define bstar_POS 6
 
-#define isREML(x) INTEGER(GET_SLOT(x, install("dims")))[isREML_pos]
-#define isGLMM(x) INTEGER(GET_SLOT(x, install("dims")))[isGLMML_pos]
+#define isREML(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isREML_POS]
+#define isGLMM(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[glmm_POS]
+
 SEXP mer_ECMEsteps(SEXP x, SEXP nsteps, SEXP Verbp);
 /* SEXP mer_Hessian(SEXP x);  not yet */
 SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbose);

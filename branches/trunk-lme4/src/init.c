@@ -8,6 +8,13 @@
  */
 #include "Syms.h" 
 
+				/* positions in the deviance vector */
+const char attr_hidden *DEVIANCE_NAMES[] = {"ML", "REML",
+					    "ldZ", "ldX", "lr2", ""};
+				/* positions in the dims vector */
+const char attr_hidden *DIMS_NAMES[] = {"nf", "n", "p", "q",
+					"REML", "glmm", "bstar", ""};
+
 static R_CallMethodDef CallEntries[] = {
     {"glmer_MCMCsamp", (DL_FUNC) &glmer_MCMCsamp, 5},
     {"glmer_PQL", (DL_FUNC) &glmer_PQL, 1},
@@ -70,11 +77,14 @@ void R_init_lme4(DllInfo *dll)
     M_R_cholmod_start(&c);
     c.final_ll = 0;	    /* LDL form of simplicial factorization */
 
+    lme4_ASym = install("A");
     lme4_DSym = install("D");
     lme4_DimSym = install("Dim");
     lme4_DimNamesSym = install("Dimnames");
     lme4_GpSym = install("Gp");
+    lme4_KSym = install("K");
     lme4_LSym = install("L");
+    lme4_LDLSym = install("LDL");
     lme4_OmegaSym = install("Omega");
     lme4_RXXSym = install("RXX");
     lme4_RZXSym = install("RZX");
@@ -92,6 +102,7 @@ void R_init_lme4(DllInfo *dll)
     lme4_devCompSym = install("devComp");
     lme4_devianceSym = install("deviance");
     lme4_diagSym = install("diag");
+    lme4_dimsSym = install("dims");
     lme4_factorSym = install("factor");
     lme4_fixefSym = install("fixef");
     lme4_flistSym = install("flist");

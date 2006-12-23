@@ -486,6 +486,7 @@ setMethod("ranef", signature(object = "mer"),
               }
               ans
 	  })
+
 ## Optimization for mer objects
 setReplaceMethod("LMEoptimize", signature(x="mer", value="list"),
 		 function(x, value)
@@ -1245,8 +1246,8 @@ lmer2 <- function(formula, data, family = gaussian,
                                  .Call(mer2_setPars, mer, x), as.integer(0)),
                            lower = ifelse(const, 0, -Inf),
                            control = list(trace = cv$msVerbose,
-                           iter.max = cv$msMaxIter))
-#                           rel.tol = abs(0.01/.Call(mer2_deviance, mer, 0))))
+                           iter.max = cv$msMaxIter,
+                           rel.tol = abs(0.001/.Call(mer2_deviance, mer, 0))))
         if (optimRes$convergence)
             warning(paste("nlminb failed to converge:", optimRes$message))
         ## ensure mer parameters are at the converged value
@@ -1444,16 +1445,15 @@ setMethod("VarCorr", signature(x = "mer2"),
 	  sc <- .Call(mer2_sigma, x, REML)
 	  cnames <- x@cnames
 	  ans <- x@LDL
-	  for (i in seq(a = ans)) {
+          for (i in seq(along = ans)) {
               ai <- ans[[i]]
               dm <- dim(ai)
               if (dm[1] < 2) {
-                  el <- sc ^2 * ai
+                  el <- (sc * ai)^2
               } else {
-                  dd <- diag(x = diag(ai), nrow = dm[1], ncol = dm[2])
-                  tr <- new("dtrMatrix", x = c(ans[[i]]), uplo = "L", diag = "U",
-                            Dim = dm, Dimnames = vector("list", 2))
-                  el <- sc^2 * (tr %*% dd %*% t(tr))
+                  dd <- diag(ai)
+                  diag(ai) <- rep(1, dm[1])
+                  el <- sc^2 * dd * t(dd * tcrossprod(ai)) 
               }
               el <- as(el, "dpoMatrix")
               el@Dimnames <- list(cnames[[i]], cnames[[i]])
