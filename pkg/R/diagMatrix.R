@@ -180,13 +180,26 @@ setMethod("diag", signature(x = "diagonalMatrix"),
 ## When you assign to a diagonalMatrix, the result should be
 ## diagonal or sparse ---
 ## FIXME: this now fails because the "denseMatrix" methods come first in dispatch
-setReplaceMethod("[", signature(x = "diagonalMatrix",
-				i = "ANY", j = "ANY", value = "ANY"),
-		 function(x, i, j, value) {
-		     r <- callGeneric(x = as(x,"sparseMatrix"),
-				      i=i, j=j, value=value)
-		     if(isDiagonal(r)) as(r, "diagonalMatrix") else r
-		 })
+
+replDiag <- function(x, i, j, value) {
+    x <- as(x, "sparseMatrix")
+    if(missing(i))
+	x[, j] <- value
+    else if(missing(j))
+	x[i, ] <- value
+    else
+	x[i,j] <- value
+    if(isDiagonal(x)) as(x, "diagonalMatrix") else x
+}
+
+setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index",
+				j = "index", value = "replValue"), replDiag)
+setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index",
+				j = "missing", value = "replValue"),
+		 function(x, i, value) replDiag(x, i=i, value=value))
+setReplaceMethod("[", signature(x = "diagonalMatrix", i = "missing",
+				j = "index", value = "replValue"),
+		 function(x, j, value) replDiag(x, j=j, value=value))
 
 
 setMethod("t", signature(x = "diagonalMatrix"),

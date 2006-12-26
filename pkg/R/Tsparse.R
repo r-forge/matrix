@@ -254,7 +254,7 @@ replTmat <- function (x, i, j, value)
 
     ## Note: *T*matrix maybe non-unique: an entry can be split
     ##	  into a *sum* of several ones :
-    x <- uniq(x) # -> ./Auxiliaries.R
+    x <- uniq(x)
 
     get.ind.sel <- function(ii,ij)
 	(match(x@i, ii, nomatch = 0) > 0:0 &
@@ -272,6 +272,17 @@ replTmat <- function (x, i, j, value)
 	    ## select also the corresponding triangle
 	    if(lenRepl > 1)
 		value <- value[(if(xU)upper.tri else lower.tri)(value, diag=TRUE)]
+	}
+	else { # go to "generalMatrix" and continue
+	    x <- as(x, paste(.M.kind(x), "gTMatrix", sep=''))
+	}
+    }
+    else if((tri.x <- is(x, "triangularMatrix"))) {
+        xU <- x@uplo == "U"
+	r.tri <- all(if(xU) i1 <= i2 else i2 <= i1)
+	if(r.tri) { ## result is *still* triangular
+            if(any(i1 == i2)) # diagonal will be changed
+                x <- diagU2N(x)
 	}
 	else { # go to "generalMatrix" and continue
 	    x <- as(x, paste(.M.kind(x), "gTMatrix", sep=''))

@@ -1,4 +1,4 @@
-#### For both 'Extract' ("[") and 'Replace' ("[<-") Method testing
+## For both 'Extract' ("[") and 'Replace' ("[<-") Method testing
 
 library(Matrix)
 
@@ -137,6 +137,37 @@ stopifnot(sm[2,] == c(0:1, rep.int(0,ncol(sm)-2)),
 	  all(sm[,-(1:3)] == t(sm[-(1:3),])), # all(<lge.>)
 	  all(sm[,-(1:3)] == 0)
 	  )
+
+### Diagonal -- Sparse:
+m0 <- Diagonal(5)
+(m1 <- as(m0, "sparseMatrix"))  # dtTMatrix
+(m2 <- as(m0, "CsparseMatrix")) # dtCMatrix (with an irrelevant warning)
+
+M <- m0; M[1,] <- 0
+stopifnot(identical(M, Diagonal(x=c(0, rep(1,4)))))
+M <- m0; M[,3] <- 3 ; M ; stopifnot(is(M, "sparseMatrix"), M[,3] == 3)
+validObject(M)
+M <- m0; M[1:3, 3] <- 0 ;M
+T <- m0; T[1:3, 3] <- 10
+stopifnot(identical(M, Diagonal(x=c(1,1, 0, 1,1))),
+          is(T, "triangularMatrix"), identical(T[,3], c(10,10,10,0,0)))
+
+M <- m1; M[1,] <- 0 ; M ; assert.EQ.mat(M, diag(c(0,rep(1,4))), tol=0)
+M <- m1; M[,3] <- 3 ; stopifnot(is(M,"sparseMatrix"), M[,3] == 3)
+validObject(M)
+M <- m1; M[1:3, 3] <- 0 ;M
+assert.EQ.mat(M, diag(c(1,1, 0, 1,1)), tol=0)
+T <- m1; T[1:3, 3] <- 10; validObject(T)
+stopifnot(is(T, "dtTMatrix"), identical(T[,3], c(10,10,10,0,0)))
+
+M <- m2; M[1,] <- 0 ; M ; assert.EQ.mat(M, diag(c(0,rep(1,4))), tol=0)
+M <- m2; M[,3] <- 3 ; stopifnot(is(M,"sparseMatrix"), M[,3] == 3)
+validObject(M)
+M <- m2; M[1:3, 3] <- 0 ;M
+assert.EQ.mat(M, diag(c(1,1, 0, 1,1)), tol=0)
+T <- m2; T[1:3, 3] <- 10; validObject(T)
+stopifnot(is(T, "dtCMatrix"), identical(T[,3], c(10,10,10,0,0)))
+
 
 
 ## --- negative indices ----------

@@ -307,18 +307,14 @@ setClass("dgTMatrix",
 setClass("dtTMatrix",
 	 contains = c("TsparseMatrix", "dsparseMatrix", "triangularMatrix"),
 	 prototype = prototype(uplo = "U", diag = "N"),
-	 validity = function(object) .Call(xTMatrix_validate, object)
+	 validity = function(object) .Call(tTMatrix_validate, object)
 	 )
 
-## Should not have dsTMatrix inherit from dgTMatrix because a dsTMatrix
-## is not fully stored.	 Methods for the dgTMatrix class would not
-## produce correct results even though all the slots are present.
-
-## numeric, sparse, triplet symmetric matrices
+## numeric, sparse, triplet symmetric matrices(also only store one triangle)
 setClass("dsTMatrix",
 	 contains = c("TsparseMatrix", "dsparseMatrix", "symmetricMatrix"),
 	 prototype = prototype(uplo = "U"),
-	 validity = function(object) .Call(xTMatrix_validate, object)
+	 validity = function(object) .Call(tTMatrix_validate, object)
 	 )
 
 ## numeric, sparse, sorted compressed sparse column-oriented general matrices
@@ -333,7 +329,7 @@ setClass("dgCMatrix",
 setClass("dtCMatrix",
 	 contains = c("CsparseMatrix", "dsparseMatrix", "triangularMatrix"),
 	 prototype = prototype(p = 0:0, uplo = "U", diag = "N"),# to be valid
-	 validity = function(object) .Call(xCMatrix_validate, object)
+	 validity = function(object) .Call(tCMatrix_validate, object)
 	 )
 
 ## see comments for dsTMatrix above
@@ -341,7 +337,7 @@ setClass("dtCMatrix",
 setClass("dsCMatrix",
 	 contains = c("CsparseMatrix", "dsparseMatrix", "symmetricMatrix"),
 	 prototype = prototype(p = 0:0, uplo = "U"),# to be valid
-	 validity = function(object) .Call(xCMatrix_validate, object)
+	 validity = function(object) .Call(tCMatrix_validate, object)
 	 )
 
 ## numeric, sparse, sorted compressed sparse row-oriented general matrices

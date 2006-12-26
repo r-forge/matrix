@@ -323,6 +323,8 @@ uniqTsparse <- function(x, class.x = c(class(x))) {
 ## but really efficient would be to use only one .Call(.) for uniq(.) !
 
 drop0 <- function(x, clx = c(class(x))) {
+    if(!extends(clx, "CsparseMatrix"))
+        clx <- sub(".Matrix$", "CMatrix", clx)
     ## FIXME: Csparse_drop should do this (not losing symm./triang.):
     ## Careful: 'Csparse_drop' also drops triangularity,...
     ## .Call(Csparse_drop, as_CspClass(x, clx), 0)
@@ -647,16 +649,19 @@ diagU2N <- function(x)
 {
     ## Purpose: Transform a *unit diagonal* sparse triangular matrix
     ##	into one with explicit diagonal entries '1'
-    if(is(x, "CsparseMatrix")) {
-        if(is(x, "triangularMatrix")) .Call(Csparse_diagU2N, x) else x
+    if(is(x, "triangularMatrix") && x@diag == "U") {
+	if(is(x, "CsparseMatrix")) {
+	    .Call(Csparse_diagU2N, x)
+	}
+	else {
+	    kind <- .M.kind(x)
+	    xT <- as(x, paste(kind, "gTMatrix", sep=''))
+	    ## leave it as  T* - the caller can always coerce to C* if needed:
+	    new(paste(kind, "tTMatrix", sep=''), x = xT@x, i = xT@i, j = xT@j,
+		Dim = x@Dim, Dimnames = x@Dimnames, uplo = x@uplo, diag = "N")
+	}
     }
-    else {
-        kind <- .M.kind(x)
-        xT <- as(x, paste(kind, "gTMatrix", sep=''))
-        ## leave it as  T* - the caller can always coerce to C* if needed:
-        new(paste(kind, "tTMatrix", sep=''), x = xT@x, i = xT@i, j = xT@j,
-            Dim = x@Dim, Dimnames = x@Dimnames, uplo = x@uplo, diag = "N")
-    }
+    else x
 }
 
 ## Needed, e.g., in ./Csparse.R for colSums() etc:
