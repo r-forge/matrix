@@ -183,6 +183,17 @@ replCmat <- function (x, i, j, value)
 	## x.sym : result is *still* symmetric
 	x <- .Call(Csparse_symmetric_to_general, x)
     }
+    else if((x.tri <- is(x, "triangularMatrix"))) {
+        xU <- x@uplo == "U"
+	r.tri <- all(if(xU) i1 <= i2 else i2 <= i1)
+	if(r.tri) { ## result is *still* triangular
+            if(any(i1 == i2)) # diagonal will be changed
+                x <- diagU2N(x)
+	}
+	else { # go to "generalMatrix" and continue
+	    x <- as(x, paste(.M.kind(x), "gCMatrix", sep=''))
+	}
+    }
 
     xj <- .Call(Matrix_expand_pointers, x@p)
     sel <- (!is.na(match(x@i, i1)) &
