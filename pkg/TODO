@@ -92,3 +92,11 @@ Check for DimNames propagation in coercion and other operations.
 - chol() and determinant() should ``work'': proper result or "good" error
   message.
 
+- Fully implement "Logic" methods - now (R 2.4.1) that the group is in S4
+
+- Think of constructing  setAs(...) calls automatically in order to
+  basically enable all ``sensible'' as(fromMatrix, toMatrix)  calls,
+  possibly using canCoerce(.)
+
+- make sure *all* group methods have (maybe "bail-out") setMethod for "Matrix".
+  e.g. zapsmall(<pMatrix>) fails "badly"

@@ -171,31 +171,7 @@ setMethod("!", "lgeMatrix",
 setMethod("!", "ldenseMatrix",
 	  function(e1) !as(e1, "lgeMatrix"))
 
-
-setMethod("|", signature(e1="lgeMatrix", e2="lgeMatrix"),
-	  function(e1,e2) {
-	      d <- dimCheck(e1, e2)
-	      e1@x <- e1@x | e2@x
-	      e1
-	  })
-setMethod("&", signature(e1="lgeMatrix", e2="lgeMatrix"),
-	  function(e1,e2) {
-	      d <- dimCheck(e1, e2)
-	      e1@x <- e1@x & e2@x
-	      e1
-	  })
-
-setMethod("|", signature(e1="ldenseMatrix", e2="ldenseMatrix"),
-	  function(e1,e2) {
-	      d <- dimCheck(e1, e2)
-	      as(e1, "lgeMatrix") | as(e2, "lgeMatrix")
-	  })
-
-setMethod("&", signature(e1="ldenseMatrix", e2="ldenseMatrix"),
-	  function(e1,e2) {
-	      d <- dimCheck(e1, e2)
-	      as(e1, "lgeMatrix") & as(e2, "lgeMatrix")
-	  })
+## NOTE:  "&" and "|"  are now in group "Logic" c "Ops" --> ./Ops.R
 
 
 setMethod("as.vector", signature(x = "ldenseMatrix", mode = "missing"),
