@@ -2,8 +2,7 @@
 \docType{class}
 \alias{ldenseMatrix-class}
 \alias{!,ldenseMatrix-method}
-\alias{|,ldenseMatrix,ldenseMatrix-method}
-\alias{&,ldenseMatrix,ldenseMatrix-method}
+\alias{Logic,ldenseMatrix,ldenseMatrix-method}
 \alias{as.logical,ldenseMatrix-method}
 \alias{coerce,matrix,ldenseMatrix-method}
 \alias{coerce,ldenseMatrix,matrix-method}

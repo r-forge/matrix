@@ -249,33 +249,8 @@ setMethod("t", signature(x = "Matrix"),
 	  function(x) .bail.out.1(.Generic, class(x)))
 
 ## Group Methods
-setMethod("+", signature(e1 = "Matrix", e2 = "missing"), function(e1) e1)
-## "fallback":
-setMethod("-", signature(e1 = "Matrix", e2 = "missing"),
-          function(e1) {
-              warning("inefficient method used for \"- e1\"")
-              0-e1
-          })
 
-## old-style matrices are made into new ones
-setMethod("Ops", signature(e1 = "Matrix", e2 = "matrix"),
-	  function(e1, e2) callGeneric(e1, Matrix(e2)))
-##	    callGeneric(e1, Matrix(e2, sparse=is(e1,"sparseMatrix"))))
-setMethod("Ops", signature(e1 = "matrix", e2 = "Matrix"),
-	  function(e1, e2) callGeneric(Matrix(e1), e2))
-
-## bail-outs -- on highest possible level, hence "Ops", not "Compare"/"Arith" :
-setMethod("Ops", signature(e1 = "Matrix", e2 = "Matrix"),
-          function(e1, e2) {
-              d <- dimCheck(e1,e2)
-              .bail.out.2(.Generic, class(e1), class(e2))
-          })
-setMethod("Ops", signature(e1 = "Matrix", e2 = "ANY"),
-          function(e1, e2) .bail.out.2(.Generic, class(e1), class(e2)))
-setMethod("Ops", signature(e1 = "ANY", e2 = "Matrix"),
-          function(e1, e2) .bail.out.2(.Generic, class(e1), class(e2)))
-
-
+##-> see ./Ops.R
 
 ### --------------------------------------------------------------------------
 ###

@@ -187,40 +187,11 @@ setMethod("[", signature(x = "sparseMatrix",
 ## FIXME: also for RsparseMatrix
 
 
+## Group Methods
 
-## "Arith" short cuts / exceptions
-setMethod("-", signature(e1 = "sparseMatrix", e2 = "missing"),
-          function(e1) { e1@x <- -e1@x ; e1 })
-## with the following exceptions:
-setMethod("-", signature(e1 = "nsparseMatrix", e2 = "missing"),
-          function(e1) callGeneric(as(e1, "dgCMatrix")))
-setMethod("-", signature(e1 = "pMatrix", e2 = "missing"),
-          function(e1) callGeneric(as(e1, "ngTMatrix")))
+##-> see ./Ops.R
 
-## Group method  "Arith"
 
-## have CsparseMatrix methods (-> ./Csparse.R )
-## which may preserve "symmetric", "triangular" -- simply defer to those:
-
-setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
-	  signature(e1 = "sparseMatrix", e2 = "sparseMatrix"),
-	  function(e1, e2) callGeneric(as(e1, "CsparseMatrix"),
-				       as(e2, "CsparseMatrix")))
-setMethod("Arith",
-	  signature(e1 = "sparseMatrix", e2 = "numeric"),
-	  function(e1, e2) callGeneric(as(e1, "CsparseMatrix"), e2))
-setMethod("Arith",
-	  signature(e1 = "numeric", e2 = "sparseMatrix"),
-	  function(e1, e2) callGeneric(e1, as(e2, "CsparseMatrix")))
-
-setMethod("Math",
-	  signature(x = "sparseMatrix"),
-	  function(x) callGeneric(as(x, "CsparseMatrix")))
-
-setMethod("Compare", signature(e1 = "sparseMatrix", e2 = "sparseMatrix"),
-	  function(e1, e2) callGeneric(as(e1, "CsparseMatrix"),
-				       as(e2, "CsparseMatrix")))
-##-> ./Csparse.R
 
 ### --- show() method ---
 

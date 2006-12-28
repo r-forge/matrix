@@ -123,19 +123,6 @@ setMethod("Schur", signature(x = "ddenseMatrix", vectors = "logical"),
           function(x, vectors, ...) callGeneric(as(x, "dgeMatrix"), vectors))
 
 
-## Cheap version: work via "dgeMatrix" and use the group methods there:
-## FIXME(?): try to preserve "symmetric", "triangular", ...
-setMethod("Arith", ##  "+", "-", "*", "^", "%%", "%/%", "/"
-          signature(e1 = "ddenseMatrix", e2 = "ddenseMatrix"),
-          function(e1, e2) callGeneric(as(e1, "dgeMatrix"),
-                                       as(e2, "dgeMatrix")))
-setMethod("Arith",
-          signature(e1 = "ddenseMatrix", e2 = "numeric"),
-          function(e1, e2) callGeneric(as(e1, "dgeMatrix"), e2))
-setMethod("Arith",
-          signature(e1 = "numeric", e2 = "ddenseMatrix"),
-          function(e1, e2) callGeneric(e1, as(e2, "dgeMatrix")))
-
 setMethod("Math",
           signature(x = "ddenseMatrix"),
           function(x) callGeneric(as(x, "dgeMatrix")))

@@ -6,7 +6,7 @@ importFrom("utils", head, tail)
 importFrom("grid", grid.rect, gpar, grob)
 
 ## Currently, group generics need to be explicitly imported (Bug?):
-importFrom("methods", Arith, Compare, Math, Math2, Summary, Complex)
+importFrom("methods", Arith, Compare, Logic, Math, Math2, Summary, Complex)
 
 ## Generics and functions defined in this package
 export("Cholesky",
@@ -175,6 +175,7 @@ exportMethods(
 	      ## Group Methods
 	      "Arith",
 	      "Compare",
+	      "Logic",
 	      "Math",
 	      "Math2",
 	      "Ops",

@@ -168,31 +168,8 @@ setMethod("!", "ngeMatrix",
 setMethod("!", "ndenseMatrix",
           function(e1) !as(e1, "ngeMatrix"))
 
+## NOTE:  "&" and "|"  are now in group "Logic" c "Ops" --> ./Ops.R
 
-setMethod("|", signature(e1="ngeMatrix", e2="ngeMatrix"),
-	  function(e1,e2) {
-	      d <- dimCheck(e1, e2)
-	      e1@x <- e1@x | e2@x
-	      e1
-	  })
-setMethod("&", signature(e1="ngeMatrix", e2="ngeMatrix"),
-	  function(e1,e2) {
-	      d <- dimCheck(e1, e2)
-	      e1@x <- e1@x & e2@x
-	      e1
-	  })
-
-setMethod("|", signature(e1="ndenseMatrix", e2="ndenseMatrix"),
-	  function(e1,e2) {
-	      d <- dimCheck(e1, e2)
-	      as(e1, "ngeMatrix") | as(e2, "ngeMatrix")
-	  })
-
-setMethod("&", signature(e1="ndenseMatrix", e2="ndenseMatrix"),
-	  function(e1,e2) {
-	      d <- dimCheck(e1, e2)
-	      as(e1, "ngeMatrix") & as(e2, "ngeMatrix")
-	  })
 
 setMethod("as.vector", signature(x = "ndenseMatrix", mode = "missing"),
           function(x) as(x, "ngeMatrix")@x)
