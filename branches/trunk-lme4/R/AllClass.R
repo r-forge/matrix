@@ -69,8 +69,8 @@ setClass("mer2",
 			## quantities that vary when Z, X, y, weights or offset are changed
 			A = "dsCMatrix",    # tcrossprod(ZXyt) with weights and offset
 			## slots that vary during the optimization
-			LDL = "list",       # list of LDL' factors of relative variance matrices
-			K = "CHMfactor",    # sparse Cholesky factor of A*
+			ST = "list",        # list of LDL' factors of relative variance matrices
+			L = "CHMfactor",    # sparse Cholesky factor of A*
 			deviance = "numeric", # Current deviance (ML and REML) and logdet
 			## Secondary slots only evaluated when requested.
 			fixef = "numeric",
@@ -127,7 +127,7 @@ setClass("summary.mer2", # the "mer2" result ``enhanced'' :
 
 setClass("summary.lmer", contains = c("summary.mer", "lmer"))
 
-setClass("summary.lmer2", contains = c("summary.mer2", "lmer"))
+setClass("summary.lmer2", contains = c("summary.mer2", "lmer2"))
 
 setClass("summary.glmer", contains = c("summary.mer", "glmer"))
 

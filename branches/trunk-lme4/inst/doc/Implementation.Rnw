@@ -103,7 +103,8 @@ with different levels of the same grouping factor are assumed to be
 independent and identically distributed, which implies that
 $\bm{\Sigma}_i$ is itself block diagonal in $n_i$ blocks and that each
 of these blocks is a copy of a $q_i\times q_i$ matrix
-$\tilde{\bm{\Sigma}}_i$.  That is \begin{equation}
+$\tilde{\bm{\Sigma}}_i$.  That is
+\begin{equation}
   \label{eq:blockblock}
   \bm{\Sigma}_i=
     \begin{bmatrix}
@@ -118,22 +119,39 @@ where $\otimes$ denotes the Kronecker product.
 
 The condition that $\bm{\Sigma}$ is positive semi-definite holds if
 and only if the $\tilde{\bm{\Sigma}}_i,i=1,\dots,k$  are positive
-semi-definite, in which case they can be expressed in the LDL form of
-the Cholesky decomposition as
+semi-definite.  To ensure that the $\tilde{\bm{\Sigma}}_i$ are
+positive semi-definite, we express them as
 \begin{equation}
-  \label{eq:LDLinner}
-  \tilde{\bm{\Sigma}}_i=\tilde{\bm{L}}_i\tilde{\bm{D}}_i\tilde{\bm{L}}_i\trans
+  \label{eq:STinner}
+  \tilde{\bm{\Sigma}}_i=
+  \tilde{\bm{S}}_i\tilde{\bm{T}}_i\tilde{\bm{T}}_i\trans\tilde{\bm{S}}_i,\quad
+  i=1,\dots,k
 \end{equation}
-where $\tilde{\bm{L}}_i$ is a $q_i\times q_i$ unit lower-triangular
+where $\tilde{\bm{T}}_i$ is a $q_i\times q_i$ unit lower-triangular
 matrix (i.e. all the elements above the diagonal are zero and all the
-elements on the diagonal are one) and $\tilde{\bm{D}}_i$ is a
-$q_i\times q_i$ diagonal matrix with non-negative elements on the
-diagonal. 
+diagonal elements are unity) and $\tilde{\bm{S}}_i$ is a $q_i\times
+q_i$ diagonal matrix with non-negative elements on the diagonal. (This
+is a form of the Cholesky decomposition of positive semi-definite
+matrices.  It is similar to the ``LDL'' form but not identical to it.
+See Pouramadi (2007) for some discussion of the statistical advantages
+of using this form of the decomposition.)
+
+The $n_i q_i\times n_i q_i$ matrices $\bm{S}_i,\bm{T}_i,\,i=1,\dots,k$
+and the $q\times q$ matrices $\bm{S}$ and $\bm{T}$ are defined
+analogously to (\ref{eq:blockblock}) and (\ref{eq:blockDiag}).  In
+particular,
+\begin{align}
+  \bm{S}_i&=\bm{I}_{n_i}\otimes\tilde{\bm{S}}_i,\quad i=1,\dots,k \\
+  \bm{T}_i&=\bm{I}_{n_i}\otimes\tilde{\bm{T}}_i,\quad i=1,\dots,k
+\end{align}
+
+Note that when $q_i=1$, $\tilde{\bm{T}}_i=\bm{I}$ and hence
+$\bm{T}_i=\bm{I}$ and $\bm{S}_i$ is a multiple of the identity.
 
 The parameter vector $\bm{\theta}_i,i=1,\dots,k$ consists of the $q_i$
-diagonal elements of $\tilde{\bm{D}}_i$, which are constrained to be
+diagonal elements of $\tilde{\bm{S}}_i$, which are constrained to be
 non-negative, followed by the $q_i(q_i-1)/2$ elements in the strict
-lower triangle of $\tilde{\bm{L}}_i$ (in column-major ordering).
+lower triangle of $\tilde{\bm{T}}_i$ (in column-major ordering).
 These last $q_i(q_i-1)/2$ elements are unconstrained.  The
 $\bm{\theta}_i$ are combined as
 \begin{displaymath}
@@ -142,27 +160,21 @@ $\bm{\theta}_i$ are combined as
     \bm{\theta}_1 \\ \bm{\theta}_2 \\ \vdots \\ \bm{\theta}_k
   \end{bmatrix} .
 \end{displaymath}
-Each of the $q\times q$ matrices $\bm{L}$, $\bm{D}$ and $\bm{\Sigma}$
-in the decomposition $\bm{\Sigma}=\bm{L}\bm{D}\bm{L}\trans$ is a
+Each of the $q\times q$ matrices $\bm{S}$, $\bm{T}$ and $\bm{\Sigma}$
+in the decomposition $\bm{\Sigma}=\bm{S}\bm{T}\bm{T}\trans\bm{S}$ is a
 function of $\bm{\theta}$.  
 
-The constraints on $\bm{\theta}$ imply that all the diagonal elements of
-$\bm{D}$ are non-negative and we can define $\bm{S}$ to be the
-$q\times q$ diagonal matrix whose $j$th diagonal element is the square
-root of the $j$th diagonal element of $\bm{D}$, $j=1,\dots,k$.
-Trivially, $\bm{D}=\bm{S}\bm{S}$.
-
-As a unit triangular matrix $\bm{L}$ is non-singular.  That is,
-$\bm{L}^{-1}$ exists and is easily calculated from the
-$\tilde{\bm{L}}_i^{-1},i=1,\dots,k$.  When $\bm{\theta}$ is not on the
-boundary defined by the constraints, both $\bm{D}$ and $\bm{S}$ are
-diagonal matrices with strictly positive elements on the diagonal,
-which implies that $\bm{D}^{-1}$ and $\bm{S}^{-1}$ exist and that
+As a unit triangular matrix $\bm{T}$ is non-singular.  That is,
+$\bm{T}^{-1}$ exists and is easily calculated from the
+$\tilde{\bm{T}}_i^{-1},i=1,\dots,k$.  When $\bm{\theta}$ is not on the
+boundary defined by the constraints, $\bm{S}$ is a
+diagonal matrix with strictly positive elements on the diagonal,
+which implies that $\bm{S}^{-1}$ exists and that
 $\bm{\Sigma}$ is non-singular with
-$\bm{\Sigma}=\bm{L}\invtrans\bm{D}^{-1}\bm{L}^{-1}$.
+$\bm{\Sigma}^{-1}=\bm{S}^{-1}\bm{T}\invtrans\bm{T}^{-1}\bm{S}^{-1}$.
 
-When $\bm{\theta}$ is on the boundary the matrices $\bm{D}$, $\bm{S}$
-and $\bm{\Sigma}$ exist but none are invertible.  We say that
+When $\bm{\theta}$ is on the boundary the matrices $\bm{S}$
+and $\bm{\Sigma}$ exist but are not invertible.  We say that
 $\bm{\Sigma}$ is a \emph{degenerate} variance-covariance matrix in the
 sense that one or more linear combinations of the vector $\bm{b}$ are
 defined to have zero variance.  That is, the distribution of these
@@ -174,48 +186,52 @@ boundary.  That is, they can correspond to a degenerate
 variance-covariance matrix and we must be careful to allow for this
 case.  However, to begin we consider the non-degenerate case.
 
-
 \section{Methods for non-singular $\bm{\Sigma}$}
 \label{sec:non-singular}
 
-When $\bm{\theta}$ is not on the boundary we can define the
+When $\bm{\theta}$ is not on the boundary we can define a
 standardized random effects vector 
 \begin{equation}
   \label{eq:bstar}
-  \bm{b}^*=\bm{S}^{-1}\bm{L}^{-1}\bm{b}
+  \bm{b}^*=\bm{T}^{-1}\bm{S}^{-1}\bm{b}
 \end{equation}
-with the property
-\begin{equation}
-  \label{eq:bstardist}
-  \bm{b}^*\sim\mathcal{N}\left(\bm{0},\sigma^2\bm{I}\right)
-\end{equation}
+with the properties
+\begin{align}
+  \mathsf{E}[\bm{b}^*]&=\bm{T}^{-1}\bm{S}^{-1}\mathsf{E}[\bm{b}]\\
+  \mathsf{Var}[\bm{b}^*]&=\mathsf{E}[\bm{b}^*{\bm{b}^*}\trans]=\bm{T}^{-1}\bm{S}^{-1}\mathsf{Var}[\bm{b}]\bm{S}^{-1}\bm{T}\invtrans=\sigma^2\bm{T}^{-1}\bm{S}^{-1}\bm{\Sigma}\bm{S}^{-1}\bm{T}\invtrans=\sigma^2\bm{I}.
+\end{align}
 That is, the unconditional distribution of the $q$ elements of
-$\bm{b}^*$ is i.i.d. (independent and identically distributed) normal
-with mean $0$ and variance $\sigma^2$, like that of the $n$
-elements of $\bm{\epsilon}$.  
+$\bm{b}^*$ is
+$\bm{b}^*\sim\mathcal{N}\left(\bm{0},\sigma^2\bm{I}\right)$, like that
+of the $n$ elements of $\bm{\epsilon}$.
 
 Obviously the transformation from $\bm{b}^*$ to $\bm{b}$ is 
 \begin{equation}
   \label{eq:bstarb}
-  \bm{b}=\bm{L}\bm{S}\bm{b}^*
+  \bm{b}=\bm{S}\bm{T}\bm{b}^*
 \end{equation}
 and the $n\times q$ model matrix for $\bm{b}^*$ is 
 \begin{equation}
   \label{eq:Zstar}
-  \bm{Z}^*=\bm{Z}\bm{S}\bm{L} .
+  \bm{Z}^*=\bm{Z}\bm{S}\bm{T}
 \end{equation}
-Notice that $\bm{Z}^*$ in (\ref{eq:Zstar}) can be evaluated when
-$\bm{\theta}$ is on the boundary and that, if we have a value of
-$\bm{b}^*$ in such a case, we can evaluated $\bm{b}$ from
-(\ref{eq:bstarb}).
+so that
+\begin{equation}
+  \label{eq:Zb}
+  \bm{Z}^*\bm{b}^*=\bm{Z}\bm{S}\bm{T}\bm{T}^{-1}\bm{S}^{-1}\bm{b}=\bm{Z}\bm{b} .
+\end{equation}
+
+Notice that $\bm{Z}^*$ can be evaluated even when
+$\bm{\theta}$ is on the boundary.  Also, if we have a value of
+$\bm{b}^*$ in such a case, we can evaluated $\bm{b}$ from $\bm{b}^*$.
  
 Given the data $\bm{y}$ and values of $\bm{\theta}$ and $\bm{\beta}$,
-the mode (which is also the mean) of the conditional distribution of
-$\bm{b}^*$ is the solution to a penalized least squares problem
+the mode of the conditional distribution of $\bm{b}^*$ is the solution
+to a penalized least squares problem
 \begin{equation}
   \label{eq:bstarmode}
   \begin{split}
-    \tilde{\bm{b}^*}(\bm{\theta},\bm{\beta},\bm{y})&=
+    \tilde{\bm{b}^*}(\bm{\theta},\bm{\beta}|\bm{y})&=
     \arg\min_{\bm{b}^*} \left[
     \left\|\bm{y}-\bm{X}\bm{\beta}-\bm{Z}^*\bm{b}^*\right\|^2
     +{\bm{b}^*}\trans\bm{b}^*\right]\\
@@ -240,8 +256,8 @@ $\bm{b}^*$ is the solution to a penalized least squares problem
 In fact, if we optimize penalized least squares expression in
 (\ref{eq:bstarmode}) with respect to both $\bm{b}$ and $\bm{\beta}$ we
 obtain the conditional estimates
-$\hat{\bm{\beta}}(\bm{\theta},\bm{y})$ and the conditional modes 
-$\tilde{\bm{b}^*}(\bm{\theta},\hat{\bm{\beta}}(\bm{\theta}),\bm{y}))$
+$\hat{\bm{\beta}}(\bm{\theta}|\bm{y})$ and the conditional modes 
+$\tilde{\bm{b}^*}(\bm{\theta},\hat{\bm{\beta}}(\bm{\theta})|\bm{y}))$
 which we write as $\widehat{\bm{b}^*}(\bm{\theta})$.  That is,
 \begin{equation}
   \label{eq:bstarbeta}
@@ -291,13 +307,13 @@ where the matrix $\bm{A}^*(\bm{\theta})$ is
     \end{bmatrix} \\
     &=
     \begin{bmatrix}
-      \bm{L}\trans\bm{S} & \bm{0} & \bm{0} \\
+      \bm{T}\trans\bm{S} & \bm{0} & \bm{0} \\
       \bm{0} & \bm{I} & \bm{0} \\
       \bm{0} & \bm{0} & 1
     \end{bmatrix}
     \bm{A}
     \begin{bmatrix}
-      \bm{S}\bm{L} & \bm{0} & \bm{0} \\
+      \bm{S}\bm{T} & \bm{0} & \bm{0} \\
       \bm{0} & \bm{I} & \bm{0} \\
       \bm{0} & \bm{0} & 1
     \end{bmatrix}+
@@ -331,8 +347,8 @@ the \emph{approximate minimal degree} (AMD) algorithm described in
 \citet{davis06:csparse_book} and \citet{Davis:1996} and implemented in
 both the \texttt{\small Csparse} \citep{Csparse} and the
 \texttt{\small CHOLMOD} \citep{Cholmod} libraries of C functions.  (In
-many cases $\bm{X}\trans\bm{X}$ is dense (but of small dimension
-compared to $\bm{Z}\trans\bm{Z}$) and $\bm{Z}\trans\bm{X}$ is nearly
+many cases $\bm{X}\trans\bm{X}$ is dense, but of small dimension
+compared to $\bm{Z}\trans\bm{Z}$, and $\bm{Z}\trans\bm{X}$ is nearly
 dense so $\bm{P}_X$ can be $\bm{I}_p$, the $p\times p$ identity
 matrix.)
 
@@ -346,32 +362,34 @@ Let the permutation matrix $\bm{P}$ be
     \bm{0} & \bm{0} & 1
   \end{bmatrix} 
 \end{equation}
-and $\bm{K}(\bm{\theta})$ be the sparse Cholesky decomposition of
+and $\bm{L}(\bm{\theta})$ be the sparse Cholesky decomposition of
 $\bm{A}^*(\bm{\theta})$ relative to this permutation.  That
-is, $\bm{K}(\bm{\theta})$ is a sparse lower triangular matrix with the
+is, $\bm{L}(\bm{\theta})$ is a sparse lower triangular matrix with the
 property that
 \begin{equation}
-  \label{eq:Kmat}
-  \bm{K}(\bm{\theta})\bm{K}(\bm{\theta})\trans=
+  \label{eq:Lmat}
+  \bm{L}(\bm{\theta})\bm{L}(\bm{\theta})\trans=
   \bm{P}\bm{A}^*(\bm{\theta})\bm{P}\trans
 \end{equation}
 
-For $\bm{K}(\bm{\theta})$ to exist we must ensure that
-$\bm{A}^*(\bm{\theta})$ is positive definite.  This will be true if
+For $\bm{L}(\bm{\theta})$ to exist we must ensure that
+$\bm{A}^*(\bm{\theta})$ is positive definite.  Examination of
+(\ref{eq:bstarbeta}) shows that 
+this will be true if
 $\bm{X}$ is of full column rank and $\bm{y}$ does not lie in the
 column span of $\bm{X}$ (or, in statistical terms, if we can't fit
 $\bm{y}$ perfectly using only the fixed effects).
 
-Let $r>0$ be the last element on the diagonal of $\bm{K}$.  Then the
+Let $r>0$ be the last element on the diagonal of $\bm{L}$.  Then the
 minumum penalized residual sum of squares in (\ref{eq:bstarbeta}) is
 $r^2$ and it occurs at $\widehat{\bm{b}^*}(\bm{\theta})$ and
 $\hat{\beta}(\bm{\theta})$, the solutions to the sparse triangular system
 \begin{equation}
   \label{eq:soln}
-  \bm{K}(\bm{\theta})\trans\bm{P}
+  \bm{L}(\bm{\theta})\trans\bm{P}
   \begin{bmatrix}
     \widehat{\bm{b}^*}(\bm{\theta})\\
-    \hat{\beta}(\bm{\theta})\\
+    \hat{\bm{\beta}}(\bm{\theta})\\
     1
   \end{bmatrix}=
   \begin{bmatrix}
@@ -381,21 +399,46 @@ $\hat{\beta}(\bm{\theta})$, the solutions to the sparse triangular system
   \end{bmatrix}
 \end{equation}
 (Technically we should not write the $1$ in the solution; it should be
-an unknown.  However, for $\bm{K}$ lower triangular with $r$ as the last
+an unknown.  However, for $\bm{L}$ lower triangular with $r$ as the last
 element on the diagonal and $\bm{P}$ a permutation that does not move
 the last row, the solution for this ``unknown'' will always be $1$.)
 Furthermore, $\log|{\bm{Z}^*}\trans\bm{Z}+\bm{I}|$ can be evaluated as
 the sum of the logarithms of the first $q$ diagonal elements of
-$\bm{K}(\bm{\theta})$.  
+$\bm{L}(\bm{\theta})$.  
 
-The maximum likelihood estimates (mle's) of $\bm{\theta}$ are the
-values that minimize the profiled deviance function
+The \emph{profiled deviance function}, $d(\bm{\theta})$, which is negative
+twice the log-likelihood of model (\ref{eq:lmm}) evaluated at
+$\bm{\Sigma}(\bm{\theta})$, $\hat{\bm{\beta}}(\bm{\theta})$ and
+$\hat{\sigma}^2(\bm{\theta})$, can be evaluated as
 \begin{equation}
-  \label{eq:thetaMLE}
-  \hat{\bm{\theta}}=\arg\min_{\bm{\theta}}\left[
-    \log|{\bm{Z}^*}\trans\bm{Z}+\bm{I}|+
-    n\left(1+\log\frac{2\pi r^2}{n}\right)\right]
+  \label{eq:dtheta}
+  d(\bm{theta})=
+    \log\left|{\bm{Z}^*}\trans\bm{Z}+\bm{I}\right|+
+    n\left(1+\log\frac{2\pi r^2}{n}\right) .
 \end{equation}
+
+Notice that it is not necessary to solve for
+$\hat{\bm{\beta}}(\bm{\theta})$ or $\widehat{\bm{b}^*}(\bm{\theta})$
+or $\widehat{\bm{b}}(\bm{\theta})$ to be able to evaluate
+$d(\bm{\theta})$.  All that is needed is to update $\bm{A}$ to form
+$\bm{A}^*$ from which the sparse Cholesky decomposition
+$\bm{L}(\bm{\theta})$ can be calculated.
+
+\section{Methods for singular $\bm{\Sigma}$}
+\label{sec:singular}
+
+When $\bm{\theta}$ is on the boundary, corresponding to a singular
+$\bm{\Sigma}$, some of the columns of $\bm{Z}^*$ are zero.  However,
+the matrix $\bm{A}^*$ is non-singular and elements of $\bm{b}^*$
+corresponding to the zeroed columns in $\bm{Z}^*$ approach zero
+smoothly as $\bm{\theta}$ approaches the boundary.  Thus
+$r(\bm{\theta})$ and $\left|{\bm{Z}^*}\trans\bm{Z}+\bm{I}\right|$ are
+well-defined, as is $d(\bm{\theta})$ and the conditional modes
+$\widehat{\bm{b}}(\bm{\theta})$.
+
+In other words, (\ref{eq:Astar}) and (\ref{eq:Lmat}) can be used to
+define $d(\bm{\theta})$ whether or not $\bm{\theta}$ is on the
+boundary.
 
 \bibliography{lme4}
 \end{document}

@@ -82,13 +82,12 @@ void R_init_lme4(DllInfo *dll)
     lme4_DimSym = install("Dim");
     lme4_DimNamesSym = install("Dimnames");
     lme4_GpSym = install("Gp");
-    lme4_KSym = install("K");
     lme4_LSym = install("L");
-    lme4_LDLSym = install("LDL");
     lme4_OmegaSym = install("Omega");
     lme4_RXXSym = install("RXX");
     lme4_RZXSym = install("RZX");
     lme4_RZXinvSym = install("RZXinv");
+    lme4_STSym = install("ST");
     lme4_XSym = install("X");
     lme4_XtXSym = install("XtX");
     lme4_XtySym = install("Xty");
@@ -97,6 +96,7 @@ void R_init_lme4(DllInfo *dll)
     lme4_ZtXSym = install("ZtX");
     lme4_ZtZSym = install("ZtZ");
     lme4_ZtySym = install("Zty");
+    lme4_ZXytSym = install("ZXyt");
     lme4_bVarSym = install("bVar");
     lme4_cnamesSym = install("cnames");
     lme4_devCompSym = install("devComp");

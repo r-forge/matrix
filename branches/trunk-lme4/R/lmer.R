@@ -1444,7 +1444,7 @@ setMethod("VarCorr", signature(x = "mer2"),
       {
 	  sc <- .Call(mer2_sigma, x, REML)
 	  cnames <- x@cnames
-	  ans <- x@LDL
+	  ans <- x@ST
           for (i in seq(along = ans)) {
               ai <- ans[[i]]
               dm <- dim(ai)
