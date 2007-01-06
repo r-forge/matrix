@@ -1752,18 +1752,11 @@ internal_deviance(double *d, const int *dims, const cholmod_factor *L)
     d[1] = d[2] + d[3] + dnmp * (1. + d[4] + log(2. * PI / dnmp));
 }
 
-/* FIXME: Remove this declaration. */
-/* Force the BSTAR decomposition regardless of the condition number of \Sigma */
-/* double attr_hidden BSTAR_TOL = -1; */
-double attr_hidden BSTAR_TOL = 10;
-
 /**
- * Update A as \tilde{D^{1/2}}]\tilde{L}'A\tilde{L}\tilde{D^{1/2}},
- * inflate the first q elements of the diagonal and evaluate its
- * numeric factorization in F.
+ * Update A to A* and evaluate its numeric factorization in L.
  *
- * @param deviance number of grouping factors
- * @param dims number of grouping factors
+ * @param deviance Hold the result
+ * @param dims dimensions {
  * @param nc length nf vector of number of random effects per factor
  * @param Gp length nf+3 vector of group pointers for the rows of A
  * @param ST pointers to the nf ST factorizations of the diagonal
@@ -1771,68 +1764,61 @@ double attr_hidden BSTAR_TOL = 10;
  * @param A symmetric matrix of size Gp[nf+2]
  * @param F factorization to be modified
  *
- * @return error code from cholmod_factorize (0 indicates success)
  */
 static void
 internal_update_L(double *deviance, int *dims, const int *nc, const int *Gp,
-		  double **ST, const cholmod_sparse *A, cholmod_factor *L)
+		  double **ST, cholmod_sparse *A, cholmod_factor *L)
 {
     cholmod_sparse *Ac = M_cholmod_copy_sparse(A, &c);
-    int *ai = (int *)(Ac->i), *ap = (int *)(Ac->p), nf = *dims;
-    int *dp = Calloc(nf + 1, int), i, ione = 1, nct;
-    double *ax = (double *)(Ac->x), *diags,
-	maxd /* max D diag */, mind /* min D diag */, one[] = {1, 0};
+    int *ai = (int *)(Ac->i), *ap = (int *)(Ac->p), nf = *dims,
+	i, ione = 1;
+#if 0
+    int j;
+    cholmod_dense *S = M_cholmod_allocate_dense(1, Gp[nf + 2], 1,
+						CHOLMOD_REAL, &c);
+    double *sx = (double*)(S->x);
+#endif
+    double *ax = (double*)(Ac->x) , one[] = {1, 0};
+    
 
     if ((!Ac->sorted) || Ac->stype <= 0) {
 	M_cholmod_free_sparse(&Ac, &c);
+#if 0
+	M_cholmod_free_dense(&S, &c);
+#endif	
 	error(_("A must be a sorted cholmod_sparse object with stype > 0"));
     }
-/* FIXME: Decide if this is really needed or if only the diagonal
- * pointers are needed.  */
-    /* Calculate the inverse condition number of D (including the
-     * columns beyond the qth). Calculate the total number of diagonal
-     * elements in ST. Assign the diagonal pointers.
-     */
-    dp[0] = 0;
-    for (i = 0, nct = 0, maxd = 1, mind = 1; i < nf; i++) {
-	int j, nci = nc[i];
-	nct += nci;
-	dp[i+1] = dp[i]+nci;	/* diagonal pointer */
-	for (j = 0; j < nci; j++) {
-	    double dij = ST[i][j * (nci + 1)];
-	    if (dij > maxd) maxd = dij;
-	    if (dij < mind) mind = dij;
-	}
-    }
-    diags = Calloc(nct, double);
-/* FIXME: Remove this calculation */
-    /* Check inverse condition number and store indicator of bstar */
-    if (BSTAR_TOL < 0) BSTAR_TOL = sqrt(DOUBLE_EPS);
-    dims[bstar_POS] = (mind/maxd) < BSTAR_TOL;
-    
+
+#if 0
+    /* Scale Ac symmetrically by S using cholmod_scale */
+    for (i = 0; i < nf; i++)
+	for (j = Gp[i]; j < Gp[i + 1]; j++)
+	    sx[j] = ST[i][((j - Gp[i]) % nc[i]) * (nc[i] + 1)];
+    for (j = Gp[nf]; j < Gp[nf + 2]; j++) sx[j] = 1.;
+    i = M_cholmod_scale(S, CHOLMOD_SYM, Ac, &c);
+    if (!i) error(_("cholmod_scale returned error code %d"), i);
+    M_cholmod_free_dense(&S, &c);
+#endif
+
     for (i = 0; i < nf; i++) {
 	int base = Gp[i], j, k, kk, nci = nc[i];
-	int nlev = (Gp[i + 1] - Gp[i])/nci;
-	
-				/* install new elements in diags */
-	for (k = 0; k < nci; k++)
-	    diags[dp[i] + k] = ST[i][k * (nci + 1)];
-				/* Multiply by D^{1/2} from right. */
+	int ncip1 = nci + 1, nlev = (Gp[i + 1] - Gp[i])/nci;
+
+				/* Multiply by S from right. */
 	for (j = Gp[i]; j < Gp[i + 1]; j += nci)
 	    for (k = 0; k < nci; k++)
 		for (kk = ap[j + k]; kk < ap[j + k + 1]; kk++)
-		    ax[kk] *= diags[dp[i] + k];
-				/* Multiply by D^{1/2} from left. */
+		    ax[kk] *= ST[i][k * ncip1];
+				/* Multiply by S from left. */
 	for (j = Gp[i]; j < A->ncol; j++)
 	    for (k = ap[j]; k < ap[j+1]; k++) {
 		int row = ai[k];
 		if (row < Gp[i]) continue;
 		if (Gp[i + 1] <= row) break;
-		ax[k] *= diags[dp[i] + (row - Gp[i]) % nci];
+		ax[k] *= ST[i][((row - Gp[i]) % nci) * ncip1];
 	    }
-
-	/* if nci == 1 then L == I and the next section is skipped */
-	if (nci > 1) {	/* evaluate ith section of AL */
+	/* if nci == 1 then T == I and the next section is skipped */
+	if (nci > 1) {	/* evaluate ith section of SAST */
 	    int maxrows = -1;
 	    double *db = Calloc(nci * nci, double), /* diagonal blcok */
 		*wrk = (double *) NULL;
@@ -1868,7 +1854,7 @@ internal_update_L(double *deviance, int *dims, const int *nc, const int *Gp,
 			    Memcpy(ax + ap[cj + k], wrk + k * maxrows,
 				   nnzm1);
 		    }
-		    /* evaluate L'A for rows and columns in this block */
+		    /* evaluate T'A for rows and columns in this block */
 		    for (k = 0; k < nci; k++) {
 			for (kk = 0; kk < nnzm1;) {
 			    int ind = ap[cj + k] + kk;
@@ -1895,7 +1881,7 @@ internal_update_L(double *deviance, int *dims, const int *nc, const int *Gp,
 		    Memcpy(ax + ap[cj + k] + nnzm1, db + k * nci, k + 1);
 	    }
 	    if (nci > 2) Free(wrk);
-				/* evaluate L'A for all blocks to the right */
+				/* evaluate T'SAST for all blocks to the right */
 	    for (j = Gp[i+1]; j < Gp[nf + 2]; j++) {
 		for (k = ap[j]; k < ap[j + 1]; ) {
 		    if (ai[k] >= Gp[i + 1]) break;
@@ -1917,7 +1903,6 @@ internal_update_L(double *deviance, int *dims, const int *nc, const int *Gp,
 	    ax[k]++;
 	}
     }
-    Free(diags); Free(dp);
     if (!M_cholmod_factorize(Ac, L, &c)) { 
 	error(_("cholmod_factorize failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
@@ -2076,7 +2061,8 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
     M_cholmod_free_sparse(&ts1, &c);
     if (!ts2->sorted) {
 	int i = M_cholmod_sort(ts2, &c);
-	if (!i) error(_("cholmod_sort returned error code %d"), i);
+	if (!i)
+	    error(_("cholmod_sort returned error code %d"), i);
     }
     SET_SLOT(val, lme4_ASym,
 	     M_chm_sparse_to_SEXP(ts2, 0, 0, 0, "", R_NilValue));
@@ -2295,3 +2281,4 @@ SEXP mer2_vcov(SEXP x)
     UNPROTECT(1);
     return ans;
 }
+

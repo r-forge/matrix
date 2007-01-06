@@ -13,7 +13,7 @@ extern const char attr_hidden *DEVIANCE_NAMES[];
 #define lr2_POS  4
 				/* positions in the dims vector */
 extern const char attr_hidden *DIMS_NAMES[];
-	      /* {"nf", "n", "p", "q", "REML", "glmm", "bstar", ""} */
+	      /* {"nf", "n", "p", "q", "REML", "glmm", ""} */
 #define nf_POS     0
 #define n_POS      1
 #define p_POS      2
@@ -24,13 +24,11 @@ extern const char attr_hidden *DIMS_NAMES[];
 */
 #define isREML_POS 4
 #define glmm_POS 5
-#define bstar_POS 6
 
 #define isREML(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isREML_POS]
 #define isGLMM(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[glmm_POS]
 
 SEXP mer_ECMEsteps(SEXP x, SEXP nsteps, SEXP Verbp);
-/* SEXP mer_Hessian(SEXP x);  not yet */
 SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbose);
 SEXP mer_coef(SEXP x, SEXP pType);
 SEXP mer_coefGets(SEXP x, SEXP coef, SEXP pType);
