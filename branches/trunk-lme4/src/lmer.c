@@ -1772,51 +1772,18 @@ internal_update_L(double *deviance, int *dims, const int *nc, const int *Gp,
     cholmod_sparse *Ac = M_cholmod_copy_sparse(A, &c);
     int *ai = (int *)(Ac->i), *ap = (int *)(Ac->p), nf = *dims,
 	i, ione = 1;
-#if 0
-    int j;
-    cholmod_dense *S = M_cholmod_allocate_dense(1, Gp[nf + 2], 1,
-						CHOLMOD_REAL, &c);
-    double *sx = (double*)(S->x);
-#endif
     double *ax = (double*)(Ac->x) , one[] = {1, 0};
     
 
     if ((!Ac->sorted) || Ac->stype <= 0) {
 	M_cholmod_free_sparse(&Ac, &c);
-#if 0
-	M_cholmod_free_dense(&S, &c);
-#endif	
 	error(_("A must be a sorted cholmod_sparse object with stype > 0"));
     }
-
-#if 0
-    /* Scale Ac symmetrically by S using cholmod_scale */
-    for (i = 0; i < nf; i++)
-	for (j = Gp[i]; j < Gp[i + 1]; j++)
-	    sx[j] = ST[i][((j - Gp[i]) % nc[i]) * (nc[i] + 1)];
-    for (j = Gp[nf]; j < Gp[nf + 2]; j++) sx[j] = 1.;
-    i = M_cholmod_scale(S, CHOLMOD_SYM, Ac, &c);
-    if (!i) error(_("cholmod_scale returned error code %d"), i);
-    M_cholmod_free_dense(&S, &c);
-#endif
 
     for (i = 0; i < nf; i++) {
 	int base = Gp[i], j, k, kk, nci = nc[i];
 	int ncip1 = nci + 1, nlev = (Gp[i + 1] - Gp[i])/nci;
 
-				/* Multiply by S from right. */
-	for (j = Gp[i]; j < Gp[i + 1]; j += nci)
-	    for (k = 0; k < nci; k++)
-		for (kk = ap[j + k]; kk < ap[j + k + 1]; kk++)
-		    ax[kk] *= ST[i][k * ncip1];
-				/* Multiply by S from left. */
-	for (j = Gp[i]; j < A->ncol; j++)
-	    for (k = ap[j]; k < ap[j+1]; k++) {
-		int row = ai[k];
-		if (row < Gp[i]) continue;
-		if (Gp[i + 1] <= row) break;
-		ax[k] *= ST[i][((row - Gp[i]) % nci) * ncip1];
-	    }
 	/* if nci == 1 then T == I and the next section is skipped */
 	if (nci > 1) {	/* evaluate ith section of SAST */
 	    int maxrows = -1;
@@ -1881,7 +1848,7 @@ internal_update_L(double *deviance, int *dims, const int *nc, const int *Gp,
 		    Memcpy(ax + ap[cj + k] + nnzm1, db + k * nci, k + 1);
 	    }
 	    if (nci > 2) Free(wrk);
-				/* evaluate T'SAST for all blocks to the right */
+				/* evaluate T'AT for all blocks to the right */
 	    for (j = Gp[i+1]; j < Gp[nf + 2]; j++) {
 		for (k = ap[j]; k < ap[j + 1]; ) {
 		    if (ai[k] >= Gp[i + 1]) break;
@@ -1896,9 +1863,20 @@ internal_update_L(double *deviance, int *dims, const int *nc, const int *Gp,
 	    }
 	    Free(db);
 	}
-				/* Increment diagonal elements */
-	for (j = Gp[i]; j < Gp[i + 1];  j++) {
-	    int k = ap[j + 1] - 1;
+				/* Multiply by S from left. */
+	for (j = Gp[i]; j < A->ncol; j++)
+	    for (k = ap[j]; k < ap[j+1]; k++) {
+		int row = ai[k];
+		if (row < Gp[i]) continue;
+		if (Gp[i + 1] <= row) break;
+		ax[k] *= ST[i][((row - Gp[i]) % nci) * ncip1];
+	    }
+	/* Multiply by S from right and increment diagonal */
+	for (j = Gp[i]; j < Gp[i + 1]; j += nci) {
+	    for (k = 0; k < nci; k++)
+		for (kk = ap[j + k]; kk < ap[j + k + 1]; kk++)
+		    ax[kk] *= ST[i][k * ncip1];
+	    k = ap[j + 1] - 1;
 	    if (ai[k] != j) error(_("Logic error"));
 	    ax[k]++;
 	}
