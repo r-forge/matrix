@@ -28,7 +28,10 @@ mcmcsamp(object, n, verbose, \dots)
     argument is \code{trans} which, if \code{TRUE} (the default), returns
     a sample of transformed parameters.  All variances are expressed on
     the logarithm scale and any covariances are converted to Fisher's "z"
-    transformation of the corresponding correlation.}
+    transformation of the corresponding correlation.  A third optional
+    argument is \code{deviance} which, if \code{TRUE}, saves the
+    conditional likelihood, expressed on the deviance scale, at each
+    iteration of the chain.  Default is \code{FALSE}.}
 }
 \value{
   An object of (S3) class \code{"mcmc"} suitable for use with the

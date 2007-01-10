@@ -503,7 +503,8 @@ SEXP mer_Hessian(SEXP x)
  *
  * @return a matrix
  */
-SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbosep)
+SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
+		  SEXP verbosep, SEXP deviancep)
 {
     SEXP ans, Omega = GET_SLOT(x, lme4_OmegaSym),
 	Omegacp = PROTECT(duplicate(Omega));
@@ -517,7 +518,8 @@ SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbosep)
 	q = LENGTH(GET_SLOT(x, lme4_rZySym)),
 	saveb = asLogical(savebp),
 	trans = asLogical(transp),
-	verbose = asLogical(verbosep);/* currently unused */
+	verbose = asLogical(verbosep),
+	deviance = asLogical(deviancep);
     double
 	*RXX = REAL(GET_SLOT(GET_SLOT(x, lme4_RXXSym), lme4_xSym)),
 	*RZX = REAL(GET_SLOT(GET_SLOT(x, lme4_RZXSym), lme4_xSym)),
@@ -526,8 +528,8 @@ SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbosep)
 	*bnew = Calloc(q, double), *betanew = Calloc(p, double),
 	*dcmp = REAL(GET_SLOT(x, lme4_devCompSym)),
 	*ansp, df = n - (REML ? p : 0);
-    int nrbase = p + 2 + coef_length(nf, nc); /* rows always included */
-    int nrtot = nrbase + (saveb ? q : 0);
+    int nrbase = p + 1 + coef_length(nf, nc); /* rows always included */
+    int nrtot = nrbase + deviance + (saveb ? q : 0);
     cholmod_dense *chbnew = M_numeric_as_chm_dense(bnew, q);
 
     if (nsamp <= 0) nsamp = 1;
@@ -535,7 +537,7 @@ SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbosep)
     ansp = REAL(ans);
     for (i = 0; i < nrtot * nsamp; i++) ansp[i] = NA_REAL;
     GetRNGstate();
-    if(verbose) Rprintf("%12s %14s\n", "sigma", "deviance");
+    if (verbose) Rprintf("%12s %14s\n", "sigma", "deviance");
 
     for (i = 0; i < nsamp; i++) {
 	double *col = ansp + i * nrtot, sigma, dev;
@@ -548,7 +550,8 @@ SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbosep)
 				/* Store beta */
 	for (j = 0; j < p; j++) col[j] = betanew[j];
 				/* Optionally store b */
-	if (saveb) for (j = 0; j < q; j++) col[nrbase + j] = bnew[j];
+	if (saveb) for (j = 0; j < q; j++)
+	    col[nrbase + deviance + j] = bnew[j];
 				/* Update and store Omega */
 	internal_Omega_update(Omega, bnew, sigma, nf, nc, Gp,
 				     col + p + 1, trans);
@@ -556,8 +559,8 @@ SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbosep)
 	mer_secondary(x);
 
 	dev = lmm_deviance(x, sigma, betanew);
-	col[nrbase - 1] = dev; /* store deviance */
-	if(verbose) Rprintf("%12.6g %14.8g\n", sigma, dev);
+	if (deviance) col[nrbase] = dev; /* store deviance */
+	if (verbose) Rprintf("%12.6g %14.8g\n", sigma, dev);
     }
     PutRNGstate();
     Free(betanew); Free(bnew); Free(chbnew);
@@ -1871,11 +1874,14 @@ internal_update_L(double *deviance, int *dims, const int *nc, const int *Gp,
 		if (Gp[i + 1] <= row) break;
 		ax[k] *= ST[i][((row - Gp[i]) % nci) * ncip1];
 	    }
-	/* Multiply by S from right and increment diagonal */
+				/* Multiply by S from right */
 	for (j = Gp[i]; j < Gp[i + 1]; j += nci) {
 	    for (k = 0; k < nci; k++)
 		for (kk = ap[j + k]; kk < ap[j + k + 1]; kk++)
 		    ax[kk] *= ST[i][k * ncip1];
+	}
+				/* Increment diagonal */
+	for (j = Gp[i]; j < Gp[i + 1]; j++) {
 	    k = ap[j + 1] - 1;
 	    if (ai[k] != j) error(_("Logic error"));
 	    ax[k]++;

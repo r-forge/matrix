@@ -25,7 +25,7 @@ static R_CallMethodDef CallEntries[] = {
     {"lme4_rWishart", (DL_FUNC) &lme4_rWishart, 3},
 
     {"mer_ECMEsteps", (DL_FUNC) &mer_ECMEsteps, 3},
-    {"mer_MCMCsamp", (DL_FUNC) &mer_MCMCsamp, 5},
+    {"mer_MCMCsamp", (DL_FUNC) &mer_MCMCsamp, 6},
     {"mer_coef", (DL_FUNC) &mer_coef, 2},
     {"mer_coefGets", (DL_FUNC) &mer_coefGets, 3},
     {"mer_create", (DL_FUNC) &mer_create, 7},

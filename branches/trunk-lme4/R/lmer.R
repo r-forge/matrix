@@ -597,7 +597,7 @@ setMethod("deviance", signature(object = "mer"),
 
 ## Mangle the names of the columns of the mcmcsamp result ans
 ## This operation is common to the methods for "lmer" and "glmer"
-mcmccompnames <- function(ans, object, saveb, trans, glmer)
+mcmccompnames <- function(ans, object, saveb, trans, glmer, deviance)
 {
     gnms <- names(object@flist)
     cnms <- object@cnames
@@ -621,7 +621,7 @@ mcmccompnames <- function(ans, object, saveb, trans, glmer)
         colnms[ptyp == 2] <-
             paste("atanh(", colnms[ptyp == 2], ")", sep = "")
     }
-    colnms <- c(colnms, "deviance")
+    if (deviance) colnms <- c(colnms, "deviance")
     if(saveb) {## maybe better colnames, "RE.1","RE.2", ... ?
         rZy <- object@rZy
         colnms <- c(colnms,
@@ -637,12 +637,12 @@ mcmccompnames <- function(ans, object, saveb, trans, glmer)
 
 setMethod("mcmcsamp", signature(object = "lmer"),
 	  function(object, n = 1, verbose = FALSE, saveb = FALSE,
-		   trans = TRUE, ...)
+		   trans = TRUE, deviance = FALSE, ...)
       {
-          ans <- t(.Call(mer_MCMCsamp, object, saveb, n, trans, verbose))
+          ans <- t(.Call(mer_MCMCsamp, object, saveb, n, trans, verbose, deviance))
 	  attr(ans, "mcpar") <- as.integer(c(1, n, 1))
 	  class(ans) <- "mcmc"
-          mcmccompnames(ans, object, saveb, trans, FALSE)
+          mcmccompnames(ans, object, saveb, trans, FALSE, deviance)
       })
 
 setMethod("mcmcsamp", signature(object = "glmer"),
@@ -1453,7 +1453,7 @@ setMethod("VarCorr", signature(x = "mer2"),
               } else {
                   dd <- diag(ai)
                   diag(ai) <- rep(1, dm[1])
-                  el <- sc^2 * dd * t(dd * tcrossprod(ai)) 
+                  el <- sc^2 * crossprod(dd * t(ai)) 
               }
               el <- as(el, "dpoMatrix")
               el@Dimnames <- list(cnames[[i]], cnames[[i]])
