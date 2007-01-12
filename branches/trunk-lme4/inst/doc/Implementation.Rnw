@@ -24,19 +24,49 @@
 
 \maketitle
 \begin{abstract}
-  We present the form of the model and the 
+  We present the form of the model and details of the computational
+  methods in \code{lmer} for linear mixed models and for generalized
+  linear mixed models.  These techniques are illustrated on several
+  examples.
 \end{abstract}
 
 <<preliminaries,echo=FALSE,print=FALSE>>=
 library(lattice)
 library(Matrix)
 library(lme4)
-#data("Early", package = "mlmRev")
+data("Rail", package = "nlme")
+Rail <- data.frame(travel = Rail$travel, Rail = Rail$Rail)
 options(width=80, show.signif.stars = FALSE,
         lattice.theme = function() canonical.theme("pdf", color = FALSE))
 @
-\section{Introduction}
-\label{sec:Intro}
+
+\section{A simple example}
+\label{sec:example}
+
+The \code{Rail} data set from the \package{nlme} package is described
+in \citet{pinheiro:bates:2000} as consisting of three measurements of
+the travel time of a type of sound wave on each of six sample railroad
+rails. We can examine the structure of these data with the \code{str}
+function
+<<strRail>>=
+str(Rail)
+@
+
+Because there are only three observations on each of the rails a
+dotplot (Figure~\ref{fig:Raildotplot}) shows the structure of the data
+well.
+<<Raildotplot,fig=TRUE,include=FALSE,width=8,height=4>>=
+print(dotplot(Rail~travel,Rail,xlab="Travel time (ms)",ylab="Rail number"))
+@ 
+
+Because there are a total of 18 observations we show the entire
+data set  
+<<Raildata>>=
+Rail
+@ 
+
+\section{Form of the model}
+\label{sec:model}
 
 A linear mixed model for a $n$-dimensional response vector $\bm{y}$ can
 be written as
