@@ -84,41 +84,53 @@ replCmat <- function (x, i, j, value)
     if(lenV > lenRepl)
 	stop("too many replacement values")
 
-    clx <- c(class(x)) # keep "symmetry" if changed here:
+    clx <- class(x)
+    clDx <- getClassDef(clx) # extends() , is() etc all use the class definition
 
-    x.sym <- is(x, "symmetricMatrix")
+    ## keep "symmetry" if changed here:
+    x.sym <- extends(clDx, "symmetricMatrix")
     if(x.sym) { ## only half the indices are there..
 	x.sym <-
-	    (dind[1] == dind[2] && i1 == i2 &&
+	    (dind[1] == dind[2] && all(i1 == i2) &&
 	     (lenRepl == 1 || isSymmetric(array(value, dim=dind))))
 	## x.sym : result is *still* symmetric
-	x <- .Call(Csparse_symmetric_to_general, x)
+	x <- .Call(Csparse_symmetric_to_general, x) ## but do *not* redefine clx!
+
     }
-    else if((x.tri <- is(x, "triangularMatrix"))) {
+    else if((x.tri <- extends(clDx, "triangularMatrix"))) {
         xU <- x@uplo == "U"
 	r.tri <- all(if(xU) i1 <= i2 else i2 <= i1)
 	if(r.tri) { ## result is *still* triangular
             if(any(i1 == i2)) # diagonal will be changed
-                x <- diagU2N(x)
+                x <- diagU2N(x) # keeps class (!)
 	}
 	else { # go to "generalMatrix" and continue
-	    x <- as(x, paste(.M.kind(x), "gCMatrix", sep=''))
+	    x <- as(x, paste(.M.kind(x), "gCMatrix", sep='')) ## & do not redefine clx!
 	}
     }
 
     xj <- .Call(Matrix_expand_pointers, x@p)
     sel <- (!is.na(match(x@i, i1)) &
 	    !is.na(match( xj, i2)))
-    has.x <- any("x" == slotNames(x)) # i.e. *not* nonzero-pattern
+    has.x <- "x" %in% slotNames(clDx)# === slotNames(x),
+    ## has.x  <==> *not* nonzero-pattern == "nMatrix"
+
     if(has.x && sum(sel) == lenRepl) { ## all entries to be replaced are non-zero:
-	value <- rep(value, length = lenRepl)
+        ## need indices instead of just 'sel', for, e.g.,  A[2:1, 2:1] <- v
+	non0 <- cbind(match(x@i[sel], i1),
+		      match(xj [sel], i2)) - 1:1
+	iN0 <- 1:1 + encodeInd(non0, nr = dind[1])
+
+        if(lenV < lenRepl)
+            value <- rep(value, length = lenRepl)
 	## Ideally we only replace them where value != 0 and drop the value==0
 	## ones; but that would have to (?) go through dgT*
 	## v0 <- 0 == value
 	## if (lenRepl == 1) and v0 is TRUE, the following is not doing anything
 	##-  --> ./dgTMatrix.R	and its	 replTmat()
 	## x@x[sel[!v0]] <- value[!v0]
-	x@x[sel] <- value
+        x@x[sel] <- value[iN0]
+
 	return(if(x.sym) as_CspClass(x, clx) else x)
     }
     ## else go via Tsparse.. {FIXME: a waste! - we already have 'xj' ..}
@@ -147,6 +159,14 @@ setReplaceMethod("[", signature(x = "CsparseMatrix", i = "missing", j = "index",
 setReplaceMethod("[", signature(x = "CsparseMatrix", i = "index", j = "index",
 				value = "replValue"),
                  replCmat)
+
+## A[ ij ] <- value,  where ij is (i,j) 2-column matrix
+setReplaceMethod("[", signature(x = "CsparseMatrix", i = "matrix", j = "missing",
+				value = "replValue"),
+		 function(x, i, value)
+		 ## goto Tsparse modify and convert back:
+		 as(.TM.repl.i.2col(as(x, "TsparseMatrix"), i, value),
+		    "CsparseMatrix"))
 
 
 setMethod("crossprod", signature(x = "CsparseMatrix", y = "missing"),

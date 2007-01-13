@@ -28,10 +28,12 @@
 % -> ../R/Tsparse.R : replValue = { numeric, logical }
 \alias{[<-,TsparseMatrix,index,index,replValue-method}
 \alias{[<-,TsparseMatrix,index,missing,replValue-method}
+\alias{[<-,TsparseMatrix,matrix,missing,replValue-method}
 \alias{[<-,TsparseMatrix,missing,index,replValue-method}
 % \alias{[<-,dgTMatrix,missing,missing,numeric-method}
 \alias{[<-,CsparseMatrix,index,index,replValue-method}
 \alias{[<-,CsparseMatrix,index,missing,replValue-method}
+\alias{[<-,CsparseMatrix,matrix,missing,replValue-method}
 \alias{[<-,CsparseMatrix,missing,index,replValue-method}
 % %
 % \alias{[<-,dsparseMatrix,missing,index,numeric-method}

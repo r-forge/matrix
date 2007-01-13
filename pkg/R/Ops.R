@@ -117,8 +117,14 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
 			      r@x <- rep.int(TRUE, length(e1@x))
 			      for(n in intersect(c("i","j","p"), slotNames(r)))
 				  slot(r, n) <- slot(e1, n)
-                          }
-			  ## else: all FALSE: keep empty 'r' matrix
+			  }
+			  else { ## all FALSE: keep empty 'r' matrix
+                              ## but may need a valid 'pointer' slot:
+			      if(extends(lClass, "CsparseMatrix"))
+                                  r@p <- rep.int(0:0, 1+ncol(r))
+			      else if(extends(lClass, "RsparseMatrix"))
+                                  r@p <- rep.int(0:0, 1+nrow(r))
+			  }
 		      } else { # some TRUE, FALSE, NA : go via unique 'Tsparse'
 			  M <- asTuniq(e1)
 			  nCl <- class2(class(M), 'l') # logical Tsparse

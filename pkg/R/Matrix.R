@@ -347,6 +347,7 @@ setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
           })
 
 ## A[ ij ] <- value,  where ij is (i,j) 2-column matrix :
+## ----------------   The cheap general method --- FIXME: provide special ones
 .M.repl.i.2col <- function (x, i, j, value)
 {
     nA <- nargs()
@@ -354,13 +355,22 @@ setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
 	if(!is.integer(nc <- ncol(i)))
 	    stop("'i' has no integer column number",
 		 " should never happen; please report")
+	else if(!is.numeric(i) || nc != 2)
+	    stop("such indexing must be by logical or 2-column numeric matrix")
 	if(is.logical(i)) {
 	    i <- c(i) # drop "matrix"
 	    return( callNextMethod() )
-	} else if(!is.numeric(i) || nc != 2)
-	    stop("such indexing must be by logical or 2-column numeric matrix")
+        }
+	if(!is.integer(i)) storage.mode(i) <- "integer"
+	if(any(i < 0))
+	    stop("negative values are not allowed in a matrix subscript")
+	if(any(is.na(i)))
+	    stop("NAs are not allowed in subscripted assignments")
+	if(any(i0 <- (i == 0))) # remove them
+            i <- i[ - which(i0, arr.ind = TRUE)[,"row"], ]
+        ## now have integer i >= 1
 	m <- nrow(i)
-	mod.x <- .type.kind[.M.kind(x)]
+	## mod.x <- .type.kind[.M.kind(x)]
 	if(length(value) > 0 && m %% length(value) != 0)
 	    warning("number of items to replace is not a multiple of replacement length")
 	## recycle:
@@ -370,10 +380,11 @@ setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
 	## inefficient -- FIXME -- (also loses "symmetry" unnecessarily)
 	for(k in seq_len(m))
 	    x[i1[k], i2[k]] <- value[k]
-	x
 
+	x
     } else stop("nargs() = ", nA, " should never happen; please report.")
 }
+
 setReplaceMethod("[", signature(x = "Matrix", i = "matrix", j = "missing",
 				value = "replValue"),
 	  .M.repl.i.2col)
@@ -382,13 +393,13 @@ setReplaceMethod("[", signature(x = "Matrix", i = "matrix", j = "missing",
 setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
 				value = "Matrix"),
 		 function (x, i, j, value) {
-### FIXME: *TEMPORARY* diagnostic output:
-                     cat("<Matrix1>[i,j] <- <Matrix1>:\n<Matrix1> = x :")
-                     str(x)
-                     cat("<Matrix2> = value :")
-                     str(value)
-                     cat("i :"); if(!missing(i)) str(i) else cat("<missing>\n")
-                     cat("j :"); if(!missing(j)) str(j) else cat("<missing>\n")
+### *TEMPORARY* diagnostic output:
+##                  cat("<Matrix1>[i,j] <- <Matrix1>:\n<Matrix1> = x :")
+##                  str(x)
+##                  cat("<Matrix2> = value :")
+##                  str(value)
+##                  cat("i :"); if(!missing(i)) str(i) else cat("<missing>\n")
+##                  cat("j :"); if(!missing(j)) str(j) else cat("<missing>\n")
 
                      callGeneric(x=x, i=i, j=j, value = as.vector(value))
                  })
