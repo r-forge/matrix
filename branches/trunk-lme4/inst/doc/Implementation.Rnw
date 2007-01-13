@@ -58,12 +58,39 @@ well.
 <<Raildotplot,fig=TRUE,include=FALSE,width=8,height=4>>=
 print(dotplot(Rail~travel,Rail,xlab="Travel time (ms)",ylab="Rail number"))
 @ 
+\begin{figure}[tb]
+  \centering
+  \includegraphics{figs/Example-Raildotplot}
+  \caption{Travel time of sound waves in a sample of six railroad rails.  There were three measurements of the travel time on each rail. The numbering of the rails has been reordered according to increasing mean travel time.}
+  \label{fig:Raildotplot}
+\end{figure}
 
-Because there are a total of 18 observations we show the entire
-data set  
+In building a model for these data
 <<Raildata>>=
 Rail
 @ 
+we wish to characterize a typical travel time, say $\mu$, for the
+population of such railroad rails and the deviations, say
+$b_i,i=1,\dots,6$ of the individual rails from this population mean.
+Because these specific rails are not of interest by themselves as much
+as the variation in the population we model the $b_i$, which are
+called the ``random effects'' for the rails, as having a normal
+(Gaussian) distribution of the form $\mathcal{N}(0,\sigma^2_b)$.  The
+$j$th measurement on the $i$th rail is expressed as
+\begin{equation}
+  \label{eq:1}
+  y_{ij}=\mu+b_i+\epsilon_{ij}\quad
+  b_i\sim\mathcal{N}(0,\sigma^2_b),\epsilon_{ij}\sim\mathcal{N}(0,\sigma^2)
+  \quad  i=1,\dots,6\;j=1,\dots,3
+\end{equation}
+
+The parameters of this model are $\mu$, $\sigma^2_b$ and $\sigma^2$.
+Technically the $b_i,i=1,\dots,6$ are not parameters but instead are
+considered to be unobserved random variables for which we form
+``predictions'' instead of ``estimates''.
+
+To express generalizations of models like (\ref{eq:1}) more
+conveniently we change the representation to a 
 
 \section{Form of the model}
 \label{sec:model}
