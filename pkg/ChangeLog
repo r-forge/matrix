@@ -1,6 +1,27 @@
+2007-01-12  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Tsparse.R (.TM.repl.i.2col): new internal function to be used
+	as method for   M[ ij ] <- v
+	* R/Csparse.R:: go via Tsparse for "M[ij] <- v"
+
+	* R/Ops.R: "Compare" for (C|R)sparse: need pointer slot for all
+	FALSE answer
+
+	* R/Csparse.R (replCmat): fix the "all non-zero" case with reordering
+	* tests/indexing.R: test it, and some of the above
+
+2007-01-05  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (is_duplicatedT): new utility
+
 2007-01-05  Douglas Bates  <bates@stat.wisc.edu>
 
 	* src/init.c (R_init_Matrix): export cholmod_scale
+
+2006-12-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/zzz.R (tmp): for R >= 2.5.0, extend formals of our
+	base::as.matrix to (x, ...)
 
 2006-12-28  Martin Maechler  <maechler@stat.math.ethz.ch>
 
@@ -14,7 +35,7 @@
 
 	* src/zpotfr.f and dependencies: use LAPACK 3.1 version
 	only needed previously to R version 2.5.0.
-	
+
 2006-12-26  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Date, Version): 0.9975-8, ready for release

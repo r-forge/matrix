@@ -113,7 +113,8 @@ isPacked <- function(x)
 {
     ## Is 'x' a packed (dense) matrix ?
     is(x, "denseMatrix") &&
-    any("x" == slotNames(x)) && length(x@x) < prod(dim(x))
+    ## unneeded(!): any("x" == slotNames(x)) &&
+    length(x@x) < prod(dim(x))
 }
 
 emptyColnames <- function(x)
@@ -204,23 +205,37 @@ nz.NA <- function(x, na.value) {
     else		x != 0 & !is.na(x)
 }
 
-## Number of non-zeros :
+## Number of "structural" non-zeros --- this is  nnzmax() in Matlab
+##        of effectively  non-zero values =      nnz()     "   "
+
 ## FIXME? -- make this into a generic function (?)
 nnzero <- function(x, na.counted = NA) {
     ## na.counted: TRUE: NA's are counted, they are not 0
-    ##               NA: NA's are not known (0 or not) ==>  result := NA
-    ##            FALSE: NA's are omitted before counting
+    ##		     NA: NA's are not known (0 or not) ==>  result := NA
+    ##		  FALSE: NA's are omitted before counting
     cl <- class(x)
-    if(!extends(cl, "Matrix"))
+    ## speedup:
+    cld <- getClassDef(cl)
+    if(!extends(cld, "Matrix"))
 	sum(nz.NA(x, na.counted))
-    else if(extends(cl, "sparseMatrix"))
-	## NOTA BENE: The number of *structural* non-zeros {could have other '0'}!
-       switch(.sp.class(cl),
-	       "CsparseMatrix" = length(x@i),
-	       "TsparseMatrix" = length(x@i),
-	       "RsparseMatrix" = length(x@j))
-    else ## denseMatrix
-	sum(nz.NA(as_geClass(x, cl)@x, na.counted))
+    else { ## Matrix
+       iSym <- extends(cld, "symmetricMatrix")
+       if(extends(cld, "sparseMatrix"))
+	   (if(iSym) 2 else 1) *
+	       switch(.sp.class(cl),
+		      "CsparseMatrix" = length(x@i),
+		      "TsparseMatrix" = length(x@i),
+		      "RsparseMatrix" = length(x@j))
+	else if(extends(cld, "diagonalMatrix"))
+	    sum(nz.NA(diag(x), na.counted))
+	else { ## dense, not diagonal: Can use 'x' slot;
+	    nn <- sum(nz.NA(as_geClass(x, cl)@x, na.counted))
+	    if(iSym && length(x@x) < prod(dim(x))) ## packed symmetric
+		## n(n+1)/2  |--> n^2
+		nn <- (nn + nn) - as.integer(sqrt(2*nn))
+	    nn
+	}
+    }
 }
 
 ## For sparseness handling
@@ -259,7 +274,9 @@ non0ind <- function(x) {
 
 ## nr= nrow: since  i in {0,1,.., nrow-1}  these are 1:1 "decimal" encodings:
 ## Further, these map to and from the usual "Fortran-indexing" (but 0-based)
-encodeInd <- function(ij, nr) ij[,1] + ij[,2] * nr
+encodeInd  <- function(ij,  nr) ij[,1] + ij[,2] * nr
+encodeInd2 <- function(i,j, nr) i      +  j     * nr
+
 decodeInd <- function(code, nr) cbind(code %% nr, code %/% nr)
 
 complementInd <- function(ij, dim)
@@ -325,11 +342,11 @@ uniqTsparse <- function(x, class.x = c(class(x))) {
 drop0 <- function(x, clx = c(class(x))) {
     if(!extends(clx, "CsparseMatrix"))
         clx <- sub(".Matrix$", "CMatrix", clx)
-    ## FIXME: Csparse_drop should do this (not losing symm./triang.):
-    ## Careful: 'Csparse_drop' also drops triangularity,...
+    ## FIXME: Csparse_drop should do this, but it
+    ##	      drops triangularity and symmetry :
     ## .Call(Csparse_drop, as_CspClass(x, clx), 0)
     as_CspClass(.Call(Csparse_drop, as_CspClass(x, clx), 0.),
-                clx)
+		clx)
 }
 
 uniq <- function(x) {
@@ -340,6 +357,15 @@ uniq <- function(x) {
 asTuniq <- function(x) {
     if(is(x, "TsparseMatrix")) uniqTsparse(x) else as(x,"TsparseMatrix")
 }
+
+## is 'x' a uniq Tsparse Matrix ?
+is_not_uniqT <- function(x, nr = nrow(x))
+    is.unsorted(x@j) || any(duplicated(encodeInd2(x@i, x@j, nr)))
+
+## is 'x' a TsparseMatrix with no duplicated entries (to be *added* for uniq):
+is_duplicatedT <- function(x, nr = nrow(x))
+    any(duplicated(encodeInd2(x@i, x@j, nr)))
+
 
 if(FALSE) ## try an "efficient" version
 uniq_gT <- function(x)
