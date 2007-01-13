@@ -1476,3 +1476,78 @@ setMethod("deviance", signature(object = "summary.mer2"),
  	  function(object) object@deviance)
 setMethod("summary", signature(object = "summary.mer2"),
           function(object) object)
+setMethod("anova", signature(object = "mer2"),
+	  function(object, ...)
+      {
+	  mCall <- match.call(expand.dots = TRUE)
+	  dots <- list(...)
+	  modp <- if (length(dots))
+	      sapply(dots, is, "mer") | sapply(dots, is, "lm") else logical(0)
+	  if (any(modp)) {		# multiple models - form table
+	      opts <- dots[!modp]
+	      mods <- c(list(object), dots[modp])
+	      names(mods) <- sapply(as.list(mCall)[c(FALSE, TRUE, modp)],
+				    as.character)
+	      mods <- mods[order(sapply(lapply(mods, logLik, REML = FALSE),
+					attr, "df"))]
+	      calls <- lapply(mods, slot, "call")
+	      data <- lapply(calls, "[[", "data")
+	      if (any(data != data[[1]]))
+		  stop("all models must be fit to the same data object")
+	      header <- paste("Data:", data[[1]])
+	      subset <- lapply(calls, "[[", "subset")
+	      if (any(subset != subset[[1]]))
+		  stop("all models must use the same subset")
+	      if (!is.null(subset[[1]]))
+		  header <-
+		      c(header, paste("Subset", deparse(subset[[1]]), sep = ": "))
+	      llks <- lapply(mods, logLik, REML = FALSE)
+	      Df <- sapply(llks, attr, "df")
+	      llk <- unlist(llks)
+	      chisq <- 2 * pmax(0, c(NA, diff(llk)))
+	      dfChisq <- c(NA, diff(Df))
+	      val <- data.frame(Df = Df,
+				AIC = sapply(llks, AIC),
+				BIC = sapply(llks, BIC),
+				logLik = llk,
+				"Chisq" = chisq,
+				"Chi Df" = dfChisq,
+				"Pr(>Chisq)" = pchisq(chisq, dfChisq, lower = FALSE),
+				check.names = FALSE)
+	      class(val) <- c("anova", class(val))
+	      attr(val, "heading") <-
+		  c(header, "Models:",
+		    paste(names(mods),
+			  unlist(lapply(lapply(calls, "[[", "formula"), deparse)),
+			  sep = ": "))
+	      return(val)
+	  }
+	  else { ## ------ single model ---------------------
+	      foo <- object
+	      ss <- foo@rXy^2
+	      ssr <- exp(foo@devComp["logryy2"])
+	      names(ss) <- object@cnames[[".fixed"]]
+	      asgn <- attr(foo@X, "assign")
+	      terms <- foo@terms
+	      nmeffects <- attr(terms, "term.labels")
+	      if ("(Intercept)" %in% names(ss))
+		  nmeffects <- c("(Intercept)", nmeffects)
+	      ss <- unlist(lapply(split(ss, asgn), sum))
+	      df <- unlist(lapply(split(asgn,  asgn), length))
+	      #dfr <- unlist(lapply(split(dfr, asgn), function(x) x[1]))
+	      ms <- ss/df
+	      #f <- ms/(ssr/dfr)
+	      #P <- pf(f, df, dfr, lower.tail = FALSE)
+	      #table <- data.frame(df, ss, ms, dfr, f, P)
+	      table <- data.frame(df, ss, ms)
+	      dimnames(table) <-
+		  list(nmeffects,
+#			c("Df", "Sum Sq", "Mean Sq", "Denom", "F value", "Pr(>F)"))
+		       c("Df", "Sum Sq", "Mean Sq"))
+	      if ("(Intercept)" %in% nmeffects)
+		  table <- table[-match("(Intercept)", nmeffects), ]
+	      attr(table, "heading") <- "Analysis of Variance Table"
+	      class(table) <- c("anova", "data.frame")
+	      table
+	  }
+      })
