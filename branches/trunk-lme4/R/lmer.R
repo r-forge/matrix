@@ -1482,7 +1482,7 @@ setMethod("anova", signature(object = "mer2"),
 	  mCall <- match.call(expand.dots = TRUE)
 	  dots <- list(...)
 	  modp <- if (length(dots))
-	      sapply(dots, is, "mer") | sapply(dots, is, "lm") else logical(0)
+	      sapply(dots, is, "mer2") | sapply(dots, is, "lm") else logical(0)
 	  if (any(modp)) {		# multiple models - form table
 	      opts <- dots[!modp]
 	      mods <- c(list(object), dots[modp])
