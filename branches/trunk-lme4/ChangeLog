@@ -1,3 +1,9 @@
+2007-01-17  Douglas Bates  <bates@R-project.org>
+
+	* R/lmer.R (ST2Omega): Added a (hidden) conversion function from
+	the lmer2 representation to the lmer representation as a temporary
+	measure.
+
 2007-01-10  Douglas Bates  <bates@r-project.org>
 
 	* R/lmer.R (mcmcsamp): Add 'deviance' argument for mcmcsamp method.

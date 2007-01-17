@@ -1551,3 +1551,17 @@ setMethod("anova", signature(object = "mer2"),
 	      table
 	  }
       })
+
+## Temporary function to convert the ST representation of the
+## relative variance-covariance matrix returned by lmer2 into the
+## Omega representation required by lmer
+ST2Omega <- function(ST)
+{
+    if (nrow(ST) == 1) return(as(1/ST^2, "dpoMatrix"))
+    dd <- diag(ST)
+    T <- as(ST, "dtrMatrix")
+    T@diag <- "U"
+    crossprod(solve(T)/dd)
+}
+
+    
