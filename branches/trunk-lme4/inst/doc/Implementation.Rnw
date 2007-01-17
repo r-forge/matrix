@@ -21,7 +21,8 @@
 \SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,strip.white=TRUE}
 \SweaveOpts{prefix=TRUE,prefix.string=figs/Example,include=FALSE}
 \setkeys{Gin}{width=\textwidth}
-
+\newcommand{\code}[1]{\texttt{\small{#1}}}
+\newcommand{\package}[1]{\textsf{\small{#1}}}
 \maketitle
 \begin{abstract}
   We present the form of the model and details of the computational
@@ -61,7 +62,10 @@ print(dotplot(Rail~travel,Rail,xlab="Travel time (ms)",ylab="Rail number"))
 \begin{figure}[tb]
   \centering
   \includegraphics{figs/Example-Raildotplot}
-  \caption{Travel time of sound waves in a sample of six railroad rails.  There were three measurements of the travel time on each rail. The numbering of the rails has been reordered according to increasing mean travel time.}
+  \caption{Travel time of sound waves in a sample of six railroad
+    rails.  There were three measurements of the travel time on each
+    rail. The numbering of the rails has been reordered according to
+    increasing mean travel time.}
   \label{fig:Raildotplot}
 \end{figure}
 
@@ -90,13 +94,18 @@ considered to be unobserved random variables for which we form
 ``predictions'' instead of ``estimates''.
 
 To express generalizations of models like (\ref{eq:1}) more
-conveniently we change the representation to a 
+conveniently we change the representation use a matrix/vector
+representation in which the 18 observations of the travel time form
+the response vector $\bm{y}$, the fixed-effect parameter $\mu$ forms a
+$1$-dimensional column vector $\bm{\beta}$ and the six random effects
+$b_i,i=1,\dots,6$ form the random effects vector $\bm{b}$.  The
+structure of the data and the values of any covariates (none are used
+in this model) are used to create model matrices $\bm{X}$ and
+$\bm{Z}$.
 
-\section{Form of the model}
-\label{sec:model}
-
-A linear mixed model for a $n$-dimensional response vector $\bm{y}$ can
-be written as
+Using these vectors and matrices and the $18$-dimensional vector
+$\bm{\epsilon}$ that represents the per-observation noise terms the
+model becomes
 \begin{equation}
   \label{eq:lmm}
   \bm{y} = \bm{X}\bm{\beta} + \bm{Z}\bm{b}+\bm{\epsilon},\quad
@@ -104,13 +113,15 @@ be written as
   \bm{b}\sim\mathcal{N}\left(\bm{0},\sigma^2\bm{\Sigma}\right)\;\mathrm{and}\;
   \bm{b}\perp\bm{\epsilon}
 \end{equation}
-where $\bm{\beta}$ is a $p$-dimensional fixed-effects parameter vector
-relative to the $n\times p$ model matrix $\bm{X}$, $\bm{b}$ is a
-$q$-dimensional random-effects vector relative to the $n\times q$
-model matrix $\bm{Z}$ and $\bm{\Sigma}$ is the $q\times q$ relative
-variance-covariance matrix for the random-effects.  The symbol $\perp$
-indicates independence of random variables and $\mathcal{N}$ denotes
-the multivariate normal (Gaussian) distribution.
+
+In the general form we write $p$ for the dimension of $\bm{\beta}$,
+the fixed-effects parameter vector, and $q$ for the dimension of
+$\bm{b}$, the vector of random effects.  Thus the model matrix
+$\bm{X}$ has dimension $n\times p$, the model matrix $\bm{Z}$ has
+dimension $n\times q$ and the relative variance-covariance matrix,
+$\bm{\Sigma}$, for the random-effects has dimension $q\times q$.  The
+symbol $\perp$ indicates independence of random variables and
+$\mathcal{N}$ denotes the multivariate normal (Gaussian) distribution.
 
 We say that matrix $\bm{\Sigma}$ is the relative variance-covariance
 matrix of the random effects in the sense that it is the variance of
@@ -119,6 +130,138 @@ per-observation noise term $\bm{\epsilon}$.  Although it size, $q$,
 can be very large, $\bm{\Sigma}$ is highly structured.  It is
 symmetric, positive semi-definite and zero except for the diagonal
 elements and certain elements close to the diagonal.
+
+\subsection{Fitting the model and examining the results}
+\label{sec:fitt-model-exam}
+
+The maximum likelihood estimates for parameters in model (\ref{eq:1})
+fit to the \code{Rail} data are obtained as
+<<RailfitML>>=
+Rm1ML <- lmer2(travel ~ 1 + (1|Rail), Rail, method = "ML",
+               control = list(msVerbose = 1))
+@ 
+In this fit we have set the control parameter \code{msVerbose} to 1
+indicating that information on the progress of the iterations should
+be printed after every iteration.  Each line gives the iteration
+number, the value of the deviance (negative twice the log-likelihood)
+and the value of the parameter $s$ which is the standard deviation of
+the random effects relative to the standard deviation of the
+residuals. 
+
+The printed form of the model
+<<Railfitshow>>=
+Rm1ML
+@ 
+provides additional information about the parameter estimates and some
+of the measures of the fit such as the log-likelihood (-64.28), the
+deviance for the maximum likelihood criterion (128.6), the deviance
+for the REML criterion (122.2), Akaike's Information Criterion
+(AIC$=132.6$) and Schwartz's Bayesian Information Criterion
+(BIC$=134.3$).
+
+The model matrices $\bm{Z}$ and $\bm{X}$ and the negative of the
+response vector $-\bm{y}$ are stored in the \code{ZXyt} slot in the
+transposed form.  Extracting the transpose of this slot
+<<ZXytRail>>=
+t(Rm1ML@ZXyt)
+@ 
+The first 6 columns of this matrix are $\bm{Z}$, the seventh column is
+$\bm{X}$ and the eighth and final column is $-\bm{y}$.  As indicated
+in the display of the matrix, it is stored as a sparse matrix.  The
+elements represented as `.' are known to be zero and are not stored
+explicitly.
+
+The columns of Z are indicator columns (that is, the $i$th column has
+a 1 in row $j$ if the $j$th observation is on rail $i$, otherwise it
+is zero) but they are not in the usual ordering.  This is because the
+levels of the \code{Rail} factor have been reordered according to
+increasing mean response for Figure~\ref{fig:Raildotplot}.
+
+The crossproduct of the columns of this matrix are stored as a
+symmetric, sparse matrix in the \code{A} slot.
+<<ARm1ML>>=
+Rm1ML@A
+@ 
+
+The \code{L} component of this fitted model is a Cholesky
+factorization of a matrix $\bm{A}^*(\bm{\theta})$ where $\bm{\theta}$ is a
+parameter vector determining $\bm{\Sigma}(\bm{\theta})$, which can be
+factored as $\bm{\Sigma}=\bm{T}\bm{S}\bm{S}\bm{T}\trans$, where
+$\bm{T}$ is a unit, lower triangular matrix (that is, all the elements
+above the diagonal are zero and all the elements on the diagonal are
+unity) and $\bm{S}$ is a diagonal matrix with non-negative elements on
+the diagonal.
+The matrix $\bm{A}^*(\bm{\theta})$ is
+\begin{equation}
+  \label{eq:Astar}
+  \begin{split}
+    \bm{A}^*(\bm{\theta})&=
+    \begin{bmatrix}
+      {\bm{Z}^*}\trans\bm{Z}^*+\bm{I} & {\bm{Z}^*}\trans\bm{X} &
+      -{\bm{Z}^*}\trans\bm{y}\\
+      {\bm{X}}\trans\bm{Z}^* & {\bm{X}}\trans\bm{X} &
+      -{\bm{X}}\trans\bm{y}\\
+      -{\bm{y}}\trans\bm{Z}^*&-{\bm{y}}\trans\bm{X}&{\bm{y}}\trans\bm{y}
+    \end{bmatrix} \\
+    &=
+    \begin{bmatrix}
+      \bm{T}\trans\bm{S} & \bm{0} & \bm{0} \\
+      \bm{0} & \bm{I} & \bm{0} \\
+      \bm{0} & \bm{0} & 1
+    \end{bmatrix}
+    \bm{A}
+    \begin{bmatrix}
+      \bm{S}\bm{T} & \bm{0} & \bm{0} \\
+      \bm{0} & \bm{I} & \bm{0} \\
+      \bm{0} & \bm{0} & 1
+    \end{bmatrix}+
+    \begin{bmatrix}
+      \bm{I} & \bm{0} & \bm{0} \\
+      \bm{0} & \bm{0} & \bm{0} \\
+      \bm{0} & \bm{0} & 0
+    \end{bmatrix} .
+  \end{split}
+\end{equation}
+
+For model (\ref{eq:1}) the matrices $\bm{T}$ and $\bm{S}$ are
+particularly simple, $\bm{T}=\bm{I}_6$, the $6\times 6$ identity matrix
+and $\bm{S}=s_{1,1}\bm{I}_6$ where $s_{1,1}=\sigma_b/\sigma$ is the
+standard deviation of the random effects relative to the standard
+deviation of the per-observation noise term $\bm{\bm{\epsilon}}$.
+
+<<fewdigits,echo=FALSE,results=hide>>=
+op <- options(digits=4)
+@ 
+
+The Cholesky decomposition of $\bm{A}^*$ is a lower triangular sparse
+matrix $\bm{L}$ 
+<<LRm1ML>>=
+as(Rm1ML@L, "sparseMatrix")
+@ 
+<<unfewdigits,echo=FALSE,results=hide>>=
+options(op)
+@
+
+As explained in later sections the matrix $\bm{L}$ provides all the
+information needed to evaluate the ML deviance or the REML as a
+function of $\bm{\theta}$.  The components of the deviance are given
+in the \code{deviance} slot of the fitted model
+<<devRm1ML>>=
+Rm1ML@deviance
+@
+The element labelled \code{ldZ} is the logarithm of the square
+determinant of the upper left $6\times 6$ section of $\bm{L}$.  This
+corresponds to $\log\left|{\bm{Z}^*}\trans\bm{Z}^*+\bm{I}_q\right|$
+where $\bm{Z}^*=\bm{Z}\bm{T}\bm{S}$.  We can verify that this value
+can be calculated in this way by
+<<ldZRm1ML>>=
+2*6*log(as(Rm1ML@L, "sparseMatrix")[1,1])
+all.equal(2*6*log(as(Rm1ML@L, "sparseMatrix")[1,1]),
+ unname(Rm1ML@deviance["ldZ"]))
+@ 
+
+The \code{lr2} element of the \code{deviance} slot is the logarithm of
+the penalized residual sum of squares.
 
 \section{Structure of $\bm{\Sigma}$ and $\bm{Z}$}
 \label{sec:role-group-fact}
@@ -350,37 +493,7 @@ which we write as $\widehat{\bm{b}^*}(\bm{\theta})$.  That is,
     \end{bmatrix}
   \end{split}
 \end{equation}
-where the matrix $\bm{A}^*(\bm{\theta})$ is
-\begin{equation}
-  \label{eq:Astar}
-  \begin{split}
-    \bm{A}^*(\bm{\theta})&=
-    \begin{bmatrix}
-      {\bm{Z}^*}\trans\bm{Z}^*+\bm{I} & {\bm{Z}^*}\trans\bm{X} &
-      -{\bm{Z}^*}\trans\bm{y}\\
-      {\bm{X}}\trans\bm{Z}^* & {\bm{X}}\trans\bm{X} &
-      -{\bm{X}}\trans\bm{y}\\
-      -{\bm{y}}\trans\bm{Z}^*&-{\bm{y}}\trans\bm{X}&{\bm{y}}\trans\bm{y}
-    \end{bmatrix} \\
-    &=
-    \begin{bmatrix}
-      \bm{T}\trans\bm{S} & \bm{0} & \bm{0} \\
-      \bm{0} & \bm{I} & \bm{0} \\
-      \bm{0} & \bm{0} & 1
-    \end{bmatrix}
-    \bm{A}
-    \begin{bmatrix}
-      \bm{S}\bm{T} & \bm{0} & \bm{0} \\
-      \bm{0} & \bm{I} & \bm{0} \\
-      \bm{0} & \bm{0} & 1
-    \end{bmatrix}+
-    \begin{bmatrix}
-      \bm{I} & \bm{0} & \bm{0} \\
-      \bm{0} & \bm{0} & \bm{0} \\
-      \bm{0} & \bm{0} & 0
-    \end{bmatrix} .
-  \end{split}
-\end{equation}
+where the matrix $\bm{A}^*(\bm{\theta})$ is as shown in (\ref{eq:Astar})
 and
 \begin{equation}
   \label{eq:Amatrix}
