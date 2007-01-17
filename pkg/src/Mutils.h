@@ -85,9 +85,13 @@ extern	 /* stored pointers to symbols initialized in R_init_Matrix */
 #define diag_P(_x_) CHAR(STRING_ELT(GET_SLOT(_x_, Matrix_diagSym), 0))
 #define class_P(_x_) CHAR(asChar(getAttrib(_x_, R_ClassSymbol)))
 
+/* should also work for "matrix" matrices: */
+#define Real_KIND(_x_)	(IS_S4_OBJECT(_x_) ? Real_kind(_x_) : \
+			 (isReal(_x_) ? 0 : (isLogical(_x_) ? 1 : -1)))
+
+/* requires 'x' slot: */
 #define Real_kind(_x_)	(isReal(GET_SLOT(_x_, Matrix_xSym)) ? 0	:	\
-			 (isLogical(GET_SLOT(_x_, Matrix_xSym)) ? 1 :	\
-			  -1))
+			 (isLogical(GET_SLOT(_x_, Matrix_xSym)) ? 1 : -1))
 
 
 /**
@@ -163,6 +167,7 @@ void make_i_matrix_symmetric(   int *to, SEXP from);
 SEXP Matrix_expand_pointers(SEXP pP);
 
 SEXP dup_mMatrix_as_dgeMatrix(SEXP A);
+SEXP dup_mMatrix_as_geMatrix (SEXP A);
 
 SEXP new_dgeMatrix(int nrow, int ncol);
 
@@ -170,6 +175,12 @@ static R_INLINE SEXP
 mMatrix_as_dgeMatrix(SEXP A)
 {
     return strcmp(class_P(A), "dgeMatrix") ? dup_mMatrix_as_dgeMatrix(A) : A;
+}
+
+static R_INLINE SEXP
+mMatrix_as_geMatrix(SEXP A)
+{
+    return strcmp(class_P(A) + 1, "geMatrix") ? dup_mMatrix_as_geMatrix(A) : A;
 }
 
 /**

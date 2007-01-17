@@ -36,6 +36,7 @@ m@Dimnames[[2]] <- m@Dimnames[[1]]
 ## not valid anymore:
 (val <- validObject(m, test=TRUE))
 stopifnot(is.character(val))
+rm(m)
 
 ###--  Sparse Triangular :
 
@@ -191,9 +192,10 @@ stopifnot(all.equal(eM$values,
 
 ##--- symmetric -> pos.def. needs valid test:
 m5 <- Matrix(diag(5) - 1)
-if(FALSE) # FIXME: this happily "works" but MM thinks it shouldn't:
-assertError(as(m5, "dpoMatrix"))
-
+if(FALSE) { # FIXME: this as(.,.) happily "works"
+ assertError(mpo <- as(m5, "dpoMatrix"))
+ validObject(mpo) # FIXME?  it is *not* really pos.definite!
+}
 
 ###-- sparse nonzero pattern : ----------
 
@@ -239,5 +241,18 @@ X
 XX <- as(Matrix:::drop0(XX), "dsCMatrix")
 stopifnot(identical(XX, Matrix(0, nrow(X), ncol(X))))
 
+M <- Matrix(m., sparse = FALSE)
+(sM <- Matrix(m.))
+class(dlM <- M >= 1)
+stopifnot(identical(dlM, !(M < 1)),
+	  is(sM, "sparseMatrix"),
+	  is(dlM, "denseMatrix"))
+(lM  <- as(dlM, "sparseMatrix"))
+lM2 <- as(dlM, "CsparseMatrix") #-> now ok
+lM0 <- Matrix:::as_Csparse(dlM)
+stopifnot(identical3(lM, lM2, lM0))
+
+selectMethod("coerce",	c("lgeMatrix", "CsparseMatrix"),
+	     useInherited = c(from = TRUE, to = FALSE))
 
 cat('Time elapsed: ', proc.time(),'\n') # "stats"
