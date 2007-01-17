@@ -228,7 +228,7 @@ setMethod("!", "ldiMatrix", function(e1) {
 	e1@diag <- "N"
 	e1@x <- rep.int(FALSE, e1@Dim[1])
     }
-    x
+    e1
 })
 
 ## Basic Matrix Multiplication {many more to add}

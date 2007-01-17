@@ -1,3 +1,29 @@
+2007-01-17  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/diagMatrix.R (!): fix typo.
+
+2007-01-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (as_Csparse): and quite a few others:
+		allow to pass class definition --> speedup
+	* R/sparseMatrix.R: apply the above
+
+	* R/Csparse.R: coercion Csparse* to dense* now preserves shape properties.
+
+	* src/Mutils.h (mMatrix_as_geMatrix): new, based on
+	* src/Mutils.c (dup_mMatrix_as_geMatrix): new; generalization of
+	old dup_mMatrix_as_dgeMatrix), eliminating a long-standing "FIXME".
+
+	* src/dense.c (dense_to_Csparse): use new mMatrix_as_geMatrix()
+
+	* R/denseMatrix.R (.dense2C): based on dense_to_Csparse: name it,
+	and use it for "sparse*" as well, since it's faster than the
+	as_Csparse(.) way.
+
+2007-01-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Ops.R ("Logic"): more methods, notably an  <lgC> o <lgC> one.
+
 2007-01-12  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Tsparse.R (.TM.repl.i.2col): new internal function to be used

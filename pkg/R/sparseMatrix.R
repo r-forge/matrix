@@ -146,37 +146,37 @@ setAs("TsparseMatrix", "graphNEL", Tsp2grNEL)
 setMethod("[", signature(x = "sparseMatrix", i = "index", j = "missing",
 			 drop = "logical"),
 	  function (x, i, j, drop) {
-              cl <- class(x)
-              viaCl <- paste(.M.kind(x,cl), "gTMatrix", sep='')
+	      cld <- getClassDef(class(x))
+              viaCl <- paste(.M.kind(x,cld), "gTMatrix", sep='')
               x <- callGeneric(x = as(x, viaCl), i=i, drop=drop)
               ## try_as(x, c(cl, sub("T","C", viaCl)))
-              if(is(x, "Matrix") && extends(cl, "CsparseMatrix"))
+              if(is(x, "Matrix") && extends(cld, "CsparseMatrix"))
                   as(x, sub("T","C", viaCl)) else x
           })
 
 setMethod("[", signature(x = "sparseMatrix", i = "missing", j = "index",
 			 drop = "logical"),
 	  function (x, i, j, drop) {
-              cl <- class(x)
-              viaCl <- paste(.M.kind(x,cl), "gTMatrix", sep='')
+	      cld <- getClassDef(class(x))
+              viaCl <- paste(.M.kind(x, cld), "gTMatrix", sep='')
               x <- callGeneric(x = as(x, viaCl), j=j, drop=drop)
               ## try_as(x, c(cl, sub("T","C", viaCl)))
-              if(is(x, "Matrix") && extends(cl, "CsparseMatrix"))
+              if(is(x, "Matrix") && extends(cld, "CsparseMatrix"))
                   as(x, sub("T","C", viaCl)) else x
           })
 
 setMethod("[", signature(x = "sparseMatrix",
 			 i = "index", j = "index", drop = "logical"),
 	  function (x, i, j, drop) {
-	      cl <- class(x)
+	      cld <- getClassDef(class(x))
 	      ## be smart to keep symmetric indexing of <symm.Mat.> symmetric:
-	      doSym <- (extends(cl, "symmetricMatrix") &&
+	      doSym <- (extends(cld, "symmetricMatrix") &&
 			length(i) == length(j) && all(i == j))
-	      viaCl <- paste(.M.kind(x,cl),
+	      viaCl <- paste(.M.kind(x, cld),
 			     if(doSym) "sTMatrix" else "gTMatrix", sep='')
 	      x <- callGeneric(x = as(x, viaCl), i=i, j=j, drop=drop)
 	      ## try_as(x, c(cl, sub("T","C", viaCl)))
-	      if(is(x, "Matrix") && extends(cl, "CsparseMatrix"))
+	      if(is(x, "Matrix") && extends(cld, "CsparseMatrix"))
 		  as(x, sub("T","C", viaCl)) else x
 	  })
 

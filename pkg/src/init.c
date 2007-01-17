@@ -150,6 +150,7 @@ static R_CallMethodDef CallEntries[] = {
     {"dtrMatrix_solve", (DL_FUNC) &dtrMatrix_solve, 1},
     {"dtrMatrix_validate", (DL_FUNC) &dtrMatrix_validate, 1},
     {"dup_mMatrix_as_dgeMatrix", (DL_FUNC) &dup_mMatrix_as_dgeMatrix, 1},
+    {"dup_mMatrix_as_geMatrix",  (DL_FUNC) &dup_mMatrix_as_geMatrix, 1},
 
     /* for dgC* _and_ lgC* : */
     {"xCMatrix_validate", (DL_FUNC) &xCMatrix_validate, 1},

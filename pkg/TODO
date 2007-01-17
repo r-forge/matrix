@@ -100,3 +100,5 @@ Check for DimNames propagation in coercion and other operations.
 
 - make sure *all* group methods have (maybe "bail-out") setMethod for "Matrix".
   e.g. zapsmall(<pMatrix>) fails "badly"
+
+- speedup: pass class definition to non0ind() [check all calls ..]

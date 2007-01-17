@@ -10,9 +10,12 @@
 \alias{lgTMatrix-class}
 \alias{ltTMatrix-class}
 \alias{lsTMatrix-class}
-%
+% Group(like)
+\alias{Logic,lsparseMatrix,lsparseMatrix-method}
+\alias{Logic,lgCMatrix,lgCMatrix-method}
 \alias{-,lsparseMatrix,missing-method}
 \alias{!,lsparseMatrix-method}
+%
 \alias{\%*\%,lgCMatrix,lgCMatrix-method}
 \alias{\%*\%,lsparseMatrix,lsparseMatrix-method}
 \alias{\%*\%,lsparseMatrix,ldenseMatrix-method}

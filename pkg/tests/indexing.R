@@ -273,6 +273,8 @@ sy3 <- new("dsyMatrix", Dim = as.integer(c(2, 2)), x = c(14, -1, 2, -7))
 validObject(dm <- kronecker(Diagonal(2), sy3))
 (s2 <- as(dm, "sparseMatrix"))
 validObject(st <- as(s2, "TsparseMatrix"))
+stopifnot(is(s2, "symmetricMatrix"),
+	  is(st, "symmetricMatrix"))
 validObject(s.32  <- st[1:3,1:2]) ## 3 x 2 - and *not* dsTMatrix
 validObject(s2.32 <- s2[1:3,1:2])
 I <- c(1,4:3)
@@ -325,5 +327,13 @@ x.x[ cbind(2:6, 2:6)] <- 12:16
 validObject(x.x)
 stopifnot(class(x.x) == "dsCMatrix",
 	  12:16 == as.mat(x.x)[cbind(2:6, 2:6)])
+(ne1 <- (mc - m.) != 0)
+stopifnot(identical(ne1, 0 != abs(mc - m.)))
+(ge <- m. >= mc) # contains "=" -> result is dense
+ne. <- mc != m.  # was wrong (+ warning)
+stopifnot(identical(!(m. < mc), m. >= mc),
+	  identical(m. < mc, as(!ge, "sparseMatrix")),
+	  identical(ne., Matrix:::drop0(ne1)))
+
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''

@@ -21,14 +21,22 @@ setAs("dsCMatrix", "dgCMatrix",
 setAs("dtCMatrix", "dtTMatrix",
       function(from) .Call(Csparse_to_Tsparse, from, TRUE))
 
-## Current code loses symmetry and triangularity properties.  With suitable
-## changes to chm_dense_to_SEXP (../src/chm_common.c) we can avoid this.
 setAs("CsparseMatrix", "denseMatrix",
       function(from) {
-          ## |-> cholmod_C -> cholmod_dense -> chm_dense_to_dense
-          if (is(from, "triangularMatrix") && from@diag == "U")
-              from <- .Call(Csparse_diagU2N, from)
-          .Call(Csparse_to_dense, from)
+	  ## |-> cholmod_C -> cholmod_dense -> chm_dense_to_dense
+	  cld <- getClassDef(class(from))
+	  if (extends(cld, "generalMatrix"))
+	      .Call(Csparse_to_dense, from)
+	  else {
+	      ## Csparse_to_dense  loses symmetry and triangularity properties.
+	      ## With suitable changes to chm_dense_to_SEXP (../src/chm_common.c)
+	      ## we could do this in C code {FIXME}
+	      if (extends(cld, "triangularMatrix") && from@diag == "U")
+		  from <- .Call(Csparse_diagU2N, from)
+	      as(.Call(Csparse_to_dense, from),
+		 paste(.M.kind(from, cld),
+		       .dense.prefixes[.M.shape(from, cld)], "Matrix", sep=''))
+	  }
       })
 
 ## special cases (when a specific "to" class is specified)

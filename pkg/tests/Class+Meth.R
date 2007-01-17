@@ -179,10 +179,10 @@ tstMatrixClass <-
 		    stopifnot(all(m == m)) ## check all() and "==" [Compare]
 		    if(any(m != m)) stop(" any (m != m) should not be true")
 		    ## FIXME: not yet, e.g. for "dgTMatrix" :
-##		    cat("m >= m for all: ")
-## 		    stopifnot(all(m >= m)); cat("ok\n")
-## 		    cat("m < m for none: ")
-## 		    stopifnot(all(! m < m)); cat("ok\n")
+		    cat("m >= m for all: ")
+		    stopifnot(all(m >= m)); cat("ok\n")
+		    cat("m < m for none: ")
+		    stopifnot(all(! m < m)); cat("ok\n")
 		}
 
                 if(is(m, "dMatrix") && is(m, "compMatrix")) {

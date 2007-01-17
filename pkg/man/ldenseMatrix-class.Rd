@@ -1,8 +1,13 @@
 \name{ldenseMatrix-class}
 \docType{class}
 \alias{ldenseMatrix-class}
+% Group
 \alias{!,ldenseMatrix-method}
 \alias{Logic,ldenseMatrix,ldenseMatrix-method}
+\alias{Logic,ldenseMatrix,lsparseMatrix-method}
+\alias{Logic,lsparseMatrix,ldenseMatrix-method}
+% purely "sparse" are in ./lsparseMatrix-classes.Rd
+%
 \alias{as.logical,ldenseMatrix-method}
 \alias{coerce,matrix,ldenseMatrix-method}
 \alias{coerce,ldenseMatrix,matrix-method}

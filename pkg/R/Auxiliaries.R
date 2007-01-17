@@ -238,38 +238,39 @@ nnzero <- function(x, na.counted = NA) {
     }
 }
 
-## For sparseness handling
-## return a 2-column (i,j) matrix of
-## 0-based indices of non-zero entries  :
-non0ind <- function(x) {
-
+## For sparseness handling, return a
+## 2-column (i,j) matrix of 0-based indices of non-zero entries:
+non0ind <- function(x, classDef.x = getClassDef(class(x)))
+{
     if(is.numeric(x))
 	return(if((n <- length(x))) (0:(n-1))[isN0(x)] else integer(0))
     ## else
-    stopifnot(is(x, "sparseMatrix"))
-    non0.i <- function(M) {
-	if(is(M, "TsparseMatrix"))
+
+    stopifnot(extends(classDef.x, "sparseMatrix"))
+
+    non0.i <- function(M, cM = class(M)) {
+	if(extends(cM, "TsparseMatrix"))
 	    return(unique(cbind(M@i,M@j)))
-	if(is(M, "pMatrix"))
+	if(extends(cM, "pMatrix"))
 	    return(cbind(seq_len(nrow(M)), M@perm) - 1:1)
-	## else:
-	isC <- any("i" == slotNames(M)) # is Csparse (not Rsparse)
+	## else: C* or R*
+	isC <- extends(cM, "CsparseMatrix")
 	.Call(compressed_non_0_ij, M, isC)
     }
 
-    if(is(x, "symmetricMatrix")) { # also get "other" triangle
-	ij <- non0.i(x)
+    if(extends(classDef.x, "symmetricMatrix")) { # also get "other" triangle
+	ij <- non0.i(x, classDef.x)
 	notdiag <- ij[,1] != ij[,2]# but not the diagonals again
 	rbind(ij, ij[notdiag, 2:1])
     }
-    else if(is(x, "triangularMatrix")) { # check for "U" diag
+    else if(extends(classDef.x, "triangularMatrix")) { # check for "U" diag
 	if(x@diag == "U") {
 	    i <- seq_len(dim(x)[1]) - 1:1
-	    rbind(non0.i(x), cbind(i,i))
-	} else non0.i(x)
+	    rbind(non0.i(x, classDef.x), cbind(i,i))
+	} else non0.i(x, classDef.x)
     }
     else
-	non0.i(x)
+	non0.i(x, classDef.x)
 }
 
 ## nr= nrow: since  i in {0,1,.., nrow-1}  these are 1:1 "decimal" encodings:
@@ -452,18 +453,23 @@ l2d_meth <- function(x) {
 
 ## return "d" or "l" or "n" or "z"
 .M.kind <- function(x, clx = class(x)) {
+    ## 'clx': class() *or* class definition of x
     if(is.matrix(x) || is.atomic(x)) { ## 'old style' matrix or vector
 	if     (is.numeric(x)) "d"
 	else if(is.logical(x)) "l" ## FIXME ? "n" if no NA ??
 	else if(is.complex(x)) "z"
 	else stop("not yet implemented for matrix w/ typeof ", typeof(x))
     }
-    else if(extends(clx, "dMatrix")) "d"
-    else if(extends(clx, "nMatrix")) "n"
-    else if(extends(clx, "lMatrix")) "l"
-    else if(extends(clx, "zMatrix")) "z"
-    else if(extends(clx, "pMatrix")) "n" # permutation -> pattern
-    else stop(" not yet be implemented for ", clx)
+    else {
+	if(is.character(clx))		# < speedup: get it once
+	    clx <- getClassDef(clx)
+	if(extends(clx, "dMatrix")) "d"
+	else if(extends(clx, "nMatrix")) "n"
+	else if(extends(clx, "lMatrix")) "l"
+	else if(extends(clx, "zMatrix")) "z"
+	else if(extends(clx, "pMatrix")) "n" # permutation -> pattern
+	else stop(" not yet be implemented for ", clx@className)
+    }
 }
 
 ## typically used as .type.kind[.M.kind(x)]:
@@ -473,16 +479,21 @@ l2d_meth <- function(x) {
                 "z" = "complex")
 
 .M.shape <- function(x, clx = class(x)) {
+    ## 'clx': class() *or* class definition of x
     if(is.matrix(x)) { ## 'old style matrix'
 	if     (isDiagonal  (x)) "d"
 	else if(isTriangular(x)) "t"
 	else if(isSymmetric (x)) "s"
 	else "g" # general
     }
-    else if(extends(clx, "diagonalMatrix"))  "d"
-    else if(extends(clx, "triangularMatrix"))"t"
-    else if(extends(clx, "symmetricMatrix")) "s"
-    else "g"
+    else {
+	if(is.character(clx)) # < speedup: get it once
+	    clx <- getClassDef(clx)
+	if(extends(clx, "diagonalMatrix"))  "d"
+	else if(extends(clx, "triangularMatrix"))"t"
+	else if(extends(clx, "symmetricMatrix")) "s"
+	else "g"
+    }
 }
 
 
@@ -528,20 +539,24 @@ as_dense <- function(x) {
     as.character(NA)
 }
 
-as_Csparse <- function(x) {
-    as(x, paste(.M.kind(x), .sparse.prefixes[.M.shape(x)], "CMatrix", sep=''))
+## Here, getting the class definition and passing it, should be faster
+as_Csparse <- function(x, cld = if(isS4(x)) getClassDef(class(x))) {
+    as(x, paste(.M.kind(x, cld),
+                .sparse.prefixes[.M.shape(x, cld)], "CMatrix", sep=''))
 }
-as_Rsparse <- function(x) {
-    as(x, paste(.M.kind(x), .sparse.prefixes[.M.shape(x)], "RMatrix", sep=''))
+as_Rsparse <- function(x, cld = if(isS4(x)) getClassDef(class(x))) {
+    as(x, paste(.M.kind(x, cld),
+                .sparse.prefixes[.M.shape(x, cld)], "RMatrix", sep=''))
 }
-as_Tsparse <- function(x) {
-    as(x, paste(.M.kind(x), .sparse.prefixes[.M.shape(x)], "TMatrix", sep=''))
+as_Tsparse <- function(x, cld = if(isS4(x)) getClassDef(class(x))) {
+    as(x, paste(.M.kind(x, cld),
+                .sparse.prefixes[.M.shape(x, cld)], "TMatrix", sep=''))
 }
 
-as_Csparse2 <- function(x) {
+as_Csparse2 <- function(x, cld = if(isS4(x)) getClassDef(class(x))) {
     ## Csparse + U2N when needed
-    sh <- .M.shape(x)
-    x <- as(x, paste(.M.kind(x), .sparse.prefixes[sh], "CMatrix", sep=''))
+    sh <- .M.shape(x, cld)
+    x <- as(x, paste(.M.kind(x, cld), .sparse.prefixes[sh], "CMatrix", sep=''))
     if(sh == "t") .Call(Csparse_diagU2N, x) else x
 }
 
