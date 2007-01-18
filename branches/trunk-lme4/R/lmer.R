@@ -642,13 +642,16 @@ setMethod("mcmcsamp", signature(object = "lmer"),
           ans <- t(.Call(mer_MCMCsamp, object, saveb, n, trans, verbose, deviance))
 	  attr(ans, "mcpar") <- as.integer(c(1, n, 1))
 	  class(ans) <- "mcmc"
-          mcmccompnames(ans, object, saveb, trans, FALSE, deviance)
+	  mcmccompnames(ans, object, saveb, trans,
+			glmer=FALSE, deviance=deviance)
       })
 
 setMethod("mcmcsamp", signature(object = "glmer"),
 	  function(object, n = 1, verbose = FALSE, saveb = FALSE,
-		   trans = TRUE, ...)
+		   trans = TRUE, deviance = FALSE, ...)
       {
+          if(!identical(deviance, FALSE))
+              warning("'deviance' not yet available for mcmcsamp(\"glmer\",*)")
           family <- object@family
           mer <- as(object, "mer")
           weights <- object@weights
@@ -669,7 +672,8 @@ setMethod("mcmcsamp", signature(object = "glmer"),
           .Call(glmer_finalize, GSpt)
 	  attr(ans, "mcpar") <- as.integer(c(1, n, 1))
 	  class(ans) <- "mcmc"
-          mcmccompnames(ans, object, saveb, trans, TRUE)
+	  mcmccompnames(ans, object, saveb, trans,
+			glmer=TRUE, deviance=FALSE)
       })
 
 setMethod("simulate", signature(object = "mer"),
@@ -1359,7 +1363,7 @@ setMethod("summary", signature(object = "mer2"),
 	      REML <- object@dims["REML"]
 	      llik <- logLik(object, REML)
 	      dev <- object@deviance
-              
+
 	      glz <- is(object, "glmer")
 	      methTitle <-
 		  if (glz)
@@ -1453,7 +1457,7 @@ setMethod("VarCorr", signature(x = "mer2"),
               } else {
                   dd <- diag(ai)
                   diag(ai) <- rep(1, dm[1])
-                  el <- sc^2 * crossprod(dd * t(ai)) 
+                  el <- sc^2 * crossprod(dd * t(ai))
               }
               el <- as(el, "dpoMatrix")
               el@Dimnames <- list(cnames[[i]], cnames[[i]])
@@ -1564,4 +1568,4 @@ ST2Omega <- function(ST)
     crossprod(solve(T)/dd)
 }
 
-    
+
