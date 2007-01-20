@@ -1,5 +1,6 @@
 2007-01-17  Douglas Bates  <bates@R-project.org>
 
+	* src/init.c: Remove bstar from the dims slot of lmer2 objects.
 	* R/lmer.R (ST2Omega): Added a (hidden) conversion function from
 	the lmer2 representation to the lmer representation as a temporary
 	measure.

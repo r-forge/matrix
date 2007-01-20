@@ -13,7 +13,7 @@ const char attr_hidden *DEVIANCE_NAMES[] = {"ML", "REML",
 					    "ldZ", "ldX", "lr2", ""};
 				/* positions in the dims vector */
 const char attr_hidden *DIMS_NAMES[] = {"nf", "n", "p", "q",
-					"REML", "glmm", "bstar", ""};
+					"REML", "glmm", ""};
 
 static R_CallMethodDef CallEntries[] = {
     {"glmer_MCMCsamp", (DL_FUNC) &glmer_MCMCsamp, 5},
