@@ -19,7 +19,7 @@
   University of Wisconsin -- Madison}
 \begin{document}
 \SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,strip.white=TRUE}
-\SweaveOpts{prefix=TRUE,prefix.string=figs/Example,include=FALSE}
+\SweaveOpts{include=FALSE}
 \setkeys{Gin}{width=\textwidth}
 \newcommand{\code}[1]{\texttt{\small{#1}}}
 \newcommand{\package}[1]{\textsf{\small{#1}}}
@@ -61,7 +61,7 @@ print(dotplot(Rail~travel,Rail,xlab="Travel time (ms)",ylab="Rail number"))
 @ 
 \begin{figure}[tb]
   \centering
-  \includegraphics{figs/Example-Raildotplot}
+  \includegraphics{Implementation-Raildotplot}
   \caption{Travel time of sound waves in a sample of six railroad
     rails.  There were three measurements of the travel time on each
     rail. The numbering of the rails has been reordered according to
@@ -94,7 +94,7 @@ considered to be unobserved random variables for which we form
 ``predictions'' instead of ``estimates''.
 
 To express generalizations of models like (\ref{eq:1}) more
-conveniently we change the representation use a matrix/vector
+conveniently we switch to a matrix/vector
 representation in which the 18 observations of the travel time form
 the response vector $\bm{y}$, the fixed-effect parameter $\mu$ forms a
 $1$-dimensional column vector $\bm{\beta}$ and the six random effects
@@ -171,7 +171,7 @@ in the display of the matrix, it is stored as a sparse matrix.  The
 elements represented as `.' are known to be zero and are not stored
 explicitly.
 
-The columns of Z are indicator columns (that is, the $i$th column has
+The columns of $\bm{Z}$ are indicator columns (that is, the $i$th column has
 a 1 in row $j$ if the $j$th observation is on rail $i$, otherwise it
 is zero) but they are not in the usual ordering.  This is because the
 levels of the \code{Rail} factor have been reordered according to
@@ -185,7 +185,7 @@ Rm1ML@A
 
 The \code{L} component of this fitted model is a Cholesky
 factorization of a matrix $\bm{A}^*(\bm{\theta})$ where $\bm{\theta}$ is a
-parameter vector determining $\bm{\Sigma}(\bm{\theta})$, which can be
+parameter vector determining $\bm{\Sigma}(\bm{\theta})$.  This matrix can be
 factored as $\bm{\Sigma}=\bm{T}\bm{S}\bm{S}\bm{T}\trans$, where
 $\bm{T}$ is a unit, lower triangular matrix (that is, all the elements
 above the diagonal are zero and all the elements on the diagonal are
@@ -243,25 +243,156 @@ options(op)
 @
 
 As explained in later sections the matrix $\bm{L}$ provides all the
-information needed to evaluate the ML deviance or the REML as a
-function of $\bm{\theta}$.  The components of the deviance are given
+information needed to evaluate the ML deviance or the REML deviance as
+a function of $\bm{\theta}$.  The components of the deviance are given
 in the \code{deviance} slot of the fitted model
 <<devRm1ML>>=
 Rm1ML@deviance
 @
-The element labelled \code{ldZ} is the logarithm of the square
-determinant of the upper left $6\times 6$ section of $\bm{L}$.  This
-corresponds to $\log\left|{\bm{Z}^*}\trans\bm{Z}^*+\bm{I}_q\right|$
-where $\bm{Z}^*=\bm{Z}\bm{T}\bm{S}$.  We can verify that this value
-can be calculated in this way by
+The element labelled \code{ldZ} is the logarithm of the square of
+the determinant of the upper left $6\times 6$ section of $\bm{L}$.
+This corresponds to
+$\log\left|{\bm{Z}^*}\trans\bm{Z}^*+\bm{I}_q\right|$ where
+$\bm{Z}^*=\bm{Z}\bm{T}\bm{S}$.  We can verify that the value
+$27.38292$ can indeed be calculated in this way.
 <<ldZRm1ML>>=
-2*6*log(as(Rm1ML@L, "sparseMatrix")[1,1])
-all.equal(2*6*log(as(Rm1ML@L, "sparseMatrix")[1,1]),
- unname(Rm1ML@deviance["ldZ"]))
+L <- as(Rm1ML@L, "sparseMatrix")
+2*sum(log(diag(L)[1:6]))
 @ 
 
 The \code{lr2} element of the \code{deviance} slot is the logarithm of
-the penalized residual sum of squares.
+the penalized residual sum of squares.  It can be calculated as the
+logarithm of the square of the last diagonal element in $\bm{L}$.
+<<lr2Rm1ML>>=
+2*log(L[8,8])
+@ 
+
+For completeness we mention that the \code{ldX} element of the
+\code{deviance} slot is the logarithm of the product of the squares of
+the diagonal elements of $\bm{L}$ corresponding to columns of $\bm{X}$.
+<<ldXRm1ML>>=
+2*log(L[7,7])
+@ 
+This element is used in the calculation of the REML criterion.
+
+Another slot in the fitted model object is \code{dims}, which 
+contains information on the dimensions of the model and some of the
+characteristics of the fit.
+<<dimsRm1ML>>=
+Rm1ML@dims
+@
+We can reconstruct the ML estimate of the residual variance as the
+penalized residual sum of squares divided by the number of
+observations.
+%% FIXME: This is not calculated correctly in the current version of lmer2
+<<s2Rm1ML>>=
+exp(Rm1ML@deviance["lr2"])/Rm1ML@dims["n"]
+@ 
+
+The \emph{profiled deviance} function
+\begin{equation}
+  \label{eq:2}
+  \begin{aligned}
+  \tilde{\mathcal{D}}(\bm{\theta}) &= \log\left|{\bm{Z}^*}\trans\bm{Z}^*+\bm{I}_q\right| + 
+  n \log \left(1+\frac{2\pi r^2}{n}\right) \\
+  &= n\left[1+\log\left(\frac{2\pi}{n}\right)\right] +
+    \log\left|{\bm{Z}^*}\trans\bm{Z}^*+\bm{I}_q\right| + n\log r^2
+  \end{aligned}
+\end{equation}
+is a function of $\bm{\theta}$ only.  In this case
+$\bm{\theta}=\sigma_1$, the relative standard deviation of the random
+effects, is one-dimensional. The maximum likelihood estimate (mle) of
+$\bm{\theta}$ minimizes the profiled deviance. The mle's of all the
+other parameters in the model can be derived from the estimate of this
+parameters.
+
+<<devcomp,echo=FALSE,fig=TRUE,height=3.5>>=
+mm <- Rm1ML
+sg <- seq(0, 20, len = 101)
+dev <- mm@deviance
+nc <- length(dev)
+nms <- names(dev)
+vals <- matrix(0, nrow = length(sg), ncol = nc, dimnames = list(NULL, nms))
+for (i in seq(along = sg)) {
+    .Call("mer2_setPars", mm, sg[i], PACKAGE = "lme4")
+    vals[i,] <- mm@deviance
+}
+vals[,"lr2"] <- mm@dims["n"] * vals[,"lr2"]
+df <- data.frame(x = rep(sg, nc), y = as.vector(vals),
+                 type = gl(nc, length(sg), labels = nms))
+print(xyplot(y ~ x | type, df, type = c("g", "l"),
+             subset = !(type %in% c("REML", "ldX")),
+             scales = list(y = list(relation = "free")),
+             layout = c(1,3)))
+@ 
+
+The term $n\left[1+\log\left(2\pi/n\right)\right]$ in (\ref{eq:2})
+does not depend on $\bm{\theta}$.  The other two terms,
+$\log\left|{\bm{Z}^*}\trans\bm{Z}^*+\bm{I}_q\right|$ and $n\log r^2$,
+measure the complexity of the model and the fidelity of the fitted
+values to the observed data, respectively.  We plot the value of each
+of the varying terms versus $\sigma_1$ in Figure~\ref{fig:devcomp}.
+\begin{figure}[tb]
+  \centering
+  \includegraphics{Implementation-devcomp}
+  \caption{The deviance and those components that vary with
+    $\bm{\theta}$ as a function of $\bm{\theta}$ (which is the
+    scalar $\sigma_1$ in this case).}
+  \label{fig:devcomp}
+\end{figure}
+
+The component $\log\left|\bm{S}\bm{Z}\trans\bm{Z}\bm{S}+\bm{I}\right|$
+has the value $0$ at $\sigma_1=0$ and increases as $\sigma_1$
+increases.  It is unbounded as $\sigma_1\rightarrow\infty$.  The
+component $n\log\left(r^2\right)$ has a finite value at $\sigma_1=1$
+from which it decreases as $\sigma_1$ increases.  The value at
+$\sigma_1=0$ corresponds to the residual sum of squares for the
+regression of $\bm{y}$ on the columns of $\bm{X}$.
+<<leftlr2>>=
+18 * log(deviance(lm(travel ~ 1, Rail)))
+@ 
+As $\sigma_1\rightarrow\infty$, $n\log\left(r^2\right)$ approaches the
+value corresponding to the residual sum of squares for the regression
+of $\bm{y}$ on the columns of $\bm{X}$ and $\bm{Z}$.  For this model
+that is
+<<rightlr2>>=
+18 * log(deviance(lm(travel ~ Rail, Rail)))
+@ 
+
+<<devcomp2,echo=FALSE,fig=TRUE,height=4>>=
+mm <- Rm1ML
+sg <- seq(3.75, 8.25, len = 101)
+dev <- mm@deviance
+nc <- length(dev)
+nms <- names(dev)
+vals <- matrix(0, nrow = length(sg), ncol = nc, dimnames = list(NULL, nms))
+for (i in seq(along = sg)) {
+    .Call("mer2_setPars", mm, sg[i], PACKAGE = "lme4")
+    vals[i,] <- mm@deviance
+}
+base <- 18 * log(deviance(lm(travel ~ Rail, Rail)))
+print(xyplot(devC + ldZ ~ sg,
+             data.frame(ldZ = vals[,"ldZ"], devC =
+                        vals[, "ldZ"] + mm@dims['n'] * vals[, "lr2"] - base,
+                        sg = sg), type = c("g", "l"),
+             scales = list(x = list(axs = 'i')),
+             xlab = expression(sigma[1]), ylab = "Shifted deviance",
+             auto.key = list(text = c("deviance", "log|SZ'ZS + I|"),
+             space = "right", points = FALSE, lines = TRUE)))
+@ 
+\begin{figure}[tb]
+  \centering
+  \includegraphics{Implementation-devcomp2}
+  \caption{The part of the deviance that varies with $\sigma_1$ as a
+    function of $\sigma_1$ near the optimum.  The component
+    $\log\left|\bm{S}\bm{Z}\trans\bm{Z}\bm{S}+\bm{I}\right|$ is shown
+    at the bottom of the frame.  This is the component of the deviance
+    that increases with $\sigma_1$.  Added to this component is
+    $n\log\left[r^2(\sigma_1)\right] - n\log\left[r^2(\infty)\right]$,
+    the comonent of the deviance that decreases as $\sigma_1$
+    increases.  Their sum is minimized at $\widehat{\sigma}_1=5.626$.}
+  \label{fig:devcomp2}
+\end{figure}
 
 \section{Structure of $\bm{\Sigma}$ and $\bm{Z}$}
 \label{sec:role-group-fact}
@@ -324,17 +455,21 @@ positive semi-definite, we express them as
 \begin{equation}
   \label{eq:STinner}
   \tilde{\bm{\Sigma}}_i=
-  \tilde{\bm{S}}_i\tilde{\bm{T}}_i\tilde{\bm{T}}_i\trans\tilde{\bm{S}}_i,\quad
+  \tilde{\bm{T}}_i\tilde{\bm{S}}_i\tilde{\bm{S}}_i\tilde{\bm{T}}_i\trans,\quad
   i=1,\dots,k
 \end{equation}
 where $\tilde{\bm{T}}_i$ is a $q_i\times q_i$ unit lower-triangular
 matrix (i.e. all the elements above the diagonal are zero and all the
 diagonal elements are unity) and $\tilde{\bm{S}}_i$ is a $q_i\times
-q_i$ diagonal matrix with non-negative elements on the diagonal. (This
-is a form of the Cholesky decomposition of positive semi-definite
-matrices.  It is similar to the ``LDL'' form but not identical to it.
-See Pouramadi (2007) for some discussion of the statistical advantages
-of using this form of the decomposition.)
+q_i$ diagonal matrix with non-negative elements on the diagonal. 
+
+This is the ``LDL'' form of the Cholesky decomposition of positive
+semi-definite matrices except that we express the diagonal matrix
+$\bm{D}$, which is on the variance scale, as the square of the
+diagonal matrix $\bm{S}$, which is on the standard deviation scale.
+The profiled deviance behaves more like a quadratic on the standard
+deviation scale than it does on the variance scale so the use of the
+standard deviation scale enhances convergence.
 
 The $n_i q_i\times n_i q_i$ matrices $\bm{S}_i,\bm{T}_i,\,i=1,\dots,k$
 and the $q\times q$ matrices $\bm{S}$ and $\bm{T}$ are defined
@@ -346,7 +481,8 @@ particular,
 \end{align}
 
 Note that when $q_i=1$, $\tilde{\bm{T}}_i=\bm{I}$ and hence
-$\bm{T}_i=\bm{I}$ and $\bm{S}_i$ is a multiple of the identity.
+$\bm{T}_i=\bm{I}$.  Furthermore, $\bm{S}_i$ is a multiple of the
+identity matrix in this case.
 
 The parameter vector $\bm{\theta}_i,i=1,\dots,k$ consists of the $q_i$
 diagonal elements of $\tilde{\bm{S}}_i$, which are constrained to be
@@ -361,7 +497,7 @@ $\bm{\theta}_i$ are combined as
   \end{bmatrix} .
 \end{displaymath}
 Each of the $q\times q$ matrices $\bm{S}$, $\bm{T}$ and $\bm{\Sigma}$
-in the decomposition $\bm{\Sigma}=\bm{S}\bm{T}\bm{T}\trans\bm{S}$ is a
+in the decomposition $\bm{\Sigma}=\bm{T}\bm{S}\bm{S}\bm{T}\trans$ is a
 function of $\bm{\theta}$.  
 
 As a unit triangular matrix $\bm{T}$ is non-singular.  That is,
@@ -371,7 +507,7 @@ boundary defined by the constraints, $\bm{S}$ is a
 diagonal matrix with strictly positive elements on the diagonal,
 which implies that $\bm{S}^{-1}$ exists and that
 $\bm{\Sigma}$ is non-singular with
-$\bm{\Sigma}^{-1}=\bm{S}^{-1}\bm{T}\invtrans\bm{T}^{-1}\bm{S}^{-1}$.
+$\bm{\Sigma}^{-1}=\bm{T}\invtrans\bm{S}^{-1}\bm{S}^{-1}\bm{T}^{-1}$.
 
 When $\bm{\theta}$ is on the boundary the matrices $\bm{S}$
 and $\bm{\Sigma}$ exist but are not invertible.  We say that
@@ -381,7 +517,7 @@ defined to have zero variance.  That is, the distribution of these
 linear combinations is a point mass at 0.
 
 The maximum likelihood estimates of $\bm{\theta}$ (or the restricted
-maximum likelihood estimates, defined below) can be on the
+maximum likelihood estimates, defined below) can be located on the
 boundary.  That is, they can correspond to a degenerate
 variance-covariance matrix and we must be careful to allow for this
 case.  However, to begin we consider the non-degenerate case.
@@ -393,14 +529,21 @@ When $\bm{\theta}$ is not on the boundary we can define a
 standardized random effects vector 
 \begin{equation}
   \label{eq:bstar}
-  \bm{b}^*=\bm{T}^{-1}\bm{S}^{-1}\bm{b}
+  \bm{b}^*=\bm{S}^{-1}\bm{T}^{-1}\bm{b}
 \end{equation}
 with the properties
 \begin{align}
-  \mathsf{E}[\bm{b}^*]&=\bm{T}^{-1}\bm{S}^{-1}\mathsf{E}[\bm{b}]\\
-  \mathsf{Var}[\bm{b}^*]&=\mathsf{E}[\bm{b}^*{\bm{b}^*}\trans]=\bm{T}^{-1}\bm{S}^{-1}\mathsf{Var}[\bm{b}]\bm{S}^{-1}\bm{T}\invtrans=\sigma^2\bm{T}^{-1}\bm{S}^{-1}\bm{\Sigma}\bm{S}^{-1}\bm{T}\invtrans=\sigma^2\bm{I}.
+  \mathsf{E}[\bm{b}^*]&=\bm{S}^{-1}\bm{T}^{-1}\mathsf{E}[\bm{b}]\\
+  \mathsf{Var}[\bm{b}^*]&
+  \begin{aligned}[t]
+    &=\mathsf{E}[\bm{b}^*{\bm{b}^*}\trans]\\
+    &=\bm{S}^{-1}\bm{T}^{-1}\mathsf{Var}[\bm{b}]\bm{T}\invtrans\bm{S}^{-1}\\
+    &=\sigma^2\bm{S}^{-1}\bm{T}^{-1}\bm{\Sigma}\bm{T}\invtrans\bm{S}^{-1}\\
+    &=\sigma^2\bm{S}^{-1}\bm{T}^{-1}\bm{T}\bm{S}\bm{S}\bm{T}\trans\bm{T}\invtrans\bm{S}^{-1}\\
+    &=\sigma^2\bm{I}.
+  \end{aligned}
 \end{align}
-That is, the unconditional distribution of the $q$ elements of
+Thus, the unconditional distribution of the $q$ elements of
 $\bm{b}^*$ is
 $\bm{b}^*\sim\mathcal{N}\left(\bm{0},\sigma^2\bm{I}\right)$, like that
 of the $n$ elements of $\bm{\epsilon}$.
@@ -408,17 +551,17 @@ of the $n$ elements of $\bm{\epsilon}$.
 Obviously the transformation from $\bm{b}^*$ to $\bm{b}$ is 
 \begin{equation}
   \label{eq:bstarb}
-  \bm{b}=\bm{S}\bm{T}\bm{b}^*
+  \bm{b}=\bm{T}\bm{S}\bm{b}^*
 \end{equation}
 and the $n\times q$ model matrix for $\bm{b}^*$ is 
 \begin{equation}
   \label{eq:Zstar}
-  \bm{Z}^*=\bm{Z}\bm{S}\bm{T}
+  \bm{Z}^*=\bm{Z}\bm{T}\bm{S}
 \end{equation}
 so that
 \begin{equation}
   \label{eq:Zb}
-  \bm{Z}^*\bm{b}^*=\bm{Z}\bm{S}\bm{T}\bm{T}^{-1}\bm{S}^{-1}\bm{b}=\bm{Z}\bm{b} .
+  \bm{Z}^*\bm{b}^*=\bm{Z}\bm{T}\bm{S}\bm{S}^{-1}\bm{T}^{-1}\bm{b}=\bm{Z}\bm{b} .
 \end{equation}
 
 Notice that $\bm{Z}^*$ can be evaluated even when
@@ -431,7 +574,7 @@ to a penalized least squares problem
 \begin{equation}
   \label{eq:bstarmode}
   \begin{split}
-    \tilde{\bm{b}^*}(\bm{\theta},\bm{\beta}|\bm{y})&=
+    \tilde{\bm{b}}^*(\bm{\theta},\bm{\beta}|\bm{y})&=
     \arg\min_{\bm{b}^*} \left[
     \left\|\bm{y}-\bm{X}\bm{\beta}-\bm{Z}^*\bm{b}^*\right\|^2
     +{\bm{b}^*}\trans\bm{b}^*\right]\\
@@ -450,21 +593,21 @@ to a penalized least squares problem
         \bm{b}^*\\
         \bm{\beta}
       \end{bmatrix}
-      \right\|^2
+      \right\|^2 .
   \end{split}
 \end{equation}
-In fact, if we optimize penalized least squares expression in
+In fact, if we optimize the penalized least squares expression in
 (\ref{eq:bstarmode}) with respect to both $\bm{b}$ and $\bm{\beta}$ we
 obtain the conditional estimates
-$\hat{\bm{\beta}}(\bm{\theta}|\bm{y})$ and the conditional modes 
-$\tilde{\bm{b}^*}(\bm{\theta},\hat{\bm{\beta}}(\bm{\theta})|\bm{y}))$
-which we write as $\widehat{\bm{b}^*}(\bm{\theta})$.  That is,
+$\widehat{\bm{\beta}}(\bm{\theta}|\bm{y})$ and the conditional modes 
+$\tilde{\bm{b}}^*(\bm{\theta},\widehat{\bm{\beta}}(\bm{\theta})|\bm{y}))$
+which we write as $\widehat{\bm{b}}^*(\bm{\theta})$.  That is,
 \begin{equation}
   \label{eq:bstarbeta}
   \begin{split}
     \begin{bmatrix}
       \widehat{\bm{b}^*}(\bm{\theta})\\
-      \hat{\bm{\beta}}(\bm{\theta})
+      \widehat{\bm{\beta}}(\bm{\theta})
     \end{bmatrix} & =
     \arg\min_{\bm{b}^*,\bm{\beta}}
     \left\|
@@ -559,7 +702,7 @@ $\hat{\beta}(\bm{\theta})$, the solutions to the sparse triangular system
   \bm{L}(\bm{\theta})\trans\bm{P}
   \begin{bmatrix}
     \widehat{\bm{b}^*}(\bm{\theta})\\
-    \hat{\bm{\beta}}(\bm{\theta})\\
+    \widehat{\bm{\beta}}(\bm{\theta})\\
     1
   \end{bmatrix}=
   \begin{bmatrix}
@@ -574,25 +717,38 @@ element on the diagonal and $\bm{P}$ a permutation that does not move
 the last row, the solution for this ``unknown'' will always be $1$.)
 Furthermore, $\log|{\bm{Z}^*}\trans\bm{Z}+\bm{I}|$ can be evaluated as
 the sum of the logarithms of the first $q$ diagonal elements of
-$\bm{L}(\bm{\theta})$.  
+$\bm{L}(\bm{\theta})$.
 
-The \emph{profiled deviance function}, $d(\bm{\theta})$, which is negative
-twice the log-likelihood of model (\ref{eq:lmm}) evaluated at
-$\bm{\Sigma}(\bm{\theta})$, $\hat{\bm{\beta}}(\bm{\theta})$ and
-$\hat{\sigma}^2(\bm{\theta})$, can be evaluated as
+The \emph{profiled deviance function},
+$\tilde{\mathcal{D}}(\bm{\theta})$, which is negative twice the
+log-likelihood of model (\ref{eq:lmm}) evaluated at
+$\bm{\Sigma}(\bm{\theta})$, $\widehat{\bm{\beta}}(\bm{\theta})$ and
+$\hat{\sigma}^2(\bm{\theta})$, can be expressed as
 \begin{equation}
   \label{eq:dtheta}
-  d(\bm{theta})=
-    \log\left|{\bm{Z}^*}\trans\bm{Z}+\bm{I}\right|+
-    n\left(1+\log\frac{2\pi r^2}{n}\right) .
+  \tilde{\mathcal{D}}(\bm{\theta})=
+  \log\left|{\bm{Z}^*}\trans\bm{Z}^*+\bm{I}\right|+
+  n\left(1+\log\frac{2\pi r^2}{n}\right) .
 \end{equation}
 
 Notice that it is not necessary to solve for
-$\hat{\bm{\beta}}(\bm{\theta})$ or $\widehat{\bm{b}^*}(\bm{\theta})$
+$\widehat{\bm{\beta}}(\bm{\theta})$ or $\widehat{\bm{b}}^*(\bm{\theta})$
 or $\widehat{\bm{b}}(\bm{\theta})$ to be able to evaluate
 $d(\bm{\theta})$.  All that is needed is to update $\bm{A}$ to form
 $\bm{A}^*$ from which the sparse Cholesky decomposition
-$\bm{L}(\bm{\theta})$ can be calculated.
+$\bm{L}(\bm{\theta})$ can be calculated and
+$\tilde{\mathcal{D}}(\bm{\theta})$ evaluated.
+
+Once $\hat{\bm{\theta}}$ is determined we can solve for
+$\widehat{\bm{\beta}}(\hat{\bm{\theta}})$
+and $\widehat{\bm{b}}^*(\bm{\theta})$ using (\ref{eq:soln}) and for
+\begin{equation}
+  \label{eq:3}
+  \widehat{\sigma}^2(\hat{\bm{\theta}})=\frac{r^2(\hat{\bm{\theta}})}{n} .
+\end{equation}
+Furthermore,
+$\widehat{\bm{b}}(\hat{\bm{\theta}})=
+\bm{S}\bm{T}\widehat{\bm{b}}^*(\hat{\bm{\theta}})$.
 
 \section{Methods for singular $\bm{\Sigma}$}
 \label{sec:singular}
@@ -603,12 +759,37 @@ the matrix $\bm{A}^*$ is non-singular and elements of $\bm{b}^*$
 corresponding to the zeroed columns in $\bm{Z}^*$ approach zero
 smoothly as $\bm{\theta}$ approaches the boundary.  Thus
 $r(\bm{\theta})$ and $\left|{\bm{Z}^*}\trans\bm{Z}+\bm{I}\right|$ are
-well-defined, as is $d(\bm{\theta})$ and the conditional modes
-$\widehat{\bm{b}}(\bm{\theta})$.
+well-defined, as are $\tilde{\mathcal{D}}(\bm{\theta})$ and the
+conditional modes $\widehat{\bm{b}}(\bm{\theta})$.
 
 In other words, (\ref{eq:Astar}) and (\ref{eq:Lmat}) can be used to
-define $d(\bm{\theta})$ whether or not $\bm{\theta}$ is on the
-boundary.
+define $\tilde{\mathcal{D}}(\bm{\theta})$ whether or not $\bm{\theta}$
+is on the boundary.
+
+\section{REML estimates}
+\label{sec:reml-estimates}
+
+It is common to estimate the per-observation noise variance $\sigma^2$
+in a fixed-effects linear model as $\hat{\sigma}^2=r^2/(n-p)$ where
+$r^2$ is the (unpenalized) residual sum-of-squares, $n$ is the number
+of observations and $p$ is the number of fixed-effects parameters.
+This is not the maximum likelihood estimate of $\sigma^2$, which is
+$r^2/n$.  It is the ``restricted'' or ``residual'' maximum likelihood
+(REML) estimate, which takes into account that the residual vector
+$\bm{y}-\hat{\bm{y}}$ is constrained to a linear subspace of dimension
+$n-p$ in the response space.  Thus its squared length,
+$\left\|bm{y}-\hat{\bm{y}}\right\|^2=r^2$, has only $n=p$
+\emph{degrees of freedom} associated with it.
+
+The profiled REML deviance for a linear mixed model can be expressed as
+\begin{equation}
+  \label{eq:REMLdev}
+  \tilde{\mathcal{D}}_R(\bm{\theta})=
+  \log\left|{\bm{Z}^*}\trans\bm{Z}^*+\bm{I}\right|+
+  (n-p)\left(1+\log\frac{2\pi r^2}{n-p}\right) .
+\end{equation}
+
+
 
 \bibliography{lme4}
 \end{document}
