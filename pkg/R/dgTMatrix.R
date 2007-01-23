@@ -36,11 +36,7 @@ setAs("dgTMatrix", "dsTMatrix",
 	  else stop("not a symmetric matrix")})
 
 setAs("dgTMatrix", "dtTMatrix",
-      function(from) {
-	  if(isTr <- isTriangular(from))
-	      gt2tT(from, uplo = attr(isTr, "kind"),
-		    diag = "N") ## improve: also test for unit diagonal
-	  else stop("not a triangular matrix")})
+      function(from) check.gt2tT(from, getClassDef("dgTMatrix")))
 
 setAs("matrix", "dgTMatrix",
       function(from) {

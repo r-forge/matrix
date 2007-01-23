@@ -1,3 +1,17 @@
+2007-01-22  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/triangularMatrix.R: new file; simple triu() and tril() methods.
+
+	* R/Ops.R ("Logic"): and other "Ops", many updates
+
+2007-01-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Mutils.h (SET_DimNames): new utility
+
+	* R/Auxiliaries.R (nnzero): improved and now exported via
+
+	* NAMESPACE: + nnzero(); length() == prod(dim(.)) method for all "Matrix" objects
+
 2007-01-17  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/diagMatrix.R (!): fix typo.

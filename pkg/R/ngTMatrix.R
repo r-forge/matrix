@@ -30,6 +30,10 @@ setAs("ngTMatrix", "dgTMatrix",
           ## cannot copy factors, but can we use them?
           Dim = from@Dim, Dimnames= from@Dimnames))
 
+setAs("ngTMatrix", "ntTMatrix",
+      function(from) check.gt2tT(from, getClassDef("ngTMatrix")))
+
+
 setMethod("t", signature(x = "ngTMatrix"),
 	  function(x) new("ngTMatrix", i = x@j, j = x@i,
 			  Dim = x@Dim[2:1],

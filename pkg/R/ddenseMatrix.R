@@ -4,13 +4,11 @@
 ## >> but << needs all sub(sub(sub)) classes of "ddenseMatrix" listed
 ##   -----  in  ../src/Mutils.c
 
-## Should this method return 'from' without duplication when it has
-## class dgeMatrix?
 setAs("ddenseMatrix", "dgeMatrix",
       function(from) {
-          if (class(from) != "dgeMatrix")
-              from <- .Call(dup_mMatrix_as_dgeMatrix, from)
-          from
+	  if (class(from) != "dgeMatrix")
+	      .Call(dup_mMatrix_as_dgeMatrix, from)
+	  else from
       })
 
 ## d(ouble) to l(ogical):

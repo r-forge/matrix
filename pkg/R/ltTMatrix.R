@@ -9,6 +9,9 @@ setAs("ltTMatrix", "lgTMatrix",
       function(from) new("lgTMatrix", i = from@i, j = from@j, x = from@x,
                          Dim = from@Dim, Dimnames = from@Dimnames))
 
+setAs("ltTMatrix", "ltCMatrix",
+      function(from) .Call(Tsparse_to_Csparse, from, TRUE))
+
 setAs("ltTMatrix", "dtTMatrix",
       function(from) new("dtTMatrix", i = from@i, j = from@j,
                          x = rep.int(1, length(from@i)), uplo = from@uplo,

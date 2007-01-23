@@ -11,8 +11,12 @@
 \alias{ltTMatrix-class}
 \alias{lsTMatrix-class}
 % Group(like)
-\alias{Logic,lsparseMatrix,lsparseMatrix-method}
+\alias{Ops,lsparseMatrix,lsparseMatrix-method}
+\alias{Arith,lgCMatrix,lgCMatrix-method}
+\alias{Arith,lgTMatrix,lgTMatrix-method}
+\alias{Compare,lsparseMatrix,lsparseCMatrix-method}
 \alias{Logic,lgCMatrix,lgCMatrix-method}
+\alias{Logic,lgTMatrix,lgTMatrix-method}
 \alias{-,lsparseMatrix,missing-method}
 \alias{!,lsparseMatrix-method}
 %
@@ -23,14 +27,17 @@
 \alias{chol,lsCMatrix,logical-method}
 \alias{chol,lsCMatrix,missing-method}
 
+\alias{coerce,lsparseMatrix,matrix-method}
 \alias{coerce,lgCMatrix,dgCMatrix-method}
 \alias{coerce,lgCMatrix,lgTMatrix-method}
-\alias{coerce,lgCMatrix,lsCMatrix-method}
 \alias{coerce,lgCMatrix,lgeMatrix-method}
+\alias{coerce,lgCMatrix,lsCMatrix-method}
+\alias{coerce,lgCMatrix,ltCMatrix-method}
 \alias{coerce,lgCMatrix,matrix-method}
 \alias{coerce,lgTMatrix,dgTMatrix-method}
 \alias{coerce,lgTMatrix,lgCMatrix-method}
 \alias{coerce,lgTMatrix,lsCMatrix-method}
+\alias{coerce,lgTMatrix,ltTMatrix-method}
 \alias{coerce,lgTMatrix,matrix-method}
 \alias{coerce,lsCMatrix,dgTMatrix-method}
 \alias{coerce,lsCMatrix,dsCMatrix-method}
@@ -39,22 +46,23 @@
 \alias{coerce,lsCMatrix,lsTMatrix-method}
 \alias{coerce,lsCMatrix,matrix-method}
 \alias{coerce,lsTMatrix,dsTMatrix-method}
+\alias{coerce,lsTMatrix,lgCMatrix-method}
 \alias{coerce,lsTMatrix,lgTMatrix-method}
 \alias{coerce,lsTMatrix,lsCMatrix-method}
 \alias{coerce,lsTMatrix,matrix-method}
-\alias{coerce,ltCMatrix,dtCMatrix-method}
 \alias{coerce,ltCMatrix,dMatrix-method}
+\alias{coerce,ltCMatrix,dtCMatrix-method}
 \alias{coerce,ltCMatrix,lgCMatrix-method}
+\alias{coerce,ltCMatrix,ltTMatrix-method}
 \alias{coerce,ltCMatrix,matrix-method}
-\alias{coerce,matrix,lgCMatrix-method}
-\alias{coerce,matrix,lsCMatrix-method}
-\alias{coerce,matrix,lgTMatrix-method}
-\alias{coerce,matrix,ltCMatrix-method}
-%
-\alias{coerce,lsparseMatrix,matrix-method}
 \alias{coerce,ltTMatrix,dtTMatrix-method}
 \alias{coerce,ltTMatrix,lgTMatrix-method}
+\alias{coerce,ltTMatrix,ltCMatrix-method}
 \alias{coerce,ltTMatrix,matrix-method}
+\alias{coerce,matrix,lgCMatrix-method}
+\alias{coerce,matrix,lgTMatrix-method}
+\alias{coerce,matrix,lsCMatrix-method}
+\alias{coerce,matrix,ltCMatrix-method}
 %
 \alias{crossprod,lgCMatrix,missing-method}
 \alias{crossprod,lgTMatrix,missing-method}
@@ -145,11 +153,11 @@
   the class \code{\linkS4class{dgCMatrix}}
 }
 \examples{
-str(m <- Matrix(c(0,0,2:0), 3,5, dimnames=list(LETTERS[1:3],NULL)))
+(m <- Matrix(c(0,0,2:0), 3,5, dimnames=list(LETTERS[1:3],NULL)))
 (lm <- (m > 1)) # lgC
-stopifnot(is(lm,"lsparseMatrix"))
 !lm     # no longer sparse
-%% FIXME:  m <= 1   -- unfinished implementation ( ../R/dMatrix.R )
+stopifnot(is(lm,"lsparseMatrix"),
+          identical(!lm, m <= 1))
 
 data(KNex)
 str(mmG.1 <- (KNex $ mm) > 0.1)# "lgC..."
@@ -162,7 +170,9 @@ stopifnot(validObject(lmG.1), identical(lmG.1, mmG.1))
 
 class(xnx <- crossprod(nmG.1))# "nsC.."
 class(xlx <- crossprod(mmG.1))# "dsC.." : numeric
-table(xlx@x != 0)# almost have are (non-structural!) 0
+is0 <- (xlx == 0)
+sum(as.vector(is0))# quite sparse, but
+table(xlx@x == 0)# more than half of the entries are (non-structural!) 0
 stopifnot(isSymmetric(xlx), isSymmetric(xnx),
           ## compare xnx and xlx :
           sapply(slotNames(xnx),

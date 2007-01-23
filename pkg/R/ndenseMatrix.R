@@ -72,7 +72,7 @@ setAs("ngeMatrix", "ntrMatrix",
       function(from) {
 	  if(isT <- isTriangular(from))
 	      new("ntrMatrix", x = from@x, Dim = from@Dim,
-		  Dimnames = from@Dimnames, uplo = attr(isT, "kind"))
+		  Dimnames = from@Dimnames, uplo = .if.NULL(attr(isT, "kind"), "U"))
           ## TODO: also check 'diag'
 	  else stop("not a triangular matrix")
       })
@@ -111,6 +111,29 @@ setAs("ndenseMatrix", "matrix", ## uses the above l*M. -> lgeM.
 
 ## dense |-> compressed :
 
+## go via "l" because dense_to_Csparse can't be used for "n" [missing CHOLMOD function]
+setAs("ndenseMatrix", "CsparseMatrix",
+      function(from) as(as(as(from, "lMatrix"), "CsparseMatrix"), "nMatrix"))
+setAs("ndenseMatrix", "sparseMatrix",
+      function(from) as(as(as(from, "lMatrix"), "sparseMatrix"), "nMatrix"))
+
+setAs("ndenseMatrix", "TsparseMatrix",
+      function(from) {
+	  if(is(from, "generalMatrix")) {
+	      ##  cheap but not so efficient:
+	      ij <- which(as(from,"matrix"), arr.ind = TRUE) - 1:1
+	      new("ngTMatrix", i = ij[,1], j = ij[,2],
+		  Dim = from@Dim, Dimnames = from@Dimnames,
+		  factors = from@factors)
+	  }
+	  else
+	      ## triangular or	symmetric (have *no* diagonal nMatrix)
+	      ##     is delicate {packed or not, upper /lower indices ..} -> easy way
+	      as(as(as(from, "lMatrix"), "TsparseMatrix"), "nMatrix")
+      })
+
+## Not sure, if these are needed or more efficient than the above:
+## First one probably is
 setAs("ngeMatrix", "ngTMatrix",
       function(from) {
           ##  cheap but not so efficient:

@@ -11,10 +11,12 @@ setAs("dtpMatrix", "dtTMatrix",
       ## FIXME this is NOT efficient:
       function(from) {
 	  x <- as(from, "TsparseMatrix")
-	  if(is(x, "dtTMatrix"))
+          cld <- getClassDef(class(x))
+	  if(extends(cld, "dtTMatrix"))
 	      x
 	  else
-	      gt2tT(as(x, "dgTMatrix"), uplo = from@uplo, diag = from@diag)
+	      gt2tT(as(x, "dgTMatrix"),
+		    uplo = from@uplo, diag = from@diag, cld = cld)
       })
 
 setAs("dtpMatrix", "matrix",

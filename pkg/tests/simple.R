@@ -56,14 +56,28 @@ stopifnot(validObject(cu), validObject(tu. <- as(cu, "dtTMatrix")),
 	  identical(cu, as(tu., "dtCMatrix")),
 	  all(cu >= 0),
 	  any(cu >= 7),
-	  validObject(t(cu)),
-	  validObject(t(tu)))
+	  validObject(tcu <- t(cu)),
+	  validObject(ttu <- t(tu)))
 assert.EQ.mat(cu, as(tu,"matrix"), tol=0)
 cu[1,2] <- tu[1,2] <- NA
+if(FALSE)## FIXME: These now fail:
+    all(cu >= 0) & all(tu >= 0)
+
 mu <- as(tu,"matrix")
+## tu. is diag "U", but tu2 not:
+tu2 <- as(as(tu., "dgTMatrix"), "dtTMatrix")
 assert.EQ.mat(cu, mu, tol=0)
 stopifnot(identical3(cu[cu > 1],  tu [tu > 1], mu [mu > 1]),
-	  identical3(cu[cu <= 1], tu[tu <= 1], mu[mu <= 1]))
+	  identical3(cu[cu <= 1], tu[tu <= 1], mu[mu <= 1]),
+	  identical3(cu , triu(cu ), t(t(cu))),
+	  identical3(tu , triu(tu ), t(t(tu))),
+	  identical3(tu., triu(tu.), t(t(tu.))),
+	  identical(tu2, triu(tu2)),
+	  identical(tcu , tril(tcu)),
+	  identical(ttu , tril(ttu)),
+	  identical(t(tu), tril(t(tu)))
+          )
+
 
 ###-- Numeric Dense: Crossprod & Solve
 
@@ -197,9 +211,45 @@ if(FALSE) { # FIXME: this as(.,.) happily "works"
  validObject(mpo) # FIXME?  it is *not* really pos.definite!
 }
 
+###-- dense nonzero pattern:
+class(m <- Matrix(TRUE,2,2)) # lsy
+(n <- as(m, "nMatrix")) # nsy
+validObject(n)
+
+## 1)
+as(n,"CsparseMatrix") # used to give CHOLMOD error: invalid xtype...
+ls2 <- as(m, "CsparseMatrix") # works fine
+## and really  'm' and 'n' are interally slot identical (!!!)
+
+if(FALSE) ## FIXME
+as(n,"sparseMatrix")
+## Error ... no method
+
+if(FALSE) ## FIXME
+as(m,"sparseMatrix")
+## Error ... no method
+
+### -- now when starting with nsparse :
+nT <- new("ngTMatrix",
+          i = as.integer(c(0, 1, 0)),
+          j = as.integer(c(0, 0, 1)), Dim = as.integer(c(2,2)),
+          Dimnames = list(NULL, NULL))
+(nC <- as(nT, "ngCMatrix"))
+str(nC)# of course, no 'x' slot
+
+if(FALSE) ## FIXME
+as(nT,"denseMatrix")
+## Error no method ... ngT -> nge
+if(FALSE) ## FIXME
+as(as(nT, "lMatrix"),"denseMatrix")
+
+as(nC,"denseMatrix")
+
+
 ###-- sparse nonzero pattern : ----------
 
 (nkt <- as(as(kt1, "dgCMatrix"), "ngCMatrix"))# ok
+dkt <- as(nkt, "denseMatrix")
 (clt <- crossprod(nkt))
 crossprod(clt) ## a warning: crossprod() of symmetric
 

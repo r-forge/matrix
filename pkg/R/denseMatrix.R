@@ -155,11 +155,11 @@ setMethod("isTriangular", signature(object = "denseMatrix"), isTriMat)
 
 setMethod("isDiagonal", signature(object = "denseMatrix"), .is.diagonal)
 
-.as.dge.Fun <- function(x, na.rm = FALSE, dims = 1) {
-    x <- as(x, "dgeMatrix")
+.as.d.Fun <- function(x, na.rm = FALSE, dims = 1) {
+    x <- as(x, "dMatrix")
     callGeneric()
 }
-setMethod("colSums",  signature(x = "denseMatrix"), .as.dge.Fun)
-setMethod("colMeans", signature(x = "denseMatrix"), .as.dge.Fun)
-setMethod("rowSums",  signature(x = "denseMatrix"), .as.dge.Fun)
-setMethod("rowMeans", signature(x = "denseMatrix"), .as.dge.Fun)
+setMethod("colSums",  signature(x = "denseMatrix"), .as.d.Fun)
+setMethod("colMeans", signature(x = "denseMatrix"), .as.d.Fun)
+setMethod("rowSums",  signature(x = "denseMatrix"), .as.d.Fun)
+setMethod("rowMeans", signature(x = "denseMatrix"), .as.d.Fun)

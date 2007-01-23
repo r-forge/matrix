@@ -5,8 +5,8 @@
 setAs("lsTMatrix", "matrix",
       function(from) as(as(from, "lgTMatrix"), "matrix"))
 
-setAs("lsTMatrix", "lsCMatrix",
-      function(from) .Call(Tsparse_to_Csparse, from, FALSE))
+setAs("lsTMatrix", "lgCMatrix",
+      function(from) as(as(from, "lsCMatrix"), "lgCMatrix"))
 
 setAs("lsTMatrix", "lgTMatrix",
       function(from) new("lgTMatrix", i = from@i, j = from@j, x = from@x,

@@ -2,10 +2,13 @@
 \docType{class}
 \alias{ndenseMatrix-class}
 \alias{!,ndenseMatrix-method}
-\alias{Logic,ndenseMatrix,ndenseMatrix-method}
+\alias{Ops,ndenseMatrix,ndenseMatrix-method}
 \alias{as.logical,ndenseMatrix-method}
 \alias{coerce,matrix,ndenseMatrix-method}
 \alias{coerce,ndenseMatrix,matrix-method}
+\alias{coerce,ndenseMatrix,CsparseMatrix-method}
+\alias{coerce,ndenseMatrix,TsparseMatrix-method}
+\alias{coerce,ndenseMatrix,sparseMatrix-method}
 \alias{as.vector,ndenseMatrix,missing-method}
 %%-- These are already in ./nsparseMatrix-classes.Rd :
 %\alias{\%*\%,nsparseMatrix,ndenseMatrix-method}

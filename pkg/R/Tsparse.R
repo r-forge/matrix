@@ -7,7 +7,8 @@ setAs("TsparseMatrix", "CsparseMatrix",
                            is(from, "triangularMatrix"))
       )
 
-## special cases
+## Special cases   ("d", "l", "n")  %o%  ("g", "s", "t") :
+## used e.g. in triu()
 
 setAs("dgTMatrix", "dgCMatrix",
       function(from) .Call(Tsparse_to_Csparse, from, FALSE))
@@ -18,10 +19,25 @@ setAs("dsTMatrix", "dsCMatrix",
 setAs("dtTMatrix", "dtCMatrix",
       function(from) .Call(Tsparse_to_Csparse, from, TRUE))
 
-setAs("ngTMatrix", "ngCMatrix",
-      function(from) .Call(Tsparse_to_Csparse, from, FALSE))
+
 setAs("lgTMatrix", "lgCMatrix",
       function(from) .Call(Tsparse_to_Csparse, from, FALSE))
+
+setAs("lsTMatrix", "lsCMatrix",
+      function(from) .Call(Tsparse_to_Csparse, from, FALSE))
+
+setAs("ltTMatrix", "ltCMatrix",
+      function(from) .Call(Tsparse_to_Csparse, from, TRUE))
+
+
+setAs("ngTMatrix", "ngCMatrix",
+      function(from) .Call(Tsparse_to_Csparse, from, FALSE))
+
+setAs("nsTMatrix", "nsCMatrix",
+      function(from) .Call(Tsparse_to_Csparse, from, FALSE))
+
+setAs("ntTMatrix", "ntCMatrix",
+      function(from) .Call(Tsparse_to_Csparse, from, TRUE))
 
 ### "[" :
 ### -----
@@ -389,6 +405,7 @@ replTmat <- function (x, i, j, value)
 
     ## else: nA == 3  i.e.,  M [ cbind(ii,jj) ] <- value
     if(is.logical(i)) {
+	message(".TM.repl.i.2col(): drop 'matrix' case ...")
 	i <- c(i) # drop "matrix"
 	return( callNextMethod() )
     } else if(!is.numeric(i) || ncol(i) != 2)
@@ -568,10 +585,13 @@ setMethod("%*%", signature(x = "ANY", y = "TsparseMatrix"),
 #setMethod("%*%", signature(x = "ANY", y = "TsparseMatrix"),
 #          function(x, y) callGeneric(x, as(y, "CsparseMatrix")))
 
-setMethod("colSums", signature(x = "TsparseMatrix"), .as.dgT.Fun,
-	  valueClass = "numeric")
-setMethod("colMeans", signature(x = "TsparseMatrix"), .as.dgT.Fun,
-	  valueClass = "numeric")
+## Not needed, have identical "sparseMatrix"
+## setMethod("colSums", signature(x = "TsparseMatrix"), .as.dgT.Fun,
+## 	  valueClass = "numeric")
+## setMethod("colMeans", signature(x = "TsparseMatrix"), .as.dgT.Fun,
+## 	  valueClass = "numeric")
+##
+## Here, "sparseMatrix" uses .as.dgC.Fun:
 setMethod("rowSums", signature(x = "TsparseMatrix"), .as.dgT.Fun,
 	  valueClass = "numeric")
 setMethod("rowMeans", signature(x = "TsparseMatrix"), .as.dgT.Fun,
