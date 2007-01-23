@@ -21,6 +21,8 @@ paste0 <- function(...) paste(..., sep = '')
 
 .M.DN <- function(x) if(!is.null(dn <- dimnames(x))) dn else list(NULL,NULL)
 
+.if.NULL <- function(x, orElse) if(!is.null(x)) x else orElse
+
 .has.DN <- ## has non-trivial Dimnames slot?
     function(x) !identical(list(NULL,NULL), x@Dimnames)
 
@@ -208,7 +210,8 @@ nz.NA <- function(x, na.value) {
 ## Number of "structural" non-zeros --- this is  nnzmax() in Matlab
 ##        of effectively  non-zero values =      nnz()     "   "
 
-## FIXME? -- make this into a generic function (?)
+## Our nnzero() is like Matlab's nnz() -- but more sophisticated because of NAs
+## This is now exported!
 nnzero <- function(x, na.counted = NA) {
     ## na.counted: TRUE: NA's are counted, they are not 0
     ##		     NA: NA's are not known (0 or not) ==>  result := NA
@@ -220,21 +223,28 @@ nnzero <- function(x, na.counted = NA) {
 	sum(nz.NA(x, na.counted))
     else { ## Matrix
        iSym <- extends(cld, "symmetricMatrix")
-       if(extends(cld, "sparseMatrix"))
-	   (if(iSym) 2 else 1) *
-	       switch(.sp.class(cl),
-		      "CsparseMatrix" = length(x@i),
-		      "TsparseMatrix" = length(x@i),
-		      "RsparseMatrix" = length(x@j))
-	else if(extends(cld, "diagonalMatrix"))
+       if(extends(cld, "pMatrix")) # is "sparse" too
+	   nrow(x)
+       else if(extends(cld, "sparseMatrix")) {
+	   nn <-
+	       if(extends(cld, "nMatrix")) # <==> no 'x' slot
+		   switch(.sp.class(cl),
+			  "CsparseMatrix" = length(x@i),
+			  "TsparseMatrix" = length(x@i),
+			  "RsparseMatrix" = length(x@j))
+	       else ## consider NAs in 'x' slot:
+		   sum(nz.NA(x@x, na.counted))
+	   if(iSym) (nn+nn - sum(nz.NA(diag(x), na.counted))) else nn
+       }
+       else if(extends(cld, "diagonalMatrix"))
 	    sum(nz.NA(diag(x), na.counted))
-	else { ## dense, not diagonal: Can use 'x' slot;
-	    nn <- sum(nz.NA(as_geClass(x, cl)@x, na.counted))
-	    if(iSym && length(x@x) < prod(dim(x))) ## packed symmetric
-		## n(n+1)/2  |--> n^2
-		nn <- (nn + nn) - as.integer(sqrt(2*nn))
-	    nn
-	}
+       else { ## dense, not diagonal: Can use 'x' slot;
+           nn <- sum(nz.NA(as_geClass(x, cl)@x, na.counted))
+           if(iSym && length(x@x) < prod(dim(x))) ## packed symmetric
+               ## n(n+1)/2  |--> n^2
+               nn <- (nn + nn) - as.integer(sqrt(2*nn))
+           nn
+       }
     }
 }
 
@@ -445,6 +455,36 @@ n2l_spMatrix <- function(from) {
         Dim = from@Dim, Dimnames = from@Dimnames)
 }
 
+gt2tT <- function(x, uplo, diag, cld = getClassDef(class(x))) {
+    ## coerce *gTMatrix to *tTMatrix {general -> triangular}
+    i <- x@i
+    j <- x@j
+    sel <-
+	if(uplo == "U") {
+	    if(diag == "U") i < j else i <= j
+	} else {
+	    if(diag == "U") i > j else i >= j
+	}
+    i <- i[sel]
+    j <- j[sel]
+    if(extends(cld, "nMatrix")) # no 'x' slot
+	new("ntTMatrix", i = i, j = j, uplo = uplo, diag = diag,
+	    Dim = x@Dim, Dimnames = x@Dimnames)
+    else
+	new(paste(substr(class(x), 1,1), # "d", "l", "i" or "z"
+		  "tTMatrix", sep=''),
+	    i = i, j = j, uplo = uplo, diag = diag,
+	    x = x@x[sel], Dim = x@Dim, Dimnames = x@Dimnames)
+}
+
+check.gt2tT <- function(from, cld = getClassDef(from)) {
+    if(isTr <- isTriangular(from))
+	gt2tT(from, uplo = .if.NULL(attr(isTr, "kind"), "U"),
+	      diag = "N", ## improve: also test for unit diagonal
+	      cld = cld)
+    else stop("not a triangular matrix")
+}
+
 if(FALSE)# unused
 l2d_meth <- function(x) {
     cl <- class(x)
@@ -501,7 +541,7 @@ class2 <- function(cl, kind = "l", do.sub = TRUE) {
     ## Find "corresponding" class; since pos.def. matrices have no pendant:
     if	   (cl == "dpoMatrix") paste(kind, "syMatrix", sep='')
     else if(cl == "dppMatrix") paste(kind, "spMatrix", sep='')
-    else if(do.sub) sub("^d", kind, cl)
+    else if(do.sub) sub("^[a-z]", kind, cl)
     else cl
 }
 
