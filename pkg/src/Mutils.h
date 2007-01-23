@@ -79,7 +79,17 @@ extern	 /* stored pointers to symbols initialized in R_init_Matrix */
 #define PACKED_LENGTH(n)   ((n) * ((n) + 1))/2
 
 /* duplicate the slot with name given by sym from src to dest */
+/* FIXME: is not yet used */
 #define slot_dup(dest, src, sym)  SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
+
+#define slot_nonNull_dup(dest, src, sym)			\
+    if(GET_SLOT(src, sym) != R_NilValue)			\
+	SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
+
+/* TODO: Make this faster for the case where dimnames = list(NULL,NULL)
+ *       and hence don't have to be set ! */
+#define SET_DimNames(dest, src) slot_dup(dest, src, Matrix_DimNamesSym)
+
 
 #define uplo_P(_x_) CHAR(STRING_ELT(GET_SLOT(_x_, Matrix_uploSym), 0))
 #define diag_P(_x_) CHAR(STRING_ELT(GET_SLOT(_x_, Matrix_diagSym), 0))

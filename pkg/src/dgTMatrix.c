@@ -37,6 +37,7 @@ SEXP dgTMatrix_to_dgeMatrix(SEXP x)
 
     SET_SLOT(ans, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(ans, Matrix_DimSym, duplicate(dd));
+    SET_DimNames(ans, x);
     SET_SLOT(ans, Matrix_xSym, allocVector(REALSXP, m * n));
     insert_triplets_in_array(m, n, length(islot),
 			     INTEGER(islot), INTEGER(GET_SLOT(x, Matrix_jSym)),
@@ -49,11 +50,14 @@ SEXP dgTMatrix_to_dgeMatrix(SEXP x)
 SEXP dgTMatrix_to_matrix(SEXP x)
 {
     SEXP dd = GET_SLOT(x, Matrix_DimSym),
+	dn = GET_SLOT(x, Matrix_DimNamesSym),
 	islot = GET_SLOT(x, Matrix_iSym);
     int m = INTEGER(dd)[0],
 	n = INTEGER(dd)[1];
     SEXP ans = PROTECT(allocMatrix(REALSXP, m, n));
-
+    if(VECTOR_ELT(dn, 0) != R_NilValue || VECTOR_ELT(dn, 1) != R_NilValue)
+	/* matrix() with non-trivial dimnames */
+	setAttrib(ans, R_DimNamesSymbol, duplicate(dn));
     insert_triplets_in_array(m, n, length(islot),
 			     INTEGER(islot), INTEGER(GET_SLOT(x, Matrix_jSym)),
 			     REAL(GET_SLOT(x, Matrix_xSym)),
