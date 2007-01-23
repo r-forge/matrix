@@ -36,6 +36,7 @@
 \alias{dim,Matrix-method}
 \alias{dimnames,Matrix-method}
 \alias{dimnames<-,Matrix,list-method}
+\alias{length,Matrix-method}
 \alias{show,Matrix-method}
 \alias{as.array,Matrix-method}
 \alias{as.matrix,Matrix-method}
@@ -48,6 +49,7 @@
 \alias{coerce,matrix,Matrix-method}
 \alias{coerce,Matrix,denseMatrix-method}
 \alias{coerce,Matrix,sparseMatrix-method}
+\alias{Arith,Matrix,Matrix-method}
 \alias{Ops,Matrix,Matrix-method}
 \alias{Ops,Matrix,ANY-method}
 \alias{Ops,ANY,Matrix-method}
@@ -90,6 +92,8 @@
     \item{dimnames<-}{\code{signature(x = "Matrix", value = "list")}: set
       the \code{dimnames} to a \code{\link{list}} of length 2, see
       \code{\link{dimnames<-}}.}
+    \item{length}{\code{signature(x = "Matrix")}: simply defined as
+      \code{prod(dim(x))} (and hence of mode \code{"double"}).}
     \item{show}{\code{signature(object = "Matrix")}: \code{\link{show}}
       method for \code{\link{print}}ing.}
     \item{head}{\code{signature(object = "Matrix")}: return only the

@@ -57,6 +57,8 @@ setMethod("isDiagonal", signature(object = "matrix"), .is.diagonal)
 setMethod("dim", signature(x = "Matrix"),
 	  function(x) x@Dim, valueClass = "integer")
 
+setMethod("length", "Matrix", function(x) prod(dim(x)))
+
 setMethod("dimnames", signature(x = "Matrix"), function(x) x@Dimnames)
 
 
@@ -79,9 +81,9 @@ setMethod("unname", signature("Matrix", force="missing"),
 	  function(obj) { obj@Dimnames <- list(NULL,NULL); obj})
 
 setMethod("all", signature(x = "Matrix"),
-          function(x, ..., na.rm) { x <- as(x, "lMatrix"); callNextMethod()})
+          function(x, ..., na.rm) { x <- as(x, "lMatrix"); callGeneric()})
 setMethod("any", signature(x = "Matrix"),
-          function(x, ..., na.rm) { x <- as(x, "lMatrix"); callNextMethod()})
+          function(x, ..., na.rm) { x <- as(x, "lMatrix"); callGeneric()})
 
 
 
@@ -358,6 +360,7 @@ setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
 	else if(!is.numeric(i) || nc != 2)
 	    stop("such indexing must be by logical or 2-column numeric matrix")
 	if(is.logical(i)) {
+	    message(".M.repl.i.2col(): drop 'matrix' case ...")
 	    i <- c(i) # drop "matrix"
 	    return( callNextMethod() )
         }

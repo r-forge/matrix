@@ -3,7 +3,7 @@
 \alias{ldenseMatrix-class}
 % Group
 \alias{!,ldenseMatrix-method}
-\alias{Logic,ldenseMatrix,ldenseMatrix-method}
+\alias{Ops,ldenseMatrix,ldenseMatrix-method}
 \alias{Logic,ldenseMatrix,lsparseMatrix-method}
 \alias{Logic,lsparseMatrix,ldenseMatrix-method}
 % purely "sparse" are in ./lsparseMatrix-classes.Rd

@@ -412,22 +412,19 @@ setClass("lsCMatrix",
 setClass("lgRMatrix",
 	 representation(j = "integer", p = "integer"),
 	 contains = c("RsparseMatrix", "lsparseMatrix", "generalMatrix"),
-	 validity =
-	 function(object) .Call(lgRMatrix_validate, object)
+	 ##TODO: validity = function(object) .Call(lgRMatrix_validate, object)
 	 )
 
 ## logical, sparse, sorted compressed sparse row-oriented triangular matrices
 setClass("ltRMatrix",
 	 contains = c("RsparseMatrix", "lsparseMatrix", "triangularMatrix"),
-	 validity =
-	 function(object) .Call(ltRMatrix_validate, object)
+	 ##TODO: validity = function(object) .Call(ltRMatrix_validate, object)
 	 )
 
 ## logical, sparse, sorted compressed sparse row-oriented symmetric matrices
 setClass("lsRMatrix",
 	 contains = c("RsparseMatrix", "lsparseMatrix", "symmetricMatrix"),
-	 validity =
-	 function(object) .Call(lsRMatrix_validate, object)
+	 ##TODO: validity = function(object) .Call(lsRMatrix_validate, object)
 	 )
 
 ##---------- nonzero pattern sparse matrix classes ---------------------------
@@ -478,18 +475,20 @@ setClass("nsCMatrix",
 
 ## nonzero pattern, sparse, sorted compressed row-oriented general matrices
 setClass("ngRMatrix",
-	 representation(j = "integer", p = "integer"),
-	 contains = c("RsparseMatrix", "nsparseMatrix", "generalMatrix")
+	 contains = c("RsparseMatrix", "nsparseMatrix", "generalMatrix"),
+	 prototype = prototype(p = 0:0)# to be valid
 	 )
 
 ## nonzero pattern, sparse, sorted compressed row-oriented triangular matrices
 setClass("ntRMatrix",
-	 contains = c("RsparseMatrix", "nsparseMatrix", "triangularMatrix")
+	 contains = c("RsparseMatrix", "nsparseMatrix", "triangularMatrix"),
+	 prototype = prototype(p = 0:0, uplo = "U", diag = "N")# to be valid
 	 )
 
 ## nonzero pattern, sparse, sorted compressed row-oriented symmetric matrices
 setClass("nsRMatrix",
-	 contains = c("RsparseMatrix", "nsparseMatrix", "symmetricMatrix")
+	 contains = c("RsparseMatrix", "nsparseMatrix", "symmetricMatrix"),
+	 prototype = prototype(p = 0:0, uplo = "U")# to be valid
 	 )
 
 ##-------------------- permutation ----------------------------------------

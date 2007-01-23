@@ -33,6 +33,9 @@ setAs("pMatrix", "ngTMatrix",
 setAs("pMatrix", "TsparseMatrix", function(from) as(from, "ngTMatrix"))
 setAs("pMatrix", "nMatrix",	  function(from) as(from, "ngTMatrix"))
 
+setAs("pMatrix", "CsparseMatrix",
+      function(from) as(as(from, "ngTMatrix"), "CsparseMatrix"))
+
 
 setMethod("solve", signature(a = "pMatrix", b = "missing"),
 	  function(a, b) {

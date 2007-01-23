@@ -102,3 +102,10 @@ Check for DimNames propagation in coercion and other operations.
   e.g. zapsmall(<pMatrix>) fails "badly"
 
 - speedup: pass class definition to non0ind() [check all calls ..]
+
+- sum(): implement methods which work for *all* our matrices.
+
+- Implement  expand(.) for the Cholesky() results
+  "dCHMsimpl" and  "dCHMsuper"  -- currently have no *decent* way to get at
+  the matrix factors of the corresponding matrix factorization !!
+
