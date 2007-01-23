@@ -8,7 +8,7 @@ cholmod_common c;
  * the result should *not* be freed with cholmod_sparse_free.  Use
  * Free on the result.
  *
- * @param x pointer to an object that inherits from TsparseMatrix
+ * @param x pointer to an object that inherits from CsparseMatrix
  *
  * @return pointer to a cholmod_triplet object that contains pointers
  * to the slots of x.
@@ -310,38 +310,42 @@ SEXP chm_triplet_to_SEXP(cholmod_triplet *a, int dofree, int uploT, int Rkind,
  */
 cholmod_dense *as_cholmod_dense(SEXP x)
 {
-    cholmod_dense *ans = Calloc(1, cholmod_dense);
-    char *valid[] = {"dmatrix", "dgeMatrix",
-		     "lmatrix", "lgeMatrix",
-		     "nmatrix", "ngeMatrix",
-		     "zmatrix", "zgeMatrix", ""};
-    int dims[2], ctype = Matrix_check_class(class_P(x), valid), nprot = 0;
+#define _AS_cholmod_dense_1						\
+    cholmod_dense *ans = Calloc(1, cholmod_dense);			\
+    char *valid[] = {"dmatrix", "dgeMatrix",				\
+		     "lmatrix", "lgeMatrix",				\
+		     "nmatrix", "ngeMatrix",				\
+		     "zmatrix", "zgeMatrix", ""};			\
+    int dims[2], ctype = Matrix_check_class(class_P(x), valid), nprot = 0; \
+									\
+    if (ctype < 0) {		/* not a classed matrix */		\
+	if (isMatrix(x)) Memcpy(dims, INTEGER(getAttrib(x, R_DimSymbol)), 2); \
+	else {dims[0] = LENGTH(x); dims[1] = 1;}			\
+	if (isInteger(x)) {						\
+	    x = PROTECT(coerceVector(x, REALSXP));			\
+	    nprot++;							\
+	}								\
+	ctype = (isReal(x) ? 0 :					\
+		 (isLogical(x) ? 2 : /* logical -> default to "l", not "n" */ \
+		  (isComplex(x) ? 6 : -1)));				\
+    } else Memcpy(dims, INTEGER(GET_SLOT(x, Matrix_DimSym)), 2);	\
+    if (ctype < 0) error("invalid class of object to as_cholmod_dense"); \
+				/* characteristics of the system */	\
+    ans->dtype = CHOLMOD_DOUBLE;					\
+    ans->x = ans->z = (void *) NULL;					\
+				/* dimensions and nzmax */		\
+    ans->d = ans->nrow = dims[0];					\
+    ans->ncol = dims[1];						\
+    ans->nzmax = dims[0] * dims[1];					\
+				/* set the xtype and any elements */	\
+    switch(ctype / 2) {							\
+    case 0: /* "d" */							\
+	ans->xtype = CHOLMOD_REAL;					\
+	ans->x = (void *) REAL((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x); \
+	break
 
-    if (ctype < 0) {		/* not a classed matrix */
-	if (isMatrix(x)) Memcpy(dims, INTEGER(getAttrib(x, R_DimSymbol)), 2);
-	else {dims[0] = LENGTH(x); dims[1] = 1;}
-	if (isInteger(x)) {
-	    x = PROTECT(coerceVector(x, REALSXP));
-	    nprot++;
-	}
-	ctype = (isReal(x) ? 0 :
-		 (isLogical(x) ? 2 : /* logical -> default to "l", not "n" */
-		  (isComplex(x) ? 6 : -1)));
-    } else Memcpy(dims, INTEGER(GET_SLOT(x, Matrix_DimSym)), 2);
-    if (ctype < 0) error("invalid class of object to as_cholmod_dense");
-				/* characteristics of the system */
-    ans->dtype = CHOLMOD_DOUBLE;
-    ans->x = ans->z = (void *) NULL;
-				/* dimensions and nzmax */
-    ans->d = ans->nrow = dims[0];
-    ans->ncol = dims[1];
-    ans->nzmax = dims[0] * dims[1];
-				/* set the xtype and any elements */
-    switch(ctype / 2) {
-    case 0: /* "d" */
-	ans->xtype = CHOLMOD_REAL;
-	ans->x = (void *) REAL((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x);
-	break;
+    _AS_cholmod_dense_1;
+
     case 1: /* "l" */
 	ans->xtype = CHOLMOD_REAL;
 	ans->x =
@@ -352,14 +356,39 @@ cholmod_dense *as_cholmod_dense(SEXP x)
 	ans->xtype = CHOLMOD_PATTERN;
 	ans->x = (void *) LOGICAL((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x);
 	break;
-    case 3: /* "z" */
-	ans->xtype = CHOLMOD_COMPLEX;
-	ans->x = (void *) COMPLEX((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x);
-	break;
-    }
-    UNPROTECT(nprot);
-    return ans;
+
+#define _AS_cholmod_dense_2						\
+    case 3: /* "z" */							\
+	ans->xtype = CHOLMOD_COMPLEX;					\
+	ans->x = (void *) COMPLEX((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x); \
+	break;								\
+    }									\
+    UNPROTECT(nprot);							\
+    return ans
+
+    _AS_cholmod_dense_2;
 }
+
+/* version of as_cholmod_dense() that produces a cholmod_dense matrix
+ * with REAL 'x' slot -- i.e. treats "nMatrix" as "lMatrix" -- as only difference;
+ * Not just via a flag in as_cholmod_dense() since that has fixed API */
+cholmod_dense *as_cholmod_x_dense(SEXP x)
+{
+    _AS_cholmod_dense_1;
+
+    case 1: /* "l" */
+    case 2: /* "n" (no NA in 'x', but *has* 'x' slot => treat as "l" */
+	ans->xtype = CHOLMOD_REAL;
+	ans->x =
+	    (void *) REAL(coerceVector((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x,
+				       REALSXP));
+	break;
+
+    _AS_cholmod_dense_2;
+}
+
+#undef _AS_cholmod_dense_1
+#undef _AS_cholmod_dense_2
 
 void R_cholmod_error(int status, char *file, int line, char *message)
 {

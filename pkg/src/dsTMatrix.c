@@ -13,6 +13,7 @@ SEXP dsTMatrix_as_dsyMatrix(SEXP x)
 	*xx = REAL(GET_SLOT(x, Matrix_xSym));
 
     SET_SLOT(val, Matrix_DimSym, duplicate(DimP));
+    SET_DimNames(val, x);
     SET_SLOT(val, Matrix_uploSym, duplicate(GET_SLOT(x, Matrix_uploSym)));
     AZERO(tx, sz);
     for (k = 0; k < nnz; k++) tx[xi[k] + xj[k] * n] = xx[k];
@@ -43,7 +44,7 @@ SEXP dsTMatrix_as_dgTMatrix(SEXP x)
     vx =    REAL(ALLOC_SLOT(val, Matrix_xSym,REALSXP, nv));
 
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
-
+    SET_DimNames(val, x);
     /* copy the upper/lower triangle (including the diagonal) "at end" ([nv]): */
     nv = nnz - n0d;
     Memcpy(&vi[nv], xi, nnz);

@@ -75,7 +75,7 @@ cs *Matrix_as_cs(SEXP x)
 css *Matrix_as_css(SEXP x)
 {
     css *ans = Calloc(1, css);
-    char *cl = CHAR(asChar(getAttrib(x, R_ClassSymbol))),
+    char *cl = class_P(x);
 	*valid[] = {"css_LU", "css_QR", ""};
     int *nz = INTEGER(GET_SLOT(x, install("nz"))),
 	ctype = check_class(cl, valid);
@@ -151,7 +151,7 @@ SEXP Matrix_cs_to_SEXP(cs *a, char *cl, int dofree)
     SEXP ans;
     char *valid[] = {"dgCMatrix", "dsCMatrix", "dtCMatrix", ""};
     int *dims, ctype = check_class(cl, valid), nz;
-    
+
     if (ctype < 0)
 	error("invalid class of object to Matrix_cs_to_SEXP");
     ans = PROTECT(NEW_OBJECT(MAKE_CLASS(cl)));
@@ -193,7 +193,7 @@ SEXP Matrix_css_to_SEXP(css *S, char *cl, int dofree, int m, int n)
     SEXP ans;
     char *valid[] = {"css_LU", "css_QR", ""};
     int *nz, ctype = check_class(cl, valid);
-    
+
     if (ctype < 0)
 	error("Inappropriate class `%s' for Matrix_css_to_SEXP", cl);
     ans = PROTECT(NEW_OBJECT(MAKE_CLASS(cl)));
@@ -236,7 +236,7 @@ SEXP Matrix_csn_to_SEXP(csn *N, char *cl, int dofree)
     SEXP ans;
     char *valid[] = {"csn_LU", "csn_QR", ""};
     int ctype = check_class(cl, valid), n = (N->U)->n;
-    
+
     if (ctype < 0)
 	error("Inappropriate class `%s' for Matrix_csn_to_SEXP", cl);
     ans = PROTECT(NEW_OBJECT(MAKE_CLASS(cl)));

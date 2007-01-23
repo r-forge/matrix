@@ -45,6 +45,7 @@ SEXP dtTMatrix_as_dtrMatrix(SEXP x)
 	*xx = REAL(GET_SLOT(x, Matrix_xSym));
 
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
+    SET_DimNames(val, x);
     SET_SLOT(val, Matrix_uploSym, duplicate(GET_SLOT(x, Matrix_uploSym)));
     SET_SLOT(val, Matrix_diagSym, duplicate(GET_SLOT(x, Matrix_diagSym)));
     AZERO(tx, sz);
