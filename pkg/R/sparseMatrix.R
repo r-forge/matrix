@@ -189,7 +189,11 @@ setMethod("[", signature(x = "sparseMatrix",
 
 ## Group Methods
 
-##-> see ./Ops.R
+setMethod("Math",
+	  signature(x = "sparseMatrix"),
+	  function(x) callGeneric(as(x, "CsparseMatrix")))
+
+## further group methods -> see ./Ops.R
 
 
 
@@ -199,10 +203,12 @@ setMethod("[", signature(x = "sparseMatrix",
 ## - - -   prMatrix() from ./Auxiliaries.R
 prSpMatrix <- function(object, digits = getOption("digits"),
                        maxp = getOption("max.print"), zero.print = ".",
+                       row.trailer = '',
                        align = c("fancy", "right"))
 ## FIXME: prTriang() in ./Auxiliaries.R  should also get  align = "fancy"
 {
-    stopifnot(is(object, "sparseMatrix"))
+    cl <- getClassDef(class(object))
+    stopifnot(extends(cl, "sparseMatrix"))
     d <- dim(object)
     if(prod(d) > maxp) { # "Large" => will be "cut"
         ## only coerce to dense that part which won't be cut :
@@ -211,7 +217,7 @@ prSpMatrix <- function(object, digits = getOption("digits"),
     } else {
         m <- as(object, "matrix")
     }
-    logi <- is(object,"lsparseMatrix") || is(object,"nsparseMatrix")
+    logi <- extends(cl,"lsparseMatrix") || extends(cl,"nsparseMatrix")
     if(logi)
 	x <- array("N", # or as.character(NA),
 		   dim(m), dimnames=dimnames(m))
@@ -232,7 +238,7 @@ prSpMatrix <- function(object, digits = getOption("digits"),
 	## show only "structural" zeros as 'zero.print', not all of them..
 	## -> cannot use 'm'
         d <- dim(x)
-	ne <- length(iN0 <- 1:1 + encodeInd(non0ind(object), nr = d[1]))
+	ne <- length(iN0 <- 1:1 + encodeInd(non0ind(object, cl), nr = d[1]))
 	if(0 < ne && ne < prod(d)) {
 	    align <- match.arg(align)
 	    if(align == "fancy") {
@@ -246,13 +252,25 @@ prSpMatrix <- function(object, digits = getOption("digits"),
 			   fi[2,] + as.logical(fi[2,] > 0),
 			   ## exponential:
 			   fi[2,] + fi[3,] + 4)
-		zero.print <- sprintf("%-*s", pad[cols] + 1, zero.print)
+                ## now be efficient ; sprintf() is relatively slow
+                ## and pad is much smaller than 'cols'; instead of "simply"
+		## zero.print <- sprintf("%-*s", pad[cols] + 1, zero.print)
+		if(any(doP <- pad > 0)) {#
+		    ## only pad those that need padding - *before* expanding
+		    z.p.pad <- rep.int(zero.print, length(pad))
+		    z.p.pad[doP] <- sprintf("%-*s", pad[doP] + 1, zero.print)
+		    zero.print <- z.p.pad[cols]
+		}
+                else
+                    zero.print <- rep.int(zero.print, length(cols))
 	    } ## else "right" : nothing to do
 
 	    x[-iN0] <- zero.print
 	} else if (ne == 0)# all zeroes
 	    x[] <- zero.print
     }
+    if(row.trailer != '')
+        x <- cbind(x, row.trailer, deparse.level = 0)
     ## right = TRUE : cheap attempt to get better "." alignment
     print(x, quote = FALSE, right = TRUE, max = maxp)
     invisible(object)
@@ -267,13 +285,38 @@ setMethod("show", signature(object = "sparseMatrix"),
        if(prod(d) <= maxp)
 	   prSpMatrix(object, maxp = maxp)
        else { ## d[1] > maxp / d[2] >= nr : -- this needs [,] working:
-	   nr <- maxp %/% d[2]
-	   n2 <- ceiling(nr / 2)
+
 	   nR <- d[1] # nrow
-	   prSpMatrix(object[seq_len(min(nR, max(1, n2))), drop = FALSE])
-	   cat("\n ..........\n\n")
-	   prSpMatrix(object[seq(to = nR, length = min(max(1, nr-n2), nR)),
-                             drop = FALSE])
+           useW <- getOption("width") - (format.info(nR)[1] + 3+1)
+           ##                           space for "[<last>,] "
+           suppCols <- (d[2] * 2 > useW)
+           nc <- if(suppCols) (useW - (1 + 6)) %/% 2 else d[2]
+           ##                          sp+ row.trailer
+           row.trailer <- if(suppCols) "......" else ""
+	   nr <- maxp %/% nc
+           suppRows <- (nr < nR)
+           if(suppRows) {
+	       if(suppCols)
+		   object <- object[ , 1:nc, drop = FALSE]
+	       n2 <- ceiling(nr / 2)
+	       prSpMatrix(object[seq_len(min(nR, max(1, n2))), , drop=FALSE],
+			  row.trailer = row.trailer)
+	       cat("\n ..............................",
+		   "\n ..........suppressing rows in show(); maybe adjust 'options(max.print= *)'",
+		   "\n ..............................\n\n", sep='')
+	       ## tail() automagically uses "[..,]" rownames:
+	       prSpMatrix(tail(object, max(1, nr-n2)),
+			  row.trailer = row.trailer)
+	   }
+	   else if(suppCols) {
+	       prSpMatrix(object[ , 1:nc , drop = FALSE],
+			  row.trailer = row.trailer)
+
+	       cat("\n .....suppressing columns in show(); maybe adjust 'options(max.print= *)'",
+		   "\n ..............................\n", sep='')
+	   }
+           else stop("logic programming error in prSpMatrix(), please report")
+
            invisible(object)
        }
    })
