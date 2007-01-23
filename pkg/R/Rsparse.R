@@ -1,6 +1,10 @@
 #### Sparse Matrices in Compressed row-oriented format
 ####                               --- "R"
 
+### ``mainly for completeness'' --- we *do* favour Csparse
+##    - - - - - - - - - - - -   hence only "minimal" methods here !
+##  see also ./SparseM-conv.R
+
 ### contains = "dMatrix"
 
 setAs("dgRMatrix", "dgTMatrix",
@@ -36,7 +40,7 @@ setAs("dgRMatrix", "CsparseMatrix", function(from) as(from, "dgCMatrix"))
 .to.dgR <- function(from) {
     m <- as(t(from), "dgCMatrix")
     new("dgRMatrix", Dim = dim(from), Dimnames = .M.DN(from),
-        p = m@p, j = m@i, x = m@x)
+	p = m@p, j = m@i, x = m@x)
 }
 
 setAs("matrix",    "dgRMatrix", .to.dgR)
@@ -44,6 +48,15 @@ setAs("dgeMatrix", "dgRMatrix", .to.dgR)
 setAs("dgCMatrix", "dgRMatrix", .to.dgR)
 setAs("dgTMatrix", "dgRMatrix", .to.dgR)
 
+setAs("dsCMatrix", "dsRMatrix",
+      function(from) new("dsRMatrix", Dim = dim(from), Dimnames = .M.DN(from),
+	      p = from@p, j = from@i, x = from@x,
+	      uplo = if (from@uplo == "U") "L" else "U"))
+
+setAs("dtCMatrix", "dtRMatrix",
+      function(from) new("dtRMatrix", Dim = dim(from), Dimnames = .M.DN(from),
+	      p = from@p, j = from@i, x = from@x, diag = from@diag,
+	      uplo = if (from@uplo == "U") "L" else "U"))
 
 
 ##setAs("dgRMatrix", "dgeMatrix",
