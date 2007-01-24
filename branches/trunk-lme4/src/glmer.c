@@ -398,6 +398,7 @@ internal_bhat(GlmerStruct GS, const double fixed[], const double varc[])
     if (varc)	  /* skip this step if varc == (double*) NULL */
 	internal_mer_coefGets(GS->mer, varc, 2);
     Memcpy(REAL(fixef), fixed, LENGTH(fixef));
+    internal_glmer_reweight(GS);
     internal_mer_Zfactor(GS->mer, L);
     internal_mer_ranef(GS->mer);
     internal_mer_fitted(GS->mer, GS->offset, etap);
