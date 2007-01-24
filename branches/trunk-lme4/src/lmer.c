@@ -625,15 +625,6 @@ SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP REMLp,
     if (!isInteger(ncp) || LENGTH(ncp) != nf)
 	error(_("ncp must be an integer vector of length %d"), nf);
     SET_SLOT(val, lme4_ncSym, duplicate(ncp));
-    Gp = INTEGER(ALLOC_SLOT(val, lme4_GpSym, INTSXP, nf + 1));
-    Gp[0] = 0;
-    if (!isNewList(fl) || nf < 1) error(_("fl must be a nonempty list"));
-    for (i = 0; i < nf; i++) {
-	SEXP fli = VECTOR_ELT(fl, i);
-	if (!isFactor(fli) || LENGTH(fli) != nobs)
-	    error(_("fl[[%d] must be a factor of length %d"), i+1, nobs);
-
-    }
     SET_SLOT(val, lme4_ZtSym, duplicate(ZZt));
     Zt = M_as_cholmod_sparse(GET_SLOT(val, lme4_ZtSym));
     q = Zt->nrow;
@@ -656,6 +647,8 @@ SEXP mer_create(SEXP fl, SEXP ZZt, SEXP Xp, SEXP yp, SEXP REMLp,
     setAttrib(Omega, R_NamesSymbol, duplicate(fnms));
     setAttrib(bVar, R_NamesSymbol, duplicate(fnms));
     setAttrib(gradComp, R_NamesSymbol, duplicate(fnms));
+    Gp = INTEGER(ALLOC_SLOT(val, lme4_GpSym, INTSXP, nf + 1));
+    Gp[0] = 0;
     for (i = 0; i < nf; i++) {
 	int nci = nc[i];
 	int nlev = LENGTH(getAttrib(VECTOR_ELT(fl, i), R_LevelsSymbol));
