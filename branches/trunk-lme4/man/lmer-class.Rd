@@ -5,13 +5,18 @@
 \alias{lmer-class}
 \alias{glmer-class}
 \alias{mer-class}
+\alias{mer2-class}
+\alias{lmer2-class}
 \alias{coef.lmer-class}
 \alias{summary.mer-class}
+\alias{summary.mer2-class}
 \alias{summary.lmer-class}
+\alias{summary.lmer2-class}
 \alias{summary.glmer-class}
 \alias{ranef.lmer-class}
 % Methods
 \alias{anova,mer-method}
+\alias{anova,mer2-method}
 \alias{coef,mer-method}
 \alias{coef,mer-method}
 \alias{coerce,lmer,dsTMatrix-method}
@@ -20,32 +25,42 @@
 \alias{chol,lmer,ANY-method}
 \alias{confint,mer-method}
 \alias{deviance,mer-method}
+\alias{deviance,mer2-method}
 \alias{fitted,mer-method}
 \alias{formula,mer-method}
 \alias{logLik,mer-method}
+\alias{logLik,mer2-method}
 \alias{plot,coef.lmer-method}
 \alias{plot,ranef.lmer-method}
 \alias{print,mer-method}
+\alias{print,mer2-method}
 \alias{qqmath,ranef.lmer-method}
 \alias{resid,glmer-method}
 \alias{resid,lmer-method}
 \alias{residuals,glmer-method}
 \alias{residuals,lmer-method}
 \alias{show,mer-method}
+\alias{show,mer2-method}
 \alias{simulate,mer-method}
 \alias{summary,mer-method}
+\alias{summary,mer2-method}
 \alias{terms,lmer-method}
 \alias{update,mer-method}
 \alias{vcov,mer-method}
+\alias{vcov,mer2-method}
 \alias{with,lmer-method}
 %
 \alias{deviance,summary.mer-method}
+\alias{deviance,summary.mer2-method}
 \alias{logLik,summary.mer-method}
+\alias{logLik,summary.mer2-method}
 \alias{vcov,summary.mer-method}
+\alias{vcov,summary.mer2-method}
 \alias{summary,summary.mer-method}
+\alias{summary,summary.mer2-method}
 \description{
   The \code{mer} class is mixed-effects representation using a
-  blocked, sparse, symmetric, column-oriented matrix and dense
+  sparse, symmetric, column-oriented matrix and several dense
   matrices.  The \code{lmer} class extends \code{mer} to represent a
   fitted linear mixed-effects model.  The \code{summary.mer} and
   \code{summary.lmer} classes represent summaries of these objects.  The
