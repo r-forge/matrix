@@ -650,8 +650,6 @@ setMethod("mcmcsamp", signature(object = "glmer"),
 	  function(object, n = 1, verbose = FALSE, saveb = FALSE,
 		   trans = TRUE, deviance = FALSE, ...)
       {
-          if(!identical(deviance, FALSE))
-              warning("'deviance' not yet available for mcmcsamp(\"glmer\",*)")
           family <- object@family
           mer <- as(object, "mer")
           weights <- object@weights
@@ -668,12 +666,12 @@ setMethod("mcmcsamp", signature(object = "glmer"),
           doLMEopt <- quote(LMEopt(x = mer, value = cv))
           fltype <- mkFltype(family)
           GSpt <- .Call(glmer_init, environment(), fltype)
-          ans <- t(.Call(glmer_MCMCsamp, GSpt, saveb, n, trans, verbose))
+          ans <- t(.Call(glmer_MCMCsamp, GSpt, saveb, n, trans, verbose, deviance))
           .Call(glmer_finalize, GSpt)
 	  attr(ans, "mcpar") <- as.integer(c(1, n, 1))
 	  class(ans) <- "mcmc"
 	  mcmccompnames(ans, object, saveb, trans,
-			glmer=TRUE, deviance=FALSE)
+			glmer=TRUE, deviance=deviance)
       })
 
 setMethod("simulate", signature(object = "mer"),
