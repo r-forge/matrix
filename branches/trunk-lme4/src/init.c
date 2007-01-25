@@ -16,7 +16,7 @@ const char attr_hidden *DIMS_NAMES[] = {"nf", "n", "p", "q",
 					"REML", "glmm", ""};
 
 static R_CallMethodDef CallEntries[] = {
-    {"glmer_MCMCsamp", (DL_FUNC) &glmer_MCMCsamp, 5},
+    {"glmer_MCMCsamp", (DL_FUNC) &glmer_MCMCsamp, 6},
     {"glmer_PQL", (DL_FUNC) &glmer_PQL, 1},
     {"glmer_devLaplace", (DL_FUNC) &glmer_devLaplace, 2},
     {"glmer_finalize", (DL_FUNC) &glmer_finalize, 1},
