@@ -1,3 +1,10 @@
+2007-01-25  Douglas Bates  <bates@stat.wisc.edu>
+
+	* DESCRIPTION (Version): release 0.9975-11
+	* src/glmer.[ch],init.c R/lmer.R: incorporate "deviance" argument
+	in mcmcsamp method for glmer objects.
+	* man/*.Rd: the lmer2 constructor and the mer2 class
+
 2007-01-25  Douglas Bates  <bates@r-project.org>
 
 	* src/glmer.c (internal_bhat): reweight before the first factoring
