@@ -1,3 +1,7 @@
+2007-01-28  Douglas Bates  <bates@R-project.org>
+
+	* R/lmer.R (lmer2): allow for specification of a start argument
+
 2007-01-25  Douglas Bates  <bates@stat.wisc.edu>
 
 	* DESCRIPTION (Version): release 0.9975-11
