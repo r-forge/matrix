@@ -58,16 +58,9 @@ SEXP compressed_to_TMatrix(SEXP x, SEXP colP)
     }
     SET_DimNames(ans, x);
     SET_SLOT(ans, indSym, duplicate(indP));
-/* The following once seemed to seg.fault (e.g on MM's notebook) ..no longer */
     expand_cmprPt(npt, INTEGER(pP),
 		  INTEGER(ALLOC_SLOT(ans, col ? Matrix_jSym : Matrix_iSym,
 				     INTSXP, length(indP))));
-/* /\* Using this instead, to see if seg.faults disappear : *\/ */
-/*     other_ind = PROTECT(allocVector(INTSXP, length(indP))); */
-/*     SET_SLOT(ans, col ? Matrix_jSym : Matrix_iSym, other_ind); */
-/*     UNPROTECT(1); */
-/*     expand_cmprPt(npt, INTEGER(pP), INTEGER(other_ind)); */
-/* /\* end{workaround possible ALLOC_SLOT() problem} *\/ */
     UNPROTECT(1);
     return ans;
 }
