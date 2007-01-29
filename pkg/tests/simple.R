@@ -109,12 +109,11 @@ stopifnot(validObject(xpx),
           validObject(res))
 stopifnot(all.equal(xpx %*% res, xpy, tol= 1e-12))
 lp <- xpx >= 1
-if(FALSE) ## FIXME
+if(FALSE) ## FIXME : needs lsy |-> lsC
 slp <- as(lp, "sparseMatrix")
-if(FALSE) ## maybe FIXME {works with old-style matrix}:
+
 ltlp <- lp[ lower.tri(lp) ]
 ij <- which(lower.tri(lp), arr.ind = TRUE)
-if(FALSE) ## FIXME !!! infinite loop in lp[ij]
 stopifnot(all.equal(lp[ij], as(lp, "matrix")[ij]))
 
 stopifnot(is(lp, "lsyMatrix"), lp@uplo == "U")
@@ -233,11 +232,10 @@ as(n,"CsparseMatrix") # used to give CHOLMOD error: invalid xtype...
 ls2 <- as(m, "CsparseMatrix") # works fine
 ## and really  'm' and 'n' are interally slot identical (!!!)
 
-if(FALSE) ## FIXME
+if(FALSE) ## FIXME: needs lsy |-> lsC
 as(n,"sparseMatrix")
-## Error ... no method
 
-if(FALSE) ## FIXME
+if(FALSE) ## FIXME: needs lsy |-> lsC
 as(m,"sparseMatrix")
 ## Error ... no method
 
@@ -249,12 +247,9 @@ nT <- new("ngTMatrix",
 (nC <- as(nT, "ngCMatrix"))
 str(nC)# of course, no 'x' slot
 
-if(FALSE) ## FIXME
-as(nT,"denseMatrix")
-## Error no method ... ngT -> nge
-if(FALSE) ## FIXME
-as(as(nT, "lMatrix"),"denseMatrix")
-
+stopifnot(identical(tt <- as(nT,"denseMatrix"), # lge
+		    as(as(nT, "lMatrix"),"denseMatrix")))
+tt
 as(nC,"denseMatrix")
 
 
