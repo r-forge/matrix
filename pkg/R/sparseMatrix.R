@@ -7,6 +7,7 @@
 
 setAs("ANY", "sparseMatrix", function(from) as(from, "CsparseMatrix"))
 
+setAs(from = "sparseMatrix", to = "generalMatrix", as_gCsimpl)
 
 ## "graph" coercions -- this needs the graph package which is currently
 ##  -----               *not* required on purpose

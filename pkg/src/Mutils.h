@@ -51,7 +51,11 @@ SEXP dgCMatrix_set_Dim(SEXP x, int nrow);
 /* SEXP csc_check_column_sorting(SEXP A); */
 SEXP Matrix_make_named(int TYP, char **names);
 SEXP check_scalar_string(SEXP sP, char *vals, char *nm);
-double *packed_getDiag(double *dest, SEXP x);
+void d_packed_getDiag(double *dest, SEXP x, int n);
+void l_packed_getDiag(   int *dest, SEXP x, int n);
+void tr_d_packed_getDiag(double *dest, SEXP x);
+void tr_l_packed_getDiag(   int *dest, SEXP x);
+
 SEXP Matrix_getElement(SEXP list, char *nm);
 
 #define PACKED_TO_FULL(TYPE)						\
@@ -130,6 +134,9 @@ int packed_ncol(int len)
  * this behavior changes then ALLOC_SLOT must use SET_SLOT followed by
  * GET_SLOT to ensure that the value returned is indeed the SEXP in
  * the slot.
+ * NOTE:  GET_SLOT(x, what)        :== R_do_slot       (x, what)
+ * ----   SET_SLOT(x, what, value) :== R_do_slot_assign(x, what, value)
+ * and the R_do_slot* are in src/main/attrib.c
  *
  * @param obj object in which to assign the slot
  * @param nm name of the slot, as an R name object

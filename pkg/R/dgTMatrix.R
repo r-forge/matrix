@@ -4,12 +4,11 @@
 ##       )
 
 setAs("dgTMatrix", "dgeMatrix",
-      function(from) .Call(dgTMatrix_to_dgeMatrix, from)
-      )
+      function(from) .Call(dgTMatrix_to_dgeMatrix, from))
 
 setAs("dgTMatrix", "matrix",
-      function(from) .Call(dgTMatrix_to_matrix, from)
-      )
+      function(from) .Call(dgTMatrix_to_matrix, from))
+
 
 setAs("dgeMatrix", "dgTMatrix",
       function(from) as(as(from, "dgCMatrix"), "dgTMatrix"))

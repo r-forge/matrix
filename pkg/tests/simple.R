@@ -46,6 +46,7 @@ stopifnot(validObject(t1),
           validObject(t1c <- as(t1, "dtCMatrix")))
 assert.EQ.mat(t1, as(t1c, "matrix"))
 
+
 ## from  0-diagonal to unit-diagonal {low-level step}:
 tu <- t1 ; tu@diag <- "U"
 tu
@@ -59,7 +60,17 @@ stopifnot(validObject(cu), validObject(tu. <- as(cu, "dtTMatrix")),
 	  validObject(tcu <- t(cu)),
 	  validObject(ttu <- t(tu)))
 assert.EQ.mat(cu, as(tu,"matrix"), tol=0)
+
+## <sparse> o <numeric> (of length > 1):
+stopifnot(is(tm <- tu * 1:8, "sparseMatrix"),
+          identical4(tm, cu * 1:8, 1:8 * cu, 1:8 * tu))
+
 cu[1,2] <- tu[1,2] <- NA
+stopifnot(is(cu, "CsparseMatrix"), is(cu, "triangularMatrix"),
+          is(tu, "TsparseMatrix"), is(tu, "triangularMatrix"),
+          identical(cu * 1:8, tu * 1:8)) # but are no longer triangular
+assert.EQ.mat(cu * 1:8, as(tu,"matrix") * 1:8)
+
 if(FALSE)## FIXME: These now fail:
     all(cu >= 0) & all(tu >= 0)
 
@@ -68,6 +79,7 @@ mu <- as(tu,"matrix")
 tu2 <- as(as(tu., "dgTMatrix"), "dtTMatrix")
 assert.EQ.mat(cu, mu, tol=0)
 stopifnot(identical3(cu[cu > 1],  tu [tu > 1], mu [mu > 1]),
+          identical3(cu <= 1, tu <= 1, as(mu <= 1, "lMatrix")),# all lgeMatrix
 	  identical3(cu[cu <= 1], tu[tu <= 1], mu[mu <= 1]),
 	  identical3(cu , triu(cu ), t(t(cu))),
 	  identical3(tu , triu(tu ), t(t(tu))),
@@ -305,4 +317,15 @@ stopifnot(identical3(lM, lM2, lM0))
 selectMethod("coerce",	c("lgeMatrix", "CsparseMatrix"),
 	     useInherited = c(from = TRUE, to = FALSE))
 
+ms0 <- Matrix(c(0,1,1,0), 2,2)
+(ms <- as(ms0, "dsTMatrix"))
+ll <- as(ms, "lMatrix")
+lt <- as(ll, "lgTMatrix")
+stopifnot(as(ms0,"matrix") == as(ll, "matrix"), # coercing num |-> log
+          as(lt, "matrix") == as(ll, "matrix")
+          )
+
 cat('Time elapsed: ', proc.time(),'\n') # "stats"
+
+if(!interactive()) warnings()
+

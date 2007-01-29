@@ -15,6 +15,7 @@
 \alias{coerce,lgeMatrix,ltrMatrix-method}
 \alias{coerce,lgeMatrix,ltpMatrix-method}
 \alias{coerce,lgeMatrix,lspMatrix-method}
+\alias{diag,lgeMatrix-method}
 \alias{t,lgeMatrix-method}
 %
 \description{This is the class of general dense \code{\link{logical}}

@@ -8,8 +8,15 @@
 \alias{coerce,ndenseMatrix,matrix-method}
 \alias{coerce,ndenseMatrix,CsparseMatrix-method}
 \alias{coerce,ndenseMatrix,TsparseMatrix-method}
+\alias{coerce,ndenseMatrix,ldenseMatrix-method}
 \alias{coerce,ndenseMatrix,sparseMatrix-method}
+\alias{coerce,ngeMatrix,lgeMatrix-method}
+\alias{coerce,nspMatrix,lspMatrix-method}
+\alias{coerce,nsyMatrix,lsyMatrix-method}
+\alias{coerce,ntpMatrix,ltpMatrix-method}
+\alias{coerce,ntrMatrix,ltrMatrix-method}
 \alias{as.vector,ndenseMatrix,missing-method}
+\alias{diag,ndenseMatrix-method}
 %%-- These are already in ./nsparseMatrix-classes.Rd :
 %\alias{\%*\%,nsparseMatrix,ndenseMatrix-method}
 %\alias{\%*\%,ndenseMatrix,nsparseMatrix-method}
@@ -45,6 +52,8 @@ Class \code{"Matrix"}, by class \code{"denseMatrix"}.
     \item{crossprod}{\code{signature(x = "nsparseMatrix", y = "ndenseMatrix")}: ... }
     \item{crossprod}{\code{signature(x = "ndenseMatrix", y = "nsparseMatrix")}: ... }
     \item{as.vector}{\code{signature(x = "ndenseMatrix", mode = "missing")}: ...}
+    \item{diag}{\code{signature(x = "ndenseMatrix")}: extracts the
+      diagonal as for all matrices, see the generic \code{\link{diag}()}.}
   }
 }
 \seealso{

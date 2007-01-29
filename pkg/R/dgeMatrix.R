@@ -141,8 +141,7 @@ setMethod("%*%", signature(x = "numeric", y = "dgeMatrix"),
 	  valueClass = "dgeMatrix")
 
 setMethod("diag", signature(x = "dgeMatrix"),
-	  function(x = 1, nrow, ncol = n)
-	  .Call(dgeMatrix_getDiag, x))
+	  function(x, nrow, ncol = n) .Call(dgeMatrix_getDiag, x))
 
 setMethod("chol", signature(x = "dgeMatrix", pivot = "ANY"), cholMat)
 

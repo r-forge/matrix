@@ -7,34 +7,64 @@
 
 ### contains = "dMatrix"
 
-setAs("dgRMatrix", "dgTMatrix",
-      function(from) .Call(compressed_to_dgTMatrix, from, FALSE))
+setAs("RsparseMatrix", "TsparseMatrix",
+      function(from) .Call(compressed_to_TMatrix, from, FALSE))
 
-### FIXME: Activate the following with "little" change in ../src/dgCMatrix.c
-### -----  similar to compressed_to_dgTMatrix above       ~~~~~~~~~~~~~~~~~~
+setAs("RsparseMatrix", "CsparseMatrix",
+      function(from) .Call(R_to_CMatrix, from))
 
-##setAs("dgRMatrix", "matrix",
-##      function(from) .Call(csc_to_matrix, from))
-## easy "cheap" alternative:
+##--- and all these are just "the essential low-level coercions" : ----------
+
 setAs("dgRMatrix", "matrix",
-      function(from) as(as(from, "dgTMatrix"), "matrix"))
+      function(from) as(.Call(compressed_to_TMatrix, from, FALSE), "matrix"))
+setAs("lgRMatrix", "matrix",
+      function(from) as(.Call(compressed_to_TMatrix, from, FALSE), "matrix"))
+setAs("ngRMatrix", "matrix",
+      function(from) as(.Call(compressed_to_TMatrix, from, FALSE), "matrix"))
 
-##setAs("dgRMatrix", "dgeMatrix",
-##      function(from) .Call(csc_to_dgeMatrix, from))
+setAs("dgRMatrix", "dgeMatrix",
+      function(from) as(.Call(compressed_to_TMatrix, from, FALSE), "dgeMatrix"))
+setAs("lgRMatrix", "lgeMatrix",
+      function(from) as(.Call(compressed_to_TMatrix, from, FALSE), "lgeMatrix"))
+setAs("ngRMatrix", "ngeMatrix",
+      function(from) as(.Call(compressed_to_TMatrix, from, FALSE), "ngeMatrix"))
+
+setAs("dgRMatrix", "dgCMatrix",
+      function(from) .Call(R_to_CMatrix, from))
+setAs("lgRMatrix", "lgCMatrix",
+      function(from) .Call(R_to_CMatrix, from))
+setAs("ngRMatrix", "ngCMatrix",
+      function(from) .Call(R_to_CMatrix, from))
+## really needed? :
+setAs("dgRMatrix", "CsparseMatrix", function(from) as(from, "dgCMatrix"))
+
+
+setAs("dgRMatrix", "dgTMatrix",
+      function(from) .Call(compressed_to_TMatrix, from, FALSE))
+setAs("lgRMatrix", "lgTMatrix",
+      function(from) .Call(compressed_to_TMatrix, from, FALSE))
+setAs("ngRMatrix", "ngTMatrix",
+      function(from) .Call(compressed_to_TMatrix, from, FALSE))
+
+setAs("dsRMatrix", "dsyMatrix",
+      function(from) .Call(compressed_to_TMatrix, from, FALSE))
+setAs("lsRMatrix", "lsyMatrix",
+      function(from) .Call(compressed_to_TMatrix, from, FALSE))
+setAs("nsRMatrix", "nsyMatrix",
+      function(from) .Call(compressed_to_TMatrix, from, FALSE))
+
+setAs("dtRMatrix", "dtrMatrix",
+      function(from) .Call(compressed_to_TMatrix, from, FALSE))
+setAs("ltRMatrix", "ltrMatrix",
+      function(from) .Call(compressed_to_TMatrix, from, FALSE))
+setAs("ntRMatrix", "ntrMatrix",
+      function(from) .Call(compressed_to_TMatrix, from, FALSE))
 
 ##setAs("matrix", "dgRMatrix",
 ##      function(from) {
 ##          storage.mode(from) <- "double"
 ##          .Call(matrix_to_csc, from)
 ##      })
-
-
-##setMethod("diag", signature(x = "dgRMatrix"),
-##          function(x = 1, nrow, ncol = n) .Call(csc_getDiag, x))
-
-setAs("dgRMatrix", "dgCMatrix",
-      function(from) as(as(from, "dgTMatrix"), "dgCMatrix"))
-setAs("dgRMatrix", "CsparseMatrix", function(from) as(from, "dgCMatrix"))
 
 ## **VERY** cheap substitutes:  work via dgC and t(.)
 .to.dgR <- function(from) {
@@ -68,6 +98,9 @@ setAs("dtCMatrix", "dtRMatrix",
 ##          .Call(matrix_to_csc, from)
 ##      })
 
+
+##setMethod("diag", signature(x = "dgRMatrix"),
+##          function(x = 1, nrow, ncol = n) .Call(csc_getDiag, x))
 
 ## try to define for "Matrix" -- once and for all -- but that fails -- why? __ FIXME __
 ## setMethod("dim", signature(x = "dgRMatrix"),

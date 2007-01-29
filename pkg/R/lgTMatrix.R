@@ -4,8 +4,13 @@
 ###             ============= ---> superclass methods in ./lsparseMatrix.R
 
 
-setAs("lgTMatrix", "matrix", # go via fast C code:
-      function(from) as(as(from, "lgCMatrix"), "matrix"))
+setAs("lgTMatrix", "lgeMatrix",
+      function(from) .Call(lgTMatrix_to_lgeMatrix, from))
+
+setAs("lgTMatrix", "matrix",
+      function(from) .Call(lgTMatrix_to_matrix, from))
+## setAs("lgTMatrix", "matrix", # go via fast C code:
+##       function(from) as(as(from, "lgCMatrix"), "matrix"))
 
 setAs("matrix", "lgTMatrix",
       function(from) {

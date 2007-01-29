@@ -11,6 +11,7 @@
 \alias{as.logical,ldenseMatrix-method}
 \alias{coerce,matrix,ldenseMatrix-method}
 \alias{coerce,ldenseMatrix,matrix-method}
+\alias{diag,ldenseMatrix-method}
 \alias{as.vector,ldenseMatrix,missing-method}
 %%-- These are already in ./lsparseMatrix-classes.Rd :
 %\alias{\%*\%,lsparseMatrix,ldenseMatrix-method}
