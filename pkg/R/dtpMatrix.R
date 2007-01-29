@@ -3,10 +3,6 @@
 setAs("dtpMatrix", "dtrMatrix",
       function(from) .Call(dtpMatrix_as_dtrMatrix, from))
 
-if(FALSE) # now have faster  "ddense" -> "dge"
-setAs("dtpMatrix", "dgeMatrix",
-      function(from) as(as(from, "dtrMatrix"), "dgeMatrix"))
-
 setAs("dtpMatrix", "dtTMatrix",
       ## FIXME this is NOT efficient:
       function(from) {
@@ -23,6 +19,11 @@ setAs("dtpMatrix", "matrix",
       function(from) as(as(from, "dtrMatrix"), "matrix"))
 setAs("matrix", "dtpMatrix",
       function(from) as(as(from, "dtrMatrix"), "dtpMatrix"))
+
+setAs("pCholesky", "lMatrix",
+      function(from) as(as(from, "dtpMatrix"), "lMatrix"))
+setAs("pBunchKaufman", "lMatrix",
+      function(from) as(as(from, "dtpMatrix"), "lMatrix"))
 
 
 setMethod("%*%", signature(x = "dtpMatrix", y = "ddenseMatrix"),
@@ -70,17 +71,15 @@ setMethod("determinant", signature(x = "dtpMatrix", logarithm = "logical"),
 	  })
 
 setMethod("diag", signature(x = "dtpMatrix"),
-          function(x = 1, nrow, ncol = n) .Call(dtpMatrix_getDiag, x),
-          valueClass = "numeric")
+	  function(x, nrow, ncol = n) .Call(dtpMatrix_getDiag, x),
+	  valueClass = "numeric")
 
 setMethod("norm", signature(x = "dtpMatrix", type = "character"),
-	  function(x, type, ...)
-	  .Call(dtpMatrix_norm, x, type),
+	  function(x, type, ...) .Call(dtpMatrix_norm, x, type),
 	  valueClass = "numeric")
 
 setMethod("norm", signature(x = "dtpMatrix", type = "missing"),
-	  function(x, type, ...)
-	  .Call(dtpMatrix_norm, x, "O"),
+	  function(x, type, ...) .Call(dtpMatrix_norm, x, "O"),
 	  valueClass = "numeric")
 
 setMethod("rcond", signature(x = "dtpMatrix", type = "character"),

@@ -8,6 +8,7 @@ setAs("CsparseMatrix", "TsparseMatrix",
           ## modified to support triangular (../src/Csparse.c)
           .Call(Csparse_to_Tsparse, from, is(from, "triangularMatrix")))
 
+
 ## special cases (when a specific "to" class is specified)
 setAs("dgCMatrix", "dgTMatrix",
       function(from) .Call(Csparse_to_Tsparse, from, FALSE))
@@ -17,6 +18,10 @@ setAs("dsCMatrix", "dsTMatrix",
 
 setAs("dsCMatrix", "dgCMatrix",
       function(from) .Call(Csparse_symmetric_to_general, from))
+
+for(prefix in c("d", "l", "n"))
+    setAs(paste(prefix,"sCMatrix",sep=''), "generalMatrix",
+	  function(from) .Call(Csparse_symmetric_to_general, from))
 
 setAs("dtCMatrix", "dtTMatrix",
       function(from) .Call(Csparse_to_Tsparse, from, TRUE))

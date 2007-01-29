@@ -4,14 +4,22 @@
 
 ## Nonzero Pattern -> Double {of same structure}:
 
-setAs("ngeMatrix", "dgeMatrix", n2d_Matrix)
-setAs("nsyMatrix", "dsyMatrix", n2d_Matrix)
-setAs("nspMatrix", "dspMatrix", n2d_Matrix)
-setAs("ntrMatrix", "dtrMatrix", n2d_Matrix)
-setAs("ntpMatrix", "dtpMatrix", n2d_Matrix)
+setAs("ngeMatrix", "dgeMatrix", function(from) n2d_Matrix(from, "ngeMatrix"))
+setAs("nsyMatrix", "dsyMatrix", function(from) n2d_Matrix(from, "nsyMatrix"))
+setAs("nspMatrix", "dspMatrix", function(from) n2d_Matrix(from, "nspMatrix"))
+setAs("ntrMatrix", "dtrMatrix", function(from) n2d_Matrix(from, "ntrMatrix"))
+setAs("ntpMatrix", "dtpMatrix", function(from) n2d_Matrix(from, "ntpMatrix"))
 
 ### NOTA BENE: Much of this is *very* parallel to ./ldenseMatrix.R
 ###						  ~~~~~~~~~~~~~~~~
+
+setAs("ndenseMatrix", "ldenseMatrix", function(from) n2l_Matrix(from))
+
+setAs("ngeMatrix", "lgeMatrix", function(from) n2l_Matrix(from, "ngeMatrix"))
+setAs("nsyMatrix", "lsyMatrix", function(from) n2l_Matrix(from, "nsyMatrix"))
+setAs("nspMatrix", "lspMatrix", function(from) n2l_Matrix(from, "nspMatrix"))
+setAs("ntrMatrix", "ltrMatrix", function(from) n2l_Matrix(from, "ntrMatrix"))
+setAs("ntpMatrix", "ltpMatrix", function(from) n2l_Matrix(from, "ntpMatrix"))
 
 ## all need be coercable to "ngeMatrix":
 

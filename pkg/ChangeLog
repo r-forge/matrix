@@ -1,3 +1,35 @@
+2007-01-29  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/Class+Meth.R (tstMatrixClass): now testing diag(), nnzero(),
+	  and more of "!", "&", "|", all, any; coercions
+
+	* R/Rsparse.R: many coercions (which enable quite a few other
+	methods), thanks to enhancements in
+	* src/dgCMatrix.c (R_to_CMatrix): new, and
+	* src/dgCMatrix.c (compressed_to_TMatrix): now for (d,l,n) ,
+	symmetric & triangular and ..RMatrix objects.
+
+	* src/TMatrix_as.c (Matrix_T_as_DENSE,Matrix_T_as_GENERAL):
+	renamed file from src/dsTMatrix.c;
+	now dealing with symmetric and triangular Tsparse coercions, both
+	to dense and general.
+
+2007-01-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/dsTMatrix.c: has now "l" and "n" methods besides the "d" ones.
+
+	* R/Ops.R (Arith): <dgCMatrix> o <numeric> now remains sparse
+	where sensible when the <numeric> is of length > 1.
+
+2007-01-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R ([<-): for M[] <- value: fix length
+
+2007-01-25  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (n2l_Matrix): new, to be used in
+	* R/ndenseMatrix.R: new coercions n* -> l*
+
 2007-01-22  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/triangularMatrix.R: new file; simple triu() and tril() methods.

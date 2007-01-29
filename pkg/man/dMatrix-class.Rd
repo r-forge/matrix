@@ -8,6 +8,7 @@
 \alias{coerce,dMatrix,lMatrix-method}
 \alias{coerce,lMatrix,dMatrix-method}
 \alias{coerce,lMatrix,dgCMatrix-method}
+\alias{coerce,matrix,lMatrix-method}
 %\alias{coerce,dMatrix,dgeMatrix-method}
 \alias{[,dMatrix,lMatrix,missing,ANY-method}
 \alias{[,dMatrix,logical,missing,ANY-method}
@@ -17,6 +18,8 @@
 \alias{Compare,dMatrix,dMatrix-method}
 \alias{Compare,dMatrix,numeric-method}
 \alias{Compare,numeric,dMatrix-method}
+\alias{Logic,logical,lMatrix-method}
+\alias{Logic,lMatrix,logical-method}
 \alias{Summary,dMatrix-method}
 \alias{Math2,dMatrix,numeric-method}% Math2 = round + signif, but
 \alias{Math2,dMatrix,missing-method}

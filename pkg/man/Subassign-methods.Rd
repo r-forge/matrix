@@ -16,6 +16,7 @@
 % in ../R/denseMatrix.R
 \alias{[<-,denseMatrix,index,missing,replValue-method}
 \alias{[<-,denseMatrix,index,index,replValue-method}
+\alias{[<-,denseMatrix,matrix,missing,replValue-method}
 \alias{[<-,denseMatrix,missing,index,replValue-method}
 % in ../R/diagMatrix.R
 \alias{[<-,diagonalMatrix,index,index,replValue-method}

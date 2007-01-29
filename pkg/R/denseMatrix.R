@@ -4,6 +4,8 @@
 
 setAs("ANY", "denseMatrix", function(from) Matrix(from, sparse=FALSE))
 
+setAs(from = "denseMatrix", to = "generalMatrix", as_geSimpl)
+
 ## dense to sparse:
 ## : if we do this, do it "right", i.e. preserve symmetric/triangular!
 ## setAs("denseMatrix", "dsparseMatrix",
@@ -37,15 +39,17 @@ setAs("ANY", "denseMatrix", function(from) Matrix(from, sparse=FALSE))
 
 setAs("denseMatrix", "CsparseMatrix", .dense2C)
 
-setAs("denseMatrix",  "sparseMatrix",
-      function(from) {
-	  cl <- class(from)
-	  cld <- getClassDef(cl)
-	  if (extends(cld, "generalMatrix"))
-	      .Call(dense_to_Csparse, from)
-	  else ## i.e. triangular | symmetric
-	      as_Csparse(from, cld)
-      })
+## This sometimes fails (eg. for "lsyMatrix"), and we really want to
+## use the generic ``go via Csparse'' (top of ./sparseMatrix.R) instead
+## setAs("denseMatrix",  "sparseMatrix",
+##       function(from) {
+## 	  cl <- class(from)
+## 	  cld <- getClassDef(cl)
+## 	  if (extends(cld, "generalMatrix"))
+## 	      .Call(dense_to_Csparse, from)
+## 	  else ## i.e. triangular | symmetric
+## 	      as_Csparse(from, cld)
+##       })
 
 setAs("denseMatrix", "TsparseMatrix",
       function(from) as(.dense2C(from), "TsparseMatrix"))
@@ -95,6 +99,12 @@ setMethod("[", signature(x = "denseMatrix", i = "index", j = "index",
 	      }
 	  })
 
+setMethod("[", signature(x = "denseMatrix", i = "matrix", j = "missing"),#drop="ANY"
+	  function(x, i, j, drop) {
+	      r <- as(x, "matrix")[ i ]
+	      if(is.null(dim(r))) r else as(r, geClass(x))
+	  })
+
 ## Now the "[<-" ones --- see also those in ./Matrix.R
 ## It's recommended to use setReplaceMethod() rather than setMethod("[<-",.)
 ## even though the former is currently just a wrapper for the latter
@@ -123,6 +133,14 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "index", j = "index",
 		     r <- as(x, "matrix")
 		     r[i, j] <- value
 		     as_geClass(r, class(x)) ## was as(r, class(x))
+		 })
+
+setReplaceMethod("[", signature(x = "denseMatrix", i = "matrix", j = "missing",
+				value = "replValue"),
+		 function(x, i, value) {
+		     r <- as(x, "matrix")
+		     r[ i ] <- value
+		     as(r, geClass(x))
 		 })
 
 

@@ -1,8 +1,21 @@
 \name{Matrix-class}
 \docType{class}
 \alias{Matrix-class}
+\alias{!,Matrix-method}
+%% Group methods:
 \alias{-,Matrix,missing-method}
 \alias{+,Matrix,missing-method}
+\alias{Arith,Matrix,Matrix-method}
+\alias{Ops,Matrix,Matrix-method}
+\alias{Ops,Matrix,ANY-method}
+\alias{Ops,ANY,Matrix-method}
+\alias{Ops,Matrix,matrix-method}
+\alias{Ops,matrix,Matrix-method}
+\alias{Logic,logical,Matrix-method}
+\alias{Logic,Matrix,logical-method}
+\alias{Logic,Matrix,ANY-method}
+\alias{Logic,ANY,Matrix-method}
+%
 \alias{\%*\%,Matrix,numeric-method}
 \alias{\%*\%,numeric,Matrix-method}
 \alias{\%*\%,Matrix,Matrix-method}
@@ -30,6 +43,7 @@
 \alias{diag,Matrix-method}
 \alias{head,Matrix-method}
 \alias{tail,Matrix-method}
+\alias{solve,Matrix,Matrix-method}
 \alias{solve,Matrix,matrix-method}
 \alias{solve,Matrix,missing-method}
 \alias{solve,Matrix,numeric-method}
@@ -49,12 +63,6 @@
 \alias{coerce,matrix,Matrix-method}
 \alias{coerce,Matrix,denseMatrix-method}
 \alias{coerce,Matrix,sparseMatrix-method}
-\alias{Arith,Matrix,Matrix-method}
-\alias{Ops,Matrix,Matrix-method}
-\alias{Ops,Matrix,ANY-method}
-\alias{Ops,ANY,Matrix-method}
-\alias{Ops,Matrix,matrix-method}
-\alias{Ops,matrix,Matrix-method}
 \alias{cbind2,Matrix,ANY-method}
 \alias{cbind2,Matrix,atomicVector-method}
 \alias{cbind2,ANY,Matrix-method}

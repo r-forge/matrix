@@ -85,6 +85,8 @@ setMethod("all", signature(x = "Matrix"),
 setMethod("any", signature(x = "Matrix"),
           function(x, ..., na.rm) { x <- as(x, "lMatrix"); callGeneric()})
 
+setMethod("!", "Matrix", function(e1) !as(e1, "lMatrix"))
+
 
 
 Matrix <-
@@ -127,7 +129,9 @@ Matrix <-
 	    dimnames(data) <- dimnames
 	}
         doDN <- FALSE
-    }
+    } else if(!missing(nrow) || !missing(ncol))
+	warning("'nrow', 'ncol', etc, are disregarded for matrix 'data'")
+
     ## 'data' is now a "matrix" or "Matrix"
     if (doDN && !is.null(dimnames))
 	dimnames(data) <- dimnames
@@ -206,6 +210,8 @@ setMethod("solve", signature(a = "Matrix", b = "numeric"),
 ## when no sub-class method is found, bail out
 setMethod("solve", signature(a = "Matrix", b = "matrix"),
 	  function(a, b, ...) .bail.out.2("solve", class(a), "matrix"))
+setMethod("solve", signature(a = "Matrix", b = "Matrix"),
+	  function(a, b, ...) .bail.out.2("solve", class(a), class(b)))
 
 ## bail-out methods in order to get better error messages
 setMethod("%*%", signature(x = "Matrix", y = "Matrix"),
@@ -300,7 +306,7 @@ setMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY", drop = "ANY"),
 	stop("not-yet-implemented 'Matrix' subsetting") ## FIXME
 
     } else stop("nargs() = ", nA,
-		" should never happen; please report.")
+		".  Extraneous illegal arguments inside '[ .. ]' ?")
 }
 setMethod("[", signature(x = "Matrix", i = "lMatrix", j = "missing",
 			 drop = "ANY"),
@@ -330,7 +336,8 @@ setMethod("[", signature(x = "Matrix", i = "logical", j = "missing",
 	## potentially inefficient -- FIXME --
 	unlist(lapply(seq_len(m), function(j) x[i1[j], i2[j]]))
 
-    } else stop("nargs() = ", nA, " should never happen; please report.")
+    } else stop("nargs() = ", nA,
+		".  Extraneous illegal arguments inside '[ .. ]' ?")
 }
 setMethod("[", signature(x = "Matrix", i = "matrix", j = "missing"),# drop="ANY"
 	  .M.sub.i.2col)
@@ -343,7 +350,7 @@ setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
                                 value = "ANY"),## double/logical/...
 	  function (x, value) {
 	      ## Fails for 'nMatrix' ... FIXME : make sure have method there
-	      x@x <- value
+	      x@x <- rep(value, length = length(x@x))
 	      validObject(x)# check if type and lengths above match
 	      x
           })
@@ -385,7 +392,8 @@ setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
 	    x[i1[k], i2[k]] <- value[k]
 
 	x
-    } else stop("nargs() = ", nA, " should never happen; please report.")
+    } else stop("nargs() = ", nA,
+		".  Extraneous illegal arguments inside '[ .. ]' ?")
 }
 
 setReplaceMethod("[", signature(x = "Matrix", i = "matrix", j = "missing",

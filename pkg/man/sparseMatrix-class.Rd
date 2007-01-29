@@ -24,6 +24,7 @@
 \alias{rbind2,numeric,sparseMatrix-method}
 %
 \alias{coerce,ANY,sparseMatrix-method}
+\alias{coerce,sparseMatrix,generalMatrix-method}
 \alias{-,sparseMatrix,missing-method}
 \alias{diag,sparseMatrix-method}
 \alias{show,sparseMatrix-method}

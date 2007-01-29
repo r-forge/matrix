@@ -12,11 +12,11 @@ setAs("ddenseMatrix", "dgeMatrix",
       })
 
 ## d(ouble) to l(ogical):
-setAs("dgeMatrix", "lgeMatrix", d2l_Matrix)
-setAs("dtrMatrix", "ltrMatrix", d2l_Matrix)
-setAs("dtpMatrix", "ltpMatrix", d2l_Matrix)
-setAs("dsyMatrix", "lsyMatrix", d2l_Matrix)
-setAs("dspMatrix", "lspMatrix", d2l_Matrix)
+setAs("dgeMatrix", "lgeMatrix", function(from) d2l_Matrix(from, "dgeMatrix"))
+setAs("dsyMatrix", "lsyMatrix", function(from) d2l_Matrix(from, "dsyMatrix"))
+setAs("dspMatrix", "lspMatrix", function(from) d2l_Matrix(from, "dspMatrix"))
+setAs("dtrMatrix", "ltrMatrix", function(from) d2l_Matrix(from, "dtrMatrix"))
+setAs("dtpMatrix", "ltpMatrix", function(from) d2l_Matrix(from, "dtpMatrix"))
 
 setAs("ddenseMatrix", "CsparseMatrix",
       function(from) {
@@ -82,7 +82,7 @@ setMethod("crossprod", signature(x = "ddenseMatrix", y = "missing"),
           function(x, y = NULL) callGeneric(as(x, "dgeMatrix")))
 
 setMethod("diag", signature(x = "ddenseMatrix"),
-          function(x = 1, nrow, ncol = n) callGeneric(as(x, "dgeMatrix")))
+          function(x, nrow, ncol = n) callGeneric(as(x, "dgeMatrix")))
 
 ## These methods cause an infinite loop in pre-2.4.0
 ## setMethod("solve", signature(a = "ddenseMatrix", b = "missing"),

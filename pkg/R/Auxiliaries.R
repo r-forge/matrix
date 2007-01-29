@@ -419,37 +419,50 @@ t_trMatrix <- function(x) {
     x
 }
 
-fixupDense <- function(m, from) {
-    if(is(m, "triangularMatrix")) {
+fixupDense <- function(m, from, cldm = getClassDef(class(m))) {
+    if(extends(cldm, "triangularMatrix")) {
 	m@uplo <- from@uplo
 	m@diag <- from@diag
-    } else if(is(m, "symmetricMatrix")) {
+    } else if(extends(cldm, "symmetricMatrix")) {
 	m@uplo <- from@uplo
     }
     m
 }
 
 ## -> ./ldenseMatrix.R :
-l2d_Matrix <- function(from) {
-    stopifnot(is(from, "lMatrix"))
-    fixupDense(new(sub("^l", "d", class(from)),
+l2d_Matrix <- function(from, cl = class(from), cld = getClassDef(cl)) {
+    ## stopifnot(is(from, "lMatrix"))
+    fixupDense(new(sub("^l", "d", cl),
 		   x = as.double(from@x),
 		   Dim = from@Dim, Dimnames = from@Dimnames),
-	       from)
+	       from, cld)
     ## FIXME: treat 'factors' smartly {not for triangular!}
 }
 
 ## -> ./ndenseMatrix.R :
-n2d_Matrix <- function(from) {
-    stopifnot(is(from, "nMatrix"))
-    fixupDense(new(sub("^n", "d", class(from)),
-		   x = as.double(from@x),
+n2d_Matrix <- function(from, cl = class(from), cld = getClassDef(cl)) {
+    ## stopifnot(is(from, "nMatrix"))
+    fixupDense(new(sub("^n", "d", cl), x = as.double(from@x),
 		   Dim = from@Dim, Dimnames = from@Dimnames),
-	       from)
+	       from, cld)
     ## FIXME: treat 'factors' smartly {not for triangular!}
 }
+n2l_Matrix <- function(from, cl = class(from), cld = getClassDef(cl)) {
+    fixupDense(new(sub("^n", "l", cl),
+		   x = from@x, Dim = from@Dim, Dimnames = from@Dimnames),
+	       from, cld)
+    ## FIXME: treat 'factors' smartly {not for triangular!}
+}
+## -> ./ddenseMatrix.R :
+d2l_Matrix <- function(from, cl = class(from), cld = getClassDef(cl)) {
+    fixupDense(new(sub("^d", "l", cl), x = as.logical(from@x),
+                   Dim = from@Dim, Dimnames = from@Dimnames),
+	       from, cld)
+    ## FIXME: treat 'factors' smartly {not for triangular!}
+}
+
 n2l_spMatrix <- function(from) {
-    stopifnot(is(from, "nMatrix"))
+    ## stopifnot(is(from, "nMatrix"))
     new(sub("^n", "l", class(from)),
         ##x = as.double(from@x),
         Dim = from@Dim, Dimnames = from@Dimnames)
@@ -600,7 +613,9 @@ as_Csparse2 <- function(x, cld = if(isS4(x)) getClassDef(class(x))) {
     if(sh == "t") .Call(Csparse_diagU2N, x) else x
 }
 
-as_geSimpl <- function(x) as(x, paste(.M.kind(x), "geMatrix", sep=''))
+as_gCsimpl <- function(from) as(from, paste(.M.kind(from), "gCMatrix", sep=''))
+
+as_geSimpl <- function(from) as(from, paste(.M.kind(from), "geMatrix", sep=''))
 ## smarter, (but sometimes too smart!) compared to geClass() above:
 as_geClass <- function(x, cl) {
     if(missing(cl)) as_geSimpl(x)
@@ -626,14 +641,6 @@ as_CspClass <- function(x, cl) {
 }
 
 
-## -> ./ddenseMatrix.R :
-d2l_Matrix <- function(from) {
-    stopifnot(is(from, "dMatrix"))
-    fixupDense(new(sub("^d", "l", class(from)), # no need for dClass2 here
-		   Dim = from@Dim, Dimnames = from@Dimnames),
-	       from)
-    ## FIXME: treat 'factors' smartly {not for triangular!}
-}
 
 
 try_as <- function(x, classes, tryAnyway = FALSE) {
@@ -726,22 +733,27 @@ isTriC <- function(x, upper = NA) {
 }
 
 
-diagU2N <- function(x)
+## Purpose: Transform a *unit diagonal* sparse triangular matrix
+##	into one with explicit diagonal entries '1'
+
+## fast no-test version:
+.diagU2N <- function(x, cl)
 {
-    ## Purpose: Transform a *unit diagonal* sparse triangular matrix
-    ##	into one with explicit diagonal entries '1'
-    if(is(x, "triangularMatrix") && x@diag == "U") {
-	if(is(x, "CsparseMatrix")) {
-	    .Call(Csparse_diagU2N, x)
-	}
-	else {
-	    kind <- .M.kind(x)
-	    xT <- as(x, paste(kind, "gTMatrix", sep=''))
-	    ## leave it as  T* - the caller can always coerce to C* if needed:
-	    new(paste(kind, "tTMatrix", sep=''), x = xT@x, i = xT@i, j = xT@j,
-		Dim = x@Dim, Dimnames = x@Dimnames, uplo = x@uplo, diag = "N")
-	}
+    if(extends(cl, "CsparseMatrix"))
+	.Call(Csparse_diagU2N, x)
+    else {
+	kind <- .M.kind(x, cl)
+	xT <- as(x, paste(kind, "gTMatrix", sep=''))
+	## leave it as	T* - the caller can always coerce to C* if needed:
+	new(paste(kind, "tTMatrix", sep=''), x = xT@x, i = xT@i, j = xT@j,
+	    Dim = x@Dim, Dimnames = x@Dimnames, uplo = x@uplo, diag = "N")
     }
+}
+
+diagU2N <- function(x, cl = getClassDef(class(x)))
+{
+    if(extends(cl, "triangularMatrix") && x@diag == "U")
+	.diagU2N(x, cl)
     else x
 }
 

@@ -14,7 +14,7 @@
 \alias{Ops,lsparseMatrix,lsparseMatrix-method}
 \alias{Arith,lgCMatrix,lgCMatrix-method}
 \alias{Arith,lgTMatrix,lgTMatrix-method}
-\alias{Compare,lsparseMatrix,lsparseCMatrix-method}
+\alias{Compare,lsparseMatrix,lsparseMatrix-method}
 \alias{Logic,lgCMatrix,lgCMatrix-method}
 \alias{Logic,lgTMatrix,lgTMatrix-method}
 \alias{-,lsparseMatrix,missing-method}
@@ -36,11 +36,13 @@
 \alias{coerce,lgCMatrix,matrix-method}
 \alias{coerce,lgTMatrix,dgTMatrix-method}
 \alias{coerce,lgTMatrix,lgCMatrix-method}
+\alias{coerce,lgTMatrix,lgeMatrix-method}
 \alias{coerce,lgTMatrix,lsCMatrix-method}
 \alias{coerce,lgTMatrix,ltTMatrix-method}
 \alias{coerce,lgTMatrix,matrix-method}
 \alias{coerce,lsCMatrix,dgTMatrix-method}
 \alias{coerce,lsCMatrix,dsCMatrix-method}
+\alias{coerce,lsCMatrix,generalMatrix-method}
 \alias{coerce,lsCMatrix,lgCMatrix-method}
 \alias{coerce,lsCMatrix,lgTMatrix-method}
 \alias{coerce,lsCMatrix,lsTMatrix-method}
@@ -49,6 +51,7 @@
 \alias{coerce,lsTMatrix,lgCMatrix-method}
 \alias{coerce,lsTMatrix,lgTMatrix-method}
 \alias{coerce,lsTMatrix,lsCMatrix-method}
+\alias{coerce,lsTMatrix,lsyMatrix-method}
 \alias{coerce,lsTMatrix,matrix-method}
 \alias{coerce,ltCMatrix,dMatrix-method}
 \alias{coerce,ltCMatrix,dtCMatrix-method}
@@ -56,9 +59,12 @@
 \alias{coerce,ltCMatrix,ltTMatrix-method}
 \alias{coerce,ltCMatrix,matrix-method}
 \alias{coerce,ltTMatrix,dtTMatrix-method}
+\alias{coerce,ltTMatrix,lgCMatrix-method}
 \alias{coerce,ltTMatrix,lgTMatrix-method}
 \alias{coerce,ltTMatrix,ltCMatrix-method}
+\alias{coerce,ltTMatrix,ltrMatrix-method}
 \alias{coerce,ltTMatrix,matrix-method}
+
 \alias{coerce,matrix,lgCMatrix-method}
 \alias{coerce,matrix,lgTMatrix-method}
 \alias{coerce,matrix,lsCMatrix-method}

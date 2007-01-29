@@ -29,7 +29,7 @@ dense.o: dense.c dense.h Mutils.h Syms.h \
   CHOLMOD/Include/cholmod_supernodal.h \
   CHOLMOD/Include/cholmod_matrixops.h CHOLMOD/Include/cholmod_modify.h
 
-dgCMatrix.o: dgCMatrix.c dgCMatrix.h Mutils.h Syms.h \
+dgCMatrix.o: dgCMatrix.c dgCMatrix.h Csparse.h Mutils.h Syms.h \
   cs_utils.h cs.h chm_common.h UFconfig/UFconfig.h \
   CHOLMOD/Include/cholmod.h CHOLMOD/Include/cholmod_config.h \
   CHOLMOD/Include/cholmod_core.h CHOLMOD/Include/cholmod_check.h \

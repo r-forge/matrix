@@ -404,24 +404,69 @@ FULL_TO_PACKED(int)
 
 
 /**
- * Copy the diagonal elements of the packed array x to dest
+ * Copy the diagonal elements of the packed denseMatrix x to dest
  *
  * @param dest vector of length ncol(x)
  * @param x pointer to an object representing a packed array
  *
  * @return dest
  */
-double *packed_getDiag(double *dest, SEXP x)
+void d_packed_getDiag(double *dest, SEXP x, int n)
 {
-    int j, n = *INTEGER(GET_SLOT(x, Matrix_DimSym)), pos;
     double *xx = REAL(GET_SLOT(x, Matrix_xSym));
 
-    if (*uplo_P(x) == 'U') {
-	for (pos = 0, j = 0; j < n; pos += ++j) dest[j] = xx[pos];
+#define END_packed_getDiag						\
+    int j, pos = 0;							\
+									\
+    if (*uplo_P(x) == 'U') {						\
+	for(pos= 0, j=0; j < n; pos += 1+(++j))	 dest[j] = xx[pos];	\
+    } else {								\
+	for(pos= 0, j=0; j < n; pos += (n - j), j++) dest[j] = xx[pos]; \
+    }									\
+    return
+
+    END_packed_getDiag;
+}
+
+void l_packed_getDiag(int *dest, SEXP x, int n)
+{
+    int *xx = LOGICAL(GET_SLOT(x, Matrix_xSym));
+
+    END_packed_getDiag;
+}
+
+#undef END_packed_getDiag
+
+void tr_d_packed_getDiag(double *dest, SEXP x)
+{
+    int n = INTEGER(GET_SLOT(x, Matrix_DimSym))[0];
+    SEXP val = PROTECT(allocVector(REALSXP, n));
+    double *v = REAL(val);
+
+    if (*diag_P(x) == 'U') {
+	int j;
+	for (j = 0; j < n; j++) v[j] = 1.;
     } else {
-	for (pos = 0, j = 0; j < n; pos += (n - j), j++) dest[j] = xx[pos];
+	d_packed_getDiag(v, x, n);
     }
-    return dest;
+    UNPROTECT(1);
+    return;
+}
+
+void tr_l_packed_getDiag(   int *dest, SEXP x)
+{
+    int n = INTEGER(GET_SLOT(x, Matrix_DimSym))[0];
+    SEXP val = PROTECT(allocVector(LGLSXP, n));
+    int *v = LOGICAL(val);
+
+    if (*diag_P(x) == 'U') {
+	int j;
+	for (j = 0; j < n; j++) v[j] = 1;
+    } else {
+	l_packed_getDiag(v, x, n);
+    }
+    UNPROTECT(1);
+    return;
 }
 
 SEXP Matrix_expand_pointers(SEXP pP)
