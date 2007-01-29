@@ -1,5 +1,8 @@
 2007-01-29  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* R/diagMatrix.R (solve): the obvious methods for diagonalMatrix
+	objects.
+
 	* tests/Class+Meth.R (tstMatrixClass): now testing diag(), nnzero(),
 	  and more of "!", "&", "|", all, any; coercions
 

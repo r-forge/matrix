@@ -384,6 +384,27 @@ setMethod("%*%", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
 setMethod("%*%", signature(x = "sparseMatrix", y = "diagonalMatrix"),
 	  function(x, y) x %*% as(y, "sparseMatrix"))
 
+setMethod("solve", signature(a = "diagonalMatrix", b = "missing"),
+	  function(a, b, ...) {
+	      a@x <- 1/ a@x
+	      a@Dimnames <- a@Dimnames[2:1]
+	      a
+	  })
+
+solveDiag <- function(a, b, ...) {
+    if((n <- a@Dim[1]) != nrow(b))
+        stop("incompatible matrix dimensions")
+    ## trivially invert a 'in place' and multiply:
+    a@x <- 1/ a@x
+    a@Dimnames <- a@Dimnames[2:1]
+    a %*% b
+}
+setMethod("solve", signature(a = "diagonalMatrix", b = "matrix"),
+          solveDiag)
+setMethod("solve", signature(a = "diagonalMatrix", b = "Matrix"),
+          solveDiag)
+
+
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "sparseMatrix"),
 	  function(x, y = NULL) { x <- as(x, "sparseMatrix"); callGeneric() })
 
