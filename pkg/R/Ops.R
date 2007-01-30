@@ -112,8 +112,8 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
 	      r	 <- callGeneric(e1@x, e2)
 	      r0 <- callGeneric(0, e2)
               d <- e1@Dim
-	      ## trivial case first
-	      if(isTRUE(r0) && all(r)) {
+	      ## trivial case first (beware of NA)
+	      if(isTRUE(r0 && all(r))) {
 		  r <- new(fullCl)
 		  r@Dim <- d
 		  r@Dimnames <- e1@Dimnames
@@ -361,8 +361,8 @@ setMethod("Logic", signature(e1 = "lMatrix", e2 = "logical"),
 	      r	 <- callGeneric(e1@x, e2)
 	      r0 <- callGeneric(FALSE, e2)
 	      d <- e1@Dim
-	      ## trivial case first
-	      if(isTRUE(r0) && all(r)) {
+	      ## trivial case first (beware of NA)
+	      if(isTRUE(r0 && all(r))) {
 		  r <- new(if(d[1] == d[2]) "lsyMatrix" else "lgeMatrix")
 		  r@Dim <- d
 		  r@Dimnames <- e1@Dimnames
@@ -517,8 +517,11 @@ setMethod("Arith", signature(e1="lgTMatrix", e2="lgTMatrix"),
 ## FIXME: These are really too cheap: currently almost all go via dgC*() :
 ## setMethod("Compare", signature(e1="lgCMatrix", e2="lgCMatrix"),
 ## setMethod("Compare", signature(e1="lgTMatrix", e2="lgTMatrix"),
+## setMethod("Compare", signature(e1="lsparseMatrix", e2="lsparseMatrix"),
+## 	  function(e1, e2) callGeneric(as(e1, "dgCMatrix"), as(e2, "dgCMatrix")))
 setMethod("Compare", signature(e1="lsparseMatrix", e2="lsparseMatrix"),
-	  function(e1, e2) callGeneric(as(e1, "dgCMatrix"), as(e2, "dgCMatrix")))
+	  function(e1, e2) callGeneric(as(e1, "CsparseMatrix"),
+				       as(e2, "CsparseMatrix")))
 
 ## setMethod("Compare", signature(e1="lgTMatrix", e2="lgTMatrix"), ## coerce to Csparse
 ## 	  function(e1, e2) callGeneric(as(e1, "dgCMatrix"), as(e2, "dgCMatrix")))

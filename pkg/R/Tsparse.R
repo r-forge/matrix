@@ -138,16 +138,23 @@ setAs("ntTMatrix", "ntCMatrix",
 setMethod("[", signature(x = "TsparseMatrix", i = "index", j = "missing",
 			 drop = "logical"),
 	  function (x, i, j, ..., drop) { ## select rows
-              if(is(x, "symmetricMatrix"))
-		  x <- as(x, paste(.M.kind(x), "gTMatrix", sep=''))
+	      clx <- getClassDef(class(x))
+	      has.x <- !extends(clx, "nsparseMatrix")
+	      x.sym <- extends(clx, "symmetricMatrix")
+	      if(x.sym)
+		  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
 	      ip <- .ind.prep(x@i, i, 1, dim(x), dimnames(x))
-	      x@Dim[1] <- ip$li
+	      Di1 <- ip$li
+	      drop.it <- drop && (Di1 == 1:1 || x@Dim[2] == 1:1)
+	      if(!drop.it && !x.sym && extends(clx, "triangularMatrix"))
+		  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
+	      x@Dim[1] <- Di1
 	      if(!is.null(ip$dn)) x@Dimnames[[1]] <- ip$dn
 	      sel <- ip$m > 0
 	      x@i <- ip$m[sel] - 1:1
 	      x@j <- x@j[sel]
-	      if (!is(x, "nsparseMatrix")) x@x <- x@x[sel]
-	      if (drop && any(x@Dim == 1:1)) drop(as(x,"matrix")) else x
+	      if (has.x) x@x <- x@x[sel]
+	      if (drop.it) drop(as(x,"matrix")) else x
 	  })
 
 
@@ -155,16 +162,23 @@ setMethod("[", signature(x = "TsparseMatrix", i = "index", j = "missing",
 setMethod("[", signature(x = "TsparseMatrix", i = "missing", j = "index",
 			 drop = "logical"),
 	  function (x, i, j, ..., drop) { ## select columns
-              if(is(x, "symmetricMatrix"))
-		  x <- as(x, paste(.M.kind(x), "gTMatrix", sep=''))
+	      clx <- getClassDef(class(x))
+	      has.x <- !extends(clx, "nsparseMatrix")
+	      x.sym <- extends(clx, "symmetricMatrix")
+	      if(x.sym)
+		  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
 	      ip <- .ind.prep(x@j, j, 2, dim(x), dimnames(x))
-	      x@Dim[2] <- ip$li
+	      Di2 <- ip$li
+	      drop.it <- drop && (x@Dim[1] == 1:1 || Di2 == 1:1)
+	      if(!drop.it && !x.sym && extends(clx, "triangularMatrix"))
+		  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
+	      x@Dim[2] <- Di2
 	      if(!is.null(ip$dn)) x@Dimnames[[2]] <- ip$dn
 	      sel <- ip$m > 0
 	      x@i <- x@i[sel]
 	      x@j <- ip$m[sel] - 1:1
-	      if (!is(x, "nsparseMatrix")) x@x <- x@x[sel]
-	      if (drop && any(x@Dim == 1:1)) drop(as(x,"matrix")) else x
+	      if (has.x) x@x <- x@x[sel]
+	      if (drop.it) drop(as(x,"matrix")) else x
 	  })
 
 
@@ -177,13 +191,16 @@ setMethod("[", signature(x = "TsparseMatrix",
 	  ## (i,j, drop) all specified
 	  di <- dim(x)
 	  dn <- dimnames(x)
-	  if(is(x, "symmetricMatrix")) {
+	  clx <- getClassDef(class(x))
+	  has.x <- !extends(clx, "nsparseMatrix")
+	  isSym <- extends(clx, "symmetricMatrix")
+	  if(isSym) {
 	      isSym <- length(i) == length(j) && all(i == j)
 	      ## result is *still* symmetric --> keep symmetry!
 	      if(!isSym)
 		  ## result no longer symmetric -> to "generalMatrix"
-		  x <- as(x, paste(.M.kind(x), "gTMatrix", sep=''))
-	  } else isSym <- FALSE
+		  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
+	  }
 	  if(isSym) {
 	      offD <- x@i != x@j
 	      ip1 <- .ind.prep(c(x@i,x@j[offD]), i, 1, di, dn)
@@ -192,9 +209,12 @@ setMethod("[", signature(x = "TsparseMatrix",
 	      ip1 <- .ind.prep(x@i, i, 1, di, dn)
 	      ip2 <- .ind.prep(x@j, j, 2, di, dn)
 	  }
-	  x@Dim <- nd <- c(ip1$li, ip2$li)
+	  nd <- c(ip1$li, ip2$li)
+	  drop.it <- drop && any(nd == 1)
+	  if(!drop.it && !isSym && extends(clx, "triangularMatrix"))
+	      x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
+	  x@Dim <- nd
 	  x@Dimnames <- list(ip1$dn, ip2$dn)
-
 	  sel <- ip1$m > 0:0  &	 ip2$m > 0:0
 	  if(isSym) { # only those corresponding to upper/lower triangle
 	      sel <- sel &
@@ -202,13 +222,14 @@ setMethod("[", signature(x = "TsparseMatrix",
 	  }
 	  x@i <- ip1$m[sel] - 1:1
 	  x@j <- ip2$m[sel] - 1:1
-	  if (!is(x, "nsparseMatrix"))
+	  if (has.x)
 	      x@x <- c(x@x, if(isSym) x@x[offD])[sel]
-	  if (drop && any(nd == 1)) drop(as(x,"matrix")) else x
+	  if (drop.it) drop(as(x,"matrix")) else x
       })
 
 
-## FIXME: Learn from .TM... below
+## FIXME: Learn from .TM... below or rather  .M.sub.i.2col(.) in ./Matrix.R
+## ------ the following should be much more efficient than the   ./Matrix.R code :
 if(FALSE)
 ## A[ ij ]  where ij is (i,j) 2-column matrix :
 setMethod("[", signature(x = "TsparseMatrix",

@@ -1,5 +1,5 @@
 
-R version 2.4.1 Patched (2007-01-15 r40493)
+R version 2.4.1 Patched (2007-01-27 r40609)
 Copyright (C) 2007 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -736,7 +736,20 @@ Ambiguous method selection for "kronecker", target "ddiMatrix#dsyMatrix" (the fi
 + 	  identical(m. < mc, as(!ge, "sparseMatrix")),
 + 	  identical(ne., Matrix:::drop0(ne1)))
 > 
+> (M3 <- Matrix(upper.tri(matrix(, 3, 3)))) # ltC; indexing used to fail
+3 x 3 sparse Matrix of class "ltCMatrix"
+          
+[1,] . | |
+[2,] . . |
+[3,] . . .
+> T3 <- as(M3, "TsparseMatrix")
+> stopifnot(identical(drop(M3), M3),
++ 	  identical4(drop(M3[,2, drop = FALSE]), M3[,2, drop = TRUE],
++ 		     drop(T3[,2, drop = FALSE]), T3[,2, drop = TRUE]),
++ 	  is(T3, "triangularMatrix"),
++ 	  !is(T3[,2, drop=FALSE], "triangularMatrix")
++ 	  )
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
-Time elapsed:  5.851 0.156 6.772 0 0 
+Time elapsed:  6.726 0.163 7.634 0 0 
 > 

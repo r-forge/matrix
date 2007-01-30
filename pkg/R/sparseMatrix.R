@@ -148,23 +148,24 @@ setMethod("[", signature(x = "sparseMatrix", i = "index", j = "missing",
 			 drop = "logical"),
 	  function (x, i, j, drop) {
 	      cld <- getClassDef(class(x))
-              viaCl <- paste(.M.kind(x,cld), "gTMatrix", sep='')
-              x <- callGeneric(x = as(x, viaCl), i=i, drop=drop)
-              ## try_as(x, c(cl, sub("T","C", viaCl)))
-              if(is(x, "Matrix") && extends(cld, "CsparseMatrix"))
-                  as(x, sub("T","C", viaCl)) else x
-          })
+	      if(!extends(cld, "generalMatrix")) x <- as(x, "generalMatrix")
+	      viaCl <- paste(.M.kind(x, cld), "gTMatrix", sep='')
+	      x <- callGeneric(x = as(x, viaCl), i=i, drop=drop)
+	      ## try_as(x, c(cl, sub("T","C", viaCl)))
+	      if(is(x, "Matrix") && extends(cld, "CsparseMatrix"))
+		  as(x, "CsparseMatrix") else x
+	  })
 
 setMethod("[", signature(x = "sparseMatrix", i = "missing", j = "index",
 			 drop = "logical"),
 	  function (x, i, j, drop) {
 	      cld <- getClassDef(class(x))
-              viaCl <- paste(.M.kind(x, cld), "gTMatrix", sep='')
-              x <- callGeneric(x = as(x, viaCl), j=j, drop=drop)
-              ## try_as(x, c(cl, sub("T","C", viaCl)))
-              if(is(x, "Matrix") && extends(cld, "CsparseMatrix"))
-                  as(x, sub("T","C", viaCl)) else x
-          })
+	      if(!extends(cld, "generalMatrix")) x <- as(x, "generalMatrix")
+	      viaCl <- paste(.M.kind(x, cld), "gTMatrix", sep='')
+	      x <- callGeneric(x = as(x, viaCl), j=j, drop=drop)
+	      if(is(x, "Matrix") && extends(cld, "CsparseMatrix"))
+		  as(x, "CsparseMatrix") else x
+	  })
 
 setMethod("[", signature(x = "sparseMatrix",
 			 i = "index", j = "index", drop = "logical"),
@@ -173,12 +174,13 @@ setMethod("[", signature(x = "sparseMatrix",
 	      ## be smart to keep symmetric indexing of <symm.Mat.> symmetric:
 	      doSym <- (extends(cld, "symmetricMatrix") &&
 			length(i) == length(j) && all(i == j))
+	      if(!doSym && !extends(cld, "generalMatrix"))
+		  x <- as(x, "generalMatrix")
 	      viaCl <- paste(.M.kind(x, cld),
 			     if(doSym) "sTMatrix" else "gTMatrix", sep='')
 	      x <- callGeneric(x = as(x, viaCl), i=i, j=j, drop=drop)
-	      ## try_as(x, c(cl, sub("T","C", viaCl)))
 	      if(is(x, "Matrix") && extends(cld, "CsparseMatrix"))
-		  as(x, sub("T","C", viaCl)) else x
+		  as(x, "CsparseMatrix") else x
 	  })
 
 

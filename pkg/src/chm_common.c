@@ -21,8 +21,9 @@ cholmod_sparse *as_cholmod_sparse(SEXP x)
 		     "ngCMatrix", "nsCMatrix", "ntCMatrix",
 		     "zgCMatrix", "zsCMatrix", "ztCMatrix",
 		     ""};
-    int *dims, ctype = Matrix_check_class(class_P(x), valid);
-    SEXP islot;
+    int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
+	ctype = Matrix_check_class(class_P(x), valid);
+    SEXP islot = GET_SLOT(x, Matrix_iSym);
 
     if (ctype < 0) error("invalid class of object to as_cholmod_sparse");
 				/* characteristics of the system */
@@ -32,10 +33,9 @@ cholmod_sparse *as_cholmod_sparse(SEXP x)
     ans->sorted = TRUE;
     ans->x = ans->z = ans->nz = (void *) NULL;
 				/* dimensions and nzmax */
-    dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
     ans->nrow = dims[0];
     ans->ncol = dims[1];
-    islot = GET_SLOT(x, Matrix_iSym);
+
     ans->nzmax = LENGTH(islot);
 				/* slots always present */
     ans->i = (void *) INTEGER(islot);
@@ -435,10 +435,13 @@ SEXP chm_dense_to_SEXP(cholmod_dense *a, int dofree, int Rkind, SEXP dn)
     PROTECT(dn); /* << (why? -- just cut&paste from chm_dense_to_mat.. below*/
 
     switch(a->xtype) {		/* determine the class of the result */
-    case CHOLMOD_PATTERN:
-	cl = "ngeMatrix"; break;
+/* CHOLMOD_PATTERN never happens because cholmod_dense can't :
+ *     case CHOLMOD_PATTERN:
+ * 	cl = "ngeMatrix"; break;
+ */
     case CHOLMOD_REAL:
-	switch(Rkind) {
+	switch(Rkind) { /* -1: special for this function! */
+	case -1: cl = "ngeMatrix"; break;
 	case 0:	 cl = "dgeMatrix"; break;
 	case 1:	 cl = "lgeMatrix"; break;
 	default: error("unknown 'Rkind'");
@@ -455,7 +458,7 @@ SEXP chm_dense_to_SEXP(cholmod_dense *a, int dofree, int Rkind, SEXP dn)
     dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
     dims[0] = a->nrow; dims[1] = a->ncol;
     ntot = dims[0] * dims[1];
-    if (a->d == a->nrow) {	/* copy data slot if present */
+    if (a->d == a->nrow) {	/* copy data slot -- always present in dense(!) */
 	if (a->xtype == CHOLMOD_REAL) {
 	    int i, *m_x;
 	    switch(Rkind) {
@@ -463,7 +466,8 @@ SEXP chm_dense_to_SEXP(cholmod_dense *a, int dofree, int Rkind, SEXP dn)
 		Memcpy(REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, ntot)),
 		       (double *) a->x, ntot);
 		break;
-	    case 1:
+	    case -1: /* nge*/
+	    case 1:  /* lge*/
 		m_x = LOGICAL(ALLOC_SLOT(ans, Matrix_xSym, LGLSXP, ntot));
 		for (i=0; i < ntot; i++)
 		    m_x[i] = (int) ((double *) a->x)[i];

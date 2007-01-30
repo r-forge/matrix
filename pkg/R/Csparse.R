@@ -35,10 +35,10 @@ setAs("CsparseMatrix", "denseMatrix",
 	  else {
 	      ## Csparse_to_dense  loses symmetry and triangularity properties.
 	      ## With suitable changes to chm_dense_to_SEXP (../src/chm_common.c)
-	      ## we could do this in C code {FIXME}
+	      ## we could do this in C code -- or do differently in C {FIXME!}
 	      if (extends(cld, "triangularMatrix") && from@diag == "U")
 		  from <- .Call(Csparse_diagU2N, from)
-	      as(.Call(Csparse_to_dense, from),
+	      as(.Call(Csparse_to_dense, from), # -> "[dln]geMatrix"
 		 paste(.M.kind(from, cld),
 		       .dense.prefixes[.M.shape(from, cld)], "Matrix", sep=''))
 	  }

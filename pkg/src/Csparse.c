@@ -40,11 +40,17 @@ SEXP Csparse_validate(SEXP x)
     return ScalarLogical(1);
 }
 
+/* Called from ../R/Csparse.R : */
+/* Can only return [dln]geMatrix (no symm/triang);
+ * FIXME: replace by non-CHOLMOD code ! */
 SEXP Csparse_to_dense(SEXP x)
 {
     cholmod_sparse *chxs = as_cholmod_sparse(x);
+    /* This loses the symmetry property, since cholmod_dense has none,
+     * BUT, much worse (FIXME!), it also transforms CHOLMOD_PATTERN ("n") matrices
+     * to numeric (CHOLMOD_REAL) ones : */
     cholmod_dense *chxd = cholmod_sparse_to_dense(chxs, &c);
-    int Rkind = (chxs->xtype == CHOLMOD_PATTERN)? 0 : Real_kind(x);
+    int Rkind = (chxs->xtype == CHOLMOD_PATTERN)? -1 : Real_kind(x);
 
     Free(chxs);
     return chm_dense_to_SEXP(chxd, 1, Rkind, GET_SLOT(x, Matrix_DimNamesSym));
