@@ -1,3 +1,24 @@
+2007-01-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Tsparse.R ([): more care when subsetting triangular Tsparse
+	* tests/indexing.R: tested now
+	* tests/indexing.Rout.save: updated
+
+	* src/Csparse.c (Csparse_to_dense): use Rkind = -1 for PATTERN to
+	* src/chm_common.c (chm_dense_to_SEXP): return "ngeMatrix" when
+	appropriate.
+
+	* NAMESPACE: export a trivial
+	* R/Matrix.R: drop() Matrix-method
+
+	* R/AllClass.R: moved all prototypes to virtual super classes.
+
+	* R/Rsparse.R: many more coercions to have less exceptions in
+	* tests/Class+Meth.R:
+
+	* R/Ops.R (Compare): tweak for case with NA
+	* tests/simpl.R: hence another 'FIXME' eliminated
+
 2007-01-29  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/diagMatrix.R (solve): the obvious methods for diagonalMatrix

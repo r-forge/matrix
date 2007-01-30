@@ -41,6 +41,7 @@
 \alias{chol,Matrix,ANY-method}
 \alias{determinant,Matrix,ANY-method}
 \alias{diag,Matrix-method}
+\alias{drop,Matrix-method}
 \alias{head,Matrix-method}
 \alias{tail,Matrix-method}
 \alias{solve,Matrix,Matrix-method}

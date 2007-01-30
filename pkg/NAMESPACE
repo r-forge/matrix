@@ -94,18 +94,18 @@ exportClasses(
 	      "ndenseMatrix",
 
 	      "dgCMatrix",
-	      "dgRMatrix",# unused
+	      "dgRMatrix",
 	      "dgTMatrix",
 	      "dgeMatrix",
 	      "dpoMatrix",
 	      "dppMatrix",
 	      "dsCMatrix",
-	      "dsRMatrix",# unused
+	      "dsRMatrix",
 	      "dsTMatrix",
 	      "dspMatrix",
 	      "dsyMatrix",
 	      "dtCMatrix",
-	      "dtRMatrix",# unused
+	      "dtRMatrix",
 	      "dtTMatrix",
 	      "dtpMatrix",
 	      "dtrMatrix",
@@ -126,20 +126,20 @@ exportClasses(
 	      "lgRMatrix",
 	      "lgTMatrix",
 	      "lsCMatrix",
-	      "lsRMatrix",# unused
+	      "lsRMatrix",
 	      "lsTMatrix",
 	      "ltCMatrix",
-	      "ltRMatrix",# unused
+	      "ltRMatrix",
 	      "ltTMatrix",
 
 	      "ngCMatrix",
 	      "ngRMatrix",
 	      "ngTMatrix",
 	      "nsCMatrix",
-	      "nsRMatrix",# unused
+	      "nsRMatrix",
 	      "nsTMatrix",
 	      "ntCMatrix",
-	      "ntRMatrix",# unused
+	      "ntRMatrix",
 	      "ntTMatrix",
 
 	      "pMatrix",
@@ -207,6 +207,7 @@ exportMethods(
 	      "dim",
 	      "dimnames",
 	      "dimnames<-",
+              "drop",
 	      "expand",
 	      "expm",
 	      "head",

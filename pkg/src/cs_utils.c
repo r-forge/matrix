@@ -42,7 +42,8 @@ check_class(const char *class, char **valid)
 cs *Matrix_as_cs(SEXP x)
 {
     cs *ans = Calloc(1, cs);
-    char *valid[] = {"dgCMatrix", "dsCMatrix", "dtCMatrix", ""};
+    char *valid[] = {"dgCMatrix", "dtCMatrix", ""};/* had also "dsCMatrix", but that
+						    * only stores one triangle */
     int *dims, ctype = check_class(class_P(x), valid);
     SEXP islot;
 

@@ -27,6 +27,9 @@ setMethod("as.array",  signature(x = "Matrix"), function(x) as(x, "matrix"))
 setMethod("head", signature(x = "Matrix"), utils::head.matrix)
 setMethod("tail", signature(x = "Matrix"), utils::tail.matrix)
 
+setMethod("drop", signature(x = "Matrix"),
+	  function(x) if(all(dim(x) != 1)) x else drop(as(x, "matrix")))
+
 ## slow "fall back" method {subclasses should have faster ones}:
 setMethod("as.vector", signature(x = "Matrix", mode = "missing"),
 	  function(x) as.vector(as(x, "matrix")))
@@ -102,6 +105,8 @@ Matrix <-
 
     doDN <- TRUE
     if (i.M) {
+        if(!missing(nrow) || !missing(ncol)|| !missing(byrow))
+            warning("'nrow', 'ncol', etc, are disregarded when 'data' is \"Matrix\" already")
 	sM <- is(data,"sparseMatrix")
 	if(!forceCheck && ((sparse && sM) || (!sparse && !sM)))
 	    return(data)
@@ -129,7 +134,7 @@ Matrix <-
 	    dimnames(data) <- dimnames
 	}
         doDN <- FALSE
-    } else if(!missing(nrow) || !missing(ncol))
+    } else if(!missing(nrow) || !missing(ncol)|| !missing(byrow))
 	warning("'nrow', 'ncol', etc, are disregarded for matrix 'data'")
 
     ## 'data' is now a "matrix" or "Matrix"

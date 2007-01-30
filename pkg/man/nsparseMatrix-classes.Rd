@@ -66,8 +66,6 @@
 \alias{crossprod,nsparseMatrix,nsparseMatrix-method}
 \alias{crossprod,nsparseMatrix,ndenseMatrix-method}
 \alias{crossprod,ndenseMatrix,nsparseMatrix-method}
-\alias{diag,ngCMatrix-method}
-\alias{diag,nsparseMatrix-method}
 \alias{image,ngCMatrix-method}
 \alias{image,nsCMatrix-method}
 \alias{image,nsTMatrix-method}

@@ -66,15 +66,13 @@ stopifnot(is(tm <- tu * 1:8, "sparseMatrix"),
           identical4(tm, cu * 1:8, 1:8 * cu, 1:8 * tu))
 
 cu[1,2] <- tu[1,2] <- NA
+mu <- as(tu,"matrix")
 stopifnot(is(cu, "CsparseMatrix"), is(cu, "triangularMatrix"),
           is(tu, "TsparseMatrix"), is(tu, "triangularMatrix"),
-          identical(cu * 1:8, tu * 1:8)) # but are no longer triangular
-assert.EQ.mat(cu * 1:8, as(tu,"matrix") * 1:8)
+          identical(cu * 1:8, tu * 1:8), # but are no longer triangular
+          all(cu >= 0), all(tu >= 0))
+assert.EQ.mat(cu * 1:8, mu * 1:8)
 
-if(FALSE)## FIXME: These now fail:
-    all(cu >= 0) & all(tu >= 0)
-
-mu <- as(tu,"matrix")
 ## tu. is diag "U", but tu2 not:
 tu2 <- as(as(tu., "dgTMatrix"), "dtTMatrix")
 assert.EQ.mat(cu, mu, tol=0)

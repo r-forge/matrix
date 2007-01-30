@@ -335,5 +335,13 @@ stopifnot(identical(!(m. < mc), m. >= mc),
 	  identical(m. < mc, as(!ge, "sparseMatrix")),
 	  identical(ne., Matrix:::drop0(ne1)))
 
+(M3 <- Matrix(upper.tri(matrix(, 3, 3)))) # ltC; indexing used to fail
+T3 <- as(M3, "TsparseMatrix")
+stopifnot(identical(drop(M3), M3),
+	  identical4(drop(M3[,2, drop = FALSE]), M3[,2, drop = TRUE],
+		     drop(T3[,2, drop = FALSE]), T3[,2, drop = TRUE]),
+	  is(T3, "triangularMatrix"),
+	  !is(T3[,2, drop=FALSE], "triangularMatrix")
+	  )
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''

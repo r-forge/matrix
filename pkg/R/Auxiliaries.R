@@ -579,8 +579,8 @@ geClass <- function(x) {
                       "g" = "g")
 
 ## Used, e.g. after subsetting: Try to use specific class -- if feasible :
-as_dense <- function(x) {
-    as(x, paste(.M.kind(x), .dense.prefixes[.M.shape(x)], "Matrix", sep=''))
+as_dense <- function(x, cld = if(isS4(x)) getClassDef(class(x))) {
+    as(x, paste(.M.kind(x, cld), .dense.prefixes[.M.shape(x, cld)], "Matrix", sep=''))
 }
 
 .sp.class <- function(x) { ## find and return the "sparseness class"

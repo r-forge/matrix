@@ -37,9 +37,6 @@ setMethod("!", "lsparseMatrix",
           ## turns FALSE to TRUE --> dense matrix
           function(e1) !as(e1, "denseMatrix"))# was "lgeMatrix"
 
-setMethod("diag", signature(x = "lsparseMatrix"),
-	  function(x, nrow, ncol = n) diag(as(x, "lgCMatrix")))
-
 
 setMethod("all", signature(x = "lsparseMatrix"),
 	  function(x, ..., na.rm = TRUE)

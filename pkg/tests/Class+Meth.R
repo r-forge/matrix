@@ -41,27 +41,31 @@ validObject(mm)
 
 ### Sparse Logical:
 m <- Matrix(c(0,0,2:0), 3,5)
-mT <- as(mC <- as(m, "dgCMatrix"), "dgTMatrix")
-stopifnot(identical(as(mT,"dgCMatrix"), mC))
-(mC. <- as(mT[1:2, 2:3], "dgCMatrix"))
-(mlC <- as(mC. , "lgCMatrix"))
-
-if(FALSE) ## ltC no longer extends lgC -- want coercion to triangular; FIXME
+mT <- as(mC <- as(m, "CsparseMatrix"), "TsparseMatrix")
+stopifnot(identical(as(mT,"CsparseMatrix"), mC))
+(mC. <- as(mT[1:2, 2:3], "CsparseMatrix"))
+(mlC <- as(mC. , "lMatrix"))
 as(mlC,"ltCMatrix")
+
 
 
 ### Test all classes:  validObject(new( * )) should be fulfilled -----------
 
 ## need stoplist for now:
 Rcl.struc <- c("gR", "sR", "tR")
-not.ok.classes <- paste0(sort(outer(c("l", "n"), Rcl.struc, paste0)), "Matrix")
-                                        # only stub implementation
+(dR.classes <- paste0(paste0("d", Rcl.struc[Rcl.struc != "gR"]),   "Matrix"))
+(.R.classes <- paste0(sort(outer(c("l", "n"), Rcl.struc, paste0)), "Matrix"))
+                                        # have only stub implementation
+
+## not.ok..: are left out almost completely
+not.ok.classes <- NULL  ## was  .R.classes
 ## From the rest, those that don't show {have no coerce to "dge":}
-no.show.classes <- paste0(paste0("d", Rcl.struc[Rcl.struc != "gR"]), "Matrix")
+no.show.classes <- NULL ## was  dR.classes
+##
 Mat.MatFact <- c("Cholesky", "pCholesky",
                  "BunchKaufman", "pBunchKaufman")##, "LDL"
-no.t.etc <- c(no.show.classes, Mat.MatFact)
-no.t.classes <- no.t.etc        # no t() available
+no.t.etc <- c(no.show.classes, .R.classes, dR.classes, Mat.MatFact)
+no.t.classes <- c(no.t.etc)     # no t() available
 not.Ops      <- no.show.classes # "Ops", e.g. "+" fails
 not.coerce0  <- no.show.classes # not coercable to   "matrix" & "dgeMatrix"
 not.coerce1  <- no.t.etc        # not coercable from "dgeMatrix"
@@ -142,8 +146,12 @@ tstMatrixClass <-
 
 		## This can only work as long as 'm' has no NAs :
                 ## not yet -- have version in not.Ops below
-## 		stopifnot(all(m == m)) ## check all() and "==" [Compare]
-## 		if(any(m != m)) stop(" any (m != m) should not be true")
+## once we have is.na():
+## 		stopifnot(all(m == m | is.na(m))) ## check all() and "==" [Compare]
+## 		if(any(m != m && !is.na(m)))
+		stopifnot(all(m == m)) ## check all() and "==" [Compare]
+		if(any(m != m))
+		    stop(" any (m != m) should not be true")
 
                 if(clNam %in% no.t.classes) {
                     cat(" in t()-'stop list'\n")
@@ -189,10 +197,7 @@ tstMatrixClass <-
 			stopifnot(as(2*m,"matrix") == as(m+m, "matrix"))
 			cat("ok\n")
 		    }
-		    ## FIXME: this should be for all valid, not just dMatrix:
-		    stopifnot(all(m == m)) ## check all() and "==" [Compare]
-		    if(any(m != m)) stop(" any (m != m) should not be true")
-
+                    ## m == m etc, now for all, see above
 		    cat("m >= m for all: ")
 		    stopifnot(all(m >= m)); cat("ok\n")
 		    cat("m < m for none: ")
