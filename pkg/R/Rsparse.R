@@ -8,7 +8,36 @@
 ### contains = "dMatrix"
 
 .R.2.T <- function(from) .Call(compressed_to_TMatrix, from, FALSE)
+
+## R_to_CMatrix -- fails on 32bit--enable-R-shlib with segfault {Kurt}
+## ------------ --> ../src/dgCMatrix.c
 .R.2.C <- function(from) .Call(R_to_CMatrix, from)
+## "slow" R-level workaround
+.R.2.C <- function(from)
+{
+    cl <- class(from)
+    valid <- c("dgRMatrix", "dsRMatrix", "dtRMatrix",
+               "lgRMatrix", "lsRMatrix", "ltRMatrix",
+               "ngRMatrix", "nsRMatrix", "ntRMatrix",
+               "zgRMatrix", "zsRMatrix", "ztRMatrix")
+    icl <- match(cl, valid) - 1:1
+    if(is.na(icl)) stop("invalid class:", cl)
+    Ccl <- sub("^(..)R","\\1C", cl)  # corresponding Csparse class name
+    r <- new(Ccl)
+    r@Dim <- rev(from@Dim)
+    if(icl %/% 3 != 2) ## not "n..Matrix" --> has 'x' slot
+        r@x <- from@x
+    if(icl %% 3 != 0) {                 # symmetric or triangular
+        r@uplo <- from@uplo
+        if(icl %% 3 == 2)               # triangular
+            r@diag <- from@diag
+    }
+    r@i <- from@j
+    r@p <- from@p
+    r <- t(r)
+    r@Dimnames <- from@Dimnames
+    r
+}
 
 setAs("RsparseMatrix", "TsparseMatrix", .R.2.T)
 setAs("RsparseMatrix", "CsparseMatrix", .R.2.C)
