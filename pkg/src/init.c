@@ -191,6 +191,12 @@ static R_CallMethodDef CallEntries[] = {
 /*     {"tsc_to_dgTMatrix", (DL_FUNC) &tsc_to_dgTMatrix, 1}, */
     {"triangularMatrix_validate", (DL_FUNC) &triangularMatrix_validate, 1},
     {"symmetricMatrix_validate", (DL_FUNC) &symmetricMatrix_validate, 1},
+
+/* still simple placeholders, but already used in ../R/AllClass.R : */
+    {"CHMfactor_validate", (DL_FUNC) &CHMfactor_validate, 1},
+    {"CHMsimpl_validate",  (DL_FUNC) &CHMsimpl_validate, 1},
+    {"CHMsuper_validate",  (DL_FUNC) &CHMsuper_validate, 1},
+
     {NULL, NULL, 0}
 };
 

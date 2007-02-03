@@ -5,9 +5,48 @@ source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 #### possibly augmented with methods
 
 allCl <- getClasses("package:Matrix")
+cat("actual and virtual classes:\n")
+table( sapply(allCl, isVirtualClass) )
 
 ## Really nice would be to construct an inheritance graph and display
 ## it.  The following is just a cheap first step.
+
+## We use a version of  canCoerce()  that works with two *classes* instead of
+## canCoerce <- function (object, Class)
+classCanCoerce <- function (class1, class2)
+{
+    extends(class1, class2) ||
+    !is.null(selectMethod("coerce", optional = TRUE,
+			  signature    = c(from = class1, to = class2),
+			  useInherited = c(from = TRUE,	  to = FALSE)))
+}
+.dq <- function(ch) paste0('"', ch, '"')
+for(n in allCl) {
+    if(isVirtualClass(n))
+        cat("Virtual class", .dq(n),"\n")
+    else {
+        cat("\"Actual\" class", .dq(n),":\n")
+        x <- new(n)
+        for(m in allCl)
+            if(classCanCoerce(n,m)) {
+                ext <- extends(n, m)
+                if(ext) {
+                    cat(sprintf("   extends  %20s %20s \n", "", .dq(m)))
+                } else {
+                    cat(sprintf("   can coerce: %20s -> %20s: ", .dq(n), .dq(m)))
+                    tt <- try(as(x, m), silent = TRUE)
+                    if(inherits(tt, "try-error")) {
+                        cat("\t *ERROR* !!\n")
+                    } else {
+                        cat("as() ok; validObject: ")
+                        vo <- validObject(tt, test = TRUE)
+                        cat(if(isTRUE(vo)) "ok" else paste("OOOOOOPS:", vo), "\n")
+                    }
+                }
+            }
+        cat("---\n")
+    }
+}
 
 if(!interactive()) { # don't want to see on source()
 
