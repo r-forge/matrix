@@ -1670,7 +1670,35 @@ SEXP Zt_carryOver(SEXP fp, SEXP Zt, SEXP tvar, SEXP discount)
     return M_chm_sparse_to_SEXP(ans, 1, 0, 0, "", R_NilValue);
 }
 
+static void
+internal_TS_multiply(int nf, const int *nc, const int *Gp,
+		     double **ST, double *b)
+{
+    int i, ione = 1;
+    for (i = 0; i < nf; i++) {
+	int j, k, nci = nc[i], ncip1 = nc[i] + 1,
+	    nlev = (Gp[i + 1] - Gp[i])/nc[i];
 
+	for (j = 0; j < nlev; j++) {
+	    int base = Gp[i] + j * nci;
+	    for (k = 0; k < nci; k++) /* multiply by S_i */
+		b[base + k] *= ST[i][k * ncip1];
+	    if (nci > 1) 	/* multiply by T_i */
+		F77_CALL(dtrmv)("L", "N", "U", &nci, ST[i], &nci,
+				b + base, &ione);
+	}
+    }
+}
+
+/**
+ * Evaluate the effects in an mer2 representation
+ *
+ * @param L factorization
+ * @param dims vector of dimensions
+ * @param fixef vector to be filled with the fixed effects
+ * @param ranef vector to be filled with the random effects
+ *
+ */
 static void
 internal_mer2_effects(const cholmod_factor *L, const int *dims,
 		      double *fixef, double *ranef)
@@ -1695,16 +1723,34 @@ internal_mer2_effects(const cholmod_factor *L, const int *dims,
 	error(_("cholmod_solve (CHOLMOD_Lt) failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
     M_cholmod_free_dense(&B, &c);
-    if (!(B = M_cholmod_solve(CHOLMOD_P, L, X, &c)))
-	error(_("cholmod_solve (CHOLMOD_P) failed: status %d, minor %d from ncol %d"),
+    if (!(B = M_cholmod_solve(CHOLMOD_Pt, L, X, &c)))
+	error(_("cholmod_solve (CHOLMOD_Pt) failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
     M_cholmod_free_dense(&X, &c);
     Memcpy(ranef, (double*)(B->x), q);
     Memcpy(fixef, (double*)(B->x) + q, p);
     M_cholmod_free_dense(&B, &c);
+    /* We now have b* in the random effects slot.  We need to create
+     * b = STb*.
+     * */
 }
 
-static void
+/**
+ * Evaluate the logarithm of the square of the determinant of selected
+ * sections of a sparse Cholesky factor.
+ *
+ * @param ans vector of doubles of sufficient length to hold the result
+ * @param nans number of values to calculate
+ * @param c vector of length nans+1 containing the cut points
+
+FIXME: It seems that there is an implicit assumtion that c[0] = 0 but
+this is never checked.
+
+ * @param F factorization
+ *
+ * @return ans
+ */
+static double*
 chm_log_abs_det2(double *ans, int nans, const int *c, const cholmod_factor *F)
 {
     int i, ii  = 0, jj = 0;
@@ -1734,9 +1780,20 @@ chm_log_abs_det2(double *ans, int nans, const int *c, const cholmod_factor *F)
 	    ans[ii] += log(fx[k] * ((F->is_ll) ? fx[k] : 1.));
 	}
     }
+    return ans;
 }
 
-static void
+/**
+ * Evaluate the elements of the deviance slot given a factorization of
+ * A* and the dimensions vector.
+ *
+ * @param d pointer to the contents of the slot
+ * @param dims dimensions
+ * @param L factor of the current A*
+ *
+ * @return d
+ */
+static double*
 internal_deviance(double *d, const int *dims, const cholmod_factor *L)
 {
     int n = dims[n_POS], p = dims[p_POS], q = dims[q_POS];
@@ -1746,6 +1803,7 @@ internal_deviance(double *d, const int *dims, const cholmod_factor *L)
     chm_log_abs_det2(d + 2, 3, c, L);
     d[0] = d[2] + dn * (1. + d[4] + log(2. * PI / dn));
     d[1] = d[2] + d[3] + dnmp * (1. + d[4] + log(2. * PI / dnmp));
+    return d;
 }
 
 /**
@@ -2172,13 +2230,18 @@ SEXP mer2_deviance(SEXP x, SEXP which)
  */
 SEXP mer2_update_effects(SEXP x)
 {
+    SEXP ST = GET_SLOT(x, lme4_STSym);
+    int i, nf = LENGTH(ST);
+    double *b = REAL(GET_SLOT(x, lme4_ranefSym));
+    double **st = Calloc(nf, double*);
     cholmod_factor *L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
+
     internal_mer2_effects(L, INTEGER(GET_SLOT(x, lme4_dimsSym)),
-			  REAL(GET_SLOT(x, lme4_fixefSym)),
-			  REAL(GET_SLOT(x, lme4_ranefSym)));
-    /* FIXME: Are the contents of the ranef slot the b*'s or the b's?  */
-    /* They are the b*'s. They should be multiplied by S. */
-    Free(L);
+			  REAL(GET_SLOT(x, lme4_fixefSym)), b);
+    for (i = 0; i < nf; i++) st[i] = REAL(VECTOR_ELT(ST, i));
+    internal_TS_multiply(nf, INTEGER(GET_SLOT(x, lme4_ncSym)),
+			 INTEGER(GET_SLOT(x, lme4_GpSym)), st, b);
+    Free(L); Free(st);
     return R_NilValue;
 }
 
