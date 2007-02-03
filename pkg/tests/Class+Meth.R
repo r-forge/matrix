@@ -6,7 +6,9 @@ source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 
 allCl <- getClasses("package:Matrix")
 cat("actual and virtual classes:\n")
-table( sapply(allCl, isVirtualClass) )
+tt <- table( sapply(allCl, isVirtualClass) )
+names(tt) <- c('"actual"', "virtual")
+tt
 
 ## Really nice would be to construct an inheritance graph and display
 ## it.  The following is just a cheap first step.
@@ -247,8 +249,18 @@ tstMatrixClass <-
                     if(any(clNam == not.coerce1))
                         cat.("not coercable_1\n")
                     else {
-                        cat.("as(dge*, <class>): ")
-                        m2 <- as(mM, clNam)
+                        cat.("as(dge*, <(super)class>): ")
+                        if(canCoerce(mM, clNam))
+                            m2 <- as(mM, clNam)
+                        else { ## find superclass to which to coerce
+                            if(extends(clNam, "sparseMatrix")) {
+                                if(is.na(newcl <- Matrix:::.sp.class(clNam)))
+                                    stop("internal failure from .sp.class()")
+                                m2 <- as(mM, newcl)
+                            } else { ## ddense & (general or symmetric)
+                                stop("don't what to coerce <dge> to - error test-logic")
+                            }
+                        }
                         cat("valid:", validObject(m2), "\n")
                         if(clNam != "corMatrix") # has diagonal divided out
                             ## as.vector()
@@ -298,10 +310,15 @@ tstMatrixClass <-
                     if(any(clNam == not.coerce1))
                         cat.("not coercable_1\n")
                     else {
-                        ## make sure we can coerce to dgT* -- needed, e.g. for "image"
-                        cat.("as dgT* ")
-                        mgT <- as(m, "dgTMatrix")
-                        cat("; valid dgT* coercion: ", validObject(mgT), "\n")
+			## make sure we can coerce to dgT* -- needed, e.g. for "image"
+			## change: use Tsparse instead of dgT, unless it *is* Tsparse:
+			isT <- is(m, "TsparseMatrix")
+			prefix <- if(isT) "dgT" else "Tsparse"
+			Tcl <- paste(prefix, "Matrix", sep='')
+			cat.(sprintf("as %s* ", prefix))
+			mgT <- as(m, Tcl)
+			cat(sprintf("; valid %s* coercion: %s\n",
+				    prefix, validObject(mgT)))
                     }
                 }
             }
