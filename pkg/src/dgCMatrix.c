@@ -18,15 +18,19 @@ SEXP xCMatrix_validate(SEXP x)
     return ScalarLogical(1);
 }
 
+/* This and the following R_to_CMatrix() lead to memory-not-mapped seg.faults
+ * only with {32bit + R-devel + enable-R-shlib} -- no idea why */
 SEXP compressed_to_TMatrix(SEXP x, SEXP colP)
 {
     int col = asLogical(colP); /* 1 if "C"olumn compressed;  0 if "R"ow */
+    /* however, for Csparse, we now effectively use the cholmod-based
+     * Csparse_to_Tsparse() in ./Csparse.c ; maybe should simply write
+     * an  as_cholmod_Rsparse() function and then do "as there" ...*/
     SEXP indSym = col ? Matrix_iSym : Matrix_jSym,
-	ans,
-	indP = GET_SLOT(x, indSym),
+	ans,	indP = GET_SLOT(x, indSym),
 	pP = GET_SLOT(x, Matrix_pSym);
     int npt = length(pP) - 1;
-    char *cl = class_P(x);/* maybe unduplicated */
+    char *cl = class_P(x);/* maybe unduplicated; duplicate() does not help seg.fault */
     char ncl[9] = "...Matrix";
     char *valid[] = {"dgCMatrix", "dsCMatrix", "dtCMatrix", /* 0: 0:2 */
 		     "lgCMatrix", "lsCMatrix", "ltCMatrix", /* 1: 3:5 */
