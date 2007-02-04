@@ -31,7 +31,7 @@ SEXP compressed_to_TMatrix(SEXP x, SEXP colP)
 	pP = GET_SLOT(x, Matrix_pSym);
     int npt = length(pP) - 1;
     char *cl = class_P(x);/* maybe unduplicated; duplicate() does not help seg.fault */
-    char ncl[9] = "...Matrix";
+    char *ncl = strdup(cl);
     char *valid[] = {"dgCMatrix", "dsCMatrix", "dtCMatrix", /* 0: 0:2 */
 		     "lgCMatrix", "lsCMatrix", "ltCMatrix", /* 1: 3:5 */
 		     "ngCMatrix", "nsCMatrix", "ntCMatrix", /* 2: 6:8 */
@@ -48,7 +48,7 @@ SEXP compressed_to_TMatrix(SEXP x, SEXP colP)
 	error(_("invalid class(x) '%s' in compressed_to_TMatrix(x)"), cl);
 
     /* replace 'C' or 'R' with 'T'  ~~ C-level	``sub()'' : */
-    strcpy(ncl, cl); ncl[2] = 'T';
+    ncl[2] = 'T';
     /* DEBUG :* / Rprintf("compressed_to_TMatrix(): new class '%s'\n", ncl); /**/
     ans = PROTECT(NEW_OBJECT(MAKE_CLASS(ncl)));
 
@@ -65,6 +65,7 @@ SEXP compressed_to_TMatrix(SEXP x, SEXP colP)
     expand_cmprPt(npt, INTEGER(pP),
 		  INTEGER(ALLOC_SLOT(ans, col ? Matrix_jSym : Matrix_iSym,
 				     INTSXP, length(indP))));
+    free(ncl);
     UNPROTECT(1);
     return ans;
 }
