@@ -232,7 +232,7 @@ R_init_Matrix(DllInfo *dll)
     R_RegisterCCallable("Matrix", "cholmod_factorize", (DL_FUNC)cholmod_factorize);
     R_RegisterCCallable("Matrix", "cholmod_finish", (DL_FUNC)cholmod_finish);
     R_RegisterCCallable("Matrix", "cholmod_free_dense", (DL_FUNC)cholmod_free_dense);
-    R_RegisterCCallable("Matrix", "cholmod_free_factor", (DL_FUNC)cholmod_free_sparse);
+    R_RegisterCCallable("Matrix", "cholmod_free_factor", (DL_FUNC)cholmod_free_factor);
     R_RegisterCCallable("Matrix", "cholmod_free_sparse", (DL_FUNC)cholmod_free_sparse);
     R_RegisterCCallable("Matrix", "cholmod_free_triplet", (DL_FUNC)cholmod_free_triplet);
     R_RegisterCCallable("Matrix", "cholmod_nnz", (DL_FUNC)cholmod_nnz);
