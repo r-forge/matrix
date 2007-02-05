@@ -9,16 +9,17 @@
 
 ## compressed_to_TMatrix -- fails on 32bit--enable-R-shlib with segfault {Kurt}
 ## ------------ --> ../src/dgCMatrix.c
-##_SF_ .R.2.T <- function(from) .Call(compressed_to_TMatrix, from, FALSE)
+.R.2.T <- function(from) .Call(compressed_to_TMatrix, from, FALSE)
 ## slow R-level workaround
 ## this is cheap; alternative: going there directly, using
 ##	i <- .Call(Matrix_expand_pointers, from@p),
+if(FALSE)
 .R.2.T <- function(from) as(.R.2.C(from), "TsparseMatrix")
 
 ## R_to_CMatrix -- fails on 32bit--enable-R-shlib with segfault {Kurt}
 ## ------------ --> ../src/dgCMatrix.c
-##_SF_ .R.2.C <- function(from) .Call(R_to_CMatrix, from)
-## "slow" R-level workaround
+.R.2.C <- function(from) .Call(R_to_CMatrix, from)
+if(FALSE)## "slow" R-level workaround
 .R.2.C <- function(from)
 {
     cl <- class(from)
@@ -55,23 +56,17 @@ setAs("RsparseMatrix", "denseMatrix",
 
 setAs("RsparseMatrix", "dsparseMatrix",
       function(from) as(.R.2.C(from), "dsparseMatrix"))
-##_SF_       function(from) as(.Call(R_to_CMatrix, from), "dsparseMatrix"))
 setAs("RsparseMatrix", "lsparseMatrix",
       function(from) as(.R.2.C(from), "lsparseMatrix"))
-##_SF_      function(from) as(.Call(R_to_CMatrix, from), "lsparseMatrix"))
 setAs("RsparseMatrix", "nsparseMatrix",
       function(from) as(.R.2.C(from), "nsparseMatrix"))
-##_SF_      function(from) as(.Call(R_to_CMatrix, from), "nsparseMatrix"))
 
 setAs("RsparseMatrix", "dMatrix",
       function(from) as(.R.2.C(from), "dMatrix"))
-##_SF_      function(from) as(.Call(R_to_CMatrix, from), "dMatrix"))
 setAs("RsparseMatrix", "lMatrix",
       function(from) as(.R.2.C(from), "lMatrix"))
-##_SF_      function(from) as(.Call(R_to_CMatrix, from), "lMatrix"))
 setAs("RsparseMatrix", "nMatrix",
       function(from) as(.R.2.C(from), "nMatrix"))
-##_SF_      function(from) as(.Call(R_to_CMatrix, from), "nMatrix"))
 
 
 ## for printing etc:
@@ -79,72 +74,6 @@ setAs("RsparseMatrix", "dgeMatrix",
       function(from) as(.R.2.C(from), "dgeMatrix"))
 setAs("RsparseMatrix", "matrix",
       function(from) as(.R.2.C(from), "matrix"))
-
-
-##--- and all these are just "the essential low-level coercions" : ----------
-
-## setAs("dgRMatrix", "matrix",
-##       function(from) as(.Call(compressed_to_TMatrix, from, FALSE), "matrix"))
-## setAs("lgRMatrix", "matrix",
-##       function(from) as(.Call(compressed_to_TMatrix, from, FALSE), "matrix"))
-## setAs("ngRMatrix", "matrix",
-##       function(from) as(.Call(compressed_to_TMatrix, from, FALSE), "matrix"))
-
-## setAs("dgRMatrix", "dgeMatrix",
-##       function(from) as(.R.2.C(from), "dgeMatrix"))
-## setAs("lgRMatrix", "lgeMatrix",
-##       function(from) as(.R.2.C(from), "lgeMatrix"))
-## setAs("ngRMatrix", "ngeMatrix",
-##       function(from) as(.R.2.C(from), "ngeMatrix"))
-
-## setAs("dgRMatrix", "dgCMatrix", .R.2.C)
-## setAs("lgRMatrix", "lgCMatrix", .R.2.C)
-## setAs("ngRMatrix", "ngCMatrix", .R.2.C)
-## ## really needed? :
-## setAs("dgRMatrix", "CsparseMatrix", .R.2.C)
-
-
-## setAs("dgRMatrix", "dgTMatrix", .R.2.T)
-## setAs("lgRMatrix", "lgTMatrix", .R.2.T)
-## setAs("ngRMatrix", "ngTMatrix", .R.2.T)
-
-##=== Now the same stories for the "s" (symmetric) and "t" (triangular) ones ===
-
-## setAs("dsRMatrix", "dsCMatrix", .R.2.C)
-## setAs("lsRMatrix", "lsCMatrix", .R.2.C)
-## setAs("nsRMatrix", "nsCMatrix", .R.2.C)
-
-## setAs("dsRMatrix", "dsTMatrix", .R.2.T)
-## setAs("lsRMatrix", "lsTMatrix", .R.2.T)
-## setAs("nsRMatrix", "nsTMatrix", .R.2.T)
-
-## setAs("dsRMatrix", "dsyMatrix",
-##       function(from) as(.R.2.C(from), "dsyMatrix"))
-## setAs("lsRMatrix", "lsyMatrix",
-##       function(from) as(.R.2.C(from), "lsyMatrix"))
-## setAs("nsRMatrix", "nsyMatrix",
-##       function(from) as(.R.2.C(from), "nsyMatrix"))
-
-## setAs("dtRMatrix", "dtCMatrix", .R.2.C)
-## setAs("ltRMatrix", "ltCMatrix", .R.2.C)
-## setAs("ntRMatrix", "ntCMatrix", .R.2.C)
-
-## setAs("dtRMatrix", "dtTMatrix", .R.2.T)
-## setAs("ltRMatrix", "ltTMatrix", .R.2.T)
-## setAs("ntRMatrix", "ntTMatrix", .R.2.T)
-
-## setAs("dtRMatrix", "dtrMatrix",
-##       function(from) as(.R.2.C(from), "dtrMatrix"))
-## setAs("ltRMatrix", "ltrMatrix",
-##       function(from) as(.R.2.C(from), "ltrMatrix"))
-## setAs("ntRMatrix", "ntrMatrix",
-##       function(from) as(.R.2.C(from), "ntrMatrix"))
-
-##setAs("matrix", "dgRMatrix",
-##      function(from) {
-##          storage.mode(from) <- "double"
-##          .Call(matrix_to_csc, from)
-##      })
 
 ## **VERY** cheap substitutes:  work via dgC and t(.)
 .viaC.to.dgR <- function(from) {
