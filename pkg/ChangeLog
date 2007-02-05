@@ -1,7 +1,23 @@
 2007-02-05  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* R/Ops.R (Arith): make sure Csparse o Csparse also works for e.g. ntCMatrix
+	* tests/simple.R: test the above and some of these coercions:
+
+	* R/nsparseMatrix.R: coercing "Csparse" to "lsparseMatrix";
+		be careful to avoid infinite recursion, using new coercions in
+	* R/ngCMatrix.R and nsC... and ntC...
+	* R/lsparseMatrix.R: ditto
+
 	* R/SparseM-conv.R: more conversion, notably for triplet matrices.
 
+	* src/dgCMatrix.c (R_to_C_Matrix): port Doug's fix and
+	* R/Rsparse.R: reactivate .Call()s
+
+	* tests/Class+Meth.R: a bit more on actual classes
+
+2007-02-04  Douglas Bates  <bates@stat.wisc.edu>
+
+	* src/dgCMatrix.c (compressed_to_TMatrix): fix memory bug using strdup()
 
 2007-02-03  Martin Maechler  <maechler@stat.math.ethz.ch>
 
