@@ -1,5 +1,7 @@
 2007-02-05  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* DESCRIPTION (Date, Version): 0.9975-10 with new date.
+
 	* R/Ops.R (Arith): make sure Csparse o Csparse also works for e.g. ntCMatrix
 	* tests/simple.R: test the above and some of these coercions:
 
