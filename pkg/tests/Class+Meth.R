@@ -6,12 +6,18 @@ source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 
 allCl <- getClasses("package:Matrix")
 cat("actual and virtual classes:\n")
-tt <- table( sapply(allCl, isVirtualClass) )
+tt <- table( isVirt <- sapply(allCl, isVirtualClass) )
 names(tt) <- c('"actual"', "virtual")
 tt
+## The "actual" Matrix classes:
+aCl <- allCl[!isVirt]
+(aMcl <- aCl[grep("Matrix$", aCl)]) # length 48
+aMc2 <-  aCl[sapply(aCl, extends, class2 = "Matrix")]
+stopifnot(all( aMcl %in% aMc2 ))
+aMc2[!(aMc2 %in% aMcl)] ## only 4 : p?Cholesky & p?BunchKaufman
 
 ## Really nice would be to construct an inheritance graph and display
-## it.  The following is just a cheap first step.
+## it.  Following things are computational variations on the theme..
 
 ## We use a version of  canCoerce()  that works with two *classes* instead of
 ## canCoerce <- function (object, Class)
@@ -49,6 +55,9 @@ for(n in allCl) {
         cat("---\n")
     }
 }
+
+cat('Time elapsed: ', proc.time(),'\n') # for the above "part I"
+
 
 if(!interactive()) { # don't want to see on source()
 
