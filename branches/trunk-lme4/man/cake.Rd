@@ -29,6 +29,12 @@ Also cited in Lee, Nelder and Pawitan (2006)
 }
 \examples{
 str(cake)
-(fm1 <- lmer(angle ~ recipe + temperature + (1|replicate/batch))
+print(fm1 <- lmer(angle ~ recipe * temperature + (1|replicate/batch), cake,
+             method = "ML"), corr = FALSE)
+print(fm2 <- lmer(angle ~ recipe + temperature + (1|replicate/batch), cake,
+             method = "ML"), corr = FALSE)
+print(fm3 <- lmer(angle ~ recipe + as.numeric(temperature) +
+             (1|replicate/batch), cake, method = "ML"), corr = FALSE)
+anova(fm3, fm2, fm1)
 }
 \keyword{datasets}
