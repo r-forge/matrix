@@ -31,6 +31,8 @@ extern const char attr_hidden *DIMS_NAMES[];
 SEXP mer_ECMEsteps(SEXP x, SEXP nsteps, SEXP Verbp);
 SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 		  SEXP verbose, SEXP deviance);
+SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
+		   SEXP verbose, SEXP deviance);
 SEXP mer_coef(SEXP x, SEXP pType);
 SEXP mer_coefGets(SEXP x, SEXP coef, SEXP pType);
 SEXP mer_create(SEXP fl, SEXP Zt, SEXP Xp, SEXP yp, SEXP REMLp, SEXP nc, SEXP cnames);
