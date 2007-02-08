@@ -2465,3 +2465,86 @@ SEXP mer2_postVar(SEXP x)
     UNPROTECT(1);
     return ans;
 }
+
+static void internal_betab2_update(int p, int q,
+				   double sigma, cholmod_factor *L,
+				   double *betahat, double *bhat,
+				   double *betanew, double *bnew)
+{
+    ;
+}
+
+/**
+ * Generate a Markov-Chain Monte Carlo sample from a fitted
+ * linear mixed model.
+ *
+ * @param x pointer to an mer2 object
+ * @param savebp pointer to a logical scalar indicating if the
+ * random-effects should be saved
+ * @param nsampp pointer to an integer scalar of the number of samples
+ * to generate
+ * @param transp pointer to an logical scalar indicating if the
+ * variance components should be transformed.
+ *
+ * @return a matrix
+ */
+SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
+		  SEXP verbosep, SEXP deviancep)
+{
+    SEXP ans, ST = GET_SLOT(x, lme4_STSym), Parscp = PROTECT(mer2_getPars(x));
+    cholmod_factor *L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)),
+	*Gp = INTEGER(GET_SLOT(x, lme4_GpSym)),
+	*nc = INTEGER(GET_SLOT(x, lme4_ncSym));
+    int REML = dims[REML_POS], i, j, n = dims[n_POS],
+	nf = dims[nf_POS], nsamp = asInteger(nsampp),
+	p = dims[p_POS], q = dims[q_POS],
+	saveb = asLogical(savebp), trans = asLogical(transp),
+	verbose = asLogical(verbosep), dev = asLogical(deviancep);
+    int qpp1 = q + p + 1;
+    double
+	*bhat = REAL(GET_SLOT(x, lme4_ranefSym)),
+	*betahat = REAL(GET_SLOT(x, lme4_fixefSym)),
+	*bnew = Calloc(q, double), *betanew = Calloc(p, double),
+	*deviance = REAL(GET_SLOT(x, lme4_devianceSym)),
+	*ansp, df = n - (REML ? p : 0);
+    int nrbase = p + 1 + coef_length(nf, nc); /* rows always included */
+    int nrtot = nrbase + dev + (saveb ? q : 0);
+    cholmod_dense *chbnew =
+	M_cholmod_allocate_dense(qpp1, 1, qpp1, CHOLMOD_REAL, &c);
+
+    if (nsamp <= 0) nsamp = 1;
+    ans = PROTECT(allocMatrix(REALSXP, nrtot, nsamp));
+    ansp = REAL(ans);
+    for (i = 0; i < nrtot * nsamp; i++) ansp[i] = NA_REAL;
+    GetRNGstate();
+    if (verbose) Rprintf("%12s %14s\n", "sigma", "deviance");
+
+    for (i = 0; i < nsamp; i++) {
+	double *col = ansp + i * nrtot, sigma, dev1;
+				/* simulate and store new value of sigma */
+	sigma = exp(deviance[lr2_POS]/2)/sqrt(rchisq(df));
+	col[p] = (trans ? 2 * log(sigma) : sigma * sigma);
+				/* simulate new fixed and random effects */
+	internal_betab2_update(p, q, sigma, L, betahat, bhat, betanew, bnew);
+				/* Store beta */
+	for (j = 0; j < p; j++) col[j] = betanew[j];
+				/* Optionally store b */
+	if (saveb) for (j = 0; j < q; j++)
+	    col[nrbase + dev + j] = bnew[j];
+				/* Update and store Omega */
+/* FIXME: Rewrite this as internal_ST_update */
+	internal_Omega_update(ST, bnew, sigma, nf, nc, Gp,
+				     col + p + 1, trans);
+	dev1 = lmm_deviance(x, sigma, betanew);
+	if (deviance) col[nrbase] = dev1; /* store deviance */
+	if (verbose) Rprintf("%12.6g %14.8g\n", sigma, dev1);
+    }
+    PutRNGstate();
+    Free(betanew); Free(bnew); Free(L);
+    M_cholmod_free_dense(&chbnew, &c);
+				/* Restore original parameter values and factor */
+    mer2_setPars(x, Parscp);
+    UNPROTECT(2);
+    return ans;
+}
