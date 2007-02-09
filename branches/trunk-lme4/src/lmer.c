@@ -2474,6 +2474,19 @@ static void internal_betab2_update(int p, int q,
     ;
 }
 
+static void
+internal_Pars_update(SEXP Pars, const double bnew[], double sigma,
+		     int nf, const int *nc, const int *Gp)
+{
+    ;
+}
+
+static void
+internal_Pars_store(SEXP ST, double *col, int trans, double sigma)
+{
+    ;
+}
+
 /**
  * Generate a Markov-Chain Monte Carlo sample from a fitted
  * linear mixed model.
@@ -2491,13 +2504,15 @@ static void internal_betab2_update(int p, int q,
 SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 		  SEXP verbosep, SEXP deviancep)
 {
-    SEXP ans, ST = GET_SLOT(x, lme4_STSym), Parscp = PROTECT(mer2_getPars(x));
+    SEXP ans, ST = GET_SLOT(x, lme4_STSym),
+	Pars = PROTECT(mer2_getPars(x));
+    SEXP Parscp = PROTECT(duplicate(Pars));
     cholmod_factor *L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)),
 	*Gp = INTEGER(GET_SLOT(x, lme4_GpSym)),
 	*nc = INTEGER(GET_SLOT(x, lme4_ncSym));
-    int REML = dims[REML_POS], i, j, n = dims[n_POS],
-	nf = dims[nf_POS], nsamp = asInteger(nsampp),
+    int dPOS = dims[REML_POS] ? REML_POS : ML_POS, i, j,
+	n = dims[n_POS], nf = dims[nf_POS], nsamp = asInteger(nsampp),
 	p = dims[p_POS], q = dims[q_POS],
 	saveb = asLogical(savebp), trans = asLogical(transp),
 	verbose = asLogical(verbosep), dev = asLogical(deviancep);
@@ -2507,7 +2522,7 @@ SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 	*betahat = REAL(GET_SLOT(x, lme4_fixefSym)),
 	*bnew = Calloc(q, double), *betanew = Calloc(p, double),
 	*deviance = REAL(GET_SLOT(x, lme4_devianceSym)),
-	*ansp, df = n - (REML ? p : 0);
+	*ansp, df = n - (dims[REML_POS] ? p : 0);
     int nrbase = p + 1 + coef_length(nf, nc); /* rows always included */
     int nrtot = nrbase + dev + (saveb ? q : 0);
     cholmod_dense *chbnew =
@@ -2521,7 +2536,7 @@ SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
     if (verbose) Rprintf("%12s %14s\n", "sigma", "deviance");
 
     for (i = 0; i < nsamp; i++) {
-	double *col = ansp + i * nrtot, sigma, dev1;
+	double *col = ansp + i * nrtot, sigma;
 				/* simulate and store new value of sigma */
 	sigma = exp(deviance[lr2_POS]/2)/sqrt(rchisq(df));
 	col[p] = (trans ? 2 * log(sigma) : sigma * sigma);
@@ -2532,18 +2547,21 @@ SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 				/* Optionally store b */
 	if (saveb) for (j = 0; j < q; j++)
 	    col[nrbase + dev + j] = bnew[j];
-				/* Update and store Omega */
-/* FIXME: Rewrite this as internal_ST_update */
-	internal_Omega_update(ST, bnew, sigma, nf, nc, Gp,
-				     col + p + 1, trans);
-	dev1 = lmm_deviance(x, sigma, betanew);
-	if (deviance) col[nrbase] = dev1; /* store deviance */
-	if (verbose) Rprintf("%12.6g %14.8g\n", sigma, dev1);
+				/* Update parameters */
+	internal_Pars_update(Pars, bnew, sigma, nf, nc, Gp);
+	/* Refactor, evaluate deviance and conditional estimates */
+	mer2_setPars(x, Pars);
+	internal_mer2_effects(L, dims, betahat, bhat);
+				/* store new variance-covariance parameters */
+	internal_Pars_store(ST, col + p + 1, trans, sigma);
+				/* optionally store deviance */
+	if (dev) col[nrbase] = deviance[dPOS]; 
+	if (verbose) Rprintf("%12.6g %14.8g\n", sigma, deviance[dPOS]);
     }
     PutRNGstate();
     Free(betanew); Free(bnew); Free(L);
     M_cholmod_free_dense(&chbnew, &c);
-				/* Restore original parameter values and factor */
+    /* Restore original parameters, refactor, etc. */
     mer2_setPars(x, Parscp);
     UNPROTECT(2);
     return ans;
