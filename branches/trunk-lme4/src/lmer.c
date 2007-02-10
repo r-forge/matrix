@@ -1694,18 +1694,17 @@ internal_TS_multiply(int nf, const int *nc, const int *Gp,
  * Evaluate the effects in an mer2 representation
  *
  * @param L factorization
- * @param dims vector of dimensions
- * @param fixef vector to be filled with the fixed effects
- * @param ranef vector to be filled with the random effects
  *
+ * @return cholmod_dense object with \hat{b*} in the first q positions
+ * and \hat{\beta} in the next p positions.
  */
-static void
-internal_mer2_effects(const cholmod_factor *L, const int *dims,
-		      double *fixef, double *ranef)
+static cholmod_dense
+*internal_mer2_effects(cholmod_factor *L)
 {
-    int i, p = dims[p_POS], q = dims[q_POS], nrm1 = dims[p_POS] + dims[q_POS];
-    size_t nr = (size_t)(p + q + 1);
-    cholmod_dense *B = M_cholmod_allocate_dense(nr, 1, nr, CHOLMOD_REAL, &c), *X;
+/*     int i, p = dims[p_POS], q = dims[q_POS], nrm1 = dims[p_POS] + dims[q_POS]; */
+    int i, nr = (L->n);
+    cholmod_dense *X,
+	*B = M_cholmod_allocate_dense((size_t)nr, 1, (size_t)nr, CHOLMOD_REAL, &c);
     double *bx = (double *)(B->x);
     
     for (i = 0; i < nr; i++) bx[i] = 0;
@@ -1715,24 +1714,20 @@ internal_mer2_effects(const cholmod_factor *L, const int *dims,
 	    nc = ((int *)(L->super))[ns] - ((int *)(L->super))[ns - 1];
 	double *x = (double *)(L->x) + ((int *)(L->px))[ns - 1];
 
-	bx[nrm1] = x[(nc - 1) * (nr + 1)];
+	bx[nr - 1] = x[(nc - 1) * (nr + 1)];
     } else {
-	bx[nrm1] = (L->is_ll) ? ((double*)(L->x))[((int*)(L->p))[nrm1]] : 1;
+	bx[nr - 1] = (L->is_ll) ? ((double*)(L->x))[((int*)(L->p))[nr - 1]] : 1;
     }
     if (!(X = M_cholmod_solve(CHOLMOD_Lt, L, B, &c)))
 	error(_("cholmod_solve (CHOLMOD_Lt) failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
     M_cholmod_free_dense(&B, &c);
+/* Should the permutation be applied here or later */
     if (!(B = M_cholmod_solve(CHOLMOD_Pt, L, X, &c)))
 	error(_("cholmod_solve (CHOLMOD_Pt) failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
     M_cholmod_free_dense(&X, &c);
-    Memcpy(ranef, (double*)(B->x), q);
-    Memcpy(fixef, (double*)(B->x) + q, p);
-    M_cholmod_free_dense(&B, &c);
-    /* We now have b* in the random effects slot.  We need to create
-     * b = STb*.
-     * */
+    return B;
 }
 
 /**
@@ -1800,7 +1795,7 @@ internal_deviance(double *d, const int *dims, const cholmod_factor *L)
     int c[] = {0,  q, p + q, p + q + 1};
     double dn = (double) n, dnmp = (double)(n - p);
     
-    chm_log_abs_det2(d + 2, 3, c, L);
+    chm_log_abs_det2(d + ldZ_POS, lr2_POS + 1 - ldZ_POS, c, L);
     d[0] = d[2] + dn * (1. + d[4] + log(2. * PI / dn));
     d[1] = d[2] + d[3] + dnmp * (1. + d[4] + log(2. * PI / dnmp));
     return d;
@@ -2122,12 +2117,28 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
     internal_update_L(REAL(GET_SLOT(val, lme4_devianceSym)),
 			  dims, nc, Gp, st, ts2, L);
     M_cholmod_free_sparse(&ts2, &c);
-    internal_mer2_effects(L, dims, fixef, ranef);
+/* Why do we need to do this? Just to initialize the fixef and ranef
+ * slots? */
     SET_SLOT(val, lme4_LSym, M_chm_factor_to_SEXP(L, 1));
 
     Free(Perm); Free(Zt);
     UNPROTECT(1);
     return val;
+}
+
+/**
+ * Calculate the number of parameters in ST
+ *
+ * @param nf number of factors
+ * @param nc number of random effects per level of the factor
+ *
+ * @return the total number of parameters in ST
+ */
+static R_INLINE int mer2_npar(int nf, const int *nc)
+{
+    int i, ans = 0;
+    for (i = 0; i < nf; i++) ans += (nc[i] * (nc[i] + 1))/2;
+    return ans;
 }
 
 /**
@@ -2139,27 +2150,22 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
  */
 SEXP mer2_getPars(SEXP x)
 {
-    SEXP ST = GET_SLOT(x, lme4_STSym), ans;
+    SEXP ST = GET_SLOT(x, lme4_STSym);
     int *nc = INTEGER(GET_SLOT(x, lme4_ncSym)),
-	i, nf = LENGTH(ST), ntot, pos;
-    double **st = Calloc(nf, double*), *par;
+	i, nf = LENGTH(ST), pos = 0;
+    SEXP ans = PROTECT(allocVector(REALSXP, mer2_npar(nf, nc)));
+    double *par = REAL(ans);
 
-    for (i = 0, ntot = 0; i < nf; i++) {
-	ntot += (nc[i] * (nc[i] + 1))/2;
-	st[i] = REAL(VECTOR_ELT(ST, i));
-    }
-    ans = PROTECT(allocVector(REALSXP, ntot));
-    par = REAL(ans);
-    for (pos = 0, i = 0; i < nf; i++) {
+    for (i = 0; i < nf; i++) {
 	int j, k, nci = nc[i], ncp1 = nc[i] + 1;
+	double *st = REAL(VECTOR_ELT(ST, i));
 
-	for (j = 0; j < nci; j++) par[pos++] = st[i][j * ncp1];
+	for (j = 0; j < nci; j++) par[pos++] = st[j * ncp1];
 	for (j = 0; j < (nci - 1); j++)
 	    for (k = j + 1; k < nci; k++)
-		par[pos++] = st[i][k + j * nci];
+		par[pos++] = st[k + j * nci];
     }
-
-    UNPROTECT(1); Free(st);
+    UNPROTECT(1); 
     return ans;
 }
 
@@ -2231,16 +2237,21 @@ SEXP mer2_deviance(SEXP x, SEXP which)
 SEXP mer2_update_effects(SEXP x)
 {
     SEXP ST = GET_SLOT(x, lme4_STSym);
+    int *dd = INTEGER(GET_SLOT(x, lme4_dimsSym));
     int i, nf = LENGTH(ST);
-    double *b = REAL(GET_SLOT(x, lme4_ranefSym));
+    double *b = REAL(GET_SLOT(x, lme4_ranefSym)), *bstbx;
     double **st = Calloc(nf, double*);
     cholmod_factor *L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
+    cholmod_dense *bstarb;
 
-    internal_mer2_effects(L, INTEGER(GET_SLOT(x, lme4_dimsSym)),
-			  REAL(GET_SLOT(x, lme4_fixefSym)), b);
+    bstarb = internal_mer2_effects(L);
+    bstbx = (double*)(bstarb->x);
     for (i = 0; i < nf; i++) st[i] = REAL(VECTOR_ELT(ST, i));
+    Memcpy(b, bstbx, dd[q_POS]);
+    Memcpy(REAL(GET_SLOT(x, lme4_fixefSym)), bstbx + dd[q_POS], dd[p_POS]);
     internal_TS_multiply(nf, INTEGER(GET_SLOT(x, lme4_ncSym)),
 			 INTEGER(GET_SLOT(x, lme4_GpSym)), st, b);
+    M_cholmod_free_dense(&bstarb, &c);
     Free(L); Free(st);
     return R_NilValue;
 }
@@ -2466,12 +2477,40 @@ SEXP mer2_postVar(SEXP x)
     return ans;
 }
 
-static void internal_betab2_update(int p, int q,
-				   double sigma, cholmod_factor *L,
-				   double *betahat, double *bhat,
-				   double *betanew, double *bnew)
+/**
+ * Update the coefficients beta and bstar given the current L
+ *
+ * @param sigma current standard deviation of the noise term
+ * @param L current factorization of A*
+ * @param bbsthat current conditional modes
+ * @param bbstnew array to receive updated coefficients
+ *
+ * @return squared length of spherical Gaussian deviate
+ */
+static double
+internal_betabst_update(double sigma, cholmod_factor *L,
+		       cholmod_dense *bbsthat,
+		       cholmod_dense *bbstnew)
 {
-    ;
+    int i, ppq1 = L->n;
+    int ppq = ppq1 - 1;
+    double *bx, *hx = (double*)(bbsthat->x),
+	*nx = (double*)(bbstnew->x), ans = 0;
+    cholmod_dense *chb;
+
+    nx[ppq] = 0.;
+    for (i = 0; i < ppq; i++) {
+	double nr = norm_rand();
+	ans += nr * nr;
+	nx[i] = sigma * nr;
+    }
+    				/* chb := L^{-T} %*% bnew */
+    chb = M_cholmod_solve(CHOLMOD_Lt, L, bbstnew, &c);
+    bx = (double*)(chb->x);
+    for (i = 0; i < ppq; i++) nx[i] = bx[i] + hx[i];
+    M_cholmod_free_dense(&chb, &c);
+
+    return ans;
 }
 
 static void
@@ -2484,7 +2523,49 @@ internal_Pars_update(SEXP Pars, const double bnew[], double sigma,
 static void
 internal_Pars_store(SEXP ST, double *col, int trans, double sigma)
 {
-    ;
+    int i, j, k, nf = LENGTH(ST), pos = 0;
+
+    for (i = 0; i < nf; i++) {
+	SEXP STi = VECTOR_ELT(ST, i);
+	int nci = INTEGER(getAttrib(STi, R_DimSymbol))[0];
+	double *st = REAL(STi), sd;
+
+	if (nci == 1) {		/* fast version */
+	    sd = st[0] * sigma;
+	    col[pos++] = (trans ? 2 * log(sd) : sd * sd);
+	} else {
+	    int ncisq = nci * nci, ncip1 = nci + 1;
+	    double *vc = Calloc(ncisq, double);
+				/* create variance-covariance */
+	    for (j = 0; j < nci; j++)
+		for (k = 0; k < nci; k++) {
+		    int ii = j * nci + k;
+		    vc[ii] = (j == k) ? st[ii] * st[ii] : 0;
+		}
+	    F77_CALL(dtrmm)("L", "L", "N", "U", &nci, &nci,
+			    &sigma, st, &nci, vc, &nci);
+	    F77_CALL(dtrmm)("R", "L", "T", "U", &nci, &nci,
+			    &sigma, st, &nci, vc, &nci);
+	    if (trans) {
+		for (j = 0; j < nci; j++) {
+		    double vj = vc[j * ncip1]; /* jth variance */
+		    double sdj = sqrt(vj);
+
+		    for (k = 0; k < j; k++) /* jth row in lower tri */
+			vc[k * nci + j] = atanh(vc[k * nci + j]/sdj);
+		    for (k = j + 1; k < nci; k++)
+			vc[j * nci + k] /= sdj; /* jth col in lower tri */
+		    vc[j * ncip1] = log(vj);
+		}
+	    }
+	    for (j = 0; j < nci; j++) col[pos++] = vc[j * ncip1];
+	    for (j = 1; j < nci; j++) {
+		for (k = 0; k < j; k++)
+		    col[pos++] = vc[k * nci + j];
+	    }
+	    Free(vc);
+	}
+    }
 }
 
 /**
@@ -2504,9 +2585,8 @@ internal_Pars_store(SEXP ST, double *col, int trans, double sigma)
 SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 		  SEXP verbosep, SEXP deviancep)
 {
-    SEXP ans, ST = GET_SLOT(x, lme4_STSym),
-	Pars = PROTECT(mer2_getPars(x));
-    SEXP Parscp = PROTECT(duplicate(Pars));
+    SEXP ST = GET_SLOT(x, lme4_STSym), Pars = PROTECT(mer2_getPars(x));
+    SEXP Parscp = PROTECT(duplicate(Pars)), ans;
     cholmod_factor *L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)),
 	*Gp = INTEGER(GET_SLOT(x, lme4_GpSym)),
@@ -2518,15 +2598,13 @@ SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 	verbose = asLogical(verbosep), dev = asLogical(deviancep);
     int qpp1 = q + p + 1;
     double
-	*bhat = REAL(GET_SLOT(x, lme4_ranefSym)),
-	*betahat = REAL(GET_SLOT(x, lme4_fixefSym)),
-	*bnew = Calloc(q, double), *betanew = Calloc(p, double),
 	*deviance = REAL(GET_SLOT(x, lme4_devianceSym)),
 	*ansp, df = n - (dims[REML_POS] ? p : 0);
     int nrbase = p + 1 + coef_length(nf, nc); /* rows always included */
     int nrtot = nrbase + dev + (saveb ? q : 0);
-    cholmod_dense *chbnew =
-	M_cholmod_allocate_dense(qpp1, 1, qpp1, CHOLMOD_REAL, &c);
+    cholmod_dense *chhat,
+	*chnew = M_cholmod_allocate_dense(qpp1, 1, qpp1, CHOLMOD_REAL, &c);
+    double *nx = (double*)(chnew->x);
 
     if (nsamp <= 0) nsamp = 1;
     ans = PROTECT(allocMatrix(REALSXP, nrtot, nsamp));
@@ -2540,18 +2618,23 @@ SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 				/* simulate and store new value of sigma */
 	sigma = exp(deviance[lr2_POS]/2)/sqrt(rchisq(df));
 	col[p] = (trans ? 2 * log(sigma) : sigma * sigma);
-				/* simulate new fixed and random effects */
-	internal_betab2_update(p, q, sigma, L, betahat, bhat, betanew, bnew);
+	/* simulate new fixed and random effects */
+				/* Evaluate conditional estimates */
+	chhat = internal_mer2_effects(L);
+	internal_betabst_update(sigma, L, chhat, chnew);
+	M_cholmod_free_dense(&chhat, &c);
 				/* Store beta */
-	for (j = 0; j < p; j++) col[j] = betanew[j];
+	for (j = 0; j < p; j++) col[j] = nx[q + j];
 				/* Optionally store b */
-	if (saveb) for (j = 0; j < q; j++)
-	    col[nrbase + dev + j] = bnew[j];
+	if (saveb) {
+	    /* FIXME:change the call to ST_mult to use ST, not st, and
+	     * insert it here. */
+	    for (j = 0; j < q; j++) col[nrbase + dev + j] = nx[j];
+	}
 				/* Update parameters */
-	internal_Pars_update(Pars, bnew, sigma, nf, nc, Gp);
-	/* Refactor, evaluate deviance and conditional estimates */
+	internal_Pars_update(Pars, nx, sigma, nf, nc, Gp);
+				/* Refactor and evaluate deviance */
 	mer2_setPars(x, Pars);
-	internal_mer2_effects(L, dims, betahat, bhat);
 				/* store new variance-covariance parameters */
 	internal_Pars_store(ST, col + p + 1, trans, sigma);
 				/* optionally store deviance */
@@ -2559,10 +2642,10 @@ SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 	if (verbose) Rprintf("%12.6g %14.8g\n", sigma, deviance[dPOS]);
     }
     PutRNGstate();
-    Free(betanew); Free(bnew); Free(L);
-    M_cholmod_free_dense(&chbnew, &c);
-    /* Restore original parameters, refactor, etc. */
+    Free(L);
+    M_cholmod_free_dense(&chnew, &c);
+				/* Restore pars, refactor, etc. */
     mer2_setPars(x, Parscp);
-    UNPROTECT(2);
+    UNPROTECT(3);
     return ans;
 }
