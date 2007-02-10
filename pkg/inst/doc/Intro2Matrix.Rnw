@@ -6,7 +6,7 @@
 \newcommand{\noFootnote}[1]{{\small (\textit{#1})}}
 %%\VignetteIndexEntry{2nd Introduction to the Matrix Package}
 %%\VignetteDepends{Matrix}
-\SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=5,height=3,strip.white=TRUE}
+\SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=5,height=3,strip.white=TRUE,keep.source=TRUE}
 %
 \title{2nd Introduction to the Matrix package}
 \author{Martin Maechler and Douglas Bates\\R Core Development Team
@@ -44,7 +44,7 @@
 %%   the matrix can reuse this factorization.
 \end{abstract}
 %% Note: These are explained in '?RweaveLatex' :
-<<preliminaries, echo=FALSE, keep.source=TRUE>>=
+<<preliminaries, echo=FALSE>>=
 options(width=75)
 @
 
