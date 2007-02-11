@@ -98,7 +98,7 @@ internal_symmetrize(double *a, int nc)
  * @return pointer to a named vector of type TYP
  */
 static R_INLINE SEXP
-internal_make_named(int TYP, const char *names[])
+internal_make_named(int TYP, char *names[])
 {
     SEXP ans, nms;
     int n, i;
