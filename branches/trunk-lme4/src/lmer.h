@@ -4,29 +4,14 @@
 #include "lme4_utils.h"
 #include "Wishart.h"
 				/* positions in the deviance vector */
-extern const char attr_hidden *DEVIANCE_NAMES[];
+enum devP {ML_POS=0, REML_POS, ldZ_POS, ldX_POS, lr2_POS};
 			 /* {"ML", "REML", "ldZ", "ldX", "lr2", ""} */
-#define ML_POS   0
-#define REML_POS 1
-#define ldZ_POS  2
-#define ldX_POS  3
-#define lr2_POS  4
 				/* positions in the dims vector */
-extern const char attr_hidden *DIMS_NAMES[];
-	      /* {"nf", "n", "p", "q", "REML", "glmm", ""} */
-#define nf_POS     0
-#define n_POS      1
-#define p_POS      2
-#define q_POS      3
-/* FIXME: change the next two codes to a single code "type" with
-   values type < 0 => LMM & REML, type == 0 => LMM & ML,
-   type == 1 => GLMM & Laplace, type == 2 => GLMM & AGQ
-*/
-#define isREML_POS 4
-#define glmm_POS 5
+enum dimP {nf_POS=0, n_POS, p_POS, q_POS, isREML_POS, isGLMM_POS};
+	      /* {"nf", "n", "p", "q", "isREML", "isGLMM", ""} */
 
 #define isREML(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isREML_POS]
-#define isGLMM(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[glmm_POS]
+#define isGLMM(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isGLMM_POS]
 
 SEXP mer_ECMEsteps(SEXP x, SEXP nsteps, SEXP Verbp);
 SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,

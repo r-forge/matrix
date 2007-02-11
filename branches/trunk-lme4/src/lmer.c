@@ -1670,24 +1670,37 @@ SEXP Zt_carryOver(SEXP fp, SEXP Zt, SEXP tvar, SEXP discount)
     return M_chm_sparse_to_SEXP(ans, 1, 0, 0, "", R_NilValue);
 }
 
-static void
-internal_TS_multiply(int nf, const int *nc, const int *Gp,
-		     double **ST, double *b)
+/**
+ * Multiply a vector by the virtual T and S matrices represented by ST
+ *
+ * @param Gp vector of group pointers
+ * @param ST compounded matrices S* and T*
+ * @param b vector of random effects to be transformed from b* to b
+ *
+ * @return b after transformation
+ */
+static double
+*internal_TS_multiply(const int *Gp, SEXP ST, double *b)
 {
-    int i, ione = 1;
+    int i, ione = 1, nf = LENGTH(ST);
+
     for (i = 0; i < nf; i++) {
-	int j, k, nci = nc[i], ncip1 = nc[i] + 1,
-	    nlev = (Gp[i + 1] - Gp[i])/nc[i];
+	SEXP STi = VECTOR_ELT(ST, i);
+	double *st = REAL(STi);
+	int nci = INTEGER(getAttrib(STi, R_DimSymbol))[0];
+	int j, k, ncip1 = nci + 1,
+	    nlev = (Gp[i + 1] - Gp[i])/nci;
 
 	for (j = 0; j < nlev; j++) {
 	    int base = Gp[i] + j * nci;
 	    for (k = 0; k < nci; k++) /* multiply by S_i */
-		b[base + k] *= ST[i][k * ncip1];
+		b[base + k] *= st[k * ncip1];
 	    if (nci > 1) 	/* multiply by T_i */
-		F77_CALL(dtrmv)("L", "N", "U", &nci, ST[i], &nci,
+		F77_CALL(dtrmv)("L", "N", "U", &nci, st, &nci,
 				b + base, &ione);
 	}
     }
+    return b;
 }
 
 /**
@@ -1701,7 +1714,6 @@ internal_TS_multiply(int nf, const int *nc, const int *Gp,
 static cholmod_dense
 *internal_mer2_effects(cholmod_factor *L)
 {
-/*     int i, p = dims[p_POS], q = dims[q_POS], nrm1 = dims[p_POS] + dims[q_POS]; */
     int i, nr = (L->n);
     cholmod_dense *X,
 	*B = M_cholmod_allocate_dense((size_t)nr, 1, (size_t)nr, CHOLMOD_REAL, &c);
@@ -1722,7 +1734,6 @@ static cholmod_dense
 	error(_("cholmod_solve (CHOLMOD_Lt) failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
     M_cholmod_free_dense(&B, &c);
-/* Should the permutation be applied here or later */
     if (!(B = M_cholmod_solve(CHOLMOD_Pt, L, X, &c)))
 	error(_("cholmod_solve (CHOLMOD_Pt) failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
@@ -1737,10 +1748,6 @@ static cholmod_dense
  * @param ans vector of doubles of sufficient length to hold the result
  * @param nans number of values to calculate
  * @param c vector of length nans+1 containing the cut points
-
-FIXME: It seems that there is an implicit assumtion that c[0] = 0 but
-this is never checked.
-
  * @param F factorization
  *
  * @return ans
@@ -1757,7 +1764,9 @@ chm_log_abs_det2(double *ans, int nans, const int *c, const cholmod_factor *F)
 	    double *x = (double *)(F->x) + ((int *)(F->px))[i];
 
 	    for (j = 0; j < nc; j++) {
-		while ((j + jj) >= c[ii + 1] && ++ii < nans) {};
+		int col = j + jj;
+		if (col < c[ii]) continue;
+		while (col >= c[ii + 1] && ++ii < nans) {};
 		if (ii >= nans) break;
 		ans[ii] += 2 * log(fabs(x[j * nrp1]));
 	    }
@@ -1768,6 +1777,7 @@ chm_log_abs_det2(double *ans, int nans, const int *c, const cholmod_factor *F)
 	double *fx = (double *)(F->x);
 	
 	for (j = 0; ii < nans && j < F->n; j++) {
+	    if (j < c[ii]) continue;
 	    for (k = fp[j]; fi[k] != j && k < fp[j + 1]; k++) {};
 	    if (fi[k] != j) break; /* what happened to the diagonal element? */
 	    while (j >= c[ii + 1] && ++ii < nans) {};
@@ -1815,8 +1825,8 @@ internal_deviance(double *d, const int *dims, const cholmod_factor *L)
  *
  */
 static void
-internal_update_L(double *deviance, int *dims, const int *nc, const int *Gp,
-		  double **ST, cholmod_sparse *A, cholmod_factor *L)
+internal_update_L(double *deviance, int *dims, const int *Gp,
+		  SEXP ST, cholmod_sparse *A, cholmod_factor *L)
 {
     cholmod_sparse *Ac = M_cholmod_copy_sparse(A, &c);
     int *ai = (int *)(Ac->i), *ap = (int *)(Ac->p), nf = *dims,
@@ -1830,7 +1840,10 @@ internal_update_L(double *deviance, int *dims, const int *nc, const int *Gp,
     }
 
     for (i = 0; i < nf; i++) {
-	int base = Gp[i], j, k, kk, nci = nc[i];
+	SEXP STi = VECTOR_ELT(ST, i);
+	double *st = REAL(STi);
+	int nci = INTEGER(getAttrib(STi, R_DimSymbol))[0];
+	int base = Gp[i], j, k, kk;
 	int ncip1 = nci + 1, nlev = (Gp[i + 1] - Gp[i])/nci;
 
 	/* if nci == 1 then T == I and the next section is skipped */
@@ -1857,14 +1870,14 @@ internal_update_L(double *deviance, int *dims, const int *nc, const int *Gp,
 		if (nnzm1) { /* elements above diagonal block to update */
 		    if (nci == 2)
 			F77_CALL(dtrmm)("R", "L", "N", "U", &nnzm1,
-					&nci, one, ST[i], &nci,
+					&nci, one, st, &nci,
 					ax + ap[cj], &nnz);
 		    else {	
 			for (k = 0; k < nci; k++) /* copy columns to wrk */
 			    Memcpy(wrk + k * maxrows, ax + ap[cj + k],
 				   nnzm1);
 			F77_CALL(dtrmm)("R", "L", "N", "U", &nnzm1,
-					&nci, one, ST[i], &nci, wrk,
+					&nci, one, st, &nci, wrk,
 					&maxrows);
 			for (k = 0; k < nci; k++) /* copy results back */
 			    Memcpy(ax + ap[cj + k], wrk + k * maxrows,
@@ -1876,7 +1889,7 @@ internal_update_L(double *deviance, int *dims, const int *nc, const int *Gp,
 			    int ind = ap[cj + k] + kk;
 			    if (Gp[i] <= ai[ind]) {
 				F77_CALL(dtrmv)("L", "T", "U", &nci,
-						ST[i], &nci, ax + ind,
+						st, &nci, ax + ind,
 						&ione);
 				kk += nci;
 			    } else kk++;
@@ -1890,9 +1903,9 @@ internal_update_L(double *deviance, int *dims, const int *nc, const int *Gp,
 		    for (kk = 0; kk < k; kk++)
 			db[k + kk * nci] = db[kk + k * nci];
 		F77_CALL(dtrmm)("L", "L", "T", "U", &nci, &nci, one,
-				ST[i], &nci, db, &nci);
+				st, &nci, db, &nci);
 		F77_CALL(dtrmm)("R", "L", "N", "U", &nci, &nci, one,
-				ST[i], &nci, db, &nci);
+				st, &nci, db, &nci);
 		for (k = 0; k < nci; k++) /* restore updated upper triangle */
 		    Memcpy(ax + ap[cj + k] + nnzm1, db + k * nci, k + 1);
 	    }
@@ -1905,7 +1918,7 @@ internal_update_L(double *deviance, int *dims, const int *nc, const int *Gp,
 			k++;
 			continue;
 		    }
-		    F77_CALL(dtrmv)("L", "T", "U", &nci, ST[i], &nci,
+		    F77_CALL(dtrmv)("L", "T", "U", &nci, st, &nci,
 				    ax + k, &ione);
 		    k += nci;
 		}
@@ -1918,13 +1931,13 @@ internal_update_L(double *deviance, int *dims, const int *nc, const int *Gp,
 		int row = ai[k];
 		if (row < Gp[i]) continue;
 		if (Gp[i + 1] <= row) break;
-		ax[k] *= ST[i][((row - Gp[i]) % nci) * ncip1];
+		ax[k] *= st[((row - Gp[i]) % nci) * ncip1];
 	    }
 				/* Multiply by S from right */
 	for (j = Gp[i]; j < Gp[i + 1]; j += nci) {
 	    for (k = 0; k < nci; k++)
 		for (kk = ap[j + k]; kk < ap[j + k + 1]; kk++)
-		    ax[kk] *= ST[i][k * ncip1];
+		    ax[kk] *= st[k * ncip1];
 	}
 				/* Increment diagonal */
 	for (j = Gp[i]; j < Gp[i + 1]; j++) {
@@ -1942,18 +1955,20 @@ internal_update_L(double *deviance, int *dims, const int *nc, const int *Gp,
 }
 
 static void
-internal_mer2_initial(double **ST, int nf, int *nc, int *Gp, cholmod_sparse *A)
+internal_mer2_initial(SEXP ST, int *Gp, cholmod_sparse *A)
 {
-    int *ai = (int*)(A->i), *ap = (int*)(A->p), i;
-    double *ax = (double*)(A->x), *st;
+    int *ai = (int*)(A->i), *ap = (int*)(A->p), i, nf = LENGTH(ST);
+    double *ax = (double*)(A->x);
     
     if (!(A->sorted) || (A->stype <= 0))
 	error(_("A should be upper triangular and sorted"));
     for (i = 0; i < nf; i++) {
-	int bb = Gp[i], j, k, nci = nc[i];
+	SEXP STi = VECTOR_ELT(ST, i);
+	double *st = REAL(STi);
+	int nci = INTEGER(getAttrib(STi, R_DimSymbol))[0];
+	int bb = Gp[i], j, k;
 	int ncip1 = nci + 1, nlev = (Gp[i + 1] - bb)/nci;
 	
-	st = ST[i];
 	AZERO(st, nci * nci);
 	for (j = 0; j < nlev; j++) {
 	    int base = bb + j * nci;
@@ -1999,13 +2014,15 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
 	i, j, nf = LENGTH(fl), nobs = LENGTH(yp), p, q;
     double **st = Calloc(nf, double*), *Xt, *fixef, *offv,
 	*ranef, *wtv, *y;
+    char *DEVIANCE_NAMES[]={"ML","REML","ldZ","ldX","lr2",""};
+    char *DIMS_NAMES[]={"nf","n","p","q","isREML","isGLMM",""};
 				/* record dimensions */
     SET_SLOT(val, lme4_dimsSym, internal_make_named(INTSXP, DIMS_NAMES));
     dims = INTEGER(GET_SLOT(val, lme4_dimsSym));
     dims[nf_POS] = nf;
     dims[n_POS] = nobs;
     dims[isREML_POS] = asLogical(REMLp);
-    dims[glmm_POS] = 0;
+    dims[isGLMM_POS] = 0;
 				/* Check arguments to be duplicated */
     if (!isReal(yp)) error(_("yp must be a real vector"));
     y = REAL(yp);
@@ -2103,7 +2120,9 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
 	SET_VECTOR_ELT(ST, i, allocMatrix(REALSXP, nc[i], nc[i]));
 	st[i] = REAL(VECTOR_ELT(ST, i));
     }
-    internal_mer2_initial(st, nf, nc, Gp, ts2);
+    internal_mer2_initial(ST, Gp, ts2);
+    j = c.final_ll;		/* force the LL' decomposition */
+    c.final_ll = TRUE;
     i = c.nmethods;
     c.nmethods = 1;		/* force user-specified permutation */
     				/* Create L  with user-specified perm */
@@ -2111,14 +2130,13 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
     if (!L)
 	error(_("cholmod_analyze_p returned with status %d"), c.status);
     c.nmethods = i;
+    c.final_ll = j;
     				/* initialize and store L */
     SET_SLOT(val, lme4_devianceSym,
 	     internal_make_named(REALSXP, DEVIANCE_NAMES));
     internal_update_L(REAL(GET_SLOT(val, lme4_devianceSym)),
-			  dims, nc, Gp, st, ts2, L);
+			  dims, Gp, ST, ts2, L);
     M_cholmod_free_sparse(&ts2, &c);
-/* Why do we need to do this? Just to initialize the fixef and ranef
- * slots? */
     SET_SLOT(val, lme4_LSym, M_chm_factor_to_SEXP(L, 1));
 
     Free(Perm); Free(Zt);
@@ -2134,11 +2152,42 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
  *
  * @return the total number of parameters in ST
  */
-static R_INLINE int mer2_npar(int nf, const int *nc)
+static R_INLINE int mer2_npar(SEXP ST)
 {
-    int i, ans = 0;
-    for (i = 0; i < nf; i++) ans += (nc[i] * (nc[i] + 1))/2;
+    int ans = 0, i, nf = LENGTH(ST);
+
+    for (i = 0; i < nf; i++) {
+	int nci = INTEGER(getAttrib(VECTOR_ELT(ST, i),
+				    R_DimSymbol))[0];
+	ans += (nci * (nci + 1))/2;
+    }
     return ans;
+}
+
+/**
+ * Extract the parameters from ST
+ *
+ * @param ST ST slot from an mer2 object
+ * @param pars double vector of the appropriate length
+ *
+ * @return pointer to the parameter vector
+ */
+static double
+*internal_mer2_getPars(SEXP ST, double *pars)
+{
+    int i, nf = LENGTH(ST), pos = 0;
+    for (i = 0; i < nf; i++) {
+	SEXP STi = VECTOR_ELT(ST, i);
+	double *st = REAL(STi);
+	int nci = INTEGER(getAttrib(STi, R_DimSymbol))[0];
+	int j, k, ncp1 = nci + 1;
+
+	for (j = 0; j < nci; j++) pars[pos++] = st[j * ncp1];
+	for (j = 0; j < (nci - 1); j++)
+	    for (k = j + 1; k < nci; k++)
+		pars[pos++] = st[k + j * nci];
+    }
+    return pars;
 }
 
 /**
@@ -2151,22 +2200,37 @@ static R_INLINE int mer2_npar(int nf, const int *nc)
 SEXP mer2_getPars(SEXP x)
 {
     SEXP ST = GET_SLOT(x, lme4_STSym);
-    int *nc = INTEGER(GET_SLOT(x, lme4_ncSym)),
-	i, nf = LENGTH(ST), pos = 0;
-    SEXP ans = PROTECT(allocVector(REALSXP, mer2_npar(nf, nc)));
-    double *par = REAL(ans);
+    SEXP ans = PROTECT(allocVector(REALSXP, mer2_npar(ST)));
 
-    for (i = 0; i < nf; i++) {
-	int j, k, nci = nc[i], ncp1 = nc[i] + 1;
-	double *st = REAL(VECTOR_ELT(ST, i));
-
-	for (j = 0; j < nci; j++) par[pos++] = st[j * ncp1];
-	for (j = 0; j < (nci - 1); j++)
-	    for (k = j + 1; k < nci; k++)
-		par[pos++] = st[k + j * nci];
-    }
+    internal_mer2_getPars(ST, REAL(ans));
     UNPROTECT(1); 
     return ans;
+}
+
+/**
+ * Update the ST slot of an mer2 object
+ *
+ * @param pars double vector of the appropriate length
+ * @param ST ST slot from an mer2 object
+ *
+ * @return pointer to the updated ST object
+ */
+static SEXP
+internal_mer2_setPars(const double *pars, SEXP ST)
+{
+    int i, nf = LENGTH(ST), pos = 0;
+    for (i = 0; i < nf; i++) {
+	SEXP STi = VECTOR_ELT(ST, i);
+	double *st = REAL(STi);
+	int nci = INTEGER(getAttrib(STi, R_DimSymbol))[0];
+	int j, k, ncp1 = nci + 1;
+
+	for (j = 0; j < nci; j++) st[j * ncp1] = pars[pos++];
+	for (j = 0; j < (nci - 1); j++)
+	    for (k = j + 1; k < nci; k++)
+		st[k + j * nci] = pars[pos++];
+    }
+    return ST;
 }
 
 /**
@@ -2183,28 +2247,15 @@ SEXP mer2_setPars(SEXP x, SEXP pars)
     cholmod_sparse *A = M_as_cholmod_sparse(GET_SLOT(x, lme4_ASym));
     cholmod_factor *L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
     SEXP ST = GET_SLOT(x, lme4_STSym);
-    int *nc = INTEGER(GET_SLOT(x, lme4_ncSym)),
-	i, nf = LENGTH(ST), ntot, pos;
-    double **st = Calloc(nf, double*), *par = REAL(pars);
+    int npar = mer2_npar(ST);
 
-    for (i = 0, ntot = 0; i < nf; i++) {
-	ntot += (nc[i] * (nc[i] + 1))/2;
-	st[i] = REAL(VECTOR_ELT(ST, i));
-    }
-    if (!isReal(pars) || LENGTH(pars) != ntot)
-	error(_("pars must be a real vector of length %d"), ntot);
-    for (pos = 0, i = 0; i < nf; i++) {
-	int j, k, nci = nc[i], ncp1 = nc[i] + 1;
-
-	for (j = 0; j < nci; j++) st[i][j * ncp1] = par[pos++];
-	for (j = 0; j < (nci - 1); j++)
-	    for (k = j + 1; k < nci; k++)
-		st[i][k + j * nci] = par[pos++];
-    }
+    if (!isReal(pars) || LENGTH(pars) != npar)
+	error(_("pars must be a real vector of length %d"), npar);
+    internal_mer2_setPars(REAL(pars), ST);
     internal_update_L(REAL(GET_SLOT(x, lme4_devianceSym)),
-		      INTEGER(GET_SLOT(x, lme4_dimsSym)), nc,
-		      INTEGER(GET_SLOT(x, lme4_GpSym)), st, A, L);
-    Free(A); Free(L); Free(st);
+		      INTEGER(GET_SLOT(x, lme4_dimsSym)), 
+		      INTEGER(GET_SLOT(x, lme4_GpSym)), ST, A, L);
+    Free(A); Free(L);
     return x;
 }
 
@@ -2236,23 +2287,19 @@ SEXP mer2_deviance(SEXP x, SEXP which)
  */
 SEXP mer2_update_effects(SEXP x)
 {
-    SEXP ST = GET_SLOT(x, lme4_STSym);
     int *dd = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int i, nf = LENGTH(ST);
     double *b = REAL(GET_SLOT(x, lme4_ranefSym)), *bstbx;
-    double **st = Calloc(nf, double*);
     cholmod_factor *L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
     cholmod_dense *bstarb;
 
     bstarb = internal_mer2_effects(L);
     bstbx = (double*)(bstarb->x);
-    for (i = 0; i < nf; i++) st[i] = REAL(VECTOR_ELT(ST, i));
     Memcpy(b, bstbx, dd[q_POS]);
     Memcpy(REAL(GET_SLOT(x, lme4_fixefSym)), bstbx + dd[q_POS], dd[p_POS]);
-    internal_TS_multiply(nf, INTEGER(GET_SLOT(x, lme4_ncSym)),
-			 INTEGER(GET_SLOT(x, lme4_GpSym)), st, b);
     M_cholmod_free_dense(&bstarb, &c);
-    Free(L); Free(st);
+    internal_TS_multiply(INTEGER(GET_SLOT(x, lme4_GpSym)),
+			 GET_SLOT(x, lme4_STSym), b);
+    Free(L);
     return R_NilValue;
 }
 
@@ -2514,8 +2561,8 @@ internal_betabst_update(double sigma, cholmod_factor *L,
 }
 
 static void
-internal_Pars_update(SEXP Pars, const double bnew[], double sigma,
-		     int nf, const int *nc, const int *Gp)
+internal_ST_update(double sigma, const int *Gp,
+		   const double *bnew, SEXP ST)
 {
     ;
 }
@@ -2627,13 +2674,16 @@ SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 	for (j = 0; j < p; j++) col[j] = nx[q + j];
 				/* Optionally store b */
 	if (saveb) {
-	    /* FIXME:change the call to ST_mult to use ST, not st, and
-	     * insert it here. */
-	    for (j = 0; j < q; j++) col[nrbase + dev + j] = nx[j];
+	    double *bstar = Memcpy(Calloc(q, double), nx, q);
+
+	    internal_TS_multiply(Gp, ST, bstar);
+	    for (j = 0; j < q; j++) col[nrbase + dev + j] = bstar[j];
+	    Free(bstar);
 	}
-				/* Update parameters */
-	internal_Pars_update(Pars, nx, sigma, nf, nc, Gp);
+				/* Update ST */
+	internal_ST_update(sigma, Gp, nx, ST);
 				/* Refactor and evaluate deviance */
+	
 	mer2_setPars(x, Pars);
 				/* store new variance-covariance parameters */
 	internal_Pars_store(ST, col + p + 1, trans, sigma);
