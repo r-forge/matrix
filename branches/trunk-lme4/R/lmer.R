@@ -1248,7 +1248,9 @@ lmer2 <- function(formula, data, family = gaussian,
 
     ## establish factor list and Ztl
     FL <- lmerFactorList(formula, mf, fltype)
-    cnames <- with(FL, c(lapply(Ztl, rownames), list(.fixed = colnames(X))))
+    cnames <- with(FL, c(lapply(Ztl, rownames),
+                         list(.fixed = colnames(X),
+                              .response = deparse(formula[[2]]))))
     nc <- with(FL, sapply(Ztl, nrow))
     Ztl <- with(FL, .Call(Ztl_sparse, fl, Ztl))
     ## FIXME: change this when rbind has been fixed.
@@ -1262,7 +1264,7 @@ lmer2 <- function(formula, data, family = gaussian,
                      fr$weights) 
         if (!is.null(start)) mer <- setST(mer, start)
         ## indicator of constrained parameters
-        const <- unlist(lapply(mer@nc,
+        const <- unlist(lapply(lapply(mer@ST, ncol),
                                function(n) rep(1:0, c(n, (n*(n - 1))/2))))
         optimRes <- nlminb(.Call(mer2_getPars, mer),
                            function (x)
