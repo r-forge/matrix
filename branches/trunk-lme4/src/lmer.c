@@ -2819,19 +2819,26 @@ SEXP mer2_validate(SEXP x)
 	return mkString(_("Slots ST, nc, and flist must have length nf"));
     if (LENGTH(GpP) != (nf + 3))
 	return mkString(_("Slot Gp must have length nf + 3"));
-    if (Gp[0] != 0 || Gp[nf + 3] != ppq1)
-	return mkString(_("Gp[0] != 0 or Gp[nf+3] != p+q+1"));
+    if (Gp[0] != 0 || Gp[nf + 2] != ppq1)
+	return mkString(_("Gp[1] != 0 or Gp[nf+3] != p+q+1"));
     if (LENGTH(fixefP) != p)
 	return mkString(_("Slot fixef must have length p"));
     if (LENGTH(ranefP) != q)
 	return mkString(_("Slot ranef must have length q"));
+    if (LENGTH(weightsP) && LENGTH(weightsP) != n)
+	return mkString(_("Slot weights must have length 0 or n"));
+    if (LENGTH(offsetP) && LENGTH(offsetP) != n)
+	return mkString(_("Slot offset must have length 0 or n"));
+    if (LENGTH(devianceP) != (lr2_POS + 1) ||
+	LENGTH(getAttrib(devianceP, R_NamesSymbol)) != (lr2_POS + 1))
+	return mkString(_("deviance slot not named or incorrect length"));
     if (ZXyt->nrow != ppq1 || ZXyt->ncol != n)
 	return mkString(_("Slot ZXyt must have dimensions (p+q+1) by n"));
     if (A->nrow != ppq1 || A->ncol != ppq1 || A->stype <= 0)
 	return mkString(_("Slot A must be symmetric (upper) of size (p+q+1)"));
     nq = 0;
     for (i = 0; i < nf; i++) {
-	SEXP STi = VECTOR_ELT(ST, i), fli = VECTOR_ELT(flist, i);
+	SEXP STi = VECTOR_ELT(ST, i), fli = VECTOR_ELT(flistP, i);
 	int *dm = INTEGER(getAttrib(STi, R_DimSymbol));
 	if (!isMatrix(STi) || !isReal(STi) || dm[0] != dm[1])
 	    return
