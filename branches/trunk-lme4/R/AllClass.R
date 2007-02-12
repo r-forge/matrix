@@ -53,7 +53,8 @@ setClass("mer",
 			gradComp = "list",
 			## status indicator
 			status = "integer"
-			)
+			),
+         validity = function(object) .Call(mer_validate, object)
 	)
 
 setClass("mer2",
@@ -75,7 +76,8 @@ setClass("mer2",
 			## Secondary slots only evaluated when requested.
 			fixef = "numeric",
 			ranef = "numeric"
-			)
+			),
+         validity = function(object) .Call(mer2_validate, object)
          )
 
 ## Representation of linear and generalized linear mixed effects model

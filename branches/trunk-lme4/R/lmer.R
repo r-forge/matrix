@@ -258,8 +258,8 @@ lmerFrames <- function(mc, formula, data, contrasts)
     m <- match(c("data", "subset", "weights", "na.action", "offset"),
                names(mf), 0)
     mf <- mf[c(1, m)]
-    frame.form <- subbars(formula)       # substitute `+' for `|'
-    fixed.form <- nobars(formula)	 # remove any terms with `|'
+    frame.form <- subbars(formula)      # substitute `+' for `|'
+    fixed.form <- nobars(formula)       # remove any terms with `|'
     if (inherits(fixed.form, "name"))  # RHS is empty - use a constant
         fixed.form <- substitute(foo ~ 1, list(foo = fixed.form))
     environment(fixed.form) <- environment(frame.form) <- environment(formula)
@@ -297,6 +297,7 @@ lmerFrames <- function(mc, formula, data, contrasts)
                       length(offset), NROW(Y)), domain = NA)
     if (is.null(weights)) weights <- rep.int(1, NROW(Y))
     if (is.null(offset)) offset <- numeric(NROW(Y))
+#    attr(mf, "terms") <- NULL           # avoid confusion
     list(Y = Y, X = X, weights = weights, offset = offset, mt = mt, mf = mf)
 }
 
@@ -1278,6 +1279,7 @@ lmer2 <- function(formula, data, family = gaussian,
         .Call(mer2_setPars, mer, optimRes$par)
         ## update the fixef and ranef slots
         .Call(mer2_update_effects, mer)
+        attr(fr$mf, "terms") <- NULL    # cosmetic
         return(new("lmer2", mer,
                    frame = if (model) fr$mf else data.frame(),
                    terms = mt,
@@ -1312,7 +1314,7 @@ printMer2 <- function(x, digits = max(3, getOption("digits") - 3),
                      signif.stars = getOption("show.signif.stars"), ...)
 {
     so <- summary(x)
-    REML <- so@dims["REML"]
+    REML <- so@dims["isREML"]
     llik <- so@logLik
     dev <- so@deviance
     dims <- x@dims
@@ -1380,7 +1382,7 @@ setMethod("summary", signature(object = "mer2"),
               dims <- object@dims
 	      ## DF <- getFixDF(object)
 	      coefs <- cbind("Estimate" = fcoef, "Std. Error" = corF@sd) #, DF = DF)
-	      REML <- object@dims["REML"]
+	      REML <- object@dims["isREML"]
 	      llik <- logLik(object, REML)
 	      dev <- object@deviance
 
@@ -1412,7 +1414,7 @@ setMethod("summary", signature(object = "mer2"),
                   REmat <- REmat[-nrow(REmat), , drop = FALSE]
 
 	      if (nrow(coefs) > 0) {
-		  if (dims["glmm"]) {
+		  if (dims["isGLMM"]) {
 		      coefs <- coefs[, 1:2, drop = FALSE]
 		      stat <- coefs[,1]/coefs[,2]
 		      pval <- 2*pnorm(abs(stat), lower = FALSE)
@@ -1444,7 +1446,7 @@ setMethod("logLik", signature(object="mer2"),
 	  function(object, REML = NULL, ...) {
 	      dims <- object@dims
               if (is.null(REML) || is.na(REML[1]))
-                  REML <- object@dims["REML"]
+                  REML <- object@dims["isREML"]
 	      val <- -deviance(object, REML = REML)/2
 	      attr(val, "nall") <- attr(val, "nobs") <- dims["n"]
 	      attr(val, "df") <-
@@ -1458,7 +1460,7 @@ setMethod("logLik", signature(object="mer2"),
 setMethod("deviance", signature(object="mer2"),
 	  function(object, REML = NULL, ...) {
               if (missing(REML) || is.null(REML) || is.na(REML[1]))
-                  REML <- object@dims["REML"]
+                  REML <- object@dims["isREML"]
               object@deviance[ifelse(REML, "REML", "ML")]
           })
 

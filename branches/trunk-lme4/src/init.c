@@ -49,6 +49,8 @@ static R_CallMethodDef CallEntries[] = {
     {"mer2_update_effects", (DL_FUNC) &mer2_update_effects, 1},
     {"mer_update_ZXy", (DL_FUNC) &mer_update_ZXy, 1},
     {"mer_update_y", (DL_FUNC) &mer_update_y, 2},
+    {"mer_validate", (DL_FUNC) &mer_validate, 1},
+    {"mer2_validate", (DL_FUNC) &mer2_validate, 1},
     {"mer2_vcov", (DL_FUNC) &mer2_vcov, 1},
 
     {"pedigree_chol", (DL_FUNC) &pedigree_chol, 2},
@@ -105,6 +107,7 @@ void R_init_lme4(DllInfo *dll)
     lme4_gradCompSym = install("gradComp");
     lme4_iSym = install("i");
     lme4_ncSym = install("nc");
+    lme4_offsetSym = install("offset");
     lme4_pSym = install("p");
     lme4_permSym = install("perm");
     lme4_rXySym = install("rXy");
@@ -112,6 +115,7 @@ void R_init_lme4(DllInfo *dll)
     lme4_ranefSym = install("ranef");
     lme4_statusSym = install("status");
     lme4_uploSym = install("uplo");
+    lme4_weightsSym = install("weights");
     lme4_wrkresSym = install("wrkres");
     lme4_wtsSym = install("wts");
     lme4_xSym = install("x");
