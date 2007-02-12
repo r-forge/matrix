@@ -61,18 +61,17 @@ setClass("mer2",
 	 representation(## original data
 			flist = "list",     # list of grouping factors
 			ZXyt = "dgCMatrix", # sparse form of [Z;X;-y]'
-			weights = "numeric",
-                        offset = "numeric",
+			weights = "numeric",# can be of length 0 for constant wts
+                        offset = "numeric", # can be of length 0 for 0 offset
 			cnames = "list",    # column names of model matrices
-			nc = "integer",     # dimensions of blocks in Omega
 			Gp = "integer",     # pointers to groups of rows in ZXyt
-                        dims = "integer",   # dimensions and indicator of REML and glmm
-			## quantities that vary when Z, X, y, weights or offset are changed
-			A = "dsCMatrix",    # tcrossprod(ZXyt) with weights and offset
+                        dims = "integer",   # dimensions and indicators
+			## quantities that vary with Z, X, y, weights or offset
+			A = "dsCMatrix",    # tcrossprod(ZXyt) (w. wts and offset)
 			## slots that vary during the optimization
-			ST = "list",        # list of LDL' factors of relative variance matrices
+			ST = "list",        # list of TSST' rep of rel. var. mats
 			L = "CHMfactor",    # sparse Cholesky factor of A*
-			deviance = "numeric", # Current deviance (ML and REML) and logdet
+			deviance = "numeric", # ML and REML deviance and components
 			## Secondary slots only evaluated when requested.
 			fixef = "numeric",
 			ranef = "numeric"
