@@ -3,15 +3,6 @@
 
 #include "lme4_utils.h"
 #include "Wishart.h"
-				/* positions in the deviance vector */
-enum devP {ML_POS=0, REML_POS, ldZ_POS, ldX_POS, lr2_POS};
-			 /* {"ML", "REML", "ldZ", "ldX", "lr2", ""} */
-				/* positions in the dims vector */
-enum dimP {nf_POS=0, n_POS, p_POS, q_POS, isREML_POS, isGLMM_POS};
-	      /* {"nf", "n", "p", "q", "isREML", "isGLMM", ""} */
-
-#define isREML(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isREML_POS]
-#define isGLMM(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isGLMM_POS]
 
 SEXP mer_ECMEsteps(SEXP x, SEXP nsteps, SEXP Verbp);
 SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
@@ -46,6 +37,7 @@ SEXP mer2_update_effects(SEXP x);
 SEXP mer_update_ZXy(SEXP x);
 SEXP mer_update_y(SEXP x, SEXP ynew);
 SEXP mer_validate(SEXP x);
+SEXP mer2_validate(SEXP x);
 SEXP mer2_vcov(SEXP x);
 
 SEXP Ztl_sparse(SEXP fl, SEXP Ztl);

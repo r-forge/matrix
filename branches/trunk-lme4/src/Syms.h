@@ -31,6 +31,7 @@ SEXP attr_hidden
     lme4_gradCompSym,
     lme4_iSym,
     lme4_ncSym,
+    lme4_offsetSym,
     lme4_pSym,
     lme4_permSym,
     lme4_rXySym,
@@ -40,6 +41,7 @@ SEXP attr_hidden
     lme4_uploSym,
     lme4_wrkresSym,
     lme4_wtsSym,
+    lme4_weightsSym,
     lme4_xSym,
     lme4_ySym;
 
