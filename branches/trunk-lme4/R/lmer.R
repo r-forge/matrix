@@ -623,6 +623,7 @@ mcmccompnames <- function(ans, object, saveb, trans, glmer, deviance)
             paste("atanh(", colnms[ptyp == 2], ")", sep = "")
     }
     if (deviance) colnms <- c(colnms, "deviance")
+## FIXME: this will fail for a mer2 object
     if(saveb) {## maybe better colnames, "RE.1","RE.2", ... ?
         rZy <- object@rZy
         colnms <- c(colnms,
@@ -1606,3 +1607,17 @@ setMethod("ranef", signature(object = "mer2"),
               }
               ans
 	  })
+
+## Generate a Markov chain Monte Carlo sample from the posterior distribution
+## of the parameters in a linear mixed model
+setMethod("mcmcsamp", signature(object = "lmer2"),
+	  function(object, n = 1, verbose = FALSE, saveb = FALSE,
+		   trans = TRUE, deviance = FALSE, ...)
+      {
+          ans <- t(.Call(mer2_MCMCsamp, object, saveb, n,
+                         trans, verbose, deviance))
+	  attr(ans, "mcpar") <- as.integer(c(1, n, 1))
+	  class(ans) <- "mcmc"
+	  mcmccompnames(ans, object, saveb, trans,
+			glmer=FALSE, deviance=deviance)
+      })
