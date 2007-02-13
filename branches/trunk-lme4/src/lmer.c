@@ -2690,7 +2690,7 @@ internal_ST_update(double sigma, const int *Gp,
 	F77_CALL(dpotrf)("L", &nci, st, &nci, &info);
 	if (info) error(_("scaled variance factor is singular"));
 	for (j = 0; j < nci; j++) { /* form the ST representation */
-	    for (i = j; i < nci ; i++)
+	    for (i = j + 1; i < nci ; i++)
 		st[i + j * nci] /= st[j * ncip1];
 	}
 	Free(scal); Free(wfac);
