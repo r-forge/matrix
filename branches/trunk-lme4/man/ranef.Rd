@@ -11,6 +11,7 @@
 \usage{
 ranef(object, \dots)
 \S4method{ranef}{lmer}(object, postVar, \dots)
+\S4method{ranef}{mer2}(object, postVar, \dots)
 }
 \description{
   A generic function to extract, and optionally accumulate, the random effects.

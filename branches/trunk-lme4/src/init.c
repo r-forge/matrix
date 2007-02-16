@@ -1,5 +1,6 @@
 #include "lme4_utils.h"
 #include "glmer.h"
+#include "lmer2.h"
 #include "pedigree.h"
 #include <R_ext/Rdynload.h>
 
