@@ -2665,35 +2665,39 @@ internal_ST_update(double sigma, const int *Gp,
 
     for (i = 0; i < nf; i++) {
 	SEXP STi = VECTOR_ELT(ST, i);
+	double *st = REAL(STi);
 	int nci = INTEGER(getAttrib(STi, R_DimSymbol))[0];
-	int nlev = (Gp[i + 1] - Gp[i])/nci, ncip1 = nci + 1, ncisqr = nci * nci;
-	double *st = REAL(STi),
-	    *scal = Calloc(ncisqr, double), /* factor of scale matrix */
-	    *wfac = Calloc(ncisqr, double); /* factor of Wishart variate */
+	int nlev = (Gp[i + 1] - Gp[i])/nci;
+
+	if (nci == 1) {		/* fast update for scalar */
+	    double ssq = 0;
+	    for (j = 0; j < nlev; j++) ssq += bnew[Gp[i] + j] * bnew[Gp[i] + j];
+	    st[0] *= sqrt(ssq/rchisq((double)nlev))/sigma;
+	} else {
+	    int ncip1 = nci + 1, ncisqr = nci * nci;
+	    double *scal = Calloc(ncisqr, double), /* factor of scale matrix */
+		*wfac = Calloc(ncisqr, double); /* factor of Wishart variate */
 				/* create the scale matrix (close to identity) */
-	AZERO(scal, ncisqr);
-	F77_CALL(dsyrk)("U", "N", &nci, &nlev, &sigsqinv, bnew + Gp[i], &nci,
-			&zero, scal, &nci);
-/* 	if (nci > 1) safe_pd_matrix(scal, "U", nci, 1e-7); */
-	F77_CALL(dpotrf)("U", &nci, scal, &nci, &info);
-	if (info) error(_("Scale matrix is not positive definite"));
-	for (j = 0; j < nci; j++)  /* postmultiply by S */
-	    for (i = 0; i <= j; i++) scal[i + j * nci] *= st[j * ncip1];
-	F77_CALL(dtrmm)("R", "L", "T", "U", /* postmultiply by T' */
-			&nci, &nci, &one, st, &nci, scal, &nci);
-				/* generate random factor from std Wishart */
-	std_rWishart_factor((double)(nlev - nci + 1), nci, wfac);
-	F77_CALL(dtrsm)("L", "U", "T", "N",/* form a scaled variance factor */
-			&nci, &nci, &one, wfac, &nci, scal, &nci);
-	F77_CALL(dsyrk)("L", "T", /* form the scaled variance */
-			&nci, &nci, &one, scal, &nci, &zero, st, &nci);
-	F77_CALL(dpotrf)("L", &nci, st, &nci, &info);
-	if (info) error(_("scaled variance factor is singular"));
-	for (j = 0; j < nci; j++) { /* form the ST representation */
-	    for (i = j + 1; i < nci ; i++)
-		st[i + j * nci] /= st[j * ncip1];
+	    AZERO(scal, ncisqr);
+	    F77_CALL(dsyrk)("L", "N", &nci, &nlev, &sigsqinv, bnew + Gp[i], &nci,
+			    &zero, scal, &nci);
+	    F77_CALL(dpotrf)("L", &nci, scal, &nci, &info);
+	    if (info) error(_("Crossprod of b*[[%d]] not positive definite"), i + 1);
+	    for (i = 0; i < nci; i++) /* premultiply by S */
+		for (j = 0; j <= i; j++) scal[i + j * nci] *= st[i * ncip1];
+	    F77_CALL(dtrmm)("L", "L", "N", "U", /* premultiply by T */
+			    &nci, &nci, &one, st, &nci, scal, &nci);
+				/* generate (lower) random factor from std Wishart */
+	    std_rWishart_factor((double)(nlev - nci + 1), nci, 0, wfac);
+	    F77_CALL(dtrsm)("L", "L", "N", "N",/* form a scaled variance factor */
+			    &nci, &nci, &one, wfac, &nci, scal, &nci);
+	    Memcpy(st, scal, ncisqr);
+	    for (j = 0; j < nci; j++) { /* form the ST representation */
+		for (i = j + 1; i < nci ; i++)
+		    st[i + j * nci] /= st[j * ncip1];
+	    }
+	    Free(scal); Free(wfac);
 	}
-	Free(scal); Free(wfac);
     }
 }
 
