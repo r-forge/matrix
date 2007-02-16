@@ -172,7 +172,7 @@ SEXP mer_secondary(SEXP x);
 SEXP mer_gradComp(SEXP x);
 /* declared here but defined in Wishart.c */
 double attr_hidden
-*std_rWishart_factor(double df, int p, double ans[]);
+*std_rWishart_factor(double df, int p, int upper, double ans[]);
 
 double attr_hidden
 internal_betab_update(int p, int q, double sigma, cholmod_factor *L,
