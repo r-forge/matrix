@@ -36,7 +36,7 @@ enum dimP {nf_POS=0, n_POS, p_POS, q_POS, isREML_POS, isGLMM_POS, isNest_POS};
  *
  * @return 1 for a simple nested sequence, 0 otherwise.
  */
-static int mer2_isNested(int nf, const int nc[], const int Gp[], const int p[])
+static int check_nesting(int nf, const int nc[], const int Gp[], const int p[])
 {
     int **cnz = Calloc(nf, int*), ans = 1, i, j, k, nct;
 
@@ -71,8 +71,7 @@ static int mer2_isNested(int nf, const int nc[], const int Gp[], const int p[])
  *
  * @return b after transformation
  */
-static double
-*TS_mult(const int *Gp, SEXP ST, double *b)
+static double *TS_mult(const int *Gp, SEXP ST, double *b)
 {
     int i, ione = 1, nf = LENGTH(ST);
 
@@ -544,7 +543,7 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
 			    CHOLMOD_PATTERN, &c);
 	ts2 = M_cholmod_copy(ts1, -1/*lower triangle*/, CHOLMOD_PATTERN, &c);
 	M_cholmod_free_sparse(&ts1, &c);
-	if (!mer2_isNested(nf, nc, Gp, (int*)(ts2->p))) {
+	if (!check_nesting(nf, nc, Gp, (int*)(ts2->p))) {
 	    dims[isNest_POS] = FALSE;
 	    L = M_cholmod_analyze(Zt, &c);
 	    if (!L)
@@ -621,8 +620,7 @@ static R_INLINE int mer2_npar(SEXP ST)
     int ans = 0, i, nf = LENGTH(ST);
 
     for (i = 0; i < nf; i++) {
-	int nci = INTEGER(getAttrib(VECTOR_ELT(ST, i),
-				    R_DimSymbol))[0];
+	int nci = INTEGER(getAttrib(VECTOR_ELT(ST, i), R_DimSymbol))[0];
 	ans += (nci * (nci + 1))/2;
     }
     return ans;
@@ -1163,7 +1161,7 @@ SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 	    TS_mult(Gp, ST, Memcpy(bstar, nx, q));
 	    for (j = 0; j < q; j++) col[nrbase + dev + j] = bstar[j];
 	}
-	internal_ST_update(sigma, trans, Gp, nx, ST, col);
+	internal_ST_update(sigma, trans, Gp, nx, ST, col + p + 1);
 				/* Refactor and evaluate deviance */
 	internal_update_L(deviance, dims, Gp, ST, A, L);
 				/* store new variance-covariance parameters */
