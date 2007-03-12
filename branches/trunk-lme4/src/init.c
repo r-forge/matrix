@@ -38,6 +38,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_hat_trace2", (DL_FUNC) &mer_hat_trace2, 1},
     {"mer_initial", (DL_FUNC) &mer_initial, 1},
     {"mer_isNested", (DL_FUNC) &mer_isNested, 1},
+    {"mer2_optimize", (DL_FUNC) &mer2_optimize, 2},
     {"mer_postVar", (DL_FUNC) &mer_postVar, 1},
     {"mer2_postVar", (DL_FUNC) &mer2_postVar, 1},
     {"mer_ranef", (DL_FUNC) &mer_ranef, 1},

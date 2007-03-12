@@ -1264,22 +1264,23 @@ lmer2 <- function(formula, data, family = gaussian,
                      method == "REML", nc, cnames, fr$offset,
                      fr$weights) 
         if (!is.null(start)) mer <- setST(mer, start)
+        .Call(mer2_optimize, mer, cv$msVerbose)
         ## indicator of constrained parameters
-        const <- unlist(lapply(lapply(mer@ST, ncol),
-                               function(n) rep(1:0, c(n, (n*(n - 1))/2))))
-        optimRes <- nlminb(.Call(mer2_getPars, mer),
-                           function (x)
-                           .Call(mer2_deviance,
-                                 .Call(mer2_setPars, mer, x), as.integer(0)),
-                           lower = ifelse(const, 0, -Inf),
-                           control = list(trace = cv$msVerbose,
-                           iter.max = cv$msMaxIter
+##         const <- unlist(lapply(lapply(mer@ST, ncol),
+##                                function(n) rep(1:0, c(n, (n*(n - 1))/2))))
+##         optimRes <- nlminb(.Call(mer2_getPars, mer),
+##                            function (x)
+##                            .Call(mer2_deviance,
+##                                  .Call(mer2_setPars, mer, x), as.integer(0)),
+##                            lower = ifelse(const, 0, -Inf),
+##                            control = list(trace = cv$msVerbose,
+##                            iter.max = cv$msMaxIter
                            #, rel.tol = abs(0.001/.Call(mer2_deviance, mer, 0))
-                           ))
-        if (optimRes$convergence)
-            warning(paste("nlminb failed to converge:", optimRes$message))
+##                            ))
+##         if (optimRes$convergence)
+##             warning(paste("nlminb failed to converge:", optimRes$message))
         ## ensure mer parameters are at the converged value
-        .Call(mer2_setPars, mer, optimRes$par)
+##        .Call(mer2_setPars, mer, optimRes$par)
         ## update the fixef and ranef slots
         .Call(mer2_update_effects, mer)
         attr(fr$mf, "terms") <- NULL    # cosmetic
