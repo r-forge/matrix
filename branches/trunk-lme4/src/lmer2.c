@@ -779,7 +779,51 @@ internal_mer2_sigma(int REML, const int* dims, const double* deviance)
     return sqrt(exp(deviance[lr2_POS])/
 		((double)(dims[n_POS] - (REML ? dims[p_POS] : 0))));
 }
-    
+
+static int internal_mer2_optimize(SEXP x, int verb)
+{
+    SEXP ST = GET_SLOT(x, lme4_STSym);
+    cholmod_sparse *A = M_as_cholmod_sparse(GET_SLOT(x, lme4_ASym));
+    cholmod_factor *L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
+    int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym)),
+	*dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), i, j,
+	n = mer2_npar(ST), nf = length(ST), pos = 0;
+    int REML = dims[isREML_POS],
+	liv = S_iv_length(OPT, n), lv = S_v_length(OPT, n);
+    int *iv = Calloc(liv, int);
+    double *b = Calloc(2 * n, double), *d = Calloc(n, double),
+	*deviance = REAL(GET_SLOT(x, lme4_devianceSym)),
+	*g = (double*)NULL, *h = (double*)NULL,
+	*v = Calloc(lv, double),
+	*xv = internal_mer2_getPars(ST, Calloc(n, double)),
+	fx = R_PosInf;
+
+    S_Rf_divset(OPT, iv, liv, lv, v);
+    if (verb) iv[OUTLEV] = 1;
+    for (i = 0; i < n; i++) {
+	b[2*i] = R_NegInf; b[2*i+1] = R_PosInf; d[i] = 1;
+    }
+    for (i = 0; i < nf; i++) {
+	int nc = *INTEGER(getAttrib(VECTOR_ELT(ST, i), R_DimSymbol));
+	for (j = 0; j < nc; j++) b[pos + 2*j] = 0;
+	pos += nc * (nc + 1);
+    }
+    do {
+	S_nlminb_iterate(b, d, fx, g, h, iv, liv, lv, n, v, xv);
+	internal_mer2_setPars(xv, ST);
+	internal_update_L(deviance, dims, Gp, ST, A, L);
+	fx = deviance[REML ? REML_POS : ML_POS];
+    } while (iv[0] < 3);
+    i = iv[0];
+    Free(iv); Free(v); Free(xv); Free(b); Free(d);
+    return i;
+}
+
+SEXP mer2_optimize(SEXP x, SEXP verb)
+{
+    return ScalarInteger(internal_mer2_optimize(x, asInteger(verb)));
+}
+
 /**
  * Extract the estimate of the scale factor from an mer2 object
  *
@@ -1135,7 +1179,7 @@ SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
     int nrtot = nrbase + dev + (saveb ? q : 0);
     cholmod_dense *chhat,
 	*chnew = M_cholmod_allocate_dense(qpp1, 1, qpp1, CHOLMOD_REAL, &c);
-    double *bstar, *nx = (double*)(chnew->x);
+    double *bstar = (double*) NULL, *nx = (double*)(chnew->x);
 
     if (nsamp <= 0) nsamp = 1;
     ans = PROTECT(allocMatrix(REALSXP, nrtot, nsamp));
@@ -1250,3 +1294,4 @@ SEXP mer2_validate(SEXP x)
     Free(A); Free(L); Free(ZXyt);
     return ScalarLogical(1);
 }
+
