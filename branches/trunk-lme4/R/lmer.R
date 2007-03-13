@@ -249,7 +249,7 @@ setOmega <- function(mer, start)
 ## formula - two-sided formula
 ## data - data frame in which to evaluate formula
 ## contrasts - contrasts argument
-lmerFrames <- function(mc, formula, data, contrasts)
+lmerFrames <- function(mc, formula, data, contrasts, ver2)
 {
     ## Must evaluate the model frame first and then fit the glm using
     ## that frame.  Otherwise missing values in the grouping factors
@@ -295,9 +295,10 @@ lmerFrames <- function(mc, formula, data, contrasts)
     if(!is.null(offset) && length(offset) != NROW(Y))
         stop(gettextf("number of offsets is %d should equal %d (number of observations)",
                       length(offset), NROW(Y)), domain = NA)
-    if (is.null(weights)) weights <- rep.int(1, NROW(Y))
-    if (is.null(offset)) offset <- numeric(NROW(Y))
-#    attr(mf, "terms") <- NULL           # avoid confusion
+    if (is.null(weights))
+        weights <- if (ver2) numeric(0) else rep.int(1, NROW(Y))
+    if (is.null(offset))
+        offset <- if (ver2) numeric(0) else numeric(NROW(Y))
     list(Y = Y, X = X, weights = weights, offset = offset, mt = mt, mf = mf)
 }
 
@@ -352,7 +353,7 @@ lmer <- function(formula, data, family = gaussian,
 
     ## Establish model frame and fixed-effects model matrix and terms
     mc <- match.call()
-    fr <- lmerFrames(mc, formula, data, contrasts)
+    fr <- lmerFrames(mc, formula, data, contrasts, ver2 = FALSE)
     Y <- fr$Y; X <- fr$X; weights <- fr$weights; offset <- fr$offset
     mf <- fr$mf; mt <- fr$mt
 
@@ -1233,7 +1234,7 @@ lmer2 <- function(formula, data, family = gaussian,
 
     ## Establish model frame and fixed-effects model matrix and terms
     mc <- match.call()
-    fr <- lmerFrames(mc, formula, data, contrasts)
+    fr <- lmerFrames(mc, formula, data, contrasts, ver2 = TRUE)
     Y <- fr$Y; X <- fr$X; weights <- fr$weights; offset <- fr$offset
     mf <- fr$mf; mt <- fr$mt
 

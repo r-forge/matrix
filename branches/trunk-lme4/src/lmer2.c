@@ -495,10 +495,10 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
 				/* Check arguments to be duplicated */
     if (!isReal(yp)) error(_("yp must be a real vector"));
     y = REAL(yp);
-    if (!isReal(offset) || LENGTH(offset) != nobs)
+    if (!isReal(offset) || (LENGTH(offset) && LENGTH(offset) != nobs))
 	error(_("offset must be a real vector of length %d"), nobs);
     SET_SLOT(val, lme4_offsetSym, duplicate(offset));
-    if (!isReal(wts) || LENGTH(wts) != nobs)
+    if (!isReal(wts) || (LENGTH(wts) && LENGTH(wts) != nobs))
 	error(_("wts must be a real vector of length %d"), nobs);
     SET_SLOT(val, lme4_weightsSym, duplicate(wts));
 				/*  check flist and create Gp*/
