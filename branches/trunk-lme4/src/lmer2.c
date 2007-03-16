@@ -1295,3 +1295,23 @@ SEXP mer2_validate(SEXP x)
     return ScalarLogical(1);
 }
 
+SEXP lmer2_create(SEXP fl, SEXP Zt, SEXP Xp, SEXP yp, SEXP REMLp,
+		  SEXP nc, SEXP cnames, SEXP offset, SEXP wts, SEXP fr,
+		  SEXP terms, SEXP call)
+{
+    SEXP mer = PROTECT(mer2_create(fl, Zt, Xp, yp, REMLp, nc, cnames, offset, wts)),
+	val = PROTECT(NEW_OBJECT(MAKE_CLASS("lmer2")));
+    SEXP nms = getAttrib(GET_SLOT(MAKE_CLASS("mer2"), install("slots")), R_NamesSymbol);
+    int i, n = LENGTH(nms);
+
+    for (i = 0; i < n; i++) {
+	SEXP sym = install(CHAR(STRING_ELT(nms, i)));
+	SET_SLOT(val, sym, GET_SLOT(mer, sym));
+    }
+    SET_SLOT(val, install("frame"), fr);
+    SET_SLOT(val, install("terms"), terms);
+    SET_SLOT(val, install("call"), call);
+
+    UNPROTECT(2);
+    return val;
+}

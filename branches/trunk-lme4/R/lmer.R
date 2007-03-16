@@ -1235,8 +1235,8 @@ lmer2 <- function(formula, data, family = gaussian,
     ## Establish model frame and fixed-effects model matrix and terms
     mc <- match.call()
     fr <- lmerFrames(mc, formula, data, contrasts, ver2 = TRUE)
-    Y <- fr$Y; X <- fr$X; weights <- fr$weights; offset <- fr$offset
-    mf <- fr$mf; mt <- fr$mt
+    X <- fr$X
+    mf <- fr$mf
 
     ## check and evaluate the family argument
     if(is.character(family))
@@ -1261,34 +1261,13 @@ lmer2 <- function(formula, data, family = gaussian,
 
     ## quick return for a linear mixed model
     if (fltype < 0) {
-        mer <- .Call(mer2_create, fl, Zt, t(X), as.double(Y),
+        mer <- .Call(lmer2_create, fl, Zt, t(X), as.double(fr$Y),
                      method == "REML", nc, cnames, fr$offset,
-                     fr$weights) 
+                     fr$weights, if (model) mf else data.frame(),
+                     fr$mt, mc)
         if (!is.null(start)) mer <- setST(mer, start)
         .Call(mer2_optimize, mer, cv$msVerbose)
-        ## indicator of constrained parameters
-##         const <- unlist(lapply(lapply(mer@ST, ncol),
-##                                function(n) rep(1:0, c(n, (n*(n - 1))/2))))
-##         optimRes <- nlminb(.Call(mer2_getPars, mer),
-##                            function (x)
-##                            .Call(mer2_deviance,
-##                                  .Call(mer2_setPars, mer, x), as.integer(0)),
-##                            lower = ifelse(const, 0, -Inf),
-##                            control = list(trace = cv$msVerbose,
-##                            iter.max = cv$msMaxIter
-                           #, rel.tol = abs(0.001/.Call(mer2_deviance, mer, 0))
-##                            ))
-##         if (optimRes$convergence)
-##             warning(paste("nlminb failed to converge:", optimRes$message))
-        ## ensure mer parameters are at the converged value
-##        .Call(mer2_setPars, mer, optimRes$par)
-        ## update the fixef and ranef slots
         .Call(mer2_update_effects, mer)
-        attr(fr$mf, "terms") <- NULL    # cosmetic
-        return(new("lmer2", mer,
-                   frame = if (model) fr$mf else data.frame(),
-                   terms = mt,
-                   call = mc))
     }
     mer
 }

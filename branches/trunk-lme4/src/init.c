@@ -17,6 +17,7 @@ static R_CallMethodDef CallEntries[] = {
     {"glmer_init", (DL_FUNC) &glmer_init, 2},
 
     {"lme4_rWishart", (DL_FUNC) &lme4_rWishart, 3},
+    {"lmer2_create", (DL_FUNC) &lmer2_create, 12},
 
     {"mer_ECMEsteps", (DL_FUNC) &mer_ECMEsteps, 3},
     {"mer_MCMCsamp", (DL_FUNC) &mer_MCMCsamp, 6},

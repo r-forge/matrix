@@ -21,6 +21,7 @@ exportClasses(
               "glmer",
               "lmList",
               "lmer",
+              "lmer2",
               "mer",
               "mer2",
               "pedigree",
