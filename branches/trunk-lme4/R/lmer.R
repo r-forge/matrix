@@ -144,6 +144,13 @@ lmerControl <-
 ## check for predefined families
 mkFltype <- function(family)
 {
+    if(is.character(family))
+        family <- get(family, mode = "function", envir = parent.frame(2))
+    if(is.function(family)) family <- family()
+    if(is.null(family$family)) {
+        print(family)
+        stop("'family' not recognized")
+    }
     fltype <- 0                         # not a predefined type
     if (family$family == "gaussian" && family$link == "identity") fltype <- -1
     if (family$family == "binomial" && family$link == "logit") fltype <- 1
@@ -358,13 +365,6 @@ lmer <- function(formula, data, family = gaussian,
     mf <- fr$mf; mt <- fr$mt
 
     ## check and evaluate the family argument
-    if(is.character(family))
-        family <- get(family, mode = "function", envir = parent.frame())
-    if(is.function(family)) family <- family()
-    if(is.null(family$family)) {
-        print(family)
-        stop("'family' not recognized")
-    }
     fltype <- mkFltype(family)
 
     ## establish factor list and Ztl
@@ -1235,23 +1235,14 @@ lmer2 <- function(formula, data, family = gaussian,
     ## Establish model frame and fixed-effects model matrix and terms
     mc <- match.call()
     fr <- lmerFrames(mc, formula, data, contrasts, ver2 = TRUE)
-    X <- fr$X
-    mf <- fr$mf
 
     ## check and evaluate the family argument
-    if(is.character(family))
-        family <- get(family, mode = "function", envir = parent.frame())
-    if(is.function(family)) family <- family()
-    if(is.null(family$family)) {
-        print(family)
-        stop("'family' not recognized")
-    }
     fltype <- mkFltype(family)
 
     ## establish factor list and Ztl
-    FL <- lmerFactorList(formula, mf, fltype)
+    FL <- lmerFactorList(formula, fr$mf, fltype)
     cnames <- with(FL, c(lapply(Ztl, rownames),
-                         list(.fixed = colnames(X),
+                         list(.fixed = colnames(fr$X),
                               .response = deparse(formula[[2]]))))
     nc <- with(FL, sapply(Ztl, nrow))
     Ztl <- with(FL, .Call(Ztl_sparse, fl, Ztl))
@@ -1261,9 +1252,9 @@ lmer2 <- function(formula, data, family = gaussian,
 
     ## quick return for a linear mixed model
     if (fltype < 0) {
-        mer <- .Call(lmer2_create, fl, Zt, t(X), as.double(fr$Y),
+        mer <- .Call(lmer2_create, fl, Zt, t(fr$X), as.double(fr$Y),
                      method == "REML", nc, cnames, fr$offset,
-                     fr$weights, if (model) mf else data.frame(),
+                     fr$weights, if (model) fr$mf else data.frame(),
                      fr$mt, mc)
         if (!is.null(start)) mer <- setST(mer, start)
         .Call(mer2_optimize, mer, cv$msVerbose)
