@@ -1255,7 +1255,7 @@ lmer2 <- function(formula, data, family = gaussian,
         mer <- .Call(lmer2_create, fl, Zt, t(fr$X), as.double(fr$Y),
                      method == "REML", nc, cnames, fr$offset,
                      fr$weights, if (model) fr$mf else data.frame(),
-                     fr$mt, mc)
+                     fr$mt, mc, NULL)
         if (!is.null(start)) mer <- setST(mer, start)
         .Call(mer2_optimize, mer, cv$msVerbose)
         .Call(mer2_update_effects, mer)
