@@ -1257,7 +1257,7 @@ SEXP mer2_validate(SEXP x)
 	return mkString(_("Slot Gp must have length nf + 3"));
     if (Gp[0] != 0 || Gp[nf + 2] != ppq1)
 	return mkString(_("Gp[1] != 0 or Gp[nf+3] != p+q+1"));
-    if (LENGTH(fixefP) != p)
+    if (p && LENGTH(fixefP) != p) /* p == 0 is a special case */
 	return mkString(_("Slot fixef must have length p"));
     if (LENGTH(ranefP) != q)
 	return mkString(_("Slot ranef must have length q"));
@@ -1296,14 +1296,26 @@ SEXP mer2_validate(SEXP x)
 }
 
 SEXP lmer2_create(SEXP fl, SEXP Zt, SEXP Xp, SEXP yp, SEXP REMLp,
-		  SEXP nc, SEXP cnames, SEXP offset, SEXP wts, SEXP fr,
-		  SEXP terms, SEXP call)
+		   SEXP nc, SEXP cnames, SEXP offset, SEXP wts, SEXP fr,
+		   SEXP terms, SEXP call, SEXP fam)
 {
-    SEXP mer = PROTECT(mer2_create(fl, Zt, Xp, yp, REMLp, nc, cnames, offset, wts)),
+    SEXP mer, val, nms = getAttrib(GET_SLOT(MAKE_CLASS("mer2"),
+					    install("slots")), R_NamesSymbol);
+    int lmm = fam == R_NilValue, i, n = LENGTH(nms);
+    
+    if (lmm) { 			/* linear mixed model, fam is NULL */
+	mer = PROTECT(mer2_create(fl, Zt, Xp, yp, REMLp, nc, cnames, offset, wts)),
 	val = PROTECT(NEW_OBJECT(MAKE_CLASS("lmer2")));
-    SEXP nms = getAttrib(GET_SLOT(MAKE_CLASS("mer2"), install("slots")), R_NamesSymbol);
-    int i, n = LENGTH(nms);
-
+    } else {
+	/* use a dummy X matrix, weights, offset and REMLp */
+	mer = PROTECT(mer2_create(fl, Zt, allocMatrix(REALSXP, LENGTH(yp), 0),
+				  yp, ScalarLogical(0), nc, cnames, yp, yp));
+	val = PROTECT(NEW_OBJECT(MAKE_CLASS("glmer2")));
+	SET_SLOT(val, install("family"), duplicate(fam));
+	SET_SLOT(val, lme4_wtsSym, duplicate(wts));
+	SET_SLOT(val, install("off"), duplicate(offset));
+	SET_SLOT(val, lme4_XSym, duplicate(Xp));
+    }
     for (i = 0; i < n; i++) {
 	SEXP sym = install(CHAR(STRING_ELT(nms, i)));
 	SET_SLOT(val, sym, GET_SLOT(mer, sym));

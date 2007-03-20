@@ -10,7 +10,7 @@ SEXP mer2_create(SEXP fl, SEXP Zt, SEXP Xp, SEXP yp, SEXP REMLp,
 		SEXP nc, SEXP cnames, SEXP offset, SEXP wts);
 SEXP lmer2_create(SEXP fl, SEXP Zt, SEXP Xp, SEXP yp, SEXP REMLp,
 		  SEXP nc, SEXP cnames, SEXP offset, SEXP wts, SEXP fr,
-		  SEXP terms, SEXP call);
+		  SEXP terms, SEXP call, SEXP fam);
 SEXP mer2_deviance(SEXP x, SEXP which);
 SEXP mer2_getPars(SEXP x);
 SEXP mer2_optimize(SEXP x, SEXP verb);

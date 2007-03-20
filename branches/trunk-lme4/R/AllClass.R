@@ -94,9 +94,18 @@ setClass("lmer2",
 	 contains = "mer2")
 
 setClass("glmer",
-	 representation(family = "family", # glm family - move here later
+	 representation(family = "family", # glm family
                         weights = "numeric"),
 	 contains = "lmer")
+
+setClass("glmer2",
+	 representation(family = "family",
+                        X = "dgCMatrix",
+                        y = "numeric",
+                        off = "numeric",
+                        wts = "numeric",
+                        dmu_deta = "numeric"),
+	 contains = "lmer2")
 
 setClass("summary.mer", # the "mer" result ``enhanced'' :
 	 representation(
