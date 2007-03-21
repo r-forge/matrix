@@ -144,13 +144,6 @@ lmerControl <-
 ## check for predefined families
 mkFltype <- function(family)
 {
-    if(is.character(family))
-        family <- get(family, mode = "function", envir = parent.frame(2))
-    if(is.function(family)) family <- family()
-    if(is.null(family$family)) {
-        print(family)
-        stop("'family' not recognized")
-    }
     fltype <- 0                         # not a predefined type
     if (family$family == "gaussian" && family$link == "identity") fltype <- -1
     if (family$family == "binomial" && family$link == "logit") fltype <- 1
@@ -302,10 +295,6 @@ lmerFrames <- function(mc, formula, data, contrasts, ver2)
     if(!is.null(offset) && length(offset) != NROW(Y))
         stop(gettextf("number of offsets is %d should equal %d (number of observations)",
                       length(offset), NROW(Y)), domain = NA)
-    if (is.null(weights))
-        weights <- if (ver2) numeric(0) else rep.int(1, NROW(Y))
-    if (is.null(offset))
-        offset <- if (ver2) numeric(0) else numeric(NROW(Y))
     list(Y = Y, X = X, weights = weights, offset = offset, mt = mt, mf = mf)
 }
 
@@ -1237,6 +1226,13 @@ lmer2 <- function(formula, data, family = gaussian,
     fr <- lmerFrames(mc, formula, data, contrasts, ver2 = TRUE)
 
     ## check and evaluate the family argument
+    if(is.character(family))
+        family <- get(family, mode = "function", envir = parent.frame(2))
+    if(is.function(family)) family <- family()
+    if(is.null(family$family)) {
+        print(family)
+        stop("'family' not recognized")
+    }
     fltype <- mkFltype(family)
 
     ## establish factor list and Ztl
@@ -1244,22 +1240,41 @@ lmer2 <- function(formula, data, family = gaussian,
     cnames <- with(FL, c(lapply(Ztl, rownames),
                          list(.fixed = colnames(fr$X),
                               .response = deparse(formula[[2]]))))
-    nc <- with(FL, sapply(Ztl, nrow))
     Ztl <- with(FL, .Call(Ztl_sparse, fl, Ztl))
     ## FIXME: change this when rbind has been fixed.
+    ## Do this inside the C code
     Zt <- if (length(Ztl) == 1) Ztl[[1]] else do.call("rbind", Ztl)
     fl <- FL$fl
+    nc <- with(FL, sapply(Ztl, nrow))
 
-    ## quick return for a linear mixed model
-    if (fltype < 0) {
+    if (fltype < 0) {          # quick return for a linear mixed model
+        ## Too many arguments are being passed in as components of
+        ## fr.  Why not pass fr?
+        weights <- fr$weights
+        offset <- fr$offset
+        ## Do this inside the C code.
+        if (is.null(weights)) weights <- numeric(0)
+        if (is.null(offset)) offset <- numeric(0)
         mer <- .Call(lmer2_create, fl, Zt, t(fr$X), as.double(fr$Y),
-                     method == "REML", nc, cnames, fr$offset,
-                     fr$weights, if (model) fr$mf else data.frame(),
+                     method == "REML", nc, cnames, offset,
+                     weights, if (model) fr$mf else data.frame(),
                      fr$mt, mc, NULL)
         if (!is.null(start)) mer <- setST(mer, start)
         .Call(mer2_optimize, mer, cv$msVerbose)
         .Call(mer2_update_effects, mer)
+        return(mer)
     }
+
+    ## generalized linear mixed model 
+
+    ## initial fit of a glm to the fixed-effects only.
+    glmFit <- glm.fit(fr$X, fr$Y, weights = fr$weights, offset = fr$offset,
+                      family = family, intercept = attr(fr$mt, "intercept") > 0)
+    ## must do this after Y has possibly been reformulated
+    mer <- .Call(lmer2_create, fl, Zt, t(fr$X), as.double(glmFit$y),
+                 fltype, nc, cnames, fr$offset,
+                 fr$weights, if (model) fr$mf else data.frame(),
+                 fr$mt, mc, family)
     mer
 }
 
