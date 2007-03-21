@@ -475,7 +475,7 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
 		 SEXP ncp, SEXP cnames, SEXP offset, SEXP wts)
 {
     SEXP ST, fnms = getAttrib(fl, R_NamesSymbol),
-	val = PROTECT(NEW_OBJECT(MAKE_CLASS("mer2"))), xnms;
+	val = PROTECT(NEW_OBJECT(MAKE_CLASS("mer2")));
     cholmod_sparse *A, *Zt, *ZXyt, *ts1, *ts2;
     cholmod_dense *Xy;
     cholmod_factor *L;
@@ -527,7 +527,6 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
     AZERO(fixef, p);
     Gp[nf + 1] = Gp[nf] + p;	/* fixed effects */
     Gp[nf + 2] = Gp[nf + 1] + 1; /* response */
-    xnms = VECTOR_ELT(getAttrib(Xtp, R_DimNamesSymbol), 0);
     zdims = INTEGER(GET_SLOT(ZZt, lme4_DimSym));
     if (zdims[1] != nobs) error(_("Zt must have %d columns"), nobs);
     dims[q_POS] = q = zdims[0];
@@ -560,6 +559,22 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
 	((double*)(Xy->x))[j * (p + 1) + p] = -y[j];
     }
     ts1 = M_cholmod_dense_to_sparse(Xy, TRUE, &c);
+    /* Ensure that all y positions are stored, even if zero */
+    if (LENGTH(offset)){	
+	cholmod_sparse *tmp = M_cholmod_allocate_sparse(p + 1, nobs, nobs, 1,
+							1, 0, 1, &c);
+	int *ip = (int*)tmp->i, *pp = (int*)tmp->p;
+	double *xp = (double*)tmp->x, one[] = {1,0}, zero[] = {0,0};
+	*pp = 0;
+	for (j = 0; j < nobs; j++) {
+	    ip[j] = p;
+	    xp[j] = 1;
+	    pp[j + 1] = j + 1;
+	}
+	ts2 = M_cholmod_add(ts1, tmp, one, zero, 1, 1, &c);
+	M_cholmod_free_sparse(&tmp, &c);
+	ts1 = ts2;
+    }
     M_cholmod_free_dense(&Xy, &c);
     ts2 = M_cholmod_vertcat(Zt, ts1, TRUE, &c);
     M_cholmod_free_sparse(&ts1, &c);
@@ -583,6 +598,9 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
     setAttrib(ST, R_NamesSymbol, duplicate(fnms));
     for (i = 0; i < nf; i++)
 	SET_VECTOR_ELT(ST, i, allocMatrix(REALSXP, nc[i], nc[i]));
+    /* consider changing this to assign large values to S only to
+     * guarantee positive-definiteness of A then later use
+     * internal_mer_initial for lmm only */ 
     internal_mer2_initial(ST, Gp, A);
     j = c.supernodal;		/* force supernodal for non-nested */
     if (!dims[isNest_POS]) c.supernodal = CHOLMOD_SUPERNODAL;
@@ -1307,14 +1325,14 @@ SEXP lmer2_create(SEXP fl, SEXP Zt, SEXP Xp, SEXP yp, SEXP REMLp,
 	mer = PROTECT(mer2_create(fl, Zt, Xp, yp, REMLp, nc, cnames, offset, wts)),
 	val = PROTECT(NEW_OBJECT(MAKE_CLASS("lmer2")));
     } else {
-	/* use a dummy X matrix, weights, offset and REMLp */
-	mer = PROTECT(mer2_create(fl, Zt, allocMatrix(REALSXP, LENGTH(yp), 0),
+	/* use a dummy Xt matrix, weights, offset and REMLp */
+	mer = PROTECT(mer2_create(fl, Zt, allocMatrix(REALSXP, 0, LENGTH(yp)),
 				  yp, ScalarLogical(0), nc, cnames, yp, yp));
 	val = PROTECT(NEW_OBJECT(MAKE_CLASS("glmer2")));
 	SET_SLOT(val, install("family"), duplicate(fam));
 	SET_SLOT(val, lme4_wtsSym, duplicate(wts));
 	SET_SLOT(val, install("off"), duplicate(offset));
-	SET_SLOT(val, lme4_XSym, duplicate(Xp));
+	SET_SLOT(val, install("origZXyt"), duplicate(Zt));
     }
     for (i = 0; i < n; i++) {
 	SEXP sym = install(CHAR(STRING_ELT(nms, i)));

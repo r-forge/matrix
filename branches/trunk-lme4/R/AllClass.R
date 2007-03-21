@@ -100,11 +100,9 @@ setClass("glmer",
 
 setClass("glmer2",
 	 representation(family = "family",
-                        X = "dgCMatrix",
-                        y = "numeric",
-                        off = "numeric",
-                        wts = "numeric",
-                        dmu_deta = "numeric"),
+                        origZXyt = "dgCMatrix",
+                        off = "numeric",  # original offset
+                        wts = "numeric"), # original weights
 	 contains = "lmer2")
 
 setClass("summary.mer", # the "mer" result ``enhanced'' :
