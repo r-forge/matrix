@@ -1,5 +1,11 @@
 #### "TsparseMatrix" : Virtual class of sparse matrices in triplet-format
 
+## These should be "catch all", going via Csparse
+setAs("matrix", "TsparseMatrix",
+      function(from) as(as(from, "CsparseMatrix"), "TsparseMatrix"))
+setAs("Matrix", "TsparseMatrix",
+      function(from) as(as(from, "CsparseMatrix"), "TsparseMatrix"))
+
 ## in ../src/Tsparse.c :  |-> cholmod_T -> cholmod_C -> chm_sparse_to_SEXP
 ## adjusted for triangular matrices not represented in cholmod
 .T.2.C <- function(from) .Call(Tsparse_to_Csparse, from, ##
@@ -48,6 +54,10 @@ setAs("ntTMatrix", "ntCMatrix",
 ## method-*internally* ; this is not strictly OO, but allows to use
 ## the following utility and hence much more compact code.
 
+## Otherwise have to write methods for all possible combinations of
+##  (i , j) \in
+##  (numeric, logical, character, missing) x (numeric, log., char., miss.)
+
 .ind.prep <- function(xi, i, margin, di, dn)
 {
     ## Purpose: do the ``common things'' for "*gTMatrix" indexing
@@ -87,7 +97,18 @@ setAs("ntTMatrix", "ntCMatrix",
 	dn <- dn[i0]
 	i0 <- i0 - 1:1
     }
-    list(m = match(xi, i0, nomatch=0), li = length(i0), dn = dn)
+    m <- match(xi, i0, nomatch=0)
+    if(anyDup <- any(iDup <- duplicated(i0))) {
+	i0m <- match(i0[iDup], i0)
+	jj <- lapply(i0m, function(.)
+		     which(match(m, ., nomatch=0) > 0))
+	i.xtra <- rep.int(which(iDup)- 1:1, sapply(jj, length))
+    }
+
+    c(list(m = m, li = length(i0),
+	   i0 = i0, anyDup = anyDup, dn = dn),
+      ## actually,  iDup  is not neeeded
+      if(anyDup) list(iDup = iDup, jj = unlist(jj), i.xtra = i.xtra))
 }
 
 
@@ -129,11 +150,6 @@ setAs("ntTMatrix", "ntCMatrix",
 }
 
 
-## Otherwise have to write methods for all possible combinations of
-##  (i , j) \in
-##  (numeric, logical, character, missing) x (numeric, log., char., miss.)
-
-
 ## Select rows
 setMethod("[", signature(x = "TsparseMatrix", i = "index", j = "missing",
 			 drop = "logical"),
@@ -141,22 +157,29 @@ setMethod("[", signature(x = "TsparseMatrix", i = "index", j = "missing",
 	      clx <- getClassDef(class(x))
 	      has.x <- !extends(clx, "nsparseMatrix")
 	      x.sym <- extends(clx, "symmetricMatrix")
-	      if(x.sym)
+              x.tri <- extends(clx, "triangularMatrix")
+	      gDo <- (x.sym || (x.tri && x@diag == "U"))
+	      if(gDo)
 		  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
+
 	      ip <- .ind.prep(x@i, i, 1, dim(x), dimnames(x))
 	      Di1 <- ip$li
 	      drop.it <- drop && (Di1 == 1:1 || x@Dim[2] == 1:1)
-	      if(!drop.it && !x.sym && extends(clx, "triangularMatrix"))
+	      if(x.tri && !drop.it && !gDo) # triangular, result not
 		  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
+
 	      x@Dim[1] <- Di1
 	      if(!is.null(ip$dn)) x@Dimnames[[1]] <- ip$dn
 	      sel <- ip$m > 0
 	      x@i <- ip$m[sel] - 1:1
+              if(ip$anyDup) { ## duplicated rows selected: extend sel
+                  sel <- c(which(sel), ip$jj)
+                  x@i <- c(x@i, ip$i.xtra)
+              }
 	      x@j <- x@j[sel]
 	      if (has.x) x@x <- x@x[sel]
 	      if (drop.it) drop(as(x,"matrix")) else x
 	  })
-
 
 ## Select columns
 setMethod("[", signature(x = "TsparseMatrix", i = "missing", j = "index",
@@ -165,18 +188,26 @@ setMethod("[", signature(x = "TsparseMatrix", i = "missing", j = "index",
 	      clx <- getClassDef(class(x))
 	      has.x <- !extends(clx, "nsparseMatrix")
 	      x.sym <- extends(clx, "symmetricMatrix")
-	      if(x.sym)
+              x.tri <- extends(clx, "triangularMatrix")
+	      gDo <- (x.sym || (x.tri && x@diag == "U"))
+	      if(gDo)
 		  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
+
 	      ip <- .ind.prep(x@j, j, 2, dim(x), dimnames(x))
 	      Di2 <- ip$li
 	      drop.it <- drop && (x@Dim[1] == 1:1 || Di2 == 1:1)
-	      if(!drop.it && !x.sym && extends(clx, "triangularMatrix"))
+	      if(x.tri && !drop.it && !gDo) # triangular, result not
 		  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
+
 	      x@Dim[2] <- Di2
 	      if(!is.null(ip$dn)) x@Dimnames[[2]] <- ip$dn
 	      sel <- ip$m > 0
-	      x@i <- x@i[sel]
 	      x@j <- ip$m[sel] - 1:1
+	      if(ip$anyDup) { ## duplicated columns selected: extend sel
+		  sel <- c(which(sel), ip$jj)
+		  x@j <- c(x@j, ip$i.xtra)
+	      }
+	      x@i <- x@i[sel]
 	      if (has.x) x@x <- x@x[sel]
 	      if (drop.it) drop(as(x,"matrix")) else x
 	  })
@@ -194,13 +225,16 @@ setMethod("[", signature(x = "TsparseMatrix",
 	  clx <- getClassDef(class(x))
 	  has.x <- !extends(clx, "nsparseMatrix")
 	  isSym <- extends(clx, "symmetricMatrix")
+
 	  if(isSym) {
 	      isSym <- length(i) == length(j) && all(i == j)
-	      ## result is *still* symmetric --> keep symmetry!
+	      ## result will *still* be symmetric --> keep symmetry!
 	      if(!isSym)
 		  ## result no longer symmetric -> to "generalMatrix"
 		  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
-	  }
+	  } else if(extends(clx, "triangularMatrix") && x@diag == "U") {
+                  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
+          }
 	  if(isSym) {
 	      offD <- x@i != x@j
 	      ip1 <- .ind.prep(c(x@i,x@j[offD]), i, 1, di, dn)
@@ -211,8 +245,6 @@ setMethod("[", signature(x = "TsparseMatrix",
 	  }
 	  nd <- c(ip1$li, ip2$li)
 	  drop.it <- drop && any(nd == 1)
-	  if(!drop.it && !isSym && extends(clx, "triangularMatrix"))
-	      x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
 	  x@Dim <- nd
 	  x@Dimnames <- list(ip1$dn, ip2$dn)
 	  sel <- ip1$m > 0:0  &	 ip2$m > 0:0
@@ -220,8 +252,23 @@ setMethod("[", signature(x = "TsparseMatrix",
 	      sel <- sel &
 	      (if(x@uplo == "U") ip1$m <= ip2$m else ip2$m <= ip1$m)
 	  }
+
+	  if(ip1$anyDup || ip2$anyDup)
+	      sel <- which(sel)
+
 	  x@i <- ip1$m[sel] - 1:1
+	  if(ip1$anyDup) { ## duplicated rows selected: extend sel
+	      x@i <- c(ip1$m[sel] - 1:1, ip1$i.xtra)
+	      sel <- c(sel, ip1$jj)
+	  }
 	  x@j <- ip2$m[sel] - 1:1
+	  if(ip2$anyDup) { ## duplicated columns selected: extend sel
+	      x@j <- c(x@j, ip2$i.xtra)
+	      sel <- c(sel, ip2$jj)
+	      ## must extend  x@i as well - is this ok?
+	      x@i <- c(x@i, ip1$m[ip2$jj] - 1:1)
+	    warning("selecting duplicated columns after rows -- not yet fully implemented")
+          }
 	  if (has.x)
 	      x@x <- c(x@x, if(isSym) x@x[offD])[sel]
 	  if (drop.it) drop(as(x,"matrix")) else x

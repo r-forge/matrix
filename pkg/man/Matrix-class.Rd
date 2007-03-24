@@ -20,14 +20,22 @@
 \alias{\%*\%,numeric,Matrix-method}
 \alias{\%*\%,Matrix,Matrix-method}
 % "[" are in ./Xtrct-methods.Rd <<<<<<<<
+\alias{cbind2,ANY,Matrix-method}
+\alias{cbind2,Matrix,ANY-method}
 \alias{cbind2,Matrix,Matrix-method}
 \alias{cbind2,Matrix,NULL-method}
+\alias{cbind2,Matrix,atomicVector-method}
 \alias{cbind2,Matrix,missing-method}
 \alias{cbind2,NULL,Matrix-method}
+\alias{cbind2,atomicVector,Matrix-method}
+\alias{rbind2,ANY,Matrix-method}
+\alias{rbind2,Matrix,ANY-method}
 \alias{rbind2,Matrix,Matrix-method}
 \alias{rbind2,Matrix,NULL-method}
+\alias{rbind2,Matrix,atomicVector-method}
 \alias{rbind2,Matrix,missing-method}
 \alias{rbind2,NULL,Matrix-method}
+\alias{rbind2,atomicVector,Matrix-method}
 \alias{crossprod,Matrix,numeric-method}
 \alias{crossprod,Matrix,ANY-method}
 \alias{crossprod,Matrix,Matrix-method}
@@ -44,11 +52,9 @@
 \alias{drop,Matrix-method}
 \alias{head,Matrix-method}
 \alias{tail,Matrix-method}
-\alias{solve,Matrix,Matrix-method}
-\alias{solve,Matrix,matrix-method}
-\alias{solve,Matrix,missing-method}
-\alias{solve,Matrix,numeric-method}
+\alias{diff,Matrix-method}
 \alias{dim,Matrix-method}
+\alias{dim<-,Matrix-method}
 \alias{dimnames,Matrix-method}
 \alias{dimnames<-,Matrix,list-method}
 \alias{length,Matrix-method}
@@ -63,15 +69,12 @@
 \alias{coerce,Matrix,matrix-method}%
 \alias{coerce,matrix,Matrix-method}
 \alias{coerce,Matrix,denseMatrix-method}
+\alias{coerce,Matrix,CsparseMatrix-method}
 \alias{coerce,Matrix,sparseMatrix-method}
-\alias{cbind2,Matrix,ANY-method}
-\alias{cbind2,Matrix,atomicVector-method}
-\alias{cbind2,ANY,Matrix-method}
-\alias{cbind2,atomicVector,Matrix-method}
-\alias{rbind2,Matrix,ANY-method}
-\alias{rbind2,Matrix,atomicVector-method}
-\alias{rbind2,ANY,Matrix-method}
-\alias{rbind2,atomicVector,Matrix-method}
+\alias{solve,Matrix,Matrix-method}
+\alias{solve,Matrix,matrix-method}
+\alias{solve,Matrix,missing-method}
+\alias{solve,Matrix,numeric-method}
 \alias{crossprod,ANY,Matrix-method}
 \alias{kronecker,ANY,Matrix-method}
 \alias{kronecker,Matrix,ANY-method}
@@ -94,8 +97,14 @@
 }
 \section{Methods}{
   \describe{
+    \item{diff}{\code{signature(x = "Matrix")}: As \code{\link{diff}()}
+      for traditional matrices, i.e., applying \code{diff()} to each
+      column.}
     \item{dim}{\code{signature(x = "Matrix")}: extract matrix dimensions
       \code{\link{dim}}.}
+    \item{dim<-}{\code{signature(x = "Matrix", value = "ANY")}: where
+      \code{value} is integer of length 2.  Allows to \emph{reshape}
+      Matrix objects, but only when \code{prod(value) == prod(dim(x))}.}
     \item{dimnames}{\code{signature(x = "Matrix")}: extract
       \code{\link{dimnames}}.}
     \item{dimnames<-}{\code{signature(x = "Matrix", value = "list")}: set
@@ -149,6 +158,14 @@ cl <- getClass("Matrix")
 names(cl@subclasses) # more than 40 ..
 
 showClass("Matrix")#> output with slots and all subclasses
+
+(M <- Matrix(c(0,1,0,0), 6, 4))
+dim(M)
+diag(M)
+diff(M)
+## can reshape it even :
+dim(M) <- c(2, 12)
+M
 }
 \keyword{classes}
 \keyword{algebra}
