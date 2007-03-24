@@ -60,6 +60,25 @@ all.equal((Atr %*% solve(Atr, y))@x, y)
 
 ## sparse matrix products
 
+## solve() for dtC*
+m <- round(chol(crossprod(A)), 2)
+m <- kronecker(Diagonal(2), m)
+im <- solve(m)
+round(im, 3)
+itm <- solve(t(m))
+iim <- solve(im) # should be ~= 'm' of course
+iitm <- solve(itm)
+I <- Diagonal(nrow(m))
+(del <- c(mean(abs(as.numeric(im %*% m - I))),
+	  mean(abs(as.numeric(m %*% im - I))),
+	  mean(abs(as.numeric(im  - t(itm)))),
+	  mean(abs(as.numeric( m  - iim))),
+	  mean(abs(as.numeric(t(m)- iitm)))))
+stopifnot(is(m, "dtCMatrix"), is(im, "dtCMatrix"),
+	  is(itm, "dtCMatrix"), is(iitm, "dtCMatrix"),
+	  del < 1e-15)
+
+
 data(KNex); mm <- KNex$mm
 M <- mm[1:500, 1:200]
 MT <- as(M, "TsparseMatrix")
