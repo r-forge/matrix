@@ -610,21 +610,37 @@ as_Csparse2 <- function(x, cld = if(isS4(x)) getClassDef(class(x))) {
     if(sh == "t") .Call(Csparse_diagU2N, x) else x
 }
 
-as_gCsimpl <- function(from) as(from, paste(.M.kind(from), "gCMatrix", sep=''))
 
+
+## 'cl'   : class() *or* class definition of from
+as_gCsimpl <- function(from, cl = class(from))
+    as(from, paste(.M.kind(from, cl), "gCMatrix", sep=''))
+## slightly smarter:
+as_gSparse2 <- function(from, cl = class(from)) {
+    if(is.character(cl)) cl <- getClassDef(cl)
+    as(from, paste(.M.kind(from, cl),
+		   if(extends(cl, "TsparseMatrix")) "gTMatrix"
+		   else "gCMatrix", sep=''))
+}
+as_geSimpl2 <- function(from, cl = class(from))
+    as(from, paste(.M.kind(from, cl), "geMatrix", sep=''))
+
+## to be used directly in setAs(.) needs one-argument-only  (from) :
 as_geSimpl <- function(from) as(from, paste(.M.kind(from), "geMatrix", sep=''))
+as_gSparse <- function(from) as_gSparse2(from, getClassDef(class(from)))
+
 ## smarter, (but sometimes too smart!) compared to geClass() above:
 as_geClass <- function(x, cl) {
     if(missing(cl)) as_geSimpl(x)
     else if(extends(cl, "diagonalMatrix")  && isDiagonal(x))
 	as(x, cl)
     else if(extends(cl, "symmetricMatrix") &&  isSymmetric(x)) {
-        kind <- .M.kind(x)
+        kind <- .M.kind(x, cl)
 	as(x, class2(cl, kind, do.sub= kind != "d"))
     } else if(extends(cl, "triangularMatrix") && isTriangular(x))
 	as(x, cl)
-    else ## forget about 'cl'
-	as_geSimpl(x)
+    else ## revert to
+	as_geSimpl2(x, cl)
 }
 
 as_CspClass <- function(x, cl) {
@@ -634,7 +650,7 @@ as_CspClass <- function(x, cl) {
 	(extends(cl, "triangularMatrix")&& isTriangular(x)))
 	as(x, cl)
     else if(is(x, "CsparseMatrix")) x
-    else as(x, paste(.M.kind(x), "gCMatrix", sep=''))
+    else as(x, paste(.M.kind(x, cl), "gCMatrix", sep=''))
 }
 
 

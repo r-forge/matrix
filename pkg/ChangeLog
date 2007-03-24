@@ -1,3 +1,31 @@
+2007-03-23  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/dtCMatrix.c (dtCMatrix_solve): use the new code from Kasper
+	Kristensen based cs_spsolve() instead of _lsolve & _usolve which
+	can be much faster.
+
+	* tests/matprod.R: add regression tests for these (upper & lower).
+
+2007-03-19  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R (diff): method for our Matrices.
+
+	* R/sparseMatrix.R (isDiagonal): check dim()!
+
+2007-03-17  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R (dim<-): new method for "reshape()" built on a
+	proposal from Tamas Papp.
+
+2007-03-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllGeneric.R: remove all  if(!isGeneric(.))  clauses
+
+	* R/zzz.R (.onLoad, .onUnload): do *not* leave bind_activation(TRUE);
+	rather define cBind() and rBind();
+	and also cbind()/rbind {in Matrix, but exported}.
+
+
 2007-02-16  Douglas Bates  <bates@r-project.org>
 
 	* DESCRIPTION (Date, Version): 0.9975-11 with new date

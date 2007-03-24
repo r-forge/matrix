@@ -7,7 +7,8 @@
 
 setAs("ANY", "sparseMatrix", function(from) as(from, "CsparseMatrix"))
 
-setAs(from = "sparseMatrix", to = "generalMatrix", as_gCsimpl)
+setAs(from = "sparseMatrix", to = "generalMatrix",
+      function(from) as_gSparse(from))
 
 ## "graph" coercions -- this needs the graph package which is currently
 ##  -----               *not* required on purpose
@@ -354,6 +355,9 @@ setMethod("isTriangular", signature(object = "sparseMatrix"),
 
 setMethod("isDiagonal", signature(object = "sparseMatrix"),
 	  function(object) {
+              d <- dim(object)
+              if(d[1] != d[2]) return(FALSE)
+              ## else
 	      gT <- as(object, "TsparseMatrix")
 	      all(gT@i == gT@j)
 	  })

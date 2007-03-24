@@ -81,6 +81,15 @@ mC[,1]
 mC[1:2,]
 mC[7,  drop = FALSE]
 assert.EQ.mat(mC[1:2,], mm[1:2,])
+
+## *repeated* indices - did not work at all ...
+i <- rep(8:10,2)
+j <- c(2:4, 4:3)
+assert.EQ.mat(mC[i,], mm[i,])
+assert.EQ.mat(mC[,j], mm[,j])
+if(FALSE) ## FIXME
+assert.EQ.mat(mC[i,j], mm[i,j])
+
 stopifnot(all.equal(mC[,3], mm[,3]),
 	  identical(mC[ij], mm[ij]))
 assert.EQ.mat(mC[7, , drop=FALSE], mm[7, , drop=FALSE])
@@ -142,6 +151,14 @@ stopifnot(sm[2,] == c(0:1, rep.int(0,ncol(sm)-2)),
 m0 <- Diagonal(5)
 (m1 <- as(m0, "sparseMatrix"))  # dtTMatrix
 (m2 <- as(m0, "CsparseMatrix")) # dtCMatrix (with an irrelevant warning)
+m1g <- as(m1, "generalMatrix")
+stopifnot(is(m1g, "dgTMatrix"))
+assert.EQ.mat(m2[1:3,],    diag(5)[1:3,])
+assert.EQ.mat(m2[,c(4,1)], diag(5)[,c(4,1)])
+stopifnot(identical(m2[1:3,], as(m1[1:3,], "CsparseMatrix")),
+          identical(Matrix:::uniqTsparse(m1[, c(4,2)]),
+                    Matrix:::uniqTsparse(as(m2[, c(4,2)], "TsparseMatrix")))
+          )## failed in 0.9975-11
 
 M <- m0; M[1,] <- 0
 stopifnot(identical(M, Diagonal(x=c(0, rep(1,4)))))

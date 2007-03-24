@@ -4,6 +4,8 @@
 \alias{TsparseMatrix-class}
 %% Methods:
 \alias{coerce,TsparseMatrix,CsparseMatrix-method}
+\alias{coerce,Matrix,TsparseMatrix-method}
+\alias{coerce,matrix,TsparseMatrix-method}
 % "[" are in ./Xtrct-methods.Rd
 \alias{\%*\%,TsparseMatrix,ANY-method}
 \alias{\%*\%,ANY,TsparseMatrix-method}

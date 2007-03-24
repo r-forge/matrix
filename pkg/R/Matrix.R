@@ -3,8 +3,12 @@
 
 ### Virtual coercions -- via smart "helpers" (-> ./Auxiliaries.R)
 
-setAs("Matrix", "sparseMatrix", function(from) as_Csparse(from))
+setAs("Matrix", "sparseMatrix", function(from) as(from, "CsparseMatrix"))
+setAs("Matrix", "CsparseMatrix", function(from) as_Csparse(from))
 setAs("Matrix", "denseMatrix",  function(from) as_dense(from))
+
+## Maybe TODO:
+## setAs("Matrix", "nMatrix", function(from) ....)
 
 ## Most of these work; this is a last resort:
 setAs(from = "Matrix", to = "matrix", # do *not* call base::as.matrix() here:
@@ -261,6 +265,45 @@ setMethod("diag", signature(x = "Matrix"),
 setMethod("t", signature(x = "Matrix"),
 	  function(x) .bail.out.1(.Generic, class(x)))
 
+setMethod("dim<-", signature(x = "Matrix", value = "ANY"),
+	  function(x, value) {
+	      if(!is.numeric(value) || length(value) != 2)
+		  stop("dim(.) value must be numeric of length 2")
+	      if(prod(dim(x)) != prod(value <- as.integer(value)))
+		  stop("dimensions don't match the number of cells")
+	      clx <- class(x)
+	      if(substring(clx,2) == "geMatrix") {
+		  x@Dim <- value
+		  if(length(x@factors) > 0)
+		      x@factors <- list()
+		  x
+	      } else if(extends(clx, "denseMatrix")) {
+		  x <- as_geSimpl2(x, clx)
+		  dim(x) <- value
+	      } else { ## FIXME: this is very inefficient for large sparse x
+		  Matrix(as.vector(x), value[1], value[2])
+	      }
+	  })
+
+## MM: More or less "Cut & paste" from
+## --- diff.default() from  R/src/library/base/R/diff.R :
+setMethod("diff", signature(x = "Matrix"),
+	  function(x, lag = 1, differences = 1, ...) {
+	      if (length(lag) > 1 || length(differences) > 1 ||
+		  lag < 1 || differences < 1)
+		  stop("'lag' and 'differences' must be integers >= 1")
+	      xlen <- nrow(x)
+	      if (lag * differences >= xlen)
+		  return(x[,FALSE][0])	# empty of proper mode
+
+	      i1 <- -1:-lag
+	      for (i in 1:differences)
+		  x <- x[i1, , drop = FALSE] -
+		      x[-nrow(x):-(nrow(x)-lag+1), , drop = FALSE]
+	      x
+	  })
+
+
 ## Group Methods
 
 ##-> see ./Ops.R
@@ -283,7 +326,11 @@ setMethod("[", signature(x = "Matrix",
 ## select rows
 setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
 			 drop = "missing"),
-	  function(x,i,j, drop) callGeneric(x, i=i, drop= TRUE))
+	  function(x,i,j, drop) {
+	      if(nargs() == 1) { ## e.g. M[0] , M[TRUE],  M[1:2]
+		  if(any(i)) as.vector(x)[i] else as.vector(x[1,1])[FALSE]
+	      } else callGeneric(x, i=i, drop= TRUE)})
+
 ## select columns
 setMethod("[", signature(x = "Matrix", i = "missing", j = "index",
 			 drop = "missing"),
