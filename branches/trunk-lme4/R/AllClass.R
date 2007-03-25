@@ -57,8 +57,24 @@ setClass("mer",
          validity = function(object) .Call(mer_validate, object)
 	)
 
-setClass("mer2",
+## Representation of linear and generalized linear mixed effects model
+setClass("lmer",
+	 representation(frame = "data.frame",
+                        call = "call",	   # call to model-fitting function
+                        terms = "terms"),  # terms for fixed-effects
+	 contains = "mer")
+
+setClass("glmer",
+	 representation(family = "family", # glm family
+                        weights = "numeric"),
+	 contains = "lmer")
+
+## Representation of linear and generalized linear mixed effects model
+setClass("lmer2",
 	 representation(## original data
+                        frame = "data.frame", # model frame or empty frame
+                        call = "call",	    # matched call to model-fitting function
+                        terms = "terms",    # terms for fixed-effects
 			flist = "list",     # list of grouping factors
 			ZXyt = "dgCMatrix", # sparse form of [Z;X;-y]'
 			weights = "numeric",# can be of length 0 for constant wts
@@ -76,27 +92,8 @@ setClass("mer2",
 			fixef = "numeric",
 			ranef = "numeric"
 			),
-         validity = function(object) .Call(mer2_validate, object)
+         validity = function(object) .Call(lmer2_validate, object)
          )
-
-## Representation of linear and generalized linear mixed effects model
-setClass("lmer",
-	 representation(frame = "data.frame",
-                        call = "call",	   # call to model-fitting function
-			terms = "terms"),
-	 contains = "mer")
-
-## Representation of linear and generalized linear mixed effects model
-setClass("lmer2",
-	 representation(frame = "data.frame",
-                        call = "call",	   # call to model-fitting function
-			terms = "terms"),
-	 contains = "mer2")
-
-setClass("glmer",
-	 representation(family = "family", # glm family
-                        weights = "numeric"),
-	 contains = "lmer")
 
 setClass("glmer2",
 	 representation(family = "family",
@@ -119,7 +116,7 @@ setClass("summary.mer", # the "mer" result ``enhanced'' :
 			),
 	 contains = "mer")
 
-setClass("summary.mer2", # the "mer2" result ``enhanced'' :
+setClass("summary.lmer2", # the "lmer2" result ``enhanced'' :
 	 representation(
 			isG   = "logical",
 			methTitle = "character",
@@ -131,11 +128,9 @@ setClass("summary.mer2", # the "mer2" result ``enhanced'' :
 			REmat = "matrix",
 			AICtab= "data.frame"
 			),
-	 contains = "mer2")
+	 contains = "lmer2")
 
 setClass("summary.lmer", contains = c("summary.mer", "lmer"))
-
-setClass("summary.lmer2", contains = c("summary.mer2", "lmer2"))
 
 setClass("summary.glmer", contains = c("summary.mer", "glmer"))
 

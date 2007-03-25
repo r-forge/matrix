@@ -24,7 +24,6 @@ exportClasses(
               "lmer",
               "lmer2",
               "mer",
-              "mer2",
               "pedigree",
               "ranef.lmer",
               "summary.glmer",

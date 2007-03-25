@@ -12,18 +12,36 @@
  * sections that are conditionally independent. As far as I can see
  * this will mean a single grouping factor only. */
 
-/* Functions for the mer2 representation */
+/* Functions for the lmer2 representation */
 
 				/* positions in the deviance vector */
 enum devP {ML_POS=0, REML_POS, ldZ_POS, ldX_POS, lr2_POS};
 			/* {"ML", "REML", "ldZ", "ldX", "lr2", ""} */
 				/* positions in the dims vector */
-enum dimP {nf_POS=0, n_POS, p_POS, q_POS, isREML_POS, isGLMM_POS, isNest_POS};
-	      /* {"nf", "n", "p", "q", "isREML", "isGLMM", "isNested"} */
+enum dimP {nf_POS=0, n_POS, p_POS, q_POS, isREML_POS, famType_POS, isNest_POS};
+	      /* {"nf", "n", "p", "q", "isREML", "famType", "isNested"} */
 
 #define isREML(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isREML_POS]
-#define isGLMM(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isGLMM_POS]
+#define isGLMM(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[famType_POS] >= 0
 #define isNested(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isNest_POS]
+
+/**
+ * Return the element of a given name from a named list
+ *
+ * @param list
+ * @param nm name of desired element
+ *
+ * @return element of list with name nm
+ */
+static SEXP R_INLINE getListElement(SEXP list, char *nm) {
+    SEXP names = getAttrib(list, R_NamesSymbol);
+    int i;
+
+    for (i = 0; i < LENGTH(names); i++)
+	if (!strcmp(CHAR(STRING_ELT(names, i)), nm))
+	    return(VECTOR_ELT(list, i));
+    return R_NilValue;
+}
 
 /**
  * Check the ZtZ matrix to see if it is a simple design from a nested
@@ -36,11 +54,12 @@ enum dimP {nf_POS=0, n_POS, p_POS, q_POS, isREML_POS, isGLMM_POS, isNest_POS};
  *
  * @return 1 for a simple nested sequence, 0 otherwise.
  */
-static int check_nesting(int nf, const int nc[], const int Gp[], const int p[])
+static int check_nesting(int nf, SEXP ST, const int Gp[], const int p[])
 {
-    int **cnz = Calloc(nf, int*), ans = 1, i, j, k, nct;
+    int **cnz = Calloc(nf, int*), *nc = Calloc(nf, int), ans = 1, i, j, k, nct;
 
     for (i = 0, nct = 0; i < nf; i++) { /* total number of columns */
+	nc[i] = *INTEGER(getAttrib(VECTOR_ELT(ST, i), R_DimSymbol));
 	nct += nc[i];
 	cnz[i] = Calloc(nc[i], int);
     }
@@ -58,7 +77,7 @@ static int check_nesting(int nf, const int nc[], const int Gp[], const int p[])
 	}
     }
     for (i = 0, nct = 0; i < nf; i++) Free(cnz[i]);
-    Free(cnz);
+    Free(cnz); Free(nc);
     return ans;
 }
 
@@ -95,7 +114,7 @@ static double *TS_mult(const int *Gp, SEXP ST, double *b)
 }
 
 /**
- * Evaluate the effects in an mer2 representation
+ * Evaluate the effects in an lmer2 representation
  *
  * @param L factorization
  *
@@ -103,7 +122,7 @@ static double *TS_mult(const int *Gp, SEXP ST, double *b)
  * and \hat{\beta} in the next p positions.
  */
 static cholmod_dense
-*internal_mer2_effects(cholmod_factor *L)
+*internal_lmer2_effects(cholmod_factor *L)
 {
     int i, nt = (L->n);
     cholmod_dense *X,
@@ -243,7 +262,7 @@ internal_update_L(double *deviance, int *dims, const int *Gp,
 	    double *db = Calloc(nci * nci, double), /* diagonal blcok */
 		*wrk = (double *) NULL;
 	    
-/* FIXME: calculate and store maxrows in mer2_create */
+/* FIXME: calculate and store maxrows in lmer2_create */
 	    if (nci > 2) {	/* calculate scratch storage size */
 		for (j = 0; j < nlev; j++) {
 		    int cj = base + j * nci; /* first column in this group */
@@ -351,7 +370,7 @@ internal_update_L(double *deviance, int *dims, const int *Gp,
 }
 
 static void
-internal_mer2_initial(SEXP ST, int *Gp, cholmod_sparse *A)
+internal_lmer2_initial(SEXP ST, int *Gp, cholmod_sparse *A)
 {
     int *ai = (int*)(A->i), *ap = (int*)(A->p), i, nf = LENGTH(ST);
     double *ax = (double*)(A->x);
@@ -455,177 +474,6 @@ internal_update_A(cholmod_sparse *ZXyt, SEXP wtP, SEXP offP,
 }
 
 /**
- * Create an mer2 object from a list of grouping factors and a list of model
- * matrices.
- *
- * @param fl named list of grouping factors
- * @param ZZt transpose of Z as a sparse matrix
- * @param Xtp transpose of model matrix for the fixed effects
- * @param yp response vector
- * @param REMLp logical scalar indicating if REML is to be used
- * @param ncp integer vector of the number of random effects per level
- *        of each grouping factors
- * @param cnames list of column names of model matrices
- * @param offset numeric vector of offsets
- * @param weights numeric vector of prior weights
- *
- * @return pointer to an mer2 object
- */
-SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
-		 SEXP ncp, SEXP cnames, SEXP offset, SEXP wts)
-{
-    SEXP ST, fnms = getAttrib(fl, R_NamesSymbol),
-	val = PROTECT(NEW_OBJECT(MAKE_CLASS("mer2")));
-    cholmod_sparse *A, *Zt, *ZXyt, *ts1, *ts2;
-    cholmod_dense *Xy;
-    cholmod_factor *L;
-    int *Perm, *Gp, *nc = INTEGER(ncp), *dims, *xdims, *zdims,
-	i, j, nf = LENGTH(fl), nobs = LENGTH(yp), p, q;
-    double *Xt, *fixef, *ranef, *y;
-    char *DEVIANCE_NAMES[]={"ML","REML","ldZ","ldX","lr2",""};
-    char *DIMS_NAMES[]={"nf","n","p","q","isREML","isGLMM","isNested",""};
-				/* record dimensions */
-    SET_SLOT(val, lme4_dimsSym, internal_make_named(INTSXP, DIMS_NAMES));
-    dims = INTEGER(GET_SLOT(val, lme4_dimsSym));
-    dims[nf_POS] = nf;
-    dims[n_POS] = nobs;
-    dims[isREML_POS] = asLogical(REMLp);
-    dims[isGLMM_POS] = FALSE;
-    dims[isNest_POS] = TRUE;
-				/* Check arguments to be duplicated */
-    if (!isReal(yp)) error(_("yp must be a real vector"));
-    y = REAL(yp);
-    if (!isReal(offset) || (LENGTH(offset) && LENGTH(offset) != nobs))
-	error(_("offset must be a real vector of length %d"), nobs);
-    SET_SLOT(val, lme4_offsetSym, duplicate(offset));
-    if (!isReal(wts) || (LENGTH(wts) && LENGTH(wts) != nobs))
-	error(_("wts must be a real vector of length %d"), nobs);
-    SET_SLOT(val, lme4_weightsSym, duplicate(wts));
-				/*  check flist and create Gp*/
-    if (!isNewList(cnames) || LENGTH(cnames) != nf + 2)
-	error(_("cnames must be a list of length %d"), nf + 2);
-    SET_SLOT(val, lme4_cnamesSym, duplicate(cnames));
-    if (!isInteger(ncp) || LENGTH(ncp) != nf)
-	error(_("ncp must be an integer vector of length %d"), nf);
-    if (!isNewList(fl) || nf < 1) error(_("fl must be a nonempty list"));
-    Gp = INTEGER(ALLOC_SLOT(val, lme4_GpSym, INTSXP, nf + 3));
-    Gp[0] = 0;
-    for (i = 0; i < nf; i++) {
-	SEXP fli = VECTOR_ELT(fl, i);
-	if (!isFactor(fli) || LENGTH(fli) != nobs)
-	    error(_("fl[[%d] must be a factor of length %d"), i+1, nobs);
-	Gp[i + 1] = Gp[i] + LENGTH(getAttrib(fli, R_LevelsSymbol)) * nc[i];
-    }
-    SET_SLOT(val, lme4_flistSym, duplicate(fl));
-				/* construct ZXyt matrix */
-    if (!isMatrix(Xtp) || !isReal(Xtp))
-	error(_("Xtp must be a real matrix"));
-    xdims = INTEGER(getAttrib(Xtp, R_DimSymbol));
-    if (xdims[1] != nobs) error(_("Xtp must have %d rows"), nobs);
-    dims[p_POS] = p = xdims[0]; Xt = REAL(Xtp);
-    fixef = REAL(ALLOC_SLOT(val, lme4_fixefSym, REALSXP, p));
-    AZERO(fixef, p);
-    Gp[nf + 1] = Gp[nf] + p;	/* fixed effects */
-    Gp[nf + 2] = Gp[nf + 1] + 1; /* response */
-    zdims = INTEGER(GET_SLOT(ZZt, lme4_DimSym));
-    if (zdims[1] != nobs) error(_("Zt must have %d columns"), nobs);
-    dims[q_POS] = q = zdims[0];
-    ranef = REAL(ALLOC_SLOT(val, lme4_ranefSym, REALSXP, q));
-    AZERO(ranef, q);
-				/* determine permutation */
-    Perm = Calloc(q + p + 1, int);
-    for (j = 0; j <= (p + q); j++) Perm[j] = j; /* initialize to identity */
-    Zt = M_as_cholmod_sparse(ZZt);
-				/* check for non-trivial perm */
-    if (nf > 1) {
-	ts1 = M_cholmod_aat(Zt, (int*)NULL/* fset */,(size_t)0,
-			    CHOLMOD_PATTERN, &c);
-	ts2 = M_cholmod_copy(ts1, -1/*lower triangle*/, CHOLMOD_PATTERN, &c);
-	M_cholmod_free_sparse(&ts1, &c);
-	if (!check_nesting(nf, nc, Gp, (int*)(ts2->p))) {
-	    dims[isNest_POS] = FALSE;
-	    L = M_cholmod_analyze(Zt, &c);
-	    if (!L)
-		error(_("cholmod_analyze returned with status %d"), c.status);
-	    Memcpy(Perm, (int*)(L->Perm), q);
-	    M_cholmod_free_factor(&L, &c);
-	}
-	M_cholmod_free_sparse(&ts2, &c);
-    }
-				/* create [X;-y]' */
-    Xy = M_cholmod_allocate_dense(p + 1, nobs, p + 1, CHOLMOD_REAL, &c);
-    for (j = 0; j < nobs; j++) {
-	Memcpy(((double*)(Xy->x)) + j * (p + 1), Xt + j * p, p);
-	((double*)(Xy->x))[j * (p + 1) + p] = -y[j];
-    }
-    ts1 = M_cholmod_dense_to_sparse(Xy, TRUE, &c);
-    /* Ensure that all y positions are stored, even if zero */
-    if (LENGTH(offset)){	
-	cholmod_sparse *tmp = M_cholmod_allocate_sparse(p + 1, nobs, nobs, 1,
-							1, 0, 1, &c);
-	int *ip = (int*)tmp->i, *pp = (int*)tmp->p;
-	double *xp = (double*)tmp->x, one[] = {1,0}, zero[] = {0,0};
-	*pp = 0;
-	for (j = 0; j < nobs; j++) {
-	    ip[j] = p;
-	    xp[j] = 1;
-	    pp[j + 1] = j + 1;
-	}
-	ts2 = M_cholmod_add(ts1, tmp, one, zero, 1, 1, &c);
-	M_cholmod_free_sparse(&tmp, &c);
-	ts1 = ts2;
-    }
-    M_cholmod_free_dense(&Xy, &c);
-    ts2 = M_cholmod_vertcat(Zt, ts1, TRUE, &c);
-    M_cholmod_free_sparse(&ts1, &c);
-    SET_SLOT(val, lme4_ZXytSym,
-	     M_chm_sparse_to_SEXP(ts2, 0, 0, 0, "", R_NilValue));
-    M_cholmod_free_sparse(&ts2, &c);
-    ZXyt = M_as_cholmod_sparse(GET_SLOT(val, lme4_ZXytSym));
-				/*  Create and store A's pattern */
-    ts1 = M_cholmod_aat(ZXyt, (int*)NULL, (size_t)0, 1, &c);
-    ts2 = M_cholmod_copy(ts1, +1/*upper triangle*/, +1/*values*/, &c);
-    M_cholmod_free_sparse(&ts1, &c);
-    make_cholmod_sparse_sorted(ts2);
-    SET_SLOT(val, lme4_ASym,
-	     M_chm_sparse_to_SEXP(ts2, 0, 0, 0, "", R_NilValue));
-    M_cholmod_free_sparse(&ts2, &c);
-				/* update A using weights and offset */
-    A = M_as_cholmod_sparse(GET_SLOT(val, lme4_ASym));
-    internal_update_A(ZXyt, wts, offset, A);
-				/* allocate, populate and initialize ST */
-    ST = ALLOC_SLOT(val, lme4_STSym, VECSXP, nf);
-    setAttrib(ST, R_NamesSymbol, duplicate(fnms));
-    for (i = 0; i < nf; i++)
-	SET_VECTOR_ELT(ST, i, allocMatrix(REALSXP, nc[i], nc[i]));
-    /* consider changing this to assign large values to S only to
-     * guarantee positive-definiteness of A then later use
-     * internal_mer_initial for lmm only */ 
-    internal_mer2_initial(ST, Gp, A);
-    j = c.supernodal;		/* force supernodal for non-nested */
-    if (!dims[isNest_POS]) c.supernodal = CHOLMOD_SUPERNODAL;
-    i = c.nmethods;
-    c.nmethods = 1;		/* force user-specified permutation */
-    				/* Create L  with user-specified perm */
-    L = M_cholmod_analyze_p(A, Perm, (int*)NULL, (size_t)0, &c);
-    if (!L)
-	error(_("cholmod_analyze_p returned with status %d"), c.status);
-				/* restore previous settings */
-    c.nmethods = i;
-    c.supernodal = j;
-    				/* initialize and store L */
-    SET_SLOT(val, lme4_devianceSym,
-	     internal_make_named(REALSXP, DEVIANCE_NAMES));
-    internal_update_L(REAL(GET_SLOT(val, lme4_devianceSym)),
-			  dims, Gp, ST, A, L);
-    SET_SLOT(val, lme4_LSym, M_chm_factor_to_SEXP(L, 1));
-
-    Free(A); Free(ZXyt); Free(Perm); Free(Zt);
-    UNPROTECT(1);
-    return val;
-}
-
-/**
  * Calculate the number of parameters in ST
  *
  * @param nf number of factors
@@ -633,7 +481,7 @@ SEXP mer2_create(SEXP fl, SEXP ZZt, SEXP Xtp, SEXP yp, SEXP REMLp,
  *
  * @return the total number of parameters in ST
  */
-static R_INLINE int mer2_npar(SEXP ST)
+static R_INLINE int lmer2_npar(SEXP ST)
 {
     int ans = 0, i, nf = LENGTH(ST);
 
@@ -647,13 +495,13 @@ static R_INLINE int mer2_npar(SEXP ST)
 /**
  * Extract the parameters from ST
  *
- * @param ST ST slot from an mer2 object
+ * @param ST ST slot from an lmer2 object
  * @param pars double vector of the appropriate length
  *
  * @return pointer to the parameter vector
  */
 static double
-*internal_mer2_getPars(SEXP ST, double *pars)
+*internal_lmer2_getPars(SEXP ST, double *pars)
 {
     int i, nf = LENGTH(ST), pos = 0;
     for (i = 0; i < nf; i++) {
@@ -671,32 +519,32 @@ static double
 }
 
 /**
- * Extract the parameters from the ST slot of an mer2 object
+ * Extract the parameters from the ST slot of an lmer2 object
  *
- * @param x an mer2 object
+ * @param x an lmer2 object
  *
  * @return pointer to a REAL vector
  */
-SEXP mer2_getPars(SEXP x)
+SEXP lmer2_getPars(SEXP x)
 {
     SEXP ST = GET_SLOT(x, lme4_STSym);
-    SEXP ans = PROTECT(allocVector(REALSXP, mer2_npar(ST)));
+    SEXP ans = PROTECT(allocVector(REALSXP, lmer2_npar(ST)));
 
-    internal_mer2_getPars(ST, REAL(ans));
+    internal_lmer2_getPars(ST, REAL(ans));
     UNPROTECT(1); 
     return ans;
 }
 
 /**
- * Update the ST slot of an mer2 object
+ * Update the ST slot of an lmer2 object
  *
  * @param pars double vector of the appropriate length
- * @param ST ST slot from an mer2 object
+ * @param ST ST slot from an lmer2 object
  *
  * @return pointer to the updated ST object
  */
 static SEXP
-internal_mer2_setPars(const double *pars, SEXP ST)
+internal_lmer2_setPars(const double *pars, SEXP ST)
 {
     int i, nf = LENGTH(ST), pos = 0;
     for (i = 0; i < nf; i++) {
@@ -714,24 +562,24 @@ internal_mer2_setPars(const double *pars, SEXP ST)
 }
 
 /**
- * Update the ST slot of an mer2 object from a REAL vector of
+ * Update the ST slot of an lmer2 object from a REAL vector of
  * parameters and update the Cholesky factorization
  *
- * @param x an mer2 object
+ * @param x an lmer2 object
  * @param pars a REAL vector of the appropriate length
  *
  * @return x
  */
-SEXP mer2_setPars(SEXP x, SEXP pars)
+SEXP lmer2_setPars(SEXP x, SEXP pars)
 {
     cholmod_sparse *A = M_as_cholmod_sparse(GET_SLOT(x, lme4_ASym));
     cholmod_factor *L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
     SEXP ST = GET_SLOT(x, lme4_STSym);
-    int npar = mer2_npar(ST);
+    int npar = lmer2_npar(ST);
 
     if (!isReal(pars) || LENGTH(pars) != npar)
 	error(_("pars must be a real vector of length %d"), npar);
-    internal_mer2_setPars(REAL(pars), ST);
+    internal_lmer2_setPars(REAL(pars), ST);
     internal_update_L(REAL(GET_SLOT(x, lme4_devianceSym)),
 		      INTEGER(GET_SLOT(x, lme4_dimsSym)), 
 		      INTEGER(GET_SLOT(x, lme4_GpSym)), ST, A, L);
@@ -742,14 +590,14 @@ SEXP mer2_setPars(SEXP x, SEXP pars)
 /* FIXME: Should I start using the name "discrepancy" instead of
    "deviance"? */
 /**
- * Extract the deviance from an mer2 object
+ * Extract the deviance from an lmer2 object
  *
- * @param x an mer2 object
+ * @param x an lmer2 object
  * @param which scalar integer < 0 => REML, 0 => native, > 0 => ML
  *
  * @return scalar REAL value
  */
-SEXP mer2_deviance(SEXP x, SEXP which)
+SEXP lmer2_deviance(SEXP x, SEXP which)
 {
     int w = asInteger(which);
     int POS = (w < 0 || (!w && isREML(x))) ? REML_POS : ML_POS; 
@@ -761,18 +609,18 @@ SEXP mer2_deviance(SEXP x, SEXP which)
 /**
  * Update the contents of the fixef and ranef slots
  *
- * @param x an mer2 object
+ * @param x an lmer2 object
  *
  * @return R_NilValue
  */
-SEXP mer2_update_effects(SEXP x)
+SEXP lmer2_update_effects(SEXP x)
 {
     int *dd = INTEGER(GET_SLOT(x, lme4_dimsSym));
     double *b = REAL(GET_SLOT(x, lme4_ranefSym)), *bstbx;
     cholmod_factor *L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
     cholmod_dense *bstarb;
 
-    bstarb = internal_mer2_effects(L);
+    bstarb = internal_lmer2_effects(L);
     bstbx = (double*)(bstarb->x);
     Memcpy(b, bstbx, dd[q_POS]);
     Memcpy(REAL(GET_SLOT(x, lme4_fixefSym)), bstbx + dd[q_POS], dd[p_POS]);
@@ -792,20 +640,20 @@ SEXP mer2_update_effects(SEXP x)
  * @param deviance vector of deviance components
  */
 static R_INLINE double
-internal_mer2_sigma(int REML, const int* dims, const double* deviance)
+internal_lmer2_sigma(int REML, const int* dims, const double* deviance)
 {
     return sqrt(exp(deviance[lr2_POS])/
 		((double)(dims[n_POS] - (REML ? dims[p_POS] : 0))));
 }
 
-static int internal_mer2_optimize(SEXP x, int verb)
+static int internal_lmer2_optimize(SEXP x, int verb)
 {
     SEXP ST = GET_SLOT(x, lme4_STSym);
     cholmod_sparse *A = M_as_cholmod_sparse(GET_SLOT(x, lme4_ASym));
     cholmod_factor *L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
     int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym)),
 	*dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), i, j,
-	n = mer2_npar(ST), nf = length(ST), pos = 0;
+	n = lmer2_npar(ST), nf = length(ST), pos = 0;
     int REML = dims[isREML_POS],
 	liv = S_iv_length(OPT, n), lv = S_v_length(OPT, n);
     int *iv = Calloc(liv, int);
@@ -813,7 +661,7 @@ static int internal_mer2_optimize(SEXP x, int verb)
 	*deviance = REAL(GET_SLOT(x, lme4_devianceSym)),
 	*g = (double*)NULL, *h = (double*)NULL,
 	*v = Calloc(lv, double),
-	*xv = internal_mer2_getPars(ST, Calloc(n, double)),
+	*xv = internal_lmer2_getPars(ST, Calloc(n, double)),
 	fx = R_PosInf;
 
     S_Rf_divset(OPT, iv, liv, lv, v);
@@ -828,7 +676,7 @@ static int internal_mer2_optimize(SEXP x, int verb)
     }
     do {
 	S_nlminb_iterate(b, d, fx, g, h, iv, liv, lv, n, v, xv);
-	internal_mer2_setPars(xv, ST);
+	internal_lmer2_setPars(xv, ST);
 	internal_update_L(deviance, dims, Gp, ST, A, L);
 	fx = deviance[REML ? REML_POS : ML_POS];
     } while (iv[0] < 3);
@@ -837,38 +685,38 @@ static int internal_mer2_optimize(SEXP x, int verb)
     return i;
 }
 
-SEXP mer2_optimize(SEXP x, SEXP verb)
+SEXP lmer2_optimize(SEXP x, SEXP verb)
 {
-    return ScalarInteger(internal_mer2_optimize(x, asInteger(verb)));
+    return ScalarInteger(internal_lmer2_optimize(x, asInteger(verb)));
 }
 
 /**
- * Extract the estimate of the scale factor from an mer2 object
+ * Extract the estimate of the scale factor from an lmer2 object
  *
- * @param x an mer2 object
+ * @param x an lmer2 object
  * @param which scalar integer (< 0 => REML, 0 => native, > 0 => ML)
  *
  * @return scalar REAL value
  */
-SEXP mer2_sigma(SEXP x, SEXP which)
+SEXP lmer2_sigma(SEXP x, SEXP which)
 {
     int w = asInteger(which);
 		
-    return ScalarReal(internal_mer2_sigma(w < 0 || (!w && isREML(x)),
+    return ScalarReal(internal_lmer2_sigma(w < 0 || (!w && isREML(x)),
 					  INTEGER(GET_SLOT(x, lme4_dimsSym)),
 					  REAL(GET_SLOT(x, lme4_devianceSym))));
 }
 
 /**
  * Extract the unscaled lower Cholesky factor of the relative
- * variance-covariance matrix for the fixed-effects in an mer2 object.
+ * variance-covariance matrix for the fixed-effects in an lmer2 object.
  *
- * @param x an mer2 object
+ * @param x an lmer2 object
  *
  * @return a REAL p by p lower triangular matrix (it's a matrix, not a Matrix)
  */
 
-SEXP mer2_vcov(SEXP x)
+SEXP lmer2_vcov(SEXP x)
 {
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), *select;
     int i, p = dims[p_POS], q = dims[q_POS];
@@ -913,7 +761,7 @@ SEXP mer2_vcov(SEXP x)
  * @return a list of matrices containing the conditional modes of the
  * random effects
  */
-SEXP mer2_ranef(SEXP x)
+SEXP lmer2_ranef(SEXP x)
 {
     SEXP ST = GET_SLOT(x, lme4_STSym),
         cnames = GET_SLOT(x, lme4_cnamesSym),
@@ -923,7 +771,7 @@ SEXP mer2_ranef(SEXP x)
     SEXP val = PROTECT(allocVector(VECSXP, nf));
     double *b = REAL(GET_SLOT(x, lme4_ranefSym));
 
-    mer2_update_effects(x);
+    lmer2_update_effects(x);
     setAttrib(val, R_NamesSymbol,
 	      duplicate(getAttrib(flist, R_NamesSymbol)));
     for (i = 0; i < nf; i++) {
@@ -953,14 +801,14 @@ SEXP mer2_ranef(SEXP x)
  *
  * @return pointer to a list of arrays
  */
-SEXP mer2_postVar(SEXP x)
+SEXP lmer2_postVar(SEXP x)
 {
     double *deviance = REAL(GET_SLOT(x, lme4_devianceSym)), one = 1;
     int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym)),
 	*dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
     int i, j, nf = dims[nf_POS], p = dims[p_POS], q = dims[q_POS];
     int ppq = p + q;
-    double sc = internal_mer2_sigma(isREML(x), dims, deviance);
+    double sc = internal_lmer2_sigma(isREML(x), dims, deviance);
     cholmod_factor *L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym)),
 	*Lcp = (cholmod_factor*)NULL;
     cholmod_sparse *rhs, *B, *Bt, *BtB;
@@ -1166,7 +1014,7 @@ internal_ST_update(double sigma, int trans, const int *Gp,
  * Generate a Markov-Chain Monte Carlo sample from a fitted
  * linear mixed model.
  *
- * @param x pointer to an mer2 object
+ * @param x pointer to an lmer2 object
  * @param savebp pointer to a logical scalar indicating if the
  * random-effects should be saved
  * @param nsampp pointer to an integer scalar of the number of samples
@@ -1176,10 +1024,10 @@ internal_ST_update(double sigma, int trans, const int *Gp,
  *
  * @return a matrix
  */
-SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
+SEXP lmer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 		  SEXP verbosep, SEXP deviancep)
 {
-    SEXP ST = GET_SLOT(x, lme4_STSym), Pars = PROTECT(mer2_getPars(x)), ans;
+    SEXP ST = GET_SLOT(x, lme4_STSym), Pars = PROTECT(lmer2_getPars(x)), ans;
     cholmod_factor *L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
     cholmod_sparse *A = M_as_cholmod_sparse(GET_SLOT(x, lme4_ASym));
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)),
@@ -1193,7 +1041,7 @@ SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
     double
 	*deviance = REAL(GET_SLOT(x, lme4_devianceSym)),
 	*ansp, df = n - (dims[REML_POS] ? p : 0);
-    int nrbase = p + 1 + mer2_npar(ST); /* rows always included */
+    int nrbase = p + 1 + lmer2_npar(ST); /* rows always included */
     int nrtot = nrbase + dev + (saveb ? q : 0);
     cholmod_dense *chhat,
 	*chnew = M_cholmod_allocate_dense(qpp1, 1, qpp1, CHOLMOD_REAL, &c);
@@ -1214,7 +1062,7 @@ SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 	col[p] = (trans ? 2 * log(sigma) : sigma * sigma);
 	/* simulate new fixed and random effects */
 				/* Evaluate conditional estimates */
-	chhat = internal_mer2_effects(L);
+	chhat = internal_lmer2_effects(L);
 	internal_betabst_update(sigma, L, chhat, chnew);
 	M_cholmod_free_dense(&chhat, &c);
 				/* Store beta */
@@ -1237,20 +1085,20 @@ SEXP mer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
     Free(L);
     M_cholmod_free_dense(&chnew, &c);
 				/* Restore pars, refactor, etc. */
-    mer2_setPars(x, Pars);
+    lmer2_setPars(x, Pars);
     UNPROTECT(2);
     return ans;
 }
 
 /**
- * Check validity of an mer2 object.
+ * Check validity of an lmer2 object.
  *
- * @param x Pointer to an mer2 object
+ * @param x Pointer to an lmer2 object
  *
- * @return TRUE if the object is a valid mer2 object, else a string
+ * @return TRUE if the object is a valid lmer2 object, else a string
  * describing the nature of the violation.
  */
-SEXP mer2_validate(SEXP x)
+SEXP lmer2_validate(SEXP x)
 {
     SEXP GpP = GET_SLOT(x, lme4_GpSym),
 	ST = GET_SLOT(x, lme4_STSym),
@@ -1313,35 +1161,270 @@ SEXP mer2_validate(SEXP x)
     return ScalarLogical(1);
 }
 
-SEXP lmer2_create(SEXP fl, SEXP Zt, SEXP Xp, SEXP yp, SEXP REMLp,
-		   SEXP nc, SEXP cnames, SEXP offset, SEXP wts, SEXP fr,
-		   SEXP terms, SEXP call, SEXP fam)
+static int flType(SEXP family)
 {
-    SEXP mer, val, nms = getAttrib(GET_SLOT(MAKE_CLASS("mer2"),
-					    install("slots")), R_NamesSymbol);
-    int lmm = fam == R_NilValue, i, n = LENGTH(nms);
-    
-    if (lmm) { 			/* linear mixed model, fam is NULL */
-	mer = PROTECT(mer2_create(fl, Zt, Xp, yp, REMLp, nc, cnames, offset, wts)),
-	val = PROTECT(NEW_OBJECT(MAKE_CLASS("lmer2")));
-    } else {
-	/* use a dummy Xt matrix, weights, offset and REMLp */
-	mer = PROTECT(mer2_create(fl, Zt, allocMatrix(REALSXP, 0, LENGTH(yp)),
-				  yp, ScalarLogical(0), nc, cnames, yp, yp));
-	val = PROTECT(NEW_OBJECT(MAKE_CLASS("glmer2")));
-	SET_SLOT(val, install("family"), duplicate(fam));
-	SET_SLOT(val, lme4_wtsSym, duplicate(wts));
-	SET_SLOT(val, install("off"), duplicate(offset));
-	SET_SLOT(val, install("origZXyt"), duplicate(Zt));
-    }
-    for (i = 0; i < n; i++) {
-	SEXP sym = install(CHAR(STRING_ELT(nms, i)));
-	SET_SLOT(val, sym, GET_SLOT(mer, sym));
-    }
-    SET_SLOT(val, install("frame"), fr);
-    SET_SLOT(val, install("terms"), terms);
-    SET_SLOT(val, install("call"), call);
+    char *fam = CHAR(asChar(getListElement(family, "family"))),
+	*lnk = CHAR(asChar(getListElement(family, "link")));
 
-    UNPROTECT(2);
+    if ((!strcmp(fam, "gaussian")) && (!strcmp(lnk, "identity")))
+	return -1;
+    if ((!strcmp(fam, "binomial")) && (!strcmp(lnk, "logit")))
+	return 1;
+    if ((!strcmp(fam, "binomial")) && (!strcmp(lnk, "probit")))
+	return 2;
+    if ((!strcmp(fam, "poisson")) && (!strcmp(lnk, "log")))
+	return 3;
+    return 0;
+}
+
+static SEXP NullFrame(void)
+{
+    SEXP ans = PROTECT(allocVector(VECSXP, 0)); /* empty list */
+    setAttrib(ans, R_ClassSymbol, mkString("data.frame"));
+    UNPROTECT(1);
+    return ans;
+}
+
+static void ZXyt_create(SEXP Ztl, SEXP Xp, SEXP yp, SEXP val)
+{
+    int *Gp = INTEGER(GET_SLOT(val, lme4_GpSym)), *Perm,
+	*dims = INTEGER(GET_SLOT(val, lme4_dimsSym)),
+	i, j, nobs = LENGTH(yp), nf = LENGTH(Ztl);
+    int p = dims[p_POS], q = Gp[nf];
+    double *src, *dest;
+    cholmod_sparse *A, *Zt, *ts1, *ts2, *ts3;
+    cholmod_dense *Xy;
+    cholmod_factor *L;
+    SEXP ST = GET_SLOT(val, lme4_STSym);
+
+    Zt = M_as_cholmod_sparse(VECTOR_ELT(Ztl, 0));
+    if (Zt->ncol != nobs)
+	error(_("dimension mismatch: ncol(Ztl[[1]]) = %d != length(y) = %d"),
+	      Zt->ncol, nobs);
+    if (Zt->nrow != Gp[1])
+	error(_("Expected nrow(Ztl[[1]]) to be %d, got %d"), Gp[1], Zt->nrow);
+    ts1 = M_cholmod_copy_sparse(Zt, &c); /* use cholmod storage, not R */
+    Free(Zt);
+    Zt = ts1;
+    for (i = 1; i < nf; i++) {
+	ts1 = M_as_cholmod_sparse(VECTOR_ELT(Ztl, i));
+	if (ts1->ncol != nobs)
+	    error(_("dimension mismatch: ncol(Ztl[[%d]]) = %d != length(y) = %d"),
+		  i + 1, ts1->ncol, nobs);
+	if (ts1->nrow != (Gp[i + 1] - Gp[i]))
+	    error(_("Expected nrow(Ztl[[%d]]) to be %d, got %d"),
+		  i + 1, Gp[i + 1] - Gp[i], ts1->nrow);
+	ts2 = M_cholmod_vertcat(Zt, ts1, TRUE, &c);
+	Free(ts1); M_cholmod_free_sparse(&Zt, &c);
+	Zt = ts2;
+    }
+				/* determine permutation */
+    Perm = Calloc(q + p + 1, int);
+    for (j = 0; j <= (p + q); j++) Perm[j] = j; /* initialize to identity */
+				/* check for non-trivial perm */
+    dims[isNest_POS] = TRUE;
+    if (nf > 1) {
+	ts1 = M_cholmod_aat(Zt, (int*)NULL/* fset */,(size_t)0,
+			    CHOLMOD_PATTERN, &c);
+	ts2 = M_cholmod_copy(ts1, -1/*lower triangle*/, CHOLMOD_PATTERN, &c);
+	M_cholmod_free_sparse(&ts1, &c);
+	if (!check_nesting(nf, ST, Gp, (int*)(ts2->p))) {
+	    dims[isNest_POS] = FALSE;
+	    L = M_cholmod_analyze(Zt, &c);
+	    if (!L)
+		error(_("cholmod_analyze returned with status %d"), c.status);
+	    Memcpy(Perm, (int*)(L->Perm), q);
+	    M_cholmod_free_factor(&L, &c);
+	}
+	M_cholmod_free_sparse(&ts2, &c);
+    }
+				/* create [X;-y]' */
+    Xy = M_cholmod_allocate_dense(nobs, p + 1, nobs, CHOLMOD_REAL, &c);
+    Memcpy((double*)(Xy->x), REAL(Xp), nobs * p);
+    src = REAL(yp); dest = ((double*)(Xy->x)) + nobs * p;
+    for (j = 0; j < nobs; j++) dest[j] = -src[j];
+    ts1 = M_cholmod_dense_to_sparse(Xy, TRUE, &c);
+    M_cholmod_free_dense(&Xy, &c);
+    ts2 = M_cholmod_transpose(ts1, 1 /* values */, &c);
+    M_cholmod_free_sparse(&ts1, &c); ts1 = ts2;
+				/* ensure that all y positions are stored, even if zero */
+    if (LENGTH(GET_SLOT(val, lme4_offsetSym)) || dims[famType_POS] >= 0){	
+	int *ip, *pp;
+	double *xp, one[] = {1,0}, zero[] = {0,0};
+
+	ts3 = M_cholmod_allocate_sparse(p + 1, nobs, nobs, 1, 1, 0, 1, &c);
+	ip = (int*)ts3->i; pp = (int*)ts3->p; *pp = 0; xp = (double*)ts3->x;
+	for (j = 0; j < nobs; j++) {
+	    ip[j] = p;
+	    xp[j] = 1;
+	    pp[j + 1] = j + 1;
+	}
+	ts2 = M_cholmod_add(ts1, ts3, one, zero, 1, 1, &c);
+	M_cholmod_free_sparse(&ts3, &c);
+	M_cholmod_free_sparse(&ts1, &c);
+	ts1 = ts2;
+    }
+    ts2 = M_cholmod_vertcat(Zt, ts1, TRUE, &c);
+    M_cholmod_free_sparse(&Zt, &c);
+    M_cholmod_free_sparse(&ts1, &c);
+    SET_SLOT(val, lme4_ZXytSym,
+	     M_chm_sparse_to_SEXP(ts2, 0, 0, 0, "", R_NilValue));
+				/*  Create and store A's pattern */
+    ts1 = M_cholmod_aat(ts2, (int*)NULL, (size_t)0, 1, &c);
+    ts3 = M_cholmod_copy(ts1, +1/*upper triangle*/, +1/*values*/, &c);
+    M_cholmod_free_sparse(&ts1, &c);
+    make_cholmod_sparse_sorted(ts3);
+    SET_SLOT(val, lme4_ASym,
+	     M_chm_sparse_to_SEXP(ts3, 0, 0, 0, "", R_NilValue));
+    M_cholmod_free_sparse(&ts3, &c);
+				/* update A using weights and offset */
+    A = M_as_cholmod_sparse(GET_SLOT(val, lme4_ASym));
+    internal_update_A(ts2, GET_SLOT(val, lme4_weightsSym),
+		      GET_SLOT(val, lme4_offsetSym), A);
+    M_cholmod_free_sparse(&ts2, &c);
+				/* consider changing this to assign large values to S only to
+				 * guarantee positive-definiteness of A then later use 
+				 * internal_mer_initial for lmm only */ 
+    internal_lmer2_initial(ST, Gp, A);
+    j = c.supernodal;		/* force supernodal for non-nested */
+    if (!dims[isNest_POS]) c.supernodal = CHOLMOD_SUPERNODAL;
+    i = c.nmethods;
+    c.nmethods = 1;		/* force user-specified permutation */
+    				/* Create L  with user-specified perm */
+    L = M_cholmod_analyze_p(A, Perm, (int*)NULL, (size_t)0, &c);
+    if (!L)
+	error(_("cholmod_analyze_p returned with status %d"), c.status);
+				/* restore previous settings */
+    c.nmethods = i;
+    c.supernodal = j;
+    				/* initialize and store L */
+    internal_update_L(REAL(GET_SLOT(val, lme4_devianceSym)),
+			  dims, Gp, ST, A, L);
+    SET_SLOT(val, lme4_LSym, M_chm_factor_to_SEXP(L, 1));
+
+    Free(A);
+    Free(Perm);
+}
+
+static SEXP R_INLINE unname(SEXP x) {
+    setAttrib(x, R_NamesSymbol, R_NilValue);
+    return x;
+}
+
+/**
+ * Create an lmer2 object from a list of grouping factors and a list of model
+ * matrices.
+ *
+ * @param fr list produced by lmerFrames
+ * @param FL factor list produced by lmerFactorList
+ * @param glmp list produced by glm.fit
+ * @param method character vector
+ * @param mc matched call
+ * @param mod logical scalar indicating if the model frame should be
+ *        saved in the returned object.
+ *
+ * @return pointer to an lmer2 object
+ */
+SEXP lmer2_create(SEXP fr, SEXP FL, SEXP Ztl, SEXP glmp,
+		  SEXP method, SEXP mc, SEXP mod)
+{
+    SEXP Xp = getListElement(fr, "X"),
+	Ztorig = getListElement(FL, "Ztl"),
+	family = getListElement(glmp, "family"),
+	fl = getListElement(FL, "fl"),
+/* 	formula = getListElement(mc, "formula"), */
+	offset = getListElement(glmp, "offset"),
+	wts = getListElement(glmp, "prior.weights"),
+	yp = getListElement(glmp, "y");
+    int *xdims = INTEGER(getAttrib(Xp, R_DimSymbol)), *Gp, *dims,
+	REML = !strcmp(CHAR(asChar(method)), "REML"),
+	ftyp = flType(family), i, nf = LENGTH(fl), nobs = LENGTH(yp), p, q;
+    SEXP ST, Xdnames, cnames, cnamesnames, flnms, 
+	val = PROTECT(NEW_OBJECT(MAKE_CLASS(ftyp < 0 ? "lmer2" : "glmer2")));
+    char *DEVIANCE_NAMES[]={"ML","REML","ldZ","ldX","lr2",""};
+    char *DIMS_NAMES[]={"nf","n","p","q","isREML","famType","isNested",""};
+				/* record dimensions */
+    
+    if (!isReal(yp) || nobs <= 0)
+	error(_("y must be a non-null numeric vector"));
+    if (!isNewList(fl) || nf <= 0)
+	error(_("fl must be a non-null list"));
+    if (!isReal(Xp) || !isMatrix(Xp))
+	error(_("X must be a numeric matrix"));
+    if (*xdims != nobs)
+	error(_("Dimension mismatch: length(y) = %d and nrow(X) = %d"), nobs, xdims[0]);
+    AZERO(REAL(ALLOC_SLOT(val, lme4_fixefSym, REALSXP, xdims[1])), xdims[1]);
+    p = (ftyp < 0) ? xdims[1] : 0;
+    if (!isNewList(Ztl) || LENGTH(Ztl) != nf) 
+	error(_("Length mismatch: fl has length %d and Ztl has length %d"),
+	      nf, LENGTH(Ztl));
+    
+    flnms = getAttrib(fl, R_NamesSymbol);
+    ST = ALLOC_SLOT(val, lme4_STSym, VECSXP, nf);
+    setAttrib(ST, R_NamesSymbol, duplicate(flnms));
+				/* set up the cnames - tedious but
+				 * convenient for R level code */
+    cnames = ALLOC_SLOT(val, lme4_cnamesSym, VECSXP, nf + 2);
+    cnamesnames = PROTECT(allocVector(STRSXP, nf + 2));
+    for (i = 0; i < nf; i++) SET_STRING_ELT(cnamesnames, i, STRING_ELT(flnms, i));
+    SET_STRING_ELT(cnamesnames, nf, mkChar(".fixed"));
+    SET_STRING_ELT(cnamesnames, nf + 1, mkChar(".response"));
+    setAttrib(cnames, R_NamesSymbol, cnamesnames);
+    UNPROTECT(1);
+    if (isNewList(Xdnames = getAttrib(Xp, R_DimNamesSymbol)) && LENGTH(Xdnames) > 1)
+	SET_VECTOR_ELT(cnames, nf, duplicate(VECTOR_ELT(Xdnames, 1)));
+    /* FIXME: Either remove the last element of cnames or decide how
+     * to deparse the LHS of the formula in the call */
+    if (!isNewList(Ztorig) || LENGTH(Ztorig) != nf)
+	error(_("FL$Ztl must be a list of length %d"), nf); 
+    Gp = INTEGER(ALLOC_SLOT(val, lme4_GpSym, INTSXP, nf + 3));
+    Gp[0] = 0;
+    for (i = 0; i < nf; i++) {
+	SEXP fli = VECTOR_ELT(fl, i);
+	SEXP Zti = VECTOR_ELT(Ztorig, i);
+	SEXP Zdimnms = getAttrib(Zti, R_DimNamesSymbol);
+	int *Zdims = INTEGER(getAttrib(Zti, R_DimSymbol));
+
+	if (!isReal(Zti) || !isMatrix(Zti) || Zdims[1] != nobs || Zdims[0] <= 0)
+	    error(_("FL$Ztl[[%d]] is not a numeric matrix with %n columns and > 0 rows"),
+		  i + 1, nobs);
+	SET_VECTOR_ELT(ST, i, allocMatrix(REALSXP, Zdims[0], Zdims[0]));
+	if (isNewList(Zdimnms) && LENGTH(Zdimnms) == 2)
+	    SET_VECTOR_ELT(cnames, i, duplicate(VECTOR_ELT(Zdimnms, 0)));
+	if (!isFactor(fli) || LENGTH(fli) != nobs)
+	    error(_("fl[[%d] must be a factor of length %d"), i+1, nobs);
+	Gp[i + 1] = Gp[i] + LENGTH(getAttrib(fli, R_LevelsSymbol)) * Zdims[0];
+    }
+    q = Gp[nf];
+    Gp[nf + 1] = Gp[nf] + p;	/* fixed effects */
+    Gp[nf + 2] = Gp[nf + 1] + 1; /* response */
+    AZERO(REAL(ALLOC_SLOT(val, lme4_ranefSym, REALSXP, q)), q);
+				/*  Copy arguments to slots*/
+    SET_SLOT(val, install("frame"),
+	     (asLogical(mod)) ? duplicate(getListElement(fr, "mf"))
+	     : NullFrame());
+    SET_SLOT(val, install("terms"), duplicate(getListElement(fr, "mt")));
+    SET_SLOT(val, install("call"), duplicate(mc));
+    SET_SLOT(val, lme4_flistSym, duplicate(fl));
+    SET_SLOT(val, lme4_weightsSym,
+	     (wts == R_NilValue) ? allocVector(REALSXP, 0) : unname(duplicate(wts)));
+    SET_SLOT(val, lme4_offsetSym,
+	     (offset == R_NilValue) ? allocVector(REALSXP, 0) : unname(duplicate(offset)));
+    
+    SET_SLOT(val, lme4_dimsSym, internal_make_named(INTSXP, DIMS_NAMES));
+    dims = INTEGER(GET_SLOT(val, lme4_dimsSym));
+    dims[nf_POS] = nf;
+    dims[n_POS] = nobs;
+    dims[isREML_POS] = REML;
+    dims[famType_POS] = ftyp;
+    dims[isNest_POS] = TRUE;
+    dims[q_POS] = q;
+    dims[p_POS] = p;
+    SET_SLOT(val, lme4_devianceSym, internal_make_named(REALSXP, DEVIANCE_NAMES));
+
+    ZXyt_create(Ztl, Xp, yp, val);
+    if (dims[famType_POS] < 0) {UNPROTECT(1); return val;} /* linear mixed model */
+
+    UNPROTECT(1);
     return val;
 }
