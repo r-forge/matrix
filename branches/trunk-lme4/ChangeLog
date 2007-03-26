@@ -1,3 +1,8 @@
+2007-03-25  Douglas Bates  <bates@r-project.org>
+
+	* src/lmer2.c (lmer2_create): Removed the mer2 class and renamed
+	mer2_create as lmer2_create (and ZXyt_create).
+
 2007-02-12  Douglas Bates  <bates@r-project.org>
 
 	* DESCRIPTION (Version): Prepare for 0.9975-14 release.
