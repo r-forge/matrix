@@ -1377,6 +1377,7 @@ SEXP lmer2_create(SEXP fr, SEXP FL, SEXP Ztl, SEXP glmp,
      * to deparse the LHS of the formula in the call */
     if (!isNewList(Ztorig) || LENGTH(Ztorig) != nf)
 	error(_("FL$Ztl must be a list of length %d"), nf); 
+				/* Create Gp and populate ST */
     Gp = INTEGER(ALLOC_SLOT(val, lme4_GpSym, INTSXP, nf + 3));
     Gp[0] = 0;
     for (i = 0; i < nf; i++) {
