@@ -432,7 +432,7 @@ internal_update_A(cholmod_sparse *ZXyt, SEXP wtP, SEXP offP,
 		M_cholmod_free_sparse(&ts1, &c);
 		error(_("missing y position in ZXyt at column %d"), j+1);
 	    }
-	    zx[ind] -= off[j];
+	    zx[ind] += off[j];	/* add offset to -y */
 	}
     }
     if (wl) {		/* skip if length 0 */
@@ -1306,6 +1306,32 @@ static void ZXyt_create(SEXP Ztl, SEXP Xp, SEXP yp, SEXP val)
     Free(Perm);
 }
 
+/**
+ * Check a numeric vector (of weights) to see if it is all ones
+ *
+ * @param x Pointer to a numeric vector
+ *
+ * @return x if it contains any values that are not 1, otherwise numeric(0)
+ */
+static SEXP all_ones(SEXP x)
+{
+    int i, n = LENGTH(x);
+    double *xx = REAL(x);
+
+    if (!isReal(x))
+	error(_("argument x to all_ones must be numeric"));
+    for (i = 0; i < n; i++) if (xx[i] != 1) return x;
+    return allocVector(REALSXP, 0);
+}
+
+
+/**
+ * Remove the names attribute from an object
+ *
+ * @param x 
+ *
+ * @return x without the names attribute
+ */
 static SEXP R_INLINE unname(SEXP x) {
     setAttrib(x, R_NamesSymbol, R_NilValue);
     return x;
@@ -1332,19 +1358,18 @@ SEXP lmer2_create(SEXP fr, SEXP FL, SEXP Ztl, SEXP glmp,
 	Ztorig = getListElement(FL, "Ztl"),
 	family = getListElement(glmp, "family"),
 	fl = getListElement(FL, "fl"),
-/* 	formula = getListElement(mc, "formula"), */
-	offset = getListElement(glmp, "offset"),
+	offset = getListElement(fr, "offset"),
 	wts = getListElement(glmp, "prior.weights"),
 	yp = getListElement(glmp, "y");
     int *xdims = INTEGER(getAttrib(Xp, R_DimSymbol)), *Gp, *dims,
 	REML = !strcmp(CHAR(asChar(method)), "REML"),
 	ftyp = flType(family), i, nf = LENGTH(fl), nobs = LENGTH(yp), p, q;
-    SEXP ST, Xdnames, cnames, cnamesnames, flnms, 
+    SEXP ST, Xdnames, cnames, cnamesnames, flnms, glmFixed,
 	val = PROTECT(NEW_OBJECT(MAKE_CLASS(ftyp < 0 ? "lmer2" : "glmer2")));
     char *DEVIANCE_NAMES[]={"ML","REML","ldZ","ldX","lr2",""};
     char *DIMS_NAMES[]={"nf","n","p","q","isREML","famType","isNested",""};
-				/* record dimensions */
-    
+
+				/* check arguments */
     if (!isReal(yp) || nobs <= 0)
 	error(_("y must be a non-null numeric vector"));
     if (!isNewList(fl) || nf <= 0)
@@ -1353,30 +1378,32 @@ SEXP lmer2_create(SEXP fr, SEXP FL, SEXP Ztl, SEXP glmp,
 	error(_("X must be a numeric matrix"));
     if (*xdims != nobs)
 	error(_("Dimension mismatch: length(y) = %d and nrow(X) = %d"), nobs, xdims[0]);
-    AZERO(REAL(ALLOC_SLOT(val, lme4_fixefSym, REALSXP, xdims[1])), xdims[1]);
-    p = (ftyp < 0) ? xdims[1] : 0;
     if (!isNewList(Ztl) || LENGTH(Ztl) != nf) 
 	error(_("Length mismatch: fl has length %d and Ztl has length %d"),
 	      nf, LENGTH(Ztl));
-    
+    if (!isNewList(Ztorig) || LENGTH(Ztorig) != nf)
+	error(_("FL$Ztl must be a list of length %d"), nf); 
+				/*  Copy arguments to slots*/
+    SET_SLOT(val, install("frame"),
+	     (asLogical(mod)) ? duplicate(getListElement(fr, "mf"))
+	     : NullFrame());
+    SET_SLOT(val, install("terms"), duplicate(getListElement(fr, "mt")));
+    SET_SLOT(val, install("call"), duplicate(mc));
+				/* allocate slots */
     flnms = getAttrib(fl, R_NamesSymbol);
     ST = ALLOC_SLOT(val, lme4_STSym, VECSXP, nf);
     setAttrib(ST, R_NamesSymbol, duplicate(flnms));
-				/* set up the cnames - tedious but
-				 * convenient for R level code */
+    /* set up the cnames - tedious but convenient to have */
     cnames = ALLOC_SLOT(val, lme4_cnamesSym, VECSXP, nf + 2);
-    cnamesnames = PROTECT(allocVector(STRSXP, nf + 2));
-    for (i = 0; i < nf; i++) SET_STRING_ELT(cnamesnames, i, STRING_ELT(flnms, i));
+    cnamesnames = PROTECT(allocVector(STRSXP, nf + 1));
+    for (i = 0; i < nf; i++)
+	SET_STRING_ELT(cnamesnames, i, STRING_ELT(flnms, i));
     SET_STRING_ELT(cnamesnames, nf, mkChar(".fixed"));
-    SET_STRING_ELT(cnamesnames, nf + 1, mkChar(".response"));
     setAttrib(cnames, R_NamesSymbol, cnamesnames);
     UNPROTECT(1);
-    if (isNewList(Xdnames = getAttrib(Xp, R_DimNamesSymbol)) && LENGTH(Xdnames) > 1)
+    if (isNewList(Xdnames = getAttrib(Xp, R_DimNamesSymbol)) &&
+	LENGTH(Xdnames) > 1)
 	SET_VECTOR_ELT(cnames, nf, duplicate(VECTOR_ELT(Xdnames, 1)));
-    /* FIXME: Either remove the last element of cnames or decide how
-     * to deparse the LHS of the formula in the call */
-    if (!isNewList(Ztorig) || LENGTH(Ztorig) != nf)
-	error(_("FL$Ztl must be a list of length %d"), nf); 
 				/* Create Gp and populate ST */
     Gp = INTEGER(ALLOC_SLOT(val, lme4_GpSym, INTSXP, nf + 3));
     Gp[0] = 0;
@@ -1396,19 +1423,23 @@ SEXP lmer2_create(SEXP fr, SEXP FL, SEXP Ztl, SEXP glmp,
 	    error(_("fl[[%d] must be a factor of length %d"), i+1, nobs);
 	Gp[i + 1] = Gp[i] + LENGTH(getAttrib(fli, R_LevelsSymbol)) * Zdims[0];
     }
+    p = (ftyp < 0) ? xdims[1] : 0;
     q = Gp[nf];
     Gp[nf + 1] = Gp[nf] + p;	/* fixed effects */
     Gp[nf + 2] = Gp[nf + 1] + 1; /* response */
-    AZERO(REAL(ALLOC_SLOT(val, lme4_ranefSym, REALSXP, q)), q);
-				/*  Copy arguments to slots*/
-    SET_SLOT(val, install("frame"),
-	     (asLogical(mod)) ? duplicate(getListElement(fr, "mf"))
-	     : NullFrame());
-    SET_SLOT(val, install("terms"), duplicate(getListElement(fr, "mt")));
-    SET_SLOT(val, install("call"), duplicate(mc));
+				/* fl is now checked and can be stored */
     SET_SLOT(val, lme4_flistSym, duplicate(fl));
+
+    AZERO(REAL(ALLOC_SLOT(val, lme4_ranefSym, REALSXP, q)), q);
+    /* initialize fixed effects (not needed for lmm but harmless) */
+    glmFixed = getListElement(glmp, "coefficients");
+    if (LENGTH(glmFixed) != xdims[1])
+	error(_("Dimension mismatch: length(coef) = %d != ncol(X) = %d"),
+	      LENGTH(glmFixed), xdims[1]);
+    SET_SLOT(val, lme4_fixefSym, duplicate(glmFixed));
     SET_SLOT(val, lme4_weightsSym,
-	     (wts == R_NilValue) ? allocVector(REALSXP, 0) : unname(duplicate(wts)));
+	     (wts == R_NilValue) ? allocVector(REALSXP, 0) :
+	     unname(duplicate(all_ones(wts))));
     SET_SLOT(val, lme4_offsetSym,
 	     (offset == R_NilValue) ? allocVector(REALSXP, 0) : unname(duplicate(offset)));
     
@@ -1425,7 +1456,96 @@ SEXP lmer2_create(SEXP fr, SEXP FL, SEXP Ztl, SEXP glmp,
 
     ZXyt_create(Ztl, Xp, yp, val);
     if (dims[famType_POS] < 0) {UNPROTECT(1); return val;} /* linear mixed model */
-
+				/* generalized linear mixed model */
+    SET_SLOT(val, install("family"), duplicate(family));
+    SET_SLOT(val, lme4_XSym, duplicate(Xp));
+    SET_SLOT(val, lme4_wtsSym, GET_SLOT(val, lme4_weightsSym));	/* prior weights */
+    ALLOC_SLOT(val, lme4_weightsSym, REALSXP, nobs); /* IRLS weights */
+    SET_SLOT(val, install("off"), GET_SLOT(val, lme4_offsetSym)); /* original offset */
+    ALLOC_SLOT(val, lme4_offsetSym, REALSXP, nobs); /* offset for adj. work variable */
+    SET_SLOT(val, install("eta"),
+	     duplicate(getListElement(glmp, "linear.predictors")));
+    SET_SLOT(val, install("mu"),
+	     duplicate(getListElement(glmp, "fitted.values")));
     UNPROTECT(1);
     return val;
+}
+
+static const double LTHRESH = 30.;
+static const double MLTHRESH = -30.;
+static double MPTHRESH = 0;
+static double PTHRESH = 0;
+static const double INVEPS = 1/DOUBLE_EPS;
+
+/** 
+ * Evaluate x/(1 - x). An inline function is used so that x is
+ * evaluated once only. 
+ * 
+ * @param x input in the range (0, 1)
+ * 
+ * @return x/(1 - x) 
+ */
+static R_INLINE double x_d_omx(double x) {
+    if (x < 0 || x > 1)
+	error(_("Value %d out of range (0, 1)"), x);
+    return x/(1 - x);
+}
+
+/** 
+ * Evaluate x/(1 + x). An inline function is used so that x is
+ * evaluated once only.
+ * 
+ * @param x input
+ * 
+ * @return x/(1 + x) 
+ */
+static R_INLINE double x_d_opx(double x) {return x/(1 + x);}
+
+static R_INLINE double y_log_y(double y, double mu)
+{
+    return (y) ? (y * log(y/mu)) : 0;
+}
+
+/**
+ * Evaluate the inverse link function at eta storing the result in mu
+ *
+ * @param GS a GlmerStruct object
+ */
+static void glmer_linkinv(SEXP x)
+{
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int i, n = dims[n_POS], fltype = dims[famType_POS];
+    double *eta = REAL(GET_SLOT(x, install("eta"))),
+	*mu = REAL(GET_SLOT(x, install("mu")));
+
+    switch(fltype) {
+    case 1: 			/* binomial with logit link */
+	for (i = 0; i < n; i++) {
+	    double etai = eta[i], tmp;
+	    tmp = (etai < MLTHRESH) ? DOUBLE_EPS :
+		((etai > LTHRESH) ? INVEPS : exp(etai));
+	    mu[i] = x_d_opx(tmp);
+	}
+	break;
+    case 2:			/* binomial with probit link */
+	if (!MPTHRESH) {
+	    MPTHRESH = qnorm5(DOUBLE_EPS, 0, 1, 1, 0);
+	    PTHRESH = -MPTHRESH;
+	}
+	for (i = 0; i < n; i++) {
+	    double etai = eta[i];
+	    mu[i] = (etai < MPTHRESH) ? DOUBLE_EPS :
+		((etai > PTHRESH) ? 1 - DOUBLE_EPS :
+		 pnorm5(etai, 0, 1, 1, 0));
+	}
+	break;
+    case 3:			/* Poisson with log link */
+	for (i = 0; i < n; i++) {
+	    double tmp = exp(eta[i]);
+	    mu[i] = (tmp < DOUBLE_EPS) ? DOUBLE_EPS : tmp;
+	}
+/* 	break; */
+/*     default: */
+/*  	eval_check_store(GS->linkinv, GS->rho, GS->mu);  */
+     } 
 }

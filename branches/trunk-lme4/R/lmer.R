@@ -1246,6 +1246,7 @@ lmer2 <- function(formula, data, family = gaussian,
     
     mer <- .Call(lmer2_create, fr, FL, Ztl, glmFit,
                  method, mc, model)
+    rm(fr, FL, Ztl, glmFit)
     if (!is.null(start)) mer <- setST(mer, start)
     if (!inherits(mer, "glmer2")) {      # linear mixed model
         .Call(lmer2_optimize, mer, cv$msVerbose)
