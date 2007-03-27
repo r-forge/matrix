@@ -70,8 +70,8 @@
 cBind <- methods:::cbind
 rBind <- methods:::rbind
 ## TODO? -- and export these {but users may need to use  base::cbind() ..?!}
-cbind <- cBind
-rbind <- rBind
+## cbind <- cBind
+## rbind <- rBind
 
 
 .onUnload <- function(libpath)
