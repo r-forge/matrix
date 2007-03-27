@@ -97,9 +97,11 @@ setClass("lmer2",
 
 setClass("glmer2",
 	 representation(family = "family",
-                        origZXyt = "dgCMatrix",
-                        off = "numeric",  # original offset
-                        wts = "numeric"), # original weights
+                        X = "matrix",     # model matrix for fixed effects
+                        eta = "numeric",  # linear predictor
+                        mu = "numeric",   # inverse link of linear predictor
+                        off = "numeric",  # model offset, if any
+                        wts = "numeric"), # prior weights, if any
 	 contains = "lmer2")
 
 setClass("summary.mer", # the "mer" result ``enhanced'' :

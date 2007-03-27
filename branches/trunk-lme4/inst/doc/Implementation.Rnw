@@ -313,7 +313,7 @@ nc <- length(dev)
 nms <- names(dev)
 vals <- matrix(0, nrow = length(sg), ncol = nc, dimnames = list(NULL, nms))
 for (i in seq(along = sg)) {
-    .Call("mer2_setPars", mm, sg[i], PACKAGE = "lme4")
+    .Call("lmer2_setPars", mm, sg[i], PACKAGE = "lme4")
     vals[i,] <- mm@deviance
 }
 vals[,"lr2"] <- mm@dims["n"] * vals[,"lr2"]
@@ -371,7 +371,7 @@ nc <- length(dev)
 nms <- names(dev)
 vals <- matrix(0, nrow = length(sg), ncol = nc, dimnames = list(NULL, nms))
 for (i in seq(along = sg)) {
-    .Call("mer2_setPars", mm, sg[i], PACKAGE = "lme4")
+    .Call("lmer2_setPars", mm, sg[i], PACKAGE = "lme4")
     vals[i,] <- mm@deviance
 }
 base <- 18 * log(deviance(lm(travel ~ Rail, Rail)))
