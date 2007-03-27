@@ -35,8 +35,8 @@ export("Cholesky",
        "writeMM"
        )
 
-## Maybe?
-export("cbind", "rbind")
+## Maybe {Doug prefers having only cBind/rBind}?
+## export("cbind", "rbind")
 ## substitute for using  cbind() / rbind()
 export("cBind",
        "rBind")
