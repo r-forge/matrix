@@ -121,20 +121,6 @@ setMethod("+", signature(e1 = "dgTMatrix", e2 = "dgTMatrix"),
                   x = c(e1@x, e2@x), Dim = e1@Dim)
           })
 
-setMethod("kronecker", signature(X = "dgTMatrix", Y = "dgTMatrix"),
-          function (X, Y, FUN = "*", make.dimnames = FALSE, ...)
-      {
-          if (FUN != "*") stop("kronecker method must use default 'FUN'")
-          ydim <- Y@Dim
-          xi <- X@i
-          xnnz <- length(xi)
-          yi <- Y@i
-          ynnz <- length(yi)
-          new("dgTMatrix", Dim = X@Dim * ydim,
-              i = rep.int(yi, xnnz) + ydim[1] * rep.int(xi, rep.int(ynnz, xnnz)),
-              j = rep.int(Y@j, xnnz) + ydim[2] * rep.int(X@j, rep.int(ynnz, xnnz)),
-              x = as.vector(outer(Y@x, X@x)))
-      }, valueClass = "dgTMatrix")
 
 setMethod("writeHB", signature(obj = "dgTMatrix"),
           function(obj, file, ...) callGeneric(as(obj, "CsparseMatrix"), file, ...))

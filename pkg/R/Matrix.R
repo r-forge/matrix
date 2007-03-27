@@ -245,13 +245,16 @@ setMethod("tcrossprod", signature(x = "Matrix", y = "Matrix"),
 
 ## There are special sparse methods; this is a "fall back":
 setMethod("kronecker", signature(X = "Matrix", Y = "ANY",
-                                 FUN = "ANY", make.dimnames = "ANY"),
-          function(X, Y, FUN, make.dimnames, ...) {
-              X <- as(X, "matrix") ; Matrix(callGeneric()) })
+				 FUN = "ANY", make.dimnames = "ANY"),
+	  function(X, Y, FUN, make.dimnames, ...) {
+	      warning("potentially slow kronecker() method")
+	      X <- as(X, "matrix") ; Matrix(callGeneric()) })
+
 setMethod("kronecker", signature(X = "ANY", Y = "Matrix",
-                                 FUN = "ANY", make.dimnames = "ANY"),
-          function(X, Y, FUN, make.dimnames, ...) {
-              Y <- as(Y, "matrix") ; Matrix(callGeneric()) })
+				 FUN = "ANY", make.dimnames = "ANY"),
+	  function(X, Y, FUN, make.dimnames, ...) {
+	      warning("potentially slow kronecker() method")
+	      Y <- as(Y, "matrix") ; Matrix(callGeneric()) })
 
 
 ## FIXME: All of these should never be called

@@ -68,6 +68,8 @@ diag2T <- function(from) {
 
 setAs("diagonalMatrix", "triangularMatrix", diag2T)
 setAs("diagonalMatrix", "sparseMatrix", diag2T)
+## needed too (otherwise <dense> -> Tsparse is taken):
+setAs("diagonalMatrix", "TsparseMatrix", diag2T)
 ## is better than this:
 ## setAs("diagonalMatrix", "sparseMatrix",
 ##       function(from)
