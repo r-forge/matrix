@@ -16,6 +16,7 @@ SEXP lmer2_ranef(SEXP x);
 SEXP lmer2_setPars(SEXP x, SEXP pars);
 SEXP lmer2_sigma(SEXP x, SEXP which);
 SEXP lmer2_update_effects(SEXP x);
+SEXP lmer2_update_y(SEXP x, SEXP yp);
 SEXP lmer2_validate(SEXP x);
 SEXP lmer2_vcov(SEXP x);
 

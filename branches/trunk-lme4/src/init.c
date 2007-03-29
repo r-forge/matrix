@@ -27,6 +27,7 @@ static R_CallMethodDef CallEntries[] = {
     {"lmer2_setPars", (DL_FUNC) &lmer2_setPars, 2},
     {"lmer2_sigma", (DL_FUNC) &lmer2_sigma, 2},
     {"lmer2_update_effects", (DL_FUNC) &lmer2_update_effects, 1},
+    {"lmer2_update_y", (DL_FUNC) &lmer2_update_y, 2},
     {"lmer2_validate", (DL_FUNC) &lmer2_validate, 1},
     {"lmer2_vcov", (DL_FUNC) &lmer2_vcov, 1},
 
