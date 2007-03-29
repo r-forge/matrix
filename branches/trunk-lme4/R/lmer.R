@@ -707,7 +707,7 @@ simulestimate <- function(x, FUN, nsim = 1, seed = NULL, control = list())
     stopifnot((nsim <- as.integer(nsim[1])) > 0,
 	      inherits(x, "lmer"))
     if (!is.null(seed)) set.seed(seed)
-    ## similate the linear predictors
+    ## simulate the linear predictors
     lpred <- .Call(mer_simulate, x, nsim)
     sc <- abs(x@devComp[8])
     ## add fixed-effects contribution and per-observation noise term
@@ -1229,6 +1229,7 @@ lmer2 <- function(formula, data, family = gaussian,
     ## Establish model frame and fixed-effects model matrix and terms
     mc <- match.call()
     fr <- lmerFrames(mc, formula, data, contrasts)
+    storage.mode(fr$X) <- "double" # when ncol(X) == 0, X is logical
     
     ## Fit a glm to the fixed-effects only.
     if(is.character(family))
@@ -1583,3 +1584,34 @@ setMethod("mcmcsamp", signature(object = "lmer2"),
 	  mcmccompnames(ans, object, saveb, trans,
 			glmer=FALSE, deviance=deviance)
       })
+
+setMethod("simulate", "lmer2",
+          function(object, nsim = 1, seed = NULL, ...)
+      {
+	  if(!is.null(seed)) set.seed(seed)
+	  if(!exists(".Random.seed", envir = .GlobalEnv))
+	      runif(1)		     # initialize the RNG if necessary
+          RNGstate <- .Random.seed
+          dims <- object@dims
+          ans <- array(0, c(dims["n"], nsim))
+          fe <- fixef(object)
+          re <- ranef(object)
+          nc <- sapply(re, ncol)
+          nr <- sapply(re, nrow)
+          sz <- nc * nr
+          vc <- VarCorr(object)
+          
+          cholL <- lapply(vc, chol)
+          n <- object@dims["n"]
+          for (i in seq_len(nsim))
+              ans[, 1] <- crossprod(object@ZXyt,
+                                    c(unlist(lapply(seq_along(re), function(k)
+                                                    (t(cholL[[k]]) %*%
+                                                     matrix(rnorm(sz[k]),
+                                                            nc = nr[k]))@x)),
+                                      fe, 0))@x
+          ans + rnorm(prod(dim(ans)), sd = attr(vc, "sc"))
+      })
+
+
+                   
