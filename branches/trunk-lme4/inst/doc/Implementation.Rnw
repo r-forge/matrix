@@ -231,7 +231,6 @@ deviation of the per-observation noise term $\bm{\bm{\epsilon}}$.
 <<fewdigits,echo=FALSE,results=hide>>=
 op <- options(digits=4)
 @ 
-
 The Cholesky decomposition of $\bm{A}^*$ is a lower triangular sparse
 matrix $\bm{L}$ 
 <<LRm1ML>>=
