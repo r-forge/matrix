@@ -432,7 +432,7 @@ internal_update_A(cholmod_sparse *ZXyt, SEXP wtP, SEXP offP,
 		M_cholmod_free_sparse(&ts1, &c);
 		error(_("missing y position in ZXyt at column %d"), j+1);
 	    }
-	    zx[ind] += off[j];	/* add offset to -y */
+	    zx[ind] += off[j];	/* *add* offset to -y */
 	}
     }
     if (wl) {		/* skip if length 0 */
@@ -1187,20 +1187,20 @@ static SEXP NullFrame(void)
 
 static void ZXyt_create(SEXP Ztl, SEXP Xp, SEXP yp, SEXP val)
 {
-    int *Gp = INTEGER(GET_SLOT(val, lme4_GpSym)), *Perm,
+    int *Gp = INTEGER(GET_SLOT(val, lme4_GpSym)), *Perm, 
 	*dims = INTEGER(GET_SLOT(val, lme4_dimsSym)),
-	i, j, nobs = LENGTH(yp), nf = LENGTH(Ztl);
-    int p = dims[p_POS], q = Gp[nf];
-    double *src, *dest;
+	*i1, *i2, *p1, *p2, i, j;
+    int n = dims[n_POS], nf = dims[nf_POS], p = dims[p_POS], q = dims[q_POS];
+    double *dest, *src, *y = REAL(yp);
     cholmod_sparse *A, *Zt, *ts1, *ts2, *ts3;
     cholmod_dense *Xy;
     cholmod_factor *L;
     SEXP ST = GET_SLOT(val, lme4_STSym);
 
     Zt = M_as_cholmod_sparse(VECTOR_ELT(Ztl, 0));
-    if (Zt->ncol != nobs)
+    if (Zt->ncol != n)
 	error(_("dimension mismatch: ncol(Ztl[[1]]) = %d != length(y) = %d"),
-	      Zt->ncol, nobs);
+	      Zt->ncol, n);
     if (Zt->nrow != Gp[1])
 	error(_("Expected nrow(Ztl[[1]]) to be %d, got %d"), Gp[1], Zt->nrow);
     ts1 = M_cholmod_copy_sparse(Zt, &c); /* use cholmod storage, not R */
@@ -1208,9 +1208,9 @@ static void ZXyt_create(SEXP Ztl, SEXP Xp, SEXP yp, SEXP val)
     Zt = ts1;
     for (i = 1; i < nf; i++) {
 	ts1 = M_as_cholmod_sparse(VECTOR_ELT(Ztl, i));
-	if (ts1->ncol != nobs)
+	if (ts1->ncol != n)
 	    error(_("dimension mismatch: ncol(Ztl[[%d]]) = %d != length(y) = %d"),
-		  i + 1, ts1->ncol, nobs);
+		  i + 1, ts1->ncol, n);
 	if (ts1->nrow != (Gp[i + 1] - Gp[i]))
 	    error(_("Expected nrow(Ztl[[%d]]) to be %d, got %d"),
 		  i + 1, Gp[i + 1] - Gp[i], ts1->nrow);
@@ -1239,31 +1239,31 @@ static void ZXyt_create(SEXP Ztl, SEXP Xp, SEXP yp, SEXP val)
 	M_cholmod_free_sparse(&ts2, &c);
     }
 				/* create [X;-y]' */
-    Xy = M_cholmod_allocate_dense(nobs, p + 1, nobs, CHOLMOD_REAL, &c);
-    Memcpy((double*)(Xy->x), REAL(Xp), nobs * p);
-    src = REAL(yp); dest = ((double*)(Xy->x)) + nobs * p;
-    for (j = 0; j < nobs; j++) dest[j] = -src[j];
-    ts1 = M_cholmod_dense_to_sparse(Xy, TRUE, &c);
-    M_cholmod_free_dense(&Xy, &c);
+    Xy = M_as_cholmod_dense(Xp);
+    ts1 = M_cholmod_dense_to_sparse(Xy, 1 /* values */, &c);
+    Free(Xy);
     ts2 = M_cholmod_transpose(ts1, 1 /* values */, &c);
-    M_cholmod_free_sparse(&ts1, &c); ts1 = ts2;
-				/* ensure that all y positions are stored, even if zero */
-    if (LENGTH(GET_SLOT(val, lme4_offsetSym)) || dims[famType_POS] >= 0){	
-	int *ip, *pp;
-	double *xp, one[] = {1,0}, zero[] = {0,0};
-
-	ts3 = M_cholmod_allocate_sparse(p + 1, nobs, nobs, 1, 1, 0, 1, &c);
-	ip = (int*)ts3->i; pp = (int*)ts3->p; *pp = 0; xp = (double*)ts3->x;
-	for (j = 0; j < nobs; j++) {
-	    ip[j] = p;
-	    xp[j] = 1;
-	    pp[j + 1] = j + 1;
+    M_cholmod_free_sparse(&ts1, &c);
+    ts1 = ts2;
+    ts2 = M_cholmod_allocate_sparse(ts1->nrow + 1, ts1->ncol,
+				    ts1->nzmax + ts1->ncol, ts1->sorted,
+				    ts1->packed, 0 /*stype */,
+				    CHOLMOD_REAL, &c);
+    p1 = (int*)(ts1->p);
+    p2 = Memcpy((int*)(ts2->p), p1, n + 1);
+    for (j = 0; j <= n; j++) p2[j] += j; /* 1 extra nz per col */
+    i1 = (int*)(ts1->i); i2 = (int*)(ts2->i);
+    src = (double*)(ts1->x); dest = (double*)(ts2->x);
+    for (j = 0; j < n; j++) {
+	for (i = p1[j]; i < p1[j + 1]; i++) {
+	    *i2++ = i1[i];
+	    *dest++ = src[i];
 	}
-	ts2 = M_cholmod_add(ts1, ts3, one, zero, 1, 1, &c);
-	M_cholmod_free_sparse(&ts3, &c);
-	M_cholmod_free_sparse(&ts1, &c);
-	ts1 = ts2;
+	*i2++ = ts1->nrow;
+	*dest++ = -(*y++);
     }
+    M_cholmod_free_sparse(&ts1, &c);
+    ts1 = ts2;
     ts2 = M_cholmod_vertcat(Zt, ts1, TRUE, &c);
     M_cholmod_free_sparse(&Zt, &c);
     M_cholmod_free_sparse(&ts1, &c);
@@ -1282,9 +1282,6 @@ static void ZXyt_create(SEXP Ztl, SEXP Xp, SEXP yp, SEXP val)
     internal_update_A(ts2, GET_SLOT(val, lme4_weightsSym),
 		      GET_SLOT(val, lme4_offsetSym), A);
     M_cholmod_free_sparse(&ts2, &c);
-				/* consider changing this to assign large values to S only to
-				 * guarantee positive-definiteness of A then later use 
-				 * internal_mer_initial for lmm only */ 
     internal_lmer2_initial(ST, Gp, A);
     j = c.supernodal;		/* force supernodal for non-nested */
     if (!dims[isNest_POS]) c.supernodal = CHOLMOD_SUPERNODAL;
@@ -1374,7 +1371,7 @@ SEXP lmer2_create(SEXP fr, SEXP FL, SEXP Ztl, SEXP glmp,
 	error(_("y must be a non-null numeric vector"));
     if (!isNewList(fl) || nf <= 0)
 	error(_("fl must be a non-null list"));
-    if (!isReal(Xp) || !isMatrix(Xp))
+    if (!isMatrix(Xp) || (xdims[1] && !isReal(Xp)))
 	error(_("X must be a numeric matrix"));
     if (*xdims != nobs)
 	error(_("Dimension mismatch: length(y) = %d and nrow(X) = %d"), nobs, xdims[0]);
@@ -1395,14 +1392,13 @@ SEXP lmer2_create(SEXP fr, SEXP FL, SEXP Ztl, SEXP glmp,
     setAttrib(ST, R_NamesSymbol, duplicate(flnms));
     /* set up the cnames - tedious but convenient to have */
     cnames = ALLOC_SLOT(val, lme4_cnamesSym, VECSXP, nf + 2);
-    cnamesnames = PROTECT(allocVector(STRSXP, nf + 1));
+    setAttrib(cnames, R_NamesSymbol, allocVector(STRSXP, nf + 1));
+    cnamesnames = getAttrib(cnames, R_NamesSymbol);
     for (i = 0; i < nf; i++)
 	SET_STRING_ELT(cnamesnames, i, STRING_ELT(flnms, i));
     SET_STRING_ELT(cnamesnames, nf, mkChar(".fixed"));
-    setAttrib(cnames, R_NamesSymbol, cnamesnames);
-    UNPROTECT(1);
-    if (isNewList(Xdnames = getAttrib(Xp, R_DimNamesSymbol)) &&
-	LENGTH(Xdnames) > 1)
+    Xdnames = getAttrib(Xp, R_DimNamesSymbol);
+    if (!isNull(Xdnames) && isNewList(Xdnames) && LENGTH(Xdnames) == 2)
 	SET_VECTOR_ELT(cnames, nf, duplicate(VECTOR_ELT(Xdnames, 1)));
 				/* Create Gp and populate ST */
     Gp = INTEGER(ALLOC_SLOT(val, lme4_GpSym, INTSXP, nf + 3));
@@ -1469,6 +1465,36 @@ SEXP lmer2_create(SEXP fr, SEXP FL, SEXP Ztl, SEXP glmp,
 	     duplicate(getListElement(glmp, "fitted.values")));
     UNPROTECT(1);
     return val;
+}
+
+/**
+ * Update the response in an lmer2 object.
+ *
+ * @param x an lmer2 object
+ * @param y a numeric vector of length nobs to update y
+ *
+ * @return R_NilValue
+ */
+SEXP lmer2_update_y(SEXP x, SEXP yp)
+{
+    cholmod_sparse *A = M_as_cholmod_sparse(GET_SLOT(x, lme4_ASym)),
+	*ZXyt = M_as_cholmod_sparse(GET_SLOT(x, lme4_ZXytSym));
+    int *ip = (int*)(ZXyt->i), *pp = (int*)(ZXyt->p), j;
+    int n = ZXyt->ncol, yrow = ZXyt->nrow - 1;
+    double *xp = (double*)(ZXyt->x), *y = REAL(yp);
+
+    if (!isReal(yp) || LENGTH(yp) != n)
+	error(_("y must be a numeric vector of length %d"), n);
+    for (j = 0; j < n; j++) {
+	int ind = pp[j + 1] - 1;
+	if (ip[ind] != yrow)
+	    error(_("Missing y position in column %d of ZXyt"), j + 1);
+	xp[ind] = -y[j];
+    }
+    internal_update_A(ZXyt, GET_SLOT(x, lme4_weightsSym),
+		      GET_SLOT(x, lme4_offsetSym), A);
+    Free(ZXyt); Free(A);
+    return R_NilValue;
 }
 
 static const double LTHRESH = 30.;
