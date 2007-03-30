@@ -37,9 +37,10 @@ static SEXP R_INLINE getListElement(SEXP list, char *nm) {
     SEXP names = getAttrib(list, R_NamesSymbol);
     int i;
 
-    for (i = 0; i < LENGTH(names); i++)
-	if (!strcmp(CHAR(STRING_ELT(names, i)), nm))
-	    return(VECTOR_ELT(list, i));
+    if (!isNull(names))
+	for (i = 0; i < LENGTH(names); i++)
+	    if (!strcmp(CHAR(STRING_ELT(names, i)), nm))
+		return(VECTOR_ELT(list, i));
     return R_NilValue;
 }
 
@@ -1463,6 +1464,9 @@ SEXP lmer2_create(SEXP fr, SEXP FL, SEXP Ztl, SEXP glmp,
 	     duplicate(getListElement(glmp, "linear.predictors")));
     SET_SLOT(val, install("mu"),
 	     duplicate(getListElement(glmp, "fitted.values")));
+    ALLOC_SLOT(val, install("dmu_deta"), REALSXP, nobs);
+    ALLOC_SLOT(val, install("var"), REALSXP, nobs);
+
     UNPROTECT(1);
     return val;
 }
@@ -1535,7 +1539,7 @@ static R_INLINE double y_log_y(double y, double mu)
 /**
  * Evaluate the inverse link function at eta storing the result in mu
  *
- * @param GS a GlmerStruct object
+ * @param x pointer to a glmer2 object
  */
 static void glmer_linkinv(SEXP x)
 {
@@ -1572,6 +1576,211 @@ static void glmer_linkinv(SEXP x)
 	}
 /* 	break; */
 /*     default: */
-/*  	eval_check_store(GS->linkinv, GS->rho, GS->mu);  */
+/*  	eval_check_store(linkinv, rho, mu);  */
      } 
 }
+
+/**
+ * Evaluate the variance function for the link
+ *
+ * @param x pointer to a glmer2 object
+ * @param var pointer to variances to be overwritten
+ *
+ * @return var
+ */
+static double *glmer_var(SEXP x, double *var)
+{
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int i, n = dims[n_POS], fltype = dims[famType_POS];
+    double *mu = REAL(GET_SLOT(x, install("mu")));
+
+    switch(fltype) {
+    case 1: 			/* binomial family with logit or probit link */
+    case 2:
+	for (i = 0; i < n; i++) {
+	    double mui = mu[i];
+	    var[i] = mui * (1 - mui);
+	}
+	break;
+    case 3:			/* Poisson with log link */
+	for (i = 0; i < n; i++) {
+	    var[i] = mu[i];
+	}
+	break;
+/*     default: */
+/*     { */
+/* 	SEXP ans = PROTECT(eval_check(vfunc, rho, REALSXP, n)); */
+/* 	Memcpy(var, REAL(ans), n); */
+/* 	UNPROTECT(1); */
+/*     } */
+    }
+    return var;
+}
+
+/**
+ * Evaluate the derivative of mu wrt eta for the link
+ *
+ * @param x pointer to a glmer2 object
+ */
+static double *glmer_dmu_deta(SEXP x, double *dmu_deta)
+{
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int i, n = dims[n_POS], fltype = dims[famType_POS];
+    double *eta = REAL(GET_SLOT(x, install("eta")));
+
+    switch(fltype) {
+    case 1: 			/* binomial with logit link */
+	for (i = 0; i < n; i++) {
+	    double etai = eta[i];
+	    double opexp = 1 + exp(etai);
+	    
+	    dmu_deta[i] = (etai > LTHRESH || etai < MLTHRESH) ?
+		DOUBLE_EPS : exp(etai)/(opexp * opexp);
+	}
+	break;
+    case 2:			/* binomial with probit link */
+	for (i = 0; i < n; i++) {
+	    double tmp = dnorm4(eta[i], 0, 1, 0);
+	    dmu_deta[i] = (tmp < DOUBLE_EPS) ? DOUBLE_EPS : tmp;
+	}
+	break;
+    case 3:			/* Poisson with log link */
+	for (i = 0; i < n; i++) {
+	    double tmp = exp(eta[i]);
+	    dmu_deta[i] = (tmp < DOUBLE_EPS) ? DOUBLE_EPS : tmp;
+	}
+	break;
+/*     default: { */
+/* 	SEXP ans = PROTECT(eval_check(mu_eta, rho, REALSXP, n)); */
+/* 	Memcpy(dmu_deta, REAL(ans), n); */
+/* 	UNPROTECT(1); */
+/*     } */
+    }
+    return dmu_deta;
+}
+
+/**
+ * Evaluate the deviance residuals
+ *
+ * @param x
+ */
+static void glmer_dev_resids(SEXP x)
+{
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int i, n = dims[n_POS], fltype = dims[famType_POS];
+    double *dev_res = REAL(GET_SLOT(x, install("dev_res")));
+    double *mu = REAL(GET_SLOT(x, install("mu")));
+    double *wts = REAL(GET_SLOT(x, lme4_wtsSym));
+    /* FIXME: Decide how to get the value of y as an SEXP */
+    double *y = REAL(GET_SLOT(x, lme4_ySym));
+
+    switch(fltype) {
+    case 1: 			/* binomial with logit or probit link */
+    case 2:
+	for (i = 0; i < n; i++) {
+	    double mui = mu[i], yi = y[i];
+	    
+	    dev_res[i] = 2 * wts[i] *
+		(y_log_y(yi, mui) + y_log_y(1 - yi, 1 - mui));
+	}
+	break;
+    case 3:			/* Poisson with log link */
+	for (i = 0; i < n; i++) {
+	    double mui = mu[i], yi = y[i];
+	    dev_res[i] = 2 * wts[i] * (y_log_y(yi, mui) - (yi - mui));
+	}
+	break;
+/*     default: { */
+/* 	SEXP ans = PROTECT(eval_check(dev_resfunc, rho, REALSXP, n)); */
+/* 	Memcpy(dev_res, REAL(ans), n); */
+/* 	UNPROTECT(1); */
+/*     } */
+    }
+}
+
+
+/**
+ * Evaluate new weights and working residuals.
+ *
+ * @param x pointer to a glmer2 object
+ */
+static void internal_glmer_reweight(SEXP x)
+{
+    SEXP off = GET_SLOT(x, install("off")),
+	offp = GET_SLOT(x, lme4_offsetSym),
+	wtsp = GET_SLOT(x, lme4_weightsSym),
+	wts = GET_SLOT(x, lme4_wtsSym);
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int i, ione = 1, n = dims[n_POS], p = dims[p_POS];
+    double *dmu_deta = Calloc(n, double),
+	*var = Calloc(n, double), *w = REAL(wtsp),
+	*z = REAL(offp), one = 1;
+    cholmod_sparse
+	*ZXyt = M_as_cholmod_sparse(GET_SLOT(x, lme4_ZXytSym)),
+	*A = M_as_cholmod_sparse(GET_SLOT(x, lme4_ASym));
+
+    if (LENGTH(off)) /* initialize offset to saved offset */
+	Memcpy(z, REAL(off), n);
+    else
+	AZERO(z, n);
+		     /* Add fixed-effects contribution to z */
+    F77_CALL(dgemv)("N", &n, &p, &one,
+		    REAL(GET_SLOT(x, lme4_XSym)), &n,
+		    REAL(GET_SLOT(x, lme4_fixefSym)), &ione,
+		    &one, z, &ione);
+
+    if (LENGTH(wts)) /* initialize weights to prior wts */
+	Memcpy(w, REAL(wts), n);
+    else
+	for(i = 0; i < n; i++) w[i] = 1;
+    
+
+
+    glmer_linkinv(x);		/* evaluate mu */
+    glmer_dmu_deta(x, dmu_deta);
+    glmer_var(x, var);
+    for (i = 0; i < n; i++) {
+	w[i] = sqrt(w[i]/var[i]) * dmu_deta[i];
+/* 	z[i] += (y[i] - mu[i])/dmu_deta[i]; */
+    }
+    internal_update_A(ZXyt, offp, wtsp, A);
+    Free(ZXyt); Free(A); Free(dmu_deta); Free(var);
+}
+
+#if 0
+
+/**
+ * Iterate to determine the conditional modes of the random effects.
+ *
+ * @param x pointer to a glmer2 object
+ *
+ * @return An indicator of whether the iterations converged
+ */
+static int
+internal_bhat(SEXP x)
+{
+    SEXP fixef = GET_SLOT(x, lme4_fixefSym);
+    cholmod_factor *L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
+    int i;
+    double crit = 1,
+	*eta = REAL(GET_SLOT(x, install("eta")));
+
+    internal_glmer_reweight(x);
+    internal_mer_Zfactor(x, L);
+    internal_mer_ranef(x);
+    internal_mer_fitted(x, offset, etap);
+    Memcpy(GS->etaold, etap, n);
+
+    for (i = 0; i < GS->maxiter && crit > GS->tol; i++) {
+	internal_glmer_reweight(GS);
+	internal_mer_Zfactor(x, L);
+	internal_mer_ranef(x);
+	internal_mer_fitted(x, GS->offset, etap);
+	crit = conv_crit(GS->etaold, etap, GS->n);
+    }
+    internal_mer_Xfactor(x);
+    Free(L);
+    return (crit > GS->tol) ? 0 : i;
+}
+
+#endif
