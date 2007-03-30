@@ -184,7 +184,7 @@ setMethod("plot", signature(x = "coef.lmer"),
                                            names(el)[sapply(el,
                                                             function(col)
                                                             any(col != col[1]))])))
-          gf <- do.call("rbind", lapply(x, "[", j = varying))
+          gf <- do.call("rBind", lapply(x, "[", j = varying))
           gf$.grp <- factor(rep(names(x), sapply(x, nrow)))
           switch(min(length(varying), 3),
                  qqmath(eval(substitute(~ x | .grp,
@@ -366,7 +366,7 @@ lmer <- function(formula, data, family = gaussian,
     nc <- with(FL, sapply(Ztl, nrow))
     Ztl <- with(FL, .Call(Ztl_sparse, fl, Ztl))
     ## FIXME: change this when rbind has been fixed.
-    Zt <- if (length(Ztl) == 1) Ztl[[1]] else do.call("rbind", Ztl)
+    Zt <- if (length(Ztl) == 1) Ztl[[1]] else do.call("rBind", Ztl)
     fl <- FL$fl
 
     ## quick return for a linear mixed model
@@ -752,7 +752,7 @@ formatVC <- function(varc, digits = max(3, getOption("digits") - 2))
     if (any(reLens > 1)) {
 	maxlen <- max(reLens)
 	corr <-
-	    do.call("rbind",
+	    do.call("rBind",
 		    lapply(recorr,
 			   function(x, maxlen) {
 			       x <- as(x, "matrix")
@@ -763,7 +763,7 @@ formatVC <- function(varc, digits = max(3, getOption("digits") - 2))
 			       cbind(cc, matrix("", nr, maxlen-nr))
 			   }, maxlen))
 	colnames(corr) <- c("Corr", rep.int("", maxlen - 1))
-	cbind(reMat, rbind(corr, rep.int("", ncol(corr))))
+	cbind(reMat, rBind(corr, rep.int("", ncol(corr))))
     } else reMat
 }
 
