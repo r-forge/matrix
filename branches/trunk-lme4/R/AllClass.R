@@ -98,6 +98,7 @@ setClass("lmer2",
 setClass("glmer2",
 	 representation(family = "family",
                         X = "matrix",     # model matrix for fixed effects
+                        dev_res = "numeric",  # deviance residuals
                         eta = "numeric",  # linear predictor
                         mu = "numeric",   # inverse link of linear predictor
                         off = "numeric",  # model offset, if any
