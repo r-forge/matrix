@@ -4,6 +4,9 @@
 #include "lme4_utils.h"
 #include <R_ext/stats_package.h>
 
+SEXP glmer_eta(SEXP x);
+SEXP glmer_reweight(SEXP x);
+
 SEXP lmer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 		   SEXP verbose, SEXP deviance);
 SEXP lmer2_create(SEXP fr, SEXP FL, SEXP Ztl, SEXP glmp,
