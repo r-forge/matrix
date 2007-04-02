@@ -15,6 +15,8 @@ static R_CallMethodDef CallEntries[] = {
     {"glmer_devLaplace", (DL_FUNC) &glmer_devLaplace, 2},
     {"glmer_finalize", (DL_FUNC) &glmer_finalize, 1},
     {"glmer_init", (DL_FUNC) &glmer_init, 2},
+    {"glmer_eta", (DL_FUNC) &glmer_eta, 1},
+    {"glmer_reweight", (DL_FUNC) &glmer_reweight, 1},
 
     {"lme4_rWishart", (DL_FUNC) &lme4_rWishart, 3},
     {"lmer2_create", (DL_FUNC) &lmer2_create, 7},

@@ -97,12 +97,12 @@ setClass("lmer2",
 
 setClass("glmer2",
 	 representation(family = "family",
-                        X = "matrix",     # model matrix for fixed effects
-                        dev_res = "numeric",  # deviance residuals
-                        eta = "numeric",  # linear predictor
-                        mu = "numeric",   # inverse link of linear predictor
-                        off = "numeric",  # model offset, if any
-                        wts = "numeric"), # prior weights, if any
+                        X = "matrix",      # model matrix for fixed effects
+                        eta = "numeric",   # linear predictor
+                        mu = "numeric",    # inverse link of linear predictor
+                        moff = "numeric",  # model offset, if any
+                        pwts = "numeric",  # prior weights, if any
+                        y = "numeric"),    # response
 	 contains = "lmer2")
 
 setClass("summary.mer", # the "mer" result ``enhanced'' :
