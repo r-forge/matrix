@@ -4,6 +4,7 @@
 #include "lme4_utils.h"
 #include <R_ext/stats_package.h>
 
+SEXP glmer_bhat(SEXP x);
 SEXP glmer_eta(SEXP x);
 SEXP glmer_reweight(SEXP x);
 
