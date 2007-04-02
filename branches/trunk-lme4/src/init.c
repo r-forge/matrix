@@ -12,6 +12,7 @@
 static R_CallMethodDef CallEntries[] = {
     {"glmer_MCMCsamp", (DL_FUNC) &glmer_MCMCsamp, 6},
     {"glmer_PQL", (DL_FUNC) &glmer_PQL, 1},
+    {"glmer_bhat", (DL_FUNC) &glmer_bhat, 1},
     {"glmer_devLaplace", (DL_FUNC) &glmer_devLaplace, 2},
     {"glmer_finalize", (DL_FUNC) &glmer_finalize, 1},
     {"glmer_init", (DL_FUNC) &glmer_init, 2},
@@ -106,11 +107,13 @@ void R_init_lme4(DllInfo *dll)
     lme4_devianceSym = install("deviance");
     lme4_diagSym = install("diag");
     lme4_dimsSym = install("dims");
+    lme4_etaSym = install("eta");
     lme4_factorSym = install("factor");
     lme4_fixefSym = install("fixef");
     lme4_flistSym = install("flist");
     lme4_gradCompSym = install("gradComp");
     lme4_iSym = install("i");
+    lme4_muSym = install("mu");
     lme4_ncSym = install("nc");
     lme4_offsetSym = install("offset");
     lme4_pSym = install("p");
