@@ -1,3 +1,8 @@
+2007-04-04  Douglas Bates  <bates@stat.wisc.edu>
+
+	* src/lmer2.c (lmer2_create): allow for a glmer2 object and
+	methods for that class.
+
 2007-03-25  Douglas Bates  <bates@r-project.org>
 
 	* src/lmer2.c (lmer2_create): Removed the mer2 class and renamed
