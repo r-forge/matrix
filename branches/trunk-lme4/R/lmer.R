@@ -773,7 +773,7 @@ formatVC <- function(varc, digits = max(3, getOption("digits") - 2))
 
 ## This is modeled a bit after  print.summary.lm :
 printMer <- function(x, digits = max(3, getOption("digits") - 3),
-                     correlation = TRUE, symbolic.cor = x$symbolic.cor,
+                     correlation = TRUE, symbolic.cor = FALSE,
                      signif.stars = getOption("show.signif.stars"), ...)
 {
     so <- summary(x)
@@ -1225,12 +1225,12 @@ lmer2 <- function(formula, data, family = gaussian,
     formula <- as.formula(formula)
     if (length(formula) < 3) stop("formula must be a two-sided formula")
     cv <- do.call("lmerControl", control)
-    
+
     ## Establish model frame and fixed-effects model matrix and terms
     mc <- match.call()
     fr <- lmerFrames(mc, formula, data, contrasts)
     storage.mode(fr$X) <- "double" # when ncol(X) == 0, X is logical
-    
+
     ## Fit a glm to the fixed-effects only.
     if(is.character(family))
         family <- get(family, mode = "function", envir = parent.frame(2))
@@ -1240,11 +1240,11 @@ lmer2 <- function(formula, data, family = gaussian,
                       offset = fr$offset, family = family,
                       intercept = attr(fr$mt, "intercept") > 0)
     storage.mode(glmFit$y) <- "double"
-    
+
     ## establish factor list and Ztl
     FL <- lmerFactorList(formula, fr$mf, !is.null(family))
     Ztl <- with(FL, .Call(Ztl_sparse, fl, Ztl))
-    
+
     mer <- .Call(lmer2_create, fr, FL, Ztl, glmFit,
                  method, mc, model)
     rm(fr, FL, Ztl, glmFit)
@@ -1278,7 +1278,7 @@ setMethod("vcov", signature(object = "lmer2"),
 
 ## This is modeled a bit after  print.summary.lm :
 printMer2 <- function(x, digits = max(3, getOption("digits") - 3),
-                      correlation = TRUE, symbolic.cor = x$symbolic.cor,
+                      correlation = TRUE, symbolic.cor = FALSE,
                       signif.stars = getOption("show.signif.stars"), ...)
 {
     so <- summary(x)
@@ -1287,7 +1287,7 @@ printMer2 <- function(x, digits = max(3, getOption("digits") - 3),
     dev <- so@deviance
     dims <- x@dims
     glz <- so@isG
-    
+
     cat(so@methTitle, "\n")
     if (!is.null(x@call$formula))
         cat("Formula:", deparse(x@call$formula),"\n")
@@ -1600,7 +1600,7 @@ setMethod("simulate", "lmer2",
           nr <- sapply(re, nrow)
           sz <- nc * nr
           vc <- VarCorr(object)
-          
+
           cholL <- lapply(vc, chol)
           n <- object@dims["n"]
           for (i in seq_len(nsim))
@@ -1614,4 +1614,4 @@ setMethod("simulate", "lmer2",
       })
 
 
-                   
+
