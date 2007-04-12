@@ -9,6 +9,7 @@
 \alias{coerce,diagonalMatrix,matrix-method}
 \alias{coerce,diagonalMatrix,sparseMatrix-method}
 \alias{coerce,diagonalMatrix,CsparseMatrix-method}
+\alias{coerce,diagonalMatrix,TsparseMatrix-method}
 \alias{coerce,Matrix,diagonalMatrix-method}
 \alias{cbind2,sparseMatrix,diagonalMatrix-method}
 \alias{cbind2,diagonalMatrix,sparseMatrix-method}

@@ -43,7 +43,7 @@ setAs("ngTMatrix", "lgTMatrix",
 	  Dim = from@Dim, Dimnames= from@Dimnames))
 
 setAs("ngTMatrix", "ntTMatrix",
-      function(from) check.gt2tT(from, getClassDef("ngTMatrix")))
+      function(from) check.gT2tT(from, cl = "ngTMatrix", toClass = "ntTMatrix"))
 
 
 setMethod("t", signature(x = "ngTMatrix"),

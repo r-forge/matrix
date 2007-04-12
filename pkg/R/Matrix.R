@@ -124,6 +124,7 @@ Matrix <-
 	if(length(data) == 1 && is0(data) && !identical(sparse, FALSE)) {
             ## Matrix(0, ...) : always sparse unless "sparse = FALSE":
 	    if(is.null(sparse)) sparse1 <- sparse <- TRUE
+            i.M <- sM <- TRUE
 	    ## will be sparse: do NOT construct full matrix!
 	    data <- new(if(is.numeric(data)) "dgTMatrix" else
 			if(is.logical(data)) "lgTMatrix" else
@@ -183,7 +184,18 @@ Matrix <-
 		  }, sep="")
 	}
 
-    ## Now coerce and return
+    ## Can we coerce and be done?
+    if(!canCoerce(data,cl)) { ## try to coerce ``via'' virtual classes
+	if(sparse && !sM)
+	    data <- as(data, "sparseMatrix")
+	else if(!sparse && !is(data, "denseMatrix"))
+	    data <- as(data, "denseMatrix")
+	if(isTri && !is(data, "triangularMatrix"))
+	    data <- as(data, "triangularMatrix")
+	else if(isSym && !is(data, "symmetricMatrix"))
+	    data <- as(data, "symmetricMatrix")
+    }
+    ## now coerce in any case .. maybe producing sensible error message:
     as(data, cl)
 }
 
@@ -247,13 +259,15 @@ setMethod("tcrossprod", signature(x = "Matrix", y = "Matrix"),
 setMethod("kronecker", signature(X = "Matrix", Y = "ANY",
 				 FUN = "ANY", make.dimnames = "ANY"),
 	  function(X, Y, FUN, make.dimnames, ...) {
-	      warning("potentially slow kronecker() method")
+	      if(is(X, "sparseMatrix"))
+		  warning("using slow kronecker() method")
 	      X <- as(X, "matrix") ; Matrix(callGeneric()) })
 
 setMethod("kronecker", signature(X = "ANY", Y = "Matrix",
 				 FUN = "ANY", make.dimnames = "ANY"),
 	  function(X, Y, FUN, make.dimnames, ...) {
-	      warning("potentially slow kronecker() method")
+	      if(is(Y, "sparseMatrix"))
+		  warning("using slow kronecker() method")
 	      Y <- as(Y, "matrix") ; Matrix(callGeneric()) })
 
 
