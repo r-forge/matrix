@@ -76,8 +76,6 @@
 \alias{solve,Matrix,missing-method}
 \alias{solve,Matrix,numeric-method}
 \alias{crossprod,ANY,Matrix-method}
-\alias{kronecker,ANY,Matrix-method}
-\alias{kronecker,Matrix,ANY-method}
 %
 \title{Virtual Class "Matrix" Class of Matrices}
 \description{
@@ -150,6 +148,8 @@
   the classes \code{\linkS4class{dgeMatrix}},
   \code{\linkS4class{dgCMatrix}}, and function
   \code{\link{Matrix}} for construction (and examples).
+
+  Methods, e.g., for \code{\link[kronecker-methods]{kronecker}}.
 }
 \examples{
 slotNames("Matrix")

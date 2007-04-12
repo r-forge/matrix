@@ -59,10 +59,12 @@ Atr <- new("dtrMatrix", Dim = A@Dim, x = A@x, uplo = "U")
 all.equal((Atr %*% solve(Atr, y))@x, y)
 
 ## sparse matrix products
-
+## ------
 ## solve() for dtC*
-m <- round(chol(crossprod(A)), 2)
-m <- kronecker(Diagonal(2), m)
+mc <- round(chol(crossprod(A)), 2)
+m <- kronecker(Diagonal(2), mc)
+stopifnot(is(mc, "Cholesky"),
+	  is(m, "sparseMatrix"))
 im <- solve(m)
 round(im, 3)
 itm <- solve(t(m))
@@ -74,8 +76,8 @@ I <- Diagonal(nrow(m))
 	  mean(abs(as.numeric(im  - t(itm)))),
 	  mean(abs(as.numeric( m  - iim))),
 	  mean(abs(as.numeric(t(m)- iitm)))))
-stopifnot(is(m, "dtCMatrix"), is(im, "dtCMatrix"),
-	  is(itm, "dtCMatrix"), is(iitm, "dtCMatrix"),
+stopifnot(is(m, "triangularMatrix"), is(m, "sparseMatrix"),
+          is(im, "dtCMatrix"), is(itm, "dtCMatrix"), is(iitm, "dtCMatrix"),
 	  del < 1e-15)
 
 
@@ -147,6 +149,8 @@ stopifnot(all.equal(as.mat(v),
 
 
 ###--- "logical" Matrices : ---------------------
+
+##__ FIXME __ now works for lsparse* and nsparse* but not yet for  lge* and nge* !
 
 ## Robert's Example, a bit more readable
 fromTo <- rbind(c(2,10),

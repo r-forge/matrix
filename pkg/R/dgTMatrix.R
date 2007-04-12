@@ -35,18 +35,22 @@ setAs("dgTMatrix", "dsTMatrix",
 	  else stop("not a symmetric matrix")})
 
 setAs("dgTMatrix", "dtTMatrix",
-      function(from) check.gt2tT(from, getClassDef("dgTMatrix")))
+      function(from) check.gT2tT(from, cl = "dgTMatrix", toClass = "dtTMatrix",
+				 cld = getClassDef("dgTMatrix")))
+setAs("dgTMatrix", "triangularMatrix",
+      function(from) check.gT2tT(from, cl = "dgTMatrix", toClass = "dtTMatrix",
+				 cld = getClassDef("dgTMatrix")))
 
-setAs("matrix", "dgTMatrix",
-      function(from) {
-	  x <- as.double(from)
-	  nz <- as.logical(x)
-	  new("dgTMatrix", Dim = dim(from),
-	      i = row(from)[nz] - 1:1,
-	      j = col(from)[nz] - 1:1,
-	      x = x[nz])
-      })
+mat2dgT <- function(from) {
+    x <- as.double(from)
+    nz <- isN0(x)
+    new("dgTMatrix", Dim = dim(from),
+        i = row(from)[nz] - 1:1,
+        j = col(from)[nz] - 1:1,
+        x = x[nz])
+}
 
+setAs("matrix", "dgTMatrix", mat2dgT)
 
 
 ## "[" methods are now in ./Tsparse.R

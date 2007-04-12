@@ -1,5 +1,5 @@
 
-R version 2.4.1 Patched (2007-03-15 r40854)
+R version 2.5.0 beta (2007-04-11 r41127)
 Copyright (C) 2007 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -660,13 +660,14 @@ Ambiguous method selection for "-", target "dgTMatrix#dgTMatrix" (the first of t
 > 
 > ## an example that failed for a long time
 > sy3 <- new("dsyMatrix", Dim = as.integer(c(2, 2)), x = c(14, -1, 2, -7))
-> validObject(dm <- kronecker(Diagonal(2), sy3))
-Warning message:
-Ambiguous method selection for "kronecker", target "ddiMatrix#dsyMatrix" (the first of the signatures shown will be used)
-    Matrix#ANY
-    ANY#Matrix
- in: .findInheritedMethods(classes, fdef, mtable) 
+> validObject(dm <- kronecker(Diagonal(2), sy3))# now sparse with new kronecker
 [1] TRUE
+Warning message:
+Ambiguous method selection for "kronecker", target "dtTMatrix#dsTMatrix" (the first of the signatures shown will be used)
+    TsparseMatrix#TsparseMatrix
+    dsparseMatrix#dsparseMatrix
+ in: .findInheritedMethods(classes, fdef, mtable) 
+> dm <- Matrix(as.matrix(dm))# -> "dsyMatrix"
 > (s2 <- as(dm, "sparseMatrix"))
 4 x 4 sparse Matrix of class "dsCMatrix"
                 
@@ -782,5 +783,5 @@ Ambiguous method selection for "!=", target "numeric#dgCMatrix" (the first of th
 + 	  )
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
-Time elapsed:  7.232 0.148 8.247 0 0 
+Time elapsed:  6.151 0.169 7.108 0 0 
 > 

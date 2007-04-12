@@ -1,10 +1,11 @@
 #### "TsparseMatrix" : Virtual class of sparse matrices in triplet-format
 
-## These should be "catch all", going via Csparse
+## more efficient than going via Csparse:
 setAs("matrix", "TsparseMatrix",
-      function(from) as(as(from, "CsparseMatrix"), "TsparseMatrix"))
-setAs("Matrix", "TsparseMatrix",
-      function(from) as(as(from, "CsparseMatrix"), "TsparseMatrix"))
+      function(from)
+      if(is.numeric(from)) mat2dgT(from)
+      else if(is.logical(from)) as(Matrix(from, sparse=TRUE), "TsparseMatrix")
+      else stop("not-yet-implemented coercion to \"TsparseMatrix\""))
 
 ## in ../src/Tsparse.c :  |-> cholmod_T -> cholmod_C -> chm_sparse_to_SEXP
 ## adjusted for triangular matrices not represented in cholmod
@@ -12,6 +13,43 @@ setAs("Matrix", "TsparseMatrix",
 			       is(from, "triangularMatrix"))
 
 setAs("TsparseMatrix", "CsparseMatrix", .T.2.C)
+
+.T.2.n <- function(from) {
+    if(is(from, "triangularMatrix")) # i.e. ?tTMatrix
+	new("ntTMatrix", i = from@i, j = from@j,
+	    uplo = from@uplo, diag = from@diag,
+	    Dim = from@Dim, Dimnames = from@Dimnames)
+    else if(is(from, "symmetricMatrix")) # i.e. ?sTMatrix
+	new("nsTMatrix", i = from@i, j = from@j, uplo = from@uplo,
+	    Dim = from@Dim, Dimnames = from@Dimnames)
+    else
+	new("ngTMatrix", i = from@i, j = from@j,
+	    Dim = from@Dim, Dimnames = from@Dimnames)
+}
+
+setAs("TsparseMatrix", "nsparseMatrix", .T.2.n)
+setAs("TsparseMatrix", "nMatrix", .T.2.n)
+
+.T.2.l <- function(from) {
+    cld <- getClassDef(class(from))
+    xx <- if(extends(cld, "nMatrix"))
+	rep.int(TRUE, length(from@i)) else as.logical(from@x)
+    if(extends(cld, "triangularMatrix")) # i.e. ?tTMatrix
+	new("ltTMatrix", i = from@i, j = from@j, x = xx,
+	    uplo = from@uplo, diag = from@diag,
+	    Dim = from@Dim, Dimnames = from@Dimnames)
+    else if(extends(cld, "symmetricMatrix")) # i.e. ?sTMatrix
+	new("lsTMatrix", i = from@i, j = from@j, x = xx, uplo = from@uplo,
+	    Dim = from@Dim, Dimnames = from@Dimnames)
+    else
+	new("lgTMatrix", i = from@i, j = from@j, x = xx,
+	    Dim = from@Dim, Dimnames = from@Dimnames)
+}
+
+setAs("TsparseMatrix", "lsparseMatrix", .T.2.l)
+setAs("TsparseMatrix", "lMatrix", .T.2.l)
+
+
 
 ## Special cases   ("d", "l", "n")  %o%  ("g", "s", "t") :
 ## used e.g. in triu()
@@ -253,7 +291,7 @@ setMethod("[", signature(x = "TsparseMatrix",
 	      (if(x@uplo == "U") ip1$m <= ip2$m else ip2$m <= ip1$m)
 	  }
 
-	  if(ip1$anyDup || ip2$anyDup)
+	  if(ip1$anyDup || ip2$anyDup) # cannot use logical
 	      sel <- which(sel)
 
 	  x@i <- ip1$m[sel] - 1:1
@@ -265,7 +303,8 @@ setMethod("[", signature(x = "TsparseMatrix",
 	  if(ip2$anyDup) { ## duplicated columns selected: extend sel
 	      x@j <- c(x@j, ip2$i.xtra)
 	      sel <- c(sel, ip2$jj)
-	      ## must extend  x@i as well - is this ok?
+	      ## must extend  x@i as well - is this ok? -- no, it's not!
+              ## BTW: SparseM also jumps through horrible hoops in this case ...
 	      x@i <- c(x@i, ip1$m[ip2$jj] - 1:1)
 	    warning("selecting duplicated columns after rows -- not yet fully implemented")
           }
@@ -652,6 +691,11 @@ setMethod("%*%", signature(x = "ANY", y = "TsparseMatrix"),
 ## Not yet.  Don't have methods for y = "CsparseMatrix" and general x
 #setMethod("%*%", signature(x = "ANY", y = "TsparseMatrix"),
 #          function(x, y) callGeneric(x, as(y, "CsparseMatrix")))
+
+setMethod("solve", signature(a = "TsparseMatrix", b = "ANY"),
+	  function(a, b) solve(as(a, "CsparseMatrix"), b))
+setMethod("solve", signature(a = "TsparseMatrix", b = "missing"),
+	  function(a, b) solve(as(a, "CsparseMatrix")))
 
 ## Not needed, have identical "sparseMatrix"
 ## setMethod("colSums", signature(x = "TsparseMatrix"), .as.dgT.Fun,

@@ -297,8 +297,8 @@ tstMatrixClass <-
                             i0 <- if(m@uplo == "L")
                                 upper.tri(mm.) else lower.tri(mm.)
                             mm.[i0] <- 0
-                            cat.("as(matrix, <class>): ")
-                            m3 <- as(mm., clNam)
+			    cat.("as(triang.matrix, <class>): ")
+			    m3 <- as(mm., clNam)
                             cat("valid:", validObject(m3), "\n")
                         }
                         else { ## diagonal (only one)?

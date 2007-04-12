@@ -468,7 +468,28 @@ n2l_spMatrix <- function(from) {
         Dim = from@Dim, Dimnames = from@Dimnames)
 }
 
-gt2tT <- function(x, uplo, diag, cld = getClassDef(class(x))) {
+tT2gT <- function(x, cl = class(x),
+                  toClass = paste(substr(cl,1,1), "tTMatrix", sep=''),# "d" | "l"|"i"|"z"
+                  cld = getClassDef(cl)) {
+    ## coerce *tTMatrix to *gTMatrix {triangular -> general}
+    d <- x@Dim
+    if(uDiag <- x@diag == "U")	     # unit diagonal, need to add '1's
+	uDiag <- (n <- d[1]) > 0
+    if(extends(cld, "nMatrix")) # no 'x' slot
+	new("ngTMatrix", Dim = d, Dimnames = x@Dimnames,
+	    i = c(x@i, if(uDiag) 0:(n-1)),
+	    j = c(x@j, if(uDiag) 0:(n-1)))
+    else
+	new(toClass, Dim = d, Dimnames = x@Dimnames,
+	    i = c(x@i, if(uDiag) 0:(n-1)),
+	    j = c(x@j, if(uDiag) 0:(n-1)),
+	    x = c(x@x, if(uDiag) rep.int(1,n)))
+}
+
+gT2tT <- function(x, uplo, diag,
+		  cl = class(x),
+		  toClass = paste(substr(cl,1,1), "tTMatrix", sep=''),# d,l,i,z
+		  cld = getClassDef(cl)) {
     ## coerce *gTMatrix to *tTMatrix {general -> triangular}
     i <- x@i
     j <- x@j
@@ -484,18 +505,19 @@ gt2tT <- function(x, uplo, diag, cld = getClassDef(class(x))) {
 	new("ntTMatrix", i = i, j = j, uplo = uplo, diag = diag,
 	    Dim = x@Dim, Dimnames = x@Dimnames)
     else
-	new(paste(substr(class(x), 1,1), # "d", "l", "i" or "z"
-		  "tTMatrix", sep=''),
-	    i = i, j = j, uplo = uplo, diag = diag,
+	new(toClass, i = i, j = j, uplo = uplo, diag = diag,
 	    x = x@x[sel], Dim = x@Dim, Dimnames = x@Dimnames)
 }
 
-check.gt2tT <- function(from, cld = getClassDef(from)) {
-    if(isTr <- isTriangular(from))
-	gt2tT(from, uplo = .if.NULL(attr(isTr, "kind"), "U"),
+check.gT2tT <- function(from, cl = class(from),
+			toClass = paste(substr(cl,1,1), "tTMatrix", sep=''),# d,l,i,z
+			cld = getClassDef(cl)) {
+    if(isTr <- isTriangular(from)) {
+        force(cl)
+	gT2tT(from, uplo = .if.NULL(attr(isTr, "kind"), "U"),
 	      diag = "N", ## improve: also test for unit diagonal
-	      cld = cld)
-    else stop("not a triangular matrix")
+	      cl = cl, toClass = toClass, cld = cld)
+    } else stop("not a triangular matrix")
 }
 
 if(FALSE)# unused

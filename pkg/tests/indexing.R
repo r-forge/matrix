@@ -287,7 +287,8 @@ Hc.[, 1:6]
 
 ## an example that failed for a long time
 sy3 <- new("dsyMatrix", Dim = as.integer(c(2, 2)), x = c(14, -1, 2, -7))
-validObject(dm <- kronecker(Diagonal(2), sy3))
+validObject(dm <- kronecker(Diagonal(2), sy3))# now sparse with new kronecker
+dm <- Matrix(as.matrix(dm))# -> "dsyMatrix"
 (s2 <- as(dm, "sparseMatrix"))
 validObject(st <- as(s2, "TsparseMatrix"))
 stopifnot(is(s2, "symmetricMatrix"),
