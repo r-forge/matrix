@@ -176,8 +176,9 @@ tstMatrixClass <-
             if(!(genC || symC || triC || diaC))
                 stop("does not extend one of 'general', 'symmetric', 'triangular', or 'diagonal'")
 	    cat("; new(..): ")
-	    m <- new(clNam)
+	    m <- new(clNam) ; cat("ok; ")
 	    if(canCoerce(mm, clNam)) { ## replace 'm' by `non-empty' version
+		cat("canCoerce() ")
                 m0 <- if(triC) trm else mm
 		if(extends(clNam, "lMatrix") ||
 		   extends(clNam, "nMatrix"))
