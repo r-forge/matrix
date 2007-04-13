@@ -62,9 +62,10 @@ M <- Matrix(10 + 1:28, 4, 7)
 M
 tM <- t(M)
 @ %def
-Such a matrix can be appended to or indexed,
+Such a matrix can be appended to (using \Rfun{cBind} or \Rfun{rBind}
+with capital ``B'') or indexed,
 <<ex2>>=
-(M2 <- cbind(-1, M))
+(M2 <- cBind(-1, M))
 M[2, 1]
 M[4, ]
 @
@@ -78,7 +79,7 @@ We assign 0 to some columns and rows to ``sparsify'' it,
 <<set0>>=
 M2[, c(2,4:6)] <- 0
 M2[2, ] <- 0
-M2 <- rbind(0, M2, 0)
+M2 <- rBind(0, M2, 0)
 @
 and then coerce it to a sparse matrix,
 @
