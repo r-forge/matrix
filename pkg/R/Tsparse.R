@@ -86,31 +86,25 @@ setAs("ntTMatrix", "ntCMatrix",
 ### "[" :
 ### -----
 
-## Want to allow 'numeric', 'logical' and 'character' indices
-
 ## Test for numeric/logical/character
 ## method-*internally* ; this is not strictly OO, but allows to use
 ## the following utility and hence much more compact code.
 
-## Otherwise have to write methods for all possible combinations of
-##  (i , j) \in
-##  (numeric, logical, character, missing) x (numeric, log., char., miss.)
-
-.ind.prep <- function(xi, i, margin, di, dn)
+intI <- function(i, n, dn, give.dn = TRUE)
 {
-    ## Purpose: do the ``common things'' for "*gTMatrix" indexing
-    ##		for 1 dimension, 'margin' ,
-    ##          and return match(.,.) + li = length of corresponding dimension
-    ##
-    ## i is "index";  xi = "x@i";  margin in {1,2};
-    ## di = dim(x)      { used when i is not character }
-    ## dn = dimnames(x) { used when i is character }
+    ## Purpose: translate numeric | logical | character index
+    ##		into 0-based integer
+    ## ----------------------------------------------------------------------
+    ## Arguments: i: index vector (numeric | logical | character)
+    ##		  n: array extent                   { ==  dim(.) [margin] }
+    ##		 dn: character col/rownames or NULL { == dimnames(.)[[margin]] }
+    ## ----------------------------------------------------------------------
+    ## Author: Martin Maechler, Date: 23 Apr 2007
 
-    dn <- dn[[margin]]
     has.dn <- is.character(dn)
+    DN <- has.dn && give.dn
     if(is(i, "numeric")) {
 	storage.mode(i) <- "integer"
-        n <- di[margin]
 	if(any(i < 0:0)) {
 	    if(any(i > 0:0))
 		stop("you cannot mix negative and positive indices")
@@ -119,24 +113,40 @@ setAs("ntTMatrix", "ntCMatrix",
 	    if(length(i) && max(i) > n)
 		stop("indexing out of range 0:",n)
 	    if(any(z <- i == 0)) i <- i[!z]
-	    i0 <- i - 1:1 # transform to 0-indexing
+	    i0 <- i - 1:1		# transform to 0-indexing
 	}
-	if(has.dn) dn <- dn[i]
+	if(DN) dn <- dn[i]
     }
     else if (is(i, "logical")) {
-	i0 <- (0:(di[margin]-1:1))[i]
-	if(has.dn) dn <- dn[i]
+	i0 <- (0:(n - 1:1))[i]
+	if(DN) dn <- dn[i]
     } else { ## character
 	if(!has.dn)
-	    stop(gettextf("no 'dimnames[[%d]]': cannot use character indexing"),
-		 margin, domain = NA)
+	    stop("no 'dimnames[[.]]': cannot use character indexing")
 	i0 <- match(i, dn)
 	if(any(is.na(i0))) stop("invalid character indexing")
-	dn <- dn[i0]
+	if(DN) dn <- dn[i0]
 	i0 <- i0 - 1:1
     }
+    if(!give.dn) i0 else list(i0 = i0, dn = dn)
+}
+
+## Otherwise have to write methods for all possible combinations of
+##  (i , j) \in
+##  (numeric, logical, character, missing) x (numeric, log., char., miss.)
+
+.ind.prep <- function(xi, intIlist, iDup = duplicated(i0), anyDup = any(iDup))
+{
+    ## Purpose: do the ``common things'' for "*gTMatrix" indexing for 1 dim.
+    ##          and return match(.,.) + li = length of corresponding dimension
+    ##
+    ## xi = "x@i" ; intIlist = intI(i, dim(x)[margin], ....)
+
+    i0 <- intIlist$i0
+    stopifnot(is.numeric(i0))# cheap fast check (i0 may have length 0 !)
+
     m <- match(xi, i0, nomatch=0)
-    if(anyDup <- any(iDup <- duplicated(i0))) {
+    if(anyDup) { # assuming   anyDup <- any(iDup <- duplicated(i0))
 	i0m <- match(i0[iDup], i0)
 	jj <- lapply(i0m, function(.)
 		     which(match(m, ., nomatch=0) > 0))
@@ -144,8 +154,8 @@ setAs("ntTMatrix", "ntCMatrix",
     }
 
     c(list(m = m, li = length(i0),
-	   i0 = i0, anyDup = anyDup, dn = dn),
-      ## actually,  iDup  is not neeeded
+	   i0 = i0, anyDup = anyDup, dn = intIlist$dn),
+      ## actually,  iDup  is rarely needed in calling code
       if(anyDup) list(iDup = iDup, jj = unlist(jj), i.xtra = i.xtra))
 }
 
@@ -159,32 +169,8 @@ setAs("ntTMatrix", "ntCMatrix",
     ## di = dim(x)      { used when i is not character }
 
     ## difference to .ind.prep(): use 1-indices; no match(xi,..), no dn at end
-    dn <- dn[[margin]]
-    has.dn <- is.character(dn)
-    if(is(i, "numeric")) {
-        storage.mode(i) <- "integer"
-        n <- di[margin]
-	if(any(i < 0:0)) {
-	    if(any(i > 0:0))
-		stop("you cannot mix negative and positive indices")
-	    i0 <- seq_len(n)[i]
-	} else	{
-	    if(length(i) && max(i) > n)
-		stop("indexing out of range 0:",n)
-	    if(any(z <- i == 0)) i <- i[!z]
-	    i0 <- i
-	}
-    }
-    else if (is(i, "logical")) {
-        i0 <- seq_len(di[margin])[i]
-    } else { ## character
-        if(!has.dn)
-            stop(gettextf("no 'dimnames[[%d]]': cannot use character indexing"),
-                 margin, domain = NA)
-        i0 <- match(i, dn)
-        if(any(is.na(i0))) stop("invalid character indexing")
-    }
-    i0 - 1:1  # transform to 0-indexing
+
+    intI(i, n = di[margin], dn = dn[[margin]], give.dn = FALSE)
 }
 
 
@@ -200,7 +186,7 @@ setMethod("[", signature(x = "TsparseMatrix", i = "index", j = "missing",
 	      if(gDo)
 		  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
 
-	      ip <- .ind.prep(x@i, i, 1, dim(x), dimnames(x))
+	      ip <- .ind.prep(x@i, intI(i, n = dim(x)[1], dimnames(x)[[1]]))
 	      Di1 <- ip$li
 	      drop.it <- drop && (Di1 == 1:1 || x@Dim[2] == 1:1)
 	      if(x.tri && !drop.it && !gDo) # triangular, result not
@@ -231,7 +217,7 @@ setMethod("[", signature(x = "TsparseMatrix", i = "missing", j = "index",
 	      if(gDo)
 		  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
 
-	      ip <- .ind.prep(x@j, j, 2, dim(x), dimnames(x))
+	      ip <- .ind.prep(x@j, intI(j, n = dim(x)[2], dimnames(x)[[2]]))
 	      Di2 <- ip$li
 	      drop.it <- drop && (x@Dim[1] == 1:1 || Di2 == 1:1)
 	      if(x.tri && !drop.it && !gDo) # triangular, result not
@@ -265,7 +251,7 @@ setMethod("[", signature(x = "TsparseMatrix",
 	  isSym <- extends(clx, "symmetricMatrix")
 
 	  if(isSym) {
-	      isSym <- length(i) == length(j) && all(i == j)
+	      isSym <- length(i) == length(j) && mode(i) == mode(j) && all(i == j)
 	      ## result will *still* be symmetric --> keep symmetry!
 	      if(!isSym)
 		  ## result no longer symmetric -> to "generalMatrix"
@@ -273,43 +259,84 @@ setMethod("[", signature(x = "TsparseMatrix",
 	  } else if(extends(clx, "triangularMatrix") && x@diag == "U") {
                   x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
           }
-	  if(isSym) {
-	      offD <- x@i != x@j
-	      ip1 <- .ind.prep(c(x@i,x@j[offD]), i, 1, di, dn)
-	      ip2 <- .ind.prep(c(x@j,x@i[offD]), j, 2, di, dn)
+	  if(isSym) { # has only stored "half" of the indices,
+              ## OTOH,  i === j, so only need one intI() call
+              ilis <- intI(i, n=di[1], dn[[1]]) # -> (i0, dn_1)
+              anyDup <- any(iDup <- duplicated(ilis$i0))
+	      ip1 <- .ind.prep(x@i, ilis, iDup=iDup, anyDup=anyDup)
+	      ip2 <- .ind.prep(x@j, ilis, iDup=iDup, anyDup=anyDup)
+              if(!is.null(dn[[2]])) # fix result colnames
+                  ip2$dn <- dn[[2]][ilis$i0]
+
 	  } else {
-	      ip1 <- .ind.prep(x@i, i, 1, di, dn)
-	      ip2 <- .ind.prep(x@j, j, 2, di, dn)
+	      ip1 <- .ind.prep(x@i, intI(i, n = di[1], dn= dn[[1]]))
+	      ip2 <- .ind.prep(x@j, intI(j, n = di[2], dn= dn[[2]]))
 	  }
-	  nd <- c(ip1$li, ip2$li)
-	  drop.it <- drop && any(nd == 1)
-	  x@Dim <- nd
-	  x@Dimnames <- list(ip1$dn, ip2$dn)
-	  sel <- ip1$m > 0:0  &	 ip2$m > 0:0
-	  if(isSym) { # only those corresponding to upper/lower triangle
-	      sel <- sel &
-	      (if(x@uplo == "U") ip1$m <= ip2$m else ip2$m <= ip1$m)
-	  }
+          nd <- c(ip1$li, ip2$li)
+          x@Dim <- nd
+          x@Dimnames <- list(ip1$dn, ip2$dn)
 
-	  if(ip1$anyDup || ip2$anyDup) # cannot use logical
-	      sel <- which(sel)
+	  if(isSym) {
+              if(anyDup) {
 
-	  x@i <- ip1$m[sel] - 1:1
-	  if(ip1$anyDup) { ## duplicated rows selected: extend sel
-	      x@i <- c(ip1$m[sel] - 1:1, ip1$i.xtra)
-	      sel <- c(sel, ip1$jj)
+                  s1 <- ip1$m > 0
+                  s2 <- ip2$m > 0
+                  ii <- c(ip1$m[s1] - 1:1, ip1$i.xtra)
+                  jj <- c(ip2$m[s2] - 1:1, ip2$i.xtra)
+                  sel1 <- c(which(s1), ip1$jj)
+                  sel2 <- c(which(s2), ip2$jj)
+
+
+              } else { ## not any Dup
+                  sel <- ip1$m > 0:0  &  ip2$m > 0:0
+                  ii <- ip1$m[sel] - 1:1
+                  jj <- ip2$m[sel] - 1:1
+                  if(x@uplo == "U") { ## i <= j : upper triangle
+                      x@i <- pmin(ii, jj)
+                      x@j <- pmax(ii, jj)
+                  } else { ## i >= j : lower left triangle
+                      x@i <- pmax(ii, jj)
+                      x@j <- pmin(ii, jj)
+                  }
+              }
 	  }
-	  x@j <- ip2$m[sel] - 1:1
-	  if(ip2$anyDup) { ## duplicated columns selected: extend sel
-	      x@j <- c(x@j, ip2$i.xtra)
-	      sel <- c(sel, ip2$jj)
-	      ## must extend  x@i as well - is this ok? -- no, it's not!
-              ## BTW: SparseM also jumps through horrible hoops in this case ...
-	      x@i <- c(x@i, ip1$m[ip2$jj] - 1:1)
-	    warning("selecting duplicated columns after rows -- not yet fully implemented")
-          }
+	  else if(!ip1$anyDup && !ip2$anyDup) {
+
+	      sel <- ip1$m > 0:0  &  ip2$m > 0:0
+	      x@i <- ip1$m[sel] - 1:1
+	      x@j <- ip2$m[sel] - 1:1
+	  }
+	  else { ## not Sym   &&  (ip1$anyDup || ip2$anyDup) :
+	      ## duplicated rows or columns -- currently the cheap solution:
+
+	      ## Basically  implement  X[i,j] as  X[i,] [,j] : __FIXME__
+	      ## FIXME: we are recomputing ip2 here
+
+
+	      ## - i - ------------------------------
+	      sel <- ip1$m > 0
+	      x@i <- ip1$m[sel] - 1:1
+	      if(ip1$anyDup) { ## duplicated rows selected: extend sel
+		  sel <- c(which(sel), ip1$jj)
+		  x@i <- c(x@i, ip1$i.xtra)
+	      }
+	      x@j <- x@j[sel]
+	      if (has.x) x@x <- x@x[sel]
+
+	      ## - j - ------------------------------
+	      ip2 <- .ind.prep(x@j, intI(j, n = di[2], dn = dn[[2]]))
+	      sel <- ip2$m > 0
+	      x@j <- ip2$m[sel] - 1:1
+	      if(ip2$anyDup) { ## duplicated columns selected: extend sel
+		  sel <- c(which(sel), ip2$jj)
+		  x@j <- c(x@j, ip2$i.xtra)
+	      }
+	      x@i <- x@i[sel]
+	  }
 	  if (has.x)
-	      x@x <- c(x@x, if(isSym) x@x[offD])[sel]
+	      x@x <- x@x[sel]
+
+          drop.it <- drop && any(nd == 1)
 	  if (drop.it) drop(as(x,"matrix")) else x
       })
 
@@ -336,11 +363,11 @@ setMethod("[", signature(x = "TsparseMatrix",
 
 	  if(isSym) {
 	      offD <- x@i != x@j
-	      ip1 <- .ind.prep(c(x@i,x@j[offD]), i, 1, di, dn)
-	      ip2 <- .ind.prep(c(x@j,x@i[offD]), j, 2, di, dn)
+	      ip1 <- .ind.prep(c(x@i,x@j[offD]), intI(i, n= di[1], dn=dn[[1]]))
+	      ip2 <- .ind.prep(c(x@j,x@i[offD]), intI(j, n= di[2], dn=dn[[2]]))
 	  } else {
-	      ip1 <- .ind.prep(x@i, i, 1, di, dn)
-	      ip2 <- .ind.prep(x@j, j, 2, di, dn)
+	      ip1 <- .ind.prep(x@i, intI(i, n = di[1], dn = dn[[1]]))
+	      ip2 <- .ind.prep(x@j, intI(j, n = di[2], dn = dn[[2]]))
 	  }
 
           stop("FIXME: NOT YET FINISHED IMPLEMENTATION")

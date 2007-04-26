@@ -87,8 +87,25 @@ i <- rep(8:10,2)
 j <- c(2:4, 4:3)
 assert.EQ.mat(mC[i,], mm[i,])
 assert.EQ.mat(mC[,j], mm[,j])
-if(FALSE) ## FIXME
+assert.EQ.mat(mC[i, 2:1], mm[i, 2:1])
+assert.EQ.mat(mC[c(4,1), j], mm[c(4,1), j])
 assert.EQ.mat(mC[i,j], mm[i,j])
+set.seed(7)
+for(n in 1:50) {
+    i <- sample(sample(nrow(mC), 7), 20, replace = TRUE)
+    j <- sample(sample(ncol(mC), 6), 17, replace = TRUE)
+    assert.EQ.mat(mC[i,j], mm[i,j])
+}
+## symmetric index of symmetric matrix 000 not yet  ok
+m. <- mC; m.[, c(2, 7:12)] <- 0
+validObject(S <- crossprod(m.) %% 100)
+ss <- as(S, "matrix")
+T <- as(S, "TsparseMatrix")
+i <- c(4:2,7) ;  assert.EQ.mat(T[i,i], ss[i,i])
+i <- c(7:5, 2:4);assert.EQ.mat(T[i,i], ss[i,i])
+if(FALSE) ## FIXME
+assert.EQ.mat(T[j,j], ss[j,j])
+
 
 stopifnot(all.equal(mC[,3], mm[,3]),
 	  identical(mC[ij], mm[ij]))
