@@ -1,5 +1,5 @@
 
-R version 2.5.0 beta (2007-04-11 r41127)
+R version 2.5.0 RC (2007-04-17 r41208)
 Copyright (C) 2007 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -177,8 +177,26 @@ Formal class 'dgTMatrix' [package "Matrix"] with 6 slots
 > j <- c(2:4, 4:3)
 > assert.EQ.mat(mC[i,], mm[i,])
 > assert.EQ.mat(mC[,j], mm[,j])
+> assert.EQ.mat(mC[i, 2:1], mm[i, 2:1])
+> assert.EQ.mat(mC[c(4,1), j], mm[c(4,1), j])
+> assert.EQ.mat(mC[i,j], mm[i,j])
+> set.seed(7)
+> for(n in 1:50) {
++     i <- sample(sample(nrow(mC), 7), 20, replace = TRUE)
++     j <- sample(sample(ncol(mC), 6), 17, replace = TRUE)
++     assert.EQ.mat(mC[i,j], mm[i,j])
++ }
+> ## symmetric index of symmetric matrix 000 not yet  ok
+> m. <- mC; m.[, c(2, 7:12)] <- 0
+> validObject(S <- crossprod(m.) %% 100)
+[1] TRUE
+> ss <- as(S, "matrix")
+> T <- as(S, "TsparseMatrix")
+> i <- c(4:2,7) ;  assert.EQ.mat(T[i,i], ss[i,i])
+> i <- c(7:5, 2:4);assert.EQ.mat(T[i,i], ss[i,i])
 > if(FALSE) ## FIXME
-+ assert.EQ.mat(mC[i,j], mm[i,j])
++ assert.EQ.mat(T[j,j], ss[j,j])
+> 
 > 
 > stopifnot(all.equal(mC[,3], mm[,3]),
 + 	  identical(mC[ij], mm[ij]))
@@ -783,5 +801,5 @@ Ambiguous method selection for "!=", target "numeric#dgCMatrix" (the first of th
 + 	  )
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
-Time elapsed:  6.151 0.169 7.108 0 0 
+Time elapsed:  11.792 0.108 12.138 0 0 
 > 

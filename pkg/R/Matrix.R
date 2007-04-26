@@ -320,6 +320,13 @@ setMethod("diff", signature(x = "Matrix"),
 	      x
 	  })
 
+setMethod("image", "Matrix",
+	  function(x, ...) { # coercing to sparse is not inefficient,
+	      ##	       since we need 'i' and 'j' for levelplot()
+	      x <- as(as(x, "sparseMatrix"), "dMatrix")
+	      callGeneric()
+	  })
+
 
 ## Group Methods
 

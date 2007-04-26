@@ -1,10 +1,26 @@
+2007-04-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Tsparse.R (intI): new utility, used for "[" :
+		Cleanup up there, and fixes for duplicated indices - more TODO!
+
+	* tests/indexing.R(out): more tests
+
 2007-04-25  Douglas Bates  <bates@stat.wisc.edu>
 
 	* DESCRIPTION,src/Makefile: require R>= 2.5.0 and remove Lapack
 	code that is now part of the R Lapack library.
-	
+
 	* src/init.c,inst/include/{Matrix_stubs.c,cholmod.h}:export
 	cholmod_factorize_p (used in lme4 for GLMMs and NLMMs).
+
+2007-04-21  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R (image): method for all Matrices, not just sparse ones.
+
+2007-04-17  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (tapply1): unname(.) -> colSums() etc don't end
+	up with extraneous names '0'...'<n-1>'
 
 2007-04-12  Martin Maechler  <maechler@stat.math.ethz.ch>
 

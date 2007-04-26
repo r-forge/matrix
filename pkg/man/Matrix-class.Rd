@@ -71,6 +71,7 @@
 \alias{coerce,Matrix,denseMatrix-method}
 \alias{coerce,Matrix,CsparseMatrix-method}
 \alias{coerce,Matrix,sparseMatrix-method}
+\alias{image,Matrix-method}
 \alias{solve,Matrix,Matrix-method}
 \alias{solve,Matrix,matrix-method}
 \alias{solve,Matrix,missing-method}
@@ -112,6 +113,9 @@
       \code{prod(dim(x))} (and hence of mode \code{"double"}).}
     \item{show}{\code{signature(object = "Matrix")}: \code{\link{show}}
       method for \code{\link{print}}ing.}
+    \item{image}{\code{signature(object = "Matrix")}: draws an
+      \code{\link{image}} of the matrix entries, using
+      \code{\link[lattice]{levelplot}()} from package \pkg{lattice}.}
     \item{head}{\code{signature(object = "Matrix")}: return only the
       \emph{\dQuote{head}}, i.e., the first few rows.}
     \item{tail}{\code{signature(object = "Matrix")}: return only the
