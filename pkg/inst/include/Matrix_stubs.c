@@ -285,7 +285,7 @@ M_cholmod_factorize(cholmod_sparse *A, cholmod_factor *L,
 }
 
 int attribute_hidden
-M_cholmod_factorize_p(cholmod_sparse *A,, double *beta, int *fset,
+M_cholmod_factorize_p(cholmod_sparse *A, double *beta, int *fset,
 		      size_t fsize, cholmod_factor *L,
 		      cholmod_common *Common)
 {
