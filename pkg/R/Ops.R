@@ -526,6 +526,7 @@ setMethod("Compare", signature(e1="lsparseMatrix", e2="lsparseMatrix"),
 				       as(e2, "CsparseMatrix")))
 
 ## setMethod("Compare", signature(e1="lgTMatrix", e2="lgTMatrix"), ## coerce to Csparse
+
 ## 	  function(e1, e2) callGeneric(as(e1, "dgCMatrix"), as(e2, "dgCMatrix")))
 
 

@@ -27,7 +27,7 @@ if(FALSE)## "slow" R-level workaround
                "lgRMatrix", "lsRMatrix", "ltRMatrix",
                "ngRMatrix", "nsRMatrix", "ntRMatrix",
                "zgRMatrix", "zsRMatrix", "ztRMatrix")
-    icl <- match(cl, valid) - 1:1
+    icl <- match(cl, valid) - 1L
     if(is.na(icl)) stop("invalid class:", cl)
     Ccl <- sub("^(..)R","\\1C", cl)  # corresponding Csparse class name
     r <- new(Ccl)

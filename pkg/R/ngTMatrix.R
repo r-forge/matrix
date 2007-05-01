@@ -17,7 +17,7 @@ setAs("matrix", "ngTMatrix",
 	  stopifnot(is.logical(from))
 	  if(any(is.na(from)))
 	      warning("'NA's coerced to 'FALSE' in coercion to logical sparse")
-	  ij <- which(from, arr.ind = TRUE) - 1:1
+	  ij <- which(from, arr.ind = TRUE) - 1L
 	  if(length(ij) == 0) ij <- matrix(ij, 0, 2)
 	  new("ngTMatrix",
 	      i = ij[,1],
