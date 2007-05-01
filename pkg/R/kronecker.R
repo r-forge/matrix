@@ -72,7 +72,7 @@ setMethod("kronecker", signature(X = "dtTMatrix", Y = "dtTMatrix"),
 	      xx <- X@x
 	  } else { ## X@diag == "U"
 	      nx <- X@Dim[1] # triangular matrices are square
-	      ii <- seq_len(nx) - 1:1
+	      ii <- seq_len(nx) - 1L
 	      xi <- c(X@i, ii)
 	      xj <- c(X@j, ii)
 	      xx <- c(X@x, rep.int(1, nx))

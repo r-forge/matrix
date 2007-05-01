@@ -1,8 +1,7 @@
 #### "Namespace private" Auxiliaries  such as method functions
 #### (called from more than one place --> need to be defined early)
 
-.isR_24 <- (paste(R.version$major, R.version$minor, sep=".") >= "2.4")
-.isR_25 <- (paste(R.version$major, R.version$minor, sep=".") >= "2.5")
+.isR_26 <- (paste(R.version$major, R.version$minor, sep=".") >= "2.6")
 
 ## Need to consider NAs ;  "== 0" even works for logical & complex:
 is0  <- function(x) !is.na(x) & x == 0
@@ -158,9 +157,7 @@ prTriang <- function(x, digits = getOption("digits"),
 	cf[row(cf) > col(cf)] <- "."
     else
 	cf[row(cf) < col(cf)] <- "."
-    if(.isR_24)
-	 print(cf, quote = FALSE, right = right, max = maxp)
-    else print(cf, quote = FALSE, right = right)
+    print(cf, quote = FALSE, right = right, max = maxp)
     invisible(x)
 }
 
@@ -173,9 +170,7 @@ prMatrix <- function(x, digits = getOption("digits"),
 	if(is(x, "triangularMatrix"))
 	    prTriang(x, digits = digits, maxp = maxp)
 	else {
-	    if(.isR_24)
-		 print(as(x, "matrix"), digits = digits, max = maxp)
-	    else print(as(x, "matrix"), digits = digits)
+            print(as(x, "matrix"), digits = digits, max = maxp)
 	}
     }
     else { ## d[1] > maxp / d[2] >= nr :

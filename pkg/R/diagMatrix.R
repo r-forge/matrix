@@ -243,16 +243,6 @@ setMethod("chol", signature(x = "ddiMatrix"),# pivot = "ANY"
 ## chol(L) is L for logical diagonal:
 setMethod("chol", signature(x = "ldiMatrix"), function(x, pivot) x)
 
-setMethod("!", "ldiMatrix", function(e1) {
-    if(e1@diag == "N")
-	e1@x <- !e1@x
-    else { ## "U"
-	e1@diag <- "N"
-	e1@x <- rep.int(FALSE, e1@Dim[1])
-    }
-    e1
-})
-
 ## Basic Matrix Multiplication {many more to add}
 ##       ---------------------
 ## Note that "ldi" logical are treated as numeric

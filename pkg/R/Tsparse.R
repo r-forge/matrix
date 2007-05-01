@@ -108,17 +108,17 @@ intI <- function(i, n, dn, give.dn = TRUE)
 	if(any(i < 0:0)) {
 	    if(any(i > 0:0))
 		stop("you cannot mix negative and positive indices")
-	    i0 <- (0:(n - 1:1))[i]
+	    i0 <- (0:(n - 1L))[i]
 	} else {
 	    if(length(i) && max(i) > n)
 		stop("indexing out of range 0:",n)
 	    if(any(z <- i == 0)) i <- i[!z]
-	    i0 <- i - 1:1		# transform to 0-indexing
+	    i0 <- i - 1L		# transform to 0-indexing
 	}
 	if(DN) dn <- dn[i]
     }
     else if (is(i, "logical")) {
-	i0 <- (0:(n - 1:1))[i]
+	i0 <- (0:(n - 1L))[i]
 	if(DN) dn <- dn[i]
     } else { ## character
 	if(!has.dn)
@@ -126,7 +126,7 @@ intI <- function(i, n, dn, give.dn = TRUE)
 	i0 <- match(i, dn)
 	if(any(is.na(i0))) stop("invalid character indexing")
 	if(DN) dn <- dn[i0]
-	i0 <- i0 - 1:1
+	i0 <- i0 - 1L
     }
     if(!give.dn) i0 else list(i0 = i0, dn = dn)
 }
@@ -150,7 +150,7 @@ intI <- function(i, n, dn, give.dn = TRUE)
 	i0m <- match(i0[iDup], i0)
 	jj <- lapply(i0m, function(.)
 		     which(match(m, ., nomatch=0) > 0))
-	i.xtra <- rep.int(which(iDup)- 1:1, sapply(jj, length))
+	i.xtra <- rep.int(which(iDup)- 1L, sapply(jj, length))
     }
 
     c(list(m = m, li = length(i0),
@@ -188,14 +188,14 @@ setMethod("[", signature(x = "TsparseMatrix", i = "index", j = "missing",
 
 	      ip <- .ind.prep(x@i, intI(i, n = dim(x)[1], dimnames(x)[[1]]))
 	      Di1 <- ip$li
-	      drop.it <- drop && (Di1 == 1:1 || x@Dim[2] == 1:1)
+	      drop.it <- drop && (Di1 == 1L || x@Dim[2] == 1L)
 	      if(x.tri && !drop.it && !gDo) # triangular, result not
 		  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
 
 	      x@Dim[1] <- Di1
 	      if(!is.null(ip$dn)) x@Dimnames[[1]] <- ip$dn
 	      sel <- ip$m > 0
-	      x@i <- ip$m[sel] - 1:1
+	      x@i <- ip$m[sel] - 1L
               if(ip$anyDup) { ## duplicated rows selected: extend sel
                   sel <- c(which(sel), ip$jj)
                   x@i <- c(x@i, ip$i.xtra)
@@ -219,14 +219,14 @@ setMethod("[", signature(x = "TsparseMatrix", i = "missing", j = "index",
 
 	      ip <- .ind.prep(x@j, intI(j, n = dim(x)[2], dimnames(x)[[2]]))
 	      Di2 <- ip$li
-	      drop.it <- drop && (x@Dim[1] == 1:1 || Di2 == 1:1)
+	      drop.it <- drop && (x@Dim[1] == 1L || Di2 == 1L)
 	      if(x.tri && !drop.it && !gDo) # triangular, result not
 		  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
 
 	      x@Dim[2] <- Di2
 	      if(!is.null(ip$dn)) x@Dimnames[[2]] <- ip$dn
 	      sel <- ip$m > 0
-	      x@j <- ip$m[sel] - 1:1
+	      x@j <- ip$m[sel] - 1L
 	      if(ip$anyDup) { ## duplicated columns selected: extend sel
 		  sel <- c(which(sel), ip$jj)
 		  x@j <- c(x@j, ip$i.xtra)
@@ -281,16 +281,16 @@ setMethod("[", signature(x = "TsparseMatrix",
 
                   s1 <- ip1$m > 0
                   s2 <- ip2$m > 0
-                  ii <- c(ip1$m[s1] - 1:1, ip1$i.xtra)
-                  jj <- c(ip2$m[s2] - 1:1, ip2$i.xtra)
+                  ii <- c(ip1$m[s1] - 1L, ip1$i.xtra)
+                  jj <- c(ip2$m[s2] - 1L, ip2$i.xtra)
                   sel1 <- c(which(s1), ip1$jj)
                   sel2 <- c(which(s2), ip2$jj)
 
 
               } else { ## not any Dup
                   sel <- ip1$m > 0:0  &  ip2$m > 0:0
-                  ii <- ip1$m[sel] - 1:1
-                  jj <- ip2$m[sel] - 1:1
+                  ii <- ip1$m[sel] - 1L
+                  jj <- ip2$m[sel] - 1L
                   if(x@uplo == "U") { ## i <= j : upper triangle
                       x@i <- pmin(ii, jj)
                       x@j <- pmax(ii, jj)
@@ -303,8 +303,8 @@ setMethod("[", signature(x = "TsparseMatrix",
 	  else if(!ip1$anyDup && !ip2$anyDup) {
 
 	      sel <- ip1$m > 0:0  &  ip2$m > 0:0
-	      x@i <- ip1$m[sel] - 1:1
-	      x@j <- ip2$m[sel] - 1:1
+	      x@i <- ip1$m[sel] - 1L
+	      x@j <- ip2$m[sel] - 1L
 	  }
 	  else { ## not Sym   &&  (ip1$anyDup || ip2$anyDup) :
 	      ## duplicated rows or columns -- currently the cheap solution:
@@ -315,7 +315,7 @@ setMethod("[", signature(x = "TsparseMatrix",
 
 	      ## - i - ------------------------------
 	      sel <- ip1$m > 0
-	      x@i <- ip1$m[sel] - 1:1
+	      x@i <- ip1$m[sel] - 1L
 	      if(ip1$anyDup) { ## duplicated rows selected: extend sel
 		  sel <- c(which(sel), ip1$jj)
 		  x@i <- c(x@i, ip1$i.xtra)
@@ -326,7 +326,7 @@ setMethod("[", signature(x = "TsparseMatrix",
 	      ## - j - ------------------------------
 	      ip2 <- .ind.prep(x@j, intI(j, n = di[2], dn = dn[[2]]))
 	      sel <- ip2$m > 0
-	      x@j <- ip2$m[sel] - 1:1
+	      x@j <- ip2$m[sel] - 1L
 	      if(ip2$anyDup) { ## duplicated columns selected: extend sel
 		  sel <- c(which(sel), ip2$jj)
 		  x@j <- c(x@j, ip2$i.xtra)
@@ -378,8 +378,8 @@ setMethod("[", signature(x = "TsparseMatrix",
 	      sel <- sel &
 	      (if(x@uplo == "U") ip1$m <= ip2$m else ip2$m <= ip1$m)
 	  }
-	  x@i <- ip1$m[sel] - 1:1
-	  x@j <- ip2$m[sel] - 1:1
+	  x@i <- ip1$m[sel] - 1L
+	  x@j <- ip2$m[sel] - 1L
 	  if (!is(x, "nsparseMatrix"))
 	      x@x <- c(x@x, if(isSym) x@x[offD])[sel]
 	  if (drop && any(nd == 1)) drop(as(x,"matrix")) else x
@@ -398,8 +398,8 @@ replTmat <- function (x, i, j, value)
 {
     di <- dim(x)
     dn <- dimnames(x)
-    i1 <- if(missing(i)) 0:(di[1] - 1:1) else .ind.prep2(i, 1, di, dn)
-    i2 <- if(missing(j)) 0:(di[2] - 1:1) else .ind.prep2(j, 2, di, dn)
+    i1 <- if(missing(i)) 0:(di[1] - 1L) else .ind.prep2(i, 1, di, dn)
+    i2 <- if(missing(j)) 0:(di[2] - 1L) else .ind.prep2(j, 2, di, dn)
     dind <- c(length(i1), length(i2)) # dimension of replacement region
     lenRepl <- prod(dind)
     lenV <- length(value)
@@ -497,8 +497,8 @@ replTmat <- function (x, i, j, value)
     if(any(sel)) {
 	## the 0-based indices of non-zero entries -- WRT to submatrix
 	non0 <- cbind(match(x@i[sel], i1),
-		      match(x@j[sel], i2)) - 1:1
-	iN0 <- 1:1 + encodeInd(non0, nr = dind[1])
+		      match(x@j[sel], i2)) - 1L
+	iN0 <- 1L + encodeInd(non0, nr = dind[1])
 
 	## 1a) replace those that are already non-zero with non-0 values
 	vN0 <- !v0[iN0]
@@ -519,9 +519,9 @@ replTmat <- function (x, i, j, value)
 
     if(length(iI0) && any(vN0 <- !v0[iI0])) {
 	## 2) add those that were structural 0 (where value != 0)
-	ij0 <- decodeInd(iI0[vN0] - 1:1, nr = dind[1])
-	x@i <- c(x@i, i1[ij0[,1] + 1:1])
-	x@j <- c(x@j, i2[ij0[,2] + 1:1])
+	ij0 <- decodeInd(iI0[vN0] - 1L, nr = dind[1])
+	x@i <- c(x@i, i1[ij0[,1] + 1L])
+	x@j <- c(x@j, i2[ij0[,2] + 1L])
         if(has.x)
             x@x <- c(x@x, value[iI0[vN0]])
     }
@@ -625,7 +625,7 @@ replTmat <- function (x, i, j, value)
 	clDx <- getClassDef(clx <- class(x))
     }
 
-    i <- i - 1:1 # 0-indexing
+    i <- i - 1L # 0-indexing
     ii.v <- encodeInd (i, nr)
     if(any(d <- duplicated(rev(ii.v)))) { # reverse: "last" duplicated FALSE
 	warning("duplicate ij-entries in 'Matrix[ ij ] <- value'; using last")

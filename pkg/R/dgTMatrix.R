@@ -45,8 +45,8 @@ mat2dgT <- function(from) {
     x <- as.double(from)
     nz <- isN0(x)
     new("dgTMatrix", Dim = dim(from),
-        i = row(from)[nz] - 1:1,
-        j = col(from)[nz] - 1:1,
+        i = row(from)[nz] - 1L,
+        j = col(from)[nz] - 1L,
         x = x[nz])
 }
 
@@ -86,7 +86,7 @@ setMethod("image", "dgTMatrix",
                    ...)
       {
           matdim <- x@Dim
-          levelplot(abs(x@x) ~ (x@j + 1:1) * (x@i + 1:1),
+          levelplot(abs(x@x) ~ (x@j + 1L) * (x@i + 1L),
                     sub = sub,
                     xlab = xlab, ylab = ylab,
                     xlim = xlim, ylim = ylim,

@@ -92,8 +92,8 @@ setMethod("all", signature(x = "Matrix"),
 setMethod("any", signature(x = "Matrix"),
           function(x, ..., na.rm) { x <- as(x, "lMatrix"); callGeneric()})
 
-setMethod("!", "Matrix", function(e1) !as(e1, "lMatrix"))
-
+## NOTE:  "&" and "|"  are now in group "Logic" c "Ops" --> ./Ops.R
+##        "!" is in ./not.R
 
 
 Matrix <-
