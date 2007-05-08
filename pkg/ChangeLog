@@ -1,3 +1,14 @@
+2007-05-08  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Tsparse.R (replTmat): fix the case of *duplicated* index
+	entries.
+	* tests/indexing.R(out): add regression test for it
+
+2007-04-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/(l(dense|sparse))?Matrix.R (!): use 'x', not 'e1' as argument
+	name for "!" method definitions.
+
 2007-04-26  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Tsparse.R (intI): new utility, used for "[" :

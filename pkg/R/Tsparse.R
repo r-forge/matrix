@@ -90,6 +90,11 @@ setAs("ntTMatrix", "ntCMatrix",
 ## method-*internally* ; this is not strictly OO, but allows to use
 ## the following utility and hence much more compact code.
 
+## Otherwise have to write methods for all possible combinations of
+##  (i , j) \in
+##  (numeric, logical, character, missing) x (numeric, log., char., miss.)
+
+
 intI <- function(i, n, dn, give.dn = TRUE)
 {
     ## Purpose: translate numeric | logical | character index
@@ -105,8 +110,8 @@ intI <- function(i, n, dn, give.dn = TRUE)
     DN <- has.dn && give.dn
     if(is(i, "numeric")) {
 	storage.mode(i) <- "integer"
-	if(any(i < 0:0)) {
-	    if(any(i > 0:0))
+	if(any(i < 0L)) {
+	    if(any(i > 0L))
 		stop("you cannot mix negative and positive indices")
 	    i0 <- (0:(n - 1L))[i]
 	} else {
@@ -131,10 +136,6 @@ intI <- function(i, n, dn, give.dn = TRUE)
     if(!give.dn) i0 else list(i0 = i0, dn = dn)
 }
 
-## Otherwise have to write methods for all possible combinations of
-##  (i , j) \in
-##  (numeric, logical, character, missing) x (numeric, log., char., miss.)
-
 .ind.prep <- function(xi, intIlist, iDup = duplicated(i0), anyDup = any(iDup))
 {
     ## Purpose: do the ``common things'' for "*gTMatrix" indexing for 1 dim.
@@ -149,7 +150,7 @@ intI <- function(i, n, dn, give.dn = TRUE)
     if(anyDup) { # assuming   anyDup <- any(iDup <- duplicated(i0))
 	i0m <- match(i0[iDup], i0)
 	jj <- lapply(i0m, function(.)
-		     which(match(m, ., nomatch=0) > 0))
+		     which(match(m, ., nomatch=0) > 0L))
 	i.xtra <- rep.int(which(iDup)- 1L, sapply(jj, length))
     }
 
@@ -194,7 +195,7 @@ setMethod("[", signature(x = "TsparseMatrix", i = "index", j = "missing",
 
 	      x@Dim[1] <- Di1
 	      if(!is.null(ip$dn)) x@Dimnames[[1]] <- ip$dn
-	      sel <- ip$m > 0
+	      sel <- ip$m > 0L
 	      x@i <- ip$m[sel] - 1L
               if(ip$anyDup) { ## duplicated rows selected: extend sel
                   sel <- c(which(sel), ip$jj)
@@ -225,7 +226,7 @@ setMethod("[", signature(x = "TsparseMatrix", i = "missing", j = "index",
 
 	      x@Dim[2] <- Di2
 	      if(!is.null(ip$dn)) x@Dimnames[[2]] <- ip$dn
-	      sel <- ip$m > 0
+	      sel <- ip$m > 0L
 	      x@j <- ip$m[sel] - 1L
 	      if(ip$anyDup) { ## duplicated columns selected: extend sel
 		  sel <- c(which(sel), ip$jj)
@@ -266,11 +267,12 @@ setMethod("[", signature(x = "TsparseMatrix",
 	      ip1 <- .ind.prep(x@i, ilis, iDup=iDup, anyDup=anyDup)
 	      ip2 <- .ind.prep(x@j, ilis, iDup=iDup, anyDup=anyDup)
               if(!is.null(dn[[2]])) # fix result colnames
-                  ip2$dn <- dn[[2]][ilis$i0]
+                  ip2$dn <- dn[[2]][ilis$i0 + 1L]
 
 	  } else {
 	      ip1 <- .ind.prep(x@i, intI(i, n = di[1], dn= dn[[1]]))
-	      ip2 <- .ind.prep(x@j, intI(j, n = di[2], dn= dn[[2]]))
+	      ij <- intI(j, n = di[2], dn= dn[[2]])
+	      ip2 <- .ind.prep(x@j, ij)
 	  }
           nd <- c(ip1$li, ip2$li)
           x@Dim <- nd
@@ -279,16 +281,20 @@ setMethod("[", signature(x = "TsparseMatrix",
 	  if(isSym) {
               if(anyDup) {
 
-                  s1 <- ip1$m > 0
-                  s2 <- ip2$m > 0
+                  s1 <- ip1$m > 0L
+                  s2 <- ip2$m > 0L
+                  sel <- which(s1 & s2)
+
                   ii <- c(ip1$m[s1] - 1L, ip1$i.xtra)
                   jj <- c(ip2$m[s2] - 1L, ip2$i.xtra)
                   sel1 <- c(which(s1), ip1$jj)
                   sel2 <- c(which(s2), ip2$jj)
 
+                  stop("unfinished implementation: symmetric indexing with duplicated indices")
+
 
               } else { ## not any Dup
-                  sel <- ip1$m > 0:0  &  ip2$m > 0:0
+                  sel <- ip1$m  &  ip2$m
                   ii <- ip1$m[sel] - 1L
                   jj <- ip2$m[sel] - 1L
                   if(x@uplo == "U") { ## i <= j : upper triangle
@@ -301,8 +307,9 @@ setMethod("[", signature(x = "TsparseMatrix",
               }
 	  }
 	  else if(!ip1$anyDup && !ip2$anyDup) {
+              ## "normal case":  no duplicated indices (and not symmetric)
 
-	      sel <- ip1$m > 0:0  &  ip2$m > 0:0
+	      sel <- ip1$m   &  ip2$m
 	      x@i <- ip1$m[sel] - 1L
 	      x@j <- ip2$m[sel] - 1L
 	  }
@@ -312,9 +319,8 @@ setMethod("[", signature(x = "TsparseMatrix",
 	      ## Basically  implement  X[i,j] as  X[i,] [,j] : __FIXME__
 	      ## FIXME: we are recomputing ip2 here
 
-
 	      ## - i - ------------------------------
-	      sel <- ip1$m > 0
+	      sel <- ip1$m > 0L
 	      x@i <- ip1$m[sel] - 1L
 	      if(ip1$anyDup) { ## duplicated rows selected: extend sel
 		  sel <- c(which(sel), ip1$jj)
@@ -324,8 +330,10 @@ setMethod("[", signature(x = "TsparseMatrix",
 	      if (has.x) x@x <- x@x[sel]
 
 	      ## - j - ------------------------------
-	      ip2 <- .ind.prep(x@j, intI(j, n = di[2], dn = dn[[2]]))
-	      sel <- ip2$m > 0
+	      ## ip2 <- .ind.prep(x@j, intI(j, n = di[2], dn = dn[[2]]))
+              ## FIXME can we do better: current x@j is original x@j[sel]
+	      ip2 <- .ind.prep(x@j, ij)
+	      sel <- ip2$m > 0L
 	      x@j <- ip2$m[sel] - 1L
 	      if(ip2$anyDup) { ## duplicated columns selected: extend sel
 		  sel <- c(which(sel), ip2$jj)
@@ -333,6 +341,7 @@ setMethod("[", signature(x = "TsparseMatrix",
 	      }
 	      x@i <- x@i[sel]
 	  }
+
 	  if (has.x)
 	      x@x <- x@x[sel]
 
@@ -373,7 +382,7 @@ setMethod("[", signature(x = "TsparseMatrix",
           stop("FIXME: NOT YET FINISHED IMPLEMENTATION")
 
           ## The M[i_vec, j_vec] had -- we need "its diagonal" :
-          sel <- ip1$m > 0:0  &	 ip2$m > 0:0
+          sel <- ip1$m  &  ip2$m
 	  if(isSym) { # only those corresponding to upper/lower triangle
 	      sel <- sel &
 	      (if(x@uplo == "U") ip1$m <= ip2$m else ip2$m <= ip1$m)
@@ -398,30 +407,44 @@ replTmat <- function (x, i, j, value)
 {
     di <- dim(x)
     dn <- dimnames(x)
-    i1 <- if(missing(i)) 0:(di[1] - 1L) else .ind.prep2(i, 1, di, dn)
-    i2 <- if(missing(j)) 0:(di[2] - 1L) else .ind.prep2(j, 2, di, dn)
-    dind <- c(length(i1), length(i2)) # dimension of replacement region
-    lenRepl <- prod(dind)
     lenV <- length(value)
     if(lenV == 0) {
         if(lenRepl != 0)
             stop("nothing to replace with")
         else return(x)
     }
-    ## else: lenV := length(value)	 is > 0
+    ## else: lenV := length(value) > 0
+    iMi <- missing(i)
+    jMi <- missing(j)
+    i1 <- if(iMi) 0:(di[1] - 1L) else .ind.prep2(i, 1, di, dn)
+    i2 <- if(jMi) 0:(di[2] - 1L) else .ind.prep2(j, 2, di, dn)
+    dind <- c(length(i1), length(i2)) # dimension of replacement region
+    lenRepl <- prod(dind)
     if(lenRepl %% lenV != 0)
         stop("number of items to replace is not a multiple of replacement length")
+    if(!iMi && any(duplicated(i1))) {
+        ## a bit faster than  keep <- !rev(duplicated(rev(i1))) :
+        ir <- dind[1]:1 ; keep <- match(i1, i1[ir]) == ir
+        i1 <- i1[keep]
+        lenV <- length(value <- rep(value, length = lenRepl)[keep])
+        dind[1] <- length(i1)
+        lenRepl <- dind[1] * dind[2]
+    }
 
+    if(!jMi && any(duplicated(i2))) {
+        ## a bit faster than  keep <- !rev(duplicated(rev(i2))) :
+        ir <- dind[2]:1 ; keep <- match(i2, i2[ir]) == ir
+        i2 <- i2[keep]
+        lenV <- length(value <- rep(value, length = lenRepl)[keep])
+        dind[2] <- length(i2)
+        lenRepl <- dind[1] * dind[2]
+    }
     clx <- class(x)
     clDx <- getClassDef(clx) # extends() , is() etc all use the class definition
     stopifnot(extends(clDx, "TsparseMatrix"))
     ## Tmatrix maybe non-unique, have an entry split into a sum of several ones:
     if(is_duplicatedT(x, nr = di[1]))
 	x <- uniqTsparse(x)
-
-    get.ind.sel <- function(ii,ij)
-	(match(x@i, ii, nomatch = 0) > 0:0 &
-	 match(x@j, ij, nomatch = 0) > 0:0)
 
     toGeneral <- FALSE
     if((sym.x <- extends(clDx, "symmetricMatrix"))) {
@@ -453,6 +476,9 @@ replTmat <- function (x, i, j, value)
         clDx <- getClassDef(clx <- class(x))
     }
 
+    get.ind.sel <- function(ii,ij)
+	(match(x@i, ii, nomatch = 0) & match(x@j, ij, nomatch = 0))
+
     ## sel[k] := TRUE iff k-th non-zero entry (typically x@x[k]) is to be replaced
     sel <- get.ind.sel(i1,i2)
     has.x <- "x" %in% slotNames(clDx) # === slotNames(x)
@@ -471,6 +497,7 @@ replTmat <- function (x, i, j, value)
     ## else --  some( value != 0 ) --
     if(lenV > lenRepl)
         stop("too many replacement values")
+    ## now have  lenV <= lenRepl
 
     ## another simple, typical case:
     if(lenRepl == 1) {
@@ -486,10 +513,12 @@ replTmat <- function (x, i, j, value)
         return(x)
     }
 
-    if(sym.x && r.sym)
+    if(sym.x && r.sym) # value already adjusted, see above
        lenRepl <- length(value) # shorter (since only "triangle")
     else if(lenV < lenRepl)
        value <- rep(value, length = lenRepl)
+
+    ## now:  length(value) == lenRepl
 
     v0 <- is0(value)
     ## value[1:lenRepl]:  which are structural 0 now, which not?
