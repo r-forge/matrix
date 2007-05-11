@@ -96,8 +96,8 @@ for(n in 1:50) {
     j <- sample(sample(ncol(mC), 6), 17, replace = TRUE)
     assert.EQ.mat(mC[i,j], mm[i,j])
 }
-## symmetric index of symmetric matrix --- not yet  ok
-m. <- mC; m.[, c(2, 7:12)] <- 0
+
+##---- Symmetric indexing of symmetric Matrix ----------
 validObject(S <- crossprod(add.simpleDimnames(m.) %% 100))
 ss <- as(S, "matrix")
 T <- as(S, "TsparseMatrix")
@@ -113,10 +113,30 @@ for(n in 1:50) {
     assert.EQ.mat(Tii, ss[i,i])
 }
 
-## repeeated ones:
+## repeated ones ``the challenge'' (to do smartly):
 j <- c(4, 4, 9, 12, 9, 4, 17, 3, 18, 4, 12, 18, 4, 9)
-if(FALSE) ## FIXME
 assert.EQ.mat(T[j,j], ss[j,j])
+## and another two sets  (a, A) &  (a., A.) :
+a <- matrix(0, 6,6)
+a[upper.tri(a)] <- (utr <- c(2, 0,-1, 0,0,5, 7,0,0,0, 0,0,-2,0,8))
+ta <- t(a); ta[upper.tri(a)] <- utr; a <- t(ta)
+diag(a) <- c(0,3,0,4,6,0)
+A <- as(Matrix(a), "TsparseMatrix")
+A. <- A
+diag(A.) <- 10 * (1:6)
+a. <- as(A., "matrix")
+## More testing {this was not working for a long time..}
+set.seed(1)
+for(n in 1:100) {
+    i <- sample(1:nrow(A), 3+2*rpois(1, lam=3), replace=TRUE)
+    Aii  <- A[i,i]
+    A.ii <- A.[i,i]
+    stopifnot(class(Aii) == class(A),
+              class(A.ii) == class(A.))
+    assert.EQ.mat(Aii , a [i,i])
+    assert.EQ.mat(A.ii, a.[i,i])
+    assert.EQ.mat(T[i,i], ss[i,i])
+}
 
 
 stopifnot(all.equal(mC[,3], mm[,3]),

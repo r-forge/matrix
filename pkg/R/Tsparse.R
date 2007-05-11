@@ -148,16 +148,17 @@ intI <- function(i, n, dn, give.dn = TRUE)
 
     m <- match(xi, i0, nomatch=0)
     if(anyDup) { # assuming   anyDup <- any(iDup <- duplicated(i0))
-	i0m <- match(i0[iDup], i0)
-	jj <- lapply(i0m, function(.)
-		     which(match(m, ., nomatch=0) > 0L))
-	i.xtra <- rep.int(which(iDup)- 1L, sapply(jj, length))
+        ## i0i: where in (non-duplicated) i0 are the duplicated ones
+	i0i <- match(i0[iDup], i0)
+        i.x <- which(iDup) - 1L
+	jm <- lapply(i0i, function(.) which(. == m))
     }
 
     c(list(m = m, li = length(i0),
 	   i0 = i0, anyDup = anyDup, dn = intIlist$dn),
       ## actually,  iDup  is rarely needed in calling code
-      if(anyDup) list(iDup = iDup, jj = unlist(jj), i.xtra = i.xtra))
+      if(anyDup) list(iDup = iDup, i0i = i0i, i.x = i.x,
+                      jm = unlist(jm), i.xtra = rep.int(i.x, sapply(jm, length))))
 }
 
 
@@ -198,7 +199,7 @@ setMethod("[", signature(x = "TsparseMatrix", i = "index", j = "missing",
 	      sel <- ip$m > 0L
 	      x@i <- ip$m[sel] - 1L
               if(ip$anyDup) { ## duplicated rows selected: extend sel
-                  sel <- c(which(sel), ip$jj)
+                  sel <- c(which(sel), ip$jm)
                   x@i <- c(x@i, ip$i.xtra)
               }
 	      x@j <- x@j[sel]
@@ -229,7 +230,7 @@ setMethod("[", signature(x = "TsparseMatrix", i = "missing", j = "index",
 	      sel <- ip$m > 0L
 	      x@j <- ip$m[sel] - 1L
 	      if(ip$anyDup) { ## duplicated columns selected: extend sel
-		  sel <- c(which(sel), ip$jj)
+		  sel <- c(which(sel), ip$jm)
 		  x@j <- c(x@j, ip$i.xtra)
 	      }
 	      x@i <- x@i[sel]
@@ -239,6 +240,7 @@ setMethod("[", signature(x = "TsparseMatrix", i = "missing", j = "index",
 
 
 ## [.data.frame has : drop = if (missing(i)) TRUE else length(cols) == 1)
+
 
 setMethod("[", signature(x = "TsparseMatrix",
 			 i = "index", j = "index", drop = "logical"),
@@ -258,72 +260,101 @@ setMethod("[", signature(x = "TsparseMatrix",
 		  ## result no longer symmetric -> to "generalMatrix"
 		  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
 	  } else if(extends(clx, "triangularMatrix") && x@diag == "U") {
-                  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
-          }
-	  if(isSym) { # has only stored "half" of the indices,
-              ## OTOH,  i === j, so only need one intI() call
-              ilis <- intI(i, n=di[1], dn[[1]]) # -> (i0, dn_1)
-              anyDup <- any(iDup <- duplicated(ilis$i0))
-	      ip1 <- .ind.prep(x@i, ilis, iDup=iDup, anyDup=anyDup)
-	      ip2 <- .ind.prep(x@j, ilis, iDup=iDup, anyDup=anyDup)
-              if(!is.null(dn[[2]])) # fix result colnames
-                  ip2$dn <- dn[[2]][ilis$i0 + 1L]
+	      x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
+	  }
+	  if(isSym) { ## has only stored "half" of the indices,
+	      ## OTOH,	i === j, so only need one intI() call
+	      ip1 <- intI(i, n=di[1], dn[[1]]) # -> (i0, dn_1)
+	      anyDup <- any(iDup <- duplicated(ip1$i0))
+	      ip1 <- .ind.prep(x@i, ip1, iDup=iDup, anyDup=anyDup)
+	      ip2 <- {
+		  if(anyDup) list(m = match(x@j, ip1$i0, nomatch=0),
+				  li = ip1$li)
+		  else	     .ind.prep(x@j, ip1, iDup=iDup, anyDup=anyDup)
+	      }
+	      if(!is.null(dn[[2]]))	# fix result colnames
+		  ip2$dn <- dn[[2]][ip1$i0 + 1L]
 
 	  } else {
 	      ip1 <- .ind.prep(x@i, intI(i, n = di[1], dn= dn[[1]]))
 	      ij <- intI(j, n = di[2], dn= dn[[2]])
 	      ip2 <- .ind.prep(x@j, ij)
 	  }
-          nd <- c(ip1$li, ip2$li)
-          x@Dim <- nd
-          x@Dimnames <- list(ip1$dn, ip2$dn)
+	  nd <- c(ip1$li, ip2$li)
+	  x@Dim <- nd
+	  x@Dimnames <- list(ip1$dn, ip2$dn)
 
 	  if(isSym) {
-              if(anyDup) {
+	      sel <- ip1$m  &  ip2$m
+	      ii <- ip1$m[sel] - 1L
+	      jj <- ip2$m[sel] - 1L
+	      if(anyDup) { ## careful algorithm --- TODO: in C
+		  sel <- which(sel)
+		  ## keep non-duplicated and "increment" for duplicated ones
+		  ij <- pmin(ii, jj)
+		  jj <- pmax(ii, jj) ; ii <- ij
+		  ## length(ii) == length(jj) == length(sel)  _and_  ii <= jj
+		  ix <- ip1$i.x
+		  for(k in seq_along(ix)) {
+		      ## "recursively" add 1 row+column corresp. iDup[k]
+		      i0 <- ip1$i0i[k] -1L # the (0-ind)column we want to repl
+		      i.x <- ix[k]	# < i0
+		      e1 <- ii == i0
+		      e2 <- jj == i0
+		      j1 <- jj[e1]	# >= ii[e1] == i0
+		      j2 <- ii[e2]	# <= jj[e2] == i0 < i.x
+		      ## now the "diagonal special":
+		      if(any(e1 & e2)) {
+			  ## (e1 & e2)[m] = TRUE  <==>	ii[m] == jj[m] == i0
+			  isD <- e1[e2] # logical of same length as j2
+			  stopifnot(sum(isD) == 1)
+			  j2[isD] <- i.x # instead of i0
+		      }
+		      l1x <- j1 < i.x	# & j12 <- j1[l1x]
+		      j11 <- j1[!l1x]	# those >= i.x
+		      s1 <- sel[e1]
+		      ii  <- c(ii,  j2, j1[l1x],  rep.int(i.x, length(j11)))
+		      jj  <- c(jj,  rep.int(ix[k], length(j2)+sum(l1x)), j11)
+		      sel <- c(sel, sel[e2], s1[l1x], s1[!l1x])
+		      stopifnot(ii <= jj, length(sel) == length(ii))
+		  }
+		  if(x@uplo == "U") { ## i <= j : upper triangle
+		      x@i <- ii
+		      x@j <- jj
+		  } else { ## i >= j : lower left triangle
+		      x@i <- jj
+		      x@j <- ii
+		  }
+	      }
+	      else { ## not any Dup
 
-                  s1 <- ip1$m > 0L
-                  s2 <- ip2$m > 0L
-                  sel <- which(s1 & s2)
+		  if(x@uplo == "U") { ## i <= j : upper triangle
+		      x@i <- pmin(ii, jj)
+		      x@j <- pmax(ii, jj)
+		  } else { ## i >= j : lower left triangle
+		      x@i <- pmax(ii, jj)
+		      x@j <- pmin(ii, jj)
+		  }
+	      }
 
-                  ii <- c(ip1$m[s1] - 1L, ip1$i.xtra)
-                  jj <- c(ip2$m[s2] - 1L, ip2$i.xtra)
-                  sel1 <- c(which(s1), ip1$jj)
-                  sel2 <- c(which(s2), ip2$jj)
-
-                  stop("unfinished implementation: symmetric indexing with duplicated indices")
-
-
-              } else { ## not any Dup
-                  sel <- ip1$m  &  ip2$m
-                  ii <- ip1$m[sel] - 1L
-                  jj <- ip2$m[sel] - 1L
-                  if(x@uplo == "U") { ## i <= j : upper triangle
-                      x@i <- pmin(ii, jj)
-                      x@j <- pmax(ii, jj)
-                  } else { ## i >= j : lower left triangle
-                      x@i <- pmax(ii, jj)
-                      x@j <- pmin(ii, jj)
-                  }
-              }
 	  }
 	  else if(!ip1$anyDup && !ip2$anyDup) {
-              ## "normal case":  no duplicated indices (and not symmetric)
+	      ## "normal case":	 no duplicated indices (and not symmetric)
 
-	      sel <- ip1$m   &  ip2$m
+	      sel <- ip1$m  &  ip2$m
 	      x@i <- ip1$m[sel] - 1L
 	      x@j <- ip2$m[sel] - 1L
 	  }
 	  else { ## not Sym   &&  (ip1$anyDup || ip2$anyDup) :
-	      ## duplicated rows or columns -- currently the cheap solution:
-
-	      ## Basically  implement  X[i,j] as  X[i,] [,j] : __FIXME__
+	      ## duplicated rows or columns -- currently the cheap solution,
+	      ## Basically  implement  X[i,j] as  X[i,] [,j] :
 	      ## FIXME: we are recomputing ip2 here
 
 	      ## - i - ------------------------------
 	      sel <- ip1$m > 0L
 	      x@i <- ip1$m[sel] - 1L
 	      if(ip1$anyDup) { ## duplicated rows selected: extend sel
-		  sel <- c(which(sel), ip1$jj)
+		  sel <- c(which(sel), ip1$jm)
 		  x@i <- c(x@i, ip1$i.xtra)
 	      }
 	      x@j <- x@j[sel]
@@ -331,12 +362,12 @@ setMethod("[", signature(x = "TsparseMatrix",
 
 	      ## - j - ------------------------------
 	      ## ip2 <- .ind.prep(x@j, intI(j, n = di[2], dn = dn[[2]]))
-              ## FIXME can we do better: current x@j is original x@j[sel]
+	      ## FIXME can we do better: current x@j is original x@j[sel]
 	      ip2 <- .ind.prep(x@j, ij)
 	      sel <- ip2$m > 0L
 	      x@j <- ip2$m[sel] - 1L
 	      if(ip2$anyDup) { ## duplicated columns selected: extend sel
-		  sel <- c(which(sel), ip2$jj)
+		  sel <- c(which(sel), ip2$jm)
 		  x@j <- c(x@j, ip2$i.xtra)
 	      }
 	      x@i <- x@i[sel]
@@ -345,10 +376,8 @@ setMethod("[", signature(x = "TsparseMatrix",
 	  if (has.x)
 	      x@x <- x@x[sel]
 
-          drop.it <- drop && any(nd == 1)
-	  if (drop.it) drop(as(x,"matrix")) else x
+	  if (drop && any(nd == 1)) drop(as(x, "matrix")) else x
       })
-
 
 ## FIXME: Learn from .TM... below or rather  .M.sub.i.2col(.) in ./Matrix.R
 ## ------ the following should be much more efficient than the   ./Matrix.R code :
