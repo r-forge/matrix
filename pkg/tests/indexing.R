@@ -98,6 +98,7 @@ for(n in 1:50) {
 }
 
 ##---- Symmetric indexing of symmetric Matrix ----------
+m. <- mC; m.[, c(2, 7:12)] <- 0
 validObject(S <- crossprod(add.simpleDimnames(m.) %% 100))
 ss <- as(S, "matrix")
 T <- as(S, "TsparseMatrix")
