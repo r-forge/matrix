@@ -1,3 +1,9 @@
+2007-05-11  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Tsparse.R ([, Tsparse): fix last case: *duplicated*, symmetric
+	indexing
+	* tests/indexing.R: test set for that.
+
 2007-05-08  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Tsparse.R (replTmat): fix the case of *duplicated* index

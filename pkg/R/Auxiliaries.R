@@ -530,17 +530,22 @@ l2d_meth <- function(x) {
 	else if(is.complex(x)) "z"
 	else stop("not yet implemented for matrix w/ typeof ", typeof(x))
     }
-    else {
-	if(is.character(clx))		# < speedup: get it once
-	    clx <- getClassDef(clx)
-	if(extends(clx, "dMatrix")) "d"
-	else if(extends(clx, "nMatrix")) "n"
-	else if(extends(clx, "lMatrix")) "l"
-	else if(extends(clx, "zMatrix")) "z"
-	else if(extends(clx, "pMatrix")) "n" # permutation -> pattern
-	else stop(" not yet be implemented for ", clx@className)
-    }
+    else .M.kindC(clx)
 }
+
+.M.kindC <- function(clx) { ## 'clx': class() *or* classdefinition
+    if(is.character(clx))		# < speedup: get it once
+        clx <- getClassDef(clx)
+    if(extends(clx, "sparseVector")) ## shortcut
+        substr(clx@className, 1,1)
+    else if(extends(clx, "dMatrix")) "d"
+    else if(extends(clx, "nMatrix")) "n"
+    else if(extends(clx, "lMatrix")) "l"
+    else if(extends(clx, "zMatrix")) "z"
+    else if(extends(clx, "pMatrix")) "n" # permutation -> pattern
+    else stop(" not yet be implemented for ", clx@className)
+}
+
 
 ## typically used as .type.kind[.M.kind(x)]:
 .type.kind <- c("d" = "double",
