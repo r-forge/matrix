@@ -105,6 +105,32 @@ setClass("glmer2",
                         y = "numeric"),    # response
 	 contains = "lmer2")
 
+setClass("nlmer",
+	 representation(## original data
+                        frame = "data.frame", # model frame or empty frame
+                        pnames = "character", # parameter names for nonlinear model
+                        call = "call",	    # matched call to model-fitting function
+                        terms = "terms",    # terms for fixed-effects
+			flist = "list",     # list of grouping factors
+                        Xt = "dgCMatrix",   # sparse form of X'
+			Zt = "dgCMatrix",   # sparse form of Z'
+                        y = "numeric",      # response
+			weights = "numeric",# can be of length 0 for constant wts
+			cnames = "list",    # column names of model matrices
+			Gp = "integer",     # pointers to groups of columns in Z
+                        dims = "integer",   # dimensions and indicators
+			## quantities that vary with Z, X, y, weights or offset
+			## slots that vary during the optimization
+			ST = "list",        # list of TSST' rep of rel. var. mats
+			L = "CHMfactor",    # sparse Cholesky factor of A*
+			deviance = "numeric", # ML and REML deviance and components
+			fixef = "numeric",
+			ranef = "numeric"
+			),
+         validity = function(object) .Call(nlmer_validate, object)
+         )
+
+
 setClass("summary.mer", # the "mer" result ``enhanced'' :
 	 representation(
 			isG   = "logical",
