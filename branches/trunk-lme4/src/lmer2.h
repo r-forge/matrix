@@ -5,6 +5,7 @@
 #include <R_ext/stats_package.h>
 
 SEXP glmer_bhat(SEXP x);
+SEXP glmer_bhat2(SEXP x);
 SEXP glmer_eta(SEXP x);
 SEXP glmer_reweight(SEXP x);
 
@@ -23,5 +24,7 @@ SEXP lmer2_update_effects(SEXP x);
 SEXP lmer2_update_y(SEXP x, SEXP yp);
 SEXP lmer2_validate(SEXP x);
 SEXP lmer2_vcov(SEXP x);
+
+SEXP nlmer_bhat(SEXP x);
 
 #endif /* LME4_LMER2_H */
