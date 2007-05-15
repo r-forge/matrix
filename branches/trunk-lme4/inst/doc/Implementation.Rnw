@@ -46,7 +46,7 @@ Rail <- data.frame(travel = Rail$travel, Rail = Rail$Rail)
 \label{sec:example}
 
 The \code{Rail} data set from the \package{nlme} package is described
-in \citet{pinheiro:bates:2000} as consisting of three measurements of
+in \citet{pinh:bate:2000} as consisting of three measurements of
 the travel time of a type of sound wave on each of six sample railroad
 rails. We can examine the structure of these data with the \code{str}
 function
@@ -605,7 +605,7 @@ print(image(Om1a@L, colorkey = FALSE, aspect = 1),
       split = c(2,1,2,1))
 @
 \begin{figure}[tbp]
-  \centerline{\includegraphics[width=\textwidth]{Implementation-Om1struct}}
+  \centerline{\includegraphics[width=\textwidth]{Implementation-Om1astruct}}
   \caption{Structure of the sparse matrices $\bm{A}$ (left panel) and
     $\bm{L}$ (right panel) for the model \code{Om1a}.}
     \label{fig:Om1astruct}
@@ -932,7 +932,7 @@ standardized random effects vector
 with the properties
 \begin{align}
   \mathsf{E}[\bm{b}^*]&=\bm{S}^{-1}\bm{T}^{-1}\mathsf{E}[\bm{b}]\\
-  \mathsf{Var}[\bm{b}^*]&
+  \mathsf{Var}[\bm{b}^*]=\bm{0}&
   \begin{aligned}[t]
     &=\mathsf{E}[\bm{b}^*{\bm{b}^*}\trans]\\
     &=\bm{S}^{-1}\bm{T}^{-1}\mathsf{Var}[\bm{b}]\bm{T}\invtrans\bm{S}^{-1}\\
@@ -1188,6 +1188,238 @@ The profiled REML deviance for a linear mixed model can be expressed as
   (n-p)\left(1+\log\frac{2\pi r^2}{n-p}\right) .
 \end{equation}
 
+\section{Generalized linear mixed models}
+\label{sec:GLMMs}
+
+\subsection{Generalized linear models}
+\label{sec:gener-line-models}
+
+As described in \citet{mccullagh89:_gener_linear_model}, a generalized
+linear model is a statistical model in which the \emph{linear
+  predictor} for the $i$th response, $\eta_i=\bm{x}_i\bm{\beta}$ where
+$\bm{x}_i$ is the $i$th row of the $n\times p$ model matrix $\bm{X}$ derived
+from the form of the model and the values of any covariates, is
+related to the \emph{expected value of the response}, $\mu_i$, through
+an invertible \emph{link function}, $g$.  That is
+\begin{equation}
+  \label{eq:glmlink}
+  \bm{x}_i\bm{\beta}=\eta_i=g(\mu_i)\quad i=1,\dots,n
+\end{equation}
+and
+\begin{equation}
+  \label{eq:glmlinkinv}
+  \mu_i=g^{-1}(\eta_i)=g^{-1}(\bm{x}_i\bm{\beta})\quad i=1,\dots,n
+\end{equation}
+
+When the distribution of $y_i$ given $\mu_i$ is from the exponential
+family there exist a \emph{natural} link function for the family
+\citep{mccullagh89:_gener_linear_model}. For a
+binomial response the natural link is the \emph{logit} link defined as
+\begin{equation}
+  \label{eq:logit}
+  \eta_i = g(\mu_i) = \log\left(\frac{\mu_i}{1-\mu_i}\right)\quad i=1,\dots,n
+\end{equation}
+with inverse link
+\begin{equation}
+  \label{eq:logitInv}
+  \mu_i=g^{-1}(\eta_i)=\frac{1}{1+\exp(-\eta_i)}\quad i=1,\dots,n
+\end{equation}
+Because $\mu_i$ is the probability of the $i$th observation being a
+``success'', $\eta_i$ is the log of the odds ratio.
+
+The parameters $\bm{\beta}$ in a generalized linear model are generally
+estimated by \emph{iteratively reweighted least squares} (IRLS).  At
+each iteration in this algorithm the current parameter estimates are
+replaced by the parameter estimates of a weighted least squares fit
+with model matrix $\bm{X}$ to an adjusted dependent variable.  The weights
+and the adjusted dependent variable are calculated from the link function and
+the current parameter values.
+
+\subsection{Generalized linear mixed models}
+\label{sec:gener-line-mixed}
+
+In a generalized linear mixed model (GLMM) the $n$-dimensional vector
+of linear predictors, $\bm{\eta}$, incorporates both fixed effects,
+$\bm{\beta}$, and random effects, $\bm{b}$, as
+\begin{equation}
+  \label{eq:glmmLP}
+  \bm{\eta} = \bm{X}\bm{\beta}+\bm{Z}\bm{b}
+\end{equation}
+where $\bm{X}$ is an $n\times p$ model matrix and $\bm{Z}$ is an $n\times q$
+model matrix.
+
+As for linear mixed models,
+we model the distribution of the random effects as a multivariate
+normal (Gaussian) distribution with mean $\bm{0}$ and $q\times q$
+variance-covariance matrix $\bm{\Sigma}$.  That is,
+\begin{equation}
+  \label{eq:random-effects-dist}
+  \bm{b}\sim\mathcal{N}\left(\bm{0},\bm{\Sigma}(\bm{\theta})\right) .
+\end{equation}
+
+The maximum likelihood estimates $\hat{\bm{\beta}}$ and $\hat{\bm{\theta}}$
+maximize the likelihood of the parameters, $\bm{\beta}$ and $\bm{\theta}$, given
+the observed data, $\bm{y}$.  This likelihood is numerically equivalent to
+the marginal density of $\bm{y}$ given $\bm{\beta}$ and $\bm{\theta}$, which is
+\begin{equation}
+  \label{eq:marginalDens}
+  f(\bm{y}|\bm{\beta},\bm{\theta}) =
+  \int_{\bm{b}}p(\bm{y}|\bm{\beta},\bm{b})f(\bm{b}|\bm{\Sigma}(\bm{\theta}))\,d\bm{b}
+\end{equation}
+where $p(\bm{y}|\bm{\beta},\bm{b})$ is the probability mass function of $\bm{y}$,
+given $\bm{\beta}$ and $\bm{b}$, and $f(\bm{b}|\bm{\Sigma})$ is the (Gaussian)
+probability density at $\bm{b}$.
+
+Unfortunately the integral in (\ref{eq:marginalDens}) does not have a
+closed-form solution when $p(\bm{y}|\bm{\beta},\bm{b})$ is binomial.  However,
+we can approximate this integral quite accurately using a \emph{Laplace}
+approximation.  For given values of $\bm{\beta}$ and $\bm{\theta}$ we
+determine the \emph{conditional modes} of the random effects
+\begin{equation}
+  \label{eq:conditionalmodes}
+  \tilde{\bm{b}}(\bm{\beta},\bm{\theta})=
+  \arg\max_{\bm{b}}p(\bm{y}|\bm{\beta},\bm{b})f(\bm{b}|\bm{\Sigma}(\bm{\theta})) ,
+\end{equation}
+which are the values of the random effects that maximize the
+conditional density of the random effects given the data and the model
+parameters.  The conditional modes can be determined by a penalized
+iteratively reweighted least squares algorithm (PIRLS, see
+\S\ref{sec:deta-pirls-algor}) where the contribution of the fixed
+effects parameters, $\bm{\beta}$, is incorporated as an offset,
+$\bm{X}\bm{\beta}$, and the contribution of the variance components,
+$\bm{\theta}$, is incorporated as a penalty term in the weighted least
+squares fit.
+
+At the conditional modes, $\tilde{\bm{b}}$, we evaluate the second order
+Taylor series approximation to the log of the integrand (i.e.{} the log
+of the conditional density of $\bm{b}$) and use its integral as an
+approximation to the likelihood.
+
+It is the Laplace approximation to the likelihood that is optimized to
+obtain approximate values of the mle's for the parameters and the
+corresponding conditional modes of the random effects vector $\bm{b}$.
+
+\subsection{Details of the PIRLS algorithm}
+\label{sec:deta-pirls-algor}
+
+Recall from (\ref{eq:conditionalmodes}) that the conditional modes of
+the random effects $\tilde{\bm{b}}(\bm{\beta},\bm{\theta},\bm{y})$ maximize the
+conditional density of $\bm{b}$ given the data and values of the
+parameters $\bm{\beta}$ and $\bm{\theta}$.  The penalized iteratively
+reweighted least squares (PIRLS) algorithm for determining these
+conditional modes combines characteristic of the iteratively
+reweighted least squares (IRLS) algorithm for generalized linear
+models~\citep[\S2.5]{mccullagh89:_gener_linear_model} and the
+penalized least squares representation of a linear mixed
+model~\citep{bates04:_linear}.
+
+At the $r$th iteration of the IRLS algorithm the current value of the
+vector of random effects. $\bm{b}^{(r)}$ (we use parenthesized
+superscripts to denote the iteration) produces a linear predictor
+\begin{equation}
+  \label{eq:rthLinPred}
+  \bm{\eta}^{(r)}=\bm{X}\bm{\beta}+\bm{Z}\bm{b}^{(r)}
+\end{equation}
+with corresponding mean vector $\bm{\mu}^{(r)}=\bm{g}^{-1}\bm{\eta}^{(r)}$.
+(The vector-valued link and inverse link functions, $\bm{g}$ and
+$\bm{g}^{-1}$, apply the scalar link and inverse link, $g$ and
+$g^{-1}$, componentwise.)
+A vector of weights and a vector of derivatives of the form
+$d\eta/d\mu$ are also evaluated.  For convenience of notation we
+express these as diagonal matrices, $\bm{W}^{(r)}$ and $\bm{G}^{(r)}$,
+although calculations involving these quantities are performed
+component-wise and not as matrices.
+
+The adjusted dependent variate at iteration $r$ is
+\begin{equation}
+  \label{eq:adjdep}
+  \bm{z}^{(r)}=\bm{\eta}^{(r)}+\bm{G}^{(r)}\left(\bm{y}-\bm{\mu}^{(r)}\right)
+\end{equation}
+from which the updated parameter, $\bm{b}^{(r+1)}$, is determined as the
+solution to
+\begin{equation}
+  \label{eq:IRLSupdate}
+  \bm{Z}\trans\bm{W}^{(r)}\bm{Z}\bm{b}^{(r+1)}=\bm{Z}\trans\bm{W}^{(r)}\bm{z}^{(r)} .
+\end{equation}
+
+\citet[\S2.5]{mccullagh89:_gener_linear_model} show that the IRLS
+algorithm is equivalent to the Fisher scoring algorithm for any link
+function and also equivalent to the Newton-Raphson algorithm when the
+link function is the natural link for a probability distribution in
+the exponential family.  That is, IRLS will minimize $-\log
+p(\bm{y}|\bm{\beta},\bm{b})$ for fixed $\bm{\beta}$.  However, we wish to determine
+\begin{equation}
+  \label{eq:conditionalmin}
+  \begin{aligned}
+    \tilde{\bm{b}}(\bm{\beta},\bm{\theta})
+    &= \arg\max_{\bm{b}}p(\bm{y}|\bm{\beta},\bm{b})f(\bm{b}|\bm{\Sigma}(\bm{\theta}))\\
+    &= \arg\min_{\bm{b}}\left[-\log p(\bm{y}|\bm{\beta},\bm{b})
+      +\frac{\bm{b}\trans\bm{\Sigma}^{-1}(\bm{\theta})\bm{b}}{2}\right] .
+  \end{aligned}
+\end{equation}
+As shown in \citet{bate:debr:2004} we can incorporate the
+contribution of the Gaussian distribution by adding $q$
+``pseudo-observations'' with constant unit weights, observed values of
+$0$ and predicted values of $\bm{\Delta}(\bm{\theta})\bm{b}$ where
+$\bm{\Delta}$ is any $q\times q$ matrix such that
+$\bm{\Delta}\trans\bm{\Delta}=\bm{\Sigma}^{-1}(\bm{\theta})$.
+
+Thus the update in the penalized iteratively reweighted least squares
+(PIRLS) algorithm for determining the conditional modes,
+$\tilde{\bm{b}}(\bm{\beta},\bm{\theta},\bm{y})$, expresses $\bm{b}^{(r+1)}$ as the
+solution to the penalized weighted least squares problem
+\begin{equation}
+  \label{eq:PIRLSupdate}
+  \left(\bm{Z}\trans\bm{W}^{(r)}\bm{Z}+\bm{\Sigma}^{-1}\right)\bm{b}^{(r+1)}=
+  \bm{Z}\trans\bm{W}^{(r)}\bm{z}^{(r)} .
+\end{equation}
+or the equivalent problem
+\begin{equation}
+  \label{eq:PIRLSbstarupdate}
+  \left({\bm{Z}^*}\trans\bm{W}^{(r)}\bm{Z}^*+\bm{I}\right){\bm{b}^*}^{(r+1)}=
+  {\bm{Z}^*}\trans\bm{W}^{(r)}\bm{z}^{(r)} .
+\end{equation}
+The sequence of iterates ${\bm{b}^*}^{(0)}, {\bm{b}^*}^{(1)},\dots$ is considered to
+have converged to the conditional modes
+$\tilde{\bm{b}}^*(\bm{\beta},\bm{\theta},\bm{y})$ when the relative change in the
+linear predictors $\|\bm{\eta}^{(r+1)}-\bm{\eta}^{(r)}\|/\|\bm{\eta}^{(r)}\|$
+falls below a threshold. The variance-covariance matrix of $\bm{b}^*$,
+conditional on $\bm{\beta}$ and $\bm{\theta}$, is approximated as
+\begin{equation}
+  \label{eq:varcov}
+  \mathrm{Var}\left(\bm{b}|\bm{\beta},\bm{\theta},\bm{y}\right)\approx\bm{D}\equiv
+  \left({\bm{Z}^*}\trans\bm{W}^{(r)}\bm{Z}^*+\bm{I}\right)^{-1} .
+\end{equation}
+This approximation is analogous to using the inverse of Fisher's
+information matrix as the approximate variance-covariance matrix for
+maximum likelihood estimates.
+
+\subsection{Details of the Laplace approximation}
+\label{sec:deta-lapl-appr}
+
+The Laplace approximation to the likelihood $L(\bm{\beta},\bm{\theta}|\bm{y})$ is
+obtained by replacing the logarithm of the integrand in
+(\ref{eq:marginalDens}) by its second-order Taylor series at the
+conditional maximum, $\tilde{\bm{b}}(\bm{\beta},\bm{\theta})$.  On the scale of
+the deviance (negative twice the log-likelihood) the approximation is
+\begin{equation}
+  \label{eq:LaplaceApprox}
+  \begin{aligned}
+    -2\ell(\bm{\beta},\bm{\theta}|\bm{y})
+    &=-2\log\left\{\int_{\bm{b}}p(\bm{y}|\bm{\beta},\bm{b})f(\bm{b}|\bm{\Sigma}(\bm{\theta}))
+      \,d\bm{b}\right\}\\
+    &\approx 2\log\left\{\int_{\bm{b}}\exp\left\{-\frac{1}{2}
+        \left[d(\bm{\beta},\tilde{\bm{b}},\bm{y})+
+          {\tilde{\bm{b}}}\trans\tilde{\bm{b}}^*+
+          +\bm{b}\trans\bm{D}^{-1}\bm{b}\right]\right\}\,d\bm{b}\right\}\\
+    &=d(\bm{\beta},\tilde{\bm{b}},\bm{y})+{\tilde{\bm{b}}^*}{}\trans\tilde{\bm{b}}^*
+    +\log|\bm{D}|
+  \end{aligned}
+\end{equation}
+where $d(\bm{\beta},\bm{b},\bm{y})$ is the deviance function from the linear
+predictor only.  That is, $d(\bm{\beta},\bm{b},\bm{y})=-2\log p(\bm{y}|\bm{\beta},\bm{b})$.
+This quantity can be evalated as the sum of the deviance
+residuals~\citep[\S2.4.3]{mccullagh89:_gener_linear_model}.
 
 
 \bibliography{lme4}
