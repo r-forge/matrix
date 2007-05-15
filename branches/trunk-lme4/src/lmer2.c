@@ -166,7 +166,7 @@ static void glmer_linkinv(SEXP x)
  * Evaluate the variance function for the link
  *
  * @param x pointer to a glmer2 object
- * @param var pointer to variances to be overwritten
+ * @param var pointer to positions to hold computed values
  *
  * @return var
  */
@@ -199,6 +199,9 @@ static double *glmer_var(SEXP x, double *var)
  * Evaluate the derivative of mu wrt eta for the link
  *
  * @param x pointer to a glmer2 object
+ * @param dmu_deta pointer to positions to hold computed values
+ *
+ * @return dmu_deta
  */
 static double *glmer_dmu_deta(SEXP x, double *dmu_deta)
 {
@@ -249,8 +252,7 @@ static double *glmer_dmu_deta(SEXP x, double *dmu_deta)
 static double glmer_dev_resids(SEXP x, double *dev_res)
 {
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int i, fltype = dims[famType_POS],
-	n = dims[n_POS];
+    int i, fltype = dims[famType_POS], n = dims[n_POS];
     double *mu = REAL(GET_SLOT(x, lme4_muSym)),
 	*wts = REAL(GET_SLOT(x, install("pwts"))),
 	*y = REAL(GET_SLOT(x, lme4_ySym)), sum;
@@ -290,7 +292,8 @@ SEXP glmer_eta(SEXP x)
     SEXP moff = GET_SLOT(x, install("moff")),
 	fixef = GET_SLOT(x, lme4_fixefSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int ione = 1, n = dims[n_POS], p = LENGTH(fixef), q = dims[q_POS];
+    int ione = 1, n = dims[n_POS], nfe = LENGTH(fixef), q = dims[q_POS];
+    /* For this model LENGTH(fixef) != dims[p_POS] == 0 */
     double *eta = REAL(GET_SLOT(x, lme4_etaSym)), one[] = {1,0};
     cholmod_sparse
 	*ZXyt = M_as_cholmod_sparse(GET_SLOT(x, lme4_ZXytSym));
@@ -303,7 +306,7 @@ SEXP glmer_eta(SEXP x)
     else
 	AZERO(eta, n);
 		     /* Add fixed-effects contribution to eta */
-    F77_CALL(dgemv)("N", &n, &p, one, REAL(GET_SLOT(x, lme4_XSym)), &n,
+    F77_CALL(dgemv)("N", &n, &nfe, one, REAL(GET_SLOT(x, lme4_XSym)), &n,
 		    REAL(fixef), &ione, one, eta, &ione);
     lmer2_update_effects(x);	/* evaluate b */
     Memcpy((double*)(re->x), REAL(GET_SLOT(x, lme4_ranefSym)), q);
@@ -461,8 +464,7 @@ internal_deviance(double *d, const int *dims, const cholmod_factor *L)
  * Update A to A* and evaluate its numeric factorization in L.
  *
  * @param deviance Hold the result
- * @param dims dimensions {
- * @param nc length nf vector of number of random effects per factor
+ * @param dims dimensions
  * @param Gp length nf+3 vector of group pointers for the rows of A
  * @param ST pointers to the nf ST factorizations of the diagonal
  *     elements of Sigma 
@@ -606,6 +608,54 @@ internal_update_L(double *deviance, int *dims, const int *Gp,
 }
 
 /**
+ * Allocate, evaluate and return ST'Z' from a glmer or nlmer object.
+ * Note that the returned pointer  must be cholmod_free_sparse'd by
+ * the caller.
+ *
+ * @param x pointer to a glmer or nlmer object
+ *
+ * @return pointer to a cholmod_sparse matrix representing ST'Z'
+ */
+static cholmod_sparse*
+internal_STZ(SEXP x)
+{
+    cholmod_sparse *val,
+	*Zt = M_as_cholmod_sparse(GET_SLOT(x, lme4_ZXytSym));
+    int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym)),
+	*dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int *zi, *zp, i, ii, ione = 1, j, nf = dims[nf_POS];
+    int *nc = Calloc(nf, int);
+    double **st = Calloc(nf, double*), *zx;
+    SEXP ST = GET_SLOT(x, lme4_STSym);
+
+    if (!Zt->sorted)
+	error(_("ZXyt slot be a sorted, sparse matrix"));
+
+    for (i = 0; i < nf; i++) {	/* populate the nc and st arrays */
+	SEXP STi = VECTOR_ELT(ST, i);
+	nc[i] = INTEGER(getAttrib(STi, R_DimSymbol))[0];
+	st[i] = REAL(STi);
+    }
+
+    val = M_cholmod_copy_sparse(Zt, &c);
+    zi = (int*)(val->i); zp = (int*)(val->p); zx = (double*)(val->x);
+    for (j = 0; j < val->ncol; j++) {
+	int k = 0;
+	for (i = zp[j]; i < zp[j + 1]; ) {
+	    while (zi[i] >= Gp[k + 1] && k < nf) k++;
+	    if (nc[k] > 1)	/* premultiply  by T' */
+		F77_CALL(dtrmv)("L", "T", "U", &(nc[k]), st[k],
+				&(nc[k]), &(zx[i]), &ione);
+	    for (ii = 0; ii < nc[k]; ii++) /* premultiply by S' */
+		zx[i + ii] *= st[k][ii * (nc[k] + 1)];
+	    i += nc[k];
+	}	
+    }    
+    Free(st); Free(nc);
+    return val;
+}
+
+/**
  * Evaluate starting estimates for the elements of ST
  *
  * @param ST pointers to the nf ST factorizations of the diagonal
@@ -661,13 +711,13 @@ internal_update_A(cholmod_sparse *ZXyt, SEXP wtP, SEXP offP,
 		  cholmod_sparse *A)
 {
     cholmod_sparse *ts1 = M_cholmod_copy_sparse(ZXyt, &c), *ts2;
-    int *ai, *ap, *zi = (int*)(ts1->i), *zp = (int*)(ts1->p),
-	i, j, m = ts1->nrow, n = ts1->ncol,
+    int *ai, *ap, *zi, *zp, i, j, m = ts1->nrow, n = ts1->ncol,
 	ol = LENGTH(offP), wl = LENGTH(wtP);
-    double *ax, *zx = (double*)(ts1->x),
-	*off = REAL(offP), *wts = REAL(wtP);
+    double *ax, *zx, *off = REAL(offP), *wts = REAL(wtP);
 
     make_cholmod_sparse_sorted(ts1);
+    zi = (int*)(ts1->i); zp = (int*)(ts1->p);
+    zx  = (double*)(ts1->x);
     if (ol) {		/* skip if length 0 */
 	if (ol != n) {
 	    M_cholmod_free_sparse(&ts1, &c);
@@ -727,31 +777,38 @@ internal_update_A(cholmod_sparse *ZXyt, SEXP wtP, SEXP offP,
  */
 SEXP glmer_reweight(SEXP x)
 {
-    SEXP off = GET_SLOT(x, lme4_offsetSym),
+    SEXP fixef = GET_SLOT(x, lme4_fixefSym),
+	off = GET_SLOT(x, lme4_offsetSym),
 	moff = GET_SLOT(x, install("moff")),
-	pwts = GET_SLOT(x, install("pwts")),
 	wts = GET_SLOT(x, lme4_weightsSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int i, lo = LENGTH(moff), n = dims[n_POS];
-    double *dmu_deta = Calloc(n, double),
-	*eta = REAL(GET_SLOT(x, lme4_etaSym)), *mo = REAL(moff),
-	*mu = REAL(GET_SLOT(x, lme4_muSym)),
+    int i, ione = 1, lo = LENGTH(moff),
+	n = dims[n_POS], nfe = LENGTH(fixef);
+    double
+	*dmu_deta = Calloc(n, double),
+	*eta = REAL(GET_SLOT(x, lme4_etaSym)),
+	*mo = REAL(moff), *mu = REAL(GET_SLOT(x, lme4_muSym)),
 	*var = Calloc(n, double), *w = REAL(wts),
-	*y = REAL(GET_SLOT(x, lme4_ySym)), *z = REAL(off);
+	*y = REAL(GET_SLOT(x, lme4_ySym)), *z = REAL(off),
+	one[] = {1, 0};
     cholmod_sparse
 	*ZXyt = M_as_cholmod_sparse(GET_SLOT(x, lme4_ZXytSym)),
 	*A = M_as_cholmod_sparse(GET_SLOT(x, lme4_ASym));
 
       
-    Memcpy(w, REAL(pwts), n); /* initialize weights to prior wts */
+				/* initialize weights to prior wts */
+    Memcpy(w, REAL(GET_SLOT(x, install("pwts"))), n); 
     glmer_linkinv(x);	      /* evaluate mu */
     glmer_dmu_deta(x, dmu_deta);
     glmer_var(x, var);
     for (i = 0; i < n; i++) {
 	w[i] *= dmu_deta[i] * dmu_deta[i]/var[i];
 	/* store negative of adj. wrk. variate in offset */
- 	z[i] = -(eta[i] - (lo ? mo[i] : 0) + (y[i] - mu[i])/dmu_deta[i]);
+ 	z[i] = (lo ? mo[i] : 0) - eta[i] - (y[i] - mu[i])/dmu_deta[i];
     }
+    /* Add the contribution of X\beta to the offset. This is a kludge. */
+    F77_CALL(dgemv)("N", &n, &nfe, one, REAL(GET_SLOT(x, lme4_XSym)),
+		    &n, REAL(fixef), &ione, one, z, &ione);
     internal_update_A(ZXyt, wts, off, A);
     Free(ZXyt); Free(A); Free(dmu_deta); Free(var);
     return R_NilValue;
@@ -893,6 +950,7 @@ SEXP lmer2_update_effects(SEXP x)
     Memcpy(b, bstbx, q);
     for (i = 0, dev[bqd_POS] = 0; i < q; i++) /* accumulate ssqs of bstar */
 	dev[bqd_POS] += bstbx[i] * bstbx[i];
+    /* FIXME: apply the permutation when copying */
     Memcpy(REAL(GET_SLOT(x, lme4_fixefSym)), bstbx + q, dims[p_POS]);
     M_cholmod_free_dense(&bstarb, &c);
     TS_mult(INTEGER(GET_SLOT(x, lme4_GpSym)),
@@ -1315,6 +1373,44 @@ SEXP lmer2_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
     lmer2_setPars(x, Pars);
     UNPROTECT(2);
     return ans;
+}
+
+SEXP nlmer_validate(SEXP x)
+{
+    SEXP GpP = GET_SLOT(x, lme4_GpSym),
+	ST = GET_SLOT(x, lme4_STSym),
+/* 	devianceP = GET_SLOT(x, lme4_devianceSym), */
+	dimsP = GET_SLOT(x, lme4_dimsSym),
+	fixefP = GET_SLOT(x, lme4_fixefSym),
+	flistP = GET_SLOT(x, lme4_flistSym),
+	ranefP = GET_SLOT(x, lme4_ranefSym),
+	weightsP = GET_SLOT(x, lme4_weightsSym) ;
+    cholmod_sparse *Xt = M_as_cholmod_sparse(GET_SLOT(x, install("Xt"))),
+	*Zt = M_as_cholmod_sparse(GET_SLOT(x, install("Zt")));
+    cholmod_factor *L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
+    int *Gp = INTEGER(GpP), *dd = INTEGER(dimsP);
+    int nf = dd[nf_POS], n = dd[n_POS], p = dd[p_POS], q = dd[q_POS];
+
+    if (nf < 1 || LENGTH(flistP) != nf || LENGTH(ST) != nf)
+	return mkString(_("Slots ST, and flist must have length nf"));
+    if (LENGTH(GpP) != (nf + 1))
+	return mkString(_("Slot Gp must have length nf + 1"));
+    if (Gp[0] != 0 || Gp[nf] != q)
+	return mkString(_("Gp[1] != 0 or Gp[nf+1] != q"));
+    if (LENGTH(ranefP) != q)
+	return mkString(_("Slot ranef must have length q"));
+    if (LENGTH(fixefP) != p)
+	return mkString(_("Slot fixef must have length p"));
+    if (LENGTH(weightsP) && LENGTH(weightsP) != n)
+	return mkString(_("Slot weights must have length 0 or n"));
+    if (Zt->nrow != q || Zt->ncol != n)
+	return mkString(_("Slot Zt must have dimensions q by n"));
+    if (Xt->nrow != p || Xt->ncol != n)
+	return mkString(_("Slot Zt must have dimensions p by n"));
+    if (L->n != q || !L->is_ll || !L->is_monotonic)
+	return mkString(_("Slot L must be a monotonic LL' factorization of size (p+q+1)"));
+    Free(L); Free(Zt); Free(Xt);
+    return ScalarLogical(1);
 }
 
 /**
@@ -1771,10 +1867,6 @@ conv_crit(double etaold[], double eta[], int n) {
     return max_abs_diff / (0.1 + max_abs_eta);
 }
 
-#ifndef DEBUG
-#define DEBUG = 1
-#endif
-
 /**
  * Iterate to determine the conditional modes of the random effects.
  *
@@ -1788,14 +1880,14 @@ static int internal_bhat(SEXP x)
     int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym)),
 	*dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
     int i, n = dims[n_POS];
-    cholmod_factor
-	*L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
     cholmod_sparse
 	*A = M_as_cholmod_sparse(GET_SLOT(x, lme4_ASym));
+    cholmod_factor
+	*L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
     double *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
 	*eta = REAL(GET_SLOT(x, lme4_etaSym)),
 	*etaold = Calloc(n, double), crit = IRLS_TOL + 1;
-#ifdef DEBUG
+#ifdef DEBUG_LMER2
     double *dev_res = Calloc(n, double);
 #endif
 
@@ -1805,23 +1897,21 @@ static int internal_bhat(SEXP x)
     lmer2_update_effects(x);
     glmer_eta(x);
     Memcpy(etaold, eta, n);
-#ifdef DEBUG
-    glmer_linkinv(x);
-    dev[Sdr_POS] = glmer_dev_resids(x, dev_res);
-#endif
     for (i = 0; i < IRLS_MAXITER && crit > IRLS_TOL; i++) {
 	glmer_reweight(x);
 	internal_update_L(dev, dims, Gp, ST, A, L);
 	lmer2_update_effects(x);
 	glmer_eta(x);
-#ifdef DEBUG
+#ifdef DEBUG_LMER2
 	glmer_linkinv(x);
-	Rprintf("%3d: %g\n", i, dev[Sdr_POS] = glmer_dev_resids(x, dev_res));
+	Rprintf("%3d: %20.15g %20.15g", i,
+		dev[Sdr_POS] = glmer_dev_resids(x, dev_res), dev[bqd_POS]);
+	Rprintf(" %20.15g\n", dev[Sdr_POS] + dev[bqd_POS]);
 #endif
 	crit = conv_crit(etaold, eta, n);
     }
     Free(L); Free(A);
-#ifdef DEBUG
+#ifdef DEBUG_LMER2
     Free(dev_res);
 #endif
     return (crit > IRLS_TOL) ? 0 : i;
@@ -1836,6 +1926,210 @@ static int internal_bhat(SEXP x)
  */
 SEXP glmer_bhat(SEXP x) {
     return ScalarInteger(internal_bhat(x));
+}
+
+/**
+ * Factor (STZ WW (STZ)' + I) as L, solve
+ * (LL')u = (STZ W z) where W is diagonal
+ *
+ * @param STZ - sparse representation of ST'Z'
+ * @param w - diagonal of matrix W
+ * @param z - working residual vector
+ * @param L - factor to update
+ * @param u - holds the solution
+ *
+ * @return squared length of u
+ */
+static double
+STZ_update_L(cholmod_sparse *STZ, const double *w,
+	     const double *z,
+	     cholmod_factor *L, double *u)
+{
+    cholmod_sparse *wZ = M_cholmod_copy_sparse(STZ, &c);
+    int *wi = (int*)(wZ->i), *wp = (int*)(wZ->p),
+	i, j, m = wZ->nrow, n = wZ->ncol;
+    cholmod_dense *td,
+	*rhs = M_cholmod_allocate_dense(m, 1, m, CHOLMOD_REAL, &c);
+    double *wx = (double*)(wZ->x), *rh = (double*)(rhs->x),
+	one[] = {1, 0}, val;
+
+    AZERO(rh, m);
+    for (j = 0; j < n; j++) {
+	for (i = wp[j]; i < wp[j + 1]; i++) {
+	    wx[i] *= w[j];	/* weight jth column */
+	    rh[wi[i]] += wx[i] * z[j]; /* inner product */
+	}
+    }
+    if (!M_cholmod_factorize_p(wZ, one, (int*) NULL, (size_t) 0, L, &c)) { 
+	error(_("cholmod_factorize_p failed: status %d, minor %d from ncol %d"),
+	      c.status, L->minor, L->n);
+    }
+    M_cholmod_free_sparse(&wZ, &c);
+				/* CHOLMOD_A also applies any permutation */
+    td = M_cholmod_solve(CHOLMOD_A, L, rhs, &c);
+    M_cholmod_free_dense(&rhs, &c);
+    for (i = 0, val = 0; i < m; i++) {
+	double tt = ((double*)(td->x))[i];
+	u[i] = tt;
+	val += tt * tt;
+    }
+    M_cholmod_free_dense(&td, &c);
+    return val;
+}
+
+/**
+ * Iterate to determine the conditional modes of the random effects.
+ *
+ * @param x pointer to a glmer2 object
+ *
+ * @return An indicator of whether the iterations converged
+ */
+static int internal_bhat2(SEXP x)
+{
+    cholmod_sparse *STZ = internal_STZ(x);
+    SEXP fixef = GET_SLOT(x, lme4_fixefSym),
+	moff = GET_SLOT(x, install("moff")), /* this can revert to offset */
+	wts = GET_SLOT(x, lme4_weightsSym);
+    int i, ione = 1, n = STZ->ncol, p = LENGTH(fixef);
+    double *Xbeta = Calloc(n, double),
+	*dev = REAL(GET_SLOT(x, lme4_devianceSym)),
+	*dmu_deta = Calloc(n, double),
+	*eta = REAL(GET_SLOT(x, lme4_etaSym)), 
+	*mu = REAL(GET_SLOT(x, lme4_muSym)),
+	*pwts = REAL(GET_SLOT(x, install("pwts"))), /* can revert to weights */
+	*u = REAL(GET_SLOT(x, lme4_ranefSym)),
+	*var = Calloc(n, double), *w = REAL(wts),
+	*y = REAL(GET_SLOT(x, lme4_ySym)), *z = Calloc(n, double),
+	*etaold = Calloc(n, double), crit = IRLS_TOL + 1, one[] = {1,0};
+    cholmod_dense *ceta = M_numeric_as_chm_dense(eta, n),
+	*cu = M_numeric_as_chm_dense(u, STZ->nrow);
+    cholmod_factor
+	*L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
+#ifdef DEBUG_LMER2
+    double *dev_res = Calloc(n, double);
+#endif
+
+				
+    AZERO(Xbeta, n);		/* Evaluate offset = moff + X\beta */
+    if (LENGTH(moff) == n) Memcpy(Xbeta, REAL(moff), n);
+    F77_CALL(dgemv)("N", &n, &p, one, REAL(GET_SLOT(x, lme4_XSym)),
+		    &n, REAL(fixef), &ione, one, Xbeta, &ione);
+
+    Memcpy(eta, Xbeta, n);	/* initialize eta to Xbeta */
+    Memcpy(etaold, eta, n);
+    for (i = 0; i < IRLS_MAXITER && crit > IRLS_TOL; i++) {
+	glmer_linkinv(x);	/* evaluate mu */
+	glmer_dmu_deta(x, dmu_deta);
+	glmer_var(x, var);
+	Memcpy(w, pwts, n);
+	for (i = 0; i < n; i++) {
+	    w[i] = sqrt(pwts[i] * dmu_deta[i] * dmu_deta[i]/var[i]);
+	    z[i] = w[i] * (eta[i] - Xbeta[i] + (y[i] - mu[i])/dmu_deta[i]);
+	}
+	dev[bqd_POS] = STZ_update_L(STZ, w, z, L, u);
+	if (!M_cholmod_sdmult(STZ, 1 /* trans */, one, one, cu, ceta, &c))
+	    error(_("cholmod_sdmult error returned"));
+#ifdef DEBUG_LMER2
+	glmer_linkinv(x);
+	Rprintf("%3d: %20.15g %20.15g", i,
+		dev[Sdr_POS] = glmer_dev_resids(x, dev_res), dev[bqd_POS]);
+	Rprintf(" %20.15g\n", dev[Sdr_POS] + dev[bqd_POS]);
+#endif
+	crit = conv_crit(etaold, eta, n);
+    }
+    Free(Xbeta); Free(dmu_deta); Free(var); Free(etaold); Free(z);
+    Free(ceta); Free(cu); Free(L);
+#ifdef DEBUG_LMER2
+    Free(dev_res);
+#endif
+    M_cholmod_free_sparse(&STZ, &c);
+    return (crit > IRLS_TOL) ? 0 : i;
+
+}
+
+/**
+ * Determine the conditional modes of the random effects.
+ *
+ * @param x pointer to a glmer2 object
+ *
+ * @return Number of iterations to convergence (0 for non-convergence)
+ */
+SEXP glmer_bhat2(SEXP x) {
+    return ScalarInteger(internal_bhat2(x));
+}
+
+static void nlmer_eval_model(SEXP x, double *Phi, int s, double *w, double *pwts, double *eta)
+{
+    ;
+}
+
+/**
+ * Iterate to determine the conditional modes of the random effects.
+ *
+ * @param x pointer to an nlmer object
+ *
+ * @return An indicator of whether the iterations converged
+ */
+static int internal_nbhat(SEXP x)
+{
+    cholmod_sparse *STZ = internal_STZ(x),
+	*X = M_as_cholmod_sparse(GET_SLOT(x, lme4_XSym));
+    SEXP ypt = GET_SLOT(x, lme4_ySym);
+    int *xi = (int*)(X->i), *xp = (int*)(X->p), i, j, k, n = X->ncol, nn = LENGTH(ypt);
+    int s = n/nn;
+    double
+	*Phi = Calloc(n, double),
+	*Phiold = Calloc(n, double),
+	*Xbeta = Calloc(n, double),
+	*beta = REAL(GET_SLOT(x, lme4_fixefSym)),
+	*dev = REAL(GET_SLOT(x, lme4_devianceSym)),
+	*eta = REAL(GET_SLOT(x, lme4_etaSym)),
+	*pwts = REAL(GET_SLOT(x, lme4_weightsSym)),
+	*u = REAL(GET_SLOT(x, lme4_ranefSym)),
+	*w = Calloc(n, double),
+	*xx = (double*)(X->x),
+	*y = REAL(ypt), 
+	*z = Calloc(n, double),
+	crit = IRLS_TOL + 1, one[] = {1,0}, zero[] = {0,0};
+    cholmod_dense *cZu = M_cholmod_allocate_dense(n, 1, n, CHOLMOD_REAL, &c),
+	*cu = M_numeric_as_chm_dense(u, STZ->nrow);
+    cholmod_factor
+	*L = M_as_cholmod_factor(GET_SLOT(x, lme4_LSym));
+
+
+    for (j = 0; j < n; j++) {	/* evaluate X\beta */
+	Xbeta[j] = 0;
+	for (i = xp[j]; i < xp[j + 1]; i++) Xbeta[j] += beta[xi[i]] * xx[i];
+    }
+    for (i = 0; i < IRLS_MAXITER && crit > IRLS_TOL; i++) {
+	if (!M_cholmod_sdmult(STZ, 1 /* trans */, one, zero, cZu, cu, &c))
+	    error(_("cholmod_sdmult error returned"));
+	for (j = 0; j < n; j++) Phi[j] = Xbeta[j] + ((double*)(cZu->x))[j];
+	nlmer_eval_model(x, Phi, s, w, pwts, eta); /* evaluate mean and gradient */
+	for (j = 0, dev[lr2_POS] = 0; j < nn; j++) {
+	    double resj = y[j] - eta[j];
+	    dev[lr2_POS] += resj * resj;
+	    for (k = 0; k < s; k++) z[j + k * nn] = resj;
+	}
+	for (j = 0; j < n; j++) z[j] -= w[j] * ((double*)(cZu->x))[j];
+	dev[bqd_POS] = STZ_update_L(STZ, w, z, L, u);
+	dev[lr2_POS] = log(dev[lr2_POS] + dev[bqd_POS]);
+#ifdef DEBUG_LMER2
+	Rprintf("%3d: %20.15g %20.15g %20.15g\n", i, dev[lr2_POS], dev[bqd_POS],
+		exp(dev[lr2_POS]) + dev[bqd_POS]);
+#endif
+/* 	crit = conv_crit(etaold, eta, n); */
+    }
+    Free(X); Free(Phi); Free(Phiold); Free(Xbeta), Free(w); Free(z); 
+    Free(cu); Free(L);
+    M_cholmod_free_sparse(&STZ, &c);
+    M_cholmod_free_dense(&cZu, &c);
+    return (crit > IRLS_TOL) ? 0 : i;
+
+}
+
+SEXP nlmer_bhat(SEXP x) {
+    return ScalarInteger(internal_nbhat(x));
 }
 
 /**

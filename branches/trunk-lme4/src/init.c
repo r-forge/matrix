@@ -13,6 +13,7 @@ static R_CallMethodDef CallEntries[] = {
     {"glmer_MCMCsamp", (DL_FUNC) &glmer_MCMCsamp, 6},
     {"glmer_PQL", (DL_FUNC) &glmer_PQL, 1},
     {"glmer_bhat", (DL_FUNC) &glmer_bhat, 1},
+    {"glmer_bhat2", (DL_FUNC) &glmer_bhat2, 1},
     {"glmer_devLaplace", (DL_FUNC) &glmer_devLaplace, 2},
     {"glmer_finalize", (DL_FUNC) &glmer_finalize, 1},
     {"glmer_init", (DL_FUNC) &glmer_init, 2},
@@ -58,6 +59,8 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_update_ZXy", (DL_FUNC) &mer_update_ZXy, 1},
     {"mer_update_y", (DL_FUNC) &mer_update_y, 2},
     {"mer_validate", (DL_FUNC) &mer_validate, 1},
+
+    {"nlmer_bhat", (DL_FUNC) &nlmer_bhat, 1},
 
     {"pedigree_chol", (DL_FUNC) &pedigree_chol, 2},
 
