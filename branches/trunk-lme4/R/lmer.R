@@ -1613,5 +1613,22 @@ setMethod("simulate", "lmer2",
           ans + rnorm(prod(dim(ans)), sd = attr(vc, "sc"))
       })
 
+nlmer <- function(formula, data, family = gaussian,
+                  control = list(), start = NULL,
+                  subset, weights, na.action, offset, contrasts = NULL,
+                  model = TRUE, ...)
+{
+    mc <- match.call()
+    formula <- as.formula(formula)
+    if (length(formula) < 2) stop("formula must be a 3-part formula")
+    formula[[2]] <- as.formula(formula[[2]])
+    if (length(formula) < 3 || length(formula[[2]]) < 3)
+        stop("formula must be a 3-part formula")
+    cv <- do.call("lmerControl", control)
+
+    if (is.numeric(start)) start <- list(fixed = start)
+    stopifnot(length(start$fixed), length(pnames <- names(start$fixed)))
+
+}
 
 
