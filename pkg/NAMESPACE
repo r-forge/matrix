@@ -16,6 +16,8 @@ export("Cholesky",
        "Schur",
        "band",
        "bdiag",
+       "colMeans", "colSums", ## these needed a "..." added
+       "rowMeans", "rowSums",
        "expand",
        "expm",
        "facmul",
@@ -175,8 +177,16 @@ exportClasses(
 	      "nCHMsuper",# unused
 	      "nCHMsimpl",# unused
 
-	      "sparseQR"
+	      "sparseQR",
+
+	      "sparseVector", ## --- and daughters : ---
+	      "dsparseVector",
+	      "isparseVector",
+	      "lsparseVector",
+	      "nsparseVector",
+	      "zsparseVector"
 	      )
+
 
 exportMethods(
 	      ## Group Methods
