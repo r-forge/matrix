@@ -4,6 +4,8 @@ band                    Extract bands of a matrix
 bdiag                   Construct a Block Diagonal Matrix
 CAex                    Albers' example Matrix with "Difficult" Eigen
                         Factorization
+cBind                   Versions of 'cbind' and 'rbind' recursively
+                        built on cbind2/rbind2
 CHMfactor-class         CHOLMOD-based Cholesky Factorizations
 Cholesky                Cholesky Decomposition of a Sparse Matrix
 Cholesky-class          Cholesky and Bunch-Kaufman Decompositions
@@ -50,6 +52,8 @@ isSymmetric-methods     Methods for Function isSymmetric in Package
                         'Matrix'
 KNex                    Koenker-Ng Example Sparse Model Matrix and
                         Response Vector
+kronecker-methods       Methods for Function 'kronecker()' in Package
+                        'Matrix'
 ldenseMatrix-class      Virtual Class "ldenseMatrix" of Dense Logical
                         Matrices
 ldiMatrix-class         Class "ldiMatrix" of Diagonal Logical Matrices
