@@ -7,8 +7,11 @@
 
 setAs("ANY", "sparseMatrix", function(from) as(from, "CsparseMatrix"))
 
-setAs(from = "sparseMatrix", to = "generalMatrix",
-      function(from) as_gSparse(from))
+setAs("sparseMatrix", "generalMatrix", as_gSparse)
+
+setAs("sparseMatrix", "symmetricMatrix", as_sSparse)
+
+setAs("sparseMatrix", "triangularMatrix", as_tSparse)
 
 ## "graph" coercions -- this needs the graph package which is currently
 ##  -----               *not* required on purpose
@@ -293,6 +296,9 @@ setMethod("show", signature(object = "sparseMatrix"),
 	   nR <- d[1] # nrow
            useW <- getOption("width") - (format.info(nR)[1] + 3+1)
            ##                           space for "[<last>,] "
+
+           ## --> suppress rows and/or columns in printing ...
+
            suppCols <- (d[2] * 2 > useW)
            nc <- if(suppCols) (useW - (1 + 6)) %/% 2 else d[2]
            ##                          sp+ row.trailer
@@ -365,6 +371,18 @@ setMethod("isDiagonal", signature(object = "sparseMatrix"),
 
 setMethod("diag", signature(x = "sparseMatrix"),
 	  function(x, nrow, ncol = n) diag(as(x, "CsparseMatrix")))
+
+setMethod("dim<-", signature(x = "sparseMatrix", value = "ANY"),
+	  function(x, value) {
+	      if(!is.numeric(value) || length(value) != 2)
+		  stop("dim(.) value must be numeric of length 2")
+	      if(prod(dim(x)) != prod(value <- as.integer(value)))
+		  stop("dimensions don't match the number of cells")
+              ## be careful to keep things sparse
+	      as(spV2M(as(x, "sparseVector"), nrow=value[1], ncol=value[2]),
+		 class(x))
+	  })
+
 
 ## .as.dgT.Fun
 setMethod("colSums",  signature(x = "sparseMatrix"), .as.dgT.Fun)

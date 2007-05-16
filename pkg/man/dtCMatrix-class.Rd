@@ -22,6 +22,8 @@
 \alias{coerce,dtTMatrix,matrix-method}
 \alias{coerce,matrix,dtCMatrix-method}
 \alias{coerce,matrix,dtTMatrix-method}
+%% Group methods
+\alias{Arith,dtCMatrix,dtCMatrix-method}
 %
 \alias{solve,dtCMatrix,matrix-method}
 \alias{solve,dtCMatrix,dgeMatrix-method}

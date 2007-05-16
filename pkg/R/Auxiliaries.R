@@ -537,7 +537,7 @@ l2d_meth <- function(x) {
     if(is.character(clx))		# < speedup: get it once
         clx <- getClassDef(clx)
     if(extends(clx, "sparseVector")) ## shortcut
-        substr(clx@className, 1,1)
+	substr(as.character(clx@className), 1,1)
     else if(extends(clx, "dMatrix")) "d"
     else if(extends(clx, "nMatrix")) "n"
     else if(extends(clx, "lMatrix")) "l"
@@ -633,36 +633,40 @@ as_Csparse2 <- function(x, cld = if(isS4(x)) getClassDef(class(x))) {
 }
 
 
-
 ## 'cl'   : class() *or* class definition of from
 as_gCsimpl <- function(from, cl = class(from))
     as(from, paste(.M.kind(from, cl), "gCMatrix", sep=''))
 ## slightly smarter:
-as_gSparse2 <- function(from, cl = class(from)) {
+as_Sp <- function(from, shape, cl = class(from)) {
     if(is.character(cl)) cl <- getClassDef(cl)
     as(from, paste(.M.kind(from, cl),
-		   if(extends(cl, "TsparseMatrix")) "gTMatrix"
-		   else "gCMatrix", sep=''))
+		   shape,
+		   if(extends(cl, "TsparseMatrix")) "TMatrix" else "CMatrix",
+		   sep=''))
 }
+as_gSparse <- function(from) as_Sp(from, "g", getClassDef(class(from)))
+as_sSparse <- function(from) as_Sp(from, "s", getClassDef(class(from)))
+as_tSparse <- function(from) as_Sp(from, "t", getClassDef(class(from)))
+
 as_geSimpl2 <- function(from, cl = class(from))
     as(from, paste(.M.kind(from, cl), "geMatrix", sep=''))
-
 ## to be used directly in setAs(.) needs one-argument-only  (from) :
 as_geSimpl <- function(from) as(from, paste(.M.kind(from), "geMatrix", sep=''))
-as_gSparse <- function(from) as_gSparse2(from, getClassDef(class(from)))
 
 ## smarter, (but sometimes too smart!) compared to geClass() above:
 as_geClass <- function(x, cl) {
-    if(missing(cl)) as_geSimpl(x)
-    else if(extends(cl, "diagonalMatrix")  && isDiagonal(x))
+    if(missing(cl)) return(as_geSimpl(x))
+    ## else
+    cld <- getClassDef(cl)
+    if(extends(cld, "diagonalMatrix")  && isDiagonal(x))
 	as(x, cl)
-    else if(extends(cl, "symmetricMatrix") &&  isSymmetric(x)) {
-        kind <- .M.kind(x, cl)
+    else if(extends(cld, "symmetricMatrix") &&  isSymmetric(x)) {
+        kind <- .M.kind(x, cld)
 	as(x, class2(cl, kind, do.sub= kind != "d"))
-    } else if(extends(cl, "triangularMatrix") && isTriangular(x))
+    } else if(extends(cld, "triangularMatrix") && isTriangular(x))
 	as(x, cl)
     else ## revert to
-	as_geSimpl2(x, cl)
+	as_geSimpl2(x, cld)
 }
 
 as_CspClass <- function(x, cl) {
@@ -792,12 +796,6 @@ diagU2N <- function(x, cl = getClassDef(class(x)))
     else x
 }
 
-## Needed, e.g., in ./Csparse.R for colSums() etc:
-.as.dgC.Fun <- function(x, na.rm = FALSE, dims = 1) {
-    x <- as(x, "dgCMatrix")
-    callGeneric()
-}
-
 .as.dgC.0.factors <- function(x) {
     if(!is(x, "dgCMatrix"))
 	as(x, "dgCMatrix") # will not have 'factors'
@@ -805,7 +803,13 @@ diagU2N <- function(x, cl = getClassDef(class(x)))
 	if(!length(x@factors)) x else { x@factors <- list() ; x }
 }
 
-.as.dgT.Fun <- function(x, na.rm = FALSE, dims = 1) {
+## Needed, e.g., in ./Csparse.R for colSums() etc:
+.as.dgC.Fun <- function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE) {
+    x <- as(x, "dgCMatrix")
+    callGeneric()
+}
+
+.as.dgT.Fun <- function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE) {
     ## used e.g. inside colSums() etc methods
     x <- as(x, "dgTMatrix")
     callGeneric()
@@ -821,4 +825,21 @@ tapply1 <- function (X, INDEX, FUN = NULL, ..., simplify = TRUE) {
 ## tapply.x <- function (X, n, INDEX, FUN = NULL, ..., simplify = TRUE) {
 ##     tapply1(X, factor(INDEX, 0:(n-1)), FUN = FUN, ..., simplify = simplify)
 ## }
+
+sparsapply <- function(x, MARGIN, FUN, sparseResult = TRUE, ...)
+{
+    ## Purpose: "Sparse Apply": better utility than tapply1() for colSums() etc :
+    ## ----------------------------------------------------------------------
+    ## Arguments: x: sparseMatrix;  others as in *apply()
+    ## ----------------------------------------------------------------------
+    ## Author: Martin Maechler, Date: 16 May 2007
+    stopifnot(MARGIN %in% 1:2)
+    xi <- if(MARGIN == 1) x@i else x@j
+    ui <- unique(xi)
+    n <- x@Dim[MARGIN]
+    ## FIXME: Here we assume 'FUN' to return  'numeric' !
+    r <- if(sparseResult) numeric(n) else new("dsparseVector", length = n)
+    r[ui + 1L] <- sapply(ui, function(i) FUN(x@x[xi == i], ...))
+    r
+}
 

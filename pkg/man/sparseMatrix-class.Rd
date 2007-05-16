@@ -24,8 +24,11 @@
 %
 \alias{coerce,ANY,sparseMatrix-method}
 \alias{coerce,sparseMatrix,generalMatrix-method}
+\alias{coerce,sparseMatrix,symmetricMatrix-method}
+\alias{coerce,sparseMatrix,triangularMatrix-method}
 \alias{-,sparseMatrix,missing-method}
 \alias{diag,sparseMatrix-method}
+\alias{dim<-,sparseMatrix-method}
 \alias{show,sparseMatrix-method}
 \alias{colMeans,sparseMatrix-method}
 \alias{colSums,sparseMatrix-method}

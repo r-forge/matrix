@@ -130,6 +130,8 @@ Check for DimNames propagation in coercion and other operations.
 
 - sparse-symmetric + diagonal should stay sparse-symmetric
   (only stays sparse): Matrix(0, 4, 4) + Diagonal(4, 1:4)
+  --> R/diagMatrix.R ('FIXME')
+  but also R/Ops.R  to ensure  sp-sym. + sp-sym. |-> sp-sym.  etc
 
 - For a square sparse matrix 'b' {typically dgCMatrix or dgTMatrix},
   we'd want a function  "Mat_plus_t_Mat" <- function(b) {....}
