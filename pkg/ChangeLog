@@ -2,6 +2,19 @@
 
 	* R/CHMfactor.R: Added solve methods for a CHMfactor object.
 
+2007-05-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (sparsapply): new utility, much faster than
+	tapply1() for large sparse matrices.
+
+2007-05-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R (dim<-): reshape now via sparseVector.
+
+	* R/sparseVector.R: methods and function for
+	* R/AllClass.R: new "sparseVector" class and daughters.
+	* NAMESPACE: export new classes
+
 2007-05-14  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.99875-1
