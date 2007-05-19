@@ -50,7 +50,7 @@ SEXP Matrix_writeMatrixMarket(SEXP obj, SEXP file, SEXP typep)
     char *type = CHAR(asChar(typep));
     int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym)),
 	*ii = (int *) NULL, *jj = (int *) NULL;
-    int M = dims[0], N = dims[1], nz = -1;
+    int M = dims[0], N = dims[1], i, nz = -1, *src;
     MM_typecode matcode;
     double *xx = (double *) NULL;
 
@@ -58,7 +58,9 @@ SEXP Matrix_writeMatrixMarket(SEXP obj, SEXP file, SEXP typep)
     if (type[2] == 'C' || type[2] == 'T') {
 	SEXP islot = GET_SLOT(obj, Matrix_iSym);
 	nz = LENGTH(islot);
-	ii = INTEGER(islot);
+	src = INTEGER(islot);
+	ii = Calloc(nz, int);
+	for (i = 0; i < nz; i++) ii[i] = src[i] + 1;
 	mm_set_coordinate(&matcode);
     } else error("Only types 'C' and 'T' allowed");
 
@@ -74,17 +76,22 @@ SEXP Matrix_writeMatrixMarket(SEXP obj, SEXP file, SEXP typep)
     }
     if (type[1] == 'G') mm_set_general(&matcode);
 
-    if (type[2] == 'C')
+    if (type[2] == 'C') {
 	jj = expand_cmprPt(N, INTEGER(GET_SLOT(obj, Matrix_pSym)),
 			   Calloc(nz, int));
-    if (type[2] == 'T')
-	jj = INTEGER(GET_SLOT(obj, Matrix_jSym));
+	for (i = 0; i < nz; i++) jj[i] += 1; /* 1-based indices */
+    }
+    if (type[2] == 'T') {
+	src = INTEGER(GET_SLOT(obj, Matrix_jSym));
+	jj = Calloc(nz, int);
+	for (i = 0; i < nz; i++) jj[i] = src[i] + 1;
+    }
     if (!jj) error("storage mode must be T or C");
 
     mm_write_mtx_crd(CHAR(asChar(file)), M, N, nz, ii, jj, xx,
 		     matcode);
 
-    if (type[2] == 'C') Free(jj);
+    Free(ii); Free(jj);
     return R_NilValue;
 
 }
