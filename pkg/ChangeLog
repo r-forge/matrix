@@ -1,3 +1,8 @@
+2007-05-17  Douglas Bates  <bates@stat.wisc.edu>
+
+	* src/HBMM.c (Matrix_writeMatrixMarket): Write 1-based, not
+	0-based, indices (Jose Quesada <quesada@gmail.com>).
+
 2007-05-16  Douglas Bates  <bates@stat.wisc.edu>
 
 	* R/CHMfactor.R: Added solve methods for a CHMfactor object.
