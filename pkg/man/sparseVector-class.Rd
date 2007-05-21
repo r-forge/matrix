@@ -11,11 +11,15 @@
 %% Group methods
 % \alias{Math,sparseVector-method}
 % %\alias{Math2,sparseVector,numeric-method}
-% \alias{Ops,sparseVector,sparseVector-method}
-% \alias{Ops,sparseVector,numeric-method}
-% \alias{Ops,numeric,sparseVector-method}
-% \alias{Ops,diagonalVector,sparseVector-method}
-% \alias{Ops,sparseVector,diagonalVector-method}
+\alias{Arith,sparseVector,sparseVector-method}
+\alias{Arith,dsparseVector,dsparseVector-method}
+\alias{-,dsparseVector,missing-method}
+\alias{Logic,sparseVector,sparseVector-method}
+\alias{Logic,lsparseVector,lsparseVector-method}
+\alias{Ops,ANY,sparseVector-method}
+\alias{Ops,sparseVector,ANY-method}
+\alias{Ops,sparseVector,atomicVector-method}
+\alias{Ops,atomicVector,sparseVector-method}
 %
 \alias{coerce,ANY,sparseVector-method}
 \alias{coerce,TsparseMatrix,sparseVector-method}
@@ -31,6 +35,7 @@
 \alias{show,sparseVector-method}
 %
 \alias{[,sparseVector,index,ANY,ANY-method}
+\alias{[<-,sparseVector,index,missing,replValue-method}
 %
 \description{Sparse Vector Classes: The virtual mother class
   \code{"sparseVector"} has the five actual daughter classes

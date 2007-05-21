@@ -13,6 +13,20 @@ setAs("sparseMatrix", "symmetricMatrix", as_sSparse)
 
 setAs("sparseMatrix", "triangularMatrix", as_tSparse)
 
+spMatrix <- function(nrow, ncol, i,j,x) {
+    ## Author: Martin Maechler, Date:  8 Jan 2007, 18:46
+    dim <- c(as.integer(nrow), as.integer(ncol))
+    ## The conformability of (i,j,x) with itself and with 'dim'
+    ## is checked automatically by internal "validObject()" inside new(.):
+    kind <- .M.kind(x)
+    new(paste(kind, "gTMatrix", sep=''), Dim = dim,
+        x = if(kind == "d") as.double(x) else x,
+        ## our "Tsparse" Matrices use  0-based indices :
+        i = as.integer(i - 1L),
+        j = as.integer(j - 1L))
+}
+
+
 ## "graph" coercions -- this needs the graph package which is currently
 ##  -----               *not* required on purpose
 ## Note: 'undirected' graph <==> 'symmetric' matrix
@@ -331,6 +345,29 @@ setMethod("show", signature(object = "sparseMatrix"),
        }
    })
 
+
+## For very large and very sparse matrices,  the above show()
+## is not really helpful;  Use  summary() as an alternative:
+
+setMethod("summary", signature(object = "sparseMatrix"),
+	  function(object, ...) {
+	      d <- dim(object)
+	      T <- as(object, "TsparseMatrix")
+	      ## return a data frame (int, int,	 {double|logical|...})	:
+	      r <- data.frame(i = T@i + 1L, j = T@j + 1L, x = T@x)
+	      attr(r, "header") <-
+		  sprintf('%d x %d sparse Matrix of class "%s", with entries',
+			  d[1], d[2], class(object))
+	      ## use ole' S3 technology for such a simple case
+	      class(r) <- c("sparseSummary", class(r))
+	      r
+	  })
+
+print.sparseSummary <- function (x, ...) {
+    cat(attr(x, "header"),"\n")
+    print.data.frame(x, ...)
+    invisible(x)
+}
 
 setMethod("isSymmetric", signature(object = "sparseMatrix"),
 	  function(object, tol = 100*.Machine$double.eps) {

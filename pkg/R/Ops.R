@@ -892,9 +892,76 @@ setMethod("Logic", signature(e1 = "sparseVector", e2 = "sparseVector"),
                                        as(e2, "lsparseVector")))
 
 setMethod("Arith", signature(e1 = "dsparseVector", e2 = "dsparseVector"),
+
+          ##  "+", "-", "*", "^", "%%", "%/%", "/"
+
           function(e1, e2) {
+              n1 <- e1@length
+              n2 <- e2@length
+              if(n1 != n2) {
+                  if(n1 < n2) {
+                      n <- n1 ; N <- n2
+                  } else {
+                      n <- n2 ; N <- n1
+                  }
+                  if(N %% n != 0) ## require this here, for conveniense
+                      ## for regular vectors, this is only a warning:
+                      stop("longer object length\n\t",
+                              "is not a multiple of shorter object length")
+                  if(n == 1) { # simple case, do not really recycle
+                      if(n1 < n2) return(callGeneric(sp2vec(e1, "double"), e2))
+                      else        return(callGeneric(e1, sp2vec(e2, "double")))
+                  }
+                  ## else : 2 <= n < N --- recycle the shorter one
+                  q <- N %/% n
+                  if(n1 < n2) {
+                      e1@i <- rep.int(e1@i, q)
+                      e1@x <- rep.int(e1@x, q)
+                  } else {
+                      e2@i <- rep.int(e2@i, q)
+                      e2@x <- rep.int(e2@x, q)
+                  }
+              } else { ## n1 == n2
+                  N <- n1
+              }
+              r <- new("dsparseVector", length = N)
+	      switch(.Generic,
+		     "+" = , "-" =  ## X +- 0 == 0 +- X == X
+
+		     ii <- union(e1@i, e2@i),
+
+		     "*" =
+		 { ##  X * 0 == 0 * X == 0 --> keep common non-0
+		     ii <- intersect(e1@i, e2@i)
+
+		 },
+
+		     "^" =
+		 {
+
+		     ii <- intersect(e1@i, e2@i)
+		     ## 3 cases:
+		     ## 1) X^0 := 1  (even for X=0) ==> dense
+		     ## 2) 0^Y := 0  for Y != 0		=====
+		     ## 3) x^y :
+
+		     ## FIXME:	dgeM[cbind(i,j)] <- V  is not yet possible
+		     ##	    nor dgeM[ i_vect   ] <- V
+		     ## r <- as(e2, "dgeMatrix")
+		     ## ...
+		 },
+
+		     "%%" = , "%/%" = , "/" = ## 0 op 0	 |-> NaN => dense
+
+		     )
+
               .bail.out.2(.Generic, class(e1), class(e2))
           })
+
+## "Arith"  exception (shortcut)
+setMethod("-", signature(e1 = "dsparseVector", e2 = "missing"),
+          function(e1) { e1@x <- -e1@x ; e1 })
+
 
 setMethod("Logic", signature(e1 = "lsparseVector", e2 = "lsparseVector"),
           function(e1, e2) {

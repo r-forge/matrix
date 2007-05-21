@@ -190,8 +190,16 @@ assert.EQ.mat(kr,
 ## sparse:
 (kt1 <- kronecker(t1, tu))
 kt2 <- kronecker(t1c, cu)
-stopifnot(identical(Matrix:::uniq(kt1), Matrix:::uniq(kt2)))
-## but kt1 and kt2, both "dgT" are different since entries are not ordered!
+mt2 <- as(kt2, "matrix")
+stopifnot(identical(Matrix:::uniq(kt1), Matrix:::uniq(kt2)),
+          ## but kt1 and kt2, both "dgT", do differ since entries are not ordered!
+          identical(rowSums (kt2), rowSums (mt2)),
+          identical(colSums (kt2), colSums (mt2)),
+          all.equal(colMeans(kt2), colMeans(mt2), tol = 1e-14),
+          all.equal(colMeans(kt2, na.rm=TRUE),
+                    colMeans(mt2, na.rm=TRUE), tol = 1e-14))
+
+
 ktf <- kronecker(as.matrix(t1), as.matrix(tu))
 if(FALSE) # FIXME? our kronecker treats "0 * NA" as "0" for structural-0
 assert.EQ.mat(kt2, ktf, tol= 0)
@@ -279,15 +287,20 @@ xpx <- crossprod(mm)
 ## extract nonzero pattern
 nxpx <- as(xpx, "nsCMatrix")
 if(FALSE)
-    show(nxpx) ## gives error about "nsC" -> "ngT" coercion ..
-## The bug is actually from *subsetting* the large matrix:
-if(FALSE) ## FIXME
-    r <- nxpx[1:2,]
+    show(nxpx) ## now ok
+## *subsetting* the large matrix used to be a problem:
+nxpx[1:10, 1:36]
 
-lmm <- as(mm, "lgCMatrix")
+
+lmm <- as(mm, "lsparseMatrix")
 nmm <- as(lmm, "nMatrix")
-xlx <- crossprod(lmm)
-x.x <- crossprod(nmm)
+xlx <- crossprod(lmm) #-> "l" -> "d"
+x.x <- crossprod(nmm) #-> "n" -> "n"  {hmm, not 100% "logical"}
+stopifnot(is(lmm, "lgCMatrix"),
+          is(nmm, "ngCMatrix"),
+          is(xlx, "dsCMatrix"),
+          is(x.x, "nsCMatrix"))
+
 
 ## now A = lxpx and B = xlx should be close, but not quite the same
 ## since <x,y> = 0 is well possible when x!=0 and y!=0 .
@@ -344,6 +357,53 @@ stopifnot(as(ms0,"matrix") == as(ll, "matrix"), # coercing num |-> log
 	  identical(as(da, "lMatrix"), as(lt, "CsparseMatrix")) # lgC*
 	  )
 
+## this used to be at the end; hence keep timing here:
+cat('Time elapsed: ', proc.time(),'\n') # "stats"
+
+op <- options(max.print = 2000)
+x.x # suppressing most rows and columns in printing
+
+sx <- c(0,0,3, 3.2, 0,0,0,-3:1,0,0,2,0,0,5,0,0)
+(ss <- as(sx, "sparseVector"))
+msx <- as(Matrix(sx,4,5),"TsparseMatrix")
+validObject(vx <- as(x.x, "sparseVector")) #-> nsparseV
+vx
+v0 <- as.vector(vx)
+v2 <- as.numeric(vx)
+i <- c(3000:1, 2000:1)
+stopifnot(identical(sx, as(ss,"vector")),
+          identical(sx, as.numeric(ss)),
+          identical(v0, as(vx, "vector")),
+          identical(v0, v2 != 0),
+          identical(v0[17], as.vector(vx[17])),
+          identical(v0[i],  as.vector(vx[i]))
+          )
+
+ss. <- ss
+sx. <- sx
+set.seed(17)
+for(n in 1:20) {
+    i <- sample(length(ss), 20, replace=TRUE)
+    ## test subsetting:
+    stopifnot(identical(as.numeric(ss[i]), sx[i]))
+    ## test sub-assignment:
+    nv <- sample(c(20,10,5,4,2,1), 1) # an integer factor of 20 == length(i)
+    v <- round(100 * rnorm(nv))
+    v[sample(nv, nv %/% 2)] <- 0
+    ss[i] <- v
+    sx[i] <- v
+    stopifnot(identical(sx, as.numeric(ss)))
+    ## restore
+    ss <- ss. ; sx <- sx.
+}
+
+## c() for sparseVectors:
+cc <- Matrix:::c2v
+stopifnot(identical(as(c(sx, sx), "sparseVector"),
+                    cc(ss, ss)))
+## TODO: lsparse <-> dsparse
+## stopifnot(identical(as(c(sx, sx > 0, sx), "sparseVector"),
+##                     cc(cc(ss, ss > 0), ss)))
 
 cat('Time elapsed: ', proc.time(),'\n') # "stats"
 
