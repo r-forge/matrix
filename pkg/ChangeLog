@@ -1,3 +1,19 @@
+2007-05-21  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (spMatrix): utility (T)sparse Matrix constructor;
+	* man/spMatrix.Rd: docu., including examples
+
+	* R/Auxiliaries.R (sp.colMeans): etc, using a patched callGeneric(),
+	in order to make colMeans() etc fast *and* correct.
+	* R/sparseVector.R (replSPvec): "[<-" functionality for
+	sparseVectors; tested in
+	* tests/simple.R:
+
+2007-05-19  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (print.sparseSummary): and summary() method for
+	(very) sparse Matrices; output similar to Matlab's print().
+
 2007-05-17  Douglas Bates  <bates@stat.wisc.edu>
 
 	* src/HBMM.c (Matrix_writeMatrixMarket): Write 1-based, not

@@ -78,9 +78,8 @@ setMethod("rowSums", signature(x = "dgCMatrix"),
 	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
 	  sparsapply(x, 1, sum, sparseResult = sparseResult, na.rm = na.rm))
 
-setMethod("rowMeans", signature(x = "dgCMatrix"),
-	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
-	  sparsapply(x, 1, sum, sparseResult = sparseResult, na.rm = na.rm)/ ncol(x))
+setMethod("rowMeans", signature(x = "dgCMatrix"), sp.rowMeans)
+
 
 setMethod("qr", signature(x = "dgCMatrix"),
 	  function(x, tol = 1e-07, LAPACK = FALSE)

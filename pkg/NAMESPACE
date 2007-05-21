@@ -13,6 +13,7 @@ export("Cholesky",
        "Diagonal",
        "Hilbert",
        "Matrix",
+       "spMatrix",
        "Schur",
        "band",
        "bdiag",
@@ -37,8 +38,6 @@ export("Cholesky",
        "writeMM"
        )
 
-## Maybe {Doug prefers having only cBind/rBind}?
-## export("cbind", "rbind")
 ## substitute for using  cbind() / rbind()
 export("cBind",
        "rBind")
@@ -247,6 +246,7 @@ exportMethods(
 	      "rowSums",
 	      "show",
 	      "solve",
+	      "summary",
 	      "t",
 	      "tail",
 	      "tcrossprod",
@@ -258,3 +258,4 @@ exportMethods(
 exportMethods("rbind2")
 exportMethods("cbind2")
 
+S3method(print, sparseSummary)

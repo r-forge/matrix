@@ -1,7 +1,63 @@
 #### "Namespace private" Auxiliaries  such as method functions
 #### (called from more than one place --> need to be defined early)
 
-.isR_26 <- (paste(R.version$major, R.version$minor, sep=".") >= "2.6")
+.isR_26  <- (paste(R.version$major, R.version$minor, sep=".") >= "2.6")
+
+
+.okR_callG <- R.version$`svn rev` >= 41656 ## << ported fix for callGeneric
+
+## will be hidden in namespace and can be removed when DEPENDS: R >= 2.5.1
+if(! .okR_callG) # use the fixed one ..
+    callGeneric <- function(...)
+{
+    frame <- sys.parent()
+    envir <- parent.frame()
+
+    ## the  lines below this comment do what the previous version
+    ## did in the expression fdef <- sys.function(frame)
+    if(exists(".Generic", envir = envir, inherits = FALSE))
+	fname <- get(".Generic", envir = envir)
+    else { # in a local method (special arguments), or	an error
+	fname <- sys.call(frame)[[1]]
+	## FIXME:  this depends on the .local mechanism, which should change
+	if(identical(as.character(fname), ".local"))
+	    fname <- sys.call(sys.parent(2))[[1]]
+	fname <- as.character(fname)
+    }
+    fdef <- get(fname, env = envir)
+
+    if(is.primitive(fdef)) {
+        if(nargs() == 0)
+            stop("'callGeneric' with a primitive needs explicit arguments (no formal args defined)")
+        else {
+            fname <- as.name(fname)
+            call <- substitute(fname(...))
+        }
+    }
+    else {
+        env <- environment(fdef)
+        if(!exists(".Generic", env, inherits = FALSE))
+            stop("'callGeneric' must be called from a generic function or method")
+        f <- get(".Generic", env, inherits = FALSE)
+        fname <- as.name(f)
+        if(nargs() == 0) {
+            call <- sys.call(frame)
+            call[[1]] <- as.name(fname) # in case called from .local
+            call <- match.call(fdef, call)
+            anames <- names(call)
+            matched <- !is.na(match(anames, names(formals(fdef))))
+            for(i in seq_along(anames))
+                if(matched[[i]])
+                    call[[i]] <- as.name(anames[[i]])
+        }
+        else {
+            call <- substitute(fname(...))
+        }
+    }
+    eval(call, sys.frame(sys.parent()))
+}
+
+
 
 ## Need to consider NAs ;  "== 0" even works for logical & complex:
 is0  <- function(x) !is.na(x) & x == 0
@@ -796,12 +852,15 @@ diagU2N <- function(x, cl = getClassDef(class(x)))
     else x
 }
 
+
+
 .as.dgC.0.factors <- function(x) {
     if(!is(x, "dgCMatrix"))
 	as(x, "dgCMatrix") # will not have 'factors'
     else ## dgCMatrix
 	if(!length(x@factors)) x else { x@factors <- list() ; x }
 }
+
 
 ## Needed, e.g., in ./Csparse.R for colSums() etc:
 .as.dgC.Fun <- function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE) {
@@ -829,6 +888,7 @@ tapply1 <- function (X, INDEX, FUN = NULL, ..., simplify = TRUE) {
 sparsapply <- function(x, MARGIN, FUN, sparseResult = TRUE, ...)
 {
     ## Purpose: "Sparse Apply": better utility than tapply1() for colSums() etc :
+    ##    NOTE: Only correct for things like sum() where the "zeros do not count"
     ## ----------------------------------------------------------------------
     ## Arguments: x: sparseMatrix;  others as in *apply()
     ## ----------------------------------------------------------------------
@@ -838,8 +898,25 @@ sparsapply <- function(x, MARGIN, FUN, sparseResult = TRUE, ...)
     ui <- unique(xi)
     n <- x@Dim[MARGIN]
     ## FIXME: Here we assume 'FUN' to return  'numeric' !
-    r <- if(sparseResult) numeric(n) else new("dsparseVector", length = n)
+    r <- if(sparseResult) new("dsparseVector", length = n) else numeric(n)
     r[ui + 1L] <- sapply(ui, function(i) FUN(x@x[xi == i], ...))
     r
 }
 
+sp.colMeans <- function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
+{
+    nr <- nrow(x)
+    if(na.rm) ## use less than nrow(.) in case of NAs
+	nr <- nr - sparsapply(x, 2, function(u) sum(is.na(u)),
+			      sparseResult=sparseResult)
+    sparsapply(x, 2, sum, sparseResult=sparseResult, na.rm=na.rm) / nr
+}
+
+sp.rowMeans <- function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
+{
+    nc <- ncol(x)
+    if(na.rm) ## use less than ncol(.) in case of NAs
+	nc <- nc - sparsapply(x, 1, function(u) sum(is.na(u)),
+			      sparseResult=sparseResult)
+    sparsapply(x, 1, sum, sparseResult=sparseResult, na.rm=na.rm) / nc
+}

@@ -181,7 +181,9 @@ intIv <- function(i, n)
     ## --------------------------------------------------------------------
     ## Arguments: i: index vector (numeric | logical)
     ##		  n: array extent { ==	length(.) }
-    if(is(i, "numeric")) {
+    if(missing(i))
+	seq_len(n)
+    else if(is(i, "numeric")) {
 	storage.mode(i) <- "integer"
 	if(any(i < 0L)) {
 	    if(any(i > 0L))
@@ -223,6 +225,93 @@ setMethod("[", signature(x = "sparseVector", i = "index"),
 	      x
 	  })
 
+## This is much analogous to replTmat in ./Tsparse.R:
+replSPvec <- function (x, i, value)
+{
+    n <- x@length
+    ii <- intIv(i, n)
+    lenRepl <- length(ii)
+    lenV <- length(value)
+    if(lenV == 0) {
+	if(lenRepl != 0)
+	    stop("nothing to replace with")
+	else return(x)
+    }
+    ## else: lenV := length(value) > 0
+    if(lenRepl %% lenV != 0)
+	stop("number of items to replace is not a multiple of replacement length")
+    anyDup <- any(duplicated(ii))
+    if(anyDup) { ## multiple *replacement* indices: last one wins
+	## TODO: in R 2.6.0 use	 duplicate(*, fromLast=TRUE)
+	ir <- lenRepl:1
+	keep <- match(ii, ii[ir]) == ir
+	ii <- ii[keep]
+	lenV <- length(value <- rep(value, length = lenRepl)[keep])
+	lenRepl <- length(ii)
+    }
+
+    cld <- getClassDef(class(x))
+    has.x <- !extends(cld, "nsparseVector")
+    m <- match(x@i, ii, nomatch = 0)
+    sel <- m > 0L
+
+    ## the simplest case
+    if(all0(value)) { ## just drop the non-zero entries
+	if(any(sel)) { ## non-zero there
+	    x@i <- x@i[!sel]
+	    if(has.x)
+		x@x <- x@x[!sel]
+	}
+	return(x)
+
+    }
+    ## else --	some( value != 0 ) --
+    if(lenV > lenRepl)
+	stop("too many replacement values")
+    else if(lenV < lenRepl)
+	value <- rep(value, length = lenRepl)
+    ## now:  length(value) == lenRepl
+
+    v0 <- is0(value)
+    ## value[1:lenRepl]:  which are structural 0 now, which not?
+
+    if(any(sel)) {
+	## indices of non-zero entries -- WRT to subvector
+	iN0 <- m[sel] ## == match(x@i[sel], ii)
+
+	## 1a) replace those that are already non-zero with new val.
+	vN0 <- !v0[iN0]
+	if(any(vN0) && has.x)
+	    x@x[sel][vN0] <- value[iN0[vN0]]
+
+	## 1b) replace non-zeros with 0 --> drop entries
+	if(any(!vN0)) {
+	    i <- which(sel)[!vN0]
+	    if(has.x)
+		x@x <- x@x[-i]
+	    x@i <- x@i[-i]
+	}
+	iI0 <- if(length(iN0) < lenRepl)
+	    seq_len(lenRepl)[-iN0]
+    } else iI0 <- seq_len(lenRepl)
+
+    if(length(iI0) && any(vN0 <- !v0[iI0])) {
+	## 2) add those that were structural 0 (where value != 0)
+	ij0 <- iI0[vN0]
+	x@i <- c(x@i, ii[ij0])
+	if(has.x)
+	    x@x <- c(x@x, value[ij0])
+    }
+    x
+
+}
+
+setReplaceMethod("[", signature(x = "sparseVector", i = "index",
+				value = "replValue"),
+		 replSPvec)
+
+
+
 ## a "method" for c(<sparseVector>, <sparseVector>):
 c2v <- function(x, y) {
     cx <- class(x)
@@ -260,8 +349,5 @@ c2v <- function(x, y) {
 
 ### Group Methods (!)
 
-## o "Ops"  :  ---> in ./Ops.R
-##
-##	setMethod("Ops", c(e1 = "sparseVector", e2 = ..),
-##                 function(e1,e2) { .... })
+## o "Ops" , "Arith", "Compare"  :  ---> in ./Ops.R
 

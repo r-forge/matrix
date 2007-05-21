@@ -30,6 +30,7 @@
 \alias{diag,sparseMatrix-method}
 \alias{dim<-,sparseMatrix-method}
 \alias{show,sparseMatrix-method}
+\alias{summary,sparseMatrix-method}
 \alias{colMeans,sparseMatrix-method}
 \alias{colSums,sparseMatrix-method}
 \alias{rowMeans,sparseMatrix-method}
