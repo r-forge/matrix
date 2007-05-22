@@ -1,0 +1,19 @@
+Pkgname         Repos   kind_of_dependence
+
+lme4            CRAN    Depends
+
+arules          CRAN    Depends
+svcm            CRAN    Depends
+qgen            CRAN    Depends
+
+Category        BioC    Depends
+ScISI           BioC    Depends
+ppiStats        BioC    Suggests
+ppiStats	BioC    via_Category
+GOstats		BioC    via_Category
+
+MEMSS           CRAN    via_lme4
+SASmixed        CRAN    via_lme4
+mlmRev          CRAN    via_lme4
+
+
