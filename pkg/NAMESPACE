@@ -1,4 +1,4 @@
-useDynLib(Matrix, .registration=TRUE)# <-> R 2.3.0 or later
+useDynLib(Matrix, .registration=TRUE)
 
 importFrom("lattice", levelplot)
 importFrom("graphics", image)
@@ -19,6 +19,7 @@ export("Cholesky",
        "bdiag",
        "colMeans", "colSums", ## these needed a "..." added
        "rowMeans", "rowSums",
+       "drop0",
        "expand",
        "expm",
        "facmul",

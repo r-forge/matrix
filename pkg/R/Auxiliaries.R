@@ -1,13 +1,9 @@
 #### "Namespace private" Auxiliaries  such as method functions
 #### (called from more than one place --> need to be defined early)
 
-.isR_26  <- (paste(R.version$major, R.version$minor, sep=".") >= "2.6")
 
-
-.okR_callG <- R.version$`svn rev` >= 41656 ## << ported fix for callGeneric
-
-## will be hidden in namespace and can be removed when DEPENDS: R >= 2.5.1
-if(! .okR_callG) # use the fixed one ..
+if(R.version$`svn rev` < 41656) ## use the fixed one
+    ## will be hidden in namespace and can be removed when DEPENDS: R >= 2.5.1
     callGeneric <- function(...)
 {
     frame <- sys.parent()
