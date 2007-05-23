@@ -1,3 +1,14 @@
+2007-05-23  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* NAMESPACE: exported drop0(), since
+	* man/drop0.Rd: I have seen several cases, I really wanted to use
+	it, so our users may want too.
+
+2007-05-22  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* man/colSums.Rd: separately document colSums() etc, since these
+	have the extra argument 'sparseResult'.
+
 2007-05-21  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/sparseMatrix.R (spMatrix): utility (T)sparse Matrix constructor;

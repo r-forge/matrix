@@ -879,6 +879,11 @@ setMethod("Ops", signature(e1 = "ANY", e2 = "sparseVector"),
 
 ## 1)  spVec  o  (sp)Vec : -------------
 
+## FIXME:
+##   1. <spVec>  o  <scalar>   should  *NOT* go via  <spV> o <spV>
+##   2. <spVec>  o  <non-NA numeric>  should also happen directly and
+##                                    |-> sparse for o = {'*', "/", '&&'
+
 setMethod("Ops", signature(e1 = "sparseVector", e2 = "atomicVector"),
 	  function(e1, e2) callGeneric(e1, as(e2, "sparseVector")))
 setMethod("Ops", signature(e1 = "atomicVector", e2 = "sparseVector"),

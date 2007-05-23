@@ -28,11 +28,20 @@
 \section{Methods}{
   \describe{
 
+    \item{kronecker}{\code{signature(X = "Matrix", Y = "ANY")} .......}
+    \item{kronecker}{\code{signature(X = "ANY", Y = "Matrix")} .......}
     \item{kronecker}{\code{signature(X = "diagonalMatrix", Y = "ANY")} .......}
-    \item{kronecker}{\code{signature(X = "diagonalMatrix", Y = "ANY")} .......}
-    \item{kronecker}{\code{signature(X = "diagonalMatrix", Y = "ANY")} .......}
+    \item{kronecker}{\code{signature(X = "sparseMatrix", Y = "ANY")} .......}
+    \item{kronecker}{\code{signature(X = "TsparseMatrix", Y = "TsparseMatrix")} .......}
+    \item{kronecker}{\code{signature(X = "dgTMatrix", Y = "dgTMatrix")} .......}
+    \item{kronecker}{\code{signature(X = "dtTMatrix", Y = "dtTMatrix")} .......}
 
-}}
+  }
+}
+\examples{
+(t1 <- spMatrix(5,4, x= c(3,2,-7,11), i= 1:4, j=4:1)) #  5 x  4
+(t2 <- kronecker(Diagonal(3, 2:4), t1))               # 15 x 12
+}
 \keyword{methods}
 \keyword{array}
 
