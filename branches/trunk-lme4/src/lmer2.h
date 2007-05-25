@@ -26,5 +26,7 @@ SEXP lmer2_validate(SEXP x);
 SEXP lmer2_vcov(SEXP x);
 
 SEXP nlmer_bhat(SEXP x);
+SEXP nlmer_eval(SEXP x, SEXP Phi);
+SEXP nlmer_validate(SEXP x);
 
 #endif /* LME4_LMER2_H */
