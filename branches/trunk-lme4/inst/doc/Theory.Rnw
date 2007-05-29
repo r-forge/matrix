@@ -1,0 +1,249 @@
+\documentclass[12pt]{article}
+\usepackage{Sweave}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage[authoryear,round]{natbib}
+\bibliographystyle{plainnat}
+\DefineVerbatimEnvironment{Sinput}{Verbatim}
+{formatcom={\vspace{-2.5ex}},fontshape=sl,
+  fontfamily=courier,fontseries=b, fontsize=\scriptsize}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}
+{formatcom={\vspace{-2.5ex}},fontfamily=courier,fontseries=b,%
+  fontsize=\scriptsize}
+%%\VignetteIndexEntry{Implementation Details}
+%%\VignetteDepends{lme4}
+\newcommand{\trans}{\ensuremath{^\prime}}
+\title{Theory and computational methods for mixed models}
+\author{Douglas Bates\\Department of Statistics\\%
+  University of Wisconsin -- Madison}
+\begin{document}
+\SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,strip.white=TRUE}
+\SweaveOpts{include=FALSE}
+\setkeys{Gin}{width=\textwidth}
+\newcommand{\code}[1]{\texttt{\small{#1}}}
+\newcommand{\package}[1]{\textsf{\small{#1}}}
+\maketitle
+\begin{abstract}
+  The \code{lme4} package provides methods for fitting linear mixed
+  models, generalized linear mixed models and nonlinear mixed models.
+  In this vignette we describe the formulation of these models and the
+  computational approach used to evaluate or approximate the
+  log-likelihood of a model/data/parameter value combination.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+
+The \code{lme4} package is used to fit and to analyze linear mixed
+models, generalized linear mixed models and nonlinear mixed models.
+These models are called mixed models because they incorporate both
+\emph{fixed-effects} parameters, which apply to an entire population or
+to well-defined and repeatable subsets of a population, and
+\emph{random effects}, which apply to the particular experimental
+units or observational units in the study.  Such models are also
+called \emph{multilevel} models because the random effects represent
+levels of variation in addition to the per-observation noise term that
+is commonly incorporated in models such as linear regression models,
+generalized linear models or nonlinear regression models.
+
+The three types of mixed models -- linear, generalized linear and
+nonlinear -- share common characteristics in that the model is
+specified in whole or in part by a \emph{mixed model formula} that
+describes a \emph{linear predictor} and a variance-covariance
+structure for the random effects.  In the next section we describe
+these properties of the mixed model formula and a general approach to
+evaluating or approximating the log-likelihood at specific parameter
+values for such models.
+
+In subsequent sections we describe computational methods for specific
+kinds of mixed models.
+
+\section{The mixed model formula and the log-likelihood}
+\label{sec:formula}
+
+In the \code{lme4} package a mixed model formula is similar to a
+linear model formula, such as used in the \code{lm} or \code{glm}
+functions, except that it contains one or more random-effects terms,
+which are terms that contain the vertical bar (\code{|}) symbol.
+Before discussing the details of the interpretation of the terms in
+the formula we describe how the formula determines the log-likelihood
+of the model.
+
+\subsection{Log-likelihood of mixed models}
+\label{sec:log-likelihood}
+
+\subsubsection{The linear predictor}
+\label{sec:linpred}
+
+
+When evaluated with respect to data consisting of an $n$-dimensional
+response vector $\bm{y}$ and corresponding covariates, a mixed model
+formula produces the model matrices $\bm{X}$ (of size $n\times p$) and
+$\bm{Z}$ (of size $n\times q$) in the \emph{linear predictor}
+\begin{equation}
+  \label{eq:linpred}
+  \bm{X}\bm{\beta}+\bm{Z}\bm{b}
+\end{equation}
+where $\bm{\beta}$ is the $p$-dimensional vector of fixed-effects
+parameters and $\bm{b}$ is the $q$-dimensional vector of random effects.
+
+For all types of mixed models the expected value of the response
+vector $\bm{y}$ is a function of $\bm{\beta}$ and $\bm{b}$ that
+depends only on the linear predictor.  That is, we can write
+\begin{equation}
+  \label{eq:expected}
+  \mathrm{E}[\bm{y}] = \bm{\mu}(\bm{\beta},\bm{b}) =
+  \bm{\mu}\left(\bm{X}\bm{\beta}+\bm{Z}\bm{b}\right)
+\end{equation}
+The particular way in which the expected value depends on the linear
+predictor is different for different types of mixed models.  In the
+simplest case, a linear mixed model, the expected value is the linear
+predictor; i.e.{}
+$\bm{\mu}(\bm{\beta},\bm{b})=\bm{X}\bm{\beta}+\bm{Z}\bm{b}$.
+
+In general we assume we can write the probability density or the
+probability mass function of $\bm{y}$ in the form
+\begin{equation}
+  \label{eq:conddens}
+  k(\sigma^2)\exp\left[\frac{d(\bm{\mu}|\bm{y})}{-2\sigma^2}\right]
+\end{equation}
+where $\sigma^2$ is a scale factor in the expression for the
+variance-covariance matrix of $\bm{y}$ and
+$d(\bm{\mu},\bm{y})$ is the \emph{discrepancy function}.
+The normalization constant $k(\sigma^2)$ depends only on the scale
+factor $\sigma^2$.
+
+For linear mixed models and nonlinear mixed models the scale factor
+$\sigma^2$ is the variance of individual components of $\bm{y}$.
+Although we still write this scale factor as $\sigma^2$ for a
+generalized linear mixed model it does not need to represent the
+variance of any specific quantity.  For some GLMM's, specifically
+those based on the binomial or Poisson distributions for $\bm{y}$, the
+variance is determined by the mean $\bm{\mu}$ and thus $\sigma^2\equiv 1$.
+
+\subsubsection{Variance-covariance of the random effects}
+\label{sec:ranefvarcov}
+
+The random effects $\bm{b}$ are random variables with a multivariate
+normal (or Gaussian) distribution of the form
+\begin{equation}
+  \label{eq:ranef}
+  \bm{b}\sim\mathcal{N}\left(\bm{0},\sigma^2\bm{\Sigma}(\bm{\theta})\right)
+\end{equation}
+where $\sigma^2$ is the same scale factor as in (\ref{eq:conddens})
+and $\bm{\Sigma}$ is a $q\times q$ positive semi-definite relative
+variance covariance matrix determined by the parameter $\bm{\theta}$.
+
+In addition to determining the linear predictor, the mixed model
+formula determines the form of $\bm{\Sigma}$.
+
+The size $q$ of the symmetric matrix $\bm{\Sigma}$ can be very large
+but this matrix is typically quite sparse and the dimension of the
+parameter $\bm{\theta}$ that determines $\bm{\Sigma}$ is small.
+Because $\bm{\Sigma}$ is positive semi-definite it has a Cholesky
+factorization which we write as
+\begin{equation}
+  \label{eq:TSST}
+  \bm{\Sigma}=\bm{T}\bm{S}\bm{S}\bm{T}\trans
+\end{equation}
+where $\bm{T}$ is unit lower triangular (i.e.{} it is lower triangular
+and all its diagonal elements are unity) and $\bm{S}$ is a
+non-negative diagonal matrix (i.e.{} it is a diagonal matrix and all
+its diagonal elements are non-negative).  This is a simple
+modification of the ``LDL'' form of the Cholesky
+factorization~\citep{davis06:csparse_book} in which the diagonal
+elements of $\bm{S}$ are the square roots of the corresponding
+diagonal elements of $\bm{D}$ from the LDL form.
+
+As shown in \S\ref{sec:theta}, the parameter $\bm{\theta}$ determines
+$\bm{\Sigma}$ through $\bm{S}$ and $\bm{T}$.  For a fixed value of
+$\bm{\theta}$ we can write $\bm{b}$ as
+\begin{equation}
+  \label{eq:TSu}
+  \bm{b}=\bm{T}(\bm{\theta})\bm{S}(\bm{\theta})\bm{u}
+\end{equation}
+where $\bm{u}$ is a vector of orthogonal random effects with distribution
+$\bm{u}\sim\mathcal{N}\left(\bm{0},\sigma^2\bm{I}\right)$.  This
+provides the desired distribution
+$\bm{b}\sim\mathcal{N}(\bm{0},\sigma^2\bm{\Sigma})$ because
+\begin{displaymath}
+  \mathrm{E}[\bm{b}]=\mathrm{E}[\bm{T}\bm{S}\bm{u}]=
+  \bm{T}\bm{S}\mathrm{E}[\bm{u}]=\bm{0}
+\end{displaymath}
+and
+\begin{displaymath}
+  \mathrm{Var}(\bm{b})=\mathrm{E}[\bm{b}\bm{b}\trans]=
+  \bm{T}\bm{S}\mathrm{E}[\bm{u}\bm{u}\trans]\bm{S}\bm{T}\trans=
+  \sigma^2\bm{T}\bm{S}\bm{S}\bm{T}\trans=\sigma^2\bm{\Sigma}
+\end{displaymath}
+
+
+Because $\bm{T}$ is unit lower triangular its determinant, $|\bm{T}|$, which
+is the product of the diagonal elements for a triangular matrix, is
+unity.  Similarly $|\bm{S}|$, which is the product of the diagonal
+elements of this diagonal matrix, is non-negative.  Together these imply that
+\begin{equation}
+  \label{eq:Sigmadet}
+  |\bm{\Sigma}|^{1/2}=\sqrt{|\bm{T}|^2|\bm{S}|^2}=|\bm{S}| .
+\end{equation}
+Thus the determinant of the Jacobian of the transformation from
+$\bm{u}$ to $\bm{b}$ is
+\begin{displaymath}
+  \left|\frac{d\bm{b}}{d\bm{u}}\right|=
+  \left|\bm{T}\bm{S}\right|=|\bm{\Sigma}|^{1/2}
+\end{displaymath}
+which allows us to rewrite an integral of the form 
+\begin{displaymath}
+  \int_{\bm{b}}\frac{f_{\bm{b}}(\bm{b})}{|\bm{\Sigma}|^{1/2}}\,d\bm{b}
+\end{displaymath}
+as
+\begin{displaymath}
+  \int_{\bm{u}}f_{\bm{u}}(\bm{u})\,d\bm{u}
+\end{displaymath}
+
+Finally, recall that $\bm{\mu}$, the expected value of $\bm{y}$, and the
+discrepancy function, $d(\bm{\mu}|\bm{y})$, depend on $\bm{b}$ only
+through the linear predictor.  Because we can rewrite the linear predictor as
+a function of $\bm{\beta}$ and $\bm{u}$
+\begin{equation}
+  \label{eq:linpredu}
+  \bm{X}\bm{\beta}+\bm{Z}\bm{b}=\bm{X}\bm{\beta}+\bm{Z}\bm{T}\bm{S}\bm{u}=
+  \bm{X}\bm{\beta}+\bm{V}\bm{u},
+\end{equation}
+where $\bm{V}=\bm{Z}\bm{T}\bm{S}$, we can also express the discrepancy as a
+function of $\bm{\beta}$ and $\bm{u}$.
+
+\subsubsection{Marginal distribution of $\bm{y}$ }
+\label{sec:marginal}
+
+The likelihood of the parameters $\bm{\beta}$,
+$\bm{\theta}$ and $\sigma^2$ given $\bm{y}$, written
+$L(\bm{\beta},\bm{\theta},\sigma^2|\bm{y})$, is equal
+to the marginal density of $\bm{y}$ given the parameters.  This
+marginal density is the integral over $\bm{b}$ of the conditional
+density of $\bm{y}$ given $\bm{b}$
+\begin{displaymath}
+  k\left(\sigma^2\right)\exp{\frac{d(\bm{\mu}|\bm{y})}{-2\sigma^2}}
+\end{displaymath}
+multiplied by the marginal distribution of $\bm{b}$
+\begin{displaymath}
+  \frac{1}{\left(2\pi\sigma^2\right)^{q/2}|\bm{\Sigma}|^{1/2}}
+  \exp\left[\frac{\bm{b}\trans\bm{\Sigma}^{-1}\bm{b}}{-2\sigma^2}\right]
+\end{displaymath}
+when $\bm{\Sigma}$ is non-singular (i.e.{} when all the diagonal
+elements of $\bm{S}$ are positive).
+
+Thus
+\begin{equation}
+  \label{eq:likelihoodb}
+  \begin{aligned}
+    L(\bm{\beta},\bm{\theta},\sigma^2|\bm{y})
+    =&\int_{\bm{b}}\frac{k(\sigma^2)}{\left(2\pi\sigma^2\right)^{q/2}|\bm{\Sigma}|^{1/2}}
+    \exp\left[{\frac{d(\bm{\mu}|\bm{y})+\bm{b}\trans\bm{\Sigma}^{-1}\bm{b}}{-2\sigma^2}}\right]\,d\bm{b}\\
+    =&\int_{\bm{u}}\frac{k(\sigma^2)}{\left(2\pi\sigma^2\right)^{q/2}}
+    \exp\left[\frac{d(\bm{\mu}|\bm{y})+\bm{u}\trans\bm{u}}{-2\sigma^2}\right]\,d\bm{u}
+  \end{aligned}
+\end{equation}
+
+\bibliography{lme4}
+\end{document}
