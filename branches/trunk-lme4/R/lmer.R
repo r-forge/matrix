@@ -1652,9 +1652,9 @@ nlmer <- function(formula, data,
 {
     mc <- match.call()
     formula <- as.formula(formula)
-    if (length(formula) < 2) stop("formula must be a 3-part formula")
+    if (length(formula) < 3) stop("formula must be a 3-part formula")
     nlform <- as.formula(formula[[2]])
-    if (length(formula) < 3 || length(nlform) < 3)
+    if (length(nlform) < 3)
         stop("formula must be a 3-part formula")
     nlmod <- as.call(nlform[[3]])
 
@@ -1697,6 +1697,7 @@ nlmer <- function(formula, data,
     Xt <- t(Matrix(as.matrix(mf[,pnames]), sparse = TRUE))
     xnms <- colnames(fr$X)
     if (!is.na(icol <- match("(Intercept)",xnms))) xnms <- xnms[-icol]
+    Xt@Dimnames[[2]] <- NULL
 ### FIXME: The only times there would be additional columns in the
 ### fixed effects would be as interactions with parameter names and
 ### they must be constructed differently
@@ -1708,9 +1709,10 @@ nlmer <- function(formula, data,
     Ztl1 <- lapply(with(FL, .Call(Ztl_sparse, fl, Ztl)), drop0)
     Gp <- unname(c(0L, cumsum(unlist(lapply(Ztl1, nrow)))))
     Zt <- do.call(rBind, Ztl1)
-    new("nlmer", env = env, mcall = nlmod, frame = fr$mf, pnames = pnames, call = mc,
-        flist = FL$fl, Xt = Xt, Zt = Zt, y = fr$Y, weights = wts,
-        cnames = lapply(FL$Ztl, rownames), L = Cholesky(tcrossprod(Zt)), Gp = Gp,
-        deviance = numeric(6), dims = integer(8), fixef = as.numeric(unlist(start$fixed)),
-        ranef = numeric(nrow(Zt)))
+### FIXME: It seems that fr$mf has a terms attribute still here
+    val <- .Call(nlmer_create, env, nlmod, fr$mf, pnames, call = mc,
+                 FL$fl, Xt, Zt, unname(fr$Y), wts,
+                 cnames = lapply(FL$Ztl, rownames), Gp = Gp,
+                 fixef = as.numeric(unlist(start$fixed)))
+    val
 }

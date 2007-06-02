@@ -26,6 +26,9 @@ SEXP lmer2_validate(SEXP x);
 SEXP lmer2_vcov(SEXP x);
 
 SEXP nlmer_bhat(SEXP x);
+SEXP nlmer_create(SEXP env, SEXP model, SEXP frame, SEXP pnames,
+		  SEXP call, SEXP flist, SEXP Xt, SEXP Zt, SEXP y,
+		  SEXP weights, SEXP cnames, SEXP Gp, SEXP fixef);
 SEXP nlmer_eval(SEXP x, SEXP Phi);
 SEXP nlmer_validate(SEXP x);
 

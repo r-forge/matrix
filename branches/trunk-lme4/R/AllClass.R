@@ -108,7 +108,7 @@ setClass("glmer2",
 setClass("nlmer",
 	 representation(## original data
                         env = "environment", # evaluation environment for model
-                        mcall = "call",     # model function as a function call
+                        model = "call",     # model function as a function call
                         frame = "data.frame", # model frame or empty frame
                         pnames = "character", # parameter names for nonlinear model
                         call = "call",	    # matched call to model-fitting function
@@ -123,6 +123,7 @@ setClass("nlmer",
 			## slots that vary during the optimization
 			ST = "list",        # list of TSST' rep of rel. var. mats
 			L = "CHMfactor",    # sparse Cholesky factor of Z'Z
+                        eta = "numeric",    # fitted values at current values of beta and b
 			deviance = "numeric", # ML and REML deviance and components
 			fixef = "numeric",
 			ranef = "numeric"
