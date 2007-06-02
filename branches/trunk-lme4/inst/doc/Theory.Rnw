@@ -36,15 +36,16 @@
 
 The \code{lme4} package is used to fit and to analyze linear mixed
 models, generalized linear mixed models and nonlinear mixed models.
-These models are called mixed models because they incorporate both
-\emph{fixed-effects} parameters, which apply to an entire population or
-to well-defined and repeatable subsets of a population, and
-\emph{random effects}, which apply to the particular experimental
-units or observational units in the study.  Such models are also
-called \emph{multilevel} models because the random effects represent
-levels of variation in addition to the per-observation noise term that
-is commonly incorporated in models such as linear regression models,
-generalized linear models or nonlinear regression models.
+These models are called \emph{mixed-effects models} or, more simply,
+\emph{mixed models} because they incorporate both \emph{fixed-effects}
+parameters, which apply to an entire population or to well-defined and
+repeatable subsets of a population, and \emph{random effects}, which
+apply to the particular experimental units or observational units in
+the study.  Such models are also called \emph{multilevel} models
+because the random effects represent levels of variation in addition
+to the per-observation noise term that is commonly incorporated in
+statistical models such as linear regression models, generalized
+linear models or nonlinear regression models.
 
 The three types of mixed models -- linear, generalized linear and
 nonlinear -- share common characteristics in that the model is
@@ -58,10 +59,51 @@ values for such models.
 In subsequent sections we describe computational methods for specific
 kinds of mixed models.
 
-\section{The mixed model formula and the log-likelihood}
+\section{Mixed-model formulas}
 \label{sec:formula}
 
-In the \code{lme4} package a mixed model formula is similar to a
+The right-hand side of a mixed-model formula, as used in the
+\code{lme4} package consists of one or more random-effects terms and
+zero or more fixed-effects terms separated by the `\code{+}' symbol.
+A simple random-effects term is of the form
+`\emph{form}\code{|}\emph{factor}' where \emph{form} is a linear model
+formula and \emph{factor} is an expression that can be evaluated as a
+factor, called the \emph{grouping factor} for the term because it
+determines to which group of observations a component of the random
+effects applies.
+
+Typically a random-effects term is enclosed by parentheses so the
+extent of \emph{form} is clearly defined.
+
+\subsection{Examples of mixed-model formulas}
+\label{sec:mixed-model-formula-examples}
+
+The simplest mixed-model formula is of the form
+<<formula1,echo=FALSE>>=
+y ~ 1 + (1 | Subject)
+@
+where \code{y} is the response vector and \code{Subject} is a factor
+that indicates the experimental unit or observational unit from which
+each individual response was collected.  In this formula there is one
+random-effect term, \code{(1|Subject)}, and one fixed-effects term,
+the constant or intercept term denoted by `\code{1}'.  In the
+random-effects term the grouping factor is `\code{Subject}' and the
+linear model formula denotes a constant term.  
+
+We denote by $k$ the number of random-effects terms in the formula.
+The $i$th grouping factor is written $\bm{f}_i$ and the number of
+levels or this factor is $n_i$.  For this formula $k=1$ and $n_1$ is
+the number of subjects.
+
+If the model described by this formula is a linear mixed model it
+could be written
+\begin{displaymath}
+  y_{ij}=\mu+b_j\quad i=1,\dots,n_1;\; j = 1,\dots,m_i
+\end{displaymath}
+
+
+
+  a mixed model formula is similar to a
 linear model formula, such as used in the \code{lm} or \code{glm}
 functions, except that it contains one or more random-effects terms,
 which are terms that contain the vertical bar (\code{|}) symbol.
@@ -69,17 +111,17 @@ Before discussing the details of the interpretation of the terms in
 the formula we describe how the formula determines the log-likelihood
 of the model.
 
-\subsection{Log-likelihood of mixed models}
+\section{Log-likelihood of mixed models}
 \label{sec:log-likelihood}
 
-\subsubsection{The linear predictor}
+\subsection{The linear predictor}
 \label{sec:linpred}
 
 
 When evaluated with respect to data consisting of an $n$-dimensional
 response vector $\bm{y}$ and corresponding covariates, a mixed model
-formula produces the model matrices $\bm{X}$ (of size $n\times p$) and
-$\bm{Z}$ (of size $n\times q$) in the \emph{linear predictor}
+formula produces the model matrices $\bm{X}$ (of size $m\times p$) and
+$\bm{Z}$ (of size $m\times q$) in the \emph{linear predictor}
 \begin{equation}
   \label{eq:linpred}
   \bm{X}\bm{\beta}+\bm{Z}\bm{b}
@@ -105,7 +147,7 @@ In general we assume we can write the probability density or the
 probability mass function of $\bm{y}$ in the form
 \begin{equation}
   \label{eq:conddens}
-  k(\sigma^2)\exp\left[\frac{d(\bm{\mu}|\bm{y})}{-2\sigma^2}\right]
+  k(\sigma^2)\exp\left[\frac{d(\bm{\mu},\bm{y})}{-2\sigma^2}\right]
 \end{equation}
 where $\sigma^2$ is a scale factor in the expression for the
 variance-covariance matrix of $\bm{y}$ and
@@ -121,7 +163,7 @@ variance of any specific quantity.  For some GLMM's, specifically
 those based on the binomial or Poisson distributions for $\bm{y}$, the
 variance is determined by the mean $\bm{\mu}$ and thus $\sigma^2\equiv 1$.
 
-\subsubsection{Variance-covariance of the random effects}
+\subsection{Variance-covariance of the random effects}
 \label{sec:ranefvarcov}
 
 The random effects $\bm{b}$ are random variables with a multivariate
@@ -202,7 +244,7 @@ as
 \end{displaymath}
 
 Finally, recall that $\bm{\mu}$, the expected value of $\bm{y}$, and the
-discrepancy function, $d(\bm{\mu}|\bm{y})$, depend on $\bm{b}$ only
+discrepancy function, $d(\bm{\mu},\bm{y})$, depend on $\bm{b}$ only
 through the linear predictor.  Because we can rewrite the linear predictor as
 a function of $\bm{\beta}$ and $\bm{u}$
 \begin{equation}
@@ -213,7 +255,7 @@ a function of $\bm{\beta}$ and $\bm{u}$
 where $\bm{V}=\bm{Z}\bm{T}\bm{S}$, we can also express the discrepancy as a
 function of $\bm{\beta}$ and $\bm{u}$.
 
-\subsubsection{Marginal distribution of $\bm{y}$ }
+\subsection{Marginal distribution of $\bm{y}$ }
 \label{sec:marginal}
 
 The likelihood of the parameters $\bm{\beta}$,
@@ -223,7 +265,7 @@ to the marginal density of $\bm{y}$ given the parameters.  This
 marginal density is the integral over $\bm{b}$ of the conditional
 density of $\bm{y}$ given $\bm{b}$
 \begin{displaymath}
-  k\left(\sigma^2\right)\exp{\frac{d(\bm{\mu}|\bm{y})}{-2\sigma^2}}
+  k\left(\sigma^2\right)\exp\left[\frac{d(\bm{\mu},\bm{y})}{-2\sigma^2}\right]
 \end{displaymath}
 multiplied by the marginal distribution of $\bm{b}$
 \begin{displaymath}
@@ -239,11 +281,427 @@ Thus
   \begin{aligned}
     L(\bm{\beta},\bm{\theta},\sigma^2|\bm{y})
     =&\int_{\bm{b}}\frac{k(\sigma^2)}{\left(2\pi\sigma^2\right)^{q/2}|\bm{\Sigma}|^{1/2}}
-    \exp\left[{\frac{d(\bm{\mu}|\bm{y})+\bm{b}\trans\bm{\Sigma}^{-1}\bm{b}}{-2\sigma^2}}\right]\,d\bm{b}\\
+    \exp\left[{\frac{d(\bm{\mu},\bm{y})+
+          \bm{b}\trans\bm{\Sigma}^{-1}\bm{b}}{-2\sigma^2}}\right]\,d\bm{b}\\
     =&\int_{\bm{u}}\frac{k(\sigma^2)}{\left(2\pi\sigma^2\right)^{q/2}}
-    \exp\left[\frac{d(\bm{\mu}|\bm{y})+\bm{u}\trans\bm{u}}{-2\sigma^2}\right]\,d\bm{u}
+    \exp\left[\frac{d(\bm{\mu},\bm{y})+\bm{u}\trans\bm{u}}{-2\sigma^2}\right]\,d\bm{u}
   \end{aligned}
 \end{equation}
+Note that the likelihood can be evaluated for a positive semi-definite
+$\bm{\Sigma}$ when written as an integral with respect to $\bm{u}$.
+
+\subsection{The Laplace approximation}
+\label{sec:Laplace}
+
+The numerator of the exponent in the integrand of
+(\ref{eq:likelihoodb}), either
+$d(\bm{\mu},\bm{y})+\bm{b}\trans\bm{\Sigma}^{-1}\bm{b}$ as a function
+of $\bm{b}$ given the parameters and the data and or
+$d(\bm{\mu},\bm{y})+\bm{u}\trans\bm{u}$ as a function of $\bm{u}$, is
+called the \emph{penalized discrepancy}.  We write it as
+\begin{equation}
+  \label{eq:delta}
+  \delta(\bm{u}|\bm{\beta},\bm{\theta},\bm{y})=d(\bm{\mu},\bm{y})+\bm{u}\trans\bm{u}
+\end{equation}
+
+Given the data $\bm{y}$ and values of the parameters $\bm{\beta}$ and
+$\bm{\theta}$ we determine the minimizer of the penalized discrepancy
+\begin{equation}
+  \label{eq:tildeu}
+  \tilde{\bm{u}}(\bm{\beta},\bm{\theta})=
+  \arg\min_{\bm{u}}\delta(\bm{u}|\bm{\beta},\bm{\theta},\bm{y})=
+  \arg\min_{\bm{u}}\left[d(\bm{\mu},\bm{y})+\bm{u}\trans\bm{u}\right] .
+\end{equation}
+This value is the \emph{conditional mode} of $\bm{u}$ given
+$\bm{\beta}$, $\bm{\theta}$ and $\bm{y}$.  That is, it is the value of
+the orthogonal random effects that maximizes the conditional density
+given the parameters $\bm{\beta}$ and $\bm{\theta}$ and the data $\bm{y}$.
+
+Near the conditional mode the penalized discrepancy has a quadratic approximation
+\begin{equation}
+  \label{eq:quadapprox}
+  \delta(\bm{u}|\bm{\beta},\bm{\theta},\bm{y})\approx
+  \delta(\tilde{\bm{u}}|\bm{\beta},\bm{\theta},\bm{y})+
+  \left(\bm{u}-\tilde{\bm{u}}\right)\trans\bm{L}\bm{L}\trans
+  \left(\bm{u}-\tilde{\bm{u}}\right)
+\end{equation}
+where $\bm{L}$ is the Cholesky factor of
+$\left.\frac{1}{2}\nabla_{\bm{u}}^2
+  \delta(\bm{u}|\bm{\beta},\bm{\theta},\bm{y})\right|_{\bm{u}=\tilde{\bm{u}}}$.
+
+After substituting the quadratic approximation (\ref{eq:quadapprox})
+into expression (\ref{eq:likelihoodb}) for
+$L(\bm{\beta},\bm{\theta},\sigma^2|\bm{y})$, the only part of the
+integrand that depends on $\bm{u}$ will be the quadratic term in the
+exponent.  To evaluate an integral of the form
+\begin{displaymath}
+  I=\int_{\bm{u}}\frac{1}{\left(2\pi\sigma^2\right)^{q/2}}
+  \exp\left[\frac{(\bm{u}-\tilde{\bm{u}})\trans\bm{L}\bm{L}\trans(\bm{u}-\tilde{\bm{u}})}
+    {-2\sigma^2}\right]\,d\bm{u}
+\end{displaymath}
+we use a change of variable to
+\begin{displaymath}
+  \bm{v}=\bm{L}\trans(\bm{u}-\tilde{\bm{u}})/\sigma
+\end{displaymath}
+for which the determinant of the Jacobian is
+\begin{displaymath}
+  \left|\frac{d\bm{v}}{d\bm{u}}\right|=\frac{|\bm{L}|}{\sigma^q} .
+\end{displaymath}
+This change of variable reduces the integral to
+\begin{equation}
+  \label{eq:reducedint}
+  I=\int_{\bm{v}}\frac{1}{\left(2\pi\right)^{q/2}}
+  e^{-\bm{v}\trans\bm{v}/2}\frac{d\bm{v}}{|\bm{L}|}=|\bm{L}|^{-1}
+\end{equation}
+provided that $\bm{L}$ is non-singular.  In general, $\bm{L}$ is lower
+triangular with non-negative elements on the diagonal.  As we will see in
+\S{\ref{sec:penalizedLS}}, the form of the penalized discrepancy
+function ensures that the diagonal elements of this particular
+$\bm{L}$ are all positive and, hence, that $\bm{L}$ is non-singular.
+
+Returning to expression (\ref{eq:likelihoodb}), we can now express the
+Laplace approximation to the likelihood function or, as more commonly
+used as an optimization criterion, the log-likelihood
+$\ell(\bm{\beta},\bm{\theta},\sigma^2|\bm{y})=
+\log L(\bm{\beta},\bm{\theta},\sigma^2|\bm{y})$.  On the deviance scale
+(twice the negative log-likelihood) the approximation is
+\begin{equation}
+  \label{eq:LaplaceDev}
+  -2\ell(\bm{\beta},\bm{\theta},\sigma^2|\bm{y})=-2\log[k(\sigma^2)]+
+  \frac{\delta(\tilde{\bm{u}}|\bm{\beta},\bm{\theta},\bm{y})}{\sigma^2}
+  +2\log|\bm{L}|
+\end{equation}
+The Laplace approximation (\ref{eq:LaplaceDev}) will be exact when the
+penalized discrepancy $\delta(\bm{u}|\bm{\beta},\bm{\theta},\bm{y})$
+is a quadratic function of $\bm{u}$.
+
+\section{Specific types of mixed models}
+\label{sec:mixedTypes}
+
+\subsection{Linear mixed models}
+\label{sec:lmm}
+
+A linear mixed model can be expressed as
+\begin{equation}
+  \label{eq:lmmDef}
+  \bm{y}=\bm{X}\bm{\beta}+\bm{Z}\bm{b}+\bm{\epsilon},\quad
+  \bm{\epsilon}\sim\mathcal{N}\left(\bm{0},\sigma^2\bm{I}\right),\quad
+  \bm{b}\sim\mathcal{N}\left(\bm{0},\sigma^2\bm{\Sigma}\right),\quad
+  \bm{\epsilon}\perp\bm{b}
+\end{equation}
+where the symbol $\perp$ denotes independence of random variables.
+This model implies that the mean of $\bm{y}$ is the linear predictor, the
+discrepancy function is the residual sum of squares and the
+normalizing factor is $1/(2\pi\sigma^2)^{n/2}$.  That is,
+\begin{align}
+  \label{eq:lmmProps}
+  \bm{\mu}&=\bm{X}\bm{\beta}+\bm{Z}\bm{b}=\bm{X}\bm{\beta}+\bm{V}\bm{u}\\
+  d(\bm{\mu},\bm{y})&=\left\|\bm{\mu}-\bm{y}\right\|^2\\
+  k(\sigma^2)&=\frac{1}{\left(2\pi\sigma^2\right)^{n/2}} .
+\end{align}
+The penalized discrepancy is
+\begin{equation}
+  \label{eq:lmmdelta}
+  \begin{aligned}
+    \delta(\bm{u}|\bm{\beta},\bm{\theta},\bm{y})
+    &= d(\bm{\mu},\bm{y})+\bm{u}\trans\bm{u}\\
+    &=\left\|\bm{\mu}-\bm{y}\right\|^2+\bm{u}\trans\bm{u}\\
+    &=\left\|\bm{V}\bm{u}+\bm{X}\bm{\beta}-\bm{y}\right\|^2+\bm{u}\trans\bm{u}\\
+    &=
+    \begin{bmatrix}
+      \bm{u}\trans&\bm{\beta}\trans&1
+    \end{bmatrix}
+    \begin{bmatrix}
+      \bm{V}\trans\bm{V}+\bm{I}&\bm{V}\trans\bm{X}&-\bm{V}\trans\bm{y}\\
+      \bm{X}\trans\bm{V}&\bm{X}\trans\bm{X}&-\bm{X}\trans\bm{y}\\
+      -\bm{y}\trans\bm{V}&-\bm{y}\trans\bm{X}&\bm{y}\trans\bm{y}
+    \end{bmatrix}
+    \begin{bmatrix}
+      \bm{u}\\
+      \bm{\beta}\\
+      1
+    \end{bmatrix} .
+  \end{aligned}
+\end{equation}
+In this form it is obvious that
+$\delta(\bm{u}|\bm{\beta},\bm{\theta},\bm{y})$ is a quadratic function
+of $\bm{u}$ and that 
+\begin{equation}
+  \label{eq:hessian}
+  \frac{1}{2}\nabla_{\bm{u}}^2\delta(\bm{u}|\bm{\beta},\bm{\theta},\bm{y})=\bm{V}\trans\bm{V}+\bm{I}
+\end{equation}
+is positive definite.  This expression for $\nabla_{\bm{u}}^2\delta$
+depends on $\bm{\theta}$ (because
+$\bm{V}=\bm{Z}\bm{T}(\bm{\theta})\bm{S}(\bm{\theta})$ depends on
+$\bm{\theta}$) but not on $\bm{\beta}$ or $\bm{u}$.  Thus the Cholesky
+factor $\bm{L}$ required for (\ref{eq:LaplaceDev}) also depends only on
+$\bm{\theta}$.
+
+The conditional mode of the orthogonal random effects,
+$\tilde{\bm{u}}(\bm{\beta}, \bm{\theta}, \bm{y})$ can be expressed as
+the solution to
+\begin{equation}
+  \label{eq:conditionalMode}
+  \left(\bm{V}\trans\bm{V}+\bm{I}\right)\tilde{\bm{u}}=
+  \bm{L}\bm{L}\trans\tilde{\bm{u}}=
+  \bm{V}\trans\left(\bm{y}-\bm{X}\bm{\beta}\right) .
+\end{equation}
+and can be easily calculated once the Cholesky factor $\bm{L}$ has
+been determined.  
+
+However, we can take advantage of the fact that
+$\delta(\bm{u}|\bm{\beta},\bm{\theta},\bm{y})$ is a quadratic function
+of both $\bm{u}$ and $\bm{\beta}$ to minimize $\delta$ with respect to
+$\bm{u}$ and $\bm{\beta}$ simultaneously.  For a given value of
+$\bm{\theta}$ we form the Cholesky factorization
+\begin{equation}
+  \label{eq:bigChol}
+    \begin{bmatrix}
+      \bm{V}\trans\bm{V}+\bm{I}&\bm{V}\trans\bm{X}&-\bm{V}\trans\bm{y}\\
+      \bm{X}\trans\bm{V}&\bm{X}\trans\bm{X}&-\bm{X}\trans\bm{y}\\
+      -\bm{y}\trans\bm{V}&-\bm{y}\trans\bm{X}&\bm{y}\trans\bm{y}
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+      \bm{L}&\bm{0}&\bm{0}\\
+      \bm{R}_{VX}\trans&\bm{L}_X&\bm{0}\\
+      \bm{r}_{Vy}\trans&\bm{r}_{Xy}\trans&r
+    \end{bmatrix}
+    \begin{bmatrix}
+      \bm{L}\trans&\bm{R}_{VX}&\bm{r}_{Vy}\\
+      \bm{0}&\bm{L}_X\trans&\bm{r}_{Xy}\\
+      \bm{0}&\bm{0}&r
+    \end{bmatrix}
+\end{equation}
+The somewhat awkward notation in (\ref{eq:bigChol}) distinguishes
+those sections of the factor that are lower triangular on the left
+($\bm{L}$ and $\bm{L}_X$) from those that are column vectors
+($\bm{r}_{Vy}$ and $\bm{r}_{Xy}$) or untransposed matrices
+($\bm{R}_{VX}$) on the right.  The lower right element, $r$, is a scalar.
+
+With the factorization (\ref{eq:bigChol}) we can write
+\begin{equation}
+  \label{eq:deltaReduced}
+  \begin{aligned}
+    \delta(\bm{u}|\bm{\beta},\bm{\theta},\bm{y})&=
+    \left\|
+      \begin{bmatrix}
+        \bm{L}\trans&\bm{R}_{VX}&\bm{r}_{Vy}\\
+        \bm{0}&\bm{L}_X\trans&\bm{r}_{Xy}\\
+        \bm{0}&\bm{0}&r
+      \end{bmatrix}
+      \begin{bmatrix}
+        \bm{u}\\
+        \bm{\beta}\\
+        1
+      \end{bmatrix}
+    \right\|^2\\
+    &=r^2+\left\|\bm{L}_X\trans\bm{\beta}+\bm{r}_{Xy}\right\|^2+
+    \left\|\bm{L}\trans\bm{u}+\bm{R}_{VX}\bm{\beta}+\bm{r}_{Vy}\right\|^2\\
+    &=r^2+\left\|\bm{L}_X\trans\left(\bm{\beta}-\hat{\bm{\beta}}\right)\right\|^2+
+    \left\|\bm{L}\trans\left(\bm{u}-\hat{\bm{u}}\right)\right\|^2
+  \end{aligned}
+\end{equation}
+where $\widehat{\bm{\beta}}$, the conditional estimate of $\bm{\beta}$
+given $\bm{\theta}$, and $\widehat{\bm{u}}$, the conditional mode of
+$\bm{u}$ given $\bm{\theta}$ and $\widehat{\bm{\beta}}(\bm{\theta})$, are
+the solutions to
+\begin{align}
+  \label{eq:conditionalest}
+  \bm{L}_X\trans\widehat{\bm{\beta}}(\bm{\theta})&=-\bm{r}_{Xy}\\
+  \bm{L}\trans\widehat{\bm{u}}(\bm{\theta})
+  &=-(\bm{R}_{VX}\widehat{\bm{\beta}}+\bm{r}_{Vy}) .
+\end{align}
+
+The deviance function,
+$-2\ell(\bm{\beta},\bm{\theta},\sigma^2|\bm{y})$ can be reduced to
+\begin{equation}
+  \label{eq:reducedDev}
+  -2\ell(\widehat{\bm{\beta}}(\bm{\theta}),\bm{\theta},\sigma^2|\bm{y})
+  =n\log\left(2\pi\sigma^2\right)+\frac{r^2}{\sigma^2}+2\log|\bm{L}| .
+\end{equation}
+Differentiating
+$-2\ell(\widehat{\bm{\beta}}(\bm{\theta}),\bm{\theta},\sigma^2|\bm{y})$
+as a function of $\sigma^2$ and setting the derivative to zero
+provides the conditional estimate
+\begin{equation}
+  \label{eq:mlsigmasq}
+  \widehat{\sigma^2}(\bm{\theta})=\frac{r^2}{n}
+\end{equation}
+and substituting this estimate into (\ref{eq:reducedDev}) provides the
+profiled deviance function
+\begin{equation}
+  \label{eq:profiledDeviance}
+  \begin{aligned}
+  -2\ell(\widehat{\bm{\beta}}(\bm{\theta}),\bm{\theta},\widehat{\sigma^2}(\bm{\theta})|\bm{y})
+  &=n\log\left(\frac{2\pi r^2}{n}\right) + n + 2\log|\bm{L}|\\
+  &=n\left[1+\log\left(\frac{2\pi}{n}\right)\right]+n\log r^2+2\log|\bm{L}|
+  \end{aligned}
+\end{equation}
+
+The three terms in the final form of the profiled deviance in
+(\ref{eq:profiledDeviance}) are, respectively, a constant,
+$n\left[1+\log\left(2\pi/n\right)\right]$, a measure of the fidelity
+of the fitted values to the observed data, $n\log r^2$, and a measure
+of model complexity, $2\log|\bm{L}|$.  We can view the act of
+optimizing the profiled deviance as determining a model that balances
+fidelity to the data against model complexity.
+
+\subsubsection{REML estimates}
+\label{sec:REML}
+
+The maximum likelihood estimate of $\sigma^2$, $\widehat{\sigma^2}=r^2/n$,
+is the penalized residual sum of squares divided by the number of
+observations.  It has a form like the maximum likelihood estimate of
+the variance from a single sample,
+$\widehat{\sigma^2}=\sum_{i=1}^n(y_i-\bar{y})^2/n$ or the maximum
+likelihood estimate of the variance in a linear regression model with
+$p$ coefficients in the predictor,
+$\widehat{\sigma^2}=\sum_{i=1}^n(y_i-\hat{y}_i)^2/n$.
+
+These variance estimates are not used in practice because they are
+biased downward.  This is, on average they will underestimate the
+variance in the model.  Instead we use 
+$\widehat{\sigma^2}_R=\sum_{i=1}^n(y_i-\bar{y})^2/(n-1)$ for the
+variance estimate from a single sample or
+$\widehat{\sigma^2}_R=\sum_{i=1}^n(y_i-\hat{y}_i)^2/(n-p)$ for the
+variance estimate in a linear regression model.  These estimates are
+based on the residuals, $y_i-\hat{y}_i, i=1,\dots,n$ which satisfy $p$
+linear constraints and thus are constrained to an $n-p$-dimensional
+subspace of the $n$-dimensional sample space.  In other words, the
+residuals have only $n-p$ degrees of freedom.
+
+In a mixed-effects model we often prefer to estimate the variance
+components, $\sigma^2$ and $\bm{\Sigma}$, according to the
+\emph{residual maximum likelihood} (REML) criterion (sometimes
+called the \emph{restricted} maximum likelihood criterion) which
+compensates for the estimation of the fixed-effects parameters when
+estimating the random effects.  
+
+The REML criterion can be expressed as
+\begin{equation}
+  \label{eq:REMLcrit}
+  \begin{aligned}
+    L_R(\bm{\theta},\sigma^2|\bm{y})
+    &=\int_{\bm{\beta}}L(\bm{\beta},\bm{\theta},\sigma^2|\bm{y})\,d\bm{\beta}\\
+    &=\frac{e^{-r^2/(2\sigma^2)}}{|\bm{L}|(2\pi\sigma^2)^{(n-p)/2}}
+      \int_{\bm{\beta}}\frac{1}{(2\pi\sigma^2)^{p/2}}
+      e^{-(\bm{\beta}-\widehat{\bm{\beta}})\trans\bm{L}_X
+          \bm{L}_X\trans(\bm{\beta}-\widehat{\bm{\beta}})/(2\sigma^2)}
+        \,d\bm{\beta}\\
+    &=\frac{e^{-r^2/(2\sigma^2)}}{|\bm{L}||\bm{L}_X|(2\pi\sigma^2)^{(n-p)/2}}
+  \end{aligned}
+\end{equation}
+or, on the deviance scale,
+\begin{equation}
+  \label{eq:REMLcrit}
+  \begin{aligned}
+    -2\ell_R(\bm{\theta},\sigma^2|\bm{y})
+    &=(n-p)\log\left(2\pi\sigma^2\right)+\frac{r^2}{\sigma^2}+2|\bm{L}|+2|\bm{L}_X|
+  \end{aligned}
+\end{equation}
+from which we can see that the REML estimate of $\sigma^2$ is
+\begin{equation}
+  \label{eq:REMLsigma}
+  \widehat{\sigma}_R(\bm{\theta})=\frac{r^2}{n-p}
+\end{equation}
+and the profiled REML deviance is
+\begin{multline}
+  \label{eq:REMLsigma}
+    -2\ell_R(\bm{\theta},\widehat{\sigma}^2(\bm{\theta})|\bm{y})=\\
+(n-p)\left[1+\log\left(\frac{2\pi}{n-p}\right)\right]+(n-p)\log r^2+2\log|\bm{L}|+2\log|\bm{L}_X|
+\end{multline}
+
+\subsection{Nonlinear mixed models}
+\label{sec:nonlinearmixed}
+
+Like the linear mixed model, the nonlinear mixed model is based on a
+multivariate normal (or Gaussian) distribution of the response
+$\bm{y}$ given $\bm{\mu}$.  That is,
+\begin{equation}
+  \label{eq:nlmm}
+  \bm{y}=\bm{\mu}(\bm{\beta},\bm{b})+\bm{\epsilon},\quad
+  \bm{\epsilon}\sim\mathcal{N}(\bm{0},\sigma^2\bm{I}),\quad
+  \bm{b}\sim\mathcal{N}(\bm{0},\sigma^2\bm{\Sigma}(\bm{\theta}),
+  \bm{\epsilon}\perp\bm{b}
+\end{equation}
+and the discrepancy function and normalizing constant are the same as
+for the linear mixed model
+\begin{align}
+  \label{eq:nlmmProps}
+  d(\bm{\mu},\bm{y})&=\left\|\bm{\mu}-\bm{y}\right\|^2\\
+  k(\sigma^2)&=\frac{1}{\left(2\pi\sigma^2\right)^{n/2}} .
+\end{align}
+
+The mean, $\bm{\mu}$, however, is no longer equal to the linear
+predictor.  Each element of $\bm{\mu}$ is the value of a nonlinear
+model function $g(\bm{x},\bm{\phi})$ that depends on covariates
+$\bm{x}$ and a nonlinear model parameter $\bm{\phi}$ of length $s$.
+When fitting a model the values of the covariates at each observation
+are known so we can regard $\bm{\mu}_i$ as a function of $\bm{\phi}_i$ only
+and write
+\begin{equation}
+  \label{eq:vectorg}
+  \bm{\mu}=\bm{g}(\bm{\Phi})
+\end{equation}
+where $\bm{\Phi}$ is the $n\times s$ matrix 
+whose $i$th row is $\bm{\phi}_i,i=1,\dots,n$ and the vector-valued
+function $\bm{g}$ applies the scalar function $g$ rowwise to
+$\bm{\Phi}$ using covariates $\bm{x}_i,i=1,\dots,n$ for the $i$th row.
+
+The linear predictor determines $\bm{\Phi}$ as
+\begin{equation}
+  \label{eq:linpred}
+  \mathrm{vec}(\bm{\Phi})=\bm{X}\bm{\beta}+\bm{Z}\bm{b}=\bm{X}\bm{\beta}+\bm{V}\bm{u}
+\end{equation}
+where the $\mathrm{vec}$ operator concatenates the columns of
+$\bm{\Phi}$ to form a vector of length $m=ns$.  Thus the matrix
+$\bm{X}$ is $ns\times p$ while $\bm{Z}$ and $\bm{V}$ are $ns\times q$.
+
+\subsubsection{Optimizing the penalized discrepancy}
+\label{sec:nlmmpenalizedLS}
+
+As for a linear mixed model, the problem of determining
+$\tilde{\bm{u}}(\bm{\beta},\bm{\theta})$, the optimizer of the
+penalized discrepancy function in a nonlinear mixed model can be
+written as a penalized least squares problem
+\begin{equation}
+  \label{eq:nlmmdisc}
+  \tilde{\bm{u}}(\bm{\beta},\bm{\theta})=\arg\min_{\bm{u}}
+  \delta(\bm{u}|\bm{\beta},\bm{\theta},\bm{y})=\arg\min_{\bm{u}}\left[
+    \|\mu(\bm{\beta},\bm{u})-\bm{y}\|^2+\bm{u}\trans\bm{u}\right].
+\end{equation}
+
+For some models (\ref{eq:nlmmdisc}) is a penalized linear least
+squares problem with a direct solution but, in general, it must be
+considered as a penalized nonlinear least squares problem that
+requires an iterative solution.
+
+
+As shown below for a linear mixed model we can minimize the penalized
+discrepancy and calculate $\bm{L}$ directly.  For generalized linear
+mixed models or nonlinear mixed models we can minimize the penalized
+discrepancy by some form of iterative penalized least squares.
+
+For each of the model types we consider: linear mixed models or
+generalized linear mixed models or nonlinear mixed models, there is a
+least squares or iterative least squares algorithm to minimize the
+discrepancy in a model that does not incorporate random effects.  That
+is, we can use least squares to minimize the discrepancy in a linear
+model, iteratively reweighted least squares to minimize the
+discrepancy in a generalized linear model and iterative least squares
+(the Gauss-Newton algorithm) to minimize the discrepancy in a
+nonlinear regression model.  To minimize the penalized discrepancy in
+the corresponding mixed model we use a penalized least squares
+algorithm or an iterative penalized least squares algorithm.
+
+ Just as we
+can minimize the discrepancy by least squares for linear models or
+iteratively reweighted least squares for generalized linear models or
+model, we can minimize the penalized discrepancy by penalized least
+squares (
+For the
+models we will consider it is possible to minimize the penalized discrepancy
 
 \bibliography{lme4}
 \end{document}
