@@ -375,10 +375,7 @@ The Laplace approximation (\ref{eq:LaplaceDev}) will be exact when the
 penalized discrepancy $\delta(\bm{u}|\bm{\beta},\bm{\theta},\bm{y})$
 is a quadratic function of $\bm{u}$.
 
-\section{Specific types of mixed models}
-\label{sec:mixedTypes}
-
-\subsection{Linear mixed models}
+\section{Linear mixed models}
 \label{sec:lmm}
 
 A linear mixed model can be expressed as
@@ -547,7 +544,7 @@ of model complexity, $2\log|\bm{L}|$.  We can view the act of
 optimizing the profiled deviance as determining a model that balances
 fidelity to the data against model complexity.
 
-\subsubsection{REML estimates}
+\subsection{REML estimates}
 \label{sec:REML}
 
 The maximum likelihood estimate of $\sigma^2$, $\widehat{\sigma^2}=r^2/n$,
@@ -612,7 +609,7 @@ and the profiled REML deviance is
 (n-p)\left[1+\log\left(\frac{2\pi}{n-p}\right)\right]+(n-p)\log r^2+2\log|\bm{L}|+2\log|\bm{L}_X|
 \end{multline}
 
-\subsection{Nonlinear mixed models}
+\section{Nonlinear mixed models}
 \label{sec:nonlinearmixed}
 
 Like the linear mixed model, the nonlinear mixed model is based on a
@@ -623,7 +620,7 @@ $\bm{y}$ given $\bm{\mu}$.  That is,
   \bm{y}=\bm{\mu}(\bm{\beta},\bm{b})+\bm{\epsilon},\quad
   \bm{\epsilon}\sim\mathcal{N}(\bm{0},\sigma^2\bm{I}),\quad
   \bm{b}\sim\mathcal{N}(\bm{0},\sigma^2\bm{\Sigma}(\bm{\theta}),
-  \bm{\epsilon}\perp\bm{b}
+  \quad\bm{\epsilon}\perp\bm{b}
 \end{equation}
 and the discrepancy function and normalizing constant are the same as
 for the linear mixed model
@@ -635,8 +632,8 @@ for the linear mixed model
 
 The mean, $\bm{\mu}$, however, is no longer equal to the linear
 predictor.  Each element of $\bm{\mu}$ is the value of a nonlinear
-model function $g(\bm{x},\bm{\phi})$ that depends on covariates
-$\bm{x}$ and a nonlinear model parameter $\bm{\phi}$ of length $s$.
+model function $g(\bm{x},\bm{\phi})$ that depends on covariates,
+$\bm{x}$, and a nonlinear model parameter, $\bm{\phi}$, of length $s$.
 When fitting a model the values of the covariates at each observation
 are known so we can regard $\bm{\mu}_i$ as a function of $\bm{\phi}_i$ only
 and write
@@ -658,31 +655,57 @@ where the $\mathrm{vec}$ operator concatenates the columns of
 $\bm{\Phi}$ to form a vector of length $m=ns$.  Thus the matrix
 $\bm{X}$ is $ns\times p$ while $\bm{Z}$ and $\bm{V}$ are $ns\times q$.
 
-\subsubsection{Optimizing the penalized discrepancy}
+\subsection{Optimizing the penalized discrepancy}
 \label{sec:nlmmpenalizedLS}
 
 As for a linear mixed model, the problem of determining
 $\tilde{\bm{u}}(\bm{\beta},\bm{\theta})$, the optimizer of the
-penalized discrepancy function in a nonlinear mixed model can be
-written as a penalized least squares problem
+penalized discrepancy function, can be written as a penalized least
+squares problem
 \begin{equation}
   \label{eq:nlmmdisc}
   \tilde{\bm{u}}(\bm{\beta},\bm{\theta})=\arg\min_{\bm{u}}
   \delta(\bm{u}|\bm{\beta},\bm{\theta},\bm{y})=\arg\min_{\bm{u}}\left[
     \|\mu(\bm{\beta},\bm{u})-\bm{y}\|^2+\bm{u}\trans\bm{u}\right].
 \end{equation}
+Unlike the case of the linear mixed model this is generally a
+penalized nonlinear least squares problem that requires an iterative
+solution.
 
-For some models (\ref{eq:nlmmdisc}) is a penalized linear least
-squares problem with a direct solution but, in general, it must be
-considered as a penalized nonlinear least squares problem that
-requires an iterative solution.
+Given $\bm{u}^{(i)}$ (the parenthesized superscripts denote the number
+of the iteration at which a quantity is evaluated) we evaluate
+\begin{align}
+  \label{eq:nlmmgrad}
+  \left.\frac{\partial\bm{\mu}}{\partial\bm{u}\trans}\right|_{\bm{u}=\bm{u}^{(i)}}&=\bm{M}^{(i)}\\
+  &=
+  \begin{bmatrix}
+    \bm{I}&\bm{I}&\dots&\bm{I}
+  \end{bmatrix}
+  \mathrm{diag}\left(\mathrm{vec}\left.\frac{d\bm{\mu}}{d\bm{\Phi}}\right|_{\bm{\Phi}=\bm{\Phi}^{(i)}}\right)
+  \bm{V} ,
+\end{align}
+where the matrix on the left is the horizontal concatenation of $s$
+copies of the $n\times n$ identity matrix, then solve for
+$\bm{u}^{(i+1)}$ in
+\begin{equation}
+  \label{eq:uip1}
+  \left({\bm{M}^{(i)}}\trans\bm{M}^{(i)}+\bm{I}\right)\bm{u}^{(i+1)}=
+  {\bm{M}^{(i)}}\trans\left(\bm{y}-\bm{\mu}^{(i)}+\bm{B}^{(i)}\bm{u}^{(i)}\right)
+\end{equation}
+using the Cholesky decomposition
+\begin{equation}
+  \label{eq:nlmmChol}
+  \left({\bm{M}^{(i)}}\trans\bm{M}^{(i)}+\bm{I}\right)={\bm{L}^{(i)}}\trans\bm{L}^{(i)} .
+\end{equation}
 
+
+\bibliography{lme4}
+\end{document}
 
 As shown below for a linear mixed model we can minimize the penalized
 discrepancy and calculate $\bm{L}$ directly.  For generalized linear
 mixed models or nonlinear mixed models we can minimize the penalized
 discrepancy by some form of iterative penalized least squares.
-
 For each of the model types we consider: linear mixed models or
 generalized linear mixed models or nonlinear mixed models, there is a
 least squares or iterative least squares algorithm to minimize the
@@ -702,6 +725,3 @@ model, we can minimize the penalized discrepancy by penalized least
 squares (
 For the
 models we will consider it is possible to minimize the penalized discrepancy
-
-\bibliography{lme4}
-\end{document}
