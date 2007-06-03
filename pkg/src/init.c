@@ -247,6 +247,7 @@ R_init_Matrix(DllInfo *dll)
     R_RegisterCCallable("Matrix", "cholmod_sparse_to_triplet", (DL_FUNC)cholmod_sparse_to_triplet);
     R_RegisterCCallable("Matrix", "cholmod_speye", (DL_FUNC)cholmod_speye);
     R_RegisterCCallable("Matrix", "cholmod_spsolve", (DL_FUNC)cholmod_spsolve);
+    R_RegisterCCallable("Matrix", "cholmod_ssmult", (DL_FUNC)cholmod_ssmult);
     R_RegisterCCallable("Matrix", "cholmod_start", (DL_FUNC)cholmod_start);
     R_RegisterCCallable("Matrix", "cholmod_submatrix", (DL_FUNC)cholmod_submatrix);
     R_RegisterCCallable("Matrix", "cholmod_transpose", (DL_FUNC)cholmod_transpose);
