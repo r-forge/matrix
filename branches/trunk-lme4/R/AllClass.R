@@ -123,7 +123,8 @@ setClass("nlmer",
 			## slots that vary during the optimization
 			ST = "list",        # list of TSST' rep of rel. var. mats
 			L = "CHMfactor",    # sparse Cholesky factor of Z'Z
-                        eta = "numeric",    # fitted values at current values of beta and b
+                        mu = "numeric",     # fitted values at current values of beta and b
+                        Mt = "dgCMatrix",   # transpose of gradient matrix d mu/d u
 			deviance = "numeric", # ML and REML deviance and components
 			fixef = "numeric",
 			ranef = "numeric"

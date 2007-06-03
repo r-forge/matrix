@@ -1488,7 +1488,7 @@ SEXP lmer2_validate(SEXP x)
 
 static int flType(SEXP family)
 {
-    char *fam = CHAR(asChar(getListElement(family, "family"))),
+    const char *fam = CHAR(asChar(getListElement(family, "family"))),
 	*lnk = CHAR(asChar(getListElement(family, "link")));
 
     if ((!strcmp(fam, "gaussian")) && (!strcmp(lnk, "identity")))
@@ -2140,8 +2140,9 @@ SEXP nlmer_create(SEXP env, SEXP model, SEXP frame, SEXP pnames,
     char *DEVIANCE_NAMES[]={"ML","REML","ldZ","ldX","lr2", "bqd", "Sdr", ""};
     char *DIMS_NAMES[]={"nf","n","p","q", "s", "np","isREML","famType","isNested",""};
     int *Gpp = INTEGER(Gp), *Zdims = INTEGER(GET_SLOT(Zt, lme4_DimSym)), *dims, i;
-    cholmod_sparse *ts1 = M_as_cholmod_sparse(Zt);
+    cholmod_sparse *cZt = M_as_cholmod_sparse(Zt), *ts1, *ts2;
     cholmod_factor *L;
+    double one[] = {1,0};
 
     SET_SLOT(ans, install("env"), env);
     SET_SLOT(ans, install("model"), model);
@@ -2152,16 +2153,10 @@ SEXP nlmer_create(SEXP env, SEXP model, SEXP frame, SEXP pnames,
     SET_SLOT(ans, install("Xt"), Xt);
     SET_SLOT(ans, lme4_ZtSym, Zt);
     SET_SLOT(ans, lme4_ySym, y);
-    SET_SLOT(ans, lme4_etaSym, allocVector(REALSXP, LENGTH(y)));
     SET_SLOT(ans, lme4_weightsSym, weights);
     SET_SLOT(ans, lme4_cnamesSym, cnames);
     SET_SLOT(ans, lme4_GpSym, Gp);
     SET_SLOT(ans, lme4_fixefSym, fixef);
-    SET_SLOT(ans, lme4_ranefSym, allocVector(REALSXP, Zdims[0]));
-    AZERO(REAL(GET_SLOT(ans, lme4_ranefSym)), Zdims[0]);
-    SET_SLOT(ans, lme4_devianceSym,
-	     internal_make_named(REALSXP, DEVIANCE_NAMES));
-    AZERO(REAL(GET_SLOT(ans, lme4_devianceSym)), 7);
     SET_SLOT(ans, lme4_dimsSym,
 	     internal_make_named(INTSXP, DIMS_NAMES));
     dims = INTEGER(GET_SLOT(ans, lme4_dimsSym));
@@ -2170,9 +2165,17 @@ SEXP nlmer_create(SEXP env, SEXP model, SEXP frame, SEXP pnames,
     dims[np_POS] = 0;
     dims[p_POS] = LENGTH(fixef);
     dims[q_POS] = Zdims[0];
+    dims[s_POS] = Zdims[1]/dims[n_POS];
     dims[isREML_POS] = FALSE;
     dims[famType_POS] = -1;
     dims[isNest_POS] = TRUE;
+    SET_SLOT(ans, lme4_ranefSym, allocVector(REALSXP, Zdims[0]));
+    AZERO(REAL(GET_SLOT(ans, lme4_ranefSym)), Zdims[0]);
+    nlmer_eval_model(ans);	/* check the model evaluation */
+
+    SET_SLOT(ans, lme4_devianceSym,
+	     internal_make_named(REALSXP, DEVIANCE_NAMES));
+    AZERO(REAL(GET_SLOT(ans, lme4_devianceSym)), 7);
 
     SET_SLOT(ans, lme4_STSym, allocVector(VECSXP, dims[nf_POS]));
     ST = GET_SLOT(ans, lme4_STSym);
@@ -2181,17 +2184,41 @@ SEXP nlmer_create(SEXP env, SEXP model, SEXP frame, SEXP pnames,
 	    LENGTH(getAttrib(VECTOR_ELT(flist, i), R_LevelsSymbol));
 	SET_VECTOR_ELT(ST, i, allocMatrix(REALSXP, nci, nci));
     }
-    internal_nlmer_initial(ST, Gpp, ts1);
-    Free(ts1);
-    ts1 = internal_Vt(ans);
-    L = M_cholmod_analyze(ts1, &c);
-    if (!M_cholmod_factorize(ts1, L, &c)) { 
-	error(_("cholmod_factorize failed: status %d, minor %d from ncol %d"),
+
+    /* Create Mt beginning with s identity matrices concatenated horizontally */
+    ts1 = M_cholmod_allocate_sparse((size_t) dims[n_POS],
+				    (size_t) Zdims[1], (size_t) Zdims[1],
+				    1/*sorted*/, 1/*packed*/,
+				    0/*stype*/, CHOLMOD_REAL, &c);
+    for (i = 0; i < Zdims[1]; i++) {
+	((int*)(ts1->p))[i] = i;
+	((int*)(ts1->i))[i] = i % dims[n_POS];
+	((double*)(ts1->x))[i] = 1;
+    }
+    ((int*)(ts1->p))[Zdims[1]] = Zdims[1];
+    ts2 = M_cholmod_transpose(ts1, TRUE/*values*/, &c);
+    M_cholmod_free_sparse(&ts1, &c);
+    ts1 = M_cholmod_ssmult(cZt, ts2, /* Create pattern for Mt */
+			   0 /*stype*/, 1 /*values*/, 1 /*sorted*/, &c);
+    M_cholmod_free_sparse(&ts2, &c);
+    SET_SLOT(ans, install("Mt"),
+	     M_chm_sparse_to_SEXP(ts1, 0, 0, 0, "", R_NilValue));
+    L = M_cholmod_analyze(ts1, &c); /* Create pattern for L */
+    if (!M_cholmod_factorize_p(ts1, one, (int*) NULL, 0, L, &c))
+	error(_("cholmod_factorize_p failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
-    }	
+    if (!(i = M_cholmod_change_factor(CHOLMOD_REAL, 1 /* to_ll */,
+				      L->is_super, 1 /* packed */,
+				      1 /* monotonic */, L, &c)))
+	error(_("cholmod_change_factor failed with code %d"), i);
+    
     SET_SLOT(ans, lme4_LSym, M_chm_factor_to_SEXP(L, 0));
     M_cholmod_free_factor(&L, &c);
-    UNPROTECT(1);
+
+    internal_nlmer_initial(ST, Gpp, ts1); /* initialize ST */
+    M_cholmod_free_sparse(&ts1, &c);
+
+    UNPROTECT(1); Free(cZt);
     return ans;
 }
 
@@ -2199,29 +2226,35 @@ SEXP nlmer_create(SEXP env, SEXP model, SEXP frame, SEXP pnames,
  * Evaluate the nonlinear model and its gradient matrix
  *
  * @param x pointer to an nlmer object
- * @param Phi n by s array of parameter values
- * @param w on return contains the gradient array
- * @param pwts prior weights (length n)
- * @param eta on return contains the model function evaluation
  */
-static void
-nlmer_eval_model(SEXP x, double *Phi, double *eta, double *w)
+SEXP nlmer_eval_model(SEXP x)
 {
-    SEXP pnames = GET_SLOT(x, install("pnames")),
-	pwts = GET_SLOT(x, lme4_weightsSym),
-	rho = GET_SLOT(x, install("env")),
-	gg, vv;
+    SEXP gg, pnames = GET_SLOT(x, install("pnames")),
+	rho = GET_SLOT(x, install("env")), vv;
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), *gdims;
-    int i, j, n = dims[n_POS], s = LENGTH(pnames);
+    int i, n = dims[n_POS], s = dims[s_POS];
+    double one[] = {1, 0}, zero[] = {0, 0};
+    cholmod_sparse *Xt = M_as_cholmod_sparse(GET_SLOT(x, install("Xt"))),
+	*Zt = M_as_cholmod_sparse(GET_SLOT(x, lme4_ZtSym));
+    cholmod_dense
+	*fe = M_numeric_as_chm_dense(REAL(GET_SLOT(x, lme4_fixefSym)), dims[p_POS]),
+	*re = M_numeric_as_chm_dense(REAL(GET_SLOT(x, lme4_ranefSym)), dims[q_POS]),
+	*Phi = M_cholmod_allocate_dense(n * s, 1, n * s, CHOLMOD_REAL, &c);
     
+				/* Evaluate Phi */
+    if (!(i = M_cholmod_sdmult(Xt, 1 /*trans*/, one, zero, fe, Phi, &c)))
+	error(_("cholmod_sdmult returned error code %d"), i);
+    if (!(i = M_cholmod_sdmult(Zt, 1 /*trans*/, one, one, re, Phi, &c)))
+	error(_("cholmod_sdmult returned error code %d"), i);
+    Free(Xt); Free(Zt); Free(fe); Free(re);
 
     /* distribute the parameters in the environment */
-    for (i = 0; i < s; i++) {
+    for (i = 0; i < dims[s_POS]; i++) {
 	vv = findVarInFrame(rho, install(CHAR(STRING_ELT(pnames, i))));
 	if (!isReal(vv) || LENGTH(vv) != n)
 	    error(_("Parameter %s in the environment must be a length %d numeric vector"),
 		  CHAR(STRING_ELT(pnames, i)), n);
-	Memcpy(REAL(vv), Phi + i * n, n);
+	Memcpy(REAL(vv), ((double*)(Phi->x)) + i * n, n);
     }
     vv = PROTECT(eval(GET_SLOT(x, install("model")), rho));
     if (!isReal(vv) || LENGTH(vv) != n)
@@ -2232,35 +2265,10 @@ nlmer_eval_model(SEXP x, double *Phi, double *eta, double *w)
     gdims = INTEGER(getAttrib(gg, R_DimSymbol));
     if (gdims[0] != n ||gdims[1] != s)
 	error(_("gradient matrix must be of size %d by %d"), n, s);
-    Memcpy(eta, REAL(vv), n);
-    Memcpy(w, REAL(gg), n * s);
-    if (LENGTH(pwts)) {
-	double *pwt = REAL(pwts);
-/* FIXME: Check that only the gradient needs to be weighted */
-	for (j = 0; j < s; j++)
-	    for (i = 0; i < n; i++) w[i + j * n] *= pwt[i];
-    }
+    SET_SLOT(x, lme4_muSym, vv);
     UNPROTECT(1);
+    return R_NilValue;
 }
-
-SEXP nlmer_eval(SEXP x, SEXP Phi)
-{
-    int *dims, s = LENGTH(GET_SLOT(x, install("pnames"))),
-	n = LENGTH(GET_SLOT(x, lme4_ySym));
-    SEXP ans = PROTECT(allocVector(VECSXP, 2));
-
-    if (!isReal(Phi) || !isMatrix(Phi) ||
-	(dims = INTEGER(getAttrib(Phi, R_DimSymbol)))[0] != n ||
-	dims[1] != s)
-	error(_("Phi must be a numeric matrix of size %d by %d"), n, s);
-    SET_VECTOR_ELT(ans, 0, allocVector(REALSXP, n));
-    SET_VECTOR_ELT(ans, 1, allocMatrix(REALSXP, n, s));
-    nlmer_eval_model(x, REAL(Phi), REAL(VECTOR_ELT(ans, 0)),
-		     REAL(VECTOR_ELT(ans, 1)));
-    UNPROTECT(1);
-    return ans;
-}
-    
 	
 /**
  * Iterate to determine the conditional modes of the random effects.
@@ -2283,7 +2291,8 @@ static int internal_nbhat(SEXP x)
 	*Xbeta = Calloc(m, double),
 	*beta = REAL(GET_SLOT(x, lme4_fixefSym)),
 	*dev = REAL(GET_SLOT(x, lme4_devianceSym)),
-	*eta = REAL(GET_SLOT(x, lme4_etaSym)),
+	*mu = REAL(GET_SLOT(x, lme4_muSym)),
+/* 	*muold = Calloc(n, double), */
 	*u = REAL(GET_SLOT(x, lme4_ranefSym)),
 	*w = Calloc(m, double),
 	*xx = (double*)(Xt->x),
@@ -2304,9 +2313,9 @@ static int internal_nbhat(SEXP x)
 	if (!M_cholmod_sdmult(Vt, 1 /* trans */, one, zero, cu, cZu, &c))
 	    error(_("cholmod_sdmult error returned"));
 	for (j = 0; j < m; j++) Phi[j] = Xbeta[j] + ((double*)(cZu->x))[j];
-	nlmer_eval_model(x, Phi, eta, w); /* evaluate mean and gradient */
+	nlmer_eval_model(x);	/* evaluate mean and gradient */
 	for (j = 0, dev[lr2_POS] = 0; j < n; j++) {
-	    double resj = y[j] - eta[j];
+	    double resj = y[j] - mu[j];
 	    dev[lr2_POS] += resj * resj;
 	    for (k = 0; k < s; k++) z[j + k * n] = resj;
 	}
@@ -2317,9 +2326,9 @@ static int internal_nbhat(SEXP x)
 	Rprintf("%3d: %20.15g %20.15g %20.15g\n", i, dev[lr2_POS], dev[bqd_POS],
 		exp(dev[lr2_POS]) + dev[bqd_POS]);
 #endif
-/* 	crit = conv_crit(etaold, eta, m); */
+/* 	crit = conv_crit(muold, mu, m); */
     }
-    Free(Xt); Free(Phi); Free(Phiold); Free(Xbeta), Free(w); Free(z); 
+    Free(Xt); Free(Phi); Free(Phiold); Free(Xbeta); Free(w); Free(z); 
     Free(cu); Free(L);
     M_cholmod_free_sparse(&Vt, &c);
     M_cholmod_free_dense(&cZu, &c);

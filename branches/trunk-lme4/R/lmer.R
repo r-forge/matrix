@@ -1709,6 +1709,7 @@ nlmer <- function(formula, data,
     Ztl1 <- lapply(with(FL, .Call(Ztl_sparse, fl, Ztl)), drop0)
     Gp <- unname(c(0L, cumsum(unlist(lapply(Ztl1, nrow)))))
     Zt <- do.call(rBind, Ztl1)
+    attr(fr$mf, "terms") <- NULL
 ### FIXME: It seems that fr$mf has a terms attribute still here
     val <- .Call(nlmer_create, env, nlmod, fr$mf, pnames, call = mc,
                  FL$fl, Xt, Zt, unname(fr$Y), wts,
