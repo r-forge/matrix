@@ -1,0 +1,5 @@
+2007-06-03 19:16  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4414] R/AllClass.R, R/lmer.R, src/init.c, src/lmer2.c, src/lmer2.h:
+	  More modifications to nlmer
+
