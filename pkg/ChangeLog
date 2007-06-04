@@ -1,3 +1,17 @@
+2007-06-04 17:13  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4418] src/Csparse.c, src/HBMM.c, src/Mutils.c, src/Mutils.h,
+	  src/Tsparse.c, src/chm_common.c, src/chm_common.h, src/dgCMatrix.c,
+	  src/dgeMatrix.c, src/dpoMatrix.c, src/dpoMatrix.h, src/dppMatrix.c,
+	  src/dppMatrix.h, src/dsCMatrix.c, src/dspMatrix.c, src/dspMatrix.h,
+	  src/dsyMatrix.c, src/dsyMatrix.h, src/dtpMatrix.c, src/dtrMatrix.c:
+	  Remove warnings after change to const char* CHAR
+
+2007-06-04 17:11  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4417] inst/include/Matrix_stubs.c, inst/include/cholmod.h: Corrected
+	  type of M_cholmod_ssmult
+
 2007-06-03 14:42  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r4412] inst/include/Matrix_stubs.c, inst/include/cholmod.h,
