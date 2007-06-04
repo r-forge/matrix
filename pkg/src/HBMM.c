@@ -47,7 +47,8 @@ SEXP Matrix_writeHarwellBoeing(SEXP obj, SEXP file, SEXP typep)
 
 SEXP Matrix_writeMatrixMarket(SEXP obj, SEXP file, SEXP typep)
 {
-    char *type = CHAR(asChar(typep));
+    const char *type = CHAR(asChar(typep));
+    char *ff = strdup(CHAR(asChar(file)));
     int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym)),
 	*ii = (int *) NULL, *jj = (int *) NULL;
     int M = dims[0], N = dims[1], i, nz = -1, *src;
@@ -88,10 +89,9 @@ SEXP Matrix_writeMatrixMarket(SEXP obj, SEXP file, SEXP typep)
     }
     if (!jj) error("storage mode must be T or C");
 
-    mm_write_mtx_crd(CHAR(asChar(file)), M, N, nz, ii, jj, xx,
-		     matcode);
+    mm_write_mtx_crd(ff, M, N, nz, ii, jj, xx, matcode);
 
-    Free(ii); Free(jj);
+    Free(ii); Free(jj); free(ff);
     return R_NilValue;
 
 }
