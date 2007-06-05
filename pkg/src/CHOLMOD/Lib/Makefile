@@ -6,8 +6,9 @@ include ${MkInclude}
 default: lib
 
 PKG_CFLAGS = -I../../AMD/Include -I../../AMD/Source \
-        -I../../COLAMD/Include  -I../../CCOLAMD \
+        -I../../COLAMD/Include \
 	-I../Include -I../../UFconfig -DNPARTITION
+#	 -I../../CCOLAMD \
 #        -I../../CAMD/Include -I../../CAMD/Source \
 #	-I../../Metis \
 
