@@ -170,11 +170,20 @@ isPacked <- function(x)
     length(x@x) < prod(dim(x))
 }
 
-emptyColnames <- function(x)
+emptyColnames <- function(x, msg.if.not.empty = FALSE)
 {
     ## Useful for compact printing of (parts) of sparse matrices
     ## possibly	 dimnames(x) "==" NULL :
-    dimnames(x) <- list(dimnames(x)[[1]], rep("", dim(x)[2]))
+    dn <- dimnames(x)
+    d <- dim(x)
+    if(msg.if.not.empty && is.list(dn) && length(dn) >= 2 &&
+       is.character(cn <- dn[[2]]) && any(cn != "")) {
+	lc <- length(cn)
+	message(sprintf("   [[ suppressing %d column names %s%s ]]", d[2],
+			paste(sQuote(cn[1:min(3, lc)]), collapse = ", "),
+			if(lc > 3) " ..." else ""))
+    }
+    dimnames(x) <- list(dn[[1]], rep("", d[2]))
     x
 }
 
