@@ -1,3 +1,14 @@
+2007-06-05 Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4425] src/UFsparse_download.sh: Update to version 3.0.0 of
+	  SuiteSparse
+	* [r4426] src/Makefile: add ./UFconfig to the include path for
+	  compilation
+	* [r4427] src/cs.c, src/cs.h: update to CSparse version 2.2.0
+	* [r4428] inst/doc/UFsparse/* src/AMD/* src/CHOLMOD/*
+	  src/COLAMD/* src/UFconfig/UFconfig.h: Update to version 3.0.0 of
+	  SuiteSparse 
+	
 2007-06-05  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Auxiliaries.R (emptyColnames): + argument msg.if.not.empty, used in
