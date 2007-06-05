@@ -142,10 +142,11 @@ Check for DimNames propagation in coercion and other operations.
   !M  where M is "sparseMatrix", currently always gives dense. This only
   makes sense when M is ``really sparse''.
 
-- column names of sparse matrices are not printed.
-  i.  "mention" them at the end of show()
-  ii.  build show( <sparseMatrix>) on a function, possibly
-       print.sparseMatrix(), which gets an argument such as
-       'col.names.show  = FALSE' which is documented and can be set to TRUE
+- column names of sparse matrices are not printed;
+  we now "mention" them (if they are non-empty).
+  Option:
+	build show( <sparseMatrix>) on a function, possibly
+        print.sparseMatrix(), which gets an argument such as
+        'col.names.show  = FALSE' which is documented and can be set to TRUE
 
 
