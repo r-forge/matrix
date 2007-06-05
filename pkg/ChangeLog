@@ -1,5 +1,7 @@
 2007-06-05 Douglas Bates <bates@stat.wisc.edu>
 
+	* [r4421] src/CSparse_install.sh: Modify for new organization of
+	  CSparse package 
 	* [r4425] src/UFsparse_download.sh: Update to version 3.0.0 of
 	  SuiteSparse
 	* [r4426] src/Makefile: add ./UFconfig to the include path for
