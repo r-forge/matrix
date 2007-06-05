@@ -29,7 +29,10 @@ SEXP nlmer_bhat(SEXP x);
 SEXP nlmer_create(SEXP env, SEXP model, SEXP frame, SEXP pnames,
 		  SEXP call, SEXP flist, SEXP Xt, SEXP Zt, SEXP y,
 		  SEXP weights, SEXP cnames, SEXP Gp, SEXP fixef);
-SEXP nlmer_eval_model(SEXP x);
+SEXP nlmer_eval_model(SEXP x, SEXP uform);
+SEXP nlmer_update_Mt(SEXP x);
+SEXP nlmer_update_Vt(SEXP x);
+SEXP nlmer_update_wrkres(SEXP x);
 SEXP nlmer_validate(SEXP x);
 
 #endif /* LME4_LMER2_H */
