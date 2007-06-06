@@ -306,7 +306,7 @@ replSPvec <- function (x, i, value)
 
 }
 
-setReplaceMethod("[", signature(x = "sparseVector", i = "index",
+setReplaceMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
 				value = "replValue"),
 		 replSPvec)
 
