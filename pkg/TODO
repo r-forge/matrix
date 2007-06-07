@@ -149,4 +149,5 @@ Check for DimNames propagation in coercion and other operations.
         print.sparseMatrix(), which gets an argument such as
         'col.names.show  = FALSE' which is documented and can be set to TRUE
 
-
+- 'arules' needs fast colSums() and rowSums() - for ngCMatrix;
+  do it for "nMatrix" and "lMatrix" and return *integer*

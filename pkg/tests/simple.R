@@ -195,6 +195,17 @@ stopifnot(identical(Matrix:::uniq(kt1), Matrix:::uniq(kt2)))
 ktf <- kronecker(as.matrix(t1), as.matrix(tu))
 if(FALSE) # FIXME? our kronecker treats "0 * NA" as "0" for structural-0
 assert.EQ.mat(kt2, ktf, tol= 0)
+(cs1 <- colSums(kt1))
+NA.or.True <- function(x) is.na(x) | x
+eq <- (cs1 == colSums(as(kt1, "matrix")))
+stopifnot(NA.or.True(eq), identical(is.na(eq), is.na(cs1)))
+nt1 <- as(kt1, "nMatrix") # no NA's anymore
+(ng1 <- as(as(nt1, "generalMatrix"),"CsparseMatrix"))
+(cs1. <- colSums(kt1, sparseResult = TRUE))# sparseVector
+(cs2 <-  colSums(ng1, sparseResult = TRUE))
+## check correct sparseness of both:
+stopifnot(sort(cs1.@i) == 9:16,
+          sort(cs2 @i) == 9:16)
 
 ## coercion from "dpo" or "dsy"
 xx <- as(xpx, "dsyMatrix")
