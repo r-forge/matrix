@@ -122,12 +122,14 @@ setClass("nlmer",
                         dims = "integer",   # dimensions and indicators
 			## slots that vary during the optimization
 			ST = "list",        # list of TSST' rep of rel. var. mats
-			L = "CHMfactor",    # sparse Cholesky factor of Z'Z
+			Vt = "dgCMatrix",   # sparse form of V'=(ZTS)'
+			L = "CHMfactor",    # sparse Cholesky factor of V'V + I
                         mu = "numeric",     # fitted values at current values of beta and b
                         Mt = "dgCMatrix",   # transpose of gradient matrix d mu/d u
 			deviance = "numeric", # ML and REML deviance and components
-			fixef = "numeric",
-			ranef = "numeric"
+			fixef = "numeric",  # the fixed effects, beta
+			ranef = "numeric",  # the random effects, b
+                        uvec = "numeric"    # orthogonal random effects, u, s.t. b=TSu
 			),
          validity = function(object) .Call(nlmer_validate, object)
          )

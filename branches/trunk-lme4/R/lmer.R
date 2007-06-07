@@ -1476,6 +1476,32 @@ setMethod("VarCorr", signature(x = "lmer2"),
 	  ans
       })
 
+# Create the VarCorr object of variances and covariances
+setMethod("VarCorr", signature(x = "nlmer"),
+	  function(x, REML = NULL, ...)
+      {
+	  sc <- sqrt(sum(x@deviance[c("bqd", "Sdr")])/x@dims["n"])
+	  cnames <- x@cnames
+	  ans <- x@ST
+          for (i in seq(along = ans)) {
+              ai <- ans[[i]]
+              dm <- dim(ai)
+              if (dm[1] < 2) {
+                  el <- (sc * ai)^2
+              } else {
+                  dd <- diag(ai)
+                  diag(ai) <- rep(1, dm[1])
+                  el <- sc^2 * crossprod(dd * t(ai))
+              }
+              el <- as(el, "dpoMatrix")
+              el@Dimnames <- list(cnames[[i]], cnames[[i]])
+	      el@factors$correlation <- as(el, "corMatrix")
+	      ans[[i]] <- el
+	  }
+	  attr(ans, "sc") <- sc
+	  ans
+      })
+
 setMethod("print", "lmer2", printMer2)
 setMethod("show", "lmer2", function(object) printMer2(object))
 
@@ -1646,7 +1672,7 @@ rmIntr <- function(mm)
 
 ## Fit a nonlinear mixed-effects model
 nlmer <- function(formula, data,
-                  control = list(), start = NULL,
+                  control = list(), start = NULL, verbose = FALSE,
                   subset, weights, na.action, contrasts = NULL,
                   model = TRUE, ...)
 {
@@ -1659,7 +1685,7 @@ nlmer <- function(formula, data,
     nlmod <- as.call(nlform[[3]])
 
     cv <- do.call("lmerControl", control)
-
+    if (missing(verbose)) verbose <- cv$msVerbose
     if (is.numeric(start)) start <- list(fixed = start)
     s <- length(pnames <- names(start$fixed))
     stopifnot(length(start$fixed) > 0, s > 0,
@@ -1710,10 +1736,39 @@ nlmer <- function(formula, data,
     Gp <- unname(c(0L, cumsum(unlist(lapply(Ztl1, nrow)))))
     Zt <- do.call(rBind, Ztl1)
     attr(fr$mf, "terms") <- NULL
-### FIXME: It seems that fr$mf has a terms attribute still here
+    fixef <- unlist(start$fixed)
+    storage.mode(fixef) <- "double"
     val <- .Call(nlmer_create, env, nlmod, fr$mf, pnames, call = mc,
                  FL$fl, Xt, Zt, unname(fr$Y), wts,
                  cnames = lapply(FL$Ztl, rownames), Gp = Gp,
-                 fixef = as.numeric(unlist(start$fixed)))
+                 fixef = fixef)
+    .Call(nlmer_optimize, val, verbose)
+    .Call(nlmer_update_ranef, val)
     val
 }
+
+setMethod("show", "nlmer", function(object)
+      {
+          dims <- object@dims
+          cat("Nonlinear mixed model fit by Laplace\n")
+          if (!is.null(object@call$formula))
+              cat("Formula:", deparse(object@call$formula),"\n")
+          if (!is.null(object@call$data))
+              cat("   Data:", deparse(object@call$data), "\n")
+          if (!is.null(object@call$subset))
+              cat(" Subset:",
+                  deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
+
+          cat("Random effects:\n")
+          print(formatVC(VarCorr(object)), quote = FALSE,
+                digits = max(3, getOption("digits") - 3))
+
+          cat(sprintf("Number of obs: %d, groups: ", dims["n"]))
+          ngrps <- sapply(object@flist, function(x) length(levels(x)))
+          cat(paste(paste(names(ngrps), ngrps, sep = ", "), collapse = "; "))
+          cat("\n")
+          cat("\nFixed effects:\n")
+          print(object@fixef)
+          invisible(object)
+      })
+
