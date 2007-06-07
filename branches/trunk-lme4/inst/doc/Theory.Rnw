@@ -666,7 +666,7 @@ squares problem
   \label{eq:nlmmdisc}
   \tilde{\bm{u}}(\bm{\beta},\bm{\theta})=\arg\min_{\bm{u}}
   \delta(\bm{u}|\bm{\beta},\bm{\theta},\bm{y})=\arg\min_{\bm{u}}\left[
-    \|\mu(\bm{\beta},\bm{u})-\bm{y}\|^2+\bm{u}\trans\bm{u}\right].
+    \|\bm{\mu}(\bm{\beta},\bm{u})-\bm{y}\|^2+\bm{u}\trans\bm{u}\right].
 \end{equation}
 Unlike the case of the linear mixed model this is generally a
 penalized nonlinear least squares problem that requires an iterative
@@ -690,7 +690,7 @@ $\bm{u}^{(i+1)}$ in
 \begin{equation}
   \label{eq:uip1}
   \left({\bm{M}^{(i)}}\trans\bm{M}^{(i)}+\bm{I}\right)\bm{u}^{(i+1)}=
-  {\bm{M}^{(i)}}\trans\left(\bm{y}-\bm{\mu}^{(i)}+\bm{B}^{(i)}\bm{u}^{(i)}\right)
+  {\bm{M}^{(i)}}\trans\left(\bm{y}-\bm{\mu}^{(i)}+\bm{M}^{(i)}\bm{u}^{(i)}\right)
 \end{equation}
 using the Cholesky decomposition
 \begin{equation}
@@ -698,7 +698,67 @@ using the Cholesky decomposition
   \left({\bm{M}^{(i)}}\trans\bm{M}^{(i)}+\bm{I}\right)={\bm{L}^{(i)}}\trans\bm{L}^{(i)} .
 \end{equation}
 
+At convergence the Laplace approximation to the deviance is
+\begin{equation}
+  \label{eq:nlmmLaplace}
+  -2\ell(\bm{\beta},\bm{\theta},\sigma^2|\bm{y})
+  =n\log\left(2\pi\sigma^2\right)+\frac{\delta(\tilde{\bm{u}}|\bm{\theta},\bm{\beta})}
+  {\sigma^2}+2\log|\bm{L}| .
+\end{equation}
+As in the linear mixed model we can form the conditional estimate of $\sigma^2$
+\begin{equation}
+  \label{eq:nlmmsigmasq}
+  \widehat{\sigma^2}(\bm{\theta},\bm{\beta})=
+  \frac{\delta(\tilde{\bm{u}}|\bm{\theta},\bm{\beta})}{n} .
+\end{equation}
+Substituting this estimate into (\ref{eq:nlmmLaplace}) produces the
+Laplace approximation to the profiled deviance
+\begin{equation}
+  \label{eq:nlmmprofdevLaplace}
+  -2\ell(\bm{\beta},\bm{\theta},\widehat{\sigma^2}(\bm{\beta},\bm{\theta})|\bm{y})
+  =n\left[1+\log\left(\frac{2\pi}{n}\right)\right]+
+  n\log \delta(\tilde{\bm{u}}|\bm{\theta},\bm{\beta})+2\log|\bm{L}| .
+\end{equation}
 
+\subsection{Random effects for conditionally linear parameters only}
+\label{sec:nlmmcondlin}
+
+There is a special case of a nonlinear mixed model where the Laplace
+approximation is the deviance and where the iterative algorithm to
+determine $\tilde{\bm{u}}(\bm{\beta}, \bm{\theta}, \bm{y})$ will
+converge in one iteration.  Frequently some of the elements of the
+parameter vector $\bm{\phi}$ occur linearly in the nonlinear model
+$g(\bm{x}, \bm{\phi})$.  These elements are said to be
+\emph{conditionally linear} parameters because, conditional on the
+values of the other parameters, the model function is a linear
+function of these.
+
+If the random effects determine only conditionally linear parameters
+then the matrix $\bm{M}$ depends on $\bm{\beta}$ and $\bm{\theta}$ but
+not on $\bm{u}$.  We can rewrite the mean function as
+\begin{equation}
+  \label{eq:condlinmu}
+  \bm{\mu}(\bm{\beta}, \bm{u})=\bm{\eta}(\bm{\beta})+\bm{M}\bm{u}
+\end{equation}
+and minimizing the penalized deviance is equivalent to
+\begin{multline}
+  \label{eq:condlinupdate}
+  \min_{\bm{u}}\left(\|\bm{y}-\bm{\eta}(\bm{\beta})-\bm{M}\bm{u}\|^2
+      +\bm{u}\trans\bm{u}\right)\\
+      = \min_{\bm{u}}\left\|
+        \begin{bmatrix}
+          \bm{y}+\bm{M}\bm{u}^{(0)}-\bm{\mu}(\bm{\beta},\bm{u}^{(0)})\\
+          \bm{0}
+        \end{bmatrix}
+        - \begin{bmatrix}\bm{M}\\\bm{I}\end{bmatrix}\bm{u}\right\|^2 .
+\end{multline}
+That is, $\tilde{\bm{u}}(\bm{\beta},\bm{\theta},\bm{y})$ is the
+solution to
+\begin{equation}
+  \label{eq:condlinsol}
+  \left(\bm{M}\trans\bm{M}+\bm{I}\right)\tilde{\bm{u}}=
+  \bm{M}\trans\left(\bm{y}+\bm{M}\bm{u}^{(0)}-\bm{\mu}(\bm{\beta},\bm{u}^{(0)})\right)
+\end{equation}
 \bibliography{lme4}
 \end{document}
 
