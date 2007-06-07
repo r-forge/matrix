@@ -9,7 +9,9 @@
 \alias{kronecker,Matrix,ANY-method}
 \alias{kronecker,diagonalMatrix,ANY-method}
 \alias{kronecker,sparseMatrix,ANY-method}
+\alias{kronecker,sparseMatrix,TsparseMatrix-method}
 %
+\alias{kronecker,TsparseMatrix,sparseMatrix-method}
 \alias{kronecker,TsparseMatrix,TsparseMatrix-method}
 \alias{kronecker,dgTMatrix,dgTMatrix-method}
 \alias{kronecker,dgTMatrix,dtTMatrix-method}
@@ -41,6 +43,17 @@
 \examples{
 (t1 <- spMatrix(5,4, x= c(3,2,-7,11), i= 1:4, j=4:1)) #  5 x  4
 (t2 <- kronecker(Diagonal(3, 2:4), t1))               # 15 x 12
+
+## should also work with special-cased logical matrices
+l3 <- upper.tri(matrix(,3,3))
+M <- Matrix(l3)
+(N <- as(M, "nsparseMatrix"))
+N2 <- as(N, "generalMatrix")
+MM <- kronecker(M,M)
+NN <- kronecker(N,N)
+NN2 <- kronecker(N2,N2)
+stopifnot(identical(NN,MM),
+          is(NN, "triangularMatrix"))
 }
 \keyword{methods}
 \keyword{array}
