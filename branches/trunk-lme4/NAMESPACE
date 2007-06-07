@@ -12,6 +12,7 @@ export(
        "lmer",
        "lmer2",
        "mcmcsamp",
+       "nlmer",
        "pedigree",
        "pooledSD"
        )
