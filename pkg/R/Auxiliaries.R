@@ -2,25 +2,25 @@
 #### (called from more than one place --> need to be defined early)
 
 
-if(R.version$`svn rev` < 41656) ## use the fixed one
+if(R.version$`svn rev` < 41863) ## use the fixed one
     ## will be hidden in namespace and can be removed when DEPENDS: R >= 2.5.1
     callGeneric <- function(...)
 {
     frame <- sys.parent()
     envir <- parent.frame()
+    call <- sys.call(frame)
 
     ## the  lines below this comment do what the previous version
     ## did in the expression fdef <- sys.function(frame)
     if(exists(".Generic", envir = envir, inherits = FALSE))
 	fname <- get(".Generic", envir = envir)
     else { # in a local method (special arguments), or	an error
-	fname <- sys.call(frame)[[1]]
 	## FIXME:  this depends on the .local mechanism, which should change
-	if(identical(as.character(fname), ".local"))
-	    fname <- sys.call(sys.parent(2))[[1]]
-	fname <- as.character(fname)
+	if(identical(as.character(call[[1]]), ".local"))
+	    call <- sys.call(sys.parent(2))
+	fname <- as.character(call[[1]])
     }
-    fdef <- get(fname, env = envir)
+    fdef <- get(fname, envir = envir)
 
     if(is.primitive(fdef)) {
         if(nargs() == 0)
@@ -37,7 +37,6 @@ if(R.version$`svn rev` < 41656) ## use the fixed one
         f <- get(".Generic", env, inherits = FALSE)
         fname <- as.name(f)
         if(nargs() == 0) {
-            call <- sys.call(frame)
             call[[1]] <- as.name(fname) # in case called from .local
             call <- match.call(fdef, call)
             anames <- names(call)

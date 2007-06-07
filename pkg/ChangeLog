@@ -1,3 +1,8 @@
+2007-06-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (callGeneric): another fix, needed for some cases
+	of colSums(*, sparseResult = TRUE)
+
 2007-06-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/lsparseMatrix.R, R/ldenseMatrix.R (all, any): change default to
