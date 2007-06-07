@@ -31,7 +31,7 @@
 \alias{dim<-,sparseMatrix-method}
 \alias{show,sparseMatrix-method}
 \alias{summary,sparseMatrix-method}
-%\alias{colMeans, etc are now in ./colSums.Rd
+%\alias{colMeans,..} etc are now in ./colSums.Rd
 % graph stuff
 \alias{coerce,graph,sparseMatrix-method}
 \alias{coerce,graph,CsparseMatrix-method}
