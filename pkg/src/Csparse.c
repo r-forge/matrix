@@ -7,7 +7,8 @@ SEXP Csparse_validate(SEXP x)
     /* NB: we do *NOT* check a potential 'x' slot here, at all */
     SEXP pslot = GET_SLOT(x, Matrix_pSym),
 	islot = GET_SLOT(x, Matrix_iSym);
-    int j, k, sorted,
+    Rboolean sorted, strictly;
+    int j, k,
 	*dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	nrow = dims[0],
 	ncol = dims[1],
@@ -18,24 +19,39 @@ SEXP Csparse_validate(SEXP x)
 	return mkString(_("slot p must have length = ncol(.) + 1"));
     if (xp[0] != 0)
 	return mkString(_("first element of slot p must be zero"));
-    if (length(islot) != xp[ncol])
+    if (length(islot) < xp[ncol]) /* allow larger slots from over-allocation!*/
 	return
 	    mkString(_("last element of slot p must match length of slots i and x"));
     for (j = 0; j < length(islot); j++) {
 	if (xi[j] < 0 || xi[j] >= nrow)
 	    return mkString(_("all row indices must be between 0 and nrow-1"));
     }
-    sorted = TRUE;
+    sorted = TRUE; strictly = TRUE;
     for (j = 0; j < ncol; j++) {
 	if (xp[j] > xp[j+1])
 	    return mkString(_("slot p must be non-decreasing"));
-	for (k = xp[j] + 1; k < xp[j + 1]; k++)
-	    if (xi[k] < xi[k - 1]) sorted = FALSE;
+	if(sorted)
+	    for (k = xp[j] + 1; k < xp[j + 1]; k++) {
+		if (xi[k] < xi[k - 1])
+		    sorted = FALSE;
+		else if (xi[k] == xi[k - 1])
+		    strictly = FALSE;
+	    }
     }
     if (!sorted) {
 	cholmod_sparse *chx = as_cholmod_sparse(x);
 	cholmod_sort(chx, &c);
 	Free(chx);
+	/* Now re-check that row indices are *strictly* increasing
+	 * (and not just increasing) within each column : */
+	for (j = 0; j < ncol; j++) {
+	    for (k = xp[j] + 1; k < xp[j + 1]; k++)
+		if (xi[k] == xi[k - 1])
+		    return mkString(_("slot i is not *strictly* increasing inside a column (even after cholmod_sort)"));
+	}
+
+    } else if(!strictly) {  /* sorted, but not strictly */
+	return mkString(_("slot i is not *strictly* increasing inside a column"));
     }
     return ScalarLogical(1);
 }
