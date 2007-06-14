@@ -1,3 +1,9 @@
+2007-06-14  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Csparse.c (Csparse_validate): check for *repeated* entries
+	thanks to example from Christian Buchta; with a test here:
+	* tests/simple.R:
+
 2007-06-07  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Auxiliaries.R (callGeneric): another fix, needed for some cases
