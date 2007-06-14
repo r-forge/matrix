@@ -283,7 +283,7 @@ stopifnot(is(nkt, "ngCMatrix"), is(clt, "nsCMatrix"))
 crossprod(clt) ## a warning: crossprod() of symmetric
 
 ## a Csparse with *repeated* entry is not valid!
-assertError(new("ngCMatrix", p = c(0L,2L), i = c(0L,0L), Dim = 2:1)
+assertError(new("ngCMatrix", p = c(0L,2L), i = c(0L,0L), Dim = 2:1))
 
 
 ### "d" <-> "l"  for (symmetric) sparse :
