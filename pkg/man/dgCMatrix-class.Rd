@@ -2,7 +2,6 @@
 \docType{class}
 \title{Compressed, sparse, column-oriented numeric matrices}
 \alias{dgCMatrix-class}
-%\alias{indicators-class}
 \alias{\%*\%,dgCMatrix,dgeMatrix-method}
 \alias{\%*\%,dgCMatrix,matrix-method}
 \alias{\%*\%,numeric,dgCMatrix-method}
@@ -55,9 +54,6 @@
   increasing row order.  \code{dsCMatrix} is the
   \emph{\dQuote{standard}} class for sparse numeric matrices in the
   \pkg{Matrix} package.
-%  The \code{indicators} class is the class of
-%  \code{dgCMatrix} objects that are the indicator rows (that is, the
-%  transpose of the matrix of indicator columns) for a factor.
 }
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("dgCMatrix", ...)} or
@@ -67,8 +63,6 @@
   \describe{
     \item{\code{x}:}{Object of class \code{"numeric"} - the non-zero
       elements of the matrix.}
-%    \item{\code{levels}:}{(\code{indicators} class only) Object of class
-%      \code{"character"} containing the levels corresponding to the rows.}
     \item{\dots}{all other slots are inherited from the superclass
       \code{"\linkS4class{CsparseMatrix}"}.
     }
