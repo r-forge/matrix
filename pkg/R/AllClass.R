@@ -298,6 +298,10 @@ setClass("dgCMatrix",
 	 validity = function(object) .Call(xCMatrix_validate, object)
 	 )
 
+## special case: indicator rows for a factor - needs more careful definition
+#setClass("indicators", representation(levels = "character"),
+#	 contains = "dgCMatrix")
+
 ## see comments for dtTMatrix above
 ## numeric, sparse, sorted compressed sparse column-oriented triangular matrices
 setClass("dtCMatrix",

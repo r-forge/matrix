@@ -23,6 +23,7 @@
 \alias{rbind2,numeric,sparseMatrix-method}
 %
 \alias{coerce,ANY,sparseMatrix-method}
+%\alias{coerce,factor,sparseMatrix-method}
 \alias{coerce,sparseMatrix,generalMatrix-method}
 \alias{coerce,sparseMatrix,symmetricMatrix-method}
 \alias{coerce,sparseMatrix,triangularMatrix-method}
