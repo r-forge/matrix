@@ -426,3 +426,44 @@ setMethod("colMeans", signature(x = "sparseMatrix"), .as.dgT.Fun)
 ## .as.dgC.Fun
 setMethod("rowSums", signature(x = "sparseMatrix"), .as.dgC.Fun)
 setMethod("rowMeans", signature(x = "sparseMatrix"),.as.dgC.Fun)
+
+lm.fit.sparse <-
+function(x, y, offset = NULL, method = c("qr", "cholesky"),
+         tol = 1e-7, singular.ok = TRUE, transpose = FALSE, ...)
+### Fit a linear model using a sparse QR or a sparse Cholesky factorization
+{
+    stopifnot(is(x, "dsparseMatrix"))
+    yy <- as.numeric(y)
+    if (!is.null(offset)) {
+        stopifnot(length(offset) == length(y))
+        yy <- yy - as.numeric(offset)
+    }
+    ans <- switch(as.character(method)[1],
+                  cholesky = .Call(dgCMatrix_cholsol,
+                  as(if (transpose) x else t(x), "dgCMatrix"), yy),
+                  qr = .Call(dgCMatrix_qrsol,
+                  as(if (transpose) t(x) else x, "dgCMatrix"), yy),
+                  stop(paste("unknown method", dQuote(method)))
+                  )
+    ans
+}
+
+## indicator rows for a factor
+## setAs("factor", "sparseMatrix",
+##       function(from)
+##   {
+##       levs <-
+##           as.character(levels(fact <- as.factor(from)[, drop = TRUE]))
+##       n <- length(fact)
+##       new("indicators", p = 0:n, i = as.integer(fact) - 1L, # 0-based
+##           x = rep.int(1, n), Dim = c(length(levs), n), levels = levs)
+##   })
+
+## if storing the levels is not desired coerce directly to dgCMatrix
+setAs("factor", "dgCMatrix",
+      function(from) {
+          fact <- as.factor(from)[, drop = TRUE]
+          n <- length(fact)
+          new("dgCMatrix", p = 0:n, i = as.integer(fact) - 1L, # 0-based
+               x = rep.int(1, n), Dim = c(length(levels(fact)), n))
+      })

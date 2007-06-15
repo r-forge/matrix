@@ -307,3 +307,40 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
     return ans;
 }
 
+SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
+{
+    cholmod_sparse *cx = as_cholmod_sparse(x);
+    cholmod_factor *L;
+    cholmod_dense *cy = as_cholmod_dense(y), *rhs, *cAns;
+    double one[] = {1,0}, zero[] = {0,0};
+    SEXP ans = PROTECT(allocVector(VECSXP, 3));
+
+    if (cx->ncol < cx->nrow || cx->ncol <= 0)
+	error(_("dgCMatrix_cholsol requires a 'short, wide' rectangular matrix"));
+    if (cy->nrow != cx->ncol)
+	error(_("Dimensions of system to be solved are inconsistent"));
+    rhs = cholmod_allocate_dense(cx->nrow, 1, cx->nrow, CHOLMOD_REAL, &c);
+    if (!(cholmod_sdmult(cx, 0 /* trans */, one, zero, cy, rhs, &c)))
+	error(_("cholmod_sdmult error"));
+    L = cholmod_analyze(cx, &c);
+    if (!cholmod_factorize(cx, L, &c))
+	error(_("cholmod_factorize failed: status %d, minor %d from ncol %d"),
+	      c.status, L->minor, L->n);
+/* FIXME: Do this in stages so an "effects" vector can be calculated */
+    if (!(cAns = cholmod_solve(CHOLMOD_A, L, rhs, &c)))
+	error(_("cholmod_solve (CHOLMOD_A) failed: status %d, minor %d from ncol %d"),
+	      c.status, L->minor, L->n);
+    SET_VECTOR_ELT(ans, 0, chm_factor_to_SEXP(L, 0));
+    SET_VECTOR_ELT(ans, 1, allocVector(REALSXP, cx->nrow));
+    Memcpy(REAL(VECTOR_ELT(ans, 1)), (double*)(cAns->x), cx->nrow);
+/* FIXME: Change this when the "effects" vector is available */
+    SET_VECTOR_ELT(ans, 2, allocVector(REALSXP, cx->nrow));
+    Memcpy(REAL(VECTOR_ELT(ans, 1)), (double*)(rhs->x), cx->nrow);
+
+    cholmod_free_factor(&L, &c);
+    cholmod_free_dense(&rhs, &c);
+    cholmod_free_dense(&cAns, &c);
+    Free(cx); Free(cy);
+    UNPROTECT(1);
+    return ans;
+}

@@ -75,6 +75,7 @@ static R_CallMethodDef CallEntries[] = {
 
     {"dgCMatrix_LU", (DL_FUNC) &dgCMatrix_LU, 3},
     {"dgCMatrix_QR", (DL_FUNC) &dgCMatrix_QR, 2},
+    {"dgCMatrix_cholsol", (DL_FUNC) &dgCMatrix_cholsol, 2},
     {"dgCMatrix_lusol", (DL_FUNC) &dgCMatrix_lusol, 2},
     {"dgCMatrix_matrix_solve", (DL_FUNC) &dgCMatrix_matrix_solve, 2},
     {"dgCMatrix_qrsol", (DL_FUNC) &dgCMatrix_qrsol, 2},
