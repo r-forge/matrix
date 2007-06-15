@@ -1,3 +1,11 @@
+2007-06-15 18:20  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4460] R/sparseMatrix.R, man/dgCMatrix-class.Rd, src/dgCMatrix.c,
+	  src/dgCMatrix.h, src/init.c: added lm.fit.sparse (unexported),
+	  coercion of "factor" to "dgCMatrix" and dgCMatrix_cholsol
+	* [r4461] R/AllClass.R, man/sparseMatrix-class.Rd: draft "indicators"
+	  class
+	
 2007-06-14  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/Csparse.c (Csparse_validate): check for *repeated* entries
