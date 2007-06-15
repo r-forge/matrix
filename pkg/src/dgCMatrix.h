@@ -11,6 +11,7 @@ SEXP compressed_non_0_ij(SEXP x, SEXP colP);
 SEXP R_to_CMatrix(SEXP x);
 SEXP dgCMatrix_lusol(SEXP x, SEXP y);
 SEXP dgCMatrix_qrsol(SEXP x, SEXP y);
+SEXP dgCMatrix_cholsol(SEXP x, SEXP y);
 SEXP dgCMatrix_QR(SEXP Ap, SEXP order);
 SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp);
 SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP bp);
