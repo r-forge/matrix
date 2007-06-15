@@ -23,7 +23,7 @@
 \alias{rbind2,numeric,sparseMatrix-method}
 %
 \alias{coerce,ANY,sparseMatrix-method}
-%\alias{coerce,factor,sparseMatrix-method}
+\alias{coerce,factor,sparseMatrix-method}
 \alias{coerce,sparseMatrix,generalMatrix-method}
 \alias{coerce,sparseMatrix,symmetricMatrix-method}
 \alias{coerce,sparseMatrix,triangularMatrix-method}
@@ -80,6 +80,12 @@
       allows to \emph{reshape} a sparse matrix to a sparse matrix with
       the same entries but different dimensions. \code{value} must be of
       length two and fulfill \code{prod(value) == prod(dim(x))}.}
+    \item{coerce}{\code{signature(from "factor", to = "sparseMatrix")}:
+      Coercion of a factor to \code{"sparseMatrix"} produces the matrix
+      of indicator \bf{rows} stored as an object of class
+      \code{"dgCMatrix"}.  To obtain columns represent the interaction
+      of the factor and a numeric covariate, replace the \code{"x"} slot
+      of the result by the numeric covariate then take the transpose.}
   }
   See also \code{\link{colSums}}, ... %% FIXME
   for methods with separate help pages.
@@ -98,6 +104,8 @@ showClass("sparseMatrix") ## and look at the help() of its subclasses
 M <- Matrix(0, 10000, 100)
 M[1,1] <- M[2,3] <- 3.14
 M
+str(fact <- gl(5, 3, labels = LETTERS[1:5]))
+as(fact, "sparseMatrix")  # indicator rows
 \dontshow{% show() was slow in 0.9975-8 because of slow adjust="fancy"
 op <- options(max.print = 25000, width = 80)
 sink(print(tempfile()))

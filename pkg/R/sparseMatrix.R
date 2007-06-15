@@ -448,22 +448,15 @@ function(x, y, offset = NULL, method = c("qr", "cholesky"),
     ans
 }
 
-## indicator rows for a factor
-## setAs("factor", "sparseMatrix",
-##       function(from)
-##   {
-##       levs <-
-##           as.character(levels(fact <- as.factor(from)[, drop = TRUE]))
-##       n <- length(fact)
-##       new("indicators", p = 0:n, i = as.integer(fact) - 1L, # 0-based
-##           x = rep.int(1, n), Dim = c(length(levs), n), levels = levs)
-##   })
+setAs("factor", "sparseMatrix",
+      function(from)
+  {
+      fact <- as.factor(from)[, drop = TRUE]
+      levs <- levels(fact)
+      n <- length(fact)
+      new("dgCMatrix", p = 0:n, i = as.integer(fact) - 1L, # 0-based
+          x = rep.int(1, n), Dim = c(length(levs), n),
+          Dimnames = list(levels(fact), NULL))
+  }
+      )
 
-## if storing the levels is not desired coerce directly to dgCMatrix
-setAs("factor", "dgCMatrix",
-      function(from) {
-          fact <- as.factor(from)[, drop = TRUE]
-          n <- length(fact)
-          new("dgCMatrix", p = 0:n, i = as.integer(fact) - 1L, # 0-based
-               x = rep.int(1, n), Dim = c(length(levels(fact)), n))
-      })
