@@ -37,7 +37,7 @@ stopifnot(all(!l0),
 ## with dimnames:
 m. <- matrix(c(0, 0, 2:0), 3, 5)
 dimnames(m.) <- list(LETTERS[1:3], letters[1:5])
-(m <- Matrix(m.))
+(m0 <- m <- Matrix(m.))
 m@Dimnames[[2]] <- m@Dimnames[[1]]
 ## not valid anymore:
 (val <- validObject(m, test=TRUE))
@@ -314,6 +314,16 @@ stopifnot(all(ij(A) %in% ij(B)))
 l3 <- upper.tri(matrix(,3,3))
 (c3 <- as(l3, "CsparseMatrix"))
 stopifnot(validObject(c3), is(c3, "CsparseMatrix"), is(c3, "triangularMatrix"))
+(M <- Matrix(l3))  # -> "ltCMatrix"
+M2 <- M %x% M
+stopifnot(is(M, "ltCMatrix"), validObject(M2), dim(M2) == c(9,9),
+          identical(M2, kronecker(M,M)),
+          is(M2, "triangularMatrix")) # is "dtT" (why not "dtC" ?)
+M3 <- M %x% M2 #ok
+(cM3 <- colSums(M3, sparse=TRUE))
+identical(as.vector(cM3),
+          as(rev(rowSums(M3, sparse=TRUE)), "vector"))
+M. <- M2 %x% M # gave infinite recursion
 
 ## diagonal, sparse & interactions
 stopifnot(is(as(Diagonal(3), "TsparseMatrix"), "TsparseMatrix"),
