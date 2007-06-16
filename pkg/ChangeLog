@@ -1,3 +1,8 @@
+2007-06-16 15:52  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4466] R/dgCMatrix.R, src/dgCMatrix.c, src/dgCMatrix.h, src/init.c:
+	  added dgCMatrix_colSums for [col,row][Sums,Means]
+
 2007-06-15 23:15  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r4460] R/sparseMatrix.R, man/dgCMatrix-class.Rd, src/dgCMatrix.c,
