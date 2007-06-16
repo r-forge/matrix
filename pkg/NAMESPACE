@@ -236,6 +236,7 @@ exportMethods(
 	      "kronecker",
 	      "length",
 	      "norm",
+              "print",# print(x, ...) when show(x) is not sufficient
 	      "qr",
 	      "qr.qy",
 	      "qr.qty",

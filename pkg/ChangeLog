@@ -1,3 +1,8 @@
+2007-06-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (prSpMatrix): change to be used as print()
+	method (which can have arguments, show() can't).
+
 2007-06-16 15:52  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r4466] R/dgCMatrix.R, src/dgCMatrix.c, src/dgCMatrix.h, src/init.c:
@@ -13,7 +18,7 @@
 	* [r4463] R/sparseMatrix.R, man/dgCMatrix-class.Rd,
 	  man/sparseMatrix-class.Rd: Don't need an "indicators" class - use the
 	  row names to store the levels - duh!	Added an example.
-	
+
 2007-06-14  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/Csparse.c (Csparse_validate): check for *repeated* entries

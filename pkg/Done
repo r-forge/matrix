@@ -181,4 +181,5 @@
 - when printing sparse matrices column names are suppressed.
   For matrices *with* non-empty column names, this is now message()d.
 
+  Alternatively, now how print(<sparseMatrix>, col.names = TRUE, .....)
 
