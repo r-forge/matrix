@@ -344,3 +344,42 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
     UNPROTECT(1);
     return ans;
 }
+
+SEXP dgCMatrix_colSums(SEXP x, SEXP NArm, SEXP spRes, SEXP trans, SEXP means)
+{
+    SEXP ans;
+    cholmod_sparse *cx = as_cholmod_sparse(x);
+    int *xp, i, j, mn = asLogical(means),
+	ignoreNA = !asLogical(NArm), tr = asLogical(trans);
+    double *xx, *a;
+
+    if (tr) {			/* replace cx by its transpose */
+	cholmod_sparse *cxt = cholmod_transpose(cx, 1 /*values*/, &c);
+	Free(cx);
+	cx = cxt;
+    }
+    xp = (int*)(cx->p); xx = (double*)(cx->x);
+
+    if (asLogical(spRes)) {
+	error(_("dgCMatrix_colSums code for sparseVector result needs to be written"));
+    } else {
+	a = REAL(ans = PROTECT(allocVector(REALSXP, cx->ncol)));
+	for (j = 0; j < cx->ncol; j++) {
+	    /* initialize the number of non-missing values */
+	    int nnm = cx->nrow - (xp[j + 1] - xp[j]);
+	    for (i = xp[j], a[j] = 0; i < xp[j + 1]; i++)
+		if (ignoreNA || xx[i] != NA_REAL) {
+		    a[j] += xx[i];
+		    nnm++;
+		}
+	    if (mn) a[j] = (nnm > 0) ? a[j]/nnm : NA_REAL; 
+	}
+    }
+
+    if (tr) cholmod_free_sparse(&cx, &c); else Free(cx);
+    UNPROTECT(1);
+    return ans;
+}
+
+
+    

@@ -59,8 +59,23 @@ setMethod("writeMM", signature(obj = "dgCMatrix"),
 	  function(obj, file, ...)
 	  .Call(Matrix_writeMatrixMarket, obj, as.character(file), "DGC"))
 
+## the last two arguments to dgCMatrix_colSums are `trans' and `means'
+setMethod("colSums", signature(x = "dgCMatrix"),
+	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
+          .Call(dgCMatrix_colSums, x, na.rm, sparseResult, FALSE, FALSE))
 
-## TODO (in C):
+setMethod("rowSums", signature(x = "dgCMatrix"),
+	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
+          .Call(dgCMatrix_colSums, x, na.rm, sparseResult, TRUE, FALSE))
+
+setMethod("colMeans", signature(x = "dgCMatrix"),
+	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
+          .Call(dgCMatrix_colSums, x, na.rm, sparseResult, FALSE, TRUE))
+
+setMethod("rowMeans", signature(x = "dgCMatrix"),
+	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
+          .Call(dgCMatrix_colSums, x, na.rm, sparseResult, TRUE, TRUE))
+
 ## setMethod("colSums", signature(x = "dgCMatrix"),
 ##	  function(x, na.rm = FALSE, dims = 1)
 ##	     .Call(dgCMatrix_colsums, x, na.rm, TRUE, FALSE),
@@ -71,14 +86,14 @@ setMethod("writeMM", signature(obj = "dgCMatrix"),
 ##	     .Call(dgCMatrix_colsums, x, na.rm, TRUE, TRUE),
 ##	  valueClass = "numeric")
 
-setMethod("colSums",  signature(x = "dgCMatrix"), .as.dgT.Fun)
-setMethod("colMeans", signature(x = "dgCMatrix"), .as.dgT.Fun)
+##setMethod("colSums",  signature(x = "dgCMatrix"), .as.dgT.Fun)
+##setMethod("colMeans", signature(x = "dgCMatrix"), .as.dgT.Fun)
 
-setMethod("rowSums", signature(x = "dgCMatrix"),
-	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
-	  sparsapply(x, 1, sum, sparseResult = sparseResult, na.rm = na.rm))
+##setMethod("rowSums", signature(x = "dgCMatrix"),
+##	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
+##	  sparsapply(x, 1, sum, sparseResult = sparseResult, na.rm = na.rm))
 
-setMethod("rowMeans", signature(x = "dgCMatrix"), sp.rowMeans)
+##setMethod("rowMeans", signature(x = "dgCMatrix"), sp.rowMeans)
 
 
 setMethod("qr", signature(x = "dgCMatrix"),
