@@ -1,5 +1,8 @@
 2007-06-16  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* R/kronecker.R: fix typo (could lead to inf.recursion)
+	* test/simple.R: testing that
+
 	* R/sparseMatrix.R (prSpMatrix): change to be used as print()
 	method (which can have arguments, show() can't).
 
