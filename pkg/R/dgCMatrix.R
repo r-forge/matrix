@@ -76,16 +76,6 @@ setMethod("rowMeans", signature(x = "dgCMatrix"),
 	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
           .Call(dgCMatrix_colSums, x, na.rm, sparseResult, TRUE, TRUE))
 
-## setMethod("colSums", signature(x = "dgCMatrix"),
-##	  function(x, na.rm = FALSE, dims = 1)
-##	     .Call(dgCMatrix_colsums, x, na.rm, TRUE, FALSE),
-##	  valueClass = "numeric")
-
-## setMethod("colMeans", signature(x = "dgCMatrix"),
-##	  function(x, na.rm = FALSE, dims = 1)
-##	     .Call(dgCMatrix_colsums, x, na.rm, TRUE, TRUE),
-##	  valueClass = "numeric")
-
 ##setMethod("colSums",  signature(x = "dgCMatrix"), .as.dgT.Fun)
 ##setMethod("colMeans", signature(x = "dgCMatrix"), .as.dgT.Fun)
 
