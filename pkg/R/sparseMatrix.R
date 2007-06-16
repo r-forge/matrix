@@ -222,43 +222,45 @@ setMethod("Math",
 
 ## FIXME(?) -- ``merge this'' (at least ``synchronize'') with
 ## - - -   prMatrix() from ./Auxiliaries.R
-prSpMatrix <- function(object, digits = getOption("digits"),
+prSpMatrix <- function(x, digits = getOption("digits"),
                        maxp = getOption("max.print"), zero.print = ".",
+                       col.names = FALSE, note.dropping.colnames = TRUE,
                        col.trailer = '', align = c("fancy", "right"))
 ## FIXME: prTriang() in ./Auxiliaries.R  should also get  align = "fancy"
 {
-    cl <- getClassDef(class(object))
+    cl <- getClassDef(class(x))
     stopifnot(extends(cl, "sparseMatrix"))
-    d <- dim(object)
+    d <- dim(x)
     if(prod(d) > maxp) { # "Large" => will be "cut"
         ## only coerce to dense that part which won't be cut :
         nr <- maxp %/% d[2]
-	m <- as(object[1:max(1, nr), ,drop=FALSE], "Matrix")
+	m <- as(x[1:max(1, nr), ,drop=FALSE], "Matrix")
     } else {
-        m <- as(object, "matrix")
+        m <- as(x, "matrix")
     }
     logi <- extends(cl,"lsparseMatrix") || extends(cl,"nsparseMatrix")
     if(logi)
-	x <- array("N", # or as.character(NA),
+	cx <- array("N", # or as.character(NA),
 		   dim(m), dimnames=dimnames(m))
     else { ## numeric (or --not yet-- complex):
-	x <- apply(m, 2, format)
-	if(is.null(dim(x))) {# e.g. in	1 x 1 case
-	    dim(x) <- dim(m)
-	    dimnames(x) <- dimnames(m)
+	cx <- apply(m, 2, format)
+	if(is.null(dim(cx))) {# e.g. in	1 x 1 case
+	    dim(cx) <- dim(m)
+	    dimnames(cx) <- dimnames(m)
 	}
     }
-    x <- emptyColnames(x, msg.if.not.empty = TRUE)
+    if(!col.names)
+        cx <- emptyColnames(cx, msg.if.not.empty = note.dropping.colnames)
     if(is.logical(zero.print))
 	zero.print <- if(zero.print) "0" else " "
     if(logi) {
-	x[!m] <- zero.print
-	x[m] <- "|"
+	cx[!m] <- zero.print
+	cx[m] <- "|"
     } else { # non logical
 	## show only "structural" zeros as 'zero.print', not all of them..
 	## -> cannot use 'm'
-        d <- dim(x)
-	ne <- length(iN0 <- 1L + encodeInd(non0ind(object, cl), nr = d[1]))
+        d <- dim(cx)
+	ne <- length(iN0 <- 1L + encodeInd(non0ind(x, cl), nr = d[1]))
 	if(0 < ne && ne < prod(d)) {
 	    align <- match.arg(align)
 	    if(align == "fancy") {
@@ -285,16 +287,18 @@ prSpMatrix <- function(object, digits = getOption("digits"),
                     zero.print <- rep.int(zero.print, length(cols))
 	    } ## else "right" : nothing to do
 
-	    x[-iN0] <- zero.print
+	    cx[-iN0] <- zero.print
 	} else if (ne == 0)# all zeroes
-	    x[] <- zero.print
+	    cx[] <- zero.print
     }
     if(col.trailer != '')
-        x <- cbind(x, col.trailer, deparse.level = 0)
+        cx <- cbind(cx, col.trailer, deparse.level = 0)
     ## right = TRUE : cheap attempt to get better "." alignment
-    print(x, quote = FALSE, right = TRUE, max = maxp)
-    invisible(object)
+    print(cx, quote = FALSE, right = TRUE, max = maxp)
+    invisible(x)
 }
+
+setMethod("print", signature(x = "sparseMatrix"), prSpMatrix)
 
 setMethod("show", signature(object = "sparseMatrix"),
    function(object) {
