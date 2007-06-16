@@ -196,7 +196,7 @@ SEXP Matrix_css_to_SEXP(css *S, char *cl, int dofree, int m, int n)
     int *nz, ctype = check_class(cl, valid);
 
     if (ctype < 0)
-	error("Inappropriate class `%s' for Matrix_css_to_SEXP", cl);
+	error("Inappropriate class '%s' for Matrix_css_to_SEXP", cl);
     ans = PROTECT(NEW_OBJECT(MAKE_CLASS(cl)));
 				/* allocate and copy common slots */
     Memcpy(INTEGER(ALLOC_SLOT(ans, install("Q"), INTSXP, n)), S->q, n);
@@ -214,7 +214,7 @@ SEXP Matrix_css_to_SEXP(css *S, char *cl, int dofree, int m, int n)
 	       S->cp, n);
 	break;
     default:
-	error("Inappropriate class `%s' for Matrix_css_to_SEXP", cl);
+	error("Inappropriate class '%s' for Matrix_css_to_SEXP", cl);
     }
     if (dofree > 0) cs_sfree(S);
     if (dofree < 0) Free(S);
@@ -239,7 +239,7 @@ SEXP Matrix_csn_to_SEXP(csn *N, char *cl, int dofree)
     int ctype = check_class(cl, valid), n = (N->U)->n;
 
     if (ctype < 0)
-	error("Inappropriate class `%s' for Matrix_csn_to_SEXP", cl);
+	error("Inappropriate class '%s' for Matrix_csn_to_SEXP", cl);
     ans = PROTECT(NEW_OBJECT(MAKE_CLASS(cl)));
 				/* allocate and copy common slots */
     /* FIXME: Use the triangular matrix classes for csn_LU */
@@ -257,7 +257,7 @@ SEXP Matrix_csn_to_SEXP(csn *N, char *cl, int dofree)
 	       N->B, n);
 	break;
     default:
-	error("Inappropriate class `%s' for Matrix_csn_to_SEXP", cl);
+	error("Inappropriate class '%s' for Matrix_csn_to_SEXP", cl);
     }
     if (dofree > 0) cs_nfree(N);
     if (dofree < 0) {

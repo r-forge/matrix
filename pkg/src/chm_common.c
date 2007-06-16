@@ -392,7 +392,7 @@ cholmod_dense *as_cholmod_x_dense(SEXP x)
 
 void R_cholmod_error(int status, char *file, int line, char *message)
 {
-    error(_("Cholmod error `%s' at file:%s, line %d"), message, file, line);
+    error(_("Cholmod error '%s' at file:%s, line %d"), message, file, line);
 }
 
 /**
