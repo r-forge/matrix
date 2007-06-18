@@ -1,3 +1,9 @@
+2007-06-18 16:12  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4472] src/Syms.h, src/init.c: Added Matrix_lengthSym
+	* [r4473] src/dgCMatrix.c: Modified dgCMatrix_colSums for sparseVector
+	  result
+	
 2007-06-16  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/kronecker.R: fix typo (could lead to inf.recursion)
