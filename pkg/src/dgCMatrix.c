@@ -347,35 +347,38 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
 
 SEXP dgCMatrix_colSums(SEXP x, SEXP NArm, SEXP spRes, SEXP trans, SEXP means)
 {
-    SEXP ans;
+    int na_rm = asLogical(NArm), mn = asLogical(means),
+	sp = asLogical(spRes), tr = asLogical(trans);
     cholmod_sparse *cx = as_cholmod_sparse(x);
-    int *xp, i, j, mn = asLogical(means),
-	ignoreNA = !asLogical(NArm), tr = asLogical(trans);
-    double *xx, *a;
+    int *xp, j, n = (tr ? cx->nrow : cx->ncol), nza, p;
+    SEXP ans = PROTECT(sp ? NEW_OBJECT(MAKE_CLASS("dsparseVector")) :
+		       allocVector(REALSXP, n));
+    double *a = (sp ? alloca(n * sizeof(double)) : REAL(ans)), *xx;
 
-    if (tr) {			/* replace cx by its transpose */
+    if (tr) {
 	cholmod_sparse *cxt = cholmod_transpose(cx, 1 /*values*/, &c);
 	Free(cx);
 	cx = cxt;
     }
     xp = (int*)(cx->p); xx = (double*)(cx->x);
-
-    if (asLogical(spRes)) {
-	error(_("dgCMatrix_colSums code for sparseVector result needs to be written"));
-    } else {
-	a = REAL(ans = PROTECT(allocVector(REALSXP, cx->ncol)));
-	for (j = 0; j < cx->ncol; j++) {
-	    /* initialize the number of non-missing values */
-	    int nnm = cx->nrow - (xp[j + 1] - xp[j]);
-	    for (i = xp[j], a[j] = 0; i < xp[j + 1]; i++)
-		if (ignoreNA || xx[i] != NA_REAL) {
-		    a[j] += xx[i];
-		    nnm++;
-		}
-	    if (mn) a[j] = (nnm > 0) ? a[j]/nnm : NA_REAL; 
-	}
+    for (j = 0, nza = 0; j < cx->ncol; j++) {
+	int dnm = cx->nrow;	/* denominator for means */
+	for(p = xp[j], a[j] = 0; p < xp[j + 1]; p++)
+	    if (na_rm && xx[p] == NA_REAL)
+		dnm--;	       /* skip NAs but decrement denominator*/
+	    else a[j] += xx[p];
+	if (mn) a[j] = (dnm > 0) ? a[j]/dnm : NA_REAL;
+	if (a[j]) nza++;
     }
+    if (sp) {
+	int *ai = INTEGER(ALLOC_SLOT(ans, Matrix_iSym, INTSXP, nza)), p;
+	double *ax = REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, nza));			  
+	SET_SLOT(ans, Matrix_lengthSym, ScalarInteger(nza));
 
+	for (j = 0, p = 0; j < n; j++)
+	    if (a[j]) {ai[p] = j; ax[p++] = a[j];}
+    }
+	
     if (tr) cholmod_free_sparse(&cx, &c); else Free(cx);
     UNPROTECT(1);
     return ans;
