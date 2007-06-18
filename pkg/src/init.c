@@ -267,6 +267,7 @@ R_init_Matrix(DllInfo *dll)
     Matrix_factorSym = install("factors");
     Matrix_iSym = install("i");
     Matrix_jSym = install("j");
+    Matrix_lengthSym = install("length");
     Matrix_pSym = install("p");
     Matrix_permSym = install("perm");
     Matrix_uploSym = install("uplo");
