@@ -312,12 +312,11 @@ setReplaceMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
 
 
 
-## a "method" for c(<sparseVector>, <sparseVector>):
+## a "method" for c(<(sparse)Vector>, <(sparse)Vector>):
 c2v <- function(x, y) {
-    cx <- class(x)
-    cy <- class(y)
-    stopifnot(extends(cx, "sparseVector"),
-              extends(cy, "sparseVector"))
+    ## these as(., "sp..V..") check input implicitly:
+    cx <- class(x <- as(x, "sparseVector"))
+    cy <- class(y <- as(y, "sparseVector"))
     if(cx != cy) { ## find "common" class; result does have 'x' slot
         cxy <- c(cx,cy)
         commType <- {

@@ -200,12 +200,16 @@ NA.or.True <- function(x) is.na(x) | x
 eq <- (cs1 == colSums(as(kt1, "matrix")))
 stopifnot(NA.or.True(eq), identical(is.na(eq), is.na(cs1)))
 nt1 <- as(kt1, "nMatrix") # no NA's anymore
-(ng1 <- as(as(nt1, "generalMatrix"),"CsparseMatrix"))
-(cs1. <- colSums(kt1, sparseResult = TRUE))# sparseVector
-(cs2 <-  colSums(ng1, sparseResult = TRUE))
+(ng1 <- as(as(nt1, "generalMatrix"),"CsparseMatrix")) # ngC
+dg1 <- as(ng1, "dMatrix")# dgC
+(cs2 <- colSums(nt1, sparseResult=TRUE))
+(cs3 <- colSums(kt1, sparseResult = TRUE))# sparseVector
+(cs4 <-  colSums(ng1, sparseResult = TRUE))
 ## check correct sparseness of both:
-stopifnot(sort(cs1.@i) == 9:16,
-          sort(cs2 @i) == 9:16)
+stopifnot(identical(cs2, cs4),
+          all.slot.equal(cs4, colSums(dg1, sparseResult = TRUE)),
+          sort(cs3 @i) == 9:16,
+          sort(cs4 @i) == 9:16)
 
 ## coercion from "dpo" or "dsy"
 xx <- as(xpx, "dsyMatrix")

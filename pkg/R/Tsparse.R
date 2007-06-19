@@ -782,17 +782,6 @@ setMethod("solve", signature(a = "TsparseMatrix", b = "ANY"),
 setMethod("solve", signature(a = "TsparseMatrix", b = "missing"),
 	  function(a, b) solve(as(a, "CsparseMatrix")))
 
-## Not needed, have identical "sparseMatrix"
-## setMethod("colSums", signature(x = "TsparseMatrix"), .as.dgT.Fun,
-## 	  valueClass = "numeric")
-## setMethod("colMeans", signature(x = "TsparseMatrix"), .as.dgT.Fun,
-## 	  valueClass = "numeric")
-##
-## Here, "sparseMatrix" uses .as.dgC.Fun:
-setMethod("rowSums", signature(x = "TsparseMatrix"), .as.dgT.Fun,
-	  valueClass = "numeric")
-setMethod("rowMeans", signature(x = "TsparseMatrix"), .as.dgT.Fun,
-	  valueClass = "numeric")
 
 ## Want tril(), triu(), band() --- just as "indexing" ---
 ## return a "close" class:
