@@ -424,13 +424,6 @@ setMethod("dim<-", signature(x = "sparseMatrix", value = "ANY"),
 	  })
 
 
-## .as.dgT.Fun
-setMethod("colSums",  signature(x = "sparseMatrix"), .as.dgT.Fun)
-setMethod("colMeans", signature(x = "sparseMatrix"), .as.dgT.Fun)
-## .as.dgC.Fun
-setMethod("rowSums", signature(x = "sparseMatrix"), .as.dgC.Fun)
-setMethod("rowMeans", signature(x = "sparseMatrix"),.as.dgC.Fun)
-
 lm.fit.sparse <-
 function(x, y, offset = NULL, method = c("qr", "cholesky"),
          tol = 1e-7, singular.ok = TRUE, transpose = FALSE, ...)
@@ -452,15 +445,22 @@ function(x, y, offset = NULL, method = c("qr", "cholesky"),
     ans
 }
 
-setAs("factor", "sparseMatrix",
-      function(from)
-  {
-      fact <- as.factor(from)[, drop = TRUE]
-      levs <- levels(fact)
-      n <- length(fact)
-      new("dgCMatrix", p = 0:n, i = as.integer(fact) - 1L, # 0-based
-          x = rep.int(1, n), Dim = c(length(levs), n),
-          Dimnames = list(levels(fact), NULL))
-  }
-      )
+fac2sparse <- function(from, to = c("d","i","l","n","z"))
+{
+    ## factor(-like) --> sparseMatrix {also works for integer, character}
+    levs <- levels(fact <- factor(from)) # drop unused levels
+    n <- length(fact)
+    to <- match.arg(to)
+    res <- new(paste(to, "gCMatrix", sep=''))
+    res@i <- as.integer(fact) - 1L # 0-based
+    res@p <- 0:n
+    res@Dim <- c(length(levs), n)
+    res@Dimnames <- list(levs, NULL)
+    if(to != "n")
+	res@x <- rep.int(switch(to,
+				"d" = 1., "i" = 1L, "l" = TRUE, "z" = 1+0i),
+			 n)
+    res
+}
 
+setAs("factor", "sparseMatrix", function(from) fac2sparse(from, to = "d"))

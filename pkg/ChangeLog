@@ -1,9 +1,17 @@
+2007-06-19  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/colSums.R: new file for all (col|row)(Sums|Means) methods,
+	  notably the new ones building on the new .Call(.)s:
+
+	* src/dgCMatrix.c (DEF_gCMatrix_COLSUMS): use to define
+	all 4 of [dlin]gCMatrix_colSums().
+
 2007-06-18 16:12  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r4472] src/Syms.h, src/init.c: Added Matrix_lengthSym
 	* [r4473] src/dgCMatrix.c: Modified dgCMatrix_colSums for sparseVector
 	  result
-	
+
 2007-06-16  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/kronecker.R: fix typo (could lead to inf.recursion)

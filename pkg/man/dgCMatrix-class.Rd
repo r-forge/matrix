@@ -27,10 +27,6 @@
 \alias{image,dgCMatrix-method}
 \alias{lu,dgCMatrix-method}
 \alias{t,dgCMatrix-method}
-\alias{colMeans,dgCMatrix-method}
-\alias{colSums,dgCMatrix-method}
-\alias{rowMeans,dgCMatrix-method}
-\alias{rowSums,dgCMatrix-method}
 \alias{solve,dgCMatrix,matrix-method}
 \alias{solve,dgCMatrix,missing-method}
 \alias{solve,dgCMatrix,ddenseMatrix-method}

@@ -47,7 +47,6 @@ setMethod("image", "dgCMatrix",
 
 ## "[<-" methods { setReplaceMethod()s }  are now in ./Csparse.R
 
-
 setMethod("writeHB", signature(obj = "dgCMatrix"),
 	  function(obj, file, ...) {
 	      .Deprecated("writeMM")
@@ -59,32 +58,7 @@ setMethod("writeMM", signature(obj = "dgCMatrix"),
 	  function(obj, file, ...)
 	  .Call(Matrix_writeMatrixMarket, obj, as.character(file), "DGC"))
 
-## the last two arguments to dgCMatrix_colSums are `trans' and `means'
-setMethod("colSums", signature(x = "dgCMatrix"),
-	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
-          .Call(dgCMatrix_colSums, x, na.rm, sparseResult, FALSE, FALSE))
-
-setMethod("rowSums", signature(x = "dgCMatrix"),
-	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
-          .Call(dgCMatrix_colSums, x, na.rm, sparseResult, TRUE, FALSE))
-
-setMethod("colMeans", signature(x = "dgCMatrix"),
-	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
-          .Call(dgCMatrix_colSums, x, na.rm, sparseResult, FALSE, TRUE))
-
-setMethod("rowMeans", signature(x = "dgCMatrix"),
-	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
-          .Call(dgCMatrix_colSums, x, na.rm, sparseResult, TRUE, TRUE))
-
-##setMethod("colSums",  signature(x = "dgCMatrix"), .as.dgT.Fun)
-##setMethod("colMeans", signature(x = "dgCMatrix"), .as.dgT.Fun)
-
-##setMethod("rowSums", signature(x = "dgCMatrix"),
-##	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
-##	  sparsapply(x, 1, sum, sparseResult = sparseResult, na.rm = na.rm))
-
-##setMethod("rowMeans", signature(x = "dgCMatrix"), sp.rowMeans)
-
+##-> ./colSums.R  for colSums,... rowMeans
 
 setMethod("qr", signature(x = "dgCMatrix"),
 	  function(x, tol = 1e-07, LAPACK = FALSE)
