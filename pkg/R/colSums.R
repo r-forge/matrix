@@ -2,15 +2,16 @@
 ####			  =======    -------    --------    --------
 
 ## Utilities:
-.as.dgC.Fun <- function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE) {
-    x <- as(x, "dgCMatrix")
-    callGeneric()
-}
 
-.as.dgT.Fun <- function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE) {
-    x <- as(x, "dgTMatrix")
-    callGeneric()
-}
+## .as.dgC.Fun <- function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE) {
+##     x <- as(x, "dgCMatrix")
+##     callGeneric()
+## }
+
+## .as.dgT.Fun <- function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE) {
+##     x <- as(x, "dgTMatrix")
+##     callGeneric()
+## }
 
 .as.d.Fun <- function(x, na.rm = FALSE, dims = 1) {
     x <- as(x, "dMatrix")

@@ -7,7 +7,7 @@
 %%\VignetteIndexEntry{2nd Introduction to the Matrix Package}
 %%\VignetteDepends{Matrix}
 \SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=5,height=3,strip.white=TRUE,keep.source=TRUE}
-%
+%								          ^^^^^^^^^^^^^^^^
 \title{2nd Introduction to the Matrix package}
 \author{Martin Maechler and Douglas Bates\\R Core Development Team
   \\\email{maechler@stat.math.ethz.ch}, \email{bates@r-project.org}}
@@ -17,8 +17,8 @@
 \maketitle
 \begin{abstract}
 
-\emph{\Large Why should you want to work with this package and what
-  does it do for you?}
+% \emph{\Large Why should you want to work with this package and what
+%   does it do for you?}
 
   Linear algebra is at the core of many areas of statistical computing
   and from its inception the \Slang{} has supported numerical linear
@@ -74,12 +74,15 @@ simple numeric vector each \footnote{because there's an additional default
   argument to indexing, \code{drop = TRUE}.  If you add
   \hbox{``\code{\ ,\ drop = FALSE}\ ''} you will get submatrices instead of
   simple vectors.}
-We assign 0 to some columns and rows to ``sparsify'' it,
+We assign 0 to some columns and rows to ``sparsify'' it, and some \code{NA}s
+(typically ``missing values'' in data analysis) in order to demonstrate how
+they are dealt with:
 @
 <<set0>>=
 M2[, c(2,4:6)] <- 0
 M2[2, ] <- 0
 M2 <- rBind(0, M2, 0)
+M2[1:2,2] <- M2[3,4:5] <- NA
 @
 and then coerce it to a sparse matrix,
 @
@@ -87,13 +90,13 @@ and then coerce it to a sparse matrix,
 sM <- as(M2, "sparseMatrix")
 10 * sM
 identical(sM * 2, sM + sM)
+sM / 10  +  M2 %/% 2  # is sparse
 @ %def
 where we see above that multiplication by a scalar keeps sparcity,
-but addition with a ``dense'' object does not:
+as does other arithmetic, but addition to a ``dense'' object does not:
 @
 <<add1>>=
 sM + 10
-is(sM / 10  +  M2 %/% 2, "denseMatrix")
 @ %def
 
 Operations on our classed matrices include

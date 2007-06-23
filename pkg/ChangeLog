@@ -1,3 +1,11 @@
+2007-06-21  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* NAMESPACE, R/AllClass.R: "xsparseVector" class union.
+
+	* R/sparseVector.R: more *sparseVector coercions, notably for
+	non - double ones.
+
+
 2007-06-19  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/colSums.R: new file for all (col|row)(Sums|Means) methods,
@@ -18,7 +26,7 @@
 	* test/simple.R: testing that
 
 	* R/sparseMatrix.R (prSpMatrix): change to be used as print()
-	method (which can have arguments, show() can't).
+	method as well (which can have arguments, show() can't).
 
 2007-06-16 15:52  Douglas Bates <bates@stat.wisc.edu>
 

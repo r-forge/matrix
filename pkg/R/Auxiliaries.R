@@ -593,6 +593,19 @@ l2d_meth <- function(x) {
     else .M.kindC(clx)
 }
 
+## the same as .M.kind, but also knows "i"
+.V.kind <- function(x, clx = class(x)) {
+    ## 'clx': class() *or* class definition of x
+    if(is.matrix(x) || is.atomic(x)) { ## 'old style' matrix or vector
+	if     (is.integer(x)) "i"
+	else if (is.numeric(x)) "d"
+	else if(is.logical(x)) "l" ## FIXME ? "n" if no NA ??
+	else if(is.complex(x)) "z"
+	else stop("not yet implemented for matrix w/ typeof ", typeof(x))
+    }
+    else .M.kindC(clx)
+}
+
 .M.kindC <- function(clx) { ## 'clx': class() *or* classdefinition
     if(is.character(clx))		# < speedup: get it once
         clx <- getClassDef(clx)
@@ -609,9 +622,10 @@ l2d_meth <- function(x) {
 
 ## typically used as .type.kind[.M.kind(x)]:
 .type.kind <- c("d" = "double",
-                "l" = "logical",
-                "n" = "logical",
-                "z" = "complex")
+		"i" = "integer",
+		"l" = "logical",
+		"n" = "logical",
+		"z" = "complex")
 
 .M.shape <- function(x, clx = class(x)) {
     ## 'clx': class() *or* class definition of x

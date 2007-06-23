@@ -49,13 +49,13 @@ rowSums (x, na.rm = FALSE, dims = 1, \dots)
 colMeans(x, na.rm = FALSE, dims = 1, \dots)
 rowMeans(x, na.rm = FALSE, dims = 1, \dots)
 
-\S4method{colSums}{TsparseMatrix}(x, na.rm = FALSE,
+\S4method{colSums}{CsparseMatrix}(x, na.rm = FALSE,
         dims = 1, sparseResult = FALSE, \dots)
-\S4method{rowSums}{TsparseMatrix}(x, na.rm = FALSE,
+\S4method{rowSums}{CsparseMatrix}(x, na.rm = FALSE,
         dims = 1, sparseResult = FALSE, \dots)
-\S4method{colMeans}{TsparseMatrix}(x, na.rm = FALSE,
+\S4method{colMeans}{CsparseMatrix}(x, na.rm = FALSE,
         dims = 1, sparseResult = FALSE, \dots)
-\S4method{rowMeans}{TsparseMatrix}(x, na.rm = FALSE,
+\S4method{rowMeans}{CsparseMatrix}(x, na.rm = FALSE,
         dims = 1, sparseResult = FALSE, \dots)
 }
 \arguments{
@@ -84,6 +84,7 @@ rowMeans(x, na.rm = FALSE, dims = 1, \dots)
 colSums(M)
 d <- Diagonal(10, c(0,0,10,0,2,rep(0,5)))
 MM <- kronecker(d, M)
+dim(MM) # 70 80
 length(MM@x) # 160, but many are '0' ; drop those:
 MM <- drop0(MM)
 length(MM@x) # 32
