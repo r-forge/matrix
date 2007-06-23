@@ -351,101 +351,38 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
  *  igCMatrix_colSums(....)
  *  lgCMatrix_colSums(....)
  *  ngCMatrix_colSums(....)
- *
- * via the following constructor :
  */
-/*		  (C_x_,Type_x_,STYP_x_,C_ans,Type_ans, STYP_ans, SXP_ans) */
-#define DEF_gCMatrix_COLSUMS(C_x_, Type_x_, STYP_x_,			\
-			     C_ans, Type_ans, STYP_ans, SXP_ans)	\
-									\
-SEXP C_x_ ## gCMatrix_colSums(SEXP x, SEXP NArm, SEXP spRes,		\
-			      SEXP trans, SEXP means)			\
-{									\
-    int na_rm = asLogical(NArm),  mn = asLogical(means),		\
-	sp    = asLogical(spRes), tr = asLogical(trans);		\
-    cholmod_sparse *cx = as_cholmod_sparse(x);				\
-    int i, j, n = (tr ? cx->nrow : cx->ncol), dnm = 0/*Wall*/;		\
-    int *xp = (int *)(cx->p);						\
-    MAYBE_SET_xx(Type_x_);						\
-    SEXP ans = PROTECT(sp ? NEW_OBJECT(MAKE_CLASS(#C_ans "sparseVector")) \
-			  : allocVector(SXP_ans, n));			\
-									\
-    if (tr) {								\
-	cholmod_sparse *cxt = cholmod_transpose(cx, 1 /*values*/, &c);	\
-	Free(cx);							\
-	cx = cxt;							\
-    }									\
-									\
-    if (sp) { /* sparseResult - never allocating length-n ... */	\
-	int nza, i1, i2, p, *ai;					\
-	Type_ans *ax;							\
-									\
-	for (j = 0, nza = 0; j < cx->ncol; j++)				\
-	    if(xp[j] < xp[j + 1])					\
-		nza++;							\
-									\
-	ai =  INTEGER(ALLOC_SLOT(ans, Matrix_iSym, INTSXP,  nza));	\
-	ax = STYP_ans(ALLOC_SLOT(ans, Matrix_xSym, SXP_ans, nza));	\
-									\
-	SET_SLOT(ans, Matrix_lengthSym, ScalarInteger(n));		\
-									\
-	i2 = xp[0];							\
-	for (j = 0, p = 0; j < cx->ncol; j++) {				\
-	    i1 = i2; i2 = xp[j + 1];					\
-	    if(i1 < i2) {						\
-		Type_ans sum;						\
-		ColSUM_column(i1,i2, sum, NA_ ## STYP_x_, NA_ ## STYP_ans); \
-									\
-		ai[p]	= j+1; /* 1-based */				\
-		ax[p++] = sum;						\
-	    }								\
-	}								\
-    }									\
-    else { /* "numeric" (non sparse) result */				\
-	Type_ans *a = STYP_ans(ans);					\
-	for (j = 0; j < cx->ncol; j++) {				\
-	    ColSUM_column(xp[j], xp[j + 1], a[j], NA_ ## STYP_x_, NA_ ## STYP_ans);			\
-	}								\
-    }									\
-									\
-    if (tr) cholmod_free_sparse(&cx, &c); else Free(cx);		\
-    UNPROTECT(1);							\
-    return ans;								\
+#define _dgC_
+#include "t_gCMatrix_colSums.c"
+
+#define _igC_
+#include "t_gCMatrix_colSums.c"
+
+#define _lgC_
+#include "t_gCMatrix_colSums.c"
+
+#define _ngC_
+#include "t_gCMatrix_colSums.c"
+
+#define _lgC_mn
+#include "t_gCMatrix_colSums.c"
+
+#define _ngC_mn
+#include "t_gCMatrix_colSums.c"
+
+
+SEXP lgCMatrix_colSums(SEXP x, SEXP NArm, SEXP spRes, SEXP trans, SEXP means)
+{
+    if(asLogical(means)) /* ==> result will be "double" / "dsparseVector" */
+	return lgCMatrix_colSums_d(x, NArm, spRes, trans, means);
+    else
+	return lgCMatrix_colSums_i(x, NArm, spRes, trans, means);
 }
 
-
-/* First the cases with an 'x' slot (and hence possibly NAs) : */
-
-#define ColSUM_column(_i1_,_i2_,_SUM_, NA_x_, NA_SUM_)			\
-		if(mn) dnm = cx->nrow;	/* denominator for means */	\
-		for(i = _i1_, _SUM_ = 0; i < _i2_; i++)			\
-		    if (mn && na_rm && xx[i] == NA_x_)			\
-			dnm--; /* skip NAs but decrement denominator*/	\
-		    else _SUM_ += xx[i];				\
-		if(mn) _SUM_ = (dnm > 0) ? _SUM_/dnm : NA_SUM_
-
-#define MAYBE_SET_xx(TYPE)  TYPE *xx = (TYPE *)(cx->x)
-
-/*		  (C_x_,Type_x_,STYP_x_,C_ans,Type_ans, STYP_ans, SXP_ans) */
-DEF_gCMatrix_COLSUMS(d, double,	   REAL,  d, double,	REAL,	REALSXP)
-
-DEF_gCMatrix_COLSUMS(i,	   int, INTEGER,  d, double,	REAL,	REALSXP)
-
-DEF_gCMatrix_COLSUMS(l,	   int, LOGICAL,  i,	int, INTEGER,	 INTSXP)
-
-#undef ColSUM_column
-#undef MAYBE_SET_xx
-
-/* Now the the cases withOUT 'x' slot -- i.e. currently just ngCMatrix() : */
-
-#define ColSUM_column(_i1_,_i2_,_SUM_, _unused, _unuse2)	\
-		_SUM_ = _i2_ - _i1_;				\
-		if(mn) _SUM_ /= cx->nrow
-
-#define MAYBE_SET_xx(TYPE)
-
-/*		  (C_x_,Type_x_,STYP_x_,C_ans,Type_ans, STYP_ans, SXP_ans) */
-DEF_gCMatrix_COLSUMS(n,	 _none,	 _none2,  i,	int, INTEGER,	 INTSXP)
-
-#undef ColSUM_column
-#undef MAYBE_SET_xx
+SEXP ngCMatrix_colSums(SEXP x, SEXP NArm, SEXP spRes, SEXP trans, SEXP means)
+{
+    if(asLogical(means)) /* ==> result will be "double" / "dsparseVector" */
+	return ngCMatrix_colSums_d(x, NArm, spRes, trans, means);
+    else
+	return ngCMatrix_colSums_i(x, NArm, spRes, trans, means);
+}
