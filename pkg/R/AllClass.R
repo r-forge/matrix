@@ -616,7 +616,11 @@ setClass("zsparseVector",
 ## nsparse has no new slot: 'i' just contains the locations!
 setClass("nsparseVector", contains = "sparseVector")
 
-
+setClassUnion("xsparseVector", ## those sparseVector's with an 'x' slot
+              c("dsparseVector",
+                "isparseVector",
+                "lsparseVector",
+                "zsparseVector"))
 
 
 setClass("determinant",

@@ -184,7 +184,8 @@ exportClasses(
 	      "isparseVector",
 	      "lsparseVector",
 	      "nsparseVector",
-	      "zsparseVector"
+	      "zsparseVector",
+	      "xsparseVector" # the class union of all 'x' lost sparseVector's
 	      )
 
 
