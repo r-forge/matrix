@@ -121,12 +121,17 @@ stopifnot(validObject(xpx),
           validObject(res))
 stopifnot(all.equal(xpx %*% res, xpy, tol= 1e-12))
 lp <- xpx >= 1
-if(FALSE) ## FIXME : needs lsy |-> lsC
 slp <- as(lp, "sparseMatrix")
 
-ltlp <- lp[ lower.tri(lp) ]
+ltlp  <-  lp[ lower.tri(lp) ]
+if(FALSE) # this particular indexing fails (FIXME, not urgent)
+sltlp <- slp[ lower.tri(slp) ]
 ij <- which(lower.tri(lp), arr.ind = TRUE)
-stopifnot(all.equal(lp[ij], as(lp, "matrix")[ij]))
+if(FALSE) {## FIXME!!! This "[.]" is *HORRENDOUSLY* slow (but "works"):
+    ss <- slp[ij]
+    stopifnot(identical(ss, lp[ij]))
+}
+stopifnot(identical3(lp[ij], ltlp, as(lp, "matrix")[ij]))
 
 stopifnot(is(lp, "lsyMatrix"), lp@uplo == "U")
 
@@ -185,8 +190,8 @@ stopifnot(all.equal(colMeans(m1k), colMeans(m.m)),
 stopifnot(is(kr <- kronecker(m1, m6), "Matrix"))
 assert.EQ.mat(kr,
               kronecker(as(m1, "matrix"),
-                        as(m6, "matrix")),
-              tol = 0)
+                        as(m6, "matrix")), tol = 0)
+
 ## sparse:
 (kt1 <- kronecker(t1, tu))
 kt2 <- kronecker(t1c, cu)
@@ -202,14 +207,31 @@ stopifnot(NA.or.True(eq), identical(is.na(eq), is.na(cs1)))
 nt1 <- as(kt1, "nMatrix") # no NA's anymore
 (ng1 <- as(as(nt1, "generalMatrix"),"CsparseMatrix")) # ngC
 dg1 <- as(ng1, "dMatrix")# dgC
-(cs2 <- colSums(nt1, sparseResult=TRUE))
-(cs3 <- colSums(kt1, sparseResult = TRUE))# sparseVector
-(cs4 <-  colSums(ng1, sparseResult = TRUE))
+lt1 <- kt1 > 5
+nt1 <- as(lt1, "nMatrix")
+(colSums(nt1, sparseResult = TRUE))
+(colSums(kt1, sparseResult = TRUE)) # dsparse, with NA
+(colSums(lt1, sparseResult = TRUE)) # isparse, with NA
+(colSums(lt1, sparseResult = TRUE, na.rm = TRUE))
+(colSums(nt1, sparseResult = TRUE)) # isparse, no NA
 ## check correct sparseness of both:
-stopifnot(identical(cs2, cs4),
-          all.slot.equal(cs4, colSums(dg1, sparseResult = TRUE)),
-          sort(cs3 @i) == 9:16,
-          sort(cs4 @i) == 9:16)
+for(M in list(kt1, nt1, ng1, dg1, lt1, nt1)) {
+    m <- as(M, "matrix")
+    for(na.rm in c(FALSE,TRUE)) {
+	cs  <- colSums(M, na.rm = na.rm)
+	cs. <- colSums(M, na.rm = na.rm, sparseResult = TRUE)
+	rs  <- rowSums(M, na.rm = na.rm)
+	rs. <- rowSums(M, na.rm = na.rm, sparseResult = TRUE)
+	stopifnot(identical(cs, as(cs., "vector")),
+		  identical(rs, as(rs., "vector")),
+		  {eq <- cs == colSums(m, na.rm = na.rm) ; ineq <- is.na(eq)
+		   all(ineq | eq) && identical(ineq, is.na(cs)) },
+		  {eq <- rs == rowSums(m, na.rm = na.rm) ; ineq <- is.na(eq)
+		   all(ineq | eq) && identical(ineq, is.na(rs)) },
+		  is(cs., "sparseVector"),
+		  is(rs., "sparseVector"))
+    }
+}
 
 ## coercion from "dpo" or "dsy"
 xx <- as(xpx, "dsyMatrix")

@@ -140,6 +140,8 @@ SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo)
 
 SEXP Csparse_transpose(SEXP x, SEXP tri)
 {
+    /* TODO: lgCMatrix & igC* currently go via double prec. cholmod -
+     *       since cholmod (& cs) lacks sparse 'int' matrices */
     cholmod_sparse *chx = as_cholmod_sparse(x);
     int Rkind = (chx->xtype != CHOLMOD_PATTERN) ? Real_kind(x) : 0;
     cholmod_sparse *chxt = cholmod_transpose(chx, (int) chx->xtype, &c);
