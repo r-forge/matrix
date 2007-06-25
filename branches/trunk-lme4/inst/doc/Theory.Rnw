@@ -119,8 +119,8 @@ for the linear predictor.
 
 The vector $\bm\beta$ is a parameter of the model.  Strictly speaking,
 the vector $\bm b$ is not a parameter --- it is the value of an
-unobserved random variable, $\bm B$.  In the models we will consider
-$\bm\beta$ and $\bm b$ determine the \emph{conditional mean},
+unobserved random variable, $\bm B$.  In the models we will consider,
+$\bm b$ and $\bm\beta$ determine the \emph{conditional mean},
 $\bm\mu_{\bm Y|\bm B}$, of the random variable, $\bm Y$, through the
 linear predictor, $\bm\eta_{\bm b}\left(\bm b,\bm\beta\right)$. That
 is,
@@ -132,7 +132,7 @@ is,
   \bm\mu(\bm Z\bm b+\bm X\bm\beta) .
 \end{equation}
 The conditional distribution of $\bm Y$ given $\bm B$ is completely
-determined by the conditional mean $\bm\mu_{\bm Y|\bm B}$ and,
+determined by the conditional mean, $\bm\mu_{\bm Y|\bm B}$, and,
 possibly, a variance scale parameter that in part determines the
 conditional variance, $\mathrm{Var}(\bm Y|\bm B)$, but does not affect
 the conditional mean, $\bm\mu_{\bm Y|\bm B}$. We will write this
@@ -140,54 +140,55 @@ variance scale parameter, when it is used, as $\sigma^2$.
 
 The random variable $\bm Y$, representing the observed responses, can
 be continuous or discrete. In both cases we will write the conditional
-distribution as $f_{\bm Y|\bm B}$, which will mean the condition probability
-density or the conditional probability
-mass function, whichever is appropriate.  This conditional
-distribution depends on the conditional mean, $\bm\mu_{\bm Y|\bm B}$,
-only through a \emph{discrepancy function}, $d(\bm\mu_{\bm Y|\bm
-  B},\bm y)$, that defines a ``squared distance'' between the
-conditional mean $\bm\mu_{\bm Y|\bm B}$ and the observed data $\bm y$.
-For linear mixed models and for nonlinear mixed models $d(\bm\mu_{\bm
-  Y|\bm B},\bm y)$ is exactly the square of the Euclidean distance,
-$d(\bm\mu_{\bm Y|\bm B},\bm y)=\left\|\bm\mu_{\bm Y|\bm B}-\bm
-  y\right\|^2$.  The more general form of the discrepancy function
-used for generalized linear mixed models is described in
-\S\ref{sec:GLMM}.  The general form of the conditional distribution is
+distribution as $f_{\bm Y|\bm B}$, which will mean the condition
+probability density or the conditional probability mass function,
+whichever is appropriate.  This conditional distribution depends on
+the conditional mean, $\bm\mu_{\bm Y|\bm B}$, only through a
+\emph{discrepancy function}, $d(\bm\mu_{\bm Y|\bm B},\bm y)$, that
+defines a ``squared distance'' between $\bm\mu_{\bm Y|\bm B}$ and the
+observed data, $\bm y$.  For linear mixed models and for nonlinear
+mixed models $d(\bm\mu_{\bm Y|\bm B},\bm y)$ is exactly the square of
+the Euclidean distance, $d(\bm\mu_{\bm Y|\bm B},\bm
+y)=\left\|\bm\mu_{\bm Y|\bm B}-\bm y\right\|^2$.  The more general
+form of the discrepancy function used for generalized linear mixed
+models is described in \S\ref{sec:GLMM}.  The general form of the
+conditional distribution is
 \begin{equation}
   \label{eq:conddens}
     f_{\bm Y|\bm B}(\bm y|\bm b,\bm\beta,\sigma^2)=
-    k(\bm y,\sigma^2)e^{-d\left(\bm\mu_{\bm Y|\bm B},\bm y\right)/\left(2\sigma^2\right)} .
+    k(\bm y,\sigma^2)e^{-d\left(\bm\mu_{\bm Y|\bm B},\bm y\right)/\left(2\sigma^2\right)}
 \end{equation}
+where $k(\bm y,\sigma^2)$ is the \emph{normalizing factor} to ensure
+that the integral of $f_{\bm Y|\bm B}(\bm y|\bm b,\bm\beta,\sigma^2)$
+is unity.
 
-In the models we will consider the elements of $\bm Y$ are modelled as
-being conditionally independent, given $\bm B$.  That is, $f_{\bm
-  Y|\bm B}$ can be written as a product of $n$ factors, each involving
-just one element of $\bm y$ and the corresponding element of
-$\bm\mu_{\bm Y|\bm B}$.  Consequently, the discrepancy can be evaluated
-as a sum of $n$ terms evaluated component-wise from
-$\bm\mu(\bm\eta_{\bm b}(\bm b,\bm\beta))$ and $\bm y$.
+In the models we will consider, the elements of $\bm Y$ are
+conditionally independent, given $\bm B$.  That is, $f_{\bm Y|\bm B}$
+can be written as a product of $n$ factors, each involving just one
+element of $\bm y$ and the corresponding element of $\bm\mu_{\bm Y|\bm
+  B}$.  Consequently, the discrepancy can be evaluated as a sum of $n$
+terms evaluated component-wise from $\bm\mu(\bm\eta_{\bm b}(\bm
+b,\bm\beta))$ and $\bm y$.
 
 For linear and generalized linear mixed models, where $\bm\mu$ and
 $\bm\eta$ both have dimension $n$, the \emph{mean function},
-$\bm\mu(\bm\eta)$, is also evaluated component-wise.  That is, the
+$\bm\mu(\bm\eta)$, can be evaluated component-wise.  That is, the
 $i$th element of $\bm\mu$ depends only on the $i$th element of
-$\bm\eta$.  For nonlinear mixed models where the dimension of
-$\bm\eta$ is a multiple, $m=ns$, of $n$, the dimension of $\bm\mu$, we
-convert $\bm\eta$ to an $n\times s$ matrix (using, say, column-major
-ordering) and the restriction in this case is that the $i$th element of
-$\bm\mu$ depends only on the $i$th row of the $\bm\eta$ matrix.
+$\bm\eta$.  For nonlinear mixed models, where the dimension of
+$\bm\eta$ is a multiple, $m=ns$, of $n$, the dimension of $\bm\mu$, if
+we convert $\bm\eta$ to an $n\times s$ matrix (using, say,
+column-major ordering) then the $i$th element of $\bm\mu$ depends only
+on the $i$th row of the $\bm\eta$ matrix.
 
-Generalized linear mixed models where the independent components of the
-conditional distribution, $f_{\bm Y|\bm B}$, have Bernoulli
+Generalized linear mixed models where the independent components of
+the conditional distribution, $f_{\bm Y|\bm B}$, have Bernoulli
 distributions or binomial distributions or Poisson distributions, do
-not have a variance scale parameter because these conditional
-distributions are completely determined by the conditional mean.  In
-such cases the conditional distribution can be written $f_{\bm Y|\bm
+not have a variance scale parameter because these distributions are
+completely determined by their means.  In such cases the conditional
+distribution of $\bm Y$ given $\bm B$ can be written $f_{\bm Y|\bm
   B}(\bm y|\bm b,\bm\beta)= k(\bm y)e^{-d(\bm\mu_{\bm Y|\bm B}(\bm
   b,\bm\beta)),\bm y)/2}$.
-
-The normalization factor, $k(\bm y,\sigma^2)$, (or $k(\bm y)$ when
-there is no scale factor), does not depends on the conditional mean.
+and the normalization factor is $k(\bm y)$.
 
 The marginal distribution of $\bm B$ is a multivariate
 Gaussian (or ``normal'') distribution of the form
@@ -196,11 +197,11 @@ Gaussian (or ``normal'') distribution of the form
   \bm b\sim\mathcal{N}\left(\bm{0},\sigma^2\bm\Sigma(\bm{\theta})\right)
 \end{equation}
 where $\sigma^2$ is the same variance scale parameter used in
-(\ref{eq:conddens}) and $\bm\Sigma(\bm\theta)$ is a $q\times q$
-symmetric, positive-semidefinite matrix, called the \emph{relative
-  variance-covariance matrix} of the random effects.  The form of
+(\ref{eq:conddens}).  The $q\times q$ symmetric, positive-semidefinite
+matrix $\bm\Sigma(\bm\theta)$ is the \emph{relative
+  variance-covariance matrix} of $\bm B$.  The form of
 $\bm\Sigma(\bm\theta)$ and the parameter, $\bm\theta$, that determines
-$\bm\Sigma$ are described in \S\ref{sec:relvarcov}. (The condition that
+it are described in \S\ref{sec:relvarcov}. (The condition that
 $\bm\Sigma(\bm\theta)$ is positive-semidefinite means that
 $\bm{v}\trans\bm\Sigma(\bm\theta)\bm{v}\ge 0,
 \forall\bm{v}\in\mathbb{R}^q$.)
@@ -227,9 +228,9 @@ $n_i,i=1,\dots,k$ be the number of levels in the $i$th grouping
 factor, $\bm{f}_i$.
 
 The linear model formula in the $i$th random-effects term determines
-the $m\times q_i$ model matrix $\bm Z_i$ according to the usual rules
+an $m\times q_i$ model matrix, $\bm Z_i$, according to the usual rules
 for model matrices, in the case of linear or generalized linear
-models, and according to slightly modified rules, described in
+models, and according to slightly modified rules, as described in
 \S\ref{sec:nlmmmodelmats}, for nonlinear mixed models.
 
 Together $\bm{f}_i$ and $\bm Z_i$ determine an \emph{indicator
@@ -273,14 +274,19 @@ str(dat)
 The $12\times 1$ model matrix $\bm Z_i$ for the random-effects term
 \code{(1|subj)} is generated and stored as \code{Zi} with
 <<trivialMM>>=
-str(Zi <- model.matrix(~1, dat))
+Zi <- model.matrix(~1, dat)
 @
-The corresponding indicator interaction matrix, $\tilde{\bm Z}_i$,
-which is simply the matrix of indicator columns of the levels of
-\code{subj}, is
+The transpose of \code{Zi} is
+<<trivialMMtrans>>=
+t(Zi)
+@
+and the corresponding indicator interaction matrix, $\tilde{\bm Z}_i$, is
 <<extendedMM1,echo=FALSE>>=
 t(as(dat$subj, "sparseMatrix"))
 @
+As stated earlier, $\tilde{\bm Z}_i$ for the random-effects term
+\code{(1|subj)} is simply the matrix of indicator columns for the
+levels of \code{subj}.
 
 In the \package{lme4} package the transposes of sparse model matrices
 like $\tilde{\bm Z}_i$ are stored as compressed column
@@ -288,13 +294,14 @@ matrices~\citep[ch. 2]{davis06:csparse_book} of class
 \code{"dgCMatrix"}.  When a matrix of this class is printed, the
 systematic zeros are shown as `.'.
 
-The transpose of the indicator matrix is generated by coercing a
+The transpose of the indicator matrix can be generated by coercing a
 factor to the virtual class \code{"sparseMatrix"}
 <<extendedMM1t>>=
 as(dat$subj, "sparseMatrix")
 @
-The rows of the transpose are associated with the levels of the
-grouping factor.
+The display shows explicitly that rows of the transpose of the
+indicator matrix are associated with the levels of the grouping
+factor.
 
 For a more general example, assume that each subject is observed at
 times 1, 2 and 3.  We can insert a \code{time} variable in the data
@@ -302,19 +309,18 @@ frame as
 <<Z1prep>>=
 dat$time <- rep(1:3, 4)
 @
-Now the first few rows of the data frame are
+and now the first few rows of the data frame are
 <<dathead>>=
 head(dat, n = 5)
 @
 The term \code{(time|Subject)}, which is equivalent to
 \code{(1+time|Subject)} because linear model formulas have an
 implicit intercept term, generates a model matrix, $\bm Z_i$, with $q_i=2$
-columns, whose first few rows are
+columns, and whose first few rows are
 <<Z1mat>>=
 head(Zi <- model.matrix(~ time, dat), n = 5)
 @
-The transpose of the indicator interaction matrix, $\tilde{\bm
-  Z}_i\trans$, could be constructed as
+The transpose of the indicator interaction matrix could be constructed as
 <<Z1tilde>>=
 tt <- ii <- as(dat$subj, "sparseMatrix")
 tt@x <- as.numeric(dat$time)
