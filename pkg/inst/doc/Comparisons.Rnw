@@ -91,7 +91,7 @@ described in \citet{koen:ng:2003}, the literal translation of
 library(Matrix)
 data(KNex, package = "Matrix")
  y <- KNex$y
-mm <- as(KNex$mm, "matrix")
+mm <- as(KNex$mm, "matrix") # full traditional matrix
 dim(mm)
 system.time(naive.sol <- solve(t(mm) %*% mm) %*% t(mm) %*% y)
 @
@@ -120,14 +120,29 @@ system.time(cpod.sol <- solve(crossprod(mm), crossprod(mm,y)))
 all.equal(naive.sol, cpod.sol)
 @
 
-On this computer (2.0 GHz Pentium-4, 1 GB Memory, Goto's BLAS) the
-%% ---- which one ? {every time the vignette's is rebuilt ..}
+On this computer (2.0 GHz Pentium-4, 1 GB Memory, Goto's BLAS, in Spring
+2004) the
 crossprod form of the calculation is about four times as fast as the
 naive calculation.  In fact, the entire crossprod solution is
 faster than simply calculating $\bX\trans\bX$ the naive way.
 <<xpxKoenNg>>=
 system.time(t(mm) %*% mm)
 @
+Note that in newer versions of \RR{} and the LAPACK library (as of summer 2007),
+\RR's \code{\%*\%} is able to detect the many zeros in \code{mm} and shortcut
+many operations, and is hence much faster for such a sparse matrix
+than \code{crossprod} which currently does not make use of such optimizations.
+For really dense matrices however, \code{crossprod} indeed remains faster
+(by a factor of two on one typical platform):
+<<fullMatrix_crossprod>>=
+fm <- mm
+set.seed(11)
+fm[] <- rnorm(length(fm))
+system.time(c1 <- t(fm) %*% fm)
+system.time(c2 <- crossprod(fm))
+all.equal(c1, c2, tol = 1e-12)
+@
+
 
 \subsection{Least squares calculations with Matrix classes}
 \label{sec:MatrixLSQ}
@@ -142,9 +157,9 @@ use a Cholesky decomposition.  The Cholesky decomposition could be used
 but it is rather awkward
 <<naiveChol>>=
 system.time(ch <- chol(crossprod(mm)))
-system.time(chol.sol <- backsolve(ch,
-   forwardsolve(ch, crossprod(mm, y), upper = TRUE, trans = TRUE)))
-
+system.time(chol.sol <-
+            backsolve(ch, forwardsolve(ch, crossprod(mm, y),
+                                       upper = TRUE, trans = TRUE)))
 all.equal(chol.sol, naive.sol)
 @
 
@@ -159,7 +174,7 @@ Cholesky decomposition.
 mm <- as(KNex$mm, "dgeMatrix")
 class(crossprod(mm))
 system.time(Mat.sol <- solve(crossprod(mm), crossprod(mm, y)))
-all.equal(naive.sol, unname(as(Mat.sol, "matrix")))
+all.equal(naive.sol, unname(as(Mat.sol,"matrix")))
 @
 
 Furthermore, any method that calculates a
@@ -169,7 +184,7 @@ the original object so that it can be reused without recalculation.
 xpx <- crossprod(mm)
 xpy <- crossprod(mm, y)
 system.time(solve(xpx, xpy))
-system.time(solve(xpx, xpy))
+system.time(solve(xpx, xpy)) # reusing factorization
 @
 
 The model matrix \code{mm} is sparse; that is, most of the elements of
@@ -180,7 +195,7 @@ methods for sparse matrices, which produce the fastest results of all.
 mm <- KNex$mm
 class(mm)
 system.time(sparse.sol <- solve(crossprod(mm), crossprod(mm, y)))
-all.equal(naive.sol, as(sparse.sol, "matrix"))
+all.equal(naive.sol, unname(as(sparse.sol, "matrix")))
 @
 
 As with other classes in the \code{Matrix} package, the

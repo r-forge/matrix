@@ -4,6 +4,7 @@
 \usepackage[authoryear,round]{natbib}
 \bibliographystyle{plainnat}
 \newcommand{\noFootnote}[1]{{\small (\textit{#1})}}
+\newcommand{\myOp}[1]{{$\left\langle\ensuremath{#1}\right\rangle$}}
 %%\VignetteIndexEntry{2nd Introduction to the Matrix Package}
 %%\VignetteDepends{Matrix}
 \SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=5,height=3,strip.white=TRUE,keep.source=TRUE}
@@ -52,7 +53,7 @@ options(width=75)
 \section{Introduction}
 \label{sec:Intro}
 The most automatic way to use the \code{Matrix} package is via the
-\Rfun{Matrix} which is very similar to the standard \RR\ function
+\Rfun{Matrix} function which is very similar to the standard \RR\ function
 \Rfun{matrix},
 @
 <<ex1>>=
@@ -70,13 +71,14 @@ M[2, 1]
 M[4, ]
 @
 where the last two statements show customary matrix indexing, returning a
-simple numeric vector each \footnote{because there's an additional default
+simple numeric vector each\footnote{because there's an additional default
   argument to indexing, \code{drop = TRUE}.  If you add
   \hbox{``\code{\ ,\ drop = FALSE}\ ''} you will get submatrices instead of
-  simple vectors.}
+  simple vectors.}.
 We assign 0 to some columns and rows to ``sparsify'' it, and some \code{NA}s
 (typically ``missing values'' in data analysis) in order to demonstrate how
-they are dealt with:
+they are dealt with; note how we can \emph{``subassign''} as usual,
+for classical \RR{} matrices (i.e., single entries or whole slices at once),
 @
 <<set0>>=
 M2[, c(2,4:6)] <- 0
@@ -90,10 +92,11 @@ and then coerce it to a sparse matrix,
 sM <- as(M2, "sparseMatrix")
 10 * sM
 identical(sM * 2, sM + sM)
-sM / 10  +  M2 %/% 2  # is sparse
+is(sM / 10  +  M2 %/% 2, "sparseMatrix")
 @ %def
 where we see above that multiplication by a scalar keeps sparcity,
-as does other arithmetic, but addition to a ``dense'' object does not:
+as does other arithmetic, but addition to a ``dense'' object does not,
+as you might have expected after thought about ``sensible'' behavior:
 @
 <<add1>>=
 sM + 10
@@ -109,36 +112,45 @@ Mg2
 returning a logical sparse matrix.  When interested in the internal
 \textbf{str}ucture, \Rfun{str} comes handy, and we have been using it
 ourselves more regulary than \Rfun{print}ing (or \Rfun{show}ing as it
-happens) our matrices,
+happens) our matrices; alternatively, \Rfun{summary} gives output similar
+to Matlab's printing of sparse matrices.
 @
 <<str_mat>>=
 str(Mg2)
+summary(Mg2)
 @ %def
 
 %
-Further, \code{"Math"}-operations (such as
-\Rfun{exp}, \Rfun{sin} or \Rfun{gamma}) and \code{"Math2"} (\Rfun{round} etc)
-and the \code{"Summary"} group of functions, \Rfun{min}, \Rfun{range},
-\Rfun{sum}, etc.  Note that all these are implemented via so called
+Further, i.e., in addition to the above \code{"Ops"} operators, the
+\code{"Math"}-operations (such as \Rfun{exp}, \Rfun{sin} or \Rfun{gamma})
+and \code{"Math2"} (\Rfun{round} etc) and the \code{"Summary"} group of
+functions, \Rfun{min}, \Rfun{range}, \Rfun{sum}, all work on our matrices
+as they should.  Note that all these are implemented via so called
 \emph{group methods}, see e.g., \code{?Arith} in \RR.
+The intention is that sparse matrices remain sparse whenever sensible,
+given the matrix \emph{classes} and operators involved,
+but not content specifically. E.g.,  <sparse> + <dense> gives <dense> even for the
+%% rare cases where it would be advantageous to get a <sparse> result.
 
 These classed matrices can be ``indexed'' (more technically ``subset'') as
 normal ones, as partly seen above. This also includes the idiom
-\code{M [ M $\left\langle \mathit{cop} \right\rangle$]} which returns
-simple vectors,
+\code{M [ M \myOp{\mathit{cop}} \myOp{\mathrm{num}} ]}
+which returns simple vectors,
 @
 <<sub_logi>>=
 sM[sM > 2]
 sml <- sM[sM <= 2]
-table(sml) # 39 entries of 0 and -10
+sml
 @ %def
-Similarly, we can \emph{``subassign''} normally,
-@
-<<sub_ass>>=
-sM[2,1] <- 0
-sM[5, ] <- 7 # a whole row
-sM
-@ %def
+% had  table(sml) # 39 entries of 0 and -10
+
+% Similarly, we can \emph{``subassign''} normally,
+% @
+% <<sub_ass>>=
+% sM[2,1] <- 0
+% sM[5, ] <- 7 # a whole row
+% sM
+% @ %def
 
 
 
@@ -157,25 +169,24 @@ such as \code{\%*\%}, \code{qr}, \code{chol}, and \code{solve}.
 %%O functions have been switched to use routines from the
 %%O Lapack~\cite{Lapack} library.
 most of these functions have been switched to use routines from the
-Lapack~\cite{Lapack} library which the state-of-the-art implementation.
-\FIXME{of numerical dense linear algebra}
+Lapack~\cite{Lapack} library which is the state-of-the-art implementation
+of numerical dense linear algebra.
 %%
 Furthermore, \RR{} can be configured to
 use accelerated BLAS (Basic Linear Algebra Subroutines), such as those
-from the Atlas~\cite{Atlas} project or Goto's BLAS~\cite{GotosBLAS}.
-\FIXME{Goto's commercial; mention new ones, like AMD's or Mac's ?}
+from the Atlas~\cite{Atlas} project or other ones, see the \RR~manual
+``Installation and Administration''.
 
 Lapack provides routines for operating on several special forms of
 matrices, such as triangular matrices and symmetric matrices.
-\FIXME{matrix decompositions}
-%% Furthermore, matrix decompositions like the QR decompositions produce
-%% multiple output components that should be regarded as parts of a
-%% single object.  There is some support in \RR{} for operations on special
-%% forms of matrices (e.g. the \code{backsolve}, \code{forwardsolve} and
-%% \code{chol2inv} functions) and for special structures (e.g. a QR
-%% structure is implicitly defined as a list by the \code{qr},
-%% \code{qr.qy}, \code{qr.qty}, and related functions) but it is not as
-%% fully developed as it could be.
+Furthermore, matrix decompositions like the QR decompositions produce
+multiple output components that should be regarded as parts of a
+single object.  There is some support in \RR{} for operations on special
+forms of matrices (e.g. the \code{backsolve}, \code{forwardsolve} and
+\code{chol2inv} functions) and for special structures (e.g. a QR
+structure is implicitly defined as a list by the \code{qr},
+\code{qr.qy}, \code{qr.qty}, and related functions) but it is not as
+fully developed as it could be.
 
 Also there is no direct support for sparse matrices in \RR{} although
 \citet{koen:ng:2003} have developed the \pkg{SparseM} package for sparse
@@ -184,10 +195,11 @@ matrices based on SparseKit.
 The \code{Matrix} package provides S4 classes and methods for dense
 and sparse matrices.  The methods for dense matrices use Lapack and
 BLAS.  The sparse matrix methods use
-CHOLMOD~\citep{Cholmod}, CSparse~\citep{Csparse} (which also use BLAS)
-\FIXME{}
+CHOLMOD~\citep{Cholmod}, CSparse~\citep{Csparse}
 %%  and TAUCS~\citep{Taucs},
-%% UMFPACK~\citep{Umfpack}, and Metis~\citep{Metis}.
+%% AMD, COLAMD, UMFPACK~\citep{Umfpack}.%, and Metis~\citep{Metis}.
+and other parts of Tim Davis' ``SuiteSparse'' collection of sparse matrix
+libraries, many of which also use BLAS.
 
 \TODO{\Rfun{triu}, \Rfun{tril}, \Rfun{diag}, ...
   and  \command{as(.,.)} , but of course only when they've seen a few
@@ -325,27 +337,24 @@ addition to basic coercion (\code({as(., \textit{<cl>})} between the classes.
 
 There are certain advantages to csc in systems like \RR{}
 and Matlab where dense matrices are stored in column-major order,
-%% can level-3 BLAS in certain sparse matrix computations.
+%% can make use of level-3 BLAS in certain sparse matrix computations. !!
 therefore it is used in sparse matrix libraries such as CHOLMOD or CSparse
 of which we make use.
 
 The Matrix package provides the following classes for sparse matrices
-\FIXME{many more}
+\FIXME{many more --- maybe explain naming scheme?}
 \begin{description}
 \item[dgTMatrix] general, numeric, sparse matrices in (a possibly
   redundant) triplet form.  This can be a convenient form in which to
   construct sparse matrices.
 \item[dgCMatrix] general, numeric, sparse matrices in the (sorted) compressed
   sparse column format.
-
-\FIXME{maybe explain naming scheme?}
-
-%% \item[dsCMatrix] symmetric, real, sparse matrices in the (sorted)
-%%   compressed sparse column format.  Only the upper or the lower triangle is
-%%   stored.  Although there is provision for both forms, the lower
-%%   triangle form works best with TAUCS.
-%% \item[dtCMatrix] triangular, real, sparse matrices in the (sorted)
-%%   compressed sparse column format.
+\item[dsCMatrix] symmetric, real, sparse matrices in the (sorted)
+  compressed sparse column format.  Only the upper or the lower triangle is
+  stored.  Although there is provision for both forms, the lower
+  triangle form works best with TAUCS.
+\item[dtCMatrix] triangular, real, sparse matrices in the (sorted)
+  compressed sparse column format.
 \end{description}
 
 \TODO{Can also read and write the Matrix Market and Harwell-Boeing
