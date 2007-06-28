@@ -5,16 +5,17 @@ SEXP attr_hidden
     lme4_DimNamesSym,
     lme4_GpSym,
     lme4_LSym,
-    lme4_OmegaSym,
-    lme4_RXXSym,
-    lme4_RZXSym,
-    lme4_RZXinvSym,
+/*     lme4_OmegaSym, */
+/*     lme4_RXXSym, */
+/*     lme4_RZXSym, */
+/*     lme4_RZXinvSym, */
     lme4_STSym,
     lme4_XSym,
     lme4_XtXSym,
+    lme4_XtSym,
     lme4_XtySym,
     lme4_ZXytSym,
-    lme4_ZZpOSym,
+/*     lme4_ZZpOSym, */
     lme4_ZtSym,
     lme4_ZtXSym,
     lme4_ZtZSym,
@@ -25,6 +26,7 @@ SEXP attr_hidden
     lme4_devianceSym,
     lme4_diagSym,
     lme4_dimsSym,
+    lme4_envSym,
     lme4_etaSym,
     lme4_factorSym,
     lme4_fixefSym,
