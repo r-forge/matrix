@@ -6,11 +6,12 @@ import("stats", "lattice")
 #importFrom("utils", head, tail)  ## already available in Matrix
 
 export(
+       "glmer",
        "gsummary",
        "hatTrace",
        "lmList",
        "lmer",
-       "lmer2",
+##        "lmer2",
        "mcmcsamp",
        "nlmer",
        "pedigree",
@@ -20,17 +21,17 @@ export(
 exportClasses(
               "coef.lmer",
               "glmer",
-              "glmer2",
+##               "glmer2",
               "lmList",
               "lmer",
-              "lmer2",
-              "mer",
+##               "lmer2",
+##               "mer",
               "nlmer",
               "pedigree",
               "ranef.lmer",
               "summary.glmer",
-              "summary.lmer",
-              "summary.mer"
+              "summary.lmer"
+##               ,"summary.mer"
               )
 
 exportMethods(
