@@ -13,8 +13,9 @@ setAs("sparseMatrix", "symmetricMatrix", as_sSparse)
 
 setAs("sparseMatrix", "triangularMatrix", as_tSparse)
 
-spMatrix <- function(nrow, ncol, i,j,x) {
-    ## Author: Martin Maechler, Date:  8 Jan 2007, 18:46
+spMatrix <- function(nrow, ncol,
+                     i = integer(), j = integer(), x = numeric())
+{
     dim <- c(as.integer(nrow), as.integer(ncol))
     ## The conformability of (i,j,x) with itself and with 'dim'
     ## is checked automatically by internal "validObject()" inside new(.):

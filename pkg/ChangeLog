@@ -1,10 +1,18 @@
+2007-06-29  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.99875-3 ready to be released.
+
+	* R/sparseMatrix.R (spMatrix): make spMatrix(3,4) working
+
+	* R/AllGeneric.R: set "Math" (and "Math2") group generics in a way
+	that should also work in a future version of R.
+
 2007-06-21  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* NAMESPACE, R/AllClass.R: "xsparseVector" class union.
 
 	* R/sparseVector.R: more *sparseVector coercions, notably for
 	non - double ones.
-
 
 2007-06-19  Martin Maechler  <maechler@stat.math.ethz.ch>
 
