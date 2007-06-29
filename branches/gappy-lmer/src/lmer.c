@@ -2136,10 +2136,10 @@ SEXP glmer_reweight(SEXP x)
 	*var = Calloc(n, double),
 	*w = REAL(findVarInFrame(rho, lme4_weightsSym)),
 	*y = REAL(GET_SLOT(x, lme4_ySym)),
-	*z = REAL(findVarInFrame(rho, install("z")));
+	*z = REAL(findVarInFrame(rho, lme4_zSym));
 
 				/* initialize weights to prior wts */
-    Memcpy(w, REAL(findVarInFrame(rho, install("pwts"))), n); 
+    Memcpy(w, REAL(findVarInFrame(rho, lme4_pwtsSym)), n); 
     glmer_linkinv(x);		/* evaluate mu */
     glmer_dmu_deta(x, dmu_deta);
     glmer_var(x, var);
@@ -2272,7 +2272,7 @@ internal_glmer_update_L(SEXP x)
     /* reweight the model then extract the pointers (which may have changed) */
     glmer_reweight(x);
     w = REAL(findVarInFrame(rho, lme4_weightsSym));
-    z = REAL(findVarInFrame(rho, install("z")));
+    z = REAL(findVarInFrame(rho, lme4_zSym));
 
     AZERO(rh, m);
     for (j = 0; j < n; j++) {
