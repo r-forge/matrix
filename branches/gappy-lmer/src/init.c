@@ -93,57 +93,64 @@ void R_init_lme4(DllInfo *dll)
 
 
     M_R_cholmod_start(&c);
-    c.final_ll = 0;	    /* LDL form of simplicial factorization */
+    c.final_ll = 1;	    /* LL' form of simplicial factorization */
 
-    lme4_ASym = install("A");
-    lme4_DSym = install("D");
+/*     lme4_ASym = install("A"); */
+/*     lme4_DSym = install("D"); */
     lme4_DimSym = install("Dim");
     lme4_DimNamesSym = install("Dimnames");
     lme4_GpSym = install("Gp");
     lme4_LSym = install("L");
+    lme4_MtSym = install("Mt");
 /*     lme4_OmegaSym = install("Omega"); */
 /*     lme4_RXXSym = install("RXX"); */
 /*     lme4_RZXSym = install("RZX"); */
 /*     lme4_RZXinvSym = install("RZXinv"); */
     lme4_STSym = install("ST");
+    lme4_VtSym = install("Vt");
     lme4_XSym = install("X");
-    lme4_XtXSym = install("Xt");
-    lme4_XtXSym = install("XtX");
-    lme4_XtySym = install("Xty");
+    lme4_XtSym = install("Xt");
+/*     lme4_XtXSym = install("XtX"); */
+/*     lme4_XtySym = install("Xty"); */
 /*     lme4_ZZpOSym = install("ZZpO"); */
     lme4_ZtSym = install("Zt");
-    lme4_ZtXSym = install("ZtX");
-    lme4_ZtZSym = install("ZtZ");
-    lme4_ZtySym = install("Zty");
-    lme4_ZXytSym = install("ZXyt");
-    lme4_bVarSym = install("bVar");
+    lme4_ZtXySym = install("ZtXy");
+/*     lme4_ZtZSym = install("ZtZ"); */
+/*     lme4_ZtySym = install("Zty"); */
+/*     lme4_ZXytSym = install("ZXyt"); */
+/*     lme4_bVarSym = install("bVar"); */
     lme4_cnamesSym = install("cnames");
-    lme4_devCompSym = install("devComp");
+    lme4_devResidSym = install("devResid");
     lme4_devianceSym = install("deviance");
-    lme4_diagSym = install("diag");
+/*     lme4_diagSym = install("diag"); */
     lme4_dimsSym = install("dims");
     lme4_etaSym = install("eta");
     lme4_envSym = install("env");
-    lme4_factorSym = install("factor");
+/*     lme4_factorSym = install("factor"); */
     lme4_fixefSym = install("fixef");
     lme4_flistSym = install("flist");
-    lme4_gradCompSym = install("gradComp");
+    lme4_gradientSym = install("gradient");
     lme4_iSym = install("i");
     lme4_muSym = install("mu");
-    lme4_ncSym = install("nc");
+    lme4_modelSym = install("model");
+/*     lme4_ncSym = install("nc"); */
     lme4_offsetSym = install("offset");
     lme4_pSym = install("p");
     lme4_permSym = install("perm");
-    lme4_rXySym = install("rXy");
-    lme4_rZySym = install("rZy");
+    lme4_pnamesSym = install("pnames");
+    lme4_pwtsSym = install("pwts");
+/*     lme4_rXySym = install("rXy"); */
+/*     lme4_rZySym = install("rZy"); */
     lme4_ranefSym = install("ranef");
-    lme4_statusSym = install("status");
-    lme4_uploSym = install("uplo");
+/*     lme4_statusSym = install("status"); */
+/*     lme4_uploSym = install("uplo"); */
+    lme4_uvecSym = install("uvec");
     lme4_weightsSym = install("weights");
     lme4_wrkresSym = install("wrkres");
     lme4_wtsSym = install("wts");
     lme4_xSym = install("x");
     lme4_ySym = install("y");
+    lme4_zSym = install("z");
 }
 
 void R_unload_lme4(DllInfo *dll){
