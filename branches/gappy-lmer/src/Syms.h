@@ -55,6 +55,3 @@ SEXP attr_hidden
     lme4_xSym,
     lme4_ySym,
     lme4_zSym;
-
-
-
