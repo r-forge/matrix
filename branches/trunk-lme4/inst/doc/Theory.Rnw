@@ -8,7 +8,7 @@
 \DefineVerbatimEnvironment{Soutput}{Verbatim}
 {formatcom={\vspace{-1ex}},fontfamily=courier,fontseries=b,%
   fontsize=\footnotesize}
-%%\VignetteIndexEntry{Implementation Details}
+%%\VignetteIndexEntry{Computational Methods}
 %%\VignetteDepends{lme4}
 \title{Theory and computational methods for mixed models}
 \author{Douglas Bates\\Department of Statistics\\%
@@ -17,9 +17,10 @@
 \SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,strip.white=TRUE}
 \SweaveOpts{include=FALSE}
 \setkeys{Gin}{width=\textwidth}
-\newcommand{\trans}{\ensuremath{^\prime}}
 \newcommand{\code}[1]{\texttt{\small{#1}}}
 \newcommand{\package}[1]{\textsf{\small{#1}}}
+\newcommand{\trans}{\ensuremath{^\prime}}
+\renewcommand{\vec}{\operatorname{vec}}
 <<preliminaries,echo=FALSE,results=hide>>=
 options(width=65,digits=5)
 library(lme4)
@@ -33,8 +34,6 @@ library(lme4)
   approximate the log-likelihood of a model/data/parameter value
   combination.
 \end{abstract}
-
-
 
 \section{Introduction}
 \label{sec:intro}
@@ -718,10 +717,10 @@ $f_{\bm U}$.  Thus the likelihood can be expressed as
     &=f_{\bm Y}(\bm y|\bm\beta,\bm\theta,\sigma^2)\\
     &=\int_{\bm b}
     f_{\bm Y|\bm B}(\bm y|\bm b,\bm\beta,\sigma^2)\,
-    f_{\bm B}(\bm b|\bm\theta,\sigma^2)\;d\bm b
+    f_{\bm B}(\bm b|\bm\theta,\sigma^2)\;d\bm b\\
     &=\int_{\bm u}
     f_{\bm Y|\bm U}(\bm y|\bm u,\bm\beta,\bm\theta,\sigma^2)\,
-    f_{\bm U}(\bm u|\sigma^2)\;d\bm u
+    f_{\bm U}(\bm u|\sigma^2)\;d\bm u\\
     &=k(\bm y,\sigma^2)\int_{\bm{u}}\frac{
     e^{-(d(\bm\mu(\bm\eta_{\bm{u}}(\bm u,\bm\beta,\bm\theta)+\bm u\trans\bm u)/(2\sigma^2)}}
     {\left(2\pi\sigma^2\right)^{q/2}}\,d\bm u\\
@@ -760,16 +759,17 @@ either directly, as the solution to a penalized linear least squares
 problem, or through an iterative algorithm in which each iteration
 requires the solution of a penalized linear least squares problem.
 Because the value that minimizes the penalized discrepancy
-will maximize the conditional density of $\bm u$ given $\bm y$,
+will maximize the conditional density of $\bm U$ given $\bm Y$,
 \begin{displaymath}
-  f_{\bm{u}|\bm y}(\bm{u}|\bm\beta,\bm\theta,\bm y)=
-  \frac{k(\bm y,\sigma^2)e^{-\delta(\bm{u},\bm\beta,\bm\theta,\bm y)
-      /(2\sigma^2)}}{(2\pi\sigma^2)^{q/2}} ,
+  f_{\bm U|\bm Y}(\bm u|\bm u,\bm\beta,\bm\theta,\sigma^2)\propto
+  k(\bm y,\sigma^2)(2\pi\sigma^2)^{-q/2}
+  e^{-\delta(\bm u,\bm\beta,\bm\theta,\bm y)/(2\sigma^2)} ,
 \end{displaymath}
 $\tilde{\bm{u}}(\bm\beta,\bm\theta,\bm y)$ is called the
-\emph{conditional mode} of $\bm{u}$ given $\bm\beta$, $\bm\theta$
-and $\bm y$.  (The conditional density depends on $\sigma^2$ as well
-as the other parameters but the conditional mode does not.)
+\emph{conditional mode} of $\bm{u}$ given the data, $\bm y$, and the
+parameters, $\bm\beta$ and $\bm\theta$.  (The conditional density
+depends on $\sigma^2$ in addition to the other parameters but the
+conditional mode does not.)
 
 Near the conditional mode, the penalized discrepancy has a quadratic approximation
 \begin{equation}
@@ -810,31 +810,38 @@ After substituting (\ref{eq:CholeskyFactor}) into the quadratic
 approximation (\ref{eq:quadapprox}) and approximation
 (\ref{eq:quadapprox}) into expression (\ref{eq:likelihoodb}) for the
 likelihood, $L(\bm\beta,\bm\theta,\sigma^2|\bm y)$, the only part
-of the integrand that will depend on $\bm{u}$ will be the quadratic
-term in the exponent.  To evaluate an integral like this, say,
+of the integrand that will depend on $\bm{u}$ is the quadratic
+term in the exponent.  To evaluate the non-constant part of the
+integral, which we can write as
 \begin{displaymath}
-  I=\int_{\bm{u}}\frac{e^{-(\bm{u}-\tilde{\bm{u}})\trans\bm{L}
-      \bm{L}\trans(\bm{u}-\tilde{\bm{u}})/(2\sigma^2)}}
-  {\left(2\pi\sigma^2\right)^{q/2}}\,d\bm{u}
+  I=\int_{\bm{u}}\frac{e^{-(\bm{u}-\tilde{\bm{u}})\trans
+      \bm L(\bm\beta,\bm\theta,\bm y)
+      \bm L(\bm\beta,\bm\theta,\bm y)\trans
+      (\bm{u}-\tilde{\bm{u}})/(2\sigma^2)}}
+  {\left(2\pi\sigma^2\right)^{q/2}}\,d\bm{u} ,
 \end{displaymath}
 we change the variable variable of integration from $\bm u$ to
 \begin{equation}
   \label{eq:vLu}
-  \bm{v}=\bm{L}\trans(\bm{u}-\tilde{\bm{u}})/\sigma .
+  \bm{v}=\bm L(\bm\beta,\bm\theta,\bm y)\trans(\bm{u}-\tilde{\bm{u}})/\sigma .
 \end{equation}
 The determinant of the Jacobian of the transformation (\ref{eq:vLu}) is
 \begin{displaymath}
-  \left|\frac{d\bm{v}}{d\bm{u}}\right|=\frac{|\bm{L}|}{\sigma^q} .
+  \left|\frac{d\bm{v}}{d\bm{u}}\right|=\frac{|\bm L(\bm\beta,\bm\theta,\bm y)|}{\sigma^q} .
 \end{displaymath}
-so, after the change of variable, $I$ becomes a multiple of the
+implying that the differential, $d\bm u$, is to be replaced by
+\begin{displaymath}
+  d\bm u=\left|\bm L(\bm\beta,\bm\theta,\bm y)\right|^{-1}\sigma^qd\bm v
+\end{displaymath}
+After the change of variable, $I$ becomes a multiple of the
 integral of the standard $q$-variate Gaussian density
 \begin{equation}
   \label{eq:reducedint}
-  I=\int_{\bm{v}}\frac{e^{-\bm{v}\trans\bm{v}/2}}{\left(2\pi\right)^{q/2}}
-  \frac{d\bm{v}}{|\bm{L}|}= \frac{1}{|\bm{L}|}
+  I=\left|\bm L(\bm\beta,\bm\theta,\bm y)\right|^{-1}
   \int_{\bm{v}}\frac{e^{-\bm{v}\trans\bm{v}/2}}{\left(2\pi\right)^{q/2}}\,d\bm{v}
+  =\left|\bm L(\bm\beta,\bm\theta,\bm y)\right|^{-1} ,
 \end{equation}
-Thus, $I=|\bm L|^{-1}$.
+because the integral of the density function over $\mathbb{R}^q$ must be unity.
 
 Returning to expression (\ref{eq:likelihoodb}), we can now express the
 Laplace approximation to the likelihood function or, as more commonly
@@ -880,7 +887,7 @@ where the symbol $\perp$ denotes independence of random variables.
 The conditional distribution of $\bm y$ given $\bm b$ is
 \begin{equation}
   \label{eq:lmmCondDist}
-  f_{\bm y|\bm b}(\bm y|\bm b,\bm\beta,\sigma^2)=
+  f_{\bm Y|\bm B}(\bm y|\bm b,\bm\beta,\sigma^2)=
   \left(2\pi\sigma^2\right)^{-n/2}
   e^{-\left\|\bm X\bm\beta+\bm Z\bm b-\bm y\right\|^2/(2\sigma^2)}
 \end{equation}
@@ -1110,10 +1117,10 @@ complexity by an appropriate choice of $\bm\theta$.
 \subsection{REML estimates}
 \label{sec:REML}
 
-The maximum likelihood estimate of $\sigma^2$, $\widehat{\sigma^2}=r^2/n$,
-is the penalized residual sum of squares divided by the number of
-observations.  It has a form like the maximum likelihood estimate of
-the variance from a single sample,
+The maximum likelihood estimate of $\sigma^2$,
+$\widehat{\sigma^2}=r^2/n$, is the penalized residual sum of squares
+divided by the number of observations.  It has a form like the maximum
+likelihood estimate of the variance from a single sample,
 $\widehat{\sigma^2}=\sum_{i=1}^n(y_i-\bar{y})^2/n$ or the maximum
 likelihood estimate of the variance in a linear regression model with
 $p$ coefficients in the predictor,
@@ -1175,38 +1182,49 @@ and the profiled REML deviance is
   +2\log|\bm L(\bm\theta)|+2\log|\bm R_X(\bm\theta)|  .
 \end{multline}
 
+%$  Something has confused emacs
 \section{Nonlinear mixed models}
 \label{sec:nonlinearmixed}
 
-Like the linear mixed model, the nonlinear mixed model is based on a
-multivariate Gaussian distribution of the response,
-$\bm y$, given $\bm\mu$.  The model is
+The nonlinear mixed model can be expressed as
 \begin{equation}
-  \label{eq:nlmm}
-  \bm y=\bm\mu(\bm\beta,\bm b)+\bm\epsilon,\quad
-  \bm\epsilon\sim\mathcal{N}(\bm{0},\sigma^2\bm I),\quad
-  \bm b\sim\mathcal{N}(\bm{0},\sigma^2\bm\Sigma(\bm\theta),
-  \quad\bm\epsilon\perp\bm b
+  \label{eq:nlmmDef}
+  \bm Y=\bm\mu(\bm\eta_{\bm b}(\bm B,\bm\beta))+\bm\epsilon,\quad
+  \bm\epsilon\sim\mathcal{N}(\bm 0,\sigma^2\bm I),\quad
+  \bm B\sim\mathcal{N}(\bm 0,\sigma^2\bm\Sigma(\bm\theta)),
+  \quad\bm\epsilon\perp\bm B
 \end{equation}
-producing the same discrepancy function and normalizing factor as for the
-linear mixed model,
+which is very similar to the linear mixed model (\ref{eq:lmmDef}).  In
+fact, these two types of mixed models differ only in the form of the
+mean function $\bm\mu(\bm\eta)$.
+
+%% Perhaps move this paragraph to the section on linear mixed models?
+
+In both models the conditional distribution of the response, given the
+random effects, is a ``spherical'' Gaussian, $\bm Y|\bm
+B\sim\mathcal{N}(\bm\mu_{\bm Y|\bm B},\sigma^2\bm I)$, producing the
+discrepancy function and normalizing factor
 \begin{align}
   \label{eq:nlmmProps}
   d(\bm\mu,\bm y)&=\left\|\bm\mu-\bm y\right\|^2\\
   k(\sigma^2)&=\left(2\pi\sigma^2\right)^{-n/2} .
 \end{align}
+(The distribution $\mathcal{N}(\bm\mu,\sigma^2\bm I)$ is said to be
+``spherical Gaussian'' because contours of its density are spheres in
+$\mathbb{R}^n$.)
 
-The mean, $\bm\mu$, however, is no longer equal to the linear
-predictor, $\bm\eta$.  Each element of $\bm\mu$ is the value of a
-nonlinear model function $g(\bm x,\bm\phi)$ that depends on
-covariates, $\bm{x}$, and on a parameter, $\bm\phi$,
-of length $s$.  The model function $q(\bm x,\bm\phi)$ can be nonlinear
-in some or all of the elements of $\bm\phi$.
+For a nonlinear mixed model, however, the mean function,
+$\bm\mu(\bm\eta)$, is not the identity, as it is for the linear mixed
+model.  In the nonlinear form each element of $\bm\mu$ is the value of
+a scalar nonlinear model function, $g(\bm x,\bm\phi)$, that depends on
+the observed values of some covariates, $\bm{x}$, and on a parameter
+vector, $\bm\phi$, of length $s$.  This model function, $g(\bm
+x,\bm\phi)$, can be nonlinear in some or all of the elements of
+$\bm\phi$.
 
-When fitting a model the values of the covariates at
-each observation are known so we can regard the $i$th element of the
-conditional mean, $\mu_i$, as a function
-of $\bm\phi_i$ only and write
+When fitting a model the values of the covariates at each observation
+are known so we can regard the $i$th element of $\bm\mu_{\bm Y|\bm B}$
+as a function of $\bm\phi_i$ only and write
 \begin{equation}
   \label{eq:vectorg}
   \bm\mu=\bm g(\bm\Phi)
@@ -1214,114 +1232,201 @@ of $\bm\phi_i$ only and write
 where $\bm\Phi$ is the $n\times s$ matrix
 with $i$th row $\bm\phi_i,i=1,\dots,n$ and the vector-valued
 function $\bm g$ applies the scalar function $g(\bm x,\bm\phi)$ to the
-rows of $\bm\Phi$ and the corresponding covariates $\bm{x}_i,i=1,\dots,n$.
+rows of $\bm\Phi$ and corresponding covariates $\bm{x}_i,i=1,\dots,n$.
 
 The linear predictor, $\bm\eta$, is
 \begin{equation}
   \label{eq:linpredPhi}
-  \mathrm{vec}(\bm\Phi)=\bm\eta=\bm X\bm\beta+\bm Z\bm b=
-  \bm X\bm\beta+\bm{V}(\bm\theta)\bm P\trans\bm u
+  \bm\eta=\vec(\bm\Phi)=\bm Z\bm b+\bm X\bm\beta=
+  \bm{V}(\bm\theta)\bm P\trans\bm u+\bm X\bm\beta .
 \end{equation}
-where the $\mathrm{vec}$ operator concatenates the columns of
-$\bm\phi$ to form a vector of length $m=ns$.  Thus the matrix
-$\bm X$ is $ns\times p$ while $\bm Z$ and $\bm{V}(\bm\theta)$ are $ns\times q$.
+(The $\vec$ operator concatenates the columns of a matrix to form a
+vector.)
+
+The matrix $\bm\Phi$ is $n\times s$ hence the dimension of
+$\vec(\bm\Phi)$ is $m=ns$ so $\bm X$ is $ns\times p$ while $\bm Z$ and
+$\bm{V}(\bm\theta)$ are $ns\times q$. Because the $i$th element of
+$\bm\mu$ depends only on the $i$th row of $\bm\Phi$, the $n\times ns$
+gradient matrix,
+\begin{equation}
+  \label{eq:nmmWDef}
+  \bm W(\bm u,\bm\beta,\bm\theta)=\frac{d\bm\mu}{d\bm\eta\trans} ,
+\end{equation}
+is the horizontal concatenation of $s$ diagonal $n\times n$ matrices.
+The $i$th diagonal element in the $j$th diagonal block of $\bm W$ is
+\begin{displaymath}
+  \left\{\bm W(\bm u,\bm\beta,\bm\theta)\right\}_{i,i+(j-1)n}=
+  \left.\frac{\partial g(\bm x,\bm\phi)}{\partial\phi_j}\right|_{\bm x=\bm
+    x_i,\bm\phi=\bm\phi_i} .
+\end{displaymath}
+All other elements in $\bm W$ are zero.
 
 \subsection{Optimizing the penalized discrepancy}
 \label{sec:nlmmpenalizedLS}
 
 As for a linear mixed model, the problem of determining
-$\tilde{\bm{u}}(\bm\beta,\bm\theta)$, the optimizer of the
-penalized discrepancy function, can be written as a penalized least
-squares problem
+$\tilde{\bm{u}}(\bm\beta,\bm\theta)$, the optimizer of the penalized
+discrepancy function, can be written as a penalized least squares
+problem
 \begin{equation}
   \label{eq:nlmmdisc}
   \begin{aligned}
     \tilde{\bm{u}}(\bm\beta,\bm\theta)
     &=\arg\min_{\bm u}\delta(\bm u|\bm\beta,\bm\theta,\bm y)\\
-    &=\arg\min_{\bm{u}}\left(\|\bm\mu(\bm\eta_{\bm u}(\bm u,\bm\beta,\bm\theta)-\bm y\|^2
+    &=\arg\min_{\bm{u}}\left(\|\bm\mu(\bm\eta_{\bm u}(\bm u,\bm\beta,\bm\theta))-\bm y\|^2
       +\bm u\trans\bm u\right).
   \end{aligned}
 \end{equation}
-Generally (\ref{eq:nlmmdisc}) is a
-penalized nonlinear least squares problem requiring an iterative
-solution, not a penalized linear least squares problem like
-(\ref{eq:conditionalMode}) with a direct solution.  A
-particular type of nonlinear mixed model, described in
-\S\ref{sec:nlmmcondlin}, does admit a direct solution to (\ref{eq:nlmmdisc}).
+Generally (\ref{eq:nlmmdisc}) is a penalized nonlinear least squares
+problem requiring an iterative solution, not a penalized linear least
+squares problem like (\ref{eq:conditionalMode}) with a direct
+solution.
 
-For the general case of an iterative solution to (\ref{eq:nlmmdisc})
-we will use parenthesized superscripts to denote the number
-of the iteration at which a quantity is evaluated.  Given
-$\bm{u}^{(i)}$, the value of the orthogonal random effects at the
-$i$th iteration, we evaluate the $n\times q$ matrix
+To describe the general case of an iterative solution to
+(\ref{eq:nlmmdisc}) we will use parenthesized superscripts to denote
+the number of the iteration at which a quantity is evaluated.  At
+$\bm{u}^{(i)}$, the value of the $\bm u$ at the $i$th iteration, the
+linear approximation to $\bm\mu$ as a function of $\bm u$ is
+\begin{equation}
+  \label{eq:nmmLinApprox}
+  \begin{aligned}
+  \bm\mu(\bm\eta_{\bm u}(\bm u,\bm\beta,\bm\theta))\approx
+  &\bm\mu(\bm\eta_{\bm u}(\bm u^{(i)},\bm\beta,\bm\theta)) +
+  \left.\frac{\partial\bm\mu}{\partial\bm{u}\trans}\right|_{\bm{u}=\bm{u}^{(i)}}(\bm
+  u-\bm u^{(i)})\\
+  &=\bm\mu^{(i)}+\bm W(\bm u^{(i)},\bm\beta,\bm\theta)\bm{V}(\bm\theta)\bm P\trans
+  (\bm u-\bm u^{(i)})\\
+  &=\bm\mu^{(i)}+\bm{M}^{(i)}\bm P\trans(\bm u-\bm u^{(i)})
+  \end{aligned}
+\end{equation}
+where $\bm\mu^{(i)}=\bm\mu(\bm\eta_{\bm u}(\bm
+u^{(i)},\bm\beta,\bm\theta))$ and the $n\times q$ matrix
 \begin{equation}
   \label{eq:nlmmgrad}
+  \bm{M}^{(i)}=\bm W(\bm u^{(i)},\bm\beta,\bm\theta)\bm{V}(\bm\theta) .
+\end{equation}
+
+As described in \S\ref{sec:nlmmcondlin}, for some nonlinear models the
+conditional mean $\bm\mu_{\bm Y|\bm U}$
+is a linear function of $\bm u$ (but a nonlinear function of one or
+more components of $\bm\beta$, so the model cannot be written as a
+linear mixed model).  For these \emph{conditionally linear mixed
+  models} (\ref{eq:nmmLinApprox}) is exact and $\bm M$ does not depend
+upon $\bm u$.
+
+In the general case, the proposed increment,
+$\bm\delta^{(i)}=\bm{u}^{(i+1)}-\bm u^{(i)}$, minimizes the
+approximate penalized discrepancy obtained from
+(\ref{eq:nmmLinApprox}).  That is,
+\begin{equation}
+  \label{eq:nmmDeltaCond}
   \begin{aligned}
-  \bm{M}^{(i)}&=\left.\frac{\partial\bm\mu}{\partial\bm{u}\trans}\right|_{\bm{u}=\bm{u}^{(i)}}\\
-  &=
-  \begin{bmatrix}
-    \bm I_n&\bm I_n&\dots&\bm I_n
-  \end{bmatrix}
-  \mathrm{diag}\left(\mathrm{vec}\left.\frac{d\bm\mu}{d\bm\Phi}\right|_{\bm\Phi=\bm\Phi^{(i)}}\right)
-  \bm{V}(\bm\theta) .
+    \bm\delta^{(i)}
+    &=\arg\min_{\bm\delta}\left\|\bm\mu^{(i)}+\bm{M}^{(i)}
+      \bm P\trans\bm\delta -\bm y\right\|^2+
+    (\bm\delta+\bm u^{(i)})\trans(\bm\delta+\bm u^{(i)})\\
+    &=\arg\min_{\bm\delta}\left\|
+      \begin{bmatrix}
+        \bm{M}^{(i)}\bm P\trans\bm\delta\\
+        \bm\delta + \bm u^{(i)}
+      \end{bmatrix} -
+      \begin{bmatrix}
+        \bm y - \bm\mu^{(i)}\\
+        \bm 0
+      \end{bmatrix}
+    \right\|^2\\
+    &=\arg\min_{\bm\delta}\left\|
+      \begin{bmatrix}
+        \bm M^{(i)}\bm P\trans\\
+        \bm I_q
+      \end{bmatrix}\bm\delta -
+      \begin{bmatrix}
+        \bm y - \bm\mu^{(i)}\\
+        -\bm u^{(i+1)}
+      \end{bmatrix}
+    \right\|^2 ,
   \end{aligned}
 \end{equation}
-(The matrix written $\begin{bmatrix}\bm I_n&\bm I_n&\dots&\bm
-  I_n\end{bmatrix}$ contains $s$ copies $\bm I_n$.)  The proposed updated
-vector of orthogonal random effects, $\bm{u}^{(i+1)}$, minimizes the
-approximate penalized discrepancy based on a linear approximation to
-$\bm\mu$ as a function of $\bm u$ evaluated at $\bm u^{(i)}$.  That is,
+which implies that $\bm\delta^{(i)}$ satisfies the ``normal equations''
 \begin{equation}
-  \label{eq:nlmmuUpdate}
-  \begin{aligned}
-    \bm{u}^{(i+1)}
-  &=\arg\min_{\bm{u}}\left\|\bm y-\bm\mu\left(\bm\beta,\bm{u}^{(i)}\right)
-    -\bm{M}^{(i)}\left(\bm{u}-\bm{u}^{(i)}\right)\right\|^2+\bm{u}\trans\bm{u}\\
-  &=\arg\min_{\bm{u}}\left\|\bm y-\bm\mu^{(i)}+
-    \bm{M}^{(i)}\bm{u}^{(i)}-\bm{M}^{(i)}\bm{u}\right\|^2+\bm{u}\trans\bm{u}\\
-  &=\arg\min_{\bm{u}}\left\|
-    \begin{bmatrix}
-      \bm y-\bm\mu^{(i)}+\bm{M}^{(i)}\bm{u}^{(i)}\\
-      \bm{0}
-    \end{bmatrix}-
-    \begin{bmatrix}
-      \bm{M}^{(i)}\\
-      \bm I
-    \end{bmatrix}\bm{u}\right\|^2 .
-  \end{aligned}
+  \label{eq:nmmUpdateNormal}
+  \bm P\left({\bm M^{(i)}}\trans\bm M^{(i)}
+    +\bm I_q\right)\bm P\trans
+  \bm\delta^{(i)}=\bm P{\bm M^{(i)}}\trans
+  \left(\bm y-\bm\mu^{(i)}\right)-\bm u^{(i)} .
 \end{equation}
-That is, $\bm{u}^{(i+1)}$ is the solution to a linear least squares
-problem for which the normal equations are
+
+Let the Cholesky factor $\bm L(\bm u^{(i)},\bm\beta,\bm\theta,\bm y)$,
+which we will write as $\bm L^{(i)}$,
+be the sparse, lower triangular matrix satisfying
 \begin{equation}
-  \label{eq:uip1}
-  \left({\bm{M}^{(i)}}\trans\bm{M}^{(i)}+\bm I\right)\bm{u}^{(i+1)}=
-  \bm{L}^{(i)}{\bm{L}^{(i)}}\trans\bm{u}^{(i+1)}=
-  {\bm{M}^{(i)}}\trans\left(\bm y-\bm\mu^{(i)}+\bm{M}^{(i)}\bm{u}^{(i)}\right) .
+  \label{eq:nmmCholFact}
+  \bm L^{(i)}{\bm L^{(i)}}\trans =
+  \bm P\left({\bm M^{(i)}}\trans\bm M^{(i)}+\bm I_q\right)\bm P\trans .
 \end{equation}
+The increment $\bm\delta^{(i)}$ is evaluated by solving the two sparse
+triangular systems in
+\begin{equation}
+  \label{eq:nmmCholIncr}
+  \bm L^{(i)}{\bm L^{(i)}}\trans\bm\delta^{(i)}=
+  \bm P{\bm M^{(i)}}\trans \left(\bm y-\bm\mu^{(i)}\right)-\bm u^{(i)} .
+\end{equation}
+
+\subsubsection{Step factor and convergence criterion}
+\label{sec:nmmConvergence}
+
+Some examination of the penalized least squares problem
+(\ref{eq:nmmDeltaCond}) will show that is it possible to write a
+penalized least squares problem for the updated random effects,
+$\bm u^{(i+1)}=\bm u^{(i)}+\bm\delta^{(i)}$ directly.  We prefer to
+write the conditions in terms of the increment and to calculate the
+proposed increment $\bm\delta^{(i)}$ for two reasons: to allow us to
+incorporate a step factor \citep[\S2.2.1]{bateswatts88:_nonlin} easily
+and to evaluate the relative offset convergence criterion based on
+orthogonality of the residual vector to the columns of the gradient
+matrix.
+
+With highly nonlinear models it can happen that the proposed update actually
+increases the penalized discrepancy rather than decreasing it.  In
+these cases we use only a fraction $h$ of the proposed step where
+$0<h_{min}\le h\le 1$ and $h_{min}$ is a prespecified minimum step
+factor.  We evaluate the penalized discrepancy at $\bm u=\bm
+u^{-1}+h\bm\delta^{(i)}$ for successively smaller values of $h$ until
+we obtain a decrease in the penalized discrepancy or the minimum step
+factor is reached.  Generally a simple strategy starting at $h=1$ each
+iteration and successively halving $h$ if necessary is sufficient.
+
+We continue iterating until the increments become negligible whereupon
+we declare convergence.  To design an algorithm, however, we must
+decide how to measure the size of the increment and when to declare
+that this size is ``negligible''.
 
 At convergence the Laplace approximation to the deviance is
 \begin{equation}
   \label{eq:nlmmLaplace}
   -2\ell(\bm\beta,\bm\theta,\sigma^2|\bm y)
-  =n\log\left(2\pi\sigma^2\right)+\frac{\delta(\tilde{\bm{u}}|\bm\theta,\bm\beta)}
-  {\sigma^2}+2\log|\bm{L}(\bm\beta,\bm\theta)|
+  =n\log\left(2\pi\sigma^2\right)+\frac{\delta(\tilde{\bm{u}}|\bm\beta,\bm\theta,\bm y)}
+  {\sigma^2}+2\log|\bm{L}(\bm\beta,\bm\theta,\bm y)|
 \end{equation}
-where $\bm{L}(\bm\beta,\bm\theta)$ is the Cholesky
+where $\bm{L}(\bm\beta,\bm\theta,\bm y)$ is the Cholesky
 factor of $\bm{M}\trans\bm{M}+\bm I$ evaluated at
-$\tilde{\bm{u}}(\bm\beta,\bm\theta)$, $\bm\beta$ and $\bm\theta$.
+$\tilde{\bm{u}}(\bm\beta,\bm\theta,\bm y)$, $\bm\beta$, $\bm\theta$ and $\bm y$.
 As for the linear mixed model we can form the conditional estimate of $\sigma^2$
 \begin{equation}
   \label{eq:nlmmsigmasq}
-  \widehat{\sigma^2}(\bm\theta,\bm\beta)=
-  \frac{\delta(\tilde{\bm{u}}|\bm\theta,\bm\beta)}{n} .
+  \widehat{\sigma^2}(\bm\beta,\bm\theta,\bm y)=
+  \frac{\delta(\tilde{\bm{u}}|\bm\beta,\bm\theta,\bm y)}{n} .
 \end{equation}
 Substituting this estimate into (\ref{eq:nlmmLaplace}) produces the
 Laplace approximation to the profiled deviance
 \begin{equation}
   \label{eq:nlmmprofdevLaplace}
-  -2\ell(\bm\beta,\bm\theta,\widehat{\sigma^2}(\bm\beta,\bm\theta)|\bm y)
-  =n\left[1+\log\left(\frac{2\pi}{n}\right)\right]+
-  n\log \delta(\tilde{\bm{u}}|\bm\theta,\bm\beta)+2\log|\bm{L}| .
+  \begin{aligned}
+  -2\ell(\bm\beta,\bm\theta,\widehat{\sigma^2}(\bm\beta,\bm\theta,\bm y)|\bm y)=
+  &n\left[1+\log\left(\frac{2\pi}{n}\right)\right]\\
+  &+n\log\delta(\tilde{\bm u}|\bm\beta,\bm\theta,\bm y)
+  +2\log|\bm L(\tilde{\bm u},\bm\beta,\bm\theta,\bm y)| .
+  \end{aligned}
 \end{equation}
 
 \subsection{Constructing model matrices for nonlinear mixed models}
@@ -1379,7 +1484,7 @@ is equivalent to
 y ~ A*(1-exp(-rc*time)) ~ A + rc + (0 + A + rc|subj)
 @
 
-The matrix $\bm X$ will be $30\times 2$ with the two columns being
+The matrix $\bm X$ will be $24\times 2$ with the two columns being
 the indicator for \code{A} and the indicator for \code{rc}.
 
 \subsection{Random effects for conditionally linear parameters only}
@@ -1480,7 +1585,7 @@ $\bm\mu$, then the conditional distribution of $\bm y$
 given $\bm\mu$ has probability mass function
 \begin{equation}
   \label{eq:Bernoulli}
-  f_{\bm y|\bm\mu}(\bm y,\bm\mu)=
+  f_{\bm Y|\bm\mu}(\bm y,\bm\mu)=
   \prod_{k=1}^n\mu_k^{y_k}\left(1-\mu_k\right)^{\left(1-y_k\right)}
 \end{equation}
 Because the distribution of $y_k$ is completely determined by $\mu_k$
@@ -1489,7 +1594,7 @@ expression (\ref{eq:conddens}) for the conditional density in terms of
 the discrepancy can be written
 \begin{equation}
   \label{eq:condBernoulli}
-  f_{\bm y|\bm\mu}(\bm y|\bm\mu)=k e^{-d(\bm\mu,\bm y)/2} .
+  f_{\bm Y|\bm\mu}(\bm y|\bm\mu)=k e^{-d(\bm\mu,\bm y)/2} .
 \end{equation}
 Thus the discrepancy function must be
 \begin{equation}
