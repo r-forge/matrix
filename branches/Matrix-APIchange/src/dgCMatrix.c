@@ -309,9 +309,9 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
 
 SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
 {
-    cholmod_sparse *cx = as_cholmod_sparse(x);
-    cholmod_factor *L;
-    cholmod_dense *cy = as_cholmod_dense(y), *rhs, *cAns;
+    CHM_SP cx = AS_CHM_SP(x);
+    CHM_FR L;
+    CHM_DN cy = AS_CHM_DN(y), rhs, cAns;
     double one[] = {1,0}, zero[] = {0,0};
     SEXP ans = PROTECT(allocVector(VECSXP, 3));
 
@@ -340,7 +340,6 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
     cholmod_free_factor(&L, &c);
     cholmod_free_dense(&rhs, &c);
     cholmod_free_dense(&cAns, &c);
-    Free(cx); Free(cy);
     UNPROTECT(1);
     return ans;
 }

@@ -153,13 +153,16 @@ SEXP gCMatrix_colSums(SEXP x, SEXP NArm, SEXP spRes, SEXP trans, SEXP means)
 {
     int mn = asLogical(means), sp = asLogical(spRes), tr = asLogical(trans);
     /* cholmod_sparse: drawback of coercing lgC to double: */
-    cholmod_sparse *cx = as_cholmod_sparse(x);
+    CHM_SP cx = AS_CHM_SP(x);
+
     if (tr) {
 	cholmod_sparse *cxt = cholmod_transpose(cx, (int)cx->xtype, &c);
-	Free(cx);
 	cx = cxt;
     }
+
     /* everything else *after* the above potential transpose : */
+    /* Don't declarations here require the C99 standard?  Can we assume C99? */
+
     int j, nc = cx->ncol;
     int *xp = (int *)(cx -> p);
 #ifdef _has_x_slot_
@@ -202,7 +205,7 @@ SEXP gCMatrix_colSums(SEXP x, SEXP NArm, SEXP spRes, SEXP trans, SEXP means)
 	}
     }
 
-    if (tr) cholmod_free_sparse(&cx, &c); else Free(cx);
+    if (tr) cholmod_free_sparse(&cx, &c); 
     UNPROTECT(1);
     return ans;
 }
