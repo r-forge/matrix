@@ -3,15 +3,16 @@
 /* Functions for the lmer representation */
 
 				/* positions in the deviance vector */
-enum devP {ML_POS=0, REML_POS, ldZ_POS, ldX_POS, lr2_POS, bqd_POS, Sdr_POS};
-			/* {"ML", "REML", "ldZ", "ldX", "lr2", "bQuad" "sumDevR" ""} */
+/* FIXME: change the name ldZ to ldL2 here and in lmer.R */
+enum devP {ML_POS=0, REML_POS, ldZ_POS, ldX_POS, lpdisc_POS, bqd_POS};
+/* ("ML", "REML", "ldZ", "ldX", "lpdisc", "bqd") */
 				/* positions in the dims vector */
-enum dimP {nf_POS=0, n_POS, p_POS, q_POS, s_POS, np_POS, isREML_POS, famType_POS, isNest_POS};
-	      /* {"nf", "n", "p", "q", "s", "np", "isREML", "famType", "isNested"} */
+enum dimP {nf_POS=0, n_POS, p_POS, q_POS, s_POS, np_POS, isREML_POS, famType_POS, Nested_POS};
+/* ("nf", "n", "p", "q", "s", "np", "REML", "famType", "Nested") */
 
 #define isREML(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isREML_POS]
 #define isGLMM(x) (INTEGER(GET_SLOT(x, lme4_dimsSym))[famType_POS] >= 0)
-#define isNested(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isNest_POS]
+/* #define isNested(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isNest_POS] */
 
 /**
  * Allocate a 3-dimensional array
@@ -64,44 +65,6 @@ static SEXP R_INLINE getListElement(SEXP list, char *nm) {
 }
 
 /**
- * Check the ZtZ matrix to see if it is a simple design from a nested
- * sequence of grouping factors.
- *
- * @param nf number of factors
- * @param nc[] number of columns per factor
- * @param Gp[] group pointers
- * @param p[] column pointers for the lower triangle of ZtZ
- *
- * @return 1 for a simple nested sequence, 0 otherwise.
- */
-static int check_nesting(int nf, SEXP ST, const int Gp[], const int p[])
-{
-    int **cnz = Calloc(nf, int*), *nc = Calloc(nf, int), ans = 1, i, j, k, nct;
-
-    for (i = 0, nct = 0; i < nf; i++) { /* total number of columns */
-	nc[i] = *INTEGER(getAttrib(VECTOR_ELT(ST, i), R_DimSymbol));
-	nct += nc[i];
-	cnz[i] = Calloc(nc[i], int);
-    }
-    for (i = 0; i < nf; i++) {	/* target number of nonzeros per column */
-	for (j = 0; j < nc[i]; j++) cnz[i][j] = nct - j;
-	nct -= nc[i];
-    }
-    for (i = 0; i < nf && ans; i++) { /* check for consistent nonzeros*/
-	int nlev = (Gp[i + 1] - Gp[i])/nc[i];
-	for (j = 0; j < nlev && ans; j++) {
-	    for (k = 0; k < nc[i] && ans; k++) {
-		int jj =  Gp[i] + j * nc[i] + k; /* column in ZtZ */
-		if ((p[jj + 1] - p[jj]) != cnz[i][k]) ans = 0;
-	    }
-	}
-    }
-    for (i = 0, nct = 0; i < nf; i++) Free(cnz[i]);
-    Free(cnz); Free(nc);
-    return ans;
-}
-
-/**
  * Evaluate the logarithm of the square of the determinant of L
  * (i.e. the logarithm of the determinant of LL')
  *
@@ -139,24 +102,23 @@ chm_log_det2(CHM_FR L)
 }
 
 /**
- * Populate the st, nc and nlev arrays.  Return an indicator of
- * non-trivial T.
+ * Populate the st, nc and nlev arrays.  Return the maximum element of nc.
  *
  * @param nf number of random-effects terms
  * @param ST pointer to a list (length nf) of matrices
  * @param Gp pointer to integer vector (length nf + 1) of group
  * pointers
  * @param st length nf array of (double*) pointers to be filled with
- * pointers to the contents of the matrices in ST
+ * pointers to the contents of the matrices in ST.  Not used if NULL.
  * @param nc length nf array of ints to be filled with the number of
  * columns
  * @param nlev length nf array of ints to be filled with the number of
  * levels of the grouping factor for each term
  * 
- * @return 0 when T == the identity matrix (all nc[i] are 1) else 1
+ * @return maximum element of nc
  */
 static int			/* populate the st, nc and nlev arrays */
-st_nc_nlev(const SEXP ST, const int *Gp, double **st, int *nc, int *nlev)
+ST_nc_nlev(const SEXP ST, const int *Gp, double **st, int *nc, int *nlev)
 {
     int ans = 0, i, nf = LENGTH(ST);
 
@@ -164,8 +126,10 @@ st_nc_nlev(const SEXP ST, const int *Gp, double **st, int *nc, int *nlev)
 	SEXP STi = VECTOR_ELT(ST, i);
 	int nci = *INTEGER(getAttrib(STi, R_DimSymbol));
 
-	if (nci > 1) ans = 1;
-	st[i] = REAL(STi); nc[i] = nci; nlev[i] = (Gp[i + 1] - Gp[i])/nci;
+	if (nci > ans) ans = nci;
+	if (st) st[i] = REAL(STi);
+	nc[i] = nci;
+	nlev[i] = (Gp[i + 1] - Gp[i])/nci;
     }
     return ans;
 }
@@ -185,7 +149,93 @@ static int R_INLINE Gp_grp(int ind, int nf, const int *Gp)
     error(_("invalid row index %d (max is %d)"), ind, Gp[nf]);
     return -1;			/* -Wall */
 }
+
 	
+/**
+ * Determine the nonzero positions in the jth column of Vt
+ *
+ * @param nz array to hold the answer
+ * @param j column index
+ * @param nf number of groups of rows
+ * @param Gp group pointers
+ * @param zi row indices in Zt
+ * @param zp column pointers for Zt
+ *
+ * @return count of nonzeros in the jth column of Vt
+ */
+static int
+nz_col(int *nz, int j, int nf, const int *Gp, const int *nc,
+       const int *nlev, const int *zi, const int *zp)
+{
+    int ans, i, p;
+
+    AZERO(nz, Gp[nf]);
+    for (p = zp[j]; p < zp[j + 1]; p++) {
+	int zrow = zi[p];
+	int k = Gp_grp(zrow, nf, Gp);
+
+	nz[zrow] = 1;		/* T contains the identity */
+	if (nc[k] > 1) {
+	    int nextra = (zrow - Gp[k]) / nlev[k];
+	    for (i = 1; i <= nextra; i++)
+		nz[zrow - i * nlev[k]] = 1;
+	}
+    }
+    for (i = 0, ans = 0; i < Gp[nf]; i++) if (nz[i]) ans++;
+    return ans;
+}
+
+/**
+ * Create the Vt matrix pattern from Zt, ST and Gp
+ *
+ * @param Zt
+ * @param ST
+ * @param GpP
+ *
+ * @return Vt
+ */
+SEXP mer_create_Vt(SEXP Zt, SEXP ST, SEXP GpP)
+{
+    SEXP ans;
+    int *Gp = INTEGER(GpP), *nnz, *nz, *vi, *vp, *zdims, *zi, *zp,
+	ZtOK, j, nf = LENGTH(ST);
+    int *nc = Alloca(nf, int), *nlev = Alloca(nf, int);
+    R_CheckStack();
+				/* Trivial case, all nc == 1 */
+    if (ST_nc_nlev(ST, Gp, (double**)NULL, nc, nlev) <= 1)
+	return duplicate(Zt);
+				/* Check the nonzero pattern in Zt */
+    zdims = INTEGER(GET_SLOT(Zt, lme4_DimSym));
+    nnz = Alloca(zdims[1], int);
+    nz = Alloca(zdims[0], int);
+    R_CheckStack();
+    zi = INTEGER(GET_SLOT(Zt, lme4_iSym));
+    zp = INTEGER(GET_SLOT(Zt, lme4_pSym));
+    for (j = 0, ZtOK = 1; j < zdims[1]; j++) {
+	if (nz_col(nz, j, nf, Gp, nc, nlev, zi, zp) != (zp[j + 1] - zp[j]))
+	    ZtOK = 0;
+    }
+    if (ZtOK) return duplicate(Zt);
+				/* Must create a new dgCMatrix object */ 
+    ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix")));
+    SET_SLOT(ans, lme4_DimSym, duplicate(GET_SLOT(Zt, lme4_DimSym)));
+    SET_SLOT(ans, lme4_DimNamesSym, allocVector(VECSXP, 2));
+				/* create and evaluate the p slot */
+    vp = INTEGER(ALLOC_SLOT(ans, lme4_pSym, INTSXP, zdims[1] + 1));
+    vp[0] = 0;
+    for (j = 0; j < zdims[1]; j++) vp[j + 1] = vp[j] + nnz[j];
+    vi = INTEGER(ALLOC_SLOT(ans, lme4_iSym, INTSXP, vp[zdims[1]]));
+    AZERO(REAL(ALLOC_SLOT(ans, lme4_xSym, REALSXP, vp[zdims[1]])), vp[zdims[1]]);
+    for (j = 0; j < zdims[1]; j++) { /* fill in the i slot */
+	int i, pos = vp[j];
+	nz_col(nz, j, nf, Gp, nc, nlev, zi, zp);
+	for (i = 0; i < zdims[0]; i++) if (nz[i]) vi[pos++] = i;
+    }
+
+    UNPROTECT(1); 
+    return ans;
+}
+
 /**
  * Change the x slot in Vt according to ST'Zt
  *
@@ -196,21 +246,25 @@ static int R_INLINE Gp_grp(int ind, int nf, const int *Gp)
  *
  * @return square of determinant of L
  */
-static double
-internal_VtL_update(SEXP Zt, SEXP ST, const int *Gp,
-		    SEXP Vt, CHM_FR L)
+static void
+update_VtL(SEXP x)
 {
+    SEXP Zt = GET_SLOT(x, lme4_ZtSym),
+	ST = GET_SLOT(x, lme4_STSym),
+	Vt = GET_SLOT(x, lme4_VtSym);
+    int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym));
+    double *dev = REAL(GET_SLOT(x, lme4_devianceSym));
     CHM_SP cVt = AS_CHM_SP(Vt);
     int *vi = (int*)(cVt->i), *vp = (int*)(cVt->p),
 	fll = c.final_ll, nf = LENGTH(ST), p;
-    int *nc = (int*)alloca(nf * sizeof(int)),
-	*nlev = (int*)alloca(nf * sizeof(int)),
+    int *nc = Alloca(nf, int), *nlev = Alloca(nf, int),
 	nnz = vp[cVt->ncol];
-    double **st = (double**)alloca(nf * sizeof(double*)),
+    double **st = Alloca(nf, double*),
 	*vx = (double*)(cVt->x), one[] = {1,0};
-    
+    CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
     R_CheckStack();
-    if (st_nc_nlev(ST, Gp, st, nc, nlev)) { /* multiply by T' */
+
+    if (ST_nc_nlev(ST, Gp, st, nc, nlev) > 1) { /* multiply by T' */
 	error(_("Code not yet written"));
     } else Memcpy(vx, REAL(GET_SLOT(Zt, lme4_xSym)), nnz);
     for (p = 0; p < nnz; p++) {
@@ -222,18 +276,13 @@ internal_VtL_update(SEXP Zt, SEXP ST, const int *Gp,
 	error(_("cholmod_factorize_p failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
     c.final_ll = fll;
-
-    return chm_log_det2(L);
+    dev[ldZ_POS] = chm_log_det2(L);
 }
 
-SEXP VtL_update(SEXP x)
+SEXP mer_update_VtL(SEXP x)
 {
-    return ScalarReal(
-	internal_VtL_update(GET_SLOT(x, lme4_ZtSym),
-			    GET_SLOT(x, lme4_STSym),
-			    INTEGER(GET_SLOT(x, lme4_GpSym)),
-			    GET_SLOT(x, lme4_VtSym),
-			    AS_CHM_FR(GET_SLOT(x, lme4_LSym))));
+    update_VtL(x);
+    return ScalarReal(REAL(GET_SLOT(x, lme4_devianceSym))[ldZ_POS]);
 }
 
 /**
@@ -284,14 +333,13 @@ SEXP ST_initialize(SEXP ST, SEXP Gpp, SEXP Zt)
 	*Zdims = INTEGER(GET_SLOT(Zt, lme4_DimSym)),
 	*zi = INTEGER(GET_SLOT(Zt, lme4_iSym)),
 	i, j, k, nf = LENGTH(ST);
-    int *nc = (int*)alloca(nf * sizeof(int)),
-	*nlev = (int*)alloca(nf * sizeof(int)),
+    int *nc = Alloca(nf, int), *nlev = Alloca(nf, int),
 	nnz = INTEGER(GET_SLOT(Zt, lme4_pSym))[Zdims[1]];
-    double *rowsqr = (double*)alloca(Zdims[0] * sizeof(double)),
-	**st = (double**)alloca(nf * sizeof(double*)),
+    double *rowsqr = Alloca(Zdims[0], double),
+	**st = Alloca(nf, double*),
 	*zx = REAL(GET_SLOT(Zt, lme4_xSym));
     
-    st_nc_nlev(ST, Gp, st, nc, nlev);
+    ST_nc_nlev(ST, Gp, st, nc, nlev);
     AZERO(rowsqr, Zdims[0]);
     for (i = 0; i < nnz; i++) rowsqr[zi[i]] += zx[i] * zx[i];
     for (i = 0; i < nf; i++) {
@@ -390,198 +438,81 @@ chm_log_abs_det2(double *ans, int nans, const int *c, const CHM_FR F)
     return ans;
 }
 
-/**
- * Evaluate the elements of the deviance slot given a factorization of
- * A* and the dimensions vector.
- *
- * @param d pointer to the contents of the slot
- * @param dims dimensions
- * @param L factor of the current A*
- *
- * @return d
- */
-static double*
-internal_deviance(double *d, const int *dims, const CHM_FR L)
+static void
+PTpS_dense_mult(SEXP dest, SEXP ST, const int *Gp, SEXP src, int *Perm)
 {
-    int n = dims[n_POS], p = dims[p_POS], q = dims[q_POS];
-    int c[] = {0,  q, p + q, p + q + 1};
-    double dn = (double) n, dnmp = (double)(n - p);
-    
-    chm_log_abs_det2(d + ldZ_POS, lr2_POS + 1 - ldZ_POS, c, L);
-    d[ML_POS] = d[ldZ_POS] + dn * (1. + d[lr2_POS] + log(2. * PI / dn));
-    d[REML_POS] = d[ldZ_POS] + d[ldX_POS] + dnmp *
-	(1. + d[lr2_POS] + log(2. * PI / dnmp));
-    d[bqd_POS] = d[Sdr_POS] = 0.;
-    return d;
+    double *dx = REAL(dest), *sx = REAL(src);
+    int *dims = INTEGER(getAttrib(src, R_DimSymbol)), i, j, k, kk;
+    int m = dims[0], n = dims[1], ncmax, nf = LENGTH(ST);
+    int *nc = Alloca(nf, int), *nlev = Alloca(nf, int);
+    double **st = Alloca(nf, double*), *Sdiag = Alloca(m, double);
+    R_CheckStack();
+
+    ncmax = ST_nc_nlev(ST, Gp, st, nc, nlev);
+    for (i = 0; i < nf; i++)	/* create the diagonal of S(theta) */
+	for (k = 0; k < nc[i]; k++)
+	    for (kk = 0; kk < nlev[i]; kk++)
+		Sdiag[Gp[i] + k * nlev[i] + kk] = st[i][k * (nc[i] + 1)];
+    for (j = 0; j < n; j++) {
+	for (i = 0; i < m; i++)
+	    dx[j * m + i] = Sdiag[Perm[i]] * sx[j * m + Perm[i]];
+	if (ncmax > 1) error(_("Code not yet written"));
+    }
 }
 
 /**
- * Update A to A* and evaluate its numeric factorization in L.
+ * Evaluate the elements of the deviance slot in an lmer object
  *
- * @param deviance Hold the result
- * @param dims dimensions
- * @param Gp length nf+3 vector of group pointers for the rows of A
- * @param ST pointers to the nf ST factorizations of the diagonal
- *     elements of Sigma 
- * @param A symmetric matrix of size Gp[nf+2]
- * @param F factorization to be modified
+ * @param x pointer to an lmer object
  *
  */
 static void
-internal_update_L(double *deviance, int *dims, const int *Gp,
-		  SEXP ST, CHM_SP A, CHM_FR L)
+lmer_update_dev(SEXP x)
 {
-    CHM_SP Ac = M_cholmod_copy_sparse(A, &c);
-    int *ai = (int *)(Ac->i), *ap = (int *)(Ac->p), nf = *dims,
-	i, j, ione = 1;
-    double *ax = (double*)(Ac->x) , one[] = {1, 0};
-    
-
-    if ((!Ac->sorted) || Ac->stype <= 0) {
-	M_cholmod_free_sparse(&Ac, &c);
-	error(_("A must be a sorted cholmod_sparse object with stype > 0"));
-    }
-
-    for (i = 0; i < nf; i++) {
-	SEXP STi = VECTOR_ELT(ST, i);
-	double *st = REAL(STi);
-	int nci = INTEGER(getAttrib(STi, R_DimSymbol))[0];
-	int base = Gp[i], k, kk;
-	int ncip1 = nci + 1, nlev = (Gp[i + 1] - Gp[i])/nci;
-
-	/* if nci == 1 then T == I and the next section is skipped */
-	if (nci > 1) {	/* evaluate ith section of SAST */
-	    int maxrows = -1;
-	    double *db = Calloc(nci * nci, double), /* diagonal blcok */
-		*wrk = (double *) NULL;
-	    
-/* FIXME: calculate and store maxrows in lmer_create */
-	    if (nci > 2) {	/* calculate scratch storage size */
-		for (j = 0; j < nlev; j++) {
-		    int cj = base + j * nci; /* first column in this group */
-		    int nnzm1 = ap[cj + 1] - ap[cj] - 1;
-		    if (nnzm1 > maxrows) maxrows = nnzm1;
-		}
-		wrk = Calloc(maxrows * nci, double);
-	    }
-	    
-	    for (j = 0; j < nlev; j++) {
-		int cj = base + j * nci; /* first column in this block */
-		int nnz = ap[cj + 1] - ap[cj]; /* nonzeros in column cj */
-		int nnzm1 = nnz - 1;
-		
-		if (nnzm1) { /* elements above diagonal block to update */
-		    if (nci == 2)
-			F77_CALL(dtrmm)("R", "L", "N", "U", &nnzm1,
-					&nci, one, st, &nci,
-					ax + ap[cj], &nnz);
-		    else {	
-			for (k = 0; k < nci; k++) /* copy columns to wrk */
-			    Memcpy(wrk + k * maxrows, ax + ap[cj + k],
-				   nnzm1);
-			F77_CALL(dtrmm)("R", "L", "N", "U", &nnzm1,
-					&nci, one, st, &nci, wrk,
-					&maxrows);
-			for (k = 0; k < nci; k++) /* copy results back */
-			    Memcpy(ax + ap[cj + k], wrk + k * maxrows,
-				   nnzm1);
-		    }
-		    /* evaluate T'A for rows and columns in this block */
-		    for (k = 0; k < nci; k++) {
-			for (kk = 0; kk < nnzm1;) {
-			    int ind = ap[cj + k] + kk;
-			    if (Gp[i] <= ai[ind]) {
-				F77_CALL(dtrmv)("L", "T", "U", &nci,
-						st, &nci, ax + ind,
-						&ione);
-				kk += nci;
-			    } else kk++;
-			}
-		    }
-		}
-				/* update the diagonal block */
-		for (k = 0; k < nci; k++) /* copy upper triangle */
-		    Memcpy(db + k * nci, ax + ap[cj + k] + nnzm1, k + 1);
-		for (k = 1; k < nci; k++) /* symmetrize */
-		    for (kk = 0; kk < k; kk++)
-			db[k + kk * nci] = db[kk + k * nci];
-		F77_CALL(dtrmm)("L", "L", "T", "U", &nci, &nci, one,
-				st, &nci, db, &nci);
-		F77_CALL(dtrmm)("R", "L", "N", "U", &nci, &nci, one,
-				st, &nci, db, &nci);
-		for (k = 0; k < nci; k++) /* restore updated upper triangle */
-		    Memcpy(ax + ap[cj + k] + nnzm1, db + k * nci, k + 1);
-	    }
-	    if (nci > 2) Free(wrk);
-				/* evaluate T'AT for all blocks to the right */
-	    for (j = Gp[i+1]; j < Gp[nf + 2]; j++) {
-		for (k = ap[j]; k < ap[j + 1]; ) {
-		    if (ai[k] >= Gp[i + 1]) break;
-		    if (ai[k] < Gp[i]) {
-			k++;
-			continue;
-		    }
-		    F77_CALL(dtrmv)("L", "T", "U", &nci, st, &nci,
-				    ax + k, &ione);
-		    k += nci;
-		}
-	    }
-	    Free(db);
-	}
-				/* Multiply by S from left. */
-	for (j = Gp[i]; j < A->ncol; j++)
-	    for (k = ap[j]; k < ap[j+1]; k++) {
-		int row = ai[k];
-		if (row < Gp[i]) continue;
-		if (Gp[i + 1] <= row) break;
-		ax[k] *= st[((row - Gp[i]) % nci) * ncip1];
-	    }
-				/* Multiply by S from right */
-	for (j = Gp[i]; j < Gp[i + 1]; j += nci) {
-	    for (k = 0; k < nci; k++)
-		for (kk = ap[j + k]; kk < ap[j + k + 1]; kk++)
-		    ax[kk] *= st[k * ncip1];
-	}
-				/* Increment diagonal */
-	for (j = Gp[i]; j < Gp[i + 1]; j++) {
-	    k = ap[j + 1] - 1;
-	    if (ai[k] != j) error(_("Logic error"));
-	    ax[k]++;
-	}
-    }
-				/* force LL' decomp and sorted row indices */
-    i = c.final_ll; c.final_ll = TRUE;
-    j = c.final_monotonic; c.final_monotonic = TRUE;
-    if (!M_cholmod_factorize(Ac, L, &c)) { 
-	error(_("cholmod_factorize failed: status %d, minor %d from ncol %d"),
-	      c.status, L->minor, L->n);
-    }	
-				/* restore previous settings */
-    c.final_ll = i; c.final_monotonic = j;
-    internal_deviance(deviance, dims, L);
-    M_cholmod_free_sparse(&Ac, &c);
-}
-
-static R_INLINE void
-make_cholmod_sparse_sorted(CHM_SP A)
-{
-    if(!A->sorted) {
-	int i = M_cholmod_sort(A, &c); 
-	if(!i)
-	    error(_("cholmod_sort returned error code %d"),i);
-    }
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), j, info;
+    double *d = REAL(GET_SLOT(x, lme4_devianceSym)),
+	*rxy = REAL(GET_SLOT(x, lme4_RXySym)), dn = (double)(dims[n_POS]),
+	dnmp = (double)(dims[n_POS] - dims[p_POS]), mone = -1, one = 1;
+    SEXP RVXy = GET_SLOT(x, lme4_RVXySym);
+    CHM_DN cRVXy = AS_CHM_DN(RVXy), ans;
+    CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
+    int pp1 = cRVXy->ncol, q = cRVXy->nrow;
+    R_CheckStack();
+				/* Evaluate PT'SZ'[X:y] in RVXy */
+    PTpS_dense_mult(RVXy, GET_SLOT(x, lme4_STSym),
+		    INTEGER(GET_SLOT(x, lme4_GpSym)),
+		    GET_SLOT(x, lme4_ZtXySym), (int*)(L->Perm));
+				/* solve for RVXy */
+    ans = M_cholmod_solve(CHOLMOD_L, L, cRVXy, &c);
+    Memcpy(REAL(RVXy), (double*)(ans->x), pp1 *q);
+    M_cholmod_free_dense(&ans, &c);
+    				/* downdate XytXy  */
+    F77_CALL(dlacpy)("U", &pp1, &pp1, REAL(GET_SLOT(x, lme4_XytXySym)),
+		     &pp1, rxy, &pp1);
+    F77_CALL(dsyrk)("U", "T", &pp1, &q, &mone, REAL(RVXy),
+		    &q, &one, rxy, &pp1);
+    F77_CALL(dpotrf)("U", &pp1, rxy, &pp1, &info);
+    if (info)
+	error(_("the leading minor of order %d of the downdated [X:y]'[X:y] is not positive definite"),
+	      info);
+    d[lpdisc_POS] = 2 * log(rxy[pp1 * pp1 - 1]);
+    for (j = 0, d[ldX_POS] = 0; j < (pp1 - 1); j++)
+	d[ldX_POS] += 2 * log(rxy[j * (pp1 + 1)]);
+    d[ML_POS] = d[ldZ_POS] + dn * (1. + d[lpdisc_POS] + log(2. * PI / dn));
+    d[REML_POS] = d[ldZ_POS] + d[ldX_POS] + dnmp *
+	(1. + d[lpdisc_POS] + log(2. * PI / dnmp));
 }
 
 /**
- * Extract the parameters from ST
+ * Extract the parameters from ST list
  *
- * @param ST ST slot from an lmer object
- * @param pars double vector of the appropriate length
+ * @param ST ST slot from an mer object
+ * @param pars vector of the appropriate length
  *
  * @return pointer to the parameter vector
  */
 static double
-*internal_lmer_getPars(SEXP ST, double *pars)
+*internal_ST_getPars(SEXP ST, double *pars)
 {
     int i, nf = LENGTH(ST), pos = 0;
     for (i = 0; i < nf; i++) {
@@ -605,13 +536,13 @@ static double
  *
  * @return pointer to a REAL vector
  */
-SEXP lmer_getPars(SEXP x)
+SEXP ST_getPars(SEXP x)
 {
+    int np = INTEGER(GET_SLOT(x, lme4_dimsSym))[np_POS];
     SEXP ST = GET_SLOT(x, lme4_STSym);
-    SEXP ans = PROTECT(allocVector(REALSXP,
-				   INTEGER(GET_SLOT(x, lme4_dimsSym))[np_POS]));
+    SEXP ans = PROTECT(allocVector(REALSXP, np));
 
-    internal_lmer_getPars(ST, REAL(ans));
+    internal_ST_getPars(ST, REAL(ans));
     UNPROTECT(1); 
     return ans;
 }
@@ -625,7 +556,7 @@ SEXP lmer_getPars(SEXP x)
  * @return pointer to the updated ST object
  */
 static SEXP
-internal_lmer_setPars(const double *pars, SEXP ST)
+internal_ST_setPars(const double *pars, SEXP ST)
 {
     int i, nf = LENGTH(ST), pos = 0;
     for (i = 0; i < nf; i++) {
@@ -649,19 +580,17 @@ internal_lmer_setPars(const double *pars, SEXP ST)
  * @param x an lmer object
  * @param pars a REAL vector of the appropriate length
  *
- * @return x
  */
-SEXP lmer_setPars(SEXP x, SEXP pars)
+SEXP ST_setPars(SEXP x, SEXP pars)
 {
-    CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
+/*     CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym)); */
     SEXP ST = GET_SLOT(x, lme4_STSym);
     int npar = INTEGER(GET_SLOT(x, lme4_dimsSym))[np_POS];
 
-    R_CheckStack();
     if (!isReal(pars) || LENGTH(pars) != npar)
 	error(_("pars must be a real vector of length %d"), npar);
-    internal_lmer_setPars(REAL(pars), ST);
-    return x;
+    internal_ST_setPars(REAL(pars), ST);
+    return R_NilValue;
 }
 
 /**
@@ -672,6 +601,7 @@ SEXP lmer_setPars(SEXP x, SEXP pars)
  *
  * @return scalar REAL value
  */
+/* FIXME: Couldn't this just be an R function? */
 SEXP lmer_deviance(SEXP x, SEXP which)
 {
     int w = asInteger(which);
@@ -722,7 +652,7 @@ SEXP lmer_update_effects(SEXP x)
 static R_INLINE double
 internal_lmer_sigma(int REML, const int* dims, const double* deviance)
 {
-    return sqrt(exp(deviance[lr2_POS])/
+    return sqrt(exp(deviance[lpdisc_POS])/
 		((double)(dims[n_POS] - (REML ? dims[p_POS] : 0))));
 }
 
@@ -1141,9 +1071,10 @@ internal_ST_update(double sigma, int trans, const int *Gp,
 SEXP lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 		  SEXP verbosep, SEXP deviancep)
 {
-    SEXP ST = GET_SLOT(x, lme4_STSym), Pars = PROTECT(lmer_getPars(x)), ans;
+    SEXP ST = GET_SLOT(x, lme4_STSym), Pars = PROTECT(ST_getPars(x)), ans;
     CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
-    CHM_SP A = AS_CHM_SP(GET_SLOT(x, lme4_ASym));
+/*     CHM_SP Zt = AS_CHM_SP(GET_SLOT(x, lme4_ZtSym)), */
+/* 	Vt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym)); */
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)),
 	*Gp = INTEGER(GET_SLOT(x, lme4_GpSym));
     int dPOS = dims[REML_POS] ? REML_POS : ML_POS, i, j,
@@ -1171,7 +1102,7 @@ SEXP lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
     for (i = 0; i < nsamp; i++) {
 	double *col = ansp + i * nrtot, sigma;
 				/* simulate and store new value of sigma */
-	sigma = exp(deviance[lr2_POS]/2)/sqrt(rchisq(df));
+	sigma = exp(deviance[lpdisc_POS]/2)/sqrt(rchisq(df));
 	col[p] = (trans ? 2 * log(sigma) : sigma * sigma);
 	/* simulate new fixed and random effects */
 				/* Evaluate conditional estimates */
@@ -1186,9 +1117,6 @@ SEXP lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 	}
 	internal_ST_update(sigma, trans, Gp, nx, ST, col + p + 1);
 				/* Refactor and evaluate deviance */
-	internal_update_L(deviance, dims, Gp, ST, A, L);
-				/* store new variance-covariance parameters */
-				/* optionally store deviance */
 	/* FIXME: This deviance should be for sigma, beta, b, ST */
 	if (dev) col[nrbase] = deviance[dPOS]; 
 	if (verbose) Rprintf("%12.6g %14.8g\n", sigma, deviance[dPOS]);
@@ -1197,7 +1125,7 @@ SEXP lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
     if (saveb) Free(bstar);
     M_cholmod_free_dense(&chnew, &c);
 				/* Restore pars, refactor, etc. */
-    lmer_setPars(x, Pars);
+    ST_setPars(x, Pars);
     UNPROTECT(2);
     return ans;
 }
@@ -1209,15 +1137,16 @@ SEXP lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
  *
  * @return L
  */
-SEXP lmer_createL(SEXP Zt)
+SEXP mer_create_L(SEXP Vt)
 {
-    CHM_SP cZt = AS_CHM_SP(Zt);
-    CHM_FR L;
     double one[] = {1, 0};
     int fll = c.final_ll;
+    CHM_SP cVt = AS_CHM_SP(Vt);
+    CHM_FR L;
+    R_CheckStack();
 
-    L = M_cholmod_analyze(cZt, &c);
-    if (!M_cholmod_factorize_p(cZt, one, (int*)NULL, 0 /*fsize*/, L, &c))
+    L = M_cholmod_analyze(cVt, &c);
+    if (!M_cholmod_factorize_p(cVt, one, (int*)NULL, 0 /*fsize*/, L, &c))
 	error(_("cholmod_factorize_p failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
     c.final_ll = fll;
@@ -1226,14 +1155,14 @@ SEXP lmer_createL(SEXP Zt)
 }
 
 /**
- * Check validity of an lmer object.
+ * Check validity of an object that inherits from the mer class.
  *
- * @param x Pointer to an lmer object
+ * @param x Pointer to an lmer or glmer or nlmer object
  *
- * @return TRUE if the object is a valid lmer object, else a string
- * describing the nature of the violation.
+ * @return TRUE if the object is a valid mer object, otherwise a string
+ *         that describes the violation.
  */
-SEXP lmer_validate(SEXP x)
+SEXP mer_validate(SEXP x)
 {
     SEXP GpP = GET_SLOT(x, lme4_GpSym),
 	ST = GET_SLOT(x, lme4_STSym),
@@ -1241,41 +1170,45 @@ SEXP lmer_validate(SEXP x)
 	dimsP = GET_SLOT(x, lme4_dimsSym),
 	fixefP = GET_SLOT(x, lme4_fixefSym),
 	flistP = GET_SLOT(x, lme4_flistSym),
-	offsetP = GET_SLOT(x, lme4_offsetSym),
 	ranefP = GET_SLOT(x, lme4_ranefSym),
-	weightsP = GET_SLOT(x, lme4_weightsSym) ;
-    CHM_SP A = AS_CHM_SP(GET_SLOT(x, lme4_ASym)),
-	ZXyt = AS_CHM_SP(GET_SLOT(x, lme4_ZXytSym));
+	uvecP = GET_SLOT(x, lme4_uvecSym),
+	weightsP = GET_SLOT(x, lme4_weightsSym),
+	y = GET_SLOT(x, lme4_ySym);
+    CHM_SP Zt = AS_CHM_SP(GET_SLOT(x, lme4_ZtSym)),
+	Vt =  AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
     CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
     int *Gp = INTEGER(GpP), *dd = INTEGER(dimsP);
-    int nf = dd[nf_POS], n = dd[n_POS], p = dd[p_POS], q = dd[q_POS];
-    int i, nq, ppq1 = p + q + 1;
+    int i, n = dd[n_POS], nf = dd[nf_POS], nq,
+	p = dd[p_POS], q = dd[q_POS], s = dd[s_POS];
 
     R_CheckStack();
 				/* check lengths */
     if (nf < 1 || LENGTH(flistP) != nf || LENGTH(ST) != nf)
 	return mkString(_("Slots ST, and flist must have length nf"));
-    if (LENGTH(GpP) != (nf + 3))
-	return mkString(_("Slot Gp must have length nf + 3"));
-    if (Gp[0] != 0 || Gp[nf + 2] != ppq1)
-	return mkString(_("Gp[1] != 0 or Gp[nf+3] != p+q+1"));
-    if (p && LENGTH(fixefP) != p) /* p == 0 is a special case */
-	return mkString(_("Slot fixef must have length p"));
-    if (LENGTH(ranefP) != q)
-	return mkString(_("Slot ranef must have length q"));
+    if (LENGTH(GpP) != nf + 1)
+	return mkString(_("Slot Gp must have length dims['nf'] + 1"));
+    if (LENGTH(y) != n)
+	return mkString(_("Slot y must have length dims['n']"));
+    if (Gp[0] != 0 || Gp[nf] != q)
+	return mkString(_("Gp[1] != 0 or Gp[dims['nf'] + 1] != dims['q']"));
+    if (LENGTH(fixefP) != p)
+	return mkString(_("Slot fixef must have length ['p']"));
+    if (LENGTH(ranefP) != q || LENGTH(uvecP) != q)
+	return mkString(_("Slots ranef and uvec must have length dims['q']"));
     if (LENGTH(weightsP) && LENGTH(weightsP) != n)
-	return mkString(_("Slot weights must have length 0 or n"));
-    if (LENGTH(offsetP) && LENGTH(offsetP) != n)
-	return mkString(_("Slot offset must have length 0 or n"));
-    if (LENGTH(devianceP) != (Sdr_POS + 1) ||
-	LENGTH(getAttrib(devianceP, R_NamesSymbol)) != (Sdr_POS + 1))
+	return mkString(_("Slot weights must have length 0 or dims['n']"));
+    if (LENGTH(devianceP) != (bqd_POS + 1) ||
+	LENGTH(getAttrib(devianceP, R_NamesSymbol)) != (bqd_POS + 1))
 	return mkString(_("deviance slot not named or incorrect length"));
-    if (ZXyt->nrow != ppq1 || ZXyt->ncol != n)
-	return mkString(_("Slot ZXyt must have dimensions (p+q+1) by n"));
-    if (A->nrow != ppq1 || A->ncol != ppq1 || A->stype <= 0)
-	return mkString(_("Slot A must be symmetric (upper) of size (p+q+1)"));
-    if (L->n != ppq1 || !L->is_ll || !L->is_monotonic)
-	return mkString(_("Slot L must be a monotonic LL' factorization of size (p+q+1)"));
+    if (LENGTH(dimsP) != (Nested_POS + 1) ||
+	LENGTH(getAttrib(dimsP, R_NamesSymbol)) != (Nested_POS + 1))
+	return mkString(_("dims slot not named or incorrect length"));
+    if (L->n != q || !L->is_ll || !L->is_monotonic)
+	return mkString(_("Slot L must be a monotonic LL' factorization of size dims['q']"));
+    if (Zt->nrow != q || Zt->ncol != n * s)
+	return mkString(_("Slot Zt must by dims['q']  by dims['n']*dims['s']"));
+    if (Vt->nrow != q || Vt->ncol != n * s)
+	return mkString(_("Slot Zt must be dims['q']  by dims['n']*dims['s']"));
 
     nq = 0;
     for (i = 0; i < nf; i++) {
@@ -1296,16 +1229,115 @@ SEXP lmer_validate(SEXP x)
     return ScalarLogical(1);
 }
 
+#define BUF_SIZE 127
+
 /**
- * Remove the names attribute from an object
+ * Check the dimensions of the matrix pointer MP.
  *
- * @param x 
+ * @param buffer character buffer of length BUF_SIZE + 1
+ * @param nm name of matrix - used in the error message
+ * @param MP pointer to a matrix
  *
- * @return x without the names attribute
+ * @return TRUE if the object is a valid lmer object, else a string
+ * describing the nature of the violation.
  */
-static SEXP R_INLINE unname(SEXP x) {
-    setAttrib(x, R_NamesSymbol, R_NilValue);
-    return x;
+static char R_INLINE
+*chkDims(char *buffer, char *nm, SEXP MP, int nr, int nc)
+{
+    int *dd = isMatrix(MP) ?
+	INTEGER(getAttrib(MP, R_DimSymbol)) :
+	(int *)NULL;
+
+    if (!dd) error(_("Argument MP to chkDims is not a matrix"));
+    buffer[0] = '\0';
+    if (!isReal(MP) || dd[0] != nr || dd[1] != nc)
+	snprintf(buffer, BUF_SIZE,
+		 "Matrix %s must be a %d by %d numeric matrix",
+		nm, nr, nc);
+    return buffer;
+}
+
+/**
+ * Check validity of an lmer object.
+ *
+ * @param x Pointer to an lmer object
+ *
+ * @return TRUE if the object is a valid lmer object, else a string
+ * describing the nature of the violation.
+ */
+SEXP lmer_validate(SEXP x)
+{
+    SEXP XP = GET_SLOT(x, lme4_XSym),
+	offsetP = GET_SLOT(x, lme4_offsetSym);
+    int *dd = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int n = dd[n_POS], p = dd[p_POS], q = dd[q_POS];
+    int pp1 = p + 1;
+    char *buf = (char*)alloca((size_t)(BUF_SIZE + 1));
+    R_CheckStack();
+
+    /* Note: We don't need to check the matrix slots to see if they are matrices. */
+    dd = INTEGER(getAttrib(XP, R_DimSymbol)); 
+    if (!isReal(XP) || dd[1] != p)
+	return mkString(_("Slot X must be a numeric matrix with dims['p'] columns"));
+    if (dd[0] != 0 && dd[0] != n) /* special case */
+	return mkString(_("Slot X must be a numeric matrix 0 or dims['n'] columns"));
+    if (strlen(chkDims(buf, "ZtXy", GET_SLOT(x, lme4_ZtXySym), q, pp1)))
+	return mkString(buf);
+    if (strlen(chkDims(buf, "XytXy", GET_SLOT(x, lme4_XytXySym), pp1, pp1)))
+	return mkString(buf);
+    if (strlen(chkDims(buf, "RXy", GET_SLOT(x, lme4_RXySym), pp1, pp1)))
+	return mkString(buf);
+    if (strlen(chkDims(buf, "RVXy", GET_SLOT(x, lme4_RVXySym), q, pp1)))
+	return mkString(buf);
+    if (LENGTH(offsetP) && LENGTH(offsetP) != n)
+	return mkString(_("Slot offset must have length 0 or dims['n']"));
+
+    return ScalarLogical(1);
+}
+
+/**
+ * Check validity of an glmer object.
+ *
+ * @param x Pointer to an glmer object
+ *
+ * @return TRUE if the object is a valid glmer object, else a string
+ *         describing the nature of the violation.
+ */
+SEXP glmer_validate(SEXP x)
+{
+    int *dd = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int n = dd[n_POS], q = dd[q_POS];
+    SEXP XP = GET_SLOT(x, lme4_XSym),
+	offsetP = GET_SLOT(x, lme4_offsetSym);
+
+    /* Note: We don't need to check the matrix slots to see if they are matrices. */
+    dd = INTEGER(getAttrib(XP, R_DimSymbol)); 
+    if (!isReal(XP) || dd[0] != n || dd[1] != q)
+	return mkString(_("Slot X must be a dims['n'] by dims['q'] numeric matrix"));
+    if (LENGTH(offsetP) && LENGTH(offsetP) != n)
+	return mkString(_("Slot offset must have length 0 or dims['n']"));
+    return ScalarLogical(1);
+}
+
+/**
+ * Check validity of an nlmer object.
+ *
+ * @param x Pointer to an nlmer object
+ *
+ * @return TRUE if the object is a valid nlmer object, else a string
+ *         describing the nature of the violation.
+ */
+SEXP nlmer_validate(SEXP x)
+{
+    int *dd = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int n = dd[n_POS], p = dd[p_POS], s = dd[s_POS];
+    CHM_SP Xt = AS_CHM_SP(GET_SLOT(x, lme4_XtSym));
+    R_CheckStack();
+
+    if (Xt->nrow != p || Xt->ncol != n * s)
+	return mkString(_("Slot Xt must have dimensions p by n*s"));
+    
+    return ScalarLogical(1);
 }
 
 /* Functions common to nonlinear and generalized linear mixed models */
@@ -1350,59 +1382,6 @@ conv_crit(double etaold[], double eta[], int n) {
 	etaold[i] = eta[i];
     }
     return max_abs_diff / (0.1 + max_abs_eta);
-}
-
-static int*
-nz_col(int *nz, int j, int nf, const int *Gp,
-       const int *nc, const int *zi, const int *zp)
-{
-    int i, ii, k, nextra, zrow;
-    for (ii = zp[j]; ii < zp[j + 1]; ii++) {
-	k = Gp_grp(zrow = zi[ii], nf, Gp);
-	nextra = (zrow - Gp[k]) % nc[k];
-	for (i = 0; i <= nextra; i++) nz[zrow - i] = 1;
-    }
-    return nz;
-}
-
-SEXP nlmer_create_Vt(SEXP x)
-{
-    SEXP ST = GET_SLOT(x, lme4_STSym),
-	Zt = GET_SLOT(x, lme4_ZtSym),
-	ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix")));
-    SEXP Zdims = GET_SLOT(Zt, lme4_DimSym);
-    int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym)), *adims = INTEGER(Zdims),
-	*vi, *vp, *zi = INTEGER(GET_SLOT(Zt, lme4_iSym)),
-	*zp = INTEGER(GET_SLOT(Zt, lme4_pSym)),
-	i, j, nf = LENGTH(ST), nnz;
-    int *nc = Calloc(nf, int), *nz = Calloc(adims[0], int);
-    
-    SET_SLOT(ans, lme4_DimSym, duplicate(Zdims));
-    SET_SLOT(ans, lme4_DimNamesSym, allocVector(VECSXP, 2));
-    for (i = 0; i < nf; i++) 	/* populate nc */
-	nc[i] = *INTEGER(getAttrib(VECTOR_ELT(ST, i), R_DimSymbol));
-				/* create and evaluate the p slot */
-    vp = INTEGER(ALLOC_SLOT(ans, lme4_pSym, INTSXP, adims[1] + 1));
-    vp[0] = 0;
-    for (j = 0; j < adims[1]; j++) {
-	AZERO(nz, adims[0]);
-	nz_col(nz, j, nf, Gp, nc, zi, zp);
-	for (i = 0, nnz = 0; i < adims[0]; i++)
-	    if (nz[i]) nnz++;
-	vp[j + 1] = vp[j] + nnz;
-    }
-    vi = INTEGER(ALLOC_SLOT(ans, lme4_iSym, INTSXP, vp[adims[1]]));
-    AZERO(REAL(ALLOC_SLOT(ans, lme4_xSym, REALSXP, vp[adims[1]])), vp[adims[1]]);
-				/* fill in the i slot */
-    for (j = 0; j < adims[1]; j++) {
-	int pos = vp[j];
-	AZERO(nz, adims[0]);
-	nz_col(nz, j, nf, Gp, nc, zi, zp);
-	for (i = 0; i < adims[0]; i++) if (nz[i]) vi[pos++] = i;
-    }
-
-    UNPROTECT(1); Free(nc); Free(nz);
-    return ans;
 }
 
 /**
@@ -1500,46 +1479,6 @@ SEXP nlmer_update_ranef(SEXP x)
 
 /* Nonlinear mixed models */
 
-SEXP nlmer_validate(SEXP x)
-{
-    SEXP GpP = GET_SLOT(x, lme4_GpSym),
-	ST = GET_SLOT(x, lme4_STSym),
- 	devianceP = GET_SLOT(x, lme4_devianceSym),
-	dimsP = GET_SLOT(x, lme4_dimsSym),
-	fixefP = GET_SLOT(x, lme4_fixefSym),
-	flistP = GET_SLOT(x, lme4_flistSym),
-	ranefP = GET_SLOT(x, lme4_ranefSym),
-	weightsP = GET_SLOT(x, lme4_weightsSym) ;
-    CHM_SP Xt = AS_CHM_SP(GET_SLOT(x, lme4_XtSym)),
-	Zt = AS_CHM_SP(GET_SLOT(x, lme4_ZtSym));
-    CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
-    int *Gp = INTEGER(GpP), *dd = INTEGER(dimsP);
-    int nf = dd[nf_POS], n = dd[n_POS], p = dd[p_POS], q = dd[q_POS], s = dd[s_POS];
-
-    R_CheckStack();
-    if (!LENGTH(devianceP))
-	return mkString(_("deviance slot must have positive length"));
-    if (nf < 1 || LENGTH(flistP) != nf || LENGTH(ST) != nf)
-	return mkString(_("Slots ST, and flist must have length nf"));
-    if (LENGTH(GpP) != (nf + 1))
-	return mkString(_("Slot Gp must have length nf + 1"));
-    if (Gp[0] != 0 || Gp[nf] != q)
-	return mkString(_("Gp[1] != 0 or Gp[nf+1] != q"));
-    if (LENGTH(ranefP) != q)
-	return mkString(_("Slot ranef must have length q"));
-    if (LENGTH(fixefP) != p)
-	return mkString(_("Slot fixef must have length p"));
-    if (LENGTH(weightsP) && LENGTH(weightsP) != n)
-	return mkString(_("Slot weights must have length 0 or n"));
-    if (Zt->nrow != q || Zt->ncol != n * s)
-	return mkString(_("Slot Zt must have dimensions q by n*s"));
-    if (Xt->nrow != p || Xt->ncol != n * s)
-	return mkString(_("Slot Xt must have dimensions p by n*s"));
-    if (L->n != q || !L->is_ll || !L->is_monotonic)
-	return mkString(_("Slot L must be a monotonic LL' factorization of size q"));
-    
-    return ScalarLogical(1);
-}
 
 /**
  * Evaluate the nonlinear model, its gradient matrix and the residual
@@ -1630,7 +1569,7 @@ SEXP nlmer_create(SEXP env, SEXP model, SEXP frame, SEXP pnames,
 {
     SEXP ST, ans = PROTECT(NEW_OBJECT(MAKE_CLASS("nlmer")));
     char *DEVIANCE_NAMES[]={"ML","REML","ldZ","ldX","lr2", "bqd", "Sdr", ""};
-    char *DIMS_NAMES[]={"nf","n","p","q", "s", "np","isREML","famType","isNested",""};
+    char *DIMS_NAMES[]={"nf","n","p","q", "s", "np","isREML","famType","Nested",""};
     int *Gpp = INTEGER(Gp), *Zdims = INTEGER(GET_SLOT(Zt, lme4_DimSym)), *dims, i, iT;
     CHM_SP cVt, ts1, ts2;
     CHM_FR L;
@@ -1658,7 +1597,7 @@ SEXP nlmer_create(SEXP env, SEXP model, SEXP frame, SEXP pnames,
     dims[s_POS] = Zdims[1]/dims[n_POS];
     dims[isREML_POS] = FALSE;
     dims[famType_POS] = -1;
-    dims[isNest_POS] = TRUE;
+    dims[Nested_POS] = TRUE;
     SET_SLOT(ans, lme4_ranefSym, allocVector(REALSXP, Zdims[0]));
     AZERO(REAL(GET_SLOT(ans, lme4_ranefSym)), Zdims[0]);
     SET_SLOT(ans, lme4_uvecSym, allocVector(REALSXP, Zdims[0]));
@@ -1680,7 +1619,7 @@ SEXP nlmer_create(SEXP env, SEXP model, SEXP frame, SEXP pnames,
 	if (nci > 1) iT = FALSE;
     }
     ST_initialize(ST, Gp, Zt);	/* initialize ST */
-    SET_SLOT(ans, lme4_VtSym, iT ? duplicate(Zt) : nlmer_create_Vt(ans));
+    SET_SLOT(ans, lme4_VtSym, iT ? duplicate(Zt) : mer_create_Vt(Zt, ST, Gp));
     nlmer_update_Vt(ans);
     cVt = AS_CHM_SP(GET_SLOT(ans, lme4_VtSym));
     
@@ -1827,11 +1766,11 @@ static int internal_nbhat(SEXP x)
     nlmer_update_Vt(x);
     Memcpy(uold, u, q);
     for (i = 0; i < IRLS_MAXITER && crit > IRLS_TOL; i++) {
-	dev[Sdr_POS] = internal_nlmer_eval_model(x, 1);
+	dev[lpdisc_POS] = internal_nlmer_eval_model(x, 1);
 	for (j = 0, dev[bqd_POS] = 0; j < q; j++) dev[bqd_POS] += u[j] * u[j];
 #ifdef DEBUG_NLMER
-	Rprintf("%3d: %20.15g %20.15g %20.15g\n", i, dev[Sdr_POS], dev[bqd_POS],
-		dev[Sdr_POS] + dev[bqd_POS]);
+	Rprintf("%3d: %20.15g %20.15g %20.15g\n", i, dev[lpdisc_POS], dev[bqd_POS],
+		dev[lpdisc_POS] + dev[bqd_POS]);
 #endif
 	nlmer_update_Mt(x);
 	j = c.final_ll;
@@ -1851,10 +1790,10 @@ static int internal_nbhat(SEXP x)
 /* FIXME: replace this by an orthogonality convergence criterion */
  	crit = conv_crit(uold, u, q);
     }
-    dev[lr2_POS] = log(dev[Sdr_POS] + dev[bqd_POS]);
+    dev[lpdisc_POS] = log(dev[lpdisc_POS] + dev[bqd_POS]);
     chm_log_abs_det2(&(dev[ldZ_POS]), 1, zq, L);
     dev[ML_POS] = dev[REML_POS] =
-	dev[ldZ_POS] + dn * (1. + dev[lr2_POS] + log(2. * PI / dn));
+	dev[ldZ_POS] + dn * (1. + dev[lpdisc_POS] + log(2. * PI / dn));
 
     Free(uold);
     M_cholmod_free_dense(&cu, &c); M_cholmod_free_dense(&cMtz, &c);
@@ -2057,9 +1996,9 @@ SEXP glmer_dev_resids(SEXP x)
     SEXP rho = GET_SLOT(x, lme4_envSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
     int i, fltype = dims[famType_POS], n = dims[n_POS];
-    double *dev_res = REAL(findVarInFrame(rho, lme4_devResidSym))),
+    double *dev_res = REAL(findVarInFrame(rho, lme4_devResidSym)),
 	*mu = REAL(GET_SLOT(x, lme4_muSym)),
-	*wts = REAL(findVarInFrame(rho, lme4_pwtsSym))),
+	*wts = REAL(findVarInFrame(rho, lme4_pwtsSym)),
 	*y = REAL(findVarInFrame(rho, lme4_ySym)), sum;
 
     switch(fltype) {
@@ -2173,7 +2112,7 @@ SEXP glmer_create(SEXP env, SEXP frame, SEXP famName, SEXP call,
 {
     SEXP ST, ans = PROTECT(NEW_OBJECT(MAKE_CLASS("glmer")));
     char *DEVIANCE_NAMES[]={"ML","REML","ldZ","ldX","lr2", "bqd", "Sdr", ""};
-    char *DIMS_NAMES[]={"nf","n","p","q", "s", "np","isREML","famType","isNested",""};
+    char *DIMS_NAMES[]={"nf","n","p","q", "s", "np","isREML","famType","Nested",""};
     int *Gpp = INTEGER(Gp), *Zdims = INTEGER(GET_SLOT(Zt, lme4_DimSym)), *dims, i, iT;
     CHM_SP cVt;
     CHM_FR L;
@@ -2199,7 +2138,7 @@ SEXP glmer_create(SEXP env, SEXP frame, SEXP famName, SEXP call,
     dims[s_POS] = 0;
     dims[isREML_POS] = FALSE;
     dims[famType_POS] = flType(famName);
-    dims[isNest_POS] = TRUE;
+    dims[Nested_POS] = TRUE;
     SET_SLOT(ans, lme4_ranefSym, allocVector(REALSXP, Zdims[0]));
     AZERO(REAL(GET_SLOT(ans, lme4_ranefSym)), Zdims[0]);
     SET_SLOT(ans, lme4_uvecSym, allocVector(REALSXP, Zdims[0]));
@@ -2219,7 +2158,7 @@ SEXP glmer_create(SEXP env, SEXP frame, SEXP famName, SEXP call,
 	if (nci > 1) iT = FALSE;
     }
     ST_initialize(ST, Gp, Zt); /* initialize ST */
-    SET_SLOT(ans, lme4_VtSym, iT ? duplicate(Zt) : nlmer_create_Vt(ans));
+    SET_SLOT(ans, lme4_VtSym, iT ? duplicate(Zt) : mer_create_Vt(Zt, ST, Gp));
     nlmer_update_Vt(ans);
     cVt = AS_CHM_SP(GET_SLOT(ans, lme4_VtSym));
 
@@ -2323,27 +2262,26 @@ static void internal_gbhat(SEXP x)
 static double
 update_deviance(SEXP x, const double *xv, int mtype)
 {
-    SEXP ST = GET_SLOT(x, lme4_STSym),
-	fixefp = GET_SLOT(x, lme4_fixefSym);
+    SEXP ST = GET_SLOT(x, lme4_STSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
     double *dev = REAL(GET_SLOT(x, lme4_devianceSym));
 
-    internal_lmer_setPars(xv, ST); /* common parameters */
+    internal_ST_setPars(xv, ST); /* common parameters */
     switch(mtype) {
     case 0: {			  /* linear mixed model */
-	CHM_SP A = AS_CHM_SP(GET_SLOT(x, lme4_ASym));
-	CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
-	internal_update_L(dev, dims, INTEGER(GET_SLOT(x, lme4_GpSym)),
-			  ST, A, L);
+	update_VtL(x);
+	lmer_update_dev(x);
 	break;
     }
     case 1: {			  /* nonlinear mixed model */
-	Memcpy(REAL(fixefp), xv + dims[np_POS], dims[p_POS]);
+	Memcpy(REAL(GET_SLOT(x, lme4_fixefSym)),
+	       xv + dims[np_POS], dims[p_POS]);
 	internal_nbhat(x);
 	break;
     }
     case 2: {
-	Memcpy(REAL(fixefp), xv + dims[np_POS], dims[p_POS]);
+	Memcpy(REAL(GET_SLOT(x, lme4_fixefSym)),
+	       xv + dims[np_POS], dims[p_POS]);
 	internal_gbhat(x);
 	break;
     }
@@ -2364,7 +2302,7 @@ update_deviance(SEXP x, const double *xv, int mtype)
  * @return indicator of convergence from nlminb_iterate
  */
 SEXP 
-lmer_optimize(SEXP x, SEXP verbp, SEXP mtypep)
+mer_optimize(SEXP x, SEXP verbp, SEXP mtypep)
 {
     SEXP ST = GET_SLOT(x, lme4_STSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), i, j,
@@ -2375,7 +2313,7 @@ lmer_optimize(SEXP x, SEXP verbp, SEXP mtypep)
     double *b = Calloc(2 * nv, double), *d = Calloc(nv, double),
 	*g = (double*)NULL, *h = (double*)NULL,
 	*v = Calloc(lv, double),
-	*xv = internal_lmer_getPars(ST, Calloc(nv, double)),
+	*xv = internal_ST_getPars(ST, Calloc(nv, double)),
 	fx = R_PosInf;
 
     if (mtype) {
