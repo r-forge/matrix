@@ -14,6 +14,114 @@ setOldClass("family")
 setOldClass("logLik")
 setOldClass("terms")
 
+setClass("mer",        ## Slots common to all three types of mixed models
+	 representation(                 # original data
+                        frame = "data.frame", # model frame or empty frame
+                        call = "call",      # matched call to model-fitting function
+                        terms = "terms",    # terms for fixed-effects
+			flist = "list",     # list of grouping factors
+			Zt = "dgCMatrix",   # sparse form of Z'
+			weights = "numeric",# can be of length 0 for constant wts
+                        y = "numeric",      # response vector
+			cnames = "list",    # row/column names of matrices in ST
+			Gp = "integer",     # pointers to groups of rows in Zt
+                        dims = "integer",   # dimensions and indicators
+                                        # slots varying during optimization
+			ST = "list",        # list of TSST' rep of rel. var. mats
+			Vt = "dgCMatrix",   # sparse form of V'=(ZTS)'
+			L = "CHMfactor",    # sparse Cholesky factor of V'V + I
+			deviance = "numeric", # ML and REML deviance and components
+			fixef = "numeric",  # fixed effects coefficients (length p)
+			ranef = "numeric",  # random effects (length q)
+                        uvec = "numeric",   # orthogonal random effects s.t. b=TSP'u
+                        "VIRTUAL"),
+         validity = function(object) .Call(mer_validate, object))
+
+setClass("lmer",        ## linear mixed models
+	 representation(                 # original data
+                        X = "matrix",       # model matrix for fixed effects (may have 0 rows)
+                        ZtXy = "matrix",    # dense form of Z'[X:y]
+                        XytXy = "matrix",   # dense form of [X:y]'[X:y]
+                        offset = "numeric", # can be of length 0 for 0 offset
+                                        # slots varying during optimization
+                        RXy = "matrix",     # dense Cholesky factor of downdated XytXy
+                        RVXy = "matrix"),   # dense solution to L RVXy = S T'ZtXy
+         contains = "mer",
+         validity = function(object) .Call(lmer_validate, object))
+
+setClass("glmer",       ## generalized linear mixed models
+	 representation(                 # original data
+                        env = "environment",# environment of the family functions
+                        famName = "character",# name of generalized linear model family and link
+                        X = "matrix",       # model matrix for fixed effects
+                        offset = "numeric"), # can be of length 0 for 0 offset
+         contains = "mer",
+         validity = function(object) .Call(glmer_validate, object))
+
+setClass("nlmer",
+	 representation(                 # original data
+                        env = "environment",# evaluation environment for model
+                        pnames = "character", # parameter names for nonlinear model
+                        Xt = "dgCMatrix",   # sparse form of X'
+                                        # slots varying during optimization
+                        mu = "numeric",     # fitted values at current values of beta and b
+                        Mt = "dgCMatrix",   # transpose of gradient matrix d mu/d u
+                        uvec = "numeric"    # orthogonal random effects, u, s.t. b=TSu
+			),
+         validity = function(object) .Call(nlmer_validate, object))
+
+setClass("summary.lmer",
+	 representation(           # the "lmer" result ``enhanced'' :
+			methTitle = "character",
+			logLik= "logLik",
+			ngrps = "integer",
+			sigma = "numeric", # scale, non-negative number
+			coefs = "matrix",
+			vcov = "dpoMatrix",
+			REmat = "matrix",
+			AICtab= "data.frame"
+			),
+	 contains = "lmer")
+
+setClass("summary.glmer",          # the "glmer" result ``enhanced'' :
+	 representation(
+			methTitle = "character",
+			logLik= "logLik",
+			ngrps = "integer",
+			sigma = "numeric", # scale, non-negative number
+			coefs = "matrix",
+			vcov = "dpoMatrix",
+			REmat = "matrix",
+			AICtab= "data.frame"
+			),
+	 contains = "glmer")
+
+setClass("ranef.lmer", contains = "list")
+
+setClass("coef.lmer", contains = "list")
+
+setClass("pedigree", representation =
+	 list(sire = "integer", dam = "integer", label = "character"),
+	 validity = function(object) {
+	     n <- length(sire <- object@sire)
+	     if (length(dam <- object@dam) != n)
+		 return("sire and dam slots must be the same length")
+	     if (length(object@label) != n)
+		 return("'label' slot must have the same length as 'sire' and 'dam'")
+	     if(n == 0) return(TRUE)
+	     animal <- 1:n
+	     snmiss <- !is.na(sire)
+	     dnmiss <- !is.na(dam)
+	     if (any(sire[snmiss] >= animal[snmiss]) ||
+		 any(dam[dnmiss] >= animal[dnmiss]))
+		 return("the sire and dam must precede the offspring")
+             if (any(sire[snmiss] < 1 | sire[snmiss] > n) |
+                 any(dam[dnmiss] < 1 | dam[dnmiss] > n))
+                 return(paste("Non-missing sire or dam must be in [1,",
+                              n, "]", sep = ''))
+	     TRUE
+	 })
+
 ## ## mixed effects representation
 ## setClass("mer",
 ## 	 representation(## original data
@@ -69,92 +177,6 @@ setOldClass("terms")
 ##                         weights = "numeric"),
 ## 	 contains = "lmer")
 
-## Representation of linear mixed-effects model fits
-setClass("lmer",
-	 representation(## original data
-                        frame = "data.frame", # model frame or empty frame
-                        call = "call",      # matched call to model-fitting function
-                        terms = "terms",    # terms for fixed-effects
-			flist = "list",     # list of grouping factors
-			Zt = "dgCMatrix",   # sparse form of Z'
-                        X = "matrix",       # model matrix for fixed effects (may have 0 rows)
-                        y = "numeric",      # response vector
-                        ZtXy = "matrix",    # dense form of Z'[X:y]
-                        XytXy = "matrix",   # dense form of [X:y]'[X:y]
-			weights = "numeric",# can be of length 0 for constant wts
-                        offset = "numeric", # can be of length 0 for 0 offset
-			cnames = "list",    # row/column names of matrices in ST
-			Gp = "integer",     # pointers to groups of rows in Zt
-                        dims = "integer",   # dimensions and indicators
-			## slots that vary during the optimization
-			ST = "list",        # list of TSST' rep of rel. var. mats
-			Vt = "dgCMatrix",   # sparse form of V'=(ZTS)'
-			L = "CHMfactor",    # sparse Cholesky factor of V'V + I
-                        LXy = "matrix",     # dense Cholesky factor of downdated XytXy
-                        LVXy = "matrix",    # dense solution to L LVXy = S T'ZtXy (P not used)
-			deviance = "numeric", # ML and REML deviance and components
-			## Secondary slots only evaluated when requested.
-			fixef = "numeric",
-			ranef = "numeric"
-			)
-#         , validity = function(object) .Call(lmer2_validate, object)
-         )
-
-setClass("glmer",
-	 representation(## original data
-                        env = "environment", # environment of the family functions
-                        famName = "character",# name of generalized linear model family and link
-                        frame = "data.frame", # model frame or empty frame
-                        call = "call",	    # matched call to model-fitting function
-			flist = "list",     # list of grouping factors
-                        X = "numeric",      # model matrix for fixed effects
-                        y = "numeric",      # response vector
-			Zt = "dgCMatrix",   # sparse representation of Z'
-			cnames = "list",    # column names of model matrices
-			Gp = "integer",     # pointers to groups of columns in Z
-                        dims = "integer",   # dimensions and indicators
-			## slots that vary during the optimization
-			ST = "list",        # list of TSST' rep of rel. var. mats
-			Vt = "dgCMatrix",   # sparse form of V'=(ZTS)'
-			L = "CHMfactor",    # sparse Cholesky factor of V'V + I
-			deviance = "numeric", # ML deviance and its components
-			fixef = "numeric",  # the fixed effects, beta
-			ranef = "numeric",  # the random effects, b
-                        uvec = "numeric"    # orthogonal random effects, u, s.t. b=TSu
-			),
-         validity = function(object) .Call(glmer_validate, object)
-     )
-
-setClass("nlmer",
-	 representation(## original data
-                        env = "environment", # evaluation environment for model
-                        model = "call",     # model function as a function call
-                        frame = "data.frame", # model frame or empty frame
-                        pnames = "character", # parameter names for nonlinear model
-                        call = "call",	    # matched call to model-fitting function
-			flist = "list",     # list of grouping factors
-                        Xt = "dgCMatrix",   # sparse form of X'
-			Zt = "dgCMatrix",   # sparse form of Z'
-                        y = "numeric",      # response
-			weights = "numeric",# can be of length 0 for constant wts
-			cnames = "list",    # column names of model matrices
-			Gp = "integer",     # pointers to groups of columns in Z
-                        dims = "integer",   # dimensions and indicators
-			## slots that vary during the optimization
-			ST = "list",        # list of TSST' rep of rel. var. mats
-			Vt = "dgCMatrix",   # sparse form of V'=(ZTS)'
-			L = "CHMfactor",    # sparse Cholesky factor of V'V + I
-                        mu = "numeric",     # fitted values at current values of beta and b
-                        Mt = "dgCMatrix",   # transpose of gradient matrix d mu/d u
-			deviance = "numeric", # ML and REML deviance and components
-			fixef = "numeric",  # the fixed effects, beta
-			ranef = "numeric",  # the random effects, b
-                        uvec = "numeric"    # orthogonal random effects, u, s.t. b=TSu
-			),
-         validity = function(object) .Call(nlmer_validate, object)
-         )
-
-
 ## setClass("summary.mer", # the "mer" result ``enhanced'' :
 ## 	 representation(
 ## 			isG   = "logical",
@@ -168,56 +190,3 @@ setClass("nlmer",
 ## 			AICtab= "data.frame"
 ## 			),
 ## 	 contains = "mer")
-
-setClass("summary.lmer", # the "lmer2" result ``enhanced'' :
-	 representation(
-			methTitle = "character",
-			logLik= "logLik",
-			ngrps = "integer",
-			sigma = "numeric", # scale, non-negative number
-			coefs = "matrix",
-			vcov = "dpoMatrix",
-			REmat = "matrix",
-			AICtab= "data.frame"
-			),
-	 contains = "lmer")
-
-setClass("summary.glmer", # the "lmer2" result ``enhanced'' :
-	 representation(
-			methTitle = "character",
-			logLik= "logLik",
-			ngrps = "integer",
-			sigma = "numeric", # scale, non-negative number
-			coefs = "matrix",
-			vcov = "dpoMatrix",
-			REmat = "matrix",
-			AICtab= "data.frame"
-			),
-	 contains = "glmer")
-
-setClass("ranef.lmer", contains = "list")
-
-setClass("coef.lmer", contains = "list")
-
-setClass("pedigree", representation =
-	 list(sire = "integer", dam = "integer", label = "character"),
-	 validity = function(object) {
-	     n <- length(sire <- object@sire)
-	     if (length(dam <- object@dam) != n)
-		 return("sire and dam slots must be the same length")
-	     if (length(object@label) != n)
-		 return("'label' slot must have the same length as 'sire' and 'dam'")
-	     if(n == 0) return(TRUE)
-	     animal <- 1:n
-	     snmiss <- !is.na(sire)
-	     dnmiss <- !is.na(dam)
-	     if (any(sire[snmiss] >= animal[snmiss]) ||
-		 any(dam[dnmiss] >= animal[dnmiss]))
-		 return("the sire and dam must precede the offspring")
-             if (any(sire[snmiss] < 1 | sire[snmiss] > n) |
-                 any(dam[dnmiss] < 1 | dam[dnmiss] > n))
-                 return(paste("Non-missing sire or dam must be in [1,",
-                              n, "]", sep = ''))
-	     TRUE
-	 })
-
