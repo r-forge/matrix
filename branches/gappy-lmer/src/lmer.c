@@ -11,7 +11,8 @@ enum dimP {nf_POS=0, n_POS, p_POS, q_POS, s_POS, np_POS, isREML_POS, famType_POS
 /* ("nf", "n", "p", "q", "s", "np", "REML", "famType", "Nested") */
 
 #define isREML(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isREML_POS]
-#define isGLMM(x) (INTEGER(GET_SLOT(x, lme4_dimsSym))[famType_POS] >= 0)
+#define L_SLOT(x) AS_CHM_FR(GET_SLOT(x, lme4_LSym))
+/* #define isGLMM(x) (INTEGER(GET_SLOT(x, lme4_dimsSym))[famType_POS] >= 0) */
 /* #define isNested(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isNest_POS] */
 
 /**
@@ -164,7 +165,7 @@ static int R_INLINE Gp_grp(int ind, int nf, const int *Gp)
  * @return count of nonzeros in the jth column of Vt
  */
 static int
-nz_col(int *nz, int j, int nf, const int *Gp, const int *nc,
+Vt_nz_col(int *nz, int j, int nf, const int *Gp, const int *nc,
        const int *nlev, const int *zi, const int *zp)
 {
     int ans, i, p;
@@ -209,10 +210,11 @@ SEXP mer_create_Vt(SEXP Zt, SEXP ST, SEXP GpP)
     nnz = Alloca(zdims[1], int);
     nz = Alloca(zdims[0], int);
     R_CheckStack();
+
     zi = INTEGER(GET_SLOT(Zt, lme4_iSym));
     zp = INTEGER(GET_SLOT(Zt, lme4_pSym));
     for (j = 0, ZtOK = 1; j < zdims[1]; j++) {
-	if (nz_col(nz, j, nf, Gp, nc, nlev, zi, zp) != (zp[j + 1] - zp[j]))
+	if (Vt_nz_col(nz, j, nf, Gp, nc, nlev, zi, zp) != (zp[j + 1] - zp[j]))
 	    ZtOK = 0;
     }
     if (ZtOK) return duplicate(Zt);
@@ -261,10 +263,11 @@ update_VtL(SEXP x)
 	nnz = vp[cVt->ncol];
     double **st = Alloca(nf, double*),
 	*vx = (double*)(cVt->x), one[] = {1,0};
-    CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
+    CHM_FR L = L_SLOT(x);
     R_CheckStack();
 
     if (ST_nc_nlev(ST, Gp, st, nc, nlev) > 1) { /* multiply by T' */
+/* FIXME: Should dtrmm be used here by setting the stride? */
 	error(_("Code not yet written"));
     } else Memcpy(vx, REAL(GET_SLOT(Zt, lme4_xSym)), nnz);
     for (p = 0; p < nnz; p++) {
@@ -297,6 +300,7 @@ SEXP mer_update_VtL(SEXP x)
 static double *TS_mult(const int *Gp, SEXP ST, double *b)
 {
     int i, ione = 1, nf = LENGTH(ST);
+/* FIXME: Use ST_nc_nlev here */
 
     for (i = 0; i < nf; i++) {
 	SEXP STi = VECTOR_ELT(ST, i);
@@ -309,6 +313,7 @@ static double *TS_mult(const int *Gp, SEXP ST, double *b)
 	    int base = Gp[i] + j * nci;
 	    for (k = 0; k < nci; k++) /* multiply by S_i */
 		b[base + k] *= st[k * ncip1];
+/* FIXME: This doesn't use the gappy lmer format */
 	    if (nci > 1) 	/* multiply by T_i */
 		F77_CALL(dtrmv)("L", "N", "U", &nci, st, &nci,
 				b + base, &ione);
@@ -475,7 +480,7 @@ lmer_update_dev(SEXP x)
 	dnmp = (double)(dims[n_POS] - dims[p_POS]), mone = -1, one = 1;
     SEXP RVXy = GET_SLOT(x, lme4_RVXySym);
     CHM_DN cRVXy = AS_CHM_DN(RVXy), ans;
-    CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
+    CHM_FR L = L_SLOT(x);
     int pp1 = cRVXy->ncol, q = cRVXy->nrow;
     R_CheckStack();
 				/* Evaluate PT'SZ'[X:y] in RVXy */
@@ -583,7 +588,7 @@ internal_ST_setPars(const double *pars, SEXP ST)
  */
 SEXP ST_setPars(SEXP x, SEXP pars)
 {
-/*     CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym)); */
+/*     CHM_FR L = L_SLOT(x); */
     SEXP ST = GET_SLOT(x, lme4_STSym);
     int npar = INTEGER(GET_SLOT(x, lme4_dimsSym))[np_POS];
 
@@ -620,7 +625,7 @@ SEXP lmer_deviance(SEXP x, SEXP which)
  */
 SEXP lmer_update_effects(SEXP x)
 {
-    CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
+    CHM_FR L = L_SLOT(x);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), i;
     int q = dims[q_POS];
     double *b = REAL(GET_SLOT(x, lme4_ranefSym)), *bstbx,
@@ -690,7 +695,7 @@ SEXP lmer_vcov(SEXP x)
     SEXP ans = PROTECT(allocMatrix(REALSXP, p, p));
 
     if (p) {
-	CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
+	CHM_FR L = L_SLOT(x);
 	 /* need a copy because factor_to_sparse changes 1st arg */
 	CHM_FR Lcp = M_cholmod_copy_factor(L, &c);
 	CHM_SP Lsp, Lred; /* sparse and reduced-size sparse */
@@ -777,7 +782,7 @@ SEXP lmer_postVar(SEXP x)
     int i, j, nf = dims[nf_POS], p = dims[p_POS], q = dims[q_POS];
     int ppq = p + q;
     double sc = internal_lmer_sigma(isREML(x), dims, deviance);
-    CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym)), Lcp = (CHM_FR) NULL;
+    CHM_FR L = L_SLOT(x), Lcp = (CHM_FR) NULL;
     CHM_SP rhs, B, Bt, BtB;
     CHM_DN BtBd;
     int *Perm = (int*)(L->Perm), *iperm = Calloc(ppq, int),
@@ -1072,7 +1077,7 @@ SEXP lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 		  SEXP verbosep, SEXP deviancep)
 {
     SEXP ST = GET_SLOT(x, lme4_STSym), Pars = PROTECT(ST_getPars(x)), ans;
-    CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
+    CHM_FR L = L_SLOT(x);
 /*     CHM_SP Zt = AS_CHM_SP(GET_SLOT(x, lme4_ZtSym)), */
 /* 	Vt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym)); */
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)),
@@ -1176,7 +1181,7 @@ SEXP mer_validate(SEXP x)
 	y = GET_SLOT(x, lme4_ySym);
     CHM_SP Zt = AS_CHM_SP(GET_SLOT(x, lme4_ZtSym)),
 	Vt =  AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
-    CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
+    CHM_FR L = L_SLOT(x);
     int *Gp = INTEGER(GpP), *dd = INTEGER(dimsP);
     int i, n = dd[n_POS], nf = dd[nf_POS], nq,
 	p = dd[p_POS], q = dd[q_POS], s = dd[s_POS];
@@ -1754,7 +1759,7 @@ static int internal_nbhat(SEXP x)
 {
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), i, j;
     int n = dims[n_POS], q = dims[q_POS], zq[] = {0, dims[q_POS]};
-    CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
+    CHM_FR L = L_SLOT(x);
     CHM_DN cz = M_cholmod_allocate_dense(n, 1, n, CHOLMOD_REAL, &c),
 	cu, cMtz = M_cholmod_allocate_dense(q, 1, q, CHOLMOD_REAL, &c);
     CHM_SP Mt = AS_CHM_SP(GET_SLOT(x, lme4_MtSym));
@@ -2199,7 +2204,7 @@ internal_glmer_update_L(SEXP x)
     SEXP rho = GET_SLOT(x, lme4_envSym);
     CHM_SP Vt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
     CHM_SP wV = M_cholmod_copy_sparse(Vt, &c);
-    CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
+    CHM_FR L = L_SLOT(x);
     double *u = REAL(GET_SLOT(x, lme4_uvecSym)), *w, *z;
     int *wi = (int*)(wV->i), *wp = (int*)(wV->p),
 	i, j, m = wV->nrow, n = wV->ncol;
