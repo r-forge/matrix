@@ -14,8 +14,8 @@ setOldClass("family")
 setOldClass("logLik")
 setOldClass("terms")
 
-setClass("mer",        ## Slots common to all three types of mixed models
-	 representation(                 # original data
+setClass("mer", ## Slots common to all three types of mixed models
+	 representation(## original data
                         frame = "data.frame", # model frame or empty frame
                         call = "call",      # matched call to model-fitting function
                         terms = "terms",    # terms for fixed-effects
@@ -26,48 +26,51 @@ setClass("mer",        ## Slots common to all three types of mixed models
 			cnames = "list",    # row/column names of matrices in ST
 			Gp = "integer",     # pointers to groups of rows in Zt
                         dims = "integer",   # dimensions and indicators
-                                        # slots varying during optimization
+                        ## slots that vary during optimization
 			ST = "list",        # list of TSST' rep of rel. var. mats
-			Vt = "dgCMatrix",   # sparse form of V'=(ZTS)'
 			L = "CHMfactor",    # sparse Cholesky factor of V'V + I
 			deviance = "numeric", # ML and REML deviance and components
 			fixef = "numeric",  # fixed effects coefficients (length p)
 			ranef = "numeric",  # random effects (length q)
-                        uvec = "numeric",   # orthogonal random effects s.t. b=TSP'u
                         "VIRTUAL"),
          validity = function(object) .Call(mer_validate, object))
 
-setClass("lmer",        ## linear mixed models
-	 representation(                 # original data
+setClass("lmer", ## linear mixed models
+	 representation(## original data
                         X = "matrix",       # model matrix for fixed effects (may have 0 rows)
                         ZtXy = "matrix",    # dense form of Z'[X:y]
                         XytXy = "matrix",   # dense form of [X:y]'[X:y]
-                        offset = "numeric", # can be of length 0 for 0 offset
-                                        # slots varying during optimization
+                        offset = "numeric", # can be length 0 (for no offset)
+                        ## slots that vary during optimization
                         RXy = "matrix",     # dense Cholesky factor of downdated XytXy
-                        RVXy = "matrix"),   # dense solution to L RVXy = S T'ZtXy
+                        RVXy = "matrix",   # dense solution to L RVXy = S T'ZtXy
+			Vt = "dgCMatrix"),   # sparse form of V'=(ZTS)'
          contains = "mer",
          validity = function(object) .Call(lmer_validate, object))
 
-setClass("glmer",       ## generalized linear mixed models
-	 representation(                 # original data
-                        env = "environment",# environment of the family functions
+setClass("glmer", ## generalized linear mixed models
+	 representation(## original data
+                        env = "environment",# evaluation environment for the family functions
                         famName = "character",# name of generalized linear model family and link
                         X = "matrix",       # model matrix for fixed effects
-                        offset = "numeric"), # can be of length 0 for 0 offset
+                        offset = "numeric", # can be length 0 (for no offset)
+                        ## slots that vary during optimization
+			Vt = "dgCMatrix",   # sparse form of V'=(ZTS)'
+                        uvec = "numeric"),  # orthogonal random effects (length q)
          contains = "mer",
          validity = function(object) .Call(glmer_validate, object))
 
-setClass("nlmer",
-	 representation(                 # original data
+setClass("nlmer", ## nonlinear mixed models
+	 representation(## original data
                         env = "environment",# evaluation environment for model
+                        model = "call",     # nonlinear model
                         pnames = "character", # parameter names for nonlinear model
                         Xt = "dgCMatrix",   # sparse form of X'
-                                        # slots varying during optimization
+                        ## slots that vary during optimization
                         mu = "numeric",     # fitted values at current values of beta and b
                         Mt = "dgCMatrix",   # transpose of gradient matrix d mu/d u
-                        uvec = "numeric"    # orthogonal random effects, u, s.t. b=TSu
-			),
+                        uvec = "numeric"),  # orthogonal random effects
+         contains = "mer",
          validity = function(object) .Call(nlmer_validate, object))
 
 setClass("summary.lmer",
