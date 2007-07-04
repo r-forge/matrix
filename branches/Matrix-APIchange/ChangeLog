@@ -1,3 +1,26 @@
+2007-07-04 16:21  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4543] src/cs_utils.c, src/cs_utils.h, src/dgCMatrix.c,
+	  src/dtCMatrix.c, src/sparseQR.c: CSP typedef for *cs and macro
+	  AS_CSP. API change - pass the empty structure to Matrix_as_cs.
+
+2007-07-01 13:27  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4529] .: Create a branch for the API changes from the 0.99875
+	  series to the 0.999375 series
+	* [r4530] DESCRIPTION, inst/include/Matrix.h,
+	  inst/include/Matrix_stubs.c, src/CHMfactor.c, src/Csparse.c,
+	  src/Mutils.h, src/Tsparse.c, src/chm_common.c, src/chm_common.h,
+	  src/dense.c, src/dgCMatrix.c, src/dsCMatrix.c, src/dtTMatrix.c,
+	  src/t_gCMatrix_colSums.c: API change - pass the empty structure to the
+	  as_cholmod_x functions
+
+2007-06-30 09:05  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* [r4527] trunk/Matrix/DESCRIPTION, trunk/Matrix/NAMESPACE,
+	  trunk/Matrix/inst/doc/Comparisons.Rnw: add session- and hardware-info
+	  to Comparisons
+
 2007-06-29  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.99875-3 ready to be released.
