@@ -16,7 +16,7 @@ VecFromNames <- function(nms, mode = "numeric")
     ans
 }
 .dims_names <- c("nf", "n", "p", "q", "s", "np", "REML", "famType", "Nested")
-.dev_names <- c("ML", "REML", "ldZ", "ldX", "lpdisc", "bqd")
+.dev_names <- c("ML", "REML", "ldL2", "ldRX2", "lpdisc", "bqd")
 
 ### Utilities for parsing the mixed model formula
 
@@ -276,7 +276,6 @@ mkFltype <- function(family)
     as.integer(fltype)
 }
 
-
 mkFamilyEnv <- function(glmFit)
 ### Create and populate the family function evaluation environment.
 {
@@ -324,7 +323,7 @@ lmer <-
     ST <- lapply(nc, function(n) matrix(0, n, n))
     .Call(ST_initialize, ST, Gp, Zt)
     if (!is.null(start) && checkSTform(ST, start)) ST <- start
-    Vt <- .Call(mer_create_Vt, Zt, ST, Gp)
+    Vt <- .Call(mer_create_Vt, Zt, ST, Gp, 1L)
 
     ## Create the dense matrices to be used in the deviance evaluation
     ### FIXME: incorporate weights and offset in the creation of ZtXy et al.
@@ -347,7 +346,7 @@ lmer <-
     dd["np"] <- as.integer(sum(nvc))    # number of parameters in optimization
     dd["REML"] <- match.arg(method) == "REML"
 
-    mer <- new("lmer",
+    ans <- new("lmer",
                frame = if (model) fr$mf else fr$mf[0,],
                call = mc, terms = fr$mt, flist = flist,
                Zt = Zt, X = if (x) fr$X else fr$X[0,],
@@ -360,11 +359,12 @@ lmer <-
                dims = dd, ST = ST, Vt = Vt,
                L = .Call(mer_create_L, Vt), RXy = RXy, RVXy = ZtXy,
                deviance = VecFromNames(.dev_names),
-               fixef = numeric(dd["p"]), ranef = numeric(dd["q"]),
-               uvec = numeric(dd["q"]))
-#    .Call(lmer_optimize, mer, cv$msVerbose, 0)
-#    .Call(lmer_update_effects, mer)
-    mer
+               fixef = numeric(dd["p"]), ranef = numeric(dd["q"]))
+    cv <- do.call("lmerControl", control)
+    if (missing(verbose)) verbose <- cv$msVerbose
+#    .Call(lmer_optimize, ans, verbose, 0)
+#    .Call(lmer_update_effects, ans)
+    ans
 }
 
 glmer <-
@@ -374,13 +374,7 @@ function(formula, data, family = gaussian, method = c("Laplace", "AGQ"),
 ### Fit a generalized linear mixed model
 {
     mc <- match.call()
-    stopifnot(length(formula <- as.formula(formula)) == 3)
-
-    ## Establish model frame, fixed-effects model matrix and terms
-    fr <- lmerFrames(mc, formula, contrasts)
-    storage.mode(fr$X) <- "double" # when ncol(X) == 0, X is logical
-
-    ## Evaluate and check the family
+                                        # Evaluate and check the family
     if(is.character(family))
         family <- get(family, mode = "function", envir = parent.frame(2))
     if(is.function(family)) family <- family()
@@ -390,26 +384,62 @@ function(formula, data, family = gaussian, method = c("Laplace", "AGQ"),
         mc$family <- NULL
         return(eval.parent(mc))
     }
+    stopifnot(length(formula <- as.formula(formula)) == 3)
 
-    ## Fit a generalized linear model to the fixed effects only.
-    glmFit <- glm.fit(fr$X, fr$Y, weights = fr$weights,
+    fr <- lmerFrames(mc, formula, contrasts) # model frame, X, etc.
+    glmFit <- glm.fit(fr$X, fr$Y, weights = fr$weights, # glm on f.e.
                       offset = fr$offset, family = family,
                       intercept = attr(fr$mt, "intercept") > 0)
-    ## establish factor list and Ztl
-    FL <- lmerFactorList(formula, fr$mf, mkFltype(family))
-    Ztl <- with(FL, .Call(Ztl_sparse, fl, Ztl))
-    val <- .Call(glmer_create, env = mkFamilyEnv(glmFit), frame = fr$mf,
-                 famName = unlist(glmFit$family[c("family", "link")]),
-                 call = mc, flist = FL$fl, X = fr$X,
-                 Zt = do.call(rBind, Ztl), y = unname(as.double(glmFit$y)),
-                 cnames = lapply(FL$Ztl, rownames),
-                 Gp = unname(c(0L, cumsum(unlist(lapply(Ztl, nrow))))),
-                 fixef = coef(glmFit))
+    FL <- lmerFactorList(formula, fr$mf)     # flist, Zt, cnames
+    flist <- lapply(FL, get("[["), "f")
+    Ztl <- lapply(FL, get("[["), "Zt")
+    cnames <- lapply(FL, get("[["), "cnames")
+    Zt <- do.call(rBind, Ztl)
+    Zt@Dimnames <- vector("list", 2)
+    Gp <- unname(c(0L, cumsum(sapply(Ztl, nrow))))
+    rm(Ztl, FL)                         # because they could be large
+    nc <- sapply(cnames, length)        # number of columns in els of ST
+    ST <- lapply(nc, function(n) matrix(0, n, n))
+    .Call(ST_initialize, ST, Gp, Zt)
+    if (!is.null(start) && checkSTform(ST, start)) ST <- start
+    Vt <- .Call(mer_create_Vt, Zt, ST, Gp, 1L)
 
+    ## record dimensions and algorithm settings
+    dd <- VecFromNames(.dims_names, "integer")
+    dd["nf"] <- length(cnames)          # number of random-effects terms
+    dd["n"] <- nrow(fr$mf)              # number of observations
+    dd["p"] <- ncol(fr$X)               # number of fixed-effects coefficients
+    dd["q"] <- nrow(Zt)                 # number of random effects
+    dd["s"] <- 1L                       # always 1 except in nlmer
+    nvc <- sapply(nc, function (qi) (qi * (qi + 1))/2) # no. of var. comp.
+### FIXME: Check number of variance components versus number of levels
+### in the factor for each term. Warn or stop as appropriate
+    dd["np"] <- as.integer(sum(nvc))    # number of parameters in optimization
+### FIXME: Change the name of this to something more appropriate
+    dd["REML"] <- match.arg(method) == "AGQ"
+    dd["famType"] <- mkFltype(glmFit$family)
+
+    ans <- new("glmer",
+               env = mkFamilyEnv(glmFit),
+               famName = unlist(glmFit$family[c("family", "link")]),
+               frame = if (model) fr$mf else fr$mf[0,],
+               call = mc, terms = fr$mt, flist = flist,
+               Zt = Zt, X = fr$X,
+               y = unname(as.double(glmFit$y)),
+### FIXME: weights and offset are recorded both here and in the env slot
+               weights = unname(fr$wts),
+               offset = unname(fr$off),
+               cnames = unname(cnames), Gp = unname(Gp),
+               dims = dd, ST = ST, Vt = Vt,
+               L = .Call(mer_create_L, Vt),
+               deviance = VecFromNames(.dev_names),
+               fixef = unname(coef(glmFit)),
+               ranef = numeric(dd["q"]),
+               uvec = numeric(dd["q"]))
     cv <- do.call("lmerControl", control)
     if (missing(verbose)) verbose <- cv$msVerbose
-#    .Call(glmer_optimize, val, verbose)
-    val
+#    .Call(mer_optimize, ans, verbose, 2)
+    ans
 }
 
 ## Fit a nonlinear mixed-effects model
@@ -425,9 +455,6 @@ nlmer <- function(formula, data,
     if (length(nlform) < 3)
         stop("formula must be a 3-part formula")
     nlmod <- as.call(nlform[[3]])
-
-    cv <- do.call("lmerControl", control)
-    if (missing(verbose)) verbose <- cv$msVerbose
     if (is.numeric(start)) start <- list(fixed = start)
     s <- length(pnames <- names(start$fixed))
     stopifnot(length(start$fixed) > 0, s > 0,
@@ -477,16 +504,26 @@ nlmer <- function(formula, data,
     Ztl1 <- lapply(with(FL, .Call(Ztl_sparse, fl, Ztl)), drop0)
     Gp <- unname(c(0L, cumsum(unlist(lapply(Ztl1, nrow)))))
     Zt <- do.call(rBind, Ztl1)
-    attr(fr$mf, "terms") <- NULL
-    fixef <- unlist(start$fixed)
-    storage.mode(fixef) <- "double"
-    val <- .Call(nlmer_create, env, nlmod, fr$mf, pnames, call = mc,
-                 FL$fl, Xt, Zt, unname(fr$Y), wts,
-                 cnames = lapply(FL$Ztl, rownames), Gp = Gp,
-                 fixef = fixef)
-    .Call(lmer_optimize, val, verbose, 1)
-    .Call(nlmer_update_ranef, val)
-    val
+    Mt <- .Call(lmer_create_Vt, Zt, ST, Gp, s)
+
+    ans <- new("nlmer",
+               env = env, model = nlmod, pnames = pnames, Xt = Xt,
+               mu = numeric(dims['n']), Mt = Mt,
+               frame = if (model) fr$mf else fr$mf[0,],
+               call = mc, terms = fr$mt, flist = flist,
+               Zt = Zt, y = unname(as.double(fr$Y)),
+               weights = unname(fr$wts),
+               cnames = unname(cnames), Gp = unname(Gp),
+               dims = dd, ST = ST, Vt = Vt,
+               L = .Call(mer_create_L, Mt),
+               deviance = VecFromNames(.dev_names),
+               fixef = unname(as.double(start$fixed)),
+               ranef = numeric(dd["q"]),
+               uvec = numeric(dd["q"]))
+    cv <- do.call("lmerControl", control)
+    if (missing(verbose)) verbose <- cv$msVerbose
+#    .Call(mer_optimize, ans, verbose, 1)
+    ans
 }
 
 ### Summary, show and print methods

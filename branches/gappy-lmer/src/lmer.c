@@ -4,16 +4,14 @@
 
 				/* positions in the deviance vector */
 /* FIXME: change the name ldZ to ldL2 here and in lmer.R */
-enum devP {ML_POS=0, REML_POS, ldZ_POS, ldX_POS, lpdisc_POS, bqd_POS};
-/* ("ML", "REML", "ldZ", "ldX", "lpdisc", "bqd") */
+enum devP {ML_POS=0, REML_POS, ldL2_POS, ldRX2_POS, lpdisc_POS, bqd_POS};
+/* ("ML", "REML", "ldL2", "ldRX2", "lpdisc", "bqd") */
 				/* positions in the dims vector */
 enum dimP {nf_POS=0, n_POS, p_POS, q_POS, s_POS, np_POS, isREML_POS, famType_POS, Nested_POS};
 /* ("nf", "n", "p", "q", "s", "np", "REML", "famType", "Nested") */
 
 #define isREML(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isREML_POS]
 #define L_SLOT(x) AS_CHM_FR(GET_SLOT(x, lme4_LSym))
-/* #define isGLMM(x) (INTEGER(GET_SLOT(x, lme4_dimsSym))[famType_POS] >= 0) */
-/* #define isNested(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isNest_POS] */
 
 /**
  * Allocate a 3-dimensional array
@@ -187,21 +185,43 @@ Vt_nz_col(int *nz, int j, int nf, const int *Gp, const int *nc,
 }
 
 /**
- * Create the Vt matrix pattern from Zt, ST and Gp
+ * Create the Vt matrix pattern from Zt, ST and Gp.  Partition the
+ * columns into s groups and overlay them.
+ * 
  *
- * @param Zt
+ * @param Zt 
  * @param ST
- * @param GpP
+ * @param GpP pointer to the Gp array
+ * @param sP pointer to the scalar s - always 1 for lmer and glmer
  *
  * @return Vt
  */
-SEXP mer_create_Vt(SEXP Zt, SEXP ST, SEXP GpP)
+SEXP mer_create_Vt(SEXP Zt, SEXP ST, SEXP GpP, SEXP sP)
 {
     SEXP ans;
     int *Gp = INTEGER(GpP), *nnz, *nz, *vi, *vp, *zdims, *zi, *zp,
-	ZtOK, j, nf = LENGTH(ST);
+	ZtOK, j, nf = LENGTH(ST), s = asInteger(sP);
     int *nc = Alloca(nf, int), *nlev = Alloca(nf, int);
     R_CheckStack();
+
+/* FIXME: Partition and overlay the columns of Zt if s > 1 */
+/* FIXME: Write this as a utility */
+    if (s > 1) {
+	SEXP Ztold = Zt;
+	int nnz;
+
+	zdims = INTEGER(GET_SLOT(Zt, lme4_DimSym));
+	zp = INTEGER(GET_SLOT(Zt, lme4_pSym));
+	zi = INTEGER(GET_SLOT(Zt, lme4_iSym));
+
+	Zt = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix")));
+	SET_SLOT(Zt, lme4_DimSym, duplicate(GET_SLOT(Ztold, lme4_DimSym)));
+	SET_SLOT(Zt, lme4_DimNamesSym, allocVector(VECSXP, 2));
+	zdims = INTEGER(GET_SLOT(Zt, lme4_DimSym));
+	zdims[1] /= s;
+	nnz = zp[zdims[1]];	/* this isn't right.  Need to
+				 * calculate it as in Vt_nz_col. */
+    }
 				/* Trivial case, all nc == 1 */
     if (ST_nc_nlev(ST, Gp, (double**)NULL, nc, nlev) <= 1)
 	return duplicate(Zt);
@@ -230,7 +250,7 @@ SEXP mer_create_Vt(SEXP Zt, SEXP ST, SEXP GpP)
     AZERO(REAL(ALLOC_SLOT(ans, lme4_xSym, REALSXP, vp[zdims[1]])), vp[zdims[1]]);
     for (j = 0; j < zdims[1]; j++) { /* fill in the i slot */
 	int i, pos = vp[j];
-	nz_col(nz, j, nf, Gp, nc, nlev, zi, zp);
+	Vt_nz_col(nz, j, nf, Gp, nc, nlev, zi, zp);
 	for (i = 0; i < zdims[0]; i++) if (nz[i]) vi[pos++] = i;
     }
 
@@ -279,13 +299,13 @@ update_VtL(SEXP x)
 	error(_("cholmod_factorize_p failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
     c.final_ll = fll;
-    dev[ldZ_POS] = chm_log_det2(L);
+    dev[ldL2_POS] = chm_log_det2(L);
 }
 
 SEXP mer_update_VtL(SEXP x)
 {
     update_VtL(x);
-    return ScalarReal(REAL(GET_SLOT(x, lme4_devianceSym))[ldZ_POS]);
+    return ScalarReal(REAL(GET_SLOT(x, lme4_devianceSym))[ldL2_POS]);
 }
 
 /**
@@ -501,10 +521,10 @@ lmer_update_dev(SEXP x)
 	error(_("the leading minor of order %d of the downdated [X:y]'[X:y] is not positive definite"),
 	      info);
     d[lpdisc_POS] = 2 * log(rxy[pp1 * pp1 - 1]);
-    for (j = 0, d[ldX_POS] = 0; j < (pp1 - 1); j++)
-	d[ldX_POS] += 2 * log(rxy[j * (pp1 + 1)]);
-    d[ML_POS] = d[ldZ_POS] + dn * (1. + d[lpdisc_POS] + log(2. * PI / dn));
-    d[REML_POS] = d[ldZ_POS] + d[ldX_POS] + dnmp *
+    for (j = 0, d[ldRX2_POS] = 0; j < (pp1 - 1); j++)
+	d[ldRX2_POS] += 2 * log(rxy[j * (pp1 + 1)]);
+    d[ML_POS] = d[ldL2_POS] + dn * (1. + d[lpdisc_POS] + log(2. * PI / dn));
+    d[REML_POS] = d[ldL2_POS] + d[ldRX2_POS] + dnmp *
 	(1. + d[lpdisc_POS] + log(2. * PI / dnmp));
 }
 
@@ -1176,7 +1196,6 @@ SEXP mer_validate(SEXP x)
 	fixefP = GET_SLOT(x, lme4_fixefSym),
 	flistP = GET_SLOT(x, lme4_flistSym),
 	ranefP = GET_SLOT(x, lme4_ranefSym),
-	uvecP = GET_SLOT(x, lme4_uvecSym),
 	weightsP = GET_SLOT(x, lme4_weightsSym),
 	y = GET_SLOT(x, lme4_ySym);
     CHM_SP Zt = AS_CHM_SP(GET_SLOT(x, lme4_ZtSym)),
@@ -1198,8 +1217,8 @@ SEXP mer_validate(SEXP x)
 	return mkString(_("Gp[1] != 0 or Gp[dims['nf'] + 1] != dims['q']"));
     if (LENGTH(fixefP) != p)
 	return mkString(_("Slot fixef must have length ['p']"));
-    if (LENGTH(ranefP) != q || LENGTH(uvecP) != q)
-	return mkString(_("Slots ranef and uvec must have length dims['q']"));
+    if (LENGTH(ranefP) != q)
+	return mkString(_("Slot ranef must have length dims['q']"));
     if (LENGTH(weightsP) && LENGTH(weightsP) != n)
 	return mkString(_("Slot weights must have length 0 or dims['n']"));
     if (LENGTH(devianceP) != (bqd_POS + 1) ||
@@ -1296,7 +1315,6 @@ SEXP lmer_validate(SEXP x)
 	return mkString(buf);
     if (LENGTH(offsetP) && LENGTH(offsetP) != n)
 	return mkString(_("Slot offset must have length 0 or dims['n']"));
-
     return ScalarLogical(1);
 }
 
@@ -1311,16 +1329,20 @@ SEXP lmer_validate(SEXP x)
 SEXP glmer_validate(SEXP x)
 {
     int *dd = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int n = dd[n_POS], q = dd[q_POS];
+    int n = dd[n_POS], p = dd[p_POS], q = dd[q_POS];
     SEXP XP = GET_SLOT(x, lme4_XSym),
-	offsetP = GET_SLOT(x, lme4_offsetSym);
+	offsetP = GET_SLOT(x, lme4_offsetSym),
+	uvecP = GET_SLOT(x, lme4_uvecSym);
+
 
     /* Note: We don't need to check the matrix slots to see if they are matrices. */
     dd = INTEGER(getAttrib(XP, R_DimSymbol)); 
-    if (!isReal(XP) || dd[0] != n || dd[1] != q)
-	return mkString(_("Slot X must be a dims['n'] by dims['q'] numeric matrix"));
+    if (!isReal(XP) || dd[0] != n || dd[1] != p)
+	return mkString(_("Slot X must be a dims['n'] by dims['p'] numeric matrix"));
     if (LENGTH(offsetP) && LENGTH(offsetP) != n)
 	return mkString(_("Slot offset must have length 0 or dims['n']"));
+    if (LENGTH(uvecP) != q)
+	return mkString(_("Slot uvec must have length dims['q']"));
     return ScalarLogical(1);
 }
 
@@ -1335,13 +1357,18 @@ SEXP glmer_validate(SEXP x)
 SEXP nlmer_validate(SEXP x)
 {
     int *dd = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int n = dd[n_POS], p = dd[p_POS], s = dd[s_POS];
+    int n = dd[n_POS], p = dd[p_POS], q = dd[q_POS], s = dd[s_POS];
+    SEXP muP = GET_SLOT(x, lme4_muSym),
+	uvecP = GET_SLOT(x, lme4_uvecSym);
     CHM_SP Xt = AS_CHM_SP(GET_SLOT(x, lme4_XtSym));
     R_CheckStack();
 
     if (Xt->nrow != p || Xt->ncol != n * s)
 	return mkString(_("Slot Xt must have dimensions p by n*s"));
-    
+    if (LENGTH(muP) != n)
+	return mkString(_("Slot mu must have length dims['n']"));
+    if (LENGTH(uvecP) != q)
+	return mkString(_("Slot uvec must have length dims['q']"));
     return ScalarLogical(1);
 }
 
@@ -1550,124 +1577,6 @@ SEXP nlmer_eval_model(SEXP x, SEXP uform)
     return ScalarReal(internal_nlmer_eval_model(x, asLogical(uform)));
 }
 
-
-/**
- * Create an nlmer object
- *
- * @param env environment in which to evaluate the model
- * @param model nonlinear model expression as a call
- * @param frame model frame
- * @param pnames character vector of parameter names
- * @param call matched call to the R nlmer function
- * @param flist factor list
- * @param Xt transpose of fixed-effects model matrix
- * @param Zt transpose of random-effects model matrix
- * @param y response vector
- * @param weights weights vector (may have length 0)
- * @param cnames list of column names
- * @param Gp integer vector of group pointers
- * @param fixef numeric vector of fixed effects
- */
-SEXP nlmer_create(SEXP env, SEXP model, SEXP frame, SEXP pnames,
-		  SEXP call, SEXP flist, SEXP Xt, SEXP Zt, SEXP y,
-		  SEXP weights, SEXP cnames, SEXP Gp, SEXP fixef)
-{
-    SEXP ST, ans = PROTECT(NEW_OBJECT(MAKE_CLASS("nlmer")));
-    char *DEVIANCE_NAMES[]={"ML","REML","ldZ","ldX","lr2", "bqd", "Sdr", ""};
-    char *DIMS_NAMES[]={"nf","n","p","q", "s", "np","isREML","famType","Nested",""};
-    int *Gpp = INTEGER(Gp), *Zdims = INTEGER(GET_SLOT(Zt, lme4_DimSym)), *dims, i, iT;
-    CHM_SP cVt, ts1, ts2;
-    CHM_FR L;
-    double one[] = {1,0};
-
-    SET_SLOT(ans, lme4_envSym, env);
-    SET_SLOT(ans, lme4_modelSym, model);
-    SET_SLOT(ans, lme4_pnamesSym, pnames);
-    SET_SLOT(ans, lme4_flistSym, flist);
-    SET_SLOT(ans, lme4_XtSym, Xt);
-    SET_SLOT(ans, lme4_ZtSym, Zt);
-    SET_SLOT(ans, lme4_ySym, y);
-    SET_SLOT(ans, lme4_weightsSym, weights);
-    SET_SLOT(ans, lme4_cnamesSym, cnames);
-    SET_SLOT(ans, lme4_GpSym, Gp);
-    SET_SLOT(ans, lme4_fixefSym, fixef);
-    SET_SLOT(ans, lme4_dimsSym,
-	     internal_make_named(INTSXP, DIMS_NAMES));
-    dims = INTEGER(GET_SLOT(ans, lme4_dimsSym));
-    dims[nf_POS] = LENGTH(flist);
-    dims[n_POS] = LENGTH(y);
-    dims[np_POS] = 0;
-    dims[p_POS] = LENGTH(fixef);
-    dims[q_POS] = Zdims[0];
-    dims[s_POS] = Zdims[1]/dims[n_POS];
-    dims[isREML_POS] = FALSE;
-    dims[famType_POS] = -1;
-    dims[Nested_POS] = TRUE;
-    SET_SLOT(ans, lme4_ranefSym, allocVector(REALSXP, Zdims[0]));
-    AZERO(REAL(GET_SLOT(ans, lme4_ranefSym)), Zdims[0]);
-    SET_SLOT(ans, lme4_uvecSym, allocVector(REALSXP, Zdims[0]));
-    AZERO(REAL(GET_SLOT(ans, lme4_uvecSym)), Zdims[0]);
-    internal_nlmer_eval_model(ans, 0); /* check the model evaluation */
-
-    SET_SLOT(ans, lme4_devianceSym,
-	     internal_make_named(REALSXP, DEVIANCE_NAMES));
-    AZERO(REAL(GET_SLOT(ans, lme4_devianceSym)), 7);
-
-    SET_SLOT(ans, lme4_STSym, allocVector(VECSXP, dims[nf_POS]));
-    ST = GET_SLOT(ans, lme4_STSym);
-    iT = TRUE;			/* is T the identity? */
-    for (i = 0; i < dims[nf_POS]; i++) {
-	int nci = (Gpp[i + 1] - Gpp[i])/
-	    LENGTH(getAttrib(VECTOR_ELT(flist, i), R_LevelsSymbol));
-	SET_VECTOR_ELT(ST, i, allocMatrix(REALSXP, nci, nci));
-	dims[np_POS] += (nci*(nci + 1))/2;
-	if (nci > 1) iT = FALSE;
-    }
-    ST_initialize(ST, Gp, Zt);	/* initialize ST */
-    SET_SLOT(ans, lme4_VtSym, iT ? duplicate(Zt) : mer_create_Vt(Zt, ST, Gp));
-    nlmer_update_Vt(ans);
-    cVt = AS_CHM_SP(GET_SLOT(ans, lme4_VtSym));
-    
-    /* Create Mt beginning with s identity matrices concatenated horizontally */
-    ts1 = M_cholmod_allocate_sparse((size_t) dims[n_POS],
-				    (size_t) Zdims[1], (size_t) Zdims[1],
-				    1/*sorted*/, 1/*packed*/,
-				    0/*stype*/, CHOLMOD_REAL, &c);
-    for (i = 0; i < Zdims[1]; i++) {
-	((int*)(ts1->p))[i] = i;
-	((int*)(ts1->i))[i] = i % dims[n_POS];
-	((double*)(ts1->x))[i] = 1;
-    }
-    ((int*)(ts1->p))[Zdims[1]] = Zdims[1];
-    ts2 = M_cholmod_transpose(ts1, TRUE/*values*/, &c);
-    M_cholmod_free_sparse(&ts1, &c);
-    ts1 = M_cholmod_ssmult(cVt, ts2, /* Create pattern for Mt */
-			   0 /*stype*/, 1 /*values*/, 1 /*sorted*/, &c);
-    M_cholmod_free_sparse(&ts2, &c);
-    SET_SLOT(ans, lme4_MtSym,
-	     M_chm_sparse_to_SEXP(ts1, 0, 0, 0, "", R_NilValue));
-/* FIXME: Check for nesting in Mt here? */
-    i = c.final_ll;
-    c.final_ll = 1;
-    L = M_cholmod_analyze(ts1, &c); /* Create pattern for L */
-    if (!M_cholmod_factorize_p(ts1, one, (int*) NULL, 0, L, &c))
-	error(_("cholmod_factorize_p failed: status %d, minor %d from ncol %d"),
-	      c.status, L->minor, L->n);
-    if (!M_cholmod_change_factor(CHOLMOD_REAL, 1 /* to_ll */,
-				 L->is_super, 1 /* packed */,
-				 1 /* monotonic */, L, &c))
-	error(_("cholmod_change_factor failed"));
-    c.final_ll = i;
-    SET_SLOT(ans, lme4_LSym, M_chm_factor_to_SEXP(L, 0));
-    M_cholmod_free_factor(&L, &c);
-
-    M_cholmod_free_sparse(&ts1, &c);
-    nlmer_update_Vt(ans);
-
-    UNPROTECT(1);
-    return ans;
-}
-
 /**
  * Update the transpose of M from the current gradient and Vt
  *
@@ -1796,9 +1705,9 @@ static int internal_nbhat(SEXP x)
  	crit = conv_crit(uold, u, q);
     }
     dev[lpdisc_POS] = log(dev[lpdisc_POS] + dev[bqd_POS]);
-    chm_log_abs_det2(&(dev[ldZ_POS]), 1, zq, L);
+    chm_log_abs_det2(&(dev[ldL2_POS]), 1, zq, L);
     dev[ML_POS] = dev[REML_POS] =
-	dev[ldZ_POS] + dn * (1. + dev[lpdisc_POS] + log(2. * PI / dn));
+	dev[ldL2_POS] + dn * (1. + dev[lpdisc_POS] + log(2. * PI / dn));
 
     Free(uold);
     M_cholmod_free_dense(&cu, &c); M_cholmod_free_dense(&cMtz, &c);
@@ -1844,22 +1753,6 @@ static R_INLINE double x_d_opx(double x) {return x/(1 + x);}
 static R_INLINE double y_log_y(double y, double mu)
 {
     return (y) ? (y * log(y/mu)) : 0;
-}
-
-static int flType(SEXP famName)
-{
-    const char *fam = CHAR(STRING_ELT(famName, 0)),
-	*lnk = CHAR(STRING_ELT(famName, 1));
-
-    if ((!strcmp(fam, "gaussian")) && (!strcmp(lnk, "identity")))
-	return -1;
-    if ((!strcmp(fam, "binomial")) && (!strcmp(lnk, "logit")))
-	return 1;
-    if ((!strcmp(fam, "binomial")) && (!strcmp(lnk, "probit")))
-	return 2;
-    if ((!strcmp(fam, "poisson")) && (!strcmp(lnk, "log")))
-	return 3;
-    return 0;
 }
 
 /**
@@ -2097,96 +1990,6 @@ SEXP glmer_reweight(SEXP x)
 }
 
 /**
- * Create a glmer object
- *
- * @param env environment in which to evaluate the linkinv, dmu_deta, etc. functions
- * @param frame model frame
- * @param famName name of the generalized linear model family and link
- * @param call matched call to the R nlmer function
- * @param flist factor list
- * @param X fixed-effects model matrix
- * @param Zt transpose of random-effects model matrix
- * @param y response vector
- * @param cnames list of column names
- * @param Gp integer vector of group pointers
- * @param fixef numeric vector of fixed effects
- */
-SEXP glmer_create(SEXP env, SEXP frame, SEXP famName, SEXP call,
-		  SEXP flist, SEXP X, SEXP Zt, SEXP y, SEXP cnames,
-		  SEXP Gp, SEXP fixef)
-{
-    SEXP ST, ans = PROTECT(NEW_OBJECT(MAKE_CLASS("glmer")));
-    char *DEVIANCE_NAMES[]={"ML","REML","ldZ","ldX","lr2", "bqd", "Sdr", ""};
-    char *DIMS_NAMES[]={"nf","n","p","q", "s", "np","isREML","famType","Nested",""};
-    int *Gpp = INTEGER(Gp), *Zdims = INTEGER(GET_SLOT(Zt, lme4_DimSym)), *dims, i, iT;
-    CHM_SP cVt;
-    CHM_FR L;
-    double one[] = {1,0};
-
-    SET_SLOT(ans, lme4_envSym, env);
-    SET_SLOT(ans, lme4_famNameSym, famName);
-    SET_SLOT(ans, lme4_flistSym, flist);
-    SET_SLOT(ans, lme4_XSym, X);
-    SET_SLOT(ans, lme4_ZtSym, Zt);
-    SET_SLOT(ans, lme4_ySym, y);
-    SET_SLOT(ans, lme4_cnamesSym, cnames);
-    SET_SLOT(ans, lme4_GpSym, Gp);
-    SET_SLOT(ans, lme4_fixefSym, fixef);
-    SET_SLOT(ans, lme4_dimsSym,
-	     internal_make_named(INTSXP, DIMS_NAMES));
-    dims = INTEGER(GET_SLOT(ans, lme4_dimsSym));
-    dims[nf_POS] = LENGTH(flist);
-    dims[n_POS] = LENGTH(y);
-    dims[np_POS] = 0;
-    dims[p_POS] = LENGTH(fixef);
-    dims[q_POS] = Zdims[0];
-    dims[s_POS] = 0;
-    dims[isREML_POS] = FALSE;
-    dims[famType_POS] = flType(famName);
-    dims[Nested_POS] = TRUE;
-    SET_SLOT(ans, lme4_ranefSym, allocVector(REALSXP, Zdims[0]));
-    AZERO(REAL(GET_SLOT(ans, lme4_ranefSym)), Zdims[0]);
-    SET_SLOT(ans, lme4_uvecSym, allocVector(REALSXP, Zdims[0]));
-    AZERO(REAL(GET_SLOT(ans, lme4_uvecSym)), Zdims[0]);
-    SET_SLOT(ans, lme4_devianceSym,
-	     internal_make_named(REALSXP, DEVIANCE_NAMES));
-    AZERO(REAL(GET_SLOT(ans, lme4_devianceSym)), 7);
-
-    SET_SLOT(ans, lme4_STSym, allocVector(VECSXP, dims[nf_POS]));
-    ST = GET_SLOT(ans, lme4_STSym);
-    iT = TRUE;			/* is T the identity? */
-    for (i = 0; i < dims[nf_POS]; i++) {
-	int nci = (Gpp[i + 1] - Gpp[i])/
-	    LENGTH(getAttrib(VECTOR_ELT(flist, i), R_LevelsSymbol));
-	SET_VECTOR_ELT(ST, i, allocMatrix(REALSXP, nci, nci));
-	dims[np_POS] += (nci*(nci + 1))/2;
-	if (nci > 1) iT = FALSE;
-    }
-    ST_initialize(ST, Gp, Zt); /* initialize ST */
-    SET_SLOT(ans, lme4_VtSym, iT ? duplicate(Zt) : mer_create_Vt(Zt, ST, Gp));
-    nlmer_update_Vt(ans);
-    cVt = AS_CHM_SP(GET_SLOT(ans, lme4_VtSym));
-
-    i = c.final_ll;
-    c.final_ll = 1;
-    L = M_cholmod_analyze(cVt, &c); /* Create pattern for L */
-    if (!M_cholmod_factorize_p(cVt, one, (int*) NULL, 0, L, &c))
-	error(_("cholmod_factorize_p failed: status %d, minor %d from ncol %d"),
-	      c.status, L->minor, L->n);
-    if (!M_cholmod_change_factor(CHOLMOD_REAL, 1 /* to_ll */,
-				 L->is_super, 1 /* packed */,
-				 1 /* monotonic */, L, &c))
-	error(_("cholmod_change_factor failed"));
-    c.final_ll = i;
-    SET_SLOT(ans, lme4_LSym, M_chm_factor_to_SEXP(L, 0));
-    M_cholmod_free_factor(&L, &c);
-
-    nlmer_update_Vt(ans);
-    UNPROTECT(1);
-    return ans;
-}
-
-/**
  * Factor (Vt WW (Vt)' + I) as L, solve
  * (LL')u = (Vt W z) where W is diagonal
  *
@@ -2400,4 +2203,121 @@ static const double
     *GHQ_w[12] = {(double *) NULL, GHQ_w1, GHQ_w2, GHQ_w3, GHQ_w4,
 		  GHQ_w5, GHQ_w6, GHQ_w7, GHQ_w8, GHQ_w9, GHQ_w10,
 		  GHQ_w11};
+
+/**
+ * Create an nlmer object
+ *
+ * @param env environment in which to evaluate the model
+ * @param model nonlinear model expression as a call
+ * @param frame model frame
+ * @param pnames character vector of parameter names
+ * @param call matched call to the R nlmer function
+ * @param flist factor list
+ * @param Xt transpose of fixed-effects model matrix
+ * @param Zt transpose of random-effects model matrix
+ * @param y response vector
+ * @param weights weights vector (may have length 0)
+ * @param cnames list of column names
+ * @param Gp integer vector of group pointers
+ * @param fixef numeric vector of fixed effects
+ */
+SEXP nlmer_create(SEXP env, SEXP model, SEXP frame, SEXP pnames,
+		  SEXP call, SEXP flist, SEXP Xt, SEXP Zt, SEXP y,
+		  SEXP weights, SEXP cnames, SEXP Gp, SEXP fixef)
+{
+    SEXP ST, ans = PROTECT(NEW_OBJECT(MAKE_CLASS("nlmer")));
+    char *DEVIANCE_NAMES[]={"ML","REML","ldL2","ldRX2","lr2", "bqd", "Sdr", ""};
+    char *DIMS_NAMES[]={"nf","n","p","q", "s", "np","isREML","famType","Nested",""};
+    int *Gpp = INTEGER(Gp), *Zdims = INTEGER(GET_SLOT(Zt, lme4_DimSym)), *dims, i, iT;
+    CHM_SP cVt, ts1, ts2;
+    CHM_FR L;
+    double one[] = {1,0};
+
+    SET_SLOT(ans, lme4_envSym, env);
+    SET_SLOT(ans, lme4_modelSym, model);
+    SET_SLOT(ans, lme4_pnamesSym, pnames);
+    SET_SLOT(ans, lme4_flistSym, flist);
+    SET_SLOT(ans, lme4_XtSym, Xt);
+    SET_SLOT(ans, lme4_ZtSym, Zt);
+    SET_SLOT(ans, lme4_ySym, y);
+    SET_SLOT(ans, lme4_weightsSym, weights);
+    SET_SLOT(ans, lme4_cnamesSym, cnames);
+    SET_SLOT(ans, lme4_GpSym, Gp);
+    SET_SLOT(ans, lme4_fixefSym, fixef);
+    SET_SLOT(ans, lme4_dimsSym,
+	     internal_make_named(INTSXP, DIMS_NAMES));
+    dims = INTEGER(GET_SLOT(ans, lme4_dimsSym));
+    dims[nf_POS] = LENGTH(flist);
+    dims[n_POS] = LENGTH(y);
+    dims[np_POS] = 0;
+    dims[p_POS] = LENGTH(fixef);
+    dims[q_POS] = Zdims[0];
+    dims[s_POS] = Zdims[1]/dims[n_POS];
+    dims[isREML_POS] = FALSE;
+    dims[famType_POS] = -1;
+    dims[Nested_POS] = TRUE;
+    SET_SLOT(ans, lme4_ranefSym, allocVector(REALSXP, Zdims[0]));
+    AZERO(REAL(GET_SLOT(ans, lme4_ranefSym)), Zdims[0]);
+    SET_SLOT(ans, lme4_uvecSym, allocVector(REALSXP, Zdims[0]));
+    AZERO(REAL(GET_SLOT(ans, lme4_uvecSym)), Zdims[0]);
+    internal_nlmer_eval_model(ans, 0); /* check the model evaluation */
+
+    SET_SLOT(ans, lme4_devianceSym,
+	     internal_make_named(REALSXP, DEVIANCE_NAMES));
+    AZERO(REAL(GET_SLOT(ans, lme4_devianceSym)), 7);
+
+    SET_SLOT(ans, lme4_STSym, allocVector(VECSXP, dims[nf_POS]));
+    ST = GET_SLOT(ans, lme4_STSym);
+    iT = TRUE;			/* is T the identity? */
+    for (i = 0; i < dims[nf_POS]; i++) {
+	int nci = (Gpp[i + 1] - Gpp[i])/
+	    LENGTH(getAttrib(VECTOR_ELT(flist, i), R_LevelsSymbol));
+	SET_VECTOR_ELT(ST, i, allocMatrix(REALSXP, nci, nci));
+	dims[np_POS] += (nci*(nci + 1))/2;
+	if (nci > 1) iT = FALSE;
+    }
+    ST_initialize(ST, Gp, Zt);	/* initialize ST */
+    SET_SLOT(ans, lme4_VtSym, iT ? duplicate(Zt) : mer_create_Vt(Zt, ST, Gp));
+    nlmer_update_Vt(ans);
+    cVt = AS_CHM_SP(GET_SLOT(ans, lme4_VtSym));
+    
+    /* Create Mt beginning with s identity matrices concatenated horizontally */
+    ts1 = M_cholmod_allocate_sparse((size_t) dims[n_POS],
+				    (size_t) Zdims[1], (size_t) Zdims[1],
+				    1/*sorted*/, 1/*packed*/,
+				    0/*stype*/, CHOLMOD_REAL, &c);
+    for (i = 0; i < Zdims[1]; i++) {
+	((int*)(ts1->p))[i] = i;
+	((int*)(ts1->i))[i] = i % dims[n_POS];
+	((double*)(ts1->x))[i] = 1;
+    }
+    ((int*)(ts1->p))[Zdims[1]] = Zdims[1];
+    ts2 = M_cholmod_transpose(ts1, TRUE/*values*/, &c);
+    M_cholmod_free_sparse(&ts1, &c);
+    ts1 = M_cholmod_ssmult(cVt, ts2, /* Create pattern for Mt */
+			   0 /*stype*/, 1 /*values*/, 1 /*sorted*/, &c);
+    M_cholmod_free_sparse(&ts2, &c);
+    SET_SLOT(ans, lme4_MtSym,
+	     M_chm_sparse_to_SEXP(ts1, 0, 0, 0, "", R_NilValue));
+/* FIXME: Check for nesting in Mt here? */
+    i = c.final_ll;
+    c.final_ll = 1;
+    L = M_cholmod_analyze(ts1, &c); /* Create pattern for L */
+    if (!M_cholmod_factorize_p(ts1, one, (int*) NULL, 0, L, &c))
+	error(_("cholmod_factorize_p failed: status %d, minor %d from ncol %d"),
+	      c.status, L->minor, L->n);
+    if (!M_cholmod_change_factor(CHOLMOD_REAL, 1 /* to_ll */,
+				 L->is_super, 1 /* packed */,
+				 1 /* monotonic */, L, &c))
+	error(_("cholmod_change_factor failed"));
+    c.final_ll = i;
+    SET_SLOT(ans, lme4_LSym, M_chm_factor_to_SEXP(L, 0));
+    M_cholmod_free_factor(&L, &c);
+
+    M_cholmod_free_sparse(&ts1, &c);
+    nlmer_update_Vt(ans);
+
+    UNPROTECT(1);
+    return ans;
+}
 #endif

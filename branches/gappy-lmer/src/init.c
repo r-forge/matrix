@@ -13,7 +13,6 @@ static R_CallMethodDef CallEntries[] = {
     {"ST_initialize", (DL_FUNC) &ST_initialize, 3},
     {"ST_setPars", (DL_FUNC) &ST_setPars, 2},
 
-    {"glmer_create", (DL_FUNC) &glmer_create, 11},
     {"glmer_dev_resids", (DL_FUNC) &glmer_dev_resids, 1},
     {"glmer_eta", (DL_FUNC) &glmer_eta, 1},
     {"glmer_linkinv", (DL_FUNC) &glmer_linkinv, 1},
@@ -33,14 +32,13 @@ static R_CallMethodDef CallEntries[] = {
     {"lmer_vcov", (DL_FUNC) &lmer_vcov, 1},
 
     {"mer_create_L", (DL_FUNC) &mer_create_L, 1},
-    {"mer_create_Vt", (DL_FUNC) &mer_create_Vt, 3},
+    {"mer_create_Vt", (DL_FUNC) &mer_create_Vt, 4},
     {"mer_optimize", (DL_FUNC) &mer_optimize, 3},
     {"mer_validate", (DL_FUNC) &mer_validate, 1},
     {"mer_update_VtL", (DL_FUNC) &mer_update_VtL, 1},
 
 
     {"nlmer_bhat", (DL_FUNC) &nlmer_bhat, 1},
-    {"nlmer_create", (DL_FUNC) &nlmer_create, 13},
     {"nlmer_eval_model", (DL_FUNC) &nlmer_eval_model, 2},
     {"nlmer_update_Mt", (DL_FUNC) &nlmer_update_Mt, 1},
     {"nlmer_update_Vt", (DL_FUNC) &nlmer_update_Vt, 1},
