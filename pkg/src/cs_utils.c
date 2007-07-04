@@ -19,16 +19,6 @@ static int is_sym (cs *A)
     return (is_upper ? 1 : (is_lower ? -1 : 0)) ;
 }
 
-static R_INLINE int
-check_class(const char *class, char **valid)
-{
-    int ans;
-    for (ans = 0; ; ans++) {
-	if (!strlen(valid[ans])) return -1;
-	if (!strcmp(class, valid[ans])) return ans;
-    }
-}
-
 /**
  * Create a cs object with the contents of x.  Note that
  * the result should *not* be freed with cs_spfree.  Use
@@ -44,7 +34,7 @@ cs *Matrix_as_cs(SEXP x)
     cs *ans = Calloc(1, cs);
     char *valid[] = {"dgCMatrix", "dtCMatrix", ""};/* had also "dsCMatrix", but that
 						    * only stores one triangle */
-    int *dims, ctype = check_class(class_P(x), valid);
+    int *dims, ctype = Matrix_check_class(class_P(x), valid);
     SEXP islot;
 
     if (ctype < 0) error("invalid class of object to Matrix_as_cs");
@@ -79,7 +69,7 @@ css *Matrix_as_css(SEXP x)
     char *cl = class_P(x);
 	*valid[] = {"css_LU", "css_QR", ""};
     int *nz = INTEGER(GET_SLOT(x, install("nz"))),
-	ctype = check_class(cl, valid);
+	ctype = Matrix_check_class(cl, valid);
 
     if (ctype < 0) error("invalid class of object to Matrix_as_css");
     ans->q = INTEGER(GET_SLOT(x, install("Q")));
@@ -116,7 +106,7 @@ csn *Matrix_as_csn(SEXP x)
 {
     csn *ans = Calloc(1, csn);
     char *valid[] = {"csn_LU", "csn_QR", ""};
-    int ctype = check_class(class_P(x), valid);
+    int ctype = Matrix_check_class(class_P(x), valid);
 
     if (ctype < 0) error("invalid class of object to Matrix_as_csn");
     ans->U = Matrix_as_cs(GET_SLOT(x, install("U")));
@@ -151,7 +141,7 @@ SEXP Matrix_cs_to_SEXP(cs *a, char *cl, int dofree)
 {
     SEXP ans;
     char *valid[] = {"dgCMatrix", "dsCMatrix", "dtCMatrix", ""};
-    int *dims, ctype = check_class(cl, valid), nz;
+    int *dims, ctype = Matrix_check_class(cl, valid), nz;
 
     if (ctype < 0)
 	error("invalid class of object to Matrix_cs_to_SEXP");
@@ -193,7 +183,7 @@ SEXP Matrix_css_to_SEXP(css *S, char *cl, int dofree, int m, int n)
 {
     SEXP ans;
     char *valid[] = {"css_LU", "css_QR", ""};
-    int *nz, ctype = check_class(cl, valid);
+    int *nz, ctype = Matrix_check_class(cl, valid);
 
     if (ctype < 0)
 	error("Inappropriate class '%s' for Matrix_css_to_SEXP", cl);
@@ -236,7 +226,7 @@ SEXP Matrix_csn_to_SEXP(csn *N, char *cl, int dofree)
 {
     SEXP ans;
     char *valid[] = {"csn_LU", "csn_QR", ""};
-    int ctype = check_class(cl, valid), n = (N->U)->n;
+    int ctype = Matrix_check_class(cl, valid), n = (N->U)->n;
 
     if (ctype < 0)
 	error("Inappropriate class '%s' for Matrix_csn_to_SEXP", cl);

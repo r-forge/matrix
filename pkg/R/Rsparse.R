@@ -32,7 +32,7 @@ if(FALSE)## "slow" R-level workaround
     if(is.na(icl)) stop("invalid class:", cl)
     Ccl <- sub("^(..)R","\\1C", cl)  # corresponding Csparse class name
     r <- new(Ccl)
-    r@Dim <- rev(from@Dim)
+    r@Dim <- from@Dim[2:1]
     if(icl %/% 3 != 2) ## not "n..Matrix" --> has 'x' slot
         r@x <- from@x
     if(icl %% 3 != 0) {                 # symmetric or triangular
@@ -62,8 +62,8 @@ if(FALSE)## "slow" R-level workaround
     r@i <- from@j
     ##-         -
     r@p <- from@p
-    r@Dim      <- rev(from@Dim)
-    r@Dimnames <- rev(from@Dimnames)
+    r@Dim      <- from@Dim[2:1]
+    r@Dimnames <- from@Dimnames[2:1]
 
     if(icl %/% 3 != 2) ## not "n..Matrix" --> has 'x' slot
         r@x <- from@x
