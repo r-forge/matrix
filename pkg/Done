@@ -185,3 +185,7 @@
 - Fast colSums(), rowSums() etc : first for dgCMatrix, but then
   'arules' needs fast colSums() and rowSums() - for ngCMatrix;
   do it for "nMatrix" and "lMatrix" and return *integer*
+
+- now check for DimNames propagation in coercions, at least by using a
+  "dimnamed" matrix in tstMatrixClass() in tests/Class+Meth.R
+
