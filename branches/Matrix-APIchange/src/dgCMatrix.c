@@ -139,7 +139,7 @@ SEXP compressed_non_0_ij(SEXP x, SEXP colP)
 SEXP dgCMatrix_lusol(SEXP x, SEXP y)
 {
     SEXP ycp = PROTECT(duplicate(y));
-    cs *xc = Matrix_as_cs(x);
+    CSP xc = AS_CSP(x);
 
     if (xc->m != xc->n || xc->m <= 0)
 	error(_("dgCMatrix_lusol requires a square, non-empty matrix"));
@@ -147,7 +147,7 @@ SEXP dgCMatrix_lusol(SEXP x, SEXP y)
 	error(_("Dimensions of system to be solved are inconsistent"));
     if (!cs_lusol(/*order*/ 1, xc, REAL(ycp), /*tol*/ 1e-7))
 	error(_("cs_lusol failed"));
-    Free(xc);
+
     UNPROTECT(1);
     return ycp;
 }
@@ -155,7 +155,8 @@ SEXP dgCMatrix_lusol(SEXP x, SEXP y)
 SEXP dgCMatrix_qrsol(SEXP x, SEXP y)
 {
     SEXP ycp = PROTECT(duplicate(y));
-    cs *xc = Matrix_as_cs(x);
+    CSP xc = AS_CSP(x);
+    R_CheckStack();
 
     if (xc->m < xc->n || xc->n <= 0)
 	error(_("dgCMatrix_qrsol requires a 'tall' rectangular matrix"));
@@ -163,7 +164,7 @@ SEXP dgCMatrix_qrsol(SEXP x, SEXP y)
 	error(_("Dimensions of system to be solved are inconsistent"));
     if (!cs_qrsol(/*order*/ 1, xc, REAL(ycp)))
 	error(_("cs_qrsol failed"));
-    Free(xc);
+
     UNPROTECT(1);
     return ycp;
 }
@@ -172,10 +173,11 @@ SEXP dgCMatrix_qrsol(SEXP x, SEXP y)
 SEXP dgCMatrix_QR(SEXP Ap, SEXP order)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("sparseQR")));
-    cs *A = Matrix_as_cs(Ap), *D;
+    CSP A = AS_CSP(Ap), D;
     css *S;
     csn *N;
     int m = A->m, n = A->n, ord = asLogical(order) ? 3 : 0, *p;
+    R_CheckStack();
 
     if (m < n) error("A must have # rows >= # columns") ;
     S = cs_sqr(ord, A, 1);	/* symbolic QR ordering & analysis*/
@@ -218,11 +220,12 @@ SEXP dgCMatrix_QR(SEXP Ap, SEXP order)
 SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp)
 {
     SEXP ans = get_factors(Ap, "LU");
-    cs *A, *D;
+    CSP A = AS_CSP(Ap), D;
     css *S;
     csn *N;
     int n, order = asInteger(orderp), *p;
     double tol = asReal(tolp);
+    R_CheckStack();
 
     /* FIXME: dgCMatrix_LU should check ans for consistency in
      * permutation type with the requested value - Should have two
@@ -231,7 +234,6 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp)
 
     if (ans != R_NilValue) return ans;
     ans = PROTECT(NEW_OBJECT(MAKE_CLASS("sparseLU")));
-    A = Matrix_as_cs(Ap);
     n = A->n;
     if (A->m != n)
 	error("LU decomposition applies only to square matrices");
@@ -265,7 +267,6 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp)
     cs_nfree(N);
     cs_sfree(S);
     cs_free(p);
-    Free(A);
     UNPROTECT(1);
     return set_factors(Ap, ans, "LU");
 }
@@ -275,8 +276,8 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
     /* b is dense or NULL [ <--> solve(A) */
     SEXP lu = dgCMatrix_LU(Ap, ScalarLogical(1), ScalarReal(1));
     SEXP qslot = GET_SLOT(lu, install("q"));
-    cs  *L = Matrix_as_cs(GET_SLOT(lu, install("L"))),
-	*U = Matrix_as_cs(GET_SLOT(lu, install("U")));
+    CSP L = AS_CSP(GET_SLOT(lu, install("L"))),
+	U = AS_CSP(GET_SLOT(lu, install("U")));
     SEXP ans = PROTECT( !isNull(b) ? dup_mMatrix_as_dgeMatrix(b)
 			: new_dgeMatrix(U->n, U->n));
     int *bdims = INTEGER(GET_SLOT(ans, Matrix_DimSym));
@@ -285,6 +286,7 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
 	*q = LENGTH(qslot) ? INTEGER(qslot) : (int *) NULL;
     double *ax = REAL(GET_SLOT(ans, Matrix_xSym)),
 	*x = Calloc(n, double);
+    R_CheckStack();
 
     if (U->n != n || nrhs < 1 || n < 1)
 	error(_("Dimensions of system to be solved are inconsistent"));
@@ -302,7 +304,7 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
 	else
 	    Memcpy(ax + j * n, x, n);
     }
-    Free(L); Free(U); Free(x);
+    Free(x);
     UNPROTECT(1);
     return ans;
 }

@@ -112,7 +112,7 @@ SEXP Parent_inverse(SEXP par, SEXP unitdiag)
 SEXP dtCMatrix_solve(SEXP a)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dtCMatrix")));
-    cs *A = Matrix_as_cs(a);
+    CSP A = AS_CSP(a);
     int *bp = INTEGER(ALLOC_SLOT(ans, Matrix_pSym, INTSXP, (A->n) + 1)),
 	lo = uplo_P(a)[0] == 'L',
 	bnz = 10 * A->n;	/* initial estimate of nnz in b */
@@ -121,6 +121,7 @@ SEXP dtCMatrix_solve(SEXP a)
     cs *u = cs_spalloc(A->n, 1,1,1,0);	/* Sparse unit vector */
     int top;				/* top of stack */
     int *xi = Calloc(2*A->n, int);	/* cs_reach uses this workspace */
+    R_CheckStack();
 
     SET_SLOT(ans, Matrix_DimSym, duplicate(GET_SLOT(a, Matrix_DimSym)));
     SET_DimNames(ans, a);
@@ -156,7 +157,7 @@ SEXP dtCMatrix_solve(SEXP a)
     Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_iSym, INTSXP,  nz)), ti, nz);
     Memcpy(   REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, nz)), tx, nz);
 
-    Free(A); Free(ti); Free(tx);
+    Free(ti); Free(tx);
     Free(wrk); cs_spfree(u); Free(xi);
     UNPROTECT(1);
     return ans;
@@ -166,12 +167,13 @@ SEXP dtCMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
 {
     int cl = asLogical(classed);
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
-    cs *A = Matrix_as_cs(a);
+    CSP A = AS_CSP(a);
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(cl ? GET_SLOT(b, Matrix_DimSym) :
 			 getAttrib(b, R_DimSymbol));
     int j, n = bdims[0], nrhs = bdims[1], lo = (*uplo_P(a) == 'L');
     double *bx;
+    R_CheckStack();
 
     if (*adims != n || nrhs < 1 || *adims < 1 || *adims != adims[1])
 	error(_("Dimensions of system to be solved are inconsistent"));
@@ -181,7 +183,6 @@ SEXP dtCMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
 		REAL(cl ? GET_SLOT(b, Matrix_xSym):b), n * nrhs);
     for (j = 0; j < nrhs; j++)
 	lo ? cs_lsolve(A, bx + n * j) : cs_usolve(A, bx + n * j);
-    Free(A);
     UNPROTECT(1);
     return ans;
 }
