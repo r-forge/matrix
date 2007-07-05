@@ -285,7 +285,7 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
     int *p = INTEGER(GET_SLOT(lu, Matrix_pSym)),
 	*q = LENGTH(qslot) ? INTEGER(qslot) : (int *) NULL;
     double *ax = REAL(GET_SLOT(ans, Matrix_xSym)),
-	*x = Calloc(n, double);
+	*x = Alloca(n, double);
     R_CheckStack();
 
     if (U->n != n || nrhs < 1 || n < 1)
@@ -304,7 +304,6 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
 	else
 	    Memcpy(ax + j * n, x, n);
     }
-    Free(x);
     UNPROTECT(1);
     return ans;
 }
