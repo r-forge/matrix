@@ -1,3 +1,10 @@
+2007-07-05  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (printSpMatrix): renamed from prSpMatrix()
+	and extended with more sophisticated 'col.names' option.
+	* NAMESPACE: export  printSparseMatrix()
+	* man/printSpMatrix.Rd: document, incl. examples
+
 2007-07-04  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.99875-4
