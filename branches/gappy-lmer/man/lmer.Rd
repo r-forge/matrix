@@ -1,19 +1,23 @@
 \name{lmer}
 \alias{lmer}
-\alias{lmer2}
+\alias{glmer}
+\alias{nlmer}
 \concept{GLMM}% << so it's found
-\title{Fit (Generalized) Linear Mixed-Effects Models}
+\concept{NLMM}% << so it's found
+\title{Fit Mixed-Effects Models}
 \description{
-  Fit a linear or generalized linear mixed-effects model with nested or
-  crossed grouping factors for the random effects.
+  Fit a linear mixed model or a generalized linear mixed model or a
+  nonlinear mixed model.
 }
 \usage{
 lmer(formula, data, family, method, control, start,
-     subset, weights, na.action, offset, contrasts,
-     model, \dots)
-lmer2(formula, data, family, method, control, start,
-      subset, weights, na.action, offset, contrasts,
-      model, \dots)
+     verbose, subset, weights, na.action, offset,
+     contrasts, model, x, \dots)
+glmer(formula, data, family, method, control, start,
+      verbose, subset, weights, na.action, offset,
+      contrasts, model, \dots)
+nlmer(formula, data, control, start, verbose,
+      subset, weights, na.action, contrasts, model, \dots)
 }
 \arguments{
   \item{formula}{a two-sided linear formula object describing the
@@ -51,8 +55,12 @@ lmer2(formula, data, family, method, control, start,
   \item{subset, weights, na.action, offset, contrasts}{further model
     specification arguments as in \code{\link[stats]{lm}}; see there for
     details.}
-  \item{model}{logical indicating if the model component
-    should be returned (in slot \code{frame}).}
+  \item{model}{logical scalar.  If \code{FALSE} the model frame in
+    slot \code{frame} is truncated to zero rows.}
+  \item{x}{logical scalar.  If \code{FALSE} the model matrix in
+    slot \code{X} is truncated to zero rows.}
+  \item{verbose}{logical scalar.  If \code{TRUE} verbose output is
+    generated during the optimization of the parameter estimates.}
   \item{\dots}{potentially further arguments for methods.  Currently
     none are used.}
 }
@@ -62,20 +70,6 @@ lmer2(formula, data, family, method, control, start,
   specifying random-effects terms and allows for fitting generalized
   linear mixed models as well as linear mixed models.
 
-  The \code{lmer2} function is a development version of \code{lmer} that
-  uses a modified internal representation of the model.  Typically
-  \code{lmer2} is faster and more reliable than \code{lmer}.  At present
-  \code{lmer2} can only fit linear mixed-effects models (that is, the
-  \code{family} argument must be left unspecified) and not all the
-  methods for \code{"lmer"} objects are defined for \code{"lmer2"}
-  objects.  In particular, there is no \code{\link{mcmcsamp}} method for
-  \code{"lmer2"} objects.
-
-  When all the methods for the \code{"lmer"} objects and all the options
-  for the \code{lmer} function have been duplicated for the new
-  representation, the new representation will replace the old one and
-  the \code{"2"} will be dropped from the name.
-    
   Additional standard arguments to model-fitting functions can be passed
   to \code{lmer}.
   \describe{
@@ -85,49 +79,22 @@ lmer2(formula, data, family, method, control, start,
       to be included, or a  character  vector of the row names to be
       included.  All observations are included by default.}
     \item{na.action}{a function that indicates what should happen when the
-      data contain \code{NA}s.  The default action (\code{na.fail}) causes
-      \code{lme} to print an error message and terminate if there are any
-      incomplete observations.}
+      data contain \code{NA}s.  The default action (\code{na.fail}) prints
+      an error message and terminate if there are any incomplete
+      observations.}
     \item{control}{a named list of control parameters for the estimation
       algorithm, specifying only the ones to be changed from their
       default values.  Hence defaults to an empty list.\cr
       Possible control options and their default values are:
       \describe{
-	\item{\code{maxIter}:}{maximum number of iterations for the \code{lme}
-	  optimization algorithm.  Default is 50.}
-	\item{\code{tolerance}:}{relative convergence tolerance for the
-	  \code{lme} optimization algorithm.  Default is
-	  \code{sqrt(.Machine$double.eps)}.}
-	\item{\code{msMaxIter}:}{maximum number of iterations
-	  for the \code{nlminb} optimization step inside the \code{lme}
-	  optimization.  Default is 200.}
+% 	\item{\code{maxIter}:}{maximum number of iterations for the \code{lme}
+% 	  optimization algorithm.  Default is 50.}
+% 	\item{\code{tolerance}:}{relative convergence tolerance for the
+% 	  \code{lme} optimization algorithm.  Default is
+% 	  \code{sqrt(.Machine$double.eps)}.}
 	\item{\code{msVerbose}:}{a logical value passed as the
 	  \code{trace} argument to \code{nlminb} (see documentation on
 	  that function).  Default is \code{getOption("verbose")}.}
-	\item{\code{niterEM}:}{number of iterations for the EM algorithm
-	  used to refine the initial estimates of the random effects
-	  variance-covariance coefficients.  Default is 15.}
-	\item{\code{EMverbose}:}{a logical value indicating if verbose output
-	  should be produced during the EM iterations.  Default is
-	  \code{getOption("verbose")}.}
-
-	\item{\code{PQLmaxIt}:}{maximum number of iterations for the PQL
-	  algorithm when fitting generalized linear mixed models.
-	  Default is 30.}%% unused currently?
-	\item{\code{usePQL}:}{Should the PQL method be used before
-	  switching to general optimization when fitting generalized linear mixed
-	  models using \code{method = "Laplace"}?  Default is \code{FALSE}.}
-	\item{\code{gradient}:}{a logical value indicating if the
-	  analytic gradient of the objective should be used.  Use of an
-	  analytic gradient results in more stable convergence but can take
-	  longer.  For models with multiple grouping factors the
-	  difference in time can be substantial.
-	  Default is \code{TRUE}.}
-	\item{\code{Hessian}:}{a logical value indicating if the
-	  analytic Hessian of the objective should be calculated.  This
-	  is an experimental feature and at present the default is
-	  \code{FALSE}.  In the future we may use the analytic Hessian in
-	  the optimization.}
       }
     }
     \item{model, x}{logicals.  If \code{TRUE} the corresponding
@@ -147,9 +114,21 @@ lmer2(formula, data, family, method, control, start,
   The \code{\linkS4class{lmer}} class, \code{\link[stats]{lm}}
 }
 \examples{
-(fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
+#(fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
 (fm2 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), sleepstudy))
-anova(fm1, fm2)
+#anova(fm1, fm2)
+(fm1 <- nlmer(circumference ~ SSlogis(age, Asym, xmid, scal) ~ Asym|Tree,
+                    Orange, verb = 1,
+                    start = c(Asym = 192.6872, xmid = 728.7544, scal = 353.5320)))
+(fm2 <- nlmer(conc ~ SSfol(Dose, Time,lKe, lKa, lCl) ~ (lKe+lKa+lCl|Subject),
+                    Theoph, start = c(lKe = -2.5, lKa = 0.5, lCl = -3), verb = 1))
+(fm3 <- nlmer(conc ~ SSfol(Dose, Time,lKe, lKa, lCl) ~
+                     (lKe|Subject) + (lKa|Subject) + (lCl|Subject), Theoph,
+                     start = c(lKe = -2.5, lKa = 0.5, lCl = -3), verb = 1))
+(fm4 <- nlmer(conc ~ SSfol(Dose, Time,lKe, lKa, lCl) ~ (lKa+lCl|Subject),
+              Theoph, start = c(lKe = -2.5, lKa = 0.5, lCl = -3), verb = 1))
+(fm5 <- nlmer(conc ~ SSfol(Dose, Time,lKe, lKa, lCl) ~ (lKa|Subject) + (lCl|Subject), 
+              Theoph, start = c(lKe = -2.5, lKa = 0.5, lCl = -3), verb = 1))
 }
 \keyword{models}
 \keyword{methods}

@@ -359,11 +359,12 @@ lmer <-
                dims = dd, ST = ST, Vt = Vt,
                L = .Call(mer_create_L, Vt), RXy = RXy, RVXy = ZtXy,
                deviance = VecFromNames(.dev_names),
-               fixef = numeric(dd["p"]), ranef = numeric(dd["q"]))
+               fixef = numeric(dd["p"]), ranef = numeric(dd["q"]),
+               uvec = numeric(dd["q"]))
     cv <- do.call("lmerControl", control)
     if (missing(verbose)) verbose <- cv$msVerbose
-#    .Call(lmer_optimize, ans, verbose, 0)
-#    .Call(lmer_update_effects, ans)
+    .Call(mer_optimize, ans, verbose, 0)
+    .Call(lmer_update_effects, ans)
     ans
 }
 
@@ -443,10 +444,9 @@ function(formula, data, family = gaussian, method = c("Laplace", "AGQ"),
 }
 
 ## Fit a nonlinear mixed-effects model
-nlmer <- function(formula, data,
-                  control = list(), start = NULL, verbose = FALSE,
-                  subset, weights, na.action, contrasts = NULL,
-                  model = TRUE, ...)
+nlmer <- function(formula, data, control = list(), start = NULL,
+                  verbose = FALSE, subset, weights, na.action,
+                  contrasts = NULL, model = TRUE, ...)
 {
     mc <- match.call()
     formula <- as.formula(formula)
@@ -805,9 +805,9 @@ setMethod("fixef", signature(object = "mer"),
 ## Extract the conditional variance-covariance matrix of the fixed effects
 setMethod("vcov", signature(object = "lmer"),
 	  function(object, REML = 0, ...) {
-	      rr <- as(.Call(lmer_sigma, object, REML)^2 *
-                       crossprod(.Call(lmer_vcov, object)), "dpoMatrix")
-              nms <- object@cnames[[".fixed"]]
+	      rr <- as(.Call(mer_sigma, object, REML)^2 *
+                       chol2inv(object@RXy, size = object@dims['p']), "dpoMatrix")
+              nms <- colnames(object@X)
               dimnames(rr) <- list(nms, nms)
 	      rr@factors$correlation <- as(rr, "corMatrix")
 	      rr
@@ -936,7 +936,7 @@ setMethod("summary", signature(object = "lmer"),
 		  methTitle = methTitle,
 		  logLik = llik,
 		  ngrps = sapply(object@flist, function(x) length(levels(x))),
-		  sigma = .Call(lmer_sigma, object, REML),
+		  sigma = .Call(mer_sigma, object, REML),
 		  coefs = coefs,
 		  vcov = vcov,
 		  REmat = REmat,
@@ -967,37 +967,12 @@ setMethod("deviance", signature(object="lmer"),
               object@deviance[ifelse(REML, "REML", "ML")]
           })
 
+### FIXME: Modify this to handle glmer models without a scale parameter
 # Create the VarCorr object of variances and covariances
-setMethod("VarCorr", signature(x = "lmer"),
+setMethod("VarCorr", signature(x = "mer"),
 	  function(x, REML = NULL, ...)
       {
-	  sc <- .Call(lmer_sigma, x, REML)
-	  cnames <- x@cnames
-	  ans <- x@ST
-          for (i in seq(along = ans)) {
-              ai <- ans[[i]]
-              dm <- dim(ai)
-              if (dm[1] < 2) {
-                  el <- (sc * ai)^2
-              } else {
-                  dd <- diag(ai)
-                  diag(ai) <- rep(1, dm[1])
-                  el <- sc^2 * crossprod(dd * t(ai))
-              }
-              el <- as(el, "dpoMatrix")
-              el@Dimnames <- list(cnames[[i]], cnames[[i]])
-	      el@factors$correlation <- as(el, "corMatrix")
-	      ans[[i]] <- el
-	  }
-	  attr(ans, "sc") <- sc
-	  ans
-      })
-
-# Create the VarCorr object of variances and covariances
-setMethod("VarCorr", signature(x = "nlmer"),
-	  function(x, REML = NULL, ...)
-      {
-	  sc <- sqrt(sum(x@deviance[c("bqd", "Sdr")])/x@dims["n"])
+	  sc <- .Call(mer_sigma, x, REML)
 	  cnames <- x@cnames
 	  ans <- x@ST
           for (i in seq(along = ans)) {

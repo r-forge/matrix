@@ -5,68 +5,51 @@
 \alias{lmer-class}
 \alias{glmer-class}
 \alias{mer-class}
-\alias{lmer2-class}
-\alias{glmer2-class}
 \alias{coef.lmer-class}
 \alias{summary.mer-class}
-\alias{summary.lmer2-class}
 \alias{summary.lmer-class}
-\alias{summary.lmer2-class}
 \alias{summary.glmer-class}
 \alias{ranef.lmer-class}
 % Methods
-\alias{anova,mer-method}
-\alias{anova,lmer2-method}
-\alias{coef,mer-method}
-\alias{coef,mer-method}
+\alias{anova,lmer-method}
+\alias{coef,lmer-method}
 \alias{coerce,lmer,dsTMatrix-method}
 \alias{coerce,mer,dtCMatrix-method}
 \alias{coerce,mer,pMatrix-method}
 \alias{chol,lmer,ANY-method}
-\alias{confint,mer-method}
+\alias{confint,lmer-method}
 \alias{deviance,mer-method}
-\alias{deviance,lmer2-method}
-\alias{fitted,mer-method}
-\alias{formula,mer-method}
+\alias{fitted,lmer-method}
+\alias{formula,lmer-method}
 \alias{logLik,mer-method}
-\alias{logLik,lmer2-method}
 \alias{plot,coef.lmer-method}
 \alias{plot,ranef.lmer-method}
 \alias{print,mer-method}
-\alias{print,lmer2-method}
 \alias{qqmath,ranef.lmer-method}
 \alias{resid,glmer-method}
 \alias{resid,lmer-method}
 \alias{residuals,glmer-method}
 \alias{residuals,lmer-method}
 \alias{show,mer-method}
-\alias{show,lmer2-method}
-\alias{simulate,mer-method}
-\alias{simulate,lmer2-method}
-\alias{summary,mer-method}
-\alias{summary,lmer2-method}
+\alias{simulate,lmer-method}
+\alias{summary,lmer-method}
 \alias{terms,lmer-method}
 \alias{update,mer-method}
 \alias{vcov,mer-method}
-\alias{vcov,lmer2-method}
 \alias{with,lmer-method}
 %
 \alias{deviance,summary.mer-method}
-\alias{deviance,summary.lmer2-method}
 \alias{logLik,summary.mer-method}
-\alias{logLik,summary.lmer2-method}
 \alias{vcov,summary.mer-method}
-\alias{vcov,summary.lmer2-method}
 \alias{summary,summary.mer-method}
-\alias{summary,summary.lmer2-method}
 \description{
-  The \code{mer} class is mixed-effects representation using a
-  sparse, symmetric, column-oriented matrix and several dense
-  matrices.  The \code{lmer} class extends \code{mer} to represent a
-  fitted linear mixed-effects model.  The \code{summary.mer} and
-  \code{summary.lmer} classes represent summaries of these objects.  The
-  \code{coef.lmer} and \code{ranef.lmer} classes represent fixed and
-  random effect \dQuote{coefficients}.
+  The \code{mer} class is mixed-effects representation using a sparse
+  model matrix and the sparse Cholesky factor of the (updated)
+  cross-product of its columns.  The \code{lmer} class extends
+  \code{mer} to represent a fitted linear mixed-effects model.  The
+  \code{summary.mer} and \code{summary.lmer} classes represent summaries
+  of these objects.  The \code{coef.lmer} and \code{ranef.lmer} classes
+  represent fixed and random effect \dQuote{coefficients}.
 }
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("lmer", ...)}
@@ -77,28 +60,30 @@
 
 \section{Slots}{
   \describe{
+    \item{\code{env}:}{An environment (of class \code{"environment"})
+      created for the evaluation of the nonlinear model function.}
+    \item{\code{model}:}{The nonlinear model function as an object of
+      class \code{"call"}.}
+    \item{\code{frame}:}{The model frame for the model, as an object of
+      class \code{"data.frame"}.}
+    \item{\code{pnames}:}{Names of the parameters in the nonlinear model
+      (class \code{"character"}).}
+    \item{\code{call}:}{The matched call to the function that
+      created the object. (class \code{"call"}).} 
     \item{\code{flist}:}{The list of grouping factors for the random
       effects.}
-    \item{\code{Zt}:}{The transpose of the model matrix for the random
-      effects stored as a \code{"\link[Matrix:dgCMatrix-class]{dgCMatrix}"}.}
-    \item{\code{X}:}{Model matrix for the fixed effects.}
-    \item{\code{y}:}{Numeric response vector.}
-    \item{\code{wts}:}{Numeric weights vector.}
-    \item{\code{wrkres}:}{Numeric vector of working residuals.}
-    \item{\code{method}:}{Character vector of length 1 containing
-      \code{"ML"}, for maximum likelihood, or \code{"REML"}, for
-      restricted maximum likelihood, or \code{"PQL"}, for penalized
-      quasi-likelihood, or \code{"Laplace"}, for the Laplacian
-      approximation, or \code{"AGQ"}, for adaptive Gauss-Hermite
-      quadrature.}
-    \item{\code{family}:}{a copy of the glm family.}
-    \item{\code{call}:}{a copy of the call to the model-fitting
-	function.}
+    \item{\code{Xt}:}{Sparse model matrix (class
+      \code{"\link[Matrix:dgCMatrix-class]{dgCMatrix}"}) for
+      the fixed effects.}
+    \item{\code{Zt}:}{Sparse model matrix (class
+      \code{"\link[Matrix:dgCMatrix-class]{dgCMatrix}"}) for
+      the random effects.}
+    \item{\code{y}:}{The response vector (class \code{"numeric"}).}
+    \item{\code{weights}:}{Numeric weights vector. This may be of length
+      zero (0) indicating unit weights.}
     \item{\code{cnames}:}{a list of character vectors of column names
       of the random-effects variance-covariance matrix associated with
       each grouping factor and the fixed-effects model matrix.}
-    \item{\code{nc}:}{integer vector giving the number of columns the
-      variance-covariance matrix associated with each grouping factor.}
     \item{\code{Gp}:}{integer vector of group pointers within the random
       effects and the rows of the transposed model matrix in the
       \code{Zt} slot.  The elements of \code{Gp} are the 0-based index
@@ -106,95 +91,51 @@
       the first element is always 0.  The last element is the total
       length of the random effects vector (also the total number of rows
       in the matrix in the \code{Zt} slot).}
-    \item{\code{XtX}:}{The crossproduct matrix of the model matrix in
-      the \code{X} slot, stored as a
-      \code{"\link[Matrix:dpoMatrix-class]{dpoMatrix}"} object.}
-    \item{\code{ZtZ}:}{The crossproduct matrix of the model matrix for
-      the random effects, stored as a
-      \code{"\link[Matrix:dpoMatrix-class]{dpoMatrix}"} object.}
-    \item{\code{ZtX}:}{The original \eqn{Z'X} matrix, stored as a
-      \code{"\link[Matrix:dgeMatrix-class]{dgeMatrix}"} object.}
-    \item{\code{Zty}:}{The numeric vector \eqn{Z'y}.}
-    \item{\code{Xty}:}{The numeric vector \eqn{X'y}.}
-    \item{\code{Omega}:}{A list of positive-definite matrices stored as
-      \code{"\link[Matrix:dpoMatrix-class]{dpoMatrix}"} objects that are the
-      relative precision matrices of the random effects associated with
-      each of the grouping factors.}
-    \item{\code{L}:}{The sparse, supernodal lower Cholesky factor of
-      \eqn{Z'Z+\Omega}, stored as a
-      \code{"\link[Matrix:CHMfactor-class]{dCHMsuper}"} object.}
-    \item{\code{RZX}:}{A rectangular matrix, stored as a
-      \code{"\link[Matrix:dgeMatrix-class]{dgeMatrix}"} object, which is the RZX
-	component of the Cholesky factor of \eqn{Z'Z+\Omega} at the
-	current values of the parameters.}
-    \item{\code{RXX}:}{An upper triangular matrix, stored as a
-      \code{"\link[Matrix:dtrMatrix-class]{dtrMatrix}"} object, which is the RXX
-	component of the Cholesky factor of \eqn{Z'Z+\Omega} at the
-	current values of the parameters.}
-    \item{\code{rZy}:}{A numeric vector - the rZy
-	component of the Cholesky factor of \eqn{Z'Z+\Omega} at the
-	current values of the parameters.}
-    \item{\code{rXy}:}{A numeric vector - the rXy
-	component of the Cholesky factor of \eqn{Z'Z+\Omega} at the
-	current values of the parameters.}
-    \item{\code{devComp}:}{Numeric vector of components from which the
-      deviance can be calculated.  The named components are: \code{"n"},
-      the number of observations (length of the \code{"y"} slot),
-      \code{"p"}, the length of the fixed-effects vector (number of
-      columns of the matrix in the \code{"X"} slot), \code{"yty"}, the
-      sum of squares of the \code{y},\code{"logryy2"}, the logarithm of
-      the penalized residual sum of squares, \code{"logDetL2"}, the
-      logarithm of the square of the determinant of \code{L},
-      \code{"logDetOmega"}, the logarithm of the determinant of
-      \code{Omega}, and \code{"logDetRXX"}, the logarithm of the
-      determinant of the triangular matrix in the \code{"RXX"} slot.
-      This slot's contents are current if \code{status$stage > 0}.}
-    \item{\code{deviance}:}{Numeric vector of length 2 containing the
-      deviance corresponding to the maximum likelihood (ML) and REML
-      criteria.  This slot's contents are current if
-      \code{status$stage > 0factored}.}
-    \item{\code{fixef}:}{Numeric vector containing the conditional estimates
-      of the fixed effects.  This slot's contents are current if
-      \code{status$stage > 1}.}
-    \item{\code{ranef}:}{Numeric vector containing the conditional modes
-      of the random effects.  This slot's contents are current if
-      \code{status$stage > 1}.}
-    \item{\code{RZXinv}:}{A rectangular matrix, stored as a
-      \code{"\link[Matrix:dgeMatrix-class]{dgeMatrix}"} object, which is the RZX
-	component of the inverse of the Cholesky factor of
-	\eqn{Z'Z+\Omega} at the current values of the parameters. This
-	slot's contents are current if \code{status$stage > 2}.}
-    \item{\code{bVar}:}{A list of the diagonal inner blocks (upper
-      triangles only) of the positive-definite matrices on the diagonal
-      of the inverse of \code{ZtZ+Omega}. With the appropriate scale
-      factor (and conversion to a symmetric matrix) these are the
-      conditional variance-covariance matrices of the random effects.}
-    \item{\code{gradComp}:}{A list of three-dimensional arrays each with four
-      faces.  See the code for the documentation of these components.}
-    \item{\code{status}:}{Integer vector of length 4 indicating the
-      stage of the calculation at the current value of \code{Omega}, and
-      whether REML is being used.  The codes for the \code{"stage"}
-      element are 0 - unfactored, 1 - factored, 2 - secondary, 3 - gradComp
-      and 4 - HessComp.}
-    \item{\code{call}:}{A copy of the matched call to the function that
-      created the object.}
-    \item{\code{frame}:}{the model frame for the model or an empty data
-      frame}
-    \item{\code{terms}:}{the terms attribute of the model frame for the
-      fixed-effects terms only}
-    \item{\code{weights}:}{prior weights on the responses.  Only present
-	in the \code{glmer} class.}
-    \item{\code{showCorrelation}:}{Logical indicator of whether to
-      display the correlation of the fixed-effects estimates when
-      showing the object. Only present in the \code{summary.lmer} class.}
+    \item{\code{dims}:}{A named integer vector of dimensions.}
+    \item{\code{ST}:}{A list of S and T factors in the TSST' Cholesky
+      factorization of the relative variance matrices of the random
+      effects associated with each grouping factor.  The unit lower
+      triangular matrix T and the diagonal matrix S are stored as a
+      single matrix whose diagonal elements determine S while the
+      subdiagonal elements determine the non-trivial elements of T.}
+    \item{\code{Vt}:}{Sparse matrix (class
+      \code{"\link[Matrix:dgCMatrix-class]{dgCMatrix}"})
+      containing the transpose of \eqn{V=ZTS}.}
+    \item{\code{L}:}{The sparse lower Cholesky factor of \eqn{V'V+I}
+      (class \code{"\link[Matrix:CHMfactor-class]{dCHMfactor}"}).}
+    \item{\code{L}:}{The Cholesky decomposition (class
+      \code{"\link[Matrix:CHMfactor-class]{dCHMfactor}"}) of \eqn{V'V+I}.}
+    \item{\code{mu}:}{A numeric vector of predicted values from the
+      model with an attibute \code{"gradient"}, the gradient matrix.}
+    \item{\code{Mt}:}{The derivative of \code{mu} with respect to
+      \code{uvec} stored as a sparse matrix (class
+      \code{"\link[Matrix:CHMfactor-class]{dCHMfactor}"}).}      
+    \item{\code{deviance}:}{Named numeric vector containing the deviance
+      corresponding to the maximum likelihood (the \code{"ML"} element)
+      and \code{"REML"} criteria and various components. The
+      \code{"ldL2"} element is twice the logarithm of the determinant of
+      the Cholesky factor in the \code{L} slot. The \code{"lpdisc"}
+      element is the logarithm of the penalized discrepancy.  The
+      \code{"bqd"} component is the value of the random-effects
+      quadratic form.}
+    \item{\code{fixef}:}{Numeric vector of fixed effects.}
+    \item{\code{ranef}:}{Numeric vector of random effects on the
+      original scale.}
+    \item{\code{uvec}:}{Numeric vector of orthogonal, constant variance
+      random effects.}
+    \item{\code{X}:}{Dense model matrix for the fixed
+      effects. (\code{"lmer"} class only.)}
+    \item{\code{XytXy}:}{The crossproduct of the columns of \eqn{[X:y]}.}
+    \item{\code{RVXy}:}{A rectangular matrix, the dense solution to
+      \eqn{L RVXy = S T'ZtXy}.}
+    \item{\code{RXy}:}{The upper triangular Cholesky factor of the
+      downdated \code{XytXy} slot.}
   }
   The \code{"summary.mer"}, \code{"summary.lmer"} and
-  \code{"summary.glmer"} classes \emph{contain}
-  the \code{"mer"}, \code{"lmer"} and \code{"glmer"} classes respectively and have
+  \code{"summary.glmer"} classes \emph{contain} the \code{"mer"},
+  \code{"lmer"} and \code{"glmer"} classes respectively and have
   additional slots,
   \describe{
-    \item{\code{isG}:}{logical indicating if we have a
-      \bold{g}eneralized linear mixed effects model.}
     \item{\code{methTitle}:}{character string specifying a method title}
     \item{\code{logLik}:}{the same as \code{\link{logLik}(object)}.}
     \item{\code{ngrps}:}{...}% FIXME

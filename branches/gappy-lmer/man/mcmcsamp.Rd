@@ -2,7 +2,6 @@
 \docType{genericFunction}
 \alias{mcmcsamp}
 \alias{mcmcsamp,lmer-method}
-\alias{mcmcsamp,lmer2-method}
 \alias{mcmcsamp,glmer-method}
 \title{Generate an MCMC sample}
 \description{
