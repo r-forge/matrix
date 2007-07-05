@@ -66,6 +66,9 @@ t(X) ## shows column names, since only 5 columns
 X2 <- as(gl(12, 3, labels = paste(LETTERS[1:12],"c",sep=".")),
          "sparseMatrix")
 X2
+## less nice, but possible:
+print(X2, col.names = TRUE) # use [,1] [,2] .. => does not fit
+
 t(X2) # suppressing column names
 print(t(X2), col.names=TRUE)
 print(t(X2), zero.print = "", col.names="abbr. 1")
