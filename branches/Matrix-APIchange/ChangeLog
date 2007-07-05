@@ -1,8 +1,34 @@
+2007-07-05  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (printSpMatrix): renamed from prSpMatrix()
+	and extended with more sophisticated 'col.names' option.
+	* NAMESPACE: export  printSparseMatrix()
+	* man/printSpMatrix.Rd: document, incl. examples
+
 2007-07-04 16:21  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r4543] src/cs_utils.c, src/cs_utils.h, src/dgCMatrix.c,
 	  src/dtCMatrix.c, src/sparseQR.c: CSP typedef for *cs and macro
 	  AS_CSP. API change - pass the empty structure to Matrix_as_cs.
+
+2007-07-04  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.99875-4
+
+	* tests/Class+Meth.R (tstMatrixClass): add dimnames, and hence test
+	some dimnames perservation.
+
+	* R/dsTMatrix.R (t-method): keep dimnames
+	* R/dtTMatrix.R:  ditto
+
+	* R/sparseMatrix.R (prSpMatrix): print colnames when non-trivial
+	and ncol(.) < 10
+
+	* src/cs_utils.c: drop check_class() and use Matrix_check_class()
+	from Mutils.h
+
+	* src/lgCMatrix.c ([ln]csc_to_matrix): no longer lose dimnames,
+	e.g. in as(<ngCMatrix>, "matrix")
 
 2007-07-01 13:27  Douglas Bates <bates@stat.wisc.edu>
 
