@@ -223,11 +223,12 @@ setMethod("Math",
 
 ## FIXME(?) -- ``merge this'' (at least ``synchronize'') with
 ## - - -   prMatrix() from ./Auxiliaries.R
-prSpMatrix <- function(x, digits = getOption("digits"),
-                       maxp = getOption("max.print"), zero.print = ".",
-                       col.names = FALSE, note.dropping.colnames = TRUE,
-                       col.trailer = '', align = c("fancy", "right"))
 ## FIXME: prTriang() in ./Auxiliaries.R  should also get  align = "fancy"
+## --> help for this is currently (rudimentary) in ../man/sparseMatrix-class.Rd
+printSpMatrix <- function(x, digits = getOption("digits"),
+		       maxp = getOption("max.print"), zero.print = ".",
+		       col.names, note.dropping.colnames = TRUE,
+		       col.trailer = '', align = c("fancy", "right"))
 {
     cl <- getClassDef(class(x))
     stopifnot(extends(cl, "sparseMatrix"))
@@ -239,19 +240,44 @@ prSpMatrix <- function(x, digits = getOption("digits"),
     } else {
         m <- as(x, "matrix")
     }
+    dn <- dimnames(m) ## will be === dimnames(cx)
     logi <- extends(cl,"lsparseMatrix") || extends(cl,"nsparseMatrix")
     if(logi)
-	cx <- array("N", # or as.character(NA),
-		   dim(m), dimnames=dimnames(m))
+	cx <- array("N", dim(m), dimnames=dn)
     else { ## numeric (or --not yet-- complex):
 	cx <- apply(m, 2, format)
 	if(is.null(dim(cx))) {# e.g. in	1 x 1 case
 	    dim(cx) <- dim(m)
-	    dimnames(cx) <- dimnames(m)
+	    dimnames(cx) <- dn
 	}
     }
-    if(!col.names)
+    if (missing(col.names))
+        col.names <- {
+            if(!is.null(cc <- getOption("sparse.colnames")))
+                cc
+            else if(is.null(dn[[2]]))
+                FALSE
+            else { # has column names == dn[[2]]
+                ncol(x) < 10
+            }
+        }
+    if(identical(col.names, FALSE))
         cx <- emptyColnames(cx, msg.if.not.empty = note.dropping.colnames)
+    else if(is.character(col.names)) {
+        stopifnot(length(col.names) == 1)
+        cn <- col.names
+        switch(substr(cn, 1,3),
+               "abb" = {
+                   iarg <- as.integer(sub("^[^0-9]*", '', cn))
+                   colnames(cx) <- abbreviate(colnames(cx), minlength = iarg)
+               },
+               "sub" = {
+                   iarg <- as.integer(sub("^[^0-9]*", '', cn))
+                   colnames(cx) <- substr(colnames(cx), 1, iarg)
+               },
+               stop("invalid 'col.names' string: ", cn))
+    }
+    ## else: nothing to do for col.names == TRUE
     if(is.logical(zero.print))
 	zero.print <- if(zero.print) "0" else " "
     if(logi) {
@@ -299,7 +325,7 @@ prSpMatrix <- function(x, digits = getOption("digits"),
     invisible(x)
 }
 
-setMethod("print", signature(x = "sparseMatrix"), prSpMatrix)
+setMethod("print", signature(x = "sparseMatrix"), printSpMatrix)
 
 setMethod("show", signature(object = "sparseMatrix"),
    function(object) {
@@ -308,7 +334,7 @@ setMethod("show", signature(object = "sparseMatrix"),
        cat(sprintf('%d x %d sparse Matrix of class "%s"\n', d[1], d[2], cl))
        maxp <- getOption("max.print")
        if(prod(d) <= maxp)
-	   prSpMatrix(object, maxp = maxp)
+	   printSpMatrix(object, maxp = maxp)
        else { ## d[1] > maxp / d[2] >= nr : -- this needs [,] working:
 
 	   nR <- d[1] # nrow
@@ -327,23 +353,23 @@ setMethod("show", signature(object = "sparseMatrix"),
 	       if(suppCols)
 		   object <- object[ , 1:nc, drop = FALSE]
 	       n2 <- ceiling(nr / 2)
-	       prSpMatrix(object[seq_len(min(nR, max(1, n2))), , drop=FALSE],
-			  col.trailer = col.trailer)
+	       printSpMatrix(object[seq_len(min(nR, max(1, n2))), , drop=FALSE],
+                             col.trailer = col.trailer)
 	       cat("\n ..............................",
 		   "\n ..........suppressing rows in show(); maybe adjust 'options(max.print= *)'",
 		   "\n ..............................\n\n", sep='')
 	       ## tail() automagically uses "[..,]" rownames:
-	       prSpMatrix(tail(object, max(1, nr-n2)),
-			  col.trailer = col.trailer)
+	       printSpMatrix(tail(object, max(1, nr-n2)),
+                             col.trailer = col.trailer)
 	   }
 	   else if(suppCols) {
-	       prSpMatrix(object[ , 1:nc , drop = FALSE],
-			  col.trailer = col.trailer)
+	       printSpMatrix(object[ , 1:nc , drop = FALSE],
+                             col.trailer = col.trailer)
 
 	       cat("\n .....suppressing columns in show(); maybe adjust 'options(max.print= *)'",
 		   "\n ..............................\n", sep='')
 	   }
-           else stop("logic programming error in prSpMatrix(), please report")
+           else stop("logic programming error in printSpMatrix(), please report")
 
            invisible(object)
        }
