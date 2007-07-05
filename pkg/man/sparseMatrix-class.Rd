@@ -62,23 +62,14 @@
 }
 \section{Methods}{
   \describe{
-%% FIXME: better description of print() / show(); notably explain the
-%% print() arguments !
     \item{show}{\code{(object = "sparseMatrix")}: The
       \code{\link{show}} method for sparse matrices prints
-      \emph{\dQuote{structural}} zeroes as \code{"."} using the
-      non-exported \code{prSpMatrix} function which allows further
-      customization such as replacing \code{"."} by \code{" "} (blank).
-
-      Note that \code{\link{options}(max.print)} will influence how many
-      entries of large matrices are printed at all.}
-    \item{print}{\code{signature(x = "sparseMatrix")}, extra arguments
-      \code{digits = getOption("digits"), maxp = getOption("max.print"),
-	zero.print = ".", col.names = FALSE, note.dropping.colnames = TRUE,
-        col.trailer = '', align = c("fancy", "right")}: The
-      \code{\link{print}} method for sparse matrices by default is the
-      same as \code{show()} but can be called with extra optional arguments.}
-
+      \emph{\dQuote{structural}} zeroes as \code{"."} using
+      \code{\link{printSpMatrix}()} which allows further customization.}
+    \item{print}{\code{signature(x = "sparseMatrix")}, ....\cr
+      The \code{\link{print}} method for sparse matrices by default is the
+      same as \code{show()} but can be called with extra optional
+      arguments, see \code{\link{printSpMatrix}()}.}
     \item{summary}{\code{(object = "sparseMatrix")}: Returns
       an object of S3 class \code{"sparseSummary"} which is basically a
       \code{\link{data.frame}} with columns \code{(i,j,x)} with the
@@ -119,17 +110,5 @@ M  ## show(.) method suppresses printing of the majority of rows
 (fact <- gl(5, 3, 30, labels = LETTERS[1:5]))
 (Xt <- as(fact, "sparseMatrix"))  # indicator rows
 X <- t(Xt)
-## printing :
-X ## <==>  show(X)  <==>  print(X)
-print(X, zero.print = "", col.names = TRUE)
-
-\dontshow{% show() was slow in 0.9975-8 because of slow adjust="fancy"
-op <- options(max.print = 25000, width = 80)
-sink(print(tempfile()))
-stopifnot((st <- system.time(show(M)))[1] < 1.0) # only 0.09 on cmath-3
-sink()
-st
-options(op)
-}
 }
 \keyword{classes}
