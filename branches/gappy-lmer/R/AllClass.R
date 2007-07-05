@@ -32,6 +32,7 @@ setClass("mer", ## Slots common to all three types of mixed models
 			deviance = "numeric", # ML and REML deviance and components
 			fixef = "numeric",  # fixed effects coefficients (length p)
 			ranef = "numeric",  # random effects (length q)
+                        uvec = "numeric",  # orthogonal random effects (length q)
                         "VIRTUAL"),
          validity = function(object) .Call(mer_validate, object))
 
@@ -55,8 +56,7 @@ setClass("glmer", ## generalized linear mixed models
                         X = "matrix",       # model matrix for fixed effects
                         offset = "numeric", # can be length 0 (for no offset)
                         ## slots that vary during optimization
-			Vt = "dgCMatrix",   # sparse form of V'=(ZTS)'
-                        uvec = "numeric"),  # orthogonal random effects (length q)
+			Vt = "dgCMatrix"),   # sparse form of V'=(ZTS)'
          contains = "mer",
          validity = function(object) .Call(glmer_validate, object))
 
@@ -68,8 +68,7 @@ setClass("nlmer", ## nonlinear mixed models
                         Xt = "dgCMatrix",   # sparse form of X'
                         ## slots that vary during optimization
                         mu = "numeric",     # fitted values at current values of beta and b
-                        Mt = "dgCMatrix",   # transpose of gradient matrix d mu/d u
-                        uvec = "numeric"),  # orthogonal random effects
+                        Mt = "dgCMatrix"),   # transpose of gradient matrix d mu/d u
          contains = "mer",
          validity = function(object) .Call(nlmer_validate, object))
 

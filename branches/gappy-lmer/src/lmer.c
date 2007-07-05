@@ -319,23 +319,21 @@ SEXP mer_update_VtL(SEXP x)
  */
 static double *TS_mult(const int *Gp, SEXP ST, double *b)
 {
-    int i, ione = 1, nf = LENGTH(ST);
-/* FIXME: Use ST_nc_nlev here */
+    int i, j, k, ione = 1, nf = LENGTH(ST);
+    int *nc = alloca(nf * sizeof(int)), *nlev = alloca(nf * sizeof(int));
+    double **st = alloca(nf * sizeof(double*));
+    R_CheckStack();
 
+    ST_nc_nlev(ST, Gp, st, nc, nlev);
     for (i = 0; i < nf; i++) {
-	SEXP STi = VECTOR_ELT(ST, i);
-	double *st = REAL(STi);
-	int nci = INTEGER(getAttrib(STi, R_DimSymbol))[0];
-	int j, k, ncip1 = nci + 1,
-	    nlev = (Gp[i + 1] - Gp[i])/nci;
 
-	for (j = 0; j < nlev; j++) {
-	    int base = Gp[i] + j * nci;
-	    for (k = 0; k < nci; k++) /* multiply by S_i */
-		b[base + k] *= st[k * ncip1];
+	for (j = 0; j < nlev[i]; j++) {
+	    int base = Gp[i] + j * nc[i];
+	    for (k = 0; k < nc[i]; k++) /* multiply by S_i */
+		b[base + k] *= st[i][k * (nc[i] + 1)];
 /* FIXME: This doesn't use the gappy lmer format */
-	    if (nci > 1) 	/* multiply by T_i */
-		F77_CALL(dtrmv)("L", "N", "U", &nci, st, &nci,
+	    if (nc[i] > 1) 	/* multiply by T_i */
+		F77_CALL(dtrmv)("L", "N", "U", nc + i, st[i], nc + i,
 				b + base, &ione);
 	}
     }
@@ -377,43 +375,6 @@ SEXP ST_initialize(SEXP ST, SEXP Gpp, SEXP Zt)
 	}
     }
     return R_NilValue;
-}
-
-/**
- * Evaluate the effects in an lmer representation
- *
- * @param L factorization
- *
- * @return cholmod_dense object with \hat{b*} in the first q positions
- * and \hat{\beta} in the next p positions.
- */
-static CHM_DN
-internal_lmer_effects(CHM_FR L)
-{
-    int i, nt = (L->n);
-    CHM_DN X, B = M_cholmod_allocate_dense(L->n, 1, L->n, CHOLMOD_REAL, &c);
-    double *bx = (double*)(B->x);
-    
-    for (i = 0; i < nt; i++) bx[i] = 0;
-    if (L->is_super) {
-	int ns = (L->nsuper);
-	int nr = ((int *)(L->pi))[ns] - ((int *)(L->pi))[ns - 1],
-	    nc = ((int *)(L->super))[ns] - ((int *)(L->super))[ns - 1];
-	double *x = (double *)(L->x) + ((int *)(L->px))[ns - 1];
-
-	bx[nt - 1] = x[(nc - 1) * (nr + 1)];
-    } else {
-	bx[nt - 1] = (L->is_ll) ? ((double*)(L->x))[((int*)(L->p))[nt - 1]] : 1;
-    }
-    if (!(X = M_cholmod_solve(CHOLMOD_Lt, L, B, &c)))
-	error(_("cholmod_solve (CHOLMOD_Lt) failed: status %d, minor %d from ncol %d"),
-	      c.status, L->minor, L->n);
-    M_cholmod_free_dense(&B, &c);
-    if (!(B = M_cholmod_solve(CHOLMOD_Pt, L, X, &c)))
-	error(_("cholmod_solve (CHOLMOD_Pt) failed: status %d, minor %d from ncol %d"),
-	      c.status, L->minor, L->n);
-    M_cholmod_free_dense(&X, &c);
-    return B;
 }
 
 /**
@@ -635,9 +596,9 @@ SEXP lmer_deviance(SEXP x, SEXP which)
     return ScalarReal(REAL(GET_SLOT(x, lme4_devianceSym))[POS]);
 }
 
-    
 /**
- * Update the contents of the fixef and ranef slots
+ * Update the contents of the fixef, ranef and uvec slots in an lmer
+ * object.
  *
  * @param x an lmer object
  *
@@ -645,24 +606,33 @@ SEXP lmer_deviance(SEXP x, SEXP which)
  */
 SEXP lmer_update_effects(SEXP x)
 {
+    SEXP ranef = GET_SLOT(x, lme4_ranefSym),
+	uvec = GET_SLOT(x, lme4_uvecSym);
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), *perm, i, ione = 1;
+    int p = dims[p_POS],  pp1 = dims[p_POS] + 1, q = dims[q_POS];
+    double *RXy = REAL(GET_SLOT(x, lme4_RXySym)),
+	*RVXy = REAL(GET_SLOT(x, lme4_RVXySym)),
+	*b = REAL(ranef), *fixef = REAL(GET_SLOT(x, lme4_fixefSym)),
+	*u = REAL(uvec), mone[] = {-1,0}, one[] = {1,0};
     CHM_FR L = L_SLOT(x);
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), i;
-    int q = dims[q_POS];
-    double *b = REAL(GET_SLOT(x, lme4_ranefSym)), *bstbx,
-	*dev = REAL(GET_SLOT(x, lme4_devianceSym));
-    CHM_DN bstarb;
-
+    CHM_DN cu = AS_CHM_DN(uvec), sol;
     R_CheckStack();
-    bstarb = internal_lmer_effects(L);
-    bstbx = (double*)(bstarb->x);
-    Memcpy(b, bstbx, q);
-    for (i = 0, dev[bqd_POS] = 0; i < q; i++) /* accumulate ssqs of bstar */
-	dev[bqd_POS] += bstbx[i] * bstbx[i];
-    /* FIXME: apply the permutation when copying */
-    Memcpy(REAL(GET_SLOT(x, lme4_fixefSym)), bstbx + q, dims[p_POS]);
-    M_cholmod_free_dense(&bstarb, &c);
-    TS_mult(INTEGER(GET_SLOT(x, lme4_GpSym)),
-	    GET_SLOT(x, lme4_STSym), b);
+
+    Memcpy(fixef, RXy + p * pp1, p);
+    F77_CALL(dtrsv)("U", "N", "N", &p, RXy, &pp1, fixef, &ione);
+    Memcpy(u, RVXy + q * p, q);
+    F77_CALL(dgemv)("N", &q, &p, mone, RVXy, &q, fixef, &ione, one, u, &ione);
+    if (!(sol = M_cholmod_solve(CHOLMOD_Lt, L, cu, &c)))
+	error(_("cholmod_solve (CHOLMOD_Lt) failed: status %d, minor %d from ncol %d"),
+	      c.status, L->minor, L->n);
+    Memcpy(u, (double*)(sol->x), q);
+    M_cholmod_free_dense(&sol, &c);
+
+    perm = (int *)(L->Perm);
+    for (i = 0; i < q; i++) /* apply the inverse permutation to u into b */
+	b[i] = u[perm[i]];
+    TS_mult(INTEGER(GET_SLOT(x, lme4_GpSym)), GET_SLOT(x, lme4_STSym), b);
+
     return R_NilValue;
 }
 
@@ -675,7 +645,7 @@ SEXP lmer_update_effects(SEXP x)
  * @param deviance vector of deviance components
  */
 static R_INLINE double
-internal_lmer_sigma(int REML, const int* dims, const double* deviance)
+Mer_sigma(int REML, const int* dims, const double* deviance)
 {
     return sqrt(exp(deviance[lpdisc_POS])/
 		((double)(dims[n_POS] - (REML ? dims[p_POS] : 0))));
@@ -690,61 +660,15 @@ internal_lmer_sigma(int REML, const int* dims, const double* deviance)
  *
  * @return scalar REAL value
  */
-SEXP lmer_sigma(SEXP x, SEXP which)
+SEXP mer_sigma(SEXP x, SEXP which)
 {
     int w = asInteger(which);
 		
-    return ScalarReal(internal_lmer_sigma(w < 0 || (!w && isREML(x)),
-					  INTEGER(GET_SLOT(x, lme4_dimsSym)),
-					  REAL(GET_SLOT(x, lme4_devianceSym))));
+    return ScalarReal(Mer_sigma(w < 0 || (!w && isREML(x)),
+				INTEGER(GET_SLOT(x, lme4_dimsSym)),
+				REAL(GET_SLOT(x, lme4_devianceSym))));
 }
 
-/**
- * Extract the unscaled lower Cholesky factor of the relative
- * variance-covariance matrix for the fixed-effects in an lmer object.
- *
- * @param x an lmer object
- *
- * @return a REAL p by p lower triangular matrix (it's a matrix, not a Matrix)
- */
-
-SEXP lmer_vcov(SEXP x)
-{
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), *select;
-    int i, p = dims[p_POS], q = dims[q_POS];
-    SEXP ans = PROTECT(allocMatrix(REALSXP, p, p));
-
-    if (p) {
-	CHM_FR L = L_SLOT(x);
-	 /* need a copy because factor_to_sparse changes 1st arg */
-	CHM_FR Lcp = M_cholmod_copy_factor(L, &c);
-	CHM_SP Lsp, Lred; /* sparse and reduced-size sparse */
-	CHM_DN Ld;
-
-	R_CheckStack();
-	if (!(Lcp->is_ll))
-	    if (!M_cholmod_change_factor(Lcp->xtype, 1, 0, 1, 1, Lcp, &c))
-		error(_("cholmod_change_factor failed with status %d"), c.status);
-	Lsp = M_cholmod_factor_to_sparse(Lcp, &c);
-	M_cholmod_free_factor(&Lcp, &c);
-	select = Calloc(p, int);
-	for (i = 0; i < p; i++) select[i] = q + i;
-	Lred = M_cholmod_submatrix(Lsp, select, p, select, p,
-				 1 /* values */, 1 /* sorted */, &c);
-	M_cholmod_free_sparse(&Lsp, &c);
-	Ld = M_cholmod_sparse_to_dense(Lred, &c);
-	M_cholmod_free_sparse(&Lred, &c);
-	Memcpy(REAL(ans), (double*)(Ld->x), p * p);
-	M_cholmod_free_dense(&Ld, &c);
-/* FIXME: This does not allow for a possible P_X permutation  */
-	F77_CALL(dtrtri)("L", "N", &p, REAL(ans), &p, &i);
-	if (i)
-	    error(_("Lapack routine dtrtri returned error code %d"), i);
-	Free(select);
-    }
-    UNPROTECT(1);
-    return ans;
-}
 
 /**
  * Extract the conditional modes of the random effects as a list of matrices
@@ -801,7 +725,7 @@ SEXP lmer_postVar(SEXP x)
 	*dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
     int i, j, nf = dims[nf_POS], p = dims[p_POS], q = dims[q_POS];
     int ppq = p + q;
-    double sc = internal_lmer_sigma(isREML(x), dims, deviance);
+    double sc = Mer_sigma(isREML(x), dims, deviance);
     CHM_FR L = L_SLOT(x), Lcp = (CHM_FR) NULL;
     CHM_SP rhs, B, Bt, BtB;
     CHM_DN BtBd;
@@ -1131,7 +1055,7 @@ SEXP lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 	col[p] = (trans ? 2 * log(sigma) : sigma * sigma);
 	/* simulate new fixed and random effects */
 				/* Evaluate conditional estimates */
-	chhat = internal_lmer_effects(L);
+	chhat = (CHM_DN)NULL; /* internal_lmer_effects(L); */
 	internal_betabst_update(sigma, L, chhat, chnew);
 	M_cholmod_free_dense(&chhat, &c);
 				/* Store beta */

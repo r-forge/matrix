@@ -25,14 +25,13 @@ SEXP lmer_getPars(SEXP x);
 SEXP lmer_postVar(SEXP x);
 SEXP lmer_ranef(SEXP x);
 SEXP lmer_setPars(SEXP x, SEXP pars);
-SEXP lmer_sigma(SEXP x, SEXP which);
 SEXP lmer_update_effects(SEXP x);
 SEXP lmer_validate(SEXP x);
-SEXP lmer_vcov(SEXP x);
 
 SEXP mer_create_L(SEXP Vt);
 SEXP mer_create_Vt(SEXP Zt, SEXP ST, SEXP Gp, SEXP sP);
 SEXP mer_optimize(SEXP x, SEXP verb, SEXP mtype);
+SEXP mer_sigma(SEXP x, SEXP which);
 SEXP mer_update_VtL(SEXP x);
 SEXP mer_validate(SEXP x);
 
