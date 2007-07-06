@@ -1,3 +1,26 @@
+2007-07-06 14:11  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4559] src/iohb.c, src/iohb.h: Remove Harwell-Boeing input/output
+	  functions - no longer used
+	* [r4560] src/HBMM.c, src/Mutils.c, src/dgTMatrix.c, src/dgeMatrix.c,
+	  src/dspMatrix.c, src/dsyMatrix.c, src/dtCMatrix.c,
+	  src/factorizations.c, src/sparseQR.c: Replace most calls to Calloc by
+	  Alloca
+	
+2007-07-06 13:14  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* [r4558] inst/doc/Comparisons.Rnw, src/CHMfactor.c, src/Csparse.c,
+	  src/Tsparse.c, src/chm_common.c, src/chm_common.h, src/dense.c,
+	  src/dgCMatrix.c, src/dsCMatrix.c, src/dtTMatrix.c, src/sparseQR.c,
+	  src/t_gCMatrix_colSums.c: more R_CheckStack()s
+
+2007-07-05 18:12  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4550] inst/include/Matrix.h: Add the macro N_AS_CHM_DN to "alloca"
+	  the required amount of memory then call M_numeric_as_chm_dense.
+	* [r4556] src/Mutils.h, src/dgCMatrix.c: Define and use the Alloca macro
+	  (like Calloc but calling alloca)
+
 2007-07-05  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/sparseMatrix.R (printSpMatrix): renamed from prSpMatrix()
