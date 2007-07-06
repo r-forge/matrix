@@ -29,7 +29,7 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x)
 
     if (ctype < 0) error("invalid class of object to as_cholmod_sparse");
     memset(ans, 0, sizeof(cholmod_sparse)); /* zero the struct */
-				
+
     ans->itype = CHOLMOD_INT;	/* characteristics of the system */
     ans->dtype = CHOLMOD_DOUBLE;
     ans->packed = TRUE;
@@ -196,7 +196,7 @@ CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x)
 
     if (ctype < 0) error("invalid class of object to as_cholmod_triplet");
     memset(ans, 0, sizeof(cholmod_triplet)); /* zero the struct */
-				
+
     ans->itype = CHOLMOD_INT;	/* characteristics of the system */
     ans->dtype = CHOLMOD_DOUBLE;
     ans->x = ans->z = (void *) NULL;
@@ -381,7 +381,7 @@ CHM_DN as_cholmod_dense(CHM_DN ans, SEXP x)
 /* version of as_cholmod_dense() that produces a cholmod_dense matrix
  * with REAL 'x' slot -- i.e. treats "nMatrix" as "lMatrix" -- as only difference;
  * Not just via a flag in as_cholmod_dense() since that has fixed API */
-cholmod_dense *as_cholmod_x_dense(cholmod_dense *ans, SEXP x)
+CHM_DN as_cholmod_x_dense(cholmod_dense *ans, SEXP x)
 {
     _AS_cholmod_dense_1;
 
@@ -572,13 +572,13 @@ CHM_FR as_cholmod_factor(CHM_FR ans, SEXP x)
     SEXP tmp;
 
     if (ctype < 0) error("invalid class of object to as_cholmod_factor");
-    memset(ans, 0, sizeof(cholmod_factor)); /* zero the struct */ 
-				
+    memset(ans, 0, sizeof(cholmod_factor)); /* zero the struct */
+
     ans->itype = CHOLMOD_INT;	/* characteristics of the system */
     ans->dtype = CHOLMOD_DOUBLE;
     ans->z = (void *) NULL;
     ans->xtype = (ctype < 2) ? CHOLMOD_REAL : CHOLMOD_PATTERN;
-				
+
     ans->ordering = type[0];	/* unravel the type */
     ans->is_ll = (type[1] ? 1 : 0);
     ans->is_super = (type[2] ? 1 : 0);

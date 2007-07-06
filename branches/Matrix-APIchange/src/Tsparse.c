@@ -37,8 +37,9 @@ SEXP Tsparse_to_Csparse(SEXP x, SEXP tri)
     CHM_SP chxs = cholmod_triplet_to_sparse(chxt, chxt->nnz, &c);
     int tr = asLogical(tri);
     int Rkind = (chxt->xtype != CHOLMOD_PATTERN) ? Real_kind(x) : 0;
+    R_CheckStack();
 
-    return chm_sparse_to_SEXP(chxs, 1, 
+    return chm_sparse_to_SEXP(chxs, 1,
 			      tr ? ((*uplo_P(x) == 'U') ? 1 : -1) : 0,
 			      Rkind, tr ? diag_P(x) : "",
 			      GET_SLOT(x, Matrix_DimNamesSym));

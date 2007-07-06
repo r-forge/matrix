@@ -242,13 +242,13 @@ Smem <- Sys.procinfo("/proc/meminfo")
 if(identical(1L, grep("linux", R.version[["os"]]))) { ## Linux - only ---
  Scpu <- sfsmisc::Sys.procinfo("/proc/cpuinfo")
  Smem <- sfsmisc::Sys.procinfo("/proc/meminfo")
- print(Scpu[c("model name", "cpu MHz", "cache size")])
+ print(Scpu[c("model name", "cpu MHz", "cache size", "bogomips")])
  print(Smem[c("MemTotal", "SwapTotal")])
 }
 @
 <<Sys_proc_out, echo=FALSE>>=
 if(identical(1L, grep("linux", R.version[["os"]]))) { ## Linux - only ---
- print(Scpu[c("model name", "cpu MHz", "cache size")])
+ print(Scpu[c("model name", "cpu MHz", "cache size", "bogomips")])
  print(Smem[c("MemTotal", "SwapTotal")])
 }
 @
