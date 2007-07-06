@@ -2,9 +2,10 @@
 \title{Mixed Model Representations and *mer Methods}
 \docType{class}
 % Classes
+\alias{mer-class}
 \alias{lmer-class}
 \alias{glmer-class}
-\alias{mer-class}
+\alias{nlmer-class}
 \alias{coef.lmer-class}
 \alias{summary.mer-class}
 \alias{summary.lmer-class}
