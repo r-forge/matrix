@@ -1,3 +1,8 @@
+2007-07-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999375 merged into the trunk; ready for
+	release.
+
 2007-07-06 14:11  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r4559] src/iohb.c, src/iohb.h: Remove Harwell-Boeing input/output
