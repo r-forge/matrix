@@ -729,10 +729,11 @@ SEXP lmer_postVar(SEXP x)
     CHM_FR L = L_SLOT(x), Lcp = (CHM_FR) NULL;
     CHM_SP rhs, B, Bt, BtB;
     CHM_DN BtBd;
-    int *Perm = (int*)(L->Perm), *iperm = Calloc(ppq, int),
-	*fset = Calloc(ppq, int);
+    int *Perm = (int*)(L->Perm);
     SEXP ST = GET_SLOT(x, lme4_STSym),
 	ans = PROTECT(allocVector(VECSXP, nf));
+    int *iperm = Alloca(ppq, int), *fset = Alloca(ppq, int);
+    R_CheckStack();
     
     for (j = 0; j < ppq; j++) {
 	iperm[Perm[j]] = j;
@@ -807,7 +808,6 @@ SEXP lmer_postVar(SEXP x)
 	Free(st);
     }
     if (L == Lcp) M_cholmod_free_factor(&L, &c); else Free(L);
-    Free(iperm); Free(fset);
     UNPROTECT(1);
     return ans;
 }
@@ -899,9 +899,12 @@ lme4_rWishart(SEXP ns, SEXP dfp, SEXP scal)
 	error("scal must be a square, real matrix");
     if (n <= 0) n = 1;
     psqr = dims[0] * dims[0];
-    tmp = Calloc(psqr, double);
+    tmp = Alloca(psqr, double);
+    scCp = Alloca(psqr, double);
+    R_CheckStack();
+
+    Memcpy(scCp, REAL(scal), psqr);
     AZERO(tmp, psqr);
-    scCp = Memcpy(Calloc(psqr, double), REAL(scal), psqr);
     F77_CALL(dpotrf)("U", &(dims[0]), scCp, &(dims[0]), &j);
     if (j)
 	error("scal matrix is not positive-definite");
@@ -920,7 +923,6 @@ lme4_rWishart(SEXP ns, SEXP dfp, SEXP scal)
     }
 
     PutRNGstate();
-    Free(scCp); Free(tmp);
     UNPROTECT(1);
     return ans;
 }
@@ -1044,7 +1046,7 @@ SEXP lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
     ans = PROTECT(allocMatrix(REALSXP, nrtot, nsamp));
     ansp = REAL(ans);
     for (i = 0; i < nrtot * nsamp; i++) ansp[i] = NA_REAL;
-    if (saveb) bstar = Calloc(q, double);
+    if (saveb) {bstar = Alloca(q, double); R_CheckStack();}
     GetRNGstate();
     if (verbose) Rprintf("%12s %14s\n", "sigma", "deviance");
 
@@ -1071,7 +1073,6 @@ SEXP lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 	if (verbose) Rprintf("%12.6g %14.8g\n", sigma, deviance[dPOS]);
     }
     PutRNGstate();
-    if (saveb) Free(bstar);
     M_cholmod_free_dense(&chnew, &c);
 				/* Restore pars, refactor, etc. */
     ST_setPars(x, Pars);
@@ -1358,18 +1359,14 @@ SEXP nlmer_update_Vt(SEXP x)
 	*zp = INTEGER(GET_SLOT(Zt, lme4_pSym)),
 	i, ione = 1, iv, iz, j, mnc, nf = LENGTH(ST),
 	ncol = INTEGER(GET_SLOT(Zt, lme4_DimSym))[1];
-    int *nc = Calloc(nf, int);
-    double **st = Calloc(nf, double*), *tmp,
-	*vx = REAL(GET_SLOT(Vt, lme4_xSym)),
+    double *tmp, *vx = REAL(GET_SLOT(Vt, lme4_xSym)),
 	*zx = REAL(GET_SLOT(Zt, lme4_xSym));
+    int *nc = Alloca(nf, int), *nlev = Alloca(nf, int);
+    double **st = Alloca(nf, double*);
+    R_CheckStack();
 
-    for (i = 0, mnc = 0; i < nf; i++) {	/* populate nc and st */
-	SEXP STi = VECTOR_ELT(ST, i);
-	nc[i] = INTEGER(getAttrib(STi, R_DimSymbol))[0];
-	if (nc[i] > mnc) mnc = nc[i]; /* max num of cols */
-	st[i] = REAL(STi);
-    }
-    tmp = Calloc(mnc, double);
+    mnc = ST_nc_nlev(ST, Gp, st, nc, nlev);
+    tmp = Alloca(mnc, double);
     for (j = 0; j < ncol; j++) {
 	int iz2 = zp[j + 1];
 				/* premultiply by T' */
@@ -1396,7 +1393,6 @@ SEXP nlmer_update_Vt(SEXP x)
 	    vx[iv] *= st[k][((vi[iv] - Gp[k]) % nc[k]) * (nc[k] + 1)];
 	}
     }    
-    Free(st); Free(nc); Free(tmp);
     return R_NilValue;
 }
 /* FIXME: Use TS_mult instead */
@@ -1551,8 +1547,7 @@ double *internal_nlmer_update_wrkres(SEXP x, double *wrkres)
 {
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), i;
     CHM_SP Mt = AS_CHM_SP(GET_SLOT(x, lme4_MtSym));
-    CHM_DN cwrk = M_numeric_as_chm_dense(Alloca(1, cholmod_dense),
-					 wrkres, dims[n_POS]),
+    CHM_DN cwrk = N_AS_CHM_DN(wrkres, dims[n_POS]),
 	cu = AS_CHM_DN(GET_SLOT(x, lme4_uvecSym));
     double *mu = REAL(GET_SLOT(x, lme4_muSym)),
 	*y = REAL(GET_SLOT(x, lme4_ySym)), one[] = {1,0};
@@ -1598,8 +1593,9 @@ static int internal_nbhat(SEXP x)
     CHM_SP Mt = AS_CHM_SP(GET_SLOT(x, lme4_MtSym));
     double *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
 	*u = REAL(GET_SLOT(x, lme4_uvecSym)),
-	*uold = Calloc(q, double), *z = ((double*)(cz->x)),
+	*uold = Alloca(q, double), *z = ((double*)(cz->x)),
 	crit = IRLS_TOL + 1, dn = (double)n, one[] = {1,0}, zero[] = {0,0};
+    R_CheckStack();
 
     nlmer_update_Vt(x);
     Memcpy(uold, u, q);
@@ -1633,7 +1629,6 @@ static int internal_nbhat(SEXP x)
     dev[ML_POS] = dev[REML_POS] =
 	dev[ldL2_POS] + dn * (1. + dev[lpdisc_POS] + log(2. * PI / dn));
 
-    Free(uold);
     M_cholmod_free_dense(&cu, &c); M_cholmod_free_dense(&cMtz, &c);
     return (crit > IRLS_TOL) ? 0 : i;
 }
@@ -1889,16 +1884,14 @@ SEXP glmer_reweight(SEXP x)
     SEXP moff = findVarInFrame(rho, lme4_offsetSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
     int i, n = dims[n_POS];
-    double
-	*dmu_deta = Calloc(n, double),
-	*eta = REAL(findVarInFrame(rho, lme4_etaSym)),
+    double *eta = REAL(findVarInFrame(rho, lme4_etaSym)),
 	*mo = (moff == R_NilValue) ? (double*) NULL : REAL(moff),
 	*mu = REAL(findVarInFrame(rho, lme4_muSym)),
-	*var = Calloc(n, double),
 	*w = REAL(findVarInFrame(rho, lme4_weightsSym)),
 	*y = REAL(GET_SLOT(x, lme4_ySym)),
 	*z = REAL(findVarInFrame(rho, lme4_zSym));
-
+    double *dmu_deta = Alloca(n, double), *var = Alloca(n, double);
+    R_CheckStack();
 				/* initialize weights to prior wts */
     Memcpy(w, REAL(findVarInFrame(rho, lme4_pwtsSym)), n); 
     glmer_linkinv(x);		/* evaluate mu */
@@ -1909,7 +1902,6 @@ SEXP glmer_reweight(SEXP x)
 	/* adjusted working variate */
  	z[i] = (mo ? mo[i] : 0) - eta[i] - (y[i] - mu[i])/dmu_deta[i];
     }
-    Free(dmu_deta); Free(var);
     return R_NilValue;
 }
 
@@ -2041,13 +2033,13 @@ mer_optimize(SEXP x, SEXP verbp, SEXP mtypep)
 	mtype = asInteger(mtypep), pos, verb = asLogical(verbp);
     int nf = dims[nf_POS], nv = dims[np_POS] + (mtype?dims[p_POS]:0);
     int liv = S_iv_length(OPT, nv), lv = S_v_length(OPT, nv);
-    int *iv = Calloc(liv, int);
-    double *b = Calloc(2 * nv, double), *d = Calloc(nv, double),
-	*g = (double*)NULL, *h = (double*)NULL,
-	*v = Calloc(lv, double),
-	*xv = internal_ST_getPars(ST, Calloc(nv, double)),
-	fx = R_PosInf;
+    double *g = (double*)NULL, *h = (double*)NULL, fx = R_PosInf;
+    int *iv = Alloca(liv, int);
+    double *b = Alloca(2 * nv, double), *d = Alloca(nv, double),
+	*v = Alloca(lv, double), *xv = Alloca(nv, double);
+    R_CheckStack();
 
+    internal_ST_getPars(ST, xv);
     if (mtype) {
 	SEXP fixef = GET_SLOT(x, lme4_fixefSym);
 	Memcpy(xv + dims[np_POS], REAL(fixef), LENGTH(fixef));
@@ -2071,7 +2063,6 @@ mer_optimize(SEXP x, SEXP verbp, SEXP mtypep)
 	S_nlminb_iterate(b, d, fx, g, h, iv, liv, lv, nv, v, xv);
     }
     i = iv[0];
-    Free(iv); Free(v); Free(xv); Free(b); Free(d);
     return ScalarInteger(i);
 }
 
