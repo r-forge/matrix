@@ -1,9 +1,38 @@
+2007-07-06 14:11  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4559] src/iohb.c, src/iohb.h: Remove Harwell-Boeing input/output
+	  functions - no longer used
+	* [r4560] src/HBMM.c, src/Mutils.c, src/dgTMatrix.c, src/dgeMatrix.c,
+	  src/dspMatrix.c, src/dsyMatrix.c, src/dtCMatrix.c,
+	  src/factorizations.c, src/sparseQR.c: Replace most calls to Calloc by
+	  Alloca
+
+2007-07-06 13:14  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* [r4558] inst/doc/Comparisons.Rnw, src/CHMfactor.c, src/Csparse.c,
+	  src/Tsparse.c, src/chm_common.c, src/chm_common.h, src/dense.c,
+	  src/dgCMatrix.c, src/dsCMatrix.c, src/dtTMatrix.c, src/sparseQR.c,
+	  src/t_gCMatrix_colSums.c: more R_CheckStack()s
+
+2007-07-05 18:12  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4550] inst/include/Matrix.h: Add the macro N_AS_CHM_DN to "alloca"
+	  the required amount of memory then call M_numeric_as_chm_dense.
+	* [r4556] src/Mutils.h, src/dgCMatrix.c: Define and use the Alloca macro
+	  (like Calloc but calling alloca)
+
 2007-07-05  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/sparseMatrix.R (printSpMatrix): renamed from prSpMatrix()
 	and extended with more sophisticated 'col.names' option.
 	* NAMESPACE: export  printSparseMatrix()
 	* man/printSpMatrix.Rd: document, incl. examples
+
+2007-07-04 16:21  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4543] src/cs_utils.c, src/cs_utils.h, src/dgCMatrix.c,
+	  src/dtCMatrix.c, src/sparseQR.c: CSP typedef for *cs and macro
+	  AS_CSP. API change - pass the empty structure to Matrix_as_cs.
 
 2007-07-04  Martin Maechler  <maechler@stat.math.ethz.ch>
 
@@ -24,6 +53,24 @@
 	* src/lgCMatrix.c ([ln]csc_to_matrix): no longer lose dimnames,
 	e.g. in as(<ngCMatrix>, "matrix")
 
+2007-07-01 13:27  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4529] .: Create a branch for the API changes from the 0.99875
+	  series to the 0.999375 series
+	* [r4530] DESCRIPTION, inst/include/Matrix.h,
+	  inst/include/Matrix_stubs.c, src/CHMfactor.c, src/Csparse.c,
+	  src/Mutils.h, src/Tsparse.c, src/chm_common.c, src/chm_common.h,
+	  src/dense.c, src/dgCMatrix.c, src/dsCMatrix.c, src/dtTMatrix.c,
+	  src/t_gCMatrix_colSums.c: API change - pass the empty structure to the
+	  as_cholmod_x functions
+
+2007-06-30 09:05  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* [r4527] trunk/Matrix/DESCRIPTION, trunk/Matrix/NAMESPACE,
+	  trunk/Matrix/inst/doc/Comparisons.Rnw: add session- and hardware-info
+	  to Comparisons
+
+>>>>>>> .merge-right.r4561
 2007-06-29  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.99875-3 ready to be released.
