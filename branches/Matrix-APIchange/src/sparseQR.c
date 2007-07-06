@@ -38,7 +38,8 @@ void sparseQR_Qmult(cs *V, double *beta, int *p, int trans,
 		    double *y, int *ydims)
 {
     int j, k, m = V->m, n = V->n;
-    double *x = Calloc(m, double);	/* workspace */
+    double *x = Alloca(m, double);	/* workspace */
+    R_CheckStack();
 
     if (ydims[0] != m)
 	error(_("Dimensions of system are inconsistent"));
@@ -56,7 +57,6 @@ void sparseQR_Qmult(cs *V, double *beta, int *p, int trans,
 	    Memcpy(yj, x, m);
 	}
     }
-    Free(x);
 }
 
 
@@ -85,7 +85,8 @@ SEXP sparseQR_coef(SEXP qr, SEXP y)
 	*q = INTEGER(qslot),
 	j, lq = LENGTH(qslot), m = R->m, n = R->n;
     double *ax = REAL(GET_SLOT(ans, Matrix_xSym)),
-	*x = Calloc(m, double);
+	*x = Alloca(m, double);
+    R_CheckStack();
     R_CheckStack();
 
     /* apply row permutation and multiply by Q' */
@@ -100,7 +101,6 @@ SEXP sparseQR_coef(SEXP qr, SEXP y)
 	    Memcpy(aj, x, n);
 	}
     }
-    Free(x);
     UNPROTECT(1);
     return ans;
 }
