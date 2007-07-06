@@ -13,16 +13,16 @@ typedef struct cholmod_triplet_struct *CHM_TR ;
 
 extern cholmod_common c;
 
-CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x);
+CHM_SP as_cholmod_sparse (CHM_SP ans, SEXP x);
 CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x);
-CHM_DN as_cholmod_dense(CHM_DN ans, SEXP x);
+CHM_DN as_cholmod_dense  (CHM_DN ans, SEXP x);
 CHM_DN as_cholmod_x_dense(CHM_DN ans, SEXP x);
 CHM_DN numeric_as_chm_dense(CHM_DN ans, double *v, int n);
-CHM_FR as_cholmod_factor(CHM_FR ans, SEXP x);
+CHM_FR as_cholmod_factor (CHM_FR ans, SEXP x);
 
-#define AS_CHM_DN(x) as_cholmod_dense((CHM_DN)alloca(sizeof(cholmod_dense)), x )
-#define AS_CHM_FR(x) as_cholmod_factor((CHM_FR)alloca(sizeof(cholmod_factor)), x )
-#define AS_CHM_SP(x) as_cholmod_sparse((CHM_SP)alloca(sizeof(cholmod_sparse)), x )
+#define AS_CHM_DN(x) as_cholmod_dense  ((CHM_DN)alloca(sizeof(cholmod_dense)), x )
+#define AS_CHM_FR(x) as_cholmod_factor ((CHM_FR)alloca(sizeof(cholmod_factor)), x )
+#define AS_CHM_SP(x) as_cholmod_sparse ((CHM_SP)alloca(sizeof(cholmod_sparse)), x )
 #define AS_CHM_TR(x) as_cholmod_triplet((CHM_TR)alloca(sizeof(cholmod_triplet)), x )
 
 int R_cholmod_start(CHM_CM Common);

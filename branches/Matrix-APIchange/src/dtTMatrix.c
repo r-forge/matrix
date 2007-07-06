@@ -41,6 +41,7 @@ SEXP dtTMatrix_as_dgCMatrix(SEXP x)
 {
     CHM_TR tx = AS_CHM_TR(x);
     CHM_SP cx = cholmod_triplet_to_sparse(tx, tx->nzmax, &c);
+    R_CheckStack();
 
  /* FIXME
  * int Rkind = (tx->xtype == CHOLMOD_REAL) ? Real_kind(x) : 0;

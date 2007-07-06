@@ -140,6 +140,7 @@ SEXP dgCMatrix_lusol(SEXP x, SEXP y)
 {
     SEXP ycp = PROTECT(duplicate(y));
     CSP xc = AS_CSP(x);
+    R_CheckStack();
 
     if (xc->m != xc->n || xc->m <= 0)
 	error(_("dgCMatrix_lusol requires a square, non-empty matrix"));
@@ -315,6 +316,7 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
     CHM_DN cy = AS_CHM_DN(y), rhs, cAns;
     double one[] = {1,0}, zero[] = {0,0};
     SEXP ans = PROTECT(allocVector(VECSXP, 3));
+    R_CheckStack();
 
     if (cx->ncol < cx->nrow || cx->ncol <= 0)
 	error(_("dgCMatrix_cholsol requires a 'short, wide' rectangular matrix"));
