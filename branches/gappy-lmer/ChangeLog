@@ -1,3 +1,54 @@
+2007-07-06 16:34  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4562] man/lmer-class.Rd: Move nlmer class documentation to
+	  lmer-class.Rd
+	* [r4563] R/lmer.R, src/lmer.c, src/pedigree.c: Got new lmer running on
+	  models with independent r.e.'s
+
+2007-07-05 23:05  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4557] NAMESPACE, R/AllClass.R, R/carryOver.R, R/lmer.R, R/mlirt.R,
+	  man/VarCorr.Rd, man/fixef.Rd, man/hatTrace.Rd, man/lmer-class.Rd,
+	  man/lmer.Rd, man/mcmcsamp.Rd, man/nlmer-class.Rd, man/nlmer.Rd,
+	  man/ranef.Rd, src/init.c, src/lmer.c, src/lmer.h: First cut at the
+	  docs and some methods including printing
+	
+2007-07-04 18:38  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4546] R/AllClass.R, R/lmer.R, src/init.c, src/lmer.c, src/lmer.h:
+	  Replaced the C functions glmer_create and nlmer_create by R code
+
+2007-07-03 14:43  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4539] inst/doc/Doxyfile: Added Doxyfile (not yet working to my
+	  satisfaction).
+	* [r4540] inst/doc/Doxyfile: Change version number (should take this
+	  from the DESCRIPTION file).
+	* [r4541] src/lmer.c: Use a macro to obtain the L slot as a CHM_FR
+	  object
+
+2007-07-02 22:38  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4537] R/AllClass.R, R/lmer.R, ToDo, src/Syms.h, src/init.c,
+	  src/lmer.c, src/lmer.h: Got a version that runs a simple model fit!
+	  Hooray!
+
+2007-06-29 03:41  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4516] src/Syms.h, src/init.c, src/lmer2.c: rationalizing the symbols
+	* [r4517] src/Syms.h, src/lme4_utils.h, src/lmer.c, src/lmer.h,
+	  src/lmer2.c, src/lmer2.h: re-arranging file names
+
+2007-06-28 21:00  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4514] ChangeLog, DESCRIPTION, NAMESPACE, R/AllClass.R, R/lmer.R,
+	  inst/doc/Theory.Rnw, man/gsummary.Rd, man/lmList.Rd, src/Syms.h,
+	  src/Wishart.c, src/Wishart.h, src/glmer.c, src/glmer.h, src/init.c,
+	  src/lme4_utils.c, src/lme4_utils.h, src/lmer.c, src/lmer.h,
+	  src/lmer2.c, src/lmer2.h, src/pedigree.h: Switch lmer2 to lmer, glmer
+	  and nlmer
+	* [r4515] src/unused: incorporated useful parts into lmer.c
+	
 2007-06-20 14:08  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r4490] R/lmer.R: Do not throw an error when nlev[i] == nobs for the
