@@ -819,11 +819,10 @@ printMer <- function(x, digits = max(3, getOption("digits") - 3),
                       signif.stars = getOption("show.signif.stars"), ...)
 {
     so <- summary(x)
-    REML <- so@dims["isREML"]
+    REML <- so@dims["REML"]
     llik <- so@logLik
     dev <- so@deviance
     dims <- x@dims
-    glz <- so@isG
 
     cat(so@methTitle, "\n")
     if (!is.null(x@call$formula))
@@ -877,95 +876,97 @@ printMer <- function(x, digits = max(3, getOption("digits") - 3),
     invisible(x)
 }
 
-setMethod("summary", signature(object = "lmer"),
-	  function(object, ...) {
-	      fcoef <- fixef(object)
-	      vcov <- vcov(object)
-	      corF <- vcov@factors$correlation
-              dims <- object@dims
-	      ## DF <- getFixDF(object)
-	      coefs <- cbind("Estimate" = fcoef, "Std. Error" = corF@sd) #, DF = DF)
-	      REML <- object@dims["isREML"]
-	      llik <- logLik(object, REML)
-	      dev <- object@deviance
+setMethod("summary", signature(object = "mer"),
+	  function(object, ...)
+      {
+          fcoef <- fixef(object)
+          vcov <- vcov(object)
+          corF <- vcov@factors$correlation
+          dims <- object@dims
+          ## DF <- getFixDF(object)
+          coefs <- cbind("Estimate" = fcoef, "Std. Error" = corF@sd) #, DF = DF)
+          REML <- object@dims["REML"]
+          llik <- logLik(object, REML)
+          dev <- object@deviance
 
-	      glz <- is(object, "glmer")
-	      methTitle <-
-		  if (glz)
-		      paste("Generalized linear mixed model fit using",
-			    switch(object@status["glmm"],
-                                   "PQL", "Laplace", "AGQ"))
-		  else paste("Linear mixed-effects model fit by",
-			     if(REML) "REML" else "maximum likelihood")
+          glz <- is(object, "glmer")
+          methTitle <-
+              if (glz)
+                  paste("Generalized linear mixed model fit using",
+                        switch(object@status["glmm"],
+                               "PQL", "Laplace", "AGQ"))
+              else paste("Linear mixed-effects model fit by",
+                         if(REML) "REML" else "maximum likelihood")
 
-	      AICframe <- {
-		  if (glz)
-		      data.frame(AIC = AIC(llik), BIC = BIC(llik),
-				 logLik = c(llik),
-				 deviance = -2*llik,
-				 row.names = "")
-		  else
-		      data.frame(AIC = AIC(llik), BIC = BIC(llik),
-				 logLik = c(llik),
-				 MLdeviance = dev["ML"],
-				 REMLdeviance = dev["REML"],
-				 row.names = "")
-	      }
-              varcor <- VarCorr(object)
-	      REmat <- formatVC(varcor)
-              if (is.na(attr(varcor, "sc")))
-                  REmat <- REmat[-nrow(REmat), , drop = FALSE]
+          AICframe <- {
+              if (glz)
+                  data.frame(AIC = AIC(llik), BIC = BIC(llik),
+                             logLik = c(llik),
+                             deviance = -2*llik,
+                             row.names = "")
+              else
+                  data.frame(AIC = AIC(llik), BIC = BIC(llik),
+                             logLik = c(llik),
+                             MLdeviance = dev["ML"],
+                             REMLdeviance = dev["REML"],
+                             row.names = "")
+          }
+          varcor <- VarCorr(object)
+          REmat <- formatVC(varcor)
+          if (is.na(attr(varcor, "sc")))
+              REmat <- REmat[-nrow(REmat), , drop = FALSE]
 
-	      if (nrow(coefs) > 0) {
-		  if (dims["famType"] >= 0) {
-		      coefs <- coefs[, 1:2, drop = FALSE]
-		      stat <- coefs[,1]/coefs[,2]
-		      pval <- 2*pnorm(abs(stat), lower = FALSE)
-		      coefs <- cbind(coefs, "z value" = stat, "Pr(>|z|)" = pval)
-		  } else {
-		      stat <- coefs[,1]/coefs[,2]
-		      ##pval <- 2*pt(abs(stat), coefs[,3], lower = FALSE)
-		      coefs <- cbind(coefs, "t value" = stat) #, "Pr(>|t|)" = pval)
-		  }
-	      } ## else : append columns to 0-row matrix ...
+          if (nrow(coefs) > 0) {
+              if (dims["famType"] >= 0) {
+                  coefs <- coefs[, 1:2, drop = FALSE]
+                  stat <- coefs[,1]/coefs[,2]
+                  pval <- 2*pnorm(abs(stat), lower = FALSE)
+                  coefs <- cbind(coefs, "z value" = stat, "Pr(>|z|)" = pval)
+              } else {
+                  stat <- coefs[,1]/coefs[,2]
+                  ##pval <- 2*pt(abs(stat), coefs[,3], lower = FALSE)
+                  coefs <- cbind(coefs, "t value" = stat) #, "Pr(>|t|)" = pval)
+              }
+          } ## else : append columns to 0-row matrix ...
 
-	      new(if(is(object, "glmer")) "summary.glmer" else
-                  {if(is(object, "lmer")) "summary.lmer" else "summary.lmer"},
-		  object,
-		  isG = glz,
-		  methTitle = methTitle,
-		  logLik = llik,
-		  ngrps = sapply(object@flist, function(x) length(levels(x))),
-		  sigma = .Call(mer_sigma, object, REML),
-		  coefs = coefs,
-		  vcov = vcov,
-		  REmat = REmat,
-		  AICtab= AICframe
-		  )
-	  })## summary()
+          new(if(is(object, "glmer")) "summary.glmer" else
+          {if(is(object, "lmer")) "summary.lmer" else "summary.lmer"},
+              object,
+              methTitle = methTitle,
+              logLik = llik,
+              ngrps = sapply(object@flist, function(x) length(levels(x))),
+              sigma = .Call(mer_sigma, object, REML),
+              coefs = coefs,
+              vcov = vcov,
+              REmat = REmat,
+              AICtab= AICframe
+              )
+      })## summary()
 
 ## Extract the log-likelihood or restricted log-likelihood
 setMethod("logLik", signature(object="lmer"),
-	  function(object, REML = NULL, ...) {
-	      dims <- object@dims
-              if (is.null(REML) || is.na(REML[1]))
-                  REML <- object@dims["isREML"]
-	      val <- -deviance(object, REML = REML)/2
-	      attr(val, "nall") <- attr(val, "nobs") <- dims["n"]
-	      attr(val, "df") <-
-                  dims["p"] + length(.Call(ST_getPars, object))
-	      attr(val, "REML") <-  as.logical(REML)
-	      class(val) <- "logLik"
-	      val
-	  })
+	  function(object, REML = NULL, ...)
+      {
+          dims <- object@dims
+          if (is.null(REML) || is.na(REML[1]))
+              REML <- object@dims["REML"]
+          val <- -deviance(object, REML = REML)/2
+          attr(val, "nall") <- attr(val, "nobs") <- dims["n"]
+          attr(val, "df") <-
+              dims["p"] + length(.Call(ST_getPars, object))
+          attr(val, "REML") <-  as.logical(REML)
+          class(val) <- "logLik"
+          val
+      })
 
 ## Extract the deviance
 setMethod("deviance", signature(object="lmer"),
-	  function(object, REML = NULL, ...) {
-              if (missing(REML) || is.null(REML) || is.na(REML[1]))
-                  REML <- object@dims["isREML"]
-              object@deviance[ifelse(REML, "REML", "ML")]
-          })
+	  function(object, REML = NULL, ...)
+      {
+          if (missing(REML) || is.null(REML) || is.na(REML[1]))
+              REML <- object@dims["REML"]
+          object@deviance[ifelse(REML, "REML", "ML")]
+      })
 
 ### FIXME: Modify this to handle glmer models without a scale parameter
 # Create the VarCorr object of variances and covariances
