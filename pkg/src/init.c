@@ -53,6 +53,7 @@ static R_CallMethodDef CallEntries[] = {
     {"Csparse_validate", (DL_FUNC) &Csparse_validate, 1},
     {"Csparse_vertcat", (DL_FUNC) &Csparse_vertcat, 2},
     {"pCholesky_validate", (DL_FUNC) &pCholesky_validate, 1},
+    {"Rsparse_validate", (DL_FUNC) &Rsparse_validate, 1},
 #ifdef _valid_only_for_old_graph_package
     {"graphNEL_as_dgTMatrix", (DL_FUNC) &graphNEL_as_dgTMatrix, 2},
 #endif
@@ -173,8 +174,10 @@ static R_CallMethodDef CallEntries[] = {
 
     /* for dgC* _and_ lgC* : */
     {"xCMatrix_validate", (DL_FUNC) &xCMatrix_validate, 1},
+    {"xRMatrix_validate", (DL_FUNC) &xRMatrix_validate, 1},
     {"xTMatrix_validate", (DL_FUNC) &xTMatrix_validate, 1},
     {"tCMatrix_validate", (DL_FUNC) &tCMatrix_validate, 1},
+    {"tRMatrix_validate", (DL_FUNC) &tRMatrix_validate, 1},
     {"tTMatrix_validate", (DL_FUNC) &tTMatrix_validate, 1},
 
     {"lapack_qr", (DL_FUNC) &lapack_qr, 2},
