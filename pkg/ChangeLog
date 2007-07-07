@@ -3,6 +3,8 @@
         * [r4567] R/AllClass.R: Slots already in RsparseMatrix were redefined in
           lgRMatrix
         * [r4568] DESCRIPTION: Prepare for bug-fix release
+        * [r4570] src/CHOLMOD/Check/cholmod_write.c: Include cholmod_matrixops.h
+          for declaration of cholmod_symmetry
 	
 2007-07-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 
