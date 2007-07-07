@@ -1,3 +1,9 @@
+2007-07-07 18:23  Douglas Bates <bates@stat.wisc.edu>
+
+        * [r4567] R/AllClass.R: Slots already in RsparseMatrix were redefined in
+          lgRMatrix
+        * [r4568] DESCRIPTION: Prepare for bug-fix release
+	
 2007-07-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.999375 merged into the trunk; ready for
