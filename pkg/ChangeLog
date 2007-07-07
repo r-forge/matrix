@@ -1,11 +1,22 @@
-2007-07-07 18:23  Douglas Bates <bates@stat.wisc.edu>
+2007-07-08  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/dgCMatrix.c (compressed_to_TMatrix):
+
+2007-07-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Csparse.c (Rsparse_validate): new, to have some validity
+	checking for RsparseMatrix
+	* src/dgCMatrix.c (xRMatrix_validate): ditto
+	* src/dtCMatrix.c (tRMatrix_validate): ditto
+
+2007-07-07  Douglas Bates <bates@stat.wisc.edu>
 
         * [r4567] R/AllClass.R: Slots already in RsparseMatrix were redefined in
           lgRMatrix
         * [r4568] DESCRIPTION: Prepare for bug-fix release
         * [r4570] src/CHOLMOD/Check/cholmod_write.c: Include cholmod_matrixops.h
           for declaration of cholmod_symmetry
-	
+
 2007-07-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.999375 merged into the trunk; ready for

@@ -205,8 +205,8 @@ SEXP dgeMatrix_LU(SEXP x)
 	error(_("Cannot factor a matrix with zero extents"));
     npiv = (dims[0] <dims[1]) ? dims[0] : dims[1];
     val = PROTECT(NEW_OBJECT(MAKE_CLASS("denseLU")));
-    SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(x, Matrix_xSym)));
-    SET_SLOT(val, Matrix_DimSym, duplicate(GET_SLOT(x, Matrix_DimSym)));
+    slot_dup(val, x, Matrix_xSym);
+    slot_dup(val, x, Matrix_DimSym);
     F77_CALL(dgetrf)(dims, dims + 1, REAL(GET_SLOT(val, Matrix_xSym)),
 		     dims,
 		     INTEGER(ALLOC_SLOT(val, Matrix_permSym, INTSXP, npiv)),
@@ -261,9 +261,9 @@ SEXP dgeMatrix_solve(SEXP a)
 
 
     if (dims[0] != dims[1]) error(_("Solve requires a square matrix"));
-    SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(lu, Matrix_xSym)));
+    slot_dup(val, lu, Matrix_xSym);
     x = REAL(GET_SLOT(val, Matrix_xSym));
-    SET_SLOT(val, Matrix_DimSym, duplicate(GET_SLOT(lu, Matrix_DimSym)));
+    slot_dup(val, lu, Matrix_DimSym);
     F77_CALL(dgetri)(dims, x, dims, pivot, &tmp, &lwork, &info);
     lwork = (int) tmp;
     F77_CALL(dgetri)(dims, x, dims, pivot,

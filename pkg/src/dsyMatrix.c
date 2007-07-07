@@ -63,9 +63,9 @@ SEXP dsyMatrix_solve(SEXP a)
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dsyMatrix")));
     int *dims = INTEGER(GET_SLOT(trf, Matrix_DimSym)), info;
 
-    SET_SLOT(val, Matrix_uploSym, duplicate(GET_SLOT(trf, Matrix_uploSym)));
-    SET_SLOT(val, Matrix_xSym, duplicate(GET_SLOT(trf, Matrix_xSym)));
-    SET_SLOT(val, Matrix_DimSym, duplicate(GET_SLOT(trf, Matrix_DimSym)));
+    slot_dup(val, trf, Matrix_uploSym);
+    slot_dup(val, trf, Matrix_xSym);
+    slot_dup(val, trf, Matrix_DimSym);
     F77_CALL(dsytri)(uplo_P(val), dims,
 		     REAL(GET_SLOT(val, Matrix_xSym)), dims,
 		     INTEGER(GET_SLOT(trf, Matrix_permSym)),
