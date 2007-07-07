@@ -378,7 +378,7 @@ setClass("lsCMatrix",
 
 ## logical, sparse, sorted compressed sparse row-oriented general matrices
 setClass("lgRMatrix",
-	 representation(j = "integer", p = "integer"),
+#	 representation(j = "integer", p = "integer"),
 	 contains = c("RsparseMatrix", "lsparseMatrix", "generalMatrix"),
 	 ##TODO: validity = function(object) .Call(lgRMatrix_validate, object)
 	 )
