@@ -525,8 +525,7 @@ SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 	*ansp, df = n - (REML ? p : 0);
     int nrbase = p + 1 + coef_length(nf, nc); /* rows always included */
     int nrtot = nrbase + deviance + (saveb ? q : 0);
-    double *bnew = alloca(q * sizeof(double)), *betanew = alloca(p * sizeof(double));
-/*     CHM_DN chbnew = M_numeric_as_chm_dense(alloca(sizeof(cholmod_dense)), bnew, q); */
+    double *bnew = Alloca(q, double), *betanew = Alloca(p, double);
     R_CheckStack();
 
     if (nsamp <= 0) nsamp = 1;
@@ -787,7 +786,7 @@ SEXP mer_hat_trace(SEXP x)
 	*wrk = Calloc(q, double), m1 = -1, one = 1, tr;
     double *Xcp = alloca((n * p) * sizeof(double));
     CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
-    CHM_DN zrow = M_numeric_as_chm_dense(alloca(sizeof(cholmod_dense)), wrk, q);
+    CHM_DN zrow = N_AS_CHM_DN(wrk, q);
     R_CheckStack();
 
     mer_factor(x);

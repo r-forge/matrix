@@ -185,10 +185,9 @@ internal_Gaussian_deviance(int p, int q, cholmod_factor *L,
     CHM_SP Lm;
     CHM_FR Lcp;
     double ans = 0, one[] = {1,0}, zero[] = {0,0};
-    double *bb = alloca(q * sizeof(double)),
-	*betab = alloca(p * sizeof(double));
+    double *bb = Alloca(q, double), *betab = Alloca(p, double);
     CHM_DN Ltb = M_cholmod_allocate_dense(q, 1, q, CHOLMOD_REAL, &c),
-	chb = M_numeric_as_chm_dense(alloca(sizeof(cholmod_dense)), bb, q);
+	chb = N_AS_CHM_DN(bb, q);
     R_CheckStack();
 
     for (i = 0; i < p; i++) betab[i] = beta[i] - betahat[i];
