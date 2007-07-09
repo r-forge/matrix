@@ -137,8 +137,7 @@ elements and certain elements close to the diagonal.
 The maximum likelihood estimates for parameters in model (\ref{eq:1})
 fit to the \code{Rail} data are obtained as
 <<RailfitML>>=
-Rm1ML <- lmer2(travel ~ 1 + (1|Rail), Rail, method = "ML",
-               control = list(msVerbose = 1))
+Rm1ML <- lmer(travel ~ 1 + (1|Rail), Rail, method = "ML", verbose = TRUE)
 @
 In this fit we have set the control parameter \code{msVerbose} to 1
 indicating that information on the progress of the iterations should
@@ -163,7 +162,8 @@ The model matrices $\bm{Z}$ and $\bm{X}$ and the negative of the
 response vector $-\bm{y}$ are stored in the \code{ZXyt} slot in the
 transposed form.  Extracting the transpose of this slot
 <<ZXytRail>>=
-t(Rm1ML@ZXyt)
+t(Rm1ML@Zt)
+as(Rail[["Rail"]], "sparseMatrix")
 @
 The first 6 columns of this matrix are $\bm{Z}$, the seventh column is
 $\bm{X}$ and the eighth and final column is $-\bm{y}$.  As indicated
@@ -177,10 +177,10 @@ is zero) but they are not in the usual ordering.  This is because the
 levels of the \code{Rail} factor have been reordered according to
 increasing mean response for Figure~\ref{fig:Raildotplot}.
 
-The crossproduct of the columns of this matrix are stored as a
-symmetric, sparse matrix in the \code{A} slot.
+%The crossproduct of the columns of this matrix are stored as a
+%symmetric, sparse matrix in the \code{A} slot.
 <<ARm1ML>>=
-Rm1ML@A
+#Rm1ML@A
 @
 
 The \code{L} component of this fitted model is a Cholesky
@@ -256,21 +256,23 @@ $\bm{Z}^*=\bm{Z}\bm{T}\bm{S}$.  We can verify that the value
 $27.38292$ can indeed be calculated in this way.
 <<ldZRm1ML>>=
 L <- as(Rm1ML@L, "sparseMatrix")
-2*sum(log(diag(L)[1:6]))
+2*sum(log(diag(L)))
 @
 
 The \code{lr2} element of the \code{deviance} slot is the logarithm of
 the penalized residual sum of squares.  It can be calculated as the
 logarithm of the square of the last diagonal element in $\bm{L}$.
 <<lr2Rm1ML>>=
-2*log(L[8,8])
+(RXy <- Rm1ML@RXy)
 @
 
 For completeness we mention that the \code{ldX} element of the
 \code{deviance} slot is the logarithm of the product of the squares of
 the diagonal elements of $\bm{L}$ corresponding to columns of $\bm{X}$.
 <<ldXRm1ML>>=
-2*log(L[7,7])
+dd <- Rm1ML@dims
+p <- dd["p"]
+2 * log(RXy[p+1L, p+1L])
 @
 This element is used in the calculation of the REML criterion.
 
@@ -278,14 +280,14 @@ Another slot in the fitted model object is \code{dims}, which
 contains information on the dimensions of the model and some of the
 characteristics of the fit.
 <<dimsRm1ML>>=
-Rm1ML@dims
+dd
 @
 We can reconstruct the ML estimate of the residual variance as the
 penalized residual sum of squares divided by the number of
 observations.
-%% FIXME: This is not calculated correctly in the current version of lmer2
+%% FIXME: This is not calculated correctly in the current version of lmer
 <<s2Rm1ML>>=
-exp(Rm1ML@deviance["lr2"])/Rm1ML@dims["n"]
+exp(Rm1ML@deviance["lpdisc"])/dd["n"]
 @
 
 The \emph{profiled deviance} function
@@ -313,14 +315,15 @@ nc <- length(dev)
 nms <- names(dev)
 vals <- matrix(0, nrow = length(sg), ncol = nc, dimnames = list(NULL, nms))
 for (i in seq(along = sg)) {
-    .Call("lmer2_setPars", mm, sg[i], PACKAGE = "lme4")
+    .Call("ST_setPars", mm, sg[i], PACKAGE = "lme4")
+    .Call("lmer_update_dev", mm, PACKAGE = "lme4")
     vals[i,] <- mm@deviance
 }
-vals[,"lr2"] <- mm@dims["n"] * vals[,"lr2"]
+vals[,"lpdisc"] <- mm@dims["n"] * vals[,"lpdisc"]
 df <- data.frame(x = rep(sg, nc), y = as.vector(vals),
                  type = gl(nc, length(sg), labels = nms))
 print(xyplot(y ~ x | type, df, type = c("g", "l"),
-             subset = !(type %in% c("REML", "ldX", "bqd", "Sdr")),
+             subset = !(type %in% c("REML", "ldRX2", "bqd")),
              scales = list(x = list(axs = 'i'),
              y = list(relation = "free", rot = 0)),
              aspect = 0.75, xlab = expression(sigma[1]), ylab = '',
@@ -371,13 +374,14 @@ nc <- length(dev)
 nms <- names(dev)
 vals <- matrix(0, nrow = length(sg), ncol = nc, dimnames = list(NULL, nms))
 for (i in seq(along = sg)) {
-    .Call("lmer2_setPars", mm, sg[i], PACKAGE = "lme4")
+    .Call("ST_setPars", mm, sg[i], PACKAGE = "lme4")
+    .Call("lmer_update_dev", mm, PACKAGE = "lme4")
     vals[i,] <- mm@deviance
 }
 base <- 18 * log(deviance(lm(travel ~ Rail, Rail)))
 print(xyplot(devC + ldZ ~ sg,
-             data.frame(ldZ = vals[,"ldZ"], devC =
-                        vals[, "ldZ"] + mm@dims['n'] * vals[, "lr2"] - base,
+             data.frame(ldL2 = vals[,"ldL2"], devC =
+                        vals[, "ldL2"] + mm@dims['n'] * vals[, "lpdisc"] - base,
                         sg = sg), type = c("g", "l"),
              scales = list(x = list(axs = 'i')), aspect = 1.8,
              xlab = expression(sigma[1]), ylab = "Shifted deviance",
@@ -430,7 +434,7 @@ intercept and the slope of the linear trend.
 
 The model
 <<sm1>>=
-print(sm1 <- lmer2(Reaction ~ Days + (Days|Subject), sleepstudy))
+print(sm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
 @
 provides for fixed effects for the intercept (the typical reaction
 time in the population after zero days of sleep deprivation) and the
@@ -439,8 +443,6 @@ per day of sleep deprivation).  In addition there are random effects
 per subject for both the intercept and the slope parameters.
 
 <<sm1struct,fig=TRUE,echo=FALSE,height=3,width=6>>=
-print(image(sm1@A, colorkey = FALSE, aspect = 1),
-      split = c(1,1,2,1), more = TRUE)
 print(image(sm1@L, colorkey = FALSE, aspect = 1),
       split = c(2,1,2,1))
 @
@@ -468,10 +470,8 @@ and at the same times.  One consequence of the balance is that the
 diagonal blocks in the first $36$ rows of $\bm{A}$ are identical as
 are those in the first $36$ rows of $\bm{L}$.
 <<A1212>>=
-sm1@A[1:2,1:2]
-sm1@A[7:8,7:8]
 as(sm1@L, "sparseMatrix")[1:2,1:2]
-as(sm1@L, "sparseMatrix")[7:8,7:8]
+sm1@RXy
 @
 
 The determinant quantities in
@@ -485,7 +485,7 @@ the $37$th and $38$th elements and \code{lr2} is the logarithm of the
 square of the $39$th element.
 <<sm1reconstruct>>=
 str(dd <- diag(as(sm1@L, "sparseMatrix")))
-c(ldZ = sum(log(dd[1:36]^2)), ldX = sum(log(dd[37:38]^2)), lr2 = log(dd[39]^2))
+c(ldL2 = sum(log(dd[1:36]^2)), ldRXy = sum(log(dd[37:38]^2)), lpdisc = log(dd[39]^2))
 @
 
 The $36\times 36$ matrices $\bm{S}$, $\bm{T}$ and
@@ -550,7 +550,7 @@ Figure~\ref{fig:Oatsxy}.
 
 The fitted model \code{Om1}
 <<Om1>>=
-print(Om1 <- lmer2(yield ~ nitro + Variety + (1|Block/Variety), Oats), corr = FALSE)
+print(Om1 <- lmer(yield ~ nitro + Variety + (1|Block/Variety), Oats), corr = FALSE)
 @
 provides fixed effects for the nitrogen concentration and for the
 varieties (coded as differences relative to the reference variety
@@ -594,7 +594,7 @@ of model \code{Om1} indicates that the systematic effect of the
 \code{Variety} factor is not significant and we could omit it from the
 model, leaving us with
 <<Om1a>>=
-print(Om1a <- lmer2(yield ~ nitro + (1|Block/Variety), Oats), corr = FALSE)
+print(Om1a <- lmer(yield ~ nitro + (1|Block/Variety), Oats), corr = FALSE)
 @
 with matrices $\bm{A}$ and $\bm{L}$ whose patterns are shown in
 Figure~\ref{fig:Om1astruct}.
@@ -627,7 +627,7 @@ For example, the random effect for the intercept and the random effect
 for the slope in the sleep-study data could reasonably be modeled as
 independent, as in the model
 <<sm2>>=
-print(sm2 <- lmer2(Reaction ~ Days + (1|Subject) + (0+Days|Subject), sleepstudy), corr = FALSE)
+print(sm2 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), sleepstudy), corr = FALSE)
 @
 
 The structures of the matrices $\bm{A}$ and $\bm{L}$ for this model are
@@ -662,7 +662,7 @@ Figure~\ref{fig:Oatsxy} indicates that the slope of yield versus
 nitrogen concentration may depend on the block but not the plot within
 the block.  We can fit such a model as
 <<Om2>>=
-print(Om2 <- lmer2(yield ~ nitro + (1|Variety:Block) + (nitro|Block), Oats), corr = FALSE)
+print(Om2 <- lmer(yield ~ nitro + (1|Variety:Block) + (nitro|Block), Oats), corr = FALSE)
 @
 The structures of the matrices $\bm{A}$ and $\bm{L}$ for this
 model are shown in Figure~\ref{fig:Om2struct}.
@@ -738,7 +738,7 @@ to form a nested sequence is to have \code{primary} nested within
 of \code{second}).  We could check if these are nested by doing a
 cross-tabulation of these factors but it is easier to fit an initial model
 <<Sm1>>=
-print(Sm1 <- lmer2(attain ~ verbal * sex + (1|primary) + (1|second), ScotsSec), corr = FALSE)
+print(Sm1 <- lmer(attain ~ verbal * sex + (1|primary) + (1|second), ScotsSec), corr = FALSE)
 @
 and examine the \code{"isNested"} element of the \code{dims} slot.
 <<Sm1dims>>=
