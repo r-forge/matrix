@@ -1148,7 +1148,7 @@ untransformed random effects,
   \label{eq:lmmBLUP}
   \widehat{\bm b}(\widehat{\bm\theta})=
   \bm T(\widehat{\bm\theta})
-  \bm S(\widehat{\bm\theta})
+  \bm S(\widehat{\bm\theta})\bm P\trans
   \widehat{\bm{u}}(\widehat{\bm\theta}) ,
 \end{equation}
 are called the \emph{empirical Best Linear Unbiased Predictors} (eBLUPs) of the
