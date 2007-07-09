@@ -26,6 +26,7 @@ SEXP lmer_postVar(SEXP x);
 SEXP lmer_ranef(SEXP x);
 SEXP lmer_setPars(SEXP x, SEXP pars);
 SEXP lmer_update_effects(SEXP x);
+SEXP lmer_update_dev(SEXP x);
 SEXP lmer_validate(SEXP x);
 
 SEXP mer_create_L(SEXP Vt);
