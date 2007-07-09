@@ -15,7 +15,7 @@ VecFromNames <- function(nms, mode = "numeric")
     names(ans) <- nms
     ans
 }
-.dims_names <- c("nf", "n", "p", "q", "s", "np", "REML", "famType", "Nested")
+.dims_names <- c("nf", "n", "p", "q", "s", "np", "REML", "ftyp", "nest")
 .dev_names <- c("ML", "REML", "ldL2", "ldRX2", "lpdisc", "bqd")
 
 ### Utilities for parsing the mixed model formula
@@ -418,7 +418,7 @@ function(formula, data, family = gaussian, method = c("Laplace", "AGQ"),
     dd["np"] <- as.integer(sum(nvc))    # number of parameters in optimization
 ### FIXME: Change the name of this to something more appropriate
     dd["REML"] <- match.arg(method) == "AGQ"
-    dd["famType"] <- mkFltype(glmFit$family)
+    dd["ftyp"] <- mkFltype(glmFit$family)
 
     ans <- new("glmer",
                env = mkFamilyEnv(glmFit),
@@ -917,7 +917,7 @@ setMethod("summary", signature(object = "mer"),
               REmat <- REmat[-nrow(REmat), , drop = FALSE]
 
           if (nrow(coefs) > 0) {
-              if (dims["famType"] >= 0) {
+              if (dims["ftyp"] >= 0) {
                   coefs <- coefs[, 1:2, drop = FALSE]
                   stat <- coefs[,1]/coefs[,2]
                   pval <- 2*pnorm(abs(stat), lower = FALSE)
@@ -1851,7 +1851,7 @@ setMethod("show", "nlmer", function(object)
 ##     loglik[] <- -deviance/2
 ## }
 
-## setMethod("isNested", "mer",
+## setMethod("isnest", "mer",
 ##           function(x, ...) !(x@L@type[1]),
 ##           valueClass = "logical")
 

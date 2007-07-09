@@ -27,6 +27,7 @@ static R_CallMethodDef CallEntries[] = {
     {"lmer_postVar", (DL_FUNC) &lmer_postVar, 1},
     {"lmer_ranef", (DL_FUNC) &lmer_ranef, 1},
     {"lmer_update_effects", (DL_FUNC) &lmer_update_effects, 1},
+    {"lmer_update_dev", (DL_FUNC) &lmer_update_dev, 1},
     {"lmer_validate", (DL_FUNC) &lmer_validate, 1},
 
     {"mer_create_L", (DL_FUNC) &mer_create_L, 1},

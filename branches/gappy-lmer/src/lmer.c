@@ -7,8 +7,8 @@
 enum devP {ML_POS=0, REML_POS, ldL2_POS, ldRX2_POS, lpdisc_POS, bqd_POS};
 /* ("ML", "REML", "ldL2", "ldRX2", "lpdisc", "bqd") */
 				/* positions in the dims vector */
-enum dimP {nf_POS=0, n_POS, p_POS, q_POS, s_POS, np_POS, isREML_POS, famType_POS, Nested_POS};
-/* ("nf", "n", "p", "q", "s", "np", "REML", "famType", "Nested") */
+enum dimP {nf_POS=0, n_POS, p_POS, q_POS, s_POS, np_POS, isREML_POS, fTyp_POS, nest_POS};
+/* ("nf", "n", "p", "q", "s", "np", "REML", "fTyp", "nest") */
 
 #define isREML(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isREML_POS]
 #define L_SLOT(x) AS_CHM_FR(GET_SLOT(x, lme4_LSym))
@@ -452,7 +452,7 @@ PTpS_dense_mult(SEXP dest, SEXP ST, const int *Gp, SEXP src, int *Perm)
  * @param x pointer to an lmer object
  *
  */
-static void
+SEXP
 lmer_update_dev(SEXP x)
 {
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), j, info;
@@ -487,6 +487,8 @@ lmer_update_dev(SEXP x)
     d[ML_POS] = d[ldL2_POS] + dn * (1. + d[lpdisc_POS] + log(2. * PI / dn));
     d[REML_POS] = d[ldL2_POS] + d[ldRX2_POS] + dnmp *
 	(1. + d[lpdisc_POS] + log(2. * PI / dnmp));
+    d[bqd_POS] = NA_REAL;
+    return R_NilValue;
 }
 
 /**
@@ -507,7 +509,8 @@ static double
 	int nci = INTEGER(getAttrib(STi, R_DimSymbol))[0];
 	int j, k, ncp1 = nci + 1;
 
-	for (j = 0; j < nci; j++) pars[pos++] = st[j * ncp1];
+	for (j = 0; j < nci; j++)
+	    pars[pos++] = st[j * ncp1];
 	for (j = 0; j < (nci - 1); j++)
 	    for (k = j + 1; k < nci; k++)
 		pars[pos++] = st[k + j * nci];
@@ -551,7 +554,8 @@ internal_ST_setPars(const double *pars, SEXP ST)
 	int nci = INTEGER(getAttrib(STi, R_DimSymbol))[0];
 	int j, k, ncp1 = nci + 1;
 
-	for (j = 0; j < nci; j++) st[j * ncp1] = pars[pos++];
+	for (j = 0; j < nci; j++)
+	    st[j * ncp1] = pars[pos++];
 	for (j = 0; j < (nci - 1); j++)
 	    for (k = j + 1; k < nci; k++)
 		st[k + j * nci] = pars[pos++];
@@ -569,7 +573,6 @@ internal_ST_setPars(const double *pars, SEXP ST)
  */
 SEXP ST_setPars(SEXP x, SEXP pars)
 {
-/*     CHM_FR L = L_SLOT(x); */
     SEXP ST = GET_SLOT(x, lme4_STSym);
     int npar = INTEGER(GET_SLOT(x, lme4_dimsSym))[np_POS];
 
@@ -609,11 +612,12 @@ SEXP lmer_update_effects(SEXP x)
     SEXP ranef = GET_SLOT(x, lme4_ranefSym),
 	uvec = GET_SLOT(x, lme4_uvecSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), *perm, i, ione = 1;
-    int p = dims[p_POS],  pp1 = dims[p_POS] + 1, q = dims[q_POS];
+    int n = dims[n_POS], p = dims[p_POS],  pp1 = dims[p_POS] + 1, q = dims[q_POS];
     double *RXy = REAL(GET_SLOT(x, lme4_RXySym)),
 	*RVXy = REAL(GET_SLOT(x, lme4_RVXySym)),
-	*b = REAL(ranef), *fixef = REAL(GET_SLOT(x, lme4_fixefSym)),
-	*u = REAL(uvec), mone[] = {-1,0}, one[] = {1,0};
+	*b = REAL(ranef), *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
+	*fixef = REAL(GET_SLOT(x, lme4_fixefSym)), *u = REAL(uvec),
+	mone[] = {-1,0}, one[] = {1,0};
     CHM_FR L = L_SLOT(x);
     CHM_DN cu = AS_CHM_DN(uvec), sol;
     R_CheckStack();
@@ -627,6 +631,10 @@ SEXP lmer_update_effects(SEXP x)
 	      c.status, L->minor, L->n);
     Memcpy(u, (double*)(sol->x), q);
     M_cholmod_free_dense(&sol, &c);
+    for (i = 0, dev[bqd_POS] = 0; i < n; i++) {
+	double ui = u[i];
+	dev[bqd_POS] += ui * ui;
+    }
 
     perm = (int *)(L->Perm);
     for (i = 0; i < q; i++) /* apply the inverse permutation to u into b */
@@ -1149,8 +1157,8 @@ SEXP mer_validate(SEXP x)
     if (LENGTH(devianceP) != (bqd_POS + 1) ||
 	LENGTH(getAttrib(devianceP, R_NamesSymbol)) != (bqd_POS + 1))
 	return mkString(_("deviance slot not named or incorrect length"));
-    if (LENGTH(dimsP) != (Nested_POS + 1) ||
-	LENGTH(getAttrib(dimsP, R_NamesSymbol)) != (Nested_POS + 1))
+    if (LENGTH(dimsP) != (nest_POS + 1) ||
+	LENGTH(getAttrib(dimsP, R_NamesSymbol)) != (nest_POS + 1))
 	return mkString(_("dims slot not named or incorrect length"));
     if (L->n != q || !L->is_ll || !L->is_monotonic)
 	return mkString(_("Slot L must be a monotonic LL' factorization of size dims['q']"));
@@ -1683,7 +1691,7 @@ SEXP glmer_linkinv(SEXP x)
 {
     SEXP rho = GET_SLOT(x, lme4_envSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int i, n = dims[n_POS], fltype = dims[famType_POS];
+    int i, n = dims[n_POS], fltype = dims[fTyp_POS];
     double *eta = REAL(findVarInFrame(rho, lme4_etaSym)),
 	*mu = REAL(findVarInFrame(rho, lme4_muSym));
 
@@ -1732,7 +1740,7 @@ static double *glmer_var(SEXP x, double *var)
 {
     SEXP rho = GET_SLOT(x, lme4_envSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int i, n = dims[n_POS], fltype = dims[famType_POS];
+    int i, n = dims[n_POS], fltype = dims[fTyp_POS];
     double *mu = REAL(findVarInFrame(rho, lme4_muSym));
 
     switch(fltype) {
@@ -1766,7 +1774,7 @@ static double *glmer_dmu_deta(SEXP x, double *dmu_deta)
 {
     SEXP rho = GET_SLOT(x, lme4_envSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int i, n = dims[n_POS], fltype = dims[famType_POS];
+    int i, n = dims[n_POS], fltype = dims[fTyp_POS];
     double *eta = REAL(findVarInFrame(rho, lme4_etaSym));
 
     switch(fltype) {
@@ -1812,7 +1820,7 @@ SEXP glmer_dev_resids(SEXP x)
 {
     SEXP rho = GET_SLOT(x, lme4_envSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int i, fltype = dims[famType_POS], n = dims[n_POS];
+    int i, fltype = dims[fTyp_POS], n = dims[n_POS];
     double *dev_res = REAL(findVarInFrame(rho, lme4_devResidSym)),
 	*mu = REAL(GET_SLOT(x, lme4_muSym)),
 	*wts = REAL(findVarInFrame(rho, lme4_pwtsSym)),
@@ -2142,7 +2150,7 @@ SEXP nlmer_create(SEXP env, SEXP model, SEXP frame, SEXP pnames,
 {
     SEXP ST, ans = PROTECT(NEW_OBJECT(MAKE_CLASS("nlmer")));
     char *DEVIANCE_NAMES[]={"ML","REML","ldL2","ldRX2","lr2", "bqd", "Sdr", ""};
-    char *DIMS_NAMES[]={"nf","n","p","q", "s", "np","isREML","famType","Nested",""};
+    char *DIMS_NAMES[]={"nf","n","p","q", "s", "np","isREML","fTyp","nest",""};
     int *Gpp = INTEGER(Gp), *Zdims = INTEGER(GET_SLOT(Zt, lme4_DimSym)), *dims, i, iT;
     CHM_SP cVt, ts1, ts2;
     CHM_FR L;
@@ -2169,8 +2177,8 @@ SEXP nlmer_create(SEXP env, SEXP model, SEXP frame, SEXP pnames,
     dims[q_POS] = Zdims[0];
     dims[s_POS] = Zdims[1]/dims[n_POS];
     dims[isREML_POS] = FALSE;
-    dims[famType_POS] = -1;
-    dims[Nested_POS] = TRUE;
+    dims[fTyp_POS] = -1;
+    dims[nest_POS] = TRUE;
     SET_SLOT(ans, lme4_ranefSym, allocVector(REALSXP, Zdims[0]));
     AZERO(REAL(GET_SLOT(ans, lme4_ranefSym)), Zdims[0]);
     SET_SLOT(ans, lme4_uvecSym, allocVector(REALSXP, Zdims[0]));
