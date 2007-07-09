@@ -320,8 +320,8 @@ SEXP mer_update_VtL(SEXP x)
 static double *TS_mult(const int *Gp, SEXP ST, double *b)
 {
     int i, j, k, ione = 1, nf = LENGTH(ST);
-    int *nc = alloca(nf * sizeof(int)), *nlev = alloca(nf * sizeof(int));
-    double **st = alloca(nf * sizeof(double*));
+    int *nc = Alloca(nf, int), *nlev = Alloca(nf, int);
+    double **st = Alloca(nf, double*);
     R_CheckStack();
 
     ST_nc_nlev(ST, Gp, st, nc, nlev);
@@ -464,13 +464,15 @@ lmer_update_dev(SEXP x)
     CHM_FR L = L_SLOT(x);
     int pp1 = cRVXy->ncol, q = cRVXy->nrow;
     R_CheckStack();
+
+    update_VtL(x);
 				/* Evaluate PT'SZ'[X:y] in RVXy */
     PTpS_dense_mult(RVXy, GET_SLOT(x, lme4_STSym),
 		    INTEGER(GET_SLOT(x, lme4_GpSym)),
 		    GET_SLOT(x, lme4_ZtXySym), (int*)(L->Perm));
 				/* solve for RVXy */
     ans = M_cholmod_solve(CHOLMOD_L, L, cRVXy, &c);
-    Memcpy(REAL(RVXy), (double*)(ans->x), pp1 *q);
+    Memcpy(REAL(RVXy), (double*)(ans->x), q * pp1);
     M_cholmod_free_dense(&ans, &c);
     				/* downdate XytXy  */
     F77_CALL(dlacpy)("U", &pp1, &pp1, REAL(GET_SLOT(x, lme4_XytXySym)),
@@ -622,6 +624,7 @@ SEXP lmer_update_effects(SEXP x)
     CHM_DN cu = AS_CHM_DN(uvec), sol;
     R_CheckStack();
 
+    lmer_update_dev(x);
     Memcpy(fixef, RXy + p * pp1, p);
     F77_CALL(dtrsv)("U", "N", "N", &p, RXy, &pp1, fixef, &ione);
     Memcpy(u, RVXy + q * p, q);
@@ -1229,7 +1232,7 @@ SEXP lmer_validate(SEXP x)
     int *dd = INTEGER(GET_SLOT(x, lme4_dimsSym));
     int n = dd[n_POS], p = dd[p_POS], q = dd[q_POS];
     int pp1 = p + 1;
-    char *buf = (char*)alloca((size_t)(BUF_SIZE + 1));
+    char *buf = Alloca(BUF_SIZE + 1, char);
     R_CheckStack();
 
     /* Note: We don't need to check the matrix slots to see if they are matrices. */
@@ -2001,7 +2004,6 @@ update_deviance(SEXP x, const double *xv, int mtype)
     internal_ST_setPars(xv, ST); /* common parameters */
     switch(mtype) {
     case 0: {			  /* linear mixed model */
-	update_VtL(x);
 	lmer_update_dev(x);
 	break;
     }

@@ -37,7 +37,7 @@ options(width=80, show.signif.stars = FALSE,
 library(lattice)
 library(Matrix)
 library(lme4)
-data("Rail", package = "nlme")
+data("Rail", package = "MEMSS")
 data("ScotsSec", package = "mlmRev")
 Rail <- data.frame(travel = Rail$travel, Rail = Rail$Rail)
 @
@@ -316,8 +316,8 @@ nms <- names(dev)
 vals <- matrix(0, nrow = length(sg), ncol = nc, dimnames = list(NULL, nms))
 for (i in seq(along = sg)) {
     .Call("ST_setPars", mm, sg[i], PACKAGE = "lme4")
-    .Call("lmer_update_dev", mm, PACKAGE = "lme4")
-    vals[i,] <- mm@deviance
+    res <- try(.Call("lmer_update_dev", mm, PACKAGE = "lme4"), silent = TRUE)
+    vals[i,] <- if (is.null(res)) mm@deviance else NA
 }
 vals[,"lpdisc"] <- mm@dims["n"] * vals[,"lpdisc"]
 df <- data.frame(x = rep(sg, nc), y = as.vector(vals),
@@ -379,7 +379,7 @@ for (i in seq(along = sg)) {
     vals[i,] <- mm@deviance
 }
 base <- 18 * log(deviance(lm(travel ~ Rail, Rail)))
-print(xyplot(devC + ldZ ~ sg,
+print(xyplot(devC + ldL2 ~ sg,
              data.frame(ldL2 = vals[,"ldL2"], devC =
                         vals[, "ldL2"] + mm@dims['n'] * vals[, "lpdisc"] - base,
                         sg = sg), type = c("g", "l"),
@@ -434,7 +434,7 @@ intercept and the slope of the linear trend.
 
 The model
 <<sm1>>=
-print(sm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
+#print(sm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
 @
 provides for fixed effects for the intercept (the typical reaction
 time in the population after zero days of sleep deprivation) and the
@@ -443,8 +443,8 @@ per day of sleep deprivation).  In addition there are random effects
 per subject for both the intercept and the slope parameters.
 
 <<sm1struct,fig=TRUE,echo=FALSE,height=3,width=6>>=
-print(image(sm1@L, colorkey = FALSE, aspect = 1),
-      split = c(2,1,2,1))
+#print(image(sm1@L, colorkey = FALSE, aspect = 1),
+#      split = c(2,1,2,1))
 @
 
 With two random effects per subject the matrix $\bm{\Sigma}$ for this
@@ -452,14 +452,14 @@ model is $36\times 36$ with $18$ $2\times 2$ diagonal blocks.  The
 matrix $\bm{A}$ is $39\times 39$ as is $\bm{L}$, the Cholesky factor
 of $\bm{A}^*$.  The structure of $\bm{A}$ and of $\bm{L}$ are shown in
 Figure~\ref{fig:ALstruct}.
-\begin{figure}[tbp]
-  \centerline{\includegraphics[width=\textwidth]{Implementation-sm1struct}}
-  \caption{Structure of the sparse matrices $\bm{A}$ (left panel) and
-    $\bm{L}$ (right panel) for the model \code{sm1}.  The non-zero
-    elements as depicted as gray squares with larger magnitudes shown as
-    darker gray.}
-    \label{fig:ALstruct}
-\end{figure}
+% \begin{figure}[tbp]
+%   \centerline{\includegraphics[width=\textwidth]{Implementation-sm1struct}}
+%   \caption{Structure of the sparse matrices $\bm{A}$ (left panel) and
+%     $\bm{L}$ (right panel) for the model \code{sm1}.  The non-zero
+%     elements as depicted as gray squares with larger magnitudes shown as
+%     darker gray.}
+%     \label{fig:ALstruct}
+% \end{figure}
 For this model (as for all models with a
 single random effects expression) the structure of $\bm{L}$ is
 identical to that of the lower triangle of $\bm{A}$.
@@ -470,13 +470,13 @@ and at the same times.  One consequence of the balance is that the
 diagonal blocks in the first $36$ rows of $\bm{A}$ are identical as
 are those in the first $36$ rows of $\bm{L}$.
 <<A1212>>=
-as(sm1@L, "sparseMatrix")[1:2,1:2]
-sm1@RXy
+#as(sm1@L, "sparseMatrix")[1:2,1:2]
+#sm1@RXy
 @
 
 The determinant quantities in
 <<sm1deviance>>=
-sm1@deviance
+#sm1@deviance
 @
 are derived from the diagonal elements of $\bm{L}$.  \code{ldZ} is the
 logarithm of square of the product of the first $36$ elements of the
@@ -484,8 +484,8 @@ diagonal, \code{ldX} is the logarithm of the square of the product of
 the $37$th and $38$th elements and \code{lr2} is the logarithm of the
 square of the $39$th element.
 <<sm1reconstruct>>=
-str(dd <- diag(as(sm1@L, "sparseMatrix")))
-c(ldL2 = sum(log(dd[1:36]^2)), ldRXy = sum(log(dd[37:38]^2)), lpdisc = log(dd[39]^2))
+#str(dd <- diag(as(sm1@L, "sparseMatrix")))
+#c(ldL2 = sum(log(dd[1:36]^2)), ldRXy = sum(log(dd[37:38]^2)), lpdisc = log(dd[39]^2))
 @
 
 The $36\times 36$ matrices $\bm{S}$, $\bm{T}$ and
@@ -494,7 +494,7 @@ consisting of $18$ identical $2\times 2$ diagonal blocks.  The
 template for the diagonal blocks of $\bm{S}$ and $\bm{T}$ is stored as
 a single matrix
 <<sm1ST>>=
-show(st <- sm1@ST$Subject)
+#show(st <- sm1@ST$Subject)
 @ %$
 where the diagonal elements are those of $\bm{S}$ and the strict lower
 triangle is that of $\bm{T}$.
@@ -504,19 +504,19 @@ variance-covariance matrices of the random effects. Because model
 \code{sm1} has a single random-effects expression there is only one
 estimated variance-covariance matrix
 <<sm1VarCorr>>=
-show(vc <- VarCorr(sm1))
+#show(vc <- VarCorr(sm1))
 @
 The \code{"sc"} attribute of this matrix is the estimate of $\sigma$,
 the standard deviation of the per-observation noise term.
 
 We can reconstruct this variance-covariance estimate as
 <<sm1VarCorrRec>>=
-T <- st
-diag(T) <- 1
-S <- diag(diag(st))
-T
-S
-T %*% S %*% S %*% t(T) * attr(vc, "sc")^2
+#T <- st
+#diag(T) <- 1
+#S <- diag(diag(st))
+#T
+#S
+#T %*% S %*% S %*% t(T) * attr(vc, "sc")^2
 @
 
 \section{A model with two nested grouping factors}
@@ -524,7 +524,7 @@ T %*% S %*% S %*% t(T) * attr(vc, "sc")^2
 
 
 <<Oatsxy,fig=TRUE,echo=FALSE,height=4,width=6>>=
-data(Oats, package = 'nlme')
+data(Oats, package = 'MEMSS')
 print(xyplot(yield ~ nitro | Block, Oats, groups = Variety, type = c("g", "b"),
              auto.key = list(lines = TRUE, space = 'top', columns = 3),
              xlab = "Nitrogen concentration (cwt/acre)",
@@ -566,10 +566,11 @@ grouping factor is \emph{nested within} the block grouping factor.
 The structure of the matrices $\bm{A}$ and $\bm{L}$ for this model
 (Figure~\ref{fig:Om1struct})
 <<Om1struct,fig=TRUE,echo=FALSE,height=3,width=6>>=
-print(image(Om1@A, colorkey = FALSE, aspect = 1),
-      split = c(1,1,2,1), more = TRUE)
-print(image(Om1@L, colorkey = FALSE, aspect = 1),
-      split = c(2,1,2,1))
+## print(image(Om1@A, colorkey = FALSE, aspect = 1),
+##       split = c(1,1,2,1), more = TRUE)
+print(image(Om1@L, colorkey = FALSE, aspect = 1)
+#      , split = c(2,1,2,1)
+      )
 @
 \begin{figure}[tbp]
   \centerline{\includegraphics[width=\textwidth]{Implementation-Om1struct}}
@@ -599,10 +600,11 @@ print(Om1a <- lmer(yield ~ nitro + (1|Block/Variety), Oats), corr = FALSE)
 with matrices $\bm{A}$ and $\bm{L}$ whose patterns are shown in
 Figure~\ref{fig:Om1astruct}.
 <<Om1astruct,fig=TRUE,echo=FALSE,height=3,width=6>>=
-print(image(Om1a@A, colorkey = FALSE, aspect = 1),
-      split = c(1,1,2,1), more = TRUE)
-print(image(Om1a@L, colorkey = FALSE, aspect = 1),
-      split = c(2,1,2,1))
+## print(image(Om1a@A, colorkey = FALSE, aspect = 1),
+##       split = c(1,1,2,1), more = TRUE)
+print(image(Om1a@L, colorkey = FALSE, aspect = 1)
+##       , split = c(2,1,2,1)
+      )
 @
 \begin{figure}[tbp]
   \centerline{\includegraphics[width=\textwidth]{Implementation-Om1astruct}}
@@ -633,10 +635,11 @@ print(sm2 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), sleepstudy),
 The structures of the matrices $\bm{A}$ and $\bm{L}$ for this model are
 shown in Figure~\ref{fig:sm2struct}.
 <<sm2struct,fig=TRUE,echo=FALSE,height=3,width=6>>=
-print(image(sm2@A, colorkey = FALSE, aspect = 1),
-      split = c(1,1,2,1), more = TRUE)
-print(image(sm2@L, colorkey = FALSE, aspect = 1),
-      split = c(2,1,2,1))
+## print(image(sm2@A, colorkey = FALSE, aspect = 1),
+##       split = c(1,1,2,1), more = TRUE)
+print(image(sm2@L, colorkey = FALSE, aspect = 1)
+##       , split = c(2,1,2,1)
+      )
 @
 \begin{figure}[tbp]
   \centerline{\includegraphics[width=\textwidth]{Implementation-sm2struct}}
@@ -662,22 +665,22 @@ Figure~\ref{fig:Oatsxy} indicates that the slope of yield versus
 nitrogen concentration may depend on the block but not the plot within
 the block.  We can fit such a model as
 <<Om2>>=
-print(Om2 <- lmer(yield ~ nitro + (1|Variety:Block) + (nitro|Block), Oats), corr = FALSE)
+#print(Om2 <- lmer(yield ~ nitro + (1|Variety:Block) + (nitro|Block), Oats), corr = FALSE)
 @
 The structures of the matrices $\bm{A}$ and $\bm{L}$ for this
 model are shown in Figure~\ref{fig:Om2struct}.
 <<Om2struct,fig=TRUE,echo=FALSE,height=3,width=6>>=
-print(image(Om2@A, colorkey = FALSE, aspect = 1),
-      split = c(1,1,2,1), more = TRUE)
-print(image(Om2@L, colorkey = FALSE, aspect = 1),
-      split = c(2,1,2,1))
+## print(image(Om2@A, colorkey = FALSE, aspect = 1),
+##       split = c(1,1,2,1), more = TRUE)
+## print(image(Om2@L, colorkey = FALSE, aspect = 1),
+##       split = c(2,1,2,1))
 @
-\begin{figure}[tbp]
-  \centerline{\includegraphics[width=\textwidth]{Implementation-Om2struct}}
-  \caption{Structure of the sparse matrices $\bm{A}$ (left panel) and
-    $\bm{L}$ (right panel) for the model \code{Om2}.}
-    \label{fig:Om2struct}
-\end{figure}
+% \begin{figure}[tbp]
+%   \centerline{\includegraphics[width=\textwidth]{Implementation-Om2struct}}
+%   \caption{Structure of the sparse matrices $\bm{A}$ (left panel) and
+%     $\bm{L}$ (right panel) for the model \code{Om2}.}
+%     \label{fig:Om2struct}
+% \end{figure}
 
 We see that the only difference in the structure of the $\bm{A}$
 matrices from models \code{Om1a} and \code{Om2} is that rows and
@@ -707,8 +710,8 @@ is stored as a symmetric matrix with only the non-redundant elements
 being stored explicitly, the number of stored nonzeros in these two
 matrices are identical.
 <<Om2ALsize>>=
-length(Om2@A@x)
-length(Om2@L@x)
+## length(Om2@A@x)
+## length(Om2@L@x)
 @
 
 \section{Non-nested grouping factors}
@@ -740,7 +743,7 @@ cross-tabulation of these factors but it is easier to fit an initial model
 <<Sm1>>=
 print(Sm1 <- lmer(attain ~ verbal * sex + (1|primary) + (1|second), ScotsSec), corr = FALSE)
 @
-and examine the \code{"isNested"} element of the \code{dims} slot.
+and examine the \code{"nest"} element of the \code{dims} slot.
 <<Sm1dims>>=
 Sm1@dims
 @
@@ -757,10 +760,11 @@ We see that primary schools 1, 4 and 6 each occurred with multiple secondary sch
 For non-nested grouping factors like these, the structure of $\bm{A}$
 and $\bm{L}$, shown in Figure~\ref{fig:Sm1struct}
 <<Sm1struct,fig=TRUE,echo=FALSE,height=3,width=6>>=
-print(image(Sm1@A, colorkey = FALSE, aspect = 1),
-      split = c(1,1,2,1), more = TRUE)
-print(image(Sm1@L, colorkey = FALSE, aspect = 1),
-      split = c(2,1,2,1))
+## print(image(Sm1@A, colorkey = FALSE, aspect = 1),
+##       split = c(1,1,2,1), more = TRUE)
+print(image(Sm1@L, colorkey = FALSE, aspect = 1)
+##       , split = c(2,1,2,1)
+      )
 @
 \begin{figure}[tbp]
   \centerline{\includegraphics[width=\textwidth]{Implementation-Sm1struct}}
@@ -781,7 +785,7 @@ With non-nested grouping factors such as these there can be fill-in.
 That is, the number of nonzeros in $\bm{L}$ is greater than the number
 of non-redundant nonzeros in $\bm{A}$.
 <<Sm1fill>>=
-c(A = length(Sm1@A@x), L = length(Sm1@L@x))
+c(A = length(tcrossprod(Sm1@Vt)@x), L = length(Sm1@L@x))
 @
 The permutation applied to the rows and columns of $\bm{A}$ is a
 ``fill-reducing'' permutation chosen to reduce the amount of fill-in
