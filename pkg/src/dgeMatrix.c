@@ -551,50 +551,51 @@ SEXP dgeMatrix_colsums(SEXP x, SEXP naRmP, SEXP cols, SEXP mean)
     int doMean = asLogical(mean);
     int useCols = asLogical(cols);
     int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
-    int i, j, n = dims[0], p = dims[1];
-    SEXP ans = PROTECT(allocVector(REALSXP, (useCols) ? p : n));
-    double *xx = REAL(GET_SLOT(x, Matrix_xSym)), *rx;
+    int i, j, m = dims[0], n = dims[1];
+    SEXP ans = PROTECT(allocVector(REALSXP, (useCols) ? n : m));
+    double *aa = REAL(ans), *xx = REAL(GET_SLOT(x, Matrix_xSym));
 
     if (useCols) {  /* col(Sums|Means) : */
-	double sum;
-	int cnt = n;
-	for (j = 0; j < p; j++) {
-	    rx = xx + n*j;
+	int cnt = m;
+	for (j = 0; j < n; j++) {
+	    double *rx = xx + m * j;
+
+	    aa[j] = 0;
 	    if (keepNA)
-		for (sum = 0., i = 0; i < n; i++) sum += *rx++;
+		for (i = 0; i < m; i++) aa[j] += rx[i];
 	    else {
-		for (cnt = 0, sum = 0., i = 0; i < n; i++, rx++)
-		    if (!ISNAN(*rx)) {cnt++; sum += *rx;}
+		cnt = 0;
+		for (i = 0; i < m; i++)
+		    if (!ISNAN(rx[i])) {cnt++; aa[j] += rx[i];}
 	    }
 	    if (doMean) {
-		if (cnt > 0) sum /= cnt; else sum = NA_REAL;
+		if (cnt > 0) aa[j] /= cnt; else aa[j] = NA_REAL;
 	    }
-	    REAL(ans)[j] = sum;
 	}
     } else { /* row(Sums|Means) : */
-	double *rans = REAL(ans), *ra, *rx, *Cnt = NULL, *c;
-	rx = xx;
-	if (!keepNA) Cnt = Alloca(n, double);
+	double *Cnt = (keepNA && doMean) ? (double*)NULL : Alloca(m, double);
 	R_CheckStack();
-	for (ra = rans, i = 0; i < n; i++) *(ra++) = 0.0;
-	for (j = 0; j < p; j++) {
-	    ra = rans;
+
+	for (i = 0; i < m; i++) aa[i] = 0.0;
+	for (j = 0; j < n; j++) {
 	    if (keepNA)
-		for (i = 0; i < n; i++) *(ra++) += *(rx++);
+		for (i = 0; i < m; i++) aa[i] += xx[i + j * m];
 	    else
-		for (c = Cnt, i = 0; i < n; i++, ra++, rx++, c++)
-		    if (!ISNAN(*rx)) {
-			*ra += *rx;
-			if (doMean) (*c)++;
+		for (i = 0; i < m; i++) {
+		    double el = xx[i + j * m];
+		    if (!ISNAN(el)) {
+			aa[i] += el;
+			if (doMean) Cnt[i]++;
 		    }
+		}
 	}
 	if (doMean) {
 	    if (keepNA)
-		for (ra = rans, i = 0; i < n; i++)
-		    *(ra++) /= p;
+		for (i = 0; i < m; i++) aa[i] /= n;
 	    else {
-		for (ra = rans, c = Cnt, i = 0; i < n; i++, c++)
-		    if (*c > 0) *(ra++) /= *c; else *(ra++) = NA_REAL;
+		for (i = 0; i < m; i++) {
+		    if (Cnt[i] > 0) aa[i] /= Cnt[i]; else aa[i] = NA_REAL;
+		}
 	    }
 	}
     }
