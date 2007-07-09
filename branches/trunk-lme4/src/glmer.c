@@ -656,10 +656,10 @@ glmer_MCMCsamp(SEXP GSpt, SEXP savebp, SEXP nsampp, SEXP transp, SEXP verbosep,
     int nrtot = nrbase + deviance + (saveb ? q : 0);
     CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
     double
-	*bcur = alloca(q * sizeof(double)), /* current */
-	*betacur = alloca(p * sizeof(double)), 
-	*bnew = alloca(q * sizeof(double)), /* proposed */
-	*betanew = alloca(p * sizeof(double));
+	*bcur = Alloca(q, double), /* current */
+	*betacur = Alloca(p, double), 
+	*bnew = Alloca(q, double), /* proposed */
+	*betanew = Alloca(p, double);
     R_CheckStack();
 
     if (nsamp <= 0) nsamp = 1;

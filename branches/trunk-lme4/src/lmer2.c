@@ -1066,7 +1066,7 @@ SEXP lmer2_vcov(SEXP x)
 	CHM_SP Lsp, Lred; /* sparse and reduced-size sparse */
 	CHM_DN Ld;
 	CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym)), Lcp;
-	select = alloca(p * sizeof(int));
+	select = Alloca(p, int);
 	R_CheckStack();
 
 	 /* need a copy of L because factor_to_sparse changes 1st arg */
@@ -1154,8 +1154,8 @@ SEXP lmer2_postVar(SEXP x)
     CHM_SP rhs, B, Bt, BtB;
     CHM_DN BtBd;
     CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym)), Lcp = (CHM_FR)NULL;
-    int *Perm = (int*)(L->Perm), *iperm = alloca(ppq * sizeof(int)),
-	*fset = alloca(ppq * sizeof(int));
+    int *Perm = (int*)(L->Perm), *iperm = Alloca(ppq, int),
+	*fset = Alloca(ppq, int);
     R_CheckStack();
     
     for (j = 0; j < ppq; j++) {
@@ -1631,7 +1631,7 @@ static void ZXyt_create(SEXP Ztl, SEXP Xp, SEXP yp, SEXP val)
 	Zt = ts2;
     }
 				/* determine permutation */
-    Perm = alloca((q + p + 1) * sizeof(int));
+    Perm = Alloca(q + p + 1, int);
     R_CheckStack();
     for (j = 0; j <= (p + q); j++) Perm[j] = j; /* initialize to identity */
     Zt_perm(Gp, Zt, ST, dims, Perm);
@@ -1955,7 +1955,7 @@ static int internal_bhat(SEXP x)
 	*eta = REAL(GET_SLOT(x, lme4_etaSym)),
 	*etaold = Calloc(n, double), crit = IRLS_TOL + 1;
 #ifdef DEBUG_LMER2
-    double *dev_res = alloca(n *sizeof(double));
+    double *dev_res = Alloca(n, double);
 #endif
     CHM_SP A = AS_CHM_SP(GET_SLOT(x, lme4_ASym));
     CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
@@ -2072,7 +2072,7 @@ static int internal_bhat2(SEXP x)
     CHM_DN ceta = AS_CHM_DN(etap), cu = AS_CHM_DN(ranef);
     CHM_FR L = AS_CHM_FR(GET_SLOT(x, lme4_LSym));
 #ifdef DEBUG_LMER2
-    double *dev_res = alloca(n * sizeof(double));
+    double *dev_res = Alloca(n, double);
 #endif
     R_CheckStack();
 				
@@ -2248,7 +2248,7 @@ SEXP nlmer_create_Vt(SEXP x)
 	*vi, *vp, *zi = INTEGER(GET_SLOT(Zt, lme4_iSym)),
 	*zp = INTEGER(GET_SLOT(Zt, lme4_pSym)),
 	i, j, nf = LENGTH(ST), nnz;
-    int *nc = alloca(nf * sizeof(int)), *nz = alloca(adims[0] * sizeof(int));
+    int *nc = Alloca(nf, int), *nz = Alloca(adims[0], int);
     R_CheckStack();
     
     SET_SLOT(ans, lme4_DimSym, duplicate(Zdims));
@@ -2575,7 +2575,7 @@ update_deviance(SEXP x, const double *xv, int nfe, int mtype)
 	break;
     }
     case 2: {
-	double *dev_res = alloca(n * sizeof(double));
+	double *dev_res = Alloca(n, double);
 	R_CheckStack();
 
 	Memcpy(REAL(fixefp), xv + dims[np_POS], nfe);
