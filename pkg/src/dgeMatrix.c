@@ -573,7 +573,8 @@ SEXP dgeMatrix_colsums(SEXP x, SEXP naRmP, SEXP cols, SEXP mean)
 	    }
 	}
     } else { /* row(Sums|Means) : */
-	double *Cnt = (keepNA && doMean) ? (double*)NULL : Alloca(m, double);
+	double *Count = ((!keepNA) && doMean) ?
+	    Alloca(m, double) : (double*)NULL ;
 	R_CheckStack();
 
 	for (i = 0; i < m; i++) aa[i] = 0.0;
@@ -585,18 +586,16 @@ SEXP dgeMatrix_colsums(SEXP x, SEXP naRmP, SEXP cols, SEXP mean)
 		    double el = xx[i + j * m];
 		    if (!ISNAN(el)) {
 			aa[i] += el;
-			if (doMean) Cnt[i]++;
+			if (doMean) Count[i]++;
 		    }
 		}
 	}
 	if (doMean) {
 	    if (keepNA)
 		for (i = 0; i < m; i++) aa[i] /= n;
-	    else {
-		for (i = 0; i < m; i++) {
-		    if (Cnt[i] > 0) aa[i] /= Cnt[i]; else aa[i] = NA_REAL;
-		}
-	    }
+	    else
+		for (i = 0; i < m; i++)
+		    aa[i] = (Count[i]>0)? aa[i]/Count[i]: NA_REAL;
 	}
     }
 
