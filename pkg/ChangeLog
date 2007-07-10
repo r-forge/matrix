@@ -1,3 +1,7 @@
+2007-07-10  Douglas Bates  <bates@stat.wisc.edu>
+
+	* src/dgeMatrix.c (dgeMatrix_colsums): Get the logic straight.
+
 2007-07-09 20:45  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r4579] src/dgeMatrix.c: Untangle horrible code in dgeMatrix_colsums
