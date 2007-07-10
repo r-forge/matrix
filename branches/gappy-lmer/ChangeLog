@@ -1,3 +1,13 @@
+2007-07-09 23:08  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4576] R/lmer.R, src/init.c, src/lmer.c, src/lmer.h: Change name
+	  famType to ftyp and Nested to nest in the dims vector (output form is
+	  easier to read)
+	* [r4577] inst/doc/Implementation.Rnw, inst/doc/Theory.Rnw: updates of
+	  vignettes
+	* [r4584] src/lmer.c: Use Alloca macro, call update_VtL from
+	  within lmer_update_dev and not in update_deviance
+	
 2007-07-06 16:34  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r4562] man/lmer-class.Rd: Move nlmer class documentation to
