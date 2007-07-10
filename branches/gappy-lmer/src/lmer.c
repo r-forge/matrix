@@ -3,7 +3,6 @@
 /* Functions for the lmer representation */
 
 				/* positions in the deviance vector */
-/* FIXME: change the name ldZ to ldL2 here and in lmer.R */
 enum devP {ML_POS=0, REML_POS, ldL2_POS, ldRX2_POS, lpdisc_POS, bqd_POS};
 /* ("ML", "REML", "ldL2", "ldRX2", "lpdisc", "bqd") */
 				/* positions in the dims vector */
@@ -103,7 +102,6 @@ chm_log_det2(CHM_FR L)
 /**
  * Populate the st, nc and nlev arrays.  Return the maximum element of nc.
  *
- * @param nf number of random-effects terms
  * @param ST pointer to a list (length nf) of matrices
  * @param Gp pointer to integer vector (length nf + 1) of group
  * pointers
@@ -200,7 +198,7 @@ SEXP mer_create_Vt(SEXP Zt, SEXP ST, SEXP GpP, SEXP sP)
 {
     SEXP ans;
     int *Gp = INTEGER(GpP), *nnz, *nz, *vi, *vp, *zdims, *zi, *zp,
-	ZtOK, j, nf = LENGTH(ST), s = asInteger(sP);
+	Vnnz, ZtOK, j, nf = LENGTH(ST), s = asInteger(sP);
     int *nc = Alloca(nf, int), *nlev = Alloca(nf, int);
     R_CheckStack();
 
@@ -246,8 +244,9 @@ SEXP mer_create_Vt(SEXP Zt, SEXP ST, SEXP GpP, SEXP sP)
     vp = INTEGER(ALLOC_SLOT(ans, lme4_pSym, INTSXP, zdims[1] + 1));
     vp[0] = 0;
     for (j = 0; j < zdims[1]; j++) vp[j + 1] = vp[j] + nnz[j];
-    vi = INTEGER(ALLOC_SLOT(ans, lme4_iSym, INTSXP, vp[zdims[1]]));
-    AZERO(REAL(ALLOC_SLOT(ans, lme4_xSym, REALSXP, vp[zdims[1]])), vp[zdims[1]]);
+    Vnnz = vp[zdims[1]];
+    vi = INTEGER(ALLOC_SLOT(ans, lme4_iSym, INTSXP, Vnnz));
+    AZERO(REAL(ALLOC_SLOT(ans, lme4_xSym, REALSXP, Vnnz)), Vnnz);
     for (j = 0; j < zdims[1]; j++) { /* fill in the i slot */
 	int i, pos = vp[j];
 	Vt_nz_col(nz, j, nf, Gp, nc, nlev, zi, zp);
@@ -286,6 +285,7 @@ update_VtL(SEXP x)
     CHM_FR L = L_SLOT(x);
     R_CheckStack();
 
+/* FIXME: Check for s > 1 and overlay to create Mt  */
     if (ST_nc_nlev(ST, Gp, st, nc, nlev) > 1) { /* multiply by T' */
 /* FIXME: Should dtrmm be used here by setting the stride? */
 	error(_("Code not yet written"));
@@ -300,12 +300,6 @@ update_VtL(SEXP x)
 	      c.status, L->minor, L->n);
     c.final_ll = fll;
     dev[ldL2_POS] = chm_log_det2(L);
-}
-
-SEXP mer_update_VtL(SEXP x)
-{
-    update_VtL(x);
-    return ScalarReal(REAL(GET_SLOT(x, lme4_devianceSym))[ldL2_POS]);
 }
 
 /**
@@ -378,52 +372,15 @@ SEXP ST_initialize(SEXP ST, SEXP Gpp, SEXP Zt)
 }
 
 /**
- * Evaluate the logarithm of the square of the determinant of selected
- * sections of a sparse Cholesky factor.
+ * dest = P %*% t(T) %*% S %*% src
  *
- * @param ans vector of doubles of sufficient length to hold the result
- * @param nans number of values to calculate
- * @param c vector of length nans+1 containing the cut points
- * @param F factorization
+ * @param dest object to receive the result
+ * @param ST ST slot
+ * @param Gp group pointers
+ * @param src originating numeric vector
+ * @param Perm permutation to be applied
  *
- * @return ans
  */
-static double*
-chm_log_abs_det2(double *ans, int nans, const int *c, const CHM_FR F)
-{
-    int i, ii  = 0, jj = 0;
-    for (i = 0; i < nans; i++) ans[i] = 0;
-    if (F->is_super) {
-	for (i = 0; i < F->nsuper; i++) {
-	    int j, nrp1 = 1 + ((int *)(F->pi))[i + 1] - ((int *)(F->pi))[i],
-		nc = ((int *)(F->super))[i + 1] - ((int *)(F->super))[i];
-	    double *x = (double *)(F->x) + ((int *)(F->px))[i];
-
-	    for (j = 0; j < nc; j++) {
-		int col = j + jj;
-		if (col < c[ii]) continue;
-		while (col >= c[ii + 1] && ++ii < nans) {};
-		if (ii >= nans) break;
-		ans[ii] += 2 * log(fabs(x[j * nrp1]));
-	    }
-	    jj += nc;
-	}
-    } else {
-	int *fi = (int*)(F->i), *fp = (int*)(F->p), j, k;
-	double *fx = (double *)(F->x);
-	
-	for (j = 0; ii < nans && j < F->n; j++) {
-	    if (j < c[ii]) continue;
-	    for (k = fp[j]; fi[k] != j && k < fp[j + 1]; k++) {};
-	    if (fi[k] != j) break; /* what happened to the diagonal element? */
-	    while (j >= c[ii + 1] && ++ii < nans) {};
-	    if (ii >= nans) break;
-	    ans[ii] += log(fx[k] * ((F->is_ll) ? fx[k] : 1.));
-	}
-    }
-    return ans;
-}
-
 static void
 PTpS_dense_mult(SEXP dest, SEXP ST, const int *Gp, SEXP src, int *Perm)
 {
@@ -443,6 +400,7 @@ PTpS_dense_mult(SEXP dest, SEXP ST, const int *Gp, SEXP src, int *Perm)
 	for (i = 0; i < m; i++)
 	    dx[j * m + i] = Sdiag[Perm[i]] * sx[j * m + Perm[i]];
 	if (ncmax > 1) error(_("Code not yet written"));
+/* FIXME: use a call to dtrmm here */
     }
 }
 
@@ -1597,7 +1555,7 @@ SEXP nlmer_update_wrkres(SEXP x)
 static int internal_nbhat(SEXP x)
 {
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), i, j;
-    int n = dims[n_POS], q = dims[q_POS], zq[] = {0, dims[q_POS]};
+    int n = dims[n_POS], q = dims[q_POS];
     CHM_FR L = L_SLOT(x);
     CHM_DN cz = M_cholmod_allocate_dense(n, 1, n, CHOLMOD_REAL, &c),
 	cu, cMtz = M_cholmod_allocate_dense(q, 1, q, CHOLMOD_REAL, &c);
@@ -1636,7 +1594,7 @@ static int internal_nbhat(SEXP x)
  	crit = conv_crit(uold, u, q);
     }
     dev[lpdisc_POS] = log(dev[lpdisc_POS] + dev[bqd_POS]);
-    chm_log_abs_det2(&(dev[ldL2_POS]), 1, zq, L);
+    dev[ldL2_POS] = chm_log_det2(L);
     dev[ML_POS] = dev[REML_POS] =
 	dev[ldL2_POS] + dn * (1. + dev[lpdisc_POS] + log(2. * PI / dn));
 
