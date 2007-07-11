@@ -34,6 +34,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_create_Vt", (DL_FUNC) &mer_create_Vt, 4},
     {"mer_optimize", (DL_FUNC) &mer_optimize, 3},
     {"mer_sigma", (DL_FUNC) &mer_sigma, 2},
+    {"mer_update_VtL", (DL_FUNC) &mer_update_VtL, 1},
     {"mer_validate", (DL_FUNC) &mer_validate, 1},
 
     {"nlmer_bhat", (DL_FUNC) &nlmer_bhat, 1},
