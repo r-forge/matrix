@@ -1,3 +1,18 @@
+2007-07-11 20:30  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4602] src/lmer.c: Part of the extension of lmer to correlated random
+	  effects
+	* [r4603] inst/doc/Theory.Rnw: Minor cleanup
+	* [r4604] src/init.c, src/lmer.c, src/lmer.h: Correct ordering of
+	  operations in PSTp_dense_mult; allow external access to mer_update_VtL
+	
+2007-07-10 16:36  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4591] inst/doc/Theory.Rnw, inst/doc/lme4.bib: Move definitive
+	  version of vignette sources to this branch
+	* [r4592] R/lmer.R, src/init.c, src/lmer.c, src/lmer.h: Clean up the
+	  code.
+	
 2007-07-09 23:08  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r4576] R/lmer.R, src/init.c, src/lmer.c, src/lmer.h: Change name
