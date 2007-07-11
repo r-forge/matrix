@@ -1021,7 +1021,7 @@ effect, evaluate a Cholesky factor of
 \begin{displaymath}
   \begin{bmatrix}
     \bm P(\bm V(\bm\theta)\trans\bm V(\bm\theta)+\bm I)\bm P\trans & \bm P\bm
-    V\trans\bm X & \bm P\bm V(\bm\theta)\trans\bm y\\
+    V(\bm\theta)\trans\bm X & \bm P\bm V(\bm\theta)\trans\bm y\\
     \bm X\trans\bm V(\bm\theta)\bm P\trans&\bm X\trans\bm X&\bm X\trans\bm y\\
     \bm y\trans\bm V(\bm\theta)\bm P\trans&\bm y\trans\bm X&\bm
     y\trans\bm y
