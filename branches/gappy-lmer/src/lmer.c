@@ -267,8 +267,7 @@ SEXP mer_create_Vt(SEXP Zt, SEXP ST, SEXP GpP, SEXP sP)
  *
  * @return square of determinant of L
  */
-static void
-update_VtL(SEXP x)
+SEXP mer_update_VtL(SEXP x)
 {
     SEXP Zt = GET_SLOT(x, lme4_ZtSym),
 	ST = GET_SLOT(x, lme4_STSym),
@@ -286,15 +285,16 @@ update_VtL(SEXP x)
 
 /* FIXME: Check for s > 1 and overlay to create Mt  */
     Memcpy(vx, REAL(GET_SLOT(Zt, lme4_xSym)), nnz);
-    if (ST_nc_nlev(ST, Gp, st, nc, nlev) > 1) /* multiply by T' */
-	for (j = 0; j < cVt->ncol; j++)
+    if (ST_nc_nlev(ST, Gp, st, nc, nlev) > 1) /* T' == I when ncmax == 1 */
+	for (j = 0; j < cVt->ncol; j++) /* multiply column j by T' */
 	    for (p = vp[j]; p < vp[j + 1];) {
 		int i = Gp_grp(vi[p], nf, Gp);
 
 		if (nc[i] <= 1) p++;
 		else {
-		    int nr = p;
+		    int nr = p;	/* number of rows in `B' in dtrmm call */
 		    while ((vi[nr] - Gp[i]) < nlev[i]) nr++;
+		    nr -= p;	/* nr == 1 except in models with carry-over */
 		    F77_CALL(dtrmm)("R", "L", "N", "U", &nr, nc + i,
 				    one, st[i], nc + i, vx + p, &nr);
 		    p += (nr * nc[i]);
@@ -310,6 +310,7 @@ update_VtL(SEXP x)
 	      c.status, L->minor, L->n);
     c.final_ll = j;
     dev[ldL2_POS] = chm_log_det2(L);
+    return R_NilValue;
 }
 
 /**
@@ -382,35 +383,42 @@ SEXP ST_initialize(SEXP ST, SEXP Gpp, SEXP Zt)
 }
 
 /**
- * dest = P %*% t(T) %*% S %*% src
+ * dest = P  %*% S %*% t(T) %*% src
  *
- * @param dest object to receive the result
+ * @param dest matrix whose contents are overwritten
  * @param ST ST slot
  * @param Gp group pointers
- * @param src originating numeric vector
+ * @param src originating numeric matrix
  * @param Perm permutation to be applied
  *
  */
 static void
-PTpS_dense_mult(SEXP dest, SEXP ST, const int *Gp, SEXP src, int *Perm)
+PSTp_dense_mult(SEXP dest, SEXP ST, const int *Gp, SEXP src, int *Perm)
 {
     double *dx = REAL(dest), *sx = REAL(src);
-    int *dims = INTEGER(getAttrib(src, R_DimSymbol)), i, j, k, kk;
+    int *dims = INTEGER(getAttrib(src, R_DimSymbol)), i, j, k;
     int m = dims[0], n = dims[1], ncmax, nf = LENGTH(ST);
     int *nc = Alloca(nf, int), *nlev = Alloca(nf, int);
-    double **st = Alloca(nf, double*), *Sdiag = Alloca(m, double);
-    R_CheckStack();
+    double **st = Alloca(nf, double*), *tmp = Alloca(m, double), one = 1;
+    R_CheckStack(); 
 
     ncmax = ST_nc_nlev(ST, Gp, st, nc, nlev);
-    for (i = 0; i < nf; i++)	/* create the diagonal of S(theta) */
-	for (k = 0; k < nc[i]; k++)
-	    for (kk = 0; kk < nlev[i]; kk++)
-		Sdiag[Gp[i] + k * nlev[i] + kk] = st[i][k * (nc[i] + 1)];
     for (j = 0; j < n; j++) {
-	for (i = 0; i < m; i++)
-	    dx[j * m + i] = Sdiag[Perm[i]] * sx[j * m + Perm[i]];
-	if (ncmax > 1)
-	    error(_("Code not yet written"));
+	Memcpy(tmp, sx + j * m, m);
+	for (i = 0; i < nf; i++) {
+	    if (nc[i] > 1) {	/* multiply by \tilde{T}_i' */
+		F77_CALL(dtrmm)("R", "L", "N", "U", nlev + i, nc + i, &one,
+				st[i], nc + i, tmp + Gp[i], nlev + i);
+	    }
+	    for (k = 0; k < nc[i]; k++) { /* multiply by \tilde{S}_i */
+		double dd = st[i][k * (nc[i] + 1)];
+		int base = Gp[i] + k * nlev[i], kk;
+		for (kk = 0; kk < nlev[i]; kk++) tmp[base + kk] *= dd;
+	    }
+	}
+				/* apply permutation if given */
+	if (Perm) for (i = 0; i < m; i++) dx[j * m + i] = tmp[Perm[i]];
+	else Memcpy(dx + j * m, tmp, m);
     }
 }
 
@@ -433,9 +441,9 @@ lmer_update_dev(SEXP x)
     int pp1 = cRVXy->ncol, q = cRVXy->nrow;
     R_CheckStack();
 
-    update_VtL(x);
-				/* Evaluate PT'SZ'[X:y] in RVXy */
-    PTpS_dense_mult(RVXy, GET_SLOT(x, lme4_STSym),
+    mer_update_VtL(x);
+				/* Evaluate PST'Z'[X:y] in RVXy */
+    PSTp_dense_mult(RVXy, GET_SLOT(x, lme4_STSym),
 		    INTEGER(GET_SLOT(x, lme4_GpSym)),
 		    GET_SLOT(x, lme4_ZtXySym), (int*)(L->Perm));
 				/* solve for RVXy */
@@ -579,8 +587,7 @@ SEXP lmer_deviance(SEXP x, SEXP which)
  */
 SEXP lmer_update_effects(SEXP x)
 {
-    SEXP ranef = GET_SLOT(x, lme4_ranefSym),
-	uvec = GET_SLOT(x, lme4_uvecSym);
+    SEXP ranef = GET_SLOT(x, lme4_ranefSym), uvec = GET_SLOT(x, lme4_uvecSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), *perm, i, ione = 1;
     int n = dims[n_POS], p = dims[p_POS],  pp1 = dims[p_POS] + 1, q = dims[q_POS];
     double *RXy = REAL(GET_SLOT(x, lme4_RXySym)),
@@ -606,7 +613,6 @@ SEXP lmer_update_effects(SEXP x)
 	double ui = u[i];
 	dev[bqd_POS] += ui * ui;
     }
-
     perm = (int *)(L->Perm);
     for (i = 0; i < q; i++) /* apply the inverse permutation to u into b */
 	b[i] = u[perm[i]];
