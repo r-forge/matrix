@@ -277,28 +277,38 @@ update_VtL(SEXP x)
     double *dev = REAL(GET_SLOT(x, lme4_devianceSym));
     CHM_SP cVt = AS_CHM_SP(Vt);
     int *vi = (int*)(cVt->i), *vp = (int*)(cVt->p),
-	fll = c.final_ll, nf = LENGTH(ST), p;
-    int *nc = Alloca(nf, int), *nlev = Alloca(nf, int),
-	nnz = vp[cVt->ncol];
+	j, nf = LENGTH(ST), nnz = vp[cVt->ncol], p;
+    int *nc = Alloca(nf, int), *nlev = Alloca(nf, int);
     double **st = Alloca(nf, double*),
 	*vx = (double*)(cVt->x), one[] = {1,0};
     CHM_FR L = L_SLOT(x);
     R_CheckStack();
 
 /* FIXME: Check for s > 1 and overlay to create Mt  */
-    if (ST_nc_nlev(ST, Gp, st, nc, nlev) > 1) { /* multiply by T' */
-/* FIXME: Should dtrmm be used here by setting the stride? */
-	error(_("Code not yet written"));
-    } else Memcpy(vx, REAL(GET_SLOT(Zt, lme4_xSym)), nnz);
+    Memcpy(vx, REAL(GET_SLOT(Zt, lme4_xSym)), nnz);
+    if (ST_nc_nlev(ST, Gp, st, nc, nlev) > 1) /* multiply by T' */
+	for (j = 0; j < cVt->ncol; j++)
+	    for (p = vp[j]; p < vp[j + 1];) {
+		int i = Gp_grp(vi[p], nf, Gp);
+
+		if (nc[i] <= 1) p++;
+		else {
+		    int nr = p;
+		    while ((vi[nr] - Gp[i]) < nlev[i]) nr++;
+		    F77_CALL(dtrmm)("R", "L", "N", "U", &nr, nc + i,
+				    one, st[i], nc + i, vx + p, &nr);
+		    p += (nr * nc[i]);
+		}
+	    }
     for (p = 0; p < nnz; p++) {
 	int i = Gp_grp(vi[p], nf, Gp);
 	vx[p] *= st[i][((vi[p] - Gp[i]) / nlev[i]) * (nc[i] + 1)];
     }
-    c.final_ll = L->is_ll;
+    j = c.final_ll; c.final_ll = L->is_ll;
     if (!M_cholmod_factorize_p(cVt, one, (int*)NULL, 0 /*fsize*/, L, &c))
 	error(_("cholmod_factorize_p failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
-    c.final_ll = fll;
+    c.final_ll = j;
     dev[ldL2_POS] = chm_log_det2(L);
 }
 
@@ -399,8 +409,8 @@ PTpS_dense_mult(SEXP dest, SEXP ST, const int *Gp, SEXP src, int *Perm)
     for (j = 0; j < n; j++) {
 	for (i = 0; i < m; i++)
 	    dx[j * m + i] = Sdiag[Perm[i]] * sx[j * m + Perm[i]];
-	if (ncmax > 1) error(_("Code not yet written"));
-/* FIXME: use a call to dtrmm here */
+	if (ncmax > 1)
+	    error(_("Code not yet written"));
     }
 }
 
