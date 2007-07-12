@@ -428,7 +428,7 @@ function(formula, data, family = gaussian, method = c("Laplace", "AGQ"),
                Zt = Zt, X = fr$X,
                y = unname(as.double(glmFit$y)),
 ### FIXME: weights and offset are recorded both here and in the env slot
-               weights = unname(fr$wts),
+               weights = unname(glmFit$prior.weights),
                offset = unname(fr$off),
                cnames = unname(cnames), Gp = unname(Gp),
                dims = dd, ST = ST, Vt = Vt,
@@ -439,6 +439,7 @@ function(formula, data, family = gaussian, method = c("Laplace", "AGQ"),
                uvec = numeric(dd["q"]))
     cv <- do.call("lmerControl", control)
     if (missing(verbose)) verbose <- cv$msVerbose
+    .Call(mer_update_VtL, ans)
 #    .Call(mer_optimize, ans, verbose, 2)
     ans
 }
@@ -712,6 +713,28 @@ formatVC <- function(varc, digits = max(3, getOption("digits") - 2))
 
 ### Other methods
 
+setMethod("update", signature(object = "mer"),
+	  function(object, formula., ..., evaluate = TRUE)
+      {
+	  call <- object@call
+	  if (is.null(call))
+	      stop("need an object with call slot")
+	  extras <- match.call(expand.dots = FALSE)$...
+	  if (!missing(formula.))
+	      call$formula <- update.formula(formula(object), formula.)
+	  if (length(extras) > 0) {
+	      existing <- !is.na(match(names(extras), names(call)))
+	      for (a in names(extras)[existing]) call[[a]] <- extras[[a]]
+	      if (any(!existing)) {
+		  call <- c(as.list(call), extras[!existing])
+		  call <- as.call(call)
+	      }
+	  }
+	  if (evaluate)
+	      eval(call, parent.frame())
+	  else call
+      })
+
 ## Extract the L matrix
 setAs("mer", "dtCMatrix", function(from) as(from@L, "sparseMatrix"))
 
@@ -817,6 +840,14 @@ setMethod("vcov", signature(object = "lmer"),
 	      rr
 	  })
 
+setMethod("vcov", "mer",                # placeholder
+          function (object, ...)
+      {
+          rr <- as(diag(length(object@fixef)), "dpoMatrix")
+          rr@factors$correlation <- as(rr, "corMatrix")
+          rr
+      })
+
 ## This is modeled a bit after  print.summary.lm :
 printMer <- function(x, digits = max(3, getOption("digits") - 3),
                       correlation = TRUE, symbolic.cor = FALSE,
@@ -837,8 +868,8 @@ printMer <- function(x, digits = max(3, getOption("digits") - 3),
         cat(" Subset:",
             deparse(asOneSidedFormula(x@call$subset)[[2]]),"\n")
     if (inherits(x, "glmer"))
-        cat(" Family: ", so@family$family, "(",
-            so@family$link, " link)\n", sep = "")
+        cat(" Family: ", so@famName["family"], "(",
+            so@famName["link"], " link)\n", sep = "")
     print(so@AICtab, digits = digits)
 
     cat("Random effects:\n")
@@ -896,9 +927,10 @@ setMethod("summary", signature(object = "mer"),
           glz <- is(object, "glmer")
           methTitle <-
               if (glz)
-                  paste("Generalized linear mixed model fit using",
-                        switch(object@status["glmm"],
-                               "PQL", "Laplace", "AGQ"))
+                  "Generalized linear mixed model fit using Laplace"
+##                   paste("Generalized linear mixed model fit using ",
+##                         switch(object@status["glmm"],
+##                                "PQL", "Laplace", "AGQ"))
               else paste("Linear mixed-effects model fit by",
                          if(REML) "REML" else "maximum likelihood")
 
@@ -948,7 +980,7 @@ setMethod("summary", signature(object = "mer"),
       })## summary()
 
 ## Extract the log-likelihood or restricted log-likelihood
-setMethod("logLik", signature(object="lmer"),
+setMethod("logLik", signature(object="mer"),
 	  function(object, REML = NULL, ...)
       {
           dims <- object@dims
@@ -964,7 +996,7 @@ setMethod("logLik", signature(object="lmer"),
       })
 
 ## Extract the deviance
-setMethod("deviance", signature(object="lmer"),
+setMethod("deviance", signature(object="mer"),
 	  function(object, REML = NULL, ...)
       {
           if (missing(REML) || is.null(REML) || is.na(REML[1]))
@@ -1000,17 +1032,10 @@ setMethod("VarCorr", signature(x = "mer"),
       })
 
 setMethod("print", "lmer", printMer)
+setMethod("print", "glmer", printMer)
 setMethod("show", "lmer", function(object) printMer(object))
+setMethod("show", "glmer", function(object) printMer(object))
 
-## Methods for "summary.*" objects:
-setMethod("vcov", signature(object = "summary.lmer"),
-	  function(object) object@vcov)
-setMethod("logLik", signature(object = "summary.lmer"),
-	  function(object) object@logLik)
-setMethod("deviance", signature(object = "summary.lmer"),
- 	  function(object) object@deviance)
-setMethod("summary", signature(object = "summary.lmer"),
-          function(object) object)
 setMethod("anova", signature(object = "lmer"),
 	  function(object, ...)
       {
@@ -1360,27 +1385,6 @@ setMethod("show", "nlmer", function(object)
 ## 	  }
 ##       })
 
-## setMethod("update", signature(object = "mer"),
-## 	  function(object, formula., ..., evaluate = TRUE)
-##       {
-## 	  call <- object@call
-## 	  if (is.null(call))
-## 	      stop("need an object with call slot")
-## 	  extras <- match.call(expand.dots = FALSE)$...
-## 	  if (!missing(formula.))
-## 	      call$formula <- update.formula(formula(object), formula.)
-## 	  if (length(extras) > 0) {
-## 	      existing <- !is.na(match(names(extras), names(call)))
-## 	      for (a in names(extras)[existing]) call[[a]] <- extras[[a]]
-## 	      if (any(!existing)) {
-## 		  call <- c(as.list(call), extras[!existing])
-## 		  call <- as.call(call)
-## 	      }
-## 	  }
-## 	  if (evaluate)
-## 	      eval(call, parent.frame())
-## 	  else call
-##       })
 
 ## simss <- function(fm0, fma, nsim)
 ## {
