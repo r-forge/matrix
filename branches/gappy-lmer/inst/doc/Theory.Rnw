@@ -21,6 +21,7 @@
 \newcommand{\package}[1]{\textsf{\small{#1}}}
 \newcommand{\trans}{\ensuremath{^\prime}}
 \renewcommand{\vec}{\operatorname{vec}}
+\newcommand{\diag}{\operatorname{diag}}
 <<preliminaries,echo=FALSE,results=hide>>=
 options(width=65,digits=5)
 library(lme4)
@@ -1620,8 +1621,155 @@ solution to
 \section{Generalized linear mixed models}
 \label{sec:GLMM}
 
-A generalized linear mixed model differs from a linear mixed model in
-the form of the conditional distribution of $\bm y$ given $\bm\beta$,
+A generalized linear mixed model (GLMM) differs from a linear mixed
+model in the form of the conditional distribution $\bm Y|\bm B$ and in
+form of the mean function, $\bm\mu(\bm\eta)$.  To motivate the general
+form of the model and to establish terminology we begin with a
+specific example - a Poisson mixed model.
+
+\subsection{Mixed models based on the Poisson distribution}
+\label{sec:PoissonMixedModels}
+
+Recall from \S\ref{sec:formula} that the elements of $\bm Y$ are
+conditionally independent given $\bm B$, which is to say that the conditional
+distribution, $f_{\bm Y|\bm B}$ can be written as a product of $n$
+factors, the $i$th of which depends only on $y_i$ and $\mu_i$.  In a
+Poisson mixed model the probability mass function of these scalar
+conditional distributions is the Poisson distribution
+\begin{equation}
+  \label{eq:PoissonScalar}
+  f_{Y_i|\mu_i}(y_i|\mu_i)=\frac{e^{-\mu_i}\mu_i^{y_i}}{y_i!}\quad
+  \mu_i>0,\;i=1,\dots,n
+\end{equation}
+for which the scalar discrepancy function and normalizing factor are
+\begin{align}
+  \label{eq:PoissonDiscr}
+  d(\mu_i,y_i)&=2\left(\mu_i-y_i\log\mu_i\right)\quad i=1,\dots,n\\
+  \label{eq:PoissonNormFac}
+  k(y_i)&=1/(y_i!)\quad i=1,\dots,n .
+\end{align}
+
+To complete the specification of the model we must define the mean
+function $\bm\mu(\bm\eta)$ which, like the discrepancy and the
+normalizing factor, is determined by applying a scalar mean function
+$\mu(\eta)$ component-wise.  That is,
+$\left\{\bm\mu\right\}_i=\mu(\left\{\bm\eta\right\}_i),i=1,\dots,n$.
+
+The scalar mean function, $\mu(\eta)$, must have the property
+$\mu(\eta)>0$ for all $\eta\in\mathbb{R}$.  An obvious candidate is the
+exponential function, $\mu(\eta)=\exp\eta$, with inverse
+$\eta(\mu)=\log\mu$.  Notice that this inverse occurs in the scalar
+discrepancy, (\ref{eq:PoissonDiscr}), in the term
+$y_i\log\mu_i,i=1,\dots,n$.  In the terminology of generalized linear
+models, the scalar function $g:\mu\mapsto\eta$ is called the
+\emph{link function}.  The scalar mean function,
+$g^{-1}:\eta\mapsto\mu$, is therefore called the \emph{inverse link
+  function}.
+
+For distributions like the Poisson that are in the \emph{exponential
+  family} (defined in \S\ref{sec:expFam}) the \emph{natural link
+  function} is the function of $\mu$ that multiplies $y$ in the
+discrepancy.
+
+Using the natural link, $\eta=g(\mu)=\log\mu$, we can write the penalized
+discrepancy for the Poisson mixed model as
+\begin{equation}
+  \label{eq:PoissonPenDisc}
+  \delta(\bm u|\bm\beta,\bm\theta,\bm y)=
+  2\left[\bm\mu(\bm\eta_{\bm u})\trans\bm 1_n-
+    \bm\eta_{\bm u}\trans\bm y\right]+\bm u\trans\bm u
+\end{equation}
+To determine the conditional mode of $\bm U$, $\tilde{\bm
+  u}(\bm\beta,\bm\theta,\bm y)=\arg\min_{\bm u}\delta(\bm
+u|\bm\beta,\bm\theta,\bm y)$, we must use an iterative optimization
+algorithm.  
+If we evaluate the $q$-dimensional gradient vector, $\nabla_{\bm
+  u}\delta(\bm u|\bm\beta,\bm\theta,\bm y)$, and the $q\times q$
+Hessian matrix, $\nabla_{\bm u}^2\delta(\bm u|\bm\beta,\bm\theta,\bm y)$,
+at $\bm u^{(i)}$, the value of $\bm u$ at the $i$th iteration, we can
+determine the \emph{Newton step}, $\bm\delta^{(i)}$, as the solution
+to 
+\begin{equation}
+  \label{eq:NewtonStep}
+  \nabla_{\bm u}^2\delta(\bm u^{(i)}|\bm\beta,\bm\theta,\bm y)\bm\delta^{(i)}
+  = - \nabla_{\bm u}\delta(\bm u|\bm\beta,\bm\theta,\bm y)
+\end{equation}
+(provided that the Hessian is positive definite) and define the
+iterative algorithm as $\bm u^{(i+1)}=\bm u^{(i)}+\bm\delta^{(i)}$.
+
+Because $\bm\eta_{\bm u}(\bm u,\bm\beta,\bm\theta)=\bm V(\bm\theta)\bm
+u+\bm X\bm\beta$, the $n\times q$ gradient matrix
+\begin{equation}
+  \label{eq:Vtheta}
+  \frac{d\bm\eta}{d\bm u\trans}=\bm V(\bm\theta)
+\end{equation}
+does not depend on $\bm u$.  However, the $n\times n$ diagonal
+gradient matrix
+\begin{equation}
+  \label{eq:Gmat}
+  \bm G^{(i)}=\left.\frac{d\bm\mu}{d\bm\eta\trans}\right|_{\bm u=\bm u^{(i)}}
+\end{equation}
+does depend on $\bm u$ and must be evaluated at each iteration.  The
+$q$-dimensional gradient vector is
+\begin{equation}
+  \label{eq:PoisPenDiscGrad}
+  \left.\nabla_{\bm u}\delta(\bm u|\bm\beta,\bm\theta,\bm
+    y)\right|_{\bm u=\bm u^{(i)}}=
+  2\bm V(\bm\theta)\trans\left(\diag(\bm G^{(i)})-\bm y\right)+2\bm u
+\end{equation}
+and the $q\times q$ Hessian matrix is
+\begin{equation}
+  \label{eq:PoisPenDiscHess}
+  \left.\nabla_{\bm u}^2\delta(\bm u|\bm\beta,\bm\theta,
+    \bm y)\right|_{\bm u=\bm u^{(i)}}=
+  2\left[\bm V(\bm\theta)\trans
+    \diag\left(\frac{d^2\bm\mu}{d\bm\eta d\bm\eta\trans}\right)
+    \bm V(\bm\theta)+\bm I_q\right] .
+\end{equation}
+
+
+\bibliography{lme4}
+\end{document}
+
+We store $\bm Z$ and $\bm
+V(\bm\theta)$ as sparse matrices. The matrices $\bm T(\bm\theta)$,
+$\bm S(\bm\theta)$ and $\bm\Sigma(\bm\theta)$ are so highly patterned
+that there is no need to store them as sparse matrices; we only need
+to store the very small dense matrices $\bm T(\bm\theta)_i$ and $\bm
+S(\bm\theta)_i$ for $i=1,\dots,k$.
+
+
+Effective algorithms for sparse matrix decompositions can be
+considerably different from the corresponding algorithms for dense
+matrices.  Algorithms for sparse matrices frequently
+have a symbolic phase, in which the number and position of the nonzero
+elements in the result are determined, followed by a numeric phase, in
+which the actual numeric values at the nonzero positions are
+calculated.  Naturally, the symbolic phase depends only on the pattern
+of nonzeros in the matrix or matrices involved in the operation being
+considered.
+
+Careful examination of the patterns in $\bm Z$ and $\bm T(\bm\theta)$
+shows that the number and locations of the nonzero elements in $\bm
+Z\bm T(\bm\theta)$ are the same as those in $\bm Z$.  Multiplication
+by $\bm S(\bm\theta)$ will not introduce nonzeros in $\bm
+V(\bm\theta)$ where there are zeros in $\bm Z$.  When $\bm\theta$ is
+on the boundary this multiplication will convert some of the nonzeros
+in $\bm Z$ to zeros but, allowing for the general case, we can assume
+the same pattern of nonzeros in $\bm V(\bm\theta)$ as in $\bm Z$.
+
+The \emph{Cholesky decomposition} of sparse, symmetric matrices is one
+of most highly optimized sparse matrix algorithms.  It is this
+decomposition, as implemented in the CHOLMOD sparse matrix library by
+Tim Davis, that forms the basis of the computational methods for mixed
+models in the \package{lme4} package.  The key step in our methods of
+determining estimates for the parameters in mixed models is creating a
+Cholesky factorization of sparse matrices of the form $\bm
+V(\bm\theta)\trans\bm W\bm V(\bm\theta) + \bm I$, where $\bm W$ is a
+diagonal weight matrix.
+
+
+given $\bm\beta$,
 $\bm b$ and, possibly, $\sigma^2$, which determines the discrepancy
 function $d(\bm\mu,\bm y)$, and in the mapping from the linear
 predictor, $\bm\eta$, to the conditional mean, $\bm\mu$.  This
@@ -1686,44 +1834,3 @@ Thus the discrepancy function must be
   \label{eq:discrBernoulli}
   d(\bm\mu,\bm y)=
 \end{equation}
-
-
-\bibliography{lme4}
-\end{document}
-
-We store $\bm Z$ and $\bm
-V(\bm\theta)$ as sparse matrices. The matrices $\bm T(\bm\theta)$,
-$\bm S(\bm\theta)$ and $\bm\Sigma(\bm\theta)$ are so highly patterned
-that there is no need to store them as sparse matrices; we only need
-to store the very small dense matrices $\bm T(\bm\theta)_i$ and $\bm
-S(\bm\theta)_i$ for $i=1,\dots,k$.
-
-
-Effective algorithms for sparse matrix decompositions can be
-considerably different from the corresponding algorithms for dense
-matrices.  Algorithms for sparse matrices frequently
-have a symbolic phase, in which the number and position of the nonzero
-elements in the result are determined, followed by a numeric phase, in
-which the actual numeric values at the nonzero positions are
-calculated.  Naturally, the symbolic phase depends only on the pattern
-of nonzeros in the matrix or matrices involved in the operation being
-considered.
-
-Careful examination of the patterns in $\bm Z$ and $\bm T(\bm\theta)$
-shows that the number and locations of the nonzero elements in $\bm
-Z\bm T(\bm\theta)$ are the same as those in $\bm Z$.  Multiplication
-by $\bm S(\bm\theta)$ will not introduce nonzeros in $\bm
-V(\bm\theta)$ where there are zeros in $\bm Z$.  When $\bm\theta$ is
-on the boundary this multiplication will convert some of the nonzeros
-in $\bm Z$ to zeros but, allowing for the general case, we can assume
-the same pattern of nonzeros in $\bm V(\bm\theta)$ as in $\bm Z$.
-
-The \emph{Cholesky decomposition} of sparse, symmetric matrices is one
-of most highly optimized sparse matrix algorithms.  It is this
-decomposition, as implemented in the CHOLMOD sparse matrix library by
-Tim Davis, that forms the basis of the computational methods for mixed
-models in the \package{lme4} package.  The key step in our methods of
-determining estimates for the parameters in mixed models is creating a
-Cholesky factorization of sparse matrices of the form $\bm
-V(\bm\theta)\trans\bm W\bm V(\bm\theta) + \bm I$, where $\bm W$ is a
-diagonal weight matrix.
