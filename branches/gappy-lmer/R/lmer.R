@@ -255,7 +255,7 @@ checkSTform <- function(ST, STnew)
 }
 
 lmerControl <- function(msVerbose = getOption("verbose"))
-    ## Control parameters for lmer, glmer and nlmer
+### Control parameters for lmer, glmer and nlmer
 {
     list(
 ### FIXME: Should the user have control of maxIter and tolerance? If
@@ -265,8 +265,41 @@ lmerControl <- function(msVerbose = getOption("verbose"))
 	 msVerbose = as.integer(msVerbose))# "integer" on purpose
 }
 
+mkdims <- function(fr, FL, start)
+### Create the standard versions of flist, Zt, Gp, ST, cnames and dd
+{
+    flist <- lapply(FL, get("[["), "f")
+    Ztl <- lapply(FL, get("[["), "Zt")
+    cnames <- lapply(FL, get("[["), "cnames")
+    Zt <- do.call(rBind, Ztl)
+    Zt@Dimnames <- vector("list", 2)
+    Gp <- unname(c(0L, cumsum(sapply(Ztl, nrow))))
+    rm(Ztl, FL)                         # because they could be large
+    nc <- sapply(cnames, length)      # number of columns in els of ST
+    ST <- lapply(nc, function(n) matrix(0, n, n))
+    .Call(ST_initialize, ST, Gp, Zt)
+    if (!is.null(start) && checkSTform(ST, start)) ST <- start
+    Vt <- .Call(mer_create_Vt, Zt, ST, Gp, 1L)
+
+    ## record dimensions and algorithm settings
+    dd <- VecFromNames(.dims_names, "integer")
+    dd["nf"] <- length(cnames)          # number of random-effects terms
+    dd["n"] <- nrow(fr$mf)              # number of observations
+    dd["p"] <- ncol(fr$X)               # number of fixed-effects coefficients
+    dd["q"] <- nrow(Zt)                 # number of random effects
+    dd["s"] <- 1L                       # always 1 except in nlmer
+    nvc <- sapply(nc, function (qi) (qi * (qi + 1))/2) # no. of var. comp.
+### FIXME: Check number of variance components versus number of
+### levels in the factor for each term. Warn or stop as appropriate
+    dd["np"] <- as.integer(sum(nvc))    # number of parameters in optimization
+    dd["REML"] <- 0L                    # glmer and nlmer don't use REML
+
+    list(Gp = Gp, ST = ST, Vt = Vt, Zt = Zt,
+         cnames = cnames, dd = dd, flist = flist)
+}
+
 mkFltype <- function(family)
-    ## check for predefined families
+### check for predefined families
 {
     fltype <- 0                         # not a predefined type
     if (family$family == "gaussian" && family$link == "identity") fltype <- -1
@@ -287,9 +320,10 @@ mkFamilyEnv <- function(glmFit)
     assign("pwts", unname(glmFit$prior.weights), env = env)
     assign("weights", unname(glmFit$weights), env = env)
     assign("z", unname(glmFit$residuals), env = env)
-#### FIXME: install the family functions and create evaluation expressions in the environment
+### FIXME: install the family functions and create evaluation expressions in the environment
     env
 }
+
 
 ### The main event
 
@@ -298,7 +332,7 @@ lmer <-
              control = list(), start = NULL, verbose, subset,
              weights, na.action, offset, contrasts = NULL,
              model = TRUE, x = TRUE, ...)
-    ## Linear Mixed-Effects in R
+### Linear Mixed-Effects in R
 {
     mc <- match.call()
     if (!is.null(family)) {             # call glmer
@@ -309,58 +343,42 @@ lmer <-
 
     fr <- lmerFrames(mc, formula, contrasts) # model frame, X, etc.
     FL <- lmerFactorList(formula, fr$mf)     # flist, Zt, cnames
-    flist <- lapply(FL, get("[["), "f")
     Y <- as.double(fr$Y)
-    stopifnot(length(levels(flist[[1]])) < length(Y))
-    ### FIXME: A kinder, gentler error message may be in order.
-    Ztl <- lapply(FL, get("[["), "Zt")
-    cnames <- lapply(FL, get("[["), "cnames")
-    Zt <- do.call(rBind, Ztl)
-    Zt@Dimnames <- vector("list", 2)
-    Gp <- unname(c(0L, cumsum(sapply(Ztl, nrow))))
-    rm(Ztl, FL)                         # because they could be large
-    nc <- sapply(cnames, length)      # number of columns in els of ST
-    ST <- lapply(nc, function(n) matrix(0, n, n))
-    .Call(ST_initialize, ST, Gp, Zt)
-    if (!is.null(start) && checkSTform(ST, start)) ST <- start
-    Vt <- .Call(mer_create_Vt, Zt, ST, Gp, 1L)
+    dm <- mkdims(fr, FL, start)
+    stopifnot(length(levels(dm$flist[[1]])) < length(Y))
+### FIXME: A kinder, gentler error message may be in order.
+### This checks that the number of levels in a grouping factor < n
+### Only need to check the first factor because it is the one with
+### the most levels.
+    dm$dd["REML"] <- match.arg(method) == "REML"
 
     ## Create the dense matrices to be used in the deviance evaluation
-    ### FIXME: incorporate weights and offset in the creation of ZtXy et al.
+### FIXME: incorporate weights and offset in the creation of ZtXy et al.
     Xy <- cbind(fr$X, Y)
-    ZtXy <- as(Zt %*% Xy, "matrix")
+    ZtXy <- as(dm$Zt %*% Xy, "matrix")
     rownames(fr$X) <- dimnames(ZtXy) <- dimnames(Xy) <- NULL
     RXy <- XytXy <- crossprod(Xy)
     RXy[] <- 0
-
-    ## record dimensions and algorithm settings
-    dd <- VecFromNames(.dims_names, "integer")
-    dd["nf"] <- length(cnames)          # number of random-effects terms
-    dd["n"] <- nrow(fr$mf)              # number of observations
-    dd["p"] <- ncol(fr$X)               # number of fixed-effects coefficients
-    dd["q"] <- nrow(Zt)                 # number of random effects
-    dd["s"] <- 1L                       # always 1 except in nlmer
-    nvc <- sapply(nc, function (qi) (qi * (qi + 1))/2) # no. of var. comp.
-    ### FIXME: Check number of variance components versus number of
-    ## levels in the factor for each term. Warn or stop as appropriate
-    dd["np"] <- as.integer(sum(nvc))    # number of parameters in optimization
-    dd["REML"] <- match.arg(method) == "REML"
+    fixef <- numeric(dm$dd["p"])
+    names(fixef) <- colnames(fr$X)
+    dimnames(fr$X) <- NULL
 
     ans <- new("lmer",
                frame = if (model) fr$mf else fr$mf[0,],
-               call = mc, terms = fr$mt, flist = flist,
-               Zt = Zt, X = if (x) fr$X else fr$X[0,],
+               call = mc, terms = fr$mt, flist = dm$flist,
+               Zt = dm$Zt, X = if (x) fr$X else fr$X[0,],
 ### FIXME: Should y retain its names? As it stands any row names in the
 ### frame are dropped.  Really?  Aren't they in the frame (if not
 ### reduced to 0 rows)?
                y = unname(Y), ZtXy = ZtXy, XytXy = XytXy,
                weights = unname(fr$wts), offset = unname(fr$off),
-               cnames = unname(cnames), Gp = unname(Gp),
-               dims = dd, ST = ST, Vt = Vt,
-               L = .Call(mer_create_L, Vt), RXy = RXy, RVXy = ZtXy,
+               cnames = unname(dm$cnames), Gp = unname(dm$Gp),
+               dims = dm$dd, ST = dm$ST, Vt = dm$Vt,
+               L = .Call(mer_create_L, dm$Vt),
+               RXy = RXy, RVXy = ZtXy,
                deviance = VecFromNames(.dev_names),
-               fixef = numeric(dd["p"]), ranef = numeric(dd["q"]),
-               uvec = numeric(dd["q"]))
+               fixef = fixef, ranef = numeric(dm$dd["q"]),
+               uvec = numeric(dm$dd["q"]))
     cv <- do.call("lmerControl", control)
     if (missing(verbose)) verbose <- cv$msVerbose
     .Call(mer_optimize, ans, verbose, 0)
@@ -392,51 +410,27 @@ function(formula, data, family = gaussian, method = c("Laplace", "AGQ"),
                       offset = fr$offset, family = family,
                       intercept = attr(fr$mt, "intercept") > 0)
     FL <- lmerFactorList(formula, fr$mf)     # flist, Zt, cnames
-    flist <- lapply(FL, get("[["), "f")
-    Ztl <- lapply(FL, get("[["), "Zt")
-    cnames <- lapply(FL, get("[["), "cnames")
-    Zt <- do.call(rBind, Ztl)
-    Zt@Dimnames <- vector("list", 2)
-    Gp <- unname(c(0L, cumsum(sapply(Ztl, nrow))))
-    rm(Ztl, FL)                         # because they could be large
-    nc <- sapply(cnames, length)        # number of columns in els of ST
-    ST <- lapply(nc, function(n) matrix(0, n, n))
-    .Call(ST_initialize, ST, Gp, Zt)
-    if (!is.null(start) && checkSTform(ST, start)) ST <- start
-    Vt <- .Call(mer_create_Vt, Zt, ST, Gp, 1L)
-
-    ## record dimensions and algorithm settings
-    dd <- VecFromNames(.dims_names, "integer")
-    dd["nf"] <- length(cnames)          # number of random-effects terms
-    dd["n"] <- nrow(fr$mf)              # number of observations
-    dd["p"] <- ncol(fr$X)               # number of fixed-effects coefficients
-    dd["q"] <- nrow(Zt)                 # number of random effects
-    dd["s"] <- 1L                       # always 1 except in nlmer
-    nvc <- sapply(nc, function (qi) (qi * (qi + 1))/2) # no. of var. comp.
-### FIXME: Check number of variance components versus number of levels
-### in the factor for each term. Warn or stop as appropriate
-    dd["np"] <- as.integer(sum(nvc))    # number of parameters in optimization
-### FIXME: Change the name of this to something more appropriate
-    dd["REML"] <- match.arg(method) == "AGQ"
-    dd["ftyp"] <- mkFltype(glmFit$family)
+    dm <- mkdims(fr, FL, start)
+    dm$dd["ftyp"] <- mkFltype(glmFit$family)
+    dimnames(fr$X) <- NULL
 
     ans <- new("glmer",
                env = mkFamilyEnv(glmFit),
                famName = unlist(glmFit$family[c("family", "link")]),
                frame = if (model) fr$mf else fr$mf[0,],
-               call = mc, terms = fr$mt, flist = flist,
-               Zt = Zt, X = fr$X,
+               call = mc, terms = fr$mt, flist = dm$flist,
+               Zt = dm$Zt, X = fr$X,
                y = unname(as.double(glmFit$y)),
 ### FIXME: weights and offset are recorded both here and in the env slot
                weights = unname(glmFit$prior.weights),
                offset = unname(fr$off),
-               cnames = unname(cnames), Gp = unname(Gp),
-               dims = dd, ST = ST, Vt = Vt,
-               L = .Call(mer_create_L, Vt),
+               cnames = unname(dm$cnames), Gp = unname(dm$Gp),
+               dims = dm$dd, ST = dm$ST, Vt = dm$Vt,
+               L = .Call(mer_create_L, dm$Vt),
                deviance = VecFromNames(.dev_names),
-               fixef = unname(coef(glmFit)),
-               ranef = numeric(dd["q"]),
-               uvec = numeric(dd["q"]))
+               fixef = coef(glmFit),
+               ranef = numeric(dm$dd["q"]),
+               uvec = numeric(dm$dd["q"]))
     cv <- do.call("lmerControl", control)
     if (missing(verbose)) verbose <- cv$msVerbose
     .Call(mer_update_VtL, ans)
@@ -475,7 +469,6 @@ nlmer <- function(formula, data, control = list(), start = NULL,
                                           bar = subnms(formula[[3]], lapply(pnames, as.name))))),
                      contrasts, vnms)
     mf <- fr$mf
-    attr(mf, "terms") <- NULL
     env <- new.env()
     lapply(names(mf), function(nm) assign(nm, env = env, mf[[nm]]))
     n <- nrow(mf)
@@ -488,7 +481,10 @@ nlmer <- function(formula, data, control = list(), start = NULL,
                                         # factor list and model matrices
     FL <- lmerFactorList(substitute(foo ~ bar, list(foo = nlform[[2]], bar = formula[[3]])),
                          mf)
-    FL$Ztl <- lapply(FL$Ztl, rmIntr)    # Remove any intercept columns
+    Ztl <- lapply(FL$Ztl, rmIntr)    # Remove any intercept columns
+    FL$Ztl <- lapply(with(FL, .Call(Ztl_sparse, fl, Ztl)), drop0)
+
+    dm <- mkdims(fr, FL, start$STpars)
 
     Xt <- t(Matrix(as.matrix(mf[,pnames]), sparse = TRUE))
     xnms <- colnames(fr$X)
