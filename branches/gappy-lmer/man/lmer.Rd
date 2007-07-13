@@ -114,9 +114,11 @@ nlmer(formula, data, control, start, verbose,
   The \code{\linkS4class{lmer}} class, \code{\link[stats]{lm}}
 }
 \examples{
-#(fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
+(fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
 (fm2 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), sleepstudy))
-#anova(fm1, fm2)
+anova(fm1, fm2)
+(m1 <- glmer(cbind(incidence, size - incidence) ~ period + (1 | herd),
+            family = binomial, data = cbpp))
 (fm1 <- nlmer(circumference ~ SSlogis(age, Asym, xmid, scal) ~ Asym|Tree,
                     Orange, verb = 1,
                     start = c(Asym = 192.6872, xmid = 728.7544, scal = 353.5320)))
