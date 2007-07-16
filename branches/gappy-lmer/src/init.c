@@ -23,9 +23,7 @@ static R_CallMethodDef CallEntries[] = {
     {"lme4_rWishart", (DL_FUNC) &lme4_rWishart, 3},
 
     {"lmer_MCMCsamp", (DL_FUNC) &lmer_MCMCsamp, 6},
-    {"lmer_deviance", (DL_FUNC) &lmer_deviance, 2},
-    {"lmer_postVar", (DL_FUNC) &lmer_postVar, 1},
-    {"lmer_ranef", (DL_FUNC) &lmer_ranef, 1},
+    {"lmer_update_L", (DL_FUNC) &lmer_update_L, 1},
     {"lmer_update_effects", (DL_FUNC) &lmer_update_effects, 1},
     {"lmer_update_dev", (DL_FUNC) &lmer_update_dev, 1},
     {"lmer_validate", (DL_FUNC) &lmer_validate, 1},
@@ -33,8 +31,9 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_create_L", (DL_FUNC) &mer_create_L, 1},
     {"mer_create_Vt", (DL_FUNC) &mer_create_Vt, 4},
     {"mer_optimize", (DL_FUNC) &mer_optimize, 3},
+    {"mer_postVar", (DL_FUNC) &mer_postVar, 1},
     {"mer_sigma", (DL_FUNC) &mer_sigma, 2},
-    {"mer_update_VtL", (DL_FUNC) &mer_update_VtL, 1},
+    {"mer_update_Vt", (DL_FUNC) &mer_update_Vt, 1},
     {"mer_validate", (DL_FUNC) &mer_validate, 1},
 
     {"nlmer_bhat", (DL_FUNC) &nlmer_bhat, 1},
@@ -48,7 +47,6 @@ static R_CallMethodDef CallEntries[] = {
     {"pedigree_chol", (DL_FUNC) &pedigree_chol, 2},
 
 /*     {"Zt_carryOver", (DL_FUNC) &Zt_carryOver, 4}, */
-/*     {"Ztl_sparse", (DL_FUNC) &Ztl_sparse, 2}, */
 
     {NULL, NULL, 0}
 };
