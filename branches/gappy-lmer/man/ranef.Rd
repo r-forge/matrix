@@ -58,9 +58,11 @@ ranef(object, \dots)
 fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
 fm2 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), sleepstudy)
 ranef(fm1)
+\dontrun{
 str(rr1 <- ranef(fm1, postVar = TRUE))
 qqmath(rr1)
 str(ranef(fm2, postVar = TRUE))
+}
 }
 \keyword{models}
 \keyword{methods}

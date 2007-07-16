@@ -58,6 +58,7 @@ mcmcsamp(object, n, verbose, \dots)
 }
 \examples{
 (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
+\dontrun{
 set.seed(101); samp0 <- mcmcsamp(fm1, n = 1000) # default deviance = FALSE
 set.seed(101); samp1 <- mcmcsamp(fm1, n = 1000, deviance = TRUE)
 colnames(samp1) # has "deviance"
@@ -73,6 +74,7 @@ if (require("coda", quietly = TRUE, character.only = TRUE)) {
 \dontshow{
 stopifnot(abs(eDF - 7) < 1,
           all.equal(samp0, samp1[,1:6], tol=0))
+}
 }
 }
 \keyword{methods}

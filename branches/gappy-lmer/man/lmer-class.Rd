@@ -10,10 +10,12 @@
 \alias{summary.mer-class}
 \alias{summary.lmer-class}
 \alias{summary.glmer-class}
+\alias{summary.nlmer-class}
 \alias{ranef.lmer-class}
 % Methods
 \alias{anova,lmer-method}
 \alias{coef,lmer-method}
+\alias{coef,mer-method}
 \alias{coerce,lmer,dsTMatrix-method}
 \alias{coerce,mer,dtCMatrix-method}
 \alias{coerce,mer,pMatrix-method}
@@ -21,22 +23,29 @@
 \alias{confint,lmer-method}
 \alias{deviance,mer-method}
 \alias{fitted,lmer-method}
-\alias{formula,lmer-method}
+\alias{formula,mer-method}
 \alias{logLik,mer-method}
 \alias{plot,coef.lmer-method}
 \alias{plot,ranef.lmer-method}
 \alias{print,mer-method}
+\alias{print,lmer-method}
+\alias{print,glmer-method}
 \alias{qqmath,ranef.lmer-method}
 \alias{resid,glmer-method}
 \alias{resid,lmer-method}
 \alias{residuals,glmer-method}
 \alias{residuals,lmer-method}
 \alias{show,mer-method}
+\alias{show,lmer-method}
+\alias{show,glmer-method}
+\alias{show,nlmer-method}
 \alias{simulate,lmer-method}
 \alias{summary,lmer-method}
+\alias{summary,mer-method}
 \alias{terms,lmer-method}
 \alias{update,mer-method}
 \alias{vcov,mer-method}
+\alias{vcov,lmer-method}
 \alias{with,lmer-method}
 %
 \alias{deviance,summary.mer-method}
@@ -213,9 +222,11 @@ print(fm2, digits = 10, corr = FALSE) # more precision; no corr.matrix
 
 logLik(fm2)
 (V2 <- vcov(fm2))
+\dontrun{
 str(resid(fm2))
 
 ## Simulate 'Reaction' according to the fitted model:
 dim(ss <- simulate(fm2, nsim = 200, seed = 101)) ## -> 180 x 200
+}
 }
 \keyword{classes}
