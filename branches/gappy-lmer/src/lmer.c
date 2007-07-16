@@ -1580,29 +1580,50 @@ SEXP glmer_eta(SEXP x)
  */
 SEXP glmer_reweight(SEXP x)
 {
-    SEXP rho = GET_SLOT(x, lme4_envSym);
     SEXP moff = GET_SLOT(x, lme4_offsetSym);
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int i, n = dims[n_POS];
-    double *eta = REAL(findVarInFrame(rho, lme4_etaSym)),
-	*mo = (moff == R_NilValue) ? (double*) NULL : REAL(moff),
-	*mu = REAL(findVarInFrame(rho, lme4_muSym)),
-	*w = REAL(findVarInFrame(rho, lme4_weightsSym)),
-	*y = REAL(GET_SLOT(x, lme4_ySym)),
-	*z = REAL(findVarInFrame(rho, lme4_zSym));
-    double *dmu_deta = Alloca(n, double), *var = Alloca(n, double);
+    CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
+    int *vp = (int*)(cVt->p);
+    int j, n = cVt->ncol, nnz = vp[cVt->ncol], p, q = cVt->nrow;
+    CHM_FR L = L_SLOT(x);
+    CHM_DN res = M_cholmod_allocate_dense(n, 1, n, CHOLMOD_REAL, &c),
+	rhs = M_cholmod_allocate_dense(q, 1, q, CHOLMOD_REAL, &c);
+    double m_one[] = {-1, 0}, one[] = {1,0};
+    double *mo = (moff == R_NilValue) ? (double*) NULL : REAL(moff),
+	*vx = (double*)(cVt->x),
+	*w = REAL(GET_SLOT(x, lme4_weightsSym)),
+	*y = REAL(GET_SLOT(x, lme4_ySym));
+    double *dmu_deta = Alloca(n, double), *var = Alloca(n, double),
+	*wx = Alloca(nnz, double); /* weighted x slot of cVt */
     R_CheckStack();
-				/* initialize weights to prior wts */
-    Memcpy(w, REAL(GET_SLOT(x, lme4_weightsSym)), n); 
-    glmer_eta(x);
-    glmer_linkinv(x);		/* evaluate mu */
+
+    glmer_eta(x);		/* evaluate eta, mu, etc., W */
+    glmer_linkinv(x);
     glmer_dmu_deta(x, dmu_deta);
     glmer_var(x, var);
-    for (i = 0; i < n; i++) {
-	w[i] *= dmu_deta[i] * dmu_deta[i]/var[i];
-	/* adjusted working variate */
- 	z[i] = (mo ? mo[i] : 0) - eta[i] - (y[i] - mu[i])/dmu_deta[i];
+    for (j = 0; j < n; j++) {	/* calculate weighted Vt and residual */
+	double ww = sqrt(w[j] * dmu_deta[j] * dmu_deta[j]/var[j]);
+	((double*)(res->x))[j] = y[j] - dmu_deta[j] - (mo ? mo[j] : 0);
+	for (p = vp[j]; p < vp[j + 1]; p++) wx[p] = vx[p] * ww;
     }
+				/* evaluate V'[y-dmu_deta]-u` */
+    Memcpy((double*)(rhs->x), REAL(GET_SLOT(x, lme4_uvecSym)), q);
+    if (!(j = M_cholmod_sdmult(cVt, 0 /* trans */, one, m_one, res, rhs, &c)))
+	error(_("cholmod_sdmult returned error code %d"), j);
+    M_cholmod_free_dense(&res, &c);
+				/* Factor V'WV + I */
+    cVt->x = (void*)wx; j = c.final_ll; c.final_ll = L->is_ll;
+    if (!M_cholmod_factorize_p(cVt, one, (int*) NULL, (size_t) 0, L, &c)) { 
+	error(_("cholmod_factorize_p failed: status %d, minor %d from ncol %d"),
+	      c.status, L->minor, L->n);
+    }
+    c.final_ll = j;
+		/* CHOLMOD_A also applies any permutation and you don't want to */
+    res = M_cholmod_solve(CHOLMOD_L, L, rhs, &c);
+    M_cholmod_free_dense(&rhs, &c);
+    rhs = M_cholmod_solve(CHOLMOD_Lt, L, res, &c);    
+    M_cholmod_free_dense(&res, &c);
+    M_cholmod_free_dense(&rhs, &c);
+    
     return R_NilValue;
 }
 
