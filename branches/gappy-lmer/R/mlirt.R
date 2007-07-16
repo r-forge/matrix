@@ -68,37 +68,37 @@ mlirt <-
 
     gVerb <- getOption("verbose")
 
-    ## extract some of the components of glmFit
-    ## weights could have changed
-    weights <- glmFit$prior.weights
-    eta <- glmFit$linear.predictors
-    linkinv <- quote(family$linkinv(eta))
-    mu.eta <- quote(family$mu.eta(eta))
-    mu <- family$linkinv(eta)
-    variance <- quote(family$variance(mu))
-    dev.resids <- quote(family$dev.resids(Y, mu, weights))
-    doLMEopt <- quote(LMEopt(x = mer, value = cv))
-    mer@devComp[8] <- -1
-    mer@status["glmm"] <- as.integer(2) # always use Laplace
-    GSpt <- .Call(glmer_init, environment(), fltype)
-    PQLpars <- c(coef(glmFit), .Call(mer_coef, mer, 2))
-    fixInd <- seq(ncol(X))
-    ## pars[fixInd] == beta, pars[-fixInd] == theta
-    ## indicator of constrained parameters
-    const <- c(rep(FALSE, length(fixInd)),
-               unlist(lapply(mer@nc[seq(along = fl)],
-                             function(k) 1:((k*(k+1))/2) <= k)
-                      ))
-##     devLaplace <- function(pars) .Call(glmer_devLaplace, pars, GSpt)
-    devLaplace <- NULL
-    rel.tol <- abs(0.01/devLaplace(PQLpars))
-    cat(paste("relative tolerance set to", rel.tol, "\n"))
+##     ## extract some of the components of glmFit
+##     ## weights could have changed
+##     weights <- glmFit$prior.weights
+##     eta <- glmFit$linear.predictors
+##     linkinv <- quote(family$linkinv(eta))
+##     mu.eta <- quote(family$mu.eta(eta))
+##     mu <- family$linkinv(eta)
+##     variance <- quote(family$variance(mu))
+##     dev.resids <- quote(family$dev.resids(Y, mu, weights))
+##     doLMEopt <- quote(LMEopt(x = mer, value = cv))
+##     mer@devComp[8] <- -1
+##     mer@status["glmm"] <- as.integer(2) # always use Laplace
+##     GSpt <- .Call(glmer_init, environment(), fltype)
+##     PQLpars <- c(coef(glmFit), .Call(mer_coef, mer, 2))
+##     fixInd <- seq(ncol(X))
+##     ## pars[fixInd] == beta, pars[-fixInd] == theta
+##     ## indicator of constrained parameters
+##     const <- c(rep(FALSE, length(fixInd)),
+##                unlist(lapply(mer@nc[seq(along = fl)],
+##                              function(k) 1:((k*(k+1))/2) <= k)
+##                       ))
+## ##     devLaplace <- function(pars) .Call(glmer_devLaplace, pars, GSpt)
+##     devLaplace <- NULL
+##     rel.tol <- abs(0.01/devLaplace(PQLpars))
+##     cat(paste("relative tolerance set to", rel.tol, "\n"))
 
-    optimRes <- nlminb(PQLpars, devLaplace,
-                       lower = ifelse(const, 5e-10, -Inf),
-                       control = list(trace = cv$msVerbose,
-                       iter.max = cv$msMaxIter,
-                       rel.tol = rel.tol))
+##     optimRes <- nlminb(PQLpars, devLaplace,
+##                        lower = ifelse(const, 5e-10, -Inf),
+##                        control = list(trace = cv$msVerbose,
+##                        iter.max = cv$msMaxIter,
+##                        rel.tol = rel.tol))
 ##     .Call(glmer_finalize, GSpt)
 ##     new("glmer",
 ##         new("lmer", mer,
