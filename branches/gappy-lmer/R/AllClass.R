@@ -72,8 +72,8 @@ setClass("nlmer", ## nonlinear mixed models
          contains = "mer",
          validity = function(object) .Call(nlmer_validate, object))
 
-setClass("summary.lmer",
-	 representation(           # the "lmer" result ``enhanced'' :
+setClass("summary.mer",                 # Additional slots in a summary object
+	 representation(           
 			methTitle = "character",
 			logLik= "logLik",
 			ngrps = "integer",
@@ -81,22 +81,17 @@ setClass("summary.lmer",
 			coefs = "matrix",
 			vcov = "dpoMatrix",
 			REmat = "matrix",
-			AICtab= "data.frame"
-			),
-	 contains = "lmer")
+			AICtab= "data.frame",
+                        "VIRTUAL"))
+
+setClass("summary.lmer", # the "lmer" result ``enhanced'' :
+	 contains = c("lmer", "summary.mer"))
 
 setClass("summary.glmer",          # the "glmer" result ``enhanced'' :
-	 representation(
-			methTitle = "character",
-			logLik= "logLik",
-			ngrps = "integer",
-			sigma = "numeric", # scale, non-negative number
-			coefs = "matrix",
-			vcov = "dpoMatrix",
-			REmat = "matrix",
-			AICtab= "data.frame"
-			),
-	 contains = "glmer")
+	 contains = c("glmer", "summary.mer"))
+
+setClass("summary.nlmer",          # the "glmer" result ``enhanced'' :
+	 contains = c("nlmer", "summary.mer"))
 
 setClass("ranef.lmer", contains = "list")
 

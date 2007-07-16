@@ -86,16 +86,6 @@ makeInteraction <- function(x)
     list(substitute(foo:bar, list(foo=x[[2]], bar = trm11)), trm1)
 }
 
-rmIntr <- function(mm)
-### Remove the intercept row from a transposed model matrix
-### first checking that it is not the only column
-{
-    if (is.na(irow <- match("(Intercept)", rownames(mm)))) return(mm)
-    if (ncol(mm) < 2)
-        stop("lhs of a random-effects term cannot be an intercept only")
-    mm[-irow, , drop = FALSE]
-}
-
 expandSlash <- function(bb)
 ### expand any slashes in the grouping factors returned by findbars
 {
@@ -321,6 +311,16 @@ mkFamilyEnv <- function(glmFit)
     env
 }
 
+rmIntr <- function(mm)
+### Remove the intercept row from a transposed model matrix
+### first checking that it is not the only column
+{
+    if (is.na(irow <- match("(Intercept)", rownames(mm)))) return(mm)
+    if (ncol(mm) < 2)
+        stop("lhs of a random-effects term cannot be an intercept only")
+    mm[-irow, , drop = FALSE]
+}
+
 ### The main event
 
 lmer <-
@@ -485,7 +485,7 @@ nlmer <- function(formula, data, control = list(), start = NULL,
                          mf)
 ### FIXME: This is where things start to differ.  FL no longer has Ztl
     Ztl <- lapply(FL$Ztl, rmIntr)    # Remove any intercept columns
-    FL$Ztl <- lapply(with(FL, .Call(Ztl_sparse, fl, Ztl)), drop0)
+##     FL$Ztl <- lapply(with(FL, .Call(Ztl_sparse, fl, Ztl)), drop0)
 
     dm <- mkdims(fr, FL, start$STpars)
 
@@ -501,25 +501,25 @@ nlmer <- function(formula, data, control = list(), start = NULL,
 
     wts <- fr$weights
     if (is.null(wts)) wts <- numeric(0)
-    Ztl1 <- lapply(with(FL, .Call(Ztl_sparse, fl, Ztl)), drop0)
+##     Ztl1 <- lapply(with(FL, .Call(Ztl_sparse, fl, Ztl)), drop0)
+    Ztl1 <- NULL
     Gp <- unname(c(0L, cumsum(unlist(lapply(Ztl1, nrow)))))
     Zt <- do.call(rBind, Ztl1)
-    Mt <- .Call(lmer_create_Vt, Zt, ST, Gp, s)
+    Mt <- .Call(mer_create_Vt, Zt, ST, Gp, s)
 
     ans <- new("nlmer",
                env = env, model = nlmod, pnames = pnames, Xt = Xt,
-               mu = numeric(dims['n']), Mt = Mt,
+               mu = numeric(dm$dd['n']), Mt = Mt,
                frame = if (model) fr$mf else fr$mf[0,],
-               call = mc, terms = fr$mt, flist = flist,
-               Zt = Zt, y = unname(as.double(fr$Y)),
-               weights = unname(fr$wts),
-               cnames = unname(cnames), Gp = unname(Gp),
-               dims = dd, ST = ST, Vt = Vt,
-               L = .Call(mer_create_L, Mt),
-               deviance = dm$dev,
-               fixef = unname(as.double(start$fixed)),
-               ranef = numeric(dd["q"]),
-               uvec = numeric(dd["q"]))
+               call = mc, terms = fr$mt, flist = dm$flist,
+               Zt = dm$Zt, y = unname(as.double(fr$Y)),
+               weights = unname(fr$wts), 
+               cnames = unname(dm$cnames), Gp = unname(dm$Gp),
+               dims = dm$dd, ST = dm$ST,
+               L = .Call(mer_create_L, dm$Mt),
+               deviance = dm$dev, fixef = fixef,
+               ranef = numeric(dm$dd["q"]),
+               uvec = numeric(dm$dd["q"]))
     cv <- do.call("lmerControl", control)
     if (missing(verbose)) verbose <- cv$msVerbose
 #    .Call(mer_optimize, ans, verbose, 1)
@@ -563,7 +563,7 @@ setMethod("ranef", signature(object = "lmer"),
 ### Extract the random effects
 ### FIXME: This will need to be modified if flist is collapsed
       {
-          if (postVar) .NotYetImplemented
+          if (postVar) .NotYetImplemented()
           Gp <- object@Gp
           ii <- lapply(diff(Gp), seq_len)
           rr <- object@ranef
@@ -747,7 +747,7 @@ setMethod("resid", signature(object = "lmer"),
 setMethod("simulate", "lmer",
           function(object, nsim = 1, seed = NULL, ...)
       {
-          .NotYetImplemented
+          .NotYetImplemented()
 	  if(!is.null(seed)) set.seed(seed)
 	  if(!exists(".Random.seed", envir = .GlobalEnv))
 	      runif(1)		     # initialize the RNG if necessary
@@ -826,9 +826,13 @@ setMethod("summary", signature(object = "mer"),
                   coefs <- cbind(coefs, "t value" = stat) #, "Pr(>|t|)" = pval)
               }
           } ## else : append columns to 0-row matrix ...
-
-          new(if(is(object, "glmer")) "summary.glmer" else
-          {if(is(object, "lmer")) "summary.lmer" else "summary.lmer"},
+          oclass <- ""
+          if (is(object, "glmer")) oclass <- "summary.glmer"
+          if (is(object, "lmer")) oclass <- "summary.lmer"
+          if (is(object, "nlmer")) oclass <- "summary.nlmer"
+          if (!nchar(oclass))
+              stop(gettextf("unrecognized class %s", class(object)))
+          new(oclass,
               object,
               methTitle = methTitle,
               logLik = llik,
@@ -1027,16 +1031,10 @@ setMethod("show", "nlmer", function(object)
 
 #### Methods for secondary, derived classes
 
-setMethod("deviance", signature(object = "summary.lmer"),
- 	  function(object) object@deviance)
-
-setMethod("logLik", signature(object = "summary.lmer"),
-	  function(object) object@logLik)
-
-setMethod("vcov", signature(object = "summary.lmer"),
-	  function(object) object@vcov)
-
-setMethod("summary", signature(object = "summary.lmer"), function(object) object)
+setMethod("deviance", signature(object = "summary.mer"), function(object) object@deviance)
+setMethod("logLik", signature(object = "summary.mer"), function(object) object@logLik)
+setMethod("vcov", signature(object = "summary.mer"), function(object) object@vcov)
+setMethod("summary", signature(object = "summary.mer"), function(object) object)
 
 #### Methods to produce specific plots
 
@@ -1129,7 +1127,7 @@ setMethod("mcmcsamp", signature(object = "lmer"),
 ### Generate a Markov chain Monte Carlo sample from the posterior distribution
 ### of the parameters in a linear mixed model
       {
-          .NotYetImplemented
+          .NotYetImplemented()
           ans <- t(.Call(lmer_MCMCsamp, object, saveb, n,
                          trans, verbose, deviance))
 	  attr(ans, "mcpar") <- as.integer(c(1, n, 1))
@@ -1157,7 +1155,7 @@ mcmccompnames <- function(ans, object, saveb, trans, glmer, deviance)
 ### Mangle the names of the columns of the mcmcsamp result ans
 ### This operation is common to the methods for "lmer" and "glmer"
 {
-    .NetYetImplemented
+    .NotYetImplemented()
     gnms <- names(object@flist)
     cnms <- object@cnames
     ff <- fixef(object)
@@ -1197,43 +1195,44 @@ mcmccompnames <- function(ans, object, saveb, trans, glmer, deviance)
 
 #### Odds and ends
 
-simulestimate <- function(x, FUN, nsim = 1, seed = NULL, control = list())
-{
-    FUN <- match.fun(FUN)
-    stopifnot((nsim <- as.integer(nsim[1])) > 0,
-	      inherits(x, "lmer"))
-    if (!is.null(seed)) set.seed(seed)
-    ## simulate the linear predictors
-    lpred <- .Call(mer_simulate, x, nsim)
-    sc <- abs(x@devComp[8])
-    ## add fixed-effects contribution and per-observation noise term
-    lpred <- lpred + drop(x@X %*% fixef(x)) + rnorm(prod(dim(lpred)), sd = sc)
+## simulestimate <- function(x, FUN, nsim = 1, seed = NULL, control = list())
+## {
+##     FUN <- match.fun(FUN)
+##     stopifnot((nsim <- as.integer(nsim[1])) > 0,
+## 	      inherits(x, "lmer"))
+##     if (!is.null(seed)) set.seed(seed)
+##     ## simulate the linear predictors
+##     lpred <- .Call(mer_simulate, x, nsim)
+##     sc <- abs(x@devComp[8])
+##     ## add fixed-effects contribution and per-observation noise term
+##     lpred <- lpred + drop(x@X %*% fixef(x)) + rnorm(prod(dim(lpred)), sd = sc)
 
-    cv <- do.call(lmerControl, control)
-    Omega <- x@Omega
-    x@wrkres <- x@y <- lpred[,1]
-    .Call(mer_update_ZXy, x)
-    LMEoptimize(x) <- cv
-    template <- FUN(x)
-    if (!is.numeric(template))
-        stop("simulestimate currently only handles functions that return numeric vectors")
-    ans <- matrix(template, nr = nsim, nc = length(template), byrow = TRUE)
-    colnames(ans) <- names(template)
-    for (i in 1:nsim) {
-        x@wrkres <- x@y <- lpred[,i]
-        x@Omega <- Omega
-        .Call(mer_update_ZXy, x)
-        LMEoptimize(x) <- cv
-        foo <- try(FUN(x))
-        ans[i,] <- if (inherits(foo, "try-error")) NA else foo
-    }
-    ans
-}
+##     cv <- do.call(lmerControl, control)
+##     Omega <- x@Omega
+##     x@wrkres <- x@y <- lpred[,1]
+##     .Call(mer_update_ZXy, x)
+##     LMEoptimize(x) <- cv
+##     template <- FUN(x)
+##     if (!is.numeric(template))
+##         stop("simulestimate currently only handles functions that return numeric vectors")
+##     ans <- matrix(template, nr = nsim, nc = length(template), byrow = TRUE)
+##     colnames(ans) <- names(template)
+##     for (i in 1:nsim) {
+##         x@wrkres <- x@y <- lpred[,i]
+##         x@Omega <- Omega
+##         .Call(mer_update_ZXy, x)
+##         LMEoptimize(x) <- cv
+##         foo <- try(FUN(x))
+##         ans[i,] <- if (inherits(foo, "try-error")) NA else foo
+##     }
+##     ans
+## }
 
 hatTrace <- function(x)
 {
+    .NotYetImplemented()
     stopifnot(is(x, "mer"))
-    .Call(mer_hat_trace2, x)
+##     .Call(mer_hat_trace2, x)
 }
 
 ST2Omega <- function(ST)
