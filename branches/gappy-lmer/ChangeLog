@@ -1,3 +1,23 @@
+2007-07-16 14:18  Douglas Bates <bates@stat.wisc.edu>
+	* [r4620] R/AllClass.R, R/AllGeneric.R, R/lmer.R, man/lmer.Rd,
+	  src/init.c, src/lmer.c, src/lmer.h: Preparing for a beta release
+	* [r4621] man/lmer-class.Rd, man/mcmcsamp.Rd, man/ranef.Rd,
+	  tests/lmer.R: Adjust tests and examples for unimplemented or broken
+	  functions and methods
+	* [r4622] src/lmer.c: documentation infelicity
+	* [r4623] R/AllClass.R, R/lmer.R: Rationalize summary class structure
+	* [r4624] R/mlirt.R: Remove references to defunct C functions
+	
+2007-07-13 21:34  Douglas Bates <bates@stat.wisc.edu>
+	* [r4613] inst/doc/Theory.Rnw: Use Poisson mixed model as example of
+	  GLMM
+	* [r4614] man/lmer.Rd: Incorporate glmer example
+	* [r4615] R/lmer.R: Add mkdims utility for lmer and glmer
+
+2007-07-12 20:11  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4607] R/lmer.R, man/cbpp.Rd: glmer skeleton and test
+
 2007-07-11 20:30  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r4602] src/lmer.c: Part of the extension of lmer to correlated random
