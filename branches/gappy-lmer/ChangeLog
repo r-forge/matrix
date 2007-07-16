@@ -1,4 +1,4 @@
-2007-07-16 14:18  Douglas Bates <bates@stat.wisc.edu>
+2007-07-16 17:09  Douglas Bates <bates@stat.wisc.edu>
 	* [r4620] R/AllClass.R, R/AllGeneric.R, R/lmer.R, man/lmer.Rd,
 	  src/init.c, src/lmer.c, src/lmer.h: Preparing for a beta release
 	* [r4621] man/lmer-class.Rd, man/mcmcsamp.Rd, man/ranef.Rd,
