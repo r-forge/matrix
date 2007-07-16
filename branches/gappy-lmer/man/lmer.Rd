@@ -117,6 +117,7 @@ nlmer(formula, data, control, start, verbose,
 (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
 (fm2 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), sleepstudy))
 anova(fm1, fm2)
+\dontrun{
 (m1 <- glmer(cbind(incidence, size - incidence) ~ period + (1 | herd),
             family = binomial, data = cbpp))
 (fm1 <- nlmer(circumference ~ SSlogis(age, Asym, xmid, scal) ~ Asym|Tree,
@@ -130,7 +131,9 @@ anova(fm1, fm2)
 (fm4 <- nlmer(conc ~ SSfol(Dose, Time,lKe, lKa, lCl) ~ (lKa+lCl|Subject),
               Theoph, start = c(lKe = -2.5, lKa = 0.5, lCl = -3), verb = 1))
 (fm5 <- nlmer(conc ~ SSfol(Dose, Time,lKe, lKa, lCl) ~ (lKa|Subject) + (lCl|Subject), 
-              Theoph, start = c(lKe = -2.5, lKa = 0.5, lCl = -3), verb = 1))
+              Theoph, start = c(lKe = -2.5, lKa = 0.5, lCl = -3), verb =
+  1))
+}
 }
 \keyword{models}
 \keyword{methods}

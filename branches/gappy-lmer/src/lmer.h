@@ -19,12 +19,7 @@ SEXP lme4_rWishart(SEXP ns, SEXP dfp, SEXP scal);
 
 SEXP lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 		   SEXP verbose, SEXP deviance);
-SEXP lmer_createL(SEXP Zt);
-SEXP lmer_deviance(SEXP x, SEXP which);
-SEXP lmer_getPars(SEXP x);
-SEXP lmer_postVar(SEXP x);
-SEXP lmer_ranef(SEXP x);
-SEXP lmer_setPars(SEXP x, SEXP pars);
+SEXP lmer_update_L(SEXP x);
 SEXP lmer_update_effects(SEXP x);
 SEXP lmer_update_dev(SEXP x);
 SEXP lmer_validate(SEXP x);
@@ -32,10 +27,10 @@ SEXP lmer_validate(SEXP x);
 SEXP mer_create_L(SEXP Vt);
 SEXP mer_create_Vt(SEXP Zt, SEXP ST, SEXP Gp, SEXP sP);
 SEXP mer_optimize(SEXP x, SEXP verb, SEXP mtype);
+SEXP mer_postVar(SEXP x);
 SEXP mer_sigma(SEXP x, SEXP which);
-SEXP mer_update_VtL(SEXP x);
+SEXP mer_update_Vt(SEXP x);
 SEXP mer_validate(SEXP x);
-
 
 SEXP nlmer_bhat(SEXP x);
 SEXP nlmer_eval_model(SEXP x, SEXP uform);

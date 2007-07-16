@@ -260,27 +260,20 @@ SEXP mer_create_Vt(SEXP Zt, SEXP ST, SEXP GpP, SEXP sP)
 /**
  * Change the x slot in Vt according to ST'Zt
  *
- * @param Zt transpose of Z as a dgCMatrix object
- * @param ST compounded matrices S* and T*
- * @param Gp nf + 1 vector of group pointers
- * @param Vt transpose of V as a dgCMatrix object
- *
- * @return square of determinant of L
+ * @param x An object that inherits from class mer
  */
-SEXP mer_update_VtL(SEXP x)
+SEXP mer_update_Vt(SEXP x)
 {
     SEXP Zt = GET_SLOT(x, lme4_ZtSym),
 	ST = GET_SLOT(x, lme4_STSym),
 	Vt = GET_SLOT(x, lme4_VtSym);
     int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym));
-    double *dev = REAL(GET_SLOT(x, lme4_devianceSym));
     CHM_SP cVt = AS_CHM_SP(Vt);
     int *vi = (int*)(cVt->i), *vp = (int*)(cVt->p),
 	j, nf = LENGTH(ST), nnz = vp[cVt->ncol], p;
     int *nc = Alloca(nf, int), *nlev = Alloca(nf, int);
     double **st = Alloca(nf, double*),
 	*vx = (double*)(cVt->x), one[] = {1,0};
-    CHM_FR L = L_SLOT(x);
     R_CheckStack();
 
 /* FIXME: Check for s > 1 and overlay to create Mt  */
@@ -304,12 +297,28 @@ SEXP mer_update_VtL(SEXP x)
 	int i = Gp_grp(vi[p], nf, Gp);
 	vx[p] *= st[i][((vi[p] - Gp[i]) / nlev[i]) * (nc[i] + 1)];
     }
-    j = c.final_ll; c.final_ll = L->is_ll;
+    return R_NilValue;
+}
+
+/**
+ * Update the L slot in an lmer object
+ *
+ * @param x An object that inherits from class mer
+ */
+SEXP lmer_update_L(SEXP x)
+{
+    int j = c.final_ll;
+    double one[] = {1,0};
+    CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
+    CHM_FR L = L_SLOT(x);
+    R_CheckStack();
+
+    c.final_ll = L->is_ll;
     if (!M_cholmod_factorize_p(cVt, one, (int*)NULL, 0 /*fsize*/, L, &c))
 	error(_("cholmod_factorize_p failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
     c.final_ll = j;
-    dev[ldL2_POS] = chm_log_det2(L);
+    REAL(GET_SLOT(x, lme4_devianceSym))[ldL2_POS] = chm_log_det2(L);
     return R_NilValue;
 }
 
@@ -423,6 +432,47 @@ PSTp_dense_mult(SEXP dest, SEXP ST, const int *Gp, SEXP src, int *Perm)
 }
 
 /**
+ * dest = P  %*% S %*% t(T) %*% src
+ *
+ * @param dest matrix whose contents are overwritten
+ * @param ST ST slot
+ * @param Gp group pointers
+ * @param src originating numeric matrix
+ * @param Perm permutation to be applied
+ *
+ */
+static void
+TSPp_dense_mult(SEXP dest, SEXP ST, const int *Gp, SEXP src, int *Perm)
+{
+    double *dx = REAL(dest), *sx = REAL(src);
+    int i, isM = isMatrix(src), j, k, ncmax, nf = LENGTH(ST);
+    int m = isM ? INTEGER(getAttrib(src, R_DimSymbol))[0] : LENGTH(src),
+	n = isM ? INTEGER(getAttrib(src, R_DimSymbol))[1] : 1;
+    int *nc = Alloca(nf, int), *nlev = Alloca(nf, int);
+    double **st = Alloca(nf, double*), *tmp = Alloca(m, double), one = 1;
+    R_CheckStack(); 
+
+    ncmax = ST_nc_nlev(ST, Gp, st, nc, nlev);
+    for (j = 0; j < n; j++) {
+				/* apply permutation if given */
+	if (Perm) for (i = 0; i < m; i++) tmp[Perm[i]] = sx[j * m + i];
+	else Memcpy(tmp, sx + j * m, m);
+	for (i = 0; i < nf; i++) {
+	    for (k = 0; k < nc[i]; k++) { /* multiply by \tilde{S}_i */
+		double dd = st[i][k * (nc[i] + 1)];
+		int base = Gp[i] + k * nlev[i], kk;
+		for (kk = 0; kk < nlev[i]; kk++) tmp[base + kk] *= dd;
+	    }
+	    if (nc[i] > 1) {	/* multiply by \tilde{T}_i */
+		F77_CALL(dtrmm)("R", "L", "T", "U", nlev + i, nc + i, &one,
+				st[i], nc + i, tmp + Gp[i], nlev + i);
+	    }
+	}
+	Memcpy(dx + j * m, tmp, m);
+    }
+}
+
+/**
  * Evaluate the elements of the deviance slot in an lmer object
  *
  * @param x pointer to an lmer object
@@ -441,7 +491,8 @@ lmer_update_dev(SEXP x)
     int pp1 = cRVXy->ncol, q = cRVXy->nrow;
     R_CheckStack();
 
-    mer_update_VtL(x);
+    mer_update_Vt(x);
+    lmer_update_L(x);
 				/* Evaluate PST'Z'[X:y] in RVXy */
     PSTp_dense_mult(RVXy, GET_SLOT(x, lme4_STSym),
 		    INTEGER(GET_SLOT(x, lme4_GpSym)),
@@ -561,23 +612,6 @@ SEXP ST_setPars(SEXP x, SEXP pars)
 }
 
 /**
- * Extract the deviance from an lmer object
- *
- * @param x an lmer object
- * @param which scalar integer < 0 => REML, 0 => native, > 0 => ML
- *
- * @return scalar REAL value
- */
-/* FIXME: Couldn't this just be an R function? */
-SEXP lmer_deviance(SEXP x, SEXP which)
-{
-    int w = asInteger(which);
-    int POS = (w < 0 || (!w && isREML(x))) ? REML_POS : ML_POS; 
-
-    return ScalarReal(REAL(GET_SLOT(x, lme4_devianceSym))[POS]);
-}
-
-/**
  * Update the contents of the fixef, ranef and uvec slots in an lmer
  * object.
  *
@@ -587,12 +621,11 @@ SEXP lmer_deviance(SEXP x, SEXP which)
  */
 SEXP lmer_update_effects(SEXP x)
 {
-    SEXP ranef = GET_SLOT(x, lme4_ranefSym), uvec = GET_SLOT(x, lme4_uvecSym);
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), *perm, i, ione = 1;
-    int n = dims[n_POS], p = dims[p_POS],  pp1 = dims[p_POS] + 1, q = dims[q_POS];
+    SEXP uvec = GET_SLOT(x, lme4_uvecSym);
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), ione = 1;
+    int p = dims[p_POS],  pp1 = dims[p_POS] + 1, q = dims[q_POS];
     double *RXy = REAL(GET_SLOT(x, lme4_RXySym)),
 	*RVXy = REAL(GET_SLOT(x, lme4_RVXySym)),
-	*b = REAL(ranef), *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
 	*fixef = REAL(GET_SLOT(x, lme4_fixefSym)), *u = REAL(uvec),
 	mone[] = {-1,0}, one[] = {1,0};
     CHM_FR L = L_SLOT(x);
@@ -608,16 +641,8 @@ SEXP lmer_update_effects(SEXP x)
 	error(_("cholmod_solve (CHOLMOD_Lt) failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
     Memcpy(u, (double*)(sol->x), q);
-    M_cholmod_free_dense(&sol, &c);
-    for (i = 0, dev[bqd_POS] = 0; i < n; i++) {
-	double ui = u[i];
-	dev[bqd_POS] += ui * ui;
-    }
-    perm = (int *)(L->Perm);
-    for (i = 0; i < q; i++) /* apply the inverse permutation to u into b */
-	b[i] = u[perm[i]];
-    TS_mult(INTEGER(GET_SLOT(x, lme4_GpSym)), GET_SLOT(x, lme4_STSym), b);
-
+    TSPp_dense_mult(GET_SLOT(x, lme4_ranefSym), GET_SLOT(x, lme4_STSym),
+		    INTEGER(GET_SLOT(x, lme4_GpSym)), uvec, (int*)(L->Perm));
     return R_NilValue;
 }
 
@@ -653,49 +678,6 @@ SEXP mer_sigma(SEXP x, SEXP which)
 				INTEGER(GET_SLOT(x, lme4_dimsSym)),
 				REAL(GET_SLOT(x, lme4_devianceSym))));
 }
-
-
-/**
- * Extract the conditional modes of the random effects as a list of matrices
- *
- * @param x Pointer to an mer object
- *
- * @return a list of matrices containing the conditional modes of the
- * random effects
- */
-SEXP lmer_ranef(SEXP x)
-{
-    SEXP ST = GET_SLOT(x, lme4_STSym),
-        cnames = GET_SLOT(x, lme4_cnamesSym),
-	flist = GET_SLOT(x, lme4_flistSym);
-    int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym)),
-	i, ii, jj, nf = LENGTH(flist);
-    SEXP val = PROTECT(allocVector(VECSXP, nf));
-    double *b = REAL(GET_SLOT(x, lme4_ranefSym));
-
-    lmer_update_effects(x);
-    setAttrib(val, R_NamesSymbol,
-	      duplicate(getAttrib(flist, R_NamesSymbol)));
-    for (i = 0; i < nf; i++) {
-	SEXP nms, rnms = getAttrib(VECTOR_ELT(flist, i), R_LevelsSymbol);
-	int nci = INTEGER(getAttrib(VECTOR_ELT(ST, i), R_DimSymbol))[0];
-	int mi = length(rnms);
-	double *bi = b + Gp[i], *mm;
-
-	SET_VECTOR_ELT(val, i, allocMatrix(REALSXP, mi, nci));
-	setAttrib(VECTOR_ELT(val, i), R_DimNamesSymbol, allocVector(VECSXP, 2));
-	nms = getAttrib(VECTOR_ELT(val, i), R_DimNamesSymbol);
-	SET_VECTOR_ELT(nms, 0, duplicate(rnms));
-	SET_VECTOR_ELT(nms, 1, duplicate(VECTOR_ELT(cnames, i)));
-	mm = REAL(VECTOR_ELT(val, i));
-	for (jj = 0; jj < nci; jj++)
-	    for(ii = 0; ii < mi; ii++)
-		mm[ii + jj * mi] = bi[jj + ii * nci];
-    }
-    UNPROTECT(1);
-    return val;
-}
-
 /**
  * Extract the posterior variances of the random effects
  *
@@ -703,7 +685,7 @@ SEXP lmer_ranef(SEXP x)
  *
  * @return pointer to a list of arrays
  */
-SEXP lmer_postVar(SEXP x)
+SEXP mer_postVar(SEXP x)
 {
     double *deviance = REAL(GET_SLOT(x, lme4_devianceSym)), one = 1;
     int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym)),
@@ -797,273 +779,6 @@ SEXP lmer_postVar(SEXP x)
     return ans;
 }
 
-/**
- * Update the coefficients beta and bstar given the current L
- *
- * @param sigma current standard deviation of the noise term
- * @param L current factorization of A*
- * @param bbsthat current conditional modes
- * @param bbstnew array to receive updated coefficients
- *
- * @return squared length of spherical Gaussian deviate
- */
-static double
-internal_betabst_update(double sigma, CHM_FR L, CHM_DN bbsthat,
-		       CHM_DN bbstnew)
-{
-    int i, ppq1 = L->n;
-    int ppq = ppq1 - 1;
-    double *bx, *hx = (double*)(bbsthat->x),
-	*nx = (double*)(bbstnew->x), ans = 0;
-    CHM_DN chb;
-
-    nx[ppq] = 0.;
-    for (i = 0; i < ppq; i++) {
-	double nr = norm_rand();
-	ans += nr * nr;
-	nx[i] = sigma * nr;
-    }
-    				/* chb := L^{-T} %*% bnew */
-    chb = M_cholmod_solve(CHOLMOD_Lt, L, bbstnew, &c);
-    bx = (double*)(chb->x);
-    for (i = 0; i < ppq; i++) nx[i] = bx[i] + hx[i];
-    M_cholmod_free_dense(&chb, &c);
-
-    return ans;
-}
-
-/**
- * Simulate the Cholesky factor of a standardized Wishart variate with
- * dimension p and df degrees of freedom.
- *
- * @param df degrees of freedom
- * @param p dimension of the Wishart distribution
- * @param upper if 0 the result is lower triangular, otherwise upper
-                triangular
- * @param ans array of size p * p to hold the result
- *
- * @return ans
- */
-static double
-*std_rWishart_factor(double df, int p, int upper, double ans[])
-{
-    int i, j, pp1 = p + 1;
-
-    if (df < (double) p || p <= 0)
-	error("inconsistent degrees of freedom and dimension");
-    for (j = 0; j < p; j++) {	/* jth column */
-	ans[j * pp1] = sqrt(rchisq(df - (double) j));
-	for (i = 0; i < j; i++) {
-	    int uind = i + j * p, /* upper triangle index */
-		lind = j + i * p; /* lower triangle index */
-	    ans[(upper ? uind : lind)] = norm_rand();
-	    ans[(upper ? lind : uind)] = 0;
-	}
-    }
-    return ans;
-}
-
-/**
- * Simulate a sample of random matrices from a Wishart distribution
- *
- * @param ns Number of samples to generate
- * @param dfp Degrees of freedom
- * @param scal Positive-definite scale matrix
- *
- * @return
- */
-SEXP
-lme4_rWishart(SEXP ns, SEXP dfp, SEXP scal)
-{
-    SEXP ans;
-    int *dims = INTEGER(getAttrib(scal, R_DimSymbol)), j,
-	n = asInteger(ns), psqr;
-    double *scCp, *ansp, *tmp, df = asReal(dfp), one = 1, zero = 0;
-
-    if (!isMatrix(scal) || !isReal(scal) || dims[0] != dims[1])
-	error("scal must be a square, real matrix");
-    if (n <= 0) n = 1;
-    psqr = dims[0] * dims[0];
-    tmp = Alloca(psqr, double);
-    scCp = Alloca(psqr, double);
-    R_CheckStack();
-
-    Memcpy(scCp, REAL(scal), psqr);
-    AZERO(tmp, psqr);
-    F77_CALL(dpotrf)("U", &(dims[0]), scCp, &(dims[0]), &j);
-    if (j)
-	error("scal matrix is not positive-definite");
-    PROTECT(ans = alloc3Darray(REALSXP, dims[0], dims[0], n));
-    ansp = REAL(ans);
-    GetRNGstate();
-    for (j = 0; j < n; j++) {
-	double *ansj = ansp + j * psqr;
-	std_rWishart_factor(df, dims[0], 1, tmp);
-	F77_CALL(dtrmm)("R", "U", "N", "N", dims, dims,
-			&one, scCp, dims, tmp, dims);
-	F77_CALL(dsyrk)("U", "T", &(dims[1]), &(dims[1]),
-			&one, tmp, &(dims[1]),
-			&zero, ansj, &(dims[1]));
-	internal_symmetrize(ansj, dims[0]);
-    }
-
-    PutRNGstate();
-    UNPROTECT(1);
-    return ans;
-}
-
-/**
- * Update the relative variance-covariance matrices by sampling from a
- * Wishart distribution with scale factor determined by the current
- * sample of random effects.
- *
- * @param sigma current value of sigma
- * @param Gp vector of group pointers
- * @param bnew current sample from the random effects
- * @param ST list of factorizations to update
- */
-static void
-internal_ST_update(double sigma, int trans, const int *Gp,
-		   const double *bnew, SEXP ST, double *dest)
-{
-    int i, j, k, info, nf = LENGTH(ST), pos = 0;
-    double one = 1, zero = 0, sigsq = sigma * sigma;
-    double sigsqinv = 1/sigsq;
-
-    for (i = 0; i < nf; i++) {
-	SEXP STi = VECTOR_ELT(ST, i);
-	double *st = REAL(STi), sd;
-	int nci = INTEGER(getAttrib(STi, R_DimSymbol))[0];
-	int nlev = (Gp[i + 1] - Gp[i])/nci;
-
-	if (nci == 1) {		/* fast update for scalar */
-	    double ssq = 0;
-	    for (j = 0; j < nlev; j++) ssq += bnew[Gp[i] + j] * bnew[Gp[i] + j];
-	    sd = sqrt(ssq/rchisq((double)nlev)) * st[0];
-	    st[0] = sd/sigma;
-	    dest[pos++] = (trans ? 2 * log(sd) : sd * sd);
-	} else {
-	    int ncip1 = nci + 1, ncisqr = nci * nci;
-	    double *scal = Calloc(ncisqr, double), /* factor of scale matrix */
-		*wfac = Calloc(ncisqr, double); /* factor of Wishart variate */
-				/* create the scale matrix (close to identity) */
-	    AZERO(scal, ncisqr);
-	    F77_CALL(dsyrk)("L", "N", &nci, &nlev, &sigsqinv, bnew + Gp[i], &nci,
-			    &zero, scal, &nci);
-	    F77_CALL(dpotrf)("L", &nci, scal, &nci, &info);
-	    if (info) error(_("Crossprod of b*[[%d]] not positive definite"), i + 1);
-	    for (i = 0; i < nci; i++) /* premultiply by S */
-		for (j = 0; j <= i; j++) scal[i + j * nci] *= st[i * ncip1];
-	    F77_CALL(dtrmm)("L", "L", "N", "U", /* premultiply by T */
-			    &nci, &nci, &one, st, &nci, scal, &nci);
-				/* generate (lower) random factor from std Wishart */
-	    std_rWishart_factor((double)(nlev - nci + 1), nci, 0, wfac);
-	    F77_CALL(dtrsm)("L", "L", "N", "N",/* form a scaled variance factor */
-			    &nci, &nci, &one, wfac, &nci, scal, &nci);
-	    Memcpy(st, scal, ncisqr);
-	    for (j = 0; j < nci; j++) { /* form the ST representation */
-		for (i = j + 1; i < nci ; i++)
-		    st[i + j * nci] /= st[j * ncip1];
-	    }
-				/* Overwrite wfac with variance-covariance */
-	    F77_CALL(dsyrk)("L", "N", &nci, &nci, &sigsq, scal, &nci,
-			    &zero, wfac, &nci);
-	    if (trans) {
-		for (j = 0; j < nci; j++) {
-		    double vj = wfac[j * ncip1]; /* jth variance */
-		    double sdj = sqrt(vj);
-
-		    for (k = 0; k < j; k++) /* jth row in lower tri */
-			wfac[k * nci + j] = atanh(wfac[k * nci + j]/sdj);
-		    for (k = j + 1; k < nci; k++)
-			wfac[j * nci + k] /= sdj; /* jth col in lower tri */
-		    wfac[j * ncip1] = log(vj);
-		}
-	    }
-	    for (j = 0; j < nci; j++) dest[pos++] = wfac[j * ncip1];
-	    for (j = 1; j < nci; j++) {
-		for (k = 0; k < j; k++)
-		    dest[pos++] = wfac[k * nci + j];
-	    }
-	    Free(scal); Free(wfac);
-	}
-    }
-}
-
-/**
- * Generate a Markov-Chain Monte Carlo sample from a fitted
- * linear mixed model.
- *
- * @param x pointer to an lmer object
- * @param savebp pointer to a logical scalar indicating if the
- * random-effects should be saved
- * @param nsampp pointer to an integer scalar of the number of samples
- * to generate
- * @param transp pointer to an logical scalar indicating if the
- * variance components should be transformed.
- *
- * @return a matrix
- */
-SEXP lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
-		  SEXP verbosep, SEXP deviancep)
-{
-    SEXP ST = GET_SLOT(x, lme4_STSym), Pars = PROTECT(ST_getPars(x)), ans;
-    CHM_FR L = L_SLOT(x);
-/*     CHM_SP Zt = AS_CHM_SP(GET_SLOT(x, lme4_ZtSym)), */
-/* 	Vt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym)); */
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)),
-	*Gp = INTEGER(GET_SLOT(x, lme4_GpSym));
-    int dPOS = dims[REML_POS] ? REML_POS : ML_POS, i, j,
-	n = dims[n_POS], nsamp = asInteger(nsampp),
-	p = dims[p_POS], q = dims[q_POS],
-	saveb = asLogical(savebp), trans = asLogical(transp),
-	verbose = asLogical(verbosep), dev = asLogical(deviancep);
-    int qpp1 = q + p + 1;
-    double
-	*deviance = REAL(GET_SLOT(x, lme4_devianceSym)),
-	*ansp, df = n - (dims[REML_POS] ? p : 0);
-    int nrbase = p + 1 + dims[np_POS]; /* rows always included */
-    int nrtot = nrbase + dev + (saveb ? q : 0);
-    CHM_DN chhat, chnew = M_cholmod_allocate_dense(qpp1, 1, qpp1, CHOLMOD_REAL, &c);
-    double *bstar = (double*) NULL, *nx = (double*)(chnew->x);
-
-    if (nsamp <= 0) nsamp = 1;
-    ans = PROTECT(allocMatrix(REALSXP, nrtot, nsamp));
-    ansp = REAL(ans);
-    for (i = 0; i < nrtot * nsamp; i++) ansp[i] = NA_REAL;
-    if (saveb) {bstar = Alloca(q, double); R_CheckStack();}
-    GetRNGstate();
-    if (verbose) Rprintf("%12s %14s\n", "sigma", "deviance");
-
-    for (i = 0; i < nsamp; i++) {
-	double *col = ansp + i * nrtot, sigma;
-				/* simulate and store new value of sigma */
-	sigma = exp(deviance[lpdisc_POS]/2)/sqrt(rchisq(df));
-	col[p] = (trans ? 2 * log(sigma) : sigma * sigma);
-	/* simulate new fixed and random effects */
-				/* Evaluate conditional estimates */
-	chhat = (CHM_DN)NULL; /* internal_lmer_effects(L); */
-	internal_betabst_update(sigma, L, chhat, chnew);
-	M_cholmod_free_dense(&chhat, &c);
-				/* Store beta */
-	for (j = 0; j < p; j++) col[j] = nx[q + j];
-	if (saveb) {		/* Optionally store b */
-	    TS_mult(Gp, ST, Memcpy(bstar, nx, q));
-	    for (j = 0; j < q; j++) col[nrbase + dev + j] = bstar[j];
-	}
-	internal_ST_update(sigma, trans, Gp, nx, ST, col + p + 1);
-				/* Refactor and evaluate deviance */
-	/* FIXME: This deviance should be for sigma, beta, b, ST */
-	if (dev) col[nrbase] = deviance[dPOS]; 
-	if (verbose) Rprintf("%12.6g %14.8g\n", sigma, deviance[dPOS]);
-    }
-    PutRNGstate();
-    M_cholmod_free_dense(&chnew, &c);
-				/* Restore pars, refactor, etc. */
-    ST_setPars(x, Pars);
-    UNPROTECT(2);
-    return ans;
-}
 
 /**
  * Create and initialize L
@@ -1837,7 +1552,7 @@ SEXP glmer_eta(SEXP x)
 {
     SEXP rho = GET_SLOT(x, lme4_envSym);
     SEXP etap = findVarInFrame(rho, lme4_etaSym),
-	moff = findVarInFrame(rho, lme4_offsetSym);
+	moff = GET_SLOT(x, lme4_offsetSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
     int ione = 1, n = dims[n_POS], p = dims[p_POS];
     double *eta = REAL(etap), one[] = {1,0};
@@ -1866,7 +1581,7 @@ SEXP glmer_eta(SEXP x)
 SEXP glmer_reweight(SEXP x)
 {
     SEXP rho = GET_SLOT(x, lme4_envSym);
-    SEXP moff = findVarInFrame(rho, lme4_offsetSym);
+    SEXP moff = GET_SLOT(x, lme4_offsetSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
     int i, n = dims[n_POS];
     double *eta = REAL(findVarInFrame(rho, lme4_etaSym)),
@@ -1878,7 +1593,8 @@ SEXP glmer_reweight(SEXP x)
     double *dmu_deta = Alloca(n, double), *var = Alloca(n, double);
     R_CheckStack();
 				/* initialize weights to prior wts */
-    Memcpy(w, REAL(findVarInFrame(rho, lme4_pwtsSym)), n); 
+    Memcpy(w, REAL(GET_SLOT(x, lme4_weightsSym)), n); 
+    glmer_eta(x);
     glmer_linkinv(x);		/* evaluate mu */
     glmer_dmu_deta(x, dmu_deta);
     glmer_var(x, var);
@@ -1951,10 +1667,69 @@ SEXP glmer_update_L(SEXP x)
     return ScalarReal(internal_glmer_update_L(x));
 }
 
-static void internal_gbhat(SEXP x)
+/**
+ * Iterate to determine the conditional modes of the random effects.
+ *
+ * @param x pointer to an glmer object
+ *
+ * @return An indicator of whether the iterations converged
+ */
+static int internal_gbhat(SEXP x)
 {
-    internal_glmer_update_L(x);
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), i, j;
+    int n = dims[n_POS], q = dims[q_POS];
+    CHM_FR L = L_SLOT(x);
+    CHM_DN cz = M_cholmod_allocate_dense(n, 1, n, CHOLMOD_REAL, &c),
+	cu, cVtz = M_cholmod_allocate_dense(q, 1, q, CHOLMOD_REAL, &c);
+    CHM_SP Vt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
+    double *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
+	*u = REAL(GET_SLOT(x, lme4_uvecSym)),
+	*uold = Alloca(q, double), *z = ((double*)(cz->x)),
+	crit = IRLS_TOL + 1, dn = (double)n, one[] = {1,0}, zero[] = {0,0};
+    R_CheckStack();
+
+    mer_update_Vt(x);
+    Memcpy(uold, u, q);
+    for (i = 0; i < IRLS_MAXITER && crit > IRLS_TOL; i++) {
+	glmer_reweight(x);
+
+	dev[lpdisc_POS] = internal_nlmer_eval_model(x, 1);
+	for (j = 0, dev[bqd_POS] = 0; j < q; j++) dev[bqd_POS] += u[j] * u[j];
+#ifdef DEBUG_NLMER
+	Rprintf("%3d: %20.15g %20.15g %20.15g\n", i, dev[lpdisc_POS], dev[bqd_POS],
+		dev[lpdisc_POS] + dev[bqd_POS]);
+#endif
+
+	j = c.final_ll;
+	c.final_ll = L->is_ll;
+	if (!M_cholmod_factorize_p(Vt, one, (int*) NULL, 0, L, &c))
+	    error(_("cholmod_factorize_p failed: status %d, minor %d from ncol %d"),
+		  c.status, L->minor, L->n);
+	c.final_ll = j;
+	internal_nlmer_update_wrkres(x, z);
+	if (!(j = M_cholmod_sdmult(Vt, 0 /* trans */, one, zero, cz, cVtz, &c)))
+	    error(_("cholmod_sdmult returned error code %d"), j);
+	if (!(cu = M_cholmod_solve(CHOLMOD_A, L, cVtz, &c)))
+	    error(_("cholmod_solve (CHOLMOD_A) failed: status %d, minor %d from ncol %d"),
+	      c.status, L->minor, L->n);
+	Memcpy(u, (double*)(cu->x), q);
+	M_cholmod_free_dense(&cu, &c); 
+/* FIXME: replace this by an orthogonality convergence criterion */
+ 	crit = conv_crit(uold, u, q);
+    }
+    dev[lpdisc_POS] = log(dev[lpdisc_POS] + dev[bqd_POS]);
+    dev[ldL2_POS] = chm_log_det2(L);
+    dev[ML_POS] = dev[REML_POS] =
+	dev[ldL2_POS] + dn * (1. + dev[lpdisc_POS] + log(2. * PI / dn));
+
+    M_cholmod_free_dense(&cu, &c); M_cholmod_free_dense(&cVtz, &c);
+    return (crit > IRLS_TOL) ? 0 : i;
 }
+
+SEXP glmer_bhat(SEXP x) {
+    return ScalarInteger(internal_nbhat(x));
+}
+
 
 /* Functions common to all three forms of mixed models */
 
@@ -1987,7 +1762,7 @@ update_deviance(SEXP x, const double *xv, int mtype)
 	internal_nbhat(x);
 	break;
     }
-    case 2: {
+    case 2: {		/* generalized linear mixed model */
 	Memcpy(REAL(GET_SLOT(x, lme4_fixefSym)),
 	       xv + dims[np_POS], dims[p_POS]);
 	internal_gbhat(x);
@@ -2048,6 +1823,276 @@ mer_optimize(SEXP x, SEXP verbp, SEXP mtypep)
     }
     i = iv[0];
     return ScalarInteger(i);
+}
+
+/* MCMC sampling functions */
+
+/**
+ * Update the coefficients beta and bstar given the current L
+ *
+ * @param sigma current standard deviation of the noise term
+ * @param L current factorization of A*
+ * @param bbsthat current conditional modes
+ * @param bbstnew array to receive updated coefficients
+ *
+ * @return squared length of spherical Gaussian deviate
+ */
+static double
+internal_betabst_update(double sigma, CHM_FR L, CHM_DN bbsthat,
+		       CHM_DN bbstnew)
+{
+    int i, ppq1 = L->n;
+    int ppq = ppq1 - 1;
+    double *bx, *hx = (double*)(bbsthat->x),
+	*nx = (double*)(bbstnew->x), ans = 0;
+    CHM_DN chb;
+
+    nx[ppq] = 0.;
+    for (i = 0; i < ppq; i++) {
+	double nr = norm_rand();
+	ans += nr * nr;
+	nx[i] = sigma * nr;
+    }
+    				/* chb := L^{-T} %*% bnew */
+    chb = M_cholmod_solve(CHOLMOD_Lt, L, bbstnew, &c);
+    bx = (double*)(chb->x);
+    for (i = 0; i < ppq; i++) nx[i] = bx[i] + hx[i];
+    M_cholmod_free_dense(&chb, &c);
+
+    return ans;
+}
+
+/**
+ * Simulate the Cholesky factor of a standardized Wishart variate with
+ * dimension p and df degrees of freedom.
+ *
+ * @param df degrees of freedom
+ * @param p dimension of the Wishart distribution
+ * @param upper if 0 the result is lower triangular, otherwise upper
+                triangular
+ * @param ans array of size p * p to hold the result
+ *
+ * @return ans
+ */
+static double
+*std_rWishart_factor(double df, int p, int upper, double ans[])
+{
+    int i, j, pp1 = p + 1;
+
+    if (df < (double) p || p <= 0)
+	error("inconsistent degrees of freedom and dimension");
+    for (j = 0; j < p; j++) {	/* jth column */
+	ans[j * pp1] = sqrt(rchisq(df - (double) j));
+	for (i = 0; i < j; i++) {
+	    int uind = i + j * p, /* upper triangle index */
+		lind = j + i * p; /* lower triangle index */
+	    ans[(upper ? uind : lind)] = norm_rand();
+	    ans[(upper ? lind : uind)] = 0;
+	}
+    }
+    return ans;
+}
+
+/**
+ * Simulate a sample of random matrices from a Wishart distribution
+ *
+ * @param ns Number of samples to generate
+ * @param dfp Degrees of freedom
+ * @param scal Positive-definite scale matrix
+ *
+ * @return
+ */
+SEXP
+lme4_rWishart(SEXP ns, SEXP dfp, SEXP scal)
+{
+    SEXP ans;
+    int *dims = INTEGER(getAttrib(scal, R_DimSymbol)), j,
+	n = asInteger(ns), psqr;
+    double *scCp, *ansp, *tmp, df = asReal(dfp), one = 1, zero = 0;
+
+    if (!isMatrix(scal) || !isReal(scal) || dims[0] != dims[1])
+	error("scal must be a square, real matrix");
+    if (n <= 0) n = 1;
+    psqr = dims[0] * dims[0];
+    tmp = Alloca(psqr, double);
+    scCp = Alloca(psqr, double);
+    R_CheckStack();
+
+    Memcpy(scCp, REAL(scal), psqr);
+    AZERO(tmp, psqr);
+    F77_CALL(dpotrf)("U", &(dims[0]), scCp, &(dims[0]), &j);
+    if (j)
+	error("scal matrix is not positive-definite");
+    PROTECT(ans = alloc3Darray(REALSXP, dims[0], dims[0], n));
+    ansp = REAL(ans);
+    GetRNGstate();
+    for (j = 0; j < n; j++) {
+	double *ansj = ansp + j * psqr;
+	std_rWishart_factor(df, dims[0], 1, tmp);
+	F77_CALL(dtrmm)("R", "U", "N", "N", dims, dims,
+			&one, scCp, dims, tmp, dims);
+	F77_CALL(dsyrk)("U", "T", &(dims[1]), &(dims[1]),
+			&one, tmp, &(dims[1]),
+			&zero, ansj, &(dims[1]));
+	internal_symmetrize(ansj, dims[0]);
+    }
+
+    PutRNGstate();
+    UNPROTECT(1);
+    return ans;
+}
+
+/**
+ * Update the relative variance-covariance matrices by sampling from a
+ * Wishart distribution with scale factor determined by the current
+ * sample of random effects.
+ *
+ * @param sigma current value of sigma
+ * @param Gp vector of group pointers
+ * @param bnew current sample from the random effects
+ * @param ST list of factorizations to update
+ */
+static void
+internal_ST_update(double sigma, int trans, const int *Gp,
+		   const double *bnew, SEXP ST, double *dest)
+{
+    int i, j, k, info, nf = LENGTH(ST), pos = 0;
+    double one = 1, zero = 0, sigsq = sigma * sigma;
+    double sigsqinv = 1/sigsq;
+
+    for (i = 0; i < nf; i++) {
+	SEXP STi = VECTOR_ELT(ST, i);
+	double *st = REAL(STi), sd;
+	int nci = INTEGER(getAttrib(STi, R_DimSymbol))[0];
+	int nlev = (Gp[i + 1] - Gp[i])/nci;
+
+	if (nci == 1) {		/* fast update for scalar */
+	    double ssq = 0;
+	    for (j = 0; j < nlev; j++) ssq += bnew[Gp[i] + j] * bnew[Gp[i] + j];
+	    sd = sqrt(ssq/rchisq((double)nlev)) * st[0];
+	    st[0] = sd/sigma;
+	    dest[pos++] = (trans ? 2 * log(sd) : sd * sd);
+	} else {
+	    int ncip1 = nci + 1, ncisqr = nci * nci;
+	    double *scal = Calloc(ncisqr, double), /* factor of scale matrix */
+		*wfac = Calloc(ncisqr, double); /* factor of Wishart variate */
+				/* create the scale matrix (close to identity) */
+	    AZERO(scal, ncisqr);
+	    F77_CALL(dsyrk)("L", "N", &nci, &nlev, &sigsqinv, bnew + Gp[i], &nci,
+			    &zero, scal, &nci);
+	    F77_CALL(dpotrf)("L", &nci, scal, &nci, &info);
+	    if (info) error(_("Crossprod of b*[[%d]] not positive definite"), i + 1);
+	    for (i = 0; i < nci; i++) /* premultiply by S */
+		for (j = 0; j <= i; j++) scal[i + j * nci] *= st[i * ncip1];
+	    F77_CALL(dtrmm)("L", "L", "N", "U", /* premultiply by T */
+			    &nci, &nci, &one, st, &nci, scal, &nci);
+				/* generate (lower) random factor from std Wishart */
+	    std_rWishart_factor((double)(nlev - nci + 1), nci, 0, wfac);
+	    F77_CALL(dtrsm)("L", "L", "N", "N",/* form a scaled variance factor */
+			    &nci, &nci, &one, wfac, &nci, scal, &nci);
+	    Memcpy(st, scal, ncisqr);
+	    for (j = 0; j < nci; j++) { /* form the ST representation */
+		for (i = j + 1; i < nci ; i++)
+		    st[i + j * nci] /= st[j * ncip1];
+	    }
+				/* Overwrite wfac with variance-covariance */
+	    F77_CALL(dsyrk)("L", "N", &nci, &nci, &sigsq, scal, &nci,
+			    &zero, wfac, &nci);
+	    if (trans) {
+		for (j = 0; j < nci; j++) {
+		    double vj = wfac[j * ncip1]; /* jth variance */
+		    double sdj = sqrt(vj);
+
+		    for (k = 0; k < j; k++) /* jth row in lower tri */
+			wfac[k * nci + j] = atanh(wfac[k * nci + j]/sdj);
+		    for (k = j + 1; k < nci; k++)
+			wfac[j * nci + k] /= sdj; /* jth col in lower tri */
+		    wfac[j * ncip1] = log(vj);
+		}
+	    }
+	    for (j = 0; j < nci; j++) dest[pos++] = wfac[j * ncip1];
+	    for (j = 1; j < nci; j++) {
+		for (k = 0; k < j; k++)
+		    dest[pos++] = wfac[k * nci + j];
+	    }
+	    Free(scal); Free(wfac);
+	}
+    }
+}
+
+/**
+ * Generate a Markov-Chain Monte Carlo sample from a fitted
+ * linear mixed model.
+ *
+ * @param x pointer to an lmer object
+ * @param savebp pointer to a logical scalar indicating if the
+ * random-effects should be saved
+ * @param nsampp pointer to an integer scalar of the number of samples
+ * to generate
+ * @param transp pointer to an logical scalar indicating if the
+ * variance components should be transformed.
+ *
+ * @return a matrix
+ */
+SEXP lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
+		  SEXP verbosep, SEXP deviancep)
+{
+    SEXP ST = GET_SLOT(x, lme4_STSym), Pars = PROTECT(ST_getPars(x)), ans;
+    CHM_FR L = L_SLOT(x);
+/*     CHM_SP Zt = AS_CHM_SP(GET_SLOT(x, lme4_ZtSym)), */
+/* 	Vt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym)); */
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)),
+	*Gp = INTEGER(GET_SLOT(x, lme4_GpSym));
+    int dPOS = dims[REML_POS] ? REML_POS : ML_POS, i, j,
+	n = dims[n_POS], nsamp = asInteger(nsampp),
+	p = dims[p_POS], q = dims[q_POS],
+	saveb = asLogical(savebp), trans = asLogical(transp),
+	verbose = asLogical(verbosep), dev = asLogical(deviancep);
+    int qpp1 = q + p + 1;
+    double
+	*deviance = REAL(GET_SLOT(x, lme4_devianceSym)),
+	*ansp, df = n - (dims[REML_POS] ? p : 0);
+    int nrbase = p + 1 + dims[np_POS]; /* rows always included */
+    int nrtot = nrbase + dev + (saveb ? q : 0);
+    CHM_DN chhat, chnew = M_cholmod_allocate_dense(qpp1, 1, qpp1, CHOLMOD_REAL, &c);
+    double *bstar = (double*) NULL, *nx = (double*)(chnew->x);
+
+    if (nsamp <= 0) nsamp = 1;
+    ans = PROTECT(allocMatrix(REALSXP, nrtot, nsamp));
+    ansp = REAL(ans);
+    for (i = 0; i < nrtot * nsamp; i++) ansp[i] = NA_REAL;
+    if (saveb) {bstar = Alloca(q, double); R_CheckStack();}
+    GetRNGstate();
+    if (verbose) Rprintf("%12s %14s\n", "sigma", "deviance");
+
+    for (i = 0; i < nsamp; i++) {
+	double *col = ansp + i * nrtot, sigma;
+				/* simulate and store new value of sigma */
+	sigma = exp(deviance[lpdisc_POS]/2)/sqrt(rchisq(df));
+	col[p] = (trans ? 2 * log(sigma) : sigma * sigma);
+	/* simulate new fixed and random effects */
+				/* Evaluate conditional estimates */
+	chhat = (CHM_DN)NULL; /* internal_lmer_effects(L); */
+	internal_betabst_update(sigma, L, chhat, chnew);
+	M_cholmod_free_dense(&chhat, &c);
+				/* Store beta */
+	for (j = 0; j < p; j++) col[j] = nx[q + j];
+	if (saveb) {		/* Optionally store b */
+	    TS_mult(Gp, ST, Memcpy(bstar, nx, q));
+	    for (j = 0; j < q; j++) col[nrbase + dev + j] = bstar[j];
+	}
+	internal_ST_update(sigma, trans, Gp, nx, ST, col + p + 1);
+				/* Refactor and evaluate deviance */
+	/* FIXME: This deviance should be for sigma, beta, b, ST */
+	if (dev) col[nrbase] = deviance[dPOS]; 
+	if (verbose) Rprintf("%12.6g %14.8g\n", sigma, deviance[dPOS]);
+    }
+    PutRNGstate();
+    M_cholmod_free_dense(&chnew, &c);
+				/* Restore pars, refactor, etc. */
+    ST_setPars(x, Pars);
+    UNPROTECT(2);
+    return ans;
 }
 
 #if 0
@@ -2219,4 +2264,48 @@ SEXP nlmer_create(SEXP env, SEXP model, SEXP frame, SEXP pnames,
     UNPROTECT(1);
     return ans;
 }
+
+
+/**
+ * Extract the conditional modes of the random effects as a list of matrices
+ *
+ * @param x Pointer to an mer object
+ *
+ * @return a list of matrices containing the conditional modes of the
+ * random effects
+ */
+SEXP lmer_ranef(SEXP x)
+{
+    SEXP ST = GET_SLOT(x, lme4_STSym),
+        cnames = GET_SLOT(x, lme4_cnamesSym),
+	flist = GET_SLOT(x, lme4_flistSym);
+    int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym)),
+	i, ii, jj, nf = LENGTH(flist);
+    SEXP val = PROTECT(allocVector(VECSXP, nf));
+    double *b = REAL(GET_SLOT(x, lme4_ranefSym));
+
+    lmer_update_effects(x);
+    setAttrib(val, R_NamesSymbol,
+	      duplicate(getAttrib(flist, R_NamesSymbol)));
+    for (i = 0; i < nf; i++) {
+	SEXP nms, rnms = getAttrib(VECTOR_ELT(flist, i), R_LevelsSymbol);
+	int nci = INTEGER(getAttrib(VECTOR_ELT(ST, i), R_DimSymbol))[0];
+	int mi = length(rnms);
+	double *bi = b + Gp[i], *mm;
+
+	SET_VECTOR_ELT(val, i, allocMatrix(REALSXP, mi, nci));
+	setAttrib(VECTOR_ELT(val, i), R_DimNamesSymbol, allocVector(VECSXP, 2));
+	nms = getAttrib(VECTOR_ELT(val, i), R_DimNamesSymbol);
+	SET_VECTOR_ELT(nms, 0, duplicate(rnms));
+	SET_VECTOR_ELT(nms, 1, duplicate(VECTOR_ELT(cnames, i)));
+	mm = REAL(VECTOR_ELT(val, i));
+	for (jj = 0; jj < nci; jj++)
+	    for(ii = 0; ii < mi; ii++)
+		mm[ii + jj * mi] = bi[jj + ii * nci];
+    }
+    UNPROTECT(1);
+    return val;
+}
+
+
 #endif

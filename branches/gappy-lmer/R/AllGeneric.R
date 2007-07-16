@@ -13,9 +13,6 @@ setGeneric("gsummary",
 
 setGeneric("isNested", function(x, ...) standardGeneric("isNested"))
 
-setGeneric("LMEoptimize<-", function(x, ..., value)
-           standardGeneric("LMEoptimize<-"))
-
 setGeneric("fixef", function(object, ...) standardGeneric("fixef"))
 
 setGeneric("denomDF", function(x, ...) standardGeneric("denomDF"))
@@ -48,8 +45,6 @@ setMethod("BIC", "logLik",
 setGeneric("VarCorr", function(x, ...) standardGeneric("VarCorr"))
 
 setGeneric("postVar", function(object, ...) standardGeneric("postVar"))
-
-setGeneric("gradient", function(x, ...) standardGeneric("gradient"))
 
 setGeneric("getFixDF", function(object, ...) standardGeneric("getFixDF"))
 
