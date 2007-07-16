@@ -323,7 +323,7 @@ SEXP lmer_update_L(SEXP x)
 }
 
 /**
- * Multiply a dense matrix by the virtual T and S matrices represented by ST
+ * Multiply a vector by the virtual T and S matrices represented by ST
  *
  * @param Gp vector of group pointers
  * @param ST compounded matrices S* and T*
