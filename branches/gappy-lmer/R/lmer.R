@@ -283,7 +283,8 @@ mkdims <- function(fr, FL, start)
 
     list(Gp = Gp, ST = ST, Vt = Vt, Zt = Zt,
          cnames = cnames, dd = dd,
-         dev = VecFromNames(c("ML", "REML", "ldL2", "ldRX2", "lpdisc", "bqd"),
+         dev = VecFromNames(
+         c("ML", "REML", "ldL2", "ldRX2", "lpdisc", "disc", "bqd"),
          "numeric"), flist = flist)
 }
 
@@ -428,8 +429,6 @@ function(formula, data, family = gaussian, method = c("Laplace", "AGQ"),
                fixef = coef(glmFit),
                ranef = numeric(dm$dd["q"]),
                uvec = numeric(dm$dd["q"]))
-    .Call(mer_update_Vt, ans)
-    .Call(glmer_reweight, ans)
     cv <- do.call("lmerControl", control)
     if (missing(verbose)) verbose <- cv$msVerbose
 #    .Call(mer_optimize, ans, verbose, 2)
@@ -558,7 +557,7 @@ setMethod("fixef", signature(object = "mer"),
 ### Extract the fixed effects
           object@fixef)
 
-setMethod("ranef", signature(object = "lmer"),
+setMethod("ranef", signature(object = "mer"),
 	  function(object, postVar = FALSE, ...)
 ### Extract the random effects
 ### FIXME: This will need to be modified if flist is collapsed
