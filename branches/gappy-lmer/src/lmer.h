@@ -8,11 +8,10 @@ SEXP ST_getPars(SEXP x);
 SEXP ST_initialize(SEXP ST, SEXP Gp, SEXP Zt);
 SEXP ST_setPars(SEXP x, SEXP pars);
 
+SEXP glmer_condMode(SEXP x);
 SEXP glmer_dev_resids(SEXP x);
 SEXP glmer_eta(SEXP x);
 SEXP glmer_linkinv(SEXP x);
-SEXP glmer_reweight(SEXP x);
-SEXP glmer_update_L(SEXP x);
 SEXP glmer_validate(SEXP x);
 
 SEXP lme4_rWishart(SEXP ns, SEXP dfp, SEXP scal);

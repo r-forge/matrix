@@ -13,11 +13,10 @@ static R_CallMethodDef CallEntries[] = {
     {"ST_initialize", (DL_FUNC) &ST_initialize, 3},
     {"ST_setPars", (DL_FUNC) &ST_setPars, 2},
 
+    {"glmer_condMode", (DL_FUNC) &glmer_condMode, 1},
     {"glmer_dev_resids", (DL_FUNC) &glmer_dev_resids, 1},
     {"glmer_eta", (DL_FUNC) &glmer_eta, 1},
     {"glmer_linkinv", (DL_FUNC) &glmer_linkinv, 1},
-    {"glmer_reweight", (DL_FUNC) &glmer_reweight, 1},
-    {"glmer_update_L", (DL_FUNC) &glmer_update_L, 1},
     {"glmer_validate", (DL_FUNC) &glmer_validate, 1},
 
     {"lme4_rWishart", (DL_FUNC) &lme4_rWishart, 3},
