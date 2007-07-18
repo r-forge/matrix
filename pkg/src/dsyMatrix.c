@@ -94,7 +94,7 @@ SEXP dsyMatrix_matrix_solve(SEXP a, SEXP b)
     return val;
 }
 
-SEXP dsyMatrix_as_matrix(SEXP from)
+SEXP dsyMatrix_as_matrix(SEXP from, SEXP keep_dimnames)
 {
     int n = INTEGER(GET_SLOT(from, Matrix_DimSym))[0];
     SEXP val = PROTECT(allocMatrix(REALSXP, n, n));
@@ -102,7 +102,8 @@ SEXP dsyMatrix_as_matrix(SEXP from)
     make_d_matrix_symmetric(Memcpy(REAL(val),
 				   REAL(GET_SLOT(from, Matrix_xSym)), n * n),
 			    from);
-    setAttrib(val, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
+    if(asLogical(keep_dimnames))
+	setAttrib(val, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
     UNPROTECT(1);
     return val;
 }

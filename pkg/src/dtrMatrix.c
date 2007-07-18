@@ -109,7 +109,7 @@ SEXP dtrMatrix_matrix_mm(SEXP a, SEXP b, SEXP right)
     return val;
 }
 
-SEXP dtrMatrix_as_matrix(SEXP from)
+SEXP dtrMatrix_as_matrix(SEXP from, SEXP keep_dimnames)
 {
     int *Dim = INTEGER(GET_SLOT(from, Matrix_DimSym));
     int m = Dim[0], n = Dim[1];
@@ -117,7 +117,8 @@ SEXP dtrMatrix_as_matrix(SEXP from)
     make_d_matrix_triangular(Memcpy(REAL(val),
 				    REAL(GET_SLOT(from, Matrix_xSym)), m * n),
 			     from);
-    setAttrib(val, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
+    if(asLogical(keep_dimnames))
+	setAttrib(val, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
     UNPROTECT(1);
     return val;
 }

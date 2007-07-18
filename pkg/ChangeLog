@@ -1,3 +1,36 @@
+2007-07-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* man/dpoMatrix-class.Rd: added 'corMatrix' example
+
+	* src/dsyMatrix.[ch] (dsyMatrix_as_matrix): new 'keep_dimnames' arg
+	* src/dtrMatrix.[ch] (dtrMatrix_as_matrix): ditto
+	* src/init.c, R/dsyMatrix.R, R/dtrMatrix.R, R/lgTMatrix.R: ditto
+
+	* R/lsparseMatrix.R: bug fix in "all" method
+	* R/Ops.R (.do.Logic.lsparse): "|" bug in borderline case
+
+	* R/dsyMatrix.R (coerce->dsTMatrix): (i,j) slots should *not* have names
+	* R/ngTMatrix.R (coerce->ngTMatrix): ditto;
+		+ matrix |-> nMatrix coercion
+	* R/pMatrix.R: + setAs()  to dMatrix and from nMatrix
+	* man/pMatrix-class.Rd: ditto
+
+	* R/Matrix.R (Summary): method for non-dMatrix
+
+	* tests/Class+Meth.R (extraValid): new check about "dirty" slots
+	* tests/Class+Meth.R (tstMatrixClass): test norm(.);
+		test all Summary methods.
+
+2007-07-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dgeMatrix.R (norm, rcond): methods for 'matrix'
+
+2007-07-14  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (norm): simple methods for sparseMatrix
+
+	* R/pMatrix.R (t?crossprod): methods for pMatrix
+
 2007-07-10  Douglas Bates  <bates@stat.wisc.edu>
 
 	* src/dgeMatrix.c (dgeMatrix_colsums): Get the logic straight.
@@ -5,7 +38,7 @@
 2007-07-09 20:45  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r4579] src/dgeMatrix.c: Untangle horrible code in dgeMatrix_colsums
-	  to fix a subtle bug (Kurt Hornik and Ingo Feinerer)
+	  trying to fix a subtle bug - which has been somewhere else.
 
 2007-07-09 19:43  Martin Maechler <maechler@stat.math.ethz.ch>
 

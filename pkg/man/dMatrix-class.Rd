@@ -20,7 +20,7 @@
 \alias{Compare,numeric,dMatrix-method}
 \alias{Logic,logical,lMatrix-method}
 \alias{Logic,lMatrix,logical-method}
-\alias{Summary,dMatrix-method}
+%\alias{Summary,dMatrix-method}
 \alias{Math2,dMatrix,numeric-method}% Math2 = round + signif, but
 \alias{Math2,dMatrix,missing-method}
 % for silly reasons, need these 2+3 as well:

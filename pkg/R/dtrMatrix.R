@@ -24,7 +24,7 @@ setAs("dtrMatrix", "CsparseMatrix", .dense2C)
 
 ## needed for t() method
 setAs("dtrMatrix", "matrix",
-      function(from) .Call(dtrMatrix_as_matrix, from))
+      function(from) .Call(dtrMatrix_as_matrix, from, TRUE))
 
 setAs("matrix", "dtrMatrix",
       function(from) as(.Call(dup_mMatrix_as_dgeMatrix, from), "dtrMatrix"))
