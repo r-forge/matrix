@@ -17,58 +17,53 @@ setOldClass("terms")
 setClass("mer", ## Slots common to all three types of mixed models
 	 representation(## original data
                         frame = "data.frame", # model frame or empty frame
-                        call = "call",      # matched call to model-fitting function
+                        call = "call", # matched call to model-fitting function
                         terms = "terms",    # terms for fixed-effects
 			flist = "list",     # list of grouping factors
+                        X = "matrix", # model matrix for fixed effects (may have 0 rows in lmer only)
 			Zt = "dgCMatrix",   # sparse form of Z'
-			weights = "numeric",# can be of length 0 for constant wts
+			weights = "numeric", # can be of length 0 for constant wts
+                        offset = "numeric", # can be length 0 (for no offset)
                         y = "numeric",      # response vector
-			cnames = "list",    # row/column names of matrices in ST
-			Gp = "integer",     # pointers to groups of rows in Zt
-                        dims = "integer",   # dimensions and indicators
+			cnames = "list", # row/column names of matrices in ST
+			Gp = "integer", # pointers to groups of rows in Zt
+                        dims = "integer", # dimensions and indicators
                         ## slots that vary during optimization
-			ST = "list",        # list of TSST' rep of rel. var. mats
-			L = "CHMfactor",    # sparse Cholesky factor of V'V + I
+			ST = "list", # list of TSST' rep of rel. var. mats
+			L = "CHMfactor", # sparse Cholesky factor of V'V + I
+			Vt = "dgCMatrix",   # sparse form of V'=(ZTS)'
 			deviance = "numeric", # ML and REML deviance and components
-			fixef = "numeric",  # fixed effects coefficients (length p)
-			ranef = "numeric",  # random effects (length q)
+			fixef = "numeric", # fixed effects coefficients (length p)
+			ranef = "numeric", # random effects (length q)
                         uvec = "numeric",  # orthogonal random effects (length q)
                         "VIRTUAL"),
          validity = function(object) .Call(mer_validate, object))
 
 setClass("lmer", ## linear mixed models
 	 representation(## original data
-                        X = "matrix",       # model matrix for fixed effects (may have 0 rows)
-                        ZtXy = "matrix",    # dense form of Z'[X:y]
-                        XytXy = "matrix",   # dense form of [X:y]'[X:y]
-                        offset = "numeric", # can be length 0 (for no offset)
+                        ZtXy = "matrix",  # dense form of Z'[X:y]
+                        XytXy = "matrix", # dense form of [X:y]'[X:y]
                         ## slots that vary during optimization
-                        RXy = "matrix",     # dense Cholesky factor of downdated XytXy
-                        RVXy = "matrix",   # dense solution to L RVXy = S T'ZtXy
-			Vt = "dgCMatrix"),   # sparse form of V'=(ZTS)'
+                        RXy = "matrix", # dense Cholesky factor of downdated XytXy
+                        RVXy = "matrix"), # dense solution to L RVXy = S T'ZtXy
          contains = "mer",
          validity = function(object) .Call(lmer_validate, object))
 
 setClass("glmer", ## generalized linear mixed models
 	 representation(## original data
-                        env = "environment",# evaluation environment for the family functions
-                        famName = "character",# name of generalized linear model family and link
-                        X = "matrix",       # model matrix for fixed effects
-                        offset = "numeric", # can be length 0 (for no offset)
-                        ## slots that vary during optimization
-			Vt = "dgCMatrix"),   # sparse form of V'=(ZTS)'
+                        env = "environment", # evaluation env for family
+                        famName = "character"), # name of GLM family and link
          contains = "mer",
          validity = function(object) .Call(glmer_validate, object))
 
 setClass("nlmer", ## nonlinear mixed models
 	 representation(## original data
-                        env = "environment",# evaluation environment for model
-                        model = "call",     # nonlinear model
+                        env = "environment", # evaluation environment for model
+                        model = "call",      # nonlinear model
                         pnames = "character", # parameter names for nonlinear model
-                        Xt = "dgCMatrix",   # sparse form of X'
                         ## slots that vary during optimization
-                        mu = "numeric",     # fitted values at current values of beta and b
-                        Mt = "dgCMatrix"),   # transpose of gradient matrix d mu/d u
+                        mu = "numeric", # fitted values at current values of beta and b
+                        Mt = "dgCMatrix"), # transpose of gradient matrix d mu/d u
          contains = "mer",
          validity = function(object) .Call(nlmer_validate, object))
 
