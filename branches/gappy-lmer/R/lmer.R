@@ -275,7 +275,7 @@ mkdims <- function(fr, FL, start)
     ST <- lapply(nc, function(n) matrix(0, n, n))
     .Call(ST_initialize, ST, Gp, Zt)
     if (!is.null(start) && checkSTform(ST, start)) ST <- start
-    Vt <- .Call(mer_create_Vt, Zt, ST, Gp, 1L)
+    Vt <- .Call(mer_create_Vt, Zt, ST, Gp)
 
     ## record dimensions and algorithm settings
     dd <-
@@ -441,7 +441,7 @@ nlmer <- function(formula, data, control = list(), start = NULL,
                   contrasts = NULL, model = TRUE, ...)
 ### Fit a nonlinear mixed-effects model
 {
-    warning("nlmer is in development.  Results reported here are wrong.")
+    ##    warning("nlmer is in development.  Results reported here are wrong.")
     mc <- match.call()
     formula <- as.formula(formula)
     if (length(formula) < 3) stop("formula must be a 3-part formula")
@@ -484,35 +484,41 @@ nlmer <- function(formula, data, control = list(), start = NULL,
     FL <- lmerFactorList(substitute(foo ~ bar, list(foo = nlform[[2]], bar = formula[[3]])),
                          mf, TRUE, TRUE)
     dm <- mkdims(fr, FL, start$STpars)
+    dm$dd["s"] <- s
+    dm$dd["ftyp"] <- -1L              # gaussian family, identity link
+    dm$dd["p"] <- length(start$fixed)
 
-    Xt <- t(Matrix(as.matrix(mf[,pnames]), sparse = TRUE))
-    xnms <- colnames(fr$X)
-    if (!is.na(icol <- match("(Intercept)",xnms))) xnms <- xnms[-icol]
-    Xt@Dimnames[[2]] <- NULL
+### FIXME: Probably store X as a dense matrix.  Sparse storage may actually be larger.
+### Then the X slot can be moved from the lmer and glmer representations to mer.
+    X <- as.matrix(mf[,pnames])
+    rownames(X) <- NULL
+
 ### FIXME: The only times there would be additional columns in the
 ### fixed effects would be as interactions with parameter names and
 ### they must be constructed differently
+    xnms <- colnames(fr$X)
+    if (!is.na(icol <- match("(Intercept)",xnms))) xnms <- xnms[-icol]
     if (length(xnms) > 0)
         Xt <- rBind(Xt, t(Matrix(fr$X[rep.int(seq_len(n), s), xnms, drop = FALSE])))
 
-    Mt <- .Call(mer_create_Vt, Zt, ST, Gp, s)
-
+    Mt <- .Call(nlmer_create_Mt, dm$Vt, s)
     ans <- new("nlmer",
-               env = env, model = nlmod, pnames = pnames, Xt = Xt,
-               mu = numeric(dm$dd['n']), Mt = Mt,
+               env = env, model = nlmod, pnames = pnames,
+               mu = numeric(dm$dd["n"]), Mt = Mt,
                frame = if (model) fr$mf else fr$mf[0,],
-               call = mc, terms = fr$mt, flist = dm$flist,
-               Zt = dm$Zt, y = unname(as.double(fr$Y)),
+               call = mc, terms = fr$mt, flist = dm$flist, X = X,
+               Zt = dm$Zt, Vt = dm$Vt, y = unname(as.double(fr$Y)),
                weights = unname(fr$wts), 
                cnames = unname(dm$cnames), Gp = unname(dm$Gp),
                dims = dm$dd, ST = dm$ST,
-               L = .Call(mer_create_L, dm$Mt),
-               deviance = dm$dev, fixef = fixef,
+               L = .Call(mer_create_L, Mt),
+               deviance = dm$dev, fixef = start$fixed,
                ranef = numeric(dm$dd["q"]),
                uvec = numeric(dm$dd["q"]))
+    .Call(nlmer_eval_model, ans)
     cv <- do.call("lmerControl", control)
     if (missing(verbose)) verbose <- cv$msVerbose
-#    .Call(mer_optimize, ans, verbose, 1)
+#    .Call(mer_optimize, ans, verbose, 1L)
     ans
 }
 
@@ -651,12 +657,11 @@ setMethod("anova", signature(object = "lmer"),
 	      return(val)
 	  }
 	  else { ## ------ single model ---------------------
-	      foo <- object
-	      ss <- foo@rXy^2
-	      ssr <- exp(foo@devComp["logryy2"])
-	      names(ss) <- object@cnames[[".fixed"]]
-	      asgn <- attr(foo@X, "assign")
-	      terms <- foo@terms
+              p <- object@dims["p"]
+	      ss <- (object@RXy[seq_len(p), p + 1L, drop = TRUE])^2
+	      names(ss) <- names(object@fixef)
+	      asgn <- attr(object@X, "assign")
+	      terms <- terms(object)
 	      nmeffects <- attr(terms, "term.labels")
 	      if ("(Intercept)" %in% names(ss))
 		  nmeffects <- c("(Intercept)", nmeffects)
@@ -664,14 +669,14 @@ setMethod("anova", signature(object = "lmer"),
 	      df <- unlist(lapply(split(asgn,  asgn), length))
 	      #dfr <- unlist(lapply(split(dfr, asgn), function(x) x[1]))
 	      ms <- ss/df
-	      #f <- ms/(ssr/dfr)
+	      f <- ms/(.Call(mer_sigma, object, 0L)^2)
 	      #P <- pf(f, df, dfr, lower.tail = FALSE)
 	      #table <- data.frame(df, ss, ms, dfr, f, P)
-	      table <- data.frame(df, ss, ms)
+	      table <- data.frame(df, ss, ms, f)
 	      dimnames(table) <-
 		  list(nmeffects,
 #			c("Df", "Sum Sq", "Mean Sq", "Denom", "F value", "Pr(>F)"))
-		       c("Df", "Sum Sq", "Mean Sq"))
+		       c("Df", "Sum Sq", "Mean Sq", "F value"))
 	      if ("(Intercept)" %in% nmeffects)
 		  table <- table[-match("(Intercept)", nmeffects), ]
 	      attr(table, "heading") <- "Analysis of Variance Table"
@@ -835,7 +840,7 @@ setMethod("summary", signature(object = "mer"),
               )
       })## summary()
 
-setMethod("terms", signature(x = "lmer"),
+setMethod("terms", signature(x = "mer"),
 	  function(x, ...) x@terms)
 
 setMethod("update", signature(object = "mer"),
@@ -1307,83 +1312,6 @@ ST2Omega <- function(ST)
 ## 	      rep(as.integer(devc[1]- devc[2]), devc[2])
 ## 	  })
 
-## setMethod("anova", signature(object = "mer"),
-## 	  function(object, ...)
-##       {
-## 	  mCall <- match.call(expand.dots = TRUE)
-## 	  dots <- list(...)
-## 	  modp <- if (length(dots))
-## 	      sapply(dots, is, "mer") | sapply(dots, is, "lm") else logical(0)
-## 	  if (any(modp)) {		# multiple models - form table
-## 	      opts <- dots[!modp]
-## 	      mods <- c(list(object), dots[modp])
-## 	      names(mods) <- sapply(as.list(mCall)[c(FALSE, TRUE, modp)],
-## 				    as.character)
-## 	      mods <- mods[order(sapply(lapply(mods, logLik, REML = FALSE),
-## 					attr, "df"))]
-## 	      calls <- lapply(mods, slot, "call")
-## 	      data <- lapply(calls, "[[", "data")
-## 	      if (any(data != data[[1]]))
-## 		  stop("all models must be fit to the same data object")
-## 	      header <- paste("Data:", data[[1]])
-## 	      subset <- lapply(calls, "[[", "subset")
-## 	      if (any(subset != subset[[1]]))
-## 		  stop("all models must use the same subset")
-## 	      if (!is.null(subset[[1]]))
-## 		  header <-
-## 		      c(header, paste("Subset", deparse(subset[[1]]), sep = ": "))
-## 	      llks <- lapply(mods, logLik, REML = FALSE)
-## 	      Df <- sapply(llks, attr, "df")
-## 	      llk <- unlist(llks)
-## 	      chisq <- 2 * pmax(0, c(NA, diff(llk)))
-## 	      dfChisq <- c(NA, diff(Df))
-## 	      val <- data.frame(Df = Df,
-## 				AIC = sapply(llks, AIC),
-## 				BIC = sapply(llks, BIC),
-## 				logLik = llk,
-## 				"Chisq" = chisq,
-## 				"Chi Df" = dfChisq,
-## 				"Pr(>Chisq)" = pchisq(chisq, dfChisq, lower = FALSE),
-## 				check.names = FALSE)
-## 	      class(val) <- c("anova", class(val))
-## 	      attr(val, "heading") <-
-## 		  c(header, "Models:",
-## 		    paste(names(mods),
-## 			  unlist(lapply(lapply(calls, "[[", "formula"), deparse)),
-## 			  sep = ": "))
-## 	      return(val)
-## 	  }
-## 	  else { ## ------ single model ---------------------
-## 	      foo <- object
-## 	      ss <- foo@rXy^2
-## 	      ssr <- exp(foo@devComp["logryy2"])
-## 	      names(ss) <- object@cnames[[".fixed"]]
-## 	      asgn <- attr(foo@X, "assign")
-## 	      terms <- foo@terms
-## 	      nmeffects <- attr(terms, "term.labels")
-## 	      if ("(Intercept)" %in% names(ss))
-## 		  nmeffects <- c("(Intercept)", nmeffects)
-## 	      ss <- unlist(lapply(split(ss, asgn), sum))
-## 	      df <- unlist(lapply(split(asgn,  asgn), length))
-## 	      #dfr <- getFixDF(object)
-## 	      ms <- ss/df
-## 	      #f <- ms/(ssr/dfr)
-## 	      #P <- pf(f, df, dfr, lower.tail = FALSE)
-## 	      #table <- data.frame(df, ss, ms, dfr, f, P)
-## 	      table <- data.frame(df, ss, ms)
-## 	      dimnames(table) <-
-## 		  list(nmeffects,
-## #			c("Df", "Sum Sq", "Mean Sq", "Denom", "F value", "Pr(>F)"))
-## 		       c("Df", "Sum Sq", "Mean Sq"))
-## 	      if ("(Intercept)" %in% nmeffects)
-## 		  table <- table[-match("(Intercept)", nmeffects), ]
-## 	      attr(table, "heading") <- "Analysis of Variance Table"
-## 	      class(table) <- c("anova", "data.frame")
-## 	      table
-## 	  }
-##       })
-
-
 ## simss <- function(fm0, fma, nsim)
 ## {
 ##     ysim <- simulate(fm0, nsim)
@@ -1435,14 +1363,6 @@ ST2Omega <- function(ST)
 ##           if (hasintercept) asgn$"(Intercept)" <- NULL
 ##           list(ml = ml, nco = nco, nlev = nlev)
 ##       })
-
-## factorNames2char <- function(nms, collapse = ", ")
-## ### utility in messages / print etc:
-## {
-##     nms <- sQuote(nms)
-##     if(length(nms) == 1) paste("factor", nms)
-##     else paste("factors", paste(nms, collapse = collapse))
-## }
 
 
 
