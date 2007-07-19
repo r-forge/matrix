@@ -224,6 +224,7 @@ R_init_Matrix(DllInfo *dll)
     R_RegisterCCallable("Matrix", "as_cholmod_sparse", (DL_FUNC)as_cholmod_sparse);
     R_RegisterCCallable("Matrix", "chm_factor_to_SEXP", (DL_FUNC)chm_factor_to_SEXP);
     R_RegisterCCallable("Matrix", "chm_sparse_to_SEXP", (DL_FUNC)chm_sparse_to_SEXP);
+    R_RegisterCCallable("Matrix", "chm_triplet_to_SEXP", (DL_FUNC)chm_triplet_to_SEXP);
 
     R_RegisterCCallable("Matrix", "cholmod_aat", (DL_FUNC)cholmod_aat);
     R_RegisterCCallable("Matrix", "cholmod_add", (DL_FUNC)cholmod_add);
