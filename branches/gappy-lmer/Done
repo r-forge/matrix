@@ -1,3 +1,8 @@
+-----
+Remove unused symbols from src/Syms.h and src/init.c
+Add symbols to src/Syms.h for names currently accessed through install().
+Replace the glmer_create and nlmer_create C functions with R code.
+-----
 - Revive the "lmer" and "glmer" classes.  Slots like "family" should
   be in "glmer" only.  Many methods for "lmer" can be simplified as,
   for example, they will always use the scale factor.
