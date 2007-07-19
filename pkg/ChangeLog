@@ -1,3 +1,9 @@
+2007-07-19 19:45  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4642] inst/include/Matrix.h, inst/include/Matrix_stubs.c,
+	  inst/include/cholmod.h, src/chm_common.c, src/init.c: Export
+	  triplet_to_sparse, documentation, use typedefs
+	
 2007-07-18  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* man/dpoMatrix-class.Rd: added 'corMatrix' example
