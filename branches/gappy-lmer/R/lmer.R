@@ -184,9 +184,12 @@ lmerFrames <- function(mc, formula, contrasts, vnms = character(0))
     list(Y = Y, X = X, wts = wts, off = off, mt = mt, mf = mf)
 }
 
-lmerFactorList <- function(formula, mf)
+lmerFactorList <- function(formula, mf, rmInt, drop)
 ### Create the list of grouping factors and the corresponding
 ### transposed model matrices.
+### rmInt is a logical scalar indicating if the `(Intercept)` column
+### should be removed before creating Zt
+### drop is a logical scalar indicating if 0 should be dropped
 {
     ## create factor list for the random effects
     bars <- expandSlash(findbars(formula[[3]]))
@@ -201,11 +204,19 @@ lmerFactorList <- function(formula, mf)
                  mm <- model.matrix(eval(substitute(~ expr, # model matrix
                                                     list(expr = x[[2]]))),
                                     mf)
-                 list(f = ff,
-                      Zt = do.call(rBind,
-                      lapply(seq_len(ncol(mm)),
-                             function(j) {im@x <- mm[,j]; im})),
-                      cnames = colnames(mm))
+                 if (rmInt) {
+                     if (is.na(icol <- match("(Intercept)", colnames(mm)))) break
+                     if (ncol(mm) < 2)
+                         stop("lhs of a random-effects term cannot be an intercept only")
+                     mm <- mm[ , -icol , drop = FALSE]
+                 }
+                 ans <- list(f = ff,
+                             Zt = do.call(rBind,
+                             lapply(seq_len(ncol(mm)),
+                                    function(j) {im@x <- mm[,j]; im})),
+                             cnames = colnames(mm))
+                 if (drop) ans$Zt <- drop0(ans$Zt)
+                 ans
              })
 
     ## order factor list by decreasing number of levels but don't
@@ -312,16 +323,6 @@ mkFamilyEnv <- function(glmFit)
     env
 }
 
-rmIntr <- function(mm)
-### Remove the intercept row from a transposed model matrix
-### first checking that it is not the only column
-{
-    if (is.na(irow <- match("(Intercept)", rownames(mm)))) return(mm)
-    if (ncol(mm) < 2)
-        stop("lhs of a random-effects term cannot be an intercept only")
-    mm[-irow, , drop = FALSE]
-}
-
 ### The main event
 
 lmer <-
@@ -339,7 +340,7 @@ lmer <-
     stopifnot(length(formula <- as.formula(formula)) == 3)
 
     fr <- lmerFrames(mc, formula, contrasts) # model frame, X, etc.
-    FL <- lmerFactorList(formula, fr$mf)     # flist, Zt, cnames
+    FL <- lmerFactorList(formula, fr$mf, 0L, 0L) # flist, Zt, cnames
     Y <- as.double(fr$Y)
     dm <- mkdims(fr, FL, start)
     stopifnot(length(levels(dm$flist[[1]])) < length(Y))
@@ -408,7 +409,7 @@ function(formula, data, family = gaussian, method = c("Laplace", "AGQ"),
     glmFit <- glm.fit(fr$X, fr$Y, weights = fr$weights, # glm on f.e.
                       offset = fr$offset, family = family,
                       intercept = attr(fr$mt, "intercept") > 0)
-    FL <- lmerFactorList(formula, fr$mf)     # flist, Zt, cnames
+    FL <- lmerFactorList(formula, fr$mf, 0L, 0L) # flist, Zt, cnames
     dm <- mkdims(fr, FL, start)
     dm$dd["ftyp"] <- mkFltype(glmFit$family)
     dimnames(fr$X) <- NULL
@@ -474,18 +475,14 @@ nlmer <- function(formula, data, control = list(), start = NULL,
     n <- nrow(mf)
     lapply(pnames, function(nm) assign(nm, env = env, rep(start$fixed[[nm]], length.out = n)))
 
-    mf <- mf[rep(seq_len(nrow(data)), s), ]
+    n <- nrow(mf)
+    mf <- mf[rep(seq_len(n), s), ]
     row.names(mf) <- seq_len(nrow(mf))
-### FIXME: Using nrow(data) won't work if data is not specified
-    ss <- rep.int(nrow(data), s)
+    ss <- rep.int(n, s)
     for (nm in pnames) mf[[nm]] <- rep.int(as.numeric(nm == pnames), ss)
                                         # factor list and model matrices
     FL <- lmerFactorList(substitute(foo ~ bar, list(foo = nlform[[2]], bar = formula[[3]])),
-                         mf)
-### FIXME: This is where things start to differ.  FL no longer has Ztl
-    Ztl <- lapply(FL$Ztl, rmIntr)    # Remove any intercept columns
-##     FL$Ztl <- lapply(with(FL, .Call(Ztl_sparse, fl, Ztl)), drop0)
-
+                         mf, TRUE, TRUE)
     dm <- mkdims(fr, FL, start$STpars)
 
     Xt <- t(Matrix(as.matrix(mf[,pnames]), sparse = TRUE))
@@ -498,12 +495,6 @@ nlmer <- function(formula, data, control = list(), start = NULL,
     if (length(xnms) > 0)
         Xt <- rBind(Xt, t(Matrix(fr$X[rep.int(seq_len(n), s), xnms, drop = FALSE])))
 
-    wts <- fr$weights
-    if (is.null(wts)) wts <- numeric(0)
-##     Ztl1 <- lapply(with(FL, .Call(Ztl_sparse, fl, Ztl)), drop0)
-    Ztl1 <- NULL
-    Gp <- unname(c(0L, cumsum(unlist(lapply(Ztl1, nrow)))))
-    Zt <- do.call(rBind, Ztl1)
     Mt <- .Call(mer_create_Vt, Zt, ST, Gp, s)
 
     ans <- new("nlmer",

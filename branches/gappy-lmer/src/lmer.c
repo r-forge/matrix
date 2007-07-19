@@ -1045,87 +1045,87 @@ conv_crit(double etaold[], double eta[], int n) {
  * @param x pointer to a glmer or nlmer object
  *
  */
-SEXP nlmer_update_Vt(SEXP x)
-{
-    SEXP ST = GET_SLOT(x, lme4_STSym),
-	Vt = GET_SLOT(x, lme4_VtSym),
-	Zt =  GET_SLOT(x, lme4_ZtSym);
-    int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym)),
-	*vi = INTEGER(GET_SLOT(Vt, lme4_iSym)),
-	*vp = INTEGER(GET_SLOT(Vt, lme4_pSym)),
-	*zi = INTEGER(GET_SLOT(Zt, lme4_iSym)),
-	*zp = INTEGER(GET_SLOT(Zt, lme4_pSym)),
-	i, ione = 1, iv, iz, j, mnc, nf = LENGTH(ST),
-	ncol = INTEGER(GET_SLOT(Zt, lme4_DimSym))[1];
-    double *tmp, *vx = REAL(GET_SLOT(Vt, lme4_xSym)),
-	*zx = REAL(GET_SLOT(Zt, lme4_xSym));
-    int *nc = Alloca(nf, int), *nlev = Alloca(nf, int);
-    double **st = Alloca(nf, double*);
-    R_CheckStack();
+/* SEXP nlmer_update_Vt(SEXP x) */
+/* { */
+/*     SEXP ST = GET_SLOT(x, lme4_STSym), */
+/* 	Vt = GET_SLOT(x, lme4_VtSym), */
+/* 	Zt =  GET_SLOT(x, lme4_ZtSym); */
+/*     int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym)), */
+/* 	*vi = INTEGER(GET_SLOT(Vt, lme4_iSym)), */
+/* 	*vp = INTEGER(GET_SLOT(Vt, lme4_pSym)), */
+/* 	*zi = INTEGER(GET_SLOT(Zt, lme4_iSym)), */
+/* 	*zp = INTEGER(GET_SLOT(Zt, lme4_pSym)), */
+/* 	i, ione = 1, iv, iz, j, mnc, nf = LENGTH(ST), */
+/* 	ncol = INTEGER(GET_SLOT(Zt, lme4_DimSym))[1]; */
+/*     double *tmp, *vx = REAL(GET_SLOT(Vt, lme4_xSym)), */
+/* 	*zx = REAL(GET_SLOT(Zt, lme4_xSym)); */
+/*     int *nc = Alloca(nf, int), *nlev = Alloca(nf, int); */
+/*     double **st = Alloca(nf, double*); */
+/*     R_CheckStack(); */
 
-    mnc = ST_nc_nlev(ST, Gp, st, nc, nlev);
-    tmp = Alloca(mnc, double);
-    for (j = 0; j < ncol; j++) {
-	int iz2 = zp[j + 1];
-				/* premultiply by T' */
-	for (iz = zp[j], iv = vp[j]; iz < iz2; iz++) {
-	    int k = Gp_grp(zi[iz], nf, Gp);
-	    if (nc[k] > 1) {
-		int itmp = (zi[iz] - Gp[k]) % nc[k];
-		AZERO(tmp, mnc);
-		tmp[itmp] = zx[iz];
-		for (i = 1; i < nc[k] && (iz + 1) < iz2; i++) {
-		    if (zi[iz + 1] != zi[iz] + 1) break;
-		    tmp[itmp++] = zx[++iz];
-		}
-		F77_CALL(dtrmv)("L", "T", "U", &(nc[k]), st[k],
-				&(nc[k]), tmp, &ione);
-		for (i = 0; i < nc[k] && iv < vp[j + 1]; i++, iv++) {
-		    vx[iv] = tmp[i];
-		    if (vi[iv + 1] != vi[iv] + 1) break;
-		}
-	    } else vx[iv++] = zx[iz++];
-	}
-	for (iv = vp[j]; iv < vp[j + 1]; iv++) {
-	    int k = Gp_grp(vi[iv], nf, Gp);
-	    vx[iv] *= st[k][((vi[iv] - Gp[k]) % nc[k]) * (nc[k] + 1)];
-	}
-    }    
-    return R_NilValue;
-}
-/* FIXME: Use TS_mult instead */
-/**
- * Update the ranef slot, b=TSu, in a glmer or nlmer object.
- *
- * @param x pointer to a glmer or nlmer object
- *
- */
-SEXP nlmer_update_ranef(SEXP x)
-{
-    SEXP ST = GET_SLOT(x, lme4_STSym);
-    int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym)),
-	i, ione = 1, nf = LENGTH(ST);
-    double *b = REAL(GET_SLOT(x, lme4_ranefSym)),
-	*u = REAL(GET_SLOT(x, lme4_uvecSym));
+/*     mnc = ST_nc_nlev(ST, Gp, st, nc, nlev); */
+/*     tmp = Alloca(mnc, double); */
+/*     for (j = 0; j < ncol; j++) { */
+/* 	int iz2 = zp[j + 1]; */
+/* 				/\* premultiply by T' *\/ */
+/* 	for (iz = zp[j], iv = vp[j]; iz < iz2; iz++) { */
+/* 	    int k = Gp_grp(zi[iz], nf, Gp); */
+/* 	    if (nc[k] > 1) { */
+/* 		int itmp = (zi[iz] - Gp[k]) % nc[k]; */
+/* 		AZERO(tmp, mnc); */
+/* 		tmp[itmp] = zx[iz]; */
+/* 		for (i = 1; i < nc[k] && (iz + 1) < iz2; i++) { */
+/* 		    if (zi[iz + 1] != zi[iz] + 1) break; */
+/* 		    tmp[itmp++] = zx[++iz]; */
+/* 		} */
+/* 		F77_CALL(dtrmv)("L", "T", "U", &(nc[k]), st[k], */
+/* 				&(nc[k]), tmp, &ione); */
+/* 		for (i = 0; i < nc[k] && iv < vp[j + 1]; i++, iv++) { */
+/* 		    vx[iv] = tmp[i]; */
+/* 		    if (vi[iv + 1] != vi[iv] + 1) break; */
+/* 		} */
+/* 	    } else vx[iv++] = zx[iz++]; */
+/* 	} */
+/* 	for (iv = vp[j]; iv < vp[j + 1]; iv++) { */
+/* 	    int k = Gp_grp(vi[iv], nf, Gp); */
+/* 	    vx[iv] *= st[k][((vi[iv] - Gp[k]) % nc[k]) * (nc[k] + 1)]; */
+/* 	} */
+/*     }     */
+/*     return R_NilValue; */
+/* } */
+/* /\* FIXME: Use TS_mult instead *\/ */
+/* /\** */
+/*  * Update the ranef slot, b=TSu, in a glmer or nlmer object. */
+/*  * */
+/*  * @param x pointer to a glmer or nlmer object */
+/*  * */
+/*  *\/ */
+/* SEXP nlmer_update_ranef(SEXP x) */
+/* { */
+/*     SEXP ST = GET_SLOT(x, lme4_STSym); */
+/*     int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym)), */
+/* 	i, ione = 1, nf = LENGTH(ST); */
+/*     double *b = REAL(GET_SLOT(x, lme4_ranefSym)), */
+/* 	*u = REAL(GET_SLOT(x, lme4_uvecSym)); */
     
-    for (i = 0; i < nf; i++) {
-	SEXP STi = VECTOR_ELT(ST, i);
-	double *sti = REAL(STi);
-	int base = Gp[i], j, k,
-	    nci = INTEGER(getAttrib(STi, R_DimSymbol))[0];
+/*     for (i = 0; i < nf; i++) { */
+/* 	SEXP STi = VECTOR_ELT(ST, i); */
+/* 	double *sti = REAL(STi); */
+/* 	int base = Gp[i], j, k, */
+/* 	    nci = INTEGER(getAttrib(STi, R_DimSymbol))[0]; */
 	
-	for (j = base; j < Gp[i+1]; j += nci) {
-	    for (k = 0; k < nci; k++) { /* premultiply  by S */
-		int jj = j + k;
-		b[jj] = u[jj] * sti[k];
-	    }
-	    if (nci > 1)	/* premultiply  by T */
-		F77_CALL(dtrmv)("L", "N", "U", &nci, sti,
-				&nci, &(u[j]), &ione);
-	}
-    }
-    return R_NilValue;
-}
+/* 	for (j = base; j < Gp[i+1]; j += nci) { */
+/* 	    for (k = 0; k < nci; k++) { /\* premultiply  by S *\/ */
+/* 		int jj = j + k; */
+/* 		b[jj] = u[jj] * sti[k]; */
+/* 	    } */
+/* 	    if (nci > 1)	/\* premultiply  by T *\/ */
+/* 		F77_CALL(dtrmv)("L", "N", "U", &nci, sti, */
+/* 				&nci, &(u[j]), &ione); */
+/* 	} */
+/*     } */
+/*     return R_NilValue; */
+/* } */
 
 /* Nonlinear mixed models */
 
@@ -1295,7 +1295,7 @@ static int internal_nbhat(SEXP x)
 	crit = IRLS_TOL + 1, dn = (double)n, one[] = {1,0}, zero[] = {0,0};
     R_CheckStack();
 
-    nlmer_update_Vt(x);
+    mer_update_Vt(x);
     Memcpy(uold, u, q);
     for (i = 0; i < IRLS_MAXITER && crit > IRLS_TOL; i++) {
 	dev[lpdisc_POS] = internal_nlmer_eval_model(x, 1);
@@ -2143,7 +2143,7 @@ SEXP nlmer_create(SEXP env, SEXP model, SEXP frame, SEXP pnames,
     }
     ST_initialize(ST, Gp, Zt);	/* initialize ST */
     SET_SLOT(ans, lme4_VtSym, iT ? duplicate(Zt) : mer_create_Vt(Zt, ST, Gp));
-    nlmer_update_Vt(ans);
+    mer_update_Vt(ans);
     cVt = AS_CHM_SP(GET_SLOT(ans, lme4_VtSym));
     
     /* Create Mt beginning with s identity matrices concatenated horizontally */
@@ -2180,7 +2180,7 @@ SEXP nlmer_create(SEXP env, SEXP model, SEXP frame, SEXP pnames,
     M_cholmod_free_factor(&L, &c);
 
     M_cholmod_free_sparse(&ts1, &c);
-    nlmer_update_Vt(ans);
+    mer_update_Vt(ans);
 
     UNPROTECT(1);
     return ans;

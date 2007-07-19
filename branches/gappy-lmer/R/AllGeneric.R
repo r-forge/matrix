@@ -11,11 +11,12 @@ setGeneric("gsummary",
                      invariantsOnly = FALSE, ...)
            standardGeneric("gsummary"))
 
+### FIXME: Probably don't need this
 setGeneric("isNested", function(x, ...) standardGeneric("isNested"))
 
 setGeneric("fixef", function(object, ...) standardGeneric("fixef"))
 
-setGeneric("denomDF", function(x, ...) standardGeneric("denomDF"))
+## setGeneric("denomDF", function(x, ...) standardGeneric("denomDF"))
 
 fixed.effects <- function(object, ...) {
     ## fixed.effects was an alternative name for fixef
@@ -46,11 +47,11 @@ setGeneric("VarCorr", function(x, ...) standardGeneric("VarCorr"))
 
 setGeneric("postVar", function(object, ...) standardGeneric("postVar"))
 
-setGeneric("getFixDF", function(object, ...) standardGeneric("getFixDF"))
+## setGeneric("getFixDF", function(object, ...) standardGeneric("getFixDF"))
 
 setGeneric("mcmcsamp", function(object, n = 1, verbose = FALSE, ...)
            standardGeneric("mcmcsamp"))
 
-setGeneric("simulate", function(object, nsim = 1, seed = NULL, ...)
-           standardGeneric("simulate"))
+## setGeneric("simulate", function(object, nsim = 1, seed = NULL, ...)
+##            standardGeneric("simulate"))
 
