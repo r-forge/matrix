@@ -35,7 +35,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_update_Vt", (DL_FUNC) &mer_update_Vt, 1},
     {"mer_validate", (DL_FUNC) &mer_validate, 1},
 
-    {"nlmer_bhat", (DL_FUNC) &nlmer_bhat, 1},
+    {"nlmer_condMode", (DL_FUNC) &nlmer_condMode, 1},
     {"nlmer_create_Mt", (DL_FUNC) &nlmer_create_Mt, 2},
     {"nlmer_eval_model", (DL_FUNC) &nlmer_eval_model, 1},
     {"nlmer_update_Mt", (DL_FUNC) &nlmer_update_Mt, 1},

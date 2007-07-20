@@ -441,7 +441,6 @@ nlmer <- function(formula, data, control = list(), start = NULL,
                   contrasts = NULL, model = TRUE, ...)
 ### Fit a nonlinear mixed-effects model
 {
-    ##    warning("nlmer is in development.  Results reported here are wrong.")
     mc <- match.call()
     formula <- as.formula(formula)
     if (length(formula) < 3) stop("formula must be a 3-part formula")
@@ -453,8 +452,8 @@ nlmer <- function(formula, data, control = list(), start = NULL,
     s <- length(pnames <- names(start$fixed))
     stopifnot(length(start$fixed) > 0, s > 0,
               inherits(data, "data.frame"), nrow(data) > 1)
-### FIXME: Allow for a situation where data is not specified.  What
-### should it default to?
+### FIXME: Allow for the data argument to be missing.  What should the
+### default be?
     if (any(pnames %in% names(data)))
         stop("parameter names must be distinct from names of the variables in data")
     anms <- all.vars(nlmod)
@@ -467,41 +466,42 @@ nlmer <- function(formula, data, control = list(), start = NULL,
     fr <- lmerFrames(mc,
                      eval(substitute(foo ~ bar,
                                      list(foo = nlform[[2]],
-                                          bar = subnms(formula[[3]], lapply(pnames, as.name))))),
+                                          bar = subnms(formula[[3]],
+                                          lapply(pnames, as.name))))),
                      contrasts, vnms)
     mf <- fr$mf
     env <- new.env()
     lapply(names(mf), function(nm) assign(nm, env = env, mf[[nm]]))
     n <- nrow(mf)
-    lapply(pnames, function(nm) assign(nm, env = env, rep(start$fixed[[nm]], length.out = n)))
+    lapply(pnames,
+           function(nm) assign(nm, env = env, rep(start$fixed[[nm]],
+                                   length.out = n)))
 
     n <- nrow(mf)
     mf <- mf[rep(seq_len(n), s), ]
     row.names(mf) <- seq_len(nrow(mf))
     ss <- rep.int(n, s)
-    for (nm in pnames) mf[[nm]] <- rep.int(as.numeric(nm == pnames), ss)
+    for (nm in pnames)
+        mf[[nm]] <- rep.int(as.numeric(nm == pnames), ss)
                                         # factor list and model matrices
-    FL <- lmerFactorList(substitute(foo ~ bar, list(foo = nlform[[2]], bar = formula[[3]])),
+    FL <- lmerFactorList(substitute(foo ~ bar, list(foo = nlform[[2]],
+                                                    bar = formula[[3]])),
                          mf, TRUE, TRUE)
+    X <- as.matrix(mf[,pnames])
+    rownames(X) <- NULL
+    xnms <- colnames(fr$X)
+    if (!is.na(icol <- match("(Intercept)",xnms))) xnms <- xnms[-icol]
+### FIXME: The only times there would be additional columns in the
+### fixed effects would be as interactions with parameter names and
+### they must be constructed differently
+    if (length(xnms) > 0)
+        Xt <- cbind(Xt, fr$X[rep.int(seq_len(n), s), xnms, drop = FALSE])
     dm <- mkdims(fr, FL, start$STpars)
+    Mt <- .Call(nlmer_create_Mt, dm$Vt, s)
     dm$dd["s"] <- s
     dm$dd["ftyp"] <- -1L              # gaussian family, identity link
     dm$dd["p"] <- length(start$fixed)
 
-### FIXME: Probably store X as a dense matrix.  Sparse storage may actually be larger.
-### Then the X slot can be moved from the lmer and glmer representations to mer.
-    X <- as.matrix(mf[,pnames])
-    rownames(X) <- NULL
-
-### FIXME: The only times there would be additional columns in the
-### fixed effects would be as interactions with parameter names and
-### they must be constructed differently
-    xnms <- colnames(fr$X)
-    if (!is.na(icol <- match("(Intercept)",xnms))) xnms <- xnms[-icol]
-    if (length(xnms) > 0)
-        Xt <- rBind(Xt, t(Matrix(fr$X[rep.int(seq_len(n), s), xnms, drop = FALSE])))
-
-    Mt <- .Call(nlmer_create_Mt, dm$Vt, s)
     ans <- new("nlmer",
                env = env, model = nlmod, pnames = pnames,
                mu = numeric(dm$dd["n"]), Mt = Mt,
@@ -515,7 +515,6 @@ nlmer <- function(formula, data, control = list(), start = NULL,
                deviance = dm$dev, fixef = start$fixed,
                ranef = numeric(dm$dd["q"]),
                uvec = numeric(dm$dd["q"]))
-    .Call(nlmer_eval_model, ans)
     cv <- do.call("lmerControl", control)
     if (missing(verbose)) verbose <- cv$msVerbose
 #    .Call(mer_optimize, ans, verbose, 1L)
@@ -998,31 +997,36 @@ setMethod("print", "glmer", printMer)
 setMethod("show", "lmer", function(object) printMer(object))
 setMethod("show", "glmer", function(object) printMer(object))
 
-setMethod("show", "nlmer", function(object)
+printNlmer <- function(x, digits = max(3, getOption("digits") - 3),
+                       correlation = TRUE, symbolic.cor = FALSE,
+                       signif.stars = getOption("show.signif.stars"), ...)
 ### FIXME: Does nlmer need a separate show method?
-      {
-          dims <- object@dims
-          cat("Nonlinear mixed model fit by Laplace\n")
-          if (!is.null(object@call$formula))
-              cat("Formula:", deparse(object@call$formula),"\n")
-          if (!is.null(object@call$data))
-              cat("   Data:", deparse(object@call$data), "\n")
-          if (!is.null(object@call$subset))
-              cat(" Subset:",
-                  deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
+{
+    dims <- object@dims
+    cat("Nonlinear mixed model fit by Laplace\n")
+    if (!is.null(object@call$formula))
+        cat("Formula:", deparse(object@call$formula),"\n")
+    if (!is.null(object@call$data))
+        cat("   Data:", deparse(object@call$data), "\n")
+    if (!is.null(object@call$subset))
+        cat(" Subset:",
+            deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
 
-          cat("Random effects:\n")
-          print(formatVC(VarCorr(object)), quote = FALSE,
-                digits = max(3, getOption("digits") - 3))
+    cat("Random effects:\n")
+    print(formatVC(VarCorr(object)), quote = FALSE,
+          digits = max(3, getOption("digits") - 3))
 
-          cat(sprintf("Number of obs: %d, groups: ", dims["n"]))
-          ngrps <- sapply(object@flist, function(x) length(levels(x)))
-          cat(paste(paste(names(ngrps), ngrps, sep = ", "), collapse = "; "))
-          cat("\n")
-          cat("\nFixed effects:\n")
-          print(object@fixef)
-          invisible(object)
-      })
+    cat(sprintf("Number of obs: %d, groups: ", dims["n"]))
+    ngrps <- sapply(object@flist, function(x) length(levels(x)))
+    cat(paste(paste(names(ngrps), ngrps, sep = ", "), collapse = "; "))
+    cat("\n")
+    cat("\nFixed effects:\n")
+    print(object@fixef)
+    invisible(object)
+}
+
+setMethod("print", "nlmer", printNlmer)
+setMethod("show", "nlmer", function(object) printNlmer(object))
 
 #### Methods for secondary, derived classes
 
