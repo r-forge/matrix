@@ -82,10 +82,13 @@ setMethod("Math2",
               x
           })
 
-## round(x) == round(x, 0)  etc
 setMethod("Math2",
 	  signature(x = "dMatrix", digits = "missing"),
-	  function(x, digits) callGeneric(x, digits = 0))
+	  function(x, digits)
+	       switch(.Generic,
+		      "signif" = callGeneric(x, digits = 6),
+		      callGeneric(x, digits = 0)) ## round(x) == round(x, 0)
+	  )
 
 ## at installation time:
 summGenerics <- getGroupMembers("Summary")
