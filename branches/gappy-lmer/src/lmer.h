@@ -31,7 +31,7 @@ SEXP mer_sigma(SEXP x, SEXP which);
 SEXP mer_update_Vt(SEXP x);
 SEXP mer_validate(SEXP x);
 
-SEXP nlmer_bhat(SEXP x);
+SEXP nlmer_condMode(SEXP x);
 SEXP nlmer_create_Mt(SEXP Vt, SEXP sP);
 SEXP nlmer_eval_model(SEXP x);
 SEXP nlmer_update_Mt(SEXP x);
