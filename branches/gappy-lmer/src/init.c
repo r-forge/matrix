@@ -32,6 +32,7 @@ static R_CallMethodDef CallEntries[] = {
     {"mer_optimize", (DL_FUNC) &mer_optimize, 3},
     {"mer_postVar", (DL_FUNC) &mer_postVar, 1},
     {"mer_sigma", (DL_FUNC) &mer_sigma, 2},
+    {"mer_update_b", (DL_FUNC) &mer_update_b, 1},
     {"mer_update_Vt", (DL_FUNC) &mer_update_Vt, 1},
     {"mer_validate", (DL_FUNC) &mer_validate, 1},
 
@@ -39,7 +40,7 @@ static R_CallMethodDef CallEntries[] = {
     {"nlmer_create_Mt", (DL_FUNC) &nlmer_create_Mt, 2},
     {"nlmer_eval_model", (DL_FUNC) &nlmer_eval_model, 1},
     {"nlmer_update_Mt", (DL_FUNC) &nlmer_update_Mt, 1},
-    {"nlmer_update_wrkres", (DL_FUNC) &nlmer_update_wrkres, 1},
+/*     {"nlmer_update_wrkres", (DL_FUNC) &nlmer_update_wrkres, 1}, */
     {"nlmer_validate", (DL_FUNC) &nlmer_validate, 1},
 
     {"pedigree_chol", (DL_FUNC) &pedigree_chol, 2},

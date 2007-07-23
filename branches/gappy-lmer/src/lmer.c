@@ -64,6 +64,23 @@ static SEXP R_INLINE getListElement(SEXP list, char *nm) {
 }
 
 /**
+ * Return the sum of squares of the first n elements of x
+ *
+ * @param n
+ * @param x
+ *
+ * @return sum of squares
+ */
+static double R_INLINE lme4_sumsq(const double *x, int n)
+{
+    double ans = 0;
+    int i;
+
+    for (i = 0; i < n; i++) ans += x[i] * x[i];
+    return ans;
+}
+
+/**
  * Evaluate the logarithm of the square of the determinant of L
  * (i.e. the logarithm of the determinant of LL')
  *
@@ -996,8 +1013,9 @@ SEXP nlmer_validate(SEXP x)
  * this will mean a single grouping factor only. */
 
 
-#define IRLS_MAXITER  600
-#define IRLS_TOL      1e-9
+#define IRLS_MAXITER  100
+#define IRLS_TOL      1e-5
+#define IRLS_SMIN     1e-4
 
 /**
  * Evaluate the convergence criterion and copy eta to
@@ -1148,7 +1166,7 @@ SEXP nlmer_update_Mt(SEXP x)
     double *grad = REAL(getAttrib(GET_SLOT(x, lme4_muSym), lme4_gradientSym)),
 	*mx = REAL(GET_SLOT(Mt, lme4_xSym)),
 	*vx = REAL(GET_SLOT(Vt, lme4_xSym)), one[] = {1,0};
-    CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
+    CHM_SP cMt = AS_CHM_SP(Mt);
     CHM_FR L = L_SLOT(x);
     R_CheckStack();
 
@@ -1165,53 +1183,12 @@ SEXP nlmer_update_Mt(SEXP x)
 	}
     }
     c.final_ll = L->is_ll;
-    if (!M_cholmod_factorize_p(cVt, one, (int*)NULL, 0 /*fsize*/, L, &c))
+    if (!M_cholmod_factorize_p(cMt, one, (int*)NULL, 0 /*fsize*/, L, &c))
 	error(_("cholmod_factorize_p failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
     c.final_ll = cfll;
     REAL(GET_SLOT(x, lme4_devianceSym))[ldL2_POS] = chm_log_det2(L);
     return R_NilValue;
-}
-
-/**
- * Update the working residual as y - mu + M u
- *
- * @param x pointer to an nlmer object
- * @param w array to hold the updated working residual
- *
- * @return w pointer
- */
-static double *Nlmer_update_wrkres(SEXP x, double *w)
-{
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), i;
-    CHM_SP Mt = AS_CHM_SP(GET_SLOT(x, lme4_MtSym));
-    CHM_DN cwrk = N_AS_CHM_DN(w, dims[n_POS]),
-	cu = AS_CHM_DN(GET_SLOT(x, lme4_uvecSym));
-    double *mu = REAL(GET_SLOT(x, lme4_muSym)),
-	*y = REAL(GET_SLOT(x, lme4_ySym)), one[] = {1,0};
-
-    R_CheckStack();
-    Memcpy(w, y, dims[n_POS]);
-    if (!(i = M_cholmod_sdmult(Mt, 1 /* trans */, one, one, cu, cwrk, &c)))
-	error(_("cholmod_sdmult returned error code %d"), i);
-    for (i = 0; i < dims[n_POS]; i++) w[i] -= mu[i];
-    return w;
-}
-
-/**
- * Externally callable function to return the working residual
- *
- * @param x pointer to an nlmer object
- *
- * @return working residual
- */
-SEXP nlmer_update_wrkres(SEXP x)
-{
-    SEXP ans = PROTECT(allocVector(REALSXP, LENGTH(GET_SLOT(x, lme4_ySym))));
-
-    Nlmer_update_wrkres(x, REAL(ans));
-    UNPROTECT(1);
-    return ans;
 }
 
 /**
@@ -1223,43 +1200,64 @@ SEXP nlmer_update_wrkres(SEXP x)
  */
 static int Nlmer_condMode(SEXP x)
 {
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), i, j;
-    int n = dims[n_POS], q = dims[q_POS];
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), *perm;
+    int i, j, n = dims[n_POS], q = dims[q_POS];
+    double *dev = REAL(GET_SLOT(x, lme4_devianceSym)), *del,
+	*mu, *u = REAL(GET_SLOT(x, lme4_uvecSym)),
+	*y = REAL(GET_SLOT(x, lme4_ySym)), crit = DOUBLE_XMAX,
+	lpd_old = DOUBLE_XMAX, one[] = {1,0}, step, zero[] = {0,0};
+    double *Mtres = Alloca(q, double),
+	*res = Alloca(n, double),
+	*rhs = Alloca(q, double),
+	*uold = Alloca(q, double);
     CHM_FR L = L_SLOT(x);
-    CHM_DN cMtz = N_AS_CHM_DN(Alloca(q, double), q), cu,
-	cz = M_cholmod_allocate_dense(n, 1, n, CHOLMOD_REAL, &c);
+    CHM_DN cMtres = N_AS_CHM_DN(Mtres, q), cdel,
+	cres = N_AS_CHM_DN(res, n),
+	crhs = N_AS_CHM_DN(rhs, q);
     CHM_SP Mt = AS_CHM_SP(GET_SLOT(x, lme4_MtSym));
-    double *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
-	*u = REAL(GET_SLOT(x, lme4_uvecSym)),
-	*uold = Alloca(q, double), *z = ((double*)(cz->x)),
-	crit = IRLS_TOL + 1, dn = (double)n, one[] = {1,0}, zero[] = {0,0};
     R_CheckStack();
 
+    if (!(L->is_ll)) error(_("L must be LL', not LDL'"));
+    perm = (int*)(L->Perm);
     Memcpy(uold, u, q);
-    for (i = 0; i < IRLS_MAXITER && crit > IRLS_TOL; i++) {
-	nlmer_eval_model(x);
-	for (j = 0, dev[bqd_POS] = 0; j < q; j++) dev[bqd_POS] += u[j] * u[j];
-#ifdef DEBUG_NLMER
-	Rprintf("%3d: %20.15g %20.15g %20.15g\n", i, dev[disc_POS], dev[bqd_POS],
-		dev[disc_POS] + dev[bqd_POS]);
-#endif
+    nlmer_eval_model(x);
+    for (i = 0; i < IRLS_MAXITER; i++) {
+	mu = REAL(GET_SLOT(x, lme4_muSym)); /* nlmer_eval_model changes this */
 	nlmer_update_Mt(x);	/* also updates L and dev[ldL2_POS] */
-	Nlmer_update_wrkres(x, z);
-	if (!(j = M_cholmod_sdmult(Mt, 0 /* trans */, one, zero, cz, cMtz, &c)))
+	for (j = 0; j < n; j++) res[j] = y[j] - mu[j];
+	if (!(j = M_cholmod_sdmult(Mt, 0 /* trans */, one, zero, cres, cMtres, &c)))
 	    error(_("cholmod_sdmult returned error code %d"), j);
-	if (!(cu = M_cholmod_solve(CHOLMOD_LDLt, L, cMtz, &c)))
-	    error(_("cholmod_solve (CHOLMOD_A) failed: status %d, minor %d from ncol %d"),
+	crit = 1/(lme4_sumsq(res, n) + lme4_sumsq(uold, q));
+	for (j = 0; j < q; j++) rhs[perm[j]] = Mtres[j] - uold[perm[j]];
+	if (!(cdel = M_cholmod_solve(CHOLMOD_L, L, crhs, &c)))
+	    error(_("cholmod_solve (CHOLMOD_L) failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
-	Memcpy(u, (double*)(cu->x), q);
-	M_cholmod_free_dense(&cu, &c); 
-/* FIXME: replace this by an orthogonality convergence criterion */
- 	crit = conv_crit(uold, u, q);
+	Memcpy(rhs, (double*)(cdel->x), q);
+	M_cholmod_free_dense(&cdel, &c);
+	crit *= lme4_sumsq(rhs, q);
+	if (crit < IRLS_TOL) break;
+	if (!(cdel = M_cholmod_solve(CHOLMOD_Lt, L, crhs, &c)))
+	    error(_("cholmod_solve (CHOLMOD_L) failed: status %d, minor %d from ncol %d"),
+	      c.status, L->minor, L->n);
+	del = (double*)(cdel->x);
+	for (step = 1; step > IRLS_SMIN; step /= 2) { /* step halving */
+	    for (j = 0; j < q; j++) u[j] = uold[j] + step * del[j];
+	    dev[bqd_POS] = lme4_sumsq(u, q);
+	    nlmer_eval_model(x); /* also updates dev[disc_POS] */
+	    dev[lpdisc_POS] = log(dev[disc_POS] + dev[bqd_POS]);
+#ifdef DEBUG_NLMER
+	    Rprintf("%3d:%8.5f %8.5f %20.15g %20.15g %20.15g\n", i, crit, step,
+		    dev[disc_POS], dev[bqd_POS], dev[lpdisc_POS]);
+#endif
+	    if (lpd_old > dev[lpdisc_POS]) break;
+	}
+	M_cholmod_free_dense(&cdel, &c);
+	lpd_old = dev[lpdisc_POS];
+	Memcpy(uold, u, q);
     }
-    dev[lpdisc_POS] = log(dev[disc_POS] + dev[bqd_POS]);
     dev[ML_POS] = dev[REML_POS] =
-	dev[ldL2_POS] + dn * (1. + dev[lpdisc_POS] + log(2. * PI / dn));
-    M_cholmod_free_dense(&cz, &c);
-    mer_update_b(x);
+	dev[ldL2_POS] + n * (1. + dev[lpdisc_POS] + log(2. * PI /((double)n)));
+    M_cholmod_free_dense(&cdel, &c);
     return (crit > IRLS_TOL) ? 0 : i;
 }
 
@@ -1277,7 +1275,7 @@ static const double INVEPS = 1/DOUBLE_EPS;
 
 /** 
  * Evaluate x/(1 - x). An inline function is used so that x is
- * evaluated once only. 
+ * only evaluated once. 
  * 
  * @param x input in the range (0, 1)
  * 
@@ -1984,5 +1982,47 @@ static const double
     *GHQ_w[12] = {(double *) NULL, GHQ_w1, GHQ_w2, GHQ_w3, GHQ_w4,
 		  GHQ_w5, GHQ_w6, GHQ_w7, GHQ_w8, GHQ_w9, GHQ_w10,
 		  GHQ_w11};
+
+
+/**
+ * Update the working residual as y - mu + M u
+ *
+ * @param x pointer to an nlmer object
+ * @param w array to hold the updated working residual
+ *
+ * @return w pointer
+ */
+static double *Nlmer_update_wrkres(SEXP x, double *w)
+{
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), i;
+    CHM_SP Mt = AS_CHM_SP(GET_SLOT(x, lme4_MtSym));
+    CHM_DN cwrk = N_AS_CHM_DN(w, dims[n_POS]),
+	cu = AS_CHM_DN(GET_SLOT(x, lme4_uvecSym));
+    double *mu = REAL(GET_SLOT(x, lme4_muSym)),
+	*y = REAL(GET_SLOT(x, lme4_ySym)), one[] = {1,0};
+
+    R_CheckStack();
+    Memcpy(w, y, dims[n_POS]);
+    if (!(i = M_cholmod_sdmult(Mt, 1 /* trans */, one, one, cu, cwrk, &c)))
+	error(_("cholmod_sdmult returned error code %d"), i);
+    for (i = 0; i < dims[n_POS]; i++) w[i] -= mu[i];
+    return w;
+}
+
+/**
+ * Externally callable function to return the working residual
+ *
+ * @param x pointer to an nlmer object
+ *
+ * @return working residual
+ */
+SEXP nlmer_update_wrkres(SEXP x)
+{
+    SEXP ans = PROTECT(allocVector(REALSXP, LENGTH(GET_SLOT(x, lme4_ySym))));
+
+    Nlmer_update_wrkres(x, REAL(ans));
+    UNPROTECT(1);
+    return ans;
+}
 
 #endif

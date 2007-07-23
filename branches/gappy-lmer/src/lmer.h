@@ -28,6 +28,7 @@ SEXP mer_create_Vt(SEXP Zt, SEXP ST, SEXP Gp);
 SEXP mer_optimize(SEXP x, SEXP verb, SEXP mtype);
 SEXP mer_postVar(SEXP x);
 SEXP mer_sigma(SEXP x, SEXP which);
+SEXP mer_update_b(SEXP x);
 SEXP mer_update_Vt(SEXP x);
 SEXP mer_validate(SEXP x);
 
@@ -35,7 +36,7 @@ SEXP nlmer_condMode(SEXP x);
 SEXP nlmer_create_Mt(SEXP Vt, SEXP sP);
 SEXP nlmer_eval_model(SEXP x);
 SEXP nlmer_update_Mt(SEXP x);
-SEXP nlmer_update_wrkres(SEXP x);
+/* SEXP nlmer_update_wrkres(SEXP x); */
 SEXP nlmer_validate(SEXP x);
 
 #endif /* LME4_LMER2_H */

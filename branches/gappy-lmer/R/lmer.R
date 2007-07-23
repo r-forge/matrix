@@ -515,9 +515,12 @@ nlmer <- function(formula, data, control = list(), start = NULL,
                deviance = dm$dev, fixef = start$fixed,
                ranef = numeric(dm$dd["q"]),
                uvec = numeric(dm$dd["q"]))
-    cv <- do.call("lmerControl", control)
-    if (missing(verbose)) verbose <- cv$msVerbose
-#    .Call(mer_optimize, ans, verbose, 1L)
+    .Call(mer_update_Vt, ans);
+    .Call(nlmer_condMode, ans)
+##     cv <- do.call("lmerControl", control)
+##     if (missing(verbose)) verbose <- cv$msVerbose
+##     .Call(mer_optimize, ans, verbose, 1L)
+    .Call(mer_update_b, ans);
     ans
 }
 
@@ -1002,27 +1005,27 @@ printNlmer <- function(x, digits = max(3, getOption("digits") - 3),
                        signif.stars = getOption("show.signif.stars"), ...)
 ### FIXME: Does nlmer need a separate show method?
 {
-    dims <- object@dims
+    dims <- x@dims
     cat("Nonlinear mixed model fit by Laplace\n")
-    if (!is.null(object@call$formula))
-        cat("Formula:", deparse(object@call$formula),"\n")
-    if (!is.null(object@call$data))
-        cat("   Data:", deparse(object@call$data), "\n")
-    if (!is.null(object@call$subset))
+    if (!is.null(x@call$formula))
+        cat("Formula:", deparse(x@call$formula),"\n")
+    if (!is.null(x@call$data))
+        cat("   Data:", deparse(x@call$data), "\n")
+    if (!is.null(x@call$subset))
         cat(" Subset:",
-            deparse(asOneSidedFormula(object@call$subset)[[2]]),"\n")
+            deparse(asOneSidedFormula(x@call$subset)[[2]]),"\n")
 
     cat("Random effects:\n")
-    print(formatVC(VarCorr(object)), quote = FALSE,
+    print(formatVC(VarCorr(x)), quote = FALSE,
           digits = max(3, getOption("digits") - 3))
 
     cat(sprintf("Number of obs: %d, groups: ", dims["n"]))
-    ngrps <- sapply(object@flist, function(x) length(levels(x)))
+    ngrps <- sapply(x@flist, function(x) length(levels(x)))
     cat(paste(paste(names(ngrps), ngrps, sep = ", "), collapse = "; "))
     cat("\n")
     cat("\nFixed effects:\n")
-    print(object@fixef)
-    invisible(object)
+    print(x@fixef)
+    invisible(x)
 }
 
 setMethod("print", "nlmer", printNlmer)
