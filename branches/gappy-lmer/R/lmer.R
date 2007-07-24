@@ -1250,21 +1250,6 @@ ST2Omega <- function(ST)
 }
 
 
-## Extract the random effects
-## setMethod("ranef", signature(object = "mer"),
-## 	  function(object, postVar = FALSE, ...) {
-## 	      ans <- new("ranef.lmer",
-##                          lapply(.Call(mer_ranef, object),
-##                                 data.frame, check.names = FALSE))
-##               names(ans) <- names(object@flist)
-##               if (postVar) {
-##                   pV <- .Call(mer_postVar, object)
-##                   for (i in seq(along = ans))
-##                       attr(ans[[i]], "postVar") <- pV[[i]]
-##               }
-##               ans
-## 	  })
-
 ## setMethod("mcmcsamp", signature(object = "lmer"),
 ## 	  function(object, n = 1, verbose = FALSE, saveb = FALSE,
 ## 		   trans = TRUE, deviance = FALSE, ...)

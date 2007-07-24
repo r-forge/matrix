@@ -375,8 +375,8 @@ nms <- names(dev)
 vals <- matrix(0, nrow = length(sg), ncol = nc, dimnames = list(NULL, nms))
 for (i in seq(along = sg)) {
     .Call("ST_setPars", mm, sg[i], PACKAGE = "lme4")
-    .Call("lmer_update_dev", mm, PACKAGE = "lme4")
-    vals[i,] <- mm@deviance
+    res <- try(.Call("lmer_update_dev", mm, PACKAGE = "lme4"), silent = TRUE)
+    vals[i,] <- if (is.null(res)) mm@deviance else NA
 }
 base <- 18 * log(deviance(lm(travel ~ Rail, Rail)))
 print(xyplot(devC + ldL2 ~ sg,

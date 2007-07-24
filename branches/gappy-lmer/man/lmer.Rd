@@ -117,21 +117,26 @@ nlmer(formula, data, control, start, verbose,
 (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
 (fm2 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), sleepstudy))
 anova(fm1, fm2)
+m1 <- nlmer(circumference ~ SSlogis(age, Asym, xmid, scal) ~ Asym|Tree,
+            Orange, verb = 1, start = c(Asym = 200, xmid = 725, scal = 350))
+.Call("mer_optimize", m1, 1L, 1L, PACKAGE = "lme4")
+m3 <- nlmer(conc ~ SSfol(Dose, Time,lKe, lKa, lCl) ~
+            (lKe|Subject) + (lKa|Subject) + (lCl|Subject), Theoph,
+            start = c(lKe = -2.5, lKa = 0.5, lCl = -3), verbose = 1)
 \dontrun{
 (m1 <- glmer(cbind(incidence, size - incidence) ~ period + (1 | herd),
             family = binomial, data = cbpp))
 (fm1 <- nlmer(circumference ~ SSlogis(age, Asym, xmid, scal) ~ Asym|Tree,
               Orange, verb = 1, start = c(Asym = 200, xmid = 725, scal = 350)))
 (fm2 <- nlmer(conc ~ SSfol(Dose, Time,lKe, lKa, lCl) ~ (lKe+lKa+lCl|Subject),
-                    Theoph, start = c(lKe = -2.5, lKa = 0.5, lCl = -3), verb = 1))
+              Theoph, start = c(lKe = -2.5, lKa = 0.5, lCl = -3), verbose = 1))
 (fm3 <- nlmer(conc ~ SSfol(Dose, Time,lKe, lKa, lCl) ~
-                     (lKe|Subject) + (lKa|Subject) + (lCl|Subject), Theoph,
-                     start = c(lKe = -2.5, lKa = 0.5, lCl = -3), verb = 1))
+              (lKe|Subject) + (lKa|Subject) + (lCl|Subject), Theoph,
+              start = c(lKe = -2.5, lKa = 0.5, lCl = -3), verbose = 1))
 (fm4 <- nlmer(conc ~ SSfol(Dose, Time,lKe, lKa, lCl) ~ (lKa+lCl|Subject),
-              Theoph, start = c(lKe = -2.5, lKa = 0.5, lCl = -3), verb = 1))
+              Theoph, start = c(lKe = -2.5, lKa = 0.5, lCl = -3), verbose = 1))
 (fm5 <- nlmer(conc ~ SSfol(Dose, Time,lKe, lKa, lCl) ~ (lKa|Subject) + (lCl|Subject), 
-              Theoph, start = c(lKe = -2.5, lKa = 0.5, lCl = -3), verb =
-  1))
+              Theoph, start = c(lKe = -2.5, lKa = 0.5, lCl = -3), verbose = 1))
 }
 }
 \keyword{models}
