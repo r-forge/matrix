@@ -919,7 +919,7 @@ A linear mixed model can be expressed as
   \bm Y=\bm X\bm\beta+\bm Z\bm B+\bm\epsilon,\quad
   \bm\epsilon\sim\mathcal{N}\left(\bm 0,\sigma^2\bm I\right),\quad
   \bm B\sim\mathcal{N}\left(\bm 0,\sigma^2\bm\Sigma(\bm\theta)\right),\quad
-  \bm{\epsilon}\perp\bm b
+  \bm\epsilon\perp\bm b
 \end{equation}
 where the symbol $\perp$ denotes independence of random variables.
 The conditional distribution of $\bm Y$ given $\bm B$ is
@@ -1367,9 +1367,12 @@ approximate penalized discrepancy obtained from
   \label{eq:nmmDeltaCond}
   \begin{aligned}
     \bm\delta^{(i)}
-    &=\arg\min_{\bm\delta}\left\|\bm\mu^{(i)}+\bm{M}^{(i)}
-      \bm P\trans\bm\delta -\bm y\right\|^2+
-    (\bm\delta+\bm u^{(i)})\trans(\bm\delta+\bm u^{(i)})\\
+    &=\arg\min_{\bm\delta}\left[\left\|\bm\mu^{(i)}+\bm{M}^{(i)}
+        \bm P\trans\bm\delta -\bm y\right\|^2+
+      (\bm\delta+\bm u^{(i)})\trans(\bm\delta+\bm u^{(i)})\right]\\
+    &=\arg\min_{\bm\delta}\left[\left\|\bm{M}^{(i)}\bm P\trans\bm\delta
+        -(\bm y-\bm\mu^{(i)})\right\|^2+
+      \left\|\bm\delta+\bm u^{(i)}\right\|^2\right]\\
     &=\arg\min_{\bm\delta}\left\|
       \begin{bmatrix}
         \bm{M}^{(i)}\bm P\trans\bm\delta\\
@@ -1382,13 +1385,28 @@ approximate penalized discrepancy obtained from
     \right\|^2\\
     &=\arg\min_{\bm\delta}\left\|
       \begin{bmatrix}
-        \bm M^{(i)}\bm P\trans\\
-        \bm I_q
-      \end{bmatrix}\bm\delta -
+        \bm{M}^{(i)}\bm P\trans\bm\delta\\
+        \bm\delta 
+      \end{bmatrix} -
       \begin{bmatrix}
         \bm y - \bm\mu^{(i)}\\
-        -\bm u^{(i+1)}
+        \bm 0 - \bm u^{(i)}
       \end{bmatrix}
+    \right\|^2\\
+    &=\arg\min_{\bm\delta}\left\|
+      \begin{bmatrix}
+        \bm M^{(i)}\bm P\trans\\
+        \bm I_q
+      \end{bmatrix}\bm\delta - \left(
+      \begin{bmatrix}
+        \bm y\\
+        \bm 0
+      \end{bmatrix} -
+      \begin{bmatrix}
+        \bm\mu^{(i)}\\
+        \bm u^{(i)}
+      \end{bmatrix}
+      \right)
     \right\|^2 ,
   \end{aligned}
 \end{equation}
@@ -1459,7 +1477,8 @@ $\bm u^{(i)}$, $\bm\beta$ and $\bm\theta$.  This ``relative
 offset'' or orthogonality convergence criterion is
 \begin{displaymath}
   \frac{\|{\bm L^{(i)}}\trans\bm\delta^{(i)}\|/\sqrt{q}}
-  {\|\bm P{\bm M^{(i)}}\trans \left(\bm y-\bm\mu^{(i)}\right)-\bm u^{(i)}\|/\sqrt{n-q}}
+  {\sqrt{\left\|\bm y-\bm\mu^{(i)}\right\|^2+\left\|\bm u^{(i)}\right\|^2}
+    /\sqrt{n-q}}
 \end{displaymath}
 when the increment is calculated using (\ref{eq:nmmCholIncr}).
 
@@ -1589,7 +1608,7 @@ not on $\bm{u}$.  We can rewrite the mean function as
   \label{eq:condlinmu}
   \bm\mu\left(\bm\eta_{\bm u}(\bm u,\bm\beta,\bm\theta)\right)=
   \bm\mu(\bm u,\bm\beta,\bm\theta)=
-  \bm\mu_{\bm{0}}(\bm\beta)+\bm{M}(\bm\beta,\bm\theta,\bm y)\bm u
+  \bm\mu_{\bm{0}}(\bm\beta)+\bm{M}(\bm\beta,\bm\theta,\bm y)\bm P\trans\bm u
 \end{equation}
 where $\bm\mu_{\bm{0}}(\bm\beta)=\bm\mu_{\bm Y|\bm U}(\bm
 0,\bm\beta,\bm\theta) =\bm\mu\left(\bm X\bm\beta\right)$.  The
@@ -1604,7 +1623,7 @@ $\bm{u}$ can be rewritten as
           \bm y-\bm\mu_{\bm{0}}(\bm\beta)\\
           \bm{0}
         \end{bmatrix}
-        - \begin{bmatrix}\bm M(\bm\beta,\bm\theta)\\
+        - \begin{bmatrix}\bm M(\bm\beta,\bm\theta)\bm P\trans\\
           \bm I_q\end{bmatrix}\bm{u}\right\|^2 .
   \end{aligned}
 \end{equation}
@@ -1612,10 +1631,10 @@ That is, $\tilde{\bm{u}}(\bm\beta,\bm\theta,\bm y)$ is the
 solution to
 \begin{equation}
   \label{eq:condlinsol}
-  \left(\bm{M}(\bm\beta,\bm\theta)\trans
-    \bm{M}(\bm\beta,\bm\theta)+\bm I_q\right)\tilde{\bm{u}}=
-  \bm L(\bm\beta,\bm\theta)\bm L(\bm\beta,\bm\theta)\trans\tilde{\bm u}
-  \bm{M}(\bm\beta,\bm\theta)\trans\left(\bm y-\bm\mu_{\bm{0}}(\bm\beta)\right) .
+  \bm P\left(\bm{M}(\bm\beta,\bm\theta)\trans
+    \bm{M}(\bm\beta,\bm\theta)+\bm I_q\right)\bm P\trans=
+  \bm L(\bm\beta,\bm\theta)\bm L(\bm\beta,\bm\theta)\trans\tilde{\bm{u}}=
+  \bm P\bm{M}(\bm\beta,\bm\theta)\trans\left(\bm y-\bm\mu_{\bm{0}}(\bm\beta)\right) .
 \end{equation}
 
 \section{Generalized linear mixed models}

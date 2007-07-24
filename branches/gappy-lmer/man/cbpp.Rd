@@ -41,7 +41,7 @@
 ## response as a matrix
 (m1 <- glmer(cbind(incidence, size - incidence) ~ period + (1 | herd),
             cbpp, binomial, verbose = TRUE))
-
+\dontrun{
 ## response as a vector of probabilities and usage of argument "weights"
 m2 <- glmer(incidence / size ~ period + (1 | herd), weights = size,
            cbpp, binomial, verbose = TRUE)
@@ -49,5 +49,6 @@ m2 <- glmer(incidence / size ~ period + (1 | herd), weights = size,
 ## Confirm that these are equivalent:
 stopifnot(all.equal(coef(m1), coef(m2)),
           all.equal(ranef(m1), ranef(m2)))
+}
 }
 \keyword{datasets}

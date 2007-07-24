@@ -30,6 +30,7 @@
 \alias{print,mer-method}
 \alias{print,lmer-method}
 \alias{print,glmer-method}
+\alias{print,nlmer-method}
 \alias{qqmath,ranef.lmer-method}
 \alias{resid,glmer-method}
 \alias{resid,lmer-method}
@@ -42,7 +43,7 @@
 \alias{simulate,lmer-method}
 \alias{summary,lmer-method}
 \alias{summary,mer-method}
-\alias{terms,lmer-method}
+\alias{terms,mer-method}
 \alias{update,mer-method}
 \alias{vcov,mer-method}
 \alias{vcov,lmer-method}
