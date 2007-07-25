@@ -254,7 +254,7 @@ tstMatrixClass <-
                 }
 		cat.(" Summary: ")
 		for(f in summList) {
-		    cat(f@generic, "() ", sep='')
+		    #cat(f@generic, "() ", sep='')
 		    stopifnot(if(clNam == "corMatrix") all.equal(f(m), f(m0))
 			      else f(m) == f(m0))
 		}

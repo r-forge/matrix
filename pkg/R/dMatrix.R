@@ -76,12 +76,13 @@ setMethod("expm", signature(x = "dMatrix"),
 setMethod("Math2",
           ## Assume that  Generic(u, k) |--> u for u in {0,1}
           ## which is true for round(), signif() ==> all structure maintained
-          signature(x = "dMatrix", digits = "numeric"),
+          signature(x = "dMatrix"),
 	  function(x, digits) {
               x@x <- callGeneric(x@x, digits = digits)
               x
           })
 
+if(getRversion() < "2.6.0" || R.version$`svn rev` < 42294) {
 setMethod("Math2",
 	  signature(x = "dMatrix", digits = "missing"),
 	  function(x, digits)
@@ -89,6 +90,7 @@ setMethod("Math2",
 		      "signif" = callGeneric(x, digits = 6),
 		      callGeneric(x, digits = 0)) ## round(x) == round(x, 0)
 	  )
+}
 
 ## at installation time:
 summGenerics <- getGroupMembers("Summary")
