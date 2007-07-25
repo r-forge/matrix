@@ -361,11 +361,13 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
 }
 
 
-/* Define all 4 of
+/* Define all of
  *  dgCMatrix_colSums(....)
  *  igCMatrix_colSums(....)
- *  lgCMatrix_colSums(....)
- *  ngCMatrix_colSums(....)
+ *  lgCMatrix_colSums_d(....)
+ *  lgCMatrix_colSums_i(....)
+ *  ngCMatrix_colSums_d(....)
+ *  ngCMatrix_colSums_i(....)
  */
 #define _dgC_
 #include "t_gCMatrix_colSums.c"

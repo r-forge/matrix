@@ -88,9 +88,12 @@ setMethod("unname", signature("Matrix", force="missing"),
 	  function(obj) { obj@Dimnames <- list(NULL,NULL); obj})
 
 setMethod("all", signature(x = "Matrix"),
-          function(x, ..., na.rm) { x <- as(x, "lMatrix"); callGeneric()})
+	  function(x, ..., na.rm)
+	  callGeneric(as(x, "lMatrix"), ..., na.rm=na.rm))
+
 setMethod("any", signature(x = "Matrix"),
-          function(x, ..., na.rm) { x <- as(x, "lMatrix"); callGeneric()})
+	  function(x, ..., na.rm)
+	  callGeneric(as(x, "lMatrix"), ..., na.rm=na.rm))
 
 ## NOTE:  "&" and "|"  are now in group "Logic" c "Ops" --> ./Ops.R
 ##        "!" is in ./not.R
