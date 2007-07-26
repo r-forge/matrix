@@ -1,5 +1,40 @@
 #include "lmer.h"
 
+/* FIXME: Add the code for alloc3DArray back in until R-2.6.0 is released */
+#if R_VERSION < R_Version(2,6,0)
+
+/**
+ * Allocate a 3-dimensional array
+ *
+ * @param mode The R mode (e.g. INTSXP)
+ * @param nrow number of rows
+ * @param ncol number of columns
+ * @param nface number of faces
+ *
+ * @return A 3-dimensional array of the indicated dimensions and mode
+ */
+static SEXP alloc3DArray(SEXPTYPE mode, int nrow, int ncol, int nface)
+{
+    SEXP s, t;
+    int n;
+
+    if (nrow < 0 || ncol < 0 || nface < 0)
+	error(_("negative extents to 3D array"));
+    if ((double)nrow * (double)ncol * (double)nface > INT_MAX)
+	error(_("alloc3Darray: too many elements specified"));
+    n = nrow * ncol * nface;
+    PROTECT(s = allocVector(mode, n));
+    PROTECT(t = allocVector(INTSXP, 3));
+    INTEGER(t)[0] = nrow;
+    INTEGER(t)[1] = ncol;
+    INTEGER(t)[2] = nface;
+    setAttrib(s, R_DimSymbol, t);
+    UNPROTECT(2);
+    return s;
+}
+
+#endif
+
 /* Functions for the lmer representation */
 
 				/* positions in the deviance vector */
@@ -499,7 +534,7 @@ lmer_update_dev(SEXP x)
     d[ML_POS] = d[ldL2_POS] + dn * (1. + d[lpdisc_POS] + log(2. * PI / dn));
     d[REML_POS] = d[ldL2_POS] + d[ldRX2_POS] + dnmp *
 	(1. + d[lpdisc_POS] + log(2. * PI / dnmp));
-    d[bqd_POS] = NA_REAL;
+    d[bqd_POS] = d[disc_POS] = NA_REAL;
     return R_NilValue;
 }
 
@@ -626,7 +661,7 @@ SEXP lmer_update_effects(SEXP x)
     Memcpy(u, (double*)(sol->x), q);
     M_cholmod_free_dense(&sol, &c);
     TSPp_SEXP_mult(GET_SLOT(x, lme4_ranefSym), GET_SLOT(x, lme4_STSym),
-		    INTEGER(GET_SLOT(x, lme4_GpSym)), uvec, (int*)(L->Perm));
+		   INTEGER(GET_SLOT(x, lme4_GpSym)), uvec, (int*)(L->Perm));
     return R_NilValue;
 }
 
@@ -761,7 +796,6 @@ SEXP lmer_postVar(SEXP x)
 /* 	    M_cholmod_free_sparse(&B, &c); */
 /* 	} */
 /* 	M_cholmod_free_sparse(&rhs, &c); */
-	Free(st);
     }
     UNPROTECT(1);
     return ans;
