@@ -500,13 +500,13 @@ M_dpoMatrix_chol(SEXP x)
 }
 
 CHM_DN attribute_hidden
-M_numeric_as_chm_dense(CHM_DN ans, double *v, int n)
+M_numeric_as_chm_dense(CHM_DN ans, double *v, int nr, int nc)
 {
-    static CHM_DN(*fun)(CHM_DN,double*,int) = NULL;
+    static CHM_DN(*fun)(CHM_DN,double*,int,int) = NULL;
     if (fun == NULL)
-	fun = (CHM_DN(*)(CHM_DN,double*,int))
+	fun = (CHM_DN(*)(CHM_DN,double*,int,int))
 	    R_GetCCallable("Matrix", "numeric_as_chm_dense");
-    return fun(ans, v, n);
+    return fun(ans, v, nr, nc);
 }
 
 int attribute_hidden

@@ -543,10 +543,11 @@ SEXP chm_dense_to_matrix(CHM_DN a, int dofree, SEXP dn)
     return ans;
 }
 
-CHM_DN numeric_as_chm_dense(CHM_DN ans, double *v, int n)
+CHM_DN numeric_as_chm_dense(CHM_DN ans, double *v, int nr, int nc)
 {
-    ans->d = ans->nzmax = ans->nrow = n;
-    ans->ncol = 1;
+    ans->d = ans->nrow = nr;
+    ans->ncol = nc;
+    ans->nzmax = nr * nc;
     ans->x = (void *) v;
     ans->xtype = CHOLMOD_REAL;
     ans->dtype = CHOLMOD_DOUBLE;
