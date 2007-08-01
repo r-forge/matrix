@@ -1,3 +1,9 @@
+2007-08-01 15:44  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4686] inst/include/Matrix.h, inst/include/Matrix_stubs.c,
+	  src/chm_common.c, src/chm_common.h: Change API for
+	  numeric_as_chm_dense and N_AS_CHM_DN
+	
 2007-08-01  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/dtrMatrix.c (dtrMatrix_matrix_mm): fix dimensionality check (!)
