@@ -51,7 +51,7 @@ setMethod("%*%", signature(x = "dtrMatrix", y = "matrix"),
 	  function(x, y) .Call(dtrMatrix_matrix_mm, x, y, FALSE),
           valueClass = "dgeMatrix")
 
-setMethod("%*%", signature(x = "dgeMatrix", y = "dtrMatrix"),
+setMethod("%*%", signature(x = "ddenseMatrix", y = "dtrMatrix"),
 	  function(x, y) .Call(dtrMatrix_matrix_mm, y, x, TRUE),
           valueClass = "dgeMatrix")
 

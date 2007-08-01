@@ -87,8 +87,10 @@ SEXP dpoMatrix_dgeMatrix_solve(SEXP a, SEXP b)
 	*bdims = INTEGER(GET_SLOT(b, Matrix_DimSym)),
 	info;
 
-    if (*adims != *bdims || bdims[1] < 1 || *adims < 1)
+    if (adims[1] != bdims[0])
 	error(_("Dimensions of system to be solved are inconsistent"));
+    if (adims[0] < 1 || bdims[1] < 1)
+	error(_("Cannot solve() for matrices with zero extents"));
     SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     slot_dup(val, b, Matrix_DimSym);
     slot_dup(val, b, Matrix_xSym);

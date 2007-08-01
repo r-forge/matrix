@@ -111,9 +111,10 @@ SEXP dsyMatrix_as_matrix(SEXP from, SEXP keep_dimnames)
 SEXP dsyMatrix_matrix_mm(SEXP a, SEXP b, SEXP rtP)
 {
     SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b));
+    int rt = asLogical(rtP); /* if(rt), compute b %*% a,  else  a %*% b */
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(b, Matrix_DimSym)),
-	m = bdims[0], n = bdims[1], rt = asLogical(rtP);
+	m = bdims[0], n = bdims[1];
     double one = 1., zero = 0.;
 
     if ((rt && n != adims[0]) || (!rt && m != adims[0]))

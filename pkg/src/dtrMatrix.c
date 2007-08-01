@@ -86,24 +86,25 @@ SEXP dtrMatrix_matrix_solve(SEXP a, SEXP b)
     return ans;
 }
 
-/* Because a must be square, the size of the answer is the same as the
- * size of b */
 SEXP dtrMatrix_matrix_mm(SEXP a, SEXP b, SEXP right)
 {
+    /* Because a must be square, the size of the answer, val,
+     * is the same as the size of b */
     SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b));
-    int rt = asLogical(right);
+    int rt = asLogical(right); /* if(rt), compute b %*% a,  else  a %*% b */
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym));
     int m = bdims[0], n = bdims[1];
     double one = 1.;
 
-    if (adims[0] != adims[1]) error(_("dtrMatrix in %*% must be square"));
-    if ((rt && (adims[0] != m)) || (!rt && (bdims[0] != m)))
-	    error(_("Matrices are not conformable for multiplication"));
+    if (adims[0] != adims[1])
+	error(_("dtrMatrix in %*% must be square"));
+    if ((rt && adims[0] != n) || (!rt && adims[1] != m))
+	error(_("Matrices are not conformable for multiplication"));
     if (m < 1 || n < 1)
 	error(_("Matrices with zero extents cannot be multiplied"));
-    F77_CALL(dtrmm)(rt ? "R" : "L", uplo_P(a), "N", diag_P(a), &m, &n,
-		    &one, REAL(GET_SLOT(a, Matrix_xSym)), adims,
+    F77_CALL(dtrmm)(rt ? "R" : "L", uplo_P(a), "N", diag_P(a), &m, &n, &one,
+		    REAL(GET_SLOT(a, Matrix_xSym)), adims,
 		    REAL(GET_SLOT(val, Matrix_xSym)), &m);
     UNPROTECT(1);
     return val;
