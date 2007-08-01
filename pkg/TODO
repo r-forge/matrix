@@ -151,6 +151,11 @@ Check for DimNames propagation in coercion and other operations.
   shows that the Cholesky factorization is computed ``too quickly''.
   Can be a big pain for largish matrices, when it is unneeded.
 
+- example(Cholesky, echo=FALSE) ; cm <- chol(mtm); str(cm); str(mtm)
+
+  shows that chol() does not seems to make use of an already
+  present factorization and rather uses one with more '0' in x slot.
+
 - diag(m) <- val    currently automatically works via  m[cbind(i,i)] <- val
   However,
   we need methods for 'diag<-' at least for diagonalMatrix,

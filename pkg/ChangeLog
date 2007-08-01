@@ -1,3 +1,8 @@
+2007-08-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/dtrMatrix.c (dtrMatrix_matrix_mm): fix dimensionality check (!)
+	* tests/matprod.R: regr.test for it
+
 2007-07-20  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/dMatrix.R: fix from Brian for   Math2(., digits = "missing")

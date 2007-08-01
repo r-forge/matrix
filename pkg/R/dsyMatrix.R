@@ -52,11 +52,12 @@ setMethod("rcond", signature(x = "dsyMatrix", type = "missing"),
 
 setMethod("%*%", signature(x = "dsyMatrix", y = "ddenseMatrix"),
           function(x, y) .Call(dsyMatrix_matrix_mm, x, y, FALSE))
-
 setMethod("%*%", signature(x = "dsyMatrix", y = "matrix"),
           function(x, y) .Call(dsyMatrix_matrix_mm, x, y, FALSE))
 
 setMethod("%*%", signature(x = "ddenseMatrix", y = "dsyMatrix"),
+          function(x, y) .Call(dsyMatrix_matrix_mm, y, x, TRUE))
+setMethod("%*%", signature(x = "matrix", y = "dsyMatrix"),
           function(x, y) .Call(dsyMatrix_matrix_mm, y, x, TRUE))
 
 setMethod("solve", signature(a = "dsyMatrix", b = "missing"),
