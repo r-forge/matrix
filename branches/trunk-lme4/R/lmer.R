@@ -697,8 +697,7 @@ setMethod("simulate", signature(object = "mer"),
 	      on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
 	  }
 
-          stopifnot((nsim <- as.integer(nsim[1])) > 0,
-                    inherits(object, "lmer"))
+	  stopifnot((nsim <- as.integer(nsim[1])) > 0, is(object, "lmer"))
 	  ## similate the linear predictors
 	  lpred <- .Call(mer_simulate, object, nsim)
 	  sc <- abs(object@devComp[8])
@@ -717,7 +716,7 @@ simulestimate <- function(x, FUN, nsim = 1, seed = NULL, control = list())
 {
     FUN <- match.fun(FUN)
     stopifnot((nsim <- as.integer(nsim[1])) > 0,
-	      inherits(x, "lmer"))
+              is(x, "lmer"))
     if (!is.null(seed)) set.seed(seed)
     ## simulate the linear predictors
     lpred <- .Call(mer_simulate, x, nsim)
@@ -1261,7 +1260,7 @@ lmer2 <- function(formula, data, family = gaussian,
                  method, mc, model)
     rm(fr, FL, Ztl, glmFit)
     if (!is.null(start)) mer <- setST(mer, start)
-    if (!inherits(mer, "glmer2")) {      # linear mixed model
+    if (!is(mer, "glmer2")) {      # linear mixed model
         .Call(lmer2_optimize, mer, cv$msVerbose)
         .Call(lmer2_update_effects, mer)
     }
@@ -1308,7 +1307,7 @@ printMer2 <- function(x, digits = max(3, getOption("digits") - 3),
     if (!is.null(x@call$subset))
         cat(" Subset:",
             deparse(asOneSidedFormula(x@call$subset)[[2]]),"\n")
-    if (inherits(x, "glmer2"))
+    if (is(x, "glmer2"))
         cat(" Family: ", so@family$family, "(",
             so@family$link, " link)\n", sep = "")
     print(so@AICtab, digits = digits)
