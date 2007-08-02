@@ -406,6 +406,18 @@ void R_cholmod_error(int status, char *file, int line, char *message)
     error(_("Cholmod error '%s' at file:%s, line %d"), message, file, line);
 }
 
+/* just to get 'int' instead of 'void' as required by CHOLMOD's print_function */
+static
+int R_cholmod_printf(const char* fmt, ...)
+{
+    va_list(ap);
+
+    va_start(ap, fmt);
+    Rprintf((char *)fmt, ap);
+    va_end(ap);
+    return 0;
+}
+
 /**
  * Initialize the CHOLMOD library and replace the print and error functions
  * by R-specific versions.
@@ -419,7 +431,7 @@ int R_cholmod_start(CHM_CM c)
     int res;
     if (!(res = cholmod_start(c)))
 	error(_("Unable to initialize cholmod: error code %d"), res);
-    c->print_function = Rprintf;
+    c->print_function = R_cholmod_printf; /* Rprintf gives warning */
     c->error_handler = R_cholmod_error;
     return TRUE;
 }
