@@ -25,7 +25,7 @@ exportClasses(
               "mer",
               "nlmer",
               "pedigree",
-              "ranef.lmer",
+              "ranef.mer",
               "summary.glmer",
               "summary.lmer"
 ##               ,"summary.mer"
