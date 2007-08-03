@@ -684,30 +684,42 @@ setMethod("mcmcsamp", signature(object = "glmer"),
       })
 
 setMethod("simulate", signature(object = "mer"),
-	  function(object, nsim = 1, seed = NULL, ...)
+          function(object, nsim = 1, seed = NULL, ...)
       {
-	  if(!exists(".Random.seed", envir = .GlobalEnv))
-	      runif(1)		     # initialize the RNG if necessary
-	  if(is.null(seed))
-	      RNGstate <- .Random.seed
-	  else {
-	      R.seed <- .Random.seed
-	      set.seed(seed)
-	      RNGstate <- structure(seed, kind = as.list(RNGkind()))
-	      on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
-	  }
-
-	  stopifnot((nsim <- as.integer(nsim[1])) > 0, is(object, "lmer"))
-	  ## similate the linear predictors
-	  lpred <- .Call(mer_simulate, object, nsim)
-	  sc <- abs(object@devComp[8])
-
-	  ## add fixed-effects contribution and per-observation noise term
-	  lpred <- as.data.frame(lpred + drop(object@X %*% fixef(object)) +
-				 rnorm(prod(dim(lpred)), sd = sc))
-	  ## save the seed
-	  attr(lpred, "seed") <- RNGstate
-	  lpred
+          if(!exists(".Random.seed", envir = .GlobalEnv))
+              runif(1)                    # initialize the RNG if necessary
+          if(is.null(seed))
+              RNGstate <- .Random.seed
+          else {
+              R.seed <- .Random.seed
+              set.seed(seed)
+              RNGstate <- structure(seed, kind = as.list(RNGkind()))
+              on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+          }
+          
+          stopifnot((nsim <- as.integer(nsim[1])) > 0, is(object, "lmer"))
+          ## similate the linear predictors
+          lpred <- .Call(lme4:::mer_simulate, object, nsim)
+          sc <- abs(object@devComp[8])
+          
+          ## add fixed-effects contribution
+          lpred <- lpred + drop(object@X %*% fixef(object))
+          n <- prod(dim(lpred))
+          
+          if (!is(object, "glmer")) {  # and per-observation noise term
+              response <- as.data.frame(lpred + rnorm(n, sd = sc))
+              attr(response, "seed") <- RNGstate
+              return(response)
+          }
+          fam <- attr(object, "family")
+          if ("poisson"==fam$family) {
+              response <- as.data.frame(matrix(byrow = FALSE, ncol=nsim,
+                                          rpois(n, fam$linkinv(lpred))))
+              attr(response, "seed") <- RNGstate
+              return(response)
+          }
+          stop("simulate() not yet implemented for", fam$family,
+               "glmms\n")
       })
 
 ### "FIXME": the following has too(?) much cut & paste from above
