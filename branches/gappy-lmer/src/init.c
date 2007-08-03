@@ -1,10 +1,8 @@
-#include "lme4_utils.h"
 #include "lmer.h"
-#include "pedigree.h" 
 #include <R_ext/Rdynload.h>
 
 /* Syms.h needs to be included a second time (it is already included
- * through lme4_utils.h) so the symbols are defined without extern.
+ * through lmer.h) so the symbols are defined without the extern modifier.
  */
 #include "Syms.h" 
 
@@ -22,15 +20,14 @@ static R_CallMethodDef CallEntries[] = {
     {"lme4_rWishart", (DL_FUNC) &lme4_rWishart, 3},
 
     {"lmer_MCMCsamp", (DL_FUNC) &lmer_MCMCsamp, 6},
-    {"lmer_postVar", (DL_FUNC) &lmer_postVar, 1},
-    {"lmer_update_L", (DL_FUNC) &lmer_update_L, 1},
-    {"lmer_update_effects", (DL_FUNC) &lmer_update_effects, 1},
     {"lmer_update_dev", (DL_FUNC) &lmer_update_dev, 1},
+    {"lmer_update_effects", (DL_FUNC) &lmer_update_effects, 1},
     {"lmer_validate", (DL_FUNC) &lmer_validate, 1},
 
     {"mer_create_L", (DL_FUNC) &mer_create_L, 1},
     {"mer_create_Vt", (DL_FUNC) &mer_create_Vt, 3},
     {"mer_optimize", (DL_FUNC) &mer_optimize, 3},
+    {"mer_postVar", (DL_FUNC) &mer_postVar, 2},
     {"mer_sigma", (DL_FUNC) &mer_sigma, 2},
     {"mer_update_b", (DL_FUNC) &mer_update_b, 1},
     {"mer_update_Vt", (DL_FUNC) &mer_update_Vt, 1},
