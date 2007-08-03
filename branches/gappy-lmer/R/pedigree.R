@@ -15,7 +15,7 @@ setAs("pedigree", "dtCMatrix", # representation as T^{-1}
       function(from) {
 	  sire <- from@sire
 	  n <- length(sire)
-	  animal <- seq(along = sire)
+	  animal <- seq_along(sire)
 	  j <- c(sire, from@dam)
 	  ind <- !is.na(j)
 	  as(new("dtTMatrix", i = rep.int(animal, 2)[ind] - 1:1,
@@ -32,7 +32,7 @@ setAs("pedigree", "data.frame",
 
 ped2DF <- function(x) {
     lab <- x@label
-    lev <- seq(along = lab)
+    lev <- seq_along(lab)
     data.frame(sire = factor(x@sire, levels = lev, labels = lab),
 	       dam  = factor(x@dam,  levels = lev, labels = lab),
 	       row.names = lab)
