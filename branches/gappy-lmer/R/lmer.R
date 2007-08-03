@@ -561,7 +561,6 @@ setMethod("ranef", signature(object = "mer"),
 ### Extract the random effects
 ### FIXME: This will need to be modified if flist is collapsed
       {
-          if (postVar) .NotYetImplemented()
           Gp <- object@Gp
           ii <- lapply(diff(Gp), seq_len)
           rr <- object@ranef
@@ -575,12 +574,15 @@ setMethod("ranef", signature(object = "mer"),
                                        dimnames = list(rn[[i]], cn[[i]])),
                                 check.names = FALSE))
           names(ans) <- names(object@ST)
-##               if (postVar) {
-##                   pV <- .Call(mer_postVar, object)
-##                   for (i in seq(along = ans))
-##                       attr(ans[[i]], "postVar") <- pV[[i]]
-##               }
-          ans
+          if (postVar) {
+              pV <- .Call(mer_postVar, object,
+                          !inherits(object, "glmer")
+                          || !(object@famName['family'] %in%
+                               c("binomial", "poisson")))
+              for (i in seq_along(ans))
+                  attr(ans[[i]], "postVar") <- pV[[i]]
+          }
+          new("ranef.mer", ans)
       })
 
 setMethod("VarCorr", signature(x = "mer"),
@@ -591,7 +593,7 @@ setMethod("VarCorr", signature(x = "mer"),
 	  sc <- .Call(mer_sigma, x, REML)
 	  cnames <- x@cnames
 	  ans <- x@ST
-          for (i in seq(along = ans)) {
+          for (i in seq_along(ans)) {
               ai <- ans[[i]]
               dm <- dim(ai)
               if (dm[1] < 2) {
@@ -1059,7 +1061,7 @@ setMethod("plot", signature(x = "coef.lmer"),
                  splom(~ gf | .grp, ...))
       })
 
-setMethod("plot", signature(x = "ranef.lmer"),
+setMethod("plot", signature(x = "ranef.mer"),
 	  function(x, y, ...)
       {
 	  lapply(x, function(x) {
@@ -1073,7 +1075,7 @@ setMethod("plot", signature(x = "ranef.lmer"),
 	  })
       })
 
-setMethod("qqmath", signature(x = "ranef.lmer"),
+setMethod("qqmath", signature(x = "ranef.mer"),
           function(x, data, ...) {
               prepanel.ci <- function(x, y, se, subscripts, ...) {
                   y <- as.numeric(y)
@@ -1129,7 +1131,6 @@ setMethod("mcmcsamp", signature(object = "lmer"),
 ### Generate a Markov chain Monte Carlo sample from the posterior distribution
 ### of the parameters in a linear mixed model
       {
-          .NotYetImplemented()
           ans <- t(.Call(lmer_MCMCsamp, object, saveb, n,
                          trans, verbose, deviance))
 	  attr(ans, "mcpar") <- as.integer(c(1, n, 1))
@@ -1157,19 +1158,18 @@ mcmccompnames <- function(ans, object, saveb, trans, glmer, deviance)
 ### Mangle the names of the columns of the mcmcsamp result ans
 ### This operation is common to the methods for "lmer" and "glmer"
 {
-    .NotYetImplemented()
     gnms <- names(object@flist)
     cnms <- object@cnames
     ff <- fixef(object)
     colnms <- c(names(ff), if (glmer) character(0) else "sigma^2",
-                unlist(lapply(seq(along = gnms),
+                unlist(lapply(seq_along(gnms),
                               function(i)
                               abbrvNms(gnms[i],cnms[[i]]))))
     if (trans) {
         ## parameter type: 0 => fixed effect, 1 => variance,
         ##		 2 => covariance
         ptyp <- c(integer(length(ff)), if (glmer) integer(0) else 1:1,
-                  unlist(lapply(seq(along = gnms),
+                  unlist(lapply(seq_along(gnms),
                                 function(i)
                             {
                                 k <- length(cnms[[i]])
@@ -1183,12 +1183,13 @@ mcmccompnames <- function(ans, object, saveb, trans, glmer, deviance)
     if (deviance) colnms <- c(colnms, "deviance")
 ### FIXME: this will fail for a mer2 object
     if(saveb) {## maybe better colnames, "RE.1","RE.2", ... ?
+        .NotYetImplemented()
         rZy <- object@rZy
         colnms <- c(colnms,
                     paste("b", sprintf(paste("%0",
                                              1+floor(log(length(rZy),10)),
                                              "d", sep = ''),
-                                       seq(along = rZy)),
+                                       seq_along(rZy)),
                           sep = '.'))
     }
     colnames(ans) <- colnms

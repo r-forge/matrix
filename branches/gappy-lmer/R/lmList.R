@@ -166,14 +166,14 @@ setMethod("confint", signature(object = "lmList"),
               a <- (1 - level)/2
               fac <- sd * qt(c(a, 1 - a)/2, attr(sd, "df"))
               parm <- dimnames(template)[[1]]
-              for (i in seq(along = object))
+              for (i in seq_along(object))
                   val[ , , i] <-
                       coef(object[[i]])[parm] +
                           sqrt(diag(summary(object[[i]],
                                             corr = FALSE)$cov.unscaled
                                     )[parm]) %o% fac
           } else {
-              for (i in seq(along = object)) {
+              for (i in seq_along(object)) {
                   mCall$object <- object[[i]]
                   val[ , , i] <- eval(mCall)
               }
