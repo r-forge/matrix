@@ -88,7 +88,7 @@ setClass("summary.glmer",          # the "glmer" result ``enhanced'' :
 setClass("summary.nlmer",          # the "glmer" result ``enhanced'' :
 	 contains = c("nlmer", "summary.mer"))
 
-setClass("ranef.lmer", contains = "list")
+setClass("ranef.mer", contains = "list")
 
 setClass("coef.lmer", contains = "list")
 

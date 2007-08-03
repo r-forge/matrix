@@ -3,13 +3,12 @@
 \docType{methods}
 \alias{ranef}
 \alias{ranef-methods}
-\alias{ranef,ANY-method}
-\alias{ranef,lmer-method}
+%\alias{ranef,ANY-method}
 \alias{ranef,mer-method}
 \title{Extract Random Effects}
 \usage{
 ranef(object, \dots)
-\S4method{ranef}{lmer}(object, postVar, \dots)
+\S4method{ranef}{mer}(object, postVar, \dots)
 }
 \description{
   A generic function to extract, and optionally accumulate, the random effects.
@@ -58,11 +57,9 @@ ranef(object, \dots)
 fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
 fm2 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), sleepstudy)
 ranef(fm1)
-\dontrun{
 str(rr1 <- ranef(fm1, postVar = TRUE))
 qqmath(rr1)
 str(ranef(fm2, postVar = TRUE))
-}
 }
 \keyword{models}
 \keyword{methods}

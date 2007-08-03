@@ -11,7 +11,7 @@
 \alias{summary.lmer-class}
 \alias{summary.glmer-class}
 \alias{summary.nlmer-class}
-\alias{ranef.lmer-class}
+\alias{ranef.mer-class}
 % Methods
 \alias{anova,lmer-method}
 \alias{coef,lmer-method}
@@ -26,12 +26,12 @@
 \alias{formula,mer-method}
 \alias{logLik,mer-method}
 \alias{plot,coef.lmer-method}
-\alias{plot,ranef.lmer-method}
+\alias{plot,ranef.mer-method}
 \alias{print,mer-method}
 \alias{print,lmer-method}
 \alias{print,glmer-method}
 \alias{print,nlmer-method}
-\alias{qqmath,ranef.lmer-method}
+\alias{qqmath,ranef.mer-method}
 \alias{resid,glmer-method}
 \alias{resid,lmer-method}
 \alias{residuals,glmer-method}
@@ -59,7 +59,7 @@
   cross-product of its columns.  The \code{lmer} class extends
   \code{mer} to represent a fitted linear mixed-effects model.  The
   \code{summary.mer} and \code{summary.lmer} classes represent summaries
-  of these objects.  The \code{coef.lmer} and \code{ranef.lmer} classes
+  of these objects.  The \code{coef.lmer} and \code{ranef.mer} classes
   represent fixed and random effect \dQuote{coefficients}.
 }
 \section{Objects from the Class}{
