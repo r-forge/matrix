@@ -279,8 +279,8 @@ mkdims <- function(fr, FL, start)
 
     ## record dimensions and algorithm settings
     dd <-
-        VecFromNames(c("nf", "n", "p", "q", "s", "np", "REML", "ftyp", "nest"),
-                       "integer")
+        VecFromNames(c("nf", "n", "p", "q", "s", "np", "REML", "ftyp",
+                       "nest", "cvg"), "integer")
     dd["nf"] <- length(cnames)          # number of random-effects terms
     dd["n"] <- nrow(fr$mf)              # number of observations
     dd["p"] <- ncol(fr$X)               # number of fixed-effects coefficients
@@ -321,6 +321,30 @@ mkFamilyEnv <- function(glmFit)
     assign("z", unname(glmFit$residuals), env = env)
 ### FIXME: install the family functions and create evaluation expressions in the environment
     env
+}
+
+convergenceMessage <- function(cvg)
+### Create the convergence message
+{
+    msg <- switch(as.character(cvg),
+                  "3" = "X-convergence (3)",
+                  "4" = "relative convergence (4)",
+                  "5" = "both X-convergence and relative convergence (5)",
+                  "6" = "absolute function convergence (6)",
+                  
+                  "7" = "singular convergence (7)",
+                  "8" = "false convergence (8)",
+                  "9" = "function evaluation limit reached without convergence (9)",
+                  "10" = "iteration limit reached without convergence (9)",
+                  "14" = "storage has been allocated (?) (14)",
+                  
+                  "15" = "LIV too small (15)",
+                  "16" = "LV too small (16)",
+                  "63" = "fn cannot be computed at initial par (63)",
+                  "65" = "gr cannot be computed at initial par (65)")
+    if (is.null(msg))
+        msg <- paste("See PORT documentation.  Code (", cvg, ")", sep = "")
+    msg
 }
 
 ### The main event
@@ -380,7 +404,8 @@ lmer <-
                uvec = numeric(dm$dd["q"]))
     cv <- do.call("lmerControl", control)
     if (missing(verbose)) verbose <- cv$msVerbose
-    .Call(mer_optimize, ans, verbose, 0)
+    .Call(mer_optimize, ans, verbose, 0L)
+    if (ans@dims["cvg"] > 6) warning(convergenceMessage(ans@dims["cvg"]))
     .Call(lmer_update_effects, ans)
     ans
 }
@@ -504,8 +529,8 @@ nlmer <- function(formula, data, control = list(), start = NULL,
 
     ans <- new("nlmer",
                env = env, model = nlmod, pnames = pnames,
-               mu = numeric(dm$dd["n"]), Mt = Mt,
-               frame = if (model) fr$mf else fr$mf[0,],
+               mu = numeric(dm$dd["n"]), resid = numeric(dm$dd["n"]),
+               Mt = Mt, frame = if (model) fr$mf else fr$mf[0,],
                call = mc, terms = fr$mt, flist = dm$flist, X = X,
                Zt = dm$Zt, Vt = dm$Vt, y = unname(as.double(fr$Y)),
                weights = unname(fr$wts), 
@@ -515,11 +540,13 @@ nlmer <- function(formula, data, control = list(), start = NULL,
                deviance = dm$dev, fixef = start$fixed,
                ranef = numeric(dm$dd["q"]),
                uvec = numeric(dm$dd["q"]))
-    .Call(mer_update_Vt, ans);
-    .Call(nlmer_condMode, ans)
-##     cv <- do.call("lmerControl", control)
-##     if (missing(verbose)) verbose <- cv$msVerbose
-##     .Call(mer_optimize, ans, verbose, 1L)
+    .Call(nlmer_eval_model, ans)
+    if (!all.equal(colnames(attr(ans@mu, "gradient")), ans@pnames))
+        stop("parameter names do not match column names of gradient")
+    cv <- do.call("lmerControl", control)
+    if (missing(verbose)) verbose <- cv$msVerbose
+    .Call(mer_optimize, ans, verbose, 1L)
+    if (ans@dims["cvg"] > 6) warning(convergenceMessage(ans@dims["cvg"]))
     .Call(mer_update_b, ans);
     ans
 }
@@ -614,7 +641,7 @@ setMethod("VarCorr", signature(x = "mer"),
 
 #### Methods for standard extractors for fitted models
 
-setMethod("anova", signature(object = "lmer"),
+setMethod("anova", signature(object = "mer"),
 	  function(object, ...)
       {
 	  mCall <- match.call(expand.dots = TRUE)
@@ -661,6 +688,8 @@ setMethod("anova", signature(object = "lmer"),
 	      return(val)
 	  }
 	  else { ## ------ single model ---------------------
+              if (!is(object, "lmer"))
+                  stop("single argument anova not implemented for nlmer or glmer")
               p <- object@dims["p"]
 	      ss <- (object@RXy[seq_len(p), p + 1L, drop = TRUE])^2
 	      names(ss) <- names(object@fixef)

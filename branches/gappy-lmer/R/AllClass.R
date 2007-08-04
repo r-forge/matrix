@@ -62,7 +62,8 @@ setClass("nlmer", ## nonlinear mixed models
                         model = "call",      # nonlinear model
                         pnames = "character", # parameter names for nonlinear model
                         ## slots that vary during optimization
-                        mu = "numeric", # fitted values at current values of beta and b
+                        mu = "numeric",      # fitted values at current beta and b
+                        resid = "numeric",   # raw residuals at current beta and b
                         Mt = "dgCMatrix"), # transpose of gradient matrix d mu/d u
          contains = "mer",
          validity = function(object) .Call(nlmer_validate, object))
