@@ -35,6 +35,7 @@ SEXP attr_hidden
     lme4_pnamesSym,
     lme4_pwtsSym,
     lme4_ranefSym,
+    lme4_residSym,
     lme4_uvecSym,
     lme4_weightsSym,
     lme4_wrkresSym,

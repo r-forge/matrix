@@ -94,6 +94,7 @@ void R_init_lme4(DllInfo *dll)
     lme4_pnamesSym = install("pnames");
     lme4_pwtsSym = install("pwts");
     lme4_ranefSym = install("ranef");
+    lme4_residSym = install("resid");
     lme4_uvecSym = install("uvec");
     lme4_weightsSym = install("weights");
     lme4_wrkresSym = install("wrkres");
