@@ -224,9 +224,9 @@ setMethod("crossprod", signature(x = "numeric", y = "Matrix"),
 	  function(x, y = NULL)	 callGeneric(as.matrix(x), y))
 
 setMethod("crossprod", signature(x = "Matrix", y = "matrix"),
-	  function(x, y) callGeneric(x, Matrix(y)))
+	  function(x, y = NULL) callGeneric(x, Matrix(y)))
 setMethod("crossprod", signature(x = "matrix", y = "Matrix"),
-	  function(x, y) callGeneric(Matrix(x), y))
+	  function(x, y = NULL) callGeneric(Matrix(x), y))
 
 ## The as.matrix() promotion seems illogical to MM,
 ## but is according to help(tcrossprod, package = "base") :
@@ -235,9 +235,9 @@ setMethod("tcrossprod", signature(x = "Matrix", y = "numeric"),
 setMethod("tcrossprod", signature(x = "numeric", y = "Matrix"),
 	  function(x, y = NULL)	 callGeneric(as.matrix(x), y))
 setMethod("tcrossprod", signature(x = "Matrix", y = "matrix"),
-	  function(x, y) callGeneric(x, Matrix(y)))
+	  function(x, y = NULL) callGeneric(x, Matrix(y)))
 setMethod("tcrossprod", signature(x = "matrix", y = "Matrix"),
-	  function(x, y) callGeneric(Matrix(x), y))
+	  function(x, y = NULL) callGeneric(Matrix(x), y))
 
 ## maybe not optimal
 setMethod("solve", signature(a = "Matrix", b = "missing"),
@@ -251,13 +251,7 @@ setMethod("solve", signature(a = "matrix", b = "Matrix"),
 	  function(a, b, ...) callGeneric(Matrix(a), b))
 
 ## when no sub-class method is found, bail out
-setMethod("solve", signature(a = "Matrix", b = "matrix"),
-	  function(a, b, ...) .bail.out.2("solve", class(a), "matrix"))
 setMethod("solve", signature(a = "Matrix", b = "Matrix"),
-	  function(a, b, ...) .bail.out.2("solve", class(a), class(b)))
-setMethod("solve", signature(a = "Matrix", b = "matrix"),
-	  function(a, b, ...) .bail.out.2("solve", class(a), class(b)))
-setMethod("solve", signature(a = "matrix", b = "Matrix"),
 	  function(a, b, ...) .bail.out.2("solve", class(a), class(b)))
 
 ## bail-out methods in order to get better error messages

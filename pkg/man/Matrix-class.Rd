@@ -80,6 +80,7 @@
 \alias{image,Matrix-method}
 \alias{solve,Matrix,Matrix-method}
 \alias{solve,Matrix,matrix-method}
+\alias{solve,matrix,Matrix-method}
 \alias{solve,Matrix,missing-method}
 \alias{solve,Matrix,numeric-method}
 \alias{crossprod,ANY,Matrix-method}
