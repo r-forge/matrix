@@ -1,15 +1,18 @@
+2007-08-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/dsyMatrix.c (dsyMatrix_matrix_mm): 'b' might be matrix;
+	must copy its *expanded* x slot before LAPACK call.
+
+	* tests/matprod.R: test the last days' changes.
+
 2007-08-03  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Matrix.R (%*%, crossprod, tcrossprod): add method for
-		("Matrix", "matrix") whish is needed in some cases.
-
-	* src/dsyMatrix.c (dsyMatrix_matrix_mm): get @Dim of 'val', not
-	'b' which differs for 'matrix'
+		("Matrix", "matrix") which is needed in some cases.
+	Ditto for solve().
 
 	* R/colSums.R (.as.dge.Fun): need ddenseMatrix methods to avoid
 	infinite recursion in dispatch for some cases.
-
-	* tests/matprod.R: test all of the above
 
 
 2007-08-02  Martin Maechler  <maechler@stat.math.ethz.ch>
