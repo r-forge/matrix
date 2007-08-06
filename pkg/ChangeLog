@@ -1,6 +1,20 @@
+2007-08-03  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R (%*%, crossprod, tcrossprod): add method for
+		("Matrix", "matrix") whish is needed in some cases.
+
+	* src/dsyMatrix.c (dsyMatrix_matrix_mm): get @Dim of 'val', not
+	'b' which differs for 'matrix'
+
+	* R/colSums.R (.as.dge.Fun): need ddenseMatrix methods to avoid
+	infinite recursion in dispatch for some cases.
+
+	* tests/matprod.R: test all of the above
+
+
 2007-08-02  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Date): set ready for release
+	* DESCRIPTION (Date): set ready for release -- 0.999375-1
 
 2007-08-01 15:44  Douglas Bates <bates@stat.wisc.edu>
 
