@@ -5,6 +5,11 @@
 
 	* tests/matprod.R: test the last days' changes.
 
+2007-08-06 16:43  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4712] inst/include/Matrix_stubs.c: Change R_cholmod_printf in stubs
+	  as well as in sources
+	
 2007-08-03  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Matrix.R (%*%, crossprod, tcrossprod): add method for
@@ -14,6 +19,10 @@
 	* R/colSums.R (.as.dge.Fun): need ddenseMatrix methods to avoid
 	infinite recursion in dispatch for some cases.
 
+2007-08-02 08:48  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* [r4693] src/chm_common.c: R_cholmod_printf() instead of Rprintf() just
+	  so pointers match
 
 2007-08-02  Martin Maechler  <maechler@stat.math.ethz.ch>
 
