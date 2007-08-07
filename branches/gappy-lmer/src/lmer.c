@@ -1477,69 +1477,105 @@ SEXP glmer_eta(SEXP x)
  */
 static int Glmer_condMode(SEXP x)
 {
-    SEXP env = GET_SLOT(x, lme4_envSym),
-	moff = GET_SLOT(x, lme4_offsetSym);
+    SEXP env = GET_SLOT(x, lme4_envSym);
     CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
     int *vp = (int*)(cVt->p), cfll = c.final_ll, i, j, p;
     int n = cVt->ncol, nnz = vp[cVt->ncol], q = cVt->nrow;
-    CHM_DN td1, td2;
-    double crit = IRLS_TOL + 1, dn = (double)n,
-	m_one[] = {-1, 0}, one[] = {1,0};
+    double cfac = ((double)(n-q))/((double)q),
+	crit = IRLS_TOL + 1, lpd_old = DOUBLE_XMAX,
+	one[] = {1,0}, step, zero[] = {0, 0};
     double *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
 	*eta = REAL(findVarInFrame(env, lme4_etaSym)),
-	*mo = LENGTH(moff) ? REAL(moff) : (double*) NULL,
-	*u = REAL(GET_SLOT(x, lme4_uvecSym)),
+	*mu = REAL(findVarInFrame(env, lme4_muSym)),
+	*rr, *u = REAL(GET_SLOT(x, lme4_uvecSym)),
 	*vx = (double*)(cVt->x),
 	*w = REAL(GET_SLOT(x, lme4_weightsSym)),
 	*y = REAL(GET_SLOT(x, lme4_ySym));
     CHM_FR L = L_SLOT(x);
-    double *dmu_deta = Alloca(n, double),
+    double *dmu_deta = Alloca(n, double), *tmp = Alloca(n, double),
 	*uold = Alloca(q, double), *var = Alloca(n, double),
 	*wx = Alloca(nnz, double); /* weighted x slot of cVt */
-    CHM_DN res = N_AS_CHM_DN(Alloca(n, double), n, 1),
-	rhs = N_AS_CHM_DN(Alloca(q, double), q, 1);
+    CHM_DN ctmp = N_AS_CHM_DN(Alloca(n, double), n, 1),
+	res = N_AS_CHM_DN(Alloca(n, double), n, 1),
+	rhs = N_AS_CHM_DN(Alloca(q, double), q, 1), sol;
     R_CheckStack();
 
+    rr = (double*)(res->x);
+    if (!(L->is_ll)) error(_("L must be LL', not LDL'"));
+
+    if (q > n) error(_("q = %d > n = %d"), q, n);
     mer_update_Vt(x);
-    Memcpy(uold, u, q); c.final_ll = L->is_ll;
+    AZERO(u, q);
+    c.final_ll = L->is_ll;
     Mer_eta(x, eta); glmer_linkinv(x);
     glmer_dmu_deta(x, dmu_deta); glmer_var(x, var);
-    for (i = 0; i < IRLS_MAXITER; i++) {
+    for (i = 0; i < IRLS_MAXITER && crit > IRLS_TOL; i++) {
 	for (j = 0; j < n; j++) { /* calculate weighted Vt and residual */
-	    double ww = sqrt(w[j] * dmu_deta[j] * dmu_deta[j]/var[j]);
-	    ((double*)(res->x))[j] = y[j] - dmu_deta[j] - (mo ? mo[j] : 0);
-	    for (p = vp[j]; p < vp[j + 1]; p++) wx[p] = vx[p] * ww;
+	    double ww = sqrt(w[j]/var[j]);
+	    rr[j] = ww * (y[j] - mu[j]);
+	    for (p = vp[j]; p < vp[j + 1]; p++) wx[p] = vx[p] * ww * dmu_deta[j];
 	}
 	cVt->x = (void*)wx;	/* Factor V'WV + I */
 	if (!M_cholmod_factorize_p(cVt, one, (int*) NULL, 0, L, &c))
 	    error(_("cholmod_factorize_p failed:"));
-				/* evaluate V'[y-dmu_deta]-u */
-	cVt->x = (void*)vx; Memcpy((double*)(rhs->x), u, q);
-	if (!(j = M_cholmod_sdmult(cVt, 0/*trans*/, one, m_one, res, rhs, &c)))
+	dev[ldL2_POS] = chm_log_det2(L);
+				/* evaluate V'W[res] */
+	if (!(j = M_cholmod_sdmult(cVt, 0/*trans*/, one, zero, res, rhs, &c)))
 	    error(_("cholmod_sdmult failed:"));
-				/* solve for the increment */
-	td1 = M_cholmod_solve(CHOLMOD_L, L, rhs, &c);
-	td2 = M_cholmod_solve(CHOLMOD_Lt, L, td1, &c);    
-	M_cholmod_free_dense(&td1, &c);
-	for (j = 0; j < q; j++) u[j] = uold[j] + ((double*)(td2->x))[j];
-	M_cholmod_free_dense(&td2, &c);
-	dev[bqd_POS] = lme4_sumsq(u, q);
-	Mer_eta(x, eta); glmer_linkinv(x); glmer_dev_resids(x);
-	glmer_dmu_deta(x, dmu_deta); glmer_var(x, var);
- 	crit = conv_crit(uold, u, q);
-#ifdef DEBUG_NLMER
-	Rprintf("%3d: %20.15g %20.15g", i, dev[disc_POS], dev[bqd_POS]);
-	Rprintf(" %20.15g\n", dev[disc_POS] + dev[bqd_POS]);
-#endif
+				/* permute */
+	sol = M_cholmod_solve(CHOLMOD_P, L, ctmp, &c);
+	for (j = 0; j < q; j++) tmp[j] = ((double*)(sol->x))[j] - u[j];
+	M_cholmod_free_dense(&sol, &c);
+	if (!(sol = M_cholmod_solve(CHOLMOD_L, L, ctmp, &c)))
+	    error(_("cholmod_solve (CHOLMOD_L) failed"));
+	Memcpy(tmp, (double*)(sol->x), q);
+	M_cholmod_free_dense(&sol, &c);
+				/* check convergence criterion */
+	crit = cfac * lme4_sumsq(tmp, q) / exp(lpd_old);
 	if (crit < IRLS_TOL) break;
+	if (!(sol = M_cholmod_solve(CHOLMOD_Lt, L, ctmp, &c)))
+	    error(_("cholmod_solve (CHOLMOD_Lt) failed"));
+	Memcpy(tmp, (double*)(sol->x), q);
+	M_cholmod_free_dense(&sol, &c);
+	for (step = 1; step > IRLS_SMIN && dev[lpdisc_POS] >= lpd_old;
+	     step /= 2) {	/* step halving */
+	    for (j = 0; j < q; j++) u[j] = uold[j] + step * tmp[j];
+	    nlmer_eval_model(x);
+	}
+	if (crit >= IRLS_TOL && dev[lpdisc_POS] >= lpd_old)
+	    error(_("unable to reduce lpdisc in PNLS for conditional modes"));
     }
-    dev[lpdisc_POS] = log(dev[disc_POS] + dev[bqd_POS]);
-    dev[ldL2_POS] = chm_log_det2(L);
-    dev[ML_POS] = dev[REML_POS] =
-	dev[ldL2_POS] + dn * (1. + dev[lpdisc_POS] + log(2. * PI / dn));
-
+    if (crit > IRLS_TOL)
+	error(_("unable to converge to conditional modes"));
     c.final_ll = cfll;
-    return (crit > IRLS_TOL) ? 0 : i;
+    return i;
+/* 				/\* evaluate V'[y-dmu_deta]-u *\/ */
+/* 	cVt->x = (void*)vx; Memcpy((double*)(rhs->x), u, q); */
+/* 	if (!(j = M_cholmod_sdmult(cVt, 0/\*trans*\/, one, m_one, res, rhs, &c))) */
+/* 	    error(_("cholmod_sdmult failed:")); */
+/* 				/\* solve for the increment *\/ */
+/* 	td1 = M_cholmod_solve(CHOLMOD_L, L, rhs, &c); */
+/* 	td2 = M_cholmod_solve(CHOLMOD_Lt, L, td1, &c);     */
+/* 	M_cholmod_free_dense(&td1, &c); */
+/* 	for (j = 0; j < q; j++) u[j] = uold[j] + ((double*)(td2->x))[j]; */
+/* 	M_cholmod_free_dense(&td2, &c); */
+/* 	dev[bqd_POS] = lme4_sumsq(u, q); */
+/* 	Mer_eta(x, eta); glmer_linkinv(x); glmer_dev_resids(x); */
+/* 	glmer_dmu_deta(x, dmu_deta); glmer_var(x, var); */
+/*  	crit = conv_crit(uold, u, q); */
+/* #ifdef DEBUG_NLMER */
+/* 	Rprintf("%3d: %20.15g %20.15g", i, dev[disc_POS], dev[bqd_POS]); */
+/* 	Rprintf(" %20.15g\n", dev[disc_POS] + dev[bqd_POS]); */
+/* #endif */
+/* 	if (crit < IRLS_TOL) break; */
+/*     } */
+/*     dev[lpdisc_POS] = log(dev[disc_POS] + dev[bqd_POS]); */
+/*     dev[ldL2_POS] = chm_log_det2(L); */
+/*     dev[ML_POS] = dev[REML_POS] = */
+/* 	dev[ldL2_POS] + dn * (1. + dev[lpdisc_POS] + log(2. * PI / dn)); */
+
+/*     c.final_ll = cfll; */
+/*     return (crit > IRLS_TOL) ? 0 : i; */
 }
 
 SEXP glmer_condMode(SEXP x) {
