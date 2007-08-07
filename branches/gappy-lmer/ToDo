@@ -1,4 +1,7 @@
 -----
+Currently lmer does not fill in the disc and bqd slots in the deviance
+slot.  Fix this.
+-----
 Allow for a matrix of responses in lmer so multiple fits can be
 performed without needing to regenerate the model matrices.
 -----

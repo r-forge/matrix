@@ -34,6 +34,15 @@ static SEXP alloc3DArray(SEXPTYPE mode, int nrow, int ncol, int nface)
 
 #endif
 
+/* Inlines and defines */
+
+extern cholmod_common c;
+
+/* zero an array */
+#define AZERO(x, n) {int _I_, _SZ_ = (n); for(_I_ = 0; _I_ < _SZ_; _I_++) (x)[_I_] = 0;}
+
+#define Alloca(n, t)   (t *) alloca( (size_t) ( (n) * sizeof(t) ) )
+
 				/* positions in the deviance vector */
 enum devP {ML_POS=0, REML_POS, ldL2_POS, ldRX2_POS,
 	   lpdisc_POS, disc_POS, bqd_POS};
@@ -44,7 +53,23 @@ enum dimP {nf_POS=0, n_POS, p_POS, q_POS, s_POS, np_POS,
 #define isREML(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isREML_POS]
 #define L_SLOT(x) AS_CHM_FR(GET_SLOT(x, lme4_LSym))
 
-/* Functions for the lmer representation */
+/**
+ * Allocate an SEXP of given type and length, assign it as slot nm in
+ * the object, and return the SEXP.
+ *
+ * @param obj object in which to assign the slot
+ * @param nm name of the slot, as an R name object
+ * @param type type of SEXP to allocate
+ * @param length length of SEXP to allocate
+ *
+ * @return SEXP of given type and length assigned as slot nm in obj
+ */
+static R_INLINE
+SEXP ALLOC_SLOT(SEXP obj, SEXP nm, SEXPTYPE type, int length)
+{
+    SET_SLOT(obj, nm, allocVector(type, length));
+    return GET_SLOT(obj, nm);
+}
 
 /**
  * Return the sum of squares of the first n elements of x
@@ -62,6 +87,96 @@ static double R_INLINE lme4_sumsq(const double *x, int n)
     for (i = 0; i < n; i++) ans += x[i] * x[i];
     return ans;
 }
+
+/**
+ * Return the group in the (nf, Gp) combination to which ind belongs
+ *
+ * @param ind a row number
+ * @param nf number of groups of rows
+ * @param Gp group pointers
+ *
+ */
+static int R_INLINE Gp_grp(int ind, int nf, const int *Gp)
+{
+    int i;
+    for (i = 0; i < nf; i++) if (ind < Gp[i + 1]) return i;
+    error(_("invalid row index %d (max is %d)"), ind, Gp[nf]);
+    return -1;			/* -Wall */
+}
+
+/**
+ * Return the REML or ML conditional estimate of sigma, the standard
+ * deviation of the per-observation noise term.
+ *
+ * @param REML non-zero for REML estimate, 0 for ML estimate
+ * @param dims vector of dimensions
+ * @param deviance vector of deviance components
+ */
+static R_INLINE double
+Mer_sigma(int REML, const int* dims, const double* deviance)
+{
+    return sqrt(exp(deviance[lpdisc_POS])/
+		((double)(dims[n_POS] - (REML ? dims[p_POS] : 0))));
+}
+
+/** 
+ * Evaluate x/(1 - x). An inline function is used so that x is
+ * only evaluated once. 
+ * 
+ * @param x input in the range (0, 1)
+ * 
+ * @return x/(1 - x) 
+ */
+static R_INLINE double x_d_omx(double x) {
+    if (x < 0 || x > 1)
+	error(_("Value %d out of range (0, 1)"), x);
+    return x/(1 - x);
+}
+
+/** 
+ * Evaluate x/(1 + x). An inline function is used so that x is
+ * evaluated once only.
+ * 
+ * @param x input
+ * 
+ * @return x/(1 + x) 
+ */
+static R_INLINE double x_d_opx(double x) {return x/(1 + x);}
+
+static R_INLINE double y_log_y(double y, double mu)
+{
+    return (y) ? (y * log(y/mu)) : 0;
+}
+
+#define BUF_SIZE 127
+
+/**
+ * Check the dimensions of the matrix pointer MP.
+ *
+ * @param buffer character buffer of length BUF_SIZE + 1
+ * @param nm name of matrix - used in the error message
+ * @param MP pointer to a matrix
+ *
+ * @return TRUE if the object is a valid lmer object, else a string
+ * describing the nature of the violation.
+ */
+static char R_INLINE
+*chkDims(char *buffer, char *nm, SEXP MP, int nr, int nc)
+{
+    int *dd = isMatrix(MP) ?
+	INTEGER(getAttrib(MP, R_DimSymbol)) :
+	(int *)NULL;
+
+    if (!dd) error(_("Argument MP to chkDims is not a matrix"));
+    buffer[0] = '\0';
+    if (!isReal(MP) || dd[0] != nr || dd[1] != nc)
+	snprintf(buffer, BUF_SIZE,
+		 "Matrix %s must be a %d by %d numeric matrix",
+		nm, nr, nc);
+    return buffer;
+}
+
+/* Functions for the mer representation */
 
 /**
  * Evaluate the logarithm of the square of the determinant of L
@@ -128,22 +243,6 @@ ST_nc_nlev(const SEXP ST, const int *Gp, double **st, int *nc, int *nlev)
 	nlev[i] = (Gp[i + 1] - Gp[i])/nci;
     }
     return ans;
-}
-
-/**
- * Return the group in the (nf, Gp) combination to which ind belongs
- *
- * @param ind a row number
- * @param nf number of groups of rows
- * @param Gp group pointers
- *
- */
-static int R_INLINE Gp_grp(int ind, int nf, const int *Gp)
-{
-    int i;
-    for (i = 0; i < nf; i++) if (ind < Gp[i + 1]) return i;
-    error(_("invalid row index %d (max is %d)"), ind, Gp[nf]);
-    return -1;			/* -Wall */
 }
 
 	
@@ -234,6 +333,57 @@ SEXP mer_create_Vt(SEXP Zt, SEXP ST, SEXP GpP)
     }
 
     UNPROTECT(1); 
+    return ans;
+}
+
+/**
+ * Evaluate the linear predictor as model offset + X \beta + V P'u
+ *
+ * @param x pointer to a glmer or a nlmer object
+ * @param ans pointer to memory to be overwritten with the values
+ *
+ * @return ans
+ */
+static double *Mer_eta(SEXP x, double *ans)
+{
+    SEXP X = GET_SLOT(x, lme4_XSym),
+	moff = GET_SLOT(x, lme4_offsetSym);
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int  ione = 1, n = dims[n_POS], p = dims[p_POS];
+    double one[] = {1,0};
+    CHM_FR L = L_SLOT(x);
+    CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
+    CHM_DN Ptu, cans = N_AS_CHM_DN(ans, n, 1),
+	cu = AS_CHM_DN(GET_SLOT(x, lme4_uvecSym));
+    R_CheckStack();
+
+    if (!INTEGER(getAttrib(X, R_DimSymbol))[0]) { /* X not stored */
+	int i;
+	for (i = 0; i < n; i++) ans[i] = NA_REAL;
+	return ans;
+    }
+				/* eta := offset or eta := 0 */
+    if (LENGTH(moff)) Memcpy(ans, REAL(moff), n);
+    else AZERO(ans, n);
+				/* eta := eta + X \beta */
+    F77_CALL(dgemv)("N", &n, &p, one, REAL(X), &n,
+		    REAL(GET_SLOT(x, lme4_fixefSym)), &ione,
+		    one, ans, &ione);
+				/* eta := eta + V P' u */
+    Ptu = M_cholmod_solve(CHOLMOD_Pt, L, cu, &c);
+    if (!M_cholmod_sdmult(cVt, 1 /* trans */, one, one, Ptu, cans, &c))
+	error(_("cholmod_sdmult error returned"));
+    M_cholmod_free_dense(&Ptu, &c);
+    return ans;
+}    
+
+SEXP mer_eta(SEXP x)
+{
+    int n = INTEGER(GET_SLOT(x, lme4_dimsSym))[n_POS];
+    SEXP ans = PROTECT(allocVector(REALSXP, n));
+
+    Mer_eta(x, REAL(ans));
+    UNPROTECT(1);
     return ans;
 }
 
@@ -397,6 +547,7 @@ SEXP ST_initialize(SEXP ST, SEXP Gpp, SEXP Zt)
     double *rowsqr = Alloca(Zdims[0], double),
 	**st = Alloca(nf, double*),
 	*zx = REAL(GET_SLOT(Zt, lme4_xSym));
+    R_CheckStack();
     
     ST_nc_nlev(ST, Gp, st, nc, nlev);
     AZERO(rowsqr, Zdims[0]);
@@ -541,21 +692,6 @@ SEXP ST_setPars(SEXP x, SEXP pars)
 	error(_("pars must be a real vector of length %d"), npar);
     ST_SetPars(REAL(pars), ST);
     return R_NilValue;
-}
-
-/**
- * Return the REML or ML conditional estimate of sigma, the standard
- * deviation of the per-observation noise term.
- *
- * @param REML non-zero for REML estimate, 0 for ML estimate
- * @param dims vector of dimensions
- * @param deviance vector of deviance components
- */
-static R_INLINE double
-Mer_sigma(int REML, const int* dims, const double* deviance)
-{
-    return sqrt(exp(deviance[lpdisc_POS])/
-		((double)(dims[n_POS] - (REML ? dims[p_POS] : 0))));
 }
 
 /**
@@ -816,9 +952,10 @@ SEXP lmer_update_effects(SEXP x)
 {
     SEXP uvec = GET_SLOT(x, lme4_uvecSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), ione = 1;
-    int p = dims[p_POS],  pp1 = dims[p_POS] + 1, q = dims[q_POS];
+    int p = dims[p_POS], pp1 = dims[p_POS] + 1, q = dims[q_POS];
     double *RXy = REAL(GET_SLOT(x, lme4_RXySym)),
 	*RVXy = REAL(GET_SLOT(x, lme4_RVXySym)),
+	*dev = REAL(GET_SLOT(x, lme4_devianceSym)),
 	*fixef = REAL(GET_SLOT(x, lme4_fixefSym)),
 	*u = REAL(uvec), mone = -1, one = 1;
     CHM_FR L = L_SLOT(x);
@@ -835,37 +972,12 @@ SEXP lmer_update_effects(SEXP x)
 	error(_("cholmod_solve (CHOLMOD_Lt) failed:"));
     Memcpy(u, (double*)(sol->x), q);
     M_cholmod_free_dense(&sol, &c);
+    dev[bqd_POS] = lme4_sumsq(u, q);
+    dev[disc_POS] = exp(dev[lpdisc_POS]) - dev[bqd_POS];
     mer_update_b(x);
     return R_NilValue;
 }
 
-#define BUF_SIZE 127
-
-/**
- * Check the dimensions of the matrix pointer MP.
- *
- * @param buffer character buffer of length BUF_SIZE + 1
- * @param nm name of matrix - used in the error message
- * @param MP pointer to a matrix
- *
- * @return TRUE if the object is a valid lmer object, else a string
- * describing the nature of the violation.
- */
-static char R_INLINE
-*chkDims(char *buffer, char *nm, SEXP MP, int nr, int nc)
-{
-    int *dd = isMatrix(MP) ?
-	INTEGER(getAttrib(MP, R_DimSymbol)) :
-	(int *)NULL;
-
-    if (!dd) error(_("Argument MP to chkDims is not a matrix"));
-    buffer[0] = '\0';
-    if (!isReal(MP) || dd[0] != nr || dd[1] != nc)
-	snprintf(buffer, BUF_SIZE,
-		 "Matrix %s must be a %d by %d numeric matrix",
-		nm, nr, nc);
-    return buffer;
-}
 
 /**
  * Check validity of an lmer object.
@@ -968,40 +1080,6 @@ static double conv_crit(double etaold[], double eta[], int n)
     return max_abs_diff / (0.1 + max_abs_eta);
 }
 
-/**
- * Evaluate the linear predictor as model offset + X \beta + V u
- *
- * @param x pointer to a glmer or a nlmer object
- * @param ans pointer to memory to be overwritten with the values
- *
- * @return ans
- */
-static double *nglmer_eta(SEXP x, double *ans)
-{
-    SEXP X = GET_SLOT(x, lme4_XSym),
-	moff = GET_SLOT(x, lme4_offsetSym);
-    int *xd = INTEGER(getAttrib(X, R_DimSymbol)), ione = 1;
-    double one[] = {1,0};
-    CHM_FR L = L_SLOT(x);
-    CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
-    CHM_DN Ptu, cans = N_AS_CHM_DN(ans, xd[0], 1),
-	cu = AS_CHM_DN(GET_SLOT(x, lme4_uvecSym));
-    R_CheckStack();
-
-    AZERO(ans, xd[0]);
-    if (LENGTH(moff)) Memcpy(ans, REAL(moff), xd[0]);
-				/* eta := eta + X \beta */
-    F77_CALL(dgemv)("N", xd, xd + 1, one, REAL(X), xd,
-		    REAL(GET_SLOT(x, lme4_fixefSym)), &ione,
-		    one, ans, &ione);
-				/* eta := eta + V P' u */
-    Ptu = M_cholmod_solve(CHOLMOD_Pt, L, cu, &c);
-    if (!M_cholmod_sdmult(cVt, 1 /* trans */, one, one, Ptu, cans, &c))
-	error(_("cholmod_sdmult error returned"));
-    M_cholmod_free_dense(&Ptu, &c);
-    return ans;
-}    
-
 /* Nonlinear mixed models */
 
 /**
@@ -1048,7 +1126,7 @@ SEXP nlmer_eval_model(SEXP x)
     double *Phi = Alloca(n * s, double);
     R_CheckStack();
 
-    nglmer_eta(x, Phi);
+    Mer_eta(x, Phi);
     /* distribute the parameters in the environment */
     for (i = 0; i < dims[s_POS]; i++) {
 	vv = findVarInFrame(rho, install(CHAR(STRING_ELT(pnames, i))));
@@ -1206,35 +1284,6 @@ static const double MLTHRESH = -30.;
 static double MPTHRESH = 0;
 static double PTHRESH = 0;
 static const double INVEPS = 1/DOUBLE_EPS;
-
-/** 
- * Evaluate x/(1 - x). An inline function is used so that x is
- * only evaluated once. 
- * 
- * @param x input in the range (0, 1)
- * 
- * @return x/(1 - x) 
- */
-static R_INLINE double x_d_omx(double x) {
-    if (x < 0 || x > 1)
-	error(_("Value %d out of range (0, 1)"), x);
-    return x/(1 - x);
-}
-
-/** 
- * Evaluate x/(1 + x). An inline function is used so that x is
- * evaluated once only.
- * 
- * @param x input
- * 
- * @return x/(1 + x) 
- */
-static R_INLINE double x_d_opx(double x) {return x/(1 + x);}
-
-static R_INLINE double y_log_y(double y, double mu)
-{
-    return (y) ? (y * log(y/mu)) : 0;
-}
 
 /**
  * Evaluate the inverse link function at eta storing the result in mu
@@ -1414,8 +1463,8 @@ SEXP glmer_dev_resids(SEXP x)
  */
 SEXP glmer_eta(SEXP x)
 {
-    nglmer_eta(x, REAL(findVarInFrame(GET_SLOT(x, lme4_envSym),
-				      lme4_etaSym)));
+    Mer_eta(x, REAL(findVarInFrame(GET_SLOT(x, lme4_envSym),
+				   lme4_etaSym)));
     return R_NilValue;
 }
 
@@ -1453,7 +1502,7 @@ static int Glmer_condMode(SEXP x)
 
     mer_update_Vt(x);
     Memcpy(uold, u, q); c.final_ll = L->is_ll;
-    nglmer_eta(x, eta); glmer_linkinv(x);
+    Mer_eta(x, eta); glmer_linkinv(x);
     glmer_dmu_deta(x, dmu_deta); glmer_var(x, var);
     for (i = 0; i < IRLS_MAXITER; i++) {
 	for (j = 0; j < n; j++) { /* calculate weighted Vt and residual */
@@ -1475,7 +1524,7 @@ static int Glmer_condMode(SEXP x)
 	for (j = 0; j < q; j++) u[j] = uold[j] + ((double*)(td2->x))[j];
 	M_cholmod_free_dense(&td2, &c);
 	dev[bqd_POS] = lme4_sumsq(u, q);
-	nglmer_eta(x, eta); glmer_linkinv(x); glmer_dev_resids(x);
+	Mer_eta(x, eta); glmer_linkinv(x); glmer_dev_resids(x);
 	glmer_dmu_deta(x, dmu_deta); glmer_var(x, var);
  	crit = conv_crit(uold, u, q);
 #ifdef DEBUG_NLMER
