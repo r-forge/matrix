@@ -733,8 +733,11 @@ setMethod("deviance", signature(object="mer"),
 
 setMethod("fitted", signature(object = "lmer"),
 	  function(object, ...)
-	  .NotYetImplemented()
-	  )
+      {
+          if (!nrow(object@X))
+              stop("unable to obtain fitted values without saved model matrix")
+          .Call(mer_eta, object)
+      })
 
 setMethod("formula", signature(x = "mer"),
 	  function(x, ...)

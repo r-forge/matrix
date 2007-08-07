@@ -26,32 +26,6 @@ extern
 #endif
 
 
-/* zero an array */
-#define AZERO(x, n) {int _I_, _SZ_ = (n); for(_I_ = 0; _I_ < _SZ_; _I_++) (x)[_I_] = 0;}
-
-#define Alloca(n, t)   (t *) alloca( (size_t) ( (n) * sizeof(t) ) )
-
-/**
- * Allocate an SEXP of given type and length, assign it as slot nm in
- * the object, and return the SEXP.
- *
- * @param obj object in which to assign the slot
- * @param nm name of the slot, as an R name object
- * @param type type of SEXP to allocate
- * @param length length of SEXP to allocate
- *
- * @return SEXP of given type and length assigned as slot nm in obj
- */
-static R_INLINE
-SEXP ALLOC_SLOT(SEXP obj, SEXP nm, SEXPTYPE type, int length)
-{
-    SET_SLOT(obj, nm, allocVector(type, length));
-    return GET_SLOT(obj, nm);
-}
-
-
-extern cholmod_common c;
-
 SEXP ST_getPars(SEXP x);
 SEXP ST_initialize(SEXP ST, SEXP Gp, SEXP Zt);
 SEXP ST_setPars(SEXP x, SEXP pars);
@@ -72,6 +46,7 @@ SEXP lmer_validate(SEXP x);
 
 SEXP mer_create_L(SEXP Vt);
 SEXP mer_create_Vt(SEXP Zt, SEXP ST, SEXP Gp);
+SEXP mer_eta(SEXP x);
 SEXP mer_optimize(SEXP x, SEXP verb, SEXP mtype);
 SEXP mer_postVar(SEXP x, SEXP useScale);
 SEXP mer_sigma(SEXP x, SEXP which);

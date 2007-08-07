@@ -13,7 +13,7 @@
 \alias{summary.nlmer-class}
 \alias{ranef.mer-class}
 % Methods
-\alias{anova,lmer-method}
+\alias{anova,mer-method}
 \alias{coef,lmer-method}
 \alias{coef,mer-method}
 \alias{coerce,lmer,dsTMatrix-method}

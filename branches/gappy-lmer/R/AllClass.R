@@ -14,28 +14,33 @@ setOldClass("family")
 setOldClass("logLik")
 setOldClass("terms")
 
+### FIXME: the nlmer class has 'mu' and 'resid' slots.  Should those
+### be part of the mer class?  Should eta, the linear predictor, be a
+### slot in the mer class?
+
 setClass("mer", ## Slots common to all three types of mixed models
 	 representation(## original data
-                        frame = "data.frame", # model frame or empty frame
-                        call = "call", # matched call to model-fitting function
+                        frame = "data.frame", # model frame (or empty frame)
+                        call = "call",      # matched call
                         terms = "terms",    # terms for fixed-effects
 			flist = "list",     # list of grouping factors
-                        X = "matrix", # model matrix for fixed effects (may have 0 rows in lmer only)
+                        X = "matrix",       # fixed effects model matrix
+                                            # (may have 0 rows in lmer)
 			Zt = "dgCMatrix",   # sparse form of Z'
-			weights = "numeric", # can be of length 0 for constant wts
-                        offset = "numeric", # can be length 0 (for no offset)
+			weights = "numeric", #  length 0 -> constant wts
+                        offset = "numeric", # length 0 -> no offset
                         y = "numeric",      # response vector
-			cnames = "list", # row/column names of matrices in ST
-			Gp = "integer", # pointers to groups of rows in Zt
-                        dims = "integer", # dimensions and indicators
+			cnames = "list",    # row/column names of els of ST
+			Gp = "integer",     # pointers to row groups of Zt
+                        dims = "integer",   # dimensions and indicators
                         ## slots that vary during optimization
 			ST = "list", # list of TSST' rep of rel. var. mats
-			L = "CHMfactor", # sparse Cholesky factor of V'V + I
+			L = "CHMfactor",    # Cholesky factor of P(V'V + I)P'
 			Vt = "dgCMatrix",   # sparse form of V'=(ZTS)'
 			deviance = "numeric", # ML and REML deviance and components
-			fixef = "numeric", # fixed effects coefficients (length p)
-			ranef = "numeric", # random effects (length q)
-                        uvec = "numeric",  # orthogonal random effects (length q)
+			fixef = "numeric",  # fixed effects (length p)
+			ranef = "numeric",  # random effects (length q)
+                        uvec = "numeric",   # orthogonal random effects (q)
                         "VIRTUAL"),
          validity = function(object) .Call(mer_validate, object))
 
@@ -44,8 +49,8 @@ setClass("lmer", ## linear mixed models
                         ZtXy = "matrix",  # dense form of Z'[X:y]
                         XytXy = "matrix", # dense form of [X:y]'[X:y]
                         ## slots that vary during optimization
-                        RXy = "matrix", # dense Cholesky factor of downdated XytXy
-                        RVXy = "matrix"), # dense solution to L RVXy = S T'ZtXy
+                        RVXy = "matrix",  # dense sol. to L RVXy = S T'ZtXy
+                        RXy = "matrix"),  # Cholesky factor of downdated XytXy
          contains = "mer",
          validity = function(object) .Call(lmer_validate, object))
 
@@ -59,11 +64,11 @@ setClass("glmer", ## generalized linear mixed models
 setClass("nlmer", ## nonlinear mixed models
 	 representation(## original data
                         env = "environment", # evaluation environment for model
-                        model = "call",      # nonlinear model
+                        model = "call",    # nonlinear model
                         pnames = "character", # parameter names for nonlinear model
                         ## slots that vary during optimization
-                        mu = "numeric",      # fitted values at current beta and b
-                        resid = "numeric",   # raw residuals at current beta and b
+                        mu = "numeric",    # fitted values at current beta and b
+                        resid = "numeric", # raw residuals at current beta and b
                         Mt = "dgCMatrix"), # transpose of gradient matrix d mu/d u
          contains = "mer",
          validity = function(object) .Call(nlmer_validate, object))
