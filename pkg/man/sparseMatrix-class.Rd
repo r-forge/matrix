@@ -30,6 +30,7 @@
 \alias{-,sparseMatrix,missing-method}
 \alias{diag,sparseMatrix-method}
 \alias{dim<-,sparseMatrix-method}
+\alias{lu,sparseMatrix-method}
 \alias{print,sparseMatrix-method}
 \alias{show,sparseMatrix-method}
 \alias{summary,sparseMatrix-method}

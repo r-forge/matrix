@@ -471,7 +471,8 @@ setMethod("norm", signature(x = "sparseMatrix", type = "character"),
 lm.fit.sparse <-
 function(x, y, offset = NULL, method = c("qr", "cholesky"),
          tol = 1e-7, singular.ok = TRUE, transpose = FALSE, ...)
-### Fit a linear model using a sparse QR or a sparse Cholesky factorization
+### Fit a linear model, __ given __ a sparse model matrix 'x'
+### using a sparse QR or a sparse Cholesky factorization
 {
     stopifnot(is(x, "dsparseMatrix"))
 ##     if(!is(x, "dsparseMatrix"))

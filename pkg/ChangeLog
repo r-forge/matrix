@@ -1,3 +1,19 @@
+2007-08-10  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* man/image-methods.Rd: new, combining all image() methods
+
+2007-08-09  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dgCMatrix.R: define qr() and lu() methods for "sparseMatrix"
+	to work via dgC...
+
+	* R/Matrix.R (Matrix): special treatment for "table" (S3)
+
+2007-08-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dgTMatrix.R (image): change defaults to
+		aspect = "iso", colorkey = FALSE
+
 2007-08-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/dsyMatrix.c (dsyMatrix_matrix_mm): 'b' might be matrix;
@@ -9,7 +25,7 @@
 
 	* [r4712] inst/include/Matrix_stubs.c: Change R_cholmod_printf in stubs
 	  as well as in sources
-	
+
 2007-08-03  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Matrix.R (%*%, crossprod, tcrossprod): add method for

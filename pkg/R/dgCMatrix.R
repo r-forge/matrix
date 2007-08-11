@@ -63,9 +63,15 @@ setMethod("writeMM", signature(obj = "dgCMatrix"),
 setMethod("qr", signature(x = "dgCMatrix"),
 	  function(x, tol = 1e-07, LAPACK = FALSE)
 	  .Call(dgCMatrix_QR, x, TRUE))
+setMethod("qr", signature(x = "sparseMatrix"),
+	  function(x, tol, ...)
+	  qr(as(as(x, "CsparseMatrix"), "dsparseMatrix"), ...))
 
 setMethod("lu", signature(x = "dgCMatrix"),
 	  function(x, ...) .Call(dgCMatrix_LU, x, TRUE, 1))
+setMethod("lu", signature(x = "sparseMatrix"),
+	  function(x, ...) lu(as(as(x, "CsparseMatrix"), "dsparseMatrix"), ...))
+
 
 setMethod("solve", signature(a = "dgCMatrix", b = "matrix"),
 	  function(a, b, ...) .Call(dgCMatrix_matrix_solve, a, b),

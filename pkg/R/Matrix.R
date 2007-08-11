@@ -106,7 +106,8 @@ Matrix <-
     sparseDefault <- function(m) prod(dim(m)) > 2*sum(isN0(as(m, "matrix")))
 
     i.M <- is(data, "Matrix")
-
+    if(!i.M && inherits(data, "table")) # special treatment
+	class(data) <- "matrix" # "matrix" first for S4 dispatch
     if(is.null(sparse1 <- sparse) && (i.M || is(data, "matrix")))
 	sparse <- sparseDefault(data)
 
@@ -239,7 +240,7 @@ setMethod("tcrossprod", signature(x = "Matrix", y = "matrix"),
 setMethod("tcrossprod", signature(x = "matrix", y = "Matrix"),
 	  function(x, y = NULL) callGeneric(Matrix(x), y))
 
-## maybe not optimal
+## maybe not 100% optimal, but elegant:
 setMethod("solve", signature(a = "Matrix", b = "missing"),
 	  function(a, b, ...) solve(a, Diagonal(nrow(a))))
 
