@@ -162,3 +162,13 @@ Check for DimNames propagation in coercion and other operations.
   triangularMatrix, and probably also "dense*general*Matrix" since the
   above currently goes via "matrix" and back instead of using the 'x' slot
   directly.
+
+- image(M, aspect= "iso", colorkey = FALSE)
+  really should be default; {aspect: non-back comptible for users !!}
+  current default colorkey=TRUE is on abs(M[M > 0]).
+  Note: Think about an optional smart option which keeps "0 |-> transparent"
+  but allows colors to differentiate negative and positive entries.
+  --- and be documented! Maybe move from man/dgTMatrix-class.Rd to image.Rd ?
+
+- examples for solve( Cholesky(.), b, system = c("A", "LDLt"....))
+  probably rather in man/CHMfactor-class.Rd than man/Cholesky.Rd

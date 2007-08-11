@@ -77,7 +77,6 @@
 \alias{coerce,Matrix,denseMatrix-method}
 \alias{coerce,Matrix,CsparseMatrix-method}
 \alias{coerce,Matrix,sparseMatrix-method}
-\alias{image,Matrix-method}
 \alias{solve,Matrix,Matrix-method}
 \alias{solve,Matrix,matrix-method}
 \alias{solve,matrix,Matrix-method}
