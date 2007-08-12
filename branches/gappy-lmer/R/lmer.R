@@ -316,9 +316,7 @@ mkFamilyEnv <- function(glmFit)
     env <- new.env()
     assign("devResid", unname(resid(glmFit, type = "deviance")), env = env)
     assign("eta", unname(glmFit$linear.predictors), env = env)
-    assign("mu", unname(glmFit$fitted.values), env = env)
-    assign("weights", unname(glmFit$weights), env = env)
-    assign("z", unname(glmFit$residuals), env = env)
+##    assign("weights", unname(glmFit$weights), env = env)
 ### FIXME: install the family functions and create evaluation expressions in the environment
     env
 }
@@ -453,7 +451,9 @@ function(formula, data, family = gaussian, method = c("Laplace", "AGQ"),
                L = .Call(mer_create_L, dm$Vt),
                deviance = dm$dev,
                fixef = coef(glmFit),
+               mu = glmFit$fitted.values,
                ranef = numeric(dm$dd["q"]),
+               resid = glmFit$residuals,
                uvec = numeric(dm$dd["q"]))
     cv <- do.call("lmerControl", control)
     if (missing(verbose)) verbose <- cv$msVerbose

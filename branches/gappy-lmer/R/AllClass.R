@@ -57,7 +57,10 @@ setClass("lmer", ## linear mixed models
 setClass("glmer", ## generalized linear mixed models
 	 representation(## original data
                         env = "environment", # evaluation env for family
-                        famName = "character"), # name of GLM family and link
+                        famName = "character", # name of GLM family and link
+                        ## slots that vary during optimization
+                        mu = "numeric",    # fitted values at current beta and b
+                        resid = "numeric"), # raw residuals at current beta and b
          contains = "mer",
          validity = function(object) .Call(glmer_validate, object))
 

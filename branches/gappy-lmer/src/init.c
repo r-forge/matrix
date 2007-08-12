@@ -80,6 +80,7 @@ void R_init_lme4(DllInfo *dll)
     lme4_devResidSym = install("devResid");
     lme4_devianceSym = install("deviance");
     lme4_dimsSym = install("dims");
+    lme4_dmu_detaSym = install("dmu_deta");
     lme4_envSym = install("env");
     lme4_etaSym = install("eta");
     lme4_famNameSym = install("famName");
@@ -97,6 +98,7 @@ void R_init_lme4(DllInfo *dll)
     lme4_ranefSym = install("ranef");
     lme4_residSym = install("resid");
     lme4_uvecSym = install("uvec");
+    lme4_varSym = install("var");
     lme4_weightsSym = install("weights");
     lme4_wrkresSym = install("wrkres");
     lme4_wtsSym = install("wts");

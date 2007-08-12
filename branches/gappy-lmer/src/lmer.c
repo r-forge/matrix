@@ -349,24 +349,24 @@ static double *Mer_eta(SEXP x, double *ans)
     SEXP X = GET_SLOT(x, lme4_XSym),
 	moff = GET_SLOT(x, lme4_offsetSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int  ione = 1, n = dims[n_POS], p = dims[p_POS];
+    int  ione = 1, nans = dims[n_POS] * dims[s_POS], p = dims[p_POS];
     double one[] = {1,0};
     CHM_FR L = L_SLOT(x);
     CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
-    CHM_DN Ptu, cans = N_AS_CHM_DN(ans, n, 1),
+    CHM_DN Ptu, cans = N_AS_CHM_DN(ans, nans, 1),
 	cu = AS_CHM_DN(GET_SLOT(x, lme4_uvecSym));
     R_CheckStack();
 
     if (!INTEGER(getAttrib(X, R_DimSymbol))[0]) { /* X not stored */
 	int i;
-	for (i = 0; i < n; i++) ans[i] = NA_REAL;
+	for (i = 0; i < nans; i++) ans[i] = NA_REAL;
 	return ans;
     }
 				/* eta := offset or eta := 0 */
-    if (LENGTH(moff)) Memcpy(ans, REAL(moff), n);
-    else AZERO(ans, n);
+    if (LENGTH(moff)) Memcpy(ans, REAL(moff), nans);
+    else AZERO(ans, nans);
 				/* eta := eta + X \beta */
-    F77_CALL(dgemv)("N", &n, &p, one, REAL(X), &n,
+    F77_CALL(dgemv)("N", &nans, &p, one, REAL(X), &nans,
 		    REAL(GET_SLOT(x, lme4_fixefSym)), &ione,
 		    one, ans, &ione);
 				/* eta := eta + V P' u */
@@ -379,8 +379,9 @@ static double *Mer_eta(SEXP x, double *ans)
 
 SEXP mer_eta(SEXP x)
 {
-    int n = INTEGER(GET_SLOT(x, lme4_dimsSym))[n_POS];
-    SEXP ans = PROTECT(allocVector(REALSXP, n));
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int nans = dims[n_POS] * dims[s_POS];
+    SEXP ans = PROTECT(allocVector(REALSXP, nans));
 
     Mer_eta(x, REAL(ans));
     UNPROTECT(1);
@@ -1054,32 +1055,6 @@ SEXP nlmer_validate(SEXP x)
 #define IRLS_TOL      1e-10
 #define IRLS_SMIN     1e-5
 
-/**
- * Evaluate the convergence criterion and copy eta to
- * etaold
- *
- * @param eta current value of the linear predictors
- * @param etaold previous values of the linear predictors
- *
- * @return convergence criterion
- */
-static double conv_crit(double etaold[], double eta[], int n)
-{
-    double max_abs_eta = -1, max_abs_diff = -1;
-    int i;
-
-    for (i = 0; i < n; i++) {
-	double abs_eta, abs_diff;
-
-	abs_eta = fabs(eta[i]);
-	if (abs_eta > max_abs_eta) max_abs_eta = abs_eta;
-	abs_diff = fabs(eta[i] - etaold[i]);
-	if (abs_diff > max_abs_diff) max_abs_diff = abs_diff;
-	etaold[i] = eta[i];
-    }
-    return max_abs_diff / (0.1 + max_abs_eta);
-}
-
 /* Nonlinear mixed models */
 
 /**
@@ -1158,6 +1133,13 @@ SEXP nlmer_eval_model(SEXP x)
     return R_NilValue;
 }
 
+static void R_INLINE eval_ML_POS(double *dev, int n)
+{
+    double dn = (double) n;
+    dev[ML_POS] = dev[REML_POS]
+	= dev[ldL2_POS] + dn * (1 + dev[lpdisc_POS] + log(2 * PI / dn));
+}
+
 /**
  * Update the transpose of M from the current gradient and Vt
  *
@@ -1179,7 +1161,7 @@ SEXP nlmer_update_Mt(SEXP x)
 	*grad = REAL(getAttrib(GET_SLOT(x, lme4_muSym), lme4_gradientSym)),
 	*mx = REAL(GET_SLOT(Mt, lme4_xSym)),
 	*vx = REAL(GET_SLOT(Vt, lme4_xSym)),
-	dn = (double)n, one[] = {1,0};
+	one[] = {1,0};
     CHM_SP cMt = AS_CHM_SP(Mt);
     CHM_FR L = L_SLOT(x);
     R_CheckStack();
@@ -1202,79 +1184,8 @@ SEXP nlmer_update_Mt(SEXP x)
 	      c.status, L->minor, L->n);
     c.final_ll = cfll;
     dev[ldL2_POS] = chm_log_det2(L);
-    dev[ML_POS] = dev[REML_POS]
-	= dev[ldL2_POS] + dn * (1 + dev[lpdisc_POS] + log(2 * PI / dn));
+    eval_ML_POS(dev, n);
     return R_NilValue;
-}
-
-/**
- * Iterate to determine the conditional modes of the random effects.
- *
- * @param x pointer to an nlmer object
- *
- * @return An indicator of whether the iterations converged
- */
-static int Nlmer_condMode(SEXP x)
-{
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int i, j, n = dims[n_POS], q = dims[q_POS];
-    double *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
-	*u = REAL(GET_SLOT(x, lme4_uvecSym)),
-	*res = REAL(GET_SLOT(x, lme4_residSym)), 
-	cfac = ((double)(n - q)) / ((double)q),
-	crit = DOUBLE_XMAX,
-	lpd_old, one[] = {1,0}, step, zero[] = {0,0};
-    double *tmp = Alloca(q, double),
-	*uold = Alloca(q, double);
-    CHM_FR L = L_SLOT(x);
-    CHM_DN cres = N_AS_CHM_DN(res, n, 1),
-	ctmp = N_AS_CHM_DN(tmp, q, 1), sol;
-    CHM_SP Mt = AS_CHM_SP(GET_SLOT(x, lme4_MtSym));
-    R_CheckStack();
-
-    if (!(L->is_ll)) error(_("L must be LL', not LDL'"));
-    if (q > n) error(_("q = %d > n = %d"), q, n);
-    mer_update_Vt(x);
-    AZERO(u, q);
-    nlmer_eval_model(x);    /* updates res and dev[lpdisc,disc,bqd] */
-    for (i = 0; i < IRLS_MAXITER && crit > IRLS_TOL; i++) {
-	nlmer_update_Mt(x);	/* also updates L and rest of dev */
-	lpd_old = dev[lpdisc_POS];
-	Memcpy(uold, u, q);
-
-	if (!(M_cholmod_sdmult(Mt, 0 /* no trans */, one, zero,
-			       cres, ctmp, &c))) /* M'(y-mu) */
-	    error(_("cholmod_sdmult returned error code"));
-				/* permute */
-	sol = M_cholmod_solve(CHOLMOD_P, L, ctmp, &c);
-	for (j = 0; j < q; j++) tmp[j] = ((double*)(sol->x))[j] - u[j];
-	M_cholmod_free_dense(&sol, &c);
-	if (!(sol = M_cholmod_solve(CHOLMOD_L, L, ctmp, &c)))
-	    error(_("cholmod_solve (CHOLMOD_L) failed"));
-	Memcpy(tmp, (double*)(sol->x), q);
-	M_cholmod_free_dense(&sol, &c);
-				/* check convergence criterion */
-	crit = cfac * lme4_sumsq(tmp, q) / exp(lpd_old);
-	if (crit < IRLS_TOL) break;
-	if (!(sol = M_cholmod_solve(CHOLMOD_Lt, L, ctmp, &c)))
-	    error(_("cholmod_solve (CHOLMOD_Lt) failed"));
-	Memcpy(tmp, (double*)(sol->x), q);
-	M_cholmod_free_dense(&sol, &c);
-	for (step = 1; step > IRLS_SMIN && dev[lpdisc_POS] >= lpd_old;
-	     step /= 2) {	/* step halving */
-	    for (j = 0; j < q; j++) u[j] = uold[j] + step * tmp[j];
-	    nlmer_eval_model(x);
-	}
-	if (crit >= IRLS_TOL && dev[lpdisc_POS] >= lpd_old)
-	    error(_("unable to reduce lpdisc in PNLS for conditional modes"));
-    }
-    if (crit > IRLS_TOL)
-	error(_("unable to converge to conditional modes"));
-    return i;
-}
-
-SEXP nlmer_condMode(SEXP x) {
-    return ScalarInteger(Nlmer_condMode(x));
 }
 
 /* Generalized linear mixed models */
@@ -1296,7 +1207,7 @@ SEXP glmer_linkinv(SEXP x)
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
     int i, n = dims[n_POS], fltype = dims[fTyp_POS];
     double *eta = REAL(findVarInFrame(rho, lme4_etaSym)),
-	*mu = REAL(findVarInFrame(rho, lme4_muSym));
+	*mu = REAL(GET_SLOT(x, lme4_muSym));
 
     switch(fltype) {
     case 1: 			/* binomial with logit link */
@@ -1341,10 +1252,9 @@ SEXP glmer_linkinv(SEXP x)
  */
 static double *glmer_var(SEXP x, double *var)
 {
-    SEXP rho = GET_SLOT(x, lme4_envSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
     int i, n = dims[n_POS], fltype = dims[fTyp_POS];
-    double *mu = REAL(findVarInFrame(rho, lme4_muSym));
+    double *mu = REAL(GET_SLOT(x, lme4_muSym));
 
     switch(fltype) {
     case 1: 			/* binomial family with logit or probit link */
@@ -1423,14 +1333,13 @@ SEXP glmer_dev_resids(SEXP x)
 {
     SEXP rho = GET_SLOT(x, lme4_envSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int i, fltype = dims[fTyp_POS], n = dims[n_POS];
-    double *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
-	*dev_res = REAL(findVarInFrame(rho, lme4_devResidSym)),
-	*mu = REAL(findVarInFrame(rho, lme4_muSym)),
+    int i, n = dims[n_POS];
+    double *dev_res = REAL(findVarInFrame(rho, lme4_devResidSym)),
+	*mu = REAL(GET_SLOT(x, lme4_muSym)),
 	*wts = REAL(GET_SLOT(x, lme4_weightsSym)),
 	*y = REAL(GET_SLOT(x, lme4_ySym));
 
-    switch(fltype) {
+    switch(dims[fTyp_POS]) {
     case 1: 			/* binomial with logit or probit link */
     case 2:
 	for (i = 0; i < n; i++) {
@@ -1449,8 +1358,6 @@ SEXP glmer_dev_resids(SEXP x)
     default:
 	error(_("General form of glmer_dev_resids not yet written"));
     }
-    for (i = 0, dev[disc_POS] = 0; i < n; i++)
-	dev[disc_POS] += dev_res[i];
     return R_NilValue;
 }
 
@@ -1468,60 +1375,108 @@ SEXP glmer_eta(SEXP x)
     return R_NilValue;
 }
 
+static void glmer_update_lpdisc(SEXP x)
+{
+    SEXP rho = GET_SLOT(x, lme4_envSym);
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int i, n = dims[n_POS];
+    double *dev = REAL(GET_SLOT(x, lme4_devianceSym)), *dev_res;
+
+    dev[bqd_POS] = lme4_sumsq(REAL(GET_SLOT(x, lme4_uvecSym)), dims[q_POS]);
+    Mer_eta(x, REAL(findVarInFrame(rho, lme4_etaSym)));
+    glmer_linkinv(x);
+    glmer_dev_resids(x);
+    dev_res = REAL(findVarInFrame(rho, lme4_devResidSym));
+    for (i = 0, dev[disc_POS] = 0; i < n; i++)
+	dev[disc_POS] += dev_res[i];
+    dev[lpdisc_POS] = log(dev[disc_POS] + dev[bqd_POS]);
+}
+
+static void glmer_update_L(SEXP x)
+{
+    SEXP rho = GET_SLOT(x, lme4_envSym);
+    CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
+    int *vp = ((int*)(cVt->p));
+    int n = cVt->ncol;
+    int j, nnz = vp[n], p;
+    double *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
+	*mu = REAL(GET_SLOT(x, lme4_muSym)),
+	*rr = REAL(GET_SLOT(x, lme4_residSym)),
+	*vx = (double*)(cVt->x),
+	*w = REAL(GET_SLOT(x, lme4_weightsSym)),
+	*y = REAL(GET_SLOT(x, lme4_ySym)), one[] = {1,0};
+    CHM_FR L = L_SLOT(x);
+    double *dmu_deta = Alloca(n, double),
+	*var = Alloca(n, double),
+	*wx = Alloca(nnz, double); /* weighted x slot of cVt */
+    R_CheckStack();
+
+    glmer_dmu_deta(x, dmu_deta); glmer_var(x, var);
+    for (j = 0; j < n; j++) { /* calculate weighted Vt and residual */
+	double ww = sqrt(w[j]/var[j]);
+	rr[j] = ww * (y[j] - mu[j]);
+	for (p = vp[j]; p < vp[j + 1]; p++)
+	    wx[p] = vx[p] * ww * dmu_deta[j];
+    }
+    cVt->x = (void*)wx;	/* Factor V'WV + I */
+    if (!M_cholmod_factorize_p(cVt, one, (int*) NULL, 0, L, &c))
+	error(_("cholmod_factorize_p failed:"));
+    cVt->x = (void*)vx;
+    dev[ldL2_POS] = chm_log_det2(L);
+    eval_ML_POS(dev, n);
+}
+
 /**
  * Iterate to determine the conditional modes of the random effects.
  *
- * @param x pointer to an glmer object
+ * @param x pointer to an nlmer object
  *
  * @return An indicator of whether the iterations converged
  */
-static int Glmer_condMode(SEXP x)
+static int nglmer_condMode(SEXP x, int mtype)
 {
-    SEXP env = GET_SLOT(x, lme4_envSym);
-    CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
-    int *vp = (int*)(cVt->p), cfll = c.final_ll, i, j, p;
-    int n = cVt->ncol, nnz = vp[cVt->ncol], q = cVt->nrow;
-    double cfac = ((double)(n-q))/((double)q),
-	crit = IRLS_TOL + 1, lpd_old = DOUBLE_XMAX,
-	one[] = {1,0}, step, zero[] = {0, 0};
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int i, j, n = dims[n_POS], q = dims[q_POS];
     double *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
-	*eta = REAL(findVarInFrame(env, lme4_etaSym)),
-	*mu = REAL(findVarInFrame(env, lme4_muSym)),
-	*rr, *u = REAL(GET_SLOT(x, lme4_uvecSym)),
-	*vx = (double*)(cVt->x),
-	*w = REAL(GET_SLOT(x, lme4_weightsSym)),
-	*y = REAL(GET_SLOT(x, lme4_ySym));
+	*u = REAL(GET_SLOT(x, lme4_uvecSym)),
+	*res = REAL(GET_SLOT(x, lme4_residSym)), 
+	cfac = ((double)(n - q)) / ((double)q),
+	crit = DOUBLE_XMAX,
+	lpd_old, one[] = {1,0}, step, zero[] = {0,0};
+    double *tmp = Alloca(q, double),
+	*uold = Alloca(q, double);
     CHM_FR L = L_SLOT(x);
-    double *dmu_deta = Alloca(n, double), *tmp = Alloca(n, double),
-	*uold = Alloca(q, double), *var = Alloca(n, double),
-	*wx = Alloca(nnz, double); /* weighted x slot of cVt */
-    CHM_DN ctmp = N_AS_CHM_DN(Alloca(n, double), n, 1),
-	res = N_AS_CHM_DN(Alloca(n, double), n, 1),
-	rhs = N_AS_CHM_DN(Alloca(q, double), q, 1), sol;
+    CHM_DN cres = N_AS_CHM_DN(res, n, 1),
+	ctmp = N_AS_CHM_DN(tmp, q, 1), sol;
+    CHM_SP mmt = (mtype - 1) ?
+	AS_CHM_SP(GET_SLOT(x, lme4_VtSym)) :
+	AS_CHM_SP(GET_SLOT(x, lme4_MtSym));
     R_CheckStack();
 
-    rr = (double*)(res->x);
     if (!(L->is_ll)) error(_("L must be LL', not LDL'"));
-
     if (q > n) error(_("q = %d > n = %d"), q, n);
     mer_update_Vt(x);
     AZERO(u, q);
-    c.final_ll = L->is_ll;
-    Mer_eta(x, eta); glmer_linkinv(x);
-    glmer_dmu_deta(x, dmu_deta); glmer_var(x, var);
+    switch (mtype) {	    /* updates dev[lpdisc,disc,bqd] */
+    case 1: nlmer_eval_model(x); break; /* updates res */
+    case 2: glmer_update_lpdisc(x); break;
+    default: error(_("Unknown model type %d"), mtype);
+    }
     for (i = 0; i < IRLS_MAXITER && crit > IRLS_TOL; i++) {
-	for (j = 0; j < n; j++) { /* calculate weighted Vt and residual */
-	    double ww = sqrt(w[j]/var[j]);
-	    rr[j] = ww * (y[j] - mu[j]);
-	    for (p = vp[j]; p < vp[j + 1]; p++) wx[p] = vx[p] * ww * dmu_deta[j];
+	switch (mtype) {	
+	case 1:			
+	    nlmer_update_Mt(x); /* also updates L and rest of dev */
+	    break;
+	case 2:
+	    glmer_update_L(x);	/* calculates weighted res and L */
+	    break;
 	}
-	cVt->x = (void*)wx;	/* Factor V'WV + I */
-	if (!M_cholmod_factorize_p(cVt, one, (int*) NULL, 0, L, &c))
-	    error(_("cholmod_factorize_p failed:"));
-	dev[ldL2_POS] = chm_log_det2(L);
-				/* evaluate V'W[res] */
-	if (!(j = M_cholmod_sdmult(cVt, 0/*trans*/, one, zero, res, rhs, &c)))
-	    error(_("cholmod_sdmult failed:"));
+	lpd_old = dev[lpdisc_POS];
+	Memcpy(uold, u, q);
+
+	if (!(M_cholmod_sdmult(mmt, 0 /* no trans */, one, zero,
+			       cres, ctmp, &c))) /* M'(y-mu) */
+	    error(_("cholmod_sdmult returned error code"));
 				/* permute */
 	sol = M_cholmod_solve(CHOLMOD_P, L, ctmp, &c);
 	for (j = 0; j < q; j++) tmp[j] = ((double*)(sol->x))[j] - u[j];
@@ -1540,48 +1495,28 @@ static int Glmer_condMode(SEXP x)
 	for (step = 1; step > IRLS_SMIN && dev[lpdisc_POS] >= lpd_old;
 	     step /= 2) {	/* step halving */
 	    for (j = 0; j < q; j++) u[j] = uold[j] + step * tmp[j];
-	    nlmer_eval_model(x);
+	    switch (mtype) {
+	    case 1: nlmer_eval_model(x); break;
+	    case 2: glmer_update_lpdisc(x); break;
+	    default: error(_("Unknown model type %d"), mtype);
+	    }
+
 	}
 	if (crit >= IRLS_TOL && dev[lpdisc_POS] >= lpd_old)
 	    error(_("unable to reduce lpdisc in PNLS for conditional modes"));
     }
     if (crit > IRLS_TOL)
 	error(_("unable to converge to conditional modes"));
-    c.final_ll = cfll;
     return i;
-/* 				/\* evaluate V'[y-dmu_deta]-u *\/ */
-/* 	cVt->x = (void*)vx; Memcpy((double*)(rhs->x), u, q); */
-/* 	if (!(j = M_cholmod_sdmult(cVt, 0/\*trans*\/, one, m_one, res, rhs, &c))) */
-/* 	    error(_("cholmod_sdmult failed:")); */
-/* 				/\* solve for the increment *\/ */
-/* 	td1 = M_cholmod_solve(CHOLMOD_L, L, rhs, &c); */
-/* 	td2 = M_cholmod_solve(CHOLMOD_Lt, L, td1, &c);     */
-/* 	M_cholmod_free_dense(&td1, &c); */
-/* 	for (j = 0; j < q; j++) u[j] = uold[j] + ((double*)(td2->x))[j]; */
-/* 	M_cholmod_free_dense(&td2, &c); */
-/* 	dev[bqd_POS] = lme4_sumsq(u, q); */
-/* 	Mer_eta(x, eta); glmer_linkinv(x); glmer_dev_resids(x); */
-/* 	glmer_dmu_deta(x, dmu_deta); glmer_var(x, var); */
-/*  	crit = conv_crit(uold, u, q); */
-/* #ifdef DEBUG_NLMER */
-/* 	Rprintf("%3d: %20.15g %20.15g", i, dev[disc_POS], dev[bqd_POS]); */
-/* 	Rprintf(" %20.15g\n", dev[disc_POS] + dev[bqd_POS]); */
-/* #endif */
-/* 	if (crit < IRLS_TOL) break; */
-/*     } */
-/*     dev[lpdisc_POS] = log(dev[disc_POS] + dev[bqd_POS]); */
-/*     dev[ldL2_POS] = chm_log_det2(L); */
-/*     dev[ML_POS] = dev[REML_POS] = */
-/* 	dev[ldL2_POS] + dn * (1. + dev[lpdisc_POS] + log(2. * PI / dn)); */
+}
 
-/*     c.final_ll = cfll; */
-/*     return (crit > IRLS_TOL) ? 0 : i; */
+SEXP nlmer_condMode(SEXP x) {
+    return ScalarInteger(nglmer_condMode(x, 1));
 }
 
 SEXP glmer_condMode(SEXP x) {
-    return ScalarInteger(Glmer_condMode(x));
+    return ScalarInteger(nglmer_condMode(x, 2));
 }
-
 
 /* Functions common to all three forms of mixed models */
 
@@ -1607,14 +1542,15 @@ update_deviance(SEXP x, const double *xv, int mtype)
 	Memcpy(REAL(GET_SLOT(x, lme4_fixefSym)),
 	       xv + dims[np_POS], dims[p_POS]);
     switch(mtype) {
-    case 0: {			/* linear mixed model */
+    case 0:			/* linear mixed model */
+    {
 	lmer_update_dev(x); break;
     }
-    case 1: {			/* nonlinear mixed model */
-	Nlmer_condMode(x); break;
-    }
-    case 2: {			/* generalized linear mixed model */
-	Glmer_condMode(x); break;
+    case 1:	     /* nonlinear or generalized linear mixed model */
+    {
+	Memcpy(REAL(GET_SLOT(x, lme4_fixefSym)),
+	       xv + dims[np_POS], dims[p_POS]);
+	nglmer_condMode(x, mtype); break;
     }
     default:
 	error(_("Unknown form of model for update_deviance"));
@@ -2134,5 +2070,117 @@ static const double
     *GHQ_w[12] = {(double *) NULL, GHQ_w1, GHQ_w2, GHQ_w3, GHQ_w4,
 		  GHQ_w5, GHQ_w6, GHQ_w7, GHQ_w8, GHQ_w9, GHQ_w10,
 		  GHQ_w11};
+
+
+
+/**
+ * Iterate to determine the conditional modes of the random effects.
+ *
+ * @param x pointer to an glmer object
+ *
+ * @return An indicator of whether the iterations converged
+ */
+static int Glmer_condMode(SEXP x)
+{
+    SEXP env = GET_SLOT(x, lme4_envSym);
+    CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
+    int *vp = (int*)(cVt->p), cfll = c.final_ll, i, j, p;
+    int n = cVt->ncol, nnz = vp[cVt->ncol], q = cVt->nrow;
+    double cfac = ((double)(n-q))/((double)q),
+	crit = IRLS_TOL + 1, lpd_old = DOUBLE_XMAX,
+	one[] = {1,0}, step, zero[] = {0, 0};
+    double *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
+	*eta = REAL(findVarInFrame(env, lme4_etaSym)),
+	*mu = REAL(findVarInFrame(env, lme4_muSym)),
+	*rr, *u = REAL(GET_SLOT(x, lme4_uvecSym)),
+	*vx = (double*)(cVt->x),
+	*w = REAL(GET_SLOT(x, lme4_weightsSym)),
+	*y = REAL(GET_SLOT(x, lme4_ySym));
+    CHM_FR L = L_SLOT(x);
+    double *dmu_deta = Alloca(n, double), *tmp = Alloca(n, double),
+	*uold = Alloca(q, double), *var = Alloca(n, double),
+	*wx = Alloca(nnz, double); /* weighted x slot of cVt */
+    CHM_DN ctmp = N_AS_CHM_DN(Alloca(n, double), n, 1),
+	res = N_AS_CHM_DN(Alloca(n, double), n, 1),
+	rhs = N_AS_CHM_DN(Alloca(q, double), q, 1), sol;
+    R_CheckStack();
+
+    rr = (double*)(res->x);
+    if (!(L->is_ll)) error(_("L must be LL', not LDL'"));
+
+    if (q > n) error(_("q = %d > n = %d"), q, n);
+    mer_update_Vt(x);
+    AZERO(u, q);
+    c.final_ll = L->is_ll;
+    Mer_eta(x, eta); glmer_linkinv(x);
+    glmer_dmu_deta(x, dmu_deta); glmer_var(x, var);
+    for (i = 0; i < IRLS_MAXITER && crit > IRLS_TOL; i++) {
+	for (j = 0; j < n; j++) { /* calculate weighted Vt and residual */
+	    double ww = sqrt(w[j]/var[j]);
+	    rr[j] = ww * (y[j] - mu[j]);
+	    for (p = vp[j]; p < vp[j + 1]; p++) wx[p] = vx[p] * ww * dmu_deta[j];
+	}
+	cVt->x = (void*)wx;	/* Factor V'WV + I */
+	if (!M_cholmod_factorize_p(cVt, one, (int*) NULL, 0, L, &c))
+	    error(_("cholmod_factorize_p failed:"));
+	dev[ldL2_POS] = chm_log_det2(L);
+				/* evaluate V'W[res] */
+	if (!(j = M_cholmod_sdmult(cVt, 0/*trans*/, one, zero, res, rhs, &c)))
+	    error(_("cholmod_sdmult failed:"));
+				/* permute */
+	sol = M_cholmod_solve(CHOLMOD_P, L, ctmp, &c);
+	for (j = 0; j < q; j++) tmp[j] = ((double*)(sol->x))[j] - u[j];
+	M_cholmod_free_dense(&sol, &c);
+	if (!(sol = M_cholmod_solve(CHOLMOD_L, L, ctmp, &c)))
+	    error(_("cholmod_solve (CHOLMOD_L) failed"));
+	Memcpy(tmp, (double*)(sol->x), q);
+	M_cholmod_free_dense(&sol, &c);
+				/* check convergence criterion */
+	crit = cfac * lme4_sumsq(tmp, q) / exp(lpd_old);
+	if (crit < IRLS_TOL) break;
+	if (!(sol = M_cholmod_solve(CHOLMOD_Lt, L, ctmp, &c)))
+	    error(_("cholmod_solve (CHOLMOD_Lt) failed"));
+	Memcpy(tmp, (double*)(sol->x), q);
+	M_cholmod_free_dense(&sol, &c);
+	for (step = 1; step > IRLS_SMIN && dev[lpdisc_POS] >= lpd_old;
+	     step /= 2) {	/* step halving */
+	    for (j = 0; j < q; j++) u[j] = uold[j] + step * tmp[j];
+	    nlmer_eval_model(x);
+	}
+	if (crit >= IRLS_TOL && dev[lpdisc_POS] >= lpd_old)
+	    error(_("unable to reduce lpdisc in PNLS for conditional modes"));
+    }
+    if (crit > IRLS_TOL)
+	error(_("unable to converge to conditional modes"));
+    c.final_ll = cfll;
+    return i;
+/* 				/\* evaluate V'[y-dmu_deta]-u *\/ */
+/* 	cVt->x = (void*)vx; Memcpy((double*)(rhs->x), u, q); */
+/* 	if (!(j = M_cholmod_sdmult(cVt, 0/\*trans*\/, one, m_one, res, rhs, &c))) */
+/* 	    error(_("cholmod_sdmult failed:")); */
+/* 				/\* solve for the increment *\/ */
+/* 	td1 = M_cholmod_solve(CHOLMOD_L, L, rhs, &c); */
+/* 	td2 = M_cholmod_solve(CHOLMOD_Lt, L, td1, &c);     */
+/* 	M_cholmod_free_dense(&td1, &c); */
+/* 	for (j = 0; j < q; j++) u[j] = uold[j] + ((double*)(td2->x))[j]; */
+/* 	M_cholmod_free_dense(&td2, &c); */
+/* 	dev[bqd_POS] = lme4_sumsq(u, q); */
+/* 	Mer_eta(x, eta); glmer_linkinv(x); glmer_dev_resids(x); */
+/* 	glmer_dmu_deta(x, dmu_deta); glmer_var(x, var); */
+/*  	crit = conv_crit(uold, u, q); */
+/* #ifdef DEBUG_NLMER */
+/* 	Rprintf("%3d: %20.15g %20.15g", i, dev[disc_POS], dev[bqd_POS]); */
+/* 	Rprintf(" %20.15g\n", dev[disc_POS] + dev[bqd_POS]); */
+/* #endif */
+/* 	if (crit < IRLS_TOL) break; */
+/*     } */
+/*     dev[lpdisc_POS] = log(dev[disc_POS] + dev[bqd_POS]); */
+/*     dev[ldL2_POS] = chm_log_det2(L); */
+/*     dev[ML_POS] = dev[REML_POS] = */
+/* 	dev[ldL2_POS] + dn * (1. + dev[lpdisc_POS] + log(2. * PI / dn)); */
+
+/*     c.final_ll = cfll; */
+/*     return (crit > IRLS_TOL) ? 0 : i; */
+}
 
 #endif
