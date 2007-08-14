@@ -1,3 +1,14 @@
+2007-08-14 13:07  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4730] src/Mutils.h: declare alloca
+	* [r4734] NAMESPACE, R/AllGeneric.R, R/Csparse.R, R/HBMM.R, R/Tsparse.R,
+	  R/dgCMatrix.R, R/dgTMatrix.R, R/dsCMatrix.R, R/dsTMatrix.R,
+	  man/externalFormats.Rd, src/Csparse.c, src/Csparse.h, src/DEPS.mkf,
+	  src/HBMM.c, src/HBMM.h, src/Mutils.h, src/SOURCES_C.mkf, src/init.c,
+	  src/mmio.c, src/mmio.h: Remove deprecated function writeHB and its
+	  methods; switch writeMM to use CHOLMOD code; repair readMM
+
+	
 2007-08-14  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/nearPD.R, man/nearPD.Rd (nearPD): new function built on Jens
@@ -30,6 +41,8 @@
 
 	* [r4712] inst/include/Matrix_stubs.c: Change R_cholmod_printf in stubs
 	  as well as in sources
+	* [r4713] src/dsyMatrix.c: Duplicate the contents of the RHS before
+	  Lapack call
 
 2007-08-03  Martin Maechler  <maechler@stat.math.ethz.ch>
 
