@@ -1,3 +1,8 @@
+2007-08-14  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/nearPD.R, man/nearPD.Rd (nearPD): new function built on Jens
+	Oehlschlaegel's ... result type still to be discussed!
+
 2007-08-10  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* man/image-methods.Rd: new, combining all image() methods
