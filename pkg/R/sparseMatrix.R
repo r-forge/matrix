@@ -468,6 +468,13 @@ setMethod("norm", signature(x = "sparseMatrix", type = "character"),
 	  })
 
 
+setMethod("rcond", signature(x = "sparseMatrix", type = "character"),
+	  function(x, type, ...) {
+	  stop("There are no specialized rcond() methods for sparse ",
+	       "matrices.\n Either use rcond(as(. , \"denseMatrix\"))\n",
+	       " or 1 / (norm(.) * norm(solve(.))).")
+	      })
+
 lm.fit.sparse <-
 function(x, y, offset = NULL, method = c("qr", "cholesky"),
          tol = 1e-7, singular.ok = TRUE, transpose = FALSE, ...)

@@ -35,6 +35,7 @@
 \alias{show,sparseMatrix-method}
 \alias{summary,sparseMatrix-method}
 \alias{norm,sparseMatrix,character-method}
+\alias{rcond,sparseMatrix,character-method}
 %\alias{colMeans,..} etc are now in ./colSums.Rd
 % graph stuff
 \alias{coerce,graph,sparseMatrix-method}
