@@ -106,7 +106,10 @@ readMM <- function(file)
                comment.char = "%", quiet = TRUE)
     nc <- scan(file, nmax = 1, what = integer(0), quiet = TRUE)
     nz <- scan(file, nmax = 1, what = integer(0), quiet = TRUE)
-    if (repr == "coordinate" && elt == "real") {
+    if (repr == "coordinate" && elt %in% c("real", "integer")) {
+### FIXME: Should the "integer" element type be returned as an object
+### that inherits from the "iMatrix" class?
+### FIXME: What about pattern and complex element types?        
         els <- scan(file, nmax = nz,
                     what = list(i = integer(0), j = integer(0),
                     x = numeric(0)), quiet = TRUE)
@@ -116,5 +119,7 @@ readMM <- function(file)
         if (sym == "symmetric")
             return(new("dsTMatrix", uplo = "L", Dim = c(nr, nc),
                        i = els$i - 1L, j = els$j - 1L, x = els$x))
-    }
+    } else
+    stop(gettextf("\"readMM\" is not yet implemented for element type",
+                  elt))
 }

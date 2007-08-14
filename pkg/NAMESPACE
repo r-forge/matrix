@@ -37,7 +37,7 @@ export("Cholesky",
        "tril",
        "triu",
        "unpack",
-       "writeHB",
+#        "writeHB",
        "writeMM"
        )
 

@@ -133,9 +133,5 @@ setMethod("+", signature(e1 = "dgTMatrix", e2 = "dgTMatrix"),
           })
 
 
-setMethod("writeHB", signature(obj = "dgTMatrix"),
-	  function(obj, file, ...) callGeneric(as(obj, "CsparseMatrix"), file, ...))
-
-setMethod("writeMM", signature(obj = "dgTMatrix"),
-	  function(obj, file, ...)
-	  .Call(Matrix_writeMatrixMarket, obj, as.character(file), "DGT"))
+## setMethod("writeHB", signature(obj = "dgTMatrix"),
+## 	  function(obj, file, ...) callGeneric(as(obj, "CsparseMatrix"), file, ...))

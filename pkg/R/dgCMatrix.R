@@ -47,16 +47,12 @@ setMethod("image", "dgCMatrix",
 
 ## "[<-" methods { setReplaceMethod()s }  are now in ./Csparse.R
 
-setMethod("writeHB", signature(obj = "dgCMatrix"),
-	  function(obj, file, ...) {
-	      .Deprecated("writeMM")
-	      .Call(Matrix_writeHarwellBoeing, obj,
-		    as.character(file), "DGC")
-	  })
-
-setMethod("writeMM", signature(obj = "dgCMatrix"),
-	  function(obj, file, ...)
-	  .Call(Matrix_writeMatrixMarket, obj, as.character(file), "DGC"))
+## setMethod("writeHB", signature(obj = "dgCMatrix"),
+## 	  function(obj, file, ...) {
+## 	      .Deprecated("writeMM")
+## 	      .Call(Matrix_writeHarwellBoeing, obj,
+## 		    as.character(file), "DGC")
+## 	  })
 
 ##-> ./colSums.R  for colSums,... rowMeans
 

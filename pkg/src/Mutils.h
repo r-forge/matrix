@@ -5,8 +5,9 @@
 extern "C" {
 #endif
 
-#include <Rdefines.h> /* Rinternals.h + GET_SLOT etc */
+#include <ctype.h>
 #include <R.h>  /* includes Rconfig.h */
+#include <Rdefines.h> /* Rinternals.h + GET_SLOT etc */
 
 #ifdef ENABLE_NLS
 #include <libintl.h>

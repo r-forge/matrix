@@ -333,3 +333,8 @@ setMethod("diag", "CsparseMatrix",
 	      }
 	      val
 	  })
+
+setMethod("writeMM", "CsparseMatrix",
+	  function(obj, file, ...)
+          .Call(Csparse_MatrixMarket, obj, as.character(file)))
+
