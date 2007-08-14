@@ -1394,7 +1394,6 @@ static void glmer_update_lpdisc(SEXP x)
 
 static void glmer_update_L(SEXP x)
 {
-    SEXP rho = GET_SLOT(x, lme4_envSym);
     CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
     int *vp = ((int*)(cVt->p));
     int n = cVt->ncol;
