@@ -15,6 +15,11 @@
 # define attr_hidden
 #endif
 
+#ifdef __GNUC__
+# undef alloca
+# define alloca(x) __builtin_alloca((x))
+#endif
+
 extern
 #include "Syms.h"
 
