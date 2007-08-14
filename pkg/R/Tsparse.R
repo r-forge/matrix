@@ -809,3 +809,8 @@ setMethod("t", signature(x = "TsparseMatrix"),
 	      r
       })
 
+
+setMethod("writeMM", "TsparseMatrix",
+	  function(obj, file, ...)
+          .Call(Csparse_MatrixMarket, as(obj, "CsparseMatrix"),
+                as.character(file)))
