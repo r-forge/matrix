@@ -8,7 +8,6 @@
 	  src/mmio.c, src/mmio.h: Remove deprecated function writeHB and its
 	  methods; switch writeMM to use CHOLMOD code; repair readMM
 
-	
 2007-08-14  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/nearPD.R, man/nearPD.Rd (nearPD): new function built on Jens
