@@ -313,7 +313,7 @@ setMethod("band", "CsparseMatrix",
 	  })
 
 setMethod("diag", "CsparseMatrix",
-	  function(x, nrow, ncol = n) {
+	  function(x, nrow, ncol) {
 	      dm <- .Call(Csparse_band, x, 0, 0)
 	      dlen <- min(dm@Dim)
 	      ind1 <- dm@i + 1L	# 1-based index vector
