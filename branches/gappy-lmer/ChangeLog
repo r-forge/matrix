@@ -1,4 +1,68 @@
-2007-07-16 17:09  Douglas Bates <bates@stat.wisc.edu>
+2007-08-14 13:07  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4731] src/lmer.h: declare alloca
+	* [r4732] src/lmer.c: unused variable
+	
+2007-08-12 13:21  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4728] R/AllClass.R, R/lmer.R, src/Syms.h, src/init.c, src/lmer.c:
+	  changes for glmer (not yet complete), code cleanup
+
+2007-08-04 23:44  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4709] R/AllClass.R, R/lmer.R, man/lmer.Rd, src/Syms.h, src/init.c,
+	  src/lmer.c, src/lmer.h: Got nlmer working
+
+2007-08-03 19:19  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4705] NAMESPACE, R/AllClass.R, man/lmer-class.Rd, man/ranef.Rd:
+	  Change name of ranef.mer class
+	* [r4706] R/lmList.R, R/lmer.R, R/pedigree.R: Use seq_along
+	* [r4707] DESCRIPTION, src/init.c, src/lme4_utils.h, src/lmer.c,
+	  src/lmer.h, src/pedigree.c, src/pedigree.h: Update Matrix API,
+	  amalgamate source files, include R.h before other R headers
+
+2007-08-01 16:29  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4688] src/lme4_utils.h: Preparing to remove this file
+	* [r4689] src/pedigree.h: Preparing to remove this file
+
+2007-07-26 14:28  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4664] R/lmer.R, inst/doc/Implementation.Rnw, inst/doc/Theory.Rnw,
+	  man/cbpp.Rd, man/lmer-class.Rd, man/lmer.Rd, src/init.c, src/lmer.c,
+	  src/lmer.h: work on glmer, nlmer, and lmer_postVar
+	* [r4678] src/lmer.c: Conditional compilation of alloc3DArray
+
+2007-07-23 13:26  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4658] R/lmer.R, src/init.c, src/lmer.c, src/lmer.h: More work on
+	  nlmer
+
+2007-07-20 20:41  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4654] R/lmer.R, src/init.c, src/lmer.c, src/lmer.h: Got nlmer
+	  running for simple models but still problems with multiple random
+	  effects per level
+
+2007-07-19 21:28  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4640] R/AllGeneric.R, R/lmer.R, src/init.c, src/lmer.c, src/lmer.h:
+	  More work on nlmer and glmer
+	* [r4645] Done, ToDo: Tracking
+	* [r4646] R/AllClass.R, R/lmer.R, man/lmer.Rd, src/init.c, src/lmer.c,
+	  src/lmer.h: More work on nlmer. Consistency of classes.
+
+2007-07-17 22:12  Douglas Bates <bates@stat.wisc.edu>
+	
+	* [r4715] R/AllClass.R, R/lmer.R, ToDo, inst/doc/Implementation.Rnw,
+	  man/lmer-class.Rd, src/init.c, src/lmer.c, src/lmer.h: Update nlmer
+	  and clean up
+	* [r4717] src/lmer.c: Work on glmer
+	* [r4635] R/lmer.R, man/cbpp.Rd, src/init.c, src/lmer.c, src/lmer.h:
+	  Working on glmer_condDev
+
+2007-07-16 23:02  Douglas Bates <bates@stat.wisc.edu>
 	* [r4620] R/AllClass.R, R/AllGeneric.R, R/lmer.R, man/lmer.Rd,
 	  src/init.c, src/lmer.c, src/lmer.h: Preparing for a beta release
 	* [r4621] man/lmer-class.Rd, man/mcmcsamp.Rd, man/ranef.Rd,
@@ -7,6 +71,8 @@
 	* [r4622] src/lmer.c: documentation infelicity
 	* [r4623] R/AllClass.R, R/lmer.R: Rationalize summary class structure
 	* [r4624] R/mlirt.R: Remove references to defunct C functions
+	* [r4627] src/lmer.c: New version of calculation of update in glmer
+	  conditional modes
 	
 2007-07-13 21:34  Douglas Bates <bates@stat.wisc.edu>
 	* [r4613] inst/doc/Theory.Rnw: Use Poisson mixed model as example of
