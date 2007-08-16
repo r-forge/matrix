@@ -35,10 +35,15 @@ nearPD(x, corr = FALSE,
   within the algorithm.
 }
 \value{
-  the computed positive-definite matrix, with
-  \code{\link{class}} \code{"nearPD"} and additional attributes
-  \item{iterations }{number of iterations needed.}
-  \item{converged }{logical indicating if iterations converged.}
+  an S3 object of \code{\link{class}} \code{"nearPD"}, basically a list
+  with components
+  \item{mat}{a matrix of class \code{\linkS4class{dpoMatrix}}, the
+  computed positive-definite matrix.}
+  \item{corr}{logical, just the argument \code{corr}.}
+  \item{normF}{the Frobenius norm (\code{\link{norm}(x-X, "F")}) of the
+  difference between the original and the resulting matrix.}
+  \item{iterations}{number of iterations needed.}
+  \item{converged}{logical indicating if iterations converged.}
 }
 \references{%% more in /u/maechler/R/Pkgs/sfsmisc/man/posdefify.Rd
   Cheng, Sheung Hun and Higham, Nick (1998)

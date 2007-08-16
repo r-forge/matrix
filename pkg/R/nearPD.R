@@ -90,7 +90,7 @@ nearPD <-
     structure(list(mat =
 		   new("dpoMatrix", x = as.vector(X),
 		       Dim = c(n,n), Dimnames = .M.DN(x)),
-		   normF = norm(x-X, "F"), iterations = iter,
+                   corr = corr, normF = norm(x-X, "F"), iterations = iter,
 		   rel.tol = conv, converged = converged),
 	      class = "nearPD")
 }
