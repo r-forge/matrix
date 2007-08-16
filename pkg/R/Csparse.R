@@ -203,7 +203,7 @@ setReplaceMethod("[", signature(x = "CsparseMatrix", i = "matrix", j = "missing"
 				value = "replValue"),
 		 function(x, i, value)
 		 ## goto Tsparse modify and convert back:
-		 as(.TM.repl.i.2col(as(x, "TsparseMatrix"), i, value),
+		 as(.TM.repl.i.2col(as(x, "TsparseMatrix"), i=i, value=value),
 		    "CsparseMatrix"))
 
 
