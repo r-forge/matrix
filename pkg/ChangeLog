@@ -1,3 +1,11 @@
+2007-08-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Date, Version): 0.999375-2
+
+2007-08-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/HBMM.R (readMM): make work for pattern matrices as well
+
 2007-08-14 13:07  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r4730] src/Mutils.h: declare alloca
