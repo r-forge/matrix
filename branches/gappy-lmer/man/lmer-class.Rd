@@ -1,4 +1,4 @@
-\name{lmer-class}
+\name{mer-class}
 \title{Mixed Model Representations and *mer Methods}
 \docType{class}
 % Classes
@@ -14,40 +14,38 @@
 \alias{ranef.mer-class}
 % Methods
 \alias{anova,mer-method}
-\alias{coef,lmer-method}
 \alias{coef,mer-method}
-\alias{coerce,lmer,dsTMatrix-method}
 \alias{coerce,mer,dtCMatrix-method}
-\alias{coerce,mer,pMatrix-method}
-\alias{chol,lmer,ANY-method}
-\alias{confint,lmer-method}
 \alias{deviance,mer-method}
-\alias{fitted,lmer-method}
 \alias{formula,mer-method}
 \alias{logLik,mer-method}
-\alias{plot,coef.lmer-method}
-\alias{plot,ranef.mer-method}
-\alias{print,mer-method}
-\alias{print,lmer-method}
-\alias{print,glmer-method}
-\alias{print,nlmer-method}
-\alias{qqmath,ranef.mer-method}
-\alias{resid,glmer-method}
-\alias{resid,lmer-method}
-\alias{residuals,glmer-method}
-\alias{residuals,lmer-method}
-\alias{show,mer-method}
-\alias{show,lmer-method}
-\alias{show,glmer-method}
-\alias{show,nlmer-method}
-\alias{simulate,lmer-method}
-\alias{summary,lmer-method}
 \alias{summary,mer-method}
 \alias{terms,mer-method}
 \alias{update,mer-method}
 \alias{vcov,mer-method}
+%
+\alias{confint,lmer-method}
+\alias{fitted,lmer-method}
+\alias{print,lmer-method}
+\alias{resid,lmer-method}
+\alias{residuals,lmer-method}
+\alias{show,lmer-method}
+\alias{simulate,lmer-method}
 \alias{vcov,lmer-method}
 \alias{with,lmer-method}
+%
+\alias{print,nlmer-method}
+\alias{show,nlmer-method}
+%
+\alias{print,glmer-method}
+\alias{resid,glmer-method}
+\alias{residuals,glmer-method}
+\alias{show,glmer-method}
+%
+\alias{plot,coef.lmer-method}
+%
+\alias{plot,ranef.mer-method}
+\alias{qqmath,ranef.mer-method}
 %
 \alias{deviance,summary.mer-method}
 \alias{logLik,summary.mer-method}
@@ -70,28 +68,31 @@
 }
 
 \section{Slots}{
+  The virtual class \code{"mer"} contains the slots that are common to
+  all forms of mixed models.  These are:
   \describe{
-    \item{\code{env}:}{An environment (of class \code{"environment"})
-      created for the evaluation of the nonlinear model function.}
-    \item{\code{model}:}{The nonlinear model function as an object of
-      class \code{"call"}.}
     \item{\code{frame}:}{The model frame for the model, as an object of
       class \code{"data.frame"}.}
-    \item{\code{pnames}:}{Names of the parameters in the nonlinear model
-      (class \code{"character"}).}
     \item{\code{call}:}{The matched call to the function that
       created the object. (class \code{"call"}).} 
     \item{\code{flist}:}{The list of grouping factors for the random
       effects.}
-    \item{\code{Xt}:}{Sparse model matrix (class
-      \code{"\link[Matrix:dgCMatrix-class]{dgCMatrix}"}) for
-      the fixed effects.}
+    \item{\code{terms}:}{A \code{"terms"} object applying to the columns
+      of the \code{X} slot.}
+    \item{\code{X}:}{Model matrix for the fixed effects. In a model fit by
+      \code{\link{lmer}} with the optional argument \code{x = FALSE}
+      this matrix is collapsed to 0 rows to save space.  In an
+      \code{\link{nlmer}} fitted model this matrix has \code{n * s} rows
+      where \code{n} is the number of observations and \code{s} is the
+      number of parameters in the nonlinear model.}
     \item{\code{Zt}:}{Sparse model matrix (class
       \code{"\link[Matrix:dgCMatrix-class]{dgCMatrix}"}) for
       the random effects.}
-    \item{\code{y}:}{The response vector (class \code{"numeric"}).}
     \item{\code{weights}:}{Numeric weights vector. This may be of length
       zero (0) indicating unit weights.}
+    \item{\code{offset}:}{Numeric offset vector. This may be of length
+      zero (0) indicating no offset.}
+    \item{\code{y}:}{The response vector (class \code{"numeric"}).}
     \item{\code{cnames}:}{a list of character vectors of column names
       of the random-effects variance-covariance matrix associated with
       each grouping factor and the fixed-effects model matrix.}
@@ -105,7 +106,7 @@
     \item{\code{dims}:}{A named integer vector of dimensions.}
     \item{\code{ST}:}{A list of S and T factors in the TSST' Cholesky
       factorization of the relative variance matrices of the random
-      effects associated with each grouping factor.  The unit lower
+      effects associated with each random-effects term.  The unit lower
       triangular matrix T and the diagonal matrix S are stored as a
       single matrix whose diagonal elements determine S while the
       subdiagonal elements determine the non-trivial elements of T.}
@@ -115,12 +116,12 @@
     \item{\code{L}:}{The sparse lower Cholesky factor of \eqn{V'V+I}
       (class \code{"\link[Matrix:CHMfactor-class]{dCHMfactor}"}).}
     \item{\code{L}:}{The Cholesky decomposition (class
-      \code{"\link[Matrix:CHMfactor-class]{dCHMfactor}"}) of \eqn{V'V+I}.}
-    \item{\code{mu}:}{A numeric vector of predicted values from the
-      model with an attibute \code{"gradient"}, the gradient matrix.}
-    \item{\code{Mt}:}{The derivative of \code{mu} with respect to
-      \code{uvec} stored as a sparse matrix (class
-      \code{"\link[Matrix:CHMfactor-class]{dCHMfactor}"}).}      
+      \code{"\link[Matrix:CHMfactor-class]{dCHMfactor}"}) of \eqn{V'V+I}
+      for \code{\link{lmer}} models or a weighted version of the matrix for
+      \code{\link{glmer}} or \code{\link{nlmer}} models.}
+    \item{\code{mu}:}{The mean of the responses at the current parameter
+      values.  In an \code{\link{nlmer}} model the gradient matrix is the
+      attibute \code{"gradient"}.}
     \item{\code{deviance}:}{Named numeric vector containing the deviance
       corresponding to the maximum likelihood (the \code{"ML"} element)
       and \code{"REML"} criteria and various components. The
@@ -134,13 +135,41 @@
       original scale.}
     \item{\code{uvec}:}{Numeric vector of orthogonal, constant variance
       random effects.}
-    \item{\code{X}:}{Dense model matrix for the fixed
-      effects. (\code{"lmer"} class only.)}
+    \item{\code{eta}:}{The linear predictor at the current values of the
+      parameters and the random effects.}
+    \item{\code{resid}:}{The raw residuals.}
+  }
+
+  The \code{"lmer"} class has additional slots
+  \describe{
+    \item{\code{ZtXy}:}{The matrix \eqn{Z'[X:y]}.}
     \item{\code{XytXy}:}{The crossproduct of the columns of \eqn{[X:y]}.}
     \item{\code{RVXy}:}{A rectangular matrix, the dense solution to
       \eqn{L RVXy = S T'ZtXy}.}
     \item{\code{RXy}:}{The upper triangular Cholesky factor of the
       downdated \code{XytXy} slot.}
+  }
+
+  The \code{"nlmer"} class has additional slots
+  \describe{
+    \item{\code{env}:}{An environment (class \code{"environment"})
+      created for the evaluation of the nonlinear model function.}
+    \item{\code{model}:}{The nonlinear model function as an object of
+      class \code{"call"}.}
+    \item{\code{pnames}:}{Names of the parameters in the nonlinear model
+      (class \code{"character"}).}
+    \item{\code{Mt}:}{The derivative of \code{mu} with respect to
+      \code{uvec} stored as a sparse matrix (class
+      \code{"\link[Matrix:CHMfactor-class]{dCHMfactor}"}).}      
+  }
+
+  The \code{"glmer"} class has additional slots
+  \describe{
+    \item{\code{env}:}{An environment (class \code{"environment"})
+      created for the evaluation of the generalized linear model family
+      functions.}
+    \item{\code{famName}:}{A named character vector with the name of the
+      model family and the link function.}
   }
   The \code{"summary.mer"}, \code{"summary.lmer"} and
   \code{"summary.glmer"} classes \emph{contain} the \code{"mer"},
