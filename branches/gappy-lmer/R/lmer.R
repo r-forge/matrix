@@ -280,7 +280,7 @@ mkdims <- function(fr, FL, start)
     ## record dimensions and algorithm settings
     dd <-
         VecFromNames(c("nf", "n", "p", "q", "s", "np", "REML", "ftyp",
-                       "nest", "cvg"), "integer")
+                       "mtyp", "nest", "cvg"), "integer")
     dd["nf"] <- length(cnames)          # number of random-effects terms
     dd["n"] <- nrow(fr$mf)              # number of observations
     dd["p"] <- ncol(fr$X)               # number of fixed-effects coefficients
@@ -290,7 +290,9 @@ mkdims <- function(fr, FL, start)
 ### FIXME: Check number of variance components versus number of
 ### levels in the factor for each term. Warn or stop as appropriate
     dd["np"] <- as.integer(sum(nvc))    # number of parameters in optimization
+    dd["mtyp"] <- 0L                    # 0 => lmer, 1 => nlmer, 2 => glmer
     dd["REML"] <- 0L                    # glmer and nlmer don't use REML
+    dd["cvg"]  <- 0L                    # no optimization attempted
 
     list(Gp = Gp, ST = ST, Vt = Vt, Zt = Zt,
          cnames = cnames, dd = dd,
@@ -314,9 +316,10 @@ mkFamilyEnv <- function(glmFit)
 ### Create and populate the family function evaluation environment.
 {
     env <- new.env()
+    n <- length(glmFit$linear.predictors)
     assign("devResid", unname(resid(glmFit, type = "deviance")), env = env)
-    assign("eta", unname(glmFit$linear.predictors), env = env)
-##    assign("weights", unname(glmFit$weights), env = env)
+    assign("dmu_deta", numeric(n), env = env)
+    assign("var", numeric(n), env = env)
 ### FIXME: install the family functions and create evaluation expressions in the environment
     env
 }
@@ -343,6 +346,16 @@ convergenceMessage <- function(cvg)
     if (is.null(msg))
         msg <- paste("See PORT documentation.  Code (", cvg, ")", sep = "")
     msg
+}
+
+mer_finalize <- function(ans, verbose)
+{
+    .Call(mer_optimize, ans, verbose)
+    if (ans@dims["cvg"] > 6) warning(convergenceMessage(ans@dims["cvg"]))
+    .Call(mer_update_effects, ans)
+    .Call(mer_update_eta, ans)
+    .Call(mer_update_mu_res, ans)
+    ans
 }
 
 ### The main event
@@ -372,6 +385,7 @@ lmer <-
 ### the most levels.
     dm$dd["REML"] <- match.arg(method) == "REML"
     dm$dd["ftyp"] <- -1L              # gaussian family, identity link
+    dm$dd["mtyp"] <-  0L              # linear mixed model
 
     ## Create the dense matrices to be used in the deviance evaluation
 ### FIXME: incorporate weights and offset in the creation of ZtXy et al.
@@ -383,7 +397,8 @@ lmer <-
     fixef <- numeric(dm$dd["p"])
     names(fixef) <- colnames(fr$X)
     dimnames(fr$X) <- NULL
-
+    n <- length(Y)
+    
     ans <- new("lmer",
                frame = if (model) fr$mf else fr$mf[0,],
                call = mc, terms = fr$mt, flist = dm$flist,
@@ -397,15 +412,14 @@ lmer <-
                dims = dm$dd, ST = dm$ST, Vt = dm$Vt,
                L = .Call(mer_create_L, dm$Vt),
                RXy = RXy, RVXy = ZtXy,
-               deviance = dm$dev, fixef = fixef,
+               deviance = dm$dev,
+               eta = numeric(n), mu = numeric(n), 
+               resid = numeric(n), fixef = fixef,
                ranef = numeric(dm$dd["q"]),
                uvec = numeric(dm$dd["q"]))
     cv <- do.call("lmerControl", control)
     if (missing(verbose)) verbose <- cv$msVerbose
-    .Call(mer_optimize, ans, verbose, 0L)
-    if (ans@dims["cvg"] > 6) warning(convergenceMessage(ans@dims["cvg"]))
-    .Call(lmer_update_effects, ans)
-    ans
+    mer_finalize(ans, verbose)
 }
 
 glmer <-
@@ -414,7 +428,7 @@ function(formula, data, family = gaussian, method = c("Laplace", "AGQ"),
          na.action, offset, contrasts = NULL, model = TRUE, ...)
 ### Fit a generalized linear mixed model
 {
-    warning("glmer is in development.  Results reported here are wrong.")
+    #warning("glmer is in development.  Results reported here are wrong.")
     mc <- match.call()
                                         # Evaluate and check the family
     if(is.character(family))
@@ -435,6 +449,7 @@ function(formula, data, family = gaussian, method = c("Laplace", "AGQ"),
     FL <- lmerFactorList(formula, fr$mf, 0L, 0L) # flist, Zt, cnames
     dm <- mkdims(fr, FL, start)
     dm$dd["ftyp"] <- mkFltype(glmFit$family)
+    dm$dd["mtyp"] <- 2L                 # generalized linear mixed model
     dimnames(fr$X) <- NULL
 
     ans <- new("glmer",
@@ -451,14 +466,14 @@ function(formula, data, family = gaussian, method = c("Laplace", "AGQ"),
                L = .Call(mer_create_L, dm$Vt),
                deviance = dm$dev,
                fixef = coef(glmFit),
-               mu = glmFit$fitted.values,
+               eta = unname(glmFit$linear.predictors),
+               mu = unname(glmFit$fitted.values),
                ranef = numeric(dm$dd["q"]),
-               resid = glmFit$residuals,
+               resid = unname(glmFit$residuals),
                uvec = numeric(dm$dd["q"]))
     cv <- do.call("lmerControl", control)
     if (missing(verbose)) verbose <- cv$msVerbose
-#    .Call(mer_optimize, ans, verbose, 2)
-    ans
+    mer_finalize(ans, verbose)
 }
 
 nlmer <- function(formula, data, control = list(), start = NULL,
@@ -525,11 +540,14 @@ nlmer <- function(formula, data, control = list(), start = NULL,
     Mt <- .Call(nlmer_create_Mt, dm$Vt, s)
     dm$dd["s"] <- s
     dm$dd["ftyp"] <- -1L              # gaussian family, identity link
+    dm$dd["mtyp"] <-  1L                # nonlinear mixed model
     dm$dd["p"] <- length(start$fixed)
+    n <- dm$dd["n"]
 
     ans <- new("nlmer",
                env = env, model = nlmod, pnames = pnames,
-               mu = numeric(dm$dd["n"]), resid = numeric(dm$dd["n"]),
+               eta = numeric(n * s),
+               mu = numeric(n), resid = numeric(n),
                Mt = Mt, frame = if (model) fr$mf else fr$mf[0,],
                call = mc, terms = fr$mt, flist = dm$flist, X = X,
                Zt = dm$Zt, Vt = dm$Vt, y = unname(as.double(fr$Y)),
@@ -540,15 +558,12 @@ nlmer <- function(formula, data, control = list(), start = NULL,
                deviance = dm$dev, fixef = start$fixed,
                ranef = numeric(dm$dd["q"]),
                uvec = numeric(dm$dd["q"]))
-    .Call(nlmer_eval_model, ans)
+    .Call(mer_update_lpdisc, ans)
     if (!all.equal(colnames(attr(ans@mu, "gradient")), ans@pnames))
         stop("parameter names do not match column names of gradient")
     cv <- do.call("lmerControl", control)
     if (missing(verbose)) verbose <- cv$msVerbose
-    .Call(mer_optimize, ans, verbose, 1L)
-    if (ans@dims["cvg"] > 6) warning(convergenceMessage(ans@dims["cvg"]))
-    .Call(mer_update_b, ans);
-    ans
+    mer_finalize(ans, verbose)
 }
 
 #### Extractors specific to mixed-effects models
@@ -1282,17 +1297,6 @@ ST2Omega <- function(ST)
     crossprod(solve(T)/dd)
 }
 
-
-## setMethod("mcmcsamp", signature(object = "lmer"),
-## 	  function(object, n = 1, verbose = FALSE, saveb = FALSE,
-## 		   trans = TRUE, deviance = FALSE, ...)
-##       {
-##           ans <- t(.Call(mer_MCMCsamp, object, saveb, n, trans, verbose, deviance))
-## 	  attr(ans, "mcpar") <- as.integer(c(1, n, 1))
-## 	  class(ans) <- "mcmc"
-## 	  mcmccompnames(ans, object, saveb, trans,
-## 			glmer=FALSE, deviance=deviance)
-##       })
 
 ## setMethod("simulate", signature(object = "mer"),
 ## 	  function(object, nsim = 1, seed = NULL, ...)
