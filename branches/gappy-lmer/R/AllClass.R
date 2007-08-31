@@ -41,6 +41,9 @@ setClass("mer", ## Slots common to all three types of mixed models
 			fixef = "numeric",  # fixed effects (length p)
 			ranef = "numeric",  # random effects (length q)
                         uvec = "numeric",   # orthogonal random effects (q)
+                        eta = "numeric",    # linear predictor
+                        mu = "numeric",     # fitted values at current beta and b
+                        resid = "numeric",  # raw residuals at current beta and b
                         "VIRTUAL"),
          validity = function(object) .Call(mer_validate, object))
 
@@ -51,18 +54,13 @@ setClass("lmer", ## linear mixed models
                         ## slots that vary during optimization
                         RVXy = "matrix",  # dense sol. to L RVXy = S T'ZtXy
                         RXy = "matrix"),  # Cholesky factor of downdated XytXy
-         contains = "mer",
-         validity = function(object) .Call(lmer_validate, object))
+         contains = "mer")
 
 setClass("glmer", ## generalized linear mixed models
 	 representation(## original data
                         env = "environment", # evaluation env for family
-                        famName = "character", # name of GLM family and link
-                        ## slots that vary during optimization
-                        mu = "numeric",    # fitted values at current beta and b
-                        resid = "numeric"), # raw residuals at current beta and b
-         contains = "mer",
-         validity = function(object) .Call(glmer_validate, object))
+                        famName = "character"), # name of GLM family and link
+         contains = "mer")
 
 setClass("nlmer", ## nonlinear mixed models
 	 representation(## original data
@@ -70,11 +68,8 @@ setClass("nlmer", ## nonlinear mixed models
                         model = "call",    # nonlinear model
                         pnames = "character", # parameter names for nonlinear model
                         ## slots that vary during optimization
-                        mu = "numeric",    # fitted values at current beta and b
-                        resid = "numeric", # raw residuals at current beta and b
                         Mt = "dgCMatrix"), # transpose of gradient matrix d mu/d u
-         contains = "mer",
-         validity = function(object) .Call(nlmer_validate, object))
+         contains = "mer")
 
 setClass("summary.mer",                 # Additional slots in a summary object
 	 representation(           
