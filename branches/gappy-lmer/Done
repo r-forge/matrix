@@ -1,4 +1,7 @@
 -----
+Currently lmer does not fill in the disc and bqd slots in the deviance
+slot.  Fix this.
+-----
 Remove unused symbols from src/Syms.h and src/init.c
 Add symbols to src/Syms.h for names currently accessed through install().
 Replace the glmer_create and nlmer_create C functions with R code.
@@ -10,7 +13,7 @@ Replace the glmer_create and nlmer_create C functions with R code.
 - Add a "pedigree" class and methods for it.  Allow a pedigree
   argument in lmer.
 
-- change the status vector to an integer vertor.  The steps are
+- change the status vector to an integer vector.  The steps are
   cumulative so we only keep track of the stage.  Also REML and glmm
   are stored here.
 
