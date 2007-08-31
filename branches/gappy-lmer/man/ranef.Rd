@@ -3,7 +3,6 @@
 \docType{methods}
 \alias{ranef}
 \alias{ranef-methods}
-%\alias{ranef,ANY-method}
 \alias{ranef,mer-method}
 \title{Extract Random Effects}
 \usage{
