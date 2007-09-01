@@ -503,24 +503,30 @@ setReplaceMethod("[", signature(x = "Matrix", i = "matrix", j = "missing",
 	  .M.repl.i.2col)
 
 
-setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
+setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "ANY",
 				value = "Matrix"),
-		 function (x, i, j, value) {
-### *TEMPORARY* diagnostic output:
-##                  cat("<Matrix1>[i,j] <- <Matrix1>:\n<Matrix1> = x :")
-##                  str(x)
-##                  cat("<Matrix2> = value :")
-##                  str(value)
-##                  cat("i :"); if(!missing(i)) str(i) else cat("<missing>\n")
-##                  cat("j :"); if(!missing(j)) str(j) else cat("<missing>\n")
+		 function (x, i, j, ..., value)
+		 callGeneric(x=x, j=j, value = as.vector(value)))
 
-                     callGeneric(x=x, i=i, j=j, value = as.vector(value))
-                 })
+setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "missing",
+				value = "Matrix"),
+		 function (x, i, j, ..., value)
+		 callGeneric(x=x, i=i, value = as.vector(value)))
 
 setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
 				value = "Matrix"),
-		 function (x, i, j, value)
+		 function (x, i, j, ..., value)
 		 callGeneric(x=x, i=i, j=j, value = as.vector(value)))
+
+setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "ANY",
+				value = "matrix"),
+		 function (x, i, j, ..., value)
+		 callGeneric(x=x, j=j, value = c(value)))
+
+setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "missing",
+				value = "matrix"),
+		 function (x, i, j, ..., value)
+		 callGeneric(x=x, i=i, value = c(value)))
 
 setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
 				value = "matrix"),

@@ -1,3 +1,8 @@
+2007-09-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R ([<-): add (Matrix,missing,ANY,Matrix) etc
+	* tests/indexing.R: add new regression for the above cases.
+
 2007-08-30  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/Mutils.h (__sun): clause for alloca.h on Solaris
