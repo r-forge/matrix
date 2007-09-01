@@ -1,3 +1,7 @@
+2007-08-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Mutils.h (__sun): clause for alloca.h on Solaris
+
 2007-08-16  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Date, Version): 0.999375-2
