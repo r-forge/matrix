@@ -27,7 +27,7 @@ Schur(x, vectors, \dots)
   of the matrix, and the Schur vectors (if requested).
 }
 \details{
-  Based on the Lapack functions \code{dgeesx}
+  Based on the Lapack subroutine \code{dgees}.
 }
 \section{BACKGROUND}{
   If \code{A} is a square matrix, then \code{A = Q T t(Q)}, where
