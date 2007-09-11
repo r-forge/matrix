@@ -11,35 +11,28 @@ static R_CallMethodDef CallEntries[] = {
     {"ST_initialize", (DL_FUNC) &ST_initialize, 3},
     {"ST_setPars", (DL_FUNC) &ST_setPars, 2},
 
-    {"glmer_condMode", (DL_FUNC) &glmer_condMode, 1},
     {"glmer_dev_resids", (DL_FUNC) &glmer_dev_resids, 1},
-    {"glmer_eta", (DL_FUNC) &glmer_eta, 1},
-    {"glmer_linkinv", (DL_FUNC) &glmer_linkinv, 1},
-    {"glmer_validate", (DL_FUNC) &glmer_validate, 1},
+    {"glmer_dmu_deta", (DL_FUNC) &glmer_dmu_deta, 1},
+    {"glmer_var", (DL_FUNC) &glmer_var, 1},
 
     {"lme4_rWishart", (DL_FUNC) &lme4_rWishart, 3},
 
-    {"lmer_MCMCsamp", (DL_FUNC) &lmer_MCMCsamp, 6},
-    {"lmer_update_dev", (DL_FUNC) &lmer_update_dev, 1},
-    {"lmer_update_effects", (DL_FUNC) &lmer_update_effects, 1},
-    {"lmer_validate", (DL_FUNC) &lmer_validate, 1},
-
+    {"mer_MCMCsamp", (DL_FUNC) &mer_MCMCsamp, 6},
+    {"mer_condMode", (DL_FUNC) &mer_condMode, 1},
     {"mer_create_L", (DL_FUNC) &mer_create_L, 1},
     {"mer_create_Vt", (DL_FUNC) &mer_create_Vt, 3},
-    {"mer_eta", (DL_FUNC) &mer_eta, 1},
-    {"mer_optimize", (DL_FUNC) &mer_optimize, 3},
+    {"mer_optimize", (DL_FUNC) &mer_optimize, 2},
     {"mer_postVar", (DL_FUNC) &mer_postVar, 2},
     {"mer_sigma", (DL_FUNC) &mer_sigma, 2},
-    {"mer_update_b", (DL_FUNC) &mer_update_b, 1},
+    {"mer_update_L", (DL_FUNC) &mer_update_L, 1},
     {"mer_update_Vt", (DL_FUNC) &mer_update_Vt, 1},
+    {"mer_update_effects", (DL_FUNC) &mer_update_effects, 1},
+    {"mer_update_eta", (DL_FUNC) &mer_update_eta, 1},
+    {"mer_update_mu_res", (DL_FUNC) &mer_update_mu_res, 1},
+    {"mer_update_lpdisc", (DL_FUNC) &mer_update_lpdisc, 1},
     {"mer_validate", (DL_FUNC) &mer_validate, 1},
 
-    {"nlmer_condMode", (DL_FUNC) &nlmer_condMode, 1},
     {"nlmer_create_Mt", (DL_FUNC) &nlmer_create_Mt, 2},
-    {"nlmer_eval_model", (DL_FUNC) &nlmer_eval_model, 1},
-    {"nlmer_update_Mt", (DL_FUNC) &nlmer_update_Mt, 1},
-/*     {"nlmer_update_wrkres", (DL_FUNC) &nlmer_update_wrkres, 1}, */
-    {"nlmer_validate", (DL_FUNC) &nlmer_validate, 1},
 
     {"pedigree_chol", (DL_FUNC) &pedigree_chol, 2},
 
