@@ -38,17 +38,16 @@ static SEXP alloc3DArray(SEXPTYPE mode, int nrow, int ncol, int nface)
 
 extern cholmod_common c;
 
-/* zero an array */
+				/* zero an array */
 #define AZERO(x, n) {int _I_, _SZ_ = (n); for(_I_ = 0; _I_ < _SZ_; _I_++) (x)[_I_] = 0;}
-
+				/* alloca n elements of type t */
 #define Alloca(n, t)   (t *) alloca( (size_t) ( (n) * sizeof(t) ) )
-
 				/* positions in the deviance vector */
 enum devP {ML_POS=0, REML_POS, ldL2_POS, ldRX2_POS,
 	   lpdisc_POS, disc_POS, bqd_POS};
 				/* positions in the dims vector */
 enum dimP {nf_POS=0, n_POS, p_POS, q_POS, s_POS, np_POS,
-	   isREML_POS, fTyp_POS, nest_POS, cvg_POS};
+	   isREML_POS, fTyp_POS, mTyp_POS, nest_POS, cvg_POS};
 
 #define isREML(x) INTEGER(GET_SLOT(x, lme4_dimsSym))[isREML_POS]
 #define L_SLOT(x) AS_CHM_FR(GET_SLOT(x, lme4_LSym))
@@ -64,8 +63,8 @@ enum dimP {nf_POS=0, n_POS, p_POS, q_POS, s_POS, np_POS,
  *
  * @return SEXP of given type and length assigned as slot nm in obj
  */
-static R_INLINE
-SEXP ALLOC_SLOT(SEXP obj, SEXP nm, SEXPTYPE type, int length)
+static SEXP R_INLINE
+ALLOC_SLOT(SEXP obj, SEXP nm, SEXPTYPE type, int length)
 {
     SET_SLOT(obj, nm, allocVector(type, length));
     return GET_SLOT(obj, nm);
@@ -148,35 +147,60 @@ static R_INLINE double y_log_y(double y, double mu)
     return (y) ? (y * log(y/mu)) : 0;
 }
 
-#define BUF_SIZE 127
-
 /**
  * Check the dimensions of the matrix pointer MP.
  *
- * @param buffer character buffer of length BUF_SIZE + 1
+ * @param buf character buffer of length nb + 1
+ * @param nb number of writable positions in the buffer
  * @param nm name of matrix - used in the error message
  * @param MP pointer to a matrix
+ * @param nr expected number of rows
+ * @param nc expected number of columns
  *
- * @return TRUE if the object is a valid lmer object, else a string
- * describing the nature of the violation.
+ * @return error message or 0-length string in buffer
  */
-static char R_INLINE
-*chkDims(char *buffer, char *nm, SEXP MP, int nr, int nc)
+static char
+*chkDims(char *buf, int nb, char *nm, SEXP MP, int nr, int nc)
 {
-    int *dd = isMatrix(MP) ?
-	INTEGER(getAttrib(MP, R_DimSymbol)) :
+    int *dd = isMatrix(MP) ? INTEGER(getAttrib(MP, R_DimSymbol)) :
 	(int *)NULL;
 
     if (!dd) error(_("Argument MP to chkDims is not a matrix"));
-    buffer[0] = '\0';
+    buf[0] = '\0';
     if (!isReal(MP) || dd[0] != nr || dd[1] != nc)
-	snprintf(buffer, BUF_SIZE,
-		 "Matrix %s must be a %d by %d numeric matrix",
+	snprintf(buf, nb, "Matrix %s must be a %d by %d numeric matrix",
 		nm, nr, nc);
-    return buffer;
+    return buf;
 }
 
-/* Functions for the mer representation */
+/**
+ * Evaluate the ML and REML deviance given the other values
+ *
+ * @param d the deviance array
+ * @param n number of observations
+ * @param p number of fixed effects (only used when mtyp == 0)
+ * @param mtyp model type 0 => lmm, 1 => nlmm, 2 => glmm
+ */
+static void
+eval_deviance(double *d, int n, int p, int mtyp)
+{
+    d[ML_POS] = d[REML_POS] = NA_REAL;
+    switch (mtyp) {
+    case 0:
+    case 1: {
+	double dn = (double) n, dnmp = (double) (n - p);
+	d[ML_POS] = d[ldL2_POS] +
+	    dn * (1 + d[lpdisc_POS] + log(2 * PI / dn));
+	if (mtyp == 0)
+	    d[REML_POS] = d[ldL2_POS] + d[ldRX2_POS] +
+		dnmp * (1. + d[lpdisc_POS] + log(2. * PI / dnmp));
+	break;
+    }
+    case 2:
+/* FIXME: This definition only works for GLMMs without a scale par. */
+	d[ML_POS] = d[disc_POS] + d[bqd_POS] + d[ldL2_POS];
+    }
+}
 
 /**
  * Evaluate the logarithm of the square of the determinant of L
@@ -245,7 +269,6 @@ ST_nc_nlev(const SEXP ST, const int *Gp, double **st, int *nc, int *nlev)
     return ans;
 }
 
-	
 /**
  * Determine the nonzero positions in the jth column of Vt
  *
@@ -278,171 +301,6 @@ Vt_nz_col(int *nz, int j, int nf, const int *Gp, const int *nc,
     }
     for (i = 0, ans = 0; i < Gp[nf]; i++) if (nz[i]) ans++;
     return ans;
-}
-
-/**
- * Create the Vt matrix pattern from Zt, ST and Gp.  Partition the
- * columns into s groups and overlay them.
- * 
- *
- * @param Zt 
- * @param ST
- * @param GpP pointer to the Gp array
- *
- * @return Vt
- */
-SEXP mer_create_Vt(SEXP Zt, SEXP ST, SEXP GpP)
-{
-    SEXP ans;
-    int *Gp = INTEGER(GpP), *nnz, *nz, *vi, *vp, *zdims, *zi, *zp,
-	Vnnz, ZtOK, j, nf = LENGTH(ST);
-    int *nc = Alloca(nf, int), *nlev = Alloca(nf, int);
-    R_CheckStack();
-
-				/* Trivial case, all nc == 1 */
-    if (ST_nc_nlev(ST, Gp, (double**)NULL, nc, nlev) <= 1)
-	return duplicate(Zt);
-				/* Check the nonzero pattern in Zt */
-    zdims = INTEGER(GET_SLOT(Zt, lme4_DimSym));
-    nnz = Alloca(zdims[1], int);
-    nz = Alloca(zdims[0], int);
-    R_CheckStack();
-
-    zi = INTEGER(GET_SLOT(Zt, lme4_iSym));
-    zp = INTEGER(GET_SLOT(Zt, lme4_pSym));
-    for (j = 0, ZtOK = 1; j < zdims[1]; j++) {
-	nnz[j] = Vt_nz_col(nz, j, nf, Gp, nc, nlev, zi, zp);
-	if (nnz[j] != (zp[j + 1] - zp[j])) ZtOK = 0;
-    }
-    if (ZtOK) return duplicate(Zt);
-				/* Must create a new dgCMatrix object */ 
-    ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix")));
-    SET_SLOT(ans, lme4_DimSym, duplicate(GET_SLOT(Zt, lme4_DimSym)));
-    SET_SLOT(ans, lme4_DimNamesSym, allocVector(VECSXP, 2));
-				/* create and evaluate the p slot */
-    vp = INTEGER(ALLOC_SLOT(ans, lme4_pSym, INTSXP, zdims[1] + 1));
-    vp[0] = 0;
-    for (j = 0; j < zdims[1]; j++) vp[j + 1] = vp[j] + nnz[j];
-    Vnnz = vp[zdims[1]];
-    vi = INTEGER(ALLOC_SLOT(ans, lme4_iSym, INTSXP, Vnnz));
-    AZERO(REAL(ALLOC_SLOT(ans, lme4_xSym, REALSXP, Vnnz)), Vnnz);
-    for (j = 0; j < zdims[1]; j++) { /* fill in the i slot */
-	int i, pos = vp[j];
-	Vt_nz_col(nz, j, nf, Gp, nc, nlev, zi, zp);
-	for (i = 0; i < zdims[0]; i++) if (nz[i]) vi[pos++] = i;
-    }
-
-    UNPROTECT(1); 
-    return ans;
-}
-
-/**
- * Evaluate the linear predictor as model offset + X \beta + V P'u
- *
- * @param x pointer to a glmer or a nlmer object
- * @param ans pointer to memory to be overwritten with the values
- *
- * @return ans
- */
-static double *Mer_eta(SEXP x, double *ans)
-{
-    SEXP X = GET_SLOT(x, lme4_XSym),
-	moff = GET_SLOT(x, lme4_offsetSym);
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int  ione = 1, nans = dims[n_POS] * dims[s_POS], p = dims[p_POS];
-    double one[] = {1,0};
-    CHM_FR L = L_SLOT(x);
-    CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
-    CHM_DN Ptu, cans = N_AS_CHM_DN(ans, nans, 1),
-	cu = AS_CHM_DN(GET_SLOT(x, lme4_uvecSym));
-    R_CheckStack();
-
-    if (!INTEGER(getAttrib(X, R_DimSymbol))[0]) { /* X not stored */
-	int i;
-	for (i = 0; i < nans; i++) ans[i] = NA_REAL;
-	return ans;
-    }
-				/* eta := offset or eta := 0 */
-    if (LENGTH(moff)) Memcpy(ans, REAL(moff), nans);
-    else AZERO(ans, nans);
-				/* eta := eta + X \beta */
-    F77_CALL(dgemv)("N", &nans, &p, one, REAL(X), &nans,
-		    REAL(GET_SLOT(x, lme4_fixefSym)), &ione,
-		    one, ans, &ione);
-				/* eta := eta + V P' u */
-    Ptu = M_cholmod_solve(CHOLMOD_Pt, L, cu, &c);
-    if (!M_cholmod_sdmult(cVt, 1 /* trans */, one, one, Ptu, cans, &c))
-	error(_("cholmod_sdmult error returned"));
-    M_cholmod_free_dense(&Ptu, &c);
-    return ans;
-}    
-
-SEXP mer_eta(SEXP x)
-{
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int nans = dims[n_POS] * dims[s_POS];
-    SEXP ans = PROTECT(allocVector(REALSXP, nans));
-
-    Mer_eta(x, REAL(ans));
-    UNPROTECT(1);
-    return ans;
-}
-
-/**
- * Change the x slot in Vt according to ST'Zt
- *
- * @param x An object that inherits from class mer
- */
-SEXP mer_update_Vt(SEXP x)
-{
-    SEXP ST = GET_SLOT(x, lme4_STSym);
-    int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym));
-    CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym)),
-	cZt = AS_CHM_SP(GET_SLOT(x, lme4_ZtSym));
-    int *vi = (int*)(cVt->i), *vp = (int*)(cVt->p),
-	*zi = (int*)(cZt->i), *zp = (int*)(cZt->p),
-	j, nf = LENGTH(ST), p;
-    int vnnz = vp[cVt->ncol], znnz = zp[cZt->ncol];
-    int *nc = Alloca(nf, int), *nlev = Alloca(nf, int);
-    double **st = Alloca(nf, double*),
-	*vx = (double*)(cVt->x), *zx = (double*)(cZt->x),
-	one[] = {1,0};
-    R_CheckStack();
-
-    if (vnnz == znnz) Memcpy(vx, zx, znnz);
-    else {
-	AZERO(vx, vnnz);
-	for (j = 0; j < cVt->ncol; j++) {
-	    int pv = vp[j];
-	    for (p = zp[j]; p < zp[j + 1]; p++) {
-		while (vi[pv] < zi[p]) pv++;
-		if (vi[pv] != zi[p])
-		    error(_("nonconforming Zt and Vt structures, j = %d"), j);
-		vx[pv] = zx[p];
-	    }
-	}
-    }
-	
-    if (ST_nc_nlev(ST, Gp, st, nc, nlev) > 1) /* T' == I when ncmax == 1 */
-	for (j = 0; j < cVt->ncol; j++) /* multiply column j by T' */
-	    for (p = vp[j]; p < vp[j + 1];) {
-		int i = Gp_grp(vi[p], nf, Gp);
-
-		if (nc[i] <= 1) p++;
-		else {
-		    int nr = p;	/* number of rows in `B' in dtrmm call */
-		    while ((vi[nr] - Gp[i]) < nlev[i]) nr++;
-		    nr -= p;	/* nr == 1 except in models with carry-over */
-		    F77_CALL(dtrmm)("R", "L", "N", "U", &nr, nc + i,
-				    one, st[i], nc + i, vx + p, &nr);
-		    p += (nr * nc[i]);
-		}
-	    }
-    for (p = 0; p < vnnz; p++) {
-	int i = Gp_grp(vi[p], nf, Gp);
-	vx[p] *= st[i][((vi[p] - Gp[i]) / nlev[i]) * (nc[i] + 1)];
-    }
-    return R_NilValue;
 }
 
 /**
@@ -510,22 +368,6 @@ TSPp_SEXP_mult(SEXP dest, SEXP ST, const int *Gp, SEXP src, const int *Perm)
 
     ST_nc_nlev(ST, Gp, st, nc, nlev);
     TSPp_dense_mult(REAL(dest), nf, m, n, st, nc, nlev, Gp, REAL(src), Perm);
-}
-
-/**
- * Update the ranef slot from the uvec slot.
- *
- * @param x An object that inherits from class lmer
- */
-SEXP mer_update_b(SEXP x)
-{
-    TSPp_SEXP_mult(GET_SLOT(x, lme4_ranefSym),
-		   GET_SLOT(x, lme4_STSym),
-		   INTEGER(GET_SLOT(x, lme4_GpSym)),
-		   GET_SLOT(x, lme4_uvecSym),
-		   INTEGER(GET_SLOT(GET_SLOT(x, lme4_LSym),
-				    lme4_permSym)));
-    return R_NilValue;
 }
 
 /**
@@ -695,6 +537,160 @@ SEXP ST_setPars(SEXP x, SEXP pars)
     return R_NilValue;
 }
 
+/* Nonlinear mixed models */
+
+/**
+ * Create a dgCMatrix object in the form of the transpose of M
+ *
+ * @param Vt V' as a dgCMatrix object
+ * @param sP pointer to the INTEGER object s
+ *
+ */
+SEXP nlmer_create_Mt(SEXP Vt, SEXP sP)
+{
+    int n, p, s = asInteger(sP);
+    CHM_SP ans;
+    CHM_TR tMt = M_cholmod_sparse_to_triplet(AS_CHM_SP(Vt), &c);
+    R_CheckStack();
+
+    if (s <= 0) error(_("s must be > 0"));
+    if (tMt->ncol % s)
+	error(_("Number of columns in Vt, %d, is not a multiple of s = %d"),
+	      tMt->ncol, s);
+    n = tMt->ncol /= s;
+    for (p = 0; p < tMt->nnz; p++) ((int*)(tMt->j))[p] %= tMt->ncol;
+    ans = M_cholmod_triplet_to_sparse(tMt, tMt->nnz, &c);
+    M_cholmod_free_triplet(&tMt, &c);
+    return M_chm_sparse_to_SEXP(ans, 1, 0, 0, "", R_NilValue);
+}
+
+/* Generalized linear mixed models */
+				/* utilities */
+static const double LTHRESH = 30.;
+static const double MLTHRESH = -30.;
+static double MPTHRESH = 0;
+static double PTHRESH = 0;
+static const double INVEPS = 1/DOUBLE_EPS;
+
+/**
+ * Evaluate the variance function for the link
+ *
+ * @param x pointer to a glmer object
+ */
+SEXP glmer_var(SEXP x)
+{
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int i, n = dims[n_POS], fltype = dims[fTyp_POS];
+    double *mu = REAL(GET_SLOT(x, lme4_muSym)),
+	*var = REAL(findVarInFrame(GET_SLOT(x, lme4_envSym),
+				   lme4_varSym));
+		    
+
+    switch(fltype) {
+    case 1: 			/* binomial family with logit or probit link */
+    case 2:
+	for (i = 0; i < n; i++) {
+	    double mui = mu[i];
+	    var[i] = mui * (1 - mui);
+	}
+	break;
+    case 3:			/* Poisson with log link */
+	for (i = 0; i < n; i++) {
+	    var[i] = mu[i];
+	}
+	break;
+    default:
+	error(_("General form of glmer_var not yet written"));
+    }
+    return R_NilValue;
+}
+
+/**
+ * Evaluate the derivative of mu wrt eta for the link
+ *
+ * @param x pointer to a glmer object
+ */
+SEXP glmer_dmu_deta(SEXP x)
+{
+    SEXP rho = GET_SLOT(x, lme4_envSym);
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int i, n = dims[n_POS], fltype = dims[fTyp_POS];
+    double *eta = REAL(GET_SLOT(x, lme4_etaSym)),
+	*dmu_deta = REAL(findVarInFrame(rho,
+					lme4_dmu_detaSym));
+
+    switch(fltype) {
+    case 1: 			/* binomial with logit link */
+	for (i = 0; i < n; i++) {
+	    double etai = eta[i];
+	    double opexp = 1 + exp(etai);
+	    
+	    dmu_deta[i] = (etai > LTHRESH || etai < MLTHRESH) ?
+		DOUBLE_EPS : exp(etai)/(opexp * opexp);
+	}
+	break;
+    case 2:			/* binomial with probit link */
+	for (i = 0; i < n; i++) {
+	    double tmp = dnorm4(eta[i], 0, 1, 0);
+	    dmu_deta[i] = (tmp < DOUBLE_EPS) ? DOUBLE_EPS : tmp;
+	}
+	break;
+    case 3:			/* Poisson with log link */
+	for (i = 0; i < n; i++) {
+	    double tmp = exp(eta[i]);
+	    dmu_deta[i] = (tmp < DOUBLE_EPS) ? DOUBLE_EPS : tmp;
+	}
+	break;
+    default:
+	error(_("General form of glmer_dmu_deta not yet written"));
+    }
+    return R_NilValue;
+}
+
+/**
+ * Evaluate the deviance residuals
+ *
+ * @param x pointer to a glmer object
+ * @param dev_res pointer to an area to hold the result
+ *
+ * @return sum of the deviance residuals
+ */
+SEXP glmer_dev_resids(SEXP x)
+{
+    SEXP rho = GET_SLOT(x, lme4_envSym);
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int i, n = dims[n_POS];
+    double *d = REAL(GET_SLOT(x, lme4_devianceSym)),
+	*dev_res = REAL(findVarInFrame(rho, lme4_devResidSym)),
+	*mu = REAL(GET_SLOT(x, lme4_muSym)),
+	*wts = REAL(GET_SLOT(x, lme4_weightsSym)),
+	*y = REAL(GET_SLOT(x, lme4_ySym));
+
+    switch(dims[fTyp_POS]) {
+    case 1: 			/* binomial with logit or probit link */
+    case 2:
+	for (i = 0; i < n; i++) {
+	    double mui = mu[i], yi = y[i];
+	    
+	    dev_res[i] = 2 * wts[i] *
+		(y_log_y(yi, mui) + y_log_y(1 - yi, 1 - mui));
+	}
+	break;
+    case 3:			/* Poisson with log link */
+	for (i = 0; i < n; i++) {
+	    double mui = mu[i], yi = y[i];
+	    dev_res[i] = 2 * wts[i] * (y_log_y(yi, mui) - (yi - mui));
+	}
+	break;
+    default:
+	error(_("General form of glmer_dev_resids not yet written"));
+    }
+    for (i = 0, d[disc_POS] = 0; i < n; i++) d[disc_POS] += dev_res[i];
+    return R_NilValue;
+}
+
+/* Functions common to all forms of mixed models */
+
 /**
  * Extract the estimate of the scale factor from an lmer object
  *
@@ -816,27 +812,35 @@ SEXP mer_validate(SEXP x)
 	XP = GET_SLOT(x, lme4_XSym),
 	devianceP = GET_SLOT(x, lme4_devianceSym),
 	dimsP = GET_SLOT(x, lme4_dimsSym),
+	etaP = GET_SLOT(x, lme4_etaSym),
 	fixefP = GET_SLOT(x, lme4_fixefSym),
 	flistP = GET_SLOT(x, lme4_flistSym),
+	muP = GET_SLOT(x, lme4_muSym),
 	offsetP = GET_SLOT(x, lme4_offsetSym),
 	ranefP = GET_SLOT(x, lme4_ranefSym),
+	residP = GET_SLOT(x, lme4_residSym),
 	uvecP = GET_SLOT(x, lme4_uvecSym),
 	weightsP = GET_SLOT(x, lme4_weightsSym),
 	y = GET_SLOT(x, lme4_ySym);
     int *Gp = INTEGER(GpP), *dd = INTEGER(dimsP);
-    int i, n = dd[n_POS], nf = dd[nf_POS], nq,
-	p = dd[p_POS], q = dd[q_POS], s = dd[s_POS];
+    int i, mtyp = dd[mTyp_POS], n = dd[n_POS], nf = dd[nf_POS],
+	nq, p = dd[p_POS], q = dd[q_POS], s = dd[s_POS];
+    int neta = n * s;
     CHM_SP Zt = AS_CHM_SP(GET_SLOT(x, lme4_ZtSym)),
 	Vt =  AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
     CHM_FR L = L_SLOT(x);
     R_CheckStack();
 				/* check lengths */
     if (nf < 1 || LENGTH(flistP) != nf || LENGTH(ST) != nf)
-	return mkString(_("Slots ST, and flist must have length nf"));
+	return mkString(_("Slots ST, and flist must have length dims['nf']"));
     if (LENGTH(GpP) != nf + 1)
 	return mkString(_("Slot Gp must have length dims['nf'] + 1"));
     if (LENGTH(y) != n)
 	return mkString(_("Slot y must have length dims['n']"));
+    if (LENGTH(muP) != n)
+	return mkString(_("Slot mu must have length dims['n']"));
+    if (LENGTH(residP) != n)
+	return mkString(_("Slot resid must have length dims['n']"));
     if (Gp[0] != 0 || Gp[nf] != q)
 	return mkString(_("Gp[1] != 0 or Gp[dims['nf'] + 1] != dims['q']"));
     if (LENGTH(fixefP) != p)
@@ -845,10 +849,12 @@ SEXP mer_validate(SEXP x)
 	return mkString(_("Slot ranef must have length dims['q']"));
     if (LENGTH(uvecP) != q)
 	return mkString(_("Slot uvec must have length dims['q']"));
+    if (LENGTH(etaP) != neta)
+	return mkString(_("Slot eta must have length dims['n']*dims['s']"));
     if (LENGTH(weightsP) && LENGTH(weightsP) != n)
 	return mkString(_("Slot weights must have length 0 or dims['n']"));
     if (LENGTH(offsetP) && LENGTH(offsetP) != n)
-	return mkString(_("Slot offset must have length 0 or dims['n']"));
+	return mkString(_("Slot offset must have length 0 or dims['n']*dims['s']"));
     if (LENGTH(devianceP) != (bqd_POS + 1) ||
 	LENGTH(getAttrib(devianceP, R_NamesSymbol)) != (bqd_POS + 1))
 	return mkString(_("deviance slot not named or incorrect length"));
@@ -857,9 +863,9 @@ SEXP mer_validate(SEXP x)
 	return mkString(_("dims slot not named or incorrect length"));
     if (L->n != q || !L->is_ll || !L->is_monotonic)
 	return mkString(_("Slot L must be a monotonic LL' factorization of size dims['q']"));
-    if (Zt->nrow != q || Zt->ncol != n * s)
+    if (Zt->nrow != q || Zt->ncol != neta)
 	return mkString(_("Slot Zt must by dims['q']  by dims['n']*dims['s']"));
-    if (Vt->nrow != q || Vt->ncol != n * s)
+    if (Vt->nrow != q || Vt->ncol != neta)
 	return mkString(_("Slot Zt must be dims['q']  by dims['n']*dims['s']"));
     dd = INTEGER(getAttrib(XP, R_DimSymbol)); 
     if (!isReal(XP) || dd[1] != p)
@@ -882,560 +888,47 @@ SEXP mer_validate(SEXP x)
     }
     if (q != nq)
 	return mkString(_("q is not sum of columns by levels"));
+#ifndef BUF_SIZE
+#define BUF_SIZE 127
+#endif	
+    if (mtyp < 0 || mtyp > 2)
+	return mkString(_("unknown model type in dims['mTyp']"));
+    if (!mtyp) {		/* linear mixed model */
+	int pp1 = p + 1;
+	char *buf = Alloca(BUF_SIZE + 1, char);
+	R_CheckStack();
 
+	if (strlen(chkDims(buf, (int) BUF_SIZE, "ZtXy",
+			   GET_SLOT(x, lme4_ZtXySym), q, pp1)))
+	    return mkString(buf);
+	if (strlen(chkDims(buf, (int) BUF_SIZE, "XytXy",
+			   GET_SLOT(x, lme4_XytXySym), pp1, pp1)))
+	    return mkString(buf);
+	if (strlen(chkDims(buf, (int) BUF_SIZE, "RXy",
+			   GET_SLOT(x, lme4_RXySym), pp1, pp1)))
+	    return mkString(buf);
+	if (strlen(chkDims(buf, (int) BUF_SIZE, "RVXy",
+			   GET_SLOT(x, lme4_RVXySym), q, pp1)))
+	    return mkString(buf);
+    }
     return ScalarLogical(1);
 }
 
-/**
- * Evaluate the elements of the deviance slot in an lmer object
- *
- * @param x pointer to an lmer object
- *
- */
-SEXP
-lmer_update_dev(SEXP x)
-{
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), j, info;
-    double *d = REAL(GET_SLOT(x, lme4_devianceSym)),
-	*rxy = REAL(GET_SLOT(x, lme4_RXySym)), dn = (double)(dims[n_POS]),
-	dnmp = (double)(dims[n_POS] - dims[p_POS]), mone = -1, one = 1;
-    SEXP RVXy = GET_SLOT(x, lme4_RVXySym);
-    CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
-    CHM_DN cRVXy = AS_CHM_DN(RVXy), ans;
-    CHM_FR L = L_SLOT(x);
-    int pp1 = cRVXy->ncol, q = cRVXy->nrow;
-    R_CheckStack();
-
-    mer_update_Vt(x);
-    j = c.final_ll;
-    c.final_ll = L->is_ll;
-    if (!M_cholmod_factorize_p(cVt, &one, (int*)NULL, 0 /*fsize*/, L, &c))
-	error(_("cholmod_factorize_p failed: status %d, minor %d from ncol %d"),
-	      c.status, L->minor, L->n);
-    c.final_ll = j;
-    d[ldL2_POS] = chm_log_det2(L);
-				/* Evaluate PST'Z'[X:y] in RVXy */
-    PSTp_dense_mult(RVXy, GET_SLOT(x, lme4_STSym),
-		    INTEGER(GET_SLOT(x, lme4_GpSym)),
-		    GET_SLOT(x, lme4_ZtXySym), (int*)(L->Perm));
-				/* solve for RVXy */
-    ans = M_cholmod_solve(CHOLMOD_L, L, cRVXy, &c);
-    Memcpy(REAL(RVXy), (double*)(ans->x), q * pp1);
-    M_cholmod_free_dense(&ans, &c);
-    				/* downdate XytXy  */
-    F77_CALL(dlacpy)("U", &pp1, &pp1, REAL(GET_SLOT(x, lme4_XytXySym)),
-		     &pp1, rxy, &pp1);
-    F77_CALL(dsyrk)("U", "T", &pp1, &q, &mone, REAL(RVXy),
-		    &q, &one, rxy, &pp1);
-    F77_CALL(dpotrf)("U", &pp1, rxy, &pp1, &info);
-    if (info)
-	error(_("the leading minor of order %d of the downdated [X:y]'[X:y] is not positive definite"),
-	      info);
-    d[lpdisc_POS] = 2 * log(rxy[pp1 * pp1 - 1]);
-    for (j = 0, d[ldRX2_POS] = 0; j < (pp1 - 1); j++)
-	d[ldRX2_POS] += 2 * log(rxy[j * (pp1 + 1)]);
-    d[ML_POS] = d[ldL2_POS] + dn * (1. + d[lpdisc_POS] + log(2. * PI / dn));
-    d[REML_POS] = d[ldL2_POS] + d[ldRX2_POS] + dnmp *
-	(1. + d[lpdisc_POS] + log(2. * PI / dnmp));
-    d[bqd_POS] = d[disc_POS] = NA_REAL;
-    return R_NilValue;
-}
-
-/**
- * Update the contents of the fixef, ranef and uvec slots in an lmer
- * object.
- *
- * @param x an lmer object
- *
- * @return R_NilValue
- */
-SEXP lmer_update_effects(SEXP x)
-{
-    SEXP uvec = GET_SLOT(x, lme4_uvecSym);
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), ione = 1;
-    int p = dims[p_POS], pp1 = dims[p_POS] + 1, q = dims[q_POS];
-    double *RXy = REAL(GET_SLOT(x, lme4_RXySym)),
-	*RVXy = REAL(GET_SLOT(x, lme4_RVXySym)),
-	*dev = REAL(GET_SLOT(x, lme4_devianceSym)),
-	*fixef = REAL(GET_SLOT(x, lme4_fixefSym)),
-	*u = REAL(uvec), mone = -1, one = 1;
-    CHM_FR L = L_SLOT(x);
-    CHM_DN cu = AS_CHM_DN(uvec), sol;
-    R_CheckStack();
-
-    lmer_update_dev(x);
-    Memcpy(fixef, RXy + p * pp1, p);
-    F77_CALL(dtrsv)("U", "N", "N", &p, RXy, &pp1, fixef, &ione);
-    Memcpy(u, RVXy + p * q, q);
-    F77_CALL(dgemv)("N", &q, &p, &mone, RVXy, &q,
-		    fixef, &ione, &one, u, &ione);
-    if (!(sol = M_cholmod_solve(CHOLMOD_Lt, L, cu, &c)))
-	error(_("cholmod_solve (CHOLMOD_Lt) failed:"));
-    Memcpy(u, (double*)(sol->x), q);
-    M_cholmod_free_dense(&sol, &c);
-    dev[bqd_POS] = lme4_sumsq(u, q);
-    dev[disc_POS] = exp(dev[lpdisc_POS]) - dev[bqd_POS];
-    mer_update_b(x);
-    return R_NilValue;
-}
-
-
-/**
- * Check validity of an lmer object.
- *
- * @param x Pointer to an lmer object
- *
- * @return TRUE if the object is a valid lmer object, else a string
- * describing the nature of the violation.
- */
-SEXP lmer_validate(SEXP x)
-{
-    int *dd = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int p = dd[p_POS], q = dd[q_POS];
-    int pp1 = p + 1;
-    char *buf = Alloca(BUF_SIZE + 1, char);
-    R_CheckStack();
-
-	/* Note: No need to check that matrix slots are matrices. */
-    if (strlen(chkDims(buf, "ZtXy", GET_SLOT(x, lme4_ZtXySym), q, pp1)))
-	return mkString(buf);
-    if (strlen(chkDims(buf, "XytXy", GET_SLOT(x, lme4_XytXySym), pp1, pp1)))
-	return mkString(buf);
-    if (strlen(chkDims(buf, "RXy", GET_SLOT(x, lme4_RXySym), pp1, pp1)))
-	return mkString(buf);
-    if (strlen(chkDims(buf, "RVXy", GET_SLOT(x, lme4_RVXySym), q, pp1)))
-	return mkString(buf);
-    return ScalarLogical(1);
-}
-
-/**
- * Check validity of an glmer object.
- *
- * @param x Pointer to an glmer object
- *
- * @return TRUE if the object is a valid glmer object, else a string
- *         describing the nature of the violation.
- */
-SEXP glmer_validate(SEXP x)
-{
-    return ScalarLogical(1);
-}
-
-/**
- * Check validity of an nlmer object.
- *
- * @param x Pointer to an nlmer object
- *
- * @return TRUE if the object is a valid nlmer object, else a string
- *         describing the nature of the violation.
- */
-SEXP nlmer_validate(SEXP x)
-{
-    if (LENGTH(GET_SLOT(x, lme4_muSym)) != LENGTH(GET_SLOT(x, lme4_ySym)))
-	return mkString(_("Slot mu must have length dims['n']"));
-    return ScalarLogical(1);
-}
-
-/* Functions common to nonlinear and generalized linear mixed models */
-
-/* TODO: */
-/* Consider the steps in reimplementing AGQ.  First you need to find
-   bhat, then evaluate the posterior variances, then step out
-   according to the posterior variance, evaluate the integrand
-   relative to the step. */
-/* Because the Gauss-Hermite quadrature is formed as a sum, it is
- * necessary to divide the contributions to the deviance according to
- * the levels of the random effects.  This means that it is only
- * practical to use AGQ when the response vector can be split into
- * sections that are conditionally independent. As far as I can see
- * this will mean a single grouping factor only. */
-
-
-#define IRLS_MAXITER  300
-#define IRLS_TOL      1e-10
-#define IRLS_SMIN     1e-5
-
-/* Nonlinear mixed models */
-
-/**
- * Create a dgCMatrix object in the form of the transpose of M
- *
- * @param Vt V' as a dgCMatrix object
- * @param sP pointer to the INTEGER object s
- *
- */
-SEXP nlmer_create_Mt(SEXP Vt, SEXP sP)
-{
-    int n, p, s = asInteger(sP);
-    CHM_SP ans;
-    CHM_TR tMt = M_cholmod_sparse_to_triplet(AS_CHM_SP(Vt), &c);
-    R_CheckStack();
-
-    if (s <= 0) error(_("s must be > 0"));
-    if (tMt->ncol % s)
-	error(_("Number of columns in Vt, %d, is not a multiple of s = %d"),
-	      tMt->ncol, s);
-    n = tMt->ncol /= s;
-    for (p = 0; p < tMt->nnz; p++) ((int*)(tMt->j))[p] %= tMt->ncol;
-    ans = M_cholmod_triplet_to_sparse(tMt, tMt->nnz, &c);
-    M_cholmod_free_triplet(&tMt, &c);
-    return M_chm_sparse_to_SEXP(ans, 1, 0, 0, "", R_NilValue);
-}
-
-/**
- * Evaluate the nonlinear model, its gradient matrix and the residual
- * sum of squares
- *
- * @param x pointer to an nlmer object
- *
- */
-SEXP nlmer_eval_model(SEXP x)
-{
-    SEXP gg, pnames = GET_SLOT(x, lme4_pnamesSym),
-	rho = GET_SLOT(x, lme4_envSym), vv;
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), *gdims;
-    int i, n = dims[n_POS], s = dims[s_POS];
-    double *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
-	*res = REAL(GET_SLOT(x, lme4_residSym)),
-	*y = REAL(GET_SLOT(x, lme4_ySym)), *mu;
-    double *Phi = Alloca(n * s, double);
-    R_CheckStack();
-
-    Mer_eta(x, Phi);
-    /* distribute the parameters in the environment */
-    for (i = 0; i < dims[s_POS]; i++) {
-	vv = findVarInFrame(rho, install(CHAR(STRING_ELT(pnames, i))));
-	if (!isReal(vv) || LENGTH(vv) != n)
-	    error(_("Parameter %s in the environment must be a length %d numeric vector"),
-		  CHAR(STRING_ELT(pnames, i)), n);
-	Memcpy(REAL(vv), Phi + i * n, n);
-    }
-    vv = PROTECT(eval(GET_SLOT(x, lme4_modelSym), rho));
-    if (!isReal(vv) || LENGTH(vv) != n)
-	error(_("evaluated model is not a numeric vector of length %d"), n);
-    gg = getAttrib(vv, lme4_gradientSym);
-    if (!isReal(gg) || !isMatrix(gg))
-	error(_("gradient attribute of evaluated model must be a numeric matrix"));
-    gdims = INTEGER(getAttrib(gg, R_DimSymbol));
-    if (gdims[0] != n ||gdims[1] != s)
-	error(_("gradient matrix must be of size %d by %d"), n, s);
-    SET_SLOT(x, lme4_muSym, vv);
-    mu = REAL(vv);
-/* FIXME: check that the colnames of the gradient correspond to the order of the pnames */
-    dev[bqd_POS] = lme4_sumsq(REAL(GET_SLOT(x, lme4_uvecSym)), dims[q_POS]);
-    for (i = 0, dev[disc_POS] = 0; i < n; i++) {
-	res[i] = y[i] - mu[i];
-	dev[disc_POS] += res[i] * res[i];
-    }
-    dev[lpdisc_POS] = log(dev[disc_POS] + dev[bqd_POS]);
-
-    UNPROTECT(1);
-    return R_NilValue;
-}
-
-static void R_INLINE eval_ML_POS(double *dev, int n)
-{
-    double dn = (double) n;
-    dev[ML_POS] = dev[REML_POS]
-	= dev[ldL2_POS] + dn * (1 + dev[lpdisc_POS] + log(2 * PI / dn));
-}
-
-/**
- * Update the transpose of M from the current gradient and Vt
- *
- * @param x pointer to an nlmer object
- *
- * @return R_NilValue
- */
-SEXP nlmer_update_Mt(SEXP x)
-{
-    SEXP Mt = GET_SLOT(x, lme4_MtSym), Vt = GET_SLOT(x, lme4_VtSym);
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)),
-	*mi = INTEGER(GET_SLOT(Mt, lme4_iSym)),
-	*mp = INTEGER(GET_SLOT(Mt, lme4_pSym)),
-	*vi = INTEGER(GET_SLOT(Vt, lme4_iSym)),
-	*vp = INTEGER(GET_SLOT(Vt, lme4_pSym)),
-	cfll = c.final_ll, jv;
-    int n = dims[n_POS], s = dims[s_POS];
-    double *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
-	*grad = REAL(getAttrib(GET_SLOT(x, lme4_muSym), lme4_gradientSym)),
-	*mx = REAL(GET_SLOT(Mt, lme4_xSym)),
-	*vx = REAL(GET_SLOT(Vt, lme4_xSym)),
-	one[] = {1,0};
-    CHM_SP cMt = AS_CHM_SP(Mt);
-    CHM_FR L = L_SLOT(x);
-    R_CheckStack();
-
-    AZERO(mx, mp[n]);
-    for (jv = 0; jv < n * s; jv++) {
-	int iv, jm = jv % n, im;
-	for (iv = vp[jv]; iv < vp[jv + 1]; iv++) {
-	    for (im = mp[jm]; im < mp[jm + 1]; im++)
-		if (mi[im] == vi[iv]) break;
-	    if (im == mp[jm + 1])
-		error(_("Structure of Mt incompatible with Vt, jv = %d, iv = %d"),
-		      jv, iv);
-	    mx[im] += grad[jv] * vx[iv];
-	}
-    }
-    c.final_ll = L->is_ll;
-    if (!M_cholmod_factorize_p(cMt, one, (int*)NULL, 0 /*fsize*/, L, &c))
-	error(_("cholmod_factorize_p failed: status %d, minor %d from ncol %d"),
-	      c.status, L->minor, L->n);
-    c.final_ll = cfll;
-    dev[ldL2_POS] = chm_log_det2(L);
-    eval_ML_POS(dev, n);
-    return R_NilValue;
-}
-
-/* Generalized linear mixed models */
-				/* utilities */
-static const double LTHRESH = 30.;
-static const double MLTHRESH = -30.;
-static double MPTHRESH = 0;
-static double PTHRESH = 0;
-static const double INVEPS = 1/DOUBLE_EPS;
-
-/**
- * Evaluate the inverse link function at eta storing the result in mu
- *
- * @param x pointer to a glmer object
- */
-SEXP glmer_linkinv(SEXP x)
-{
-    SEXP rho = GET_SLOT(x, lme4_envSym);
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int i, n = dims[n_POS], fltype = dims[fTyp_POS];
-    double *eta = REAL(findVarInFrame(rho, lme4_etaSym)),
-	*mu = REAL(GET_SLOT(x, lme4_muSym));
-
-    switch(fltype) {
-    case 1: 			/* binomial with logit link */
-	for (i = 0; i < n; i++) {
-	    double etai = eta[i], tmp;
-	    tmp = (etai < MLTHRESH) ? DOUBLE_EPS :
-		((etai > LTHRESH) ? INVEPS : exp(etai));
-	    mu[i] = x_d_opx(tmp);
-	}
-	break;
-    case 2:			/* binomial with probit link */
-	if (!MPTHRESH) {
-	    MPTHRESH = qnorm5(DOUBLE_EPS, 0, 1, 1, 0);
-	    PTHRESH = -MPTHRESH;
-	}
-	for (i = 0; i < n; i++) {
-	    double etai = eta[i];
-	    mu[i] = (etai < MPTHRESH) ? DOUBLE_EPS :
-		((etai > PTHRESH) ? 1 - DOUBLE_EPS :
-		 pnorm5(etai, 0, 1, 1, 0));
-	}
-	break;
-    case 3:			/* Poisson with log link */
-	for (i = 0; i < n; i++) {
-	    double tmp = exp(eta[i]);
-	    mu[i] = (tmp < DOUBLE_EPS) ? DOUBLE_EPS : tmp;
-	}
- 	break;
-    default:
-	error(_("General form of glmer_linkinv not yet written"));
-     } 
-    return R_NilValue;
-}
-
-/**
- * Evaluate the variance function for the link
- *
- * @param x pointer to a glmer object
- * @param var pointer to positions to hold computed values
- *
- * @return var
- */
-static double *glmer_var(SEXP x, double *var)
-{
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int i, n = dims[n_POS], fltype = dims[fTyp_POS];
-    double *mu = REAL(GET_SLOT(x, lme4_muSym));
-
-    switch(fltype) {
-    case 1: 			/* binomial family with logit or probit link */
-    case 2:
-	for (i = 0; i < n; i++) {
-	    double mui = mu[i];
-	    var[i] = mui * (1 - mui);
-	}
-	break;
-    case 3:			/* Poisson with log link */
-	for (i = 0; i < n; i++) {
-	    var[i] = mu[i];
-	}
-	break;
-    default:
-	error(_("General form of glmer_var not yet written"));
-    }
-    return var;
-}
-
-/**
- * Evaluate the derivative of mu wrt eta for the link
- *
- * @param x pointer to a glmer object
- * @param dmu_deta pointer to positions to hold computed values
- *
- * @return dmu_deta
- */
-static double *glmer_dmu_deta(SEXP x, double *dmu_deta)
-{
-    SEXP rho = GET_SLOT(x, lme4_envSym);
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int i, n = dims[n_POS], fltype = dims[fTyp_POS];
-    double *eta = REAL(findVarInFrame(rho, lme4_etaSym));
-
-    switch(fltype) {
-    case 1: 			/* binomial with logit link */
-	for (i = 0; i < n; i++) {
-	    double etai = eta[i];
-	    double opexp = 1 + exp(etai);
-	    
-	    dmu_deta[i] = (etai > LTHRESH || etai < MLTHRESH) ?
-		DOUBLE_EPS : exp(etai)/(opexp * opexp);
-	}
-	break;
-    case 2:			/* binomial with probit link */
-	for (i = 0; i < n; i++) {
-	    double tmp = dnorm4(eta[i], 0, 1, 0);
-	    dmu_deta[i] = (tmp < DOUBLE_EPS) ? DOUBLE_EPS : tmp;
-	}
-	break;
-    case 3:			/* Poisson with log link */
-	for (i = 0; i < n; i++) {
-	    double tmp = exp(eta[i]);
-	    dmu_deta[i] = (tmp < DOUBLE_EPS) ? DOUBLE_EPS : tmp;
-	}
-	break;
-/*     default: { */
-/* 	SEXP ans = PROTECT(eval_check(mu_eta, rho, REALSXP, n)); */
-/* 	Memcpy(dmu_deta, REAL(ans), n); */
-/* 	UNPROTECT(1); */
-/*     } */
-    }
-    return dmu_deta;
-}
-
-/**
- * Evaluate the deviance residuals
- *
- * @param x pointer to a glmer object
- * @param dev_res pointer to an area to hold the result
- *
- * @return sum of the deviance residuals
- */
-SEXP glmer_dev_resids(SEXP x)
-{
-    SEXP rho = GET_SLOT(x, lme4_envSym);
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int i, n = dims[n_POS];
-    double *dev_res = REAL(findVarInFrame(rho, lme4_devResidSym)),
-	*mu = REAL(GET_SLOT(x, lme4_muSym)),
-	*wts = REAL(GET_SLOT(x, lme4_weightsSym)),
-	*y = REAL(GET_SLOT(x, lme4_ySym));
-
-    switch(dims[fTyp_POS]) {
-    case 1: 			/* binomial with logit or probit link */
-    case 2:
-	for (i = 0; i < n; i++) {
-	    double mui = mu[i], yi = y[i];
-	    
-	    dev_res[i] = 2 * wts[i] *
-		(y_log_y(yi, mui) + y_log_y(1 - yi, 1 - mui));
-	}
-	break;
-    case 3:			/* Poisson with log link */
-	for (i = 0; i < n; i++) {
-	    double mui = mu[i], yi = y[i];
-	    dev_res[i] = 2 * wts[i] * (y_log_y(yi, mui) - (yi - mui));
-	}
-	break;
-    default:
-	error(_("General form of glmer_dev_resids not yet written"));
-    }
-    return R_NilValue;
-}
-
-/**
- * Evaluate the linear predictor as model offset + X \beta + V u
- *
- * @param x pointer to a glmer object
- *
- * @return R_NilValue
- */
-SEXP glmer_eta(SEXP x)
-{
-    Mer_eta(x, REAL(findVarInFrame(GET_SLOT(x, lme4_envSym),
-				   lme4_etaSym)));
-    return R_NilValue;
-}
-
-static void glmer_update_lpdisc(SEXP x)
-{
-    SEXP rho = GET_SLOT(x, lme4_envSym);
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int i, n = dims[n_POS];
-    double *dev = REAL(GET_SLOT(x, lme4_devianceSym)), *dev_res;
-
-    dev[bqd_POS] = lme4_sumsq(REAL(GET_SLOT(x, lme4_uvecSym)), dims[q_POS]);
-    Mer_eta(x, REAL(findVarInFrame(rho, lme4_etaSym)));
-    glmer_linkinv(x);
-    glmer_dev_resids(x);
-    dev_res = REAL(findVarInFrame(rho, lme4_devResidSym));
-    for (i = 0, dev[disc_POS] = 0; i < n; i++)
-	dev[disc_POS] += dev_res[i];
-    dev[lpdisc_POS] = log(dev[disc_POS] + dev[bqd_POS]);
-}
-
-static void glmer_update_L(SEXP x)
-{
-    CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
-    int *vp = ((int*)(cVt->p));
-    int n = cVt->ncol;
-    int j, nnz = vp[n], p;
-    double *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
-	*mu = REAL(GET_SLOT(x, lme4_muSym)),
-	*rr = REAL(GET_SLOT(x, lme4_residSym)),
-	*vx = (double*)(cVt->x),
-	*w = REAL(GET_SLOT(x, lme4_weightsSym)),
-	*y = REAL(GET_SLOT(x, lme4_ySym)), one[] = {1,0};
-    CHM_FR L = L_SLOT(x);
-    double *dmu_deta = Alloca(n, double),
-	*var = Alloca(n, double),
-	*wx = Alloca(nnz, double); /* weighted x slot of cVt */
-    R_CheckStack();
-
-    glmer_dmu_deta(x, dmu_deta); glmer_var(x, var);
-    for (j = 0; j < n; j++) { /* calculate weighted Vt and residual */
-	double ww = sqrt(w[j]/var[j]);
-	rr[j] = ww * (y[j] - mu[j]);
-	for (p = vp[j]; p < vp[j + 1]; p++)
-	    wx[p] = vx[p] * ww * dmu_deta[j];
-    }
-    cVt->x = (void*)wx;	/* Factor V'WV + I */
-    if (!M_cholmod_factorize_p(cVt, one, (int*) NULL, 0, L, &c))
-	error(_("cholmod_factorize_p failed:"));
-    cVt->x = (void*)vx;
-    dev[ldL2_POS] = chm_log_det2(L);
-    eval_ML_POS(dev, n);
-}
+#define CM_MAXITER  300
+#define CM_TOL      1e-10
+#define CM_SMIN     1e-5
 
 /**
  * Iterate to determine the conditional modes of the random effects.
  *
- * @param x pointer to an nlmer object
+ * @param x pointer to an mer object
  *
  * @return An indicator of whether the iterations converged
  */
-static int nglmer_condMode(SEXP x, int mtype)
+SEXP mer_condMode(SEXP x)
 {
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
-    int i, j, n = dims[n_POS], q = dims[q_POS];
+    int i, j, mtyp = dims[mTyp_POS], n = dims[n_POS], q = dims[q_POS];
     double *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
 	*u = REAL(GET_SLOT(x, lme4_uvecSym)),
 	*res = REAL(GET_SLOT(x, lme4_residSym)), 
@@ -1447,7 +940,7 @@ static int nglmer_condMode(SEXP x, int mtype)
     CHM_FR L = L_SLOT(x);
     CHM_DN cres = N_AS_CHM_DN(res, n, 1),
 	ctmp = N_AS_CHM_DN(tmp, q, 1), sol;
-    CHM_SP mmt = (mtype - 1) ?
+    CHM_SP mmt = (mtyp - 1) ?
 	AS_CHM_SP(GET_SLOT(x, lme4_VtSym)) :
 	AS_CHM_SP(GET_SLOT(x, lme4_MtSym));
     R_CheckStack();
@@ -1455,21 +948,14 @@ static int nglmer_condMode(SEXP x, int mtype)
     if (!(L->is_ll)) error(_("L must be LL', not LDL'"));
     if (q > n) error(_("q = %d > n = %d"), q, n);
     mer_update_Vt(x);
+    /* resetting u to zero at the beginning of each evaluation
+     * requires more iterations but is necessary to obtain a
+     * repeatable evaluation.  If this is not done the optimization
+     * algorithm can take wild steps. */
     AZERO(u, q);
-    switch (mtype) {	    /* updates dev[lpdisc,disc,bqd] */
-    case 1: nlmer_eval_model(x); break; /* updates res */
-    case 2: glmer_update_lpdisc(x); break;
-    default: error(_("Unknown model type %d"), mtype);
-    }
-    for (i = 0; i < IRLS_MAXITER && crit > IRLS_TOL; i++) {
-	switch (mtype) {	
-	case 1:			
-	    nlmer_update_Mt(x); /* also updates L and rest of dev */
-	    break;
-	case 2:
-	    glmer_update_L(x);	/* calculates weighted res and L */
-	    break;
-	}
+    mer_update_lpdisc(x);
+    for (i = 0; ; i++) {
+	mer_update_L(x);
 	lpd_old = dev[lpdisc_POS];
 	Memcpy(uold, u, q);
 
@@ -1486,38 +972,445 @@ static int nglmer_condMode(SEXP x, int mtype)
 	M_cholmod_free_dense(&sol, &c);
 				/* check convergence criterion */
 	crit = cfac * lme4_sumsq(tmp, q) / exp(lpd_old);
-	if (crit < IRLS_TOL) break;
+	if (crit < CM_TOL) break; /* don't do needless evaluations */
 	if (!(sol = M_cholmod_solve(CHOLMOD_Lt, L, ctmp, &c)))
 	    error(_("cholmod_solve (CHOLMOD_Lt) failed"));
 	Memcpy(tmp, (double*)(sol->x), q);
 	M_cholmod_free_dense(&sol, &c);
-	for (step = 1; step > IRLS_SMIN && dev[lpdisc_POS] >= lpd_old;
+	for (step = 1; step > CM_SMIN && dev[lpdisc_POS] >= lpd_old;
 	     step /= 2) {	/* step halving */
 	    for (j = 0; j < q; j++) u[j] = uold[j] + step * tmp[j];
-	    switch (mtype) {
-	    case 1: nlmer_eval_model(x); break;
-	    case 2: glmer_update_lpdisc(x); break;
-	    default: error(_("Unknown model type %d"), mtype);
-	    }
-
+	    mer_update_lpdisc(x);
+#ifdef NGLMER_DEBUG
+	    Rprintf("%2d,%6.4f: %15.6g %15.6g %15.6g\n",
+		    i, step, dev[lpdisc_POS], dev[bqd_POS], dev[disc_POS]);
+#endif
 	}
-	if (crit >= IRLS_TOL && dev[lpdisc_POS] >= lpd_old)
-	    error(_("unable to reduce lpdisc in PNLS for conditional modes"));
+	if (step <= CM_SMIN || i > CM_MAXITER) {
+	    dev[lpdisc_POS] = DOUBLE_XMAX;
+	    break;
+	}
     }
-    if (crit > IRLS_TOL)
-	error(_("unable to converge to conditional modes"));
-    return i;
+    return R_NilValue;
 }
 
-SEXP nlmer_condMode(SEXP x) {
-    return ScalarInteger(nglmer_condMode(x, 1));
+/**
+ * Evaluate mu, the discrepancy and lpdisc for a generalized linear or
+ * nonlinear mixed model.  
+ *
+ * @param x pointer to a glmer or nlmer object
+ *
+ */
+SEXP mer_update_lpdisc(SEXP x)
+{
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int j, mtyp = dims[mTyp_POS], n = dims[n_POS];
+    double *d = REAL(GET_SLOT(x, lme4_devianceSym));
+
+    switch (mtyp) {
+    case 0: {
+	double *rxy = REAL(GET_SLOT(x, lme4_RXySym)), mone = -1, one = 1;
+	SEXP RVXy = GET_SLOT(x, lme4_RVXySym);
+	CHM_DN cRVXy = AS_CHM_DN(RVXy), ans;
+	CHM_FR L = L_SLOT(x);
+	int pp1 = cRVXy->ncol, q = cRVXy->nrow;
+	R_CheckStack();
+
+	mer_update_Vt(x);
+	mer_update_L(x);
+				/* Evaluate PST'Z'[X:y] in RVXy */
+	PSTp_dense_mult(RVXy, GET_SLOT(x, lme4_STSym),
+			INTEGER(GET_SLOT(x, lme4_GpSym)),
+			GET_SLOT(x, lme4_ZtXySym), (int*)(L->Perm));
+				/* solve for RVXy */
+	ans = M_cholmod_solve(CHOLMOD_L, L, cRVXy, &c);
+	Memcpy(REAL(RVXy), (double*)(ans->x), q * pp1);
+	M_cholmod_free_dense(&ans, &c);
+    				/* downdate XytXy  */
+	F77_CALL(dlacpy)("U", &pp1, &pp1, REAL(GET_SLOT(x, lme4_XytXySym)),
+			 &pp1, rxy, &pp1);
+	F77_CALL(dsyrk)("U", "T", &pp1, &q, &mone, REAL(RVXy),
+			&q, &one, rxy, &pp1);
+	F77_CALL(dpotrf)("U", &pp1, rxy, &pp1, &j);
+	if (j)
+	    error(_("leading minor of order %d of downdated [X:y]'[X:y] is not pos. def."),
+		  j);
+	d[lpdisc_POS] = 2 * log(rxy[pp1 * pp1 - 1]);
+	for (j = 0, d[ldRX2_POS] = 0; j < (pp1 - 1); j++)
+	    d[ldRX2_POS] += 2 * log(rxy[j * (pp1 + 1)]);
+	break;
+    }
+    case 1:
+    case 2:
+	mer_update_eta(x);
+	mer_update_mu_res(x);
+	if (mtyp == 1)
+	    d[disc_POS] = lme4_sumsq(REAL(GET_SLOT(x, lme4_residSym)), n);
+	else
+	    glmer_dev_resids(x); /* updates d[disc_POS] */
+	d[bqd_POS] = lme4_sumsq(REAL(GET_SLOT(x, lme4_uvecSym)), dims[q_POS]);
+	d[lpdisc_POS] = log(d[disc_POS] + d[bqd_POS]);
+	break;
+    default:
+	error(_("Unknown model type %d"), mtyp);
+    }
+    eval_deviance(d, n, dims[p_POS], mtyp);    
+    return R_NilValue;
 }
 
-SEXP glmer_condMode(SEXP x) {
-    return ScalarInteger(nglmer_condMode(x, 2));
+/**
+ * Update the contents of the fixef, ranef and uvec slots in an lmer
+ * object.
+ *
+ * @param x an lmer object
+ *
+ * @return R_NilValue
+ */
+SEXP mer_update_effects(SEXP x)
+{
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+
+    if (dims[mTyp_POS] == 0) {	/* linear mixed model */
+	SEXP uvec = GET_SLOT(x, lme4_uvecSym);
+	int ione = 1, p = dims[p_POS], pp1 = dims[p_POS] + 1,
+	    q = dims[q_POS];
+	double *RXy = REAL(GET_SLOT(x, lme4_RXySym)),
+	    *RVXy = REAL(GET_SLOT(x, lme4_RVXySym)),
+	    *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
+	    *fixef = REAL(GET_SLOT(x, lme4_fixefSym)),
+	    *u = REAL(uvec), mone = -1, one = 1;
+	CHM_FR L = L_SLOT(x);
+	CHM_DN cu = AS_CHM_DN(uvec), sol;
+	R_CheckStack();
+
+	mer_update_L(x);
+	Memcpy(fixef, RXy + p * pp1, p);
+	F77_CALL(dtrsv)("U", "N", "N", &p, RXy, &pp1, fixef, &ione);
+	Memcpy(u, RVXy + p * q, q);
+	F77_CALL(dgemv)("N", &q, &p, &mone, RVXy, &q,
+			fixef, &ione, &one, u, &ione);
+	if (!(sol = M_cholmod_solve(CHOLMOD_Lt, L, cu, &c)))
+	    error(_("cholmod_solve (CHOLMOD_Lt) failed:"));
+	Memcpy(u, (double*)(sol->x), q);
+	M_cholmod_free_dense(&sol, &c);
+	dev[bqd_POS] = lme4_sumsq(u, q);
+	dev[disc_POS] = exp(dev[lpdisc_POS]) - dev[bqd_POS];
+    }
+    TSPp_SEXP_mult(GET_SLOT(x, lme4_ranefSym),
+		   GET_SLOT(x, lme4_STSym),
+		   INTEGER(GET_SLOT(x, lme4_GpSym)),
+		   GET_SLOT(x, lme4_uvecSym),
+		   INTEGER(GET_SLOT(GET_SLOT(x, lme4_LSym),
+				    lme4_permSym)));
+    return R_NilValue;
 }
 
-/* Functions common to all three forms of mixed models */
+SEXP mer_update_eta(SEXP x)
+{
+    SEXP X = GET_SLOT(x, lme4_XSym),
+	moff = GET_SLOT(x, lme4_offsetSym);
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int i, ione = 1, nans = dims[n_POS] * dims[s_POS], p = dims[p_POS];
+    double *eta = REAL(GET_SLOT(x, lme4_etaSym)), one[] = {1,0};
+    CHM_FR L = L_SLOT(x);
+    CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
+    CHM_DN Ptu, ceta = N_AS_CHM_DN(eta, nans, 1),
+	cu = AS_CHM_DN(GET_SLOT(x, lme4_uvecSym));
+    R_CheckStack();
+
+    if (!INTEGER(getAttrib(X, R_DimSymbol))[0]) { /* X not stored */
+	for (i = 0; i < nans; i++) eta[i] = NA_REAL;
+	return R_NilValue;
+    }
+				/* eta := offset or eta := 0 */
+    if (LENGTH(moff)) Memcpy(eta, REAL(moff), nans);
+    else AZERO(eta, nans);
+				/* eta := eta + X \beta */
+    F77_CALL(dgemv)("N", &nans, &p, one, REAL(X), &nans,
+		    REAL(GET_SLOT(x, lme4_fixefSym)), &ione,
+		    one, eta, &ione);
+				/* eta := eta + V P' u */
+    Ptu = M_cholmod_solve(CHOLMOD_Pt, L, cu, &c);
+    if (!M_cholmod_sdmult(cVt, 1 /* trans */, one, one, Ptu, ceta, &c))
+	error(_("cholmod_sdmult error returned"));
+    M_cholmod_free_dense(&Ptu, &c);
+
+    return R_NilValue;
+}
+
+SEXP mer_update_mu_res(SEXP x)
+{
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int i, n = dims[n_POS];
+    double *eta = REAL(GET_SLOT(x, lme4_etaSym)),
+	*mu = REAL(GET_SLOT(x, lme4_muSym)),
+	*res = REAL(GET_SLOT(x, lme4_residSym)),
+	*y = REAL(GET_SLOT(x, lme4_ySym));
+
+    switch (dims[mTyp_POS]) {
+    case 0:
+	Memcpy(mu, eta, n);
+	break;
+    case 1: {			/* nonlinear mixed models */
+	SEXP rho = GET_SLOT(x, lme4_envSym);
+	SEXP gg, pnames = GET_SLOT(x, lme4_pnamesSym), vv;
+	int *gdims, s = dims[s_POS];
+
+	for (i = 0; i < s; i++) { /* par. vals. into env. */
+	    vv = findVarInFrame(rho,
+				install(CHAR(STRING_ELT(pnames, i))));
+	    if (!isReal(vv) || LENGTH(vv) != n)
+		error(_("Parameter %s in the environment must be a length %d numeric vector"),
+		      CHAR(STRING_ELT(pnames, i)), n);
+	    Memcpy(REAL(vv), eta + i * n, n);
+	}
+	vv = PROTECT(eval(GET_SLOT(x, lme4_modelSym), rho));
+	if (!isReal(vv) || LENGTH(vv) != n)
+	    error(_("evaluated model is not a numeric vector of length %d"), n);
+	gg = getAttrib(vv, lme4_gradientSym);
+	if (!isReal(gg) || !isMatrix(gg))
+	    error(_("gradient attribute of evaluated model must be a numeric matrix"));
+	gdims = INTEGER(getAttrib(gg, R_DimSymbol));
+	if (gdims[0] != n ||gdims[1] != s)
+	    error(_("gradient matrix must be of size %d by %d"), n, s);
+				/* colnames of the gradient
+				 * corresponding to the order of the
+				 * pnames has been checked */
+	SET_SLOT(x, lme4_muSym, vv);
+	UNPROTECT(1);
+	mu = REAL(vv);
+	break;
+    }
+    case 2:			/* generalized linear mixed model */
+	switch(dims[fTyp_POS]) {
+	case 1: 			/* binomial with logit link */
+	    for (i = 0; i < n; i++) {
+		double etai = eta[i], tmp;
+		tmp = (etai < MLTHRESH) ? DOUBLE_EPS :
+		    ((etai > LTHRESH) ? INVEPS : exp(etai));
+		mu[i] = x_d_opx(tmp);
+	    }
+	    break;
+	case 2:			/* binomial with probit link */
+	    if (!MPTHRESH) {
+		MPTHRESH = qnorm5(DOUBLE_EPS, 0, 1, 1, 0);
+		PTHRESH = -MPTHRESH;
+	    }
+	    for (i = 0; i < n; i++) {
+		double etai = eta[i];
+		mu[i] = (etai < MPTHRESH) ? DOUBLE_EPS :
+		    ((etai > PTHRESH) ? 1 - DOUBLE_EPS :
+		     pnorm5(etai, 0, 1, 1, 0));
+	    }
+	    break;
+	case 3:			/* Poisson with log link */
+	    for (i = 0; i < n; i++) {
+		double tmp = exp(eta[i]);
+		mu[i] = (tmp < DOUBLE_EPS) ? DOUBLE_EPS : tmp;
+	    }
+	    break;
+	default:
+	    error(_("General form of glmer_linkinv not yet written"));
+	} 
+	break;
+    default:
+	error(_("Unknown model type %d"), dims[mTyp_POS]);
+    }
+				/* update raw residuals */
+    for (i = 0; i < n; i++) res[i] = y[i] - mu[i];
+    return R_NilValue;
+}
+
+/**
+ * Change the x slot in Vt according to ST'Zt
+ *
+ * @param x An object that inherits from class mer
+ */
+SEXP mer_update_Vt(SEXP x)
+{
+    SEXP ST = GET_SLOT(x, lme4_STSym);
+    int *Gp = INTEGER(GET_SLOT(x, lme4_GpSym));
+    CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym)),
+	cZt = AS_CHM_SP(GET_SLOT(x, lme4_ZtSym));
+    int *vi = (int*)(cVt->i), *vp = (int*)(cVt->p),
+	*zi = (int*)(cZt->i), *zp = (int*)(cZt->p),
+	j, nf = LENGTH(ST), p;
+    int vnnz = vp[cVt->ncol], znnz = zp[cZt->ncol];
+    int *nc = Alloca(nf, int), *nlev = Alloca(nf, int);
+    double **st = Alloca(nf, double*),
+	*vx = (double*)(cVt->x), *zx = (double*)(cZt->x),
+	one[] = {1,0};
+    R_CheckStack();
+
+    if (vnnz == znnz) Memcpy(vx, zx, znnz);
+    else {
+	AZERO(vx, vnnz);
+	for (j = 0; j < cVt->ncol; j++) {
+	    int pv = vp[j];
+	    for (p = zp[j]; p < zp[j + 1]; p++) {
+		while (vi[pv] < zi[p]) pv++;
+		if (vi[pv] != zi[p])
+		    error(_("nonconforming Zt and Vt structures, j = %d"), j);
+		vx[pv] = zx[p];
+	    }
+	}
+    }
+	
+    if (ST_nc_nlev(ST, Gp, st, nc, nlev) > 1) /* T' == I when ncmax == 1 */
+	for (j = 0; j < cVt->ncol; j++) /* multiply column j by T' */
+	    for (p = vp[j]; p < vp[j + 1];) {
+		int i = Gp_grp(vi[p], nf, Gp);
+
+		if (nc[i] <= 1) p++;
+		else {
+		    int nr = p;	/* number of rows in `B' in dtrmm call */
+		    while ((vi[nr] - Gp[i]) < nlev[i]) nr++;
+		    nr -= p;	/* nr == 1 except in models with carry-over */
+		    F77_CALL(dtrmm)("R", "L", "N", "U", &nr, nc + i,
+				    one, st[i], nc + i, vx + p, &nr);
+		    p += (nr * nc[i]);
+		}
+	    }
+    for (p = 0; p < vnnz; p++) {
+	int i = Gp_grp(vi[p], nf, Gp);
+	vx[p] *= st[i][((vi[p] - Gp[i]) / nlev[i]) * (nc[i] + 1)];
+    }
+    return R_NilValue;
+}
+
+/**
+ * Create the Vt matrix pattern from Zt, ST and Gp.  Partition the
+ * columns into s groups and overlay them.
+ * 
+ *
+ * @param Zt 
+ * @param ST
+ * @param GpP pointer to the Gp array
+ *
+ * @return Vt
+ */
+SEXP mer_create_Vt(SEXP Zt, SEXP ST, SEXP GpP)
+{
+    SEXP ans;
+    int *Gp = INTEGER(GpP), *nnz, *nz, *vi, *vp, *zdims, *zi, *zp,
+	Vnnz, ZtOK, j, nf = LENGTH(ST);
+    int *nc = Alloca(nf, int), *nlev = Alloca(nf, int);
+    R_CheckStack();
+
+				/* Trivial case, all nc == 1 */
+    if (ST_nc_nlev(ST, Gp, (double**)NULL, nc, nlev) <= 1)
+	return duplicate(Zt);
+				/* Check the nonzero pattern in Zt */
+    zdims = INTEGER(GET_SLOT(Zt, lme4_DimSym));
+    nnz = Alloca(zdims[1], int);
+    nz = Alloca(zdims[0], int);
+    R_CheckStack();
+
+    zi = INTEGER(GET_SLOT(Zt, lme4_iSym));
+    zp = INTEGER(GET_SLOT(Zt, lme4_pSym));
+    for (j = 0, ZtOK = 1; j < zdims[1]; j++) {
+	nnz[j] = Vt_nz_col(nz, j, nf, Gp, nc, nlev, zi, zp);
+	if (nnz[j] != (zp[j + 1] - zp[j])) ZtOK = 0;
+    }
+    if (ZtOK) return duplicate(Zt);
+				/* Must create a new dgCMatrix object */ 
+    ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix")));
+    SET_SLOT(ans, lme4_DimSym, duplicate(GET_SLOT(Zt, lme4_DimSym)));
+    SET_SLOT(ans, lme4_DimNamesSym, allocVector(VECSXP, 2));
+				/* create and evaluate the p slot */
+    vp = INTEGER(ALLOC_SLOT(ans, lme4_pSym, INTSXP, zdims[1] + 1));
+    vp[0] = 0;
+    for (j = 0; j < zdims[1]; j++) vp[j + 1] = vp[j] + nnz[j];
+    Vnnz = vp[zdims[1]];
+    vi = INTEGER(ALLOC_SLOT(ans, lme4_iSym, INTSXP, Vnnz));
+    AZERO(REAL(ALLOC_SLOT(ans, lme4_xSym, REALSXP, Vnnz)), Vnnz);
+    for (j = 0; j < zdims[1]; j++) { /* fill in the i slot */
+	int i, pos = vp[j];
+	Vt_nz_col(nz, j, nf, Gp, nc, nlev, zi, zp);
+	for (i = 0; i < zdims[0]; i++) if (nz[i]) vi[pos++] = i;
+    }
+
+    UNPROTECT(1); 
+    return ans;
+}
+
+/**
+ * Update L for an mer model
+ *
+ * @param x pointer to an mer object
+ *
+ * @return R_NilValue
+ */
+SEXP mer_update_L(SEXP x)
+{
+    SEXP Vt = GET_SLOT(x, lme4_VtSym);
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)),
+	*vi = INTEGER(GET_SLOT(Vt, lme4_iSym)),
+	*vp = INTEGER(GET_SLOT(Vt, lme4_pSym));
+    int j, jv, n = dims[n_POS], s = dims[s_POS];
+    double *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
+	*vx = REAL(GET_SLOT(Vt, lme4_xSym)),
+	one[] = {1,0};
+    CHM_SP cSP = AS_CHM_SP(Vt);
+    CHM_FR L = L_SLOT(x);
+    R_CheckStack();
+
+    switch (dims[mTyp_POS]) {
+    case 0: break;		/* nothing to do for lmm */
+    case 1: {			/* nonlinear mixed model */
+	SEXP Mt = GET_SLOT(x, lme4_MtSym);
+	int *mi = INTEGER(GET_SLOT(Mt, lme4_iSym)),
+	    *mp = INTEGER(GET_SLOT(Mt, lme4_pSym));
+	double *grad = REAL(getAttrib(GET_SLOT(x, lme4_muSym),
+				      lme4_gradientSym)),
+	    *mx = REAL(GET_SLOT(Mt, lme4_xSym));
+	R_CheckStack();
+
+	AZERO(mx, mp[n]);
+	for (jv = 0; jv < n * s; jv++) {
+	    int iv, jm = jv % n, im;
+	    for (iv = vp[jv]; iv < vp[jv + 1]; iv++) {
+		for (im = mp[jm]; im < mp[jm + 1]; im++)
+		    if (mi[im] == vi[iv]) break;
+		if (im == mp[jm + 1])
+		    error(_("Structure of Mt incompatible with Vt, jv = %d, iv = %d"),
+			  jv, iv);
+		mx[im] += grad[jv] * vx[iv];
+	    }
+	}
+	cSP = AS_CHM_SP(Mt);
+	break;
+    }
+    case 2: {			/* generalized linear mixed model */
+	SEXP rho = GET_SLOT(x, lme4_envSym);
+	int nnz = vp[n], p;
+	double *dmu_deta, /* *var, */
+	    *w = REAL(GET_SLOT(x, lme4_weightsSym));
+	double *wx = Alloca(nnz, double); /* weighted x slot of cVt */
+	R_CheckStack();
+
+	glmer_dmu_deta(x);
+	dmu_deta = REAL(findVarInFrame(rho, lme4_dmu_detaSym));
+/*     glmer_var(x); */
+/*     var = REAL(findVarInFrame(rho, lme4_varSym)); */
+	for (j = 0; j < n; j++) { /* weighted Vt */
+	    double ww = sqrt(w[j] * dmu_deta[j]);
+	    for (p = vp[j]; p < vp[j + 1]; p++)
+		wx[p] = vx[p] * ww;
+	}
+	cSP->x = (void*)wx;
+	break;
+    }
+    default:
+	error(_("Unknown model type %d"), dims[mTyp_POS]);
+    }
+    if (!M_cholmod_factorize_p(cSP, one, (int*)NULL, 0 /*fsize*/, L, &c))
+	error(_("cholmod_factorize_p failed: status %d, minor %d from ncol %d"),
+	      c.status, L->minor, L->n);
+    dev[ldL2_POS] = chm_log_det2(L);
+    eval_deviance(dev, n, dims[p_POS], dims[mTyp_POS]);
+    return R_NilValue;
+}
 
 /**
  * Set the parameters in an lmer object and evaluate the deviance of
@@ -1525,32 +1418,28 @@ SEXP glmer_condMode(SEXP x) {
  *
  * @param x pointer to a glmer object
  * @param xv vector of parameter values
- * @param mtype model type: 0 -> lmm, 1 -> nlmm, 2 -> glmm
  *
  * @return deviance
  */
 static double
-update_deviance(SEXP x, const double *xv, int mtype)
+update_deviance(SEXP x, const double *xv)
 {
     SEXP ST = GET_SLOT(x, lme4_STSym);
     int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym));
+    int mtyp = dims[mTyp_POS];
     double *dev = REAL(GET_SLOT(x, lme4_devianceSym));
 
     ST_SetPars(xv, ST);		/* common parameters */
-    if (mtype)			/* not a linear mixed model */
-	Memcpy(REAL(GET_SLOT(x, lme4_fixefSym)),
-	       xv + dims[np_POS], dims[p_POS]);
-    switch(mtype) {
+    switch(mtyp) {
     case 0:			/* linear mixed model */
-    {
-	lmer_update_dev(x); break;
-    }
+	mer_update_lpdisc(x);
+	break;
     case 1:	     /* nonlinear or generalized linear mixed model */
-    {
+    case 2:
 	Memcpy(REAL(GET_SLOT(x, lme4_fixefSym)),
 	       xv + dims[np_POS], dims[p_POS]);
-	nglmer_condMode(x, mtype); break;
-    }
+	mer_condMode(x);
+	break;
     default:
 	error(_("Unknown form of model for update_deviance"));
     }
@@ -1563,17 +1452,18 @@ update_deviance(SEXP x, const double *xv, int mtype)
  *
  * @param x pointer to an lmer, glmer or nlmer object
  * @param verbp indicator of verbose output
- * @param mtypep model type 0 -> lmer, 1 -> nlmer, 2 -> glmer
  *
  * @return indicator of convergence from nlminb_iterate
  */
 SEXP 
-mer_optimize(SEXP x, SEXP verbp, SEXP mtypep)
+mer_optimize(SEXP x, SEXP verbp)
 {
     SEXP ST = GET_SLOT(x, lme4_STSym);
-    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)), i, j,
-	mtype = asInteger(mtypep), pos, verb = asLogical(verbp);
-    int nf = dims[nf_POS], nv = dims[np_POS] + (mtype?dims[p_POS]:0);
+    int *dims = INTEGER(GET_SLOT(x, lme4_dimsSym)),
+	i, j, pos, verb = asLogical(verbp);
+    int mtyp = dims[mTyp_POS], nf = dims[nf_POS];
+/* FIXME: need to add 1 to nv for mtyp == 2 when scale par is introduced. */
+    int nv = dims[np_POS] + (mtyp > 0 ? dims[p_POS] : 0);
     int liv = S_iv_length(OPT, nv), lv = S_v_length(OPT, nv);
     double *g = (double*)NULL, *h = (double*)NULL, fx = R_PosInf;
     int *iv = Alloca(liv, int);
@@ -1582,9 +1472,13 @@ mer_optimize(SEXP x, SEXP verbp, SEXP mtypep)
     R_CheckStack();
 
     ST_GetPars(ST, xv);
-    if (mtype) {
+    if (mtyp) {
+	double eta = 1.e-5; /* estimated rel. error on computed lpdisc */
 	SEXP fixef = GET_SLOT(x, lme4_fixefSym);
 	Memcpy(xv + dims[np_POS], REAL(fixef), LENGTH(fixef));
+	v[31] = eta;		/* RFCTOL */
+	v[36] = eta;		/* SCTOL */
+	v[41] = eta;		/* ETA0 */
     }
 				/* initialize the state vectors v and iv */
     S_Rf_divset(OPT, iv, liv, lv, v);
@@ -1601,11 +1495,10 @@ mer_optimize(SEXP x, SEXP verbp, SEXP mtypep)
     }
     S_nlminb_iterate(b, d, fx, g, h, iv, liv, lv, nv, v, xv);
     while (iv[0] == 1 || iv[0] == 2) {
-	fx = update_deviance(x, xv, mtype); 
+	fx = update_deviance(x, xv);
 	S_nlminb_iterate(b, d, fx, g, h, iv, liv, lv, nv, v, xv);
     }
     dims[cvg_POS] = iv[0];
-    mer_update_b(x);
     return R_NilValue;
 }
 
@@ -1706,7 +1599,7 @@ lme4_rWishart(SEXP ns, SEXP dfp, SEXP scal)
  * @param sigma current standard deviation of the per-observation
  *        noise terms.
  */
-static void lmer_MCMC_betab(SEXP x, double sigma)
+static void mer_MCMC_betab(SEXP x, double sigma)
 {
     SEXP fixefP = GET_SLOT(x, lme4_fixefSym),
 	uvecP = GET_SLOT(x, lme4_uvecSym);
@@ -1718,7 +1611,7 @@ static void lmer_MCMC_betab(SEXP x, double sigma)
     CHM_DN sol, rhs = N_AS_CHM_DN(del1, q, 1);
     R_CheckStack();
 
-    lmer_update_effects(x);
+    mer_update_effects(x);
 				/* Update the fixed effects */
     for (j = 0; j < p; j++) del2[j] = sigma * norm_rand();
     F77_CALL(dtrsv)("U", "N", "N", &p, REAL(GET_SLOT(x, lme4_RXySym)),
@@ -1837,7 +1730,7 @@ static void mer_MCMC_ST(SEXP x, double sigma, double *vals, int trans)
  *
  * @return a matrix
  */
-SEXP lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
+SEXP mer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 		  SEXP verbosep, SEXP deviancep)
 {
     SEXP Pars = PROTECT(ST_getPars(x)), ans;
@@ -1866,13 +1759,13 @@ SEXP lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
 				/* simulate and store new value of sigma */
 	sigma = exp(deviance[lpdisc_POS]/2)/sqrt(rchisq(df));
 	col[p] = (trans ? 2 * log(sigma) : sigma * sigma);
-	lmer_update_effects(x);	/* Conditional estimates of beta, u and b */
-	lmer_MCMC_betab(x, sigma); /* Updated beta, u and b */
+	mer_update_effects(x);	/* Conditional estimates of beta, u and b */
+	mer_MCMC_betab(x, sigma); /* Updated beta, u and b */
 	for (j = 0; j < p; j++) col[j] = fixef[j]; /* Store beta */
 	if (saveb)				   /* store b */
 	    for (j = 0; j < q; j++) col[nrbase + dev + j] = ranef[j];
 	mer_MCMC_ST(x, sigma, col + p + 1, trans);
-	lmer_update_dev(x);	/* Refactor and evaluate deviance */
+/* 	lmer_update_dev(x);	/\* Refactor and evaluate deviance *\/ */
 	/* FIXME: This deviance should be for sigma, beta, b, ST */
 	if (dev) col[nrbase] = deviance[dPOS]; 
 	if (verbose) Rprintf("%12.6g %14.8g\n", sigma, deviance[dPOS]);
@@ -1880,8 +1773,8 @@ SEXP lmer_MCMCsamp(SEXP x, SEXP savebp, SEXP nsampp, SEXP transp,
     PutRNGstate();
 				/* Restore pars, refactor, etc. */
     ST_setPars(x, Pars);
-    lmer_update_dev(x);
-    lmer_update_effects(x);
+/*     lmer_update_dev(x); */
+/*     lmer_update_effects(x); */
     UNPROTECT(2);
     return ans;
 }
@@ -2070,116 +1963,5 @@ static const double
 		  GHQ_w5, GHQ_w6, GHQ_w7, GHQ_w8, GHQ_w9, GHQ_w10,
 		  GHQ_w11};
 
-
-
-/**
- * Iterate to determine the conditional modes of the random effects.
- *
- * @param x pointer to an glmer object
- *
- * @return An indicator of whether the iterations converged
- */
-static int Glmer_condMode(SEXP x)
-{
-    SEXP env = GET_SLOT(x, lme4_envSym);
-    CHM_SP cVt = AS_CHM_SP(GET_SLOT(x, lme4_VtSym));
-    int *vp = (int*)(cVt->p), cfll = c.final_ll, i, j, p;
-    int n = cVt->ncol, nnz = vp[cVt->ncol], q = cVt->nrow;
-    double cfac = ((double)(n-q))/((double)q),
-	crit = IRLS_TOL + 1, lpd_old = DOUBLE_XMAX,
-	one[] = {1,0}, step, zero[] = {0, 0};
-    double *dev = REAL(GET_SLOT(x, lme4_devianceSym)),
-	*eta = REAL(findVarInFrame(env, lme4_etaSym)),
-	*mu = REAL(findVarInFrame(env, lme4_muSym)),
-	*rr, *u = REAL(GET_SLOT(x, lme4_uvecSym)),
-	*vx = (double*)(cVt->x),
-	*w = REAL(GET_SLOT(x, lme4_weightsSym)),
-	*y = REAL(GET_SLOT(x, lme4_ySym));
-    CHM_FR L = L_SLOT(x);
-    double *dmu_deta = Alloca(n, double), *tmp = Alloca(n, double),
-	*uold = Alloca(q, double), *var = Alloca(n, double),
-	*wx = Alloca(nnz, double); /* weighted x slot of cVt */
-    CHM_DN ctmp = N_AS_CHM_DN(Alloca(n, double), n, 1),
-	res = N_AS_CHM_DN(Alloca(n, double), n, 1),
-	rhs = N_AS_CHM_DN(Alloca(q, double), q, 1), sol;
-    R_CheckStack();
-
-    rr = (double*)(res->x);
-    if (!(L->is_ll)) error(_("L must be LL', not LDL'"));
-
-    if (q > n) error(_("q = %d > n = %d"), q, n);
-    mer_update_Vt(x);
-    AZERO(u, q);
-    c.final_ll = L->is_ll;
-    Mer_eta(x, eta); glmer_linkinv(x);
-    glmer_dmu_deta(x, dmu_deta); glmer_var(x, var);
-    for (i = 0; i < IRLS_MAXITER && crit > IRLS_TOL; i++) {
-	for (j = 0; j < n; j++) { /* calculate weighted Vt and residual */
-	    double ww = sqrt(w[j]/var[j]);
-	    rr[j] = ww * (y[j] - mu[j]);
-	    for (p = vp[j]; p < vp[j + 1]; p++) wx[p] = vx[p] * ww * dmu_deta[j];
-	}
-	cVt->x = (void*)wx;	/* Factor V'WV + I */
-	if (!M_cholmod_factorize_p(cVt, one, (int*) NULL, 0, L, &c))
-	    error(_("cholmod_factorize_p failed:"));
-	dev[ldL2_POS] = chm_log_det2(L);
-				/* evaluate V'W[res] */
-	if (!(j = M_cholmod_sdmult(cVt, 0/*trans*/, one, zero, res, rhs, &c)))
-	    error(_("cholmod_sdmult failed:"));
-				/* permute */
-	sol = M_cholmod_solve(CHOLMOD_P, L, ctmp, &c);
-	for (j = 0; j < q; j++) tmp[j] = ((double*)(sol->x))[j] - u[j];
-	M_cholmod_free_dense(&sol, &c);
-	if (!(sol = M_cholmod_solve(CHOLMOD_L, L, ctmp, &c)))
-	    error(_("cholmod_solve (CHOLMOD_L) failed"));
-	Memcpy(tmp, (double*)(sol->x), q);
-	M_cholmod_free_dense(&sol, &c);
-				/* check convergence criterion */
-	crit = cfac * lme4_sumsq(tmp, q) / exp(lpd_old);
-	if (crit < IRLS_TOL) break;
-	if (!(sol = M_cholmod_solve(CHOLMOD_Lt, L, ctmp, &c)))
-	    error(_("cholmod_solve (CHOLMOD_Lt) failed"));
-	Memcpy(tmp, (double*)(sol->x), q);
-	M_cholmod_free_dense(&sol, &c);
-	for (step = 1; step > IRLS_SMIN && dev[lpdisc_POS] >= lpd_old;
-	     step /= 2) {	/* step halving */
-	    for (j = 0; j < q; j++) u[j] = uold[j] + step * tmp[j];
-	    nlmer_eval_model(x);
-	}
-	if (crit >= IRLS_TOL && dev[lpdisc_POS] >= lpd_old)
-	    error(_("unable to reduce lpdisc in PNLS for conditional modes"));
-    }
-    if (crit > IRLS_TOL)
-	error(_("unable to converge to conditional modes"));
-    c.final_ll = cfll;
-    return i;
-/* 				/\* evaluate V'[y-dmu_deta]-u *\/ */
-/* 	cVt->x = (void*)vx; Memcpy((double*)(rhs->x), u, q); */
-/* 	if (!(j = M_cholmod_sdmult(cVt, 0/\*trans*\/, one, m_one, res, rhs, &c))) */
-/* 	    error(_("cholmod_sdmult failed:")); */
-/* 				/\* solve for the increment *\/ */
-/* 	td1 = M_cholmod_solve(CHOLMOD_L, L, rhs, &c); */
-/* 	td2 = M_cholmod_solve(CHOLMOD_Lt, L, td1, &c);     */
-/* 	M_cholmod_free_dense(&td1, &c); */
-/* 	for (j = 0; j < q; j++) u[j] = uold[j] + ((double*)(td2->x))[j]; */
-/* 	M_cholmod_free_dense(&td2, &c); */
-/* 	dev[bqd_POS] = lme4_sumsq(u, q); */
-/* 	Mer_eta(x, eta); glmer_linkinv(x); glmer_dev_resids(x); */
-/* 	glmer_dmu_deta(x, dmu_deta); glmer_var(x, var); */
-/*  	crit = conv_crit(uold, u, q); */
-/* #ifdef DEBUG_NLMER */
-/* 	Rprintf("%3d: %20.15g %20.15g", i, dev[disc_POS], dev[bqd_POS]); */
-/* 	Rprintf(" %20.15g\n", dev[disc_POS] + dev[bqd_POS]); */
-/* #endif */
-/* 	if (crit < IRLS_TOL) break; */
-/*     } */
-/*     dev[lpdisc_POS] = log(dev[disc_POS] + dev[bqd_POS]); */
-/*     dev[ldL2_POS] = chm_log_det2(L); */
-/*     dev[ML_POS] = dev[REML_POS] = */
-/* 	dev[ldL2_POS] + dn * (1. + dev[lpdisc_POS] + log(2. * PI / dn)); */
-
-/*     c.final_ll = cfll; */
-/*     return (crit > IRLS_TOL) ? 0 : i; */
-}
 
 #endif
