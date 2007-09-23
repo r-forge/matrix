@@ -1,3 +1,15 @@
+2007-09-11 22:17  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4767] src/init.c, src/lmer.c, src/lmer.h: Cleanup, add new functions
+	  for .Call
+
+2007-08-31 10:50  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4750] man/lmer-class.Rd, man/ranef.Rd: Update documentation
+	* [r4751] Done, ToDo: Update
+	* [r4752] R/AllClass.R: Incorporate mu and resid slots in mer class
+	* [r4753] R/lmer.R: Incorporate mu and resid slots in mer class
+
 2007-08-14 13:07  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r4731] src/lmer.h: declare alloca
