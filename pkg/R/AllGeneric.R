@@ -67,6 +67,7 @@
 ## [The following is more future-proof than direct  setGeneric(.) calls:
 ## FIX (in R!) : "trunc" should really be in Math, but we try both for the time
 
+if (R.version$major <= 2 && R.version$minor < "6.0") {
 ## "Math"
 for(fname in intersect(getGroupMembers("Math"),
 		       c("log", "log2", "log10", "logb", "log1p", "expm1",
@@ -78,7 +79,7 @@ for(fname in intersect(getGroupMembers("Math"),
 for(fname in intersect(getGroupMembers("Math2"),
 		       c("round", "signif", "trunc")))
     if (!is.primitive(get(fname))) setGeneric(fname, group="Math2")
-
+}
 
 ## "Summary"
 if(!is.primitive(max)) { ## or another R 2.6.0 solution
