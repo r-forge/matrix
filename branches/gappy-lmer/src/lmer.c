@@ -1,39 +1,5 @@
 #include "lmer.h"
 
-#if R_VERSION < R_Version(2,6,0)
-
-/**
- * Allocate a 3-dimensional array
- *
- * @param mode The R mode (e.g. INTSXP)
- * @param nrow number of rows
- * @param ncol number of columns
- * @param nface number of faces
- *
- * @return A 3-dimensional array of the indicated dimensions and mode
- */
-static SEXP alloc3DArray(SEXPTYPE mode, int nrow, int ncol, int nface)
-{
-    SEXP s, t;
-    int n;
-
-    if (nrow < 0 || ncol < 0 || nface < 0)
-	error(_("negative extents to 3D array"));
-    if ((double)nrow * (double)ncol * (double)nface > INT_MAX)
-	error(_("alloc3Darray: too many elements specified"));
-    n = nrow * ncol * nface;
-    PROTECT(s = allocVector(mode, n));
-    PROTECT(t = allocVector(INTSXP, 3));
-    INTEGER(t)[0] = nrow;
-    INTEGER(t)[1] = ncol;
-    INTEGER(t)[2] = nface;
-    setAttrib(s, R_DimSymbol, t);
-    UNPROTECT(2);
-    return s;
-}
-
-#endif
-
 /* Inlines and defines */
 
 extern cholmod_common c;
