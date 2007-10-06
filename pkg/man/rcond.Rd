@@ -105,6 +105,5 @@ all.equal(rcond(S1), rcond(m1))
 ## wide and sparse
 rcond(Matrix(cbind(0, diag(2:-1))))
 }
-}
 \keyword{array}
 \keyword{algebra}
