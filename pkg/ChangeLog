@@ -1,3 +1,19 @@
+2007-10-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/pMatrix.R: solve(<Matrix>, <pMatrix>)
+
+2007-10-05  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/LU.R: solve() method for "denseLU"
+
+2007-10-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999375-3 preparing for release
+
+	* R/AllGeneric.R: simplify  if(.) .. else .. for R <= 2.5.1
+
+	* R/Matrix.R (Matrix): .Internal(matrix(..)) different for R >= 2.7.0
+
 2007-09-26  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/pMatrix.R (.m.mult.pMat): fix <matrix> %*% <pMatrix>,
