@@ -747,12 +747,7 @@ setMethod("deviance", signature(object="mer"),
       })
 
 setMethod("fitted", signature(object = "lmer"),
-	  function(object, ...)
-      {
-          if (!nrow(object@X))
-              stop("unable to obtain fitted values without saved model matrix")
-          .Call(mer_eta, object)
-      })
+	  function(object, ...) object@eta)
 
 setMethod("formula", signature(x = "mer"),
 	  function(x, ...)
@@ -776,19 +771,19 @@ setMethod("logLik", signature(object="mer"),
       })
 
 setMethod("residuals", signature(object = "glmer"),
-	  function(object, ...) .NotYetImplemented())
+	  function(object, ...) object@resid)
 
 setMethod("residuals", signature(object = "lmer"),
-	  function(object, ...) object@y - fitted(object))
+	  function(object, ...) object@resid)
 
 ### FIXME: There should not be two identical methods like this but I'm not
 ##        sure how to pass the ... argument to a method for another generic
 ##        cleanly.
 setMethod("resid", signature(object = "glmer"),
-	  function(object, ...) .NotYetImplemented())
+	  function(object, ...) object@resid)
 
 setMethod("resid", signature(object = "lmer"),
-	  function(object, ...) object@y - fitted(object))
+	  function(object, ...) object@resid)
 
 setMethod("simulate", "lmer",
           function(object, nsim = 1, seed = NULL, ...)
