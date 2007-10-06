@@ -68,6 +68,14 @@ setMethod("solve", signature(a = "pMatrix", b = "missing"),
               a
           })
 
+setMethod("solve", signature(a = "Matrix", b = "pMatrix"),
+	  function(a, b) {
+	      ## Or alternatively  solve(a, as(b, "CsparseMatrix"))
+	      i <- b@perm
+	      i[i] <- seq_along(i)
+	      solve(a)[, i]
+	  })
+
 ## t(pM) is == the inverse  pM^(-1):
 setMethod("t", signature(x = "pMatrix"), function(x) solve(x))
 

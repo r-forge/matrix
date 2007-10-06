@@ -136,11 +136,15 @@ Matrix <-
 			Dim = as.integer(c(nrow,ncol)),
 			Dimnames = if(is.null(dimnames)) list(NULL,NULL)
 			else dimnames)
-	} else { ## normal case
-	    data <- .Internal(matrix(data, nrow, ncol, byrow))
+	} else { ## normal case - using .Internal() to avoid more copying
+	    if(getRversion() >= "2.7.0")
+		data <- .Internal(matrix(data, nrow, ncol, byrow, dimnames))
+	    else {
+		data <- .Internal(matrix(data, nrow, ncol, byrow))
+		dimnames(data) <- dimnames
+	    }
 	    if(is.null(sparse))
 		sparse <- sparseDefault(data)
-	    dimnames(data) <- dimnames
 	}
         doDN <- FALSE
     } else if(!missing(nrow) || !missing(ncol)|| !missing(byrow))
