@@ -216,8 +216,9 @@ setMethod("cbind2", signature(x = "sparseMatrix", y = "sparseMatrix"),
           function(x, y) {
               nr <- rowCheck(x,y)
               ## beware of (packed) triangular, symmetric, ...
-              hasDN <- !all(lapply(c(dnx <- dimnames(x),
-                                     dny <- dimnames(y)), is.null))
+	      hasDN <- !identical(c(dnx <- dimnames(x),
+				    dny <- dimnames(y)),
+				  list(NULL,NULL,NULL,NULL))
               ans <- .Call(Csparse_horzcat,
                            as_Csparse2(x), as_Csparse2(y))
               if(hasDN) {
@@ -237,8 +238,9 @@ setMethod("rbind2", signature(x = "sparseMatrix", y = "sparseMatrix"),
           function(x, y) {
               nr <- colCheck(x,y)
               ## beware of (packed) triangular, symmetric, ...
-              hasDN <- !all(lapply(c(dnx <- dimnames(x),
-                                     dny <- dimnames(y)), is.null))
+	      hasDN <- !identical(c(dnx <- dimnames(x),
+				    dny <- dimnames(y)),
+				  list(NULL,NULL,NULL,NULL))
               ans <- .Call(Csparse_vertcat,
                            as_Csparse2(x), as_Csparse2(y))
               if(hasDN) {
