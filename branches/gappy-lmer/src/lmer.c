@@ -741,7 +741,7 @@ SEXP mer_postVar(SEXP x, SEXP uS)
 /**
  * Create and initialize L
  *
- * @param Zt pointer to the random-effects model matrix (transposed)
+ * @param Vt pointer to the model matrix for the orthogonal random effects (transposed)
  *
  * @return L
  */
