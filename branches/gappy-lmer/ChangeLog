@@ -1,3 +1,30 @@
+2007-11-09 18:33  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4845] R/AllGeneric.R,lmer.R, NAMESPACE: new functions lmer2, for
+	  back-compatibility, and devvals
+	* [r4847] DESCRIPTION: standardized LICENSE information
+	* [r4848] src/lmer.c: Minor clean-up
+	* [r4849] inst/doc/Implementation.Rnw: Switch location of datasets to
+	  MEMSS package
+	
+2007-10-06 18:06  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4816] DESCRIPTION, R/lmer.R: Update fitted and resid methods; new
+	  version of R
+
+2007-10-04 20:33  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4809] src/lmer.c: remove alloc3DArray (part of R from 2.6.0)
+
+2007-09-26 17:32  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4787] R/lmer.R: Reinstitute the names of variance components from
+	  formatVC
+
+2007-09-25 15:08  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r4782] src/lmer.h: Provide definition of alloca for Solaris 10
+
 2007-09-11 22:17  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r4767] src/init.c, src/lmer.c, src/lmer.h: Cleanup, add new functions
