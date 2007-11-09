@@ -422,6 +422,19 @@ lmer <-
     mer_finalize(ans, verbose)
 }
 
+## for back-compatibility
+lmer2 <- 
+    function(formula, data, family = NULL, method = c("REML", "ML"),
+             control = list(), start = NULL, verbose, subset,
+             weights, na.action, offset, contrasts = NULL,
+             model = TRUE, x = TRUE, ...)
+{
+    .Deprecated("lmer")
+    mc <- match.call()
+    mc[[1]] <- as.name("lmer")
+    eval.parent(mc)
+}
+
 glmer <-
 function(formula, data, family = gaussian, method = c("Laplace", "AGQ"),
          control = list(), start = NULL, verbose, subset, weights,
@@ -1173,7 +1186,7 @@ setMethod("mcmcsamp", signature(object = "lmer"),
 ### Generate a Markov chain Monte Carlo sample from the posterior distribution
 ### of the parameters in a linear mixed model
       {
-          ans <- t(.Call(lmer_MCMCsamp, object, saveb, n,
+          ans <- t(.Call(mer_MCMCsamp, object, saveb, n,
                          trans, verbose, deviance))
 	  attr(ans, "mcpar") <- as.integer(c(1, n, 1))
 	  class(ans) <- "mcmc"
@@ -1238,6 +1251,35 @@ mcmccompnames <- function(ans, object, saveb, trans, glmer, deviance)
     ans
 }
 
+devvals <- function(fm, pmat, sigma1 = FALSE)
+{
+    if (!is(fm, "lmer"))
+        stop('fm must be an "lmer" fitted model')
+    np <- length(p0 <- .Call("ST_getPars", fm))
+    pmat <- as.matrix(pmat)
+    if (ncol(pmat) != np + sigma1)
+        stop(gettextf("pmat must have %d columns", np + sigma1))
+    storage.mode(pmat) <- "double"
+    if (is.null(pnms <- dimnames(pmat)[[2]]))
+        pnms <- c(ifelse(sigma1, character(0), "sigma"),
+                  paste("th", seq_len(np), sep = ""))
+    dev <- fm@deviance
+    ans <- matrix(0, nrow(pmat), ncol(pmat) + length(dev),
+                  dimnames = list(NULL, c(pnms, names(dev))))
+    for (i in seq_len(nrow(pmat))) {
+        .Call("ST_setPars", fm,
+              ## This expression does not allow for correlated random
+              ## effects.  It would be best to make the appropriate
+              ## changes in the C code for ST_setPars.
+              if (sigma1) pmat[i,-1]/pmat[i,1] else pmat[i,])
+        .Call("mer_update_lpdisc", fm)
+        ans[i, ] <- c(pmat[i, ], fm@deviance)
+    }
+    .Call("ST_setPars", fm, p0)
+    .Call("mer_update_lpdisc", fm)
+    as.data.frame(ans)
+}
+                   
 #### Odds and ends
 
 ## simulestimate <- function(x, FUN, nsim = 1, seed = NULL, control = list())
