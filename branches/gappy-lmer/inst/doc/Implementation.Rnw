@@ -45,7 +45,7 @@ Rail <- data.frame(travel = Rail$travel, Rail = Rail$Rail)
 \section{A simple example}
 \label{sec:example}
 
-The \code{Rail} data set from the \package{nlme} package is described
+The \code{Rail} data set from the \package{MEMSS} package is described
 in \citet{pinh:bate:2000} as consisting of three measurements of
 the travel time of a type of sound wave on each of six sample railroad
 rails. We can examine the structure of these data with the \code{str}
@@ -58,14 +58,14 @@ Because there are only three observations on each of the rails a
 dotplot (Figure~\ref{fig:Raildotplot}) shows the structure of the data
 well.
 <<Raildotplot,fig=TRUE,include=FALSE,width=8,height=2>>=
-print(dotplot(Rail~travel,Rail,xlab="Travel time (ms)",ylab="Rail number"))
+print(dotplot(reorder(Rail,travel)~travel,Rail,xlab="Travel time (ms)",ylab="Rail"))
 @
 \begin{figure}[tb]
   \centering
   \includegraphics{Implementation-Raildotplot}
   \caption{Travel time of sound waves in a sample of six railroad
     rails.  There were three measurements of the travel time on each
-    rail. The rail numbers are sorted by increasing mean travel time.}
+    rail. The order of the rails is by increasing mean travel time.}
   \label{fig:Raildotplot}
 \end{figure}
 
@@ -1418,9 +1418,37 @@ the deviance (negative twice the log-likelihood) the approximation is
 \end{equation}
 where $d(\bm{\beta},\bm{b},\bm{y})$ is the deviance function from the linear
 predictor only.  That is, $d(\bm{\beta},\bm{b},\bm{y})=-2\log p(\bm{y}|\bm{\beta},\bm{b})$.
-This quantity can be evalated as the sum of the deviance
+This quantity can be evaluated as the sum of the deviance
 residuals~\citep[\S2.4.3]{mccullagh89:_gener_linear_model}.
 
 
 \bibliography{lme4}
+\appendix
+
+\section{Notation}
+\label{app:notation}
+
+\subsection{Random variables}
+\label{sec:randomVariables}
+
+\begin{itemize}
+\item $\emph{Y}$- the $n$-dimensional random variable of
+  responses.  The observed responses are the $n$-vector $\bm y$.
+\item $\emph{B}$ - The $q$-dimensional vector of random effects.  This
+  vector is not observed directly.  It has the properties
+  $\mathsf{E}[\emph{B}]=\bm 0$ and
+  $\mathsf{Var}([\emph{B}])=\sigma^2\bm\Sigma(\bm\theta)$, where the
+  scalar $\sigma$ is the common scale factor (if used in the model)
+  and $\bm\Sigma$ is a $q\times q$ symmetric, positive semi-definite
+  \emph{relative variance-covariance matrix} determined by the
+  variance parameter vector $\bm\theta$.
+\item $\emph{U}$ - a $q$-dimensional \emph{unit} vector of random
+  effects with distribution $\emph{U}\sim\mathcal{N}(\bm
+  0,\sigma^2\bm I_q)$.
+\end{itemize}
+
+\subsection{Dimensions}
+\label{sec:dimensions}
+
+
 \end{document}
