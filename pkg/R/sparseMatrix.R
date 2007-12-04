@@ -524,3 +524,52 @@ fac2sparse <- function(from, to = c("d","i","l","n","z"))
 }
 
 setAs("factor", "sparseMatrix", function(from) fac2sparse(from, to = "d"))
+
+# xtabs returning a sparse matrix.  This should probably be an option
+# for the xtabs function
+sxtabs <- function (formula = ~., data = parent.frame(), subset, na.action, 
+    exclude = c(NA, NaN), drop.unused.levels = FALSE) 
+{
+    if (missing(formula) && missing(data)) 
+        stop("must supply either 'formula' or 'data'")
+    if (!missing(formula)) {
+        formula <- as.formula(formula)
+        if (!inherits(formula, "formula")) 
+            stop("'formula' missing or incorrect")
+    }
+    if (any(attr(terms(formula, data = data), "order") > 1)) 
+        stop("interactions are not allowed")
+    m <- match.call(expand.dots = FALSE)
+    if (is.matrix(eval(m$data, parent.frame()))) 
+        m$data <- as.data.frame(data)
+    m$... <- m$exclude <- m$drop.unused.levels <- NULL
+    m[[1]] <- as.name("model.frame")
+    mf <- eval(m, parent.frame())
+    if(length(formula) == 2) {
+	by <- mf
+	y <- NULL
+    }
+    else {
+	i <- attr(attr(mf, "terms"), "response")
+	by <- mf[-i]
+	y <- mf[[i]]
+    }
+    by <- lapply(by, function(u) {
+	if(!is.factor(u)) u <- factor(u, exclude = exclude)
+	u[ , drop = drop.unused.levels]
+    })
+    if (length(by) != 2)
+        stop("sxtabs applies only to two-way tables")
+    rows <- by[[1]]
+    cols <- by[[2]]
+    rl <- levels(rows)
+    cl <- levels(cols)
+    if (is.null(y))
+        y <- rep(1, length(rows))
+    as(new("dgTMatrix",
+           list(i = as.integer(rows),
+                j = as.integer(cols),
+                x = y,
+                Dim = c(length(rl), length(cl)),
+                Dimnames = list(rl, cl))), "CsparseMatrix")
+}
