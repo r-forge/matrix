@@ -525,24 +525,27 @@ fac2sparse <- function(from, to = c("d","i","l","n","z"))
 
 setAs("factor", "sparseMatrix", function(from) fac2sparse(from, to = "d"))
 
-# xtabs returning a sparse matrix.  This should probably be an option
-# for the xtabs function
-sxtabs <- function (formula = ~., data = parent.frame(), subset, na.action, 
-    exclude = c(NA, NaN), drop.unused.levels = FALSE) 
+## xtabs returning a sparse matrix.  This is cut'n'paste
+## of xtabs() in <Rsrc>/src/library/stats/R/xtabs.R ;
+## with the new argument 'sparse'
+xtabs <- function(formula = ~., data = parent.frame(), subset, sparse = FALSE,
+		  na.action, exclude = c(NA, NaN), drop.unused.levels = FALSE)
 {
-    if (missing(formula) && missing(data)) 
-        stop("must supply either 'formula' or 'data'")
-    if (!missing(formula)) {
-        formula <- as.formula(formula)
-        if (!inherits(formula, "formula")) 
-            stop("'formula' missing or incorrect")
+    if (missing(formula) && missing(data))
+	stop("must supply either 'formula' or 'data'")
+    if(!missing(formula)){
+	## We need to coerce the formula argument now, but model.frame
+	## will coerce the original version later.
+	formula <- as.formula(formula)
+	if (!inherits(formula, "formula"))
+	    stop("'formula' missing or incorrect")
     }
-    if (any(attr(terms(formula, data = data), "order") > 1)) 
-        stop("interactions are not allowed")
+    if (any(attr(terms(formula, data = data), "order") > 1))
+	stop("interactions are not allowed")
     m <- match.call(expand.dots = FALSE)
-    if (is.matrix(eval(m$data, parent.frame()))) 
-        m$data <- as.data.frame(data)
-    m$... <- m$exclude <- m$drop.unused.levels <- NULL
+    if (is.matrix(eval(m$data, parent.frame())))
+	m$data <- as.data.frame(data)
+    m$... <- m$exclude <- m$drop.unused.levels <- m$sparse <- NULL
     m[[1]] <- as.name("model.frame")
     mf <- eval(m, parent.frame())
     if(length(formula) == 2) {
@@ -558,18 +561,41 @@ sxtabs <- function (formula = ~., data = parent.frame(), subset, na.action,
 	if(!is.factor(u)) u <- factor(u, exclude = exclude)
 	u[ , drop = drop.unused.levels]
     })
-    if (length(by) != 2)
-        stop("sxtabs applies only to two-way tables")
-    rows <- by[[1]]
-    cols <- by[[2]]
-    rl <- levels(rows)
-    cl <- levels(cols)
-    if (is.null(y))
-        y <- rep(1, length(rows))
-    as(new("dgTMatrix",
-           list(i = as.integer(rows),
-                j = as.integer(cols),
-                x = y,
-                Dim = c(length(rl), length(cl)),
-                Dimnames = list(rl, cl))), "CsparseMatrix")
+    if(!sparse) { ## identical to stats::xtabs
+	x <-
+	    if(is.null(y))
+		do.call("table", by)
+	    else if(NCOL(y) == 1)
+		tapply(y, by, sum)
+	    else {
+		z <- lapply(as.data.frame(y), tapply, by, sum)
+		array(unlist(z),
+		      dim = c(dim(z[[1]]), length(z)),
+		      dimnames = c(dimnames(z[[1]]), list(names(z))))
+	    }
+	x[is.na(x)] <- 0
+	class(x) <- c("xtabs", "table")
+	attr(x, "call") <- match.call()
+	x
+
+    } else { ## sparse
+	if (length(by) != 2)
+	    stop("xtabs(*, sparse=TRUE) applies only to two-way tables")
+	rows <- by[[1]]
+	cols <- by[[2]]
+	rl <- levels(rows)
+	cl <- levels(cols)
+	## FIXME?  y == 1 seems the most common case.
+	##	   Shouldn't we rather use a pattern matrix then ??
+	if (is.null(y))
+	    y <- rep.int(1, length(rows))
+	else if(!is.double(y))
+	    y <- as.double(y)
+	as(new("dgTMatrix",
+	       i = as.integer(rows) - 1L,
+	       j = as.integer(cols) - 1L,
+	       x = y,
+	       Dim = c(length(rl), length(cl)),
+	       Dimnames = list(rl, cl)), "CsparseMatrix")
+    }
 }
