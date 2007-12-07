@@ -1,3 +1,36 @@
+
+
+>>>>>> FIXME  rcond(matrix(1:6, 2,3))   gives infinite recursion !!! <<<<<<<<<<
+
+
+
+2007-12-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (cov2cor): method for sparse matrices
+
+	* R/diagMatrix.R ([<-): fix   D[ cbind(i,j) ] <- v
+
+	* R/bind2.R: fix for Rsparse* and rbind2(dense,dense)
+
+	* tests/Class+Meth.R: test cbind2, rbind2  and  diag<-
+
+2007-12-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R: "generic" cov2cor() method
+
+	* R/nearPD.R: new 'only.values', 'keepDiag' arguments;
+		speed up Q %*% D %*% t(Q)
+	* tests/dpoMatrix.R: test nearPD()
+
+2007-12-05  Doug Bates and Martin Maechler
+
+	* R/sparseMatrix.R: xtabs(*, sparse=.) function; an extention of
+	stats::xtabs() allowing to create sparse matrices.
+
+2007-10-08  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): *-4 (released *-3 two days ago)
+
 2007-10-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/pMatrix.R: solve(<Matrix>, <pMatrix>)

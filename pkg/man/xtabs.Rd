@@ -75,12 +75,17 @@ xtabs(formula = ~., data = parent.frame(), subset, sparse = FALSE, na.action,
 ## See for non-sparse examples:
 example(xtabs, package = "stats")
 
-## similar to "nlme"s  'ergoStool':
-d.ergo <- data.frame(Type = paste("T", rep(1:4, 9), sep=""),
-                     Subj = gl(9,4))
-
-xtabs(~ Type + Subj, data=d.ergo) # 1 replicate each
+## similar to "nlme"s  'ergoStool' :
+d.ergo <- data.frame(Type = paste("T", rep(1:4, 9*4), sep=""),
+                     Subj = gl(9,4, 36*4))
+xtabs(~ Type + Subj, data=d.ergo) # 4 replicates each
 set.seed(15) # a subset of cases:
 xtabs(~ Type + Subj, data=d.ergo[sample(36, 10),], sparse=TRUE)
+
+## Hypothetical two level setup:
+inner <- factor(sample(letters[1:25], 100, replace = TRUE))
+inout <- factor(sample(LETTERS[1:5], 25, replace = TRUE))
+fr <- data.frame(inner = inner, outer = inout[as.integer(inner)])
+xtabs(~ inner + outer, fr, sparse = TRUE)
 }
 \keyword{category}

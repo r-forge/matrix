@@ -214,6 +214,7 @@ setMethod("[", signature(x = "diagonalMatrix", i = "missing",
 ## FIXME: this now fails because the "denseMatrix" methods come first in dispatch
 replDiag <- function(x, i, j, value) {
     x <- as(x, "sparseMatrix")
+    message(sprintf("diagnosing replDiag() -- nargs() = %d\n", nargs()))
     if(missing(i))
 	x[, j] <- value
     else if(missing(j))
@@ -228,6 +229,26 @@ setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index",
 setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index",
 				j = "missing", value = "replValue"),
 		 function(x, i, value) replDiag(x, i=i, value=value))
+setReplaceMethod("[", signature(x = "diagonalMatrix", i = "matrix", # 2-col.matrix
+				j = "missing", value = "replValue"),
+		 function(x, i, value) {
+		     if(ncol(i) == 2) {
+			 if(all((ii <- i[,1]) == i[,2])) { # replace in diagonal only
+			     x@x[ii] <- value
+			     x
+			 } else { ## no longer diagonal, but remain sparse:
+			     x <- as(x, "sparseMatrix")
+			     x[i] <- value
+			     x
+			 }
+		     }
+		     else { # behave as "base R": use as if vector
+			 x <- as(x, "matrix")
+			 x[i] <- value
+			 Matrix(x)
+		     }
+		 })
+
 setReplaceMethod("[", signature(x = "diagonalMatrix", i = "missing",
 				j = "index", value = "replValue"),
 		 function(x, j, value) replDiag(x, j=j, value=value))

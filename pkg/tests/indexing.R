@@ -249,6 +249,17 @@ T <- m2; T[1:3, 3] <- 10; validObject(T)
 stopifnot(is(T, "dtCMatrix"), identical(T[,3], c(10,10,10,0,0)))
 
 
+## "Vector indices" --- now ``work'' but wrongly __FIXME__
+i <- c(1,3,6); v <- c(10,15,20)
+D <- Diagonal(6)
+m <- as(D,"matrix")
+s <- as(D,"sparseMatrix")
+
+D[i] <- v; D
+s[i] <- v; s
+m[i] <- v; m
+
+
 ## --- negative indices ----------
 mc <- mC[1:5, 1:7]
 mt <- mT[1:5, 1:7]
