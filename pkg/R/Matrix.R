@@ -44,6 +44,8 @@ setMethod("as.numeric", signature(x = "Matrix"),
 setMethod("as.logical", signature(x = "Matrix"),
 	  function(x, ...) as.logical(as.vector(x)))
 
+setMethod("cov2cor", signature(V = "Matrix"),
+	  function(V) as(cov2cor(as(V, "matrix")), "dpoMatrix"))
 
 ## "base" has an isSymmetric() S3-generic since R 2.3.0
 setMethod("isSymmetric", signature(object = "symmetricMatrix"),

@@ -477,6 +477,26 @@ setMethod("rcond", signature(x = "sparseMatrix", type = "character"),
 		    type = type)
 	  })
 
+setMethod("cov2cor", signature(V = "sparseMatrix"),
+	  function(V) {
+	      ## like stats::cov2cor() but making sure all matrices stay sparse
+	      p <- (d <- dim(V))[1]
+	      if (p != d[2])
+		  stop("'V' is not a *square* matrix")
+	      if(!is(V, "dMatrix"))
+		  V <- as(V, "dMatrix")# actually "dsparseMatrix"
+	      Is <- sqrt(1/diag(V))
+	      if (any(!is.finite(Is))) ## original had 0 or NA
+		  warning("diag(.) had 0 or NA entries; non-finite result is doubtful")
+	      ## TODO: if  <diagonal> %*% <sparse> was implemented more efficiently
+	      ##       we'd rather use that!
+	      Is <- as(Diagonal(x = Is), "sparseMatrix")
+	      r <- Is %*% V %*% Is
+	      r[cbind(1L:p,1L:p)] <- 1 # exact in diagonal
+	      as(r, "symmetricMatrix")
+	  })
+
+
 
 lm.fit.sparse <-
 function(x, y, offset = NULL, method = c("qr", "cholesky"),

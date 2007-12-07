@@ -141,7 +141,6 @@ tstMatrixClass <-
 
     ## Compute a few things only once :
     mM <- as(mM, "dgeMatrix")
-    mm <- as(mm, "matrix")
     trm <- mm; trm[lower.tri(mm)] <- 0
     summList <- lapply(getGroupMembers("Summary"), get,
                        envir = asNamespace("Matrix"))
@@ -276,6 +275,8 @@ tstMatrixClass <-
 ### 1) produce 'mM'  and 'mm' for the other cases,
 ### 2) use identical code for all cases
 
+                ## use non-square matrix when "allowed":
+
 		## "!" should work (via as(*, "l...")) :
                 m11 <- as(as(!!m,"CsparseMatrix"), "lMatrix")
                 m12 <- as(as(  m, "lMatrix"),"CsparseMatrix")
@@ -301,23 +302,32 @@ tstMatrixClass <-
                 if(is(m, "dMatrix") && is(m, "compMatrix")) {
                     if(any(clNam == not.coerce1))
                         cat.("not coercable_1\n")
-                    else {
-                        cat.("as(dge*, <(super)class>): ")
-                        if(canCoerce(mM, clNam))
-                            m2 <- as(mM, clNam)
-                        else { ## find superclass to which to coerce
-                            if(extends(clNam, "sparseMatrix")) {
-                                if(is.na(newcl <- Matrix:::.sp.class(clNam)))
-                                    stop("internal failure from .sp.class()")
-                                m2 <- as(mM, newcl)
-                            } else { ## ddense & (general or symmetric)
-                                stop("don't know what to coerce <dge> to - error test-logic")
-                            }
-                        }
-                        cat("valid:", validObject(m2), "\n")
-                        if(clNam != "corMatrix") # has diagonal divided out
-                            ## as.vector()
-                            stopifnot(as.vector(m2) == as.vector(mM))
+		    else {
+			cat.("as(dge*, <(super)class>): ")
+			if(canCoerce(mM, clNam))
+			    m2 <- as(mM, clNam)
+			else { ## find superclass to which to coerce
+			    if(extends(clNam, "sparseMatrix")) {
+				if(is.na(newcl <- Matrix:::.sp.class(clNam)))
+				    stop("internal failure from .sp.class()")
+				m2 <- as(mM, newcl)
+			    } else { ## ddense & (general or symmetric)
+				stop("don't know what to coerce <dge> to - error test-logic")
+			    }
+			}
+			cat("valid:", validObject(m2), "\n")
+			is_cor <- (clNam == "corMatrix") # has diagonal divided out
+			if(!is_cor) ## as.vector()
+			    stopifnot(as.vector(m2) == as.vector(mM))
+			cat.("[cr]bind2():"); mm2 <- cbind2(m2,m2)
+			stopifnot(dim(rbind2(m2,m2)) == 2:1 * dim(mM)); cat(" ok")
+			if(genC && class(mm2) == clNam)## non-square matrix when "allowed"
+			    m2 <- mm2
+			dd <- diag(m2)
+			cat("; `diag<-` ")
+			diag(m2) <- 10*dd
+			stopifnot(is_cor || identical(dd, diag(mM)),
+				  identical(10*dd, diag(m2))); cat("ok ")
                     }
                     if(all(clNam != not.coerce2)) {
                         cat.("as(matrix, <class>): ")

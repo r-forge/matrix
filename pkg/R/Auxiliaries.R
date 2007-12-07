@@ -647,8 +647,8 @@ as_dense <- function(x, cld = if(isS4(x)) getClassDef(class(x))) {
 
 
 ### Goal: Eventually get rid of these --- want to foster coercions
-### ----  *to* virtual classes whenever possible, i.e.
-##  as(*, "CsparseMatrix"),  etc
+### ----  *to* virtual classes whenever possible, e.g. as(*, "CsparseMatrix")
+## 2007-12: better goal: use them only for "matrix" [maybe speed them up later]
 
 ## Here, getting the class definition and passing it, should be faster
 as_Csparse <- function(x, cld = if(isS4(x)) getClassDef(class(x))) {
@@ -661,6 +661,13 @@ as_Csparse2 <- function(x, cld = if(isS4(x)) getClassDef(class(x))) {
     sh <- .M.shape(x, cld)
     x <- as(x, paste(.M.kind(x, cld), .sparse.prefixes[sh], "CMatrix", sep=''))
     if(sh == "t") .Call(Csparse_diagU2N, x) else x
+}
+
+## *do* use this where applicable
+as_Csp2 <- function(x) {
+    ## Csparse + U2N when needed
+    x <- as(x, "CsparseMatrix")
+    if(is(x, "triangularMatrix")) .Call(Csparse_diagU2N, x) else x
 }
 
 
