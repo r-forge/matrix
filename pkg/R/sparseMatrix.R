@@ -605,16 +605,12 @@ xtabs <- function(formula = ~., data = parent.frame(), subset, sparse = FALSE,
 	cols <- by[[2]]
 	rl <- levels(rows)
 	cl <- levels(cols)
-	## FIXME?  y == 1 seems the most common case.
-	##	   Shouldn't we rather use a pattern matrix then ??
 	if (is.null(y))
 	    y <- rep.int(1, length(rows))
-	else if(!is.double(y))
-	    y <- as.double(y)
 	as(new("dgTMatrix",
 	       i = as.integer(rows) - 1L,
 	       j = as.integer(cols) - 1L,
-	       x = y,
+	       x = as.double(y),
 	       Dim = c(length(rl), length(cl)),
 	       Dimnames = list(rl, cl)), "CsparseMatrix")
     }
