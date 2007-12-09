@@ -3,6 +3,24 @@
 >>>>>> FIXME  rcond(matrix(1:6, 2,3))   gives infinite recursion !!! <<<<<<<<<<
 
 
+2007-12-08  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/pMatrix.R: as(*, "matrix") now returns 0/1 *integer* matrix,
+		and hence does as.vector(.).
+	* man/pMatrix-class.Rd: docs
+	* R/sparseMatrix.R: fix for printing "integer sparse"
+
+	* tests/Class+Meth.R (tstMatrixClass): test M[FALSE], M[2] etc
+
+	* R/Matrix.R and others: use "exact" function argument list for
+		both "["   : (x, i,j, ..., drop)
+		and  "[<-" : (x, i,j, ..., value)
+
+	* R/denseMatrix.R: M[i] and M[i] <- v  (i vector) now work
+	* R/Tsparse.R (replTmat):    ditto
+	* R/diagMatrix.R (replDiag): ditto
+	* R/Csparse.R (replCmat):    ditto {was it worth the pain?}
+	* tests/indexing.R: testing the above
 
 2007-12-07  Martin Maechler  <maechler@stat.math.ethz.ch>
 

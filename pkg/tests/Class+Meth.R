@@ -195,11 +195,13 @@ tstMatrixClass <-
                 stop("does not extend either 'sparse' or 'dense'")
 	    cat("; new(..): ")
 	    m <- new(clNam) ; cat("ok; ")
+            is_p <- extends(clNam, "pMatrix")
+            is_cor <- (clNam == "corMatrix") # has diagonal divided out
 	    if(canCoerce(mm, clNam)) { ## replace 'm' by `non-empty' version
 		cat("canCoerce() ")
 		m0 <- {
 		    if(triC) trm
-		    else if(extends(clNam, "pMatrix"))
+		    else if(is_p)
 			mm == 1 # logical *and* "true" permutation
 		    else mm
 		}
@@ -210,15 +212,23 @@ tstMatrixClass <-
 		    storage.mode(m0) <- "complex"
 		validObject(m) ## validity of trivial 'm' before replacing
 		m <- as(m0, clNam)
-		if(clNam == "corMatrix")
+		if(is_cor)
                     m0 <- cov2cor(m0)
-	    } else m0 <- matrix(,0,0)
-            ## m0 is the 'matrix' version of our 'Matrix' m
+	    } else {
+                m0 <- vector(Matrix:::.type.kind[Matrix:::.M.kindC(clNam)])
+                dim(m0) <- c(0L,0L)
+            }
+	    ## m0 is the 'matrix' version of our 'Matrix' m
+	    m. <- if(is_p) as.integer(m0) else m0
+            EQ <- if(is_cor) all.equal else identical
+	    stopifnot(EQ(m0[FALSE], m[FALSE]),
+		      EQ(m.[TRUE],  m[TRUE]),
+		      if(length(m) >= 2) EQ(m.[2:1], m[2:1]) else TRUE)
 
-            if(any(clNam == not.ok.classes)) {
-                cat("in 'stop list' - no validity\n")
-            } else {
-                cat("valid: ", validObject(m), extraValid(m, clNam))
+	    if(any(clNam == not.ok.classes)) {
+		cat("in 'stop list' - no validity\n")
+	    } else {
+		cat("valid: ", validObject(m), extraValid(m, clNam))
 
 		## This can only work as long as 'm' has no NAs :
                 ## not yet -- have version in not.Ops below
@@ -316,7 +326,6 @@ tstMatrixClass <-
 			    }
 			}
 			cat("valid:", validObject(m2), "\n")
-			is_cor <- (clNam == "corMatrix") # has diagonal divided out
 			if(!is_cor) ## as.vector()
 			    stopifnot(as.vector(m2) == as.vector(mM))
 			cat.("[cr]bind2():"); mm2 <- cbind2(m2,m2)

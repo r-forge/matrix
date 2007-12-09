@@ -165,11 +165,11 @@ setAs("TsparseMatrix", "graphNEL", Tsp2grNEL)
 
 setMethod("[", signature(x = "sparseMatrix", i = "index", j = "missing",
 			 drop = "logical"),
-	  function (x, i, drop) {
+	  function (x, i,j, ..., drop) {
 	      cld <- getClassDef(class(x))
 	      if(!extends(cld, "generalMatrix")) x <- as(x, "generalMatrix")
-	      viaCl <- paste(.M.kind(x, cld), "gTMatrix", sep='')
-	      x <- callGeneric(x = as(x, viaCl), i=i, drop=drop)
+## 	      viaCl <- paste(.M.kind(x, cld), "gTMatrix", sep='')
+	      x <- callGeneric(x = as(x, "TsparseMatrix"), i=i, drop=drop)
 	      ## try_as(x, c(cl, sub("T","C", viaCl)))
 	      if(is(x, "Matrix") && extends(cld, "CsparseMatrix"))
 		  as(x, "CsparseMatrix") else x
@@ -177,11 +177,11 @@ setMethod("[", signature(x = "sparseMatrix", i = "index", j = "missing",
 
 setMethod("[", signature(x = "sparseMatrix", i = "missing", j = "index",
 			 drop = "logical"),
-	  function (x, j, drop) {
+	  function (x,i,j, ..., drop) {
 	      cld <- getClassDef(class(x))
 	      if(!extends(cld, "generalMatrix")) x <- as(x, "generalMatrix")
-	      viaCl <- paste(.M.kind(x, cld), "gTMatrix", sep='')
-	      x <- callGeneric(x = as(x, viaCl), j=j, drop=drop)
+## 	      viaCl <- paste(.M.kind(x, cld), "gTMatrix", sep='')
+	      x <- callGeneric(x = as(x, "TsparseMatrix"), j=j, drop=drop)
 	      if(is(x, "Matrix") && extends(cld, "CsparseMatrix"))
 		  as(x, "CsparseMatrix") else x
 	  })
@@ -195,9 +195,9 @@ setMethod("[", signature(x = "sparseMatrix",
 			length(i) == length(j) && all(i == j))
 	      if(!doSym && !extends(cld, "generalMatrix"))
 		  x <- as(x, "generalMatrix")
-	      viaCl <- paste(.M.kind(x, cld),
-			     if(doSym) "sTMatrix" else "gTMatrix", sep='')
-	      x <- callGeneric(x = as(x, viaCl), i=i, j=j, drop=drop)
+## 	      viaCl <- paste(.M.kind(x, cld),
+## 			     if(doSym) "sTMatrix" else "gTMatrix", sep='')
+	      x <- callGeneric(x = as(x, "TsparseMatrix"), i=i, j=j, drop=drop)
 	      if(is(x, "Matrix") && extends(cld, "CsparseMatrix"))
 		  as(x, "CsparseMatrix") else x
 	  })
@@ -290,7 +290,7 @@ printSpMatrix <- function(x, digits = getOption("digits"),
 	ne <- length(iN0 <- 1L + encodeInd(non0ind(x, cl), nr = d[1]))
 	if(0 < ne && ne < prod(d)) {
 	    align <- match.arg(align)
-	    if(align == "fancy") {
+	    if(align == "fancy" && !is.integer(m)) {
 		fi <- apply(m, 2, format.info) ## fi[3,] == 0  <==> not expo.
 		## now 'format' the zero.print by padding it with ' ' on the right:
 		## case 1: non-exponent:  fi[2,] + as.logical(fi[2,] > 0)
