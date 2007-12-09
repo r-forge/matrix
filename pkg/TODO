@@ -109,8 +109,6 @@ Check for DimNames propagation in coercion and other operations.
 
 - rbind(<sparse>, <dense>) does not work  (e.g. <dgC>, <dge>)
 
-- ensure that  M[0], M[FALSE], M[1:2]  works as for traditional Matrices
-
 - make sure  M[FALSE, FALSE]  works for all Matrices
   {e.g. fails for M <- Diagonal(4)}
 
