@@ -1,0 +1,13 @@
+digraph G
+{
+  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
+  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  rankdir=LR;
+  Node1 [label="dsCMatrix_Csparse_solve",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 [label="chm_sparse_to_SEXP",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$chm__common_8c.html#7aa1a6e564c24a55b031b5c03b3313f4",tooltip="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free..."];
+  Node1 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node3 [label="dsCMatrix_Cholesky",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dsCMatrix_8c.html#ad9928295b1d5cef6dcbbcb046e153dc"];
+  Node1 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node4 [label="get_factor_pattern",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dsCMatrix_8c.html#fb5246986201a47e3d4fdf7554edd538"];
+}

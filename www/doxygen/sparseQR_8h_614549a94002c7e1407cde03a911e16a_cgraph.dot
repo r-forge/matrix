@@ -1,0 +1,20 @@
+digraph G
+{
+  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
+  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  rankdir=LR;
+  Node1 [label="sparseQR_coef",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 [label="cs_ipvec",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#1d7df434402e7553c34dbd59fd040159"];
+  Node1 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node3 [label="cs_usolve",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#a4cdacecec403b30b97abc7c27594b4f"];
+  Node1 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node4 [label="dup_mMatrix_as_dgeMatrix",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8c.html#574d0797f3bfb4cb555038c8d90cceb8"];
+  Node1 -> Node5 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node5 [label="sparseQR_Qmult",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$sparseQR_8c.html#d4bb283bd0128438e01523e07feb4993",tooltip="Apply Householder transformations and the row permutation P to y."];
+  Node5 -> Node6 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node6 [label="cs_happly",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#27050a31d36046e833b7763fe8ef62ce"];
+  Node5 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node5 -> Node7 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node7 [label="cs_pvec",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#d854f5cf7572128900a5acb1a7c87754"];
+}

@@ -1,0 +1,9 @@
+digraph G
+{
+  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
+  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  rankdir=LR;
+  Node1 [label="dtpMatrix_getDiag",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 [label="d_packed_getDiag",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8c.html#dd5d4be8679ecd4316a738f1d16e47e0",tooltip="Copy the diagonal elements of the packed denseMatrix x to dest."];
+}

@@ -1,0 +1,15 @@
+digraph G
+{
+  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
+  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  rankdir=LR;
+  Node1 [label="Matrix_cs_to_SEXP",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 [label="ALLOC_SLOT",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786",tooltip="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..."];
+  Node1 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node3 [label="cs_spfree",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#6d705e404a7831ccf01bc0ea064215b9"];
+  Node1 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node4 [label="is_sym",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs__utils_8c.html#0b2592041f5b822459b7052a451c07a5"];
+  Node1 -> Node5 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node5 [label="Matrix_check_class",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html#2206f293e563a99c83fa8480b7e26912",tooltip="Return the 0-based index of a string match in a vector of strings terminated by an..."];
+}

@@ -1,0 +1,11 @@
+digraph G
+{
+  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
+  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  rankdir=LR;
+  Node1 [label="dup_mMatrix_as_geMatrix",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 [label="mMatrix_as_geMatrix",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html#623039270a92fce0643031ef7f6e72b2"];
+  Node2 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node3 [label="dense_to_Csparse",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dense_8h.html#33b46f3a16a95734d4875ddfbfa079cb"];
+}

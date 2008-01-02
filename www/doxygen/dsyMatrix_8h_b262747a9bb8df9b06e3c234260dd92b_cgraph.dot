@@ -1,0 +1,13 @@
+digraph G
+{
+  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
+  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  rankdir=LR;
+  Node1 [label="dsyMatrix_rcond",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 [label="dsyMatrix_trf",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dsyMatrix_8c.html#e436ba23f7410148775ce808f08d1210"];
+  Node1 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node3 [label="get_norm_sy",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dpoMatrix_8h.html#886569af93c91d1856c961323c5d6bce"];
+  Node1 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node4 [label="rcond_type",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8c.html#dd88135be7a933f50eb4edb769355172"];
+}

@@ -1,0 +1,13 @@
+digraph G
+{
+  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
+  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  rankdir=LR;
+  Node1 [label="left_cyclic",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 [label="getGivens",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dense_8c.html#00caca24445d05daed3f05182e00c00c"];
+  Node2 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node3 [label="checkGivens",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dense_8c.html#4ada21e7b04deec43e792d2fc3b0d70e"];
+  Node2 -> Node4 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node4 [label="lapack_qr",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dense_8h.html#3a13ecdf06811d2b2ced413892145007"];
+}

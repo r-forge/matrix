@@ -1,0 +1,35 @@
+digraph G
+{
+  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
+  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  rankdir=LR;
+  Node1 [label="dgCMatrix_QR",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 [label="ALLOC_SLOT",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786",tooltip="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..."];
+  Node1 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node3 [label="cs_dropzeros",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#50c30e47141ef37dbb4b342e1b4ba924"];
+  Node1 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node4 [label="cs_free",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#78c1d1194aacc65212bb0d2b03643ac7"];
+  Node1 -> Node5 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node5 [label="cs_nfree",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#f2e6d75dfc24a842fdbce3aa510dc4bc"];
+  Node1 -> Node6 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node6 [label="cs_pinv",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#4ddf83c074fafd1120be9fbbfa4a29f9"];
+  Node1 -> Node7 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node7 [label="cs_qr",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#767dc90c22d90fe898f72c2da0d98c03"];
+  Node1 -> Node8 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node8 [label="cs_sfree",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#ce766075ef439ad6e4347f6b076eb4b7"];
+  Node1 -> Node9 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node9 [label="cs_spfree",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#6d705e404a7831ccf01bc0ea064215b9"];
+  Node1 -> Node10 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node10 [label="cs_sqr",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#31db4da8e996966094f83c7601dc08ff"];
+  Node1 -> Node11 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node11 [label="cs_transpose",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#090225477a18abe5f8d5ab26e4efaf3a"];
+  Node1 -> Node12 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node12 [label="Matrix_cs_to_SEXP",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs__utils_8c.html#e53880c709c9977b041217226c202deb",tooltip="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free..."];
+  Node12 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node12 -> Node9 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node12 -> Node13 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node13 [label="is_sym",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs__utils_8c.html#0b2592041f5b822459b7052a451c07a5"];
+  Node12 -> Node14 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node14 [label="Matrix_check_class",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html#2206f293e563a99c83fa8480b7e26912",tooltip="Return the 0-based index of a string match in a vector of strings terminated by an..."];
+}

@@ -1,0 +1,17 @@
+digraph G
+{
+  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
+  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  rankdir=LR;
+  Node1 [label="cs_usolve",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 [label="cs_lusol",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#2ecf7b79f04b1f14554e67d3522b0ad4"];
+  Node1 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node3 [label="cs_qrsol",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#f1cde25f7d702464291dd2a7e85b4770"];
+  Node1 -> Node4 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node4 [label="dgCMatrix_matrix_solve",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgCMatrix_8h.html#eae674c1f247043d2e34fe45d4239769"];
+  Node1 -> Node5 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node5 [label="dtCMatrix_matrix_solve",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dtCMatrix_8h.html#118c095d59c9a257885d3aec3aa59268"];
+  Node1 -> Node6 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node6 [label="sparseQR_coef",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$sparseQR_8h.html#614549a94002c7e1407cde03a911e16a"];
+}

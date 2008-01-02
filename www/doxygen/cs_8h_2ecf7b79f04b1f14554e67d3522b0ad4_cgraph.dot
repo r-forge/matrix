@@ -1,0 +1,25 @@
+digraph G
+{
+  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
+  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  rankdir=LR;
+  Node1 [label="cs_lusol",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 [label="cs_free",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#78c1d1194aacc65212bb0d2b03643ac7"];
+  Node1 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node3 [label="cs_ipvec",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#1d7df434402e7553c34dbd59fd040159"];
+  Node1 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node4 [label="cs_lsolve",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#dbd011bdb4d7bef9825ca1c743fc6b46"];
+  Node1 -> Node5 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node5 [label="cs_lu",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#6a35ad4816f210234a33eed09b19d181"];
+  Node1 -> Node6 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node6 [label="cs_malloc",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#4c6c75c54cbdf2f3fd4574a90c2f8a86"];
+  Node1 -> Node7 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node7 [label="cs_nfree",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#f2e6d75dfc24a842fdbce3aa510dc4bc"];
+  Node1 -> Node8 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node8 [label="cs_sfree",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#ce766075ef439ad6e4347f6b076eb4b7"];
+  Node1 -> Node9 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node9 [label="cs_sqr",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#31db4da8e996966094f83c7601dc08ff"];
+  Node1 -> Node10 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node10 [label="cs_usolve",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#a4cdacecec403b30b97abc7c27594b4f"];
+}

@@ -1,0 +1,13 @@
+digraph G
+{
+  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
+  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  rankdir=LR;
+  Node1 [label="chm_factor_to_SEXP",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 [label="dgCMatrix_cholsol",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgCMatrix_8h.html#f7d6aca940ff91850aa82c28fac47a66"];
+  Node1 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node3 [label="dsCMatrix_Cholesky",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dsCMatrix_8h.html#7b6d56ca95d1a257eb0698361ff81f20"];
+  Node1 -> Node4 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node4 [label="R_init_Matrix",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$init_8c.html#3c984b3c92aeb789d5679e2aae8b8eac"];
+}
