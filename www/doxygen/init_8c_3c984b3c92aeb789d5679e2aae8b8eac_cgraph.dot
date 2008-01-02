@@ -1,0 +1,25 @@
+digraph G
+{
+  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
+  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  rankdir=LR;
+  Node1 [label="R_init_Matrix",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 [label="as_cholmod_dense",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$chm__common_8c.html#0ed4e091a525ec3cdf847755a3c4b76a",tooltip="Populate ans with the pointers from x and modify its scalar elements accordingly..."];
+  Node1 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node3 [label="as_cholmod_factor",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$chm__common_8c.html#2e28b03190e5ba5fcb59935cc0a1ea9e",tooltip="Populate ans with the pointers from x and modify its scalar elements accordingly..."];
+  Node1 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node4 [label="as_cholmod_sparse",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$chm__common_8c.html#62ef281b168f55be5aee0cd0a83b5db5",tooltip="Populate ans with the pointers from x and modify its scalar elements accordingly..."];
+  Node1 -> Node5 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node5 [label="chm_factor_to_SEXP",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$chm__common_8c.html#b819ab14a3e30e850191896d33089b94",tooltip="Copy the contents of f to an appropriate dCHMfactor object and, optionally, free..."];
+  Node1 -> Node6 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node6 [label="chm_sparse_to_SEXP",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$chm__common_8c.html#7aa1a6e564c24a55b031b5c03b3313f4",tooltip="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free..."];
+  Node1 -> Node7 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node7 [label="chm_triplet_to_SEXP",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$chm__common_8c.html#b5d31c23691cc4a3c96a7f526dc84006",tooltip="Copy the contents of a to an appropriate TsparseMatrix object and, optionally, free..."];
+  Node1 -> Node8 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node8 [label="dpoMatrix_chol",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dpoMatrix_8c.html#a951f7c9871735266da55e7d92a6ae58"];
+  Node1 -> Node9 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node9 [label="numeric_as_chm_dense",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$chm__common_8c.html#ac8221663c2752d8a26b05dd9be28314"];
+  Node1 -> Node10 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node10 [label="R_cholmod_start",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$chm__common_8c.html#1b14bacbdeada9ba9def1db396a98215",tooltip="Initialize the CHOLMOD library and replace the print and error functions by R-specific..."];
+}

@@ -1,0 +1,9 @@
+digraph G
+{
+  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
+  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  rankdir=LR;
+  Node1 [label="R_cholmod_error",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 [label="R_cholmod_start",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$chm__common_8h.html#5b4b7e397d76f774a204afec64f2f09f",tooltip="Initialize the CHOLMOD library and replace the print and error functions by R-specific..."];
+}

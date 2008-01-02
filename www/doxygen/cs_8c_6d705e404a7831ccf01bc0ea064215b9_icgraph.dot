@@ -1,0 +1,43 @@
+digraph G
+{
+  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
+  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  rankdir=LR;
+  Node1 [label="cs_spfree",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 [label="cs_amd",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#633a0b0214f3ee86a27adf6ee6dea640"];
+  Node1 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node3 [label="cs_bfs",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#e296f1a9ad0b70efedc382fae12e028b"];
+  Node3 -> Node4 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node4 [label="cs_dmperm",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#e2efa3ed8c8a2931e584b6d39a293e38"];
+  Node1 -> Node5 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node5 [label="cs_ddone",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#312cb23797ac49cd9e99853f6bd2895f"];
+  Node1 -> Node6 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node6 [label="cs_done",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#41590e7ef8c8f3ebce8c7bbe07303c28"];
+  Node1 -> Node7 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node7 [label="cs_idone",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#9c3bd8e36cdfb832d199b580e22467c7"];
+  Node1 -> Node8 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node8 [label="cs_load",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#12eb66c4f53e51ee5e03ec0b9f24b368"];
+  Node1 -> Node9 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node9 [label="cs_ndone",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#24796e2f78414578fd2b8e7528535cbb"];
+  Node1 -> Node10 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node10 [label="cs_nfree",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#f2e6d75dfc24a842fdbce3aa510dc4bc"];
+  Node1 -> Node11 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node11 [label="cs_qrsol",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#f1cde25f7d702464291dd2a7e85b4770"];
+  Node1 -> Node12 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node12 [label="cs_schol",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#7c5aa6c4fadeba20b904a1c56b4543f5"];
+  Node1 -> Node13 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node13 [label="cs_spalloc",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#ad3a584d9185a4fe4497a36f892b9c72"];
+  Node1 -> Node14 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node14 [label="cs_sqr",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#31db4da8e996966094f83c7601dc08ff"];
+  Node1 -> Node15 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node15 [label="dgCMatrix_LU",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgCMatrix_8h.html#fbcd07ccafaa2ee0299b8d1972748a9c"];
+  Node1 -> Node16 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node16 [label="dgCMatrix_QR",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgCMatrix_8h.html#2d37aad3c93e57b6dbafbf8a337273e8"];
+  Node1 -> Node17 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node17 [label="dtCMatrix_solve",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dtCMatrix_8h.html#f330357afa35bc1adf831118c1d440ee"];
+  Node1 -> Node18 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node18 [label="Matrix_cs_to_SEXP",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs__utils_8c.html#e53880c709c9977b041217226c202deb",tooltip="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free..."];
+  Node18 -> Node15 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node18 -> Node16 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+}

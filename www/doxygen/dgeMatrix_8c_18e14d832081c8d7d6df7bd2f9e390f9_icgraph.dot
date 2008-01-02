@@ -1,0 +1,15 @@
+digraph G
+{
+  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
+  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  rankdir=LR;
+  Node1 [label="get_norm",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 [label="dgeMatrix_norm",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgeMatrix_8h.html#d6b2835d2acbc142689c1d980387c5e0"];
+  Node1 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node3 [label="dgeMatrix_rcond",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgeMatrix_8h.html#c4f1b4b19a004fb62c9cb68ccb1028ea"];
+  Node1 -> Node4 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node4 [label="dtpMatrix_norm",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dtpMatrix_8h.html#a9ed2c0dc25946f221d79fa4caf54fd6"];
+  Node1 -> Node5 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node5 [label="dtrMatrix_norm",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dtrMatrix_8h.html#e06260deeaaa22549b6c634f3add5999"];
+}

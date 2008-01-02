@@ -1,0 +1,11 @@
+<area shape="rect" href="$chm__common_8h.html#2e28b03190e5ba5fcb59935cc0a1ea9e" title="Populate ans with the pointers from x and modify its scalar elements accordingly..." alt="" coords="227,5,368,32">
+<area shape="rect" href="$chm__common_8h.html#62ef281b168f55be5aee0cd0a83b5db5" title="Populate ans with the pointers from x and modify its scalar elements accordingly..." alt="" coords="224,56,371,83">
+<area shape="rect" href="$chm__common_8h.html#22f06f28ba580965e5ee88a67a45de54" title="Populate ans with the pointers from x and modify its scalar elements accordingly..." alt="" coords="227,107,368,133">
+<area shape="rect" href="$dgCMatrix_8h.html#d3b5c3bc224c09316427f7e86e4e8a86" title="compressed_to_TMatrix" alt="" coords="211,157,384,184">
+<area shape="rect" href="$Mutils_8h.html#574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="197,208,397,235">
+<area shape="rect" href="$Mutils_8h.html#23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="201,259,393,285">
+<area shape="rect" href="$cs__utils_8c.html#957bebd2e4fc66333983ab78197aff6c" title="Create a cs object with the contents of x." alt="" coords="245,309,349,336">
+<area shape="rect" href="$cs__utils_8c.html#e53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free..." alt="" coords="225,360,369,387">
+<area shape="rect" href="$dgCMatrix_8h.html#c71c15cfb9558156fb98c0f1cad60922" title="R_to_CMatrix" alt="" coords="243,411,352,437">
+<area shape="rect" href="$dgCMatrix_8h.html#fbcd07ccafaa2ee0299b8d1972748a9c" title="dgCMatrix_LU" alt="" coords="447,335,561,361">
+<area shape="rect" href="$dgCMatrix_8h.html#2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="447,385,561,412">

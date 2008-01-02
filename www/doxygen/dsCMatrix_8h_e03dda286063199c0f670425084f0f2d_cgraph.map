@@ -1,0 +1,5 @@
+<area shape="rect" href="$chm__common_8c.html#c0552f8d5248824ec90a314b69bd1408" title="Copy the contents of a to an appropriate denseMatrix object and, optionally, free..." alt="" coords="239,5,396,32">
+<area shape="rect" href="$dsCMatrix_8c.html#ad9928295b1d5cef6dcbbcb046e153dc" title="dsCMatrix_Cholesky" alt="" coords="241,56,393,83">
+<area shape="rect" href="$dsCMatrix_8c.html#fb5246986201a47e3d4fdf7554edd538" title="get_factor_pattern" alt="" coords="247,107,388,133">
+<area shape="rect" href="$Mutils_8h.html#460951a1f5dadb579d977ba114eec12e" title="mMatrix_as_dgeMatrix" alt="" coords="233,157,401,184">
+<area shape="rect" href="$Mutils_8c.html#574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="451,157,651,184">

@@ -1,0 +1,9 @@
+<area shape="rect" href="$chm__common_8c.html#0ed4e091a525ec3cdf847755a3c4b76a" title="Populate ans with the pointers from x and modify its scalar elements accordingly..." alt="" coords="175,5,316,32">
+<area shape="rect" href="$chm__common_8c.html#2e28b03190e5ba5fcb59935cc0a1ea9e" title="Populate ans with the pointers from x and modify its scalar elements accordingly..." alt="" coords="175,56,316,83">
+<area shape="rect" href="$chm__common_8c.html#62ef281b168f55be5aee0cd0a83b5db5" title="Populate ans with the pointers from x and modify its scalar elements accordingly..." alt="" coords="172,107,319,133">
+<area shape="rect" href="$chm__common_8c.html#b819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate dCHMfactor object and, optionally, free..." alt="" coords="167,157,324,184">
+<area shape="rect" href="$chm__common_8c.html#7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free..." alt="" coords="165,208,325,235">
+<area shape="rect" href="$chm__common_8c.html#b5d31c23691cc4a3c96a7f526dc84006" title="Copy the contents of a to an appropriate TsparseMatrix object and, optionally, free..." alt="" coords="168,259,323,285">
+<area shape="rect" href="$dpoMatrix_8c.html#a951f7c9871735266da55e7d92a6ae58" title="dpoMatrix_chol" alt="" coords="187,309,304,336">
+<area shape="rect" href="$chm__common_8c.html#ac8221663c2752d8a26b05dd9be28314" title="numeric_as_chm_dense" alt="" coords="159,360,332,387">
+<area shape="rect" href="$chm__common_8c.html#1b14bacbdeada9ba9def1db396a98215" title="Initialize the CHOLMOD library and replace the print and error functions by R&#45;specific..." alt="" coords="181,411,309,437">

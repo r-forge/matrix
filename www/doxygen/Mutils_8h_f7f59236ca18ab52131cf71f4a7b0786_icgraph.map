@@ -1,0 +1,30 @@
+<area shape="rect" href="$chm__common_8h.html#c0552f8d5248824ec90a314b69bd1408" title="Copy the contents of a to an appropriate denseMatrix object and, optionally, free..." alt="" coords="180,5,337,32">
+<area shape="rect" href="$chm__common_8h.html#b819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate dCHMfactor object and, optionally, free..." alt="" coords="180,56,337,83">
+<area shape="rect" href="$chm__common_8h.html#7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free..." alt="" coords="179,107,339,133">
+<area shape="rect" href="$chm__common_8h.html#b5d31c23691cc4a3c96a7f526dc84006" title="Copy the contents of a to an appropriate TsparseMatrix object and, optionally, free..." alt="" coords="181,157,336,184">
+<area shape="rect" href="$dgCMatrix_8h.html#d3b5c3bc224c09316427f7e86e4e8a86" title="compressed_to_TMatrix" alt="" coords="172,208,345,235">
+<area shape="rect" href="$dgCMatrix_8h.html#fbcd07ccafaa2ee0299b8d1972748a9c" title="dgCMatrix_LU" alt="" coords="404,284,519,311">
+<area shape="rect" href="$dgCMatrix_8h.html#2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="404,841,519,868">
+<area shape="rect" href="$dgeMatrix_8h.html#1d6cfeb6b881161af7296a438c4bf1b3" title="dgeMatrix_crossprod" alt="" coords="181,360,336,387">
+<area shape="rect" href="$dgeMatrix_8h.html#b666ff2da2d98c91e4842dd563ac945f" title="dgeMatrix_LU" alt="" coords="203,411,315,437">
+<area shape="rect" href="$dgeMatrix_8h.html#cf21cab0cdce9d8e08d40584cbe0647c" title="dgeMatrix_matrix_mm" alt="" coords="175,461,343,488">
+<area shape="rect" href="$dpoMatrix_8h.html#a951f7c9871735266da55e7d92a6ae58" title="dpoMatrix_chol" alt="" coords="200,512,317,539">
+<area shape="rect" href="$dspMatrix_8h.html#2cab43904a971c57f55dddc031c0f897" title="dspMatrix_as_dsyMatrix" alt="" coords="171,563,347,589">
+<area shape="rect" href="$dspMatrix_8h.html#54f1c211fe36a020c613498e295f6365" title="dspMatrix_trf" alt="" coords="205,613,312,640">
+<area shape="rect" href="$dsyMatrix_8h.html#232ea460adfa12a96c5ef4a26d19862e" title="dsyMatrix_as_dspMatrix" alt="" coords="171,664,347,691">
+<area shape="rect" href="$dsyMatrix_8h.html#e436ba23f7410148775ce808f08d1210" title="dsyMatrix_trf" alt="" coords="205,715,312,741">
+<area shape="rect" href="$dtCMatrix_8h.html#118c095d59c9a257885d3aec3aa59268" title="dtCMatrix_matrix_solve" alt="" coords="171,765,347,792">
+<area shape="rect" href="$dtCMatrix_8h.html#f330357afa35bc1adf831118c1d440ee" title="dtCMatrix_solve" alt="" coords="196,816,321,843">
+<area shape="rect" href="$dtCMatrix_8h.html#9eaadf7fff6b3f5af049af6dcd72394b" title="dtCMatrix_upper_solve" alt="" coords="173,867,344,893">
+<area shape="rect" href="$dtpMatrix_8h.html#dde075ebf8bf3e96d25ce191d7a747ca" title="dtpMatrix_as_dtrMatrix" alt="" coords="173,917,344,944">
+<area shape="rect" href="$dtrMatrix_8h.html#3fe60655d1544bd661d62f1f3e86d92f" title="dtrMatrix_as_dtpMatrix" alt="" coords="173,968,344,995">
+<area shape="rect" href="$Mutils_8h.html#23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="163,1019,355,1045">
+<area shape="rect" href="$t__gCMatrix__colSums_8c.html#219a05baa8d090c70aaa52830e25a7b3" title="gCMatrix_colSums" alt="" coords="188,1069,329,1096">
+<area shape="rect" href="$ldense_8h.html#c1ba7ec4c96aad29844f8cb812e4d280" title="lspMatrix_as_lsyMatrix" alt="" coords="176,1120,341,1147">
+<area shape="rect" href="$ldense_8h.html#a29c0c324f440f575bb115543d599f86" title="lsyMatrix_as_lspMatrix" alt="" coords="176,1171,341,1197">
+<area shape="rect" href="$ldense_8h.html#e2d091c48281f6b782dd9b8fbd9d0788" title="ltpMatrix_as_ltrMatrix" alt="" coords="179,1221,339,1248">
+<area shape="rect" href="$ldense_8h.html#dec1048daf414729034a60e82ce13f83" title="ltrMatrix_as_ltpMatrix" alt="" coords="179,1272,339,1299">
+<area shape="rect" href="$factorizations_8h.html#0ec00f455c00bf1b862139fe6d4a265a" title="LU_expand" alt="" coords="212,1323,305,1349">
+<area shape="rect" href="$cs__utils_8c.html#e53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free..." alt="" coords="187,309,331,336">
+<area shape="rect" href="$Mutils_8h.html#2802c3f504e089a00a97c6c0e97bee21" title="new_dgeMatrix" alt="" coords="199,1424,319,1451">
+<area shape="rect" href="$dgCMatrix_8h.html#c71c15cfb9558156fb98c0f1cad60922" title="R_to_CMatrix" alt="" coords="204,1475,313,1501">

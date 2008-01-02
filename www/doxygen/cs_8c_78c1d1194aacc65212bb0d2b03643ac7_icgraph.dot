@@ -1,0 +1,48 @@
+digraph G
+{
+  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
+  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  rankdir=LR;
+  Node1 [label="cs_free",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 [label="cs_cholsol",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#661c215839fe06dfed360d022188abad"];
+  Node1 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node3 [label="cs_ddone",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#312cb23797ac49cd9e99853f6bd2895f"];
+  Node1 -> Node4 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node4 [label="cs_dfree",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#7c59264397d2c5cc85c87c879aedc4f5"];
+  Node1 -> Node5 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node5 [label="cs_dmperm",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#e2efa3ed8c8a2931e584b6d39a293e38"];
+  Node1 -> Node6 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node6 [label="cs_done",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#41590e7ef8c8f3ebce8c7bbe07303c28"];
+  Node1 -> Node7 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node7 [label="cs_dupl",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#83dc83954d821b748c3ba9fea1f6b5ca"];
+  Node1 -> Node8 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node8 [label="cs_idone",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#9c3bd8e36cdfb832d199b580e22467c7"];
+  Node1 -> Node9 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node9 [label="cs_lusol",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#2ecf7b79f04b1f14554e67d3522b0ad4"];
+  Node1 -> Node10 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node10 [label="cs_maxtrans",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#0404ef3688f241d15729b5c54c59a704"];
+  Node1 -> Node11 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node11 [label="cs_ndone",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#24796e2f78414578fd2b8e7528535cbb"];
+  Node1 -> Node12 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node12 [label="cs_nfree",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#f2e6d75dfc24a842fdbce3aa510dc4bc"];
+  Node1 -> Node13 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node13 [label="cs_qrsol",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#f1cde25f7d702464291dd2a7e85b4770"];
+  Node1 -> Node14 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node14 [label="cs_schol",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#7c5aa6c4fadeba20b904a1c56b4543f5"];
+  Node1 -> Node15 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node15 [label="cs_sfree",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#ce766075ef439ad6e4347f6b076eb4b7"];
+  Node1 -> Node16 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node16 [label="cs_spfree",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#6d705e404a7831ccf01bc0ea064215b9"];
+  Node1 -> Node17 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node17 [label="cs_sqr",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#31db4da8e996966094f83c7601dc08ff"];
+  Node1 -> Node18 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node18 [label="cs_updown",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#d5fa81f80009c06259a77fd7d2092f78"];
+  Node1 -> Node19 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node19 [label="cs_vcount",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#9aa3afad1ec55f96205b52d378b8000f"];
+  Node19 -> Node17 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node20 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node20 [label="dgCMatrix_LU",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgCMatrix_8h.html#fbcd07ccafaa2ee0299b8d1972748a9c"];
+  Node1 -> Node21 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node21 [label="dgCMatrix_QR",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgCMatrix_8h.html#2d37aad3c93e57b6dbafbf8a337273e8"];
+}
