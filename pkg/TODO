@@ -175,3 +175,9 @@ Check for DimNames propagation in coercion and other operations.
   and even more so for, e.g.  <sparse> %*% <dense>
   {used in Soeren's 'gR' computations},
   we should also provide a generic and methods.
+
+- qr.R(qr(x)) may differ for the "same" matrix, depending on it being
+  sparse or dense:
+    "qr.R(<sparse>) may differ from qr.R(<dense>) because of permutations"
+
+  This is not really acceptable and currently influences  rcond() as well.
