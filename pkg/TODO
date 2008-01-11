@@ -162,7 +162,7 @@ Check for DimNames propagation in coercion and other operations.
   circumstances; unfortunately it's not "smart" (preserving symmetry, ...)
   --> define a generic and methods for it!
   Names:  symPart(A) or  symMat(A) or symmetrize(A) or ... ?
-  Googling around I found that Nick Higham as a GPL contributed Matlab
+  Googling around I found that Nick Higham has a GPL contributed Matlab
   toolbox where he uses  symmpart(A) := (A + A') /. 2
   {and  skewpart(A) := (A - A') /. 2}
 

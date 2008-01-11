@@ -470,8 +470,10 @@ setMethod("norm", signature(x = "sparseMatrix", type = "character"),
 setMethod("rcond", signature(x = "sparseMatrix", type = "character"),
 	  function(x, type, ...) {
 	      d <- dim(x)
+              ## FIXME: qr.R(qr(.)) warns about differing R (permutation!)
+              ##        really fix qr.R() *or* go via dense in any cases
 	      rcond(if(d[1] == d[2]) {
-			warning("rcond(.) via  sparse -> dense	coercion")
+			warning("rcond(.) via sparse -> dense coercion")
 			as(x, "denseMatrix")
 		    } else if(d[1] > d[2]) qr.R(qr(x)) else qr.R(qr(t(x))),
 		    type = type)
