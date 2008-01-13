@@ -33,178 +33,178 @@
 <a name="l00019"></a>00019     <span class="keywordflow">return</span> (is_upper ? 1 : (is_lower ? -1 : 0)) ;
 <a name="l00020"></a>00020 }
 <a name="l00021"></a>00021 
-<a name="l00030"></a><a class="code" href="cs__utils_8c.html#957bebd2e4fc66333983ab78197aff6c">00030</a> <a class="code" href="structcs.html">cs</a> *<a class="code" href="cs__utils_8c.html#957bebd2e4fc66333983ab78197aff6c" title="Create a cs object with the contents of x.">Matrix_as_cs</a>(<a class="code" href="structcs.html">cs</a> *ans, SEXP x)
-<a name="l00031"></a>00031 {
-<a name="l00032"></a>00032     <span class="keywordtype">char</span> *valid[] = {<span class="stringliteral">"dgCMatrix"</span>, <span class="stringliteral">"dtCMatrix"</span>, <span class="stringliteral">""</span>};<span class="comment">/* had also "dsCMatrix", but that</span>
-<a name="l00033"></a>00033 <span class="comment">                                                    * only stores one triangle */</span>
-<a name="l00034"></a>00034     <span class="keywordtype">int</span> *dims, ctype = <a class="code" href="Mutils_8h.html#2206f293e563a99c83fa8480b7e26912" title="Return the 0-based index of a string match in a vector of strings terminated by an...">Matrix_check_class</a>(<a class="code" href="Mutils_8h.html#e692d23e2a86a20fccc024b05fc23df9">class_P</a>(x), valid);
-<a name="l00035"></a>00035     SEXP islot;
-<a name="l00036"></a>00036 
-<a name="l00037"></a>00037     <span class="keywordflow">if</span> (ctype &lt; 0) error(<span class="stringliteral">"invalid class of object to Matrix_as_cs"</span>);
-<a name="l00038"></a>00038                                 <span class="comment">/* dimensions and nzmax */</span>
-<a name="l00039"></a>00039     dims = INTEGER(GET_SLOT(x, <a class="code" href="Syms_8h.html#2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>));
-<a name="l00040"></a>00040     ans-&gt;<a class="code" href="structcs.html#8ccc112c8aebe5217bdcfefa878f9f48">m</a> = dims[0]; ans-&gt;<a class="code" href="structcs.html#5b4c6edbd2854f3e63d60877f1496c0e">n</a> = dims[1];
-<a name="l00041"></a>00041     islot = GET_SLOT(x, <a class="code" href="Syms_8h.html#900b6b19a8e80b529c1a26eb9fb6156d">Matrix_iSym</a>);
-<a name="l00042"></a>00042     ans-&gt;<a class="code" href="structcs.html#021f084cee227785c9db2cfe25dd295f">nz</a> = -1;               <span class="comment">/* indicates compressed column storage */</span>
-<a name="l00043"></a>00043     ans-&gt;<a class="code" href="structcs.html#a5fa808e61a8d99950652e60079c6c0e">nzmax</a> = LENGTH(islot);
-<a name="l00044"></a>00044     ans-&gt;<a class="code" href="structcs.html#a106cc84c171ffd42c60669fde1d213c">i</a> = INTEGER(islot);
-<a name="l00045"></a>00045     ans-&gt;<a class="code" href="structcs.html#f51750dc19af9117b42713148bfd2ca9">p</a> = INTEGER(GET_SLOT(x, <a class="code" href="Syms_8h.html#f08cd6c75b2da4b71c2eb605e00e94ab">Matrix_pSym</a>));
-<a name="l00046"></a>00046     ans-&gt;<a class="code" href="structcs.html#4579fe67e411fb59f8993df429f32ccc">x</a> = REAL(GET_SLOT(x, <a class="code" href="Syms_8h.html#8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a>));
-<a name="l00047"></a>00047 
-<a name="l00048"></a>00048     <span class="keywordflow">return</span> ans;
-<a name="l00049"></a>00049 }
-<a name="l00050"></a>00050 
-<a name="l00061"></a><a class="code" href="cs__utils_8c.html#e53880c709c9977b041217226c202deb">00061</a> SEXP <a class="code" href="cs__utils_8c.html#e53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free...">Matrix_cs_to_SEXP</a>(<a class="code" href="structcs.html">cs</a> *a, <span class="keywordtype">char</span> *cl, <span class="keywordtype">int</span> dofree)
-<a name="l00062"></a>00062 {
-<a name="l00063"></a>00063     SEXP ans;
-<a name="l00064"></a>00064     <span class="keywordtype">char</span> *valid[] = {<span class="stringliteral">"dgCMatrix"</span>, <span class="stringliteral">"dsCMatrix"</span>, <span class="stringliteral">"dtCMatrix"</span>, <span class="stringliteral">""</span>};
-<a name="l00065"></a>00065     <span class="keywordtype">int</span> *dims, ctype = <a class="code" href="Mutils_8h.html#2206f293e563a99c83fa8480b7e26912" title="Return the 0-based index of a string match in a vector of strings terminated by an...">Matrix_check_class</a>(cl, valid), nz;
-<a name="l00066"></a>00066 
-<a name="l00067"></a>00067     <span class="keywordflow">if</span> (ctype &lt; 0)
-<a name="l00068"></a>00068         error(<span class="stringliteral">"invalid class of object to Matrix_cs_to_SEXP"</span>);
-<a name="l00069"></a>00069     ans = PROTECT(NEW_OBJECT(MAKE_CLASS(cl)));
-<a name="l00070"></a>00070                                 <span class="comment">/* allocate and copy common slots */</span>
-<a name="l00071"></a>00071     dims = INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, <a class="code" href="Syms_8h.html#2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>, INTSXP, 2));
-<a name="l00072"></a>00072     dims[0] = a-&gt;<a class="code" href="structcs.html#8ccc112c8aebe5217bdcfefa878f9f48">m</a>; dims[1] = a-&gt;<a class="code" href="structcs.html#5b4c6edbd2854f3e63d60877f1496c0e">n</a>;
-<a name="l00073"></a>00073     Memcpy(INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, <a class="code" href="Syms_8h.html#f08cd6c75b2da4b71c2eb605e00e94ab">Matrix_pSym</a>, INTSXP, a-&gt;<a class="code" href="structcs.html#5b4c6edbd2854f3e63d60877f1496c0e">n</a> + 1)),
-<a name="l00074"></a>00074            a-&gt;<a class="code" href="structcs.html#f51750dc19af9117b42713148bfd2ca9">p</a>, a-&gt;<a class="code" href="structcs.html#5b4c6edbd2854f3e63d60877f1496c0e">n</a> + 1);
-<a name="l00075"></a>00075     nz = a-&gt;<a class="code" href="structcs.html#f51750dc19af9117b42713148bfd2ca9">p</a>[a-&gt;<a class="code" href="structcs.html#5b4c6edbd2854f3e63d60877f1496c0e">n</a>];
-<a name="l00076"></a>00076     Memcpy(INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, <a class="code" href="Syms_8h.html#900b6b19a8e80b529c1a26eb9fb6156d">Matrix_iSym</a>, INTSXP, nz)), a-&gt;<a class="code" href="structcs.html#a106cc84c171ffd42c60669fde1d213c">i</a>, nz);
-<a name="l00077"></a>00077     Memcpy(REAL(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, <a class="code" href="Syms_8h.html#8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a>, REALSXP, nz)), a-&gt;<a class="code" href="structcs.html#4579fe67e411fb59f8993df429f32ccc">x</a>, nz);
-<a name="l00078"></a>00078     <span class="keywordflow">if</span> (ctype &gt; 0) {
-<a name="l00079"></a>00079         <span class="keywordtype">int</span> uplo = <a class="code" href="cs__utils_8c.html#0b2592041f5b822459b7052a451c07a5">is_sym</a>(a);
-<a name="l00080"></a>00080         <span class="keywordflow">if</span> (!uplo) error(<span class="stringliteral">"cs matrix not compatible with class"</span>);
-<a name="l00081"></a>00081         SET_SLOT(ans, <a class="code" href="Syms_8h.html#aaa2d2105381747118da72d6f1aba4e9">Matrix_diagSym</a>, mkString(<span class="stringliteral">"N"</span>));
-<a name="l00082"></a>00082         SET_SLOT(ans, <a class="code" href="Syms_8h.html#c4fa9962123be6abbeaf9c7219b62644">Matrix_uploSym</a>, mkString(uplo &lt; 0 ? <span class="stringliteral">"L"</span> : <span class="stringliteral">"U"</span>));
-<a name="l00083"></a>00083     }
-<a name="l00084"></a>00084     <span class="keywordflow">if</span> (dofree &gt; 0) <a class="code" href="cs_8c.html#6d705e404a7831ccf01bc0ea064215b9">cs_spfree</a>(a);
-<a name="l00085"></a>00085     <span class="keywordflow">if</span> (dofree &lt; 0) Free(a);
-<a name="l00086"></a>00086     UNPROTECT(1);
-<a name="l00087"></a>00087     <span class="keywordflow">return</span> ans;
-<a name="l00088"></a>00088 }
-<a name="l00089"></a>00089 
-<a name="l00090"></a>00090 <span class="preprocessor">#if 0                           </span><span class="comment">/* unused */</span>
-<a name="l00091"></a>00091 
-<a name="l00100"></a>00100 <a class="code" href="structcss.html">css</a> *Matrix_as_css(<a class="code" href="structcss.html">css</a> *ans, SEXP x)
-<a name="l00101"></a>00101 {
-<a name="l00102"></a>00102     <span class="keywordtype">char</span> *cl = <a class="code" href="Mutils_8h.html#e692d23e2a86a20fccc024b05fc23df9">class_P</a>(x);
-<a name="l00103"></a>00103         *valid[] = {<span class="stringliteral">"css_LU"</span>, <span class="stringliteral">"css_QR"</span>, <span class="stringliteral">""</span>};
-<a name="l00104"></a>00104     <span class="keywordtype">int</span> *nz = INTEGER(GET_SLOT(x, install(<span class="stringliteral">"nz"</span>))),
-<a name="l00105"></a>00105         ctype = <a class="code" href="Mutils_8h.html#2206f293e563a99c83fa8480b7e26912" title="Return the 0-based index of a string match in a vector of strings terminated by an...">Matrix_check_class</a>(cl, valid);
-<a name="l00106"></a>00106 
-<a name="l00107"></a>00107     <span class="keywordflow">if</span> (ctype &lt; 0) error(<span class="stringliteral">"invalid class of object to Matrix_as_css"</span>);
-<a name="l00108"></a>00108     ans-&gt;<a class="code" href="structcss.html#6dc664f0723f4b708a5ac5d09ddf66f5">q</a> = INTEGER(GET_SLOT(x, install(<span class="stringliteral">"Q"</span>)));
-<a name="l00109"></a>00109     ans-&gt;<a class="code" href="structcss.html#cd57e5b6973554914b89e7d6c55f4dd2">m2</a> = nz[0]; ans-&gt;<a class="code" href="structcss.html#8df432673a2114a47522fe905a1b6172">lnz</a> = nz[1]; ans-&gt;<a class="code" href="structcss.html#6db5576fbbe08c451f9ff9d214ea9aaf">unz</a> = nz[2];
-<a name="l00110"></a>00110     <span class="keywordflow">switch</span>(ctype) {
-<a name="l00111"></a>00111     <span class="keywordflow">case</span> 0:                     <span class="comment">/* css_LU */</span>
-<a name="l00112"></a>00112         ans-&gt;<a class="code" href="structcss.html#402c8b6fcf38049109edb782f8d84c7f">pinv</a> = (<span class="keywordtype">int</span> *) NULL;
-<a name="l00113"></a>00113         ans-&gt;<a class="code" href="structcss.html#d2eff0202fbca658bdd42023621ea8c3">parent</a> = (<span class="keywordtype">int</span> *) NULL;
-<a name="l00114"></a>00114         ans-&gt;<a class="code" href="structcss.html#9059b547afcb913f9f9d90e9e2744cbc">cp</a> = (<span class="keywordtype">int</span> *) NULL;
-<a name="l00115"></a>00115         <span class="keywordflow">break</span>;
-<a name="l00116"></a>00116     <span class="keywordflow">case</span> 1:                     <span class="comment">/* css_QR */</span>
-<a name="l00117"></a>00117         ans-&gt;<a class="code" href="structcss.html#402c8b6fcf38049109edb782f8d84c7f">pinv</a> = INTEGER(GET_SLOT(x, install(<span class="stringliteral">"Pinv"</span>)));
-<a name="l00118"></a>00118         ans-&gt;<a class="code" href="structcss.html#d2eff0202fbca658bdd42023621ea8c3">parent</a> = INTEGER(GET_SLOT(x, install(<span class="stringliteral">"parent"</span>)));
-<a name="l00119"></a>00119         ans-&gt;<a class="code" href="structcss.html#9059b547afcb913f9f9d90e9e2744cbc">cp</a> = INTEGER(GET_SLOT(x, install(<span class="stringliteral">"cp"</span>)));
-<a name="l00120"></a>00120         <span class="keywordflow">break</span>;
-<a name="l00121"></a>00121     <span class="keywordflow">default</span>:
-<a name="l00122"></a>00122         error(<span class="stringliteral">"invalid class of object to Matrix_as_css"</span>);
-<a name="l00123"></a>00123     }
-<a name="l00124"></a>00124     <span class="keywordflow">return</span> ans;
-<a name="l00125"></a>00125 }
-<a name="l00126"></a>00126 
-<a name="l00136"></a>00136 <a class="code" href="structcsn.html">csn</a> *Matrix_as_csn(<a class="code" href="structcsn.html">csn</a> *ans, SEXP x)
-<a name="l00137"></a>00137 {
-<a name="l00138"></a>00138     <span class="keywordtype">char</span> *valid[] = {<span class="stringliteral">"csn_LU"</span>, <span class="stringliteral">"csn_QR"</span>, <span class="stringliteral">""</span>};
-<a name="l00139"></a>00139     <span class="keywordtype">int</span> ctype = <a class="code" href="Mutils_8h.html#2206f293e563a99c83fa8480b7e26912" title="Return the 0-based index of a string match in a vector of strings terminated by an...">Matrix_check_class</a>(<a class="code" href="Mutils_8h.html#e692d23e2a86a20fccc024b05fc23df9">class_P</a>(x), valid);
-<a name="l00140"></a>00140 
-<a name="l00141"></a>00141     <span class="keywordflow">if</span> (ctype &lt; 0) error(<span class="stringliteral">"invalid class of object to Matrix_as_csn"</span>);
-<a name="l00142"></a>00142     ans-&gt;<a class="code" href="structcsn.html#508aa83b1b813b60cd50a79269ad334a">U</a> = <a class="code" href="cs__utils_8c.html#957bebd2e4fc66333983ab78197aff6c" title="Create a cs object with the contents of x.">Matrix_as_cs</a>(GET_SLOT(x, install(<span class="stringliteral">"U"</span>)));
-<a name="l00143"></a>00143     ans-&gt;<a class="code" href="structcsn.html#54a5eee4c97a81e9146d583f0395fa57">L</a> = <a class="code" href="cs__utils_8c.html#957bebd2e4fc66333983ab78197aff6c" title="Create a cs object with the contents of x.">Matrix_as_cs</a>(GET_SLOT(x, install(<span class="stringliteral">"L"</span>)));
-<a name="l00144"></a>00144     <span class="keywordflow">switch</span>(ctype) {
-<a name="l00145"></a>00145     <span class="keywordflow">case</span> 0:
-<a name="l00146"></a>00146         ans-&gt;<a class="code" href="structcsn.html#196ee09d34e7fbec6f9114d07cd79210">B</a> = (<span class="keywordtype">double</span>*) NULL;
-<a name="l00147"></a>00147         ans-&gt;<a class="code" href="structcsn.html#2cfead92d2cdbfb7c4f667d3b63a012d">pinv</a> = INTEGER(GET_SLOT(x, install(<span class="stringliteral">"Pinv"</span>)));
-<a name="l00148"></a>00148         <span class="keywordflow">break</span>;
-<a name="l00149"></a>00149     <span class="keywordflow">case</span> 1:
-<a name="l00150"></a>00150         ans-&gt;<a class="code" href="structcsn.html#196ee09d34e7fbec6f9114d07cd79210">B</a> = REAL(GET_SLOT(x, install(<span class="stringliteral">"beta"</span>)));
-<a name="l00151"></a>00151         ans-&gt;<a class="code" href="structcsn.html#2cfead92d2cdbfb7c4f667d3b63a012d">pinv</a> = (<span class="keywordtype">int</span>*) NULL;
+<a name="l00034"></a><a class="code" href="cs__utils_8c.html#957bebd2e4fc66333983ab78197aff6c">00034</a> <a class="code" href="structcs.html">cs</a> *<a class="code" href="cs__utils_8c.html#957bebd2e4fc66333983ab78197aff6c" title="Create a cs object with the contents of x.">Matrix_as_cs</a>(<a class="code" href="structcs.html">cs</a> *ans, SEXP x)
+<a name="l00035"></a>00035 {
+<a name="l00036"></a>00036     <span class="keywordtype">char</span> *valid[] = {<span class="stringliteral">"dgCMatrix"</span>, <span class="stringliteral">"dtCMatrix"</span>, <span class="stringliteral">""</span>};<span class="comment">/* had also "dsCMatrix", but that</span>
+<a name="l00037"></a>00037 <span class="comment">                                                    * only stores one triangle */</span>
+<a name="l00038"></a>00038     <span class="keywordtype">int</span> *dims, ctype = <a class="code" href="Mutils_8h.html#2206f293e563a99c83fa8480b7e26912" title="Return the 0-based index of a string match in a vector of strings terminated by an...">Matrix_check_class</a>(<a class="code" href="Mutils_8h.html#e692d23e2a86a20fccc024b05fc23df9">class_P</a>(x), valid);
+<a name="l00039"></a>00039     SEXP islot;
+<a name="l00040"></a>00040 
+<a name="l00041"></a>00041     <span class="keywordflow">if</span> (ctype &lt; 0) error(<span class="stringliteral">"invalid class of object to Matrix_as_cs"</span>);
+<a name="l00042"></a>00042                                 <span class="comment">/* dimensions and nzmax */</span>
+<a name="l00043"></a>00043     dims = INTEGER(GET_SLOT(x, <a class="code" href="Syms_8h.html#2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>));
+<a name="l00044"></a>00044     ans-&gt;<a class="code" href="structcs.html#8ccc112c8aebe5217bdcfefa878f9f48">m</a> = dims[0]; ans-&gt;<a class="code" href="structcs.html#5b4c6edbd2854f3e63d60877f1496c0e">n</a> = dims[1];
+<a name="l00045"></a>00045     islot = GET_SLOT(x, <a class="code" href="Syms_8h.html#900b6b19a8e80b529c1a26eb9fb6156d">Matrix_iSym</a>);
+<a name="l00046"></a>00046     ans-&gt;<a class="code" href="structcs.html#021f084cee227785c9db2cfe25dd295f">nz</a> = -1;               <span class="comment">/* indicates compressed column storage */</span>
+<a name="l00047"></a>00047     ans-&gt;<a class="code" href="structcs.html#a5fa808e61a8d99950652e60079c6c0e">nzmax</a> = LENGTH(islot);
+<a name="l00048"></a>00048     ans-&gt;<a class="code" href="structcs.html#a106cc84c171ffd42c60669fde1d213c">i</a> = INTEGER(islot);
+<a name="l00049"></a>00049     ans-&gt;<a class="code" href="structcs.html#f51750dc19af9117b42713148bfd2ca9">p</a> = INTEGER(GET_SLOT(x, <a class="code" href="Syms_8h.html#f08cd6c75b2da4b71c2eb605e00e94ab">Matrix_pSym</a>));
+<a name="l00050"></a>00050     ans-&gt;<a class="code" href="structcs.html#4579fe67e411fb59f8993df429f32ccc">x</a> = REAL(GET_SLOT(x, <a class="code" href="Syms_8h.html#8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a>));
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052     <span class="keywordflow">return</span> ans;
+<a name="l00053"></a>00053 }
+<a name="l00054"></a>00054 
+<a name="l00065"></a><a class="code" href="cs__utils_8c.html#e53880c709c9977b041217226c202deb">00065</a> SEXP <a class="code" href="cs__utils_8c.html#e53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free...">Matrix_cs_to_SEXP</a>(<a class="code" href="structcs.html">cs</a> *a, <span class="keywordtype">char</span> *cl, <span class="keywordtype">int</span> dofree)
+<a name="l00066"></a>00066 {
+<a name="l00067"></a>00067     SEXP ans;
+<a name="l00068"></a>00068     <span class="keywordtype">char</span> *valid[] = {<span class="stringliteral">"dgCMatrix"</span>, <span class="stringliteral">"dsCMatrix"</span>, <span class="stringliteral">"dtCMatrix"</span>, <span class="stringliteral">""</span>};
+<a name="l00069"></a>00069     <span class="keywordtype">int</span> *dims, ctype = <a class="code" href="Mutils_8h.html#2206f293e563a99c83fa8480b7e26912" title="Return the 0-based index of a string match in a vector of strings terminated by an...">Matrix_check_class</a>(cl, valid), nz;
+<a name="l00070"></a>00070 
+<a name="l00071"></a>00071     <span class="keywordflow">if</span> (ctype &lt; 0)
+<a name="l00072"></a>00072         error(<span class="stringliteral">"invalid class of object to Matrix_cs_to_SEXP"</span>);
+<a name="l00073"></a>00073     ans = PROTECT(NEW_OBJECT(MAKE_CLASS(cl)));
+<a name="l00074"></a>00074                                 <span class="comment">/* allocate and copy common slots */</span>
+<a name="l00075"></a>00075     dims = INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, <a class="code" href="Syms_8h.html#2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>, INTSXP, 2));
+<a name="l00076"></a>00076     dims[0] = a-&gt;<a class="code" href="structcs.html#8ccc112c8aebe5217bdcfefa878f9f48">m</a>; dims[1] = a-&gt;<a class="code" href="structcs.html#5b4c6edbd2854f3e63d60877f1496c0e">n</a>;
+<a name="l00077"></a>00077     Memcpy(INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, <a class="code" href="Syms_8h.html#f08cd6c75b2da4b71c2eb605e00e94ab">Matrix_pSym</a>, INTSXP, a-&gt;<a class="code" href="structcs.html#5b4c6edbd2854f3e63d60877f1496c0e">n</a> + 1)),
+<a name="l00078"></a>00078            a-&gt;<a class="code" href="structcs.html#f51750dc19af9117b42713148bfd2ca9">p</a>, a-&gt;<a class="code" href="structcs.html#5b4c6edbd2854f3e63d60877f1496c0e">n</a> + 1);
+<a name="l00079"></a>00079     nz = a-&gt;<a class="code" href="structcs.html#f51750dc19af9117b42713148bfd2ca9">p</a>[a-&gt;<a class="code" href="structcs.html#5b4c6edbd2854f3e63d60877f1496c0e">n</a>];
+<a name="l00080"></a>00080     Memcpy(INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, <a class="code" href="Syms_8h.html#900b6b19a8e80b529c1a26eb9fb6156d">Matrix_iSym</a>, INTSXP, nz)), a-&gt;<a class="code" href="structcs.html#a106cc84c171ffd42c60669fde1d213c">i</a>, nz);
+<a name="l00081"></a>00081     Memcpy(REAL(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, <a class="code" href="Syms_8h.html#8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a>, REALSXP, nz)), a-&gt;<a class="code" href="structcs.html#4579fe67e411fb59f8993df429f32ccc">x</a>, nz);
+<a name="l00082"></a>00082     <span class="keywordflow">if</span> (ctype &gt; 0) {
+<a name="l00083"></a>00083         <span class="keywordtype">int</span> uplo = <a class="code" href="cs__utils_8c.html#0b2592041f5b822459b7052a451c07a5">is_sym</a>(a);
+<a name="l00084"></a>00084         <span class="keywordflow">if</span> (!uplo) error(<span class="stringliteral">"cs matrix not compatible with class"</span>);
+<a name="l00085"></a>00085         SET_SLOT(ans, <a class="code" href="Syms_8h.html#aaa2d2105381747118da72d6f1aba4e9">Matrix_diagSym</a>, mkString(<span class="stringliteral">"N"</span>));
+<a name="l00086"></a>00086         SET_SLOT(ans, <a class="code" href="Syms_8h.html#c4fa9962123be6abbeaf9c7219b62644">Matrix_uploSym</a>, mkString(uplo &lt; 0 ? <span class="stringliteral">"L"</span> : <span class="stringliteral">"U"</span>));
+<a name="l00087"></a>00087     }
+<a name="l00088"></a>00088     <span class="keywordflow">if</span> (dofree &gt; 0) <a class="code" href="cs_8c.html#6d705e404a7831ccf01bc0ea064215b9">cs_spfree</a>(a);
+<a name="l00089"></a>00089     <span class="keywordflow">if</span> (dofree &lt; 0) Free(a);
+<a name="l00090"></a>00090     UNPROTECT(1);
+<a name="l00091"></a>00091     <span class="keywordflow">return</span> ans;
+<a name="l00092"></a>00092 }
+<a name="l00093"></a>00093 
+<a name="l00094"></a>00094 <span class="preprocessor">#if 0                           </span><span class="comment">/* unused */</span>
+<a name="l00095"></a>00095 
+<a name="l00104"></a>00104 <a class="code" href="structcss.html">css</a> *Matrix_as_css(<a class="code" href="structcss.html">css</a> *ans, SEXP x)
+<a name="l00105"></a>00105 {
+<a name="l00106"></a>00106     <span class="keywordtype">char</span> *cl = <a class="code" href="Mutils_8h.html#e692d23e2a86a20fccc024b05fc23df9">class_P</a>(x);
+<a name="l00107"></a>00107         *valid[] = {<span class="stringliteral">"css_LU"</span>, <span class="stringliteral">"css_QR"</span>, <span class="stringliteral">""</span>};
+<a name="l00108"></a>00108     <span class="keywordtype">int</span> *nz = INTEGER(GET_SLOT(x, install(<span class="stringliteral">"nz"</span>))),
+<a name="l00109"></a>00109         ctype = <a class="code" href="Mutils_8h.html#2206f293e563a99c83fa8480b7e26912" title="Return the 0-based index of a string match in a vector of strings terminated by an...">Matrix_check_class</a>(cl, valid);
+<a name="l00110"></a>00110 
+<a name="l00111"></a>00111     <span class="keywordflow">if</span> (ctype &lt; 0) error(<span class="stringliteral">"invalid class of object to Matrix_as_css"</span>);
+<a name="l00112"></a>00112     ans-&gt;<a class="code" href="structcss.html#6dc664f0723f4b708a5ac5d09ddf66f5">q</a> = INTEGER(GET_SLOT(x, install(<span class="stringliteral">"Q"</span>)));
+<a name="l00113"></a>00113     ans-&gt;<a class="code" href="structcss.html#cd57e5b6973554914b89e7d6c55f4dd2">m2</a> = nz[0]; ans-&gt;<a class="code" href="structcss.html#8df432673a2114a47522fe905a1b6172">lnz</a> = nz[1]; ans-&gt;<a class="code" href="structcss.html#6db5576fbbe08c451f9ff9d214ea9aaf">unz</a> = nz[2];
+<a name="l00114"></a>00114     <span class="keywordflow">switch</span>(ctype) {
+<a name="l00115"></a>00115     <span class="keywordflow">case</span> 0:                     <span class="comment">/* css_LU */</span>
+<a name="l00116"></a>00116         ans-&gt;<a class="code" href="structcss.html#402c8b6fcf38049109edb782f8d84c7f">pinv</a> = (<span class="keywordtype">int</span> *) NULL;
+<a name="l00117"></a>00117         ans-&gt;<a class="code" href="structcss.html#d2eff0202fbca658bdd42023621ea8c3">parent</a> = (<span class="keywordtype">int</span> *) NULL;
+<a name="l00118"></a>00118         ans-&gt;<a class="code" href="structcss.html#9059b547afcb913f9f9d90e9e2744cbc">cp</a> = (<span class="keywordtype">int</span> *) NULL;
+<a name="l00119"></a>00119         <span class="keywordflow">break</span>;
+<a name="l00120"></a>00120     <span class="keywordflow">case</span> 1:                     <span class="comment">/* css_QR */</span>
+<a name="l00121"></a>00121         ans-&gt;<a class="code" href="structcss.html#402c8b6fcf38049109edb782f8d84c7f">pinv</a> = INTEGER(GET_SLOT(x, install(<span class="stringliteral">"Pinv"</span>)));
+<a name="l00122"></a>00122         ans-&gt;<a class="code" href="structcss.html#d2eff0202fbca658bdd42023621ea8c3">parent</a> = INTEGER(GET_SLOT(x, install(<span class="stringliteral">"parent"</span>)));
+<a name="l00123"></a>00123         ans-&gt;<a class="code" href="structcss.html#9059b547afcb913f9f9d90e9e2744cbc">cp</a> = INTEGER(GET_SLOT(x, install(<span class="stringliteral">"cp"</span>)));
+<a name="l00124"></a>00124         <span class="keywordflow">break</span>;
+<a name="l00125"></a>00125     <span class="keywordflow">default</span>:
+<a name="l00126"></a>00126         error(<span class="stringliteral">"invalid class of object to Matrix_as_css"</span>);
+<a name="l00127"></a>00127     }
+<a name="l00128"></a>00128     <span class="keywordflow">return</span> ans;
+<a name="l00129"></a>00129 }
+<a name="l00130"></a>00130 
+<a name="l00140"></a>00140 <a class="code" href="structcsn.html">csn</a> *Matrix_as_csn(<a class="code" href="structcsn.html">csn</a> *ans, SEXP x)
+<a name="l00141"></a>00141 {
+<a name="l00142"></a>00142     <span class="keywordtype">char</span> *valid[] = {<span class="stringliteral">"csn_LU"</span>, <span class="stringliteral">"csn_QR"</span>, <span class="stringliteral">""</span>};
+<a name="l00143"></a>00143     <span class="keywordtype">int</span> ctype = <a class="code" href="Mutils_8h.html#2206f293e563a99c83fa8480b7e26912" title="Return the 0-based index of a string match in a vector of strings terminated by an...">Matrix_check_class</a>(<a class="code" href="Mutils_8h.html#e692d23e2a86a20fccc024b05fc23df9">class_P</a>(x), valid);
+<a name="l00144"></a>00144 
+<a name="l00145"></a>00145     <span class="keywordflow">if</span> (ctype &lt; 0) error(<span class="stringliteral">"invalid class of object to Matrix_as_csn"</span>);
+<a name="l00146"></a>00146     ans-&gt;<a class="code" href="structcsn.html#508aa83b1b813b60cd50a79269ad334a">U</a> = <a class="code" href="cs__utils_8c.html#957bebd2e4fc66333983ab78197aff6c" title="Create a cs object with the contents of x.">Matrix_as_cs</a>(GET_SLOT(x, install(<span class="stringliteral">"U"</span>)));
+<a name="l00147"></a>00147     ans-&gt;<a class="code" href="structcsn.html#54a5eee4c97a81e9146d583f0395fa57">L</a> = <a class="code" href="cs__utils_8c.html#957bebd2e4fc66333983ab78197aff6c" title="Create a cs object with the contents of x.">Matrix_as_cs</a>(GET_SLOT(x, install(<span class="stringliteral">"L"</span>)));
+<a name="l00148"></a>00148     <span class="keywordflow">switch</span>(ctype) {
+<a name="l00149"></a>00149     <span class="keywordflow">case</span> 0:
+<a name="l00150"></a>00150         ans-&gt;<a class="code" href="structcsn.html#196ee09d34e7fbec6f9114d07cd79210">B</a> = (<span class="keywordtype">double</span>*) NULL;
+<a name="l00151"></a>00151         ans-&gt;<a class="code" href="structcsn.html#2cfead92d2cdbfb7c4f667d3b63a012d">pinv</a> = INTEGER(GET_SLOT(x, install(<span class="stringliteral">"Pinv"</span>)));
 <a name="l00152"></a>00152         <span class="keywordflow">break</span>;
-<a name="l00153"></a>00153     <span class="keywordflow">default</span>:
-<a name="l00154"></a>00154         error(<span class="stringliteral">"invalid class of object to Matrix_as_csn"</span>);
-<a name="l00155"></a>00155     }
-<a name="l00156"></a>00156     <span class="keywordflow">return</span> ans;
-<a name="l00157"></a>00157 }
-<a name="l00158"></a>00158 
-<a name="l00171"></a>00171 SEXP Matrix_css_to_SEXP(<a class="code" href="structcss.html">css</a> *S, <span class="keywordtype">char</span> *cl, <span class="keywordtype">int</span> dofree, <span class="keywordtype">int</span> m, <span class="keywordtype">int</span> n)
-<a name="l00172"></a>00172 {
-<a name="l00173"></a>00173     SEXP ans;
-<a name="l00174"></a>00174     <span class="keywordtype">char</span> *valid[] = {<span class="stringliteral">"css_LU"</span>, <span class="stringliteral">"css_QR"</span>, <span class="stringliteral">""</span>};
-<a name="l00175"></a>00175     <span class="keywordtype">int</span> *nz, ctype = <a class="code" href="Mutils_8h.html#2206f293e563a99c83fa8480b7e26912" title="Return the 0-based index of a string match in a vector of strings terminated by an...">Matrix_check_class</a>(cl, valid);
-<a name="l00176"></a>00176 
-<a name="l00177"></a>00177     <span class="keywordflow">if</span> (ctype &lt; 0)
-<a name="l00178"></a>00178         error(<span class="stringliteral">"Inappropriate class '%s' for Matrix_css_to_SEXP"</span>, cl);
-<a name="l00179"></a>00179     ans = PROTECT(NEW_OBJECT(MAKE_CLASS(cl)));
-<a name="l00180"></a>00180                                 <span class="comment">/* allocate and copy common slots */</span>
-<a name="l00181"></a>00181     Memcpy(INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, install(<span class="stringliteral">"Q"</span>), INTSXP, n)), S-&gt;<a class="code" href="structcss.html#6dc664f0723f4b708a5ac5d09ddf66f5">q</a>, n);
-<a name="l00182"></a>00182     nz = INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, install(<span class="stringliteral">"nz"</span>), INTSXP, 3));
-<a name="l00183"></a>00183     nz[0] = S-&gt;<a class="code" href="structcss.html#cd57e5b6973554914b89e7d6c55f4dd2">m2</a>; nz[1] = S-&gt;<a class="code" href="structcss.html#8df432673a2114a47522fe905a1b6172">lnz</a>; nz[2] = S-&gt;<a class="code" href="structcss.html#6db5576fbbe08c451f9ff9d214ea9aaf">unz</a>;
-<a name="l00184"></a>00184     <span class="keywordflow">switch</span>(ctype) {
-<a name="l00185"></a>00185     <span class="keywordflow">case</span> 0:
-<a name="l00186"></a>00186         <span class="keywordflow">break</span>;
-<a name="l00187"></a>00187     <span class="keywordflow">case</span> 1:
-<a name="l00188"></a>00188         Memcpy(INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, install(<span class="stringliteral">"Pinv"</span>), INTSXP, m)),
-<a name="l00189"></a>00189                S-&gt;<a class="code" href="structcss.html#402c8b6fcf38049109edb782f8d84c7f">pinv</a>, m);
-<a name="l00190"></a>00190         Memcpy(INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, install(<span class="stringliteral">"parent"</span>), INTSXP, n)),
-<a name="l00191"></a>00191                S-&gt;<a class="code" href="structcss.html#d2eff0202fbca658bdd42023621ea8c3">parent</a>, n);
-<a name="l00192"></a>00192         Memcpy(INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, install(<span class="stringliteral">"cp"</span>), INTSXP, n)),
-<a name="l00193"></a>00193                S-&gt;<a class="code" href="structcss.html#9059b547afcb913f9f9d90e9e2744cbc">cp</a>, n);
-<a name="l00194"></a>00194         <span class="keywordflow">break</span>;
-<a name="l00195"></a>00195     <span class="keywordflow">default</span>:
-<a name="l00196"></a>00196         error(<span class="stringliteral">"Inappropriate class '%s' for Matrix_css_to_SEXP"</span>, cl);
-<a name="l00197"></a>00197     }
-<a name="l00198"></a>00198     <span class="keywordflow">if</span> (dofree &gt; 0) <a class="code" href="cs_8c.html#ce766075ef439ad6e4347f6b076eb4b7">cs_sfree</a>(S);
-<a name="l00199"></a>00199     <span class="keywordflow">if</span> (dofree &lt; 0) Free(S);
-<a name="l00200"></a>00200     UNPROTECT(1);
-<a name="l00201"></a>00201     <span class="keywordflow">return</span> ans;
-<a name="l00202"></a>00202 }
-<a name="l00203"></a>00203 
-<a name="l00214"></a>00214 SEXP Matrix_csn_to_SEXP(<a class="code" href="structcsn.html">csn</a> *N, <span class="keywordtype">char</span> *cl, <span class="keywordtype">int</span> dofree)
-<a name="l00215"></a>00215 {
-<a name="l00216"></a>00216     SEXP ans;
-<a name="l00217"></a>00217     <span class="keywordtype">char</span> *valid[] = {<span class="stringliteral">"csn_LU"</span>, <span class="stringliteral">"csn_QR"</span>, <span class="stringliteral">""</span>};
-<a name="l00218"></a>00218     <span class="keywordtype">int</span> ctype = <a class="code" href="Mutils_8h.html#2206f293e563a99c83fa8480b7e26912" title="Return the 0-based index of a string match in a vector of strings terminated by an...">Matrix_check_class</a>(cl, valid), n = (N-&gt;<a class="code" href="structcsn.html#508aa83b1b813b60cd50a79269ad334a">U</a>)-&gt;n;
-<a name="l00219"></a>00219 
-<a name="l00220"></a>00220     <span class="keywordflow">if</span> (ctype &lt; 0)
-<a name="l00221"></a>00221         error(<span class="stringliteral">"Inappropriate class '%s' for Matrix_csn_to_SEXP"</span>, cl);
-<a name="l00222"></a>00222     ans = PROTECT(NEW_OBJECT(MAKE_CLASS(cl)));
-<a name="l00223"></a>00223                                 <span class="comment">/* allocate and copy common slots */</span>
-<a name="l00224"></a>00224     <span class="comment">/* FIXME: Use the triangular matrix classes for csn_LU */</span>
-<a name="l00225"></a>00225     SET_SLOT(ans, install(<span class="stringliteral">"L"</span>), <span class="comment">/* these are free'd later if requested */</span>
-<a name="l00226"></a>00226              <a class="code" href="cs__utils_8c.html#e53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free...">Matrix_cs_to_SEXP</a>(N-&gt;<a class="code" href="structcsn.html#54a5eee4c97a81e9146d583f0395fa57">L</a>, <span class="stringliteral">"dgCMatrix"</span>, 0));
-<a name="l00227"></a>00227     SET_SLOT(ans, install(<span class="stringliteral">"U"</span>),
-<a name="l00228"></a>00228              <a class="code" href="cs__utils_8c.html#e53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free...">Matrix_cs_to_SEXP</a>(N-&gt;<a class="code" href="structcsn.html#508aa83b1b813b60cd50a79269ad334a">U</a>, <span class="stringliteral">"dgCMatrix"</span>, 0));
-<a name="l00229"></a>00229     <span class="keywordflow">switch</span>(ctype) {
-<a name="l00230"></a>00230     <span class="keywordflow">case</span> 0:
-<a name="l00231"></a>00231         Memcpy(INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, install(<span class="stringliteral">"Pinv"</span>), INTSXP, n)),
-<a name="l00232"></a>00232                N-&gt;<a class="code" href="structcsn.html#2cfead92d2cdbfb7c4f667d3b63a012d">pinv</a>, n);
-<a name="l00233"></a>00233         <span class="keywordflow">break</span>;
-<a name="l00234"></a>00234     <span class="keywordflow">case</span> 1:
-<a name="l00235"></a>00235         Memcpy(REAL(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, install(<span class="stringliteral">"beta"</span>), REALSXP, n)),
-<a name="l00236"></a>00236                N-&gt;<a class="code" href="structcsn.html#196ee09d34e7fbec6f9114d07cd79210">B</a>, n);
+<a name="l00153"></a>00153     <span class="keywordflow">case</span> 1:
+<a name="l00154"></a>00154         ans-&gt;<a class="code" href="structcsn.html#196ee09d34e7fbec6f9114d07cd79210">B</a> = REAL(GET_SLOT(x, install(<span class="stringliteral">"beta"</span>)));
+<a name="l00155"></a>00155         ans-&gt;<a class="code" href="structcsn.html#2cfead92d2cdbfb7c4f667d3b63a012d">pinv</a> = (<span class="keywordtype">int</span>*) NULL;
+<a name="l00156"></a>00156         <span class="keywordflow">break</span>;
+<a name="l00157"></a>00157     <span class="keywordflow">default</span>:
+<a name="l00158"></a>00158         error(<span class="stringliteral">"invalid class of object to Matrix_as_csn"</span>);
+<a name="l00159"></a>00159     }
+<a name="l00160"></a>00160     <span class="keywordflow">return</span> ans;
+<a name="l00161"></a>00161 }
+<a name="l00162"></a>00162 
+<a name="l00175"></a>00175 SEXP Matrix_css_to_SEXP(<a class="code" href="structcss.html">css</a> *S, <span class="keywordtype">char</span> *cl, <span class="keywordtype">int</span> dofree, <span class="keywordtype">int</span> m, <span class="keywordtype">int</span> n)
+<a name="l00176"></a>00176 {
+<a name="l00177"></a>00177     SEXP ans;
+<a name="l00178"></a>00178     <span class="keywordtype">char</span> *valid[] = {<span class="stringliteral">"css_LU"</span>, <span class="stringliteral">"css_QR"</span>, <span class="stringliteral">""</span>};
+<a name="l00179"></a>00179     <span class="keywordtype">int</span> *nz, ctype = <a class="code" href="Mutils_8h.html#2206f293e563a99c83fa8480b7e26912" title="Return the 0-based index of a string match in a vector of strings terminated by an...">Matrix_check_class</a>(cl, valid);
+<a name="l00180"></a>00180 
+<a name="l00181"></a>00181     <span class="keywordflow">if</span> (ctype &lt; 0)
+<a name="l00182"></a>00182         error(<span class="stringliteral">"Inappropriate class '%s' for Matrix_css_to_SEXP"</span>, cl);
+<a name="l00183"></a>00183     ans = PROTECT(NEW_OBJECT(MAKE_CLASS(cl)));
+<a name="l00184"></a>00184                                 <span class="comment">/* allocate and copy common slots */</span>
+<a name="l00185"></a>00185     Memcpy(INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, install(<span class="stringliteral">"Q"</span>), INTSXP, n)), S-&gt;<a class="code" href="structcss.html#6dc664f0723f4b708a5ac5d09ddf66f5">q</a>, n);
+<a name="l00186"></a>00186     nz = INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, install(<span class="stringliteral">"nz"</span>), INTSXP, 3));
+<a name="l00187"></a>00187     nz[0] = S-&gt;<a class="code" href="structcss.html#cd57e5b6973554914b89e7d6c55f4dd2">m2</a>; nz[1] = S-&gt;<a class="code" href="structcss.html#8df432673a2114a47522fe905a1b6172">lnz</a>; nz[2] = S-&gt;<a class="code" href="structcss.html#6db5576fbbe08c451f9ff9d214ea9aaf">unz</a>;
+<a name="l00188"></a>00188     <span class="keywordflow">switch</span>(ctype) {
+<a name="l00189"></a>00189     <span class="keywordflow">case</span> 0:
+<a name="l00190"></a>00190         <span class="keywordflow">break</span>;
+<a name="l00191"></a>00191     <span class="keywordflow">case</span> 1:
+<a name="l00192"></a>00192         Memcpy(INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, install(<span class="stringliteral">"Pinv"</span>), INTSXP, m)),
+<a name="l00193"></a>00193                S-&gt;<a class="code" href="structcss.html#402c8b6fcf38049109edb782f8d84c7f">pinv</a>, m);
+<a name="l00194"></a>00194         Memcpy(INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, install(<span class="stringliteral">"parent"</span>), INTSXP, n)),
+<a name="l00195"></a>00195                S-&gt;<a class="code" href="structcss.html#d2eff0202fbca658bdd42023621ea8c3">parent</a>, n);
+<a name="l00196"></a>00196         Memcpy(INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, install(<span class="stringliteral">"cp"</span>), INTSXP, n)),
+<a name="l00197"></a>00197                S-&gt;<a class="code" href="structcss.html#9059b547afcb913f9f9d90e9e2744cbc">cp</a>, n);
+<a name="l00198"></a>00198         <span class="keywordflow">break</span>;
+<a name="l00199"></a>00199     <span class="keywordflow">default</span>:
+<a name="l00200"></a>00200         error(<span class="stringliteral">"Inappropriate class '%s' for Matrix_css_to_SEXP"</span>, cl);
+<a name="l00201"></a>00201     }
+<a name="l00202"></a>00202     <span class="keywordflow">if</span> (dofree &gt; 0) <a class="code" href="cs_8c.html#ce766075ef439ad6e4347f6b076eb4b7">cs_sfree</a>(S);
+<a name="l00203"></a>00203     <span class="keywordflow">if</span> (dofree &lt; 0) Free(S);
+<a name="l00204"></a>00204     UNPROTECT(1);
+<a name="l00205"></a>00205     <span class="keywordflow">return</span> ans;
+<a name="l00206"></a>00206 }
+<a name="l00207"></a>00207 
+<a name="l00218"></a>00218 SEXP Matrix_csn_to_SEXP(<a class="code" href="structcsn.html">csn</a> *N, <span class="keywordtype">char</span> *cl, <span class="keywordtype">int</span> dofree)
+<a name="l00219"></a>00219 {
+<a name="l00220"></a>00220     SEXP ans;
+<a name="l00221"></a>00221     <span class="keywordtype">char</span> *valid[] = {<span class="stringliteral">"csn_LU"</span>, <span class="stringliteral">"csn_QR"</span>, <span class="stringliteral">""</span>};
+<a name="l00222"></a>00222     <span class="keywordtype">int</span> ctype = <a class="code" href="Mutils_8h.html#2206f293e563a99c83fa8480b7e26912" title="Return the 0-based index of a string match in a vector of strings terminated by an...">Matrix_check_class</a>(cl, valid), n = (N-&gt;<a class="code" href="structcsn.html#508aa83b1b813b60cd50a79269ad334a">U</a>)-&gt;n;
+<a name="l00223"></a>00223 
+<a name="l00224"></a>00224     <span class="keywordflow">if</span> (ctype &lt; 0)
+<a name="l00225"></a>00225         error(<span class="stringliteral">"Inappropriate class '%s' for Matrix_csn_to_SEXP"</span>, cl);
+<a name="l00226"></a>00226     ans = PROTECT(NEW_OBJECT(MAKE_CLASS(cl)));
+<a name="l00227"></a>00227                                 <span class="comment">/* allocate and copy common slots */</span>
+<a name="l00228"></a>00228     <span class="comment">/* FIXME: Use the triangular matrix classes for csn_LU */</span>
+<a name="l00229"></a>00229     SET_SLOT(ans, install(<span class="stringliteral">"L"</span>), <span class="comment">/* these are free'd later if requested */</span>
+<a name="l00230"></a>00230              <a class="code" href="cs__utils_8c.html#e53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free...">Matrix_cs_to_SEXP</a>(N-&gt;<a class="code" href="structcsn.html#54a5eee4c97a81e9146d583f0395fa57">L</a>, <span class="stringliteral">"dgCMatrix"</span>, 0));
+<a name="l00231"></a>00231     SET_SLOT(ans, install(<span class="stringliteral">"U"</span>),
+<a name="l00232"></a>00232              <a class="code" href="cs__utils_8c.html#e53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free...">Matrix_cs_to_SEXP</a>(N-&gt;<a class="code" href="structcsn.html#508aa83b1b813b60cd50a79269ad334a">U</a>, <span class="stringliteral">"dgCMatrix"</span>, 0));
+<a name="l00233"></a>00233     <span class="keywordflow">switch</span>(ctype) {
+<a name="l00234"></a>00234     <span class="keywordflow">case</span> 0:
+<a name="l00235"></a>00235         Memcpy(INTEGER(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, install(<span class="stringliteral">"Pinv"</span>), INTSXP, n)),
+<a name="l00236"></a>00236                N-&gt;<a class="code" href="structcsn.html#2cfead92d2cdbfb7c4f667d3b63a012d">pinv</a>, n);
 <a name="l00237"></a>00237         <span class="keywordflow">break</span>;
-<a name="l00238"></a>00238     <span class="keywordflow">default</span>:
-<a name="l00239"></a>00239         error(<span class="stringliteral">"Inappropriate class '%s' for Matrix_csn_to_SEXP"</span>, cl);
-<a name="l00240"></a>00240     }
-<a name="l00241"></a>00241     <span class="keywordflow">if</span> (dofree &gt; 0) <a class="code" href="cs_8c.html#f2e6d75dfc24a842fdbce3aa510dc4bc">cs_nfree</a>(N);
-<a name="l00242"></a>00242     <span class="keywordflow">if</span> (dofree &lt; 0) {
-<a name="l00243"></a>00243         Free(N-&gt;<a class="code" href="structcsn.html#54a5eee4c97a81e9146d583f0395fa57">L</a>); Free(N-&gt;<a class="code" href="structcsn.html#508aa83b1b813b60cd50a79269ad334a">U</a>); Free(N);
+<a name="l00238"></a>00238     <span class="keywordflow">case</span> 1:
+<a name="l00239"></a>00239         Memcpy(REAL(<a class="code" href="Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and...">ALLOC_SLOT</a>(ans, install(<span class="stringliteral">"beta"</span>), REALSXP, n)),
+<a name="l00240"></a>00240                N-&gt;<a class="code" href="structcsn.html#196ee09d34e7fbec6f9114d07cd79210">B</a>, n);
+<a name="l00241"></a>00241         <span class="keywordflow">break</span>;
+<a name="l00242"></a>00242     <span class="keywordflow">default</span>:
+<a name="l00243"></a>00243         error(<span class="stringliteral">"Inappropriate class '%s' for Matrix_csn_to_SEXP"</span>, cl);
 <a name="l00244"></a>00244     }
-<a name="l00245"></a>00245     UNPROTECT(1);
-<a name="l00246"></a>00246     <span class="keywordflow">return</span> ans;
-<a name="l00247"></a>00247 }
-<a name="l00248"></a>00248 
-<a name="l00249"></a>00249 <span class="preprocessor">#endif  </span><span class="comment">/* unused */</span>
-</pre></div><hr size="1"><address style="text-align: right;"><small>Generated on Wed Jan 2 09:19:07 2008 for Matrix by&nbsp;
+<a name="l00245"></a>00245     <span class="keywordflow">if</span> (dofree &gt; 0) <a class="code" href="cs_8c.html#f2e6d75dfc24a842fdbce3aa510dc4bc">cs_nfree</a>(N);
+<a name="l00246"></a>00246     <span class="keywordflow">if</span> (dofree &lt; 0) {
+<a name="l00247"></a>00247         Free(N-&gt;<a class="code" href="structcsn.html#54a5eee4c97a81e9146d583f0395fa57">L</a>); Free(N-&gt;<a class="code" href="structcsn.html#508aa83b1b813b60cd50a79269ad334a">U</a>); Free(N);
+<a name="l00248"></a>00248     }
+<a name="l00249"></a>00249     UNPROTECT(1);
+<a name="l00250"></a>00250     <span class="keywordflow">return</span> ans;
+<a name="l00251"></a>00251 }
+<a name="l00252"></a>00252 
+<a name="l00253"></a>00253 <span class="preprocessor">#endif  </span><span class="comment">/* unused */</span>
+</pre></div><hr size="1"><address style="text-align: right;"><small>Generated on Sun Jan 13 09:52:52 2008 for Matrix by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.3 </small></address>
 </body>
