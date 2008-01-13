@@ -325,87 +325,87 @@
 <a name="l00319"></a>00319 
 <a name="l00320"></a>00320 
 <a name="l00321"></a>00321 
-<a name="l00330"></a><a class="code" href="Mutils_8h.html#dd5d4be8679ecd4316a738f1d16e47e0">00330</a> <span class="keywordtype">void</span> <a class="code" href="Mutils_8c.html#dd5d4be8679ecd4316a738f1d16e47e0" title="Copy the diagonal elements of the packed denseMatrix x to dest.">d_packed_getDiag</a>(<span class="keywordtype">double</span> *dest, SEXP x, <span class="keywordtype">int</span> n)
-<a name="l00331"></a>00331 {
-<a name="l00332"></a>00332     <span class="keywordtype">double</span> *xx = REAL(GET_SLOT(x, <a class="code" href="Syms_8h.html#8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a>));
-<a name="l00333"></a>00333 
-<a name="l00334"></a>00334 <span class="preprocessor">#define END_packed_getDiag                                              \</span>
-<a name="l00335"></a>00335 <span class="preprocessor">    int j, pos = 0;                                                     \</span>
-<a name="l00336"></a>00336 <span class="preprocessor">                                                                        \</span>
-<a name="l00337"></a>00337 <span class="preprocessor">    if (*uplo_P(x) == 'U') {                                            \</span>
-<a name="l00338"></a>00338 <span class="preprocessor">        for(pos= 0, j=0; j &lt; n; pos += 1+(++j))  dest[j] = xx[pos];     \</span>
-<a name="l00339"></a>00339 <span class="preprocessor">    } else {                                                            \</span>
-<a name="l00340"></a>00340 <span class="preprocessor">        for(pos= 0, j=0; j &lt; n; pos += (n - j), j++) dest[j] = xx[pos]; \</span>
-<a name="l00341"></a>00341 <span class="preprocessor">    }                                                                   \</span>
-<a name="l00342"></a>00342 <span class="preprocessor">    return</span>
-<a name="l00343"></a>00343 <span class="preprocessor"></span>
-<a name="l00344"></a>00344     <a class="code" href="Mutils_8c.html#632e6ad6c032601132c818f457b96799">END_packed_getDiag</a>;
-<a name="l00345"></a>00345 }
-<a name="l00346"></a>00346 
-<a name="l00347"></a><a class="code" href="Mutils_8h.html#9341ce0544816af21527638ee847972a">00347</a> <span class="keywordtype">void</span> <a class="code" href="Mutils_8c.html#9341ce0544816af21527638ee847972a">l_packed_getDiag</a>(<span class="keywordtype">int</span> *dest, SEXP x, <span class="keywordtype">int</span> n)
-<a name="l00348"></a>00348 {
-<a name="l00349"></a>00349     <span class="keywordtype">int</span> *xx = LOGICAL(GET_SLOT(x, <a class="code" href="Syms_8h.html#8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a>));
-<a name="l00350"></a>00350 
-<a name="l00351"></a>00351     <a class="code" href="Mutils_8c.html#632e6ad6c032601132c818f457b96799">END_packed_getDiag</a>;
-<a name="l00352"></a>00352 }
-<a name="l00353"></a>00353 
-<a name="l00354"></a>00354 <span class="preprocessor">#undef END_packed_getDiag</span>
-<a name="l00355"></a>00355 <span class="preprocessor"></span>
-<a name="l00356"></a><a class="code" href="Mutils_8h.html#9a9ef98e9c7c7fded7f108ef27974105">00356</a> <span class="keywordtype">void</span> <a class="code" href="Mutils_8c.html#9a9ef98e9c7c7fded7f108ef27974105">tr_d_packed_getDiag</a>(<span class="keywordtype">double</span> *dest, SEXP x)
-<a name="l00357"></a>00357 {
-<a name="l00358"></a>00358     <span class="keywordtype">int</span> n = INTEGER(GET_SLOT(x, <a class="code" href="Syms_8h.html#2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>))[0];
-<a name="l00359"></a>00359     SEXP val = PROTECT(allocVector(REALSXP, n));
-<a name="l00360"></a>00360     <span class="keywordtype">double</span> *v = REAL(val);
-<a name="l00361"></a>00361 
-<a name="l00362"></a>00362     <span class="keywordflow">if</span> (*<a class="code" href="Mutils_8h.html#1e1f224c5e72ee3eb2583024db2c59e6">diag_P</a>(x) == <span class="charliteral">'U'</span>) {
-<a name="l00363"></a>00363         <span class="keywordtype">int</span> j;
-<a name="l00364"></a>00364         <span class="keywordflow">for</span> (j = 0; j &lt; n; j++) v[j] = 1.;
-<a name="l00365"></a>00365     } <span class="keywordflow">else</span> {
-<a name="l00366"></a>00366         <a class="code" href="Mutils_8c.html#dd5d4be8679ecd4316a738f1d16e47e0" title="Copy the diagonal elements of the packed denseMatrix x to dest.">d_packed_getDiag</a>(v, x, n);
-<a name="l00367"></a>00367     }
-<a name="l00368"></a>00368     UNPROTECT(1);
-<a name="l00369"></a>00369     <span class="keywordflow">return</span>;
-<a name="l00370"></a>00370 }
-<a name="l00371"></a>00371 
-<a name="l00372"></a><a class="code" href="Mutils_8h.html#abce976db950f54233c64465c0e06f31">00372</a> <span class="keywordtype">void</span> <a class="code" href="Mutils_8c.html#abce976db950f54233c64465c0e06f31">tr_l_packed_getDiag</a>(   <span class="keywordtype">int</span> *dest, SEXP x)
-<a name="l00373"></a>00373 {
-<a name="l00374"></a>00374     <span class="keywordtype">int</span> n = INTEGER(GET_SLOT(x, <a class="code" href="Syms_8h.html#2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>))[0];
-<a name="l00375"></a>00375     SEXP val = PROTECT(allocVector(LGLSXP, n));
-<a name="l00376"></a>00376     <span class="keywordtype">int</span> *v = LOGICAL(val);
-<a name="l00377"></a>00377 
-<a name="l00378"></a>00378     <span class="keywordflow">if</span> (*<a class="code" href="Mutils_8h.html#1e1f224c5e72ee3eb2583024db2c59e6">diag_P</a>(x) == <span class="charliteral">'U'</span>) {
-<a name="l00379"></a>00379         <span class="keywordtype">int</span> j;
-<a name="l00380"></a>00380         <span class="keywordflow">for</span> (j = 0; j &lt; n; j++) v[j] = 1;
-<a name="l00381"></a>00381     } <span class="keywordflow">else</span> {
-<a name="l00382"></a>00382         <a class="code" href="Mutils_8c.html#9341ce0544816af21527638ee847972a">l_packed_getDiag</a>(v, x, n);
-<a name="l00383"></a>00383     }
-<a name="l00384"></a>00384     UNPROTECT(1);
-<a name="l00385"></a>00385     <span class="keywordflow">return</span>;
-<a name="l00386"></a>00386 }
-<a name="l00387"></a>00387 
-<a name="l00388"></a><a class="code" href="Mutils_8h.html#f9c3d821b08775115572c042d9e61a28">00388</a> SEXP <a class="code" href="Mutils_8c.html#f9c3d821b08775115572c042d9e61a28">Matrix_expand_pointers</a>(SEXP pP)
-<a name="l00389"></a>00389 {
-<a name="l00390"></a>00390     <span class="keywordtype">int</span> n = length(pP) - 1;
-<a name="l00391"></a>00391     <span class="keywordtype">int</span> *p = INTEGER(pP);
-<a name="l00392"></a>00392     SEXP ans = PROTECT(allocVector(INTSXP, p[n]));
-<a name="l00393"></a>00393 
-<a name="l00394"></a>00394     <a class="code" href="Mutils_8h.html#1a3b55b173f7d329b6309e56dea20024" title="Expand compressed pointers in the array mp into a full set of indices in the array...">expand_cmprPt</a>(n, p, INTEGER(ans));
-<a name="l00395"></a>00395     UNPROTECT(1);
-<a name="l00396"></a>00396     <span class="keywordflow">return</span> ans;
-<a name="l00397"></a>00397 }
-<a name="l00398"></a>00398 
+<a name="l00331"></a><a class="code" href="Mutils_8h.html#dd5d4be8679ecd4316a738f1d16e47e0">00331</a> <span class="keywordtype">void</span> <a class="code" href="Mutils_8c.html#dd5d4be8679ecd4316a738f1d16e47e0" title="Copy the diagonal elements of the packed denseMatrix x to dest.">d_packed_getDiag</a>(<span class="keywordtype">double</span> *dest, SEXP x, <span class="keywordtype">int</span> n)
+<a name="l00332"></a>00332 {
+<a name="l00333"></a>00333     <span class="keywordtype">double</span> *xx = REAL(GET_SLOT(x, <a class="code" href="Syms_8h.html#8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a>));
+<a name="l00334"></a>00334 
+<a name="l00335"></a>00335 <span class="preprocessor">#define END_packed_getDiag                                              \</span>
+<a name="l00336"></a>00336 <span class="preprocessor">    int j, pos = 0;                                                     \</span>
+<a name="l00337"></a>00337 <span class="preprocessor">                                                                        \</span>
+<a name="l00338"></a>00338 <span class="preprocessor">    if (*uplo_P(x) == 'U') {                                            \</span>
+<a name="l00339"></a>00339 <span class="preprocessor">        for(pos= 0, j=0; j &lt; n; pos += 1+(++j))  dest[j] = xx[pos];     \</span>
+<a name="l00340"></a>00340 <span class="preprocessor">    } else {                                                            \</span>
+<a name="l00341"></a>00341 <span class="preprocessor">        for(pos= 0, j=0; j &lt; n; pos += (n - j), j++) dest[j] = xx[pos]; \</span>
+<a name="l00342"></a>00342 <span class="preprocessor">    }                                                                   \</span>
+<a name="l00343"></a>00343 <span class="preprocessor">    return</span>
+<a name="l00344"></a>00344 <span class="preprocessor"></span>
+<a name="l00345"></a>00345     <a class="code" href="Mutils_8c.html#632e6ad6c032601132c818f457b96799">END_packed_getDiag</a>;
+<a name="l00346"></a>00346 }
+<a name="l00347"></a>00347 
+<a name="l00348"></a><a class="code" href="Mutils_8h.html#9341ce0544816af21527638ee847972a">00348</a> <span class="keywordtype">void</span> <a class="code" href="Mutils_8c.html#9341ce0544816af21527638ee847972a">l_packed_getDiag</a>(<span class="keywordtype">int</span> *dest, SEXP x, <span class="keywordtype">int</span> n)
+<a name="l00349"></a>00349 {
+<a name="l00350"></a>00350     <span class="keywordtype">int</span> *xx = LOGICAL(GET_SLOT(x, <a class="code" href="Syms_8h.html#8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a>));
+<a name="l00351"></a>00351 
+<a name="l00352"></a>00352     <a class="code" href="Mutils_8c.html#632e6ad6c032601132c818f457b96799">END_packed_getDiag</a>;
+<a name="l00353"></a>00353 }
+<a name="l00354"></a>00354 
+<a name="l00355"></a>00355 <span class="preprocessor">#undef END_packed_getDiag</span>
+<a name="l00356"></a>00356 <span class="preprocessor"></span>
+<a name="l00357"></a><a class="code" href="Mutils_8h.html#9a9ef98e9c7c7fded7f108ef27974105">00357</a> <span class="keywordtype">void</span> <a class="code" href="Mutils_8c.html#9a9ef98e9c7c7fded7f108ef27974105">tr_d_packed_getDiag</a>(<span class="keywordtype">double</span> *dest, SEXP x)
+<a name="l00358"></a>00358 {
+<a name="l00359"></a>00359     <span class="keywordtype">int</span> n = INTEGER(GET_SLOT(x, <a class="code" href="Syms_8h.html#2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>))[0];
+<a name="l00360"></a>00360     SEXP val = PROTECT(allocVector(REALSXP, n));
+<a name="l00361"></a>00361     <span class="keywordtype">double</span> *v = REAL(val);
+<a name="l00362"></a>00362 
+<a name="l00363"></a>00363     <span class="keywordflow">if</span> (*<a class="code" href="Mutils_8h.html#1e1f224c5e72ee3eb2583024db2c59e6">diag_P</a>(x) == <span class="charliteral">'U'</span>) {
+<a name="l00364"></a>00364         <span class="keywordtype">int</span> j;
+<a name="l00365"></a>00365         <span class="keywordflow">for</span> (j = 0; j &lt; n; j++) v[j] = 1.;
+<a name="l00366"></a>00366     } <span class="keywordflow">else</span> {
+<a name="l00367"></a>00367         <a class="code" href="Mutils_8c.html#dd5d4be8679ecd4316a738f1d16e47e0" title="Copy the diagonal elements of the packed denseMatrix x to dest.">d_packed_getDiag</a>(v, x, n);
+<a name="l00368"></a>00368     }
+<a name="l00369"></a>00369     UNPROTECT(1);
+<a name="l00370"></a>00370     <span class="keywordflow">return</span>;
+<a name="l00371"></a>00371 }
+<a name="l00372"></a>00372 
+<a name="l00373"></a><a class="code" href="Mutils_8h.html#abce976db950f54233c64465c0e06f31">00373</a> <span class="keywordtype">void</span> <a class="code" href="Mutils_8c.html#abce976db950f54233c64465c0e06f31">tr_l_packed_getDiag</a>(   <span class="keywordtype">int</span> *dest, SEXP x)
+<a name="l00374"></a>00374 {
+<a name="l00375"></a>00375     <span class="keywordtype">int</span> n = INTEGER(GET_SLOT(x, <a class="code" href="Syms_8h.html#2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>))[0];
+<a name="l00376"></a>00376     SEXP val = PROTECT(allocVector(LGLSXP, n));
+<a name="l00377"></a>00377     <span class="keywordtype">int</span> *v = LOGICAL(val);
+<a name="l00378"></a>00378 
+<a name="l00379"></a>00379     <span class="keywordflow">if</span> (*<a class="code" href="Mutils_8h.html#1e1f224c5e72ee3eb2583024db2c59e6">diag_P</a>(x) == <span class="charliteral">'U'</span>) {
+<a name="l00380"></a>00380         <span class="keywordtype">int</span> j;
+<a name="l00381"></a>00381         <span class="keywordflow">for</span> (j = 0; j &lt; n; j++) v[j] = 1;
+<a name="l00382"></a>00382     } <span class="keywordflow">else</span> {
+<a name="l00383"></a>00383         <a class="code" href="Mutils_8c.html#9341ce0544816af21527638ee847972a">l_packed_getDiag</a>(v, x, n);
+<a name="l00384"></a>00384     }
+<a name="l00385"></a>00385     UNPROTECT(1);
+<a name="l00386"></a>00386     <span class="keywordflow">return</span>;
+<a name="l00387"></a>00387 }
+<a name="l00388"></a>00388 
+<a name="l00389"></a><a class="code" href="Mutils_8h.html#f9c3d821b08775115572c042d9e61a28">00389</a> SEXP <a class="code" href="Mutils_8c.html#f9c3d821b08775115572c042d9e61a28">Matrix_expand_pointers</a>(SEXP pP)
+<a name="l00390"></a>00390 {
+<a name="l00391"></a>00391     <span class="keywordtype">int</span> n = length(pP) - 1;
+<a name="l00392"></a>00392     <span class="keywordtype">int</span> *p = INTEGER(pP);
+<a name="l00393"></a>00393     SEXP ans = PROTECT(allocVector(INTSXP, p[n]));
+<a name="l00394"></a>00394 
+<a name="l00395"></a>00395     <a class="code" href="Mutils_8h.html#1a3b55b173f7d329b6309e56dea20024" title="Expand compressed pointers in the array mp into a full set of indices in the array...">expand_cmprPt</a>(n, p, INTEGER(ans));
+<a name="l00396"></a>00396     UNPROTECT(1);
+<a name="l00397"></a>00397     <span class="keywordflow">return</span> ans;
+<a name="l00398"></a>00398 }
 <a name="l00399"></a>00399 
-<a name="l00408"></a>00408 SEXP
-<a name="l00409"></a><a class="code" href="Mutils_8h.html#c400cec966c098c329850d1e2878e563">00409</a> <a class="code" href="Mutils_8c.html#c400cec966c098c329850d1e2878e563" title="Return the element of a given name from a named list.">Matrix_getElement</a>(SEXP list, <span class="keywordtype">char</span> *nm) {
-<a name="l00410"></a>00410     SEXP names = getAttrib(list, R_NamesSymbol);
-<a name="l00411"></a>00411     <span class="keywordtype">int</span> i;
-<a name="l00412"></a>00412 
-<a name="l00413"></a>00413     <span class="keywordflow">for</span> (i = 0; i &lt; LENGTH(names); i++)
-<a name="l00414"></a>00414         <span class="keywordflow">if</span> (!strcmp(CHAR(STRING_ELT(names, i)), nm))
-<a name="l00415"></a>00415             <span class="keywordflow">return</span>(VECTOR_ELT(list, i));
-<a name="l00416"></a>00416     <span class="keywordflow">return</span> R_NilValue;
-<a name="l00417"></a>00417 }
-<a name="l00418"></a>00418 
+<a name="l00400"></a>00400 
+<a name="l00409"></a>00409 SEXP
+<a name="l00410"></a><a class="code" href="Mutils_8h.html#c400cec966c098c329850d1e2878e563">00410</a> <a class="code" href="Mutils_8c.html#c400cec966c098c329850d1e2878e563" title="Return the element of a given name from a named list.">Matrix_getElement</a>(SEXP list, <span class="keywordtype">char</span> *nm) {
+<a name="l00411"></a>00411     SEXP names = getAttrib(list, R_NamesSymbol);
+<a name="l00412"></a>00412     <span class="keywordtype">int</span> i;
+<a name="l00413"></a>00413 
+<a name="l00414"></a>00414     <span class="keywordflow">for</span> (i = 0; i &lt; LENGTH(names); i++)
+<a name="l00415"></a>00415         <span class="keywordflow">if</span> (!strcmp(CHAR(STRING_ELT(names, i)), nm))
+<a name="l00416"></a>00416             <span class="keywordflow">return</span>(VECTOR_ELT(list, i));
+<a name="l00417"></a>00417     <span class="keywordflow">return</span> R_NilValue;
+<a name="l00418"></a>00418 }
+<a name="l00419"></a>00419 
 <a name="l00429"></a>00429 <span class="keyword">static</span> <span class="keywordtype">double</span> *
 <a name="l00430"></a><a class="code" href="Mutils_8c.html#d21c0ebe6eadc4c3951c4db9ccc92b1c">00430</a> <a class="code" href="Mutils_8c.html#d21c0ebe6eadc4c3951c4db9ccc92b1c" title="Zero a square matrix of size nc then copy a vector to the diagonal.">install_diagonal</a>(<span class="keywordtype">double</span> *dest, SEXP A)
 <a name="l00431"></a>00431 {
@@ -659,7 +659,7 @@
 <a name="l00686"></a>00686     <span class="keywordflow">return</span> ans;
 <a name="l00687"></a>00687 }
 <a name="l00688"></a>00688 
-</pre></div><hr size="1"><address style="text-align: right;"><small>Generated on Wed Jan 2 09:19:24 2008 for Matrix by&nbsp;
+</pre></div><hr size="1"><address style="text-align: right;"><small>Generated on Sun Jan 13 09:53:13 2008 for Matrix by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.3 </small></address>
 </body>
