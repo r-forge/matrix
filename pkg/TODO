@@ -181,3 +181,12 @@ Check for DimNames propagation in coercion and other operations.
     "qr.R(<sparse>) may differ from qr.R(<dense>) because of permutations"
 
   This is not really acceptable and currently influences  rcond() as well.
+
+- chol() and qr() generic:  currently have *two* arguments, and give
+
+  New generic for "chol" does not agree with implicit generic from package "base"; a new generic will be assigned with package "Matrix"
+
+  New generic for "qr" does not agree with implicit generic from package "base"; a new generic will be assigned with package "Matrix"
+
+  It was mentioned by an R-core member that he thought it did not make
+  sense to also dispatch on 'tol' or 'pivot' ...  --> maybe change that..

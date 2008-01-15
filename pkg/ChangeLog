@@ -1,6 +1,13 @@
+2008-01-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/CHMfactor.R (solve): method for b="numeric", but also b="ANY"
+		in order to ensure 'system = *' is not lost;
+		formals()$system instead of cut&paste.
+	* tests/factorizing.R: test solve(<CHM..>, <numeric>)
+
 2008-01-11  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Date): make ready for release
+	* DESCRIPTION (Date): make ready for release --> 0.999375-4
 
 	* R/dgeMatrix.R: fix rcond() method for "dgeMatrix".
 

@@ -61,8 +61,15 @@ data(KNex)
 mtm <- with(KNex, crossprod(mm))
 c1 <- Cholesky(mtm)
 c2 <- Cholesky(mtm, super = TRUE)
-b <- matrix(c(rep(0, 711), 1), nc = 1)
+bv <- 1:nrow(mtm) # even integer
+b <- matrix(bv)
 ## solve(c2, b) by default solves  Ax = b, where A = c2'c2 !
-stopifnot(identical(solve(c2, b), solve(c2, b, system = "A")),
-          all.equal(solve(mtm, b),
-                    solve(c2 , b)))
+x <- solve(c2,b)
+stopifnot(identical3(x, solve(c2, bv), solve(c2, b, system = "A")),
+          all.equal(x, solve(mtm, b)))
+for(sys in c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt")) {
+    x <- solve(c2, b,  system = sys)
+    cat(sys,":\n"); print(head(x))
+    stopifnot(dim(x) == c(712, 1),
+              identical(x, solve(c2, bv, system = sys)))
+}
