@@ -81,10 +81,12 @@ export(
 }
 
 exportClasses(
+              ## Class unions:
 	      "index",
-## LOGIC      "logic",
 	      "replValue", # if we don't export it, things fail in dispatch
 	      "atomicVector",
+	      "number",
+## LOGIC      "logic",
 
 	      ## --- 'Matrix' mother and all its daughters : ---------------
 	      "Matrix",
@@ -193,6 +195,8 @@ exportClasses(
 	      "nCHMsimpl",# unused
 
 	      "sparseQR",
+
+	      "Schur",
 
 	      "sparseVector", ## --- and daughters : ---
 	      "dsparseVector",

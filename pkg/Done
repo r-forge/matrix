@@ -204,3 +204,5 @@
 
 - ensuring that M[0], M[FALSE], M[1:2]  now work as for traditional matrices
 
+- Schur() now returns a proper class extending "MatrixFactorization".
+

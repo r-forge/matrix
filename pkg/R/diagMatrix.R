@@ -444,6 +444,7 @@ setMethod("solve", signature(a = "diagonalMatrix", b = "matrix"),
 setMethod("solve", signature(a = "diagonalMatrix", b = "Matrix"),
           solveDiag)
 
+## Schur()  ---> ./eigen.R
 
 
 

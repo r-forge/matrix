@@ -73,3 +73,32 @@ for(sys in c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt")) {
     stopifnot(dim(x) == c(712, 1),
               identical(x, solve(c2, bv, system = sys)))
 }
+
+## Schur() ----------------------
+checkSchur <- function(A, SchurA = Schur(A), tol = 1e-14) {
+    stopifnot(is(SchurA, "Schur"),
+              isOrthogonal(Q <- SchurA@Q),
+              all.equal(as.mat(A),
+                        as.mat(Q %*% SchurA@T %*% t(Q)), tol = tol))
+}
+
+SH <- Schur(H5 <- Hilbert(5))
+checkSchur(H5, SH)
+checkSchur(Diagonal(x = 9:3))
+
+p <- 4L
+uTp <- new("dtpMatrix", x=c(2, 3, -1, 4:6, -2:1), Dim = c(p,p))
+(uT <- as(uTp, "dtrMatrix"))
+## Schur ( <general> )  <--> Schur( <triangular> )
+Su <- Schur(uT) ;   checkSchur(uT, Su)
+gT <- as(uT,"generalMatrix")
+Sg <- Schur(gT) ;   checkSchur(gT, Sg)
+Stg <- Schur(t(gT));checkSchur(t(gT), Stg)
+Stu <- Schur(t(uT));checkSchur(t(uT), Stu)
+
+stopifnot(identical3(Sg@T, uT, Su@T),
+          identical(Sg@Q, as(diag(p), "dgeMatrix")),
+          identical(Stg@T, as(t(gT[,p:1])[,p:1], "triangularMatrix")),
+          identical(Stg@Q, as(diag(p)[,p:1], "dgeMatrix")),
+          identical(Stu@T, Stg@T))
+assert.EQ.mat(Stu@Q, as(Stg@Q,"matrix"), tol=0)
