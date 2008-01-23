@@ -1,3 +1,28 @@
+2008-01-23  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/factorizing.R (checkSchur): and more tests for checking Schur()
+
+	* inst/test-tools.R (isOrthogonal): new function; also re-sort file structure
+
+2008-01-22  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/ngTMatrix.R: allow as(<numeric matrix>, "ngTMatrix") and hence
+	coercion to "nMatrix" and "pMatrix"
+
+	* R/AllClass.R: "Schur" class;  "number" class union
+	* man/number-class.Rd:
+	* man/Schur-class.Rd:
+
+	* R/eigen.R (.dgeSchur): utility, and return "Schur" class
+	(.simpleSchur): Schur() method for diagonal matrices
+	(.triSchur):    Schur() method for triangular matrices
+	(Schur.sym):    Schur() for symmetric matrices {building on eigen()}.
+
+
+2008-01-21  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/dgCMatrix.c (dgCMatrix_QR): set @Dim slot (as per doc)
+
 2008-01-15  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/CHMfactor.R (solve): method for b="numeric", but also b="ANY"

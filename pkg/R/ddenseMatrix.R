@@ -113,13 +113,6 @@ setMethod("determinant", signature(x = "ddenseMatrix", logarithm = "logical"),
 ## setMethod("expm", signature(x = "ddenseMatrix"),
 ##           function(x) callGeneric(as(x, "dgeMatrix")))
 
-setMethod("Schur", signature(x = "ddenseMatrix", vectors = "missing"),
-          function(x, vectors, ...) callGeneric(as(x, "dgeMatrix")))
-
-setMethod("Schur", signature(x = "ddenseMatrix", vectors = "logical"),
-          function(x, vectors, ...) callGeneric(as(x, "dgeMatrix"), vectors))
-
-
 setMethod("Math",
           signature(x = "ddenseMatrix"),
           function(x) callGeneric(as(x, "dgeMatrix")))

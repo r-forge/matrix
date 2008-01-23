@@ -184,9 +184,20 @@ Check for DimNames propagation in coercion and other operations.
 
 - chol() and qr() generic:  currently have *two* arguments, and give
 
-  New generic for "chol" does not agree with implicit generic from package "base"; a new generic will be assigned with package "Matrix"
-
-  New generic for "qr" does not agree with implicit generic from package "base"; a new generic will be assigned with package "Matrix"
+  New generic for "chol" does not agree with implicit generic from package
+  "base"; a new generic will be assigned with package "Matrix"
+  (and ditto for "qr")
 
   It was mentioned by an R-core member that he thought it did not make
   sense to also dispatch on 'tol' or 'pivot' ...  --> maybe change that..
+
+- eigen() should become generic, and get a method at least for diagonal,
+  but also for symmetric -> dsyMatrix  [LAPACK dsyev() uses UPLO !],
+  but also simply for dgeMatrix (without going via tradition matrices).
+  What about Sparse?  There's fill-in, but it may still be sensible, e.g.
+  mlist <- list(1, 2:3, diag(x=5:3), 27, cbind(1,3:6), 100:101)
+  ee <- eigen(tcrossprod(bdiag(lapply(mlist, as.matrix))))
+  Matrix( signif(ee$vectors, 3) )
+
+- facmul() has no single method defined;  it looks like a good idea though
+  (instead of the infamous qr.qy, qr.qty,.... functions)
