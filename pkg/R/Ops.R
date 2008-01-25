@@ -565,80 +565,97 @@ setMethod("Logic", signature(e1="ldenseMatrix", e2="lsparseMatrix"),
 ## -----
 setMethod("Arith", signature(e1 = "dsCMatrix", e2 = "dsCMatrix"),
 	  function(e1, e2) {
-	      message("suboptimal implementation of 'symm. o symm.'")
+	      message("suboptimal implementation of sparse 'symm. o symm.'")
 	      as(callGeneric(as(e1, "dgCMatrix"), as(e2, "dgCMatrix")),
 		 "dsCMatrix")
 	  })
 
-setMethod("Arith", signature(e1 = "dtCMatrix", e2 = "dtCMatrix"),
-	  function(e1, e2) {
-	      U1 <- e1@uplo
-	      isTri <- U1 == e2@uplo
-	      if(isTri)
-		  message("suboptimal implementation of 'triang.  o  triang.'")
-              ## else:   lowerTri  o  upperTri: |--> "all 0" {often} -- FIXME?
-	      r <- callGeneric(as(e1, "dgCMatrix"), as(e2, "dgCMatrix"))
-	      if(isTri) as(r, "dtCMatrix") else r
-	  })
-
-
 
 ##-------- originally from ./dgCMatrix.R --------------------
 
+.Arith.Csparse <- function(e1, e2, Generic, triangular = FALSE)
+{
+    ## Generic is one of  "+", "-", "*", "^", "%%", "%/%", "/"
+
+    ## triangular:  TRUE  iff e1,e2 are triangular  _and_  e1@uplo == e2@uplo
+    d <- dimCheck(e1, e2)
+    dn <- dimNamesCheck(e1, e2)
+    ij1 <- non0ind(e1)
+    ij2 <- non0ind(e2)
+    if(triangular) {
+	uplo <- e1@uplo
+	newTMat <- function(i,j,x)
+	    new("dtTMatrix", Dim = d, Dimnames = dn, i = i, j = j, x = x, uplo = uplo)
+	dmat <- "dtrMatrix"
+    } else {
+	newTMat <- function(i,j,x)
+	    new("dgTMatrix", Dim = d, Dimnames = dn, i = i, j = j, x = x)
+	dmat <- "dgeMatrix"
+    }
+    switch(Generic,
+	   "+" = , "-" = {
+	       ## special "T" convention: repeated entries are *summed*
+	       .Call(Tsparse_to_Csparse,
+		     newTMat(i = c(ij1[,1], ij2[,1]),
+			     j = c(ij1[,2], ij2[,2]),
+			     x = if(Generic == "+") c(e1@x, e2@x) else c(e1@x, - e2@x)),
+		     triangular)
+	   },
+
+	   "*" =
+       { ##  X * 0 == 0 * X == 0 --> keep common non-0
+	   ii <- WhichintersectInd(ij1, ij2, nrow=d[1])
+	   ij <- ij1[ii[[1]], , drop = FALSE]
+	   .Call(Tsparse_to_Csparse,
+		 newTMat(i = ij[,1],
+			 j = ij[,2],
+			 x = e1@x[ii[[1]]] * e2@x[ii[[2]]]),
+		 triangular)
+       },
+
+	   "^" =
+       {
+	   ii <- WhichintersectInd(ij1, ij2, nrow=d[1])
+	   ## 3 cases:
+	   ## 1) X^0 := 1  (even for X=0) ==> dense
+	   ## 2) 0^Y := 0  for Y != 0	      =====
+	   ## 3) x^y :
+
+	   ## FIXME:	dgeM[cbind(i,j)] <- V  is not yet possible
+	   ##	    nor dgeM[ i_vect   ] <- V
+	   ## r <- as(e2, "dgeMatrix")
+	   ## ...
+	   r <- as(e2, "matrix")
+	   Yis0 <- is0(r)
+	   r[complementInd(ij1, dim=d)] <- 0 ## 2)
+	   r[1:1 + ij2[ii[[2]], , drop=FALSE]] <-
+	       e1@x[ii[[1]]] ^ e2@x[ii[[2]]] ## 3)
+	   r[Yis0] <- 1			     ## 1)
+	   as(r, dmat)
+       },
+
+	   "%%" = , "%/%" = , "/" = ## 0 op 0	 |-> NaN => dense
+	   get(Generic)(as(e1, dmat), e2)
+
+	   )# end{switch(..)}
+}
+
 setMethod("Arith", signature(e1 = "dgCMatrix", e2 = "dgCMatrix"),
-          ##  "+", "-", "*", "^", "%%", "%/%", "/"
+	  function(e1,e2) .Arith.Csparse(e1,e2, .Generic))
+
+setMethod("Arith", signature(e1 = "dtCMatrix", e2 = "dtCMatrix"),
 	  function(e1, e2) {
-	      d <- dimCheck(e1, e2)
-	      dn <- dimNamesCheck(e1, e2)
-	      ij1 <- non0ind(e1)
-	      ij2 <- non0ind(e2)
-	      switch(.Generic,
-		     "+" = , "-" =
-		     ## special "T" convention: repeated entries are *summed*
-		     .Call(Tsparse_to_Csparse,
-			   new("dgTMatrix", Dim = d, Dimnames = dn,
-			       i = c(ij1[,1], ij2[,1]),
-			       j = c(ij1[,2], ij2[,2]),
-			       x = c(callGeneric(e1@x, 0),callGeneric(0,e2@x))),
-			   FALSE),
-
-		     "*" =
-		 { ##  X * 0 == 0 * X == 0 --> keep common non-0
-		     ii <- WhichintersectInd(ij1, ij2, nrow=d[1])
-		     ij <- ij1[ii[[1]], , drop = FALSE]
-		     .Call(Tsparse_to_Csparse,
-			   new("dgTMatrix", Dim = d, Dimnames = dn,
-			       i = ij[,1],
-			       j = ij[,2],
-			       x = e1@x[ii[[1]]] * e2@x[ii[[2]]]),
-			   FALSE)
-		 },
-
-		     "^" =
-		 {
-		     ii <- WhichintersectInd(ij1, ij2, nrow=d[1])
-		     ## 3 cases:
-		     ## 1) X^0 := 1  (even for X=0) ==> dense
-		     ## 2) 0^Y := 0  for Y != 0		=====
-		     ## 3) x^y :
-
-		     ## FIXME:	dgeM[cbind(i,j)] <- V  is not yet possible
-		     ##	    nor dgeM[ i_vect   ] <- V
-		     ## r <- as(e2, "dgeMatrix")
-		     ## ...
-		     r <- as(e2, "matrix")
-		     Yis0 <- is0(r)
-		     r[complementInd(ij1, dim=d)] <- 0 ## 2)
-		     r[1:1 + ij2[ii[[2]], , drop=FALSE]] <-
-			 e1@x[ii[[1]]] ^ e2@x[ii[[2]]]	    ## 3)
-		     r[Yis0] <- 1			    ## 1)
-		     as(r, "dgeMatrix")
-		 },
-
-		     "%%" = , "%/%" = , "/" = ## 0 op 0	 |-> NaN => dense
-		     callGeneric(as(e1, "dgeMatrix"), e2)
-		     )
+	      U1 <- e1@uplo
+	      isTri <- U1 == e2@uplo # will the result definitely be triangular?
+	      if(isTri) {
+		  .Arith.Csparse(e1,e2, .Generic, triangular=TRUE)
+	      }
+	      else { ## lowerTri  o  upperTri: |--> "all 0" {often} -- FIXME?
+		  callGeneric(as(e1, "dgCMatrix"), as(e2, "dgCMatrix"))
+	      }
 	  })
+
+
 
 setMethod("Arith", signature(e1 = "dgCMatrix", e2 = "numeric"),
 	  function(e1, e2) {
