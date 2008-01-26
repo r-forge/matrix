@@ -431,6 +431,7 @@ setMethod("[", signature(x = "TsparseMatrix",
 ### -----   M[i,j] <- v  with   i,j = length-1-numeric;  v= length-1 number
 ###                            *and* M[i,j] == 0 previously
 
+## ---------     ----- FIXME(2): keep in sync with replCmat() in ./Csparse.R
 ## workhorse for "[<-" :
 replTmat <- function (x, i, j, ..., value)
 {
@@ -455,8 +456,8 @@ replTmat <- function (x, i, j, ..., value)
 	if(!is(x,"generalMatrix")) {
 	    cl <- class(x)
 	    x <- as(x, paste(.M.kind(x), "gTMatrix", sep=''))
-	    ## give a message, since this is sub-optimal
-	    message("'x[i] <- v' indexing: Coercing class ",cl," to ",class(x))
+	    message("'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ",
+		    cl," to ",class(x))
 	}
 	nr <- di[1]
 	x.i <- encodeInd2(x@i, x@j, nr)
@@ -464,6 +465,7 @@ replTmat <- function (x, i, j, ..., value)
 	    x <- uniqTsparse(x)
 	    x.i <- encodeInd2(x@i, x@j, nr)
 	}
+
 	if(is.logical(i)) { # full-size logical indexing
 	    n <- prod(di)
 	    if(n) {
@@ -471,6 +473,25 @@ replTmat <- function (x, i, j, ..., value)
 		i <- (0:(n-1))[i] # -> 0-based index vector as well {maybe LARGE!}
 	    } else i <- integer(0)
 	} else i <- as.integer(i) - 1L ## 0-based indices
+
+        clx <- class(x)
+        clDx <- getClassDef(clx) # extends(), is() etc all use the class definition
+        has.x <- "x" %in% slotNames(clDx) # === slotNames(x)
+
+	## now have 0-based indices   x.i (entries) and	 i (new entries)
+
+	## the simplest case:
+	if(all0(value)) { ## just drop the non-zero entries
+	    sel <- is.na(match(x.i, i))
+	    if(any(!sel)) { ## non-zero there
+		x@i <- x@i[sel]
+		x@j <- x@j[sel]
+		if(has.x)
+		    x@x <- x@x[sel]
+	    }
+	    return(x)
+	}
+
 	m <- length(i)
 	if(length(value) != m) { ## use recycling rules
 	    if(m %% length(value) != 0)
@@ -478,16 +499,17 @@ replTmat <- function (x, i, j, ..., value)
 	    value <- rep(value, length.out = m)
 	}
 
-	## now have 0-based indices   x.i (entries) and	 i (new entries)
-	## 1) Change the matching non-zero entries
+	## matching existing non-zeros and new entries
 	isE <- !is.na(mi <- match(i, x.i)) ## use  which(isE) , mi[isE]
-	x@x[mi[isE]] <- value[isE]
+	## 1) Change the matching non-zero entries
+	if(has.x)
+	    x@x[mi[isE]] <- value[isE]
 	## 2) add the new non-zero entries
 	i <- i[!isE]
 	x@i <- c(x@i, i %%  nr)
 	x@j <- c(x@j, i %/% nr)
-	x@x <- c(x@x, value[!isE])
-
+	if(has.x)
+	    x@x <- c(x@x, value[!isE])
 	return(x)
     }
     ## nargs() == 4 :
@@ -502,7 +524,7 @@ replTmat <- function (x, i, j, ..., value)
             stop("nothing to replace with")
         else return(x)
     }
-    ## else: lenV := length(value) > 0
+    ## else: lenV := length(value)	 is > 0
     if(lenRepl %% lenV != 0)
         stop("number of items to replace is not a multiple of replacement length")
     if(!iMi && any(duplicated(i1))) {
@@ -531,7 +553,7 @@ replTmat <- function (x, i, j, ..., value)
 
     toGeneral <- FALSE
     if((sym.x <- extends(clDx, "symmetricMatrix"))) {
-	r.sym <- dind[1] == dind[2] && all(i1 == i2) &&
+	r.sym <- (dind[1] == dind[2]) && all(i1 == i2) &&
 	(lenRepl == 1 || isSymmetric(value <- array(value, dim=dind)))
 	if(r.sym) { ## result is *still* symmetric --> keep symmetry!
 	    ## now consider only those indices above / below diagonal:
@@ -547,7 +569,8 @@ replTmat <- function (x, i, j, ..., value)
     }
     else if((tri.x <- extends(clDx, "triangularMatrix"))) {
         xU <- x@uplo == "U"
-	r.tri <- all(if(xU) i1 <= i2 else i2 <= i1)
+	r.tri <- ((any(dind == 1) || dind[1] == dind[2]) &&
+		  all(if(xU) i1 <= i2 else i2 <= i1))
 	if(r.tri) { ## result is *still* triangular
             if(any(i1 == i2)) # diagonal will be changed
                 x <- diagU2N(x) # keeps class (!)
@@ -648,11 +671,12 @@ replTmat <- function (x, i, j, ..., value)
     nA <- nargs()
     if(nA != 3) stop("nargs() = ", nA, " should never happen; please report.")
 
-    ## else: nA == 3  i.e.,  M [ cbind(ii,jj) ] <- value
+    ## else: nA == 3  i.e.,  M [ cbind(ii,jj) ] <- value or M [ Lmat ] <- value
     if(is.logical(i)) {
 	message(".TM.repl.i.2col(): drop 'matrix' case ...")
-	i <- c(i) # drop "matrix"
-	return( callNextMethod() )
+	## c(i) : drop "matrix" to logical vector
+	x[c(i)] <- value
+	return(x)
     } else if(!is.numeric(i) || ncol(i) != 2)
 	stop("such indexing must be by logical or 2-column numeric matrix")
     if(!is.integer(i)) storage.mode(i) <- "integer"
@@ -780,18 +804,16 @@ replTmat <- function (x, i, j, ..., value)
 } ## end{.TM.repl.i.2col}
 
 setReplaceMethod("[", signature(x = "TsparseMatrix", i = "index", j = "missing",
-                                value = "replValue"),
-                 replTmat)
-##                  function (x, i, j, ..., value) replTmat(x, i=i, , value=value))
+				value = "replValue"),
+		 replTmat)
 
 setReplaceMethod("[", signature(x = "TsparseMatrix", i = "missing", j = "index",
-                                value = "replValue"),
-                 replTmat)
-##                  function (x, i, j, ..., value) replTmat(x, , j=j, value=value))
+				value = "replValue"),
+		 replTmat)
 
 setReplaceMethod("[", signature(x = "TsparseMatrix", i = "index", j = "index",
 				value = "replValue"),
-                 replTmat)
+		 replTmat)
 
 setReplaceMethod("[", signature(x = "TsparseMatrix", i = "matrix", j = "missing",
 				value = "replValue"),

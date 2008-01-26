@@ -5,13 +5,15 @@
 
 ## tcrossprod() is now in R's base
 
+## these two are *not* exported (yet) :
+
     setGeneric("isDiagonal", function(object, ...)
                standardGeneric("isDiagonal"))
 
-## isSymmetric is "S3 generic" in R's  base/R/eigen.R
-
     setGeneric("isTriangular", function(object, ...) ## 'upper = NA'
                standardGeneric("isTriangular"))
+
+## isSymmetric is "S3 generic" in R's  base/R/eigen.R
 
     setGeneric("facmul",
                function(x, factor, y, transpose, left, ...)
