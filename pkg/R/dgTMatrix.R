@@ -34,6 +34,16 @@ setAs("dgTMatrix", "dsTMatrix",
 	  }
 	  else stop("not a symmetric matrix")})
 
+## This is faster:
+setAs("dgTMatrix", "dtCMatrix",
+      function(from) {
+	  if(!(iTri <- isTriangular(from)))
+	      stop("the matrix is not triangular")
+	  ## else
+	  stopifnot(is.character(uplo <- attr(iTri,"kind")))
+	  .Call(Tsparse_to_tCsparse, from, uplo, "N")
+      })
+
 setAs("dgTMatrix", "dtTMatrix",
       function(from) check.gT2tT(from, cl = "dgTMatrix", toClass = "dtTMatrix",
 				 cld = getClassDef("dgTMatrix")))

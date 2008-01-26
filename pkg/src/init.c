@@ -67,6 +67,7 @@ static R_CallMethodDef CallEntries[] = {
     {"SVD_validate", (DL_FUNC) &SVD_validate, 1},
     {"Tsparse_validate", (DL_FUNC) &Tsparse_validate, 1},
     {"Tsparse_to_Csparse", (DL_FUNC) &Tsparse_to_Csparse, 2},
+    {"Tsparse_to_tCsparse", (DL_FUNC) &Tsparse_to_tCsparse, 3},
 /*     {"csc_check_column_sorting", (DL_FUNC) &csc_check_column_sorting, 1}, */
     {"compressed_to_TMatrix", (DL_FUNC) &compressed_to_TMatrix, 2},
     {"compressed_non_0_ij", (DL_FUNC) &compressed_non_0_ij, 2},
