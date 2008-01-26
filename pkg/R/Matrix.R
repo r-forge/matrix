@@ -428,16 +428,16 @@ setMethod("[", signature(x = "Matrix", i = "logical", j = "missing",
 	  .M.sub.i.logical)
 
 
-## A[ ij ]  where ij is (i,j) 2-column matrix :
+## A[ ij ]  where ij is (i,j) 2-column matrix -- but also when that is logical mat!
 .M.sub.i.2col <- function (x, i, j, ..., drop)
 {
     nA <- nargs()
-    if(nA == 2) { ##  M [ cbind(ii,jj) ]
+    if(nA == 2) { ##  M [ cbind(ii,jj) ] or M [ <logical matrix> ]
 	if(!is.integer(nc <- ncol(i)))
-	    stop("'i' has no integer column number",
-		 " should never happen; please report")
+	    stop(".M.sub.i.2col(): 'i' has no integer column number;\n",
+		 "should never happen; please report")
 	if(is.logical(i))
-	    return(.M.sub.i.logical(x,i,j,drop))
+	    return(.M.sub.i.logical(x, i=i)) # call with 2 args!
 	else if(!is.numeric(i) || nc != 2)
 	    stop("such indexing must be by logical or 2-column numeric matrix")
 	m <- nrow(i)
@@ -475,17 +475,17 @@ setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
 .M.repl.i.2col <- function (x, i, j, ..., value)
 {
     nA <- nargs()
-    if(nA == 3) { ##  M [ cbind(ii,jj) ] <- value
+    if(nA == 3) { ##  M [ cbind(ii,jj) ] <- value  or M [ Lmat ] <- value
 	if(!is.integer(nc <- ncol(i)))
-	    stop("'i' has no integer column number",
-		 " should never happen; please report")
+	    stop(".M.repl.i.2col(): 'i' has no integer column number;\n",
+		 "should never happen; please report")
 	else if(!is.numeric(i) || nc != 2)
 	    stop("such indexing must be by logical or 2-column numeric matrix")
 	if(is.logical(i)) {
 	    message(".M.repl.i.2col(): drop 'matrix' case ...")
-	    i <- c(i) # drop "matrix"
-	    return( callNextMethod() )
-        }
+	    ## c(i) : drop "matrix" to logical vector
+	    return( callGeneric(x, i=c(i), value=value) )
+	}
 	if(!is.integer(i)) storage.mode(i) <- "integer"
 	if(any(i < 0))
 	    stop("negative values are not allowed in a matrix subscript")

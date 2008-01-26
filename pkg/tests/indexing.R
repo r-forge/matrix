@@ -373,10 +373,36 @@ m. <- mc
 mc[4,] <- 0
 mc
 
+S <- as(Diagonal(5),"sparseMatrix")
 H <- Hilbert(9)
 Hc <- as(round(H, 3), "dsCMatrix")# a sparse matrix with no 0 ...
 (trH <- tril(Hc[1:5, 1:5]))
-stopifnot(is(trH, "triangularMatrix"), trH@uplo == "L")
+stopifnot(is(trH, "triangularMatrix"), trH@uplo == "L",
+          is(S, "triangularMatrix"))
+
+## triangular assignment
+## the slick (but inefficient in case of sparse!) way to assign sub-diagonals:
+## equivalent to tmp <- `diag<-`(S[,-1], -2:1); S[,-1] <- tmp
+## which dispatches to (x="TsparseMatrix", i="missing",j="index", value="replValue")
+diag(S[,-1]) <- -2:1 # used to give a wrong warning
+## FIXME? the above *could* return triangular -- but for that
+
+trH[c(1:2,4), c(2:3,5)] <- 0 # gave an *error* upto Jan.2008
+trH[ lower.tri(trH) ] <- 0   # ditto, because of callNextMethod()
+
+m <- Matrix(0+1:28, nrow = 4)
+m[-3,c(2,4:5,7)] <- m[ 3, 1:4] <- m[1:3, 6] <- 0
+mT <- as(m, "dgTMatrix")
+stopifnot(identical(mT[lower.tri(mT)],
+                    m [lower.tri(m) ]))
+lM <- upper.tri(mT, diag=TRUE)
+mT[lM] <- 0
+ m[lM] <- 0
+assert.EQ.mat(mT, as(m,"matrix"))
+mT[lM] <- -1:0
+ m[lM] <- -1:0
+assert.EQ.mat(mT, as(m,"matrix"))
+(mT <- drop0(mT))
 
 i <- c(1:2, 4, 6:7); j <- c(2:4,6)
 H[i,j] <- 0

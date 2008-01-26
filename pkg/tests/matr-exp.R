@@ -39,14 +39,17 @@ all.equal(as(e2,"matrix"), te2, tol = 0) # 1.48e-14 on "lynne"
 ## or                           log det(exp(A)) == tr(A) :
 stopifnot(all.equal(c(determinant(e2)$modulus), sum(diag(m2))))
 
-m3 <- Matrix(cbind(0,rbind(6*diag(3),0)), nc = 4)#  sparse
+## a very simple nilpotent one:
+(m3 <- Matrix(cbind(0,rbind(6*diag(3),0))))# sparse
+stopifnot(all(m3 %*% m3 %*% m3 %*% m3 == 0))# <-- m3 "^" 4 == 0
 e3 <- expm(m3)
 E3 <- expm(Matrix(m3, sparse=FALSE))
-stopifnot(identical(e3, E3))
 e3. <- rbind(c(1,6,18,36),
              c(0,1, 6,18),
              c(0,0, 1, 6),
              c(0,0, 0, 1))
-assert.EQ.mat(e3, e3.)
+stopifnot(identical(e3, E3),
+          identical(as.mat(e3), e3.))
+
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''

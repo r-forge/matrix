@@ -421,10 +421,8 @@ setMethod("isSymmetric", signature(object = "sparseMatrix"),
 	  })
 
 
-## These two are not (yet?) exported:
-setMethod("isTriangular", signature(object = "sparseMatrix"),
-	  function(object, upper = NA)
-              isTriC(as(object, "CsparseMatrix"), upper))
+setMethod("isTriangular", signature(object = "CsparseMatrix"), isTriC)
+setMethod("isTriangular", signature(object = "TsparseMatrix"), isTriT)
 
 setMethod("isDiagonal", signature(object = "sparseMatrix"),
 	  function(object) {

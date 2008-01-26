@@ -1,3 +1,15 @@
+2008-01-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R (.M.sub.i.2col): fix for logical matrix indexing
+	* R/Tsparse.R (.TM.sub.i.2col, .TM.repl.i.2col): ditto;
+		now, M[lower.tri(M)] and  M[lower.tri(M)] <- v  work better
+
+	* src/Tsparse.c (Tsparse_to_tCsparse): new fast utility.
+	* src/Tsparse.h, init.c: ditto
+	* R/Auxiliaries.R (isTriT): new; faster than going via Csparse
+	     both isTriC() and isTriT() now return TRUE with "kind" or FALSE.
+	* R/sparseMatrix.R (isTriangular): hence simplified
+
 2008-01-24  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Ops.R (.Arith.Csparse): new utility factored out of former

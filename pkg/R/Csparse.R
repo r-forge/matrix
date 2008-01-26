@@ -101,8 +101,8 @@ setMethod("Math",
 
 
 
-### workhorse for "[<-" -- both for d* and l*  C-sparse matrices :
-## must have exact signature or then not be set as method directly
+## workhorse for "[<-" -- both for d* and l*  C-sparse matrices :
+## ---------     -----  FIXME(2): keep in sync with replTmat() in ./Tsparse.R
 replCmat <- function (x, i, j, ..., value)
 {
     di <- dim(x)
@@ -147,9 +147,10 @@ replCmat <- function (x, i, j, ..., value)
 	## x.sym : result is *still* symmetric
 	x <- .Call(Csparse_symmetric_to_general, x) ## but do *not* redefine clx!
     }
-    else if((x.tri <- extends(clDx, "triangularMatrix"))) {
+    else if((tri.x <- extends(clDx, "triangularMatrix"))) {
         xU <- x@uplo == "U"
-	r.tri <- all(if(xU) i1 <= i2 else i2 <= i1)
+	r.tri <- ((any(dind == 1) || dind[1] == dind[2]) &&
+		  all(if(xU) i1 <= i2 else i2 <= i1))
 	if(r.tri) { ## result is *still* triangular
             if(any(i1 == i2)) # diagonal will be changed
                 x <- diagU2N(x) # keeps class (!)
