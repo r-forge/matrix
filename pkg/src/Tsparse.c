@@ -44,3 +44,18 @@ SEXP Tsparse_to_Csparse(SEXP x, SEXP tri)
 			      Rkind, tr ? diag_P(x) : "",
 			      GET_SLOT(x, Matrix_DimNamesSym));
 }
+
+/* speedup utility, needed e.g. after subsetting: */
+SEXP Tsparse_to_tCsparse(SEXP x, SEXP uplo, SEXP diag)
+{
+    CHM_TR chxt = AS_CHM_TR(x);
+    CHM_SP chxs = cholmod_triplet_to_sparse(chxt, chxt->nnz, &c);
+    int Rkind = (chxt->xtype != CHOLMOD_PATTERN) ? Real_kind(x) : 0;
+    R_CheckStack();
+
+    return chm_sparse_to_SEXP(chxs, 1,
+			      /* uploT = */ (*CHAR(asChar(uplo)) == 'U')? 1: -1,
+			      Rkind,
+			      /* diag = */ CHAR(STRING_ELT(diag, 0)),
+			      GET_SLOT(x, Matrix_DimNamesSym));
+}
