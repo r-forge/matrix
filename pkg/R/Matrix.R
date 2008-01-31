@@ -376,14 +376,15 @@ setMethod("[", signature(x = "Matrix",
 
 ## missing 'drop' --> 'drop = TRUE'
 ##                     -----------
-## select rows
+## select rows __ or __ vector indexing:
 setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
 			 drop = "missing"),
 	  function(x,i,j, ..., drop) {
 	      if(nargs() == 2) { ## e.g. M[0] , M[TRUE],  M[1:2]
-		  if(any(i) || prod(dim(x)) == 0)
+		  if(any(as.logical(i)) || prod(dim(x)) == 0)
+                      ## FIXME: for *large sparse*, use sparseVector !
 		      as.vector(x)[i]
-		  else ## save memory
+		  else ## save memory (for large sparse M):
 		      as.vector(x[1,1])[FALSE]
 	      } else {
 		  callGeneric(x, i=i, , drop=TRUE)
