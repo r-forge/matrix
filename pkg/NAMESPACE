@@ -36,13 +36,15 @@ export("Cholesky",
        "rcond",
        "readHB",
        "readMM",
-       "xtabs",
+       "symmpart",
+       "skewpart",
        "tcrossprod",
        "tril",
        "triu",
        "unpack",
 #        "writeHB",
-       "writeMM"
+       "writeMM",
+       "xtabs"
        )
 
 ## substitute for using  cbind() / rbind()
@@ -271,6 +273,8 @@ exportMethods(
 	      "show",
 	      "solve",
 	      "summary",
+              "symmpart",
+              "skewpart",
 	      "t",
 	      "tail",
 	      "tcrossprod",

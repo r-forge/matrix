@@ -11,6 +11,7 @@ setAs("ddenseMatrix", "dgeMatrix",
 	  else from
       })
 
+
 ## d(ouble) to l(ogical):
 setAs("dgeMatrix", "lgeMatrix", function(from) d2l_Matrix(from, "dgeMatrix"))
 setAs("dsyMatrix", "lsyMatrix", function(from) d2l_Matrix(from, "dsyMatrix"))
@@ -120,36 +121,77 @@ setMethod("Math",
 
 ### FIXME: band() et al should be extended from "ddense" to "dense" !
 ###        However, needs much work to generalize dup_mMatrix_as_dgeMatrix()
+### --> use workaround below: go via "d"(ouble) and back
 
+.trilDense <- function(x, k = 0, ...) {
+    k <- as.integer(k[1])
+    dd <- dim(x); sqr <- dd[1] == dd[2]
+    stopifnot(-dd[1] <= k, k <= dd[1]) # had k <= 0
+    ## returns "lower triangular" if k <= 0 && sqr
+    .Call(ddense_band, x, -dd[1], k)
+}
 ## NB: have extra tril(), triu() methods for symmetric ["dsy" and "dsp"] and
 ##     for triangular ["dtr" and "dtp"]
-setMethod("tril", "ddenseMatrix",
+setMethod("tril", "ddenseMatrix", .trilDense)
+setMethod("tril",	"matrix",
 	  function(x, k = 0, ...) {
-	      k <- as.integer(k[1])
-	      dd <- dim(x); sqr <- dd[1] == dd[2]
-	      stopifnot(-dd[1] <= k, k <= dd[1]) # had k <= 0
-	      ## returns "lower triangular" if k <= 0 && sqr
-	      .Call(ddense_band, x, -dd[1], k)
-	  })
-
-setMethod("triu", "ddenseMatrix",
-	  function(x, k = 0, ...) {
-	      k <- as.integer(k[1])
-	      dd <- dim(x); sqr <- dd[1] == dd[2]
-	      stopifnot(-dd[1] <= k, k <= dd[1]) # had k >= 0
-	      ## returns "upper triangular" if k >= 0
-	      .Call(ddense_band, x, k, dd[2])
-	  })
-
-setMethod("band", "ddenseMatrix",
-	  function(x, k1, k2, ...) {
-	      k1 <- as.integer(k1[1])
-	      k2 <- as.integer(k2[1])
-	      dd <- dim(x); sqr <- dd[1] == dd[2]
-	      stopifnot(-dd[1] <= k1, k1 <= k2, k2 <= dd[1])
-	      r <- .Call(ddense_band, x, k1, k2)
-	      if (k1 < 0  &&  k1 == -k2  && isSymmetric(x)) ## symmetric
-		  as(r, paste(.M.kind(x), "syMatrix", sep=''))
-	      else
+	      if(is.double(x)) .trilDense(x, k)
+	      else {
+		  r <- .trilDense(x, k)
+		  storage.mode(r) <- storage.mode(x)
 		  r
-	  })
+	      }})
+setMethod("tril", "denseMatrix",# all but ddense*
+	  function(x, k = 0, ...)
+	      as(.trilDense(as(x, "dMatrix"), k), class(x)))
+
+.triuDense <- function(x, k = 0, ...) {
+    k <- as.integer(k[1])
+    dd <- dim(x); sqr <- dd[1] == dd[2]
+    stopifnot(-dd[1] <= k, k <= dd[1]) # had k >= 0
+    ## returns "upper triangular" if k >= 0
+    .Call(ddense_band, x, k, dd[2])
+}
+setMethod("triu", "ddenseMatrix", .triuDense)
+setMethod("triu",	"matrix",
+	  function(x, k = 0, ...) {
+	      if(is.double(x)) .triuDense(x, k)
+	      else {
+		  r <- .triuDense(x, k)
+		  storage.mode(r) <- storage.mode(x)
+		  r
+	      }})
+setMethod("triu", "denseMatrix",# all but ddense*
+	  function(x, k = 0, ...)
+	      as(.triuDense(as(x, "dMatrix"), k), class(x)))
+
+.bandDense <- function(x, k1, k2, ...) {
+    k1 <- as.integer(k1[1])
+    k2 <- as.integer(k2[1])
+    dd <- dim(x); sqr <- dd[1] == dd[2]
+    stopifnot(-dd[1] <= k1, k1 <= k2, k2 <= dd[1])
+    r <- .Call(ddense_band, x, k1, k2)
+    if (k1 < 0	&&  k1 == -k2  && isSymmetric(x)) ## symmetric
+	as(r, paste(.M.kind(x), "syMatrix", sep=''))
+    else
+	r
+}
+
+setMethod("band", "ddenseMatrix", .bandDense)
+setMethod("band",	"matrix",
+	  function(x, k1, k2, ...) {
+	      if(is.double(x)) .bandDense(x, k1, k2)
+	      else {
+		  r <- .bandDense(x, k1, k2)
+		  storage.mode(r) <- storage.mode(x)
+		  r
+	      }})
+setMethod("band", "denseMatrix",# all but ddense*
+	  function(x, k1, k2, ...)
+	      as(.bandDense(as(x, "dMatrix"), k1, k2), class(x)))
+
+setMethod("symmpart", signature(x = "ddenseMatrix"),
+	  function(x) .Call(ddense_symmpart, x))
+setMethod("skewpart", signature(x = "ddenseMatrix"),
+	  function(x) .Call(ddense_skewpart, x))
+

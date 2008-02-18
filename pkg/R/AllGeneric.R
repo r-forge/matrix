@@ -62,6 +62,10 @@
                function(A, perm = TRUE, LDL = TRUE, super = FALSE, ...)
                standardGeneric("Cholesky"))
 
+setGeneric("symmpart", function(x) standardGeneric("symmpart"))
+setGeneric("skewpart", function(x) standardGeneric("skewpart"))
+
+
 
 ###---- Group Generics ----
 

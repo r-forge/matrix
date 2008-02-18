@@ -74,6 +74,9 @@ static R_CallMethodDef CallEntries[] = {
     {"dense_to_Csparse", (DL_FUNC) &dense_to_Csparse, 1},
     {"dense_nonpacked_validate", (DL_FUNC) &dense_nonpacked_validate, 1},
     {"ddense_band", (DL_FUNC) &ddense_band, 3},
+    {"ddense_to_symmetric", (DL_FUNC) &ddense_to_symmetric, 2},
+    {"ddense_symmpart", (DL_FUNC) &ddense_symmpart, 1},
+    {"ddense_skewpart", (DL_FUNC) &ddense_skewpart, 1},
     {"dMatrix_validate", (DL_FUNC) &dMatrix_validate, 1},
 
     {"dgCMatrix_LU", (DL_FUNC) &dgCMatrix_LU, 3},
@@ -82,7 +85,7 @@ static R_CallMethodDef CallEntries[] = {
     {"igCMatrix_colSums", (DL_FUNC) &igCMatrix_colSums, 5},
     {"lgCMatrix_colSums", (DL_FUNC) &lgCMatrix_colSums, 5},
     {"ngCMatrix_colSums", (DL_FUNC) &ngCMatrix_colSums, 5},
-    {"dgCMatrix_cholsol", (DL_FUNC) &dgCMatrix_cholsol, 2},
+   {"dgCMatrix_cholsol", (DL_FUNC) &dgCMatrix_cholsol, 2},
     {"dgCMatrix_lusol", (DL_FUNC) &dgCMatrix_lusol, 2},
     {"dgCMatrix_matrix_solve", (DL_FUNC) &dgCMatrix_matrix_solve, 2},
     {"dgCMatrix_qrsol", (DL_FUNC) &dgCMatrix_qrsol, 2},

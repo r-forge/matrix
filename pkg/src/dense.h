@@ -9,5 +9,8 @@ SEXP lsq_dense_QR(SEXP X, SEXP y);
 SEXP lapack_qr(SEXP Xin, SEXP tl);
 SEXP dense_to_Csparse(SEXP x);
 SEXP ddense_band(SEXP x, SEXP k1, SEXP k2);
+SEXP ddense_to_symmetric(SEXP x, SEXP uplo);
+SEXP ddense_symmpart(SEXP x);
+SEXP ddense_skewpart(SEXP x);
 
 #endif
