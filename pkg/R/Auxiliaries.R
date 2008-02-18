@@ -273,23 +273,23 @@ nnzero <- function(x, na.counted = NA) {
 
 ## For sparseness handling, return a
 ## 2-column (i,j) matrix of 0-based indices of non-zero entries:
+
+non0.i <- function(M, cM = class(M)) {
+    if(extends(cM, "TsparseMatrix"))
+	return(unique(cbind(M@i,M@j)))
+    if(extends(cM, "pMatrix"))
+	return(cbind(seq_len(nrow(M)), M@perm) - 1L)
+    ## else: C* or R*
+    isC <- extends(cM, "CsparseMatrix")
+    .Call(compressed_non_0_ij, M, isC)
+}
+
 non0ind <- function(x, classDef.x = getClassDef(class(x)))
 {
     if(is.numeric(x))
 	return(if((n <- length(x))) (0:(n-1))[isN0(x)] else integer(0))
     ## else
-
     stopifnot(extends(classDef.x, "sparseMatrix"))
-
-    non0.i <- function(M, cM = class(M)) {
-	if(extends(cM, "TsparseMatrix"))
-	    return(unique(cbind(M@i,M@j)))
-	if(extends(cM, "pMatrix"))
-	    return(cbind(seq_len(nrow(M)), M@perm) - 1L)
-	## else: C* or R*
-	isC <- extends(cM, "CsparseMatrix")
-	.Call(compressed_non_0_ij, M, isC)
-    }
 
     if(extends(classDef.x, "symmetricMatrix")) { # also get "other" triangle
 	ij <- non0.i(x, classDef.x)
@@ -393,7 +393,7 @@ asTuniq <- function(x) {
     if(is(x, "TsparseMatrix")) uniqTsparse(x) else as(x,"TsparseMatrix")
 }
 
-## is 'x' a uniq Tsparse Matrix ?
+## is 'x' a uniq Tsparse Matrix ?  {not used currently}
 is_not_uniqT <- function(x, nr = nrow(x))
     is.unsorted(x@j) || any(duplicated(encodeInd2(x@i, x@j, nr)))
 
@@ -617,6 +617,14 @@ l2d_meth <- function(x) {
     }
 }
 
+## a faster simpler version [for sparse matrices, i.e., never diagonal]
+.M.shapeC <- function(x, clx = class(x)) {
+    if(is.character(clx)) # < speedup: get it once
+	clx <- getClassDef(clx)
+    if	   (extends(clx, "triangularMatrix")) "t"
+    else if(extends(clx, "symmetricMatrix"))  "s" else "g"
+}
+
 
 class2 <- function(cl, kind = "l", do.sub = TRUE) {
     ## Find "corresponding" class; since pos.def. matrices have no pendant:
@@ -651,6 +659,8 @@ as_dense <- function(x, cld = if(isS4(x)) getClassDef(class(x))) {
     as(x, paste(.M.kind(x, cld), .dense.prefixes[.M.shape(x, cld)], "Matrix", sep=''))
 }
 
+## This is "general" but slower than the next definition
+if(FALSE)
 .sp.class <- function(x) { ## find and return the "sparseness class"
     if(!is.character(x)) x <- class(x)
     for(cl in paste(c("C","T","R"), "sparseMatrix", sep=''))
@@ -658,6 +668,14 @@ as_dense <- function(x, cld = if(isS4(x)) getClassDef(class(x))) {
 	    return(cl)
     ## else (should rarely happen)
     as.character(NA)
+}
+
+.sp.class <- function(x) { ## find and return the "sparseness class"
+    if(!is.character(x)) x <- c(class(x))
+    if(any((ch <- substr(x,3,3)) == c("C","T","R")))
+        return(paste(ch, "sparseMatrix", sep=''))
+    ## else
+    NA_character_
 }
 
 
@@ -938,4 +956,20 @@ sp.rowMeans <- function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
 	nc <- nc - sparsapply(x, 1, function(u) sum(is.na(u)),
 			      sparseResult=sparseResult)
     sparsapply(x, 1, sum, sparseResult=sparseResult, na.rm=na.rm) / nc
+}
+
+all0Matrix <- function(n,m) {
+    ## an  all-0 matrix	 -- chose what Matrix() also gives -- "most efficiently"
+    n <- as.integer(n)
+    m <- as.integer(m)
+    new(if(n == m) "dsCMatrix" else "dgCMatrix",
+	Dim = c(n,m),
+	p = rep.int(0L, m+1L))
+}
+
+setZero <- function(x) {
+    ## all-0 matrix  from x  which must inherit from 'Matrix'
+    d <- x@Dim
+    new(if(d[1] == d[2]) "dsCMatrix" else "dgCMatrix",
+	Dim = d, Dimnames = x@Dimnames, p = rep.int(0L, d[2]+1L))
 }

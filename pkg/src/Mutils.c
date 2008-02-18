@@ -257,6 +257,33 @@ SEXP check_scalar_string(SEXP sP, char *vals, char *nm)
 #undef SPRINTF
 }
 
+/* FIXME? Something like this should be part of the R API ?
+ *        But then, R has the more general  compute_identical()
+ * in src/main/identical.c: Rboolean compute_identical(SEXP x, SEXP y);
+*/
+Rboolean equal_string_vectors(SEXP s1, SEXP s2)
+{
+    Rboolean n1 = isNull(s1), n2 = isNull(s2);
+    if (n1 || n2)
+	return (n1 == n2) ? TRUE : FALSE;
+    else if (TYPEOF(s1) != STRSXP || TYPEOF(s2) != STRSXP)
+	error(_("'s1' and 's2' must be \"character\" vectors"));
+    else {
+	int n = LENGTH(s1), i;
+	if (n != LENGTH(s2))
+	    return FALSE;
+	for(i = 0; i < n; i++) {
+	    /* note that compute_identical() code for STRSXP
+	       is careful about NA's which we don't need */
+	    if(strcmp(CHAR(STRING_ELT(s1, i)),
+		      CHAR(STRING_ELT(s2, i))))
+		return FALSE;
+	}
+	return TRUE; /* they *are* equal */
+    }
+}
+
+
 SEXP dense_nonpacked_validate(SEXP obj)
 {
     int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym));
@@ -673,14 +700,12 @@ SEXP new_dgeMatrix(int nrow, int ncol)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
 	 ad = PROTECT(allocVector(INTSXP, 2));
-    double *ansx;
-    int sz = nrow * ncol;
 
     INTEGER(ad)[0] = nrow;
     INTEGER(ad)[1] = ncol;
     SET_SLOT(ans, Matrix_DimSym, ad);
     SET_SLOT(ans, Matrix_DimNamesSym, allocVector(VECSXP, 2));
-    ansx = REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, sz));
+    ALLOC_SLOT(ans, Matrix_xSym, REALSXP, nrow * ncol);
 
     UNPROTECT(2);
     return ans;

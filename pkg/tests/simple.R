@@ -5,6 +5,8 @@ library(Matrix)
 
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 
+options(verbose = TRUE)# to show message()s
+
 ### Matrix() ''smartness''
 (d4 <- Matrix(diag(4)))
 (z4 <- Matrix(0*diag(4)))
@@ -95,6 +97,11 @@ stopifnot(identical3(cu[cu > 1],  tu [tu > 1], mu [mu > 1]),
 	  identical(ttu , tril(ttu)),
 	  identical(t(tu), tril(t(tu)))
           )
+assert.EQ.mat(triu(cu),   as.matrix(triu(as.matrix(cu))))
+for(k in -1:1)
+    assert.EQ.mat(tril(cu,k), as.matrix(tril(as.matrix(cu),k)))
+
+
 
 (t4 <- new("dgTMatrix", i = 3:0, j = 0:3, x = rep(1,4), Dim = as.integer(c(4,4))))
 c4 <- as(t4, "CsparseMatrix")
@@ -126,16 +133,12 @@ lp <- xpx >= 1
 slp <- as(lp, "sparseMatrix")
 
 ltlp  <-  lp[ lower.tri(lp) ]
-if(FALSE) # this particular indexing fails (FIXME, not urgent)
 sltlp <- slp[ lower.tri(slp) ]
-ij <- which(lower.tri(lp), arr.ind = TRUE)
-if(FALSE) {## FIXME!!! This "[.]" is *HORRENDOUSLY* slow (but "works"):
-    ss <- slp[ij]
-    stopifnot(identical(ss, lp[ij]))
-}
-stopifnot(identical3(lp[ij], ltlp, as(lp, "matrix")[ij]))
-
-stopifnot(is(lp, "lsyMatrix"), lp@uplo == "U")
+dim(ij <- which(lower.tri(lp), arr.ind = TRUE))
+ss <- slp[ij] # now fast (!)
+stopifnot(identical4(lp[ij], ltlp, sltlp, as(lp, "matrix")[ij]),
+          identical(ss, sltlp),
+          is(lp, "lsyMatrix"), lp@uplo == "U")
 
 ###-- more solve() methods  {was ./solve.R }
 
@@ -262,6 +265,8 @@ stopifnot(is(mM, "dsCMatrix"), is(tM, "dtCMatrix")
 	  , identical(as(as(mM, "dgCMatrix"), "dsCMatrix"), mM)
 	  , identical(as(as(mM, "dgTMatrix"), "dsTMatrix"), mT)
 	  , identical(as(as(tM, "dgCMatrix"), "dtCMatrix"), tM)
+          , identical(tM + Diagonal(8), tMD <- Diagonal(8) + tM)
+          , is(tMD, "dtCMatrix")
 	  )
 eM <- eigen(mM) # works thanks to base::as.matrix hack in ../R/zzz.R
 stopifnot(all.equal(eM$values,
@@ -320,11 +325,8 @@ mm <- KNex$mm
 xpx <- crossprod(mm)
 ## extract nonzero pattern
 nxpx <- as(xpx, "nsCMatrix")
-if(FALSE)
-    show(nxpx) ## gives error about "nsC" -> "ngT" coercion ..
-## The bug is actually from *subsetting* the large matrix:
-if(FALSE) ## FIXME
-    r <- nxpx[1:2,]
+show(nxpx) ## now ok, since subsetting works
+r <- nxpx[1:2,]
 
 lmm <- as(mm, "lgCMatrix")
 nmm <- as(lmm, "nMatrix")
@@ -355,11 +357,11 @@ M. <- M2 %x% M # gave infinite recursion
 
 ## diagonal, sparse & interactions
 stopifnot(is(as(Diagonal(3), "TsparseMatrix"), "TsparseMatrix"),
-          is(X <- Diagonal(7) + 1.5 * tM[1:7,1:7], "sparseMatrix"))
+          is(X <- Diagonal(7) + 1.5 * tM[1:7,1:7], "sparseMatrix"),
+          is(X, "triangularMatrix"))
 X
 (XX <- X - chol(crossprod(X)))
-## hmm, if we use drop0() here, maybe we should export it ...
-XX <- as(Matrix:::drop0(XX), "dsCMatrix")
+XX <- as(drop0(XX), "dsCMatrix")
 stopifnot(identical(XX, Matrix(0, nrow(X), ncol(X))))
 
 M <- Matrix(m., sparse = FALSE)

@@ -4,6 +4,8 @@ library(Matrix)
 
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 
+options(verbose = TRUE)# to show message()s
+
 ### Dense Matrices
 
 m <- Matrix(1:28 +0, nrow = 7)
@@ -13,7 +15,7 @@ stopifnot(identical(m, m[]),
           identical(m[2, 3:4], c(16,23))) # simple numeric of length 2
 
 m[2, 3:4, drop=FALSE] # sub matrix of class 'dgeMatrix'
-m[-(4:7), 3:4]        # dito; the upper right corner of 'm'
+m[-(4:7), 3:4]        # ditto; the upper right corner of 'm'
 
 ## rows or columns only:
 m[1,]     # first row, as simple numeric vector
@@ -385,7 +387,8 @@ stopifnot(is(trH, "triangularMatrix"), trH@uplo == "L",
 ## equivalent to tmp <- `diag<-`(S[,-1], -2:1); S[,-1] <- tmp
 ## which dispatches to (x="TsparseMatrix", i="missing",j="index", value="replValue")
 diag(S[,-1]) <- -2:1 # used to give a wrong warning
-## FIXME? the above *could* return triangular -- but for that
+S <- as(S,"triangularMatrix")
+assert.EQ.mat(S, local({s <- diag(5); diag(s[,-1]) <- -2:1; s}))
 
 trH[c(1:2,4), c(2:3,5)] <- 0 # gave an *error* upto Jan.2008
 trH[ lower.tri(trH) ] <- 0   # ditto, because of callNextMethod()
@@ -478,7 +481,7 @@ stopifnot(identical(ne1, 0 != abs(mc - m.)))
 ne. <- mc != m.  # was wrong (+ warning)
 stopifnot(identical(!(m. < mc), m. >= mc),
 	  identical(m. < mc, as(!ge, "sparseMatrix")),
-	  identical(ne., Matrix:::drop0(ne1)))
+	  identical(ne., drop0(ne1)))
 
 (M3 <- Matrix(upper.tri(matrix(, 3, 3)))) # ltC; indexing used to fail
 T3 <- as(M3, "TsparseMatrix")
@@ -488,5 +491,18 @@ stopifnot(identical(drop(M3), M3),
 	  is(T3, "triangularMatrix"),
 	  !is(T3[,2, drop=FALSE], "triangularMatrix")
 	  )
+
+M <- Diagonal(4); M[1,2] <- 2
+M. <- as(M, "CsparseMatrix")
+(R <- as(M., "RsparseMatrix"))
+stopifnot(is(M, "triangularMatrix"),
+          is(M.,"triangularMatrix"),
+          is(R, "triangularMatrix"))
+stopifnot(dim(M[2:3, FALSE]) == c(2,0),
+          dim(R[2:3, FALSE]) == c(2,0),
+          identical(M [2:3,TRUE], M [2:3,]),
+          identical(M.[2:3,TRUE], M.[2:3,]),
+          identical(R [2:3,TRUE], R [2:3,]),
+          dim(R[FALSE, FALSE]) == c(0,0))
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''

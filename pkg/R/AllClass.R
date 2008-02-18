@@ -625,6 +625,9 @@ setClass("css_LU", representation(Q = "integer", nz = "integer"))
 
 ##-- Schur ---
 
+## non-"Matrix" Class 1  --- For Eigen values:
+setClassUnion("number", members = c("numeric", "complex"))
+
 setClass("Schur", contains = "MatrixFactorization",
 	 representation(T = "Matrix", # <- "block-triangular"; maybe triangular
 			Q = "Matrix", EValues = "number"),
@@ -669,9 +672,6 @@ setClassUnion("atomicVector", ## numeric = {integer, double} but all 3 should *d
 
 ### for 'value' in  x[..] <- value hence for all "contents" of our Matrices:
 setClassUnion("replValue", members = c("numeric", "logical", "complex", "raw"))
-
-### Eigen values
-setClassUnion("number", members = c("numeric", "complex"))
 
 ### Sparse Vectors ---- here use 1-based indexing ! -----------
 setClass("sparseVector",

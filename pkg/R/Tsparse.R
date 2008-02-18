@@ -443,8 +443,9 @@ replTmat <- function (x, i, j, ..., value)
     jMi <- missing(j)
     na <- nargs()
     if(na == 3) { ## "vector (or 2-col) indexing"  M[i] <- v
-##	   message(sprintf(paste("diagnosing replTmat(x,i,j,v): nargs()= %d;",
-##				 "missing(i,j)= (%d,%d)."), na, iMi,jMi))
+	if(getOption("verbose"))
+	   message(sprintf(paste("diagnosing replTmat(x,i,j,v): nargs()= %d;",
+				 "missing(i,j)= (%d,%d)."), na, iMi,jMi))
 	if(iMi) stop("internal bug: missing 'i' in replTmat(): please report")
 	if(is.character(i))
 	    stop("[ <character> ] indexing not allowed: forgot a \",\" ?")
@@ -673,7 +674,8 @@ replTmat <- function (x, i, j, ..., value)
 
     ## else: nA == 3  i.e.,  M [ cbind(ii,jj) ] <- value or M [ Lmat ] <- value
     if(is.logical(i)) {
-	message(".TM.repl.i.2col(): drop 'matrix' case ...")
+	if(getOption("verbose"))
+	    message(".TM.repl.i.2col(): drop 'matrix' case ...")
 	## c(i) : drop "matrix" to logical vector
 	x[c(i)] <- value
 	return(x)
@@ -736,7 +738,8 @@ replTmat <- function (x, i, j, ..., value)
 	    }
 	}
 	if(r.sym) { ## result is *still* symmetric --> keep symmetry!
-	    ## message("keeping Tsparse matrix *symmetric* in sub-assignment")
+	    if(getOption("verbose"))
+		message("keeping Tsparse matrix *symmetric* in sub-assignment")
 	    ## now consider only those indices above / below diagonal:
 	    xU <- x@uplo == "U"
 	    useI <- if(xU) i1 <= i2 else i2 <= i1

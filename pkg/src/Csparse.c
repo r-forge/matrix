@@ -170,7 +170,7 @@ SEXP Csparse_symmetric_to_general(SEXP x)
 SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo)
 {
     CHM_SP chx = AS_CHM_SP(x), chgx;
-    int uploT = (*CHAR(asChar(uplo)) == 'U') ? 1 : -1;
+    int uploT = (*CHAR(STRING_ELT(uplo,0)) == 'U') ? 1 : -1;
     int Rkind = (chx->xtype != CHOLMOD_PATTERN) ? Real_kind(x) : 0;
     R_CheckStack();
 
