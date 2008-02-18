@@ -1,5 +1,13 @@
 #### symmetricMatrix : virtual class
 
+setAs("ddenseMatrix", "symmetricMatrix",
+      function(from) .Call(ddense_to_symmetric, from, "U"))
+setAs("matrix", "symmetricMatrix",
+      function(from) .Call(ddense_to_symmetric, from, "U"))
+
+setMethod("symmpart", signature(x = "symmetricMatrix"), function(x) x)
+setMethod("skewpart", signature(x = "symmetricMatrix"), setZero)
+
 
 ### autogenerate coercions
 ###  as(*,  "symmetricMatrix")

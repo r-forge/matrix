@@ -49,17 +49,25 @@ setMethod("cov2cor", signature(V = "Matrix"),
 
 ## "base" has an isSymmetric() S3-generic since R 2.3.0
 setMethod("isSymmetric", signature(object = "symmetricMatrix"),
-          function(object,tol) TRUE)
+	  function(object, ...) TRUE)
 setMethod("isSymmetric", signature(object = "triangularMatrix"),
-          ## TRUE iff diagonal:
-          function(object,tol) isDiagonal(object))
-
-setMethod("isTriangular", signature(object = "triangularMatrix"),
-          function(object, ...) TRUE)
+	  ## TRUE iff diagonal:
+	  function(object, ...) isDiagonal(object))
 
 setMethod("isTriangular", signature(object = "matrix"), isTriMat)
 
 setMethod("isDiagonal", signature(object = "matrix"), .is.diagonal)
+
+## The "catch all" methods -- far from optimal:
+setMethod("symmpart", signature(x = "Matrix"),
+	  function(x) as((x + t(x))/2, "symmetricMatrix"))
+setMethod("skewpart", signature(x = "Matrix"),
+	  function(x) (x - t(x))/2)
+
+## FIXME: do this (similarly as for "ddense.." in C
+setMethod("symmpart", signature(x = "matrix"), function(x) (x + t(x))/2)
+setMethod("skewpart", signature(x = "matrix"), function(x) (x - t(x))/2)
+
 
 
 
@@ -412,8 +420,12 @@ setMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY", drop = "ANY"),
 {
     nA <- nargs()
     if(nA == 2) { ##  M [ M >= 7 ]
-        ## FIXME: when both 'x' and 'i' are sparse, this can be very inefficient
-	as(x, geClass(x))@x[as.vector(i)]
+	## FIXME: when both 'x' and 'i' are sparse, this can be very inefficient
+	if(is(x, "sparseMatrix"))
+	    message("<sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient")
+	toC <- geClass(x)
+	if(canCoerce(x, toC)) as(x, toC)@x[as.vector(i)]
+	else as(as(as(x, "generalMatrix"), "denseMatrix"), toC)@x[as.vector(i)]
 	## -> error when lengths don't match
     } else if(nA == 3) { ##  M [ M[,1, drop=FALSE] >= 7, ]
 	stop("not-yet-implemented 'Matrix' subsetting") ## FIXME
@@ -428,6 +440,58 @@ setMethod("[", signature(x = "Matrix", i = "logical", j = "missing",
 			 drop = "ANY"),
 	  .M.sub.i.logical)
 
+
+subset.ij <- function(x, ij) {
+    m <- nrow(ij)
+    if(m > 3) {
+        cld <- getClassDef(class(x))
+	sym.x <- extends(cld, "symmetricMatrix")
+	if(sym.x) {
+	    W <- if(x@uplo == "U") # stored only [i,j] with i <= j
+		ij[,1] > ij[,2] else ij[,1] < ij[,2]
+	    if(any(W))
+		ij[W,] <- ij[W, 2:1]
+        }
+        if(extends(cld, "sparseMatrix")) {
+	    ## do something smarter:
+	    nr <- nrow(x)
+	    if(!extends(cld, "CsparseMatrix")) {
+		x <- as(x, "CsparseMatrix") # simpler; our standard
+		cld <- getClassDef(class(x))
+	    }
+	    tri.x <- extends(cld, "triangularMatrix")
+	    if(tri.x) {
+		## need these for the 'x' slot in any case
+		if (x@diag == "U") x <- .Call(Csparse_diagU2N, x)
+		## slightly more efficient than non0.i() or non0ind():
+		ij.x <- .Call(compressed_non_0_ij, x, isC=TRUE)
+	    } else { ## symmetric / general : for symmetric, only "existing"b
+		ij.x <- non0.i(x, cld)
+	    }
+
+	    mi <- match(encodeInd(ij.x,	  nr),
+			encodeInd(ij -1L, nr), nomatch=0)
+	    mmi <- mi != 0
+	    ## Result:
+	    ans <- vector(mode = .type.kind[.M.kindC(cld)], length = m)
+	    ## those that are *not* zero:
+	    ans[mi[mmi]] <-
+		if(extends(cld, "nsparseMatrix")) TRUE else x@x[mmi]
+	    ans
+
+        } else { ## non-sparse : dense
+            message("m[ <ij-matrix> ]: inefficiently indexing single elements")
+            i1 <- ij[,1]
+            i2 <- ij[,2]
+            ## very inefficient for large m -- FIXME! --
+            unlist(lapply(seq_len(m), function(j) x[i1[j], i2[j]]))
+        }
+    } else { # 1 <= m <= 3
+        i1 <- ij[,1]
+        i2 <- ij[,2]
+        unlist(lapply(seq_len(m), function(j) x[i1[j], i2[j]]))
+    }
+}
 
 ## A[ ij ]  where ij is (i,j) 2-column matrix -- but also when that is logical mat!
 .M.sub.i.2col <- function (x, i, j, ..., drop)
@@ -444,10 +508,7 @@ setMethod("[", signature(x = "Matrix", i = "logical", j = "missing",
 	m <- nrow(i)
         if(m == 0) return(vector(mode = .type.kind[.M.kind(x)]))
         ## else
-	i1 <- i[,1]
-	i2 <- i[,2]
-	## potentially inefficient -- FIXME --
-	unlist(lapply(seq_len(m), function(j) x[i1[j], i2[j]]))
+        subset.ij(x, i)
 
     } else stop("nargs() = ", nA,
 		".  Extraneous illegal arguments inside '[ .. ]' (i.2col)?")
@@ -503,6 +564,8 @@ setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
 	value <- rep(value, length = m)
 	i1 <- i[,1]
 	i2 <- i[,2]
+	if(m > 2)
+	    message("m[ <ij-matrix> ] <- v: inefficiently treating single elements")
 	## inefficient -- FIXME -- (also loses "symmetry" unnecessarily)
 	for(k in seq_len(m))
 	    x[i1[k], i2[k]] <- value[k]

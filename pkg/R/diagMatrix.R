@@ -290,7 +290,10 @@ setMethod("isDiagonal", signature(object = "diagonalMatrix"),
 setMethod("isTriangular", signature(object = "diagonalMatrix"),
           function(object) TRUE)
 setMethod("isSymmetric", signature(object = "diagonalMatrix"),
-          function(object) TRUE)
+	  function(object, ...) TRUE)
+
+setMethod("symmpart", signature(x = "diagonalMatrix"), function(x) x)
+setMethod("skewpart", signature(x = "diagonalMatrix"), setZero)
 
 setMethod("chol", signature(x = "ddiMatrix"),# pivot = "ANY"
 	  function(x, pivot) {
