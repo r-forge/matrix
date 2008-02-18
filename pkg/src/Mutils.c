@@ -281,6 +281,7 @@ Rboolean equal_string_vectors(SEXP s1, SEXP s2)
 	}
 	return TRUE; /* they *are* equal */
     }
+    return FALSE;		/* -Wall */
 }
 
 
