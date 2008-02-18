@@ -1,6 +1,8 @@
 \name{triangularMatrix-class}
 \docType{class}
 \alias{triangularMatrix-class}
+\alias{coerce,triangularMatrix,symmetricMatrix-method}
+%
 \title{Virtual Class of Triangular Matrices in package:Matrix}
 \description{
   The virtual class of triangular matrices,\code{"triangularMatrix"},

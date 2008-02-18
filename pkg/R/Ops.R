@@ -159,9 +159,9 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
 			  else { ## all FALSE: keep empty 'r' matrix
 			      ## but may need a valid 'pointer' slot:
 			      if(extends(lClass, "CsparseMatrix"))
-				  r@p <- rep.int(0:0, 1+ncol(r))
+				  r@p <- rep.int(0L, 1+ncol(r))
 			      else if(extends(lClass, "RsparseMatrix"))
-				  r@p <- rep.int(0:0, 1+nrow(r))
+				  r@p <- rep.int(0L, 1+nrow(r))
 			  }
 		      } else { # some TRUE, FALSE, NA : go via unique 'Tsparse'
 			  M <- asTuniq(e1)
@@ -184,7 +184,7 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
 			  message(sprintf("sparse to dense (%s) coercion in '%s'",
 					  lClass, .Generic))
 		      rx <- rep.int(r0, d[1]*d[2])
-		      rx[1:1 + encodeInd(non0ind(e1), nr = d[1])] <- r
+		      rx[1L + encodeInd(non0ind(e1, cl1), nr = d[1])] <- r
 		      r <- new(fullCl, x = rx, Dim = d, Dimnames = dimnames(e1))
 		  }
 	      }
@@ -402,9 +402,9 @@ setMethod("Logic", signature(e1 = "lMatrix", e2 = "logical"),
 			  else { ## all FALSE: keep empty 'r' matrix
 			      ## but may need a valid 'pointer' slot:
 			      if(extends(cl, "CsparseMatrix"))
-				  r@p <- rep.int(0:0, 1+ncol(r))
+				  r@p <- rep.int(0L, 1+ncol(r))
 			      else if(extends(cl, "RsparseMatrix"))
-				  r@p <- rep.int(0:0, 1+nrow(r))
+				  r@p <- rep.int(0L, 1+nrow(r))
 			  }
 		      } else { # some TRUE, FALSE, NA : go via unique 'Tsparse'
 			  M <- asTuniq(e1)
@@ -429,7 +429,7 @@ setMethod("Logic", signature(e1 = "lMatrix", e2 = "logical"),
 		      rx <- rep.int(r0, d[1]*d[2])
 		      if(extends(cl1, "triangularMatrix") && e1@diag == "U")
 			  r <- c(r, rep.int(callGeneric(1, e2),d[1]))
-		      rx[1:1 + encodeInd(non0ind(e1), nr = d[1])] <- r
+		      rx[1L + encodeInd(non0ind(e1, cl1), nr = d[1])] <- r
 		      fullCl <-
 			  if(extends(cl1, "symmetricMatrix")) "lsyMatrix" else "lgeMatrix"
 		      r <- new(fullCl, x = rx, Dim = d, Dimnames = dimnames(e1))
@@ -580,18 +580,27 @@ setMethod("Arith", signature(e1 = "dsCMatrix", e2 = "dsCMatrix"),
     ## triangular:  TRUE  iff e1,e2 are triangular  _and_  e1@uplo == e2@uplo
     d <- dimCheck(e1, e2)
     dn <- dimNamesCheck(e1, e2)
-    ij1 <- non0ind(e1)
-    ij2 <- non0ind(e2)
     if(triangular) {
-	uplo <- e1@uplo
+	## need these for the 'x' slots in any case
+	if (e1@diag == "U") e1 <- .Call(Csparse_diagU2N, e1)
+	if (e2@diag == "U") e2 <- .Call(Csparse_diagU2N, e2)
+        ## slightly more efficient than non0.i() or non0ind():
+	ij1 <- .Call(compressed_non_0_ij, e1, isC=TRUE)
+	ij2 <- .Call(compressed_non_0_ij, e2, isC=TRUE)
+
 	newTMat <- function(i,j,x)
-	    new("dtTMatrix", Dim = d, Dimnames = dn, i = i, j = j, x = x, uplo = uplo)
+	    new("dtTMatrix", Dim = d, Dimnames = dn, i = i, j = j, x = x,
+		uplo = e1@uplo)
 	dmat <- "dtrMatrix"
     } else {
+	ij1 <- non0ind(e1)
+	ij2 <- non0ind(e2)
+
 	newTMat <- function(i,j,x)
 	    new("dgTMatrix", Dim = d, Dimnames = dn, i = i, j = j, x = x)
 	dmat <- "dgeMatrix"
     }
+
     switch(Generic,
 	   "+" = , "-" = {
 	       ## special "T" convention: repeated entries are *summed*
@@ -628,7 +637,7 @@ setMethod("Arith", signature(e1 = "dsCMatrix", e2 = "dsCMatrix"),
 	   r <- as(e2, "matrix")
 	   Yis0 <- is0(r)
 	   r[complementInd(ij1, dim=d)] <- 0 ## 2)
-	   r[1:1 + ij2[ii[[2]], , drop=FALSE]] <-
+	   r[1L + ij2[ii[[2]], , drop=FALSE]] <-
 	       e1@x[ii[[1]]] ^ e2@x[ii[[2]]] ## 3)
 	   r[Yis0] <- 1			     ## 1)
 	   as(r, dmat)
@@ -669,10 +678,10 @@ setMethod("Arith", signature(e1 = "dgCMatrix", e2 = "numeric"),
 			  stop("<Matrix>",.Generic,"numeric(<too-long>)")
 		      if(n %% l2 != 0) ## identical warning as in main/arithmetic.c
 			  warning(gettextf("longer object length\n\tis not a multiple of shorter object length"))
-		      ## TODO: construction of [1:1 + in0 %%l2] via one .Call()
+		      ## TODO: construction of [1L + in0 %%l2] via one .Call()
 		      ## 0-based indices:
 		      in0 <- encodeInd(.Call(compressed_non_0_ij, e1, TRUE), d[1])
-		      e2 <- e2[1:1 + in0 %% l2]
+		      e2 <- e2[1L + in0 %% l2]
 		  }
 		  e1@x <- callGeneric(e1@x, e2)
 		  e1
@@ -681,7 +690,8 @@ setMethod("Arith", signature(e1 = "dgCMatrix", e2 = "numeric"),
 		  r <- as(e1, "matrix")
 		  if(length(e2) == 1) {
 		      r[] <- f0
-		      r[non0ind(e1) + 1:1] <- callGeneric(e1@x, e2)
+		      r[non0ind(e1, getClassDef("dgCMatrix")) + 1L] <-
+                          callGeneric(e1@x, e2)
 		      as(r, "dgeMatrix")
 		  } else {
 		      as(callGeneric(r, e2), "dgeMatrix")
@@ -701,10 +711,10 @@ setMethod("Arith", signature(e1 = "numeric", e2 = "dgCMatrix"),
 			  stop("numeric(<too-long>)",.Generic,"<Matrix>")
 		      if(n %% l1 != 0) ## identical warning as in main/arithmetic.c
 			  warning(gettextf("longer object length\n\tis not a multiple of shorter object length"))
-		      ## TODO: construction of [1:1 + in0 %% l1] via one .Call()
+		      ## TODO: construction of [1L + in0 %% l1] via one .Call()
 		      ## 0-based indices:
 		      in0 <- encodeInd(.Call(compressed_non_0_ij, e2, TRUE), d[1])
-		      e1 <- e1[1:1 + in0 %% l1]
+		      e1 <- e1[1L + in0 %% l1]
 		  }
 		  e2@x <- callGeneric(e1, e2@x)
 		  e2
@@ -713,7 +723,8 @@ setMethod("Arith", signature(e1 = "numeric", e2 = "dgCMatrix"),
 		  r <- as(e2, "matrix")
 		  if(length(e1) == 1) {
 		      r[] <- f0
-		      r[non0ind(e2) + 1:1] <- callGeneric(e1, e2@x)
+		      r[non0ind(e2, getClassDef("dgCMatrix")) + 1L] <-
+                        callGeneric(e1, e2@x)
 		      as(r, "dgeMatrix")
 		  } else {
 		      as(callGeneric(e1, r), "dgeMatrix")

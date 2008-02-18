@@ -21,6 +21,12 @@
 \alias{band,ddenseMatrix-method}
 \alias{tril,ddenseMatrix-method}
 \alias{triu,ddenseMatrix-method}
+\alias{band,denseMatrix-method}
+\alias{tril,denseMatrix-method}
+\alias{triu,denseMatrix-method}
+\alias{band,matrix-method}
+\alias{tril,matrix-method}
+\alias{triu,matrix-method}
 % Begin{UGLY-disAMBIGUATION-hack} -- in ../R/triangularMatrix.R
 % we would want to define 'triangularMatrix' methods, but they ambiguate with the above!
 % \alias{tril,triangularMatrix-method}

@@ -446,7 +446,7 @@ SEXP dgeMatrix_exp(SEXP x)
 	F77_CALL(dgemm)("N", "N", &nc, &nc, &nc, &one, v, &nc, npp, &nc,
 			&zero, work, &nc);
 	for (i = 0; i < ncsqr; i++) npp[i] = work[i] + mult * v[i];
-	/* dpp = m * dpp * (m1_j * padec[j]) * m */
+	/* dpp = m * dpp + (m1_j * padec[j]) * m */
 	mult *= m1_j;
 	F77_CALL(dgemm)("N", "N", &nc, &nc, &nc, &one, v, &nc, dpp, &nc,
 			&zero, work, &nc);

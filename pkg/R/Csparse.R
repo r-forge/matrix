@@ -289,7 +289,8 @@ setMethod("%*%", signature(x = "matrix", y = "CsparseMatrix"),
 ##          function(x, y) t(.Call(Csparse_dense_crossprod, y, x)),
 ##          valueClass = "dgeMatrix")
 
-## NB: have extra tril(), triu() methods for symmetric ["dsC" and "lsC"]
+## NB: have extra tril(), triu() methods for symmetric ["dsC" and "lsC"] and
+## NB: for all triangular ones, where the latter may 'callNextMethod()' these:
 setMethod("tril", "CsparseMatrix",
 	  function(x, k = 0, ...) {
 	      k <- as.integer(k[1])

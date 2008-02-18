@@ -1,3 +1,57 @@
+2008-02-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R (subset.ij): utility, as first step to faster
+	   M [ <ij-matrix> ] indexing.
+
+	* R/Matrix.R (.M.sub.i.logical): M[ <logical> ] : try better.
+
+	* src/dense.c (ddense_symmpart, ddense_skewpart): new functions
+	for more efficient symmpart() and skewpart() methods.
+
+	* src/Mutils.c (equal_string_vectors): utility
+
+	* src/dense.c (ddense_to_symmetric): new function used in
+
+	* R/symmetricMatrix.R: setAs(., "symmetricMatrix")
+
+	* R/sparseMatrix.R, et_al (isSymmetric): add '...' to formals, in
+	order to match the generic (and evade .local(..)).
+
+	* R/dsCMatrix.R: dgC -> dsC: use C code!
+
+	* NAMESPACE, R/AllGeneric.R (symmpart, skewpart): new functions
+	as per TODO
+
+	* R/Auxiliaries.R (setZero, all0Matrix): new utilities
+
+	* R/symmetricMatrix.R: obvious symmpart(), skewpart() methods
+
+
+2008-02-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Ops.R (.Arith.Csparse): use diagU2N when needed in triangular
+
+	* R/Auxiliaries.R (non0.i): take out of non0ind
+
+	* R/ddenseMatrix.R (.trilDense, .triuDense, .bandDense):
+	make tril(), triu(), band() work for "matrix" and all "dense*"
+
+	* R/triangularMatrix.R (.tri[lu].tr): need .diagU2N(*)
+	* tests/simple.R: test the fix above
+
+	* R/sparseMatrix.R ([): simplification: no coerce to <general>
+		before we use as(., <Tsparse>)[...] anyway
+
+	* R/Rsparse.R (.viaC.to.R): mostly instead of .viaC.to.dgR()
+
+	* R/triangularMatrix.R (isTriangular): methods for all subclasses
+	instead of "triangularMatrix" -- just to disambiguate
+
+2008-02-14  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/Class+Meth.R (dotestMat): add m[FALSE, FALSE] { <-> TODO}
+	* tests/indexing.R: example that fails above
+
 2008-01-26  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Matrix.R (.M.sub.i.2col): fix for logical matrix indexing

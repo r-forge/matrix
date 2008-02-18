@@ -64,6 +64,8 @@ SEXP dgCMatrix_set_Dim(SEXP x, int nrow);
 /* SEXP csc_check_column_sorting(SEXP A); */
 SEXP Matrix_make_named(int TYP, char **names);
 SEXP check_scalar_string(SEXP sP, char *vals, char *nm);
+Rboolean equal_string_vectors(SEXP s1, SEXP s2);
+
 void d_packed_getDiag(double *dest, SEXP x, int n);
 void l_packed_getDiag(   int *dest, SEXP x, int n);
 void tr_d_packed_getDiag(double *dest, SEXP x);
