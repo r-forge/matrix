@@ -135,10 +135,10 @@ band(sm5, -1, 1)# symmetric band preserves symmetry property
 (x.x <- crossprod(mm))
 tril(x.x)
 xx <- tril(x.x) + triu(x.x, 1) ## the same as x.x (but stored differently):
-txx <- t(as(xx, "dsCMatrix"))
+txx <- t(as(xx, "symmetricMatrix"))
 stopifnot(identical(triu(x.x), t(tril(x.x))),
 	  identical(class(x.x), class(txx)),
-	  identical(as(x.x, "dgCMatrix"), as(txx, "dgCMatrix")))
+	  identical(as(x.x, "generalMatrix"), as(txx, "generalMatrix")))
 }
 }
 \keyword{methods}

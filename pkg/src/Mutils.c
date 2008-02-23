@@ -139,8 +139,8 @@ SEXP set_factors(SEXP obj, SEXP val, char *nm)
     return val;
 }
 
-/*MM: this is useful for all the ..CMatrix classes
-  (and ..R by [0] <-> [1]): */
+#if 0 				/* unused */
+/* useful for all the ..CMatrix classes (and ..R by [0] <-> [1]); but unused */
 SEXP dgCMatrix_set_Dim(SEXP x, int nrow)
 {
     int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
@@ -149,6 +149,7 @@ SEXP dgCMatrix_set_Dim(SEXP x, int nrow)
     dims[1] = length(GET_SLOT(x, Matrix_pSym)) - 1;
     return x;
 }
+#endif	/* unused */
 
 /* Fill in the "trivial remainder" in  n*m  array ;
  *  typically the 'x' slot of a "dtrMatrix" :
@@ -266,9 +267,10 @@ Rboolean equal_string_vectors(SEXP s1, SEXP s2)
     Rboolean n1 = isNull(s1), n2 = isNull(s2);
     if (n1 || n2)
 	return (n1 == n2) ? TRUE : FALSE;
-    else if (TYPEOF(s1) != STRSXP || TYPEOF(s2) != STRSXP)
+    else if (TYPEOF(s1) != STRSXP || TYPEOF(s2) != STRSXP) {
 	error(_("'s1' and 's2' must be \"character\" vectors"));
-    else {
+	return FALSE; /* -Wall */
+    } else {
 	int n = LENGTH(s1), i;
 	if (n != LENGTH(s2))
 	    return FALSE;
@@ -281,7 +283,7 @@ Rboolean equal_string_vectors(SEXP s1, SEXP s2)
 	}
 	return TRUE; /* they *are* equal */
     }
-    return FALSE;		/* -Wall */
+    return FALSE; /* -Wall */
 }
 
 
@@ -532,10 +534,15 @@ SEXP dup_mMatrix_as_geMatrix(SEXP A)
 
 	if (isReal(A))
 	    M_type = ddense;
+	else if (isInteger(A)) {
+	    A = PROTECT(coerceVector(A, REALSXP));
+	    nprot++;
+	    M_type = ddense;
+	}
 	else if (isLogical(A))
 	    M_type = ldense;
 	else
-	    error(_("invalid class `%s' to dup_mMatrix_as_geMatrix"), cl);
+	    error(_("invalid class '%s' to dup_mMatrix_as_geMatrix"), cl);
 
 #define	DUP_MMATRIX_NON_CLASS						\
 	if (isMatrix(A)) {	/* "matrix" */				\
@@ -571,7 +578,7 @@ SEXP dup_mMatrix_as_geMatrix(SEXP A)
 #define DUP_MMATRIX_ddense_CASES						\
 	ansx = REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, sz));			\
 	switch(ctype) {								\
-	case 0:			/* unclassed real/logical matrix */		\
+	case 0:			/* unclassed real matrix */			\
 	    Memcpy(ansx, REAL(A), sz);						\
 	    break;								\
 	case 1:			/* dgeMatrix */					\
@@ -616,7 +623,7 @@ SEXP dup_mMatrix_as_geMatrix(SEXP A)
 	int *ansx = LOGICAL(ALLOC_SLOT(ans, Matrix_xSym, LGLSXP, sz));
 
 	switch(ctype) {
-	case 0:			/* unclassed real/logical matrix */
+	case 0:			/* unclassed logical matrix */
 	    Memcpy(ansx, LOGICAL(A), sz);
 	    break;
 
@@ -685,7 +692,7 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A)
 	    nprot++;
 	}
 	if (!isReal(A))
-	    error(_("invalid class `%s' to dup_mMatrix_as_dgeMatrix"), cl);
+	    error(_("invalid class '%s' to dup_mMatrix_as_dgeMatrix"), cl);
     }
 
     DUP_MMATRIX_SET_1;

@@ -666,7 +666,7 @@ replTmat <- function (x, i, j, ..., value)
 
 ## A[ ij ] <- value,  where ij is (i,j) 2-column matrix :
 ## ----------------   ./Matrix.R has a general cheap method
-## This one should become as fast as possible:
+## This one should become as fast as possible -- is also used from Csparse.R --
 .TM.repl.i.2col <- function (x, i, j, ..., value)
 {
     nA <- nargs()

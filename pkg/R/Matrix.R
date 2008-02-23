@@ -45,7 +45,18 @@ setMethod("as.logical", signature(x = "Matrix"),
 	  function(x, ...) as.logical(as.vector(x)))
 
 setMethod("cov2cor", signature(V = "Matrix"),
-	  function(V) as(cov2cor(as(V, "matrix")), "dpoMatrix"))
+	  function(V) { ## was as(cov2cor(as(V, "matrix")), "dpoMatrix"))
+	      r <- V
+	      p <- (d <- dim(V))[1]
+	      if(p != d[2]) stop("'V' is not a square matrix")
+	      Is <- sqrt(1/diag(V)) # diag( 1/sigma_i )
+	      if(any(!is.finite(Is)))
+		  warning("diag(.) had 0 or NA entries; non-finite result is doubtful")
+              Is <- Diagonal(x = Is)
+              r <- Is %*% V %*% Is
+	      r[cbind(1L:p,1L:p)] <- 1 # exact in diagonal
+	      as(forceSymmetric(r), "dpoMatrix")
+          })
 
 ## "base" has an isSymmetric() S3-generic since R 2.3.0
 setMethod("isSymmetric", signature(object = "symmetricMatrix"),
@@ -109,9 +120,8 @@ setMethod("any", signature(x = "Matrix"),
 ##        "!" is in ./not.R
 
 
-Matrix <-
-    function (data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL,
-	      sparse = NULL, forceCheck = FALSE)
+Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
+                    dimnames = NULL, sparse = NULL, forceCheck = FALSE)
 {
     sparseDefault <- function(m) prod(dim(m)) > 2*sum(isN0(as(m, "matrix")))
 
@@ -120,7 +130,7 @@ Matrix <-
 	class(data) <- "matrix" # "matrix" first for S4 dispatch
     if(is.null(sparse1 <- sparse) && (i.M || is(data, "matrix")))
 	sparse <- sparseDefault(data)
-
+    sM <- FALSE
     doDN <- TRUE
     if (i.M) {
         if(!missing(nrow) || !missing(ncol)|| !missing(byrow))
@@ -136,13 +146,16 @@ Matrix <-
 	else if (missing(ncol))
 	    ncol <- ceiling(length(data)/nrow)
 	if(length(data) == 1 && is0(data) && !identical(sparse, FALSE)) {
-            ## Matrix(0, ...) : always sparse unless "sparse = FALSE":
+	    ## Matrix(0, ...) : always sparse unless "sparse = FALSE":
 	    if(is.null(sparse)) sparse1 <- sparse <- TRUE
-            i.M <- sM <- TRUE
+	    i.M <- sM <- TRUE
+            isSym <- nrow == ncol
 	    ## will be sparse: do NOT construct full matrix!
-	    data <- new(if(is.numeric(data)) "dgTMatrix" else
-			if(is.logical(data)) "lgTMatrix" else
-			stop("invalid 'data'"),
+	    data <- new(paste(if(is.numeric(data)) "d" else
+			      if(is.logical(data)) "l" else
+			      stop("invalid 'data'"),
+			      if(isSym) "s" else "g", "CMatrix", sep=''),
+			p = rep.int(0L, ncol+1L),
 			Dim = as.integer(c(nrow,ncol)),
 			Dimnames = if(is.null(dimnames)) list(NULL,NULL)
 			else dimnames)
@@ -170,51 +183,38 @@ Matrix <-
 	isTri <- isTriangular(data)
     isDiag <- isSym # cannot be diagonal if it isn't symmetric
     if(isDiag)
-	isDiag <- isDiagonal(data)
+	isDiag <- !isTRUE(sparse1) && isDiagonal(data)
 
-    ## Find proper matrix class 'cl'
-    cl <-
-	if(isDiag && !isTRUE(sparse1))
-	    "diagonalMatrix" # -> will automatically check for type
-	else {
-	    ## consider it's type
-	    ctype <-
-		if(is(data,"Matrix")) class(data)
-		else {
-		    if("complex" == (ctype <- typeof(data)))
-			"z" else ctype
-		}
-	    ctype <- substr(ctype, 1,1) # "d", "l", "i" or "z"
-	    if(ctype == "z")
+    ## try to coerce ``via'' virtual classes
+    if(isDiag) { ## diagonal is preferred to sparse !
+	data <- as(data, "diagonalMatrix")
+	isSym <- FALSE
+    } else if(sparse && !sM)
+	data <- as(data, "sparseMatrix")
+    else if(!sparse) {
+	if(i.M) { ## data is 'Matrix'
+	    if(!is(data, "denseMatrix"))
+		data <- as(data, "denseMatrix")
+	} else { ## data is "matrix" (and result "dense" -> go via "general"
+	    ctype <- typeof(data)
+	    if (ctype == "complex")
 		stop("complex matrices not yet implemented in Matrix package")
-	    if(ctype == "i") {
-		warning("integer matrices not yet implemented in 'Matrix'; ",
-			"using 'double' ones'")
-		ctype <- "d"
-	    }
-	    paste(ctype,
-		  if(sparse) {
-		      if(isSym) "sCMatrix" else
-		      if(isTri) "tCMatrix" else "gCMatrix"
-		  } else { ## dense
-		      if(isSym) "syMatrix" else
-		      if(isTri) "trMatrix" else "geMatrix"
-		  }, sep="")
+	    if (ctype == "integer") ## integer Matrices not yet implemented
+		storage.mode(data) <- "double"
+	    data <- new(paste(.M.kind(data), "geMatrix", sep=''),
+			Dim = dim(data),
+			Dimnames = .M.DN(data),
+			x = c(data))
 	}
-
-    ## Can we coerce and be done?
-    if(!canCoerce(data,cl)) { ## try to coerce ``via'' virtual classes
-	if(sparse && !sM)
-	    data <- as(data, "sparseMatrix")
-	else if(!sparse && !is(data, "denseMatrix"))
-	    data <- as(data, "denseMatrix")
-	if(isTri && !is(data, "triangularMatrix"))
-	    data <- as(data, "triangularMatrix")
-	else if(isSym && !is(data, "symmetricMatrix"))
-	    data <- as(data, "symmetricMatrix")
     }
-    ## now coerce in any case .. maybe producing sensible error message:
-    as(data, cl)
+
+    if(isTri && !is(data, "triangularMatrix")) {
+	data <- if(attr(isTri,"kind") == "L") tril(data) else triu(data)
+					#was as(data, "triangularMatrix")
+    } else if(isSym && !is(data, "symmetricMatrix"))
+	data <- forceSymmetric(data) #was as(data, "symmetricMatrix")
+
+    data
 }
 
 ## Methods for operations where one argument is numeric
@@ -480,10 +480,11 @@ subset.ij <- function(x, ij) {
 	    ans
 
         } else { ## non-sparse : dense
+            ##---- NEVER happens:  'denseMatrix' has its own setMethod(.) !
             message("m[ <ij-matrix> ]: inefficiently indexing single elements")
             i1 <- ij[,1]
             i2 <- ij[,2]
-            ## very inefficient for large m -- FIXME! --
+            ## very inefficient for large m
             unlist(lapply(seq_len(m), function(j) x[i1[j], i2[j]]))
         }
     } else { # 1 <= m <= 3

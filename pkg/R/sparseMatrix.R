@@ -410,7 +410,15 @@ setMethod("isSymmetric", signature(object = "sparseMatrix"),
 	      ## pretest: is it square?
 	      d <- dim(object)
 	      if(d[1] != d[2]) return(FALSE)
-	      ## else slower test
+
+	      ## else slower test using t()  --
+
+	      ## FIXME (for tol = 0): use cholmod_symmetry(A, 1, ...)
+	      ##        for tol > 0   should modify  cholmod_symmetry(..) to work with tol
+
+	      ## or slightly simpler, rename and export	 is_sym() in ../src/cs_utils.c
+
+
 	      if (is(object, "dMatrix"))
 		  ## use gC; "T" (triplet) is *not* unique!
 		  isTRUE(all.equal(.as.dgC.0.factors(  object),
@@ -418,11 +426,11 @@ setMethod("isSymmetric", signature(object = "sparseMatrix"),
 				   tol = tol, ...))
 	      else if (is(object, "lMatrix"))
 		  ## test for exact equality; FIXME(?): identical() too strict?
-		  identical(as(object, "lgCMatrix"),
+		  identical(as(	 object,  "lgCMatrix"),
 			    as(t(object), "lgCMatrix"))
 	      else if (is(object, "nMatrix"))
 		  ## test for exact equality; FIXME(?): identical() too strict?
-		  identical(as(object, "ngCMatrix"),
+		  identical(as(	 object,  "ngCMatrix"),
 			    as(t(object), "ngCMatrix"))
 	      else stop("not yet implemented")
 	  })

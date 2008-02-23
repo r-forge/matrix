@@ -73,7 +73,8 @@ setAs("ngeMatrix", "nsyMatrix",
 	  if(isSymmetric(from))
 	      new("nsyMatrix", x = from@x, Dim = from@Dim,
 		  Dimnames = from@Dimnames, factors = from@factors)
-	  else stop("not a symmetric matrix")
+	  else
+	      stop("not a symmetric matrix; consider forceSymmetric() or symmpart()")
       })
 
 setAs("ngeMatrix", "ntrMatrix",

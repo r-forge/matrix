@@ -65,7 +65,8 @@ setAs("lgeMatrix", "lsyMatrix",
 	  if(isSymmetric(from))
 	      new("lsyMatrix", x = from@x, Dim = from@Dim,
 		  Dimnames = from@Dimnames, factors = from@factors)
-	  else stop("not a symmetric matrix")
+	  else
+	      stop("not a symmetric matrix; consider forceSymmetric() or symmpart()")
       })
 
 setAs("lgeMatrix", "ltrMatrix",

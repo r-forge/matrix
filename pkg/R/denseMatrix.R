@@ -2,7 +2,10 @@
 ### These are "cheap" to program, but potentially far from efficient;
 ### Methods for specific subclasses will overwrite these:
 
-setAs("ANY", "denseMatrix", function(from) Matrix(from, sparse=FALSE))
+setAs("ANY",    "denseMatrix", function(from) Matrix(from, sparse=FALSE))
+## Conceivably, could write
+## setAs("matrix", "denseMatrix", ....) which was slightly more efficient than
+##  Matrix(.)  but would have many things in common
 
 setAs(from = "denseMatrix", to = "generalMatrix", as_geSimpl)
 
@@ -23,17 +26,19 @@ setAs(from = "denseMatrix", to = "generalMatrix", as_geSimpl)
         ## FIXME: this is a waste for these matrices, particularly if packed
 
         if(extends(cld, "diagonalMatrix"))
-            stop("diagonalMatrix in .dense2C() -- should not happen")
+            stop("diagonalMatrix in .dense2C() -- should never happen, please report!")
 
         sym <- extends(cld, "symmetricMatrix")
         ## Note: if(!sym), we have "triangular"
 
-	if     (extends(cld, "dMatrix")) as(r, if(sym) "dsCMatrix" else "dtCMatrix")
-	else if(extends(cld, "nMatrix")) as(r, if(sym) "nsCMatrix" else "ntCMatrix")
-	else if(extends(cld, "lMatrix")) as(r, if(sym) "lsCMatrix" else "ltCMatrix")
-	else if(extends(cld, "zMatrix")) as(r, if(sym) "zsCMatrix" else "ztCMatrix")
-
-	else stop("undefined method for class ", cl)
+	if(sym) forceSymmetric(r)
+	else {
+	    if	   (extends(cld,"dMatrix")) as(r, "dtCMatrix")
+	    else if(extends(cld,"lMatrix")) as(r, "ltCMatrix")
+	    else if(extends(cld,"nMatrix")) as(r, "ntCMatrix")
+	    else if(extends(cld,"zMatrix")) as(r, "ztCMatrix")
+	    else stop("undefined method for class ", cl)
+	}
     }
 }
 

@@ -196,8 +196,8 @@ assert.EQ.mat(t(sM) %*% sM,
               t(sm) %*% sm, tol=0)
 crossprod(sM)
 tcrossprod(sM)
-stopifnot(identical( crossprod(sM), as(t(sM) %*% sM, "dsCMatrix")),
-          identical(tcrossprod(sM), as(sM %*% t(sM), "dsCMatrix")))
+stopifnot(identical( crossprod(sM), as(t(sM) %*% sM, "symmetricMatrix")),
+          identical(tcrossprod(sM), forceSymmetric(sM %*% t(sM))))
 assert.EQ.mat( crossprod(sM),  crossprod(sm))
 assert.EQ.mat(tcrossprod(sM), as(tcrossprod(sm),"matrix"))
 

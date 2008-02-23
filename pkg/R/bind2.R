@@ -6,12 +6,14 @@
 
 ###-- Sparse ------------------------------------------------------------
 
-for(f in c("cbind2", "rbind2")) {
-    setMethod(f, signature(x = "sparseMatrix", y = "matrix"),
-	      function(x, y) callGeneric(x, as_Csparse2(y)))
-    setMethod(f, signature(x = "matrix", y = "sparseMatrix"),
-	      function(x, y) callGeneric(as_Csparse2(x), y))
-}
+setMethod("cbind2", signature(x = "sparseMatrix", y = "matrix"),
+	  function(x, y) cbind2(x, .Call(dense_to_Csparse, y)))
+setMethod("cbind2", signature(x = "matrix", y = "sparseMatrix"),
+	  function(x, y) cbind2(.Call(dense_to_Csparse, x), y))
+setMethod("rbind2", signature(x = "sparseMatrix", y = "matrix"),
+	  function(x, y) rbind2(x, .Call(dense_to_Csparse, y)))
+setMethod("rbind2", signature(x = "matrix", y = "sparseMatrix"),
+	  function(x, y) rbind2(.Call(dense_to_Csparse, x), y))
 
 ## originally from ./Matrix.R : -------------------------------
 
@@ -188,13 +190,13 @@ setMethod("rbind2", signature(x = "sparseMatrix", y = "diagonalMatrix"),
 for(cls in names(getClass("diagonalMatrix")@subclasses)) {
 
  setMethod("cbind2", signature(x = cls, y = "matrix"),
-	   function(x,y) cbind2(diag2Sp(x), as_Csparse2(y)))
+	   function(x,y) cbind2(diag2Sp(x), .Call(dense_to_Csparse, y)))
  setMethod("cbind2", signature(x = "matrix", y = cls),
-	   function(x,y) cbind2(as_Csparse2(x), diag2Sp(y)))
+	   function(x,y) cbind2(.Call(dense_to_Csparse, x), diag2Sp(y)))
  setMethod("rbind2", signature(x = cls, y = "matrix"),
-	   function(x,y) rbind2(diag2Sp(x), as_Csparse2(y)))
+	   function(x,y) rbind2(diag2Sp(x), .Call(dense_to_Csparse, y)))
  setMethod("rbind2", signature(x = "matrix", y = cls),
-	   function(x,y) rbind2(as_Csparse2(x), diag2Sp(y)))
+	   function(x,y) rbind2(.Call(dense_to_Csparse, x), diag2Sp(y)))
 
  ## These are already defined for "Matrix"
  ## -- repeated here for method dispatch disambiguation	 {"design-FIXME" ?}

@@ -108,6 +108,8 @@ tu <- t1 ; tu@diag <- "U"
 tu
 (cu <- as(tu, "dtCMatrix"))
 str(cu)# only two entries in @i and @x
+stopifnot(cu@i == 1:0,
+          all(2 * symmpart(cu) == Diagonal(4) + forceSymmetric(cu)))
 
 t1[1,2:3] <- -1:-2
 diag(t1) <- 10*c(1:2,3:2)

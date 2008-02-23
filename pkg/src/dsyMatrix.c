@@ -122,11 +122,12 @@ SEXP dsyMatrix_matrix_mm(SEXP a, SEXP b, SEXP rtP)
 
     if ((rt && n != adims[0]) || (!rt && m != adims[0]))
 	error(_("Matrices are not conformable for multiplication"));
-    if (m < 1 || n < 1)
-	error(_("Matrices with zero extents cannot be multiplied"));
-    F77_CALL(dsymm)(rt ? "R" :"L", uplo_P(a), &m, &n, &one,
-		    REAL(GET_SLOT(a, Matrix_xSym)), adims, bcp,
-		    &m, &zero, vx, &m);
+    if (m < 1 || n < 1) {
+/* 	error(_("Matrices with zero extents cannot be multiplied")); */
+    } else
+	F77_CALL(dsymm)(rt ? "R" :"L", uplo_P(a), &m, &n, &one,
+			REAL(GET_SLOT(a, Matrix_xSym)), adims, bcp,
+			&m, &zero, vx, &m);
     UNPROTECT(1);
     return val;
 }

@@ -59,9 +59,8 @@ assertError(as(M., "dpoMatrix"))
 ## Cholesky
 chk.matrix(ch <- chol(cm))
 chk.matrix(ch2 <- chol(as(cm, "dsyMatrix")))
-#not yet{FIXME}: chk.matrix(ch3 <- chol(as(cm, "dgeMatrix")))
-stopifnot(all.equal(as(ch, "matrix"), as(ch2, "matrix")))
-
+chk.matrix(ch3 <- chol(as(cm, "dgeMatrix")))
+stopifnot(is.all.equal3(as(ch, "matrix"), as(ch2, "matrix"), as(ch3, "matrix")))
 ### Very basic	triangular matrix stuff
 
 assertError( new("dtrMatrix", Dim = c(2,2), x= 1:4) )# double 'Dim'

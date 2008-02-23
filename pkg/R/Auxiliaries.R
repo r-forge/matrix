@@ -689,6 +689,7 @@ as_Csparse <- function(x, cld = if(isS4(x)) getClassDef(class(x))) {
                 .sparse.prefixes[.M.shape(x, cld)], "CMatrix", sep=''))
 }
 
+if(FALSE) # replaced by .Call(dense_to_Csparse, *) which is perfect for "matrix"
 as_Csparse2 <- function(x, cld = if(isS4(x)) getClassDef(class(x))) {
     ## Csparse + U2N when needed
     sh <- .M.shape(x, cld)
@@ -747,7 +748,7 @@ as_CspClass <- function(x, cl) {
     ## NOTE: diagonal is *not* sparse:
     ##(extends(cl, "diagonalMatrix") && isDiagonal(x)) ||
     if (extends(cl, "symmetricMatrix") && isSymmetric(x))
-	as(x, cl)
+        forceSymmetric(as(x,"CsparseMatrix"))
     else if (extends(cl, "triangularMatrix") && (iT <- isTriangular(x)))
 	as(x, cl)
     else if(is(x, "CsparseMatrix")) x
