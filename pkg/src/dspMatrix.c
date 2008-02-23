@@ -118,11 +118,12 @@ SEXP dspMatrix_matrix_mm(SEXP a, SEXP b)
     Memcpy(bx, vx, n * nrhs);
     if (bdims[0] != n)
 	error(_("Matrices are not conformable for multiplication"));
-    if (nrhs < 1 || n < 1)
-	error(_("Matrices with zero extents cannot be multiplied"));
-    for (i = 0; i < nrhs; i++)
-	F77_CALL(dspmv)(uplo, &n, &one, ax, bx + i * n, &ione,
-			&zero, vx + i * n, &ione);
+    if (nrhs < 1 || n < 1) {
+/* 	error(_("Matrices with zero extents cannot be multiplied")); */
+    } else
+	for (i = 0; i < nrhs; i++)
+	    F77_CALL(dspmv)(uplo, &n, &one, ax, bx + i * n, &ione,
+			    &zero, vx + i * n, &ione);
     UNPROTECT(1);
     return val;
 }

@@ -178,7 +178,7 @@ tail(x.x., -3) # all but the first three lines
 lx.x <- as(x.x, "lsCMatrix") # FALSE only for "structural" 0
 (l10 <- lx.x[1:10, 1:10])# "lsC"
 (l3 <-  lx.x[1:3, ])
-m.x <- as(x.x, "matrix")
+m.x <- as.mat(x.x) # as.mat() *drops* (NULL,NULL) dimnames
 stopifnot(class(l10) == "lsCMatrix", # symmetric indexing -> symmetric !
           identical(as.mat(lx.x), m.x != 0),
           identical(as.logical(lx.x), as.logical(m.x)),

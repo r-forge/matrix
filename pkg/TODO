@@ -112,11 +112,10 @@
   present factorization and rather uses one with more '0' in x slot.
 
 - diag(m) <- val    currently automatically works via  m[cbind(i,i)] <- val
-  However,
-  we need methods for 'diag<-' at least for diagonalMatrix,
-  triangularMatrix, and probably also "dense*general*Matrix" since the
+  This (`[<-` method) is now "smart" for diagonalMatrix, but needs also to
+  be for triangularMatrix, and probably also "dense*general*Matrix" since the
   above currently goes via "matrix" and back instead of using the 'x' slot
-  directly.
+  directly; in particular, the triangular* "class property" is lost!
 
 - image(M, ..): Think about an optional smart option which keeps
    "0 |-> transparent" and allows colors to differentiate negative and
@@ -167,11 +166,7 @@
   Consider going via  asTuniq() or something very close to
   .Arith.Csparse() in R/Ops.R
 
-- grep for '*HORRENDOUSLY* slow' in tests/simple.R
-  and do better than
-	unlist(lapply(seq_len(m), function(j) x[i1[j], i2[j]]))
-  in R/Matrix.R
-  --> now fixed for sparseMatrices : 'ss <- slp[ij]' in tests/simple.R
-
-  But need similar fix for  m[ <ij-matrix> ] <- value
-  and the same for *dense* Matrices
+- many setAs(*, "[dl]..Matrix") are still needed, as long as e.g.
+  replCmat() uses as_CspClass() and drop0(.) which itself call
+  as_CspClass() quite a bit.  --> try to replace these by
+  as(*, "CsparseMatrix"); forceSymmetric, etc.

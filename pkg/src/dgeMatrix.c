@@ -307,26 +307,30 @@ SEXP dgeMatrix_matrix_mm(SEXP a, SEXP bP, SEXP right)
 	int m = bdims[0], n = adims[1], k = bdims[1];
 	if (adims[0] != k)
 	    error(_("Matrices are not conformable for multiplication"));
-	if (m < 1 || n < 1 || k < 1)
-	    error(_("Matrices with zero extents cannot be multiplied"));
 	cdims[0] = m; cdims[1] = n;
-	F77_CALL(dgemm) ("N", "N", &m, &n, &k, &one,
-			 REAL(GET_SLOT(b, Matrix_xSym)), &m,
-			 REAL(GET_SLOT(a, Matrix_xSym)), &k, &zero,
-			 REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, m * n)),
-			 &m);
+	if (m < 1 || n < 1 || k < 1) {
+/* 	    error(_("Matrices with zero extents cannot be multiplied")); */
+	    ALLOC_SLOT(val, Matrix_xSym, REALSXP, m * n);
+	} else
+	    F77_CALL(dgemm) ("N", "N", &m, &n, &k, &one,
+			     REAL(GET_SLOT(b, Matrix_xSym)), &m,
+			     REAL(GET_SLOT(a, Matrix_xSym)), &k, &zero,
+			     REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, m * n)),
+			     &m);
     } else {
 	int m = adims[0], n = bdims[1], k = adims[1];
 
 	if (bdims[0] != k)
 	    error(_("Matrices are not conformable for multiplication"));
-	if (m < 1 || n < 1 || k < 1)
-	    error(_("Matrices with zero extents cannot be multiplied"));
 	cdims[0] = m; cdims[1] = n;
-	F77_CALL(dgemm)
-	    ("N", "N", &m, &n, &k, &one, REAL(GET_SLOT(a, Matrix_xSym)),
-	     &m, REAL(GET_SLOT(b, Matrix_xSym)), &k, &zero,
-	     REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, m * n)), &m);
+	if (m < 1 || n < 1 || k < 1) {
+/* 	    error(_("Matrices with zero extents cannot be multiplied")); */
+	    ALLOC_SLOT(val, Matrix_xSym, REALSXP, m * n);
+	} else
+	    F77_CALL(dgemm)
+		("N", "N", &m, &n, &k, &one, REAL(GET_SLOT(a, Matrix_xSym)),
+		 &m, REAL(GET_SLOT(b, Matrix_xSym)), &k, &zero,
+		 REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, m * n)), &m);
     }
     ALLOC_SLOT(val, Matrix_DimNamesSym, VECSXP, 2);
     UNPROTECT(2);

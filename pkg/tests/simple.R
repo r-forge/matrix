@@ -21,7 +21,7 @@ assert.EQ.mat(dm4, as(m4, "matrix"))
 assert.EQ.mat(mN, matrix(NA, 3,4))
 sL <- Matrix(, 3,4, sparse=TRUE)# -> "lgC"
 trS <- Matrix(tr, sparse=TRUE)# failed in 0.9975-11
-stopifnot(
+stopifnot(is(d4, "diagonalMatrix"),   is(z4,  "diagonalMatrix"),
           is(tr, "triangularMatrix"), is(trS, "triangularMatrix"),
           all(is.na(sL@x)), ## not yet:  all(is.na(sL)),
           !any(sL, na.rm=TRUE), all(!sL, na.rm=TRUE),
@@ -53,7 +53,8 @@ rm(m)
 (t1 <- new("dtTMatrix", x= c(3,7), i= 0:1, j=3:2,
            Dim= as.integer(c(4,4))))
 stopifnot(validObject(t1),
-          validObject(t1c <- as(t1, "dtCMatrix")))
+          validObject(t1c <- as(t1, "CsparseMatrix")),
+          class(t1c) == "dtCMatrix")
 assert.EQ.mat(t1, as(t1c, "matrix"))
 
 
@@ -84,7 +85,7 @@ stopifnot(is(cu, "CsparseMatrix"), is(cu, "triangularMatrix"),
 assert.EQ.mat(cu * 1:8, mu * 1:8)
 
 ## tu. is diag "U", but tu2 not:
-tu2 <- as(as(tu., "dgTMatrix"), "dtTMatrix")
+tu2 <- as(as(tu., "generalMatrix"), "triangularMatrix")
 assert.EQ.mat(cu, mu, tol=0)
 stopifnot(identical3(cu[cu > 1],  tu [tu > 1], mu [mu > 1]),
           identical3(cu <= 1, tu <= 1, as(mu <= 1, "lMatrix")),# all lgeMatrix
@@ -163,15 +164,15 @@ I1 <- m %*% i.m
 o4 <- diag(I1)
 im <- solve(m)
 (I2 <- m %*% im)
-(ms <- as(m, "dsCMatrix"))
+(ms <- as(m, "symmetricMatrix"))
 ## solve(<sparse>, <sparse>):
 s.mm <-  solve(m,m)
 s.mms <- solve(m, ms)
 ## these now work "fully-sparse"
 s.ms2 <- solve(ms, ms)
 s.msm <- solve(ms, m)
-I4c <- as(Matrix(diag(4),sparse=TRUE), "dgCMatrix")
-stopifnot(is(im, "Matrix"), is(I2, "Matrix"),
+I4c <- as(Matrix(diag(4),sparse=TRUE), "generalMatrix")
+stopifnot(is(im, "Matrix"), is(I2, "Matrix"), class(I4c) == "dgCMatrix",
           all.equal(I1, I2, tol = 1e-14),
           all.equal(diag(4), as.mat(I2), tol = 1e-12),
           all.equal(s.mm,  I2, tol = 1e-14),
@@ -262,9 +263,9 @@ stopifnot(is(mM, "dsCMatrix"), is(tM, "dtCMatrix")
 	  , identical(mT, as(mM, "TsparseMatrix"))
 	  , identical(gC, as(mM, "generalMatrix"))
 	  ## coercions	general <-> symmetric
-	  , identical(as(as(mM, "dgCMatrix"), "dsCMatrix"), mM)
-	  , identical(as(as(mM, "dgTMatrix"), "dsTMatrix"), mT)
-	  , identical(as(as(tM, "dgCMatrix"), "dtCMatrix"), tM)
+	  , identical(as(as(mM, "generalMatrix"), "symmetricMatrix"), mM)
+	  , identical(as(as(mM, "dgTMatrix"),     "symmetricMatrix"), mT)
+	  , identical(as(as(tM, "generalMatrix"),"triangularMatrix"), tM)
           , identical(tM + Diagonal(8), tMD <- Diagonal(8) + tM)
           , is(tMD, "dtCMatrix")
 	  )
@@ -277,7 +278,7 @@ stopifnot(all.equal(eM$values,
 m5 <- Matrix(diag(5) - 1)
 if(FALSE) { # FIXME: this as(.,.) happily "works"
  assertError(mpo <- as(m5, "dpoMatrix"))
- validObject(mpo) # FIXME?  it is *not* really pos.definite!
+ validObject(mpo) #-> TRUE  FIXME?  it is *not* really pos.definite!
 }
 
 ###-- dense nonzero pattern:
@@ -342,8 +343,8 @@ ij <- function(a) a@i + ncol(a) * a@j
 stopifnot(all(ij(A) %in% ij(B)))
 
 l3 <- upper.tri(matrix(,3,3))
-(c3 <- as(l3, "CsparseMatrix"))
-stopifnot(validObject(c3), is(c3, "CsparseMatrix"), is(c3, "triangularMatrix"))
+(c3 <- as(l3, "CsparseMatrix"))# lgC
+stopifnot(validObject(c3), is(c3, "CsparseMatrix"), is(c3, "lMatrix"))
 (M <- Matrix(l3))  # -> "ltCMatrix"
 M2 <- M %x% M
 stopifnot(is(M, "ltCMatrix"), validObject(M2), dim(M2) == c(9,9),
@@ -358,9 +359,10 @@ M. <- M2 %x% M # gave infinite recursion
 ## diagonal, sparse & interactions
 stopifnot(is(as(Diagonal(3), "TsparseMatrix"), "TsparseMatrix"),
           is(X <- Diagonal(7) + 1.5 * tM[1:7,1:7], "sparseMatrix"),
-          is(X, "triangularMatrix"))
+          is(X, "triangularMatrix"),
+          is(XX <- X - chol(crossprod(X)), "triangularMatrix"))
 X
-(XX <- X - chol(crossprod(X)))
+XX
 XX <- as(drop0(XX), "dsCMatrix")
 stopifnot(identical(XX, Matrix(0, nrow(X), ncol(X))))
 
@@ -379,7 +381,7 @@ selectMethod("coerce",	c("lgeMatrix", "CsparseMatrix"),
 	     useInherited = c(from = TRUE, to = FALSE))
 
 ms0 <- Matrix(c(0,1,1,0), 2,2)
-(ms <- as(ms0, "dsTMatrix"))
+(ms <- as(ms0, "TsparseMatrix"))
 cs <- as(ms, "CsparseMatrix")
 ll <- as(ms, "lMatrix")
 lt <- as(ll, "lgTMatrix")
@@ -391,7 +393,7 @@ da <- nt + t(nt)
 dm <- nt * t(nt) + da
 stopifnot(as(ms0,"matrix") == as(ll, "matrix"), # coercing num |-> log
 	  as(lt, "matrix") == as(ll, "matrix"),
-	  identical(ms, as(ll, "dMatrix")),
+	  identical(ms, as(ll, "dMatrix")), is(ms, "dsTMatrix"),
 	  identical4(as(ll, "CsparseMatrix"), as(cs, "lMatrix"),# lsC*
 		     as(nn, "lsparseMatrix"), l2),
 	  identical3(da, dm, as(cs, "generalMatrix")),		# dgC*

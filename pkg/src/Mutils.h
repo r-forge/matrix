@@ -57,7 +57,10 @@ SEXP set_double_by_name(SEXP obj, double val, char *nm);
 SEXP as_det_obj(double val, int log, int sign);
 SEXP get_factors(SEXP obj, char *nm);
 SEXP set_factors(SEXP obj, SEXP val, char *nm);
+
+#if 0
 SEXP dgCMatrix_set_Dim(SEXP x, int nrow);
+#endif	/* unused */
 
 /* int csc_unsorted_columns(int ncol, const int p[], const int i[]); */
 /* void csc_sort_columns(int ncol, const int p[], int i[], double x[]); */
@@ -117,10 +120,16 @@ extern	 /* stored pointers to symbols initialized in R_init_Matrix */
 /* should also work for "matrix" matrices: */
 #define Real_KIND(_x_)	(IS_S4_OBJECT(_x_) ? Real_kind(_x_) : \
 			 (isReal(_x_) ? 0 : (isLogical(_x_) ? 1 : -1)))
+/* This one gives '0' also for integer "matrix" :*/
+#define Real_KIND2(_x_)	(IS_S4_OBJECT(_x_) ? Real_kind(_x_) : \
+			 (isLogical(_x_) ? 1 : 0))
 
 /* requires 'x' slot: */
 #define Real_kind(_x_)	(isReal(GET_SLOT(_x_, Matrix_xSym)) ? 0	:	\
 			 (isLogical(GET_SLOT(_x_, Matrix_xSym)) ? 1 : -1))
+
+#define DECLARE_AND_GET_X_SLOT(__C_TYPE, __SEXP)	\
+    __C_TYPE *xx = __SEXP(GET_SLOT(x, Matrix_xSym))
 
 
 /**

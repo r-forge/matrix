@@ -13,6 +13,7 @@ setAs("dgTMatrix", "matrix",
 setAs("dgeMatrix", "dgTMatrix",
       function(from) as(as(from, "dgCMatrix"), "dgTMatrix"))
 
+if(FALSE) ## special case, relatively ugly, needed ??
 setAs("dgTMatrix", "dsCMatrix",
       function(from) {
           if (!isSymmetric(from))
@@ -32,7 +33,9 @@ setAs("dgTMatrix", "dsTMatrix",
 		  i = from@i[upper],
 		  j = from@j[upper], x = from@x[upper], uplo = "U")
 	  }
-	  else stop("not a symmetric matrix")})
+	  else
+	      stop("not a symmetric matrix; consider forceSymmetric() or symmpart()")
+      })
 
 ## This is faster:
 setAs("dgTMatrix", "dtCMatrix",

@@ -1,3 +1,39 @@
+2008-02-21  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (as_Csparse2): drop this, replacing by
+	* R/bind.R:  .Call(dense_to_Csparse, *)
+
+2008-02-20  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R (Matrix): no longer use coercions to specific classes
+		(since we are discouraging them in user code).
+
+	* tests/*.R: also replaces coercions to specific classes by
+	coercions to super classes.
+
+	* R/denseMatrix.R (.dense2C): simplified by using forceSymmetric()
+
+
+2008-02-19  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* man/CAex.Rd: example: coerce to symmetric*, not dsC*
+
+	* src/dense.c (dense_band): generalized from ddense_band
+
+	* R/ddenseMatrix.R (.trilDense,.triuDense, .bandDense):
+	  now for "denseMatrix" (instead of just "ddense*"); much
+	  simplified setMethod()s for these.
+
+	* src/dense.c (dense_to_symmetric): generalized from ddense_*
+
+2008-02-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllGeneric.R: forceSymmetric() generic: fast no-checking
+	version of as(*, "symmetricMatric").
+
+	* src/dense.c (ddense_to_symmetric): add 'symm_test' argument, and
+	* R/symmetricMatrix.R: set it TRUE in coercion to "symmetricMatrix"
+
 2008-02-16  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Matrix.R (subset.ij): utility, as first step to faster

@@ -101,11 +101,12 @@ SEXP dtrMatrix_matrix_mm(SEXP a, SEXP b, SEXP right)
 	error(_("dtrMatrix in %*% must be square"));
     if ((rt && adims[0] != n) || (!rt && adims[1] != m))
 	error(_("Matrices are not conformable for multiplication"));
-    if (m < 1 || n < 1)
-	error(_("Matrices with zero extents cannot be multiplied"));
-    F77_CALL(dtrmm)(rt ? "R" : "L", uplo_P(a), "N", diag_P(a), &m, &n, &one,
-		    REAL(GET_SLOT(a, Matrix_xSym)), adims,
-		    REAL(GET_SLOT(val, Matrix_xSym)), &m);
+    if (m < 1 || n < 1) {
+/* 	error(_("Matrices with zero extents cannot be multiplied")); */
+    } else
+	F77_CALL(dtrmm)(rt ? "R" : "L", uplo_P(a), "N", diag_P(a), &m, &n, &one,
+			REAL(GET_SLOT(a, Matrix_xSym)), adims,
+			REAL(GET_SLOT(val, Matrix_xSym)), &m);
     UNPROTECT(1);
     return val;
 }
@@ -160,11 +161,12 @@ SEXP dtrMatrix_dgeMatrix_mm_R(SEXP a, SEXP b)
 
     if (bdims[0] != k)
 	error(_("Matrices are not conformable for multiplication"));
-    if (m < 1 || n < 1 || k < 1)
-	error(_("Matrices with zero extents cannot be multiplied"));
-    F77_CALL(dtrmm)("R", uplo_P(a), "N", diag_P(a), adims, bdims+1, &one,
-		    REAL(GET_SLOT(a, Matrix_xSym)), adims,
-		    REAL(GET_SLOT(val, Matrix_xSym)), bdims);
+    if (m < 1 || n < 1 || k < 1) {
+/* 	error(_("Matrices with zero extents cannot be multiplied")); */
+    } else
+	F77_CALL(dtrmm)("R", uplo_P(a), "N", diag_P(a), adims, bdims+1, &one,
+			REAL(GET_SLOT(a, Matrix_xSym)), adims,
+			REAL(GET_SLOT(val, Matrix_xSym)), bdims);
     UNPROTECT(1);
     return val;
 }

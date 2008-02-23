@@ -249,3 +249,10 @@
   skewpart(A) := (A - A') /. 2.
   Hence defined symmpart() and skewpart().
 
+- fixed '*HORRENDOUSLY* slow' in tests/simple.R
+  and do better than
+	unlist(lapply(seq_len(m), function(j) x[i1[j], i2[j]]))
+  in R/Matrix.R
+  --> now fixed for sparseMatrices : 'ss <- slp[ij]' in tests/simple.R
+  denseMatrices have their own method,
+  and m[ <ij-matrix> ] <- value seems more or less ok.
