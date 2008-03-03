@@ -36,7 +36,7 @@ double get_norm(SEXP obj, const char *typstr)
     int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym));
     double *work = (double *) NULL;
 
-    typnm[0] = norm_type(typstr);
+    typnm[0] = La_norm_type(typstr);
     if (*typnm == 'I') {
         work = (double *) R_alloc(dims[0], sizeof(double));
     }
@@ -52,13 +52,15 @@ SEXP dgeMatrix_norm(SEXP obj, SEXP type)
 
 SEXP dgeMatrix_rcond(SEXP obj, SEXP type)
 {
-    SEXP LU = dgeMatrix_LU(obj);
+    SEXP LU = PROTECT(dgeMatrix_LU(obj));
     char typnm[] = {'\0', '\0'};
     int *dims = INTEGER(GET_SLOT(LU, Matrix_DimSym)), info;
     double anorm, rcond;
 
-    if (dims[0] != dims[1] || dims[0] < 1)
+    if (dims[0] != dims[1] || dims[0] < 1) {
+	UNPROTECT(1);
 	error(_("rcond requires a square, non-empty matrix"));
+    }
     typnm[0] = rcond_type(CHAR(asChar(type)));
     anorm = get_norm(obj, typnm);
     F77_CALL(dgecon)(typnm,
@@ -66,6 +68,7 @@ SEXP dgeMatrix_rcond(SEXP obj, SEXP type)
 		     dims, &anorm, &rcond,
 		     (double *) R_alloc(4*dims[0], sizeof(double)),
 		     (int *) R_alloc(dims[0], sizeof(int)), &info);
+    UNPROTECT(1);
     return ScalarReal(rcond);
 }
 

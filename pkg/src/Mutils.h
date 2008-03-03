@@ -50,7 +50,7 @@ enum CBLAS_SIDE {CblasLeft=141, CblasRight=142};
 #define LFT CblasLeft
 #define RGT CblasRight
 
-char norm_type(const char *typstr);
+char La_norm_type(const char *typstr);
 char rcond_type(const char *typstr);
 double get_double_by_name(SEXP obj, char *nm);
 SEXP set_double_by_name(SEXP obj, double val, char *nm);
