@@ -21,7 +21,7 @@ double get_norm_sp(SEXP obj, const char *typstr)
     int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym));
     double *work = (double *) NULL;
 
-    typnm[0] = norm_type(typstr);
+    typnm[0] = La_norm_type(typstr);
     if (*typnm == 'I' || *typnm == 'O') {
 	work = (double *) R_alloc(dims[0], sizeof(double));
     }

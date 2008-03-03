@@ -1,7 +1,7 @@
 #include "Mutils.h"
 #include <R_ext/Lapack.h>
 
-char norm_type(const char *typstr)
+char La_norm_type(const char *typstr)
 {
     char typup;
 
