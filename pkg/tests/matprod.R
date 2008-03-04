@@ -88,6 +88,17 @@ stopifnot(is(m, "triangularMatrix"), is(m, "sparseMatrix"),
           is(im, "dtCMatrix"), is(itm, "dtCMatrix"), is(iitm, "dtCMatrix"),
 	  del < 1e-15)
 
+## *unit* triangular :
+t1 <- new("dtTMatrix", x= c(3,7), i= 0:1, j=3:2, Dim= as.integer(c(4,4)))
+## from  0-diagonal to unit-diagonal {low-level step}:
+tu <- t1 ; tu@diag <- "U"
+cu <- as(tu, "dtCMatrix")
+cu2 <- Diagonal(4) + Matrix(c(rep(0,9),14,0,0,6,0,0,0), 4,4)
+stopifnot(all(cu %*% cu == cu2),# was wrong for ver. <= 0.999375-4
+## FIXME: cu %*% cu should be unit triangular
+          identical(crossprod(cu), Matrix(crossprod(as.matrix(cu)),sparse=TRUE)),
+          identical(tcrossprod(cu), Matrix(tcrossprod(as.matrix(cu)),sparse=TRUE)) )
+
 
 data(KNex); mm <- KNex$mm
 M <- mm[1:500, 1:200]

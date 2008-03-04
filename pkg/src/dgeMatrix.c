@@ -61,7 +61,7 @@ SEXP dgeMatrix_rcond(SEXP obj, SEXP type)
 	UNPROTECT(1);
 	error(_("rcond requires a square, non-empty matrix"));
     }
-    typnm[0] = rcond_type(CHAR(asChar(type)));
+    typnm[0] = La_rcond_type(CHAR(asChar(type)));
     anorm = get_norm(obj, typnm);
     F77_CALL(dgecon)(typnm,
 		     dims, REAL(GET_SLOT(LU, Matrix_xSym)),

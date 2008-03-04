@@ -885,6 +885,8 @@ isTriC <- function(object, upper = NA) {
 {
     if(extends(cl, "CsparseMatrix"))
 	.Call(Csparse_diagU2N, x)
+    else if(extends(cl, "TsparseMatrix"))
+	.Call(Tsparse_diagU2N, x)
     else {
 	kind <- .M.kind(x, cl)
 	xT <- as(x, paste(kind, "gTMatrix", sep=''))

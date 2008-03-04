@@ -212,8 +212,10 @@ stopifnot(sm[2,] == c(0:1, rep.int(0,ncol(sm)-2)),
 	  all(sm[,-(1:3)] == 0)
 	  )
 
-### Diagonal -- Sparse:
 m0 <- Diagonal(5)
+stopifnot(identical(m0[2,], m0[,2]),
+	  identical(m0[,1], c(1,0,0,0,0)))
+### Diagonal -- Sparse:
 (m1 <- as(m0, "sparseMatrix"))  # dtTMatrix
 (m2 <- as(m0, "CsparseMatrix")) # dtCMatrix (with an irrelevant warning)
 m1g <- as(m1, "generalMatrix")
@@ -224,6 +226,10 @@ stopifnot(identical(m2[1:3,], as(m1[1:3,], "CsparseMatrix")),
           identical(Matrix:::uniqTsparse(m1[, c(4,2)]),
                     Matrix:::uniqTsparse(as(m2[, c(4,2)], "TsparseMatrix")))
           )## failed in 0.9975-11
+
+(uTr <- new("dtTMatrix", Dim = c(3L,3L), diag="U"))
+uTr[1,] <- 0
+assert.EQ.mat(uTr, cbind(0, rbind(0,diag(2))))
 
 M <- m0; M[1,] <- 0
 stopifnot(identical(M, Diagonal(x=c(0, rep(1,4)))))
