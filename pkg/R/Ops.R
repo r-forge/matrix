@@ -748,7 +748,7 @@ setMethod("Arith", signature(e1 = "CsparseMatrix", e2 = "numeric"),
 	      if(length(e2) == 1) { ## e.g.,  Mat ^ a
 		  f0 <- callGeneric(0, e2)
 		  if(is0(f0)) { # remain sparse, symm., tri.,...
-                      e1 <- as(e1, "dMatrix")
+                      e1 <- diagU2N(as(e1, "dMatrix"))
 		      e1@x <- callGeneric(e1@x, e2)
 		      return(e1)
 		  }
@@ -763,7 +763,7 @@ setMethod("Arith", signature(e1 = "numeric", e2 = "CsparseMatrix"),
 	      if(length(e1) == 1) {
 		  f0 <- callGeneric(e1, 0)
 		  if(is0(f0)) {
-                      e2 <- as(e2, "dMatrix")
+                      e2 <- diagU2N(as(e2, "dMatrix"))
 		      e2@x <- callGeneric(e1, e2@x)
 		      return(e2)
 		  }
@@ -875,12 +875,12 @@ setMethod("Compare", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 
 ## "Arith" short cuts / exceptions
 setMethod("-", signature(e1 = "sparseMatrix", e2 = "missing"),
-          function(e1) { e1@x <- -e1@x ; e1 })
+	  function(e1, e2) { e1 <- diagU2N(e1); e1@x <- -e1@x; e1 })
 ## with the following exceptions:
 setMethod("-", signature(e1 = "nsparseMatrix", e2 = "missing"),
-          function(e1) callGeneric(as(as(e1, "dMatrix"), "dgCMatrix")))
+          function(e1,e2) callGeneric(as(as(e1, "dMatrix"), "dgCMatrix")))
 setMethod("-", signature(e1 = "pMatrix", e2 = "missing"),
-          function(e1) callGeneric(as(e1, "ngTMatrix")))
+          function(e1,e2) callGeneric(as(e1, "ngTMatrix")))
 
 ## Group method  "Arith"
 
@@ -944,7 +944,7 @@ setMethod("Arith", signature(e1 = "dsparseVector", e2 = "dsparseVector"),
                   if(N %% n != 0) ## require this here, for conveniense
                       ## for regular vectors, this is only a warning:
                       stop("longer object length\n\t",
-                              "is not a multiple of shorter object length")
+                           "is not a multiple of shorter object length")
                   if(n == 1) { # simple case, do not really recycle
                       if(n1 < n2) return(callGeneric(sp2vec(e1, "double"), e2))
                       else        return(callGeneric(e1, sp2vec(e2, "double")))

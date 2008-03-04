@@ -50,8 +50,11 @@ enum CBLAS_SIDE {CblasLeft=141, CblasRight=142};
 #define LFT CblasLeft
 #define RGT CblasRight
 
+#if !defined(R_VERSION) || R_VERSION < R_Version(2, 7, 0)
 char La_norm_type(const char *typstr);
-char rcond_type(const char *typstr);
+char La_rcond_type(const char *typstr);
+#endif
+
 double get_double_by_name(SEXP obj, char *nm);
 SEXP set_double_by_name(SEXP obj, double val, char *nm);
 SEXP as_det_obj(double val, int log, int sign);
@@ -101,9 +104,10 @@ extern	 /* stored pointers to symbols initialized in R_init_Matrix */
 #define PACKED_LENGTH(n)   ((n) * ((n) + 1))/2
 
 /* duplicate the slot with name given by sym from src to dest */
-/* FIXME: is not yet used */
+
 #define slot_dup(dest, src, sym)  SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
 
+/* is not yet used: */
 #define slot_nonNull_dup(dest, src, sym)			\
     if(GET_SLOT(src, sym) != R_NilValue)			\
 	SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))

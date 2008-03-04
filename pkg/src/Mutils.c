@@ -1,6 +1,11 @@
 #include "Mutils.h"
 #include <R_ext/Lapack.h>
 
+#include <Rversion.h>
+
+#if defined(R_VERSION) && R_VERSION >= R_Version(2, 7, 0)
+/* La_norm_type() & La_rcond_type() are now in R_ext/Lapack.h */
+#else
 char La_norm_type(const char *typstr)
 {
     char typup;
@@ -10,15 +15,17 @@ char La_norm_type(const char *typstr)
 	    _("argument type[1]='%s' must be a character string of string length 1"),
 	    typstr);
     typup = toupper(*typstr);
-    if (typup == '1') typup = 'O'; /* aliases */
-    if (typup == 'E') typup = 'F';
-    if (typup != 'M' && typup != 'O' && typup != 'I' && typup != 'F')
+    if (typup == '1')
+	typup = 'O'; /* aliases */
+    else if (typup == 'E')
+	typup = 'F';
+    else if (typup != 'M' && typup != 'O' && typup != 'I' && typup != 'F')
 	error(_("argument type[1]='%s' must be one of 'M','1','O','I','F' or 'E'"),
 	      typstr);
     return typup;
 }
 
-char rcond_type(const char *typstr)
+char La_rcond_type(const char *typstr)
 {
     char typup;
 
@@ -26,12 +33,14 @@ char rcond_type(const char *typstr)
 	error(_("argument type[1]='%s' must be a character string of string length 1"),
 	      typstr);
     typup = toupper(*typstr);
-    if (typup == '1') typup = 'O'; /* alias */
-    if (typup != 'O' && typup != 'I')
+    if (typup == '1')
+	typup = 'O'; /* alias */
+    else if (typup != 'O' && typup != 'I')
 	error(_("argument type[1]='%s' must be one of '1','O', or 'I'"),
 	      typstr);
     return typup;
 }
+#endif
 
 double get_double_by_name(SEXP obj, char *nm)
 {
@@ -455,7 +464,6 @@ Matrix_getElement(SEXP list, char *nm) {
  *
  * @return dest
  */
-
 static double *
 install_diagonal(double *dest, SEXP A)
 {

@@ -68,13 +68,14 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x)
     case 0: /* g(eneral) */							\
 	ans->stype = 0; break;							\
     case 1: /* s(ymmetric) */							\
-	ans->stype =								\
-	    (!strcmp(CHAR(asChar(getAttrib(x, Matrix_uploSym))), "U")) ?	\
-	    1 : -1;								\
+	ans->stype = (*uplo_P(x) == 'U') ? 1 : -1;				\
 	break;									\
-    case 2: /* t(riangular) */							\
-	ans->stype = 0; break; /* Note that triangularity property is lost */	\
-/*	error("triangular matrices not yet mapped to CHOLMOD"); */		\
+    case 2: /* t(riangular) -- Note that triangularity property is lost! */	\
+	ans->stype = 0;								\
+	/* NOTE: if(*diag_P(x) == 'U'), the diagonal is lost (!); */		\
+        /* ---- that may be ok, e.g. if we are just converting from/to Tsparse, */ \
+        /*      but is *not* at all ok, e.g. when used before matrix products */   \
+	break;									\
     }										\
     return ans
 

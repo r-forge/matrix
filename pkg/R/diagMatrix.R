@@ -211,7 +211,7 @@ subDiag <- function(x, i, j, ..., drop) {
 	x[i, , drop=drop]
     else
 	x[i,j, drop=drop]
-    if(isDiagonal(x)) as(x, "diagonalMatrix") else x
+    if(isS4(x) && isDiagonal(x)) as(x, "diagonalMatrix") else x
 }
 
 setMethod("[", signature(x = "diagonalMatrix", i = "index",

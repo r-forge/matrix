@@ -1,3 +1,17 @@
+2008-03-04  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/diagMatrix.R (subDiag): fix when x[..] became a vector
+
+	* src/Tsparse.c (Tsparse_diagU2N): new utility, necessary for e.g.
+	* src/Csparse.c (Csparse_crossprod): use [CT]sparse_diagU2N() !!
+
+	* R/Auxiliaries.R (.diagU2N): make use of new Tsparse_diagU2N
+
+	* R/Ops.R ("-" (<sparseMatrix>)): use diagU2N()
+
+	* src/chm_common.c (AS_CHM_FINISH): add note about problem
+	for triangular (diag = "U").
+
 2008-02-21  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Auxiliaries.R (as_Csparse2): drop this, replacing by

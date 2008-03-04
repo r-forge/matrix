@@ -1,5 +1,6 @@
 			/* Sparse matrices in compressed column-oriented form */
 #include "Csparse.h"
+#include "Tsparse.h"
 #include "chm_common.h"
 
 SEXP Csparse_validate(SEXP x)
@@ -202,8 +203,10 @@ SEXP Csparse_transpose(SEXP x, SEXP tri)
 
 SEXP Csparse_Csparse_prod(SEXP a, SEXP b)
 {
-    CHM_SP cha = AS_CHM_SP(a), chb = AS_CHM_SP(b);
-    CHM_SP chc = cholmod_ssmult(cha, chb, 0, cha->xtype, 1, &c);
+    CHM_SP
+	cha = AS_CHM_SP(Csparse_diagU2N(a)),
+	chb = AS_CHM_SP(Csparse_diagU2N(b)),
+	chc = cholmod_ssmult(cha, chb, 0, cha->xtype, 1, &c);
     SEXP dn = allocVector(VECSXP, 2);
     R_CheckStack();
 
@@ -217,7 +220,10 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b)
 SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans)
 {
     int tr = asLogical(trans);
-    CHM_SP cha = AS_CHM_SP(a), chb = AS_CHM_SP(b), chTr, chc;
+    CHM_SP
+	cha = AS_CHM_SP(Csparse_diagU2N(a)),
+	chb = AS_CHM_SP(Csparse_diagU2N(b)),
+	chTr, chc;
     SEXP dn = allocVector(VECSXP, 2);
     R_CheckStack();
 
@@ -235,7 +241,7 @@ SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans)
 
 SEXP Csparse_dense_prod(SEXP a, SEXP b)
 {
-    CHM_SP cha = AS_CHM_SP(a);
+    CHM_SP cha = AS_CHM_SP(Csparse_diagU2N(a));
     SEXP b_M = PROTECT(mMatrix_as_dgeMatrix(b));
     CHM_DN chb = AS_CHM_DN(b_M);
     CHM_DN chc = cholmod_allocate_dense(cha->nrow, chb->ncol, cha->nrow,
@@ -255,7 +261,7 @@ SEXP Csparse_dense_prod(SEXP a, SEXP b)
 
 SEXP Csparse_dense_crossprod(SEXP a, SEXP b)
 {
-    CHM_SP cha = AS_CHM_SP(a);
+    CHM_SP cha = AS_CHM_SP(Csparse_diagU2N(a));
     SEXP b_M = PROTECT(mMatrix_as_dgeMatrix(b));
     CHM_DN chb = AS_CHM_DN(b_M);
     CHM_DN chc = cholmod_allocate_dense(cha->ncol, chb->ncol, cha->ncol,
@@ -278,15 +284,20 @@ SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet)
 {
     int trip = asLogical(triplet),
 	tr   = asLogical(trans); /* gets reversed because _aat is tcrossprod */
-    CHM_TR cht = trip ? AS_CHM_TR(x) : (CHM_TR) NULL;
+    CHM_TR cht = trip ? AS_CHM_TR(Tsparse_diagU2N(x)) : (CHM_TR) NULL;
     CHM_SP chcp, chxt,
-	chx = trip ? cholmod_triplet_to_sparse(cht, cht->nnz, &c) : AS_CHM_SP(x);
+	chx = (trip ?
+	       cholmod_triplet_to_sparse(cht, cht->nnz, &c) :
+	       AS_CHM_SP(Csparse_diagU2N(x)));
     SEXP dn = PROTECT(allocVector(VECSXP, 2));
     R_CheckStack();
 
     if (!tr) chxt = cholmod_transpose(chx, chx->xtype, &c);
     chcp = cholmod_aat((!tr) ? chxt : chx, (int *) NULL, 0, chx->xtype, &c);
-    if(!chcp) error(_("Csparse_crossprod(): error return from cholmod_aat()"));
+    if(!chcp) {
+	UNPROTECT(1);
+	error(_("Csparse_crossprod(): error return from cholmod_aat()"));
+    }
     cholmod_band_inplace(0, chcp->ncol, chcp->xtype, chcp, &c);
     chcp->stype = 1;
     if (trip) cholmod_free_sparse(&chx, &c);
@@ -348,7 +359,10 @@ SEXP Csparse_band(SEXP x, SEXP k1, SEXP k2)
 
 SEXP Csparse_diagU2N(SEXP x)
 {
-    if (*diag_P(x) != 'U') {/* "trivially fast" when there's no 'diag' slot at all */
+    const char *cl = class_P(x);
+    /* dtCMatrix, etc; [1] = the second character =?= 't' for triangular */
+    if (cl[1] != 't' || *diag_P(x) != 'U') {
+	/* "trivially fast" when not triangular (<==> no 'diag' slot), or not *unit* triangular */
 	return (x);
     }
     else {
@@ -393,8 +407,8 @@ SEXP Csparse_MatrixMarket(SEXP x, SEXP fname)
     if (!f)
 	error(_("failure to open file \"%s\" for writing"),
 	      CHAR(asChar(fname)));
-    if (!cholmod_write_sparse(f, AS_CHM_SP(x), (CHM_SP)NULL,
-			      (char*) NULL, &c))
+    if (!cholmod_write_sparse(f, AS_CHM_SP(Csparse_diagU2N(x)),
+			      (CHM_SP)NULL, (char*) NULL, &c))
 	error(_("cholmod_write_sparse returned error code"));
     fclose(f);
     return R_NilValue;

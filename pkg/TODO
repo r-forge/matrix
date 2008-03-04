@@ -23,6 +23,10 @@
    keep triangular and symmetric Matrices when appropriate:
    particularly desirable for  "Math2": round(), signif()
 
+  For triangular matrices, more specifically make sure the four rules of
+  "triangular matrix algebra" (Golub+Van Loan 1996, 3.1.8, p.93) are
+  fulfilled;  currently  <dtC> %*% <dtC> --> <dgC>
+
 - "d" <-> "l" coercion for all "[TCR]" sparse matrices is really trivial:
   "d" -> "l" : drops the 'x' slot
   "l" -> "d" : construct an 'x' slot of all '1'

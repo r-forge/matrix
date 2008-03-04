@@ -45,7 +45,7 @@ SEXP dtpMatrix_rcond(SEXP obj, SEXP type)
     char typnm[] = {'\0', '\0'};
     double rcond;
 
-    typnm[0] = rcond_type(CHAR(asChar(type)));
+    typnm[0] = La_rcond_type(CHAR(asChar(type)));
     F77_CALL(dtpcon)(typnm, uplo_P(obj), diag_P(obj), dims,
 		     REAL(GET_SLOT(obj, Matrix_xSym)), &rcond,
 		     (double *) R_alloc(3*dims[0], sizeof(double)),
