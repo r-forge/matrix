@@ -7,6 +7,7 @@ extern "C" {
 
 #include <ctype.h>
 #include <R.h>  /* includes Rconfig.h */
+#include <Rversion.h>
 #include <Rdefines.h> /* Rinternals.h + GET_SLOT etc */
 
 #ifdef ENABLE_NLS
