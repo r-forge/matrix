@@ -26,9 +26,9 @@ setMethod("cbind2", signature(x = "NULL", y="Matrix"),
           function(x, y) x)
 ## using "atomicVector" not just "numeric"
 setMethod("cbind2", signature(x = "Matrix", y = "atomicVector"),
-	  function(x, y) callGeneric(x, matrix(y, nrow = nrow(x))))
+	  function(x, y) cbind2(x, matrix(y, nrow = nrow(x))))
 setMethod("cbind2", signature(x = "atomicVector", y = "Matrix"),
-	  function(x, y) callGeneric(matrix(x, nrow = nrow(y)), y))
+	  function(x, y) cbind2(matrix(x, nrow = nrow(y)), y))
 setMethod("cbind2", signature(x = "ANY", y = "Matrix"),
 	  function(x, y) .bail.out.2(.Generic, class(x), class(y)))
 setMethod("cbind2", signature(x = "Matrix", y = "ANY"),
@@ -41,9 +41,9 @@ setMethod("rbind2", signature(x = "Matrix", y = "missing"),
 setMethod("rbind2", signature(x = "NULL", y="Matrix"),
           function(x, y) x)
 setMethod("rbind2", signature(x = "Matrix", y = "atomicVector"),
-	  function(x, y) callGeneric(x, matrix(y, ncol = ncol(x))))
+	  function(x, y) rbind2(x, matrix(y, ncol = ncol(x))))
 setMethod("rbind2", signature(x = "atomicVector", y = "Matrix"),
-	  function(x, y) callGeneric(matrix(x, ncol = ncol(y)), y))
+	  function(x, y) rbind2(matrix(x, ncol = ncol(y)), y))
 setMethod("rbind2", signature(x = "ANY", y = "Matrix"),
 	  function(x, y) .bail.out.2(.Generic, class(x), class(y)))
 setMethod("rbind2", signature(x = "Matrix", y = "ANY"),
@@ -95,9 +95,9 @@ setMethod("cbind2", signature(x = "numeric", y = "denseMatrix"),
 
 
 setMethod("cbind2", signature(x = "denseMatrix", y = "matrix"),
-	  function(x, y) callGeneric(x, as_geSimpl(y)))
+	  function(x, y) cbind2(x, as_geSimpl(y)))
 setMethod("cbind2", signature(x = "matrix", y = "denseMatrix"),
-	  function(x, y) callGeneric(as_geSimpl(x), y))
+	  function(x, y) cbind2(as_geSimpl(x), y))
 
 setMethod("cbind2", signature(x = "denseMatrix", y = "denseMatrix"),
 	  function(x, y) {
@@ -142,9 +142,9 @@ setMethod("rbind2", signature(x = "numeric", y = "denseMatrix"),
 	  })
 
 setMethod("rbind2", signature(x = "denseMatrix", y = "matrix"),
-	  function(x, y) callGeneric(x, as_geSimpl(y)))
+	  function(x, y) rbind2(x, as_geSimpl(y)))
 setMethod("rbind2", signature(x = "matrix", y = "denseMatrix"),
-	  function(x, y) callGeneric(as_geSimpl(x), y))
+	  function(x, y) rbind2(as_geSimpl(x), y))
 
 setMethod("rbind2", signature(x = "denseMatrix", y = "denseMatrix"),
 	  function(x, y) {
@@ -201,13 +201,13 @@ for(cls in names(getClass("diagonalMatrix")@subclasses)) {
  ## These are already defined for "Matrix"
  ## -- repeated here for method dispatch disambiguation	 {"design-FIXME" ?}
  setMethod("cbind2", signature(x = cls, y = "atomicVector"),
-	   function(x, y) callGeneric(x, matrix(y, nrow = nrow(x))))
+	   function(x, y) cbind2(x, matrix(y, nrow = nrow(x))))
  setMethod("cbind2", signature(x = "atomicVector", y = cls),
-	   function(x, y) callGeneric(matrix(x, nrow = nrow(y)), y))
+	   function(x, y) cbind2(matrix(x, nrow = nrow(y)), y))
  setMethod("rbind2", signature(x = cls, y = "atomicVector"),
-	   function(x, y) callGeneric(x, matrix(y, ncol = ncol(x))))
+	   function(x, y) rbind2(x, matrix(y, ncol = ncol(x))))
  setMethod("rbind2", signature(x = "atomicVector", y = cls),
-	   function(x, y) callGeneric(matrix(x, ncol = ncol(y)), y))
+	   function(x, y) rbind2(matrix(x, ncol = ncol(y)), y))
 }
 
 

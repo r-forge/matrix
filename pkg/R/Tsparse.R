@@ -842,16 +842,16 @@ setMethod("tcrossprod", signature(x = "TsparseMatrix", y = "missing"),
 ## (this will change in R-2.4.0).
 
 setMethod("crossprod", signature(x = "TsparseMatrix", y = "ANY"),
-	  function(x, y = NULL) callGeneric(.T.2.C(x), y))
+	  function(x, y = NULL) crossprod(.T.2.C(x), y))
 
 setMethod("tcrossprod", signature(x = "TsparseMatrix", y = "ANY"),
-	  function(x, y = NULL) callGeneric(.T.2.C(x), y))
+	  function(x, y = NULL) tcrossprod(.T.2.C(x), y))
 
 setMethod("%*%", signature(x = "TsparseMatrix", y = "ANY"),
-          function(x, y) callGeneric(.T.2.C(x), y))
+	  function(x, y) .T.2.C(x) %*% y)
 
 setMethod("%*%", signature(x = "ANY", y = "TsparseMatrix"),
-          function(x, y) callGeneric(x, as(y, "CsparseMatrix")))
+	  function(x, y) x %*% as(y, "CsparseMatrix"))
 
 ## Not yet.  Don't have methods for y = "CsparseMatrix" and general x
 #setMethod("%*%", signature(x = "ANY", y = "TsparseMatrix"),

@@ -1,3 +1,7 @@
+2008-03-05  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (LicenseDetails): new; such that 'License:' becomes "canonical"
+
 2008-03-04  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/diagMatrix.R (subDiag): fix when x[..] became a vector

@@ -62,35 +62,35 @@ setMethod("as.numeric", signature(x = "ddenseMatrix"),
 ## dgeMatrix. Methods for special forms override these.
 
 setMethod("norm", signature(x = "ddenseMatrix", type = "missing"),
-          function(x, type, ...) callGeneric(as(x, "dgeMatrix")))
+	  function(x, type, ...) norm(as(x, "dgeMatrix")))
 
 setMethod("norm", signature(x = "ddenseMatrix", type = "character"),
-          function(x, type, ...) callGeneric(as(x, "dgeMatrix"), type))
+	  function(x, type, ...) norm(as(x, "dgeMatrix"), type))
 
 setMethod("rcond", signature(x = "ddenseMatrix", type = "missing"),
-          function(x, type, ...) callGeneric(as(x, "dgeMatrix")))
+	  function(x, type, ...) rcond(as(x, "dgeMatrix")))
 
 setMethod("rcond", signature(x = "ddenseMatrix", type = "character"),
-          function(x, type, ...) callGeneric(as(x, "dgeMatrix"), type))
+	  function(x, type, ...) rcond(as(x, "dgeMatrix"), type))
 
 ## Not really useful; now require *identical* class for result:
 ## setMethod("t", signature(x = "ddenseMatrix"),
 ## 	  function(x) callGeneric(as(x, "dgeMatrix")))
 
 setMethod("tcrossprod", signature(x = "ddenseMatrix", y = "missing"),
-	  function(x, y = NULL) callGeneric(as(x, "dgeMatrix")))
+	  function(x, y = NULL) tcrossprod(as(x, "dgeMatrix")))
 
 setMethod("crossprod", signature(x = "ddenseMatrix", y = "missing"),
-          function(x, y = NULL) callGeneric(as(x, "dgeMatrix")))
+          function(x, y = NULL) crossprod(as(x, "dgeMatrix")))
 
 setMethod("diag", signature(x = "ddenseMatrix"),
-          function(x, nrow, ncol) callGeneric(as(x, "dgeMatrix")))
+          function(x, nrow, ncol) diag(as(x, "dgeMatrix")))
 
 setMethod("solve", signature(a = "ddenseMatrix", b = "missing"),
-          function(a, b, ...) callGeneric(as(a, "dgeMatrix")))
+          function(a, b, ...) solve(as(a, "dgeMatrix")))
 
 setMethod("solve", signature(a = "ddenseMatrix", b = "ANY"),
-          function(a, b, ...) callGeneric(as(a, "dgeMatrix"), b))
+          function(a, b, ...) solve(as(a, "dgeMatrix"), b))
 
 ## General method for dense matrix multiplication in case specific methods
 ## have not been defined.
@@ -100,16 +100,16 @@ setMethod("%*%", signature(x = "ddenseMatrix", y = "ddenseMatrix"),
           valueClass = "dgeMatrix")
 
 setMethod("lu", signature(x = "ddenseMatrix"),
-          function(x, ...) callGeneric(as(x, "dgeMatrix")))
+          function(x, ...) lu(as(x, "dgeMatrix")))
 
 setMethod("chol", signature(x = "ddenseMatrix", pivot = "ANY"), cholMat)
 
 setMethod("determinant", signature(x = "ddenseMatrix", logarithm = "missing"),
-          function(x, logarithm, ...) callGeneric(as(x, "dgeMatrix")))
+	  function(x, logarithm, ...) determinant(as(x, "dgeMatrix")))
 
 setMethod("determinant", signature(x = "ddenseMatrix", logarithm = "logical"),
-          function(x, logarithm, ...)
-          callGeneric(as(x, "dgeMatrix"), logarithm))
+	  function(x, logarithm, ...)
+	  determinant(as(x, "dgeMatrix"), logarithm))
 
 ## now done for "dMatrix":
 ## setMethod("expm", signature(x = "ddenseMatrix"),

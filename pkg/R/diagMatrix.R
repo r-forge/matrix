@@ -397,16 +397,16 @@ setMethod("%*%", signature(x = "dgeMatrix", y = "diagonalMatrix"),
 ##           })
 
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "sparseMatrix"),
-	  function(x, y = NULL) { x <- as(x, "sparseMatrix"); callGeneric() })
+	  function(x, y = NULL) crossprod(as(x, "sparseMatrix"), y))
 
 setMethod("crossprod", signature(x = "sparseMatrix", y = "diagonalMatrix"),
-	  function(x, y = NULL) { y <- as(y, "sparseMatrix"); callGeneric() })
+	  function(x, y = NULL) crossprod(x, as(y, "sparseMatrix")))
 
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "sparseMatrix"),
-	  function(x, y = NULL) { x <- as(x, "sparseMatrix"); callGeneric() })
+	  function(x, y = NULL) tcrossprod(as(x, "sparseMatrix"), y))
 
 setMethod("tcrossprod", signature(x = "sparseMatrix", y = "diagonalMatrix"),
-	  function(x, y = NULL) { y <- as(y, "sparseMatrix"); callGeneric() })
+	  function(x, y = NULL) tcrossprod(x, as(y, "sparseMatrix")))
 
 
 ## FIXME?: In theory, this can be done *FASTER*, in some cases, via tapply1()
