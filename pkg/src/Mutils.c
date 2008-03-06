@@ -3,8 +3,9 @@
 
 #include <Rversion.h>
 
-#if defined(R_VERSION) && R_VERSION >= R_Version(2, 7, 0)
-/* La_norm_type() & La_rcond_type() are now in R_ext/Lapack.h */
+#if 0 /* defined(R_VERSION) && R_VERSION >= R_Version(2, 7, 0) *
+       * La_norm_type() & La_rcond_type() are now in R_ext/Lapack.h
+       * but because of the 'module-mess' that's not sufficient */
 #else
 char La_norm_type(const char *typstr)
 {
