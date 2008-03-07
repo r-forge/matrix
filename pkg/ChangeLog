@@ -1,5 +1,10 @@
 2008-03-07  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* src/dgeMatrix.c (dgeMatrix_exp): fix the octave-origin bug in the
+	back-permutation of the matrix exponential.
+
+	* tests/matr-exp.R: test the fix (for an example where expm() was wrong).
+
 	* DESCRIPTION (Date,Version): ready to release 0.999375-5
 
 	* tests/simple.R: testing diagN2U

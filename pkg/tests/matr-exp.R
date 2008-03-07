@@ -52,4 +52,21 @@ stopifnot(identical(e3, E3),
           identical(as.mat(e3), e3.))
 
 
+## This used to be wrong {bug in octave-origin code}:
+M6 <- Matrix(c(0, -2, 0, 0, 0, 0,
+              10, 0, 0, 0,10,-2,
+              0,  0, 0, 0,-2, 0,
+              0, 10,-2,-2,-2,10,
+              0,  0, 0, 0, 0, 0,
+              10, 0, 0, 0, 0, 0), 6, 6)
+
+exp.M6 <- expm(M6)
+as(exp.M6, "sparseMatrix")# prints a bit more nicely
+stopifnot(all.equal(t(exp.M6),
+		    expm(t(M6)), tol = 1e-12),
+          all.equal(exp.M6[,3], c(0,0,1,0,-2,0), tol = 1e-12),
+          all.equal(exp.M6[,5], c(0,0,0,0, 1,0), tol = 1e-12),
+          all(exp.M6[3:4, c(1:2,5:6)] == 0)
+          )
+
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
