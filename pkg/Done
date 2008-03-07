@@ -256,3 +256,5 @@
   --> now fixed for sparseMatrices : 'ss <- slp[ij]' in tests/simple.R
   denseMatrices have their own method,
   and m[ <ij-matrix> ] <- value seems more or less ok.
+
+- dtC Matrices now preserve (unit-) triangularity in %*% and crossprod

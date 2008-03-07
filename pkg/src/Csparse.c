@@ -206,15 +206,36 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b)
     CHM_SP
 	cha = AS_CHM_SP(Csparse_diagU2N(a)),
 	chb = AS_CHM_SP(Csparse_diagU2N(b)),
-	chc = cholmod_ssmult(cha, chb, 0, cha->xtype, 1, &c);
+	chc = cholmod_ssmult(cha, chb, /*out_stype:*/ 0,
+			     cha->xtype, /*out sorted:*/ 1, &c);
+    const char *cl_a = class_P(a), *cl_b = class_P(b);
+    char diag[] = {'\0', '\0'};
+    int uploT = 0;
     SEXP dn = allocVector(VECSXP, 2);
     R_CheckStack();
 
+    /* Preserve triangularity and even unit-triangularity if appropriate.
+     * Note that in that case, the multiplication itself should happen
+     * faster.  But there's no support for that in CHOLMOD */
+
+    /* UGLY hack -- rather should have (fast!) C-level version of
+     *       is(a, "triangularMatrix") etc */
+    if (cl_a[1] == 't' && cl_b[1] == 't')
+	/* FIXME: fails for "Cholesky","BunchKaufmann"..*/
+	if(*uplo_P(a) == *uplo_P(b)) { /* both upper, or both lower tri. */
+	    uploT = (*uplo_P(a) == 'U') ? 1 : -1;
+	    if(*diag_P(a) == 'U' && *diag_P(b) == 'U') { /* return UNIT-triag. */
+		/* "remove the diagonal entries": */
+		chm_diagN2U(chc, uploT, /* do_realloc */ FALSE);
+		diag[0]= 'U';
+	    }
+	    else diag[0]= 'N';
+	}
     SET_VECTOR_ELT(dn, 0,	/* establish dimnames */
 		   duplicate(VECTOR_ELT(GET_SLOT(a, Matrix_DimNamesSym), 0)));
     SET_VECTOR_ELT(dn, 1,
 		   duplicate(VECTOR_ELT(GET_SLOT(b, Matrix_DimNamesSym), 1)));
-    return chm_sparse_to_SEXP(chc, 1, 0, 0, "", dn);
+    return chm_sparse_to_SEXP(chc, 1, uploT, /*Rkind*/0, diag, dn);
 }
 
 SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans)
@@ -224,19 +245,34 @@ SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans)
 	cha = AS_CHM_SP(Csparse_diagU2N(a)),
 	chb = AS_CHM_SP(Csparse_diagU2N(b)),
 	chTr, chc;
+    const char *cl_a = class_P(a), *cl_b = class_P(b);
+    char diag[] = {'\0', '\0'};
+    int uploT = 0;
     SEXP dn = allocVector(VECSXP, 2);
     R_CheckStack();
 
     chTr = cholmod_transpose((tr) ? chb : cha, chb->xtype, &c);
     chc = cholmod_ssmult((tr) ? cha : chTr, (tr) ? chTr : chb,
-			 0, cha->xtype, 1, &c);
+			 /*out_stype:*/ 0, cha->xtype, /*out sorted:*/ 1, &c);
     cholmod_free_sparse(&chTr, &c);
+
+    /* Preserve triangularity and unit-triangularity if appropriate;
+     * see Csparse_Csparse_prod() for comments */
+    if (cl_a[1] == 't' && cl_b[1] == 't')
+	if(*uplo_P(a) != *uplo_P(b)) { /* one 'U', the other 'L' */
+	    uploT = (*uplo_P(b) == 'U') ? 1 : -1;
+	    if(*diag_P(a) == 'U' && *diag_P(b) == 'U') { /* return UNIT-triag. */
+		chm_diagN2U(chc, uploT, /* do_realloc */ FALSE);
+		diag[0]= 'U';
+	    }
+	    else diag[0]= 'N';
+	}
 
     SET_VECTOR_ELT(dn, 0,	/* establish dimnames */
 		   duplicate(VECTOR_ELT(GET_SLOT(a, Matrix_DimNamesSym), (tr) ? 0 : 1)));
     SET_VECTOR_ELT(dn, 1,
 		   duplicate(VECTOR_ELT(GET_SLOT(b, Matrix_DimNamesSym), (tr) ? 0 : 1)));
-    return chm_sparse_to_SEXP(chc, 1, 0, 0, "", dn);
+    return chm_sparse_to_SEXP(chc, 1, uploT, /*Rkind*/0, diag, dn);
 }
 
 SEXP Csparse_dense_prod(SEXP a, SEXP b)
@@ -279,7 +315,8 @@ SEXP Csparse_dense_crossprod(SEXP a, SEXP b)
     return chm_dense_to_SEXP(chc, 1, 0, dn);
 }
 
-/* Computes   x'x  or  x x'  -- see Csparse_Csparse_crossprod above for  x'y and x y' */
+/* Computes   x'x  or  x x' -- *also* for Tsparse (triplet = TRUE)
+   see Csparse_Csparse_crossprod above for  x'y and x y' */
 SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet)
 {
     int trip = asLogical(triplet),
@@ -362,10 +399,11 @@ SEXP Csparse_diagU2N(SEXP x)
     const char *cl = class_P(x);
     /* dtCMatrix, etc; [1] = the second character =?= 't' for triangular */
     if (cl[1] != 't' || *diag_P(x) != 'U') {
-	/* "trivially fast" when not triangular (<==> no 'diag' slot), or not *unit* triangular */
+	/* "trivially fast" when not triangular (<==> no 'diag' slot),
+	   or not *unit* triangular */
 	return (x);
     }
-    else {
+    else { /* unit triangular (diag='U'): "fill the diagonal" & diag:= "N" */
 	CHM_SP chx = AS_CHM_SP(x);
 	CHM_SP eye = cholmod_speye(chx->nrow, chx->ncol, chx->xtype, &c);
 	double one[] = {1, 0};
@@ -376,6 +414,30 @@ SEXP Csparse_diagU2N(SEXP x)
 	R_CheckStack();
 	cholmod_free_sparse(&eye, &c);
 	return chm_sparse_to_SEXP(ans, 1, uploT, Rkind, "N",
+				  GET_SLOT(x, Matrix_DimNamesSym));
+    }
+}
+
+SEXP Csparse_diagN2U(SEXP x)
+{
+    const char *cl = class_P(x);
+    /* dtCMatrix, etc; [1] = the second character =?= 't' for triangular */
+    if (cl[1] != 't' || *diag_P(x) != 'N') {
+	/* "trivially fast" when not triangular (<==> no 'diag' slot),
+	   or already *unit* triangular */
+	return (x);
+    }
+    else { /* triangular with diag='N'): now drop the diagonal */
+	/* duplicate, since chx will be modified: */
+	CHM_SP chx = AS_CHM_SP(duplicate(x));
+	int uploT = (*uplo_P(x) == 'U') ? 1 : -1,
+	    Rkind = (chx->xtype != CHOLMOD_PATTERN) ? Real_kind(x) : 0;
+	R_CheckStack();
+
+	chm_diagN2U(chx, uploT, /* do_realloc */ FALSE);
+
+	return chm_sparse_to_SEXP(chx, /*dofree*/ 0/* or 1 ?? */,
+				  uploT, Rkind, "U",
 				  GET_SLOT(x, Matrix_DimNamesSym));
     }
 }

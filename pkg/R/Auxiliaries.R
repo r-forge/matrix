@@ -903,6 +903,11 @@ diagU2N <- function(x, cl = getClassDef(class(x)))
     else x
 }
 
+diagN2U <- function(x, cl = getClassDef(class(x)))
+{
+    if(extends(cl, "triangularMatrix") && x@diag == "N")
+	.Call(Csparse_diagN2U, as(x, "CsparseMatrix")) else x
+}
 
 
 .as.dgC.0.factors <- function(x) {

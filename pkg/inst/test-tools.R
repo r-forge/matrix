@@ -116,3 +116,41 @@ Qidentical <- function(x,y) {
             return(FALSE)
     TRUE
 }
+
+## Useful Matrix constructors for testing:
+
+rspMat <- function(n, m = n, density = 1/4, nnz = round(density * n*m))
+{
+    ## Purpose: random sparse Matrix
+    ## ----------------------------------------------------------------------
+    ## Arguments: (n,m) : dimension [default m=n ==> *square* matrix}
+    ##           density: the desired sparseness density:
+    ## ----------------------------------------------------------------------
+    ## Author: Martin Maechler, Date: 5 Mar 2008, 11:07
+    stopifnot(length(n) == 1, n == as.integer(n),
+              length(m) == 1, m == as.integer(m),
+              0 <= density, density <= 1,
+              0 <= nnz, nnz <= n*m)
+    x <- numeric(n*m)
+    ## entries 2 : (nnz+1) {so we can have '1' as 'special'}
+    x[sample(n*m, nnz, replace=FALSE)] <- as.numeric(1L + seq_len(nnz))
+    Matrix(x, n,m, sparse=TRUE)
+}
+
+rUnitTri <- function(n, upper = TRUE, ...)
+{
+    ## Purpose: random unit-triangular sparse Matrix .. built from rspMat()
+    ## ----------------------------------------------------------------------
+    ## Arguments:  n: matrix dimension
+    ##         upper: logical indicating if upper or lower triangular
+    ##         ...  : further arguments passed to rspMat(), eg. 'density'
+    ## ----------------------------------------------------------------------
+    ## Author: Martin Maechler, Date:  5 Mar 2008, 11:35
+
+    r <- (if(upper) triu else tril)(rspMat(n, ...))
+    ## make sure the diagonal is empty
+    diag(r) <- 0
+    r <- drop0(r)
+    r@diag <- "U"
+    r
+}

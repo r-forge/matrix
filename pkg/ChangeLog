@@ -1,4 +1,22 @@
+2008-03-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/simple.R: testing diagN2U
+
+2008-03-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (diagN2U): interface to
+
+	* src/Csparse.c (Csparse_diagN2U): .Call()able SEXP version of chm_diagN2U()
+
+	* tests/matprod.R: test for triangularity preserving <dtC> %*% <dtC>
+
 2008-03-05  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/chm_common.c (chm_diagN2U): new utility.
+
+	* src/Csparse.c (Csparse_Csparse_crossprod, Csparse_Csparse_prod):
+	make use of chm_diagN2U() and hence now preserve triangularity and
+	unit-triangularity.
 
 	* DESCRIPTION (LicenseDetails): new; such that 'License:' becomes "canonical"
 
