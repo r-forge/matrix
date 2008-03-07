@@ -1,5 +1,7 @@
 2008-03-07  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* DESCRIPTION (Date,Version): ready to release 0.999375-5
+
 	* tests/simple.R: testing diagN2U
 
 2008-03-06  Martin Maechler  <maechler@stat.math.ethz.ch>
