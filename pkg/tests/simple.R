@@ -62,15 +62,20 @@ assert.EQ.mat(t1, as(t1c, "matrix"))
 tu <- t1 ; tu@diag <- "U"
 tu
 cu <- as(tu, "dtCMatrix")
+validObject(cnu <- Matrix:::diagU2N(cu))# <- testing diagU2N
 stopifnot(validObject(cu), validObject(tu. <- as(cu, "dtTMatrix")),
           validObject(tt <- as(cu, "TsparseMatrix")),
 	  ## NOT: identical(tu, tu.), # since T* is not unique!
 	  identical(cu, as(tu., "dtCMatrix")),
+          length(cnu@i) == length(cu@i) + nrow(cu),
+          identical(cu, Matrix:::diagN2U(cnu)),# <- testing diagN2U
 	  all(cu >= 0, na.rm = TRUE), all(cu >= 0),
 	  any(cu >= 7),
 	  validObject(tcu <- t(cu)),
 	  validObject(ttu <- t(tu)))
+
 assert.EQ.mat(cu, as(tu,"matrix"), tol=0)
+assert.EQ.mat(cnu, as(tu,"matrix"), tol=0)
 
 ## <sparse> o <numeric> (of length > 1):
 stopifnot(is(tm <- tu * 1:8, "sparseMatrix"),

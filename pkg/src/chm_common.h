@@ -41,6 +41,8 @@ SEXP chm_dense_to_SEXP(CHM_DN a, int dofree, int Rkind, SEXP dn);
 /* 		       int uploST, char *diag, SEXP dn); */
 SEXP chm_dense_to_matrix(CHM_DN a, int dofree, SEXP dn);
 
+void chm_diagN2U(CHM_SP chx, int uploT, Rboolean do_realloc);
+
 SEXP CHMfactor_validate(SEXP obj);
 SEXP CHMsimpl_validate(SEXP obj);
 SEXP CHMsuper_validate(SEXP obj);

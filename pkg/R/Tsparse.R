@@ -851,7 +851,7 @@ setMethod("%*%", signature(x = "TsparseMatrix", y = "ANY"),
 	  function(x, y) .T.2.C(x) %*% y)
 
 setMethod("%*%", signature(x = "ANY", y = "TsparseMatrix"),
-	  function(x, y) x %*% as(y, "CsparseMatrix"))
+	  function(x, y) x %*% .T.2.C(y))
 
 ## Not yet.  Don't have methods for y = "CsparseMatrix" and general x
 #setMethod("%*%", signature(x = "ANY", y = "TsparseMatrix"),

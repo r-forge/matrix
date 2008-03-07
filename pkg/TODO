@@ -25,7 +25,7 @@
 
   For triangular matrices, more specifically make sure the four rules of
   "triangular matrix algebra" (Golub+Van Loan 1996, 3.1.8, p.93) are
-  fulfilled;  currently  <dtC> %*% <dtC> --> <dgC>
+  fulfilled; now(2008-03-06) ok for Csparse; not yet for <dtr> %*% <dtr>
 
 - "d" <-> "l" coercion for all "[TCR]" sparse matrices is really trivial:
   "d" -> "l" : drops the 'x' slot
