@@ -52,11 +52,35 @@ rm(m)
 
 (t1 <- new("dtTMatrix", x= c(3,7), i= 0:1, j=3:2,
            Dim= as.integer(c(4,4))))
+## Diagonal  o  Sparse
+I4 <- Diagonal(4)
+validObject(t2  <-   t1  + I4)
+validObject(tt2 <- t(t1) + I4)
+validObject(t1c <- as(t1, "CsparseMatrix"))
+validObject(t2c <- as(t2, "CsparseMatrix"))
 stopifnot(validObject(t1),
-          validObject(t1c <- as(t1, "CsparseMatrix")),
-          class(t1c) == "dtCMatrix")
+          identical(t1, t(t(t1))),
+          identical(t1c, t(t(t1c))),
+##           is(t2,"triangularMatrix"), is(t2c,"triangularMatrix"),
+##           is(t1c,"triangularMatrix"),
+          is(t1c + I4,"triangularMatrix"), is(t2c + I4,"triangularMatrix"),
+          c(class(t2), class(t1c), class(t2c), class(tt2)) == "dtCMatrix",
+          identical(t(tt2), t2))
 assert.EQ.mat(t1, as(t1c, "matrix"))
 
+## as(<diag>, <anything>) :
+str(cls <- names(getClass("Matrix")@subclasses))# all Matrix classes
+D4 <- Diagonal(4, x=1:4)
+
+for(cl in cls)
+    if(canCoerce(I4, cl)) {
+	cat(cl,":")
+	M  <- as(I4, cl)
+	M. <- as(D4, cl)
+        stopifnot(diag(4) == as(M,"matrix"),
+                  if(is(cl,"dMatrix")) diag(x=1:4) == as(M.,"matrix") else TRUE)
+	cat(" [Ok]\n")
+    }
 
 ## from  0-diagonal to unit-diagonal {low-level step}:
 tu <- t1 ; tu@diag <- "U"
@@ -107,6 +131,9 @@ assert.EQ.mat(triu(cu),   as.matrix(triu(as.matrix(cu))))
 for(k in -1:1)
     assert.EQ.mat(tril(cu,k), as.matrix(tril(as.matrix(cu),k)))
 
+(dtr <- Matrix(local({m <- diag(2); m[1,2] <- 3;m})))
+identical(dtr, triu(dtr))
+assert.EQ.mat(tril(dtr), diag(2))
 
 
 (t4 <- new("dgTMatrix", i = 3:0, j = 0:3, x = rep(1,4), Dim = as.integer(c(4,4))))
