@@ -50,6 +50,14 @@ rm(m)
 
 ###--  Sparse Triangular :
 
+g5 <- new("dgCMatrix", Dim = c(5L, 5L),
+          x = c(10, 1, 3, 10, 1, 10, 1, 10, 10),
+          i = c(0L,2L,4L, 1L, 3L,2L,4L, 3L, 4L),
+          p = c(0L, 3L, 5L, 7:9))
+t5 <- as(g5, "triangularMatrix") # works fine (but slowly) FIXME
+stopifnot(class(t5) == "dtCMatrix",
+          identical(t5, tril(g5)))
+
 (t1 <- new("dtTMatrix", x= c(3,7), i= 0:1, j=3:2,
            Dim= as.integer(c(4,4))))
 ## Diagonal  o  Sparse
