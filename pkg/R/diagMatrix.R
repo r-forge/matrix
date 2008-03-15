@@ -327,14 +327,15 @@ setMethod("isSymmetric", signature(object = "diagonalMatrix"),
 setMethod("symmpart", signature(x = "diagonalMatrix"), function(x) x)
 setMethod("skewpart", signature(x = "diagonalMatrix"), setZero)
 
-setMethod("chol", signature(x = "ddiMatrix"),# pivot = "ANY"
-	  function(x, pivot) {
-	      if(any(x@x < 0)) stop("chol() is undefined for diagonal matrix with negative entries")
+setMethod("chol", signature(x = "ddiMatrix"),
+	  function(x, pivot, ...) {
+	      if(any(x@x < 0))
+		  stop("chol() is undefined for diagonal matrix with negative entries")
 	      x@x <- sqrt(x@x)
 	      x
 	  })
 ## chol(L) is L for logical diagonal:
-setMethod("chol", signature(x = "ldiMatrix"), function(x, pivot) x)
+setMethod("chol", signature(x = "ldiMatrix"), function(x, pivot, ...) x)
 
 ## Basic Matrix Multiplication {many more to add}
 ##       ---------------------
