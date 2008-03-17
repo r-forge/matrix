@@ -6,20 +6,27 @@
 \alias{as.vector,diagonalMatrix,missing-method}
 \alias{coerce,matrix,diagonalMatrix-method}
 \alias{coerce,diagonalMatrix,generalMatrix-method}
-\alias{coerce,diagonalMatrix,symmetricMatrix-method}
-\alias{coerce,diagonalMatrix,triangularMatrix-method}
 \alias{coerce,diagonalMatrix,matrix-method}
 \alias{coerce,diagonalMatrix,nMatrix-method}
-\alias{coerce,diagonalMatrix,sparseMatrix-method}
-\alias{coerce,diagonalMatrix,CsparseMatrix-method}
-\alias{coerce,diagonalMatrix,TsparseMatrix-method}
 \alias{coerce,Matrix,diagonalMatrix-method}
 \alias{cbind2,sparseMatrix,diagonalMatrix-method}
 \alias{cbind2,diagonalMatrix,sparseMatrix-method}
 \alias{rbind2,sparseMatrix,diagonalMatrix-method}
 \alias{rbind2,diagonalMatrix,sparseMatrix-method}
+% Mainly against ambiguity warnings:
 % Horrible-Hack: currently define for "all subclasses of diagonalMatrix"
 % ------------- in ../R/diagMatrix.R
+\alias{coerce,ddiMatrix,symmetricMatrix-method}
+\alias{coerce,ldiMatrix,symmetricMatrix-method}
+\alias{coerce,ddiMatrix,triangularMatrix-method}
+\alias{coerce,ldiMatrix,triangularMatrix-method}
+\alias{coerce,ddiMatrix,sparseMatrix-method}
+\alias{coerce,ldiMatrix,sparseMatrix-method}
+\alias{coerce,ddiMatrix,CsparseMatrix-method}
+\alias{coerce,ldiMatrix,CsparseMatrix-method}
+\alias{coerce,ddiMatrix,TsparseMatrix-method}
+\alias{coerce,ldiMatrix,TsparseMatrix-method}
+%
 \alias{cbind2,ddiMatrix,matrix-method}
 \alias{cbind2,ldiMatrix,matrix-method}
 \alias{cbind2,matrix,ddiMatrix-method}
@@ -37,6 +44,8 @@
 \alias{rbind2,ldiMatrix,atomicVector-method}
 \alias{rbind2,atomicVector,ddiMatrix-method}
 \alias{rbind2,atomicVector,ldiMatrix-method}
+\alias{diag,ddiMatrix-method}
+\alias{diag,ldiMatrix-method}
 %-end{H.Hack}
 \alias{Ops,diagonalMatrix,diagonalMatrix-method}
 \alias{Ops,diagonalMatrix,ddiMatrix-method}
@@ -44,7 +53,6 @@
 \alias{Ops,diagonalMatrix,ANY-method}
 \alias{Ops,ANY,diagonalMatrix-method}
 \alias{t,diagonalMatrix-method}
-\alias{diag,diagonalMatrix-method}
 \alias{show,diagonalMatrix-method}
 \alias{\%*\%,dgeMatrix,diagonalMatrix-method}
 \alias{\%*\%,matrix,diagonalMatrix-method}

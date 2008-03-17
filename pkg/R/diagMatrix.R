@@ -61,21 +61,20 @@ bdiag <- function(...) {
 }
 
 
-.diag2tT <- function(from, uplo = "U") { ## to triangular Tsparse
+.diag2tT <- function(from, uplo = "U", kind = .M.kind(from)) {
+    ## to triangular Tsparse
     i <- if(from@diag == "U") integer(0) else seq_len(from@Dim[1]) - 1L
-    new(paste(.M.kind(from), "tTMatrix", sep=''),
+    new(paste(kind, "tTMatrix", sep=''),
 	diag = from@diag, Dim = from@Dim, Dimnames = from@Dimnames,
 	uplo = uplo,
 	x = from@x, # <- ok for diag = "U" and "N" (!)
 	i = i, j = i)
 }
 
-diag2tT <- function(from) .diag2tT(from, "U")
-
-.diag2sT <- function(from, uplo = "U") { # to symmetric Tsparse
+.diag2sT <- function(from, uplo = "U", kind = .M.kind(from)) {
+    ## to symmetric Tsparse
     n <- from@Dim[1]
     i <- seq_len(n) - 1L
-    kind <- .M.kind(from)
     new(paste(kind, "sTMatrix", sep=''),
 	Dim = from@Dim, Dimnames = from@Dimnames,
 	i = i, j = i, uplo = uplo,
@@ -88,24 +87,37 @@ diag2tT <- function(from) .diag2tT(from, "U")
 		       stop("'", kind,"' kind not yet implemented")), n))
 }
 
-diag2sT <- function(from) .diag2sT(from, "U")
-
 ## diagonal -> triangular,  upper / lower depending on "partner":
 diag2tT.u <- function(d, x)
     .diag2tT(d, uplo = if(is(x,"triangularMatrix")) x@uplo else "U")
 
-setAs("diagonalMatrix", "triangularMatrix", diag2tT)
-setAs("diagonalMatrix", "sparseMatrix", diag2tT)
-## needed too (otherwise <dense> -> Tsparse is taken):
-setAs("diagonalMatrix", "TsparseMatrix", diag2tT)
-## is better than this:
-## setAs("diagonalMatrix", "sparseMatrix",
-##       function(from)
-## 	  as(from, if(is(from, "dMatrix")) "dgCMatrix" else "lgCMatrix"))
-setAs("diagonalMatrix", "CsparseMatrix",
-      function(from) as(diag2tT(from), "CsparseMatrix"))
 
-setAs("diagonalMatrix", "symmetricMatrix", diag2sT)
+## In order to evade method dispatch ambiguity warnings,
+## and because we can save a .M.kind() call, we use this explicit
+## "hack"  instead of signature  x = "diagonalMatrix" :
+##
+## ddi*:
+diag2tT <- function(from) .diag2tT(from, "U", "d")
+setAs("ddiMatrix", "triangularMatrix", diag2tT)
+setAs("ddiMatrix", "sparseMatrix", diag2tT)
+## needed too (otherwise <dense> -> Tsparse is taken):
+setAs("ddiMatrix", "TsparseMatrix", diag2tT)
+setAs("ddiMatrix", "CsparseMatrix",
+      function(from) as(.diag2tT(from, "U", "d"), "CsparseMatrix"))
+setAs("ddiMatrix", "symmetricMatrix",
+      function(from) .diag2sT(from, "U", "d"))
+##
+## ldi*:
+diag2tT <- function(from) .diag2tT(from, "U", "l")
+setAs("ldiMatrix", "triangularMatrix", diag2tT)
+setAs("ldiMatrix", "sparseMatrix", diag2tT)
+## needed too (otherwise <dense> -> Tsparse is taken):
+setAs("ldiMatrix", "TsparseMatrix", diag2tT)
+setAs("ldiMatrix", "CsparseMatrix",
+      function(from) as(.diag2tT(from, "U", "l"), "CsparseMatrix"))
+setAs("ldiMatrix", "symmetricMatrix",
+      function(from) .diag2sT(from, "U", "l"))
+
 
 setAs("diagonalMatrix", "nMatrix",
       function(from) {
@@ -143,8 +155,7 @@ setAs("diagonalMatrix", "generalMatrix", # prefer sparse:
 
 .diag.x <- function(m) {
     if(m@diag == "U")
-	rep.int(if(is.numeric(m@x)) 1. else TRUE,
-		m@Dim[1])
+	rep.int(if(is.numeric(m@x)) 1. else TRUE, m@Dim[1])
     else m@x
 }
 
@@ -231,8 +242,13 @@ setAs("Matrix", "diagonalMatrix",
       })
 
 
-setMethod("diag", signature(x = "diagonalMatrix"),
-	  function(x = 1, nrow, ncol) .diag.x(x))
+## In order to evade method dispatch ambiguity warnings,
+## we use this hack instead of signature  x = "diagonalMatrix" :
+diCls <- names(getClass("diagonalMatrix")@subclasses)
+for(cls in diCls) {
+    setMethod("diag", signature(x = cls),
+	      function(x = 1, nrow, ncol) .diag.x(x))
+}
 
 
 subDiag <- function(x, i, j, ..., drop) {
