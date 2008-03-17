@@ -86,6 +86,9 @@ b <- matrix(c(rep(0, 711), 1), nc = 1)
 x <- solve(Cm, b)
 stopifnot(identical(x, solve(Cm, b, system = "A")),
           all.equal(x, solve(mtm, b)))
+
+(Cn <- Cholesky(mtm, perm = FALSE))# no permutation
+
 }
 \keyword{array}
 \keyword{algebra}

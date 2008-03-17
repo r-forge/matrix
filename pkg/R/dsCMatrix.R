@@ -114,16 +114,32 @@ setMethod("t", signature(x = "dsCMatrix"),
 setMethod("determinant", signature(x = "dsCMatrix", logarithm = "missing"),
           function(x, logarithm, ...) determinant(x, TRUE))
 
+.diag.dsC <- function(x, Chx = Cholesky(x, LDL=TRUE), res.kind = "diag") {
+    force(Chx)
+    stopifnot(is.integer(Chx@p), is.double(Chx@x))
+    .Call(diag_tC, Chx@p, Chx@x, Chx@perm, res.kind)
+}
+
+## FIXME:  kind = "diagBack" is not yet implemented
+##	would be much more efficient, but there's no CHOLMOD UI (?)
+##
+## Note: for det(), permutation is unimportant;
+##       for diag(), apply *inverse* permutation
+##    	q <- p ; q[q] <- seq_along(q); q
+
+
 setMethod("determinant", signature(x = "dsCMatrix", logarithm = "logical"),
-          function(x, logarithm, ...)
+	  function(x, logarithm, ...)
       {
-          stop("Temporarily disabled until we work out the LDL factorization diagonal")
-          ldet <- sum(log(chol(x)@D))
-          modulus <- if (logarithm) ldet else exp(ldet)
-          attr(modulus, "logarithm") <- logarithm
-          val <- list(modulus = modulus, sign = as.integer(1))
-          class(val) <- "det"
-          val
+          ## TODO: become faster by having the next two steps in C
+          ##       --> start in dsCMatrix_LDL_D() in ../src/dsCMatrix.c ...
+          Chx <- Cholesky(x, LDL=TRUE)
+	  ldet <- .Call(diag_tC, Chx@p, Chx@x, Chx@perm, res.kind = "sumLog")
+
+	  modulus <- if (logarithm) ldet else exp(ldet)
+	  attr(modulus, "logarithm") <- logarithm
+	  structure(list(modulus = modulus, sign = as.integer(1)),
+		    class = "det")
       })
 
 ## setMethod("writeHB", signature(obj = "dsCMatrix"),

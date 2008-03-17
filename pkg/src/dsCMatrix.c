@@ -82,6 +82,87 @@ SEXP dsCMatrix_Cholesky(SEXP Ap, SEXP permP, SEXP LDLp, SEXP superP)
     return Chol;
 }
 
+/**
+ * Fast version of getting at the diagonal matrix D of the
+ * (generalized) simplicial Cholesky LDL' decomposition of a
+ * (sparse symmetric) dsCMatrix.
+ *
+ * @param Ap  symmetric CsparseMatrix
+ * @param permp  logical indicating if permutation is allowed
+ *
+ * @return SEXP containing either the vector diagonal entries of D,
+ *         or just  sum_i D[i], prod_i D[i] or  sum_i log(D[i]).
+ */
+/* Started as copy + modification of dsCMatrix_Cholesky();
+ * builds strongly on diag_tC(...., SEXP resultKind) in Csparse.c
+*/
+SEXP dsCMatrix_LDL_D(SEXP Ap, SEXP permP, SEXP resultKind)
+{
+    char fname[12] = "spDCholesky"; /* template for factorization name */
+    /* S|s : super or not
+     * P|p : permuted or not
+     * D|d :  LDL' or not (= LL')
+     */
+    const int perm = asLogical(permP), LDL = 1, super = 0;
+    SEXP Chol;
+    CHM_SP A;
+    CHM_FR L;
+    int sup, ll;
+
+    /* if (super) fname[0] = 'S'; */
+    if (perm) fname[1] = 'P';
+    /* if (LDL) fname[2] = 'D'; */
+    Chol = get_factors(Ap, fname);
+    if (Chol != R_NilValue) { /* use the *cached* Cholesky() factor */
+	return diag_tC(GET_SLOT(Chol, Matrix_pSym),
+		       GET_SLOT(Chol, Matrix_xSym),
+		       GET_SLOT(Chol, Matrix_permSym),
+		       resultKind);
+    }
+    else {
+	A = AS_CHM_SP(Ap);
+	R_CheckStack();
+	if (!A->stype)
+	    error("Non-symmetric matrix passed to dsCMatrix_LDL_D");
+
+	sup = c.supernodal;
+	ll = c.final_ll;
+
+	c.final_ll = !LDL;	/* leave as LL' or form LDL' */
+	c.supernodal = super ? CHOLMOD_SUPERNODAL : CHOLMOD_SIMPLICIAL;
+
+	if (perm) {
+	    L = cholmod_analyze(A, &c); /* get fill-reducing permutation */
+	} else {			/* require identity permutation */
+	    int nmethods = c.nmethods,
+		ord0 = c.method[0].ordering, postorder = c.postorder;
+	    c.nmethods = 1;
+	    c.method[0].ordering = CHOLMOD_NATURAL; c.postorder = FALSE;
+	    L = cholmod_analyze(A, &c);
+	    c.nmethods = nmethods;
+	    c.method[0].ordering = ord0;            c.postorder = postorder;
+	}
+	if (!cholmod_factorize(A, L, &c))
+	    error(_("Cholesky factorization failed"));
+	/* restore previous setting */
+	c.supernodal = sup;
+	c.final_ll = ll;
+
+	/* Now, instead of
+	 *   Chol = set_factors(Ap, chm_factor_to_SEXP(L, 1), fname);
+	 *   return Chol;
+	 *
+	 * get the correct entries from the CHOLMOD 'L' struct directly : */
+
+	return diag_tC_ptr(L->n,
+			   L->p,
+			   L->x,
+			   L->Perm,
+			   resultKind);
+    }
+    return R_NilValue;/*just for now --- FIXME */
+}
+
 static
 SEXP get_factor_pattern(SEXP obj, char *pat, int offset)
 {

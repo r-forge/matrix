@@ -128,6 +128,14 @@
 - examples for solve( Cholesky(.), b, system = c("A", "LDLt"....))
   probably rather in man/CHMfactor-class.Rd than man/Cholesky.Rd
 
+- LDL(<CHMsimpl>) looks relatively easy; via  "tCsparse_diag()"
+   {diagonal entries of *triangular* Csparse}
+  --> see comment in determinant(<dsC>) in R/dsCMatrix.R, will give
+  faster determinant
+
+- Cholesky() generalized: provide R interface cholmod_factorize_p()
+  which factorizes |A + beta*I| ==> R interface to fast det|A + b*I|
+
 - tr(A %*% B) {and even  tr(A %*% B %*% C) ...} are also needed
   frequently in some computations {conditional normal distr. ...}.
   Since this can be done faster than by
