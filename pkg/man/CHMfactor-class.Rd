@@ -30,7 +30,7 @@
 }
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("dCHMsuper", ...)}
-  but are more commonly created via \code{\link{Cholesky}()}.
+  but are more commonly created via \code{\link{Cholesky}()},
   applied to  \code{\linkS4class{dsCMatrix}} or
   \code{\linkS4class{lsCMatrix}} objects.
 }

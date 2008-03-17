@@ -457,6 +457,7 @@ replTmat <- function (x, i, j, ..., value)
 	if(!is(x,"generalMatrix")) {
 	    cl <- class(x)
 	    x <- as(x, paste(.M.kind(x), "gTMatrix", sep=''))
+            if(getOption("verbose")) ## hmm, only sub-optimal in *some* cases
 	    message("'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ",
 		    cl," to ",class(x))
 	}
