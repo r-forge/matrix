@@ -48,3 +48,49 @@ SEXP CHMfactor_spsolve(SEXP a, SEXP b, SEXP system)
 			      "", GET_SLOT(b, Matrix_DimNamesSym));
 }
 
+/**
+ * Evaluate the logarithm of the square of the determinant of L
+ *
+ * @param x pointer to a CHMfactor object
+ *
+ * @return log(det(L)^2)
+ *
+ */
+double chm_factor_ldetL2(CHM_FR f)
+{
+    int i, j, p;
+    double ans = 0;
+
+    if (f->is_super) {
+	int *lpi = (int*)(f->pi), *lsup = (int*)(f->super);
+	for (i = 0; i < f->nsuper; i++) { /* supernodal block i */
+	    int nrp1 = 1 + lpi[i + 1] - lpi[i],
+		nc = lsup[i + 1] - lsup[i];
+	    double *x = (double*)(f->x) + ((int*)(f->px))[i];
+
+	    for (j = 0; j < nc; j++) {
+		ans += 2 * log(fabs(x[j * nrp1]));
+	    }
+	}
+    } else {
+	int *li = (int*)(f->i), *lp = (int*)(f->p);
+	double *lx = (double *)(f->x);
+	
+	for (j = 0; j < f->n; j++) {
+	    for (p = lp[j]; li[p] != j && p < lp[j + 1]; p++) {};
+	    if (li[p] != j) {
+		error(_("%d diagonal element of Cholesky factor is missing"), j);
+		break;		/* -Wall */
+	    }
+	    ans += log(lx[p] * ((f->is_ll) ? lx[p] : 1.));
+	}
+    }
+    return ans;
+}
+
+SEXP CHMfactor_ldetL2(SEXP x)
+{
+    CHM_FR L = AS_CHM_FR(x); R_CheckStack();
+
+    return ScalarReal(chm_factor_ldetL2(L));
+}

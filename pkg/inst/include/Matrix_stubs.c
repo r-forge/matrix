@@ -49,6 +49,16 @@ M_chm_factor_to_SEXP(CHM_FR f, int dofree)
     return fun(f, dofree);
 }
 
+double attribute_hidden
+M_chm_factor_ldetL2(CHM_FR f)
+{
+    static double(*fun)(CHM_FR) = NULL;
+    if(fun == NULL)
+	fun = (double(*)(CHM_FR))
+	    R_GetCCallable("Matrix", "chm_factor_ldetL2");
+    return fun(f);
+}
+
 SEXP attribute_hidden
 M_chm_sparse_to_SEXP(CHM_SP a, int dofree,
 		     int uploT, int Rkind, char *diag, SEXP dn)

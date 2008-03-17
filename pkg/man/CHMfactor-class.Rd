@@ -16,6 +16,8 @@
 \alias{solve,CHMfactor,numeric-method}
 \alias{solve,CHMfactor,matrix-method}
 \alias{solve,CHMfactor,ANY-method}
+\alias{determinant,CHMfactor,missing-method}
+\alias{determinant,CHMfactor,logical-method}
 %
 \description{The virtual class \code{"CHMfactor"} is a class of
   CHOLMOD-based Cholesky factorizations of symmetric, sparse,
@@ -76,6 +78,14 @@
     \item{solve}{\code{signature(a = "CHMfactor", b = "dsparseMatrix")}
       takes the same third argument \code{system} and calls the
       corresponding sparse CHOLMOD algorithm.}
+    \item{determinant}{\code{signature(x = "CHMfactor", logarithm =
+      "logical")} returns the determinant (or the logarithm of the
+      determinant, if \code{logarithm = TRUE}, the default) of \emph{the
+      matrix whose decomposition is represented by} \code{x}.  The
+      determinant of the decomposition is not well defined because it
+      may be an \dQuote{LDL'} or an \dQuote{LL'} decomposition.  The
+      determinant of the original matrix that was decomposed is well
+      defined.}
   }
 }
 %\references{}

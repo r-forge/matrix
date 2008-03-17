@@ -73,6 +73,9 @@ for(sys in c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt")) {
     stopifnot(dim(x) == c(712, 1),
               identical(x, solve(c2, bv, system = sys)))
 }
+## log(|LL'|) - check if super = TRUE and simplicial give same determinant
+all.equal(.Call("CHMfactor_ldetL2", c1), .Call("CHMfactor_ldetL2", c2))
+## FIXME: Add other checks here for determinant(mtm) when available
 
 ## Schur() ----------------------
 checkSchur <- function(A, SchurA = Schur(A), tol = 1e-14) {

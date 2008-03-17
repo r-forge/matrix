@@ -34,6 +34,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(CHMfactor_to_sparse, 1),
     CALLDEF(CHMfactor_solve, 3),
     CALLDEF(CHMfactor_spsolve, 3),
+    CALLDEF(CHMfactor_ldetL2, 1),
     CALLDEF(Cholesky_validate, 1),
     CALLDEF(Csparse_Csparse_prod, 2),
     CALLDEF(Csparse_Csparse_crossprod, 3),
@@ -233,6 +234,7 @@ R_init_Matrix(DllInfo *dll)
     RREGDEF(as_cholmod_factor);
     RREGDEF(as_cholmod_sparse);
     RREGDEF(chm_factor_to_SEXP);
+    RREGDEF(chm_factor_ldetL2);
     RREGDEF(chm_sparse_to_SEXP);
     RREGDEF(chm_triplet_to_SEXP);
 
