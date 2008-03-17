@@ -49,3 +49,17 @@ setMethod("solve", signature(a = "CHMfactor", b = "ANY"),
 	  function(a, b, system = c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt"),
 		   ...)
 	      solve(a, as(b, "dMatrix"), system, ...))
+
+setMethod("determinant", signature(x = "CHMfactor", logarithm = "missing"),
+          function(x, logarithm, ...) determinant(x, TRUE))
+
+setMethod("determinant", signature(x = "CHMfactor", logarithm = "logical"),
+          function(x, logarithm, ...)
+      {
+          ldet <- .Call(CHMfactor_ldetL2, x)
+          modulus <- if (logarithm) ldet else exp(ldet)
+          attr(modulus, "logarithm") <- logarithm
+          val <- list(modulus = modulus, sign = as.integer(1))
+          class(val) <- "det"
+          val
+      })
