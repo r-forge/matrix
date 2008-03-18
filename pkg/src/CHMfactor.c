@@ -51,7 +51,7 @@ SEXP CHMfactor_spsolve(SEXP a, SEXP b, SEXP system)
 /**
  * Evaluate the logarithm of the square of the determinant of L
  *
- * @param x pointer to a CHMfactor object
+ * @param f pointer to a CHMfactor object
  *
  * @return log(det(L)^2)
  *
@@ -93,4 +93,25 @@ SEXP CHMfactor_ldetL2(SEXP x)
     CHM_FR L = AS_CHM_FR(x); R_CheckStack();
 
     return ScalarReal(chm_factor_ldetL2(L));
+}
+
+/**
+ * Update the numerical values in the factor f as A + mult * I, if A is
+ * symmetric, otherwise AA' + mult * I
+ *
+ * @param f pointer to a CHM_FR object.  f is updated upon return.
+ * @param A pointer to a CHM_SP object, possibly symmetric
+ * @param mult multiple of the identity to be added to A or AA' before
+ * decomposing.
+ *
+ * \note: A and f must be compatible.  There is no check on this
+ * here.  Incompatibility of A and f will cause the CHOLMOD functions
+ * to take an error exit.
+ * 
+ */
+void chm_factor_update(CHM_FR f, CHM_SP A, double mult)
+{
+    if (!cholmod_factorize_p(A, &mult, (int*)NULL, 0 /*fsize*/, f, &c))
+	error(_("cholmod_factorize_p failed: status %d, minor %d of ncol %d"),
+	      c.status, f->minor, f->n);
 }
