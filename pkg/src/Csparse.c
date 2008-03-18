@@ -543,9 +543,13 @@ SEXP diag_tC_ptr(int n, int *x_p, double *x_x, int *perm, SEXP resultKind)
 
     case diag_backpermuted:
 	for_DIAG(v[i] = x_x[i_from]);
-	/* now back_permute : */
 
 	error(_("resultKind = 'diagBack' (back-permuted) is not yet implemented"));
+	/* now back_permute : */
+	for(i = 0; i < n; i++) {
+	    double tmp = v[i]; v[i] = v[perm[i]]; v[perm[i]] = tmp;
+	    /*^^^^ FIXME[Generalize] */
+	}
 	break;
 
     default: /* -1 from above */

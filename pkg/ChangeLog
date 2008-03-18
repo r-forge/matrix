@@ -1,5 +1,14 @@
 2008-03-18  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* R/Tsparse.R (.T.2.n): drop 0's before coercion to "nMatrix"
+
+	* R/sparseMatrix.R (is.na): new simple method
+	* R/denseMatrix.R (is.na): ditto.
+
+	* R/diagMatrix.R (.symDiagonal): newly exported utility.
+
+	* R/diagMatrix.R (Ops): <diag> * <numeric> should not become dgeMatrix!
+
 	* src/UFsparse_download.sh: -->
 	* src/CHOLMOD/: update to CHOLMOD version 1.6 (Nov.2007)
 

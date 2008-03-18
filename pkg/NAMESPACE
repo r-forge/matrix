@@ -13,7 +13,7 @@ importFrom("methods", Arith, Compare, Logic, Math, Math2, Summary, Complex)
 
 ## Generics and functions defined in this package
 export("Cholesky",
-       "Diagonal",
+       "Diagonal", ".symDiagonal",
        "Hilbert",
        "Matrix",
        "spMatrix",
@@ -211,7 +211,9 @@ exportClasses(
 	      )
 
 
-exportMethods(
+
+exportMethods(## for both own and "other" generics:
+
 	      ## Group Methods
 	      "Arith",
 	      "Compare",
@@ -258,6 +260,7 @@ exportMethods(
 	      "isSymmetric",
 ##	       "isDiagonal",
 ##	       "isTriangular",
+              "is.na",
 	      "kronecker",
 	      "length",
 	      "norm",
