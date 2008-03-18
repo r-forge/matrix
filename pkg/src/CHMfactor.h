@@ -9,5 +9,6 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP type);
 SEXP CHMfactor_spsolve(SEXP a, SEXP b, SEXP type);
 SEXP CHMfactor_ldetL2(SEXP x);
 double chm_factor_ldetL2(CHM_FR f);
+void chm_factor_update(CHM_FR f, CHM_SP A, double fac);
 
 #endif
