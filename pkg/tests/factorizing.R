@@ -112,9 +112,12 @@ mtm <- with(KNex, crossprod(mm))
 ## BEFORE Cholesky() is called and any factors are cashed inside mtm:
 ld.3 <- .Call("dsCMatrix_LDL_D", mtm, perm=TRUE,  "sumLog")
 ld.4 <- .Call("dsCMatrix_LDL_D", mtm, perm=FALSE, "sumLog")# clearly slower
+stopifnot(length(mtm@factors) == 0)
 
 c1 <- Cholesky(mtm)
+stopifnot(length(mtm@factors) == 1)
 c2 <- Cholesky(mtm, super = TRUE)
+stopifnot(length(mtm@factors) == 2)
 bv <- 1:nrow(mtm) # even integer
 b <- matrix(bv)
 ## solve(c2, b) by default solves  Ax = b, where A = c2'c2 !
@@ -142,6 +145,18 @@ stopifnot(all.equal(ld1, ld2),
 	  ## must be identical, based on same CHMsimpl object:
 	  identical(ld1, as.vector(ld1.$modulus)))
 
+## Some timing measurements
+mtm <- with(KNex, crossprod(mm))
+I <- as(as(Diagonal(n=nrow(mtm)), "CsparseMatrix"), "symmetricMatrix")
+set.seed(101); r <- runif(100)
+
+system.time(D1 <- sapply(r, function(rho) Matrix:::ldet1.dsC(mtm + (1/rho) * I)))
+## 1.099 on fast cmath-5
+system.time(D2 <- sapply(r, function(rho) Matrix:::ldet2.dsC(mtm + (1/rho) * I)))
+## 1.167
+system.time(D3 <- sapply(r, function(rho) Matrix:::ldet3.dsC(mtm + (1/rho) * I)))
+## 1.007
+stopifnot(is.all.equal3(D1,D2,D3, tol = 1e-13))
 
 ## Schur() ----------------------
 checkSchur <- function(A, SchurA = Schur(A), tol = 1e-14) {
