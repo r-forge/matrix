@@ -5,7 +5,7 @@ useDynLib(Matrix, .registration=TRUE)
 importFrom("lattice", levelplot)
 importFrom("graphics", image)
 importFrom("utils", head, tail)
-importFrom("stats", cov2cor)
+importFrom("stats", cov2cor, update)
 importFrom("grid", grid.rect, gpar, grob)
 
 ## Currently, group generics need to be explicitly imported (Bug?):
@@ -282,6 +282,7 @@ exportMethods(
 	      "tcrossprod",
 	      "tril",
 	      "triu",
+              "update",
 	      "zapsmall"
 	      )
 

@@ -59,14 +59,14 @@ M_chm_factor_ldetL2(CHM_FR f)
     return fun(f);
 }
 
-void attribute_hidden
+CHM_FR attribute_hidden
 M_chm_factor_update(CHM_FR f, CHM_SP A, double mult)
 {
-    static void(*fun)(CHM_FR,CHM_SP,double) = NULL;
+    static CHM_FR(*fun)(CHM_FR,CHM_SP,double) = NULL;
     if(fun == NULL)
-	fun = (void(*)(CHM_FR,CHM_SP,double))
+	fun = (CHM_FR(*)(CHM_FR,CHM_SP,double))
 	    R_GetCCallable("Matrix", "chm_factor_update");
-    fun(f, A, mult);
+    return fun(f, A, mult);
 }
 
 SEXP attribute_hidden

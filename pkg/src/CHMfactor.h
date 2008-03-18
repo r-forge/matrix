@@ -4,11 +4,12 @@
 #include "Mutils.h"
 #include "chm_common.h"
 
+SEXP CHMfactor_ldetL2(SEXP x);
 SEXP CHMfactor_to_sparse(SEXP x);
 SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP type);
 SEXP CHMfactor_spsolve(SEXP a, SEXP b, SEXP type);
-SEXP CHMfactor_ldetL2(SEXP x);
+SEXP CHMfactor_update(SEXP object, SEXP parent, SEXP mult);
 double chm_factor_ldetL2(CHM_FR f);
-void chm_factor_update(CHM_FR f, CHM_SP A, double fac);
+CHM_FR chm_factor_update(CHM_FR f, CHM_SP A, double fac);
 
 #endif
