@@ -127,15 +127,23 @@ setMethod("determinant", signature(x = "dsCMatrix", logarithm = "missing"),
 ##       for diag(), apply *inverse* permutation
 ##    	q <- p ; q[q] <- seq_along(q); q
 
+ldet1.dsC <- function(x, ...) .Call(CHMfactor_ldetL2, Cholesky(x, ...))
+ldet2.dsC <- function(x, ...) {
+    Ch <- Cholesky(x, super = FALSE, ...)
+    .Call(diag_tC, Ch@p, Ch@x, Ch@perm, "sumLog")
+}
+ldet3.dsC <- function(x, perm = TRUE)
+    .Call(dsCMatrix_LDL_D, x, perm=perm, "sumLog")
 
 setMethod("determinant", signature(x = "dsCMatrix", logarithm = "logical"),
 	  function(x, logarithm, ...)
       {
-          ## TODO: become faster by having the next two steps in C
-          ##       --> start in dsCMatrix_LDL_D() in ../src/dsCMatrix.c ...
-          Chx <- Cholesky(x, LDL=TRUE)
-	  ldet <- .Call(diag_tC, Chx@p, Chx@x, Chx@perm, res.kind = "sumLog")
-
+          ## Chx <- Cholesky(x, LDL=TRUE)
+          ## ldet <- .Call(diag_tC, Chx@p, Chx@x, Chx@perm, res.kind = "sumLog")
+          ## or
+          ## ldet <- .Call("CHMfactor_ldetL2", Chx) # which would also work
+          ##                                 when Chx <- Cholesky(x, super=TRUE)
+          ldet <- .Call(dsCMatrix_LDL_D, x, perm=TRUE, "sumLog")
 	  modulus <- if (logarithm) ldet else exp(ldet)
 	  attr(modulus, "logarithm") <- logarithm
 	  structure(list(modulus = modulus, sign = as.integer(1)),
