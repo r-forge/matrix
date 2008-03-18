@@ -27,10 +27,11 @@ Interfaces to many efficient algorithms from Lapack (for "dense") and from
 CHOLMOD / Csparse (for "sparse") are all implemented via method definitions
 for the customary linear algebra functions
   %*%, t(), crossprod(), tcrossprod(), chol(), qr(), solve(),
-  colSums(), rowSums(), kronecker(), ...
+  colSums(), rowSums(), kronecker(), determinant(), ...
 and for various formal groups of generics, such as
   "Math" (sin,exp,gamma,..)  "Arith" (+,-,*,...),
-  "Logic" (>, <=, ..),  "Summary" (sum, max, ...)  etc
+  "Logic" (>, <=, ..),  "Summary" (sum, max, ...)  etc;
+  is.na()
 
 Furthermore, 'indexing' : "A[...]" and "A[..] <- value"
 and some new generic functions such as

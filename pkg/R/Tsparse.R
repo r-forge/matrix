@@ -15,6 +15,8 @@ setAs("matrix", "TsparseMatrix",
 setAs("TsparseMatrix", "CsparseMatrix", .T.2.C)
 
 .T.2.n <- function(from) {
+    if(any(is0(from@x))) ## 0 or FALSE -- the following should have drop0Tsp(.)
+	from <- as(drop0(from), "TsparseMatrix")
     if(is(from, "triangularMatrix")) # i.e. ?tTMatrix
 	new("ntTMatrix", i = from@i, j = from@j,
 	    uplo = from@uplo, diag = from@diag,
