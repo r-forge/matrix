@@ -63,3 +63,10 @@ setMethod("determinant", signature(x = "CHMfactor", logarithm = "logical"),
           class(val) <- "det"
           val
       })
+
+setMethod("update", signature(object = "CHMfactor"),
+          function(object, parent, mult = 0, ...)
+      {
+          stopifnot(is(parent, "sparseMatrix"))
+          .Call(CHMfactor_update, object, parent, mult)
+      })
