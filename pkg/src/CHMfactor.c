@@ -128,3 +128,20 @@ SEXP CHMfactor_update(SEXP object, SEXP parent, SEXP mult)
     Lcp = cholmod_copy_factor(L, &c);
     return chm_factor_to_SEXP(chm_factor_update(Lcp, A, asReal(mult)), -1);
 }
+
+SEXP CHMfactor_ldetL2up(SEXP x, SEXP parent, SEXP mult)
+{
+    SEXP ans = PROTECT(duplicate(mult));
+    int i, nmult = LENGTH(mult);
+    double *aa = REAL(ans), *mm = REAL(mult);
+    CHM_FR L = AS_CHM_FR(x), Lcp;
+    CHM_SP A = AS_CHM_SP(parent);
+    R_CheckStack();
+
+    Lcp = cholmod_copy_factor(L, &c);
+    for (i = 0; i < nmult; i++)
+	aa[i] = chm_factor_ldetL2(chm_factor_update(Lcp, A, mm[i]));
+    cholmod_free_factor(&Lcp, &c);
+    UNPROTECT(1);
+    return ans;
+}

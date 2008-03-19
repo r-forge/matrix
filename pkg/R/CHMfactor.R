@@ -70,3 +70,11 @@ setMethod("update", signature(object = "CHMfactor"),
           stopifnot(is(parent, "sparseMatrix"))
           .Call(CHMfactor_update, object, parent, mult)
       })
+
+ldetL2up <- function(x, parent, Imult)
+{
+    stopifnot(is(x, "CHMfactor"),
+              is(parent, "sparseMatrix"),
+              nrow(x) == nrow(parent))
+    .Call(CHMfactor_ldetL2up, x, parent, as.double(Imult))
+}
