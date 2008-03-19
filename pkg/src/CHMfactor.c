@@ -111,7 +111,9 @@ SEXP CHMfactor_ldetL2(SEXP x)
  */
 CHM_FR chm_factor_update(CHM_FR f, CHM_SP A, double mult)
 {
-    if (!cholmod_factorize_p(A, &mult, (int*)NULL, 0 /*fsize*/, f, &c))
+    double mm[2] = {0, 0};
+    mm[0] = mult;
+    if (!cholmod_factorize_p(A, mm, (int*)NULL, 0 /*fsize*/, f, &c))
 	error(_("cholmod_factorize_p failed: status %d, minor %d of ncol %d"),
 	      c.status, f->minor, f->n);
     return f;
@@ -119,9 +121,10 @@ CHM_FR chm_factor_update(CHM_FR f, CHM_SP A, double mult)
 
 SEXP CHMfactor_update(SEXP object, SEXP parent, SEXP mult)
 {
-    CHM_FR L = AS_CHM_FR(duplicate(object));
+    CHM_FR L = AS_CHM_FR(object), Lcp;
     CHM_SP A = AS_CHM_SP(parent);
     R_CheckStack();
 
-    return chm_factor_to_SEXP(chm_factor_update(L, A, asReal(mult)), 0);
+    Lcp = cholmod_copy_factor(L, &c);
+    return chm_factor_to_SEXP(chm_factor_update(Lcp, A, asReal(mult)), -1);
 }
