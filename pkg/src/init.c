@@ -128,7 +128,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dppMatrix_rcond, 2),
     CALLDEF(dppMatrix_solve, 1),
     CALLDEF(dppMatrix_validate, 1),
-    CALLDEF(dsCMatrix_Cholesky, 4),
+    CALLDEF(dsCMatrix_Cholesky, 5),
     CALLDEF(dsCMatrix_LDL_D, 3),
     CALLDEF(dsCMatrix_chol, 2),
     CALLDEF(dsCMatrix_Csparse_solve, 2),

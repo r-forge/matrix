@@ -3,7 +3,8 @@
 SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
 {
     CHM_FR N = AS_CHM_FR(dsCMatrix_Cholesky(x, pivot, ScalarLogical(FALSE),
-					    ScalarLogical(FALSE)));
+					    ScalarLogical(FALSE),
+					    ScalarReal(0.)));
     /* Must use a copy; cholmod_factor_to_sparse modifies first arg. */
     CHM_FR Ncp = cholmod_copy_factor(N, &c);
     CHM_SP L = cholmod_factor_to_sparse(Ncp, &c);
@@ -32,7 +33,7 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
     return ans;
 }
 
-SEXP dsCMatrix_Cholesky(SEXP Ap, SEXP permP, SEXP LDLp, SEXP superP)
+SEXP dsCMatrix_Cholesky(SEXP Ap, SEXP permP, SEXP LDLp, SEXP superP, SEXP ImultP)
 {
     char fname[12] = "spdCholesky"; /* template for factorization name */
     /* S|s : super or not
@@ -40,6 +41,7 @@ SEXP dsCMatrix_Cholesky(SEXP Ap, SEXP permP, SEXP LDLp, SEXP superP)
      * D|d :  LDL' or not (= LL')
      */
     int perm = asLogical(permP), LDL = asLogical(LDLp), super = asLogical(superP);
+    double mult = asReal(ImultP);
     SEXP Chol;
     CHM_SP A;
     CHM_FR L;
@@ -74,7 +76,7 @@ SEXP dsCMatrix_Cholesky(SEXP Ap, SEXP permP, SEXP LDLp, SEXP superP)
 	c.nmethods = nmethods; c.method[0].ordering = ord0;
 	c.postorder = postorder;
     }
-    if (!cholmod_factorize(A, L, &c))
+    if (!cholmod_factorize_p(A, &mult, (int*)NULL, 0 /*fsize*/, L, &c))
 	error(_("Cholesky factorization failed"));
     c.supernodal = sup;	/* restore previous setting */
     c.final_ll = ll;
@@ -191,7 +193,8 @@ SEXP dsCMatrix_Csparse_solve(SEXP a, SEXP b)
 	Chol = dsCMatrix_Cholesky(a,
 				  ScalarLogical(1),  /* permuted  : "P" */
 				  ScalarLogical(1),  /* LDL'	  : "D" */
-				  ScalarLogical(0)); /* simplicial: "s" */
+				  ScalarLogical(0),  /* simplicial: "s" */
+				  ScalarReal(0.));   /* Imult */
     L = AS_CHM_FR(Chol);
     R_CheckStack();
     cx = cholmod_spsolve(CHOLMOD_A, L, cb, &c);
@@ -211,7 +214,8 @@ SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b)
 	Chol = dsCMatrix_Cholesky(a,
 				  ScalarLogical(1),  /* permuted  : "P" */
 				  ScalarLogical(1),  /* LDL'      : "D" */
-				  ScalarLogical(0)); /* simplicial: "s" */
+				  ScalarLogical(0),  /* simplicial: "s" */
+				  ScalarReal(0.));   /* Imult */
     L = AS_CHM_FR(Chol);
     R_CheckStack();
     cx = cholmod_solve(CHOLMOD_A, L, cb, &c);

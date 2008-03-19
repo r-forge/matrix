@@ -6,7 +6,7 @@
 /* -> diag_tC() */
 #include "chm_common.h"
 
-SEXP dsCMatrix_Cholesky(SEXP A, SEXP perm, SEXP LDL, SEXP super);
+SEXP dsCMatrix_Cholesky(SEXP A, SEXP perm, SEXP LDL, SEXP super, SEXP Imult);
 SEXP dsCMatrix_LDL_D(SEXP Ap, SEXP permP, SEXP resultKind);
 SEXP dsCMatrix_chol(SEXP x, SEXP pivot);
 SEXP dsCMatrix_Csparse_solve(SEXP a, SEXP b);

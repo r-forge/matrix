@@ -59,7 +59,7 @@
                standardGeneric("band"))
 
     setGeneric("Cholesky",
-               function(A, perm = TRUE, LDL = TRUE, super = FALSE, ...)
+               function(A, perm = TRUE, LDL = TRUE, super = FALSE, Imult = 0, ...)
                standardGeneric("Cholesky"))
 
 setGeneric("symmpart", function(x) standardGeneric("symmpart"))

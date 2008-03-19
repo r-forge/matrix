@@ -4,7 +4,7 @@
 \alias{Cholesky,dsCMatrix-method}
 \title{Cholesky Decomposition of a Sparse Matrix}
 \usage{
-Cholesky(A, perm = TRUE, LDL = TRUE, super = FALSE, \dots)
+Cholesky(A, perm = TRUE, LDL = TRUE, super = FALSE, Imult = 0, \dots)
 }
 \description{
   Computes the Cholesky decomposition of a sparse, symmetric,
@@ -25,6 +25,9 @@ Cholesky(A, perm = TRUE, LDL = TRUE, super = FALSE, \dots)
   \item{super}{logical scalar indicating is a supernodal decomposition
     should be created.  The alternative is a simplicial decomposition.
     Default is \code{FALSE}.}
+  \item{Imult}{numeric scalar which defaults to zero. The matrix that is
+    decomposed is \eqn{A+m*I} where \eqn{m} is the value of \code{Imult}
+    and \code{I} is the identity matrix of order \code{ncol(A)}.}
   \item{\dots}{further arguments passed to or from other methods.}
 }
 \value{

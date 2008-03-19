@@ -103,8 +103,8 @@ setMethod("chol", signature(x = "dsCMatrix", pivot = "logical"),
 	  valueClass = "dtCMatrix")
 
 setMethod("Cholesky", signature(A = "dsCMatrix"),
-          function(A, perm = TRUE, LDL = TRUE, super = FALSE, ...)
-          .Call(dsCMatrix_Cholesky, A, perm, LDL, super))
+          function(A, perm = TRUE, LDL = TRUE, super = FALSE, Imult = 0, ...)
+          .Call(dsCMatrix_Cholesky, A, perm, LDL, super, Imult))
 
 
 setMethod("t", signature(x = "dsCMatrix"),
