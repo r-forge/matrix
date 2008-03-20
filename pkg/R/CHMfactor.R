@@ -71,10 +71,19 @@ setMethod("update", signature(object = "CHMfactor"),
           .Call(CHMfactor_update, object, parent, mult)
       })
 
+## Currently hidden:
 ldetL2up <- function(x, parent, Imult)
 {
+    ## Purpose: compute  log Det |A + m*I|  for many values of m
+    ## ----------------------------------------------------------------------
+    ## Arguments: x: CHMfactor to be updated
+    ##      parent : CsparseMatrix M; for symmetric M, A = M, otherwise A = MM'
+    ##       Imult : a numeric *vector* of 'm's (= I multipliers)
+    ## ----------------------------------------------------------------------
+    ## Author: Doug Bates, Date: 19 Mar 2008
+
     stopifnot(is(x, "CHMfactor"),
-              is(parent, "sparseMatrix"),
+              is(parent, "CsparseMatrix"),
               nrow(x) == nrow(parent))
     .Call(CHMfactor_ldetL2up, x, parent, as.double(Imult))
 }

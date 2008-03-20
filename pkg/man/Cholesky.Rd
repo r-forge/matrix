@@ -4,7 +4,7 @@
 \alias{Cholesky,dsCMatrix-method}
 \title{Cholesky Decomposition of a Sparse Matrix}
 \usage{
-Cholesky(A, perm = TRUE, LDL = TRUE, super = FALSE, Imult = 0, \dots)
+Cholesky(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, \dots)
 }
 \description{
   Computes the Cholesky decomposition of a sparse, symmetric,
