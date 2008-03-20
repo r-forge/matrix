@@ -133,9 +133,6 @@
   --> see comment in determinant(<dsC>) in R/dsCMatrix.R, will give
   faster determinant
 
-- Cholesky() generalized: provide R interface cholmod_factorize_p()
-  which factorizes |A + beta*I| ==> R interface to fast det|A + b*I|
-
 - tr(A %*% B) {and even  tr(A %*% B %*% C) ...} are also needed
   frequently in some computations {conditional normal distr. ...}.
   Since this can be done faster than by
@@ -182,3 +179,7 @@
   replCmat() uses as_CspClass() and drop0(.) which itself call
   as_CspClass() quite a bit.  --> try to replace these by
   as(*, "CsparseMatrix"); forceSymmetric, etc.
+
+- add examples (and tests!) for update(<CHMfactor>, ..) and
+  Cholesky(......, Imult), also tests for hidden {hence no examples}
+  ldetL2up() { R/CHMfactor.R }

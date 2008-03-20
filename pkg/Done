@@ -258,3 +258,7 @@
   and m[ <ij-matrix> ] <- value seems more or less ok.
 
 - dtC Matrices now preserve (unit-) triangularity in %*% and crossprod
+
+- Cholesky() generalized: provide R interface cholmod_factorize_p()
+  which factorizes |A + m*I| ==> R interface to fast det|A + m*I|
+

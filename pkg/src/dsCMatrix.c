@@ -12,14 +12,14 @@ static int chk_nm(const char *nm, int perm, int LDL, int super)
     if (LDL == 0 && nm[2] != 'd') return 0;
     return 1;
 }
-    
+
 /**
  * Return a CHOLMOD copy of the cached Cholesky decomposition with the
  * required perm, LDL and super attributes.  If Imult is nonzero,
  * update the numeric values before returning.
  *
  * If no cached copy is available then evaluate one, cache it (for
- * nonzero Imult), and return a copy.
+ * zero Imult), and return a copy.
  *
  * @param A      dsCMatrix object
  * @param perm   integer indicating if permutation is required (>0),
@@ -28,7 +28,7 @@ static int chk_nm(const char *nm, int perm, int LDL, int super)
  *               forbidden (0) or optional (<0)
  * @param LDL    integer indicating if the LDL' form is required (>0),
  *               forbidden (0) or optional (<0)
- * @param super  integer indicating if the supernodal form is required (>0), 
+ * @param super  integer indicating if the supernodal form is required (>0),
  *               forbidden (0) or optional (<0)
  */
 static CHM_FR
@@ -43,11 +43,11 @@ internal_chm_factor(SEXP Ap, int perm, int LDL, int super, double Imult)
 
     if (LENGTH(facs)) {
 	for (int i = 0; i < LENGTH(nms); i++) { /* look for a match in cache */
-	    if (chk_nm(CHAR(STRING_ELT(nms, i)), perm, LDL, super)) { 
+	    if (chk_nm(CHAR(STRING_ELT(nms, i)), perm, LDL, super)) {
 		L = AS_CHM_FR(VECTOR_ELT(facs, i));
 		R_CheckStack();
 		/* copy the factor so later it can safely be cholmod_free'd */
-		L = cholmod_copy_factor(L, &c); 
+		L = cholmod_copy_factor(L, &c);
 		if (Imult) cholmod_factorize_p(A, &Imult, (int*)NULL, 0, L, &c);
 		return L;
 	    }
@@ -57,11 +57,11 @@ internal_chm_factor(SEXP Ap, int perm, int LDL, int super, double Imult)
     sup = c.supernodal;		/* save current settings */
     ll = c.final_ll;
 
-    c.final_ll = (LDL == 0) ? 1 : 0;	
+    c.final_ll = (LDL == 0) ? 1 : 0;
     c.supernodal = (super > 0) ? CHOLMOD_SUPERNODAL : CHOLMOD_SIMPLICIAL;
 
     if (perm) {			/* obtain fill-reducing permutation */
-	L = cholmod_analyze(A, &c); 
+	L = cholmod_analyze(A, &c);
     } else {			/* require identity permutation */
 	int nmethods = c.nmethods, ord0 = c.method[0].ordering,
 	    postorder = c.postorder;
@@ -116,8 +116,10 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
 
 SEXP dsCMatrix_Cholesky(SEXP Ap, SEXP perm, SEXP LDL, SEXP super, SEXP Imult)
 {
-    return chm_factor_to_SEXP(internal_chm_factor(Ap, asLogical(perm), asLogical(LDL),
-						  asLogical(super), asReal(Imult)),
+    return chm_factor_to_SEXP(internal_chm_factor(Ap, asLogical(perm),
+						  asLogical(LDL),
+						  asLogical(super),
+						  asReal(Imult)),
 			      1 /* dofree */);
 }
 
@@ -199,7 +201,6 @@ SEXP dsCMatrix_LDL_D(SEXP Ap, SEXP permP, SEXP resultKind)
 			   L->Perm,
 			   resultKind);
     }
-    return R_NilValue;/*just for now --- FIXME */
 }
 
 SEXP dsCMatrix_Csparse_solve(SEXP a, SEXP b)
