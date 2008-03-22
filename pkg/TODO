@@ -149,16 +149,6 @@
 
   This is not really acceptable and currently influences  rcond() as well.
 
-- chol() and qr() generic:  currently have *two* arguments, and give the msg
-
-  >  New generic for "chol" does not agree with implicit generic from package
-  >  "base"; a new generic will be assigned with package "Matrix"
-
-  (and ditto for "qr")
-
-  It was mentioned by an R-core member that he thought it did not make
-  sense to also dispatch on 'tol' or 'pivot' ...  --> maybe change that..
-
 - eigen() should become generic, and get a method at least for diagonal,
   but also for symmetric -> dsyMatrix  [LAPACK dsyev() uses UPLO !],
   but also simply for dgeMatrix (without going via tradition matrices).
@@ -180,6 +170,16 @@
   as_CspClass() quite a bit.  --> try to replace these by
   as(*, "CsparseMatrix"); forceSymmetric, etc.
 
+- implement fast diag(<triangularCsparse>) via calling new
+  src/Csparse.c's diag_tC_ptr()
+
 - add examples (and tests!) for update(<CHMfactor>, ..) and
   Cholesky(......, Imult), also tests for hidden {hence no examples}
   ldetL2up() { R/CHMfactor.R }
+
+- data(CAex); determinant(CAex) -- says
+  "Ask the package authors to implement the missing feature."
+
+- chol(<nsCMatrix>)  gives "temporarily disabled"
+  but should give the *symbolic* factorization;
+  similarly Cholesky(.) is not enabled

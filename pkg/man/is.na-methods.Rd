@@ -4,10 +4,6 @@
 \alias{is.na,denseMatrix-method}
 \alias{is.na,sparseMatrix-method}
 \title{is.na() Methods for 'Matrix' Objects}
-%% Gives warnings in "CMD check":
-% \usage{
-% is.na(x)
-% }
 \description{
   Methods for function \code{\link{is.na}()} for all Matrices (objects
   extending the \code{\linkS4class{Matrix}} class):
@@ -16,6 +12,12 @@
   dimension as \code{x}, with TRUE's whenever \code{x} was NA.}
 
   \item{x = "sparseMatrix"}{ditto.}
+}
+\usage{
+\S4method{is.na}{sparseMatrix}(x)
+}
+\arguments{
+  \item{x}{sparse or dense matrix.}
 }
 \seealso{
   \code{\link{NA}}, \code{\link{is.na}};

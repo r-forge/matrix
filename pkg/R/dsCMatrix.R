@@ -94,12 +94,8 @@ setMethod("solve", signature(a = "dsCMatrix", b = "dsparseMatrix"),
 	  })
 
 
-setMethod("chol", signature(x = "dsCMatrix", pivot = "missing"),
-	  function(x, pivot, ...) .Call(dsCMatrix_chol, x, FALSE),
-	  valueClass = "dtCMatrix")
-
-setMethod("chol", signature(x = "dsCMatrix", pivot = "logical"),
-	  function(x, pivot, ...) .Call(dsCMatrix_chol, x, pivot),
+setMethod("chol", signature(x = "dsCMatrix"),
+	  function(x, pivot = FALSE, ...) .Call(dsCMatrix_chol, x, pivot),
 	  valueClass = "dtCMatrix")
 
 setMethod("Cholesky", signature(A = "dsCMatrix"),
@@ -143,6 +139,8 @@ setMethod("determinant", signature(x = "dsCMatrix", logarithm = "logical"),
           ## or
           ## ldet <- .Call("CHMfactor_ldetL2", Chx) # which would also work
           ##                                 when Chx <- Cholesky(x, super=TRUE)
+
+### FIXME: not okay when the matrix is *NOT* pos.def.
           ldet <- .Call(dsCMatrix_LDL_D, x, perm=TRUE, "sumLog")
 	  modulus <- if (logarithm) ldet else exp(ldet)
 	  attr(modulus, "logarithm") <- logarithm
