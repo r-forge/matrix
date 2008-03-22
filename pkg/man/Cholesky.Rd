@@ -78,20 +78,31 @@ Cholesky(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, \dots)
 data(KNex)
 mtm <- with(KNex, crossprod(mm))
 str(mtm@factors) # empty list()
-Cholesky(mtm)             # uses show(<MatrixFactorization>)
+(C1 <- Cholesky(mtm))             # uses show(<MatrixFactorization>)
 str(mtm@factors) # 'sPDCholesky' (simpl)
 (Cm <- Cholesky(mtm, super = TRUE))
-str(mtm@factors) # 'sPDCholesky'  *and*  'SPDCholesky'
-str(cmat <- as(Cm, "sparseMatrix"))
-cmat[1:20, 1:20]
+str(mtm@factors) # 'sPDCholesky'  *and* 'SPdCholesky'
+str(cm1  <- as(C1, "sparseMatrix"))
+str(cmat <- as(Cm, "sparseMatrix"))# hmm: super is *less* sparse here
+cm1[1:20, 1:20]
+
 b <- matrix(c(rep(0, 711), 1), nc = 1)
 ## solve(Cm, b) by default solves  Ax = b, where A = Cm'Cm !
 x <- solve(Cm, b)
 stopifnot(identical(x, solve(Cm, b, system = "A")),
           all.equal(x, solve(mtm, b)))
 
-(Cn <- Cholesky(mtm, perm = FALSE))# no permutation
+Cn <- Cholesky(mtm, perm = FALSE)# no permutation -- much worse:
+sizes <- c(simple = object.size(C1),
+           super  = object.size(Cm),
+           noPerm = object.size(Cn))
+format(cbind(100 * sizes / sizes[1]), digits=4)
 
+## Visualize the sparseness:
+dq <- function(ch) paste('"',ch,'"', sep="") ## dQuote(<UTF-8>) gives bad plots
+image(mtm, main=paste("crossprod(mm) : Sparse", dq(class(mtm))))
+image(cm1, main= paste("as(Cholesky(crossprod(mm)),\"sparseMatrix\"):",
+                        dq(class(cm1))))
 }
 \keyword{array}
 \keyword{algebra}

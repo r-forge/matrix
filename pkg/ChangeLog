@@ -1,3 +1,17 @@
+2008-03-22  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/dsCMatrix.c (dsCMatrix_LDL_D): cleanup, also using
+	internal_chm_factor().
+
+	* R/AllGeneric.R: do *not* define a "chol" generic
+		(but rather use the implicit one *without* making pivot
+		part of the signature)
+	* R/*.R: drop the 'pivot' from chol's signature and make
+		'pivot=FALSE' a default argument of method definitions.
+
+	* .Rbuildignore: add 'wrld_1deg': I.e. do not put it into released
+	version of Matrix
+
 2008-03-18  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Tsparse.R (.T.2.n): drop 0's before coercion to "nMatrix"
