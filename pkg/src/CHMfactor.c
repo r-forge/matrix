@@ -126,7 +126,7 @@ SEXP CHMfactor_update(SEXP object, SEXP parent, SEXP mult)
     R_CheckStack();
 
     Lcp = cholmod_copy_factor(L, &c);
-    return chm_factor_to_SEXP(chm_factor_update(Lcp, A, asReal(mult)), -1);
+    return chm_factor_to_SEXP(chm_factor_update(Lcp, A, asReal(mult)), 1);
 }
 
 SEXP CHMfactor_ldetL2up(SEXP x, SEXP parent, SEXP mult)
