@@ -1,6 +1,11 @@
+2008-03-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllGeneric.R: rcond(., norm) instead of rcond(., type), in
+	order to become compatible to new R 2.7.0 base::rcond().
+
 2008-03-25  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version,Date): 0.999375-8
+	* DESCRIPTION (Version,Date): 0.999375-8 --- released to CRAN
 
 	* R/diagMatrix.R (Ops): fix newly introduce bug in <.di> o <numeric>
 
