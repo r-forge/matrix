@@ -3,10 +3,14 @@
 	* DESCRIPTION (Version): 0.999375-9 --- need to release
 	for R-devel (and R 2.7.0 alpha soon).
 
+	* R/AllClass.R: drop "double" from "atomicVector" class union
+
 	* R/AllGeneric.R (rcond): check for base::rcond instead of R version
 	* R/dgeMatrix.R: ditto
 
 	* R/sparseMatrix.R (summary): count NAs
+
+	* inst/doc/Intro2Matrix.Rnw: changes, aim for *one* introduction.
 
 2008-03-28  Martin Maechler  <maechler@stat.math.ethz.ch>
 
