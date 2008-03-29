@@ -308,7 +308,7 @@ does not matter; consequently, such matrices are not unique in their
 representation.  \footnote{
   Furthermore, there can be \emph{repeated} \code{(i,j)} entries with the
   customary convention that the corresponding \code{x} entries are
-  \emph{added} to form the matrix element $m_{ij}$.}
+  \emph{added} to form the matrix element $m_{ij}$.
 }
 %% The triplet representation is row-oriented if elements in the same row
 %% were adjacent and column-oriented if elements in the same column were
