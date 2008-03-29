@@ -3,6 +3,8 @@
 	* DESCRIPTION (Version): 0.999375-9 --- need to release
 	for R-devel (and R 2.7.0 alpha soon).
 
+	* R/AllGeneric.R (rcond): check for base::rcond instead of R version
+
 	* R/sparseMatrix.R (summary): count NAs
 
 2008-03-28  Martin Maechler  <maechler@stat.math.ethz.ch>
