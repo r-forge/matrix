@@ -4,6 +4,7 @@
 	for R-devel (and R 2.7.0 alpha soon).
 
 	* R/AllGeneric.R (rcond): check for base::rcond instead of R version
+	* R/dgeMatrix.R: ditto
 
 	* R/sparseMatrix.R (summary): count NAs
 
