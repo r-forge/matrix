@@ -95,25 +95,54 @@ setMethod("image", "dgTMatrix",
                    aspect = "iso", ## was default "fill"
                    sub = sprintf("Dimensions: %d x %d", di[1], di[2]),
                    xlab = "Column", ylab = "Row",
-                   col.regions = grey(seq(from = 0.7, to = 0, length = 100)),
-                   colorkey = FALSE,
-                   ...)
+                   useAbs = NULL, colorkey = !useAbs, col.regions = NULL,
+                   lwd = NULL, ...)
       {
+          ## 'at' can remain missing and be passed to levelplot
           di <- x@Dim
-          levelplot(abs(x@x) ~ (x@j + 1L) * (x@i + 1L),
-                    sub = sub,
-                    xlab = xlab, ylab = ylab,
-                    xlim = xlim, ylim = ylim,
-		    aspect = aspect,
-		    colorkey = colorkey,
-		    col.regions = col.regions,
+          xx <- x@x
+          if(missing(useAbs)) ## use abs() when all values are non-neg
+              useAbs <- min(xx, na.rm=TRUE) >= 0
+          else if(useAbs)
+              xx <- abs(xx)
+          rx <- range(xx, finite=TRUE)
+          if(is.null(col.regions))
+              col.regions <-
+                  if(useAbs) {
+                      grey(seq(from = 0.7, to = 0, length = 100))
+                  } else { ## no abs(.), rx[1] < 0
+                      nn <- 100
+                      n0 <- min(nn, max(0, round((0 - rx[1])/(rx[2]-rx[1]) * nn)))
+                      col.regions <-
+                          c(colorRampPalette(c("blue3", "gray80"))(n0),
+                            colorRampPalette(c("gray75","red3"))(nn - n0))
+                  }
+          if(is.null(lwd)) {
+              ## the line-width used in grid.rect() inside levelplot()'s panel
+              ## for the *border* of the rectangles: levelplot()panel has lwd=1e-5:
+
+              ## Here: use smart default !
+
+              ## FIXME: This is cheap and provisional!
+              ##        Much better: keep 'NULL' and find good value
+              ##        inside levelplot()'s panel function
+              ## Should really have "current viewport size"("px") :
+              pSize <- dev.size("px") / di ## ~ size of one matrix-entry in pixels
+              pA <- prod(pSize) # the "area"
+              p1 <- min(pSize)
+              lwd <- ## crude for now
+                  if(p1 < 1 || pA < 2)  1e-5
+                  else if(p1 > 3) 1 else if(p1 > 2) 0.5 else 0.05
+
+          } else stopifnot(is.numeric(lwd), all(lwd >= 0))
+
+          levelplot(x@x ~ (x@j + 1L) * (x@i + 1L),
+                    sub = sub, xlab = xlab, ylab = ylab,
+                    xlim = xlim, ylim = ylim, aspect = aspect,
+		    colorkey = colorkey, col.regions = col.regions,
 		    par.settings = list(background = list(col = "transparent")),
                     panel = function(x, y, z, subscripts, at, ..., col.regions)
                 {
-##                     if(getOption("verbose")) {
-##                         cat("image(<dgTMatrix>, ..); inside panel():\n")
-##                         print(ls.str(envir = environment()))
-##                     }
                     x <- as.numeric(x[subscripts])
                     y <- as.numeric(y[subscripts])
 
@@ -129,11 +158,13 @@ setMethod("image", "dgTMatrix",
                              at[i] <= z & z < at[i+1]] <- i
 
                     zcol <- as.numeric(zcol[subscripts])
+
+## browser()
                     if (any(subscripts))
                         grid.rect(x = x, y = y, width = 1, height = 1,
                                   default.units = "native",
                                   gp = gpar(fill = col.regions[zcol],
-                                  col = NULL))
+                                  lwd = lwd, col = NULL))
                 }, ...)
       })
 
