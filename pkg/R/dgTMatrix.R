@@ -117,24 +117,8 @@ setMethod("image", "dgTMatrix",
                           c(colorRampPalette(c("blue3", "gray80"))(n0),
                             colorRampPalette(c("gray75","red3"))(nn - n0))
                   }
-          if(is.null(lwd)) {
-              ## the line-width used in grid.rect() inside levelplot()'s panel
-              ## for the *border* of the rectangles: levelplot()panel has lwd=1e-5:
-
-              ## Here: use smart default !
-
-              ## FIXME: This is cheap and provisional!
-              ##        Much better: keep 'NULL' and find good value
-              ##        inside levelplot()'s panel function
-              ## Should really have "current viewport size"("px") :
-              pSize <- dev.size("px") / di ## ~ size of one matrix-entry in pixels
-              pA <- prod(pSize) # the "area"
-              p1 <- min(pSize)
-              lwd <- ## crude for now
-                  if(p1 < 1 || pA < 2)  1e-5
-                  else if(p1 > 3) 1 else if(p1 > 2) 0.5 else 0.05
-
-          } else stopifnot(is.numeric(lwd), all(lwd >= 0))
+          if(!is.null(lwd) && !(is.numeric(lwd) && all(lwd >= 0))) # allow lwd=0
+              stop("'lwd' must be NULL or non-negative numeric")
 
           levelplot(x@x ~ (x@j + 1L) * (x@i + 1L),
                     sub = sub, xlab = xlab, ylab = ylab,
@@ -152,19 +136,46 @@ setMethod("image", "dgTMatrix",
 			if (num.r <= numcol)
 			    rep(col.regions, length = numcol)
 			else col.regions[1+ ((1:numcol-1)*(num.r-1)) %/% (numcol-1)]
-                    zcol <- rep.int(NA, length(z)) #numeric(length(z))
+                    zcol <- rep.int(NA_integer_, length(z))
 		    for (i in seq_along(col.regions))
                         zcol[!is.na(x) & !is.na(y) & !is.na(z) &
                              at[i] <= z & z < at[i+1]] <- i
+                    zcol <- zcol[subscripts]
 
-                    zcol <- as.numeric(zcol[subscripts])
+                    if (any(subscripts)) {
+                        ## the line-width used in grid.rect() inside
+                        ## levelplot()'s panel for the *border* of the
+                        ## rectangles: levelplot()panel has lwd=1e-5:
 
-## browser()
-                    if (any(subscripts))
+                        ## Here: use smart default !
+
+                        if(is.null(lwd)) {
+                            wh <- grid::current.viewport()[c("width", "height")]
+                            ## wh : current viewport dimension in pixel
+                            wh <- c(grid::convertWidth(wh$width, "inches",
+                                                       valueOnly=TRUE),
+                                    grid::convertHeight(wh$height, "inches",
+                                                        valueOnly=TRUE)) *
+                                                            par("cra") / par("cin")
+                            pSize <- wh/di ## size of one matrix-entry in pixels
+                            pA <- prod(pSize) # the "area"
+                            p1 <- min(pSize)
+                            lwd <- ## crude for now
+                                if(p1 < 2 || pA < 6) 0.01 # effectively 0
+                                else if(p1 >= 4) 1
+                                else if(p1 > 3) 0.5 else 0.2
+                            ## browser()
+                            if(getOption("verbose"))
+                                message("rectangle size ",
+                                        paste(round(pSize,1), collapse=" x "),
+                                        " [pixels];  --> lwd :", formatC(lwd))
+                        } else stopifnot(is.numeric(lwd), all(lwd >= 0)) # allow 0
+
                         grid.rect(x = x, y = y, width = 1, height = 1,
                                   default.units = "native",
                                   gp = gpar(fill = col.regions[zcol],
-                                  lwd = lwd, col = NULL))
+                                  lwd = lwd, col = if(lwd < .01) NA))
+                    }
                 }, ...)
       })
 
