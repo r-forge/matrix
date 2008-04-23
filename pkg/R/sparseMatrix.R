@@ -221,7 +221,7 @@ setMethod("Math",
 	  signature(x = "sparseMatrix"),
 	  function(x) callGeneric(as(x, "CsparseMatrix")))
 
-## further group methods -> see ./Ops.R
+## further group methods -> see ./Ops.R {"Summary": ./dMatrix.R }
 
 
 
@@ -238,6 +238,7 @@ printSpMatrix <- function(x, digits = getOption("digits"),
 {
     cl <- getClassDef(class(x))
     stopifnot(extends(cl, "sparseMatrix"))
+    validObject(x) # have seen seg.faults for invalid objects
     d <- dim(x)
     if(prod(d) > maxp) { # "Large" => will be "cut"
         ## only coerce to dense that part which won't be cut :
@@ -390,11 +391,12 @@ setMethod("summary", signature(object = "sparseMatrix"),
 	      d <- dim(object)
 	      T <- as(object, "TsparseMatrix")
 	      ## return a data frame (int, int,	 {double|logical|...})	:
-	      r <- data.frame(i = T@i + 1L, j = T@j + 1L, x = T@x)
+	      r <- if(is(object,"nsparseMatrix"))
+		  data.frame(i = T@i + 1L, j = T@j + 1L)
+	      else data.frame(i = T@i + 1L, j = T@j + 1L, x = T@x)
 	      attr(r, "header") <-
 		  sprintf('%d x %d sparse Matrix of class "%s", with %d entries',
-			  d[1], d[2], class(object),
-                          nnzero(object, na.counted=TRUE))
+			  d[1], d[2], class(object), length(T@i))
 	      ## use ole' S3 technology for such a simple case
 	      class(r) <- c("sparseSummary", class(r))
 	      r
@@ -448,6 +450,14 @@ setMethod("isDiagonal", signature(object = "sparseMatrix"),
 	      gT <- as(object, "TsparseMatrix")
 	      all(gT@i == gT@j)
 	  })
+
+
+setMethod("determinant", signature(x = "sparseMatrix", logarithm = "missing"),
+	  function(x, logarithm, ...)
+	  determinant(x, logarithm = TRUE, ...))
+setMethod("determinant", signature(x = "sparseMatrix", logarithm = "logical"),
+	  function(x, logarithm = TRUE, ...)
+	  determinant(as(x,"dsparseMatrix"), logarithm, ...))
 
 
 setMethod("diag", signature(x = "sparseMatrix"),
@@ -512,17 +522,17 @@ setMethod("cov2cor", signature(V = "sparseMatrix"),
 	      as(r, "symmetricMatrix")
 	  })
 
-setMethod("is.na", signature(x = "sparseMatrix"),
+setMethod("is.na", signature(x = "sparseMatrix"),## NB: nsparse* have own method!
 	  function(x) {
 	      if(any((inax <- is.na(x@x)))) {
-		  r <- as(x, "lMatrix")# will be "lsparseMatrix" - *has* x slot
+		  cld <- getClassDef(class(x))
+		  if(extends(cld, "triangularMatrix") && x@diag == "U")
+		      inax <- is.na((x <- .diagU2N(x, cld))@x)
+		  r <- as(x, "lMatrix") # will be "lsparseMatrix" - *has* x slot
 		  r@x <- inax
 		  as(r, "nMatrix") # a 'pattern matrix
-	      } else {
-		  d <- x@Dim
-		  new("ngCMatrix", Dim = d, Dimnames = dimnames(x),
-		      i = integer(0), p = rep.int(0L, d[2]+1L))
 	      }
+	      else is.na_nsp(x)
 	  })
 
 

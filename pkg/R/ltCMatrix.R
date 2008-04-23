@@ -6,7 +6,8 @@ setAs("matrix", "ltCMatrix",
       function(from) as(as(from, "dtCMatrix"), "ltCMatrix"))
 
 setAs("ltCMatrix", "lgCMatrix",
-      function(from) copyClass(from, "lgCMatrix"))
+      function(from) copyClass(diagU2N(from), "lgCMatrix",
+			       c("i", "p", "x", "Dim", "Dimnames")))
 
 setAs("ltCMatrix", "ltTMatrix",
       function(from) .Call(Csparse_to_Tsparse, from, TRUE))

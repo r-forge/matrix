@@ -16,6 +16,7 @@
 \alias{Logic,Matrix,ANY-method}
 \alias{Logic,ANY,Matrix-method}
 \alias{Summary,Matrix-method}
+\alias{mean,Matrix-method}
 \alias{\%*\%,Matrix,numeric-method}
 \alias{\%*\%,numeric,Matrix-method}
 \alias{\%*\%,Matrix,Matrix-method}
@@ -53,7 +54,8 @@
 \alias{tcrossprod,numeric,Matrix-method}
 %
 \alias{cov2cor,Matrix-method}
-\alias{determinant,Matrix,ANY-method}
+\alias{determinant,Matrix,missing-method}
+\alias{determinant,Matrix,logical-method}
 \alias{diag,Matrix-method}
 \alias{drop,Matrix-method}
 \alias{head,Matrix-method}

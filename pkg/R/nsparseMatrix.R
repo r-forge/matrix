@@ -41,3 +41,7 @@ setMethod("%*%", signature(x = "nsparseMatrix", y = "nsparseMatrix"),
 setMethod("crossprod", signature(x = "nsparseMatrix", y = "nsparseMatrix"),
 	  function(x, y = NULL)
 	  crossprod(as(x, "ngCMatrix"), as(y, "ngCMatrix")))
+
+setMethod("is.na", signature(x = "nsparseMatrix"), is.na_nsp)
+
+

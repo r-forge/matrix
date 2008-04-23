@@ -15,18 +15,20 @@
 % Group methods
 \alias{Arith,dMatrix,dMatrix-method}
 \alias{Ops,dMatrix,dMatrix-method}
-\alias{Compare,dMatrix,dMatrix-method}
+\alias{Ops,dMatrix,nMatrix-method}
+\alias{Ops,nMatrix,dMatrix-method}
+\alias{Ops,lMatrix,lMatrix-method}
 \alias{Compare,dMatrix,numeric-method}
 \alias{Compare,numeric,dMatrix-method}
 \alias{Logic,logical,lMatrix-method}
 \alias{Logic,lMatrix,logical-method}
-%\alias{Summary,dMatrix-method}
+\alias{Summary,lMatrix-method}
 %% R <= 2.5.x :
-\alias{Math2,dMatrix,ANY-method}% Math2 = round + signif,.., but
-\alias{Math2,dMatrix,missing-method}
-% for silly reasons, need these 2+3 as well:
-\alias{round,dMatrix,numeric-method}
-\alias{signif,dMatrix,numeric-method}
+% \alias{Math2,dMatrix,ANY-method}% Math2 = round + signif,.., but
+% \alias{Math2,dMatrix,missing-method}
+% % for silly reasons, need these 2+3 as well:
+% \alias{round,dMatrix,numeric-method}
+% \alias{signif,dMatrix,numeric-method}
 %% R-2.6.0 - maybe
 \alias{Math2,dMatrix-method}
 \alias{log,dMatrix-method}

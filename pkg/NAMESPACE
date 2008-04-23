@@ -6,7 +6,7 @@ importFrom("lattice", levelplot)
 importFrom("graphics", image)
 importFrom("utils", head, tail)
 importFrom("stats", cov2cor, update)
-importFrom("grid", grid.rect, gpar, grob)
+importFrom("grid", grid.rect, gpar, grob)# others via 'grid::'
 
 ## Currently, group generics need to be explicitly imported (Bug?):
 importFrom("methods", Arith, Compare, Logic, Math, Math2, Summary, Complex)
@@ -22,6 +22,7 @@ export("Cholesky",
        "bdiag",
        "colMeans", "colSums", ## these needed a "..." added
        "rowMeans", "rowSums",
+##NOT_YET "det", # = a copy of base::det() but with Matrix namespace
        "drop0",
        "expand",
        "expm",
@@ -264,6 +265,7 @@ exportMethods(## for both own and "other" generics:
               "is.na",
 	      "kronecker",
 	      "length",
+              "mean",
 	      "norm",
               "print",# print(x, ...) when show(x) is not sufficient
 	      "qr",

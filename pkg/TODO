@@ -121,10 +121,6 @@
   above currently goes via "matrix" and back instead of using the 'x' slot
   directly; in particular, the triangular* "class property" is lost!
 
-- image(M, ..): Think about an optional smart option which keeps
-   "0 |-> transparent" and allows colors to differentiate negative and
-   positive entries.
-
 - examples for solve( Cholesky(.), b, system = c("A", "LDLt"....))
   probably rather in man/CHMfactor-class.Rd than man/Cholesky.Rd
 
@@ -177,9 +173,12 @@
   Cholesky(......, Imult), also tests for hidden {hence no examples}
   ldetL2up() { R/CHMfactor.R }
 
-- data(CAex); determinant(CAex) -- says
-  "Ask the package authors to implement the missing feature."
-
 - chol(<nsCMatrix>)  gives "temporarily disabled"
   but should give the *symbolic* factorization;
   similarly Cholesky(.) is not enabled
+
+- writeMM(obj, file=stdout()) creates file "1" since file is silently
+  assumed to be a string, i.e. cannot be a connection.
+  An R (instead of C) version should be pretty simple, and would work with
+  connections automatically ["lsparse" become either "real" or
+  "pattern", "depending if they have NAs or not].

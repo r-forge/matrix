@@ -32,17 +32,21 @@ SEXP dgeMatrix_validate(SEXP obj)
 static
 double get_norm(SEXP obj, const char *typstr)
 {
-    char typnm[] = {'\0', '\0'};
-    int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym));
-    double *work = (double *) NULL;
+    if(any_NA(obj))
+	return NA_REAL;
+    else {
+	char typnm[] = {'\0', '\0'};
+	int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym));
+	double *work = (double *) NULL;
 
-    typnm[0] = La_norm_type(typstr);
-    if (*typnm == 'I') {
-        work = (double *) R_alloc(dims[0], sizeof(double));
+	typnm[0] = La_norm_type(typstr);
+	if (*typnm == 'I') {
+	    work = (double *) R_alloc(dims[0], sizeof(double));
+	}
+	return F77_CALL(dlange)(typstr, dims, dims+1,
+				REAL(GET_SLOT(obj, Matrix_xSym)),
+				dims, work);
     }
-    return F77_CALL(dlange)(typstr, dims, dims+1,
-			    REAL(GET_SLOT(obj, Matrix_xSym)),
-			    dims, work);
 }
 
 SEXP dgeMatrix_norm(SEXP obj, SEXP type)
@@ -225,29 +229,31 @@ SEXP dgeMatrix_LU(SEXP x)
 SEXP dgeMatrix_determinant(SEXP x, SEXP logarithm)
 {
     int lg = asLogical(logarithm);
-    SEXP lu = dgeMatrix_LU(x);
-    int *dims = INTEGER(GET_SLOT(lu, Matrix_DimSym)),
-	*jpvt = INTEGER(GET_SLOT(lu, Matrix_permSym)),
-	i, n = dims[0], sign = 1;
-    double *luvals = REAL(GET_SLOT(lu, Matrix_xSym)), modulus;
+    int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
+	n = dims[0], sign = 1;
+    double modulus = lg ? 0. : 1; /* initialize; = result for n == 0 */
 
     if (n != dims[1])
 	error(_("Determinant requires a square matrix"));
-    for (i = 0; i < n; i++) if (jpvt[i] != (i + 1)) sign = -sign;
-    if (lg) {
-	modulus = 0.0;
-	for (i = 0; i < n; i++) {
-	    double dii = luvals[i*(n + 1)]; /* ith diagonal element */
-	    modulus += log(dii < 0 ? -dii : dii);
-	    if (dii < 0) sign = -sign;
-	}
-    } else {
-	modulus = 1.0;
-	for (i = 0; i < n; i++)
-	    modulus *= luvals[i*(n + 1)];
-	if (modulus < 0) {
-	    modulus = -modulus;
-	    sign = -sign;
+    if (n > 0) {
+	SEXP lu = dgeMatrix_LU(x);
+	int i, *jpvt = INTEGER(GET_SLOT(lu, Matrix_permSym));
+	double *luvals = REAL(GET_SLOT(lu, Matrix_xSym));
+
+	for (i = 0; i < n; i++) if (jpvt[i] != (i + 1)) sign = -sign;
+	if (lg) {
+	    for (i = 0; i < n; i++) {
+		double dii = luvals[i*(n + 1)]; /* ith diagonal element */
+		modulus += log(dii < 0 ? -dii : dii);
+		if (dii < 0) sign = -sign;
+	    }
+	} else {
+	    for (i = 0; i < n; i++)
+		modulus *= luvals[i*(n + 1)];
+	    if (modulus < 0) {
+		modulus = -modulus;
+		sign = -sign;
+	    }
 	}
     }
     return as_det_obj(modulus, lg, sign);

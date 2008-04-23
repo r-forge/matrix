@@ -2,6 +2,7 @@
 \docType{class}
 \alias{ldiMatrix-class}
 \alias{!,ldiMatrix-method}
+%%----> put almost all methods into ./diagonalMatrix-class.Rd
 % Deprecated:
 \alias{coerce,ldiMatrix,lgCMatrix-method}
 \alias{coerce,ldiMatrix,lgTMatrix-method}

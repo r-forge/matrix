@@ -81,6 +81,8 @@
 \alias{t,lgTMatrix-method}
 \alias{t,lsCMatrix-method}
 \alias{t,ltCMatrix-method}
+\alias{t,lsTMatrix-method}
+\alias{t,ltTMatrix-method}
 \alias{tcrossprod,lgCMatrix,missing-method}
 \alias{tcrossprod,lgTMatrix,missing-method}
 \alias{tcrossprod,lsparseMatrix,missing-method}
@@ -160,6 +162,7 @@ stopifnot(is(lm,"lsparseMatrix"),
 
 data(KNex)
 str(mmG.1 <- (KNex $ mm) > 0.1)# "lgC..."
+table(mmG.1@x)# however with many ``non-structural zeros''
 ## from logical to nz_pattern -- okay when there are no NA's :
 nmG.1 <- as(mmG.1, "nMatrix")
 ## from logical to "double"
@@ -170,12 +173,12 @@ stopifnot(validObject(lmG.1), identical(lmG.1, mmG.1))
 class(xnx <- crossprod(nmG.1))# "nsC.."
 class(xlx <- crossprod(mmG.1))# "dsC.." : numeric
 is0 <- (xlx == 0)
-sum(as.vector(is0))# quite sparse, but
+mean(as.vector(is0))# 99.3\% zeros: quite sparse, but
 table(xlx@x == 0)# more than half of the entries are (non-structural!) 0
 stopifnot(isSymmetric(xlx), isSymmetric(xnx),
-          ## compare xnx and xlx :
+          ## compare xnx and  drop0(xlx) :
           sapply(slotNames(xnx),
-                 function(n) identical(slot(xnx, n), slot(xlx, n))))
+                 function(n) identical(slot(xnx, n), slot(drop0(xlx), n))))
 }
 \keyword{classes}
 \keyword{algebra}

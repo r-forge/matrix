@@ -25,10 +25,11 @@
 \alias{tcrossprod,CsparseMatrix,CsparseMatrix-method}
 \alias{tcrossprod,CsparseMatrix,missing-method}
 %% Group methods --------- FIXME: not tested yet (or documented)
+\alias{Compare,CsparseMatrix,CsparseMatrix-method}
 \alias{Arith,CsparseMatrix,CsparseMatrix-method}
 \alias{Arith,CsparseMatrix,numeric-method}
 \alias{Arith,numeric,CsparseMatrix-method}
-\alias{Compare,CsparseMatrix,CsparseMatrix-method}
+\alias{Logic,CsparseMatrix,CsparseMatrix-method}
 \alias{Math,CsparseMatrix-method}
 %
 \title{Class "CsparseMatrix" of Sparse Matrices in Column-compressed Form}

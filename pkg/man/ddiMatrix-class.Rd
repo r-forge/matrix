@@ -2,6 +2,7 @@
 \title{Class "ddiMatrix" of Diagonal Numeric Matrices}
 \docType{class}
 \alias{ddiMatrix-class}
+%%----> put all methods into ./diagonalMatrix-class.Rd
 % Deprecated:
 \alias{coerce,ddiMatrix,dgCMatrix-method}
 \alias{coerce,ddiMatrix,dgTMatrix-method}
