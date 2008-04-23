@@ -4,7 +4,9 @@ library(Matrix)
 
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 
-options(verbose = TRUE)# to show message()s
+if(interactive()) {
+    options(error = recover)
+} else options(verbose = TRUE)# to show message()s
 
 ### Dense Matrices
 
@@ -34,6 +36,7 @@ stopifnot(identical(m[2,3], m[(1:nrow(m)) == 2, (1:ncol(m)) == 3]),
 mn <- m
 dimnames(mn) <- list(paste("r",letters[1:nrow(mn)],sep=""),
                      LETTERS[1:ncol(mn)])
+checkMatrix(mn)
 mn["rd", "D"]
 stopifnot(identical(mn["rc", "D"], mn[3,4]), mn[3,4] == 24,
           identical(mn[, "A"], mn[,1]), mn[,1] == 1:7,
@@ -234,7 +237,7 @@ assert.EQ.mat(uTr, cbind(0, rbind(0,diag(2))))
 M <- m0; M[1,] <- 0
 stopifnot(identical(M, Diagonal(x=c(0, rep(1,4)))))
 M <- m0; M[,3] <- 3 ; M ; stopifnot(is(M, "sparseMatrix"), M[,3] == 3)
-validObject(M)
+checkMatrix(M)
 M <- m0; M[1:3, 3] <- 0 ;M
 T <- m0; T[1:3, 3] <- 10
 stopifnot(identical(M, Diagonal(x=c(1,1, 0, 1,1))),
@@ -242,18 +245,18 @@ stopifnot(identical(M, Diagonal(x=c(1,1, 0, 1,1))),
 
 M <- m1; M[1,] <- 0 ; M ; assert.EQ.mat(M, diag(c(0,rep(1,4))), tol=0)
 M <- m1; M[,3] <- 3 ; stopifnot(is(M,"sparseMatrix"), M[,3] == 3)
-validObject(M)
+checkMatrix(M)
 M <- m1; M[1:3, 3] <- 0 ;M
 assert.EQ.mat(M, diag(c(1,1, 0, 1,1)), tol=0)
-T <- m1; T[1:3, 3] <- 10; validObject(T)
+T <- m1; T[1:3, 3] <- 10; checkMatrix(T)
 stopifnot(is(T, "dtTMatrix"), identical(T[,3], c(10,10,10,0,0)))
 
 M <- m2; M[1,] <- 0 ; M ; assert.EQ.mat(M, diag(c(0,rep(1,4))), tol=0)
 M <- m2; M[,3] <- 3 ; stopifnot(is(M,"sparseMatrix"), M[,3] == 3)
-validObject(M)
+checkMatrix(M)
 M <- m2; M[1:3, 3] <- 0 ;M
 assert.EQ.mat(M, diag(c(1,1, 0, 1,1)), tol=0)
-T <- m2; T[1:3, 3] <- 10; validObject(T)
+T <- m2; T[1:3, 3] <- 10; checkMatrix(T)
 stopifnot(is(T, "dtCMatrix"), identical(T[,3], c(10,10,10,0,0)))
 
 
@@ -341,7 +344,7 @@ as((mt0 - mt)[1:5,], "dsparseMatrix")# [1,5] and lines 2:3
 
 mt[c(2,4), ] <- 0; stopifnot(as(mt[c(2,4), ],"matrix") == 0)
 mt[2:3, 4:7] <- 33
-validObject(mt)
+checkMatrix(mt)
 mt
 
 mc[1,4] <- -99 ; stopifnot(mc[1,4] == -99)
@@ -376,7 +379,7 @@ for(i in 1:50) {
 mc # no longer has non-structural zeros
 mc[ii, jj] <- 1:6
 mc[c(2,5), c(3,5)] <- 3.2
-validObject(mc)
+checkMatrix(mc)
 m. <- mc
 mc[4,] <- 0
 mc
@@ -423,14 +426,14 @@ Hc.[, 1:6]
 
 ## an example that failed for a long time
 sy3 <- new("dsyMatrix", Dim = as.integer(c(2, 2)), x = c(14, -1, 2, -7))
-validObject(dm <- kronecker(Diagonal(2), sy3))# now sparse with new kronecker
+checkMatrix(dm <- kronecker(Diagonal(2), sy3))# now sparse with new kronecker
 dm <- Matrix(as.matrix(dm))# -> "dsyMatrix"
 (s2 <- as(dm, "sparseMatrix"))
-validObject(st <- as(s2, "TsparseMatrix"))
+checkMatrix(st <- as(s2, "TsparseMatrix"))
 stopifnot(is(s2, "symmetricMatrix"),
 	  is(st, "symmetricMatrix"))
-validObject(s.32  <- st[1:3,1:2]) ## 3 x 2 - and *not* dsTMatrix
-validObject(s2.32 <- s2[1:3,1:2])
+checkMatrix(s.32  <- st[1:3,1:2]) ## 3 x 2 - and *not* dsTMatrix
+checkMatrix(s2.32 <- s2[1:3,1:2])
 I <- c(1,4:3)
 stopifnot(is(s2.32, "generalMatrix"),
           is(s.32,  "generalMatrix"),
@@ -445,8 +448,8 @@ stopifnot(is(s2.32, "generalMatrix"),
 
 ## now sub-assign  and check for consistency
 ## symmetric subassign should keep symmetry
-st[I,I] <- 0; validObject(st); stopifnot(is(st,"symmetricMatrix"))
-s2[I,I] <- 0; validObject(s2); stopifnot(is(s2,"symmetricMatrix"))
+st[I,I] <- 0; checkMatrix(st); stopifnot(is(st,"symmetricMatrix"))
+s2[I,I] <- 0; checkMatrix(s2); stopifnot(is(s2,"symmetricMatrix"))
 ##
 m <- as.mat(st)
  m[2:1,2:1] <- 4:1
@@ -478,8 +481,7 @@ assert.EQ.mat(s2, m)# failed in 0.9975-8
 m.[ cbind(3:5, 1:3) ] <- 1:3
 stopifnot(m.[3,1] == 1, m.[4,2] == 2)
 x.x[ cbind(2:6, 2:6)] <- 12:16
-validObject(x.x)
-stopifnot(class(x.x) == "dsCMatrix",
+stopifnot(isValid(x.x, "dsCMatrix"),
 	  12:16 == as.mat(x.x)[cbind(2:6, 2:6)])
 (ne1 <- (mc - m.) != 0)
 stopifnot(identical(ne1, 0 != abs(mc - m.)))
@@ -501,9 +503,13 @@ stopifnot(identical(drop(M3), M3),
 M <- Diagonal(4); M[1,2] <- 2
 M. <- as(M, "CsparseMatrix")
 (R <- as(M., "RsparseMatrix"))
-stopifnot(is(M, "triangularMatrix"),
-          is(M.,"triangularMatrix"),
-          is(R, "triangularMatrix"))
+(Ms <- symmpart(M.))
+Rs <- as(Ms, "RsparseMatrix")
+stopifnot(isValid(M, "triangularMatrix"),
+          isValid(M.,"triangularMatrix"),
+          isValid(Ms, "dsCMatrix"),
+          isValid(R,  "dtRMatrix"),
+          isValid(Rs, "dsRMatrix") )
 stopifnot(dim(M[2:3, FALSE]) == c(2,0),
           dim(R[2:3, FALSE]) == c(2,0),
           identical(M [2:3,TRUE], M [2:3,]),
@@ -511,4 +517,16 @@ stopifnot(dim(M[2:3, FALSE]) == c(2,0),
           identical(R [2:3,TRUE], R [2:3,]),
           dim(R[FALSE, FALSE]) == c(0,0))
 
-cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
+cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
+##
+cat("checkMatrix() of all: \n---------\n")
+Sys.setlocale("LC_COLLATE", "C")# to keep ls() reproducible
+for(nm in ls()) if(is(.m <- get(nm), "Matrix")) {
+    cat(nm, "\n")
+    checkMatrix(.m, doCoerce2 = !is(.m, "RsparseMatrix"),
+		verbose = FALSE)
+}
+cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
+
+if(!interactive()) warnings()
+

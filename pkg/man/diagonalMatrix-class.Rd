@@ -13,6 +13,7 @@
 \alias{cbind2,diagonalMatrix,sparseMatrix-method}
 \alias{rbind2,sparseMatrix,diagonalMatrix-method}
 \alias{rbind2,diagonalMatrix,sparseMatrix-method}
+\alias{determinant,diagonalMatrix,logical-method}
 % Mainly against ambiguity warnings:
 % Horrible-Hack: currently define for "all subclasses of diagonalMatrix"
 % ------------- in ../R/diagMatrix.R
@@ -59,10 +60,46 @@
 \alias{Ops,ANY,ddiMatrix-method}
 \alias{Ops,ldiMatrix,ANY-method}
 \alias{Ops,ANY,ldiMatrix-method}
+\alias{Ops,ddiMatrix,ddiMatrix-method}
+\alias{Ops,ddiMatrix,ldiMatrix-method}
+\alias{Ops,ldiMatrix,ddiMatrix-method}
+\alias{Ops,ldiMatrix,ldiMatrix-method}
+\alias{Arith,numeric,ddiMatrix-method}
+\alias{Arith,numeric,ldiMatrix-method}
+\alias{Arith,ddiMatrix,numeric-method}
+\alias{Arith,ldiMatrix,numeric-method}
+
+\alias{all,ddiMatrix-method}
+\alias{all,ldiMatrix-method}
+\alias{any,ddiMatrix-method}
+\alias{any,ldiMatrix-method}
+\alias{prod,ddiMatrix-method}
+\alias{prod,ldiMatrix-method}
+\alias{sum,ddiMatrix-method}
+\alias{sum,ldiMatrix-method}
+
+\alias{&,ANY,ddiMatrix-method}
+\alias{&,ANY,ldiMatrix-method}
+\alias{&,ddiMatrix,ANY-method}
+\alias{&,ldiMatrix,ANY-method}
+
+\alias{&,Matrix,ddiMatrix-method}
+\alias{&,Matrix,ldiMatrix-method}
+\alias{&,ddiMatrix,Matrix-method}
+\alias{&,ldiMatrix,Matrix-method}
+
+\alias{&,ddiMatrix,denseMatrix-method}
+\alias{&,ldiMatrix,denseMatrix-method}
+\alias{&,denseMatrix,ddiMatrix-method}
+\alias{&,denseMatrix,ldiMatrix-method}
 %-end{H.Hack}
 \alias{Ops,diagonalMatrix,diagonalMatrix-method}
 \alias{Ops,diagonalMatrix,ddiMatrix-method}
 \alias{Ops,ddiMatrix,diagonalMatrix-method}
+
+\alias{Summary,ddiMatrix-method}
+\alias{Summary,ldiMatrix-method}
+%
 \alias{t,diagonalMatrix-method}
 \alias{show,diagonalMatrix-method}
 \alias{\%*\%,dgeMatrix,diagonalMatrix-method}

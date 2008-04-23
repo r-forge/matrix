@@ -24,9 +24,11 @@ setAs("nsCMatrix", "nsTMatrix",
 	Dim = from@Dim, Dimnames = from@Dimnames)
 
 setAs("nsCMatrix", "dsCMatrix", .nsC2d)
+setAs("nsCMatrix", "dMatrix", .nsC2d)
 setAs("nsCMatrix", "dsparseMatrix", .nsC2d)
 
 setAs("nsCMatrix", "lsCMatrix", .nsC2l)
+setAs("nsCMatrix", "lMatrix", .nsC2l)
 setAs("nsCMatrix", "lsparseMatrix", .nsC2l)
 
 rm(.nsC2d,.nsC2l) # don't even keep "hidden"

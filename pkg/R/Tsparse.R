@@ -555,26 +555,20 @@ replTmat <- function (x, i, j, ..., value)
     if(is_duplicatedT(x, nr = di[1]))
 	x <- uniqTsparse(x)
 
-    toGeneral <- FALSE
+    toGeneral <- r.sym <- FALSE
     if((sym.x <- extends(clDx, "symmetricMatrix"))) {
 	r.sym <- (dind[1] == dind[2]) && all(i1 == i2) &&
 	(lenRepl == 1 || isSymmetric(value <- array(value, dim=dind)))
 	if(r.sym) { ## result is *still* symmetric --> keep symmetry!
-	    ## now consider only those indices above / below diagonal:
 	    xU <- x@uplo == "U"
-	    useI <- if(xU) i1 <= i2 else i2 <= i1
-	    i1 <- i1[useI]
-	    i2 <- i2[useI]
-	    ## select also the corresponding triangle
-	    if(lenRepl > 1)
-		value <- value[(if(xU)upper.tri else lower.tri)(value, diag=TRUE)]
+            # later, we will consider only those indices above / below diagonal:
 	}
 	else toGeneral <- TRUE
     }
     else if((tri.x <- extends(clDx, "triangularMatrix"))) {
         xU <- x@uplo == "U"
 	r.tri <- ((any(dind == 1) || dind[1] == dind[2]) &&
-		  all(if(xU) i1 <= i2 else i2 <= i1))
+		  if(xU) max(i1) <= min(i2) else max(i2) <= min(i1))
 	if(r.tri) { ## result is *still* triangular
             if(any(i1 == i2)) # diagonal will be changed
                 x <- diagU2N(x) # keeps class (!)
@@ -623,10 +617,10 @@ replTmat <- function (x, i, j, ..., value)
         return(x)
     }
 
-    if(sym.x && r.sym) # value already adjusted, see above
-       lenRepl <- length(value) # shorter (since only "triangle")
-    else if(lenV < lenRepl)
-       value <- rep(value, length = lenRepl)
+##     if(r.sym) # value already adjusted, see above
+##        lenRepl <- length(value) # shorter (since only "triangle")
+    if(!r.sym && lenV < lenRepl)
+        value <- rep(value, length = lenRepl)
 
     ## now:  length(value) == lenRepl
 
@@ -656,13 +650,21 @@ replTmat <- function (x, i, j, ..., value)
 	    seq_len(lenRepl)[-iN0] # == complementInd(non0, dind)
     } else iI0 <- seq_len(lenRepl)
 
-    if(length(iI0) && any(vN0 <- !v0[iI0])) {
-	## 2) add those that were structural 0 (where value != 0)
-	ij0 <- decodeInd(iI0[vN0] - 1L, nr = dind[1])
-	x@i <- c(x@i, i1[ij0[,1] + 1L])
-	x@j <- c(x@j, i2[ij0[,2] + 1L])
-        if(has.x)
-            x@x <- c(x@x, value[iI0[vN0]])
+    if(length(iI0)) {
+        if(r.sym) {
+	    ## should only set new entries above / below diagonal
+	    iSel <- indTri(dind[1], upper=xU, diag=TRUE)
+	    ## select also the corresponding triangle of values
+	    iI0 <- intersect(iI0, iSel)
+        }
+        if(any(vN0 <- !v0[iI0])) {
+            ## 2) add those that were structural 0 (where value != 0)
+            ij0 <- decodeInd(iI0[vN0] - 1L, nr = dind[1])
+            x@i <- c(x@i, i1[ij0[,1] + 1L])
+            x@j <- c(x@j, i2[ij0[,2] + 1L])
+            if(has.x)
+                x@x <- c(x@x, value[iI0[vN0]])
+        }
     }
     x
 } ## end{replTmat}
@@ -882,10 +884,11 @@ setMethod("band", "TsparseMatrix",
 ## For the "general" T ones (triangular & symmetric have special methods):
 setMethod("t", signature(x = "TsparseMatrix"),
 	  function(x) {
-	      r <- new(class(x))
+              cld <- getClassDef(class(x))
+	      r <- new(cld)
 	      r@i <- x@j
 	      r@j <- x@i
-	      if(any("x" == slotNames(x)))
+	      if(any("x" == slotNames(cld)))
 		  r@x <- x@x
 	      r@Dim <- x@Dim[2:1]
 	      r@Dimnames <- x@Dimnames[2:1]

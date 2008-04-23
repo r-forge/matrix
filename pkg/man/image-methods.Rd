@@ -44,10 +44,10 @@
     see \code{\link[lattice]{levelplot}}.}
   \item{sub, xlab, ylab}{axis annotation with sensible defaults;
     see \code{\link{plot.default}}.}
-  \item{useAbs}{logical indicating \code{\link{abs}(x)} should be shown;
-    if \code{TRUE}, the former (implicit) default, the default
+  \item{useAbs}{logical indicating if \code{\link{abs}(x)} should be
+    shown; if \code{TRUE}, the former (implicit) default, the default
     \code{col.regions} will be \code{\link{grey}} colors (and no
-    \code{colorkey} drawn). The default is \code{FALSE} unless the
+    \code{colorkey} drawn).  The default is \code{FALSE} unless the
     matrix has no negative entries.}
   \item{colorkey}{logical indicating if a color key aka \sQuote{legend}
     should be produced.  Default is to draw one, unless \code{useAbs} is
@@ -81,8 +81,13 @@ image(cCA, useAbs=TRUE)
 
 data(USCounties)
 image(USCounties)# huge
-## Drawing borders around each rectangle:
-## Viewing of these depends very much on resolution & anti-aliasing:
+image(sign(USCounties))## just the pattern
+    # how the result looks, may depend heavily on
+    # the device, screen resolution, antialiasing etc
+    # e.g. x11(type="Xlib") may show very differently than cairo-based
+
+## Drawing borders around each rectangle;
+    # again, viewing depends very much on the device:
 image(USCounties[1:400,1:200], lwd=.1)
 image(USCounties[1:200,1:200], lwd=.5)
 image(USCounties[1:200,1:200], lwd=.01)

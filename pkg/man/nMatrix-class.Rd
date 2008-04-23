@@ -15,10 +15,14 @@
 % \alias{Arith,dMatrix,dMatrix-method}
 % \alias{Math2,dMatrix,numeric-method}% Math2 = round + signif, but
 % \alias{Math2,dMatrix,missing-method}
-% \alias{Summary,dMatrix-method}
+\alias{Summary,nMatrix-method}
 % \alias{Compare,dMatrix,dMatrix-method}
 % \alias{Compare,dMatrix,numeric-method}
-% \alias{Compare,numeric,dMatrix-method}
+\alias{Compare,nMatrix,nMatrix-method}
+\alias{Logic,nMatrix,Matrix-method}
+\alias{Logic,Matrix,nMatrix-method}
+\alias{Ops,nMatrix,lMatrix-method}
+\alias{Ops,lMatrix,nMatrix-method}
 % % for silly reasons, need these 2+3 as well:
 % \alias{round,dMatrix,numeric-method}
 % \alias{signif,dMatrix,numeric-method}

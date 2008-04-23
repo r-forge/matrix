@@ -65,6 +65,18 @@ setAs("dtCMatrix", "dtTMatrix",
 setAs("dtCMatrix", "dtrMatrix",
       function(from) as(as(from, "dtTMatrix"), "dtrMatrix"))
 
+setMethod("determinant", signature(x = "dtCMatrix", logarithm = "logical"),
+	  function(x, logarithm = TRUE, ...) {
+	      if(x@diag == "N")
+		  mkDet(diag(x), logarithm)
+	      else
+		  structure(list(modulus = structure(if (logarithm) 0 else 1,
+				 "logarithm" = logarithm),
+				 sign = 1L),
+			    class = "det")
+	  })
+
+
 setMethod("solve", signature(a = "dtCMatrix", b = "missing"),
 	  function(a, b, ...) {
 	      if (a@diag == "U") {

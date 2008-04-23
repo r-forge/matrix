@@ -3,8 +3,7 @@
 ### contains = "nsparseMatrix"
 
 setAs("matrix", "ntTMatrix",
-      function(from) as(as(as(from, "TsparseMatrix"),"triangularMatrix"), "nMatrix"))
-
+      function(from) as(as(from, "ntrMatrix"), "TsparseMatrix"))
 
 setAs("ntTMatrix", "ngTMatrix",
       function(from) tT2gT(from, cl = "ntTMatrix", toClass = "ngTMatrix"))
@@ -37,7 +36,8 @@ setMethod("image", "ntTMatrix",
               callGeneric()
           })
 
-## FIXME
-## setMethod("t", signature(x = "ntTMatrix"),
-##           function(x) .Call(ntTMatrix_trans, x),
-##           valueClass = "ntTMatrix")
+setMethod("t", "ntTMatrix",
+	  function(x)
+	  new("ntTMatrix", Dim = x@Dim[2:1], Dimnames = x@Dimnames[2:1],
+	      i = x@j, j = x@i, diag = x@diag,
+	      uplo = if (x@uplo == "U") "L" else "U"))

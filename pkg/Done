@@ -271,4 +271,11 @@
   Now they are *implicit generics* and methods all have just (x= *Matrix)
   signature and default argument (pivot=FALSE) or (tol=1e-7) respectively.
 
+- summary(<nMatrix>) now only reports the (i,j) locations; no "TRUE".
 
+- data(CAex); determinant(CAex) now works - via lu() decomposition;
+  and effectively, determinant() should now work for all our numeric
+  ("dMatrix") Matrices, of course with an error for non-square ones.
+
+- image(M, ..): now have smart option which keeps "0 |-> transparent"
+  and allows colors to differentiate negative and positive entries.
