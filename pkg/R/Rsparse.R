@@ -142,9 +142,9 @@ setAs("matrix", "dgRMatrix", .viaC.to.dgR)
     r
 }
 
-setAs("matrix",       "RsparseMatrix", .viaC.to.R)
-setAs("ddenseMatrix", "RsparseMatrix", .viaC.to.R)
-setAs("dsparseMatrix","RsparseMatrix", .viaC.to.R)
+setAs("matrix",      "RsparseMatrix", .viaC.to.R)
+setAs("denseMatrix", "RsparseMatrix", .viaC.to.R)
+setAs("sparseMatrix","RsparseMatrix", .viaC.to.R)
 
 ## symmetric: can use same 'p' slot
 setAs("dsCMatrix", "dsRMatrix",

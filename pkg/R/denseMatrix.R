@@ -121,10 +121,12 @@ setMethod("[", signature(x = "denseMatrix", i = "index", j = "index",
 	      if(is.null(dim(r)))
 		  r
 	      else {
-		  cl <- class(x)
-		  if(extends(cl, "symmetricMatrix") &&
+		  cld <- getClassDef(cl <- class(x))
+		  if(extends(cld, "symmetricMatrix") &&
 		     length(i) == length(j) && all(i == j))
-		      as(r, cl) ## keep original symmetric class
+                      ## keep original symmetric class (but not "dpo")
+                      as(r, class2(cl, .M.kindC(cld)))
+
 		  else as_smartClass(r, cl)
 	      }
 	  })

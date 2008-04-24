@@ -31,9 +31,8 @@
 }
 \section{Extends}{
   Class \code{"\linkS4class{diagonalMatrix}"}, directly.
-  Class \code{"\linkS4class{ddenseMatrix}"}, directly.
-  Classes \code{"denseMatrix"} and \code{"dMatrix"} and their super
-  classes, indirectly, see \code{\link{showClass}("ddiMatrix")}.
+  Class \code{"\linkS4class{dMatrix}"}, directly.
+  Class \code{"denseMatrix"} indirectly, see \code{\link{showClass}("ddiMatrix")}.
 }
 \section{Methods}{
   \describe{

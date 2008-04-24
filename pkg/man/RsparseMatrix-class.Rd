@@ -14,8 +14,8 @@
 \alias{coerce,RsparseMatrix,lMatrix-method}
 \alias{coerce,RsparseMatrix,nMatrix-method}
 \alias{coerce,matrix,RsparseMatrix-method}
-\alias{coerce,ddenseMatrix,RsparseMatrix-method}
-\alias{coerce,dsparseMatrix,RsparseMatrix-method}
+\alias{coerce,denseMatrix,RsparseMatrix-method}
+\alias{coerce,sparseMatrix,RsparseMatrix-method}
 % all other ..RMatrix coercions -- here as well for now --
 \alias{coerce,matrix,dgRMatrix-method}
 %

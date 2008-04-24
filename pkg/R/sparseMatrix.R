@@ -477,9 +477,6 @@ setMethod("dim<-", signature(x = "sparseMatrix", value = "ANY"),
 
 setMethod("norm", signature(x = "sparseMatrix", type = "character"),
 	  function(x, type, ...) {
-## as(*, "dsparseMatrix") fails e.g. for "lgT*", but why use it anyway?
-## 	      if(!is(x, "dsparseMatrix"))
-## 		  x <- as(x, "dsparseMatrix")
 	      type <- toupper(substr(type[1], 1, 1))
 	      switch(type,  ##  max(<empty>, 0)  |-->  0
 		     "O" = ,

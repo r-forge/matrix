@@ -7,6 +7,17 @@ to_dpp <- function(from) as(as(from, "dpoMatrix"), "dppMatrix")
 setAs("Matrix", "dppMatrix", to_dpp)# some may fail, but this tries
 setAs("matrix", "dppMatrix", to_dpp)
 
+setAs("dspMatrix", "dppMatrix",
+      function(from){
+	  if(is.null(tryCatch(.Call(dppMatrix_chol, from),
+			      error = function(e) NULL)))
+	      stop("not a positive definite matrix")
+	  ## else
+	  copyClass(from, "dppMatrix",
+		    sNames = c("x", "Dim", "Dimnames", "uplo", "factors"))
+      })
+
+
 setMethod("chol", signature(x = "dppMatrix"),
 	  function(x, pivot, LINPACK) .Call(dppMatrix_chol, x))
 

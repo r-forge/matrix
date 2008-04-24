@@ -499,7 +499,10 @@ install_diagonal_int(int *dest, SEXP A)
  *
  * @param A	  either a denseMatrix object or a matrix object
  */
-/* NOTA BENE: If you enlarge this list, do change '14' and '6' below !*/
+/* NOTA BENE: If you enlarge this list, do change '14' and '6' below !
+ * ---------  ddiMatrix & ldiMatrix  are no longer ddense or ldense on the R level,
+ *            ---         ---        but are still dealt with here.
+ */
 
 #define ddense_CLASSES							\
 		    "dgeMatrix", "dtrMatrix",				\

@@ -24,3 +24,7 @@ Tsparse_to_Csparse <- Matrix:::Tsparse_to_Csparse
 Tsparse_diagU2N    <- Matrix:::Tsparse_diagU2N
 Csparse_symmetric_to_general <- Matrix:::Csparse_symmetric_to_general
 diag_tC    <- Matrix:::diag_tC
+dup_mMatrix_as_dgeMatrix <- Matrix:::dup_mMatrix_as_dgeMatrix
+dup_mMatrix_as_geMatrix  <- Matrix:::dup_mMatrix_as_geMatrix
+dsCMatrix_matrix_solve  <-  Matrix:::dsCMatrix_matrix_solve
+dsyMatrix_matrix_solve  <-  Matrix:::dsyMatrix_matrix_solve

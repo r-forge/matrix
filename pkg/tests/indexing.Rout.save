@@ -1,5 +1,5 @@
 
-R version 2.7.0 Patched (2008-04-22 r45460)
+R version 2.7.0 Patched (2008-04-23 r45482)
 Copyright (C) 2008 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -626,6 +626,11 @@ as(<triangular (ge)matrix>, dtCMatrix): valid: TRUE
 > D <- Diagonal(6)
 > M <- as(D,"dgeMatrix")
 > m <- as(D,"matrix")
+Warning message:
+Ambiguous method selection for "coerce", target "ddiMatrix#matrix" (the first of the signatures shown will be used)
+    diagonalMatrix#matrix
+    dMatrix#matrix
+ 
 > s <- as(D,"TsparseMatrix")
 > S <- as(s,"CsparseMatrix")
 > i <- c(3,1,6); v <- c(10,15,20)
@@ -1142,7 +1147,7 @@ Ambiguous method selection for "!=", target "numeric#dgCMatrix" (the first of th
 +           dim(R[FALSE, FALSE]) == c(0,0))
 > 
 > cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
-Time elapsed:  15.016 0.119 15.244 0 0 
+Time elapsed:  16.672 0.129 16.891 0 0 
 > ##
 > cat("checkMatrix() of all: \n---------\n")
 checkMatrix() of all: 
@@ -1179,6 +1184,9 @@ M.
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 M3 
+.TM.repl.i.2col(): drop 'matrix' case ...
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ltTMatrix to lgTMatrix
 Ms 
 suboptimal implementation of sparse 'symm. o symm.'
 R 
@@ -1193,6 +1201,9 @@ T
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 T3 
+.TM.repl.i.2col(): drop 'matrix' case ...
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ltTMatrix to lgTMatrix
 Tii 
 suboptimal implementation of sparse 'symm. o symm.'
 cI 
@@ -1246,7 +1257,7 @@ x.x.
 suboptimal implementation of sparse 'symm. o symm.'
 There were 18 warnings (use warnings() to see them)
 > cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
-Time elapsed:  11.884 0.026 11.913 0 0 
+Time elapsed:  13.507 0.01 13.518 0 0 
 > 
 > if(!interactive()) warnings()
 Warning messages:

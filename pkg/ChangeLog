@@ -1,3 +1,19 @@
+2008-04-24  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/expm.R: new file for all expm() methods; notably new ones for
+	diagonal*, triangular*, symmetric* and also simple "matrix".
+
+2008-04-23  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dsyMatrix.R: setAs(.) rather than setIs(.)  "to dpoMatrix"
+
+	* inst/test-tools.R (assert.EQ.mat): better message when not equal
+
+	* src/dgeMatrix.c (dgeMatrix_matrix_crossprod): allow integer RHS.
+
+	* R/AllClass.R (ddiMatrix,ldiMatrix): extend [dl]Matrix instead of
+	[dl]denseMatrix {identical slots; but more logical method dispatch}
+
 2008-04-23  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/sparseMatrix.R (summary): use length(<i-slot>) instead of nnzero()
