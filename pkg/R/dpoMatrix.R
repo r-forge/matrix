@@ -14,6 +14,7 @@ setAs("dpoMatrix", "corMatrix",
 	      sd = unname(sd))
       })
 
+if(FALSE) # should no longer be needed
 setAs("corMatrix", "lMatrix",
       function(from) as(as(from, "dpoMatrix"), "lMatrix"))
 
@@ -28,28 +29,21 @@ setMethod("chol", signature(x = "dpoMatrix"),
 	  function(x, pivot, ...) .Call(dpoMatrix_chol, x))
 
 setMethod("rcond", signature(x = "dpoMatrix", norm = "character"),
-          function(x, norm, ...)
-          .Call(dpoMatrix_rcond, x, norm),
-          valueClass = "numeric")
+          function(x, norm, ...) .Call(dpoMatrix_rcond, x, norm))
 
 setMethod("rcond", signature(x = "dpoMatrix", norm = "missing"),
-          function(x, norm, ...)
-          .Call(dpoMatrix_rcond, x, "O"),
-          valueClass = "numeric")
+          function(x, norm, ...) .Call(dpoMatrix_rcond, x, "O"))
 
 setMethod("solve", signature(a = "dpoMatrix", b = "missing"),
-          function(a, b, ...)
-          .Call(dpoMatrix_solve, a),
+          function(a, b, ...) .Call(dpoMatrix_solve, a),
           valueClass = "dpoMatrix")
 
 setMethod("solve", signature(a = "dpoMatrix", b = "dgeMatrix"),
-          function(a, b, ...)
-          .Call(dpoMatrix_dgeMatrix_solve, a, b),
+          function(a, b, ...) .Call(dpoMatrix_dgeMatrix_solve, a, b),
           valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dpoMatrix", b = "matrix"),
-          function(a, b, ...)
-          .Call(dpoMatrix_matrix_solve, a, b),
+          function(a, b, ...) .Call(dpoMatrix_matrix_solve, a, b),
           valueClass = "matrix")
 
 ## Is this usable / necessary?  -- FIXME!
@@ -58,4 +52,3 @@ setMethod("solve", signature(a = "dpoMatrix", b = "matrix"),
 ##          as.numeric(.Call(dpoMatrix_matrix_solve,
 ##                           a, as.matrix(b))),
 ##          valueClass = "numeric")
-

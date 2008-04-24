@@ -71,6 +71,11 @@ setMethod("solve", signature(a = "dsCMatrix", b = "ddenseMatrix"),
               .Call(dsCMatrix_matrix_solve, a, b)
           },
           valueClass = "dgeMatrix")
+setMethod("solve", signature(a = "dsCMatrix", b = "denseMatrix"),
+	  ## only triggers for diagonal*, ldense*.. (but *not* ddense: above)
+	  function(a, b, ...)
+	      .Call(dsCMatrix_matrix_solve, a,
+		    as(.Call(dup_mMatrix_as_geMatrix, b), "dgeMatrix")))
 
 setMethod("solve", signature(a = "dsCMatrix", b = "matrix"),
           function(a, b, ...)

@@ -14,6 +14,11 @@
 \alias{rbind2,sparseMatrix,diagonalMatrix-method}
 \alias{rbind2,diagonalMatrix,sparseMatrix-method}
 \alias{determinant,diagonalMatrix,logical-method}
+\alias{norm,diagonalMatrix,character-method}
+%
+\alias{coerce,ddiMatrix,dgeMatrix-method}
+\alias{coerce,ddiMatrix,ddenseMatrix-method}
+\alias{coerce,ldiMatrix,ldenseMatrix-method}
 % Mainly against ambiguity warnings:
 % Horrible-Hack: currently define for "all subclasses of diagonalMatrix"
 % ------------- in ../R/diagMatrix.R
@@ -112,6 +117,7 @@
 \alias{\%*\%,CsparseMatrix,diagonalMatrix-method}
 \alias{\%*\%,sparseMatrix,diagonalMatrix-method}
 \alias{crossprod,diagonalMatrix,dgeMatrix-method}
+\alias{crossprod,diagonalMatrix,lgeMatrix-method}
 \alias{crossprod,diagonalMatrix,diagonalMatrix-method}
 \alias{crossprod,diagonalMatrix,matrix-method}
 \alias{crossprod,diagonalMatrix,missing-method}
@@ -120,6 +126,9 @@
 \alias{tcrossprod,diagonalMatrix,diagonalMatrix-method}
 \alias{tcrossprod,diagonalMatrix,sparseMatrix-method}
 \alias{tcrossprod,diagonalMatrix,matrix-method}
+\alias{tcrossprod,matrix,diagonalMatrix-method}
+\alias{tcrossprod,dgeMatrix,diagonalMatrix-method}
+\alias{tcrossprod,lgeMatrix,diagonalMatrix-method}
 \alias{tcrossprod,diagonalMatrix,missing-method}
 \alias{tcrossprod,sparseMatrix,diagonalMatrix-method}
 \alias{solve,diagonalMatrix,Matrix-method}

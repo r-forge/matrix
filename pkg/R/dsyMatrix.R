@@ -77,8 +77,9 @@ setMethod("solve", signature(a = "dsyMatrix", b = "matrix"),
           valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dsyMatrix", b = "ddenseMatrix"),
-          function(a, b, ...) .Call(dsyMatrix_matrix_solve, a, b),
-          valueClass = "dgeMatrix")
+	  function(a, b, ...) .Call(dsyMatrix_matrix_solve, a, b))
+setMethod("solve", signature(a = "dsyMatrix", b = "denseMatrix"), ## eg. for ddi* or ldi*
+	  function(a, b, ...) .Call(dsyMatrix_matrix_solve, a, as(b,"dMatrix")))
 
 setMethod("norm", signature(x = "dsyMatrix", type = "character"),
           function(x, type, ...) .Call(dsyMatrix_norm, x, type),

@@ -78,7 +78,8 @@ assert.EQ.mat <- function(M, m, tol = if(show) 0 else 1e-15, show=FALSE) {
 	storage.mode(MM) <- "integer"
     attr(MM, "dimnames") <- attr(m, "dimnames") <- NULL
     if(show) all.equal(MM, m, tol = tol)
-    else stopifnot(all.equal(MM, m, tol = tol))
+    else if(!isTRUE(r <- all.equal(MM, m, tol = tol)))
+	stop("all.equal() |->  ", r)
 }
 
 chk.matrix <- function(M) {

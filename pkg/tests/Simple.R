@@ -359,10 +359,9 @@ stopifnot(all.equal(eM$values,
 
 ##--- symmetric -> pos.def. needs valid test:
 m5 <- Matrix(diag(5) - 1)
-if(FALSE) { # FIXME: this as(.,.) happily "works"
- assertError(mpo <- as(m5, "dpoMatrix"))
- validObject(mpo) #-> TRUE  FIXME?  it is *not* really pos.definite!
-}
+assertError(as(m5, "dpoMatrix"))# not pos.definite!
+pm5 <- as(m5, "dspMatrix") # packed
+assertError(as(pm5, "dppMatrix"))# not pos.definite!
 
 ###-- dense nonzero pattern:
 class(m <- Matrix(TRUE,2,2)) # lsy

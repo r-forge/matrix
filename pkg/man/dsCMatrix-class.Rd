@@ -8,6 +8,7 @@
 \alias{solve,dsCMatrix,matrix-method}
 \alias{solve,dsCMatrix,numeric-method}
 \alias{solve,dsCMatrix,ddenseMatrix-method}
+\alias{solve,dsCMatrix,denseMatrix-method}
 \alias{t,dsCMatrix-method}
 \alias{t,dsTMatrix-method}
 \alias{coerce,dgeMatrix,dsCMatrix-method}

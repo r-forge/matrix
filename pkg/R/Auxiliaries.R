@@ -780,8 +780,10 @@ l2d_meth <- function(x) {
 
 class2 <- function(cl, kind = "l", do.sub = TRUE) {
     ## Find "corresponding" class; since pos.def. matrices have no pendant:
-    if	   (cl == "dpoMatrix") paste(kind, "syMatrix", sep='')
-    else if(cl == "dppMatrix") paste(kind, "spMatrix", sep='')
+    if(cl %in% c("dpoMatrix","corMatrix"))
+	paste(kind, "syMatrix", sep='')
+    else if(cl == "dppMatrix")
+	paste(kind, "spMatrix", sep='')
     else if(do.sub) sub("^[a-z]", kind, cl)
     else cl
 }
@@ -882,10 +884,9 @@ as_geSimpl2 <- function(from, cl = class(from))
 as_geSimpl <- function(from) as(from, paste(.M.kind(from), "geMatrix", sep=''))
 
 ## Smarter, (but sometimes too smart!) compared to geClass() above:
-as_smartClass <- function(x, cl) {
+as_smartClass <- function(x, cl, cld = getClassDef(cl)) {
     if(missing(cl)) return(as_geSimpl(x))
     ## else
-    cld <- getClassDef(cl)
     if(extends(cld, "diagonalMatrix")  && isDiagonal(x))
         ## diagonal* result:
 	as(x, cl)

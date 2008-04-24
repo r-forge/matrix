@@ -259,9 +259,9 @@ setClass("nspMatrix",
 
 ## 'diagonalMatrix' already has validity checking
 ## diagonal, numeric matrices;	    "d*" has 'x' slot :
-setClass("ddiMatrix", contains = c("diagonalMatrix", "ddenseMatrix"))# or "dMatrix"
+setClass("ddiMatrix", contains = c("diagonalMatrix", "dMatrix"))# or "dMatrix"
 ## diagonal, logical matrices; "ldense*" has 'x' slot :
-setClass("ldiMatrix", contains = c("diagonalMatrix", "ldenseMatrix"))
+setClass("ldiMatrix", contains = c("diagonalMatrix", "lMatrix"))
 
 setClass("corMatrix", representation(sd = "numeric"), contains = "dpoMatrix",
 	 validity = function(object) {

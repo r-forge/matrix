@@ -1,5 +1,8 @@
 \name{dsyMatrix-class}
 \docType{class}
+\alias{dspMatrix-class}
+\alias{dsyMatrix-class}
+%
 \alias{\%*\%,ddenseMatrix,dsyMatrix-method}
 \alias{\%*\%,matrix,dsyMatrix-method}
 \alias{\%*\%,dspMatrix,ddenseMatrix-method}
@@ -17,8 +20,6 @@
 \alias{coerce,dsyMatrix,matrix-method}
 \alias{coerce,matrix,dsyMatrix-method}
 \alias{show,dsyMatrix-method}
-\alias{dspMatrix-class}
-\alias{dsyMatrix-class}
 \alias{norm,dspMatrix,character-method}
 \alias{norm,dspMatrix,missing-method}
 \alias{norm,dsyMatrix,character-method}
@@ -31,6 +32,7 @@
 \alias{solve,dspMatrix,matrix-method}
 \alias{solve,dspMatrix,missing-method}
 \alias{solve,dsyMatrix,ddenseMatrix-method}
+\alias{solve,dsyMatrix,denseMatrix-method}
 \alias{solve,dsyMatrix,matrix-method}
 \alias{solve,dsyMatrix,missing-method}
 \alias{t,dspMatrix-method}
@@ -99,10 +101,11 @@ chol(sy2) #-> "Cholesky" matrix
 
 ## Coercing to dpoMatrix gives invalid object:
 sy3 <- new("dsyMatrix", Dim = as.integer(c(2,2)), x = c(14, -1, 2, -7))
-validObject(as(sy3, "dpoMatrix"), test=TRUE) #... not positive definite
+try(as(sy3, "dpoMatrix")) # -> error: not positive definite
 \dontshow{
-stopifnot(identical("dpoMatrix is not positive definite",
-                    validObject(as(sy3, "dpoMatrix"), test=TRUE)))
+tr <- try(as(sy3, "dpoMatrix"), silent=TRUE)
+stopifnot(1 == grep("not a positive definite matrix",
+                    as.character(tr)))
 }
 }
 \keyword{classes}

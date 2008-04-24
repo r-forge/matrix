@@ -223,12 +223,15 @@ setAs("ldiMatrix", "lgTMatrix",
 
 setAs("ldiMatrix", "lgCMatrix",
       function(from) as(as(from, "lgTMatrix"), "lgCMatrix"))
-}
+}##{unused}
 
-
-if(FALSE) # now have faster  "ddense" -> "dge"
 setAs("ddiMatrix", "dgeMatrix",
-      function(from) as(as(from, "matrix"), "dgeMatrix"))
+      function(from) .Call(dup_mMatrix_as_dgeMatrix, from))
+setAs("ddiMatrix", "ddenseMatrix",
+      function(from) as(as(from, "triangularMatrix"),"denseMatrix"))
+setAs("ldiMatrix", "ldenseMatrix",
+      function(from) as(as(from, "triangularMatrix"),"denseMatrix"))
+
 
 setAs("matrix", "diagonalMatrix",
       function(from) {
@@ -373,6 +376,8 @@ setMethod("skewpart", signature(x = "diagonalMatrix"), setZero)
 
 setMethod("chol", signature(x = "ddiMatrix"),
 	  function(x, pivot, ...) {
+	      if(x@diag == "U") return(x)
+	      ## else
 	      if(any(x@x < 0))
 		  stop("chol() is undefined for diagonal matrix with negative entries")
 	      x@x <- sqrt(x@x)
@@ -382,13 +387,28 @@ setMethod("chol", signature(x = "ddiMatrix"),
 setMethod("chol", signature(x = "ldiMatrix"), function(x, pivot, ...) x)
 
 setMethod("determinant", signature(x = "diagonalMatrix", logarithm = "logical"),
-	  function(x, logarithm, ...) mkDet(x@x, logarithm))
+	  function(x, logarithm, ...)
+          mkDet(if(x@diag == "U") rep.int(as1(x@x), x@Dim[1]) else x@x,
+                logarithm))
+
+setMethod("norm", signature(x = "diagonalMatrix", type = "character"),
+	  function(x, type, ...) {
+	      if((n <- x@Dim[1]) == 0) return(0) # as for "sparseMatrix"
+	      type <- toupper(substr(type[1], 1, 1))
+	      isU <- (x@diag == "U") # unit-diagonal
+	      if(type == "F") sqrt(if(isU) n else sum(x@x^2))
+	      else { ## norm == "I","1","O","M" :
+		  if(isU) 1 else max(abs(x@x))
+	      }
+	  })
+
+
 
 ## Basic Matrix Multiplication {many more to add}
 ##       ---------------------
 ## Note that "ldi" logical are treated as numeric
 diagdiagprod <- function(x, y) {
-    if(any(dim(x) != dim(y))) stop("non-matching dimensions")
+    n <- dimCheck(x,y)[1]
     if(x@diag != "U") {
 	if(y@diag != "U") {
 	    nx <- x@x * y@x
@@ -416,22 +436,21 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "missing"),
 
 
 diagmatprod <- function(x, y) {
+    ## x is diagonalMatrix
     dx <- dim(x)
     dy <- dim(y)
     if(dx[2] != dy[1]) stop("non-matching dimensions")
     n <- dx[1]
     as(if(x@diag == "U") y else x@x * y, "Matrix")
 }
-
 setMethod("%*%", signature(x = "diagonalMatrix", y = "matrix"),
 	  diagmatprod)
+## sneaky .. :
 formals(diagmatprod) <- alist(x=, y=NULL)
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "matrix"),
 	  diagmatprod)
-setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "matrix"),
-	  diagmatprod)
 
-diagdgeprod <- function(x, y) {
+diagGeprod <- function(x, y) {
     dx <- dim(x)
     dy <- dim(y)
     if(dx[2] != dy[1]) stop("non-matching dimensions")
@@ -439,33 +458,51 @@ diagdgeprod <- function(x, y) {
         y@x <- x@x * y@x
     y
 }
-setMethod("%*%", signature(x = "diagonalMatrix", y = "dgeMatrix"),
-	  diagdgeprod, valueClass = "dgeMatrix")
-formals(diagdgeprod) <- alist(x=, y=NULL)
+setMethod("%*%", signature(x= "diagonalMatrix", y= "dgeMatrix"), diagGeprod)
+setMethod("%*%", signature(x= "diagonalMatrix", y= "lgeMatrix"), diagGeprod)
+formals(diagGeprod) <- alist(x=, y=NULL)
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "dgeMatrix"),
-	  diagdgeprod, valueClass = "dgeMatrix")
+	  diagGeprod, valueClass = "dgeMatrix")
+setMethod("crossprod", signature(x = "diagonalMatrix", y = "lgeMatrix"),
+	  diagGeprod)
 
+matdiagprod <- function(x, y) {
+    dx <- dim(x)
+    dy <- dim(y)
+    if(dx[2] != dy[1]) stop("non-matching dimensions")
+    Matrix(if(y@diag == "U") x else x * rep(y@x, each = dx[1]))
+}
 setMethod("%*%", signature(x = "matrix", y = "diagonalMatrix"),
-	  function(x, y) {
-	      dx <- dim(x)
-	      dy <- dim(y)
-	      if(dx[2] != dy[1]) stop("non-matching dimensions")
-	      as(if(y@diag == "U") x else x * rep(y@x, each = dx[1]), "Matrix")
-	  })
+	  matdiagprod)
+formals(matdiagprod) <- alist(x=, y=NULL)
+setMethod("tcrossprod", signature(x = "matrix", y = "diagonalMatrix"),
+	  matdiagprod)
 
-setMethod("%*%", signature(x = "dgeMatrix", y = "diagonalMatrix"),
-	  function(x, y) {
-	      dx <- dim(x)
-	      dy <- dim(y)
-	      if(dx[2] != dy[1]) stop("non-matching dimensions")
-	      if(y@diag == "N")
-		  x@x <- x@x * rep(y@x, each = dx[1])
-	      x
-	  })
+gediagprod <- function(x, y) {
+    dx <- dim(x)
+    dy <- dim(y)
+    if(dx[2] != dy[1]) stop("non-matching dimensions")
+    if(y@diag == "N")
+	x@x <- x@x * rep(y@x, each = dx[1])
+    x
+}
+setMethod("%*%", signature(x= "dgeMatrix", y= "diagonalMatrix"), gediagprod)
+setMethod("%*%", signature(x= "lgeMatrix", y= "diagonalMatrix"), gediagprod)
+formals(gediagprod) <- alist(x=, y=NULL)
+setMethod("tcrossprod", signature(x = "dgeMatrix", y = "diagonalMatrix"),
+	  gediagprod)
+setMethod("tcrossprod", signature(x = "lgeMatrix", y = "diagonalMatrix"),
+	  gediagprod)
 
 ## crossprod {more of these}
 
 ## tcrossprod --- all are not yet there: do the dense ones here:
+
+setMethod("%*%", signature(x = "diagonalMatrix", y = "denseMatrix"),
+	  function(x, y) if(x@diag == "U") y else x %*% as(y, "generalMatrix"))
+setMethod("%*%", signature(x = "denseMatrix", y = "diagonalMatrix"),
+	  function(x, y) if(y@diag == "U") x else as(x, "generalMatrix") %*% y)
+
 
 ## FIXME:
 ## setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "denseMatrix"),
@@ -492,6 +529,8 @@ setMethod("tcrossprod", signature(x = "sparseMatrix", y = "diagonalMatrix"),
 ## FIXME?: In theory, this can be done *FASTER*, in some cases, via tapply1()
 setMethod("%*%", signature(x = "diagonalMatrix", y = "sparseMatrix"),
 	  function(x, y) as(x, "sparseMatrix") %*% y)
+setMethod("%*%", signature(x = "sparseMatrix", y = "diagonalMatrix"),
+	  function(x, y) x %*% as(y, "sparseMatrix"))
 ## NB: The previous is *not* triggering for  "ddi" o "dgC" (= distance 3)
 ##     since there's a "ddense" o "Csparse" at dist. 2 => triggers first.
 ## ==> do this:
@@ -503,8 +542,6 @@ setMethod("%*%", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
 ## TODO: Write tests in ./tests/ which ensure that many "ops" with diagonal*
 ##       do indeed work by going through sparse (and *not* ddense)!
 
-setMethod("%*%", signature(x = "sparseMatrix", y = "diagonalMatrix"),
-	  function(x, y) x %*% as(y, "sparseMatrix"))
 
 
 setMethod("solve", signature(a = "diagonalMatrix", b = "missing"),
