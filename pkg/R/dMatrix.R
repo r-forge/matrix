@@ -65,9 +65,6 @@ setAs("dMatrix", "nMatrix",
 ## setMethod("solve", signature(a = "dMatrix", b = "integer"),
 ##           function(a, b, ...) callGeneric(a, as.numeric(b)))
 
-setMethod("expm", signature(x = "dMatrix"),
-	  function(x) expm(as(x, "dgeMatrix")))
-
 
 ## Group Methods, see ?Arith (e.g.)
 ## -----
