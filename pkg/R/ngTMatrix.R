@@ -56,7 +56,7 @@ setAs("ngTMatrix", "lMatrix", function(from) as(from, "lgTMatrix"))
 
 setAs("ngTMatrix", "ntTMatrix",
       function(from) check.gT2tT(from, cl = "ngTMatrix", toClass = "ntTMatrix"))
-setAs("ngTMatrix", "triangularTMatrix", function(from) as(from, "ntTMatrix"))
+setAs("ngTMatrix", "triangularMatrix", function(from) as(from, "ntTMatrix"))
 
 
 if(FALSE) ## unneeded: use t.<TsparseMatrix>
