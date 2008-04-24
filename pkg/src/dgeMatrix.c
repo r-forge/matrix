@@ -137,13 +137,17 @@ SEXP dgeMatrix_matrix_crossprod(SEXP x, SEXP y, SEXP trans)
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
     int *xDims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	*yDims = INTEGER(getAttrib(y, R_DimSymbol)),
-	*vDims;
+	*vDims, nprot = 1;
     int m  = xDims[!tr],  n = yDims[!tr];/* -> result dim */
     int xd = xDims[ tr], yd = yDims[ tr];/* the conformable dims */
     double one = 1.0, zero = 0.0;
 
+    if (isInteger(y)) {
+	y = PROTECT(coerceVector(y, REALSXP));
+	nprot++;
+    }
     if (!(isMatrix(y) && isReal(y)))
-	error(_("Argument y must be a numeric (real) matrix"));
+	error(_("Argument y must be a numeric matrix"));
     SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
     SET_SLOT(val, Matrix_DimSym, allocVector(INTSXP, 2));
     vDims = INTEGER(GET_SLOT(val, Matrix_DimSym));
@@ -158,7 +162,7 @@ SEXP dgeMatrix_matrix_crossprod(SEXP x, SEXP y, SEXP trans)
 			REAL(y), yDims,
 			&zero, REAL(GET_SLOT(val, Matrix_xSym)), &m);
     }
-    UNPROTECT(1);
+    UNPROTECT(nprot);
     return val;
 }
 
