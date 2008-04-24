@@ -366,7 +366,8 @@ checkMatrix <- function(m, m.m = as(m, "matrix"),
 	    stopifnot(identical(m, m & TRUE),
 		      identical(m, FALSE | m))
 	}
-	else if(extends(cld, "triangularMatrix")) {
+
+	if(extends(cld, "triangularMatrix")) {
 	    mm. <- m
 	    i0 <- if(m@uplo == "L")
 		upper.tri(mm.) else lower.tri(mm.)
@@ -375,7 +376,8 @@ checkMatrix <- function(m, m.m = as(m, "matrix"),
 	    tm <- as(as(mm., "triangularMatrix"), clNam)
 	    Cat("valid:", validObject(tm), "\n")
             if(m@uplo == tm@uplo) ## otherwise, the matrix effectively was *diagonal*
-                stopifnot(Qidentical(tm, Matrix:::diagU2N(m)))
+                ## note that diagU2N(<dtr>) |-> dtC :
+                stopifnot(Qidentical(tm, as(Matrix:::diagU2N(m), clNam)))
 	}
 	else if(extends(cld, "diagonalMatrix")) {
 
