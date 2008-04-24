@@ -401,7 +401,7 @@ const static double padec [] = /* for matrix exponential calculation. */
 };
 
 /**
- * Matrix exponential - based on the _FIXED_ code for Octave's expm function.
+ * Matrix exponential - based on the _corrected_ code for Octave's expm function.
  *
  * @param x real square matrix to exponentiate
  *
@@ -427,8 +427,11 @@ SEXP dgeMatrix_exp(SEXP x)
 
     if (n < 1 || Dims[0] != n)
 	error(_("Matrix exponential requires square, non-null matrix"));
-
-    /* FIXME: Add special treatment for n == 1 */
+    if(n == 1) {
+	v[0] = exp(v[0]);
+	UNPROTECT(1);
+	return val;
+    }
 
     /* Preconditioning 1.  Shift diagonal by average diagonal if positive. */
     trshift = 0;		/* determine average diagonal element */
