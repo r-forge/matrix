@@ -50,8 +50,9 @@
 \alias{rbind2,ldiMatrix,atomicVector-method}
 \alias{rbind2,atomicVector,ddiMatrix-method}
 \alias{rbind2,atomicVector,ldiMatrix-method}
-\alias{diag,ddiMatrix-method}
-\alias{diag,ldiMatrix-method}
+\alias{diag,diagonalMatrix-method}
+% \alias{diag,ddiMatrix-method}
+% \alias{diag,ldiMatrix-method}
 %
 \alias{Ops,ddiMatrix,sparseMatrix-method}
 \alias{Ops,sparseMatrix,ddiMatrix-method}

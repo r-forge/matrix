@@ -324,32 +324,30 @@ checkMatrix <- function(m, m.m = as(m, "matrix"),
 			     as(m12, "generalMatrix")))
 
     if(doOps) {
-        if(extends(cld, "dMatrix")) { ## <<<<<<<<< FIXME! should *NOT* be needed!
-            ## makes sense with non-trivial m (!)
-            CatF("2*m =?= m+m: ")
-            if(identical(2*m, m+m)) Cat("identical\n")
-            else {
-                stopifnot(as(2*m,"matrix") == as(m+m, "matrix"))
-                Cat("ok\n")
-            }
-            ## m == m etc, now for all, see above
-            CatF("m >= m for all: "); stopifnot(all(m >= m | ina)); Cat("ok\n")
-	    if(d[1] * d[2] > 0) {
-		CatF("m < m for none: "); stopifnot(!all(m < m & !ina)); Cat("ok\n")
-	    }
-
-            if(isSqr) {
-                ## determinant(<dense>) "fails" for triangular with NA such as
-                ## (m <- matrix(c(1:0,NA,1), 2))
-                CatF("det...(): ")
-                if(any(is.na(m.m)) && extends(cld, "triangularMatrix"))
-                    Cat(" skipped: is triang. and has NA")
-                else
-                    stopifnot(all.equal(determinant(m.m), determinant(m)))
-                Cat("ok\n")
-            }
-            else assertError(determinant(m))
+        ## makes sense with non-trivial m (!)
+        CatF("2*m =?= m+m: ")
+        if(identical(2*m, m+m)) Cat("identical\n")
+        else {
+            stopifnot(as(2*m,"matrix") == as(m+m, "matrix"))
+            Cat("ok\n")
         }
+        ## m == m etc, now for all, see above
+        CatF("m >= m for all: "); stopifnot(all(m >= m | ina)); Cat("ok\n")
+        if(d[1] * d[2] > 0) {
+            CatF("m < m for none: "); stopifnot(!all(m < m & !ina)); Cat("ok\n")
+        }
+
+        if(isSqr) {
+            ## determinant(<dense>) "fails" for triangular with NA such as
+            ## (m <- matrix(c(1:0,NA,1), 2))
+            CatF("det...(): ")
+            if(any(is.na(m.m)) && extends(cld, "triangularMatrix"))
+                Cat(" skipped: is triang. and has NA")
+            else
+                stopifnot(all.equal(determinant(m.m), determinant(m)))
+            Cat("ok\n")
+        }
+        else assertError(determinant(m))
     }
 
     if(doCoerce && canCoerce("matrix", clNam)) {

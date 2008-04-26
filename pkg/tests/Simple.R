@@ -132,9 +132,11 @@ ltu - (ttu > 0) # failed
 
 lcu <- new("ltCMatrix", Dim = c(4L, 4L), i = c(0:1, 0L), p = c(0L, 0:3),
            x = c(TRUE, FALSE, FALSE), uplo = "U", diag = "U")
-(ncu <- as(lcu, "nMatrix"))# was completely wrong
-stopifnot(identical3(rowSums(lcu), rowSums(drop0(lcu)),
-                    rowSums(ncu)))
+stopifnot(identical(rowSums(lcu), rowSums(drop0(lcu))))
+(ncu <- as(lcu, "nMatrix"))# -- gives the "pattern" of lcu, i.e. FALSE are *there*
+stopifnot(identical(ncu, as(lcu,"nsparseMatrix")),
+          identical(rowSums(ncu), c(3:1, 1L)))
+
 
 assert.EQ.mat(cu, as(tu,"matrix"), tol=0)
 assert.EQ.mat(cnu, as(tu,"matrix"), tol=0)

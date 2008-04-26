@@ -1,5 +1,5 @@
 \name{nsparseMatrix-classes}
-\title{Sparse logical matrices}
+\title{Sparse "pattern" Matrices}
 \docType{class}
 \alias{nsparseMatrix-class}
 \alias{ngCMatrix-class}
@@ -19,6 +19,7 @@
 \alias{\%*\%,nsparseMatrix,ndenseMatrix-method}
 \alias{\%*\%,ndenseMatrix,nsparseMatrix-method}
 
+\alias{coerce,nsparseMatrix,dsparseMatrix-method}
 \alias{coerce,matrix,ngCMatrix-method}
 \alias{coerce,matrix,ngTMatrix-method}
 \alias{coerce,matrix,ntCMatrix-method}
@@ -99,7 +100,8 @@
 \alias{Ops,nsparseMatrix,sparseMatrix-method}
 %
 \description{The \code{nsparseMatrix} class is a virtual class of sparse
-  matrices with \code{TRUE}/\code{FALSE} entries.  Only the positions of the
+  \emph{\dQuote{pattern}} matrices, i.e., binary matrices conceptually
+  with \code{TRUE}/\code{FALSE} entries.  Only the positions of the
   elements that are \code{TRUE} are stored.  These can be stored in the
   ``triplet'' form (classes \code{ngTMatrix}, \code{nsTMatrix}, and
   \code{ntTMatrix} which really contain pairs, not triplets) or in
@@ -112,14 +114,14 @@
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("ngCMatrix",
     ...)} and so on.  More frequently objects are created by coercion of
-  a numeric sparse matrix to the logical form for use in
+  a numeric sparse matrix to the pattern form for use in
   the symbolic analysis phase
   of an algorithm involving sparse matrices.  Such algorithms often
   involve two phases: a symbolic phase wherein the positions of the
   non-zeros in the result are determined and a numeric phase wherein the
   actual results are calculated.  During the symbolic phase only the
   positions of the non-zero elements in any operands are of interest,
-  hence any numeric sparse matrices can be treated as logical sparse
+  hence numeric sparse matrices can be treated as sparse pattern
   matrices.
 }
 \section{Slots}{
@@ -151,7 +153,13 @@
 }
 \section{Methods}{
   \describe{
-    \item{coerce}{\code{signature(from = "dgCMatrix", to = "ngCMatrix")}}
+    \item{coerce}{\code{signature(from = "dgCMatrix", to =
+	"ngCMatrix")}, and many similar ones; typically you should
+      coerce to \code{"nsparseMatrix"} (or \code{"nMatrix"}).  Note that
+      coercion to a sparse pattern matrix records all the potential
+      non-zero entries, i.e., explicit (\dQuote{non-structural}) zeroes
+      are coerced to \code{TRUE}, not \code{FALSE}, see the example.
+    }
     \item{t}{\code{signature(x = "ngCMatrix")}: returns the transpose
       of \code{x}}
   }
@@ -171,6 +179,8 @@ str(nm) # no 'x' slot
 ## consistency check:
 stopifnot(xor(as( nm, "matrix"),
               as(!nm, "matrix")))
+
+
 
 data(KNex)
 nmm <- as(KNex $ mm, "ngCMatrix")

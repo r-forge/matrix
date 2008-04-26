@@ -527,7 +527,9 @@ setMethod("is.na", signature(x = "sparseMatrix"),## NB: nsparse* have own method
 		      inax <- is.na((x <- .diagU2N(x, cld))@x)
 		  r <- as(x, "lMatrix") # will be "lsparseMatrix" - *has* x slot
 		  r@x <- inax
-		  as(r, "nMatrix") # a 'pattern matrix
+                  if(!extends(cld, "CsparseMatrix"))
+                      r <- as(r, "CsparseMatrix")
+		  as(.Call(Csparse_drop, r, 0), "nMatrix") # a 'pattern matrix
 	      }
 	      else is.na_nsp(x)
 	  })

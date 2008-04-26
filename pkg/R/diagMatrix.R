@@ -181,49 +181,12 @@ setMethod("as.vector", signature(x = "diagonalMatrix", mode="missing"),
 setAs("diagonalMatrix", "generalMatrix", # prefer sparse:
       function(from) as(as(from, "CsparseMatrix"), "generalMatrix"))
 
-.diag.x <- function(m) {
-    if(m@diag == "U")
-	rep.int(if(is.numeric(m@x)) 1. else TRUE, m@Dim[1])
-    else m@x
-}
+.diag.x <- function(m) if(m@diag == "U") rep.int(as1(m@x), m@Dim[1]) else m@x
 
 .diag.2N <- function(m) {
     if(m@diag == "U") m@diag <- "N"
     m
 }
-
-if(FALSE) {
-## given the above, the following  4  coercions should be all unneeded;
-## we prefer triangular to general:
-setAs("ddiMatrix", "dgTMatrix",
-      function(from) {
-	  .Deprecated("as(, \"sparseMatrix\")")
-	  n <- from@Dim[1]
-	  i <- seq_len(n) - 1L
-	  new("dgTMatrix", i = i, j = i, x = .diag.x(from),
-	      Dim = c(n,n), Dimnames = from@Dimnames) })
-
-setAs("ddiMatrix", "dgCMatrix",
-      function(from) as(as(from, "sparseMatrix"), "dgCMatrix"))
-
-setAs("ldiMatrix", "lgTMatrix",
-      function(from) {
-	  .Deprecated("as(, \"sparseMatrix\")")
-	  n <- from@Dim[1]
-	  if(from@diag == "U") { # unit-diagonal
-	      x <- rep.int(TRUE, n)
-	      i <- seq_len(n) - 1L
-	  } else { # "normal"
-	      nz <- nz.NA(from@x, na. = TRUE)
-	      x <- from@x[nz]
-	      i <- which(nz) - 1L
-	  }
-	  new("lgTMatrix", i = i, j = i, x = x,
-	      Dim = c(n,n), Dimnames = from@Dimnames) })
-
-setAs("ldiMatrix", "lgCMatrix",
-      function(from) as(as(from, "lgTMatrix"), "lgCMatrix"))
-}##{unused}
 
 setAs("ddiMatrix", "dgeMatrix",
       function(from) .Call(dup_mMatrix_as_dgeMatrix, from))
@@ -273,14 +236,8 @@ setAs("Matrix", "diagonalMatrix",
       })
 
 
-## In order to evade method dispatch ambiguity warnings,
-## we use this hack instead of signature  x = "diagonalMatrix" :
-diCls <- names(getClass("diagonalMatrix")@subclasses)
-for(cls in diCls) {
-    setMethod("diag", signature(x = cls),
-	      function(x = 1, nrow, ncol) .diag.x(x))
-}
-
+setMethod("diag", signature(x = "diagonalMatrix"),
+          function(x = 1, nrow, ncol) .diag.x(x))
 
 subDiag <- function(x, i, j, ..., drop) {
     x <- as(x, "sparseMatrix")
@@ -387,9 +344,7 @@ setMethod("chol", signature(x = "ddiMatrix"),
 setMethod("chol", signature(x = "ldiMatrix"), function(x, pivot, ...) x)
 
 setMethod("determinant", signature(x = "diagonalMatrix", logarithm = "logical"),
-	  function(x, logarithm, ...)
-          mkDet(if(x@diag == "U") rep.int(as1(x@x), x@Dim[1]) else x@x,
-                logarithm))
+	  function(x, logarithm, ...) mkDet(.diag.x(x), logarithm))
 
 setMethod("norm", signature(x = "diagonalMatrix", type = "character"),
 	  function(x, type, ...) {
@@ -614,6 +569,8 @@ diagOdiag <- function(e1,e2) {
 }
 
 ### This would be *the* way, but we get tons of "ambiguous method dispatch"
+## we use this hack instead of signature  x = "diagonalMatrix" :
+diCls <- names(getClass("diagonalMatrix")@subclasses)
 if(FALSE) {
 setMethod("Ops", signature(e1 = "diagonalMatrix", e2 = "diagonalMatrix"),
           diagOdiag)

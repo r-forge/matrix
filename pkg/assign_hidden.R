@@ -28,3 +28,5 @@ dup_mMatrix_as_dgeMatrix <- Matrix:::dup_mMatrix_as_dgeMatrix
 dup_mMatrix_as_geMatrix  <- Matrix:::dup_mMatrix_as_geMatrix
 dsCMatrix_matrix_solve  <-  Matrix:::dsCMatrix_matrix_solve
 dsyMatrix_matrix_solve  <-  Matrix:::dsyMatrix_matrix_solve
+Csparse_to_nz_pattern   <-  Matrix:::Csparse_to_nz_pattern
+Ops.x.x <- Matrix:::Ops.x.x
