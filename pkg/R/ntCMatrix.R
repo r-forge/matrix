@@ -39,12 +39,6 @@ setAs("ngCMatrix", "ntCMatrix", # to triangular, needed for triu,..
 ## setAs("ntCMatrix", "generalMatrix",
 ##       function(from) ......)
 
-setMethod("image", "ntCMatrix",
-          function(x, ...) {
-              x <- as(as(x, "dtCMatrix"), "dgTMatrix")
-              callGeneric()
-          })
-
 ## setMethod("t", signature(x = "ntCMatrix"),
 ##           function(x) .Call(ntCMatrix_trans, x),
 ##           valueClass = "ntCMatrix")

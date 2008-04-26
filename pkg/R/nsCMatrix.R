@@ -54,10 +54,6 @@ setMethod("triu", "nsCMatrix",
 	      else triu(as(x, "ngCMatrix"), k = k, ...)
 	  })
 
-## FIXME: generalize to "nsparseMatrix" or (class union)  "symmetric sparse"
-setMethod("image", "nsCMatrix",
-	  function(x, ...) image(as(as(x, "dsCMatrix"), "dgTMatrix"), ...))
-
 setMethod("chol", signature(x = "nsCMatrix"),
 	  function(x, pivot=FALSE, ...) stop("temporarily disabled"))## FIXME
 

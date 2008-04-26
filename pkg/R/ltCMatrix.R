@@ -25,12 +25,6 @@ setAs("lgCMatrix", "ltCMatrix", # to triangular {needed in triu() }
 ## setAs("ltCMatrix", "generalMatrix",
 ##       function(from) ......)
 
-setMethod("image", "ltCMatrix",
-          function(x, ...) {
-              x <- as(as(x, "dtCMatrix"), "dgTMatrix")
-              callGeneric()
-          })
-
 ## setMethod("t", signature(x = "ltCMatrix"),
 ##           function(x) .Call(ltCMatrix_trans, x),
 ##           valueClass = "ltCMatrix")
