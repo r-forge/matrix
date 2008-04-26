@@ -1,21 +1,13 @@
 #### Superclass Methods for all sparse nonzero-pattern matrices
 
-## Would be nice to do this, but it also triggers for e.g.
-## ngCMatrix and hence infinite recursion
-if(FALSE) ## "bug" in 'methods' -  R_FIXME ?
 setAs("CsparseMatrix", "nsparseMatrix",
       function(from) .Call(Csparse_to_nz_pattern, from,
 			   is(from, "triangularMatrix")))
-setAs("CsparseMatrix", "nsparseMatrix",
-      function(from) {
-	  cld <- getClassDef(class(from))
-	  if(extends(cld, "nsparseMatrix"))
-	      from
-	  else
-	      .Call(Csparse_to_nz_pattern, from,
-		    extends(cld, "triangularMatrix"))
-      })
+setAs("CsparseMatrix", "nMatrix",
+      function(from) .Call(Csparse_to_nz_pattern, from,
+			   is(from, "triangularMatrix")))
 
+setAs("nsparseMatrix", "dsparseMatrix", function(from) as(from, "dMatrix"))
 
 ###------- Work via  as(*, lgC) : ------------
 
@@ -44,4 +36,4 @@ setMethod("crossprod", signature(x = "nsparseMatrix", y = "nsparseMatrix"),
 
 setMethod("is.na", signature(x = "nsparseMatrix"), is.na_nsp)
 
-
+setMethod("image", "lsparseMatrix", function(x, ...) image(as(x,"dMatrix")))

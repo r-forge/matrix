@@ -10,20 +10,13 @@
 \alias{image,dgCMatrix-method}
 \alias{image,dgTMatrix-method}
 \alias{image,dsparseMatrix-method}
-\alias{image,lgCMatrix-method}
-\alias{image,lsCMatrix-method}
-\alias{image,lsTMatrix-method}
-\alias{image,ltCMatrix-method}
-\alias{image,ltTMatrix-method}
-\alias{image,ngCMatrix-method}
-\alias{image,nsCMatrix-method}
-\alias{image,nsTMatrix-method}
-\alias{image,ntCMatrix-method}
-\alias{image,ntTMatrix-method}
+\alias{image,lsparseMatrix-method}
+\alias{image,nsparseMatrix-method}
 \description{
   Methods for function \code{\link[graphics]{image}} in package
-  \pkg{Matrix}.  An image of a matrix
-
+  \pkg{Matrix}.  An image of a matrix simply color codes all matrix
+  entries and draws the \eqn{n\times m}{n x m} matrix using an
+  \eqn{n\times m}{n x m} grid of (colored) rectangles.
 }
 \usage{% want \usage{} since we have many "surprising arguments"
 \S4method{image}{dgTMatrix}(x,

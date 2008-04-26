@@ -66,6 +66,3 @@ setAs("matrix", "ngCMatrix",
 ## 	  function(x, y = NULL)
 ##           .Call(ngCMatrix_crossprod, x, FALSE, NULL),
 ## 	  valueClass = "nsCMatrix")
-
-setMethod("image", "ngCMatrix",
-	  function(x, ...) image(as(as(x, "dgCMatrix"), "dgTMatrix"), ...))
