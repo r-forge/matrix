@@ -22,12 +22,6 @@ setAs("lsTMatrix", "dsTMatrix",
 setAs("lsTMatrix", "lsyMatrix",
       function(from) .Call(lsTMatrix_as_lsyMatrix, from))
 
-## untested:
-setMethod("image", "lsTMatrix",
-          function(x, ...) {
-              x <- as(as(x, "dsTMatrix"), "dgTMatrix")
-              callGeneric()
-          })
 
 setMethod("t", "lsTMatrix",
 	  function(x)

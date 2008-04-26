@@ -29,13 +29,6 @@ setAs("ntTMatrix", "matrix",
       function(from) as(as(from, "ntrMatrix"), "matrix"))
 
 
-## untested:
-setMethod("image", "ntTMatrix",
-          function(x, ...) {
-              x <- as(as(x, "dtTMatrix"), "dgTMatrix")
-              callGeneric()
-          })
-
 setMethod("t", "ntTMatrix",
 	  function(x)
 	  new("ntTMatrix", Dim = x@Dim[2:1], Dimnames = x@Dimnames[2:1],

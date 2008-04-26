@@ -21,13 +21,6 @@ setAs("nsTMatrix", "nsyMatrix",
       function(from) .Call(nsTMatrix_as_nsyMatrix, from))
 
 
-## untested:
-setMethod("image", "nsTMatrix",
-          function(x, ...) {
-              x <- as(as(x, "dsTMatrix"), "dgTMatrix")
-              callGeneric()
-          })
-
 setMethod("t", "nsTMatrix",
 	  function(x)
 	  new("nsTMatrix", Dim = x@Dim, Dimnames = x@Dimnames,

@@ -1,3 +1,8 @@
+2008-04-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* inst/test-tools.R (checkMatrix): test <Ops> not only for dMatrix
+	* R/Ops.R: more methods, for lMatrix/nMatrix
+
 2008-04-24  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/expm.R: new file for all expm() methods; notably new ones for

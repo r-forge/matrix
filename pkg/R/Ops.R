@@ -238,9 +238,24 @@ setMethod("Ops", signature(e1 = "lMatrix", e2 = "lMatrix"), Ops.x.x)
 setMethod("Compare", signature(e1 = "nMatrix", e2 = "nMatrix"), Ops.x.x)
 
 ## l o d : depends on *kind* of Ops -- but Ops.x.x works on slots - correctly:
-setMethod("Ops", signature(e1="lMatrix", e2="dMatrix"), Ops.x.x)
+setMethod("Ops", signature(e1="lMatrix", e2="dMatrix"),
+	  Ops.x.x)
 setMethod("Ops", signature(e1="dMatrix", e2="lMatrix"), Ops.x.x)
 
+## lMatrix & nMatrix ... probably should also just use "Matrix" ?
+setMethod("Ops", signature(e1="lMatrix", e2="numeric"),
+	  function(e1,e2) callGeneric(as(e1,"dMatrix"), e2))
+setMethod("Ops", signature(e1="numeric", e2="lMatrix"),
+	  function(e1,e2) callGeneric(e1, as(e2,"dMatrix")))
+setMethod("Ops", signature(e1="nMatrix", e2="numeric"),
+	  function(e1,e2) callGeneric(as(e1,"dMatrix"), e2))
+setMethod("Ops", signature(e1="numeric", e2="nMatrix"),
+	  function(e1,e2) callGeneric(e1, as(e2,"dMatrix")))
+
+setMethod("Ops", signature(e1="Matrix", e2="logical"),
+	  function(e1,e2) callGeneric(as(e1,"lMatrix"), e2))
+setMethod("Ops", signature(e1="logical", e2="Matrix"),
+	  function(e1,e2) callGeneric(e1, as(e2,"lMatrix")))
 
 ### --  I -- dense -----------------------------------------------------------
 
@@ -561,6 +576,26 @@ setMethod("Arith", signature(e1="lgCMatrix", e2="lgCMatrix"),
 setMethod("Arith", signature(e1="lgTMatrix", e2="lgTMatrix"),
 	  function(e1, e2) callGeneric(as(e1, "dgTMatrix"), as(e2, "dgTMatrix")))
 
+## More generally:  Arith: l* and n*  via  d*
+setMethod("Arith", signature(e1="lsparseMatrix", e2="Matrix"),
+	  function(e1, e2) callGeneric(as(e1, "dMatrix"), as(e2,"dMatrix")))
+setMethod("Arith", signature(e1="Matrix", e2="lsparseMatrix"),
+	  function(e1, e2) callGeneric(as(e1, "dMatrix"), as(e2,"dMatrix")))
+setMethod("Arith", signature(e1="nsparseMatrix", e2="Matrix"),
+	  function(e1, e2) callGeneric(as(e1, "dMatrix"), as(e2,"dMatrix")))
+setMethod("Arith", signature(e1="Matrix", e2="nsparseMatrix"),
+	  function(e1, e2) callGeneric(as(e1, "dMatrix"), as(e2,"dMatrix")))
+##
+setMethod("Arith", signature(e1="lMatrix", e2="numeric"),
+	  function(e1, e2) callGeneric(as(e1, "dMatrix"), e2))
+setMethod("Arith", signature(e1="numeric", e2="lMatrix"),
+	  function(e1, e2) callGeneric(e1, as(e2,"dMatrix")))
+setMethod("Arith", signature(e1="nMatrix", e2="numeric"),
+	  function(e1, e2) callGeneric(as(e1, "dMatrix"), e2))
+setMethod("Arith", signature(e1="numeric", e2="nMatrix"),
+	  function(e1, e2) callGeneric(e1, as(e2,"dMatrix")))
+
+
 ## FIXME: These are really too cheap: currently almost all go via dgC*() :
 ## setMethod("Compare", signature(e1="lgCMatrix", e2="lgCMatrix"),
 ## setMethod("Compare", signature(e1="lgTMatrix", e2="lgTMatrix"),
@@ -796,7 +831,7 @@ setMethod("Arith", signature(e1 = "CsparseMatrix", e2 = "numeric"),
 		  }
 	      }
 	      ## all other (potentially non-sparse) cases: give up symm, tri,..
-	      callGeneric(as(e1, paste(.M.kind(e1), "gCMatrix", sep='')), e2)
+	      callGeneric(as(as(e1, "dMatrix"), "dgCMatrix"), e2)
 	  })
 
 ## The same,  e1 <-> e2 :
@@ -810,8 +845,9 @@ setMethod("Arith", signature(e1 = "numeric", e2 = "CsparseMatrix"),
 		      return(e2)
 		  }
 	      }
-	      callGeneric(e1, as(e2, paste(.M.kind(e2), "gCMatrix", sep='')))
+	      callGeneric(e1, as(as(e2, "dMatrix"), "dgCMatrix"))
 	  })
+
 
 setMethod("Compare", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 	  function(e1, e2) {

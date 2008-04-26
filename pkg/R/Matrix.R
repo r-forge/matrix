@@ -327,7 +327,8 @@ environment(det) <- environment()## == as.environment("Matrix")
 setMethod("chol", signature(x = "Matrix"),
 	  function(x, pivot, ...) .bail.out.1(.Generic, class(x)))
 setMethod("determinant", signature(x = "Matrix", logarithm = "logical"),
-	  function(x, logarithm, ...) .bail.out.1(.Generic, class(x)))
+	  function(x, logarithm, ...)
+	  determinant(as(x,"dMatrix"), logarithm=logarithm, ...))
 
 setMethod("diag", signature(x = "Matrix"),
 	  function(x, nrow, ncol) .bail.out.1(.Generic, class(x)))
