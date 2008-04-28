@@ -1,5 +1,8 @@
 2008-04-28  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* inst/test-tools.R (checkMatrix): add fixed determinant.matrix()
+	for R < 2.7.0.
+
 	* R/Tsparse.R ([): for triangularMatrix, check if result may be
 	triangular.
 	* tests/indexing.R: regression test
