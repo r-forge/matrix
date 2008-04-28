@@ -1,5 +1,7 @@
 2008-04-28  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* R/Auxiliaries.R (cholMat): possibly keep packed
+
 	* inst/test-tools.R (checkMatrix): add fixed determinant.matrix()
 	for R < 2.7.0.
 

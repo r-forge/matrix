@@ -364,6 +364,9 @@ m5 <- Matrix(diag(5) - 1)
 assertError(as(m5, "dpoMatrix"))# not pos.definite!
 pm5 <- as(m5, "dspMatrix") # packed
 assertError(as(pm5, "dppMatrix"))# not pos.definite!
+sm <- as(Matrix(diag(5) + 1),"dspMatrix")
+pm <- as(sm,"dpoMatrix")## gave infinite recursion (for a day or so)
+pp <- as(pm,"dppMatrix")
 
 ###-- dense nonzero pattern:
 class(m <- Matrix(TRUE,2,2)) # lsy

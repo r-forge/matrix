@@ -49,7 +49,9 @@ copyClass <- function(x, newCl, sNames =
 
 ## chol() via "dpoMatrix"
 cholMat <- function(x, pivot = FALSE, ...) {
-    px <- as(x, "dpoMatrix")
+    ## This will only be called for *dense* matrices
+    px <- as(x, if(length(x@x) < prod(dim(x))) ## packed
+	     "dppMatrix" else "dpoMatrix")
     if (isTRUE(validObject(px, test=TRUE))) chol(px, pivot, ...)
     else stop("'x' is not positive definite -- chol() undefined.")
 }

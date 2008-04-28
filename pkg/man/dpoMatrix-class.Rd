@@ -5,9 +5,10 @@
 \alias{dppMatrix-class}
 \alias{corMatrix-class}
 %      ---
-\alias{coerce,dpoMatrix,dppMatrix-method}
 \alias{coerce,dpoMatrix,corMatrix-method}
+\alias{coerce,dpoMatrix,dppMatrix-method}
 \alias{coerce,dppMatrix,dpoMatrix-method}
+\alias{coerce,dspMatrix,dpoMatrix-method}
 \alias{coerce,dspMatrix,dppMatrix-method}
 \alias{coerce,matrix,corMatrix-method}
 \alias{coerce,Matrix,corMatrix-method}

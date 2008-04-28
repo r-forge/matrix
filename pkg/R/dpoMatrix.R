@@ -21,11 +21,16 @@ if(FALSE) # should no longer be needed
 setAs("corMatrix", "lMatrix",
       function(from) as(as(from, "dpoMatrix"), "lMatrix"))
 
-to_dpo <- function(from) # not't coercing to "dsy*" explicitly:
+## Needed *in addition* to the general to_dpo() method below:
+setAs("dspMatrix", "dpoMatrix",
+      function(from) as(as(from,"dsyMatrix"), "dpoMatrix"))
+
+to_dpo <- function(from) # not coercing to "dsy*" explicitly:
     as(as(as(as(from, "symmetricMatrix"), "dMatrix"),
-          "denseMatrix"), "dpoMatrix")
+	  "denseMatrix"), "dpoMatrix")
 setAs("Matrix", "dpoMatrix", to_dpo)
 setAs("matrix", "dpoMatrix", to_dpo)
+
 
 
 setMethod("chol", signature(x = "dpoMatrix"),
