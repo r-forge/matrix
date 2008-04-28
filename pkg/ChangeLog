@@ -1,3 +1,9 @@
+2008-04-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Tsparse.R ([): for triangularMatrix, check if result may be
+	triangular.
+	* tests/indexing.R: regression test
+
 2008-04-26  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* inst/test-tools.R (checkMatrix): test <Ops> not only for dMatrix

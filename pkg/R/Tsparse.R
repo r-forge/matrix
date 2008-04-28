@@ -15,8 +15,9 @@ setAs("matrix", "TsparseMatrix",
 setAs("TsparseMatrix", "CsparseMatrix", .T.2.C)
 
 .T.2.n <- function(from) {
-    if(any(is0(from@x))) ## 0 or FALSE -- the following should have drop0Tsp(.)
-	from <- as(drop0(from), "TsparseMatrix")
+    ## No: coercing to n(sparse)Matrix gives the "full" pattern including 0's
+    ## if(any(is0(from@x))) ## 0 or FALSE -- the following should have drop0Tsp(.)
+    ##	from <- as(drop0(from), "TsparseMatrix")
     if(is(from, "triangularMatrix")) # i.e. ?tTMatrix
 	new("ntTMatrix", i = from@i, j = from@j,
 	    uplo = from@uplo, diag = from@diag,
@@ -254,16 +255,26 @@ setMethod("[", signature(x = "TsparseMatrix",
 	  clx <- getClassDef(class(x))
 	  has.x <- !extends(clx, "nsparseMatrix")
 	  isSym <- extends(clx, "symmetricMatrix")
+          x.tri <- extends(clx, "triangularMatrix")
 
 	  if(isSym) {
 	      isSym <- length(i) == length(j) && mode(i) == mode(j) && all(i == j)
 	      ## result will *still* be symmetric --> keep symmetry!
-	      if(!isSym)
-		  ## result no longer symmetric -> to "generalMatrix"
-		  x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
-	  } else if(extends(clx, "triangularMatrix") && x@diag == "U") {
-	      x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
+	      gDo <- !isSym ## result no longer symmetric -> to "generalMatrix"
+	  } else if(x.tri) {
+	      ii <- intI(i, n = di[1], dn= dn[[1]])
+	      ij <- intI(j, n = di[2], dn= dn[[2]])
+	      gDo <- { (x@diag == "U") ||
+		       ## maybe result is no longer triangular
+		       !(isTri <- identical(ii$i0, ij$i0) && !is.unsorted(ii$i0))
+		   }
 	  }
+          else gDo <- FALSE
+
+          if(gDo) # go via "generalMatrix":
+              x <- as(x, paste(.M.kind(x, clx), "gTMatrix", sep=''))
+
+
 	  if(isSym) { ## has only stored "half" of the indices,
 	      ## OTOH,	i === j, so only need one intI() call
 	      ip1 <- intI(i, n=di[1], dn[[1]]) # -> (i0, dn_1)
@@ -278,8 +289,11 @@ setMethod("[", signature(x = "TsparseMatrix",
 		  ip2$dn <- dn[[2]][ip1$i0 + 1L]
 
 	  } else {
-	      ip1 <- .ind.prep(x@i, intI(i, n = di[1], dn= dn[[1]]))
-	      ij <- intI(j, n = di[2], dn= dn[[2]])
+	      if(!x.tri) {
+		  ii <- intI(i, n = di[1], dn= dn[[1]])
+		  ij <- intI(j, n = di[2], dn= dn[[2]])
+	      }
+	      ip1 <- .ind.prep(x@i, ii)
 	      ip2 <- .ind.prep(x@j, ij)
 	  }
 	  nd <- c(ip1$li, ip2$li)

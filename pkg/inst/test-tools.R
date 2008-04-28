@@ -197,7 +197,8 @@ mkLDL <- function(n, density = 1/3) {
 ##--- Compatibility tests "Matrix" =!= "traditional Matrix" ---
 checkMatrix <- function(m, m.m = as(m, "matrix"),
 			do.t = TRUE, doNorm = TRUE, doOps = TRUE, doSummary = TRUE,
-			doCoerce = TRUE, doCoerce2 = doCoerce,
+			doCoerce = TRUE,
+			doCoerce2 = doCoerce && !extends(cld, "RsparseMatrix"),
 			verbose = TRUE, catFUN = cat)
 {
     ## Purpose: Compatibility tests "Matrix" <-> "traditional matrix"
@@ -212,6 +213,7 @@ checkMatrix <- function(m, m.m = as(m, "matrix"),
     cld <- getClassDef(clNam) ## extends(cld, FOO) is faster than is(m, FOO)
     isCor    <- extends(cld, "corMatrix")
     isSparse <- extends(cld, "sparseMatrix")
+    isSym    <- extends(cld, "symmetricMatrix")
 
     Cat	 <- function(...) if(verbose) cat(...)
     CatF <- function(...) if(verbose) catFUN(...)
@@ -308,10 +310,9 @@ checkMatrix <- function(m, m.m = as(m, "matrix"),
 	      identical(nnzero(m, na.= TRUE),  sum(m.m != 0 | is.na(m.m)))
               )
 
-
     if(isSparse) {
-        n0m <- drop0(m, cld)
-        has0 <- !Qidentical(m, n0m)
+	n0m <- drop0(m, cld) #==> n0m is Csparse
+	has0 <- !Qidentical(n0m, as(m,"CsparseMatrix"))
     }
     ## use non-square matrix when "allowed":
 
@@ -322,6 +323,15 @@ checkMatrix <- function(m, m.m = as(m, "matrix"),
     if(!Qidentical(m11, m12))
 	stopifnot(Qidentical(as(m11, "generalMatrix"),
 			     as(m12, "generalMatrix")))
+    if(isSparse && has0) { ## ensure that as(., "nMatrix") gives nz-pattern
+	CatF("as(., \"nMatrix\") giving full nonzero-pattern: ")
+	n1 <- as(m, "nMatrix")
+	ns <- as(m, "nsparseMatrix")
+	stopifnot(identical(n1,ns),
+		  (if(isSym) Matrix:::nnzSparse else sum)(n1) ==
+		  length(Matrix:::diagU2N(m)@x))
+	Cat("ok\n")
+    }
 
     if(doOps) {
         ## makes sense with non-trivial m (!)
