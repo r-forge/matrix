@@ -500,6 +500,12 @@ stopifnot(identical(drop(M3), M3),
 	  !is(T3[,2, drop=FALSE], "triangularMatrix")
 	  )
 
+(T6 <- as(as(kronecker(Matrix(c(0,0,1,0),2,2), t(T3)), "lMatrix"),
+	  "triangularMatrix"))
+T6[1:4, -(1:3)] # failed (trying to coerce back to ltTMatrix)
+stopifnot(identical(T6[1:4, -(1:3)][2:3, -3],
+		    spMatrix(2,2, i=c(1,2,2), j=c(1,1,2), x=rep(TRUE,3))))
+
 M <- Diagonal(4); M[1,2] <- 2
 M. <- as(M, "CsparseMatrix")
 (R <- as(M., "RsparseMatrix"))
@@ -523,8 +529,7 @@ cat("checkMatrix() of all: \n---------\n")
 Sys.setlocale("LC_COLLATE", "C")# to keep ls() reproducible
 for(nm in ls()) if(is(.m <- get(nm), "Matrix")) {
     cat(nm, "\n")
-    checkMatrix(.m, doCoerce2 = !is(.m, "RsparseMatrix"),
-		verbose = FALSE)
+    checkMatrix(.m, verbose = FALSE)
 }
 cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
 
