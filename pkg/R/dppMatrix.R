@@ -1,7 +1,10 @@
 #### Positive-definite Symmetric Packed Matrices -- Coercion and Methods
 
 setAs("dppMatrix", "dpoMatrix",
-      function(from) as(as(from, "dsyMatrix"), "dpoMatrix"))
+      function(from)
+      copyClass(.Call(dspMatrix_as_dsyMatrix, from)
+		"dpoMatrix",
+		sNames = c("x", "Dim", "Dimnames", "uplo", "factors")))
 
 to_dpp <- function(from) as(as(from, "dpoMatrix"), "dppMatrix")
 setAs("Matrix", "dppMatrix", to_dpp)# some may fail, but this tries

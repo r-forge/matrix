@@ -1,7 +1,10 @@
 #### Positive-definite Symmetric Matrices -- Coercion and Methods
 
 setAs("dpoMatrix", "dppMatrix",
-      function(from) as(as(from, "dspMatrix"), "dppMatrix"))
+      function(from)
+      copyClass(.Call(dsyMatrix_as_dspMatrix, from),
+		"dppMatrix",
+		sNames = c("x", "Dim", "Dimnames", "uplo", "factors")))
 
 setAs("dpoMatrix", "corMatrix",
       function(from) {
