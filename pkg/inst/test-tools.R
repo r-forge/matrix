@@ -218,6 +218,27 @@ checkMatrix <- function(m, m.m = as(m, "matrix"),
     Cat	 <- function(...) if(verbose) cat(...)
     CatF <- function(...) if(verbose) catFUN(...)
     warnNow <- function(...) warning(..., call. = FALSE, immediate. = TRUE)
+    if(getRversion() < "2.7.0") {
+	## Equivalent of fixing base::determinant.matrix() :
+	determinant.matrix <- function(x, logarithm = TRUE, ...)
+	{
+	    if ((n <- ncol(x)) != nrow(x))
+		stop("'x' must be a square matrix")
+	    if (n < 1)
+		return(structure(list(modulus =
+				      structure(if(logarithm) 0 else 1,
+						logarithm = logarithm),
+				      sign = 1L),
+				 class = "det"))
+	    if (is.complex(x))
+		stop("determinant not currently defined for complex matrices")
+	    storage.mode(x) <- "double"
+	    .Call("det_ge_real", x, logarithm, PACKAGE = "base")
+	}
+	setMethod(determinant, c("matrix","ANY"), determinant.matrix)
+	setMethod(determinant, c("matrix","logical"), determinant.matrix)
+    }
+
     if(getRversion() < "2.7.1" && R.version$`svn rev` < 45428) {
         ## "Fixup base::diag()", i.e. the default diag() method, locally:
         b.diag <- function(x = 1, nrow, ncol)
