@@ -2,11 +2,12 @@
 
 setAs("dppMatrix", "dpoMatrix",
       function(from)
-      copyClass(.Call(dspMatrix_as_dsyMatrix, from)
+      copyClass(.Call(dspMatrix_as_dsyMatrix, from),
 		"dpoMatrix",
 		sNames = c("x", "Dim", "Dimnames", "uplo", "factors")))
 
-to_dpp <- function(from) as(as(from, "dpoMatrix"), "dppMatrix")
+to_dpp <- function(from) as(as(as(as(from, "symmetricMatrix"), "dMatrix"),
+			       "dpoMatrix"), "dppMatrix")
 setAs("Matrix", "dppMatrix", to_dpp)# some may fail, but this tries
 setAs("matrix", "dppMatrix", to_dpp)
 

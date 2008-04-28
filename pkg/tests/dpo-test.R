@@ -15,7 +15,7 @@ str(f9 <- as(chol(h9), "dtrMatrix"))
 stopifnot(names(h9@factors) == "Cholesky",
           all.equal(rcond(h9), 9.0938e-13),
           all.equal(rcond(f9), 9.1272e-7, tol = 1e-6))# more precision fails
-str(h9)# has 'factors'
+str(h9)# has 'factors $ Cholesky'
 options(digits=4)
 (cf9 <- crossprod(f9))# looks the same as  h9 :
 stopifnot(all.equal(as.matrix(h9),
@@ -23,10 +23,10 @@ stopifnot(all.equal(as.matrix(h9),
 
 h9. <- round(h9, 2)# actually loses pos.def. "slightly"
                    # ==> the above may be invalid in the future
-assertError(as(h9., "dppMatrix"))# not pos.def.
-h9p <- as(h9, "dppMatrix")#-> also caches Cholesky in @factors:
-stopifnot(identical(h9p@factors$pCholesky,
-                    chol(h9p)))
+h9p  <- as(h9,  "dppMatrix") # {FIXME? lost @factors$pCholesky}
+h9.p <- as(h9., "dppMatrix")
+ch9p <- chol(h9p)
+stopifnot(identical(ch9p, h9p@factors$pCholesky))
 h4  <- h9.[1:4, 1:4] # this and the next
 h9.[1,1] <- 10       # had failed in 0.995-14
 h9p[1,1] <- 10 # failed in 0.995-14
