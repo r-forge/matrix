@@ -13,6 +13,8 @@
 \alias{lsTMatrix-class}
 % Group(like)
 \alias{Ops,lsparseMatrix,lsparseMatrix-method}
+\alias{Arith,lsparseMatrix,Matrix-method}
+\alias{Arith,Matrix,lsparseMatrix-method}
 \alias{Arith,lgCMatrix,lgCMatrix-method}
 \alias{Arith,lgTMatrix,lgTMatrix-method}
 \alias{Compare,lsparseMatrix,lsparseMatrix-method}

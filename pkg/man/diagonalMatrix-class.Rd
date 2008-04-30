@@ -117,6 +117,11 @@
 \alias{\%*\%,diagonalMatrix,sparseMatrix-method}
 \alias{\%*\%,CsparseMatrix,diagonalMatrix-method}
 \alias{\%*\%,sparseMatrix,diagonalMatrix-method}
+\alias{\%*\%,denseMatrix,diagonalMatrix-method}
+\alias{\%*\%,diagonalMatrix,denseMatrix-method}
+\alias{\%*\%,diagonalMatrix,lgeMatrix-method}
+\alias{\%*\%,lgeMatrix,diagonalMatrix-method}
+
 \alias{crossprod,diagonalMatrix,dgeMatrix-method}
 \alias{crossprod,diagonalMatrix,lgeMatrix-method}
 \alias{crossprod,diagonalMatrix,diagonalMatrix-method}

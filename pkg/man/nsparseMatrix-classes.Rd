@@ -44,7 +44,7 @@
 \alias{coerce,ngTMatrix,ngCMatrix-method}
 \alias{coerce,ngTMatrix,ngeMatrix-method}
 \alias{coerce,ngTMatrix,ntTMatrix-method}
-\alias{coerce,ngTMatrix,triangularTMatrix-method}
+\alias{coerce,ngTMatrix,triangularMatrix-method}
 \alias{coerce,nsCMatrix,dMatrix-method}
 \alias{coerce,nsCMatrix,dgTMatrix-method}
 \alias{coerce,nsCMatrix,dsCMatrix-method}
@@ -96,8 +96,15 @@
 \alias{tcrossprod,ngTMatrix,missing-method}
 \alias{tcrossprod,nsparseMatrix,missing-method}
 \alias{is.na,nsparseMatrix-method}
+% Group
+\alias{Ops,dsparseMatrix,nsparseMatrix-method}
+\alias{Ops,nsparseMatrix,dsparseMatrix-method}
+\alias{Ops,lsparseMatrix,nsparseMatrix-method}
+\alias{Ops,nsparseMatrix,lsparseMatrix-method}
 \alias{Ops,sparseMatrix,nsparseMatrix-method}
 \alias{Ops,nsparseMatrix,sparseMatrix-method}
+\alias{Arith,nsparseMatrix,Matrix-method}
+\alias{Arith,Matrix,nsparseMatrix-method}
 %
 \description{The \code{nsparseMatrix} class is a virtual class of sparse
   \emph{\dQuote{pattern}} matrices, i.e., binary matrices conceptually

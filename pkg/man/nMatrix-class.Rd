@@ -9,9 +9,12 @@
 \alias{coerce,nMatrix,lMatrix-method}
 \alias{coerce,lMatrix,nMatrix-method}
 % %\alias{coerce,dMatrix,dgeMatrix-method}
-% \alias{[,dMatrix,lMatrix,missing,ANY-method}
-% \alias{[,dMatrix,logical,missing,ANY-method}
-% % Group methods
+%
+%% Group methods
+\alias{Arith,nMatrix,numeric-method}
+\alias{Arith,numeric,nMatrix-method}
+\alias{Ops,nMatrix,numeric-method}
+\alias{Ops,numeric,nMatrix-method}
 % \alias{Arith,dMatrix,dMatrix-method}
 % \alias{Math2,dMatrix,numeric-method}% Math2 = round + signif, but
 % \alias{Math2,dMatrix,missing-method}

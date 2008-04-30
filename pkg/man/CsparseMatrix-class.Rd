@@ -9,6 +9,7 @@
 \alias{\%*\%,matrix,CsparseMatrix-method}
 \alias{\%*\%,numeric,CsparseMatrix-method}
 \alias{coerce,CsparseMatrix,lsparseMatrix-method}
+\alias{coerce,CsparseMatrix,lMatrix-method}
 \alias{coerce,CsparseMatrix,nsparseMatrix-method}
 \alias{coerce,CsparseMatrix,nMatrix-method}
 \alias{coerce,CsparseMatrix,TsparseMatrix-method}
