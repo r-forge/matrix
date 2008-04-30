@@ -14,10 +14,16 @@
 \alias{[,dMatrix,logical,missing,ANY-method}
 % Group methods
 \alias{Arith,dMatrix,dMatrix-method}
+\alias{Arith,lMatrix,numeric-method}
+\alias{Ops,lMatrix,numeric-method}
+\alias{Arith,numeric,lMatrix-method}
+\alias{Ops,numeric,lMatrix-method}
 \alias{Ops,dMatrix,dMatrix-method}
+\alias{Ops,dMatrix,lMatrix-method}
+\alias{Ops,lMatrix,dMatrix-method}
+\alias{Ops,lMatrix,lMatrix-method}
 \alias{Ops,dMatrix,nMatrix-method}
 \alias{Ops,nMatrix,dMatrix-method}
-\alias{Ops,lMatrix,lMatrix-method}
 \alias{Compare,dMatrix,numeric-method}
 \alias{Compare,numeric,dMatrix-method}
 \alias{Logic,logical,lMatrix-method}

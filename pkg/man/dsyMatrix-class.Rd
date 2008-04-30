@@ -15,10 +15,13 @@
 \alias{coerce,dgeMatrix,dspMatrix-method}
 \alias{coerce,matrix,dspMatrix-method}
 \alias{coerce,dgeMatrix,dsyMatrix-method}% or rather setIs?
+\alias{coerce,dsyMatrix,corMatrix-method}
+\alias{coerce,dsyMatrix,dpoMatrix-method}% instead of setIs
 \alias{coerce,dsyMatrix,dspMatrix-method}
 \alias{coerce,dsyMatrix,lsyMatrix-method}
 \alias{coerce,dsyMatrix,matrix-method}
 \alias{coerce,matrix,dsyMatrix-method}
+%
 \alias{show,dsyMatrix-method}
 \alias{norm,dspMatrix,character-method}
 \alias{norm,dspMatrix,missing-method}

@@ -11,6 +11,8 @@
 \alias{Ops,ANY,Matrix-method}
 \alias{Ops,Matrix,matrix-method}
 \alias{Ops,matrix,Matrix-method}
+\alias{Ops,logical,Matrix-method}
+\alias{Ops,Matrix,logical-method}
 \alias{Logic,logical,Matrix-method}
 \alias{Logic,Matrix,logical-method}
 \alias{Logic,Matrix,ANY-method}
