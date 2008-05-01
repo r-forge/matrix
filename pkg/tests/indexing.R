@@ -491,6 +491,11 @@ stopifnot(identical(!(m. < mc), m. >= mc),
 	  identical(m. < mc, as(!ge, "sparseMatrix")),
 	  identical(ne., drop0(ne1)))
 
+d6 <- Diagonal(6)
+ii <- c(1:2, 4:5)
+d6[cbind(ii,ii)] <- 7*ii
+stopifnot(is(d6, "ddiMatrix"), identical(d6, Diagonal(x=c(7*1:2,1,7*4:5,1))))
+
 (M3 <- Matrix(upper.tri(matrix(, 3, 3)))) # ltC; indexing used to fail
 T3 <- as(M3, "TsparseMatrix")
 stopifnot(identical(drop(M3), M3),

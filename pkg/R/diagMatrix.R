@@ -293,11 +293,19 @@ setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index",
                          replDiag(x, i=i, , value=value)
                  })
 
-setReplaceMethod("[", signature(x = "diagonalMatrix", i = "matrix", # 2-col.matrix
+setReplaceMethod("[", signature(x = "diagonalMatrix",
+                                i = "matrix", # 2-col.matrix
 				j = "missing", value = "replValue"),
 		 function(x,i,j, ..., value) {
 		     if(ncol(i) == 2) {
 			 if(all((ii <- i[,1]) == i[,2])) { # replace in diagonal only
+			     if(x@diag == "U") {
+				 one <- as1(x@x)
+				 if(any(value != one | is.na(value))) {
+				     x@diag <- "N"
+				     x@x <- rep.int(one, x@Dim[1])
+				 }
+			     }
 			     x@x[ii] <- value
 			     x
 			 } else { ## no longer diagonal, but remain sparse:
