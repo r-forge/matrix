@@ -401,6 +401,10 @@ The Matrix package provides the following classes for sparse matrices
 
 Mention \texttt{drop0()} showing a nice example
 
+Show the use of \code{dim<-} for \emph{resizing} a (sparse) matrix.
+
+Maybe mention  \Rfun{nearPD}.
+
 \TODO{Solve a sparse least squares problem and demonstrate memory / speed gain}
 
 \TODO{mention \code{lme4} and \Rfun{lmer}, maybe use one example to show the
