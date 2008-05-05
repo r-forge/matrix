@@ -41,6 +41,7 @@
 \alias{rbind2,Matrix,missing-method}
 \alias{rbind2,NULL,Matrix-method}
 \alias{rbind2,atomicVector,Matrix-method}
+\alias{crossprod,ANY,Matrix-method}
 \alias{crossprod,Matrix,numeric-method}
 \alias{crossprod,Matrix,ANY-method}
 \alias{crossprod,Matrix,Matrix-method}
@@ -67,6 +68,7 @@
 \alias{dim<-,Matrix-method}
 \alias{dimnames,Matrix-method}
 \alias{dimnames<-,Matrix,list-method}
+\alias{dimnames<-,Matrix,NULL-method}
 \alias{length,Matrix-method}
 \alias{show,Matrix-method}
 \alias{as.array,Matrix-method}
@@ -86,7 +88,8 @@
 \alias{solve,matrix,Matrix-method}
 \alias{solve,Matrix,missing-method}
 \alias{solve,Matrix,numeric-method}
-\alias{crossprod,ANY,Matrix-method}
+%\alias{unname,Matrix-method}
+\alias{unname,Matrix,missing-method}
 %
 \title{Virtual Class "Matrix" Class of Matrices}
 \description{

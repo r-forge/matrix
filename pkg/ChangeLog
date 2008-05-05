@@ -1,3 +1,8 @@
+2008-05-03  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R (dimnames<-): dimnames(.) <- NULL works with a message;
+	* NAMESPACE (unname): finally exported
+
 2008-04-28  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Auxiliaries.R (cholMat): possibly keep packed

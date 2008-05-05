@@ -205,6 +205,7 @@
 - norm() methods for all Matrices, notably sparse "now too".
 
 - check all "Summary" group methods for all matrices in ./tests/Class+Meth.R
+  {this includes  sum() for *all* our matrices}
 
 - log1p(<sparseMatrix>) now gives <dsparseMatrix>
   simply via "Math" group generic -- only from R 2.6.0 on.
@@ -279,3 +280,15 @@
 
 - image(M, ..): now have smart option which keeps "0 |-> transparent"
   and allows colors to differentiate negative and positive entries.
+
+- Diagonal(n) %*% A   is fast now
+
+- msy <- as(matrix(c(2:1,1:2),2), "dsyMatrix"); str(msy)
+  no longer contains a Cholesky factorization {as we've replaced setIs() by
+  setAs(), for now}.
+
+- determinant() now works {it is checkMatrix()ed}
+
+- dimnames(Mat) <- NULL   now works with a message;
+  unname() is defined equivalently explicitly.
+

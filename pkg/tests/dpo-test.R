@@ -126,8 +126,14 @@ stopifnot(is(spr, "dsCMatrix"),
 
 x <- c(2,1,1,2)
 mM <- Matrix(x, 2,2, dimnames=rep( list(c("A","B")), 2))# dsy
+mM
+stopifnot(length(mM@factors)== 0)
 (po <- as(mM, "dpoMatrix")) # still has dimnames
 mm <- as(mM, "matrix")
+msy <- as(mm, "dsyMatrix")
+stopifnot(Qidentical(mM, msy),
+	  length(mM @factors)== 1,
+	  length(msy@factors)== 0)
 
 c1 <- as(mm, "corMatrix")
 c2 <- as(mM, "corMatrix")

@@ -110,6 +110,14 @@ dimnamesGets <- function (x, value) {
 setMethod("dimnames<-", signature(x = "Matrix", value = "list"),
 	  dimnamesGets)
 
+setMethod("dimnames<-", signature(x = "Matrix", value = "NULL"),
+	  function(x, value) {
+	      message("dimnames(.) <- NULL:  translated to \n",
+		      "dimnames(.) <- list(NULL,NULL)  <==>  unname(.)")
+	      x@Dimnames <- list(NULL,NULL)
+	      x
+	  })
+
 setMethod("unname", signature("Matrix", force="missing"),
 	  function(obj) { obj@Dimnames <- list(NULL,NULL); obj})
 
