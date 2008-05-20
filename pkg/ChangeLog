@@ -1,3 +1,7 @@
+2008-05-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* NAMESPACE: also import "Ops" {found via new tools:::get_S4_generics_with_methods()}
+
 2008-05-03  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Matrix.R (dimnames<-): dimnames(.) <- NULL works with a message;

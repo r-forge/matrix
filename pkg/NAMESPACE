@@ -9,7 +9,7 @@ importFrom("stats", cov2cor, update)
 importFrom("grid", grid.rect, gpar, grob)# others via 'grid::'
 
 ## Currently, group generics need to be explicitly imported (Bug?):
-importFrom("methods", Arith, Compare, Logic, Math, Math2, Summary, Complex)
+importFrom("methods", Ops, Arith, Compare, Logic, Math, Math2, Summary, Complex)
 
 ## Generics and functions defined in this package
 export("Cholesky",
