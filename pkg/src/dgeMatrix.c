@@ -416,13 +416,13 @@ SEXP dgeMatrix_exp(SEXP x)
 
     SEXP val = PROTECT(duplicate(x));
     int i, ilo, ilos, ihi, ihis, j, sqpow;
-    int *pivot = Alloca(n, int);
-    double *dpp = Alloca(nsqr, double), /* denominator power Pade' */
-	*npp = Alloca(nsqr, double), /* numerator power Pade' */
-	*perm = Alloca(n, double),
-	*scale = Alloca(n, double),
+    int *pivot = Calloc(n, int);
+    double *dpp = Calloc(nsqr, double), /* denominator power Pade' */
+	*npp = Calloc(nsqr, double), /* numerator power Pade' */
+	*perm = Calloc(n, double),
+	*scale = Calloc(n, double),
 	*v = REAL(GET_SLOT(val, Matrix_xSym)),
-	*work = Alloca(nsqr, double), inf_norm, m1_j/*= (-1)^j */, trshift;
+	*work = Calloc(nsqr, double), inf_norm, m1_j/*= (-1)^j */, trshift;
     R_CheckStack();
 
     if (n < 1 || Dims[0] != n)
@@ -532,6 +532,7 @@ SEXP dgeMatrix_exp(SEXP x)
     }
 
     /* Clean up */
+    Free(work); Free(scale); Free(perm); Free(npp); Free(dpp); Free(pivot);
     UNPROTECT(1);
     return val;
 }
