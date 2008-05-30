@@ -79,6 +79,16 @@ stopifnot(validObject(t1),
           c(class(t2), class(t1c), class(t2c), class(tt2)) == "dtCMatrix",
           identical(t(tt2), t2))
 assert.EQ.mat(t1, as(t1c, "matrix"))
+D4. <- D4 * (M4 <- Matrix(1:4, 4,4))
+D4p <- M4 + D4
+Lg1 <- D4 > 0 & D4 > 1
+assert.EQ.mat(D4., diag(x= (1:4)^2))
+assert.EQ.mat(D4p, diag(x= (1:4)) + (1:4))
+assert.EQ.mat(Lg1, diag(x= c(FALSE, rep(TRUE,3))))
+if(FALSE)## FIXME
+stopifnot(is(D4., "diagonalMatrix"))
+stopifnot(is(Lg1, "diagonalMatrix"),
+          identical(Lg1 != !Lg1, Diagonal(4,x=TRUE)))
 
 ## as(<diag>, <anything>) :
 str(cls <- names(getClass("Matrix")@subclasses))# all Matrix classes

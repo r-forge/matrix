@@ -172,3 +172,7 @@
   An R (instead of C) version should be pretty simple, and would work with
   connections automatically ["lsparse" become either "real" or
   "pattern", "depending if they have NAs or not].
+
+- <diagMatrix> o <ddenseMatrix> currently works via sparse, but
+  should return <diagMatrix> in the same cases where
+  <diagMatrix> o <numeric> does.
