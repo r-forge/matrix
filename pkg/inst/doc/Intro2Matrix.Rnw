@@ -1,10 +1,12 @@
 \documentclass{article}
 %
 \usepackage{myVignette}
+\usepackage{fullpage}% save trees ;-)
 \usepackage[authoryear,round]{natbib}
 \bibliographystyle{plainnat}
 \newcommand{\noFootnote}[1]{{\small (\textit{#1})}}
 \newcommand{\myOp}[1]{{$\left\langle\ensuremath{#1}\right\rangle$}}
+%
 %%\VignetteIndexEntry{2nd Introduction to the Matrix Package}
 %%\VignetteDepends{Matrix}
 \SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=7,height=4,strip.white=TRUE,keep.source=TRUE}

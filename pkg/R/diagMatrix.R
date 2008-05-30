@@ -771,17 +771,18 @@ setMethod("Ops", signature(e1 = "numeric", e2 = "ldiMatrix"),
 
 
 ## Not {"sparseMatrix", "numeric} :  {"denseMatrix", "matrix", ... }
-## ddi*:
-setMethod("Ops", signature(e1 = "ddiMatrix", e2 = "ANY"),
-	  function(e1,e2) callGeneric(diag2tT.u(e1,e2, "d"), e2))
-setMethod("Ops", signature(e1 = "ANY", e2 = "ddiMatrix"),
-	  function(e1,e2) callGeneric(e1, diag2tT.u(e2,e1, "d")))
-## ldi*:
-setMethod("Ops", signature(e1 = "ldiMatrix", e2 = "ANY"),
-	  function(e1,e2) callGeneric(diag2tT.u(e1,e2, "l"), e2))
-setMethod("Ops", signature(e1 = "ANY", e2 = "ldiMatrix"),
-	  function(e1,e2) callGeneric(e1, diag2tT.u(e2,e1, "l")))
-
+for(other in c("ANY", "Matrix", "dMatrix")) {
+    ## ddi*:
+    setMethod("Ops", signature(e1 = "ddiMatrix", e2 = other),
+	      function(e1,e2) callGeneric(diag2tT.u(e1,e2, "d"), e2))
+    setMethod("Ops", signature(e1 = other, e2 = "ddiMatrix"),
+	      function(e1,e2) callGeneric(e1, diag2tT.u(e2,e1, "d")))
+    ## ldi*:
+    setMethod("Ops", signature(e1 = "ldiMatrix", e2 = other),
+	      function(e1,e2) callGeneric(diag2tT.u(e1,e2, "l"), e2))
+    setMethod("Ops", signature(e1 = other, e2 = "ldiMatrix"),
+	      function(e1,e2) callGeneric(e1, diag2tT.u(e2,e1, "l")))
+}
 ## This should *not* dispatch to <dense> methods (in ./Ops.R ), as
 ##  FALSE & <anything> |-> FALSE : hence result should be diagonal:
 for(cl in diCls) {

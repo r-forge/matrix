@@ -1,3 +1,8 @@
+2008-05-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/diagMatrix.R (Ops): more <diagonal> o <Matrix> methods
+	* tests/Simple.R: testing the above
+
 2008-05-07  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* NAMESPACE: also import "Ops" {found via new tools:::get_S4_generics_with_methods()}
