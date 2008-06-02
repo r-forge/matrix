@@ -6,13 +6,18 @@ setMethod("!", "Matrix", function(x) !as(x, "lMatrix"))
 ## -- diag ---
 
 setMethod("!", "ldiMatrix", function(x) {
-    if(x@diag == "N")
-	x@x <- !x@x
-    else { ## "U"
-	x@diag <- "N"
-	x@x <- rep.int(FALSE, x@Dim[1])
+    r <- copyClass(x, "lsyMatrix", c("Dim","Dimnames"))
+    n <- x@Dim[1]
+    if (n > 0) {
+	## off-diagonal: assign all and then reassign diagonals:
+	rx <- rep.int(TRUE, n * n)
+	## diagonal entries:
+	rx[1L + 0:(n - 1L) * (n + 1L)] <- {
+	    if(x@diag == "N") !x@x else FALSE ## "U"
+	}
+	r@x <- rx
     }
-    x
+    r
 })
 
 ## -- lsparse --
@@ -45,11 +50,15 @@ setMethod("!", "ltrMatrix",
 setMethod("!", "ltpMatrix", function(x) !as(x, "ltrMatrix"))
 
 ## for the other ldense* ones
-setMethod("!", "lgeMatrix",
-	  function(x) { x@x <- !x@x ; x })
-## FIXME : this loses symmetry "lsy" and "lsp":
-setMethod("!", "ldenseMatrix",
-	  function(x) !as(x, "lgeMatrix"))
+setMethod("!", "lgeMatrix", function(x) { x@x <- !x@x ; x })
+setMethod("!", "ldenseMatrix", function(x) {
+    if(is(x, "symmetricMatrix")) { # lsy | lsp
+	x@x <- !x@x
+	x
+    }
+    else ## triangular are dealt with above already : "general" here:
+	!as(x, "lgeMatrix")
+})
 
 ## -- ndense ---
 
@@ -78,8 +87,12 @@ setMethod("!", "ntrMatrix",
 setMethod("!", "ntpMatrix", function(x) !as(x, "ntrMatrix"))
 
 ## for the other ldense* ones
-setMethod("!", "ngeMatrix",
-          function(x) { x@x <- !x@x ; x })
-## FIXME : this loses symmetry "nsy" and "nsp":
-setMethod("!", "ndenseMatrix",
-          function(x) !as(x, "ngeMatrix"))
+setMethod("!", "ngeMatrix", function(x) { x@x <- !x@x ; x })
+setMethod("!", "ndenseMatrix", function(x) {
+    if(is(x, "symmetricMatrix")) { # lsy | lsp
+	x@x <- !x@x
+	x
+    }
+    else ## triangular are dealt with above already : "general" here:
+	!as(x, "ngeMatrix")
+})

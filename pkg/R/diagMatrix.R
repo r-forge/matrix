@@ -629,7 +629,7 @@ setMethod("Arith", signature(e1 = "ddiMatrix", e2 = "numeric"),
 		      if(L1) r <- rep.int(r, n)
 		  } else
 		      r <- callGeneric(e1@x, e2)
-		  e1@x <- if(L1) r else r[1L + n*(0:(n-1L))]
+		  e1@x <- if(L1) r else r[1L + (n+1L)*(0:(n-1L))]
 		  return(e1)
 	      }
 	      callGeneric(diag2tT.u(e1,e2, "d"), e2)
@@ -647,7 +647,7 @@ setMethod("Arith", signature(e1 = "numeric", e2 = "ddiMatrix"),
 		      if(L1) r <- rep.int(r, n)
 		  } else
 		      r <- callGeneric(e1, e2@x)
-		  e2@x <- if(L1) r else r[1L + n*(0:(n-1L))]
+		  e2@x <- if(L1) r else r[1L + (n+1L)*(0:(n-1L))]
 		  return(e2)
 	      }
 	      callGeneric(e1, diag2tT.u(e2,e1, "d"))
@@ -667,7 +667,7 @@ setMethod("Arith", signature(e1 = "ldiMatrix", e2 = "numeric"),
 		  } else
 		      r <- callGeneric(e1@x, e2)
 		  e1 <- copyClass(e1, "ddiMatrix", c("diag", "Dim", "Dimnames"))
-		  e1@x <- if(L1) r else r[1L + n*(0:(n-1L))]
+		  e1@x <- if(L1) r else r[1L + (n+1L)*(0:(n-1L))]
 		  return(e1)
 	      }
 	      callGeneric(diag2tT.u(e1,e2, "d"), e2)
@@ -686,7 +686,7 @@ setMethod("Arith", signature(e1 = "numeric", e2 = "ldiMatrix"),
 		  } else
 		      r <- callGeneric(e1, e2@x)
 		  e2 <- copyClass(e2, "ddiMatrix", c("diag", "Dim", "Dimnames"))
-		  e2@x <- if(L1) r else r[1L + n*(0:(n-1L))]
+		  e2@x <- if(L1) r else r[1L + (n+1L)*(0:(n-1L))]
 		  return(e2)
 	      }
 	      callGeneric(e1, diag2tT.u(e2,e1, "d"))
@@ -706,7 +706,7 @@ setMethod("Ops", signature(e1 = "ddiMatrix", e2 = "numeric"),
 		  } else
 		      r <- callGeneric(e1@x, e2)
 		  e1 <- copyClass(e1, "ldiMatrix", c("diag", "Dim", "Dimnames"))
-		  e1@x <- if(L1) r else r[1L + n*(0:(n-1L))]
+		  e1@x <- if(L1) r else r[1L + (n+1L)*(0:(n-1L))]
 		  return(e1)
 	      }
 	      callGeneric(diag2tT.u(e1,e2, "l"), e2)
@@ -725,7 +725,7 @@ setMethod("Ops", signature(e1 = "numeric", e2 = "ddiMatrix"),
 		  } else
 		      r <- callGeneric(e1, e2@x)
 		  e2 <- copyClass(e2, "ldiMatrix", c("diag", "Dim", "Dimnames"))
-		  e2@x <- if(L1) r else r[1L + n*(0:(n-1L))]
+		  e2@x <- if(L1) r else r[1L + (n+1L)*(0:(n-1L))]
 		  return(e2)
 	      }
 	      callGeneric(e1, diag2tT.u(e2,e1, "l"))
@@ -744,7 +744,7 @@ setMethod("Ops", signature(e1 = "ldiMatrix", e2 = "numeric"),
 		      if(L1) r <- rep.int(r, n)
 		  } else
 		      r <- callGeneric(e1@x, e2)
-		  e1@x <- if(L1) r else r[1L + n*(0:(n-1L))]
+		  e1@x <- if(L1) r else r[1L + (n+1L)*(0:(n-1L))]
 		  return(e1)
 	      }
 	      callGeneric(diag2tT.u(e1,e2, "l"), e2)
@@ -762,7 +762,7 @@ setMethod("Ops", signature(e1 = "numeric", e2 = "ldiMatrix"),
 		      if(L1) r <- rep.int(r, n)
 		  } else
 		      r <- callGeneric(e1, e2@x)
-		  e2@x <- if(L1) r else r[1L + n*(0:(n-1L))]
+		  e2@x <- if(L1) r else r[1L + (n+1L)*(0:(n-1L))]
 		  return(e2)
 	      }
 	      callGeneric(e1, diag2tT.u(e2,e1, "l"))
