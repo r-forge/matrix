@@ -1,5 +1,5 @@
 
-R version 2.7.0 Patched (2008-04-30 r45572)
+R version 2.7.0 Patched (2008-05-29 r45820)
 Copyright (C) 2008 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -31,8 +31,8 @@ Attaching package: 'Matrix'
 > source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 > 
 > if(interactive()) {
-+     options(error = recover)
-+ } else options(verbose = TRUE)# to show message()s
++     options(error = recover, warn = 1)
++ } else options(verbose = TRUE, warn = 1)
 > 
 > ### Dense Matrices
 > 
@@ -93,16 +93,15 @@ Attaching package: 'Matrix'
 > dimnames(mn) <- list(paste("r",letters[1:nrow(mn)],sep=""),
 +                      LETTERS[1:ncol(mn)])
 > checkMatrix(mn)
+Warning: Ambiguous method selection for "==", target "ngCMatrix#lgCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    nsparseMatrix#lsparseMatrix
+
  norm(m [7 x 4]) : 1  I  F  M  ok
  Summary:  ok
 2*m =?= m+m: identical
 m >= m for all: ok
 m < m for none: ok
-Warning message:
-Ambiguous method selection for "==", target "ngCMatrix#lgCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    nsparseMatrix#lsparseMatrix
- 
 > mn["rd", "D"]
 [1] 25
 > stopifnot(identical(mn["rc", "D"], mn[3,4]), mn[3,4] == 24,
@@ -430,15 +429,14 @@ keeping Tsparse matrix *symmetric* in sub-assignment
 + 	  all(sm[,-(1:3)] == t(sm[-(1:3),])), # all(<lge.>)
 + 	  all(sm[,-(1:3)] == 0)
 + 	  )
-Warning messages:
-1: Ambiguous method selection for "==", target "dgTMatrix#dgTMatrix" (the first of the signatures shown will be used)
+Warning: Ambiguous method selection for "==", target "dgTMatrix#dgTMatrix" (the first of the signatures shown will be used)
     sparseMatrix#sparseMatrix
     dMatrix#dMatrix
- 
-2: Ambiguous method selection for "==", target "dgTMatrix#numeric" (the first of the signatures shown will be used)
+
+Warning: Ambiguous method selection for "==", target "dgTMatrix#numeric" (the first of the signatures shown will be used)
     dMatrix#numeric
     sparseMatrix#numeric
- 
+
 > 
 > m0 <- Diagonal(5)
 > stopifnot(identical(m0[2,], m0[,2]),
@@ -452,7 +450,7 @@ Warning messages:
 [3,] . . 1 . .
 [4,] . . . 1 .
 [5,] . . . . 1
-> (m2 <- as(m0, "CsparseMatrix")) # dtCMatrix (with an irrelevant warning)
+> (m2 <- as(m0, "CsparseMatrix")) # dtCMatrix
 5 x 5 sparse Matrix of class "dtCMatrix"
               
 [1,] 1 . . . .
@@ -489,29 +487,32 @@ Warning messages:
 [4,] . . 3 1 .
 [5,] . . 3 . 1
 > checkMatrix(M)
+Warning: Ambiguous method selection for "==", target "lsCMatrix#lsCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
+Warning: Ambiguous method selection for "!=", target "dgTMatrix#dgTMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+Warning: Ambiguous method selection for "&", target "lgCMatrix#lsCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
  norm(m [5 x 5]) : 1  I  F  M  ok
  Summary:  ok
 2*m =?= m+m: ok
-m >= m for all: ok
-m < m for none: ok
+m >= m for all: Warning: Ambiguous method selection for ">=", target "dgTMatrix#dgTMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+ok
+m < m for none: Warning: Ambiguous method selection for "<", target "dgTMatrix#dgTMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+ok
 det...(): ok
-Warning messages:
-1: Ambiguous method selection for "==", target "lsCMatrix#lsCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#lsparseMatrix
- 
-2: Ambiguous method selection for "!=", target "dgTMatrix#dgTMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
- 
-3: Ambiguous method selection for ">=", target "dgTMatrix#dgTMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
- 
-4: Ambiguous method selection for "<", target "dgTMatrix#dgTMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
- 
 > M <- m0; M[1:3, 3] <- 0 ;M
 5 x 5 diagonal matrix of class "ddiMatrix"
      [,1] [,2] [,3] [,4] [,5]
@@ -550,37 +551,36 @@ det...(): ok
 [5,] . . . . 1
 > assert.EQ.mat(M, diag(c(1,1, 0, 1,1)), tol=0)
 > T <- m1; T[1:3, 3] <- 10; checkMatrix(T)
+Warning: Ambiguous method selection for "==", target "dtTMatrix#dtTMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+Warning: Ambiguous method selection for "!=", target "dtTMatrix#dtTMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
  norm(m [5 x 5]) : 1  I  F  M  ok
  Summary:  ok
-2*m =?= m+m: identical
-m >= m for all: ok
-m < m for none: ok
+2*m =?= m+m: Warning: Ambiguous method selection for "+", target "dtTMatrix#dtTMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+identical
+m >= m for all: Warning: Ambiguous method selection for ">=", target "dtTMatrix#dtTMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+ok
+m < m for none: Warning: Ambiguous method selection for "<", target "dtTMatrix#dtTMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+ok
 det...(): ok
 .TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 as(<triangular (ge)matrix>, dtTMatrix): valid: TRUE 
-Warning messages:
-1: Ambiguous method selection for "==", target "dtTMatrix#dtTMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
- 
-2: Ambiguous method selection for "!=", target "dtTMatrix#dtTMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
- 
-3: Ambiguous method selection for "+", target "dtTMatrix#dtTMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
- 
-4: Ambiguous method selection for ">=", target "dtTMatrix#dtTMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
- 
-5: Ambiguous method selection for "<", target "dtTMatrix#dtTMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
- 
 > stopifnot(is(T, "dtTMatrix"), identical(T[,3], c(10,10,10,0,0)))
 > 
 > M <- m2; M[1,] <- 0 ; M ; assert.EQ.mat(M, diag(c(0,rep(1,4))), tol=0)
@@ -626,11 +626,6 @@ as(<triangular (ge)matrix>, dtCMatrix): valid: TRUE
 > D <- Diagonal(6)
 > M <- as(D,"dgeMatrix")
 > m <- as(D,"matrix")
-Warning message:
-Ambiguous method selection for "coerce", target "ddiMatrix#matrix" (the first of the signatures shown will be used)
-    diagonalMatrix#matrix
-    dMatrix#matrix
- 
 > s <- as(D,"TsparseMatrix")
 > S <- as(s,"CsparseMatrix")
 > i <- c(3,1,6); v <- c(10,15,20)
@@ -754,6 +749,10 @@ diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
 [4,]   . 30   .   . .
 [5,]   2  4   .   6 .
 > as((mt0 - mt)[1:5,], "dsparseMatrix")# [1,5] and lines 2:3
+Warning: Ambiguous method selection for "-", target "dgTMatrix#dgTMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
 5 x 7 sparse Matrix of class "dgCMatrix"
                                     
 [1,]    .    .   .  220    .   . 241
@@ -761,11 +760,6 @@ diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
 [3,] -247 -250   . -250 -250   . 243
 [4,]    .    . -30    .    .   .   .
 [5,]    .   43  -4    .   -6   .   .
-Warning message:
-Ambiguous method selection for "-", target "dgTMatrix#dgTMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
- 
 > 
 > mt[c(2,4), ] <- 0; stopifnot(as(mt[c(2,4), ],"matrix") == 0)
 > mt[2:3, 4:7] <- 33
@@ -944,17 +938,16 @@ diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
 > ## an example that failed for a long time
 > sy3 <- new("dsyMatrix", Dim = as.integer(c(2, 2)), x = c(14, -1, 2, -7))
 > checkMatrix(dm <- kronecker(Diagonal(2), sy3))# now sparse with new kronecker
+Warning: Ambiguous method selection for "kronecker", target "dtTMatrix#dsTMatrix" (the first of the signatures shown will be used)
+    TsparseMatrix#TsparseMatrix
+    dsparseMatrix#dsparseMatrix
+
  norm(m [4 x 4]) : 1  I  F  M  ok
  Summary:  ok
 2*m =?= m+m: ok
 m >= m for all: ok
 m < m for none: ok
 det...(): ok
-Warning message:
-Ambiguous method selection for "kronecker", target "dtTMatrix#dsTMatrix" (the first of the signatures shown will be used)
-    TsparseMatrix#TsparseMatrix
-    dsparseMatrix#dsparseMatrix
- 
 > dm <- Matrix(as.matrix(dm))# -> "dsyMatrix"
 > (s2 <- as(dm, "sparseMatrix"))
 4 x 4 sparse Matrix of class "dsCMatrix"
@@ -964,34 +957,33 @@ Ambiguous method selection for "kronecker", target "dtTMatrix#dsTMatrix" (the fi
 [3,]  .  . 14  2
 [4,]  .  .  2 -7
 > checkMatrix(st <- as(s2, "TsparseMatrix"))
+Warning: Ambiguous method selection for "==", target "dsTMatrix#dsTMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+Warning: Ambiguous method selection for "!=", target "dsTMatrix#dsTMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
  norm(m [4 x 4]) : 1  I  F  M  ok
  Summary:  ok
-2*m =?= m+m: suboptimal implementation of sparse 'symm. o symm.'
+2*m =?= m+m: Warning: Ambiguous method selection for "+", target "dsTMatrix#dsTMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+suboptimal implementation of sparse 'symm. o symm.'
 identical
-m >= m for all: ok
-m < m for none: ok
+m >= m for all: Warning: Ambiguous method selection for ">=", target "dsTMatrix#dsTMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+ok
+m < m for none: Warning: Ambiguous method selection for "<", target "dsTMatrix#dsTMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+ok
 det...(): ok
-Warning messages:
-1: Ambiguous method selection for "==", target "dsTMatrix#dsTMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
- 
-2: Ambiguous method selection for "!=", target "dsTMatrix#dsTMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
- 
-3: Ambiguous method selection for "+", target "dsTMatrix#dsTMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
- 
-4: Ambiguous method selection for ">=", target "dsTMatrix#dsTMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
- 
-5: Ambiguous method selection for "<", target "dsTMatrix#dsTMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
- 
 > stopifnot(is(s2, "symmetricMatrix"),
 + 	  is(st, "symmetricMatrix"))
 > checkMatrix(s.32  <- st[1:3,1:2]) ## 3 x 2 - and *not* dsTMatrix
@@ -1072,6 +1064,10 @@ keeping Tsparse matrix *symmetric* in sub-assignment
 > stopifnot(isValid(x.x, "dsCMatrix"),
 + 	  12:16 == as.mat(x.x)[cbind(2:6, 2:6)])
 > (ne1 <- (mc - m.) != 0)
+Warning: Ambiguous method selection for "!=", target "dgCMatrix#numeric" (the first of the signatures shown will be used)
+    dMatrix#numeric
+    sparseMatrix#numeric
+
 5 x 7 sparse Matrix of class "lgCMatrix"
                   
 [1,] . . . . . . .
@@ -1079,17 +1075,11 @@ keeping Tsparse matrix *symmetric* in sub-assignment
 [3,] | . . . . . .
 [4,] | | . . . | .
 [5,] . . | . . . .
-Warning message:
-Ambiguous method selection for "!=", target "dgCMatrix#numeric" (the first of the signatures shown will be used)
-    dMatrix#numeric
-    sparseMatrix#numeric
- 
 > stopifnot(identical(ne1, 0 != abs(mc - m.)))
-Warning message:
-Ambiguous method selection for "!=", target "numeric#dgCMatrix" (the first of the signatures shown will be used)
+Warning: Ambiguous method selection for "!=", target "numeric#dgCMatrix" (the first of the signatures shown will be used)
     numeric#dMatrix
     numeric#sparseMatrix
- 
+
 > (ge <- m. >= mc) # contains "=" -> result is dense
 5 x 7 Matrix of class "lgeMatrix"
       [,1] [,2]  [,3] [,4] [,5] [,6] [,7]
@@ -1172,7 +1162,7 @@ Ambiguous method selection for "!=", target "numeric#dgCMatrix" (the first of th
 +           dim(R[FALSE, FALSE]) == c(0,0))
 > 
 > cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
-Time elapsed:  27.661 0.148 29.374 0 0 
+Time elapsed:  8.751 0.127 8.969 0 0 
 > ##
 > cat("checkMatrix() of all: \n---------\n")
 checkMatrix() of all: 
@@ -1195,6 +1185,10 @@ B.
 C 
 D 
 H 
+Warning: Ambiguous method selection for "==", target "lgCMatrix#ltCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
 H. 
 Hc 
 suboptimal implementation of sparse 'symm. o symm.'
@@ -1208,14 +1202,78 @@ M.
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 M3 
+Warning: Ambiguous method selection for "==", target "ltCMatrix#ltCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
+Warning: Ambiguous method selection for "!=", target "ltCMatrix#ltCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
+Warning: Ambiguous method selection for "+", target "ltCMatrix#ltCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
+Warning: Ambiguous method selection for ">=", target "ltCMatrix#ltCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
+Warning: Ambiguous method selection for "<", target "ltCMatrix#ltCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
+Warning: Ambiguous method selection for "|", target "lgCMatrix#nsCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#nsparseMatrix
+
 .TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ltTMatrix to lgTMatrix
 Ms 
 suboptimal implementation of sparse 'symm. o symm.'
 R 
+Warning: Ambiguous method selection for "==", target "dtRMatrix#dtRMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+Warning: Ambiguous method selection for "!=", target "dtRMatrix#dtRMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+Warning: Ambiguous method selection for "+", target "dtRMatrix#dtRMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+Warning: Ambiguous method selection for ">=", target "dtRMatrix#dtRMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+Warning: Ambiguous method selection for "<", target "dtRMatrix#dtRMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
 Rs 
+Warning: Ambiguous method selection for "==", target "dsRMatrix#dsRMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+Warning: Ambiguous method selection for "!=", target "dsRMatrix#dsRMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+Warning: Ambiguous method selection for "+", target "dsRMatrix#dsRMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
 suboptimal implementation of sparse 'symm. o symm.'
+Warning: Ambiguous method selection for ">=", target "dsRMatrix#dsRMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
+Warning: Ambiguous method selection for "<", target "dsRMatrix#dsRMatrix" (the first of the signatures shown will be used)
+    sparseMatrix#sparseMatrix
+    dMatrix#dMatrix
+
 S 
 .TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
@@ -1225,6 +1283,14 @@ T
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 T3 
+Warning: Ambiguous method selection for "^", target "ltTMatrix#numeric" (the first of the signatures shown will be used)
+    lMatrix#numeric
+    sparseMatrix#numeric
+
+Warning: Ambiguous method selection for "*", target "numeric#ltTMatrix" (the first of the signatures shown will be used)
+    numeric#lMatrix
+    numeric#sparseMatrix
+
 .TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ltTMatrix to lgTMatrix
@@ -1240,13 +1306,65 @@ cm
 suboptimal implementation of sparse 'symm. o symm.'
 d6 
 exploding	<diag>	o  <diag>  into dense matrix
+Warning: Ambiguous method selection for "|", target "nsyMatrix#ngCMatrix" (the first of the signatures shown will be used)
+    nMatrix#Matrix
+    Matrix#nMatrix
+
+Warning: Ambiguous method selection for "|", target "lsCMatrix#lgCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
 exploding	<diag>	o  <diag>  into dense matrix
 exploding	<diag>	o  <diag>  into dense matrix
 dm 
 ge 
 l10 
+Warning: Ambiguous method selection for "!=", target "lsCMatrix#lsCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
+Warning: Ambiguous method selection for "+", target "lsCMatrix#lsCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
 suboptimal implementation of sparse 'symm. o symm.'
+Warning: Ambiguous method selection for ">=", target "lsCMatrix#lsCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
+Warning: Ambiguous method selection for "<", target "lsCMatrix#lsCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
+Warning: Ambiguous method selection for "|", target "lgCMatrix#lsCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
+Warning: Ambiguous method selection for "&", target "lsCMatrix#lgCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
 l3 
+Warning: Ambiguous method selection for "==", target "lgCMatrix#lgCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
+Warning: Ambiguous method selection for "!=", target "lgCMatrix#lgCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
+Warning: Ambiguous method selection for ">=", target "lgCMatrix#lgCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
+Warning: Ambiguous method selection for "<", target "lgCMatrix#lgCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#lsparseMatrix
+
+Warning: Ambiguous method selection for "|", target "lgCMatrix#ngCMatrix" (the first of the signatures shown will be used)
+    CsparseMatrix#CsparseMatrix
+    lsparseMatrix#nsparseMatrix
+
 lx.x 
 suboptimal implementation of sparse 'symm. o symm.'
 m. 
@@ -1289,135 +1407,10 @@ x.x
 suboptimal implementation of sparse 'symm. o symm.'
 x.x. 
 suboptimal implementation of sparse 'symm. o symm.'
-There were 31 warnings (use warnings() to see them)
 > cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
-Time elapsed:  24.046 0.056 25.642 0 0 
+Time elapsed:  7.675 0.007 7.683 0 0 
 > 
 > if(!interactive()) warnings()
-Warning messages:
-1: Ambiguous method selection for "==", target "lgCMatrix#ltCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#lsparseMatrix
-
-2: Ambiguous method selection for "==", target "ltCMatrix#ltCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#lsparseMatrix
-
-3: Ambiguous method selection for "!=", target "ltCMatrix#ltCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#lsparseMatrix
-
-4: Ambiguous method selection for "+", target "ltCMatrix#ltCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#lsparseMatrix
-
-5: Ambiguous method selection for ">=", target "ltCMatrix#ltCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#lsparseMatrix
-
-6: Ambiguous method selection for "<", target "ltCMatrix#ltCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#lsparseMatrix
-
-7: Ambiguous method selection for "|", target "lgCMatrix#nsCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#nsparseMatrix
-
-8: Ambiguous method selection for "==", target "dtRMatrix#dtRMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
-
-9: Ambiguous method selection for "!=", target "dtRMatrix#dtRMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
-
-10: Ambiguous method selection for "+", target "dtRMatrix#dtRMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
-
-11: Ambiguous method selection for ">=", target "dtRMatrix#dtRMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
-
-12: Ambiguous method selection for "<", target "dtRMatrix#dtRMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
-
-13: Ambiguous method selection for "==", target "dsRMatrix#dsRMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
-
-14: Ambiguous method selection for "!=", target "dsRMatrix#dsRMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
-
-15: Ambiguous method selection for "+", target "dsRMatrix#dsRMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
-
-16: Ambiguous method selection for ">=", target "dsRMatrix#dsRMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
-
-17: Ambiguous method selection for "<", target "dsRMatrix#dsRMatrix" (the first of the signatures shown will be used)
-    sparseMatrix#sparseMatrix
-    dMatrix#dMatrix
-
-18: Ambiguous method selection for "^", target "ltTMatrix#numeric" (the first of the signatures shown will be used)
-    lMatrix#numeric
-    sparseMatrix#numeric
-
-19: Ambiguous method selection for "*", target "numeric#ltTMatrix" (the first of the signatures shown will be used)
-    numeric#lMatrix
-    numeric#sparseMatrix
-
-20: Ambiguous method selection for "coerce", target "ddiMatrix#matrix" (the first of the signatures shown will be used)
-    diagonalMatrix#matrix
-    dMatrix#matrix
-
-21: Ambiguous method selection for "|", target "nsyMatrix#ngCMatrix" (the first of the signatures shown will be used)
-    nMatrix#Matrix
-    Matrix#nMatrix
-
-22: Ambiguous method selection for "|", target "lsCMatrix#lgCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#lsparseMatrix
-
-23: Ambiguous method selection for "!=", target "lsCMatrix#lsCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#lsparseMatrix
-
-24: Ambiguous method selection for "+", target "lsCMatrix#lsCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#lsparseMatrix
-
-25: Ambiguous method selection for ">=", target "lsCMatrix#lsCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#lsparseMatrix
-
-26: Ambiguous method selection for "<", target "lsCMatrix#lsCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#lsparseMatrix
-
-27: Ambiguous method selection for "==", target "lgCMatrix#lgCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#lsparseMatrix
-
-28: Ambiguous method selection for "!=", target "lgCMatrix#lgCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#lsparseMatrix
-
-29: Ambiguous method selection for ">=", target "lgCMatrix#lgCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#lsparseMatrix
-
-30: Ambiguous method selection for "<", target "lgCMatrix#lgCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#lsparseMatrix
-
-31: Ambiguous method selection for "|", target "lgCMatrix#ngCMatrix" (the first of the signatures shown will be used)
-    CsparseMatrix#CsparseMatrix
-    lsparseMatrix#nsparseMatrix
-
+NULL
 > 
 > 
