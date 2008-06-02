@@ -35,7 +35,6 @@ export("Cholesky",
        "nearPD",
        "nnzero",
        "printSpMatrix",
-       "rcond",
        "readHB",
        "readMM",
        "symmpart",
@@ -48,6 +47,9 @@ export("Cholesky",
        "writeMM",
        "xtabs"
        )
+
+if(getRversion() < "2.7.0")
+    export("rcond")
 
 ## substitute for using  cbind() / rbind()
 export("cBind",

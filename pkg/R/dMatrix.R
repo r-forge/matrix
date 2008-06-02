@@ -1,9 +1,5 @@
 ### Define Methods that can be inherited for all subclasses
 
-
-setAs("dMatrix", "matrix",
-      function(from) as(as(from, "dgeMatrix"), "matrix"))
-
 ##-> "dMatrix" <--> "lMatrix"   ---> ./lMatrix.R
 
 ## these two are parallel to "n <-> l" in the above :

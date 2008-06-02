@@ -1,3 +1,15 @@
+2008-06-02  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dMatrix.R, R/Tsparse.R: get rid of some disambiguation warnings
+
+	* R/not.R: fix !<ldiMatrix>
+	implement two old "FIXME"s:  !<ldenseMatrix> & !<ndenseMatrix>
+
+	* R/diagMatrix.R (Ops): fix one-off thinko in
+	<diagonal> o <numeric> methods
+
+	* inst/test-tools.R: checkMatrix(): drop0(m12) unconditionally
+
 2008-05-30  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/diagMatrix.R (Ops): more <diagonal> o <Matrix> methods

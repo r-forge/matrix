@@ -535,6 +535,7 @@ setMethod("is.na", signature(x = "sparseMatrix"),## NB: nsparse* have own method
 	  })
 
 
+### Keep this namespace-hidden: Would need to return a classed object
 lm.fit.sparse <-
 function(x, y, offset = NULL, method = c("qr", "cholesky"),
          tol = 1e-7, singular.ok = TRUE, transpose = FALSE, ...)
