@@ -216,8 +216,8 @@ Ops.x.x <- function(e1, e2)
         if(!dens1 && !dens2) {
             ## both e1 _and_ e2 are sparse
             ## should not happen since we have <sparse> o <sparse> methods
-            stop("Mistaken intended method dispatch -- please report to ",
-                 packageDescription("Matrix")$Author)
+	    stop("Mistaken intended method dispatch -- please report to ",
+		 packageDescription("Matrix")$Maintainer)
         }
         ## else
         if(dens1 && !dens2) ## go to dense
@@ -973,10 +973,22 @@ setMethod("Ops", signature(e1 = "nsparseMatrix", e2 = "sparseMatrix"),
 	  function(e1, e2) callGeneric(as(e1, "lsparseMatrix"),
 				       as(e2, "CsparseMatrix")))
 
-## these where 'Arith', now generalized:
+## these were 'Arith', now generalized:
+if(FALSE) { ## just shifts the ambiguity warnings ..
+## <sparse> o <sparse> more complicated - against PITA disambiguation warnings:
+setMethod("Ops", signature(e1 = "TsparseMatrix", e2 = "TsparseMatrix"),
+	  function(e1, e2) callGeneric(as(e1, "CsparseMatrix"),
+				       as(e2, "CsparseMatrix")))
+setMethod("Ops", signature(e1 = "TsparseMatrix", e2 = "CsparseMatrix"),
+	  function(e1, e2) callGeneric(as(e1, "CsparseMatrix"), e2))
+setMethod("Ops", signature(e1 = "CsparseMatrix", e2 = "TsparseMatrix"),
+	  function(e1, e2) callGeneric(e1, as(e2, "CsparseMatrix")))
+}
+## catch the rest:  Rsparse*  and  T*  o  R*
 setMethod("Ops", signature(e1 = "sparseMatrix", e2 = "sparseMatrix"),
 	  function(e1, e2) callGeneric(as(e1, "CsparseMatrix"),
 				       as(e2, "CsparseMatrix")))
+
 setMethod("Ops", signature(e1 = "sparseMatrix", e2 = "numeric"),
 	  function(e1, e2) callGeneric(as(e1, "CsparseMatrix"), e2))
 setMethod("Ops", signature(e1 = "numeric", e2 = "sparseMatrix"),

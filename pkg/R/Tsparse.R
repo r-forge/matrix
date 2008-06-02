@@ -7,6 +7,9 @@ setAs("matrix", "TsparseMatrix",
       else if(is.logical(from)) as(Matrix(from, sparse=TRUE), "TsparseMatrix")
       else stop("not-yet-implemented coercion to \"TsparseMatrix\""))
 
+setAs("TsparseMatrix", "matrix",
+      function(from) .Call(dgTMatrix_to_matrix, as(from, "dgTMatrix")))
+
 ## in ../src/Tsparse.c :  |-> cholmod_T -> cholmod_C -> chm_sparse_to_SEXP
 ## adjusted for triangular matrices not represented in cholmod
 .T.2.C <- function(from) .Call(Tsparse_to_Csparse, from, ##

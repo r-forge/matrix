@@ -194,6 +194,12 @@ mkLDL <- function(n, density = 1/3) {
     list(A = A, L = L, d.half = d.half, D = D)
 }
 
+eqDeterminant <- function(m1, m2, ...) {
+    d1 <- determinant(m1)
+    d2 <- determinant(m2)
+    (d1$modulus == -Inf && d2$modulus == -Inf) || all.equal(d1, d2, ...)
+}
+
 ##--- Compatibility tests "Matrix" =!= "traditional Matrix" ---
 checkMatrix <- function(m, m.m = as(m, "matrix"),
 			do.t = TRUE, doNorm = TRUE, doOps = TRUE, doSummary = TRUE,
@@ -340,7 +346,8 @@ checkMatrix <- function(m, m.m = as(m, "matrix"),
     ## "!" should work (via as(*, "l...")) :
     m11 <- as(as(!!m,"CsparseMatrix"), "lMatrix")
     m12 <- as(as(  m, "lMatrix"),"CsparseMatrix")
-    if(isSparse && has0) m12 <- drop0(m12)
+    ## m12: sparse and may have 0s even if this is not: if(isSparse && has0)
+    m12 <- drop0(m12)
     if(!Qidentical(m11, m12))
 	stopifnot(Qidentical(as(m11, "generalMatrix"),
 			     as(m12, "generalMatrix")))
@@ -375,7 +382,7 @@ checkMatrix <- function(m, m.m = as(m, "matrix"),
             if(any(is.na(m.m)) && extends(cld, "triangularMatrix"))
                 Cat(" skipped: is triang. and has NA")
             else
-                stopifnot(all.equal(determinant(m.m), determinant(m)))
+		stopifnot(eqDeterminant(m, m.m))
             Cat("ok\n")
         }
         else assertError(determinant(m))

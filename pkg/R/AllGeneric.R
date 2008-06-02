@@ -35,6 +35,7 @@ setGeneric("lu", function(x, ...) standardGeneric("lu"))
 ## base::rcond() has additional argument 'triangular'
 ## which should *not* be part of the signature
 setGeneric("rcond", function(x, norm, ...) standardGeneric("rcond"),
+	   signature = c("x", "norm"),
 	   useAsDefault =
            ## for now:
            if(existsFunction("rcond", where=baseenv()))

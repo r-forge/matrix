@@ -4,7 +4,7 @@
 \alias{lMatrix-class}
 %
 \alias{show,dMatrix-method}
-\alias{coerce,dMatrix,matrix-method}
+%\alias{coerce,dMatrix,matrix-method}
 \alias{coerce,dMatrix,lMatrix-method}
 \alias{coerce,lMatrix,dMatrix-method}
 \alias{coerce,lMatrix,dgCMatrix-method}

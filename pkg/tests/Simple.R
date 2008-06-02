@@ -82,13 +82,20 @@ assert.EQ.mat(t1, as(t1c, "matrix"))
 D4. <- D4 * (M4 <- Matrix(1:4, 4,4))
 D4p <- M4 + D4
 Lg1 <- D4 > 0 & D4 > 1
+nLg <- !Lg1
+nnLg <- !nLg
+D4m <- D4 * 4:1
 assert.EQ.mat(D4., diag(x= (1:4)^2))
 assert.EQ.mat(D4p, diag(x= (1:4)) + (1:4))
+assert.EQ.mat(D4m, diag(x=c(4,6,6,4)))
 assert.EQ.mat(Lg1, diag(x= c(FALSE, rep(TRUE,3))))
 if(FALSE)## FIXME
 stopifnot(is(D4., "diagonalMatrix"))
-stopifnot(is(Lg1, "diagonalMatrix"),
-          identical(Lg1 != !Lg1, Diagonal(4,x=TRUE)))
+stopifnot(is(Lg1, "diagonalMatrix"), is(D4m, "diagonalMatrix"),
+          is(nLg, "symmetricMatrix"), is(nnLg, "symmetricMatrix"),
+          identical3(Lg1, Matrix(nnLg), as(nnLg, "diagonalMatrix")),
+          all(Lg1 != (!Lg1)))
+
 
 ## as(<diag>, <anything>) :
 str(cls <- names(getClass("Matrix")@subclasses))# all Matrix classes
