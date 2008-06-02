@@ -5,8 +5,8 @@ library(Matrix)
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 
 if(interactive()) {
-    options(error = recover)
-} else options(verbose = TRUE)# to show message()s
+    options(error = recover, warn = 1)
+} else options(verbose = TRUE, warn = 1)
 
 ### Dense Matrices
 
@@ -220,7 +220,7 @@ stopifnot(identical(m0[2,], m0[,2]),
 	  identical(m0[,1], c(1,0,0,0,0)))
 ### Diagonal -- Sparse:
 (m1 <- as(m0, "sparseMatrix"))  # dtTMatrix
-(m2 <- as(m0, "CsparseMatrix")) # dtCMatrix (with an irrelevant warning)
+(m2 <- as(m0, "CsparseMatrix")) # dtCMatrix
 m1g <- as(m1, "generalMatrix")
 stopifnot(is(m1g, "dgTMatrix"))
 assert.EQ.mat(m2[1:3,],    diag(5)[1:3,])
