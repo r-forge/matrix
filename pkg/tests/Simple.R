@@ -58,6 +58,12 @@ g5 <- new("dgCMatrix", Dim = c(5L, 5L),
 t5 <- as(g5, "triangularMatrix") # works fine (but slowly) FIXME
 stopifnot(class(t5) == "dtCMatrix",
           identical(t5, tril(g5)))
+## This is really a regression test for 'methods::selectMethod()'
+## Maybe move to R once 'Matrix' is recommended
+if(getRversion() >= "2.7.1" || R.version$`svn rev` >= 45885)  {
+    sm <- selectMethod(coerce, c("dgCMatrix", "triangularMatrix"), verbose=TRUE)
+    stopifnot(identical(sm(g5), t5))
+}
 
 (t1 <- new("dtTMatrix", x= c(3,7), i= 0:1, j=3:2,
            Dim= as.integer(c(4,4))))
