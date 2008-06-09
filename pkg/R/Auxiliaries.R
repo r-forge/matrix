@@ -38,12 +38,20 @@ paste0 <- function(...) paste(..., sep = '')
 		  fun, cl1, cl2), call. = FALSE)
 }
 
+## we can set this to FALSE and possibly measure speedup:
+.copyClass.check <- TRUE
+
 ## This should be done in C and be exported by 'methods':  [FIXME - ask JMC ]
 copyClass <- function(x, newCl, sNames =
-		      intersect(slotNames(newCl), slotNames(x))) {
+		      intersect(slotNames(newCl), slotNames(x)),
+                      check = .copyClass.check)
+{
     r <- new(newCl)
-    for(n in sNames)
-	slot(r, n) <- slot(x, n)
+    ## Equivalent of
+    ##   for(n in sNames) slot(r, n, check=check) <- slot(x, n)  :
+    if(check) for(n in sNames) slot(r, n) <- slot(x, n)
+    else for(n in sNames) # don't check, be fast
+	.Call("R_set_slot", r, n, slot(x,n), PACKAGE = "methods")
     r
 }
 

@@ -1,3 +1,11 @@
+2008-06-09  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dtCMatrix.R: faster dgC* -> dtC* method
+	* tests/Simple.R: (hence removed "FIXME")
+
+	* R/Auxiliaries.R (copyClass): add 'check = .copyClass.check'
+	which can be be turned off for possible speed gains.
+
 2008-06-02  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/dMatrix.R, R/Tsparse.R: get rid of some disambiguation warnings
