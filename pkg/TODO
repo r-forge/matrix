@@ -176,7 +176,3 @@
 - <diagMatrix> o <ddenseMatrix> currently works via sparse, but
   should return <diagMatrix> in the same cases where
   <diagMatrix> o <numeric> does.
-
-- coercing sparse to dense when the denseMatrix is too large
-  (length(@ x) > .Machine$integer.max), should give better error
-  messages; e.g. Lrg == Lrg or  !Lrg  (in tests/indexing.R )
