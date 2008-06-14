@@ -183,8 +183,8 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
 			  r <- c(r, rep.int(callGeneric(1, e2),d[1]))
 
 		      ## Here, we assume that 'r' and the indices align (!)
-		      encI <- encodeInd(non0ind(e1, cl1, uniqT=FALSE,
-						xtendSymm=FALSE), nr = d[1])
+		      encI <- .Call(m_encodeInd, non0ind(e1, cl1, uniqT=FALSE,
+						xtendSymm=FALSE), di = d)
 		      rx[1L + encI] <- r
 		      r <- new(if(extends(cl1, "symmetricMatrix"))
 			       "lsyMatrix" else "lgeMatrix",
@@ -482,8 +482,8 @@ setMethod("Logic", signature(e1 = "lMatrix", e2 = "logical"),
 			  r <- c(r, rep.int(callGeneric(TRUE, e2),d[1]))
 
 		      ## Here, we assume that 'r' and the indices align (!)
-		      encI <- encodeInd(non0ind(e1, cl1, uniqT=FALSE,
-						xtendSymm=FALSE), nr = d[1])
+		      encI <- .Call(m_encodeInd, non0ind(e1, cl1, uniqT=FALSE,
+						xtendSymm=FALSE), di = d)
 		      rx[1L + encI] <- r
 		      r <- new(if(extends(cl1, "symmetricMatrix"))
 			       "lsyMatrix" else "lgeMatrix",
@@ -500,7 +500,7 @@ setMethod("Logic", signature(e1 = "lMatrix", e2 = "logical"),
 
 ## Here's the common functionality
 .do.Logic.lsparse <- function(e1,e2, d, dn, isOR, ij1, ij2) {
-    ii <- WhichintersectInd(ij1, ij2, nrow=d[1])
+    ii <- WhichintersectInd(ij1, ij2, di=d)
     I1 <- ii[[1]] ; has1 <- length(I1) > 0
     I2 <- ii[[2]] ; has2 <- length(I2) > 0
 
@@ -677,7 +677,7 @@ setMethod("Arith", signature(e1 = "dsCMatrix", e2 = "dsCMatrix"),
 
 	   "*" =
        { ##  X * 0 == 0 * X == 0 --> keep common non-0
-	   ii <- WhichintersectInd(ij1, ij2, nrow=d[1])
+	   ii <- WhichintersectInd(ij1, ij2, di=d)
 	   ij <- ij1[ii[[1]], , drop = FALSE]
 	   .Call(Tsparse_to_Csparse,
 		 newTMat(i = ij[,1],
@@ -688,7 +688,7 @@ setMethod("Arith", signature(e1 = "dsCMatrix", e2 = "dsCMatrix"),
 
 	   "^" =
        {
-	   ii <- WhichintersectInd(ij1, ij2, nrow=d[1])
+	   ii <- WhichintersectInd(ij1, ij2, di=d)
 	   ## 3 cases:
 	   ## 1) X^0 := 1  (even for X=0) ==> dense
 	   ## 2) 0^Y := 0  for Y != 0	      =====
@@ -745,7 +745,7 @@ setMethod("Arith", signature(e1 = "dgCMatrix", e2 = "numeric"),
 			  warning(gettextf("longer object length\n\tis not a multiple of shorter object length"))
 		      ## TODO: construction of [1L + in0 %%l2] via one .Call()
 		      ## 0-based indices:
-		      in0 <- encodeInd(.Call(compressed_non_0_ij, e1, TRUE), d[1])
+		      in0 <- .Call(m_encodeInd, .Call(compressed_non_0_ij, e1, TRUE), d)
 		      e2 <- e2[1L + in0 %% l2]
 		  }
 		  e1@x <- callGeneric(e1@x, e2)
@@ -778,7 +778,7 @@ setMethod("Arith", signature(e1 = "numeric", e2 = "dgCMatrix"),
 			  warning(gettextf("longer object length\n\tis not a multiple of shorter object length"))
 		      ## TODO: construction of [1L + in0 %% l1] via one .Call()
 		      ## 0-based indices:
-		      in0 <- encodeInd(.Call(compressed_non_0_ij, e2, TRUE), d[1])
+		      in0 <- .Call(m_encodeInd, .Call(compressed_non_0_ij, e2, TRUE), d)
 		      e1 <- e1[1L + in0 %% l1]
 		  }
 		  e2@x <- callGeneric(e1, e2@x)
@@ -923,7 +923,7 @@ setMethod("Compare", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
                   ## want only those which correspond to 'x' slot
                   ij1 <- .Call(compressed_non_0_ij, e1, TRUE)
                   ij2 <- .Call(compressed_non_0_ij, e2, TRUE)
-                  ii <- WhichintersectInd(ij1, ij2, nrow=d[1])
+                  ii <- WhichintersectInd(ij1, ij2, di=d)
                   I1 <- ii[[1]]
                   I2 <- ii[[2]]
 

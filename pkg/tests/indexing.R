@@ -528,6 +528,20 @@ stopifnot(dim(M[2:3, FALSE]) == c(2,0),
           identical(R [2:3,TRUE], R [2:3,]),
           dim(R[FALSE, FALSE]) == c(0,0))
 
+n <- 50000L
+Lrg <- new("dgTMatrix", Dim = c(n,n))
+diag(Lrg) <- 1:n
+dLrg <- as(Lrg, "diagonalMatrix")
+stopifnot(identical(Diagonal(x = 1:n), dLrg))
+diag(dLrg) <- 1 + diag(dLrg)
+Clrg <- as(Lrg,"CsparseMatrix")
+Ctrg <- as(Clrg, "triangularMatrix")
+diag(Ctrg) <- 1 + diag(Ctrg)
+stopifnot(identical(Diagonal(x = 1+ 1:n), dLrg),
+          identical(Ctrg, as(dLrg,"CsparseMatrix")))
+
+cc <- capture.output(show(dLrg))# show(<diag>) used to error for large n
+
 cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
 ##
 cat("checkMatrix() of all: \n---------\n")

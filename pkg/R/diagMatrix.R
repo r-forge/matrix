@@ -619,7 +619,7 @@ setMethod("Ops", signature(e1 = "sparseMatrix", e2 = "ldiMatrix"),
 ## ddi*: Arith: result numeric, potentially ddiMatrix
 setMethod("Arith", signature(e1 = "ddiMatrix", e2 = "numeric"),
 	  function(e1,e2) {
-	      n <- e1@Dim[1]; nsq <- n*n
+	      n <- e1@Dim[1]; nsq <- n^2
 	      f0 <- callGeneric(0, e2)
 	      if(all(is0(f0))) { # remain diagonal
 		  L1 <- (le <- length(e2)) == 1L
@@ -637,7 +637,7 @@ setMethod("Arith", signature(e1 = "ddiMatrix", e2 = "numeric"),
 
 setMethod("Arith", signature(e1 = "numeric", e2 = "ddiMatrix"),
 	  function(e1,e2) {
-	      n <- e2@Dim[1]; nsq <- n*n
+	      n <- e2@Dim[1]; nsq <- n^2
 	      f0 <- callGeneric(e1, 0)
 	      if(all(is0(f0))) { # remain diagonal
 		  L1 <- (le <- length(e1)) == 1L
@@ -656,7 +656,7 @@ setMethod("Arith", signature(e1 = "numeric", e2 = "ddiMatrix"),
 ## ldi* Arith --> result numeric, potentially ddiMatrix
 setMethod("Arith", signature(e1 = "ldiMatrix", e2 = "numeric"),
 	  function(e1,e2) {
-	      n <- e1@Dim[1]; nsq <- n*n
+	      n <- e1@Dim[1]; nsq <- n^2
 	      f0 <- callGeneric(0, e2)
 	      if(all(is0(f0))) { # remain diagonal
 		  L1 <- (le <- length(e2)) == 1L
@@ -675,7 +675,7 @@ setMethod("Arith", signature(e1 = "ldiMatrix", e2 = "numeric"),
 
 setMethod("Arith", signature(e1 = "numeric", e2 = "ldiMatrix"),
 	  function(e1,e2) {
-	      n <- e2@Dim[1]; nsq <- n*n
+	      n <- e2@Dim[1]; nsq <- n^2
 	      f0 <- callGeneric(e1, 0)
 	      if(all(is0(f0))) { # remain diagonal
 		  L1 <- (le <- length(e1)) == 1L
@@ -695,7 +695,7 @@ setMethod("Arith", signature(e1 = "numeric", e2 = "ldiMatrix"),
 ## ddi*: for "Ops" without Arith --> result logical, potentially ldi
 setMethod("Ops", signature(e1 = "ddiMatrix", e2 = "numeric"),
 	  function(e1,e2) {
-	      n <- e1@Dim[1]; nsq <- n*n
+	      n <- e1@Dim[1]; nsq <- n^2
 	      f0 <- callGeneric(0, e2)
 	      if(all(is0(f0))) { # remain diagonal
 		  L1 <- (le <- length(e2)) == 1L
@@ -714,7 +714,7 @@ setMethod("Ops", signature(e1 = "ddiMatrix", e2 = "numeric"),
 
 setMethod("Ops", signature(e1 = "numeric", e2 = "ddiMatrix"),
 	  function(e1,e2) {
-	      n <- e2@Dim[1]; nsq <- n*n
+	      n <- e2@Dim[1]; nsq <- n^2
 	      f0 <- callGeneric(e1, 0)
 	      if(all(is0(f0))) { # remain diagonal
 		  L1 <- (le <- length(e1)) == 1L
@@ -734,7 +734,7 @@ setMethod("Ops", signature(e1 = "numeric", e2 = "ddiMatrix"),
 ## ldi*: for "Ops" without Arith --> result logical, potentially ldi
 setMethod("Ops", signature(e1 = "ldiMatrix", e2 = "numeric"),
 	  function(e1,e2) {
-	      n <- e1@Dim[1]; nsq <- n*n
+	      n <- e1@Dim[1]; nsq <- n^2
 	      f0 <- callGeneric(FALSE, e2)
 	      if(all(is0(f0))) { # remain diagonal
 		  L1 <- (le <- length(e2)) == 1L
@@ -752,7 +752,7 @@ setMethod("Ops", signature(e1 = "ldiMatrix", e2 = "numeric"),
 
 setMethod("Ops", signature(e1 = "numeric", e2 = "ldiMatrix"),
 	  function(e1,e2) {
-	      n <- e2@Dim[1]; nsq <- n*n
+	      n <- e2@Dim[1]; nsq <- n^2
 	      f0 <- callGeneric(e1, FALSE)
 	      if(all(is0(f0))) { # remain diagonal
 		  L1 <- (le <- length(e1)) == 1L
@@ -851,7 +851,14 @@ setMethod("show", signature(object = "diagonalMatrix"),
 	  function(object) {
 	      d <- dim(object)
 	      cl <- class(object)
-	      cat(sprintf('%d x %d diagonal matrix of class "%s"\n',
+	      cat(sprintf('%d x %d diagonal matrix of class "%s"',
 			  d[1], d[2], cl))
-	      prDiag(object)
+	      if(d[1] < 50) {
+		  cat("\n")
+		  prDiag(object)
+	      } else {
+		  cat(", with diagonal entries\n")
+		  show(diag(object))
+		  invisible(object)
+	      }
 	  })

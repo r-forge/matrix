@@ -235,6 +235,9 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A);
 SEXP dup_mMatrix_as_geMatrix (SEXP A);
 
 SEXP new_dgeMatrix(int nrow, int ncol);
+SEXP m_encodeInd (SEXP ij, SEXP di);
+SEXP m_encodeInd2(SEXP i, SEXP j, SEXP di);
+
 
 static R_INLINE SEXP
 mMatrix_as_dgeMatrix(SEXP A)
@@ -266,6 +269,7 @@ Matrix_check_class(const char *class, char **valid)
 	if (!strcmp(class, valid[ans])) return ans;
     }
 }
+
 
 #ifdef __cplusplus
 }

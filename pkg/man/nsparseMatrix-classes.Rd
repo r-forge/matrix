@@ -12,6 +12,8 @@
 \alias{ntTMatrix-class}
 \alias{nsTMatrix-class}
 %
+\alias{all,nsparseMatrix-method}
+\alias{any,nsparseMatrix-method}
 \alias{-,nsparseMatrix,missing-method}
 \alias{!,nsparseMatrix-method}
 \alias{\%*\%,ngCMatrix,ngCMatrix-method}

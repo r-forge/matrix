@@ -490,7 +490,7 @@ subset.ij <- function(x, ij) {
         }
         if(extends(cld, "sparseMatrix")) {
 	    ## do something smarter:
-	    nr <- nrow(x)
+	    di <- dim(x)
 	    if(!extends(cld, "CsparseMatrix")) {
 		x <- as(x, "CsparseMatrix") # simpler; our standard
 		cld <- getClassDef(class(x))
@@ -505,8 +505,8 @@ subset.ij <- function(x, ij) {
 		ij.x <- non0.i(x, cld)
 	    }
 
-	    mi <- match(encodeInd(ij.x,	  nr),
-			encodeInd(ij -1L, nr), nomatch=0)
+	    mi <- match(.Call(m_encodeInd, ij.x,	  di),
+			.Call(m_encodeInd, ij -1L, di), nomatch=0)
 	    mmi <- mi != 0
 	    ## Result:
 	    ans <- vector(mode = .type.kind[.M.kindC(cld)], length = m)
