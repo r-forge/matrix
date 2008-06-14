@@ -37,6 +37,20 @@ str(l0 <- Matrix(FALSE, nrow=100, ncol = 200))
 stopifnot(all(!l0),
           identical(FALSE, any(l0)))
 
+## really large {length(<dense equivalent>) is beyond R's limits}:
+op <- options(warn = 2) # warnings here are errors
+n <- 50000L
+Lrg <- new("dgTMatrix", Dim = c(n,n))
+diag(Lrg[2:9,1:8]) <- 1:8
+e1 <- try(Lrg == Lrg) # error message almost ok
+e2 <- try(!Lrg) # error message was "bad", now perfect
+ina <- is.na(Lrg)# "all FALSE"
+stopifnot(grep("too large", e1) == 1,
+          grep("too large", e2) == 1,
+                    !any(ina))# <- gave warning previously
+## FIXME  any(Lrg), !any(ina))# <- gave warning previously
+options(op)
+
 ## with dimnames:
 m. <- matrix(c(0, 0, 2:0), 3, 5)
 dimnames(m.) <- list(LETTERS[1:3], letters[1:5])

@@ -465,13 +465,28 @@ non0ind <- function(x, classDef.x = getClassDef(class(x)),
 	ij
 }
 
+if(FALSE) { ## -- now have  .Call(m_encodeInd, ...) etc :
+
 ## nr= nrow: since  i in {0,1,.., nrow-1}  these are 1L "decimal" encodings:
 ## Further, these map to and from the usual "Fortran-indexing" (but 0-based)
-encodeInd  <- function(ij,  nr) ij[,1] + ij[,2] * nr
-encodeInd2 <- function(i,j, nr) i      +  j     * nr
+## __ care against integer overflow __
+encodeInd  <- function(ij, di) {
+    stopifnot(length(di) == 2)
+    nr <- di[1L]
+    if(prod(di) >= .Machine$integer.max) nr <- as.double(nr)
+    ij[,1] + ij[,2] * nr
+}
+encodeInd2 <- function(i,j, di) {
+    stopifnot(length(di) == 2)
+    nr <- di[1L]
+    if(prod(di) >= .Machine$integer.max) nr <- as.double(nr)
+    i +  j * nr
+}
+}## no more needed
 
-## 'code' is 0-based:
-decodeInd <- function(code, nr) cbind(code %% nr, code %/% nr)
+## 'code' is 0-based; as.integer(.) because encode*() may produce double
+decodeInd <- function(code, nr) cbind(as.integer(code %% nr),
+				      as.integer(code %/% nr))
 
 complementInd <- function(ij, dim)
 {
@@ -479,23 +494,22 @@ complementInd <- function(ij, dim)
     ##		but as 1-based indices
     n <- prod(dim)
     if(n == 0) return(integer(0))
-    ii <- 1:n
-    ii[-(1 + encodeInd(ij, nr = dim[1]))]
+    seq_len(n)[-(1L + .Call(m_encodeInd, ij, dim))]
 }
 
 unionInd <- function(ij1, ij2) unique(rbind(ij1, ij2))
 
-intersectInd <- function(ij1, ij2, nrow) {
+intersectInd <- function(ij1, ij2, di) {
     ## from 2-column (i,j) matrices where i in {0,.., nrow-1},
     ## return only the *common* entries
-    decodeInd(intersect(encodeInd(ij1, nrow),
-			encodeInd(ij2, nrow)), nrow)
+    decodeInd(intersect(.Call(m_encodeInd, ij1, di),
+			.Call(m_encodeInd, ij2, di)), nr=di[1])
 }
 
-WhichintersectInd <- function(ij1, ij2, nrow) {
+WhichintersectInd <- function(ij1, ij2, di) {
     ## from 2-column (i,j) matrices where i \in {0,.., nrow-1},
     ## find *where*  common entries are in ij1 & ij2
-    m1 <- match(encodeInd(ij1, nrow), encodeInd(ij2, nrow))
+    m1 <- match(.Call(m_encodeInd, ij1, di), .Call(m_encodeInd, ij2, di))
     ni <- !is.na(m1)
     list(which(ni), m1[ni])
 }
@@ -555,13 +569,13 @@ asTuniq <- function(x) {
     if(is(x, "TsparseMatrix")) uniqTsparse(x) else as(x,"TsparseMatrix")
 }
 
-## is 'x' a uniq Tsparse Matrix ?  {not used currently}
-is_not_uniqT <- function(x, nr = nrow(x))
-    is.unsorted(x@j) || any(duplicated(encodeInd2(x@i, x@j, nr)))
+## is 'x' a uniq Tsparse Matrix ?
+is_not_uniqT <- function(x, di = dim(x))
+    is.unsorted(x@j) || any(duplicated(.Call(m_encodeInd2, x@i, x@j, di)))
 
 ## is 'x' a TsparseMatrix with no duplicated entries (to be *added* for uniq):
-is_duplicatedT <- function(x, nr = nrow(x))
-    any(duplicated(encodeInd2(x@i, x@j, nr)))
+is_duplicatedT <- function(x, di = dim(x))
+    any(duplicated(.Call(m_encodeInd2, x@i, x@j, di)))
 
 
 if(FALSE) ## try an "efficient" version

@@ -201,7 +201,8 @@ eqDeterminant <- function(m1, m2, ...) {
 }
 
 ##--- Compatibility tests "Matrix" =!= "traditional Matrix" ---
-checkMatrix <- function(m, m.m = as(m, "matrix"),
+checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
+			do.matrix = !(isSparse || isDiag) || prod(dim(m)) < 1e6,
 			do.t = TRUE, doNorm = TRUE, doOps = TRUE, doSummary = TRUE,
 			doCoerce = TRUE,
 			doCoerce2 = doCoerce && !extends(cld, "RsparseMatrix"),
@@ -220,6 +221,7 @@ checkMatrix <- function(m, m.m = as(m, "matrix"),
     isCor    <- extends(cld, "corMatrix")
     isSparse <- extends(cld, "sparseMatrix")
     isSym    <- extends(cld, "symmetricMatrix")
+    isDiag   <- extends(cld, "diagonalMatrix")
 
     Cat	 <- function(...) if(verbose) cat(...)
     CatF <- function(...) if(verbose) catFUN(...)
@@ -245,57 +247,66 @@ checkMatrix <- function(m, m.m = as(m, "matrix"),
 	setMethod(determinant, c("matrix","logical"), determinant.matrix)
     }
 
-    if(getRversion() < "2.7.1" && R.version$`svn rev` < 45428) {
-        ## "Fixup base::diag()", i.e. the default diag() method, locally:
-        b.diag <- function(x = 1, nrow, ncol)
-        {
-            if (is.matrix(x) && nargs() == 1) {
-                if((m <- min(dim(x))) == 0)
-                    return(vector(typeof(x), 0)) # logical, integer, also list ..
+    if(getRversion() < "2.7.1") {
+	## "Fixup base::diag()", i.e. the default diag() method, locally:
+	b.diag <- function(x = 1, nrow, ncol)
+	{
+	    if (is.matrix(x) && nargs() == 1) {
+		if((m <- min(dim(x))) == 0)
+		    return(vector(typeof(x), 0)) # logical, integer, also list ..
 
-                y <- c(x)[1 + 0:(m - 1) * (dim(x)[1] + 1)]
-                nms <- dimnames(x)
-                if (is.list(nms) && !any(sapply(nms, is.null)) &&
-                    identical((nm <- nms[[1]][1:m]), nms[[2]][1:m]))
-                    names(y) <- nm
-                return(y)
-            }
-            if(is.array(x) && length(dim(x)) != 1)
-                stop("first argument is array, but not matrix.")
+		y <- c(x)[1 + 0:(m - 1) * (dim(x)[1] + 1)]
+		nms <- dimnames(x)
+		if (is.list(nms) && !any(sapply(nms, is.null)) &&
+		    identical((nm <- nms[[1]][1:m]), nms[[2]][1:m]))
+		    names(y) <- nm
+		return(y)
+	    }
+	    if(is.array(x) && length(dim(x)) != 1)
+		stop("first argument is array, but not matrix.")
 
-            if(missing(x))
-                n <- nrow
-            else if(length(x) == 1 && missing(nrow) && missing(ncol)) {
-                n <- as.integer(x)
-                x <- 1
-            }
-            else n <- length(x)
-            if(!missing(nrow))
-                n <- nrow
-            if(missing(ncol))
-                ncol <- n
-            p <- ncol
-            y <- array(0, c(n, p))
-            if((m <- min(n, p)) > 0) y[1 + 0:(m - 1) * (n + 1)] <- x
-            y
-        }
-        ## .old.base.diag <- base::diag
-        on.exit(setMethod(diag, "ANY", base::diag))
-        setMethod(diag, "ANY", b.diag)
-    }## end{Fix base::diag() for R < 2.7.0}
+	    if(missing(x))
+		n <- nrow
+	    else if(length(x) == 1 && missing(nrow) && missing(ncol)) {
+		n <- as.integer(x)
+		x <- 1
+	    }
+	    else n <- length(x)
+	    if(!missing(nrow))
+		n <- nrow
+	    if(missing(ncol))
+		ncol <- n
+	    p <- ncol
+	    y <- array(0, c(n, p))
+	    if((m <- min(n, p)) > 0) y[1 + 0:(m - 1) * (n + 1)] <- x
+	    y
+	}
+	## .old.base.diag <- base::diag
+	on.exit(setMethod(diag, "ANY", base::diag))
+	setMethod(diag, "ANY", b.diag)
+    }## end{Fix base::diag() for R <= 2.7.0}
 
+    DO.m <- function(expr) if(do.matrix) eval(expr) else TRUE
     ina <- is.na(m)
-    stopifnot(all(ina == is.na(m.m)),
-	      all(m == m | ina)) ## check all() , "==" [Compare], "|" [Logic]
-    if(any(m != m & !ina)) stop(" any (m != m) should not be true")
+    if(do.matrix) {
+	stopifnot(all(ina == is.na(m.m)),
+		  all(m == m | ina)) ## check all() , "==" [Compare], "|" [Logic]
+	if(any(m != m & !ina)) stop(" any (m != m) should not be true")
+    } else {
+	if(any(m != m)) stop(" any (m != m) should not be true")
+    }
     if(do.t) {
 	ttm <- t(t(m))
 	if(extends(cld, "CsparseMatrix") ||
-	   extends(cld, "generalMatrix")) stopifnot(Qidentical(m, ttm))
-	else
+	   extends(cld, "generalMatrix") || isDiag)
+            stopifnot(Qidentical(m, ttm))
+	else if(do.matrix)
 	    stopifnot(class(ttm) == clNam, all(m == ttm | ina))
+        ## else : not testing
     }
-    if(doNorm) {
+    if(!do.matrix) {
+	CatF(" will *not* coerce to 'matrix' since do.matrix is FALSE\n")
+    } else if(doNorm) {
 	CatF(sprintf(" norm(m [%d x %d]) :", nrow(m), ncol(m)))
 	for(typ in c("1","I","F","M")) {
 	    Cat('', typ, '')
@@ -303,39 +314,40 @@ checkMatrix <- function(m, m.m = as(m, "matrix"),
 	}
 	Cat(" ok\n")
     }
-    if(doSummary) {
+    if(do.matrix && doSummary) {
 	summList <- lapply(getGroupMembers("Summary"), get,
 			   envir = asNamespace("Matrix"))
 	CatF(" Summary: ")
-        for(f in summList) {
-            ## suppressWarnings():  e.g. any(<double>)  would warn here:
-            r <- suppressWarnings(if(isCor) all.equal(f(m), f(m.m)) else
-                                  identical(f(m), f(m.m)))
+	for(f in summList) {
+	    ## suppressWarnings():  e.g. any(<double>)	would warn here:
+	    r <- suppressWarnings(if(isCor) all.equal(f(m), f(m.m)) else
+				  identical(f(m), f(m.m)))
 	    if(!isTRUE(r)) {
 		f.nam <- sub("..$", '', sub("^\\.Primitive..", '', format(f)))
 		(if(f.nam == "prod") warnNow else stop)(
 		    sprintf("%s(m) differs from %s(m.m)", f.nam, f.nam))
 	    }
-        }
+	}
 	if(verbose) cat(" ok\n")
     }
 
     ## and test 'dim()' as well:
     d <- dim(m)
     isSqr <- d[1] == d[2]
+    if(do.t) stopifnot(identical(diag(m), diag(t(m))))
+    ## TODO: also === diag(band(m,0,0))
+    if(do.matrix)
     stopifnot(identical(dim(m.m), dim(m)),
-	      if(do.t) identical(diag(m), diag(t(m))) else TRUE,
-	      ## TODO: also === diag(band(m,0,0))
-              ## base::diag() keeps names [Matrix FIXME]
+	      ## base::diag() keeps names [Matrix FIXME]
 	      if(extends(cld, "pMatrix")) {
 		  identical(as.integer(unname(diag(m))), unname(diag(m.m)))
 	      } else
 	      identical(unname(diag(m)),
 			unname(diag(m.m))),## not for NA: diag(m) == diag(m.m),
-              identical(nnzero(m), sum(m.m != 0)),
+	      identical(nnzero(m), sum(m.m != 0)),
 	      identical(nnzero(m, na.= FALSE), sum(m.m != 0, na.rm = TRUE)),
 	      identical(nnzero(m, na.= TRUE),  sum(m.m != 0 | is.na(m.m)))
-              )
+	      )
 
     if(isSparse) {
 	n0m <- drop0(m, cld) #==> n0m is Csparse
@@ -343,14 +355,16 @@ checkMatrix <- function(m, m.m = as(m, "matrix"),
     }
     ## use non-square matrix when "allowed":
 
-    ## "!" should work (via as(*, "l...")) :
-    m11 <- as(as(!!m,"CsparseMatrix"), "lMatrix")
-    m12 <- as(as(  m, "lMatrix"),"CsparseMatrix")
     ## m12: sparse and may have 0s even if this is not: if(isSparse && has0)
+    m12 <- as(as(  m, "lMatrix"),"CsparseMatrix")
     m12 <- drop0(m12)
-    if(!Qidentical(m11, m12))
-	stopifnot(Qidentical(as(m11, "generalMatrix"),
-			     as(m12, "generalMatrix")))
+    if(do.matrix) {
+	## "!" should work (via as(*, "l...")) :
+	m11 <- as(as(!!m,"CsparseMatrix"), "lMatrix")
+	if(!Qidentical(m11, m12))
+	    stopifnot(Qidentical(as(m11, "generalMatrix"),
+				 as(m12, "generalMatrix")))
+    }
     if(isSparse && has0) { ## ensure that as(., "nMatrix") gives nz-pattern
 	CatF("as(., \"nMatrix\") giving full nonzero-pattern: ")
 	n1 <- as(m, "nMatrix")
@@ -362,40 +376,56 @@ checkMatrix <- function(m, m.m = as(m, "matrix"),
     }
 
     if(doOps) {
-        ## makes sense with non-trivial m (!)
-        CatF("2*m =?= m+m: ")
-        if(identical(2*m, m+m)) Cat("identical\n")
-        else {
-            stopifnot(as(2*m,"matrix") == as(m+m, "matrix"))
-            Cat("ok\n")
-        }
-        ## m == m etc, now for all, see above
-        CatF("m >= m for all: "); stopifnot(all(m >= m | ina)); Cat("ok\n")
-        if(d[1] * d[2] > 0) {
-            CatF("m < m for none: "); stopifnot(!all(m < m & !ina)); Cat("ok\n")
-        }
+	## makes sense with non-trivial m (!)
+	CatF("2*m =?= m+m: ")
+	if(identical(2*m, m+m)) Cat("identical\n")
+	else if(do.matrix) {
+	    stopifnot(as(2*m,"matrix") == as(m+m, "matrix"))
+	    Cat("ok\n")
+	} else {# !do.matrix
+	    identical(as(2*m, "CsparseMatrix"),
+		      as(m+m, "CsparseMatrix"))
+	    Cat("ok\n")
+	}
+	if(do.matrix) {
+	    ## m == m etc, now for all, see above
+	    CatF("m >= m for all: "); stopifnot(all(m >= m | ina)); Cat("ok\n")
+	}
+	if(prod(d) > 0) {
+	    CatF("m < m for none: ")
+	    mlm <- m < m
+	    if(!any(ina)) stopifnot(!any(mlm))
+	    else if(do.matrix) stopifnot(!any(mlm & !ina))
+	    else { ## !do.matrix & any(ina) :  !ina can *not* be used
+		mlm[ina] <- FALSE
+		stopifnot(!any(mlm))
+	    }
+	    Cat("ok\n")
+	}
 
-        if(isSqr) {
-            ## determinant(<dense>) "fails" for triangular with NA such as
-            ## (m <- matrix(c(1:0,NA,1), 2))
-            CatF("det...(): ")
-            if(any(is.na(m.m)) && extends(cld, "triangularMatrix"))
-                Cat(" skipped: is triang. and has NA")
-            else
-		stopifnot(eqDeterminant(m, m.m))
-            Cat("ok\n")
-        }
-        else assertError(determinant(m))
+	if(isSqr) {
+	    if(do.matrix) {
+		## determinant(<dense>) "fails" for triangular with NA such as
+		## (m <- matrix(c(1:0,NA,1), 2))
+		CatF("det...(): ")
+		if(any(is.na(m.m)) && extends(cld, "triangularMatrix"))
+		    Cat(" skipped: is triang. and has NA")
+		else
+		    stopifnot(eqDeterminant(m, m.m))
+		Cat("ok\n")
+	    }
+	} else assertError(determinant(m))
     }
 
-    if(doCoerce && canCoerce("matrix", clNam)) {
+    if(doCoerce && do.matrix && canCoerce("matrix", clNam)) {
 	CatF("as(<matrix>, ",clNam,"): ", sep='')
 	m3 <- as(m.m, clNam)
 	Cat("valid:", validObject(m3), "\n")
 	## m3 should ``ideally'' be identical to 'm'
     }
 
-    if(doCoerce2) {
+    if(doCoerce2 && do.matrix) { ## not for large m:  !m will be dense
+
 	if(extends(cld, "lMatrix")) { ## should fulfill even with NA:
 	    stopifnot(all(m | !m | ina), !any(!m & m & !ina))
 	    if(extends(cld, "TsparseMatrix")) # allow modify, since at end here
@@ -412,9 +442,9 @@ checkMatrix <- function(m, m.m = as(m, "matrix"),
 	    CatF("as(<triangular (ge)matrix>, ",clNam,"): ", sep='')
 	    tm <- as(as(mm., "triangularMatrix"), clNam)
 	    Cat("valid:", validObject(tm), "\n")
-            if(m@uplo == tm@uplo) ## otherwise, the matrix effectively was *diagonal*
-                ## note that diagU2N(<dtr>) |-> dtC :
-                stopifnot(Qidentical(tm, as(Matrix:::diagU2N(m), clNam)))
+	    if(m@uplo == tm@uplo) ## otherwise, the matrix effectively was *diagonal*
+		## note that diagU2N(<dtr>) |-> dtC :
+		stopifnot(Qidentical(tm, as(Matrix:::diagU2N(m), clNam)))
 	}
 	else if(extends(cld, "diagonalMatrix")) {
 

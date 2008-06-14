@@ -1,3 +1,26 @@
+2008-06-14  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/nsparseMatrix.R: specific fast all() and any() methods.
+
+	* src/dgTMatrix.c (MAKE_gTMatrix_to_geMatrix): better error message
+	when trying to produce too large result.
+
+	* inst/test-tools.R (checkMatrix): add 'do.matrix' with a check for
+	very large matrices.
+
+	* R/sparseMatrix.R (printSpMatrix2): new function, used by
+	show(<sparseMatrix>).
+
+	* R/diagMatrix.R (show): print only diagonal entries when nrow(.) >= 50.
+
+2008-06-13  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Mutils.c (m_encodeInd, m_encodeInd2):
+	* R/*.R: .Call(m_encodeInd2?, ..) instead of encodeInd2?(..).
+
+	* R/Auxiliaries.R (encodeInd2?): care against integer overflow (for
+	big matrices): -> 2nd argument 'di' instead of 'nr' !
+
 2008-06-09  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/dtCMatrix.R: faster dgC* -> dtC* method

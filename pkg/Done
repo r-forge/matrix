@@ -292,3 +292,8 @@
 - dimnames(Mat) <- NULL   now works with a message;
   unname() is defined equivalently explicitly.
 
+- auxiliary  encodeInd(), encodeInd2() are now done in C and .Call()ed.
+
+- coercing sparse to dense when the denseMatrix is too large
+  (length(@ x) > .Machine$integer.max), gives better error
+  messages; e.g. Lrg == Lrg or  !Lrg in tests/indexing.R

@@ -481,10 +481,10 @@ replTmat <- function (x, i, j, ..., value)
 		    cl," to ",class(x))
 	}
 	nr <- di[1]
-	x.i <- encodeInd2(x@i, x@j, nr)
-	if(any(duplicated(x.i))) { ## == if(is_duplicatedT(x, nr = di[1]))
+	x.i <- .Call(m_encodeInd2, x@i, x@j, di=di)
+	if(any(duplicated(x.i))) { ## == if(is_duplicatedT(x, di = di))
 	    x <- uniqTsparse(x)
-	    x.i <- encodeInd2(x@i, x@j, nr)
+	    x.i <- .Call(m_encodeInd2, x@i, x@j, di=di)
 	}
 
 	if(is.logical(i)) { # full-size logical indexing
@@ -569,7 +569,7 @@ replTmat <- function (x, i, j, ..., value)
     clDx <- getClassDef(clx) # extends() , is() etc all use the class definition
     stopifnot(extends(clDx, "TsparseMatrix"))
     ## Tmatrix maybe non-unique, have an entry split into a sum of several ones:
-    if(is_duplicatedT(x, nr = di[1]))
+    if(is_duplicatedT(x, di = di))
 	x <- uniqTsparse(x)
 
     toGeneral <- r.sym <- FALSE
@@ -648,7 +648,7 @@ replTmat <- function (x, i, j, ..., value)
 	## the 0-based indices of non-zero entries -- WRT to submatrix
 	non0 <- cbind(match(x@i[sel], i1),
 		      match(x@j[sel], i2)) - 1L
-	iN0 <- 1L + encodeInd(non0, nr = dind[1])
+	iN0 <- 1L + .Call(m_encodeInd, non0, di = dind)
 
 	## 1a) replace those that are already non-zero with non-0 values
 	vN0 <- !v0[iN0]
@@ -737,7 +737,7 @@ replTmat <- function (x, i, j, ..., value)
     if(any(i2 > nc)) stop("column indices must be <= ncol(.) which is ", nc)
 
     ## Tmatrix maybe non-unique, have an entry split into a sum of several ones:
-    if(is_duplicatedT(x, nr = nr))
+    if(is_duplicatedT(x, di = di))
 	x <- uniqTsparse(x)
 
     toGeneral <- FALSE
@@ -786,7 +786,7 @@ replTmat <- function (x, i, j, ..., value)
     }
 
     i <- i - 1L # 0-indexing
-    ii.v <- encodeInd (i, nr)
+    ii.v <- .Call(m_encodeInd, i, di)
     if(any(d <- duplicated(rev(ii.v)))) { # reverse: "last" duplicated FALSE
 	warning("duplicate ij-entries in 'Matrix[ ij ] <- value'; using last")
 	nd <- !rev(d)
@@ -794,7 +794,7 @@ replTmat <- function (x, i, j, ..., value)
 	ii.v  <- ii.v [nd]
 	value <- value[nd]
     }
-    ii.x <- encodeInd2(x@i, x@j, nr)
+    ii.x <- .Call(m_encodeInd2, x@i, x@j, di)
     m1 <- match(ii.v, ii.x)
     i.repl <- !is.na(m1) # those that need to be *replaced*
 
