@@ -52,28 +52,57 @@ Diagonal <- function(n, x = NULL)
 ### Bert's code built on a post by Andy Liaw who most probably was influenced
 ### by earlier posts, notably one by Scott Chasalow on S-news, 16 Jan 2002
 ### who posted his bdiag() function written in December 1995.
-
-bdiag <- function(...) {
-    if(nargs() == 0) return(new("dgCMatrix"))
-    ## else :
-    mlist <- if (nargs() == 1) as.list(...) else list(...)
-    dims <- sapply(mlist, dim)
+if(FALSE)##--- currently unused:
+.bdiag <- function(lst) {
+    ### block-diagonal matrix [a dgTMatrix] from list of matrices
+    stopifnot(is.list(lst), length(lst) >= 1)
+    dims <- sapply(lst, dim, USE.NAMES=FALSE)
     ## make sure we had all matrices:
     if(!(is.matrix(dims) && nrow(dims) == 2))
 	stop("some arguments are not matrices")
     csdim <- rbind(rep.int(0L, 2),
-                   apply(sapply(mlist, dim), 1, cumsum))
-    ret <- new("dgTMatrix", Dim = as.integer(csdim[nrow(csdim),]))
+                   apply(dims, 1, cumsum))
+    r <- new("dgTMatrix")
+    r@Dim <- as.integer(csdim[nrow(csdim),])
     add1 <- matrix(1:0, 2,2)
-    for(i in seq_along(mlist)) {
+    for(i in seq_along(lst)) {
 	indx <- apply(csdim[i:(i+1),] + add1, 2, function(n) n[1]:n[2])
 	if(is.null(dim(indx))) ## non-square matrix
-	    ret[indx[[1]],indx[[2]]] <- mlist[[i]]
+	    r[indx[[1]],indx[[2]]] <- lst[[i]]
 	else ## square matrix
-	    ret[indx[,1],indx[,2]] <- mlist[[i]]
+	    r[indx[,1], indx[,2]] <- lst[[i]]
     }
-    ## slightly debatable if we really should return Csparse.. :
-    as(ret, "CsparseMatrix")
+    r
+}
+### Doug Bates needed something like bdiag() for lower-triangular
+### (Tsparse) Matrices and provided a much more efficient implementation:
+.bdiag <- function(lst) {
+    ### block-diagonal matrix [a dgTMatrix] from list of matrices
+    stopifnot(is.list(lst), (nl <- length(lst)) >= 1)
+
+    Tlst <- lapply(lapply(lst, Matrix:::as_Csp2), # includes "diagU2N"
+                   as, "TsparseMatrix")
+
+    if(nl == 1) return(Tlst[[1]])
+    ## else
+    i_off <- c(0L, cumsum(sapply(Tlst, nrow)))
+    j_off <- c(0L, cumsum(sapply(Tlst, ncol)))
+    new("dgTMatrix", Dim = c(i_off[nl+1], j_off[nl + 1]),
+	i = unlist(lapply(1:nl, function(k) Tlst[[k]]@i + i_off[k])),
+	j = unlist(lapply(1:nl, function(k) Tlst[[k]]@j + j_off[k])),
+	x = unlist(lapply(Tlst, slot, "x")))
+}
+
+bdiag <- function(...) {
+    if((nA <- nargs()) == 0) return(new("dgCMatrix"))
+    if(nA == 1 && !is.list(...))
+	return(as(..., "CsparseMatrix"))
+    alis <- if(nA == 1 && is.list(..1)) ..1 else list(...)
+    if(length(alis) == 1)
+	return(as(alis[[1]], "CsparseMatrix"))
+
+    ## else : two or more arguments
+    as(.bdiag(alis), "CsparseMatrix")
 }
 
 
