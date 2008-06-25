@@ -1,3 +1,16 @@
+2008-06-25  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/diagMatrix.R (.bdiag): use more efficient Bates-algorithm for
+	.bdiag().
+	* man/bdiag.Rd: update, including test.
+
+2008-06-24  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/Simple.R: add minimal bdiag() checks
+
+	* R/diagMatrix.R (bdiag): fix bdiag(diag(4:5)) case;
+	  factor out the Tsparse - internal computation into new .bdiag()
+
 2008-06-14  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/nsparseMatrix.R: specific fast all() and any() methods.

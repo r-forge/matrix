@@ -17,10 +17,16 @@ if(interactive()) {
 (m4 <- Matrix(cbind(0,rbind(6*diag(3),0))))
 dm4 <- Matrix(m4, sparse = FALSE)
 class(mN <-  Matrix(NA, 3,4)) # NA *is* logical
+bd4 <- bdiag(m4,dm4,m4)
 stopifnot(validObject(d4), validObject(z4), validObject(o4),
-          validObject(m4), validObject(dm4), validObject(mN))
+          validObject(m4), validObject(dm4), validObject(mN),
+          identical(bdiag(m4), bdiag(dm4)),
+          identical(bd4@p, c(0L,0:3,3:6,6:9)),
+          identical(bd4@i, c(0:2, 4:6, 8:10)), bd4@x == 6
+          )
 assert.EQ.mat(dm4, as(m4, "matrix"))
 assert.EQ.mat(mN, matrix(NA, 3,4))
+assert.EQ.mat(bdiag(diag(4)), diag(4))
 sL <- Matrix(, 3,4, sparse=TRUE)# -> "lgC"
 trS <- Matrix(tr, sparse=TRUE)# failed in 0.9975-11
 stopifnot(isValid(d4, "diagonalMatrix"),   isValid(z4,  "diagonalMatrix"),
