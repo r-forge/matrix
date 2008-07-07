@@ -538,6 +538,10 @@ setClass("pMatrix", representation(perm = "integer"),
 	     TRUE
 	 })
 
+## "scarce", those "sparse" in a more common sense,
+##  -----   e.g., do not coerce these to dense needlessly :
+setClassUnion("scarceMatrix", members = c("sparseMatrix", "diagonalMatrix"))
+
 
 ### Factorization classes ---------------------------------------------
 
@@ -681,6 +685,7 @@ setClassUnion("replValue", members = c("numeric", "logical", "complex", "raw"))
 ### Sparse Vectors ---- here use 1-based indexing ! -----------
 setClass("sparseVector",
          representation(length = "integer", i = "integer", "VIRTUAL"),
+	 prototype = prototype(length = 0L),
          validity = function(object) {
              n <- object@length
              if(any(object@i < 1L) || any(object@i > n))

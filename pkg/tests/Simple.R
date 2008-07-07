@@ -48,6 +48,7 @@ op <- options(warn = 2) # warnings here are errors
 n <- 50000L
 Lrg <- new("dgTMatrix", Dim = c(n,n))
 diag(Lrg[2:9,1:8]) <- 1:8
+## ==:  Lrg[2:9,1:8] <- `diag<-`(Lrg[2:9,1:8], 1:8)
 e1 <- try(Lrg == Lrg) # error message almost ok
 e2 <- try(!Lrg) # error message was "bad", now perfect
 ina <- is.na(Lrg)# "all FALSE"
@@ -544,6 +545,15 @@ stopifnot(all.equal(list(modulus = structure(24, logarithm = FALSE), sign = -1L)
           all.equal(list(modulus = structure(0, logarithm = FALSE), sign = 1L),
                     unclass(determinant(D0,FALSE)), tol=0)
           )
+
+### More sparseVector checks: -------------------------------
+validObject(new("isparseVector"))
+R <- sv <- as(D4, "sparseVector")
+## dim(<sparseVector>) <- (n1,n2)  --> sparse Matrix :
+dim(R) <- dim(D4)
+stopifnot(isValid(sv,"sparseVector"),
+	  isValid(R, "sparseMatrix"),
+	  identical(D4, as(R, "diagonalMatrix")))
 
 
 cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"

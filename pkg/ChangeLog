@@ -1,3 +1,28 @@
+2008-07-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseVector.R (spV2M): fix for "isparseVector".
+	Further, fix <diag> -> <sparseVector> coercion
+	(repSpV): add rep(<sparseVector>, .) method
+
+	* R/sparseMatrix.R ([<-): when the RHS is a "scarce"Matrix, do *not*
+	use as.vector(.).
+
+	* R/[TCR]sparse.R ([<-): methods for  value = "sparseVector"
+
+	* R/AllClass.R: new (hidden) class union "scarceMatrix"
+	* R/AllClass.R: sparseVector: add prototype
+
+	* src/dsCMatrix.c (chk_nm): fix "Cholesky" check, thanks to Kasper Kristensen
+
+2008-06-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/other-pkgs.R: add more interesting Matrix -> graph
+
+2008-06-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (Tsp2grNEL): add 'need.uniq' argument for speed
+	improvement in "[CR]sparseMatrix" -> "graphNEL" coercion.
+
 2008-06-25  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/diagMatrix.R (.bdiag): use more efficient Bates-algorithm for

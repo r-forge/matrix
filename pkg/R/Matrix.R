@@ -616,7 +616,8 @@ setReplaceMethod("[", signature(x = "Matrix", i = "matrix", j = "missing",
 				value = "replValue"),
 	  .M.repl.i.2col)
 
-
+## Three catch-all methods ... would be very inefficient for sparse*
+## --> extra methods in ./sparseMatrix.R
 setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "ANY",
 				value = "Matrix"),
 		 function (x, i, j, ..., value)
@@ -631,6 +632,7 @@ setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
 				value = "Matrix"),
 		 function (x, i, j, ..., value)
 		 callGeneric(x=x, i=i, j=j, value = as.vector(value)))
+
 
 setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "ANY",
 				value = "matrix"),
