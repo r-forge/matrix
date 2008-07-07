@@ -3,7 +3,7 @@
 static int chk_nm(const char *nm, int perm, int LDL, int super)
 {
     if (strlen(nm) != 11) return 0;
-    if (!strcmp(nm + 3, "Cholesky")) return 0;
+    if (strcmp(nm + 3, "Cholesky")) return 0;
     if (super > 0 && nm[0] != 'S') return 0;
     if (super == 0 && nm[0] != 's') return 0;
     if (perm > 0 && nm[1] != 'P') return 0;

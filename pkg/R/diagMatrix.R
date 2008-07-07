@@ -354,6 +354,29 @@ setReplaceMethod("[", signature(x = "diagonalMatrix", i = "missing",
 				j = "index", value = "replValue"),
 		 function(x,i,j, ..., value) replDiag(x, j=j, value=value))
 
+setReplaceMethod("[", signature(x = "diagonalMatrix", i = "missing", j = "index",
+				value = "scarceMatrix"),
+		 function (x, i, j, ..., value)
+		 callGeneric(x=x, , j=j, value = as(value, "sparseVector")))
+setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index", j = "missing",
+				value = "scarceMatrix"),
+		 function (x, i, j, ..., value)
+		 callGeneric(x=x, i=i, , value = as(value, "sparseVector")))
+setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index", j = "index",
+				value = "scarceMatrix"),
+		 function (x, i, j, ..., value)
+		 callGeneric(x=x, i=i, j=j, value = as(value, "sparseVector")))
+
+setReplaceMethod("[", signature(x = "diagonalMatrix", i = "missing", j = "index",
+				value = "sparseVector"),
+		 replDiag)
+setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index", j = "missing",
+				value = "sparseVector"),
+		 replDiag)
+setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index", j = "index",
+				value = "sparseVector"),
+		 replDiag)
+
 
 setMethod("t", signature(x = "diagonalMatrix"),
           function(x) { x@Dimnames <- x@Dimnames[2:1] ; x })

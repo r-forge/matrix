@@ -124,9 +124,11 @@ setAs("graphNEL", "TsparseMatrix",
 
 setAs("sparseMatrix", "graph", function(from) as(from, "graphNEL"))
 setAs("sparseMatrix", "graphNEL",
-      function(from) as(as(from, "TsparseMatrix"), "graphNEL"))
+      ## since have specific method for Tsparse below, are Csparse or Rsparse,
+      ## i.e. do not need to "uniquify" the T* matrix:
+      function(from) Tsp2grNEL(as(from, "TsparseMatrix"), need.uniq=FALSE))
 
-Tsp2grNEL <- function(from) {
+Tsp2grNEL <- function(from, need.uniq = is_not_uniqT(from)) {
     d <- dim(from)
     if(d[1] != d[2])
 	stop("only square matrices can be used as incidence matrices for graphs")
@@ -134,7 +136,8 @@ Tsp2grNEL <- function(from) {
     if(n == 0) return(new("graphNEL"))
     if(is.null(rn <- dimnames(from)[[1]]))
 	rn <- as.character(1:n)
-    from <- uniq(from) ## Need to 'uniquify' the triplets!
+    if(need.uniq) ## Need to 'uniquify' the triplets!
+        from <- uniq(from)
 
     if(isSymmetric(from)) { # either "symmetricMatrix" or otherwise
 	##-> undirected graph: every edge only once!
@@ -153,7 +156,7 @@ Tsp2grNEL <- function(from) {
     ftM2graphNEL(ft1, W = from@x, V= rn, edgemode= eMode)
 
 }
-setAs("TsparseMatrix", "graphNEL", Tsp2grNEL)
+setAs("TsparseMatrix", "graphNEL", function(from) Tsp2grNEL(from))
 
 
 ### Subsetting -- basic things (drop = "missing") are done in ./Matrix.R
@@ -211,8 +214,24 @@ setMethod("[", signature(x = "sparseMatrix",
 
 ## setReplaceMethod("[", .........)
 ## -> ./Tsparse.R
-## &  ./Csparse.R
-## FIXME: also for RsparseMatrix
+## &  ./Csparse.R  & ./Rsparse.R {those go via Tsparse}
+##
+## Do not use as.vector() (see ./Matrix.R ) for "scarce" matrices :
+setReplaceMethod("[", signature(x = "sparseMatrix", i = "missing", j = "ANY",
+				value = "scarceMatrix"),
+		 function (x, i, j, ..., value)
+		 callGeneric(x=x, , j=j, value = as(value, "sparseVector")))
+
+setReplaceMethod("[", signature(x = "sparseMatrix", i = "ANY", j = "missing",
+				value = "scarceMatrix"),
+		 function (x, i, j, ..., value)
+		 callGeneric(x=x, i=i, , value = as(value, "sparseVector")))
+
+setReplaceMethod("[", signature(x = "sparseMatrix", i = "ANY", j = "ANY",
+				value = "scarceMatrix"),
+		 function (x, i, j, ..., value)
+		 callGeneric(x=x, i=i, j=j, value = as(value, "sparseVector")))
+
 
 
 ## Group Methods

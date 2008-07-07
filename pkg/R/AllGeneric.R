@@ -84,7 +84,9 @@ setGeneric("forceSymmetric",
 	   function(x, uplo) standardGeneric("forceSymmetric"))
 
 
-## Add '...' so our methods can add  'sparseResult':
+if(all(names(formals(colSums)) != "...")) { ## maybe unneeded in future
+
+    ## Add '...' so our methods can add  'sparseResult':
 setGeneric("colSums",
 	   def = function(x, na.rm = FALSE, dims = 1, ...) standardGeneric("colSums"),
 	   useAsDefault = function(x,  na.rm = FALSE, dims = 1, ...)
@@ -101,3 +103,4 @@ setGeneric("rowMeans",
 	   def = function(x, na.rm = FALSE, dims = 1, ...) standardGeneric("rowMeans"),
 	   useAsDefault = function(x,  na.rm = FALSE, dims = 1, ...)
 	   base::rowMeans(x, na.rm=na.rm, dims=dims))
+}
