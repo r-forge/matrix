@@ -25,13 +25,13 @@ SEXP tCMatrix_validate(SEXP x)
 	if(uploT) {
 	    for (k = 0; k < nnz; k++)
 		if(xi[k] > xj[k]) {
-		    RETURN(mkString(_("uplo='U' must not have sparse entries in lower diagonal")));
+		    RETURN(mkString(_("uplo='U' must not have sparse entries below the diagonal")));
 		}
 	}
 	else {
 	    for (k = 0; k < nnz; k++)
 		if(xi[k] < xj[k]) {
-		    RETURN(mkString(_("uplo='L' must not have sparse entries in upper diagonal")));
+		    RETURN(mkString(_("uplo='L' must not have sparse entries above the diagonal")));
 		}
 	}
 
@@ -60,13 +60,13 @@ SEXP tRMatrix_validate(SEXP x)
 	if(uploT) {
 	    for (k = 0; k < nnz; k++)
 		if(xi[k] > xj[k]) {
-		    RETURN(mkString(_("uplo='U' must not have sparse entries in lower diagonal")));
+		    RETURN(mkString(_("uplo='U' must not have sparse entries below the diagonal")));
 		}
 	}
 	else {
 	    for (k = 0; k < nnz; k++)
 		if(xi[k] < xj[k]) {
-		    RETURN(mkString(_("uplo='L' must not have sparse entries in upper diagonal")));
+		    RETURN(mkString(_("uplo='L' must not have sparse entries above the diagonal")));
 		}
 	}
 
