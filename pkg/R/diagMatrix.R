@@ -52,7 +52,7 @@ Diagonal <- function(n, x = NULL)
 ### Bert's code built on a post by Andy Liaw who most probably was influenced
 ### by earlier posts, notably one by Scott Chasalow on S-news, 16 Jan 2002
 ### who posted his bdiag() function written in December 1995.
-if(FALSE)##--- currently unused:
+if(FALSE)##--- no longer used:
 .bdiag <- function(lst) {
     ### block-diagonal matrix [a dgTMatrix] from list of matrices
     stopifnot(is.list(lst), length(lst) >= 1)
@@ -74,23 +74,73 @@ if(FALSE)##--- currently unused:
     }
     r
 }
-### Doug Bates needed something like bdiag() for lower-triangular
-### (Tsparse) Matrices and provided a much more efficient implementation:
+## expand(<mer>) needed something like bdiag() for lower-triangular
+## (Tsparse) Matrices; hence Doug Bates provided a much more efficient
+##  implementation for those; now extended and generalized:
 .bdiag <- function(lst) {
-    ### block-diagonal matrix [a dgTMatrix] from list of matrices
+    ## block-diagonal matrix [a dgTMatrix] from list of matrices
     stopifnot(is.list(lst), (nl <- length(lst)) >= 1)
 
     Tlst <- lapply(lapply(lst, Matrix:::as_Csp2), # includes "diagU2N"
-                   as, "TsparseMatrix")
-
+		   as, "TsparseMatrix")
     if(nl == 1) return(Tlst[[1]])
     ## else
     i_off <- c(0L, cumsum(sapply(Tlst, nrow)))
     j_off <- c(0L, cumsum(sapply(Tlst, ncol)))
-    new("dgTMatrix", Dim = c(i_off[nl+1], j_off[nl + 1]),
-	i = unlist(lapply(1:nl, function(k) Tlst[[k]]@i + i_off[k])),
-	j = unlist(lapply(1:nl, function(k) Tlst[[k]]@j + j_off[k])),
-	x = unlist(lapply(Tlst, slot, "x")))
+
+    clss <- sapply(Tlst, class)
+    knds <- substr(clss, 2, 2)
+    sym	 <- knds == "s" # symmetric ones
+    tri	 <- knds == "t" # triangular ones
+    use.n <- any(is.n <- substr(clss,1,1) == "n")
+    if(use.n && !(use.n <- all(is.n)))
+	Tlst[is.n] <- lapply(Tlst[is.n], as, "lMatrix")
+    if(all(sym)) { ## result should be *symmetric*
+	uplos <- sapply(Tlst, slot, "uplo") ## either "U" or "L"
+	tLU <- table(uplos)# of length 1 or 2 ..
+	if(length(tLU) == 1) { ## all "U" or all "L"
+	    useU <- uplos[1] == "U"
+	} else { ## length(tLU) == 2, counting "L" and "U"
+	    useU <- diff(tLU) >= 0
+	    if(useU && (hasL <- tLU[1] > 0))
+		Tlst[hasL] <- lapply(Tlst[hasL], t)
+	    else if(!useU && (hasU <- tLU[2] > 0))
+		Tlst[hasU] <- lapply(Tlst[hasU], t)
+	}
+	if(use.n) { ## return nsparseMatrix :
+	    r <- new("nsTMatrix")
+	} else {
+	    r <- new("dsTMatrix")
+	    r@x <- unlist(lapply(Tlst, slot, "x"))
+	}
+	r@uplo <- if(useU) "U" else "L"
+    }
+    else if(all(tri) && { ULs <- sapply(Tlst, slot, "uplo")##  "U" or "L"
+			  all(ULs[1L] == ULs[-1L]) } ## all upper or all lower
+       ){ ## *triangular* result
+
+	if(use.n) { ## return nsparseMatrix :
+	    r <- new("ntTMatrix")
+	} else {
+	    r <- new("dtTMatrix")
+	    r@x <- unlist(lapply(Tlst, slot, "x"))
+	}
+	r@uplo <- ULs[1L]
+    }
+    else {
+	if(any(sym))
+	    Tlst[sym] <- lapply(Tlst[sym], as, "generalMatrix")
+	if(use.n) { ## return nsparseMatrix :
+	    r <- new("ngTMatrix")
+	} else {
+	    r <- new("dgTMatrix")
+	    r@x <- unlist(lapply(Tlst, slot, "x"))
+	}
+    }
+    r@Dim <- c(i_off[nl+1], j_off[nl + 1])
+    r@i <- unlist(lapply(1:nl, function(k) Tlst[[k]]@i + i_off[k]))
+    r@j <- unlist(lapply(1:nl, function(k) Tlst[[k]]@j + j_off[k]))
+    r
 }
 
 bdiag <- function(...) {
