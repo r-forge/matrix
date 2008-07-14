@@ -37,6 +37,18 @@ stopifnot(isValid(d4, "diagonalMatrix"),   isValid(z4,  "diagonalMatrix"),
           validObject(Matrix(c(NA,0), 4, 4)),
           isValid(Matrix(c(NA,0,0,0), 4, 4), "sparseMatrix"))
 
+L <- spMatrix(9, 30, i = rep(1:9, 3), 1:27, (1:27) %% 4 != 1)
+M <- drop0(crossprod(L))
+diag(M) <- diag(M) + 5 # to make it pos.def.
+M. <- M[1:12,1:12] # small ex
+N3 <- as(Matrix(upper.tri(diag(3))), "nMatrix")
+isValid(bdN <- bdiag(N3, N3),"nsparseMatrix")
+stopifnot(isSymmetric(M), isSymmetric(M.),
+	  is(bdiag(M., M.),"symmetricMatrix"),
+	  is(bdN, "triangularMatrix"))
+
+
+
 ## large sparse ones: these now directly "go sparse":
 str(m0 <- Matrix(0,     nrow=100, ncol = 1000))
 str(l0 <- Matrix(FALSE, nrow=100, ncol = 200))

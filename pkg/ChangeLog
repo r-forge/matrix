@@ -1,3 +1,15 @@
+2008-07-14  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/diagMatrix.R (.bdiag): also keep triangular
+
+2008-07-12  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/diagMatrix.R (.bdiag): make more sophisticated, keeping
+	symmetric- or nsparse-Matrix, also fixing the bug introduced with
+	the new version (.999375-10).
+
+	* tests/Simple.R: regression test for the bugs.
+
 2008-07-07  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/sparseVector.R (spV2M): fix for "isparseVector".
@@ -7,12 +19,13 @@
 	* R/sparseMatrix.R ([<-): when the RHS is a "scarce"Matrix, do *not*
 	use as.vector(.).
 
-	* R/[TCR]sparse.R ([<-): methods for  value = "sparseVector"
+	* R/Tsparse.R ([<-): & [CR]sparse.R: methods for value = "sparseVector"
 
 	* R/AllClass.R: new (hidden) class union "scarceMatrix"
 	* R/AllClass.R: sparseVector: add prototype
 
-	* src/dsCMatrix.c (chk_nm): fix "Cholesky" check, thanks to Kasper Kristensen
+	* src/dsCMatrix.c (chk_nm): fix "Cholesky" check, thanks to
+	Kasper Kristensen
 
 2008-06-28  Martin Maechler  <maechler@stat.math.ethz.ch>
 
@@ -24,6 +37,8 @@
 	improvement in "[CR]sparseMatrix" -> "graphNEL" coercion.
 
 2008-06-25  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION: release 0.999375-10 to CRAN
 
 	* R/diagMatrix.R (.bdiag): use more efficient Bates-algorithm for
 	.bdiag().
