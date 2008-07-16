@@ -24,6 +24,7 @@ CHM_FR M_chm_factor_update(CHM_FR f, CHM_SP A, double mult);
 #define AS_CHM_TR(x) M_as_cholmod_triplet((CHM_TR)alloca(sizeof(cholmod_triplet)), x )
 #define N_AS_CHM_DN(x,nr,nc) M_numeric_as_chm_dense((CHM_DN)alloca(sizeof(cholmod_dense)), x , nr, nc )
 
+SEXP M_Csparse_diagU2N(SEXP x);
 SEXP M_chm_factor_to_SEXP(CHM_FR f, int dofree);
 SEXP M_chm_sparse_to_SEXP(CHM_SP a, int dofree, int uploT, int Rkind,
 			  char *diag, SEXP dn);
