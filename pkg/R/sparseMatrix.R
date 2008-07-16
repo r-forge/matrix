@@ -606,10 +606,11 @@ function(x, y, offset = NULL, method = c("qr", "cholesky"),
     ans
 }
 
-fac2sparse <- function(from, to = c("d","i","l","n","z"))
+fac2sparse <- function(from, to = c("d","i","l","n","z"), drop.unused.levels = TRUE)
 {
     ## factor(-like) --> sparseMatrix {also works for integer, character}
-    levs <- levels(fact <- factor(from)) # drop unused levels
+    fact <- if (drop.unused.levels) factor(from) else as.factor(from)
+    levs <- levels(fact)
     n <- length(fact)
     to <- match.arg(to)
     res <- new(paste(to, "gCMatrix", sep=''))
