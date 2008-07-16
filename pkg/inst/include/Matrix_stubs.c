@@ -40,6 +40,16 @@ M_as_cholmod_sparse(CHM_SP ans, SEXP x)
 }
 
 SEXP attribute_hidden
+M_Csparse_diagU2N(SEXP x)
+{
+    static SEXP(*fun)(SEXP) = NULL;
+    if(fun == NULL)
+	fun = (SEXP(*)(SEXP))
+	    R_GetCCallable("Matrix", "Csparse_diagU2N");
+    return fun(x);
+}
+
+SEXP attribute_hidden
 M_chm_factor_to_SEXP(CHM_FR f, int dofree)
 {
     static SEXP(*fun)(CHM_FR,int) = NULL;
