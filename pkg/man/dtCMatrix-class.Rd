@@ -27,6 +27,7 @@
 \alias{Arith,dtCMatrix,dtCMatrix-method}
 %
 \alias{solve,dtCMatrix,matrix-method}
+\alias{solve,dtCMatrix,CsparseMatrix-method}
 \alias{solve,dtCMatrix,dgeMatrix-method}
 \alias{solve,dtCMatrix,missing-method}
 \alias{solve,dtCMatrix,numeric-method}
