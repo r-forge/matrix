@@ -35,11 +35,12 @@ static CSP csp_eye(int n)
     double *ex = eye->x;
     
     if (n <= 0) error("csp_eye argument n must be positive");
-    eye->nz = ep[n] = n;
+    eye->nz = -1;
     for (int j = 0; j < n; j++) {
 	ep[j] = ei[j] = j;
 	ex[j] = 1;
     }
+    ep[n] = n;
     return eye;
 }
 
