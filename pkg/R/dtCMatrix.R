@@ -79,14 +79,11 @@ setMethod("determinant", signature(x = "dtCMatrix", logarithm = "logical"),
 
 setMethod("solve", signature(a = "dtCMatrix", b = "missing"),
 	  function(a, b, ...) {
-## 	      if (a@diag == "U") {
-## 		  if (a@uplo == "U")
-## 		      return(.Call(dtCMatrix_upper_solve, a))
-## 		  else
-## 		      return(t(.Call(dtCMatrix_upper_solve, t(a))))
-## 	      }
-	      .Call(dtCMatrix_solve, a)
-	  }, valueClass = "dtCMatrix")
+              stopifnot(nrow(a) == ncol(a))
+              as(.Call(dtCMatrix_sparse_solve, a,
+                       as(Diagonal(ncol(a)), "CsparseMatrix")),
+                 "dtCMatrix")
+          }, valueClass = "dtCMatrix")
 
 setMethod("solve", signature(a = "dtCMatrix", b = "dgeMatrix"),
 	  function(a, b, ...) .Call(dtCMatrix_matrix_solve, a, b, TRUE),
@@ -94,7 +91,7 @@ setMethod("solve", signature(a = "dtCMatrix", b = "dgeMatrix"),
 
 setMethod("solve", signature(a = "dtCMatrix", b = "CsparseMatrix"),
 	  function(a, b, ...) .Call(dtCMatrix_sparse_solve, a, b),
-	  valueClass = "dgeMatrix")
+	  valueClass = "dgCMatrix")
 
 setMethod("solve", signature(a = "dtCMatrix", b = "matrix"),
 	  function(a, b, ...) {
