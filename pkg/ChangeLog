@@ -1,7 +1,41 @@
+2008-07-17  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r2217] R/dtCMatrix.R, src/dtCMatrix.c, src/dtCMatrix.h, src/init.c:
+	  Replace dtCMatrix_solve by more general dtCMatrix_sparse_solve and add
+	  new solve method
+	* [r2216] src/cs_utils.c: Utility csp_eye in case we want to fold
+	  Csparse_diagU2N functionality into Matrix_as_cs
+
+2008-07-17  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* [r2215] inst/doc/factor2sparse.Rnw: revive a year-old unfinished
+	  vignette
+	* [r2214] R/AllGeneric.R: cosmetic
+	* [r2213] man/image-methods.Rd: typo ("non-number" :-\ )
+
+2008-07-16  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r2212] R/sparseMatrix.R: fac2sparse gets a drop.unused.levels
+	  argument with default TRUE
+	* [r2211] inst/include/Matrix.h, inst/include/Matrix_stubs.c: Export
+	  Csparse_diagU2N
+	* [r2210] R/dtCMatrix.R, man/dtCMatrix-class.Rd, src/dtCMatrix.c,
+	  src/dtCMatrix.h, src/init.c: Remove vestigial methods based on the
+	  parent array; new solve method for signature(a = "dtCMatrix", b =
+	  "sparseMatrix")
+
 2008-07-14  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/diagMatrix.R (.bdiag): also keep triangular
+	* [r2209] ChangeLog, DESCRIPTION, R/diagMatrix.R, inst/test-tools.R,
+	  man/dsCMatrix-class.Rd, man/dsyMatrix-class.Rd, tests/Simple.R:
+	  bdiag() improvements of last week
 
+2008-07-13  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r2208] src/dtCMatrix.c, src/dtTMatrix.c: Revise wording in error
+	  messages
+	
 2008-07-12  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/diagMatrix.R (.bdiag): make more sophisticated, keeping
