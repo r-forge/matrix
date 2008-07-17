@@ -76,39 +76,6 @@ SEXP tRMatrix_validate(SEXP x)
 
 #undef RETURN
 
-SEXP dtCMatrix_solve(SEXP a)
-{
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dtCMatrix")));
-    CSP A = AS_CSP(Csparse_diagU2N(a));
-    CSP eye = csp_eye(A->n);
-    int *bp = INTEGER(ALLOC_SLOT(ans, Matrix_pSym, INTSXP, (A->n) + 1)),
-	bnz = 10 * A->n,	/* initial estimate of nnz in b */
-	lo = uplo_P(a)[0] == 'L', top;
-    /* These arrays must use Calloc because of possible Realloc */
-    int *ti = Calloc(bnz, int), pos = 0;
-    double *tx = Calloc(bnz, double);
-    double  *wrk = Alloca(A->n, double);
-    int *xi = Alloca(2*A->n, int);	/* for cs_reach */
-    R_CheckStack();
-
-    slot_dup(ans, a, Matrix_DimSym);
-    SET_DimNames(ans, a);
-    slot_dup(ans, a, Matrix_uploSym);
-    slot_dup(ans, a, Matrix_diagSym);
-    bp[0] = 0;
-    for (int k = 0; k < A->n; k++)
-	col_spsolve(A, eye, k, xi, wrk, (int*)NULL, lo, bnz, pos, bp, ti, tx);
-    nz = bp[A->n];
-    Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_iSym, INTSXP,  nz)), ti, nz);
-    Memcpy(   REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, nz)), tx, nz);
-
-    Free(ti); Free(tx); cs_spfree(u);
-    UNPROTECT(1);
-    return ans;
-}
-
-#endif
-
 SEXP dtCMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
 {
     int cl = asLogical(classed);
@@ -171,7 +138,7 @@ SEXP dtCMatrix_sparse_solve(SEXP a, SEXP b)
 		tx[pos] = wrk[xi[p]];
 	    }
     }
-    xnz = xp[A->n];
+    xnz = xp[B->n];
     Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_iSym, INTSXP,  xnz)), ti, xnz);
     Memcpy(   REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, xnz)), tx, xnz);
     
