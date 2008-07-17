@@ -19,6 +19,30 @@ static int is_sym (cs *A)
     return (is_upper ? 1 : (is_lower ? -1 : 0)) ;
 }
 
+
+/**
+ * Create an identity matrix of size n as a cs struct.  The structure
+ * must be freed with cs_free by the caller.
+ *
+ * @param n size of identity matrix to construct.
+ *
+ * @return pointer to a cs object that contains the identity matrix.
+ */
+static CSP csp_eye(int n)
+{
+    CSP eye = cs_spalloc(n, n, n, 1, 0);
+    int *ep = eye->p, *ei = eye->i;
+    double *ex = eye->x;
+    
+    if (n <= 0) error("csp_eye argument n must be positive");
+    eye->nz = ep[n] = n;
+    for (int j = 0; j < n; j++) {
+	ep[j] = ei[j] = j;
+	ex[j] = 1;
+    }
+    return eye;
+}
+
 /**
  * Create a cs object with the contents of x.  Typically called via  AS_CSP()
  *
