@@ -154,7 +154,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dspMatrix_solve, 1),
     CALLDEF(dspMatrix_trf, 1),
     CALLDEF(dspMatrix_validate, 1),
-    CALLDEF(dtCMatrix_solve, 1),
+/*     CALLDEF(dtCMatrix_solve, 1), */
     CALLDEF(dtCMatrix_matrix_solve, 3),
     CALLDEF(dtCMatrix_sparse_solve, 2),
     CALLDEF(dtTMatrix_as_dtrMatrix, 1),

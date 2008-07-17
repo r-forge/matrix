@@ -12,7 +12,7 @@ extern SEXP Csparse_diagU2N(SEXP x);
 
 SEXP tCMatrix_validate(SEXP x);
 SEXP tRMatrix_validate(SEXP x);
-SEXP dtCMatrix_solve(SEXP a);
+/* SEXP dtCMatrix_solve(SEXP a); */
 SEXP dtCMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed);
 SEXP dtCMatrix_sparse_solve(SEXP a, SEXP b);
 /* SEXP dtCMatrix_upper_solve(SEXP a); */
