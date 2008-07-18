@@ -906,9 +906,9 @@ setMethod("%*%", signature(x = "ANY", y = "TsparseMatrix"),
 #          function(x, y) callGeneric(x, as(y, "CsparseMatrix")))
 
 setMethod("solve", signature(a = "TsparseMatrix", b = "ANY"),
-	  function(a, b) solve(as(a, "CsparseMatrix"), b))
+	  function(a, b, ...) solve(as(a, "CsparseMatrix"), b))
 setMethod("solve", signature(a = "TsparseMatrix", b = "missing"),
-	  function(a, b) solve(as(a, "CsparseMatrix")))
+	  function(a, b, ...) solve(as(a, "CsparseMatrix")))
 
 
 ## Want tril(), triu(), band() --- just as "indexing" ---
