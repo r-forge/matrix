@@ -331,7 +331,7 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
 
 SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
 {
-    CHM_SP cx = AS_CHM_SP(x);
+    CHM_SP cx = AS_CHM_SP__(x);
     CHM_FR L;
     CHM_DN cy = AS_CHM_DN(y), rhs, cAns;
     double one[] = {1,0}, zero[] = {0,0};

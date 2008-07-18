@@ -20,6 +20,7 @@ CHM_FR M_chm_factor_update(CHM_FR f, CHM_SP A, double mult);
 
 #define AS_CHM_DN(x) M_as_cholmod_dense((CHM_DN)alloca(sizeof(cholmod_dense)), x )
 #define AS_CHM_FR(x) M_as_cholmod_factor((CHM_FR)alloca(sizeof(cholmod_factor)), x )
+/* FIXME --- "sync" with ../../src/chm_common.h -- with 3 arguments -- !!! */
 #define AS_CHM_SP(x) M_as_cholmod_sparse((CHM_SP)alloca(sizeof(cholmod_sparse)), x )
 #define AS_CHM_TR(x) M_as_cholmod_triplet((CHM_TR)alloca(sizeof(cholmod_triplet)), x )
 #define N_AS_CHM_DN(x,nr,nc) M_numeric_as_chm_dense((CHM_DN)alloca(sizeof(cholmod_dense)), x , nr, nc )

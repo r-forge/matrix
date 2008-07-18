@@ -1094,7 +1094,7 @@ isTriC <- function(object, upper = NA) {
 	    x@diag <- "N"
 	    x
         }
-        else {
+        else { ## not dense, not [CT]sparseMatrix  ==>  Rsparse*
             xT <- as(as(x, paste(kind, "Matrix", sep='')), "TsparseMatrix")
             ## leave it as T* - the caller can always coerce to C* if needed:
             new(paste(kind, "tTMatrix", sep=''), x = xT@x, i = xT@i, j = xT@j,
