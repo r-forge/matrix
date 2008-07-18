@@ -83,8 +83,11 @@
     \item{coerce}{\code{signature(from = "dtTMatrix", to = "matrix")}}
     \item{solve}{\code{signature(a = "dtCMatrix", b = "matrix")}}
     \item{solve}{\code{signature(a = "dtCMatrix", b = "dgeMatrix")}}
-    \item{solve}{\code{signature(a = "dtTMatrix", b = "missing")}}
-    \item{solve}{\code{signature(a = "dtTMatrix", b = "numeric")}}
+    \item{solve}{\code{signature(a = "dtCMatrix", b = "missing")}}
+    \item{solve}{\code{signature(a = "dtCMatrix", b = "numeric")}}
+    \item{solve}{\code{signature(a = "dtCMatrix", b = "CsparseMatrix")}:
+      fully sparse triangular solve, in traditional S/\R\ aka
+      \code{\link{backsolve}}.}
     \item{t}{\code{signature(x = "dtCMatrix")}: returns the transpose of
       \code{x}}
     \item{t}{\code{signature(x = "dtTMatrix")}: returns the transpose of

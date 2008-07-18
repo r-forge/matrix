@@ -37,7 +37,7 @@ internal_chm_factor(SEXP Ap, int perm, int LDL, int super, double Imult)
     SEXP nms = getAttrib(facs, R_NamesSymbol);
     int sup, ll;
     CHM_FR L;
-    CHM_SP A = AS_CHM_SP(Ap);
+    CHM_SP A = AS_CHM_SP__(Ap);
     R_CheckStack();
 
     if (LENGTH(facs)) {
@@ -160,7 +160,7 @@ SEXP dsCMatrix_LDL_D(SEXP Ap, SEXP permP, SEXP resultKind)
 SEXP dsCMatrix_Csparse_solve(SEXP a, SEXP b)
 {
     CHM_FR L = internal_chm_factor(a, -1, -1, -1, 0.);
-    CHM_SP cx, cb = AS_CHM_SP(b);
+    CHM_SP cx, cb = AS_CHM_SP__(b);
     R_CheckStack();
 
     cx = cholmod_spsolve(CHOLMOD_A, L, cb, &c);
@@ -187,7 +187,7 @@ SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b)
 *         e.g. make  compressed_to_dgTMatrix() in ./dgCMatrix.c work for dsC */
 SEXP dsCMatrix_to_dgTMatrix(SEXP x)
 {
-    CHM_SP A = AS_CHM_SP(x);
+    CHM_SP A = AS_CHM_SP__(x);
     CHM_SP Afull = cholmod_copy(A, /*stype*/ 0, /*mode*/ 1, &c);
     CHM_TR At = cholmod_sparse_to_triplet(Afull, &c);
     R_CheckStack();

@@ -16,7 +16,7 @@ cholmod_common c;
  *
  * @return ans containing pointers to the slots of x.
  */
-CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x)
+CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x, Rboolean check_Udiag)
 {
     char *valid[] = {"dgCMatrix", "dsCMatrix", "dtCMatrix",
 		     "lgCMatrix", "lsCMatrix", "ltCMatrix",
@@ -25,6 +25,7 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x)
 		     ""};
     int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	ctype = Matrix_check_class(class_P(x), valid);
+    Rboolean do_Udiag = FALSE;
     SEXP islot = GET_SLOT(x, Matrix_iSym);
 
     if (ctype < 0) error("invalid class of object to as_cholmod_sparse");
@@ -44,7 +45,19 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x)
     ans->i = (void *) INTEGER(islot);
     ans->p = (void *) INTEGER(GET_SLOT(x, Matrix_pSym));
 
-#define AS_CHM_FINISH								\
+#define AS_CHM_COMMON								\
+				/* set the stype */				\
+    switch(ctype % 3) {								\
+    case 0: /* g(eneral) */							\
+	ans->stype = 0; break;							\
+    case 1: /* s(ymmetric) */							\
+	ans->stype = (*uplo_P(x) == 'U') ? 1 : -1;				\
+	break;									\
+    case 2: /* t(riangular) -- Note that triangularity property is lost! */	\
+	ans->stype = 0;								\
+	do_Udiag = (check_Udiag && (*diag_P(x) == 'U'));			\
+	break;									\
+    }										\
     				/* set the xtype and any elements */		\
     switch(ctype / 3) {								\
     case 0: /* "d" */								\
@@ -62,24 +75,25 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x)
 	ans->xtype = CHOLMOD_COMPLEX;						\
 	ans->x = (void *) COMPLEX(GET_SLOT(x, Matrix_xSym));			\
 	break;									\
-    }										\
-				/* set the stype */				\
-    switch(ctype % 3) {								\
-    case 0: /* g(eneral) */							\
-	ans->stype = 0; break;							\
-    case 1: /* s(ymmetric) */							\
-	ans->stype = (*uplo_P(x) == 'U') ? 1 : -1;				\
-	break;									\
-    case 2: /* t(riangular) -- Note that triangularity property is lost! */	\
-	ans->stype = 0;								\
-	/* NOTE: if(*diag_P(x) == 'U'), the diagonal is lost (!); */		\
-        /* ---- that may be ok, e.g. if we are just converting from/to Tsparse, */ \
-        /*      but is *not* at all ok, e.g. when used before matrix products */   \
-	break;									\
-    }										\
-    return ans
+    }
 
-    AS_CHM_FINISH;
+    AS_CHM_COMMON;
+
+    if(do_Udiag) {  /* diagU2N(.)  "in place" : */
+	double one[] = {1, 0};
+	CHM_SP tmp = cholmod_copy (ans, ans->stype, ans->xtype, &c);
+	CHM_SP eye = cholmod_speye(ans->nrow, ans->ncol, ans->xtype, &c);
+
+	ans = cholmod_add(tmp, eye, one, one, TRUE, TRUE, &c);
+
+	cholmod_free_sparse(&tmp, &c);
+	cholmod_free_sparse(&eye, &c);
+    } /* else :
+       * NOTE: if(*diag_P(x) == 'U'), the diagonal is lost (!);
+       * ---- that may be ok, e.g. if we are just converting from/to Tsparse,
+       *      but is *not* at all ok, e.g. when used before matrix products */
+
+    return ans;
 }
 
 /**
@@ -186,15 +200,16 @@ SEXP chm_sparse_to_SEXP(CHM_SP a, int dofree, int uploT, int Rkind,
  *
  * @return ans containing pointers to the slots of x.
  */
-CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x)
+CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x, Rboolean check_Udiag)
 {
     char *valid[] = {"dgTMatrix", "dsTMatrix", "dtTMatrix",
 		     "lgTMatrix", "lsTMatrix", "ltTMatrix",
 		     "ngTMatrix", "nsTMatrix", "ntTMatrix",
 		     "zgTMatrix", "zsTMatrix", "ztTMatrix",
 		     ""};
-    int *dims, ctype = Matrix_check_class(class_P(x), valid);
+    int *dims, ctype = Matrix_check_class(class_P(x), valid), m;
     SEXP islot;
+    Rboolean do_Udiag;
 
     if (ctype < 0) error("invalid class of object to as_cholmod_triplet");
     memset(ans, 0, sizeof(cholmod_triplet)); /* zero the struct */
@@ -206,13 +221,63 @@ CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x)
     dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
     ans->nrow = dims[0];
     ans->ncol = dims[1];
+
+    do_Udiag = (check_Udiag && ctype % 3 == 2 && (*diag_P(x) == 'U'));
+
     islot = GET_SLOT(x, Matrix_iSym);
-    ans->nnz = ans->nzmax = LENGTH(islot);
+    m = LENGTH(islot);
+    ans->nnz = ans->nzmax = do_Udiag ? m + dims[0] : m;
 				/* slots always present */
     ans->i = (void *) INTEGER(islot);
     ans->j = (void *) INTEGER(GET_SLOT(x, Matrix_jSym));
 
-    AS_CHM_FINISH;
+    AS_CHM_COMMON;
+
+    if(do_Udiag) {  /* Tsparse_diagU2N(.)  [ ./Tsparse.c ]  "in place" : */
+	int k = m + dims[0];
+	int *a_i, *a_j;
+
+	/* TODO? instead of reallocating, don't do the 2nd part of AS_CHM_COMMON()
+	 * ---- above, and allocate to correct length + Memcpy() here, as in
+	 * Tsparse_diagU2N() */
+	if(cholmod_reallocate_triplet((size_t) k, ans, &c))
+	    error(_("as_cholmod_triplet(): could not reallocate for internal diagU2N()"
+		      ));
+	a_i = ans->i;
+	a_j = ans->j;
+	/* add (@i, @j)[k+m] = k, @x[k+m] = 1.   for k = 0,..,(n-1) */
+	for(k=0; k < dims[0]; k++) {
+	    a_i[k+m] = k;
+	    a_j[k+m] = k;
+
+	    switch(ctype / 3) {
+	    case 0: { /* "d" */
+		double *a_x = ans->x;
+		a_x[k+m] = 1.;
+		break;
+	    }
+	    case 1: { /* "l" */
+		int *a_x = ans->x;
+		a_x[k+m] = 1;
+		break;
+	    }
+	    case 2: /* "n" */
+		break;
+	    case 3: { /* "z" */
+		double *a_x = ans->x;
+		a_x[2*(k+m)  ] = 1.;
+		a_x[2*(k+m)+1] = 0.;
+		break;
+	    }
+	    }
+	}
+
+    } /* else :
+       * NOTE: if(*diag_P(x) == 'U'), the diagonal is lost (!);
+       * ---- that may be ok, e.g. if we are just converting from/to Tsparse,
+       *      but is *not* at all ok, e.g. when used before matrix products */
+
+    return ans;
 }
 
 /**

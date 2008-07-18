@@ -1,3 +1,15 @@
+2008-07-19  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/chm_common.h (AS_CHM_SP__, AS_CHM_TR__): the non-diagU2N
+	versions.
+
+	* src/chm_common.c (as_cholmod_sparse, as_cholmod_triplet): new
+	boolean argument 'check_Udiag' (formerly implicitly was FALSE).
+
+	* src/Csparse.c (Csparse_Csparse_prod, ...): etc: use the new
+	  AS_CHM_SP() which includes diagU2N.
+
+
 2008-07-17  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r2217] R/dtCMatrix.R, src/dtCMatrix.c, src/dtCMatrix.h, src/init.c:
@@ -35,7 +47,7 @@
 
 	* [r2208] src/dtCMatrix.c, src/dtTMatrix.c: Revise wording in error
 	  messages
-	
+
 2008-07-12  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/diagMatrix.R (.bdiag): make more sophisticated, keeping
