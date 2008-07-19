@@ -30,13 +30,23 @@ M_as_cholmod_factor(CHM_FR ans, SEXP x)
 }
 
 CHM_SP attribute_hidden
-M_as_cholmod_sparse(CHM_SP ans, SEXP x)
+M_as_cholmod_sparse(CHM_SP ans, SEXP x, Rboolean check_Udiag)
 {
-    static CHM_SP(*fun)(CHM_SP,SEXP)= NULL;
+    static CHM_SP(*fun)(CHM_SP,SEXP,Rboolean)= NULL;
     if(fun == NULL)
-	fun = (CHM_SP(*)(CHM_SP,SEXP))
+	fun = (CHM_SP(*)(CHM_SP,SEXP,Rboolean))
 	    R_GetCCallable("Matrix", "as_cholmod_sparse");
-    return fun(ans, x);
+    return fun(ans, x, check_Udiag);
+}
+
+CHM_SP attribute_hidden
+M_as_cholmod_triplet(CHM_SP ans, SEXP x, Rboolean check_Udiag)
+{
+    static CHM_SP(*fun)(CHM_SP,SEXP,Rboolean)= NULL;
+    if(fun == NULL)
+	fun = (CHM_SP(*)(CHM_SP,SEXP,Rboolean))
+	    R_GetCCallable("Matrix", "as_cholmod_triplet");
+    return fun(ans, x, check_Udiag);
 }
 
 SEXP attribute_hidden
@@ -480,7 +490,7 @@ M_R_cholmod_error(int status, char *file, int line, char *message)
 {
     error("Cholmod error `%s' at file:%s, line %d", message, file, line);
 }
-    
+
 /* just to get 'int' instead of 'void' as required by CHOLMOD's print_function */
 static int
 R_cholmod_printf(const char* fmt, ...)
