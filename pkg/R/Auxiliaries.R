@@ -155,6 +155,7 @@ mmultCheck <- function(a, b) {
 }
 
 dimNamesCheck <- function(a, b) {
+    ## Constructs "sensical" dimnames for something like  a + b ;
     ## assume dimCheck() has happened before
     nullDN <- list(NULL,NULL)
     h.a <- !identical(nullDN, dna <- dimnames(a))
@@ -164,11 +165,10 @@ dimNamesCheck <- function(a, b) {
 	else if(!h.a) dnb
 	else { ## both have non-trivial dimnames
 	    r <- dna # "default" result
-	    for(j in 1:2) {
-		dn <- dnb[[j]]
+	    for(j in 1:2) if(!is.null(dn <- dnb[[j]])) {
 		if(is.null(r[[j]]))
 		    r[[j]] <- dn
-		else if (!is.null(dn) && any(r[[j]] != dn))
+		else if(!identical(r[[j]], dn))
 		    warning(gettextf("dimnames [%d] mismatch in %s", j,
 				     deparse(sys.call(sys.parent()))),
 			    call. = FALSE)

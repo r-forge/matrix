@@ -1,5 +1,10 @@
 2008-07-19  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* R/Auxiliaries.R (dimNamesCheck): fix very long standing buglet,
+	stumbled upon by Michael H.
+
+	* tests/validObj.R: testing the bug-fix
+
 	* src/chm_common.h (AS_CHM_SP__, AS_CHM_TR__): the non-diagU2N
 	versions.
 
@@ -9,6 +14,8 @@
 	* src/Csparse.c (Csparse_Csparse_prod, ...): etc: use the new
 	  AS_CHM_SP() which includes diagU2N.
 
+	* inst/include/Matrix_stubs.c (M_as_cholmod_sparse): similarly
+	adapt to 3 arguments.
 
 2008-07-17  Douglas Bates <bates@stat.wisc.edu>
 

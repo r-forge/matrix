@@ -22,9 +22,11 @@ stopifnot(unique(is(m1)) == c("dgeMatrix", "ddenseMatrix", "generalMatrix",
 	  identical(m1, t(t(m1))))
 c.nam <- paste("C",1:2, sep='')
 dimnames(m1) <- list(NULL, c.nam)
+checkMatrix(m1) # failed in 0.999375-10
+checkMatrix(tm1 <- t(m1))
 stopifnot(colnames(m1) == c.nam,
-	  identical(dimnames(t(m1)), list(c.nam, NULL)),
-	  identical(m1, t(t(m1))))
+	  identical(dimnames(tm1), list(c.nam, NULL)),
+	  identical(m1, t(tm1)))
 
 ## an example of *named* dimnames
 (t34N <- as(unclass(table(x = gl(3,4), y=gl(4,3))), "dgeMatrix"))
@@ -38,7 +40,7 @@ checkMatrix(cp <- as(cm, "dppMatrix"))# 'dpp' + factors
 checkMatrix(cs <- as(cm, "dsyMatrix"))# 'dsy' + factors
 checkMatrix(dcm <- as(cm, "dgeMatrix"))#'dge'
 checkMatrix(mcm <- as(cm, "dMatrix")) # 'dsy' + factors -- buglet? rather == cm?
-checkMatrix(mc. <- as(cm, "Matrix"))
+checkMatrix(mc. <- as(cm, "Matrix")) # dpo --> dsy -- FIXME!
 stopifnot(identical(mc., mcm),
           identical4(2*cm, cm + cp, cp + cs, mcm * 2))
 
