@@ -1,6 +1,6 @@
 Package: Matrix
 Version: 0.999375-11
-Date: 2008-07-..
+Date: 2008-07-19
 Title: A Matrix package for R
 Author: Douglas Bates <bates@stat.wisc.edu> and Martin Maechler <maechler@stat.math.ethz.ch>
 Maintainer: Doug and Martin <Matrix-authors@R-project.org>
