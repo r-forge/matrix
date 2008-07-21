@@ -1,5 +1,11 @@
 2008-07-21  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* src/cs_utils.c (Matrix_as_cs): add check_Udiag switch
+	* src/cs_utils.h (AS_CSP & AS_CSP__): two versions
+	* src/dtCMatrix.c (dtCMatrix_sparse_solve): no longer needs
+	diagU2N().
+	
+	
 	* R/diagMatrix.R (.sparseDiagonal): new utility, used in "old"
 	.spDiagonal() and new .trDiagonal().
 

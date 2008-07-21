@@ -33,7 +33,7 @@ static CSP csp_eye(int n)
     CSP eye = cs_spalloc(n, n, n, 1, 0);
     int *ep = eye->p, *ei = eye->i;
     double *ex = eye->x;
-    
+
     if (n <= 0) error("csp_eye argument n must be positive");
     eye->nz = -1;
     for (int j = 0; j < n; j++) {
@@ -56,10 +56,10 @@ static CSP csp_eye(int n)
  * @return pointer to a cs object that contains pointers
  * to the slots of x.
  */
-cs *Matrix_as_cs(cs *ans, SEXP x)
+cs *Matrix_as_cs(cs *ans, SEXP x, Rboolean check_Udiag)
 {
-    char *valid[] = {"dgCMatrix", "dtCMatrix", ""};/* had also "dsCMatrix", but that
-						    * only stores one triangle */
+    char *valid[] = {"dgCMatrix", "dtCMatrix", ""};
+    /* had also "dsCMatrix", but that only stores one triangle */
     int *dims, ctype = Matrix_check_class(class_P(x), valid);
     SEXP islot;
 
@@ -74,6 +74,42 @@ cs *Matrix_as_cs(cs *ans, SEXP x)
     ans->p = INTEGER(GET_SLOT(x, Matrix_pSym));
     ans->x = REAL(GET_SLOT(x, Matrix_xSym));
 
+    if(check_Udiag && ctype == 1 && (*diag_P(x) == 'U')) { /* diagU2N(.) : */
+	int n = dims[0];
+	CSP I_n = csp_eye(n);
+	/* tmp := 1*ans + 1*eye -- result is newly allocated in cs_add(): */
+	CSP tmp = cs_add(ans, I_n, 1., 1.);
+	int nz = tmp->nzmax;
+	{
+	    int i;/*debugging only*/
+	    int *ii; double *dd;
+
+	    Rprintf("Debugging Matrix_as_cs(.,x, check_Udiag=TRUE): n=%d, new nz=%d\n",
+		    n, nz);
+	    Rprintf("p[0:n]: "); ii = tmp->p;
+	    for(i = 0; i <= n; i++) Rprintf("%3d,", ii[i]); Rprintf("\n");
+	    Rprintf("i[.. ]: "); ii = tmp->i;
+	    for(i = 0; i < nz; i++) Rprintf("%5d,", ii[i]); Rprintf("\n");
+	    Rprintf("x[.. ]: "); dd = tmp->x;
+	    for(i = 0; i < nz; i++) Rprintf("%5g,", dd[i]); Rprintf("\n");
+	}
+
+	/* The ans "slots" were pointers to x@.slots; need new content now:*/
+	/* "FIXME": combine  Alloca() and Memcpy() into one call...
+	 * ........  but we have a much bigger problem (segfault!!) anyway */
+	ans->i = Alloca(nz, int);
+	ans->x = Alloca(nz, double);
+	ans->p = Alloca(n+1, int);
+	R_CheckStack();
+	/* content(ans) := content(tmp) : */
+	ans->nzmax = nz;
+	Memcpy(ans->i, tmp->i, nz);
+	Memcpy(ans->x, tmp->x, nz);
+	Memcpy(ans->p, tmp->p, n + 1);
+
+	cs_spfree(I_n);
+	cs_spfree(tmp);
+    }
     return ans;
 }
 
@@ -119,6 +155,8 @@ SEXP Matrix_cs_to_SEXP(cs *a, char *cl, int dofree)
 }
 
 #if 0 				/* unused ------------------------------------*/
+/*  -------------------------------------*/
+
 /**
  * Populate a css object with the contents of x.
  *

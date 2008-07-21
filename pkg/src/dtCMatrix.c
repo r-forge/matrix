@@ -80,7 +80,7 @@ SEXP dtCMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
 {
     int cl = asLogical(classed);
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));
-    CSP A = AS_CSP(Csparse_diagU2N(a));
+    CSP A = AS_CSP(a);
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(cl ? GET_SLOT(b, Matrix_DimSym) :
 			 getAttrib(b, R_DimSymbol));
@@ -103,7 +103,7 @@ SEXP dtCMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
 SEXP dtCMatrix_sparse_solve(SEXP a, SEXP b)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix")));
-    CSP A = AS_CSP(Csparse_diagU2N(a)), B = AS_CSP(Csparse_diagU2N(b));
+    CSP A = AS_CSP(a), B = AS_CSP(b);
     int *xp = INTEGER(ALLOC_SLOT(ans, Matrix_pSym, INTSXP, (B->n) + 1)),
 	xnz = 10 * B->p[B->n];	/* initial estimate of nnz in x */
     int *ti = Calloc(xnz, int), k, lo = uplo_P(a)[0] == 'L', pos = 0;
@@ -111,7 +111,7 @@ SEXP dtCMatrix_sparse_solve(SEXP a, SEXP b)
     double  *wrk = Alloca(A->n, double);
     int *xi = Alloca(2*A->n, int);	/* for cs_reach */
     R_CheckStack();
-    
+
     if (A->m != A->n || B->n < 1 || A->n < 1 || A->n != B->m)
 	error(_("Dimensions of system to be solved are inconsistent"));
     slot_dup(ans, b, Matrix_DimSym);
@@ -141,7 +141,7 @@ SEXP dtCMatrix_sparse_solve(SEXP a, SEXP b)
     xnz = xp[B->n];
     Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_iSym, INTSXP,  xnz)), ti, xnz);
     Memcpy(   REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, xnz)), tx, xnz);
-    
+
     Free(ti); Free(tx);
     UNPROTECT(1);
     return ans;

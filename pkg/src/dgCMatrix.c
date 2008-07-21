@@ -152,7 +152,7 @@ SEXP compressed_non_0_ij(SEXP x, SEXP colP)
 SEXP dgCMatrix_lusol(SEXP x, SEXP y)
 {
     SEXP ycp = PROTECT(duplicate(y));
-    CSP xc = AS_CSP(x);
+    CSP xc = AS_CSP__(x);
     R_CheckStack();
 
     if (xc->m != xc->n || xc->m <= 0)
@@ -169,7 +169,7 @@ SEXP dgCMatrix_lusol(SEXP x, SEXP y)
 SEXP dgCMatrix_qrsol(SEXP x, SEXP y)
 {
     SEXP ycp = PROTECT(duplicate(y));
-    CSP xc = AS_CSP(x);
+    CSP xc = AS_CSP__(x);
     R_CheckStack();
 
     if (xc->m < xc->n || xc->n <= 0)
@@ -187,7 +187,7 @@ SEXP dgCMatrix_qrsol(SEXP x, SEXP y)
 SEXP dgCMatrix_QR(SEXP Ap, SEXP order)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("sparseQR")));
-    CSP A = AS_CSP(Ap), D;
+    CSP A = AS_CSP__(Ap), D;
     css *S;
     csn *N;
     int m = A->m, n = A->n, ord = asLogical(order) ? 3 : 0, *p;
@@ -237,7 +237,7 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp)
 {
     /* Is currently only called as  .Call(dgCMatrix_LU, x, TRUE, 1)) */
     SEXP ans = get_factors(Ap, "LU");
-    CSP A = AS_CSP(Ap), D;
+    CSP A = AS_CSP__(Ap), D;
     css *S;
     csn *N;
     int n, order = asInteger(orderp), *p;
@@ -297,8 +297,8 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
     /* b is dense or NULL [ <--> solve(A) */
     SEXP lu = dgCMatrix_LU(Ap, ScalarLogical(1), ScalarReal(1));
     SEXP qslot = GET_SLOT(lu, install("q"));
-    CSP L = AS_CSP(GET_SLOT(lu, install("L"))),
-	U = AS_CSP(GET_SLOT(lu, install("U")));
+    CSP L = AS_CSP__(GET_SLOT(lu, install("L"))),
+	U = AS_CSP__(GET_SLOT(lu, install("U")));
     SEXP ans = PROTECT( !isNull(b) ? dup_mMatrix_as_dgeMatrix(b)
 			: new_dgeMatrix(U->n, U->n));
     int *bdims = INTEGER(GET_SLOT(ans, Matrix_DimSym));
