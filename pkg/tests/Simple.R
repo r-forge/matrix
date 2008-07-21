@@ -319,6 +319,12 @@ stopifnot(isValid(im, "Matrix"), isValid(I2, "Matrix"), class(I4c) == "dgCMatrix
           all.equal(s.ms2, I4c  , tol = 4e-15),
           abs(o4 - 1) < 1e-14)
 
+image(T125 <- kronecker(kronecker(t5,t5),t5))
+system.time(IT1 <- solve(T125))
+I. <- drop0(zapsmall(IT1 %*% T125))
+stopifnot(isValid(IT1, "dtCMatrix"),
+          all(I. == Diagonal(125)))
+
 ###-- row- and column operations  {was ./rowcolOps.R }
 
 set.seed(321)

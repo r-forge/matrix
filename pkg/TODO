@@ -210,3 +210,4 @@
       ( in inst/include/Matrix.h )
 
 [[ have done the as_cholmod_* ones, but not yet the Matrix_as_cs() one ]]
+
