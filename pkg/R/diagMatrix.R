@@ -32,21 +32,32 @@ Diagonal <- function(n, x = NULL)
     }
 }
 
-## Pkg 'spdep' had (relatively slow) versions of this as_dsCMatrix_I()
-.symDiagonal <- function(n, x = rep.int(1,n), uplo = "U") {
+.sparseDiagonal <- function(n, x = rep.int(1,n), uplo = "U", shape = "t") {
     stopifnot(n == (n. <- as.integer(n)), (n <- n.) >= 0)
     if((lx <- length(x)) == 1) x <- rep.int(x, n)
     else if(lx != n) stop("length(x) must be 1 or n")
-    cls <-
-        if(is.double(x)) "dsCMatrix"
-        else if(is.logical(x)) "lsCMatrix"
-        else { ## for now
-            storage.mode(x) <- "double"
-            "dsCMatrix"
-        }
-    new(cls, Dim = c(n,n), x = x, uplo = uplo,
-        i = if(n) 0:(n - 1L) else integer(0), p = 0:n)
+    stopifnot(is.character(shape), nchar(shape) == 1,
+	      any(shape == c("t","s","g"))) # triangular / symmetric / general
+    kind <-
+	if(is.double(x)) "d"
+	else if(is.logical(x)) "l"
+	else { ## for now
+	    storage.mode(x) <- "double"
+	    "d"
+	}
+    new(paste(kind, shape, "CMatrix", sep=''),
+	Dim = c(n,n), x = x, uplo = uplo,
+	i = if(n) 0:(n - 1L) else integer(0), p = 0:n)
 }
+
+## Pkg 'spdep' had (relatively slow) versions of this as_dsCMatrix_I()
+.symDiagonal <- function(n, x = rep.int(1,n), uplo = "U")
+    .sparseDiagonal(n, x, uplo, shape = "s")
+
+## instead of   diagU2N(as(Diagonal(n), "CsparseMatrix")), diag = "N" in any case:
+.trDiagonal <- function(n, x = rep.int(1,n), uplo = "U")
+    .sparseDiagonal(n, x, uplo, shape = "t")
+
 
 ### This is modified from a post of Bert Gunter to R-help on  1 Sep 2005.
 ### Bert's code built on a post by Andy Liaw who most probably was influenced

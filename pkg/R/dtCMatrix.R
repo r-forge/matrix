@@ -79,9 +79,8 @@ setMethod("determinant", signature(x = "dtCMatrix", logarithm = "logical"),
 
 setMethod("solve", signature(a = "dtCMatrix", b = "missing"),
 	  function(a, b, ...) {
-              stopifnot(nrow(a) == ncol(a))
-              as(.Call(dtCMatrix_sparse_solve, a,
-                       as(Diagonal(ncol(a)), "CsparseMatrix")),
+	      stopifnot((n <- nrow(a)) == ncol(a))
+	      as(.Call(dtCMatrix_sparse_solve, a, .trDiagonal(n)),
                  "dtCMatrix")
           }, valueClass = "dtCMatrix")
 
