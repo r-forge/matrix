@@ -1,3 +1,10 @@
+2008-07-21  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/diagMatrix.R (.sparseDiagonal): new utility, used in "old"
+	.spDiagonal() and new .trDiagonal().
+
+	* R/dtCMatrix.R (solve): make use of .trDiagonal()
+
 2008-07-19  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Auxiliaries.R (dimNamesCheck): fix very long standing buglet,
