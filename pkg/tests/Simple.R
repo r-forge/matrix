@@ -192,10 +192,20 @@ stopifnot(identical(rowSums(lcu), rowSums(drop0(lcu))))
 (ncu <- as(lcu, "nMatrix"))# -- gives the "pattern" of lcu, i.e. FALSE are *there*
 stopifnot(identical(ncu, as(lcu,"nsparseMatrix")),
           identical(rowSums(ncu), c(3:1, 1L)))
-
-
 assert.EQ.mat(cu, as(tu,"matrix"), tol=0)
 assert.EQ.mat(cnu, as(tu,"matrix"), tol=0)
+
+U <- new("dtCMatrix", Dim = c(6L, 6L),
+	 i = c(0:1, 0L, 2:3, 1L, 4L),
+	 p = c(0L,0L,0L, 2:3, 5L, 7L),
+	 x = rep.int(-0.5, 7), diag = "U")
+validObject(U)
+U. <- solve(iU <- solve(U))#-> gave segmentation fault
+stopifnot(validObject(U), ## had a case where solve(U) modified U !
+	  validObject(iU),
+	  validObject(U.),
+	  ## no rounding error, since have iU@x * 8 is integer :
+	  identical(U, Matrix:::diagN2U(drop0(U.))))
 
 ## <sparse> o <numeric> (of length > 1):
 stopifnot(isValid(tm <- tu * 1:8, "sparseMatrix"),
@@ -319,11 +329,13 @@ stopifnot(isValid(im, "Matrix"), isValid(I2, "Matrix"), class(I4c) == "dgCMatrix
           all.equal(s.ms2, I4c  , tol = 4e-15),
           abs(o4 - 1) < 1e-14)
 
-image(T125 <- kronecker(kronecker(t5,t5),t5))
-system.time(IT1 <- solve(T125))
-I. <- drop0(zapsmall(IT1 %*% T125))
-stopifnot(isValid(IT1, "dtCMatrix"),
-          all(I. == Diagonal(125)))
+image(T125 <- kronecker(kronecker(t5,t5),t5),
+      main = paste("T125:",class(T125)))
+dim(T3k <- kronecker(t5,kronecker(T125, t5)))
+system.time(IT3 <- solve(T3k))# incredibly fast
+I. <- drop0(zapsmall(IT3 %*% T3k))
+stopifnot(isValid(IT3, "dtCMatrix"),
+          all(I. == Diagonal(3125)))
 
 ###-- row- and column operations  {was ./rowcolOps.R }
 
