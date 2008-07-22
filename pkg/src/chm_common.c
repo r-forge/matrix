@@ -34,7 +34,7 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x, Rboolean check_Udiag)
     ans->itype = CHOLMOD_INT;	/* characteristics of the system */
     ans->dtype = CHOLMOD_DOUBLE;
     ans->packed = TRUE;
-    ans->sorted = TRUE;
+    ans->sorted = FALSE;
     ans->x = ans->z = ans->nz = (void *) NULL;
 				/* dimensions and nzmax */
     ans->nrow = dims[0];
@@ -78,13 +78,21 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x, Rboolean check_Udiag)
     }
 
     AS_CHM_COMMON;
+    if (!cholmod_sort(ans, &c))
+	error(_("cholmod_sort returned an error code"));
 
     if(do_Udiag) {  /* diagU2N(.)  "in place" : */
 	double one[] = {1, 0};
-	CHM_SP tmp = cholmod_copy (ans, ans->stype, ans->xtype, &c);
 	CHM_SP eye = cholmod_speye(ans->nrow, ans->ncol, ans->xtype, &c);
+	CHM_SP tmp = cholmod_add(ans, eye, one, one, TRUE, TRUE, &c);
+	int np1 = ans->ncol + 1, nz = (int) cholmod_nnz(tmp, &c);
 
-	ans = cholmod_add(tmp, eye, one, one, TRUE, TRUE, &c);
+	ans->p = (void*) Memcpy((   int*)R_alloc(sizeof(   int), np1),
+				(   int*)(tmp->p), np1);
+	ans->i = (void*) Memcpy((   int*)R_alloc(sizeof(   int), nz),
+				(   int*)(tmp->i), nz);
+	ans->x = (void*) Memcpy((double*)R_alloc(sizeof(double), nz),
+				(double*)(tmp->x), nz);
 
 	cholmod_free_sparse(&tmp, &c);
 	cholmod_free_sparse(&eye, &c);
