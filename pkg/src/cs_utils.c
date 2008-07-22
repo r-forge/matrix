@@ -83,8 +83,9 @@ cs *Matrix_as_cs(cs *ans, SEXP x, Rboolean check_Udiag)
 
 	/* content(ans) := content(tmp) : */
 	ans->nzmax = nz;
-	Memcpy(ans->p, tmp->p, n + 1); /* ans->p already has n + 1 locations */
-	ans->i = Memcpy((int*) R_alloc(sizeof(int), nz), tmp->i, nz);
+	/* The ans "slots" were pointers to x@ <slots>; all need new content now: */
+	ans->p = Memcpy(   (int*) R_alloc(sizeof(int),   n+1), tmp->p, nz);
+	ans->i = Memcpy(   (int*) R_alloc(sizeof(int),    nz), tmp->i, nz);
 	ans->x = Memcpy((double*) R_alloc(sizeof(double), nz), tmp->x, nz);
 
 	cs_spfree(I_n);
