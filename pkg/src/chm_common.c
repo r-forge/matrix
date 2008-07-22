@@ -3,6 +3,73 @@
 
 cholmod_common c;
 
+static int stype(int ctype, SEXP x)
+{
+    if ((ctype % 3) == 1) return (*uplo_P(x) == 'U') ? 1 : -1;
+    return 0;
+}
+    
+static int xtype(int ctype)
+{
+    switch(ctype / 3) {
+    case 0: /* "d" */
+    case 1: /* "l" */
+	return CHOLMOD_REAL;
+    case 2: /* "n" */
+	return CHOLMOD_PATTERN;
+    case 3: /* "z" */
+	return CHOLMOD_COMPLEX;
+    }
+    return -1;
+}
+
+static void *xpt(int ctype, SEXP x)
+{
+    switch(ctype / 3) {
+    case 0: /* "d" */
+	return (void *) REAL(GET_SLOT(x, Matrix_xSym));
+    case 1: /* "l" */
+	return (void *) REAL(coerceVector(GET_SLOT(x, Matrix_xSym), REALSXP));
+    case 2: /* "n" */
+	return (void *) NULL; 
+    case 3: /* "z" */
+	return (void *) COMPLEX(GET_SLOT(x, Matrix_xSym));
+    }
+    return (void *) NULL; 	/* -Wall */
+}
+
+static Rboolean check_sorted(CHM_SP A)
+{
+    int *Ai = (int*)(A->i), *Ap = (int*)(A->p);
+    int j, p;
+    
+    for (j = 0; j < A->ncol; j++) {
+	int p1 = Ap[j], p2 = Ap[j + 1] - 1;
+	for (p = p1; p < p2; p++)
+	    if (Ai[p] >= Ai[p + 1])
+		return FALSE;
+    }
+    return TRUE;
+}
+
+static void chm2Ralloc(CHM_SP dest, CHM_SP src)
+{
+    int np1, nnz;
+
+    /* copy all the characteristics of src to dest */
+    memcpy(dest, src, sizeof(cholmod_sparse)); 
+    
+    /* R_alloc the vector storage for dest and copy the contents from src */
+    np1 = src->ncol + 1;
+    nnz = (int) cholmod_nnz(src, &c);
+    dest->p = (void*) Memcpy((   int*)R_alloc(sizeof(   int), np1),
+			     (   int*)(src->p), np1);
+    dest->i = (void*) Memcpy((   int*)R_alloc(sizeof(   int), nnz),
+			     (   int*)(src->i), nnz);
+    dest->x = (void*) Memcpy((double*)R_alloc(sizeof(double), nnz),
+			     (double*)(src->x), nnz);
+}
+
 /**
  * Populate ans with the pointers from x and modify its scalar
  * elements accordingly. Note that later changes to the contents of
@@ -25,7 +92,6 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x, Rboolean check_Udiag)
 		     ""};
     int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	ctype = Matrix_check_class(class_P(x), valid);
-    Rboolean do_Udiag = FALSE;
     SEXP islot = GET_SLOT(x, Matrix_iSym);
 
     if (ctype < 0) error("invalid class of object to as_cholmod_sparse");
@@ -34,8 +100,6 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x, Rboolean check_Udiag)
     ans->itype = CHOLMOD_INT;	/* characteristics of the system */
     ans->dtype = CHOLMOD_DOUBLE;
     ans->packed = TRUE;
-    ans->sorted = FALSE;
-    ans->x = ans->z = ans->nz = (void *) NULL;
 				/* dimensions and nzmax */
     ans->nrow = dims[0];
     ans->ncol = dims[1];
@@ -44,56 +108,26 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x, Rboolean check_Udiag)
 				/* slots always present */
     ans->i = (void *) INTEGER(islot);
     ans->p = (void *) INTEGER(GET_SLOT(x, Matrix_pSym));
+				/* values depending on ctype */
+    ans->x = xpt(ctype, x);
+    ans->stype = stype(ctype, x);
+    ans->xtype = xtype(ctype);
+    
+    if (!(ans->sorted = check_sorted(ans))) { /* sort columns if needed */
+	CHM_SP tmp = cholmod_copy_sparse(ans, &c);
+	if (!cholmod_sort(tmp, &c))
+	    error(_("cholmod_sort returned an error code"));
 
-#define AS_CHM_COMMON								\
-				/* set the stype */				\
-    switch(ctype % 3) {								\
-    case 0: /* g(eneral) */							\
-	ans->stype = 0; break;							\
-    case 1: /* s(ymmetric) */							\
-	ans->stype = (*uplo_P(x) == 'U') ? 1 : -1;				\
-	break;									\
-    case 2: /* t(riangular) -- Note that triangularity property is lost! */	\
-	ans->stype = 0;								\
-	do_Udiag = (check_Udiag && (*diag_P(x) == 'U'));			\
-	break;									\
-    }										\
-    				/* set the xtype and any elements */		\
-    switch(ctype / 3) {								\
-    case 0: /* "d" */								\
-	ans->xtype = CHOLMOD_REAL;						\
-	ans->x = (void *) REAL(GET_SLOT(x, Matrix_xSym));			\
-	break;									\
-    case 1: /* "l" */								\
-	ans->xtype = CHOLMOD_REAL;						\
-	ans->x = (void *) REAL(coerceVector(GET_SLOT(x, Matrix_xSym), REALSXP)); \
-	break;									\
-    case 2: /* "n" */								\
-	ans->xtype = CHOLMOD_PATTERN;						\
-	break;									\
-    case 3: /* "z" */								\
-	ans->xtype = CHOLMOD_COMPLEX;						\
-	ans->x = (void *) COMPLEX(GET_SLOT(x, Matrix_xSym));			\
-	break;									\
+	chm2Ralloc(ans, tmp);
+	cholmod_free_sparse(&tmp, &c);
     }
 
-    AS_CHM_COMMON;
-    if (!cholmod_sort(ans, &c))
-	error(_("cholmod_sort returned an error code"));
-
-    if(do_Udiag) {  /* diagU2N(.)  "in place" : */
+    if (check_Udiag && ctype % 3 == 2 && (*diag_P(x) == 'U')) { /* diagU2N(.)  "in place" : */
 	double one[] = {1, 0};
 	CHM_SP eye = cholmod_speye(ans->nrow, ans->ncol, ans->xtype, &c);
 	CHM_SP tmp = cholmod_add(ans, eye, one, one, TRUE, TRUE, &c);
-	int np1 = ans->ncol + 1, nz = (int) cholmod_nnz(tmp, &c);
 
-	ans->p = (void*) Memcpy((   int*)R_alloc(sizeof(   int), np1),
-				(   int*)(tmp->p), np1);
-	ans->i = (void*) Memcpy((   int*)R_alloc(sizeof(   int), nz),
-				(   int*)(tmp->i), nz);
-	ans->x = (void*) Memcpy((double*)R_alloc(sizeof(double), nz),
-				(double*)(tmp->x), nz);
-
+	chm2Ralloc(ans, tmp);
 	cholmod_free_sparse(&tmp, &c);
 	cholmod_free_sparse(&eye, &c);
     } /* else :
@@ -239,7 +273,9 @@ CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x, Rboolean check_Udiag)
     ans->i = (void *) INTEGER(islot);
     ans->j = (void *) INTEGER(GET_SLOT(x, Matrix_jSym));
 
-    AS_CHM_COMMON;
+    ans->stype = stype(ctype, x);
+    ans->xtype = xtype(ctype);
+    ans->x = xpt(ctype, x);
 
     if(do_Udiag) {  /* Tsparse_diagU2N(.)  [ ./Tsparse.c ]  "in place" : */
 	int k = m + dims[0];
