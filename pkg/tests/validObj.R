@@ -1,5 +1,4 @@
 library(Matrix)
-
 ### Do all kinds of object creation and coercion
 
 source(system.file("test-tools.R", package = "Matrix"))
@@ -117,3 +116,35 @@ stopifnot(identical(mm, m.)) ## since it was auto-sorted
 ## and m.@i, m.@x now differ from m.i & m.x respectively:
 stopifnot(identical(m.i, m.@i[ip]),
 	  identical(m.x, m.@x[ip]))
+##
+## Make sure that validObject() objects...
+## 1) to wrong 'p'
+m. <- mm; m.@p[1] <- 1L
+stopifnot(grep("first element of slot p", validObject(m., test=TRUE)) == 1)
+m.@p <- mm@p[c(1,3:2,4:6)]
+stopifnot(grep("^slot p.* non-decreasing", validObject(m., test=TRUE)) == 1)
+## 2) to non-strictly increasing i's:
+m. <- mm ; ix <- c(1:3,3,5:6)
+m.@i <- mm@i[ix]
+m.@x <- mm@x[ix]
+stopifnot(identical(grep("slot i is not.* increasing .*column$",
+                         validObject(m., test=TRUE)), 1L))
+ix <- c(1:3, 3:6) # now the the (i,x) slots are too large (and decreasing at end)
+m.@i <- mm@i[ix]
+m.@x <- mm@x[ix]
+stopifnot(identical(grep("^slot i is not.* increasing .*sort",
+                         (msg <- validObject(m., test=TRUE))),# seg.fault in the past
+                    1L))
+
+## over-allocation of the i- and x- slot should be allowed:
+## (though it does not really help in M[.,.] <- *  yet)
+m. <- mm
+m.@i <- c(mm@i, NA, NA, NA)
+m.@x <- c(mm@x, 10:12)
+stopifnot(validObject(m.))
+m. # show() now works
+stopifnot(all(m. == mm), # in spite of
+	  length(m.@i) > length(mm@i),
+          identical(t(t(m.)), mm),
+	  identical3(m. * m., m. * mm, mm * mm))
+m.[1,4] <- 99 ## FIXME: warning and cuts (!) the over-allocated slots

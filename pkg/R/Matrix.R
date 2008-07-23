@@ -278,6 +278,9 @@ setMethod("solve", signature(a = "Matrix", b = "matrix"),
 setMethod("solve", signature(a = "matrix", b = "Matrix"),
 	  function(a, b, ...) callGeneric(Matrix(a), b))
 
+setMethod("solve", signature(a = "Matrix", b = "diagonalMatrix"),
+	  function(a, b, ...) callGeneric(a, as(b,"CsparseMatrix")))
+
 ## when no sub-class method is found, bail out
 setMethod("solve", signature(a = "Matrix", b = "Matrix"),
 	  function(a, b, ...) .bail.out.2("solve", class(a), class(b)))

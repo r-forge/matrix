@@ -340,6 +340,7 @@ nz.NA <- function(x, na.value) {
     else		x != 0 & !is.na(x)
 }
 
+### This assumes that e.g. the i-slot in Csparse is *not* over-allocated:
 nnzSparse <- function(x, cl = class(x), cld = getClassDef(cl))
 {
     ## Purpose: number of *stored* / structural non-zeros {NA's counted too}
@@ -379,14 +380,14 @@ nnzero <- function(x, na.counted = NA) {
 	if(extends(cld, "pMatrix"))	# is "sparse" too
 	    n
 	else if(extends(cld, "sparseMatrix")) {
-	    nn <-
-		if(extends(cld, "nMatrix")) # <==> no 'x' slot
-		    switch(.sp.class(cl),
-			   "CsparseMatrix" = length(x@i),
-			   "TsparseMatrix" = length(x@i),
-			   "RsparseMatrix" = length(x@j))
-		else ## consider NAs in 'x' slot:
-		    sum(nz.NA(x@x, na.counted))
+	    nn <- switch(.sp.class(cl),
+                         "CsparseMatrix" = x@p[d[2]+1L],# == length(x@i) only if not over-alloc.
+                         "TsparseMatrix" = length(x@i),
+                         "RsparseMatrix" = x@p[n+1L])
+	    if(!extends(cld, "nMatrix")) # <==> has 'x' slot : consider NAs in it:
+		nn <- sum(nz.NA(if(nn < length(x@x)) x@x[seq_len(nn)] else x@x,
+				na.counted))
+
 	    if(iSym)
 		nn+nn - sum(nz.NA(diag(x), na.counted))
 	    else if(extends(cld, "triangularMatrix") && x@diag == "U")

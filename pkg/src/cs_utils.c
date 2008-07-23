@@ -74,7 +74,7 @@ cs *Matrix_as_cs(cs *ans, SEXP x, Rboolean check_Udiag)
     ans->p = INTEGER(GET_SLOT(x, Matrix_pSym));
     ans->x = REAL(GET_SLOT(x, Matrix_xSym));
 
-    if(check_Udiag && ctype == 1 && (*diag_P(x) == 'U') && ans->m == ans->n) { /* diagU2N(.) : */
+    if(check_Udiag && ctype == 1 && (*diag_P(x) == 'U')) { /* diagU2N(.) : */
 	int n = dims[0];
 	CSP I_n = csp_eye(n);
 	/* tmp := 1*ans + 1*eye -- result is newly allocated in cs_add(): */

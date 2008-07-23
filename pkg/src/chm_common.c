@@ -100,14 +100,15 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x, Rboolean check_Udiag, Rboolean sort
     ans->itype = CHOLMOD_INT;	/* characteristics of the system */
     ans->dtype = CHOLMOD_DOUBLE;
     ans->packed = TRUE;
+				/* slots always present */
+    ans->i = INTEGER(islot);
+    ans->p = INTEGER(GET_SLOT(x, Matrix_pSym));
 				/* dimensions and nzmax */
     ans->nrow = dims[0];
     ans->ncol = dims[1];
+    ans->nzmax = (size_t) ((int *)ans->p)[dims[1]];
+    /* == LENGTH(islot) only if the i-slot is not over-allocated */
 
-    ans->nzmax = LENGTH(islot);
-				/* slots always present */
-    ans->i = (void *) INTEGER(islot);
-    ans->p = (void *) INTEGER(GET_SLOT(x, Matrix_pSym));
 				/* values depending on ctype */
     ans->x = xpt(ctype, x);
     ans->stype = stype(ctype, x);
@@ -126,6 +127,11 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x, Rboolean check_Udiag, Rboolean sort
 	    if (!cholmod_sort(tmp, &c))
 		error(_("cholmod_sort returned an error code"));
 
+#ifdef DEBUG_Matrix
+	    /* This "triggers" exactly for return values of dtCMatrix_sparse_solve():*/
+	    /* Don't want to translate this: want it report */
+	    Rprintf("Note: as_cholmod_sparse() needed cholmod_sort()ing\n");
+#endif
 	    chm2Ralloc(ans, tmp);
 	    cholmod_free_sparse(&tmp, &c);
 	}
