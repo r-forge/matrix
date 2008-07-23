@@ -40,10 +40,11 @@ SEXP Csparse_validate(SEXP x)
 	    }
     }
     if (!sorted) {
-	CHM_SP chx = AS_CHM_SP__(x);
+	CHM_SP chx = (CHM_SP) alloca(sizeof(cholmod_sparse));
 	R_CheckStack();
+	as_cholmod_sparse(chx, x, FALSE, TRUE); /* includes cholmod_sort() ! */
+	/* as chx = AS_CHM_SP__(x)  but  ^^^^  sorting x in_place (no copying)*/
 
-	cholmod_sort(chx, &c);
 	/* Now re-check that row indices are *strictly* increasing
 	 * (and not just increasing) within each column : */
 	for (j = 0; j < ncol; j++) {

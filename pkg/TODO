@@ -189,25 +189,3 @@
    		 from class "integer" to "numeric" (i.e. double prec),
   since we want to be able to coerce large sparse matrices to sparse
   vectors, where length maybe considerably larger than 2^32.
-
-- src/Csparce.c etc:  grep 'AS_.*sparse_diagU2N' src/*.?
-  reveals
-     o AS_CHM_SP(Csparse_diagU2N(.)) : as_cholmod_sparse(..)  \ src/chm_common.h
-     o AS_CHM_TR(Tsparse_diagU2N(.)) : as_cholmod_triplet(..) /
-     o AS_CSP   (Csparse_diagU2N(.)) : Matrix_as_cs(..)       > src/cs_utils.h
-
-  all of which are "inefficient", because several "S4 <-> Cholmod" or
-  "S4 <-> CS" coercions happen inside.
-
-  Should make the "inner" Csparse_diagU2N()  part of the
-    as_cholmod_sparse() or Matrix_as_cs() functions.
-    Drawback: extraneous check even for all AS_*(x) calls where *sparse_diagU2N()
-    is unneeded because x is known *not* to be triangular.
-
-  To evade the drawback, do this by adding a new boolean argument
-  'check_Udiag' to the C functions.
-   --> This is an API change however, notably since we export as_cholmod_sparse
-      ( in inst/include/Matrix.h )
-
-[[ have done the as_cholmod_* ones, but not yet the Matrix_as_cs() one ]]
-

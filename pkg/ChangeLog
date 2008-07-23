@@ -1,11 +1,18 @@
+2008-07-23  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/chm_common.c (as_cholmod_sparse): add 4th argument
+	'sort_in_place' and set it to TRUE in call from
+	* src/Csparse.c (Csparse_validate): sort in place, making sure that
+	validObject() continues sort the columns if needed.
+	* tests/validObj.R: now tests that.
+
 2008-07-21  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/cs_utils.c (Matrix_as_cs): add check_Udiag switch
 	* src/cs_utils.h (AS_CSP & AS_CSP__): two versions
 	* src/dtCMatrix.c (dtCMatrix_sparse_solve): no longer needs
 	diagU2N().
-	
-	
+
 	* R/diagMatrix.R (.sparseDiagonal): new utility, used in "old"
 	.spDiagonal() and new .trDiagonal().
 

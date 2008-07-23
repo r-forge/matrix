@@ -101,3 +101,19 @@ stopifnot(grep("replacing.*sensible", ind.try[1]) == 1,
 	  identical(p9[TRUE,], as(p9, "ngTMatrix")),
 	  identical(as(diag(9), "pMatrix"), as(1:9, "pMatrix"))
 	  )
+
+## validObject --> Cparse_validate(.)  *sorts* if needed:
+mm <- new("dgCMatrix", Dim = c(3L, 5L),
+          i = c(2L, 0L, 1L, 2L, 0L, 1L),
+          x = c( 2,  1,  2,  1,  2,  1),
+          p = c(0:2, 4L, 4L, 6L))
+m. <- mm
+ip <- c(1:2, 4:3, 6:5) # permute the 'i' and 'x' slot just "inside column":
+m.@i <- m.i <- mm@i[ip]
+m.@x <- m.x <- mm@x[ip]
+stopifnot(validObject(mm),
+	  validObject(m.))   ## <<-- this auto-sorts  m.
+stopifnot(identical(mm, m.)) ## since it was auto-sorted
+## and m.@i, m.@x now differ from m.i & m.x respectively:
+stopifnot(identical(m.i, m.@i[ip]),
+	  identical(m.x, m.@x[ip]))
