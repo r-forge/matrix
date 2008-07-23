@@ -30,13 +30,13 @@ M_as_cholmod_factor(CHM_FR ans, SEXP x)
 }
 
 CHM_SP attribute_hidden
-M_as_cholmod_sparse(CHM_SP ans, SEXP x, Rboolean check_Udiag)
+M_as_cholmod_sparse(CHM_SP ans, SEXP x, Rboolean check_Udiag, Rboolean sort_in_place)
 {
-    static CHM_SP(*fun)(CHM_SP,SEXP,Rboolean)= NULL;
+    static CHM_SP(*fun)(CHM_SP,SEXP,Rboolean,Rboolean)= NULL;
     if(fun == NULL)
-	fun = (CHM_SP(*)(CHM_SP,SEXP,Rboolean))
+	fun = (CHM_SP(*)(CHM_SP,SEXP,Rboolean,Rboolean))
 	    R_GetCCallable("Matrix", "as_cholmod_sparse");
-    return fun(ans, x, check_Udiag);
+    return fun(ans, x, check_Udiag, sort_in_place);
 }
 
 CHM_SP attribute_hidden

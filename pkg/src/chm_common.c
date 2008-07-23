@@ -8,7 +8,7 @@ static int stype(int ctype, SEXP x)
     if ((ctype % 3) == 1) return (*uplo_P(x) == 'U') ? 1 : -1;
     return 0;
 }
-    
+
 static int xtype(int ctype)
 {
     switch(ctype / 3) {
@@ -31,18 +31,18 @@ static void *xpt(int ctype, SEXP x)
     case 1: /* "l" */
 	return (void *) REAL(coerceVector(GET_SLOT(x, Matrix_xSym), REALSXP));
     case 2: /* "n" */
-	return (void *) NULL; 
+	return (void *) NULL;
     case 3: /* "z" */
 	return (void *) COMPLEX(GET_SLOT(x, Matrix_xSym));
     }
     return (void *) NULL; 	/* -Wall */
 }
 
-static Rboolean check_sorted(CHM_SP A)
+Rboolean check_sorted_chm(CHM_SP A)
 {
     int *Ai = (int*)(A->i), *Ap = (int*)(A->p);
     int j, p;
-    
+
     for (j = 0; j < A->ncol; j++) {
 	int p1 = Ap[j], p2 = Ap[j + 1] - 1;
 	for (p = p1; p < p2; p++)
@@ -57,8 +57,8 @@ static void chm2Ralloc(CHM_SP dest, CHM_SP src)
     int np1, nnz;
 
     /* copy all the characteristics of src to dest */
-    memcpy(dest, src, sizeof(cholmod_sparse)); 
-    
+    memcpy(dest, src, sizeof(cholmod_sparse));
+
     /* R_alloc the vector storage for dest and copy the contents from src */
     np1 = src->ncol + 1;
     nnz = (int) cholmod_nnz(src, &c);
@@ -83,7 +83,7 @@ static void chm2Ralloc(CHM_SP dest, CHM_SP src)
  *
  * @return ans containing pointers to the slots of x.
  */
-CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x, Rboolean check_Udiag)
+CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x, Rboolean check_Udiag, Rboolean sort_in_place)
 {
     char *valid[] = {"dgCMatrix", "dsCMatrix", "dtCMatrix",
 		     "lgCMatrix", "lsCMatrix", "ltCMatrix",
@@ -112,14 +112,23 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x, Rboolean check_Udiag)
     ans->x = xpt(ctype, x);
     ans->stype = stype(ctype, x);
     ans->xtype = xtype(ctype);
-    
-    if (!(ans->sorted = check_sorted(ans))) { /* sort columns if needed */
-	CHM_SP tmp = cholmod_copy_sparse(ans, &c);
-	if (!cholmod_sort(tmp, &c))
-	    error(_("cholmod_sort returned an error code"));
 
-	chm2Ralloc(ans, tmp);
-	cholmod_free_sparse(&tmp, &c);
+    /* are the columns sorted (increasing row numbers) ?*/
+    ans->sorted = check_sorted_chm(ans);
+    if (!(ans->sorted)) { /* sort columns */
+	if(sort_in_place) {
+	    if (!cholmod_sort(ans, &c))
+		error(_("in_place cholmod_sort returned an error code"));
+	    ans->sorted = 1;
+	}
+	else {
+	    CHM_SP tmp = cholmod_copy_sparse(ans, &c);
+	    if (!cholmod_sort(tmp, &c))
+		error(_("cholmod_sort returned an error code"));
+
+	    chm2Ralloc(ans, tmp);
+	    cholmod_free_sparse(&tmp, &c);
+	}
     }
 
     if (check_Udiag && ctype % 3 == 2 && (*diag_P(x) == 'U')) { /* diagU2N(.)  "in place" : */
