@@ -23,15 +23,15 @@ SEXP Csparse_validate(SEXP x)
     if (length(islot) < xp[ncol]) /* allow larger slots from over-allocation!*/
 	return
 	    mkString(_("last element of slot p must match length of slots i and x"));
-    for (j = 0; j < length(islot); j++) {
+    for (j = 0; j < xp[ncol]; j++) {
 	if (xi[j] < 0 || xi[j] >= nrow)
 	    return mkString(_("all row indices must be between 0 and nrow-1"));
     }
     sorted = TRUE; strictly = TRUE;
     for (j = 0; j < ncol; j++) {
-	if (xp[j] > xp[j+1])
+	if (xp[j] > xp[j + 1])
 	    return mkString(_("slot p must be non-decreasing"));
-	if(sorted)
+	if(sorted) /* only act if >= 2 entries in column j : */
 	    for (k = xp[j] + 1; k < xp[j + 1]; k++) {
 		if (xi[k] < xi[k - 1])
 		    sorted = FALSE;

@@ -1,10 +1,23 @@
 2008-07-23  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* src/chm_common.c (as_cholmod_sparse): add 4th argument
+	* src/dgCMatrix.c (compressed_non_0_ij): for nnzero(), use
+	"x@p[ncol(x)]" instead of length(x@i).
+	* R/Auxiliaries.R (nnzero): ditto
+
+	* src/chm_common.c (as_cholmod_sparse): Do not use LENGTH(islot)
+	since that fails for over-allocated i.
+
+	* tests/validObj.R: more testing of over-allocated (i,x) slots
+
+2008-07-23  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/chm_common.c (as_cholmod_sparse): Add 4th argument
 	'sort_in_place' and set it to TRUE in call from
 	* src/Csparse.c (Csparse_validate): sort in place, making sure that
 	validObject() continues sort the columns if needed.
-	* tests/validObj.R: now tests that.
+
+	* tests/validObj.R: now tests that more thoroughly, and
+	* man/CsparseMatrix-class.Rd: documents it.
 
 2008-07-21  Martin Maechler  <maechler@stat.math.ethz.ch>
 
@@ -47,10 +60,7 @@
 
 2008-07-17  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* [r2215] inst/doc/factor2sparse.Rnw: revive a year-old unfinished
-	  vignette
-	* [r2214] R/AllGeneric.R: cosmetic
-	* [r2213] man/image-methods.Rd: typo ("non-number" :-\ )
+	* inst/doc/factor2sparse.Rnw: revive a year-old unfinished vignette
 
 2008-07-16  Douglas Bates <bates@stat.wisc.edu>
 
@@ -65,10 +75,7 @@
 
 2008-07-14  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* R/diagMatrix.R (.bdiag): also keep triangular
-	* [r2209] ChangeLog, DESCRIPTION, R/diagMatrix.R, inst/test-tools.R,
-	  man/dsCMatrix-class.Rd, man/dsyMatrix-class.Rd, tests/Simple.R:
-	  bdiag() improvements of last week
+	* R/diagMatrix.R (.bdiag): also keep result triangular
 
 2008-07-13  Douglas Bates <bates@stat.wisc.edu>
 

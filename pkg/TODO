@@ -189,3 +189,11 @@
    		 from class "integer" to "numeric" (i.e. double prec),
   since we want to be able to coerce large sparse matrices to sparse
   vectors, where length maybe considerably larger than 2^32.
+
+- We allow "over-allocated" (i,x)-slots for CsparseMatrix objects,
+  as per Csparse_validate() and the tests in tests/validObj.R. This is as
+  in CHOLMOD/CSparse, where nzmax (>= .@p[n]) corresponds to length(.@i),
+  and makes sense e.g. for M[.,.] <- v  assignments which could allocate in
+  chunks and would not need to re-allocate anything in many cases.
+  HOWEVER, replCmat() in R/Csparse.R is still far from making use of that.
+
