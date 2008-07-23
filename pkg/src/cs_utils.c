@@ -63,7 +63,7 @@ cs *Matrix_as_cs(cs *ans, SEXP x, Rboolean check_Udiag)
     int *dims, ctype = Matrix_check_class(class_P(x), valid);
     SEXP islot;
 
-    if (ctype < 0) error("invalid class of object to Matrix_as_cs");
+    if (ctype < 0) error("invalid class of 'x' in Matrix_as_cs(a, x)");
 				/* dimensions and nzmax */
     dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
     ans->m = dims[0]; ans->n = dims[1];
@@ -84,9 +84,12 @@ cs *Matrix_as_cs(cs *ans, SEXP x, Rboolean check_Udiag)
 	/* content(ans) := content(tmp) : */
 	ans->nzmax = nz;
 	/* The ans "slots" were pointers to x@ <slots>; all need new content now: */
-	ans->p = Memcpy(   (int*) R_alloc(sizeof(int),   n+1), tmp->p, nz);
-	ans->i = Memcpy(   (int*) R_alloc(sizeof(int),    nz), tmp->i, nz);
-	ans->x = Memcpy((double*) R_alloc(sizeof(double), nz), tmp->x, nz);
+	ans->p = Memcpy((   int*) R_alloc(sizeof(   int), n+1),
+			(   int*) tmp->p, n+1);
+	ans->i = Memcpy((   int*) R_alloc(sizeof(   int), nz),
+			(   int*) tmp->i, nz);
+	ans->x = Memcpy((double*) R_alloc(sizeof(double), nz),
+			(double*) tmp->x, nz);
 
 	cs_spfree(I_n);
 	cs_spfree(tmp);
