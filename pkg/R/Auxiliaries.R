@@ -379,6 +379,8 @@ nnzero <- function(x, na.counted = NA) {
 	iSym <- extends(cld, "symmetricMatrix")
 	if(extends(cld, "pMatrix"))	# is "sparse" too
 	    n
+	else if(extends(cld, "diagonalMatrix"))
+	    sum(nz.NA(diag(x), na.counted))
 	else if(extends(cld, "sparseMatrix")) {
 	    nn <- switch(.sp.class(cl),
                          "CsparseMatrix" = x@p[d[2]+1L],# == length(x@i) only if not over-alloc.
@@ -393,8 +395,6 @@ nnzero <- function(x, na.counted = NA) {
 	    else if(extends(cld, "triangularMatrix") && x@diag == "U")
 		nn + n else nn
 	}
-	else if(extends(cld, "diagonalMatrix"))
-	    sum(nz.NA(diag(x), na.counted))
 	else {
 	    ## dense, not diagonal: Can use 'x' slot;
 	    if(iSym || extends(cld, "triangularMatrix")) {

@@ -579,13 +579,17 @@ setMethod("is.na", signature(x = "sparseMatrix"),## NB: nsparse* have own method
 
 
 ### Keep this namespace-hidden: Would need to return a classed object
-lm.fit.sparse <-
-function(x, y, offset = NULL, method = c("qr", "cholesky"),
-         tol = 1e-7, singular.ok = TRUE, transpose = FALSE, ...)
+
+## FIXME: still test this function for both methods, since currently
+## ----- both  dgCMatrix_cholsol and  dgCMatrix_qrsol are only called from here!
+lm.fit.sparse <- function(x, y, offset = NULL, method = c("qr", "cholesky"),
+                          tol = 1e-7, singular.ok = TRUE,
+                          transpose = FALSE, ...)
 ### Fit a linear model, __ given __ a sparse model matrix 'x'
 ### using a sparse QR or a sparse Cholesky factorization
 {
-    stopifnot(is(x, "dsparseMatrix"))
+    cld <- getClass(class(x))
+    stopifnot(extends(cld, "dsparseMatrix"))
 ##     if(!is(x, "dsparseMatrix"))
 ##	   x <- as(x, "dsparseMatrix")
     yy <- as.numeric(y)
@@ -593,13 +597,15 @@ function(x, y, offset = NULL, method = c("qr", "cholesky"),
 	stopifnot(length(offset) == length(y))
 	yy <- yy - as.numeric(offset)
     }
+    if(!transpose) x <- t(x) # yes! this seems "reverted"
     ans <- switch(as.character(method)[1],
 		  cholesky =
-		  .Call(dgCMatrix_cholsol,
-			as(if (transpose) x else t(x), "dgCMatrix"), yy),
+		  .Call(dgCMatrix_cholsol,# has AS_CHM_SP(x)
+			as(x, "CsparseMatrix"), yy),
 		  qr =
-		  .Call(dgCMatrix_qrsol,
-			as(if (transpose) t(x) else x, "dgCMatrix"), yy),
+		  .Call(dgCMatrix_qrsol, # has AS_CSP(): must be dgC or dtC:
+			if(cld@className %in% c("dtCMatrix", "dgCMatrix")) x
+			else as(x, "dgCMatrix"), yy),
 		  ## otherwise:
 		  stop("unknown method ", dQuote(method))
 		  )

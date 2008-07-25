@@ -373,9 +373,10 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	n1 <- as(m, "nMatrix")
 	ns <- as(m, "nsparseMatrix")
 	stopifnot(identical(n1,ns),
-		  (if(isSym) Matrix:::nnzSparse else sum)(n1) ==
-		  length(Matrix:::diagU2N(m)@x))
-	Cat("ok\n")
+		  isDiag || ((if(isSym) Matrix:::nnzSparse else sum)(n1) ==
+			     length(Matrix:::diagU2N(m)@x)))
+
+        Cat("ok\n")
     }
 
     if(doOps) {
