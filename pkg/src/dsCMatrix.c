@@ -160,7 +160,7 @@ SEXP dsCMatrix_LDL_D(SEXP Ap, SEXP permP, SEXP resultKind)
 SEXP dsCMatrix_Csparse_solve(SEXP a, SEXP b)
 {
     CHM_FR L = internal_chm_factor(a, -1, -1, -1, 0.);
-    CHM_SP cx, cb = AS_CHM_SP__(b);
+    CHM_SP cx, cb = AS_CHM_SP(b);
     R_CheckStack();
 
     cx = cholmod_spsolve(CHOLMOD_A, L, cb, &c);

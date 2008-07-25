@@ -242,6 +242,7 @@ setAs("diagonalMatrix", "nMatrix",
 	      Dim = from@Dim, Dimnames = from@Dimnames)
       })
 
+setAs("diagonalMatrix", "nsparseMatrix", function(from) as(from, "nMatrix"))
 
 ## Cheap fast substitute for diag() which *does* preserve the mode of x :
 mkDiag <- function(x, n) {
@@ -959,6 +960,9 @@ prDiag <-
     print(cf, quote = FALSE, right = right)
     invisible(x)
 }
+
+## somewhat consistent with "print" for sparseMatrix :
+setMethod("print", signature(x = "diagonalMatrix"), prDiag)
 
 setMethod("show", signature(object = "diagonalMatrix"),
 	  function(object) {

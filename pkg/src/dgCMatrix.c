@@ -154,13 +154,14 @@ SEXP compressed_non_0_ij(SEXP x, SEXP colP)
 
 SEXP dgCMatrix_lusol(SEXP x, SEXP y)
 {
-    SEXP ycp = PROTECT(duplicate(y));
+    SEXP ycp = PROTECT((TYPEOF(y) == REALSXP) ?
+		       duplicate(y) : coerceVector(y, REALSXP));
     CSP xc = AS_CSP__(x);
     R_CheckStack();
 
     if (xc->m != xc->n || xc->m <= 0)
 	error(_("dgCMatrix_lusol requires a square, non-empty matrix"));
-    if (!isReal(ycp) || LENGTH(ycp) != xc->m)
+    if (LENGTH(ycp) != xc->m)
 	error(_("Dimensions of system to be solved are inconsistent"));
     if (!cs_lusol(/*order*/ 1, xc, REAL(ycp), /*tol*/ 1e-7))
 	error(_("cs_lusol failed"));
@@ -171,13 +172,15 @@ SEXP dgCMatrix_lusol(SEXP x, SEXP y)
 
 SEXP dgCMatrix_qrsol(SEXP x, SEXP y)
 {
-    SEXP ycp = PROTECT(duplicate(y));
-    CSP xc = AS_CSP__(x);
+    SEXP ycp = PROTECT((TYPEOF(y) == REALSXP) ?
+		       duplicate(y) : coerceVector(y, REALSXP));
+    CSP xc = AS_CSP(x); /* <--> x  may be  dgC* or dtC* */
     R_CheckStack();
 
     if (xc->m < xc->n || xc->n <= 0)
-	error(_("dgCMatrix_qrsol requires a 'tall' rectangular matrix"));
-    if (!isReal(ycp) || LENGTH(ycp) != xc->m)
+	error(_("dgCMatrix_qrsol(<%d x %d>-matrix) requires a 'tall' rectangular matrix"),
+		xc->m, xc->n);
+    if (LENGTH(ycp) != xc->m)
 	error(_("Dimensions of system to be solved are inconsistent"));
     if (!cs_qrsol(/*order*/ 1, xc, REAL(ycp)))
 	error(_("cs_qrsol failed"));
@@ -334,9 +337,9 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
 
 SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
 {
-    CHM_SP cx = AS_CHM_SP__(x);
+    CHM_SP cx = AS_CHM_SP(x);
     CHM_FR L;
-    CHM_DN cy = AS_CHM_DN(y), rhs, cAns;
+    CHM_DN cy = AS_CHM_DN(coerceVector(y, REALSXP)), rhs, cAns;
     double one[] = {1,0}, zero[] = {0,0};
     SEXP ans = PROTECT(allocVector(VECSXP, 3));
     R_CheckStack();

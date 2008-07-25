@@ -1,3 +1,23 @@
+2008-07-24  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dgeMatrix.R: need solve(<dge>, <sparse>) against infinite
+	recursion in new test in
+	* tests/matprod.R: testing the above and another solve() case, below
+
+	* R/sparseMatrix.R (lm.fit.sparse): slightly more efficient for
+	e.g. triangular 'x'.
+
+	* src/dgCMatrix.c (dgCMatrix_qrsol): use AS_CSP() hence allowing dtC*
+	* src/dgCMatrix.c (dgCMatrix_cholsol): use AS_CHM_SP() to work
+	correctly with unit-triangular x
+
+	* src/dsCMatrix.c (dsCMatrix_Csparse_solve): use AS_CHM_SP()
+	instead of not checking diagU.
+
+	* R/diagMatrix.R, R/Auxiliaries.R: tweaks to allow later
+	experiments where diagonalMatrix would extend sparse*.
+
+
 2008-07-23  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/dgCMatrix.c (compressed_non_0_ij): for nnzero(), use
