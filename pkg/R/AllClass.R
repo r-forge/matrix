@@ -102,9 +102,8 @@ setClass("sparseMatrix", representation("VIRTUAL"), contains = "Matrix")
 
 ## diagonal: has 'diag' slot;  diag = "U"  <--> have identity matrix
 setClass("diagonalMatrix", representation(diag = "character", "VIRTUAL"),
-	 contains = "denseMatrix",
-	 ## TODO??   ^^^^^ -- against DSC'07 talk(3D classes), reconsider
-##>>	 contains = "sparseMatrix", ## which makes "scarceMatrix"  superfluous
+	 contains = "sparseMatrix",
+         ## NOTE:    ^^^^^^ was dense Matrix, until 0.999375-11 (2008-07)
 	 validity = function(object) {
 	     d <- object@Dim
 	     if(d[1] != (n <- d[2])) return("matrix is not square")
@@ -538,10 +537,6 @@ setClass("pMatrix", representation(perm = "integer"),
 		 return("'perm' slot is not a valid permutation")
 	     TRUE
 	 })
-
-## "scarce", those "sparse" in a more common sense,
-##  -----   e.g., do not coerce these to dense needlessly :
-setClassUnion("scarceMatrix", members = c("sparseMatrix", "diagonalMatrix"))
 
 
 ### Factorization classes ---------------------------------------------
