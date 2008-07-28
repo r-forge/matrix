@@ -170,21 +170,41 @@ SEXP dgCMatrix_lusol(SEXP x, SEXP y)
     return ycp;
 }
 
-SEXP dgCMatrix_qrsol(SEXP x, SEXP y)
+SEXP dgCMatrix_qrsol(SEXP x, SEXP y, SEXP ord)
 {
     SEXP ycp = PROTECT((TYPEOF(y) == REALSXP) ?
 		       duplicate(y) : coerceVector(y, REALSXP));
     CSP xc = AS_CSP(x); /* <--> x  may be  dgC* or dtC* */
+    int order = INTEGER(ord)[0];
     R_CheckStack();
 
+    if (order < 0 || order > 3)
+	warning(_("dgCMatrix_qrsol(., order) needs order in {0,..,3}"));
+    /* --> cs_amd()  ---  order 0: natural, 1: Chol, 2: LU, 3: QR */
+    if (LENGTH(ycp) != xc->m)
+	error(_("Dimensions of system to be solved are inconsistent"));
+    /* FIXME?  Note that qr_sol() would allow *under-determined systems;
+               In general, we'd need  LENGTH(ycp) = max(n,m)
+     */
     if (xc->m < xc->n || xc->n <= 0)
 	error(_("dgCMatrix_qrsol(<%d x %d>-matrix) requires a 'tall' rectangular matrix"),
 		xc->m, xc->n);
-    if (LENGTH(ycp) != xc->m)
-	error(_("Dimensions of system to be solved are inconsistent"));
-    if (!cs_qrsol(/*order*/ 1, xc, REAL(ycp)))
+
+    /* cs_qrsol(): Tim Davis (2006) .. "8.2 Using a QR factorization", p.136f , calling
+     * -------      cs_sqr(order, ..), see  p.76 */
+    if (!cs_qrsol(order, xc, REAL(ycp)))
+	/* return value really is 0 or 1 - no more info there */
 	error(_("cs_qrsol failed"));
 
+    /* Solution is only in the first part of ycp -- cut its length back to n : */
+    {
+	SEXP nms = getAttrib(ycp, R_NamesSymbol);
+	SETLENGTH(ycp, xc->n);
+	if(nms != R_NilValue) {
+	    SETLENGTH(nms, xc->n);
+	    setAttrib(ycp, R_NamesSymbol, nms);
+	}
+    }
     UNPROTECT(1);
     return ycp;
 }
@@ -337,9 +357,13 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
 
 SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
 {
+    /* Solve Sparse Least Squares X %*% beta ~= y  with dense RHS y,
+     * where X = t(x) i.e. we pass  x = t(X)  as argument,
+     * via  "Cholesky(X'X)" .. well not really:
+     * cholmod_factorize("x", ..) finds L in  X'X = L'L directly */
     CHM_SP cx = AS_CHM_SP(x);
-    CHM_FR L;
     CHM_DN cy = AS_CHM_DN(coerceVector(y, REALSXP)), rhs, cAns;
+    CHM_FR L;
     double one[] = {1,0}, zero[] = {0,0};
     SEXP ans = PROTECT(allocVector(VECSXP, 3));
     R_CheckStack();

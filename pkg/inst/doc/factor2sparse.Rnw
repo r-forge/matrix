@@ -31,6 +31,7 @@ options(width=75)
 Model matrices in our (generalized) linear models (\code{lm}) are often
 practically sparse ---  whenever categorical predictors are used.
 
+\section{One factor: \texttt{y ~ f1}}
 Let's start with an artifical small example:
 <<ex1>>=
  (ff <- factor(substring("statistics", 1:10, 1:10), levels=letters))
@@ -62,6 +63,45 @@ apart from the column names (here transposed),
 <<ex1-model.matrix>>=
 t( Matrix(model.matrix(~ 0 + f.)) )
 @
+
+\section{One factor, one continuous: \texttt{y ~ f1 + x}}
+
+To create the model matrix for the case of one factor and one continuous
+predictor---called ``analysis of covariance'' in the historical literature---
+we can adopt the following simple scheme:
+
+--- FIXME ---
+
+The final model matrix is the catenation of
+
+1) create the sparse 0-1 matrix \code{m1} from the factor -- == f1 main-effect
+
+2) the single row/column 'x'  ==  'x' main-effect
+
+3) replacing the values 1 in \code{m1@x} (the x-slot of the factor model matrix),
+   by the values of \code{x} (our continuous predictor)
+
+
+\section{Two (or more) factors, main effects only: \texttt{y ~ f1 + f2}}
+
+Simple concatenation of the model matrices,
+putting thought into the basic contrast - intercept or no -
+where the easiest is to have one factor ``swallow'' the intercept,
+and all others being at \code{"treatment"} contrast, i.e.,
+
+rBind(as(f1, "sparseMatrix"),
+      as(f2, "sparseMatrix")[-1,])
+
+%% Also see Doug's E-mail to  R-help
+% From: "Douglas Bates" <bates@stat.wisc.edu>
+% Subject: Re: [R] Large number of dummy variables
+% Date: Mon, 21 Jul 2008 18:07:26 -0500
+
+\section{Interactions of two (or more) factors,.....}
+
+%% Of course, this is *the* interesting part
+%% To form interactions, we would have to  ``outer-multiply''
+%% the single-factor model-matrices (after "[, -1]")
 
 In situations with more than one factor, particularly with interactions,
 the model matrix is currently not directly available via \pkg{Matrix}

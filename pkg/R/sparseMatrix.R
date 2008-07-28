@@ -216,19 +216,19 @@ setMethod("[", signature(x = "sparseMatrix",
 ## -> ./Tsparse.R
 ## &  ./Csparse.R  & ./Rsparse.R {those go via Tsparse}
 ##
-## Do not use as.vector() (see ./Matrix.R ) for "scarce" matrices :
+## Do not use as.vector() (see ./Matrix.R ) for sparse matrices :
 setReplaceMethod("[", signature(x = "sparseMatrix", i = "missing", j = "ANY",
-				value = "scarceMatrix"),
+				value = "sparseMatrix"),
 		 function (x, i, j, ..., value)
 		 callGeneric(x=x, , j=j, value = as(value, "sparseVector")))
 
 setReplaceMethod("[", signature(x = "sparseMatrix", i = "ANY", j = "missing",
-				value = "scarceMatrix"),
+				value = "sparseMatrix"),
 		 function (x, i, j, ..., value)
 		 callGeneric(x=x, i=i, , value = as(value, "sparseVector")))
 
 setReplaceMethod("[", signature(x = "sparseMatrix", i = "ANY", j = "ANY",
-				value = "scarceMatrix"),
+				value = "sparseMatrix"),
 		 function (x, i, j, ..., value)
 		 callGeneric(x=x, i=i, j=j, value = as(value, "sparseVector")))
 
@@ -583,29 +583,37 @@ setMethod("is.na", signature(x = "sparseMatrix"),## NB: nsparse* have own method
 ## FIXME: still test this function for both methods, since currently
 ## ----- both  dgCMatrix_cholsol and  dgCMatrix_qrsol are only called from here!
 lm.fit.sparse <- function(x, y, offset = NULL, method = c("qr", "cholesky"),
-                          tol = 1e-7, singular.ok = TRUE,
-                          transpose = FALSE, ...)
+                          tol = 1e-7, singular.ok = TRUE, order = NULL,
+                          transpose = FALSE) ## NB: meaning of 'transpose'
+                                        # is changed from original
+
 ### Fit a linear model, __ given __ a sparse model matrix 'x'
 ### using a sparse QR or a sparse Cholesky factorization
 {
     cld <- getClass(class(x))
     stopifnot(extends(cld, "dsparseMatrix"))
-##     if(!is(x, "dsparseMatrix"))
-##	   x <- as(x, "dsparseMatrix")
+## or     if(!is(x, "dsparseMatrix")) x <- as(x, "dsparseMatrix")
     yy <- as.numeric(y)
     if (!is.null(offset)) {
 	stopifnot(length(offset) == length(y))
 	yy <- yy - as.numeric(offset)
     }
-    if(!transpose) x <- t(x) # yes! this seems "reverted"
-    ans <- switch(as.character(method)[1],
+    method <- match.arg(method)
+    order <- {
+        if(is.null(order)) ## recommended default depends on method :
+            if(method == "qr") 3L else 1L
+        else as.integer(order) }
+
+    if(transpose) x <- t(x)
+    ans <- switch(method,
 		  cholesky =
 		  .Call(dgCMatrix_cholsol,# has AS_CHM_SP(x)
 			as(x, "CsparseMatrix"), yy),
 		  qr =
 		  .Call(dgCMatrix_qrsol, # has AS_CSP(): must be dgC or dtC:
 			if(cld@className %in% c("dtCMatrix", "dgCMatrix")) x
-			else as(x, "dgCMatrix"), yy),
+			else as(x, "dgCMatrix"),
+			yy, order),
 		  ## otherwise:
 		  stop("unknown method ", dQuote(method))
 		  )

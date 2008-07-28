@@ -1,3 +1,21 @@
+2008-07-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllClass.R (diagonalMatrix): extend  "sparseMatrix" instead of
+	"denseMatrix".  This renders "scarceMatrix" dispensable and
+	invalidates part of MM's presentations on "space of Matrix
+	classes", but seems cleaner overall.
+
+	* R/diagMatrix.R, etc: eliminate "scarceMatrix", replacing it by
+	"sparseMatrix" in method signatures;
+	further, instead of coercing to "sparseMatrix", coerce to
+	"TsparseMatrix" now.
+
+2008-07-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/dgCMatrix.c (dgCMatrix_qrsol): allow third argument 'order' in
+	.Call(.)
+	* R/sparseMatrix.R (lm.fit.sparse), src/dgCMatrix.h, src/init.c: ditto
+
 2008-07-24  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/dgeMatrix.R: need solve(<dge>, <sparse>) against infinite
