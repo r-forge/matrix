@@ -1,3 +1,26 @@
+2008-08-19  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/nsCMatrix.R (setAs(., dgTMatrix))): remove unused method
+
+2008-08-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Ops.R (.Ops2dge.via.x, and many others): eliminate never-used
+	variable assignments {from "next version" codetools}.
+	* R/Csparse.R, R/Tsparse.R: ditto
+
+2008-08-17  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseVector.R (sp2vec, coerce to sparseVector):
+	make sure no integer overflows happen, and use double precision
+	(n, index) where appropriate.
+
+	* tests/Simple.R: test "large" sparse vectors.
+
+2008-08-14  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllClass.R (sparseVector): 'length' and 'i' are "numeric", not
+	just integer (allowing much longer length).
+
 2008-07-28  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/AllClass.R (diagonalMatrix): extend  "sparseMatrix" instead of
