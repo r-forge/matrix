@@ -504,7 +504,7 @@ setMethod("determinant", signature(x = "sparseMatrix", logarithm = "logical"),
 
 
 setMethod("diag", signature(x = "sparseMatrix"),
-	  function(x, nrow, ncol = n) diag(as(x, "CsparseMatrix")))
+	  function(x, nrow, ncol) diag(as(x, "CsparseMatrix")))
 
 setMethod("dim<-", signature(x = "sparseMatrix", value = "ANY"),
 	  function(x, value) {

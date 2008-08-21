@@ -45,7 +45,7 @@ setMethod("Ops", signature(e1 = "matrix", e2 = "Matrix"),
 ## bail-outs -- on highest possible level, hence "Ops", not "Compare"/"Arith" :
 setMethod("Ops", signature(e1 = "Matrix", e2 = "Matrix"),
           function(e1, e2) {
-              d <- dimCheck(e1,e2)
+              dimCheck(e1,e2)
               .bail.out.2(.Generic, class(e1), class(e2))
           })
 setMethod("Ops", signature(e1 = "Matrix", e2 = "ANY"),
@@ -332,7 +332,7 @@ setMethod("Arith", signature(e1 = "numeric", e2 = "ddenseMatrix"),
 ## These all had "Logic", now also for "Compare",
 ## but "Arith" differs: result will be "dgeMatrix' :
 .Ops2dge.via.x <- function(e1,e2) {
-    d <- dimCheck(e1, e2)
+    dimCheck(e1, e2)
     r <- copyClass(e1, "dgeMatrix", sNames = c("Dim","Dimnames"))
     r@x <- as.numeric(callGeneric(e1@x, e2@x))
     r
@@ -350,13 +350,13 @@ setMethod("Arith",   signature(e1="ngeMatrix", e2="ngeMatrix"), .Ops2dge.via.x)
 ## FIXME: These lose symmmetry & triangularity
 setMethod("Ops", signature(e1="ldenseMatrix", e2="ldenseMatrix"),
 	  function(e1,e2) {
-	      d <- dimCheck(e1, e2)
+	      dimCheck(e1, e2)
 	      callGeneric(as(e1, "lgeMatrix"), as(e2, "lgeMatrix"))
 	  })
 
 setMethod("Ops", signature(e1="ndenseMatrix", e2="ndenseMatrix"),
 	  function(e1,e2) {
-	      d <- dimCheck(e1, e2)
+	      dimCheck(e1, e2)
 	      callGeneric(as(e1, "ngeMatrix"), as(e2, "ngeMatrix"))
 	  })
 
@@ -805,8 +805,8 @@ setMethod("Arith", signature(e1 = "numeric", e2 = "dgCMatrix"),
 setMethod("Arith", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 	  function(e1, e2) {
 	      ## go via "symmetric" if both are symmetric, etc...
-	      s1 <- .M.shape(e1, c1 <- getClassDef(class(e1)))
-	      s2 <- .M.shape(e2, c2 <- getClassDef(class(e2)))
+	      s1 <- .M.shape(e1, getClassDef(class(e1)))
+	      s2 <- .M.shape(e2, getClassDef(class(e2)))
 	      viaCl <- paste("d", if(s1 == s2) s1 else "g", "CMatrix", sep='')
 	      callGeneric(as(as(e1, "dMatrix"), viaCl),
 			  as(as(e2, "dMatrix"), viaCl))
@@ -815,8 +815,8 @@ setMethod("Arith", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 setMethod("Logic", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 	  function(e1, e2) {
 	      ## go via "symmetric" if both are symmetric, etc...
-	      s1 <- .M.shape(e1, c1 <- getClassDef(class(e1)))
-	      s2 <- .M.shape(e2, c2 <- getClassDef(class(e2)))
+	      s1 <- .M.shape(e1, getClassDef(class(e1)))
+	      s2 <- .M.shape(e2, getClassDef(class(e2)))
 	      viaCl <- paste("l", if(s1 == s2) s1 else "g", "CMatrix", sep='')
 	      callGeneric(as(as(e1, "lMatrix"), viaCl),
 			  as(as(e2, "lMatrix"), viaCl))
@@ -1095,6 +1095,8 @@ setMethod("Arith", signature(e1 = "dsparseVector", e2 = "dsparseVector"),
 		     )
 
               .bail.out.2(.Generic, class(e1), class(e2))
+              r  ##
+              ii ## << codetools {but all this is FIXME !}
           })
 
 ## "Arith"  exception (shortcut)

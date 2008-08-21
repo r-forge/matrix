@@ -679,12 +679,19 @@ setClassUnion("atomicVector", ## "double" is not needed, and not liked by some
 setClassUnion("replValue", members = c("numeric", "logical", "complex", "raw"))
 
 ### Sparse Vectors ---- here use 1-based indexing ! -----------
+
+## 'longindex' should allow sparseVectors of "length" > 2^32,
+## which is necessary e.g. when converted from large sparse matrices
+## setClass("longindex", contains = "numeric")
+## but we use "numeric" instead, for simplicity (efficiency?)
 setClass("sparseVector",
-         representation(length = "integer", i = "integer", "VIRTUAL"),
-	 prototype = prototype(length = 0L),
+         representation(length = "numeric", i = "numeric", "VIRTUAL"),
+         ##                     "longindex"    "longindex"
+         ## note that "numeric" contains "integer" (if I like it or not..)
+	 prototype = prototype(length = 0),
          validity = function(object) {
              n <- object@length
-             if(any(object@i < 1L) || any(object@i > n))
+             if(any(object@i < 1) || any(object@i > n))
                  sprintf("'i' must be in 1:%d", n)
              else TRUE
          })

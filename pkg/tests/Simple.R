@@ -584,7 +584,18 @@ dim(R) <- dim(D4)
 stopifnot(isValid(sv,"sparseVector"),
 	  isValid(R, "sparseMatrix"),
 	  identical(D4, as(R, "diagonalMatrix")))
-
+## "Large" sparse:
+n <- 100000
+m <-  50000 ; nnz <- 47
+M <- spMatrix(n, m,
+              i = sample(n, nnz, replace = TRUE),
+              j = sample(m, nnz, replace = TRUE),
+              x = round(rnorm(nnz),1))
+validObject(Mv <- as(M, "sparseVector"))
+validObject(Dv <- as(Diagonal(60000), "sparseVector"))
+Dm <- Dv; dim(Dm) <- c(180000L, 20000L)
+stopifnot(isValid(Dm, "sparseMatrix"),
+	  identical(Dv, as(Dm, "sparseVector")))
 
 cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
 ##

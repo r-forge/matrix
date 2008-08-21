@@ -109,6 +109,7 @@
       determinant of the original matrix that was decomposed is well
       defined.}
 
+    %% since 0.999375-8 (2008-03-25):
     \item{update}{\code{signature(object = "CHMfactor")}.  The
       \code{\link{update}} method requires an additional argument
       \code{parent}, which is a \code{"\linkS4class{dsCMatrix}"} object with
