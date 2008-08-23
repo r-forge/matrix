@@ -11,6 +11,8 @@
 %
 \alias{coerce,CHMfactor,Matrix-method}
 \alias{coerce,CHMfactor,sparseMatrix-method}
+\alias{coerce,CHMfactor,pMatrix-method}
+\alias{expand,CHMfactor-method}
 \alias{solve,CHMfactor,ddenseMatrix-method}
 \alias{solve,CHMfactor,dsparseMatrix-method}
 \alias{solve,CHMfactor,numeric-method}
@@ -80,9 +82,32 @@
 }
 \section{Methods}{
   \describe{
-    \item{coerce}{\code{signature(from = "CHMfactor", to = "sparseMatrix")}}
-    \item{image}{\code{signature(x = "CHMfactor")}}
-
+    \item{coerce}{\code{signature(from = "CHMfactor", to =
+	"sparseMatrix")} Returns the lower triangular factor \eqn{L}
+      from the \eqn{LL'} form of the Cholesky factorization.  Note that
+      the factor from the \eqn{LL'} form is always returned, even if the
+      \code{"CHMfactor"} object represents an \eqn{LDL'} decomposition.
+      Furthermore, this is the factor after any fill-reducing
+      permutation has been applied.  See the \code{expand} method for
+      obtaining both the permutation matrix, \eqn{P}, and the lower
+      Cholesky factor, \eqn{L}.}
+    \item{coerce}{\code{signature(from = "CHMfactor", to =
+	"pMatrix")} Returns the permutation matrix, \eqn{P},
+      representing the fill-reducing permutation used in the
+      decomposition.}
+    \item{expand}{\code{signature(x = "CHMfactor")} Returns a list with
+      components \code{P}, the matrix representing the fill-reducing
+      permutation, and \code{L}, the lower triangular Cholesky factor.
+      The original positive-definite matrix corresponds to the product
+      \eqn{P'LL'P}. Because of fill-in during the decomposition the
+      product may apparently have more non-zeros than the original
+      matrix, even after applying \code{\link{drop0}} to it. However,
+      the extra "non-zeros" should be very small in magnitude.}
+    \item{image}{\code{signature(x = "CHMfactor")} Plot the image of the
+      lower triangular factor, \eqn{L}, from the decomposition.  This method
+      is equivalent to \code{image(as(x, "sparseMatrix"))} so the
+      comments in the above description of the \code{coerce} method
+      apply here too.}
     \item{solve}{\code{signature(a = "CHMfactor", b = "ddenseMatrix")}
       The \code{solve} methods for a \code{"CHMfactor"} object take an
       optional third argument \code{system} whose value can be one of the
