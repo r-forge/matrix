@@ -1,3 +1,10 @@
+2008-08-23  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r2243] R/CHMfactor.R, man/CHMfactor-class.Rd: Added expand method and
+	  documentation for CHMfactor class
+	* [r2241] R/CHMfactor.R: Added trivial coercion method for CHMfactor ->
+	  pMatrix
+
 2008-08-19  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/nsCMatrix.R (setAs(., dgTMatrix))): remove unused method
@@ -79,6 +86,16 @@
 
 	* tests/validObj.R: now tests that more thoroughly, and
 	* man/CsparseMatrix-class.Rd: documents it.
+	
+2008-07-22  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r2233] src/chm_common.c: sort columns more carefully in
+	  as_cholmod_sparse
+	* [r2231] src/chm_common.c: check for sorted columns in
+	  as_cholmod_sparse instead of assuming it
+	* [r2228] src/cs_utils.c: Use R_alloc for semi-permanent storage when
+	  expanding diagonal
+
 
 2008-07-21  Martin Maechler  <maechler@stat.math.ethz.ch>
 
@@ -113,6 +130,10 @@
 
 2008-07-17  Douglas Bates <bates@stat.wisc.edu>
 
+	* [r2220] src/dtCMatrix.c: Correct number of columns for rhs in
+	  dtCMatrix_sparse_solve
+	* [r2219] src/cs_utils.c: eye->nz should be -1 for compressed column
+	  storage
 	* [r2217] R/dtCMatrix.R, src/dtCMatrix.c, src/dtCMatrix.h, src/init.c:
 	  Replace dtCMatrix_solve by more general dtCMatrix_sparse_solve and add
 	  new solve method
