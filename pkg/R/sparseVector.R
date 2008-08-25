@@ -398,6 +398,74 @@ c2v <- function(x, y) {
     x
 }
 
+## This is just a slight modification from base::all.equal.numeric(),
+## see  <R>/src/library/base/R/all.equal.R :
+all.equal.sparseV <- function(target, current, ...)
+{
+    if(data.class(target) != data.class(current)) {
+	return(paste("target is ", data.class(target), ", current is ",
+		     data.class(current), sep = ""))
+    }
+
+    lt <- length(target)
+    lc <- length(current)
+    ## cplx <- is.complex(target)
+    if(lt != lc) {
+	return( paste("sparseVector", ## if(cplx)"Complex" else "Numeric",
+		      ": lengths (", lt, ", ", lc, ") differ", sep = ""))
+    }
+
+    nz.t <- length(i.t <- target @i)
+    nz.c <- length(i.c <- current@i)
+    if(nz.t != nz.c || any(i.t != i.c)) { ## "work" if indices are not the same
+	i1.c <- setdiff(i.t, i.c)	# those in i.t, not yet in i.c
+	i1.t <- setdiff(i.c, i.t)	# those in i.c, not yet in i.t
+	if((n1t <- length(i1.t))) {
+	    target@i <- i.t <- c(i.t, i1.t)
+	    target@x <- c(target@x, rep.int(0, n1t))
+	}
+	if((n1c <- length(i1.c))) {
+	    current@i <- i.c <- c(i.c, i1.c)
+	    current@x <- c(current@x, rep.int(0, n1c))
+	}
+    }
+    if(is.unsorted(i.t)) {  ## method="quick" {"radix" not ok for large range}
+	ii <- sort.list(i.t, method = "quick", na.last=NA)
+	target@i <- i.t <- i.t[ii]
+	target@x <- target@x[ii]
+    }
+    if(is.unsorted(i.c)) {
+	ii <- sort.list(i.c, method = "quick", na.last=NA)
+	current@i <- i.c <- i.c[ii]
+	current@x <- current@x[ii]
+    }
+
+    ## Now, we have extended both target and current
+    ## *and* have sorted the respective i-slot, the i-slots should match!
+    stopifnot(all(i.c == i.t))
+
+    all.equal.numeric(current@x, target@x, ...)
+} ## all.equal.sparseV
+
+
+## For these, we remain sparse:
+setMethod("all.equal", c(target = "sparseVector", current = "sparseVector"),
+	  all.equal.sparseV)
+setMethod("all.equal", c(target = "sparseVector", current = "sparseMatrix"),
+	  function(target, current, ...)
+	  all.equal.sparseV(target, as(current, "sparseVector"), ...))
+setMethod("all.equal", c(target = "sparseMatrix", current = "sparseVector"),
+	  function(target, current, ...)
+	  all.equal.sparseV(as(target, "sparseVector"), current, ...))
+## For the others, where one is "dense", "go to" dense rather now than later:
+setMethod("all.equal", c(target = "ANY", current = "sparseVector"),
+	  function(target, current, ...)
+	  all.equal(target, as.vector(current), ...))
+setMethod("all.equal", c(target = "sparseVector", current = "ANY"),
+	  function(target, current, ...)
+	  all.equal(as.vector(target), current, ...))
+
+
 ### rep(x, ...) -- rep() is primitive with internal default method with these args:
 ### -----------
 ### till R 2.3.1, it had  rep.default()  which we use as 'model' here.

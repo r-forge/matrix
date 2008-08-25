@@ -577,6 +577,18 @@ setMethod("is.na", signature(x = "sparseMatrix"),## NB: nsparse* have own method
 	      else is.na_nsp(x)
 	  })
 
+## all.equal(): simply defer to  "sparseVector" methods:
+setMethod("all.equal", c(target = "sparseMatrix", current = "sparseMatrix"),
+	  function(target, current, ...)
+	  all.equal(as(target, "sparseVector"), as(current, "sparseVector"), ...))
+setMethod("all.equal", c(target = "sparseMatrix", current = "ANY"),
+	  function(target, current, ...)
+	  all.equal(as(target, "sparseVector"), current, ...))
+setMethod("all.equal", c(target = "ANY", current = "sparseMatrix"),
+	  function(target, current, ...)
+	  all.equal(target, as(current, "sparseVector"), ...))
+
+
 
 ### Keep this namespace-hidden: Would need to return a classed object
 

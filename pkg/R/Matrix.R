@@ -361,6 +361,22 @@ setMethod("rcond", signature(x = "ANY", norm = "missing"),
 
 
 
+## We want to use all.equal.numeric() *and* make sure that uses
+## not just base::as.vector but the generic with our methods:
+all.equal_num <- base::all.equal.numeric ## from <R>/src/library/base/R/all.equal.R
+environment(all.equal_num) <- environment()## == as.environment("Matrix")
+all.equal_num_2 <- function(target,current, ...)
+    all.equal_num(as.vector(target), as.vector(current), ...)
+## The all.equal() methods for dense matrices (and fallback):
+setMethod("all.equal", c(target = "Matrix", current = "Matrix"),
+          all.equal_num_2)
+setMethod("all.equal", c(target = "Matrix", current = "ANY"),
+          all.equal_num_2)
+setMethod("all.equal", c(target = "ANY", current = "Matrix"),
+          all.equal_num_2)
+## -> ./sparseMatrix.R, ./sparseVector.R  have specific methods
+
+
 
 ## MM: More or less "Cut & paste" from
 ## --- diff.default() from  R/src/library/base/R/diff.R :

@@ -1,3 +1,12 @@
+2008-08-25  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/LU.R: expand( <sparseLU> )
+
+	* NAMESPACE, man/all.equal-methods.Rd:
+	* R/Matrix.R (all.equal): methods for Matrices,
+	* R/sparseMatrix.R, R/sparseVector.R: sparseMatrices and -Vectors
+
+
 2008-08-23  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r2243] R/CHMfactor.R, man/CHMfactor-class.Rd: Added expand method and
@@ -86,7 +95,7 @@
 
 	* tests/validObj.R: now tests that more thoroughly, and
 	* man/CsparseMatrix-class.Rd: documents it.
-	
+
 2008-07-22  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r2233] src/chm_common.c: sort columns more carefully in

@@ -319,3 +319,7 @@
   able to coerce large sparse matrices to sparse vectors,
   where length maybe considerably larger than 2^32.
 
+- Implement expand(.) for the Cholesky() results "dCHMsimpl", "dCHMsuper", etc.
+
+- expand() for lu(<sparse>) is simple too
+

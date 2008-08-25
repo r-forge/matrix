@@ -79,10 +79,6 @@
 - make sure *all* group methods have (maybe "bail-out") setMethod for "Matrix".
   e.g. zapsmall(<pMatrix>) fails "badly"
 
-- Implement  expand(.) for the Cholesky() results
-  "dCHMsimpl" and  "dCHMsuper"  -- currently have no *decent* way to get at
-  the matrix factors of the corresponding matrix factorization !!
-
 - rbind2(<sparse>, <dense>) does not work  (e.g. <dgC>, <dge>)
 
 - <sparse> %*% <dense>  {also in crossprod/tcrossprod}  currently always

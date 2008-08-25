@@ -691,7 +691,9 @@ setClass("sparseVector",
 	 prototype = prototype(length = 0),
          validity = function(object) {
              n <- object@length
-             if(any(object@i < 1) || any(object@i > n))
+	     if(any(!is.finite(i <- object@i)))
+		 sprintf("'i' slot is not all finite")
+	     else if(any(i < 1) || any(i > n))
                  sprintf("'i' must be in 1:%d", n)
              else TRUE
          })
