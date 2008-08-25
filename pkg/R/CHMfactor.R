@@ -8,12 +8,13 @@ setAs("CHMfactor", "pMatrix", function(from) as(from@perm + 1L, "pMatrix"))
 setMethod("expand", signature(x = "CHMfactor"),
           function(x, ...)
           list(P = as(x, "pMatrix"), L = as(x, "sparseMatrix")))
-          
+
+## nowhere used {FIXME?}
 isLDL <- function(x) {
     stopifnot(is(x, "CHMfactor"))
     x@type[2]
 }
-      
+
 setMethod("image", "CHMfactor",
           function(x, ...) {
               x <- as(as(x, "sparseMatrix"), "dgTMatrix")
@@ -98,4 +99,4 @@ ldetL2up <- function(x, parent, Imult)
               nrow(x) == nrow(parent))
     .Call(CHMfactor_ldetL2up, x, parent, as.double(Imult))
 }
-              
+

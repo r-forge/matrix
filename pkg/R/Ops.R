@@ -1043,7 +1043,7 @@ setMethod("Arith", signature(e1 = "dsparseVector", e2 = "dsparseVector"),
                   } else {
                       n <- n2 ; N <- n1
                   }
-                  if(N %% n != 0) ## require this here, for conveniense
+                  if(N %% n != 0) ## require this here, for convenience
                       ## for regular vectors, this is only a warning:
                       stop("longer object length\n\t",
                            "is not a multiple of shorter object length")
@@ -1104,6 +1104,7 @@ setMethod("-", signature(e1 = "dsparseVector", e2 = "missing"),
           function(e1) { e1@x <- -e1@x ; e1 })
 
 
+## FIXME: These *are* desirable!
 setMethod("Logic", signature(e1 = "lsparseVector", e2 = "lsparseVector"),
           function(e1, e2) {
               .bail.out.2(.Generic, class(e1), class(e2))

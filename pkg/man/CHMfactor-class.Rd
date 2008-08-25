@@ -158,6 +158,21 @@
   \code{\link{Cholesky}}, also for examples;
   class \code{\linkS4class{dgCMatrix}}.
 }
-%\examples{} are in ./Cholesky.Rd
+\examples{% most are in ./Cholesky.Rd
+## An example for the expand() method
+n <- 1000; m <- 200; nnz <- 2000
+set.seed(1)
+M1 <- spMatrix(n, m,
+               i = sample(n, nnz, replace = TRUE),
+               j = sample(m, nnz, replace = TRUE),
+               x = round(rnorm(nnz),1))
+XX <- crossprod(M1)
+CX <- Cholesky(XX)
+str(CX) ## a "dCHMsimpl" object
+r <- expand(CX <- Cholesky(XX))
+L.P <- with(r, crossprod(L,P))  ## == L'P
+PLLP <- crossprod(L.P)          ## == (L'P)' L'P == P'LL'P
+stopifnot( all.equal(PLLP, XX) )
+}
 \keyword{classes}
 \keyword{algebra}
