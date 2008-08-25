@@ -398,28 +398,24 @@ c2v <- function(x, y) {
     x
 }
 
-## This is just a slight modification from base::all.equal.numeric(),
-## see  <R>/src/library/base/R/all.equal.R :
 all.equal.sparseV <- function(target, current, ...)
 {
-    if(data.class(target) != data.class(current)) {
+    if(!is(target, "sparseVector") || !is(current, "sparseVector")) {
 	return(paste("target is ", data.class(target), ", current is ",
 		     data.class(current), sep = ""))
     }
-
     lt <- length(target)
     lc <- length(current)
-    ## cplx <- is.complex(target)
     if(lt != lc) {
-	return( paste("sparseVector", ## if(cplx)"Complex" else "Numeric",
-		      ": lengths (", lt, ", ", lc, ") differ", sep = ""))
+	return(paste("sparseVector", ": lengths (", lt, ", ", lc, ") differ",
+		     sep = ""))
     }
 
     nz.t <- length(i.t <- target @i)
     nz.c <- length(i.c <- current@i)
     if(nz.t != nz.c || any(i.t != i.c)) { ## "work" if indices are not the same
-	i1.c <- setdiff(i.t, i.c)	# those in i.t, not yet in i.c
-	i1.t <- setdiff(i.c, i.t)	# those in i.c, not yet in i.t
+	i1.c <- setdiff(i.t, i.c)# those in i.t, not yet in i.c
+	i1.t <- setdiff(i.c, i.t)
 	if((n1t <- length(i1.t))) {
 	    target@i <- i.t <- c(i.t, i1.t)
 	    target@x <- c(target@x, rep.int(0, n1t))
