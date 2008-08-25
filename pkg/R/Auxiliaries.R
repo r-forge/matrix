@@ -103,15 +103,14 @@ detSparseLU <- function(x, logarithm = TRUE, ...) {
     ## Author: Martin Maechler, Date: 15 Apr 2008
 
     if(any(x@Dim == 0)) return(mkDet(numeric(0)))
-    ll <- lu(x)
-    if(is.null(ll)) {
-        ## LU-decomposition failed:
-        ## <== Matrix singular and we behave as if "==>" was sure :
-        return(mkDet(ldet=-Inf, logarithm=logarithm, sig = 1L))
+    ll <- tryCatch(lu(x), error = function(e)e)
 
-##     ll <- tryCatch(lu(x), error = function(e)e)
-##     if(inherits(ll, "error")) ## now check for the message ..
-##         ## but really, I think we should get an option to work without try*()
+    if(inherits(ll, "error")) {
+	## LU-decomposition failed:
+        if(length(grep("singular", ll$message, fixed=TRUE)))
+            ## <== Matrix singular and we behave as if "==>" was sure :
+            return(mkDet(ldet=-Inf, logarithm=logarithm, sig = 1L))
+        else stop(ll$message, call. = FALSE)
     }
     ## else
     stopifnot(all(c("L","U") %in% slotNames(ll))) # ensure we have *sparse* LU

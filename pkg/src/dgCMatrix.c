@@ -273,7 +273,9 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp)
     /* FIXME: dgCMatrix_LU should check ans for consistency in
      * permutation type with the requested value - Should have two
      * classes or two different names in the factors list for LU with
-     * permuted columns or not. */
+     * permuted columns or not.
+     * OTOH, currently  (order, tol) === (1, 1) always.
+     */
 
     if (ans != R_NilValue) return ans;
     n = A->n;
@@ -286,9 +288,8 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp)
     S = cs_sqr (order, A, 0) ;	/* symbolic ordering, no QR bound */
     N = cs_lu (A, S, tol) ;	/* numeric factorization */
     if (!N) {
-	/*WAS: error ("cs_lu failed (singular, or out of memory)") ; */
-	return R_NilValue;
-	/* and the caller can warn() or stop() ... */
+	error ("cs_lu(A) failed: near-singular A (or out of memory)");
+	return R_NilValue; /*-Wall*/
     }
     cs_dropzeros (N->L) ;	/* drop zeros from L and sort it */
     D = cs_transpose (N->L, 1) ;
@@ -306,7 +307,7 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp)
 	     Matrix_cs_to_SEXP(N->L, "dtCMatrix", 0));
     SET_SLOT(ans, install("U"),
 	     Matrix_cs_to_SEXP(N->U, "dtCMatrix", 0));
-    Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_pSym,
+    Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_pSym, /* "p" */
 			      INTSXP, n)), p, n);
     if (order)
 	Memcpy(INTEGER(ALLOC_SLOT(ans, install("q"),
