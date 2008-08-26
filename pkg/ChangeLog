@@ -2,7 +2,7 @@
 
 	* src/dgCMatrix.c (dgCMatrix_LU): partially revert change
 	r2175 (2008-04-23) and do give an error for a singular matrix.
-	* R/Auxiliaries.R (detSparseLU): adapt to that.
+	* man/lu.Rd, R/Auxiliaries.R (detSparseLU): adapt to that.
 
 	* R/LU.R: expand( <sparseLU> )
 
