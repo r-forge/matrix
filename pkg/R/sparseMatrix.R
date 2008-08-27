@@ -650,6 +650,25 @@ fac2sparse <- function(from, to = c("d","i","l","n","z"), drop.unused.levels = T
 			 n)
     res
 }
+    
+fac2sparse <- function(from, to = c("d","i","l","n","z"),
+                       drop.unused.levels = TRUE)
+{
+    ## factor(-like) --> sparseMatrix {also works for integer, character}
+    fact <- if (drop.unused.levels) factor(from) else as.factor(from)
+    levs <- levels(fact)
+    n <- length(fact)
+    to <- match.arg(to)
+    i <- as.integer(fact) - 1L                  # 0-based indices
+    df <- data.frame(i = i, j = seq_len(n) - 1L)[!is.na(i),]
+    if(to != "n")
+        df$x <- rep.int(switch(to,
+                               "d" = 1., "i" = 1L, "l" = TRUE, "z" = 1+0i),
+                        nrow(df))
+    as(do.call("new", c(list(Class = paste(to, "gTMatrix", sep=''),
+                             Dim = c(length(levs), n),
+                             Dimnames = list(levs, names(fact))), df)), "CsparseMatrix")
+}
 
 setAs("factor", "sparseMatrix", function(from) fac2sparse(from, to = "d"))
 
