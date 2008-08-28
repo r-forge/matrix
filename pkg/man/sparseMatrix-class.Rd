@@ -130,10 +130,12 @@ determinant(CAex) # works via sparse lu(.)
 ## factor -> t( <sparse design matrix> ) :
 (fact <- gl(5, 3, 30, labels = LETTERS[1:5]))
 (Xt <- as(fact, "sparseMatrix"))  # indicator rows
-%% X <- t(Xt)
+
 ## missing values --> all-0 columns:
 f.mis <- fact
-is.na(f.mis) <- c(3:5, 17)
+i.mis <- c(3:5, 17)
+is.na(f.mis) <- i.mis
 Xt != (X. <- as(f.mis, "sparseMatrix")) # differ only in columns 3:5,17
+stopifnot(all(X.[,i.mis] == 0), all(Xt[,-i.mis] == X.[,-i.mis]))
 }
 \keyword{classes}
