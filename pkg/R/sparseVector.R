@@ -411,36 +411,40 @@ all.equal.sparseV <- function(target, current, ...)
 		     sep = ""))
     }
 
+    t.has.x <- class(target)  != "nsparseVector"
+    c.has.x <- class(current) != "nsparseVector"
     nz.t <- length(i.t <- target @i)
     nz.c <- length(i.c <- current@i)
+    t.x <- if(t.has.x)	target@x else rep.int(TRUE, nz.t)
+    c.x <- if(c.has.x) current@x else rep.int(TRUE, nz.c)
     if(nz.t != nz.c || any(i.t != i.c)) { ## "work" if indices are not the same
 	i1.c <- setdiff(i.t, i.c)# those in i.t, not yet in i.c
 	i1.t <- setdiff(i.c, i.t)
 	if((n1t <- length(i1.t))) {
 	    target@i <- i.t <- c(i.t, i1.t)
-	    target@x <- c(target@x, rep.int(0, n1t))
+	    t.x <- c(t.x, rep.int(if(t.has.x) 0 else 0L, n1t))
 	}
 	if((n1c <- length(i1.c))) {
 	    current@i <- i.c <- c(i.c, i1.c)
-	    current@x <- c(current@x, rep.int(0, n1c))
+	    c.x <- c(c.x, rep.int(if(c.has.x) 0 else 0L, n1c))
 	}
     }
     if(is.unsorted(i.t)) {  ## method="quick" {"radix" not ok for large range}
 	ii <- sort.list(i.t, method = "quick", na.last=NA)
 	target@i <- i.t <- i.t[ii]
-	target@x <- target@x[ii]
+	t.x <- t.x[ii]
     }
     if(is.unsorted(i.c)) {
 	ii <- sort.list(i.c, method = "quick", na.last=NA)
 	current@i <- i.c <- i.c[ii]
-	current@x <- current@x[ii]
+	c.x <- c.x[ii]
     }
 
     ## Now, we have extended both target and current
     ## *and* have sorted the respective i-slot, the i-slots should match!
     stopifnot(all(i.c == i.t))
 
-    all.equal.numeric(current@x, target@x, ...)
+    all.equal.numeric(c.x, t.x, ...)
 } ## all.equal.sparseV
 
 

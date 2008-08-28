@@ -639,6 +639,8 @@ fac2sparse <- function(from, to = c("d","i","l","n","z"), drop.unused.levels = T
     levs <- levels(fact)
     n <- length(fact)
     to <- match.arg(to)
+    ## MM: using new() and then assigning slots has efficiency "advantage"
+    ##     of *not* validity checking
     res <- new(paste(to, "gCMatrix", sep=''))
     res@i <- as.integer(fact) - 1L # 0-based
     res@p <- 0:n
@@ -650,7 +652,8 @@ fac2sparse <- function(from, to = c("d","i","l","n","z"), drop.unused.levels = T
 			 n)
     res
 }
-    
+
+## This version can deal with NA's -- but is less efficient (how much?) :
 fac2sparse <- function(from, to = c("d","i","l","n","z"),
                        drop.unused.levels = TRUE)
 {
@@ -660,14 +663,16 @@ fac2sparse <- function(from, to = c("d","i","l","n","z"),
     n <- length(fact)
     to <- match.arg(to)
     i <- as.integer(fact) - 1L                  # 0-based indices
-    df <- data.frame(i = i, j = seq_len(n) - 1L)[!is.na(i),]
+    n <- nrow(df <- data.frame(i = i, j = seq_len(n) - 1L)[!is.na(i),])
     if(to != "n")
-        df$x <- rep.int(switch(to,
-                               "d" = 1., "i" = 1L, "l" = TRUE, "z" = 1+0i),
-                        nrow(df))
+	df$x <- rep.int(switch(to,
+			       "d" = 1., "i" = 1L, "l" = TRUE, "z" = 1+0i),
+			n)
     as(do.call("new", c(list(Class = paste(to, "gTMatrix", sep=''),
-                             Dim = c(length(levs), n),
-                             Dimnames = list(levs, names(fact))), df)), "CsparseMatrix")
+			     Dim = c(length(levs), n),
+			     Dimnames = list(levs, names(fact))),
+                        df)),
+       "CsparseMatrix")
 }
 
 setAs("factor", "sparseMatrix", function(from) fac2sparse(from, to = "d"))
