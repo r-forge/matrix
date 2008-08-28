@@ -904,12 +904,34 @@ setMethod("Compare", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 	      newC <- sub("^.", "l", class(e1))
               ## FIXME: "n" result when e1 & e2 are "n", or even whenever possible
 	      r <- new(newC)
-              ## Very easy case:
-              if(identical(e1@i, e2@i) && identical(e1@p, e2@p)) {
-		  if(extends(cD2, "nMatrix")) {
-		      ## non-equality of identical pattern matrices: all FALSE
-		      r@p <- rep.int(0L, d[2]+1L)
-		  } else { # have 'x' slot
+              e1is.n <- extends(cD1, "nMatrix")
+              e2is.n <- extends(cD2, "nMatrix")
+              ## Easy case: identical sparsity pattern
+	      if(identical(e1@i, e2@i) && identical(e1@p, e2@p)) {
+		  if(e1is.n) {
+		      if(e2is.n)
+			  ## non-equality of identical pattern matrices: all FALSE
+			  r@p <- rep.int(0L, d[2]+1L) # and r@i, r@x remain empty
+		      else { ## e1 pattern, e2@x
+			  rx <- callGeneric(TRUE, e2@x)
+			  if(allFalse(rx))
+			      r@p <- rep.int(0L, d[2]+1L) # and r@i, r@x remain empty
+			  else {
+			      r@x <- rx
+			      r@i <- e2@i
+			      r@p <- e2@p
+			  }
+		      }
+		  } else if(e2is.n) { ## e1@x, e2 pattern
+		      rx <- callGeneric(e1@x, TRUE)
+		      if(allFalse(rx))
+			  r@p <- rep.int(0L, d[2]+1L) # and r@i, r@x remain empty
+		      else {
+			  r@x <- rx
+			  r@i <- e1@i
+			  r@p <- e1@p
+		      }
+		  } else {		# both have 'x' slot
 		      r@x <- callGeneric(e1@x, e2@x)
 		      ## and all others are  '0 op 0' which give FALSE
 		      r@i <- e1@i
@@ -931,13 +953,17 @@ setMethod("Compare", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
                   I1 <- ii[[1]]
                   I2 <- ii[[2]]
 
-                  ## 1) common
-                  x <- callGeneric(e1@x[I1],
-                                   e2@x[I2])
-                  ## 2) "e1 o  0":
-                  x2 <- callGeneric(e1@x[- I1], 0)
-                  ## 3) "0  o e1":
-                  x3 <- callGeneric(0, e2@x[- I2])
+		  ## potentially could be faster for 'nsparse' but this is simple:
+		  e1x <- if(e1is.n) rep.int(1L, length(e1@i)) else e1@x
+		  e2x <- if(e2is.n) rep.int(1L, length(e2@i)) else e2@x
+
+		  ## 1) common
+		  x <- callGeneric(e1x[I1],
+				   e2x[I2])
+		  ## 2) "e1 o  0":
+		  x2 <- callGeneric(e1x[- I1], 0)
+		  ## 3) "0  o e1":
+		  x3 <- callGeneric(0, e2x[- I2])
 
 		  i <- c(ij1[I1, 1], ij1[-I1, 1], ij2[-I2, 1])
 		  j <- c(ij1[I1, 2], ij1[-I1, 2], ij2[-I2, 2])
@@ -948,8 +974,11 @@ setMethod("Compare", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 		      x <- x[x]
 		  }
 		  .Call(Tsparse_to_Csparse,
-			new("lgTMatrix", Dim = d, Dimnames = dn,
-			    i = i, j = j, x = x), FALSE)
+			if(e1is.n && e2is.n)
+			new("ngTMatrix", Dim = d, Dimnames = dn, i = i, j = j)
+			else new("lgTMatrix", Dim = d, Dimnames = dn,
+				 i = i, j = j, x = x),
+			FALSE)
               }
 	  })
 

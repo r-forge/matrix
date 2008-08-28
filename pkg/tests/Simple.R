@@ -45,9 +45,13 @@ N3 <- as(Matrix(upper.tri(diag(3))), "nMatrix")
 isValid(bdN <- bdiag(N3, N3),"nsparseMatrix")
 stopifnot(isSymmetric(M), isSymmetric(M.),
 	  is(bdiag(M., M.),"symmetricMatrix"),
-	  is(bdN, "triangularMatrix"))
-
-
+	  is(bdN, "triangularMatrix"),
+	  all.equal(N3,N3),
+	  all.equal(N3, t(N3)) == "Mean relative difference: 2",
+	  !any(bdN != t(bdN)), # <nsparse> != <nsparse>	 failed to work...
+	  !any((0+bdN) > bdN), # <dsparse> o <nsparse>
+	  !any(bdN != (0+bdN)) # <nsparse> o <dsparse>
+	  )
 
 ## large sparse ones: these now directly "go sparse":
 str(m0 <- Matrix(0,     nrow=100, ncol = 1000))

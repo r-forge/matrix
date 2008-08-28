@@ -1,3 +1,15 @@
+2008-08-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Ops.R (Compare(<Csparse>,<Csparse>): fix for nsparseMatrix
+
+2008-08-27  Douglas Bates <bates@stat.wisc.edu>
+
+	* R/sparseMatrix.R: fac2sparse() for NA's
+
+2008-08-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseVector.R (all.equal.sparseV): make work for nsparseVector's
+
 2008-08-25  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/dgCMatrix.c (dgCMatrix_LU): partially revert change
