@@ -663,15 +663,15 @@ fac2sparse <- function(from, to = c("d","i","l","n","z"),
     n <- length(fact)
     to <- match.arg(to)
     i <- as.integer(fact) - 1L                  # 0-based indices
-    n <- nrow(df <- data.frame(i = i, j = seq_len(n) - 1L)[!is.na(i),])
+    df <- data.frame(i = i, j = seq_len(n) - 1L)[!is.na(i),]
     if(to != "n")
 	df$x <- rep.int(switch(to,
 			       "d" = 1., "i" = 1L, "l" = TRUE, "z" = 1+0i),
-			n)
+			nrow(df))
     as(do.call("new", c(list(Class = paste(to, "gTMatrix", sep=''),
 			     Dim = c(length(levs), n),
 			     Dimnames = list(levs, names(fact))),
-                        df)),
+			df)),
        "CsparseMatrix")
 }
 
