@@ -31,10 +31,12 @@
 \examples{
 (A <- spMatrix(3,3, i= c(1:3,2:1), j=c(3:1,1:2), x = 1:5))
 ex <- expand(lu. <- lu(A))
-stopifnot( all.equal(A[lu.@p + 1L, lu.@q + 1L],
+stopifnot( all.equal(as(A[lu.@p + 1L, lu.@q + 1L], "CsparseMatrix"),
                      lu.@L \%*\% lu.@U),
-           with(ex, all.equal(P \%*\% A \%*\% Q, L \%*\% U)),
-           with(ex, all.equal(A, t(P) \%*\% L \%*\% U \%*\% t(Q))))
+           with(ex, all.equal(as(P \%*\% A \%*\% Q, "CsparseMatrix"),
+                              L \%*\% U)),
+           with(ex, all.equal(as(A, "CsparseMatrix"),
+                              t(P) \%*\% L \%*\% U \%*\% t(Q))))
 }
 \keyword{methods}
 \keyword{arith}

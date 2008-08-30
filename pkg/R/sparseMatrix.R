@@ -577,16 +577,38 @@ setMethod("is.na", signature(x = "sparseMatrix"),## NB: nsparse* have own method
 	      else is.na_nsp(x)
 	  })
 
-## all.equal(): simply defer to  "sparseVector" methods:
+## all.equal(): similar to all.equal_Mat() in ./Matrix.R ;
+## -----------	eventually defer to  "sparseVector" methods:
 setMethod("all.equal", c(target = "sparseMatrix", current = "sparseMatrix"),
-	  function(target, current, ...)
-	  all.equal(as(target, "sparseVector"), as(current, "sparseVector"), ...))
+	  function(target, current, check.attributes = TRUE, ...)
+      {
+	  msg <- attr.all_Mat(target, current, check.attributes=check.attributes, ...)
+	  if(is.list(msg)) return(msg[[1]])
+	  ## else
+	  r <- all.equal(as(target, "sparseVector"), as(current, "sparseVector"),
+			 check.attributes=check.attributes, ...)
+	  if(is.null(msg) && (r.ok <- isTRUE(r))) TRUE else c(msg, if(!r.ok) r)
+      })
 setMethod("all.equal", c(target = "sparseMatrix", current = "ANY"),
-	  function(target, current, ...)
-	  all.equal(as(target, "sparseVector"), current, ...))
+	  function(target, current, check.attributes = TRUE, ...)
+      {
+	  msg <- attr.all_Mat(target, current, check.attributes=check.attributes, ...)
+	  if(is.list(msg)) return(msg[[1]])
+	  ## else
+	  r <- all.equal(as(target, "sparseVector"), current,
+			 check.attributes=check.attributes, ...)
+	  if(is.null(msg) && (r.ok <- isTRUE(r))) TRUE else c(msg, if(!r.ok) r)
+      })
 setMethod("all.equal", c(target = "ANY", current = "sparseMatrix"),
-	  function(target, current, ...)
-	  all.equal(target, as(current, "sparseVector"), ...))
+	  function(target, current, check.attributes = TRUE, ...)
+      {
+	  msg <- attr.all_Mat(target, current, check.attributes=check.attributes, ...)
+	  if(is.list(msg)) return(msg[[1]])
+	  ## else
+	  r <- all.equal(target, as(current, "sparseVector"),
+			 check.attributes=check.attributes, ...)
+	  if(is.null(msg) && (r.ok <- isTRUE(r))) TRUE else c(msg, if(!r.ok) r)
+      })
 
 
 

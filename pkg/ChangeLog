@@ -1,4 +1,19 @@
+2008-08-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999375-13 released to CRAN
+
+2008-08-29  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (attrSlotNames, attrSlots, attr.all_Mat): new
+	utilities, for now to be used in all.equal() methods.
+
+	* R/Matrix.R (all.equal_Mat): be more careful (less tolerant) in
+	all.equal() methods.
+	* R/sparseMatrix.R: ditto
+
 2008-08-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999375-12 released to CRAN
 
 	* R/Ops.R (Compare(<Csparse>,<Csparse>): fix for nsparseMatrix
 
