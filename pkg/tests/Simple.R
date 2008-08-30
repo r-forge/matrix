@@ -50,7 +50,10 @@ stopifnot(isSymmetric(M), isSymmetric(M.),
 	  all.equal(N3, t(N3)) == "Mean relative difference: 2",
 	  !any(bdN != t(bdN)), # <nsparse> != <nsparse>	 failed to work...
 	  !any((0+bdN) > bdN), # <dsparse> o <nsparse>
-	  !any(bdN != (0+bdN)) # <nsparse> o <dsparse>
+	  !any(bdN != (0+bdN)), # <nsparse> o <dsparse>
+	  length(grep("Length", all.equal(M., (vM <- as.vector(M.))))) > 0,
+	  identical(M., (M2 <- Matrix(vM, 12,12))),
+	  all.equal(M., M2, tol=0)
 	  )
 
 ## large sparse ones: these now directly "go sparse":

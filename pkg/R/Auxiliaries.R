@@ -55,6 +55,30 @@ copyClass <- function(x, newCl, sNames =
     r
 }
 
+
+attrSlotNames <- function(m) {
+    ## slotnames of Matrix objects which *not* directly content related
+    sn <- slotNames(m); sn[!(sn %in% c("x","i","j","p"))]
+}
+
+##' @param m
+##' @return the slots of 'm' which are "attributes" of them kind.
+attrSlots <- function(m) sapply(attrSlotNames(m), function(sn) slot(m, sn),
+				simplify = FALSE)
+
+attr.all_Mat <- function(target, current, check.attributes = TRUE, ...) {
+    msg <- if(check.attributes)
+	attr.all.equal(attrSlots(target), attrSlots(current), ...)
+    if((c1 <- class(target)) != (c2 <- class(current)))
+
+	## list(): so we can easily check for this
+	list(c(msg, paste("class(target) is ", class(target), ", current is ",
+				 class(current), sep = "")))
+    else msg
+}
+
+
+
 ## chol() via "dpoMatrix"
 cholMat <- function(x, pivot = FALSE, ...) {
     ## This will only be called for *dense* matrices
