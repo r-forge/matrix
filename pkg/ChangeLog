@@ -1,3 +1,8 @@
+2008-09-10  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* man/ddiMatrix-class.Rd: docu update : sparse, not dense (see 2008-07-28).
+	* man/ldiMatrix-class.Rd , man/diagonalMatrix-class.Rd: ditto.
+
 2008-09-08  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.999375-14  to be released to CRAN,
