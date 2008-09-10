@@ -168,20 +168,25 @@
   }
 }
 \section{Extends}{
-  Class \code{"\linkS4class{denseMatrix}"}, directly.
+  Class \code{"\linkS4class{sparseMatrix}"}, directly.
 }
 \section{Methods}{
   \describe{
     \item{coerce}{\code{signature(from = "matrix", to = "diagonalMatrix")}: ... }
-    \item{coerce}{\code{signature(from = "diagonalMatrix", to = "symmetricMatrix")}: ... }
-    \item{coerce}{\code{signature(from = "diagonalMatrix", to = "triangularMatrix")}: ... }
-    \item{coerce}{\code{signature(from = "diagonalMatrix", to = "matrix")}: ... }
     \item{coerce}{\code{signature(from = "Matrix", to = "diagonalMatrix")}: ... }
+    \item{coerce}{\code{signature(from = "diagonalMatrix", to = "generalMatrix")}: ... }
+    \item{coerce}{\code{signature(from = "diagonalMatrix", to = "triangularMatrix")}: ... }
+    \item{coerce}{\code{signature(from = "diagonalMatrix", to = "nMatrix")}: ... }
+    \item{coerce}{\code{signature(from = "diagonalMatrix", to = "matrix")}: ... }
+    \item{coerce}{\code{signature(from = "diagonalMatrix", to = "sparseVector")}: ... }
     \item{t}{\code{signature(x = "diagonalMatrix")}: ... }
     \item{\%*\%}{\code{signature(x = "dgeMatrix", y = "diagonalMatrix")}: ... }
     \item{\%*\%}{\code{signature(x = "matrix", y = "diagonalMatrix")}: ... }
     \item{\%*\%}{\code{signature(x = "diagonalMatrix", y = "matrix")}: ... }
     \item{\%*\%}{\code{signature(x = "diagonalMatrix", y = "dgeMatrix")}: ... }
+
+    \item{crossprod}{\code{signature(x = "diagonalMatrix", y = "dgeMatrix")}: ... }
+    \cr and many more methods
 
     \item{solve}{\code{signature(a = "diagonalMatrix", b, ...)}: is
       trivially implemented, of course.}
