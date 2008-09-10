@@ -80,6 +80,11 @@ static void chm2Ralloc(CHM_SP dest, CHM_SP src)
  *
  * @param ans a CHM_SP pointer
  * @param x pointer to an object that inherits from CsparseMatrix
+ * @param check_Udiag boolean - should a check for (and consequent
+ *  expansion of) a unit diagonal be performed.
+ * @param sort_in_place boolean - if the i and x slots are to be sorted
+ *  should they be sorted in place?  If the i and x slots are pointers
+ *  to an input SEXP they should not be modified.
  *
  * @return ans containing pointers to the slots of x.
  */
@@ -254,6 +259,8 @@ SEXP chm_sparse_to_SEXP(CHM_SP a, int dofree, int uploT, int Rkind,
  *
  * @param ans a CHM_TR pointer
  * @param x pointer to an object that inherits from TsparseMatrix
+ * @param check_Udiag boolean - should a check for (and consequent
+ *  expansion of) a unit diagonal be performed.
  *
  * @return ans containing pointers to the slots of x.
  */
