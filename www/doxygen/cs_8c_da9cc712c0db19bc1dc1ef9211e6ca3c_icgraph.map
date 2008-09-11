@@ -1,2 +1,9 @@
-<area shape="rect" href="$cs_8h.html#e2efa3ed8c8a2931e584b6d39a293e38" title="cs_dmperm" alt="" coords="153,5,249,32">
-<area shape="rect" href="$cs_8h.html#31db4da8e996966094f83c7601dc08ff" title="cs_sqr" alt="" coords="171,56,232,83">
+<area shape="rect" href="$cs_8h.html#e2efa3ed8c8a2931e584b6d39a293e38" title="cs_dmperm" alt="" coords="145,30,233,54">
+<area shape="rect" href="$cs_8h.html#31db4da8e996966094f83c7601dc08ff" title="cs_sqr" alt="" coords="160,78,219,102">
+<area shape="rect" href="$cs_8h.html#2ecf7b79f04b1f14554e67d3522b0ad4" title="cs_lusol" alt="" coords="301,6,371,30">
+<area shape="rect" href="$cs_8h.html#f1cde25f7d702464291dd2a7e85b4770" title="cs_qrsol" alt="" coords="301,54,371,78">
+<area shape="rect" href="$dgCMatrix_8h.html#fbcd07ccafaa2ee0299b8d1972748a9c" title="dgCMatrix_LU" alt="" coords="284,102,388,126">
+<area shape="rect" href="$dgCMatrix_8h.html#2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="283,150,389,174">
+<area shape="rect" href="$dgCMatrix_8h.html#b39afc804422ac41e7e017dc4637a52a" title="dgCMatrix_lusol" alt="" coords="461,6,576,30">
+<area shape="rect" href="$dgCMatrix_8h.html#5937063a2f86fc60d92f942eb9425b86" title="dgCMatrix_qrsol" alt="" coords="461,54,576,78">
+<area shape="rect" href="$dgCMatrix_8h.html#eae674c1f247043d2e34fe45d4239769" title="dgCMatrix_matrix_solve" alt="" coords="439,102,599,126">

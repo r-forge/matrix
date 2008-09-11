@@ -1,1 +1,11 @@
-<area shape="rect" href="$cs_8h.html#633a0b0214f3ee86a27adf6ee6dea640" title="cs_amd" alt="" coords="148,5,217,32">
+<area shape="rect" href="$cs_8h.html#633a0b0214f3ee86a27adf6ee6dea640" title="cs_amd" alt="" coords="143,66,209,90">
+<area shape="rect" href="$cs_8h.html#7c5aa6c4fadeba20b904a1c56b4543f5" title="cs_schol" alt="" coords="260,30,332,54">
+<area shape="rect" href="$cs_8h.html#31db4da8e996966094f83c7601dc08ff" title="cs_sqr" alt="" coords="267,102,325,126">
+<area shape="rect" href="$cs_8h.html#661c215839fe06dfed360d022188abad" title="cs_cholsol" alt="" coords="393,6,476,30">
+<area shape="rect" href="$cs_8h.html#2ecf7b79f04b1f14554e67d3522b0ad4" title="cs_lusol" alt="" coords="400,54,469,78">
+<area shape="rect" href="$cs_8h.html#f1cde25f7d702464291dd2a7e85b4770" title="cs_qrsol" alt="" coords="400,102,469,126">
+<area shape="rect" href="$dgCMatrix_8h.html#fbcd07ccafaa2ee0299b8d1972748a9c" title="dgCMatrix_LU" alt="" coords="383,150,487,174">
+<area shape="rect" href="$dgCMatrix_8h.html#2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="381,198,488,222">
+<area shape="rect" href="$dgCMatrix_8h.html#b39afc804422ac41e7e017dc4637a52a" title="dgCMatrix_lusol" alt="" coords="560,54,675,78">
+<area shape="rect" href="$dgCMatrix_8h.html#5937063a2f86fc60d92f942eb9425b86" title="dgCMatrix_qrsol" alt="" coords="560,102,675,126">
+<area shape="rect" href="$dgCMatrix_8h.html#eae674c1f247043d2e34fe45d4239769" title="dgCMatrix_matrix_solve" alt="" coords="537,150,697,174">

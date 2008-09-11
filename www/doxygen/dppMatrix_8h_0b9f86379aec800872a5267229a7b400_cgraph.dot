@@ -1,11 +1,17 @@
 digraph G
 {
-  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
-  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=10,shape=record];
   rankdir=LR;
   Node1 [label="dppMatrix_matrix_solve",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node2 [label="dppMatrix_chol",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dppMatrix_8c.html#6111600bf96735d9b39d5bc193203b31"];
-  Node1 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
-  Node3 [label="dup_mMatrix_as_dgeMatrix",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8c.html#574d0797f3bfb4cb555038c8d90cceb8"];
+  Node2 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node3 [label="get_factors",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8c.html#c8a9910ab35d85d32c6801477c2e6622"];
+  Node2 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node4 [label="set_factors",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8c.html#cb9e30480c757f0c780a5d94853b7284"];
+  Node1 -> Node5 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node5 [label="dup_mMatrix_as_dgeMatrix",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8c.html#574d0797f3bfb4cb555038c8d90cceb8"];
+  Node5 -> Node6 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node6 [label="Matrix_check_class",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html#2206f293e563a99c83fa8480b7e26912",tooltip="Return the 0-based index of a string match in a vector of strings terminated by an..."];
 }

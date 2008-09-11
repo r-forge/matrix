@@ -1,17 +1,17 @@
 digraph G
 {
-  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
-  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=10,shape=record];
   rankdir=LR;
   Node1 [label="dup_mMatrix_as_geMatrix",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node2 [label="ALLOC_SLOT",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786",tooltip="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..."];
-  Node1 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node3 [label="install_diagonal_int",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8c.html#daf5449cf279f61000d9d1a1215d4b6a"];
-  Node1 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node4 [label="make_i_matrix_symmetric",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html#133847040a4bd7d9bdb602c11aa6f048"];
-  Node1 -> Node5 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node5 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node5 [label="make_i_matrix_triangular",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html#b30d497ec7595dda8670f741fcd74992"];
-  Node1 -> Node6 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node6 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node6 [label="Matrix_check_class",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html#2206f293e563a99c83fa8480b7e26912",tooltip="Return the 0-based index of a string match in a vector of strings terminated by an..."];
 }

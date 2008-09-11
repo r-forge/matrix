@@ -1,16 +1,18 @@
 digraph G
 {
-  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
-  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=10,shape=record];
   Node1 [label="Tsparse.h",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node2 [label="Mutils.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html"];
-  Node2 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node3 [label="ctype.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
-  Node2 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node2 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node4 [label="R.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
-  Node2 -> Node5 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
-  Node5 [label="Rdefines.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
-  Node2 -> Node6 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
-  Node6 [label="Syms.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Syms_8h.html"];
+  Node2 -> Node5 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node5 [label="Rversion.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
+  Node2 -> Node6 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node6 [label="Rdefines.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
+  Node2 -> Node7 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node7 [label="Syms.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Syms_8h.html"];
 }

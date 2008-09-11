@@ -1,15 +1,15 @@
 digraph G
 {
-  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
-  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=10,shape=record];
   rankdir=LR;
   Node1 [label="dgeMatrix_LU",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node2 [label="dgeMatrix_determinant",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgeMatrix_8h.html#ebb502aae0db4698b17a88c6c0f0ec39"];
-  Node1 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node3 [label="dgeMatrix_matrix_solve",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgeMatrix_8h.html#4aaf5ed4d71841560a06e2eda9da3762"];
-  Node1 -> Node4 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node4 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node4 [label="dgeMatrix_rcond",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgeMatrix_8h.html#c4f1b4b19a004fb62c9cb68ccb1028ea"];
-  Node1 -> Node5 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node5 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node5 [label="dgeMatrix_solve",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgeMatrix_8h.html#8f0564cd095a4415738ef1ad8d537da1"];
 }

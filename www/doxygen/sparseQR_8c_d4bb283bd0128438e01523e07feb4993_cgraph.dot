@@ -1,13 +1,13 @@
 digraph G
 {
-  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
-  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=10,shape=record];
   rankdir=LR;
   Node1 [label="sparseQR_Qmult",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node2 [label="cs_happly",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#27050a31d36046e833b7763fe8ef62ce"];
-  Node1 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node3 [label="cs_ipvec",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#1d7df434402e7553c34dbd59fd040159"];
-  Node1 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node4 [label="cs_pvec",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#d854f5cf7572128900a5acb1a7c87754"];
 }

@@ -1,9 +1,13 @@
 digraph G
 {
-  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
-  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=10,shape=record];
   rankdir=LR;
   Node1 [label="dppMatrix_validate",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node2 [label="dspMatrix_validate",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dspMatrix_8c.html#d80747112d9a6358e2dcb86b319bbaec"];
+  Node2 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node3 [label="symmetricMatrix_validate",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dsyMatrix_8c.html#0d501d2a856f4fdfd3acab0d14888b6e"];
+  Node3 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node4 [label="check_scalar_string",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8c.html#cde6ee3844e52ed5a90e619cec56bc59"];
 }

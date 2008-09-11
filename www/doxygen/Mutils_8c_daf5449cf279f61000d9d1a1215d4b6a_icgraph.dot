@@ -1,9 +1,17 @@
 digraph G
 {
-  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
-  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=10,shape=record];
   rankdir=LR;
   Node1 [label="install_diagonal_int",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node2 [label="dup_mMatrix_as_geMatrix",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html#23764b1c8334e40406598a0446cc8bc5"];
+  Node2 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node3 [label="dense_band",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dense_8h.html#fc94ab69278e25ef4ea5ed5ba90935c3"];
+  Node2 -> Node4 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node4 [label="dense_to_symmetric",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dense_8h.html#389bdf26bd829335d25dffb4244c9ae6"];
+  Node2 -> Node5 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node5 [label="mMatrix_as_geMatrix",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html#623039270a92fce0643031ef7f6e72b2"];
+  Node5 -> Node6 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node6 [label="dense_to_Csparse",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dense_8h.html#33b46f3a16a95734d4875ddfbfa079cb"];
 }

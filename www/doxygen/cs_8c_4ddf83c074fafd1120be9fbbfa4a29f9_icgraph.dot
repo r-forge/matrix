@@ -1,15 +1,19 @@
 digraph G
 {
-  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
-  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=10,shape=record];
   rankdir=LR;
   Node1 [label="cs_pinv",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node2 [label="cs_dmperm",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#e2efa3ed8c8a2931e584b6d39a293e38"];
-  Node1 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node3 [label="cs_schol",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#7c5aa6c4fadeba20b904a1c56b4543f5"];
-  Node1 -> Node4 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
-  Node4 [label="dgCMatrix_LU",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgCMatrix_8h.html#fbcd07ccafaa2ee0299b8d1972748a9c"];
-  Node1 -> Node5 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
-  Node5 [label="dgCMatrix_QR",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgCMatrix_8h.html#2d37aad3c93e57b6dbafbf8a337273e8"];
+  Node3 -> Node4 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node4 [label="cs_cholsol",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#661c215839fe06dfed360d022188abad"];
+  Node1 -> Node5 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node5 [label="dgCMatrix_LU",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgCMatrix_8h.html#fbcd07ccafaa2ee0299b8d1972748a9c"];
+  Node5 -> Node6 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node6 [label="dgCMatrix_matrix_solve",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgCMatrix_8h.html#eae674c1f247043d2e34fe45d4239769"];
+  Node1 -> Node7 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node7 [label="dgCMatrix_QR",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgCMatrix_8h.html#2d37aad3c93e57b6dbafbf8a337273e8"];
 }

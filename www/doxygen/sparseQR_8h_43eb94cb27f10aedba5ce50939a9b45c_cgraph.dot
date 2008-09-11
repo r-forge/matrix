@@ -1,17 +1,19 @@
 digraph G
 {
-  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
-  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=10,shape=record];
   rankdir=LR;
   Node1 [label="sparseQR_resid_fitted",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node2 [label="dup_mMatrix_as_dgeMatrix",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8c.html#574d0797f3bfb4cb555038c8d90cceb8"];
-  Node1 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
-  Node3 [label="sparseQR_Qmult",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$sparseQR_8c.html#d4bb283bd0128438e01523e07feb4993",tooltip="Apply Householder transformations and the row permutation P to y."];
-  Node3 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
-  Node4 [label="cs_happly",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#27050a31d36046e833b7763fe8ef62ce"];
-  Node3 -> Node5 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
-  Node5 [label="cs_ipvec",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#1d7df434402e7553c34dbd59fd040159"];
-  Node3 -> Node6 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
-  Node6 [label="cs_pvec",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#d854f5cf7572128900a5acb1a7c87754"];
+  Node2 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node3 [label="Matrix_check_class",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html#2206f293e563a99c83fa8480b7e26912",tooltip="Return the 0-based index of a string match in a vector of strings terminated by an..."];
+  Node1 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node4 [label="sparseQR_Qmult",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$sparseQR_8c.html#d4bb283bd0128438e01523e07feb4993",tooltip="Apply Householder transformations and the row permutation P to y."];
+  Node4 -> Node5 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node5 [label="cs_happly",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#27050a31d36046e833b7763fe8ef62ce"];
+  Node4 -> Node6 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node6 [label="cs_ipvec",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#1d7df434402e7553c34dbd59fd040159"];
+  Node4 -> Node7 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node7 [label="cs_pvec",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#d854f5cf7572128900a5acb1a7c87754"];
 }
