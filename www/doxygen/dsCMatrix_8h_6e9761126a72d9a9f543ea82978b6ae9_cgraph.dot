@@ -1,13 +1,22 @@
 digraph G
 {
-  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
-  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=10,shape=record];
   rankdir=LR;
   Node1 [label="dsCMatrix_Csparse_solve",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node2 [label="chm_sparse_to_SEXP",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$chm__common_8c.html#7aa1a6e564c24a55b031b5c03b3313f4",tooltip="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free..."];
-  Node1 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
-  Node3 [label="dsCMatrix_Cholesky",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dsCMatrix_8c.html#ad9928295b1d5cef6dcbbcb046e153dc"];
-  Node1 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
-  Node4 [label="get_factor_pattern",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dsCMatrix_8c.html#fb5246986201a47e3d4fdf7554edd538"];
+  Node2 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node3 [label="ALLOC_SLOT",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786",tooltip="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..."];
+  Node1 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node4 [label="internal_chm_factor",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dsCMatrix_8c.html#9c9746e3464cc26aa2abfc21dbf2a130",tooltip="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm..."];
+  Node4 -> Node5 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node5 [label="chk_nm",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dsCMatrix_8c.html#3340463e47a1a5b85c7a529dd5c09e52"];
+  Node4 -> Node6 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node6 [label="chm_factor_to_SEXP",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$chm__common_8c.html#b819ab14a3e30e850191896d33089b94",tooltip="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f..."];
+  Node6 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node6 -> Node7 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node7 [label="xtype",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$chm__common_8c.html#f9e93950e044e8dd6480f0b32dfe3f03"];
+  Node4 -> Node8 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node8 [label="set_factors",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8c.html#cb9e30480c757f0c780a5d94853b7284"];
 }

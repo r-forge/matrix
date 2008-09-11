@@ -1,2 +1,6 @@
-<area shape="rect" href="$Mutils_8h.html#23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="245,5,437,32">
-<area shape="rect" href="$ldense_8h.html#0dc07e735b6fe4687f207bb06e950b70" title="lsyMatrix_as_lgeMatrix" alt="" coords="257,56,425,83">
+<area shape="rect" href="$Mutils_8h.html#23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="231,54,404,78">
+<area shape="rect" href="$ldense_8h.html#0dc07e735b6fe4687f207bb06e950b70" title="lsyMatrix_as_lgeMatrix" alt="" coords="240,102,395,126">
+<area shape="rect" href="$dense_8h.html#fc94ab69278e25ef4ea5ed5ba90935c3" title="dense_band" alt="" coords="481,6,572,30">
+<area shape="rect" href="$dense_8h.html#389bdf26bd829335d25dffb4244c9ae6" title="dense_to_symmetric" alt="" coords="456,54,597,78">
+<area shape="rect" href="$Mutils_8h.html#623039270a92fce0643031ef7f6e72b2" title="mMatrix_as_geMatrix" alt="" coords="453,102,600,126">
+<area shape="rect" href="$dense_8h.html#33b46f3a16a95734d4875ddfbfa079cb" title="dense_to_Csparse" alt="" coords="649,102,777,126">

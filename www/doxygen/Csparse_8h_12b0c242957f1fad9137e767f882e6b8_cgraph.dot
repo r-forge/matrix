@@ -1,9 +1,11 @@
 digraph G
 {
-  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
-  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=10,shape=record];
   rankdir=LR;
   Node1 [label="Csparse_to_Tsparse",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node2 [label="chm_triplet_to_SEXP",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$chm__common_8c.html#b5d31c23691cc4a3c96a7f526dc84006",tooltip="Copy the contents of a to an appropriate TsparseMatrix object and, optionally, free..."];
+  Node2 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node3 [label="ALLOC_SLOT",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786",tooltip="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..."];
 }

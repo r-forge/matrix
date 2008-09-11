@@ -1,2 +1,4 @@
-<area shape="rect" href="$chm__common_8c.html#c0552f8d5248824ec90a314b69bd1408" title="Copy the contents of a to an appropriate denseMatrix object and, optionally, free..." alt="" coords="208,5,365,32">
-<area shape="rect" href="$Mutils_8c.html#574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="187,56,387,83">
+<area shape="rect" href="$chm__common_8c.html#c0552f8d5248824ec90a314b69bd1408" title="Copy the contents of a to an appropriate denseMatrix object and, optionally, free..." alt="" coords="192,6,341,30">
+<area shape="rect" href="$Mutils_8c.html#574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="176,54,357,78">
+<area shape="rect" href="$Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..." alt="" coords="424,6,525,30">
+<area shape="rect" href="$Mutils_8h.html#2206f293e563a99c83fa8480b7e26912" title="Return the 0&#45;based index of a string match in a vector of strings terminated by an..." alt="" coords="407,54,543,78">

@@ -1,3 +1,4 @@
-<area shape="rect" href="$cs__utils_8c.html#e53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free..." alt="" coords="121,31,265,57">
-<area shape="rect" href="$dgCMatrix_8h.html#fbcd07ccafaa2ee0299b8d1972748a9c" title="dgCMatrix_LU" alt="" coords="316,5,431,32">
-<area shape="rect" href="$dgCMatrix_8h.html#2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="316,56,431,83">
+<area shape="rect" href="$cs__utils_8c.html#e53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free..." alt="" coords="119,30,257,54">
+<area shape="rect" href="$dgCMatrix_8h.html#fbcd07ccafaa2ee0299b8d1972748a9c" title="dgCMatrix_LU" alt="" coords="308,6,412,30">
+<area shape="rect" href="$dgCMatrix_8h.html#2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="307,54,413,78">
+<area shape="rect" href="$dgCMatrix_8h.html#eae674c1f247043d2e34fe45d4239769" title="dgCMatrix_matrix_solve" alt="" coords="463,6,623,30">

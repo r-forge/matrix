@@ -1,1 +1,4 @@
-<area shape="rect" href="$dsyMatrix_8c.html#e436ba23f7410148775ce808f08d1210" title="dsyMatrix_trf" alt="" coords="180,5,287,32">
+<area shape="rect" href="$dsyMatrix_8c.html#e436ba23f7410148775ce808f08d1210" title="dsyMatrix_trf" alt="" coords="172,54,268,78">
+<area shape="rect" href="$Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..." alt="" coords="317,6,419,30">
+<area shape="rect" href="$Mutils_8c.html#c8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="325,54,411,78">
+<area shape="rect" href="$Mutils_8c.html#cb9e30480c757f0c780a5d94853b7284" title="set_factors" alt="" coords="325,102,411,126">

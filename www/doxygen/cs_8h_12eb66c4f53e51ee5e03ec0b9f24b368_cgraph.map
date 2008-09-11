@@ -1,3 +1,8 @@
-<area shape="rect" href="$cs_8c.html#123f77ef9b940089a931a994deb21735" title="cs_entry" alt="" coords="128,5,203,32">
-<area shape="rect" href="$cs_8c.html#ad3a584d9185a4fe4497a36f892b9c72" title="cs_spalloc" alt="" coords="124,56,207,83">
-<area shape="rect" href="$cs_8c.html#6d705e404a7831ccf01bc0ea064215b9" title="cs_spfree" alt="" coords="124,107,207,133">
+<area shape="rect" href="$cs_8c.html#123f77ef9b940089a931a994deb21735" title="cs_entry" alt="" coords="127,30,199,54">
+<area shape="rect" href="$cs_8c.html#ad3a584d9185a4fe4497a36f892b9c72" title="cs_spalloc" alt="" coords="121,100,204,124">
+<area shape="rect" href="$cs_8c.html#6d705e404a7831ccf01bc0ea064215b9" title="cs_spfree" alt="" coords="263,150,340,174">
+<area shape="rect" href="$cs_8c.html#5a9bc4224732ce1cedc50119afc687c1" title="cs_sprealloc" alt="" coords="255,6,348,30">
+<area shape="rect" href="$cs_8c.html#7e829e1175f2c8ddb0d6d9e0bb90f985" title="cs_realloc" alt="" coords="397,6,477,30">
+<area shape="rect" href="$cs_8c.html#d3e846c0142a1457e8e85bcaf559fb98" title="cs_calloc" alt="" coords="264,54,339,78">
+<area shape="rect" href="$cs_8c.html#4c6c75c54cbdf2f3fd4574a90c2f8a86" title="cs_malloc" alt="" coords="261,102,341,126">
+<area shape="rect" href="$cs_8c.html#78c1d1194aacc65212bb0d2b03643ac7" title="cs_free" alt="" coords="405,150,469,174">

@@ -1,13 +1,19 @@
 digraph G
 {
-  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
-  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=10,shape=record];
   rankdir=LR;
   Node1 [label="cs_dfree",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node2 [label="cs_dalloc",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#efbcfeb2d1143578988d22d116dde57b"];
-  Node1 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
-  Node3 [label="cs_ddone",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#312cb23797ac49cd9e99853f6bd2895f"];
-  Node1 -> Node4 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
-  Node4 [label="cs_dmperm",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#e2efa3ed8c8a2931e584b6d39a293e38"];
+  Node2 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node3 [label="cs_dmperm",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#e2efa3ed8c8a2931e584b6d39a293e38"];
+  Node2 -> Node4 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node4 [label="cs_scc",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#9fede5f7dcf4367d7d005ca6dd0ba100"];
+  Node4 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node1 -> Node5 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node5 [label="cs_ddone",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#312cb23797ac49cd9e99853f6bd2895f"];
+  Node5 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node5 -> Node4 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node1 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
 }

@@ -1,2 +1,3 @@
-<area shape="rect" href="$dgeMatrix_8c.html#18e14d832081c8d7d6df7bd2f9e390f9" title="get_norm" alt="" coords="183,5,265,32">
-<area shape="rect" href="$Mutils_8c.html#8bb8065fb46047789264e28f5f533077" title="norm_type" alt="" coords="316,5,407,32">
+<area shape="rect" href="$dgeMatrix_8c.html#18e14d832081c8d7d6df7bd2f9e390f9" title="get_norm" alt="" coords="169,30,244,54">
+<area shape="rect" href="$Mutils_8h.html#83b5182165f4bf1e4cb7157ca23a0623" title="Check if slot(obj, &quot;x&quot;) contains any NA (or NaN)." alt="" coords="312,6,379,30">
+<area shape="rect" href="$Mutils_8c.html#e83d110234906231be64768d898c866c" title="La_norm_type" alt="" coords="293,54,397,78">

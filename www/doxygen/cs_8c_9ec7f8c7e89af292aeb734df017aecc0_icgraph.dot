@@ -1,9 +1,21 @@
 digraph G
 {
-  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
-  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=10,shape=record];
   rankdir=LR;
   Node1 [label="cs_reach",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node2 [label="cs_spsolve",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#dcb6aabd14949ff1294ad629276c1a05"];
+  Node2 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node3 [label="cs_lu",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#6a35ad4816f210234a33eed09b19d181"];
+  Node3 -> Node4 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node4 [label="cs_lusol",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8h.html#2ecf7b79f04b1f14554e67d3522b0ad4"];
+  Node4 -> Node5 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node5 [label="dgCMatrix_lusol",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgCMatrix_8h.html#b39afc804422ac41e7e017dc4637a52a"];
+  Node3 -> Node6 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node6 [label="dgCMatrix_LU",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgCMatrix_8h.html#fbcd07ccafaa2ee0299b8d1972748a9c"];
+  Node6 -> Node7 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node7 [label="dgCMatrix_matrix_solve",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgCMatrix_8h.html#eae674c1f247043d2e34fe45d4239769"];
+  Node2 -> Node8 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node8 [label="dtCMatrix_sparse_solve",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dtCMatrix_8h.html#4370f8d80c77fc815ac826f457e4960b"];
 }

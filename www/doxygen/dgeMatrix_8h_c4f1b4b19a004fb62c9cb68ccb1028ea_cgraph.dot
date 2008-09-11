@@ -1,15 +1,23 @@
 digraph G
 {
-  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
-  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=10,shape=record];
   rankdir=LR;
   Node1 [label="dgeMatrix_rcond",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node2 [label="dgeMatrix_LU",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgeMatrix_8c.html#b666ff2da2d98c91e4842dd563ac945f"];
-  Node1 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
-  Node3 [label="get_norm",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgeMatrix_8c.html#18e14d832081c8d7d6df7bd2f9e390f9"];
-  Node3 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
-  Node4 [label="norm_type",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8c.html#8bb8065fb46047789264e28f5f533077"];
-  Node1 -> Node5 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
-  Node5 [label="rcond_type",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8c.html#dd88135be7a933f50eb4edb769355172"];
+  Node2 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node3 [label="ALLOC_SLOT",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786",tooltip="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..."];
+  Node2 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node4 [label="get_factors",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8c.html#c8a9910ab35d85d32c6801477c2e6622"];
+  Node2 -> Node5 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node5 [label="set_factors",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8c.html#cb9e30480c757f0c780a5d94853b7284"];
+  Node1 -> Node6 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node6 [label="get_norm",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$dgeMatrix_8c.html#18e14d832081c8d7d6df7bd2f9e390f9"];
+  Node6 -> Node7 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node7 [label="any_NA",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8h.html#83b5182165f4bf1e4cb7157ca23a0623",tooltip="Check if slot(obj, &quot;x&quot;) contains any NA (or NaN)."];
+  Node6 -> Node8 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node8 [label="La_norm_type",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8c.html#e83d110234906231be64768d898c866c"];
+  Node1 -> Node9 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node9 [label="La_rcond_type",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$Mutils_8c.html#646ee60a4fb346b69460858856a4a5a2"];
 }

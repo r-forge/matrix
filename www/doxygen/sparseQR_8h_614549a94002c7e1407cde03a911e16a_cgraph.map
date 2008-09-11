@@ -1,6 +1,7 @@
-<area shape="rect" href="$cs_8c.html#1d7df434402e7553c34dbd59fd040159" title="cs_ipvec" alt="" coords="427,24,501,51">
-<area shape="rect" href="$cs_8c.html#a4cdacecec403b30b97abc7c27594b4f" title="cs_usolve" alt="" coords="232,36,315,63">
-<area shape="rect" href="$Mutils_8c.html#574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="173,87,373,113">
-<area shape="rect" href="$sparseQR_8c.html#d4bb283bd0128438e01523e07feb4993" title="Apply Householder transformations and the row permutation P to y." alt="" coords="208,137,339,164">
-<area shape="rect" href="$cs_8c.html#27050a31d36046e833b7763fe8ef62ce" title="cs_happly" alt="" coords="423,112,505,139">
-<area shape="rect" href="$cs_8c.html#d854f5cf7572128900a5acb1a7c87754" title="cs_pvec" alt="" coords="428,163,500,189">
+<area shape="rect" href="$cs_8c.html#1d7df434402e7553c34dbd59fd040159" title="cs_ipvec" alt="" coords="428,103,500,127">
+<area shape="rect" href="$cs_8c.html#a4cdacecec403b30b97abc7c27594b4f" title="cs_usolve" alt="" coords="216,53,296,77">
+<area shape="rect" href="$Mutils_8c.html#574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="165,5,347,29">
+<area shape="rect" href="$sparseQR_8c.html#d4bb283bd0128438e01523e07feb4993" title="Apply Householder transformations and the row permutation P to y." alt="" coords="196,152,316,176">
+<area shape="rect" href="$Mutils_8h.html#2206f293e563a99c83fa8480b7e26912" title="Return the 0&#45;based index of a string match in a vector of strings terminated by an..." alt="" coords="396,5,532,29">
+<area shape="rect" href="$cs_8c.html#27050a31d36046e833b7763fe8ef62ce" title="cs_happly" alt="" coords="424,151,504,175">
+<area shape="rect" href="$cs_8c.html#d854f5cf7572128900a5acb1a7c87754" title="cs_pvec" alt="" coords="429,199,499,223">

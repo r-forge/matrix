@@ -1,11 +1,15 @@
 digraph G
 {
-  edge [fontname="FreeSans.ttf",fontsize=10,labelfontname="FreeSans.ttf",labelfontsize=10];
-  node [fontname="FreeSans.ttf",fontsize=10,shape=record];
+  edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=10,shape=record];
   rankdir=LR;
   Node1 [label="cs_droptol",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
+  Node1 -> Node2 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
   Node2 [label="cs_fkeep",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#de63a58ec1758250c64518d817ea3c4c"];
-  Node1 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans.ttf"];
-  Node3 [label="cs_tol",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#db704422b5f80f757920bf30c5dcabed"];
+  Node2 -> Node3 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node3 [label="cs_sprealloc",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#5a9bc4224732ce1cedc50119afc687c1"];
+  Node3 -> Node4 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node4 [label="cs_realloc",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#7e829e1175f2c8ddb0d6d9e0bb90f985"];
+  Node1 -> Node5 [color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node5 [label="cs_tol",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$cs_8c.html#db704422b5f80f757920bf30c5dcabed"];
 }
