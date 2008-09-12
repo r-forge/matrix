@@ -1,0 +1,5 @@
+<area shape="rect" href="$Mutils_8c.html#11d1c1bc4eec273005b5a2a340db9f78" title="as_det_obj" alt="" coords="217,6,300,30">
+<area shape="rect" href="$dgeMatrix_8c.html#b666ff2da2d98c91e4842dd563ac945f" title="dgeMatrix_LU" alt="" coords="208,54,309,78">
+<area shape="rect" href="$Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..." alt="" coords="357,6,459,30">
+<area shape="rect" href="$Mutils_8c.html#c8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="365,54,451,78">
+<area shape="rect" href="$Mutils_8c.html#cb9e30480c757f0c780a5d94853b7284" title="set_factors" alt="" coords="365,102,451,126">

@@ -1,0 +1,7 @@
+<area shape="rect" href="$dgeMatrix_8c.html#18e14d832081c8d7d6df7bd2f9e390f9" title="get_norm" alt="" coords="168,78,243,102">
+<area shape="rect" href="$dspMatrix_8h.html#2a8d63739f02971700f3a26bffe3ba52" title="get_norm_sp" alt="" coords="157,126,253,150">
+<area shape="rect" href="$dsyMatrix_8h.html#886569af93c91d1856c961323c5d6bce" title="get_norm_sy" alt="" coords="157,174,253,198">
+<area shape="rect" href="$dgeMatrix_8h.html#d6b2835d2acbc142689c1d980387c5e0" title="dgeMatrix_norm" alt="" coords="303,6,417,30">
+<area shape="rect" href="$dgeMatrix_8h.html#c4f1b4b19a004fb62c9cb68ccb1028ea" title="dgeMatrix_rcond" alt="" coords="301,54,419,78">
+<area shape="rect" href="$dtpMatrix_8h.html#a9ed2c0dc25946f221d79fa4caf54fd6" title="dtpMatrix_norm" alt="" coords="304,102,416,126">
+<area shape="rect" href="$dtrMatrix_8h.html#e06260deeaaa22549b6c634f3add5999" title="dtrMatrix_norm" alt="" coords="307,150,413,174">

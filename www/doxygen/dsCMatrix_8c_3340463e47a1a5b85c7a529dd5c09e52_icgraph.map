@@ -1,0 +1,6 @@
+<area shape="rect" href="$dsCMatrix_8c.html#9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm..." alt="" coords="123,102,259,126">
+<area shape="rect" href="$dsCMatrix_8h.html#326fdb98f74608895abd9df179158253" title="dsCMatrix_chol" alt="" coords="337,6,449,30">
+<area shape="rect" href="$dsCMatrix_8h.html#f424de259d431a9c8719a23188265887" title="dsCMatrix_Cholesky" alt="" coords="323,54,464,78">
+<area shape="rect" href="$dsCMatrix_8h.html#6e9761126a72d9a9f543ea82978b6ae9" title="dsCMatrix_Csparse_solve" alt="" coords="307,102,480,126">
+<area shape="rect" href="$dsCMatrix_8h.html#e60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial..." alt="" coords="331,150,456,174">
+<area shape="rect" href="$dsCMatrix_8h.html#e03dda286063199c0f670425084f0f2d" title="dsCMatrix_matrix_solve" alt="" coords="313,198,473,222">
