@@ -1,0 +1,6 @@
+<area shape="rect" href="$dsyMatrix_8c.html#e436ba23f7410148775ce808f08d1210" title="dsyMatrix_trf" alt="" coords="256,66,352,90">
+<area shape="rect" href="$Mutils_8c.html#574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="213,126,395,150">
+<area shape="rect" href="$Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..." alt="" coords="461,6,563,30">
+<area shape="rect" href="$Mutils_8c.html#c8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="469,54,555,78">
+<area shape="rect" href="$Mutils_8c.html#cb9e30480c757f0c780a5d94853b7284" title="set_factors" alt="" coords="469,102,555,126">
+<area shape="rect" href="$Mutils_8h.html#2206f293e563a99c83fa8480b7e26912" title="Return the 0&#45;based index of a string match in a vector of strings terminated by an..." alt="" coords="444,150,580,174">

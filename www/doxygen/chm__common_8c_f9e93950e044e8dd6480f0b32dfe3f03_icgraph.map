@@ -1,0 +1,13 @@
+<area shape="rect" href="$chm__common_8h.html#c0b9d7e2006dcf1a8d388954b408d007" title="Populate ans with the pointers from x and modify its scalar elements accordingly..." alt="" coords="113,53,249,77">
+<area shape="rect" href="$chm__common_8h.html#7c6132b98d7e38fc876c745c9cc8da2d" title="Populate ans with the pointers from x and modify its scalar elements accordingly..." alt="" coords="116,101,247,125">
+<area shape="rect" href="$chm__common_8h.html#b819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f..." alt="" coords="108,149,255,173">
+<area shape="rect" href="$Csparse_8h.html#77f654c86c318184ef29b46dc4929e12" title="Csparse_validate" alt="" coords="312,5,432,29">
+<area shape="rect" href="$init_8c.html#3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="324,53,420,77">
+<area shape="rect" href="$CHMfactor_8h.html#afc574f19837b7c6879c395a382444b0" title="CHMfactor_update" alt="" coords="308,101,436,125">
+<area shape="rect" href="$dgCMatrix_8h.html#f7d6aca940ff91850aa82c28fac47a66" title="dgCMatrix_cholsol" alt="" coords="308,149,436,173">
+<area shape="rect" href="$dsCMatrix_8h.html#f424de259d431a9c8719a23188265887" title="dsCMatrix_Cholesky" alt="" coords="504,187,645,211">
+<area shape="rect" href="$dsCMatrix_8c.html#9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm..." alt="" coords="304,271,440,295">
+<area shape="rect" href="$dsCMatrix_8h.html#326fdb98f74608895abd9df179158253" title="dsCMatrix_chol" alt="" coords="519,235,631,259">
+<area shape="rect" href="$dsCMatrix_8h.html#6e9761126a72d9a9f543ea82978b6ae9" title="dsCMatrix_Csparse_solve" alt="" coords="488,283,661,307">
+<area shape="rect" href="$dsCMatrix_8h.html#e60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial..." alt="" coords="512,331,637,355">
+<area shape="rect" href="$dsCMatrix_8h.html#e03dda286063199c0f670425084f0f2d" title="dsCMatrix_matrix_solve" alt="" coords="495,379,655,403">
