@@ -1,3 +1,8 @@
+2008-09-10  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r2260] src/Mutils.h, src/chm_common.c, src/cs_utils.c,
+	  src/dsCMatrix.c: Update doxygen comments
+
 2008-09-10  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* man/ddiMatrix-class.Rd: docu update : sparse, not dense (see 2008-07-28).
