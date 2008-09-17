@@ -1,3 +1,10 @@
+2008-09-17  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Tsparse.R (.TM.repl.i.2col): fix sub-assignment of "dsCMatrix";
+	bug reported by Jacob van Etten.
+
+	* tests/indexing.R, tests/indexing.Rout.save: testing it
+
 2008-09-10  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r2260] src/Mutils.h, src/chm_common.c, src/cs_utils.c,
