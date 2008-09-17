@@ -752,7 +752,7 @@ replTmat <- function (x, i, j, ..., value)
 	x <- uniqTsparse(x)
 
     toGeneral <- FALSE
-    if(extends(clDx, "symmetricMatrix")) {
+    if(r.sym <- extends(clDx, "symmetricMatrix")) {
 	## Tests to see if the assignments are symmetric as well
 	r.sym <- all(i1 == i2)
 	if(!r.sym) { # do have *some* Lower or Upper entries
@@ -763,28 +763,23 @@ replTmat <- function (x, i, j, ..., value)
 		iLord <- order(i1[iL], i2[iL])
 		iUord <- order(i2[iU], i1[iU]) # row <-> col. !
 		r.sym <- {
-		    identical(i[iL,    ][iLord,],
-			      i[iU, 2:1][iUord,]) &&
+		    identical(i[iL,    , drop=FALSE][iLord,],
+			      i[iU, 2:1, drop=FALSE][iUord,]) &&
 		    all(value[iL][iLord] ==
 			value[iU][iUord])
 		}
 	    }
 	}
 	if(r.sym) { ## result is *still* symmetric --> keep symmetry!
-	    if(getOption("verbose"))
-		message("keeping Tsparse matrix *symmetric* in sub-assignment")
 	    ## now consider only those indices above / below diagonal:
-	    xU <- x@uplo == "U"
-	    useI <- if(xU) i1 <= i2 else i2 <= i1
-	    i1 <- i1[useI]
-	    i2 <- i2[useI]
+	    useI <- if(x@uplo == "U") i1 <= i2 else i2 <= i1
+	    i <- i[useI, , drop=FALSE]
 	    value <- value[useI]
 	}
 	else toGeneral <- TRUE
     }
     else if(extends(clDx, "triangularMatrix")) {
-	xU <- x@uplo == "U"
-	r.tri <- all(if(xU) i1 <= i2 else i2 <= i1)
+	r.tri <- all(if(x@uplo == "U") i1 <= i2 else i2 <= i1)
 	if(r.tri) { ## result is *still* triangular
 	    if(any(i1 == i2)) # diagonal will be changed
 		x <- diagU2N(x) # keeps class (!)
@@ -792,12 +787,14 @@ replTmat <- function (x, i, j, ..., value)
 	else toGeneral <- TRUE
     }
     if(toGeneral) { # go to "generalMatrix" and continue
+	if((.w <- isTRUE(getOption("Matrix.warn"))) || getOption("verbose"))
+	    (if(.w) warning else message)(
+	     "M[ij] <- v :  coercing symmetric M[] into non-symmetric")
 	x <- as(x, paste(.M.kind(x), "gTMatrix", sep=''))
 	clDx <- getClassDef(clx <- class(x))
     }
 
-    i <- i - 1L # 0-indexing
-    ii.v <- .Call(m_encodeInd, i, di)
+    ii.v <- .Call(m_encodeInd, i - 1L, di)# 0-indexing
     if(any(d <- duplicated(rev(ii.v)))) { # reverse: "last" duplicated FALSE
 	warning("duplicate ij-entries in 'Matrix[ ij ] <- value'; using last")
 	nd <- !rev(d)

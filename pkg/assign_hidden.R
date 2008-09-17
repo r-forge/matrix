@@ -33,3 +33,5 @@ Ops.x.x 	<- Matrix:::Ops.x.x
 attr.all_Mat	<- Matrix:::attr.all_Mat
 attrSlots    	<- Matrix:::attrSlots
 attrSlotNames 	<- Matrix:::attrSlotNames
+m_encodeInd 	<- Matrix:::m_encodeInd
+m_encodeInd2 	<- Matrix:::m_encodeInd2
