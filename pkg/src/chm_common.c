@@ -273,7 +273,7 @@ CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x, Rboolean check_Udiag)
 		     ""};
     int *dims, ctype = Matrix_check_class(class_P(x), valid), m;
     SEXP islot;
-    Rboolean do_Udiag;
+    Rboolean do_Udiag = (check_Udiag && ctype % 3 == 2 && (*diag_P(x) == 'U'));
 
     if (ctype < 0) error("invalid class of object to as_cholmod_triplet");
     memset(ans, 0, sizeof(cholmod_triplet)); /* zero the struct */
@@ -285,8 +285,6 @@ CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x, Rboolean check_Udiag)
     dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
     ans->nrow = dims[0];
     ans->ncol = dims[1];
-
-    do_Udiag = (check_Udiag && ctype % 3 == 2 && (*diag_P(x) == 'U'));
 
     islot = GET_SLOT(x, Matrix_iSym);
     m = LENGTH(islot);
