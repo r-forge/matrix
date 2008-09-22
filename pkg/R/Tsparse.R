@@ -467,10 +467,11 @@ replTmat <- function (x, i, j, ..., value)
     .all0 <- function(v) if(spV) length(v@i) == 0 else all0(v)
 
     na <- nargs()
-    if(na == 3) { ## "vector (or 2-col) indexing"  M[i] <- v
+    if(na == 3) { ## i = vector (but *not* 2-col) indexing"  M[i] <- v
 	if(getOption("verbose"))
-	   message(sprintf(paste("diagnosing replTmat(x,i,j,v): nargs()= %d;",
-				 "missing(i,j)= (%d,%d)."), na, iMi,jMi))
+	   message(sprintf(
+		"diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (%d,%d)",
+			   iMi,jMi))
 	if(iMi) stop("internal bug: missing 'i' in replTmat(): please report")
 	if(is.character(i))
 	    stop("[ <character> ] indexing not allowed: forgot a \",\" ?")
@@ -601,6 +602,9 @@ replTmat <- function (x, i, j, ..., value)
 	else toGeneral <- TRUE
     }
     if(toGeneral) { # go to "generalMatrix" and continue
+	if((.w <- isTRUE(getOption("Matrix.warn"))) || getOption("verbose"))
+	    (if(.w) warning else message)(
+	     "M[i,j] <- v :  coercing symmetric M[] into non-symmetric")
         x <- as(x, paste(.M.kind(x), "gTMatrix", sep=''))
         clDx <- getClassDef(clx <- class(x))
     }

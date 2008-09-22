@@ -1,5 +1,5 @@
 
-R version 2.7.2 Patched (2008-09-12 r46542)
+R version 2.7.2 Patched (2008-09-20 r46555)
 Copyright (C) 2008 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -478,6 +478,7 @@ Warning: Ambiguous method selection for "==", target "dgTMatrix#numeric" (the fi
 > M <- m0; M[1,] <- 0
 > stopifnot(identical(M, Diagonal(x=c(0, rep(1,4)))))
 > M <- m0; M[,3] <- 3 ; M ; stopifnot(is(M, "sparseMatrix"), M[,3] == 3)
+M[i,j] <- v :  coercing symmetric M[] into non-symmetric
 5 x 5 sparse Matrix of class "dgTMatrix"
               
 [1,] 1 . 3 . .
@@ -513,6 +514,14 @@ m < m for none: Warning: Ambiguous method selection for "<", target "dgTMatrix#d
 
 ok
 det...(): ok
+Warning: Ambiguous method selection for "!=", target "dgTMatrix#numeric" (the first of the signatures shown will be used)
+    dMatrix#numeric
+    sparseMatrix#numeric
+
+Warning: Ambiguous method selection for "*", target "lgTMatrix#numeric" (the first of the signatures shown will be used)
+    lMatrix#numeric
+    sparseMatrix#numeric
+
 > M <- m0; M[1:3, 3] <- 0 ;M
 5 x 5 diagonal matrix of class "ddiMatrix"
      [,1] [,2] [,3] [,4] [,5]
@@ -534,6 +543,7 @@ det...(): ok
 [4,] . . . 1 .
 [5,] . . . . 1
 > M <- m1; M[,3] <- 3 ; stopifnot(is(M,"sparseMatrix"), M[,3] == 3)
+M[i,j] <- v :  coercing symmetric M[] into non-symmetric
 > checkMatrix(M)
  norm(m [5 x 5]) : 1  I  F  M  ok
  Summary:  ok
@@ -579,8 +589,16 @@ m < m for none: Warning: Ambiguous method selection for "<", target "dtTMatrix#d
 
 ok
 det...(): ok
+Warning: Ambiguous method selection for "!=", target "dtTMatrix#numeric" (the first of the signatures shown will be used)
+    dMatrix#numeric
+    sparseMatrix#numeric
+
+Warning: Ambiguous method selection for "*", target "ltTMatrix#numeric" (the first of the signatures shown will be used)
+    lMatrix#numeric
+    sparseMatrix#numeric
+
 .TM.repl.i.2col(): drop 'matrix' case ...
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 as(<triangular (ge)matrix>, dtTMatrix): valid: TRUE 
 > stopifnot(is(T, "dtTMatrix"), identical(T[,3], c(10,10,10,0,0)))
@@ -602,6 +620,10 @@ as(., "nMatrix") giving full nonzero-pattern: ok
 m >= m for all: ok
 m < m for none: ok
 det...(): ok
+Warning: Ambiguous method selection for "!=", target "dgCMatrix#numeric" (the first of the signatures shown will be used)
+    dMatrix#numeric
+    sparseMatrix#numeric
+
 > M <- m2; M[1:3, 3] <- 0 ;M
 5 x 5 sparse Matrix of class "dtCMatrix"
               
@@ -619,8 +641,12 @@ as(., "nMatrix") giving full nonzero-pattern: ok
 m >= m for all: ok
 m < m for none: ok
 det...(): ok
+Warning: Ambiguous method selection for "!=", target "dtCMatrix#numeric" (the first of the signatures shown will be used)
+    dMatrix#numeric
+    sparseMatrix#numeric
+
 .TM.repl.i.2col(): drop 'matrix' case ...
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 as(<triangular (ge)matrix>, dtCMatrix): valid: TRUE 
 > stopifnot(is(T, "dtCMatrix"), identical(T[,3], c(10,10,10,0,0)))
@@ -641,13 +667,13 @@ as(<triangular (ge)matrix>, dtCMatrix): valid: TRUE
 > m[i] <- v # the role model: only first column is affected
 > M[i] <- v; assert.EQ.mat(M,m) # dge
 > D[i] <- v; assert.EQ.mat(D,m) # ddi -> dtT -> dgT
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 > s[i] <- v; assert.EQ.mat(s,m) # dtT -> dgT
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 > S[i] <- v; assert.EQ.mat(S,m); S # dtC -> dtT -> dgT -> dgC
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 6 x 6 sparse Matrix of class "dgCMatrix"
                  
@@ -661,11 +687,11 @@ diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
 > m[L] <- z
 > M[L] <- z; assert.EQ.mat(M,m)
 > D[L] <- z; assert.EQ.mat(D,m)
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 > s[L] <- z; assert.EQ.mat(s,m)
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 > S[L] <- z; assert.EQ.mat(S,m) ; S
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 6 x 6 sparse Matrix of class "dgCMatrix"
                     
 [1,] 50  . . 50  . .
@@ -877,13 +903,14 @@ m < m for none: ok
 > ## equivalent to tmp <- `diag<-`(S[,-1], -2:1); S[,-1] <- tmp
 > ## which dispatches to (x="TsparseMatrix", i="missing",j="index", value="replValue")
 > diag(S[,-1]) <- -2:1 # used to give a wrong warning
+M[i,j] <- v :  coercing symmetric M[] into non-symmetric
 > S <- as(S,"triangularMatrix")
 > assert.EQ.mat(S, local({s <- diag(5); diag(s[,-1]) <- -2:1; s}))
 > 
 > trH[c(1:2,4), c(2:3,5)] <- 0 # gave an *error* upto Jan.2008
 > trH[ lower.tri(trH) ] <- 0   # ditto, because of callNextMethod()
 .TM.repl.i.2col(): drop 'matrix' case ...
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 > 
 > m <- Matrix(0+1:28, nrow = 4)
@@ -895,12 +922,12 @@ diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
 > lM <- upper.tri(mT, diag=TRUE)
 > mT[lM] <- 0
 .TM.repl.i.2col(): drop 'matrix' case ...
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 >  m[lM] <- 0
 > assert.EQ.mat(mT, as(m,"matrix"))
 > mT[lM] <- -1:0
 .TM.repl.i.2col(): drop 'matrix' case ...
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 >  m[lM] <- -1:0
 > assert.EQ.mat(mT, as(m,"matrix"))
 > (mT <- drop0(mT))
@@ -992,6 +1019,14 @@ m < m for none: Warning: Ambiguous method selection for "<", target "dsTMatrix#d
 
 ok
 det...(): ok
+Warning: Ambiguous method selection for "!=", target "dsTMatrix#numeric" (the first of the signatures shown will be used)
+    dMatrix#numeric
+    sparseMatrix#numeric
+
+Warning: Ambiguous method selection for "*", target "lsTMatrix#numeric" (the first of the signatures shown will be used)
+    lMatrix#numeric
+    sparseMatrix#numeric
+
 > stopifnot(is(s2, "symmetricMatrix"),
 + 	  is(st, "symmetricMatrix"))
 > checkMatrix(s.32  <- st[1:3,1:2]) ## 3 x 2 - and *not* dsTMatrix
@@ -1040,10 +1075,15 @@ identical
 m >= m for all: ok
 m < m for none: ok
 det...(): ok
+Warning: Ambiguous method selection for "!=", target "dsCMatrix#numeric" (the first of the signatures shown will be used)
+    dMatrix#numeric
+    sparseMatrix#numeric
+
 > ##
 > m <- as.mat(st)
 >  m[2:1,2:1] <- 4:1
 > st[2:1,2:1] <- 4:1
+M[i,j] <- v :  coercing symmetric M[] into non-symmetric
 > s2[2:1,2:1] <- 4:1
 > stopifnot(identical(m, as.mat(st)),
 + 	  1:4 == as.vector(s2[1:2,1:2]),
@@ -1057,6 +1097,7 @@ det...(): ok
 > m <- as.mat(s2)
 > s2[2:1,2:1] <- 4:1
 > t2[2:1,2:1] <- 4:1
+M[i,j] <- v :  coercing symmetric M[] into non-symmetric
 >  m[2:1,2:1] <- 4:1
 > assert.EQ.mat(t2, m)
 > assert.EQ.mat(s2, m)
@@ -1074,10 +1115,6 @@ det...(): ok
 > stopifnot(isValid(x.x, "dsCMatrix"),
 + 	  12:16 == as.mat(x.x)[cbind(2:6, 2:6)])
 > (ne1 <- (mc - m.) != 0)
-Warning: Ambiguous method selection for "!=", target "dgCMatrix#numeric" (the first of the signatures shown will be used)
-    dMatrix#numeric
-    sparseMatrix#numeric
-
 5 x 7 sparse Matrix of class "lgCMatrix"
                   
 [1,] . . . . . . .
@@ -1212,7 +1249,7 @@ Warning: Ambiguous method selection for "!=", target "numeric#dgCMatrix" (the fi
 > cc <- capture.output(show(dLrg))# show(<diag>) used to error for large n
 > 
 > cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
-Time elapsed:  11.365 2.604 15.202 0 0 
+Time elapsed:  14.032 0.805 26.015 0 0 
 > ##
 > cat("checkMatrix() of all: \n---------\n")
 checkMatrix() of all: 
@@ -1249,11 +1286,11 @@ Hc.
 Lrg 
 M 
 .TM.repl.i.2col(): drop 'matrix' case ...
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 M. 
 .TM.repl.i.2col(): drop 'matrix' case ...
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 M3 
 Warning: Ambiguous method selection for "==", target "ltCMatrix#ltCMatrix" (the first of the signatures shown will be used)
@@ -1281,7 +1318,7 @@ Warning: Ambiguous method selection for "|", target "lgCMatrix#nsCMatrix" (the f
     lsparseMatrix#nsparseMatrix
 
 .TM.repl.i.2col(): drop 'matrix' case ...
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ltTMatrix to lgTMatrix
 Ms 
 suboptimal implementation of sparse 'symm. o symm.'
@@ -1330,7 +1367,7 @@ Warning: Ambiguous method selection for "<", target "dsRMatrix#dsRMatrix" (the f
 
 S 
 .TM.repl.i.2col(): drop 'matrix' case ...
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 T 
 suboptimal implementation of sparse 'symm. o symm.'
@@ -1344,11 +1381,11 @@ Warning: Ambiguous method selection for "*", target "numeric#ltTMatrix" (the fir
     numeric#sparseMatrix
 
 .TM.repl.i.2col(): drop 'matrix' case ...
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ltTMatrix to lgTMatrix
 T6 
 .TM.repl.i.2col(): drop 'matrix' case ...
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ltTMatrix to lgTMatrix
 TG 
 Tii 
@@ -1427,7 +1464,7 @@ suboptimal implementation of sparse 'symm. o symm.'
 m. 
 m1 
 .TM.repl.i.2col(): drop 'matrix' case ...
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 m1g 
 m2 
@@ -1458,14 +1495,14 @@ suboptimal implementation of sparse 'symm. o symm.'
 trH 
 uTr 
 .TM.repl.i.2col(): drop 'matrix' case ...
-diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1).
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 x.x 
 suboptimal implementation of sparse 'symm. o symm.'
 x.x. 
 suboptimal implementation of sparse 'symm. o symm.'
 > cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
-Time elapsed:  9.258 0.252 9.53 0 0 
+Time elapsed:  10.634 0.21 26.433 0 0 
 > 
 > if(!interactive()) warnings()
 NULL
