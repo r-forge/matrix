@@ -169,9 +169,8 @@
   connections automatically ["lsparse" become either "real" or
   "pattern", "depending if they have NAs or not].
 
-- <diagMatrix> o <ddenseMatrix> currently works via sparse, but
-  should return <diagMatrix> in the same cases where
-  <diagMatrix> o <numeric> does.
+- <diagMatrix> o <ddenseMatrix> still works via sparse in some cases, but
+  could return <diagMatrix> in the same cases where <diagMatrix> o <numeric> does.
 
 - look at solve.QP.compact() in \pkg{quadprog} and how to do that using
   our sparse matrices.  Maybe this needs to be re-implemented using CHOLMOD
