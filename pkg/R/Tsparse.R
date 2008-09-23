@@ -122,7 +122,7 @@ intI <- function(i, n, dn, give.dn = TRUE)
 	    i0 <- (0:(n - 1L))[i]
 	} else {
 	    if(length(i) && max(i) > n)
-		stop("indexing out of range 0:",n)
+		stop("index larger than maximal ",n)
 	    if(any(z <- i == 0)) i <- i[!z]
 	    i0 <- i - 1L		# transform to 0-indexing
 	}

@@ -54,11 +54,6 @@
   calling Lapack's DGEMM for "dense"
   [2005-12-xx: done for dgeMatrix at least]
 
-- BUGlet:  Shouldn't lose factorization here:
-  h6 <- Hilbert(6); chol(h6) ; str(h6) # has factor
-  str(H6 <- as(h6, "dspMatrix"))       # has lost factor
-  ## and the same in a similar situation involving  "dpo", "dpp"
-
 - Factorizations: LU done; also Schur()  for  *sparse*  Matrices.
 
 - use  .Call(Csparse_drop, M, tol) in more places,
@@ -183,7 +178,7 @@
   chunks and would not need to re-allocate anything in many cases.
   HOWEVER, replCmat() in R/Csparse.R is still far from making use of that.
 
-- advertize  rbid2() / cbind2() and (rather?) rBind() / cBind()
+- advertize  rbind2() / cbind2() and (rather?) rBind() / cBind()
   	     ------                            -----
   in all vignettes / talks / ... !!
   People erronously try rbind/cbind see that they don't work and then
