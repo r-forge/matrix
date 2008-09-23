@@ -1,3 +1,10 @@
+2008-09-23  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/dsyMatrix.c (dsyMatrix_as_dspMatrix): copy 'factors' slot
+	* tests/dpo-test.R: test for it
+
+	* R/Tsparse.R (intI): improve one error message.
+
 2008-09-22  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.999375-15 to be released
