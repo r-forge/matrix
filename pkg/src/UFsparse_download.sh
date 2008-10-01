@@ -5,6 +5,7 @@ wget $ufl_URL/amd/current/AMD.tar.gz
 wget $ufl_URL/cholmod/current/CHOLMOD.tar.gz
 wget $ufl_URL/colamd/current/COLAMD.tar.gz
 wget $ufl_URL/UFconfig/current/UFconfig.tar.gz
+wget $ufl_URL/SPQR/current/SPQR.tar.gz
   ## install UFconfig.h file (now needed by some UFsparse libraries)
 tar zxf UFconfig.tar.gz UFconfig/UFconfig.h UFconfig/README.txt
   ## Move the UFconfig/README.txt file to ../inst/doc/UFsparse/UFconfig.txt
@@ -39,9 +40,29 @@ svn revert CHOLMOD/Lib/Makefile
   ##
 
 ls -l CHOLMOD/Lib/Makefile_CHOLMOD
-echo 'now diff CHOLMOD/Lib/Makefile with .... Makefile_CHOLMD'
+echo 'now diff CHOLMOD/Lib/Makefile with .... Makefile_CHOLMOD'
+echo ' make changes as necessary, and then'
+echo ' rm CHOLMOD/Lib/Makefile_CHOLMOD'
+
+  ## install SPQR source files
+for d in Source Include Lib
+do
+    tar zxf ./SPQR.tar.gz SPQR/$d
+done
+  ## install CHOLMOD documentation in ../inst/doc/UFsparse
+tar zxf ./SPQR.tar.gz SPQR/README.txt
+mv SPQR/README.txt ../inst/doc/UFsparse/SPQR.txt
+
+mv SPQR/Lib/Makefile SPQR/Lib/Makefile_SPQR
+#svn revert SPQR/Lib/Makefile
+  ##
+
+
+ls -l CHOLMOD/Lib/Makefile_CHOLMOD
+echo 'now diff CHOLMOD/Lib/Makefile with .... Makefile_CHOLMOD'
 echo ' make changes as necessary, and then'
 echo ' rm CHOLMOD/Lib/Makefile_CHOLMOD'
 
   ## remove the downloaded tar files
-rm CHOLMOD.tar.gz AMD.tar.gz COLAMD.tar.gz UFconfig.tar.gz
+rm CHOLMOD.tar.gz AMD.tar.gz COLAMD.tar.gz UFconfig.tar.gz SPQR.tar.gz
+

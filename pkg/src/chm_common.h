@@ -37,7 +37,7 @@ CHM_FR as_cholmod_factor (CHM_FR ans, SEXP x);
 Rboolean check_sorted_chm(CHM_SP A);
 
 int R_cholmod_start(CHM_CM Common);
-void R_cholmod_error(int status, char *file, int line, char *message);
+void R_cholmod_error(int status, const char *file, int line, const char *message);
 
 SEXP chm_factor_to_SEXP(CHM_FR f, int dofree);
 SEXP chm_sparse_to_SEXP(CHM_SP a, int dofree, int uploT, int Rkind,

@@ -532,7 +532,7 @@ CHM_DN as_cholmod_x_dense(cholmod_dense *ans, SEXP x)
 #undef _AS_cholmod_dense_1
 #undef _AS_cholmod_dense_2
 
-void R_cholmod_error(int status, char *file, int line, char *message)
+void R_cholmod_error(int status, const char *file, int line, const char *message)
 {
     error(_("Cholmod error '%s' at file:%s, line %d"), message, file, line);
 }
