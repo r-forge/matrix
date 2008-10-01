@@ -26,9 +26,9 @@ INC =   ../Include/cholmod.h \
 	../Include/cholmod_internal.h \
 	../Include/cholmod_matrixops.h \
 	../Include/cholmod_modify.h \
+	../Include/cholmod_partition.h \
 	../Include/cholmod_supernodal.h \
 	../Include/cholmod_template.h
-#	../Include/cholmod_partition.h \
 
 #-------------------------------------------------------------------------------
 # The 7 CHOLMOD library modules (int, double)
