@@ -258,6 +258,44 @@ SEXP dgCMatrix_QR(SEXP Ap, SEXP order)
     return ans;
 }
 
+
+/**
+ * Return a SuiteSparse QR factorization of the sparse matrix A
+ *
+ * @param obj pointer to an S4 object
+ * @param nm pointer to a symbol naming the slot to extract
+ * 
+ * @return pointer to the REAL contents, if nonzero length, otherwise
+ * a NULL pointer 
+ *
+ */
+SEXP dgCMatrix_SPQR(SEXP Ap, SEXP order)
+{
+    SEXP ans = PROTECT(allocVector(VECSXP, 4));
+    CHM_SP A = AS_CHM_SP(Ap), Q, R;
+    UF_long *E, rank;
+    
+    if ((rank = SuiteSparseQR_C_QR(asInteger(order), -2., A->ncol,
+				   A, &Q, &R, &E, &c)) == -1)
+	error(_("SuiteSparseQR_C_QR returned an error code"));
+    SET_VECTOR_ELT(ans, 0,
+		   chm_sparse_to_SEXP(Q, 1/*cholmod_free*/,
+				      0, 0, "", R_NilValue));
+    SET_VECTOR_ELT(ans, 1,
+		   chm_sparse_to_SEXP(R, 1/*cholmod_free*/,
+				      0, 0, "", R_NilValue));
+    if (E) {
+	int *Er;
+	SET_VECTOR_ELT(ans, 2, allocVector(INTSXP, A->ncol));
+	Er = INTEGER(VECTOR_ELT(ans, 2));
+	for (int i = 0; i < A->ncol; i++) Er[i] = E[i];
+	Free(E);
+    } else SET_VECTOR_ELT(ans, 2, allocVector(INTSXP, 0));
+    SET_VECTOR_ELT(ans, 3, ScalarInteger((int)rank));
+    UNPROTECT(1);
+    return ans;
+}
+
 /* Modified version of Tim Davis's cs_lu_mex.c file for MATLAB */
 SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp)
 {
