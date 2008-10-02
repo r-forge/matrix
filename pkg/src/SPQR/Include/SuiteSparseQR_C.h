@@ -11,8 +11,14 @@
 extern "C" {
 #endif
 
+#ifndef CHOLMOD_H
 #include "cholmod.h"
+#endif
+
+#ifndef _UFCONFIG_H
 #include "UFconfig.h"
+#endif
+
 #include "SuiteSparseQR_definitions.h"
 
 #ifdef __cplusplus

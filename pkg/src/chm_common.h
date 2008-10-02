@@ -3,6 +3,7 @@
 
 #include "UFconfig/UFconfig.h"
 #include "CHOLMOD/Include/cholmod.h"
+#include "SPQR/Include/SuiteSparseQR_C.h"
 #include "Mutils.h"
 
 typedef struct cholmod_common_struct  *CHM_CM ;

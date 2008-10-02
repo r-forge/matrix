@@ -19,7 +19,7 @@ include SOURCES_C.mkf
 
 OBJECTS = $(SOURCES_C:.c=.o)
 SHLIB = $(pkg)$(SHLIB_EXT)
-SUBDIRS = CHOLMOD COLAMD AMD SPQR
+SUBDIRS = SPQR CHOLMOD COLAMD AMD
 SUBLIBS = $(SUBDIRS:=.a)
 SUBSTAMP = $(SUBDIRS:=.stamp)
 
@@ -27,7 +27,7 @@ $(SHLIB): $(OBJECTS) $(SUBLIBS)
 ifdef build_under_Windows
 	$(DLL) --shared -s -o $@ $(OBJECTS) $(SUBLIBS) $(DLLLIBS)
 else
-	$(SHLIB_LINK) -o $@ $(OBJECTS) $(SUBLIBS) $(ALL_LIBS)
+	$(SHLIB_CXXLD) $(SHLIB_CXXLDFLAGS) $(SHLIB_LDFLAGS) $(LDFLAGS) -o $@ $(OBJECTS) $(SUBLIBS) $(ALL_LIBS)
 endif
 all: $(SHLIB)
 
