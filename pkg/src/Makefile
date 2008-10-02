@@ -21,7 +21,6 @@ OBJECTS = $(SOURCES_C:.c=.o)
 SHLIB = $(pkg)$(SHLIB_EXT)
 SUBDIRS = SPQR CHOLMOD COLAMD AMD
 SUBLIBS = $(SUBDIRS:=.a)
-SUBSTAMP = $(SUBDIRS:=.stamp)
 
 $(SHLIB): $(OBJECTS) $(SUBLIBS)
 ifdef build_under_Windows
@@ -33,18 +32,12 @@ all: $(SHLIB)
 
 mostlyclean: clean
 
-$(SUBLIBS): $(SUBSTAMP)
-	@for d in $(SUBDIRS); do \
-	  (cd $${d} && MkInclude=$(MkInclude) $(MAKE) lib) || exit 1; \
-	  touch $${d}.stamp; \
-	done
-
-$(SUBSTAMP):
-	touch $(SUBSTAMP)
+$(SUBLIBS):
+	cd $(@:%.a=%) && MkInclude=$(MkInclude) $(MAKE) lib
 
 clean:
 	@-rm -rf .libs _libs
-	@-rm -f *.o $(SHLIB) *.a $(SUBSTAMP)
+	@-rm -f *.o $(SHLIB) *.a
 	@for d in $(SUBDIRS); do \
 	  (cd $${d} && $(MAKE) clean) || exit 1; \
 	  rm -f $${d}.stamp; \
