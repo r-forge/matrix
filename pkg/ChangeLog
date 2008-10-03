@@ -1,3 +1,14 @@
+2008-10-03  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Csparse.c (isValid_Csparse): new utility
+	* src/chm_common.c (as_cholmod_sparse): add validity check early
+	* tests/validObj.R: test the above
+
+2008-10-02  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (printSpMatrix2): another validObject(.) call
+	* src/Makefile: getting rid of SUBSTAMP etc, thanks to Simon U.
+
 2008-09-23  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/dsyMatrix.c (dsyMatrix_as_dspMatrix): copy 'factors' slot
