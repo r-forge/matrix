@@ -286,6 +286,7 @@ R_init_Matrix(DllInfo *dll)
     RREGDEF(numeric_as_chm_dense);
 
     R_cholmod_start(&c);
+    R_cholmod_l_start(&cl);
 
     Matrix_DimNamesSym = install("Dimnames");
     Matrix_DimSym = install("Dim");

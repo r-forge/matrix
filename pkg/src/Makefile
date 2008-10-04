@@ -33,7 +33,7 @@ all: $(SHLIB)
 mostlyclean: clean
 
 $(SUBLIBS):
-	cd $(@:%.a=%) && MkInclude=$(MkInclude) $(MAKE) lib
+	cd $(@:%.a=%) && CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" MkInclude=$(MkInclude) $(MAKE) lib
 
 clean:
 	@-rm -rf .libs _libs
