@@ -174,6 +174,6 @@ stopifnot(identical(msg, getLastMsg(t)),
 	  identical(1L, grep("as_cholmod_sparse", getLastMsg(t2))))
 
 
-cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
+cat('Time elapsed: ', proc.time(),'\n') # "stats"
 
 if(!interactive()) warnings()
