@@ -22,6 +22,9 @@ SHLIB = $(pkg)$(SHLIB_EXT)
 SUBDIRS = SPQR CHOLMOD COLAMD AMD
 SUBLIBS = $(SUBDIRS:=.a)
 
+## Link with g++ on Windows
+DLL_LDMAIN=$(CXX)
+
 $(SHLIB): $(OBJECTS) $(SUBLIBS)
 ifdef build_under_Windows
 	$(DLL) --shared -s -o $@ $(OBJECTS) $(SUBLIBS) $(DLLLIBS)
