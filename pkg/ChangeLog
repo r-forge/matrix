@@ -1,3 +1,8 @@
+2008-10-14  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Makefile, src/*/Makefile: changes from Brian Ripley enabling
+	parallel make.
+
 2008-10-03  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/Csparse.c (isValid_Csparse): new utility
