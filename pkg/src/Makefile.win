@@ -4,8 +4,9 @@ include Win.mk
 #       |-> gnuwin32/MkRules
 
 CPPFLAGS=$(PKG_CPPFLAGS) -I$(RHOME)/include
-CFLAGS=$(CPPFLAGS) $(DEBUGFLAG) -O2 $(PKG_CFLAGS)
-CXXFLAGS=$(CPPFLAGS) $(DEBUGFLAG) -O2 $(PKG_CXXFLAGS)
+SHLIB_EXT = .dll
+SHLIB_CXXLD = g++ --shared
+SHLIB_LINK = $(SHLIB_LD) $(SHLIB_LDFLAGS) $(LDFLAGS)
 
 ## Use this to
 build_under_Windows = true

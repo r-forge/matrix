@@ -73,7 +73,7 @@ mostlyclean: clean
 
 clean:
 	@-rm -rf .libs _libs $(LIB)
-	@-rm -f $(OBJS) 
+	@-rm -f $(OBJ) 
 
 C = $(CXX) $(ALL_CPPFLAGS) $(ALL_CXXFLAGS) $(SPQR_CONFIG)
 
