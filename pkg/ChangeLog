@@ -1,3 +1,8 @@
+2008-10-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Makevars, src/Makevars.win: replacing
+	* src/Makefile, src/Makefile.win which are no longer needed
+
 2008-10-14  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/Makefile, src/*/Makefile: changes from Brian Ripley enabling
@@ -13,6 +18,16 @@
 
 	* R/sparseMatrix.R (printSpMatrix2): another validObject(.) call
 	* src/Makefile: getting rid of SUBSTAMP etc, thanks to Simon U.
+
+2008-10-01  Douglas Bates <bates@stat.wisc.edu>
+
+	* src/Makefile:
+	* src/SPQR/*  add "SPQR", from Tim Davis' "SuiteSparse" collection,
+	not yet with an R interface.
+
+2008-09-25  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* Release 0.999375-15 to CRAN.
 
 2008-09-23  Martin Maechler  <maechler@stat.math.ethz.ch>
 
