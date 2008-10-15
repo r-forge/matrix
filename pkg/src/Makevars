@@ -1,34 +1,19 @@
-#
-pkg = Matrix
+# -*- Makefile -*-
 
-PKG_CFLAGS = -I./UFconfig
+PKG_CPPFLAGS = -I./UFconfig
 ## we use the BLAS and the LAPACK library:
 PKG_LIBS = $(SUBLIBS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
 
-ifdef build_under_Windows
-  ALL_LIBS = $(PKG_LIBS) -lR
-  PKG_HOME = $(shell $(RHOME)/src/gnuwin32/Rpwd.exe .)
-  MkInclude = $(PKG_HOME)/Win.mk
-else
-  MkInclude = $(R_HOME)/etc${R_ARCH}/Makeconf
-endif
+MkInclude = $(R_HOME)/etc${R_ARCH}/Makeconf
 
 include SOURCES_C.mkf
 
 OBJECTS = $(SOURCES_C:.c=.o)
-SHLIB = $(pkg)$(SHLIB_EXT)
 SUBDIRS = SPQR CHOLMOD COLAMD AMD
 SUBLIBS = $(SUBDIRS:=.a)
 
-## Link with C++
-SHLIB_LD  = $(SHLIB_CXXLD)
-
-$(SHLIB): sublibs $(OBJECTS)
-	$(SHLIB_LINK) -o $@ $(OBJECTS) $(ALL_LIBS)
-
-all: $(SHLIB)
-
-mostlyclean: clean
+## We have to clean here, to clean up between architectures
+all: clean sublibs $(SHLIB)
 
 sublibs:
 	@for d in $(SUBDIRS); do \
