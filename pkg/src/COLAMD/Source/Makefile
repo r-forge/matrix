@@ -7,7 +7,7 @@ LIB = ../../COLAMD.a
 lib: $(LIB)
 
 colamd_l.o: colamd.c
-	$(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -I../Include -DDLONG -c $< -o $@
+	$(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -I../Include -DDLONG -c colamd.c -o $@
 
 $(LIB): colamd_global.o colamd.o colamd_l.o
 	$(AR) -rucs $(LIB) colamd_global.o colamd.o colamd_l.o

@@ -78,121 +78,121 @@ clean:
 C = $(CXX) $(ALL_CPPFLAGS) $(ALL_CXXFLAGS) $(SPQR_CONFIG)
 
 spqr_1colamd.o: ../Source/spqr_1colamd.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_1colamd.cpp
 
 spqr_1factor.o: ../Source/spqr_1factor.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_1factor.cpp
 
 spqr_1fixed.o: ../Source/spqr_1fixed.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_1fixed.cpp
 
 spqr_analyze.o: ../Source/spqr_analyze.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_analyze.cpp
 
 spqr_parallel.o: ../Source/spqr_parallel.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_parallel.cpp
 
 spqr_kernel.o: ../Source/spqr_kernel.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_kernel.cpp
 
 spqr_append.o: ../Source/spqr_append.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_append.cpp
 
 spqr_assemble.o: ../Source/spqr_assemble.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_assemble.cpp
 
 spqr_cpack.o: ../Source/spqr_cpack.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_cpack.cpp
 
 spqr_csize.o: ../Source/spqr_csize.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_csize.cpp
 
 spqr_cumsum.o: ../Source/spqr_cumsum.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_cumsum.cpp
 
 spqr_debug.o: ../Source/spqr_debug.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_debug.cpp
 
 spqr_factorize.o: ../Source/spqr_factorize.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_factorize.cpp
 
 spqr_fcsize.o: ../Source/spqr_fcsize.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_fcsize.cpp
 
 spqr_freefac.o: ../Source/spqr_freefac.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_freefac.cpp
 
 spqr_freenum.o: ../Source/spqr_freenum.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_freenum.cpp
 
 spqr_freesym.o: ../Source/spqr_freesym.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_freesym.cpp
 
 spqr_fsize.o: ../Source/spqr_fsize.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_fsize.cpp
 
 spqr_happly.o: ../Source/spqr_happly.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_happly.cpp
 
 spqr_panel.o: ../Source/spqr_panel.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_panel.cpp
 
 spqr_happly_work.o: ../Source/spqr_happly_work.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_happly_work.cpp
 
 spqr_hpinv.o: ../Source/spqr_hpinv.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_hpinv.cpp
 
 spqr_larftb.o: ../Source/spqr_larftb.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_larftb.cpp
 
 spqr_rconvert.o: ../Source/spqr_rconvert.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_rconvert.cpp
 
 spqr_rcount.o: ../Source/spqr_rcount.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_rcount.cpp
 
 spqr_rhpack.o: ../Source/spqr_rhpack.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_rhpack.cpp
 
 spqr_rsolve.o: ../Source/spqr_rsolve.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_rsolve.cpp
 
 spqr_shift.o: ../Source/spqr_shift.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_shift.cpp
 
 spqr_stranspose1.o: ../Source/spqr_stranspose1.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_stranspose1.cpp
 
 spqr_stranspose2.o: ../Source/spqr_stranspose2.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_stranspose2.cpp
 
 spqr_trapezoidal.o: ../Source/spqr_trapezoidal.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_trapezoidal.cpp
 
 spqr_type.o: ../Source/spqr_type.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_type.cpp
 
 spqr_front.o: ../Source/spqr_front.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_front.cpp
 
 SuiteSparseQR_expert.o: ../Source/SuiteSparseQR_expert.cpp
-	$(C) -c $<
+	$(C) -c ../Source/SuiteSparseQR_expert.cpp
 
 spqr_maxcolnorm.o: ../Source/spqr_maxcolnorm.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_maxcolnorm.cpp
 
 SuiteSparseQR_qmult.o: ../Source/SuiteSparseQR_qmult.cpp
-	$(C) -c $<
+	$(C) -c ../Source/SuiteSparseQR_qmult.cpp
 
 SuiteSparseQR.o: ../Source/SuiteSparseQR.cpp
-	$(C) -c $<
+	$(C) -c ../Source/SuiteSparseQR.cpp
 
 spqr_tol.o: ../Source/spqr_tol.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_tol.cpp
 
 SuiteSparseQR_C.o: ../Source/SuiteSparseQR_C.cpp
-	$(C) -c $<
+	$(C) -c ../Source/SuiteSparseQR_C.cpp
 
 spqr_rmap.o: ../Source/spqr_rmap.cpp
-	$(C) -c $<
+	$(C) -c ../Source/spqr_rmap.cpp
