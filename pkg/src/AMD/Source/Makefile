@@ -26,9 +26,9 @@ $(LIB): amd_global.o $(AMDI) $(AMDL)
 
 amd_global.o: amd_global.c $(INC)
 amd_i_%.o: amd_%.c $(INC)
-	$(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -I../Include -DDINT -c amd_%.c -o $@
+	$(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -I../Include -DDINT -c $< -o $@
 amd_l_%.o: amd_%.c $(INC)
-	$(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -I../Include -DDLONG -c amd_%.c -o $@
+	$(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -I../Include -DDLONG -c $< -o $@
 
 mostlyclean: clean
 
