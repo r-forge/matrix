@@ -1,5 +1,6 @@
 .Rhistory
 assign_hidden.R
+.*\.patch
 wrld_1deg
 misc/
 doc/unused
