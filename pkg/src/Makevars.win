@@ -6,9 +6,9 @@ PKG_CFLAGS = -I./UFconfig
 PKG_LIBS = $(SUBLIBS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
 
 PKG_HOME = $(shell $(RHOME)/src/gnuwin32/Rpwd.exe .)
-MkInclude = $(PKG_HOME)/Win.mk
+MkInclude = $(PKG_HOME)/scripts/Win.mk
 
-include SOURCES_C.mkf
+include scripts/SOURCES_C.mkf
 
 OBJECTS = $(SOURCES_C:.c=.o)
 DEPS = $(SOURCES_C:.c=.d)

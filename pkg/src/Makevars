@@ -6,7 +6,7 @@ PKG_LIBS = $(SUBLIBS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
 
 MkInclude = $(R_HOME)/etc${R_ARCH}/Makeconf
 
-include SOURCES_C.mkf
+include scripts/SOURCES_C.mkf
 
 OBJECTS = $(SOURCES_C:.c=.o)
 SUBDIRS = SPQR CHOLMOD COLAMD AMD
@@ -27,4 +27,4 @@ clean:
 	  (cd $${d} && MkInclude="$(MkInclude)" $(MAKE) clean) || exit 1; \
 	done
 
-include DEPS.mkf
+include scripts/DEPS.mkf
