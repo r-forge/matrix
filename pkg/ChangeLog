@@ -2,7 +2,8 @@
 
 	* src/scripts/ : move *.sh, *.mkf and *.mk files from src/ to src/scripts/
 
-	* src/*/{Lib|Source}/Makefile: change to non-GNU-make style
+	* src/*/{Lib|Source}/Makefile: change to non-GNU-make style, and
+	other improvements from Brian Ripley.
 
 2008-10-15  Martin Maechler  <maechler@stat.math.ethz.ch>
 

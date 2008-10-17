@@ -1,7 +1,6 @@
 include $(MkInclude)
 
-PKG_CFLAGS = -I../Include -I../../UFconfig
-
+PKG_CPPFLAGS = -I../Include -I../../UFconfig
 
 # GNU make :
 # AMD = amd_aat amd_1 amd_2 amd_postorder amd_post_tree amd_defaults \

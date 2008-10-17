@@ -1,7 +1,11 @@
-## Note: This is included from ./Makefile.win , but also
-## ----  as 'MkInclude' from several */Makefile s
+# -*- Makefile -*-
+## Note: This is included as 'MkInclude' from several */Makefile s
+
 include $(RHOME)/src/gnuwin32/MkRules
-CFLAGS=$(PKG_CFLAGS) -O3
-ALL_CFLAGS=$(PKG_CFLAGS) -O3
-CXXFLAGS=$(PKG_CXXFLAGS) -O2 
-ALL_CXXFLAGS=$(PKG_CXXFLAGS) -O2
+
+# COLAMD/Source/Makefile uses the .c.o rule for which we need
+CFLAGS=$(PKG_CPPFLAGS) -O3
+# other Makefiles use these explicitly
+ALL_CPPFLAGS=$(PKG_CPPFLAGS)
+ALL_CFLAGS=-O3
+ALL_CXXFLAGS=-O3

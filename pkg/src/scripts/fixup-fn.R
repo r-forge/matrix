@@ -12,26 +12,29 @@
 
 ## was applied to src/CHOLMOD/Lib/Makefile
 ## and            src/SPQR/Lib/Makefile
-## to 'POSIXify' them, 
+## to 'POSIXify' them,
 fixup <- function(file="Makefile")
 {
-     file.copy(file, paste(file, "orig", sep="."))
-     orig <- readLines(file)
-     current <- ""
-     for(i in seq_along(orig)) {
-         if (length(grep(".o: ", orig[i], fixed = TRUE))) {
-             print(orig[i])
-             current <- sub("[^ ]* (.*)", "\\1", orig[i])
-             current <- strsplit(current, " ")[[1]][1]
-         } else if (length(grep("$<", orig[i], fixed = TRUE))) {
-             orig[i] <- sub("$<", current, orig[i], fixed = TRUE)
+    file.copy(file, paste(file, "orig", sep="."))
+    orig <- readLines(file)
+    current <- ""
+    for(i in seq_along(orig)) {
+	if (length(grep(".o: ", orig[i], fixed = TRUE))) {
+	    print(orig[i]) # "verbose info"
+	    current <- sub("[^ ]* (.*)", "\\1", orig[i])
+	    current <- strsplit(current, " ")[[1]][1]
+	} else if (length(grep("$<", orig[i], fixed = TRUE))) {
+            ## use last line's current :
+	    orig[i] <- sub("$<", current, orig[i], fixed = TRUE)
+	} else if (length(grep("^PKG_CFLAGS *= *-I", orig[i]))) {
+	    orig[i] <- sub("^PKG_CFLAGS", "PKG_CPPFLAGS", orig[i])
         }
     }
     writeLines(orig, file)
 }
 
-## and I hand edited src/AMD/Source/Makefile and
-## src/CHOLMOD/Lib/Makefile.  If I did it right those changes are attached as
+## and I hand edited ../AMD/Source/Makefile and
+## ../CHOLMOD/Lib/Makefile.  If I did it right those changes are attached as
 ## Matrix.patch2.  Hopefully such a script makes future maintenance easy.
 
 ## MM: Try to apply it to all 4 Makefiles  and only use a patch file for
