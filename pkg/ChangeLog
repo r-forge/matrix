@@ -1,3 +1,7 @@
+2008-10-17  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Mutils.h: include <alloca.h> also for AIX
+
 2008-10-16  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/scripts/ : move *.sh, *.mkf and *.mk files from src/ to src/scripts/
