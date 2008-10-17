@@ -1,6 +1,6 @@
 include $(MkInclude)
 
-PKG_CFLAGS = -I../Include -I../../UFconfig
+PKG_CPPFLAGS = -I../Include -I../../UFconfig
 
 LIB = ../../COLAMD.a
 
@@ -16,4 +16,4 @@ mostlyclean: clean
 
 clean:
 	@-rm -rf .libs _libs $(LIB)
-	@-rm -f *.o 
+	@-rm -f *.o

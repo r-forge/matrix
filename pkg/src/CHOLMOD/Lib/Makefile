@@ -5,7 +5,7 @@ include ${MkInclude}
 
 default: lib
 
-PKG_CFLAGS = -I../../AMD/Include -I../../AMD/Source \
+PKG_CPPFLAGS = -I../../AMD/Include -I../../AMD/Source \
         -I../../COLAMD/Include \
 	-I../Include -I../../UFconfig -DNPARTITION
 #	 -I../../CCOLAMD \
@@ -107,7 +107,7 @@ mostlyclean: clean
 
 clean:
 	@-rm -rf .libs _libs $(LIB)
-	@-rm -f $(OBJS) 
+	@-rm -f $(OBJS)
 
 $(OBJ): $(INC)
 

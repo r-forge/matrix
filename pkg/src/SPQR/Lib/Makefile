@@ -6,9 +6,8 @@ include ${MkInclude}
 
 default: lib
 
-PKG_CFLAGS = -I../../UFconfig -I../../CHOLMOD/Include -I../Include -DNPARTITION
-
-PKG_CXXFLAGS = $(PKG_CFLAGS)
+## C preprocessor: For C and C++ :
+PKG_CPPFLAGS = -I../../UFconfig -I../../CHOLMOD/Include -I../Include -DNPARTITION
 
 # no statement coverage, high optimization
 # CFLAGS = -O3 \
@@ -73,7 +72,7 @@ mostlyclean: clean
 
 clean:
 	@-rm -rf .libs _libs $(LIB)
-	@-rm -f $(OBJ) 
+	@-rm -f $(OBJ)
 
 C = $(CXX) $(ALL_CPPFLAGS) $(ALL_CXXFLAGS) $(SPQR_CONFIG)
 
