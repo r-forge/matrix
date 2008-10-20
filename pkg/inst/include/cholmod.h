@@ -4,6 +4,10 @@
 #include <stddef.h>
 #include <limits.h>
 
+#ifdef	__cplusplus
+extern "C" {
+#endif
+
 #define UF_long long
 #define UF_long_max LONG_MAX
 #define UF_long_id "%ld"
@@ -864,5 +868,9 @@ CHM_TR M_cholmod_allocate_triplet (size_t nrow, size_t ncol, size_t nzmax,
 #define CHOLMOD_SYM 3		/* A = diag(s)*A*diag(s) */
 
 int M_cholmod_scale(CHM_DN S, int scale, CHM_SP A, CHM_CM Common);
+
+#ifdef	__cplusplus
+}
+#endif
 
 #endif  /* MATRIX_CHOLMOD_H */
