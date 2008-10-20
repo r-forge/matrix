@@ -3,6 +3,10 @@
 #include <R_ext/Rdynload.h>
 #include "cholmod.h"
 
+#ifdef	__cplusplus
+extern "C" {
+#endif
+
 #ifdef HAVE_VISIBILITY_ATTRIBUTE
 # define attribute_hidden __attribute__ ((visibility ("hidden")))
 #else
@@ -571,3 +575,7 @@ M_cholmod_scale(CHM_DN S, int scale, CHM_SP A,
 	    R_GetCCallable("Matrix", "cholmod_l_scale");
     return fun(S, scale, A, Common);
 }
+
+#ifdef	__cplusplus
+}
+#endif
