@@ -69,19 +69,7 @@ SEXP Csparse_validate(SEXP x)
 	    }
     }
     if (!sorted) {
-	CHM_SP chx = (CHM_SP) alloca(sizeof(cholmod_sparse));
-	R_CheckStack();
-	as_cholmod_sparse(chx, x, FALSE, TRUE); /* includes cholmod_l_sort() ! */
-	/* as chx = AS_CHM_SP__(x)  but  ^^^^  sorting x in_place (no copying)*/
-
-	/* Now re-check that row indices are *strictly* increasing
-	 * (and not just increasing) within each column : */
-	for (j = 0; j < ncol; j++) {
-	    for (k = xp[j] + 1; k < xp[j + 1]; k++)
-		if (xi[k] == xi[k - 1])
-		    return mkString(_("slot i is not *strictly* increasing inside a column (even after cholmod_l_sort)"));
-	}
-
+	return mkString(_("row indices are not sorted within columns"));
     } else if(!strictly) {  /* sorted, but not strictly */
 	return mkString(_("slot i is not *strictly* increasing inside a column"));
     }
