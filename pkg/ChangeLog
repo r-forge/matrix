@@ -1,3 +1,10 @@
+2008-10-26  Douglas Bates <bates@stat.wisc.edu>
+
+	* src/Csparse.c (Csparse_validate): do not sort, but report error
+	on unsorted row-indices within column.
+
+	* tests/validObj.R: adapt the regression test.
+
 2008-10-17  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r2300] inst/include/Matrix_stubs.c: Consistency with SparseSuite names
@@ -39,7 +46,7 @@
 	  src/Win.mk: Modifications for compilation under Windows
 	* [r2283] tests/validObj.R: remove reference to undefined object
 	* [r2282] inst/doc/UFsparse/SPQR.txt: SPQR license information
-	
+
 2008-10-04  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r2281] src/Makefile, src/chm_common.c, src/chm_common.h,
@@ -50,7 +57,7 @@
 	* src/Csparse.c (isValid_Csparse): new utility
 	* src/chm_common.c (as_cholmod_sparse): add validity check early
 	* tests/validObj.R: test the above
-	
+
 2008-10-02  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r2277] TODO: Think of a better way of structuring include files
