@@ -1,3 +1,21 @@
+2008-12-10  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r2309] DESCRIPTION: Release 0.99375-17
+
+2008-12-05  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r2308] inst/include/Matrix_stubs.c, inst/include/cholmod.h: Adding
+	  const for picky compilers; Using CHM_FR typedef
+
+2008-11-17  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* [r2307] ChangeLog, tests/validObj.R: update (as of Oct.26)
+
+2008-10-31  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r2306] inst/include/Matrix_stubs.c: Consistency with cholmod.h re
+	  const qualifier
+
 2008-10-26  Douglas Bates <bates@stat.wisc.edu>
 
 	* src/Csparse.c (Csparse_validate): do not sort, but report error
