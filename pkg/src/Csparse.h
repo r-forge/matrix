@@ -25,7 +25,9 @@ SEXP Csparse_to_dense(SEXP x);
 SEXP Csparse_to_nz_pattern(SEXP x, SEXP tri);
 SEXP Csparse_to_matrix(SEXP x);
 SEXP Csparse_transpose(SEXP x, SEXP tri);
-SEXP Csparse_validate(SEXP x);
+SEXP Csparse_validate (SEXP x);
+SEXP Csparse_validate2(SEXP x, SEXP maybe_modify);
+SEXP Csparse_validate_(SEXP x, Rboolean maybe_modify);
 SEXP Csparse_vertcat(SEXP x, SEXP y);
 
 SEXP Rsparse_validate(SEXP x);

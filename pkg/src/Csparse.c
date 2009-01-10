@@ -32,7 +32,15 @@ Rboolean isValid_Csparse(SEXP x)
     return TRUE;
 }
 
-SEXP Csparse_validate(SEXP x)
+SEXP Csparse_validate(SEXP x) {
+    return Csparse_validate_(x, FALSE);
+}
+
+SEXP Csparse_validate2(SEXP x, SEXP maybe_modify) {
+    return Csparse_validate_(x, asLogical(maybe_modify));
+}
+
+SEXP Csparse_validate_(SEXP x, Rboolean maybe_modify)
 {
     /* NB: we do *NOT* check a potential 'x' slot here, at all */
     SEXP pslot = GET_SLOT(x, Matrix_pSym),
@@ -69,7 +77,22 @@ SEXP Csparse_validate(SEXP x)
 	    }
     }
     if (!sorted) {
-	return mkString(_("row indices are not sorted within columns"));
+	if(maybe_modify) {
+	    CHM_SP chx = (CHM_SP) alloca(sizeof(cholmod_sparse));
+	    R_CheckStack();
+	    as_cholmod_sparse(chx, x, FALSE, TRUE);/*-> cholmod_l_sort() ! */
+	    /* as chx = AS_CHM_SP__(x)  but  ^^^^ sorting x in_place !!! */
+
+	    /* Now re-check that row indices are *strictly* increasing
+	     * (and not just increasing) within each column : */
+	    for (j = 0; j < ncol; j++) {
+		for (k = xp[j] + 1; k < xp[j + 1]; k++)
+		    if (xi[k] == xi[k - 1])
+			return mkString(_("slot i is not *strictly* increasing inside a column (even after cholmod_l_sort)"));
+	    }
+	} else { /* no modifying sorting : */
+	    return mkString(_("row indices are not sorted within columns"));
+	}
     } else if(!strictly) {  /* sorted, but not strictly */
 	return mkString(_("slot i is not *strictly* increasing inside a column"));
     }
