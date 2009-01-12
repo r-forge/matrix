@@ -1,3 +1,8 @@
+2009-01-12  Douglas Bates <bates@stat.wisc.edu>
+
+	* [r2313] R/sparseMatrix.R, man/sparseMatrix.rd: Use intermediate
+	triplet rep in sparseMatrix.
+
 2009-01-07  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/sparseMatrix.R (sparseMatrix): new function to be used in
