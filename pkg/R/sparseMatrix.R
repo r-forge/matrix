@@ -79,6 +79,42 @@ sparseMatrix <- function(i, j, p, x, dims, dimnames, index0 = FALSE)
     r
 }
 
+sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames, index0 = FALSE)
+{
+  ## Purpose: user-level substitute for most  new(<sparseMatrix>, ..) calls
+  ## Author: Douglas Bates, Date: 12 Jan 2009, based on Martin's version
+    if((m.i <- missing(i)) + (m.j <- missing(j)) + (m.p <- missing(p)) != 1)
+        stop("exactly one of 'i', 'j', or 'p' must be missing from call")
+    if(!m.p) {
+        p <- as.integer(p)
+        if((lp <- length(p)) < 1 || p[1] != 0 || any((dp <- p[-1] - p[-lp]) < 0))
+            stop("'p' must be a non-decreasing vector (0, ...)")
+        ep <- rep.int(seq_along(dp), dp)
+    }
+    ## i and j are now both defined.  Make them 1-based indices.
+    i0 <- as.logical(index0)[1]
+    i <- as.integer(i + (!m.i && i0))
+    j <- as.integer(j + (!m.j && i0))    
+
+    ## "minimal dimensions" from (i,j,p) :
+    dims.min <- c(max(i), max(j))
+    if(any(is.na(dims.min))) stop("NA's in (i,j) are not allowed")
+    if(missing(dims)) {
+        dims <- dims.min
+    } else { ## check dims
+        stopifnot(all(dims >= dims.min))
+        dims <- as.integer(dims)
+    }
+    isPat <- missing(x) ## <-> patter"n" Matrix
+    kx <- if(isPat) "n" else .M.kind(x)
+    r <- new(paste(kx, "gTMatrix", sep=''))
+    r@Dim <- dims
+    if(!isPat) r@x <- if(kx == "d" && !is.double(x)) as.double(x) else x
+    r@i <- i - 1L
+    r@j <- j - 1L
+    validObject(r)
+    as(r, "CsparseMatrix")
+}
 
 ## "graph" coercions -- this needs the graph package which is currently
 ##  -----               *not* required on purpose
