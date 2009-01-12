@@ -1,0 +1,95 @@
+\name{sparseMatrix}
+\alias{sparseMatrix}
+\title{General Sparse Matrix Constructor}
+\description{
+  User friendly construction of a compressed, column-oriented, sparse
+  matrix, inheriting from class \code{\linkS4class{TsparseMatrix}}.
+}
+\usage{
+sparseMatrix(i = ep, j = ep, p, x, dims, dimnames, index0 = FALSE)
+}
+\arguments{
+  \item{i,j}{integer vectors of the same length specifying the locations
+    of the non-zero (or non-\code{TRUE}) entries of the matrix.}
+  \item{p}{integer vector of column or row pointers. Exactly one of
+    \code{i}, \code{j} or \code{p} must be missing.}
+  \item{x}{optional atomic vector of the same length as \code{i} and
+    \code{j}, specifying the values of the non-zero entries.}
+  \item{dims}{optional, non-negative, integer, dimensions vector of
+    length 2.  Defaults to \code{c(max(i), max(j))}.}
+  \item{dimnames}{optional list of dimnames.}
+  \item{index0}{logical scalar.  If \code{FALSE}, the default, the index
+    vectors \code{i} and/or \code{j} are 1-based, as is the convention
+    in R.  That is, counting of rows and columns starts at 1.  If
+    \code{TRUE} the index vectors are 0-based so counting of rows and
+    columns starts at 0.}
+}
+\value{
+  A sparse matrix in compressed, column-oriented form, as an \R object
+  inheriting from both \code{\linkS4class{CsparseMatrix}} and
+  \code{\linkS4class{generalMatrix}}.
+}
+\details{
+  Exactly one of the arguments \code{i}, \code{j} and \code{p} must be
+  missing.
+
+  In typical usage, \code{p} is missing, \code{i} and \code{j} are
+  vectors of positive integers and \code{x} is a numeric vector.  These
+  three vectors, which must have the same length, form the triplet
+  representation of the sparse matrix.
+
+  If \code{i} or \code{j} is missing then \code{p} must be a
+  non-decreasing integer vector whose first element is zero.  It
+  provides the compressed, or \dQuote{pointer} representation of the row
+  or column indices, whichever is missing.  The expanded form of \code{p},
+  \code{rep(seq_along(dp),dp)} where \code{dp <- diff(p)}, is used as
+  the (1-based) row or column indices.
+
+  The values of \code{i}, code{j}, code{p} and \code{index0} are used to
+  create 1-based index vectors \code{i} and \code{j} from which a
+  \code{\linkS4class{TsparseMatrix}} is constructed, with numerical
+  values given by \code{x}, if non-missing.  The
+  \code{\linkS4class{CsparseMatrix}} derived from this triplet form is
+  returned. 
+  
+  The reason for returning a \code{\linkS4class{CsparseMatrix}} object
+  instead of the triplet format is that the compressed column form is
+  easier to work with when performing matrix operations.  In particular,
+  if there are no zeros in \code{x} then a
+  \code{\linkS4class{CsparseMatrix}} is a unique representation of the 
+  sparse matrix.
+}
+\seealso{\code{\link{Matrix}(*, sparse=TRUE)} for the more usual
+  constructor of such matrices; further \code{\link{bdiag}} and
+  \code{\link{Diagonal}} for (block-)diagonal matrix constructors.
+
+  Consider \code{\linkS4class{CsparseMatrix}} and similar class
+  definition help files.
+}
+\examples{
+## simple example
+i <- c(1,3:8); j <- c(2,9,6:10); x <- 7 * (1:7)
+(A <- sparseMatrix(i, j, x = x))
+summary(A)
+str(A) # note that *internally* 0-based row indices are used
+
+## dims can be larger than the maximum row or column indices
+(AA <- sparseMatrix(c(1,3:8), c(2,9,6:10), x = 7 * (1:7), dims = c(10,20)))
+summary(AA)
+
+## i, j and x can be in an arbitrary order, as long as they are consistent
+set.seed(1); (perm <- sample(1:7))
+(A1 <- sparseMatrix(i[perm], j[perm], x = x[perm]))
+all.equal(A, A1)
+
+## the (i,j) pairs can be repeated, in which case the x's are summed
+(args <- data.frame(i = c(i, 1), j = c(j, 2), x = c(x, 2)))
+(Aa <- do.call(sparseMatrix, args))
+
+## pointer vectors can be used, for example in converting from other
+## sparse matrix representations.
+# library(SparseM)
+# example(SparseM.hb)
+# XX <- sparseMatrix(j = X@ja, p = X@ia - 1L, x = X@ra, dims = X@dimension)
+}
+\keyword{array}
