@@ -1,28 +1,44 @@
 \name{sparseMatrix}
+\Rdversion{1.1}
 \alias{sparseMatrix}
-\title{General Sparse Matrix Constructor}
+\title{General Sparse Matrix Construction from Nonzero Entries}
 \description{
   User friendly construction of a compressed, column-oriented, sparse
-  matrix, inheriting from class \code{\linkS4class{TsparseMatrix}}.
+  matrix, inheriting from \code{\link{class}}
+  \code{\linkS4class{CsparseMatrix}}, locations (and values) of its
+  nonzero entries.
+
+  This is the recommended user interface rather than direct
+  \code{\link{new}("***Matrix", ....)} calls.
 }
 \usage{
 sparseMatrix(i = ep, j = ep, p, x, dims, dimnames, index0 = FALSE)
 }
 \arguments{
   \item{i,j}{integer vectors of the same length specifying the locations
-    of the non-zero (or non-\code{TRUE}) entries of the matrix.}
-  \item{p}{integer vector of column or row pointers. Exactly one of
-    \code{i}, \code{j} or \code{p} must be missing.}
-  \item{x}{optional atomic vector of the same length as \code{i} and
-    \code{j}, specifying the values of the non-zero entries.}
+    (row and column indices) of the non-zero (or non-\code{TRUE})
+    entries of the matrix.}
+  \item{p}{numeric (integer valued) vector of pointers, one for each
+    column (or row), to the initial (zero-based) index of elements in the
+    column (or row).  Exactly one of \code{i}, \code{j} or \code{p} must
+    be missing.}
+
+  \item{x}{
+    optional values of the matrix entries.  If specified, must be of
+    the same length as \code{i} / \code{j}, or of
+    length one where it will be recycled to full length.  If missing,
+    the resulting matrix will be a 0/1 patter\bold{n} matrix, i.e.,
+    extending class \code{\linkS4class{nsparseMatrix}}.
+  }
   \item{dims}{optional, non-negative, integer, dimensions vector of
     length 2.  Defaults to \code{c(max(i), max(j))}.}
-  \item{dimnames}{optional list of dimnames.}
+  \item{dimnames}{optional list of \code{\link{dimnames}}; if not
+    specified, none, i.e., \code{\link{NULL}} ones, are used.}
   \item{index0}{logical scalar.  If \code{FALSE}, the default, the index
     vectors \code{i} and/or \code{j} are 1-based, as is the convention
-    in R.  That is, counting of rows and columns starts at 1.  If
+    in \R.  That is, counting of rows and columns starts at 1.  If
     \code{TRUE} the index vectors are 0-based so counting of rows and
-    columns starts at 0.}
+    columns starts at 0; this corresponds to the internal representation.}
 }
 \value{
   A sparse matrix in compressed, column-oriented form, as an \R object
@@ -50,13 +66,13 @@ sparseMatrix(i = ep, j = ep, p, x, dims, dimnames, index0 = FALSE)
   \code{\linkS4class{TsparseMatrix}} is constructed, with numerical
   values given by \code{x}, if non-missing.  The
   \code{\linkS4class{CsparseMatrix}} derived from this triplet form is
-  returned. 
-  
+  returned.
+
   The reason for returning a \code{\linkS4class{CsparseMatrix}} object
   instead of the triplet format is that the compressed column form is
   easier to work with when performing matrix operations.  In particular,
   if there are no zeros in \code{x} then a
-  \code{\linkS4class{CsparseMatrix}} is a unique representation of the 
+  \code{\linkS4class{CsparseMatrix}} is a unique representation of the
   sparse matrix.
 }
 \seealso{\code{\link{Matrix}(*, sparse=TRUE)} for the more usual
@@ -80,16 +96,32 @@ summary(AA)
 ## i, j and x can be in an arbitrary order, as long as they are consistent
 set.seed(1); (perm <- sample(1:7))
 (A1 <- sparseMatrix(i[perm], j[perm], x = x[perm]))
-all.equal(A, A1)
+stopifnot(identical(A, A1))
 
 ## the (i,j) pairs can be repeated, in which case the x's are summed
 (args <- data.frame(i = c(i, 1), j = c(j, 2), x = c(x, 2)))
 (Aa <- do.call(sparseMatrix, args))
 
-## pointer vectors can be used, for example in converting from other
-## sparse matrix representations.
-# library(SparseM)
-# example(SparseM.hb)
-# XX <- sparseMatrix(j = X@ja, p = X@ia - 1L, x = X@ra, dims = X@dimension)
-}
+## pointer vectors can be used, and the (i,x) slots are sorted if necessary:
+m <- sparseMatrix(i = c(3, 1, 3:2, 2:1), p= c(0:2, 4,4,6), x = 1:6)
+m
+str(m)
+
+## no 'x' --> patter*n* matrix:
+(n <- sparseMatrix(i=1:6, j=rev(2:7)))# -> ngTMatrix
+
+## pointers example in converting from other sparse matrix representations.
+if(require(SparseM)) {
+  X <- model.matrix(read.matrix.hb(system.file("data", "rua_32_ax.rua",
+					       package = "SparseM")))
+  XX <- sparseMatrix(j = X@ja, p = X@ia - 1L, x = X@ra, dims = X@dimension)
+  validObject(XX)
+
+  ## Alternatively, and even more user friendly :
+  X. <- as(X, "Matrix")  # or also
+  X2 <- as(X, "sparseMatrix")
+  stopifnot(identical(XX, X.), identical(X., X2))
+}% if
+}% example
 \keyword{array}
+
