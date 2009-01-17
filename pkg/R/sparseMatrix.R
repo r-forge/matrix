@@ -79,7 +79,7 @@ sparseMatrix <- function(i, j, p, x, dims, dimnames, index0 = FALSE)
     r
 }
 
-sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames, index0 = FALSE)
+sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames, index1 = TRUE)
 {
   ## Purpose: user-level substitute for most  new(<sparseMatrix>, ..) calls
   ## Author: Douglas Bates, Date: 12 Jan 2009, based on Martin's version
@@ -92,9 +92,9 @@ sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames, index0 = FALSE)
         ep <- rep.int(seq_along(dp), dp)
     }
     ## i and j are now both defined.  Make them 1-based indices.
-    i0 <- as.logical(index0)[1]
-    i <- as.integer(i + (!m.i && i0))
-    j <- as.integer(j + (!m.j && i0))    
+    i1 <- as.logical(index1)[1]
+    i <- as.integer(i + !(m.i || i1))
+    j <- as.integer(j + !(m.j || i1))
 
     ## "minimal dimensions" from (i,j,p) :
     dims.min <- c(max(i), max(j))
@@ -109,7 +109,15 @@ sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames, index0 = FALSE)
     kx <- if(isPat) "n" else .M.kind(x)
     r <- new(paste(kx, "gTMatrix", sep=''))
     r@Dim <- dims
-    if(!isPat) r@x <- if(kx == "d" && !is.double(x)) as.double(x) else x
+    if(!isPat) {
+	if(kx == "d" && !is.double(x)) x <- as.double(x)
+	if(length(x) != (n <- length(i))) { ## recycle
+	    if(length(x) != 1 && n %% length(x) != 0)
+		warning("length(i) is not a multiple of length(x)")
+	    x <- rep(x, length.out = n)
+	}
+	r@x <- x
+    }
     r@i <- i - 1L
     r@j <- j - 1L
     validObject(r)

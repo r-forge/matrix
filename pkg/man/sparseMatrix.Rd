@@ -12,7 +12,7 @@
   \code{\link{new}("***Matrix", ....)} calls.
 }
 \usage{
-sparseMatrix(i = ep, j = ep, p, x, dims, dimnames, index0 = FALSE)
+sparseMatrix(i = ep, j = ep, p, x, dims, dimnames, index1 = TRUE)
 }
 \arguments{
   \item{i,j}{integer vectors of the same length specifying the locations
@@ -34,10 +34,10 @@ sparseMatrix(i = ep, j = ep, p, x, dims, dimnames, index0 = FALSE)
     length 2.  Defaults to \code{c(max(i), max(j))}.}
   \item{dimnames}{optional list of \code{\link{dimnames}}; if not
     specified, none, i.e., \code{\link{NULL}} ones, are used.}
-  \item{index0}{logical scalar.  If \code{FALSE}, the default, the index
+  \item{index1}{logical scalar.  If \code{TRUE}, the default, the index
     vectors \code{i} and/or \code{j} are 1-based, as is the convention
     in \R.  That is, counting of rows and columns starts at 1.  If
-    \code{TRUE} the index vectors are 0-based so counting of rows and
+    \code{FALSE} the index vectors are 0-based so counting of rows and
     columns starts at 0; this corresponds to the internal representation.}
 }
 \value{
@@ -61,7 +61,7 @@ sparseMatrix(i = ep, j = ep, p, x, dims, dimnames, index0 = FALSE)
   \code{rep(seq_along(dp),dp)} where \code{dp <- diff(p)}, is used as
   the (1-based) row or column indices.
 
-  The values of \code{i}, code{j}, code{p} and \code{index0} are used to
+  The values of \code{i}, code{j}, code{p} and \code{index1} are used to
   create 1-based index vectors \code{i} and \code{j} from which a
   \code{\linkS4class{TsparseMatrix}} is constructed, with numerical
   values given by \code{x}, if non-missing.  The
@@ -106,6 +106,9 @@ stopifnot(identical(A, A1))
 m <- sparseMatrix(i = c(3, 1, 3:2, 2:1), p= c(0:2, 4,4,6), x = 1:6)
 m
 str(m)
+
+sparseMatrix(x = 2.72, i=1:3, j=2:4) # recycling x
+sparseMatrix(x = TRUE, i=1:3, j=2:4) # recycling x, |--> "lgCMatrix"
 
 ## no 'x' --> patter*n* matrix:
 (n <- sparseMatrix(i=1:6, j=rev(2:7)))# -> ngTMatrix
