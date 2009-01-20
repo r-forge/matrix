@@ -1,3 +1,8 @@
+2009-01-20  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* inst/doc/Intro2Matrix.Rnw: mention sparseMatrix
+	* man/sparseMatrix.Rd: fix typos found by parse_Rd
+
 2009-01-19  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version,Date): release 0.999375-18 (as of yesterday)

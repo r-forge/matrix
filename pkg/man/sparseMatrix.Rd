@@ -61,8 +61,8 @@ sparseMatrix(i = ep, j = ep, p, x, dims, dimnames, index1 = TRUE)
   \code{rep(seq_along(dp),dp)} where \code{dp <- diff(p)}, is used as
   the (1-based) row or column indices.
 
-  The values of \code{i}, code{j}, code{p} and \code{index1} are used to
-  create 1-based index vectors \code{i} and \code{j} from which a
+  The values of \code{i}, \code{j}, \code{p} and \code{index1} are used
+  to create 1-based index vectors \code{i} and \code{j} from which a
   \code{\linkS4class{TsparseMatrix}} is constructed, with numerical
   values given by \code{x}, if non-missing.  The
   \code{\linkS4class{CsparseMatrix}} derived from this triplet form is
