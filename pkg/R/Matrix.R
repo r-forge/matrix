@@ -514,6 +514,7 @@ setMethod("[", signature(x = "Matrix", i = "logical", j = "missing",
 
 
 subset.ij <- function(x, ij) {
+    ## x[ ij ]  where ij is (i,j) 2-column matrix
     m <- nrow(ij)
     if(m > 3) {
         cld <- getClassDef(class(x))
@@ -537,18 +538,21 @@ subset.ij <- function(x, ij) {
 		if (x@diag == "U") x <- .Call(Csparse_diagU2N, x)
 		## slightly more efficient than non0.i() or non0ind():
 		ij.x <- .Call(compressed_non_0_ij, x, isC=TRUE)
-	    } else { ## symmetric / general : for symmetric, only "existing"b
+	    } else { ## symmetric / general : for symmetric, only "existing" part
 		ij.x <- non0.i(x, cld)
 	    }
 
-	    mi <- match(.Call(m_encodeInd, ij.x,	  di),
-			.Call(m_encodeInd, ij -1L, di), nomatch=0)
+	    m1 <- .Call(m_encodeInd, ij.x, di)
+            m2 <- .Call(m_encodeInd, ij -1L, di)
+	    mi <- match(m1, m2, nomatch=0)
 	    mmi <- mi != 0
 	    ## Result:
 	    ans <- vector(mode = .type.kind[.M.kindC(cld)], length = m)
 	    ## those that are *not* zero:
 	    ans[mi[mmi]] <-
 		if(extends(cld, "nsparseMatrix")) TRUE else x@x[mmi]
+	    if(any(ina <- is.na(m2))) # has one or two NA in that (i,j) row
+		is.na(ans) <- ina
 	    ans
 
         } else { ## non-sparse : dense
