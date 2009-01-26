@@ -87,6 +87,7 @@ cs *Matrix_as_cs(cs *ans, SEXP x, Rboolean check_Udiag)
 	/* double transpose trick to sort the columns */
 	cs_spfree(I_n);
 	t2 = cs_transpose(tmp, 1); /* transpose including values */
+	cs_spfree(tmp);
 	tmp = cs_transpose(t2, 1);
 	cs_spfree(t2);
 
