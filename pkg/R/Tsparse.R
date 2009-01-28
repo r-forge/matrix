@@ -263,7 +263,8 @@ setMethod("[", signature(x = "TsparseMatrix",
           x.tri <- extends(clx, "triangularMatrix")
 
 	  if(isSym) {
-	      isSym <- length(i) == length(j) && mode(i) == mode(j) && isTRUE(all(i == j))# work for i,j NA
+	      isSym <- (length(i) == length(j) && mode(i) == mode(j) &&
+                        isTRUE(all(i == j)))# work for i,j NA
 	      ## result will *still* be symmetric --> keep symmetry!
 	      gDo <- !isSym ## result no longer symmetric -> to "generalMatrix"
 	  } else if(x.tri) {
