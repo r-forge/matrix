@@ -104,6 +104,9 @@
   \code{\link[base]{qr.resid}}, \code{\link[base]{qr.coef}},
   \code{\link[base]{qr.qty}}, \code{\link[base]{qr.qy}},
   \code{\linkS4class{dgCMatrix}}, \code{\linkS4class{dgeMatrix}}.
+
+  \code{\linkS4class{SPQR}} an alternative QR decomposition resulting
+  from \code{\link{spqr}()}.
 }
 \examples{
 data(KNex); mm <- KNex$mm
