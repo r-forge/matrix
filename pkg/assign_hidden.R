@@ -7,8 +7,10 @@ is0       <- Matrix:::is0
 isN0      <- Matrix:::isN0
 .M.kind   <- Matrix:::.M.kind
 .M.kindC  <- Matrix:::.M.kindC
+.M.shape   <- Matrix:::.M.shape
 .M.DN     <- Matrix:::.M.DN
 ##
+dimCheck  <- Matrix:::dimCheck
 
 isDiagonal   <- Matrix:::isDiagonal
 isTriangular <- Matrix:::isTriangular
