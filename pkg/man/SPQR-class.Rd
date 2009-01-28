@@ -7,7 +7,7 @@
   \code{\link{spqr}}, one kind of sparse QR decompositions.
 
   Currently, \code{\link{qr}(<sparseMatrix>)} is more widely used and
-  provides a different class, \code{\linkS4class{SparseQR}}.
+  provides a different class, \code{\linkS4class{sparseQR}}.
 }
 \section{Slots}{
   \describe{
@@ -32,7 +32,7 @@ Class \code{"\linkS4class{MatrixFactorization}"}, directly.
   \code{\link{spqr}} which produces \code{"SPQR"} classed results.
 
   The (currently much wider used) alternative \code{\link{qr}} which
-  produces \code{\linkS4class{SparseQR}} classed results.
+  produces \code{\linkS4class{sparseQR}} classed results.
 }
 \examples{
 showClass("SPQR")
