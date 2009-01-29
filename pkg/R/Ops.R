@@ -232,8 +232,8 @@ Ops.x.x <- function(e1, e2)
         if(!dens1 && !dens2) {
             ## both e1 _and_ e2 are sparse
             ## should not happen since we have <sparse> o <sparse> methods
-	    stop("Mistaken intended method dispatch -- please report to ",
-		 packageDescription("Matrix")$Maintainer)
+            ## now (new method dispatch, 2009-01, *does* happen :)
+            callGeneric(as(e1, "CsparseMatrix"), as(e2, "CsparseMatrix"))
         }
         ## else
         if(dens1 && !dens2) ## go to dense
