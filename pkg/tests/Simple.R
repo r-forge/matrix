@@ -135,7 +135,8 @@ assert.EQ.mat(D4., diag(x= (1:4)^2))
 assert.EQ.mat(D4p, diag(x= (1:4)) + (1:4))
 assert.EQ.mat(D4m, diag(x=c(4,6,6,4)))
 assert.EQ.mat(Lg1, diag(x= c(FALSE, rep(TRUE,3))))
-stopifnot(is(Lg1, "diagonalMatrix"), is(D4m, "diagonalMatrix"), is(D4., "diagonalMatrix"),
+stopifnot(is(Lg1, "diagonalMatrix"), is(D4m, "diagonalMatrix"),
+	  is(D4., "diagonalMatrix"),
           is(nLg, "symmetricMatrix"), is(nnLg, "symmetricMatrix"),
           identical3(Lg1, Matrix(nnLg), as(nnLg, "diagonalMatrix")),
           all(Lg1 != (!Lg1)))

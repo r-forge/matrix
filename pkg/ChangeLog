@@ -1,5 +1,14 @@
 2009-01-29  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* man/dgTMatrix-class.Rd: remove no-more-existing coercion method;
+	mention a bit less, and note.
+
+	* R/diagMatrix.R: ensure that <diagonal> * <dgeMatrix> is diagonal
+	even with new method dispatch
+
+	* R/Matrix.R (.M.sub.i.logical): change comments only, and extend
+	error message which is never called currently.
+
 	* R/Ops.R (Ops.x.x): fix for new "inherited method" dispatch
 
 2009-01-28  Martin Maechler  <maechler@stat.math.ethz.ch>

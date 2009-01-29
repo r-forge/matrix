@@ -490,7 +490,7 @@ setMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY", drop = "ANY"),
 ##                 and also for   M [ <logical> , ]
 .M.sub.i.logical <- function (x, i, j, ..., drop)
 {
-    nA <- nargs()
+    nA <- nargs() # counts 'M[i]' as 2 arguments,  'M[i,]' as 3
     if(nA == 2) { ##  M [ M >= 7 ]
 	## FIXME: when both 'x' and 'i' are sparse, this can be very inefficient
 	if(is(x, "sparseMatrix"))
@@ -499,8 +499,16 @@ setMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY", drop = "ANY"),
 	if(canCoerce(x, toC)) as(x, toC)@x[as.vector(i)]
 	else as(as(as(x, "generalMatrix"), "denseMatrix"), toC)@x[as.vector(i)]
 	## -> error when lengths don't match
-    } else if(nA == 3) { ##  M [ M[,1, drop=FALSE] >= 7, ]
-	stop("not-yet-implemented 'Matrix' subsetting") ## FIXME
+    }
+    else if(nA == 3) { ## M[i, ]  e.g.,  M [ M[,1, drop=FALSE] >= 7, ]
+
+	## Note: current method dispatch seems not to call this ever
+
+	if(!any(is.na(i)) && all(i)) ## select everything
+	    x
+	else ## not selecting all -> result is *NOT* diagonal/triangular/symmetric/..
+	    ## keep j missing, but  drop = "logical"
+	    callGeneric(as(x,"generalMatrix"), i = i, , drop = TRUE)
 
     } else stop("nargs() = ", nA,
 		".  Extraneous illegal arguments inside '[ .. ]' (i.logical)?")
