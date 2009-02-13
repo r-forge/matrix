@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+pkg=Matrix
+#
+if [ ! -d $pkg ] ; then cd `dirname $0`/.. ; fi
+if [ -d $pkg ]
+then
+  echo '' ; echo -n ' ** DROPPING the SPQR C++ parts .. '
+  perl -pi -e 's{^}{## } if /spqr/i' $pkg/NAMESPACE
+  perl -pi -e 's{^}{%% } if /spqr/i' $pkg/man/sparseQR-class.Rd
+  perl -pi -e 's{define}{undef} if m{^#define Matrix_with_SPQR}' $pkg/src/Mutils.h
+  for f in Makevars Makevars.win
+  do
+      perl -pi -e 's{SPQR }{} if /SPQR/' $pkg/src/$f
+  done
+  for f in R/spqr.R man/spqr.Rd man/SPQR-class.Rd src/SPQR
+  do
+      mv $pkg/$f $pkg/${f}.~notyet~
+  done
+  echo ' [Done]'
+else
+  echo '***'" $0 error: "
+  echo "  '$pkg' \*must\* be a subdirectory of the current directory (= `pwd`)"
+fi
