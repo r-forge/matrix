@@ -1,3 +1,8 @@
+2009-02-13  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Mutils.h (Matrix_with_SPQR): #define (or #undef), in order to
+	allow easy building "SPQR-free version" of Matrix.
+
 2009-02-11  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Csparse.R (replCmat): another check for 'has.x'
