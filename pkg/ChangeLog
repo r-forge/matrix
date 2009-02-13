@@ -1,3 +1,8 @@
+2009-02-11  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Csparse.R (replCmat): another check for 'has.x'
+	* tests/indexing.R: very large (very sparse) sub-indexing.
+
 2009-01-30  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.999375-20
@@ -49,9 +54,8 @@
 
 2009-01-26  Douglas Bates <bates@stat.wisc.edu>
 
-	* [r2324] src/cs_utils.c: Force sorted columns after expanding unit
-	  diagonal in Matrix_as_cs
-	* src/cs_utils.c (Matrix_as_cs): fix needed in diagU2N case
+	* src/cs_utils.c (Matrix_as_cs): in diagU2N case: Force sorted
+	columns after expanding unit diagonal.
 
 2009-01-21  Martin Maechler  <maechler@stat.math.ethz.ch>
 
