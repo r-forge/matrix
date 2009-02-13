@@ -105,6 +105,7 @@
   \code{\link[base]{qr.qty}}, \code{\link[base]{qr.qy}},
   \code{\linkS4class{dgCMatrix}}, \code{\linkS4class{dgeMatrix}}.
 
+%%% not (yet) in CRAN-released version of Matrix:
   \code{\linkS4class{SPQR}} an alternative QR decomposition resulting
   from \code{\link{spqr}()}.
 }
