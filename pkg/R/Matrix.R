@@ -139,7 +139,9 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
     sparseDefault <- function(m) prod(dim(m)) > 2*sum(isN0(as(m, "matrix")))
 
     i.M <- is(data, "Matrix")
-    if(!i.M && inherits(data, "table")) # special treatment
+    if(i.M) {
+	if(is(data, "diagonalMatrix")) return(data) # in all cases
+    } else if(inherits(data, "table")) # special treatment
 	class(data) <- "matrix" # "matrix" first for S4 dispatch
     if(is.null(sparse1 <- sparse) && (i.M || is(data, "matrix")))
 	sparse <- sparseDefault(data)
@@ -195,8 +197,8 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
     if((isTri <- !isSym))
 	isTri <- isTriangular(data)
     isDiag <- isSym # cannot be diagonal if it isn't symmetric
-    if(isDiag)
-	isDiag <- !isTRUE(sparse1) && isDiagonal(data)
+    if(isDiag) # do not *build*  1 x 1 diagonalMatrix
+	isDiag <- !isTRUE(sparse1) && nrow(data) > 1 && isDiagonal(data)
 
     ## try to coerce ``via'' virtual classes
     if(isDiag) { ## diagonal is preferred to sparse !

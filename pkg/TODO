@@ -184,6 +184,9 @@
   People erronously try rbind/cbind see that they don't work and then
   reinvent the wheel!
 
+  --> Consider using the new  'dotMethods' functionality to define
+      cbind() and rbind() versions that work with Matrix.
+
 --------
 
 - Reconsider the linkages in the include files for the SuiteSparse
@@ -193,3 +196,4 @@
   file src/SPQR/Include/SuiteSparseQR_C.h so that it does not expect
   to have src/UFsparse and src/CHOLMOD/Include on the include path.
   Maybe just those two should be added to the include path.
+

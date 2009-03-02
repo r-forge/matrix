@@ -17,9 +17,11 @@ if(interactive()) {
 (m4 <- Matrix(cbind(0,rbind(6*diag(3),0))))
 dm4 <- Matrix(m4, sparse = FALSE)
 class(mN <-  Matrix(NA, 3,4)) # NA *is* logical
+validObject(Matrix(NA))
 bd4 <- bdiag(m4,dm4,m4)
-stopifnot(validObject(d4), validObject(z4), validObject(o4),
-          validObject(m4), validObject(dm4), validObject(mN),
+stopifnot(isValid(o4, "dsyMatrix"),
+          isValid(m4, "dtCMatrix"),
+          validObject(dm4), validObject(mN),
           identical(bdiag(m4), bdiag(dm4)),
           identical(bd4@p, c(0L,0:3,3:6,6:9)),
           identical(bd4@i, c(0:2, 4:6, 8:10)), bd4@x == 6
@@ -36,6 +38,13 @@ stopifnot(isValid(d4, "diagonalMatrix"),   isValid(z4,  "diagonalMatrix"),
           validObject(Matrix(c(NA,0), 4, 3, byrow = TRUE)),
           validObject(Matrix(c(NA,0), 4, 4)),
           isValid(Matrix(c(NA,0,0,0), 4, 4), "sparseMatrix"))
+I <- i1 <- I1 <- Diagonal(1)
+I1[1,1] <- i1[1, ] <- I [ ,1] <- NA
+stopifnot(identical3(I,i1,I1))
+
+I <- Diagonal(3); I[,1] <- NA; I[2,2] <- NA ; I[3,] <- NaN
+stopifnot(isValid(I, "sparseMatrix"))
+I # gave error in printSpMatrix() - because of R bug in format.info()
 
 L <- spMatrix(9, 30, i = rep(1:9, 3), 1:27, (1:27) %% 4 != 1)
 M <- drop0(crossprod(L))

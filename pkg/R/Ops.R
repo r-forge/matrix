@@ -708,6 +708,33 @@ setMethod("Logic", signature(e1="lsparseMatrix", e2="ldenseMatrix"),
 setMethod("Logic", signature(e1="ldenseMatrix", e2="lsparseMatrix"),
 	  function(e1,e2) callGeneric(as(e1, "sparseMatrix"), as(e2, "generalMatrix")))
 
+setMethod("Logic", signature(e1="lsparseMatrix", e2="lsparseMatrix"),
+	  function(e1,e2) {
+	      if(!is(e1,"generalMatrix"))
+		  callGeneric(as(as(e1, "generalMatrix"), "CsparseMatrix"), e2)
+	      else if(!is(e2,"generalMatrix"))
+		  callGeneric(e1, as(as(e2, "generalMatrix"), "CsparseMatrix"))
+	      else callGeneric(as(e1, "lgCMatrix"), as(e2, "lgCMatrix"))
+	  })
+
+
+setMethod("Logic", signature(e1 = "lsCMatrix", e2 = "lsCMatrix"),
+	  function(e1, e2) {
+	      if(getOption("verbose"))
+		  message("suboptimal implementation of sparse 'symm. o symm.'")
+	      forceSymmetric(callGeneric(as(e1, "lgCMatrix"),
+					 as(e2, "lgCMatrix")))
+	  })
+
+setMethod("Logic", signature(e1 = "ltCMatrix", e2 = "ltCMatrix"),
+	  function(e1, e2) {
+	      if(getOption("verbose"))
+		  message("suboptimal implementation of sparse 'symm. o symm.'")
+	      forceTriangular(callGeneric(as(e1, "lgCMatrix"),
+					  as(e2, "lgCMatrix")))
+	  })
+
+
 
 ## FIXME: also want (symmetric o symmetric) , (triangular o triangular)
 ## -----
