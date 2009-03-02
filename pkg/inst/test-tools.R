@@ -203,7 +203,8 @@ mkLDL <- function(n, density = 1/3) {
 eqDeterminant <- function(m1, m2, ...) {
     d1 <- determinant(m1)
     d2 <- determinant(m2)
-    (d1$modulus == -Inf && d2$modulus == -Inf) || all.equal(d1, d2, ...)
+    (d1$modulus == -Inf && d2$modulus == -Inf) ||
+    (is.na(d1$modulus) && is.na(d2$modulus))   || all.equal(d1, d2, ...)
 }
 
 ##--- Compatibility tests "Matrix" =!= "traditional Matrix" ---
@@ -392,9 +393,11 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	CatF("2*m =?= m+m: ")
 	if(identical(2*m, m+m)) Cat("identical\n")
 	else if(do.matrix) {
-	    stopifnot(as(2*m,"matrix") == as(m+m, "matrix"))
+	    eq <- as(2*m,"matrix") == as(m+m, "matrix") # but work for NA's:
+	    stopifnot(all(eq | (is.na(m) & is.na(eq))))
 	    Cat("ok\n")
 	} else {# !do.matrix
+## FIXME! forgot  stopifnot()
 	    identical(as(2*m, "CsparseMatrix"),
 		      as(m+m, "CsparseMatrix"))
 	    Cat("ok\n")
@@ -494,3 +497,4 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
     }
     invisible(TRUE)
 }
+

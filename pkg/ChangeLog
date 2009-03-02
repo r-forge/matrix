@@ -1,4 +1,43 @@
+2009-03-02  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999375-22, ready for CRAN
+
+2009-03-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* inst/test-tools.R (eqDeterminant): fix for NAs
+
+2009-02-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/diagMatrix.R (prod, all): fix methods (cut & paste remnant);
+	for NA.
+
+	* R/Auxiliaries.R (detSparseLU): determinant(<..NA..>) now gives NaN
+
+	* R/sparseMatrix.R (printSpMatrix): workaround format.info() R bug
+	* tests/Simple.R: test that
+
+2009-02-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R (Matrix): Matrix(x,*) returns x unaltered when
+	is(x, "diagonalMatrix"); OTOH, Matrix(x,1,1) should typically
+	*not* return a diagonalMatrix.
+
+	* R/diagMatrix.R (setAs(matrix, *)): fix for NAs.
+	* tests/Simple.R: test things like Matrix(NA, 1,1)
+
+2009-02-25  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* NAMESPACE: add bandSparse() "properly"
+	* man/bandSparse.Rd: doc including examples
+
+2009-02-20  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/bandSparse.R (bandSparse): constructor for band(diagonal)
+	sparse matrices.
+
 2009-02-13  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999375-21, released to CRAN
 
 	* src/Mutils.h (Matrix_with_SPQR): #define (or #undef), in order to
 	allow easy building "SPQR-free version" of Matrix.
