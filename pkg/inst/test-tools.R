@@ -204,7 +204,7 @@ eqDeterminant <- function(m1, m2, ...) {
     d1 <- determinant(m1)
     d2 <- determinant(m2)
     (d1$modulus == -Inf && d2$modulus == -Inf) ||
-    (is.na(d1$modulus) && is.na(d2$modulus))   || all.equal(d1, d2, ...)
+    ((!is.finite(d1$modulus)) && (!is.finite(d2$modulus)))   || all.equal(d1, d2, ...)
 }
 
 ##--- Compatibility tests "Matrix" =!= "traditional Matrix" ---
