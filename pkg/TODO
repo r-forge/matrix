@@ -187,6 +187,12 @@
   --> Consider using the new  'dotMethods' functionality to define
       cbind() and rbind() versions that work with Matrix.
 
+- In  all(M1 == M2)  for sparse large matrices M1, M2 (e.g. M2 <- M1 !),
+  the intermediate 'M1 == M2' typically is dense, hence potentially using
+  humongous amount of memory.
+  We should/could devise something like   allCompare(M1, M2, `==`)
+  which would remain sparse in all its computations.
+
 --------
 
 - Reconsider the linkages in the include files for the SuiteSparse

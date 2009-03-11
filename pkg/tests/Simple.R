@@ -56,7 +56,7 @@ stopifnot(isSymmetric(M), isSymmetric(M.),
 	  is(bdiag(M., M.),"symmetricMatrix"),
 	  is(bdN, "triangularMatrix"),
 	  all.equal(N3,N3),
-	  all.equal(N3, t(N3)) == "Mean relative difference: 2",
+	  all.equal(N3, t(N3)) == all.equal(1,-1),# ~= "Mean relative difference: 2"
 	  !any(bdN != t(bdN)), # <nsparse> != <nsparse>	 failed to work...
 	  !any((0+bdN) > bdN), # <dsparse> o <nsparse>
 	  !any(bdN != (0+bdN)), # <nsparse> o <dsparse>
@@ -83,8 +83,7 @@ ina <- is.na(Lrg)# "all FALSE"
 stopifnot(grep("too large", e1) == 1,
           grep("too large", e2) == 1,
           !any(ina))# <- gave warning previously
-options(op)
-stopifnot(any(Lrg))# warns (double -> logical) correctly
+stopifnot(suppressWarnings(any(Lrg)))# (double -> logical  warning)
 
 ## with dimnames:
 m. <- matrix(c(0, 0, 2:0), 3, 5)
@@ -113,6 +112,10 @@ if(getRversion() >= "2.7.1" || R.version$`svn rev` >= 45885)  {
     sm <- selectMethod(coerce, c("dgCMatrix", "triangularMatrix"), verbose=TRUE)
     stopifnot(identical(sm(g5), t5))
 }
+
+if(getRversion() < "2.9.0") ## 2.9.0++ has "Note"s instead of ambiguity "Warning"s:
+    options(op)
+
 
 (t1 <- new("dtTMatrix", x= c(3,7), i= 0:1, j=3:2,
            Dim= as.integer(c(4,4))))
@@ -275,7 +278,7 @@ assert.EQ.mat(tril(dtr), diag(2))
 (t4 <- new("dgTMatrix", i = 3:0, j = 0:3, x = rep(1,4), Dim = as.integer(c(4,4))))
 c4 <- as(t4, "CsparseMatrix")
 ## the same but "dsT" (symmetric)
-M <- Matrix(c(0, rep(c(0,0:1),4)), 4,4)#ok warning
+suppressWarnings(M <- Matrix(c(0, rep(c(0,0:1),4)), 4,4))# warning:.. length [13] is not ..multiple
 tt <- as(M, "TsparseMatrix")
 stopifnot(all.equal(triu(t4) + tril(t4), c4),
           all.equal(triu(tt) + tril(tt), c4))
@@ -354,8 +357,13 @@ image(T125 <- kronecker(kronecker(t5,t5),t5),
 dim(T3k <- kronecker(t5,kronecker(T125, t5)))
 system.time(IT3 <- solve(T3k))# incredibly fast
 I. <- drop0(zapsmall(IT3 %*% T3k))
+I.. <- Matrix:::diagN2U(I.)
+I <- Diagonal(5^5)
 stopifnot(isValid(IT3, "dtCMatrix"),
-          all(I. == Diagonal(3125)))
+          ## something like the equivalent of  all(I. == Diagonal(3125)) :
+          identical(as(I., "diagonalMatrix"), I),
+          identical(as(I..,"diagonalMatrix"), I)
+          )
 
 ###-- row- and column operations  {was ./rowcolOps.R }
 
@@ -498,14 +506,15 @@ dkt <- as(nkt, "denseMatrix")
 (clt <- crossprod(nkt))
 stopifnot(isValid(nkt, "ngCMatrix"),
           isValid(clt, "nsCMatrix"))
-crossprod(clt) ## a warning: crossprod() of symmetric
+suppressWarnings(crossprod(clt)) ## warning "crossprod() of symmetric ..."
 
 ## a Csparse with *repeated* entry is not valid!
 assertError(new("ngCMatrix", p = c(0L,2L), i = c(0L,0L), Dim = 2:1))
 
 
-### "d" <-> "l"  for (symmetric) sparse :
-data(KNex)
+### "d" <-> "l"  for (symmetric) sparse : ---------------------------------------
+suppressWarnings( data(KNex) ) ## may warn, as 'Matrix' is recommended
+                               ## and exist more than once at check-time
 mm <- KNex$mm
 xpx <- crossprod(mm)
 ## extract nonzero pattern

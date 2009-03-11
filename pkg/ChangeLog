@@ -1,6 +1,31 @@
+2009-03-11  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dMatrix.R (Summary): (dsparseMatrix): new logic, fixing
+	prod(<sparse with NA>).
+
+	* inst/test-tools.R (eqDeterminant): improve after suggestions from Doug
+	* inst/test-tools.R (checkMatrix): message(), not warning(),
+	for differing prod().
+
+	* src/dgeMatrix.h, src/init.c: dgeMatrix_LU(x, warn_singularity)
+	* src/dgeMatrix.c (dgeMatrix_LU): allow to suppress singularity warning.
+	(dgeMatrix_determinant, dgeMatrix_rcond): do *not* warn on exact singularity
+
+2009-03-10  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R (Summary.l, Summary.np): no conversion to "dMatrix" for all()/any()
+
+	* tests/Simple.R: do not use memory-expensive all(I.. == Diagonal(n))
+		for R >= 2.9.0, keep option 'warn = 2', i.e. warnings
+		producing errors  ==>
+
+	* R/Ops.R: small fixes, getting rid of warnings in tests/Simple.R
+
+	* TODO: think about providing something like  allCompare(.,., "==")
+
 2009-03-02  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 0.999375-22, ready for CRAN
+	* DESCRIPTION (Version): 0.999375-22, ready but not submitted
 
 2009-03-01  Martin Maechler  <maechler@stat.math.ethz.ch>
 
