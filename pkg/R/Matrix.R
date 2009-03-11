@@ -431,13 +431,27 @@ setMethod("Summary", signature(x = "Matrix", na.rm = "ANY"),
 	  callGeneric(as(x,"dMatrix"), ..., na.rm = na.rm))
 
 Summary.l <- function(x, ..., na.rm) { ## must be method directly
-    r <- callGeneric(as(x,"dMatrix"), ..., na.rm = na.rm)
-    if(!is.infinite(r) && .Generic %in% c("max", "min", "range", "sum"))
-        as.integer(r) else r
+    if(.Generic %in% c("all", "any"))
+	callGeneric(x@x, ..., na.rm = na.rm)
+    else {
+	r <- callGeneric(as(x,"dMatrix"), ..., na.rm = na.rm)
+	if(!is.infinite(r) && .Generic != "prod") as.integer(r) else r
+    }
 }
+## identical (apart from last line):
+Summary.np <- function(x, ..., na.rm) {
+    if(.Generic %in% c("all", "any"))
+	callGeneric(as(x, "lMatrix"), ..., na.rm = na.rm)
+    else {
+	r <- callGeneric(as(x,"dMatrix"), ..., na.rm = na.rm)
+	if(!is.infinite(r) && .Generic != "prod") as.integer(r) else r
+    }
+}
+##
 setMethod("Summary", signature(x = "lMatrix", na.rm = "ANY"), Summary.l)
-setMethod("Summary", signature(x = "nMatrix", na.rm = "ANY"), Summary.l)
-setMethod("Summary", signature(x = "pMatrix", na.rm = "ANY"), Summary.l)
+setMethod("Summary", signature(x = "nMatrix", na.rm = "ANY"), Summary.np)
+setMethod("Summary", signature(x = "pMatrix", na.rm = "ANY"), Summary.np)
+
 
 ## Further, see ./Ops.R
 ##                ~~~~~

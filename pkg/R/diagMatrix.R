@@ -922,7 +922,7 @@ for(DI in diCls) {
 
 
 ### "Summary" : "max"   "min"   "range" "prod"  "sum"   "any"   "all"
-### ----------  any, all: separately here
+### ----------   the last 4: separately here
 for(cl in diCls) {
 setMethod("any", cl,
 	  function (x, ..., na.rm) {

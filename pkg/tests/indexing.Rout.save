@@ -1,6 +1,6 @@
 
-R version 2.8.1 Patched (2009-03-01 r48037)
-Copyright (C) 2009 The R Foundation for Statistical Computing
+R version 2.8.1 (2008-12-22)
+Copyright (C) 2008 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -1322,7 +1322,7 @@ attr(,"package")
 + 	  identical(thCol,  fx[,5762]))
 > 
 > cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
-Time elapsed:  26.2 1.426 27.915 0 0 
+Time elapsed:  23.985 1.383 25.44 0 0 
 > ##
 > cat("checkMatrix() of all: \n---------\n")
 checkMatrix() of all: 
@@ -1481,8 +1481,6 @@ exploding	<diag>	o  <diag>  into dense matrix
 dLrg 
 dm 
 ds 
-Warning in determinant(as(x, "dgeMatrix")) :
-  Exact singularity detected during LU decomposition.
 f 
 fx 
 ge 
@@ -1576,7 +1574,7 @@ suboptimal implementation of sparse 'symm. o symm.'
 x.x. 
 suboptimal implementation of sparse 'symm. o symm.'
 > cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
-Time elapsed:  13.589 0.121 13.714 0 0 
+Time elapsed:  12.376 0.115 12.504 0 0 
 > 
 > if(!interactive()) warnings()
 NULL
