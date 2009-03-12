@@ -1,3 +1,12 @@
+2009-03-12  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* man/band.Rd: note and example about band(<dense>) |-> dense
+
+	* R/ddenseMatrix.R (.bandDense): fix typo in argument check.
+	* R/Csparse.R: ditto
+	* src/dense.c (dense_band): limit index range; thanks to Bill Dunlap.
+	* tests/Simple.R (band): check it
+
 2009-03-11  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/dMatrix.R (Summary): (dsparseMatrix): new logic, fixing

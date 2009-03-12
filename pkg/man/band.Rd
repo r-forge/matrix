@@ -98,7 +98,8 @@ triu(x, k = 0, \dots)
 \value{
   An object of an appropriate matrix class.  The class of the value of
   \code{tril} or \code{triu} inherits from
-  \code{\linkS4class{triangularMatrix}} when appropriate.
+  \code{\linkS4class{triangularMatrix}} when appropriate.  Note that the
+  result is of class \code{\linkS4class{sparseMatrix}} only if \code{x} is.
 }
 \section{Methods}{
   \describe{
@@ -130,7 +131,9 @@ band(m5, -1, 2) # general band
 (m65 <- Matrix(rnorm(30), nc = 5))  # not square
 triu(m65)       # result in not dtrMatrix unless square
 (sm5 <- crossprod(m65)) # symmetric
-band(sm5, -1, 1)# symmetric band preserves symmetry property
+   band(sm5, -1, 1)# symmetric band preserves symmetry property
+as(band(sm5, -1, 1), "sparseMatrix")# often preferable
+%%
 \dontshow{ ## this uses special methods
 (x.x <- crossprod(mm))
 tril(x.x)
