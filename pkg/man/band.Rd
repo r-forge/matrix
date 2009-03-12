@@ -112,6 +112,10 @@ triu(x, k = 0, \dots)
       including packed numeric matrices.}
   }
 }
+\seealso{
+  \code{\link{bandSparse}} for the \emph{construction} of a banded
+  sparse matrix directly from its non-zero diagonals.
+}
 \examples{
 ## A random sparse matrix :
 set.seed(7)
