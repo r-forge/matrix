@@ -599,6 +599,23 @@ tpL <- as(tril(sp),"dtpMatrix")
 stopifnot(sp @uplo=="U", tp @uplo=="U",
 	  spL@uplo=="L", tpL@uplo=="L")
 
+## band():
+n <- 4 ; m <- 6
+r1 <- Matrix(1:24, n,m)
+validObject(M1 <- band(r1, 0,0))
+(M1 <- as(M1, "sparseMatrix"))
+r2 <- Matrix(1:18, 3, 6)
+stopifnot(identical(M1, bandSparse(n,m, k=0, diag = list(diag(r1)))),
+	  identical(band(r2, 0,4),
+		    band(r2, 0,3) + band(r2, 4,4)))
+s1 <- as(r1, "sparseMatrix") # such that band(s1) is sparse, too
+for(k1 in (-n):m)
+    for(k2 in k1:m) {
+        isValid(br1 <- band(r1, k1,k2), "ddenseMatrix")
+        isValid(bs1 <- band(s1, k1,k2), "CsparseMatrix")
+        stopifnot(all(r1 == s1))
+    }
+
 D. <- Diagonal(x= c(-2,3:4)); D.[lower.tri(D.)] <- 1:3 ; D.
 D0 <- Diagonal(x= 0:3);       D0[upper.tri(D0)] <- 1:6 ; D0
 stopifnot(all.equal(list(modulus = structure(24, logarithm = FALSE), sign = -1L),
