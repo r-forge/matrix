@@ -226,7 +226,7 @@ void make_i_matrix_symmetric(int *to, SEXP from)
  * @return pointer to a named vector of type TYP
  */
 SEXP
-Matrix_make_named(int TYP, char **names)
+Matrix_make_named(int TYP, const char **names)
 {
     SEXP ans, nms;
     int i, n;
