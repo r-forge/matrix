@@ -271,10 +271,10 @@ Matrix_check_class(const char *class, char **valid)
 }
 
 /**
- * Return the 0-based index of a match in a vector of class-name strings
- * terminated by an empty string.  Returns -1 for no match.
+ * Return the 0-based index of an is() match in a vector of class-name
+ * strings terminated by an empty string.  Returns -1 for no match.
  *
- * @param x  an R object, potentially with  is(x, <someClass>)
+ * @param x  an R object, about which we want is(x, .) information.
  * @param valid vector of possible matches terminated by an empty string.
  * @param rho  the environment in which the class definitions exist.
  *
@@ -294,9 +294,12 @@ Matrix_check_class_and_super(SEXP x, char **valid, SEXP rho)
     /* if not found directly, now search the non-virtual super classes :*/
     if(IS_S4_OBJECT(x)) {
 	/* now try the superclasses, i.e.,  try   is(x, "....") : */
-	SEXP classDef = eval(lang2(install("getClassDef"), cl), rho),
-	    superCl   = eval(lang2(install("nonVirtualSuperClasses"), classDef),
-			     rho);
+	SEXP classExts = GET_SLOT(eval(lang2(install("getClassDef"), cl), rho),
+				  install("contains")),
+	    superCl = eval(lang3(install(".selectSuperClasses"),
+				 classExts,
+				 /* dropVirtual = */ ScalarLogical(1)),
+			   rho);
 	int i;
 	const char *s_class;
 	for(i=0; i < length(superCl); i++) {
