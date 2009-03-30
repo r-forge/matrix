@@ -66,3 +66,6 @@ if(R.version$`svn rev` < 48201) { ## later: if(getRversion() < "2.9.0")
         if(namesOnly) names(ext) else ext
     }
 }
+
+## A wrapper for now [as long as  'methods' has no *exported* version]:
+.M.classEnv <- function (Class) methods:::.classEnv(Class)

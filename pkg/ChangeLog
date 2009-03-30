@@ -1,3 +1,14 @@
+2009-03-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Mutils.h (Matrix_check_class_etc): new version that *computes*
+	the environment to be used.
+	* src/Tsparse.c, src/cs_utils.c, src/chm_common.c, src/dgCMatrix.c:
+	use the above in place of Matrix_check_class_and_super().
+
+2009-03-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (MatrixClass): use cld@package, not packageSlot(.) !
+
 2009-03-25  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version, Date): 0.999375-23

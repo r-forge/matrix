@@ -50,6 +50,7 @@ export("Cholesky",
 #        "writeHB",
        "writeMM",
        "xtabs"
+       , ".M.classEnv"
        )
 
 if(getRversion() < "2.7.0")

@@ -70,10 +70,10 @@ MatrixClass <- function(cl, cld = getClassDef(cl),
     ## ----------------------------------------------------------------------
     ## Author: Martin Maechler, Date: 24 Mar 2009
 
-    if(is.null(pkg <- packageSlot(cl))) {
-	if(is.null(cld)) return(character())
-	## else
-	pkg <- cld@package
+    ## Hmm, packageSlot(cl)  *can* be misleading --> use  cld@package  first:
+    if(is.null(pkg <- cld@package)) {
+	if(is.null(pkg <- packageSlot(cl))) return(character())
+	## else we use 'pkg'
     }
     if(identical(pkg, "Matrix") &&
        (!...Matrix || identical(1L, grep("^...Matrix$", cl))))
