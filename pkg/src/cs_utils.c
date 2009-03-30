@@ -62,7 +62,7 @@ cs *Matrix_as_cs(cs *ans, SEXP x, Rboolean check_Udiag)
 {
     char *valid[] = {"dgCMatrix", "dtCMatrix", ""};
     /* had also "dsCMatrix", but that only stores one triangle */
-    int *dims, ctype = Matrix_check_class_and_super(x, valid, R_GlobalEnv);
+    int *dims, ctype = Matrix_check_class_etc(x, valid);
     SEXP islot;
 
     if (ctype < 0) error("invalid class of 'x' in Matrix_as_cs(a, x)");

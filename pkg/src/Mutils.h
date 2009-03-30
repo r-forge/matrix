@@ -314,6 +314,25 @@ Matrix_check_class_and_super(SEXP x, char **valid, SEXP rho)
     return -1;
 }
 
+/**
+ * Return the 0-based index of an is() match in a vector of class-name
+ * strings terminated by an empty string.  Returns -1 for no match.
+ *
+ * @param x  an R object, about which we want is(x, .) information.
+ * @param valid vector of possible matches terminated by an empty string.
+ *
+ * @return index of match or -1 for no match
+ */
+static R_INLINE int
+Matrix_check_class_etc(SEXP x, char **valid)
+{
+    SEXP cl = getAttrib(x, R_ClassSymbol),
+ 	pkg = getAttrib(cl, install("package")), /* ==R== packageSlot(class(x)) */
+	rho = (isNull(pkg) ? R_GlobalEnv
+	       : eval(lang2(install(".M.classEnv"), cl), R_GlobalEnv));
+    return Matrix_check_class_and_super(x, valid, rho);
+}
+
 
 #ifdef __cplusplus
 }

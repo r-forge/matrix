@@ -99,7 +99,7 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x, Rboolean check_Udiag, Rboolean sort
 		     "zgCMatrix", "zsCMatrix", "ztCMatrix",
 		     ""};
     int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
-	ctype = Matrix_check_class_and_super(x, valid, R_GlobalEnv);
+	ctype = Matrix_check_class_etc(x, valid);
 
     SEXP islot = GET_SLOT(x, Matrix_iSym);
 
@@ -275,7 +275,7 @@ CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x, Rboolean check_Udiag)
 		     "ngTMatrix", "nsTMatrix", "ntTMatrix",
 		     "zgTMatrix", "zsTMatrix", "ztTMatrix",
 		     ""};
-    int *dims, ctype = Matrix_check_class_and_super(x, valid, R_GlobalEnv), m;
+    int *dims, ctype = Matrix_check_class_etc(x, valid), m;
     SEXP islot;
     Rboolean do_Udiag = (check_Udiag && ctype % 3 == 2 && (*diag_P(x) == 'U'));
 
@@ -461,7 +461,7 @@ CHM_DN as_cholmod_dense(CHM_DN ans, SEXP x)
 		     "lmatrix", "lgeMatrix",				\
 		     "nmatrix", "ngeMatrix",				\
 		     "zmatrix", "zgeMatrix", ""};			\
-    int dims[2], ctype = Matrix_check_class_and_super(x, valid, R_GlobalEnv), nprot = 0; \
+    int dims[2], ctype = Matrix_check_class_etc(x, valid), nprot = 0; \
 									\
     if (ctype < 0) {		/* not a classed matrix */		\
 	if (isMatrix(x)) Memcpy(dims, INTEGER(getAttrib(x, R_DimSymbol)), 2); \
@@ -722,7 +722,7 @@ CHM_FR as_cholmod_factor(CHM_FR ans, SEXP x)
 {
     char *valid[] = {"dCHMsuper", "dCHMsimpl", "nCHMsuper", "nCHMsimpl", ""};
     int *type = INTEGER(GET_SLOT(x, install("type"))),
-	ctype = Matrix_check_class_and_super(x, valid, R_GlobalEnv);
+	ctype = Matrix_check_class_etc(x, valid);
     SEXP tmp;
 
     if (ctype < 0) error("invalid class of object to as_cholmod_factor");
