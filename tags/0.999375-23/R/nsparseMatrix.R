@@ -1,0 +1,71 @@
+#### Superclass Methods for all sparse nonzero-pattern matrices
+
+setAs("CsparseMatrix", "nsparseMatrix",
+      function(from) .Call(Csparse_to_nz_pattern, from,
+			   is(from, "triangularMatrix")))
+setAs("CsparseMatrix", "nMatrix",
+      function(from) .Call(Csparse_to_nz_pattern, from,
+			   is(from, "triangularMatrix")))
+
+setAs("nsparseMatrix", "dsparseMatrix", function(from) as(from, "dMatrix"))
+
+###------- Work via  as(*, lgC) : ------------
+
+## For multiplication operations, sparseMatrix overrides other method
+## selections.  Coerce a ddensematrix argument to a nsparseMatrix.
+
+setMethod("%*%", signature(x = "nsparseMatrix", y = "ndenseMatrix"),
+	  function(x, y) x %*% as(y, "nsparseMatrix"))
+
+setMethod("%*%", signature(x = "ndenseMatrix", y = "nsparseMatrix"),
+	  function(x, y) as(x, "nsparseMatrix") %*% y)
+
+setMethod("crossprod", signature(x = "nsparseMatrix", y = "ndenseMatrix"),
+	  function(x, y = NULL) crossprod(x, as(y, "nsparseMatrix")))
+
+setMethod("crossprod", signature(x = "ndenseMatrix", y = "nsparseMatrix"),
+	  function(x, y = NULL) crossprod(as(x, "nsparseMatrix"), y))
+
+## and coerce nsparse* to lgC*
+setMethod("%*%", signature(x = "nsparseMatrix", y = "nsparseMatrix"),
+	  function(x, y) as(x, "ngCMatrix") %*% as(y, "ngCMatrix"))
+
+setMethod("crossprod", signature(x = "nsparseMatrix", y = "nsparseMatrix"),
+	  function(x, y = NULL)
+	  crossprod(as(x, "ngCMatrix"), as(y, "ngCMatrix")))
+
+setMethod("is.na", signature(x = "nsparseMatrix"), is.na_nsp)
+
+setMethod("all", signature(x = "nsparseMatrix"),
+	  function(x, ..., na.rm = FALSE) {
+	      pd <- prod(d <- dim(x))
+	      if(pd == 0) return(TRUE)
+	      cld <- getClassDef(class(x))
+	      if(extends(cld, "triangularMatrix"))
+		  return(FALSE)
+	      ## else
+	      if(extends(cld, "TsparseMatrix"))
+		  cld <- getClassDef(class(x <- as(x, "CsparseMatrix")))
+	      ## now have Csparse or Rsparse: length of index slot = no.{TRUE}
+	      l.x <- length(if(extends(cld, "CsparseMatrix")) x@i else x@j)
+
+	      (l.x == pd) || ## fully non-zero
+	      (extends(cld, "symmetricMatrix") && l.x == choose(d[1]+1, 2))
+	      ## else FALSE
+	  })
+
+setMethod("any", signature(x = "nsparseMatrix"),
+	  function(x, ..., na.rm = FALSE) {
+	      if(any(dim(x) == 0)) return(FALSE)
+	      cld <- getClassDef(class(x))
+	      if(extends(cld, "triangularMatrix") && x@diag == "U")
+		  TRUE # unit-diagonal
+	      else if(extends(cld, "CsparseMatrix") ||
+		      extends(cld, "TsparseMatrix"))
+		  length(x@i) > 0
+	      else # RsparseMatrix
+		  length(x@j) > 0
+	  })
+
+
+setMethod("image", "nsparseMatrix", function(x, ...) image(as(x,"dMatrix")))

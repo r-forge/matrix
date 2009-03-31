@@ -1,0 +1,106 @@
+#### Triangular Matrices -- Coercion and Methods
+
+
+## or rather setIs() {since test can fail }?
+## FIXME: get rid of this (coerce to "triangular..") ?!?
+setAs("dgeMatrix", "dtrMatrix", function(from) asTri(from, "dtrMatrix"))
+
+setAs("dtrMatrix", "dtpMatrix",
+      function(from) .Call(dtrMatrix_as_dtpMatrix, from))
+
+setAs("dtrMatrix", "sparseMatrix", .dense2C)
+setAs("dtrMatrix", "CsparseMatrix", .dense2C)
+
+
+## needed for t() method
+setAs("dtrMatrix", "matrix",
+      function(from) .Call(dtrMatrix_as_matrix, from, TRUE))
+
+setAs("matrix", "dtrMatrix",
+      function(from) as(.Call(dup_mMatrix_as_dgeMatrix, from), "dtrMatrix"))
+
+setAs("Cholesky", "lMatrix",
+      function(from) as(as(from, "dtrMatrix"), "lMatrix"))
+setAs("BunchKaufman", "lMatrix",
+      function(from) as(as(from, "dtrMatrix"), "lMatrix"))
+
+
+## Group Methods:
+## TODO: carefully check for the cases where the result remains triangular
+## instead : inherit them from "dgeMatrix" via definition in ./dMatrix.R
+
+## Note: Just *because* we have an explicit  dtr -> dge coercion,
+##       show( <ddenseMatrix> ) is not okay, and we need our own:
+setMethod("show", "dtrMatrix", function(object) prMatrix(object))
+
+setMethod("%*%", signature(x = "dtrMatrix", y = "ddenseMatrix"),
+	  function(x, y) .Call(dtrMatrix_matrix_mm, x, y, FALSE),
+          valueClass = "dgeMatrix")
+
+setMethod("%*%", signature(x = "dtrMatrix", y = "matrix"),
+	  function(x, y) .Call(dtrMatrix_matrix_mm, x, y, FALSE),
+          valueClass = "dgeMatrix")
+
+setMethod("%*%", signature(x = "ddenseMatrix", y = "dtrMatrix"),
+	  function(x, y) .Call(dtrMatrix_matrix_mm, y, x, TRUE),
+          valueClass = "dgeMatrix")
+
+setMethod("%*%", signature(x = "matrix", y = "dtrMatrix"),
+	  function(x, y) .Call(dtrMatrix_matrix_mm, y, x, TRUE),
+          valueClass = "dgeMatrix")
+
+## no longer needed
+## setMethod("%*%", signature(x = "dtrMatrix", y = "dtrMatrix"),
+## 	  function(x, y) callGeneric(x = x, y = as(y, "dgeMatrix")),
+##           valueClass = "dgeMatrix")
+
+setMethod("crossprod", signature(x = "dtrMatrix", y = "missing"),
+	  function(x, y = NULL) callGeneric(x = as(x, "dgeMatrix")),
+	  valueClass = "dpoMatrix")
+
+setMethod("determinant", signature(x = "dtrMatrix", logarithm = "missing"),
+	  function(x, logarithm, ...) callGeneric(x, TRUE))
+
+setMethod("determinant", signature(x = "dtrMatrix", logarithm = "logical"),
+	  function(x, logarithm, ...) mkDet(diag(x), logarithm))
+
+setMethod("diag", signature(x = "dtrMatrix"),
+          function(x, nrow, ncol) .Call(dtrMatrix_getDiag, x),
+          valueClass = "numeric")
+
+setMethod("norm", signature(x = "dtrMatrix", type = "character"),
+	  function(x, type, ...)
+	  .Call(dtrMatrix_norm, x, type),
+	  valueClass = "numeric")
+
+setMethod("norm", signature(x = "dtrMatrix", type = "missing"),
+	  function(x, type, ...)
+	  .Call(dtrMatrix_norm, x, "O"),
+	  valueClass = "numeric")
+
+setMethod("rcond", signature(x = "dtrMatrix", norm = "character"),
+	  function(x, norm, ...)
+	  .Call(dtrMatrix_rcond, x, norm),
+	  valueClass = "numeric")
+
+setMethod("rcond", signature(x = "dtrMatrix", norm = "missing"),
+	  function(x, norm, ...)
+	  .Call(dtrMatrix_rcond, x, "O"),
+	  valueClass = "numeric")
+
+setMethod("solve", signature(a = "dtrMatrix", b="missing"),
+	  function(a, b, ...)
+	  .Call(dtrMatrix_solve, a),
+	  valueClass = "dtrMatrix")
+
+setMethod("solve", signature(a = "dtrMatrix", b="ddenseMatrix"),
+	  function(a, b, ...)
+          .Call(dtrMatrix_matrix_solve, a, b),
+	  valueClass = "dgeMatrix")
+
+setMethod("solve", signature(a = "dtrMatrix", b="matrix"),
+	  function(a, b, ...)
+          .Call(dtrMatrix_matrix_solve, a, b),
+	  valueClass = "dgeMatrix")
+
+setMethod("t", signature(x = "dtrMatrix"), t_trMatrix)
