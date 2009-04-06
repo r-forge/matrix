@@ -1,3 +1,7 @@
+2009-04-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version, Date): 0.999375-24 only for 2.9.0 (and newer)
+
 2009-03-30  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/Mutils.h (Matrix_check_class_etc): new version that *computes*
