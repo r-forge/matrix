@@ -2,13 +2,18 @@
 \title{Triangular Decomposition of a Square Matrix}
 \usage{
 lu(x, \dots)
+lu(x, warnSing = TRUE, \dots)
 }
 \alias{lu}
 \description{
   Computes triangular decompositions of square matrices.
 }
 \arguments{
-  \item{x}{a matrix. No missing values or IEEE special values are allowed.}
+  \item{x}{a matrix of square dimension.  No missing values or IEEE
+    special values are allowed.}
+  \item{warnSing}{(when \code{x} is a
+    \code{"\linkS4class{denseMatrix}"}) logical specifying if a \code{\link{warning}}
+    should be signalled when \code{x} is singular.}
   \item{\dots}{further arguments passed to or from other methods.}
 }
 \value{
