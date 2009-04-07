@@ -1,3 +1,10 @@
+2009-04-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* man/lu.Rd: document 'warnSing' argument
+	* tests/dg_Matrix.R: and test it
+
+	* src/dgeMatrix.c (dgeMatrix_LU): missing 'return'
+
 2009-04-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version, Date): 0.999375-24 only for 2.9.0 (and newer)
