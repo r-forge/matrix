@@ -630,6 +630,14 @@ dim(R) <- dim(D4)
 stopifnot(isValid(sv,"sparseVector"),
 	  isValid(R, "sparseMatrix"),
 	  identical(D4, as(R, "diagonalMatrix")))
+iv <- c(rep(0, 5), 3, 0,0,7,0,0,0)
+sv <- as(iv, "sparseVector")
+sv. <- as(as.integer(iv), "sparseVector")
+## Note: Method with signature "numeric#sparseVector" chosen ...
+(sv2 <- as(sv, "isparseVector")) ## gave error
+stopifnot(identical(sv., sv2))
+as(sv, "zsparseVector")
+
 ## "Large" sparse:
 n <- 100000
 m <-  50000 ; nnz <- 47

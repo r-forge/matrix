@@ -1,10 +1,11 @@
 \name{lu}
 \title{Triangular Decomposition of a Square Matrix}
+\alias{lu}
+\alias{lu,dgeMatrix-method}
 \usage{
 lu(x, \dots)
-lu(x, warnSing = TRUE, \dots)
+\S4method{lu}{dgeMatrix}(x, warnSing = TRUE, \dots)
 }
-\alias{lu}
 \description{
   Computes triangular decompositions of square matrices.
 }
@@ -22,7 +23,7 @@ lu(x, warnSing = TRUE, \dots)
   a representation of a triangular decomposition of \code{x}.
 }
 \details{
-  This is a generic function with special methods for different types
+  \code{lu()} is a generic function with special methods for different types
   of matrices.  Use \code{\link{showMethods}("lu")} to list all the methods
   for the \code{\link{lu}} generic.
 
@@ -33,7 +34,9 @@ lu(x, warnSing = TRUE, \dots)
   The method for class \code{\linkS4class{dgCMatrix}} (and all sparse
   matrices) is based on functions from the CSparse library.  It signals
   an error when the decomposition algorithm fails, as when \code{x} is
-  (too close to) singular.
+  (too close to) singular.% yes, it would be nice if we could have it
+  % behave similarly as the dense method: still give an LU, and
+  % only an optional warning, instead of error.
 }
 \references{
   Golub, G., and Van Loan, C. F. (1989).
