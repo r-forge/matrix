@@ -32,7 +32,7 @@
     assignInNamespace("%x%", function (X, Y) kronecker(X, Y), ns = "base")
 
     ## Hack needed, as C-level  eval / findFun seems not to work with
-    ## loaded & non-attached Matrix: (":::" even though it *is* exported)
+    ## loaded & non-attached Matrix:
     assignInNamespace(".M.classEnv", .M.classEnv, ns = "base")
 }
 
