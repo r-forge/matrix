@@ -1,6 +1,12 @@
+2009-05-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/HBMM.R (readMM): add checkIJ() to produce nicer error messages,
+	on malformed input.
+	* tests/write-read.R: and test that..
+
 2009-04-18  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version, Date): 0.999375-26
+	* DESCRIPTION (Version, Date): 0.999375-26, CRAN-released on 2009-04-29
 
 	* src/Mutils.h (Matrix_check_class_etc): try to ensure it works
 	also when Matrix is loaded but not attached.
