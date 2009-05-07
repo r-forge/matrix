@@ -826,7 +826,7 @@ int Matrix_check_class_and_super(SEXP x, char **valid, SEXP rho)
 {
     int ans;
     SEXP cl = getAttrib(x, R_ClassSymbol);
-    char *class = CHAR(asChar(cl)); 
+    const char *class = CHAR(asChar(cl)); 
     for (ans = 0; ; ans++) {
 	if (!strlen(valid[ans]))
 	    break;
