@@ -826,7 +826,7 @@ int Matrix_check_class_and_super(SEXP x, char **valid, SEXP rho)
 {
     int ans;
     SEXP cl = getAttrib(x, R_ClassSymbol);
-    const char *class = CHAR(asChar(cl)); 
+    const char *class = CHAR(asChar(cl));
     for (ans = 0; ; ans++) {
 	if (!strlen(valid[ans]))
 	    break;
@@ -835,22 +835,27 @@ int Matrix_check_class_and_super(SEXP x, char **valid, SEXP rho)
     /* if not found directly, now search the non-virtual super classes :*/
     if(IS_S4_OBJECT(x)) {
 	/* now try the superclasses, i.e.,  try   is(x, "....") : */
-	SEXP classExts = GET_SLOT(eval(lang2(install("getClassDef"), cl), rho),
-				  install("contains")),
-	    superCl = eval(lang3(install(".selectSuperClasses"),
-				 classExts,
-				 /* dropVirtual = */ ScalarLogical(1)),
-			   rho);
+	SEXP classExts, superCl, _call;
 	int i;
-	const char *s_class;
+	PROTECT(cl);
+	PROTECT(_call = lang2(install("getClassDef"), cl));
+	PROTECT(classExts = GET_SLOT(eval(_call, rho),
+				     install("contains")));
+	PROTECT(_call = lang3(install(".selectSuperClasses"), classExts,
+			      /* dropVirtual = */ ScalarLogical(1)));
+	PROTECT(superCl = eval(_call, rho));
 	for(i=0; i < length(superCl); i++) {
-	    s_class = CHAR(STRING_ELT(superCl, i));
+	    const char *s_class = CHAR(STRING_ELT(superCl, i));
 	    for (ans = 0; ; ans++) {
 		if (!strlen(valid[ans]))
 		    break;
-		if (!strcmp(s_class, valid[ans])) return ans;
+		if (!strcmp(s_class, valid[ans])) {
+		    UNPROTECT(5);
+		    return ans;
+		}
 	    }
 	}
+	UNPROTECT(5);
     }
     return -1;
 }
@@ -867,21 +872,27 @@ int Matrix_check_class_and_super(SEXP x, char **valid, SEXP rho)
 int Matrix_check_class_etc(SEXP x, char **valid)
 {
     SEXP cl = getAttrib(x, R_ClassSymbol), rho = R_GlobalEnv,
-	M_classEnv_sym = install(".M.classEnv"),
+	M_classEnv_sym = install(".M.classEnv"), pkg;
+
+    PROTECT(cl);
+
 #if defined(R_VERSION) && R_VERSION >= R_Version(2, 10, 0)
- 	pkg = getAttrib(cl, R_PackageSymbol); /* ==R== packageSlot(class(x)) */
+    pkg = getAttrib(cl, R_PackageSymbol); /* ==R== packageSlot(class(x)) */
 #else
- 	pkg = getAttrib(cl, install("package"));
+    pkg = getAttrib(cl, install("package"));
 #endif
-	if(!isNull(pkg)) { /* find  rho := correct class Environment */
-	    /* need to make sure we find ".M.classEnv" even if Matrix is not
-	       attached, but just namespace-loaded: */
+    if(!isNull(pkg)) { /* find  rho := correct class Environment */
+	SEXP clEnvCall;
+	/* need to make sure we find ".M.classEnv" even if Matrix is not
+	   attached, but just namespace-loaded: */
 
-/* Matrix::: does not work here either ... :
- *	    rho = eval(lang2(install("Matrix:::.M.classEnv"), cl), */
+	/* Matrix::: does not work here either ... :
+	 *	    rho = eval(lang2(install("Matrix:::.M.classEnv"), cl), */
 
-/* Now make this work via .onLoad() hack in ../R/zzz.R  : */
-	    rho = eval(lang2(M_classEnv_sym, cl), R_GlobalEnv);
+	/* Now make this work via .onLoad() hack in ../R/zzz.R  : */
+	PROTECT(clEnvCall = lang2(M_classEnv_sym, cl));
+	rho = eval(clEnvCall, R_GlobalEnv);
+	UNPROTECT(1);
 
 /* the following would look fine in theory,
  * but it consistently segfaults in practice inside the
@@ -907,8 +918,9 @@ int Matrix_check_class_etc(SEXP x, char **valid)
 
 /* 	    Rprintf("  Mcce: *after* eval(.) ...\n"); */
 
-	    if(!isEnvironment(rho))
-		error("could not find correct environment; please report!");
-	}
+	if(!isEnvironment(rho))
+	    error("could not find correct environment; please report!");
+    }
+    UNPROTECT(1);
     return Matrix_check_class_and_super(x, valid, rho);
 }
