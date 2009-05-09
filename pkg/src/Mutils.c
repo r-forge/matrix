@@ -837,25 +837,29 @@ int Matrix_check_class_and_super(SEXP x, char **valid, SEXP rho)
 	/* now try the superclasses, i.e.,  try   is(x, "....") : */
 	SEXP classExts, superCl, _call;
 	int i;
-	PROTECT(cl);
+/* 	PROTECT(cl); */
 	PROTECT(_call = lang2(install("getClassDef"), cl));
-	PROTECT(classExts = GET_SLOT(eval(_call, rho),
-				     install("contains")));
+	classExts = GET_SLOT(eval(_call, rho),
+				     install("contains"));
+	UNPROTECT(1);
+	PROTECT(classExts);
 	PROTECT(_call = lang3(install(".selectSuperClasses"), classExts,
 			      /* dropVirtual = */ ScalarLogical(1)));
-	PROTECT(superCl = eval(_call, rho));
+	superCl = eval(_call, rho);
+	UNPROTECT(2);
+	PROTECT(superCl);
 	for(i=0; i < length(superCl); i++) {
 	    const char *s_class = CHAR(STRING_ELT(superCl, i));
 	    for (ans = 0; ; ans++) {
 		if (!strlen(valid[ans]))
 		    break;
 		if (!strcmp(s_class, valid[ans])) {
-		    UNPROTECT(5);
+		    UNPROTECT(1);
 		    return ans;
 		}
 	    }
 	}
-	UNPROTECT(5);
+	UNPROTECT(1);
     }
     return -1;
 }
@@ -874,7 +878,7 @@ int Matrix_check_class_etc(SEXP x, char **valid)
     SEXP cl = getAttrib(x, R_ClassSymbol), rho = R_GlobalEnv,
 	M_classEnv_sym = install(".M.classEnv"), pkg;
 
-    PROTECT(cl);
+/*     PROTECT(cl); */
 
 #if defined(R_VERSION) && R_VERSION >= R_Version(2, 10, 0)
     pkg = getAttrib(cl, R_PackageSymbol); /* ==R== packageSlot(class(x)) */
@@ -894,33 +898,9 @@ int Matrix_check_class_etc(SEXP x, char **valid)
 	rho = eval(clEnvCall, R_GlobalEnv);
 	UNPROTECT(1);
 
-/* the following would look fine in theory,
- * but it consistently segfaults in practice inside the
- * findFun(...) call : */
-
-/* 	    SEXP s; */
-
-/* 	    Rprintf("Matrix_check_class_etc(.) finding env...\n"); */
-
-/* 	    rho = findFun(M_classEnv_sym, Matrix_NS); */
-/* 	    Rprintf("  Mcce: found .M.classEnv .."); */
-/* 	    Rprintf(" '%s'", CHAR(asChar(eval(lang2(install("utils::str"), */
-/* 						    rho), R_GlobalEnv)))); */
-/* 	    if(rho == R_UnboundValue) */
-/* 		error(".M.classEnv unbound in Matrix namespace: should not happen"); */
-
-/* 	    Rprintf("  Mcce: before eval(.) ...\n"); */
-
-/* /\* 	    rho = eval(lang2(rho, cl), R_GlobalEnv); *\/ */
-/* 	    PROTECT(s = lang2(rho, cl)); */
-/* 	    rho = eval(s, R_GlobalEnv); */
-/* 	    UNPROTECT(1); */
-
-/* 	    Rprintf("  Mcce: *after* eval(.) ...\n"); */
-
 	if(!isEnvironment(rho))
 	    error("could not find correct environment; please report!");
     }
-    UNPROTECT(1);
+/*     UNPROTECT(1); */
     return Matrix_check_class_and_super(x, valid, rho);
 }
