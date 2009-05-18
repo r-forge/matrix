@@ -115,9 +115,9 @@ spV2M <- function (x, nrow, ncol, byrow = FALSE)
     cx <- class(x)
     stopifnot(extends(cx, "sparseVector"))
     if(!missing(ncol)) { ncol <- as.integer(ncol)
-			 if(ncol <= 0) stop("'ncol' must be >= 1") }
+			 if(ncol < 0) stop("'ncol' must be >= 0") }
     if(!missing(nrow)) { nrow <- as.integer(nrow)
-			 if(nrow <= 0) stop("'nrow' must be >= 1") }
+			 if(nrow < 0) stop("'nrow' must be >= 0") }
     n <- length(x)
     if(missing(nrow)) {
 	if(missing(ncol)) { ## both missing: --> (n x 1)
@@ -171,7 +171,7 @@ setMethod("dim<-", signature(x = "sparseVector", value = "ANY"),
 	  function(x, value) {
 	      if(!is.numeric(value) || length(value) != 2)
 		  stop("dim(.) value must be numeric of length 2")
-	      if(length(x) != prod(value <- as.integer(value)))
+	      if(length(x) != prod(value <- round(value)))
 		  stop("dimensions don't match the number of cells")
 	      spV2M(x, nrow=value[1], ncol=value[2])
 	  })

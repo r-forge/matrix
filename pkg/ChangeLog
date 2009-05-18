@@ -1,3 +1,23 @@
+2009-05-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseVector.R (dim<-): prod(as.integer(.)) may overflow!
+
+	* R/Matrix.R (Matrix): Matrix(sv, ..) now works for a sparseVector
+
+	* R/sparseVector.R (spV2M): allow zero nrow or ncol.
+
+2009-05-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (dim<-): should also work for diagonalMatrix.
+
+	* inst/test-tools.R (vec): add test for dim(x) <- c(n, 1)
+
+
+2009-05-13  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/rankMatrix.R (rankMatrix): new function for matrix rank;
+	"to be discussed".
+
 2009-05-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/HBMM.R (readMM): add checkIJ() to produce nicer error messages,

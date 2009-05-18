@@ -75,6 +75,7 @@ MatrixClass <- function(cl, cld = getClassDef(cl),
     ## ----------------------------------------------------------------------
     ## Author: Martin Maechler, Date: 24 Mar 2009
 
+    ## stopifnot(is.character(cl))
     ## Hmm, packageSlot(cl)  *can* be misleading --> use  cld@package  first:
     if(is.null(pkg <- cld@package)) {
 	if(is.null(pkg <- packageSlot(cl))) return(character())
