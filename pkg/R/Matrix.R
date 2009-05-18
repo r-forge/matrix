@@ -145,21 +145,28 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
     sparseDefault <- function(m) prod(dim(m)) > 2*sum(isN0(as(m, "matrix")))
 
     i.M <- is(data, "Matrix")
+    sM <- FALSE
     if(i.M) {
 	if(is(data, "diagonalMatrix")) return(data) # in all cases
+	sV <- FALSE
     } else if(inherits(data, "table")) # special treatment
 	class(data) <- "matrix" # "matrix" first for S4 dispatch
+    else if(is(data, "sparseVector")) {
+	data <- spV2M(data, nrow, ncol, byrow=byrow)
+	i.M <- sparse <- forceCheck <- sM <- sV <- TRUE
+    }
     if(is.null(sparse1 <- sparse) && (i.M || is(data, "matrix")))
 	sparse <- sparseDefault(data)
-    sM <- FALSE
     doDN <- TRUE
     if (i.M) {
-        if(!missing(nrow) || !missing(ncol)|| !missing(byrow))
-            warning("'nrow', 'ncol', etc, are disregarded when 'data' is \"Matrix\" already")
-	sM <- is(data,"sparseMatrix")
-	if(!forceCheck && ((sparse && sM) || (!sparse && !sM)))
-	    return(data)
-	## else : convert  dense <-> sparse -> at end
+	if (!sV) {
+	    if(!missing(nrow) || !missing(ncol)|| !missing(byrow))
+		warning("'nrow', 'ncol', etc, are disregarded when 'data' is \"Matrix\" already")
+	    sM <- is(data,"sparseMatrix")
+	    if(!forceCheck && ((sparse && sM) || (!sparse && !sM)))
+		return(data)
+	    ## else : convert  dense <-> sparse -> at end
+	}
     }
     else if (!is.matrix(data)) { ## cut & paste from "base::matrix" :
 	if (missing(nrow))
