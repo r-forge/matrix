@@ -242,41 +242,6 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
 
 ## Methods for operations where one argument is numeric
 
-## Using as.matrix() and rbind()
-## in order to get dimnames from names {at least potentially}:
-
-setMethod("%*%", signature(x = "Matrix", y = "numeric"),
-	  function(x, y) callGeneric(x, as.matrix(y)))
-setMethod("%*%", signature(x = "numeric", y = "Matrix"),
-	  function(x, y) callGeneric(matrix(x, nrow = 1, byrow=TRUE), y))
-
-setMethod("%*%", signature(x = "Matrix", y = "matrix"),
-	  function(x, y) callGeneric(x, Matrix(y)))
-setMethod("%*%", signature(x = "matrix", y = "Matrix"),
-	  function(x, y) callGeneric(Matrix(x), y))
-
-
-setMethod("crossprod", signature(x = "Matrix", y = "numeric"),
-	  function(x, y = NULL) callGeneric(x, as.matrix(y)))
-setMethod("crossprod", signature(x = "numeric", y = "Matrix"),
-	  function(x, y = NULL)	 callGeneric(as.matrix(x), y))
-
-setMethod("crossprod", signature(x = "Matrix", y = "matrix"),
-	  function(x, y = NULL) callGeneric(x, Matrix(y)))
-setMethod("crossprod", signature(x = "matrix", y = "Matrix"),
-	  function(x, y = NULL) callGeneric(Matrix(x), y))
-
-## The as.matrix() promotion seems illogical to MM,
-## but is according to help(tcrossprod, package = "base") :
-setMethod("tcrossprod", signature(x = "Matrix", y = "numeric"),
-	  function(x, y = NULL) callGeneric(x, as.matrix(y)))
-setMethod("tcrossprod", signature(x = "numeric", y = "Matrix"),
-	  function(x, y = NULL)	 callGeneric(as.matrix(x), y))
-setMethod("tcrossprod", signature(x = "Matrix", y = "matrix"),
-	  function(x, y = NULL) callGeneric(x, Matrix(y)))
-setMethod("tcrossprod", signature(x = "matrix", y = "Matrix"),
-	  function(x, y = NULL) callGeneric(Matrix(x), y))
-
 ## maybe not 100% optimal, but elegant:
 setMethod("solve", signature(a = "Matrix", b = "missing"),
 	  function(a, b, ...) solve(a, Diagonal(nrow(a))))
@@ -296,28 +261,6 @@ setMethod("solve", signature(a = "Matrix", b = "ANY"),
 	  function(a, b, ...) .bail.out.2("solve", class(a), class(b)))
 setMethod("solve", signature(a = "ANY", b = "Matrix"),
 	  function(a, b, ...) .bail.out.2("solve", class(a), class(b)))
-
-## bail-out methods in order to get better error messages
-	  .local.bail.out = function (x, y)
-          stop(gettextf('not-yet-implemented method for <%s> %%*%% <%s>',
-                        class(x), class(y)))
-
-setMethod("%*%", signature(x = "ANY", y = "Matrix"), .local.bail.out)
-setMethod("%*%", signature(x = "Matrix", y = "ANY"), .local.bail.out)
-
-## cheap fallbacks
-setMethod("crossprod", signature(x = "Matrix", y = "Matrix"),
-	  function(x, y = NULL) t(x) %*% y)
-setMethod("crossprod", signature(x = "Matrix", y = "ANY"),
-	  function(x, y = NULL) t(x) %*% y)
-setMethod("crossprod", signature(x = "ANY", y = "Matrix"),
-	  function(x, y = NULL) t(x) %*% y)
-setMethod("tcrossprod", signature(x = "Matrix", y = "Matrix"),
-	  function(x, y = NULL) x %*% t(y))
-setMethod("tcrossprod", signature(x = "Matrix", y = "ANY"),
-	  function(x, y = NULL) x %*% t(y))
-setMethod("tcrossprod", signature(x = "ANY", y = "Matrix"),
-	  function(x, y = NULL) x %*% t(y))
 
 ## There are special sparse methods; this is a "fall back":
 setMethod("kronecker", signature(X = "Matrix", Y = "ANY",

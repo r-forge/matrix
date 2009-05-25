@@ -1,3 +1,26 @@
+2009-05-25  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version, Date): 0.999375-27, CRAN-released on ...
+
+	* R/sparseVector.R: add as(<atomic>, "dsparseVector")
+	(spV2M): now works (again!?) for "isparseVector" (-> "dgTMatrix").
+
+	* tests/matprod.R: tcrossprod(), sparseVector multiplications, i.e.,
+	features of next paragraph.
+
+2009-05-23  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/products.R: move almost all %*%, crossprod(), tcrossprod()
+	methods to a new file.  tcrossprod() compatibility with *fixed*
+	base-R; enable operations with "sparseVector"s; some extra methods
+	to avoid ambiguity messages.
+
+2009-05-20  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (.M.v, .v.M): slight speedup, and *use* them in
+	* R/Matrix.R (crossprod)
+
+
 2009-05-18  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/sparseVector.R (dim<-): prod(as.integer(.)) may overflow!
