@@ -1,5 +1,7 @@
 2009-05-25  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* po/update-me.sh, Matrix.pot, etc: updated *.pot / *.po files
+
 	* DESCRIPTION (Version, Date): 0.999375-27, CRAN-released on ...
 
 	* R/sparseVector.R: add as(<atomic>, "dsparseVector")
