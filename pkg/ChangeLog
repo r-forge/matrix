@@ -2,7 +2,7 @@
 
 	* po/update-me.sh, Matrix.pot, etc: updated *.pot / *.po files
 
-	* DESCRIPTION (Version, Date): 0.999375-27, CRAN-released on ...
+	* DESCRIPTION (Version, Date): 0.999375-27, CRAN-released today.
 
 	* R/sparseVector.R: add as(<atomic>, "dsparseVector")
 	(spV2M): now works (again!?) for "isparseVector" (-> "dgTMatrix").
@@ -21,7 +21,6 @@
 
 	* R/Auxiliaries.R (.M.v, .v.M): slight speedup, and *use* them in
 	* R/Matrix.R (crossprod)
-
 
 2009-05-18  Martin Maechler  <maechler@stat.math.ethz.ch>
 
@@ -42,6 +41,12 @@
 
 	* R/rankMatrix.R (rankMatrix): new function for matrix rank;
 	"to be discussed".
+
+2009-05-07  Doug Bates and Martin Maechler <Matrix-authors@r-project.org>
+
+	* src/Mutils.c (Matrix_check_class_etc): diverse smallish
+	improvements, stuffing a small leak, adding PROTECT()ion,
+	but, alas, not enough.
 
 2009-05-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 
