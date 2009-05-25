@@ -4,10 +4,20 @@
 # atomicVector : classUnion (logical,integer,double,....)
 setAs("atomicVector", "sparseVector",
       function(from) {
-	  n <- length(from)
+	  n <- length(from)# *is* integer for atomic vectors
 	  r <- new(paste(.V.kind(from), "sparseVector", sep=''), length = n)
 	  ii <- from != 0
 	  r@x <- from[ii]
+	  r@i <- seq_len(n)[ii]
+	  r
+      })
+## dsparseVector: currently important, as later potentially made into d..Matrix :
+setAs("atomicVector", "dsparseVector",
+      function(from) {
+	  n <- length(from)# *is* integer for atomic vectors
+	  r <- new("dsparseVector", length = n)
+	  ii <- from != 0
+	  r@x <- as.numeric(from)[ii]
 	  r@i <- seq_len(n)[ii]
 	  r
       })
@@ -97,12 +107,7 @@ setAs("TsparseMatrix", "sparseVector",
       })
 
 
-
-## TODO -- also want  (sparseVector, dim) |---> sparseMatrix
-##  because of (nrow,ncol) specification can not (?)  use as(.).
-##  Hence use  Matrix(.) ?  or my  spMatrix(.) ?
-
-## For now, define this utility function:
+## Utility -- used in `dim<-` below, but also in  Matrix(.) :
 spV2M <- function (x, nrow, ncol, byrow = FALSE)
 {
     ## Purpose:	 sparseVector --> sparseMatrix	constructor
@@ -144,7 +149,7 @@ spV2M <- function (x, nrow, ncol, byrow = FALSE)
     has.x <- kind != "n"
     ## "careful_new()" :
     cNam <- paste(kind, "gTMatrix", sep='')
-    chngCl <- is.null(newCl <- getClass(cNam, .Force=TRUE))
+    chngCl <- is.null(slotNames(newCl <- getClass(cNam, .Force=TRUE)))
     if(chngCl) { ## e.g. "igTMatrix" is not yet implemented
 	if(substr(cNam,1,1) == "z")
 	    stopifnot(sprintf("Class '%s' is not yet implemented", cNam))
@@ -157,7 +162,7 @@ spV2M <- function (x, nrow, ncol, byrow = FALSE)
     if(byrow) { ## need as.integer(.) since <sparseVector> @ i can be double
 	r@j <- as.integer(i0 %% ncol)
 	r@i <- as.integer(i0 %/% ncol)
-    } else {				# default{byrow = FALSE}
+    } else { ## default{byrow = FALSE}
 	r@i <- as.integer(i0 %% nrow)
 	r@j <- as.integer(i0 %/% nrow)
     }
@@ -519,6 +524,7 @@ setMethod("rep", "sparseVector",
 
 
 ### Group Methods (!)
-
 ## o "Ops" , "Arith", "Compare"  :  ---> in ./Ops.R
 
+setMethod("solve", signature(a = "Matrix", b = "sparseVector"),
+	  function(a, b, ...) callGeneric(a, as(b, "sparseMatrix")))
