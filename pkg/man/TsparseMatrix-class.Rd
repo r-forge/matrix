@@ -41,10 +41,7 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{Dim}, \code{Dimnames}:}{from the \code{"Matrix"} class,}
-    \item{\code{factors}:}{from class \code{"sparseMatrix"}, see
-      \code{\linkS4class{sparseMatrix}}.}
-
+    \item{\code{Dim}, \code{Dimnames}:}{from the \code{"\linkS4class{Matrix}"} class,}
     \item{\code{i}:}{Object of class \code{"integer"} - the row indices
       of non-zero entries \emph{in 0-base}, i.e., must be in
       \code{0:(nrow(.)-1)}.}
