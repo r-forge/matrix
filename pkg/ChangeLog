@@ -1,3 +1,8 @@
+2009-05-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/chm_common.c, src/cs_utils.c, etc: internationalize more
+	messages; fix some; thanks to feedback from Chris Leick.
+
 2009-05-27  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* man/denseMatrix-class.Rd, etc: 'factors' is *not* a slot in this
