@@ -733,7 +733,8 @@ replTmat <- function (x, i, j, ..., value)
 .TM.repl.i.2col <- function (x, i, j, ..., value)
 {
     nA <- nargs()
-    if(nA != 3) stop("nargs() = ", nA, " should never happen; please report.")
+    if(nA != 3)
+	stop(gettextf("nargs() = %d should never happen; please report.", nA))
 
     ## else: nA == 3  i.e.,  M [ cbind(ii,jj) ] <- value or M [ Lmat ] <- value
     if(is.logical(i)) {
