@@ -105,7 +105,7 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x, Rboolean check_Udiag, Rboolean sort
 
     if (ctype < 0) error(_("invalid class of object to as_cholmod_sparse"));
     if (!isValid_Csparse(x))
-	error(_("invalid object passed to as_cholmod_sparse"))s;
+	error(_("invalid object passed to as_cholmod_sparse"));
     memset(ans, 0, sizeof(cholmod_sparse)); /* zero the struct */
 
     ans->itype = CHOLMOD_LONG;	/* characteristics of the system */
