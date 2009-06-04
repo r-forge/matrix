@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: R 2.10.0 / matrix 0.999375-26\n"
-"Report-Msgid-Bugs-To: bugs@R-project.org\n"
-"POT-Creation-Date: 2009-05-25 12:15\n"
+"Report-Msgid-Bugs-To: bugs@r-project.org\n"
+"POT-Creation-Date: 2009-05-29 12:38\n"
 "PO-Revision-Date: 2009-05-26 10:21+0100\n"
 "Last-Translator: Chris Leick <c.leick@vollbio.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
@@ -16,16 +16,21 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-
-msgid "not-yet-implemented method for %s(<%s>).\n ->>  Ask the package authors to implement the missing feature."
+msgid ""
+"not-yet-implemented method for %s(<%s>).\n"
+" ->>  Ask the package authors to implement the missing feature."
 msgstr ""
-"noch nicht implementierte Methode für %s(<%s>).\n ->> Bitten Sie die "
-"Autoren des Pakets, um diese fehlende Funktion zu implementieren."
+"noch nicht implementierte Methode für %s(<%s>).\n"
+" ->> Bitten Sie die Autoren des Pakets, um diese fehlende Funktion zu "
+"implementieren."
 
-msgid "not-yet-implemented method for %s(<%s>, <%s>).\n ->>  Ask the package authors to implement the missing feature."
+msgid ""
+"not-yet-implemented method for %s(<%s>, <%s>).\n"
+" ->>  Ask the package authors to implement the missing feature."
 msgstr ""
-"noch nicht implementierte Methode für %s(<%s>, <%s>).\n ->> Bitten Sie "
-"die Autoren des Pakets, um diese fehlende Funktion zu implementieren."
+"noch nicht implementierte Methode für %s(<%s>, <%s>).\n"
+" ->> Bitten Sie die Autoren des Pakets, um diese fehlende Funktion zu "
+"implementieren."
 
 msgid "'x' is not positive definite -- chol() undefined."
 msgstr "»x« ist nicht positiv definit -- chol() undefiniert."
@@ -198,12 +203,10 @@ msgstr "ungültige oder noch nicht implementierte »Matrix«-Untermenge"
 msgid "<sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient"
 msgstr "<sparse>[ <logic> ] : .M.sub.i.logical() könnte ineffizient sein"
 
-msgid "nargs() ="
-msgstr "nargs() ="
-
-msgid ".  Extraneous illegal arguments inside '[ .. ]' (i.logical)?"
-msgstr ""
-". Irrelevante ungültige Argumente innerhalb »[ .. ]« (i.logisch)?"
+#, fuzzy
+msgid ""
+"nargs() = %d.  Extraneous illegal arguments inside '[ .. ]' (i.logical)?"
+msgstr ". Irrelevante ungültige Argumente innerhalb »[ .. ]« (i.logisch)?"
 
 msgid "m[ <ij-matrix> ]: inefficiently indexing single elements"
 msgstr "m[ <ij-matrix> ]: ineffiziente Indexierung einzelner Elemente"
@@ -216,10 +219,10 @@ msgstr "Sollte niemals vorkommen. Bitte berichten."
 
 msgid "such indexing must be by logical or 2-column numeric matrix"
 msgstr ""
-"solche Indexierung muss von logischer oder 2-spaltig numerischer Matrix "
-"sein"
+"solche Indexierung muss von logischer oder 2-spaltig numerischer Matrix sein"
 
-msgid ".  Extraneous illegal arguments inside '[ .. ]' (i.2col)?"
+#, fuzzy
+msgid "nargs() = %d.  Extraneous illegal arguments inside '[ .. ]' (i.2col)?"
 msgstr ". Irrelevante ungültige Argumente innerhalb »[ .. ]« (i.2col)?"
 
 msgid ".M.repl.i.2col(): 'i' has no integer column number;"
@@ -237,13 +240,13 @@ msgstr "NAs sind in indexierten Anweisungen nicht erlaubt"
 msgid "m[ <ij-matrix> ] <- v: inefficiently treating single elements"
 msgstr "m[ <ij-matrix> ] <- v: Einzelne Elemente ineffizient behandelt"
 
-msgid ".  Extraneous illegal arguments inside '[ .. ]' ?"
+#, fuzzy
+msgid "nargs() = %d.  Extraneous illegal arguments inside '[ .. ]' ?"
 msgstr ". Irrelevante ungültige Argumente innerhalb »[ .. ]«?"
 
 msgid "RHS 'value' (class %s) matches 'ANY', but must match matrix class %s"
 msgstr ""
-"RHS »value« (Klasse %s) passt zu »ANY«, muss aber zur Matrixklasse %s "
-"passen"
+"RHS »value« (Klasse %s) passt zu »ANY«, muss aber zur Matrixklasse %s passen"
 
 msgid "not-yet-implemented 'Matrix[<-' method"
 msgstr "noch nicht implementierte »Matrix[<-«-Methode"
@@ -268,8 +271,7 @@ msgid "length of 1st arg does not match dimension of 2nd"
 msgstr "Länge des ersten arg passt nicht zur Dimension des zweiten"
 
 msgid "internal bug in \"Logic\" method for \"lMatrix\"; please report"
-msgstr ""
-"interner Fehler in der »Logic«-Methode für »lMatrix«. Bitte berichten"
+msgstr "interner Fehler in der »Logic«-Methode für »lMatrix«. Bitte berichten"
 
 msgid "<Matrix>"
 msgstr "<Matrix>"
@@ -280,8 +282,12 @@ msgstr "numeric(0) ist undefiniert"
 msgid "numeric(<too-long>)"
 msgstr "numerisch(<zu lang>)"
 
-msgid "longer object length\n\tis not a multiple of shorter object length"
-msgstr "längere Objektlänge\n\tist kein Vielfaches der kürzeren Objektlänge"
+msgid ""
+"longer object length\n"
+"\tis not a multiple of shorter object length"
+msgstr ""
+"längere Objektlänge\n"
+"\tist kein Vielfaches der kürzeren Objektlänge"
 
 msgid "numeric(0)"
 msgstr "numerisch(0)"
@@ -329,7 +335,8 @@ msgstr "[ <Zeichen> ] Indexierung nicht erlaubt: Ein »,« vergessen?"
 msgid "internal bug: matrix 'i' in replTmat(): please report"
 msgstr "interner Fehler: Matrix »i« in replTmat(): Bitte berichten"
 
-msgid "should never happen; please report."
+#, fuzzy
+msgid "nargs() = %d should never happen; please report."
 msgstr "sollte niemals vorkommen. Bitte berichten."
 
 msgid "row indices must be <= nrow(.) which is"
@@ -339,8 +346,7 @@ msgid "column indices must be <= ncol(.) which is"
 msgstr "Spaltenindexe müssen <= ncol(.) sein. Dies ist"
 
 msgid "duplicate ij-entries in 'Matrix[ ij ] <- value'; using last"
-msgstr ""
-"doppelte ij-Einträge in »Matrix[ IJ ] <- value«. Letzter wird benutzt"
+msgstr "doppelte ij-Einträge in »Matrix[ IJ ] <- value«. Letzter wird benutzt"
 
 msgid "<abIndex>[i]  is not yet implemented"
 msgstr "<abIndex>[i] ist noch nicht implementiert"
@@ -419,8 +425,8 @@ msgstr "nicht quadratische Matrix"
 
 msgid "matrix with non-zero off-diagonals cannot be coerced to diagonalMatrix"
 msgstr ""
-"Matrix mit Nichtdiagonalelementen ungleich null kann nicht in "
-"diagonalMatrix umgewandelt werden"
+"Matrix mit Nichtdiagonalelementen ungleich null kann nicht in diagonalMatrix "
+"umgewandelt werden"
 
 msgid "matrix is not diagonal"
 msgstr "Matrix ist nicht diagonal"
@@ -493,8 +499,7 @@ msgid "not-yet-implemented method for <%s> %%*%% <%s>"
 msgstr "noch nicht implementierte Methode für <%s> %%*%% <%s>"
 
 msgid "crossprod(x) calculated as x %*% x for sparse, symmetric x"
-msgstr ""
-"crossprod(x) berechnete als x %*% x für dünn besetztes,symmetrisches x"
+msgstr "crossprod(x) berechnete als x %*% x für dünn besetztes,symmetrisches x"
 
 msgid "tcrossprod(x) calculated as x %*% x for sparse, symmetric x"
 msgstr ""
@@ -518,8 +523,8 @@ msgstr "length(i) ist kein Vielfaches von length(x)"
 # http://www.woxikon.de/deutsch-englisch/incidence matrix.php
 msgid "only square matrices can be used as incidence matrices for graphs"
 msgstr ""
-"nur quadratische Matrizen können als Verbindungsmatrizen für Graphen "
-"benutzt werden"
+"nur quadratische Matrizen können als Verbindungsmatrizen für Graphen benutzt "
+"werden"
 
 msgid "Matrix-internal error in <sparseM>[i,,d]; please report"
 msgstr "Matrixinterner Fehler in <sparseM>[i,,d]. Bitte berichten"
@@ -528,8 +533,7 @@ msgid "invalid 'col.names' string:"
 msgstr "ungültige »col.names«-Zeichenkette:"
 
 msgid "logic programming error in printSpMatrix2(), please report"
-msgstr ""
-"logischer Programmierungsfehler in printSpMatrix2(), bitte berichten"
+msgstr "logischer Programmierungsfehler in printSpMatrix2(), bitte berichten"
 
 msgid "invalid 'type'"
 msgstr "ungültiger »type«"
@@ -557,8 +561,7 @@ msgstr "xtabs(*, sparse=TRUE) liefert nur wechselseitige Tabellen"
 
 msgid "qr.R(<sparse>) may differ from qr.R(<dense>) because of permutations"
 msgstr ""
-"qr.R(<sparse>) könnte von qr.R(<dense>) aufgrund von Permutationen "
-"abweichen"
+"qr.R(<sparse>) könnte von qr.R(<dense>) aufgrund von Permutationen abweichen"
 
 msgid "cannot coerce 'NA's to \"nsparseVector\""
 msgstr "Kann NAs nicht in »nsparseVector« umwandeln"
@@ -575,18 +578,20 @@ msgstr "»ncol« ist kein Faktor der length(x)"
 msgid "'nrow' is not a factor of length(x)"
 msgstr "»nrow« ist kein Faktor der length(x)"
 
-msgid "nrow * ncol < length(x)"
-msgstr "»nrow« * ncol < length(x)"
-
-msgid "nrow * ncol != length(x)"
-msgstr "»nrow« * ncol != length(x)"
-
 msgid "indexing out of range 0:"
 msgstr "Indexierung außerhalb des Bereichs 0:"
 
 msgid "index must be numeric or logical for 'sparseVector' indexing"
-msgstr ""
-"Index muss numerisch oder logisch für »sparseVector«-Indexierung sein"
+msgstr "Index muss numerisch oder logisch für »sparseVector«-Indexierung sein"
 
 msgid "'times >= 0' is required"
 msgstr "»times >= 0« wird benötigt"
+
+#~ msgid "nargs() ="
+#~ msgstr "nargs() ="
+
+#~ msgid "nrow * ncol < length(x)"
+#~ msgstr "»nrow« * ncol < length(x)"
+
+#~ msgid "nrow * ncol != length(x)"
+#~ msgstr "»nrow« * ncol != length(x)"
