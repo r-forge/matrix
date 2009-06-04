@@ -10,12 +10,14 @@ then
   perl -pi -e 's{^}{%% } if /spqr/i' $pkg/man/sparseQR-class.Rd
   perl -pi -e 's{define}{undef} if m{^#define Matrix_with_SPQR}' $pkg/src/Mutils.h
   for f in Makevars Makevars.win
-  do
-      perl -pi -e 's{SPQR }{} if /SPQR/' $pkg/src/$f
+  do if [ -f $f ]
+     then perl -pi -e 's{SPQR }{} if /SPQR/' $pkg/src/$f
+     fi
   done
   for f in R/spqr.R man/spqr.Rd man/SPQR-class.Rd src/SPQR
-  do
-      mv $pkg/$f $pkg/${f}.~notyet~
+  do if [ -f $f ]
+     then mv $pkg/$f $pkg/${f}.~notyet~
+     fi
   done
   echo ' [Done]'
 else
