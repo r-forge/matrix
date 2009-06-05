@@ -1,3 +1,15 @@
+2009-06-05  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Mutils.h, src/dgeMatrix.c: using dngettext(.) only
+	on future versions of R.
+
+2009-06-04  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999375-28, CRAN-released: ...
+
+	* po/de.po, po/R-de.po: German translations from Chris Leick.
+	* inst/po/de/: ditto, via po/update-me.sh
+
 2009-05-28  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/chm_common.c, src/cs_utils.c, etc: internationalize more

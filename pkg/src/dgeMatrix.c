@@ -10,13 +10,13 @@ SEXP dMatrix_validate(SEXP obj)
 	return mkString(_("Dim slot must have length 2"));
     m = INTEGER(Dim)[0]; n = INTEGER(Dim)[1];
     if (m < 0 || n < 0)
-#ifdef _not_easy_to_translate_
-	return mkString(_("Negative value(s) in Dim"));
-#else
+#if defined(R_VERSION) && R_VERSION >= R_Version(2, 10, 0)
 	return mkString(dngettext("Matrix",
 				  "Negative value in Dim",
 				  "Negative values in Dim",
 				  (m*n > 0) ? 2 : 1));
+#else
+	return mkString(_("Negative value(s) in Dim"));
 #endif
     if (!isReal(x))
 	return mkString(_("x slot must be numeric \"double\""));
