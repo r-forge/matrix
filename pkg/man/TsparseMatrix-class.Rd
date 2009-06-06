@@ -11,6 +11,7 @@
 \alias{coerce,TsparseMatrix,matrix-method}
 \alias{coerce,Matrix,TsparseMatrix-method}
 \alias{coerce,matrix,TsparseMatrix-method}
+\alias{coerce,numeric,TsparseMatrix-method}
 % \alias{Ops,TsparseMatrix,TsparseMatrix-method}
 % \alias{Ops,TsparseMatrix,CsparseMatrix-method}
 % \alias{Ops,CsparseMatrix,TsparseMatrix-method}
