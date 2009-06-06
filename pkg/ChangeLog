@@ -1,3 +1,7 @@
+2009-06-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Tsparse.R: add numeric -> Tsparse* coercion
+
 2009-06-05  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/Mutils.h, src/dgeMatrix.c: using dngettext(.) only
