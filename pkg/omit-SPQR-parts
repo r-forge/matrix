@@ -4,6 +4,7 @@ pkg=Matrix
 #
 if [ ! -d $pkg ] ; then cd `dirname $0`/.. ; fi
 if [ -d $pkg ]
+then
  if [ -d $pkg/.svn ]
  then echo 'Ooooooooops!  not omitting inside svn checkout !!'
  else
