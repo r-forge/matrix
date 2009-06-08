@@ -15,7 +15,7 @@ then
      fi
   done
   for f in R/spqr.R man/spqr.Rd man/SPQR-class.Rd src/SPQR
-  do if [ -f $f ]
+  do if [ -f $pkg/$f -o -d $pkg/$f ]
      then mv $pkg/$f $pkg/${f}.~notyet~
      fi
   done
