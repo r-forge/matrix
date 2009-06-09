@@ -343,7 +343,10 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp)
      * OTOH, currently  (order, tol) === (1, 1) always.
      */
 
-    if (ans != R_NilValue) return ans;
+    if (ans != R_NilValue) {
+	Rprintf("Returning cached factorization\n");
+	return ans;
+    }
     n = A->n;
     if (A->m != n)
 	error(_("LU decomposition applies only to square matrices"));
@@ -390,7 +393,7 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp)
 SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
 {
     /* b is dense or NULL [ <--> solve(A) */
-    SEXP lu = dgCMatrix_LU(Ap, ScalarLogical(1), ScalarReal(1));
+    SEXP lu = PROTECT(dgCMatrix_LU(Ap, ScalarLogical(1), ScalarReal(1)));
     SEXP qslot = GET_SLOT(lu, install("q"));
     CSP L = AS_CSP__(GET_SLOT(lu, install("L"))),
 	U = AS_CSP__(GET_SLOT(lu, install("U")));
@@ -404,6 +407,7 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
 	*x = Alloca(n, double);
     R_CheckStack();
 
+    
     if (U->n != n || nrhs < 1 || n < 1)
 	error(_("Dimensions of system to be solved are inconsistent"));
     for (j = 0; j < nrhs; j++) {
@@ -420,7 +424,7 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
 	else
 	    Memcpy(ax + j * n, x, n);
     }
-    UNPROTECT(1);
+    UNPROTECT(2);
     return ans;
 }
 
