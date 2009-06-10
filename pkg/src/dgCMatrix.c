@@ -385,6 +385,7 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp)
      * classes or two different names in the factors list for LU with
      * permuted columns or not.
      * OTOH, currently  (order, tol) === (1, 1) always.
+     * It is true that length(LU@q) does flag the order argument.
      */
     if (!isNull(ans = get_factors(Ap, "LU")))
 	return ans;
