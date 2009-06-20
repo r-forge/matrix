@@ -111,11 +111,16 @@ SEXP CHMfactor_ldetL2(SEXP x)
  */
 CHM_FR chm_factor_update(CHM_FR f, CHM_SP A, double mult)
 {
+    int ll = f->is_ll;
     double mm[2] = {0, 0};
     mm[0] = mult;
     if (!cholmod_l_factorize_p(A, mm, (int*)NULL, 0 /*fsize*/, f, &c))
 	error(_("cholmod_l_factorize_p failed: status %d, minor %d of ncol %d"),
 	      c.status, f->minor, f->n);
+    if (f->is_ll != ll)
+	if(!cholmod_l_change_factor(f->xtype, ll, f->is_super, 1 /*to_packed*/,
+				    1 /*to_monotonic*/, f, &c))
+	   error(_("cholmod_l_change_factor failed"));
     return f;
 }
 
