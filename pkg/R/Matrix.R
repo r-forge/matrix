@@ -65,7 +65,7 @@ setMethod("cov2cor", signature(V = "Matrix"),
 		  warning("diag(.) had 0 or NA entries; non-finite result is doubtful")
               Is <- Diagonal(x = Is)
               r <- Is %*% V %*% Is
-	      r[cbind(1L:p,1L:p)] <- 1 # exact in diagonal
+	      r[cbind(1:p,1:p)] <- 1 # exact in diagonal
 	      as(forceSymmetric(r), "dpoMatrix")
           })
 

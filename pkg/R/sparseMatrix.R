@@ -662,7 +662,7 @@ setMethod("cov2cor", signature(V = "sparseMatrix"),
 	      ##       we'd rather use that!
 	      Is <- as(Diagonal(x = Is), "sparseMatrix")
 	      r <- Is %*% V %*% Is
-	      r[cbind(1L:p,1L:p)] <- 1 # exact in diagonal
+	      r[cbind(1:p,1:p)] <- 1 # exact in diagonal
 	      as(r, "symmetricMatrix")
 	  })
 
