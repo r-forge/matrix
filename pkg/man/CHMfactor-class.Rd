@@ -173,6 +173,8 @@ r <- expand(CX <- Cholesky(XX))
 L.P <- with(r, crossprod(L,P))  ## == L'P
 PLLP <- crossprod(L.P)          ## == (L'P)' L'P == P'LL'P
 stopifnot( all.equal(PLLP, XX) )
+
+   ## [ See  help(Cholesky)  for more examples ]
 }
 \keyword{classes}
 \keyword{algebra}
