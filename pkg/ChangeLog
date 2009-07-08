@@ -1,3 +1,13 @@
+2009-07-08  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Tsparse.R (intI): also work for integer dimnames (well ..)
+
+2009-07-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R: "factor out" sparse model things into
+
+	* R/spModels.R (sparse.model.matrix): new model matrix functions
+
 2009-06-20  Douglas Bates <bates@stat.wisc.edu>
 
 	* src/CHMfactor.c: Ensure updated LL stays LL
