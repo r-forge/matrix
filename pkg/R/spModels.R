@@ -292,8 +292,8 @@ model.spmatrix <- function(trms, mf, transpose=FALSE)
     ## ----------------------------------------------------------------------
     ## Author: Martin Maechler, Date:  7 Jul 2009
 
-    ## mf is a model frame
-    stopifnot(is.model.frame(mf))
+    ## mf is a model frame or a "simple" data.frame [after reorder !]
+    stopifnot(is.data.frame(mf))
 
 ##     cat("model.spmatrix(trms, mf): \n trms = \n")
 ##     str(trms)
