@@ -134,6 +134,15 @@ SEXP CHMfactor_update(SEXP object, SEXP parent, SEXP mult)
     return chm_factor_to_SEXP(chm_factor_update(Lcp, A, asReal(mult)), 1);
 }
 
+SEXP destructive_CHM_update(SEXP object, SEXP parent, SEXP mult)
+{
+    CHM_FR L = AS_CHM_FR(object);
+    CHM_SP A = AS_CHM_SP__(parent);
+    R_CheckStack();
+
+    return chm_factor_to_SEXP(chm_factor_update(L, A, asReal(mult)), 0);
+}
+
 SEXP CHMfactor_ldetL2up(SEXP x, SEXP parent, SEXP mult)
 {
     SEXP ans = PROTECT(duplicate(mult));
