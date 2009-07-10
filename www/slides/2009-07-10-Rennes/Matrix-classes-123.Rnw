@@ -1,0 +1,291 @@
+% NOTE -- ONLY EDIT THE .Rnw FILE!!!  The .tex file is
+% likely to be overwritten.
+%
+\SweaveOpts{engine=R, keep.source=TRUE}
+\SweaveOpts{eps=FALSE, pdf=TRUE, width=10, height=6.5, strip.white=TRUE}
+\SweaveOpts{prefix=TRUE,prefix.string=figs/Matclass,include=FALSE}
+\setkeys{Gin}{width=\textwidth}%      -------------  ^^^^^^--> \includegraphics
+%
+<<preliminaries,echo=FALSE,results=hide>>=
+library("graph")
+library("Rgraphviz")
+library("classGraph")
+@
+
+\subsection{Matrix: Goals}
+\begin{frame}[fragile]\frametitle{R Package \texttt{Matrix}: Compelling
+    reasons for S4}
+
+\begin{enumerate}
+%% I
+\item \alert{Classes} for Matrices: well-defined inheritance hierarchies:
+   \begin{enumerate}
+   \item Content kind: Classes \code{dMatrix}, \code{lMatrix}, \code{nMatrix},
+     (\code{iMatrix}, \code{zMatrix}) for contents of \textbf{d}ouble,
+     \textbf{l}ogical, patter\textbf{n} (and not yet \textbf{i}nteger and complex)
+     Matrices, where \code{nMatrix} only stores the \emph{location} of
+     non-zero matrix entries (where as logical Matrices can also have
+     \code{NA} entries)
+   \item sparsity: \code{denseMatrix}, \code{sparseMatrix}
+   \item structure: general, triangular, symmetric, diagonal Matrices
+   \end{enumerate}
+\item Inheritance: Visualisation via graphs
+\item \textbf{Multiple} Inheritance (of classes)
+\item \textbf{Multiple} Dispatch  (of methods)
+\end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Multiple Dispatch in S4 .... for Matrix operations}
+\alert{Methods} for "{}Matrix"{}-matrices: Often \ {\large 2} \ matrices involved..
+\begin{enumerate}
+%% I
+\item \code{x \%*\% y}
+\item \code{crossprod(x,y)} --- $ \mathbf{x}\tr \mathbf{y}$
+\item \code{tcrossprod(x,y)} --- $ \mathbf{x} \mathbf{y}\tr$
+\item \code{x + y} --- \code{"Arith"} \emph{group methods}
+\item \code{x <= y} --- \code{"Compare"} \emph{group methods}
+\end{enumerate}
+\hspace*{\fill} and many many more.
+
+\begin{block}{S4 $>>$ S3}
+  \begin{itemize}
+  \item S4 - multiple dispatch: Find method according to classes of
+    \emph{both} (or more) arguments.
+  \item S3 - single dispatch: e.g., "ops.Matrix": only first argument counts.
+  \end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Goals of Matrix package}
+\begin{enumerate}
+\item interface to \LAPACK $=$ state-of-the-art numerical linear algebra for
+  \emph{dense} matrices
+  \begin{itemize}
+  \item making use of special structure for \emph{symmetric} or
+    \emph{triangular} matrices (e.g. when solving linear systems)
+  \item setting and keep such properties alows more optimized code in
+    these cases.
+  \end{itemize}
+\item \U{Sparse} matrices for \U{large} designs: regression, mixed models,
+  etc
+\item \dots\dots [omitted in this talk] % keep factorizations automagically
+
+\end{enumerate}
+Hence, quite a few \emph{different classes} for matrices.
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{many Matrix classes \dots}
+\begin{small}
+<<Matrix-classes>>=
+library(Matrix)
+length(allCl <- getClasses("package:Matrix"))
+## Those called "...Matrix" :
+length(M.Cl <- grep("Matrix$",allCl, value = TRUE))
+@ %def
+\end{small}
+
+i.e., \emph{many} \dots, each inheriting from root class "\code{Matrix}"
+\begin{small}
+<<Matrix>>=
+str(subs <- showExtends(getClassDef("Matrix")@subclasses,
+                        printTo=FALSE))
+## even more... :  All those above and these in addition:
+subs$what[ ! (subs$what %in% M.Cl)]
+@ %def
+\end{small}
+\dots\dots \fbox{\color{salmonII} a bit messy} \dots
+\end{frame}
+
+\subsection{3D space of Matrix classes}
+\begin{frame}[fragile]\frametitle{3-way Partitioning of ``Matrix space''}
+Logical organization of  our Matrices:
+Three (\ 3 \ ) main ``class classifications'' for our Matrices, i.e.,\\
+three ``orthogonal'' partitions of  ``Matrix space'', and every Matrix
+object's class corresponds to an \emph{intersection} of these three partitions.
+
+i.e., in \Rp's S4 class system: We have three independent inheritence
+schemes for every Matrix, and each such Matrix class is simply defined to
+\texttt{contain} three \emph{virtual} classes (one from each partitioning
+scheme), e.g,
+
+\medskip
+
+\begin{Schunk}\footnotesize
+\begin{Sinput}
+setClass("dgCMatrix",
+      contains= c("CsparseMatrix", "dsparseMatrix", "generalMatrix"),
+      validity= function(..) .....)
+\end{Sinput}
+\end{Schunk}
+\end{frame}
+
+\begin{frame}\frametitle{3-way Partitioning of Matrix space --- 2}
+  The three partioning schemes are
+  \begin{enumerate}
+  \item Content \texttt{type}: Classes \code{dMatrix}, \code{lMatrix},
+    \code{nMatrix},
+    (\code{iMatrix}, \code{zMatrix}) for entries of type \textbf{d}ouble,
+    \textbf{l}ogical, patter\textbf{n} (and not yet \textbf{i}nteger and
+    complex) Matrices.
+
+    \code{nMatrix} only stores the
+    \emph{location} of non-zero matrix entries (where as logical Matrices
+    can also have \code{NA} entries!)
+
+  \item structure: general, triangular, symmetric, diagonal Matrices
+
+  \item sparsity: \code{denseMatrix}, \code{sparseMatrix}
+
+  \end{enumerate}
+
+  \medskip
+
+  First two schemes: a slight generalization from \LAPACK\
+  for dense matrices.
+\end{frame}
+
+
+\begin{frame}[fragile]\frametitle{3D space of Matrix classes}
+three-way partitioning of Matrix classes visualized in 3D space,
+dropping the final {\texttt{Matrix}}, e.g.,
+\texttt{"\U{d}"} instead of \texttt{"\U{d}Matrix"}:
+<<3dim, keep.source=FALSE>>=
+## keep.source=FALSE: do *not* show comments
+# d1 <- c("d", "l", "n", "z", "i")
+d1 <- c("d", "l", "n") # , "z", "i")
+d2 <- c("general", "symmetric", "triangular", "diagonal")
+# d3. <- c("dense", "sparse")
+d3 <- c("dense", c("Csparse", "Tsparse", "Rsparse"))
+
+clGrid <- expand.grid(dim1 = d1, dim2 = d2, dim3 = d3, KEEP.OUT.ATTRS = FALSE)
+clGr <- data.matrix(clGrid)
+
+library(scatterplot3d)
+@
+used for visualization:
+<<3dplot, fig=TRUE, echo=FALSE, results=hide, width=6, height=4>>=
+clGr <- 0.25 + data.matrix(clGrid) # "offset" from the coordinate planes
+if(FALSE)## for experiment
+    r3 <- scatterplot3d(clGr, color = "tomato", cex.symbols = 0.2)
+
+## for real:
+p.3dcl <- function(color = "tomato", cex.symbols = 0.2, text.cex = 1.25) {
+  r3 <- scatterplot3d(clGr, color = color, cex.symbols = cex.symbols,
+                      col.axis = "gray60", col.lab = "gray70",
+                      label.tick.marks=FALSE, grid = FALSE)
+  op <- par(xpd = NA) ## no(!) : on.exit(par(op))
+  ##
+  ## d, l, n :
+  text(r3$xyz(cbind(x = .4+ seq_along(d1), y= 0.5, z= 0.9)),
+       d1, col = "blue", cex = text.cex)
+  ## general, symmetric, .. -- on the *other* side (+ length(.)):
+  text(r3$xyz(cbind(x = 1.1+length(d1), y = seq_along(d2), z= 1.3)),
+       d2, col = "purple", cex = text.cex)
+  ## dense, Csparse, Tsparse, Rsparse:
+  text(r3$xyz(cbind(x = .2, y = 1.7, z = seq_along(d3))),
+       d3, col = "gold3", cex = text.cex)
+  invisible(r3)
+}
+p.3dcl()
+@
+\par\vspace*{-6ex}
+\centerline{\includegraphics[width=.7\textwidth]{figs/Matclass-3dplot}}
+\end{frame}
+
+%% Not again here
+% \begin{frame}[fragile]\frametitle{3D space of Matrix classes}
+% \centerline{\includegraphics[width=.9\textwidth]{figs/Matclass-3dplot}}
+% \end{frame}
+
+\begin{frame}[fragile]\frametitle{3-fold classification --- Matrix naming scheme}
+  \begin{enumerate}
+  \item \emph{``Actual''} classes: Matrix objects are of those; the above
+    ``points in 3D space''
+  \item \emph{Virtual} classes: e.g. the above coordinate axes
+    categories. Superclasses of actual ones\\
+    cannot have objects of, but ---importantly--- many \emph{methods} for
+    these virtual classes.
+  \end{enumerate}
+  Actual classes follow a ``simple'' terse naming convention:
+<<3M-cl>>=
+str(M3cl <- grep("^...Matrix$",M.Cl, value = TRUE))
+substring(M3cl,1,3)
+M3cl <- M3cl[M3cl != "corMatrix"] # corMatrix not desired in following
+@
+%% this is actually 'funny':
+%% str(ll <- lapply(M3cl, new))
+\end{frame}
+
+%% How do they arise in 3-space:
+%%
+%\begin{frame}[fragile]\frametitle{Matrix 3d space: filled}
+\begin{frame}[fragile]\frametitle{3D space of Matrix classes}
+%% First, just repeat the old plot:
+\centerline{\includegraphics[width=.9\textwidth]{figs/Matclass-3dplot}}
+\end{frame}
+
+<<3dpl-1, fig=TRUE, echo=FALSE, results=hide, width=6, height=4>>=
+## find coordinate of each class in M3cl
+dlist <- list(d1=d1, d2=d2, d3=d3)
+cList <- lapply(dlist, function(n)paste(n,"Matrix", sep=""))
+ncl <- length(M3cl)
+{ ## This is now quite different:
+    ## R >= 2.9.0: no longer have *duplicated* superclasses
+    xyz <- matrix(0, ncl, 3, dimnames=list(M3cl, NULL))
+    for(i in 1:ncl) {
+        supcl <- names(getClassDef(M3cl[i]) @ contains)
+        xyz[i,] <- sapply(cList, function(cls) {
+            i <- which(cls %in% supcl); if(length(i)) i else 0})
+    }
+    xyz[duplicated(xyz),]
+}
+r3 <- p.3dcl(color = "tomato", cex.symbols = 0.2)
+if(FALSE) { ## rather do it incrementally
+    text(r3$xyz(.25 + xyz), substring(M3cl, 1,3))
+}
+p.3dIncr <- function(i.id1 = seq_along(d1)) {
+    ## incrementally, for interactive demo :
+    for(id1 in i.id1) {
+        if(id1 != 1) {
+            if(dev.interactive())
+                readline("press [Enter] for next 'slice': ")
+            ## redraw last one with "dim" color:
+            text(xyi, substring(M3cl[iii], 1,3), col="gray")
+        }
+        iii <- xyz[,1] == id1
+        ##     ^^^
+        xyi <- r3$xyz(.25 + xyz[iii,])      # $ (emacs)
+        ##     ^^^^^^
+        ## make the "tomato" points invisible:
+        points(xyi, col=par("bg"), cex = 0.2)
+        text(xyi, substring(M3cl[iii], 1,3))
+    }
+}
+if(FALSE)# not here -- need separate plot files
+    p.3dIncr()
+p.3dIncr(1)
+@
+%%%------ FIXME : use 'beamer' overlays correctly instead of this ugly....
+
+\begin{frame}[fragile]\frametitle{Matrix 3d space: filled (2)}
+\centerline{\includegraphics[width=.9\textwidth]{figs/Matclass-3dpl-1}}
+\end{frame}
+
+<<3dpl-2, fig=TRUE, echo=FALSE, results=hide, width=6, height=4>>=
+p.3dcl(color = "tomato", cex.symbols = 0.2)
+p.3dIncr(1:2)
+@
+\begin{frame}[fragile]\frametitle{Matrix 3d space: filled (3)}
+\centerline{\includegraphics[width=.9\textwidth]{figs/Matclass-3dpl-2}}
+\end{frame}
+
+<<3dpl-3, fig=TRUE, echo=FALSE, results=hide, width=6, height=4>>=
+p.3dcl(color = "tomato", cex.symbols = 0.2)
+p.3dIncr() ## all 3
+@
+\begin{frame}[fragile]\frametitle{Matrix 3d space: filled (4)}
+\centerline{\includegraphics[width=.9\textwidth]{figs/Matclass-3dpl-3}}
+\end{frame}
+
+%%%--- Now finally show the graphs!!
+%% -- separate *.Rnw file -- to save R CPU
