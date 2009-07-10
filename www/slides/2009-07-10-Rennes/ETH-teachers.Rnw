@@ -1,0 +1,109 @@
+\SweaveOpts{engine=R, keep.source=TRUE}
+\SweaveOpts{eps=FALSE, pdf=TRUE, width=9, height=6, strip.white=TRUE}
+\setkeys{Gin}{width=\textwidth}
+
+\section[ETH Profs]{Who's the best liked prof at ETH?}
+%% Doug Bates: "best liked", *not*  "most liked"
+<<preliminaries, echo=FALSE>>=
+options(width=75)
+@
+\begin{frame} \frametitle{Who's the best liked prof at ETH?}
+  \begin{itemize}
+  \item Private donation for encouraging excellent teaching at ETH
+  \item Student union of ETH Zurich organizes survey to award prizes:\\
+    Best lecturer --- of ETH, and of each of the 14 departments.
+  \item Smart Web-interface for survey: Each student sees the names of his/her
+    professors from the last 4 semesters and all the lectures that applied.
+  \item ratings in $\{1,2,3,4,5\}$.
+  \item high response rate
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Who's the best prof --- data}
+@
+<<read-dat>>=
+md <- within(read.csv("~/R/MM/Pkg-ex/lme4/puma-lmertest.csv"), {
+    s       <- factor(s) # Student_ID
+    d       <- factor(d) # Lecturer_ID ("d"ozentIn)
+    dept    <- factor(dept)
+    service <- factor(service)
+    studage <- ordered(studage)## *ordered* factors
+    lectage <- ordered(lectage) })
+str(md)
+@ %def
+\end{frame}
+
+<<save-dat,echo=FALSE,eval=FALSE>>=
+d.eth <- md
+save(d.eth, file="/u/maechler/R/MM/Pkg-ex/lme4/puma-eth.rda")
+@
+
+\begin{frame}\frametitle{Modelling the ETH teacher ratings}
+  Model: The rating depends on
+  \begin{itemize}
+  \item students (\texttt{s}) (rating subjectively)
+  \item teacher  (\texttt{d}) -- main interest
+  \item department (\texttt{dept})
+  \item ``service'' lecture or ``own department student'',
+    (\texttt{service}: 0/1).
+  \item semester of student at time of rating
+    (\texttt{studage}$\in\{2,4,6,8\}$).
+  \item how many semesters back was the lecture (\texttt{lectage}).
+  \end{itemize}
+
+  Main question: \fbox{Who's the best prof?}
+
+  Hence, for ``political'' reasons, want \texttt{d} as a \textbf{fixed}
+  effect.
+\end{frame}
+\begin{frame}[fragile]\frametitle{Model for ETH teacher ratings}
+
+Want \texttt{d} (``teacher\_ID'', $\approx 1000$ levels) as \textbf{fixed}
+effect.
+Consequently, in
+\[ y = \bX\bbeta + \bZ\bm{b} + \beps
+\]
+% have $\bX$ as $n \times 1000$ (roughly) \\
+% have $\bZ$ as $n \times 5000$, $n \approx 70'000$.
+have $\bX$ as $n \times 1000$ (roughly), \ \ $\bZ$ as $n \times 5000$, $n \approx 70'000$.
+
+\smallskip
+
+@
+<<lmer-tst,eval=FALSE>>=
+fm0 <- lmer2(y ~ d + dept*service + studage + lectage + (1|s),
+             data = md, sparseX = TRUE)
+#                       ^^^^^^^^^^^^^^^ new option
+@ %def
+\texttt{sparseX = TRUE}: \emph{sparse} $\bX$ (fixed effects)
+in addition to the indispensably sparse $\bZ$ (random effects).
+
+Unfortunately: Here, the above ``sparseX - lmer'' ends in
+\begin{Schunk}
+% \begin{Sinput}
+% > fm0 <- lmer2(y ~ d + dept*service + studage + lectage + (1|s),
+% +             data = md, sparseX = TRUE)
+% \end{Sinput}
+\begin{Soutput}
+Error ... Cholmod error 'not positive definite' at file:../Cholesky/......
+\end{Soutput}
+\end{Schunk}
+@
+
+\begin{block}{Good News: Newly in \texttt{Matrix}:}
+  \texttt{sparse.model.matrix()}
+\end{block}
+
+\begin{itemize}
+\item which \texttt{lmer()} can use,
+\item or you can use for ``truly sparse'' least
+  squares (i.e. no intermediately dense design matrix)
+\item something we plan to provide in Matrix 1.0-0.
+\end{itemize}
+\end{frame}
+
+
+%%% Local Variables:
+%%% TeX-command-default: "LaTeX PDF"
+%%% TeX-master: "talk.tex"
+%%% End:

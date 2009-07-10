@@ -1,0 +1,95 @@
+\SweaveOpts{engine=R, keep.source=TRUE}
+\SweaveOpts{eps=FALSE, pdf=TRUE, width=9, height=6, strip.white=TRUE}
+\setkeys{Gin}{width=\textwidth}
+
+\subsection[Intro Sparse Matrix]{Sparse Matrices in  package \texttt{Matrix}}
+\label{sec:spMat}
+\begin{frame}\frametitle{Intro to Sparse Matrices in \RR\ package \pkg{Matrix}}
+
+\begin{itemize}
+\item The \RR\ Package \pkg{Matrix} contains dozens of matrix classes and
+  hundreds of method definitions.
+\item Has sub-hierarchies of \code{denseMatrix} and \code{sparseMatrix}.
+\item Very basic intro in \emph{some} of sparse matrices:
+\end{itemize}
+
+\end{frame}
+
+
+<<preliminaries, echo=FALSE, results=hide>>=
+options(width=75)
+library(Matrix)
+@
+\begin{frame}[fragile]\frametitle{simple example --- Triplet form}
+The most obvious way to store a sparse matrix is the so called
+\emph{``Triplet''} form; (virtual class \texttt{TsparseMatrix} in \pkg{Matrix}):
+@
+<<ex1>>=
+A <- spMatrix(10, 20, i = c(1,3:8),
+                      j = c(2,9,6:10),
+                      x = 7 * (1:7))
+A # a  "dgTMatrix"
+@ %def
+
+\bigskip
+
+Less didactical, slighly more recommended:\ \texttt{A1 <- sparseMatrix(.....)}
+% does NOT fit:
+% <<ex1-a>>=
+% A1 <- sparseMatrix(i = c(1,3:8),
+%                    j = c(2,9,6:10),
+%                    x = 7 * (1:7), dims= c(10,20))
+
+% class(A1) # *not* ``..TMatrix'' --> see below
+% @ %def
+\end{frame}
+
+%%N  summary(A)
+
+
+\begin{frame}[fragile]\frametitle{simple example -- 2 -- }
+<<ex1-summ>>=
+str(A) # note that *internally* 0-based indices (i,j) are used
+A[2:7, 12:20] <- rep(c(0,0,0,(3:1)*30,0), length = 6*9)
+@ %def
+
+\smallskip
+
+<<ex2-log-not-yet,eval=false>>=
+A >= 20  ##  <--- what result do you expect ?
+@
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{simple example -- 3 -- }
+<<ex2-logic>>=
+A >= 20 # -> logical sparse; nice show() method
+@ %def
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{sparse \emph{compressed} form}
+Triplet representation: easy for us humans,
+but can be both made smaller \emph{and} more efficient for
+(column-access heavy) operations:\\
+The ``column compressed'' sparse representation%,
+%(virtual class \texttt{CsparseMatrix} in \pkg{Matrix})
+:
+\medskip
+
+@
+<<ex1-Csparse>>=
+Ac <- as(t(A), "CsparseMatrix")
+str(Ac)
+@ %def
+
+\bigskip
+
+Column \emph{index} slot \texttt{j} \\
+replaced by a column \emph{pointer} slot \texttt{p}.
+\end{frame}
+
+
+%%% Local Variables:
+%%% TeX-command-default: "LaTeX PDF"
+%%% TeX-master: "talk.tex"
+%%% End:
+

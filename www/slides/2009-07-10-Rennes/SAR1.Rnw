@@ -1,0 +1,131 @@
+\SweaveOpts{engine=R, keep.source=TRUE}
+\SweaveOpts{eps=FALSE, pdf=TRUE, width=9, height=6, strip.white=TRUE}
+\setkeys{Gin}{width=\textwidth}
+
+<<preliminaries, echo=FALSE, results=hide>>=
+library(Matrix)
+options(width=75)
+@
+\section[Spatial-appl]{Applications in Spatial Statistics}\label{sec:spatial}
+\subsection{Regression with Spatially Dependent Errors: SAR(1)}
+\begin{frame}\frametitle{Spatially Dependent Errors --- SAR(1)}
+  Regression with spatially dependent errors; observations at
+  \emph{locations} $i, \ \ i=1,\dots, n$,  $n$ in the thousands, possibly
+  100'000s.
+
+  \begin{block}{Simultaneous Autoregression}
+  \begin{equation}
+    \label{eq:SAR}
+    \by = \bX\bbeta + \bu \ \ \ \textrm{where} \ \  \bu = \lambda\W\bu + \beps.
+  \end{equation}
+  \end{block}
+
+  \begin{itemize}
+  \item $\W$ : matrix $(W_{ij})$ of ``distance-based contiguities''
+    of locations $i$ and $j$ ($ W_{ii} \equiv 0$).
+
+  \item   $\lambda$: SAR(1) parameter; estimate via MLE, ($\bbeta$ profiled out).
+
+  \item $\bu \sim
+    \mathcal{N}\bigl(\bm 0, \sigma^2(\bI - \lambda \W)^{-1}(\bI - \lambda \W\tr)^{-1}\bigr)$
+  \item For log likelihood, need to compute determinant $\abs{\bI -
+      \lambda\W} = (-\lambda)^n \abs{-\W + \frac{1}{\lambda}\bI}$
+    for many $\lambda$.
+  \end{itemize}
+
+  \begin{block}{}
+    Compute  Cholesky / Determinant of  $\bm A + \rho \bm I$
+    for large sparse symmetric $\bm A$:
+
+    \qquad $\Longrightarrow$ \ Fast \alert{Cholesky Update}
+  \end{block}
+
+\end{frame}
+
+
+\begin{frame}[fragile]\frametitle{SAR(1) -- fast Likelihood from Cholesky Update}
+Data provided by Roger Bivand, as a relevant test case:
+
+<<USCounties-dat>>=
+data(USCounties, package="Matrix")
+dim(USCounties)
+(n <- ncol(USCounties))
+
+IM <- .symDiagonal(n)
+nWC <- -USCounties
+
+set.seed(1)
+rho <- sort(runif(50,  0, 1)) ## rho = 1 / lambda
+@
+
+and now compute \emph{determinant(A)} $=: \abs{\bm A}$
+\begin{equation}
+  \label{eq:detW_rI}
+  \abs{\bI - \lambda\W} \propto \abs{-\W + \frac{1}{\lambda}\bI}
+  \ \ \hbox{\textrm{for many}} \lambda\ 's.%'
+\end{equation}
+
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{SAR(1) -- Cholesky Update -- 2 --}
+<<USCounties-Det>>=
+## Determinant : Direct Computation
+system.time(MJ <- sapply(rho, function(x)
+       determinant(IM - x * USCounties, logarithm = TRUE)$modulus))
+
+## Determinant : "high-level" Update of the Cholesky {Simplicial / Supernodal}
+C1 <- Cholesky(nWC, Imult = 2)
+system.time(MJ1 <- n * log(rho) +
+   sapply(rho, function(x) c(determinant(update(C1, nWC, 1/x))$mod)))
+stopifnot(all.equal(MJ, MJ1))
+
+C2 <- Cholesky(nWC, super = TRUE, Imult = 2) ## <<-- "Supernodal"
+system.time(MJ2 <- n * log(rho) +
+   sapply(rho, function(x) c(determinant(update(C2, nWC, 1/x))$mod)))
+@
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{SAR(1) -- Cholesky Update -- 3 --}
+<<USCounties-Det-2>>=
+stopifnot(all.equal(MJ, MJ2))
+
+## Determinant : "low-level" Update of the Cholesky {Simplicial / Supernodal}
+system.time(MJ3 <- n*log(rho) + Matrix:::ldetL2up(C1, nWC,1/rho))
+stopifnot(all.equal(MJ, MJ3))
+system.time(MJ4 <- n*log(rho) + Matrix:::ldetL2up(C2, nWC,1/rho))
+stopifnot(all.equal(MJ, MJ4))
+@
+
+\begin{block}{Findings:}
+\begin{enumerate}
+\item Using Cholesky update: order of magnitude faster
+\item Simplicial ({\footnotesize \texttt{super= FALSE}})
+  $\leftrightarrow$
+  Supernodal ({\footnotesize \texttt{super= TRUE}}) : \ no big
+  difference here
+\item An even faster method for Det(Chol(.)) yields another 50\% speed.
+\end{enumerate}
+\end{block}
+\end{frame}
+
+
+% and a larger one, for size reasons only part of the R-forge version of Matrix:
+% <<world1d-dat>>=
+% data("wrld_1deg", package = "Matrix")
+% dim(wrld_1deg)
+
+%\subsection{Simplified Variogram Modelling}
+
+%--> Duenki c/o Kuensch: Robust Kriging --> exp(-||S_i - S_j||^2) ``zapsmall''
+
+%\begin{frame}\frametitle{Spatial Modelling -- ML for Variogram }
+
+%% cUSC   <- as(Cholesky(-USCounties,           , Imult = 4), "Matrix")
+%% cUSC.f <- as(Cholesky(-USCounties, perm=FALSE, Imult = 4), "Matrix")
+%\end{frame}
+
+
+%%% Local Variables:
+%%% TeX-command-default: "LaTeX PDF"
+%%% TeX-master: "MM-talk.tex"
+%%% End:
