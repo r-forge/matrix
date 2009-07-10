@@ -103,3 +103,26 @@ ldetL2up <- function(x, parent, Imult)
     .Call(CHMfactor_ldetL2up, x, parent, as.double(Imult))
 }
 
+##' Update a sparse Cholesky factorization in place
+##' @param L A sparse Cholesky factor that inherits from CHMfactor
+##' @param parent a sparse matrix for updating the factor.  Either a
+##'   dsCMatrix, in which case L is updated to the Cholesky
+##'   factorization of parent, or a dgCMatrix, in which case L is
+##'   updated to the Cholesky factorization of tcrossprod(parent)
+##' @param Imult an optional positive scalar to be added to the
+##'   diagonal before factorization,
+
+##' @return NULL.  This function always returns NULL.  It is called
+##'   for its side-effect of updating L in place.
+
+##' @note This function violates the functional language semantics of
+##'   R in that it updates its argument L in place (i.e. without copying).
+##'   This is intentional but it means the function should be used
+##'   with caution.  If the preceding sentences do not make sense to
+##'   you, you should not use this function,.
+destructive_Chol_update <- function(L, parent, Imult = 1)
+{
+    stopifnot(is(L, "CHMfactor"),
+              is(parent, "sparseMatrix"))
+    .Call(destructive_CHM_update, L, parent, Imult)
+}
