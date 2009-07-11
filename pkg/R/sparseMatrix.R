@@ -362,7 +362,7 @@ printSpMatrix <- function(x, digits = getOption("digits"),
     if(prod(d) > maxp) { # "Large" => will be "cut"
         ## only coerce to dense that part which won't be cut :
         nr <- maxp %/% d[2]
-	m <- as(x[1:max(1, nr), ,drop=FALSE], "Matrix")
+	m <- as(x[1:max(1, nr), ,drop=FALSE], "matrix")
     } else {
         m <- as(x, "matrix")
     }
@@ -461,6 +461,9 @@ printSpMatrix2 <- function(x, digits = getOption("digits"),
                            align = c("fancy", "right"))
 {
     d <- dim(x)
+    cl <- class(x)
+    cat(sprintf('%d x %d sparse Matrix of class "%s"\n',
+                d[1], d[2], cl))
     if((identical(suppRows,FALSE) && identical(suppCols, FALSE)) ||
        (!isTRUE(suppRows) && !isTRUE(suppCols) && prod(d) <= maxp))
     {
@@ -517,16 +520,11 @@ printSpMatrix2 <- function(x, digits = getOption("digits"),
     }
 } ## printSpMatrix2 ()
 
-setMethod("print", signature(x = "sparseMatrix"), printSpMatrix)
+setMethod("print", signature(x = "sparseMatrix"), printSpMatrix2)
 
 setMethod("show", signature(object = "sparseMatrix"),
-          function(object) {
-              d <- dim(object)
-              cl <- class(object)
-              cat(sprintf('%d x %d sparse Matrix of class "%s"\n',
-                          d[1], d[2], cl))
-              printSpMatrix2(object)
-          })
+	  function(object) printSpMatrix2(object))
+
 
 
 ## For very large and very sparse matrices,  the above show()
