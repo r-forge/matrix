@@ -81,6 +81,7 @@ str(mtm@factors) # empty list()
 (C1 <- Cholesky(mtm))             # uses show(<MatrixFactorization>)
 str(mtm@factors) # 'sPDCholesky' (simpl)
 (Cm <- Cholesky(mtm, super = TRUE))
+c(C1 = isLDL(C1), Cm = isLDL(Cm))
 str(mtm@factors) # 'sPDCholesky'  *and* 'SPdCholesky'
 str(cm1  <- as(C1, "sparseMatrix"))
 str(cmat <- as(Cm, "sparseMatrix"))# hmm: super is *less* sparse here
@@ -103,6 +104,9 @@ dq <- function(ch) paste('"',ch,'"', sep="") ## dQuote(<UTF-8>) gives bad plots
 image(mtm, main=paste("crossprod(mm) : Sparse", dq(class(mtm))))
 image(cm1, main= paste("as(Cholesky(crossprod(mm)),\"sparseMatrix\"):",
                         dq(class(cm1))))
+\dontshow{
+expand(C1) ## to check printing
+}
 }
 \keyword{array}
 \keyword{algebra}

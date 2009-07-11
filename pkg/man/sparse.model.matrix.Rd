@@ -22,9 +22,10 @@ sparse.model.matrix(object, data = environment(object),
     \code{data} has no \code{"terms"} attribute.}
   \item{\dots}{further arguments passed to or from other methods.}
 }
-% \details{
-% %%  ~~ If necessary, more details than the description above ~~
-% }
+\details{
+  Currently, the model must have an intercept;
+  this is a temporary limitation, hopefully removed within days.. % 2009-07-09
+}
 \value{
   a sparse matrix, inheriting from \code{\linkS4class{CsparseMatrix}},
   typically of class  \code{\linkS4class{dgCMatrix}}.

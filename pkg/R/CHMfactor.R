@@ -12,10 +12,13 @@ setMethod("expand", signature(x = "CHMfactor"),
           function(x, ...)
           list(P = as(x, "pMatrix"), L = as(x, "sparseMatrix")))
 
-## nowhere used:
-isLDL <- function(x) {
+##' Determine if a CHMfactor object is LDL or LL
+##' @param x - a CHMfactor object
+##' @return TRUE if x is LDL, otherwise FALSE
+isLDL <- function(x)
+{
     stopifnot(is(x, "CHMfactor"))
-    x@type[2]
+    as.logical(x@type[2])
 }
 
 setMethod("image", "CHMfactor",

@@ -143,6 +143,13 @@ contr.SAS <- function(n, contrasts = TRUE, sparse=FALSE)
                     contrasts, sparse=sparse)
 }
 
+contr.poly <- function (n, scores = 1L:n, contrasts = TRUE, sparse = FALSE) {
+    ## this is non-sense anyway
+    as(stats::contr.poly(n, scores=scores, contrasts=contrasts),
+       "sparseMatrix")
+}
+
+
 }## end if (<old R version>)
 
 

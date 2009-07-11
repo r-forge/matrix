@@ -32,6 +32,7 @@ export("Cholesky",
        "forceSymmetric",
 #	 "isTriangular",
 #	 "isDiagonal",
+       "isLDL",
        "lu",
        "norm",
        "nearPD",
@@ -271,6 +272,9 @@ exportMethods(## for both own and "other" generics:
               "update",
 	      "zapsmall"
 	      )
+
+if(getRversion() < "2.10.0")
+    exportPattern("^contr\\..*")
 
 exportMethods("rbind2")
 exportMethods("cbind2")
