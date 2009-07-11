@@ -1,3 +1,12 @@
+2009-07-11  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (show, printSpMatrix2): both print() and show()
+	now use printSpMatrix2(), and that now already prints
+	"<n> x <m> sparse Matrix of class ...".
+
+	* R/CHMfactor.R (isLDL): fix and
+	* NAMESPACE: export  isLDL()
+
 2009-07-10  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/spModels.R (model.spmatrix): mf may be simple data.frame
