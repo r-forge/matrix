@@ -102,9 +102,9 @@ profDev <- function(rho, theta) {
     by a call to \Rfun{model.matrix}.
   \item Many users feel frustrated that \RR does not transparently
     handle very large model matrices, failing to realize that a naive
-    decomposition of an $n\times p$ dense model matrix requires $np^2$
-    flops.  Large values of $p$ are particularly problematic.
-  \item Frequently large values of $p$ are a consequence of
+    decomposition of an $n\times p$ dense model matrix requires $O(np^2)$
+    flops.  Large values of $p$ are thus particularly problematic.
+  \item Frequently, large values of $p$ are a consequence of
     incorporating factors with a large number of levels in the model.
     A factor with $k$ levels generates at least $k-1$ columns as do
     any interactions with such a factor.
@@ -302,7 +302,7 @@ profDev <- function(rho, theta) {
     \begin{displaymath}
       (\bm U_\theta\,\bm U\tr_\theta+\bm I_q)
       \bm\mu_{\bc U|\bc Y}=\bm U\tr_\theta(\bm y-\bm X\bm\beta) =
-      \bm\Lambda\tr_\theta\left(\bm Z\bm y-\bm Z\bm X\bm\beta\right)
+      \bm\Lambda\tr_\theta\left(\bm Z\tr\bm y-\bm Z\tr\bm X\bm\beta\right)
     \end{displaymath}
   \item This would be interesting but not very important were it not
     for the fact that we actually can solve that system for
@@ -324,6 +324,54 @@ profDev <- function(rho, theta) {
     of the identity, from the sparse, rectangular $\bm U_\theta$.)
     From $\bm L_\theta$ we solve for $\bm\mu_{\bc U|\bc Y}$.
   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{What do we mean by ``large'' nowadays?}
+  \begin{itemize}
+  \item Harold Doran recently fit a linear mixed model to the annual
+    achievement test results for the last 4 years in one of the United
+    States.  There were $n=5212017$ observations on a total of
+    $n_1=1876788$ students and $n_2=47480$ teachers.
+  \item The models had simple, scalar random effects for student and
+    for teacher resulting in $q=1924268$ (i.e. nearly 2 million!)
+  \item There were a total of $p=29$ fixed-effects parameters.
+  \item At present Harold needed to fit the model to a subset and only
+    evaluate the conditional means for all the students and teachers
+    but we should be able to get around that limitation and actually
+    fit the model to all these responses and random effects.
+  \item I don't know of other software that can be used to fit a
+    model this large.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Size of the decomposition for this large model}
+  \begin{itemize}
+  \item The limiting factor on the memory size in such a model is the
+    Cholesky factor $\bm L(\bm\theta)$.
+  \item In this case the \code{x} slot is itself over 1GB in size and the \code{i} slot is over 0.5 GB.
+  \item These are close to an inherent limit on atomic R objects (the
+    range of an index into an atomic object cannot exceed $2^{31}$).
+  \end{itemize}
+  \begin{Schunk}
+    \begin{Sinput}
+> str(L)
+    \end{Sinput}
+    \begin{Soutput}
+Formal class 'dCHMsimpl' [package "Matrix"] with 10 slots
+  ..@ x       : num [1:174396181] 1.71 2.16 1.4 1.32 2.29 ...
+  ..@ p       : int [1:1924269] 0 2 4 5 7 9 10 12 14 15 ...
+  ..@ i       : int [1:174396181] 0 2 1 2 2 3 5 4 5 5 ...
+  ..@ nz      : int [1:1924268] 2 2 1 2 2 1 2 2 1 2 ...
+  ..@ nxt     : int [1:1924270] 1 2 3 4 5 6 7 8 9 10 ...
+  ..@ prv     : int [1:1924270] 1924269 0 1 2 3 4 5 6 7 8 ...
+  ..@ colcount: int [1:1924268] 2 2 1 2 2 1 2 2 1 2 ...
+  ..@ perm    : int [1:1924268] 1922843 1886519 134451 1921046 1893309 183471 1912388 1888309 196670 1922626 ...
+  ..@ type    : int [1:4] 2 1 0 1
+  ..@ Dim     : int [1:2] 1924268 1924268
+    \end{Soutput}
+  \end{Schunk}
 \end{frame}
 
 \section[Cholesky]{Using the sparse Cholesky for mixed models}
@@ -479,7 +527,8 @@ print(image(L, xlab = NULL, ylab = NULL, sub = "L"),
     \begin{displaymath}
       \bm P\tr\bm L_\theta\bm L\tr_\theta\bm P
       \bm\mu_{\bc U|\bc Y}=
-      \bm U\tr_\theta(\bm y-\bm X\bm\beta) .
+      \bm U\tr_\theta(\bm y-\bm X\bm\beta)=
+      \bm\Lambda\tr_\theta\left(\bm Z\tr\bm y-\bm Z\tr\bm X\bm\beta\right) .
     \end{displaymath}
     Although the \code{Matrix} package provides a one-step
     \code{solve} method for this, we write it in stages:
