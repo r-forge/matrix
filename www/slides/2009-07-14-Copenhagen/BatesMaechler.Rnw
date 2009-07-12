@@ -1,0 +1,705 @@
+%\documentclass[dvipsnames,pdflatex,beamer]{beamer}
+%\documentclass[dvipsnames,pdflatex,handout]{beamer}
+%                                   ^^^^^^^ << for handout - happens in Makefile
+%\usepackage[english]{babel}
+%\usepackage[utf8]{inputenc}
+%beamer breaks with\usepackage{paralist}%-> {compactenum}, ... (Aargh!)
+%\usepackage{mdwlist}% \suspend and \resume enumerate
+%\usepackage{relsize}% ``relative font sizes''
+%% part of {mmVignette} below: \usepackage{SweaveSlides}
+\usepackage{SweaveSlides}
+\title[Sparse model matrices]{Exploiting sparsity in model matrices}
+\author[Doug Bates, Martin Maechler]{Douglas Bates and Martin Maechler}
+\institute[R Core]{% 'ETH Z' if more needed
+  Department of Statistics \\ University of Wisconsin -- Madison \ \ U.S.A.
+
+  \bigskip
+
+  Seminar für Statistik \\ ETH Zurich  \ \ Switzerland
+
+  {\color{Scode}\texttt{(bates|maechler)@R-project.org} \ \ (R-Core)}
+}
+\date[DSC2009, Copenhagen]{DSC2009, Copenhagen \\ July 14, 2009}
+\subject{SparseMM}
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+\newcounter{saveenum}
+\newcommand*{\Rp}{\textsf{R}$\;$}% R program
+\newcommand*{\CRAN}{\textsc{cran}$\;$}
+\newcommand*{\W}{\ensuremath{\mathbf{W}}}
+\newcommand*{\Ip}{\mathbf{I}_p}
+%---- from texab.sty --- can not take all --------------
+% \newcommand{\norm}[1]   {\left\| #1 \right\|}
+% % the above sometimes give much too long  || -- then use the following:
+% \newcommand{\normb}[1]  {\bigl\|{#1}\bigr\|}
+% \newcommand{\normB}[1]  {\Bigl\|{#1}\Bigr\|}
+\newcommand{\fn}[1]{\kern-2pt\left(#1\right)}
+\newcommand{\Ew}[1]{\mathbf{E}\kern2pt\fn{#1}}
+%
+%
+\mode<handout>{\usetheme{default}}
+\mode<beamer>{%
+  %%> http://www.namsu.de/latex/themes/uebersicht_beamer.html
+  \usetheme{Boadilla}% somewhat similar to Singapore, but "nice" blocks
+  %\usetheme{Singapore}%  \usetheme{Madrid}%
+  \setbeamercovered{dynamic}% {transparent} {invisible} or {dynamic}
+  % Use ETH Logo
+%   \pgfdeclareimage[height=0.5cm]{ETH-logo}{../ethlogo_black}%
+%   \logo{\pgfuseimage{ETH-logo}}%
+  % \pgfdeclareimage[height=0.5cm]{R-logo}{Rlogo}%
+%  \pgfdeclareimage[height=0.5cm]{R-logo}{useR}%
+%  \logo{\pgfuseimage{R-logo}}%
+}
+\begin{document}
+\frame{\titlepage}
+\begin{frame}
+  \frametitle{Outline}
+  \tableofcontents[pausesections,hideallsubsections]
+\end{frame}
+
+\SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=10,height=6.5,strip.white=all}
+\SweaveOpts{prefix=TRUE,prefix.string=figs/theory,include=TRUE}
+\setkeys{Gin}{width=\textwidth}
+<<preliminaries,echo=FALSE,results=hide>>=
+options(width=69,show.signif.stars=FALSE)
+library(lattice)
+lattice.options(default.theme = function() standard.theme())
+#lattice.options(default.theme = function() standard.theme(color=FALSE))
+library(Matrix)
+library(lme4)
+profDev <- function(rho, theta) {
+    stopifnot(is.numeric(theta), length(theta) == length(rho$nlev))
+    Ut <- crossprod(Diagonal(x = rep.int(theta, rho$nlev)), rho$Zt)
+    L <- update(rho$L, Ut, mult = 1)
+    cu <- solve(L, solve(L, Ut %*% rho$y, sys = "P"), sys = "L")
+    RZX <- solve(L, solve(L, Ut %*% rho$X, sys = "P"), sys = "L")
+    RX <- chol(rho$XtX - crossprod(RZX))
+    cb <- solve(t(RX), crossprod(rho$X, rho$y) - crossprod(RZX, cu))
+    beta <- solve(RX, cb)
+    u <- solve(L, solve(L, cu - RZX %*% beta, sys = "Lt"), sys = "Pt")
+    fitted <- as.vector(crossprod(Ut, u) + rho$X %*% beta)
+    prss <- sum(c(rho$y - fitted, as.vector(u))^2) # penalized residual sum of squares
+    n <- length(fitted);  p <- ncol(RX)
+    if (rho$REML) return(determinant(L)$mod + 2*determinant(RX)$mod +
+                         (n-p)*(1+log(2*pi*prss/(n-p))))
+    determinant(L)$mod + n * (1 + log(2*pi*prss/n))}
+@ 
+
+\section[Model matrices]{Model matrices with many columns}
+
+\begin{frame}
+  \frametitle{Model matrices and sparsity}
+  \begin{itemize}
+  \item In statistical models the effects of the covariates on the
+    response are often expressed through \Emph{model matrices}.
+  \item A common idiom in a model fitting function using a
+    \code{formula} argument is a call to \Rfun{model.frame} followed
+    by a call to \Rfun{model.matrix}.
+  \item Many users feel frustrated that \RR does not transparently
+    handle very large model matrices, failing to realize that a naive
+    decomposition of an $n\times p$ dense model matrix requires $np^2$
+    flops.  Large values of $p$ are particularly problematic.
+  \item Frequently large values of $p$ are a consequence of
+    incorporating factors with a large number of levels in the model.
+    A factor with $k$ levels generates at least $k-1$ columns as do
+    any interactions with such a factor.
+  \item The model matrix columns are generated from the indicator
+    columns for the factor, which are very sparse.  The greater the
+    number of levels, the more sparse the indicators become.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Sparse model matrices and regularization}
+  \begin{itemize}
+  \item As stated at useR!2009, large, sparse model matrices usually
+    require some amount of regularization for computationally feasible
+    evaluation of coefficients and fitted values.
+  \item Frequently the regularization parameter(s) is(are) chosen to
+    optimize a criterion, requiring evaluation of the criterion for
+    many different trial values of the regularization parameter(s).
+  \item Usually the repeated evaluations of the criterion require
+    decomposition of a matrix with a constant structure (including the
+    positions of the non-zeros) and varying numeric values.
+  \item The sparse Cholesky factorization is ideally suited to
+    problems requiring many evaluations of a decomposition of
+    a matrix with constant structure and varying numeric values.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The sparse Choelsky factorization}
+  \begin{itemize}
+  \item The \pkg{Matrix} package for \RR provides sparse matrix
+    methods, including the sparse Cholesky, by interfacting to Tim
+    Davis' \acronym{CHOLMOD} library of C functions.
+  \item This C library provides separate functions for the symbolic
+    factorization, including determining a \Emph{fill-reducing
+      permutation}, and the numeric factorization.
+  \item The symbolic factorization determines the positions of the
+    non-zeros in the result.  The numeric factorization simply
+    evaluates the numeric values.  Generally it is much faster than
+    the symbolic factorization.
+  \item There are many beautiful mathermatical results associated with
+    sparse matrix operations.  See Tim Davis' 2007 SIAM book for some
+    of these results.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Variations of the sparse Cholesky}
+  \begin{itemize}
+  \item In the \pkg{Matrix} package we use the formulation from the
+    \acronym{CHOLMOD} C library.  Sparse matrices may be entered in
+    the triplet formulation but operations are usually performed on
+    the \Emph{compressed-column representation} (the
+    \class{CsparseMatrix} class).
+  \item If $\bm A$ is a positive-definite symmetric sparse matrix, the
+    sparse Cholesky factorization consists of a permutation matrix
+    $\bm P$ and a lower triangular matrix $\bm L$ such that
+    \begin{displaymath}
+      \bm L\bm L\tr=\bm P\bm A\bm P\tr .
+    \end{displaymath}
+    Note that $\bm L$ is the left factor (statisticians often consider
+    the the right factor, $\bm R=\bm L\tr$). The permutation $\bm P$
+    is stored (as a vector) within the factorization.
+  \item There are two variations: the \Emph{LDL} factorization, where
+    the lhs is $\bm L\bm D\bm L\tr$ ($\bm L$ unit lower triangular;
+    $\bm D$ diagonal), and a \Emph{supernodal} $\bm L\bm L\tr$
+    decomposition, which is a sparse/dense hybrid that collapses
+    columns with similar structure to a ``supernode'' of the graph
+    representation.
+  \end{itemize}
+\end{frame}
+
+\section[Linear Mixed]{Applications to linear mixed models}
+
+\begin{frame}
+  \frametitle{Definition of linear mixed models}
+  \begin{itemize}
+  \item A linear mixed model consists of two random variables: the
+    $n$-dimensional response, $\bc Y$, and the $q$-dimensional random
+    effects, $\bc B$.  We observe the value, $\bm y$, of $\bc Y$; we do
+    not observe the value of $\bm B$.
+  \item The probability model defines one conditional and one
+    unconditional distribution
+    \begin{displaymath}
+      \left(\bc Y|\bc B=\bm b\right)\sim
+        \mathcal{N}\left(\bm Z\bm b+\bm X\bm\beta,\sigma^2\bm I_n\right),\quad
+      \bc B\sim\mathcal{N}\left(\bm 0,\bm\Sigma_\theta\right) ,
+    \end{displaymath}
+    which depend on parameters $\bm\beta$, $\bm\theta$ and $\sigma$.
+  \item Although the dimension of $\bm\Sigma_\theta$ can be huge, the
+    dimension of the \Emph{variance-component parameter vector},
+    $\bm\theta$, is usually very small.
+  \item The model specification determines the $n\times q$ model
+    matrix $\bm Z$ (generated from indicator columns and typically
+    very sparse), the $n\times p$ model matrix $\bm X$, and the way in
+    which $\bm\theta$ generates $\bm\Sigma_\theta$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Properties of $\bm\Sigma_\theta$; generating it}
+  \begin{itemize}
+  \item Because it is a variance-covariance matrix, the $q\times q$ 
+    $\bm\Sigma_\theta$ must be symmetric and \Emph{positive
+      semi-definite}, which means, in effect, that it has a ``square
+    root'' --- there must be another matrix that, when
+    multiplied by its transpose, gives $\bm\Sigma_\theta$.
+  \item We never really form $\bm\Sigma_\theta$; we always work with the
+    \Emph{relative covariance factor}, $\bm\Lambda_\theta$,
+    defined so that
+    \begin{displaymath}
+      \bm\Sigma_\theta=\sigma^2\bm\Lambda_\theta\bm\Lambda\tr_\theta
+    \end{displaymath}
+    where $\sigma^2$ is the same variance parameter as in $(\bc Y|\bc
+    B=\bm b)$.
+  \item We also work with a $q$-dimensional ``spherical'' or ``unit''
+    random-effects vector, $\bc U$, such that
+    \begin{displaymath}
+      \bc U\sim\mathcal{N}\left(\bm 0,\sigma^2\bm I_q\right),\:
+      \bc B=\bm\Lambda(\bm\theta)\bc U\Rightarrow
+      \text{Var}(\bc B)=\sigma^2\bm\Lambda_\theta\bm\Lambda_\theta\tr=\bm\Sigma_\theta .
+    \end{displaymath}
+  \item The linear predictor expression becomes
+    \begin{displaymath}
+      \bm Z\bm b+\bm X\bm\beta=
+      \bm Z\bm\Lambda_\theta\,\bm u+\bm X\bm\beta=
+      \bm U_\theta\,\bm u+\bm X\bm\beta
+    \end{displaymath}
+    where $\bm U_\theta=\bm Z\bm\Lambda_\theta$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The conditional mean $\bm\mu_{\bc U|\bc Y}$}
+  \begin{itemize}
+  \item Although the probability model is defined from $(\bc Y|\bc
+    U=\bm u)$, we observe $\bm y$, not $\bm u$ (or $\bm b$) so we want
+    to work with the other conditional distribution, $(\bc U|\bc Y=\bm
+    y)$.
+  \item The joint distribution of $\bc Y$ and $\bc U$ is Gaussian
+    with density
+    \begin{displaymath}
+      \begin{aligned}
+        f_{\bc Y,\bc U}(\bm y,\bm u)&
+        =f_{\bc Y|\bc U}(\bm y|\bm u)\,f_{\bc U}(\bm u)\\
+        &=\frac{\exp(-\frac{1}{2\sigma^2}\|\bm y-\bm X\bm\beta-\bm U_\theta\,\bm u\|^2)}
+        {(2\pi\sigma^2)^{n/2}}\;
+        \frac{\exp(-\frac{1}{2\sigma^2}\|\bm u\|^2)}{(2\pi\sigma^2)^{q/2}}\\
+        &=\frac{\exp(-
+          \left[\|\bm y-\bm X\bm\beta-\bm U_\theta\,\bm u\|^2+\|\bm u\|^2\right]/(2\sigma^2))}
+        {(2\pi\sigma^2)^{(n+q)/2}}
+      \end{aligned}
+    \end{displaymath}
+  \item $(\bc U|\bc Y=\bm y)$ is also Gaussian so its mean is its mode. I.e.
+    \begin{displaymath}
+      \bm\mu_{\bc U|\bc Y}=\arg\min_{\bm u}
+      \left[\left\|\bm y-\bm X\bm\beta-\bm U_\theta\,\bm u\right\|^2 +
+      \left\|\bm u\right\|^2\right]
+    \end{displaymath}
+  \end{itemize}
+\end{frame}
+
+\section[PLS]{The penalized least squares problem}
+
+\begin{frame}
+  \frametitle{Minimizing a penalized sum of squared residuals}  
+  \begin{itemize}
+  \item An expression like $\|\bm y-\bm X\bm\beta-\bm U_\theta\,\bm
+    u\|^2 + \|\bm u\|^2$ is called a \Emph{penalized sum of squared
+      residuals} because $\|\bm y-\bm X\bm\beta-\bm U_\theta\,\bm
+    u\|^2$ is a sum of squared residuals and $\|\bm u\|^2$ is a
+    penalty on the size of the vector $\bm u$.
+  \item Determining $\bm\mu_{\bc U|\bc Y}$ as the minimizer of
+    this expression is a \Emph{penalized least squares} (PLS) problem.  In
+    this case it is a \Emph{penalized linear least squares problem}
+    that we can solve directly (i.e. without iterating).
+  \item One way to determine the solution is to rephrase it as a
+    linear least squares problem for an extended residual vector
+    \begin{displaymath}
+      \bm\mu_{\bc U|\bc Y}=\arg\min_{\bm u}\left\|
+        \begin{bmatrix}\bm y-\bm X\bm\beta\\\bm 0\end{bmatrix}-
+        \begin{bmatrix}\bm U_\theta\\\bm I_q\end{bmatrix}
+        \bm u\right\|^2
+    \end{displaymath}
+    This is sometimes called a \Emph{pseudo-data} approach because we
+    create the effect of the penalty term, $\|\bm u\|^2$, by adding
+    ``pseudo-observations'' to $\bm y$ and to the predictor.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Solving the linear PLS problem}
+  \begin{itemize}
+  \item The conditional mean satisfies the equations
+    \begin{displaymath}
+      (\bm U_\theta\,\bm U\tr_\theta+\bm I_q)
+      \bm\mu_{\bc U|\bc Y}=\bm U\tr_\theta(\bm y-\bm X\bm\beta) =
+      \bm\Lambda\tr_\theta\left(\bm Z\bm y-\bm Z\bm X\bm\beta\right)
+    \end{displaymath}
+  \item This would be interesting but not very important were it not
+    for the fact that we actually can solve that system for
+    $\bm\mu_{\bc U|\bc Y}$ even when its dimension, $q$, is
+    very, very large.
+  \item Recall that $\bm U_\theta=\bm Z\bm\Lambda_\theta$.
+    Because $\bm Z$ is generated from indicator columns for the
+    grouping factors, it is sparse.  $\bm U_\theta$ is also very sparse.
+  \item The fill-reducing permutation $\bm P$ and the structure of the
+    Cholesky factor $\bm L$ are determined from $\bm U_{\theta^{(0)}}$
+    where $\bm\theta^{(0)}$ is the starting value.  For subsequent
+    values of $\bm\theta$ the update of the factor $\bm L_\theta$ satisfying
+    \begin{displaymath}
+      \bm L_\theta\bm L\tr_\theta=
+      \bm P\left(\bm U_\theta\tr\bm U_\theta+\bm I_q\right)\bm P\tr
+    \end{displaymath}
+    is direct from $\bm U_\theta$.  (One of the \acronym{CHOLMOD}
+    functions does the update, including virtually adding a multiple
+    of the identity, from the sparse, rectangular $\bm U_\theta$.)
+    From $\bm L_\theta$ we solve for $\bm\mu_{\bc U|\bc Y}$.
+  \end{itemize}
+\end{frame}
+
+\section[Cholesky]{Using the sparse Cholesky for mixed models}
+
+\begin{frame}
+  \frametitle{Applications to models with simple, scalar random effects}
+  \begin{itemize}
+  \item For a model with simple, scalar random-effects terms only, the
+    matrix $\bm\Sigma_\theta$ is block-diagonal in $k$ blocks and the
+    $i$th block is $\sigma_i^2\bm I_{n_i}$ where $n_i$ is the number
+    of levels in the $i$th grouping factor.
+  \item The matrix $\bm\Lambda_\theta$ is also block-diagonal with
+    the $i$th block being $\theta_i\bm I_{n_i}$, where
+    $\theta_i=\sigma_i/\sigma$.
+  \item Given the grouping factors for the model and a value of
+    $\bm\theta$ we produce $\bm U_\theta$ then $\bm L_\theta$, using \code{Cholesky}
+    the first time then \code{update}.
+  \item To avoid recalculating we assign
+    \begin{description}
+    \item[\code{flist}] a list of the grouping factors
+    \item[\code{nlev}] number of levels in each factor
+    \item[\code{Zt}] the transpose of the model matrix, $\bm Z$
+    \item[\code{theta}] current value of $\bm\theta$
+    \item[\code{Lambda}] current $\bm\Lambda_\theta$
+    \item[\code{Ut}] transpose of $\bm U_\theta=\bm Z\bm\Lambda_\theta$
+    \end{description}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Cholesky factor for the Penicillin model}
+<<PenicillinL>>=
+flist <- subset(Penicillin, select = c(plate, sample))
+Zt <- do.call(rBind, lapply(flist, as, "sparseMatrix"))
+(nlev <- sapply(flist, function(f) length(levels(factor(f)))))
+theta <- c(1.2, 2.1)
+Lambda <- Diagonal(x = rep.int(theta, nlev))
+Ut <- crossprod(Lambda, Zt)
+str(L <- Cholesky(tcrossprod(Ut), LDL = FALSE, Imult = 1))
+@   
+\end{frame}
+\begin{frame}[fragile]
+  \frametitle{Images of $\bm U\tr\bm U+\bm I$ and $\bm L$}
+  \begin{center}
+<<Penicillinimage,fig=TRUE,echo=FALSE,height=5>>=
+print(image(tcrossprod(Ut), xlab = NULL, ylab = NULL, sub = "U'U+I"),
+      pos = c(0,0,0.47,1), more = TRUE)
+print(image(L, xlab = NULL, ylab = NULL, sub = "L"),
+      pos = c(0.47,0,1,1))
+@ 
+  \end{center}
+\begin{itemize}
+\item Note that there are nonzeros in the lower right of $\bm L$ in
+  positions that are zero in the lower triangle of $\bm U\tr\bm
+  U+\bm I$.  This is described as ``fill-in''.
+\end{itemize}
+\end{frame}
+\begin{frame}[fragile]
+  \frametitle{Reversing the order of the factors}
+  \begin{itemize}
+  \item To show the effect of a fill-reducing permutation, we reverse
+    the order of the factors and calculate the Cholesky factor with
+    and without a fill-reducing permutation.
+  \item We evaluate \code{nnzero} (number of nonzeros) for \code{L},
+    from the original factor order, and for \code{Lnoperm} and
+    \code{Lperm}, the reversed factor order without and with
+    permutation
+  \end{itemize}
+<<revChol>>=
+Zt <- do.call(rBind, lapply(flist[2:1], as, "sparseMatrix"))
+Lambda <- Diagonal(x = rep.int(theta[2:1], nlev[2:1]))
+Ut <- crossprod(Lambda, Zt)
+Lnoperm <- Cholesky(tcrossprod(Ut), perm = FALSE, LDL = FALSE, Imult = 1)
+Lperm <- Cholesky(tcrossprod(Ut), LDL = FALSE, Imult = 1)
+sapply(lapply(list(L, Lnoperm, Lperm), as, "sparseMatrix"), nnzero)
+@   
+\end{frame}
+\begin{frame}[fragile]
+  \frametitle{Images of the reversed factor decompositions}
+  \begin{center}
+<<Reversedfactorimages,fig=TRUE,echo=FALSE,height=4>>=
+print(image(Lnoperm, xlab = NULL, ylab = NULL, sub = "Lnoperm"),
+      split = c(1,1,2,1), more = TRUE)
+print(image(Lperm, xlab = NULL, ylab = NULL, sub = "Lperm"),
+      split = c(2,1,2,1))
+@ 
+  \end{center}
+  \begin{itemize}
+  \item Without permutation, we get the worst possible fill-in.  With
+    a fill-reducing permutation we get much less fill-in but still not
+    as good as the original factor order.
+  \item This is why the permutation is called
+    ``fill-reducing'', not ``fill-minimizing''.  Getting the
+    fill-minimizing permutation in the general case is a very hard
+    problem.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Cholesky factor for the Pastes data}
+  \begin{itemize}
+  \item For the special case of nested grouping factors, such as in
+    the \code{Pastes} and \code{classroom} data, there is no fill-in,
+    regardless of the permutation.
+  \item A permutation is nevertheless evaluated but it is a
+    ``post-ordering'' that puts the nonzeros near the diagonal.
+  \end{itemize}
+<<classroomL>>=
+Zt <- do.call(rBind, lapply(flist <- subset(Pastes,,c(sample, batch)),
+                            as, "sparseMatrix"))
+nlev <- sapply(flist, function(f) length(levels(factor(f))))
+theta <- c(0.4, 0.5)
+Lambda <- Diagonal(x = rep.int(theta, nlev))
+Ut <- crossprod(Lambda, Zt)
+L <- Cholesky(tcrossprod(Ut), LDL = FALSE, Imult = 1)
+str(L@perm)
+@ 
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Image of the factor for the Pastes data}
+  \begin{center}
+<<Pastesimage,fig=TRUE,echo=FALSE,height=5>>=
+print(image(tcrossprod(Ut), xlab = NULL, ylab = NULL, sub = "U'U+I"),
+      split = c(1,1,2,1), more = TRUE)
+print(image(L, xlab = NULL, ylab = NULL, sub = "L"),
+      split = c(2,1,2,1))
+@ 
+  \end{center}
+  \begin{itemize}
+  \item The image for the Cholesky factor from the \code{classroom}
+    data model is similar but, with more than 400 rows and columns,
+    the squares for the nonzeros are difficult to see.
+  \end{itemize}
+\end{frame}
+
+\section[Likelihood]{Evaluating the likelihood}
+
+\begin{frame}
+  \frametitle{The conditional density, $f_{\bc U|\bc Y}$}
+  \begin{itemize}
+  \item We know the joint density, $f_{\bc Y,\bc U}(\bm y,\bm u)$.  Because
+    \begin{displaymath}
+      f_{\bc U|\bc Y}(\bm u|\bm y)=\frac{f_{\bc Y,\bc U}(\bm y,\bm u)}
+      {\int f_{\bc Y,\bc U}(\bm y,\bm u)\,d\bm u}
+    \end{displaymath}
+    we almost have $f_{\bc U|\bc Y}$. The trick is evaluating
+    the integral in the denominator, which, it turns out, is exactly
+    the likelihood, $L(\bm\theta,\bm\beta,\sigma^2|\bm y)$, that we
+    want to maximize.
+  \item The Cholesky factor, $\bm L_\theta$ is the
+    key to doing this because
+    \begin{displaymath}
+      \bm P\tr\bm L_\theta\bm L\tr_\theta\bm P
+      \bm\mu_{\bc U|\bc Y}=
+      \bm U\tr_\theta(\bm y-\bm X\bm\beta) .
+    \end{displaymath}
+    Although the \code{Matrix} package provides a one-step
+    \code{solve} method for this, we write it in stages:
+    \begin{enumerate}
+    \item Solve $\bm L_\theta\bm c_{\bm u}=\bm P\bm U\tr_\theta(\bm y-\bm
+      X\bm\beta)$ for $\bm c_{\bm u}$.
+    \item Solve $\bm L_\theta\tr\bm P\bm\mu_{\bc U|\bc Y}=\bm c_{\bm u}$ for $\bm
+      P\bm\mu_{\bc U|\bc Y}$.  Evaluate $\bm\mu_{\bc U|\bc Y}=\bm
+      P\tr\bm P\bm\mu_{\bc U|\bc Y}$.
+    \end{enumerate}
+  \end{itemize}
+\end{frame}
+\begin{frame}
+  \frametitle{Evaluating the likelihood}
+  \begin{itemize}
+  \item The exponent of $f_{\bc Y,\bc U}(\bm y,\bm u)$ can now be written
+    \begin{displaymath}
+      \|\bm y-\bm X\bm\beta-\bm U\bm u\|^2+\|\bm u\|^2=
+      r^2(\bm\theta,\bm\beta)+
+      \|\bm L\tr\bm P(\bm u-\bm\mu_{\bc U|\bc Y})\|^2.
+    \end{displaymath}
+    where $r^2(\bm\theta,\bm\beta)=\|\bm y-\bm X\bm\beta-\bm
+    U\bm\mu_{\bc U|\bc Y}\|^2+\|\bm\mu_{\bc U|\bc Y}\|^2$.  The first
+    term doesn't depend on $\bm u$ and the second is relatively easy
+    to integrate.
+  \item Use the change of variable $\bm v=\bm L\tr\bm
+    P(\bm u-\bm\mu_{\bc U|\bc Y})$, with $d\bm v=\abs(|\bm L||\bm P|)\,d\bm u$, in
+    \begin{multline*}
+      \int\frac{\exp\left(\frac{-\|\bm L\tr\bm P(\bm u-\bm\mu_{\bc U|\bc Y})\|^2}
+          {2\sigma^2}\right)}
+      {(2\pi\sigma^2)^{q/2}}\,d\bm u \\
+      = \int\frac{\exp\left(\frac{-\|\bm
+          v\|^2}{2\sigma^2}\right)}{(2\pi\sigma^2)^{q/2}}\,\frac{d\bm
+        v}{\abs(|\bm L||\bm P|)} = \frac{1}{\abs(|\bm L||\bm
+        P|)}=\frac{1}{|\bm L|}
+    \end{multline*}
+    because $\abs|\bm P|=1$ and $\abs|\bm L|$, which is the product of
+    its diagonal elements, all of which are positive, is positive.
+  \end{itemize}
+\end{frame}
+\begin{frame}
+  \frametitle{Evaluating the likelihood (cont'd)}
+  \begin{itemize}
+  \item As is often the case, it is easiest to write the
+    log-likelihood.  On the deviance scale (negative twice the
+    log-likelihood) $\ell(\bm\theta,\bm\beta,\sigma|\bm y)=\log
+    L(\bm\theta,\bm\beta,\sigma|\bm y)$ becomes
+    \begin{displaymath}
+      -2\ell(\bm\theta,\bm\beta,\sigma|\bm y)=
+      n\log(2\pi\sigma^2)+\frac{r^2(\bm\theta,\bm\beta)}{\sigma^2}+
+      \log(|\bm L_\theta|^2)
+    \end{displaymath}
+  \item We wish to minimize the deviance.  Its dependence on $\sigma$
+    is straightforward.  Given values of the other parameters, we can
+    evaluate the conditional estimate
+    \begin{displaymath}
+      \widehat{\sigma^2}(\bm\theta,\bm\beta)=\frac{r^2(\bm\theta,\bm\beta)}{n}
+    \end{displaymath}
+    producing the \Emph{profiled deviance}
+    \begin{displaymath}
+    -2\tilde{\ell}(\bm\theta,\bm\beta|\bm y)=\log(|\bm L_\theta|^2)+
+      n\left[1+\log\left(\frac{2\pi r^2(\bm\theta,\bm\beta)}{n}\right)\right]
+    \end{displaymath}
+  \item However, an even greater simplification is possible because
+    the deviance depends on $\bm\beta$ only through
+    $r^2(\bm\theta,\bm\beta)$.
+  \end{itemize}
+\end{frame}
+\begin{frame}
+  \frametitle{Profiling the deviance with respect to $\bm\beta$}
+  \begin{itemize}
+  \item Because the deviance depends on $\bm\beta$ only through
+    $r^2(\bm\theta,\bm\beta)$ we can obtain the conditional estimate,
+    $\widehat{\bm\beta}_\theta$, by extending the PLS problem to
+    \begin{displaymath}
+      r^2(\bm\theta)=\min_{\bm u,\bm\beta}
+      \left[\left\|\bm y-\bm X\bm\beta-\bm U_\theta\,\bm u\right\|^2 +
+      \left\|\bm u\right\|^2\right]
+    \end{displaymath}
+    with the solution satisfying the equations
+    \begin{displaymath}
+      \begin{bmatrix}
+        \bm U_\theta\tr\bm U_\theta+\bm I_q & \bm
+        U_\theta\tr\bm X\\
+        \bm X\tr\bm U_\theta & \bm X\tr\bm X
+      \end{bmatrix}
+      \begin{bmatrix}
+        \bm\mu_{\bc U|\bc Y}\\\widehat{\bm\beta}_\theta
+      \end{bmatrix}=
+      \begin{bmatrix}\bm U_\theta\tr\bm y\\\bm X\tr\bm y .
+      \end{bmatrix}
+    \end{displaymath}
+  \item The profiled deviance, which is a function of $\bm\theta$
+    only, is
+    \begin{displaymath}
+      -2\tilde{\ell}(\bm\theta)=\log(|\bm L_\theta|^2)+
+      n\left[1+\log\left(\frac{2\pi r^2(\bm\theta)}{n}\right)\right]
+    \end{displaymath}
+  \end{itemize}
+\end{frame}
+\begin{frame}
+  \frametitle{Solving the extended PLS problem}
+  \begin{itemize}
+  \item For brevity we will no longer show the dependence of matrices
+    and vectors on the parameter $\bm\theta$.
+  \item As before we use the sparse Cholesky decomposition, with $\bm
+    L$ and $\bm P$ satisfying $\bm L\bm L\tr=\bm P(\bm U\tr\bm
+    U+\bm I)\bm P\tr$ and $\bm c_{\bm u}$, the solution to $\bm L\bm c_{\bm
+      u}=\bm P\bm U\tr\bm y$.
+  \item We extend the decomposition with the $q\times p$ matrix $\bm
+    R_{ZX}$, the upper triangular $p\times p$ matrix $\bm R_X$, and
+    the $p$-vector $\bm c_{\bm\beta}$ satisfying
+    \begin{align*}
+      \bm L\bm R_{ZX}&=\bm P\bm U\tr\bm X\\
+      \bm R_X\tr\bm R_X&=\bm X\tr\bm X-\bm R_{ZX}\tr\bm R_{ZX}\\
+      \bm R_X\tr\bm c_{\bm\beta}&=\bm X\tr\bm y-\bm
+      R_{ZX}\tr\bm c_{\bm u}
+    \end{align*}
+    so that
+    \begin{displaymath}
+      \begin{bmatrix}
+        \bm P\tr\bm L& \bm 0\\
+        \bm R_{ZX}\tr & \bm R_X\tr
+      \end{bmatrix}
+      \begin{bmatrix}
+        \bm L\tr\bm P & \bm R_{ZX}\\
+        \bm 0            & \bm R_X
+      \end{bmatrix}=
+      \begin{bmatrix}
+        \bm U\tr\bm U+\bm I & \bm U\tr\bm X\\
+        \bm X\tr\bm U       & \bm X\tr\bm X
+      \end{bmatrix} .
+    \end{displaymath}
+  \end{itemize}
+\end{frame}
+\begin{frame}
+  \frametitle{Solving the extended PLS problem (cont'd)}
+  \begin{itemize}
+  \item Finally we solve
+    \begin{align*}
+      \bm R_X\widehat{\bm\beta}_\theta&=\bm c_{\bm\beta}\\
+      \bm L\tr\bm P\bm\mu_{\bc U|\bc Y}&=\bm c_{\bm u}-\bm R_{ZX}\widehat{\bm\beta}_\theta
+    \end{align*}
+  \item The profiled REML criterion also can be expressed simply.
+    The criterion is
+    \begin{displaymath}
+      L_R(\bm\theta,\sigma^2|\bm y)=\int L(\bm\theta,\bm\beta,\sigma^2|\bm y)\,d\bm\beta
+    \end{displaymath}
+    The same change-of-variable technique for evaluating
+    the integral w.r.t. $\bm u$ as $1/\abs(|\bm L|)$ produces 
+    $1/\abs(|\bm R_X|)$ here and removes
+    $(2\pi\sigma^2)^{p/2}$ from the denominator.  On the deviance
+    scale, the profiled REML criterion is
+    \begin{displaymath}
+      -2\tilde{\ell}_R(\bm\theta)=\log(|\bm L|^2)+\log(|\bm R_x|^2)+
+      (n-p)\left[1+\log\left(\frac{2\pi r^2(\bm\theta)}{n-p}\right)\right]
+    \end{displaymath}
+  \item These calculations can be expressed in a few lines of \RR code.
+    Assume the environment of \Rfun{setPars} contains \code{y}, \code{X}, \code{Zt}, \code{REML}, \code{L},
+    \code{nlev} and \code{XtX} ($\bm X\tr\bm X$).
+  \end{itemize}
+\end{frame}
+\begin{frame}[fragile]
+  \frametitle{Code for evaluating the profiled deviance}
+\begin{Schunk}
+\begin{Sinput}
+setPars <- function(theta) {
+  stopifnot(is.numeric(theta), length(theta)==length(nlev))
+  Ut <- crossprod(Diagonal(x=rep.int(theta,nlev)),Zt)
+  L <- update(L, Ut, mult = 1)
+  cu <- solve(L, solve(L, Ut %*% y, sys = "P"), sys = "L")
+  RZX <- solve(L, solve(L, Ut %*% X, sys = "P"), sys = "L")
+  RX <- chol(XtX - crossprod(RZX))
+  cb <- solve(t(RX),crossprod(X,y)- crossprod(RZX, cu))
+  beta <- solve(RX, cb)
+  u <- solve(L,solve(L,cu - RZX %*% beta, sys="Lt"), sys="Pt")
+  fitted <- as.vector(crossprod(Ut, u) + X %*% beta)
+  prss <- sum(c(y - fitted, as.vector(u))^2)
+  n <- length(fitted);  p <- ncol(RX)
+  if (REML) return(determinant(L)$mod +
+                       2 * determinant(RX)$mod +
+                       (n-p) * (1+log(2*pi*prss/(n-p))))
+  determinant(L)$mod + n * (1 + log(2*pi*prss/n))
+}
+\end{Sinput}
+\end{Schunk}
+\end{frame}
+%$
+
+\begin{frame}
+  \frametitle{How lmer works}
+  \begin{itemize}
+  \item Essentially \code{lmer} takes its arguments and creates a
+    structure like the \code{rho} environment shown above.  The
+    optimization of the profiled deviance or the profiled REML
+    criterion happens within this environment.
+  \item The creation of $\bm\Lambda_\theta$ is somewhat more
+    complex for models with vector-valued random effects but not
+    excessively so.
+  \item Some care is taken to avoid allocating storage for large
+    objects during each function evaluation.  Many of the objects
+    created in \code{profDev} are updated in place within \code{lmer}.
+
+  \item Once the optimizer, \code{nlminb}, has converged some
+    additional information for the summary is calculated.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Recap}
+  \begin{itemize}
+  \item For a linear mixed model, even one with a huge number of
+    observations and random effects like the model for the grade point
+    scores, evaluation of the ML or REML profiled deviance, given a
+    value of $\bm\theta$, is straightforward.  It involves updating
+    $\bm\Lambda$, $\bm U$, $\bm L$, $\bm R_{ZX}$, $\bm R_{X}$,
+    calculating the penalized residual sum of squares,
+    $r^2(\bm\theta)$ and two determinants of triangular matrices.
+  \item The profiled deviance can be optimized as a function of
+    $\bm\theta$ only.  The dimension of $\bm\theta$ is usually very
+    small.  For the grade point scores there are only three components
+    to $\bm\theta$.
+  \end{itemize}
+\end{frame}
