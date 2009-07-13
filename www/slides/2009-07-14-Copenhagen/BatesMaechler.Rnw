@@ -15,7 +15,7 @@
 
   \bigskip
 
-  Seminar für Statistik \\ ETH Zurich  \ \ Switzerland
+  Seminar f\"ur Statistik \\ ETH Zurich  \ \ Switzerland
 
   {\color{Scode}\texttt{(bates|maechler)@R-project.org} \ \ (R-Core)}
 }
@@ -145,7 +145,7 @@ profDev <- function(rho, theta) {
     non-zeros in the result.  The numeric factorization simply
     evaluates the numeric values.  Generally it is much faster than
     the symbolic factorization.
-  \item There are many beautiful mathermatical results associated with
+  \item There are many beautiful mathematical results associated with
     sparse matrix operations.  See Tim Davis' 2007 SIAM book for some
     of these results.
   \end{itemize}
@@ -224,7 +224,7 @@ profDev <- function(rho, theta) {
     random-effects vector, $\bc U$, such that
     \begin{displaymath}
       \bc U\sim\mathcal{N}\left(\bm 0,\sigma^2\bm I_q\right),\:
-      \bc B=\bm\Lambda(\bm\theta)\bc U\Rightarrow
+      \bc B=\bm\Lambda_\theta\bc U\Rightarrow
       \text{Var}(\bc B)=\sigma^2\bm\Lambda_\theta\bm\Lambda_\theta\tr=\bm\Sigma_\theta .
     \end{displaymath}
   \item The linear predictor expression becomes
