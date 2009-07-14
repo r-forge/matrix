@@ -743,16 +743,19 @@ setPars <- function(theta) {
 %---------------------------------------------------------------
 
 \section[ETH Profs]{Who's the best liked prof at ETH?}
-%% Doug Bates: "best liked", *not*  "most liked"
+%% Martin, please note:   ' Doug Bates: "best liked", *not*  "most liked" '
 <<preliminaries, echo=FALSE, hide=TRUE>>=
 ## Hide this as well
-load("~/R/MM/Pkg-ex/lme4/eth-d-rating.rda") ; d.eth <- md
+load("eth-d-rating.rda") ; d.eth <- md
+@
+<<read-dat,eval=FALSE>>=
+load("...../eth-d-rating.rda")
 @
 \begin{frame} \frametitle{Who's the best liked prof at ETH?}
   \begin{itemize}
   \item Private donation for encouraging excellent teaching at ETH
   \item Student union of ETH Zurich organizes survey to award prizes:\\
-    Best lecturer --- of ETH, and of each of the 14 departments.
+    Best lecturer --- of ETH, and of each of the 15 departments.
   \item Smart Web-interface for survey: Each student sees the names of his/her
     professors from the last 4 semesters and all the lectures that applied.
   \item ratings in $\{1,2,3,4,5\}$.
@@ -761,9 +764,6 @@ load("~/R/MM/Pkg-ex/lme4/eth-d-rating.rda") ; d.eth <- md
 \end{frame}
 
 \begin{frame}[fragile]\frametitle{Who's the best prof --- data}
-@
-<<read-dat,eval=FALSE>>=
-load("...../eth-d-rating.rda")
 @
 <<str-dat>>=
 str(d.eth)
@@ -922,7 +922,7 @@ ldRX2 :  num 4167
   We rather prefer some bias in order to reduce variance:
   \\ make \texttt{'d'} a random effect:
 
-  Adantage: Can easily use \texttt{dept} as a fixed effect:
+  Advantage: Can easily use \texttt{dept} as a fixed effect:
 
 %%% FIXME:  Need "old" lme4 for this!
 <<change-to-old-lme4, echo=FALSE, hide=FALSE>>=
@@ -943,7 +943,9 @@ library(lme4)
 % @
 
 <<lmer-eth-rf, echo=FALSE, hide=TRUE>>=
-load(file="lmer-eth.rda") # -> beta.fix, ranef.fm2, fixef.fm2
+load("lmer-eth.rda") # -> beta.fix, ranef.fm2, fixef.fm2
+b.random <- fixef.fm2["(Intercept)"] + ranef.fm2$d[, 1]
+beta.Fix <- beta.fix["(Intercept)"] + c(0, beta.fix[2:1128])
 @
 <<lmer-eth-rf, eval=FALSE>>=
 fm2 <- lmer(y ~ service + studage + lectage + (1 | d) + (1 | s),
