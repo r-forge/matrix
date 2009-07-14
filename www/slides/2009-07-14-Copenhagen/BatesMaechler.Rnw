@@ -70,8 +70,12 @@ options(width=69,show.signif.stars=FALSE)
 library(lattice)
 lattice.options(default.theme = function() standard.theme())
 #lattice.options(default.theme = function() standard.theme(color=FALSE))
-library(Matrix)
-library(lme4)
+if(inherits(try(Mlibrary(Matrix)), "try-error"))
+    library(Matrix)
+if(inherits(try(Mlibrary(lme4a)), "try-error"))
+    library(lme4a)
+# was
+# library(lme4)
 profDev <- function(rho, theta) {
     stopifnot(is.numeric(theta), length(theta) == length(rho$nlev))
     Ut <- crossprod(Diagonal(x = rep.int(theta, rho$nlev)), rho$Zt)
@@ -88,7 +92,7 @@ profDev <- function(rho, theta) {
     if (rho$REML) return(determinant(L)$mod + 2*determinant(RX)$mod +
                          (n-p)*(1+log(2*pi*prss/(n-p))))
     determinant(L)$mod + n * (1 + log(2*pi*prss/n))}
-@ 
+@
 
 \section[Model matrices]{Model matrices with many columns}
 
@@ -207,7 +211,7 @@ profDev <- function(rho, theta) {
 \begin{frame}
   \frametitle{Properties of $\bm\Sigma_\theta$; generating it}
   \begin{itemize}
-  \item Because it is a variance-covariance matrix, the $q\times q$ 
+  \item Because it is a variance-covariance matrix, the $q\times q$
     $\bm\Sigma_\theta$ must be symmetric and \Emph{positive
       semi-definite}, which means, in effect, that it has a ``square
     root'' --- there must be another matrix that, when
@@ -271,7 +275,7 @@ profDev <- function(rho, theta) {
 \section[PLS]{The penalized least squares problem}
 
 \begin{frame}
-  \frametitle{Minimizing a penalized sum of squared residuals}  
+  \frametitle{Minimizing a penalized sum of squared residuals}
   \begin{itemize}
   \item An expression like $\|\bm y-\bm X\bm\beta-\bm U_\theta\,\bm
     u\|^2 + \|\bm u\|^2$ is called a \Emph{penalized sum of squared
@@ -352,7 +356,8 @@ profDev <- function(rho, theta) {
     Cholesky factor, $\bm L(\bm\theta)$.
   \item In this case the \code{x} slot is itself over 1GB in size (\code{i} slot $>$ 0.5 GB).
   \item These are close to an inherent limit on atomic R objects (the
-    range of an index into an atomic object cannot exceed $2^{31}$).
+    range of an index into an atomic object cannot exceed
+    $2^{31} {\scriptscriptstyle (= 2147'483'648)}$.
   \end{itemize}
   \begin{Schunk}
     \begin{Sinput}
@@ -411,7 +416,7 @@ theta <- c(1.2, 2.1)
 Lambda <- Diagonal(x = rep.int(theta, nlev))
 Ut <- crossprod(Lambda, Zt)
 str(L <- Cholesky(tcrossprod(Ut), LDL = FALSE, Imult = 1))
-@   
+@
 \end{frame}
 \begin{frame}[fragile]
   \frametitle{Images of $\bm U\tr\bm U+\bm I$ and $\bm L$}
@@ -421,7 +426,7 @@ print(image(tcrossprod(Ut), xlab = NULL, ylab = NULL, sub = "U'U+I"),
       pos = c(0,0,0.47,1), more = TRUE)
 print(image(L, xlab = NULL, ylab = NULL, sub = "L"),
       pos = c(0.47,0,1,1))
-@ 
+@
   \end{center}
 \begin{itemize}
 \item Note that there are nonzeros in the lower right of $\bm L$ in
@@ -447,7 +452,7 @@ Ut <- crossprod(Lambda, Zt)
 Lnoperm <- Cholesky(tcrossprod(Ut), perm = FALSE, LDL = FALSE, Imult = 1)
 Lperm <- Cholesky(tcrossprod(Ut), LDL = FALSE, Imult = 1)
 sapply(lapply(list(L, Lnoperm, Lperm), as, "sparseMatrix"), nnzero)
-@   
+@
 \end{frame}
 \begin{frame}[fragile]
   \frametitle{Images of the reversed factor decompositions}
@@ -457,7 +462,7 @@ print(image(Lnoperm, xlab = NULL, ylab = NULL, sub = "Lnoperm"),
       split = c(1,1,2,1), more = TRUE)
 print(image(Lperm, xlab = NULL, ylab = NULL, sub = "Lperm"),
       split = c(2,1,2,1))
-@ 
+@
   \end{center}
   \begin{itemize}
   \item Without permutation, we get the worst possible fill-in.  With
@@ -488,7 +493,7 @@ Lambda <- Diagonal(x = rep.int(theta, nlev))
 Ut <- crossprod(Lambda, Zt)
 L <- Cholesky(tcrossprod(Ut), LDL = FALSE, Imult = 1)
 str(L@perm)
-@ 
+@
 \end{frame}
 
 \begin{frame}[fragile]
@@ -499,7 +504,7 @@ print(image(tcrossprod(Ut), xlab = NULL, ylab = NULL, sub = "U'U+I"),
       split = c(1,1,2,1), more = TRUE)
 print(image(L, xlab = NULL, ylab = NULL, sub = "L"),
       split = c(2,1,2,1))
-@ 
+@
   \end{center}
 \end{frame}
 
@@ -529,7 +534,7 @@ print(image(L, xlab = NULL, ylab = NULL, sub = "L"),
     \end{displaymath}
     where $r^2(\bm\theta,\bm\beta)=\|\bm y-\bm X\bm\beta-\bm
     U\tilde{\bm u}_{\theta,\beta}\|^2+\|\tilde{\bm u}_{\theta,\beta}\|^2$.
-  \item The first term doesn't depend on $\bm u$ and 
+  \item The first term doesn't depend on $\bm u$ and
     \begin{displaymath}
       \int\frac{\exp\left(\frac{-\|\bm L\tr\bm P(\bm u-\tilde{\bm u}_{\theta,\beta})\|^2}
           {2\sigma^2}\right)}
@@ -651,7 +656,7 @@ print(image(L, xlab = NULL, ylab = NULL, sub = "L"),
       L_R(\bm\theta,\sigma^2|\bm y)=\int L(\bm\theta,\bm\beta,\sigma^2|\bm y)\,d\bm\beta
     \end{displaymath}
     The same change-of-variable technique for evaluating
-    the integral w.r.t. $\bm u$ as $1/\abs(|\bm L|)$ produces 
+    the integral w.r.t. $\bm u$ as $1/\abs(|\bm L|)$ produces
     $1/\abs(|\bm R_X|)$ here and removes
     $(2\pi\sigma^2)^{p/2}$ from the denominator.  On the deviance
     scale, the profiled REML criterion is
@@ -734,3 +739,247 @@ setPars <- function(theta) {
     revised numeric values.
   \end{itemize}
 \end{frame}
+
+%---------------------------------------------------------------
+
+\section[ETH Profs]{Who's the best liked prof at ETH?}
+%% Doug Bates: "best liked", *not*  "most liked"
+<<preliminaries, echo=FALSE, hide=TRUE>>=
+## Hide this as well
+load("~/R/MM/Pkg-ex/lme4/eth-d-rating.rda") ; d.eth <- md
+@
+\begin{frame} \frametitle{Who's the best liked prof at ETH?}
+  \begin{itemize}
+  \item Private donation for encouraging excellent teaching at ETH
+  \item Student union of ETH Zurich organizes survey to award prizes:\\
+    Best lecturer --- of ETH, and of each of the 14 departments.
+  \item Smart Web-interface for survey: Each student sees the names of his/her
+    professors from the last 4 semesters and all the lectures that applied.
+  \item ratings in $\{1,2,3,4,5\}$.
+  \item high response rate
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Who's the best prof --- data}
+@
+<<read-dat,eval=FALSE>>=
+load("...../eth-d-rating.rda")
+@
+<<str-dat>>=
+str(d.eth)
+@ %def
+\end{frame}
+
+\begin{frame}\frametitle{Modelling the ETH teacher ratings}
+  Model: The rating depends on
+  \begin{itemize}
+  \item students (\texttt{s}) (rating subjectively)
+  \item teacher  (\texttt{d}) -- main interest
+  \item department (\texttt{dept})  [[obfuscated]]
+  \item ``service'' lecture or ``own department student'',
+    (\texttt{service}: 0/1).
+  \item semester of student at time of rating
+    (\texttt{studage}$\in\{2,4,6,8\}$).
+  \item how many semesters back was the lecture (\texttt{lectage}).
+  \end{itemize}
+
+  Main question: \fbox{Who's the best prof?}
+
+  Hence, for ``political'' reasons, want \texttt{d} as a \textbf{fixed}
+  effect.
+\end{frame}
+\begin{frame}[fragile]\frametitle{Model for ETH teacher ratings}
+
+ \begin{itemize}
+ \item Want \texttt{d} (``teacher\_ID'', 1128 levels) as \textbf{fixed}
+   effect.
+ \item Further fixed effects \texttt{studage} (4~ l.), \texttt{lectage} (6~l.),
+   maybe \texttt{service} (2~l.), \texttt{dept} (15~l.).
+
+ \item Use the new \Rfun{sparse.model.matrix} \footnote{in next version of
+   \pkg{Matrix}}:
+ \end{itemize}
+
+<<sparse-mod-matr>>=
+X <- sparse.model.matrix( ~ d + dept*service + studage + lectage,
+                         data = d.eth)
+dim(X)
+@
+<<sparse-obj-size-show,eval=FALSE>>=
+object.size(X) / (ncol(X) * nrow(X) * 8)
+@
+<<sparse-obj-size-do,echo=FALSE>>=
+c(round(object.size(X) / (ncol(X) * nrow(X) * 8), 3))
+@
+<<str-sparse-mod-matr>>=
+str(X)
+@
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Large fixed effect (ETH teacher)}
+  \begin{itemize}
+  \item Now, in
+    \[ y = \bX\bbeta + \bZ\bm{b} + \beps
+    \]
+    have $\bX$ as $n \times 1165$, \ \ $\bZ$ roughly $n \times 5000$,
+    $n = 73'421$.
+
+\item using ``developmental'' \code{lmer2(..., sparseX = TRUE)}
+  \\ with \emph{sparse} $\bX$ (fixed effects) in addition to % the indispensably
+  sparse $\bZ$ (random effects) :
+
+\smallskip
+
+<<lmer-tst,eval=FALSE>>=
+fm0 <- lmer2(y ~ d + dept*service + studage + lectage + (1|s),
+             data = d.eth, sparseX = TRUE)
+#                          ^^^^^^^^^^^^^^^ new option
+@ %def
+\begin{Schunk}
+% \begin{Sinput}
+% > fm0 <- lmer2(y ~ d + dept*service + studage + lectage + (1|s),
+% +             data = d.eth, sparseX = TRUE)
+% \end{Sinput}
+\begin{Soutput}
+Error ... Cholmod error 'not positive definite' at file:../Cholesky/......
+\end{Soutput}
+\end{Schunk}
+@
+\item indeed, fixed-effects $\bm X$ is rank-deficient, whereas making it random,
+  \emph{regularizes}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+14 columns would have to be eliminated to render it non-singular:
+<<svn-XtX,fig=TRUE>>=
+SVD.XX <- svd(crossprod(X), 0,0)$d
+table(SVD.XX < 1e-5 * median(SVD.XX))
+plot(SVD.XX, log = "y")
+@
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{itemize}
+  \item Finding: Do not use \texttt{'dept'} as that is entirely explained by
+    \texttt{'d'}
+  \item Then, the corresponding $\bm X$ has full rank ($p = 1137$)
+  \end{itemize}
+<<lmer-eth, eval=FALSE>>=
+fm1 <- lmer2(y ~ d + service + studage + lectage + (1|s),
+             data = d.eth, sparseX = TRUE)
+@
+\begin{Schunk}
+\begin{Sinput}
+## now call the minimizer -- on here one-dimensional:
+str( optimize(fm1 @ setPars, c(0,5)) )
+\end{Sinput}
+\begin{Soutput}
+List of 2
+ $ minimum  : num 0.278
+ $ objective: num 235716
+\end{Soutput}
+\begin{Sinput}
+beta.fix <- get("beta", envir = lme4a:::env(fm1)) # to keep ..
+ls.str(lme4a:::env(fm1))
+\end{Sinput}
+\begin{Soutput}
+beta :  Named num [1:1137] 3.807 -1.102 0.164 -1.272 -0.36 ...
+contrasts :  NULL
+control :  list()
+data : 'data.frame':	73421 obs. of  7 variables:
+ $ s      : Factor w/ 2972 levels "1","2","3","4",..: 1 1 1 1 2 2 3 3 3 3 ...
+ $ d      : Factor w/ 1128 levels "1","6","7","8",..: 525 560 832 1068 62 406 3 6 19 75 ...
+ $ studage: Ord.factor w/ 4 levels "2"<"4"<"6"<"8": 1 1 1 1 1 1 1 1 1 1 ...
+ $ lectage: Ord.factor w/ 6 levels "1"<"2"<"3"<"4"<..: 2 1 2 2 1 1 1 1 1 1 ...
+ $ service: Factor w/ 2 levels "0","1": 1 2 1 2 1 1 2 1 1 1 ...
+ $ dept   : Factor w/ 15 levels "5","12","6","11",..: 15 5 15 12 2 2 14 3 3 3 ...
+ $ y      : int  5 2 5 3 2 4 4 5 5 4 ...
+etastart : <missing>
+family : function (link = "identity")
+fitted :  num [1:73421] 3.14 3.16 3.4 3.1 3.33 ...
+flist : List of 1
+ $ s: Factor w/ 2972 levels "1","2","3","4",..: 1 1 1 1 2 2 3 3 3 3 ...
+formula : Class 'formula' length 3 y ~ d + service + studage + lectage + (1 | s)
+fr : 'data.frame':	73421 obs. of  6 variables:
+ $ y      : int  5 2 5 3 2 4 4 5 5 4 ...
+ $ d      : Factor w/ 1128 levels "1","6","7","8",..: 525 560 832 1068 62 406 3 6 19 75 ...
+ $ service: Factor w/ 2 levels "0","1": 1 2 1 2 1 1 2 1 1 1 ...
+ $ studage: Ord.factor w/ 4 levels "2"<"4"<"6"<"8": 1 1 1 1 1 1 1 1 1 1 ...
+ $ lectage: Ord.factor w/ 6 levels "1"<"2"<"3"<"4"<..: 2 1 2 2 1 1 1 1 1 1 ...
+ $ s      : Factor w/ 2972 levels "1","2","3","4",..: 1 1 1 1 2 2 3 3 3 3 ...
+fr.form : Class 'formula' length 3 y ~ d + service + studage + lectage + (1 + s)
+L : Formal class 'dCHMsimpl' [package "Matrix"] with 10 slots
+ldL2 :  num 2957
+ldRX2 :  num 4167
+.....................
+\end{Soutput}
+\end{Schunk}
+
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{'d' as random effect: Regularization}
+  We rather prefer some bias in order to reduce variance:
+  \\ make \texttt{'d'} a random effect:
+
+  Adantage: Can easily use \texttt{dept} as a fixed effect:
+
+%%% FIXME:  Need "old" lme4 for this!
+<<change-to-old-lme4, echo=FALSE, hide=FALSE>>=
+detach("package:lme4a")
+library(lme4)
+@
+
+% <<lmer-eth-rf, fig=TRUE>>=
+% fm2 <- lmer(y ~        service + studage + lectage + (1|d) + (1|s),
+%              data = d.eth)
+
+% fm2D <- lmer(y ~ dept + service + studage + lectage + (1|d) + (1|s),
+%              data = d.eth)
+
+% ## revert the treatment contrast:
+% beta.Fix <- beta.fix["(Intercept)"] + c(0, beta.fix[2:1128])
+% b.random <- fixef(fm2)["(Intercept)"] + ranef(fm2)$d[,1]
+% @
+
+<<lmer-eth-rf, echo=FALSE, hide=TRUE>>=
+load(file="lmer-eth.rda") # -> beta.fix, ranef.fm2, fixef.fm2
+@
+<<lmer-eth-rf, eval=FALSE>>=
+fm2 <- lmer(y ~ service + studage + lectage + (1 | d) + (1 | s),
+            data = d.eth)
+fm2D <- lmer(y ~ dept + service + studage + lectage +
+                 (1 | d) + (1 | s), data = d.eth)
+
+beta.Fix <- beta.fix["(Intercept)"] + c(0, beta.fix[2:1128])
+b.random <- fixef(fm2)["(Intercept)"] + ranef(fm2)$d[, 1]
+@
+
+\end{frame}
+
+% fm2 <- lmer(y ~        service + studage + lectage + (1|d) + (1|s),
+%              data = d.eth)
+
+% fm2D <- lmer(y ~ dept + service + studage + lectage + (1|d) + (1|s),
+%              data = d.eth)
+
+% ## revert the treatment contrast:
+% beta.Fix <- beta.fix["(Intercept)"] + c(0, beta.fix[2:1128])
+% b.random <- fixef(fm2)["(Intercept)"] + ranef(fm2)$d[,1]
+% @
+
+\begin{frame}[fragile]
+<<lmer-eth-plot-fix-rf, fig=TRUE>>=
+plot(b.random ~ beta.Fix, main = "shrinkage of random effects")
+abline(0:1, col=2, lwd=2, lty=2)
+@
+\end{frame}
+
+%% Do this *manually* !!
+<<lmer-eth-rf, echo=FALSE, eval=FALSE>>=
+ranef.fm2 <- ranef(fm2)
+fixef.fm2 <- fixef(fm2)
+save(beta.fix, ranef.fm2, fixef.fm2, file="lmer-eth.rda")
+@
+
+%-- end ETH-teacher--------------------------------------------------------
