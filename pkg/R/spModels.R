@@ -362,30 +362,30 @@ model.spmatrix <- function(trms, mf, transpose=FALSE,
     f.matr <- structure(vector("list", length = length(indF)),
                         names = namObj[indF])
     for(i in seq_along(indF)) {
-        ii <- indF[i]
-        nam <- namObj[ii]
-        f <- mf[[i]]
-        fp <- factorPattern[nam,]
-        L2 <- # a list of 2
-            lapply(fac2Sparse(f, to = "d",
-                              drop.unused.levels=drop.unused.levels,
-                              factorPatt12 = 1:2 %in% fp,
-                              contrasts.arg = attr(f, "contrasts")),
-                   function(s) {
-                       if(is.null(s)) return(s)
-                       ## for some contr.sum, above *loses* rownames .. hmm ..
-                       rownames(s) <-
-                           paste(nam, if(is.null(rownames(s))) seq_len(nrow(s)) else
-                                 rownames(s), sep="")
-                       s
-                   })
+	ii <- indF[i]
+	nam <- namObj[ii]
+	f <- mf[[ii]]
+	fp <- factorPattern[nam,]
+	L2 <- # a list of 2
+	    lapply(fac2Sparse(f, to = "d",
+			      drop.unused.levels=drop.unused.levels,
+			      factorPatt12 = 1:2 %in% fp,
+			      contrasts.arg = attr(f, "contrasts")),
+		   function(s) {
+		       if(is.null(s)) return(s)
+		       ## for some contr.sum, above *loses* rownames .. hmm ..
+		       rownames(s) <-
+			   paste(nam, if(is.null(rownames(s))) seq_len(nrow(s)) else
+				 rownames(s), sep="")
+		       s
+		   })
 
-        if(any(nam == Names) && fp[nam] != 0)
-            ## Assign sparse matrix of the simple factor as well:
-            ## get [[1]] or [[2]] depending on its own factorPattern:
-            mf[[i]] <- L2[[fp[nam]]]
+	if(any(nam == Names) && fp[nam] != 0)
+	    ## Assign sparse matrix of the simple factor as well:
+	    ## get [[1]] or [[2]] depending on its own factorPattern:
+	    mf[[ii]] <- L2[[fp[nam]]]
 
-        f.matr[[i]] <- L2
+	f.matr[[i]] <- L2
     }
 
     result[simpleNames] <- mf[simpleNames]
