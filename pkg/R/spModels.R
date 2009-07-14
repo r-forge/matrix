@@ -47,20 +47,28 @@ fac2sparse <- function(from, to = c("d","i","l","n","z"),
 setAs("factor", "sparseMatrix", function(from) fac2sparse(from, to = "d"))
 
 ## a version that uses contrasts --- *iff* contrasts.arg is not FALSE
+## and returns a list in any case
 fac2Sparse <- function(from, to = c("d","i","l","n","z"),
-                       drop.unused.levels = TRUE, contrasts.arg = NULL)
+                       drop.unused.levels = TRUE,
+                       factorPatt12, contrasts.arg = NULL)
 {
 
     m <- fac2sparse(from, to=to,
                     drop.unused.levels=drop.unused.levels)
-    if(identical(contrasts.arg, FALSE))
-	return(m)
+##     if(identical(contrasts.arg, FALSE))
+## 	return(list(m))
+    stopifnot(is.logical(factorPatt12), length(factorPatt12) == 2)
+    if(!factorPatt12[1])
+	return(list(NULL, if(factorPatt12[2]) m))
+
     ## else *do* use contrasts.arg
     if(is.null(contrasts.arg))
 	contrasts.arg <- getOption("contrasts")[if(is.ordered(from))
 						"ordered" else "unordered"]
     stopifnot(is.function(FUN <- get(contrasts.arg)))
-    t(FUN(length(levels(from)), sparse = TRUE)) %*% m
+    ## calling  contr.*() with correct level names directly :
+    list(t(FUN(rownames(m), sparse = TRUE)) %*% m,
+         if(factorPatt12[2]) m)
 }
 
 if(getRversion() < "2.10.0" || R.version$`svn rev` < 48913) {
@@ -97,7 +105,7 @@ contr.treatment <-
 	if(n > 1) levels <- as.character(seq_len(n))
 	else stop("not enough degrees of freedom to define contrasts")
     } else {
-	levels <- as.character(n)
+        levels <- as.character(n)
 	n <- length(n)
     }
 
@@ -145,8 +153,16 @@ contr.SAS <- function(n, contrasts = TRUE, sparse=FALSE)
 
 contr.poly <- function (n, scores = 1L:n, contrasts = TRUE, sparse = FALSE) {
     ## this is non-sense anyway
-    as(stats::contr.poly(n, scores=scores, contrasts=contrasts),
-       "sparseMatrix")
+
+    ## need for 'scores' default :
+    if (is.numeric(n) && length(n) == 1)
+	levs <- seq_len(n)
+    else {
+	levs <- n
+	n <- length(levs)
+    }
+    m <- stats::contr.poly(levs, scores=scores, contrasts=contrasts)
+    if(sparse) as(m, "sparseMatrix") else m
 }
 
 
@@ -290,7 +306,9 @@ is.model.frame <- function(x)
 }
 
 ## This version uses  'rBind' and returns  X' { t(X) ] :
-model.spmatrix <- function(trms, mf, transpose=FALSE)
+model.spmatrix <- function(trms, mf, transpose=FALSE,
+                           drop.unused.levels = TRUE)
+
 {
     ## Purpose:
     ## ----------------------------------------------------------------------
@@ -307,16 +325,15 @@ model.spmatrix <- function(trms, mf, transpose=FALSE)
 ##     cat("-------  mf = \n")
 ##     str(mf)
 
-    hasInt <- attr(trms, "intercept") == 1
-    if(!hasInt)
-        stop("formula with*OUT* intercept not yet implemented")
+    factorPattern <- attr(trms, "factors")
 
     ## Create a sparse model matrix from a model frame.
     ## TH: I expect that at least one component is a factor or sparse
 
-
-    termsFactors <- attr(trms, "factors")
-    Names <- colnames(termsFactors)
+    n.fP <- dimnames(factorPattern)
+    Names  <- n.fP[[2]] # == colnames == names of terms "a", "b:c", ...
+    fnames <- n.fP[[1]] # == names of those variables in the model at all
+    hasInt <- attr(trms, "intercept") == 1
     ## the degree of interaction:
     intOrder <- attr(trms, "order")
     isInteraction <- intOrder > 1L
@@ -325,27 +342,57 @@ model.spmatrix <- function(trms, mf, transpose=FALSE)
     attributes(mf) <- list(names = namObj) # i.e. drop all other attributes
 
     ## Convert character & factor to "Rowwise- sparseMatrix ("dummy"-matrix)
+    result <- structure(vector("list", length = length(Names)), names = Names)
     ich <- sapply(mf, is.character)
     mf[ich] <- lapply(mf[ich], factor)
-    is.f <- sapply(mf, is.factor)
-    mf[is.f] <- mapply(function(f, nam) {
-        r <- ## as(f, "sparseMatrix")
-            fac2Sparse(f, to = "d",
-                       drop.unused.levels = TRUE,
-                       contrasts.arg = attr(f, "contrasts"))
-        ## for some contrast {contr.sum}, the above *loses* rownames .. hmm ..
-	rownames(r) <-
-	    paste(nam, if(is.null(rownames(r))) seq_len(nrow(r)) else rownames(r),
-		  sep="")
-        ## if(nrow(r) > 1) seq_len(nrow(r)), sep="")
-        r
-    }, mf[is.f], namObj[is.f])
+    indF <- which(is.f <- sapply(mf, is.factor))
 
-    ## mf: now a list of *numeric* vectors and sparseMatrix (ex-factors)
+    if(!hasInt) { ## change the '1' of the first factor in a '2' :
 
-    result <- structure(vector("list", length = length(Names)),
-                        names = Names)
+        ## not yet -- FIXME --
+        stop("formula with*OUT* intercept not yet implemented")
+
+        ## can we rely on that colnames(mf) === fnames ?
+        factorPattern[cbind(fnames,fnames)]
+    }
+
+    ## This was an mapply(function(f,nam) {......}, mf[is.f], namObj[is.f],
+    ##				        SIMPLIFY = FALSE, USE.NAMES = FALSE)
+    ## for each basic factor in the model :
+    f.matr <- structure(vector("list", length = length(indF)),
+                        names = namObj[indF])
+    for(i in seq_along(indF)) {
+        ii <- indF[i]
+        nam <- namObj[ii]
+        f <- mf[[i]]
+        fp <- factorPattern[nam,]
+        L2 <- # a list of 2
+            lapply(fac2Sparse(f, to = "d",
+                              drop.unused.levels=drop.unused.levels,
+                              factorPatt12 = 1:2 %in% fp,
+                              contrasts.arg = attr(f, "contrasts")),
+                   function(s) {
+                       if(is.null(s)) return(s)
+                       ## for some contr.sum, above *loses* rownames .. hmm ..
+                       rownames(s) <-
+                           paste(nam, if(is.null(rownames(s))) seq_len(nrow(s)) else
+                                 rownames(s), sep="")
+                       s
+                   })
+
+        if(any(nam == Names) && fp[nam] != 0)
+            ## Assign sparse matrix of the simple factor as well:
+            ## get [[1]] or [[2]] depending on its own factorPattern:
+            mf[[i]] <- L2[[fp[nam]]]
+
+        f.matr[[i]] <- L2
+    }
+
     result[simpleNames] <- mf[simpleNames]
+
+    getR <- function(N, nm2)
+        if(!is.null(r <- f.matr[[N]])) r[[factorPattern[N, nm2]]] else mf[[N]]
+
 
     ## Now handle interactions.
     ##  Use previous columns in result (especially for high-order interactions).
@@ -362,14 +409,15 @@ model.spmatrix <- function(trms, mf, transpose=FALSE)
                 if(getOption("verbose"))
                     cat(sprintf("interaction '%s' from   '%s' * '%s' \n",
                                 nm, nmSplits[1],nmSplits[2]))
-                result[[nm]] <- sparseInt.r(result[[nmSplits[1]]],
-                                            result[[nmSplits[2]]])
+                result[[nm]] <- sparseInt.r(getR(nmSplits[1], nm),
+                                            getR(nmSplits[2], nm))
             }
+
         }
 
     myFormula <- trms
     attributes(myFormula) <- NULL       # only need formula
-    ## r :=  X^T
+    ## r :=  t(X)
     r <- structure(do.call("rBind",
 			   c(if(hasInt) list("(Intercept)" = 1), result)),
 		   ## extra attributes added to the sparse Matrix:
