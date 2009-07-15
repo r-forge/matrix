@@ -76,22 +76,6 @@ if(inherits(try(Mlibrary(lme4a)), "try-error"))
     library(lme4a)
 # was
 # library(lme4)
-profDev <- function(rho, theta) {
-    stopifnot(is.numeric(theta), length(theta) == length(rho$nlev))
-    Ut <- crossprod(Diagonal(x = rep.int(theta, rho$nlev)), rho$Zt)
-    L <- update(rho$L, Ut, mult = 1)
-    cu <- solve(L, solve(L, Ut %*% rho$y, sys = "P"), sys = "L")
-    RZX <- solve(L, solve(L, Ut %*% rho$X, sys = "P"), sys = "L")
-    RX <- chol(rho$XtX - crossprod(RZX))
-    cb <- solve(t(RX), crossprod(rho$X, rho$y) - crossprod(RZX, cu))
-    beta <- solve(RX, cb)
-    u <- solve(L, solve(L, cu - RZX %*% beta, sys = "Lt"), sys = "Pt")
-    fitted <- as.vector(crossprod(Ut, u) + rho$X %*% beta)
-    prss <- sum(c(rho$y - fitted, as.vector(u))^2) # penalized residual sum of squares
-    n <- length(fitted);  p <- ncol(RX)
-    if (rho$REML) return(determinant(L)$mod + 2*determinant(RX)$mod +
-                         (n-p)*(1+log(2*pi*prss/(n-p))))
-    determinant(L)$mod + n * (1 + log(2*pi*prss/n))}
 @
 
 \section[Model matrices]{Model matrices with many columns}
@@ -305,7 +289,7 @@ profDev <- function(rho, theta) {
   \begin{itemize}
   \item The conditional mean satisfies the equations
     \begin{displaymath}
-      (\bm U_\theta\,\bm U\tr_\theta+\bm I_q)
+      (\bm U\tr_\theta\,\bm U_\theta+\bm I_q)
       \tilde{\bm u}_{\theta,\beta}=\bm U\tr_\theta(\bm y-\bm X\bm\beta)
     \end{displaymath}
   \item This would be interesting but not very important were it not
@@ -315,8 +299,8 @@ profDev <- function(rho, theta) {
   \item Recall that $\bm U_\theta=\bm Z\bm\Lambda_\theta$.
     Because $\bm Z$ is generated from indicator columns for the
     grouping factors, it is sparse.  $\bm U_\theta$ is also very sparse.
-  \item The fill-reducing permutation $\bm P$ and the structure of the
-    Cholesky factor $\bm L$ are determined from $\bm U_{\theta^{(0)}}$
+  \item The fill-reducing permutation, $\bm P$, and the structure of the
+    Cholesky factor, $\bm L$, are determined from $\bm U_{\theta^{(0)}}$
     where $\bm\theta^{(0)}$ is the starting value.  For subsequent
     values of $\bm\theta$ the update of the factor $\bm L_\theta$ satisfying
     \begin{displaymath}
@@ -852,7 +836,7 @@ Error ... Cholmod error 'not positive definite' at file:../Cholesky/......
 
 \begin{frame}[fragile]
 14 columns would have to be eliminated to render it non-singular:
-<<svn-XtX,fig=TRUE>>=
+<<svn-XtX,fig=TRUE,height=4>>=
 SVD.XX <- svd(crossprod(X), 0,0)$d
 table(SVD.XX < 1e-5 * median(SVD.XX))
 plot(SVD.XX, log = "y")
@@ -924,35 +908,27 @@ ldRX2 :  num 4167
 
   Advantage: Can easily use \texttt{dept} as a fixed effect:
 
-%%% FIXME:  Need "old" lme4 for this!
-<<change-to-old-lme4, echo=FALSE, hide=FALSE>>=
-detach("package:lme4a")
-library(lme4)
-@
-
-% <<lmer-eth-rf, fig=TRUE>>=
-% fm2 <- lmer(y ~        service + studage + lectage + (1|d) + (1|s),
-%              data = d.eth)
-
-% fm2D <- lmer(y ~ dept + service + studage + lectage + (1|d) + (1|s),
-%              data = d.eth)
-
-% ## revert the treatment contrast:
-% beta.Fix <- beta.fix["(Intercept)"] + c(0, beta.fix[2:1128])
-% b.random <- fixef(fm2)["(Intercept)"] + ranef(fm2)$d[,1]
-% @
-
-<<lmer-eth-rf, echo=FALSE, hide=TRUE>>=
-load("lmer-eth.rda") # -> beta.fix, ranef.fm2, fixef.fm2
+<<lmer-eth-rf,echo=FALSE, hide=TRUE>>=
+if (file.exists("lmer-eth.rda")) {
+    load("lmer-eth.rda") # -> beta.fix, ranef.fm2, fixef.fm2
+} else {
+    if (!exists(fm2))
+        fm2 <- lmer(y ~        service + studage + lectage + (1|d) + (1|s),
+                    d.eth, control = list(algorithm = "nlminb"))
+    if (!exists(fm2D))
+        fm2D <- lmer(y ~ dept + service + studage + lectage + (1|d) + (1|s),
+                     d.eth, control = list(algorithm = "nlminb"))
+}
 b.random <- fixef.fm2["(Intercept)"] + ranef.fm2$d[, 1]
 beta.Fix <- beta.fix["(Intercept)"] + c(0, beta.fix[2:1128])
 @
+
 <<lmer-eth-rf, eval=FALSE>>=
 fm2 <- lmer(y ~ service + studage + lectage + (1 | d) + (1 | s),
             data = d.eth)
 fm2D <- lmer(y ~ dept + service + studage + lectage +
-                 (1 | d) + (1 | s), data = d.eth)
-
+             (1 | d) + (1 | s), data = d.eth)
+## revert the treatment contrast:
 beta.Fix <- beta.fix["(Intercept)"] + c(0, beta.fix[2:1128])
 b.random <- fixef(fm2)["(Intercept)"] + ranef(fm2)$d[, 1]
 @
@@ -971,10 +947,18 @@ b.random <- fixef(fm2)["(Intercept)"] + ranef(fm2)$d[, 1]
 % @
 
 \begin{frame}[fragile]
-<<lmer-eth-plot-fix-rf, fig=TRUE>>=
-plot(b.random ~ beta.Fix, main = "shrinkage of random effects")
-abline(0:1, col=2, lwd=2, lty=2)
+  \frametitle{Shrinkage of the random effects relative to fixed effects}
+  \begin{center}
+<<lmer-eth-plot-fix-rf, fig=TRUE, echo = FALSE>>=
+print(xyplot(b.random ~ beta.Fix, type = c("g","p"),
+             panel = function(...){
+                 panel.abline(0,1,lty = 2,alpha=0.6)
+                 panel.xyplot(...)
+             }, ylab = "Conditional mean of random effects",
+             xlab = "Fixed-effects estimate",
+             main = "shrinkage of random effects", aspect = 1))
 @
+  \end{center}
 \end{frame}
 
 %% Do this *manually* !!
