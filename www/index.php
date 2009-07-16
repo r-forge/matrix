@@ -1,5 +1,6 @@
 
-<!-- This is the project specific website template -->
+<!-- This is == http://matrix.r-forge.r-project.org/ -->
+<!--            ==================================== -->
 <!-- It can be changed as liked or replaced by other content -->
 
 <?php
@@ -41,9 +42,22 @@ while (!feof($handle)) {
 fclose($handle);
 echo $contents; } ?>
 
+<p>
+<t>Matrix</t> has been a "recommended" R package since R version 2.9.0 (October 2008). This means that it is now part of every regular installation of R.
+</p>
+
+<p>
+The <t>Matrix</t> package comes with several vignettes describing its functionality.
+In addition, we provide <strong><a href="./slides">slides</a></strong> of presentations or talks about the subject.
+</p>
+
 <p> <strong>Doxygen</strong> documentation of the underlying C functions is <a href="./doxygen/"><strong>here</strong></a>. </p>
 
-<p> The <strong>project summary page</strong> you can find <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </p>
+<p> <strong>Do read</string> on <strong><a href="./programming/">compatibility</a></strong> changes  in connection with <t>Matrix</t>.
+</p>
+
+
+<p> The <strong>project summary page</strong> is <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </p>
 
 </body>
 </html>
