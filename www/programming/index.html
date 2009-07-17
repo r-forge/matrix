@@ -1,0 +1,51 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>Hints on Programming using the R Matrix Package</title>
+</head>
+<body bgcolor="#FFFFFF">
+<h1 align=center>
+Programming using the R Matrix Package</h1>
+
+<ol>
+<li> In versions of the Matrix package up to (and including) 0.999375-30,
+  <<tt>determinant(CF)</tt> where <tt>CF <- Cholesky(A,*)</tt> has been
+  computing the  determinant of A, whereas e.g.,  <tt>determinant(chol(A))</tt>
+  has always returned the determinant of the Cholesky <em>factor</em> of
+  A = RR' = L'L.
+  Of course, det(A) = det(L)^2 = det(R)^2, or equivalently
+  log(det(A)) = 2 * log(abs(det(L))) = 2 * log(abs(det(R))) which is
+  what <tt>determinant()</tt> computes with its default
+  setting <tt>logarithm = TRUE</tt>.
+  <p>
+
+  This behavior is changed for consistency reasons, from Matrix version
+  0.999375-31 on, notably the upcoming Matrix 1.0-0.
+  <cr>
+  "Once per session" warnings are issued in version 0.999375-30
+  (<em>before</em> the change) and 0.999375-31 (<em>after</em> the change),
+  possibly also for a few further releases.
+  <p>
+
+  Those of you making use of <tt>determinant(Cholesky(.))</tt> are
+  <em>strongly</em> advised to make their R code work correctly in older
+  and newer versions of <tt>Matrix</tt> with something like the following
+<pre>
+  .f <- if(package_version(packageDescription("Matrix")$Version) >=
+           "0.999375-30") 2 else 1
+  ## and use
+  .f * determinant(myCholesky)$modulus
+</pre>
+
+</li>
+
+<!-- <li> </li> -->
+<!-- <li> </li> -->
+</ol>
+
+</body>
+</html>
+
+
+
