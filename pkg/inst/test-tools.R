@@ -222,11 +222,56 @@ eqDeterminant <- function(m1, m2, ...) {
     all.equal(d1, d2, ...)
 }
 
+##' @param A a non-negative definite sparseMatrix, typically "dsCMatrix"
+##'
+##' @return a list with components resulting from calling
+##'    Cholesky(.,  perm = .P., LDL = .L., super = .S.)
+##'
+##'    for all 3^3 combinations of (.P., .L., .S.)
+##'  FIXME:  currently 2*3^2  (perm = NA is not implemented)
+allCholesky <- function(A, verbose = FALSE)
+{
+    ## Author: Martin Maechler, Date: 16 Jul 2009
+
+    ##' @param r   list of CHMfactor objects, typically with names() as '. | .'
+    ##'
+    ##' @return an is(perm,LDL,super) matrix with interesting and *named* rownames
+    CHM_to_pLs <- function(r) {
+        is.perm <- function(.)
+            if(inherits(., "try-error")) NA else !all(.@perm == 0:(.@Dim[1]-1))
+        is.LDL <- function(.)if(inherits(., "try-error")) NA else isLDL(.)
+	r.st <-
+	    cbind(perm	= sapply(r, is.perm),
+		  LDL	= sapply(r, is.LDL),
+		  super = sapply(r, class) == "dCHMsuper")
+	names(dimnames(r.st)) <- list("  p L s", "")
+	r.st
+    }
+
+    logi <- c(FALSE, TRUE, NA)
+    d12 <- expand.grid(perm = logi[1:2], LDL = logi, super = logi,
+		       KEEP.OUT.ATTRS = FALSE)
+    r1 <- lapply(seq_len(nrow(d12)),
+		 function(i) try(do.call(Cholesky,
+                                         c(list(A = A), as.list(d12[i,])))))
+    names(r1) <- apply(d12, 1,
+		       function(.) paste(symnum(.), collapse=" "))
+    dup.r1 <- duplicated(r1)
+    r.all <- CHM_to_pLs(r1)
+    if(!identical(dup.r1, duplicated(r.all)))
+        warning("duplicated( <pLs-matrix> ) differs from duplicated( <CHM-list> )",
+                immediate. = TRUE)
+    list(dup.r.all = dup.r1,
+	 r.all	= r.all,
+	 r.uniq = CHM_to_pLs(r1[ ! dup.r1]))
+}
+
+
 ##--- Compatibility tests "Matrix" =!= "traditional Matrix" ---
 checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 			do.matrix = !(isSparse || isDiag) || prod(dim(m)) < 1e6,
-			do.t = TRUE, doNorm = TRUE, doOps = TRUE, doSummary = TRUE,
-			doCoerce = TRUE,
+			do.t = TRUE, doNorm = TRUE, doOps = TRUE,
+                        doSummary = TRUE, doCoerce = TRUE,
 			doCoerce2 = doCoerce && !extends(cld, "RsparseMatrix"),
 			verbose = TRUE, catFUN = cat)
 {

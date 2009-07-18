@@ -106,6 +106,79 @@ set.seed(17)
 (CA <- Cholesky(rr$A))
 stopifnot(all.equal(determinant(rr$A),
 		    determinant(as(rr$A, "matrix"))))
+A12 <- mkLDL(12, 1/10)
+
+(r12 <- allCholesky(A12$A))
+aCh.hash <- r12$r.all %*% (2^(2:0))
+if(FALSE)## if(require("sfsmisc"))
+split(rownames(r12$r.all), Duplicated(aCh.hash))
+
+## TODO: find cases for both choices when we leave it to CHOLMOD to chose
+if(FALSE) ## not yet
+for(n in 1:9) { ## # before seg.fault at n = 10 !
+    cat(sprintf("n = %3d:\n", n))
+    mkA <- mkLDL(1+rpois(1, 30), 1/10)
+    r <- allCholesky(mkA$A)
+    ## Compare .. apart from the NAs that happen from (perm=FALSE, super=TRUE)
+    iNA <- apply(is.na(r$r.all), 1, any)
+    stopifnot(aCh.hash[!iNA] == r$r.all[!iNA,] %*% (2^(2:0)))
+    cat("--------\n")
+}
+### --- see seg.fault on  nb-mm {for the R version I can't 'dbg' ..}
+## FIXME -- UNfinished
+
+A. <-
+    new("dsCMatrix", Dim = c(32L, 32L), uplo = "U"
+        , i = c(0L, 1L, 2L, 3L, 4L, 2L, 5L, 5L, 6L, 0L, 7L, 8L, 8L, 9L, 3L,
+          4L, 10L, 11L, 0L, 7L, 12L, 6L, 13L, 14L, 4L, 10L, 15L, 8L, 9L,
+          16L, 17L, 1L, 2L, 5L, 18L, 6L, 9L, 13L, 15L, 19L, 12L, 20L, 0L,
+          7L, 8L, 9L, 12L, 16L, 21L, 7L, 21L, 22L, 9L, 19L, 23L, 2L, 5L,
+          18L, 19L, 21L, 22L, 24L, 10L, 11L, 18L, 25L, 0L, 6L, 7L, 12L,
+          13L, 18L, 19L, 20L, 21L, 22L, 24L, 25L, 26L, 6L, 9L, 13L, 15L,
+          16L, 19L, 23L, 26L, 27L, 9L, 11L, 19L, 23L, 25L, 27L, 28L, 1L,
+          4L, 7L, 10L, 15L, 18L, 22L, 24L, 25L, 28L, 29L, 1L, 18L, 19L,
+          24L, 29L, 30L, 14L, 21L, 22L, 24L, 26L, 31L)
+        ##
+        , p = c(0L, 1L, 2L, 3L, 4L, 5L, 7L, 9L, 11L, 12L, 14L, 17L, 18L, 21L,
+          23L, 24L, 27L, 30L, 31L, 35L, 40L, 42L, 49L, 52L, 55L, 62L, 66L,
+          79L, 88L, 95L, 106L, 112L, 118L)
+        ##
+        , x = c(25, 225, 441, 484, 529, 36603, 3038085, 828, 19333, 500, 10256,
+          841, 52983, 3338253, 26136, 52371, 6596473, 121, 75, 1500, 1186,
+          24276, 2039809, 144, 2116, 209484, 8825, 1682, 105966, 3428, 9, 21150,
+          33516, 2781828, 4535397, 6358, 32724, 534072, 6859, 3576050, 49011,
+          2500237, 2325, 46500, 47937, 3020031, 6975, 95874, 2949210, 1536,
+          4032, 38340, 31752, 3206952, 3112720, 4851, 402633, 368676, 37908,
+          17856, 124992, 2578213, 13200, 9317, 4455, 1398038, 200, 27455, 4000,
+          79402, 2306220, 5832, 604010, 4018902, 56040, 262080, 1160640,
+          320760, 11925262, 16184, 25596, 1401956, 23826, 3008, 3393938,
+          2508408, 1537480, 7532296, 28512, 5445, 2879712, 2794176, 419505,
+          2252448, 2768530, 225, 14812, 11264, 1466388, 59248, 21150, 67584,
+          2500, 116, 6960, 976637, 3375, 317250, 74358, 3866616, 20231,
+          9084758, 2592, 39744, 278208, 1232064, 2583360, 2789776)
+        )
+validObject(A.)
+
+for(p in c(FALSE,TRUE)) # no NA here
+    for(L in c(FALSE,TRUE, NA))
+        for(s in c(FALSE,TRUE, NA)) {
+            cat(sprintf("p,L,S = (%2d,%2d,%2d): ", p,L,s))
+            r <- tryCatch(Cholesky(A., perm=p, LDL=L, super=s),
+                          error = function(e)e)
+            cat(if(inherits(r, "error")) " *** E ***" else
+                sprintf("%3d", r@type),"\n", sep="")
+        }
+str(A., max=3) ## look at the 'factors'
+
+facs <- A.@factors
+names(facs) <- sub("Cholesky$", "", names(facs))
+facs <- facs[order(names(facs))]
+
+sapply(facs, class)
+str(lapply(facs, slot, "type"))
+## super = TRUE  currently always entails  LDL=FALSE :
+## hence isLDL is TRUE for ("D" and not "S"):
+sapply(facs, isLDL)
 
 ## --- now a "large" (712 x 712) real data example
 

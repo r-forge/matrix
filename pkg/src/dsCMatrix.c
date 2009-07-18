@@ -22,14 +22,15 @@ static int chk_nm(const char *nm, int perm, int LDL, int super)
  * zero Imult), and return a copy.
  *
  * @param Ap     dsCMatrix object
- * @param perm   integer indicating if permutation is required (>0),
- *               forbidden (0) or optional (<0)
+ * @param perm   integer indicating if permutation is required (!= 0),
+ *               forbidden (0) [not yet: or optional (<0)]
  * @param LDL    integer indicating if the LDL' form is required (>0),
  *               forbidden (0) or optional (<0)
  * @param super  integer indicating if the supernodal form is required (>0),
  *               forbidden (0) or optional (<0)
  * @param Imult  numeric multiplier of I in  |A + Imult * I|
  */
+/* FIXME:    LDL < 0 is still equivalent to LDL > 0 ! */
 static CHM_FR
 internal_chm_factor(SEXP Ap, int perm, int LDL, int super, double Imult)
 {
@@ -77,9 +78,14 @@ internal_chm_factor(SEXP Ap, int perm, int LDL, int super, double Imult)
 
     if (!Imult) {		/* cache the factor */
 	char fnm[12] = "sPDCholesky";
+
+	/* now that we allow (super, LDL) to be "< 0", be careful :*/
+	if(super < 0) super = L->is_super ? 1 : 0;
+	if(LDL < 0)   LDL   = L->is_ll    ? 0 : 1;
+
 	if (super > 0) fnm[0] = 'S';
 	if (perm == 0) fnm[1] = 'p';
-	if (LDL == 0) fnm[2] = 'd';
+	if (LDL  == 0) fnm[2] = 'd';
 	set_factors(Ap, chm_factor_to_SEXP(L, 0), fnm);
     }
     return L;
@@ -88,7 +94,8 @@ internal_chm_factor(SEXP Ap, int perm, int LDL, int super, double Imult)
 SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
 {
     int pivP = asLogical(pivot);
-    CHM_FR L = internal_chm_factor(x, pivP, 0, 0, 0.);
+    CHM_FR L = internal_chm_factor(x, pivP, /*LDL = */ 0, /* super = */ 0,
+				   /* Imult = */ 0.);
     CHM_SP R, Rt;
     SEXP ans;
 
@@ -114,12 +121,18 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
 
 SEXP dsCMatrix_Cholesky(SEXP Ap, SEXP perm, SEXP LDL, SEXP super, SEXP Imult)
 {
+    int iSuper = asLogical(super),
+	iPerm  = asLogical(perm),
+	iLDL   = asLogical(LDL);
     int c_pr = c.print;
     c.print = 0;/* stop CHOLMOD printing; we cannot suppress it (in R), and
 		   have error handler already */
-    SEXP r = chm_factor_to_SEXP(internal_chm_factor(Ap, asLogical(perm),
-						    asLogical(LDL),
-						    asLogical(super),
+
+    /* When parameter is set to  NA  in R, let CHOLMOD choose */
+    if(iSuper == NA_LOGICAL)	iSuper = -1;
+    /* if(iPerm  == NA_LOGICAL)	iPerm  = -1; */
+    if(iLDL   == NA_LOGICAL)	iLDL   = -1;
+    SEXP r = chm_factor_to_SEXP(internal_chm_factor(Ap, iPerm, iLDL, iSuper,
 						    asReal(Imult)),
 				1 /* dofree */);
     c.print = c_pr;

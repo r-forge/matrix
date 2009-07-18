@@ -48,11 +48,10 @@ export("Cholesky",
        "tcrossprod",
        "tril",
        "triu",
-       "unpack",
-       ".validateCsparse",
+       "unpack"
+       , ".validateCsparse"
 #        "writeHB",
-       "writeMM",
-       "xtabs"
+       , "writeMM"
        , ".M.classEnv"
        )
 
@@ -275,6 +274,10 @@ exportMethods(## for both own and "other" generics:
 
 if(getRversion() < "2.10.0")
     exportPattern("^contr\\..*")
+
+if(getRversion() < "2.10.0")
+    export("xtabs")
+
 
 exportMethods("rbind2")
 exportMethods("cbind2")
