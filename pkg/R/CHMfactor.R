@@ -18,7 +18,7 @@ setMethod("expand", signature(x = "CHMfactor"),
 isLDL <- function(x)
 {
     stopifnot(is(x, "CHMfactor"))
-    as.logical(x@type[2])
+    as.logical(! x@type[2])# "!" = not as type[2] := (cholmod_factor)->is_ll
 }
 
 setMethod("image", "CHMfactor",

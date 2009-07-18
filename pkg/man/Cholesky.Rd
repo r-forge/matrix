@@ -17,14 +17,16 @@ Cholesky(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, \dots)
     values are allowed.}
   \item{perm}{logical scalar indicating if a fill-reducing permutation
     should be computed and applied to the rows and columns of \code{A}.
-  Default is \code{TRUE}.}
+    Default is \code{TRUE}.}% NA not available here
   \item{LDL}{logical scalar indicating if the decomposition should be
     computed as LDL' where \code{L} is a unit lower triangular matrix.
     The alternative is LL' where \code{L} is lower triangular with
-    arbitrary diagonal elements.  Default is \code{TRUE}.}
+    arbitrary diagonal elements.  Default is \code{TRUE}.  Setting it to
+    \code{\link{NA}} leaves the choice to a CHOLMOD-internal heuristic.}
   \item{super}{logical scalar indicating is a supernodal decomposition
     should be created.  The alternative is a simplicial decomposition.
-    Default is \code{FALSE}.}
+    Default is \code{FALSE}.  Setting it to \code{\link{NA}} leaves the
+    choice to a CHOLMOD-internal heuristic.}
   \item{Imult}{numeric scalar which defaults to zero. The matrix that is
     decomposed is \eqn{A+m*I} where \eqn{m} is the value of \code{Imult}
     and \code{I} is the identity matrix of order \code{ncol(A)}.}
