@@ -538,7 +538,21 @@ CHM_DN as_cholmod_x_dense(cholmod_dense *ans, SEXP x)
 
 void R_cholmod_error(int status, const char *file, int line, const char *message)
 {
-    error(_("Cholmod error '%s' at file:%s, line %d"), message, file, line);
+    /* From CHOLMOD/Include/cholmod_core.h : ...status values.
+       zero means success, negative means a fatal error, positive is a warning.
+    */
+#ifndef R_CHOLMOD_ALWAYS_ERROR
+    if(status < 0) {
+#endif
+	cholmod_l_defaults(&c);/* <--- restore defaults,
+				* as we will not be able to .. */
+	error(_("Cholmod error '%s' at file:%s, line %d"), message, file, line);
+#ifndef R_CHOLMOD_ALWAYS_ERROR
+    }
+    else
+	warning(_("Cholmod warning '%s' at file:%s, line %d"),
+		message, file, line);
+#endif
 }
 
 /* just to get 'int' instead of 'void' as required by CHOLMOD's print_function */
@@ -557,9 +571,9 @@ int R_cholmod_printf(const char* fmt, ...)
  * Initialize the CHOLMOD library and replace the print and error functions
  * by R-specific versions.
  *
- * @param c pointer to a cholmod_common structure to be initialized
+ * @param cl pointer to a cholmod_common structure to be initialized
  *
- * @return CHOLMOD_OK if successful
+ * @return TRUE if successful
  */
 int R_cholmod_l_start(CHM_CM cl)
 {

@@ -53,12 +53,15 @@ internal_chm_factor(SEXP Ap, int perm, int LDL, int super, double Imult)
 	    }
 	}
     }
-				/* No cached factor - create one */
+    /* Else:  No cached factor - create one */
+
     sup = c.supernodal;		/* save current settings */
     ll = c.final_ll;
 
     c.final_ll = (LDL == 0) ? 1 : 0;
-    c.supernodal = (super > 0) ? CHOLMOD_SUPERNODAL : CHOLMOD_SIMPLICIAL;
+    c.supernodal = (super > 0) ? CHOLMOD_SUPERNODAL :
+	((super < 0) ? CHOLMOD_AUTO :
+	 /* super == 0 */ CHOLMOD_SIMPLICIAL);
 
     if (perm) {			/* obtain fill-reducing permutation */
 	L = cholmod_l_analyze(A, &c);
@@ -71,6 +74,9 @@ internal_chm_factor(SEXP Ap, int perm, int LDL, int super, double Imult)
 	/* and now restore */
 	c.nmethods = nmethods; c.method[0].ordering = ord0; c.postorder = postorder;
     }
+    /* Note that the "restore" (above and below) now only "works",
+     * because our error handler call cholmod_l_defaults() ! */
+
     if (!cholmod_l_factorize_p(A, &Imult, (int*)NULL, 0 /*fsize*/, L, &c))
 	error(_("Cholesky factorization failed"));
     c.supernodal = sup;		/* restore previous settings */

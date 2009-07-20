@@ -105,6 +105,8 @@ setMethod("chol", signature(x = "dsCMatrix"),
 	  valueClass = "dtCMatrix")
 
 setMethod("Cholesky", signature(A = "dsCMatrix"),
+          ## signature(): leaving away (perm, LDL,..), but specify below:
+          ##              <==> all "ANY"
           function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
           .Call(dsCMatrix_Cholesky, A, perm, LDL, super, Imult))
 
