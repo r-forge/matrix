@@ -569,7 +569,10 @@ int R_cholmod_l_start(CHM_CM cl)
     cl->print_function = R_cholmod_printf; /* Rprintf gives warning */
     /* Since we provide an error handler, it may not be a good idea to allow CHOLMOD printing,
      * because that's not easily suppressed on the R level :
-     * Hence consider, at least temporarily *  c->print_function = NULL; */
+     * Hence consider, at least temporarily *  cl->print_function = NULL;
+     * FIXME? alternative {slightly more efficient}:
+     * do *compile* CHOLMOD with '#define NPRINT'  */
+    cl->print_function = NULL;
     cl->error_handler = R_cholmod_error;
     return TRUE;
 }
