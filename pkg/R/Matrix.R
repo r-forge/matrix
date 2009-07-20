@@ -292,20 +292,20 @@ environment(det) <- environment()## == as.environment("Matrix")
 
 ## FIXME: All of these should never be called
 setMethod("chol", signature(x = "Matrix"),
-	  function(x, pivot, ...) .bail.out.1(.Generic, class(x)))
+	  function(x, pivot, ...) .bail.out.1("chol", class(x)))
 setMethod("determinant", signature(x = "Matrix", logarithm = "logical"),
 	  function(x, logarithm, ...)
 	  determinant(as(x,"dMatrix"), logarithm=logarithm, ...))
 
 setMethod("diag", signature(x = "Matrix"),
-	  function(x, nrow, ncol) .bail.out.1(.Generic, class(x)))
+	  function(x, nrow, ncol) .bail.out.1("diag", class(x)))
 setMethod("t", signature(x = "Matrix"),
 	  function(x) .bail.out.1(.Generic, class(x)))
 
 setMethod("norm", signature(x = "Matrix", type = "character"),
-	  function(x, type, ...) .bail.out.1(.Generic, class(x)))
+	  function(x, type, ...) .bail.out.1("norm", class(x)))
 setMethod("rcond", signature(x = "Matrix", norm = "character"),
-	  function(x, norm, ...) .bail.out.1(.Generic, class(x)))
+	  function(x, norm, ...) .bail.out.1("rcond", class(x)))
 
 
 ## for all :
