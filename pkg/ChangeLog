@@ -1,5 +1,9 @@
 2009-07-20  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* src/chm_common.c (R_cholmod_l_start): set print_function to NULL,
+	as we have long suggested ==> get rid of random strings seen in
+	some cholmod warnings.
+
 	* R/ldenseMatrix.R (.rcond_via_d): fix thinko
 
 2009-07-18  Martin Maechler  <maechler@stat.math.ethz.ch>
