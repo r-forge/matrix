@@ -3,6 +3,8 @@
 	* src/chm_common.c (R_cholmod_l_start): set print_function to NULL,
 	as we have long suggested ==> get rid of random strings seen in
 	some cholmod warnings.
+	(R_cholmod_error): call cholmod_l_defaults() before error(), so
+	we restore the Cholmod global in case of errors.
 
 	* R/ldenseMatrix.R (.rcond_via_d): fix thinko
 

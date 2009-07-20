@@ -290,6 +290,11 @@ det <- base::det
 environment(det) <- environment()## == as.environment("Matrix")
 }
 
+setMethod("Cholesky", signature(A = "Matrix"),
+	  function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
+	  stop(gettextf("Cholesky(A) called for 'A' of class \"%s\";\n\t it is currently defined for sparseMatrix only; consider using chol() instead",
+			class(A)), call. = FALSE))
+
 ## FIXME: All of these should never be called
 setMethod("chol", signature(x = "Matrix"),
 	  function(x, pivot, ...) .bail.out.1("chol", class(x)))

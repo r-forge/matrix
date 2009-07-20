@@ -603,6 +603,10 @@ setMethod("determinant", signature(x = "sparseMatrix", logarithm = "logical"),
 	  function(x, logarithm = TRUE, ...)
 	  determinant(as(x,"dsparseMatrix"), logarithm, ...))
 
+setMethod("Cholesky", signature(A = "sparseMatrix"),
+	  function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
+	  Cholesky(as(A, "CsparseMatrix"),
+		   perm=perm, LDL=LDL, super=super, Imult=Imult, ...))
 
 setMethod("diag", signature(x = "sparseMatrix"),
 	  function(x, nrow, ncol) diag(as(x, "CsparseMatrix")))
