@@ -1,7 +1,11 @@
 \name{Cholesky}
 \docType{genericFunction}
 \alias{Cholesky}
-\alias{Cholesky,dsCMatrix-method}
+\alias{Cholesky,dsCMatrix-method}% -> ../R/dsCMatrix.R
+\alias{Cholesky,CsparseMatrix-method}% coerce
+\alias{Cholesky,sparseMatrix-method}%  coerce
+\alias{Cholesky,nsparseMatrix-method}%  error for now; todo in the future
+\alias{Cholesky,Matrix-method}% <- "good" error message
 \title{Cholesky Decomposition of a Sparse Matrix}
 \usage{
 Cholesky(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, \dots)
