@@ -79,7 +79,23 @@ if(inherits(try(Mlibrary(lme4a)), "try-error"))
 @
 
 \section[Model matrices]{Model matrices with many columns}
-
+\begin{frame}
+  \frametitle{In case it all starts to blur}
+  \begin{itemize}
+  \item Model matrices with many columns typically have some degree of sparsity.
+  \item Regularization is important in combination with many columns.
+    Updating a factorization is much more efficient when optimizing a
+    regularization parameter.
+  \item The complexity of the factorization depends on the order of
+    the columns.  Need to consider carefully the parameterization
+    (contrasts) and the order of terms.
+  \item Mixed-effects models are regularization problems that
+    benefit greatly from sparse matrix methods.  They are implicit in \pkg{lme4}.
+  \item A new function \Rfun{sparse.model.matrix} is available in the
+    \pkg{Matrix} package for non-implicit sparse model matrix construction.
+  \item These slides are available at \url{http://Matrix.R-forge.R-project.org/slides/}.
+  \end{itemize}
+\end{frame}
 \begin{frame}
   \frametitle{Model matrices and sparsity}
   \begin{itemize}
@@ -732,9 +748,6 @@ setPars <- function(theta) {
 ## Hide this as well
 load("eth-d-rating.rda") ; d.eth <- md
 @
-<<read-dat,eval=FALSE>>=
-load("...../eth-d-rating.rda")
-@
 \begin{frame} \frametitle{Who's the best liked prof at ETH?}
   \begin{itemize}
   \item Private donation for encouraging excellent teaching at ETH
@@ -837,7 +850,8 @@ Error ... Cholmod error 'not positive definite' at file:../Cholesky/......
 \begin{frame}[fragile]
 14 columns would have to be eliminated to render it non-singular:
 <<svn-XtX,fig=TRUE,height=4>>=
-SVD.XX <- svd(crossprod(X), 0,0)$d
+if (!exists("SVD.XX"))
+    SVD.XX <- svd(crossprod(X), 0,0)$d
 table(SVD.XX < 1e-5 * median(SVD.XX))
 plot(SVD.XX, log = "y")
 @
