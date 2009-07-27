@@ -1,3 +1,23 @@
+2009-07-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999375-30, CRAN-released: 2009-0...
+
+	* R/Matrix.R (all.equal_Mat): add factorsCheck=FALSE argument
+	* R/Auxiliaries.R (attr.all_Mat, attrSlots): ditto
+
+2009-07-25  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (attr.all_Mat): fix checking of non-content slots.
+	* R/Matrix.R (all.equal_Mat): thinko needed  s/&&/&/
+	* R/sparseMatrix.R (all.equal(.) methods): ditto
+	===> Note:  all.equal() is more stringent for "Matrix" arguments now!
+
+2009-07-23  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/spModels.R (model.spmatrix, sparse2int): "complete" re-write
+
+	* tests/spModel.matrix.R: many tests added
+
 2009-07-20  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/chm_common.c (R_cholmod_l_start): set print_function to NULL,
