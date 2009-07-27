@@ -182,7 +182,7 @@ r <- expand(CX)
 L.P <- with(r, crossprod(L,P))  ## == L'P
 PLLP <- crossprod(L.P)          ## == (L'P)' L'P == P'LL'P
 b <- sample(m)
-stopifnot(all.equal(PLLP, XX),
+stopifnot(all.equal(PLLP, XX), % not needed: factorsCheck is off: check.attr=FALSE),
           all(as.vector(solve(CX, b, system="P" )) == r$P \%*\% b),
           all(as.vector(solve(CX, b, system="Pt")) == t(r$P) \%*\% b) )
 

@@ -693,7 +693,7 @@ setMethod("all.equal", c(target = "sparseMatrix", current = "sparseMatrix"),
 	  ## else
 	  r <- all.equal(as(target, "sparseVector"), as(current, "sparseVector"),
 			 check.attributes=check.attributes, ...)
-	  if(is.null(msg) && (r.ok <- isTRUE(r))) TRUE else c(msg, if(!r.ok) r)
+	  if(is.null(msg) & (r.ok <- isTRUE(r))) TRUE else c(msg, if(!r.ok) r)
       })
 setMethod("all.equal", c(target = "sparseMatrix", current = "ANY"),
 	  function(target, current, check.attributes = TRUE, ...)
@@ -703,7 +703,7 @@ setMethod("all.equal", c(target = "sparseMatrix", current = "ANY"),
 	  ## else
 	  r <- all.equal(as(target, "sparseVector"), current,
 			 check.attributes=check.attributes, ...)
-	  if(is.null(msg) && (r.ok <- isTRUE(r))) TRUE else c(msg, if(!r.ok) r)
+	  if(is.null(msg) & (r.ok <- isTRUE(r))) TRUE else c(msg, if(!r.ok) r)
       })
 setMethod("all.equal", c(target = "ANY", current = "sparseMatrix"),
 	  function(target, current, check.attributes = TRUE, ...)
@@ -713,7 +713,7 @@ setMethod("all.equal", c(target = "ANY", current = "sparseMatrix"),
 	  ## else
 	  r <- all.equal(target, as(current, "sparseVector"),
 			 check.attributes=check.attributes, ...)
-	  if(is.null(msg) && (r.ok <- isTRUE(r))) TRUE else c(msg, if(!r.ok) r)
+	  if(is.null(msg) & (r.ok <- isTRUE(r))) TRUE else c(msg, if(!r.ok) r)
       })
 
 

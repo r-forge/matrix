@@ -272,7 +272,7 @@ exportMethods(## for both own and "other" generics:
 	      "zapsmall"
 	      )
 
-if(getRversion() < "2.10.0")
+if(getRversion() < "2.10.0")# The version of R -- at *install* time (!)
     exportPattern("^contr\\..*")
 
 if(getRversion() < "2.10.0")

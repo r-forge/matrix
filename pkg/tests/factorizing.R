@@ -114,53 +114,47 @@ if(FALSE)## if(require("sfsmisc"))
 split(rownames(r12$r.all), Duplicated(aCh.hash))
 
 ## TODO: find cases for both choices when we leave it to CHOLMOD to chose
-if(FALSE) ## not yet
-for(n in 1:9) { ## # before seg.fault at n = 10 !
-    cat(sprintf("n = %3d:\n", n))
+for(n in 1:50) { ## # before seg.fault at n = 10 !
     mkA <- mkLDL(1+rpois(1, 30), 1/10)
-    r <- allCholesky(mkA$A)
+    cat(sprintf("n = %3d, LDL-dim = %d x %d ", n, nrow(mkA$A), ncol(mkA$A)))
+    r <- allCholesky(mkA$A, silentTry=TRUE)
     ## Compare .. apart from the NAs that happen from (perm=FALSE, super=TRUE)
     iNA <- apply(is.na(r$r.all), 1, any)
+    cat(sprintf(" -> %3s NAs\n", if(any(iNA)) format(sum(iNA)) else "no"))
     stopifnot(aCh.hash[!iNA] == r$r.all[!iNA,] %*% (2^(2:0)))
-    cat("--------\n")
+##     cat("--------\n")
 }
-### --- see seg.fault on  nb-mm {for the R version I can't 'dbg' ..}
-## FIXME -- UNfinished
 
+
+## This is a relatively small "critical example" :
 A. <-
-    new("dsCMatrix", Dim = c(32L, 32L), uplo = "U"
-        , i = c(0L, 1L, 2L, 3L, 4L, 2L, 5L, 5L, 6L, 0L, 7L, 8L, 8L, 9L, 3L,
-          4L, 10L, 11L, 0L, 7L, 12L, 6L, 13L, 14L, 4L, 10L, 15L, 8L, 9L,
-          16L, 17L, 1L, 2L, 5L, 18L, 6L, 9L, 13L, 15L, 19L, 12L, 20L, 0L,
-          7L, 8L, 9L, 12L, 16L, 21L, 7L, 21L, 22L, 9L, 19L, 23L, 2L, 5L,
-          18L, 19L, 21L, 22L, 24L, 10L, 11L, 18L, 25L, 0L, 6L, 7L, 12L,
-          13L, 18L, 19L, 20L, 21L, 22L, 24L, 25L, 26L, 6L, 9L, 13L, 15L,
-          16L, 19L, 23L, 26L, 27L, 9L, 11L, 19L, 23L, 25L, 27L, 28L, 1L,
-          4L, 7L, 10L, 15L, 18L, 22L, 24L, 25L, 28L, 29L, 1L, 18L, 19L,
-          24L, 29L, 30L, 14L, 21L, 22L, 24L, 26L, 31L)
-        ##
-        , p = c(0L, 1L, 2L, 3L, 4L, 5L, 7L, 9L, 11L, 12L, 14L, 17L, 18L, 21L,
-          23L, 24L, 27L, 30L, 31L, 35L, 40L, 42L, 49L, 52L, 55L, 62L, 66L,
-          79L, 88L, 95L, 106L, 112L, 118L)
-        ##
-        , x = c(25, 225, 441, 484, 529, 36603, 3038085, 828, 19333, 500, 10256,
-          841, 52983, 3338253, 26136, 52371, 6596473, 121, 75, 1500, 1186,
-          24276, 2039809, 144, 2116, 209484, 8825, 1682, 105966, 3428, 9, 21150,
-          33516, 2781828, 4535397, 6358, 32724, 534072, 6859, 3576050, 49011,
-          2500237, 2325, 46500, 47937, 3020031, 6975, 95874, 2949210, 1536,
-          4032, 38340, 31752, 3206952, 3112720, 4851, 402633, 368676, 37908,
-          17856, 124992, 2578213, 13200, 9317, 4455, 1398038, 200, 27455, 4000,
-          79402, 2306220, 5832, 604010, 4018902, 56040, 262080, 1160640,
-          320760, 11925262, 16184, 25596, 1401956, 23826, 3008, 3393938,
-          2508408, 1537480, 7532296, 28512, 5445, 2879712, 2794176, 419505,
-          2252448, 2768530, 225, 14812, 11264, 1466388, 59248, 21150, 67584,
-          2500, 116, 6960, 976637, 3375, 317250, 74358, 3866616, 20231,
-          9084758, 2592, 39744, 278208, 1232064, 2583360, 2789776)
-        )
+    new("dsCMatrix", Dim = c(25L, 25L), uplo = "U"
+	, i = as.integer(
+          c(0, 1, 2, 3, 4, 2, 5, 6, 0, 8, 8, 9, 3, 4, 10, 11, 6, 12, 13, 4,
+            10, 14, 15, 1, 2, 5, 16, 17, 0, 7, 8, 18, 9, 19, 10, 11, 16, 20,
+            0, 6, 7, 16, 17, 18, 20, 21, 6, 9, 12, 14, 19, 21, 22, 9, 11, 19,
+            20, 22, 23, 1, 16, 24))
+	##
+	, p = c(0:6, 8:10, 12L, 15:16, 18:19, 22:23, 27:28, 32L, 34L, 38L, 46L, 53L, 59L, 62L)
+	##
+	, x = c(1, 1, 1, 1, 2, 100, 2, 40, 1, 2, 100, 6700, 100, 100, 13200,
+	  1, 50, 4100, 1, 5, 400, 20, 1, 40, 100, 5600, 9100, 5000, 5,
+	  100, 100, 5900, 100, 6200, 30, 20, 9, 2800, 1, 100, 8, 10, 8000,
+	  100, 600, 23900, 30, 100, 2800, 50, 5000, 3100, 15100, 100, 10,
+	  5600, 800, 4500, 5500, 7, 600, 18200))
 validObject(A.)
+## A1: the same pattern as  A.   just simply filled with '1's :
+A1 <- A.; A1@x[] <- 1; A1@factors <- list()
+A1.8 <- A1; diag(A1.8) <- 8
+##
+nT. <- as(AT <- as(A., "TsparseMatrix"),"nMatrix")
+stopifnot(all(nT.@i <= nT.@j))
 
-for(p in c(FALSE,TRUE)) # no NA here
-    for(L in c(FALSE,TRUE, NA))
+## FINALLY fix this "TODO":
+try(    tc <- Cholesky(nT.)  )
+
+for(p in c(FALSE,TRUE))
+    for(L in c(FALSE,TRUE))
         for(s in c(FALSE,TRUE, NA)) {
             cat(sprintf("p,L,S = (%2d,%2d,%2d): ", p,L,s))
             r <- tryCatch(Cholesky(A., perm=p, LDL=L, super=s),
@@ -180,7 +174,27 @@ str(lapply(facs, slot, "type"))
 ## hence isLDL is TRUE for ("D" and not "S"):
 sapply(facs, isLDL)
 
-## --- now a "large" (712 x 712) real data example
+chkCholesky <- function(chmf, A) {
+    stopifnot(is(chmf, "CHMfactor"),
+              is(A, "Matrix"), isSymmetric(A))
+    if(!is(A, "dsCMatrix"))
+        A <- as(A, "dsCMatrix")
+    L <- drop0(zapsmall(L. <- as(chmf, "Matrix")))
+    cat("no. nonzeros in L {before / after drop0(zapsmall(.))}: ",
+        c(nnzero(L.), nnzero(L)), "\n") ## 112, 95
+    ecc <- expand(chmf)
+    A... <- with(ecc, crossprod(crossprod(L,P)))
+    stopifnot(all.equal(L., ecc$L, tol = 1e-14),
+              all.equal(A,  A...,  tol = 1e-14, factorsCheck = FALSE))
+    invisible(ecc)
+}
+
+c1.8 <- try(Cholesky(A1.8, super = TRUE))# works "always", interestingly ...
+chkCholesky(c1.8, A1.8)
+
+
+
+## --- now a "large" (712 x 712) real data example ---------------------------
 
 data(KNex)
 mtm <- with(KNex, crossprod(mm))
@@ -191,6 +205,9 @@ stopifnot(names(mtm@factors) == paste(c("sPD", "spD"),"Cholesky", sep=''))
 c2 <- Cholesky(mtm, super = TRUE)
 stopifnot(names(mtm@factors) == paste(c("sPD", "spD", "SPd"),
                "Cholesky", sep=''))
+
+r <- allCholesky(mtm)
+r
 
 ## is now taken from cache
 c1 <- Cholesky(mtm)

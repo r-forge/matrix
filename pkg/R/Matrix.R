@@ -327,14 +327,16 @@ setMethod("rcond", signature(x = "ANY", norm = "missing"),
 all.equal_num <- base::all.equal.numeric ## from <R>/src/library/base/R/all.equal.R
 environment(all.equal_num) <- environment()## == as.environment("Matrix")
 
-all.equal_Mat <- function(target, current, check.attributes = TRUE, ...)
+all.equal_Mat <- function(target, current, check.attributes = TRUE,
+                          factorsCheck = FALSE, ...)
 {
-    msg <- attr.all_Mat(target, current, check.attributes=check.attributes, ...)
+    msg <- attr.all_Mat(target, current, check.attributes=check.attributes,
+                        factorsCheck=factorsCheck, ...)
     if(is.list(msg)) return(msg[[1]])
     ## else
     r <- all.equal_num(as.vector(target), as.vector(current),
                        check.attributes=check.attributes, ...)
-    if(is.null(msg) && (r.ok <- isTRUE(r))) TRUE else c(msg, if(!r.ok) r)
+    if(is.null(msg) & (r.ok <- isTRUE(r))) TRUE else c(msg, if(!r.ok) r)
 }
 ## The all.equal() methods for dense matrices (and fallback):
 setMethod("all.equal", c(target = "Matrix", current = "Matrix"),

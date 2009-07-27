@@ -22,10 +22,6 @@ sparse.model.matrix(object, data = environment(object),
     \code{data} has no \code{"terms"} attribute.}
   \item{\dots}{further arguments passed to or from other methods.}
 }
-\details{
-  Currently, the model must have an intercept;
-  this is a temporary limitation, hopefully removed within days.. % 2009-07-09
-}
 \value{
   a sparse matrix, inheriting from \code{\linkS4class{CsparseMatrix}},
   typically of class  \code{\linkS4class{dgCMatrix}}.
@@ -34,10 +30,9 @@ sparse.model.matrix(object, data = environment(object),
 %% this, and/or if we want to advertize it.
 
 }
-\author{Doug Bates and Martin Maechler, with suggestions from Tim
+\author{Doug Bates and Martin Maechler, with initial suggestions from Tim
   Hesterberg.
 }
-
 \seealso{
   \code{\link{model.matrix}}, ...
 }
@@ -45,12 +40,16 @@ sparse.model.matrix(object, data = environment(object),
 dd <- data.frame(a = gl(3,4), b = gl(4,1,12))# balanced 2-way
 options("contrasts") # the default:  "contr.treatment"
 sparse.model.matrix(~ a + b, dd)
+sparse.model.matrix(~ -1+ a + b, dd)# no intercept --> even sparse
 sparse.model.matrix(~ a + b, dd, contrasts = list(a="contr.sum"))
 sparse.model.matrix(~ a + b, dd, contrasts = list(b="contr.SAS"))
 
 ## Sparse method is equivalent to the traditional one :
 stopifnot(all(sparse.model.matrix(~ a + b, dd) ==
-	      Matrix(model.matrix(~ a + b, dd), sparse=TRUE)))
+	      Matrix(model.matrix(~ a + b, dd), sparse=TRUE)),
+          all(sparse.model.matrix(~ 0+ a + b, dd) ==
+	      Matrix(model.matrix(~ 0+ a + b, dd), sparse=TRUE)))
+%% many more and tougher examples ---> ../tests/spModel.matrix.R
 }
 \keyword{models}
 

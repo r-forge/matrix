@@ -227,9 +227,8 @@ eqDeterminant <- function(m1, m2, ...) {
 ##' @return a list with components resulting from calling
 ##'    Cholesky(.,  perm = .P., LDL = .L., super = .S.)
 ##'
-##'    for all 3^3 combinations of (.P., .L., .S.)
-##'  FIXME:  currently 2*3^2  (perm = NA is not implemented)
-allCholesky <- function(A, verbose = FALSE)
+##'    for all 2*2*3 combinations of (.P., .L., .S.)
+allCholesky <- function(A, verbose = FALSE, silentTry = FALSE)
 {
     ## Author: Martin Maechler, Date: 16 Jul 2009
 
@@ -248,12 +247,24 @@ allCholesky <- function(A, verbose = FALSE)
 	r.st
     }
 
-    logi <- c(FALSE, TRUE, NA)
-    d12 <- expand.grid(perm = logi[1:2], LDL = logi, super = logi,
+    my.Cholesky <- {
+	if(verbose)
+	    function (A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...) {
+		cat(sprintf("Chol..(*, perm= %1d, LDL= %1d, super=%1d):",
+			    perm, LDL, super))
+		r <- Cholesky(A, perm=perm, LDL=LDL, super=super, Imult=Imult, ...)
+		cat(" [Ok]\n")
+		r
+	    }
+	else Cholesky
+    }
+    logi <- c(FALSE, TRUE)
+    d12 <- expand.grid(perm = logi, LDL = logi, super = c(logi,NA),
 		       KEEP.OUT.ATTRS = FALSE)
     r1 <- lapply(seq_len(nrow(d12)),
-		 function(i) try(do.call(Cholesky,
-                                         c(list(A = A), as.list(d12[i,])))))
+		 function(i) try(do.call(my.Cholesky,
+                                         c(list(A = A), as.list(d12[i,]))),
+                                 silent=silentTry))
     names(r1) <- apply(d12, 1,
 		       function(.) paste(symnum(.), collapse=" "))
     dup.r1 <- duplicated(r1)
