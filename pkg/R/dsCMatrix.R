@@ -146,7 +146,7 @@ setMethod("determinant", signature(x = "dsCMatrix", logarithm = "logical"),
       {
 	  if((n <- x@Dim[1]) <= 1)
 	      return(mkDet(x@x, logarithm))
-	  Chx <- tryCatch(Cholesky(x, LDL=TRUE),
+	  Chx <- tryCatch(suppressWarnings(Cholesky(x, LDL=TRUE)),
                           error = function(e) NULL)
 	  ## or
 	  ## ldet <- .Call("CHMfactor_ldetL2", Chx) # which would also work
