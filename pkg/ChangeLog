@@ -1,3 +1,8 @@
+2009-07-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/spModels.R (contr.sum): need also to define contr.*() as long
+	as we document (./man/) them.
+
 2009-07-27  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.999375-30, CRAN-released: 2009-0...
