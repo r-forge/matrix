@@ -179,7 +179,23 @@ contr.poly <- function (n, scores = 1L:n, contrasts = TRUE, sparse = FALSE) {
 }
 
 
-}## end if {define  contr.*()  for pre-2.10.0 R)
+} else { ## make codoc() happy [needed as long as we *document* these (support R <= 2.9.x) ]
+contr.helmert <- function (n, contrasts=TRUE, sparse=FALSE)
+ stats::contr.helmert(n, contrasts=contrasts, sparse=sparse)
+
+contr.treatment <- function(n, base = 1, contrasts = TRUE, sparse = FALSE)
+ stats::contr.treatment(n, base=base, contrasts=contrasts, sparse=sparse)
+
+contr.sum <- function (n, contrasts=TRUE, sparse=FALSE)
+ stats::contr.sum(n, contrasts=contrasts, sparse=sparse)
+
+contr.SAS <- function(n, contrasts = TRUE, sparse=FALSE)
+ stats::contr.SAS(n, contrasts=contrasts, sparse=sparse)
+
+contr.poly <- function (n, scores = 1L:n, contrasts = TRUE, sparse = FALSE)
+ stats::contr.poly(n, scores=scores, contrasts=contrasts, sparse=sparse)
+
+} ## end if {define  contr.*()  for pre-2.10.0 R)
 
 
 ## Goal: an  model.sparseMatrix()
