@@ -71,7 +71,12 @@ SEXP dgCMatrix_set_Dim(SEXP x, int nrow);
 /* int csc_unsorted_columns(int ncol, const int p[], const int i[]); */
 /* void csc_sort_columns(int ncol, const int p[], int i[], double x[]); */
 /* SEXP csc_check_column_sorting(SEXP A); */
+#if R_VERSION < R_Version(2, 10, 0)
 SEXP Matrix_make_named(int TYP, const char **names);
+#else
+# define Matrix_make_named Rf_mkNamed
+#endif
+
 SEXP check_scalar_string(SEXP sP, char *vals, char *nm);
 Rboolean equal_string_vectors(SEXP s1, SEXP s2);
 

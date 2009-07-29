@@ -3,8 +3,6 @@
 #include "Mutils.h"
 #include <R_ext/Lapack.h>
 
-#include <Rversion.h>
-
 #if 0 /* defined(R_VERSION) && R_VERSION >= R_Version(2, 7, 0) *
        * La_norm_type() & La_rcond_type() are now in R_ext/Lapack.h
        * but because of the 'module-mess' that's not sufficient */
@@ -158,7 +156,7 @@ SEXP set_factors(SEXP obj, SEXP val, char *nm)
 
 #if 0 				/* unused */
 /* useful for all the ..CMatrix classes (and ..R by [0] <-> [1]); but unused */
-SEXP dgCMatrix_set_Dim(SEXP x, int nrow)
+SEXP CMatrix_set_Dim(SEXP x, int nrow)
 {
     int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
 
@@ -222,6 +220,7 @@ void make_i_matrix_symmetric(int *to, SEXP from)
     MAKE_SYMMETRIC_BODY(to, from)
 
 
+#if R_VERSION < R_Version(2, 10, 0)
 /**
  * Create a named vector of type TYP
  *
@@ -244,6 +243,8 @@ Matrix_make_named(int TYP, const char **names)
     UNPROTECT(2);
     return ans;
 }
+#endif
+
 
 #define Matrix_Error_Bufsiz    4096
 
