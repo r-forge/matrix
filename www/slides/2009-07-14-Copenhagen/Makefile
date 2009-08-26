@@ -1,11 +1,13 @@
 R_PROG = R
 RNWSRC = BatesMaechler
-TEXSRC = 
+DRIVERS= $(RNWSRC)
+TEXSRC =
 SWEAVE = SweaveSlides.sty # SweaveSlides.cfg
 
-all: $(DRIVERS:=D.pdf) $(DRIVERS:=-4.pdf) $(RNWSRC:_R.txt)
-	${RM} $(DRIVERS:H.pdf) *.out Rplots.ps figs/*.eps \
-          *.aux *.log *.toc *.nav *.snm *.vrb *.dvi
+## 'make' should make the  slides file only
+slides: $(DRIVERS:=D.pdf)
+
+all: slides $(DRIVERS:=-4.pdf) $(DRIVERS:=-4a4.pdf) $(RNWSRC:_R.txt)
 
 allR: $(RNWSRC:=.R)
 	touch allR
@@ -13,29 +15,30 @@ allR: $(RNWSRC:=.R)
 %.tex: %.Rnw
 	${R_PROG} CMD Sweave $<
 
-%.R: %.Rnw	
+%.R: %.Rnw
 	${R_PROG} CMD Stangle $<
 
 %.pdf : %.tex
 	${R_PROG} CMD texi2pdf $<
 
-clean:
-	$(RM) $(DRIVERS:=D.pdf) $(DRIVERS:=-4.pdf) $(DRIVERS:=-4a4.pdf) $(RNWSRC:=.tex) \
-          $(RNWSRC:=.R) Rplots.ps $(DRIVERS:=.out) allR figs/*.pdf figs/*.eps \
-          *.aux *.log *.toc *.nav *.snm *.vrb *.dvi
+clean:  realclean
+realclean: distclean
+	$(RM) $(DRIVERS:=D.pdf) $(DRIVERS:=-4.pdf) $(DRIVERS:=-4a4.pdf)
 
-dist:
+dist: distclean
+## ^ currently not more
+distclean:
 	$(RM) $(RNWSRC:=.tex) \
-          Rplots.ps $(DRIVERS:=.out) allR figs/*.pdf figs/*.eps \
+          Rplots.ps  Rplots.pdf $(DRIVERS:=.out) allR figs/*.pdf figs/*.eps \
           *.aux *.log *.toc *.nav *.snm *.vrb *.dvi
 
 %D.tex: %.tex
-	@echo "\\documentclass[dvipsnames,pdflatex,beamer]{beamer}" >> $@
+	@echo "\\documentclass[dvipsnames,pdflatex,beamer]{beamer}" > $@
 	@echo "\\input{"$*"}" >> $@
 	@echo "\\end{document}" >> $@
 
 %H.tex: %.tex
-	@echo "\\documentclass[dvipsnames,pdflatex,handout]{beamer}" >> $@
+	@echo "\\documentclass[dvipsnames,pdflatex,handout]{beamer}" > $@
 	@echo "\\input{"$*"}" >> $@
 	@echo "\\end{document}" >> $@
 
@@ -50,7 +53,7 @@ dist:
 %-4.tex: %H.pdf
 	@echo "\\documentclass[letterpaper,landscape]{article}" > $@
 	@echo "\\usepackage{pdfpages}" >> $@
-	@echo "\\\\begin{document}" >> $@
+	@echo "\\begin{document}" >> $@
 	@echo "\\includepdf[nup=2x2,pages=-]{"$*"H.pdf}" >> $@
 	@echo "\\end{document}" >> $@
 
@@ -60,7 +63,7 @@ dist:
 %-2.tex: %H.pdf
 	@echo "\\documentclass[letterpaper]{article}" > $@
 	@echo "\\usepackage{pdfpages}" >> $@
-	@echo "\\\\begin{document}" >> $@
+	@echo "\\begin{document}" >> $@
 	@echo "\\includepdf[nup=1x2,pages=-]{"$*"H.pdf}" >> $@
 	@echo "\\end{document}" >> $@
 
