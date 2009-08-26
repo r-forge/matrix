@@ -4,10 +4,12 @@ DRIVERS= $(RNWSRC)
 TEXSRC =
 SWEAVE = SweaveSlides.sty # SweaveSlides.cfg
 
+XtrTARGETS = $(DRIVERS:=-4.pdf) $(DRIVERS:=-4a4.pdf) $(RNWSRC:_R.txt)
+
 ## 'make' should make the  slides file only
 slides: $(DRIVERS:=D.pdf)
 
-all: slides $(DRIVERS:=-4.pdf) $(DRIVERS:=-4a4.pdf) $(RNWSRC:_R.txt)
+all: slides $(XtrTARGETS)
 
 allR: $(RNWSRC:=.R)
 	touch allR
@@ -21,16 +23,15 @@ allR: $(RNWSRC:=.R)
 %.pdf : %.tex
 	${R_PROG} CMD texi2pdf $<
 
-clean:  realclean
-realclean: distclean
-	$(RM) $(DRIVERS:=D.pdf) $(DRIVERS:=-4.pdf) $(DRIVERS:=-4a4.pdf)
-
-dist: distclean
+dist: clean
 ## ^ currently not more
-distclean:
+clean:
 	$(RM) $(RNWSRC:=.tex) \
-          Rplots.ps  Rplots.pdf $(DRIVERS:=.out) allR figs/*.pdf figs/*.eps \
+          Rplots.ps  Rplots.pdf $(DRIVERS:=*.out) allR figs/*.pdf figs/*.eps \
           *.aux *.log *.toc *.nav *.snm *.vrb *.dvi
+
+realclean: clean
+	$(RM) $(DRIVERS:=D.pdf) $(XtrTARGETS)
 
 %D.tex: %.tex
 	@echo "\\documentclass[dvipsnames,pdflatex,beamer]{beamer}" > $@
@@ -72,13 +73,13 @@ distclean:
 #	texclean $<
 
 
-# A4 paper version
+# A4 paper version: is   echo "-4" | sed s/letter/a4/
 %-4a4.tex: %H.pdf
 	@echo "\\documentclass[a4paper,landscape]{article}" > $@
 	@echo "\\usepackage{pdfpages}" >> $@
-	@echo "\\\\begin{document}" >> $@
+	@echo "\\begin{document}" >> $@
 	@echo "\\includepdf[nup=2x2,pages=-]{"$*"H.pdf}" >> $@
 	@echo "\\end{document}" >> $@
 
-%-4a4.pdf: %-4.tex
+%-4a4.pdf: %-4a4.tex
 	texi2dvi --pdf $<
