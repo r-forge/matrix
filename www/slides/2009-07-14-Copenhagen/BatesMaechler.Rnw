@@ -932,9 +932,11 @@ if (file.exists("lmer-eth.rda")) {
     if (!exists(fm2D))
         fm2D <- lmer(y ~ dept + service + studage + lectage + (1|d) + (1|s),
                      d.eth, control = list(algorithm = "nlminb"))
+    fixef.fm2 <- fixef(fm2)
+    ranef.fm2 <- ranef(fm2)
 }
+beta.Fix <- beta.fix ["(Intercept)"] + c(0, beta.fix[2:1128])
 b.random <- fixef.fm2["(Intercept)"] + ranef.fm2$d[, 1]
-beta.Fix <- beta.fix["(Intercept)"] + c(0, beta.fix[2:1128])
 @
 
 <<lmer-eth-rf, eval=FALSE>>=
@@ -943,22 +945,11 @@ fm2 <- lmer(y ~ service + studage + lectage + (1 | d) + (1 | s),
 fm2D <- lmer(y ~ dept + service + studage + lectage +
              (1 | d) + (1 | s), data = d.eth)
 ## revert the treatment contrast:
-beta.Fix <- beta.fix["(Intercept)"] + c(0, beta.fix[2:1128])
+beta.Fix <-  beta.fix ["(Intercept)"] + c(0, beta.fix[2:1128])
 b.random <- fixef(fm2)["(Intercept)"] + ranef(fm2)$d[, 1]
 @
 
 \end{frame}
-
-% fm2 <- lmer(y ~        service + studage + lectage + (1|d) + (1|s),
-%              data = d.eth)
-
-% fm2D <- lmer(y ~ dept + service + studage + lectage + (1|d) + (1|s),
-%              data = d.eth)
-
-% ## revert the treatment contrast:
-% beta.Fix <- beta.fix["(Intercept)"] + c(0, beta.fix[2:1128])
-% b.random <- fixef(fm2)["(Intercept)"] + ranef(fm2)$d[,1]
-% @
 
 \begin{frame}[fragile]
   \frametitle{Shrinkage of the random effects relative to fixed effects}
