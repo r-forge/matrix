@@ -32,7 +32,7 @@ Programming using the R Matrix Package</h1>
   <em>strongly</em> advised to make their R code work correctly in older
   and newer versions of <tt>Matrix</tt> with something like the following
 <pre>
-  .f <- if(package_version(packageDescription("Matrix")$Version) >=
+  .f <- if(package_version(packageDescription("Matrix")$Version) >
            "0.999375-30") 2 else 1
   ## and use
   .f * determinant(myCholesky)$modulus
