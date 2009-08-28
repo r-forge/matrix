@@ -28,11 +28,18 @@ static int xtype(int ctype)
 
 static void *xpt(int ctype, SEXP x)
 {
+    int lx;
+    SEXP newx;
+    double *xx;
     switch(ctype / 3) {
     case 0: /* "d" */
 	return (void *) REAL(GET_SLOT(x, Matrix_xSym));
     case 1: /* "l" */
-	return (void *) REAL(coerceVector(GET_SLOT(x, Matrix_xSym), REALSXP));
+	newx = PROTECT(coerceVector(GET_SLOT(x, Matrix_xSym), REALSXP));
+	lx = LENGTH(newx);
+	xx = Memcpy((double *) R_alloc(lx, sizeof(double)), REAL(newx), lx);
+	UNPROTECT(1);
+	return (void *) xx;
     case 2: /* "n" */
 	return (void *) NULL;
     case 3: /* "z" */
