@@ -219,7 +219,7 @@ int* expand_cmprPt(int ncol, const int mp[], int mj[])
  * @return Rboolean :== any(is.na(slot(obj, "x") )
  */
 static R_INLINE
-Rboolean any_NA(SEXP obj)
+Rboolean any_NA_in_x(SEXP obj)
 {
     double *x = REAL(GET_SLOT(obj, Matrix_xSym));
     int i, n = LENGTH(GET_SLOT(obj, Matrix_xSym));
