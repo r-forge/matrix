@@ -26,20 +26,24 @@ static int xtype(int ctype)
     return -1;
 }
 
+/* coerce a vector to REAL and copy the result to freshly R_alloc'd memory */
+static void *RallocedREAL(SEXP x)
+{
+    SEXP rx = PROTECT(coerceVector(x, REALSXP));
+    int lx = LENGTH(rx);
+    double *ans = Memcpy((double*)R_alloc(lx, sizeof(double)), REAL(rx), lx);
+    UNPROTECT(1);
+    return (void*)ans;
+}
+
+    
 static void *xpt(int ctype, SEXP x)
 {
-    int lx;
-    SEXP newx;
-    double *xx;
     switch(ctype / 3) {
     case 0: /* "d" */
 	return (void *) REAL(GET_SLOT(x, Matrix_xSym));
     case 1: /* "l" */
-	newx = PROTECT(coerceVector(GET_SLOT(x, Matrix_xSym), REALSXP));
-	lx = LENGTH(newx);
-	xx = Memcpy((double *) R_alloc(lx, sizeof(double)), REAL(newx), lx);
-	UNPROTECT(1);
-	return (void *) xx;
+	return RallocedREAL(GET_SLOT(x, Matrix_xSym));
     case 2: /* "n" */
 	return (void *) NULL;
     case 3: /* "z" */
@@ -501,9 +505,7 @@ CHM_DN as_cholmod_dense(CHM_DN ans, SEXP x)
 
     case 1: /* "l" */
 	ans->xtype = CHOLMOD_REAL;
-	ans->x =
-	    (void *) REAL(coerceVector((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x,
-				       REALSXP));
+	ans->x = RallocedREAL((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x);
 	break;
     case 2: /* "n" */
 	ans->xtype = CHOLMOD_PATTERN;
@@ -532,9 +534,7 @@ CHM_DN as_cholmod_x_dense(cholmod_dense *ans, SEXP x)
     case 1: /* "l" */
     case 2: /* "n" (no NA in 'x', but *has* 'x' slot => treat as "l" */
 	ans->xtype = CHOLMOD_REAL;
-	ans->x =
-	    (void *) REAL(coerceVector((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x,
-				       REALSXP));
+	ans->x = RallocedREAL((ctype % 2) ? GET_SLOT(x, Matrix_xSym) : x);
 	break;
 
     _AS_cholmod_dense_2;
