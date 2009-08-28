@@ -596,7 +596,7 @@ setMethod("%*%", signature(x = "denseMatrix", y = "diagonalMatrix"),
 ##           })
 
 Cspdiagprod <- function(x, y) {
-    dx <- dim(x)
+    dx <- dim(x <- .Call(Csparse_diagU2N, x))
     dy <- dim(y)
     if(dx[2] != dy[1]) stop("non-matching dimensions")
     ind <- rep.int(seq_len(dx[2]), x@p[-1] - x@p[-dx[2]-1L])
@@ -607,7 +607,7 @@ Cspdiagprod <- function(x, y) {
 
 diagCspprod <- function(x, y) {
     dx <- dim(x)
-    dy <- dim(y)
+    dy <- dim(y <- .Call(Csparse_diagU2N, y))
     if(dx[2] != dy[1]) stop("non-matching dimensions")
     if(x@diag == "N")
         y@x <- y@x * x@x[y@i + 1L]
