@@ -9,7 +9,7 @@
 }
 \section{Objects from the Class}{A virtual Class: No objects may be created from it.}
 \section{Methods}{
-  In the \pkg{Matrix} package, the "atomicVector" is used in signature
+  In the \pkg{Matrix} package, the "atomicVector" is used in signatures
   where typically \dQuote{old-style} "matrix" objects can be used and
   can be substituted by simple vectors.
 }
