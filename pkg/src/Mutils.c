@@ -92,8 +92,8 @@ set_double_by_name(SEXP obj, double val, char *nm)
 SEXP as_det_obj(double val, int log, int sign)
 {
     SEXP det = PROTECT(allocVector(VECSXP, 2)),
-	nms = allocVector(STRSXP, 2),
-	vv = ScalarReal(val);
+	nms = PROTECT(allocVector(STRSXP, 2)),
+	vv = PROTECT(ScalarReal(val));
 
     setAttrib(det, R_NamesSymbol, nms);
     SET_STRING_ELT(nms, 0, mkChar("modulus"));
@@ -102,7 +102,7 @@ SEXP as_det_obj(double val, int log, int sign)
     SET_VECTOR_ELT(det, 0, vv);
     SET_VECTOR_ELT(det, 1, ScalarInteger(sign));
     setAttrib(det, R_ClassSymbol, mkString("det"));
-    UNPROTECT(1);
+    UNPROTECT(3);
     return det;
 }
 
@@ -134,6 +134,7 @@ SEXP set_factors(SEXP obj, SEXP val, char *nm)
 
     if ((!isNewList(fac)) || (length(fac) > 0 && nms == R_NilValue))
 	error(_("'factors' slot must be a named list"));
+    PROTECT(val); /* set_factors(..) may be called as "finalizer" after UNPROTECT()*/
     for (i = 0; i < len; i++) {
 	if (!strcmp(nm, CHAR(STRING_ELT(nms, i)))) {
 	    SET_VECTOR_ELT(fac, i, duplicate(val));
@@ -150,7 +151,7 @@ SEXP set_factors(SEXP obj, SEXP val, char *nm)
     SET_VECTOR_ELT(nfac, len, duplicate(val));
     SET_STRING_ELT(nnms, len, mkChar(nm));
     SET_SLOT(obj, Matrix_factorSym, nfac);
-    UNPROTECT(2);
+    UNPROTECT(3);
     return VECTOR_ELT(nfac, len);
 }
 
@@ -248,6 +249,16 @@ Matrix_make_named(int TYP, const char **names)
 
 #define Matrix_Error_Bufsiz    4096
 
+/**
+ * Check validity of 1-letter string from a set of possible values
+ * (typically used in  S4 validity method)
+ *
+ * @param sP
+ * @param vals a string containing the possible valid letters
+ * @param nm   the name of the slot being checked
+ *
+ * @return a SEXP, either NULL (= success) or an error message
+ */
 SEXP check_scalar_string(SEXP sP, char *vals, char *nm)
 {
     SEXP val = ScalarLogical(1);
