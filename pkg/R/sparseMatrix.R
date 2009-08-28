@@ -720,6 +720,8 @@ setMethod("all.equal", c(target = "ANY", current = "sparseMatrix"),
 ### --- sparse model matrix,  fac2sparse, etc ----> ./spModels.R
 
 
+###--- TODO: Remove, once we require  R >= 2.10.0 ---- :
+
 ## xtabs returning a sparse matrix.  This is cut'n'paste
 ## of xtabs() in <Rsrc>/src/library/stats/R/xtabs.R ;
 ## with the new argument 'sparse'
