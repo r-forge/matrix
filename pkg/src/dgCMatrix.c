@@ -101,7 +101,7 @@ SEXP R_to_CMatrix(SEXP x)
 
     /* replace 'R' with 'C' : */
     ncl[2] = 'C';
-    ans = PROTECT_WITH_INDEX(NEW_OBJECT(MAKE_CLASS(ncl)), &ipx);
+    PROTECT_WITH_INDEX(ans = NEW_OBJECT(MAKE_CLASS(ncl)), &ipx);
 
     a_dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
     /* reversed dim() since we will transpose: */
