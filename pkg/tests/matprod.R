@@ -127,6 +127,8 @@ t1 <- new("dtTMatrix", x= c(3,7), i= 0:1, j=3:2, Dim= as.integer(c(4,4)))
 tu <- t1 ; tu@diag <- "U"
 cu <- as(tu, "dtCMatrix")
 cl <- t(cu) # unit lower-triangular
+cl10 <- cl %*% Diagonal(4, x=10)
+assert.EQ.mat(cl10, as(cl, "matrix") %*% diag(4, x=10))
 stopifnot(is(cl,"dtCMatrix"), cl@diag == "U")
 (cu2 <- cu %*% cu)
 cl2 <- cl %*% cl
@@ -134,8 +136,10 @@ validObject(cl2)
 cl2
 cu2. <- Diagonal(4) + Matrix(c(rep(0,9),14,0,0,6,0,0,0), 4,4)
 stopifnot(all(cu2 == cu2.),# was wrong for ver. <= 0.999375-4
-          is(cu2, "dtCMatrix"), is(cl2, "dtCMatrix"), # triangularity preserved
-          cu2@diag == "U", cl2@diag == "U",# UNIT-triangularity preserved
+	  is(cu2, "dtCMatrix"), is(cl2, "dtCMatrix"), # triangularity preserved
+	  cu2@diag == "U", cl2@diag == "U",# UNIT-triangularity preserved
+	  all.equal(Diagonal(4, x=10) %*% cu,
+		    Diagonal(4, x=10) %*% as.matrix(cu)),
           identical(t(cl2), cu2), # !!
           identical( crossprod(cu), Matrix( crossprod(as.matrix(cu)),sparse=TRUE)),
           identical(tcrossprod(cu), Matrix(tcrossprod(as.matrix(cu)),sparse=TRUE)))
