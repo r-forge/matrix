@@ -61,14 +61,14 @@ stopifnot(isEQsparseDense(~ a + b, dd),
 			  contrasts = list(a=contr.sum, b=contr.treatment(4))),
 	  isEQsparseDense(~ a + b, dd, contrasts =
 			  list(a=contr.SAS(3),# << ok after 'contrasts<-' update
-                               b = function(n, contr, sparse=FALSE)
+                               b = function(n, contr=TRUE, sparse=FALSE)
                                contr.sum(n=n, contr=contr, sparse=sparse))))
 
 sm <- sparse.model.matrix(~a * b, dd,
                           contrasts = list(a= contr.SAS(3, sparse = TRUE)))
 sm
-stopifnot(all(sm == model.matrix(~a * b, dd,
-				contrasts= list(a= contr.SAS(3))))
+stopifnot(all(sm == model.matrix( ~a * b, dd,
+                                 contrasts= list(a= contr.SAS(3)))))
 
 
 ##
