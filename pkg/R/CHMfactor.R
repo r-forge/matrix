@@ -80,13 +80,13 @@ setMethod("determinant", signature(x = "CHMfactor", logarithm = "logical"),
               ## ok
           } else if (! .e) {
               assign("det_CHMfactor.warn", TRUE, envir = .MatrixEnv)
-              warning("The next version of the Matrix package will return a\n",
-	"determinant(L) instead of determinant(A), i.e., a\n",
+              warning("This version of the Matrix package returns\n",
+	"|determinant(L)| instead of determinant(A), i.e., a\n",
         "*DIFFERENT* value.\n",
-        " Do change your code, following http://matrix.r-forge.r-project.org\n")
+        " If still necessary, do change your code, following http://matrix.r-forge.r-project.org\n")
 ## packageDescription("Matrix")$Version >= package_version("0.999375-31")
           } ## else  the variable exists but is FALSE --> no warning either
-          ldet <- .Call(CHMfactor_ldetL2, x)
+          ldet <- .Call(CHMfactor_ldetL2, x) / 2
           modulus <- if (logarithm) ldet else exp(ldet)
           attr(modulus, "logarithm") <- logarithm
           val <- list(modulus = modulus, sign = as.integer(1))

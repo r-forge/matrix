@@ -1,3 +1,23 @@
+2009-09-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/CHMfactor.R (determinant): divide previous log(det(.)) by 2;
+	now returning det(L); and modifiy the "CHMfactor.warn" message.
+
+	* man/CHMfactor-class.Rd: modify documentation accordingly.
+
+2009-08-21  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/spModels.R (`contrasts<-`): a version that can also work with a
+	"sparseMatrix" value.  This is put into R 2.10.0 (devel) as well.
+
+	* src/Mutils.h: rename any_NA to any_NA_in_x
+	* src/Mutils.c (check_scalar_string): add doxygen doc
+
+2009-08-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/spModels.R (fac2Sparse): make also work for 'contrasts.arg' =
+	matrix;
+
 2009-07-28  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/spModels.R (contr.sum): need also to define contr.*() as long
@@ -5,7 +25,7 @@
 
 2009-07-27  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 0.999375-30, CRAN-released: 2009-0...
+	* DESCRIPTION (Version): 0.999375-30, CRAN-released: 2009-07-28
 
 	* R/Matrix.R (all.equal_Mat): add factorsCheck=FALSE argument
 	* R/Auxiliaries.R (attr.all_Mat, attrSlots): ditto
@@ -90,6 +110,10 @@
 
 	* src/CHMfactor.c: Ensure updated LL stays LL
 
+2009-06-10  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999375-29, CRAN-released: 2009-06-11
+
 2009-06-10  Douglas Bates <bates@stat.wisc.edu>
 
 	* [r2404] src/Mutils.c: Change value of set_factor to be the cached factor
@@ -99,10 +123,6 @@
 	  "missing")
 	* [r2401] src/dgCMatrix.c: Re-arrange LU factorization to always use the
 	  cached value.
-
-2009-06-10  Martin Maechler  <maechler@stat.math.ethz.ch>
-
-	* DESCRIPTION (Version): 0.999375-29, CRAN-released: 2009-06-11
 
 2009-06-09  Douglas Bates <bates@stat.wisc.edu>
 
