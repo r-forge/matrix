@@ -127,17 +127,6 @@ setMethod("dimnames<-", signature(x = "Matrix", value = "NULL"),
 setMethod("unname", signature("Matrix", force="missing"),
 	  function(obj) { obj@Dimnames <- list(NULL,NULL); obj})
 
-setMethod("all", signature(x = "Matrix"),
-	  function(x, ..., na.rm)
-	  callGeneric(as(x, "lMatrix"), ..., na.rm=na.rm))
-
-setMethod("any", signature(x = "Matrix"),
-	  function(x, ..., na.rm)
-	  callGeneric(as(x, "lMatrix"), ..., na.rm=na.rm))
-
-## NOTE:  "&" and "|"  are now in group "Logic" c "Ops" --> ./Ops.R
-##        "!" is in ./not.R
-
 
 Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
                     dimnames = NULL, sparse = NULL, forceCheck = FALSE)
@@ -377,7 +366,18 @@ setMethod("image", "Matrix",
 
 ## Group Methods
 
-## For all  non-dMatrix objects, and note that  "all" and "any" have their own
+## --- "Summary" ------- have "ddense*" and "dsparse*" ones in ---> ./dMatrix.R <---
+##      -------          "diagMatrix" --> ./diagMatrix.R            ~~~~~~~~~~~
+## For all other Matrix objects {and note that  "all" and "any" have their own}:
+
+setMethod("all", signature(x = "Matrix"),
+	  function(x, ..., na.rm)
+	  callGeneric(as(x, "lMatrix"), ..., na.rm=na.rm))
+
+setMethod("any", signature(x = "Matrix"),
+	  function(x, ..., na.rm)
+	  callGeneric(as(x, "lMatrix"), ..., na.rm=na.rm))
+
 setMethod("Summary", signature(x = "Matrix", na.rm = "ANY"),
 	  function(x, ..., na.rm)
 	  callGeneric(as(x,"dMatrix"), ..., na.rm = na.rm))
@@ -390,7 +390,7 @@ Summary.l <- function(x, ..., na.rm) { ## must be method directly
 	if(!is.infinite(r) && .Generic != "prod") as.integer(r) else r
     }
 }
-## identical (apart from last line):
+## almost identical:
 Summary.np <- function(x, ..., na.rm) {
     if(.Generic %in% c("all", "any"))
 	callGeneric(as(x, "lMatrix"), ..., na.rm = na.rm)
@@ -404,6 +404,8 @@ setMethod("Summary", signature(x = "lMatrix", na.rm = "ANY"), Summary.l)
 setMethod("Summary", signature(x = "nMatrix", na.rm = "ANY"), Summary.np)
 setMethod("Summary", signature(x = "pMatrix", na.rm = "ANY"), Summary.np)
 
+## NOTE:  "&" and "|"  are now in group "Logic" c "Ops" --> ./Ops.R
+##        "!" is in ./not.R
 
 ## Further, see ./Ops.R
 ##                ~~~~~
