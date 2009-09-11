@@ -111,7 +111,8 @@
 	...)} as the default method for rep().}
 
     \item{Ops}{\code{signature(e1 = "sparseVector", e2 = "*")}: define
-      arithmetic, compare and logic operations, (see \code{\link{Ops}}).}
+      arithmetic, compare and logic operations, (see
+      \code{\link[=S4groupGeneric]{Ops}}).}
     \item{Summary}{\code{signature(x = "sparseVector")}: define
       all the \code{\link[=S4groupGeneric]{Summary}} methods.}
   }
