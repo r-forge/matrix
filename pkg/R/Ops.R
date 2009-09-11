@@ -70,7 +70,7 @@ setMethod("Compare", signature(e1 = "Matrix", e2 = "Matrix"),
               if(is.na(match(.Generic, c("==", "!="))))
                   callGeneric(as(e1, "dMatrix"), as(e2, "dMatrix"))
               else { ## no coercion needed for "==" or "!="
-
+                  ##
                   ## what now ?  <<<<<<<<<<< FIXME >>>>>>>>>
                   .bail.out.2(.Generic, class(e1), class(e2))
               }
@@ -87,10 +87,10 @@ setMethod("Compare", signature(e1 = "Matrix", e2 = "Matrix"),
 }
 
 
-##-------- originally from ./dMatrix.R --------------------
-
+###-------- originally from ./dMatrix.R --------------------
+##
 ## Note that there extra methods for <sparse> o <sparse> !
-
+##
 ## "Compare" -> returning  logical Matrices
 setMethod("Compare", signature(e1 = "numeric", e2 = "dMatrix"),
 	  function(e1,e2) {
@@ -144,7 +144,6 @@ setMethod("Compare", signature(e1 = "dMatrix", e2 = "numeric"),
                       r <- new("lgeMatrix", x = rx,
                                Dim = d, Dimnames = dimnames(e1))
 		  }
-
 	      }
 	      else { ##---- e1 is(. , dsparseMatrix) -----------------
                   remainSparse <- identical(r0, FALSE) ## <==> things remain sparse
@@ -231,7 +230,7 @@ Ops.x.x <- function(e1, e2)
         ## now, both are xge {dense* & general*}
 
         r <- callGeneric(e1@x, e2@x)
-        new(paste(.M.kind(r), "geMatrix", sep=''),
+        new(paste0(.M.kind(r), "geMatrix"),
             x = r, Dim = d, Dimnames = dimnames(e1))
     }
     else {
@@ -349,7 +348,7 @@ setMethod("Arith", signature(e1 = "ddenseMatrix", e2 = "numeric"),
 	      if(le == 1 || le == d[1] || prod(d) == le) { # matching dim
 		  if(is(e1, "triangularMatrix")) {
 		      r0 <- callGeneric(0, e2)
-		      if(all(r0 == 0)) {# result remains triangular
+		      if(all0(r0)) {# result remains triangular
 			  if(e1@diag == "U" && !all(1 == callGeneric(1,e2)))
 			      e1 <- diagU2N(e1)
 			  e1@x <- callGeneric(e1@x, e2)
@@ -380,7 +379,7 @@ setMethod("Arith", signature(e1 = "numeric", e2 = "ddenseMatrix"),
 	      if(le == 1 || le == d[1] || prod(d) == le) { # matching dim
 		  if(is(e2, "triangularMatrix")) {
 		      r0 <- callGeneric(e1, 0)
-		      if(all(r0 == 0)) {# result remains triangular
+		      if(all0(r0)) {# result remains triangular
 			  if(e2@diag == "U" && !all(1 == callGeneric(e1,1)))
 			      e2 <- diagU2N(e2)
 			  e2@x <- callGeneric(e1, e2@x)
@@ -929,7 +928,7 @@ setMethod("Arith", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 	      ## go via "symmetric" if both are symmetric, etc...
 	      s1 <- .M.shape(e1, getClassDef(class(e1)))
 	      s2 <- .M.shape(e2, getClassDef(class(e2)))
-	      viaCl <- paste("d", if(s1 == s2) s1 else "g", "CMatrix", sep='')
+	      viaCl <- paste0("d", if(s1 == s2) s1 else "g", "CMatrix")
 	      callGeneric(as(as(e1, "dMatrix"), viaCl),
 			  as(as(e2, "dMatrix"), viaCl))
 	  })
@@ -939,7 +938,7 @@ setMethod("Logic", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 	      ## go via "symmetric" if both are symmetric, etc...
 	      s1 <- .M.shape(e1, getClassDef(class(e1)))
 	      s2 <- .M.shape(e2, getClassDef(class(e2)))
-	      viaCl <- paste("l", if(s1 == s2) s1 else "g", "CMatrix", sep='')
+	      viaCl <- paste0("l", if(s1 == s2) s1 else "g", "CMatrix")
 	      callGeneric(as(as(e1, "lMatrix"), viaCl),
 			  as(as(e2, "lMatrix"), viaCl))
 	  })
@@ -1171,100 +1170,146 @@ setMethod("Ops", signature(e1 = "ANY", e2 = "sparseVector"),
 ## 1)  spVec  o  (sp)Vec : -------------
 
 ## FIXME:
-##   1. <spVec>  o  <scalar>   should  *NOT* go via  <spV> o <spV>
 ##   2. <spVec>  o  <non-NA numeric>  should also happen directly and
 ##                                    |-> sparse for o = {'*', "/", '&&'
 
 setMethod("Ops", signature(e1 = "sparseVector", e2 = "atomicVector"),
-	  function(e1, e2) callGeneric(e1, as(e2, "sparseVector")))
+	  function(e1, e2) {
+	      if(length(e2) == 1) { ## scalar ------ special case - "fast"
+		  if(all0(rf <- callGeneric(FALSE, e2))) { # result remains sparse
+		      if(is(e1, "nsparseVector")) { # no 'x' slot, i.e. all TRUE
+			  r <- callGeneric(TRUE, e2)
+			  if(is.logical(r)) {
+			      if(isTRUE(at <- all(r))) # (could be NA)
+				  e1	# result unchanged
+			      else
+				  new("lsparseVector", x = r,
+				      length = e1@length, i = e1@i)
+			  } else {
+			      new(paste0(if(is.integer(r)) "i" else "d", "sparseVector"),
+				  x = r, length = e1@length, i = e1@i)
+			  }
+		      } else { # has x slot
+			  r <- callGeneric(e1@x, e2)
+			  if(identical(class(r), class(e1@x))) {
+			      e1@x <- r
+			      e1
+			  } else {
+			      new(paste0(.V.kind(r), "sparseVector"),
+				  x = r, length = e1@length, i = e1@i)
+			  }
+		      }
+		  }
+		  else ## non-sparse result
+		      callGeneric(sp2vec(e1), e2)
+	      }
+	      else ## e2 is not scalar
+		  callGeneric(e1, as(e2, "sparseVector"))
+	  })
+
 setMethod("Ops", signature(e1 = "atomicVector", e2 = "sparseVector"),
-	  function(e1, e2) callGeneric(as(e1, "sparseVector"), e2))
+	  function(e1, e2) {
+	      if(length(e1) == 1) { ## scalar ------ special case - "fast"
+		  if(all0(rf <- callGeneric(e1, FALSE))) { # result remains sparse
+		      if(is(e1, "nsparseVector")) { # no 'x' slot, i.e. all TRUE
+			  r <- callGeneric(e1, TRUE)
+			  if(is.logical(r)) {
+			      if(isTRUE(at <- all(r))) # (could be NA)
+				  e2	# result unchanged
+			      else
+				  new("lsparseVector", x = r,
+				      length = e2@length, i = e2@i)
+			  } else {
+			      new(paste0(if(is.integer(r)) "i" else "d", "sparseVector"),
+				  x = r, length = e2@length, i = e2@i)
+			  }
+		      } else { # has x slot
+			  r <- callGeneric(e1, e2@x)
+			  if(identical(class(r), class(e2@x))) {
+			      e2@x <- r
+			      e2
+			  } else {
+			      new(paste0(.V.kind(r), "sparseVector"),
+				  x = r, length = e2@length, i = e2@i)
+			  }
+		      }
+		  }
+		  else ## non-sparse result
+		      callGeneric(e1, sp2vec(e2))
+	      }
+	      else ## e1 is not scalar
+		  callGeneric(as(e1, "sparseVector"), e2)
+	  })
+
+
+Ops.spV.spV <- function(e1, e2) {
+    n1 <- e1@length
+    n2 <- e2@length
+    if(n1 != n2) {
+	if(n1 < n2) {
+	    n <- n1 ; N <- n2
+	} else {
+	    n <- n2 ; N <- n1
+	}
+	if(N %% n != 0) ## require this here, for convenience
+	    ## for regular vectors, this is only a warning:
+	    stop("longer object length\n\t",
+		 "is not a multiple of shorter object length")
+	if(n == 1) {		  # simple case, do not really recycle
+	    if(n1 < n2) return(callGeneric(sp2vec(e1, "double"), e2))
+	    else	return(callGeneric(e1, sp2vec(e2, "double")))
+	}
+	## else : 2 <= n < N --- recycle the shorter one
+	q <- N %/% n
+	if(n1 < n2) {
+	    e1@i <- rep.int(e1@i, q)
+	    e1@x <- rep.int(e1@x, q)
+	} else {
+	    e2@i <- rep.int(e2@i, q)
+	    e2@x <- rep.int(e2@x, q)
+	}
+    } else { ## n1 == n2
+	N <- n1
+    }
+    ## ---- e1 & e2 now are both of length 'N' ----
+
+    sp <- .setparts(e1@i, e2@i)
+    ## Modify 'e2' and return it :
+    e2@x <- c(callGeneric(e1@x[sp[["ix.only"]]], 0),
+	      callGeneric(0, e2@x[sp[["iy.only"]]]),
+	      callGeneric(e1@x[sp[["mx"]]],
+			  e2@x[sp[["my"]]]))
+    e2@i <- c(sp[["x.only"]], sp[["y.only"]], sp[["int"]])
+    e2
+}
 
 setMethod("Arith", signature(e1 = "sparseVector", e2 = "sparseVector"),
-          function(e1, e2) callGeneric(as(e1, "dsparseVector"),
-                                       as(e2, "dsparseVector")))
-setMethod("Logic", signature(e1 = "sparseVector", e2 = "sparseVector"),
-          function(e1, e2) callGeneric(as(e1, "lsparseVector"),
-                                       as(e2, "lsparseVector")))
+	  function(e1, e2) callGeneric(as(e1, "dsparseVector"),
+				       as(e2, "dsparseVector")))
 
 setMethod("Arith", signature(e1 = "dsparseVector", e2 = "dsparseVector"),
-
-          ##  "+", "-", "*", "^", "%%", "%/%", "/"
-
-          function(e1, e2) {
-              n1 <- e1@length
-              n2 <- e2@length
-              if(n1 != n2) {
-                  if(n1 < n2) {
-                      n <- n1 ; N <- n2
-                  } else {
-                      n <- n2 ; N <- n1
-                  }
-                  if(N %% n != 0) ## require this here, for convenience
-                      ## for regular vectors, this is only a warning:
-                      stop("longer object length\n\t",
-                           "is not a multiple of shorter object length")
-                  if(n == 1) { # simple case, do not really recycle
-                      if(n1 < n2) return(callGeneric(sp2vec(e1, "double"), e2))
-                      else        return(callGeneric(e1, sp2vec(e2, "double")))
-                  }
-                  ## else : 2 <= n < N --- recycle the shorter one
-                  q <- N %/% n
-                  if(n1 < n2) {
-                      e1@i <- rep.int(e1@i, q)
-                      e1@x <- rep.int(e1@x, q)
-                  } else {
-                      e2@i <- rep.int(e2@i, q)
-                      e2@x <- rep.int(e2@x, q)
-                  }
-              } else { ## n1 == n2
-                  N <- n1
-              }
-              r <- new("dsparseVector", length = N)
-	      switch(.Generic,
-		     "+" = , "-" =  ## X +- 0 == 0 +- X == X
-
-		     ii <- union(e1@i, e2@i),
-
-		     "*" =
-		 { ##  X * 0 == 0 * X == 0 --> keep common non-0
-		     ii <- intersect(e1@i, e2@i)
-
-		 },
-
-		     "^" =
-		 {
-
-		     ii <- intersect(e1@i, e2@i)
-		     ## 3 cases:
-		     ## 1) X^0 := 1  (even for X=0) ==> dense
-		     ## 2) 0^Y := 0  for Y != 0		=====
-		     ## 3) x^y :
-
-		     ## FIXME:	dgeM[cbind(i,j)] <- V  is not yet possible
-		     ##	    nor dgeM[ i_vect   ] <- V
-		     ## r <- as(e2, "dgeMatrix")
-		     ## ...
-		 },
-
-		     "%%" = , "%/%" = , "/" = ## 0 op 0	 |-> NaN => dense
-
-		     )
-
-              .bail.out.2(.Generic, class(e1), class(e2))
-              r  ##
-              ii ## << codetools {but all this is FIXME !}
-          })
+	  Ops.spV.spV)
 
 ## "Arith"  exception (shortcut)
 setMethod("-", signature(e1 = "dsparseVector", e2 = "missing"),
-          function(e1) { e1@x <- -e1@x ; e1 })
+	  function(e1) { e1@x <- -e1@x ; e1 })
 
 
-## FIXME: These *are* desirable!
+setMethod("Logic", signature(e1 = "sparseVector", e2 = "sparseVector"),
+	  ## FIXME: this is suboptimal for "nsparseVector" !!
+	  function(e1, e2) callGeneric(as(e1, "lsparseVector"),
+				       as(e2, "lsparseVector")))
+
 setMethod("Logic", signature(e1 = "lsparseVector", e2 = "lsparseVector"),
-          function(e1, e2) {
-              .bail.out.2(.Generic, class(e1), class(e2))
-          })
+	  Ops.spV.spV)
+
+## "nsparse" have no 'x' slot --> version of Ops.spV.spV..
+## --------  but also for (nsp.. o lsp..) etc, when  lsp... has no NA
+if(FALSE) ### FIXME
+setMethod("Logic", signature(e1 = "nsparseVector", e2 = "nsparseVector"),
+	  function(e1, e2) {
+	      .bail.out.2(.Generic, class(e1), class(e2))
+	  })
+
 
 ## 2)  spVec  o  [Mm]atrix : -------------

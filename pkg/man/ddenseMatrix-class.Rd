@@ -6,6 +6,10 @@
 % METHODS:
 % undocu (FIXME)
 \alias{\%*\%,ddenseMatrix,ddenseMatrix-method}
+\alias{crossprod,ddenseMatrix,missing-method}
+\alias{crossprod,ddenseMatrix,dgCMatrix-method}
+\alias{tcrossprod,ddenseMatrix,missing-method}
+%
 \alias{show,ddenseMatrix-method}
 \alias{coerce,ddenseMatrix,matrix-method}
 \alias{coerce,ddenseMatrix,dgeMatrix-method}
@@ -19,7 +23,6 @@
 \alias{Summary,ddenseMatrix-method}
 %
 \alias{as.numeric,ddenseMatrix-method}
-\alias{crossprod,ddenseMatrix,missing-method}
 \alias{diag,ddenseMatrix-method}
 \alias{determinant,ddenseMatrix,missing-method}
 \alias{determinant,ddenseMatrix,logical-method}
@@ -31,7 +34,6 @@
 \alias{solve,ddenseMatrix,missing-method}
 \alias{solve,ddenseMatrix,ANY-method}
 \alias{t,ddenseMatrix-method}
-\alias{tcrossprod,ddenseMatrix,missing-method}
 %
 \description{This is the virtual class of all dense numeric (i.e.,
   \bold{d}ouble, hence \emph{\dQuote{ddense}}) S4 matrices.

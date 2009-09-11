@@ -2,14 +2,15 @@
 #### (called from more than one place --> need to be defined early)
 
 ## Need to consider NAs ;  "== 0" even works for logical & complex:
+## Note that "!x" is faster than "x == 0", but does not (yet!) work for complex
 is0  <- function(x) !is.na(x) & x == 0
 isN0 <- function(x)  is.na(x) | x != 0
-all0 <- function(x) !any(is.na(x)) && all(x == 0)
-
-## These work "identically" for  1 ('==' TRUE)  and 0 ('==' FALSE):
+all0 <- function(x) !any(is.na(x)) && all(!x) ## ~= allFalse
+## These work "identically" for  1 ('==' TRUE)  and 0 ('==' FALSE)
+##	(but give a warning for "double"  1 or 0)
 ## TODO: C versions of these would be faster
 allTrue  <- function(x) all(x)  && !any(is.na(x))
-allFalse <- function(x) !any(x) && !any(is.na(x))
+allFalse <- function(x) !any(x) && !any(is.na(x))## ~= all0
 
 as1 <- function(x, mod=mode(x))
     switch(mod, "integer" = 1L, "numeric" = 1, "logical" = TRUE, "complex" = 1+0i)
@@ -1281,3 +1282,31 @@ setZero <- function(x) {
     else ## save memory (for large sparse M):
 	as.vector(x[1,1])[FALSE]
 }
+
+##' Compute the three "parts" of two sets:
+##' @param x  arbitrary vector; possibly with duplicated values,
+##' @param y  (ditto)
+##'
+##' @return list(x.only = setdiff(x,y),
+##'              y.only = setdiff(y,x), int = intersect(x,y))
+setparts <- function(x,y, uniqueCheck = TRUE, check = TRUE) {
+    if(check) {
+        x <- as.vector(x)
+        y <- as.vector(y)
+    }
+    if(uniqueCheck) {
+        x <- unique.default(x)
+        y <- unique.default(y)
+    }
+    .setparts(x,y)
+}
+.setparts <- function(x,y) {
+    n1 <- length(m1 <- match(x,y, 0L))
+    n2 <- length(m2 <- match(y,x, 0L))
+    ix <- seq_len(n1)[m1 == 0L]
+    iy <- seq_len(n2)[m2 == 0L]
+    list(x.only = x[ix], ix.only = ix, mx = m1,
+         y.only = y[iy], iy.only = iy, my = m2,
+         int = if(n1 < n2) y[m1] else x[m2])
+}
+
