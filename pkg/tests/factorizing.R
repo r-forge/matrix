@@ -114,7 +114,7 @@ if(FALSE)## if(require("sfsmisc"))
 split(rownames(r12$r.all), Duplicated(aCh.hash))
 
 ## TODO: find cases for both choices when we leave it to CHOLMOD to chose
-for(n in 1:50) { ## # before seg.fault at n = 10 !
+for(n in 1:50) { ## used to seg.fault at n = 10 !
     mkA <- mkLDL(1+rpois(1, 30), 1/10)
     cat(sprintf("n = %3d, LDL-dim = %d x %d ", n, nrow(mkA$A), ncol(mkA$A)))
     r <- allCholesky(mkA$A, silentTry=TRUE)
@@ -148,7 +148,9 @@ A1 <- A.; A1@x[] <- 1; A1@factors <- list()
 A1.8 <- A1; diag(A1.8) <- 8
 ##
 nT. <- as(AT <- as(A., "TsparseMatrix"),"nMatrix")
-stopifnot(all(nT.@i <= nT.@j))
+stopifnot(all(nT.@i <= nT.@j),
+	  identical(qr(A1.8), qr(as(A1.8, "dgCMatrix"))))
+
 
 ## FINALLY fix this "TODO":
 try(    tc <- Cholesky(nT.)  )

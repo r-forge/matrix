@@ -1,3 +1,26 @@
+2009-09-12  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseVector.R ([): allow *indexing* with "lsparseVector"
+
+2009-09-11  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseVector.R (prSpVector): using ":" as in printSpMatrix()
+	(Summary): add "Summary" group methods
+	* man/sparseVector-class.Rd: and test a bit
+
+2009-09-10  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (printSpMatrix): visually differentiate
+	non-structural zeros in *logical* sparse matrices, using ":"
+
+	* R/Auxiliaries.R (setparts): new utility, for
+	* R/Ops.R (Ops.spV.spV): start implementing sparseVector arithmetic etc
+
+2009-09-08  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dgCMatrix.R (qr): for sparseMatrix must coerce to "dgCMatrix".
+	* tests/factorizing.R: test qr(<dsCMatrix>)
+
 2009-09-01  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/CHMfactor.R (determinant): divide previous log(det(.)) by 2;

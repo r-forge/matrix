@@ -1,5 +1,5 @@
 
-R version 2.9.1 Patched (2009-07-18 r48959)
+R version 2.9.2 Patched (2009-09-08 r49653)
 Copyright (C) 2009 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -1102,11 +1102,11 @@ M[i,j] <- v :  coercing symmetric M[] into non-symmetric
 > (ne1 <- (mc - m.) != 0)
 5 x 7 sparse Matrix of class "lgCMatrix"
                   
-[1,] . . . . . . .
-[2,] . . . . . . .
-[3,] | . . . . . .
+[1,] . . : : . . :
+[2,] : : : : : : .
+[3,] | . : . . . :
 [4,] | | . . . | .
-[5,] . . | . . . .
+[5,] . : | . : . .
 > stopifnot(identical(ne1, 0 != abs(mc - m.)))
 > (ge <- m. >= mc) # contains "=" -> result is dense
 5 x 7 Matrix of class "lgeMatrix"
@@ -1284,7 +1284,7 @@ attr(,"package")
 + 	  identical(thCol,  fx[,5762]))
 > 
 > cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
-Time elapsed:  21.691 1.553 25.207 0 0 
+Time elapsed:  17.046 0.745 18.319 0 0 
 > ##
 > cat("checkMatrix() of all: \n---------\n")
 checkMatrix() of all: 
@@ -1424,7 +1424,7 @@ suboptimal implementation of sparse 'symm. o symm.'
 x.x. 
 suboptimal implementation of sparse 'symm. o symm.'
 > cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
-Time elapsed:  13.831 0.68 14.511 0 0 
+Time elapsed:  10.299 0.156 10.462 0 0 
 > 
 > if(!interactive()) warnings()
 NULL
