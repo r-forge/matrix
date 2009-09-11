@@ -264,7 +264,7 @@
       trivially implemented, of course.}
 
     \item{*}{\code{signature(e1 = "ddiMatrix", e2="denseMatrix")}:
-      arithmetic and other operators from the \code{\link[methods]{Ops}}
+      arithmetic and other operators from the \code{\link[=S4groupGeneric]{Ops}}
       group have a few dozen explicit method definitions, in order to
       keep the results \emph{diagonal} in many cases, including the following:}
     \item{/}{\code{signature(e1 = "ddiMatrix", e2="denseMatrix")}:

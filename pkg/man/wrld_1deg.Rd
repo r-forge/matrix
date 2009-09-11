@@ -25,7 +25,7 @@
   (column-compressed).
 }
 \source{
-  The shoreline data was read into \R using \code{\link[maptools]{Rgssh}}
+  The shoreline data was read into \R using \code{\link[maptools]{Rgshhs}}
   from the GSHHS coarse shoreline database distributed with the
   \pkg{maptools} package, omitting Antarctica.  A matching approximately
   one-degree grid was generated using
