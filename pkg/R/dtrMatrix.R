@@ -68,6 +68,15 @@ setMethod("solve", signature(a = "dtrMatrix", b="missing"),
 	  .Call(dtrMatrix_solve, a),
 	  valueClass = "dtrMatrix")
 
+setMethod("chol2inv", signature(x = "dtrMatrix"),
+          function (x, size = NCOL(x), LINPACK = FALSE)
+      {
+          if (!missing(size) || !missing(LINPACK))
+              warning("Arguments size and LINPACK are ignored for chol2inv\n\tmethods in the Matrix package")
+          if (x@diag != "N") x <- diagU2N(x)
+          .Call(dtrMatrix_chol2inv, x)
+      })
+
 setMethod("solve", signature(a = "dtrMatrix", b="ddenseMatrix"),
 	  function(a, b, ...)
           .Call(dtrMatrix_matrix_solve, a, b),
