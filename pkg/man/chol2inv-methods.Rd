@@ -13,8 +13,13 @@
   compute \eqn{(R'R)^{-1}}{(R'R)^(-1)}.
 }
 \usage{
-chol2inv(x)
+chol2inv(x, size = NCOL(x), LINPACK = FALSE)
 }
+\arguments{
+  \item{x}{a matrix(-like) object; see below.}
+  \item{size, LINPACK}{not used here; for back-compatibility.}
+}
+
 \section{Methods}{
   \describe{
     \item{x = "ANY"}{the default method from \pkg{base}, see
