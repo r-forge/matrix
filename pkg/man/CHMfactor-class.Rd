@@ -18,6 +18,7 @@
 \alias{solve,CHMfactor,dsparseMatrix-method}
 \alias{solve,CHMfactor,numeric-method}
 \alias{solve,CHMfactor,matrix-method}
+\alias{solve,CHMfactor,missing-method}
 \alias{solve,CHMfactor,ANY-method}
 \alias{determinant,CHMfactor,missing-method}
 \alias{determinant,CHMfactor,logical-method}

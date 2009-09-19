@@ -1099,9 +1099,15 @@ isTriC <- function(object, upper = NA) {
     if(d[1] != d[2]) return(FALSE)
     ## else
     TRUE.U <- structure(TRUE, kind = "U")
-    if(d[1] == 0) return(TRUE.U)
+    if((n <- d[1]) == 0) return(TRUE.U)
     TRUE.L <- structure(TRUE, kind = "L")
-    ni <- 1:d[2]
+    ## Need this, since 'i' slot of symmetric looks like triangular :
+    if(is(object, "symmetricMatrix")) # triangular only iff diagonal :
+        return(if(length(oi <- object@i) == n && identical(oi, 0:(n-1L))
+                  && identical(object@p, 0:n))
+               structure(TRUE, kind = object@uplo) else FALSE)
+    ## else
+    ni <- 1:n
     ## the row indices split according to column:
     ilist <- split(object@i, factor(rep.int(ni, diff(object@p)), levels= ni))
     lil <- unlist(lapply(ilist, length), use.names = FALSE)

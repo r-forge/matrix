@@ -60,13 +60,47 @@ setMethod("solve", signature(a = "CHMfactor", b = "dsparseMatrix"),
 	      sysDef <- eval(formals()$system)
 	      .Call(CHMfactor_spsolve, a, as(b, "dgCMatrix"),
 		    match(match.arg(system, sysDef), sysDef, nomatch = 0))
-	  }, valueClass = "dgCMatrix")
+	  }, valueClass = "CsparseMatrix")# < virtual value ?
+
+setMethod("solve", signature(a = "CHMfactor", b = "missing"),
+	  ## <--> b = Diagonal(.)
+	  function(a, b,
+		   system = c("A", "LDLt", "LD","DLt", "L","Lt", "D", "P","Pt"),
+		   ...) {
+	      if(length(list(...)))
+		  warning("arguments in", deparse(list(...)), "are disregarded")
+	      sysDef <- eval(formals()$system)
+	      i.sys <- match(match.arg(system, sysDef), sysDef, nomatch = 0L)
+	      as(.Call(CHMfactor_spsolve, a,
+		       .sparseDiagonal(a@Dim[1], shape="g"), i.sys),
+		 switch(system,
+			"A"=, "LDLt" = "dsCMatrix",
+			"LD"=, "DLt"=, "L"=, "Lt" =,
+			"D" = "dtCMatrix", # < diagonal: still as "Csparse.."
+			"P"=, "Pt" = "pMatrix"))
+	  })
 
 ## Catch-all the rest : make sure 'system' is not lost
 setMethod("solve", signature(a = "CHMfactor", b = "ANY"),
-	  function(a, b, system = c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt"),
+	  function(a, b, system = c("A", "LDLt", "LD","DLt", "L","Lt", "D", "P","Pt"),
 		   ...)
 	      solve(a, as(b, "dMatrix"), system, ...))
+
+if(FALSE) { ## once we have this nicely as implicitGeneric {in base R}
+setMethod("chol2inv", signature(x = "CHMfactor"),
+	  function (x, ...) {
+	      if(length(list(...)))
+		  warning("arguments in", deparse(list(...)), "are disregarded")
+	      solve(x, system = "A")
+	  })
+} else { ## for now: still carry  'size' and 'LINPACK'
+setMethod("chol2inv", signature(x = "CHMfactor"),
+	  function (x, size, LINPACK) {
+	      if (!missing(size) || !missing(LINPACK))
+		  warning("Arguments size and LINPACK are ignored for chol2inv\n\tmethods in the Matrix package")
+	      solve(x, system = "A")
+	  })
+}
 
 setMethod("determinant", signature(x = "CHMfactor", logarithm = "missing"),
           function(x, logarithm, ...) determinant(x, TRUE))

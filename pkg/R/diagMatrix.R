@@ -45,9 +45,12 @@ Diagonal <- function(n, x = NULL)
 	    storage.mode(x) <- "double"
 	    "d"
 	}
-    new(paste(kind, shape, "CMatrix", sep=''),
-	Dim = c(n,n), x = x, uplo = uplo,
-	i = if(n) 0:(n - 1L) else integer(0), p = 0:n)
+    ii <- if(n) 0:(n - 1L) else integer(0)
+    if(shape == "g")
+	new(paste0(kind, "gCMatrix"), Dim = c(n,n),
+	    x = x, i = ii, p = 0:n)
+    else new(paste0(kind, shape, "CMatrix"), Dim = c(n,n), uplo = uplo,
+	     x = x, i = ii, p = 0:n)
 }
 
 ## Pkg 'spdep' had (relatively slow) versions of this as_dsCMatrix_I()
@@ -639,13 +642,13 @@ setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
 
 setMethod("tcrossprod", signature(x = "sparseMatrix", y = "diagonalMatrix"),
 	  function(x, y = NULL) Cspdiagprod(as(x, "CsparseMatrix"), y))
-          
+
 setMethod("%*%", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
 	  function(x, y) diagCspprod(x, y))
 
 setMethod("%*%", signature(x = "diagonalMatrix", y = "sparseMatrix"),
 	  function(x, y) diagCspprod(as(x, "CsparseMatrix"), y))
-          
+
 setMethod("%*%", signature(x = "sparseMatrix", y = "diagonalMatrix"),
 	  function(x, y) Cspdiagprod(as(x, "CsparseMatrix"), y))
 
