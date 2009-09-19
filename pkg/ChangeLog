@@ -1,3 +1,35 @@
+2009-09-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999375-31, CRAN-released: 2009-09-...
+
+	* inst/include/Matrix_stubs.c (M_R_cholmod_start): print_function = NULL
+	as in src/chm_common.c (2009-07-20)
+	(M_R_cholmod_error): ditto.
+
+	* R/Tsparse.R (intI): do *not* allow logical subscript (row or
+	column) to be too long, compatibly with traditional matrix
+	indexing.
+	* tests/indexing.R: and assert the error.
+
+2009-09-17  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/pMatrix.R: as(sparseMatrix, pMatrix)
+
+	* R/CHMfactor.R (solve): method for (CHMfactor, missing)
+
+	* inst/test-tools.R (assertError): use tryCatch()
+
+	* R/diagMatrix.R (.sparseDiagonal): fix shape "g" case.
+
+	* R/Auxiliaries.R (isTriC): do not wrongly return TRUE for a *sCMatrix.
+
+	* man/chol2inv-methods.Rd: document & example
+
+2009-09-16   Douglas Bates <bates@stat.wisc.edu>
+
+	* NAMESPACE, R/dtrMatrix.R, src/dtrMatrix.[ch]: add chol2inv()
+	method for dtrMatrix.
+
 2009-09-12  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/sparseVector.R ([): allow *indexing* with "lsparseVector"
