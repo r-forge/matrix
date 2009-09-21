@@ -489,13 +489,25 @@ M_cholmod_spsolve(int sys, CHM_FR L,
     return fun(sys, L, B, Common);
 }
 
+int attribute_hidden
+M_cholmod_defaults (CHM_CM Common)
+{
+    static int(*fun)(CHM_CM) = NULL;
+    if (fun == NULL)
+	fun = (int(*)(CHM_CM))
+	    R_GetCCallable("Matrix", "cholmod_l_defaults");
+    return fun(Common);
+}
+
+extern cholmod_common c;
+
 void attribute_hidden
 M_R_cholmod_error(int status, const char *file, int line, const char *message)
 {
-/* NB: keep in sync with M_R_cholmod_error(), ../inst/include/Matrix_stubs.c */
+/* NB: keep in sync with R_cholmod_error(), ../../src/chm_common.c */
 
     if(status < 0) {
-	cholmod_l_defaults(&c);/* <--- restore defaults,
+	M_cholmod_defaults(&c);/* <--- restore defaults,
 				* as we will not be able to .. */
 	error("Cholmod error '%s' at file:%s, line %d", message, file, line);
     }
@@ -527,7 +539,7 @@ M_R_cholmod_start(CHM_CM Common)
     val = fun(Common);
 /*-- NB: keep in sync with  R_cholmod_l_start() --> ../../src/chm_common.c */
     /* do not allow CHOLMOD printing - currently */
-    Common->print_function = NULL;
+    Common->print_function = NULL;/* was  R_cholmod_printf; /.* Rprintf gives warning */
     Common->error_handler = M_R_cholmod_error;
     return val;
 }
