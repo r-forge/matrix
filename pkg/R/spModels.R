@@ -424,9 +424,7 @@ is.model.frame <- function(x)
 
 ##' @return sparse matrix (class "dgCMatrix")
 model.spmatrix <- function(trms, mf, transpose=FALSE,
-                           drop.unused.levels = TRUE, row.names=TRUE,
-                           verbose = getOption('verbose'))
-
+                           drop.unused.levels = TRUE, row.names=TRUE)
 {
     ## Author: Martin Maechler, Date:  7 Jul 2009
 

@@ -752,8 +752,7 @@ SEXP new_dgeMatrix(int nrow, int ncol)
 }
 
 /**
- * Return the 0-based index of a string match in a vector of strings
- * terminated by an empty string.  Returns -1 for no match.
+ * Encode Matrix index (i,j)  |-->  i + j * nrow   {i,j : 0-origin}
  *
  * @param ij: 2-column integer matrix
  * @param di: dim(.), i.e. length 2 integer vector
@@ -792,8 +791,7 @@ SEXP m_encodeInd(SEXP ij, SEXP di)
 #undef do_ii_FILL
 
 /**
- * Return the 0-based index of a string match in a vector of strings
- * terminated by an empty string.  Returns -1 for no match.
+ * Encode Matrix index (i,j)  |-->  i + j * nrow   {i,j : 0-origin}
  *
  * @param i: integer vector
  * @param j: integer vector of same length as 'i'
