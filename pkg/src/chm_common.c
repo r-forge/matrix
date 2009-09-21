@@ -39,7 +39,7 @@ static void *RallocedREAL(SEXP x)
     return (void*)ans;
 }
 
-    
+
 static void *xpt(int ctype, SEXP x)
 {
     switch(ctype / 3) {
@@ -548,6 +548,8 @@ CHM_DN as_cholmod_x_dense(cholmod_dense *ans, SEXP x)
 
 void R_cholmod_error(int status, const char *file, int line, const char *message)
 {
+/* NB: keep in sync with M_R_cholmod_error(), ../inst/include/Matrix_stubs.c */
+
     /* From CHOLMOD/Include/cholmod_core.h : ...status values.
        zero means success, negative means a fatal error, positive is a warning.
     */
@@ -587,13 +589,13 @@ int R_cholmod_printf(const char* fmt, ...)
  */
 int R_cholmod_l_start(CHM_CM cl)
 {
+/* NB: keep in sync with M_R_cholmod_l_start(), ../inst/include/Matrix_stubs.c */
     int res;
     if (!(res = cholmod_l_start(cl)))
 	error(_("Unable to initialize cholmod_l: error code %d"), res);
     cl->print_function = R_cholmod_printf; /* Rprintf gives warning */
-    /* Since we provide an error handler, it may not be a good idea to allow CHOLMOD printing,
-     * because that's not easily suppressed on the R level :
-     * Hence consider, at least temporarily *  cl->print_function = NULL;
+    /* Since we provide an error handler, it may not be a good idea to
+     * allow CHOLMOD printing.
      * FIXME? alternative {slightly more efficient}:
      * do *compile* CHOLMOD with '#define NPRINT'  */
     cl->print_function = NULL;

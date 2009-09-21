@@ -492,7 +492,16 @@ M_cholmod_spsolve(int sys, CHM_FR L,
 void attribute_hidden
 M_R_cholmod_error(int status, const char *file, int line, const char *message)
 {
-    error("Cholmod error `%s' at file:%s, line %d", message, file, line);
+/* NB: keep in sync with M_R_cholmod_error(), ../inst/include/Matrix_stubs.c */
+
+    if(status < 0) {
+	cholmod_l_defaults(&c);/* <--- restore defaults,
+				* as we will not be able to .. */
+	error("Cholmod error '%s' at file:%s, line %d", message, file, line);
+    }
+    else
+	warning("Cholmod warning '%s' at file:%s, line %d",
+		message, file, line);
 }
 
 /* just to get 'int' instead of 'void' as required by CHOLMOD's print_function */
@@ -516,7 +525,9 @@ M_R_cholmod_start(CHM_CM Common)
 	fun = (int(*)(CHM_CM))
 	    R_GetCCallable("Matrix", "cholmod_l_start");
     val = fun(Common);
-    Common->print_function = R_cholmod_printf; /* Rprintf gives warning */
+/*-- NB: keep in sync with  R_cholmod_l_start() --> ../../src/chm_common.c */
+    /* do not allow CHOLMOD printing - currently */
+    Common->print_function = NULL;
     Common->error_handler = M_R_cholmod_error;
     return val;
 }
