@@ -1,10 +1,18 @@
+2009-09-22  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Ops.R (A.M.n,A.n.M): replace "Ops" methods by explicit "Arith",
+	"Logic", etc, getting rid of ambiguity (notes), and of infinite recursions.
+
+	* tests/group-methods.R: test these systematically.
+
 2009-09-18  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.999375-31, CRAN-released: 2009-09-...
 
 	* inst/include/Matrix_stubs.c (M_R_cholmod_start): print_function = NULL
 	as in src/chm_common.c (2009-07-20)
-	(M_R_cholmod_error): ditto.
+	(M_R_cholmod_error): ditto, using new M_cholmod_default(), declared in
+	* inst/include/cholmod.h
 
 	* R/Tsparse.R (intI): do *not* allow logical subscript (row or
 	column) to be too long, compatibly with traditional matrix

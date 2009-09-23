@@ -17,7 +17,9 @@
 %
 % Group
 \alias{Arith,ddenseMatrix,ddenseMatrix-method}
+\alias{Arith,ddenseMatrix,logical-method}
 \alias{Arith,ddenseMatrix,numeric-method}
+\alias{Arith,logical,ddenseMatrix-method}
 \alias{Arith,numeric,ddenseMatrix-method}
 \alias{Math,ddenseMatrix-method}
 \alias{Summary,ddenseMatrix-method}
