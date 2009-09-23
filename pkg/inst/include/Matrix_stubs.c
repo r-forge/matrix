@@ -516,6 +516,7 @@ M_R_cholmod_error(int status, const char *file, int line, const char *message)
 		message, file, line);
 }
 
+#if 0  /* no longer used */
 /* just to get 'int' instead of 'void' as required by CHOLMOD's print_function */
 static int
 R_cholmod_printf(const char* fmt, ...)
@@ -527,6 +528,7 @@ R_cholmod_printf(const char* fmt, ...)
     va_end(ap);
     return 0;
 }
+#endif
 
 int attribute_hidden
 M_R_cholmod_start(CHM_CM Common)
