@@ -979,3 +979,75 @@ SEXP CHMsuper_validate(SEXP obj) /* placeholder */
     return ScalarLogical(1);
 }
 
+SEXP CHM_store_common() {
+    SEXP MatrixEnv = findVarInFrame(Matrix_NS, install(".MatrixEnv"));
+    if (!isEnvironment(MatrixEnv)) {
+	/* FIXME: define .MatrixEnv as an environment here */
+	error(_("Missing .MatrixEnv"));
+    }
+    defineVar(install("dbound"), ScalarReal(c.dbound), MatrixEnv);
+    defineVar(install("grow0"), ScalarReal(c.grow0), MatrixEnv);
+    defineVar(install("grow1"), ScalarReal(c.grow1), MatrixEnv);
+    defineVar(install("grow2"), ScalarInteger(c.grow2), MatrixEnv);
+    defineVar(install("maxrank"), ScalarInteger(c.maxrank), MatrixEnv);
+    defineVar(install("supernodal_switch"),
+	      ScalarReal(c.supernodal_switch), MatrixEnv);
+    defineVar(install("supernodal"),
+	      ScalarInteger(c.supernodal), MatrixEnv);
+    defineVar(install("final_asis"),
+	      ScalarLogical(c.final_asis), MatrixEnv);
+    defineVar(install("final_super"),
+	      ScalarLogical(c.final_super), MatrixEnv);
+    defineVar(install("final_ll"),
+	      ScalarLogical(c.final_ll), MatrixEnv);
+    defineVar(install("final_pack"),
+	      ScalarLogical(c.final_pack), MatrixEnv);
+    defineVar(install("final_monotonic"),
+	      ScalarLogical(c.final_monotonic), MatrixEnv);
+    defineVar(install("final_resymbol"),
+	      ScalarLogical(c.final_resymbol), MatrixEnv);
+    defineVar(install("prefer_zomplex"),
+	      ScalarLogical(c.prefer_zomplex), MatrixEnv);
+    defineVar(install("prefer_upper"),
+	      ScalarLogical(c.prefer_upper), MatrixEnv);
+    defineVar(install("quick_return_if_not_posdef"),
+	      ScalarLogical(c.quick_return_if_not_posdef), MatrixEnv);
+    return R_NilValue;
+}
+
+SEXP CHM_restore_common() {
+    SEXP MatrixEnv = findVarInFrame(Matrix_NS, install(".MatrixEnv"));
+    if (!isEnvironment(MatrixEnv)) {
+	error(_("Missing .MatrixEnv")); /* this is always an error */
+    }
+    c.dbound = asReal(findVarInFrame(MatrixEnv, install("dbound")));
+    c.grow0 = asReal(findVarInFrame(MatrixEnv, install("grow0")));
+    c.grow1 = asReal(findVarInFrame(MatrixEnv, install("grow1")));
+    c.grow2 = asInteger(findVarInFrame(MatrixEnv, install("grow2")));
+    c.maxrank =
+	asInteger(findVarInFrame(MatrixEnv, install("maxrank")));
+    c.supernodal_switch =
+	asReal(findVarInFrame(MatrixEnv, install("supernodal_switch")));
+    c.supernodal = 
+	asLogical(findVarInFrame(MatrixEnv, install("supernodal")));
+    c.final_asis =
+	asLogical(findVarInFrame(MatrixEnv, install("final_asis")));
+    c.final_super =
+	asLogical(findVarInFrame(MatrixEnv, install("final_super")));
+    c.final_ll =
+	asLogical(findVarInFrame(MatrixEnv, install("final_ll")));
+    c.final_pack =
+	asLogical(findVarInFrame(MatrixEnv, install("final_pack")));
+    c.final_monotonic =
+	asLogical(findVarInFrame(MatrixEnv, install("final_monotonic")));
+    c.final_resymbol =
+	asLogical(findVarInFrame(MatrixEnv, install("final_resymbol")));
+    c.prefer_zomplex =
+	asLogical(findVarInFrame(MatrixEnv, install("prefer_zomplex")));
+    c.prefer_upper =
+	asLogical(findVarInFrame(MatrixEnv, install("prefer_upper")));
+    c.quick_return_if_not_posdef =
+	asLogical(findVarInFrame(MatrixEnv,
+				 install("quick_return_if_not_posdef")));
+    return R_NilValue;
+}
