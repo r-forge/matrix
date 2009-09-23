@@ -222,6 +222,9 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(CHMsimpl_validate, 1),
     CALLDEF(CHMsuper_validate, 1),
 
+    CALLDEF(CHM_store_common, 0),
+    CALLDEF(CHM_restore_common, 0),
+
     CALLDEF(m_encodeInd, 2),
     CALLDEF(m_encodeInd2, 3),
 
@@ -318,7 +321,7 @@ R_init_Matrix(DllInfo *dll)
     if(!isEnvironment(Matrix_NS))
 #endif
 	error(_("Matrix namespace not determined correctly"));
-
+    /* CHM_store_common(); */
 }
 
 void R_unload_Matrix(DllInfo *dll)
