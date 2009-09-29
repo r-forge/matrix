@@ -30,15 +30,11 @@ setGeneric("lu", function(x, ...) standardGeneric("lu"))
 
     setGeneric("norm", function(x, type, ...) standardGeneric("norm"))
 
-## base::rcond() has additional argument 'triangular'
-## which should *not* be part of the signature
-## In the future .. R has 'rcond' as implicit generic:
-## if(getRversion() < "2.10.0" || R.version$`svn rev` < 49746) {
-setGeneric("rcond", function(x, norm, ...) standardGeneric("rcond"),
+if(getRversion() < "2.10.0" || R.version$`svn rev` < 49870) {
+  setGeneric("rcond", function(x, norm, ...) standardGeneric("rcond"),
 	   signature = c("x", "norm"),
 	   useAsDefault = function(x, norm, ...) base::rcond(x, norm=norm, ...))
-## }
-
+}## else:  rcond() has implicit generic in newer versions of R
 
     setGeneric("Schur", function(x, vectors, ...) standardGeneric("Schur"))
 
