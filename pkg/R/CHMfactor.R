@@ -58,9 +58,12 @@ setMethod("solve", signature(a = "CHMfactor", b = "dsparseMatrix"),
 	      if(length(list(...)))
 		  warning("arguments in", deparse(list(...)), "are disregarded")
 	      sysDef <- eval(formals()$system)
-	      .Call(CHMfactor_spsolve, a, as(b, "dgCMatrix"),
+	      .Call(CHMfactor_spsolve, a, as(as(b, "CsparseMatrix"), "dgCMatrix"),
 		    match(match.arg(system, sysDef), sysDef, nomatch = 0))
 	  }, valueClass = "CsparseMatrix")# < virtual value ?
+
+setMethod("solve", signature(a = "CHMfactor", b = "diagonalMatrix"),
+	  function(a, b, ...) solve(a, as(b, "dsparseMatrix"), ...))
 
 setMethod("solve", signature(a = "CHMfactor", b = "missing"),
 	  ## <--> b = Diagonal(.)
@@ -70,14 +73,15 @@ setMethod("solve", signature(a = "CHMfactor", b = "missing"),
 	      if(length(list(...)))
 		  warning("arguments in", deparse(list(...)), "are disregarded")
 	      sysDef <- eval(formals()$system)
-	      i.sys <- match(match.arg(system, sysDef), sysDef, nomatch = 0L)
+	      system <- match.arg(system, sysDef)
+	      i.sys <- match(system, sysDef, nomatch = 0L)
 	      as(.Call(CHMfactor_spsolve, a,
 		       .sparseDiagonal(a@Dim[1], shape="g"), i.sys),
 		 switch(system,
-			"A"=, "LDLt" = "dsCMatrix",
-			"LD"=, "DLt"=, "L"=, "Lt" =,
-			"D" = "dtCMatrix", # < diagonal: still as "Csparse.."
-			"P"=, "Pt" = "pMatrix"))
+			A=, LDLt = "symmetricMatrix",# was "dsCMatrix"
+			LD=, DLt=, L=, Lt =,
+			D = "dtCMatrix", # < diagonal: still as "Csparse.."
+			P=, Pt = "pMatrix"))
 	  })
 
 ## Catch-all the rest : make sure 'system' is not lost

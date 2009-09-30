@@ -382,7 +382,8 @@ setMethod("diff", signature(x = "Matrix"),
 setMethod("image", "Matrix",
 	  function(x, ...) { # coercing to sparse is not inefficient,
 	      ##	       since we need 'i' and 'j' for levelplot()
-	      x <- as(as(x, "sparseMatrix"), "dMatrix")
+	      x <- as(as(x, "sparseMatrix"), "dsparseMatrix")
+              ## note that "ddiMatrix" is "sparse*" and "d*", but *not* dsparse
 	      callGeneric()
 	  })
 

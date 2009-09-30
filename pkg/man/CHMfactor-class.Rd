@@ -16,6 +16,7 @@
 \alias{expand,CHMfactor-method}
 \alias{solve,CHMfactor,ddenseMatrix-method}
 \alias{solve,CHMfactor,dsparseMatrix-method}
+\alias{solve,CHMfactor,diagonalMatrix-method}
 \alias{solve,CHMfactor,numeric-method}
 \alias{solve,CHMfactor,matrix-method}
 \alias{solve,CHMfactor,missing-method}
