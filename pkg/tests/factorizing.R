@@ -150,7 +150,15 @@ A1.8 <- A1; diag(A1.8) <- 8
 nT. <- as(AT <- as(A., "TsparseMatrix"),"nMatrix")
 stopifnot(all(nT.@i <= nT.@j),
 	  identical(qr(A1.8), qr(as(A1.8, "dgCMatrix"))))
-
+CA <- Cholesky(A.)
+stopifnot(isValid(CAinv <- solve(CA), "dsCMatrix"))
+MA <- as(CA, "Matrix") # with a confusing warning -- FIXME!
+isValid(MAinv <- solve(MA), "dtCMatrix")
+## comparing MAinv with some solve(CA, system="...") .. *not* trivial? - TODO
+##
+CAinv2 <- solve(CA, Diagonal(nrow(A.)))
+CAinv2 <- as(CAinv2, "symmetricMatrix")
+stopifnot(identical(CAinv, CAinv2))
 
 ## FINALLY fix this "TODO":
 try(    tc <- Cholesky(nT.)  )

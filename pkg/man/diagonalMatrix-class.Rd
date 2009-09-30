@@ -33,7 +33,9 @@
 \alias{coerce,ddiMatrix,CsparseMatrix-method}
 \alias{coerce,ldiMatrix,CsparseMatrix-method}
 \alias{coerce,ddiMatrix,TsparseMatrix-method}
+\alias{coerce,ddiMatrix,dsparseMatrix-method}
 \alias{coerce,ldiMatrix,TsparseMatrix-method}
+\alias{coerce,ldiMatrix,lsparseMatrix-method}
 %
 \alias{cbind2,ddiMatrix,matrix-method}
 \alias{cbind2,ldiMatrix,matrix-method}

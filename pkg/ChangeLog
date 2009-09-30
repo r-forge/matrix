@@ -1,3 +1,12 @@
+2009-09-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/CHMfactor.R (solve): fix methods for "ddiMatrix" and "missing" RHS.
+	* tests/factorizing.R: test these
+
+	* R/Matrix.R (image): fix Matrix method to work for "ddiMatrix"
+	* R/diagMatrix.R: coercion to "dsparse*"
+	* tests/Simple.R: test image(<ddiMatrix>)
+
 2009-09-29  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/AllGeneric.R: rcond is implicit generic in latest versions of R

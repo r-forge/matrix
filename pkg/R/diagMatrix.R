@@ -220,6 +220,7 @@ setAs("ddiMatrix", "triangularMatrix", diag2tT)
 ##_no_longer_ setAs("ddiMatrix", "sparseMatrix", diag2tT)
 ## needed too (otherwise <dense> -> Tsparse is taken):
 setAs("ddiMatrix", "TsparseMatrix", diag2tT)
+setAs("ddiMatrix", "dsparseMatrix", diag2tT)
 setAs("ddiMatrix", "CsparseMatrix",
       function(from) as(.diag2tT(from, "U", "d"), "CsparseMatrix"))
 setAs("ddiMatrix", "symmetricMatrix",
@@ -231,6 +232,7 @@ setAs("ldiMatrix", "triangularMatrix", diag2tT)
 ##_no_longer_ setAs("ldiMatrix", "sparseMatrix", diag2tT)
 ## needed too (otherwise <dense> -> Tsparse is taken):
 setAs("ldiMatrix", "TsparseMatrix", diag2tT)
+setAs("ldiMatrix", "lsparseMatrix", diag2tT)
 setAs("ldiMatrix", "CsparseMatrix",
       function(from) as(.diag2tT(from, "U", "l"), "CsparseMatrix"))
 setAs("ldiMatrix", "symmetricMatrix",
