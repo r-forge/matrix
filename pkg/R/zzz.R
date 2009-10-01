@@ -3,6 +3,7 @@
 
 .MatrixEnv <- new.env(parent=emptyenv())
 ## as long as it's small, no 'hash = TRUE'
+
 .chm_common <- new.env(parent = emptyenv())
 ## environment in which to store some settings from cholmod_common
 
@@ -40,7 +41,7 @@
     ## loaded & non-attached Matrix:
     assignInNamespace(".M.classEnv", .M.classEnv, ns = "base")
 
-    .Call(CHM_store_common, .chm_common)
+    .Call(CHM_set_common_env, .chm_common)
 }
 
 ## Instead, simply re-assign the [cr]bind()s which are recursively
