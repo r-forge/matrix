@@ -36,7 +36,6 @@ internal_chm_factor(SEXP Ap, int perm, int LDL, int super, double Imult)
 {
     SEXP facs = GET_SLOT(Ap, Matrix_factorSym);
     SEXP nms = getAttrib(facs, R_NamesSymbol);
-    int sup, ll;
     CHM_FR L;
     CHM_SP A = AS_CHM_SP__(Ap);
     R_CheckStack();
