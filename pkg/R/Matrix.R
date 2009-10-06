@@ -251,17 +251,8 @@ setMethod("solve", signature(a = "Matrix", b = "ANY"),
 setMethod("solve", signature(a = "ANY", b = "Matrix"),
 	  function(a, b, ...) .bail.out.2("solve", class(a), class(b)))
 
-if(FALSE) { ## once we have this nicely as implicitGeneric {in base R}
-setMethod("chol2inv", signature(x = "denseMatrix"),
-	  function (x, ...) chol2inv(as(as(x, "dMatrix"), "dtrMatrix"), ...))
-setMethod("chol2inv", signature(x = "sparseMatrix"),
-	  function (x, ...) {
-	      if(length(list(...)))
-		  warning("arguments in", deparse(list(...)), "are disregarded")
-	      ## for now:
-	      tcrossprod(solve(as(x,"triangularMatrix")))
-	  })
-} else { ## for now: still carry  'size' and 'LINPACK'
+if(getRversion() < "2.10.0" || R.version$`svn rev` < 49944) {
+    ## for now: still carry  'size' and 'LINPACK'
 setMethod("chol2inv", signature(x = "denseMatrix"),
 	  function (x, size, LINPACK)
 	  chol2inv(as(as(x, "dMatrix"), "dtrMatrix"), size, LINPACK))
@@ -272,7 +263,19 @@ setMethod("chol2inv", signature(x = "sparseMatrix"),
 	      ## for now:
 	      tcrossprod(solve(as(x,"triangularMatrix")))
 	  })
-}
+
+} else {## chol2inv() has implicit generic in newer versions of R
+
+setMethod("chol2inv", signature(x = "denseMatrix"),
+	  function (x, ...) chol2inv(as(as(x, "dMatrix"), "dtrMatrix"), ...))
+setMethod("chol2inv", signature(x = "sparseMatrix"),
+	  function (x, ...) {
+	      if(length(list(...)))
+		  warning("arguments in", deparse(list(...)), "are disregarded")
+	      ## for now:
+	      tcrossprod(solve(as(x,"triangularMatrix")))
+	  })
+}# end {if}
 
 ## There are special sparse methods; this is a "fall back":
 setMethod("kronecker", signature(X = "Matrix", Y = "ANY",

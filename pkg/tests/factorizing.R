@@ -311,3 +311,9 @@ p <- new("dtCMatrix", i = c(2L, 3L, 2L, 5L, 4L, 4:5), p = c(0L, 2L, 4:7, 7L),
 	 x = rep.int(-0.5, 7), uplo = "L", diag = "U")
 ip <- solve(p)
 assert.EQ.mat(solve(ip), as(p,"matrix"))
+
+## chol2inv() for a traditional matrix
+assert.EQ.mat(     crossprod(chol2inv(chol(Diagonal(x = 5:1)))),
+              C <- crossprod(chol2inv(chol(    diag(x = 5:1)))))
+stopifnot(all.equal(C, diag((5:1)^-2)))
+## failed in some versions because of a "wrong" implicit generic

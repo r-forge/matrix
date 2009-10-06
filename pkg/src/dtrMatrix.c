@@ -71,7 +71,7 @@ SEXP dtrMatrix_solve(SEXP a)
 
 SEXP dtrMatrix_chol2inv(SEXP a)
 {
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dsyMatrix")));
+    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dpoMatrix")));
     int info, n;
 
     slot_dup(val, a, Matrix_DimSym);
