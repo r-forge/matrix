@@ -63,15 +63,8 @@ setMethod("rcond", signature(x = "dtrMatrix", norm = "missing"),
 	  .Call(dtrMatrix_rcond, x, "O"),
 	  valueClass = "numeric")
 
-if(FALSE) { ## once we have this nicely as implicitGeneric {in base R}
-setMethod("chol2inv", signature(x = "dtrMatrix"),
-	  function (x, ...) {
-	      if(length(list(...)))
-		  warning("arguments in", deparse(list(...)), "are disregarded")
-	      if (x@diag != "N") x <- diagU2N(x)
-	      .Call(dtrMatrix_chol2inv, x)
-	  })
-} else { ## for now: still carry  'size' and 'LINPACK'
+if(getRversion() < "2.10.0" || R.version$`svn rev` < 49944) {
+    ## for now: still carry  'size' and 'LINPACK'
 setMethod("chol2inv", signature(x = "dtrMatrix"),
           function (x, size = NCOL(x), LINPACK = FALSE)
       {
@@ -80,6 +73,14 @@ setMethod("chol2inv", signature(x = "dtrMatrix"),
           if (x@diag != "N") x <- diagU2N(x)
           .Call(dtrMatrix_chol2inv, x)
       })
+} else {## chol2inv() has implicit generic in newer versions of R
+setMethod("chol2inv", signature(x = "dtrMatrix"),
+	  function (x, ...) {
+	      if(length(list(...)))
+		  warning("arguments in", deparse(list(...)), "are disregarded")
+	      if (x@diag != "N") x <- diagU2N(x)
+	      .Call(dtrMatrix_chol2inv, x)
+	  })
 }
 
 setMethod("solve", signature(a = "dtrMatrix", b="missing"),
