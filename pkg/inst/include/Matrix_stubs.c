@@ -499,7 +499,7 @@ M_cholmod_defaults (CHM_CM Common)
     return fun(Common);
 }
 
-extern cholmod_common c;
+/* extern cholmod_common c; */
 
 void attribute_hidden
 M_R_cholmod_error(int status, const char *file, int line, const char *message)
@@ -507,8 +507,12 @@ M_R_cholmod_error(int status, const char *file, int line, const char *message)
 /* NB: keep in sync with R_cholmod_error(), ../../src/chm_common.c */
 
     if(status < 0) {
-	M_cholmod_defaults(&c);/* <--- restore defaults,
-				* as we will not be able to .. */
+/* Note: Matrix itself here calls
+ *	cholmod_defaults(&c);/* <--- restore defaults, as we will not be able to ..
+ *
+ *  Consider defining your own error handler, *and* possibly restoring *your* version
+ *  of the cholmod_common that *you* use.
+ */
 	error("Cholmod error '%s' at file:%s, line %d", message, file, line);
     }
     else
@@ -542,6 +546,7 @@ M_R_cholmod_start(CHM_CM Common)
 /*-- NB: keep in sync with  R_cholmod_l_start() --> ../../src/chm_common.c */
     /* do not allow CHOLMOD printing - currently */
     Common->print_function = NULL;/* was  R_cholmod_printf; /.* Rprintf gives warning */
+/* Consider using your own error handler: */
     Common->error_handler = M_R_cholmod_error;
     return val;
 }

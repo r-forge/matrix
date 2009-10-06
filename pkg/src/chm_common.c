@@ -266,7 +266,7 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x, Rboolean check_Udiag, Rboolean sort
  * Copy the contents of a to an appropriate CsparseMatrix object and,
  * optionally, free a or free both a and its the pointers to its contents.
  *
- * @param a matrix to be converted
+ * @param a  (cholmod_sparse) matrix to be converted
  * @param dofree 0 - don't free a; > 0 cholmod_l_free a; < 0 Free a
  * @param uploT 0 - not triangular; > 0 upper triangular; < 0 lower
  * @param Rkind - vector type to store for a->xtype == CHOLMOD_REAL,

@@ -1,3 +1,15 @@
+2009-10-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* inst/include/Matrix_stubs.c (M_R_cholmod_error): revert (2009-09-18),
+	i.e., no longer restore cholmod_common.
+
+2009-10-05  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/dtrMatrix.c (dtrMatrix_chol2inv): use "dpoMatrix" instead of "dsy"
+
+	* R/dtrMatrix.R: make use of implicit generic for chol2inv() in
+	newer R versions.
+
 2009-09-30  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/CHMfactor.R (solve): fix methods for "ddiMatrix" and "missing" RHS.
