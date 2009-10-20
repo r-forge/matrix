@@ -53,7 +53,7 @@ void CHM_restore_common() {
 	asInteger(findVarInFrame(rho, install("maxrank")));
     c.supernodal_switch =
 	asReal(findVarInFrame(rho, install("supernodal_switch")));
-    c.supernodal = 
+    c.supernodal =
 	asLogical(findVarInFrame(rho, install("supernodal")));
     c.final_asis =
 	asLogical(findVarInFrame(rho, install("final_asis")));
@@ -356,7 +356,7 @@ SEXP chm_sparse_to_SEXP(CHM_SP a, int dofree, int uploT, int Rkind,
  * elements accordingly. Note that later changes to the contents of
  * ans will change the contents of the SEXP.
  *
- * In most cases this function is called through the macro AS_CHM_SP.
+ * In most cases this function is called through the macro AS_CHM_TR().
  * It is unusual to call it directly.
  *
  * @param ans a CHM_TR pointer
@@ -407,7 +407,7 @@ CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x, Rboolean check_Udiag)
 	 * ---- above, and allocate to correct length + Memcpy() here, as in
 	 * Tsparse_diagU2N() */
 	if(cholmod_l_reallocate_triplet((size_t) k, ans, &c))
-	    error(_("as_cholmod_l_triplet(): could not reallocate for internal diagU2N()"
+	    error(_("as_cholmod_triplet(): could not reallocate for internal diagU2N()"
 		      ));
 	a_i = ans->i;
 	a_j = ans->j;
