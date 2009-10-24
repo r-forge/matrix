@@ -528,10 +528,11 @@ setMethod("Ops", signature(e1="dsparseMatrix", e2="nsparseMatrix"),
 ## setMethod("Logic", signature(e1 = "Matrix", e2 = "logical"),
 ##           function(e1, e2) callGeneric(as(e1, "lMatrix"), e2))
 
-setMethod("Logic", signature(e1 = "nMatrix", e2 = "Matrix"),
-	  function(e1, e2) callGeneric(as(e1,"lMatrix"), as(e2, "lMatrix")))
-setMethod("Logic", signature(e1 = "Matrix", e2 = "nMatrix"),
-	  function(e1, e2) callGeneric(as(e1, "lMatrix"),as(e2, "lMatrix")))
+.ll <- function(e1, e2) callGeneric(as(e1,"lMatrix"), as(e2, "lMatrix"))
+setMethod("Logic", signature(e1 = "nMatrix", e2 =  "Matrix"), .ll)
+setMethod("Logic", signature(e1 =  "Matrix", e2 = "nMatrix"), .ll)
+setMethod("Logic", signature(e1 = "nMatrix", e2 = "nMatrix"), .ll)
+rm(.ll)
 
 ### "ANY" here means "any non-Matrix" (since "Ops"(ANY) has already bailout above):
 setMethod("Logic", signature(e1 = "ANY", e2 = "Matrix"),
@@ -721,41 +722,74 @@ for(Mcl in c("lMatrix","nMatrix","dMatrix"))
     new("lgTMatrix", Dim = d, Dimnames = dn, i = i, j = j, x = x)
 }
 
-setMethod("Logic", signature(e1="lgCMatrix", e2="lgCMatrix"),
-	  function(e1, e2) {
-	      d <- dimCheck(e1, e2)
-	      dn <- dimNamesCheck(e1, e2)
-	      ## Very easy case first :
-	      if(identical(e1@i, e2@i) && identical(e1@p, e2@p)) {
-		  e1@x <- callGeneric(e1@x, e2@x)
-		  return(e1)
-	      }
-	      ## else :
+Logic.lCMat <- function(e1, e2, isOR) {
+    d <- dimCheck(e1, e2)
+    dn <- dimNamesCheck(e1, e2)
+    stopifnot(is.logical(isOR))
+    ## Very easy case first :
+    if(identical(e1@i, e2@i) && identical(e1@p, e2@p)) {
+        e1@x <- if(isOR) e1@x | e2@x else e1@x & e2@x
+        return(e1)
+    }
+    ## else :
 
-	      .Call(Tsparse_to_Csparse,
-		    .do.Logic.lsparse(e1, e2, d = d, dn = dn,
-				      isOR = .Generic == "|",
-				      ij1 = .Call(compressed_non_0_ij, e1, TRUE),
-				      ij2 = .Call(compressed_non_0_ij, e2, TRUE)),
-		    FALSE)
+    .Call(Tsparse_to_Csparse,
+          .do.Logic.lsparse(e1, e2, d = d, dn = dn, isOR = isOR,
+                            ij1 = .Call(compressed_non_0_ij, e1, TRUE),
+                            ij2 = .Call(compressed_non_0_ij, e2, TRUE)),
+          FALSE)
+}
+
+m.Logic.lCMat <- function(e1, e2) Logic.lCMat(e1, e2, isOR = .Generic == "|")
+
+Logic.lTMat <- function(e1,e2) {
+    d <- dimCheck(e1, e2)
+    dn <- dimNamesCheck(e1, e2)
+    ## Very easy case first :
+    if(identical(e1@i, e2@i) && identical(e1@j, e2@j)) {
+        e1@x <- callGeneric(e1@x, e2@x)
+        return(e1)
+    }
+    ## else :
+    cld <- getClassDef(class(e1))
+    .do.Logic.lsparse(e1, e2, d = d, dn = dn,
+                      isOR = .Generic == "|",
+                      ij1 = non0ind(e1, cld),
+                      ij2 = non0ind(e2, cld))
+}
+
+setMethod("Logic", signature(e1="lgCMatrix", e2="lgCMatrix"), m.Logic.lCMat)
+
+setMethod("Logic", signature(e1="lgTMatrix", e2="lgTMatrix"), Logic.lTMat)
+
+setMethod("Logic", signature(e1 = "lsCMatrix", e2 = "lsCMatrix"),
+	  function(e1, e2) {
+	      if(e1@uplo == e2@uplo) Logic.lCMat(e1, e2, isOR = .Generic == "|")
+	      else Logic.lCMat(e1, t(e2), isOR = .Generic == "|")
 	  })
 
-setMethod("Logic", signature(e1="lgTMatrix", e2="lgTMatrix"),
-	  function(e1,e2) {
-	      d <- dimCheck(e1, e2)
-	      dn <- dimNamesCheck(e1, e2)
-	      ## Very easy case first :
-	      if(identical(e1@i, e2@i) && identical(e1@j, e2@j)) {
-		  e1@x <- callGeneric(e1@x, e2@x)
-		  return(e1)
+setMethod("Logic", signature(e1 = "ltCMatrix", e2 = "ltCMatrix"),
+	  function(e1, e2) {
+	      if(e1@uplo == e2@uplo) {
+		  if(e1@diag == e2@diag) ## both "N" or both "U" (!)
+		      Logic.lCMat(e1, e2, isOR = .Generic == "|")
+		  else if(e1@diag == "U")
+		      Logic.lCMat(diagU2N(e1), e2, isOR = .Generic == "|")
+		  else ## e1@diag == "N"  *and*	 e2@diag == "U"
+		      Logic.lCMat(e1, diagU2N(e2), isOR = .Generic == "|")
 	      }
-	      ## else :
-	      cld <- getClassDef("lgTMatrix")
-	      .do.Logic.lsparse(e1, e2, d = d, dn = dn,
-				isOR = .Generic == "|",
-				ij1 = non0ind(e1, cld),
-				ij2 = non0ind(e2, cld))
-          })
+	      else {
+		  d <- dimCheck(e1, e2)
+		  ## differing triangle (upper <-> lower):
+		  ## all will be FALSE apart from diagonal
+		  as(.diag2tT(new("ldiMatrix", Dim=d,
+				  x = get(.Generic)(diag(e1), diag(e2))),
+			      uplo = e1@uplo, kind = "l"),
+		     "dtCMatrix")
+	      }
+	  })
+
+
 
 ## Now the other "Ops" for the "lgT" and "lgC" cases:
 setMethod("Arith", signature(e1="lgCMatrix", e2="lgCMatrix"),
@@ -818,27 +852,11 @@ setMethod("Logic", signature(e1="lsparseMatrix", e2="lsparseMatrix"),
 	  })
 
 
-setMethod("Logic", signature(e1 = "lsCMatrix", e2 = "lsCMatrix"),
-	  function(e1, e2) {
-	      Matrix.msg("suboptimal implementation of sparse 'symm. o symm.'")
-	      forceSymmetric(callGeneric(as(e1, "lgCMatrix"),
-					 as(e2, "lgCMatrix")))
-	  })
-
-setMethod("Logic", signature(e1 = "ltCMatrix", e2 = "ltCMatrix"),
-	  function(e1, e2) {
-	      Matrix.msg("suboptimal implementation of sparse 'symm. o symm.'")
-	      forceTriangular(callGeneric(as(e1, "lgCMatrix"),
-					  as(e2, "lgCMatrix")))
-	  })
-
-
-
 ## FIXME: also want (symmetric o symmetric) , (triangular o triangular)
 ## -----
 setMethod("Arith", signature(e1 = "dsCMatrix", e2 = "dsCMatrix"),
 	  function(e1, e2) {
-	      Matrix.msg("suboptimal implementation of sparse 'symm. o symm.'")
+	      Matrix.msg("suboptimal 'Arith' implementation of  'dsC*  o  dsC*'")
 	      forceSymmetric(callGeneric(as(e1, "dgCMatrix"), as(e2, "dgCMatrix")))
 	  })
 

@@ -1,6 +1,8 @@
 ### Testing the group methods  --- some also happens in ./Class+Meth.R
 
 library(Matrix)
+source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
+
 set.seed(2001)
 
 mm <- Matrix(rnorm(50 * 7), nc = 7)
@@ -73,7 +75,9 @@ stopifnot(validObject(lm1), validObject(lm2),
           identical(dsc, as(dsc * as(lm1, "dMatrix"), "dsCMatrix")))
 
 crossprod(lm1) # lm1: "lsC*"
-stopifnot(identical(nm1 %*% nm1, crossprod(nm1))) # + warning
+cnm1 <- crossprod(nm1)
+stopifnot(is(cnm1, "symmetricMatrix"), ## whereas the %*% is not:
+	  Q.eq(cnm1, nm1 %*% nm1))
 dn1 <- as(nm1, "denseMatrix")
 stopifnot(all(dn1 == nm1))
 

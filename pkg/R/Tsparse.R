@@ -519,7 +519,7 @@ replTmat <- function (x, i, j, ..., value)
 	}
 	nr <- di[1]
 	x.i <- .Call(m_encodeInd2, x@i, x@j, di=di)
-	if(any(duplicated(x.i))) { ## == if(is_duplicatedT(x, di = di))
+	if(anyDuplicated(x.i)) { ## == if(is_duplicatedT(x, di = di))
 	    x <- uniqTsparse(x)
 	    x.i <- .Call(m_encodeInd2, x@i, x@j, di=di)
 	}
@@ -546,6 +546,8 @@ replTmat <- function (x, i, j, ..., value)
 		x@j <- x@j[sel]
 		if(has.x)
 		    x@x <- x@x[sel]
+		if(extends(clDx, "compMatrix") && length(x@factors)) # drop cashed ones
+		    x@factors <- list()
 	    }
 	    return(x)
 	}
@@ -568,6 +570,8 @@ replTmat <- function (x, i, j, ..., value)
 	x@j <- c(x@j, i %/% nr)
 	if(has.x)
 	    x@x <- c(x@x, value[!isE])
+	if(extends(clDx, "compMatrix") && length(x@factors)) # drop cashed ones
+	    x@factors <- list()
 	return(x)
     }
     ## nargs() == 4 :
@@ -653,6 +657,8 @@ replTmat <- function (x, i, j, ..., value)
 	    x@j <- x@j[!sel]
             if(has.x)
 		x@x <- x@x[!sel]
+	    if(extends(clDx, "compMatrix") && length(x@factors)) # drop cashed ones
+		x@factors <- list()
 	}
 	return(x)
     }
@@ -674,6 +680,8 @@ replTmat <- function (x, i, j, ..., value)
             if(has.x)
                 x@x <- c(x@x, value)
         }
+	if(extends(clDx, "compMatrix") && length(x@factors)) # drop cashed ones
+	    x@factors <- list()
         return(x)
     }
 
@@ -730,6 +738,8 @@ replTmat <- function (x, i, j, ..., value)
 		x@x <- c(x@x, as.vector(value[iI0[vN0]]))
         }
     }
+    if(extends(clDx, "compMatrix") && length(x@factors)) # drop cashed ones
+	x@factors <- list()
     x
 } ## end{replTmat}
 
@@ -869,6 +879,8 @@ replTmat <- function (x, i, j, ..., value)
 	    x@x <- c(x@x, value[!i.repl])
     }
 
+    if(extends(clDx, "compMatrix") && length(x@factors)) # drop cashed ones
+	x@factors <- list()
     x
 } ## end{.TM.repl.i.2col}
 

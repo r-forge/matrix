@@ -248,12 +248,17 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b)
 	cha = AS_CHM_SP(a),
 	chb = AS_CHM_SP(b),
 	chc = cholmod_l_ssmult(cha, chb, /*out_stype:*/ 0,
-			     cha->xtype, /*out sorted:*/ 1, &c);
+			       /* values:= is_numeric (T/F) */ cha->xtype > 0,
+			       /*out sorted:*/ 1, &c);
     const char *cl_a = class_P(a), *cl_b = class_P(b);
     char diag[] = {'\0', '\0'};
     int uploT = 0;
     SEXP dn = allocVector(VECSXP, 2);
     R_CheckStack();
+
+#ifdef DEBUG_Matrix
+    Rprintf("DBG Csparse_C*_prod(%s, %s)\n", cl_a, cl_b);
+#endif
 
     /* Preserve triangularity and even unit-triangularity if appropriate.
      * Note that in that case, the multiplication itself should happen
@@ -363,6 +368,10 @@ SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet)
     int trip = asLogical(triplet),
 	tr   = asLogical(trans); /* gets reversed because _aat is tcrossprod */
     CHM_TR cht = trip ? AS_CHM_TR(x) : (CHM_TR) NULL;
+/* workaround originally:
+    CHM_TR cht = trip ? AS_CHM_TR__(Tsparse_diagU2N(x)) : (CHM_TR) NULL;
+*/
+
     CHM_SP chcp, chxt,
 	chx = (trip ?
 	       cholmod_l_triplet_to_sparse(cht, cht->nnz, &c) :
