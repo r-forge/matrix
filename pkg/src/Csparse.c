@@ -367,11 +367,11 @@ SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet)
 {
     int trip = asLogical(triplet),
 	tr   = asLogical(trans); /* gets reversed because _aat is tcrossprod */
+#ifdef AS_CHM_DIAGU2N_FIXED_FINALLY
     CHM_TR cht = trip ? AS_CHM_TR(x) : (CHM_TR) NULL;
-/* workaround originally:
+#else /* workaround needed:*/
     CHM_TR cht = trip ? AS_CHM_TR__(Tsparse_diagU2N(x)) : (CHM_TR) NULL;
-*/
-
+#endif
     CHM_SP chcp, chxt,
 	chx = (trip ?
 	       cholmod_l_triplet_to_sparse(cht, cht->nnz, &c) :
