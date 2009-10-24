@@ -308,8 +308,7 @@ replSPvec <- function (x, i, value)
     ## else: lenV := length(value) > 0
     if(lenRepl %% lenV != 0)
 	stop("number of items to replace is not a multiple of replacement length")
-    anyDup <- any(duplicated(ii))
-    if(anyDup) { ## multiple *replacement* indices: last one wins
+    if(anyDuplicated(ii)) { ## multiple *replacement* indices: last one wins
 	## TODO: in R 2.6.0 use	 duplicate(*, fromLast=TRUE)
 	ir <- lenRepl:1
 	keep <- match(ii, ii[ir]) == ir
