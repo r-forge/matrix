@@ -347,3 +347,10 @@
 - determinant(m) should *not* give an error for a singular m;
   no longer does even when German error messages are active (used to look
   at tryCatch()$message; this is *not* feasible)
+
+- <symmetric sparse>  o  <symmetric sparse>  now remains *symmetric*
+
+- <symmetric sparse>   o  <diagonal>  now remains *symmetric*, too
+- <triangular sparse>  o  <diagonal>  now remains *triangular* (mostly)
+
+

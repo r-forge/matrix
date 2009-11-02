@@ -216,10 +216,10 @@ Cmp.Mat.atomic <- function(e1, e2) { ## result will inherit from "lMatrix"
                     r <- as(r, "RsparseMatrix")
             }
         }
-        else { ## non sparse result
+        else { ## non sparse result; triangularity also gone, typically
             lClass <- if(extends(cl1, "symmetricMatrix")) "lsyMatrix" else "lgeMatrix"
             Matrix.msg(sprintf("sparse to dense (%s) coercion in '%s'",
-                               lClass, .Generic))
+                               lClass, .Generic), .M.level = 2)
             rx <- rep(r0, length.out = d[1]*d[2])
 
             ## Here, we assume that 'r' and the indices align (!)
