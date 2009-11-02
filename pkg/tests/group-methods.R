@@ -59,10 +59,14 @@ stopifnot(px@i == c(3,4,1,4),
 ###----- Compare methods ---> logical Matrices ------------
 l3 <- upper.tri(matrix(, 3, 3))
 (ll3 <- Matrix(l3))
+dt3 <- (99* Diagonal(3) + (10 * ll3 + Diagonal(3)))/10
 (dsc <- crossprod(ll3))
 stopifnot(validObject(ll3), validObject(dsc),
           identical(ll3, t(t(ll3))),
-          identical(dsc, t(t(dsc)))
+          identical(dsc, t(t(dsc))),
+          isValid(dsc + 3 * Diagonal(nrow(dsc)), "dsCMatrix"),
+          isValid(dt3, "triangularMatrix"),   # remained triangular
+          isValid(dt3 > 0, "triangularMatrix")# ditto
           )
 
 (lm1 <- dsc >= 1) # now ok
