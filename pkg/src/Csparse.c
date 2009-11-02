@@ -256,7 +256,7 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b)
     SEXP dn = allocVector(VECSXP, 2);
     R_CheckStack();
 
-#ifdef DEBUG_Matrix
+#ifdef DEBUG_Matrix_verbose
     Rprintf("DBG Csparse_C*_prod(%s, %s)\n", cl_a, cl_b);
 #endif
 
