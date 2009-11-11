@@ -253,7 +253,7 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b)
     const char *cl_a = class_P(a), *cl_b = class_P(b);
     char diag[] = {'\0', '\0'};
     int uploT = 0;
-    SEXP dn = allocVector(VECSXP, 2);
+    SEXP dn = PROTECT(allocVector(VECSXP, 2));
     R_CheckStack();
 
 #ifdef DEBUG_Matrix_verbose
@@ -281,6 +281,7 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b)
 		   duplicate(VECTOR_ELT(GET_SLOT(a, Matrix_DimNamesSym), 0)));
     SET_VECTOR_ELT(dn, 1,
 		   duplicate(VECTOR_ELT(GET_SLOT(b, Matrix_DimNamesSym), 1)));
+    UNPROTECT(1);
     return chm_sparse_to_SEXP(chc, 1, uploT, /*Rkind*/0, diag, dn);
 }
 
@@ -294,7 +295,7 @@ SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans)
     const char *cl_a = class_P(a), *cl_b = class_P(b);
     char diag[] = {'\0', '\0'};
     int uploT = 0;
-    SEXP dn = allocVector(VECSXP, 2);
+    SEXP dn = PROTECT(allocVector(VECSXP, 2));
     R_CheckStack();
 
     chTr = cholmod_l_transpose((tr) ? chb : cha, chb->xtype, &c);
@@ -313,11 +314,11 @@ SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans)
 	    }
 	    else diag[0]= 'N';
 	}
-
     SET_VECTOR_ELT(dn, 0,	/* establish dimnames */
 		   duplicate(VECTOR_ELT(GET_SLOT(a, Matrix_DimNamesSym), (tr) ? 0 : 1)));
     SET_VECTOR_ELT(dn, 1,
 		   duplicate(VECTOR_ELT(GET_SLOT(b, Matrix_DimNamesSym), (tr) ? 0 : 1)));
+    UNPROTECT(1);
     return chm_sparse_to_SEXP(chc, 1, uploT, /*Rkind*/0, diag, dn);
 }
 

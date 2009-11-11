@@ -1,3 +1,10 @@
+2009-11-11  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999375-32, CRAN-released:
+
+	* src/Csparse.c (Csparse_Csparse_prod, Csparse_Csparse_crossprod):
+	PROTECT(.) the dimnames; thanks to Kaspar Kristensen
+
 2009-10-24  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Ops.R (Logic.lCMat): to be used for lsC* and ltC* as well,
@@ -46,6 +53,8 @@
 
 2009-10-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* DESCRIPTION (Version): 0.999375-31, CRAN-released: 2009-10-06
+
 	* inst/include/Matrix_stubs.c (M_R_cholmod_error): revert (2009-09-18),
 	i.e., no longer restore cholmod_common. {{M_cholmod_defaults()
 	still seems not usable from lme4's init.c}}
@@ -69,10 +78,6 @@
 2009-09-29  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/AllGeneric.R: rcond is implicit generic in latest versions of R
-
-2009-09-23  Martin Maechler  <maechler@stat.math.ethz.ch>
-
-	* DESCRIPTION (Version): 0.999375-31, CRAN-released: 2009-10-06
 
 2009-09-22  Martin Maechler  <maechler@stat.math.ethz.ch>
 
