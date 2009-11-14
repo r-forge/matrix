@@ -1,4 +1,5 @@
 #include "Mutils.h"
+#include "abIndex.h"
 #include "chm_common.h"
 #include "CHMfactor.h"
 #include "Csparse.h"
@@ -226,6 +227,8 @@ static R_CallMethodDef CallEntries[] = {
 
     CALLDEF(m_encodeInd, 2),
     CALLDEF(m_encodeInd2, 3),
+
+    CALLDEF(Matrix_int_rle, 1),
 
     {NULL, NULL, 0}
 };

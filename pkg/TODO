@@ -203,3 +203,9 @@
 
 - (systematically check that LAPACK-calling functions check for
    0-dimensional input themselves; LAPACK gives an integer error code)
+
+- the  f[,5762] <- thisCol # now ...
+  line in tests/indexing.R uses very large objects unnecessarily;
+  Improve  replTmat()  in R/Tsparse.R, making use of new "abIndex"
+  vectors.
+
