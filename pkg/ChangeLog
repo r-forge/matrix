@@ -1,3 +1,8 @@
+2009-11-14  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/diagMatrix.R (diagOdiag): "exploding" Matrix.msg() only level 2;
+	* tests/indexing.Rout.save: update
+
 2009-11-11  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.999375-32, CRAN-released:

@@ -2,11 +2,15 @@
 
 library(Matrix)
 
-source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
+source(system.file("test-tools.R", package = "Matrix"), keep.source = FALSE)
+##-> identical3() etc
 
 if(interactive()) {
     options(error = recover, warn = 1)
+} else if(FALSE) { ## MM @ testing
+    options(error = recover, Matrix.verbose = TRUE, warn = 1)
 } else options(Matrix.verbose = TRUE, warn = 1)
+
 
 ### Dense Matrices
 
