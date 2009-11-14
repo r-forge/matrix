@@ -1,5 +1,11 @@
 2009-11-14  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* R/AllClass.R: "abIndex" (and "rleDiff") class
+	* R/abIndex.R: with some methods; commit these finally, even if
+	it's mostly unfinished.
+	* src/abIndex.[ch]: new: currently only for .Call(Matrix_int_rle,*)
+	* tests/abIndex-tsts.R: basic consistency checks for "abIndex".
+
 	* R/diagMatrix.R (diagOdiag): "exploding" Matrix.msg() only level 2;
 	* tests/indexing.Rout.save: update
 
