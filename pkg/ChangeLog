@@ -1,3 +1,7 @@
+2009-11-17  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/other-pkgs.R: detach(*, unload) Rgraphviz too
+
 2009-11-14  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/AllClass.R: "abIndex" (and "rleDiff") class
