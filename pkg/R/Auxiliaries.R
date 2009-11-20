@@ -7,6 +7,7 @@ is0  <- function(x) !is.na(x) & x == 0
 isN0 <- function(x)  is.na(x) | x != 0
 ##
 all0 <- function(x) !any(is.na(x)) && all(!x) ## ~= allFalse
+any0 <- function(x) isTRUE(any(x == 0))	      ## ~= anyFalse
 ## These work "identically" for  1 ('==' TRUE)  and 0 ('==' FALSE)
 ##	(but give a warning for "double"  1 or 0)
 ## TODO: C versions of these would be faster
@@ -406,7 +407,7 @@ prMatrix <- function(x, digits = getOption("digits"),
 }
 
 nonFALSE <- function(x) {
-    ## typically used for lMatrices:  (TRUE,NA,FALSE) |-> (TRUE,FALSE)
+    ## typically used for lMatrices:  (TRUE,NA,FALSE) |-> (TRUE,TRUE,FALSE)
     if(any(ix <- is.na(x))) x[ix] <- TRUE
     x
 }
@@ -840,6 +841,8 @@ l2d_meth <- function(x) {
 		"l" = "logical",
 		"n" = "logical",
 		"z" = "complex")
+## the reverse, a "version of" .M.kind(.):
+.kind.type <- names(.type.kind); names(.kind.type) <- as.vector(.type.kind)
 
 .M.shape <- function(x, clx = class(x)) {
     ## 'clx': class() *or* class definition of x

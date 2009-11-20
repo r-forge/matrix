@@ -455,6 +455,26 @@ for(M in list(kt1, nt1, ng1, dg1, lt1, nt1)) {
     }
 }
 
+i1 <- cs. == 1
+cs2 <- cs.
+cs2[i1] <- 0 # failed in *-31 !!
+## now *index* with a NA-sparseVector :
+i2 <- i1 ; i2[3] <- NA ; li2 <- as.logical(i2)
+cs3 <- cs. ;	       cs3 [i2] <- 0
+v3 <- as(cs.,"vector"); v3[li2] <- 0
+cs4 <- cs.	     ; cs4[li2] <- 0
+stopifnot(length(i1@x) == 2, identical(li2, as(i2,"vector")),
+	  identical(cs3, cs4),
+	  cs3 == v3, all(as(v3, "sparseVector") == cs3)
+	  ## indexing simple "numeric" with sparseVector:
+	  ## see 'R_FIXME' in ../R/sparseVector.R
+	  ## , identical(v3[i2], v3[li2])
+	  ## TODO:
+	  ## sub-assigning into simple "numeric" with sparseVector index:
+	  )
+
+
+
 M <- Matrix(c(2:0,1),2); M. <- as(M, "sparseMatrix")
 (N <- as(crossprod(kronecker(diag(2), M)) > 0,
          "nMatrix"))
