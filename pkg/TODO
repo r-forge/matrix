@@ -182,6 +182,7 @@
 
   --> Consider using the new  'dotMethods' functionality to define
       cbind() and rbind() versions that work with Matrix.
+      The "Rmpfr" package does that now.
 
 - In  all(M1 == M2)  for sparse large matrices M1, M2 (e.g. M2 <- M1 !),
   the intermediate 'M1 == M2' typically is dense, hence potentially using

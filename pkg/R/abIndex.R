@@ -54,18 +54,30 @@ setMethod("[", signature(x = "abIndex", i = "index"),
 {
     switch(x@kind,
            "rleDiff" = {
-              ## intIv() in ./sparseVector.R -- not memory-efficient (??)
-	      ii <- intIv(i, n)## ii : 1-based integer indices
-              d <- x@rleD
-              ## Now work with the equivalent of
-              ##   cumsum(c(d@first, rep.int(d@rle$values, d@rle$lengths)))
+               ## intIv() in ./sparseVector.R -- not memory-efficient (??)
+	       n <- length(x)
+               ii <- intIv(i, n)## ii : 1-based integer indices
+               d <- x@rleD
+               ## Now work with the equivalent of
+               ##   cumsum(c(d@first, rep.int(d@rle$values, d@rle$lengths)))
 
-              stop("<abIndex>[i]  is not yet implemented")
+               stop("<abIndex>[i]  is not yet implemented")
            },
-           ## "int32" or "double" -- as it's not rle-packed, just remain simple:
-           x@x[i])
+	   "int32" =, "double" =
+	   ## as it's not rle-packed, can remain simple:
+	   x@x[i])
 })
 
+## Endpoints of all linear stretches -- auxiliary for range(.)
+##' @param x an "rleDiff" object
+
+##' @return numeric vector of end points of all linear stretches of x.
+ends.rleD <- function(x)
+{
+    rl <- x@rle
+    stopifnot(length(lens <- rl$lengths) == (m <- length(vals <- rl$values)))
+    cumsum(c(x@first, lens*vals))
+}
 
 ## Summary: { max, min, range, prod, sum, any, all } :
 ## have  'summGener1' := those without prod, sum
@@ -74,21 +86,32 @@ setMethod("Summary", signature(x = "abIndex", na.rm = "ANY"),
           function(x, ..., na.rm)
 {
     switch(x@kind,
-           "rleDiff" = {
+           "rleDiff" =
+       {
+           d <- x@rleD
+           if(.Generic %in% c("range","min","max")) {
+               callGeneric(ends.rleD(d), ..., na.rm=na.rm)
+           } else { ## "sum", "prod" :
+               switch(.Generic,
+                      "all" = {
+                          ## these often, but *not* always come in pairs
+                          en <- ends.rleD(d)
+                          ## so maybe it does not really help!
 
-              d <- x@rleD
-              ## Now work with the equivalent of
-              ##   cumsum(c(d@first, rep.int(d@rle$values, d@rle$lengths)))
+                          stop("all(<abIndex>) is not yet implemented")
 
-              if(.Generic %in% summGener1) {
-
-              } else { ## "sum", "prod" :
-
-              }
-              stop("not yet implemented")
-           },
-           ## "int32" or "double" -- as it's not rle-packed, just remain simple:
-           callGeneric(x@x, ..., na.rm = na.rm)
+                          ## all(c(d@first, d@rle$values), ..., na.rm=na.rm)
+                      },
+                      "any" = any(c(d@first, d@rle$values), ..., na.rm=na.rm),
+                      "sum" = {
+                          stop("sum(<abIndex>) is not yet implemented")
+                      },
+                      "prod"= {
+                          stop("prod(<abIndex>) is not yet implemented")
+                      })
+           }
+       },
+           "int32" =, "double" = callGeneric(x@x, ..., na.rm = na.rm)
            )
 })
 
@@ -112,9 +135,11 @@ setMethod("Ops", signature(e1 = "abIndex", e2 = "abIndex"),
     }
     switch(e1@kind,
 	   "rleDiff" = {
-               ...
+
 	   },
-	   "int32" =, "double" = ...)
+	   "int32" =, "double" = {
+
+           })
 
 })
 

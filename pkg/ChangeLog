@@ -1,3 +1,21 @@
+2009-11-20  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Ops.R (Ops.spV.spV): enable sparseVector operations in more cases.
+
+	* R/sparseVector.R (is.na): methods defined.
+	* R/sparseVector.R (intIv): also accept "sparseVector"s
+
+	* tests/Simple.R: check the above
+
+2009-11-19  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseVector.R (newSpV, newSpVec): new utility, dropping 0 "on the fly".
+	* R/sparseVector.R (atomic -> sparse*): fix for NA case.
+
+	* R/Ops.R (<spV>): using newSpVec()
+
+	* R/not.R: fix thinko in !<sparseVector>
+
 2009-11-17  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* tests/other-pkgs.R: detach(*, unload) Rgraphviz too

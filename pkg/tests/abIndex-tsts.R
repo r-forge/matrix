@@ -7,9 +7,10 @@ validObject(ab <- new("abIndex"))
 str(ab)
 
 set.seed(1)
-ex. <- list(2:1000, 0:10, sample(100), c(-3:40, 20:70))
+ex. <- list(2:1000, 0:10, sample(100), c(-3:40, 20:70),
+            c(1:100,77L, 50:40, 10L), c(17L, 3L*(12:3)))
 ## we know which kinds will come out: "compressed" for all but random:
-rD <- "rleDiff"; kinds <- c(rD,rD,"int32", rD)
+rD <- "rleDiff"; kinds <- c(rD,rD,"int32", rD, rD, rD)
 isCmpr <- kinds == rD
 ab. <- lapply(ex., as, Class = "abIndex")
 nu. <- lapply(ab., as, Class = "numeric")
@@ -23,8 +24,11 @@ stopifnot(sapply(ab., validObject),
           ## Check that the relevant cases really *are* "compressed":
           sapply(ab., slot, "kind") == kinds,
           ## Using rle(diff(.)) is equivalent to using our C code:
-          identical(rles, r.x)
-          )
+          identical(rles, r.x),
+          ## Checking Group Methods - "Summary" :
+          sapply(ab., range) == sapply(ex., range),
+          sapply(ab., any) == sapply(ex., any),
+          TRUE)
 
 for(n in 1:120) {
     cat(".")
@@ -45,5 +49,3 @@ for(n in 1:120) {
 }
 
 cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
-
-

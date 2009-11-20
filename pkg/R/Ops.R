@@ -1280,7 +1280,7 @@ setMethod("Ops", signature(e1 = "numeric", e2 = "sparseMatrix"),
 ###-------- sparseVector -------------
 ###-------- ============ -------------
 
-## Catch all ( ==> better error message than default):
+## Catch all remaining
 setMethod("Ops", signature(e1 = "sparseVector", e2 = "ANY"),
           function(e1, e2) .bail.out.2(.Generic, class(e1), class(e2)))
 setMethod("Ops", signature(e1 = "ANY", e2 = "sparseVector"),
@@ -1290,7 +1290,7 @@ setMethod("Ops", signature(e1 = "ANY", e2 = "sparseVector"),
 
 ## FIXME:
 ##   2. <spVec>  o  <non-NA numeric>  should also happen directly and
-##                                    |-> sparse for o = {'*', "/", '&&'
+##                                    |-> sparse for o = {'*', "/", '&&', '==', ...
 
 setMethod("Ops", signature(e1 = "sparseVector", e2 = "atomicVector"),
 	  function(e1, e2) {
@@ -1302,11 +1302,10 @@ setMethod("Ops", signature(e1 = "sparseVector", e2 = "atomicVector"),
 			      if(isTRUE(at <- all(r))) # (could be NA)
 				  e1	# result unchanged
 			      else
-				  new("lsparseVector", x = r,
-				      length = e1@length, i = e1@i)
+				  newSpVec("lsparseVector", x = r, e1)
 			  } else {
-			      new(paste0(if(is.integer(r)) "i" else "d", "sparseVector"),
-				  x = r, length = e1@length, i = e1@i)
+			      newSpVec(paste0(if(is.integer(r)) "i" else "d", "sparseVector"),
+				       x = r, e1)
 			  }
 		      } else { # has x slot
 			  r <- callGeneric(e1@x, e2)
@@ -1314,8 +1313,7 @@ setMethod("Ops", signature(e1 = "sparseVector", e2 = "atomicVector"),
 			      e1@x <- r
 			      e1
 			  } else {
-			      new(paste0(.V.kind(r), "sparseVector"),
-				  x = r, length = e1@length, i = e1@i)
+			      newSpVec(paste0(.V.kind(r), "sparseVector"), x = r, e1)
 			  }
 		      }
 		  }
@@ -1336,11 +1334,10 @@ setMethod("Ops", signature(e1 = "atomicVector", e2 = "sparseVector"),
 			      if(isTRUE(at <- all(r))) # (could be NA)
 				  e2	# result unchanged
 			      else
-				  new("lsparseVector", x = r,
-				      length = e2@length, i = e2@i)
+				  newSpVec("lsparseVector", x = r, e2)
 			  } else {
-			      new(paste0(if(is.integer(r)) "i" else "d", "sparseVector"),
-				  x = r, length = e2@length, i = e2@i)
+			      newSpVec(paste0(if(is.integer(r)) "i" else "d", "sparseVector"),
+				       x = r, e2)
 			  }
 		      } else { # has x slot
 			  r <- callGeneric(e1, e2@x)
@@ -1348,8 +1345,7 @@ setMethod("Ops", signature(e1 = "atomicVector", e2 = "sparseVector"),
 			      e2@x <- r
 			      e2
 			  } else {
-			      new(paste0(.V.kind(r), "sparseVector"),
-				  x = r, length = e2@length, i = e2@i)
+			      newSpVec(paste0(.V.kind(r), "sparseVector"), x = r, e2)
 			  }
 		      }
 		  }
@@ -1375,8 +1371,8 @@ Ops.spV.spV <- function(e1, e2) {
 	    stop("longer object length\n\t",
 		 "is not a multiple of shorter object length")
 	if(n == 1) {		  # simple case, do not really recycle
-	    if(n1 < n2) return(callGeneric(sp2vec(e1, "double"), e2))
-	    else	return(callGeneric(e1, sp2vec(e2, "double")))
+	    if(n1 < n2) return(callGeneric(sp2vec(e1), e2))
+	    else	return(callGeneric(e1, sp2vec(e2)))
 	}
 	## else : 2 <= n < N --- recycle the shorter one
 	q <- N %/% n
@@ -1392,20 +1388,37 @@ Ops.spV.spV <- function(e1, e2) {
     }
     ## ---- e1 & e2 now are both of length 'N' ----
 
-    sp <- .setparts(e1@i, e2@i)
-    ## Modify 'e2' and return it :
-    e2@x <- c(callGeneric(e1@x[sp[["ix.only"]]], 0),
-	      callGeneric(0, e2@x[sp[["iy.only"]]]),
-	      callGeneric(e1@x[sp[["mx"]]],
-			  e2@x[sp[["my"]]]))
-    e2@i <- c(sp[["x.only"]], sp[["y.only"]], sp[["int"]])
-    e2
-}
+    ## First check the (0  o  0) result
+    if(is0(r00 <- callGeneric(as0(e1@x), as0(e2@x)))) { ## -> sparseVector
+	sp <- .setparts(e1@i, e2@i)
+	## Idea: Modify 'e2' and return it :
+	new.x <- c(callGeneric(e1@x[sp[["ix.only"]]], 0),
+		   callGeneric(0, e2@x[sp[["iy.only"]]]),
+		   callGeneric(e1@x[sp[["mx"]]],
+			       e2@x[sp[["my"]]]))
+	i. <- c(sp[["x.only"]], sp[["y.only"]], sp[["int"]])
+	cl2x <- typeof(e2@x) ## atomic "class"es - can use in is(), as(), too:
+	if(is(new.x, cl2x)) {
+	    e2@x <- as(new.x, cl2x)
+	    e2@i <- i.
+	    e2
+	} else {
+	    newSpV(paste0(.kind.type[typeof(new.x)],"sparseVector"),
+		   x = new.x, i = i., length = e2@length)
+	}
+    } else { ## 0 o 0  is NOT in {0 , FALSE} --> "dense" result
+	callGeneric(sp2vec(e1),	 sp2vec(e2))
+    }
+} ## {Ops.spV.spV}
+
+## try to use it in all cases
+setMethod("Ops", signature(e1 = "sparseVector", e2 = "sparseVector"),
+	  Ops.spV.spV)
+## was    function(e1, e2) .bail.out.2(.Generic, class(e1), class(e2)))
 
 setMethod("Arith", signature(e1 = "sparseVector", e2 = "sparseVector"),
 	  function(e1, e2) callGeneric(as(e1, "dsparseVector"),
 				       as(e2, "dsparseVector")))
-
 setMethod("Arith", signature(e1 = "dsparseVector", e2 = "dsparseVector"),
 	  Ops.spV.spV)
 
