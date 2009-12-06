@@ -1,3 +1,19 @@
+2009-12-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): *-33
+
+	* R/Ops.R (Compare<Csp><Csp>): fix case with NA x.
+
+	* R/not.R: fix "typo" in !<sparseVector>
+
+	* R/Ops.R (Ops.spV.spV): fix thinko
+
+2009-12-05  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseVector.R: setAs(nsparseV*, lsparseV*) etc
+
+	* R/Ops.R (Ops.spM.spV, Ops.spV.spM): sparseVec. o sparseMat.
+
 2009-11-20  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Ops.R (Ops.spV.spV): enable sparseVector operations in more cases.
