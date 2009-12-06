@@ -210,3 +210,4 @@
   Improve  replTmat()  in R/Tsparse.R, making use of new "abIndex"
   vectors.
 
+- <sparseMatrix>  op  <sparseVector>  is desirable to work
