@@ -19,3 +19,4 @@ LicenseDetails: The Matrix package includes libraries AMD, CHOLMOD,
  COLAMD, CSparse and SPQR from the SuiteSparse collection of Tim
  Davis.  All sections of that code are covered by the GPL or LGPL
  licenses.  See the directory doc/UFsparse for details.
+URL: http://Matrix.R-forge.R-project.org/
