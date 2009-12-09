@@ -104,7 +104,9 @@ isValid(ddv <- rowSums(ddsc, sparse=TRUE), "sparseVector")
 sv <- colSums(kC <- kronecker(mC,kronecker(mC,mC)), sparse=TRUE)
 EQ <- ddv == rowSums(ddsc)
 na.ddv <- is.na(ddv)
+sM <- Matrix(pmax(0, round(rnorm(50*15, -1.5), 2)), 50,15)
 stopifnot(sv == colSums(kC), is.na(as.vector(ddv)) == na.ddv,
+          isValid(sM/(-7:7), "CsparseMatrix"),
 	  all(EQ | na.ddv))
 
 ## Just for print "show":
