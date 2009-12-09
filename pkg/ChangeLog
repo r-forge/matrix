@@ -1,6 +1,13 @@
+2009-12-09  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Ops.R (A.n.M, A.n.M): <sparseMatrix> o <numeric> : remain
+	sparse also when *majority* (instead of all) of   0 o v  is 0.
+
+	* tests/group-methods.R: test one such case.
+
 2009-12-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): *-33
+	* DESCRIPTION (Version): 0.999375-33, CRAN-released:
 
 	* R/Ops.R (Compare<Csp><Csp>): fix case with NA x.
 
@@ -49,7 +56,7 @@
 
 2009-11-11  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 0.999375-32, CRAN-released:
+	* DESCRIPTION (Version): 0.999375-32, CRAN-released: 2009-11-20
 
 	* src/Csparse.c (Csparse_Csparse_prod, Csparse_Csparse_crossprod):
 	PROTECT(.) the dimnames; thanks to Kaspar Kristensen

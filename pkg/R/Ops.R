@@ -1009,7 +1009,7 @@ A.M.n <- function(e1, e2) {
     if((l2 <- length(e2)) == 0)
 	stop("<Matrix> ",.Generic," ", class(e2),"(0) is undefined")
     f0 <- callGeneric(0, e2)
-    if(all(is0(f0))) { ## remain sparse
+    if(mean(is0(f0)) > 7/8) { ## remain sparse ['7/8' is *somewhat* arbitrary]
 	if(l2 > 1) {   # length(e2) > 1 : "recycle" e2 "carefully"
 	    n <- prod(d <- dim(e1))
 	    if(n < l2)
@@ -1045,7 +1045,7 @@ A.n.M <- function(e1, e2) {
     if((l1 <- length(e1)) == 0)
 	stop(class(e2),"(0) ",.Generic," <Matrix> is undefined")
     f0 <- callGeneric(e1, 0)
-    if(all(is0(f0))) { ## remain sparse
+    if(mean(is0(f0)) > 7/8) { ## remain sparse ['7/8' is *somewhat* arbitrary]
 	if(l1 > 1) {   # length(e1) > 1 : "recycle" e1 "carefully"
 	    n <- prod(d <- dim(e2))
 	    if(n < l1)
