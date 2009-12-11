@@ -136,7 +136,10 @@ setAs("TsparseMatrix", "sparseVector",
       function(from) {
 	  d <- dim(from)
 	  n <- prod(d) # -> numeric, no integer overflow
-	  kind <- .M.kind(from)
+          cld <- getClassDef(class(from))
+	  kind <- .M.kind(from, cl = cld)
+	  if(extends(cld, "symmetricMatrix"))
+	      from <- as(from, "generalMatrix")
 	  if(is_duplicatedT(from, di = d))
 	      from <- uniqTsparse(from)
 	  r <- new(paste0(kind, "sparseVector"), length = n)

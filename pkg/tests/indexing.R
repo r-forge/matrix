@@ -151,6 +151,17 @@ for(n in 1:50) {
     assert.EQ.mat(Tii, ss[i,i])
 }
 
+b <- diag(1:2)[,c(1,1,2,2)]
+cb <- crossprod(b)
+cB <- crossprod(Matrix(b, sparse=TRUE))
+a <- matrix(0, 6, 6)
+a[1:4, 1:4] <- cb
+A1 <- A2 <- Matrix(0, 6, 6)#-> sparse
+A1[1:4, 1:4] <- cb
+A2[1:4, 1:4] <- cB
+assert.EQ.mat(A1, a)# indeed
+stopifnot(identical(A1, A2), is(A1, "dsCMatrix"))
+
 ## repeated ones ``the challenge'' (to do smartly):
 j <- c(4, 4, 9, 12, 9, 4, 17, 3, 18, 4, 12, 18, 4, 9)
 assert.EQ.mat(T[j,j], ss[j,j])
