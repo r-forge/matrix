@@ -1,3 +1,11 @@
+2009-12-11  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseVector.R (TsparseM* -> sparseV): symmetricMatrix needs to
+	be expanded.  This fixes a bug reported by Yu-Sung Su.
+	* tests/indexing.R: testing the fix.
+
+	* inst/test-tools.R (all.equalX): new util
+
 2009-12-09  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Ops.R (A.n.M, A.n.M): <sparseMatrix> o <numeric> : remain
