@@ -13,12 +13,13 @@ importFrom("methods", Ops, Arith, Compare, Logic, Math, Math2, Summary, Complex)
 
 ## Generics and functions defined in this package
 export("Cholesky",
-       "Diagonal", ".symDiagonal",
+       "Diagonal", ".symDiagonal", ".sparseDiagonal",
        "Hilbert",
        "Matrix",
        "spMatrix",
        "sparseMatrix",
        "Schur",
+       "abIseq", "abIseq1",
        "band",
        "bandSparse",
        "bdiag",
@@ -216,6 +217,7 @@ exportMethods(## for both own and "other" generics:
 	      "as.matrix",
 	      "as.vector",
 	      "as.numeric",
+	      "as.integer",
 	      "as.logical",
 	      "band",
 	      "chol",
@@ -285,3 +287,4 @@ exportMethods("rbind2")
 exportMethods("cbind2")
 
 S3method(print, sparseSummary)
+S3method(c, abIndex)# < for now -- S4 method on c() seems "difficult"

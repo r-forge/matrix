@@ -1,5 +1,5 @@
 
-R version 2.10.1 RC (2009-12-06 r50681)
+R version 2.10.1 Patched (2009-12-17 r50777)
 Copyright (C) 2009 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -247,6 +247,17 @@ Formal class 'dgTMatrix' [package "Matrix"] with 6 slots
 +               identical(t(Tii), t(T)[i,i]))
 +     assert.EQ.mat(Tii, ss[i,i])
 + }
+> 
+> b <- diag(1:2)[,c(1,1,2,2)]
+> cb <- crossprod(b)
+> cB <- crossprod(Matrix(b, sparse=TRUE))
+> a <- matrix(0, 6, 6)
+> a[1:4, 1:4] <- cb
+> A1 <- A2 <- Matrix(0, 6, 6)#-> sparse
+> A1[1:4, 1:4] <- cb
+> A2[1:4, 1:4] <- cB
+> assert.EQ.mat(A1, a)# indeed
+> stopifnot(identical(A1, A2), is(A1, "dsCMatrix"))
 > 
 > ## repeated ones ``the challenge'' (to do smartly):
 > j <- c(4, 4, 9, 12, 9, 4, 17, 3, 18, 4, 12, 18, 4, 9)
@@ -1255,7 +1266,7 @@ attr(,"package")
 + 	  identical(thCol,  fx[,5762]))
 > 
 > cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
-Time elapsed:  18.403 0.797 19.309 0 0 
+Time elapsed:  18.785 0.755 19.704 0 0 
 > ##
 > cat("checkMatrix() of all: \n---------\n")
 checkMatrix() of all: 
@@ -1270,6 +1281,10 @@ A
 A. 
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 A.ii 
+suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
+A1 
+suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
+A2 
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 Aii 
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
@@ -1322,6 +1337,8 @@ diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ltTMatrix to lgTMatrix
 TG 
 Tii 
+suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
+cB 
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 cI 
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
@@ -1388,7 +1405,7 @@ suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 x.x. 
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 > cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
-Time elapsed:  12.239 0.29 12.535 0 0 
+Time elapsed:  12.787 0.296 13.112 0 0 
 > 
 > if(!interactive()) warnings()
 NULL
