@@ -1,3 +1,39 @@
+2009-12-21  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllClass.R: abIndex@x and rleDiff@first are now "numLike",
+	such that also logical can be converted to "abIndex".
+
+	* R/abIndex.R (.diff): new utility, used in num2abI()
+
+2009-12-19  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/abIndex.c: include new
+	* src/t_Matrix_rle.c (Matrix_RLE_): is template for
+	Matrix_rle_i() and Matrix_rle_d(); now obeys a 'force' argument.
+
+	* R/abIndex.R: implement <Arith> methods, at least with scalars.
+	(all.equal.abI): add also all.equal() methods.
+
+	* tests/abIndex-tsts.R: testing <Arith>, using all.equal().
+
+	* R/AllClass.R: classUnion  "numLike" := {"numeric", "logical"}
+
+2009-12-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/abIndex.c (Matrix_int_rle): UNPROTECT() needed in trivial case.
+
+	* R/abIndex.R (abIseq1, abIseq): new functions for building
+	"abIndex" vectors.
+
+	* tests/abIndex-tsts.R (tst.c.abI): test new c("<abIndex>") method.
+
+	* DESCRIPTION (Version): 0.999375-34, CRAN-released:
+
+	* R/Ops.R: use prod(d) instead of d[1]*d[2], as the latter may
+	integer overflow; fixes  <large sparseMatrix>  o  <sparseVector>
+
+	* tests/Simple.R: test that.
+
 2009-12-11  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/sparseVector.R (TsparseM* -> sparseV): symmetricMatrix needs to
@@ -15,7 +51,7 @@
 
 2009-12-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 0.999375-33, CRAN-released:
+	* DESCRIPTION (Version): 0.999375-33, CRAN-released: 2009-12-11
 
 	* R/Ops.R (Compare<Csp><Csp>): fix case with NA x.
 
