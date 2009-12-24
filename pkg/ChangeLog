@@ -1,3 +1,23 @@
+2009-12-23  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/indexing.R: slightly adapt to the very slight [] changes.
+	* inst/test-tools.R (Q.C.identical): + checkClass
+
+	* R/Tsparse.R ([-methods): for now go via "Csparse" and drop
+	all the sophisticated code dealing with the many cases.
+
+	* R/Csparse.R (subCsp_cols, etc): faster [i,j] via matrix
+	multiplication, thanks to suggestions by Greg Jorstad.
+
+	* R/Auxiliaries.R (paste0): more use of paste0()
+
+2009-12-22  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/diagMatrix.R (.sparseDiagonal): made more general, allowing
+	to directly build the equivalent of   Diagonal(n)[, j]
+
+	* man/Diagonal.Rd: document .sparseDiagonal() as well.
+
 2009-12-21  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/AllClass.R: abIndex@x and rleDiff@first are now "numLike",

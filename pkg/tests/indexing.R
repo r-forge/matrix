@@ -145,9 +145,10 @@ N <- nrow(T)
 set.seed(11)
 for(n in 1:50) {
     i <- sample(N, max(2, sample(N,1)), replace = FALSE)
-    validObject(Tii <- T[i,i])
+    validObject(Tii <- T[i,i]) ; tTi <- t(T)[i,i]
     stopifnot(is(Tii, "dsTMatrix"), # remained symmetric Tsparse
-              identical(t(Tii), t(T)[i,i]))
+	      is(tTi, "dsTMatrix"), # may not be identical when *sorted* differently
+	      identical(as(t(Tii),"CsparseMatrix"), as(tTi,"CsparseMatrix")))
     assert.EQ.mat(Tii, ss[i,i])
 }
 
@@ -200,11 +201,10 @@ stopifnot(dim(mC[numeric(0), ]) == c(0,20), # used to give warnings
           identical(mC[, integer(0)], mC[, FALSE]))
 validObject(print(mT[,c(2,4)]))
 stopifnot(all.equal(mT[2,], mm[2,]),
-          ## row or column indexing in combination with t() :
-          identical(mT[2,], t(mT)[,2]),
-          identical(mT[-2,], t(t(mT)[,-2])),
-          identical(mT[c(2,5),], t(t(mT)[,c(2,5)]))
-          )
+	  ## row or column indexing in combination with t() :
+	  Q.C.identical(mT[2,], t(mT)[,2]),
+	  Q.C.identical(mT[-2,], t(t(mT)[,-2])),
+	  Q.C.identical(mT[c(2,5),], t(t(mT)[,c(2,5)])) )
 assert.EQ.mat(mT[4,, drop = FALSE], mm[4,, drop = FALSE])
 stopifnot(identical3(mm[,1], mC[,1], mT[,1]),
 	  identical3(mm[3,], mC[3,], mT[3,]),
