@@ -265,6 +265,7 @@ R_init_Matrix(DllInfo *dll)
     RREGDEF(cholmod_l_allocate_triplet);
     RREGDEF(cholmod_l_analyze);
     RREGDEF(cholmod_l_analyze_p);
+    RREGDEF(cholmod_l_band_inplace); 
     RREGDEF(cholmod_l_change_factor);
     RREGDEF(cholmod_l_copy);
     RREGDEF(cholmod_l_copy_dense);
