@@ -355,3 +355,5 @@
 
 - <sparseMatrix>  o  <sparseVector>  are implemented now.
 
+- sparse.model.matrix( ... ) now works (again!) for lme4a's InstEval data.
+
