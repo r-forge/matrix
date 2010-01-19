@@ -39,9 +39,9 @@ spqr(x, ...)
 }
 \section{Methods}{
   \describe{
-    \item{x = "dgCMatrix"}{ ~~describe this method here }
-    \item{x = "CsparseMatrix"}{ ~~describe this method here }
-    \item{x = "TsparseMatrix"}{ ~~describe this method here }
+    \item{x = "dgCMatrix"}{ ... }
+    \item{x = "CsparseMatrix"}{ ... }
+    \item{x = "TsparseMatrix"}{ ... }
   }
 }
 \references{\url{http://www.cise.ufl.edu/research/sparse/SPQR/} has
