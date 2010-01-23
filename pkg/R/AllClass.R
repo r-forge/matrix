@@ -746,10 +746,10 @@ setClass("sparseVector",
              else TRUE
          })
 .validXspVec <- function(object) {
-	     n <- object@length
-	     if(length(object@i) != length(object@x))
-		 "'i' and 'x' differ in length"
-	     else TRUE
+    n <- object@length
+    if(length(object@i) != length(object@x))
+        "'i' and 'x' differ in length"
+    else TRUE
 }
 setClass("dsparseVector",
 	 representation(x = "numeric"), contains = "sparseVector",

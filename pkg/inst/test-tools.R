@@ -531,7 +531,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	    if(do.matrix) {
 		## determinant(<dense>) "fails" for triangular with NA such as
 		## (m <- matrix(c(1:0,NA,1), 2))
-		CatF("det...(): ")
+		CatF("determinant(): ")
 		if(any(is.na(m.m)) && extends(cld, "triangularMatrix"))
 		    Cat(" skipped: is triang. and has NA")
 		else
