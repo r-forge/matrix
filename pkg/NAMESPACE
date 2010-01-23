@@ -23,8 +23,9 @@ export("Cholesky",
        "band",
        "bandSparse",
        "bdiag",
-       "colMeans", "colSums", ## these needed a "..." added
-       "rowMeans", "rowSums",
+## no longer; implicit generics now
+       ## "colMeans", "colSums", ## these needed a "..." added
+       ## "rowMeans", "rowSums",
 ##NOT_YET "det", # = a copy of base::det() but with Matrix namespace
        "drop0",
        "expand",
@@ -35,7 +36,6 @@ export("Cholesky",
 #	 "isDiagonal",
        "isLDL",
        "lu",
-       "norm",
        "nearPD",
        "nnzero",
        "printSpMatrix",
@@ -248,6 +248,7 @@ exportMethods(## for both own and "other" generics:
 	      "length",
               "mean",
 	      "norm",
+              "nnzero",
               "print",# print(x, ...) when show(x) is not sufficient
 	      "qr",
 	      "qr.R",
@@ -282,6 +283,9 @@ if(getRversion() < "2.10.0")# The version of R -- at *install* time (!)
 if(getRversion() < "2.10.0")
     export("xtabs")
 
+if(getRversion() < "2.11.0" || R.version$`svn rev` < 51000)
+    ##                                               ----- FIXME exact number
+    export("norm")
 
 exportMethods("rbind2")
 exportMethods("cbind2")

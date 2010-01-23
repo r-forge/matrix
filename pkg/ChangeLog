@@ -1,3 +1,14 @@
+2010-01-22  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/SparseM-conv.R (setAs(., "matrix.csc")): fix typo in method.
+
+2010-01-20  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllGeneric.R: nnzero() is now generic,
+	* R/nnzero.R: newly containing all nnzero() methods.
+
+	* R/zzz.R (det): assign base::det such that it uses S4 generic kronecker.
+
 2010-01-18  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/spModels.R (contr.poly): [the back-compatible-only version]:

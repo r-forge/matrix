@@ -54,6 +54,9 @@ sparse.model.matrix(~ a + b, dd, contrasts = list(b="contr.SAS"))
 
 ## Sparse method is equivalent to the traditional one :
 stopifnot(isEQsparseDense(~ a + b, dd),
+          isEQsparseDense(~ 0 + a + b, dd),
+	  identical(sparse.model.matrix(~  0 + a + b, dd),
+		    sparse.model.matrix(~ -1 + a + b, dd)),
           isEQsparseDense(~ a + b, dd, contrasts = list(a="contr.sum")),
           isEQsparseDense(~ a + b, dd, contrasts = list(a="contr.SAS")),
 	  ## contrasts as *functions* or contrast *matrices* :
