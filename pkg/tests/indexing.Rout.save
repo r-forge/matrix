@@ -1,6 +1,6 @@
 
-R version 2.10.1 Patched (2009-12-23 r50829)
-Copyright (C) 2009 The R Foundation for Statistical Computing
+R version 2.11.0 Under development (unstable) (2010-01-27 r51053)
+Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -19,7 +19,6 @@ Type 'q()' to quit R.
 > 
 > library(Matrix)
 Loading required package: lattice
-Matrix_NS: <environment: namespace:Matrix>
 > 
 > source(system.file("test-tools.R", package = "Matrix"), keep.source = FALSE)
 > ##-> identical3() etc
@@ -346,7 +345,6 @@ Formal class 'dgTMatrix' [package "Matrix"] with 6 slots
 + 	  Q.C.identical(mT[2,], t(mT)[,2]),
 + 	  Q.C.identical(mT[-2,], t(t(mT)[,-2])),
 + 	  Q.C.identical(mT[c(2,5),], t(t(mT)[,c(2,5)])) )
-+ )
 > assert.EQ.mat(mT[4,, drop = FALSE], mm[4,, drop = FALSE])
 > stopifnot(identical3(mm[,1], mC[,1], mT[,1]),
 + 	  identical3(mm[3,], mC[3,], mT[3,]),
@@ -527,7 +525,7 @@ as(., "nMatrix") giving full nonzero-pattern: ok
 ok
 m >= m for all: ok
 m < m for none: ok
-det...(): ok
+determinant(): ok
 > M <- m0; M[1:3, 3] <- 0 ;M
 5 x 5 diagonal matrix of class "ddiMatrix"
      [,1] [,2] [,3] [,4] [,5]
@@ -557,7 +555,7 @@ as(., "nMatrix") giving full nonzero-pattern: ok
 2*m =?= m+m: ok
 m >= m for all: ok
 m < m for none: ok
-det...(): ok
+determinant(): ok
 > M <- m1; M[1:3, 3] <- 0 ;M
 5 x 5 sparse Matrix of class "dtTMatrix"
               
@@ -574,7 +572,7 @@ as(., "nMatrix") giving full nonzero-pattern: ok
 2*m =?= m+m: identical
 m >= m for all: ok
 m < m for none: ok
-det...(): ok
+determinant(): ok
 .TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
@@ -597,7 +595,7 @@ as(., "nMatrix") giving full nonzero-pattern: ok
 2*m =?= m+m: identical
 m >= m for all: ok
 m < m for none: ok
-det...(): ok
+determinant(): ok
 > M <- m2; M[1:3, 3] <- 0 ;M
 5 x 5 sparse Matrix of class "dtCMatrix"
               
@@ -614,7 +612,7 @@ as(., "nMatrix") giving full nonzero-pattern: ok
 2*m =?= m+m: identical
 m >= m for all: ok
 m < m for none: ok
-det...(): ok
+determinant(): ok
 .TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
@@ -975,7 +973,7 @@ as(., "nMatrix") giving full nonzero-pattern: ok
 2*m =?= m+m: ok
 m >= m for all: ok
 m < m for none: ok
-det...(): ok
+determinant(): ok
 > dm <- Matrix(as.matrix(dm))# -> "dsyMatrix"
 > (s2 <- as(dm, "sparseMatrix"))
 4 x 4 sparse Matrix of class "dsCMatrix"
@@ -992,7 +990,7 @@ as(., "nMatrix") giving full nonzero-pattern: ok
 identical
 m >= m for all: ok
 m < m for none: ok
-det...(): ok
+determinant(): ok
 > stopifnot(is(s2, "symmetricMatrix"),
 + 	  is(st, "symmetricMatrix"))
 > checkMatrix(s.32  <- st[1:3,1:2]) ## 3 x 2 - and *not* dsTMatrix
@@ -1031,7 +1029,7 @@ as(., "nMatrix") giving full nonzero-pattern: ok
 identical
 m >= m for all: ok
 m < m for none: ok
-det...(): ok
+determinant(): ok
 > s2[I,I] <- 0; checkMatrix(s2); stopifnot(is(s2,"symmetricMatrix"))
  norm(m [4 x 4]) : 1  I  F  M  ok
  Summary:  ok
@@ -1040,7 +1038,7 @@ as(., "nMatrix") giving full nonzero-pattern: ok
 identical
 m >= m for all: ok
 m < m for none: ok
-det...(): ok
+determinant(): ok
 > ##
 > m <- as.mat(st)
 >  m[2:1,2:1] <- 4:1
@@ -1267,7 +1265,7 @@ attr(,"package")
 + 	  identical(thCol,  fx[,5762]))
 > 
 > cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
-Time elapsed:  30.481 2.202 32.909 0 0 
+Time elapsed:  45.55 4.052 108.252 0 0 
 > ##
 > cat("checkMatrix() of all: \n---------\n")
 checkMatrix() of all: 
@@ -1409,7 +1407,7 @@ suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 x.x. 
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 > cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
-Time elapsed:  19.965 0.711 20.685 0 0 
+Time elapsed:  31.574 2.532 73.477 0 0 
 > 
 > if(!interactive()) warnings()
 NULL
