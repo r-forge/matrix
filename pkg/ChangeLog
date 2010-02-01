@@ -1,3 +1,8 @@
+2010-01-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Csparse.c (Csparse_crossprod): PROTECT() Tsparse_diagU2N()
+	result, from a suggestion by Andrew Runnalls.
+
 2010-01-22  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/SparseM-conv.R (setAs(., "matrix.csc")): fix typo in method.
