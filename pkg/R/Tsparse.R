@@ -666,12 +666,12 @@ replTmat <- function (x, i, j, ..., value)
 	    }
 	}
     }
-    if(!all(i.repl)) { ## some new entries
-	i.j <- decodeInd(ii.v[!i.repl], nr)
+    if(any(i.new <- !i.repl & isN0(value))) { ## some new entries
+	i.j <- decodeInd(ii.v[i.new], nr)
 	x@i <- c(x@i, i.j[,1])
 	x@j <- c(x@j, i.j[,2])
 	if(has.x)
-	    x@x <- c(x@x, value[!i.repl])
+	    x@x <- c(x@x, value[i.new])
     }
 
     if(extends(clDx, "compMatrix") && length(x@factors)) # drop cashed ones

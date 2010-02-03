@@ -9,7 +9,8 @@ if(interactive()) {
     options(error = recover, warn = 1)
 } else if(FALSE) { ## MM @ testing
     options(error = recover, Matrix.verbose = TRUE, warn = 1)
-} else options(Matrix.verbose = TRUE, warn = 1)
+} else
+options(Matrix.verbose = TRUE, warn = 1)
 
 
 ### Dense Matrices
@@ -380,6 +381,7 @@ assertError(mT[-1:1,])
 
 ## Sub *Assignment* ---- now works (partially):
 mt0 <- mt
+nt <- as(mt, "nMatrix")
 mt[1, 4] <- -99
 mt[2:3, 1:6] <- 0
 mt
@@ -539,9 +541,13 @@ assert.EQ.mat(t2, m)# ok
 assert.EQ.mat(s2, m)# failed in 0.9975-8
 
 
-## m[cbind(i,j)] <- value:
+## m[cbind(i,j)] <- value: (2-column matrix subassignment):
 m.[ cbind(3:5, 1:3) ] <- 1:3
 stopifnot(m.[3,1] == 1, m.[4,2] == 2)
+nt. <- nt ; nt[rbind(2:3, 3:4, c(3,3))] <- FALSE
+s. <- m. ; m.[cbind(3:4,2:3)] <- 0 ## assigning 0 where there *is* 0 ..
+stopifnot(identical(nt.,nt),       ## should not have changed
+	  identical(s., m.))
 x.x[ cbind(2:6, 2:6)] <- 12:16
 stopifnot(isValid(x.x, "dsCMatrix"),
 	  12:16 == as.mat(x.x)[cbind(2:6, 2:6)])
