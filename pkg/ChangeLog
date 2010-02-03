@@ -1,3 +1,8 @@
+2010-02-03  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Tsparse.R (.TM.repl.i.2col): <nsparse>[ <ij> ] <- FALSE fix
+	* tests/indexing.R, *.Rout.save: test that
+
 2010-01-28  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/Csparse.c (Csparse_crossprod): PROTECT() Tsparse_diagU2N()
