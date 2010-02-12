@@ -93,6 +93,15 @@ setMethod("solve", signature(a = "dtrMatrix", b="ddenseMatrix"),
           .Call(dtrMatrix_matrix_solve, a, b),
 	  valueClass = "dgeMatrix")
 
+setMethod("solve", signature(a = "dtrMatrix", b="dMatrix"),
+	  function(a, b, ...)
+	  .Call(dtrMatrix_matrix_solve, a, as(b,"denseMatrix")),
+	  valueClass = "dgeMatrix")
+setMethod("solve", signature(a = "dtrMatrix", b="Matrix"),
+	  function(a, b, ...)
+	  .Call(dtrMatrix_matrix_solve, a, as(as(b, "dMatrix"), "denseMatrix")),
+	  valueClass = "dgeMatrix")
+
 setMethod("solve", signature(a = "dtrMatrix", b="matrix"),
 	  function(a, b, ...)
           .Call(dtrMatrix_matrix_solve, a, b),
