@@ -1,3 +1,8 @@
+2010-02-12  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dtrMatrix.R: add solve(<dtrMatrix>, <dMatrix>): e.g., for
+	 solve(<Cholesky>, <dgCMatrix>) in lme4.
+
 2010-02-09  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.999375-38, CRAN-released: ...
