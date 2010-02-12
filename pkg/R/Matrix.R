@@ -297,13 +297,12 @@ setMethod("determinant", signature(x = "Matrix", logarithm = "missing"),
           function(x, logarithm, ...)
           determinant(x, logarithm = TRUE, ...))
 
-if(FALSE) { ## This is desired "in theory" - but gives
-    ## "The following object(s) are masked from package:base :   det
+## Gives  "The following object(s) are masked from package:base :   det"
+## but is still ``the Right Thing'' to do :
 ## base::det() calls [base::]determinant();
 ## our det() should call our determinant() :
 det <- base::det
-environment(det) <- environment()## == as.environment("Matrix")
-}
+environment(det) <- environment()## == asNamespace("Matrix")
 
 setMethod("Cholesky", signature(A = "Matrix"),
 	  function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
