@@ -1,6 +1,14 @@
+2010-02-09  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999375-38, CRAN-released: ...
+
+	* NAMESPACE, R/AllGeneric.R, R/zzz.R: change det() into a regularly exported
+	function (masking base::det) instead of load-time hack.
+	* man/Matrix-class.Rd: \alias, docu
+
 2010-02-05  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 0.999375-37, CRAN-released: 2010-02-..
+	* DESCRIPTION (Version): 0.999375-37, CRAN-released: 2010-02-05
 
 	* inst/test-tools.R (Qidentical.DN): new
 	(Qidentical): all Qidentical.DN(<dimnames>)

@@ -1,5 +1,5 @@
 
-R version 2.10.1 Patched (2010-02-04 r51101)
+R version 2.10.1 Patched (2010-02-08 r51110)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -19,6 +19,14 @@ Type 'q()' to quit R.
 > 
 > library(Matrix)
 Loading required package: lattice
+
+Attaching package: 'Matrix'
+
+
+	The following object(s) are masked from package:base :
+
+	 det 
+
 > 
 > source(system.file("test-tools.R", package = "Matrix"), keep.source = FALSE)
 > ##-> identical3() etc
@@ -1323,7 +1331,7 @@ attr(,"package")
 + 	  identical(thCol,  fx[,5762]))
 > 
 > cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
-Time elapsed:  18.861 1.002 19.96 0 0 
+Time elapsed:  18.824 1.12 20.144 0 0 
 > ##
 > cat("checkMatrix() of all: \n---------\n")
 checkMatrix() of all: 
@@ -1483,7 +1491,7 @@ suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 x.x. 
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 > cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
-Time elapsed:  13.256 0.371 13.634 0 0 
+Time elapsed:  13.23 0.364 13.703 0 0 
 > 
 > if(!interactive()) warnings()
 NULL
