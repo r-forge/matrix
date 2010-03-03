@@ -1,3 +1,19 @@
+2010-03-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* man/rep2abI.Rd: rep2abI() utility is exported now.
+
+	* R/Csparse.R (subCsp_cols, subCsp_rows, subCsp_ij): dimnames() <-
+	fix for character subsetting.
+
+	* tests/indexing.R: testing it.
+
+2010-02-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/spModels.R (model.spmatrix): warn and coerce to sparseMatrix if
+	result would end up dense (e.g., in case of *no* factors in formula).
+
+	* tests/spModel.matrix.R: test the above.
+
 2010-02-12  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/dtrMatrix.R: add solve(<dtrMatrix>, <dMatrix>): e.g., for
