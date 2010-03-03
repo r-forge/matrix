@@ -1,5 +1,5 @@
 
-R version 2.10.1 Patched (2010-02-08 r51110)
+R version 2.10.1 Patched (2010-02-27 r51193)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -19,6 +19,7 @@ Type 'q()' to quit R.
 > 
 > library(Matrix)
 Loading required package: lattice
+Matrix_NS: <environment: namespace:Matrix>
 
 Attaching package: 'Matrix'
 
@@ -108,16 +109,24 @@ m < m for none: ok
 [1] 25
 > ## Printing sparse colnames:
 > ms <- as(mn,"sparseMatrix")
+> stopifnot(identical(mn["rc", "D"], mn[3,4]), mn[3,4] == 24,
++ 	  identical(mn[, "A"], mn[,1]), mn[,1] == 1:7,
++ 	  identical(mn[c("re", "rb"), "B"], mn[c(5,2), 2]),
++ 	  identical(ms["rc", "D"], ms[3,4]), ms[3,4] == 24,
++ 	  identical(ms[, "A"], ms[,1]), ms[,1] == 1:7,
++ 	  identical(ms[ci <- c("re", "rb"), "B"], ms[c(5,2), 2]),
++ 	  identical(rownames(mn[ci, ]), ci),
++ 	  identical(rownames(ms[ci, ]), ci),
++ 	  identical(colnames(mn[,cj <- c("B","D")]), cj),
++ 	  identical(colnames(ms[,cj]), cj))
+> 
 > ms[sample(28, 20)] <- 0
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 > ms <- t(rbind2(ms, 3*ms))
 > cnam1 <- capture.output(show(ms))[2] ; op <- options("sparse.colnames" = "abb3")
    [[ suppressing 14 column names 'ra', 'rb', 'rc' ... ]]
 > cnam2 <- capture.output(show(ms))[2] ; options(op) # revert
-> stopifnot(identical(mn["rc", "D"], mn[3,4]), mn[3,4] == 24,
-+           identical(mn[, "A"], mn[,1]), mn[,1] == 1:7,
-+           identical(mn[c("re", "rb"), "B"], mn[c(5,2), 2]),
-+ 	  ## sparse printing
+> stopifnot(## sparse printing
 + 	  grep("^ +$", cnam1) == 1, # cnam1 is empty
 + 	  identical(cnam2,
 + 		    paste(" ", paste(rep(rownames(mn), 2), collapse=" "))))
@@ -872,7 +881,7 @@ r5   .   2  4   .  6  .  .
 > mc0 <- mc
 > mt0 <- as(mc0, "TsparseMatrix")
 > m0  <- as(mc0, "matrix")
-> set.seed(1)
+> set.seed(1); options(Matrix.verbose = FALSE)
 > for(i in 1:50) {
 +     mc <- mc0; mt <- mt0 ; m <- m0
 +     ev <- 1:5 %% 2 == round(runif(1))# 0 or 1
@@ -910,6 +919,7 @@ r5  1
 r1  .
 r3  3
 r5  1
+> options(Matrix.verbose = TRUE)
 > 
 > mc # no longer has non-structural zeros
 5 x 7 sparse Matrix of class "dgCMatrix"
@@ -1331,7 +1341,7 @@ attr(,"package")
 + 	  identical(thCol,  fx[,5762]))
 > 
 > cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
-Time elapsed:  18.824 1.12 20.144 0 0 
+Time elapsed:  19.007 0.841 19.973 0 0 
 > ##
 > cat("checkMatrix() of all: \n---------\n")
 checkMatrix() of all: 
@@ -1491,7 +1501,7 @@ suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 x.x. 
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 > cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
-Time elapsed:  13.23 0.364 13.703 0 0 
+Time elapsed:  12.987 0.311 13.312 0 0 
 > 
 > if(!interactive()) warnings()
 NULL

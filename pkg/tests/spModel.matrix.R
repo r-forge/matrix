@@ -16,13 +16,14 @@ mEQ <- function(x,y) {
 }
 
 ##' Is  sparse.model.matrix() giving the "same" as dense model.matrix() ?
-##' @param frml  formula
-##' @param dat   data frame
-
+##'
 ##' @return logical
-isEQsparseDense <-
-    function(frml, dat,
-             showFactors = isTRUE(getOption("verboseSparse")), ...)
+##' @param frml formula
+##' @param dat data frame
+##' @param showFactors
+##' @param ...
+isEQsparseDense <- function(frml, dat,
+                            showFactors = isTRUE(getOption("verboseSparse")), ...)
 {
     ## Author: Martin Maechler, Date: 21 Jul 2009
     stopifnot(inherits(frml, "formula"), is.data.frame(dat))
@@ -51,9 +52,13 @@ op <- options(sparse.colnames = TRUE) # for convenience
 
 sparse.model.matrix(~ a + b, dd, contrasts = list(a="contr.sum"))
 sparse.model.matrix(~ a + b, dd, contrasts = list(b="contr.SAS"))
+xm <-  sparse.model.matrix(~ x, dM) # gives a warning, correctly
+dxm <- Matrix(model.matrix(~ x, dM), sparse=TRUE)
+stopifnot(is(xm, "sparseMatrix"), mEQ(xm, dxm))
 
 ## Sparse method is equivalent to the traditional one :
 stopifnot(isEQsparseDense(~ a + b, dd),
+          suppressWarnings(isEQsparseDense(~ x, dM)),
           isEQsparseDense(~ 0 + a + b, dd),
 	  identical(sparse.model.matrix(~  0 + a + b, dd),
 		    sparse.model.matrix(~ -1 + a + b, dd)),

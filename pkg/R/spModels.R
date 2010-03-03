@@ -417,11 +417,11 @@ is.model.frame <- function(x)
 ##' -- This version uses  'rBind' and returns  X' i.e. t(X) :
 ##' @param trms a "terms" object
 ##' @param mf a data frame, typically resulting from  model.frame()
-##' @param transpose logical indicating if  X' = t(X) {is faster!} or X
-##' 	should be returned
-##' @param drop.unused.levels logical indicating if unused factor levels
-##'	should be dropped
-
+##' @param transpose logical indicating if  X' = t(X) {is faster!}
+##' 	or X should be returned
+##' @param drop.unused.levels logical indicating if unused factor
+##' 	levels should be dropped
+##' @param row.names
 ##' @return sparse matrix (class "dgCMatrix")
 model.spmatrix <- function(trms, mf, transpose=FALSE,
                            drop.unused.levels = TRUE, row.names=TRUE)
@@ -520,6 +520,11 @@ model.spmatrix <- function(trms, mf, transpose=FALSE,
 		   df = sapply(result, ncol),
 		   call = match.call(),
 		   formula = trms)
+    if(!length(indF) && !is(r, "sparseMatrix")) {
+	mmsg <- gettext('explicitly coercing to "sparseMatrix"')
+	warning(if(!any(is.f)) "no factors in formula; ", mmsg)
+	r <- as(r, "CsparseMatrix")
+    }
     if(row.names)
         colnames(r) <- rnames
     if(!transpose) t(r) else r
