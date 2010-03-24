@@ -549,8 +549,8 @@ subset.ij <- function(x, ij) {
 		ij.x <- non0.i(x, cld)
 	    }
 
-	    m1 <- .Call(m_encodeInd, ij.x, di)
-            m2 <- .Call(m_encodeInd, ij -1L, di)
+	    m1 <- .Call(m_encodeInd, ij.x, di, checkBounds = FALSE)
+            m2 <- .Call(m_encodeInd, ij -1L, di, checkBounds = TRUE)
 	    mi <- match(m1, m2, nomatch=0)
 	    mmi <- mi != 0
 	    ## Result:

@@ -23,6 +23,8 @@ rep2abI(x, times)
   \code{\link{abIseq}}, \code{\linkS4class{abIndex}}.
 }
 \examples{
-rep2abI(2:7, 4)
+(ab <- rep2abI(2:7, 4))
+stopifnot(identical(as(ab, "numeric"),
+	   rep(2:7, 4)))
 }
 \keyword{manip}

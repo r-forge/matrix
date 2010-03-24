@@ -1,3 +1,20 @@
+2010-03-24  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Mutils.c (m_encodeInd, do_ii_FILL):
+	coerce ij to integer if necessary; check that ij are within "dim[]"
+	values.  Parametrize do_ii_FILL() to be used in m_encodeInd2() as well:
+	* src/Mutils.c (m_encodeInd2): also check bounds (if desired).
+
+	* tests/indexing.R: test the above.
+
+2010-03-19  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/dgeMatrix.c (dgeMatrix_solve): compute the recip.cond.number
+	and also bail out for *computational* singularity {as "base R"
+	does}, from (code) suggestion by Daniel Sabanés Bové.
+
+	* tests/dg_Matrix.R: "test" the above.
+
 2010-03-01  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* man/rep2abI.Rd: rep2abI() utility is exported now.

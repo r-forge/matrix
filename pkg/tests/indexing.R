@@ -213,8 +213,12 @@ for(n in 1:100) {
 
 
 stopifnot(all.equal(mC[,3], mm[,3]),
+	  identical(mC[ij], mC[ij + 0.4]),
 	  identical(mC[ij], mm[ij]),
 	  identical(mC[iN], mm[iN]))
+## out of bound indexing must be detected:
+assertError(mC[cbind(ij[,1] - 5, ij[,2])])
+assertError(mC[cbind(ij[,1],     ij[,2] + ncol(mC))])
 
 assert.EQ.mat(mC[7, , drop=FALSE], mm[7, , drop=FALSE])
 identical    (mC[7,   drop=FALSE], mm[7,   drop=FALSE]) # *vector* indexing

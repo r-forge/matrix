@@ -273,7 +273,7 @@ replCmat <- function (x, i, j, ..., value)
         ## need indices instead of just 'sel', for, e.g.,  A[2:1, 2:1] <- v
 	non0 <- cbind(match(x@i[sel], i1),
 		      match(xj [sel], i2)) - 1L
-	iN0 <- 1L + .Call(m_encodeInd, non0, di = dind)
+	iN0 <- 1L + .Call(m_encodeInd, non0, di = dind, checkBounds = FALSE)
 
         has0 <-
             if(spV) length(value@i) < lenV else any(value[!is.na(value)] == 0)

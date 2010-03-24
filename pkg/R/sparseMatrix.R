@@ -428,7 +428,8 @@ printSpMatrix <- function(x, digits = getOption("digits"),
 	## show only "structural" zeros as 'zero.print', not all of them..
 	## -> cannot use 'm'
         d <- dim(cx)
-	ne <- length(iN0 <- 1L + .Call(m_encodeInd, non0ind(x, cld), di = d))
+	ne <- length(iN0 <- 1L + .Call(m_encodeInd, non0ind(x, cld),
+				       di = d, FALSE))
 	if(0 < ne && (logi || ne < prod(d))) {
 	    if(logi) {
 		cx[m] <- "|"
@@ -447,7 +448,7 @@ printSpMatrix <- function(x, digits = getOption("digits"),
 			ij <- rbind(ij, ij[notdiag, 2:1], deparse.level=0)
 			F. <-	  c(F., F.[notdiag])
 		    }
-		    iN0 <- 1L + .Call(m_encodeInd, ij, di = d)
+		    iN0 <- 1L + .Call(m_encodeInd, ij, di = d, FALSE)
 		    cx[iN0[F.]] <- ":" # non-structural FALSE (or "o", "," , "-" or "f")?
 		}
 	    }
