@@ -316,10 +316,10 @@ replTmat <- function (x, i, j, ..., value)
 		       cl," to ",class(x))
 	}
 	nr <- di[1]
-	x.i <- .Call(m_encodeInd2, x@i, x@j, di=di)
+	x.i <- .Call(m_encodeInd2, x@i, x@j, di=di, FALSE)
 	if(anyDuplicated(x.i)) { ## == if(is_duplicatedT(x, di = di))
 	    x <- uniqTsparse(x)
-	    x.i <- .Call(m_encodeInd2, x@i, x@j, di=di)
+	    x.i <- .Call(m_encodeInd2, x@i, x@j, di=di, FALSE)
 	}
 
 	if(is.logical(i)) { # full-size logical indexing
@@ -509,7 +509,7 @@ replTmat <- function (x, i, j, ..., value)
 	## the 0-based indices of non-zero entries -- WRT to submatrix
 	non0 <- cbind(match(x@i[sel], i1),
 		      match(x@j[sel], i2)) - 1L
-	iN0 <- 1L + .Call(m_encodeInd, non0, di = dind)
+	iN0 <- 1L + .Call(m_encodeInd, non0, di = dind, FALSE)
 
 	## 1a) replace those that are already non-zero with non-0 values
 	vN0 <- isN0(as.vector(value[iN0]))
@@ -653,7 +653,7 @@ replTmat <- function (x, i, j, ..., value)
 	clDx <- getClassDef(clx <- class(x))
     }
 
-    ii.v <- .Call(m_encodeInd, i - 1L, di)# 0-indexing
+    ii.v <- .Call(m_encodeInd, i - 1L, di, checkBounds = TRUE)# 0-indexing
     if(any(d <- duplicated(rev(ii.v)))) { # reverse: "last" duplicated FALSE
 	warning("duplicate ij-entries in 'Matrix[ ij ] <- value'; using last")
 	nd <- !rev(d)
@@ -661,7 +661,7 @@ replTmat <- function (x, i, j, ..., value)
 	ii.v  <- ii.v [nd]
 	value <- value[nd]
     }
-    ii.x <- .Call(m_encodeInd2, x@i, x@j, di)
+    ii.x <- .Call(m_encodeInd2, x@i, x@j, di, FALSE)
     m1 <- match(ii.v, ii.x)
     i.repl <- !is.na(m1) # those that need to be *replaced*
 

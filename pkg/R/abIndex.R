@@ -623,3 +623,36 @@ setMethod("all.equal", c(target = "numLike", current = "abIndex"),
 
 ## Then I want something like  get.ind.sel(.)  [ ./Tsparse.R ] working,
 ## i.e. possibly   match(i, <abI>, nomatch = 0)
+
+setAs("seqMat", "numeric", function(from)
+  {
+      do.call(c, lapply(seq_len(ncol(from)), function(j)
+                        seq(from=from[1L,j], to = from[2L,j])))
+  })
+
+setAs("numeric", "seqMat",
+      function(from) as(as(from, "abIndex"), "seqMat"))
+
+setAs("abIndex", "seqMat", function(from)
+  {
+      n <- length(from)
+      d <- from@rleD
+      va <- d@rle$values
+      le <- d@rle$lengths
+      m <- length(le)
+      ## Now work the 'ends' are  cumsum(c(d@first, le * va))
+      ## we need to care for the "length 1" stretches:
+      if(any(nonPair <- le[2* seq_len(m2 <- m %/% 2)] != 1)) {
+
+          ## an "easy" (but not so efficient when 'm' is "large")
+          ## way would be to "make these" into pairs, then work for that case...
+      }
+      ## use ~/R/MM/Pkg-ex/Matrix/abIndex-experi.R for trying things ...
+
+      stop("<abIndex>  -->  <seqMat>  is not yet implemented")
+  })
+
+setAs("seqMat", "abIndex", function(from)
+  {
+      stop("<seqMat>  -->  <abIndex>  is not yet implemented")
+  })
