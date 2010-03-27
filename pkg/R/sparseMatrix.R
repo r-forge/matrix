@@ -358,6 +358,7 @@ printSpMatrix <- function(x, digits = getOption("digits"),
 {
     stopifnot(extends(cld, "sparseMatrix"))
     validObject(x) # have seen seg.faults for invalid objects
+    x.orig <- x # to be returned
     d <- dim(x)
     if(is.Udiag <- (extends(cld, "triangularMatrix") && x@diag == "U")) {
 	if(extends(cld, "CsparseMatrix"))
@@ -485,7 +486,7 @@ printSpMatrix <- function(x, digits = getOption("digits"),
         cx <- cbind(cx, col.trailer, deparse.level = 0)
     ## right = TRUE : cheap attempt to get better "." alignment
     print(cx, quote = FALSE, right = TRUE, max = maxp)
-    invisible(x)
+    invisible(x.orig)
 } ## printSpMatrix()
 
 printSpMatrix2 <- function(x, digits = getOption("digits"),

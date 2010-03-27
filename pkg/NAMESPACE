@@ -274,6 +274,7 @@ exportMethods(## for both own and "other" generics:
 	      "triu",
               "unname",
               "update",
+              "which",
 	      "zapsmall"
 	      )
 

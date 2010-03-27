@@ -3,8 +3,11 @@
 
 ## Need to consider NAs ;  "== 0" even works for logical & complex:
 ## Note that "!x" is faster than "x == 0", but does not (yet!) work for complex
+## if we did these in C, would gain a factor 2 (or so):
 is0  <- function(x) !is.na(x) & x == 0
 isN0 <- function(x)  is.na(x) | x != 0
+is1  <- function(x) !is.na(x) & x   # also == "isTRUE componentwise"
+
 ##
 all0 <- function(x) !any(is.na(x)) && all(!x) ## ~= allFalse
 any0 <- function(x) isTRUE(any(x == 0))	      ## ~= anyFalse
@@ -1212,8 +1215,10 @@ setZero <- function(x) {
 }
 
 ##' Compute the three "parts" of two sets:
-##' @param x  arbitrary vector; possibly with duplicated values,
-##' @param y  (ditto)
+##' @param x arbitrary vector; possibly with duplicated values,
+##' @param y (ditto)
+##' @param uniqueCheck
+##' @param check
 ##'
 ##' @return list(x.only = setdiff(x,y),
 ##'              y.only = setdiff(y,x),
