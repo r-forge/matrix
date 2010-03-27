@@ -1,4 +1,28 @@
+2010-03-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (printSpMatrix): ensure returning original argument
+
+2010-03-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseVector.R (coercion from TsparseMatrix): diagU2N() when
+	needed.
+
+	* inst/test-tools.R (checkMatrix): explicit which() test for
+	"l" and "nMatrix".  New sparseVector (coercion "and back") check.
+
+2010-03-25  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/lMatrix.R (which): define methods for which(<[ln]Matrix>).
+
+	* inst/test-tools.R (Q.eq.symmpart): new utility, now called in
+	 checkMatrix().
+
+	* R/nearPD.R: use symmpart() for non-symmetric x
+	* man/nearPD.Rd: improve title
+
 2010-03-24  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/colSums.R (.diag.Mean): define methods for "diagonalMatrix"
 
 	* src/Mutils.c (m_encodeInd, do_ii_FILL):
 	coerce ij to integer if necessary; check that ij are within "dim[]"
