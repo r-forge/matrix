@@ -452,7 +452,7 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
     CHM_FR L;
     double one[] = {1,0}, zero[] = {0,0};
     const char *nms[] = {"L", "a_x", "coef", ""};
-    SEXP val = PROTECT(Matrix_make_named(VECSXP, nms));
+    SEXP ans = PROTECT(Matrix_make_named(VECSXP, nms));
     R_CheckStack();
 
     if (cx->ncol < cx->nrow || cx->ncol <= 0)
