@@ -451,7 +451,8 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
     CHM_DN cy = AS_CHM_DN(coerceVector(y, REALSXP)), rhs, cAns;
     CHM_FR L;
     double one[] = {1,0}, zero[] = {0,0};
-    SEXP ans = PROTECT(allocVector(VECSXP, 3));
+    const char *nms[] = {"L", "a_x", "coef", ""};
+    SEXP val = PROTECT(Matrix_make_named(VECSXP, nms));
     R_CheckStack();
 
     if (cx->ncol < cx->nrow || cx->ncol <= 0)
@@ -474,7 +475,7 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
     Memcpy(REAL(VECTOR_ELT(ans, 1)), (double*)(cAns->x), cx->nrow);
 /* FIXME: Change this when the "effects" vector is available */
     SET_VECTOR_ELT(ans, 2, allocVector(REALSXP, cx->nrow));
-    Memcpy(REAL(VECTOR_ELT(ans, 1)), (double*)(rhs->x), cx->nrow);
+    Memcpy(REAL(VECTOR_ELT(ans, 2)), (double*)(rhs->x), cx->nrow);
 
     cholmod_l_free_factor(&L, &c);
     cholmod_l_free_dense(&rhs, &c);
