@@ -1,3 +1,10 @@
+2010-03-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/spModels.R (sparse.model.matrix, model.spmatrix): border case
+	'~ 1' should also work.  Add  'transpose = FALSE' argument.
+
+	* tests/spModel.matrix.R: test that.
+
 2010-03-27  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/sparseMatrix.R (printSpMatrix): ensure returning original argument

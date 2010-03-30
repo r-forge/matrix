@@ -50,6 +50,9 @@ str(dM)# contains *matrices*
 options("contrasts") # the default:  "contr.treatment"
 op <- options(sparse.colnames = TRUE) # for convenience
 
+stopifnot(identical(## non-sensical, but "should work" (with a warning each):
+		    sparse.model.matrix(a~ 1, dd),
+		    sparse.model.matrix( ~ 1, dd)))
 sparse.model.matrix(~ a + b, dd, contrasts = list(a="contr.sum"))
 sparse.model.matrix(~ a + b, dd, contrasts = list(b="contr.SAS"))
 xm <-  sparse.model.matrix(~ x, dM) # gives a warning, correctly

@@ -35,6 +35,7 @@ export("Cholesky",
 #	 "isTriangular",
 #	 "isDiagonal",
        "isLDL",
+#TODO       "lm.fit.sparse",# <- "somewhat experimental"
        "lu",
        "nearPD",
        "nnzero",
