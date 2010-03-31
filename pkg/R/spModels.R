@@ -543,41 +543,105 @@ model.spmatrix <- function(trms, mf, transpose=FALSE,
 
 ## FIXME: still test this function for both methods, since currently
 ## ----- both  dgCMatrix_cholsol and  dgCMatrix_qrsol are only called from here!
-lm.fit.sparse <- function(x, y, offset = NULL, method = c("qr", "cholesky"),
-                          tol = 1e-7, singular.ok = TRUE, order = NULL,
-                          transpose = FALSE) ## NB: meaning of 'transpose'
-                                        # is changed from original
-
+lm.fit.sparse <- function(x, y, w = NULL, offset = NULL,
+			  method = c("qr", "cholesky"),
+			  tol = 1e-7, singular.ok = TRUE, order = NULL,
+			  transpose = FALSE)
 ### Fit a linear model, __ given __ a sparse model matrix 'x'
 ### using a sparse QR or a sparse Cholesky factorization
 {
     cld <- getClass(class(x))
-    stopifnot(extends(cld, "dsparseMatrix"))
-## or     if(!is(x, "dsparseMatrix")) x <- as(x, "dsparseMatrix")
-    yy <- as.numeric(y)
+    stopifnot(extends(cld, "dsparseMatrix"), is.numeric(y))
+## or	  if(!is(x, "dsparseMatrix")) x <- as(x, "dsparseMatrix")
+    if(transpose) { tx <- x ; x <- t(x) }
+    n <- nrow(x)
+    if(NROW(y) != n) stop("incompatible dimensions of (x,y)")
+    ny <- NCOL(y)
     if (!is.null(offset)) {
-	stopifnot(length(offset) == length(y))
-	yy <- yy - as.numeric(offset)
+	stopifnot(length(offset) == n)
+	y <- y - as.numeric(offset)
     }
+    if(ny != 1L) ## FIXME: should not be too much work!
+	stop("multivariate, i.e., matrix 'y' is not yet implemented")
+    if ((has.w <- !is.null(w))) {
+	if(any(w < 0 | is.na(w)))
+	    stop("missing or negative weights not allowed")
+	if(length(w) != n)
+	    stop("weights vector 'w' is of wrong length")
+
+	zero.weights <- any(wis0 <- w == 0)
+	if (zero.weights) {
+	    save.r <- y
+	    save.f <- y
+	    save.w <- w
+	    ok <- !wis0 # == w != 0
+	    i0 <- which(wis0)
+	    ok <- which(ok) # (faster when indexing repeatedly)
+	    w <- w[ok]
+	    x0 <- x[i0, , drop = FALSE]
+	    x  <- x[ok, , drop = FALSE]
+	    n <- nrow(x)
+	    y0 <- if (ny > 1L) y[i0, , drop = FALSE] else y[i0]
+	    y  <- if (ny > 1L) y[ok, , drop = FALSE] else y[ok]
+	}
+	wts <- sqrt(w)
+	## keep the unweighted (x,y):
+	y. <- y ## x. <- x
+	x <- x * wts
+	y <- y * wts
+    }
+
     method <- match.arg(method)
     order <- {
-        if(is.null(order)) ## recommended default depends on method :
-            if(method == "qr") 3L else 1L
-        else as.integer(order) }
+	if(is.null(order)) ## recommended default depends on method :
+	    if(method == "qr") 3L else 1L
+	else as.integer(order) }
 
-    if(transpose) x <- t(x)
-    ans <- switch(method,
-		  "cholesky" =
-		  .Call(dgCMatrix_cholsol,# has AS_CHM_SP(x)
-			as(x, "CsparseMatrix"), yy),
-		  "qr" =
-		  .Call(dgCMatrix_qrsol, # has AS_CSP(): must be dgC or dtC:
-			if(cld@className %in% c("dtCMatrix", "dgCMatrix")) x
-			else as(x, "dgCMatrix"),
-			yy, order),
-		  ## otherwise:
-		  stop("unknown method ", dQuote(method))
-		  )
-    ans
+    switch(method,
+	   "cholesky" = {
+	       r <- .Call(dgCMatrix_cholsol, # has AS_CHM_SP(x)
+			  as(if(transpose) tx else t(x), "CsparseMatrix"), y)
+	       coef <- r[["coef"]]
+	   },
+	   "qr" = {
+	       ## FIXME: should improve C code here, to return more
+	       coef <- .Call(dgCMatrix_qrsol, # has AS_CSP(): must be dgC or dtC:
+			     if(cld@className %in% c("dtCMatrix", "dgCMatrix")) x
+			     else as(x, "dgCMatrix"),
+			     y, order)
+	       ## for now -- FIXME --
+	       return(coef)
+	   },
+	   ## otherwise:
+	   stop("unknown method ", dQuote(method))
+	   )
+
+    ## FIXME: add names to coef as in lm.wfit(),
+    ##		~/R/D/r-devel/R/src/library/stats/R/lm.R
+    resid <- if(has.w) r[["resid"]] / wts else r[["resid"]]
+    z <- list(coef = coef, weights = w,
+	      residuals = resid, fitted.values = y - resid)
+    if(has.w && zero.weights) {
+	coef[is.na(coef)] <- 0
+	f0 <- x0 %*% coef
+	if (ny > 1) {
+	    save.r[ok, ] <- resid
+	    save.r[i0, ] <- y0 - f0
+	    save.f[ok, ] <- z$fitted.values
+	    save.f[i0, ] <- f0
+	}
+	else {
+	    save.r[ok] <- resid
+	    save.r[i0] <- y0 - f0
+	    save.f[ok] <- z$fitted.values
+	    save.f[i0] <- f0
+	}
+	z$residuals <- save.r
+	z$fitted.values <- save.f
+	z$weights <- save.w
+    }
+    if(!is.null(offset))
+	z$fitted.values <- z$fitted.values + offset
+
+    z
 }
-

@@ -1,3 +1,13 @@
+2010-03-31  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/spModels.R (lm.fit.sparse): update, allowing weights; also
+	return residuals, notably for "cholesky" case.
+
+	* man/lm.fit.sparse.Rd: examples; comparing with dense case.
+
+	* src/dgCMatrix.c (dgCMatrix_cholsol): comments; also compute
+	residuals.
+
 2010-03-30  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/spModels.R (sparse.model.matrix, model.spmatrix): border case

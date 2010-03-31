@@ -38,6 +38,11 @@ sparse.model.matrix(object, data = environment(object),
 }
 \seealso{
   \code{\link{model.matrix}} in standard \R's package \pkg{stats}.
+
+  \code{as(f, "sparseMatrix")} (see \code{coerce(from = "factor", ..)}
+  in the class doc \linkS4class{sparseMatrix}) produces the
+  \emph{transposed} sparse model matrix for a single factor \code{f}
+  (and \emph{no} contrasts).
 }
 \examples{
 dd <- data.frame(a = gl(3,4), b = gl(4,1,12))# balanced 2-way
