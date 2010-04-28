@@ -37,11 +37,16 @@ fac2sparse <- function(from, to = c("d","i","l","n","z"),
 	df$x <- rep.int(switch(to,
 			       "d" = 1., "i" = 1L, "l" = TRUE, "z" = 1+0i),
 			nrow(df))
-    as(do.call("new", c(list(Class = paste0(to, "gTMatrix"),
+    ## a version of the following which adapts to a future change of the 1st arg.name of new():
+    ## do.call("new", c(list(Class = paste0(to, "gTMatrix"),
+    ##			     Dim = c(length(levs), n),
+    ##			     Dimnames = list(levs, names(fact)))))
+    argNew <- c(list(Class = paste0(to, "gTMatrix"),
 			     Dim = c(length(levs), n),
 			     Dimnames = list(levs, names(fact))),
-			df)),
-       "CsparseMatrix")
+			df)
+    names(argNew)[1] <- names(formals(new))[[1]]
+    as(do.call("new", argNew), "CsparseMatrix")
 }
 
 setAs("factor", "sparseMatrix", function(from) fac2sparse(from, to = "d"))
