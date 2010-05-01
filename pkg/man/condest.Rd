@@ -1,20 +1,20 @@
 \name{condest}
 \alias{condest}
 \alias{onenormest}
-
-\title{
-%%  ~~function to do ... ~~
-}
+\title{Compute Approximate CONDition number and 1-Norm of (Large) Matrices}
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+  \dQuote{Estimate}, i.e. compute approximately the CONDition number of
+  a (potentially large, often sparse) matrix \code{A}.
+  It works by apply a fast approximation of the 1-norm,
+  \code{norm(A,"1")}, through \code{onenormest(.)}.
 }
 \usage{
-condest(A, t = min(n, 5), normA = norm(A, "1"), silent = FALSE, quiet = TRUE)
+condest(A, t = min(n, 5), normA = norm(A, "1"),
+        silent = FALSE, quiet = TRUE)
 
 onenormest(A, t = min(n, 5), A.x, At.x, n,
            silent = FALSE, quiet = silent,
            iter.max = 10, eps = 4 * .Machine$double.eps)
-
 }
 \arguments{
   \item{A}{a square matrix, optional for \code{onenormest()}, where
@@ -52,14 +52,32 @@ onenormest(A, t = min(n, 5), A.x, At.x, n,
   \item{iter}{the number of iterations used.}
 }
 \references{
+  Nicholas J. Higham and Françoise Tisseur (2000).
+  A Block Algorithm for Matrix 1-Norm Estimation, with an Application to 1-Norm
+  Pseudospectra.
+  \emph{SIAM J. Matrix Anal. Appl.} \bold{21}, 4, 1185--1201.
+  \url{http://dx.doi.org/10.1137/S0895479899356080}
+  %% and \url{http://citeseer.ist.psu.edu/223007.html}
 
+  William W. Hager (1984).
+  Condition Estimates.
+  \emph{SIAM J. Sci. Stat. Comput.} \bold{5}, 311--316.
 }
-%\author{Martin Maechler}
-
+\author{This is based on octave's \code{condest()} and
+  \code{onenormest()} implementations with original author
+  Jason Riedy, U Berkeley; translation to \R and
+  adaption by Martin Maechler.
+}
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{norm}}, \code{\link{rcond}}.
 }
 \examples{
+data(KNex)
+mtm <- with(KNex, crossprod(mm))
+system.time(ce <- condest(mtm))
+## reciprocal
+1 / ce$est
+system.time(rc <- rcond(mtm)) # takes ca  3 x  longer
+rc
+all.equal(rc, 1/ce$est) # TRUE -- the approxmation was good
 }
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
