@@ -43,8 +43,8 @@
       \code{"U"} (and \code{"P"}) factors as a named list of matrices,
       see also the example below.}
     \item{solve}{\code{signature(a = "denseLU", b = "missing")}: Compute
-    the inverse of A, \eqn{A^{-1}}{A^(-1)}, \code{solve(A)} using the LU
-    decomposition.
+      the inverse of A, \eqn{A^{-1}}{A^(-1)}, \code{solve(A)} using the LU
+      decomposition.}
   }
 }
 % \references{}
