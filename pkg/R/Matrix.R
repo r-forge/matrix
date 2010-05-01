@@ -333,7 +333,8 @@ setMethod("norm", signature(x = "ANY", type = "missing"),
 setMethod("rcond", signature(x = "ANY", norm = "missing"),
 	  function(x, norm, ...) rcond(x, norm = "O", ...))
 
-setMethod("lu", "matrix", function(x, ...) lu(as(x, "dgeMatrix"), ...))
+setMethod("lu", "matrix", function(x, warnSing = TRUE, ...)
+	  lu(as(x, "dgeMatrix"), warnSing=warnSing, ...))
 
 
 
