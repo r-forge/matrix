@@ -1,6 +1,18 @@
+2010-05-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/condest.R (onenormest, condest): allow to estimate condition
+	number for large sparse matrices.
+	* condest.Rd: docu
+
+	* R/pMatrix.R (.inv.perm): utility; add [t]crossprod() methods
+
+	* man/sparseLU-class.Rd: A = P'LUQ; add examples, with "identities"
+
+	* R/Auxiliaries.R (mmultCheck): new arg. 'kind'
+
 2010-04-28  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 0.999375-39
+	* DESCRIPTION (Version): 0.999375-39, CRAN-released: 2010-.....
 
 	* R/spModels.R (fac2sparse): using names(formals(new))[[1]] to
 	adapt to a future change in new()'s first argument *name*.
