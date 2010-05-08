@@ -318,12 +318,19 @@ sparse.model.matrix <- function(object, data = environment(object),
     ans
 }
 
-
+##' <description>
+##' Produce the t(Z); Z = "design matrix" of (X : Y), where
+##'             --- t(Z) : aka rowwise -version : "r"
+##' <details>
+##'
+##' @title sparse model matrix for 2-way interaction
+##' @param X and Y either are numeric matrices {maybe 1-column}
+##' @param Y       or "as(<factor>, sparseM)"
+##' @param do.names
+##' @return
+##' @author Martin Maechler
 sparse2int <- function(X, Y, do.names = TRUE)
 {
-    ## Produce the t(Z); Z = "design matrix" of (X : Y), where
-    ##             --- t(Z) : aka rowwise -version : "r"
-
     if(do.names) {
         dnx <- dimnames(X)
         dny <- dimnames(Y)
@@ -331,10 +338,6 @@ sparse2int <- function(X, Y, do.names = TRUE)
     dimnames(Y) <- dimnames(X) <- list(NULL,NULL)
     nx <- nrow(X)
     ny <- nrow(Y)
-
-    ## X, Y either are numeric matrices {maybe 1-column}
-    ##      or "as(<factor>, sparseM)"
-
     r <-
 	if((nX <- is.numeric(X)) | (nY <- is.numeric(Y))) {
 	    if(nX) {
@@ -418,9 +421,13 @@ is.model.frame <- function(x)
 }
 
 
+##' <description>
 ##' Create a sparse model matrix from a model frame.
-##'          Assumption:  at least one component is a factor or sparse  << ? FIXME ?
+##'      Assumption:  at least one component is a factor or sparse  << FIXME ?
 ##' -- This version uses  'rBind' and returns  X' i.e. t(X) :
+##' <details>
+##'
+##' @title Sparse Model Matrix from Model Frame
 ##' @param trms a "terms" object
 ##' @param mf a data frame, typically resulting from  model.frame()
 ##' @param transpose logical indicating if  X' = t(X) {is faster!}
@@ -429,6 +436,7 @@ is.model.frame <- function(x)
 ##' 	levels should be dropped
 ##' @param row.names
 ##' @return sparse matrix (class "dgCMatrix")
+##' @author Martin Maechler
 model.spmatrix <- function(trms, mf, transpose=FALSE,
                            drop.unused.levels = TRUE, row.names=TRUE)
 {
@@ -506,6 +514,8 @@ model.spmatrix <- function(trms, mf, transpose=FALSE,
                            s
                        })
         } else { ## continuous variable --> "matrix" - for all of them
+	    if(any(iA <- (cl <- class(f)) == "AsIs")) # drop "AsIs" class
+		class(f) <- if(length(cl) > 1L) cl[!iA]
             nr <- if(is.matrix(f)) nrow(f <- t(f)) else (dim(f) <- c(1L, length(f)))[1]
             if(is.null(rownames(f)))
                 rownames(f) <- if(nr == 1) nam else paste0(nam, seq_len(nr))
