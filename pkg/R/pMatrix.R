@@ -138,7 +138,9 @@ setMethod("tcrossprod", signature(x = "pMatrix", y = "missing"),
 
 
 .pMat.nosense <- function (x, i, j, ..., value)
-    stop('partially replacing "pMatrix" entries is not sensible')
+    stop('replacing "pMatrix" entries is not allowed, as rarely sensible')
 setReplaceMethod("[", signature(x = "pMatrix", i = "index"), .pMat.nosense)
 setReplaceMethod("[", signature(x = "pMatrix", i = "missing", j = "index"),
 		 .pMat.nosense) ##   explicit  ^^^^^^^^^^^^ for disambiguation
+setReplaceMethod("[", signature(x = "pMatrix", i = "missing", j = "missing"),
+		 .pMat.nosense)

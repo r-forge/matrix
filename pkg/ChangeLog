@@ -1,3 +1,11 @@
+2010-05-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R: A[] <- v ; differentiate dense & sparse
+	* R/pMatrix.R: disallow <pMatrix>[] <- v  more consequently
+
+	* tests/indexing.R: test above
+
+
 2010-05-08  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/spModels.R (model.spmatrix): deal with "AsIs" components
