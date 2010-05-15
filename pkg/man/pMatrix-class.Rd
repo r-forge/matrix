@@ -37,8 +37,6 @@
 \alias{solve,pMatrix,missing-method}
 \alias{solve,Matrix,pMatrix-method}
 \alias{t,pMatrix-method}
-\alias{[<-,pMatrix,index,ANY,ANY-method}
-\alias{[<-,pMatrix,missing,index,ANY-method}
 %
 \title{Permutation matrices}
 \description{The \code{"pMatrix"} class is the class of permutation
