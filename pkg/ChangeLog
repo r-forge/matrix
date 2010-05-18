@@ -1,3 +1,10 @@
+2010-05-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Csparse.c (Csparse_horzcat, Csparse_vertcat): ensure that
+	rBind()/cBind() i.e., rbind2()/cbind2() return logical sparse
+	matrices when the components are.
+	* tests/bind.R: test
+
 2010-05-15  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/sparseMatrix.R: A[] <- v ; differentiate dense & sparse
