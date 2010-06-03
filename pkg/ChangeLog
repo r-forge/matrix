@@ -1,3 +1,7 @@
+2010-06-03  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/spModels.R (model.Matrix): tweak for NULL contrasts in dense case.
+
 2010-06-02  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* tests/spModel.matrix.R (Sparse.model.matrix): adapt to the fact, that
