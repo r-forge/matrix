@@ -327,7 +327,8 @@ model.Matrix <- function(object, data = environment(object),
 	m <- model.matrix(object, data=data,
 			  contrasts.arg=contrasts.arg, xlev=xlev, ...)
 	new("ddenseModelMatrix", as(m, "dgeMatrix"),
-	    assign = attr(m, "assign"), contrasts = attr(m, "contrasts"))
+	    assign = attr(m, "assign"),
+	    contrasts = if(is.null(ctr <- attr(m,"contrasts")))list() else ctr)
     }
 }
 
