@@ -1,5 +1,5 @@
 
-R version 2.11.0 Patched (2010-05-11 r51981)
+R version 2.11.1 Patched (2010-06-03 r52200)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -15,17 +15,10 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
-> ## For both 'Extract' ("[") and 'Replace' ("[<-") Method testing
+> #### For both 'Extract' ("[") and 'Replace' ("[<-") Method testing
 > 
-> library(Matrix)
-Loading required package: lattice
-
-Attaching package: 'Matrix'
-
-The following object(s) are masked from 'package:base':
-
-    det
-
+> #### suppressPackageStartupMessages(...)  as we have an *.Rout.save to Rdiff against
+> stopifnot(suppressPackageStartupMessages(require(Matrix)))
 > 
 > source(system.file("test-tools.R", package = "Matrix"), keep.source = FALSE)
 > ##-> identical3() etc
@@ -1327,16 +1320,11 @@ Formal class 'lsparseVector' [package "Matrix"] with 3 slots
   ..@ i     : int(0) 
 > validObject(spCol <- f[,5000, drop=FALSE])
 [1] TRUE
-> ## ^^ FIXME slow Tsparse_to_Csparse from memory-hog
-> ## cholmod_sparse *CHOLMOD(triplet_to_sparse)
-> ## which has  "workspace: Iwork (max (nrow,ncol))"
-> ## in ../src/CHOLMOD/Core/cholmod_triplet.c  *and*
-> ## in ../src/CHOLMOD/Core/t_cholmod_triplet.c
 > ##
 > ## *not* identical(): as(spCol, "sparseVector")@length is "double"prec:
 > stopifnot(all.equal(as(spCol, "sparseVector"),
 +                     as(sv,   "nsparseVector"), tol=0))
-> f[,5762] <- thisCol # now "fine" <<<<<<<<<< FIXME uses LARGE objects
+> f[,5762] <- thisCol # now "fine" <<<<<<<<<< FIXME uses LARGE objects -- slow --
 > ## is using  replCmat() in ../R/Csparse.R, then
 > ##           replTmat() in ../R/Tsparse.R
 > 
@@ -1347,16 +1335,16 @@ Formal class 'lsparseVector' [package "Matrix"] with 3 slots
 [1] "dgCMatrix"
 attr(,"package")
 [1] "Matrix"
-> fx[,6000] <- (tC <- rep(thisCol, length=nrow(fx)))
+> fx[,6000] <- (tC <- rep(thisCol, length=nrow(fx)))# slow (as above)
 > thCol <- fx[,2000]
-> fx[,5762] <- thCol
+> fx[,5762] <- thCol# slow
 > stopifnot(is(f, "ngCMatrix"), is(fx, "dgCMatrix"),
 + 	  identical(thisCol, f[,5762]),# perfect
 + 	  identical(as.logical(fx[,6000]), tC),
 + 	  identical(thCol,  fx[,5762]))
 > 
 > cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
-Time elapsed:  17.56 0.75 18.311 0 0 
+Time elapsed:  18.926 1.097 20.113 0 0 
 > ##
 > cat("checkMatrix() of all: \n---------\n")
 checkMatrix() of all: 
@@ -1540,7 +1528,7 @@ x.x.
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 > cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
-Time elapsed:  14.67 0.33 15.011 0 0 
+Time elapsed:  14.551 0.352 14.916 0 0 
 > 
 > if(!interactive()) warnings()
 NULL

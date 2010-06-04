@@ -244,11 +244,9 @@ contr.poly <- stats::contr.poly
 } ## end if {define  contr.*()  for pre-2.10.0 R)
 
 
-## Goal: an  model.sparseMatrix()
+## Goal: a  "sparse model.matrix()"
 ##      model.matrix(object, data = environment(object),
 ##                   contrasts.arg = NULL, xlev = NULL, ...)
-## "FIXME": Rather should have
-##    model.matrix(.......,  sparse = TRUE) ...
 ##
 ##  Cut'n'paste from model.matrix() ... just replacing small part at end:
 sparse.model.matrix <- function(object, data = environment(object),
