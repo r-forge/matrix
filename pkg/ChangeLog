@@ -1,3 +1,7 @@
+2010-06-04  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (sparseMatrix): re-enable 'dimnames' argument.
+
 2010-06-03  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/spModels.R (model.Matrix): tweak for NULL contrasts in dense case.
@@ -9,7 +13,7 @@
 
 2010-05-29  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 0.999375-40, CRAN-released: 2010-06-..
+	* DESCRIPTION (Version): 0.999375-40, CRAN-released: 2010-06-04
 
 	* R/AllClass.R: new classes "ModelMatrix", "sparseModelMatrix", etc.
 

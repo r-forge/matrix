@@ -1,6 +1,7 @@
-## For both 'Extract' ("[") and 'Replace' ("[<-") Method testing
+#### For both 'Extract' ("[") and 'Replace' ("[<-") Method testing
 
-library(Matrix)
+#### suppressPackageStartupMessages(...)  as we have an *.Rout.save to Rdiff against
+stopifnot(suppressPackageStartupMessages(require(Matrix)))
 
 source(system.file("test-tools.R", package = "Matrix"), keep.source = FALSE)
 ##-> identical3() etc
@@ -688,16 +689,11 @@ str(thisCol <-  f[,5000])# logi [~ 7 mio....]
 sv <- as(thisCol, "sparseVector")
 str(sv) ## "empty" !
 validObject(spCol <- f[,5000, drop=FALSE])
-## ^^ FIXME slow Tsparse_to_Csparse from memory-hog
-## cholmod_sparse *CHOLMOD(triplet_to_sparse)
-## which has  "workspace: Iwork (max (nrow,ncol))"
-## in ../src/CHOLMOD/Core/cholmod_triplet.c  *and*
-## in ../src/CHOLMOD/Core/t_cholmod_triplet.c
 ##
 ## *not* identical(): as(spCol, "sparseVector")@length is "double"prec:
 stopifnot(all.equal(as(spCol, "sparseVector"),
                     as(sv,   "nsparseVector"), tol=0))
-f[,5762] <- thisCol # now "fine" <<<<<<<<<< FIXME uses LARGE objects
+f[,5762] <- thisCol # now "fine" <<<<<<<<<< FIXME uses LARGE objects -- slow --
 ## is using  replCmat() in ../R/Csparse.R, then
 ##           replTmat() in ../R/Tsparse.R
 
@@ -705,9 +701,9 @@ fx <- sparseMatrix(i = sample(n, size=nnz, replace=TRUE),
                    j = sample(m, size=nnz, replace=TRUE),
                    x = round(10*rnorm(nnz)))
 class(fx)## dgCMatrix
-fx[,6000] <- (tC <- rep(thisCol, length=nrow(fx)))
+fx[,6000] <- (tC <- rep(thisCol, length=nrow(fx)))# slow (as above)
 thCol <- fx[,2000]
-fx[,5762] <- thCol
+fx[,5762] <- thCol# slow
 stopifnot(is(f, "ngCMatrix"), is(fx, "dgCMatrix"),
 	  identical(thisCol, f[,5762]),# perfect
 	  identical(as.logical(fx[,6000]), tC),
