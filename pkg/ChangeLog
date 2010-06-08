@@ -1,3 +1,12 @@
+2010-06-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Tsparse.R (.TM.repl.i.mat): renamed from .TM.repl.i.2col().
+	* R/Matrix.R (.repl.i.lSMat): implement logical sparse
+	sub-assignment: M[<lsparseMatrix>] <- v; ditto for dense & nsparse.
+
+	* R/Csparse.R (.CM.repl.i.lSMat, ..): direct logical sparse
+	sub-assignment for "Csparse".
+
 2010-06-04  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/sparseMatrix.R (sparseMatrix): re-enable 'dimnames' argument.
