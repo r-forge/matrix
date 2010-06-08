@@ -1,5 +1,5 @@
 
-R version 2.11.1 Patched (2010-06-03 r52200)
+R version 2.11.1 Patched (2010-06-06 r52218)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -19,6 +19,7 @@ Type 'q()' to quit R.
 > 
 > #### suppressPackageStartupMessages(...)  as we have an *.Rout.save to Rdiff against
 > stopifnot(suppressPackageStartupMessages(require(Matrix)))
+Matrix_NS: <environment: namespace:Matrix>
 > 
 > source(system.file("test-tools.R", package = "Matrix"), keep.source = FALSE)
 > ##-> identical3() etc
@@ -515,7 +516,15 @@ c3 . | | . | | | | | | | | | | | . . | | |
 + 	  identical(unname(as.matrix(B)),
 + 		    local({a <- matrix(0,4,3); a[c(1,2,1), 2] <- 1:3; a})),
 + 	  identical(C, drop0(B.)))
-> 
+> ## <sparse>[<logicalSparse>] <- v  failed in the past
+> T <- as(C,"TsparseMatrix"); C. <- C
+> T[T>0] <- 21
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
+> C[C>0] <- 21
+diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
+> a. <- local({a <- as.matrix(C.); a[a>0] <- 21; a})
+> assert.EQ.mat(C, a.)
+> stopifnot(identical(C, as(T, "CsparseMatrix")))
 > 
 > ## used to fail
 > n <- 5 ## or much larger
@@ -648,7 +657,6 @@ as(., "nMatrix") giving full nonzero-pattern: ok
 m >= m for all: ok
 m < m for none: ok
 symmpart(m) + skewpart(m) == m: ok;  determinant(): ok
-.TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 as(<triangular (ge)matrix>, dtTMatrix): valid: TRUE 
@@ -688,7 +696,6 @@ as(., "nMatrix") giving full nonzero-pattern: ok
 m >= m for all: ok
 m < m for none: ok
 symmpart(m) + skewpart(m) == m: ok;  determinant(): ok
-.TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 as(<triangular (ge)matrix>, dtCMatrix): valid: TRUE 
@@ -979,7 +986,6 @@ M[i,j] <- v :  coercing symmetric M[] into non-symmetric
 > 
 > trH[c(1:2,4), c(2:3,5)] <- 0 # gave an *error* upto Jan.2008
 > trH[ lower.tri(trH) ] <- 0   # ditto, because of callNextMethod()
-.TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 > 
@@ -991,12 +997,10 @@ diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 <sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
 > lM <- upper.tri(mT, diag=TRUE)
 > mT[lM] <- 0
-.TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 >  m[lM] <- 0
 > assert.EQ.mat(mT, as(m,"matrix"))
 > mT[lM] <- -1:0
-.TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 >  m[lM] <- -1:0
 > assert.EQ.mat(mT, as(m,"matrix"))
@@ -1344,7 +1348,7 @@ attr(,"package")
 + 	  identical(thCol,  fx[,5762]))
 > 
 > cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
-Time elapsed:  18.926 1.097 20.113 0 0 
+Time elapsed:  19.063 0.878 20.033 0 0 
 > ##
 > cat("checkMatrix() of all: \n---------\n")
 checkMatrix() of all: 
@@ -1374,6 +1378,7 @@ suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 B 
 B. 
 C 
+C. 
 Clrg 
 Ctrg 
 D 
@@ -1390,15 +1395,12 @@ suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 Hc. 
 Lrg 
 M 
-.TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 M. 
-.TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 M3 
-.TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ltTMatrix to lgTMatrix
 Ms 
@@ -1409,18 +1411,15 @@ Rs
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 S 
-.TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 T 
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 T3 
-.TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ltTMatrix to lgTMatrix
 T6 
-.TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ltTMatrix to lgTMatrix
 TG 
@@ -1456,7 +1455,6 @@ suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 m. 
 m1 
-.TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 m1g 
@@ -1493,7 +1491,6 @@ Note: Method with signature "nsparseMatrix#sparseMatrix" chosen for function "<"
  "nMatrix#nMatrix", "sparseMatrix#nsparseMatrix" would also be valid
 nt. 
 s 
-.TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 s. 
@@ -1518,7 +1515,6 @@ suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 trH 
 uTr 
-.TM.repl.i.2col(): drop 'matrix' case ...
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing(i,j)= (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 x.x 
@@ -1528,7 +1524,7 @@ x.x.
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 > cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
-Time elapsed:  14.551 0.352 14.916 0 0 
+Time elapsed:  14.661 0.335 15.005 0 0 
 > 
 > if(!interactive()) warnings()
 NULL

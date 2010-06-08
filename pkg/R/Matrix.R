@@ -693,6 +693,32 @@ setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
 		 function (x, i, j, value)
 		 callGeneric(x=x, i=i, j=j, value = c(value)))
 
+##  M [ <lMatrix> ] <- value; used notably for x = "CsparseMatrix"  -------------------
+.repl.i.lDMat <- function (x, i, j, ..., value)
+{
+    ## nA <- nargs()
+    ## if(nA != 3) stop(gettextf("nargs() = %d should never happen; please report.", nA))
+    ## else: nA == 3  i.e.,  M [ Lmat ] <- value
+    ## x[i] <- value ; return(x)
+    `[<-`(x, i=which(as.vector(i)), value=value)
+}
+setReplaceMethod("[", signature(x = "Matrix", i = "ldenseMatrix", j = "missing",
+				value = "replValue"), .repl.i.lDMat)
+setReplaceMethod("[", signature(x = "Matrix", i = "ndenseMatrix", j = "missing",
+				value = "replValue"), .repl.i.lDMat)
+.repl.i.lSMat <- function (x, i, j, ..., value)
+{
+    ## nA <- nargs()
+    ## if(nA != 3) stop(gettextf("nargs() = %d should never happen; please report.", nA))
+    ## else: nA == 3  i.e.,  M [ Lmat ] <- value
+    ## x[i] <- value ; return(x)
+    `[<-`(x, i=which(as(i, "sparseVector")), value=value)
+}
+setReplaceMethod("[", signature(x = "Matrix", i = "lsparseMatrix", j = "missing",
+				value = "replValue"), .repl.i.lSMat)
+setReplaceMethod("[", signature(x = "Matrix", i = "nsparseMatrix", j = "missing",
+				value = "replValue"), .repl.i.lSMat)
+
 ## (ANY,ANY,ANY) is used when no `real method' is implemented :
 setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
                                 value = "ANY"),

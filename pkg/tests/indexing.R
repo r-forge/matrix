@@ -281,7 +281,13 @@ stopifnot(identical(unname(as.matrix(A)),
 	  identical(unname(as.matrix(B)),
 		    local({a <- matrix(0,4,3); a[c(1,2,1), 2] <- 1:3; a})),
 	  identical(C, drop0(B.)))
-
+## <sparse>[<logicalSparse>] <- v  failed in the past
+T <- as(C,"TsparseMatrix"); C. <- C
+T[T>0] <- 21
+C[C>0] <- 21
+a. <- local({a <- as.matrix(C.); a[a>0] <- 21; a})
+assert.EQ.mat(C, a.)
+stopifnot(identical(C, as(T, "CsparseMatrix")))
 
 ## used to fail
 n <- 5 ## or much larger
