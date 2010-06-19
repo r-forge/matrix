@@ -571,6 +571,11 @@ replTmat <- function (x, i, j, ..., value)
 	## c(i) : drop "matrix" to logical vector
 	x[as.vector(i)] <- value
 	return(x)
+    } else if(extends(cli <- getClassDef(class(i)),"lMatrix") || extends(cli, "nMatrix")) {
+	Matrix.msg(".TM.repl.i.mat(): \"lMatrix\" case ...", .M.level=2)
+	i <- which(as(i, if(extends(cli, "sparseMatrix")) "sparseVector" else "vector"))
+	## x[i] <- value ; return(x)
+	return(`[<-`(x,i, value=value))
     } else if(!is.numeric(i) || ncol(i) != 2)
 	stop("such indexing must be by logical or 2-column numeric matrix")
     if(!is.integer(i)) storage.mode(i) <- "integer"
