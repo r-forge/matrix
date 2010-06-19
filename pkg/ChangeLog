@@ -1,3 +1,10 @@
+2010-06-08  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999375-41, CRAN-released: ...
+
+	* R/sparseVector.R (spV2M): enable sparseVector -> (sparse)Matrix
+	as(*,.) coercion.
+
 2010-06-07  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Tsparse.R (.TM.repl.i.mat): renamed from .TM.repl.i.2col().

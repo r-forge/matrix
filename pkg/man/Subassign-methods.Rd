@@ -64,6 +64,10 @@
 \alias{[<-,CsparseMatrix,index,index,replValue-method}
 \alias{[<-,CsparseMatrix,index,missing,replValue-method}
 \alias{[<-,CsparseMatrix,matrix,missing,replValue-method}
+\alias{[<-,CsparseMatrix,lsparseMatrix,missing,replValue-method}
+\alias{[<-,CsparseMatrix,nsparseMatrix,missing,replValue-method}
+\alias{[<-,CsparseMatrix,ldenseMatrix,missing,replValue-method}
+\alias{[<-,CsparseMatrix,ndenseMatrix,missing,replValue-method}
 \alias{[<-,CsparseMatrix,missing,index,replValue-method}
 \alias{[<-,CsparseMatrix,missing,index,sparseVector-method}
 \alias{[<-,CsparseMatrix,index,missing,sparseVector-method}

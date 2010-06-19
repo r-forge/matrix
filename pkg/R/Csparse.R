@@ -349,6 +349,7 @@ setReplaceMethod("[", signature(x = "CsparseMatrix", i = "matrix", j = "missing"
 		    "CsparseMatrix"))
 ## more in ./Matrix.R
 
+
 setMethod("t", signature(x = "CsparseMatrix"),
 	  function(x) .Call(Csparse_transpose, x, is(x, "triangularMatrix")))
 

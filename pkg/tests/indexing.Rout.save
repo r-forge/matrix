@@ -19,7 +19,6 @@ Type 'q()' to quit R.
 > 
 > #### suppressPackageStartupMessages(...)  as we have an *.Rout.save to Rdiff against
 > stopifnot(suppressPackageStartupMessages(require(Matrix)))
-Matrix_NS: <environment: namespace:Matrix>
 > 
 > source(system.file("test-tools.R", package = "Matrix"), keep.source = FALSE)
 > ##-> identical3() etc
