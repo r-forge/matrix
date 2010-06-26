@@ -72,6 +72,7 @@
 \alias{is.na,nsparseVector-method}
 \alias{is.na,sparseVector-method}
 \alias{length,sparseVector-method}
+\alias{mean,sparseVector-method}
 \alias{rep,sparseVector-method}
 \alias{show,sparseVector-method}
 % ../R/products.R :
