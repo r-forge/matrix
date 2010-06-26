@@ -1,3 +1,8 @@
+2010-06-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Matrix.R: fix mean() method; add sparse one, remaining sparse
+	at least for trim = 0.
+
 2010-06-08  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.999375-41, CRAN-released: ...
