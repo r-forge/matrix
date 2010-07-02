@@ -273,9 +273,11 @@ setReplaceMethod("[", signature(x = "sparseMatrix", i = "missing", j = "missing"
 	  function (x, value) {
 	      if(all0(value)) { # be faster
 		  cld <- getClassDef(class(x))
-		  for(nm in intersect(names(cld@slots),
-				      c("x", "i","j","p", "factors")))
+		  for(nm in intersect(nsl <- names(cld@slots),
+				      c("x", "i","j", "factors")))
 		      length(slot(x, nm)) <- 0L
+		  if("p" %in% nsl)
+		      x@p <- rep.int(0L, ncol(x)+1L)
 	      } else { ## typically non-sense: assigning to full sparseMatrix
 		  x[TRUE] <- value
 	      }

@@ -51,6 +51,8 @@ mnr <- mn
 v <- rev(as(ms, "vector"))
 mnr[] <- v
 msr[] <- v # [<- "sparse" -- not very sensical; did fail w/o a message
+z <- msr; z[] <- 0
+zz <- as(array(0, dim(z)), "sparseMatrix")
 a.m <- as(mnr,"matrix")
 stopifnot(identical(mn["rc", "D"], mn[3,4]), mn[3,4] == 24,
 	  identical(mn[, "A"], mn[,1]), mn[,1] == 1:7,
@@ -63,8 +65,10 @@ stopifnot(identical(mn["rc", "D"], mn[3,4]), mn[3,4] == 24,
 	  identical(colnames(mn[,cj <- c("B","D")]), cj),
 	  identical(colnames(ms[,cj]), cj),
 	  identical(a.m, as(msr,"matrix")),
+	  identical(unname(z), zz),
 	  identical(a.m, array(v, dim=dim(mn), dimnames=dimnames(mn)))
 	  )
+
 
 ## Printing sparse colnames:
 ms[sample(28, 20)] <- 0
@@ -726,4 +730,3 @@ for(nm in ls()) if(is(.m <- get(nm), "Matrix")) {
 cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
 
 if(!interactive()) warnings()
-
