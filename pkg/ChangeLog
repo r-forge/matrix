@@ -1,3 +1,12 @@
+2010-07-02  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (x[] <- 0): fix shortcut code.
+	* tests/indexing.R: and test
+
+	* R/nearPD.R (nearPD): 'doDykstra = TRUE' and *do* use Dykstra's
+	correction which was *not* used in Jens' code; thanks to Bernhard
+	Spangl for a report
+
 2010-06-26  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Matrix.R: fix mean() method; add sparse one, remaining sparse
