@@ -7,7 +7,7 @@
 }
 \usage{
 nearPD(x, corr = FALSE, keepDiag = FALSE, do2eigen = TRUE,
-       doSym = TRUE, doDykstra = TRUE, only.values = FALSE,
+       doSym = FALSE, doDykstra = TRUE, only.values = FALSE,
        eig.tol = 1e-06, conv.tol = 1e-07, posd.tol = 1e-08,
        maxit = 100, trace = FALSE)
 }

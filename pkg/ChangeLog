@@ -43,7 +43,7 @@
 
 2010-05-29  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 0.999375-40, CRAN-released: 2010-06-04
+	* DESCRIPTION (Version): 0.999375-40, CRAN-released: 2010-06-04, r 2546
 
 	* R/AllClass.R: new classes "ModelMatrix", "sparseModelMatrix", etc.
 
@@ -91,7 +91,7 @@
 
 2010-04-28  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 0.999375-39, CRAN-released: 2010-05-19
+	* DESCRIPTION (Version): 0.999375-39, CRAN-released: 2010-05-19, r 2540
 
 	* R/spModels.R (fac2sparse): using names(formals(new))[[1]] to
 	adapt to a future change in new()'s first argument *name*.
@@ -177,7 +177,7 @@
 
 2010-02-09  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 0.999375-38, CRAN-released: 2010-03-31
+	* DESCRIPTION (Version): 0.999375-38, CRAN-released: 2010-03-31, r 2529
 
 	* NAMESPACE, R/AllGeneric.R, R/zzz.R: change det() into a regularly exported
 	function (masking base::det) instead of load-time hack.

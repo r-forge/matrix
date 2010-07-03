@@ -10,7 +10,7 @@ nearPD <-
     function(x               # n-by-n approx covariance/correlation matrix
              , corr = FALSE, keepDiag = FALSE
              , do2eigen = TRUE  # if TRUE do a sfsmisc::posdefify() eigen step
-             , doSym = TRUE  # symmetrize after tcrossprod()
+             , doSym = FALSE  # symmetrize after tcrossprod()
              , doDykstra = TRUE # do use Dykstra's correction
              , only.values = FALSE# if TRUE simply return lambda[j].
              , eig.tol   = 1e-6 # defines relative positiveness of eigenvalues compared to largest
@@ -58,7 +58,8 @@ nearPD <-
             D_S <- X - R
 
         ## project onto symmetric and possibly 'given diag' matrices:
-        X <- (X + t(X))/2
+        if(doSym)
+            X <- (X + t(X))/2
         if(corr) diag(X) <- 1
         else if(keepDiag) diag(X) <- diagX0
 
