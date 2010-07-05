@@ -212,7 +212,7 @@ contr.poly <- function (n, scores = 1L:n, contrasts = TRUE, sparse = FALSE) {
 	    cm[,1L:nc] <- value
 	    dimnames(cm) <- list(levels(x),NULL)
 	    if(!is.null(nmcol <- dimnames(value)[[2L]]))
-		dimnames(cm)[[2L]] <- c(nmcol, rep.int("", n1-nc))
+		dimnames(cm)[[2L]] <- c(nmcol, character(n1-nc))
 	} else cm <- value[, 1L:n1, drop=FALSE]
     }
     else if(is.character(value)) cm <- value
