@@ -36,9 +36,10 @@ export("Cholesky",
 #	 "isTriangular",
 #	 "isDiagonal",
        "isLDL",
-       "model.Matrix",
 #TODO       "lm.fit.sparse",# <- "somewhat experimental"
        "lu",
+       "mkRespMod",
+       "model.Matrix",
        "nearPD",
        "nnzero",
        "printSpMatrix",
@@ -197,7 +198,19 @@ exportClasses(
 	      "lsparseVector",
 	      "nsparseVector",
 	      "zsparseVector",
-	      "xsparseVector" # the class union of all 'x' lost sparseVector's
+	      "xsparseVector", # the class union of all 'x' lost sparseVector's
+
+              ## --- linear predictor modules, containing a model matrix
+              "predModule",
+              "dPredModule",
+              "sPredModule",
+
+              ## --- response modules, containing a response vector, etc.
+              "respModule",          # base class and also linear model
+              "glmRespMod",          # generalized linear models
+              "nlsRespMod",          # nonlinear regression response
+              "nglmRespMod"          # generalized nonlinear
+
 	      )
 
 
