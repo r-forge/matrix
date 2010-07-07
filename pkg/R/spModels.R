@@ -677,7 +677,6 @@ lm.fit.sparse <- function(x, y, w = NULL, offset = NULL,
     z
 }
 
-
 setMethod("show", "modelMatrix",
 	  function(object)
       {
@@ -696,3 +695,121 @@ setMethod("show", "modelMatrix",
 	  invisible(object)
       })
 
+setAs("ddenseModelMatrix", "predModule",
+      function(from)
+      new("dPredModule", coef = numeric(ncol(from)),
+          X = from, fac = chol(crossprod(from))))
+
+setAs("dsparseModelMatrix", "predModule",
+      function(from)
+      new("sPredModule", coef = numeric(ncol(from)),
+          X = from, fac = Cholesky(crossprod(from))))
+
+##' <description>
+##' Create an respModule, which could be from a derived class such as
+##' glmRespMod or nlsRespMod. 
+##' <details>
+##' @title Create a respModule object
+##' @param a model frame
+##' @param family the optional glm family (glmRespMod only)
+##' @param nlenv the nonlinear model evaluation environment (nlsRespMod only)
+##' @param nlmod the nonlinear model function (nlsRespMod only)
+##' @param s a positive integer - the number of columns in sqrtXwt.
+##' @return an respModule object
+mkRespMod <- function(fr, family = NULL, nlenv = NULL, nlmod = NULL, s = 1L)
+{
+    n <- nrow(fr)
+    stopifnot((s <- as.integer(s)[1]) > 0L)
+    N <- n * s
+                                        # components of the model frame
+    y <- model.response(fr)
+    if(length(dim(y)) == 1) { # avoid problems with 1D arrays, but keep names
+        nm <- rownames(y)
+        dim(y) <- NULL
+        if(!is.null(nm)) names(y) <- nm
+    }
+    weights <- model.weights(fr)
+    if (is.null(weights)) weights <- rep.int(1, n)
+    else if (any(weights < 0))
+        stop(gettext("negative weights not allowed", domain = "R-Matrix"))
+    offset <- model.offset(fr)
+    if (is.null(offset)) offset <- numeric(N)
+    if (length(offset) == 1) offset <- rep.int(offset, N)
+    else if (length(offset) != N)
+        stop(gettextf("number of offsets (%d) should be %d (s * n)",
+                      length(offset), N), domain = "R-Matrix")
+    ll <- list(weights = unname(weights), offset = unname(offset))
+    if (!is.null(family)) {
+        ll$y <- y                       # may get overwritten later
+        rho <- new.env()
+        rho$etastart <- model.extract(fr, "etastart")
+        rho$mustart <- model.extract(fr, "mustart")
+        rho$nobs <- n
+        if (is.character(family))
+            family <- get(family, mode = "function", envir = parent.frame(3))
+        if (is.function(family)) family <- family()
+        eval(family$initialize, rho)
+        family$initialize <- NULL       # remove clutter from str output
+        ll$mu <- unname(rho$mustart)
+        lr <- as.list(rho)
+        ll[names(lr)] <- lr             # may overwrite y, weights, etc.
+        ll$weights <- unname(ll$weights)
+        ll$y <- unname(ll$y)
+        ll$eta <- family$linkfun(ll$mu)
+        ll$sqrtrwt <- sqrt(ll$weights/family$variance(ll$mu))
+        ll$sqrtXwt <- matrix(ll$sqrtrwt * family$mu.eta(ll$eta))
+        ll$family <- family
+        ll <- ll[intersect(names(ll), slotNames("glmRespMod"))]
+        ll$n <- unname(rho$n)           # for the family$aic function
+        ll$Class <- "glmRespMod"
+    } else {
+        ll$sqrtrwt <- sqrt(ll$weights)
+        ll$y <- unname(as.numeric(y))
+        ll$mu <- numeric(n)
+        if (is.null(nlenv)) {
+            ll$Class <- "respModule"
+            ll$sqrtXwt <- matrix(ll$sqrtrwt)
+        } else {
+            ll$Class <- "nlsRespMod"
+            ll$nlenv <- nlenv
+            ll$nlmod <- Quote(nlmod)
+            eta <- eval(nlmod, nlenv)
+            ll$sqrtXwt <- attr(eta, "gradient")
+            if (is.null(ll$sqrtXwt))
+                stop("At present a nonlinear model must return a gradient attribute")
+            ll$pnames <- colnames(ll$sqrtXwt)
+        }
+    }
+    do.call("new", ll)
+}
+
+glm1 <- function(formula, family, data, weights, subset, 
+                 na.action, start = NULL, etastart, mustart, offset,
+                 control = list(...), sparse = FALSE, model = TRUE,
+                 x = FALSE, y = TRUE, contrasts = NULL, ...) {
+    call <- match.call()
+    if (missing(family)) {
+        family <- NULL
+    } else {
+        if(is.character(family))
+            family <- get(family, mode = "function", envir = parent.frame())
+        if(is.function(family)) family <- family()
+        if(is.null(family$family)) {
+            print(family)
+            stop("'family' not recognized")
+        }
+    }
+    ## extract x, y, etc from the model formula and frame
+    if(missing(data)) data <- environment(formula)
+    mf <- match.call(expand.dots = FALSE)
+    m <- match(c("formula", "data", "subset", "weights", "na.action",
+                 "etastart", "mustart", "offset"), names(mf), 0L)
+    mf <- mf[c(1L, m)]
+    mf$drop.unused.levels <- TRUE
+    mf[[1L]] <- as.name("model.frame")
+    mf <- eval(mf, parent.frame())
+    
+    new("lpMod", resp = mkRespMod(mf, family),
+        pred = as(model.Matrix(formula, mf, sparse = sparse), "predModule"))
+}
+    

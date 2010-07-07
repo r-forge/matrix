@@ -837,3 +837,83 @@ setClass("determinant",
 			sign = "integer",
 			call = "call"))
 
+## Linear predictor modules, which consist of the model matrix, the
+## coefficient vector and a triangular factor of the weighted model matrix.
+
+setClass("predModule",
+         representation(coef = "numeric", "VIRTUAL"))
+
+setClass("dPredModule",
+         representation(X  = "ddenseModelMatrix", fac = "Cholesky"), contains = "predModule")
+
+setClass("sPredModule",
+         representation(X  = "dsparseModelMatrix", fac = "CHMfactor"), contains = "predModule")
+
+## Response modules for models with a linear predictor, which can
+## include linear models, generalized linear models, nonlinear models
+## and generalized nonlinear models.
+
+## y, offset and mu are as expected.  Note that length(offset) can be a multiple of length(y)
+## weights are the prior weights
+## sqrtrwt and sqrtXwt are the square roots of residual and X weights
+
+setClass("respModule",
+         representation(mu = "numeric",
+                        offset = "numeric",
+                        sqrtXwt = "matrix",
+                        sqrtrwt = "numeric", # sqrt(residual weights)
+                        weights = "numeric", # prior weights
+                        y = "numeric"),
+         validity = function(object) {
+             n <- length(object@y)
+             if (any(n != sapply(lapply(c("weights","sqrtrwt","mu"#,"wtres"
+                     ), slot, object = object), length)))
+                 return("lengths of weights, sqrtwt and mu must match length(y)")
+             lo <- length(object@offset)
+             if (!lo || lo %% n)
+                 return("length(offset) must be a positive multiple of length(y)")
+             if (length(object@sqrtXwt) != lo)
+                 return("length(sqrtXwt) must equal length(offset)")
+             if (nrow(object@sqrtXwt) != n)
+                 return("nrow(sqrtXwt) != length(y)")
+             TRUE
+         })
+
+setOldClass("family")
+
+##' glm response module
+setClass("glmRespMod",
+         representation(family =  "family",
+                        eta =    "numeric",
+                        n =      "numeric"), # for evaluation of the aic
+         contains = "respModule",
+         validity = function(object) {
+             if (length(object@eta) != length(object@y))
+                 return("lengths of eta and y must match")
+         })
+
+##' nls response module
+setClass("nlsRespMod",
+         representation(nlenv = "environment",
+                        nlmod = "call",
+                        pnames = "character"),
+         contains = "respModule",
+         validity = function(object) {
+             n <- length(object@y)
+             N <- length(object@offset)
+             s <- N %/% n
+             lpn <- length(object@pnames)
+             if (lpn != s) return(sprintf("length(pnames) = %d != s = %d", lpn, s))
+             dd <- dim(object@sqrtXwt)
+             if (!all(dd == c(n, s))) {
+                 return(sprintf("dim(gradient) = (%d, %d), n = %d, s = %d",
+                                dd[1], dd[2], n, s))
+             }
+             TRUE
+         })
+
+##' nglm response module
+setClass("nglmRespMod", contains = c("glmRespMod", "nlsRespMod"))
+
+##' Statistical models based on linear predictors
+setClass("lpMod", representation(resp = "respModule", pred = "predModule"))
