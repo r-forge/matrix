@@ -708,7 +708,7 @@ setAs("dsparseModelMatrix", "predModule",
   {
       p <- ncol(from)
       new("sPredModule", coef = numeric(p), Vtr = numeric(p),
-          X = from, fac = Cholesky(crossprod(from)))
+          X = from, fac = Cholesky(crossprod(from), LDL = FALSE))
   })
 
 ##' <description>
@@ -830,7 +830,7 @@ IRLS <- function(mod, control = list()) {
     respMod <- mod@resp
     predMod <- mod@pred
     rho <- environment()
-    do.call(function(MXITER = 300L, TOL = 0.001, SMIN = 0.001,
+    do.call(function(MXITER = 200L, TOL = 0.0001, SMIN = 0.0001,
                      verbose = FALSE, ...)
         {
             assign("MXITER", as.integer(MXITER)[1], rho)
@@ -854,7 +854,6 @@ IRLS <- function(mod, control = list()) {
         convcrit <- sqrt(attr(incr, "sqrLen")/wrss0)
         if (verbose)
             cat(sprintf("  convergence criterion: %5g\n", convcrit))
-        if (convcrit < TOL) break;
         step <- 2
         repeat {
             if ((step <- step/2) < SMIN)
@@ -869,6 +868,7 @@ IRLS <- function(mod, control = list()) {
             }
             if (wrss1 < wrss0) break;
         }
+        if (convcrit < TOL) break;
     }
     predMod@coef <- cc
     new("lpMod", resp = respMod, pred = predMod)
@@ -912,18 +912,9 @@ setMethod("updateWts", signature(respM = "glmRespMod"),
       {
           respM@sqrtrwt <- sqrt(respM@weights/respM@family$variance(respM@mu))
           respM@sqrtXwt[] <- respM@sqrtrwt * respM@family$mu.eta(respM@eta)
+          respM@wtres <- respM@sqrtrwt * (respM@y - respM@mu)
           respM
       })
-
-if (FALSE) {
-setMethod("setCoef", signature(predM = "predModule"),
-          function(predM, base, incr, step = 0, ...)
-      {
-          if (step == 0) predM@coef <- base
-          else predM@coef <- base + incr * step
-          predM
-      })
-}
 
 setMethod("reweight",
           signature(predM = "dPredModule", sqrtXwt = "matrix", wtres = "numeric"),
@@ -940,6 +931,27 @@ setMethod("solveCoef", "dPredModule", function(predM, ...)
       {
           cc <- solve(t(predM@fac), predM@Vtr)
           ans <- as.vector(solve(predM@fac, cc))
+          attr(ans, "sqrLen") <- sum(as.vector(cc)^2)
+          ans
+      })
+
+setMethod("reweight",
+          signature(predM = "sPredModule", sqrtXwt = "matrix", wtres = "numeric"),
+          function(predM, sqrtXwt, wtres, ...)
+      {
+          stopifnot(ncol(sqrtXwt) == 1L) # FIXME: add nls version
+          Vt <- t(predM@X) %*% Diagonal(x = as.vector(sqrtXwt))
+          predM@Vtr <- as.vector(Vt %*% wtres)
+          predM@fac <- update(predM@fac, Vt)
+          predM
+      })
+
+setMethod("solveCoef", "sPredModule", function(predM, ...)
+      {
+          ff <- predM@fac
+          if (isLDL(ff)) stop("sparse factor must be LL, not LDL")
+          cc <- solve(ff, solve(ff, predM@Vtr, system = "P"), system = "L")
+          ans <- as.vector(solve(ff, solve(ff, cc, system = "Lt"), system = "Pt"))
           attr(ans, "sqrLen") <- sum(as.vector(cc)^2)
           ans
       })
