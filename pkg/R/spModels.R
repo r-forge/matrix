@@ -697,13 +697,19 @@ setMethod("show", "modelMatrix",
 
 setAs("ddenseModelMatrix", "predModule",
       function(from)
-      new("dPredModule", coef = numeric(ncol(from)),
-          X = from, fac = chol(crossprod(from))))
+  {
+      p <- ncol(from)
+      new("dPredModule", coef = numeric(p), Vtr = numeric(p),
+          X = from, fac = chol(crossprod(from)))
+  })
 
 setAs("dsparseModelMatrix", "predModule",
       function(from)
-      new("sPredModule", coef = numeric(ncol(from)),
-          X = from, fac = Cholesky(crossprod(from))))
+  {
+      p <- ncol(from)
+      new("sPredModule", coef = numeric(p), Vtr = numeric(p),
+          X = from, fac = Cholesky(crossprod(from)))
+  })
 
 ##' <description>
 ##' Create an respModule, which could be from a derived class such as
@@ -714,13 +720,19 @@ setAs("dsparseModelMatrix", "predModule",
 ##' @param family the optional glm family (glmRespMod only)
 ##' @param nlenv the nonlinear model evaluation environment (nlsRespMod only)
 ##' @param nlmod the nonlinear model function (nlsRespMod only)
-##' @param s a positive integer - the number of columns in sqrtXwt.
+##' @param pnames character vector of parameter names for the
+##'        nonlinear model
 ##' @return an respModule object
-mkRespMod <- function(fr, family = NULL, nlenv = NULL, nlmod = NULL, s = 1L)
+mkRespMod <- function(fr, family = NULL, nlenv = NULL, nlmod = NULL)
 {
-    n <- nrow(fr)
-    stopifnot((s <- as.integer(s)[1]) > 0L)
-    N <- n * s
+    N <- n <- nrow(fr)
+    if (!is.null(nlmod)) {
+        nleta <- eval(nlmod, nlenv)
+        grad <- attr(nleta, "gradient")
+        if (is.null(grad))
+            stop("At present a nonlinear model must return a gradient attribute")
+        N <- n * ncol(grad)
+    }
                                         # components of the model frame
     y <- model.response(fr)
     if(length(dim(y)) == 1) { # avoid problems with 1D arrays, but keep names
@@ -738,7 +750,8 @@ mkRespMod <- function(fr, family = NULL, nlenv = NULL, nlmod = NULL, s = 1L)
     else if (length(offset) != N)
         stop(gettextf("number of offsets (%d) should be %d (s * n)",
                       length(offset), N), domain = "R-Matrix")
-    ll <- list(weights = unname(weights), offset = unname(offset))
+    ll <- list(weights = unname(weights), offset = unname(offset),
+               wtres = numeric(n))
     if (!is.null(family)) {
         ll$y <- y                       # may get overwritten later
         rho <- new.env()
@@ -773,10 +786,7 @@ mkRespMod <- function(fr, family = NULL, nlenv = NULL, nlmod = NULL, s = 1L)
             ll$Class <- "nlsRespMod"
             ll$nlenv <- nlenv
             ll$nlmod <- Quote(nlmod)
-            eta <- eval(nlmod, nlenv)
-            ll$sqrtXwt <- attr(eta, "gradient")
-            if (is.null(ll$sqrtXwt))
-                stop("At present a nonlinear model must return a gradient attribute")
+            ll$sqrtXwt <- grad
             ll$pnames <- colnames(ll$sqrtXwt)
         }
     }
@@ -785,8 +795,8 @@ mkRespMod <- function(fr, family = NULL, nlenv = NULL, nlmod = NULL, s = 1L)
 
 glm1 <- function(formula, family, data, weights, subset, 
                  na.action, start = NULL, etastart, mustart, offset,
-                 control = list(...), sparse = FALSE, model = TRUE,
-                 x = FALSE, y = TRUE, contrasts = NULL, ...) {
+                 control = list(...), sparse = FALSE, doFit = TRUE,
+                 model = TRUE, x = FALSE, y = TRUE, contrasts = NULL, ...) {
     call <- match.call()
     if (missing(family)) {
         family <- NULL
@@ -809,7 +819,127 @@ glm1 <- function(formula, family, data, weights, subset,
     mf[[1L]] <- as.name("model.frame")
     mf <- eval(mf, parent.frame())
     
-    new("lpMod", resp = mkRespMod(mf, family),
-        pred = as(model.Matrix(formula, mf, sparse = sparse), "predModule"))
+    ans <- new("lpMod", resp = mkRespMod(mf, family),
+               pred = as(model.Matrix(formula, mf, sparse = sparse), "predModule"))
+    if (doFit) ans <- IRLS(ans, control)
+    ans
 }
-    
+
+IRLS <- function(mod, control = list()) {
+    stopifnot(is(mod, "lpMod"))
+    respMod <- mod@resp
+    predMod <- mod@pred
+    rho <- environment()
+    do.call(function(MXITER = 300L, TOL = 0.001, SMIN = 0.001,
+                     verbose = FALSE, ...)
+        {
+            assign("MXITER", as.integer(MXITER)[1], rho)
+            assign("TOL", as.double(TOL)[1], rho)
+            assign("SMIN", as.double(SMIN)[1], rho)
+            assign("verbose", as.logical(verbose)[1], rho)            
+            NULL
+        }, control)
+
+    cc <- predMod@coef
+    respMod <- updateMu(respMod, as.vector(predMod@X %*% cc))
+    iter <- 0
+    repeat {
+        if ((iter <- iter + 1) > MXITER)
+            stop("Maximum number of iterations exceeded")
+        cbase <- cc
+        respMod <- updateWts(respMod)
+        wrss0 <- sum(respMod@wtres^2)
+        predMod <- reweight(predMod, respMod@sqrtXwt, respMod@wtres)
+        incr <- solveCoef(predMod)
+        convcrit <- sqrt(attr(incr, "sqrLen")/wrss0)
+        if (verbose)
+            cat(sprintf("  convergence criterion: %5g\n", convcrit))
+        if (convcrit < TOL) break;
+        step <- 2
+        repeat {
+            if ((step <- step/2) < SMIN)
+                stop("Minimum step factor failed to reduce wrss")
+            cc <- as.vector(cbase + step * incr)
+            respMod <- updateMu(respMod, as.vector(predMod@X %*% cc))
+            wrss1 <- sum(respMod@wtres^2)
+            if (verbose) {
+                cat(sprintf("step = %.5f, wrss0 = %g, wrss1 = %g\n",
+                            step, wrss0, wrss1))
+                print(cc)
+            }
+            if (wrss1 < wrss0) break;
+        }
+    }
+    predMod@coef <- cc
+    new("lpMod", resp = respMod, pred = predMod)
+}
+
+setMethod("updateMu", signature(respM = "respModule", gamma = "numeric"),
+          function(respM, gamma, ...)
+      {
+          respM@wtres <- respM@sqrtrwt * (respM@y - (respM@mu <- respM@offset + gamma))
+          respM
+      })
+
+setMethod("updateMu", signature(respM = "glmRespMod", gamma = "numeric"),
+          function(respM, gamma, ...)
+      {
+          respM@mu <- respM@family$linkinv(respM@eta <- respM@offset + gamma)
+          respM@wtres <- respM@sqrtrwt * (respM@y - respM@mu)
+          respM
+      })
+
+setMethod("updateMu", signature(respM = "nlsRespMod", gamma = "numeric"),
+          function(respM, gamma, ...)
+      {
+          ll <- as.data.frame(matrix(respM@offset + gamma, nrow =
+                                     length(respM@y),
+                                     dimnames = list(NULL, respM@pnames)))
+          lapply(names(ll),
+                 function(nm) assign(nm, ll[[nm]], envir = respM@nlenv))
+          mm <- eval(respM@nlmod, respM@nlenv)
+          respM@wtres <- respM@sqrtrwt * (respM@y - (respM@mu <- as.vector(mm)))
+          respM@sqrtXwt <- respM@sqrtrwt * attr(mm, "grad")
+          respM
+      })
+
+## For models based on a Gaussian distribution updateWts has no effect
+setMethod("updateWts", signature(respM = "respModule"),
+          function(respM, ...) respM)
+
+setMethod("updateWts", signature(respM = "glmRespMod"),
+          function(respM, ...)
+      {
+          respM@sqrtrwt <- sqrt(respM@weights/respM@family$variance(respM@mu))
+          respM@sqrtXwt[] <- respM@sqrtrwt * respM@family$mu.eta(respM@eta)
+          respM
+      })
+
+if (FALSE) {
+setMethod("setCoef", signature(predM = "predModule"),
+          function(predM, base, incr, step = 0, ...)
+      {
+          if (step == 0) predM@coef <- base
+          else predM@coef <- base + incr * step
+          predM
+      })
+}
+
+setMethod("reweight",
+          signature(predM = "dPredModule", sqrtXwt = "matrix", wtres = "numeric"),
+          function(predM, sqrtXwt, wtres, ...)
+      {
+          stopifnot(ncol(sqrtXwt) == 1L) # FIXME: add nls version
+          V <- as.vector(sqrtXwt) * predM@X
+          predM@Vtr <- as.vector(crossprod(V, wtres))
+          predM@fac <- chol(crossprod(V))
+          predM
+      })
+
+setMethod("solveCoef", "dPredModule", function(predM, ...)
+      {
+          cc <- solve(t(predM@fac), predM@Vtr)
+          ans <- as.vector(solve(predM@fac, cc))
+          attr(ans, "sqrLen") <- sum(as.vector(cc)^2)
+          ans
+      })

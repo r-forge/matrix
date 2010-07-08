@@ -841,7 +841,7 @@ setClass("determinant",
 ## coefficient vector and a triangular factor of the weighted model matrix.
 
 setClass("predModule",
-         representation(coef = "numeric", "VIRTUAL"))
+         representation(coef = "numeric", Vtr = "numeric", "VIRTUAL"))
 
 setClass("dPredModule",
          representation(X  = "ddenseModelMatrix", fac = "Cholesky"), contains = "predModule")
@@ -863,10 +863,11 @@ setClass("respModule",
                         sqrtXwt = "matrix",
                         sqrtrwt = "numeric", # sqrt(residual weights)
                         weights = "numeric", # prior weights
+                        wtres = "numeric",
                         y = "numeric"),
          validity = function(object) {
              n <- length(object@y)
-             if (any(n != sapply(lapply(c("weights","sqrtrwt","mu"#,"wtres"
+             if (any(n != sapply(lapply(c("weights","sqrtrwt","mu","wtres"
                      ), slot, object = object), length)))
                  return("lengths of weights, sqrtwt and mu must match length(y)")
              lo <- length(object@offset)
