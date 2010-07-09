@@ -202,16 +202,18 @@ exportClasses(
 
               ## --- linear predictor modules, containing a model matrix
               "predModule",
-              "dPredModule",
-              "sPredModule",
+              "dPredModule",# dense &
+              "sPredModule",# sparse  (for now)
 
               ## --- response modules, containing a response vector, etc.
               "respModule",          # base class and also linear model
               "glmRespMod",          # generalized linear models
               "nlsRespMod",          # nonlinear regression response
-              "nglmRespMod"          # generalized nonlinear
+              "nglmRespMod",         # generalized nonlinear
 
+              "lpMod"
 	      )
+
 
 
 exportMethods(## for both own and "other" generics:

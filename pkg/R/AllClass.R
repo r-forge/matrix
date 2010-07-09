@@ -781,7 +781,7 @@ setClassUnion("atomicVector", ## "double" is not needed, and not liked by some
 
 ## --- Matrix - related (but not "Matrix" nor "Decomposition/Factorization):
 
-### for 'value' in  x[..] <- value hence for all "contents" of our Matrices:
+## for 'value' in  x[..] <- value hence for all "contents" of our Matrices:
 setClassUnion("replValue", members = c("numeric", "logical", "complex", "raw"))
 
 ### Sparse Vectors ---- here use 1-based indexing ! -----------
@@ -837,6 +837,10 @@ setClass("determinant",
 			sign = "integer",
 			call = "call"))
 
+###------ Modules related to modelling --- basically in two parts --------------
+###------ 1) "prediction-Module" -- currently in a sparse and dense flavor
+###------ 2) "response-Module"
+
 ## Linear predictor modules, which consist of the model matrix, the
 ## coefficient vector and a triangular factor of the weighted model matrix.
 
@@ -844,10 +848,10 @@ setClass("predModule",
          representation(coef = "numeric", Vtr = "numeric", "VIRTUAL"))
 
 setClass("dPredModule",
-         representation(X  = "ddenseModelMatrix", fac = "Cholesky"), contains = "predModule")
+         representation(X = "ddenseModelMatrix", fac = "Cholesky"), contains = "predModule")
 
 setClass("sPredModule",
-         representation(X  = "dsparseModelMatrix", fac = "CHMfactor"), contains = "predModule")
+         representation(X = "dsparseModelMatrix", fac = "CHMfactor"), contains = "predModule")
 
 ## Response modules for models with a linear predictor, which can
 ## include linear models, generalized linear models, nonlinear models
@@ -858,9 +862,9 @@ setClass("sPredModule",
 ## sqrtrwt and sqrtXwt are the square roots of residual and X weights
 
 setClass("respModule",
-         representation(mu = "numeric",
-                        offset = "numeric",
-                        sqrtXwt = "matrix",
+         representation(mu = "numeric",      # of length n
+                        offset = "numeric",  # of length n * k
+                        sqrtXwt = "matrix",  # of dim(.) == dim(X) == (n, k)
                         sqrtrwt = "numeric", # sqrt(residual weights)
                         weights = "numeric", # prior weights
                         wtres = "numeric",

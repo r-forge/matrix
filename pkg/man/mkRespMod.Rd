@@ -1,8 +1,6 @@
 \name{mkRespMod}
 \alias{mkRespMod}
-\title{
-Create a respModule object
-}
+\title{Create a respModule object}
 \description{
   Create a \code{\linkS4class{respModule}} object, which could be from a
   derived class such as \code{\linkS4class{glmRespMod}} or
@@ -13,26 +11,21 @@ mkRespMod(fr, family = NULL, nlenv = NULL, nlmod = NULL, s = 1L)
 }
 \arguments{
   \item{fr}{
-    a model frame, usually created by a call to \code{\link{model.frame}}
-}
+    a model frame, usually created by a call to \code{\link{model.frame}}.}
   \item{family}{
     an optional glm \code{\link{family}} object
-    (\code{\linkS4class{glmRespMod}} objects only).
-}
+    (\code{\linkS4class{glmRespMod}} objects only).}
   \item{nlenv}{
     an environment for evaluation of the nonlinear model, \code{nlmod}.
-    (\code{\linkS4class{nlsRespMod}} objects only).
-}
+    (\code{\linkS4class{nlsRespMod}} objects only).}
   \item{nlmod}{
     the nonlinear model function, as a function call
-    (\code{\linkS4class{nlsRespMod}} objects only).
-}
+    (\code{\linkS4class{nlsRespMod}} objects only).}
   \item{s}{
     a positive integer which is the number of columns in the
     \code{sqrtXwt} slot.  For \code{\linkS4class{nlsRespMod}} objects
     this is the number of parameters in \code{nlmod}.  For all other
-    classes this unity.
-}
+    classes this unity.}
 }
 \details{
   The internal representation of a statistical model based on
@@ -52,7 +45,9 @@ mkRespMod(fr, family = NULL, nlenv = NULL, nlmod = NULL, s = 1L)
 %\references{}
 %\author{}
 %\note{}
-%\seealso{}
+\seealso{
+  The \code{\linkS4class{respModule}} class description.
+}
 \examples{
 data(CO2, package="datasets")
 ## dense linear model

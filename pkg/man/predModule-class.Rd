@@ -17,9 +17,9 @@
   otherwise modified, model matrix.
 }
 \section{Objects from the Classes}{
-  Objects are typically created by coercion from objects of classe
+  Objects are typically created by coercion from objects of class
   \code{\linkS4class{ddenseModelMatrix}} or
-  \code{\linkS4class{sdenseModelMatrix}}.
+  \code{\linkS4class{dsparseModelMatrix}}.
 }
 \section{Slots}{
   The virtual class \code{"predModule"} contains a
