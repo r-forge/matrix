@@ -821,8 +821,41 @@ glm1 <- function(formula, family, data, weights, subset,
     
     ans <- new("lpMod", resp = mkRespMod(mf, family),
                pred = as(model.Matrix(formula, mf, sparse = sparse), "predModule"))
-    if (doFit) ans <- IRLS(ans, control)
+    if (doFit) {
+        ans@pred@coef <- glm.fp(ans)
+        ans <- IRLS(ans, control)
+    }
     ans
+}
+
+##' <description>
+##' A single step in the fixed-point algorithm for GLMs.
+##' <details>
+##' In general we use an algorithm similar to the Gauss-Newton
+##' algorithm for nonlinear least squares (except, of course, that it
+##' allows for reweighting).  For some models, such as those using the
+##' Gamma family with the inverse link the initial values of eta must
+##' be non-zero.  This function calculates a single iteration of the
+##' fixed-point algorithm used in stats::glm.fit to obtain suitable
+##' starting estimates for the parameters.
+##' @title Fixed-point iteration for a GLM
+##' @param lp a linear predictor model.  The resp slot should inherit
+##' from the glmRespMod class.
+##' @return parameter vector
+glm.fp <- function(lp) {
+    stopifnot(is(lp, "lpMod"), is(rM <- lp@resp, "glmRespMod"))
+    ff <- rM@family
+    mu <- rM@mu
+    vv <- ff$variance(mu)
+    eta <- rM@eta
+    muEta <- ff$mu.eta(eta)
+    wts <- rM@weights
+    z <- (eta - rM@offset) + (rM@y - rM@mu)/muEta
+    good <- is.finite(vv) & vv > 0 & is.finite(z)
+    stopifnot(any(good))
+    w <- sqrt(wts * muEta * muEta /vv)[good]
+    wM <- lp@pred@X[good,] * w
+    as.vector(solve(crossprod(wM), crossprod(wM, z[good] * w)))
 }
 
 IRLS <- function(mod, control = list()) {
