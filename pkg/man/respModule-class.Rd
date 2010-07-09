@@ -18,7 +18,7 @@
   Objects from these classes are usually created with
   \code{\link{mkRespMod}} as part of an \code{\linkS4class{lpMod}}
   object returned by model-fitting functions such as the hidden function
-  \code{glm1}. 
+  \code{glm1}.
 }
 \section{Slots}{
   \describe{
@@ -31,9 +31,10 @@
     weights for the model matrices, derived from the \code{sqrtrwt} slot.}
     \item{\code{sqrtrwt}:}{Numeric vector of the square roots
       of the weights for the residuals.  For
-      \code{\linkS4class{respMod}} and \code{\linkS4class{nlsRespMod}}
-      objects these are constant.  For \code{\linkS4class{glmRespMod}}
-      object these are updated at each iteration of the iteratively
+      \code{respModule} and \code{\linkS4class{nlsRespMod}}
+      objects these are constant.  For
+      \code{\linkS4class{glmRespMod}} and \code{\linkS4class{nglmRespMod}}
+      objects these are updated at each iteration of the iteratively
       reweighted least squares algorithm.}
     \item{\code{weights}:}{Prior
       weights -- always present even when it is a vector of ones.}
