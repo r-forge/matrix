@@ -7,7 +7,7 @@
   \code{\linkS4class{nlsRespMod}}.
 }
 \usage{
-mkRespMod(fr, family = NULL, nlenv = NULL, nlmod = NULL, s = 1L)
+mkRespMod(fr, family = NULL, nlenv = NULL, nlmod = NULL)
 }
 \arguments{
   \item{fr}{
@@ -21,11 +21,6 @@ mkRespMod(fr, family = NULL, nlenv = NULL, nlmod = NULL, s = 1L)
   \item{nlmod}{
     the nonlinear model function, as a function call
     (\code{\linkS4class{nlsRespMod}} objects only).}
-  \item{s}{
-    a positive integer which is the number of columns in the
-    \code{sqrtXwt} slot.  For \code{\linkS4class{nlsRespMod}} objects
-    this is the number of parameters in \code{nlmod}.  For all other
-    classes this unity.}
 }
 \details{
   The internal representation of a statistical model based on
