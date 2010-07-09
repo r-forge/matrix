@@ -1,3 +1,8 @@
+2010-07-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/lMatrix.R (whichDense): use arrayInd()
+	* R/zzz.R (arrayInd): provide for older R versions
+
 2010-07-05  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/chm_common.c (chm_triplet_to_SEXP): deal more carefully with

@@ -6,7 +6,7 @@
 \description{
   \code{model.Matrix} creates design matrix, very much like the
   standard \R function \code{\link{model.matrix}}, however returning an
-  object of class \code{\linkS4class{ModelMatrix}}.
+  object of class \code{\linkS4class{modelMatrix}}.
 }
 \usage{
 model.Matrix(object, data = environment(object),
@@ -39,7 +39,7 @@ model.Matrix(object, data = environment(object),
   For more details, see \code{\link{model.matrix}}.
 }
 \value{
- an object inheriting from class \code{\linkS4class{ModelMatrix}}, by
+ an object inheriting from class \code{\linkS4class{modelMatrix}}, by
  default, \code{\linkS4class{ddenseModelMatrix}}.
 }
 % \author{Martin Maechler}
