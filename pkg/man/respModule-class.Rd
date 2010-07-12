@@ -8,15 +8,16 @@
 \title{"respModule" and derived classes}
 \description{
   The \code{"respModule"} class is the virtual base class of
-  response modules for \code{\linkS4class{lpMod}} models.  Classes that inherit from
-  \code{"respModule"} include \code{\linkS4class{glmRespMod}}, for
+  response modules for \code{\linkS4class{glpModel}} model objects.
+  Classes that inherit from \code{"respModule"} include
+  \code{\linkS4class{glmRespMod}}, for
   generalized linear models, \code{\linkS4class{nlsRespMod}}, for
   nonlinear models and \code{\linkS4class{nglmRespMod}} for generalized
   nonlinear models.
 }
 \section{Objects from the Class}{
   Objects from these classes are usually created with
-  \code{\link{mkRespMod}} as part of an \code{\linkS4class{lpMod}}
+  \code{\link{mkRespMod}} as part of an \code{\linkS4class{glpModel}}
   object returned by model-fitting functions such as the hidden function
   \code{glm1}.
 }

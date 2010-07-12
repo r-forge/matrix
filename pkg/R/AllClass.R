@@ -581,13 +581,16 @@ setClass("pMatrix", representation(perm = "integer"),
 ## Mother class:
 setClass("MatrixFactorization", representation(Dim = "integer", "VIRTUAL"))
 
+setClass("CholeskyFactorization", representation = "VIRTUAL",
+         contains = "MatrixFactorization")
+
 ## -- Those (exceptions) inheriting from "Matrix" : ---
 
-setClass("Cholesky",  contains = c("dtrMatrix", "MatrixFactorization"))
+setClass("Cholesky",  contains = c("dtrMatrix", "CholeskyFactorization"))
 
-#unUsed: setClass("LDL", contains = c("dtrMatrix", "MatrixFactorization"))
+#unUsed: setClass("LDL", contains = c("dtrMatrix", "CholeskyFactorization"))
 
-setClass("pCholesky", contains = c("dtpMatrix", "MatrixFactorization"))
+setClass("pCholesky", contains = c("dtpMatrix", "CholeskyFactorization"))
 
 ## These are currently only produced implicitly from *solve()
 setClass("BunchKaufman",
@@ -606,7 +609,7 @@ setClass("pBunchKaufman",
 ## -- the usual ``non-Matrix'' factorizations : ---------
 
 setClass("CHMfactor",		 # cholmod_factor struct as S4 object
-	 contains = "MatrixFactorization",
+	 contains = "CholeskyFactorization",
 	 representation(colcount = "integer", perm = "integer",
 			type = "integer", "VIRTUAL"),
 	 validity = function(object) .Call(CHMfactor_validate, object))
@@ -844,14 +847,16 @@ setClass("determinant",
 ## Linear predictor modules, which consist of the model matrix, the
 ## coefficient vector and a triangular factor of the weighted model matrix.
 
+## the super class contains the slots already;
 setClass("predModule",
-         representation(coef = "numeric", Vtr = "numeric", "VIRTUAL"))
-
-setClass("dPredModule",
-         representation(X = "ddenseModelMatrix", fac = "Cholesky"), contains = "predModule")
-
-setClass("sPredModule",
-         representation(X = "dsparseModelMatrix", fac = "CHMfactor"), contains = "predModule")
+         representation(X = "modelMatrix", coef = "numeric", Vtr = "numeric",
+                        fac = "CholeskyFactorization",
+                        "VIRTUAL"))
+## the sub classes specify more specific classes for the two non-trivial slots:
+setClass("dPredModule", contains = "predModule",
+	 representation(X = "ddenseModelMatrix", fac = "Cholesky"))
+setClass("sPredModule", contains = "predModule",
+	 representation(X = "dsparseModelMatrix", fac = "CHMfactor"))
 
 ## Response modules for models with a linear predictor, which can
 ## include linear models, generalized linear models, nonlinear models
@@ -921,4 +926,5 @@ setClass("nlsRespMod",
 setClass("nglmRespMod", contains = c("glmRespMod", "nlsRespMod"))
 
 ##' Statistical models based on linear predictors
-setClass("lpMod", representation(resp = "respModule", pred = "predModule"))
+##' "glpModel" := General Linear Prediction Models
+setClass("glpModel", representation(resp = "respModule", pred = "predModule"))
