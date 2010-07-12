@@ -713,7 +713,7 @@ setAs("dsparseModelMatrix", "predModule",
 
 ##' <description>
 ##' Create an respModule, which could be from a derived class such as
-##' glmRespMod or nlsRespMod. 
+##' glmRespMod or nlsRespMod.
 ##' <details>
 ##' @title Create a respModule object
 ##' @param a model frame
@@ -793,9 +793,10 @@ mkRespMod <- function(fr, family = NULL, nlenv = NULL, nlmod = NULL)
     do.call("new", ll)
 }
 
-glm1 <- function(formula, family, data, weights, subset, 
+glm1 <- function(formula, family, data, weights, subset,
                  na.action, start = NULL, etastart, mustart, offset,
-                 control = list(...), sparse = FALSE, doFit = TRUE,
+                 sparse = FALSE, doFit = TRUE, control = list(...),
+                 ## all the following are currently ignored:
                  model = TRUE, x = FALSE, y = TRUE, contrasts = NULL, ...) {
     call <- match.call()
     if (missing(family)) {
@@ -818,14 +819,22 @@ glm1 <- function(formula, family, data, weights, subset,
     mf$drop.unused.levels <- TRUE
     mf[[1L]] <- as.name("model.frame")
     mf <- eval(mf, parent.frame())
-    
-    ans <- new("lpMod", resp = mkRespMod(mf, family),
-               pred = as(model.Matrix(formula, mf, sparse = sparse), "predModule"))
-    if (doFit) {
-        ans@pred@coef <- glm.fp(ans)
-        ans <- IRLS(ans, control)
-    }
-    ans
+
+    ans <- new("glpModel",
+	       resp = mkRespMod(mf, family),
+	       pred = as(model.Matrix(formula, mf, sparse = sparse),
+			 "predModule"))
+    if (doFit)
+	## FIXME ? - make 'iterFP' to a function argument / control component:
+	fitGlm1(ans, iterFP = 1, control = control)
+    else
+	ans
+}
+
+fitGlm1 <- function(lp, iterFP = 1, control = list()) {
+    for(i in seq_len(iterFP))
+        lp@pred@coef <- glm.fp(lp)
+    IRLS(lp, control)
 }
 
 ##' <description>
@@ -843,7 +852,7 @@ glm1 <- function(formula, family, data, weights, subset,
 ##' from the glmRespMod class.
 ##' @return parameter vector
 glm.fp <- function(lp) {
-    stopifnot(is(lp, "lpMod"), is(rM <- lp@resp, "glmRespMod"))
+    stopifnot(is(lp, "glpModel"), is(rM <- lp@resp, "glmRespMod"))
     ff <- rM@family
     mu <- rM@mu
     vv <- ff$variance(mu)
@@ -859,7 +868,7 @@ glm.fp <- function(lp) {
 }
 
 IRLS <- function(mod, control = list()) {
-    stopifnot(is(mod, "lpMod"))
+    stopifnot(is(mod, "glpModel"))
     respMod <- mod@resp
     predMod <- mod@pred
     rho <- environment()
@@ -869,7 +878,7 @@ IRLS <- function(mod, control = list()) {
             assign("MXITER", as.integer(MXITER)[1], rho)
             assign("TOL", as.double(TOL)[1], rho)
             assign("SMIN", as.double(SMIN)[1], rho)
-            assign("verbose", as.logical(verbose)[1], rho)            
+            assign("verbose", as.integer(verbose)[1], rho)
             NULL
         }, control)
 
@@ -877,41 +886,44 @@ IRLS <- function(mod, control = list()) {
     respMod <- updateMu(respMod, as.vector(predMod@X %*% cc))
     iter <- 0
     repeat {
-        if ((iter <- iter + 1) > MXITER)
-            stop("Maximum number of iterations exceeded")
+	if((iter <- iter + 1) > MXITER)
+	    stop("Number of iterations exceeded maximum MXITER = ", MXITER)
         cbase <- cc
         respMod <- updateWts(respMod)
         wrss0 <- sum(respMod@wtres^2)
         predMod <- reweight(predMod, respMod@sqrtXwt, respMod@wtres)
         incr <- solveCoef(predMod)
         convcrit <- sqrt(attr(incr, "sqrLen")/wrss0)
-        if (verbose)
-            cat(sprintf("  convergence criterion: %5g\n", convcrit))
-        step <- 2
+	if(verbose)
+	    cat(sprintf("_%d_ convergence criterion: %5g\n",
+			iter, convcrit))
+        step <- 1
         repeat {
-            if ((step <- step/2) < SMIN)
-                stop("Minimum step factor failed to reduce wrss")
             cc <- as.vector(cbase + step * incr)
             respMod <- updateMu(respMod, as.vector(predMod@X %*% cc))
             wrss1 <- sum(respMod@wtres^2)
+            ## if(verbose >= 2) {
             if (verbose) {
-                cat(sprintf("step = %.5f, wrss0 = %g, wrss1 = %g\n",
-                            step, wrss0, wrss1))
+                cat(sprintf("step = %.5f, new wrss = %.8g, Delta(wrss)= %g, \n",
+                            step, wrss1, wrss0 - wrss1))
                 print(cc)
             }
-            if (wrss1 < wrss0) break;
+            if (wrss1 < wrss0) break
+            if ((step <- step/2) < SMIN)
+                stop("Minimum step factor 'SMIN' failed to reduce wrss")
         }
-        if (convcrit < TOL) break;
+        if (convcrit < TOL) break
     }
     predMod@coef <- cc
-    new("lpMod", resp = respMod, pred = predMod)
+    new("glpModel", resp = respMod, pred = predMod)
 }
 
 setMethod("updateMu", signature(respM = "respModule", gamma = "numeric"),
-          function(respM, gamma, ...)
+	  function(respM, gamma, ...)
       {
-          respM@wtres <- respM@sqrtrwt * (respM@y - (respM@mu <- respM@offset + gamma))
-          respM
+	  respM@wtres <- respM@sqrtrwt *
+	      (respM@y - (respM@mu <- respM@offset + gamma))
+	  respM
       })
 
 setMethod("updateMu", signature(respM = "glmRespMod", gamma = "numeric"),

@@ -22,21 +22,24 @@
   \code{\linkS4class{dsparseModelMatrix}}.
 }
 \section{Slots}{
-  The virtual class \code{"predModule"} contains a
-  \code{\linkS4class{modelMatrix}} and one additional slot,
+  The virtual class \code{"predModule"} and its two subclasses all have slots
   \describe{
+    \item{\code{X}:}{a \code{\linkS4class{modelMatrix}}.}
     \item{\code{coef}:}{\code{"numeric"} coefficient vector of length
-      \code{ncol(.)}.
-    }
+      \code{ncol(.)}\eqn{:= p}.}
+    \item{\code{Vtr}:}{\code{"numeric"} vector of length \eqn{p},
+      to contain \eqn{V'r} (\dQuote{\bold{V} \bold{t}ransposed \bold{r}}).}
+    \item{\code{fac}:}{a representation of a triangular factor, the
+      Cholesky decomposition of \eqn{V'V}.}% << FIXME? (weights !)
   }
   The actual classes \code{"dPredModule"} and \code{"sPredModule"}
-  contain an additional slot
+  specify specific (sub) classes for the two non-trivial slots,
   \describe{
-    \item{\code{fac}:}{a representation of a triangular factor.  For the
-      \code{"dpredModule"} class this factor is a
+    \item{\code{X}:}{a \code{"\linkS4class{ddenseModelMatrix}"} or
+      \code{"\linkS4class{dsparseModelMatrix}"}, respectively.}
+    \item{\code{fac}:}{For the \code{"dpredModule"} class this factor is a
       \code{\linkS4class{Cholesky}} object.  For the \code{"spredModule"} class
-      it is a \code{\linkS4class{CHMfactor}} object.
-    }
+      it is of class \code{\linkS4class{CHMfactor}}.}
   }
 }
 \section{Methods}{
@@ -49,10 +52,12 @@
 }
 \author{Douglas Bates}
 \seealso{
-  \code{\link{model.Matrix}} which is a simple wrapper around the traditional
-  \code{\link{model.matrix}} and returns a \code{"ddenseModelMatrix"}
-  object or, optionally, a \code{"dsparseModelMatrix"} object which can
-  then be coerced to a sparse or dense \code{"predModule"}.
+  \code{\link{model.Matrix}()} which returns a
+  \code{"\linkS4class{ddenseModelMatrix}"} or
+  \code{"\linkS4class{dsparseModelMatrix}"} object, depending if its
+  \code{sparse} argument is false or true. In both cases, the resulting
+  \code{"modelMatrix"} can then be coerced to a sparse or dense
+  \code{"predModule"}.
 }
 \examples{
 showClass("dPredModule")

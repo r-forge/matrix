@@ -1,3 +1,9 @@
+2010-07-12  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* NAMESPACE: rename, export and
+	* man/glpModel-class.Rd: document Doug's new "glpModel" class.
+	* R/spModels.R
+
 2010-07-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/lMatrix.R (whichDense): use arrayInd()
