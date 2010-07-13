@@ -19,7 +19,7 @@
   Objects from these classes are usually created with
   \code{\link{mkRespMod}} as part of an \code{\linkS4class{glpModel}}
   object returned by model-fitting functions such as the hidden function
-  \code{glm1}.
+  \code{glm4}.
 }
 \section{Slots}{
   \describe{

@@ -793,7 +793,7 @@ mkRespMod <- function(fr, family = NULL, nlenv = NULL, nlmod = NULL)
     do.call("new", ll)
 }
 
-glm1 <- function(formula, family, data, weights, subset,
+glm4 <- function(formula, family, data, weights, subset,
                  na.action, start = NULL, etastart, mustart, offset,
                  sparse = FALSE, doFit = TRUE, control = list(...),
                  ## all the following are currently ignored:
@@ -825,14 +825,15 @@ glm1 <- function(formula, family, data, weights, subset,
 	       pred = as(model.Matrix(formula, mf, sparse = sparse),
 			 "predModule"))
     if (doFit)
-	## FIXME ? - make 'iterFP' to a function argument / control component:
-	fitGlm1(ans, iterFP = 1, control = control)
+	## TODO ? - make 'doFP' a function argument / control component:
+	fitGlm4(ans, doFP = TRUE, control = control)
     else
 	ans
 }
 
-fitGlm1 <- function(lp, iterFP = 1, control = list()) {
-    for(i in seq_len(iterFP))
+fitGlm4 <- function(lp, doFP = TRUE, control = list()) {
+### note that more than one iteration would need to update more than just 'coef'
+    if(doFP)
         lp@pred@coef <- glm.fp(lp)
     IRLS(lp, control)
 }
@@ -908,58 +909,81 @@ IRLS <- function(mod, control = list()) {
                             step, wrss1, wrss0 - wrss1))
                 print(cc)
             }
-            if (wrss1 < wrss0) break
-            if ((step <- step/2) < SMIN)
-                stop("Minimum step factor 'SMIN' failed to reduce wrss")
-        }
-        if (convcrit < TOL) break
+	    ## re-compute convergence criterion
+            convcOld <- convcrit
+	    convcrit <- sqrt(step * attr(incr, "sqrLen")/wrss1)
+	    if (wrss1 < wrss0) break
+            ## else
+            convcrit <- convcOld
+	    if ((step <- step/2) < SMIN) {
+		warning("Minimum step factor 'SMIN' failed to reduce wrss")
+		cc <- cbase
+		break
+	    }
+            ## no further step halving, if we are good enough anyway
+	    if (convcrit < TOL) break
+	}
+	if (convcrit < TOL) break
     }
     predMod@coef <- cc
+    if(FALSE) {## FIXME?  For consistency, shouldn't we add
+	respMod <- updateWts(respMod)
+	predMod <- reweight(predMod, respMod@sqrtXwt, respMod@wtres)
+    }
+    ## TODO: store 'convcrit = convcrit' in a new slot "fitProps" = "list"
     new("glpModel", resp = respMod, pred = predMod)
 }
 
 setMethod("updateMu", signature(respM = "respModule", gamma = "numeric"),
 	  function(respM, gamma, ...)
       {
-	  respM@wtres <- respM@sqrtrwt *
-	      (respM@y - (respM@mu <- respM@offset + gamma))
+	  respM@ wtres <- respM@sqrtrwt *
+	      (respM@y - (respM@ mu <- respM@offset + gamma))
 	  respM
       })
 
 setMethod("updateMu", signature(respM = "glmRespMod", gamma = "numeric"),
           function(respM, gamma, ...)
       {
-          respM@mu <- respM@family$linkinv(respM@eta <- respM@offset + gamma)
-          respM@wtres <- respM@sqrtrwt * (respM@y - respM@mu)
+          respM@ mu <- respM@family$linkinv(respM@ eta <- respM@offset + gamma)
+          respM@ wtres <- respM@sqrtrwt * (respM@y - respM@mu)
           respM
       })
 
 setMethod("updateMu", signature(respM = "nlsRespMod", gamma = "numeric"),
           function(respM, gamma, ...)
       {
-          ll <- as.data.frame(matrix(respM@offset + gamma, nrow =
-                                     length(respM@y),
+          ll <- as.data.frame(matrix(respM@offset + gamma,
+                                     nrow = length(respM@y),
                                      dimnames = list(NULL, respM@pnames)))
           lapply(names(ll),
                  function(nm) assign(nm, ll[[nm]], envir = respM@nlenv))
           mm <- eval(respM@nlmod, respM@nlenv)
-          respM@wtres <- respM@sqrtrwt * (respM@y - (respM@mu <- as.vector(mm)))
-          respM@sqrtXwt <- respM@sqrtrwt * attr(mm, "grad")
+          respM@ wtres <- respM@sqrtrwt * (respM@y - (respM@ mu <- as.vector(mm)))
+          respM@ sqrtXwt <- respM@sqrtrwt * attr(mm, "grad")
           respM
       })
+setMethod("updateMu", signature(respM = "nglmRespMod", gamma = "numeric"),
+	  function(respM, gamma, ...)
+      {
+	  .NotYetImplemented() ## FIXME
+      })
 
-## For models based on a Gaussian distribution updateWts has no effect
+
+## For models based on a Gaussian distribution (incl. "nlsRespMod")
+## updateWts() has no effect:
 setMethod("updateWts", signature(respM = "respModule"),
           function(respM, ...) respM)
 
 setMethod("updateWts", signature(respM = "glmRespMod"),
           function(respM, ...)
       {
-          respM@sqrtrwt <- sqrt(respM@weights/respM@family$variance(respM@mu))
-          respM@sqrtXwt[] <- respM@sqrtrwt * respM@family$mu.eta(respM@eta)
-          respM@wtres <- respM@sqrtrwt * (respM@y - respM@mu)
-          respM
+	  respM@ sqrtrwt   <- rtrwt <- sqrt(respM@weights/respM@family$variance(respM@mu))
+	  respM@ sqrtXwt[] <- rtrwt * respM@family$mu.eta(respM@eta)
+	  respM@ wtres	   <- rtrwt * (respM@y - respM@mu)
+	  respM
       })
+
 
 setMethod("reweight",
           signature(predM = "dPredModule", sqrtXwt = "matrix", wtres = "numeric"),
@@ -971,24 +995,22 @@ setMethod("reweight",
           predM@fac <- chol(crossprod(V))
           predM
       })
-
-setMethod("solveCoef", "dPredModule", function(predM, ...)
-      {
-          cc <- solve(t(predM@fac), predM@Vtr)
-          ans <- as.vector(solve(predM@fac, cc))
-          attr(ans, "sqrLen") <- sum(as.vector(cc)^2)
-          ans
-      })
-
 setMethod("reweight",
           signature(predM = "sPredModule", sqrtXwt = "matrix", wtres = "numeric"),
           function(predM, sqrtXwt, wtres, ...)
       {
           stopifnot(ncol(sqrtXwt) == 1L) # FIXME: add nls version
-          Vt <- t(predM@X) %*% Diagonal(x = as.vector(sqrtXwt))
+          Vt <- crossprod(predM@X, Diagonal(x = as.vector(sqrtXwt)))
           predM@Vtr <- as.vector(Vt %*% wtres)
           predM@fac <- update(predM@fac, Vt)
           predM
+      })
+
+setMethod("solveCoef", "dPredModule", function(predM, ...)
+      {
+          cc <- solve(t(predM@fac), predM@Vtr)
+	  structure(as.vector(solve(predM@fac, cc)),
+		    sqrLen = sum(as.vector(cc)^2))
       })
 
 setMethod("solveCoef", "sPredModule", function(predM, ...)
@@ -996,7 +1018,6 @@ setMethod("solveCoef", "sPredModule", function(predM, ...)
           ff <- predM@fac
           if (isLDL(ff)) stop("sparse factor must be LL, not LDL")
           cc <- solve(ff, solve(ff, predM@Vtr, system = "P"), system = "L")
-          ans <- as.vector(solve(ff, solve(ff, cc, system = "Lt"), system = "Pt"))
-          attr(ans, "sqrLen") <- sum(as.vector(cc)^2)
-          ans
+	  structure(as.vector(solve(ff, solve(ff, cc, system = "Lt"), system = "Pt")),
+		    sqrLen = sum(as.vector(cc)^2))
       })
