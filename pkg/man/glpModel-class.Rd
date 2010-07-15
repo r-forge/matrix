@@ -53,7 +53,7 @@ str(trial <- data.frame(counts=c(18,17,15,20,10,20,25,13,12),
 glm.D93 <- glm(counts ~ outcome + treatment, family=poisson, data=trial)
 summary(glm.D93)
 glmM <- Matrix:::glm4(counts ~ outcome + treatment, family = poisson, data=trial)
-stopifnot( all.equal(glmM@pred@coef, unname(coef(glm.D93))) )
+stopifnot( all.equal(glmM@pred@coef, unname(coef(glm.D93)), tol=1e-7) )
 
 ## Watch the iterations --- and use no intercept --> more sparse X
 ## 1) dense generalized linear model
@@ -73,6 +73,6 @@ clotting <- data.frame(u = c(5,10,15,20,30,40,60,80,100),
                        lot2 = c(69,35,26,21,18,16,13,12,12))
 str(gMN <- Matrix:::glm4(lot1 ~ log(u), data=clotting, family=Gamma, verbose=TRUE))
 glm. <- glm(lot1 ~ log(u), data=clotting, family=Gamma)
-stopifnot( all.equal(gMN@pred@coef, unname(coef(glm.))) )
+stopifnot( all.equal(gMN@pred@coef, unname(coef(glm.)), tol=1e-7) )
 }
 \keyword{classes}
