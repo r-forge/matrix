@@ -4,7 +4,7 @@
 \alias{glpModel-class}
 \title{Class "glpModel" of General Linear Prediction Models}
 \description{
-  The class \code{"glpModel"} conceptionally contains a very large class
+  The class \code{"glpModel"} conceptually contains a very large class
   of \emph{\dQuote{General Linear Prediction Models}}.
 
   Its \code{resp} slot (of class \code{"\linkS4class{respModule}"}) may
