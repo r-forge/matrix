@@ -898,38 +898,22 @@ IRLS <- function(mod, control = list()) {
 	if(verbose)
 	    cat(sprintf("_%d_ convergence criterion: %5g\n",
 			iter, convcrit))
+	if (convcrit < TOL) break
         step <- 1
         repeat {
             cc <- as.vector(cbase + step * incr)
             respMod <- updateMu(respMod, as.vector(predMod@X %*% cc))
             wrss1 <- sum(respMod@wtres^2)
-            ## if(verbose >= 2) {
             if (verbose) {
                 cat(sprintf("step = %.5f, new wrss = %.8g, Delta(wrss)= %g, \n",
                             step, wrss1, wrss0 - wrss1))
                 print(cc)
             }
-	    ## re-compute convergence criterion
-            convcOld <- convcrit
-	    convcrit <- sqrt(step * attr(incr, "sqrLen")/wrss1)
 	    if (wrss1 < wrss0) break
-            ## else
-            convcrit <- convcOld
-	    if ((step <- step/2) < SMIN) {
-		warning("Minimum step factor 'SMIN' failed to reduce wrss")
-		cc <- cbase
-		break
-	    }
-            ## no further step halving, if we are good enough anyway
-	    if (convcrit < TOL) break
 	}
-	if (convcrit < TOL) break
     }
     predMod@coef <- cc
-    if(FALSE) {## FIXME?  For consistency, shouldn't we add
-	respMod <- updateWts(respMod)
-	predMod <- reweight(predMod, respMod@sqrtXwt, respMod@wtres)
-    }
+
     ## TODO: store 'convcrit = convcrit' in a new slot "fitProps" = "list"
     new("glpModel", resp = respMod, pred = predMod)
 }
