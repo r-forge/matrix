@@ -212,7 +212,7 @@ exportClasses(
               "nlsRespMod",          # nonlinear regression response
               "nglmRespMod",         # generalized nonlinear
 
-              "glpModel"
+              "glpModel", "Model"
 	      )
 
 

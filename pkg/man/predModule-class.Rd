@@ -1,5 +1,7 @@
 \name{predModule-class}
 \Rdversion{1.1}
+%%________ FIXME _______ rename class to  "linPredModule"
+%%________ ===== _______ as they are about *linear* pred. really
 \title{Class "predModule" and SubClasses}
 \docType{class}
 \alias{predModule-class}

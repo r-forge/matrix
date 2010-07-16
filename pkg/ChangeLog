@@ -1,8 +1,29 @@
+2010-07-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999375-43
+
+	* R/AllClass.R (Model): as mother class (of "glpModel")
+
+	* R/spModels.R (IRLS): more options()
+	(updateModel): update(<glm4>)
+
+2010-07-13  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999375-42, CRAN-released: 2010-07-15, r 2566
+
+	* R/spModels.R (glm4, IRLS): glm4 was 'glm1'; tweaks.
+
 2010-07-12  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* NAMESPACE: rename, export and
 	* man/glpModel-class.Rd: document Doug's new "glpModel" class.
-	* R/spModels.R
+
+2010-07-08  Douglas Bates <bates@stat.wisc.edu>
+
+	* R/AllClass.R: new "lpMod" class (-> later =: "glpModel"), and
+	working function:
+	* R/spModels.R (glm1): using linear pred.Model class, and
+	Bates-Watts convergence criterion.
 
 2010-07-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 

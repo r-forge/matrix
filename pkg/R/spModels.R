@@ -820,7 +820,7 @@ glm4 <- function(formula, family, data, weights, subset,
     mf[[1L]] <- as.name("model.frame")
     mf <- eval(mf, parent.frame())
 
-    ans <- new("glpModel",
+    ans <- new("glpModel", call = call,
 	       resp = mkRespMod(mf, family),
 	       pred = as(model.Matrix(formula, mf, sparse = sparse),
 			 "predModule"))
@@ -868,24 +868,33 @@ glm.fp <- function(lp) {
     as.vector(solve(crossprod(wM), crossprod(wM, z[good] * w)))
 }
 
-IRLS <- function(mod, control = list()) {
+IRLS <- function(mod, control) {
     stopifnot(is(mod, "glpModel"))
     respMod <- mod@resp
     predMod <- mod@pred
     rho <- environment()
+    ## Make all the control entries into local variables;
+    ## additionally specify defaults here,
+    ## and the caller can use "..." and control=list(...)
+    ## TODO {Doug Bates [Date: Tue, 13 Jul 2010 12:43:31]:
+    ## ----> nice utility function  do.defaults(ctrl, defaults, env)
     do.call(function(MXITER = 200L, TOL = 0.0001, SMIN = 0.0001,
-                     verbose = FALSE, ...)
+		     verbose = 0L, warnOnly = FALSE,
+		     quick = TRUE, finalUpdate = FALSE)# no "..." -> catch typos in control names
         {
             assign("MXITER", as.integer(MXITER)[1], rho)
             assign("TOL", as.double(TOL)[1], rho)
             assign("SMIN", as.double(SMIN)[1], rho)
-            assign("verbose", as.integer(verbose)[1], rho)
+	    assign("verbose", as.integer(verbose)[1], rho)# integer: for verboseness levels
+	    assign("warnOnly", as.logical(warnOnly)[1], rho)
+	    assign("quick", as.logical(quick)[1], rho)
+	    assign("finalUpdate", as.logical(finalUpdate)[1], rho)
             NULL
         }, control)
 
     cc <- predMod@coef
     respMod <- updateMu(respMod, as.vector(predMod@X %*% cc))
-    iter <- 0
+    iter <- nHalvings <- 0 ; DONE <- FALSE
     repeat {
 	if((iter <- iter + 1) > MXITER)
 	    stop("Number of iterations exceeded maximum MXITER = ", MXITER)
@@ -898,25 +907,91 @@ IRLS <- function(mod, control = list()) {
 	if(verbose)
 	    cat(sprintf("_%d_ convergence criterion: %5g\n",
 			iter, convcrit))
-	if (convcrit < TOL) break
+        if(quick)## faster, but "loses" precision by not doing the "free" update:
+            if (convcrit < TOL) break
         step <- 1
         repeat {
             cc <- as.vector(cbase + step * incr)
             respMod <- updateMu(respMod, as.vector(predMod@X %*% cc))
             wrss1 <- sum(respMod@wtres^2)
             if (verbose) {
-                cat(sprintf("step = %.5f, new wrss = %.8g, Delta(wrss)= %g, \n",
+		cat(sprintf("step = %.5f, new wrss = %.8g, Delta(wrss)= %g, coef =\n",
                             step, wrss1, wrss0 - wrss1))
                 print(cc)
             }
 	    if (wrss1 < wrss0) break
+            ## else
+	    if ((step <- step/2) < SMIN) {
+                msg <- "Minimum step factor 'SMIN' failed to reduce wrss"
+		if(!warnOnly)
+                    stop(msg)
+                ## else :
+                warning(msg)
+                cc <- cbase
+                DONE <- TRUE
+                break
+	    }
+            ## no further step halving, if we are good enough anyway
+	    if (DONE <- convcrit < TOL) break
+            nHalvings <- nHalvings + 1
 	}
+        if(DONE || (!quick # check now
+                    && convcrit < TOL))
+            break
     }
     predMod@coef <- cc
+    if(finalUpdate) {
+	respMod <- updateWts(respMod)
+	predMod <- reweight(predMod, respMod@sqrtXwt, respMod@wtres)
+    }
 
-    ## TODO: store 'convcrit = convcrit' in a new slot "fitProps" = "list"
-    new("glpModel", resp = respMod, pred = predMod)
+    mod@ fitProps <- list(convcrit=convcrit, iter=iter, nHalvings=nHalvings)
+    ## This is more portable than  new("glpModel", ....) as soon as
+    ## the class contains extra slots (such as, say, the model formula):
+    mod@ resp <- respMod
+    mod@ pred <- predMod
+    mod
 }
+
+### FIXME: Think of replacing  stats::update() by this, and provide a
+### -----  stats::getCall() S3 generic (and S4 generic in methods).
+
+### FIXME(2): lme4a can get rid of its  updateMer(), as soon as it uses this:
+
+##' @title update( <S4 model> ) -- using  getCall(obj)
+##'
+##' <description> This is almost identical to stats::update(), with the only
+##' difference that we use  getCall(object) instead of  object$call.  This
+##' makes it much more generally useful, notably for S4 model classes.
+##'
+##' @param object
+##' @param formula.
+##' @param ...
+##' @param evaluate
+##' @return
+updateModel <- function(object, formula., ..., evaluate = TRUE)
+{
+    if (is.null(call <- getCall(object)))
+	stop("object should contain a 'call' component")
+    extras <- match.call(expand.dots = FALSE)$...
+    if (!missing(formula.))
+	call$formula <- update.formula(formula(object), formula.)
+    if (length(extras) > 0) {
+	existing <- !is.na(match(names(extras), names(call)))
+	for (a in names(extras)[existing]) call[[a]] <- extras[[a]]
+	if (any(!existing)) {
+	    call <- c(as.list(call), extras[!existing])
+	    call <- as.call(call)
+	}
+    }
+    if (evaluate)
+	eval(call, parent.frame())
+    else call
+}
+
+setMethod("update", "Model", updateModel)
+setMethod("getCall", "Model", function(x) x@call)
+
 
 setMethod("updateMu", signature(respM = "respModule", gamma = "numeric"),
 	  function(respM, gamma, ...)
