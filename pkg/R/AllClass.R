@@ -925,6 +925,14 @@ setClass("nlsRespMod",
 ##' nglm response module
 setClass("nglmRespMod", contains = c("glmRespMod", "nlsRespMod"))
 
+
+### FIXME: move this eventually to 'methods':
+##  -----
+##' The mother class of all (S4 based)  (statistical / physical / ...) models in R:
+setClass("Model", representation(call = "call", fitProps = "list",
+                                 "VIRTUAL"))
+
 ##' Statistical models based on linear predictors
 ##' "glpModel" := General Linear Prediction Models
-setClass("glpModel", representation(resp = "respModule", pred = "predModule"))
+setClass("glpModel", representation(resp = "respModule", pred = "predModule"),
+         contains = "Model")

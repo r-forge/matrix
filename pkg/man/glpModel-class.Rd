@@ -52,8 +52,18 @@ str(trial <- data.frame(counts=c(18,17,15,20,10,20,25,13,12),
                         treatment=gl(3,3,labels=letters[1:3])))
 glm.D93 <- glm(counts ~ outcome + treatment, family=poisson, data=trial)
 summary(glm.D93)
-glmM <- Matrix:::glm4(counts ~ outcome + treatment, family = poisson, data=trial)
-stopifnot( all.equal(glmM@pred@coef, unname(coef(glm.D93)), tol=1e-7) )
+c.glm <- unname(coef(glm.D93))
+glmM  <- Matrix:::glm4(counts ~ outcome + treatment, family = poisson, data=trial)
+glmM2 <- update(glmM, quick = FALSE) # slightly more accurate
+glmM3 <- update(glmM, quick = FALSE, finalUpdate = TRUE)
+                 # finalUpdate has no effect on 'coef'
+stopifnot( identical(glmM2@pred@coef, glmM3@pred@coef),
+           all.equal(glmM @pred@coef, c.glm, tol=1e-7),
+           all.equal(glmM2@pred@coef, c.glm, tol=1e-12))
+
+stopifnot( ## ensure typos are *caught* :
+  inherits(try(Matrix:::glm4(counts ~ outcome + treatment, family=poisson, data=trial,
+                       fooBar = FALSE)), "try-error"))
 
 ## Watch the iterations --- and use no intercept --> more sparse X
 ## 1) dense generalized linear model
