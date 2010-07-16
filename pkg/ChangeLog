@@ -1,5 +1,14 @@
 2010-07-16  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* R/spModels.R (do.defaults): add 'nonMatched.action' with default
+	ensuring that typos are caught.
+
+2010-07-16  Douglas Bates <bates@stat.wisc.edu>
+
+	* R/spModels.R (do.defaults): utility function; TODO: move to R
+
+2010-07-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
 	* DESCRIPTION (Version): 0.999375-43
 
 	* R/AllClass.R (Model): as mother class (of "glpModel")
@@ -11,7 +20,7 @@
 
 	* DESCRIPTION (Version): 0.999375-42, CRAN-released: 2010-07-15, r 2566
 
-	* R/spModels.R (glm4, IRLS): glm4 was 'glm1'; tweaks.
+	* R/spModels.R (glm4, IRLS): glm4 [was 'glm1']; tweaks.
 
 2010-07-12  Martin Maechler  <maechler@stat.math.ethz.ch>
 
