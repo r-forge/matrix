@@ -868,29 +868,27 @@ glm.fp <- function(lp) {
     as.vector(solve(crossprod(wM), crossprod(wM, z[good] * w)))
 }
 
-IRLS <- function(mod, control) {
+do.defaults <- function(control, defaults, rho)
+{
+                                        # Install the default values
+    dnms <- names(defaults <- as.list(defaults))
+    lapply(dnms, function(nm) assign(nm, defaults[[nm]], rho))
+                                        # Match names of control arguments to defaults
+    if (any(matched <- !is.na(mm <- pmatch(names(control <- as.list(control)), dnms)))) {
+        cc <- control[matched]
+        names(cc) <- dnms[mm[matched]]
+        lapply(names(cc),
+               function(nm) assign(nm, as(cc[[nm]], class(defaults[[nm]])), rho))
+    }
+}
+    
+IRLS <- function(mod, control = list()) {
     stopifnot(is(mod, "glpModel"))
     respMod <- mod@resp
     predMod <- mod@pred
-    rho <- environment()
-    ## Make all the control entries into local variables;
-    ## additionally specify defaults here,
-    ## and the caller can use "..." and control=list(...)
-    ## TODO {Doug Bates [Date: Tue, 13 Jul 2010 12:43:31]:
-    ## ----> nice utility function  do.defaults(ctrl, defaults, env)
-    do.call(function(MXITER = 200L, TOL = 0.0001, SMIN = 0.0001,
-		     verbose = 0L, warnOnly = FALSE,
-		     quick = TRUE, finalUpdate = FALSE)# no "..." -> catch typos in control names
-        {
-            assign("MXITER", as.integer(MXITER)[1], rho)
-            assign("TOL", as.double(TOL)[1], rho)
-            assign("SMIN", as.double(SMIN)[1], rho)
-	    assign("verbose", as.integer(verbose)[1], rho)# integer: for verboseness levels
-	    assign("warnOnly", as.logical(warnOnly)[1], rho)
-	    assign("quick", as.logical(quick)[1], rho)
-	    assign("finalUpdate", as.logical(finalUpdate)[1], rho)
-            NULL
-        }, control)
+    do.defaults(control,
+                list(MXITER = 200L, TOL = 0.0001, SMIN = 0.0001, verbose = FALSE),
+                environment())
 
     cc <- predMod@coef
     respMod <- updateMu(respMod, as.vector(predMod@X %*% cc))
@@ -920,7 +918,6 @@ IRLS <- function(mod, control) {
                 print(cc)
             }
 	    if (wrss1 < wrss0) break
-            ## else
 	    if ((step <- step/2) < SMIN) {
                 msg <- "Minimum step factor 'SMIN' failed to reduce wrss"
 		if(!warnOnly)
