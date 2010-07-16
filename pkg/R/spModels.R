@@ -868,26 +868,41 @@ glm.fp <- function(lp) {
     as.vector(solve(crossprod(wM), crossprod(wM, z[good] * w)))
 }
 
-do.defaults <- function(control, defaults, rho)
+do.defaults <- function(control, defaults, rho,
+			## by default stop() on mistyped control arguments:
+			nonMatched.action = c("stop", "warning", "none"))
 {
-                                        # Install the default values
+    nonMatched.action <- match.arg(nonMatched.action)
+					# Install the default values
     dnms <- names(defaults <- as.list(defaults))
     lapply(dnms, function(nm) assign(nm, defaults[[nm]], rho))
-                                        # Match names of control arguments to defaults
-    if (any(matched <- !is.na(mm <- pmatch(names(control <- as.list(control)), dnms)))) {
-        cc <- control[matched]
-        names(cc) <- dnms[mm[matched]]
-        lapply(names(cc),
-               function(nm) assign(nm, as(cc[[nm]], class(defaults[[nm]])), rho))
+					# Match names of control arguments to defaults
+    matched <- !is.na(mm <- pmatch(names(control <- as.list(control)), dnms))
+    if(nonMatched.action != "none" && any(!matched)) {
+	msg <-
+	    paste("The following control arguments did not match any default's names:",
+		  paste(dQuote(names(control)[!matched]), collapse=", "), sep="\n   ")
+	switch(nonMatched.action,
+	       "warning" = warning(msg, call.=FALSE, immediate.=TRUE),
+	       "stop" = stop(msg, call.=FALSE))
+    }
+    if (any(matched)) {
+	cc <- control[matched]
+	names(cc) <- dnms[mm[matched]]
+	lapply(names(cc),
+	       function(nm) assign(nm, as(cc[[nm]], class(defaults[[nm]])), rho))
     }
 }
-    
+
 IRLS <- function(mod, control = list()) {
     stopifnot(is(mod, "glpModel"))
     respMod <- mod@resp
     predMod <- mod@pred
     do.defaults(control,
-                list(MXITER = 200L, TOL = 0.0001, SMIN = 0.0001, verbose = FALSE),
+		list(MXITER = 200L, TOL = 0.0001, SMIN = 0.0001,
+		     verbose = 0L,# integer: for verboseness levels
+		     warnOnly = FALSE,
+		     quick = TRUE, finalUpdate = FALSE),
                 environment())
 
     cc <- predMod@coef
@@ -918,6 +933,7 @@ IRLS <- function(mod, control = list()) {
                 print(cc)
             }
 	    if (wrss1 < wrss0) break
+	    ## else
 	    if ((step <- step/2) < SMIN) {
                 msg <- "Minimum step factor 'SMIN' failed to reduce wrss"
 		if(!warnOnly)
