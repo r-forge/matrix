@@ -868,21 +868,35 @@ glm.fp <- function(lp) {
     as.vector(solve(crossprod(wM), crossprod(wM, z[good] * w)))
 }
 
+##' <description>
+##'
+##' <details>
+##' @title
+##' @param control  a (named) list {or vector; as.list(.)  must work}.
+##' @param defaults a (named) list {or vector; as.list(.)  must work}.
+##' @param rho typically an environment; in fact anything that "works" as third
+##'    argument in  'assign(nm, val, rho)'>
+##' @param nomatch.action string specifying what should happen when control()
+##'    entries do not match any of the defaults.
+##' @return none. Side effect: 'rho' will contain 'control' and 'defaults' entries.
+##' @author Doug Bates (& Martin Maechler)
+##
+## FIXME -- ESS-oxygen bug:  comment line inside the arg.list messes up @param:
 do.defaults <- function(control, defaults, rho,
 			## by default stop() on mistyped control arguments:
-			nonMatched.action = c("stop", "warning", "none"))
+			nomatch.action = c("stop", "warning", "none"))
 {
-    nonMatched.action <- match.arg(nonMatched.action)
+    nomatch.action <- match.arg(nomatch.action)
 					# Install the default values
     dnms <- names(defaults <- as.list(defaults))
     lapply(dnms, function(nm) assign(nm, defaults[[nm]], rho))
 					# Match names of control arguments to defaults
     matched <- !is.na(mm <- pmatch(names(control <- as.list(control)), dnms))
-    if(nonMatched.action != "none" && any(!matched)) {
+    if(nomatch.action != "none" && any(!matched)) {
 	msg <-
 	    paste("The following control arguments did not match any default's names:",
 		  paste(dQuote(names(control)[!matched]), collapse=", "), sep="\n   ")
-	switch(nonMatched.action,
+	switch(nomatch.action,
 	       "warning" = warning(msg, call.=FALSE, immediate.=TRUE),
 	       "stop" = stop(msg, call.=FALSE))
     }
@@ -892,9 +906,10 @@ do.defaults <- function(control, defaults, rho,
 	lapply(names(cc),
 	       function(nm) assign(nm, as(cc[[nm]], class(defaults[[nm]])), rho))
     }
+    invisible()
 }
 
-IRLS <- function(mod, control = list()) {
+IRLS <- function(mod, control) {
     stopifnot(is(mod, "glpModel"))
     respMod <- mod@resp
     predMod <- mod@pred
@@ -960,7 +975,7 @@ IRLS <- function(mod, control = list()) {
 
     mod@ fitProps <- list(convcrit=convcrit, iter=iter, nHalvings=nHalvings)
     ## This is more portable than  new("glpModel", ....) as soon as
-    ## the class contains extra slots (such as, say, the model formula):
+    ## the class contains extra slots (such as 'call'):
     mod@ resp <- respMod
     mod@ pred <- predMod
     mod
@@ -989,13 +1004,12 @@ updateModel <- function(object, formula., ..., evaluate = TRUE)
     extras <- match.call(expand.dots = FALSE)$...
     if (!missing(formula.))
 	call$formula <- update.formula(formula(object), formula.)
-    if (length(extras) > 0) {
+    if (length(extras)) {
 	existing <- !is.na(match(names(extras), names(call)))
-	for (a in names(extras)[existing]) call[[a]] <- extras[[a]]
-	if (any(!existing)) {
-	    call <- c(as.list(call), extras[!existing])
-	    call <- as.call(call)
-	}
+	for(a in names(extras)[existing])
+            call[[a]] <- extras[[a]]
+	if(any(!existing))
+	    call <- as.call(c(as.list(call), extras[!existing]))
     }
     if (evaluate)
 	eval(call, parent.frame())
@@ -1004,6 +1018,7 @@ updateModel <- function(object, formula., ..., evaluate = TRUE)
 
 setMethod("update", "Model", updateModel)
 setMethod("getCall", "Model", function(x) x@call)
+setMethod("formula", "Model", function(x, ...) x@call$formula)
 
 
 setMethod("updateMu", signature(respM = "respModule", gamma = "numeric"),
