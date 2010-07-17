@@ -5,7 +5,7 @@ useDynLib(Matrix, .registration=TRUE)
 importFrom("lattice", levelplot)
 importFrom("graphics", image)
 importFrom("utils", head, tail)
-importFrom("stats", cov2cor, update)
+importFrom("stats", cov2cor, update, formula)
 importFrom("grid", grid.rect, gpar, grob)# others via 'grid::'
 
 ## Currently, group generics need to be explicitly imported (Bug?):
@@ -33,6 +33,7 @@ export("Cholesky",
        "expm",
        "facmul",
        "forceSymmetric",
+       "getCall",
 #	 "isTriangular",
 #	 "isDiagonal",
        "isLDL",
@@ -263,6 +264,8 @@ exportMethods(## for both own and "other" generics:
               "drop",
 	      "expand",
 	      "expm",
+	      "formula",
+	      "getCall",
 	      "head",
 	      "image",
 	      "forceSymmetric",

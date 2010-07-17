@@ -644,11 +644,13 @@ setMethod("norm", signature(x = "sparseMatrix", type = "character"),
 		     stop("invalid 'type'"))
 	  })
 
+## FIXME: need a version of LAPACK's rcond() algorithm, using sparse-arithmetic
+## FIXME: as workaround, allow use of  1/(norm(A) * norm(solve(A)))
 setMethod("rcond", signature(x = "sparseMatrix", norm = "character"),
 	  function(x, norm, ...) {
 	      d <- dim(x)
               ## FIXME: qr.R(qr(.)) warns about differing R (permutation!)
-              ##        really fix qr.R() *or* go via dense in any cases
+              ##        really fix qr.R() *or* go via dense even in those cases
 	      rcond(if(d[1] == d[2]) {
 			warning("rcond(.) via sparse -> dense coercion")
 			as(x, "denseMatrix")

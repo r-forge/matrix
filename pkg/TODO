@@ -223,3 +223,9 @@
 - sort(<sparseVector>, partial=..), needed, e.g. for mean(*, trim = .).
   Note that defining xtfrm() does not "help" (as sort() then goes via dense
   index).  See "mean" in R/Matrix.R
+
+- rcond(<sparseMatrix>) - for square currently goes via *dense* -- BAD --
+  can we go via qr() in any case?
+  In some cases, e.g. lmer()'s  "Lambda" (block triangular, small blocks)
+       rcond(L) :=  1 / (norm(L) * norm(solve(L)))
+  is simple {and remains sparse, as solve(L) is still block triangular}

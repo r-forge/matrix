@@ -60,10 +60,13 @@ glmM3 <- update(glmM, quick = FALSE, finalUpdate = TRUE)
 stopifnot( identical(glmM2@pred@coef, glmM3@pred@coef),
            all.equal(glmM @pred@coef, c.glm, tol=1e-7),
            all.equal(glmM2@pred@coef, c.glm, tol=1e-12))
-
+\dontshow{
 stopifnot( ## ensure typos are *caught* :
   inherits(try(Matrix:::glm4(counts ~ outcome + treatment, family=poisson, data=trial,
-                       fooBar = FALSE)), "try-error"))
+                       fooBar = FALSE)), "try-error"),
+  ## check formula(.): {environments differ - FIXME?}
+  formula(glmM) == formula(glm.D93))
+}
 
 ## Watch the iterations --- and use no intercept --> more sparse X
 ## 1) dense generalized linear model
