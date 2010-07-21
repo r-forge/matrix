@@ -139,21 +139,21 @@ nonlinear models (\code{nls}) and generalized nonlinear models (\code{nglm}):
 \begin{footnotesize}\begin{Schunk}
 \begin{Sinput}
 setClass("respModule",
-         representation(mu = "numeric",      # of length n
-                        offset = "numeric",  # of length n * k
-                        sqrtXwt = "matrix",  # of dim(.) == dim(X) == (n, k)
-                        sqrtrwt = "numeric", # sqrt(residual weights)
-                        weights = "numeric", # prior weights
-                        wtres = "numeric",
-                        y = "numeric"),
-         validity = function(object) { ....... })
+    representation(mu = "numeric",      # of length n
+                   offset = "numeric",  # of length n * s
+                   sqrtXwt = "matrix",  # of dim(.) == (n, s)
+                   sqrtrwt = "numeric", # sqrt(residual weights)
+                   weights = "numeric", # prior weights
+                   wtres = "numeric",
+                   y = "numeric"),
+    validity = function(object) { ....... })
 setClass("glmRespMod",
-         representation(family =  "family",
-                        eta =    "numeric",
-                        n =      "numeric"), # for evaluation of the aic
-         contains = "respModule", validity = function(object) { ..... })
+    representation(family =  "family",
+                   eta =    "numeric",
+                   n =      "numeric"), # for evaluation of the aic
+    contains = "respModule", validity=function(object) { .... })
 setClass("nlsRespMod",
-         representation(nlenv = "environment", ......), ............)
+         representation(nlenv = "environment", .....), .......)
 setClass("nglmRespMod", contains = c("glmRespMod", "nlsRespMod"))
 \end{Sinput}
 \end{Schunk}\end{footnotesize}
@@ -176,10 +176,10 @@ currently in \textcolor{Orange}{dense} and
 \begin{footnotesize}\begin{Schunk}
 \begin{Sinput}
 setClass("predModule",
-         representation(X = "modelMatrix", coef = "numeric", Vtr = "numeric",
-                        fac = "CholeskyFactorization",
-                        "VIRTUAL"))
-## the sub classes specify more specific classes for the two non-trivial slots:
+     representation(X = "modelMatrix", coef = "numeric",
+                    Vtr = "numeric", fac = "CholeskyFactorization",
+                    "VIRTUAL"))
+## sub classes: more specific classes for the two non-trivial slots:
 setClass("dPredModule", contains = "predModule",
          representation(X = "ddenseModelMatrix", fac = "Cholesky"))
 setClass("sPredModule", contains = "predModule",
