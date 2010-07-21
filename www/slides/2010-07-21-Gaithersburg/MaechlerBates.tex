@@ -1,0 +1,222 @@
+% \documentclass[dvipsnames,pdflatex,beamer]{beamer}
+%\documentclass[dvipsnames,pdflatex,handout]{beamer}
+%                                   ^^^^^^^ << for handout - happens in Makefile
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+%beamer breaks with\usepackage{paralist}%-> {compactenum}, ... (Aargh!)
+%\usepackage{mdwlist}% \suspend and \resume enumerate
+\usepackage{relsize}% ``relative font sizes''
+%% part of {mmVignette} below: \usepackage{SweaveSlides}
+\usepackage{mmVignette}%-- local in this directory: -> {listings}, \lstset,...
+%           ^^^^^^^^^^
+\usepackage{MM-slides}% whitespace-tricks, \nlQ etc
+\usepackage{MM-colors}% {\color{salmonII} ..text..} \textcolor{red}{..txt..}
+%\usepackage{bm}
+%-------------------------------------------------------------
+%
+\newcounter{saveenum}
+\newcommand{\Rp}{\textsf{R}}
+%fails: why? \def\Rp\RR% and \RR is in mmVignette -- R program
+\newcommand*{\CRAN}{\textsc{cran}$\;$}
+\newcommand*{\W}{\ensuremath{\mathbf{W}}}
+\newcommand*{\Ip}{\mathbf{I}_p}
+%---- from texab.sty --- can not take all --------------
+% \newcommand{\norm}[1]   {\left\| #1 \right\|}
+% % the above sometimes give much too long  || -- then use the following:
+% \newcommand{\normb}[1]  {\bigl\|{#1}\bigr\|}
+% \newcommand{\normB}[1]  {\Bigl\|{#1}\Bigr\|}
+\newcommand{\fn}[1]{\kern-2pt\left(#1\right)}
+\newcommand{\Ew}[1]{\mathbf{E}\kern2pt\fn{#1}}
+%
+%
+\mode<handout>{\usetheme{default}}
+\mode<beamer>{%
+  %%> http://www.namsu.de/latex/themes/uebersicht_beamer.html
+  \usetheme{Boadilla}% somewhat similar to Singapore, but "nice" blocks
+  %\usetheme{Singapore}%  \usetheme{Madrid}%
+  \setbeamercovered{dynamic}% {transparent} {invisible} or {dynamic}
+  % Use ETH Logo
+%   \pgfdeclareimage[height=0.5cm]{ETH-logo}{../ethlogo_black}%
+%   \logo{\pgfuseimage{ETH-logo}}%
+  % \pgfdeclareimage[height=0.5cm]{R-logo}{Rlogo}%
+  \pgfdeclareimage[height=0.5cm]{R-logo}{useR}%
+  \logo{\pgfuseimage{R-logo}}%
+}
+\usefonttheme[onlymath]{serif}
+
+
+\title[Sparse Model Matrices for GLM's]{%
+Sparse Model Matrices for Generalized Linear Models
+}
+
+\author[Martin Maechler, Doug Bates]{Martin Maechler and Douglas Bates}
+\institute[R Core]{% 'ETH Z' if more needed
+  {\color{Scode}\texttt{(maechler|bates)@R-project.org} \ \ (R-Core)}
+  \bigskip
+
+  Seminar für Statistik \\ ETH Zurich  \ \ Switzerland
+  \medskip
+  Department of Statistics \\ University of Madison, Wisconsin \ \ U.S.A.
+}
+\date[useR! @ NIST, 2010]{useR! 2010, Gaithersburg \\ July 21, 2010}
+
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsection,hideallsubsections]
+  \end{frame}
+}
+\begin{document}
+
+\begin{frame} \titlepage
+\end{frame}
+%
+\begin{frame} \frametitle{Outline}
+  \tableofcontents[hideallsubsections]
+  % You might wish to add the option [pausesections]:
+  %\tableofcontents[pausesections,hideallsubsections]
+\end{frame}
+
+\section{Sparse Matrices}\label{sec:intro}
+\begin{frame}\frametitle{Introduction}
+  \begin{itemize}
+  \item Package \texttt{Matrix}: a \alert{recommended} R package \ $\to$
+    part of every \Rp.%since R 2.9.0
+  \item Infrastructure for other packages for several years,
+    notably \pkg{lme4}\footnote{
+      \alert{lme4} := (Generalized--) (Non--) \alert{L}inear \alert{M}ixed
+      \alert{E}ffect Modelling,
+      \\ \qquad\qquad
+      (using S\alert{4} $\mid$ re-implemented from scratch the
+      $\alert{4}^\mathrm{th}$ time)}
+
+  \item<2->\emph{Reverse depends (2010-07-18):} ChainLadder, CollocInfer,
+    EquiNorm, FAiR, FTICRMS, GLMMarp, GOSim, GrassmannOptim, HGLMMM,
+    MCMCglmm, Metabonomic, amer, arm, arules, diffusionMap, expm,
+    gamlss.util, gamm4, \alert{glmnet}, klin, languageR, \alert{lme4}, mclogit,
+    mediation, mi, mlmRev, optimbase, pedigree, pedigreemm, phybase,
+    qgen, ramps, recommenderlab, spdep, \alert{speedglm}, sphet, surveillance,
+    surveyNG, svcm, systemfit, tsDyn, Ringo
+
+  \item<3-> \emph{Reverse suggests:} another dozen \dots
+  \end{itemize}
+\end{frame}
+
+\input{sparse-intro-10}
+%%     ===============
+
+\section{Sparse {Model} Matrices}\label{sec:sparse-modmat}
+\input{sparse-model-matrices}
+%%     ===============
+
+\section{Mixed Modelling in R: \pkg{lme4}}\label{sec:lmer}
+\begin{frame}\frametitle{Mixed Modelling - (RE)ML Estimation}% in pure R}
+In (linear) mixed effects,
+\begin{equation}%% from ../../../../lme4/www/lMMwR/ChIntro.Rnw
+  %% replacing \vec (Springer) by \bm:
+  \label{eq:LMMdist}
+  \begin{aligned}
+    (\bc Y|\bc B=\bm b)&\sim\mathcal{N}(\bm X\bm\beta+\bm Z\bm
+    b,\sigma^2\bm I)\\
+    \bc{B}&\sim\mathcal{N}(\bm0,\Sigma_\theta), \ \ \ \
+    \textrm{and}\\
+    \Sigma_\theta &= \sigma^2 \Lambda_\theta \Lambda_\theta\trans,
+  \end{aligned}
+\end{equation}
+the evaluation of the (RE)
+likelihood or equivalently deviance, needs repeated Cholesky decompositions
+(including fill-reducing permutation $\bm P$)
+% \begin{equation}
+%   \label{eq:U'U+I}
+%   \bU_\theta \bU_\theta\tr + \bI,
+% \end{equation}
+\begin{equation}
+  \label{eq:sparseCholeskyP}
+  \bm L_\theta\bm L_\theta\trans
+   = \bm P\left(\Lambda_\theta\trans\bm Z\trans\bm Z\Lambda_\theta
+   +\bm I_q\right)\bm P\trans,
+\end{equation}
+for many $\theta$'s %values ($=$ the relative variance components)
+and often very large, very sparse matrices $\bm Z$ and
+$\Lambda_\theta$ where only the \emph{non}-zeros of $\Lambda$ depend on
+$\theta$,  i.e., the sparsity pattern (incl.\ fill-reducing permutation
+$\bm P$)and f is  given (by the observational design).
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Modelling - (RE)ML Estimation}% in pure R}
+Sophisticated (fill-reducing) Cholesky done in two phases:
+\begin{enumerate}
+\item ``symbolic'' decomposition: Determine the non-zero entries of $\bm L$
+  ($\bm L {\bm L}\tr = \bU \bU\tr + \bI$),
+\item numeric phase: compute these entries.
+
+\bigskip
+
+Phase 1: typically takes much longer; only needs to happen \emph{once}.\\
+Phase 2: ``update the Cholesky Factorization''
+\end{enumerate}
+\end{frame}
+
+%%--------------
+%\input{ETH-teachers}%-> ./ETH-teachers.Rnw
+%%--------------
+
+\begin{frame}\frametitle{Summary}
+
+\begin{itemize}[<+->]
+ \item \emph{Sparse} Matrices: used in increasing number of applications
+   and \Rp\ packages.
+ % \item S4 classes and methods are \alert{the} natural implementation tools
+
+ % \item lme4 is going to contain an alternative ``pure R'' version of ML and REML,
+ %   you can pass to \texttt{nlminb()} \textcolor{gray}{(or \texttt{optim()}
+ %     if you must :-)}.
+ %   UseRs can easily extend these R functions to more flexible models or
+ %   algorithms.
+
+ \item \pkg{Matrix} (in every \Rp{} since 2.9.0)
+   \begin{enumerate}[<+->]
+   \item has \ \code{model.Matrix(formula, \dots\dots, sparse = TRUE/FALSE)}
+   \item has class \code{"glpModel"} for linear prediction modeling
+   \item has (currently hidden) function \Rfun{glm4}; a proof of concept,
+     (allowing ``\code{glm}'' with \alert{sparse} $\bm X$), using very
+     general \Rfun{IRLS} function [convergence check by stringent
+     Bates and Watts (1988) orthogonality criterion]
+   \end{enumerate}
+
+ \item
+   \pkg{lme4a} on R-forge ($=$ next generation of package \pkg{lme4})
+   is providing
+   \begin{enumerate}[<+->]
+     \item
+       \Rfun{lmer}, \Rfun{glmer}, \Rfun{nlmer},
+       and eventually \Rfun{gnlmer}, all making use of modular
+       classes (prediction [$=$ fixed eff. $+$ random eff.] and response
+       modules) and generic algorithms (e.g. ``PIRLS'').
+     \item
+       All with \emph{sparse} (random effect) matrices $\rZ$ and
+       $\Lambda_\theta$ (where $\operatorname{Var}(\bc B) = \sigma^2
+       \Lambda_\theta \Lambda_\theta\trans$),
+
+     \item \emph{and} optionally (\code{sparseX = TRUE}) sparse fixed effect
+       matrix, $\gX$.
+     \end{enumerate}
+   \end{itemize}
+\pause
+
+\bigskip
+
+\begin{block}{}
+   That's all folks --- with thanks for your attention!
+\end{block}
+
+\end{frame}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-command-default: "LaTeX PDF"
+%%% TeX-master: t
+%%% End:
