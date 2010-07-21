@@ -35,24 +35,32 @@ model.matrix(~ 0+ a * b, dd)
 \end{frame}
 
 \begin{frame}[fragile]\frametitle{Sparse \alert{Model} Matrices in 'Matrix'}
-  These matrices can become very large (not only many rows, large $n$), but
-  also many columns, large $p$).
+  \begin{itemize}
+  \item
+  These matrices can become very large: Both many rows (large $n$), \emph{and}
+  many columns, large $p$.
 
+
+\item
   Eg., in Linear Mixed Effects Models,
   \begin{equation*}
     \Ew{\bc Y|\bc B=\bm b} = \gX \bm\beta+\rZ\bm b,
   \end{equation*}
-  the $\rZ$ matrix is often large and very sparse, and in \pkg{lme4} has
-  always been stored as \code{"sparseMatrix"} (notably, \code{"dgCMatrix"}).
+  \begin{itemize}
+  \item
+    the $\rZ$ matrix is often large and very sparse, and in \pkg{lme4} has
+    always been stored as \code{"sparseMatrix"} (\code{"dgCMatrix"}, specifically).
 
-  Sometimes, $\gX$, (fixed effect matrix) is large, too.
-  \nlQ $\to$ optionally also \code{"sparseMatrix"} in
-  \pkg{lme4}\footnote{the development version of \pkg{lme4}, currently called \pkg{lme4a}.}.
+  \item
+    Sometimes, $\gX$, (fixed effect matrix) is large, too.
+    \nlQ $\to$ optionally also \code{"sparseMatrix"} in
+    \pkg{lme4}\footnote{the development version of \pkg{lme4}, currently called \pkg{lme4a}.}.
+  \end{itemize}
 
-  \medskip
-
+\item
   We've extended \Rfun{model.\Ul{m}atrix} to  \Rfun{model.\Ul{M}atrix} in
   package \pkg{Matrix} with optional argument \code{sparse = TRUE}.
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -78,9 +86,12 @@ setClass("ddenseModelMatrix", contains =
 \end{Sinput}
 \end{Schunk}
 \end{footnotesize}
----\\
-(adding \code{"ddenseMatrix"} above does \emph{not} influence slots, but yields
-consistent superclass ordering.)
+\medskip
+
+% (adding \code{"ddenseMatrix"} above does \emph{not} influence slots, but yields
+% consistent superclass ordering.)
+(\code{"ddenseMatrix"}: \emph{not} for slots, but
+consistent superclass ordering)
 \end{frame}
 
 \begin{frame}[fragile]\frametitle{model.\alert{M}atrix(*, sparse=TRUE)}
@@ -150,10 +161,18 @@ setClass("nglmRespMod", contains = c("glmRespMod", "nlsRespMod"))
 
 \begin{frame}[fragile]\frametitle{(2) Prediction Module}
 %\item
-\code{"predModule"}: Linear predictor modules, which consist of the model
-matrix, the coefficient vector and a triangular factor of the weighted
-model matrix, currently in \textcolor{Orange}{dense} and
+\code{"predModule"}: Linear predictor module consists of
+\begin{itemize}
+\item the model matrix \code{X},
+\item the coefficient vector \code{coef},
+\item a triangular factor of the weighted model matrix \code{fac},
+\item (\code{Vtr} $= \bm {V\trans r}$, where $\bm r =$ residuals (typically)
+\end{itemize}
+currently in \textcolor{Orange}{dense} and
 \textcolor{Mulberry}{sparse} flavor:
+
+\medskip
+
 \begin{footnotesize}\begin{Schunk}
 \begin{Sinput}
 setClass("predModule",
@@ -172,12 +191,32 @@ setClass("sPredModule", contains = "predModule",
 
 \begin{frame}
   \frametitle{Fitting all ``glpModel''s with One IRLS algorithm}
-  Fitting:   The prediction and response module parts each update
+  Fitting via IRLS (Iteratively Reweighted Least Squares), where
+  the prediction and response module parts each update
   ``themselves''.
+
+  \bigskip
+
+  These 3 Steps are iterated till convergence:\\
   \begin{enumerate}
-  \item prediction module only passes $\bm \mu$ to response module
+  \item prediction module (\textsc{pm}) only passes \code{X \%*\% coef}$ = \bm X \beta$
+    to the response module (\textsc{rm})
+  \item from that, the \textsc{rm}
+    \begin{itemize}
+    \item updates its $\bm \mu$,
+    \item then its weighted residuals and ``X weights''
+    \end{itemize}
+  \item these two are in turn passed to \textsc{pm} which
+    \begin{itemize}
+    \item reweights itself and
+    \item \code{solve()}s for
+      $\Delta\bm\beta$, the \emph{increment} of $\bm\beta$.
+    \end{itemize}
   \end{enumerate}
+  Convergence only if Bates-Watts orthgonality criterion is fulfilled.
 \end{frame}
+
+
 %%% Local Variables:
 %%% TeX-command-default: "LaTeX PDF"
 %%% TeX-master: "MaechlerBates.tex"
