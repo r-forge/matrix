@@ -1,0 +1,185 @@
+\SweaveOpts{engine=R, keep.source=TRUE}
+\SweaveOpts{eps=FALSE, pdf=TRUE, width=9, height=6, strip.white=TRUE}
+\setkeys{Gin}{width=\textwidth}
+
+<<preliminaries,echo=FALSE,results=hide>>=
+options(width=75)
+library(Matrix)
+@
+
+\begin{frame}[fragile]\frametitle{Sparse \alert{Model} Matrices}
+New model matrix classes,
+%The \pkg{Matrix} package now has model matrix classes,
+generalizing \Rp's standard \Rfun{model.matrix}:% function:
+<<model.matrix>>=
+str(dd <- data.frame(a = gl(3,4), b = gl(4,1,12)))# balanced 2-way
+model.matrix(~ 0+ a + b, dd)
+@
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Sparse \alert{Model} Matrices}
+The model matrix above
+\begin{itemize}
+\item \dots\dots has many zeros, and
+\item \emph{ratio}  ((zeros) : (non-zeros))  increases dramatically
+  with many-level factors
+\item even more zeros for factor \emph{interactions}:
+\end{itemize}
+\smallskip
+
+\begin{footnotesize}
+<<model.matrix>>=
+model.matrix(~ 0+ a * b, dd)
+@
+\end{footnotesize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Sparse \alert{Model} Matrices in 'Matrix'}
+  These matrices can become very large (not only many rows, large $n$), but
+  also many columns, large $p$).
+
+  Eg., in Linear Mixed Effects Models,
+  \begin{equation*}
+    \Ew{\bc Y|\bc B=\bm b} = \gX \bm\beta+\rZ\bm b,
+  \end{equation*}
+  the $\rZ$ matrix is often large and very sparse, and in \pkg{lme4} has
+  always been stored as \code{"sparseMatrix"} (notably, \code{"dgCMatrix"}).
+
+  Sometimes, $\gX$, (fixed effect matrix) is large, too.
+  \nlQ $\to$ optionally also \code{"sparseMatrix"} in
+  \pkg{lme4}\footnote{the development version of \pkg{lme4}, currently called \pkg{lme4a}.}.
+
+  \medskip
+
+  We've extended \Rfun{model.\Ul{m}atrix} to  \Rfun{model.\Ul{M}atrix} in
+  package \pkg{Matrix} with optional argument \code{sparse = TRUE}.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Sparse Model Matrix \alert{Classes} in 'Matrix'}
+\begin{footnotesize}
+\begin{Schunk}
+\begin{Sinput}
+setClass("modelMatrix",
+         representation(assign = "integer",
+                        contrasts = "list", "VIRTUAL"),
+         contains = "Matrix",
+         validity = function(object) { ........... })
+
+setClass("sparseModelMatrix", representation("VIRTUAL"),
+         contains = c("CsparseMatrix", "modelMatrix"))
+setClass("denseModelMatrix",  representation("VIRTUAL"),
+         contains = c("denseMatrix", "modelMatrix"))
+## The ``actual''  *ModelMatrix classes:
+setClass("dsparseModelMatrix",
+         contains = c("dgCMatrix", "sparseModelMatrix"))
+setClass("ddenseModelMatrix", contains =
+         c("dgeMatrix", "ddenseMatrix", "denseModelMatrix"))
+\end{Sinput}
+\end{Schunk}
+\end{footnotesize}
+---\\
+(adding \code{"ddenseMatrix"} above does \emph{not} influence slots, but yields
+consistent superclass ordering.)
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{model.\alert{M}atrix(*, sparse=TRUE)}
+Constructing \alert{sparse} models matrices (\pkg{Matrix} package):
+  \begin{footnotesize}
+<<modelMat-ex>>=
+model.Matrix(~ 0+ a * b, dd, sparse=TRUE)
+@
+  \end{footnotesize}
+% the above is cut off, i.e. not visible here
+% identical syntax, just \code{model.\alert{M}atrix(..)}.
+\end{frame}
+
+\section[modelMatrix \Also "glpModel"s]{%
+  modelMatrix \Also General Linear Prediction Models}
+\begin{frame}[fragile]
+  \frametitle{"modelMatrix" \Also General Linear Prediction Models}
+Idea: Very \emph{general} setup for
+\begin{block}{Statistical models based on linear predictors}
+ Class \code{"glpModel"} := General Linear Prediction Models
+\end{block}
+\begin{Schunk}
+\begin{Sinput}
+setClass("Model", representation(call = "call", fitProps = "list",
+                                 "VIRTUAL"))
+setClass("glpModel", representation(resp = "respModule",
+                                    pred = "predModule"),
+         contains = "Model")
+\end{Sinput}
+\end{Schunk}
+\medskip
+
+Two main ingredients:
+\begin{enumerate}
+\item Response module \code{"respModule"}
+\item (Linear) Prediction module \code{"predModule"}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{(1) Response Module}
+\code{"respModule"}:
+Response modules for models with a linear predictor, which can
+include linear models (\code{lm}), generalized linear models (\code{glm}),
+nonlinear models (\code{nls}) and generalized nonlinear models (\code{nglm}):
+\begin{footnotesize}\begin{Schunk}
+\begin{Sinput}
+setClass("respModule",
+         representation(mu = "numeric",      # of length n
+                        offset = "numeric",  # of length n * k
+                        sqrtXwt = "matrix",  # of dim(.) == dim(X) == (n, k)
+                        sqrtrwt = "numeric", # sqrt(residual weights)
+                        weights = "numeric", # prior weights
+                        wtres = "numeric",
+                        y = "numeric"),
+         validity = function(object) { ....... })
+setClass("glmRespMod",
+         representation(family =  "family",
+                        eta =    "numeric",
+                        n =      "numeric"), # for evaluation of the aic
+         contains = "respModule", validity = function(object) { ..... })
+setClass("nlsRespMod",
+         representation(nlenv = "environment", ......), ............)
+setClass("nglmRespMod", contains = c("glmRespMod", "nlsRespMod"))
+\end{Sinput}
+\end{Schunk}\end{footnotesize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{(2) Prediction Module}
+%\item
+\code{"predModule"}: Linear predictor modules, which consist of the model
+matrix, the coefficient vector and a triangular factor of the weighted
+model matrix, currently in \textcolor{Orange}{dense} and
+\textcolor{Mulberry}{sparse} flavor:
+\begin{footnotesize}\begin{Schunk}
+\begin{Sinput}
+setClass("predModule",
+         representation(X = "modelMatrix", coef = "numeric", Vtr = "numeric",
+                        fac = "CholeskyFactorization",
+                        "VIRTUAL"))
+## the sub classes specify more specific classes for the two non-trivial slots:
+setClass("dPredModule", contains = "predModule",
+         representation(X = "ddenseModelMatrix", fac = "Cholesky"))
+setClass("sPredModule", contains = "predModule",
+         representation(X = "dsparseModelMatrix", fac = "CHMfactor"))
+\end{Sinput}
+\end{Schunk}\end{footnotesize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Fitting all ``glpModel''s with One IRLS algorithm}
+  Fitting:   The prediction and response module parts each update
+  ``themselves''.
+  \begin{enumerate}
+  \item prediction module only passes $\bm \mu$ to response module
+  \end{enumerate}
+\end{frame}
+%%% Local Variables:
+%%% TeX-command-default: "LaTeX PDF"
+%%% TeX-master: "MaechlerBates.tex"
+%%% End:
+
