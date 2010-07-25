@@ -23,9 +23,11 @@
    keep triangular and symmetric Matrices when appropriate:
    particularly desirable for  "Math2": round(), signif()
 
-  For triangular matrices, more specifically make sure the four rules of
-  "triangular matrix algebra" (Golub+Van Loan 1996, 3.1.8, p.93) are
-  fulfilled; now(2008-03-06) ok for Csparse; not yet for <dtr> %*% <dtr>
+- For triangular matrices, make sure the four rules of
+  "triangular matrix algebra" (Golub+Van Loan 1996, 3.1.8, p.93) are fulfilled.
+  - since 2008-03-06 ok for Csparse
+  - since 2010-07-23 ok for <dtr> %*% <dtr>
+  TODO: e.g. for  <ltr> %*% <dtC>
 
 - "d" <-> "l" coercion for all "[TCR]" sparse matrices is really trivial:
   "d" -> "l" : drops the 'x' slot

@@ -5,7 +5,16 @@ useDynLib(Matrix, .registration=TRUE)
 importFrom("lattice", levelplot)
 importFrom("graphics", image)
 importFrom("utils", head, tail)
-importFrom("stats", cov2cor, update, formula)
+importFrom("stats", ## potentially all these (we import into 'lme4a'):
+           # anova,
+           coef,# confint,
+           cov2cor,# deviance,
+           fitted,
+           formula,# predict, profile,
+           residuals,# simulate, terms,
+           update#, vcov
+           )
+
 importFrom("grid", grid.rect, gpar, grob)# others via 'grid::'
 
 ## Currently, group generics need to be explicitly imported (Bug?):
@@ -229,6 +238,12 @@ exportMethods(## for both own and "other" generics:
 	      "Ops",
 	      "Summary",
 
+              ## re-export S4 methods, for "stats"-S3-generics:
+              "coef", "cov2cor",
+              "fitted", "formula", "residuals",
+              "update",
+
+
 	      "!",
 	      "+",# for dgT(Matrix) only
 	      "%*%",
@@ -251,7 +266,6 @@ exportMethods(## for both own and "other" generics:
               "chol2inv",
 	      "colMeans",
 	      "colSums",
-              "cov2cor",
 	      "coerce",
 	      "crossprod",
 	      "determinant",
@@ -264,7 +278,6 @@ exportMethods(## for both own and "other" generics:
               "drop",
 	      "expand",
 	      "expm",
-	      "formula",
 	      "getCall",
 	      "head",
 	      "image",
@@ -302,7 +315,6 @@ exportMethods(## for both own and "other" generics:
 	      "tril",
 	      "triu",
               "unname",
-              "update",
               "which",
 	      "zapsmall"
 	      )
