@@ -677,23 +677,29 @@ lm.fit.sparse <- function(x, y, w = NULL, offset = NULL,
     z
 }
 
-setMethod("show", "modelMatrix",
-	  function(object)
-      {
-	  ## workaround because	 callNextMethod() fails here:
-	  cat(sprintf("\"%s\": ", class(object)[1]))
-	  show(as(object, "generalMatrix")) # (an "intermediate" class) - why exactly? -- callNextMethod()
-	  ## end{workaround}
-	  p <- length(ass <- object@assign)
-	  c.ass <- encodeString(ass)
-	  if(sum(nchar(c.ass))+ p-1 < getOption("width") - 10) ## short enough
-	      cat("@ assign: ", c.ass,"\n")
-	  else {
-	      cat("@ assign:\n"); print(ass)
-	  }
-	  cat("@ contrasts:\n"); print(object@contrasts)
-	  invisible(object)
-      })
+## allow extra args to be passed to print, notably those
+## to printSpMatrix()  [ ../sparseMatrix.R ] :
+printModelMat <- function(x, ...)
+{
+    ## workaround because	 callNextMethod() fails here:
+    cat(sprintf("\"%s\": ", class(x)[1]))
+    ## (an "intermediate" class) - why exactly? -- callNextMethod()
+    print(as(x, "generalMatrix"), ...)
+    ## end{workaround}
+    p <- length(ass <- x@assign)
+    c.ass <- encodeString(ass)
+    if(sum(nchar(c.ass))+ p-1 < getOption("width") - 10) ## short enough
+	cat("@ assign: ", c.ass,"\n")
+    else {
+	cat("@ assign:\n"); print(ass)
+    }
+    cat("@ contrasts:\n"); print(x@contrasts)
+    invisible(x)
+}
+
+setMethod("print", "modelMatrix", printModelMat)
+setMethod("show", "modelMatrix", function(object) printModelMat(object))
+
 
 setAs("ddenseModelMatrix", "predModule",
       function(from)
@@ -833,7 +839,7 @@ glm4 <- function(formula, family, data, weights, subset,
 
 fitGlm4 <- function(lp, doFP = TRUE, control = list()) {
 ### note that more than one iteration would need to update more than just 'coef'
-    if(doFP)
+    if(doFP && is(lp@resp, "glmRespMod"))
         lp@pred@coef <- glm.fp(lp)
     IRLS(lp, control)
 }
@@ -924,8 +930,16 @@ IRLS <- function(mod, control) {
     respMod <- updateMu(respMod, as.vector(predMod@X %*% cc))
     iter <- nHalvings <- 0 ; DONE <- FALSE
     repeat {
-	if((iter <- iter + 1) > MXITER)
-	    stop("Number of iterations exceeded maximum MXITER = ", MXITER)
+	if((iter <- iter + 1) > MXITER) {
+            msg <- paste("Number of iterations exceeded maximum MXITER =", MXITER)
+            if(!warnOnly)
+                stop(msg)
+            ## else :
+            warning(msg)
+            cc <- cbase
+            DONE <- TRUE
+            break
+        }
         cbase <- cc
         respMod <- updateWts(respMod)
         wrss0 <- sum(respMod@wtres^2)
@@ -1019,7 +1033,33 @@ updateModel <- function(object, formula., ..., evaluate = TRUE)
 setMethod("update", "Model", updateModel)
 setMethod("getCall", "Model", function(x) x@call)
 setMethod("formula", "Model", function(x, ...) x@call$formula)
+setMethod("coef", "glpModel", function(object, ...)
+      {
+	  prd <- object@pred
+	  structure(prd@coef,
+		    names = colnames(prd@X))
+      })
+setMethod("fitted", "glpModel", function(object, ...) object@resp@mu)
+setMethod("residuals", "glpModel",
+          function(object, type = c("deviance", "pearson",
+                           "working", "response", "partial"), ...)
+      {
+	  type <- match.arg(type)
 
+	  ## glm.fit: residuals <- (y - mu)/mu.eta(eta)
+	  rsp <- object@resp
+	  mu <- rsp@mu
+	  y <- rsp@y
+	  residuals <- y - mu
+	  if(rsp@family)
+	      ## working residuals:
+	      residuals <- residuals/rsp@family@mu.eta(rsp@eta)
+
+	  if(type != "working")
+	      warning("returning 'working' residuals only at the moment")
+
+	  residuals
+      })
 
 setMethod("updateMu", signature(respM = "respModule", gamma = "numeric"),
 	  function(respM, gamma, ...)

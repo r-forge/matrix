@@ -9,6 +9,7 @@
 \alias{dsparseModelMatrix-class}
 %
 \alias{show,modelMatrix-method}
+\alias{print,modelMatrix-method}
 \description{
   The class \code{"modelMatrix"} and notably its subclass
   \code{"dsparseModelMatrix"} are used to encode additional information,
@@ -56,6 +57,11 @@
     \item{show}{\code{signature(object = "modelMatrix")}:
       \code{\link{show}(.)} the matrix, but also the \code{assign} and
       \code{contrasts} slots.}
+    \item{print}{\code{signature(x = "modelMatrix")}: as \code{show()},
+      however (via \code{\dots}) allowing to pass further arguments for
+      printing the matrix.% notably those of (currently hidden !!)
+      % \code{\link{printSpMatrix}()}.
+      }
   }
 }
 \author{Martin Maechler}

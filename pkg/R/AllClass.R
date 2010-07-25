@@ -868,8 +868,8 @@ setClass("sPredModule", contains = "predModule",
 
 setClass("respModule",
          representation(mu = "numeric",      # of length n
-                        offset = "numeric",  # of length n * k
-                        sqrtXwt = "matrix",  # of dim(.) == dim(X) == (n, k)
+                        offset = "numeric",  # of length n * s
+                        sqrtXwt = "matrix",  # of dim(.)  == (n, s)
                         sqrtrwt = "numeric", # sqrt(residual weights)
                         weights = "numeric", # prior weights
                         wtres = "numeric",
