@@ -1,7 +1,7 @@
 #ifndef MATRIX_MUTILS_H
 #define MATRIX_MUTILS_H
 
-#define Matrix_with_SPQR
+#undef Matrix_with_SPQR
 
 #ifdef __cplusplus
 extern "C" {

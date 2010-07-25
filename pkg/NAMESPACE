@@ -199,7 +199,7 @@ exportClasses(
 	      "nCHMsimpl",# unused
 
 	      "sparseQR",
-	      "SPQR",
+## 	      "SPQR",
 
 	      "Schur",
 
@@ -305,7 +305,7 @@ exportMethods(## for both own and "other" generics:
 	      "rowSums",
 	      "show",
 	      "solve",
-              "spqr",
+##               "spqr",
 	      "summary",
               "symmpart",
               "skewpart",
