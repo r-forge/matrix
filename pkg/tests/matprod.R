@@ -7,12 +7,24 @@ source(system.file("test-tools.R", package = "Matrix"))
 m5 <- 1 + as(diag(-1:4)[-5,], "dgeMatrix")
 ## named dimnames:
 dimnames(m5) <- list(Rows= LETTERS[1:5], paste("C", 1:6, sep=""))
+tr5 <- tril(m5[,-6])
 m. <- as(m5, "matrix")
-stopifnot(dim(m5) == 5:6,
-          class(cm5 <- crossprod(m5)) == "dpoMatrix")
-assert.EQ.mat((c.m5 <- t(m5) %*% m5), as(cm5, "matrix"))
-stopifnot(as.vector(rep(1,6) %*% cm5) == colSums(cm5),
+m5.2 <- local({t5 <- as.matrix(tr5); t5 %*% t5})
+stopifnot(isValid(tr5, "dtrMatrix"),
+	  dim(m5) == 5:6,
+	  class(cm5 <- crossprod(m5)) == "dpoMatrix")
+assert.EQ.mat(t(m5) %*% m5, as(cm5, "matrix"))
+assert.EQ.mat(tr5.2 <- tr5 %*% tr5, m5.2)
+stopifnot(isValid(tr5.2, "dtrMatrix"),
+	  as.vector(rep(1,6) %*% cm5) == colSums(cm5),
 	  as.vector(cm5 %*% rep(1,6)) == rowSums(cm5))
+## uni-diagonal dtrMatrix with "wrong" entries in diagonal
+## {the diagonal can be anything: because of diag = "U" it should never be used}:
+tru <- Diagonal(3, x=3); tru[i.lt <- lower.tri(tru, diag=FALSE)] <- c(2,-3,4)
+tru@diag <- "U" ; stopifnot(diag(trm <- as.matrix(tru)) == 1)
+## TODO: Also add *upper-triangular*  *packed* case !!
+stopifnot((tru %*% tru)[i.lt] ==
+          (trm %*% trm)[i.lt])
 
 ## crossprod() with numeric vector RHS and LHS
 ## not sensical for tcrossprod() because of 'vec' --> cbind(vec) promotion:
@@ -148,6 +160,9 @@ stopifnot(is(cl,"dtCMatrix"), cl@diag == "U")
 (cu2 <- cu %*% cu)
 cl2 <- cl %*% cl
 validObject(cl2)
+
+crossprod(tru, tu[-1,-1])## TODO compare this with .... once it "works"
+
 cl2
 cu2. <- Diagonal(4) + Matrix(c(rep(0,9),14,0,0,6,0,0,0), 4,4)
 stopifnot(all(cu2 == cu2.),# was wrong for ver. <= 0.999375-4
@@ -301,6 +316,10 @@ assert.EQ.mat(solve(I3,I3), diag(3))
 assert.EQ.mat(solve(M3, I3), iM3)# was wrong because I3 is unit-diagonal
 assert.EQ.mat(solve(m3, I3), iM3)# gave infinite recursion in (<=) 0.999375-10
 
+isValid(tru %*% I3, 		"triangularMatrix")
+isValid(crossprod(tru, I3), 	"triangularMatrix")
+isValid(crossprod(I3, tru), 	"triangularMatrix")
+isValid(tcrossprod(I3, tru), 	"triangularMatrix")
 
 ## even simpler
 m <- matrix(0, 4,7); m[c(1, 3, 6, 9, 11, 22, 27)] <- 1
