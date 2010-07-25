@@ -115,17 +115,13 @@ stopifnot(is(m, "triangularMatrix"), is(m, "sparseMatrix"),
           is(im, "dtCMatrix"), is(itm, "dtCMatrix"), is(iitm, "dtCMatrix"),
 	  del < 1e-15)
 
-t.crossprod <- function(x, y=NULL)
-    if(getRversion() < "2.9.1" && R.version$`svn rev` < 48575)
-    ## tcrossprod() bug in "base R"
-    x %*% t(y) else tcrossprod(x, y)
 ## crossprod(.,.) & tcrossprod(),  mixing dense & sparse
 v <- c(0,0,2:0)
 (V <- Matrix(v, 5,1, sparse=TRUE))
 sv <- as(v, "sparseVector")
 a <- as.matrix(A)
 cav <-  crossprod(a,v)
-tva <- t.crossprod(v,a)
+tva <- tcrossprod(v,a)
 assert.EQ.mat(crossprod(A, V), cav) # gave infinite recursion
 assert.EQ.mat(crossprod(A,sv), cav)
 assert.EQ.mat(tcrossprod( sv, A), tva)
@@ -135,7 +131,7 @@ M <- Matrix(0:5, 2,3) ; sM <- as(M, "sparseMatrix"); m <- as(M, "matrix")
 v <- 1:3; v2 <- 2:1
 sv  <- as( v, "sparseVector")
 sv2 <- as(v2, "sparseVector")
-tvm <- t.crossprod(v, m)
+tvm <- tcrossprod(v, m)
 assert.EQ.mat(tcrossprod( v, M), tvm)
 assert.EQ.mat(tcrossprod( v,sM), tvm)
 assert.EQ.mat(tcrossprod(sv,sM), tvm)
@@ -161,7 +157,10 @@ stopifnot(is(cl,"dtCMatrix"), cl@diag == "U")
 cl2 <- cl %*% cl
 validObject(cl2)
 
-crossprod(tru, tu[-1,-1])## TODO compare this with .... once it "works"
+cu3 <- tu[-1,-1]
+assert.EQ.mat(crossprod(tru, cu3),
+	      crossprod(trm, as.matrix(cu3)))
+## "FIXME" should return triangular ...
 
 cl2
 cu2. <- Diagonal(4) + Matrix(c(rep(0,9),14,0,0,6,0,0,0), 4,4)
