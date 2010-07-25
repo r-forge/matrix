@@ -69,7 +69,7 @@
       matrix multiplication.  Multiplication of (matching) triangular
       matrices now should remain triangular (in the sense of class
       \linkS4class{triangularMatrix}).}
-    \item{crossprod,tcrossprod}{signature(x = "dtrMatrix", y = "matrix")} and other
+    \item{crossprod,tcrossprod}{\code{signature(x = "dtrMatrix", y = "matrix")} and other
       signatures, see \code{"\%*\%"} above.}
     \item{coerce}{\code{signature(from = "dgeMatrix", to = "dtrMatrix")}}
     \item{coerce}{\code{signature(from = "dtrMatrix", to = "matrix")}}
