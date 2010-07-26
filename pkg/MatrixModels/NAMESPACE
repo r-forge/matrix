@@ -1,24 +1,31 @@
 ##useDynLib(MatrixModels, .registration=TRUE)
 
-import("Matrix")#  all for now -- notably "update"
 ## Import non-base functions we need explicitly,
-## notably for which we define methods:
-## importFrom("lattice", levelplot)
+## notably for which we define methods
+## -- prefering   importMethodsFrom(., ...)  where applicable
+
 ## importFrom("graphics", image)
 ## importFrom("utils", head, tail)
+##
 importFrom("stats", ## potentially all these (we import into 'lme4a'):
            # anova,
-           coef,# confint,
-##           cov2cor,# deviance,
+           coef,# confint, cov2cor, deviance,
            fitted,
            formula,# predict, profile,
            residuals# simulate, terms,
            )
 
-## importFrom("grid", grid.rect, gpar, grob)# others via 'grid::'
 
-## Currently, group generics need to be explicitly imported (Bug?):
-## importFrom("methods", Ops, Arith, Compare, Logic, Math, Math2, Summary, Complex)
+## Those our methods and functions use:
+importMethodsFrom("Matrix", as.matrix, as.vector, coerce,
+                  ## Group Methods
+                  "Arith", "Compare", "Logic", "Math", "Math2", "Ops", "Summary",
+                  t, "%*%", crossprod, tcrossprod,
+                  Cholesky, chol, chol2inv,
+                  solve,
+                  summary, print,
+                  update
+                  )
 
 ## Generics and functions defined in this package
 export(
@@ -53,12 +60,12 @@ exportClasses(
 
 
 exportMethods(## for both own and "other" generics:
-              "getCall",
+              "getCall"
               ## re-export S4 methods, for "stats"-S3-generics:
-              "coef", ## "cov2cor",
-              "fitted", "formula", "residuals",
-              "update",
-	      "print",# print(x, ...) when show(x) is not sufficient
-	      "show",
-	      "summary"
+              ,"coef" ## "cov2cor",
+              ,"fitted", "formula", "residuals"
+              ,"update"
+	      ,"print"# print(x, ...) when show(x) is not sufficient
+	      ,"show"
+## not yet      ,"summary"
 	      )
