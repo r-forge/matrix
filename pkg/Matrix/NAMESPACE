@@ -5,14 +5,7 @@ useDynLib(Matrix, .registration=TRUE)
 importFrom("lattice", levelplot)
 importFrom("graphics", image)
 importFrom("utils", head, tail)
-importFrom("stats", ## potentially all these (we import into 'lme4a'):
-           # anova,
-           coef,# confint,
-           cov2cor,# deviance,
-           fitted,
-           formula,# predict, profile,
-           residuals,# simulate, terms,
-           update#, vcov
+importFrom("stats", cov2cor, update#, vcov
            )
 
 importFrom("grid", grid.rect, gpar, grob)# others via 'grid::'
@@ -42,14 +35,10 @@ export("Cholesky",
        "expm",
        "facmul",
        "forceSymmetric",
-       "getCall",
 #	 "isTriangular",
 #	 "isDiagonal",
        "isLDL",
-#TODO       "lm.fit.sparse",# <- "somewhat experimental"
        "lu",
-       "mkRespMod",
-       "model.Matrix",
        "nearPD",
        "nnzero",
        "printSpMatrix",
@@ -167,13 +156,6 @@ exportClasses(
 
 	      "corMatrix", # unused
 
-              ##
-              "modelMatrix",
-              "sparseModelMatrix",
-              "denseModelMatrix",
-              "dsparseModelMatrix",
-              "ddenseModelMatrix",
-
 	      ## --- inheriting "Matrix", but also factorizations:
 	      "BunchKaufman",
 	      "pBunchKaufman",
@@ -209,20 +191,7 @@ exportClasses(
 	      "lsparseVector",
 	      "nsparseVector",
 	      "zsparseVector",
-	      "xsparseVector", # the class union of all 'x' lost sparseVector's
-
-              ## --- linear predictor modules, containing a model matrix
-              "predModule",
-              "dPredModule",# dense &
-              "sPredModule",# sparse  (for now)
-
-              ## --- response modules, containing a response vector, etc.
-              "respModule",          # base class and also linear model
-              "glmRespMod",          # generalized linear models
-              "nlsRespMod",          # nonlinear regression response
-              "nglmRespMod",         # generalized nonlinear
-
-              "glpModel", "Model"
+	      "xsparseVector" # the class union of all 'x' lost sparseVector's
 	      )
 
 
@@ -239,10 +208,8 @@ exportMethods(## for both own and "other" generics:
 	      "Summary",
 
               ## re-export S4 methods, for "stats"-S3-generics:
-              "coef", "cov2cor",
-              "fitted", "formula", "residuals",
+              "cov2cor",
               "update",
-
 
 	      "!",
 	      "+",# for dgT(Matrix) only
@@ -278,7 +245,6 @@ exportMethods(## for both own and "other" generics:
               "drop",
 	      "expand",
 	      "expm",
-	      "getCall",
 	      "head",
 	      "image",
 	      "forceSymmetric",
@@ -318,12 +284,6 @@ exportMethods(## for both own and "other" generics:
               "which",
 	      "zapsmall"
 	      )
-
-if(getRversion() < "2.10.0")# The version of R -- at *install* time (!)
-    exportPattern("^contr\\..*")
-
-if(getRversion() < "2.10.0")
-    export("xtabs")
 
 if(getRversion() < "2.11.0" || R.version$`svn rev` < 51018)
     export("norm")

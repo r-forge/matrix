@@ -39,8 +39,9 @@ sparse.model.matrix(object, data = environment(object),
 }
 \seealso{
   \code{\link{model.matrix}} in standard \R's package \pkg{stats}.\cr
-  \code{\link{model.Matrix}} which calls \code{sparse.model.matrix} or
-  \code{model.matrix} depending on its \code{sparse} argument.
+  \code{\link[MatrixModels]{model.Matrix}} which calls
+  \code{sparse.model.matrix} or \code{model.matrix} depending on its
+  \code{sparse} argument.
 
   \code{as(f, "sparseMatrix")} (see \code{coerce(from = "factor", ..)}
   in the class doc \linkS4class{sparseMatrix}) produces the

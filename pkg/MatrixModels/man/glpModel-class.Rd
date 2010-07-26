@@ -39,9 +39,9 @@ showClass("glpModel")
 
 data(CO2, package="datasets")
 ## dense linear model
-str(Matrix:::glm4(uptake ~ 0 + Type*Treatment, data=CO2, doFit = FALSE), 4)
+str(glm4(uptake ~ 0 + Type*Treatment, data=CO2, doFit = FALSE), 4)
 ## sparse linear model
-str(Matrix:::glm4(uptake ~ 0 + Type*Treatment, data=CO2, doFit = FALSE,
+str(glm4(uptake ~ 0 + Type*Treatment, data=CO2, doFit = FALSE,
                   sparse = TRUE), 4)
 
 ## From example(glm): -----------------
@@ -53,7 +53,7 @@ str(trial <- data.frame(counts=c(18,17,15,20,10,20,25,13,12),
 glm.D93 <- glm(counts ~ outcome + treatment, family=poisson, data=trial)
 summary(glm.D93)
 c.glm <- unname(coef(glm.D93))
-glmM  <- Matrix:::glm4(counts ~ outcome + treatment, family = poisson, data=trial)
+glmM  <- glm4(counts ~ outcome + treatment, family = poisson, data=trial)
 glmM2 <- update(glmM, quick = FALSE) # slightly more accurate
 glmM3 <- update(glmM, quick = FALSE, finalUpdate = TRUE)
                  # finalUpdate has no effect on 'coef'
@@ -62,7 +62,7 @@ stopifnot( identical(glmM2@pred@coef, glmM3@pred@coef),
            all.equal(glmM2@pred@coef, c.glm, tol=1e-12))
 \dontshow{
 stopifnot( ## ensure typos are *caught* :
-  inherits(try(Matrix:::glm4(counts ~ outcome + treatment, family=poisson, data=trial,
+  inherits(try(glm4(counts ~ outcome + treatment, family=poisson, data=trial,
                        fooBar = FALSE)), "try-error"),
   ## check formula(.): {environments differ - FIXME?}
   formula(glmM) == formula(glm.D93))
@@ -70,10 +70,10 @@ stopifnot( ## ensure typos are *caught* :
 
 ## Watch the iterations --- and use no intercept --> more sparse X
 ## 1) dense generalized linear model
-glmM <- Matrix:::glm4(counts ~ 0+outcome + treatment, poisson, trial,
+glmM <- glm4(counts ~ 0+outcome + treatment, poisson, trial,
                       verbose = TRUE)
 ## 2) sparse generalized linear model
-glmS <- Matrix:::glm4(counts ~ 0+outcome + treatment, poisson, trial,
+glmS <- glm4(counts ~ 0+outcome + treatment, poisson, trial,
                       verbose = TRUE, sparse = TRUE)
 str(glmS, max.lev = 4)
 stopifnot( all.equal(glmM@pred@coef, glmS@pred@coef),
@@ -84,7 +84,7 @@ stopifnot( all.equal(glmM@pred@coef, glmS@pred@coef),
 clotting <- data.frame(u = c(5,10,15,20,30,40,60,80,100),
                        lot1 = c(118,58,42,35,27,25,21,19,18),
                        lot2 = c(69,35,26,21,18,16,13,12,12))
-str(gMN <- Matrix:::glm4(lot1 ~ log(u), data=clotting, family=Gamma, verbose=TRUE))
+str(gMN <- glm4(lot1 ~ log(u), data=clotting, family=Gamma, verbose=TRUE))
 glm. <- glm(lot1 ~ log(u), data=clotting, family=Gamma)
 stopifnot( all.equal(gMN@pred@coef, unname(coef(glm.)), tol=1e-7) )
 }

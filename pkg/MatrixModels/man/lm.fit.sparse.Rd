@@ -83,21 +83,21 @@ X <- sparse.model.matrix( ~ (a+b+c+d)^2 + c*x, data = dM)
 dim(X) # 1870 x 69
 X[1:10, 1:20]
 
-## For now, use  'Matrix:::'  --- TODO : export once interface is clear!
+## For now, use  'MatrixModels:::'  --- TODO : export once interface is clear!
 
 Xd <- as(X,"matrix")
 system.time(fmDense <- lm.fit(Xd, y = dM[,"Y"]))
-system.time( r1 <- Matrix:::lm.fit.sparse(X, y = dM[,"Y"]) ) # *is* faster
+system.time( r1 <- MatrixModels:::lm.fit.sparse(X, y = dM[,"Y"]) ) # *is* faster
 stopifnot(all.equal(r1, unname(fmDense$coeff), tol = 1e-12))
 system.time(
-     r2 <- Matrix:::lm.fit.sparse(X, y = dM[,"Y"], method = "chol") )
+     r2 <- MatrixModels:::lm.fit.sparse(X, y = dM[,"Y"], method = "chol") )
 stopifnot(all.equal(r1, r2$coef, tol = 1e-12),
           all.equal(fmDense$residuals, r2$residuals, tol=1e-9)
          )
 ## with weights:
 system.time(fmD.w <- with(dM, lm.wfit(Xd, Y, w = wts)))
-system.time(fm.w1 <- with(dM, Matrix:::lm.fit.sparse(X, Y, w = wts)))
-system.time(fm.w2 <- with(dM, Matrix:::lm.fit.sparse(X, Y, w = wts,
+system.time(fm.w1 <- with(dM, MatrixModels:::lm.fit.sparse(X, Y, w = wts)))
+system.time(fm.w2 <- with(dM, MatrixModels:::lm.fit.sparse(X, Y, w = wts,
                                                      method = "chol") ))
 stopifnot(all.equal(fm.w1, unname(fmD.w$coeff), tol = 1e-12),
           all.equal(fm.w2$coef, fm.w1, tol = 1e-12),

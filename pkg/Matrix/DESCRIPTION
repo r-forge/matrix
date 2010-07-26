@@ -7,7 +7,7 @@ Author: Douglas Bates <bates@stat.wisc.edu> and Martin Maechler <maechler@stat.m
 Maintainer: Doug and Martin <Matrix-authors@R-project.org>
 Description: Classes and methods for dense and sparse matrices and
     operations on them using Lapack and SuiteSparse.
-Depends: R (>= 2.9.1), stats, methods, utils, lattice
+Depends: R (>= 2.10.0), stats, methods, utils, lattice
 Imports: graphics, lattice, grid, stats
 Enhances: graph, SparseM
 LazyLoad: yes
