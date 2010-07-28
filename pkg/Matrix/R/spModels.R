@@ -400,3 +400,12 @@ model.spmatrix <- function(trms, mf, transpose=FALSE,
     r
 } ## model.spmatrix()
 
+## For now --- to help people who used to use this as part of 'Matrix':
+model.Matrix <- function(object, ...) {
+    .Deprecated(msg = paste(
+	"model.Matrix() has been moved from package 'Matrix' to the new package",
+	"'MatrixModels' which is now loaded (if installed).",
+	"  Its use from package 'Matrix' is deprecated.",
+	"Do use it from 'MatrixModels' instead.", sep='\n'))
+    MatrixModels::model.Matrix(object, ...)
+}
