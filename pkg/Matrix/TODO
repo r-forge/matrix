@@ -222,7 +222,7 @@
   help for defining a chol2inv() method for  *sparse* (upper)
   triangular matrices.
 
-- sort(<sparseVector>, partial=..), needed, e.g. for mean(*, trim = .).
+- sort(<sparseVector>, partial=..), needed, for mean(*, trim = .) or median().
   Note that defining xtfrm() does not "help" (as sort() then goes via dense
   index).  See "mean" in R/Matrix.R
 
