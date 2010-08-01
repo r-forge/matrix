@@ -2,7 +2,7 @@
 \alias{lm.fit.sparse}
 \title{Fitter Function for Sparse Linear Models}
 \description{
-  The basic computing engine for sparse linear least squares regression.
+  A basic computing engine for sparse linear least squares regression.
 
   Note that the exact interface (arguments, return value) currently is
   \bold{experimental}, and is bound to change.  Use at your own risk!
@@ -52,10 +52,10 @@ lm.fit.sparse(x, y, w = NULL, offset = NULL,
 \value{
   Either a single numeric vector or a list of four numeric vectors.
 }
-% \references{
-% %% ~put references to the literature/web site here ~
-% }
 \seealso{
+  \code{\link{glm4}} is an alternative (much) more general fitting
+  function.
+
   \code{\link{sparse.model.matrix}}; the non-sparse function in standard
     \R's package \pkg{stats}: \code{\link{lm.fit}()}.
 }
