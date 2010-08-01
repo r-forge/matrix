@@ -148,7 +148,7 @@ SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
     int rt = asLogical(right);
     int tr = asLogical(trans);/* if true, use t(a) */
     int *adims = INTEGER(d_a), n = adims[0];
-    double *valx;
+    double *valx = (double *) NULL /*Wall*/;
     const char
 	*uplo_a_ch = CHAR(STRING_ELT(uplo_a, 0)), /* = uplo_P(a) */
 	*diag_a_ch = CHAR(STRING_ELT(diag_a, 0)); /* = diag_P(a) */
@@ -167,9 +167,9 @@ SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
 	SET_DimNames(val, b);
 	valx = REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, sz));
 	Memcpy(valx, REAL(GET_SLOT(b, Matrix_xSym)), sz);
-	if((uDiag_b = *diag_P(b) == 'U')) { /* unit-diagonal b --> */
-	    int i, np1 = n + 1; /* may contain garbage in diagonal */
-	    for (i = 0; i < n; i++)
+	if((uDiag_b = *diag_P(b) == 'U')) {
+	    /* unit-diagonal b - may contain garbage in diagonal */
+	    for (int i = 0; i < n; i++)
 		valx[i * (n+1)] = 1.;
 	}
     } else { /* different "uplo" ==> result is "dgeMatrix" ! */
