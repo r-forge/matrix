@@ -1,8 +1,11 @@
 \name{glpModel-class}
+\title{Class "glpModel" of General Linear Prediction Models}
 \Rdversion{1.1}
 \docType{class}
 \alias{glpModel-class}
-\title{Class "glpModel" of General Linear Prediction Models}
+\alias{coef,glpModel-method}
+\alias{fitted,glpModel-method}
+\alias{residuals,glpModel-method}
 \description{
   The class \code{"glpModel"} conceptually contains a very large class
   of \emph{\dQuote{General Linear Prediction Models}}.
@@ -22,11 +25,27 @@
     \item{\code{pred}:}{a \code{"\linkS4class{predModule}"} object.}
   }
 }
+\section{Extends}{
+  Class \code{"\linkS4class{Model}"}, directly.%%-- FIXME move that stats4
+}
 \section{Methods}{
- There are no methods, currently, but that will change.
+  \describe{
+    \item{coef}{\code{signature(object = "glpModel")}: extract the
+      coefficient vector \eqn{\beta} from the object.}
+    \item{fitted}{\code{signature(object = "glpModel")}: fitted values;
+      there may be several types, corresponding to the residuals, see there
+      (below).}
+    \item{residuals}{\code{signature(object = "glpModel")}: residuals,
+      depending on the type of the model, there are several types of
+      residuals and correspondingly residuals,
+      see \code{\link[stats:glm.summaries]{residuals.glm}} from the
+      \pkg{stats} package.}
+  }
 }
 %\author{Douglas Bates}
 \seealso{
+  \code{\link{glm4}()} returns fitted \code{glpModel} objects.
+
   The constituents of this class are
   \code{\linkS4class{respModule}} and
   \code{\linkS4class{predModule}}, both of which have several sub
@@ -35,57 +54,6 @@
 \examples{
 showClass("glpModel")
 
-### All the following is very experimental -- and probably will change: -------
-
-data(CO2, package="datasets")
-## dense linear model
-str(glm4(uptake ~ 0 + Type*Treatment, data=CO2, doFit = FALSE), 4)
-## sparse linear model
-str(glm4(uptake ~ 0 + Type*Treatment, data=CO2, doFit = FALSE,
-                  sparse = TRUE), 4)
-
-## From example(glm): -----------------
-
-## Dobson (1990) Page 93: Randomized Controlled Trial :
-str(trial <- data.frame(counts=c(18,17,15,20,10,20,25,13,12),
-                        outcome=gl(3,1,9,labels=LETTERS[1:3]),
-                        treatment=gl(3,3,labels=letters[1:3])))
-glm.D93 <- glm(counts ~ outcome + treatment, family=poisson, data=trial)
-summary(glm.D93)
-c.glm <- unname(coef(glm.D93))
-glmM  <- glm4(counts ~ outcome + treatment, family = poisson, data=trial)
-glmM2 <- update(glmM, quick = FALSE) # slightly more accurate
-glmM3 <- update(glmM, quick = FALSE, finalUpdate = TRUE)
-                 # finalUpdate has no effect on 'coef'
-stopifnot( identical(glmM2@pred@coef, glmM3@pred@coef),
-           all.equal(glmM @pred@coef, c.glm, tol=1e-7),
-           all.equal(glmM2@pred@coef, c.glm, tol=1e-12))
-\dontshow{
-stopifnot( ## ensure typos are *caught* :
-  inherits(try(glm4(counts ~ outcome + treatment, family=poisson, data=trial,
-                       fooBar = FALSE)), "try-error"),
-  ## check formula(.): {environments differ - FIXME?}
-  formula(glmM) == formula(glm.D93))
-}
-
-## Watch the iterations --- and use no intercept --> more sparse X
-## 1) dense generalized linear model
-glmM <- glm4(counts ~ 0+outcome + treatment, poisson, trial,
-                      verbose = TRUE)
-## 2) sparse generalized linear model
-glmS <- glm4(counts ~ 0+outcome + treatment, poisson, trial,
-                      verbose = TRUE, sparse = TRUE)
-str(glmS, max.lev = 4)
-stopifnot( all.equal(glmM@pred@coef, glmS@pred@coef),
-           all.equal(glmM@pred@Vtr,  glmS@pred@Vtr) )
-
-
-## A Gamma example, from McCullagh & Nelder (1989, pp. 300-2)
-clotting <- data.frame(u = c(5,10,15,20,30,40,60,80,100),
-                       lot1 = c(118,58,42,35,27,25,21,19,18),
-                       lot2 = c(69,35,26,21,18,16,13,12,12))
-str(gMN <- glm4(lot1 ~ log(u), data=clotting, family=Gamma, verbose=TRUE))
-glm. <- glm(lot1 ~ log(u), data=clotting, family=Gamma)
-stopifnot( all.equal(gMN@pred@coef, unname(coef(glm.)), tol=1e-7) )
+## Use   example(glm4)  or see  help(glm4) for many more examples.
 }
 \keyword{classes}

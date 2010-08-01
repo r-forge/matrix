@@ -1,6 +1,6 @@
 Package: MatrixModels
-Version: 0.1-0
-Date: 2010-07-26
+Version: 0.1-1
+Date: 2010-08-01
 Title: Modelling with Sparse And Dense Matrices
 Author: Douglas Bates <bates@stat.wisc.edu> and Martin Maechler <maechler@stat.math.ethz.ch>
 Maintainer: Doug and Martin <Matrix-authors@R-project.org>
