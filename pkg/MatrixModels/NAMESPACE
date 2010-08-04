@@ -28,6 +28,26 @@ importMethodsFrom("Matrix", as.matrix, as.vector, coerce,
                   update
                   )
 
+importClassesFrom("Matrix",
+                  CHMfactor,
+                  CHMsimpl,
+                  CHMsuper,
+                  Cholesky,
+                  CsparseMatrix,
+                  Matrix,
+                  compMatrix,
+                  corMatrix,
+                  dCHMsimpl,
+                  dCHMsuper,
+                  dMatrix,
+                  ddenseMatrix,
+                  denseMatrix,
+                  dgCMatrix,
+                  dgeMatrix,
+                  dsparseMatrix,
+                  generalMatrix,
+                  sparseMatrix)
+
 ## Generics and functions defined in this package
 export(
        "getCall",
