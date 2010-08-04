@@ -1,3 +1,8 @@
+2010-08-04  Douglas Bates  <bates@stat.wisc.edu>
+
+	* R/spModels.R (fac2sparse): Fix name resolution problem
+	(R-SIG-Mixed-Models post by Florent Duyme).
+
 2010-07-25  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Depends): require R >= 2.10.0  --> can clean up
