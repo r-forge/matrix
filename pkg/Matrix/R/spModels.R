@@ -45,7 +45,7 @@ fac2sparse <- function(from, to = c("d","i","l","n","z"),
 			     Dim = c(length(levs), n),
 			     Dimnames = list(levs, names(fact))),
 			df)
-    names(argNew)[1] <- names(formals(new))[[1]]
+    names(argNew)[1] <- names(formals(methods::new))[[1]]
     as(do.call("new", argNew), "CsparseMatrix")
 }
 
