@@ -1,7 +1,0 @@
-<area shape="rect" href="$Csparse_8c.html#8867b77701a5fc055dee7f72ab7e0709" title="Extract the diagonal entries from *triangular* Csparse matrix __or__ a cholmod_sparse..." alt="" coords="205,6,293,30">
-<area shape="rect" href="$dsCMatrix_8c.html#9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm..." alt="" coords="181,54,317,78">
-<area shape="rect" href="$dsCMatrix_8c.html#3340463e47a1a5b85c7a529dd5c09e52" title="chk_nm" alt="" coords="407,6,473,30">
-<area shape="rect" href="$chm__common_8c.html#b819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f..." alt="" coords="367,54,513,78">
-<area shape="rect" href="$Mutils_8c.html#cb9e30480c757f0c780a5d94853b7284" title="set_factors" alt="" coords="397,102,483,126">
-<area shape="rect" href="$Mutils_8h.html#f7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..." alt="" coords="563,30,664,54">
-<area shape="rect" href="$chm__common_8c.html#f9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="587,78,640,102">

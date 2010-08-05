@@ -1,0 +1,8 @@
+<map id="G" name="G">
+<area shape="rect" href="$chm__common_8c.html#ac0552f8d5248824ec90a314b69bd1408" title="Copy the contents of a to an appropriate denseMatrix object and, optionally, free..." alt="" coords="232,5,381,35"/>
+<area shape="rect" href="$Mutils_8h.html#a460951a1f5dadb579d977ba114eec12e" title="mMatrix_as_dgeMatrix" alt="" coords="231,59,383,88"/>
+<area shape="rect" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..." alt="" coords="472,5,573,35"/>
+<area shape="rect" href="$Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="432,59,613,88"/>
+<area shape="rect" href="$Mutils_8c.html#a8ed2ff2e1a0de240a9c5b5a617f46838" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated..." alt="" coords="661,59,824,88"/>
+<area shape="rect" href="$Mutils_8c.html#afd54bbce8f08c11478dbd0b6c40d2c24" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated..." alt="" coords="873,59,1076,88"/>
+</map>

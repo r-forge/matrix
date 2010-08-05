@@ -1,0 +1,12 @@
+<map id="G" name="G">
+<area shape="rect" href="$chm__common_8h.html#a0ed4e091a525ec3cdf847755a3c4b76a" title="Populate ans with the pointers from x and modify its scalar elements accordingly..." alt="" coords="168,5,301,35"/>
+<area shape="rect" href="$chm__common_8h.html#a726394f0da6f0a20ad32963d2ba3007a" title="as_cholmod_x_dense" alt="" coords="161,59,308,88"/>
+<area shape="rect" href="$chm__common_8c.html#a9ea43d94a2bbd6c055ff9da6e3f24109" title="xpt" alt="" coords="215,112,255,141"/>
+<area shape="rect" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="560,5,656,35"/>
+<area shape="rect" href="$chm__common_8h.html#ac0b9d7e2006dcf1a8d388954b408d007" title="Populate ans with the pointers from x and modify its scalar elements accordingly..." alt="" coords="359,59,495,88"/>
+<area shape="rect" href="$chm__common_8h.html#a7c6132b98d7e38fc876c745c9cc8da2d" title="Populate ans with the pointers from x and modify its scalar elements accordingly..." alt="" coords="361,112,492,141"/>
+<area shape="rect" href="$dense_8h.html#a3a13ecdf06811d2b2ced413892145007" title="lapack_qr" alt="" coords="388,165,465,195"/>
+<area shape="rect" href="$Csparse_8h.html#a10392132372fdfc01e1aff7622f5ee7f" title="Csparse_validate_" alt="" coords="544,59,672,88"/>
+<area shape="rect" href="$Csparse_8h.html#a77f654c86c318184ef29b46dc4929e12" title="Csparse_validate" alt="" coords="724,32,844,61"/>
+<area shape="rect" href="$Csparse_8h.html#a5b2f297662f7f5dd66097ed12b320468" title="Csparse_validate2" alt="" coords="720,85,848,115"/>
+</map>
