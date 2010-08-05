@@ -1,4 +1,7 @@
-<area shape="rect" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="219,156,285,180">
-<area shape="rect" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="289,81,367,105">
-<area shape="rect" href="$Syms_8h.html" title="Syms.h" alt="" coords="371,230,437,254">
-<area shape="rect" href="$cs_8h.html" title="cs.h" alt="" coords="559,156,604,180">
+<map id="G" name="G">
+<area shape="rect" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="309,160,376,189"/>
+<area shape="rect" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="432,83,509,112"/>
+<area shape="rect" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="539,83,653,112"/>
+<area shape="rect" href="$Syms_8h.html" title="Syms.h" alt="" coords="219,237,283,267"/>
+<area shape="rect" href="$cs_8h.html" title="cs.h" alt="" coords="465,160,511,189"/>
+</map>

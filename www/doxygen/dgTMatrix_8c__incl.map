@@ -1,5 +1,6 @@
-<area shape="rect" href="$dgTMatrix_8h.html" title="dgTMatrix.h" alt="" coords="120,81,211,105">
-<area shape="rect" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="336,81,451,105">
-<area shape="rect" href="$Tsparse_8h.html" title="Tsparse.h" alt="" coords="235,81,312,105">
-<area shape="rect" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="233,156,300,180">
-<area shape="rect" href="$Syms_8h.html" title="Syms.h" alt="" coords="439,230,505,254">
+<map id="G" name="G">
+<area shape="rect" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="169,160,236,189"/>
+<area shape="rect" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="272,83,387,112"/>
+<area shape="rect" href="$Tsparse_8h.html" title="Tsparse.h" alt="" coords="171,83,248,112"/>
+<area shape="rect" href="$Syms_8h.html" title="Syms.h" alt="" coords="375,237,439,267"/>
+</map>

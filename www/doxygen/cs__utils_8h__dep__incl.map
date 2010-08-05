@@ -1,9 +1,10 @@
-<area shape="rect" href="$cs__utils_8c.html" title="cs_utils.c" alt="" coords="5,81,83,105">
-<area shape="rect" href="$dgCMatrix_8h.html" title="dgCMatrix.h" alt="" coords="269,81,360,105">
-<area shape="rect" href="$dtCMatrix_8c.html" title="dtCMatrix.c" alt="" coords="225,230,313,254">
-<area shape="rect" href="$sparseQR_8h.html" title="sparseQR.h" alt="" coords="515,81,605,105">
-<area shape="rect" href="$dgCMatrix_8c.html" title="dgCMatrix.c" alt="" coords="269,156,360,180">
-<area shape="rect" href="$dtCMatrix_8h.html" title="dtCMatrix.h" alt="" coords="384,156,472,180">
-<area shape="rect" href="$init_8c.html" title="init.c" alt="" coords="485,230,533,254">
-<area shape="rect" href="$lgCMatrix_8c.html" title="lgCMatrix.c" alt="" coords="157,156,245,180">
-<area shape="rect" href="$sparseQR_8c.html" title="sparseQR.c" alt="" coords="597,156,688,180">
+<map id="G" name="G">
+<area shape="rect" href="$dgCMatrix_8c.html" title="dgCMatrix.c" alt="" coords="32,83,123,112"/>
+<area shape="rect" href="$dgCMatrix_8h.html" title="dgCMatrix.h" alt="" coords="221,83,312,112"/>
+<area shape="rect" href="$dtCMatrix_8c.html" title="dtCMatrix.c" alt="" coords="5,160,93,189"/>
+<area shape="rect" href="$init_8c.html" title="init.c" alt="" coords="243,237,291,267"/>
+<area shape="rect" href="$sparseQR_8h.html" title="sparseQR.h" alt="" coords="467,83,557,112"/>
+<area shape="rect" href="$dtCMatrix_8h.html" title="dtCMatrix.h" alt="" coords="141,160,229,189"/>
+<area shape="rect" href="$lgCMatrix_8c.html" title="lgCMatrix.c" alt="" coords="304,160,392,189"/>
+<area shape="rect" href="$sparseQR_8c.html" title="sparseQR.c" alt="" coords="467,160,557,189"/>
+</map>

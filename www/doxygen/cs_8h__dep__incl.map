@@ -1,11 +1,12 @@
-<area shape="rect" href="$cs_8c.html" title="cs.c" alt="" coords="109,81,155,105">
-<area shape="rect" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="179,81,256,105">
-<area shape="rect" href="$cs__utils_8c.html" title="cs_utils.c" alt="" coords="5,156,83,180">
-<area shape="rect" href="$dgCMatrix_8h.html" title="dgCMatrix.h" alt="" coords="269,156,360,180">
-<area shape="rect" href="$dtCMatrix_8c.html" title="dtCMatrix.c" alt="" coords="225,305,313,329">
-<area shape="rect" href="$sparseQR_8h.html" title="sparseQR.h" alt="" coords="515,156,605,180">
-<area shape="rect" href="$dgCMatrix_8c.html" title="dgCMatrix.c" alt="" coords="269,231,360,255">
-<area shape="rect" href="$dtCMatrix_8h.html" title="dtCMatrix.h" alt="" coords="384,231,472,255">
-<area shape="rect" href="$init_8c.html" title="init.c" alt="" coords="485,305,533,329">
-<area shape="rect" href="$lgCMatrix_8c.html" title="lgCMatrix.c" alt="" coords="157,231,245,255">
-<area shape="rect" href="$sparseQR_8c.html" title="sparseQR.c" alt="" coords="597,231,688,255">
+<map id="G" name="G">
+<area shape="rect" href="$cs__utils_8c.html" title="cs_utils.c" alt="" coords="103,83,180,112"/>
+<area shape="rect" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="228,83,305,112"/>
+<area shape="rect" href="$dgCMatrix_8c.html" title="dgCMatrix.c" alt="" coords="32,160,123,189"/>
+<area shape="rect" href="$dgCMatrix_8h.html" title="dgCMatrix.h" alt="" coords="221,160,312,189"/>
+<area shape="rect" href="$dtCMatrix_8c.html" title="dtCMatrix.c" alt="" coords="5,237,93,267"/>
+<area shape="rect" href="$init_8c.html" title="init.c" alt="" coords="243,315,291,344"/>
+<area shape="rect" href="$sparseQR_8h.html" title="sparseQR.h" alt="" coords="467,160,557,189"/>
+<area shape="rect" href="$dtCMatrix_8h.html" title="dtCMatrix.h" alt="" coords="141,237,229,267"/>
+<area shape="rect" href="$lgCMatrix_8c.html" title="lgCMatrix.c" alt="" coords="304,237,392,267"/>
+<area shape="rect" href="$sparseQR_8c.html" title="sparseQR.c" alt="" coords="467,237,557,267"/>
+</map>
