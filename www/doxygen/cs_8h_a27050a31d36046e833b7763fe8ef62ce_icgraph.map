@@ -1,0 +1,10 @@
+<map id="G" name="G">
+<area shape="rect" href="$cs_8h.html#a767dc90c22d90fe898f72c2da0d98c03" title="cs_qr" alt="" coords="168,59,221,88"/>
+<area shape="rect" href="$cs_8h.html#af1cde25f7d702464291dd2a7e85b4770" title="cs_qrsol" alt="" coords="345,5,415,35"/>
+<area shape="rect" href="$sparseQR_8c.html#ad4bb283bd0128438e01523e07feb4993" title="Apply Householder transformations and the row permutation P to y." alt="" coords="135,139,255,168"/>
+<area shape="rect" href="$dgCMatrix_8h.html#a2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="327,59,433,88"/>
+<area shape="rect" href="$dgCMatrix_8h.html#a5937063a2f86fc60d92f942eb9425b86" title="dgCMatrix_qrsol" alt="" coords="505,5,620,35"/>
+<area shape="rect" href="$sparseQR_8h.html#a614549a94002c7e1407cde03a911e16a" title="sparseQR_coef" alt="" coords="324,112,436,141"/>
+<area shape="rect" href="$sparseQR_8h.html#a77c75b1c89f4e32f426420faa76275a9" title="sparseQR_qty" alt="" coords="328,165,432,195"/>
+<area shape="rect" href="$sparseQR_8h.html#a43eb94cb27f10aedba5ce50939a9b45c" title="sparseQR_resid_fitted" alt="" coords="305,219,455,248"/>
+</map>

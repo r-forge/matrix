@@ -1,0 +1,9 @@
+<map id="G" name="G">
+<area shape="rect" href="$Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="157,19,339,48"/>
+<area shape="rect" href="$sparseQR_8c.html#ad4bb283bd0128438e01523e07feb4993" title="Apply Householder transformations and the row permutation P to y." alt="" coords="188,99,308,128"/>
+<area shape="rect" href="$Mutils_8c.html#a8ed2ff2e1a0de240a9c5b5a617f46838" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated..." alt="" coords="387,5,549,35"/>
+<area shape="rect" href="$Mutils_8c.html#afd54bbce8f08c11478dbd0b6c40d2c24" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated..." alt="" coords="599,5,801,35"/>
+<area shape="rect" href="$cs_8c.html#a27050a31d36046e833b7763fe8ef62ce" title="cs_happly" alt="" coords="428,59,508,88"/>
+<area shape="rect" href="$cs_8c.html#a1d7df434402e7553c34dbd59fd040159" title="cs_ipvec" alt="" coords="432,112,504,141"/>
+<area shape="rect" href="$cs_8c.html#ad854f5cf7572128900a5acb1a7c87754" title="cs_pvec" alt="" coords="433,165,503,195"/>
+</map>
