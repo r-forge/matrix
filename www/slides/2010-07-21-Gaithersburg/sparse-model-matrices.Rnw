@@ -4,8 +4,24 @@
 
 <<preliminaries,echo=FALSE,results=hide>>=
 options(width=75)
-library(Matrix)
+library(MatrixModels)
 @
+
+\begin{frame}
+  CHANGE since talk (July 21, 2010):
+
+  \begin{itemize}
+  \item   \Rfun{model.Matrix},
+  \item its result classes,
+  \item all subsequent modeling classes,
+  \item \Rfun{glm4}, etc
+  \end{itemize}
+  have been ``factored out''
+  into (new) package \alert{\pkg{MatrixModels}}.
+
+  (2010, End of July on R-forge; Aug. 6 on CRAN)
+\end{frame}
+
 
 \begin{frame}[fragile]\frametitle{Sparse \alert{Model} Matrices}
 New model matrix classes,
@@ -34,7 +50,7 @@ model.matrix(~ 0+ a * b, dd)
 \end{footnotesize}
 \end{frame}
 
-\begin{frame}[fragile]\frametitle{Sparse \alert{Model} Matrices in 'Matrix'}
+\begin{frame}[fragile]\frametitle{Sparse \alert{Model} Matrices in 'Matrix\alert{Models}'}
   \begin{itemize}
   \item
   These matrices can become very large: Both many rows (large $n$), \emph{and}
@@ -59,12 +75,12 @@ model.matrix(~ 0+ a * b, dd)
 
 \item
   We've extended \Rfun{model.\Ul{m}atrix} to  \Rfun{model.\Ul{M}atrix} in
-  package \pkg{Matrix} with optional argument \code{sparse = TRUE}.
+  package \pkg{Matrix\alert{Models}} with optional argument \code{sparse = TRUE}.
 \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Sparse Model Matrix \alert{Classes} in 'Matrix'}
+  \frametitle{Sparse Model Matrix \alert{Classes} in 'MatrixModels'}
 \begin{footnotesize}
 \begin{Schunk}
 \begin{Sinput}
@@ -95,7 +111,7 @@ consistent superclass ordering)
 \end{frame}
 
 \begin{frame}[fragile]\frametitle{model.\alert{M}atrix(*, sparse=TRUE)}
-Constructing \alert{sparse} models matrices (\pkg{Matrix} package):
+Constructing \alert{sparse} models matrices (\alert{\pkg{MatrixModels}} package):
   \begin{footnotesize}
 <<modelMat-ex>>=
 model.Matrix(~ 0+ a * b, dd, sparse=TRUE)
@@ -213,7 +229,7 @@ setClass("sPredModule", contains = "predModule",
       $\Delta\bm\beta$, the \emph{increment} of $\bm\beta$.
     \end{itemize}
   \end{enumerate}
-  Convergence only if Bates-Watts orthgonality criterion is fulfilled.
+  Convergence only if Bates-Watts orthogonality criterion is fulfilled.
 \end{frame}
 
 
