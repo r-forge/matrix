@@ -1,8 +1,9 @@
-<area shape="rect" href="$dgCMatrix_8h.html" title="dgCMatrix.h" alt="" coords="320,81,411,105">
-<area shape="rect" href="$Csparse_8h.html" title="Csparse.h" alt="" coords="469,81,549,105">
-<area shape="rect" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="573,81,688,105">
-<area shape="rect" href="$t__gCMatrix__colSums_8c.html" title="t_gCMatrix_colSums.c" alt="" coords="712,81,864,105">
-<area shape="rect" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="476,231,543,255">
-<area shape="rect" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="216,156,293,180">
-<area shape="rect" href="$Syms_8h.html" title="Syms.h" alt="" coords="349,305,416,329">
-<area shape="rect" href="$cs_8h.html" title="cs.h" alt="" coords="189,231,235,255">
+<map id="G" name="G">
+<area shape="rect" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="305,160,372,189"/>
+<area shape="rect" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="463,83,540,112"/>
+<area shape="rect" href="$Csparse_8h.html" title="Csparse.h" alt="" coords="359,83,439,112"/>
+<area shape="rect" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="564,83,679,112"/>
+<area shape="rect" href="$t__gCMatrix__colSums_8c.html" title="t_gCMatrix_colSums.c" alt="" coords="703,83,855,112"/>
+<area shape="rect" href="$Syms_8h.html" title="Syms.h" alt="" coords="219,237,283,267"/>
+<area shape="rect" href="$cs_8h.html" title="cs.h" alt="" coords="483,160,528,189"/>
+</map>

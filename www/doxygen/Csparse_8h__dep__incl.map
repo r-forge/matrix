@@ -1,5 +1,6 @@
-<area shape="rect" href="$Csparse_8c.html" title="Csparse.c" alt="" coords="5,82,85,106">
-<area shape="rect" href="$dgCMatrix_8c.html" title="dgCMatrix.c" alt="" coords="109,82,200,106">
-<area shape="rect" href="$dsCMatrix_8h.html" title="dsCMatrix.h" alt="" coords="224,82,315,106">
-<area shape="rect" href="$init_8c.html" title="init.c" alt="" coords="328,156,376,180">
-<area shape="rect" href="$dsCMatrix_8c.html" title="dsCMatrix.c" alt="" coords="213,156,304,180">
+<map id="G" name="G">
+<area shape="rect" href="$dgCMatrix_8c.html" title="dgCMatrix.c" alt="" coords="5,83,96,112"/>
+<area shape="rect" href="$dsCMatrix_8c.html" title="dsCMatrix.c" alt="" coords="144,83,235,112"/>
+<area shape="rect" href="$dsCMatrix_8h.html" title="dsCMatrix.h" alt="" coords="283,83,373,112"/>
+<area shape="rect" href="$init_8c.html" title="init.c" alt="" coords="345,160,393,189"/>
+</map>
