@@ -55,12 +55,10 @@ export(
 #TODO       "lm.fit.sparse",# <- "somewhat experimental"
        "mkRespMod",
        "model.Matrix"
-
-## not-yet-exported:
-## , "solveCoef"
-## , "reweight"
-## , "updateMu"
-## , "updateWts"
+       , "solveCoef"
+       , "reweightPred"
+       , "updateMu"
+       , "updateWts"
        )
 
 exportClasses(
