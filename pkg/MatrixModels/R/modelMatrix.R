@@ -169,10 +169,8 @@ setAs("dsparseModelMatrix", "predModule",
           X = from, fac = Cholesky(crossprod(from), LDL = FALSE))
   })
 
-##' <description>
 ##' Create an respModule, which could be from a derived class such as
 ##' glmRespMod or nlsRespMod.
-##' <details>
 ##' @title Create a respModule object
 ##' @param a model frame
 ##' @param family the optional glm family (glmRespMod only)
@@ -296,9 +294,8 @@ fitGlm4 <- function(lp, doFP = TRUE, control = list()) {
     IRLS(lp, control)
 }
 
-##' <description>
 ##' A single step in the fixed-point algorithm for GLMs.
-##' <details>
+##'
 ##' In general we use an algorithm similar to the Gauss-Newton
 ##' algorithm for nonlinear least squares (except, of course, that it
 ##' allows for reweighting).  For some models, such as those using the
@@ -326,9 +323,7 @@ glm.fp <- function(lp) {
     as.vector(solve(crossprod(wM), crossprod(wM, z[good] * w)))
 }
 
-##' <description>
 ##'
-##' <details>
 ##' @title
 ##' @param control  a (named) list {or vector; as.list(.)  must work}.
 ##' @param defaults a (named) list {or vector; as.list(.)  must work}.
@@ -395,7 +390,7 @@ IRLS <- function(mod, control) {
         cbase <- cc
         respMod <- updateWts(respMod)
         wrss0 <- sum(respMod@wtres^2)
-        predMod <- reweight(predMod, respMod@sqrtXwt, respMod@wtres)
+        predMod <- reweightPred(predMod, respMod@sqrtXwt, respMod@wtres)
         incr <- solveCoef(predMod)
         convcrit <- sqrt(attr(incr, "sqrLen")/wrss0)
 	if(verbose)
@@ -436,7 +431,7 @@ IRLS <- function(mod, control) {
     predMod@coef <- cc
     if(finalUpdate) {
 	respMod <- updateWts(respMod)
-	predMod <- reweight(predMod, respMod@sqrtXwt, respMod@wtres)
+	predMod <- reweightPred(predMod, respMod@sqrtXwt, respMod@wtres)
     }
 
     mod@ fitProps <- list(convcrit=convcrit, iter=iter, nHalvings=nHalvings)
@@ -452,17 +447,17 @@ IRLS <- function(mod, control) {
 
 ### FIXME(2): lme4a can get rid of its  updateMer(), as soon as it uses this:
 
-##' @title update( <S4 model> ) -- using  getCall(obj)
-##'
-##' <description> This is almost identical to stats::update(), with the only
+##' This is almost identical to stats::update(), with the only
 ##' difference that we use  getCall(object) instead of  object$call.  This
 ##' makes it much more generally useful, notably for S4 model classes.
+##'
+##' @title update( <S4 model> ) -- using  getCall(obj)
 ##'
 ##' @param object
 ##' @param formula.
 ##' @param ...
 ##' @param evaluate
-##' @return
+##' @return a 'Model', very similar to 'object'
 updateModel <- function(object, formula., ..., evaluate = TRUE)
 {
     if (is.null(call <- getCall(object)))
@@ -564,7 +559,7 @@ setMethod("updateWts", signature(respM = "glmRespMod"),
       })
 
 
-setMethod("reweight",
+setMethod("reweightPred",
           signature(predM = "dPredModule", sqrtXwt = "matrix", wtres = "numeric"),
           function(predM, sqrtXwt, wtres, ...)
       {
@@ -574,7 +569,7 @@ setMethod("reweight",
           predM@fac <- chol(crossprod(V))
           predM
       })
-setMethod("reweight",
+setMethod("reweightPred",
           signature(predM = "sPredModule", sqrtXwt = "matrix", wtres = "numeric"),
           function(predM, sqrtXwt, wtres, ...)
       {
