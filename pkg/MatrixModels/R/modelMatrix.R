@@ -576,23 +576,29 @@ setMethod("updateWts", signature(respM = "glmRespMod"),
 	  respM
       })
 
-
 setMethod("reweightPred",
           signature(predM = "dPredModule", sqrtXwt = "matrix", wtres = "numeric"),
           function(predM, sqrtXwt, wtres, ...)
       {
-          stopifnot(ncol(sqrtXwt) == 1L) # FIXME: add nls version
           V <- as.vector(sqrtXwt) * predM@X
+          s <- ncol(sqrtXwt)
+          if (s > 1L)
+              V <- Reduce("+", lapply(split(seq_len(nrow(V)), gl(s, nrow(sqrtXwt))),
+                                      function(ind) V[ind,]))
           predM@Vtr <- as.vector(crossprod(V, wtres))
           predM@fac <- chol(crossprod(V))
           predM
       })
+
 setMethod("reweightPred",
           signature(predM = "sPredModule", sqrtXwt = "matrix", wtres = "numeric"),
           function(predM, sqrtXwt, wtres, ...)
       {
-          stopifnot(ncol(sqrtXwt) == 1L) # FIXME: add nls version
           Vt <- crossprod(predM@X, Diagonal(x = as.vector(sqrtXwt)))
+          s <- ncol(sqrtXwt)
+          if (s > 1L)
+              Vt <- Reduce("+", lapply(split(seq_len(ncol(Vt)), gl(s, nrow(sqrtXwt))),
+                                      function(ind) Vt[, ind]))
           predM@Vtr <- as.vector(Vt %*% wtres)
           predM@fac <- update(predM@fac, Vt)
           predM
