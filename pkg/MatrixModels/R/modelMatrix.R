@@ -486,26 +486,44 @@ setMethod("coef", "glpModel", function(object, ...)
 	  structure(prd@coef,
 		    names = colnames(prd@X))
       })
-setMethod("fitted", "glpModel", function(object, ...) object@resp@mu)
-setMethod("residuals", "glpModel",
+setMethod("fitted", "respModule", function(object, ...) object@mu)
+setMethod("fitted", "glpModel", function(object, ...) {object <- object@resp; callGeneric(...)})
+setMethod("residuals", "respModule",
           function(object, type = c("deviance", "pearson",
                            "working", "response", "partial"), ...)
       {
 	  type <- match.arg(type)
-
-	  ## glm.fit: residuals <- (y - mu)/mu.eta(eta)
-	  rsp <- object@resp
-	  mu <- rsp@mu
-	  y <- rsp@y
-	  residuals <- y - mu
-	  if(rsp@family)
-	      ## working residuals:
-	      residuals <- residuals/rsp@family@mu.eta(rsp@eta)
-
-	  if(type != "working")
-	      warning("returning 'working' residuals only at the moment")
-
-	  residuals
+          if (type %in% c("pearson", "deviance")) return(object@wtres)
+          if (type %in% c("working", "response")) return(object@y - object@mu)
+          stop(paste("residuals of type", sQuote(type), "not yet available"))
+      })
+setMethod("residuals", "glmRespMod",
+          function(object, type = c("deviance", "pearson",
+                           "working", "response", "partial"), ...)
+      {
+          
+	  type <- match.arg(type)
+          if (type == "pearson") return(object@wtres)
+          
+          fam <- object@family
+	  mu <- object@mu
+	  y <- object@y
+          wts <- object@weights
+          residuals <- y - mu
+	  if (type == "response") return(residuals)
+          if (type == "working") return(residuals/fam$mu.eta(object@eta))
+          if (type == "deviance") {
+              d.res <- sqrt(pmax(fam$dev.resids(y, mu, wts), 0))
+              return(ifelse(y > mu, d.res, -d.res))
+          }
+          stop(paste("residuals of type", sQuote(type), "not yet available"))
+      })
+setMethod("residuals", "glpModel", 
+          function(object, type = c("deviance", "pearson",
+                           "working", "response", "partial"), ...)
+      {
+          object <- object@resp
+          callGeneric(...)
       })
 
 setMethod("updateMu", signature(respM = "respModule", gamma = "numeric"),
