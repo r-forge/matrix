@@ -2,5 +2,7 @@
 
 	* modelMatrix.R: added "fitted" and "residuals" methods for
 	"respModule" classes.  Modified corresponding methods for
-	"glpModel" to chain to these.
+	"glpModel" to chain to these.  Modified the reweightPred methods
+	to allow for ncol(sqrtXwt) > 1.
+
 
