@@ -488,6 +488,7 @@ setMethod("coef", "glpModel", function(object, ...)
       })
 setMethod("fitted", "respModule", function(object, ...) object@mu)
 setMethod("fitted", "glpModel", function(object, ...) {object <- object@resp; callGeneric(...)})
+
 setMethod("residuals", "respModule",
           function(object, type = c("deviance", "pearson",
                            "working", "response", "partial"), ...)
@@ -501,10 +502,9 @@ setMethod("residuals", "glmRespMod",
           function(object, type = c("deviance", "pearson",
                            "working", "response", "partial"), ...)
       {
-          
 	  type <- match.arg(type)
           if (type == "pearson") return(object@wtres)
-          
+
           fam <- object@family
 	  mu <- object@mu
 	  y <- object@y
@@ -518,7 +518,7 @@ setMethod("residuals", "glmRespMod",
           }
           stop(paste("residuals of type", sQuote(type), "not yet available"))
       })
-setMethod("residuals", "glpModel", 
+setMethod("residuals", "glpModel",
           function(object, type = c("deviance", "pearson",
                            "working", "response", "partial"), ...)
       {

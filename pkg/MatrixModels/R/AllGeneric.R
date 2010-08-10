@@ -71,9 +71,20 @@ setGeneric("gammaInc", function(predM, ...)
 setGeneric("solveCoef", function(predM, ...)
            standardGeneric("solveCoef"))
 
+
+##------------ all these should wander to  stats4  eventually: -----------------
+
 ##'
 ##' @title simple accessor to get the "call" component from a fitted model
 ##' @param x a (fitted) model
 ##' @return a "call" object
 setGeneric("getCall", function(x) standardGeneric("getCall"),
 	   valueClass = "call")
+
+## Make resid() into a reasonable S4 generic (still dispatching for S3):
+setMethod("resid", "ANY", function(object, ...) residuals(object, ...))
+
+## ditto for fitted.values() & coefficients():
+setMethod("fitted.values", "ANY", function(object, ...) fitted(object, ...))
+setMethod("coefficients",  "ANY", function(object, ...) coef  (object, ...))
+
