@@ -90,22 +90,12 @@ setMethod("solve", signature(a = "CHMfactor", b = "ANY"),
 		   ...)
 	      solve(a, as(b, "dMatrix"), system, ...))
 
-if(getRversion() < "2.10.0" || R.version$`svn rev` < 49944) {
-    ## for now: still carry  'size' and 'LINPACK'
-setMethod("chol2inv", signature(x = "CHMfactor"),
-	  function (x, size, LINPACK) {
-	      if (!missing(size) || !missing(LINPACK))
-		  warning("Arguments size and LINPACK are ignored for chol2inv\n\tmethods in the Matrix package")
-	      solve(x, system = "A")
-	  })
-} else {## chol2inv() has implicit generic in newer versions of R
 setMethod("chol2inv", signature(x = "CHMfactor"),
 	  function (x, ...) {
 	      if(length(list(...)))
 		  warning("arguments in", deparse(list(...)), "are disregarded")
 	      solve(x, system = "A")
 	  })
-}# end {if}
 
 setMethod("determinant", signature(x = "CHMfactor", logarithm = "missing"),
           function(x, logarithm, ...) determinant(x, TRUE))
