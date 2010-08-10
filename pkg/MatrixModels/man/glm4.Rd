@@ -110,11 +110,18 @@ stopifnot( identical(glmM2@pred@coef, glmM3@pred@coef),
            all.equal(glmM @pred@coef, c.glm, tol=1e-7),
            all.equal(glmM2@pred@coef, c.glm, tol=1e-12))
 \dontshow{
+All.eq <- function(x,y, ...) all.equal(x,y, tol= 1e-12, ...)
 stopifnot( ## ensure typos are *caught* :
   inherits(try(glm4(counts ~ outcome + treatment, family=poisson, data=trial,
                        fooBar = FALSE)), "try-error"),
   ## check formula(.): {environments differ - FIXME?}
-  formula(glmM) == formula(glm.D93))
+  formula(glmM) == formula(glm.D93),
+  identical(coef(glmM2), coefficients(glmM3)),
+  All.eq   (coef(glmM2), coefficients(glm.D93)),
+  identical(fitted.values(glmM2), fitted(glmM3)),
+  All.eq   (residuals(glmM2), resid(glm.D93), check.attr=FALSE),# names()% FIXME ??
+  identical(residuals(glmM2), resid(glmM3))
+)
 }
 
 ## Watch the iterations --- and use no intercept --> more sparse X
