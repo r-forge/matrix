@@ -327,6 +327,10 @@ assert.EQ.mat(Stu@Q, as(Stg@Q,"matrix"), tol=0)
 p <- new("dtCMatrix", i = c(2L, 3L, 2L, 5L, 4L, 4:5), p = c(0L, 2L, 4:7, 7L),
 	 Dim = c(6L, 6L), Dimnames = list(as.character(1:6), NULL),
 	 x = rep.int(-0.5, 7), uplo = "L", diag = "U")
+Sp <- Schur(p)
+Sp. <- Schur(as(p,"generalMatrix"))
+Sp.p <- Schur(crossprod(p))
+## the last two failed
 ip <- solve(p)
 assert.EQ.mat(solve(ip), as(p,"matrix"))
 
