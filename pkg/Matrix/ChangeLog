@@ -1,3 +1,8 @@
+2010-08-11  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/eigen.R (Schur): correct setMethod() such that
+	Schur(<dgCMatrix>) works.
+
 2010-08-10  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/diagMatrix.R, man/bdiag.Rd, NAMESPACE: export .bdiag() as well.
