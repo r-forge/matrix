@@ -280,7 +280,7 @@ setMethod("chol2inv", signature(x = "denseMatrix"),
 setMethod("chol2inv", signature(x = "sparseMatrix"),
 	  function (x, ...) {
 	      if(length(list(...)))
-		  warning("arguments in", deparse(list(...)), "are disregarded")
+		  warning("arguments in ",deparse(list(...))," are disregarded")
 	      ## for now:
 	      tcrossprod(solve(as(x,"triangularMatrix")))
 	  })
