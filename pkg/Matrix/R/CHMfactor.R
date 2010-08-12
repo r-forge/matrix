@@ -33,7 +33,7 @@ setMethod("image", "CHMfactor",
 	     ...)
 {
     if(length(list(...)))
-	warning("arguments in", deparse(list(...)), "are disregarded")
+	warning("arguments in ",deparse(list(...))," are disregarded")
     sysDef <- eval(formals()$system)
     .Call(CHMfactor_solve, a, b,
 	  match(match.arg(system, sysDef), sysDef, nomatch = 0))
@@ -56,7 +56,7 @@ setMethod("solve", signature(a = "CHMfactor", b = "dsparseMatrix"),
 		   system = c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt"),
 		   ...) {
 	      if(length(list(...)))
-		  warning("arguments in", deparse(list(...)), "are disregarded")
+		  warning("arguments in ",deparse(list(...))," are disregarded")
 	      sysDef <- eval(formals()$system)
 	      .Call(CHMfactor_spsolve, a, as(as(b, "CsparseMatrix"), "dgCMatrix"),
 		    match(match.arg(system, sysDef), sysDef, nomatch = 0))
@@ -71,7 +71,7 @@ setMethod("solve", signature(a = "CHMfactor", b = "missing"),
 		   system = c("A", "LDLt", "LD","DLt", "L","Lt", "D", "P","Pt"),
 		   ...) {
 	      if(length(list(...)))
-		  warning("arguments in", deparse(list(...)), "are disregarded")
+		  warning("arguments in ",deparse(list(...))," are disregarded")
 	      sysDef <- eval(formals()$system)
 	      system <- match.arg(system, sysDef)
 	      i.sys <- match(system, sysDef, nomatch = 0L)
@@ -93,7 +93,7 @@ setMethod("solve", signature(a = "CHMfactor", b = "ANY"),
 setMethod("chol2inv", signature(x = "CHMfactor"),
 	  function (x, ...) {
 	      if(length(list(...)))
-		  warning("arguments in", deparse(list(...)), "are disregarded")
+		  warning("arguments in ",deparse(list(...))," are disregarded")
 	      solve(x, system = "A")
 	  })
 
