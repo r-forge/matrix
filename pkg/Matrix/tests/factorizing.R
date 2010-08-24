@@ -334,6 +334,7 @@ Sp.p <- Schur(crossprod(p))
 ip <- solve(p)
 assert.EQ.mat(solve(ip), as(p,"matrix"))
 
+
 ## chol2inv() for a traditional matrix
 assert.EQ.mat(     crossprod(chol2inv(chol(Diagonal(x = 5:1)))),
               C <- crossprod(chol2inv(chol(    diag(x = 5:1)))))

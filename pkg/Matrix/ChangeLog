@@ -1,3 +1,12 @@
+2010-08-21  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/spModels.R (sparse.model.matrix): argument 'drop.unused.levels = FALSE'
+	NB: was *true* implicitly, before.  Compatibility with model.matrix().
+
+	* R/sparseMatrix.R (formatSpMatrix, formatSparseM): factored out of
+	printSpMatrix(); export as potentially useful for standard
+	matrices, even.
+
 2010-08-11  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/eigen.R (Schur): correct setMethod() such that
