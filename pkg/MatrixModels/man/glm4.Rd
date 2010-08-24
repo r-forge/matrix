@@ -13,7 +13,8 @@
 \usage{
 glm4(formula, family, data, weights, subset, na.action,
      start = NULL, etastart, mustart, offset,
-     sparse = FALSE, doFit = TRUE, control = list(\dots),
+     sparse = FALSE, drop.unused.levels = FALSE, doFit = TRUE,
+     control = list(\dots),
      model = TRUE, x = FALSE, y = TRUE, contrasts = NULL, \dots)
 }
 \arguments{%% much cut & pasted from  glm.Rd :
@@ -58,6 +59,12 @@ glm4(formula, family, data, weights, subset, na.action,
     specified their sum is used.  See \code{\link{model.offset}}.}
   \item{sparse}{logical indicating if the model matrix should be sparse
     or not.}
+  \item{drop.unused.levels}{used only when \code{sparse} is TRUE: Should
+    factors have unused levels dropped?
+    (This used to be true, \emph{implicitly} in the first versions up to
+    July 2010; the default has been changed for compatibility with
+    \R's standard (dense) \code{\link{model.matrix}()}.
+  }
   \item{doFit}{logical indicating if the model should be fitted (or just
     returned unfitted).}
   \item{control}{

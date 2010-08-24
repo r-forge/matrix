@@ -2,11 +2,12 @@
 
 model.Matrix <- function(object, data = environment(object),
 			 contrasts.arg = NULL, xlev = NULL,
-			 sparse = FALSE, ...)
+			 sparse = FALSE, drop.unused.levels = FALSE, ...)
 {
     if(sparse) {
 	m <- sparse.model.matrix(object, data=data, contrasts.arg=contrasts.arg,
-			    xlev=xlev, ...)
+				 drop.unused.levels=drop.unused.levels, xlev=xlev,
+				 ...)
 	new("dsparseModelMatrix",  m, ## droping attributes ?
 	    assign = attr(m, "assign"),
 	    contrasts = if(is.null(ctr <- attr(m,"contrasts")))list() else ctr)
@@ -251,7 +252,8 @@ mkRespMod <- function(fr, family = NULL, nlenv = NULL, nlmod = NULL)
 
 glm4 <- function(formula, family, data, weights, subset,
                  na.action, start = NULL, etastart, mustart, offset,
-                 sparse = FALSE, doFit = TRUE, control = list(...),
+		 sparse = FALSE, drop.unused.levels = FALSE, doFit = TRUE,
+		 control = list(...),
                  ## all the following are currently ignored:
                  model = TRUE, x = FALSE, y = TRUE, contrasts = NULL, ...) {
     call <- match.call()
@@ -278,7 +280,8 @@ glm4 <- function(formula, family, data, weights, subset,
 
     ans <- new("glpModel", call = call,
 	       resp = mkRespMod(mf, family),
-	       pred = as(model.Matrix(formula, mf, sparse = sparse),
+	       pred = as(model.Matrix(formula, mf, sparse = sparse,
+				      drop.unused.levels=drop.unused.levels),
 			 "predModule"))
     if (doFit)
 	## TODO ? - make 'doFP' a function argument / control component:
