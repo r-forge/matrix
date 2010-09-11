@@ -47,6 +47,7 @@
 % "[" are in ./Xtrct-methods.Rd
 %\alias{colMeans,..} etc are now in ./colSums.Rd
 % graph stuff
+\alias{coerce,graph,Matrix-method}
 \alias{coerce,graph,sparseMatrix-method}
 \alias{coerce,graph,CsparseMatrix-method}
 \alias{coerce,graphAM,sparseMatrix-method}
