@@ -1,3 +1,7 @@
+2010-09-09  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (setAs): graph |-> Matrix: via CsparseMatrix
+
 2010-08-21  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/spModels.R (sparse.model.matrix): argument 'drop.unused.levels = FALSE'

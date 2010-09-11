@@ -127,6 +127,7 @@ setAs("graphAM", "sparseMatrix",
 
 setAs("graph", "CsparseMatrix",
       function(from) as(as(from, "graphNEL"), "CsparseMatrix"))
+setAs("graph", "Matrix", function(from) as(from, "CsparseMatrix"))
 
 setAs("graphNEL", "CsparseMatrix",
       function(from) as(as(from, "TsparseMatrix"), "CsparseMatrix"))
