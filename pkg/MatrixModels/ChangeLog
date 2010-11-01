@@ -1,3 +1,9 @@
+2010-11-01  Douglas Bates  <bates@stat.wisc.edu>
+
+	* R/AllClass.R (rMod,glrMod): Initial attempt at using reference
+	classes for the response modules.  Still some problems with the
+	contains argument to setRefClass for GLMRespMod.
+
 2010-08-23  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/modelMatrix.R (model.Matrix, glm4): use argument
