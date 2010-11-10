@@ -1,6 +1,6 @@
 2010-10-08  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 0.999375-45
+	* DESCRIPTION (Version): 0.999375-45, CRAN-released: 2010-11-10
 
 	* R/sparseMatrix.R (graph.wgtMatrix): add 'graph::' in a few
 	places; as 'graph' package is not imported and may well be loaded
