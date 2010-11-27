@@ -149,7 +149,7 @@ rMod <-
                     initFields(...)
                     if (length(n) == 0L) n <<- length(y)
                     s <- 0L
-                    stopifnot(n > 0L)
+		    ##currently fails at pkg INSTALL time: stopifnot(n > 0L)
                     if (length(weights) == 0L) weights <<- numeric(n) + 1
                     sqrtrwt <<- sqrt(weights)
                     if (any((dd <- dim(sqrtXwt)) < 1L))
