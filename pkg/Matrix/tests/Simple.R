@@ -59,6 +59,16 @@ I1[1,1] <- i1[1, ] <- I [ ,1] <- NA
 stopifnot(identical3(I,i1,I1))
 image(d4) # gave infinite recursion
 
+assertError( Matrix(factor(letters)) )
+mlp <- matrix(.leap.seconds)## 24 x 1 numeric matrix
+Mlp <- Matrix(.leap.seconds)
+assert.EQ.mat(Mlp, mlp)
+if(FALSE) { ## TODO -- once R itself does better ...
+    .Leap.seconds <- as.POSIXlt(.leap.seconds)
+    mLp <- matrix(.Leap.seconds)##  24 x 1  list each of length 24 -- yuck!!!
+    MLp <- Matrix(.Leap.seconds)## --> error (for now)
+}
+
 I <- Diagonal(3); I[,1] <- NA; I[2,2] <- NA ; I[3,] <- NaN
 stopifnot(isValid(I, "sparseMatrix"))
 I # gave error in printSpMatrix() - because of R bug in format.info()
