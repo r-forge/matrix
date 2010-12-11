@@ -660,6 +660,7 @@ nt <- triu(nn)
 n3 <- as(nt, "lsparseMatrix")
 da <- nt + t(nt)
 dm <- nt * t(nt) + da
+assert.EQ.mat(nt %*% 2:3, as(nt,"matrix") %*% 2:3)
 stopifnot(isValid(ms, "dsTMatrix"),
           as(ms0,"matrix") == as(ll, "matrix"), # coercing num |-> log
 	  as(lt, "matrix") == as(ll, "matrix"),
