@@ -660,7 +660,16 @@ nt <- triu(nn)
 n3 <- as(nt, "lsparseMatrix")
 da <- nt + t(nt)
 dm <- nt * t(nt) + da
-assert.EQ.mat(nt %*% 2:3, as(nt,"matrix") %*% 2:3)
+##
+mnt <- as(nt, "matrix")
+m <- rbind(v <- 2:3)
+assert.EQ.mat(nt %*% v, mnt %*% v)
+assert.EQ.mat(v %*% nt, v %*% mnt)
+assert.EQ.mat( crossprod(nt, v),  crossprod(mnt,v))
+assert.EQ.mat( crossprod(v, nt),  crossprod(v,mnt))
+assert.EQ.mat(tcrossprod(v, nt), tcrossprod(v,mnt))
+assert.EQ.mat(tcrossprod(nt, m), tcrossprod(mnt, m))
+##
 stopifnot(isValid(ms, "dsTMatrix"),
           as(ms0,"matrix") == as(ll, "matrix"), # coercing num |-> log
 	  as(lt, "matrix") == as(ll, "matrix"),
