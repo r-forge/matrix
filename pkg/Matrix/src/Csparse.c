@@ -414,16 +414,20 @@ SEXP Csparse_dense_crossprod(SEXP a, SEXP b)
     CHM_DN chb = AS_CHM_DN(b_M);
     CHM_DN chc = cholmod_l_allocate_dense(cha->ncol, chb->ncol, cha->ncol,
 					chb->xtype, &c);
-    SEXP dn = PROTECT(allocVector(VECSXP, 2));
+    SEXP dn = PROTECT(allocVector(VECSXP, 2)); int nprot = 2;
     double one[] = {1,0}, zero[] = {0,0};
     R_CheckStack();
-
+    // -- see Csparse_dense_prod() above :
+    if(cha->xtype == CHOLMOD_PATTERN) {
+	SEXP da = PROTECT(nz2Csparse(a, x_double)); nprot++;
+	cha = AS_CHM_SP(da);
+    }
     cholmod_l_sdmult(cha, 1, one, zero, chb, chc, &c);
     SET_VECTOR_ELT(dn, 0,	/* establish dimnames */
 		   duplicate(VECTOR_ELT(GET_SLOT(a, Matrix_DimNamesSym), 1)));
     SET_VECTOR_ELT(dn, 1,
 		   duplicate(VECTOR_ELT(GET_SLOT(b_M, Matrix_DimNamesSym), 1)));
-    UNPROTECT(2);
+    UNPROTECT(nprot);
     return chm_dense_to_SEXP(chc, 1, 0, dn);
 }
 
