@@ -1,9 +1,9 @@
 <map id="G" name="G">
-<area shape="rect" href="$chm__common_8c.html#ac83bdca818781738d783ca4348834b37" title="Copy cholmod_triplet to an R_alloc()ed version of it." alt="" coords="221,5,309,35"/>
-<area shape="rect" href="$Mutils_8c.html#a8ed2ff2e1a0de240a9c5b5a617f46838" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated..." alt="" coords="184,59,347,88"/>
-<area shape="rect" href="$chm__common_8c.html#ad7dbb3616e40830729a242662b561897" title="stype" alt="" coords="239,112,292,141"/>
-<area shape="rect" href="$chm__common_8c.html#a9ea43d94a2bbd6c055ff9da6e3f24109" title="xpt" alt="" coords="245,165,285,195"/>
-<area shape="rect" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="239,219,292,248"/>
-<area shape="rect" href="$Mutils_8c.html#afd54bbce8f08c11478dbd0b6c40d2c24" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated..." alt="" coords="396,59,599,88"/>
-<area shape="rect" href="$chm__common_8c.html#a6eb9b8c79c573099970c93d50e059039" title="RallocedREAL" alt="" coords="445,165,549,195"/>
+<area shape="rect" id="node3" href="$chm__common_8c.html#ac83bdca818781738d783ca4348834b37" title="Copy cholmod_triplet to an R_alloc()ed version of it." alt="" coords="220,5,311,35"/>
+<area shape="rect" id="node5" href="$Mutils_8c.html#a8ed2ff2e1a0de240a9c5b5a617f46838" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="184,58,347,89"/>
+<area shape="rect" id="node9" href="$chm__common_8c.html#ad7dbb3616e40830729a242662b561897" title="stype" alt="" coords="239,111,292,142"/>
+<area shape="rect" id="node11" href="$chm__common_8c.html#a9ea43d94a2bbd6c055ff9da6e3f24109" title="xpt" alt="" coords="245,165,285,195"/>
+<area shape="rect" id="node15" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="239,218,292,249"/>
+<area shape="rect" id="node7" href="$Mutils_8c.html#afd54bbce8f08c11478dbd0b6c40d2c24" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="395,58,600,89"/>
+<area shape="rect" id="node13" href="$chm__common_8c.html#a6eb9b8c79c573099970c93d50e059039" title="RallocedREAL" alt="" coords="444,165,551,195"/>
 </map>

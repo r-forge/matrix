@@ -1,12 +1,13 @@
 <map id="G" name="G">
-<area shape="rect" href="$cs__utils_8c.html" title="cs_utils.c" alt="" coords="103,83,180,112"/>
-<area shape="rect" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="228,83,305,112"/>
-<area shape="rect" href="$dgCMatrix_8c.html" title="dgCMatrix.c" alt="" coords="32,160,123,189"/>
-<area shape="rect" href="$dgCMatrix_8h.html" title="dgCMatrix.h" alt="" coords="221,160,312,189"/>
-<area shape="rect" href="$dtCMatrix_8c.html" title="dtCMatrix.c" alt="" coords="5,237,93,267"/>
-<area shape="rect" href="$init_8c.html" title="init.c" alt="" coords="243,315,291,344"/>
-<area shape="rect" href="$sparseQR_8h.html" title="sparseQR.h" alt="" coords="467,160,557,189"/>
-<area shape="rect" href="$dtCMatrix_8h.html" title="dtCMatrix.h" alt="" coords="141,237,229,267"/>
-<area shape="rect" href="$lgCMatrix_8c.html" title="lgCMatrix.c" alt="" coords="304,237,392,267"/>
-<area shape="rect" href="$sparseQR_8c.html" title="sparseQR.c" alt="" coords="467,237,557,267"/>
+<area shape="rect" id="node3" href="$cs_8c.html" title="cs.c" alt="" coords="109,86,155,117"/>
+<area shape="rect" id="node5" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="179,86,256,117"/>
+<area shape="rect" id="node7" href="$cs__utils_8c.html" title="cs_utils.c" alt="" coords="5,166,83,197"/>
+<area shape="rect" id="node9" href="$dgCMatrix_8h.html" title="dgCMatrix.h" alt="" coords="269,166,360,197"/>
+<area shape="rect" id="node15" href="$dtCMatrix_8c.html" title="dtCMatrix.c" alt="" coords="224,326,312,357"/>
+<area shape="rect" id="node23" href="$sparseQR_8h.html" title="sparseQR.h" alt="" coords="515,166,605,197"/>
+<area shape="rect" id="node11" href="$dgCMatrix_8c.html" title="dgCMatrix.c" alt="" coords="269,246,360,277"/>
+<area shape="rect" id="node13" href="$dtCMatrix_8h.html" title="dtCMatrix.h" alt="" coords="384,246,472,277"/>
+<area shape="rect" id="node17" href="$init_8c.html" title="init.c" alt="" coords="484,326,535,357"/>
+<area shape="rect" id="node20" href="$lgCMatrix_8c.html" title="lgCMatrix.c" alt="" coords="157,246,245,277"/>
+<area shape="rect" id="node26" href="$sparseQR_8c.html" title="sparseQR.c" alt="" coords="597,246,688,277"/>
 </map>

@@ -1,7 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" href="$chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free..." alt="" coords="188,5,340,35"/>
-<area shape="rect" href="$Tsparse_8c.html#a1b1ca7081cfcbef11f1cafc4270412ed" title="Tsparse_diagU2N" alt="" coords="203,59,325,88"/>
-<area shape="rect" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..." alt="" coords="420,5,521,35"/>
-<area shape="rect" href="$Mutils_8c.html#a8ed2ff2e1a0de240a9c5b5a617f46838" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated..." alt="" coords="389,59,552,88"/>
-<area shape="rect" href="$Mutils_8c.html#afd54bbce8f08c11478dbd0b6c40d2c24" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated..." alt="" coords="601,59,804,88"/>
+<area shape="rect" id="node3" href="$chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="189,5,344,35"/>
+<area shape="rect" id="node7" href="$Tsparse_8c.html#a1b1ca7081cfcbef11f1cafc4270412ed" title="Tsparse_diagU2N" alt="" coords="205,58,328,89"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="423,5,524,35"/>
+<area shape="rect" id="node10" href="$Mutils_8c.html#a8ed2ff2e1a0de240a9c5b5a617f46838" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="392,58,555,89"/>
+<area shape="rect" id="node12" href="$Mutils_8c.html#afd54bbce8f08c11478dbd0b6c40d2c24" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="603,58,808,89"/>
 </map>

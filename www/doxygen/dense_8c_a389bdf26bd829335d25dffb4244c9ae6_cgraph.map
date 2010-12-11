@@ -1,10 +1,10 @@
 <map id="G" name="G">
-<area shape="rect" href="$Mutils_8c.html#a23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="196,112,369,141"/>
-<area shape="rect" href="$Mutils_8c.html#ae0e07b5d446943159295e745388285e2" title="equal_string_vectors" alt="" coords="212,165,353,195"/>
-<area shape="rect" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..." alt="" coords="455,5,556,35"/>
-<area shape="rect" href="$Mutils_8c.html#adaf5449cf279f61000d9d1a1215d4b6a" title="install_diagonal_int" alt="" coords="440,59,571,88"/>
-<area shape="rect" href="$Mutils_8h.html#a133847040a4bd7d9bdb602c11aa6f048" title="make_i_matrix_symmetric" alt="" coords="419,112,592,141"/>
-<area shape="rect" href="$Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title="make_i_matrix_triangular" alt="" coords="423,165,588,195"/>
-<area shape="rect" href="$Mutils_8c.html#a8ed2ff2e1a0de240a9c5b5a617f46838" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated..." alt="" coords="424,219,587,248"/>
-<area shape="rect" href="$Mutils_8c.html#afd54bbce8f08c11478dbd0b6c40d2c24" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated..." alt="" coords="641,219,844,248"/>
+<area shape="rect" id="node3" href="$Mutils_8c.html#a23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="199,111,372,142"/>
+<area shape="rect" id="node17" href="$Mutils_8c.html#ae0e07b5d446943159295e745388285e2" title="equal_string_vectors" alt="" coords="215,165,356,195"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="459,5,560,35"/>
+<area shape="rect" id="node7" href="$Mutils_8c.html#adaf5449cf279f61000d9d1a1215d4b6a" title="install_diagonal_int" alt="" coords="444,58,575,89"/>
+<area shape="rect" id="node9" href="$Mutils_8h.html#a133847040a4bd7d9bdb602c11aa6f048" title="make_i_matrix_symmetric" alt="" coords="423,111,596,142"/>
+<area shape="rect" id="node11" href="$Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title="make_i_matrix_triangular" alt="" coords="427,165,592,195"/>
+<area shape="rect" id="node13" href="$Mutils_8c.html#a8ed2ff2e1a0de240a9c5b5a617f46838" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="428,218,591,249"/>
+<area shape="rect" id="node15" href="$Mutils_8c.html#afd54bbce8f08c11478dbd0b6c40d2c24" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="645,218,851,249"/>
 </map>

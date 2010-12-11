@@ -1,4 +1,4 @@
 <map id="G" name="G">
-<area shape="rect" href="$chm__common_8c.html#ab5d31c23691cc4a3c96a7f526dc84006" title="Copy the contents of a to an appropriate TsparseMatrix object and, optionally, free..." alt="" coords="195,5,341,35"/>
-<area shape="rect" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..." alt="" coords="389,5,491,35"/>
+<area shape="rect" id="node3" href="$chm__common_8c.html#ab5d31c23691cc4a3c96a7f526dc84006" title="Copy the contents of a to an appropriate TsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="195,5,341,35"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="391,5,492,35"/>
 </map>

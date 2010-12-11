@@ -1,4 +1,4 @@
 <map id="G" name="G">
-<area shape="rect" href="$dtrMatrix_8c.html#a0193c7fc2f398bf2a8431b22eb76d7c3" title="triangularMatrix_validate" alt="" coords="181,5,344,35"/>
-<area shape="rect" href="$Mutils_8c.html#acde6ee3844e52ed5a90e619cec56bc59" title="Check validity of 1&#45;letter string from a set of possible values (typically used in..." alt="" coords="393,5,529,35"/>
+<area shape="rect" id="node3" href="$dtrMatrix_8c.html#a0193c7fc2f398bf2a8431b22eb76d7c3" title="triangularMatrix_validate" alt="" coords="181,5,344,35"/>
+<area shape="rect" id="node5" href="$Mutils_8c.html#acde6ee3844e52ed5a90e619cec56bc59" title="Check validity of 1&#45;letter string from a set of possible values (typically used in S4 validity method..." alt="" coords="392,5,531,35"/>
 </map>

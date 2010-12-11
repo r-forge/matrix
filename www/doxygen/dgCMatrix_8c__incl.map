@@ -1,9 +1,10 @@
 <map id="G" name="G">
-<area shape="rect" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="305,160,372,189"/>
-<area shape="rect" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="463,83,540,112"/>
-<area shape="rect" href="$Csparse_8h.html" title="Csparse.h" alt="" coords="359,83,439,112"/>
-<area shape="rect" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="564,83,679,112"/>
-<area shape="rect" href="$t__gCMatrix__colSums_8c.html" title="t_gCMatrix_colSums.c" alt="" coords="703,83,855,112"/>
-<area shape="rect" href="$Syms_8h.html" title="Syms.h" alt="" coords="219,237,283,267"/>
-<area shape="rect" href="$cs_8h.html" title="cs.h" alt="" coords="483,160,528,189"/>
+<area shape="rect" id="node3" href="$dgCMatrix_8h.html" title="dgCMatrix.h" alt="" coords="324,86,415,117"/>
+<area shape="rect" id="node32" href="$Csparse_8h.html" title="Csparse.h" alt="" coords="473,86,553,117"/>
+<area shape="rect" id="node35" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="577,86,692,117"/>
+<area shape="rect" id="node42" href="$t__gCMatrix__colSums_8c.html" title="t_gCMatrix_colSums.c" alt="" coords="716,86,871,117"/>
+<area shape="rect" id="node7" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="480,246,547,277"/>
+<area shape="rect" id="node19" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="220,166,297,197"/>
+<area shape="rect" id="node17" href="$Syms_8h.html" title="Syms.h" alt="" coords="352,326,419,357"/>
+<area shape="rect" id="node21" href="$cs_8h.html" title="cs.h" alt="" coords="189,246,235,277"/>
 </map>

@@ -1,6 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..." alt="" coords="247,5,348,35"/>
-<area shape="rect" href="$Mutils_8h.html#a1a3b55b173f7d329b6309e56dea20024" title="Expand compressed pointers in the array mp into a full set of indices in the array..." alt="" coords="241,59,353,88"/>
-<area shape="rect" href="$Mutils_8c.html#a8ed2ff2e1a0de240a9c5b5a617f46838" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated..." alt="" coords="216,112,379,141"/>
-<area shape="rect" href="$Mutils_8c.html#afd54bbce8f08c11478dbd0b6c40d2c24" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated..." alt="" coords="428,112,631,141"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="247,5,348,35"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#a1a3b55b173f7d329b6309e56dea20024" title="Expand compressed pointers in the array mp into a full set of indices in the array mj..." alt="" coords="241,58,353,89"/>
+<area shape="rect" id="node7" href="$Mutils_8c.html#a8ed2ff2e1a0de240a9c5b5a617f46838" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="216,111,379,142"/>
+<area shape="rect" id="node9" href="$Mutils_8c.html#afd54bbce8f08c11478dbd0b6c40d2c24" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="427,111,632,142"/>
 </map>

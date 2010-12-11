@@ -1,25 +1,29 @@
 <map id="G" name="G">
-<area shape="rect" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="1133,315,1200,344"/>
-<area shape="rect" href="$Syms_8h.html" title="Syms.h" alt="" coords="681,392,745,421"/>
-<area shape="rect" href="$abIndex_8h.html" title="abIndex.h" alt="" coords="1433,160,1511,189"/>
-<area shape="rect" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="529,160,644,189"/>
-<area shape="rect" href="$CHMfactor_8h.html" title="CHMfactor.h" alt="" coords="624,83,717,112"/>
-<area shape="rect" href="$Csparse_8h.html" title="Csparse.h" alt="" coords="847,160,927,189"/>
-<area shape="rect" href="$Tsparse_8h.html" title="Tsparse.h" alt="" coords="951,160,1028,189"/>
-<area shape="rect" href="$dense_8h.html" title="dense.h" alt="" coords="2188,237,2255,267"/>
-<area shape="rect" href="$dgCMatrix_8h.html" title="dgCMatrix.h" alt="" coords="1319,160,1409,189"/>
-<area shape="rect" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="849,237,927,267"/>
-<area shape="rect" href="$dgTMatrix_8h.html" title="dgTMatrix.h" alt="" coords="1153,160,1244,189"/>
-<area shape="rect" href="$dgeMatrix_8h.html" title="dgeMatrix.h" alt="" coords="1975,237,2063,267"/>
-<area shape="rect" href="$dpoMatrix_8h.html" title="dpoMatrix.h" alt="" coords="1593,237,1681,267"/>
-<area shape="rect" href="$dppMatrix_8h.html" title="dppMatrix.h" alt="" coords="1869,83,1957,112"/>
-<area shape="rect" href="$dspMatrix_8h.html" title="dspMatrix.h" alt="" coords="1968,160,2056,189"/>
-<area shape="rect" href="$dsCMatrix_8h.html" title="dsCMatrix.h" alt="" coords="741,83,832,112"/>
-<area shape="rect" href="$dsyMatrix_8h.html" title="dsyMatrix.h" alt="" coords="1756,237,1844,267"/>
-<area shape="rect" href="$dtCMatrix_8h.html" title="dtCMatrix.h" alt="" coords="1287,83,1375,112"/>
-<area shape="rect" href="$dtTMatrix_8h.html" title="dtTMatrix.h" alt="" coords="461,83,549,112"/>
-<area shape="rect" href="$dtrMatrix_8h.html" title="dtrMatrix.h" alt="" coords="1868,237,1951,267"/>
-<area shape="rect" href="$dtpMatrix_8h.html" title="dtpMatrix.h" alt="" coords="1484,237,1569,267"/>
-<area shape="rect" href="$factorizations_8h.html" title="factorizations.h" alt="" coords="1103,83,1212,112"/>
-<area shape="rect" href="$cs_8h.html" title="cs.h" alt="" coords="145,315,191,344"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="1056,326,1123,357"/>
+<area shape="rect" id="node13" href="$Syms_8h.html" title="Syms.h" alt="" coords="1909,406,1976,437"/>
+<area shape="rect" id="node15" href="$abIndex_8h.html" title="abIndex.h" alt="" coords="479,166,556,197"/>
+<area shape="rect" id="node18" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="199,246,313,277"/>
+<area shape="rect" id="node25" href="$CHMfactor_8h.html" title="CHMfactor.h" alt="" coords="84,166,177,197"/>
+<area shape="rect" id="node29" href="$Csparse_8h.html" title="Csparse.h" alt="" coords="641,246,721,277"/>
+<area shape="rect" id="node32" href="$Tsparse_8h.html" title="Tsparse.h" alt="" coords="1177,166,1255,197"/>
+<area shape="rect" id="node35" href="$dense_8h.html" title="dense.h" alt="" coords="2041,246,2108,277"/>
+<area shape="rect" id="node40" href="$dgCMatrix_8h.html" title="dgCMatrix.h" alt="" coords="856,166,947,197"/>
+<area shape="rect" id="node58" href="$dgTMatrix_8h.html" title="dgTMatrix.h" alt="" coords="1307,86,1397,117"/>
+<area shape="rect" id="node61" href="$dgeMatrix_8h.html" title="dgeMatrix.h" alt="" coords="1711,246,1801,277"/>
+<area shape="rect" id="node67" href="$dpoMatrix_8h.html" title="dpoMatrix.h" alt="" coords="1927,246,2017,277"/>
+<area shape="rect" id="node71" href="$dppMatrix_8h.html" title="dppMatrix.h" alt="" coords="1697,86,1788,117"/>
+<area shape="rect" id="node75" href="$dspMatrix_8h.html" title="dspMatrix.h" alt="" coords="1844,166,1935,197"/>
+<area shape="rect" id="node79" href="$dsCMatrix_8h.html" title="dsCMatrix.h" alt="" coords="580,166,671,197"/>
+<area shape="rect" id="node84" href="$TMatrix__as_8h.html" title="TMatrix_as.h" alt="" coords="632,86,731,117"/>
+<area shape="rect" id="node88" href="$dsyMatrix_8h.html" title="dsyMatrix.h" alt="" coords="1329,246,1420,277"/>
+<area shape="rect" id="node92" href="$dtCMatrix_8h.html" title="dtCMatrix.h" alt="" coords="939,86,1027,117"/>
+<area shape="rect" id="node96" href="$dtTMatrix_8h.html" title="dtTMatrix.h" alt="" coords="367,166,455,197"/>
+<area shape="rect" id="node100" href="$dtrMatrix_8h.html" title="dtrMatrix.h" alt="" coords="1444,246,1527,277"/>
+<area shape="rect" id="node104" href="$dtpMatrix_8h.html" title="dtpMatrix.h" alt="" coords="1551,246,1636,277"/>
+<area shape="rect" id="node108" href="$factorizations_8h.html" title="factorizations.h" alt="" coords="755,86,864,117"/>
+<area shape="rect" id="node111" href="$ldense_8h.html" title="ldense.h" alt="" coords="1051,86,1120,117"/>
+<area shape="rect" id="node114" href="$lgCMatrix_8h.html" title="lgCMatrix.h" alt="" coords="1144,86,1232,117"/>
+<area shape="rect" id="node117" href="$sparseQR_8h.html" title="sparseQR.h" alt="" coords="252,166,343,197"/>
+<area shape="rect" id="node45" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="388,246,465,277"/>
+<area shape="rect" id="node47" href="$cs_8h.html" title="cs.h" alt="" coords="404,326,449,357"/>
 </map>

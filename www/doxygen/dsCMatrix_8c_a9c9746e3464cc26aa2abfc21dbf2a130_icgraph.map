@@ -1,7 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" href="$dsCMatrix_8h.html#a326fdb98f74608895abd9df179158253" title="dsCMatrix_chol" alt="" coords="220,5,332,35"/>
-<area shape="rect" href="$dsCMatrix_8h.html#af424de259d431a9c8719a23188265887" title="dsCMatrix_Cholesky" alt="" coords="205,59,347,88"/>
-<area shape="rect" href="$dsCMatrix_8h.html#a6e9761126a72d9a9f543ea82978b6ae9" title="dsCMatrix_Csparse_solve" alt="" coords="189,112,363,141"/>
-<area shape="rect" href="$dsCMatrix_8h.html#ae60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial..." alt="" coords="213,165,339,195"/>
-<area shape="rect" href="$dsCMatrix_8h.html#ae03dda286063199c0f670425084f0f2d" title="dsCMatrix_matrix_solve" alt="" coords="196,219,356,248"/>
+<area shape="rect" id="node3" href="$dsCMatrix_8h.html#a326fdb98f74608895abd9df179158253" title="dsCMatrix_chol" alt="" coords="221,5,333,35"/>
+<area shape="rect" id="node5" href="$dsCMatrix_8h.html#af424de259d431a9c8719a23188265887" title="dsCMatrix_Cholesky" alt="" coords="207,58,348,89"/>
+<area shape="rect" id="node7" href="$dsCMatrix_8h.html#a6e9761126a72d9a9f543ea82978b6ae9" title="dsCMatrix_Csparse_solve" alt="" coords="191,111,364,142"/>
+<area shape="rect" id="node9" href="$dsCMatrix_8h.html#ae60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial Cholesky LDL&#39; de..." alt="" coords="215,165,340,195"/>
+<area shape="rect" id="node11" href="$dsCMatrix_8h.html#ae03dda286063199c0f670425084f0f2d" title="dsCMatrix_matrix_solve" alt="" coords="196,218,359,249"/>
 </map>

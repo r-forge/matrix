@@ -1,9 +1,9 @@
 <map id="G" name="G">
-<area shape="rect" href="$dsCMatrix_8c.html#a3340463e47a1a5b85c7a529dd5c09e52" title="chk_nm" alt="" coords="233,5,300,35"/>
-<area shape="rect" href="$chm__common_8c.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f..." alt="" coords="193,59,340,88"/>
-<area shape="rect" href="$chm__common_8c.html#a9ca1fded97b51a281e6ef9f76a12c788" title="CHM_restore_common" alt="" coords="189,112,344,141"/>
-<area shape="rect" href="$chm__common_8c.html#a4c25f5e728f63c091cdc740d9d6dd023" title="CHM_store_common" alt="" coords="195,165,339,195"/>
-<area shape="rect" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="set_factors" alt="" coords="224,219,309,248"/>
-<area shape="rect" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..." alt="" coords="392,32,493,61"/>
-<area shape="rect" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="416,85,469,115"/>
+<area shape="rect" id="node3" href="$dsCMatrix_8c.html#a3340463e47a1a5b85c7a529dd5c09e52" title="chk_nm" alt="" coords="233,5,300,35"/>
+<area shape="rect" id="node5" href="$chm__common_8c.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f or free both f and ..." alt="" coords="193,58,340,89"/>
+<area shape="rect" id="node11" href="$chm__common_8c.html#a9ca1fded97b51a281e6ef9f76a12c788" title="CHM_restore_common" alt="" coords="189,111,344,142"/>
+<area shape="rect" id="node13" href="$chm__common_8c.html#a4c25f5e728f63c091cdc740d9d6dd023" title="CHM_store_common" alt="" coords="195,165,339,195"/>
+<area shape="rect" id="node15" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="set_factors" alt="" coords="224,218,309,249"/>
+<area shape="rect" id="node7" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="393,31,495,62"/>
+<area shape="rect" id="node9" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="417,85,471,115"/>
 </map>
