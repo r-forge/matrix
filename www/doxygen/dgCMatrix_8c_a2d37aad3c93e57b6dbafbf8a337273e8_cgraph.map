@@ -1,42 +1,42 @@
 <map id="G" name="G">
-<area shape="rect" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..." alt="" coords="368,93,469,123"/>
-<area shape="rect" href="$cs_8c.html#a50c30e47141ef37dbb4b342e1b4ba924" title="cs_dropzeros" alt="" coords="181,1600,280,1629"/>
-<area shape="rect" href="$cs_8c.html#a78c1d1194aacc65212bb0d2b03643ac7" title="cs_free" alt="" coords="957,457,1021,487"/>
-<area shape="rect" href="$cs_8c.html#af2e6d75dfc24a842fdbce3aa510dc4bc" title="cs_nfree" alt="" coords="697,175,769,204"/>
-<area shape="rect" href="$cs_8c.html#a6d705e404a7831ccf01bc0ea064215b9" title="cs_spfree" alt="" coords="831,457,908,487"/>
-<area shape="rect" href="$cs_8c.html#a4ddf83c074fafd1120be9fbbfa4a29f9" title="cs_pinv" alt="" coords="197,408,264,437"/>
-<area shape="rect" href="$cs_8c.html#a767dc90c22d90fe898f72c2da0d98c03" title="cs_qr" alt="" coords="392,588,445,617"/>
-<area shape="rect" href="$cs_8c.html#ace766075ef439ad6e4347f6b076eb4b7" title="cs_sfree" alt="" coords="383,147,455,176"/>
-<area shape="rect" href="$cs_8c.html#a31db4da8e996966094f83c7601dc08ff" title="cs_sqr" alt="" coords="201,1128,260,1157"/>
-<area shape="rect" href="$cs_8c.html#a090225477a18abe5f8d5ab26e4efaf3a" title="cs_transpose" alt="" coords="537,1549,636,1579"/>
-<area shape="rect" href="$cs__utils_8c.html#ae53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free..." alt="" coords="161,251,300,280"/>
-<area shape="rect" href="$cs_8c.html#ade63a58ec1758250c64518d817ea3c4c" title="cs_fkeep" alt="" coords="549,1445,624,1475"/>
-<area shape="rect" href="$cs_8c.html#a9dad9370bdde743eee26de2d53572bda" title="cs_nonzero" alt="" coords="375,1861,463,1891"/>
-<area shape="rect" href="$cs_8c.html#a5a9bc4224732ce1cedc50119afc687c1" title="cs_sprealloc" alt="" coords="687,1436,780,1465"/>
-<area shape="rect" href="$cs_8c.html#a7e829e1175f2c8ddb0d6d9e0bb90f985" title="cs_realloc" alt="" coords="829,1436,909,1465"/>
-<area shape="rect" href="$cs_8c.html#a4c6c75c54cbdf2f3fd4574a90c2f8a86" title="cs_malloc" alt="" coords="829,1047,909,1076"/>
-<area shape="rect" href="$cs_8c.html#ad3e846c0142a1457e8e85bcaf559fb98" title="cs_calloc" alt="" coords="832,1357,907,1387"/>
-<area shape="rect" href="$cs_8c.html#a27050a31d36046e833b7763fe8ef62ce" title="cs_happly" alt="" coords="547,509,627,539"/>
-<area shape="rect" href="$cs_8c.html#a096c9057bf2038f9eaef0c1dfb09f3dd" title="cs_house" alt="" coords="548,563,625,592"/>
-<area shape="rect" href="$cs_8c.html#a24796e2f78414578fd2b8e7528535cbb" title="cs_ndone" alt="" coords="548,233,625,263"/>
-<area shape="rect" href="$cs_8c.html#a3729a7e21dbc3309ac96461ddb060328" title="cs_scatter" alt="" coords="692,1124,775,1153"/>
-<area shape="rect" href="$cs_8c.html#aad3a584d9185a4fe4497a36f892b9c72" title="cs_spalloc" alt="" coords="692,1177,775,1207"/>
-<area shape="rect" href="$cs_8c.html#a633a0b0214f3ee86a27adf6ee6dea640" title="cs_amd" alt="" coords="385,1208,452,1237"/>
-<area shape="rect" href="$cs_8c.html#aa7fdeead97aef81cdf18af7576a7f722" title="cs_counts" alt="" coords="379,1600,459,1629"/>
-<area shape="rect" href="$cs_8c.html#a5c531804008e67c207e93f14c2551b1a" title="cs_etree" alt="" coords="383,869,455,899"/>
-<area shape="rect" href="$cs_8c.html#ada9cc712c0db19bc1dc1ef9211e6ca3c" title="cs_permute" alt="" coords="543,1128,631,1157"/>
-<area shape="rect" href="$cs_8c.html#adc01793c66e6caa0eef76be3dda7ffd5" title="cs_post" alt="" coords="385,948,452,977"/>
-<area shape="rect" href="$cs_8c.html#a9aa3afad1ec55f96205b52d378b8000f" title="cs_vcount" alt="" coords="693,1695,773,1724"/>
-<area shape="rect" href="$cs_8c.html#a12000fbd0b9198d3852978cca8386afe" title="cs_add" alt="" coords="555,1288,619,1317"/>
-<area shape="rect" href="$cs_8c.html#ab744b6c0bb84f8f54496c547e8a95e16" title="cs_diag" alt="" coords="553,1235,620,1264"/>
-<area shape="rect" href="$cs_8c.html#a9c3bd8e36cdfb832d199b580e22467c7" title="cs_idone" alt="" coords="551,869,623,899"/>
-<area shape="rect" href="$cs_8c.html#a066e18f8570c820530c73ebc88b30a97" title="cs_multiply" alt="" coords="543,1181,631,1211"/>
-<area shape="rect" href="$cs_8c.html#a7b064c4799cc09da13c13d982197eff7" title="cs_tdfs" alt="" coords="555,973,619,1003"/>
-<area shape="rect" href="$cs_8c.html#a73c323ac388668ef8ab5a2aa97807fbe" title="cs_wclear" alt="" coords="547,1341,627,1371"/>
-<area shape="rect" href="$cs_8c.html#a41590e7ef8c8f3ebce8c7bbe07303c28" title="cs_done" alt="" coords="699,1231,768,1260"/>
-<area shape="rect" href="$cs_8c.html#a97200b7cc3ad296c964134a59616efdd" title="cs_cumsum" alt="" coords="688,1591,779,1620"/>
-<area shape="rect" href="$cs_8c.html#adf3182dea8214e7a96ac2d055d60d267" title="cs_leaf" alt="" coords="555,1707,619,1736"/>
-<area shape="rect" href="$cs_8c.html#a3e3f8da5491fe28fab370482d0cc3389" title="init_ata" alt="" coords="555,1653,619,1683"/>
-<area shape="rect" href="$cs__utils_8c.html#a0b2592041f5b822459b7052a451c07a5" title="is_sym" alt="" coords="388,304,449,333"/>
-<area shape="rect" href="$Mutils_8h.html#a2206f293e563a99c83fa8480b7e26912" title="Return the 0&#45;based index of a string match in a vector of strings terminated by an..." alt="" coords="351,251,487,280"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="368,93,469,123"/>
+<area shape="rect" id="node5" href="$cs_8c.html#a50c30e47141ef37dbb4b342e1b4ba924" title="cs_dropzeros" alt="" coords="181,1599,280,1630"/>
+<area shape="rect" id="node15" href="$cs_8c.html#a78c1d1194aacc65212bb0d2b03643ac7" title="cs_free" alt="" coords="961,457,1025,487"/>
+<area shape="rect" id="node17" href="$cs_8c.html#af2e6d75dfc24a842fdbce3aa510dc4bc" title="cs_nfree" alt="" coords="697,174,769,205"/>
+<area shape="rect" id="node20" href="$cs_8c.html#a6d705e404a7831ccf01bc0ea064215b9" title="cs_spfree" alt="" coords="832,457,909,487"/>
+<area shape="rect" id="node23" href="$cs_8c.html#a4ddf83c074fafd1120be9fbbfa4a29f9" title="cs_pinv" alt="" coords="197,407,264,438"/>
+<area shape="rect" id="node27" href="$cs_8c.html#a767dc90c22d90fe898f72c2da0d98c03" title="cs_qr" alt="" coords="392,587,445,618"/>
+<area shape="rect" id="node48" href="$cs_8c.html#ace766075ef439ad6e4347f6b076eb4b7" title="cs_sfree" alt="" coords="383,146,455,177"/>
+<area shape="rect" id="node52" href="$cs_8c.html#a31db4da8e996966094f83c7601dc08ff" title="cs_sqr" alt="" coords="200,1127,261,1158"/>
+<area shape="rect" id="node87" href="$cs_8c.html#a090225477a18abe5f8d5ab26e4efaf3a" title="cs_transpose" alt="" coords="537,1549,636,1579"/>
+<area shape="rect" id="node127" href="$cs__utils_8c.html#ae53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="161,250,300,281"/>
+<area shape="rect" id="node7" href="$cs_8c.html#ade63a58ec1758250c64518d817ea3c4c" title="cs_fkeep" alt="" coords="549,1445,624,1475"/>
+<area shape="rect" id="node13" href="$cs_8c.html#a9dad9370bdde743eee26de2d53572bda" title="cs_nonzero" alt="" coords="375,1861,463,1891"/>
+<area shape="rect" id="node9" href="$cs_8c.html#a5a9bc4224732ce1cedc50119afc687c1" title="cs_sprealloc" alt="" coords="687,1435,780,1466"/>
+<area shape="rect" id="node11" href="$cs_8c.html#a7e829e1175f2c8ddb0d6d9e0bb90f985" title="cs_realloc" alt="" coords="831,1435,911,1466"/>
+<area shape="rect" id="node25" href="$cs_8c.html#a4c6c75c54cbdf2f3fd4574a90c2f8a86" title="cs_malloc" alt="" coords="831,1046,911,1077"/>
+<area shape="rect" id="node29" href="$cs_8c.html#ad3e846c0142a1457e8e85bcaf559fb98" title="cs_calloc" alt="" coords="832,1357,909,1387"/>
+<area shape="rect" id="node31" href="$cs_8c.html#a27050a31d36046e833b7763fe8ef62ce" title="cs_happly" alt="" coords="547,509,627,539"/>
+<area shape="rect" id="node33" href="$cs_8c.html#a096c9057bf2038f9eaef0c1dfb09f3dd" title="cs_house" alt="" coords="548,562,625,593"/>
+<area shape="rect" id="node36" href="$cs_8c.html#a24796e2f78414578fd2b8e7528535cbb" title="cs_ndone" alt="" coords="548,233,625,263"/>
+<area shape="rect" id="node41" href="$cs_8c.html#a3729a7e21dbc3309ac96461ddb060328" title="cs_scatter" alt="" coords="692,1123,775,1154"/>
+<area shape="rect" id="node43" href="$cs_8c.html#aad3a584d9185a4fe4497a36f892b9c72" title="cs_spalloc" alt="" coords="692,1177,775,1207"/>
+<area shape="rect" id="node54" href="$cs_8c.html#a633a0b0214f3ee86a27adf6ee6dea640" title="cs_amd" alt="" coords="385,1207,452,1238"/>
+<area shape="rect" id="node97" href="$cs_8c.html#aa7fdeead97aef81cdf18af7576a7f722" title="cs_counts" alt="" coords="377,1599,460,1630"/>
+<area shape="rect" id="node106" href="$cs_8c.html#a5c531804008e67c207e93f14c2551b1a" title="cs_etree" alt="" coords="383,869,455,899"/>
+<area shape="rect" id="node111" href="$cs_8c.html#ada9cc712c0db19bc1dc1ef9211e6ca3c" title="cs_permute" alt="" coords="541,1127,632,1158"/>
+<area shape="rect" id="node115" href="$cs_8c.html#adc01793c66e6caa0eef76be3dda7ffd5" title="cs_post" alt="" coords="385,947,452,978"/>
+<area shape="rect" id="node122" href="$cs_8c.html#a9aa3afad1ec55f96205b52d378b8000f" title="cs_vcount" alt="" coords="692,1694,775,1725"/>
+<area shape="rect" id="node56" href="$cs_8c.html#a12000fbd0b9198d3852978cca8386afe" title="cs_add" alt="" coords="555,1287,619,1318"/>
+<area shape="rect" id="node67" href="$cs_8c.html#ab744b6c0bb84f8f54496c547e8a95e16" title="cs_diag" alt="" coords="553,1234,620,1265"/>
+<area shape="rect" id="node70" href="$cs_8c.html#a9c3bd8e36cdfb832d199b580e22467c7" title="cs_idone" alt="" coords="549,869,624,899"/>
+<area shape="rect" id="node75" href="$cs_8c.html#a066e18f8570c820530c73ebc88b30a97" title="cs_multiply" alt="" coords="543,1181,631,1211"/>
+<area shape="rect" id="node85" href="$cs_8c.html#a7b064c4799cc09da13c13d982197eff7" title="cs_tdfs" alt="" coords="555,973,619,1003"/>
+<area shape="rect" id="node94" href="$cs_8c.html#a73c323ac388668ef8ab5a2aa97807fbe" title="cs_wclear" alt="" coords="547,1341,627,1371"/>
+<area shape="rect" id="node59" href="$cs_8c.html#a41590e7ef8c8f3ebce8c7bbe07303c28" title="cs_done" alt="" coords="699,1230,768,1261"/>
+<area shape="rect" id="node90" href="$cs_8c.html#a97200b7cc3ad296c964134a59616efdd" title="cs_cumsum" alt="" coords="687,1590,780,1621"/>
+<area shape="rect" id="node100" href="$cs_8c.html#adf3182dea8214e7a96ac2d055d60d267" title="cs_leaf" alt="" coords="555,1706,619,1737"/>
+<area shape="rect" id="node104" href="$cs_8c.html#a3e3f8da5491fe28fab370482d0cc3389" title="init_ata" alt="" coords="555,1653,619,1683"/>
+<area shape="rect" id="node131" href="$cs__utils_8c.html#a0b2592041f5b822459b7052a451c07a5" title="is_sym" alt="" coords="388,303,449,334"/>
+<area shape="rect" id="node133" href="$Mutils_8h.html#a2206f293e563a99c83fa8480b7e26912" title="Return the 0&#45;based index of a string match in a vector of strings terminated by an empty string..." alt="" coords="349,250,488,281"/>
 </map>

@@ -1,5 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="283,160,349,189"/>
-<area shape="rect" href="$dgeMatrix_8h.html" title="dgeMatrix.h" alt="" coords="156,83,244,112"/>
-<area shape="rect" href="$Syms_8h.html" title="Syms.h" alt="" coords="488,237,552,267"/>
+<area shape="rect" id="node3" href="$dppMatrix_8h.html" title="dppMatrix.h" alt="" coords="124,86,215,117"/>
+<area shape="rect" id="node7" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="283,326,349,357"/>
+<area shape="rect" id="node19" href="$dspMatrix_8h.html" title="dspMatrix.h" alt="" coords="124,166,215,197"/>
+<area shape="rect" id="node17" href="$Syms_8h.html" title="Syms.h" alt="" coords="488,406,555,437"/>
+<area shape="rect" id="node21" href="$dgeMatrix_8h.html" title="dgeMatrix.h" alt="" coords="153,246,244,277"/>
 </map>

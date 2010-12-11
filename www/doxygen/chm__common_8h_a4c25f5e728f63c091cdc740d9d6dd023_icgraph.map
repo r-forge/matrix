@@ -1,9 +1,9 @@
 <map id="G" name="G">
-<area shape="rect" href="$chm__common_8h.html#a7f16af487582ba302c90cc63e9857387" title="CHM_set_common_env" alt="" coords="197,59,357,88"/>
-<area shape="rect" href="$dsCMatrix_8c.html#a9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm..." alt="" coords="209,112,345,141"/>
-<area shape="rect" href="$dsCMatrix_8h.html#a326fdb98f74608895abd9df179158253" title="dsCMatrix_chol" alt="" coords="436,5,548,35"/>
-<area shape="rect" href="$dsCMatrix_8h.html#af424de259d431a9c8719a23188265887" title="dsCMatrix_Cholesky" alt="" coords="421,59,563,88"/>
-<area shape="rect" href="$dsCMatrix_8h.html#a6e9761126a72d9a9f543ea82978b6ae9" title="dsCMatrix_Csparse_solve" alt="" coords="405,112,579,141"/>
-<area shape="rect" href="$dsCMatrix_8h.html#ae60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial..." alt="" coords="429,165,555,195"/>
-<area shape="rect" href="$dsCMatrix_8h.html#ae03dda286063199c0f670425084f0f2d" title="dsCMatrix_matrix_solve" alt="" coords="412,219,572,248"/>
+<area shape="rect" id="node3" href="$chm__common_8h.html#a7f16af487582ba302c90cc63e9857387" title="CHM_set_common_env" alt="" coords="199,58,359,89"/>
+<area shape="rect" id="node5" href="$dsCMatrix_8c.html#a9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm, LDL and super attributes." alt="" coords="211,111,347,142"/>
+<area shape="rect" id="node7" href="$dsCMatrix_8h.html#a326fdb98f74608895abd9df179158253" title="dsCMatrix_chol" alt="" coords="440,5,552,35"/>
+<area shape="rect" id="node9" href="$dsCMatrix_8h.html#af424de259d431a9c8719a23188265887" title="dsCMatrix_Cholesky" alt="" coords="425,58,567,89"/>
+<area shape="rect" id="node11" href="$dsCMatrix_8h.html#a6e9761126a72d9a9f543ea82978b6ae9" title="dsCMatrix_Csparse_solve" alt="" coords="409,111,583,142"/>
+<area shape="rect" id="node13" href="$dsCMatrix_8h.html#ae60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial Cholesky LDL&#39; de..." alt="" coords="433,165,559,195"/>
+<area shape="rect" id="node15" href="$dsCMatrix_8h.html#ae03dda286063199c0f670425084f0f2d" title="dsCMatrix_matrix_solve" alt="" coords="415,218,577,249"/>
 </map>

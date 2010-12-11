@@ -1,5 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" href="$dppMatrix_8h.html" title="dppMatrix.h" alt="" coords="5,83,93,112"/>
-<area shape="rect" href="$init_8c.html" title="init.c" alt="" coords="65,160,113,189"/>
-<area shape="rect" href="$dspMatrix_8c.html" title="dspMatrix.c" alt="" coords="168,83,256,112"/>
+<area shape="rect" id="node3" href="$dppMatrix_8h.html" title="dppMatrix.h" alt="" coords="17,86,108,117"/>
+<area shape="rect" id="node7" href="$init_8c.html" title="init.c" alt="" coords="120,166,171,197"/>
+<area shape="rect" id="node9" href="$dspMatrix_8c.html" title="dspMatrix.c" alt="" coords="183,86,273,117"/>
+<area shape="rect" id="node5" href="$dppMatrix_8c.html" title="dppMatrix.c" alt="" coords="5,166,96,197"/>
 </map>

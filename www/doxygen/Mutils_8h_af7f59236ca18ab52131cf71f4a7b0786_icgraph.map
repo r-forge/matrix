@@ -1,51 +1,51 @@
 <map id="G" name="G">
-<area shape="rect" href="$chm__common_8h.html#ac0552f8d5248824ec90a314b69bd1408" title="Copy the contents of a to an appropriate denseMatrix object and, optionally, free..." alt="" coords="168,137,317,167"/>
-<area shape="rect" href="$chm__common_8h.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f..." alt="" coords="169,427,316,456"/>
-<area shape="rect" href="$chm__common_8h.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free..." alt="" coords="167,693,319,723"/>
-<area shape="rect" href="$chm__common_8h.html#ab5d31c23691cc4a3c96a7f526dc84006" title="Copy the contents of a to an appropriate TsparseMatrix object and, optionally, free..." alt="" coords="169,480,316,509"/>
-<area shape="rect" href="$dgCMatrix_8h.html#ad3b5c3bc224c09316427f7e86e4e8a86" title="compressed_to_TMatrix" alt="" coords="163,587,323,616"/>
-<area shape="rect" href="$Csparse_8h.html#a49bea3bf31864cc0553a4af67f7cdc39" title="Create a Csparse matrix object from indices and/or pointers." alt="" coords="187,640,299,669"/>
-<area shape="rect" href="$dgCMatrix_8h.html#a2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="420,1812,527,1841"/>
-<area shape="rect" href="$dgeMatrix_8h.html#a1d6cfeb6b881161af7296a438c4bf1b3" title="dgeMatrix_crossprod" alt="" coords="172,747,313,776"/>
-<area shape="rect" href="$dgeMatrix_8h.html#a25fac53ee67024e89f6240deaa4c7ca3" title="dgeMatrix_LU_" alt="" coords="189,800,296,829"/>
-<area shape="rect" href="$dgeMatrix_8h.html#acf21cab0cdce9d8e08d40584cbe0647c" title="dgeMatrix_matrix_mm" alt="" coords="168,853,317,883"/>
-<area shape="rect" href="$dpoMatrix_8h.html#aa951f7c9871735266da55e7d92a6ae58" title="dpoMatrix_chol" alt="" coords="188,533,297,563"/>
-<area shape="rect" href="$dspMatrix_8h.html#a2cab43904a971c57f55dddc031c0f897" title="dspMatrix_as_dsyMatrix" alt="" coords="161,960,324,989"/>
-<area shape="rect" href="$dspMatrix_8h.html#a54f1c211fe36a020c613498e295f6365" title="dspMatrix_trf" alt="" coords="195,1013,291,1043"/>
-<area shape="rect" href="$dsyMatrix_8h.html#a232ea460adfa12a96c5ef4a26d19862e" title="dsyMatrix_as_dspMatrix" alt="" coords="161,1067,324,1096"/>
-<area shape="rect" href="$dsyMatrix_8h.html#ae436ba23f7410148775ce808f08d1210" title="dsyMatrix_trf" alt="" coords="195,1120,291,1149"/>
-<area shape="rect" href="$dtCMatrix_8h.html#a118c095d59c9a257885d3aec3aa59268" title="dtCMatrix_matrix_solve" alt="" coords="164,1173,321,1203"/>
-<area shape="rect" href="$dtCMatrix_8h.html#a4370f8d80c77fc815ac826f457e4960b" title="dtCMatrix_sparse_solve" alt="" coords="163,1227,323,1256"/>
-<area shape="rect" href="$dtpMatrix_8h.html#adde075ebf8bf3e96d25ce191d7a747ca" title="dtpMatrix_as_dtrMatrix" alt="" coords="165,1280,320,1309"/>
-<area shape="rect" href="$dtrMatrix_8h.html#a3fe60655d1544bd661d62f1f3e86d92f" title="dtrMatrix_as_dtpMatrix" alt="" coords="165,1333,320,1363"/>
-<area shape="rect" href="$dtrMatrix_8h.html#a4c867d5968ff8e94c0570c6b761cdabe" title="dtrMatrix_dtrMatrix_mm" alt="" coords="163,1387,323,1416"/>
-<area shape="rect" href="$Mutils_8h.html#a23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="156,1440,329,1469"/>
-<area shape="rect" href="$t__gCMatrix__colSums_8c.html#a219a05baa8d090c70aaa52830e25a7b3" title="gCMatrix_colSums" alt="" coords="177,1493,308,1523"/>
-<area shape="rect" href="$dgCMatrix_8c.html#ad6045ab51c67c719a4deab2c929e4d13" title="install_lu" alt="" coords="437,1917,509,1947"/>
-<area shape="rect" href="$ldense_8h.html#ac1ba7ec4c96aad29844f8cb812e4d280" title="lspMatrix_as_lsyMatrix" alt="" coords="165,1597,320,1627"/>
-<area shape="rect" href="$ldense_8h.html#aa29c0c324f440f575bb115543d599f86" title="lsyMatrix_as_lspMatrix" alt="" coords="165,1651,320,1680"/>
-<area shape="rect" href="$ldense_8h.html#ae2d091c48281f6b782dd9b8fbd9d0788" title="ltpMatrix_as_ltrMatrix" alt="" coords="169,1704,316,1733"/>
-<area shape="rect" href="$ldense_8h.html#adec1048daf414729034a60e82ce13f83" title="ltrMatrix_as_ltpMatrix" alt="" coords="169,1757,316,1787"/>
-<area shape="rect" href="$factorizations_8h.html#a0ec00f455c00bf1b862139fe6d4a265a" title="LU_expand" alt="" coords="200,1811,285,1840"/>
-<area shape="rect" href="$cs__utils_8c.html#ae53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free..." alt="" coords="173,1864,312,1893"/>
-<area shape="rect" href="$Mutils_8h.html#a2802c3f504e089a00a97c6c0e97bee21" title="new_dgeMatrix" alt="" coords="189,1917,296,1947"/>
-<area shape="rect" href="$dgCMatrix_8h.html#ac71c15cfb9558156fb98c0f1cad60922" title="R_to_CMatrix" alt="" coords="193,1971,292,2000"/>
-<area shape="rect" href="$Tsparse_8h.html#a1b1ca7081cfcbef11f1cafc4270412ed" title="Tsparse_diagU2N" alt="" coords="181,907,304,936"/>
-<area shape="rect" href="$CHMfactor_8h.html#a8651ba67f85b2a18a8b2b1b23a392219" title="CHMfactor_solve" alt="" coords="413,216,533,245"/>
-<area shape="rect" href="$Csparse_8h.html#aef1a61ab6f25436301b8ee835106c23b" title="Csparse_dense_crossprod" alt="" coords="385,5,561,35"/>
-<area shape="rect" href="$Csparse_8h.html#afec5dcac16fd72028456b98704632f1e" title="Csparse_dense_prod" alt="" coords="401,59,545,88"/>
-<area shape="rect" href="$Csparse_8h.html#ab78e05571230070d4afb830b2e82134c" title="Csparse_to_dense" alt="" coords="409,112,537,141"/>
-<area shape="rect" href="$dsCMatrix_8h.html#ae03dda286063199c0f670425084f0f2d" title="dsCMatrix_matrix_solve" alt="" coords="617,244,777,273"/>
-<area shape="rect" href="$CHMfactor_8h.html#aafc574f19837b7c6879c395a382444b0" title="CHMfactor_update" alt="" coords="409,480,537,509"/>
-<area shape="rect" href="$CHMfactor_8h.html#a5b0d200f2e7a1d06d1c353d826af0d70" title="destructive_CHM_update" alt="" coords="389,269,557,299"/>
-<area shape="rect" href="$dgCMatrix_8h.html#af7d6aca940ff91850aa82c28fac47a66" title="dgCMatrix_cholsol" alt="" coords="409,323,537,352"/>
-<area shape="rect" href="$dsCMatrix_8h.html#af424de259d431a9c8719a23188265887" title="dsCMatrix_Cholesky" alt="" coords="627,403,768,432"/>
-<area shape="rect" href="$dsCMatrix_8c.html#a9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm..." alt="" coords="405,376,541,405"/>
-<area shape="rect" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="425,533,521,563"/>
-<area shape="rect" href="$CHMfactor_8h.html#aae1511a0bca842168f9bf6ae554eda88" title="CHMfactor_spsolve" alt="" coords="405,800,541,829"/>
-<area shape="rect" href="$CHMfactor_8h.html#a65d766e6b16a370b3057acf81b4c6f1a" title="CHMfactor_to_sparse" alt="" coords="400,587,547,616"/>
-<area shape="rect" href="$Csparse_8h.html#a546eddc63011f2f2af462894dbec7dc9" title="Csparse_band" alt="" coords="421,640,525,669"/>
-<area shape="rect" href="$Csparse_8h.html#a407589b56b662830f7a14b251a8c4da3" title="Csparse_crossprod" alt="" coords="407,880,540,909"/>
-<area shape="rect" href="$Csparse_8h.html#a6c4e110d10721580b2b43969800dfdb2" title="Csparse_Csparse_crossprod" alt="" coords="380,693,567,723"/>
-<area shape="rect" href="$Csparse_8h.html#a8414bce86d0916499c2d63f70728176b" title="Csparse_Csparse_prod" alt="" coords="396,747,551,776"/>
+<area shape="rect" id="node3" href="$chm__common_8h.html#ac0552f8d5248824ec90a314b69bd1408" title="Copy the contents of a to an appropriate denseMatrix object and, optionally, free a or free both a an..." alt="" coords="171,138,320,169"/>
+<area shape="rect" id="node15" href="$chm__common_8h.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f or free both f and ..." alt="" coords="172,429,319,459"/>
+<area shape="rect" id="node31" href="$chm__common_8h.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="168,633,323,663"/>
+<area shape="rect" id="node44" href="$chm__common_8h.html#ab5d31c23691cc4a3c96a7f526dc84006" title="Copy the contents of a to an appropriate TsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="172,579,319,610"/>
+<area shape="rect" id="node47" href="$dgCMatrix_8h.html#ad3b5c3bc224c09316427f7e86e4e8a86" title="compressed_to_TMatrix" alt="" coords="164,739,327,770"/>
+<area shape="rect" id="node49" href="$Csparse_8h.html#a49bea3bf31864cc0553a4af67f7cdc39" title="Create a Csparse matrix object from indices and/or pointers." alt="" coords="189,793,301,823"/>
+<area shape="rect" id="node51" href="$dgCMatrix_8h.html#a2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="423,859,529,890"/>
+<area shape="rect" id="node53" href="$dgeMatrix_8h.html#a1d6cfeb6b881161af7296a438c4bf1b3" title="dgeMatrix_crossprod" alt="" coords="175,1001,316,1031"/>
+<area shape="rect" id="node55" href="$dgeMatrix_8h.html#a25fac53ee67024e89f6240deaa4c7ca3" title="dgeMatrix_LU_" alt="" coords="191,1054,300,1085"/>
+<area shape="rect" id="node57" href="$dgeMatrix_8h.html#acf21cab0cdce9d8e08d40584cbe0647c" title="dgeMatrix_matrix_mm" alt="" coords="171,1107,320,1138"/>
+<area shape="rect" id="node59" href="$dpoMatrix_8h.html#aa951f7c9871735266da55e7d92a6ae58" title="dpoMatrix_chol" alt="" coords="191,526,300,557"/>
+<area shape="rect" id="node62" href="$dspMatrix_8h.html#a2cab43904a971c57f55dddc031c0f897" title="dspMatrix_as_dsyMatrix" alt="" coords="164,1161,327,1191"/>
+<area shape="rect" id="node64" href="$dspMatrix_8h.html#a54f1c211fe36a020c613498e295f6365" title="dspMatrix_trf" alt="" coords="196,1214,295,1245"/>
+<area shape="rect" id="node66" href="$dsyMatrix_8h.html#a232ea460adfa12a96c5ef4a26d19862e" title="dsyMatrix_as_dspMatrix" alt="" coords="164,1267,327,1298"/>
+<area shape="rect" id="node68" href="$dsyMatrix_8h.html#ae436ba23f7410148775ce808f08d1210" title="dsyMatrix_trf" alt="" coords="196,1321,295,1351"/>
+<area shape="rect" id="node70" href="$dtCMatrix_8h.html#a118c095d59c9a257885d3aec3aa59268" title="dtCMatrix_matrix_solve" alt="" coords="167,1374,324,1405"/>
+<area shape="rect" id="node72" href="$dtCMatrix_8h.html#a4370f8d80c77fc815ac826f457e4960b" title="dtCMatrix_sparse_solve" alt="" coords="164,1427,327,1458"/>
+<area shape="rect" id="node74" href="$dtpMatrix_8h.html#adde075ebf8bf3e96d25ce191d7a747ca" title="dtpMatrix_as_dtrMatrix" alt="" coords="168,1481,323,1511"/>
+<area shape="rect" id="node76" href="$dtrMatrix_8h.html#a3fe60655d1544bd661d62f1f3e86d92f" title="dtrMatrix_as_dtpMatrix" alt="" coords="168,1534,323,1565"/>
+<area shape="rect" id="node78" href="$dtrMatrix_8h.html#a4c867d5968ff8e94c0570c6b761cdabe" title="dtrMatrix_dtrMatrix_mm" alt="" coords="165,1587,325,1618"/>
+<area shape="rect" id="node80" href="$Mutils_8h.html#a23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="159,1641,332,1671"/>
+<area shape="rect" id="node82" href="$t__gCMatrix__colSums_8c.html#a219a05baa8d090c70aaa52830e25a7b3" title="gCMatrix_colSums" alt="" coords="180,1694,311,1725"/>
+<area shape="rect" id="node84" href="$dgCMatrix_8c.html#ad6045ab51c67c719a4deab2c929e4d13" title="install_lu" alt="" coords="440,925,512,955"/>
+<area shape="rect" id="node86" href="$ldense_8h.html#ac1ba7ec4c96aad29844f8cb812e4d280" title="lspMatrix_as_lsyMatrix" alt="" coords="168,1747,323,1778"/>
+<area shape="rect" id="node88" href="$ldense_8h.html#aa29c0c324f440f575bb115543d599f86" title="lsyMatrix_as_lspMatrix" alt="" coords="168,1801,323,1831"/>
+<area shape="rect" id="node90" href="$ldense_8h.html#ae2d091c48281f6b782dd9b8fbd9d0788" title="ltpMatrix_as_ltrMatrix" alt="" coords="172,1854,319,1885"/>
+<area shape="rect" id="node92" href="$ldense_8h.html#adec1048daf414729034a60e82ce13f83" title="ltrMatrix_as_ltpMatrix" alt="" coords="172,1907,319,1938"/>
+<area shape="rect" id="node94" href="$factorizations_8h.html#a0ec00f455c00bf1b862139fe6d4a265a" title="LU_expand" alt="" coords="203,1961,288,1991"/>
+<area shape="rect" id="node96" href="$cs__utils_8c.html#ae53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="176,897,315,927"/>
+<area shape="rect" id="node100" href="$Mutils_8h.html#a2802c3f504e089a00a97c6c0e97bee21" title="new_dgeMatrix" alt="" coords="191,2014,300,2045"/>
+<area shape="rect" id="node102" href="$Csparse_8h.html#a4445bf9e1d6a9ee608151123b9d3aa9f" title="nz2Csparse" alt="" coords="200,58,291,89"/>
+<area shape="rect" id="node106" href="$dgCMatrix_8h.html#ac71c15cfb9558156fb98c0f1cad60922" title="R_to_CMatrix" alt="" coords="195,2067,296,2098"/>
+<area shape="rect" id="node108" href="$Tsparse_8h.html#a1b1ca7081cfcbef11f1cafc4270412ed" title="Tsparse_diagU2N" alt="" coords="184,686,307,717"/>
+<area shape="rect" id="node5" href="$CHMfactor_8h.html#a8651ba67f85b2a18a8b2b1b23a392219" title="CHMfactor_solve" alt="" coords="415,111,537,142"/>
+<area shape="rect" id="node7" href="$Csparse_8h.html#aef1a61ab6f25436301b8ee835106c23b" title="Csparse_dense_crossprod" alt="" coords="388,5,564,35"/>
+<area shape="rect" id="node9" href="$Csparse_8h.html#afec5dcac16fd72028456b98704632f1e" title="Csparse_dense_prod" alt="" coords="404,58,548,89"/>
+<area shape="rect" id="node11" href="$Csparse_8h.html#ab78e05571230070d4afb830b2e82134c" title="Csparse_to_dense" alt="" coords="411,165,541,195"/>
+<area shape="rect" id="node13" href="$dsCMatrix_8h.html#ae03dda286063199c0f670425084f0f2d" title="dsCMatrix_matrix_solve" alt="" coords="619,243,781,274"/>
+<area shape="rect" id="node17" href="$CHMfactor_8h.html#aafc574f19837b7c6879c395a382444b0" title="CHMfactor_update" alt="" coords="411,322,541,353"/>
+<area shape="rect" id="node19" href="$CHMfactor_8h.html#a5b0d200f2e7a1d06d1c353d826af0d70" title="destructive_CHM_update" alt="" coords="392,375,560,406"/>
+<area shape="rect" id="node21" href="$dgCMatrix_8h.html#af7d6aca940ff91850aa82c28fac47a66" title="dgCMatrix_cholsol" alt="" coords="412,429,540,459"/>
+<area shape="rect" id="node23" href="$dsCMatrix_8h.html#af424de259d431a9c8719a23188265887" title="dsCMatrix_Cholesky" alt="" coords="629,375,771,406"/>
+<area shape="rect" id="node25" href="$dsCMatrix_8c.html#a9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm, LDL and super attributes." alt="" coords="408,269,544,299"/>
+<area shape="rect" id="node29" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="427,533,525,563"/>
+<area shape="rect" id="node33" href="$CHMfactor_8h.html#aae1511a0bca842168f9bf6ae554eda88" title="CHMfactor_spsolve" alt="" coords="408,693,544,723"/>
+<area shape="rect" id="node35" href="$CHMfactor_8h.html#a65d766e6b16a370b3057acf81b4c6f1a" title="CHMfactor_to_sparse" alt="" coords="403,746,549,777"/>
+<area shape="rect" id="node37" href="$Csparse_8h.html#a546eddc63011f2f2af462894dbec7dc9" title="Csparse_band" alt="" coords="424,586,528,617"/>
+<area shape="rect" id="node39" href="$Csparse_8h.html#a407589b56b662830f7a14b251a8c4da3" title="Csparse_crossprod" alt="" coords="409,799,543,830"/>
+<area shape="rect" id="node41" href="$Csparse_8h.html#a6c4e110d10721580b2b43969800dfdb2" title="Csparse_Csparse_crossprod" alt="" coords="381,639,571,670"/>
 </map>

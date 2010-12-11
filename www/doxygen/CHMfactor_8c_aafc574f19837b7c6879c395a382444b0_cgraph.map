@@ -1,6 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" href="$chm__common_8c.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f..." alt="" coords="185,32,332,61"/>
-<area shape="rect" href="$CHMfactor_8c.html#a8f49596874078a3b8482df1ee23fe829" title="Update the numerical values in the factor f as A + mult * I, if A is symmetric, otherwise..." alt="" coords="193,85,324,115"/>
-<area shape="rect" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and..." alt="" coords="381,5,483,35"/>
-<area shape="rect" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="405,59,459,88"/>
+<area shape="rect" id="node3" href="$chm__common_8c.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f or free both f and ..." alt="" coords="185,31,332,62"/>
+<area shape="rect" id="node9" href="$CHMfactor_8c.html#a8f49596874078a3b8482df1ee23fe829" title="Update the numerical values in the factor f as A + mult * I, if A is symmetric, otherwise AA&#39; + m..." alt="" coords="192,85,325,115"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="383,5,484,35"/>
+<area shape="rect" id="node7" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="407,58,460,89"/>
 </map>
