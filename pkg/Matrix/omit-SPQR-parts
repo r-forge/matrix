@@ -21,7 +21,7 @@ Rather call $0 on directory  $pkg  produced by (something like)
      then perl -pi -e 's{SPQR }{} if /SPQR/' $pkg/src/$f
      fi
   done
-  for f in R/spqr.R man/spqr.Rd man/SPQR-class.Rd src/SPQR
+  for f in R/spqr.R man/spqr.Rd man/SPQR-class.Rd src/SPQR src/dummy.cpp
   do if [ -e $pkg/$f ]
      then mv $pkg/$f $pkg/${f}.~notyet~
      fi
