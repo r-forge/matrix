@@ -1,5 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" href="$cs_8h.html#af1cde25f7d702464291dd2a7e85b4770" title="cs_qrsol" alt="" coords="125,5,195,35"/>
-<area shape="rect" href="$dgCMatrix_8h.html#a2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="107,59,213,88"/>
-<area shape="rect" href="$dgCMatrix_8h.html#a5937063a2f86fc60d92f942eb9425b86" title="dgCMatrix_qrsol" alt="" coords="263,5,377,35"/>
+<area shape="rect" id="node3" href="$cs_8h.html#af1cde25f7d702464291dd2a7e85b4770" title="cs_qrsol" alt="" coords="128,5,197,35"/>
+<area shape="rect" id="node7" href="$dgCMatrix_8h.html#a2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="109,58,216,89"/>
+<area shape="rect" id="node5" href="$dgCMatrix_8h.html#a5937063a2f86fc60d92f942eb9425b86" title="dgCMatrix_qrsol" alt="" coords="265,5,380,35"/>
 </map>

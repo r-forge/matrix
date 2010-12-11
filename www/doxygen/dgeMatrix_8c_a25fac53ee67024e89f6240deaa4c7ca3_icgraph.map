@@ -1,7 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" href="$dgeMatrix_8h.html#aebb502aae0db4698b17a88c6c0f0ec39" title="dgeMatrix_determinant" alt="" coords="167,5,319,35"/>
-<area shape="rect" href="$dgeMatrix_8h.html#a14710a79940dbc67cab89dc8c302c210" title="dgeMatrix_LU" alt="" coords="192,59,293,88"/>
-<area shape="rect" href="$dgeMatrix_8h.html#a4aaf5ed4d71841560a06e2eda9da3762" title="dgeMatrix_matrix_solve" alt="" coords="163,112,323,141"/>
-<area shape="rect" href="$dgeMatrix_8h.html#ac4f1b4b19a004fb62c9cb68ccb1028ea" title="dgeMatrix_rcond" alt="" coords="184,165,301,195"/>
-<area shape="rect" href="$dgeMatrix_8h.html#a8f0564cd095a4415738ef1ad8d537da1" title="dgeMatrix_solve" alt="" coords="185,219,300,248"/>
+<area shape="rect" id="node3" href="$dgeMatrix_8h.html#aebb502aae0db4698b17a88c6c0f0ec39" title="dgeMatrix_determinant" alt="" coords="165,5,320,35"/>
+<area shape="rect" id="node5" href="$dgeMatrix_8h.html#a14710a79940dbc67cab89dc8c302c210" title="dgeMatrix_LU" alt="" coords="192,58,293,89"/>
+<area shape="rect" id="node7" href="$dgeMatrix_8h.html#a4aaf5ed4d71841560a06e2eda9da3762" title="dgeMatrix_matrix_solve" alt="" coords="163,111,323,142"/>
+<area shape="rect" id="node9" href="$dgeMatrix_8h.html#ac4f1b4b19a004fb62c9cb68ccb1028ea" title="dgeMatrix_rcond" alt="" coords="184,165,301,195"/>
+<area shape="rect" id="node11" href="$dgeMatrix_8h.html#a8f0564cd095a4415738ef1ad8d537da1" title="dgeMatrix_solve" alt="" coords="184,218,301,249"/>
 </map>

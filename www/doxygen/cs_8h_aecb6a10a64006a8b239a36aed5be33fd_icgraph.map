@@ -1,9 +1,9 @@
 <map id="G" name="G">
-<area shape="rect" href="$cs_8h.html#ae2efa3ed8c8a2931e584b6d39a293e38" title="cs_dmperm" alt="" coords="129,5,217,35"/>
-<area shape="rect" href="$cs_8h.html#a7c5aa6c4fadeba20b904a1c56b4543f5" title="cs_schol" alt="" coords="137,59,209,88"/>
-<area shape="rect" href="$dgCMatrix_8h.html#a2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="120,112,227,141"/>
-<area shape="rect" href="$dgCMatrix_8c.html#ad6045ab51c67c719a4deab2c929e4d13" title="install_lu" alt="" coords="137,165,209,195"/>
-<area shape="rect" href="$cs_8h.html#a661c215839fe06dfed360d022188abad" title="cs_cholsol" alt="" coords="315,59,397,88"/>
-<area shape="rect" href="$dgCMatrix_8h.html#a848fa1b60915b5ee7926c897b8b5f050" title="dgCMatrix_LU" alt="" coords="304,139,408,168"/>
-<area shape="rect" href="$dgCMatrix_8h.html#aeae674c1f247043d2e34fe45d4239769" title="dgCMatrix_matrix_solve" alt="" coords="276,192,436,221"/>
+<area shape="rect" id="node3" href="$cs_8h.html#ae2efa3ed8c8a2931e584b6d39a293e38" title="cs_dmperm" alt="" coords="128,5,219,35"/>
+<area shape="rect" id="node5" href="$cs_8h.html#a7c5aa6c4fadeba20b904a1c56b4543f5" title="cs_schol" alt="" coords="136,58,211,89"/>
+<area shape="rect" id="node9" href="$dgCMatrix_8h.html#a2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="120,111,227,142"/>
+<area shape="rect" id="node11" href="$dgCMatrix_8c.html#ad6045ab51c67c719a4deab2c929e4d13" title="install_lu" alt="" coords="137,165,209,195"/>
+<area shape="rect" id="node7" href="$cs_8h.html#a661c215839fe06dfed360d022188abad" title="cs_cholsol" alt="" coords="315,58,397,89"/>
+<area shape="rect" id="node13" href="$dgCMatrix_8h.html#a848fa1b60915b5ee7926c897b8b5f050" title="dgCMatrix_LU" alt="" coords="304,138,408,169"/>
+<area shape="rect" id="node15" href="$dgCMatrix_8h.html#aeae674c1f247043d2e34fe45d4239769" title="dgCMatrix_matrix_solve" alt="" coords="275,191,437,222"/>
 </map>

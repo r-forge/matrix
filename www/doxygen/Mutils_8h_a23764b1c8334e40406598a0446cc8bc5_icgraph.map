@@ -1,6 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" href="$dense_8h.html#afc94ab69278e25ef4ea5ed5ba90935c3" title="dense_band" alt="" coords="257,5,348,35"/>
-<area shape="rect" href="$dense_8h.html#a389bdf26bd829335d25dffb4244c9ae6" title="dense_to_symmetric" alt="" coords="232,59,373,88"/>
-<area shape="rect" href="$Mutils_8h.html#a623039270a92fce0643031ef7f6e72b2" title="mMatrix_as_geMatrix" alt="" coords="229,112,376,141"/>
-<area shape="rect" href="$dense_8h.html#a33b46f3a16a95734d4875ddfbfa079cb" title="dense_to_Csparse" alt="" coords="425,112,553,141"/>
+<area shape="rect" id="node3" href="$dense_8h.html#afc94ab69278e25ef4ea5ed5ba90935c3" title="dense_band" alt="" coords="257,5,348,35"/>
+<area shape="rect" id="node5" href="$dense_8h.html#a389bdf26bd829335d25dffb4244c9ae6" title="dense_to_symmetric" alt="" coords="232,58,373,89"/>
+<area shape="rect" id="node7" href="$Mutils_8h.html#a623039270a92fce0643031ef7f6e72b2" title="mMatrix_as_geMatrix" alt="" coords="229,111,376,142"/>
+<area shape="rect" id="node9" href="$dense_8h.html#a33b46f3a16a95734d4875ddfbfa079cb" title="dense_to_Csparse" alt="" coords="424,111,555,142"/>
 </map>

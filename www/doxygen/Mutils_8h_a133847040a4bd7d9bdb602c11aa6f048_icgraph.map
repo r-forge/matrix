@@ -1,8 +1,8 @@
 <map id="G" name="G">
-<area shape="rect" href="$Mutils_8h.html#a23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="228,59,401,88"/>
-<area shape="rect" href="$ldense_8h.html#a0dc07e735b6fe4687f207bb06e950b70" title="lsyMatrix_as_lgeMatrix" alt="" coords="237,112,392,141"/>
-<area shape="rect" href="$dense_8h.html#afc94ab69278e25ef4ea5ed5ba90935c3" title="dense_band" alt="" coords="479,5,569,35"/>
-<area shape="rect" href="$dense_8h.html#a389bdf26bd829335d25dffb4244c9ae6" title="dense_to_symmetric" alt="" coords="453,59,595,88"/>
-<area shape="rect" href="$Mutils_8h.html#a623039270a92fce0643031ef7f6e72b2" title="mMatrix_as_geMatrix" alt="" coords="451,112,597,141"/>
-<area shape="rect" href="$dense_8h.html#a33b46f3a16a95734d4875ddfbfa079cb" title="dense_to_Csparse" alt="" coords="647,112,775,141"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#a23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="231,58,404,89"/>
+<area shape="rect" id="node13" href="$ldense_8h.html#a0dc07e735b6fe4687f207bb06e950b70" title="lsyMatrix_as_lgeMatrix" alt="" coords="240,111,395,142"/>
+<area shape="rect" id="node5" href="$dense_8h.html#afc94ab69278e25ef4ea5ed5ba90935c3" title="dense_band" alt="" coords="481,5,572,35"/>
+<area shape="rect" id="node7" href="$dense_8h.html#a389bdf26bd829335d25dffb4244c9ae6" title="dense_to_symmetric" alt="" coords="456,58,597,89"/>
+<area shape="rect" id="node9" href="$Mutils_8h.html#a623039270a92fce0643031ef7f6e72b2" title="mMatrix_as_geMatrix" alt="" coords="453,111,600,142"/>
+<area shape="rect" id="node11" href="$dense_8h.html#a33b46f3a16a95734d4875ddfbfa079cb" title="dense_to_Csparse" alt="" coords="648,111,779,142"/>
 </map>

@@ -1,6 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" href="$cs_8c.html#ade63a58ec1758250c64518d817ea3c4c" title="cs_fkeep" alt="" coords="161,5,236,35"/>
-<area shape="rect" href="$cs_8c.html#a9dad9370bdde743eee26de2d53572bda" title="cs_nonzero" alt="" coords="155,59,243,88"/>
-<area shape="rect" href="$cs_8c.html#a5a9bc4224732ce1cedc50119afc687c1" title="cs_sprealloc" alt="" coords="292,5,385,35"/>
-<area shape="rect" href="$cs_8c.html#a7e829e1175f2c8ddb0d6d9e0bb90f985" title="cs_realloc" alt="" coords="435,5,515,35"/>
+<area shape="rect" id="node3" href="$cs_8c.html#ade63a58ec1758250c64518d817ea3c4c" title="cs_fkeep" alt="" coords="163,5,237,35"/>
+<area shape="rect" id="node9" href="$cs_8c.html#a9dad9370bdde743eee26de2d53572bda" title="cs_nonzero" alt="" coords="156,58,244,89"/>
+<area shape="rect" id="node5" href="$cs_8c.html#a5a9bc4224732ce1cedc50119afc687c1" title="cs_sprealloc" alt="" coords="295,5,388,35"/>
+<area shape="rect" id="node7" href="$cs_8c.html#a7e829e1175f2c8ddb0d6d9e0bb90f985" title="cs_realloc" alt="" coords="439,5,519,35"/>
 </map>
