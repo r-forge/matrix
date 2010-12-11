@@ -1,14 +1,14 @@
 <map id="G" name="G">
-<area shape="rect" href="$cs_8h.html#a661c215839fe06dfed360d022188abad" title="cs_cholsol" alt="" coords="377,5,460,35"/>
-<area shape="rect" href="$cs_8h.html#a2ecf7b79f04b1f14554e67d3522b0ad4" title="cs_lusol" alt="" coords="384,84,453,113"/>
-<area shape="rect" href="$cs_8h.html#a24796e2f78414578fd2b8e7528535cbb" title="cs_ndone" alt="" coords="125,148,203,177"/>
-<area shape="rect" href="$dgCMatrix_8c.html#ad6045ab51c67c719a4deab2c929e4d13" title="install_lu" alt="" coords="383,188,455,217"/>
-<area shape="rect" href="$cs_8h.html#af1cde25f7d702464291dd2a7e85b4770" title="cs_qrsol" alt="" coords="384,265,453,295"/>
-<area shape="rect" href="$dgCMatrix_8h.html#a2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="365,331,472,360"/>
-<area shape="rect" href="$cs_8h.html#a5ae664f3c6b2baeed717be084e00e13f" title="cs_chol" alt="" coords="251,95,317,124"/>
-<area shape="rect" href="$cs_8h.html#a6a35ad4816f210234a33eed09b19d181" title="cs_lu" alt="" coords="259,148,309,177"/>
-<area shape="rect" href="$cs_8h.html#a767dc90c22d90fe898f72c2da0d98c03" title="cs_qr" alt="" coords="257,252,311,281"/>
-<area shape="rect" href="$dgCMatrix_8h.html#a848fa1b60915b5ee7926c897b8b5f050" title="dgCMatrix_LU" alt="" coords="549,207,653,236"/>
-<area shape="rect" href="$dgCMatrix_8h.html#aeae674c1f247043d2e34fe45d4239769" title="dgCMatrix_matrix_solve" alt="" coords="521,153,681,183"/>
-<area shape="rect" href="$dgCMatrix_8h.html#a5937063a2f86fc60d92f942eb9425b86" title="dgCMatrix_qrsol" alt="" coords="544,265,659,295"/>
+<area shape="rect" id="node3" href="$cs_8h.html#a661c215839fe06dfed360d022188abad" title="cs_cholsol" alt="" coords="380,5,463,35"/>
+<area shape="rect" id="node5" href="$cs_8h.html#a2ecf7b79f04b1f14554e67d3522b0ad4" title="cs_lusol" alt="" coords="387,83,456,114"/>
+<area shape="rect" id="node7" href="$cs_8h.html#a24796e2f78414578fd2b8e7528535cbb" title="cs_ndone" alt="" coords="127,147,204,178"/>
+<area shape="rect" id="node15" href="$dgCMatrix_8c.html#ad6045ab51c67c719a4deab2c929e4d13" title="install_lu" alt="" coords="385,187,457,218"/>
+<area shape="rect" id="node23" href="$cs_8h.html#af1cde25f7d702464291dd2a7e85b4770" title="cs_qrsol" alt="" coords="387,265,456,295"/>
+<area shape="rect" id="node27" href="$dgCMatrix_8h.html#a2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="368,330,475,361"/>
+<area shape="rect" id="node9" href="$cs_8h.html#a5ae664f3c6b2baeed717be084e00e13f" title="cs_chol" alt="" coords="253,94,320,125"/>
+<area shape="rect" id="node12" href="$cs_8h.html#a6a35ad4816f210234a33eed09b19d181" title="cs_lu" alt="" coords="260,147,313,178"/>
+<area shape="rect" id="node21" href="$cs_8h.html#a767dc90c22d90fe898f72c2da0d98c03" title="cs_qr" alt="" coords="260,251,313,282"/>
+<area shape="rect" id="node17" href="$dgCMatrix_8h.html#a848fa1b60915b5ee7926c897b8b5f050" title="dgCMatrix_LU" alt="" coords="552,206,656,237"/>
+<area shape="rect" id="node19" href="$dgCMatrix_8h.html#aeae674c1f247043d2e34fe45d4239769" title="dgCMatrix_matrix_solve" alt="" coords="523,153,685,183"/>
+<area shape="rect" id="node25" href="$dgCMatrix_8h.html#a5937063a2f86fc60d92f942eb9425b86" title="dgCMatrix_qrsol" alt="" coords="547,265,661,295"/>
 </map>

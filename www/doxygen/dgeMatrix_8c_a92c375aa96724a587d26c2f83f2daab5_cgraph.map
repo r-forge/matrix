@@ -1,5 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" href="$dgeMatrix_8c.html#a18e14d832081c8d7d6df7bd2f9e390f9" title="get_norm" alt="" coords="169,32,244,61"/>
-<area shape="rect" href="$Mutils_8h.html#a30e9ab9c0cdcfcee7a38b82d58deb13c" title="Check if slot(obj, &quot;x&quot;) contains any NA (or NaN)." alt="" coords="296,5,395,35"/>
-<area shape="rect" href="$Mutils_8c.html#ae83d110234906231be64768d898c866c" title="La_norm_type" alt="" coords="293,59,397,88"/>
+<area shape="rect" id="node3" href="$dgeMatrix_8c.html#a18e14d832081c8d7d6df7bd2f9e390f9" title="get_norm" alt="" coords="169,31,244,62"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#a30e9ab9c0cdcfcee7a38b82d58deb13c" title="Check if slot(obj, &quot;x&quot;) contains any NA (or NaN)." alt="" coords="296,5,395,35"/>
+<area shape="rect" id="node7" href="$Mutils_8c.html#ae83d110234906231be64768d898c866c" title="La_norm_type" alt="" coords="293,58,397,89"/>
 </map>

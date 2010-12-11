@@ -1,6 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" href="$CHMfactor_8h.html#abb40b3666ce7a47edddf74ed8299939d" title="CHMfactor_ldetL2up" alt="" coords="201,5,340,35"/>
-<area shape="rect" href="$CHMfactor_8h.html#aafc574f19837b7c6879c395a382444b0" title="CHMfactor_update" alt="" coords="207,59,335,88"/>
-<area shape="rect" href="$CHMfactor_8h.html#a5b0d200f2e7a1d06d1c353d826af0d70" title="destructive_CHM_update" alt="" coords="187,112,355,141"/>
-<area shape="rect" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="223,165,319,195"/>
+<area shape="rect" id="node3" href="$CHMfactor_8h.html#abb40b3666ce7a47edddf74ed8299939d" title="CHMfactor_ldetL2up" alt="" coords="201,5,340,35"/>
+<area shape="rect" id="node5" href="$CHMfactor_8h.html#aafc574f19837b7c6879c395a382444b0" title="CHMfactor_update" alt="" coords="205,58,336,89"/>
+<area shape="rect" id="node7" href="$CHMfactor_8h.html#a5b0d200f2e7a1d06d1c353d826af0d70" title="destructive_CHM_update" alt="" coords="187,111,355,142"/>
+<area shape="rect" id="node9" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="221,165,320,195"/>
 </map>
