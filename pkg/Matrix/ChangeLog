@@ -1,3 +1,9 @@
+2010-12-12  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/eigen.R,...: use full argument names;
+	* R/*.R: get rid of more from
+		checkUsagePackage("Matrix", suppressPartialMatchArgs = FALSE)
+
 2010-12-11  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/products.R: dimension fixing in some Matrix o vector  [t]crossprod()s.

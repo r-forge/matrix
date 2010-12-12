@@ -786,7 +786,7 @@ setClass("sparseVector",
              else TRUE
          })
 .validXspVec <- function(object) {
-    n <- object@length
+    ## n <- object@length
     if(length(object@i) != length(object@x))
         "'i' and 'x' differ in length"
     else TRUE
