@@ -118,8 +118,7 @@ attr.all_Mat <- function(target, current,
 		  check.attributes = TRUE, ...)
     if((c1 <- class(target)) != (c2 <- class(current)))
 	## list(): so we can easily check for this
-	list(c(msg, paste0("class(target) is ", class(target), ", current is ",
-			   class(current))))
+	list(c(msg, paste0("class(target) is ", c1, ", current is ", c2)))
     else msg
 }
 
