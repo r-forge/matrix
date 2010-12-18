@@ -1,3 +1,8 @@
+2010-12-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/spModels.R, NAMESPACE: remove model.Matrix();
+	we had deprecated it for about four months now.
+
 2010-12-12  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/eigen.R,...: use full argument names;
