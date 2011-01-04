@@ -1,3 +1,8 @@
+2011-01-04  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/nearPD.R (nearPD): better error message when all eigenvalues
+	are (at least close to) negative.
+
 2010-12-18  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/spModels.R, NAMESPACE: remove model.Matrix();
