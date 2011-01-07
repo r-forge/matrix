@@ -1,9 +1,17 @@
+2011-01-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/CHMfactor.R (determinant(<CHMfactor>)): no longer warn about
+	incompatible change of 2009-09-01.
+
 2011-01-04  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/nearPD.R (nearPD): better error message when all eigenvalues
 	are (at least close to) negative.
 
 2010-12-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+>>>>>>>	1.0-0 ?? <<<<<<<<<<<<<<<<<<<
+	* DESCRIPTION (Version): 0.999375-47, CRAN-released: .., r..
 
 	* R/spModels.R, NAMESPACE: remove model.Matrix();
 	we had deprecated it for about four months now.
@@ -16,6 +24,8 @@
 
 2010-12-11  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* DESCRIPTION (Version): 0.999375-46, CRAN-released: 2010-12-14, r2633
+
 	* R/products.R: dimension fixing in some Matrix o vector  [t]crossprod()s.
 
 	* src/Csparse.c (nz2Csparse, nz_pattern_to_Csparse): new utilities,
@@ -27,7 +37,7 @@
 
 2010-10-08  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 0.999375-45, CRAN-released: 2010-11-10
+	* DESCRIPTION (Version): 0.999375-45, CRAN-released: 2010-11-10, r2624
 
 	* R/sparseMatrix.R (graph.wgtMatrix): add 'graph::' in a few
 	places; as 'graph' package is not imported and may well be loaded
@@ -57,7 +67,7 @@
 
 2010-08-09  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 0.999375-44, CRAN-released: 2010-09-11
+	* DESCRIPTION (Version): 0.999375-44, CRAN-released: 2010-09-11, r2618
 
 	* R/diagMatrix.R (diagCspprod, Cspdiagprod): drop (possibly wrong) @factors
 	* R/Ops.R (.Arith.CM.atom, .Arith.atom.CM, A.M.n, A.n.M): ditto
@@ -644,7 +654,7 @@
 2009-09-01  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/CHMfactor.R (determinant): divide previous log(det(.)) by 2;
-	now returning det(L); and modifiy the "CHMfactor.warn" message.
+	now returning det(L); and modify the "CHMfactor.warn" message.
 
 	* man/CHMfactor-class.Rd: modify documentation accordingly.
 
