@@ -8,7 +8,7 @@ model.Matrix <- function(object, data = environment(object),
 	m <- sparse.model.matrix(object, data=data, contrasts.arg=contrasts.arg,
 				 drop.unused.levels=drop.unused.levels, xlev=xlev,
 				 ...)
-	new("dsparseModelMatrix",  m, ## droping attributes ?
+	new("dsparseModelMatrix",  m, ## dropping attributes ?
 	    assign = attr(m, "assign"),
 	    contrasts = if(is.null(ctr <- attr(m,"contrasts")))list() else ctr)
     } else {
