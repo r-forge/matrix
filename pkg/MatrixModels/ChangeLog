@@ -1,3 +1,15 @@
+2011-02-17  Douglas Bates <bates@stat.wisc.edu>
+
+	* DESCRIPTION: Remove Encoding: directive.
+
+2011-01-17  Douglas Bates <bates@stat.wisc.edu>
+
+	* R/modelMatrix.R: Spelling correction.
+
+2010-11-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllClass.R: comment stopifnot() which prevents INSTALL
+
 2010-11-01  Douglas Bates  <bates@stat.wisc.edu>
 
 	* R/AllClass.R (rMod,glrMod): Initial attempt at using reference
