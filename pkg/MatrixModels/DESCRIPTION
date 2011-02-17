@@ -9,6 +9,5 @@ Description: Modelling with sparse and dense 'Matrix' matrices, using
 Depends: R (>= 2.10.1), stats, utils, methods, Matrix (>= 0.999375-44)
 notyetImports: stats4
 LazyLoad: yes
-Encoding: UTF-8
 License: GPL (>= 2)
 URL: http://Matrix.R-forge.R-project.org/
