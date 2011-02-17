@@ -13,7 +13,6 @@ Enhances: MatrixModels, graph, SparseM, sfsmisc
 LazyLoad: yes
 LazyData: no
 LazyDataNote: no longer available, since we use data/*.R *and* our classes
-Encoding: UTF-8
 License: GPL (>= 2)
 LicenseDetails: The Matrix package includes libraries AMD, CHOLMOD,
  COLAMD, CSparse and SPQR from the SuiteSparse collection of Tim
