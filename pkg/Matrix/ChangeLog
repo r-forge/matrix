@@ -1,3 +1,16 @@
+2011-02-17  Douglas Bates <bates@stat.wisc.edu>
+
+	* DESCRIPTION: Remove Encoding: directive.
+
+2011-02-10  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* inst/doc/sparseModels.Rnw: use png for large graphics (suggestion from
+	  Brian)
+
+2011-02-05  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* man/symmpart.Rd: update, thanks to Spencer Graves' prompting.
+
 2011-01-07  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/CHMfactor.R (determinant(<CHMfactor>)): no longer warn about
