@@ -1,3 +1,8 @@
+2011-02-17  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllClass.R, R/sparseVector.R, man/sparseVector-class.Rd: now
+	require explicitly that i-slot must be sorted for sparseVectors.
+
 2011-02-16  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/sparseMatrix.R (formatSparseM): align="right" accidentally did
