@@ -183,7 +183,7 @@ SEXP dgCMatrix_qrsol(SEXP x, SEXP y, SEXP ord)
     int order = INTEGER(ord)[0];
 #ifdef _not_yet_do_FIXME__
     const char *nms[] = {"L", "coef", "Xty", "resid", ""};
-    SEXP ans = PROTECT(Matrix_make_named(VECSXP, nms));
+    SEXP ans = PROTECT(Rf_mkNamed(VECSXP, nms));
 #endif
     R_CheckStack();
 
@@ -464,7 +464,7 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
     int n = cx->ncol;/* #{obs.} {x = t(X) !} */
     double one[] = {1,0}, zero[] = {0,0}, neg1[] = {-1,0};
     const char *nms[] = {"L", "coef", "Xty", "resid", ""};
-    SEXP ans = PROTECT(Matrix_make_named(VECSXP, nms));
+    SEXP ans = PROTECT(Rf_mkNamed(VECSXP, nms));
     R_CheckStack();
 
     if (n < cx->nrow || n <= 0)
