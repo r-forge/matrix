@@ -218,11 +218,12 @@ static void chTr2Ralloc(CHM_TR dest, CHM_TR src)
 CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x,
 			 Rboolean check_Udiag, Rboolean sort_in_place)
 {
-    char *valid[] = {"dgCMatrix", "dsCMatrix", "dtCMatrix",
-		     "lgCMatrix", "lsCMatrix", "ltCMatrix",
-		     "ngCMatrix", "nsCMatrix", "ntCMatrix",
-		     "zgCMatrix", "zsCMatrix", "ztCMatrix",
-		     ""};
+    static const char *valid[] = {
+	"dgCMatrix", "dsCMatrix", "dtCMatrix",
+	"lgCMatrix", "lsCMatrix", "ltCMatrix",
+	"ngCMatrix", "nsCMatrix", "ntCMatrix",
+	"zgCMatrix", "zsCMatrix", "ztCMatrix",
+	""};
     int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	ctype = Matrix_check_class_etc(x, valid);
     SEXP islot = GET_SLOT(x, Matrix_iSym);
@@ -871,7 +872,8 @@ CHM_DN numeric_as_chm_dense(CHM_DN ans, double *v, int nr, int nc)
  */
 CHM_FR as_cholmod_factor(CHM_FR ans, SEXP x)
 {
-    char *valid[] = {"dCHMsuper", "dCHMsimpl", "nCHMsuper", "nCHMsimpl", ""};
+    static const char *valid[] = {"dCHMsuper", "dCHMsimpl",
+				  "nCHMsuper", "nCHMsimpl", ""};
     int *type = INTEGER(GET_SLOT(x, install("type"))),
 	ctype = Matrix_check_class_etc(x, valid);
     SEXP tmp;

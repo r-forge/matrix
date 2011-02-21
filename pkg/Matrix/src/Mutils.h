@@ -265,7 +265,7 @@ mMatrix_as_geMatrix(SEXP A)
  * @return index of match or -1 for no match
  */
 static R_INLINE int
-Matrix_check_class(const char *class, char **valid)
+Matrix_check_class(char *class, const char **valid)
 {
     int ans;
     for (ans = 0; ; ans++) {
