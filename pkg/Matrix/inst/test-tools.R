@@ -70,6 +70,15 @@ showProc.time <- local({
     }
 })
 
+##' @title turn an S4 object (with slots) into a list with corresponding components
+##' @param obj an R object with a formal class (aka "S4")
+##' @return a list with named components where \code{obj} had slots
+##' @author Martin Maechler
+S4_2list <- function(obj) {
+   sn <- slotNames(obj)
+   structure(lapply(sn, slot, object = obj), .Names = sn)
+}
+
 
 ### ------- Part II  -- related to matrices, but *not* "Matrix" -----------
 
