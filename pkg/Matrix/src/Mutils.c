@@ -519,11 +519,12 @@ install_diagonal_int(int *dest, SEXP A)
 SEXP dup_mMatrix_as_geMatrix(SEXP A)
 {
     SEXP ans, ad = R_NilValue, an = R_NilValue;	/* -Wall */
-    char *valid[] = {"_NOT_A_CLASS_",/* *_CLASSES defined in ./Mutils.h */
-		    ddense_CLASSES, /* 14 */
-		    ldense_CLASSES, /* 6  */
-		    ndense_CLASSES, /* 5  */
-		    ""};
+    static const char *valid[] = {
+	"_NOT_A_CLASS_",/* *_CLASSES defined in ./Mutils.h */
+	ddense_CLASSES, /* 14 */
+	ldense_CLASSES, /* 6  */
+	ndense_CLASSES, /* 5  */
+	""};
     int sz, ctype = Matrix_check_class_etc(A, valid),
 	nprot = 1;
     enum dense_enum { ddense, ldense, ndense } M_type = ddense /* -Wall */;
@@ -679,7 +680,7 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
 	ad = R_NilValue , an = R_NilValue;	/* -Wall */
-    char *valid[] = {"_NOT_A_CLASS_", ddense_CLASSES, ""};
+    static const char *valid[] = {"_NOT_A_CLASS_", ddense_CLASSES, ""};
     int ctype = Matrix_check_class_etc(A, valid),
 	nprot = 1, sz;
     double *ansx;
@@ -832,7 +833,7 @@ SEXP m_encodeInd2(SEXP i, SEXP j, SEXP di, SEXP chk_bnds)
  *
  * @return index of match or -1 for no match
  */
-int Matrix_check_class_and_super(SEXP x, char **valid, SEXP rho)
+int Matrix_check_class_and_super(SEXP x, const char **valid, SEXP rho)
 {
     int ans;
     SEXP cl = getAttrib(x, R_ClassSymbol);
@@ -885,7 +886,7 @@ int Matrix_check_class_and_super(SEXP x, char **valid, SEXP rho)
  *
  * @return index of match or -1 for no match
  */
-int Matrix_check_class_etc(SEXP x, char **valid)
+int Matrix_check_class_etc(SEXP x, const char **valid)
 {
     static SEXP s_M_classEnv = NULL;
     SEXP cl = getAttrib(x, R_ClassSymbol), rho = R_GlobalEnv, pkg;

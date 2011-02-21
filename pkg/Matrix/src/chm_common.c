@@ -403,11 +403,12 @@ SEXP chm_sparse_to_SEXP(CHM_SP a, int dofree, int uploT, int Rkind,
  */
 CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x, Rboolean check_Udiag)
 {
-    char *valid[] = {"dgTMatrix", "dsTMatrix", "dtTMatrix",
-		     "lgTMatrix", "lsTMatrix", "ltTMatrix",
-		     "ngTMatrix", "nsTMatrix", "ntTMatrix",
-		     "zgTMatrix", "zsTMatrix", "ztTMatrix",
-		     ""};
+    static const char *valid[] = {
+	"dgTMatrix", "dsTMatrix", "dtTMatrix",
+	"lgTMatrix", "lsTMatrix", "ltTMatrix",
+	"ngTMatrix", "nsTMatrix", "ntTMatrix",
+	"zgTMatrix", "zsTMatrix", "ztTMatrix",
+	""};
     int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	ctype = Matrix_check_class_etc(x, valid);
     SEXP islot = GET_SLOT(x, Matrix_iSym);
@@ -591,11 +592,12 @@ SEXP chm_triplet_to_SEXP(CHM_TR a, int dofree, int uploT, int Rkind,
 CHM_DN as_cholmod_dense(CHM_DN ans, SEXP x)
 {
 #define _AS_cholmod_dense_1						\
-    char *valid[] = {"dmatrix", "dgeMatrix",				\
-		     "lmatrix", "lgeMatrix",				\
-		     "nmatrix", "ngeMatrix",				\
-		     "zmatrix", "zgeMatrix", ""};			\
-    int dims[2], ctype = Matrix_check_class_etc(x, valid), nprot = 0; \
+    static const char *valid[] = {					\
+        "dmatrix", "dgeMatrix",						\
+	"lmatrix", "lgeMatrix",						\
+	"nmatrix", "ngeMatrix",						\
+	"zmatrix", "zgeMatrix", ""};					\
+    int dims[2], ctype = Matrix_check_class_etc(x, valid), nprot = 0;	\
 									\
     if (ctype < 0) {		/* not a classed matrix */		\
 	if (isMatrix(x)) Memcpy(dims, INTEGER(getAttrib(x, R_DimSymbol)), 2); \
