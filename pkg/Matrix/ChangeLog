@@ -1,3 +1,9 @@
+2011-02-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (formatSparseM): align="right" accidentally did
+	not use zero.print at all.
+	print/format sparse Matrix: fix align="right" and improve docu
+
 2011-02-17  Douglas Bates <bates@stat.wisc.edu>
 
 	* DESCRIPTION: Remove Encoding: directive.
