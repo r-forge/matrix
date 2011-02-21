@@ -579,7 +579,7 @@ SEXP dgeMatrix_Schur(SEXP x, SEXP vectors)
     int vecs = asLogical(vectors), info, izero = 0, lwork = -1, n = dims[0];
     double *work, tmp;
     const char *nms[] = {"WR", "WI", "T", "Z", ""};
-    SEXP val = PROTECT(Matrix_make_named(VECSXP, nms));
+    SEXP val = PROTECT(Rf_mkNamed(VECSXP, nms));
 
     if (n != dims[1] || n < 1)
 	error(_("dgeMatrix_Schur: argument x must be a non-null square matrix"));
