@@ -1,3 +1,9 @@
+2011-02-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Tsparse.R (replTmat): fix bug for  M[i,j] <- v,
+	when j had duplicated entries.
+	* tests/indexing.R (chkAssign): new function; testing the above.
+
 2011-02-17  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/AllClass.R, R/sparseVector.R, man/sparseVector-class.Rd: now
