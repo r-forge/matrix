@@ -278,9 +278,9 @@ Matrix_check_class(const char *class, char **valid)
  * These are the ones users should use -- is() versions, also looking
  * at super classes:
  */
-int Matrix_check_class_etc(SEXP x, char **valid);
+int Matrix_check_class_etc(SEXP x, const char **valid);
 #if R_VERSION < R_Version(2, 13, 0)
-int Matrix_check_class_and_super(SEXP x, char **valid, SEXP rho);
+int Matrix_check_class_and_super(SEXP x, const char **valid, SEXP rho);
 #else
 # define Matrix_check_class_and_super R_check_class_and_super
 #endif
