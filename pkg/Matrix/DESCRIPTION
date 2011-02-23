@@ -1,6 +1,6 @@
 Package: Matrix
 Version: 0.999375-47
-Date: 2011-02-..
+Date: 2011-02-23
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Author: Douglas Bates <bates@stat.wisc.edu> and Martin Maechler <maechler@stat.math.ethz.ch>
@@ -10,6 +10,7 @@ Description: Classes and methods for dense and sparse matrices and
 Depends: R (>= 2.10.0), stats, methods, utils, lattice
 Imports: graphics, grid
 Enhances: MatrixModels, graph, SparseM, sfsmisc
+Encoding: UTF-8
 LazyLoad: yes
 LazyData: no
 LazyDataNote: no longer available, since we use data/*.R *and* our classes

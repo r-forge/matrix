@@ -36,7 +36,7 @@ all.slot.equal <- function(x,y, ...) {
     TRUE
 }
 
-## all.equal() for list-coercable objects -- apart from *some* components
+## all.equal() for list-coercible objects -- apart from *some* components
 all.equal.X <- function(x,y, except, ...)
 {
     .trunc <- function(x) {
@@ -320,7 +320,7 @@ rUnitTri <- function(n, upper = TRUE, ...)
 
 ## This is related to rUnitTri(), ver
 mkLDL <- function(n, density = 1/3) {
-    ## Purpose: make nice artifical   A = L D L'  (with exact numbers) decomp
+    ## Purpose: make nice artificial   A = L D L'  (with exact numbers) decomp
     ## ----------------------------------------------------------------------
     ## Author: Martin Maechler, Date: 15 Mar 2008
     stopifnot(n == round(n))

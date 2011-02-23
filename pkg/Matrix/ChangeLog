@@ -1,3 +1,8 @@
+2011-02-23  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/factorizations.c (LU_expand): now also works for non-square (m x n)
+	* tests/factorizing.R: testing that
+
 2011-02-22  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Auxiliaries.R (t_geMatrix): drop 'factors', as they can be
