@@ -1,3 +1,8 @@
+2011-02-22  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (t_geMatrix): drop 'factors', as they can be
+	wrong.
+
 2011-02-18  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Tsparse.R (replTmat): fix bug for  M[i,j] <- v,
@@ -40,7 +45,6 @@
 
 2010-12-18  Martin Maechler  <maechler@stat.math.ethz.ch>
 
->>>>>>>	1.0-0 ?? <<<<<<<<<<<<<<<<<<<
 	* DESCRIPTION (Version): 0.999375-47, CRAN-released: .., r..
 
 	* R/spModels.R, NAMESPACE: remove model.Matrix();
