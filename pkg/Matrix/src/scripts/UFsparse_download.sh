@@ -4,12 +4,16 @@
 if [ ! -d ../src ]
 then echo 'Must run in Matrix/src/ !' ; exit 1
 fi
+getSPQR=no
+##     --- since late summer 2010, we no longer get SPQR
 ufl_URL=http://www.cise.ufl.edu/research/sparse
 wget -nc  $ufl_URL/amd/current/AMD.tar.gz
 wget -nc  $ufl_URL/cholmod/current/CHOLMOD.tar.gz
 wget -nc  $ufl_URL/colamd/current/COLAMD.tar.gz
 wget -nc  $ufl_URL/UFconfig/current/UFconfig.tar.gz
+if [ $getSPQR = yes ] ; then
 wget -nc  $ufl_URL/SPQR/current/SPQR.tar.gz
+fi
 
 ## 1) UFconfig ---------------------------------------------
   ## install UFconfig.h file (now needed by some UFsparse libraries)
@@ -61,26 +65,29 @@ echo ' make changes as necessary, and then (later)'
 echo ' rm CHOLMOD/Lib/Makefile_*' ; echo
 
 ## 5) SPQR -------------------------------------------------
+if [ $getSPQR = yes ]
+then
   ## install SPQR source files
-for d in Source Include Lib
-do
-    tar zxf ./SPQR.tar.gz SPQR/$d
-done
-  ## install CHOLMOD documentation in ../inst/doc/UFsparse
-tar zxf ./SPQR.tar.gz SPQR/README.txt
-mv SPQR/README.txt ../inst/doc/UFsparse/SPQR.txt
-  ## patch for Matrix:
-patch -p0 < scripts/SPQR.patch
+  for d in Source Include Lib
+  do
+      tar zxf ./SPQR.tar.gz SPQR/$d
+  done
+    ## install CHOLMOD documentation in ../inst/doc/UFsparse
+  tar zxf ./SPQR.tar.gz SPQR/README.txt
+  mv SPQR/README.txt ../inst/doc/UFsparse/SPQR.txt
+    ## patch for Matrix:
+  patch -p0 < scripts/SPQR.patch
 
-cp -p SPQR/Lib/Makefile SPQR/Lib/Makefile_SPQR
-Rscript --vanilla -e 'source("scripts/fixup-fn.R")' -e 'fixup("SPQR/Lib/Makefile")'
-mv    SPQR/Lib/Makefile SPQR/Lib/Makefile_pre
-svn revert SPQR/Lib/Makefile
-  ##
-ls -l SPQR/Lib/Makefile_pre
-echo 'now diff SPQR/Lib/Makefile with SPQR/Lib/Makefile_pre'
-echo ' make changes as necessary, and then (later)'
-echo ' rm SPQR/Lib/Makefile_*' ; echo
+  cp -p SPQR/Lib/Makefile SPQR/Lib/Makefile_SPQR
+  Rscript --vanilla -e 'source("scripts/fixup-fn.R")' -e 'fixup("SPQR/Lib/Makefile")'
+  mv    SPQR/Lib/Makefile SPQR/Lib/Makefile_pre
+  svn revert SPQR/Lib/Makefile
+    ##
+  ls -l SPQR/Lib/Makefile_pre
+  echo 'now diff SPQR/Lib/Makefile with SPQR/Lib/Makefile_pre'
+  echo ' make changes as necessary, and then (later)'
+  echo ' rm SPQR/Lib/Makefile_*' ; echo
+fi
 
 ## ----- remove the downloaded tar files -------------------
 echo 'Execute this eventually:

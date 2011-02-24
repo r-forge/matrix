@@ -92,6 +92,8 @@ LSUPERNODAL = cholmod_l_super_numeric.o cholmod_l_super_solve.o \
 
 DL = $(LCORE) $(LCHECK) $(LCHOLESKY) $(LMATRIXOPS) $(LMODIFY) $(LSUPERNODAL) #$(LPARTITION)
 
+#-------------------------------------------------------------------------------
+
 OBJS = $(DL) # $(DI)
 
 LIB = ../../CHOLMOD.a
@@ -132,6 +134,7 @@ cholmod_l_read.o: ../Check/cholmod_read.c
 
 cholmod_l_write.o: ../Check/cholmod_write.c
 	$(C) -DDLONG -c $(I) ../Check/cholmod_write.c -o $@
+
 
 #-------------------------------------------------------------------------------
 # Core Module:
@@ -392,6 +395,7 @@ cholmod_l_rowdel.o: ../Modify/cholmod_rowdel.c
 cholmod_l_updown.o: ../Modify/cholmod_updown.c \
 	../Modify/t_cholmod_updown.c ../Modify/t_cholmod_updown_numkr.c
 	$(C) -DDLONG -c $(I) ../Modify/cholmod_updown.c -o $@
+
 
 #-------------------------------------------------------------------------------
 # Supernodal Module:
