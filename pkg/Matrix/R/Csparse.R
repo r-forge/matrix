@@ -213,7 +213,7 @@ replCmat <- function (x, i, j, ..., value)
     na <- nargs()
     Matrix.msg("replCmat[x,i,j,.., val] : nargs()=", na,"; ",
 	       if(iMi | jMi) sprintf("missing (i,j) = (%d,%d)", iMi,jMi),
-               .M.level = 2)
+	       .M.level = 2)
     if(na == 3) { ## "vector (or 2-col) indexing"  M[i] <- v
 	x <- as(x, "TsparseMatrix")
 	x[i] <- value # may change class e.g. from dtT* to dgT*
@@ -223,11 +223,11 @@ replCmat <- function (x, i, j, ..., value)
     }
     ## nargs() == 4 :
 
+    lenV <- length(value)
     i1 <- if(iMi) 0:(di[1] - 1L) else .ind.prep2(i, 1, di, dn)
     i2 <- if(jMi) 0:(di[2] - 1L) else .ind.prep2(j, 2, di, dn)
     dind <- c(length(i1), length(i2)) # dimension of replacement region
     lenRepl <- prod(dind)
-    lenV <- length(value)
     if(lenV == 0) {
         if(lenRepl != 0)
             stop("nothing to replace with")
@@ -245,11 +245,13 @@ replCmat <- function (x, i, j, ..., value)
     ## keep "symmetry" if changed here:
     x.sym <- extends(clDx, "symmetricMatrix")
     if(x.sym) { ## only half the indices are there..
-        mkArray <- if(spV) # TODO: room for improvement
-            function(v, dim) spV2M(v, dim[1],dim[2]) else array
+	## using array() for large dind is a disaster...
+	mkArray <- if(spV) # TODO: room for improvement
+	    function(v, dim) spV2M(v, dim[1],dim[2]) else array
 	x.sym <-
 	    (dind[1] == dind[2] && all(i1 == i2) &&
-	     (lenRepl == 1 || isSymmetric(mkArray(value, dim=dind))))
+	     (lenRepl == 1 || lenV == 1 ||
+	      isSymmetric(mkArray(value, dim=dind))))
 	## x.sym : result is *still* symmetric
 	x <- .Call(Csparse_symmetric_to_general, x) ## but do *not* redefine clx!
     }

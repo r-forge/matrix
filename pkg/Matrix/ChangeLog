@@ -1,3 +1,25 @@
+2011-04-04  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/....: Finally no longer hack "UFlong := int", but rather
+	* src/UFconfig/UFconfig.h: use standard CHOLMOD headers
+
+	* DESCRIPTION (Version): 0.9996875-0
+
+2011-03-31  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999375-49
+
+2011-03-30  Douglas Bates <bates@stat.wisc.edu>
+
+	* Matrix/src/chm_common.c: [r2658] Install symbols first -
+	{preventing seg.fault under -gct}
+
+2011-03-17  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999375-48
+	*only* difference to CRAN released *-47, is the work around Sweave bug
+	in inst/doc/sparseModels.Rnw.
+
 2011-02-23  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/factorizations.c (LU_expand): now also works for non-square (m x n)
@@ -50,7 +72,7 @@
 
 2010-12-18  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 0.999375-47, CRAN-released: .., r..
+	* DESCRIPTION (Version): 0.999375-47, CRAN-released: 2011-02-23, r2653
 
 	* R/spModels.R, NAMESPACE: remove model.Matrix();
 	we had deprecated it for about four months now.

@@ -95,9 +95,15 @@
   above currently goes via "matrix" and back instead of using the 'x' slot
   directly; in particular, the triangular* "class property" is lost!
 
-  Note that 'diag(M[,-1]) <- val' is deadly slow for large sparse M,
-  but that's because of the "outer" assignment in the equivalent
-  M[,-1] <- `diag<-`(M[,-1], val).
+  Note that 'diag(M[,-1]) <- val' is deadly slow (*) for large sparse M,
+  but that's because of the 2nd line assignment in the equivalent
+    tmpM <- `diag<-`(M[,-1], val)
+    M[,-1] <- tmpM
+  (*): gives *error* {about negative integer} when
+       prod(dim(M)) > .Machine$integer.max, e.g. for square (n x n) M when
+       n >= 46341 == ceiling(2^15.5)
+  This is "the same" as Ashley Ford's report (25 Feb 2010),
+  MM @ ~/R/MM/Pkg-ex/Matrix/nsp-2col-index-bug.R
 
 - examples for solve( Cholesky(.), b, system = c("A", "LDLt"....))
   probably rather in man/CHMfactor-class.Rd than man/Cholesky.Rd
@@ -118,7 +124,7 @@
   we should also provide a generic and methods.
 - diag(A %*% B) might look like a "generalization" of tr(A %*% B),
   but as the above tricks show, is not really.
-  Still, it's well worth to provide  diag.prod(A, B) 
+  Still, it's well worth to provide  diag.prod(A, B)
 
 - qr.R(qr(x)) may differ for the "same" matrix, depending on it being
   sparse or dense:
@@ -234,3 +240,8 @@
   In some cases, e.g. lmer()'s  "Lambda" (block triangular, small blocks)
        rcond(L) :=  1 / (norm(L) * norm(solve(L)))
   is simple {and remains sparse, as solve(L) is still block triangular}
+
+- How can we ensure that     inst/include/cholmod.h		 remains
+  correct and equivalent to  src/CHOLMOD/Include/cholmod_core.h  and
+  siblings ???
+  [it is *not* currently]

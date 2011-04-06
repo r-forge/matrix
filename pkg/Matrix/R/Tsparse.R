@@ -402,7 +402,7 @@ replTmat <- function (x, i, j, ..., value)
     }
     if(!jMi && any(dup <- duplicated(i2, fromLast = TRUE))) { ## duplicated columns
         iDup <- which(dup)
-        ## FIXME: this is correct, but  rep(keep,..) can be *HUGE*
+        ## The following is correct, but  rep(keep,..) can be *HUGE*
         ## keep <- !dup
         ## i2 <- i2[keep]
         ## lenV <- length(value <- rep(value, length.out = lenRepl)[rep(keep, each=dind[1])])
@@ -423,10 +423,13 @@ replTmat <- function (x, i, j, ..., value)
 
     toGeneral <- r.sym <- FALSE
     if(extends(clDx, "symmetricMatrix")) {
-        mkArray <- if(spV) # TODO: room for improvement
-            function(v, dim) spV2M(v, dim[1],dim[2]) else array
-	r.sym <- (dind[1] == dind[2]) && all(i1 == i2) &&
-	(lenRepl == 1 || isSymmetric(value <- mkArray(value, dim=dind)))
+	## using array() for large dind is a disaster...
+	mkArray <- if(spV) # TODO: room for improvement
+	    function(v, dim) spV2M(v, dim[1],dim[2]) else array
+	r.sym <-
+	    (dind[1] == dind[2] && all(i1 == i2) &&
+	     (lenRepl == 1 || lenV == 1 ||
+	      isSymmetric(value <- mkArray(value, dim=dind))))
 	if(r.sym) { ## result is *still* symmetric --> keep symmetry!
 	    xU <- x@uplo == "U"
             # later, we will consider only those indices above / below diagonal:
@@ -510,10 +513,10 @@ replTmat <- function (x, i, j, ..., value)
     ##   (or impossible e.g. when lenRepl == 50000^2)
     ##       and the  vN0 <- isN0(as.vector(value[iI0]))  is even more ...
     ## try to replace   'seq_len(lenRepl)'  by  'abIseq1(1L, lenRepl)' :
-    ##_ new experimental: -- need   <value>[ <abIndex> ] , intersect() ...
-    ##_ iI0 <- abIseq1(1L, lenRepl)
-    ##_ old -- FIXME_replace -- (but need more abIndex functionality)
-    iI0 <- seq_len(lenRepl)
+    ## This 'use.abI' should later depend on the *dimension* of things !
+    use.abI <- isTRUE(getOption("Matrix.use.abIndex"))
+    ##>>> abIndex: -- need  <abI>[-n],  <value>[ <abIndex> ] , intersect()
+    iI0 <- if(use.abI) abIseq1(1L, lenRepl) else seq_len(lenRepl)
     if(any(sel)) {
 	## the 0-based indices of non-zero entries -- WRT to submatrix
 	non0 <- cbind(match(x@i[sel], i1),
@@ -540,9 +543,12 @@ replTmat <- function (x, i, j, ..., value)
         if(r.sym) {
 	    ## should only set new entries above / below diagonal, i.e.,
             ## subset iI0 such as to contain only  above/below ..
-            ## FIXME: this should be changed for abIndex case ...
-	    iSel <- indTri(dind[1], upper=xU, diag=TRUE)
+	    iSel <-
+		if(use.abI) abIindTri(dind[1], upper=xU, diag=TRUE)
+		else	       indTri(dind[1], upper=xU, diag=TRUE)
 	    ## select also the corresponding triangle of values
+### TODO for "abIndex" -- note we KNOW that both  iI0 and iSel
+### are strictly increasing :
 	    iI0 <- intersect(iI0, iSel)
         }
         full <- length(iI0) == lenRepl
