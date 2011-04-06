@@ -17,6 +17,7 @@ SEXP Csparse_diagN2U(SEXP x);
 SEXP Csparse_drop(SEXP x, SEXP tol);
 SEXP Csparse_horzcat(SEXP x, SEXP y);
 SEXP Csparse_submatrix(SEXP x, SEXP i, SEXP j);
+SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value);
 SEXP Csparse_symmetric_to_general(SEXP x);
 SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo);
 SEXP Csparse_MatrixMarket(SEXP x, SEXP fname);
@@ -37,6 +38,7 @@ SEXP Rsparse_validate(SEXP x);
 SEXP diag_tC_ptr(int n, int *x_p, double *x_x, int *perm, SEXP resultKind);
 SEXP diag_tC(SEXP pslot, SEXP xslot, SEXP perm_slot, SEXP resultKind);
 
+// FIXME: these are nowhere used (are they?)
 SEXP create_Csparse(char* cls, int* i, int* j, int* p, int np,
 		    void* x, int nnz, int* dims, SEXP dimnames,
 		    int index1);
