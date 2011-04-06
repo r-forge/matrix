@@ -97,3 +97,5 @@ ldense.o: ldense.c ldense.h Mutils.h Syms.h
 lgCMatrix.o: lgCMatrix.c lgCMatrix.h Mutils.h Syms.h dgCMatrix.h \
   cs_utils.h cs.h
 sparseQR.o: sparseQR.c sparseQR.h Mutils.h Syms.h cs_utils.h cs.h
+
+sparseVector.o: sparseVector.c Mutils.h t_sparseVector.c
