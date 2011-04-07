@@ -242,6 +242,7 @@
   is simple {and remains sparse, as solve(L) is still block triangular}
 
 - How can we ensure that     inst/include/cholmod.h		 remains
-  correct and equivalent to  src/CHOLMOD/Include/cholmod_core.h  and
-  siblings ???
-  [it is *not* currently]
+  correct and equivalent to  src/CHOLMOD/Include/cholmod_core.h  and  siblings ???
+  {currently need to do this manually (Emacs M-x compare-windows) for the   typedefs}
+
+- finalize and activate the new *unused* code in src/sparseVector.c

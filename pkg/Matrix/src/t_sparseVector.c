@@ -1,7 +1,7 @@
 /*------ Definition of a template for [dilnz]sparseVector_sub(...) : *
  *                       --------     ~~~~~~~~~~~~~~~~~~~~~~
- * i.e., included several times from ./Csparse.c {for now}
- *                                   ~~~~~~~~~~~
+ * i.e., included several times from ./sparseVector.c
+ *                                   ~~~~~~~~~~~~~~~~
  */
 
 /* for all cases with an 'x' slot -- i.e. almost all cases ;
