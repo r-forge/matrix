@@ -24,7 +24,8 @@ mv UFconfig/README.txt ../inst/doc/UFsparse/UFconfig.txt
   ## environment variables but this name is embedded in some Makefiles
 touch UFconfig/UFconfig.mk
   ## Need to add the Matrix-specific changes to UFconfig/UFconfig.h :
-patch -p0 < scripts/UFconfig.patch
+## 2011-04: *no longer* !!
+# patch -p0 < scripts/UFconfig.patch
 
 ## 2) COLAMD -----------------------------------------------
    ## install COLAMD/Source and COLAMD/Include directories

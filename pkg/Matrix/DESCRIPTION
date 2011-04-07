@@ -9,7 +9,7 @@ Description: Classes and methods for dense and sparse matrices and
     operations on them using Lapack and SuiteSparse.
 Depends: R (>= 2.10.0), stats, methods, utils, lattice
 Imports: graphics, grid
-Enhances: MatrixModels, graph, SparseM, sfsmisc
+Enhances: MatrixModels, graph, SparseM (>= 0.87), sfsmisc
 Encoding: UTF-8
 LazyLoad: yes
 LazyData: no
