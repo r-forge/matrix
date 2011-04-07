@@ -120,9 +120,10 @@ sparseMatrix(x = TRUE, i=1:3, j=2:4) # recycling x, |--> "lgCMatrix"
 (e <- sparseMatrix(dims = c(4,6), i={}, j={}))
 
 ## pointers example in converting from other sparse matrix representations.
-if(require(SparseM)) {
-  X <- model.matrix(read.matrix.hb(system.file("data", "rua_32_ax.rua",
-					       package = "SparseM")))
+if(require(SparseM) && packageVersion("SparseM") >= 0.87 &&
+   nzchar(dfil <- system.file("textdata", "rua_32_ax.rua",
+                              package = "SparseM"))) {
+  X <- model.matrix(read.matrix.hb(dfil))
   XX <- sparseMatrix(j = X@ja, p = X@ia - 1L, x = X@ra, dims = X@dimension)
   validObject(XX)
 
