@@ -119,6 +119,7 @@ sparseMatrix(x = TRUE, i=1:3, j=2:4) # recycling x, |--> "lgCMatrix"
 ## an empty sparse matrix:
 (e <- sparseMatrix(dims = c(4,6), i={}, j={}))
 
+\donttest{% as SparseM is "outside"
 ## pointers example in converting from other sparse matrix representations.
 if(require(SparseM) && packageVersion("SparseM") >= 0.87 &&
    nzchar(dfil <- system.file("textdata", "rua_32_ax.rua",
@@ -132,6 +133,7 @@ if(require(SparseM) && packageVersion("SparseM") >= 0.87 &&
   X2 <- as(X, "sparseMatrix")
   stopifnot(identical(XX, X.), identical(X., X2))
 }% if
+}% donttest
 }% example
 \keyword{array}
 
