@@ -60,7 +60,7 @@ relErr <- function(target, current) { ## make this work for 'Matrix'
 ## is.R22 <- (paste(R.version$major, R.version$minor, sep=".") >= "2.2")
 
 pkgRversion <- function(pkgname)
-    substring(packageDescription(pkgname)[["Built"]], 3,5)
+    sub("^R ([0-9.]+).*", "\\1", packageDescription(pkgname)[["Built"]])
 
 showProc.time <- local({
     pct <- proc.time()
