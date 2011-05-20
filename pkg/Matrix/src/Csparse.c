@@ -645,7 +645,7 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
 		       duplicate(i_) : coerceVector(i_, INTSXP)),
 	j_cp = PROTECT((TYPEOF(j_) == INTSXP) ?
 		       duplicate(j_) : coerceVector(j_, INTSXP)),
-	// for d.CMatrix and l.CMatrix  but not n.CMatrix
+	// for d.CMatrix and l.CMatrix  but not n.CMatrix:
 	xslot = GET_SLOT(x, Matrix_xSym);
 
     int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
@@ -657,6 +657,7 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
 	*jj = INTEGER(j_cp), len_j = LENGTH(j_cp),
 	i, j, k;
     int    *val_i = INTEGER(GET_SLOT(value, Matrix_iSym));
+    // for dsparseVector only:
     double *val_x =   REAL (GET_SLOT(value, Matrix_xSym));
     int len_val = asInteger(GET_SLOT(value, Matrix_lengthSym));
     int p_last = xp[0];
@@ -667,6 +668,23 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
 
     PROTECT(ans = duplicate(x));
     for(j = 0; j < ncol; j++) {
+// FIXME
+// ....
+// ....
+// ....
+// ....
+
+
+
+
+
+
+
+// ....
+// ....
+// ....
+// ....
+// ....
     }
     UNPROTECT(3);
     return ans;

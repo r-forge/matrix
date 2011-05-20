@@ -1,4 +1,14 @@
+2011-05-20  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dsCMatrix.R (determinant(<dsCMatrix>): fix for Matrix(0, 1) case.
+
+2011-05-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (sparseMatrix): add 'symmetric' argument.
+
 2011-04-04  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Csparse.c (Csparse_subassign): unfinished prototype
 
 	* src/....: Finally no longer hack "UFlong := int", but rather
 	* src/UFconfig/UFconfig.h: use standard CHOLMOD headers
