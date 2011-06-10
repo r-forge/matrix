@@ -112,6 +112,10 @@ assert.EQ.mat <- function(M, m, tol = if(show) 0 else 1e-15, show=FALSE) {
     else if(!isTRUE(r <- all.equal(MM, m, tol = tol)))
 	stop("all.equal() |->  ", r)
 }
+## a short cut
+assert.EQ.Mat <- function(M, M2, tol = if(show) 0 else 1e-15, show=FALSE)
+    assert.EQ.mat(M, as.mat(M2), tol=tol, show=show)
+
 
 chk.matrix <- function(M) {
     ## check object; including coercion to "matrix" :
