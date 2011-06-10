@@ -142,6 +142,7 @@ mT <- as(mm, "dgTMatrix")
 sC <- Matrix(mT, sparse=TRUE, forceCheck=TRUE)
 
 sym2 <- as(symC, "TsparseMatrix")
+## --> the same as 'symM', a "dsTMatrix"
 \dontshow{
 stopifnot(identical(symC, sC), identical(sym2, symM),
           class(sym2) == "dsTMatrix",
