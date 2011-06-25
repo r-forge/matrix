@@ -1,4 +1,6 @@
 			/* Sparse matrices in compressed column-oriented form */
+
+#include <stdint.h> // C99 for int64_t
 #include "Csparse.h"
 #include "Tsparse.h"
 #include "chm_common.h"
@@ -624,8 +626,9 @@ SEXP Csparse_submatrix(SEXP x, SEXP i, SEXP j)
  */
 SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
 {
+    // TODO: for other classes consider using a trick as  RallocedReal() in ./chm_common.c
     static const char
-	*valid_cM [] = {"dgCMatrix",// the only one, for "the moment", more later
+	*valid_cM [] = {"dgCMatrix",// the only one, for "the moment", .. TODO
 			""},
 	*valid_spv[] = {"dsparseVector",
 			""};
@@ -638,55 +641,212 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
     if (ctype < 0)
 	error(_("invalid class of 'value' in Csparse_subassign()"));
 
-    SEXP ans,
-	pslot = GET_SLOT(x, Matrix_pSym),
-	islot = GET_SLOT(x, Matrix_iSym),
-	i_cp = PROTECT((TYPEOF(i_) == INTSXP) ?
-		       duplicate(i_) : coerceVector(i_, INTSXP)),
-	j_cp = PROTECT((TYPEOF(j_) == INTSXP) ?
-		       duplicate(j_) : coerceVector(j_, INTSXP)),
+    SEXP
+	islot   = GET_SLOT(x, Matrix_iSym),
+	dimslot = GET_SLOT(x, Matrix_DimSym),
+	i_cp = PROTECT(coerceVector(i_, INTSXP)),
+	j_cp = PROTECT(coerceVector(j_, INTSXP));
 	// for d.CMatrix and l.CMatrix  but not n.CMatrix:
-	xslot = GET_SLOT(x, Matrix_xSym);
 
-    int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
-	nrow = dims[0],
-	ncol = dims[1],
-	*xp = INTEGER(pslot),
-	*xi = INTEGER(islot),
-	*ii = INTEGER(i_cp), len_i = LENGTH(i_cp),
-	*jj = INTEGER(j_cp), len_j = LENGTH(j_cp),
-	i, j, k;
-    int    *val_i = INTEGER(GET_SLOT(value, Matrix_iSym));
+    int *dims = INTEGER(dimslot),
+	ncol = dims[1],	/* nrow = dims[0], */
+	*i = INTEGER(i_cp), len_i = LENGTH(i_cp),
+	*j = INTEGER(j_cp), len_j = LENGTH(j_cp),
+	k,
+	nnz_x = LENGTH(islot);
+    int nnz = nnz_x;
+
+#define MATRIX_SUBASSIGN_VERBOSE
+// Temporary hack for debugging --- remove eventually -- FIXME
+#ifdef MATRIX_SUBASSIGN_VERBOSE
+    Rboolean verbose = i[0] < 0;
+    if(verbose) i[0] = -i[0];
+#endif
+
+    SEXP val_i_slot;
+    PROTECT(val_i_slot = coerceVector(GET_SLOT(value, Matrix_iSym), REALSXP));
+    double *val_i = REAL(val_i_slot);
+    int nnz_val =  LENGTH(GET_SLOT(value, Matrix_iSym));
     // for dsparseVector only:
     double *val_x =   REAL (GET_SLOT(value, Matrix_xSym));
-    int len_val = asInteger(GET_SLOT(value, Matrix_lengthSym));
-    int p_last = xp[0];
+    int64_t len_val = (int64_t) asReal(GET_SLOT(value, Matrix_lengthSym));
+    /* llen_i = (int64_t) len_i; */
 
+    double z_ans = 0.;
+
+    SEXP ans;
+    /* Instead of simple "duplicate": PROTECT(ans = duplicate(x)) , build up: */
+    ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix" /* <- TODO*/)));
+    SET_SLOT(ans, Matrix_DimSym,      duplicate(dimslot));
+    SET_SLOT(ans, Matrix_DimNamesSym, duplicate(GET_SLOT(x, Matrix_DimNamesSym)));
+    SET_SLOT(ans, Matrix_pSym,        duplicate(GET_SLOT(x, Matrix_pSym)));
+    SEXP r_pslot = GET_SLOT(ans, Matrix_pSym);
+    // and assign the i- and x- slots at the end, as they are potentially modified
+    // not just in content, but also in their *length*
+    int	*rp = INTEGER(r_pslot),
+	*ri = Calloc(nnz_x, int);       // to contain the final i - slot
     // for d.CMatrix only:
-    double *xx = REAL(xslot);
-    double ind; // the index that goes all the way from 1:(len_i * len_j)
+    double *rx = Calloc(nnz_x, double); // to contain the final x - slot
+    Memcpy(ri, INTEGER(islot), nnz_x);
+    Memcpy(rx, REAL(GET_SLOT(x, Matrix_xSym)), nnz_x);
+    // NB:  nnz_x : will always be the "current allocated length" of (i, x) slots
+    // --   nnz   : the current *used* length; always   nnz <= nnz_x
 
-    PROTECT(ans = duplicate(x));
-    for(j = 0; j < ncol; j++) {
-// FIXME
-// ....
-// ....
-// ....
-// ....
+    int jj, j_val = 0; // in "running" conceptionally through all value[i+ jj*len_i]
+    // values, we are "below"/"before" the (j_val)-th non-zero one.
+    // e.g. if value = (0,0,...,0), have nnz_val == 0, j_val must remain == 0
+    int64_t ii_val;// == "running" index (i + jj*len_i) % len_val for value[]
+    for(jj = 0, ii_val=0; jj < len_j; jj++) {
+	int j__ = j[jj];
+	/* int64_t j_l = jj * llen_i; */
+	R_CheckUserInterrupt();
+	for(int ii = 0; ii < len_i; ii++, ii_val++) {
+	    int i__ = i[ii], p1, p2;
+	    if(nnz_val && ii_val >= len_val) { // "recycle" indexing into value[]
+		ii_val -= len_val; // = (ii + jj*len_i) % len_val
+		j_val = 0;
+	    }
+	    int64_t ii_v1;//= ii_val + 1;
+	    double v, /* := value[(ii + j_l) % len_val]
+			 = dsparseVector_sub((ii + j_l) % len_val,
+			                     nnz_val, val_i, val_x, len_val)
+		      */
+		M_ij;
+	    int ind;
+	    Rboolean have_entry = FALSE;
 
+	    // note that rp[]'s may have *changed* even when 'j' remained!
+	    // "FIXME": do this only *when* rp[] has changed
+	    p1 = rp[j__], p2 = rp[j__ + 1];
 
+	    // v :=  value[(ii + j_l) % len_val] = value[ii_val]
+	    v = z_ans;
+	    if(j_val < nnz_val) { // maybe find v := non-zero value[ii_val]
+		ii_v1 = ii_val + 1;
+		if(ii_v1 < val_i[j_val]) { // typical case: are still in zero-stretch
+		    v = z_ans; // v = 0
+		} else if(ii_v1 == val_i[j_val]) { // have a match
+		    v = val_x[j_val];
+		    j_val++;// from now on, look at the next non-zero entry
+		} else { //  ii_v1 > val_i[j_val]
+		    REprintf("programming thinko in Csparse_subassign(*, i=%d,j=%d): ii_v=%d, v@i[j_val=%ld]=%g\n",
+			     i__,j__, ii_v1, j_val, val_i[j_val]);
+		    j_val++;// from now on, look at the next non-zero entry
+		}
+	    }
+	    // --------------- M_ij := getM(i., j.) --------------------------------
+	    M_ij = z_ans; // as in  ./t_sparseVector.c
+	    for(ind = p1; ind < p2; ind++) {
+		if(ri[ind] >= i__) {
+		    if(ri[ind] == i__) {
+			M_ij = rx[ind];
+#ifdef MATRIX_SUBASSIGN_VERBOSE
+			if(verbose) REprintf("have entry x[%d, %d] = %g\n",
+					     i__, j__, M_ij);
+#endif
+			have_entry = TRUE;
+		    } else { // ri[ind] > i__
+#ifdef MATRIX_SUBASSIGN_VERBOSE
+			if(verbose)
+			    REprintf("@i > i__ = %d --> ind-- = %d\n", i__, ind);
+#endif
+		    }
+		    break;
+		}
+	    }
 
+	    //-- R:  if(getM(i., j.) != (v <- getV(ii, jj)))
 
+	    if(M_ij != v) { // contents differ ==> value needs to be changed
+#ifdef MATRIX_SUBASSIGN_VERBOSE
+		if(verbose)
+		    REprintf("setting x[%d, %d] <- %g", i__,j__, v);
+#endif
+		// (otherwise: nothing to do):
+		// setM(i__, j__, v)
+		// ----------------------------------------------------------
 
+		// Case I --------------------------------------------
+/* 		if(v == z_ans) { // remove x[i, j] = M_ij  which we know is *non*-zero */
+/* 		    // we know : have_entry = TRUE ; */
+/* 		    //  ri[ind] == i__; M_ij = rx[ind]; */
+/* #ifdef MATRIX_SUBASSIGN_VERBOSE */
+/* 		    if(verbose) */
+/* 		    	REprintf(" rm ind=%d\n", ind); */
+/* #endif */
+/* 		    // remove the 'ind'-th element from x@i and x@x : */
+/* 		    nnz-- ; */
+/* 		    for(k=ind; k < nnz; k++) { */
+/* 			ri[k] = ri[k+1]; */
+/* 			rx[k] = rx[k+1]; */
+/* 		    } */
+/* 		    for(k=j__ + 1; k <= ncol; k++) { */
+/* 			rp[k] = rp[k] - 1; */
+/* 		    } */
+/* 		} */
+/* 		else  */
+  	        if(have_entry) {
+		    // Case II ----- replace (non-empty) x[i,j] by v -------
+#ifdef MATRIX_SUBASSIGN_VERBOSE
+		    if(verbose)
+		    	REprintf(" repl.  ind=%d\n", ind);
+#endif
+		    rx[ind] = v;
+		} else {
+		    // Case III ---- v != 0 : insert v into "empty" x[i,j] ----
 
+		    // extend the  i  and  x  slot by one entry : ---------------------
 
-// ....
-// ....
-// ....
-// ....
-// ....
-    }
-    UNPROTECT(3);
+		    if(nnz+1 > nnz_x) { // need to reallocate:
+#ifdef MATRIX_SUBASSIGN_VERBOSE
+			if(verbose) REprintf(" Realloc()ing: nnz_x=%d", nnz_x);
+#endif
+			// do it "only" 1x,..4x at the very most increasing by the
+			// nnz-length of "value":
+			nnz_x += (1 + nnz_val / 4);
+#ifdef MATRIX_SUBASSIGN_VERBOSE
+			if(verbose) REprintf("(nnz_v=%d) --> %d ", nnz_val, nnz_x);
+#endif
+			// C doc on realloc() says that the old content is *preserve*d
+			ri = Realloc(ri, nnz_x, int);
+			rx = Realloc(rx, nnz_x, double);
+		    }
+
+		    // 3) fill them ...
+
+		    int i1 = ind;
+#ifdef MATRIX_SUBASSIGN_VERBOSE
+		    if(verbose)
+		    	REprintf(" INSERT p12=(%d,%d) -> ind=%d -> i1 = %d\n",
+		    		 p1,p2, ind, i1);
+#endif
+
+		    // shift the "upper values" *before* the insertion:
+		    for(int l = nnz-1; l >= i1; l--) {
+			ri[l+1] = ri[l];
+			rx[l+1] = rx[l];
+		    }
+		    ri[i1] = i__;
+		    rx[i1] = v;
+		    nnz++;
+
+		    // the columns j "right" of the current one :
+		    for(k=j__ + 1; k <= ncol; k++)
+			rp[k]++;
+		}
+	    }
+#ifdef MATRIX_SUBASSIGN_VERBOSE
+	    else if(verbose) REprintf("M_ij == v = %g\n", v);
+#endif
+	}// for( ii )
+    }// for( jj )
+
+    // now assign the i- and x- slots,  free memory and return :
+    Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_iSym,  INTSXP, nnz)), ri, nnz);
+    Memcpy(   REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, nnz)), rx, nnz);
+    Free(ri);
+    Free(rx);
+    UNPROTECT(4);
     return ans;
 }
 

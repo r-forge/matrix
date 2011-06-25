@@ -268,6 +268,14 @@ replCmat <- function (x, i, j, ..., value)
 	}
     }
 
+    if(extends(clDx, "dMatrix")) {
+	has.x <- TRUE
+	x <- .Call(Csparse_subassign,
+                   if(clx == "dgCMatrix")x else as(x, "dgCMatrix"),
+                   i1, i2,
+                   as(value, "dsparseVector"))
+    }
+    else {
     xj <- .Call(Matrix_expand_pointers, x@p)
     sel <- (!is.na(match(x@i, i1)) &
 	    !is.na(match( xj, i2)))
@@ -309,11 +317,11 @@ replCmat <- function (x, i, j, ..., value)
 	x[i, ] <- value
     else
 	x[i,j] <- value
-
     if(extends(clDx, "compMatrix") && length(x@factors)) # drop cashed ones
 	x@factors <- list()
+}# else{ not using new memory-sparse  code
     if(has.x && any(is0(x@x))) ## drop all values that "happen to be 0"
-	drop0(x)
+	as_CspClass(drop0(x), clx)
     else as_CspClass(x, clx)
 } ## replCmat
 

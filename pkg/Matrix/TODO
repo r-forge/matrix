@@ -1,3 +1,7 @@
+- Arm twisting ... and other convincing arguments by R core fellows:
+  ==>  R/zzz.R --- do NOT redefine base, but define an S3 method
+       ------- for as.array() etc
+
 - Check for DimNames propagation in coercion and other operations.
 
 - Report the problem in the Linux ldexp manual page.  The second and
