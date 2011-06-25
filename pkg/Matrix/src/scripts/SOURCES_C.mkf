@@ -25,5 +25,4 @@ SOURCES_C =  \
 	    ldense.c \
 	    lgCMatrix.c \
 	    sparseQR.c \
-	    sparseVector.c \
 	    abIndex.c

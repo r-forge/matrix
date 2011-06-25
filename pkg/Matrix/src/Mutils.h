@@ -211,7 +211,7 @@ int* expand_cmprPt(int ncol, const int mp[], int mj[])
 /**
  * Check if slot(obj, "x") contains any NA (or NaN).
  *
- * @param obj   a 'Matrix' object with an 'x' slot.
+ * @param obj   a 'Matrix' object with a (double precision) 'x' slot.
  *
  * @return Rboolean :== any(is.na(slot(obj, "x") )
  */
@@ -284,6 +284,35 @@ int Matrix_check_class_and_super(SEXP x, const char **valid, SEXP rho);
 #else
 # define Matrix_check_class_and_super R_check_class_and_super
 #endif
+
+
+/** Accessing  *sparseVectors :  fast (and recycling)  v[i] for v = ?sparseVector:
+ * -> ./sparseVector.c  -> ./t_sparseVector.c :
+ */
+// Type_ans sparseVector_sub(int64_t i, int nnz_v, int* v_i, Type_ans* v_x, int len_v):
+
+/* Define all of
+ *  dsparseVector_sub(....)
+ *  isparseVector_sub(....)
+ *  lsparseVector_sub(....)
+ *  nsparseVector_sub(....)
+ *  zsparseVector_sub(....)
+ */
+#define _dspV_
+#include "t_sparseVector.c"
+
+#define _ispV_
+#include "t_sparseVector.c"
+
+#define _lspV_
+#include "t_sparseVector.c"
+
+#define _nspV_
+#include "t_sparseVector.c"
+
+#define _zspV_
+#include "t_sparseVector.c"
+
 
 #ifdef __cplusplus
 }
