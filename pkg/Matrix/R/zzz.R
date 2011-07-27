@@ -35,7 +35,7 @@
     ## -----------> ?? performance hit ?? in mantelhaen.test() ??
     ##
     ## This is formally identical to the base definition, but should use the
-    ## generic kronecker
+    ## generic kronecker (and hence our kronecker() methods for our matrices):
     assignInNamespace("%x%", function (X, Y) kronecker(X, Y), ns = "base")
 
     ## Hack needed, as C-level  eval / findFun seems not to work with

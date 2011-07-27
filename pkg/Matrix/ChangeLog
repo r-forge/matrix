@@ -1,3 +1,7 @@
+2011-07-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/nearPD.R: allow 'ensureSymmetry' argument for speedup.
+
 2011-06-10  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/diagMatrix.R (Cspdiagprod, diagCspprod): fixup for symmetric
