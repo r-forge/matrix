@@ -62,11 +62,12 @@ relErr <- function(target, current) { ## make this work for 'Matrix'
 pkgRversion <- function(pkgname)
     sub("^R ([0-9.]+).*", "\\1", packageDescription(pkgname)[["Built"]])
 
-showProc.time <- local({
+showProc.time <- local({ ## function + 'pct' variable
     pct <- proc.time()
-    function() { ## CPU elapsed __since last called__
+    function(final="\n") { ## CPU elapsed __since last called__
 	ot <- pct ; pct <<- proc.time()
-	cat('Time elapsed: ', (pct - ot)[1:3],'\n')
+	## 'Time ..' *not* to be translated:  tools::Rdiff() skips its lines!
+	cat('Time elapsed: ', (pct - ot)[1:3], final)
     }
 })
 
