@@ -1,3 +1,9 @@
+2011-07-29  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/dgTMatrix.R (image): add 'useRaster = FALSE' argument,
+	providing the possibility of using raster (instead of rectangle
+	drawing vector) images.
+
 2011-07-27  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/nearPD.R: allow 'ensureSymmetry' argument for speedup.
