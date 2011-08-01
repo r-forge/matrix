@@ -628,17 +628,19 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
 {
     // TODO: for other classes consider using a trick as  RallocedReal() in ./chm_common.c
     static const char
-	*valid_cM [] = {"dgCMatrix",// the only one, for "the moment", .. TODO
-			""},
+	*valid_cM [] = { // the only ones, for "the moment". FIXME: extend (!)
+	"dgCMatrix",// 0
+	"dtCMatrix",// 1
+	""},
+	// value: assume a  "dsparseVector" for now -- slots: (i, length, x)
 	*valid_spv[] = {"dsparseVector",
 			""};
 
-    int ctype = Matrix_check_class_etc(x, valid_cM);
-    if (ctype < 0)
+    int ctype_x = Matrix_check_class_etc(x, valid_cM),
+	ctype_v = Matrix_check_class_etc(value, valid_spv);
+    if (ctype_x < 0)
 	error(_("invalid class of 'x' in Csparse_subassign()"));
-    // value: assume a  "dsparseVector" for now -- slots: (i, length, x)
-    ctype = Matrix_check_class_etc(value, valid_spv);
-    if (ctype < 0)
+    if (ctype_v < 0)
 	error(_("invalid class of 'value' in Csparse_subassign()"));
 
     SEXP
@@ -676,7 +678,8 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
 
     SEXP ans;
     /* Instead of simple "duplicate": PROTECT(ans = duplicate(x)) , build up: */
-    ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgCMatrix" /* <- TODO*/)));
+    // Assuming that ans will have the same basic Matrix type as x :
+    ans = PROTECT(NEW_OBJECT(MAKE_CLASS(valid_cM[ctype_x])));
     SET_SLOT(ans, Matrix_DimSym,      duplicate(dimslot));
     SET_SLOT(ans, Matrix_DimNamesSym, duplicate(GET_SLOT(x, Matrix_DimNamesSym)));
     SET_SLOT(ans, Matrix_pSym,        duplicate(GET_SLOT(x, Matrix_pSym)));
@@ -768,6 +771,8 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
 
 		// Case I --------------------------------------------
 /* 		if(v == z_ans) { // remove x[i, j] = M_ij  which we know is *non*-zero */
+//-------- Better (memory-management) *NOT* to remove, but rather at the very end
+//         currently using  drop0() in R code
 /* 		    // we know : have_entry = TRUE ; */
 /* 		    //  ri[ind] == i__; M_ij = rx[ind]; */
 /* #ifdef MATRIX_SUBASSIGN_VERBOSE */
@@ -841,6 +846,10 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
 	}// for( ii )
     }// for( jj )
 
+    if(ctype_x == 1) { // triangularMatrix: copy the 'diag' and 'uplo' slots
+	SET_SLOT(ans, Matrix_uploSym, duplicate(GET_SLOT(x, Matrix_uploSym)));
+	SET_SLOT(ans, Matrix_diagSym, duplicate(GET_SLOT(x, Matrix_diagSym)));
+    }
     // now assign the i- and x- slots,  free memory and return :
     Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_iSym,  INTSXP, nnz)), ri, nnz);
     Memcpy(   REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, nnz)), rx, nnz);

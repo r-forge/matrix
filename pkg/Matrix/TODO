@@ -1,6 +1,5 @@
-- Arm twisting ... and other convincing arguments by R core fellows:
-  ==>  R/zzz.R --- do NOT redefine base, but define an S3 method
-       ------- for as.array() etc
+- R/zzz.R : Remove the  '%*%'  base assignInNamespace hack --
+  	  as soon as R's  '%*%'  is properly generic  // or itself calls the generic kronecker()
 
 - Check for DimNames propagation in coercion and other operations.
 
