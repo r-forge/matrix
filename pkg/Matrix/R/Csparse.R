@@ -271,7 +271,8 @@ replCmat <- function (x, i, j, ..., value)
     if(extends(clDx, "dMatrix")) {
 	has.x <- TRUE
 	x <- .Call(Csparse_subassign,
-                   if(clx == "dgCMatrix")x else as(x, "dgCMatrix"),
+                   if(clx %in% c("dgCMatrix", "dtCMatrix"))x
+                   else as(x, "dgCMatrix"),
                    i1, i2,
                    as(value, "dsparseVector"))
     }
@@ -308,8 +309,9 @@ replCmat <- function (x, i, j, ..., value)
     }
     ## else go via Tsparse.. {FIXME: a waste! - we already have 'xj' ..}
     ## and inside  Tsparse... the above i1, i2,..., sel  are *all* redone!
-## Happens too often:
-##     Matrix.msg("wasteful C -> T -> C in replCmat(x,i,j,v) for <sparse>[i,j] <- v")
+## Happens too often {not anymore, I hope!}
+##
+    Matrix.msg("wasteful C -> T -> C in replCmat(x,i,j,v) for <sparse>[i,j] <- v")
     x <- as(x, "TsparseMatrix")
     if(missing(i))
 	x[ ,j] <- value
