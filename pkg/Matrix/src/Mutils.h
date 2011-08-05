@@ -7,6 +7,7 @@
 extern "C" {
 #endif
 
+#include <stdint.h> // C99 for int64_t
 #include <ctype.h>
 #include <R.h>  /* includes Rconfig.h */
 #include <Rversion.h>
