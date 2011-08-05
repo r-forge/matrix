@@ -383,6 +383,7 @@ replTmat <- function (x, i, j, ..., value)
 	return(x)
     }
     ## nargs() == 4 :  x[i,j] <- value
+    ## --------------------------------------------------------------------------
     lenV <- length(value)
     Matrix.msg(".. replTmat(x,i,j,v): nargs()= 4; cl.(x)=",
 	       class(x),"; len.(value)=", lenV,"; ",
@@ -403,6 +404,7 @@ replTmat <- function (x, i, j, ..., value)
     if(lenRepl %% lenV != 0)
         stop("number of items to replace is not a multiple of replacement length")
     ## Now deal with duplicated / repeated indices: "last one wins"
+    ## FIXME: this is also disastrous ("dense") for large lenRepl
     if(!iMi && any(dup <- duplicated(i1, fromLast = TRUE))) { ## duplicated rows
         keep <- !dup
         i1 <- i1[keep]

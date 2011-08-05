@@ -1,5 +1,8 @@
 2011-08-05  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* R/sparseVector.R (head): method; used in a few cases, eliminating
+	two FIXMEs.
+
 	* DESCRIPTION (Version): 0.9996875-1
 
 	* R/ngTMatrix.R: stop() instead of warning() when NA's are coerced.
