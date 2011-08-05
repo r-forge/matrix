@@ -1,7 +1,7 @@
 /*------ Definition of a template for [dilnz]sparseVector_sub(...) : *
  *                       --------     ~~~~~~~~~~~~~~~~~~~~~~
- * i.e., included several times from ./sparseVector.c
- *                                   ~~~~~~~~~~~~~~~~
+ * i.e., included several times from ./Mutils.h
+ *                                     ~~~~~~~~
  */
 
 /* for all cases with an 'x' slot -- i.e. almost all cases ;
@@ -85,11 +85,13 @@ static Rcomplex cmplx_zero() {
     z.r = z.i = 0.;
     return z;
 }
+#ifdef _using_NA_ans // <-- get rid of "non-used" warning message
 static Rcomplex cmplx_NA() {
     Rcomplex z;
     z.r = z.i = NA_REAL;
     return z;
 }
+#endif
 
 # define Type_ans Rcomplex
 # define STYP_ans COMPLEX

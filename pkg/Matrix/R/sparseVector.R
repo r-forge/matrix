@@ -112,6 +112,9 @@ setAs("sparseVector", "logical", function(from) sp2vec(from, mode = "logical"))
 ## the "catch all remaining" method:
 setAs("ANY", "sparseVector",
       function(from) as(as.vector(from), "sparseVector"))
+## "nsparse*" is special -- by default "lsparseVector" are produced
+setAs("ANY", "nsparseVector",
+      function(from) as(as(from, "sparseVector"),"nsparseVector"))
 
 setAs("diagonalMatrix", "sparseVector",
       function(from) {

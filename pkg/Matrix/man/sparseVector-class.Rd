@@ -41,6 +41,7 @@
 \alias{Summary,nsparseVector-method}
 %
 \alias{coerce,ANY,sparseVector-method}
+\alias{coerce,ANY,nsparseVector-method}
 \alias{coerce,CsparseMatrix,sparseVector-method}
 \alias{coerce,TsparseMatrix,sparseVector-method}
 \alias{coerce,sparseMatrix,sparseVector-method}

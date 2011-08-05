@@ -107,6 +107,7 @@
        n >= 46341 == ceiling(2^15.5)
   This is "the same" as Ashley Ford's report (25 Feb 2010),
   MM @ ~/R/MM/Pkg-ex/Matrix/nsp-2col-index-bug.R
+  --> This no longer happens for CsparseMat.. (but still for Tsparse*)
 
 - examples for solve( Cholesky(.), b, system = c("A", "LDLt"....))
   probably rather in man/CHMfactor-class.Rd than man/Cholesky.Rd
@@ -127,7 +128,10 @@
   we should also provide a generic and methods.
 - diag(A %*% B) might look like a "generalization" of tr(A %*% B),
   but as the above tricks show, is not really.
-  Still, it's well worth to provide  diag.prod(A, B)
+  Still, it's well worth to provide  diag.prod(A, B):
+
+  Well, if A %*% B is square,   diag(A %*% B)  ===  colSums(t(A) * B)
+  and we should probably teach people about that !
 
 - qr.R(qr(x)) may differ for the "same" matrix, depending on it being
   sparse or dense:
