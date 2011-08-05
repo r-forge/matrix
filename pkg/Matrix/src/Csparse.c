@@ -1,6 +1,5 @@
 			/* Sparse matrices in compressed column-oriented form */
 
-#include <stdint.h> // C99 for int64_t
 #include "Csparse.h"
 #include "Tsparse.h"
 #include "chm_common.h"
