@@ -1,3 +1,13 @@
+2011-08-05  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.9996875-1
+
+	* R/ngTMatrix.R: stop() instead of warning() when NA's are coerced.
+	* R/Csparse.R, R/Tsparse.R
+	* src/t_Csparse_subassign.c, src/Csparse.c: <Csparse>[..] <- val
+	now works via .Call(*Csparse_subassign, ...) and no longer suffers
+	from unnecessary memory-blowup.
+
 2011-07-29  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/dgTMatrix.R (image): add 'useRaster = FALSE' argument,

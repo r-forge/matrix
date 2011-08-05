@@ -292,10 +292,17 @@ replTmat <- function (x, i, j, ..., value)
     jMi <- missing(j)
     ## "FIXME": could pass this (and much ? more) when this function would not *be* a
     ## method but be *called* from methods
-    spV <- is(value, "sparseVector")
+
+    clDv <- getClassDef(clV <- class(value))
+    spV <- extends(clDv, "sparseVector")
     ## own version of all0() that works both for sparseVector and atomic vectors:
     .all0 <- function(v) if(spV) length(v@i) == 0 else all0(v)
-
+    delayedAssign("value.is.logical",
+                  if(spV) {
+                      extends(clDv, "lsparseVector") || extends(clDv, "nsparseVector")
+                  } else {
+                      is.logical(value) || is.logical(as.vector(value))
+                  })
     na <- nargs()
     if(na == 3) { ## i = vector (but *not* 2-col) indexing"  M[i] <- v
 	Matrix.msg("diagnosing replTmat(x,i,j,v): nargs()= 3; ",
@@ -332,6 +339,10 @@ replTmat <- function (x, i, j, ..., value)
         clx <- class(x)
         clDx <- getClassDef(clx) # extends(), is() etc all use the class definition
         has.x <- "x" %in% slotNames(clDx) # === slotNames(x)
+	if(!has.x && # <==> "n.TMatrix"
+	   ((iNA <- any(is.na(value))) || !value.is.logical))
+	    warning(gettextf("x[.] <- val: x is \"%s\", val not in {TRUE, FALSE} is coerced%s.",
+			     clx, if(iNA) " NA |--> TRUE" else ""))
 
 	## now have 0-based indices   x.i (entries) and	 i (new entries)
 
@@ -435,8 +446,7 @@ replTmat <- function (x, i, j, ..., value)
             # later, we will consider only those indices above / below diagonal:
 	}
 	else toGeneral <- TRUE
-    }
-    else if(extends(clDx, "triangularMatrix")) {
+    } else if(extends(clDx, "triangularMatrix")) {
         xU <- x@uplo == "U"
 	r.tri <- ((any(dind == 1) || dind[1] == dind[2]) &&
 		  if(xU) max(i1) <= min(i2) else max(i2) <= min(i1))
@@ -474,11 +484,15 @@ replTmat <- function (x, i, j, ..., value)
 	}
 	return(x)
     }
-
     ## else --  some( value != 0 ) --
     if(lenV > lenRepl)
         stop("too many replacement values")
     ## now have  lenV <= lenRepl
+
+    if(!has.x && # <==> "n.TMatrix"
+       ((iNA <- any(is.na(value))) || !value.is.logical))
+	warning(gettextf("x[.,.] <- val: x is \"%s\", val not in {TRUE, FALSE} is coerced%s.",
+			 clx, if(iNA) " NA |--> TRUE" else ""))
 
     ## another simple, typical case:
     if(lenRepl == 1) {

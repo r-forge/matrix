@@ -125,6 +125,7 @@ extern	 /* stored pointers to symbols initialized in R_init_Matrix */
 
 // Define this "Cholmod compatible" to some degree
 enum x_slot_kind {x_pattern=-1, x_double=0, x_logical=1, x_integer=2, x_complex=3};
+//		    n		  d	      l		   i		z
 
 /* should also work for "matrix" matrices: */
 #define Real_KIND(_x_)	(IS_S4_OBJECT(_x_) ? Real_kind(_x_) : \

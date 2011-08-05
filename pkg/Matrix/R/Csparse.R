@@ -267,61 +267,103 @@ replCmat <- function (x, i, j, ..., value)
 	    x <- as(x, paste(.M.kind(x), "gCMatrix", sep='')) ## & do not redefine clx!
 	}
     }
+    ## Temporary hack for debugging --- remove eventually -- FIXME :
+    ## see also	 MATRIX_SUBASSIGN_VERBOSE in ../src/t_Csparse_subassign.c
+    if(!is.null(v <- getOption("Matrix.subassign.verbose")) && v) {
+	op <- options(Matrix.verbose = 2); on.exit(options(op))
+	## the "hack" to signal "verbose" to the C code:
+	i1[1] <- -i1[1]
+	if(i1[1] == 0)
+	    warning("i1[1] == 0 ==> C-level verbosity will not happen!")
+    }
 
     if(extends(clDx, "dMatrix")) {
 	has.x <- TRUE
-	x <- .Call(Csparse_subassign,
-                   if(clx %in% c("dgCMatrix", "dtCMatrix"))x
-                   else as(x, "dgCMatrix"),
-                   i1, i2,
-                   as(value, "dsparseVector"))
+	x <- .Call(dCsparse_subassign,
+		   if(clx %in% c("dgCMatrix", "dtCMatrix"))x
+		   else as(x, "dgCMatrix"),
+		   i1, i2,
+		   as(value, "sparseVector"))
     }
-    else {
-    xj <- .Call(Matrix_expand_pointers, x@p)
-    sel <- (!is.na(match(x@i, i1)) &
-	    !is.na(match( xj, i2)))
-    has.x <- "x" %in% slotNames(clDx)# === slotNames(x),
-    ## has.x  <==> *not* nonzero-pattern == "nMatrix"
+    else if(extends(clDx, "lMatrix")) {
+	has.x <- TRUE
+	x <- .Call(lCsparse_subassign,
+		   if(clx %in% c("lgCMatrix", "ltCMatrix"))x
+		   else as(x, "lgCMatrix"),
+		   i1, i2,
+		   as(value, "sparseVector"))
+    }
+    else if(extends(clDx, "nMatrix")) {
+	has.x <- FALSE
+	x <- .Call(nCsparse_subassign,
+		   if(clx %in% c("ngCMatrix", "ntCMatrix"))x
+		   else as(x, "ngCMatrix"),
+		   i1, i2,
+		   as(value, "sparseVector"))
+    }
+    else if(extends(clDx, "iMatrix")) {
+	has.x <- TRUE
+	x <- .Call(iCsparse_subassign,
+		   if(clx %in% c("igCMatrix", "itCMatrix"))x
+		   else as(x, "igCMatrix"),
+		   i1, i2,
+		   as(value, "sparseVector"))
+    }
+    else if(extends(clDx, "zMatrix")) {
+	has.x <- TRUE
+	x <- .Call(zCsparse_subassign,
+		   if(clx %in% c("zgCMatrix", "ztCMatrix"))x
+		   else as(x, "zgCMatrix"),
+		   i1, i2,
+		   ## here we only want zsparseVector {to not have to do this in C}:
+		   as(value, "zsparseVector"))
+    }
+    else { ## use "old" code
+	xj <- .Call(Matrix_expand_pointers, x@p)
+	sel <- (!is.na(match(x@i, i1)) &
+		!is.na(match( xj, i2)))
+	has.x <- "x" %in% slotNames(clDx)# === slotNames(x),
+	## has.x  <==> *not* nonzero-pattern == "nMatrix"
 
-    if(has.x && sum(sel) == lenRepl) { ## all entries to be replaced are non-zero:
-        ## need indices instead of just 'sel', for, e.g.,  A[2:1, 2:1] <- v
-	non0 <- cbind(match(x@i[sel], i1),
-		      match(xj [sel], i2)) - 1L
-	iN0 <- 1L + .Call(m_encodeInd, non0, di = dind, checkBounds = FALSE)
+	if(has.x && sum(sel) == lenRepl) { ## all entries to be replaced are non-zero:
+	    ## need indices instead of just 'sel', for, e.g.,  A[2:1, 2:1] <- v
+	    non0 <- cbind(match(x@i[sel], i1),
+			  match(xj [sel], i2)) - 1L
+	    iN0 <- 1L + .Call(m_encodeInd, non0, di = dind, checkBounds = FALSE)
 
-        has0 <-
-            if(spV) length(value@i) < lenV else any(value[!is.na(value)] == 0)
-        if(lenV < lenRepl)
-            value <- rep(value, length = lenRepl)
-	## Ideally we only replace them where value != 0 and drop the value==0
-	## ones; FIXME: see Davis(2006) "2.7 Removing entries", p.16, e.g. use cs_dropzeros()
-        ##       but really could be faster and write something like cs_drop_k(A, k)
-	## v0 <- 0 == value
-	## if (lenRepl == 1) and v0 is TRUE, the following is not doing anything
-	##-  --> ./dgTMatrix.R	and its	 replTmat()
-	## x@x[sel[!v0]] <- value[!v0]
-        x@x[sel] <- as.vector(value[iN0])
+	    has0 <-
+		if(spV) length(value@i) < lenV else any(value[!is.na(value)] == 0)
+	    if(lenV < lenRepl)
+		value <- rep(value, length = lenRepl)
+	    ## Ideally we only replace them where value != 0 and drop the value==0
+	    ## ones; FIXME: see Davis(2006) "2.7 Removing entries", p.16, e.g. use cs_dropzeros()
+	    ##	     but really could be faster and write something like cs_drop_k(A, k)
+	    ## v0 <- 0 == value
+	    ## if (lenRepl == 1) and v0 is TRUE, the following is not doing anything
+	    ##-	 --> ./dgTMatrix.R	and its	 replTmat()
+	    ## x@x[sel[!v0]] <- value[!v0]
+	    x@x[sel] <- as.vector(value[iN0])
+	    if(extends(clDx, "compMatrix") && length(x@factors)) # drop cashed ones
+		x@factors <- list()
+	    if(has0) x <- .Call(Csparse_drop, x, 0)
+
+	    return(if(x.sym) as_CspClass(x, clx) else x)
+	}
+	## else go via Tsparse.. {FIXME: a waste! - we already have 'xj' ..}
+	## and inside  Tsparse... the above i1, i2,..., sel  are *all* redone!
+	## Happens too often {not anymore, I hope!}
+	##
+	Matrix.msg("wasteful C -> T -> C in replCmat(x,i,j,v) for <sparse>[i,j] <- v")
+	x <- as(x, "TsparseMatrix")
+	if(missing(i))
+	    x[ ,j] <- value
+	else if(missing(j))
+	    x[i, ] <- value
+	else
+	    x[i,j] <- value
 	if(extends(clDx, "compMatrix") && length(x@factors)) # drop cashed ones
 	    x@factors <- list()
-        if(has0) x <- .Call(Csparse_drop, x, 0)
-
-	return(if(x.sym) as_CspClass(x, clx) else x)
-    }
-    ## else go via Tsparse.. {FIXME: a waste! - we already have 'xj' ..}
-    ## and inside  Tsparse... the above i1, i2,..., sel  are *all* redone!
-## Happens too often {not anymore, I hope!}
-##
-    Matrix.msg("wasteful C -> T -> C in replCmat(x,i,j,v) for <sparse>[i,j] <- v")
-    x <- as(x, "TsparseMatrix")
-    if(missing(i))
-	x[ ,j] <- value
-    else if(missing(j))
-	x[i, ] <- value
-    else
-	x[i,j] <- value
-    if(extends(clDx, "compMatrix") && length(x@factors)) # drop cashed ones
-	x@factors <- list()
-}# else{ not using new memory-sparse  code
+    }# else{ not using new memory-sparse  code
     if(has.x && any(is0(x@x))) ## drop all values that "happen to be 0"
 	as_CspClass(drop0(x), clx)
     else as_CspClass(x, clx)
