@@ -202,7 +202,7 @@ setMethod("[", signature(x = "CsparseMatrix",
 
 
 ## workhorse for "[<-" -- both for d* and l*  C-sparse matrices :
-## ---------     -----  FIXME(2): keep in sync with replTmat() in ./Tsparse.R
+## ---------     -----
 replCmat <- function (x, i, j, ..., value)
 {
     di <- dim(x)
@@ -218,20 +218,25 @@ replCmat <- function (x, i, j, ..., value)
 	x <- as(x, "TsparseMatrix")
 	x[i] <- value # may change class e.g. from dtT* to dgT*
 	clx <- sub(".Matrix$", "CMatrix", class(x))
-	return(if(any(is0(x@x))) ## drop all values that "happen to be 0"
-	       drop0(x, is.Csparse=FALSE) else as_CspClass(x, clx))
+	if(any(is0(x@x))) ## drop all values that "happen to be 0"
+	    drop0(x, is.Csparse=FALSE) else as_CspClass(x, clx)
     }
-    ## nargs() == 4 :
+    else ## nargs() == 4 :
+	replCmat4(x,
+		  i1 = if(iMi) 0:(di[1] - 1L) else .ind.prep2(i, 1, di, dn),
+		  i2 = if(jMi) 0:(di[2] - 1L) else .ind.prep2(j, 2, di, dn),
+                  iMi=iMi, jMi=jMi, value=value, spV=spV)
+} ## replCmat
 
-    lenV <- length(value)
-    i1 <- if(iMi) 0:(di[1] - 1L) else .ind.prep2(i, 1, di, dn)
-    i2 <- if(jMi) 0:(di[2] - 1L) else .ind.prep2(j, 2, di, dn)
+replCmat4 <- function(x, i1, i2, iMi, jMi, value, spV = is(value,"sparseVector"))
+{
     dind <- c(length(i1), length(i2)) # dimension of replacement region
     lenRepl <- prod(dind)
+    lenV <- length(value)
     if(lenV == 0) {
-        if(lenRepl != 0)
-            stop("nothing to replace with")
-        else return(x)
+	if(lenRepl != 0)
+	    stop("nothing to replace with")
+	else return(x)
     }
     ## else: lenV := length(value)	 is > 0
     if(lenRepl %% lenV != 0)
@@ -256,12 +261,12 @@ replCmat <- function (x, i, j, ..., value)
 	x <- .Call(Csparse_symmetric_to_general, x) ## but do *not* redefine clx!
     }
     else if(extends(clDx, "triangularMatrix")) {
-        xU <- x@uplo == "U"
+	xU <- x@uplo == "U"
 	r.tri <- ((any(dind == 1) || dind[1] == dind[2]) &&
 		  if(xU) max(i1) <= min(i2) else max(i2) <= min(i1))
 	if(r.tri) { ## result is *still* triangular
-            if(any(i1 == i2)) # diagonal will be changed
-                x <- diagU2N(x) # keeps class (!)
+	    if(any(i1 == i2)) # diagonal will be changed
+		x <- diagU2N(x) # keeps class (!)
 	}
 	else { # go to "generalMatrix" and continue
 	    x <- as(x, paste(.M.kind(x), "gCMatrix", sep='')) ## & do not redefine clx!
@@ -318,7 +323,15 @@ replCmat <- function (x, i, j, ..., value)
 		   ## here we only want zsparseVector {to not have to do this in C}:
 		   as(value, "zsparseVector"))
     }
-    else { ## use "old" code
+    else { ## use "old" code ...
+        ## does this happen ? ==>
+	if(identical(Sys.getenv("USER"),"maechler"))## does it still happen? __ FIXME __
+	    stop("using	 \"old code\" part in  Csparse subassignment")
+        ## else
+	warning("using	\"old code\" part in  Csparse subassignment\n",
+		" >>> please report to Matrix-authors@r-project.org",
+		immediate. = TRUE, domain = NA)
+
 	xj <- .Call(Matrix_expand_pointers, x@p)
 	sel <- (!is.na(match(x@i, i1)) &
 		!is.na(match( xj, i2)))
@@ -355,19 +368,19 @@ replCmat <- function (x, i, j, ..., value)
 	##
 	Matrix.msg("wasteful C -> T -> C in replCmat(x,i,j,v) for <sparse>[i,j] <- v")
 	x <- as(x, "TsparseMatrix")
-	if(missing(i))
-	    x[ ,j] <- value
-	else if(missing(j))
-	    x[i, ] <- value
+	if(iMi)
+	    x[ ,i2+1L] <- value
+	else if(jMi)
+	    x[i1+1L, ] <- value
 	else
-	    x[i,j] <- value
+	    x[i1+1L,i2+1L] <- value
 	if(extends(clDx, "compMatrix") && length(x@factors)) # drop cashed ones
 	    x@factors <- list()
     }# else{ not using new memory-sparse  code
     if(has.x && any(is0(x@x))) ## drop all values that "happen to be 0"
 	as_CspClass(drop0(x), clx)
     else as_CspClass(x, clx)
-} ## replCmat
+} ## replCmat4
 
 setReplaceMethod("[", signature(x = "CsparseMatrix", i = "index", j = "missing",
                                 value = "replValue"),
@@ -401,7 +414,7 @@ setReplaceMethod("[", signature(x = "CsparseMatrix", i = "matrix", j = "missing"
 		 ## goto Tsparse modify and convert back:
 		 as(.TM.repl.i.mat(as(x, "TsparseMatrix"), i=i, value=value),
 		    "CsparseMatrix"))
-## more in ./Matrix.R
+## more in ./sparseMatrix.R (and ./Matrix.R )
 
 
 setMethod("t", signature(x = "CsparseMatrix"),
