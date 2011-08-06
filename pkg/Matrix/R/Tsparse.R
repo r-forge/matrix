@@ -402,9 +402,12 @@ replTmat <- function (x, i, j, ..., value)
     }
     ## else: lenV := length(value)	 is > 0
     if(lenRepl %% lenV != 0)
-        stop("number of items to replace is not a multiple of replacement length")
+	stop("number of items to replace is not a multiple of replacement length")
+    if(!spV && lenRepl > 2^16) { # (somewhat arbitrary cutoff)
+	value <- as(value, "sparseVector")# so that subsequent rep(.) are fast
+        spV <- TRUE
+    }
     ## Now deal with duplicated / repeated indices: "last one wins"
-    ## FIXME: this is also disastrous ("dense") for large lenRepl
     if(!iMi && any(dup <- duplicated(i1, fromLast = TRUE))) { ## duplicated rows
         keep <- !dup
         i1 <- i1[keep]
@@ -442,7 +445,7 @@ replTmat <- function (x, i, j, ..., value)
 	r.sym <-
 	    (dind[1] == dind[2] && all(i1 == i2) &&
 	     (lenRepl == 1 || lenV == 1 ||
-	      isSymmetric(value <- mkArray(value, dim=dind))))
+	      isSymmetric(mkArray(value, dim=dind))))
 	if(r.sym) { ## result is *still* symmetric --> keep symmetry!
 	    xU <- x@uplo == "U"
             # later, we will consider only those indices above / below diagonal:
@@ -469,9 +472,9 @@ replTmat <- function (x, i, j, ..., value)
     ## TODO (efficiency): replace  'sel' by 'which(sel)'
     get.ind.sel <- function(ii,ij)
 	(match(x@i, ii, nomatch = 0) & match(x@j, ij, nomatch = 0))
-
     ## sel[k] := TRUE iff k-th non-zero entry (typically x@x[k]) is to be replaced
     sel <- get.ind.sel(i1,i2)
+
     has.x <- "x" %in% slotNames(clDx) # === slotNames(x)
 
     ## the simplest case: for all Tsparse, even for i or j missing
@@ -513,12 +516,25 @@ replTmat <- function (x, i, j, ..., value)
         return(x)
     }
 
-##     if(r.sym) # value already adjusted, see above
-##        lenRepl <- length(value) # shorter (since only "triangle")
-    if(!r.sym && lenV < lenRepl)
-        value <- rep(value, length.out = lenRepl)
+### Otherwise, for large lenRepl, we get into trouble below
 
-    ## now:  length(value) == lenRepl
+    if(lenRepl > 2^20) { # (somewhat arbitrary cutoff)
+## FIXME: just for testing !!
+## if(identical(Sys.getenv("USER"),"maechler")
+##    if(lenRepl > 2) { # __________ ___ JUST for testing! _______________
+	if(is.null(v <- getOption("Matrix.quiet")) || !v)
+	    message(gettextf("x[.,.] <- val : x being coerced from Tsparse* to CsparseMatrix"))
+	return(replCmat4(as(x,"CsparseMatrix"), i1, i2, iMi=iMi, jMi=jMi,
+			 value = if(spV) value else as(value, "sparseVector"),
+			 spV = TRUE))
+    }
+
+    ##     if(r.sym) # value already adjusted, see above
+    ##        lenRepl <- length(value) # shorter (since only "triangle")
+    if(!r.sym && lenV < lenRepl)
+	value <- rep(value, length.out = lenRepl)
+
+    ## now:  length(value) == lenRepl  {but value is sparseVector if it's "long" !}
 
     ## value[1:lenRepl]:  which are structural 0 now, which not?
     ## v0 <- is0(value)
@@ -528,11 +544,17 @@ replTmat <- function (x, i, j, ..., value)
     ## ----- The use of  seq_len(lenRepl) below is *still* inefficient
     ##   (or impossible e.g. when lenRepl == 50000^2)
     ##       and the  vN0 <- isN0(as.vector(value[iI0]))  is even more ...
-    ## try to replace   'seq_len(lenRepl)'  by  'abIseq1(1L, lenRepl)' :
-    ## This 'use.abI' should later depend on the *dimension* of things !
+
+    ## One idea: use "abIndex", (a very efficient storage of index vectors which are
+    ## a concatenation of only a few arithmetic seq()ences
     use.abI <- isTRUE(getOption("Matrix.use.abIndex"))
-    ##>>> abIndex: -- need  <abI>[-n],  <value>[ <abIndex> ] , intersect()
+    ## This 'use.abI' should later depend on the *dimension* of things !
+    ##>>> But for that, we need to implement the following abIndex - "methods":
+    ##>>>   <abI>[-n],  <value>[ <abIndex> ] , intersect(<abI>, <abI>)
+    ## and for intersect(): typically sort(), unique() & similar
+
     iI0 <- if(use.abI) abIseq1(1L, lenRepl) else seq_len(lenRepl)
+
     if(any(sel)) {
 	## the 0-based indices of non-zero entries -- WRT to submatrix
 	non0 <- cbind(match(x@i[sel], i1),
@@ -540,9 +562,11 @@ replTmat <- function (x, i, j, ..., value)
 	iN0 <- 1L + .Call(m_encodeInd, non0, di = dind, FALSE)
 
 	## 1a) replace those that are already non-zero with non-0 values
-	vN0 <- isN0(as.vector(value[iN0]))
-	if(any(vN0) && has.x)
-	    x@x[sel][vN0] <- as.vector(value[iN0[vN0]])
+	vN0 <- isN0(value[iN0])
+	if(any(vN0) && has.x) {
+	    vv0 <- which(vN0)
+	    x@x[sel][vv0] <- as.vector(value[iN0[vv0]])
+	}
 
 	## 1b) replace non-zeros with 0 --> drop entries
 	if(any(!vN0)) {
@@ -569,7 +593,7 @@ replTmat <- function (x, i, j, ..., value)
         }
         full <- length(iI0) == lenRepl
 	vN0 <-
-	    if(!is.atomic(value)) ## <==> "sparseVector"
+	    if(spV) ## "sparseVector"
 		(if(full) value else value[iI0])@i
 	    else which(isN0(if(full) value else value[iI0]))
 	if(length(vN0)) {

@@ -1,5 +1,5 @@
 
-R version 2.13.1 Patched (2011-08-02 r56624)
+R version 2.13.1 Patched (2011-08-05 r56640)
 Copyright (C) 2011 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-unknown-linux-gnu (64-bit)
@@ -125,7 +125,7 @@ diagnosing replTmat(x,i,j,v): nargs()= 3; missing (i,j) = (0,1)
 + 	  identical(a.m, array(v, dim=dim(mn), dimnames=dimnames(mn)))
 + 	  )
 > showProc.time()
-Time elapsed:  0.434 0.002 0.436 
+Time elapsed:  0.593 0.011 0.603 
 > 
 > ## Printing sparse colnames:
 > ms[sample(28, 20)] <- 0
@@ -182,7 +182,7 @@ diagnosing replTmat(x,i,j,v): nargs()= 3; missing (i,j) = (0,1)
 + 	  identical3(m[!sel],  m[!ssel], as.matrix(m)[as.matrix(!ssel)])
 + 	  )
 > showProc.time()
-Time elapsed:  0.093 0 0.093 
+Time elapsed:  0.126 0.002 0.128 
 > 
 > ## more sparse Matrices --------------------------------------
 > 
@@ -214,6 +214,16 @@ Time elapsed:  0.093 0 0.093
 +     if(!show) { op <- options(error = recover); on.exit(options(op)) }
 +     assert.EQ.mat(ms, mm, show=show)
 + }
+> 
+> ## Get duplicated index {because these are "hard" (and rare)
+> getDuplIndex <- function(n, k) {
++     repeat {
++         i <- sample(n, k, replace=TRUE) # 3 4 6 9 2 9 :  9 is twice
++         if(anyDuplicated(i)) break
++     }
++     i
++ }
+> 
 > ## From package 'sfsmisc':
 > repChar <- function (char, no) paste(rep.int(char, no), collapse = "")
 > 
@@ -221,7 +231,7 @@ Time elapsed:  0.093 0 0.093
 > set.seed(101) ; m[sample(800, 600)] <- 0
 > m0 <- Matrix(m, nrow = 40)
 > m1 <- add.simpleDimnames(m0)
-> for(kind in c("n","l", "d")) {
+> for(kind in c("n", "l", "d")) {
 +  for(m in list(m0,m1)) { ## -- with and without dimnames -------------------------
 +     kClass <- paste(kind, "Matrix", sep="")
 +     Ckind <- paste(kind, "gCMatrix", sep="")
@@ -478,7 +488,7 @@ ok( d )
 == ###======================================================================
 
 > showProc.time()
-Time elapsed:  5.083 0.013 5.1 
+Time elapsed:  6.745 0.03 6.788 
 > 
 > ##---- Symmetric indexing of symmetric Matrix ----------
 > m. <- mC
@@ -550,7 +560,7 @@ Time elapsed:  5.083 0.013 5.1
 +     assert.EQ.mat(T[i,i], ss[i,i])
 + }
 > showProc.time()
-Time elapsed:  1.742 0.003 1.746 
+Time elapsed:  2.199 0.004 2.206 
 > 
 > stopifnot(all.equal(mC[,3], mm[,3]),
 + 	  identical(mC[ij], mC[ij + 0.4]),
@@ -754,7 +764,83 @@ diagnosing replTmat(x,i,j,v): nargs()= 3; missing (i,j) = (0,1)
 + 	  all(sm[,-(1:3)] == 0)
 + 	  )
 > showProc.time()
-Time elapsed:  0.299 0.004 0.303 
+Time elapsed:  0.429 0.008 0.439 
+> 
+> ##---  "nsparse*" sub-assignment :----------
+> M <- Matrix(c(1, rep(0,7), 1:4), 3,4)
+> N0 <- kronecker(M,M)
+> Nn <- as(N0, "nMatrix"); nn <- as(Nn,"matrix")
+> (Nn00 <- Nn0 <- Nn); nn00 <- nn0 <- nn
+9 x 16 sparse Matrix of class "ngTMatrix"
+                                     
+ [1,] | . . | . . . . . . . . | . . |
+ [2,] . . . | . . . . . . . . . . . |
+ [3,] . . | | . . . . . . . . . . | |
+ [4,] . . . . . . . . . . . . | . . |
+ [5,] . . . . . . . . . . . . . . . |
+ [6,] . . . . . . . . . . . . . . | |
+ [7,] . . . . . . . . | . . | | . . |
+ [8,] . . . . . . . . . . . | . . . |
+ [9,] . . . . . . . . . . | | . . | |
+> 
+> set.seed(1)
+> Nn0 <- Nn00; nn0 <- nn00
+> for(i in 1:200) {
++     Nn <- Nn0
++     nn <- nn0
++     i. <- getDuplIndex(nrow(N0), 6)
++     j. <- getDuplIndex(ncol(N0), 4)
++     vv <- sample(c(FALSE,TRUE),
++                  length(i.)*length(j.), replace=TRUE)
++     cat(",")
++     Nn[i., j.] <- vv
++     nn[i., j.] <- vv
++     assert.EQ.mat(Nn, nn)
++     if(!all(Nn == nn)) {
++         cat("i=",i,":\n i. <- "); dput(i.)
++         cat("j. <- "); dput(j.)
++         cat("which(vv): "); dput(which(vv))
++         cat("Difference matrix:\n")
++         show(drop0(Nn - nn))
++     }
++     cat("k")
++     ## sub-assign double precision to logical sparseMatrices should error:
++     ## well... warning for now {back compatibility: gave *no* warning, nothing .. !}:
++     assertWarning(Nn[1:2,] <- -pi)
++     assertWarning(Nn[, 5] <- -pi)
++     assertWarning(Nn[2:4, 5:8] <- -pi)
++     ##
++     cat(".")
++     if(i %% 10 == 0) cat("\n")
++     if(i == 100) {
++         Nn0 <- as(Nn0, "CsparseMatrix")
++         cat("Now: class", class(Nn0)," :\n~~~~~~~~~~~~~~~~~\n")
++     }
++ }
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+Now: class ngCMatrix  :
+~~~~~~~~~~~~~~~~~
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+,k.,k.,k.,k.,k.,k.,k.,k.,k.,k.
+> showProc.time()
+Time elapsed:  3.62 0.02 3.647 
 > 
 > m0 <- Diagonal(5)
 > stopifnot(identical(m0[2,], m0[,2]),
@@ -869,7 +955,7 @@ symmpart(m) + skewpart(m) == m: ok;  determinant(): ok
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing (i,j) = (0,1)
 'sub-optimal sparse 'x[i] <- v' assignment: Coercing class dtTMatrix to dgTMatrix
 as(<triangular (ge)matrix>, dtTMatrix): valid: TRUE 
-> stopifnot(isValid(T, "dtTMatrix"), identical(T[,3], c(10,10,10,0,0)))
+> stopifnot(is(T, "triangularMatrix"), identical(T[,3], c(10,10,10,0,0)))
 > 
 > M <- m2; M[1,] <- 0 ; M ; assert.EQ.mat(M, diag(c(0,rep(1,4))), tol=0)
 5 x 5 sparse Matrix of class "dtCMatrix"
@@ -910,7 +996,7 @@ diagnosing replTmat(x,i,j,v): nargs()= 3; missing (i,j) = (0,1)
 as(<triangular (ge)matrix>, dtCMatrix): valid: TRUE 
 > stopifnot(is(T, "dtCMatrix"), identical(T[,3], c(10,10,10,0,0)))
 > showProc.time()
-Time elapsed:  1.27 0.003 1.279 
+Time elapsed:  1.596 0.008 1.607 
 > 
 > 
 > ## "Vector indices" -------------------
@@ -1018,7 +1104,7 @@ diagnosing replTmat(x,i,j,v): nargs()= 3; missing (i,j) = (0,1)
 > ## mixing of negative and positive must give error
 > assertError(mT[-1:1,])
 > showProc.time()
-Time elapsed:  0.176 0.002 0.178 
+Time elapsed:  0.221 0.002 0.223 
 > 
 > ## Sub *Assignment* ---- now works (partially):
 > mt0 <- mt
@@ -1145,7 +1231,7 @@ r1  .
 r3  3
 r5  1
 > showProc.time()
-Time elapsed:  0.973 0.002 0.976 
+Time elapsed:  1.135 0.004 1.14 
 > options(Matrix.verbose = TRUE)
 > 
 > mc # no longer has non-structural zeros
@@ -1366,7 +1452,7 @@ M[i,j] <- v :  coercing symmetric M[] into non-symmetric
 > assert.EQ.mat(t2, m)# ok
 > assert.EQ.mat(s2, m)# failed in 0.9975-8
 > showProc.time()
-Time elapsed:  1.289 0.005 1.295 
+Time elapsed:  1.725 0.011 1.741 
 > 
 > 
 > ## m[cbind(i,j)] <- value: (2-column matrix subassignment):
@@ -1509,7 +1595,7 @@ r5  TRUE TRUE FALSE TRUE TRUE TRUE TRUE
 > 
 > cc <- capture.output(show(dLrg))# show(<diag>) used to error for large n
 > showProc.time()
-Time elapsed:  1.532 0.004 1.537 
+Time elapsed:  1.913 0.019 1.934 
 > 
 > ## Large Matrix indexing / subassignment
 > ## ------------------------------------- (from ex. by Imran Rashid)
@@ -1567,7 +1653,7 @@ attr(,"package")
 + 	  identical(thCol,  fx[,5762]))
 > 
 > showProc.time()
-Time elapsed:  6.677 0.486 7.168 
+Time elapsed:  7.936 1.118 9.064 
 > ##
 > cat("checkMatrix() of all: \n---------\n")
 checkMatrix() of all: 
@@ -1625,6 +1711,25 @@ diagnosing replTmat(x,i,j,v): nargs()= 3; missing (i,j) = (0,1)
 Ms 
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
+N0 
+Nn 
+Nn0 
+Nn00 
+Note: Method with signature "nsparseMatrix#sparseMatrix" chosen for function "==",
+ target signature "ngTMatrix#ngTMatrix".
+ "nMatrix#nMatrix", "sparseMatrix#nsparseMatrix" would also be valid
+Note: Method with signature "nsparseMatrix#sparseMatrix" chosen for function "!=",
+ target signature "ngTMatrix#ngTMatrix".
+ "nMatrix#nMatrix", "sparseMatrix#nsparseMatrix" would also be valid
+Note: Method with signature "nsparseMatrix#sparseMatrix" chosen for function "+",
+ target signature "ngTMatrix#ngTMatrix".
+ "sparseMatrix#nsparseMatrix" would also be valid
+Note: Method with signature "nsparseMatrix#sparseMatrix" chosen for function ">=",
+ target signature "ngTMatrix#ngTMatrix".
+ "nMatrix#nMatrix", "sparseMatrix#nsparseMatrix" would also be valid
+Note: Method with signature "nsparseMatrix#sparseMatrix" chosen for function "<",
+ target signature "ngTMatrix#ngTMatrix".
+ "nMatrix#nMatrix", "sparseMatrix#nsparseMatrix" would also be valid
 R 
 Rs 
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
@@ -1693,21 +1798,6 @@ ne.
 ne1 
 nsel 
 nt 
-Note: Method with signature "nsparseMatrix#sparseMatrix" chosen for function "==",
- target signature "ngTMatrix#ngTMatrix".
- "nMatrix#nMatrix", "sparseMatrix#nsparseMatrix" would also be valid
-Note: Method with signature "nsparseMatrix#sparseMatrix" chosen for function "!=",
- target signature "ngTMatrix#ngTMatrix".
- "nMatrix#nMatrix", "sparseMatrix#nsparseMatrix" would also be valid
-Note: Method with signature "nsparseMatrix#sparseMatrix" chosen for function "+",
- target signature "ngTMatrix#ngTMatrix".
- "sparseMatrix#nsparseMatrix" would also be valid
-Note: Method with signature "nsparseMatrix#sparseMatrix" chosen for function ">=",
- target signature "ngTMatrix#ngTMatrix".
- "nMatrix#nMatrix", "sparseMatrix#nsparseMatrix" would also be valid
-Note: Method with signature "nsparseMatrix#sparseMatrix" chosen for function "<",
- target signature "ngTMatrix#ngTMatrix".
- "nMatrix#nMatrix", "sparseMatrix#nsparseMatrix" would also be valid
 nt. 
 s 
 diagnosing replTmat(x,i,j,v): nargs()= 3; missing (i,j) = (0,1)
@@ -1744,7 +1834,7 @@ suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
 zz 
 > showProc.time()
-Time elapsed:  11.81 0.272 12.1 
+Time elapsed:  16.668 0.573 17.268 
 > 
 > if(!interactive()) warnings()
 NULL

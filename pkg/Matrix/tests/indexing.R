@@ -141,6 +141,16 @@ chkAssign <- function(ms, mm = as(ms, "matrix"),
     if(!show) { op <- options(error = recover); on.exit(options(op)) }
     assert.EQ.mat(ms, mm, show=show)
 }
+
+## Get duplicated index {because these are "hard" (and rare)
+getDuplIndex <- function(n, k) {
+    repeat {
+        i <- sample(n, k, replace=TRUE) # 3 4 6 9 2 9 :  9 is twice
+        if(anyDuplicated(i)) break
+    }
+    i
+}
+
 ## From package 'sfsmisc':
 repChar <- function (char, no) paste(rep.int(char, no), collapse = "")
 
@@ -148,7 +158,7 @@ m <- 1:800
 set.seed(101) ; m[sample(800, 600)] <- 0
 m0 <- Matrix(m, nrow = 40)
 m1 <- add.simpleDimnames(m0)
-for(kind in c("n","l", "d")) {
+for(kind in c("n", "l", "d")) {
  for(m in list(m0,m1)) { ## -- with and without dimnames -------------------------
     kClass <- paste(kind, "Matrix", sep="")
     Ckind <- paste(kind, "gCMatrix", sep="")
@@ -353,6 +363,48 @@ stopifnot(sm[2,] == c(0:1, rep.int(0,ncol(sm)-2)),
 	  )
 showProc.time()
 
+##---  "nsparse*" sub-assignment :----------
+M <- Matrix(c(1, rep(0,7), 1:4), 3,4)
+N0 <- kronecker(M,M)
+Nn <- as(N0, "nMatrix"); nn <- as(Nn,"matrix")
+(Nn00 <- Nn0 <- Nn); nn00 <- nn0 <- nn
+
+set.seed(1)
+Nn0 <- Nn00; nn0 <- nn00
+for(i in 1:200) {
+    Nn <- Nn0
+    nn <- nn0
+    i. <- getDuplIndex(nrow(N0), 6)
+    j. <- getDuplIndex(ncol(N0), 4)
+    vv <- sample(c(FALSE,TRUE),
+                 length(i.)*length(j.), replace=TRUE)
+    cat(",")
+    Nn[i., j.] <- vv
+    nn[i., j.] <- vv
+    assert.EQ.mat(Nn, nn)
+    if(!all(Nn == nn)) {
+        cat("i=",i,":\n i. <- "); dput(i.)
+        cat("j. <- "); dput(j.)
+        cat("which(vv): "); dput(which(vv))
+        cat("Difference matrix:\n")
+        show(drop0(Nn - nn))
+    }
+    cat("k")
+    ## sub-assign double precision to logical sparseMatrices should error:
+    ## well... warning for now {back compatibility: gave *no* warning, nothing .. !}:
+    assertWarning(Nn[1:2,] <- -pi)
+    assertWarning(Nn[, 5] <- -pi)
+    assertWarning(Nn[2:4, 5:8] <- -pi)
+    ##
+    cat(".")
+    if(i %% 10 == 0) cat("\n")
+    if(i == 100) {
+        Nn0 <- as(Nn0, "CsparseMatrix")
+        cat("Now: class", class(Nn0)," :\n~~~~~~~~~~~~~~~~~\n")
+    }
+}
+showProc.time()
+
 m0 <- Diagonal(5)
 stopifnot(identical(m0[2,], m0[,2]),
 	  identical(m0[,1], c(1,0,0,0,0)))
@@ -387,7 +439,7 @@ checkMatrix(M)
 M <- m1; M[1:3, 3] <- 0 ;M
 assert.EQ.mat(M, diag(c(1,1, 0, 1,1)), tol=0)
 T <- m1; T[1:3, 3] <- 10; checkMatrix(T)
-stopifnot(isValid(T, "dtTMatrix"), identical(T[,3], c(10,10,10,0,0)))
+stopifnot(is(T, "triangularMatrix"), identical(T[,3], c(10,10,10,0,0)))
 
 M <- m2; M[1,] <- 0 ; M ; assert.EQ.mat(M, diag(c(0,rep(1,4))), tol=0)
 M <- m2; M[,3] <- 3 ; stopifnot(is(M,"sparseMatrix"), M[,3] == 3)
