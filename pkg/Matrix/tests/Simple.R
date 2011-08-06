@@ -773,3 +773,13 @@ for(nm in ls()) if(is(.m <- get(nm), "Matrix")) {
 cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
 
 if(!interactive()) warnings()
+
+## Platform - and other such info -- so we find it in old saved outputs
+SysI <- Sys.info()
+structure(Sys.info()[c(4,5,1:3)], class="simple.list")
+sessionInfo()
+if(SysI[["sysname"]] == "Linux" && require("sfsmisc")) local({
+    nn <- names(.Sc <- Sys.cpuinfo())
+    nn <- names(.Sc <- .Sc[nn != "flags"])
+    print(.Sc[grep("\\.[0-9]$", nn, invert=TRUE)])
+})
