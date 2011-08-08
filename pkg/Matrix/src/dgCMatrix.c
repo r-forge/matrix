@@ -360,7 +360,7 @@ void install_lu(SEXP Ap, int order, double tol, Rboolean err_sing)
 	    error(_("cs_lu(A) failed: near-singular A (or out of memory)"));
 	else {
 	    /* No warning: The useR should be careful :
-	     * Put  FALSE  into  "LU" factor */
+	     * Put  NA  into  "LU" factor */
 	    set_factors(Ap, ScalarLogical(NA_LOGICAL), "LU");
 	    return;
 	}
@@ -424,7 +424,7 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
     R_CheckStack();
 
     if (isNull(lu = get_factors(Ap, "LU"))) {
-	install_lu(Ap, 1, 1.0, /* err_sing = */ TRUE);
+	install_lu(Ap, /* order = */ 1, /* tol = */ 1.0, /* err_sing = */ TRUE);
 	lu = get_factors(Ap, "LU");
     }
     qslot = GET_SLOT(lu, install("q"));
