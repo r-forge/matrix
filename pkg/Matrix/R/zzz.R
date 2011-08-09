@@ -12,8 +12,9 @@
 
 .onLoad <- function(libname, pkgname)
 {
-    require(methods)
-    require(utils) # -> assignInNamespace {but "anyway"}
+    ## We now 'depend' on these anyway
+    ## require(methods)
+    ## require(utils) # -> assignInNamespace {but "anyway"}
 
     ## GOAL: all the functions in 'base' that start with something like
     ##	"x <- as.matrix(x)" or	"X <- as.array(X)"
