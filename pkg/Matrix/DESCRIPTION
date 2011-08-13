@@ -1,6 +1,6 @@
 Package: Matrix
 Version: 0.9996875-3
-Date: 2011-08-10
+Date: 2011-08-12
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Author: Douglas Bates <bates@stat.wisc.edu> and Martin Maechler <maechler@stat.math.ethz.ch>
@@ -14,6 +14,7 @@ Encoding: UTF-8
 LazyLoad: yes
 LazyData: no
 LazyDataNote: no longer available, since we use data/*.R *and* our classes
+BuildResaveData: no
 License: GPL (>= 2)
 LicenseDetails: The Matrix package includes libraries AMD, CHOLMOD,
  COLAMD, CSparse and SPQR from the SuiteSparse collection of Tim
