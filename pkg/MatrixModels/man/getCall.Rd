@@ -1,3 +1,4 @@
+%%---- can get rid of this, once we require  R >= 2.14.0
 \name{getCall}
 \alias{getCall}
 \alias{getCall}

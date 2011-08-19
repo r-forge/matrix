@@ -1,3 +1,10 @@
+2011-08-19  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.3-0
+
+	* R/modelMatrix.R:
+	* NAMESPACE: only define & export getCall() if R < 2.14
+
 2011-02-17  Douglas Bates <bates@stat.wisc.edu>
 
 	* DESCRIPTION: Remove Encoding: directive.
