@@ -5,6 +5,7 @@
 \docType{class}
 \alias{Model-class}
 \alias{formula,Model-method}
+%% if(getRversion() < "2.14")
 \alias{getCall,Model-method}
 \alias{update,Model-method}
 \description{
@@ -30,8 +31,8 @@
   \describe{
     \item{formula}{\code{signature(x = "Model")}: extract the model
       formula - if there is one, or \code{\link{NULL}}.}
-    \item{getCall}{\code{signature(x = "Model")}: the model generating
-      \code{\link{call}}, here identical to \code{x@call}.}
+    % \item{getCall}{\code{signature(x = "Model")}: the model generating
+    %   \code{\link{call}}, here identical to \code{x@call}.}
     \item{update}{\code{signature(object = "Model")}: Update the model
       with a new formula, new data, \dots\dots etc.  This semantically
       equivalent (and as \R function almost identical) to the standard

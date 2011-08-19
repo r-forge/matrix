@@ -445,8 +445,7 @@ IRLS <- function(mod, control) {
     mod
 }
 
-### FIXME: Think of replacing  stats::update() by this, and provide a
-### -----  stats::getCall() S3 generic (and S4 generic in methods).
+if(getRversion() < "2.14") {##------------- only for R < 2.14 ------------------
 
 ### FIXME(2): lme4a can get rid of its  updateMer(), as soon as it uses this:
 
@@ -481,6 +480,8 @@ updateModel <- function(object, formula., ..., evaluate = TRUE)
 }
 
 setMethod("update", "Model", updateModel)
+}##------------- only for R < 2.14 ---------------------------------------------
+
 setMethod("getCall", "Model", function(x) x@call)
 setMethod("formula", "Model", function(x, ...) x@call$formula)
 setMethod("coef", "glpModel", function(object, ...)

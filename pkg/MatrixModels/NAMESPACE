@@ -50,8 +50,11 @@ importClassesFrom("Matrix",
                   sparseMatrix)
 
 ## Generics and functions defined in this package
+
+if(getRversion() < "2.14")
+    export("getCall")
+
 export(
-       "getCall",
        "glm4",
 #TODO       "lm.fit.sparse",# <- "somewhat experimental"
        "mkRespMod",
@@ -85,10 +88,12 @@ exportClasses(
 
 
 
+if(getRversion() < "2.14") # the stats::getCall() + *.default() is sufficient otherwise
+    exportMethods("getCall")
 exportMethods(## for both own and "other" generics:
-              "getCall"
+
               ## re-export S4 methods, for "stats"-S3-generics:
-              ,"coef", "coefficients" ## , "cov2cor"
+              "coef", "coefficients" ## , "cov2cor"
               ,"fitted", "fitted.values", "formula"
               ,"residuals", "resid"
               ,"update"
