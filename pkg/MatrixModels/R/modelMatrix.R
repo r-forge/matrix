@@ -1,7 +1,7 @@
 ####---- This was part of ../../Matrix/R/spModels.R -- till 2010-07-25
 
 model.Matrix <- function(object, data = environment(object),
-			 contrasts.arg = NULL, xlev = NULL,
+		 contrasts.arg = NULL, xlev = NULL,
 			 sparse = FALSE, drop.unused.levels = FALSE, ...)
 {
     if(sparse) {
@@ -480,9 +480,11 @@ updateModel <- function(object, formula., ..., evaluate = TRUE)
 }
 
 setMethod("update", "Model", updateModel)
-}##------------- only for R < 2.14 ---------------------------------------------
 
 setMethod("getCall", "Model", function(x) x@call)
+
+}##------------- only for R < 2.14 ---------------------------------------------
+
 setMethod("formula", "Model", function(x, ...) x@call$formula)
 setMethod("coef", "glpModel", function(object, ...)
       {
