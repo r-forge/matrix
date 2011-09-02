@@ -26,8 +26,8 @@ importMethodsFrom("Matrix", as.matrix, as.vector, coerce,
                   Cholesky, chol, chol2inv,
                   solve,
                   summary, print,
-                  update
-                  )
+		  update # notably the "CHMfactor" one
+		  )
 
 importClassesFrom("Matrix",
                   CHMfactor,
@@ -88,15 +88,16 @@ exportClasses(
 
 
 
-if(getRversion() < "2.14") # the stats::getCall() + *.default() is sufficient otherwise
+if(getRversion() < "2.14") { # the stats::getCall() + *.default() is sufficient otherwise
     exportMethods("getCall")
+    exportMethods("update")
+}
 exportMethods(## for both own and "other" generics:
 
               ## re-export S4 methods, for "stats"-S3-generics:
               "coef", "coefficients" ## , "cov2cor"
               ,"fitted", "fitted.values", "formula"
               ,"residuals", "resid"
-              ,"update"
 	      ,"print"# print(x, ...) when show(x) is not sufficient
 	      ,"show"
 ## not yet      ,"summary"
