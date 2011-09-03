@@ -247,8 +247,8 @@ SEXP check_scalar_string(SEXP sP, char *vals, char *nm)
 	if (strlen(str) != 1) {
 	    SPRINTF(buf, _("'%s' must have string length 1"), nm);
 	} else {
-	    int i, len, match;
-	    for (i = 0, len = strlen(vals), match = 0; i < len; i++) {
+	    int i, len;
+	    for (i = 0, len = strlen(vals); i < len; i++) {
 		if (str[0] == vals[i])
 		    return R_NilValue;
 	    }
