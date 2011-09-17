@@ -14,6 +14,33 @@ extern "C" {
 # define attribute_hidden
 #endif
 
+// Copied from ../../src/Mutils.h ----------------------------------------
+#define MATRIX_valid_dense			\
+        "dmatrix", "dgeMatrix",			\
+	"lmatrix", "lgeMatrix",			\
+	"nmatrix", "ngeMatrix",			\
+	"zmatrix", "zgeMatrix"
+
+#define MATRIX_valid_Csparse			\
+ "dgCMatrix", "dsCMatrix", "dtCMatrix",		\
+ "lgCMatrix", "lsCMatrix", "ltCMatrix",		\
+ "ngCMatrix", "nsCMatrix", "ntCMatrix",		\
+ "zgCMatrix", "zsCMatrix", "ztCMatrix"
+
+#define MATRIX_valid_Tsparse			\
+ "dgTMatrix", "dsTMatrix", "dtTMatrix",		\
+ "lgTMatrix", "lsTMatrix", "ltTMatrix",		\
+ "ngTMatrix", "nsTMatrix", "ntTMatrix",		\
+ "zgTMatrix", "zsTMatrix", "ztTMatrix"
+
+#define MATRIX_valid_Rsparse			\
+ "dgRMatrix", "dsRMatrix", "dtRMatrix",		\
+ "lgRMatrix", "lsRMatrix", "ltRMatrix",		\
+ "ngRMatrix", "nsRMatrix", "ntRMatrix",		\
+ "zgRMatrix", "zsRMatrix", "ztRMatrix"
+
+#define MATRIX_valid_CHMfactor "dCHMsuper", "dCHMsimpl", "nCHMsuper", "nCHMsimpl"
+
 CHM_SP M_as_cholmod_sparse (CHM_SP ans, SEXP x, Rboolean check_Udiag, Rboolean sort_in_place);
 CHM_TR M_as_cholmod_triplet(CHM_TR ans, SEXP x, Rboolean check_Udiag);
 CHM_DN M_as_cholmod_dense(CHM_DN ans, SEXP x);
