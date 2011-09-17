@@ -2,9 +2,13 @@
 #include <Rinternals.h>
 #include <R_ext/Rdynload.h>
 #include "cholmod.h"
+#include "Matrix.h"
 
 #ifdef	__cplusplus
 extern "C" {
+// and  bool is defined
+#else
+# define bool Rboolean
 #endif
 
 #ifdef HAVE_VISIBILITY_ATTRIBUTE
@@ -513,15 +517,15 @@ M_R_cholmod_error(int status, const char *file, int line, const char *message)
 /* NB: keep in sync with R_cholmod_error(), ../../src/chm_common.c */
 
     if(status < 0) {
-/* Note: Matrix itself uses CHM_set_common_env, CHM_store_common 
+/* Note: Matrix itself uses CHM_set_common_env, CHM_store_common
  *   and CHM_restore_common to preserve settings through error calls.
  *  Consider defining your own error handler, *and* possibly restoring
  *  *your* version of the cholmod_common that *you* use.
  */
-	error("Cholmod error '%s' at file:%s, line %d", message, file, line);
+	error("Cholmod error '%s' at file '%s', line %d", message, file, line);
     }
     else
-	warning("Cholmod warning '%s' at file:%s, line %d",
+	warning("Cholmod warning '%s' at file '%s', line %d",
 		message, file, line);
 }
 
@@ -607,6 +611,38 @@ M_cholmod_scale(const_CHM_DN S, int scale, CHM_SP A,
     return fun(S, scale, A, Common);
 }
 
+
+int M_Matrix_check_class_etc(SEXP x, const char **valid)
+{
+    static int(*fun)(SEXP, const char**) = NULL;
+    if (fun == NULL)
+	fun = (int(*)(SEXP, const char**))
+	    R_GetCCallable("Matrix", "Matrix_check_class_etc");
+    return fun(x, valid);
+}
+
+const char *Matrix_valid_Csparse[] = { MATRIX_VALID_Csparse, ""};
+const char *Matrix_valid_dense[]   = { MATRIX_VALID_dense, ""};
+const char *Matrix_valid_triplet[] = { MATRIX_VALID_Tsparse, ""};
+const char *Matrix_valid_CHMfactor[]={ MATRIX_VALID_CHMfactor, ""};
+
+bool Matrix_isclass_Csparse(SEXP x) {
+    return M_Matrix_check_class_etc(x, Matrix_valid_Csparse) >= 0;
+}
+
+bool Matrix_isclass_triplet(SEXP x) {
+    return M_Matrix_check_class_etc(x, Matrix_valid_triplet) >= 0;
+}
+
+bool Matrix_isclass_dense(SEXP x) {
+    return M_Matrix_check_class_etc(x, Matrix_valid_dense) >= 0;
+}
+
+bool Matrix_isclass_CHMfactor(SEXP x) {
+    return M_Matrix_check_class_etc(x, Matrix_valid_CHMfactor) >= 0;
+}
+
 #ifdef	__cplusplus
 }
 #endif
+

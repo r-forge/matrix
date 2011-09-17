@@ -1,10 +1,5 @@
 ##-*- mode: org -*-
 
-- Fix the bug that our solve("dsCMatrix") uses CHOLMOD's  LDL'  but that
-  typically (but not at all always!) fails when the matrix is *not* pos.def !!
-  ~/R/MM/Pkg-ex/Matrix/solve-Gorjanc-bug.R
-  ==> must fall back to LU (e.g.) in that case.
-
 - Look at Paul Bailey's problem -- CHOLMOD error (even seg.fault for him)
   --> ~/R/MM/Pkg-ex/Matrix/sparseOrderedLogit.R
 
