@@ -943,6 +943,9 @@ SEXP chm_factor_to_SEXP(CHM_FR f, int dofree)
     int *dims, *type;
     char *class = (char*) NULL;	/* -Wall */
 
+    if(!chm_factor_ok(f))
+	error(_("previous CHOLMOD factorization was unsuccessful"));
+
     switch(f->xtype) {
     case CHOLMOD_REAL:
 	class = f->is_super ? "dCHMsuper" : "dCHMsimpl";
