@@ -2,10 +2,13 @@
 #define MATRIX_H
 #include <Rdefines.h>
 #include <Rconfig.h>
-#include "cholmod.h"
+#include "cholmod.h" //--->  M_cholmod_*() declarations
 
 #ifdef	__cplusplus
 extern "C" {
+// and  bool is defined
+#else
+# define bool Rboolean
 #endif
 
 #ifdef HAVE_VISIBILITY_ATTRIBUTE
@@ -68,6 +71,15 @@ SEXP M_chm_triplet_to_SEXP(const CHM_TR a, int dofree, int uploT, int Rkind,
 			   const char* diag, SEXP dn);
 
 SEXP M_dpoMatrix_chol(SEXP x);
+
+int M_Matrix_check_class_etc(SEXP x, const char **valid);
+
+// ./Matrix_stubs.c   "illustrative example code" (of the above):
+bool Matrix_isclass_Csparse(SEXP x);
+bool Matrix_isclass_triplet(SEXP x);
+bool Matrix_isclass_dense(SEXP x);
+bool Matrix_isclass_CHMfactor(SEXP x);
+
 
 /* TODO:  Utilities for C level of model_matrix(*, sparse) */
 
