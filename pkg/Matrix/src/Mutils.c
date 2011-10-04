@@ -845,10 +845,10 @@ int Matrix_check_class_and_super(SEXP x, const char **valid, SEXP rho)
     }
     /* if not found directly, now search the non-virtual super classes :*/
     if(IS_S4_OBJECT(x)) {
-	/* now try the superclasses, i.e.,  try   is(x, "....") : */
+	/* now try the superclasses, i.e.,  try   is(x, "....");  superCl :=
+	   .selectSuperClasses(getClass("...")@contains, dropVirtual=TRUE)  */
 	SEXP classExts, superCl, _call;
 	int i;
-/* 	PROTECT(cl); */
 	PROTECT(_call = lang2(install("getClassDef"), cl));
 	classExts = GET_SLOT(eval(_call, rho),
 			     install("contains"));

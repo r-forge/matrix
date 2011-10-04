@@ -1,3 +1,7 @@
+2011-09-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.0-0 -- to be released for R 2.14.0
+
 2011-09-16  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/dsCMatrix.R (solve.dsC.mat): new utility which calls lu() if
