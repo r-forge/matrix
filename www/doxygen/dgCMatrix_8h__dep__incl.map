@@ -1,7 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$dgCMatrix_8c.html" title="dgCMatrix.c" alt="" coords="5,86,96,117"/>
-<area shape="rect" id="node5" href="$dtCMatrix_8h.html" title="dtCMatrix.h" alt="" coords="120,86,208,117"/>
-<area shape="rect" id="node9" href="$init_8c.html" title="init.c" alt="" coords="220,166,271,197"/>
-<area shape="rect" id="node12" href="$lgCMatrix_8c.html" title="lgCMatrix.c" alt="" coords="283,86,371,117"/>
-<area shape="rect" id="node7" href="$dtCMatrix_8c.html" title="dtCMatrix.c" alt="" coords="108,166,196,197"/>
+<area shape="rect" id="node3" href="$dgCMatrix_8c.html" title="dgCMatrix.c" alt="" coords="5,86,99,117"/>
+<area shape="rect" id="node5" href="$dtCMatrix_8h.html" title="dtCMatrix.h" alt="" coords="123,86,211,117"/>
+<area shape="rect" id="node9" href="$init_8c.html" title="init.c" alt="" coords="224,166,272,197"/>
+<area shape="rect" id="node12" href="$lgCMatrix_8c.html" title="lgCMatrix.c" alt="" coords="285,86,373,117"/>
+<area shape="rect" id="node7" href="$dtCMatrix_8c.html" title="dtCMatrix.c" alt="" coords="112,166,200,197"/>
 </map>

@@ -1,7 +1,8 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$dppMatrix_8h.html" title="dppMatrix.h" alt="" coords="124,86,215,117"/>
-<area shape="rect" id="node7" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="283,326,349,357"/>
-<area shape="rect" id="node19" href="$dspMatrix_8h.html" title="dspMatrix.h" alt="" coords="124,166,215,197"/>
-<area shape="rect" id="node17" href="$Syms_8h.html" title="Syms.h" alt="" coords="488,406,555,437"/>
-<area shape="rect" id="node21" href="$dgeMatrix_8h.html" title="dgeMatrix.h" alt="" coords="153,246,244,277"/>
+<area shape="rect" id="node3" href="$dppMatrix_8h.html" title="dppMatrix.h" alt="" coords="127,86,217,117"/>
+<area shape="rect" id="node7" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="288,326,355,357"/>
+<area shape="rect" id="node23" href="$dspMatrix_8h.html" title="dspMatrix.h" alt="" coords="127,166,217,197"/>
+<area shape="rect" id="node19" href="$Syms_8h.html" title="Syms.h" alt="" coords="497,406,561,437"/>
+<area shape="rect" id="node21" href="$t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="585,406,705,437"/>
+<area shape="rect" id="node25" href="$dgeMatrix_8h.html" title="dgeMatrix.h" alt="" coords="157,246,248,277"/>
 </map>

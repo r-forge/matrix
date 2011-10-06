@@ -1,46 +1,46 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$cs_8h.html#a661c215839fe06dfed360d022188abad" title="cs_cholsol" alt="" coords="889,767,972,798"/>
-<area shape="rect" id="node5" href="$cs_8h.html#a312cb23797ac49cd9e99853f6bd2895f" title="cs_ddone" alt="" coords="401,194,479,225"/>
-<area shape="rect" id="node7" href="$cs_8h.html#ae2efa3ed8c8a2931e584b6d39a293e38" title="cs_dmperm" alt="" coords="713,169,804,199"/>
-<area shape="rect" id="node12" href="$cs_8h.html#a7c59264397d2c5cc85c87c879aedc4f5" title="cs_dfree" alt="" coords="263,141,335,171"/>
-<area shape="rect" id="node21" href="$cs_8h.html#a41590e7ef8c8f3ebce8c7bbe07303c28" title="cs_done" alt="" coords="264,941,333,971"/>
-<area shape="rect" id="node27" href="$cs_8h.html#a7c5aa6c4fadeba20b904a1c56b4543f5" title="cs_schol" alt="" coords="721,767,796,798"/>
-<area shape="rect" id="node30" href="$cs_8h.html#a31db4da8e996966094f83c7601dc08ff" title="cs_sqr" alt="" coords="728,922,789,953"/>
-<area shape="rect" id="node32" href="$cs_8h.html#a2ecf7b79f04b1f14554e67d3522b0ad4" title="cs_lusol" alt="" coords="896,922,965,953"/>
-<area shape="rect" id="node34" href="$cs_8h.html#af1cde25f7d702464291dd2a7e85b4770" title="cs_qrsol" alt="" coords="896,1613,965,1643"/>
-<area shape="rect" id="node38" href="$dgCMatrix_8h.html#a2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="877,1267,984,1298"/>
-<area shape="rect" id="node40" href="$dgCMatrix_8c.html#ad6045ab51c67c719a4deab2c929e4d13" title="install_lu" alt="" coords="895,1793,967,1823"/>
-<area shape="rect" id="node73" href="$cs_8h.html#a0404ef3688f241d15729b5c54c59a704" title="cs_maxtrans" alt="" coords="541,450,637,481"/>
-<area shape="rect" id="node81" href="$cs_8h.html#a83dc83954d821b748c3ba9fea1f6b5ca" title="cs_dupl" alt="" coords="131,965,197,995"/>
-<area shape="rect" id="node83" href="$cs_8h.html#a9c3bd8e36cdfb832d199b580e22467c7" title="cs_idone" alt="" coords="403,703,477,734"/>
-<area shape="rect" id="node98" href="$cs_8h.html#a24796e2f78414578fd2b8e7528535cbb" title="cs_ndone" alt="" coords="551,1535,628,1566"/>
-<area shape="rect" id="node109" href="$cs_8h.html#af2e6d75dfc24a842fdbce3aa510dc4bc" title="cs_nfree" alt="" coords="404,1791,476,1822"/>
-<area shape="rect" id="node119" href="$cs_8h.html#ace766075ef439ad6e4347f6b076eb4b7" title="cs_sfree" alt="" coords="553,607,625,638"/>
-<area shape="rect" id="node128" href="$cs_8h.html#a6d705e404a7831ccf01bc0ea064215b9" title="cs_spfree" alt="" coords="125,1435,203,1466"/>
-<area shape="rect" id="node165" href="$cs_8h.html#ad5fa81f80009c06259a77fd7d2092f78" title="cs_updown" alt="" coords="121,2146,207,2177"/>
-<area shape="rect" id="node167" href="$cs_8c.html#a9aa3afad1ec55f96205b52d378b8000f" title="cs_vcount" alt="" coords="257,1991,340,2022"/>
-<area shape="rect" id="node9" href="$cs_8h.html#a9fede5f7dcf4367d7d005ca6dd0ba100" title="cs_scc" alt="" coords="557,143,621,174"/>
-<area shape="rect" id="node14" href="$cs_8h.html#aefbcfeb2d1143578988d22d116dde57b" title="cs_dalloc" alt="" coords="401,141,479,171"/>
-<area shape="rect" id="node23" href="$cs_8h.html#a12000fbd0b9198d3852978cca8386afe" title="cs_add" alt="" coords="408,1074,472,1105"/>
-<area shape="rect" id="node48" href="$cs_8h.html#a917a026613fc4f26e5c5c1b8ce2f8389" title="cs_compress" alt="" coords="391,914,489,945"/>
-<area shape="rect" id="node50" href="$cs_8h.html#a066e18f8570c820530c73ebc88b30a97" title="cs_multiply" alt="" coords="396,967,484,998"/>
-<area shape="rect" id="node53" href="$cs_8h.html#ada9cc712c0db19bc1dc1ef9211e6ca3c" title="cs_permute" alt="" coords="395,757,485,787"/>
-<area shape="rect" id="node57" href="$cs_8h.html#a3f7a692a1d59e85e601e4ca13c1acffc" title="cs_symperm" alt="" coords="392,1021,488,1051"/>
-<area shape="rect" id="node63" href="$cs_8h.html#a090225477a18abe5f8d5ab26e4efaf3a" title="cs_transpose" alt="" coords="391,810,489,841"/>
-<area shape="rect" id="node25" href="$cs_8h.html#a633a0b0214f3ee86a27adf6ee6dea640" title="cs_amd" alt="" coords="556,1074,623,1105"/>
-<area shape="rect" id="node46" href="$cs__utils_8c.html#ae015ca3e4a6c1b3a7265208ab035a1c7" title="Create a cs object with the contents of x." alt="" coords="540,1178,639,1209"/>
-<area shape="rect" id="node36" href="$dgCMatrix_8h.html#a5937063a2f86fc60d92f942eb9425b86" title="dgCMatrix_qrsol" alt="" coords="1056,1613,1171,1643"/>
-<area shape="rect" id="node42" href="$dgCMatrix_8h.html#a848fa1b60915b5ee7926c897b8b5f050" title="dgCMatrix_LU" alt="" coords="1061,1766,1165,1797"/>
-<area shape="rect" id="node44" href="$dgCMatrix_8h.html#aeae674c1f247043d2e34fe45d4239769" title="dgCMatrix_matrix_solve" alt="" coords="1032,1819,1195,1850"/>
-<area shape="rect" id="node59" href="$cs_8h.html#a5ae664f3c6b2baeed717be084e00e13f" title="cs_chol" alt="" coords="725,1178,792,1209"/>
-<area shape="rect" id="node66" href="$cs_8c.html#ae296f1a9ad0b70efedc382fae12e028b" title="cs_bfs" alt="" coords="559,554,620,585"/>
-<area shape="rect" id="node69" href="$cs_8h.html#aa7fdeead97aef81cdf18af7576a7f722" title="cs_counts" alt="" coords="548,767,631,798"/>
-<area shape="rect" id="node87" href="$cs_8h.html#a5c531804008e67c207e93f14c2551b1a" title="cs_etree" alt="" coords="553,661,625,691"/>
-<area shape="rect" id="node92" href="$cs_8h.html#adc01793c66e6caa0eef76be3dda7ffd5" title="cs_post" alt="" coords="556,714,623,745"/>
-<area shape="rect" id="node101" href="$cs_8h.html#a6a35ad4816f210234a33eed09b19d181" title="cs_lu" alt="" coords="732,1559,785,1590"/>
-<area shape="rect" id="node105" href="$cs_8h.html#a767dc90c22d90fe898f72c2da0d98c03" title="cs_qr" alt="" coords="732,1613,785,1643"/>
-<area shape="rect" id="node135" href="$cs_8h.html#a12eb66c4f53e51ee5e03ec0b9f24b368" title="cs_load" alt="" coords="407,1333,473,1363"/>
-<area shape="rect" id="node141" href="$cs_8h.html#aad3a584d9185a4fe4497a36f892b9c72" title="cs_spalloc" alt="" coords="257,1101,340,1131"/>
-<area shape="rect" id="node160" href="$cs__utils_8c.html#ae53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="689,1893,828,1923"/>
-<area shape="rect" id="node153" href="$cs__utils_8c.html#a3f4422610da1a3e9e7268e1843ca6de5" title="Create an identity matrix of size n as a cs struct." alt="" coords="405,1127,475,1158"/>
+<area shape="rect" id="node3" href="$cs_8h.html#a661c215839fe06dfed360d022188abad" title="cs_cholsol" alt="" coords="896,767,981,798"/>
+<area shape="rect" id="node5" href="$cs_8h.html#a312cb23797ac49cd9e99853f6bd2895f" title="cs_ddone" alt="" coords="405,194,488,225"/>
+<area shape="rect" id="node7" href="$cs_8h.html#ae2efa3ed8c8a2931e584b6d39a293e38" title="cs_dmperm" alt="" coords="720,169,811,199"/>
+<area shape="rect" id="node12" href="$cs_8h.html#a7c59264397d2c5cc85c87c879aedc4f5" title="cs_dfree" alt="" coords="265,141,340,171"/>
+<area shape="rect" id="node21" href="$cs_8h.html#a41590e7ef8c8f3ebce8c7bbe07303c28" title="cs_done" alt="" coords="265,941,340,971"/>
+<area shape="rect" id="node27" href="$cs_8h.html#a7c5aa6c4fadeba20b904a1c56b4543f5" title="cs_schol" alt="" coords="728,767,803,798"/>
+<area shape="rect" id="node30" href="$cs_8h.html#a31db4da8e996966094f83c7601dc08ff" title="cs_sqr" alt="" coords="735,922,796,953"/>
+<area shape="rect" id="node32" href="$cs_8h.html#a2ecf7b79f04b1f14554e67d3522b0ad4" title="cs_lusol" alt="" coords="904,922,973,953"/>
+<area shape="rect" id="node34" href="$cs_8h.html#af1cde25f7d702464291dd2a7e85b4770" title="cs_qrsol" alt="" coords="903,1613,975,1643"/>
+<area shape="rect" id="node38" href="$dgCMatrix_8h.html#a2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="884,1267,993,1298"/>
+<area shape="rect" id="node40" href="$dgCMatrix_8c.html#ad6045ab51c67c719a4deab2c929e4d13" title="install_lu" alt="" coords="903,1793,975,1823"/>
+<area shape="rect" id="node73" href="$cs_8h.html#a0404ef3688f241d15729b5c54c59a704" title="cs_maxtrans" alt="" coords="548,450,647,481"/>
+<area shape="rect" id="node81" href="$cs_8h.html#a83dc83954d821b748c3ba9fea1f6b5ca" title="cs_dupl" alt="" coords="132,965,199,995"/>
+<area shape="rect" id="node83" href="$cs_8h.html#a9c3bd8e36cdfb832d199b580e22467c7" title="cs_idone" alt="" coords="408,703,485,734"/>
+<area shape="rect" id="node98" href="$cs_8h.html#a24796e2f78414578fd2b8e7528535cbb" title="cs_ndone" alt="" coords="557,1535,637,1566"/>
+<area shape="rect" id="node109" href="$cs_8h.html#af2e6d75dfc24a842fdbce3aa510dc4bc" title="cs_nfree" alt="" coords="411,1791,483,1822"/>
+<area shape="rect" id="node119" href="$cs_8h.html#ace766075ef439ad6e4347f6b076eb4b7" title="cs_sfree" alt="" coords="561,607,633,638"/>
+<area shape="rect" id="node128" href="$cs_8h.html#a6d705e404a7831ccf01bc0ea064215b9" title="cs_spfree" alt="" coords="125,1435,205,1466"/>
+<area shape="rect" id="node165" href="$cs_8h.html#ad5fa81f80009c06259a77fd7d2092f78" title="cs_updown" alt="" coords="121,2146,209,2177"/>
+<area shape="rect" id="node167" href="$cs_8c.html#a9aa3afad1ec55f96205b52d378b8000f" title="cs_vcount" alt="" coords="261,1991,344,2022"/>
+<area shape="rect" id="node9" href="$cs_8h.html#a9fede5f7dcf4367d7d005ca6dd0ba100" title="cs_scc" alt="" coords="565,143,629,174"/>
+<area shape="rect" id="node14" href="$cs_8h.html#aefbcfeb2d1143578988d22d116dde57b" title="cs_dalloc" alt="" coords="407,141,487,171"/>
+<area shape="rect" id="node23" href="$cs_8h.html#a12000fbd0b9198d3852978cca8386afe" title="cs_add" alt="" coords="413,1074,480,1105"/>
+<area shape="rect" id="node48" href="$cs_8h.html#a917a026613fc4f26e5c5c1b8ce2f8389" title="cs_compress" alt="" coords="396,914,497,945"/>
+<area shape="rect" id="node50" href="$cs_8h.html#a066e18f8570c820530c73ebc88b30a97" title="cs_multiply" alt="" coords="404,967,489,998"/>
+<area shape="rect" id="node53" href="$cs_8h.html#ada9cc712c0db19bc1dc1ef9211e6ca3c" title="cs_permute" alt="" coords="401,757,492,787"/>
+<area shape="rect" id="node57" href="$cs_8h.html#a3f7a692a1d59e85e601e4ca13c1acffc" title="cs_symperm" alt="" coords="399,1021,495,1051"/>
+<area shape="rect" id="node63" href="$cs_8h.html#a090225477a18abe5f8d5ab26e4efaf3a" title="cs_transpose" alt="" coords="396,810,497,841"/>
+<area shape="rect" id="node25" href="$cs_8h.html#a633a0b0214f3ee86a27adf6ee6dea640" title="cs_amd" alt="" coords="563,1074,632,1105"/>
+<area shape="rect" id="node46" href="$cs__utils_8c.html#ae015ca3e4a6c1b3a7265208ab035a1c7" title="Create a cs object with the contents of x." alt="" coords="547,1178,648,1209"/>
+<area shape="rect" id="node36" href="$dgCMatrix_8h.html#a5937063a2f86fc60d92f942eb9425b86" title="dgCMatrix_qrsol" alt="" coords="1067,1613,1187,1643"/>
+<area shape="rect" id="node42" href="$dgCMatrix_8h.html#a848fa1b60915b5ee7926c897b8b5f050" title="dgCMatrix_LU" alt="" coords="1073,1766,1180,1797"/>
+<area shape="rect" id="node44" href="$dgCMatrix_8h.html#aeae674c1f247043d2e34fe45d4239769" title="dgCMatrix_matrix_solve" alt="" coords="1044,1819,1209,1850"/>
+<area shape="rect" id="node59" href="$cs_8h.html#a5ae664f3c6b2baeed717be084e00e13f" title="cs_chol" alt="" coords="732,1178,799,1209"/>
+<area shape="rect" id="node66" href="$cs_8c.html#ae296f1a9ad0b70efedc382fae12e028b" title="cs_bfs" alt="" coords="568,554,627,585"/>
+<area shape="rect" id="node69" href="$cs_8h.html#aa7fdeead97aef81cdf18af7576a7f722" title="cs_counts" alt="" coords="556,767,639,798"/>
+<area shape="rect" id="node87" href="$cs_8h.html#a5c531804008e67c207e93f14c2551b1a" title="cs_etree" alt="" coords="560,661,635,691"/>
+<area shape="rect" id="node92" href="$cs_8h.html#adc01793c66e6caa0eef76be3dda7ffd5" title="cs_post" alt="" coords="564,714,631,745"/>
+<area shape="rect" id="node101" href="$cs_8h.html#a6a35ad4816f210234a33eed09b19d181" title="cs_lu" alt="" coords="739,1559,792,1590"/>
+<area shape="rect" id="node105" href="$cs_8h.html#a767dc90c22d90fe898f72c2da0d98c03" title="cs_qr" alt="" coords="739,1613,792,1643"/>
+<area shape="rect" id="node135" href="$cs_8h.html#a12eb66c4f53e51ee5e03ec0b9f24b368" title="cs_load" alt="" coords="412,1333,481,1363"/>
+<area shape="rect" id="node141" href="$cs_8h.html#aad3a584d9185a4fe4497a36f892b9c72" title="cs_spalloc" alt="" coords="260,1101,345,1131"/>
+<area shape="rect" id="node160" href="$cs__utils_8c.html#ae53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="696,1893,835,1923"/>
+<area shape="rect" id="node153" href="$cs__utils_8c.html#a3f4422610da1a3e9e7268e1843ca6de5" title="Create an identity matrix of size n as a cs struct." alt="" coords="411,1127,483,1158"/>
 </map>

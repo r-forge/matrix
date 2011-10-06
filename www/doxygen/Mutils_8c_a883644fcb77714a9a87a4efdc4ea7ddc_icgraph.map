@@ -1,0 +1,44 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$chm__common_8h.html#a2e28b03190e5ba5fcb59935cc0a1ea9e" title="Populate ans with the pointers from x and modify its scalar elements accordingly." alt="" coords="244,5,380,35"/>
+<area shape="rect" id="node5" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="489,5,585,35"/>
+<area shape="rect" id="node7" href="$chm__common_8h.html#ac0b9d7e2006dcf1a8d388954b408d007" title="Populate ans with the pointers from x and modify its scalar elements accordingly." alt="" coords="240,109,384,139"/>
+<area shape="rect" id="node16" href="$chm__common_8h.html#a7c6132b98d7e38fc876c745c9cc8da2d" title="Populate ans with the pointers from x and modify its scalar elements accordingly." alt="" coords="245,458,379,489"/>
+<area shape="rect" id="node18" href="$dgCMatrix_8h.html#ad3b5c3bc224c09316427f7e86e4e8a86" title="compressed_to_TMatrix" alt="" coords="228,511,396,542"/>
+<area shape="rect" id="node20" href="$t__Csparse__subassign_8c.html#acd57fdd460d858cc1b8696d23ba65088" title="Subassignment: x[i,j] &lt;&#45; value." alt="" coords="241,565,383,595"/>
+<area shape="rect" id="node22" href="$Mutils_8h.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="219,618,405,649"/>
+<area shape="rect" id="node70" href="$Mutils_8h.html#a23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="223,778,401,809"/>
+<area shape="rect" id="node80" href="$cs__utils_8c.html#ae015ca3e4a6c1b3a7265208ab035a1c7" title="Create a cs object with the contents of x." alt="" coords="261,831,363,862"/>
+<area shape="rect" id="node83" href="$dgCMatrix_8h.html#ac71c15cfb9558156fb98c0f1cad60922" title="R_to_CMatrix" alt="" coords="261,885,363,915"/>
+<area shape="rect" id="node85" href="$Tsparse_8h.html#a1b1ca7081cfcbef11f1cafc4270412ed" title="Tsparse_diagU2N" alt="" coords="247,1151,377,1182"/>
+<area shape="rect" id="node9" href="$Csparse_8h.html#a10392132372fdfc01e1aff7622f5ee7f" title="Csparse_validate_" alt="" coords="471,58,604,89"/>
+<area shape="rect" id="node11" href="$Csparse_8h.html#a77f654c86c318184ef29b46dc4929e12" title="Csparse_validate" alt="" coords="699,31,827,62"/>
+<area shape="rect" id="node13" href="$Csparse_8h.html#a5b2f297662f7f5dd66097ed12b320468" title="Csparse_validate2" alt="" coords="696,85,829,115"/>
+<area shape="rect" id="node24" href="$CHMfactor_8h.html#a8651ba67f85b2a18a8b2b1b23a392219" title="CHMfactor_solve" alt="" coords="475,111,600,142"/>
+<area shape="rect" id="node26" href="$dense_8h.html#af57ee72c2df4d7eaca5ecd2084f78747" title="ddense_skewpart" alt="" coords="473,165,601,195"/>
+<area shape="rect" id="node28" href="$dense_8h.html#a270b02ab3c84accb423eaefbe42dfe8b" title="ddense_symmpart" alt="" coords="472,218,603,249"/>
+<area shape="rect" id="node30" href="$dgCMatrix_8h.html#aeae674c1f247043d2e34fe45d4239769" title="dgCMatrix_matrix_solve" alt="" coords="455,271,620,302"/>
+<area shape="rect" id="node32" href="$dgeMatrix_8h.html#a4aaf5ed4d71841560a06e2eda9da3762" title="dgeMatrix_matrix_solve" alt="" coords="455,325,620,355"/>
+<area shape="rect" id="node34" href="$dppMatrix_8h.html#a0b9f86379aec800872a5267229a7b400" title="dppMatrix_matrix_solve" alt="" coords="456,378,619,409"/>
+<area shape="rect" id="node36" href="$dspMatrix_8h.html#aaa6c019f29f3215d81de78ab81db19c2" title="dspMatrix_matrix_mm" alt="" coords="461,431,613,462"/>
+<area shape="rect" id="node38" href="$dspMatrix_8h.html#ac1c54a26f283497edb9cb22e131ddd77" title="dspMatrix_matrix_solve" alt="" coords="456,485,619,515"/>
+<area shape="rect" id="node40" href="$dsyMatrix_8h.html#a393e873fe2d4db546a6c8b3eeda0507f" title="dsyMatrix_matrix_mm" alt="" coords="461,538,613,569"/>
+<area shape="rect" id="node42" href="$dsyMatrix_8h.html#a729dcefd1ff17369b45dcd4f7feda7ab" title="dsyMatrix_matrix_solve" alt="" coords="456,591,619,622"/>
+<area shape="rect" id="node44" href="$dtpMatrix_8h.html#ab43f823d6979ab9c45b327843e0be102" title="dtpMatrix_matrix_mm" alt="" coords="464,645,611,675"/>
+<area shape="rect" id="node46" href="$dtpMatrix_8h.html#af136e9ac2f176132d6db91d571ca0209" title="dtpMatrix_matrix_solve" alt="" coords="459,698,616,729"/>
+<area shape="rect" id="node48" href="$dtrMatrix_8h.html#a4c867d5968ff8e94c0570c6b761cdabe" title="dtrMatrix_dtrMatrix_mm" alt="" coords="457,751,617,782"/>
+<area shape="rect" id="node50" href="$dtrMatrix_8h.html#ae5a49deee36265c16bc1e33986e2a35a" title="dtrMatrix_matrix_mm" alt="" coords="465,805,609,835"/>
+<area shape="rect" id="node52" href="$dtrMatrix_8h.html#a5d0b56aff85a147c16111f5dc8c78ef5" title="dtrMatrix_matrix_solve" alt="" coords="460,858,615,889"/>
+<area shape="rect" id="node54" href="$Mutils_8h.html#a460951a1f5dadb579d977ba114eec12e" title="mMatrix_as_dgeMatrix" alt="" coords="459,911,616,942"/>
+<area shape="rect" id="node64" href="$sparseQR_8h.html#a614549a94002c7e1407cde03a911e16a" title="sparseQR_coef" alt="" coords="480,965,595,995"/>
+<area shape="rect" id="node66" href="$sparseQR_8h.html#a77c75b1c89f4e32f426420faa76275a9" title="sparseQR_qty" alt="" coords="484,1018,591,1049"/>
+<area shape="rect" id="node68" href="$sparseQR_8h.html#a43eb94cb27f10aedba5ce50939a9b45c" title="sparseQR_resid_fitted" alt="" coords="460,1071,615,1102"/>
+<area shape="rect" id="node56" href="$Csparse_8h.html#aef1a61ab6f25436301b8ee835106c23b" title="Csparse_dense_crossprod" alt="" coords="671,831,855,862"/>
+<area shape="rect" id="node58" href="$Csparse_8h.html#afec5dcac16fd72028456b98704632f1e" title="Csparse_dense_prod" alt="" coords="687,885,839,915"/>
+<area shape="rect" id="node60" href="$dgeMatrix_8h.html#acf21cab0cdce9d8e08d40584cbe0647c" title="dgeMatrix_matrix_mm" alt="" coords="685,938,840,969"/>
+<area shape="rect" id="node62" href="$dsCMatrix_8h.html#ae03dda286063199c0f670425084f0f2d" title="dsCMatrix_matrix_solve" alt="" coords="680,991,845,1022"/>
+<area shape="rect" id="node72" href="$dense_8h.html#afc94ab69278e25ef4ea5ed5ba90935c3" title="dense_band" alt="" coords="489,1125,585,1155"/>
+<area shape="rect" id="node74" href="$dense_8h.html#a389bdf26bd829335d25dffb4244c9ae6" title="dense_to_symmetric" alt="" coords="465,1178,609,1209"/>
+<area shape="rect" id="node76" href="$Mutils_8h.html#a623039270a92fce0643031ef7f6e72b2" title="mMatrix_as_geMatrix" alt="" coords="463,1231,612,1262"/>
+<area shape="rect" id="node78" href="$dense_8h.html#a33b46f3a16a95734d4875ddfbfa079cb" title="dense_to_Csparse" alt="" coords="695,1231,831,1262"/>
+<area shape="rect" id="node87" href="$Csparse_8h.html#a407589b56b662830f7a14b251a8c4da3" title="Csparse_crossprod" alt="" coords="468,1285,607,1315"/>
+</map>

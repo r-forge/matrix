@@ -23,4 +23,9 @@ find . -path ./.svn -prune -o \( -mtime +1 -a -type f -exec rm {} \; \)
 svn add *
 
 cd $SVN_MATRIX_DIR
+echo -n "svn cleanup in `pwd` : "
+svn cleanup .
+echo '[Ok]
+Now trying to commit all : '
+set -v
 svn ci -m'after "doxygen -u" and "doxygen" and cleanup of www directory' pkg/Matrix/inst/Doxyfile www/doxygen

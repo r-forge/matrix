@@ -1,8 +1,8 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$cs_8h.html#a2ecf7b79f04b1f14554e67d3522b0ad4" title="cs_lusol" alt="" coords="183,5,252,35"/>
-<area shape="rect" id="node5" href="$cs_8h.html#af1cde25f7d702464291dd2a7e85b4770" title="cs_qrsol" alt="" coords="183,58,252,89"/>
-<area shape="rect" id="node9" href="$dgCMatrix_8h.html#aeae674c1f247043d2e34fe45d4239769" title="dgCMatrix_matrix_solve" alt="" coords="136,111,299,142"/>
-<area shape="rect" id="node11" href="$dtCMatrix_8h.html#a118c095d59c9a257885d3aec3aa59268" title="dtCMatrix_matrix_solve" alt="" coords="139,165,296,195"/>
-<area shape="rect" id="node13" href="$sparseQR_8h.html#a614549a94002c7e1407cde03a911e16a" title="sparseQR_coef" alt="" coords="161,218,273,249"/>
-<area shape="rect" id="node7" href="$dgCMatrix_8h.html#a5937063a2f86fc60d92f942eb9425b86" title="dgCMatrix_qrsol" alt="" coords="348,58,463,89"/>
+<area shape="rect" id="node3" href="$cs_8h.html#a2ecf7b79f04b1f14554e67d3522b0ad4" title="cs_lusol" alt="" coords="185,5,255,35"/>
+<area shape="rect" id="node5" href="$cs_8h.html#af1cde25f7d702464291dd2a7e85b4770" title="cs_qrsol" alt="" coords="184,58,256,89"/>
+<area shape="rect" id="node9" href="$dgCMatrix_8h.html#aeae674c1f247043d2e34fe45d4239769" title="dgCMatrix_matrix_solve" alt="" coords="137,111,303,142"/>
+<area shape="rect" id="node11" href="$dtCMatrix_8h.html#a118c095d59c9a257885d3aec3aa59268" title="dtCMatrix_matrix_solve" alt="" coords="139,165,301,195"/>
+<area shape="rect" id="node13" href="$sparseQR_8h.html#a614549a94002c7e1407cde03a911e16a" title="sparseQR_coef" alt="" coords="163,218,277,249"/>
+<area shape="rect" id="node7" href="$dgCMatrix_8h.html#a5937063a2f86fc60d92f942eb9425b86" title="dgCMatrix_qrsol" alt="" coords="353,58,473,89"/>
 </map>

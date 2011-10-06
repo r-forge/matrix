@@ -1,5 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="215,5,316,35"/>
-<area shape="rect" id="node5" href="$cs_8c.html#adbd011bdb4d7bef9825ca1c743fc6b46" title="cs_lsolve" alt="" coords="227,58,304,89"/>
-<area shape="rect" id="node7" href="$cs_8c.html#aa4cdacecec403b30b97abc7c27594b4f" title="cs_usolve" alt="" coords="225,111,305,142"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="217,5,321,35"/>
+<area shape="rect" id="node5" href="$cs_8c.html#adbd011bdb4d7bef9825ca1c743fc6b46" title="cs_lsolve" alt="" coords="231,58,308,89"/>
+<area shape="rect" id="node7" href="$cs_8c.html#aa4cdacecec403b30b97abc7c27594b4f" title="cs_usolve" alt="" coords="228,111,311,142"/>
 </map>

@@ -1,8 +1,8 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$dsCMatrix_8c.html#a9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm, LDL and super attributes." alt="" coords="123,111,259,142"/>
-<area shape="rect" id="node5" href="$dsCMatrix_8h.html#a326fdb98f74608895abd9df179158253" title="dsCMatrix_chol" alt="" coords="339,5,451,35"/>
-<area shape="rect" id="node7" href="$dsCMatrix_8h.html#af424de259d431a9c8719a23188265887" title="dsCMatrix_Cholesky" alt="" coords="324,58,465,89"/>
-<area shape="rect" id="node9" href="$dsCMatrix_8h.html#a6e9761126a72d9a9f543ea82978b6ae9" title="dsCMatrix_Csparse_solve" alt="" coords="308,111,481,142"/>
-<area shape="rect" id="node11" href="$dsCMatrix_8h.html#ae60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial Cholesky LDL&#39; de..." alt="" coords="332,165,457,195"/>
-<area shape="rect" id="node13" href="$dsCMatrix_8h.html#ae03dda286063199c0f670425084f0f2d" title="dsCMatrix_matrix_solve" alt="" coords="313,218,476,249"/>
+<area shape="rect" id="node3" href="$dsCMatrix_8c.html#a9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm, LDL and super attributes." alt="" coords="124,111,260,142"/>
+<area shape="rect" id="node5" href="$dsCMatrix_8h.html#a326fdb98f74608895abd9df179158253" title="dsCMatrix_chol" alt="" coords="343,5,457,35"/>
+<area shape="rect" id="node7" href="$dsCMatrix_8h.html#af424de259d431a9c8719a23188265887" title="dsCMatrix_Cholesky" alt="" coords="327,58,473,89"/>
+<area shape="rect" id="node9" href="$dsCMatrix_8h.html#a6e9761126a72d9a9f543ea82978b6ae9" title="dsCMatrix_Csparse_solve" alt="" coords="309,111,491,142"/>
+<area shape="rect" id="node11" href="$dsCMatrix_8h.html#ae60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial Cholesky LDL&#39; decomp..." alt="" coords="335,165,465,195"/>
+<area shape="rect" id="node13" href="$dsCMatrix_8h.html#ae03dda286063199c0f670425084f0f2d" title="dsCMatrix_matrix_solve" alt="" coords="317,218,483,249"/>
 </map>
