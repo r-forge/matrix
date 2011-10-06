@@ -1,7 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="213,5,315,35"/>
-<area shape="rect" id="node5" href="$cs_8c.html#a6d705e404a7831ccf01bc0ea064215b9" title="cs_spfree" alt="" coords="225,58,303,89"/>
-<area shape="rect" id="node9" href="$cs__utils_8c.html#a0b2592041f5b822459b7052a451c07a5" title="is_sym" alt="" coords="233,111,295,142"/>
-<area shape="rect" id="node11" href="$Mutils_8h.html#a2206f293e563a99c83fa8480b7e26912" title="Return the 0&#45;based index of a string match in a vector of strings terminated by an empty string..." alt="" coords="195,165,333,195"/>
-<area shape="rect" id="node7" href="$cs_8c.html#a78c1d1194aacc65212bb0d2b03643ac7" title="cs_free" alt="" coords="383,58,447,89"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="211,5,315,35"/>
+<area shape="rect" id="node5" href="$cs_8c.html#a6d705e404a7831ccf01bc0ea064215b9" title="cs_spfree" alt="" coords="223,58,303,89"/>
+<area shape="rect" id="node9" href="$cs__utils_8c.html#a0b2592041f5b822459b7052a451c07a5" title="is_sym" alt="" coords="232,111,293,142"/>
+<area shape="rect" id="node11" href="$Mutils_8h.html#a952a7277ea90f8560245dc16801da86b" title="Return the 0&#45;based index of a string match in a vector of strings terminated by an empty string..." alt="" coords="193,165,332,195"/>
+<area shape="rect" id="node7" href="$cs_8c.html#a78c1d1194aacc65212bb0d2b03643ac7" title="cs_free" alt="" coords="381,58,448,89"/>
 </map>

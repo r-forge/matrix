@@ -1,17 +1,17 @@
 <map id="G" name="G">
 <area shape="rect" id="node3" href="$chm__common_8c.html" title="chm_common.c" alt="" coords="5,86,120,117"/>
 <area shape="rect" id="node5" href="$CHMfactor_8h.html" title="CHMfactor.h" alt="" coords="144,86,237,117"/>
-<area shape="rect" id="node9" href="$init_8c.html" title="init.c" alt="" coords="364,166,415,197"/>
-<area shape="rect" id="node11" href="$Csparse_8c.html" title="Csparse.c" alt="" coords="653,86,733,117"/>
-<area shape="rect" id="node13" href="$dense_8c.html" title="dense.c" alt="" coords="757,86,824,117"/>
-<area shape="rect" id="node15" href="$dgCMatrix_8c.html" title="dgCMatrix.c" alt="" coords="848,86,939,117"/>
-<area shape="rect" id="node17" href="$dgTMatrix_8c.html" title="dgTMatrix.c" alt="" coords="963,86,1053,117"/>
-<area shape="rect" id="node19" href="$dsCMatrix_8h.html" title="dsCMatrix.h" alt="" coords="261,86,352,117"/>
-<area shape="rect" id="node24" href="$dtTMatrix_8h.html" title="dtTMatrix.h" alt="" coords="427,86,515,117"/>
-<area shape="rect" id="node30" href="$sparseQR_8h.html" title="sparseQR.h" alt="" coords="539,86,629,117"/>
-<area shape="rect" id="node35" href="$Tsparse_8c.html" title="Tsparse.c" alt="" coords="1077,86,1155,117"/>
-<area shape="rect" id="node7" href="$CHMfactor_8c.html" title="CHMfactor.c" alt="" coords="132,166,225,197"/>
-<area shape="rect" id="node21" href="$dsCMatrix_8c.html" title="dsCMatrix.c" alt="" coords="249,166,340,197"/>
-<area shape="rect" id="node26" href="$dtTMatrix_8c.html" title="dtTMatrix.c" alt="" coords="439,166,527,197"/>
-<area shape="rect" id="node33" href="$sparseQR_8c.html" title="sparseQR.c" alt="" coords="551,166,641,197"/>
+<area shape="rect" id="node9" href="$init_8c.html" title="init.c" alt="" coords="368,166,416,197"/>
+<area shape="rect" id="node11" href="$Csparse_8c.html" title="Csparse.c" alt="" coords="656,86,739,117"/>
+<area shape="rect" id="node13" href="$dense_8c.html" title="dense.c" alt="" coords="763,86,832,117"/>
+<area shape="rect" id="node15" href="$dgCMatrix_8c.html" title="dgCMatrix.c" alt="" coords="856,86,949,117"/>
+<area shape="rect" id="node17" href="$dgTMatrix_8c.html" title="dgTMatrix.c" alt="" coords="973,86,1067,117"/>
+<area shape="rect" id="node19" href="$dsCMatrix_8h.html" title="dsCMatrix.h" alt="" coords="261,86,355,117"/>
+<area shape="rect" id="node24" href="$dtTMatrix_8h.html" title="dtTMatrix.h" alt="" coords="429,86,517,117"/>
+<area shape="rect" id="node30" href="$sparseQR_8h.html" title="sparseQR.h" alt="" coords="541,86,632,117"/>
+<area shape="rect" id="node35" href="$Tsparse_8c.html" title="Tsparse.c" alt="" coords="1091,86,1173,117"/>
+<area shape="rect" id="node7" href="$CHMfactor_8c.html" title="CHMfactor.c" alt="" coords="133,166,227,197"/>
+<area shape="rect" id="node21" href="$dsCMatrix_8c.html" title="dsCMatrix.c" alt="" coords="251,166,344,197"/>
+<area shape="rect" id="node26" href="$dtTMatrix_8c.html" title="dtTMatrix.c" alt="" coords="440,166,528,197"/>
+<area shape="rect" id="node33" href="$sparseQR_8c.html" title="sparseQR.c" alt="" coords="552,166,643,197"/>
 </map>

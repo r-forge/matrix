@@ -1,5 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$dense_8c.html#a00caca24445d05daed3f05182e00c00c" title="getGivens" alt="" coords="137,31,217,62"/>
-<area shape="rect" id="node5" href="$dense_8c.html#a4ada21e7b04deec43e792d2fc3b0d70e" title="checkGivens" alt="" coords="267,5,365,35"/>
-<area shape="rect" id="node7" href="$dense_8h.html#a3a13ecdf06811d2b2ced413892145007" title="lapack_qr" alt="" coords="277,58,355,89"/>
+<area shape="rect" id="node3" href="$dense_8c.html#a00caca24445d05daed3f05182e00c00c" title="getGivens" alt="" coords="135,31,217,62"/>
+<area shape="rect" id="node5" href="$dense_8c.html#a4ada21e7b04deec43e792d2fc3b0d70e" title="checkGivens" alt="" coords="267,5,368,35"/>
+<area shape="rect" id="node7" href="$dense_8h.html#a3a13ecdf06811d2b2ced413892145007" title="lapack_qr" alt="" coords="277,58,357,89"/>
 </map>

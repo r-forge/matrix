@@ -1,5 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$chm__common_8c.html#a713dd9a3d6095f9b55e453d18ca87d5a" title="Drop the (unit) diagonal entries from a cholmod_sparse matrix." alt="" coords="237,5,339,35"/>
-<area shape="rect" id="node5" href="$chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="211,58,365,89"/>
-<area shape="rect" id="node7" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="415,58,516,89"/>
+<area shape="rect" id="node3" href="$chm__common_8c.html#a713dd9a3d6095f9b55e453d18ca87d5a" title="Drop the (unit) diagonal entries from a cholmod_sparse matrix." alt="" coords="243,5,349,35"/>
+<area shape="rect" id="node5" href="$chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="219,58,373,89"/>
+<area shape="rect" id="node7" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="423,58,527,89"/>
 </map>

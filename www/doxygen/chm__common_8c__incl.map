@@ -1,5 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="227,86,341,117"/>
-<area shape="rect" id="node9" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="392,166,459,197"/>
-<area shape="rect" id="node19" href="$Syms_8h.html" title="Syms.h" alt="" coords="597,246,664,277"/>
+<area shape="rect" id="node3" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="231,86,345,117"/>
+<area shape="rect" id="node9" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="397,166,464,197"/>
+<area shape="rect" id="node21" href="$Syms_8h.html" title="Syms.h" alt="" coords="607,246,671,277"/>
+<area shape="rect" id="node23" href="$t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="695,246,815,277"/>
 </map>

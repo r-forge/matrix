@@ -1,6 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$Csparse_8c.html" title="Csparse.c" alt="" coords="5,86,85,117"/>
-<area shape="rect" id="node5" href="$dgTMatrix_8c.html" title="dgTMatrix.c" alt="" coords="109,86,200,117"/>
-<area shape="rect" id="node7" href="$init_8c.html" title="init.c" alt="" coords="224,86,275,117"/>
-<area shape="rect" id="node9" href="$Tsparse_8c.html" title="Tsparse.c" alt="" coords="299,86,376,117"/>
+<area shape="rect" id="node3" href="$Csparse_8c.html" title="Csparse.c" alt="" coords="5,86,88,117"/>
+<area shape="rect" id="node5" href="$dgTMatrix_8c.html" title="dgTMatrix.c" alt="" coords="112,86,205,117"/>
+<area shape="rect" id="node7" href="$init_8c.html" title="init.c" alt="" coords="229,86,277,117"/>
+<area shape="rect" id="node9" href="$Tsparse_8c.html" title="Tsparse.c" alt="" coords="301,86,384,117"/>
 </map>

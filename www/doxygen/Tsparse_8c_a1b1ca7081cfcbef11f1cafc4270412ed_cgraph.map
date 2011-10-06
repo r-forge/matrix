@@ -1,5 +1,4 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="209,5,311,35"/>
-<area shape="rect" id="node5" href="$Mutils_8c.html#a8ed2ff2e1a0de240a9c5b5a617f46838" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="179,58,341,89"/>
-<area shape="rect" id="node7" href="$Mutils_8c.html#afd54bbce8f08c11478dbd0b6c40d2c24" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="389,58,595,89"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="215,5,319,35"/>
+<area shape="rect" id="node5" href="$Mutils_8c.html#a883644fcb77714a9a87a4efdc4ea7ddc" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="184,58,349,89"/>
 </map>

@@ -1,6 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$dppMatrix_8c.html#a6111600bf96735d9b39d5bc193203b31" title="dppMatrix_chol" alt="" coords="175,31,284,62"/>
-<area shape="rect" id="node9" href="$dppMatrix_8h.html#a2a8d63739f02971700f3a26bffe3ba52" title="get_norm_sp" alt="" coords="181,85,277,115"/>
-<area shape="rect" id="node5" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="335,5,420,35"/>
-<area shape="rect" id="node7" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="set_factors" alt="" coords="335,58,420,89"/>
+<area shape="rect" id="node3" href="$dppMatrix_8c.html#a6111600bf96735d9b39d5bc193203b31" title="dppMatrix_chol" alt="" coords="176,31,288,62"/>
+<area shape="rect" id="node9" href="$dppMatrix_8h.html#a2a8d63739f02971700f3a26bffe3ba52" title="get_norm_sp" alt="" coords="183,85,281,115"/>
+<area shape="rect" id="node5" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="336,5,424,35"/>
+<area shape="rect" id="node7" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="set_factors" alt="" coords="337,58,423,89"/>
 </map>

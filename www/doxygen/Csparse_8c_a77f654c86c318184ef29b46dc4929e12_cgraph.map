@@ -1,13 +1,12 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$Csparse_8c.html#a10392132372fdfc01e1aff7622f5ee7f" title="Csparse_validate_" alt="" coords="177,165,305,195"/>
-<area shape="rect" id="node5" href="$chm__common_8c.html#ac0b9d7e2006dcf1a8d388954b408d007" title="Populate ans with the pointers from x and modify its scalar elements accordingly." alt="" coords="355,165,493,195"/>
-<area shape="rect" id="node7" href="$chm__common_8c.html#a954bf0c9515c3774116e79f0ee51d43c" title="check_sorted_chm" alt="" coords="557,5,688,35"/>
-<area shape="rect" id="node9" href="$chm__common_8c.html#a66c990c6f2cab76ee049ec970bc7d5e8" title="Copy cholmod_sparse, to an R_alloc()ed version of it." alt="" coords="577,58,668,89"/>
-<area shape="rect" id="node11" href="$chm__common_8c.html#ad988031b3c1f79de0d13da2bf40cc4c1" title="&quot;Cheap&quot; C version of Csparse_validate() &#45; *not* sorting :" alt="" coords="565,111,680,142"/>
-<area shape="rect" id="node13" href="$Mutils_8c.html#a8ed2ff2e1a0de240a9c5b5a617f46838" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="541,165,704,195"/>
-<area shape="rect" id="node17" href="$chm__common_8c.html#ad7dbb3616e40830729a242662b561897" title="stype" alt="" coords="596,218,649,249"/>
-<area shape="rect" id="node19" href="$chm__common_8c.html#a9ea43d94a2bbd6c055ff9da6e3f24109" title="xpt" alt="" coords="603,271,643,302"/>
-<area shape="rect" id="node23" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="596,325,649,355"/>
-<area shape="rect" id="node15" href="$Mutils_8c.html#afd54bbce8f08c11478dbd0b6c40d2c24" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="752,165,957,195"/>
-<area shape="rect" id="node21" href="$chm__common_8c.html#a6eb9b8c79c573099970c93d50e059039" title="RallocedREAL" alt="" coords="801,271,908,302"/>
+<area shape="rect" id="node3" href="$Csparse_8c.html#a10392132372fdfc01e1aff7622f5ee7f" title="Csparse_validate_" alt="" coords="183,165,316,195"/>
+<area shape="rect" id="node5" href="$chm__common_8c.html#ac0b9d7e2006dcf1a8d388954b408d007" title="Populate ans with the pointers from x and modify its scalar elements accordingly." alt="" coords="365,165,509,195"/>
+<area shape="rect" id="node7" href="$chm__common_8c.html#a954bf0c9515c3774116e79f0ee51d43c" title="check_sorted_chm" alt="" coords="573,5,707,35"/>
+<area shape="rect" id="node9" href="$chm__common_8c.html#a66c990c6f2cab76ee049ec970bc7d5e8" title="Copy cholmod_sparse, to an R_alloc()ed version of it." alt="" coords="595,58,685,89"/>
+<area shape="rect" id="node11" href="$chm__common_8c.html#ad988031b3c1f79de0d13da2bf40cc4c1" title="&quot;Cheap&quot; C version of Csparse_validate() &#45; *not* sorting :" alt="" coords="580,111,700,142"/>
+<area shape="rect" id="node13" href="$Mutils_8c.html#a883644fcb77714a9a87a4efdc4ea7ddc" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="557,165,723,195"/>
+<area shape="rect" id="node15" href="$chm__common_8c.html#ad7dbb3616e40830729a242662b561897" title="stype" alt="" coords="613,218,667,249"/>
+<area shape="rect" id="node17" href="$chm__common_8c.html#a9ea43d94a2bbd6c055ff9da6e3f24109" title="xpt" alt="" coords="621,271,659,302"/>
+<area shape="rect" id="node21" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="613,325,667,355"/>
+<area shape="rect" id="node19" href="$chm__common_8c.html#a6eb9b8c79c573099970c93d50e059039" title="RallocedREAL" alt="" coords="771,271,880,302"/>
 </map>

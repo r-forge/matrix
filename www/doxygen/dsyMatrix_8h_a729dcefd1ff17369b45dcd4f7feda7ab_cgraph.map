@@ -1,9 +1,8 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$dsyMatrix_8c.html#ae436ba23f7410148775ce808f08d1210" title="dsyMatrix_trf" alt="" coords="256,71,355,102"/>
-<area shape="rect" id="node11" href="$Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="215,151,396,182"/>
-<area shape="rect" id="node5" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="476,5,577,35"/>
-<area shape="rect" id="node7" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="484,58,569,89"/>
-<area shape="rect" id="node9" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="set_factors" alt="" coords="484,111,569,142"/>
-<area shape="rect" id="node13" href="$Mutils_8c.html#a8ed2ff2e1a0de240a9c5b5a617f46838" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="445,165,608,195"/>
-<area shape="rect" id="node15" href="$Mutils_8c.html#afd54bbce8f08c11478dbd0b6c40d2c24" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="656,165,861,195"/>
+<area shape="rect" id="node3" href="$dsyMatrix_8c.html#ae436ba23f7410148775ce808f08d1210" title="dsyMatrix_trf" alt="" coords="261,71,357,102"/>
+<area shape="rect" id="node11" href="$Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="216,138,403,169"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="481,5,585,35"/>
+<area shape="rect" id="node7" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="489,58,577,89"/>
+<area shape="rect" id="node9" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="set_factors" alt="" coords="491,111,576,142"/>
+<area shape="rect" id="node13" href="$Mutils_8c.html#a883644fcb77714a9a87a4efdc4ea7ddc" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="451,165,616,195"/>
 </map>

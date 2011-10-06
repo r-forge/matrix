@@ -1,8 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$dsyMatrix_8c.html#ae436ba23f7410148775ce808f08d1210" title="dsyMatrix_trf" alt="" coords="177,58,276,89"/>
-<area shape="rect" id="node11" href="$dpoMatrix_8h.html#a886569af93c91d1856c961323c5d6bce" title="get_norm_sy" alt="" coords="179,111,275,142"/>
-<area shape="rect" id="node13" href="$Mutils_8c.html#a646ee60a4fb346b69460858856a4a5a2" title="La_rcond_type" alt="" coords="173,165,280,195"/>
-<area shape="rect" id="node5" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="329,5,431,35"/>
-<area shape="rect" id="node7" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="337,58,423,89"/>
-<area shape="rect" id="node9" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="set_factors" alt="" coords="337,111,423,142"/>
+<area shape="rect" id="node3" href="$dsyMatrix_8c.html#ae436ba23f7410148775ce808f08d1210" title="dsyMatrix_trf" alt="" coords="177,58,273,89"/>
+<area shape="rect" id="node11" href="$dpoMatrix_8h.html#a886569af93c91d1856c961323c5d6bce" title="get_norm_sy" alt="" coords="176,111,275,142"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="324,5,428,35"/>
+<area shape="rect" id="node7" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="332,58,420,89"/>
+<area shape="rect" id="node9" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="set_factors" alt="" coords="333,111,419,142"/>
 </map>

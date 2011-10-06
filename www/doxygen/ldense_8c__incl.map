@@ -1,5 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$ldense_8h.html" title="ldense.h" alt="" coords="167,86,236,117"/>
-<area shape="rect" id="node5" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="168,166,235,197"/>
-<area shape="rect" id="node15" href="$Syms_8h.html" title="Syms.h" alt="" coords="373,246,440,277"/>
+<area shape="rect" id="node3" href="$ldense_8h.html" title="ldense.h" alt="" coords="249,86,321,117"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="252,166,319,197"/>
+<area shape="rect" id="node17" href="$Syms_8h.html" title="Syms.h" alt="" coords="461,246,525,277"/>
+<area shape="rect" id="node19" href="$t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="549,246,669,277"/>
 </map>

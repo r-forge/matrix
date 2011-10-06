@@ -1,9 +1,8 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="207,18,388,49"/>
-<area shape="rect" id="node9" href="$sparseQR_8c.html#ad4bb283bd0128438e01523e07feb4993" title="Apply Householder transformations and the row permutation P to y." alt="" coords="236,98,359,129"/>
-<area shape="rect" id="node5" href="$Mutils_8c.html#a8ed2ff2e1a0de240a9c5b5a617f46838" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="437,5,600,35"/>
-<area shape="rect" id="node7" href="$Mutils_8c.html#afd54bbce8f08c11478dbd0b6c40d2c24" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="648,5,853,35"/>
-<area shape="rect" id="node11" href="$cs_8c.html#a27050a31d36046e833b7763fe8ef62ce" title="cs_happly" alt="" coords="479,58,559,89"/>
-<area shape="rect" id="node13" href="$cs_8c.html#a1d7df434402e7553c34dbd59fd040159" title="cs_ipvec" alt="" coords="481,111,556,142"/>
-<area shape="rect" id="node15" href="$cs_8c.html#ad854f5cf7572128900a5acb1a7c87754" title="cs_pvec" alt="" coords="484,165,553,195"/>
+<area shape="rect" id="node3" href="$Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="208,18,395,49"/>
+<area shape="rect" id="node7" href="$sparseQR_8c.html#ad4bb283bd0128438e01523e07feb4993" title="Apply Householder transformations and the row permutation P to y." alt="" coords="240,98,363,129"/>
+<area shape="rect" id="node5" href="$Mutils_8c.html#a883644fcb77714a9a87a4efdc4ea7ddc" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="443,5,608,35"/>
+<area shape="rect" id="node9" href="$cs_8c.html#a27050a31d36046e833b7763fe8ef62ce" title="cs_happly" alt="" coords="484,58,567,89"/>
+<area shape="rect" id="node11" href="$cs_8c.html#a1d7df434402e7553c34dbd59fd040159" title="cs_ipvec" alt="" coords="488,111,563,142"/>
+<area shape="rect" id="node13" href="$cs_8c.html#ad854f5cf7572128900a5acb1a7c87754" title="cs_pvec" alt="" coords="489,165,561,195"/>
 </map>
