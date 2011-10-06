@@ -3,7 +3,7 @@
 ## svn co svn+ssh://mmaechler@svn.r-forge.r-project.org/svnroot/matrix Matrix
 SVN_MATRIX_DIR=~/R/D/R-forge/Matrix
 ##
-checkDir = function () {
+checkDir () {
     dir="$1"
     Nam="$2"
     if [ ! -d $dir ]
