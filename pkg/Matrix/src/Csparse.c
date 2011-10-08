@@ -488,7 +488,7 @@ SEXP Csparse_drop(SEXP x, SEXP tol)
 
     if(!cholmod_drop(dtol, ans, &c))
 	error(_("cholmod_drop() failed"));
-    return chm_sparse_to_SEXP(ans, 1,
+   return chm_sparse_to_SEXP(ans, 1,
 			      tr ? ((*uplo_P(x) == 'U') ? 1 : -1) : 0,
 			      Rkind, tr ? diag_P(x) : "",
 			      GET_SLOT(x, Matrix_DimNamesSym));
