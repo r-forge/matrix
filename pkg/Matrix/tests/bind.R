@@ -125,7 +125,7 @@ stopifnot(TRUE
 	  ,isValid(print(rbind2(Matrix(1:10, 2,5), D5)),   "dgCMatrix")
 	  ,isValid(print(cbind2(Matrix(10:1, 5,2), D5.1)), "dgeMatrix")
 	  ,isValid(zz <- cbind2(z42, C86), "dgCMatrix")
-          ,identical(zz, cbind2(s42, C86), "dgCMatrix")
+          ,identical(zz, cbind2(s42, C86))
 	  )
 
 showProc.time()
