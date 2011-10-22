@@ -12,9 +12,11 @@
 \alias{qr.qty,sparseQR,dgeMatrix-method}
 \alias{qr.qty,sparseQR,matrix-method}
 \alias{qr.qty,sparseQR,numeric-method}
+\alias{qr.qty,sparseQR,Matrix-method}
 \alias{qr.qy,sparseQR,dgeMatrix-method}
 \alias{qr.qy,sparseQR,matrix-method}
 \alias{qr.qy,sparseQR,numeric-method}
+\alias{qr.qy,sparseQR,Matrix-method}
 \alias{qr.resid,sparseQR,dgeMatrix-method}
 \alias{qr.resid,sparseQR,matrix-method}
 \alias{qr.resid,sparseQR,numeric-method}

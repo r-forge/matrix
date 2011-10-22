@@ -27,6 +27,11 @@ setMethod("qr.qy", signature(qr = "sparseQR", y = "numeric"),
           function(qr, y) .Call(sparseQR_qty, qr, y, FALSE),
           valueClass = "dgeMatrix")
 
+setMethod("qr.qy", signature(qr = "sparseQR", y = "Matrix"),
+	  function(qr, y) .Call(sparseQR_qty, qr,
+				as(as(y, "denseMatrix"),"dgeMatrix"), FALSE),
+	  valueClass = "dgeMatrix")
+
 ## The signature should change to y = "ddenseMatrix" later
 setMethod("qr.qty", signature(qr = "sparseQR", y = "dgeMatrix"),
           function(qr, y) .Call(sparseQR_qty, qr, y, TRUE),
@@ -39,6 +44,11 @@ setMethod("qr.qty", signature(qr = "sparseQR", y = "matrix"),
 setMethod("qr.qty", signature(qr = "sparseQR", y = "numeric"),
           function(qr, y) .Call(sparseQR_qty, qr, y, TRUE),
           valueClass = "dgeMatrix")
+
+setMethod("qr.qty", signature(qr = "sparseQR", y = "Matrix"),
+	  function(qr, y) .Call(sparseQR_qty, qr,
+				as(as(y, "denseMatrix"),"dgeMatrix"), TRUE),
+	  valueClass = "dgeMatrix")
 
 .coef.trunc <- function(qr, res) res[1:ncol(qr@R),,drop=FALSE]
 
