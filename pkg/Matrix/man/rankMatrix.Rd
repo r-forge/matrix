@@ -69,6 +69,11 @@ rankMatrix(H12, tol = 1e-20) # 12;  but  11  with default method & tol.
 sapply(meths, function(.m.) rankMatrix(H12, method = .m.))
 ## tolNorm2 qrLINPACK   useGrad maybeGrad
 ##       11        12        11        11
+
+## "sparse" case:
+M15 <- kronecker(diag(x=c(100,1,10)), Hilbert(5))
+sapply(meths, function(.m.) rankMatrix(M15, method = .m.))
+#--> all 15, but 'useGrad' has 14.
 }
 \keyword{algebra}
 \keyword{array}

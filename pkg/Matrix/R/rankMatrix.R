@@ -57,11 +57,13 @@ rankMatrix <- function(x, tol = NULL,
     structure(## rank :
 	      if(useGrad) which.min(diff1)
 	      else if(method == "qrLINPACK") {
-                  q.r <- qr(x, tol=tol, LAPACK = FALSE)
-		  if(is(qr, "qr")) qr$rank else if(is(qr,"sparseQR"))
-		      sum(diag(qr@R) != 0) else
-		  stop(gettextf("method '%s' not applicable for qr() result class '%s'", method, class(qr)[1]))
-	      else sum(sval >= tol),
+		  q.r <- qr(x, tol=tol, LAPACK = FALSE)
+		  if(is(q.r, "qr")) q.r$rank
+		  else if(is(q.r,"sparseQR")) sum(diag(q.r@R) != 0)
+		  else stop(gettextf(
+			"method '%s' not applicable for qr() result class '%s'",
+				     method, class(q.r)[1]))
+	      } else sum(sval >= tol),
 	      "method" = method,
 	      "useGrad" = useGrad,
 	      "tol" = if(useGrad) NA else tol)
