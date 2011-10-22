@@ -1,5 +1,8 @@
 2011-10-22  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* R/rankMatrix.R (rankMatrix): 'method = "qrLINPACK"' now also
+	works for sparse matrices, but using \code{sparseQR()}.
+
 	* man/sparseQR-class.Rd: document options "Matrix.quiet" (old) and
 	new "Matrix.quiet.qr.R" for suppressiong the permutation warning.
 	* R/sparseQR.R:
