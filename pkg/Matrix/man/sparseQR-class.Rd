@@ -46,7 +46,13 @@
 }
 \section{Methods}{
   \describe{
-    \item{qr.R}{\code{signature(qr = "sparseQR")}: ... }
+    \item{qr.R}{\code{signature(qr = "sparseQR")}: compute the upper
+      triangular \eqn{R} matrix of the QR decomposition.
+      Note that this currently warns because of possible permutation
+      mismatch with the classical \code{qr.R()} result, \emph{and} you
+      can suppress these warnings by setting \code{\link{options}()}
+      either \code{"Matrix.quiet.qr.R"} or (the more general)
+      either \code{"Matrix.quiet"} to \code{\link{TRUE}}.}
     \item{qr.coef}{\code{signature(qr = "sparseQR", y = "dgeMatrix")}: ... }
     \item{qr.coef}{\code{signature(qr = "sparseQR", y = "matrix")}: ... }
     \item{qr.coef}{\code{signature(qr = "sparseQR", y = "numeric")}: ... }
