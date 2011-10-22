@@ -23,8 +23,13 @@ rankMatrix(x, tol = NULL,
     can be abbreviated:
     \describe{
       \item{tolNorm2}{the number of singular values \code{>= tol};}
-      \item{qrLINPACK}{= \code{\link{qr}(x, tol, LAPACK=FALSE)$rank};
-	this used to be \emph{the} recommended way to compute a matrix
+      \item{qrLINPACK}{this is the rank of \code{\link{qr}(x, tol,
+	  LAPACK=FALSE)}, which is \code{qr(...)$rank} for a dense
+	matrix, and the rank of \eqn{R} for sparse \code{x} (where
+	\code{qr} uses a "sparseQR" method, see
+	\code{\link{qr-methods}}, and not LINPACK).
+
+	This used to be \emph{the} recommended way to compute a matrix
 	rank for a while in the past.  For this method, \code{sval} are
 	not used (nor computed).}
       \item{useGrad}{considering the \dQuote{gradient} of the
