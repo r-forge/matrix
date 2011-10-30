@@ -36,7 +36,7 @@ if(isTRUE(try(require(graph)))) { # may be there and fail (with R-devel)
     sm.g <- as(gR, "sparseMatrix")
     str(sm.g) ## dgC: TODO: want 'ds.' (symmetric)
     validObject(sm.g)
-    sm.g ## (incl colnames !)
+    show( sm.g )## (incl colnames !)
 
     ## 1b) weighted
     set.seed(123)
@@ -47,14 +47,14 @@ if(isTRUE(try(require(graph)))) { # may be there and fail (with R-devel)
     sm.gw <- as(gRw, "sparseMatrix")
     str(sm.gw) ## *numeric* dgCMatrix
     validObject(sm.gw)
-    sm.gw ## U[0,1] numbers in anti-diagonal
+    show( sm.gw )## U[0,1] numbers in anti-diagonal
 
     ## 2) directed
     gU <- gR; edgemode(gU) <- "directed"
     sgU <- as(gU, "sparseMatrix")
     str(sgU) ## 'dgC'
     validObject(sgU)
-    sgU
+    show( sgU )
 
     ## Reverse :  sparseMatrix -> graph
     sm.g[1,2] <- 1
@@ -93,7 +93,8 @@ if(isTRUE(try(require(graph)))) { # may be there and fail (with R-devel)
 ###-- 2)  'SparseM' ---------------------------------------------
 ###-- ==  ========  ---------------------------------------------
 
-if(isTRUE(try(require(SparseM)))) { # may be there and fail
+if(Sys.info()[["sysname"]] != "SunOS" &&
+   isTRUE(try(require(SparseM)))) { # may be there and fail
 
     if(pkgRversion("SparseM") != MatrixRversion) {
 
