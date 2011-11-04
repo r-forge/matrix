@@ -1,4 +1,11 @@
+2011-11-02  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/zzz.R (.onLoad): when R version >= 2.15.0, no longer
+	need to assignInNamespace( ns = "base"), methods provides S4 generic.
+
 2011-10-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.0-2, CRAN-released: ..., r...
 
 	* tests/other-pkgs.R: print more, don't run SparseM on Solaris for now.
 	* tests/Simple.R: encoding warning should not be promoted to error.
