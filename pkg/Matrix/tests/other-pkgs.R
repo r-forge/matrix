@@ -8,7 +8,9 @@ MatrixRversion <- pkgRversion("Matrix")
 
 ###-- 1)  'graph' (from Bioconductor) ---------------------------
 ###-- ==  =======                     ---------------------------
-if(isTRUE(try(require(graph)))) { # may be there and fail (with R-devel)
+## do not run the test "usually" for now [Solaris problem after detach() ..]:
+if((Sys.getenv("USER")=="maechler" || nzchar(Sys.getenv("R_MATRIX_CHECK_EXTRA"))) &&
+   isTRUE(try(require(graph)))) { # may be there and fail (with R-devel)
 
     if(packageDescription("graph")$Version <= "1.10.2") {
         ## graph 1.10.x for x <= 2 had too many problems  as(<graph>, "matrix")
@@ -93,8 +95,7 @@ if(isTRUE(try(require(graph)))) { # may be there and fail (with R-devel)
 ###-- 2)  'SparseM' ---------------------------------------------
 ###-- ==  ========  ---------------------------------------------
 
-if(Sys.info()[["sysname"]] != "SunOS" &&
-   isTRUE(try(require(SparseM)))) { # may be there and fail
+if(isTRUE(try(require(SparseM)))) { # may be there and fail
 
     if(pkgRversion("SparseM") != MatrixRversion) {
 
