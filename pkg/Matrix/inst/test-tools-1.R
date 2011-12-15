@@ -5,7 +5,8 @@
 
 ### ------- Part I --  unrelated to "Matrix" classes ---------------
 
-paste0 <- function(...) paste(..., sep = '')
+if(!exists("paste0", .BaseNamespaceEnv)) # have in R >= 2.15.0
+    paste0 <- function(...) paste(..., sep = '')
 
 identical3 <- function(x,y,z)	  identical(x,y) && identical (y,z)
 identical4 <- function(a,b,c,d)   identical(a,b) && identical3(b,c,d)
