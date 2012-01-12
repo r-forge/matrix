@@ -1,3 +1,7 @@
+2012-01-12  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Suggests): MASS, as we use a data set in a vignette
+
 2011-12-09  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 1.0-3, CRAN-released: ..., r...
