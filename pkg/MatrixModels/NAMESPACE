@@ -51,8 +51,6 @@ importClassesFrom("Matrix",
 
 ## Generics and functions defined in this package
 
-if(getRversion() < "2.14")
-    export("getCall")
 
 export(
        "glm4",
@@ -88,10 +86,6 @@ exportClasses(
 
 
 
-if(getRversion() < "2.14") { # the stats::getCall() + *.default() is sufficient otherwise
-    exportMethods("getCall")
-    exportMethods("update")
-}
 exportMethods(## for both own and "other" generics:
 
               ## re-export S4 methods, for "stats"-S3-generics:

@@ -1,3 +1,11 @@
+2012-01-12  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.3-1
+	(Depends): R >= 2.14.0, so we can
+	* man/getCall.Rd: remove entirely
+	* R/modelMatrix.R: ditto:
+	get rid of getCall (and all the new wrong R CMD check warnings).
+
 2011-08-19  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.3-0
