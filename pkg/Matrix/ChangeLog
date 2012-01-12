@@ -4,7 +4,7 @@
 
 2011-12-09  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 1.0-3, CRAN-released: ..., r...
+	* DESCRIPTION (Version): 1.0-3, CRAN-released: 2012-01-12, r2749
 	* R/diagMatrix.R (.bdiag): now works correctly when all blocks are "lMatrix"
 
 2011-11-02  Martin Maechler  <maechler@stat.math.ethz.ch>
