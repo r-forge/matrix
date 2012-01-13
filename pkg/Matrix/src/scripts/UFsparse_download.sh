@@ -24,8 +24,9 @@ mv UFconfig/README.txt ../inst/doc/UFsparse/UFconfig.txt
   ## environment variables but this name is embedded in some Makefiles
 touch UFconfig/UFconfig.mk
   ## Need to add the Matrix-specific changes to UFconfig/UFconfig.h :
-## 2011-04: *no longer* !!
-# patch -p0 < scripts/UFconfig.patch
+## 2011-04: *no longer* !!  patch -p0 < scripts/UFconfig.patch
+## again for printf():
+patch -p0 < scripts/UFconfig.patch2
 
 ## 2) COLAMD -----------------------------------------------
    ## install COLAMD/Source and COLAMD/Include directories
@@ -34,6 +35,7 @@ Rscript --vanilla -e 'source("scripts/fixup-fn.R")' -e 'fixup("COLAMD/Source/Mak
   ## install documentation for COLAMD
 tar zxf COLAMD.tar.gz COLAMD/README.txt COLAMD/Doc
 mv COLAMD/README.txt ../inst/doc/UFsparse/COLAMD.txt
+patch -p0 < scripts/COLAMD.patch
 
 ## 3) AMD --------------------------------------------------
   ## install AMD/Source and AMD/Include directories
