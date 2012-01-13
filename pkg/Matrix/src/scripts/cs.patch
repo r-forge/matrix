@@ -1,0 +1,14 @@
+--- cs.h.~1~	2009-01-20 21:42:59.000000000 +0100
++++ cs.h	2012-01-13 12:07:30.005416000 +0100
+@@ -3,7 +3,11 @@
+ #include <stdlib.h>
+ #include <limits.h>
+ #include <math.h>
++// needed for FILE:
+ #include <stdio.h>
++// For use with R package 'Matrix'
++# include <R_ext/Print.h>
++# define printf Rprintf
+ #ifdef MATLAB_MEX_FILE
+ #include "mex.h"
+ #endif

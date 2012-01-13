@@ -1,5 +1,6 @@
 #!/bin/sh
 ## Update Libraries from Tim Davis' University of Florida (UF) collection:
+## Note that cs.c , cs.h  are done in ./CSparse_install.sh
 #
 if [ ! -d ../src ]
 then echo 'Must run in Matrix/src/ !' ; exit 1
@@ -46,6 +47,7 @@ svn revert AMD/Source/Makefile
 mv AMD/README.txt ../inst/doc/UFsparse/AMD.txt
   ## remove Fortran source files and GNUMakefile
 rm AMD/Source/*.f AMD/Source/GNUmakefile
+#(for f in AMD/Include/amd_internal.h AMD/Source/amd_global.c; do diff -ubBw ${f}.~1~ $f ; done ) | tee scripts/AMD-noprint.patch
 patch -p0 < scripts/AMD-noprint.patch
 
 ## 4) CHOLMOD ----------------------------------------------
