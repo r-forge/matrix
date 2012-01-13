@@ -1,13 +1,12 @@
---- COLAMD/Source/colamd_global.c~	2010-07-25 04:32:06.000000000 +0200
-+++ COLAMD/Source/colamd_global.c	2012-01-13 10:29:10.000519000 +0100
-@@ -8,6 +8,10 @@
-  * http://www.cise.ufl.edu/research/sparse
-  * -------------------------------------------------------------------------- */
- 
+--- COLAMD/Source/colamd_global.c.~1~	2010-07-25 04:32:06.000000000 +0200
++++ COLAMD/Source/colamd_global.c	2012-01-13 12:12:17.001781000 +0100
+@@ -16,6 +16,9 @@
+ int (*colamd_printf) (const char *, ...) = mexPrintf ;
+ #else
+ #include <stdio.h>
 +// For use with R package 'Matrix':
-+#include <R.h>
++#include <R_ext/Print.h>
 +#define printf Rprintf
-+
- /* Global variables for COLAMD */
- 
- #ifndef NPRINT
+ int (*colamd_printf) (const char *, ...) = printf ;
+ #endif
+ #else
