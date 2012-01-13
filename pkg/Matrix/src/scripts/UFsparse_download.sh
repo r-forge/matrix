@@ -44,6 +44,7 @@ svn revert AMD/Source/Makefile
 mv AMD/README.txt ../inst/doc/UFsparse/AMD.txt
   ## remove Fortran source files and GNUMakefile
 rm AMD/Source/*.f AMD/Source/GNUmakefile
+patch -p0 < scripts/AMD-noprint.patch
 
 ## 4) CHOLMOD ----------------------------------------------
   ## install CHOLMOD source files
