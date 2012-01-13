@@ -8,6 +8,10 @@
  * http://www.cise.ufl.edu/research/sparse
  * -------------------------------------------------------------------------- */
 
+// For use with R package 'Matrix':
+#include <R.h>
+#define printf Rprintf
+
 /* Global variables for COLAMD */
 
 #ifndef NPRINT
