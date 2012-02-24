@@ -1,6 +1,13 @@
+2012-02-25  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.0-5, CRAN-released: 2012-...., r...
+	* src/chm_common.c (chm_factor_to_SEXP): in case of failure,
+	* src/dsCMatrix.c (internal_chm_factor): ensure memory cleanup;
+	memory leak reported by Kasper Kristensen at dtu.dk.
+
 2012-02-17  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 1.0-4, CRAN-released: 2012-...., r...
+	* DESCRIPTION (Version): 1.0-4, CRAN-released: 2012-02-21, r2765
 	* R/Ops.R: Fix "-" method for diagonalMatrix types.
 
 2012-01-12  Martin Maechler  <maechler@stat.math.ethz.ch>
