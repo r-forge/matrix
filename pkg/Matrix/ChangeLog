@@ -1,3 +1,8 @@
+2012-02-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Ops.R (A.M.n, A.n.M): <sparse> o <numeric> now correct, newly
+	via sparseVector.
+
 2012-02-25  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 1.0-5, CRAN-released: 2012-...., r...
