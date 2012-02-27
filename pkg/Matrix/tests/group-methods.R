@@ -68,9 +68,9 @@ tst <- function(n, i = 1) {
               {C <- (ee / D == ee / diag(n)); all(is.na(C) | C)},
               TRUE)
 }
-sapply(1:16, tst)
+tmp <- sapply(1:16, tst)
 i <- sapply(1:16, function(i) sample(i,1))
-mapply(tst, n= 1:16, i= i)
+tmp <- mapply(tst, n= 1:16, i= i)
 
 
 ###----- Compare methods ---> logical Matrices ------------
