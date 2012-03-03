@@ -1,3 +1,14 @@
+2012-03-03  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/spModels.R (sparseInt.r): 'forceSparse' was not passed to
+	recursive call.
+
+2012-03-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/spModels.R (sparse.model.matrix, model.spmatrix): add 'verbose'
+	argument in order to show to the user what's going on.
+	* man/sparse.model.matrix.Rd: ditto
+
 2012-02-27  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Ops.R (A.M.n, A.n.M): <sparse> o <numeric> now correct, newly
