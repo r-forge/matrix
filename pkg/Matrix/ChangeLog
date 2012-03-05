@@ -1,7 +1,10 @@
-2012-03-03  Martin Maechler  <maechler@stat.math.ethz.ch>
+2012-03-05  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* R/spModels.R (sparseInt.r): 'forceSparse' was not passed to
-	recursive call.
+	* src/dtCMatrix.c (dtCMatrix_sparse_solve): no longer use Alloca()
+	here.
+	* tests/factorizing.R (checkSchur): check against segfault example.
+
+	* R/Matrix.R (chol2inv(<diagonalMatrix>)) new method.
 
 2012-03-01  Martin Maechler  <maechler@stat.math.ethz.ch>
 
