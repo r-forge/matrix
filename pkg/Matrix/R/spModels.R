@@ -249,22 +249,21 @@ sparse2int <- function(X, Y, do.names = TRUE, forceSparse = FALSE, verbose = FAL
 sparseInt.r <- function(rList, do.names = TRUE, forceSparse = FALSE, verbose=FALSE)
 {
     nl <- length(rList)
-    F <- if(forceSparse) {
-	function(m) if(is.matrix(m)) .Call(dense_to_Csparse, m) else m
-    } else identity
+    if(forceSparse)
+	F <- function(m) if(is.matrix(m)) .Call(dense_to_Csparse, m) else m
     if(verbose)
 	cat("sparseInt.r(<list>[1:",nl,"], f.Sp=",forceSparse,"): is.mat()= (",
 	    paste(symnum(vapply(rList, is.matrix, NA)), collapse=""),
 	    ")\n", sep="")
     if(nl == 1) {
-	F(rList[[1]])
+	if(forceSparse) F(rList[[1]]) else rList[[1]]
     } else {
-	## *recursion* :
-	F(sparse2int(sparseInt.r(rList[-nl], do.names=do.names
-                     ## , forceSparse=forceSparse ## <- seems logical, but fails (why?)
-                     ## , verbose=verbose
-                                 ),
-		     rList[[nl]], do.names=do.names, verbose=verbose))
+	## 'recursion' free:
+	r <- rList[[1]]
+	for(j in 2:nl)
+	    r <- sparse2int(r, rList[[j]],
+			    do.names=do.names, verbose=verbose)
+	if(forceSparse) F(r) else r
     }
 }
 

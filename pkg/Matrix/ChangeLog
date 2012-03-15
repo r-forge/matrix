@@ -1,3 +1,7 @@
+2012-03-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/spModels.R (sparseInt.r): recursion free (which does not help much).
+
 2012-03-05  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/dtCMatrix.c (dtCMatrix_sparse_solve): no longer use Alloca()
