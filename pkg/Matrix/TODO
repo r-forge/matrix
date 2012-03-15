@@ -261,3 +261,9 @@
   {currently need to do this manually (Emacs M-x compare-windows) for the   typedefs}
 
 - finalize and activate the new *unused* code in src/t_sparseVector.c
+
+- check all uses of  alloca()/Alloca() in  src/*.[ch]
+  ensuring that the *size* allocated cannot grow with the
+  vector/matrix/nnzero sizes of the input.
+  [see the change needed in svn r2770 in src/dtCMatrix.c !]
+
