@@ -243,7 +243,7 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
 		stop("complex matrices not yet implemented in Matrix package")
 	    if (ctype == "integer") ## integer Matrices not yet implemented
 		storage.mode(data) <- "double"
-	    data <- new(paste(.M.kind(data), "geMatrix", sep=''),
+	    data <- new(paste0(.M.kind(data), "geMatrix"),
 			Dim = dim(data),
 			Dimnames = .M.DN(data),
 			x = c(data))

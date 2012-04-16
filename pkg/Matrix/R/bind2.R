@@ -128,7 +128,7 @@ setMethod("rbind2", signature(x = "denseMatrix", y = "numeric"),
 	  function(x, y) {
 	      if(is.character(dn <- x@Dimnames[[1]])) dn <- c(dn, "")
 	      y <- rbind2(as(x,"matrix"), y)
-	      new(paste(.M.kind(y), "geMatrix", sep=''), x = c(y),
+	      new(paste0(.M.kind(y), "geMatrix"), x = c(y),
                   Dim = x@Dim + 1:0, Dimnames = list(dn, x@Dimnames[[2]]))
 	  })
 ## the same, (x,y) <-> (y,x):
@@ -136,7 +136,7 @@ setMethod("rbind2", signature(x = "numeric", y = "denseMatrix"),
 	  function(x, y) {
 	      if(is.character(dn <- y@Dimnames[[1]])) dn <- c("", dn)
 	      x <- rbind2(x, as(y,"matrix"))
-	      new(paste(.M.kind(x), "geMatrix", sep=''), x = c(x),
+	      new(paste0(.M.kind(x), "geMatrix"), x = c(x),
                   Dim = y@Dim + 1:0, Dimnames = list(dn, y@Dimnames[[2]]))
 	  })
 
@@ -164,7 +164,7 @@ setMethod("rbind2", signature(x = "denseMatrix", y = "denseMatrix"),
 		  } else list(NULL, NULL)
 	      ## beware of (packed) triangular, symmetric, -> "cheap" (FIXME):
               x <- rbind2(as(x,"matrix"), as(y,"matrix"))
-	      new(paste(.M.kind(x), "geMatrix", sep=''), x = c(x),
+	      new(paste0(.M.kind(x), "geMatrix"), x = c(x),
                   Dim = c(nrx + nry, nc), Dimnames = dn)
 	  })
 

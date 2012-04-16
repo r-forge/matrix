@@ -251,7 +251,7 @@ setMethod("[", signature(x = "sparseMatrix", i = "missing", j = "index",
 	      cld <- getClassDef(class(x))
 ##> why should this be needed; can still happen in <Tsparse>[..]:
 ##>	      if(!extends(cld, "generalMatrix")) x <- as(x, "generalMatrix")
-##	      viaCl <- paste(.M.kind(x, cld), "gTMatrix", sep='')
+##	      viaCl <- paste0(.M.kind(x, cld), "gTMatrix")
 
 	      x <- as(x, "TsparseMatrix")[, j, drop=drop]
 ##simpler than x <- callGeneric(x = as(x, "TsparseMatrix"), j=j, drop=drop)
