@@ -137,7 +137,11 @@ sparseMatrix(x = TRUE, i=1:3, j=2:4) # recycling x, |--> "lgCMatrix"
 ## a symmetric one:
 (sy <- sparseMatrix(i= c(2,4,3:5), j= c(4,7:5,5), x = 1:5,
                     dims = c(7,7), symmetric=TRUE))
-stopifnot(isSymmetric(sy))
+stopifnot(isSymmetric(sy),
+          identical(sy, ## switch i <-> j {and transpose }
+    t( sparseMatrix(j= c(2,4,3:5), i= c(4,7:5,5), x = 1:5,
+                    dims = c(7,7), symmetric=TRUE))))
+
 
 \donttest{% as SparseM is "outside"
 ## pointers example in converting from other sparse matrix representations.
