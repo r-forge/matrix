@@ -1,3 +1,13 @@
+2012-04-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/sparseMatrix.R (sparseMatrix): now also works for
+	'symmetric=TRUE' and lower triangular indices.
+
+2012-04-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/CHMfactor.R (updown): new generic and methods, provided by
+	* man/updown.Rd: Nicholas Nagle.
+
 2012-03-15  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/spModels.R (sparseInt.r): recursion free (which does not help much).
