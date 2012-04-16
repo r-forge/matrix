@@ -193,7 +193,7 @@ bdiag <- function(...) {
 .diag2tT <- function(from, uplo = "U", kind = .M.kind(from)) {
     ## to triangular Tsparse
     i <- if(from@diag == "U") integer(0) else seq_len(from@Dim[1]) - 1L
-    new(paste(kind, "tTMatrix", sep=''),
+    new(paste0(kind, "tTMatrix"),
 	diag = from@diag, Dim = from@Dim, Dimnames = from@Dimnames,
 	uplo = uplo,
 	x = from@x, # <- ok for diag = "U" and "N" (!)
@@ -204,7 +204,7 @@ bdiag <- function(...) {
     ## to symmetric Tsparse
     n <- from@Dim[1]
     i <- seq_len(n) - 1L
-    new(paste(kind, "sTMatrix", sep=''),
+    new(paste0(kind, "sTMatrix"),
 	Dim = from@Dim, Dimnames = from@Dimnames,
 	i = i, j = i, uplo = uplo,
 	x = if(from@diag == "N") from@x else ## "U"-diag
