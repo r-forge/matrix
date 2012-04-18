@@ -71,3 +71,4 @@ setGeneric("forceSymmetric",
 setGeneric("nnzero", function(x, na.counted = NA) standardGeneric("nnzero"),
 	   signature = "x")
 
+setGeneric("updown", function(update, C, L) standardGeneric("updown"))

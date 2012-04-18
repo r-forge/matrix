@@ -114,6 +114,27 @@ setMethod("update", signature(object = "CHMfactor"),
           .Call(CHMfactor_update, object, parent, mult)
       })
 
+setMethod("updown", signature(update="ANY", C="ANY", L="ANY"),
+          ## fallback method -- give a "good" error message:
+	function(update,C,L)
+            stop("'update' must be logical or '+' o '-'; 'C' a matrix, and 'L' a
+\"CHMfactor\""))
+
+setMethod("updown", signature(update="logical", C="mMatrix", L="CHMfactor"),
+	function(update,C,L){
+	   bnew <- as(L,'pMatrix') %*% C
+	   .Call(CHMfactor_updown,update, as(bnew,'sparseMatrix'), L)
+	})
+
+setMethod("updown", signature(update="character", C="mMatrix", L="CHMfactor"),
+	function(update,C,L){
+	   if(! update %in% c("+","-"))
+	       stop("update must be TRUE/FALSE or '+' or '-'")
+	   update <- update=="+"
+	   bnew <- as(L,'pMatrix') %*% C
+	   .Call(CHMfactor_updown,update, as(bnew,'sparseMatrix'), L)
+	})
+
 ## Currently hidden:
 ldetL2up <- function(x, parent, Imult)
 {
