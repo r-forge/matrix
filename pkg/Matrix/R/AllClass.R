@@ -671,6 +671,8 @@ setClass("Schur", contains = "MatrixFactorization",
 
 ### Class Union :  no inheritance, but is(*, <class>) :
 
+setClassUnion("mMatrix", members = c("matrix", "Matrix"))
+
 ## Definition  Packed := dense with length( . @x) < prod( . @Dim)
 ##	       ~~~~~~
 ## REPLACED the following with	isPacked() in ./Auxiliaries.R :

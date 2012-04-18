@@ -5,8 +5,8 @@
 
 2012-04-15  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* R/CHMfactor.R (updown): new generic and methods, provided by
-	* man/updown.Rd: Nicholas Nagle.
+	* R/CHMfactor.R (updown): new generic and methods,
+	* man/updown.Rd: provided by Nicholas Nagle.
 
 2012-03-15  Martin Maechler  <maechler@stat.math.ethz.ch>
 

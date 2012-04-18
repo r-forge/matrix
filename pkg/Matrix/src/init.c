@@ -37,6 +37,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(CHMfactor_ldetL2, 1),
     CALLDEF(CHMfactor_ldetL2up, 3),
     CALLDEF(CHMfactor_update, 3),
+    CALLDEF(CHMfactor_updown,3),
     CALLDEF(destructive_CHM_update, 3),
     CALLDEF(Cholesky_validate, 1),
     CALLDEF(Csparse_Csparse_prod, 2),
@@ -303,6 +304,7 @@ R_init_Matrix(DllInfo *dll)
     RREGDEF(cholmod_transpose);
     RREGDEF(cholmod_triplet_to_sparse);
     RREGDEF(cholmod_vertcat);
+    RREGDEF(cholmod_updown);
 
     RREGDEF(dpoMatrix_chol);
     RREGDEF(numeric_as_chm_dense);

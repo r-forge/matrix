@@ -63,6 +63,7 @@ export("Cholesky",
        "tcrossprod",
        "tril",
        "triu",
+       "updown",
        "unpack"
        , ".validateCsparse"
 #        "writeHB",
@@ -293,6 +294,7 @@ exportMethods(## for both own and "other" generics:
 	      "tcrossprod",
 	      "tril",
 	      "triu",
+	      "updown",
               "unname",
               "which",
 	      "zapsmall"
