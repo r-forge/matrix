@@ -1,8 +1,9 @@
 \name{updown}
 \alias{updown}
 \alias{updown-methods}
-\alias{updown,character,ANY,CHMfactor-method}
-\alias{updown,logical,ANY,CHMfactor-method}
+\alias{updown,ANY,ANY,ANY-method}
+\alias{updown,character,mMatrix,CHMfactor-method}
+\alias{updown,logical,mMatrix,CHMfactor-method}
 \title{Up- and Down-Dating a Cholesky Decomposition}
 \description{
   Compute the up- or down-dated Cholesky decomposition
@@ -33,8 +34,8 @@ updown(update, C, L)
 \author{Contributed by Nicholas Nagle, University of Tennessee, Knoxville, USA}
 \section{Methods}{
   \describe{
-    \item{\code{signature(update = "character", C = "ANY", L = "CHMfactor")}}{..}
-    \item{\code{signature(update = "logical", C = "ANY", L = "CHMfactor")}}{ .. }
+    \item{\code{signature(update = "character", C = "mMatrix", L = "CHMfactor")}}{..}
+    \item{\code{signature(update = "logical", C = "mMatrix", L = "CHMfactor")}}{ .. }
   }
 }
 \seealso{
