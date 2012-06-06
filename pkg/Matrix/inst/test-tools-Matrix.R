@@ -189,7 +189,6 @@ rUnitTri <- function(n, upper = TRUE, ...)
     r
 }
 
-## This is related to rUnitTri(), ver
 mkLDL <- function(n, density = 1/3) {
     ## Purpose: make nice artificial   A = L D L'  (with exact numbers) decomp
     ## ----------------------------------------------------------------------
@@ -280,7 +279,8 @@ allCholesky <- function(A, verbose = FALSE, silentTry = FALSE)
     if(!identical(dup.r1, duplicated(r.all)))
         warning("duplicated( <pLs-matrix> ) differs from duplicated( <CHM-list> )",
                 immediate. = TRUE)
-    list(dup.r.all = dup.r1,
+    list(Chol.A = r1,
+         dup.r.all = dup.r1,
 	 r.all	= r.all,
 	 r.uniq = CHM_to_pLs(r1[ ! dup.r1]))
 }

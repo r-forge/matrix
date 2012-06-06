@@ -113,6 +113,26 @@ image(cm1, main= paste("as(Cholesky(crossprod(mm)),\"sparseMatrix\"):",
 \dontshow{
 expand(C1) ## to check printing
 }
+
+## Smaller example, with same matrix as in  help(chol) :
+(mm <- Matrix(toeplitz(c(10, 0, 1, 0, 3)), sparse = TRUE)) # 5 x 5
+(opts <- expand.grid(perm = c(TRUE,FALSE), LDL = c(TRUE,FALSE), super = c(FALSE,TRUE)))
+rr <- lapply(seq_len(nrow(opts)), function(i)
+             do.call(Cholesky, c(list(A = mm), opts[i,])))
+nn <- do.call(expand.grid, c(attr(opts, "out.attr")$dimnames,
+              stringsAsFactors=FALSE,KEEP.OUT.ATTRS=FALSE))
+names(rr) <- apply(nn, 1, function(r)
+                   paste(sub("(=.).*","\\1", r), collapse=","))
+str(rr, max=1)
+
+str(re <- lapply(rr, expand), max=2)
+## each has a 'P' and a 'L' matrix
+R0 <- chol(mm, pivot=FALSE)
+R1 <- chol(mm, pivot=TRUE )
+stopifnot(all.equal(t(R1), re[[1]]$L),
+          all.equal(t(R0), re[[2]]$L),
+          identical(as(1:5, "pMatrix"), re[[2]]$P), # no pivoting
+TRUE)
 }
 \keyword{array}
 \keyword{algebra}

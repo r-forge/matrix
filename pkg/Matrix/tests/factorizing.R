@@ -134,11 +134,11 @@ for(n in c(5:12)) {
 set.seed(17)
 (rr <- mkLDL(4))
 (CA <- Cholesky(rr$A))
-stopifnot(all.equal(determinant(rr$A),
-		    determinant(as(rr$A, "matrix"))))
+stopifnot(all.equal(determinant(rr$A) -> detA,
+                    determinant(as(rr$A, "matrix"))),
+          is.all.equal3(c(detA$modulus), log(det(rr$D)), sum(log(rr$D@x))))
 A12 <- mkLDL(12, 1/10)
-
-(r12 <- allCholesky(A12$A))
+(r12 <- allCholesky(A12$A))[-1]
 aCh.hash <- r12$r.all %*% (2^(2:0))
 if(FALSE)## if(require("sfsmisc"))
 split(rownames(r12$r.all), Duplicated(aCh.hash))
@@ -247,7 +247,7 @@ stopifnot(names(mtm@factors) == paste(c("sPD", "spD", "SPd"),
                "Cholesky", sep=''))
 
 r <- allCholesky(mtm)
-r
+r[-1]
 
 ## is now taken from cache
 c1 <- Cholesky(mtm)

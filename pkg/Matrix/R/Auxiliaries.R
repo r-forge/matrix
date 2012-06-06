@@ -1278,3 +1278,13 @@ setparts <- function(x,y, uniqueCheck = TRUE, check = TRUE) {
          int = if(n1 < n2) y[m1] else x[m2])
 }
 
+##' @title Warn about extraneous arguments in the "..."  (of its caller)
+##' @return
+##' @author Martin Maechler, June 2012
+chk.s <- function(...) {
+    if(length(list(...)))
+	warning("arguments  ",
+		sub(")$", '', sub("^list\\(", '', deparse(list(...), control=c()))),
+		"  are disregarded in\n ", deparse(sys.call(-1), control=c()),
+		call. = FALSE)
+}

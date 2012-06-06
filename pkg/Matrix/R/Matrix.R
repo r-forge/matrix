@@ -285,14 +285,12 @@ setMethod("chol2inv", signature(x = "denseMatrix"),
 	  function (x, ...) chol2inv(as(as(x, "dMatrix"), "dtrMatrix"), ...))
 setMethod("chol2inv", signature(x = "diagonalMatrix"),
 	  function (x, ...) {
-	      if(length(list(...)))
-		  warning("arguments in ",deparse(list(...))," are disregarded")
+	      chk.s(...)
 	      tcrossprod(solve(x))
 	  })
 setMethod("chol2inv", signature(x = "sparseMatrix"),
 	  function (x, ...) {
-	      if(length(list(...)))
-		  warning("arguments in ",deparse(list(...))," are disregarded")
+	      chk.s(...)
 	      ## for now:
 	      tcrossprod(solve(as(x,"triangularMatrix")))
 	  })
@@ -429,6 +427,7 @@ setMethod("any", signature(x = "Matrix"),
 setMethod("Summary", signature(x = "Matrix", na.rm = "ANY"),
 	  function(x, ..., na.rm)
 	  callGeneric(as(x,"dMatrix"), ..., na.rm = na.rm))
+
 
 Summary.l <- function(x, ..., na.rm) { ## must be method directly
     if(.Generic %in% c("all", "any"))
