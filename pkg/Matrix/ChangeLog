@@ -1,3 +1,8 @@
+2012-06-05  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (chk.s): "check dots" - new utility -- possibly
+	for base R ?
+
 2012-04-16  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/sparseMatrix.R (sparseMatrix): now also works for
@@ -7,6 +12,15 @@
 
 	* R/CHMfactor.R (updown): new generic and methods,
 	* man/updown.Rd: provided by Nicholas Nagle.
+
+2012-03-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.0-7, CRAN-released: ..., r
+
+2012-03-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.0-6, CRAN-released: 2012-03-30, r2775
+	* DESCRIPTION (Depends): R >= 2.15.0
 
 2012-03-15  Martin Maechler  <maechler@stat.math.ethz.ch>
 
@@ -33,7 +47,7 @@
 
 2012-02-25  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 1.0-5, CRAN-released: 2012-...., r...
+	* DESCRIPTION (Version): 1.0-5, CRAN-released: 2012-03-15, r2773
 	* src/chm_common.c (chm_factor_to_SEXP): in case of failure,
 	* src/dsCMatrix.c (internal_chm_factor): ensure memory cleanup;
 	memory leak reported by Kasper Kristensen at dtu.dk.

@@ -65,8 +65,7 @@ setMethod("rcond", signature(x = "dtrMatrix", norm = "missing"),
 
 setMethod("chol2inv", signature(x = "dtrMatrix"),
 	  function (x, ...) {
-	      if(length(list(...)))
-		  warning("arguments in ",deparse(list(...))," are disregarded")
+	      chk.s(...)
 	      if (x@diag != "N") x <- diagU2N(x)
 	      .Call(dtrMatrix_chol2inv, x)
 	  })
@@ -74,36 +73,31 @@ setMethod("chol2inv", signature(x = "dtrMatrix"),
 setMethod("solve", signature(a = "dtrMatrix", b="missing"),
 	  function(a, b, ...) {
 	      ## warn, as e.g. CHMfactor have 'system' as third argument
-	      if(length(list(...)))
-		  warning("arguments in ",deparse(list(...))," are disregarded")
+	      chk.s(...)
 	      .Call(dtrMatrix_solve, a)
 	  }, valueClass = "dtrMatrix")
 
 setMethod("solve", signature(a = "dtrMatrix", b="ddenseMatrix"),
 	  function(a, b, ...) {
-	      if(length(list(...)))
-		  warning("arguments in ",deparse(list(...))," are disregarded")
+	      chk.s(...)
 	      .Call(dtrMatrix_matrix_solve, a, b)
 	  }, valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dtrMatrix", b="dMatrix"),
 	  function(a, b, ...) {
-	      if(length(list(...)))
-		  warning("arguments in ",deparse(list(...))," are disregarded")
+	      chk.s(...)
 	      .Call(dtrMatrix_matrix_solve, a, as(b,"denseMatrix"))
 	  }, valueClass = "dgeMatrix")
 setMethod("solve", signature(a = "dtrMatrix", b="Matrix"),
 	  function(a, b, ...) {
-	      if(length(list(...)))
-		  warning("arguments in ",deparse(list(...))," are disregarded")
+	      chk.s(...)
 	      .Call(dtrMatrix_matrix_solve, a, as(as(b, "dMatrix"),
 						  "denseMatrix"))
 	  }, valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dtrMatrix", b="matrix"),
 	  function(a, b, ...) {
-	      if(length(list(...)))
-		  warning("arguments in ",deparse(list(...))," are disregarded")
+	      chk.s(...)
 	      .Call(dtrMatrix_matrix_solve, a, b)
 	  }, valueClass = "dgeMatrix")
 

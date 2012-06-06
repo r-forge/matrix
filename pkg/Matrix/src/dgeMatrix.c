@@ -234,6 +234,9 @@ SEXP dgeMatrix_LU_(SEXP x, Rboolean warn_sing)
     UNPROTECT(1);
     return set_factors(x, val, "LU");
 }
+// FIXME: also allow an interface to LAPACK's  dgesvx()  which uses LU fact.
+//        and then optionally does "equilibration" (row and column scaling)
+//  maybe also allow low-level interface to  dgeEQU() ...
 
 SEXP dgeMatrix_LU(SEXP x, SEXP warn_singularity)
 {
