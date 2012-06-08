@@ -428,6 +428,21 @@ setMethod("Summary", signature(x = "Matrix", na.rm = "ANY"),
 	  function(x, ..., na.rm)
 	  callGeneric(as(x,"dMatrix"), ..., na.rm = na.rm))
 
+if(FALSE) ## FIXME: it does *not* solve the problem anyway ..
+##
+##  (m <- Matrix(c(0,0,2:0), 3,5))
+##   min(1,m)
+##-> error, as it calls the .Primitive min() and that does *not* dispatch on 2nd arg
+##
+setMethod("Summary", signature(x = "ANY", na.rm = "ANY"),
+	  function(x, ..., na.rm) {
+          if(!length(a <- list(...))) (get(.Generic, envir=baseenv()))(x, na.rm=na.rm)
+          else {
+                 if(!is.null(v <- getOption("Matrix.verbose")) && v >= 1)
+                     message(sprintf("in Summary(<ANY>, .): %s(<%s>, <%s>%s)\n",
+                                     .Generic, class(x), class(a[[1]]), if(length(a) > 1)", ..." else ""))
+                 do.call(.Generic, c(x, a, list(na.rm=na.rm)))
+             }})
 
 Summary.l <- function(x, ..., na.rm) { ## must be method directly
     if(.Generic %in% c("all", "any"))

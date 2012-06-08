@@ -299,9 +299,17 @@ Zt <- new("dgCMatrix", Dim = c(6L, 30L), x = rep(1, 30),
           i = rep(0:5, each=5),
           p = 0:30, Dimnames = list(LETTERS[1:6], NULL))
 Ut <- 0.78 * Zt
-L <- Cholesky(tcrossprod(Ut), LDL = FALSE, Imult = 1)
-L1 <- update(L, tcrossprod(Ut), mult = 1)
-stopifnot(all.equal(L, L1))
+L <- Cholesky(UtU <- tcrossprod(Ut), LDL = FALSE, Imult = 1)
+L1 <- update(L, UtU, mult = 1)
+rr <- tryCatch.W.E(update(L, as(UtU,"generalMatrix"), mult = 1))
+stopifnot(is(rr[["warning"]], "warning"),
+          is.all.equal3(L, L1, rr$value, tol = 1e-14))
+
+## TODO: (--> ../TODO "Cholesky"): make *also* use of the possibility to update
+## ----   with non-symmetric A  and then  AA' + mult * I is considered
+.updateCHMfactor  ## allows that
+## similarly, allow Cholesky(A,..) when A is not symmetric *AND*
+##           we really want to factorize  AA' ( + beta * I)
 
 
 ## Schur() ----------------------

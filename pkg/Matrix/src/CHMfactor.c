@@ -25,7 +25,8 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP system)
     int sys = asInteger(system);
     R_CheckStack();
 
-    if (!(sys--))		/* -- align with CHOLMOD defs */
+    if (!(sys--))		/* align with CHOLMOD defs: R's {1:9} --> {0:8},
+				   see ./CHOLMOD/Cholesky/cholmod_solve.c */
 	error(_("system argument is not valid"));
 
     X = cholmod_solve(sys, L, B, &c);
@@ -53,7 +54,8 @@ SEXP CHMfactor_spsolve(SEXP a, SEXP b, SEXP system)
     int sys = asInteger(system);
     R_CheckStack();
 
-    if (!(sys--))		/* -- align with CHOLMOD defs */
+    if (!(sys--))		/* align with CHOLMOD defs: R's {1:9} --> {0:8},
+				   see ./CHOLMOD/Cholesky/cholmod_solve.c */
 	error(_("system argument is not valid"));
     return chm_sparse_to_SEXP(cholmod_spsolve(sys, L, B, &c),
 			      1/*do_free*/, 0/*uploT*/, 0/*Rkind*/,
@@ -126,13 +128,15 @@ CHM_FR chm_factor_update(CHM_FR f, CHM_SP A, double mult)
     int ll = f->is_ll;
     double mm[2] = {0, 0};
     mm[0] = mult;
+    // NB: Result depends if A is "dsC" or "dgC"; the latter case assumes we mean AA' !!!
     if (!cholmod_factorize_p(A, mm, (int*)NULL, 0 /*fsize*/, f, &c))
+	/* -> ./CHOLMOD/Cholesky/cholmod_factorize.c */
 	error(_("cholmod_factorize_p failed: status %d, minor %d of ncol %d"),
 	      c.status, f->minor, f->n);
     if (f->is_ll != ll)
 	if(!cholmod_change_factor(f->xtype, ll, f->is_super, 1 /*to_packed*/,
-				    1 /*to_monotonic*/, f, &c))
-	   error(_("cholmod_change_factor failed"));
+				  1 /*to_monotonic*/, f, &c))
+	    error(_("cholmod_change_factor failed"));
     return f;
 }
 

@@ -20,6 +20,7 @@ isLDL <- function(x)
     stopifnot(is(x, "CHMfactor"))
     as.logical(! x@type[2])# "!" = not as type[2] := (cholmod_factor)->is_ll
 }
+.isLDL <- function(x) as.logical(! x@type[2])# "!" = not as type[2] := (cholmod_factor)->is_ll
 
 setMethod("image", "CHMfactor",
           function(x, ...) {
@@ -34,8 +35,10 @@ setMethod("image", "CHMfactor",
 {
     chk.s(...)
     sysDef <- eval(formals()$system)
-    .Call(CHMfactor_solve, a, b,
-	  match(match.arg(system, sysDef), sysDef, nomatch = 0))
+    .Call(CHMfactor_solve, #-> cholmod_solve() in  ../src/CHOLMOD/Cholesky/cholmod_solve.c
+          a, b,
+	  ## integer in	 1 ("A"), 2 ("LDLt"), ..., 9 ("Pt") :
+	  match(match.arg(system, sysDef), sysDef, nomatch = 0L))
 }
 
 setMethod("solve", signature(a = "CHMfactor", b = "ddenseMatrix"),
@@ -56,8 +59,10 @@ setMethod("solve", signature(a = "CHMfactor", b = "dsparseMatrix"),
 		   ...) {
 	      chk.s(...)
 	      sysDef <- eval(formals()$system)
-	      .Call(CHMfactor_spsolve, a, as(as(b, "CsparseMatrix"), "dgCMatrix"),
-		    match(match.arg(system, sysDef), sysDef, nomatch = 0))
+	      .Call(CHMfactor_spsolve,	#--> cholmod_spsolve() in  ../src/CHOLMOD/Cholesky/cholmod_spsolve.c
+					#\-->  cholmod_solve() in  ../src/CHOLMOD/Cholesky/cholmod_solve.c
+		    a, as(as(b, "CsparseMatrix"), "dgCMatrix"),
+		    match(match.arg(system, sysDef), sysDef, nomatch = 0L))
 	  }, valueClass = "CsparseMatrix")# < virtual value ?
 
 setMethod("solve", signature(a = "CHMfactor", b = "diagonalMatrix"),
@@ -104,17 +109,30 @@ setMethod("determinant", signature(x = "CHMfactor", logarithm = "logical"),
       })
 
 setMethod("update", signature(object = "CHMfactor"),
-          function(object, parent, mult = 0, ...)
+	  function(object, parent, mult = 0, ...)
       {
-          stopifnot(is(parent, "sparseMatrix"))
-          .Call(CHMfactor_update, object, parent, mult)
+	  stopifnot(extends(clp <- class(parent), "sparseMatrix"))
+	  if(!extends(clp, "dsCMatrix")) {
+	      if(!extends(clp, "symmetricMatrix") &&
+		 (is.null(v <- getOption("Matrix.quiet.update")) || !v) &&
+		 (is.null(v <- getOption("Matrix.quiet")) || !v))
+		  warning(gettextf("Probable inefficiency: '%s' is not formally symmetric.\n  Coercing it to '%s'",
+				   "parent", "symmetricMatrix"))
+	      parent <- as(as(parent, "CsparseMatrix"), "symmetricMatrix")
+	  }
+	  chk.s(...)
+	  .Call(CHMfactor_update, object, parent, mult)
       })
 
+##' fast version, somewhat hidden -- also works when parent is "dgCMatrix", however *differently*
+.updateCHMfactor <- function(object, parent, mult)
+    .Call(CHMfactor_update, object, parent, mult)
+
+
 setMethod("updown", signature(update="ANY", C="ANY", L="ANY"),
-          ## fallback method -- give a "good" error message:
-	function(update,C,L)
-            stop("'update' must be logical or '+' o '-'; 'C' a matrix, and 'L' a
-\"CHMfactor\""))
+	  ## fallback method -- give a "good" error message:
+	  function(update,C,L)
+	  stop("'update' must be logical or '+' or '-'; 'C' a matrix, and 'L' a \"CHMfactor\""))
 
 setMethod("updown", signature(update="logical", C="mMatrix", L="CHMfactor"),
 	function(update,C,L){

@@ -1,3 +1,8 @@
+2012-06-08  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/CHMfactor.R (update): now *warn* when parent is not formally
+	symmetric and coerce it.
+
 2012-06-05  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Auxiliaries.R (chk.s): "check dots" - new utility -- possibly

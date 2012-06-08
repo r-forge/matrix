@@ -110,7 +110,7 @@ dq <- function(ch) paste('"',ch,'"', sep="") ## dQuote(<UTF-8>) gives bad plots
 image(mtm, main=paste("crossprod(mm) : Sparse", dq(class(mtm))))
 image(cm1, main= paste("as(Cholesky(crossprod(mm)),\"sparseMatrix\"):",
                         dq(class(cm1))))
-\dontshow{
+\dontshow{% FIXME-- move to ../tests/factorizing.R :
 expand(C1) ## to check printing
 }
 
@@ -122,17 +122,24 @@ rr <- lapply(seq_len(nrow(opts)), function(i)
 nn <- do.call(expand.grid, c(attr(opts, "out.attr")$dimnames,
               stringsAsFactors=FALSE,KEEP.OUT.ATTRS=FALSE))
 names(rr) <- apply(nn, 1, function(r)
-                   paste(sub("(=.).*","\\1", r), collapse=","))
+                   paste(sub("(=.).*","\\\\1", r), collapse=","))% extra '\\' in Rd
 str(rr, max=1)
 
 str(re <- lapply(rr, expand), max=2)
-## each has a 'P' and a 'L' matrix
+## each has a 'P' and a 'L' matrix %% FIXME !! --- "check" them  __unfinished__
 R0 <- chol(mm, pivot=FALSE)
 R1 <- chol(mm, pivot=TRUE )
 stopifnot(all.equal(t(R1), re[[1]]$L),
           all.equal(t(R0), re[[2]]$L),
           identical(as(1:5, "pMatrix"), re[[2]]$P), # no pivoting
 TRUE)
+
+%% --> ../TODO : .diag.dsC() should be renamed, documented, tested,...
+\dontshow{
+str(dd <- .diag.dsC(mtm))
+dc <- .diag.dsC(Chx=C1) # <- directly from the Cholesky
+stopifnot(all.equal(dd,dc))
+}%dont
 }
 \keyword{array}
 \keyword{algebra}
