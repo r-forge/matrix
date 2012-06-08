@@ -24,6 +24,7 @@
 \alias{determinant,CHMfactor,missing-method}
 \alias{determinant,CHMfactor,logical-method}
 \alias{update,CHMfactor-method}
+\alias{.updateCHMfactor}
 %
 \description{The virtual class \code{"CHMfactor"} is a class of
   CHOLMOD-based Cholesky factorizations of symmetric, sparse,
@@ -35,11 +36,19 @@
   \code{"nCHMsimpl"} and \code{"nCHMsuper"}).
 }
 \usage{% want usage for the update method which has "surprising arguments"
-\S4method{update}{CHMfactor}(object, parent, mult = 0, \dots)
 isLDL(x)
+
+\S4method{update}{CHMfactor}(object, parent, mult = 0, \dots)
+.updateCHMfactor(object, parent, mult)% otherwise don't mention; for experts
+
+\S4method{solve}{CHMfactor,ddenseMatrix}(a, b,
+      system = c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt"), \dots)
+
+## and more methods, see below
 }
 \arguments{
-  \item{object,x}{a \code{"CHMfactor"} object.}
+  \item{x,object,a}{a \code{"CHMfactor"} object (almost always the result
+    of \code{\link{Cholesky}()}).}
   \item{parent}{a \code{"\linkS4class{dsCMatrix}"} matrix or
     \code{"\linkS4class{dgCMatrix}"} object with the same nonzero
     pattern as the matrix that generated \code{object}.  If
@@ -53,13 +62,22 @@ isLDL(x)
     identity matrix is (implicitly) added to \code{parent} or
     \code{tcrossprod(parent)} before updating the decomposition
     \code{object}.}
-  \item{\dots}{Optional additional arguments to the methods.}
+  \item{b}{(for \code{solve()}:) numeric vector or (dense) matrix as RHS
+    of the linear system \eqn{Ax = b}.}
+  \item{system}{(for \code{solve()}:) character string indicating the
+    kind of linear system to be solved.  Note that the default,
+    \code{"A"}, does \emph{not} solve the triangular system (but
+    \code{"L"} does).}
+  \item{\dots}{potentially further arguments to the methods.}
 }
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("dCHMsuper", ...)}
   but are more commonly created via \code{\link{Cholesky}()},
   applied to  \code{\linkS4class{dsCMatrix}} or
   \code{\linkS4class{lsCMatrix}} objects.
+
+  For an introduction, it may be helpful to look at the \code{expand()}
+  method and examples below.
 }
 \section{Slots}{
   of \code{"CHMfactor"} and all classes inheriting from it:
@@ -105,17 +123,17 @@ isLDL(x)
     \item{expand}{\code{signature(x = "CHMfactor")} Returns a list with
       components \code{P}, the matrix representing the fill-reducing
       permutation, and \code{L}, the lower triangular Cholesky factor.
-      The original positive-definite matrix corresponds to the product
-      \eqn{P'LL'P}. Because of fill-in during the decomposition the
+      The original positive-definite matrix \eqn{A} corresponds to the product
+      \eqn{A = P'LL'P}.  Because of fill-in during the decomposition the
       product may apparently have more non-zeros than the original
-      matrix, even after applying \code{\link{drop0}} to it. However,
+      matrix, even after applying \code{\link{drop0}} to it.  However,
       the extra "non-zeros" should be very small in magnitude.}
     \item{image}{\code{signature(x = "CHMfactor")} Plot the image of the
       lower triangular factor, \eqn{L}, from the decomposition.  This method
       is equivalent to \code{image(as(x, "sparseMatrix"))} so the
       comments in the above description of the \code{coerce} method
       apply here too.}
-    \item{solve}{\code{signature(a = "CHMfactor", b = "ddenseMatrix")}
+    \item{solve}{\code{signature(a = "CHMfactor", b = "ddenseMatrix"), system= *}
       The \code{solve} methods for a \code{"CHMfactor"} object take an
       optional third argument \code{system} whose value can be one of the
       character strings \code{"A"}, \code{"LDLt"}, \code{"LD"},
@@ -145,7 +163,7 @@ isLDL(x)
       positive-definite matrix that was decomposed.}
 
     %% since 0.999375-8 (2008-03-25):
-    \item{update}{\code{signature(object = "CHMfactor")}.  The
+    \item{update}{\code{signature(object = "CHMfactor"), parent}.  The
       \code{\link{update}} method requires an additional argument
       \code{parent}, which is a \code{"\linkS4class{dsCMatrix}"} object with
       the same structure of nonzeros as the matrix that was decomposed
@@ -188,7 +206,9 @@ stopifnot(all.equal(PLLP, XX), % not needed: factorsCheck is off: check.attr=FAL
           all(as.vector(solve(CX, b, system="P" )) == r$P \%*\% b),
           all(as.vector(solve(CX, b, system="Pt")) == t(r$P) \%*\% b) )
 
+
    ## [ See  help(Cholesky)  for more examples ]
+   ##        -------------
 }
 \keyword{classes}
 \keyword{algebra}

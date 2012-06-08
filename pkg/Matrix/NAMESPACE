@@ -39,6 +39,7 @@ export("Cholesky",
        ## "rowMeans", "rowSums",
        "condest", "onenormest",
        "det",# << "identical" as base - but with correct determinant()
+       ".diag.dsC",# -> R/dsCMatrix.R --has FIXME
        "diagN2U", "diagU2N",
        "drop0",
        "expand",
@@ -65,6 +66,7 @@ export("Cholesky",
        "triu",
        "updown",
        "unpack"
+       , ".updateCHMfactor"
        , ".validateCsparse"
 #        "writeHB",
        , "writeMM"

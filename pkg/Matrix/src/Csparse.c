@@ -684,11 +684,11 @@ SEXP diag_tC_ptr(int n, int *x_p, double *x_x, int *perm, SEXP resultKind)
     double *v = REAL(ans);
 /*  ^^^^^^      ^^^^  FIXME[Generalize] */
 
-#define for_DIAG(v_ASSIGN)						\
-    for(i = 0; i < n; i++, i_from += n_x) {				\
-	/* looking at i-th column */					\
+#define for_DIAG(v_ASSIGN)					\
+    for(i = 0; i < n; i++, i_from += n_x) {			\
+	/* looking at i-th column */				\
 	n_x = x_p[i+1] - x_p[i];/* #{entries} in this column */	\
-	v_ASSIGN;							\
+	v_ASSIGN;						\
     }
 
     /* NOTA BENE: we assume  -- uplo = "L" i.e. lower triangular matrix
@@ -720,7 +720,8 @@ SEXP diag_tC_ptr(int n, int *x_p, double *x_x, int *perm, SEXP resultKind)
     case diag_backpermuted:
 	for_DIAG(v[i] = x_x[i_from]);
 
-	warning(_("resultKind = 'diagBack' (back-permuted) is experimental"));
+	warning(_("%s = '%s' (back-permuted) is experimental"),
+		"resultKind", "diagBack");
 	/* now back_permute : */
 	for(i = 0; i < n; i++) {
 	    double tmp = v[i]; v[i] = v[perm[i]]; v[perm[i]] = tmp;
