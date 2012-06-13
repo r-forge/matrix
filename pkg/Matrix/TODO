@@ -19,6 +19,7 @@
   happen in C, see  R/bind2.R and src/Csparse.c (Csparse_horzcat etc).
 
 - Check for DimNames propagation in coercion and other operations.
+  Done for (%*%, crossprod, tcrossprod).
 
 - Report the problem in the Linux ldexp manual page.  The second and
   third calls in the Synopsis should be to ldexpf and ldexpl.
