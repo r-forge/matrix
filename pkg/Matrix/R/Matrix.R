@@ -428,7 +428,37 @@ setMethod("Summary", signature(x = "Matrix", na.rm = "ANY"),
 	  function(x, ..., na.rm)
 	  callGeneric(as(x,"dMatrix"), ..., na.rm = na.rm))
 
-if(FALSE) ## FIXME: it does *not* solve the problem anyway ..
+## Try to make   min(1, <Matrix>)  work, i.e., not dispatch on first arg to .Primitive
+## This for(..) gives {during installation}
+## Error in setGeneric(F, signature = "...") :
+##   ‘max’ is a primitive function;  methods can be defined, but the generic function is implicit, and cannot be changed.
+if(FALSE)
+for(F in c("max", "min", "range", "prod", "sum", "any", "all")) {
+    setGeneric(F, signature = "...")
+}
+### try on "min" for now --- ~/R/Pkgs/Rmpfr/R/mpfr.R is the example (for "pmin")
+if(FALSE)### This gives error message that the "ANY" is method is sealed ...
+setMethod("min", "ANY",
+	  function(..., na.rm = FALSE) {
+	      args <- list(...)
+	      if(all(isAtm <- vapply(args, is.atomic, NA)))
+		  return( base::min(..., na.rm = na.rm) )
+              ## else try to dispatch on an argument which is a Matrix.. or in a
+              if(any(isM <- vapply(args, is, NA, class2="Matrix"))) {
+                  ## swap the Matrix with the first argument
+                  i <- which.max(isM)# the first "Matrix"
+                  if(i == 1)
+                      stop("programming error: min() should have dispatched w/ 1st arg much earlier")
+              } else { ## if no "Matrix", take the first non-atomic argument
+                  ## (FIXME: should take the first for which there is a method !)
+                  i <- which.max(!isAtm)
+              }
+              ii <- seq_along(args)
+              ii[c(1,i)] <- c(i,1)
+              do.call(min, c(args[ii], list(na.rm=na.rm)))
+          })
+
+if(FALSE) { ## FIXME: it does *not* solve the problem anyway ..
 ##
 ##  (m <- Matrix(c(0,0,2:0), 3,5))
 ##   min(1,m)
@@ -443,6 +473,7 @@ setMethod("Summary", signature(x = "ANY", na.rm = "ANY"),
                                      .Generic, class(x), class(a[[1]]), if(length(a) > 1)", ..." else ""))
                  do.call(.Generic, c(x, a, list(na.rm=na.rm)))
              }})
+}
 
 Summary.l <- function(x, ..., na.rm) { ## must be method directly
     if(.Generic %in% c("all", "any"))

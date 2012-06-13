@@ -1,3 +1,7 @@
+2012-06-12  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/matprod.R (chkDnProd): new testing function
+
 2012-06-08  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/CHMfactor.R (update): now *warn* when parent is not formally
