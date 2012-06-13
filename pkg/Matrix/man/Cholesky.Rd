@@ -103,7 +103,9 @@ Cn <- Cholesky(mtm, perm = FALSE)# no permutation -- much worse:
 sizes <- c(simple = object.size(C1),
            super  = object.size(Cm),
            noPerm = object.size(Cn))
-format(cbind(100 * sizes / sizes[1]), digits=4)
+## simple is 100, super= 137, noPerm= 812 :
+noquote(cbind(format(100 * sizes / sizes[1], digits=4)))
+
 
 ## Visualize the sparseness:
 dq <- function(ch) paste('"',ch,'"', sep="") ## dQuote(<UTF-8>) gives bad plots
