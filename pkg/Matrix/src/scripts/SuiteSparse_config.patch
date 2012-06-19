@@ -1,0 +1,13 @@
+--- SuiteSparse_config/SuiteSparse_config.h.orig	2012-05-28 11:39:06.000000000 -0500
++++ SuiteSparse_config/SuiteSparse_config.h	2012-06-19 14:57:25.120296486 -0500
+@@ -45,6 +45,10 @@
+ #include <limits.h>
+ #include <stdlib.h>
+ 
++// For use with R package 'Matrix'
++#include <R_ext/Print.h>
++#define printf Rprintf
++
+ /* ========================================================================== */
+ /* === SuiteSparse_long ===================================================== */
+ /* ========================================================================== */

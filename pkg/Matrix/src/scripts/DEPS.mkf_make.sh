@@ -13,7 +13,7 @@ cd $MatrixDir
 FIX=CHOLMOD/Include/cholmod.h
 if [ -f $FIX ]
 then
-  sed '/^#include "UFconfig/s/\(.*\)/\/* \1 *\//' $FIX > ${FIX}_fixed
+  sed '/^#include "SuiteSparse_config/s/\(.*\)/\/* \1 *\//' $FIX > ${FIX}_fixed
   mv $FIX ${FIX}_orig
   mv ${FIX}_fixed $FIX
 fi
