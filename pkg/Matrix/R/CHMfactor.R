@@ -112,19 +112,19 @@ setMethod("update", signature(object = "CHMfactor"),
 	  function(object, parent, mult = 0, ...)
       {
 	  stopifnot(extends(clp <- class(parent), "sparseMatrix"))
-	  if(!extends(clp, "dsCMatrix")) {
-	      if(!extends(clp, "symmetricMatrix") &&
-		 (is.null(v <- getOption("Matrix.quiet.update")) || !v) &&
-		 (is.null(v <- getOption("Matrix.quiet")) || !v))
-		  warning(gettextf("Probable inefficiency: '%s' is not formally symmetric.\n  Coercing it to '%s'",
-				   "parent", "symmetricMatrix"))
-	      parent <- as(as(parent, "CsparseMatrix"), "symmetricMatrix")
-	  }
+	  d <- dim(parent)
+	  if(!extends(clp, "dsparseMatrix"))
+	      clp <- class(parent <- as(parent, "dsparseMatrix"))
+	  if(!extends(clp, "CsparseMatrix"))
+	      clp <- class(parent <- as(parent, "CsparseMatrix"))
+	  if(d[1] == d[2] && !extends(clp, "dsCMatrix") &&
+	     !is.null(v <- getOption("Matrix.verbose")) && v >= 1)
+	      message(gettextf("Quadratic matrix '%s' (=: A) is not formally\n	symmetric.  Will be treated as	A A' ",
+			       "parent"))
 	  chk.s(...)
 	  .Call(CHMfactor_update, object, parent, mult)
       })
-
-##' fast version, somewhat hidden -- also works when parent is "dgCMatrix", however *differently*
+##' fast version, somewhat hidden; here parent *must* be  'd[sg]CMatrix'
 .updateCHMfactor <- function(object, parent, mult)
     .Call(CHMfactor_update, object, parent, mult)
 
