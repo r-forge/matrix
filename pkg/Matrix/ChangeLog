@@ -1,3 +1,11 @@
+2012-06-19  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.0-8, CRAN-released: 2012-06-20, r
+
+	* R/CHMfactor.R (update): *DO* allow non-symmetric parent.
+	* man/CHMfactor-class.Rd: be more clear about the two ways.
+	* tests/factorizing.R: more update(<Chol>) testing
+
 2012-06-12  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* tests/matprod.R (chkDnProd): new testing function
@@ -24,7 +32,7 @@
 
 2012-03-30  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 1.0-7, CRAN-released: ..., r
+	* DESCRIPTION (Version): 1.0-7, CRAN-released: for a few days only.
 
 2012-03-16  Martin Maechler  <maechler@stat.math.ethz.ch>
 

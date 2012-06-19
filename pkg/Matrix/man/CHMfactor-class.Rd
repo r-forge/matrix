@@ -49,15 +49,18 @@ isLDL(x)
 \arguments{
   \item{x,object,a}{a \code{"CHMfactor"} object (almost always the result
     of \code{\link{Cholesky}()}).}
-  \item{parent}{a \code{"\linkS4class{dsCMatrix}"} matrix or
-    \code{"\linkS4class{dgCMatrix}"} object with the same nonzero
-    pattern as the matrix that generated \code{object}.  If
-    \code{parent} is a symmetric matrix (class
-    \code{"\linkS4class{dsCMatrix}"}) then \code{object} should be a
-    decomposition of a matrix with the same nonzero pattern as
-    \code{parent}.  If \code{parent} is not symmetric then \code{object}
+  \item{parent}{a \code{"\linkS4class{dsCMatrix}"} or
+    \code{"\linkS4class{dgCMatrix}"} matrix object with the same nonzero
+    pattern as the matrix that generated \code{object}.  If \code{parent}
+    is symmetric, of class \code{"\linkS4class{dsCMatrix}"}, then
+    \code{object} should be a decomposition of a matrix with the same
+    nonzero pattern as \code{parent}.  If \code{parent} is not symmetric then \code{object}
     should be the decomposition of a matrix with the same nonzero
-    pattern as \code{tcrossprod(parent)}.}
+    pattern as \code{tcrossprod(parent)}.
+
+    Since Matrix version 1.0-8, other \code{"\linkS4class{sparseMatrix}"} matrices are
+    coerced to \code{\linkS4class{dsparseMatrix}} and
+    \code{\linkS4class{CsparseMatrix}} if needed.}
   \item{mult}{a numeric scalar (default 0).  \code{mult} times the
     identity matrix is (implicitly) added to \code{parent} or
     \code{tcrossprod(parent)} before updating the decomposition
@@ -165,18 +168,21 @@ isLDL(x)
     %% since 0.999375-8 (2008-03-25):
     \item{update}{\code{signature(object = "CHMfactor"), parent}.  The
       \code{\link{update}} method requires an additional argument
-      \code{parent}, which is a \code{"\linkS4class{dsCMatrix}"} object with
-      the same structure of nonzeros as the matrix that was decomposed
-      to produce \code{object}, and provides an optional argument
-      \code{mult}, a numeric scalar.  This method updates the numeric
-      values in \code{object} to the decomposition of \eqn{A+mI} where
-      \eqn{A} is the matrix represented by \code{parent} and \eqn{m} is
-      the scalar \code{mult}. Because only the numeric values are
+      \code{parent}, which is \emph{either} a
+      \code{"\linkS4class{dsCMatrix}"} object, say \eqn{A}, (with the
+      same structure of nonzeros as the matrix that was decomposed to
+      produce \code{object}) or a general \code{"\linkS4class{dgCMatrix}"},
+      say \eqn{M}, where \eqn{A := M M'} (\code{== tcrossprod(parent)})
+      is used for \eqn{A}.
+      Further it provides an optional argument \code{mult}, a numeric
+      scalar.  This method updates the numeric values in \code{object}
+      to the decomposition of \eqn{A+mI} where \eqn{A} is the matrix
+      above (either the \code{parent} or \eqn{M M'}) and \eqn{m} is
+      the scalar \code{mult}.  Because only the numeric values are
       updated this method should be faster than creating and decomposing
       \eqn{A+mI}.  It is not uncommon to want, say, the determinant of
       \eqn{A+mI} for many different values of \eqn{m}.  This method
       would be the preferred approach in such cases.}
-
   }
 }
 %\references{}
@@ -194,7 +200,7 @@ M1 <- spMatrix(n, m,
                i = sample(n, nnz, replace = TRUE),
                j = sample(m, nnz, replace = TRUE),
                x = round(rnorm(nnz),1))
-XX <- crossprod(M1)
+XX <- crossprod(M1) ## = M1'M1  = M M'  where M <- t(M1)
 CX <- Cholesky(XX)
 isLDL(CX)
 str(CX) ## a "dCHMsimpl" object
@@ -205,6 +211,10 @@ b <- sample(m)
 stopifnot(all.equal(PLLP, XX), % not needed: factorsCheck is off: check.attr=FALSE),
           all(as.vector(solve(CX, b, system="P" )) == r$P \%*\% b),
           all(as.vector(solve(CX, b, system="Pt")) == t(r$P) \%*\% b) )
+
+u1 <- update(CX, XX,    mult=pi)
+if(FALSE) ## fails ___ FIXME ? ___
+u2 <- update(CX, t(M1), mult=pi)
 
 
    ## [ See  help(Cholesky)  for more examples ]
