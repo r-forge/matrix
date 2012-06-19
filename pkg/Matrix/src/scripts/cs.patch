@@ -1,14 +1,24 @@
---- cs.h.~1~	2009-01-20 21:42:59.000000000 +0100
-+++ cs.h	2012-01-13 12:07:30.005416000 +0100
-@@ -3,7 +3,11 @@
+--- cs.h.~1~	2012-06-19 14:34:39.040367096 -0500
++++ cs.h	2012-06-19 14:32:40.224373237 -0500
+@@ -3,8 +3,12 @@
  #include <stdlib.h>
  #include <limits.h>
  #include <math.h>
 +// needed for FILE:
  #include <stdio.h>
+ #include <stddef.h>
 +// For use with R package 'Matrix'
 +# include <R_ext/Print.h>
 +# define printf Rprintf
  #ifdef MATLAB_MEX_FILE
  #include "mex.h"
  #endif
+@@ -19,7 +23,7 @@
+ #define csi mwSignedIndex
+ #endif
+ #ifndef csi
+-#define csi ptrdiff_t
++#define csi int
+ #endif
+ 
+ /* --- primary CSparse routines and data structures ------------------------- */
