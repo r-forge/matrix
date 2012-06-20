@@ -405,6 +405,7 @@ cholmod_l_updown.o: ../Modify/cholmod_updown.c \
 #-------------------------------------------------------------------------------
 
 cholmod_super_numeric.o: ../Supernodal/cholmod_super_numeric.c \
+        ../Supernodal/t_cholmod_gpu.c \
 	../Supernodal/t_cholmod_super_numeric.c
 	$(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c ../Supernodal/cholmod_super_numeric.c -o $@
 cholmod_super_symbolic.o: ../Supernodal/cholmod_super_symbolic.c
