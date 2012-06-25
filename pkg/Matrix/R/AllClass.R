@@ -278,6 +278,8 @@ setClass("corMatrix", representation(sd = "numeric"), contains = "dpoMatrix",
 	     n <- object@Dim[2]
 	     if(length(sd <- object@sd) != n)
 		 return("'sd' slot must be of length 'dim(.)[1]'")
+	     if(any(!is.finite(sd)))# including NA
+		 return("'sd' slot has non-finite entries")
 	     if(any(sd < 0))
 		 return("'sd' slot has negative entries")
 	     TRUE
