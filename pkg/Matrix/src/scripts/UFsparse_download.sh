@@ -16,18 +16,18 @@ if [ $getSPQR = yes ] ; then
 wget -nc  $ufl_URL/SPQR/current/SPQR.tar.gz
 fi
 
-## 1) UFconfig ---------------------------------------------
-  ## install UFconfig.h file (now needed by some UFsparse libraries)
-tar zxf SuiteSparse_config.tar.gz SuiteSparse_config/SuiteSparse_config.h SuiteSparse_config/README.txt
-  ## Move the UFconfig/README.txt file to ../inst/doc/UFsparse/UFconfig.txt
-mv SuiteSparse_config/README.txt ../inst/doc/UFsparse/SuiteSparse_config.txt
+## 1) SuiteSparse_config ---------------------------------------------
+  ## install SuiteSparse_config.h file (now needed by some SuiteSparse libraries)
+tar zxf SuiteSparse_config.tar.gz SuiteSparse_config/SuiteSparse_config.h SuiteSparse_config/README.txt SuiteSparse_config/SuiteSparse_config.c SuiteSparse_config/Makefile
+  ## Move the SuiteSparse_config/README.txt file to ../inst/doc/SuiteSparse/SuiteSparse_config.txt
+mv SuiteSparse_config/README.txt ../inst/doc/SuiteSparse/SuiteSparse_config.txt
   ## touch the file SuiteSparse_config/SuiteSparse_config.mk.  We use other configuration
   ## environment variables but this name is embedded in some Makefiles
 touch SuiteSparse_config/SuiteSparse_config.mk
   ## Need to add the Matrix-specific changes to SuiteSparse_config/SuiteSparse_config.h :
 ## 2011-04: *no longer* !!  patch -p0 < scripts/UFconfig.patch
 ## again for printf():
-patch -p0 < scripts/SuiteSparse_config.patch
+## 2012-06: *no longer* patch -p0 < scripts/SuiteSparse_config.patch
 
 ## 2) COLAMD -----------------------------------------------
    ## install COLAMD/Source and COLAMD/Include directories
@@ -39,12 +39,12 @@ mv COLAMD/README.txt ../inst/doc/UFsparse/COLAMD.txt
 patch -p0 < scripts/COLAMD.patch
 
 ## 3) AMD --------------------------------------------------
-  ## install AMD/Source and AMD/Include directories
+  ## install AMD/Source, AMD/Include and AMD/Lib directories
 tar zxf AMD.tar.gz AMD/Source AMD/Include AMD/Lib AMD/README.txt
   ## restore AMD/Lib/Makefile
-svn revert AMD/Lib/Makefile
+##svn revert AMD/Lib/Makefile
   ## install AMD documentation
-mv AMD/README.txt ../inst/doc/UFsparse/AMD.txt
+mv AMD/README.txt ../inst/doc/SuiteSparse/AMD.txt
   ## remove Fortran source files and GNUMakefile
 rm AMD/Source/*.f AMD/Lib/GNUmakefile
 #(for f in AMD/Include/amd_internal.h AMD/Source/amd_global.c; do diff -ubBw ${f}.~1~ $f ; done ) | tee scripts/AMD-noprint.patch
