@@ -189,7 +189,8 @@ SEXP nz2Csparse(SEXP x, enum x_slot_kind r_kind)
     if(cl_x[2] != 'C') error(_("not a CsparseMatrix"));
     int nnz = LENGTH(GET_SLOT(x, Matrix_iSym));
     SEXP ans;
-    char *ncl = strdup(cl_x);
+    char *ncl = alloca(strlen(cl_x) + 1); /* not much memory required */
+    strcpy(ncl, cl_x);
     double *dx_x; int *ix_x;
     ncl[0] = (r_kind == x_double ? 'd' :
 	      (r_kind == x_logical ? 'l' :
