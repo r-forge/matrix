@@ -160,6 +160,7 @@ SEXP dsyMatrix_trf(SEXP x)
     return set_factors(x, val, "BunchKaufman");
 }
 
+// this is very close to lsyMatrix_as_lsp*() in ./ldense.c  -- keep synced !
 SEXP dsyMatrix_as_dspMatrix(SEXP from)
 {
     SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dspMatrix"))),
@@ -171,7 +172,7 @@ SEXP dsyMatrix_as_dspMatrix(SEXP from)
     SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
     full_to_packed_double(
 	REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, (n*(n+1))/2)),
-	REAL(GET_SLOT(from, Matrix_xSym)), n,
+	REAL( GET_SLOT(from, Matrix_xSym)), n,
 	*CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW, NUN);
     SET_SLOT(val, Matrix_DimNamesSym,
 	     duplicate(GET_SLOT(from, Matrix_DimNamesSym)));

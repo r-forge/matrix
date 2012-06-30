@@ -166,6 +166,8 @@ SEXP dtpMatrix_as_dtrMatrix(SEXP from)
     packed_to_full_double(REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, n*n)),
 			  REAL(GET_SLOT(from, Matrix_xSym)), n,
 			  *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW);
+    SET_SLOT(val, Matrix_DimNamesSym,
+	     duplicate(GET_SLOT(from, Matrix_DimNamesSym)));
     UNPROTECT(1);
     return val;
 }
