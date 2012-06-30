@@ -66,13 +66,11 @@ setMethod("norm", signature(x = "dspMatrix", type = "missing"),
           function(x, type, ...) .Call(dspMatrix_norm, x, "O"),
           valueClass = "numeric")
 
+## FIXME: speed up!
 setMethod("t", signature(x = "dspMatrix"),
           function(x) as(t(as(x, "dsyMatrix")), "dspMatrix"),
           valueClass = "dspMatrix")
 
-setMethod("unpack", signature(x = "dspMatrix"),
-          function(x, ...) as(x, "dsyMatrix"),
-          valueClass = "dsyMatrix")
 
 ## The following allows  as(*, "dppMatrix").
 ## However it *requires* that dppMatrix_chol() gives an error

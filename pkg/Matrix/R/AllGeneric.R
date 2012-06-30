@@ -30,7 +30,8 @@ setGeneric("lu", function(x, ...) standardGeneric("lu"))
 
     setGeneric("Schur", function(x, vectors, ...) standardGeneric("Schur"))
 
-    setGeneric("unpack", function(x, ...) standardGeneric("unpack"))
+setGeneric("unpack", function(x, ...) standardGeneric("unpack"))
+setGeneric("pack", function(x, ...) standardGeneric("pack"))
 
 ##-     setGeneric("%p%", function(a, b) standardGeneric("%p%"))
 

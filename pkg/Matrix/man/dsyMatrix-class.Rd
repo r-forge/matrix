@@ -43,7 +43,6 @@
 \alias{solve,dsyMatrix,missing-method}
 \alias{t,dspMatrix-method}
 \alias{t,dsyMatrix-method}
-\alias{unpack,dspMatrix-method}
 \title{Symmetric Dense Numeric Matrices}
 \description{
   The \code{"dsyMatrix"} class is the class of symmetric, dense matrices

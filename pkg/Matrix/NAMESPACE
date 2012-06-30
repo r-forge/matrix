@@ -65,7 +65,7 @@ export("Cholesky",
        "tril",
        "triu",
        "updown",
-       "unpack"
+       "pack", "unpack"
        , ".updateCHMfactor"
        , ".validateCsparse"
 #        "writeHB",
