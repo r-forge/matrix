@@ -766,9 +766,11 @@ table(uniC <- sapply(lst[istri], function(.) get(.)@diag == "U"))
 lsUtr <- lst[istri][uniC]
 (di <- sapply(lsUtr, function(.) dim(get(.))))
 ## TODO: use %*%, crossprod(), .. on all those  4 x 4 -- and check "triangular rules"
-
 cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
 ##
+
+(doExtras <- interactive() || nzchar(Sys.getenv("R_MATRIX_CHECK_EXTRA")))
+if(doExtras) {
 cat("checkMatrix() of all: \n---------\n")
 Sys.setlocale("LC_COLLATE", "C")# to keep ls() reproducible
 for(nm in ls()) if(is(.m <- get(nm), "Matrix")) {
@@ -776,6 +778,7 @@ for(nm in ls()) if(is(.m <- get(nm), "Matrix")) {
     checkMatrix(.m)
 }
 cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
+}
 
 if(!interactive()) warnings()
 

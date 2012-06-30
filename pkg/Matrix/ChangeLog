@@ -1,3 +1,14 @@
+2012-06-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Ops.R (Ops.x.x): now, dense symmetric and triangular matrices
+	are preserved for many arithmetic and logic binary operators.
+
+	* src/ldense.c (lsyMatrix_as_lspMatrix, ..): more coercions keep
+	the dimnames().
+
+	* R/symmetricMatrix.R (pack, unpack): new pack() {"inverse" of
+	unpack(), including pack(<matrix>)}; new unpack() methods.
+
 2012-06-19  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 1.0-8, CRAN-released: 2012-06-20, r

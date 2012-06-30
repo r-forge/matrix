@@ -63,6 +63,52 @@ setMethod("forceSymmetric", signature(x="CsparseMatrix"),
 setMethod("symmpart", signature(x = "symmetricMatrix"), function(x) x)
 setMethod("skewpart", signature(x = "symmetricMatrix"), setZero)
 
+###------- pack() and unpack() --- for *dense*  symmetric & triangular matrices:
+packM <-  function(x, Mtype) {
+    cd <- getClassDef(cx <- class(x))
+    if(extends(cd, "sparseMatrix"))
+	stop(sprintf("(un)packing only applies to dense matrices, class(x)='%s'",
+		     cx))
+    as(x, paste0(.M.kindC(cd), Mtype))
+}
+setMethod("unpack", "symmetricMatrix", function(x, ...) packM(x,"syMatrix"))
+setMethod("pack",   "symmetricMatrix", function(x, ...) packM(x,"spMatrix"))
+setMethod("unpack", "triangularMatrix", function(x, ...) packM(x,"trMatrix"))
+setMethod("pack",   "triangularMatrix", function(x, ...) packM(x,"tpMatrix"))
+## to produce a nicer error message:
+pckErr <- function(x, ...)
+    stop(sprintf("(un)packing only applies to dense matrices, class(x)='%s'",
+		 class(x)))
+setMethod("unpack", "sparseMatrix", pckErr)
+setMethod("pack",   "sparseMatrix", pckErr)
+rm(pckErr)
+
+##' pack (<matrix>)  -- smartly:
+setMethod("pack", signature(x = "matrix"),
+	  function(x, symmetric=NA, upperTri = NA, ...) {
+	      if(is.na(symmetric)) ## must guess symmetric / triangular
+		  symmetric <- isSymmetric.matrix(x)
+	      if(symmetric) {
+		  pack(.Call(dense_to_symmetric, x, "U", TRUE), ...)
+	      } else { # triangular
+		  ## isTriMat(..) : should still check fully (speed up ?) ..
+		  if(isTr <- isTriMat(x, upper=upperTri)) {
+		      uplo <- attr(isTr, "kind")
+		      pack(new(paste0(.M.kind(x),"tpMatrix"),
+			       x = x[indTri(nrow(x), upper=(uplo == "U"), diag=TRUE)],
+			       Dim = dim(x), Dimnames = .M.DN(x), uplo = uplo), ...)
+		  } else
+		      stop("'x' is not symmetric nor triangular")
+	      }
+	  })
+
+## {"traditional"} specific methods
+setMethod("unpack", signature(x = "dspMatrix"),
+          function(x, ...) as(x, "dsyMatrix"), valueClass = "dsyMatrix")
+setMethod("unpack", signature(x = "dtpMatrix"),
+          function(x, ...) as(x, "dtrMatrix"), valueClass = "dtrMatrix")
+###
+
 
 ## autogenerate coercions
 ##  as(*,  "symmetricMatrix")

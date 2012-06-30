@@ -68,11 +68,7 @@ setMethod("solve", signature(a = "dtpMatrix", b="matrix"),
 	  function(a, b, ...) .Call(dtpMatrix_matrix_solve, a, b),
 	  valueClass = "dgeMatrix")
 
+## FIXME: speed up
 setMethod("t", signature(x = "dtpMatrix"),
           function(x) as(t(as(x, "dtrMatrix")), "dtpMatrix"),
           valueClass = "dtpMatrix")
-
-setMethod("unpack", signature(x = "dtpMatrix"),
-          function(x, ...) as(x, "dtrMatrix"),
-          valueClass = "dtrMatrix")
-###

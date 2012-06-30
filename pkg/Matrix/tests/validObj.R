@@ -48,7 +48,7 @@ stopifnot(identical(mc., mcm),
 
 checkMatrix(eq <- cm == cs)
 stopifnot(all(eq@x),
-	  identical3(eq, cs == cp, cm == cp),
+	  identical3(pack(eq), cs == cp, cm == cp),
 	  as.logical(!(cs < cp)),
 	  identical4(!(cs < cp), !(cp > cs), cp <= cs, cs >= cp))
 

@@ -304,6 +304,8 @@ isPacked <- function(x)
     ## unneeded(!): any("x" == slotNames(x)) &&
     length(x@x) < prod(dim(x))
 }
+##" Is 'x' a packed (dense) matrix -- "no-check" version
+.isPacked <- function(x) length(x@x) < prod(dim(x))
 
 emptyColnames <- function(x, msg.if.not.empty = FALSE)
 {
@@ -964,7 +966,7 @@ asTri <- function(from, newclass) {
     ## TODO: also check for unit-diagonal: 'diag = "U"'
     isTri <- isTriangular(from)
     if(isTri)
-	new(newclass, x = from@x, Dim = from@Dim,
+ 	new(newclass, x = from@x, Dim = from@Dim,
 	    Dimnames = from@Dimnames, uplo = attr(isTri, "kind"))
     else stop("not a triangular matrix")
 }
