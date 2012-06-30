@@ -157,9 +157,9 @@ Cmp.Mat.atomic <- function(e1, e2) { ## result will inherit from "lMatrix"
         r@Dimnames <- e1@Dimnames
         r@x <- rep.int(TRUE, prod(d))
     }
-    else if(extends(cl1 ,"denseMatrix")) {
-        full <- !isPacked(e1)     # << both "dtr" and "dsy" are 'full'
-        if(full || allFalse(r0) || extends(cl1, "symmetricMatrix")) {
+    else if(extends(cl1, "denseMatrix")) {
+	full <- !.isPacked(e1)	   # << both "dtr" and "dsy" are 'full'
+	if(full || allFalse(r0) || extends(cl1, "symmetricMatrix")) {
             isTri <- extends(cl1, "triangularMatrix")
             if(isTri) {
                 if(extends(cl1,"Cholesky") || extends(cl1,"BunchKaufman"))
@@ -268,30 +268,59 @@ setMethod("Compare", signature(e1 = "nMatrix", e2 = "logical"), Cmp.Mat.atomic)
 Ops.x.x <- function(e1, e2)
 {
     d <- dimCheck(e1,e2)
-    if((dens1 <- is(e1, "denseMatrix"))) gen1 <- is(e1, "generalMatrix")
-    if((dens2 <- is(e2, "denseMatrix"))) gen2 <- is(e2, "generalMatrix")
+    if((dens1 <- extends(c1 <- class(e1), "denseMatrix"))) gen1 <- extends(c1, "generalMatrix")
+    if((dens2 <- extends(c2 <- class(e2), "denseMatrix"))) gen2 <- extends(c2, "generalMatrix")
 
     if(dens1 && dens2) { ## both inherit from ddense*
-
-        if(!gen1) e1 <- as(e1, "generalMatrix") # was "dgeMatrix"
-        if(!gen2) e2 <- as(e2, "generalMatrix")
-        ## now, both are xge {dense* & general*}
-
-        r <- callGeneric(e1@x, e2@x)
-        new(paste0(.M.kind(r), "geMatrix"),
-            x = r, Dim = d, Dimnames = dimnames(e1))
+	geM <- TRUE ; Mclass <- "geMatrix"
+	if(!gen1) {
+	    if(!gen2) { ## consider preserving "triangular" / "symmetric"
+		geM <- FALSE
+		Mclass <-
+		    if(sym <- extends(c1, "symmetricMatrix") && extends(c2, "symmetricMatrix")) {
+			if(e1@uplo != e2@uplo)
+			    ## one is upper, one is lower
+			    e2 <- t(e2)
+			if((p1 <- .isPacked(e1)) | (p2 <- .isPacked(e2))) { ## at least one is packed
+			    if(p1 != p2) { # one is not packed --> *do* pack it:
+				if(p1) e2 <- .Call(dsyMatrix_as_dspMatrix, e2)
+				else   e1 <- .Call(dsyMatrix_as_dspMatrix, e1)
+			    }
+			    "spMatrix"
+			} else
+			    "syMatrix"
+		    }
+		    else if(tri <- extends(c1, "triangularMatrix") && extends(c2, "triangularMatrix")) {
+			if(geM <- e1@uplo != e2@uplo || callGeneric(0,0) != 0)
+			    "geMatrix" else "trMatrix"
+		    }
+		    else {
+			geM <- TRUE
+			"geMatrix"
+		    }
+		if(geM)
+		    e2 <- as(e2, "generalMatrix")
+	    }
+	    if(geM)
+		e1 <- as(e1, "generalMatrix") # was "dgeMatrix"
+	} else { ## gen1
+	    if(!gen2) e2 <- as(e2, "generalMatrix")
+	}
+	## now, in all cases @x should be matching & correct {only "uplo" part is used}
+	r <- callGeneric(e1@x, e2@x)
+	new(paste0(.M.kind(r), Mclass),
+	    x = r, Dim = d, Dimnames = dimnames(e1))
     }
     else {
-	if(!dens1 && !dens2) {
+	r <- if(!dens1 && !dens2)
 	    ## both e1 _and_ e2 are sparse.
 	    ## Now (new method dispatch, 2009-01) *does* happen
 	    ## even though we have <sparse> o <sparse> methods
-	    r <- callGeneric(as(e1, "CsparseMatrix"), as(e2, "CsparseMatrix"))
-	}
+	    callGeneric(as(e1, "CsparseMatrix"), as(e2, "CsparseMatrix"))
 	else if(dens1 && !dens2) ## go to dense
-	    r <- callGeneric(e1, as(e2, "denseMatrix"))
+	    callGeneric(e1, as(e2, "denseMatrix"))
 	else ## if(!dens1 && dens2)
-	    r <- callGeneric(as(e1, "denseMatrix"), e2)
+	    callGeneric(as(e1, "denseMatrix"), e2)
 
 	## criterion "2 * nnz(.) < ." as in sparseDefault() in Matrix()	 [./Matrix.R] :
 	if(2 * nnzero(r, na.counted = TRUE) < prod(d))
@@ -305,8 +334,7 @@ setMethod("Ops", signature(e1 = "lMatrix", e2 = "lMatrix"), Ops.x.x)
 setMethod("Compare", signature(e1 = "nMatrix", e2 = "nMatrix"), Ops.x.x)
 
 ## l o d : depends on *kind* of Ops -- but Ops.x.x works on slots - correctly:
-setMethod("Ops", signature(e1="lMatrix", e2="dMatrix"),
-	  Ops.x.x)
+setMethod("Ops", signature(e1="lMatrix", e2="dMatrix"), Ops.x.x)
 setMethod("Ops", signature(e1="dMatrix", e2="lMatrix"), Ops.x.x)
 
 ## lMatrix & nMatrix ... probably should also just use "Matrix" ?
@@ -606,8 +634,8 @@ for(Mcl in c("lMatrix","nMatrix","dMatrix"))
         r@x <- rep.int(TRUE, prod(d))
     }
     else if(extends(cl1, "denseMatrix")) {
-        full <- !isPacked(e1)     # << both "dtr" and "dsy" are 'full'
-        if(full || allFalse(r0) || extends(cl1,"symmetricMatrix")) {
+	full <- !.isPacked(e1)	   # << both "dtr" and "dsy" are 'full'
+	if(full || allFalse(r0) || extends(cl1, "symmetricMatrix")) {
             isTri <- extends(cl1, "triangularMatrix")
             if(isTri) {
                 if(extends(cl1,"Cholesky") || extends(cl1,"BunchKaufman"))
