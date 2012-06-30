@@ -252,6 +252,8 @@ SEXP dtrMatrix_as_dtpMatrix(SEXP from)
 	REAL(GET_SLOT(from, Matrix_xSym)), n,
 	*CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW,
 	*CHAR(STRING_ELT(diag, 0)) == 'U' ? UNT : NUN);
+    SET_SLOT(val, Matrix_DimNamesSym,
+	     duplicate(GET_SLOT(from, Matrix_DimNamesSym)));
     UNPROTECT(1);
     return val;
 }
