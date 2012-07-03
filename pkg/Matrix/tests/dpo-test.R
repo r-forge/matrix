@@ -79,8 +79,7 @@ nL <-
 	 rH  = nearPD(pr, conv.tol = 1e-15),
          rH.1= nearPD(pr, conv.tol = 1e-15, corr = TRUE))
 
-sapply(nL, function(el) unlist(el[c("iterations", "normF")]))
-#sapply(nL, `[`, c("iterations", "normF"))
+sapply(nL, `[`, c("iterations", "normF"))
 
 allnorms <- function(d) sapply(c("1","I","F","M"), function(typ) norm(d, typ))
 
