@@ -18,6 +18,11 @@
 	* R/symmetricMatrix.R (pack, unpack): new pack() {"inverse" of
 	unpack(), including pack(<matrix>)}; new unpack() methods.
 
+2012-06-20  Douglas Bates <bates@stat.wisc.edu>
+
+	* src/scripts/DEPS.mkf,	...
+	* src/*.c: Update to version 4.0.0 of SuiteSparse
+
 2012-06-19  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 1.0-8, CRAN-released: 2012-06-20, r
