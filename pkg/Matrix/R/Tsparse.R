@@ -701,8 +701,12 @@ replTmat <- function (x, i, j, ..., value)
     else if(extends(clDx, "triangularMatrix")) {
 	r.tri <- all(if(x@uplo == "U") i1 <= i2 else i2 <= i1)
 	if(r.tri) { ## result is *still* triangular
-	    if(any(i1 == i2)) # diagonal will be changed
+	    if(any(ieq <- i1 == i2)) { # diagonal will be changed
+		if(x@diag == "U" && all(ieq) && all(value == as1(x@x)))
+		    ## only diagonal values are set to 1 -- i.e. unchanged
+		    return(x)
 		x <- diagU2N(x) # keeps class (!)
+	    }
 	}
 	else toGeneral <- TRUE
     }

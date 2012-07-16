@@ -471,7 +471,7 @@ M[i] <- v; assert.EQ.mat(M,m) # dge
 D[i] <- v; assert.EQ.mat(D,m) # ddi -> dtT -> dgT
 s[i] <- v; assert.EQ.mat(s,m) # dtT -> dgT
 S[i] <- v; assert.EQ.mat(S,m); S # dtC -> dtT -> dgT -> dgC
-stopifnot(identical(s,D))
+stopifnot(Q.C.identical(D,s, checkClass=FALSE))
 ## logical
 eval(.iniDiag.example)
 m[L] <- z

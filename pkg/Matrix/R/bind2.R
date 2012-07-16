@@ -369,7 +369,7 @@ setMethod("cbind2", signature(x = "numeric", y = "sparseMatrix"),
                   x <- rep(x, length.out = nr) # 'silent procrustes'
                   n0x <- x != 0
                   y@i <- c((0:(nr-1))[n0x], y@i)
-                  y@p <- c(0:0, sum(n0x) + y@p)
+                  y@p <- c(0L, sum(n0x) + y@p)
                   y@x <- c(x[n0x], y@x)
               } else { ## nr == 0
 

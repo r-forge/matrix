@@ -123,13 +123,13 @@ setClass("TsparseMatrix", representation(i = "integer", j = "integer", "VIRTUAL"
 
 setClass("CsparseMatrix", representation(i = "integer", p = "integer", "VIRTUAL"),
 	 contains = "sparseMatrix",
-	 prototype = prototype(p = 0:0),# to be valid
+	 prototype = prototype(p = 0L),# to be valid
          validity = function(object) .Call(Csparse_validate, object)
          )
 
 setClass("RsparseMatrix", representation(p = "integer", j = "integer", "VIRTUAL"),
 	 contains = "sparseMatrix",
-	 prototype = prototype(p = 0:0),# to be valid
+	 prototype = prototype(p = 0L),# to be valid
 	 validity = function(object) .Call(Rsparse_validate, object)
          )
 

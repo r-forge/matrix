@@ -345,7 +345,7 @@ mm. <- mm <- Matrix(rnorm(500 * 150), nc = 150)
 stopifnot(validObject(mm))
 xpx <- crossprod(mm)
 stopifnot(identical(mm, mm.),# once upon a time, mm was altered by crossprod()
-          validObject(xpx))
+          isValid(xpx, "dpoMatrix"))
 str(mm) # 'dge*"
 str(xpx)# 'dpo*"
 xpy <- crossprod(mm, rnorm(500))
@@ -553,10 +553,29 @@ sm <- as(Matrix(diag(5) + 1),"dspMatrix")
 pm <- as(sm,"dpoMatrix")## gave infinite recursion (for a day or so)
 pp <- as(pm,"dppMatrix")
 
+x <- round(100 * crossprod(Matrix(runif(25),5)))
+D <- Diagonal(5, round(1000*runif(5)))
+px <- pack(x)
+stopifnot(is(x, "dpoMatrix"), is(px,"dppMatrix"), is(D, "ddiMatrix"))
+
+## MM: These now give  "dsyMatrix" --- I think that's good enough!
+class(x+D)#--> now "dsyMatrix"
+stopifnot(is(x+D, "symmetricMatrix"),
+          is(D+px, "dspMatrix"),
+          identical(x+D, D+x), identical(px+D, D+px))
+
+
+tx <- tril(x)
+ptx <- pack(tx)
+stopifnot(is(tx, "dtrMatrix"), is(ptx, "dtpMatrix"),
+          is(t(tx), "dtrMatrix"), is(t(ptx), "dtpMatrix"),
+          is(D + tx, "dtrMatrix"), is(tx + D, "dtrMatrix"),
+          is(ptx + D, "dtpMatrix"), is(D + ptx, "dtpMatrix"))
+
+
 ###-- dense nonzero pattern:
 class(m <- Matrix(TRUE,2,2)) # lsy
-(n <- as(m, "nMatrix")) # nsy
-validObject(n)
+isValid(n <- as(m, "nMatrix"), "nsyMatrix")
 
 ## 1)
 as(n,"CsparseMatrix") # used to give CHOLMOD error: invalid xtype...
@@ -569,8 +588,7 @@ as(m,"sparseMatrix")
 ### -- now when starting with nsparse :
 nT <- new("ngTMatrix",
           i = as.integer(c(0, 1, 0)),
-          j = as.integer(c(0, 0, 1)), Dim = as.integer(c(2,2)),
-          Dimnames = list(NULL, NULL))
+          j = as.integer(c(0, 0, 1)), Dim = as.integer(c(2,2)))
 (nC <- as(nT, "ngCMatrix"))
 str(nC)# of course, no 'x' slot
 

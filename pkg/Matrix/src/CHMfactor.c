@@ -37,14 +37,15 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP system)
 
 SEXP CHMfactor_updown(SEXP upd, SEXP C_, SEXP L_)
 {
-	CHM_FR L = AS_CHM_FR(L_), Lcp;
-	CHM_SP C = AS_CHM_SP__(C_);
-	int update = asInteger(upd), r;
-	R_CheckStack();
+    CHM_FR L = AS_CHM_FR(L_), Lcp;
+    CHM_SP C = AS_CHM_SP__(C_);
+    int update = asInteger(upd);
+    R_CheckStack();
 
-	Lcp = cholmod_copy_factor(L, &c);
-	r = cholmod_updown(update, C, Lcp, &c);
-	return chm_factor_to_SEXP(Lcp, 1);
+    Lcp = cholmod_copy_factor(L, &c);
+    int r = cholmod_updown(update, C, Lcp, &c);
+    if(!r) error(_("cholmod_updown() returned %d"), r);
+    return chm_factor_to_SEXP(Lcp, 1);
 }
 
 SEXP CHMfactor_spsolve(SEXP a, SEXP b, SEXP system)

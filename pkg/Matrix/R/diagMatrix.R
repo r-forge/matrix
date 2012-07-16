@@ -389,7 +389,7 @@ setMethod("[", signature(x = "diagonalMatrix", i = "missing",
 ## FIXME: this now fails because the "denseMatrix" methods come first in dispatch
 ## Only(?) current bug:  x[i] <- value  is wrong when  i is *vector*
 replDiag <- function(x, i, j, ..., value) {
-    x <- as(x, "TsparseMatrix")
+    x <- as(x, "CsparseMatrix")# was "Tsparse.." till 2012-07
     if(missing(i))
 	x[, j] <- value
     else if(missing(j)) { ##  x[i , ] <- v  *OR*   x[i] <- v
@@ -429,7 +429,7 @@ setReplaceMethod("[", signature(x = "diagonalMatrix",
 				 if(any(value != one | is.na(value))) {
 				     x@diag <- "N"
 				     x@x <- rep.int(one, x@Dim[1])
-				 }
+				 } else return(x)
 			     }
 			     x@x[ii] <- value
 			     x
@@ -726,7 +726,6 @@ setMethod("solve", signature(a = "diagonalMatrix", b = "Matrix"),
 ###---------------- <Ops> (<Arith>, <Logic>, <Compare> ) ----------------------
 
 ## Use function for several signatures, in order to evade
-## ambiguous dispatch for "ddi", since there's also Arith(ddense., ddense.)
 diagOdiag <- function(e1,e2) {
     ## result should also be diagonal _ if possible _
     r <- callGeneric(.diag.x(e1), .diag.x(e2)) # error if not "compatible"
@@ -757,11 +756,9 @@ diagOdiag <- function(e1,e2) {
 	stopifnot(length(r) == n)
 	xx <- as.vector(matrix(rbind(r, matrix(r00,n,n)), n,n))
 	newcl <-
-	    paste(if(isNum) "d" else if(isLog) {
+	    paste0(if(isNum) "d" else if(isLog) {
 		if(!any(is.na(r)) && !any(is.na(r00))) "n" else "l"
-	    } else stop("not yet implemented .. please report")
-		  ,
-		  "syMatrix", sep='')
+	    } else stop("not yet implemented .. please report"), "syMatrix")
 
 	new(newcl, Dim = e1@Dim, Dimnames = e1@Dimnames, x = xx)
     }
@@ -783,6 +780,65 @@ setMethod("Ops", signature(e1 = "diagonalMatrix", e2 = "diagonalMatrix"),
 ## diagonal  o  symmetric   |-->  symmetric
 ##    {also when other is sparse: do these "here" --
 ##     before conversion to sparse, since that loses "diagonality"}
+diagOtri <- function(e1,e2) {
+    ## result must be triangular
+    r <- callGeneric(d1 <- .diag.x(e1), diag(e2)) # error if not "compatible"
+    ## Check what happens with non-diagonals, i.e. (0 o 0), (FALSE o 0), ...:
+    e1.0 <- if(.n1 <- is.numeric(d1   )) 0 else FALSE
+    r00 <- callGeneric(e1.0, if(.n2 <- is.numeric(e2[0])) 0 else FALSE)
+    if(is0(r00)) { ##  r00 == 0 or FALSE --- result *is* triangular
+        diag(e2) <- r
+        ## check what happens "in the triangle"
+        e2.2 <- if(.n2) 2 else TRUE
+        if(!callGeneric(e1.0, e2.2) == e2.2) { # values "in triangle" can change:
+            n <- dim(e2)[1L]
+            it <- indTri(n, upper = (e2@uplo == "U"))
+            e2[it] <- callGeneric(e1.0, e2[it])
+        }
+        e2
+    }
+    else { ## result not triangular ---> general
+        rr <- as(e2, "generalMatrix")
+        diag(rr) <- r
+        rr
+    }
+}
+
+
+setMethod("Ops", signature(e1 = "diagonalMatrix", e2 = "triangularMatrix"),
+          diagOtri)
+## For the reverse,  Ops == "Arith" | "Compare" | "Logic"
+##   'Arith'  :=  '"+"', '"-"', '"*"', '"^"', '"%%"', '"%/%"', '"/"'
+setMethod("Arith", signature(e1 = "triangularMatrix", e2 = "diagonalMatrix"),
+          function(e1,e2)
+      { ## this must only trigger for *dense* e1
+	  switch(.Generic,
+		 "+" = .Call(dtrMatrix_addDiag, as(e1,"dtrMatrix"),   .diag.x(e2)),
+		 "-" = .Call(dtrMatrix_addDiag, as(e1,"dtrMatrix"), - .diag.x(e2)),
+		 "*" = {
+		     n <- e2@Dim[1L]
+		     d2 <- if(e2@diag == "U") { # unit-diagonal
+			 d <- rep.int(as1(e2@x), n)
+			 e2@x <- d
+			 e2@diag <- "N"
+			 d
+		     } else e2@x
+		     e2@x <- diag(e1) * d2
+		     e2
+		 },
+		 "^" = { ## will be dense ( as  <ANY> ^ 0 == 1 ):
+		     e1 ^ as(e2, "denseMatrix")
+		 },
+		 ## otherwise:
+		 callGeneric(e1, diag2Tsmart(e2,e1)))
+})
+
+## Compare --> 'swap' (e.g.   e1 < e2   <==>  e2 > e1 ):
+setMethod("Compare", signature(e1 = "triangularMatrix", e2 = "diagonalMatrix"),
+	  .Cmp.swap)
+## '&' and "|'  are commutative:
+setMethod("Logic", signature(e1 = "triangularMatrix", e2 = "diagonalMatrix"),
+          function(e1,e2) callGeneric(e2, e1))
 
 ## For almost everything else, diag* shall be treated "as sparse" :
 ## These are cheap implementations via coercion

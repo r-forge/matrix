@@ -424,6 +424,8 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	stopifnot(is(vm, "Matrix"), validObject(vm), dim(vm) == c(d[1]*d[2], 1))
     }
 
+    if(!isPerm)
+        m.d <- local({ m. <- m; diag(m.) <- diag(m); m. })
     if(do.matrix)
     stopifnot(identical(dim(m.m), dim(m)),
 	      ## base::diag() keeps names [Matrix FIXME]
@@ -441,6 +443,12 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
     if(isSparse) {
 	n0m <- drop0(m) #==> n0m is Csparse
 	has0 <- !Qidentical(n0m, as(m,"CsparseMatrix"))
+	if(!isPerm && !extends(cld, "RsparseMatrix"))
+                                        # 'diag<-' is does not change attrib:
+	    stopifnot(identical(m, m.d))
+    }
+    else { # dense
+        stopifnot(identical(m, m.d)) # 'diag<-' is does not change attrib
     }
     ## use non-square matrix when "allowed":
 

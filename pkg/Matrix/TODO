@@ -26,12 +26,6 @@
 
 - provide methods for "dspMatrix" and "dppMatrix"!
 
-- implement (more) methods for supporting "packed" (symmetric / triangular)
-  matrices; particularly something like pack() and unpack()  [to/from our
-  classes from/to "numeric"] --- have already man/unpack.Rd but no method yet!
-
-  (have some dtr* <-> dtp*)
-
 - combine the C functions for multiplication by special forms and
   solution wrt special forms by using a 'right' argument and a
   'classed' argument.

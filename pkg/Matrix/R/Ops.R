@@ -114,16 +114,7 @@ setMethod("Compare", signature(e1 = "Matrix", e2 = "Matrix"),
 ##
 ## Note that there extra methods for <sparse> o <sparse> !
 ##
-## "Compare" -> returning  logical Matrices
-.Cmp.swap <- function(e1,e2) {
-    ## "swap RHS and LHS" and use the method below:
-    switch(.Generic,
-	   "==" =, "!=" = callGeneric(e2, e1),
-	   "<"	= e2 >	e1,
-	   "<=" = e2 >= e1,
-	   ">"	= e2 <	e1,
-	   ">=" = e2 <= e1)
-}
+## "Compare" -> returning  logical Matrices;  .Cmp.swap() is in ./Auxiliaries.R
 setMethod("Compare", signature(e1 = "numeric", e2 = "dMatrix"), .Cmp.swap)
 setMethod("Compare", signature(e1 = "logical", e2 = "dMatrix"), .Cmp.swap)
 setMethod("Compare", signature(e1 = "numeric", e2 = "lMatrix"), .Cmp.swap)
@@ -268,20 +259,24 @@ setMethod("Compare", signature(e1 = "nMatrix", e2 = "logical"), Cmp.Mat.atomic)
 Ops.x.x <- function(e1, e2)
 {
     d <- dimCheck(e1,e2)
-    if((dens1 <- extends(c1 <- class(e1), "denseMatrix"))) gen1 <- extends(c1, "generalMatrix")
-    if((dens2 <- extends(c2 <- class(e2), "denseMatrix"))) gen2 <- extends(c2, "generalMatrix")
-
+    if((dens1 <- extends(c1 <- class(e1), "denseMatrix")))
+	gen1 <- extends(c1, "generalMatrix")
+    if((dens2 <- extends(c2 <- class(e2), "denseMatrix")))
+	gen2 <- extends(c2, "generalMatrix")
     if(dens1 && dens2) { ## both inherit from ddense*
-	geM <- TRUE ; Mclass <- "geMatrix"
+	geM <- TRUE
 	if(!gen1) {
 	    if(!gen2) { ## consider preserving "triangular" / "symmetric"
 		geM <- FALSE
+		le <- prod(d)
+		isPacked <- function(x) length(x@x) < le
 		Mclass <-
-		    if(sym <- extends(c1, "symmetricMatrix") && extends(c2, "symmetricMatrix")) {
+		    if(sym <- extends(c1, "symmetricMatrix") &&
+			      extends(c2, "symmetricMatrix")) {
 			if(e1@uplo != e2@uplo)
 			    ## one is upper, one is lower
 			    e2 <- t(e2)
-			if((p1 <- .isPacked(e1)) | (p2 <- .isPacked(e2))) { ## at least one is packed
+			if((p1 <- isPacked(e1)) | (p2 <- isPacked(e2))) { ## at least one is packed
 			    if(p1 != p2) { # one is not packed --> *do* pack it:
 				if(p1) e2 <- .Call(dsyMatrix_as_dspMatrix, e2)
 				else   e1 <- .Call(dsyMatrix_as_dspMatrix, e1)
@@ -290,13 +285,21 @@ Ops.x.x <- function(e1, e2)
 			} else
 			    "syMatrix"
 		    }
-		    else if(tri <- extends(c1, "triangularMatrix") && extends(c2, "triangularMatrix")) {
-			if(geM <- e1@uplo != e2@uplo || callGeneric(0,0) != 0)
-			    "geMatrix" else "trMatrix"
+		    else if(tri <- extends(c1, "triangularMatrix") &&
+				   extends(c2, "triangularMatrix")) {
+			if(!(geM <- e1@uplo != e2@uplo || callGeneric(0,0) != 0)) {
+			    if((p1 <- isPacked(e1)) | (p2 <- isPacked(e2))) { ## at least one is packed
+				if(p1 != p2) { # one is not packed --> *do* pack it:
+				    if(p1) e2 <- .Call(dtrMatrix_as_dtpMatrix, e2)
+				    else   e1 <- .Call(dtrMatrix_as_dtpMatrix, e1)
+				}
+				"tpMatrix"
+			    } else
+				"trMatrix"
+			}
 		    }
 		    else {
 			geM <- TRUE
-			"geMatrix"
 		    }
 		if(geM)
 		    e2 <- as(e2, "generalMatrix")
@@ -308,8 +311,10 @@ Ops.x.x <- function(e1, e2)
 	}
 	## now, in all cases @x should be matching & correct {only "uplo" part is used}
 	r <- callGeneric(e1@x, e2@x)
-	new(paste0(.M.kind(r), Mclass),
-	    x = r, Dim = d, Dimnames = dimnames(e1))
+	if(geM)
+	    new(paste0(.M.kind(r), "geMatrix"), x = r, Dim = d, Dimnames = dimnames(e1))
+	else
+	    new(paste0(.M.kind(r), Mclass), x = r, Dim = d, Dimnames = dimnames(e1), uplo = e1@uplo)
     }
     else {
 	r <- if(!dens1 && !dens2)
@@ -454,7 +459,7 @@ rm(A.M.n, A.n.M)
 ##-------- originally from ./ddenseMatrix.R --------------------
 
 ## Cheap version: work via "dgeMatrix" and use the group methods there:
-## FIXME(?): try to preserve "symmetric", "triangular", ...
+if(FALSE)## preserve "symmetric", "triangular", --> rather use Ops.x.x
 setMethod("Arith", signature(e1 = "ddenseMatrix", e2 = "ddenseMatrix"),
           function(e1, e2) callGeneric(as(e1, "dgeMatrix"),
                                        as(e2, "dgeMatrix")))

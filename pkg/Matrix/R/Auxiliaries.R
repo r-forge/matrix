@@ -782,7 +782,7 @@ l2d_meth <- function(x) {
     else if(extends(clx, "pMatrix")) "n" # permutation -> pattern
     else if(extends(clx, "zMatrix")) "z"
     else if(extends(clx, "iMatrix")) "i"
-    else stop(" not yet be implemented for ", clx@className)
+    else stop(" not yet implemented for ", clx@className)
 }
 
 ## typically used as .type.kind[.M.kind(x)]:
@@ -1105,7 +1105,7 @@ isTriC <- function(object, upper = NA) {
 xtC.diagU2N <- function(x) if(x@diag == "U") .Call(Csparse_diagU2N, x) else x
 
 ##' @title uni-diagonal to "regular" triangular Matrix
-##' <description>
+##'
 ##' NOTE:   class is *not* checked here! {speed}
 ##' @param x a dense unidiagonal (x@diag == "U") triangular Matrix
 ##'     ("ltrMatrix", "dtpMatrix", ...).
@@ -1120,7 +1120,7 @@ xtC.diagU2N <- function(x) if(x@diag == "U") .Call(Csparse_diagU2N, x) else x
     n <- x@Dim[1]
     if(n > 0) {
 	one <- if(kind == "d") 1. else TRUE
-	if(length(x@x) < n*n) { ## { == isPacked(x)) } : dtp-, ltp-, or "ntpMatrix":
+	if(length(x@x) < n^2) { ## { == isPacked(x)) } : dtp-, ltp-, or "ntpMatrix":
 	    ## x@x is of length	 n*(n+1)/2
 	    if(n == 1)
 		x@x <- one
@@ -1149,7 +1149,7 @@ xtC.diagU2N <- function(x) if(x@diag == "U") .Call(Csparse_diagU2N, x) else x
         if(checkDense && extends(cl,"denseMatrix")) {
 	    .dense.diagU2N(x, kind)
         }
-        else { ## not dense, not [CT]sparseMatrix  ==>  Rsparse*
+        else { ## possibly dense, not [CT]sparseMatrix  ==>  Rsparse*
 	    .Call(Tsparse_diagU2N,
 		  as(as(x, paste0(kind, "Matrix")), "TsparseMatrix"))
 	    ## leave it as T* - the caller can always coerce to C* if needed
@@ -1164,10 +1164,28 @@ diagU2N <- function(x, cl = getClassDef(class(x)), checkDense = FALSE)
     else x
 }
 
-diagN2U <- function(x, cl = getClassDef(class(x)))
+##' @title coerce triangular Matrix to uni-diagonal
+##'
+##' NOTE: class is *not* checked here! {speed}
+##' @param x a dense triangular Matrix ("ltrMatrix", "dtpMatrix", ...).
+##' @return Matrix "like" x, but with x@diag == "U"
+.dense.diagN2U <- function(x)
 {
-    if(extends(cl, "triangularMatrix") && x@diag == "N")
-	.Call(Csparse_diagN2U, as(x, "CsparseMatrix")) else x
+    ## as we promise that the diagonal entries are not accessed when
+    ##	diag = "U",   we don't even need to set them to one !!
+    x@diag <- "U"
+    x
+}
+
+diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE)
+{
+    if(!(extends(cl, "triangularMatrix") && x@diag == "N"))
+	return(x)
+    if(checkDense && extends(cl,"denseMatrix")) {
+	.dense.diagN2U(x)
+    }
+    else ## still possibly dense
+	.Call(Csparse_diagN2U, as(x, "CsparseMatrix"))
 }
 
 .as.dgC.0.factors <- function(x) {
@@ -1289,4 +1307,17 @@ chk.s <- function(...) {
 		sub(")$", '', sub("^list\\(", '', deparse(list(...), control=c()))),
 		"  are disregarded in\n ", deparse(sys.call(-1), control=c()),
 		call. = FALSE)
+}
+
+
+##' *Only* to be used as function in
+##'    setMethod("Compare", ...., .Cmp.swap)  -->  ./Ops.R  & ./diagMatrix.R
+.Cmp.swap <- function(e1,e2) {
+    ## "swap RHS and LHS" and use the method below:
+    switch(.Generic,
+	   "==" =, "!=" = callGeneric(e2, e1),
+	   "<"	= e2 >	e1,
+	   "<=" = e2 >= e1,
+	   ">"	= e2 <	e1,
+	   ">=" = e2 <= e1)
 }

@@ -355,7 +355,7 @@ FULL_TO_PACKED(int)
  * Copy the diagonal elements of the packed denseMatrix x to dest
  *
  * @param dest vector of length ncol(x)
- * @param x pointer to an object representing a packed array
+ * @param x (pointer to) a "d?pMatrix" object
  * @param n number of columns in the matrix represented by x
  *
  * @return dest
@@ -386,37 +386,117 @@ void l_packed_getDiag(int *dest, SEXP x, int n)
 
 #undef END_packed_getDiag
 
-void tr_d_packed_getDiag(double *dest, SEXP x)
-{
-    int n = INTEGER(GET_SLOT(x, Matrix_DimSym))[0];
-    SEXP val = PROTECT(allocVector(REALSXP, n));
-    double *v = REAL(val);
+//----------------------------------------------------------------------
 
-    if (*diag_P(x) == 'U') {
-	int j;
-	for (j = 0; j < n; j++) v[j] = 1.;
+SEXP d_packed_setDiag(double *diag, int l_d, SEXP x, int n)
+{
+#define SET_packed_setDiag				\
+    SEXP ret = PROTECT(duplicate(x)),			\
+	r_x = GET_SLOT(ret, Matrix_xSym);		\
+    Rboolean d_full = (l_d == n);			\
+    if (!d_full && l_d != 1)				\
+	error("replacement diagonal has wrong length")
+
+#define END_packed_setDiag						\
+    int j, pos = 0;							\
+									\
+    if (*uplo_P(x) == 'U') {						\
+	if(d_full)							\
+	    for(pos= 0, j=0; j < n; pos += 1+(++j))	 xx[pos] = diag[j]; \
+	else /* l_d == 1 */						\
+	    for(pos= 0, j=0; j < n; pos += 1+(++j))	 xx[pos] = *diag; \
+    } else {								\
+	if(d_full)							\
+	    for(pos= 0, j=0; j < n; pos += (n - j), j++) xx[pos] = diag[j]; \
+	else /* l_d == 1 */						\
+	    for(pos= 0, j=0; j < n; pos += (n - j), j++) xx[pos] = *diag; \
+    }									\
+    UNPROTECT(1);							\
+    return ret
+
+    SET_packed_setDiag; double *xx = REAL(r_x);
+    END_packed_setDiag;
+}
+
+SEXP l_packed_setDiag(int *diag, int l_d, SEXP x, int n)
+{
+    SET_packed_setDiag; int *xx = LOGICAL(r_x);
+    END_packed_setDiag;
+}
+
+#define tr_END_packed_setDiag						\
+    if (*diag_P(x) == 'U') { /* uni-triangular */			\
+	/* after setting, typically is not uni-triangular anymore: */	\
+	SET_STRING_ELT(GET_SLOT(ret, Matrix_diagSym), 0, mkChar("N"));	\
+    }									\
+    END_packed_setDiag
+
+
+SEXP tr_d_packed_setDiag(double *diag, int l_d, SEXP x, int n)
+{
+    SET_packed_setDiag; double *xx = REAL(r_x);
+    tr_END_packed_setDiag;
+}
+
+SEXP tr_l_packed_setDiag(int *diag, int l_d, SEXP x, int n)
+{
+    SET_packed_setDiag; int *xx = LOGICAL(r_x);
+    tr_END_packed_setDiag;
+}
+
+
+#undef SET_packed_setDiag
+#undef END_packed_setDiag
+#undef tr_END_packed_setDiag
+//----------------------------------------------------------------------
+
+SEXP d_packed_addDiag(double *diag, int l_d, SEXP x, int n)
+{
+    SEXP ret = PROTECT(duplicate(x)),
+	r_x = GET_SLOT(ret, Matrix_xSym);
+    double *xx = REAL(r_x);
+    int j, pos = 0;
+
+    if (*uplo_P(x) == 'U') {
+	for(pos= 0, j=0; j < n; pos += 1+(++j))	     xx[pos] += diag[j];
     } else {
-	d_packed_getDiag(v, x, n);
+	for(pos= 0, j=0; j < n; pos += (n - j), j++) xx[pos] += diag[j];
     }
     UNPROTECT(1);
+    return ret;
+}
+
+SEXP tr_d_packed_addDiag(double *diag, int l_d, SEXP x, int n)
+{
+    SEXP ret = PROTECT(d_packed_addDiag(diag, l_d, x, n));
+    if (*diag_P(x) == 'U') /* uni-triangular */
+	SET_STRING_ELT(GET_SLOT(ret, Matrix_diagSym), 0, mkChar("N"));
+    UNPROTECT(1);
+    return ret;
+}
+
+
+//----------------------------------------------------------------------
+
+void tr_d_packed_getDiag(double *dest, SEXP x, int n)
+{
+    if (*diag_P(x) == 'U') {
+	for (int j = 0; j < n; j++) dest[j] = 1.;
+    } else {
+	d_packed_getDiag(dest, x, n);
+    }
     return;
 }
 
-void tr_l_packed_getDiag(   int *dest, SEXP x)
+void tr_l_packed_getDiag(   int *dest, SEXP x, int n)
 {
-    int n = INTEGER(GET_SLOT(x, Matrix_DimSym))[0];
-    SEXP val = PROTECT(allocVector(LGLSXP, n));
-    int *v = LOGICAL(val);
-
-    if (*diag_P(x) == 'U') {
-	int j;
-	for (j = 0; j < n; j++) v[j] = 1;
-    } else {
-	l_packed_getDiag(v, x, n);
-    }
-    UNPROTECT(1);
+    if (*diag_P(x) == 'U')
+	for (int j = 0; j < n; j++) dest[j] = 1;
+    else
+	l_packed_getDiag(dest, x, n);
     return;
 }
+
 
 SEXP Matrix_expand_pointers(SEXP pP)
 {

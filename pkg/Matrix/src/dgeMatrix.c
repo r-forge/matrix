@@ -239,6 +239,61 @@ SEXP lgeMatrix_getDiag(SEXP x)
 #undef geMatrix_getDiag_2
 
 
+SEXP dgeMatrix_setDiag(SEXP x, SEXP d)
+{
+#define geMatrix_setDiag_1					\
+    int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym));		\
+    int m = dims[0], nret = (m < dims[1]) ? m : dims[1];	\
+    SEXP ret = PROTECT(duplicate(x));				\
+    SEXP r_x = GET_SLOT(ret, Matrix_xSym);			\
+    int l_d = LENGTH(d); Rboolean d_full = (l_d == nret);	\
+    if (!d_full && l_d != 1)					\
+	error("replacement diagonal has wrong length")
+
+    geMatrix_setDiag_1;
+    double *dv = REAL(d), *rv = REAL(r_x);
+
+#define geMatrix_setDiag_2			\
+    if(d_full) for (int i = 0; i < nret; i++)	\
+	rv[i * (m + 1)] = dv[i];		\
+    else for (int i = 0; i < nret; i++)		\
+	rv[i * (m + 1)] = *dv;			\
+    UNPROTECT(1);				\
+    return ret
+
+    geMatrix_setDiag_2;
+}
+
+SEXP lgeMatrix_setDiag(SEXP x, SEXP d)
+{
+    geMatrix_setDiag_1;
+    int *dv = INTEGER(d), *rv = INTEGER(r_x);
+
+    geMatrix_setDiag_2;
+}
+
+#undef geMatrix_setDiag_1
+#undef geMatrix_setDiag_2
+
+SEXP dgeMatrix_addDiag(SEXP x, SEXP d)
+{
+    int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
+	m = dims[0], nret = (m < dims[1]) ? m : dims[1];
+    SEXP ret = PROTECT(duplicate(x)),
+	r_x = GET_SLOT(ret, Matrix_xSym);
+    double *dv = REAL(d), *rv = REAL(r_x);
+    int l_d = LENGTH(d); Rboolean d_full = (l_d == nret);
+    if (!d_full && l_d != 1)
+	error("diagonal to be added has wrong length");
+
+    if(d_full) for (int i = 0; i < nret; i++) rv[i * (m + 1)] += dv[i];
+    else for (int i = 0; i < nret; i++)	      rv[i * (m + 1)] += *dv;
+    UNPROTECT(1);
+    return ret;
+}
+
+
+
 SEXP dgeMatrix_LU_(SEXP x, Rboolean warn_sing)
 {
     SEXP val = get_factors(x, "LU");

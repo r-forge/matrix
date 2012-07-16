@@ -336,6 +336,9 @@ setMethod("determinant", signature(x = "Matrix", logarithm = "logical"),
 
 setMethod("diag", signature(x = "Matrix"),
 	  function(x, nrow, ncol) .bail.out.1("diag", class(x)))
+if(FALSE)## TODO: activate later
+setMethod("diag<-", signature(x = "Matrix"),
+	  function(x, value) .bail.out.1("diag", class(x)))
 setMethod("t", signature(x = "Matrix"),
 	  function(x) .bail.out.1(.Generic, class(x)))
 

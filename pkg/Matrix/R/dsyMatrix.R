@@ -97,6 +97,11 @@ setAs("dsyMatrix", "dpoMatrix",
 		    sNames = c("x", "Dim", "Dimnames", "uplo", "factors"))
       })
 
+setMethod("diag", signature(x = "dsyMatrix"),
+	  function(x, nrow, ncol) .Call(dgeMatrix_getDiag, x))
+setMethod("diag<-", signature(x = "dsyMatrix"),
+	  function(x, value) .Call(dgeMatrix_setDiag, x, value))
+
 ## Now that we have "chol", we can define  "determinant" methods,
 ## exactly like in ./dsCMatrix.R
 ## DB - Probably figure out how to use the BunchKaufman decomposition instead

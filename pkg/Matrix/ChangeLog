@@ -1,3 +1,12 @@
+2012-07-14  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/d??Matrix.R (diag<-): many "diag<-" methods, which preserve
+	symmetricity, triangularity (even uni-triangularity sometimes);
+	Partly by also making   A[cbind(i,i)]  preserve such properties.
+
+	* src/Mutils.c (SET_packed_setDiag) {and similar}:
+	*_setDiag() C functions implementing "diag<-" R methods.
+
 2012-06-30  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/Ops.R (Ops.x.x): now, dense symmetric and triangular matrices

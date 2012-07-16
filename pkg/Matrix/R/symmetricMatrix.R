@@ -64,15 +64,26 @@ setMethod("symmpart", signature(x = "symmetricMatrix"), function(x) x)
 setMethod("skewpart", signature(x = "symmetricMatrix"), setZero)
 
 ###------- pack() and unpack() --- for *dense*  symmetric & triangular matrices:
-packM <-  function(x, Mtype) {
+packM <-  function(x, Mtype, kind, unpack) {
     cd <- getClassDef(cx <- class(x))
     if(extends(cd, "sparseMatrix"))
 	stop(sprintf("(un)packing only applies to dense matrices, class(x)='%s'",
 		     cx))
-    as(x, paste0(.M.kindC(cd), Mtype))
+    if(!missing(kind) && kind == "symmetric") { ## use 'unpack' but not 'Mtype'
+	## special treatment for positive definite ones:
+	as(x, if(unpack) {
+	    if(extends(cd, "dppMatrix")) "dpoMatrix"
+	    else paste0(.M.kindC(cd), "syMatrix")
+	} else { ## !unpack : "pack" :
+	    if(extends(cd, "dpoMatrix")) "dppMatrix"
+	    else paste0(.M.kindC(cd), "spMatrix")
+	})
+    } else as(x, paste0(.M.kindC(cd), Mtype))
 }
-setMethod("unpack", "symmetricMatrix", function(x, ...) packM(x,"syMatrix"))
-setMethod("pack",   "symmetricMatrix", function(x, ...) packM(x,"spMatrix"))
+setMethod("unpack", "symmetricMatrix", function(x, ...)
+	  packM(x, kind="symmetric", unpack=TRUE))
+setMethod("pack",   "symmetricMatrix", function(x, ...)
+	  packM(x, kind="symmetric", unpack=FALSE))
 setMethod("unpack", "triangularMatrix", function(x, ...) packM(x,"trMatrix"))
 setMethod("pack",   "triangularMatrix", function(x, ...) packM(x,"tpMatrix"))
 ## to produce a nicer error message:

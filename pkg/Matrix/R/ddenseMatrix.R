@@ -76,8 +76,7 @@ setMethod("rcond", signature(x = "ddenseMatrix", norm = "character"),
 ## setMethod("t", signature(x = "ddenseMatrix"),
 ## 	  function(x) callGeneric(as(x, "dgeMatrix")))
 
-setMethod("diag", signature(x = "ddenseMatrix"),
-          function(x, nrow, ncol) diag(as(x, "dgeMatrix")))
+## "diag" --> specific methods for dge, dtr,dtp, dsy,dsp
 
 setMethod("solve", signature(a = "ddenseMatrix", b = "missing"),
           function(a, b, ...) solve(as(a, "dgeMatrix")))

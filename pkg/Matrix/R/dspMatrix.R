@@ -71,6 +71,10 @@ setMethod("t", signature(x = "dspMatrix"),
           function(x) as(t(as(x, "dsyMatrix")), "dspMatrix"),
           valueClass = "dspMatrix")
 
+setMethod("diag", signature(x = "dspMatrix"),
+	  function(x, nrow, ncol) .Call(dspMatrix_getDiag, x))
+setMethod("diag<-", signature(x = "dspMatrix"),
+	  function(x, value) .Call(dspMatrix_setDiag, x, value))
 
 ## The following allows  as(*, "dppMatrix").
 ## However it *requires* that dppMatrix_chol() gives an error
