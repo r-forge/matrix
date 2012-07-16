@@ -37,6 +37,8 @@ setMethod("determinant", signature(x = "dtpMatrix", logarithm = "logical"),
 setMethod("diag", signature(x = "dtpMatrix"),
 	  function(x, nrow, ncol) .Call(dtpMatrix_getDiag, x),
 	  valueClass = "numeric")
+setMethod("diag<-", signature(x = "dtpMatrix"),
+	  function(x, value) .Call(dtpMatrix_setDiag, x, value))
 
 setMethod("norm", signature(x = "dtpMatrix", type = "character"),
 	  function(x, type, ...) .Call(dtpMatrix_norm, x, type),

@@ -24,6 +24,10 @@
 \alias{coerce,dsyMatrix,lsyMatrix-method}
 \alias{coerce,dsyMatrix,matrix-method}
 \alias{coerce,matrix,dsyMatrix-method}
+\alias{diag,dspMatrix-method}
+\alias{diag,dsyMatrix-method}
+\alias{diag<-,dspMatrix-method}
+\alias{diag<-,dsyMatrix-method}
 %
 \alias{show,dsyMatrix-method}
 \alias{norm,dspMatrix,character-method}

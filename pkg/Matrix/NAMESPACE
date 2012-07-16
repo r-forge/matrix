@@ -40,7 +40,7 @@ export("Cholesky",
        "condest", "onenormest",
        "det",# << "identical" as base - but with correct determinant()
        ".diag.dsC",# -> R/dsCMatrix.R --has FIXME
-       "diagN2U", "diagU2N",
+       "diagN2U", "diagU2N", ".diagU2N",
        "drop0",
        "expand",
        "expm",
@@ -251,7 +251,7 @@ exportMethods(## for both own and "other" generics:
 	      "coerce",
 	      "crossprod",
 	      "determinant",
-	      "diag",
+	      "diag", "diag<-",
 	      "diff",
 	      "dim",
 	      "dim<-",

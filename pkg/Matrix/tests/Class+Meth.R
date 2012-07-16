@@ -150,8 +150,8 @@ tstMatrixClass <-
     ## ----------------------------------------------------------------------
     ## Author: Martin Maechler
 
-    ## This is sfsmisc::bl.string():
-    bl.string <- function (no) paste(rep(" ", no), collapse = "")
+    ## from pkg sfsmisc :
+    bl.string <- function(no) sprintf("%*s", no, "")
 
     ## Compute a few things only once :
     mM <- as(mM, "dgeMatrix")

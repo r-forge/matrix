@@ -59,6 +59,7 @@
 % \alias{diag,ldiMatrix-method}
 \alias{which,ldiMatrix-method}
 %
+\alias{Ops,diagonalMatrix,triangularMatrix-method}
 \alias{Ops,ddiMatrix,sparseMatrix-method}
 \alias{Ops,sparseMatrix,ddiMatrix-method}
 \alias{Ops,ldiMatrix,sparseMatrix-method}
@@ -85,6 +86,9 @@
 \alias{Ops,ddiMatrix,ldiMatrix-method}
 \alias{Ops,ldiMatrix,ddiMatrix-method}
 \alias{Ops,ldiMatrix,ldiMatrix-method}
+\alias{Arith,triangularMatrix,diagonalMatrix-method}
+\alias{Compare,triangularMatrix,diagonalMatrix-method}
+\alias{Logic,triangularMatrix,diagonalMatrix-method}
 \alias{Arith,numeric,ddiMatrix-method}
 \alias{Arith,numeric,ldiMatrix-method}
 \alias{Arith,ddiMatrix,numeric-method}
