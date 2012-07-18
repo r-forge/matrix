@@ -68,6 +68,10 @@
 \alias{Ops,numeric,ddiMatrix-method}
 \alias{Ops,ldiMatrix,numeric-method}
 \alias{Ops,numeric,ldiMatrix-method}
+\alias{Ops,ddiMatrix,logical-method}
+\alias{Ops,logical,ddiMatrix-method}
+\alias{Ops,ldiMatrix,logical-method}
+\alias{Ops,logical,ldiMatrix-method}
 %
 \alias{Ops,ddiMatrix,ANY-method}
 \alias{Ops,ANY,ddiMatrix-method}
@@ -93,6 +97,10 @@
 \alias{Arith,numeric,ldiMatrix-method}
 \alias{Arith,ddiMatrix,numeric-method}
 \alias{Arith,ldiMatrix,numeric-method}
+\alias{Arith,logical,ddiMatrix-method}
+\alias{Arith,logical,ldiMatrix-method}
+\alias{Arith,ddiMatrix,logical-method}
+\alias{Arith,ldiMatrix,logical-method}
 \alias{-,ddiMatrix,missing-method}
 \alias{-,ldiMatrix,missing-method}
 

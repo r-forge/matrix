@@ -25,6 +25,7 @@
   third calls in the Synopsis should be to ldexpf and ldexpl.
 
 - provide methods for "dspMatrix" and "dppMatrix"!
+  2012-07: mostly(?) DONE, with Ops, etc, also pack() / unpack()
 
 - combine the C functions for multiplication by special forms and
   solution wrt special forms by using a 'right' argument and a

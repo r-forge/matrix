@@ -30,19 +30,20 @@ if(interactive()) {
 (z4 <- Matrix(0*diag(4)))
 (o4 <- Matrix(1+diag(4)))
 (tr <- Matrix(cbind(1,0:1)))
-(m4 <- Matrix(cbind(0,rbind(6*diag(3),0))))
-dm4 <- Matrix(m4, sparse = FALSE)
+(M4 <- Matrix(m4 <- cbind(0,rbind(6*diag(3),0))))
+dM4 <- Matrix(M4, sparse = FALSE)
 class(mN <-  Matrix(NA, 3,4)) # NA *is* logical
 validObject(Matrix(NA))
-bd4 <- bdiag(m4,dm4,m4)
+bd4 <- bdiag(M4,dM4,M4)
 stopifnot(isValid(o4, "dsyMatrix"),
-          isValid(m4, "dtCMatrix"),
-          validObject(dm4), validObject(mN),
-          identical(bdiag(m4), bdiag(dm4)),
+          isValid(M4, "dtCMatrix"),
+          validObject(dM4), validObject(mN),
+          identical(bdiag(M4), bdiag(dM4)),
           identical(bd4@p, c(0L,0:3,3:6,6:9)),
           identical(bd4@i, c(0:2, 4:6, 8:10)), bd4@x == 6
           )
-assert.EQ.mat(dm4, as(m4, "matrix"))
+assert.EQ.mat(dM4, m4)
+assert.EQ.mat(M4^M4, m4^m4)
 assert.EQ.mat(mN, matrix(NA, 3,4))
 assert.EQ.mat(bdiag(diag(4)), diag(4))
 sL <- Matrix(, 3,4, sparse=TRUE)# -> "lgC"
@@ -182,8 +183,8 @@ stopifnot(validObject(t1),
           c(class(t2), class(t1c), class(t2c), class(tt2)) == "dtCMatrix",
           identical(t(tt2), t2))
 assert.EQ.mat(t1, as(t1c, "matrix"))
-D4. <- D4 * (M4 <- Matrix(1:4, 4,4))
-D4p <- M4 + D4
+D4. <- D4 * (A4 <- Matrix(1:4, 4,4))
+D4p <- A4 + D4
 Lg1 <- D4 > 0 & D4 > 1
 nLg <- !Lg1
 nnLg <- !nLg
@@ -558,11 +559,10 @@ D <- Diagonal(5, round(1000*runif(5)))
 px <- pack(x)
 stopifnot(is(x, "dpoMatrix"), is(px,"dppMatrix"), is(D, "ddiMatrix"))
 
-## MM: These now give  "dsyMatrix" --- I think that's good enough!
 class(x+D)#--> now "dsyMatrix"
 stopifnot(is(x+D, "symmetricMatrix"),
-          is(D+px, "dspMatrix"),
-          identical(x+D, D+x), identical(px+D, D+px))
+	  is(D+px, "dspMatrix"),
+	  identical(x+D, D+x), identical(px+D, D+px), identical(pack(x-D), px-D))
 
 
 tx <- tril(x)

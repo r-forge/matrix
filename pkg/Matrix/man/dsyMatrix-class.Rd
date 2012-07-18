@@ -113,6 +113,7 @@
 str(t(sy2)) # uplo = "L", and the lower tri. (i.e. NA is replaced).
 
 chol(sy2) #-> "Cholesky" matrix
+(sp2 <- pack(sy2)) # a "dspMatrix"
 
 ## Coercing to dpoMatrix gives invalid object:
 sy3 <- new("dsyMatrix", Dim = as.integer(c(2,2)), x = c(14, -1, 2, -7))
@@ -120,7 +121,8 @@ try(as(sy3, "dpoMatrix")) # -> error: not positive definite
 \dontshow{
 tr <- try(as(sy3, "dpoMatrix"), silent=TRUE)
 stopifnot(1 == grep("not a positive definite matrix",
-                    as.character(tr)))
+                    as.character(tr)),
+	  is(sp2, "dspMatrix"))
 }
 }
 \keyword{classes}
