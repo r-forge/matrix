@@ -147,14 +147,22 @@ stopifnot(identical(crossprod(lm1),# "lgC": here works!
                     crossprod(as(lm1, "dMatrix"))
                     ))
 
+D3 <- Diagonal(x=4:2)  # for the checks below, also want a *diagonal*
+
+
 ## Systematically look at all "Ops" group generics for "all" Matrix classes
 ## -------------- Main issue: Detect infinite recursion problems
 cl <- sapply(ls(), function(.) class(get(.)))
 Mcl <- c(grep("Matrix$", cl, value=TRUE),
          grep("sparseVector", cl, value=TRUE))
 table(Mcl)
+## choose *one* of each class:
 M.objs <- names(Mcl[!duplicated(Mcl)])
+Mat.objs <- M.objs[vapply(M.objs, function(nm) is(get(nm), "Matrix"), NA)]
+(MatDims <- t(vapply(Mat.objs, function(nm) dim(get(nm)), 0:1)))
+mDims <- MatDims %*% (d.sig <- c(1, 1000)) # "dim-signature" to match against
 
+m2num <- function(m) { if(is.integer(m)) storage.mode(m) <- "double" ; m }
 cat("Checking all group generics for a set of arguments:\n",
     "---------------------------------------------------\n", sep='')
 for(gr in getGroupMembers("Ops")) {
@@ -178,15 +186,32 @@ for(gr in getGroupMembers("Ops")) {
             cat("s.")
             validObject(r3 <- do.call(f, list(M, sv)))
             stopifnot(dim(r3) == dim(M))
+	    if(is(M, "Matrix")) { ## M	o <Matrix>
+		d <- dim(M)
+		ds <- sum(d * d.sig)
+		if(any(match. <- ds == mDims)) {
+		    cat("\nM o M:")
+		    for(oM in Mat.objs[match.]) {
+			M2 <- get(oM)
+			validObject(R4 <- do.call(f, list(M, M2)))
+                        cat(".")
+			r4 <- m2num(do.call(f, list(as.mat(M), as.mat(M2))))
+			## stopifnot(identical(r4, as.mat(R4)))
+                        if(!identical(r4, as.mat(R4))) {
+                            cat("\n  ** not identical:  r4 \\ R4 :\n")
+                            print(r4); print(R4)
+                        }
+                        cat("i")
+		    }
+		}
+	    }
 	}
 	cat("\n")
     }
 }
 
-if(FALSE) {## These are not yet there
-lm1 & lm2
-lm1 | lm2
-}
+stopifnot(identical(lm2, lm1 & lm2),
+          identical(lm1, lm1 | lm2))
 
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''

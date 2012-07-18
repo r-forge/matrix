@@ -86,7 +86,7 @@ if(FALSE)##--- no longer used:
 .bdiag <- function(lst) {
     ## block-diagonal matrix [a dgTMatrix] from list of matrices
     stopifnot(is.list(lst), length(lst) >= 1)
-    dims <- sapply(lst, dim, USE.NAMES=FALSE)
+    dims <- vapply(lst, dim, 1L, USE.NAMES=FALSE)
     ## make sure we had all matrices:
     if(!(is.matrix(dims) && nrow(dims) == 2))
 	stop("some arguments are not matrices")
@@ -115,10 +115,10 @@ if(FALSE)##--- no longer used:
 		   as, "TsparseMatrix")
     if(nl == 1) return(Tlst[[1]])
     ## else
-    i_off <- c(0L, cumsum(sapply(Tlst, nrow)))
-    j_off <- c(0L, cumsum(sapply(Tlst, ncol)))
+    i_off <- c(0L, cumsum(vapply(Tlst, nrow, 1L)))
+    j_off <- c(0L, cumsum(vapply(Tlst, ncol, 1L)))
 
-    clss <- sapply(Tlst, class)
+    clss <- vapply(Tlst, class, "")
     typ <- substr(clss, 2, 2)
     knd <- substr(clss, 1, 1)
     sym <- typ == "s" # symmetric ones
@@ -130,7 +130,7 @@ if(FALSE)##--- no longer used:
     }
     use.l <- !use.n && all(knd == "l")
     if(all(sym)) { ## result should be *symmetric*
-	uplos <- sapply(Tlst, slot, "uplo") ## either "U" or "L"
+	uplos <- vapply(Tlst, slot, ".", "uplo") ## either "U" or "L"
 	tLU <- table(uplos)# of length 1 or 2 ..
 	if(length(tLU) == 1) { ## all "U" or all "L"
 	    useU <- uplos[1] == "U"
@@ -149,7 +149,7 @@ if(FALSE)##--- no longer used:
 	}
 	r@uplo <- if(useU) "U" else "L"
     }
-    else if(all(tri) && { ULs <- sapply(Tlst, slot, "uplo")##  "U" or "L"
+    else if(all(tri) && { ULs <- vapply(Tlst, slot, ".", "uplo")##  "U" or "L"
 			  all(ULs[1L] == ULs[-1L]) } ## all upper or all lower
        ){ ## *triangular* result
 
@@ -864,7 +864,8 @@ setMethod("Ops", signature(e1 = "sparseMatrix", e2 = "ldiMatrix"),
 
 ##  other = "numeric" : stay diagonal if possible
 ## ddi*: Arith: result numeric, potentially ddiMatrix
-setMethod("Arith", signature(e1 = "ddiMatrix", e2 = "numeric"),
+for(arg2 in c("numeric","logical"))
+setMethod("Arith", signature(e1 = "ddiMatrix", e2 = arg2),
 	  function(e1,e2) {
 	      n <- e1@Dim[1]; nsq <- n^2
 	      f0 <- callGeneric(0, e2)
@@ -882,7 +883,8 @@ setMethod("Arith", signature(e1 = "ddiMatrix", e2 = "numeric"),
 	      callGeneric(diag2tT.u(e1,e2, "d"), e2)
 	  })
 
-setMethod("Arith", signature(e1 = "numeric", e2 = "ddiMatrix"),
+for(arg1 in c("numeric","logical"))
+setMethod("Arith", signature(e1 = arg1, e2 = "ddiMatrix"),
 	  function(e1,e2) {
 	      n <- e2@Dim[1]; nsq <- n^2
 	      f0 <- callGeneric(e1, 0)
@@ -901,7 +903,8 @@ setMethod("Arith", signature(e1 = "numeric", e2 = "ddiMatrix"),
 	  })
 
 ## ldi* Arith --> result numeric, potentially ddiMatrix
-setMethod("Arith", signature(e1 = "ldiMatrix", e2 = "numeric"),
+for(arg2 in c("numeric","logical"))
+setMethod("Arith", signature(e1 = "ldiMatrix", e2 = arg2),
 	  function(e1,e2) {
 	      n <- e1@Dim[1]; nsq <- n^2
 	      f0 <- callGeneric(0, e2)
@@ -917,10 +920,11 @@ setMethod("Arith", signature(e1 = "ldiMatrix", e2 = "numeric"),
 		  e1@x <- if(L1) r else r[1L + (n+1L)*(0:(n-1L))]
 		  return(e1)
 	      }
-	      callGeneric(diag2tT.u(e1,e2, "d"), e2)
+	      callGeneric(diag2tT.u(e1,e2, "l"), e2)
 	  })
 
-setMethod("Arith", signature(e1 = "numeric", e2 = "ldiMatrix"),
+for(arg1 in c("numeric","logical"))
+setMethod("Arith", signature(e1 = arg1, e2 = "ldiMatrix"),
 	  function(e1,e2) {
 	      n <- e2@Dim[1]; nsq <- n^2
 	      f0 <- callGeneric(e1, 0)
@@ -936,11 +940,12 @@ setMethod("Arith", signature(e1 = "numeric", e2 = "ldiMatrix"),
 		  e2@x <- if(L1) r else r[1L + (n+1L)*(0:(n-1L))]
 		  return(e2)
 	      }
-	      callGeneric(e1, diag2tT.u(e2,e1, "d"))
+	      callGeneric(e1, diag2tT.u(e2,e1, "l"))
 	  })
 
 ## ddi*: for "Ops" without Arith --> result logical, potentially ldi
-setMethod("Ops", signature(e1 = "ddiMatrix", e2 = "numeric"),
+for(arg2 in c("numeric","logical"))
+setMethod("Ops", signature(e1 = "ddiMatrix", e2 = arg2),
 	  function(e1,e2) {
 	      n <- e1@Dim[1]; nsq <- n^2
 	      f0 <- callGeneric(0, e2)
@@ -956,10 +961,11 @@ setMethod("Ops", signature(e1 = "ddiMatrix", e2 = "numeric"),
 		  e1@x <- if(L1) r else r[1L + (n+1L)*(0:(n-1L))]
 		  return(e1)
 	      }
-	      callGeneric(diag2tT.u(e1,e2, "l"), e2)
+	      callGeneric(diag2tT.u(e1,e2, "d"), e2)
 	  })
 
-setMethod("Ops", signature(e1 = "numeric", e2 = "ddiMatrix"),
+for(arg1 in c("numeric","logical"))
+setMethod("Ops", signature(e1 = arg1, e2 = "ddiMatrix"),
 	  function(e1,e2) {
 	      n <- e2@Dim[1]; nsq <- n^2
 	      f0 <- callGeneric(e1, 0)
@@ -975,11 +981,12 @@ setMethod("Ops", signature(e1 = "numeric", e2 = "ddiMatrix"),
 		  e2@x <- if(L1) r else r[1L + (n+1L)*(0:(n-1L))]
 		  return(e2)
 	      }
-	      callGeneric(e1, diag2tT.u(e2,e1, "l"))
+	      callGeneric(e1, diag2tT.u(e2,e1, "d"))
 	  })
 
 ## ldi*: for "Ops" without Arith --> result logical, potentially ldi
-setMethod("Ops", signature(e1 = "ldiMatrix", e2 = "numeric"),
+for(arg2 in c("numeric","logical"))
+setMethod("Ops", signature(e1 = "ldiMatrix", e2 = arg2),
 	  function(e1,e2) {
 	      n <- e1@Dim[1]; nsq <- n^2
 	      f0 <- callGeneric(FALSE, e2)
@@ -997,7 +1004,8 @@ setMethod("Ops", signature(e1 = "ldiMatrix", e2 = "numeric"),
 	      callGeneric(diag2tT.u(e1,e2, "l"), e2)
 	  })
 
-setMethod("Ops", signature(e1 = "numeric", e2 = "ldiMatrix"),
+for(arg1 in c("numeric","logical"))
+setMethod("Ops", signature(e1 = arg1, e2 = "ldiMatrix"),
 	  function(e1,e2) {
 	      n <- e2@Dim[1]; nsq <- n^2
 	      f0 <- callGeneric(e1, FALSE)
@@ -1032,10 +1040,8 @@ for(other in c("ANY", "Matrix", "dMatrix")) {
 }
 
 ## Direct subclasses of "denseMatrix": currently ddenseMatrix, ldense... :
-if(FALSE)## too general, would contain  denseModelMatrix:
 dense.subCl <- local({ dM.scl <- getClass("denseMatrix")@subclasses
-                       names(dM.scl)[sapply(dM.scl, slot, "distance") == 1] })
-dense.subCl <- paste(c("d","l","n"), "denseMatrix", sep="")
+		       names(dM.scl)[vapply(dM.scl, slot, 0, "distance") == 1] })
 for(DI in diCls) {
     for(c2 in c(dense.subCl, "Matrix")) {
 	for(Fun in c("*", "^", "&")) {
@@ -1130,3 +1136,5 @@ setMethod("show", signature(object = "diagonalMatrix"),
 		  invisible(object)
 	      }
 	  })
+
+rm(dense.subCl, diCls)# not used elsewhere

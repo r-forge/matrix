@@ -123,7 +123,7 @@ setMethod("Compare", signature(e1 = "numeric", e2 = "nMatrix"), .Cmp.swap)
 setMethod("Compare", signature(e1 = "logical", e2 = "nMatrix"), .Cmp.swap)
 
 
-## This is parallel to .Logic.Mat.atomic() below --->  __keep parallel__ !
+## This is parallel to Logic.Mat.atomic() below --->  __keep parallel__ !
 Cmp.Mat.atomic <- function(e1, e2) { ## result will inherit from "lMatrix"
     d <- e1@Dim
     cl <- class(e1)
@@ -176,6 +176,8 @@ Cmp.Mat.atomic <- function(e1, e2) { ## result will inherit from "lMatrix"
         }
     }
     else { ##---- e1 is(. , sparseMatrix) -----------------
+        ## FIXME: remove this test eventually
+        if(extends(cl1, "diagonalMatrix")) stop("Cmp.Mat.atomic() should not be called for diagonalMatrix")
         remainSparse <- allFalse(r0) ## <==> things remain sparse
         Udg <- extends(cl1, "triangularMatrix") && e1@diag == "U"
         if(Udg) {          # e1 *is* unit-diagonal (triangular sparse)
@@ -287,7 +289,7 @@ Ops.x.x <- function(e1, e2)
 		    }
 		    else if(tri <- extends(c1, "triangularMatrix") &&
 				   extends(c2, "triangularMatrix")) {
-			if(!(geM <- e1@uplo != e2@uplo || callGeneric(0,0) != 0)) {
+			if(!(geM <- e1@uplo != e2@uplo || isN0(callGeneric(0,0)))) {
 			    if((p1 <- isPacked(e1)) | (p2 <- isPacked(e2))) { ## at least one is packed
 				if(p1 != p2) { # one is not packed --> *do* pack it:
 				    if(p1) e2 <- .Call(dtrMatrix_as_dtpMatrix, e2)
@@ -608,10 +610,10 @@ for(Mcl in c("lMatrix","nMatrix","dMatrix"))
     setMethod("Logic", signature(e1 = cl, e2 = Mcl),
               function(e1,e2) callGeneric(e2, e1))
 ## conceivably "numeric" could use  callGeneric(e2, as.logical(e1))
-## but that's not useful at the moment, since .Logic.Mat.atomic() does as.logical()
+## but that's not useful at the moment, since Logic.Mat.atomic() does as.logical()
 
 ## This is parallel to Cmp.Mat.atomic() above --->  __keep parallel__ !
-.Logic.Mat.atomic <- function(e1, e2) { ## result will typically be "like" e1:
+Logic.Mat.atomic <- function(e1, e2) { ## result will typically be "like" e1:
     e2 <- as.logical(e2)
     if(.Generic == "&" && allTrue (e2)) return(e1)
     if(.Generic == "|" && allFalse(e2)) return(e1)
@@ -659,7 +661,7 @@ for(Mcl in c("lMatrix","nMatrix","dMatrix"))
             ##--> result cannot be packed anymore
             ## [dense & packed & not symmetric ] ==> must be "ltp*" :
             if(!extends(cl1, "ltpMatrix"))
-                stop("internal bug in \"Logic\" method (.Logic.Mat.atomic); please report")
+                stop("internal bug in \"Logic\" method (Logic.Mat.atomic); please report")
             rx <- rep(r0, length.out = prod(d))
             rx[indTri(d[1], upper = (e1@uplo == "U"))] <- r
             r <- new("lgeMatrix", x = rx,
@@ -668,6 +670,8 @@ for(Mcl in c("lMatrix","nMatrix","dMatrix"))
 
     }
     else { ##---- e1 is(. , sparseMatrix) -----------------
+        ## FIXME: remove this test eventually
+        if(extends(cl1, "diagonalMatrix")) stop("Logic.Mat.atomic() should not be called for diagonalMatrix")
         remainSparse <- allFalse(r0) ## <==> things remain sparse
         Udg <- extends(cl1, "triangularMatrix") && e1@diag == "U"
         if(Udg) {          # e1 *is* unit-diagonal (triangular sparse)
@@ -741,7 +745,7 @@ for(Mcl in c("lMatrix","nMatrix","dMatrix"))
 }
 for(Mcl in c("lMatrix","nMatrix","dMatrix"))
     for(cl in c("logical", "numeric", "sparseVector"))
-    setMethod("Logic", signature(e1 = Mcl, e2 = cl), .Logic.Mat.atomic)
+    setMethod("Logic", signature(e1 = Mcl, e2 = cl), Logic.Mat.atomic)
 
 
 ### -- II -- sparse ----------------------------------------------------------
@@ -1012,13 +1016,14 @@ setMethod("Arith", signature(e1 = "dgCMatrix", e2 = "dgCMatrix"),
 setMethod("Arith", signature(e1 = "dtCMatrix", e2 = "dtCMatrix"),
 	  function(e1, e2) {
 	      U1 <- e1@uplo
-	      isTri <- U1 == e2@uplo # will the result definitely be triangular?
+	      isTri <- U1 == e2@uplo && .Generic != "^" # will the result definitely be triangular?
 	      if(isTri) {
 		  .Arith.Csparse(e1,e2, .Generic, class. = "dtCMatrix",
 				 triangular = TRUE)
 	      }
 	      else { ## lowerTri  o  upperTri: |--> "all 0" {often} -- FIXME?
-		  callGeneric(as(e1, "dgCMatrix"), as(e2, "dgCMatrix"))
+		  .Arith.Csparse(as(e1, "dgCMatrix"), as(e2, "dgCMatrix"),
+				 .Generic, class.= "dgCMatrix")
 	      }
 	  })
 
