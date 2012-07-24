@@ -672,6 +672,7 @@ replTmat <- function (x, i, j, ..., value)
 	x <- uniqTsparse(x)
 
     toGeneral <- FALSE
+    isN <- extends(clDx, "nMatrix")
     if(r.sym <- extends(clDx, "symmetricMatrix")) {
 	## Tests to see if the assignments are symmetric as well
 	r.sym <- all(i1 == i2)
@@ -702,7 +703,8 @@ replTmat <- function (x, i, j, ..., value)
 	r.tri <- all(if(x@uplo == "U") i1 <= i2 else i2 <= i1)
 	if(r.tri) { ## result is *still* triangular
 	    if(any(ieq <- i1 == i2)) { # diagonal will be changed
-		if(x@diag == "U" && all(ieq) && all(value == as1(x@x)))
+		if(x@diag == "U" && all(ieq) &&
+		   all(value == if(isN) TRUE else as1(x@x)))
 		    ## only diagonal values are set to 1 -- i.e. unchanged
 		    return(x)
 		x <- diagU2N(x) # keeps class (!)
@@ -730,7 +732,7 @@ replTmat <- function (x, i, j, ..., value)
     m1 <- match(ii.v, ii.x)
     i.repl <- !is.na(m1) # those that need to be *replaced*
 
-    if(isN <- extends(clDx, "nMatrix")) { ## no 'x' slot
+    if(isN) { ## no 'x' slot
 	isN <- all(value %in% c(FALSE, TRUE)) # will result remain  "nMatrix" ?
 	if(!isN)
 	    x <- as(x, paste(if(extends(clDx, "lMatrix")) "l" else "d",

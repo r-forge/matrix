@@ -281,8 +281,13 @@ colCheck <- function(a, b) {
     da[2]
 }
 
-## used for is.na(<nsparse>)  but not only;
-## just gives a "all-FALSE" n(C)sparseMatrix of same form as x
+## is.na(<nsparse>) is FALSE everywhere.  Consequently, this function
+## just gives an "all-FALSE" nCsparseMatrix of same form as x
+##'
+##' @title all FALSE nCsparseMatrix "as x"
+##' @param x Matrix
+##' @return n.CsparseMatrix "as \code{x}"
+##' @author Martin Maechler
 is.na_nsp <- function(x) {
     d <- x@Dim
     dn <- x@Dimnames
@@ -294,6 +299,20 @@ is.na_nsp <- function(x) {
     r@p <- rep.int(0L, d[2]+1L)
     r
 }
+
+allTrueMat <- function(x, sym = (d[1] == d[2] &&
+				 identical(dn[[1]], dn[[2]])),
+		       packed=TRUE)
+{
+    d <- x@Dim
+    dn <- x@Dimnames
+    r <- new("ngeMatrix", Dim=d, Dimnames=dn, x = rep.int(TRUE, prod(d)))
+    if(sym) as(r, if(packed) "nspMatrix" else "nsyMatrix")
+    else r
+}
+allTrueMatrix <- function(x) allTrueMat(x)
+
+
 
 ## Note: !isPacked(.)  i.e. `full' still contains
 ## ----  "*sy" and "*tr" which have "undefined" lower or upper part
@@ -1110,17 +1129,18 @@ xtC.diagU2N <- function(x) if(x@diag == "U") .Call(Csparse_diagU2N, x) else x
 ##' @param x a dense unidiagonal (x@diag == "U") triangular Matrix
 ##'     ("ltrMatrix", "dtpMatrix", ...).
 ##' @param kind character indicating content kind: "d","l",..
+##' @param isPacked logical indicating if 'x' is packed
 ##' @return Matrix "like" x, but with x@diag == "N" (and 1 or TRUE values "filled" in .@x)
 ##' @author Martin Maechler
-.dense.diagU2N <- function(x, kind = .M.kind(x))
+.dense.diagU2N <- function(x, kind = .M.kind(x), isPacked = length(x@x) < n^2)
 {
-    ## For denseMatrix, 'diag = "U"'
-    ## means the 'x' slot can have wrong values which are
-    ## documented to never be accessed
+### FIXME: Move this to C ----- (possibly with an option of *not* copying)
+    ## For denseMatrix, .@diag = "U"  means the 'x' slot can have wrong values
+    ## which are documented to never be accessed
     n <- x@Dim[1]
     if(n > 0) {
 	one <- if(kind == "d") 1. else TRUE
-	if(length(x@x) < n^2) { ## { == isPacked(x)) } : dtp-, ltp-, or "ntpMatrix":
+	if(isPacked) { ## { == isPacked(x)) } : dtp-, ltp-, or "ntpMatrix":
 	    ## x@x is of length	 n*(n+1)/2
 	    if(n == 1)
 		x@x <- one

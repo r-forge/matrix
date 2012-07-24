@@ -2,6 +2,10 @@
 
 * *Urgent* in some sense ------------------------------------------------------
 
+- diagonalMatrix inherits from sparseMatrix, *BUT*
+  "ddiMatrix" does not inherit from "dsparseMatrix", nor does
+  "ldiMatrix" from "lparseMatrix".   Seems an undesirable inconsistency
+
 - Look at Paul Bailey's problem -- CHOLMOD error (even seg.fault for him)
   --> ~/R/MM/Pkg-ex/Matrix/sparseOrderedLogit.R
 

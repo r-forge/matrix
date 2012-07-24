@@ -787,15 +787,16 @@ lsUtr <- lst[istri][uniC]
 cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
 ##
 
-(doExtras <- interactive() || nzchar(Sys.getenv("R_MATRIX_CHECK_EXTRA")))
+(doExtras <- interactive() || nzchar(Sys.getenv("R_MATRIX_CHECK_EXTRA")) ||
+ identical("true", unname(Sys.getenv("R_MM_PKG_CHECKING"))))
 if(doExtras) {
-cat("checkMatrix() of all: \n---------\n")
-Sys.setlocale("LC_COLLATE", "C")# to keep ls() reproducible
-for(nm in ls()) if(is(.m <- get(nm), "Matrix")) {
-    cat("\n", rep("-",nchar(nm)),"\n",nm, ":\n", sep='')
-    checkMatrix(.m)
-}
-cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
+    cat("checkMatrix() of all: \n---------\n")
+    Sys.setlocale("LC_COLLATE", "C")    # to keep ls() reproducible
+    for(nm in ls()) if(is(.m <- get(nm), "Matrix")) {
+	cat("\n", rep("-",nchar(nm)),"\n",nm, ":\n", sep='')
+	checkMatrix(.m)
+    }
+    cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
 }
 
 if(!interactive()) warnings()

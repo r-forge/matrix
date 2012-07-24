@@ -171,9 +171,10 @@ Cmp.Mat.atomic <- function(e1, e2) { ## result will inherit from "lMatrix"
             if(!extends(cl1, "dtpMatrix"))
                 stop("internal bug in \"Compare\" method (Cmp.Mat.atomic); please report")
             rx <- rep(r0, length.out = prod(d))
-            rx[indTri(d[1], upper = (e1@uplo == "U"))] <- r
-            r <- new("lgeMatrix", x = rx, Dim = d, Dimnames = dimnames(e1))
-        }
+	    rx[indTri(d[1], upper = (e1@uplo == "U"), diag=TRUE)] <- r
+	    r <- new("lgeMatrix", x = rx, Dim = d, Dimnames = dimnames(e1))
+	}
+
     }
     else { ##---- e1 is(. , sparseMatrix) -----------------
         ## FIXME: remove this test eventually
@@ -280,8 +281,12 @@ Ops.x.x <- function(e1, e2)
 			    e2 <- t(e2)
 			if((p1 <- isPacked(e1)) | (p2 <- isPacked(e2))) { ## at least one is packed
 			    if(p1 != p2) { # one is not packed --> *do* pack it:
-				if(p1) e2 <- .Call(dsyMatrix_as_dspMatrix, e2)
-				else   e1 <- .Call(dsyMatrix_as_dspMatrix, e1)
+				pack.sy <- function(x)
+				    if(is.numeric(x@x))
+					 .Call(dsyMatrix_as_dspMatrix, x)
+				    else .Call(lsyMatrix_as_lspMatrix, x, 0L)
+				if(p1) e2 <- pack.sy(e2)
+				else   e1 <- pack.sy(e1)
 			    }
 			    "spMatrix"
 			} else
@@ -290,10 +295,17 @@ Ops.x.x <- function(e1, e2)
 		    else if(tri <- extends(c1, "triangularMatrix") &&
 				   extends(c2, "triangularMatrix")) {
 			if(!(geM <- e1@uplo != e2@uplo || isN0(callGeneric(0,0)))) {
-			    if((p1 <- isPacked(e1)) | (p2 <- isPacked(e2))) { ## at least one is packed
+			    p1 <- isPacked(e1)
+			    p2 <- isPacked(e2)
+			    if(e1@diag == "U") e1 <- .dense.diagU2N(e1, isPacked=p1)
+			    if(e2@diag == "U") e2 <- .dense.diagU2N(e2, isPacked=p2)
+			    if(p1 | p2) { ## at least one is packed
 				if(p1 != p2) { # one is not packed --> *do* pack it:
-				    if(p1) e2 <- .Call(dtrMatrix_as_dtpMatrix, e2)
-				    else   e1 <- .Call(dtrMatrix_as_dtpMatrix, e1)
+				    pack.tr <- function(x)
+					if(is.numeric(x@x)) .Call(dtrMatrix_as_dtpMatrix, x)
+					else .Call(ltrMatrix_as_ltpMatrix, x, 0L)
+				    if(p1) e2 <- pack.tr(e2)
+				    else   e1 <- pack.tr(e1)
 				}
 				"tpMatrix"
 			    } else
@@ -663,10 +675,9 @@ Logic.Mat.atomic <- function(e1, e2) { ## result will typically be "like" e1:
             if(!extends(cl1, "ltpMatrix"))
                 stop("internal bug in \"Logic\" method (Logic.Mat.atomic); please report")
             rx <- rep(r0, length.out = prod(d))
-            rx[indTri(d[1], upper = (e1@uplo == "U"))] <- r
-            r <- new("lgeMatrix", x = rx,
-                     Dim = d, Dimnames = dimnames(e1))
-        }
+	    rx[indTri(d[1], upper = (e1@uplo == "U"), diag=TRUE)] <- r
+	    r <- new("lgeMatrix", x = rx, Dim = d, Dimnames = dimnames(e1))
+	}
 
     }
     else { ##---- e1 is(. , sparseMatrix) -----------------
@@ -751,9 +762,39 @@ for(Mcl in c("lMatrix","nMatrix","dMatrix"))
 ### -- II -- sparse ----------------------------------------------------------
 
 ## Have lgC o lgC  and then lgT o lgT  Logic - quite similarly -
+## also lsC o *  and ltC o * :
 
 ## Here's the common functionality
 .do.Logic.lsparse <- function(e1,e2, d, dn, isOR, ij1, ij2) {
+
+    ## NB non-diagonalMatrix := Union{ general, symmetric, triangular}
+    gen1 <- extends(cD1 <- getClassDef(class(e1)), "generalMatrix")
+    gen2 <- extends(cD2 <- getClassDef(class(e2)), "generalMatrix")
+    sym1 <- !gen1 && extends(cD1, "symmetricMatrix")
+    sym2 <- !gen2 && extends(cD2, "symmetricMatrix")
+    tri1 <- !gen1 && !sym1
+    tri2 <- !gen2 && !sym2
+    G <- gen1 && gen2
+    S <- sym1 && sym2 && e1@uplo == e2@uplo
+    T <- tri1 && tri2 && e1@uplo == e2@uplo
+    if(T && e1@diag != e2@diag) {
+	## one is "U" the other "N"
+	if(e1@diag == "U")
+	    e1 <- diagU2N(e1)
+	else ## (e2@diag == "U"
+	    e2 <- diagU2N(e2)
+	shape <- "t"
+    }
+    else if(!G && !S && !T) {
+	## e.g. one symmetric, one general
+	## coerce to generalMatrix and go :
+	if(!gen1) e1 <- as(e1, "generalMatrix", strict = FALSE)
+	if(!gen2) e2 <- as(e2, "generalMatrix", strict = FALSE)
+	shape <- "g"
+    } else {
+	shape <- if(T) "t" else if(S) "s" else "g"
+    }
+
     ii <- WhichintersectInd(ij1, ij2, di=d)
     I1 <- ii[[1]] ; has1 <- length(I1) > 0
     I2 <- ii[[2]] ; has2 <- length(I2) > 0
@@ -780,18 +821,20 @@ for(Mcl in c("lMatrix","nMatrix","dMatrix"))
 	x <- e1@x[I1] & e2@x[I2]
     }
 
+
     if(any(!(x. <- x | is.na(x)))) { ## drop 'FALSE's
 	i <- i[x.]
 	j <- j[x.]
 	x <- x[x.]
     }
-    new("lgTMatrix", Dim = d, Dimnames = dn, i = i, j = j, x = x)
+    new(paste0("l",shape,"TMatrix"), Dim = d, Dimnames = dn,
+        i = i, j = j, x = x)
 }
 
 Logic.lCMat <- function(e1, e2, isOR) {
+    stopifnot(is.logical(isOR))
     d <- dimCheck(e1, e2)
     dn <- dimNamesCheck(e1, e2)
-    stopifnot(is.logical(isOR))
     ## Very easy case first :
     if(identical(e1@i, e2@i) && identical(e1@p, e2@p)) {
         e1@x <- if(isOR) e1@x | e2@x else e1@x & e2@x
@@ -1203,12 +1246,16 @@ setMethod("Compare", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 		      e1 <- diagU2N(e1)
 		  else ## (e2@diag == "U"
 		      e2 <- diagU2N(e2)
+		  shape <- "t"
 	      }
 	      else if(!G && !S && !T) {
-                  ## e.g. one symmetric, one general
-                  ## coerce to generalMatrix and go :
+		  ## e.g. one symmetric, one general
+		  ## coerce to generalMatrix and go :
 		  if(!gen1) e1 <- as(e1, "generalMatrix", strict = FALSE)
 		  if(!gen2) e2 <- as(e2, "generalMatrix", strict = FALSE)
+		  shape <- "g"
+	      } else {
+		  shape <- if(T) "t" else if(S) "s" else "g"
 	      }
 
 	      dn <- dimNamesCheck(e1, e2)
@@ -1274,7 +1321,7 @@ setMethod("Compare", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 				   e2x[I2])
 		  ## 2) "e1 o  0":
 		  x2 <- callGeneric(if(has1) e1x[- I1] else e1x, 0)
-		  ## 3) "0  o e1":
+		  ## 3) "0  o e2":
 		  x3 <- callGeneric(0, if(has2) e2x[- I2] else e2x)
 
 		  i <- c(ij1[I1, 1],
@@ -1292,9 +1339,10 @@ setMethod("Compare", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 		  }
 		  .Call(Tsparse_to_Csparse,
 			if(e1is.n && e2is.n)
-			new("ngTMatrix", Dim = d, Dimnames = dn, i = i, j = j)
-			else new("lgTMatrix", Dim = d, Dimnames = dn,
-				 i = i, j = j, x = x),
+			new(paste0("n",shape,"TMatrix"), Dim = d,
+			    Dimnames = dn, i = i, j = j)
+			else new(paste0("l",shape,"TMatrix"), Dim = d,
+				 Dimnames = dn, i = i, j = j, x = x),
 			FALSE)
               }
 	  })
