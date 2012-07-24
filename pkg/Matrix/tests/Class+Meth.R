@@ -2,6 +2,7 @@ library(Matrix)
 source(system.file("test-tools.R", package = "Matrix"))# identical3(),
                                         # further  checkMatrix(), etc
 if(interactive()) options(error = recover)
+cat("doExtras:",doExtras,"\n")
 
 setClass("myDGC", contains = "dgCMatrix")
 M <- new("myDGC", as(Matrix(c(-2:4, rep(0,9)), 4), "CsparseMatrix"))
@@ -54,7 +55,7 @@ for(n in allCl) {
     else {
         cat("\"Actual\" class", .dq(n),":\n")
         x <- new(n)
-        for(m in allCl)
+        if(doExtras) for(m in allCl)
             if(classCanCoerce(n,m)) {
                 ext <- extends(n, m)
                 if(ext) {
