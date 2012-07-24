@@ -2,8 +2,7 @@
 
 library(Matrix)
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
-(doExtras <- interactive() || nzchar(Sys.getenv("R_MATRIX_CHECK_EXTRA")) ||
- identical("true", unname(Sys.getenv("R_MM_PKG_CHECKING"))))
+cat("doExtras:",doExtras,"\n")
 
 set.seed(2001)
 

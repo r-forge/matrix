@@ -787,8 +787,7 @@ lsUtr <- lst[istri][uniC]
 cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
 ##
 
-(doExtras <- interactive() || nzchar(Sys.getenv("R_MATRIX_CHECK_EXTRA")) ||
- identical("true", unname(Sys.getenv("R_MM_PKG_CHECKING"))))
+cat("doExtras:",doExtras,"\n")
 if(doExtras) {
     cat("checkMatrix() of all: \n---------\n")
     Sys.setlocale("LC_COLLATE", "C")    # to keep ls() reproducible
