@@ -2,6 +2,7 @@
 \title{is.na(), is.{in}finite() Methods for 'Matrix' Objects}
 \docType{methods}
 \alias{is.finite,ddenseMatrix-method}
+\alias{is.finite,dgeMatrix-method}
 \alias{is.finite,dsparseMatrix-method}
 \alias{is.finite,diagonalMatrix-method}
 \alias{is.finite,lMatrix-method}
@@ -37,14 +38,16 @@
 ## and for other classes
 }
 \arguments{
-  \item{x}{sparse or dense matrix.}
+  \item{x}{sparse or dense matrix (here; any \R object in general).}
 }
 \seealso{
   \code{\link{NA}}, \code{\link{is.na}};
   \code{\link{is.finite}}, \code{\link{is.infinite}};
   \code{\linkS4class{nMatrix}},
-  \code{\linkS4class{denseMatrix}},
-  \code{\linkS4class{sparseMatrix}}.
+  \code{\linkS4class{denseMatrix}}, \code{\linkS4class{sparseMatrix}}.
+
+  These methods are also defined for \code{\linkS4class{sparseVector}}
+  objects.
 }
 \examples{
 M <- Matrix(1:6, nrow=4, ncol=3,
