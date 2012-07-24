@@ -410,7 +410,7 @@ setReplaceMethod("[", signature(x = "CsparseMatrix", i = "index", j = "index",
 ## A[ ij ] <- value,  where ij is (i,j) 2-column matrix
 setReplaceMethod("[", signature(x = "CsparseMatrix", i = "matrix", j = "missing",
 				value = "replValue"),
-		 function(x, i, value)
+		 function(x, i, j, ..., value)
 		 ## goto Tsparse modify and convert back:
 		 as(.TM.repl.i.mat(as(x, "TsparseMatrix"), i=i, value=value),
 		    "CsparseMatrix"))

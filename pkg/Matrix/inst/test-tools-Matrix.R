@@ -329,6 +329,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
     isSym    <- extends(cld, "symmetricMatrix")
     isDiag   <- extends(cld, "diagonalMatrix")
     isPerm   <- extends(cld, "pMatrix")
+    isTri <- !isSym && !isDiag && !isPerm && extends(cld, "triangularMatrix")
     is.n     <- extends(cld, "nMatrix")
     nonMatr  <- clNam != Matrix:::MatrixClass(clNam, cld)
 
@@ -348,6 +349,8 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
     ina <- is.na(m)
     if(do.matrix) {
 	stopifnot(all(ina == is.na(m.m)),
+		  all(is.finite(m) == is.finite(m.m)),
+		  all(is.infinite(m) == is.infinite(m.m)),
 		  all(m == m | ina), ## check all() , "==" [Compare], "|" [Logic]
 		  if(ncol(m) > 0) identical3(unname(m[,1]), unname(m.m[,1]),
 					     as(m[,1,drop=FALSE], "vector"))
@@ -447,8 +450,11 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
                                         # 'diag<-' is does not change attrib:
 	    stopifnot(identical(m, m.d))
     }
-    else { # dense
-        stopifnot(identical(m, m.d)) # 'diag<-' is does not change attrib
+    else if(!identical(m, m.d)) { # dense : 'diag<-' is does not change attrib
+	if(isTri && m@diag == "U" && m.d@diag == "N" &&
+	   all(m == m.d))
+	    message("unitriangular m: diag(m) <- diag(m) lost \"U\" .. is ok")
+	else stop("diag(m) <- diag(m) has changed 'm' too much")
     }
     ## use non-square matrix when "allowed":
 

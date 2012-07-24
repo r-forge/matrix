@@ -138,10 +138,12 @@ setMethod("Summary", signature(x = "dsparseMatrix", na.rm = "ANY"),
 
 ## Methods for single-argument transformations
 
-setMethod("zapsmall", signature = list(x = "dMatrix"),
+setMethod("zapsmall", signature(x = "dMatrix"),
           function(x, digits = getOption("digits")) {
               x@x <- zapsmall(x@x, digits)
               x
           })
 
 ## -- end(single-argument transformations) ------
+
+

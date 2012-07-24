@@ -234,7 +234,7 @@ setClass("lsyMatrix",
 setClass("lspMatrix",
 	 contains = c("ldenseMatrix", "symmetricMatrix"),
 	 validity = function(object) .Call(dspMatrix_validate, object)
-	 ## "dsp" and "lsp" have the same validate
+	 ## "dsp", "lsp" and "nsp" have the same validate
 	 )
 
 ##----- nonzero pattern dense Matrices -- "for completeness"
@@ -262,7 +262,7 @@ setClass("nsyMatrix",
 setClass("nspMatrix",
 	 contains = c("ndenseMatrix", "symmetricMatrix"),
 	 validity = function(object) .Call(dspMatrix_validate, object)
-	 ## "dsp" and "nsp" have the same validate
+	 ## "dsp", "lsp" and "nsp" have the same validate
 	 )
 
 

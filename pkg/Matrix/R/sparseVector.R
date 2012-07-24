@@ -60,6 +60,21 @@ setMethod("is.na", signature(x = "sparseVector"),
 	  ## x is *not* "nsparse*" as that has own method
 	  function(x) new("nsparseVector", i = x@i[is.na(x@x)], length= x@length))
 
+setMethod("is.infinite", signature(x = "nsparseVector"),
+	  function(x) new("nsparseVector", length = x@length))## all FALSE
+setMethod("is.infinite", signature(x = "sparseVector"),
+	  ## x is *not* "nsparse*" as that has own method
+	  function(x) new("nsparseVector", i = x@i[is.infinite(x@x)], length= x@length))
+
+setMethod("is.finite", signature(x = "nsparseVector"),
+	  function(x) rep.int(TRUE, x@length))## all TRUE
+setMethod("is.finite", signature(x = "sparseVector"),
+	  function(x)  {
+	      ## x is *not* "nsparse*" as that has own method
+	      r <- rep.int(TRUE, x@length) ## mostly TRUE
+	      r[x@i[!is.finite(x@x)]] <- FALSE
+	      r
+	  })
 
 
 sp2vec <- function(x, mode = .type.kind[substr(cl, 1,1)]) {
@@ -610,14 +625,13 @@ sortSparseV <- function(x, decreasing = FALSE, na.last = NA) {
 all.equal.sparseV <- function(target, current, ...)
 {
     if(!is(target, "sparseVector") || !is(current, "sparseVector")) {
-	return(paste("target is ", data.class(target), ", current is ",
-		     data.class(current), sep = ""))
+	return(paste0("target is ", data.class(target), ", current is ",
+		      data.class(current)))
     }
     lt <- length(target)
     lc <- length(current)
     if(lt != lc) {
-	return(paste("sparseVector", ": lengths (", lt, ", ", lc, ") differ",
-		     sep = ""))
+	return(paste0("sparseVector", ": lengths (", lt, ", ", lc, ") differ"))
     }
 
     t.has.x <- class(target)  != "nsparseVector"

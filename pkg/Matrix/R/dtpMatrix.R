@@ -38,7 +38,11 @@ setMethod("diag", signature(x = "dtpMatrix"),
 	  function(x, nrow, ncol) .Call(dtpMatrix_getDiag, x),
 	  valueClass = "numeric")
 setMethod("diag<-", signature(x = "dtpMatrix"),
-	  function(x, value) .Call(dtpMatrix_setDiag, x, value))
+	  function(x, value) {
+	      .Call(dtpMatrix_setDiag,
+		    if(x@diag == "U") .dense.diagU2N(x, "d", isPacked=TRUE) else x,
+		    value)
+	  })
 
 setMethod("norm", signature(x = "dtpMatrix", type = "character"),
 	  function(x, type, ...) .Call(dtpMatrix_norm, x, type),

@@ -145,10 +145,18 @@ setMethod("diag<-", signature(x = "lsyMatrix"),
 	  function(x, value) .Call(lgeMatrix_setDiag, x, value))
 setMethod("diag<-", signature(x = "lspMatrix"),
 	  function(x, value) .Call(lspMatrix_setDiag, x, value))
-setMethod("diag<-", signature(x = "ltrMatrix"),
-	  function(x, value) .Call(ltrMatrix_setDiag, x, value))
-setMethod("diag<-", signature(x = "ltpMatrix"),
-	  function(x, value) .Call(ltpMatrix_setDiag, x, value))
+.diag.set.ltr <- function(x, value) {
+    .Call(ltrMatrix_setDiag,
+          if(x@diag == "U") .dense.diagU2N(x, "l", isPacked=FALSE) else x,
+          value)
+}
+.diag.set.ltp <- function(x, value) {
+    .Call(ltpMatrix_setDiag,
+          if(x@diag == "U") .dense.diagU2N(x, "l", isPacked=TRUE) else x,
+          value)
+}
+setMethod("diag<-", signature(x = "ltrMatrix"), .diag.set.ltr)
+setMethod("diag<-", signature(x = "ltpMatrix"), .diag.set.ltp)
 
 ## the *same* for the  "ndenseMatrix" elements:
 setMethod("diag<-", signature(x = "ngeMatrix"),
@@ -157,12 +165,10 @@ setMethod("diag<-", signature(x = "nsyMatrix"),
 	  function(x, value) .Call(lgeMatrix_setDiag, x, value))
 setMethod("diag<-", signature(x = "nspMatrix"),
 	  function(x, value) .Call(lspMatrix_setDiag, x, value))
-setMethod("diag<-", signature(x = "ntrMatrix"),
-	  function(x, value) .Call(ltrMatrix_setDiag, x, value))
-setMethod("diag<-", signature(x = "ntpMatrix"),
-	  function(x, value) .Call(ltpMatrix_setDiag, x, value))
+setMethod("diag<-", signature(x = "ntrMatrix"), .diag.set.ltr)
+setMethod("diag<-", signature(x = "ntpMatrix"), .diag.set.ltp)
 
-
+rm(.diag.set.ltr, .diag.set.ltp)
 
 setMethod("t", signature(x = "lgeMatrix"), t_geMatrix)
 setMethod("t", signature(x = "ltrMatrix"), t_trMatrix)
