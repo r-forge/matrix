@@ -446,7 +446,8 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
     if(isSparse) {
 	n0m <- drop0(m) #==> n0m is Csparse
 	has0 <- !Qidentical(n0m, as(m,"CsparseMatrix"))
-	if(!isPerm && !extends(cld, "RsparseMatrix"))
+	if(!isPerm && !extends(cld, "RsparseMatrix") &&
+           !(extends(cld, "TsparseMatrix") && Matrix:::is_duplicatedT(m, di = d)))
                                         # 'diag<-' is does not change attrib:
 	    stopifnot(identical(m, m.d))
     }
