@@ -267,11 +267,15 @@ SEXP Csparse_symmetric_to_general(SEXP x)
 
 SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo)
 {
+    int *adims = INTEGER(GET_SLOT(x, Matrix_DimSym)), n = adims[0];
+    if(n != adims[1]) {
+	error(_("Csparse_general_to_symmetric(): matrix is not square!"));
+	return R_NilValue; /* -Wall */
+    }
     CHM_SP chx = AS_CHM_SP__(x), chgx;
     int uploT = (*CHAR(STRING_ELT(uplo,0)) == 'U') ? 1 : -1;
     int Rkind = (chx->xtype != CHOLMOD_PATTERN) ? Real_kind(x) : 0;
     R_CheckStack();
-
     chgx = cholmod_copy(chx, /* stype: */ uploT, chx->xtype, &c);
     /* xtype: pattern, "real", complex or .. */
     return chm_sparse_to_SEXP(chgx, 1, 0, Rkind, "",
