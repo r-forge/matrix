@@ -622,7 +622,7 @@ asTuniq <- function(x) {
 is_not_uniqT <- function(x, di = dim(x))
     is.unsorted(x@j) || anyDuplicated(.Call(m_encodeInd2, x@i, x@j, di, FALSE))
 
-## is 'x' a TsparseMatrix with no duplicated entries (to be *added* for uniq):
+## is 'x' a TsparseMatrix with duplicated entries (to be *added* for uniq):
 is_duplicatedT <- function(x, di = dim(x))
     anyDuplicated(.Call(m_encodeInd2, x@i, x@j, di, FALSE))
 

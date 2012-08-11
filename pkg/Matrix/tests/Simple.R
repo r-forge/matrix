@@ -307,6 +307,16 @@ stopifnot(all(ina == is.na(cu)),
 	  all(ina == as(is.na(as(cu,"matrix")),"nMatrix")))
 
 
+set.seed(7)
+xx <- rpois(10, 50)
+Samp <- function(n,size) sample(n, size, replace=TRUE)
+Tn <- sparseMatrix(i=Samp(8, 50), j=Samp(9,50), x=xx, giveCsparse=FALSE)
+Tn
+stopifnot(xx == Tn@x,
+	  max(xx) < max(Tn), 0 == min(Tn),
+	  (sT <- sum(Tn)) == sum(colSums(Tn)), sT == sum(Tn@x),
+	  range(Tn) == range(as(Tn, "CsparseMatrix")))
+
 ## tu. is diag "U", but tu2 not:
 tu2 <- as(as(tu., "generalMatrix"), "triangularMatrix")
 assert.EQ.mat(cu, mu, tol=0)
