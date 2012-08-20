@@ -22,10 +22,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: R 2.16.0\n"
+"Project-Id-Version: R 2.15.1\n"
 "Report-Msgid-Bugs-To: bugs@r-project.org\n"
-"POT-Creation-Date: 2012-03-06 17:05\n"
-"PO-Revision-Date: 2012-03-06 17:05\n"
+"POT-Creation-Date: 2012-08-20 17:08\n"
+"PO-Revision-Date: 2012-08-20 17:08\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -33,6 +33,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "invalid 'mod':"
+msgstr "invalid 'mod':"
 
 msgid ""
 "not-yet-implemented method for %s(<%s>).\n"
@@ -87,17 +90,38 @@ msgstr "not a triangular matrix"
 msgid "not yet implemented for matrix w/ typeof"
 msgstr "not yet implemented for matrix w/ typeof"
 
-msgid "not yet be implemented for"
-msgstr "not yet be implemented for"
+msgid "not yet implemented for"
+msgstr "not yet implemented for"
 
 msgid "general Matrix class not yet implemented for"
 msgstr "general Matrix class not yet implemented for"
 
-msgid "arguments in"
-msgstr "arguments in"
+msgid "arguments"
+msgstr "arguments"
 
-msgid "are disregarded"
-msgstr "are disregarded"
+msgid ")$"
+msgstr ")$"
+
+msgid "^list\\("
+msgstr "^list\\("
+
+msgid "are disregarded in"
+msgstr "are disregarded in"
+
+msgid ""
+"Quadratic matrix '%s' (=: A) is not formally\n"
+"\tsymmetric.  Will be treated as\tA A'"
+msgstr ""
+"Quadratic matrix ‘%s’ (=: A) is not formally\n"
+"\tsymmetric.  Will be treated as\tA A'"
+
+msgid ""
+"'update' must be logical or '+' or '-'; 'C' a matrix, and 'L' a \"CHMfactor\""
+msgstr ""
+"‘update’ must be logical or ‘+’ or '-'; ‘C’ a matrix, and ‘L’ a “CHMfactor”"
+
+msgid "update must be TRUE/FALSE or '+' or '-'"
+msgstr "update must be TRUE/FALSE or ‘+’ or ‘-’"
 
 msgid "not a symmetric matrix; consider forceSymmetric() or symmpart()"
 msgstr "not a symmetric matrix; consider forceSymmetric() or symmpart()"
@@ -230,6 +254,16 @@ msgstr ""
 msgid "'lag' and 'differences' must be integers >= 1"
 msgstr "‘lag’ and ‘differences’ must be integers >= 1"
 
+msgid "programming error: min() should have dispatched w/ 1st arg much earlier"
+msgstr ""
+"programming error: min() should have dispatched w/ 1st arg much earlier"
+
+msgid "in Summary(<ANY>, .): %s(<%s>, <%s>%s)"
+msgstr "in Summary(<ANY>, .): %s(<%s>, <%s>%s)"
+
+msgid ", ..."
+msgstr ", ..."
+
 msgid "invalid or not-yet-implemented 'Matrix' subsetting"
 msgstr "invalid or not-yet-implemented ‘Matrix’ subsetting"
 
@@ -292,6 +326,9 @@ msgstr "(0) is undefined"
 msgid "internal bug in \"Compare\" method (Cmp.Mat.atomic); please report"
 msgstr "internal bug in “Compare” method (Cmp.Mat.atomic); please report"
 
+msgid "Cmp.Mat.atomic() should not be called for diagonalMatrix"
+msgstr "Cmp.Mat.atomic() should not be called for diagonalMatrix"
+
 msgid "Matrices must have same number of rows for arithmetic"
 msgstr "Matrices must have same number of rows for arithmetic"
 
@@ -304,8 +341,11 @@ msgstr "length of 2nd arg does not match dimension of first"
 msgid "length of 1st arg does not match dimension of 2nd"
 msgstr "length of 1st arg does not match dimension of 2nd"
 
-msgid "internal bug in \"Logic\" method (.Logic.Mat.atomic); please report"
-msgstr "internal bug in “Logic” method (.Logic.Mat.atomic); please report"
+msgid "internal bug in \"Logic\" method (Logic.Mat.atomic); please report"
+msgstr "internal bug in “Logic” method (Logic.Mat.atomic); please report"
+
+msgid "Logic.Mat.atomic() should not be called for diagonalMatrix"
+msgstr "Logic.Mat.atomic() should not be called for diagonalMatrix"
 
 msgid "(0)"
 msgstr "(0)"
@@ -681,3 +721,9 @@ msgstr ""
 
 msgid "'times >= 0' is required"
 msgstr "‘times >= 0’ is required"
+
+msgid "(un)packing only applies to dense matrices, class(x)='%s'"
+msgstr "(un)packing only applies to dense matrices, class(x)='%s'"
+
+msgid "'x' is not symmetric nor triangular"
+msgstr "‘x’ is not symmetric nor triangular"
