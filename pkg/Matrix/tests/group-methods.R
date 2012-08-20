@@ -182,6 +182,7 @@ for(gr in getGroupMembers("Ops")) {
   for(f in getGroupMembers(gr)) {
     cat(sprintf("%9s :\n%9s\n", paste0('"',f,'"'), "--"))
     for(nm in M.objs) {
+      if(doExtras) cat("  '",nm,"' ", sep="")
       M <- get(nm, inherits=FALSE)
       n.m <- NROW(M)
       cat("o")

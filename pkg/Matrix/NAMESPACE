@@ -307,6 +307,7 @@ exportMethods("rbind2")
 exportMethods("cbind2")
 
 S3method(print, sparseSummary)
+S3method(print, diagSummary)
 S3method(c, abIndex)# < for now -- S4 method on c() seems "difficult"
 
 ## So that such dispatch also works inside base functions:

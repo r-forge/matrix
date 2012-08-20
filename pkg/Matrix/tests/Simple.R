@@ -70,7 +70,9 @@ if(FALSE) { ## TODO -- once R itself does better ...
     MLp <- Matrix(.Leap.seconds)## --> error (for now)
 }
 
-I <- Diagonal(3); I[,1] <- NA; I[2,2] <- NA ; I[3,] <- NaN
+I <- Diagonal(3)
+stopifnot(identical(I != 0, Diagonal(3, TRUE)), I@diag == "U")
+I[,1] <- NA; I[2,2] <- NA ; I[3,] <- NaN
 stopifnot(isValid(I, "sparseMatrix"))
 I # gave error in printSpMatrix() - because of R bug in format.info()
 
@@ -118,8 +120,18 @@ stopifnot(all(!l0),
 
 if(!interactive()) warnings()
 ## really large {length(<dense equivalent>) is beyond R's limits}:
-op <- options(warn = 2) # warnings here are errors
+op <- options(warn = 2) # warnings (e.g. integer overflow!) become errors:
 n <- 50000L
+stopifnot(n^2 > .Machine$integer.max)
+## had integer overflow in index constructions:
+x <- 1:n
+D <- Diagonal(n, x=x[n:1])
+summary(D)# special method
+summary(D != 0)
+stopifnot(identical(x*D, (Dx <- D*x)),
+	  identical(D != 0, as(D, "lMatrix")),
+	  identical(Dx, local({d <- D; d@x <- d@x * x; d})))
+
 Lrg <- new("dgTMatrix", Dim = c(n,n))
 diag(Lrg[2:9,1:8]) <- 1:8
 ## ==:  Lrg[2:9,1:8] <- `diag<-`(Lrg[2:9,1:8], 1:8)
@@ -775,8 +787,11 @@ M <- spMatrix(n, m,
               x = round(rnorm(nnz),1))
 validObject(Mv <- as(M, "sparseVector"))
 validObject(Dv <- as(Diagonal(60000), "sparseVector"))
+validObject(LD <- Diagonal(60000, TRUE))
+validObject(Lv <- as(LD, "sparseVector"))
 Dm <- Dv; dim(Dm) <- c(180000L, 20000L)
-stopifnot(isValid(Md <- M * rowSums(M, sparseResult=TRUE), "sparseMatrix"),
+stopifnot(!doExtras || isValid(Md <- M * rowSums(M, sparseResult=TRUE), "sparseMatrix"),
+	  LD@diag == "U",
           isValid(Dm, "sparseMatrix"),
 	  identical(Dv, as(Dm, "sparseVector")))
 

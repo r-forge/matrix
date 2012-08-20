@@ -238,6 +238,7 @@
 \alias{solve,diagonalMatrix,Matrix-method}
 \alias{solve,diagonalMatrix,matrix-method}
 \alias{solve,diagonalMatrix,missing-method}
+\alias{summary,diagonalMatrix-method}
 \description{
   Class "diagonalMatrix" is the virtual class of all diagonal matrices.
 }
@@ -293,7 +294,12 @@
       typically very desirable.  Note that when \code{e2} contains
       off-diagonal zeros or \code{\link{NA}}s, we implicitly use \eqn{0 / x = 0}, hence
       differing from traditional \R arithmetic (where \eqn{0 / 0
-      \mapsto \mbox{NaN}}{0/0 |-> NaN}), in order to preserve sparsity.}
+	\mapsto \mbox{NaN}}{0/0 |-> NaN}), in order to preserve sparsity.}
+
+    \item{summary}{\code{(object = "diagonalMatrix")}: Returns
+      an object of S3 class \code{"diagSummary"} which is the summary of
+      the vector \code{object@x} plus a simple heading, and an
+      appropriate \code{\link{print}} method.}
   }
 }
 \seealso{

@@ -19,9 +19,11 @@ allFalse <- function(x) !any(x) && !any(is.na(x))## ~= all0
 anyFalse <- function(x) isTRUE(any(!x))		 ## ~= any0
 
 as1 <- function(x, mod=mode(x))
-    switch(mod, "integer" = 1L, "numeric" = 1, "logical" = TRUE, "complex" = 1+0i)
+    switch(mod, "integer"= 1L, "double"=, "numeric"= 1, "logical"= TRUE,
+	   "complex"= 1+0i, stop("invalid 'mod': ", mod))
 as0 <- function(x, mod=mode(x))
-    switch(mod, "integer" = 0L, "numeric" = 0, "logical" = FALSE, "complex" = 0+0i)
+    switch(mod, "integer"= 0L, "double"=, "numeric"= 0, "logical"= FALSE,
+	   "complex"= 0+0i, stop("invalid 'mod': ", mod))
 
 
 .M.DN <- function(x) if(!is.null(dn <- dimnames(x))) dn else list(NULL,NULL)
