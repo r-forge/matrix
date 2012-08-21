@@ -1,5 +1,5 @@
 # English translations for R package.
-# Copyright (C) 2012 The R Foundation
+# Copyright (C) 2012 The R Core Team
 # This file is distributed under the same license as the R package.
 # Automatically generated, 2012.
 #
@@ -28,9 +28,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: R 2.15.1\n"
-"Report-Msgid-Bugs-To: bugs@R-project.org\n"
-"POT-Creation-Date: 2012-08-20 17:08+0200\n"
-"PO-Revision-Date: 2012-08-20 17:08+0200\n"
+"Report-Msgid-Bugs-To: bugs.r-project.org\n"
+"POT-Creation-Date: 2012-08-21 22:08+0200\n"
+"PO-Revision-Date: 2012-08-21 22:08+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en\n"
@@ -163,7 +163,7 @@ msgstr "Index j must be NULL or integer"
 #: Csparse.c:651
 #, c-format
 msgid "failure to open file \"%s\" for writing"
-msgstr "failure to open file “%s” for writing"
+msgstr "failure to open file \"%s\" for writing"
 
 #: Csparse.c:655
 msgid "cholmod_write_sparse returned error code"
@@ -185,7 +185,7 @@ msgstr "negative vector lengths not allowed: np = %d, nnz = %d"
 
 #: Csparse.c:804
 msgid "exactly 1 of 'i', 'j' or 'p' must be NULL"
-msgstr "exactly 1 of 'i', ‘j’ or ‘p’ must be NULL"
+msgstr "exactly 1 of ‘i’, ‘j’ or ‘p’ must be NULL"
 
 #: Csparse.c:806
 #, c-format
@@ -224,12 +224,12 @@ msgstr "strlen of cls argument = %d, should be 8"
 #: Csparse.c:855
 #, c-format
 msgid "cls = \"%s\" does not end in \"CMatrix\""
-msgstr "cls = “%s” does not end in “CMatrix”"
+msgstr "cls = \"%s\" does not end in \"CMatrix\""
 
 #: Csparse.c:865
 #, c-format
 msgid "cls = \"%s\" must begin with 'd', 'l' or 'n'"
-msgstr "cls = “%s” must begin with 'd', ‘l’ or ‘n’"
+msgstr "cls = \"%s\" must begin with ‘d’, ‘l’ or ‘n’"
 
 #: Csparse.c:868
 msgid "Only 'g'eneral sparse matrix types allowed"
@@ -237,7 +237,7 @@ msgstr "Only 'g'eneral sparse matrix types allowed"
 
 #: Csparse.c:896
 msgid "code not yet written for cls = \"lgCMatrix\""
-msgstr "code not yet written for cls = “lgCMatrix”"
+msgstr "code not yet written for cls = \"lgCMatrix\""
 
 #: Mutils.c:16 Mutils.c:35
 #, c-format
@@ -247,12 +247,12 @@ msgstr "argument type[1]='%s' must be a one-letter character string"
 #: Mutils.c:24
 #, c-format
 msgid "argument type[1]='%s' must be one of 'M','1','O','I','F' or 'E'"
-msgstr "argument type[1]='%s' must be one of 'M','1','O','I','F' or ‘E’"
+msgstr "argument type[1]='%s' must be one of ‘M’,'1','O','I','F' or ‘E’"
 
 #: Mutils.c:41
 #, c-format
 msgid "argument type[1]='%s' must be one of '1','O', or 'I'"
-msgstr "argument type[1]='%s' must be one of '1','O', or ‘I’"
+msgstr "argument type[1]='%s' must be one of ‘1’,'O', or ‘I’"
 
 #: Mutils.c:53 Mutils.c:69
 msgid "object must be a named, numeric vector"
@@ -279,7 +279,7 @@ msgstr "‘%s’ must be in ‘%s’"
 
 #: Mutils.c:274
 msgid "'s1' and 's2' must be \"character\" vectors"
-msgstr "‘s1’ and ‘s2’ must be “character” vectors"
+msgstr "‘s1’ and ‘s2’ must be \"character\" vectors"
 
 #: Mutils.c:296
 msgid "length of x slot != prod(Dim)"
@@ -332,13 +332,13 @@ msgstr "slot Dim must have length 2"
 msgid ""
 "all row indices (slot 'i') must be between 0 and nrow-1 in a TsparseMatrix"
 msgstr ""
-"all row indices (slot 'i') must be between 0 and nrow-1 in a TsparseMatrix"
+"all row indices (slot ‘i’) must be between 0 and nrow-1 in a TsparseMatrix"
 
 #: Tsparse.c:29
 msgid ""
 "all column indices (slot 'j') must be between 0 and ncol-1 in a TsparseMatrix"
 msgstr ""
-"all column indices (slot 'j') must be between 0 and ncol-1 in a TsparseMatrix"
+"all column indices (slot ‘j’) must be between 0 and ncol-1 in a TsparseMatrix"
 
 #: chm_common.c:67
 msgid "Argument rho must be an environment"
@@ -708,7 +708,7 @@ msgstr[1] "Negative values in Dim"
 
 #: dgeMatrix.c:18
 msgid "x slot must be numeric \"double\""
-msgstr "x slot must be numeric “double”"
+msgstr "x slot must be numeric \"double\""
 
 #: dgeMatrix.c:31
 msgid "factors slot must be named list"
@@ -879,11 +879,11 @@ msgstr "dtrMatrices in %*% must have matching (square) dim."
 
 #: dtrMatrix.c:247
 msgid "cannot set diag() as long as 'diag = \"U\"'"
-msgstr "cannot set diag() as long as ‘diag = “U”’"
+msgstr "cannot set diag() as long as ‘diag = \"U\"’"
 
 #: dtrMatrix.c:268
 msgid "cannot add diag() as long as 'diag = \"U\"'"
-msgstr "cannot add diag() as long as ‘diag = “U”’"
+msgstr "cannot add diag() as long as ‘diag = \"U\"’"
 
 #: init.c:342
 msgid "missing 'Matrix' namespace: should never happen"
@@ -924,12 +924,12 @@ msgstr "invalid class of ‘value’ in Csparse_subassign()"
 #: t_Csparse_subassign.c:189
 #, c-format
 msgid "x[] <- val: val must be logical for \"%s\" x"
-msgstr "x[] <- val: val must be logical for “%s” x"
+msgstr "x[] <- val: val must be logical for \"%s\" x"
 
 #: t_Csparse_subassign.c:194
 #, c-format
 msgid "x[] <- val: val must be integer or logical for \"%s\" x"
-msgstr "x[] <- val: val must be integer or logical for “%s” x"
+msgstr "x[] <- val: val must be integer or logical for \"%s\" x"
 
 #: t_Csparse_subassign.c:201
 msgid "programming error in Csparse_subassign() should never happen"
