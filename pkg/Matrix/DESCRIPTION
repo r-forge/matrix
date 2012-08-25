@@ -4,7 +4,7 @@ Date: 2012-08-20
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Author: Douglas Bates <bates@stat.wisc.edu> and Martin Maechler <maechler@stat.math.ethz.ch>
-Maintainer: mmaechler+Matrix@gmail.com
+Maintainer: Martin Maechler <mmaechler+Matrix@gmail.com>
 Contact: Doug and Martin <Matrix-authors@R-project.org>
 Description: Classes and methods for dense and sparse matrices and
     operations on them using Lapack and SuiteSparse.
