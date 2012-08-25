@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Matrix 1.0-6\n"
+"Project-Id-Version: Matrix 1.0-9\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
 "POT-Creation-Date: 2012-08-21 22:31\n"
-"PO-Revision-Date: 2012-08-21 10:38+0100\n"
+"PO-Revision-Date: 2012-08-22 08:17+0100\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language: pl_PL\n"
@@ -16,9 +16,8 @@ msgstr ""
 
 # Recommended/Matrix/R/Matrix.R: 202
 # stop("invalid 'data'")
-#, fuzzy
 msgid "invalid 'mod':"
-msgstr "niepoprawne 'data'"
+msgstr "niepoprawne 'mod':"
 
 # Recommended/Matrix/R/Auxiliaries.R: 39
 # stop(gettextf('not-yet-implemented method for %s(<%s>).\n
@@ -133,7 +132,6 @@ msgstr "to nie jest macierz trójkątną"
 msgid "not yet implemented for matrix w/ typeof"
 msgstr "jeszcze niezaimplementowana dla macierzy z typem"
 
-#, fuzzy
 msgid "not yet implemented for"
 msgstr "jeszcze nie jest zaimplementowana dla"
 
@@ -143,31 +141,33 @@ msgstr "jeszcze nie jest zaimplementowana dla"
 msgid "general Matrix class not yet implemented for"
 msgstr "ogólna klasa 'Matrix' jeszcze nie jest zaimplementowana dla"
 
-#, fuzzy
 msgid "arguments"
-msgstr "argumenty w"
+msgstr "argumenty"
 
 msgid ")$"
-msgstr ""
+msgstr ")$"
 
 msgid "^list\\("
-msgstr ""
+msgstr "^list\\("
 
-#, fuzzy
 msgid "are disregarded in"
-msgstr "zostały odrzucone"
+msgstr "zostały odrzucone w"
 
 msgid ""
 "Quadratic matrix '%s' (=: A) is not formally\n"
 "\tsymmetric.  Will be treated as\tA A'"
 msgstr ""
+"Macierz kwadratowa '%s' (=: A) nie jest formalnie\n"
+"\tsymetryczna.  Będzie traktowana jako\tA A'"
 
 msgid ""
 "'update' must be logical or '+' or '-'; 'C' a matrix, and 'L' a \"CHMfactor\""
 msgstr ""
+"'update' musi być wartością logiczną lub '+' lub '-'; 'C' musi być macierzą, "
+"oraz 'L' musi być obiektem klasy 'CHMfactor'"
 
 msgid "update must be TRUE/FALSE or '+' or '-'"
-msgstr ""
+msgstr "'update' musi wynosić TRUE/FALSE lub '+' lub '-'"
 
 # Recommended/Matrix/R/dsyMatrix.R: 8
 # stop("not a symmetric matrix; consider forceSymmetric() or symmpart()")
@@ -288,9 +288,8 @@ msgstr "plik nie jest plikiem typu 'MatrixMarket'"
 # stop("element type '", elt, "' not recognized")
 # Recommended/Matrix/R/HBMM.R: 101
 # stop("symmetry form '", sym, "' not recognized")
-#, fuzzy
 msgid "type '%s' not recognized"
-msgstr "': nie rozpoznano"
+msgstr "typ '%s' nie został rozpoznany"
 
 # Recommended/Matrix/R/HBMM.R: 93
 # stop("type '", typ, "' not recognized")
@@ -300,9 +299,8 @@ msgstr "': nie rozpoznano"
 # stop("element type '", elt, "' not recognized")
 # Recommended/Matrix/R/HBMM.R: 101
 # stop("symmetry form '", sym, "' not recognized")
-#, fuzzy
 msgid "representation '%s' not recognized"
-msgstr "': nie rozpoznano"
+msgstr "reprezentacja '%s' nie została rozpoznana"
 
 # Recommended/Matrix/R/HBMM.R: 93
 # stop("type '", typ, "' not recognized")
@@ -312,17 +310,15 @@ msgstr "': nie rozpoznano"
 # stop("element type '", elt, "' not recognized")
 # Recommended/Matrix/R/HBMM.R: 101
 # stop("symmetry form '", sym, "' not recognized")
-#, fuzzy
 msgid "element type '%s' not recognized"
-msgstr "': nie rozpoznano"
+msgstr "element typu '%s' nie został rozpoznany"
 
 # Recommended/Matrix/R/HBMM.R: 140
 # stop(gettextf("symmetry form '%s' is not yet implemented", sym))
 # Recommended/Matrix/R/HBMM.R: 167
 # stop(gettextf("symmetry form '%s' is not yet implemented", sym))
-#, fuzzy
 msgid "symmetry form '%s' not recognized"
-msgstr "forma symetryczna '%s' nie jest jeszcze zaimplementowana"
+msgstr "forma symetryczna '%s' nie została rozpoznana"
 
 msgid "readMM(): row\t values 'i' are not in 1:nr"
 msgstr "readMM(): wartości wiersza 'i' nie są w przedziale 1:nr"
@@ -457,12 +453,14 @@ msgstr "'lag' oraz 'differences' muszą być liczbami całkowitymi >= 1"
 
 msgid "programming error: min() should have dispatched w/ 1st arg much earlier"
 msgstr ""
+"błąd programistyczny: 'min()' powinno zostać wysłane z pierwszym argumentem "
+"znacznie wcześniej"
 
 msgid "in Summary(<ANY>, .): %s(<%s>, <%s>%s)"
-msgstr ""
+msgstr "w 'Summary(<ANY>, .)': %s(<%s>, <%s>%s)"
 
 msgid ", ..."
-msgstr ""
+msgstr ", ..."
 
 # Recommended/Matrix/R/Matrix.R: 555
 # stop("invalid or not-yet-implemented 'Matrix' subsetting")
@@ -602,7 +600,7 @@ msgstr ""
 "błąd wewnętrzny w metodzie 'Compare' (Cmp.Mat.atomic); proszę zgłosić raport"
 
 msgid "Cmp.Mat.atomic() should not be called for diagonalMatrix"
-msgstr ""
+msgstr "'Cmp.Mat.atomic()' nie powinien być wywołany dla 'diagonalMatrix'"
 
 # Recommended/Matrix/R/Ops.R: 426
 # stop("Matrices must have same number of rows for arithmetic")
@@ -630,13 +628,12 @@ msgstr "długość drugiego argumentu nie zgadza się z wymiarem pierwszego"
 msgid "length of 1st arg does not match dimension of 2nd"
 msgstr "długość pierwszego argumentu nie zgadza się z wymiarem drugiego"
 
-#, fuzzy
 msgid "internal bug in \"Logic\" method (Logic.Mat.atomic); please report"
 msgstr ""
 "błąd wewnętrzny w metodzie 'Logic' (.Logic.Mat.atomic); proszę zgłosić raport"
 
 msgid "Logic.Mat.atomic() should not be called for diagonalMatrix"
-msgstr ""
+msgstr "'Logic.Mat.atomic()' nie powinien być wywołany dla 'diagonalMatrix'"
 
 # Recommended/Matrix/R/Ops.R: 1153
 # stop(class(e2),"(0) ",.Generic," <Matrix> is undefined")
@@ -1382,30 +1379,9 @@ msgid "'times >= 0' is required"
 msgstr "wymagane jest 'times >= 0'"
 
 msgid "(un)packing only applies to dense matrices, class(x)='%s'"
-msgstr ""
+msgstr "(roz)pakowanie stosuje się jedynie do gęstych macierzy, class(x)='%s'"
 
 # Recommended/Matrix/R/dgTMatrix.R: 44
 # stop("the matrix is not triangular")
-#, fuzzy
 msgid "'x' is not symmetric nor triangular"
-msgstr "macierz nie jest trójkątna"
-
-# Recommended/Matrix/R/HBMM.R: 93
-# stop("type '", typ, "' not recognized")
-#~ msgid "type '"
-#~ msgstr "typ '"
-
-# Recommended/Matrix/R/HBMM.R: 95
-# stop("representation '", repr, "' not recognized")
-#~ msgid "representation '"
-#~ msgstr "reprezentacja '"
-
-# Recommended/Matrix/R/HBMM.R: 98
-# stop("element type '", elt, "' not recognized")
-#~ msgid "element type '"
-#~ msgstr "typ elementu '"
-
-# Recommended/Matrix/R/HBMM.R: 101
-# stop("symmetry form '", sym, "' not recognized")
-#~ msgid "symmetry form '"
-#~ msgstr "forma symetryczna '"
+msgstr "'x' nie jest macierzą symetryczną ani trójkątną"
