@@ -9,7 +9,7 @@ pkgDIR=`dirname $thisdir`
 pkg=`basename $pkgDIR`
 echo '  -->        pkgDIR='$pkgDIR' ; pkg='$pkg
 echo ''; echo '## FIXME ## use new Scheme from R 2.16.x on'
-cd `R-2.15.1 RHOME`/po
+cd `R-patched RHOME`/po
 make pkg-update PKG=$pkg PKGDIR=$pkgDIR
 echo 'end{make pkg-update}' ; echo ''
 echo 'Test with (e.g.)'
