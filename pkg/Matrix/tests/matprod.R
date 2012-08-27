@@ -395,7 +395,7 @@ M3 <- Matrix(c(rep(c(2,0),4),3), 3,3, sparse=TRUE)
 I3 <- as(Diagonal(3), "CsparseMatrix")
 m3 <- as.matrix(M3)
 iM3 <- solve(m3)
-stopifnot(all.equal(iM3, matrix(c(3/2,0,-1,0,1/2,0,-1,0,1), 3)))
+stopifnot(all.equal(unname(iM3), matrix(c(3/2,0,-1,0,1/2,0,-1,0,1), 3)))
 assert.EQ.mat(solve(as(M3, "sparseMatrix")), iM3)
 assert.EQ.mat(solve(I3,I3), diag(3))
 assert.EQ.mat(solve(M3, I3), iM3)# was wrong because I3 is unit-diagonal
