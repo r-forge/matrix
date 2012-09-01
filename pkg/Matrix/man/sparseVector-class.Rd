@@ -187,7 +187,11 @@
       length as \code{x}, indicating if/where \code{x} is
       \code{\link{NA}} (or \code{NaN}), finite or infinite, entirely
       analogously to the corresponding base \R functions.}
-   }
+  }
+}
+\seealso{
+  \code{\link{sparseVector}()} for friendly construction of sparse
+  vectors (apart from \code{as(*, "sparseVector")}).
 }
 %\author{Martin}
 \examples{

@@ -1117,16 +1117,35 @@ setMethod("Arith", signature(e1 = "dtCMatrix", e2 = "dtCMatrix"),
 setMethod("Arith", signature(e1 = "CsparseMatrix", e2 = "numeric"), .Arith.CM.atom)
 setMethod("Arith", signature(e1 = "numeric", e2 = "CsparseMatrix"), .Arith.atom.CM)
 
+.Ops.recycle.ind <- function(spM, len) {
+    n <- prod(d <- dim(spM))
+    if(n < len) stop("vector too long in Matrix - vector operation")
+    if(n %% len != 0) ## identical warning as in main/arithmetic.c
+        warning("longer object length\n\tis not a multiple of shorter object length")
+    ## TODO(speedup!): construction of [1L + in0 %%len] via one .Call()
+    in0 <- .Call(m_encodeInd, .Call(compressed_non_0_ij, spM, TRUE),
+                 d, FALSE)
+    1L + in0 %% len
+}
+
 A.M.n <- function(e1, e2) {
     if((l2 <- length(e2)) == 0)
 	stop("<Matrix> ",.Generic," ", class(e2),"(0) is undefined")
-    f0 <- callGeneric(0, e2)
-    if(mean(is0(f0)) > 7/8) { ## remain sparse ['7/8' is *somewhat* arbitrary]
-	if(l2 > 1)
+    is0f <- is0(f0 <- callGeneric(0, e2))
+    if(all(is0f)) { ## result keeps sparseness structure of e1
+	if(l2 > 1) {  #	 "recycle" e2 "carefully"
+	    e2 <- e2[.Ops.recycle.ind(e1, len = l2)]
+	}
+	e1@x <- callGeneric(e1@x, e2)
+	if(length(e1@factors)) # TODO: be smarter and try *updating* (some) 'factors':
+	    e1@factors <- list()
+	e1
+    } else if(mean(is0f) > 7/8) { ## remain sparse ['7/8' is *somewhat* arbitrary]
+	if(l2 > 1) ## as not all callGeneric(0, e2) is 0, e2 is typically sparse
 	    callGeneric(e1, as(e2, "sparseVector"))
 	else { ## l2 == 1: e2 is "scalar"
 	    e1@x <- callGeneric(e1@x, e2)
-	    if(length(e1@factors)) # TODO: be much smarter and try *updating* (some) 'factors':
+	    if(length(e1@factors)) # TODO: be smarter (see above)
 		e1@factors <- list()
 	    e1
 	}
@@ -1151,13 +1170,21 @@ setMethod("Arith", signature(e1 = "dsparseMatrix", e2 = "logical"), .Arith.CM.at
 A.n.M <- function(e1, e2) {
     if((l1 <- length(e1)) == 0)
 	stop(class(e2),"(0) ",.Generic," <Matrix> is undefined")
-    f0 <- callGeneric(e1, 0)
-    if(mean(is0(f0)) > 7/8) { ## remain sparse ['7/8' is *somewhat* arbitrary]
-	if(l1 > 1)
+    is0f <- is0(f0 <- callGeneric(e1, 0))
+    if(all(is0f)) { ## result keeps sparseness structure of e2
+	if(l1 > 1) {  #	 "recycle" e1 "carefully"
+	    e1 <- e1[.Ops.recycle.ind(e2, len = l1)]
+	}
+	e2@x <- callGeneric(e1, e2@x)
+	if(length(e2@factors))# TODO: be much smarter and try *updating* (some) 'factors':
+	    e2@factors <- list()
+	e2
+    } else if(mean(is0f) > 7/8) { ## remain sparse ['7/8' is *somewhat* arbitrar
+	if(l1 > 1) ## as not all callGeneric(e1, 0) is 0, e1 is typically sparse
 	    callGeneric(as(e1, "sparseVector"), e2)
 	else { ## l1 == 1: e1 is "scalar"
 	    e2@x <- callGeneric(e1, e2@x)
-	    if(length(e2@factors))# TODO: be much smarter and try *updating* (some) 'factors':
+	    if(length(e2@factors))# TODO: be much smarter (see above)
 		e2@factors <- list()
 	    e2
 	}

@@ -148,27 +148,55 @@ Q.eq.symmpart <- function(m, tol = 8 * .Machine$double.eps)
     Q.eq2(m, ss, tol = tol)
 }
 
+##' sample.int(n, size, replace=FALSE) for large n:
+sampleL <- function(n, size) {
+    if(n < .Machine$integer.max)
+	sample(n, size, replace=FALSE)
+    else {
+	i <- unique(round(n * runif(1.8 * size)))
+	while(length(i) < size) {
+	    i <- unique(c(i, round(n * runif(size))))
+	}
+	i[seq_len(size)]
+    }
+}
+
 
 ## Useful Matrix constructors for testing:
 
-rspMat <- function(n, m = n, density = 1/4, nnz = round(density * n*m))
+##' @title Random Sparse Matrix
+##' @param n
+##' @param m number of columns; default (=n)  ==> square matrix
+##' @param density the desired sparseness density:
+##' @param nnz number of non-zero entries; default from \code{density}
+##' @param giveCsparse logical specifying if result should be CsparseMatrix
+##' @return a [TC]sparseMatrix,  n x m
+##' @author Martin Maechler, Mar 2008
+rspMat <- function(n, m = n, density = 1/4, nnz = round(density * n*m),
+                   giveCsparse = TRUE)
 {
-    ## Purpose: random sparse Matrix
-    ## ----------------------------------------------------------------------
-    ## Arguments: (n,m) : dimension [default m=n ==> *square* matrix}
-    ##           density: the desired sparseness density:
-    ## ----------------------------------------------------------------------
-    ## Author: Martin Maechler, Date: 5 Mar 2008, 11:07
     stopifnot(length(n) == 1, n == as.integer(n),
               length(m) == 1, m == as.integer(m),
               0 <= density, density <= 1,
-              0 <= nnz, nnz <= n*m)
-    x <- numeric(n*m)
-    ## entries 2 : (nnz+1) {so we can have '1' as 'special'}
-    x[sample(n*m, nnz, replace=FALSE)] <- as.numeric(1L + seq_len(nnz))
-    Matrix(x, n,m, sparse=TRUE)
+              0 <= nnz,
+	      nnz <= (N <- n*m))
+    in0 <- sampleL(N, nnz)
+    x <- sparseVector(i = in0, x = as.numeric(1L + seq_along(in0)), length = N)
+    dim(x) <- c(n,m)#-> sparseMatrix
+    if (giveCsparse) as(x, "CsparseMatrix") else x
 }
 
+
+## From \examples{..}  in ../man/sparseMatrix.Rd :
+rSparseMatrix <- function(nrow, ncol, nnz,
+			  rand.x = function(n) round(rnorm(nnz), 2), ...)
+{
+    stopifnot((nnz <- as.integer(nnz)) >= 0,
+	      nrow >= 0, ncol >= 0, nnz <= nrow * ncol)
+    sparseMatrix(i = sample(nrow, nnz, replace = TRUE),
+		 j = sample(ncol, nnz, replace = TRUE),
+		 x = rand.x(nnz), dims = c(nrow, ncol), ...)
+}
 
 
 rUnitTri <- function(n, upper = TRUE, ...)
