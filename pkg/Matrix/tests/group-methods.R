@@ -69,9 +69,39 @@ tst <- function(n, i = 1) {
               {C <- (ee / D == ee / diag(n)); all(is.na(C) | C)},
               TRUE)
 }
-tmp <- sapply(1:16, tst)
+tmp <- sapply(1:16, tst) # failed in Matrix 1.0-4
 i <- sapply(1:16, function(i) sample(i,1))
-tmp <- mapply(tst, n= 1:16, i= i)
+tmp <- mapply(tst, n= 1:16, i= i)# failed too
+
+showProc.time()
+set.seed(111)
+local({
+    for(i in 1:20) {
+        M <- rspMat(n=1000, 200, density = 1/20)
+        v <- rnorm(ncol(M))
+        m <- as(M,"matrix")
+        stopifnot(all(t(M)/v == t(m)/v))
+        cat(".")
+    }});cat("\n")
+
+## Now just once, with a large such matrix:
+local({
+    n <- 100000; m <- 30000
+    AA <- rspMat(n, m, density = 1/20000)
+    v <- rnorm(m)
+    st <- system.time({
+        BB <- t(AA)/v # should happen *fast*
+        stopifnot(dim(BB) == c(m,n), is(BB, "sparseMatrix"))
+    })
+    str(BB)
+    print(st)
+    if(Sys.info()[["sysname"]] == "Linux") {
+        mips <- as.numeric(sub(".*: *", '',
+                               grep("bogomips", readLines("/proc/cpuinfo"),
+                                    value=TRUE)[[1]]))
+        stopifnot(st[1] < 1000/mips)# ensure there was no gross inefficiency
+    }
+})
 
 
 ###----- Compare methods ---> logical Matrices ------------
@@ -157,8 +187,10 @@ validObject(dtp <- pack(as(dt3, "denseMatrix")))
 lsp <- xpp > 0
 isValid(lsC <- as(lsp, "sparseMatrix"), "lsCMatrix")
 
-## Systematically look at all "Ops" group generics for "all" Matrix classes
-## -------------- Main issue: Detect infinite recursion problems
+showProc.time()
+
+### Systematically look at all "Ops" group generics for "all" Matrix classes
+### -------------- Main issue: Detect infinite recursion problems
 cl <- sapply(ls(), function(.) class(get(.)))
 Mcl <- c(grep("Matrix$", cl, value=TRUE),
          grep("sparseVector", cl, value=TRUE))

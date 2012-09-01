@@ -96,19 +96,31 @@ sp2vec <- function(x, mode = .type.kind[substr(cl, 1,1)]) {
 ##' @param length integer: the 'length' slot
 
 ##' @return a sparseVector, with 0-dropped 'x' (and 'i')
-newSpV <- function(class, x, i, length) {
+newSpV <- function(class, x, i, length, drop0 = TRUE, checkSort = TRUE) {
     if(length(x) == 1 && (li <- length(i)) != 1) ## recycle x :
 	x <- rep.int(x, li)
-    if(isTRUE(any(x0 <- x == 0))) {
+    if(drop0 && isTRUE(any(x0 <- x == 0))) {
 	keep <- is.na(x) | !x0
 	x <- x[keep]
 	i <- i[keep]
+    }
+    if(checkSort && is.unsorted(i)) {
+	ii <- sort.list(i)
+	x <- x[ii]
+	i <- i[ii]
     }
     new(class, x = x, i = i, length = length)
 }
 ## a "version" of 'prev' with changed contents:
 newSpVec <- function(class, x, prev)
     newSpV(class, x=x, i=prev@i, length=prev@length)
+
+## Exported:
+sparseVector <- function(x, i, length) {
+    newSpV(class = paste0(.V.kind(x), "sparseVector"),
+           x=x, i=i, length=length)
+}
+
 
 setAs("sparseVector", "vector", function(from) sp2vec(from))
 

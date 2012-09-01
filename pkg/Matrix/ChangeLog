@@ -1,5 +1,12 @@
-2012-07-23  Martin Maechler  <maechler@stat.math.ethz.ch>
+2012-09-01  Martin Maechler  <maechler@stat.math.ethz.ch>
 
+	* R/sparseVector.R (sparseVector): new constructor
+
+	* inst/test-tools-Matrix.R (rspMat): smarter; also useful for large
+	dimensions.
+
+
+2012-07-23  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* tests/group-methods.R: now do much more testing, notably <Ops> of
 	pairs of matrices ... however only when 'doExtras' is true, which
@@ -44,7 +51,7 @@
 
 2012-06-19  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 1.0-8, CRAN-released: 2012-06-20, r
+	* DESCRIPTION (Version): 1.0-8, CRAN-released: 2012-06-20, r2789
 
 	* R/CHMfactor.R (update): *DO* allow non-symmetric parent.
 	* man/CHMfactor-class.Rd: be more clear about the two ways.

@@ -771,7 +771,7 @@ l2d_meth <- function(x) {
 .M.kind <- function(x, clx = class(x)) {
     ## 'clx': class() *or* class definition of x
     if(is.matrix(x) || is.atomic(x)) { ## 'old style' matrix or vector
-	if     (is.numeric(x)) "d"
+	if     (is.numeric(x)) "d" ## also for 'integer' --> see .V.kind()
 	else if(is.logical(x)) "l" ## FIXME ? "n" if no NA ??
 	else if(is.complex(x)) "z"
 	else stop("not yet implemented for matrix w/ typeof ", typeof(x))
