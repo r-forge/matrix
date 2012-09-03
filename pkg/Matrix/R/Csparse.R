@@ -485,7 +485,7 @@ setMethod("diag", "CsparseMatrix",
 
 setMethod("writeMM", "CsparseMatrix",
 	  function(obj, file, ...)
-          .Call(Csparse_MatrixMarket, obj, as.character(file)))
+	  .Call(Csparse_MatrixMarket, obj, path.expand(as.character(file))))
 
 setMethod("Cholesky", signature(A = "CsparseMatrix"),
 	  function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
