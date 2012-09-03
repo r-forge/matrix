@@ -7,4 +7,4 @@ source(system.file("test-tools-1.R",      package = "Matrix"), keep.source = FAL
 source(system.file("test-tools-Matrix.R", package = "Matrix"), keep.source = FALSE)
 
 doExtras <- interactive() || nzchar(Sys.getenv("R_MATRIX_CHECK_EXTRA")) ||
-    identical("true", unname(Sys.getenv("R_MM_PKG_CHECKING")))
+    identical("true", unname(Sys.getenv("R_PKG_CHECKING_doExtras")))

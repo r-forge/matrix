@@ -579,10 +579,11 @@ SEXP Csparse_diagN2U(SEXP x)
 
 	chm_diagN2U(chx, uploT, /* do_realloc */ FALSE);
 
-	UNPROTECT(1);
-	return chm_sparse_to_SEXP(chx, /*dofree*/ 0/* or 1 ?? */,
-				  uploT, Rkind, "U",
-				  GET_SLOT(x, Matrix_DimNamesSym));
+	SEXP ans = chm_sparse_to_SEXP(chx, /*dofree*/ 0/* or 1 ?? */,
+				      uploT, Rkind, "U",
+				      GET_SLOT(x, Matrix_DimNamesSym));
+	UNPROTECT(1);// only now !
+	return ans;
     }
 }
 
