@@ -64,7 +64,9 @@ copyClass <- function(x, newCl, sNames =
     ##   for(n in sNames) slot(r, n, check=check) <- slot(x, n)  :
     if(check) for(n in sNames) slot(r, n) <- slot(x, n)
     else for(n in sNames) # don't check, be fast
-	.Call("R_set_slot", r, n, slot(x,n), PACKAGE = "methods")
+	## .Call("R_set_slot", r, n, slot(x,n), PACKAGE = "methods")
+	## "ugly", but not using .Call(*, "methods")
+	attr(r, n) <- attr(x, n)
     r
 }
 
