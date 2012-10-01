@@ -5,10 +5,10 @@
 # Detlef Steuer <steuer@hsu-hh.de>, 2012.
 msgid ""
 msgstr ""
-"Project-Id-Version: R 2.15.2 / matrix 1.0-9\n"
+"Project-Id-Version: R 2.15.2 / matrix 1.0-10\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
 "POT-Creation-Date: 2012-09-10 23:41\n"
-"PO-Revision-Date: 2012-09-10 16:12+0200\n"
+"PO-Revision-Date: 2012-10-01 15:38+0200\n"
 "Last-Translator: Chris Leick <c.leick@vollbio.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
 "Language: de\n"
@@ -346,7 +346,7 @@ msgid "Logic.Mat.atomic() should not be called for diagonalMatrix"
 msgstr "Logic.mat.atomic() sollte für diagonalMatrix nicht aufgerufen werden"
 
 msgid "vector too long in Matrix - vector operation"
-msgstr ""
+msgstr "Vektor zu lang in der Matrix - Vektor Operation"
 
 msgid ""
 "longer object length\n"
@@ -725,13 +725,13 @@ msgid "'nrow' must be >= 0"
 msgstr "'nrow' muss >= 0 sein"
 
 msgid "Must specify 'nrow' when 'symmetric' is true"
-msgstr ""
+msgstr "'nrow' muss angegeben werden, wenn 'symmetric' auf true gesetzt ist"
 
 msgid "'nrow' and 'ncol' must be the same when 'symmetric' is true"
-msgstr ""
+msgstr "'nrow' und 'ncol' müssen gleich sein, wenn 'symmetric' auf true gesetzt ist"
 
 msgid "'x' must have length nrow^2 when 'symmetric' is true"
-msgstr ""
+msgstr "'x' muss die Länge nrow^2, wenn 'symmetric' auf true gesetzt ist"
 
 msgid "'ncol' is not a factor of length(x)"
 msgstr "'ncol' ist kein Faktor der length(x)"
@@ -739,9 +739,8 @@ msgstr "'ncol' ist kein Faktor der length(x)"
 msgid "'nrow' is not a factor of length(x)"
 msgstr "'nrow' ist kein Faktor der length(x)"
 
-#, fuzzy
 msgid "Class '%s' is not yet implemented"
-msgstr "Symmetrieform '%s' noch nicht implementiert"
+msgstr "Klasse '%s' noch nicht implementiert"
 
 msgid "too large index i > n ="
 msgstr "zu großer Index i > n ="
