@@ -54,9 +54,7 @@ setAs("dgCMatrix", "dgeMatrix",
 setAs("CsparseMatrix", "matrix",
       function(from) {
           ## |-> cholmod_C -> cholmod_dense -> chm_dense_to_matrix
-          if (is(from, "triangularMatrix") && from@diag == "U")
-              from <- .Call(Csparse_diagU2N, from)
-          .Call(Csparse_to_matrix, from)
+	  .Call(Csparse_to_matrix, .Call(Csparse_diagU2N, from))
       })
 
 setAs("CsparseMatrix", "symmetricMatrix",
