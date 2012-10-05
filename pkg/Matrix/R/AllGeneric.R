@@ -71,4 +71,4 @@ setGeneric("updown", function(update, C, L) standardGeneric("updown"))
 if(as.numeric(R.version$`svn rev`) < 60620)
 setGeneric("toeplitz", function(x, ...) standardGeneric("toeplitz"),
            useAsDefault= function(x, ...) stats::toeplitz(x))
-
+## and an entry in ../man/sparseVector-class.Rd
