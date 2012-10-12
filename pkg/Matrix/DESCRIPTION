@@ -15,6 +15,7 @@ Enhances: MatrixModels, graph, SparseM, sfsmisc
 Encoding: UTF-8
 LazyData: no
 LazyDataNote: no longer available, since we use data/*.R *and* our classes
+ByteCompile: yes
 BuildResaveData: no
 License: GPL (>= 2)
 LicenseDetails: The Matrix package includes libraries AMD, CHOLMOD,
