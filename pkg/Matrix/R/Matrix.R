@@ -208,8 +208,11 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
 	} else { ## normal case
 	    ## Now 'forbidden' though particularly efficient:
 	    ## using .Internal() to avoid more copying
-	    data <- .Internal(matrix(data, nrow, ncol, byrow, dimnames,
-					missing(nrow), missing(ncol)))
+	    ## data <- .Internal(matrix(data, nrow, ncol, byrow, dimnames,
+	    ##     			missing(nrow), missing(ncol)))
+	    data <- .External(Mmatrix,
+                              data, nrow, ncol, byrow, dimnames,
+                              missing(nrow), missing(ncol))
 	    ## This is *NOT* sufficient!
 	    ## data <- matrix(data, nrow, ncol, byrow=byrow, dimnames=dimnames)
 	    ## this would be needed but is "horrible" compared to .Internal()

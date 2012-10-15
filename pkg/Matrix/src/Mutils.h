@@ -30,6 +30,12 @@ extern "C" {
 # include <alloca.h>
 #endif
 
+#ifndef LONG_VECTOR_SUPPORT
+// notably for  R <= 2.15.x :
+# define XLENGTH(x) LENGTH(x)
+  typedef int R_xlen_t;
+#endif
+
 #define Alloca(n, t)   (t *) alloca( (size_t) ( (n) * sizeof(t) ) )
 
 SEXP triangularMatrix_validate(SEXP obj);
@@ -239,6 +245,7 @@ Rboolean any_NA_in_x(SEXP obj)
     return FALSE;
 }
 
+SEXP Mmatrix(SEXP args);
 
 void make_d_matrix_triangular(double *x, SEXP from);
 void make_i_matrix_triangular(   int *x, SEXP from);

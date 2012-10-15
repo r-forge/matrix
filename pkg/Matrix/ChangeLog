@@ -1,3 +1,8 @@
+2012-10-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/Mutils.c (Mmatrix): new, to be used by .External()
+	in order to replace .Internal(matrix(....))
+
 2012-10-05  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/diagMatrix.R (.sparseDiagonal): new 'unitri' argument;
