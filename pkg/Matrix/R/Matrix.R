@@ -206,23 +206,12 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
 			Dimnames = if(is.null(dimnames)) list(NULL,NULL)
 			else dimnames)
 	} else { ## normal case
-	    ## Now 'forbidden' though particularly efficient:
-	    ## using .Internal() to avoid more copying
+	    ## Now 'forbidden' :
 	    ## data <- .Internal(matrix(data, nrow, ncol, byrow, dimnames,
-	    ##     			missing(nrow), missing(ncol)))
+	    ##				missing(nrow), missing(ncol)))
 	    data <- .External(Mmatrix,
-                              data, nrow, ncol, byrow, dimnames,
-                              missing(nrow), missing(ncol))
-	    ## This is *NOT* sufficient!
-	    ## data <- matrix(data, nrow, ncol, byrow=byrow, dimnames=dimnames)
-	    ## this would be needed but is "horrible" compared to .Internal()
-	    ## data <- if(missing(nrow)) {
-	    ##	   if(missing(ncol))
-	    ##	       matrix(data, byrow=byrow, dimnames=dimnames)
-	    ##	   else matrix(data, ncol=ncol, byrow=byrow, dimnames=dimnames)
-	    ## } else if(missing(ncol))
-	    ##	   matrix(data, nrow=nrow, byrow=byrow, dimnames=dimnames)
-	    ## } else matrix(data, nrow, ncol, byrow=byrow, dimnames=dimnames)
+			      data, nrow, ncol, byrow, dimnames,
+			      missing(nrow), missing(ncol))
 	    if(is.null(sparse))
 		sparse <- sparseDefault(data)
 	}
