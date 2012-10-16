@@ -942,9 +942,9 @@ void copyListMatrix(SEXP s, SEXP t, Rboolean byrow)
 // Almost "Cut n Paste" from ...R../src/main/array.c  do_matrix() :
 // used in ../R/Matrix.R as
 //
-// data <- .External(Mmatrix,
-//                  data, nrow, ncol, byrow, dimnames,
-//                  missing(nrow), missing(ncol))
+// .External(Mmatrix,
+//	     data, nrow, ncol, byrow, dimnames,
+//	     missing(nrow), missing(ncol))
 SEXP Mmatrix(SEXP args)
 {
     SEXP vals, ans, snr, snc, dimnames;
