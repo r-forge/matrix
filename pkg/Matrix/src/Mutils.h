@@ -42,6 +42,11 @@ SEXP triangularMatrix_validate(SEXP obj);
 SEXP symmetricMatrix_validate(SEXP obj);
 SEXP dense_nonpacked_validate(SEXP obj);
 
+// La_norm_type() & La_rcond_type()  have been in R_ext/Lapack.h
+//  but have still not been available to package writers ...
+char La_norm_type (const char *typstr);
+char La_rcond_type(const char *typstr);
+
 /* enum constants from cblas.h and some short forms */
 enum CBLAS_ORDER {CblasRowMajor=101, CblasColMajor=102};
 enum CBLAS_TRANSPOSE {CblasNoTrans=111, CblasTrans=112, CblasConjTrans=113};

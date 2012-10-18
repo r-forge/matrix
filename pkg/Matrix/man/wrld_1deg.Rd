@@ -46,7 +46,7 @@ data(wrld_1deg)
 IM <- .symDiagonal(n)
 doExtras <- interactive() || nzchar(Sys.getenv("R_MATRIX_CHECK_EXTRA")) ||
     identical("true", unname(Sys.getenv("R_PKG_CHECKING_doExtras")))
-nn <- if(doExtras) 20 else 4
+nn <- if(doExtras) 20 else 3
 set.seed(1)
 rho <- runif(nn, 0, 1)
 system.time(MJ <- sapply(rho,

@@ -3,10 +3,8 @@
 #include "Mutils.h"
 #include <R_ext/Lapack.h>
 
-#if 0 /* defined(R_VERSION) && R_VERSION >= R_Version(2, 7, 0) *
-       * La_norm_type() & La_rcond_type() are now in R_ext/Lapack.h
-       * but because of the 'module-mess' that's not sufficient */
-#else
+// La_norm_type() & La_rcond_type()  have been in R_ext/Lapack.h
+//  but have still not been available to package writers ...
 char La_norm_type(const char *typstr)
 {
     char typup;
@@ -42,7 +40,6 @@ char La_rcond_type(const char *typstr)
 	      typstr);
     return typup;
 }
-#endif
 
 double get_double_by_name(SEXP obj, char *nm)
 {
