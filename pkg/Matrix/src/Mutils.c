@@ -898,8 +898,9 @@ SEXP m_encodeInd2(SEXP i, SEXP j, SEXP di, SEXP chk_bnds)
 }
 #undef do_ii_FILL
 
-#if R_VERSION < R_Version(2, 15, 2)
-// it is *hidden* in earlier versions o fR
+#if R_SVN_REVISION < 60943
+// #if R_VERSION < R_Version(2, 15, 2)
+// it is *hidden* in earlier versions of R
 void copyListMatrix(SEXP s, SEXP t, Rboolean byrow)
 {
     SEXP pt, tmp;
