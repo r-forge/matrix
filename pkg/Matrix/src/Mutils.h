@@ -33,7 +33,9 @@ extern "C" {
 #ifndef LONG_VECTOR_SUPPORT
 // notably for  R <= 2.15.x :
 # define XLENGTH(x) LENGTH(x)
+# if R_VERSION < R_Version(2,16,0)
   typedef int R_xlen_t;
+# endif
 #endif
 
 #define Alloca(n, t)   (t *) alloca( (size_t) ( (n) * sizeof(t) ) )

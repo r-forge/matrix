@@ -67,8 +67,7 @@ system.time(MJ2 <- n * log(rho) +
 system.time(MJ3 <- n * log(rho) + Matrix:::ldetL2up(C1, nWC, 1/rho))
 system.time(MJ4 <- n * log(rho) + Matrix:::ldetL2up(C2, nWC, 1/rho))
 stopifnot(all.equal(MJ, MJ2),
-          all.equal(MJ, MJ3)
+          all.equal(MJ, MJ3),
           all.equal(MJ, MJ4))
 }
 \keyword{datasets}
-
