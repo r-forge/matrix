@@ -134,6 +134,14 @@ cholMat <- function(x, pivot = FALSE, ...) {
     else stop("'x' is not positive definite -- chol() undefined.")
 }
 
+
+invPerm.R <- function(p) { p[p] <- seq_along(p) ; p }
+## how much faster would this be in C? -- less than a factor of two?
+invPerm <- function(p, zero.p = FALSE, zero.res = FALSE)
+    .Call(inv_permutation, p, zero.p, zero.res)
+
+
+
 ##  sign( <permutation> ) == determinant( <pMatrix>)
 
 signPerm <- function(p)
