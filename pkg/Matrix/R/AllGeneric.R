@@ -68,7 +68,13 @@ setGeneric("nnzero", function(x, na.counted = NA) standardGeneric("nnzero"),
 
 setGeneric("updown", function(update, C, L) standardGeneric("updown"))
 
-if(as.numeric(R.version$`svn rev`) < 60620)
+##> must do this in any case, as long as this should *run* in R < 2.15.2
+##> if(as.numeric(R.version$`svn rev`) < 60620)
 setGeneric("toeplitz", function(x, ...) standardGeneric("toeplitz"),
            useAsDefault= function(x, ...) stats::toeplitz(x))
 ## and an entry in ../man/sparseVector-class.Rd
+
+if(FALSE)## on  attaching Matrix, gives "conflict" warning  about  base qr.Q :
+    ## Need ? this, as 'Dvec' should not get its default from base::qr.Q :
+setGeneric("qr.Q", function(qr, complete=FALSE, Dvec=1) standardGeneric("qr.Q"),
+           useAsDefault= base::qr.Q)

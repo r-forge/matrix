@@ -1,21 +1,35 @@
 #### Methods for the sparse QR decomposition
 
+qrR <- function(qr, complete = FALSE, backPermute = TRUE) {
+    ir <- seq_len(qr@Dim[if(complete) 1L else 2L])
+    r <- if(backPermute <- backPermute && length(qr@q))
+	qr@R[ir, order(qr@q), drop = FALSE] else
+	qr@R[ir,	    , drop = FALSE]
+    if(complete || backPermute) r else as(r, "triangularMatrix")
+}
 setMethod("qr.R", signature(qr = "sparseQR"),
 	  function(qr, complete = FALSE) {
-	      r <- qr@R
 	      ## FIXME: add option (e.g. argument 'backPermute = FALSE')
 	      ##	to deal with this:
 	      if((is.null(v <- getOption("Matrix.quiet.qr.R")) || !v) &&
 		 (is.null(v <- getOption("Matrix.quiet")) || !v))
-		  warning("qr.R(<sparse>) may differ from qr.R(<dense>) because of permutations")
-	      if(!complete && {d <- dim(r); d[1] != d[2]})
-		  as(r[seq.int(min(d)), , drop = FALSE], "triangularMatrix")
-	      else
-		  r
-	  })
+		  warning("qr.R(<sparse>) may differ from qr.R(<dense>) because of permutations.  Possibly use our qrR() instead")
+	      qrR(qr, complete=complete, backPermute=FALSE)
+	      })
+
+
+setMethod("qr.Q", "sparseQR",
+	  function(qr, complete=FALSE, Dvec = rep.int(1, if(complete) d[1] else min(d)))
+      {
+	  d <- qr@Dim
+	  ir <- seq_len(d[k <- if(complete) 1L else 2L])
+	  D <- .sparseDiagonal(d[1], x=Dvec, cols=0L:(d[k] -1L))
+	  qr.qy(qr, D)
+      })
+
 
 ## The signature should change to y = "ddenseMatrix" later
-setMethod("qr.qy", signature(qr = "sparseQR", y = "dgeMatrix"),
+setMethod("qr.qy", signature(qr = "sparseQR", y = "ddenseMatrix"),
           function(qr, y) .Call(sparseQR_qty, qr, y, FALSE),
           valueClass = "dgeMatrix")
 
@@ -33,7 +47,7 @@ setMethod("qr.qy", signature(qr = "sparseQR", y = "Matrix"),
 	  valueClass = "dgeMatrix")
 
 ## The signature should change to y = "ddenseMatrix" later
-setMethod("qr.qty", signature(qr = "sparseQR", y = "dgeMatrix"),
+setMethod("qr.qty", signature(qr = "sparseQR", y = "ddenseMatrix"),
           function(qr, y) .Call(sparseQR_qty, qr, y, TRUE),
           valueClass = "dgeMatrix")
 
@@ -53,7 +67,7 @@ setMethod("qr.qty", signature(qr = "sparseQR", y = "Matrix"),
 .coef.trunc <- function(qr, res) res[1:ncol(qr@R),,drop=FALSE]
 
 ## The signature should change to y = "ddenseMatrix" later
-setMethod("qr.coef", signature(qr = "sparseQR", y = "dgeMatrix"),
+setMethod("qr.coef", signature(qr = "sparseQR", y = "ddenseMatrix"),
           function(qr, y)
           .coef.trunc(qr, .Call(sparseQR_coef, qr, y)),
           valueClass = "dgeMatrix")
@@ -69,7 +83,7 @@ setMethod("qr.coef", signature(qr = "sparseQR", y = "numeric"),
           valueClass = "dgeMatrix")
 
 ## The signature should change to y = "ddenseMatrix" later
-setMethod("qr.resid", signature(qr = "sparseQR", y = "dgeMatrix"),
+setMethod("qr.resid", signature(qr = "sparseQR", y = "ddenseMatrix"),
           function(qr, y)
           .Call(sparseQR_resid_fitted, qr, y, TRUE),
           valueClass = "dgeMatrix")
@@ -85,7 +99,7 @@ setMethod("qr.resid", signature(qr = "sparseQR", y = "numeric"),
           valueClass = "dgeMatrix")
 
 ## The signature should change to y = "ddenseMatrix" later
-setMethod("qr.fitted", signature(qr = "sparseQR", y = "dgeMatrix"),
+setMethod("qr.fitted", signature(qr = "sparseQR", y = "ddenseMatrix"),
           function(qr, y, k)
           .Call(sparseQR_resid_fitted, qr, y, FALSE),
           valueClass = "dgeMatrix")

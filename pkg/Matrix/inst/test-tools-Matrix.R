@@ -148,10 +148,10 @@ Q.eq.symmpart <- function(m, tol = 8 * .Machine$double.eps)
     Q.eq2(m, ss, tol = tol)
 }
 
-##' sample.int(n, size, replace=FALSE) for large n:
+##' sample.int(n, size, replace=FALSE) for really large n:
 sampleL <- function(n, size) {
     if(n < .Machine$integer.max)
-	sample(n, size, replace=FALSE)
+	sample.int(n, size)
     else {
 	i <- unique(round(n * runif(1.8 * size)))
 	while(length(i) < size) {
