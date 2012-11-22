@@ -3,7 +3,7 @@
 library(Matrix)
 
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
-
+doExtras
 
 ### "sparseQR" : Check consistency of methods
 ##   --------
@@ -11,18 +11,95 @@ data(KNex); mm <- KNex$mm; y <- KNex$y
 stopifnot(is((Y <- Matrix(y)), "dgeMatrix"))
 md <- as(mm, "matrix")                  # dense
 
-system.time(mmq <- qr(mm))
-system.time(mdq <- qr(md))# much (~ 150 x) slower
+(cS <- system.time(Sq <- qr(mm)))
+(cD <- system.time(Dq <- qr(md))) # 1.1 sec. (lynne, 2011)
+cD[1] / cS[1] # dense is  much ( ~ 100--170 times) slower
 
-## qr.qy and qr.qty should be inverses
-stopifnot(all.equal(qr.qy (mmq, qr.qty(mmq, y))@x, y),
-          all.equal(qr.qty(mmq, qr.qy (mmq, y))@x, y),
-          all.equal(qr.qty(mmq, y), qr.qty(mmq, Y)) )
+chkQR <- function(a, y = a[, sample(ncol(a), 1)],
+                  a.qr = qr(a), tol=1e-13,
+                  ##----------
+                  QinvChk=TRUE, verbose=getOption("verbose"))
+{
+    d <- dim(a)
+    stopifnot((n <- d[1]) >= (p <- d[2]), is.numeric(y))
+
+    if(QinvChk) ## qr.qy and qr.qty should be inverses,	 Q'Q y = y = QQ' y :
+        ## FIXME: Fails for structurally rank deficient sparse a's, but never for classical
+	stopifnot(all.equal(drop(qr.qy (a.qr, qr.qty(a.qr, y))), y),
+		  all.equal(drop(qr.qty(a.qr, qr.qy (a.qr, y))), y))
+
+    kind <- if(is.qr(a.qr)) "qr" else
+    if(is(a.qr, "sparseQR")) "spQR" else stop("unknown qr() class: ", class(a.qr))
+    piv <- switch(kind,
+                  "qr" = a.qr$pivot,
+                  "spQR" = 1L + a.qr@q)# 'q', not 'p' !!
+    invP <- sort.list(piv)
+
+    .ckQR <- function(cmpl) { ## local function, using parent's variables
+        if(verbose) cat("complete = ",cmpl,":\n", sep="")
+        Q <- qr.Q(a.qr, complete=cmpl)
+        R <- qr.R(a.qr, complete=cmpl)
+        rr <- if(cmpl) n else p
+        stopifnot(dim(Q) == c(n,rr),
+                  dim(R) == c(rr,p))
+        assert.EQ.Mat(a, Q %*% R[, invP], tol = tol)
+        ##            =  ===============
+    }
+    .ckQR(FALSE)
+    .ckQR(TRUE)
+    invisible(a.qr)
+}
+
+##' Check QR-consistency of dense and sparse
+chk.qr.D.S <- function(d., s., y, Y = Matrix(y), force = FALSE) {
+    stopifnot(is.qr(d.), is(s., "sparseQR"))
+    cc <- qr.coef(d.,y)
+    rank.def <- any(is.na(cc)) && d.$rank < length(d.$pivot)
+    if(rank.def && force) cc <- mkNA.0(cc) ## set NA's to 0 .. ok, in some case
+    ## when system is rank deficient, have differing cases, not always just NA <-> 0 coef
+    if(force || !rank.def) stopifnot(
+	is.all.equal3(	    cc	     , drop(qr.coef  (s.,y)), drop(qr.coef  (s.,Y))) ,
+	is.all.equal3(qr.resid (d.,y), drop(qr.resid (s.,y)), drop(qr.resid (s.,Y))) ,
+	is.all.equal3(qr.fitted(d.,y), drop(qr.fitted(s.,y)), drop(qr.fitted(s.,Y)))
+	)
+}
+
+
+if(doExtras) system.time({ ## ~ 20 sec {"large" example}
+    chkQR(mm, y=y, a.qr = Sq)
+    chkQR(md, y=y, a.qr = Dq)
+})
 
 ## consistency of results dense and sparse
-stopifnot(is.all.equal3(qr.coef  (mdq, y), qr.coef  (mmq,y)@x, qr.coef  (mmq,Y)@x) ,
-          is.all.equal3(qr.resid (mdq, y), qr.resid (mmq,y)@x, qr.resid (mmq,Y)@x) ,
-          is.all.equal3(qr.fitted(mdq, y), qr.fitted(mmq,y)@x, qr.fitted(mmq,Y)@x) )
+chk.qr.D.S(Dq, Sq, y, Y)
+
+## rank deficient QR cases: ---------------
+
+## From Simon (15 Jul 2009):
+set.seed(10)
+a <- matrix(round(10 * runif(90)), 10,9); a[a < 7.5] <- 0
+(A <- Matrix(a))# first column = all zeros
+qD <- chkQR(a) ## using base qr
+qS <- chkQR(A) ## using Matrix "sparse qr"
+validObject(qS)# with the validity now (2012-11-18) -- ok, also for "bad" case
+chk.qr.D.S(qD, qS, y = 10 + 1:nrow(A), force=TRUE)
+
+
+xtrChk <- TRUE  ## should work -- fails for *some* structurally rank deficient cases
+xtrChk <- FALSE ## for now [FIXME]
+oo <- options(Matrix.quiet.qr.R = TRUE, Matrix.verbose = TRUE)
+for(N in 1:(if(doExtras) 1008 else 24)) {
+    A <- rSparseMatrix(8,5, nnz = rpois(1, lambda=16))
+    cat(sprintf("%4d - classical: ", N))
+    qa <- chkQR(as.matrix(A))# works always
+    cat("[Ok] ---  sparse: ")
+    qA <- chkQR(A, QinvChk= xtrChk)# now (2012-11-20): apart from QinvChk, too!
+    validObject(qA)
+    cat("[Ok]\n")
+    chk.qr.D.S(qa, qA, y = 10 + 1:nrow(A))# ok [not done in rank deficient case!]
+}
+options(oo)
+
 
 
 ### "denseLU"
