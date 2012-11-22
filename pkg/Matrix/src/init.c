@@ -248,6 +248,7 @@ static R_CallMethodDef CallEntries[] = {
 
     CALLDEF(CHM_set_common_env, 1),
 
+    CALLDEF(inv_permutation, 3),
     CALLDEF(m_encodeInd, 3),
     CALLDEF(m_encodeInd2, 4),
 
