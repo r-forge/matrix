@@ -24,8 +24,11 @@
 \alias{qr.resid,sparseQR,numeric-method}
 \alias{solve,sparseQR,ANY-method}
 %
-\description{Objects of this class represent a QR decomposition of a
-  sparse rectangular matrix.}
+\description{Objects class \code{"sparseQR"} represent a QR decomposition of a
+  sparse \eqn{n \times p}{n x p} rectangular matrix \eqn{X},
+  typically resulting from \code{\link{qr}()}
+}
+
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("sparseQR", ...)}
   but are more commonly created by function \code{\link[base]{qr}} applied
