@@ -33,6 +33,17 @@ as0 <- function(x, mod=mode(x))
 ##  not %in%  :
 `%nin%` <- function (x, table) is.na(match(x, table))
 
+##' @title Check identical(i, 0:n) {or identical(i, 1:n) when Ostart is false}
+##' @param i an integer vector, to be compared with 0:n or 1:n
+##' @param n an integer number
+##' @param Ostart logical indicating if comparison with 0:n or 1:n should be made
+##' @return TRUE or FALSE
+##' @author Martin Maechler
+isSeq <- function(i, n, Ostart = TRUE) {
+    ## FIXME: Port to C, use simple .Call() which is must faster notably in FALSE cases
+    ##        and then *export* (and hence document)
+    identical(i, if(Ostart) 0L:n else seq_len(n))
+}
 
 .has.DN <- ## has non-trivial Dimnames slot?
     function(x) !identical(list(NULL,NULL), x@Dimnames)
@@ -312,8 +323,7 @@ is.na_nsp <- function(x) {
     r
 }
 
-allTrueMat <- function(x, sym = (d[1] == d[2] &&
-				 identical(dn[[1]], dn[[2]])),
+allTrueMat <- function(x, sym = (d[1] == d[2] && identical(dn[[1]], dn[[2]])),
 		       packed=TRUE)
 {
     d <- x@Dim
@@ -382,6 +392,7 @@ indDiag <- function(n) cumsum(c(1L, rep.int(n+1L, n-1)))
 ### TODO:  write in C and port to base (or 'utils') R
 ### -----
 ### "Theory" behind this: /u/maechler/R/MM/MISC/lower-tri-w.o-matrix.R
+## NB: also have "abIndex" version:  abIindTri() --> ./abIndex.R
 indTri <- function(n, upper = TRUE, diag = FALSE) {
     ## Indices of (strict) upper/lower triangular part
     ## == which(upper.tri(diag(n), diag=diag) or
@@ -1072,8 +1083,8 @@ isTriC <- function(object, upper = NA) {
     TRUE.L <- structure(TRUE, kind = "L")
     ## Need this, since 'i' slot of symmetric looks like triangular :
     if(is(object, "symmetricMatrix")) # triangular only iff diagonal :
-        return(if(length(oi <- object@i) == n && identical(oi, 0:(n-1L))
-                  && identical(object@p, 0:n))
+        return(if(length(oi <- object@i) == n && isSeq(oi, n-1L)
+                  && isSeq(object@p, n))
                structure(TRUE, kind = object@uplo) else FALSE)
     ## else
     ni <- 1:n
