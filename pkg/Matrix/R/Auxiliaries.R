@@ -50,11 +50,11 @@ isSeq <- function(i, n, Ostart = TRUE) {
 
 .bail.out.1 <- function(fun, cl) {
     stop(gettextf('not-yet-implemented method for %s(<%s>).\n ->>  Ask the package authors to implement the missing feature.', fun, cl),
-	 call. = FALSE)
+	 call. = FALSE, domain=NA)
 }
 .bail.out.2 <- function(fun, cl1, cl2) {
     stop(gettextf('not-yet-implemented method for %s(<%s>, <%s>).\n ->>  Ask the package authors to implement the missing feature.',
-		  fun, cl1, cl2), call. = FALSE)
+		  fun, cl1, cl2), call. = FALSE, domain=NA)
 }
 
 Matrix.msg <- function(..., .M.level = 1) {
@@ -225,7 +225,7 @@ dimCheck <- function(a, b) {
     if(any(da != db))
 	stop(gettextf("Matrices must have same dimensions in %s",
 		      deparse(sys.call(sys.parent()))),
-	     call. = FALSE)
+	     call. = FALSE, domain=NA)
     da
 }
 
@@ -252,7 +252,7 @@ mmultCheck <- function(a, b, kind = 1L) {
     if(ca != rb)
 	stop(gettextf("non-conformable matrix dimensions in %s",
 		      deparse(sys.call(sys.parent()))),
-	     call. = FALSE)
+	     call. = FALSE, domain=NA)
     ca
 }
 
@@ -273,7 +273,7 @@ dimNamesCheck <- function(a, b) {
 		else if(!identical(r[[j]], dn))
 		    warning(gettextf("dimnames [%d] mismatch in %s", j,
 				     deparse(sys.call(sys.parent()))),
-			    call. = FALSE)
+			    call. = FALSE, domain=NA)
 	    }
 	    r
 	}
@@ -288,7 +288,7 @@ rowCheck <- function(a, b) {
     if(da[1] != db[1])
 	stop(gettextf("Matrices must have same number of rows in %s",
 		      deparse(sys.call(sys.parent()))),
-	     call. = FALSE)
+	     call. = FALSE, domain=NA)
     ## return the common nrow()
     da[1]
 }
@@ -299,7 +299,7 @@ colCheck <- function(a, b) {
     if(da[2] != db[2])
 	stop(gettextf("Matrices must have same number of columns in %s",
 		      deparse(sys.call(sys.parent()))),
-	     call. = FALSE)
+	     call. = FALSE, domain=NA)
     ## return the common ncol()
     da[2]
 }
@@ -1342,6 +1342,8 @@ setparts <- function(x,y, uniqueCheck = TRUE, check = TRUE) {
 }
 
 ##' @title Warn about extraneous arguments in the "..."  (of its caller)
+## TODO NOTE:   R/src/library/base/R/seq.R  uses a simpler approach,
+##    *and* ngettext(.)  {->  singular/plural *and* translatable}
 ##' @return
 ##' @author Martin Maechler, June 2012
 chk.s <- function(...) {
@@ -1351,7 +1353,6 @@ chk.s <- function(...) {
 		"  are disregarded in\n ", deparse(sys.call(-1), control=c()),
 		call. = FALSE)
 }
-
 
 ##' *Only* to be used as function in
 ##'    setMethod("Compare", ...., .Cmp.swap)  -->  ./Ops.R  & ./diagMatrix.R

@@ -24,13 +24,13 @@ bandSparse <- function(n, m = n, k, diagonals,
         if(diag.isMat) {
             if(ncol(diagonals) != len.k)
 		stop(gettextf("'diagonals' matrix must have %d columns (= length(k) )",
-			      len.k))
+			      len.k), domain=NA)
             getD <- function(j) diagonals[,j]
 
         } else { ## is.list(diagonals):
             if(length(diagonals) != len.k)
 		stop(gettextf("'diagonals' must have the same length (%d) as 'k'",
-			      len.k))
+			      len.k), domain=NA)
             getD <- function(j) diagonals[[j]]
         }
     }

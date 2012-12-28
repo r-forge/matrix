@@ -136,7 +136,7 @@ intI <- function(i, n, dn, give.dn = TRUE)
     else if (is(i, "logical")) {
 	if(length(i) > n)
 	    stop(gettextf("logical subscript too long (%d, should be %d)",
-			  length(i), n))
+			  length(i), n), domain=NA)
 	i0 <- (0:(n - 1L))[i]
 	if(DN) dn <- dn[i]
     } else { ## character
@@ -342,7 +342,7 @@ replTmat <- function (x, i, j, ..., value)
 	if(!has.x && # <==> "n.TMatrix"
 	   ((iNA <- any(is.na(value))) || !value.is.logical))
 	    warning(gettextf("x[.] <- val: x is \"%s\", val not in {TRUE, FALSE} is coerced%s.",
-			     clx, if(iNA) " NA |--> TRUE" else ""))
+			     clx, if(iNA) " NA |--> TRUE" else ""), domain=NA)
 
 	## now have 0-based indices   x.i (entries) and	 i (new entries)
 
@@ -498,7 +498,7 @@ replTmat <- function (x, i, j, ..., value)
     if(!has.x && # <==> "n.TMatrix"
        ((iNA <- any(is.na(value))) || !value.is.logical))
 	warning(gettextf("x[.,.] <- val: x is \"%s\", val not in {TRUE, FALSE} is coerced%s.",
-			 clx, if(iNA) " NA |--> TRUE" else ""))
+			 clx, if(iNA) " NA |--> TRUE" else ""), domain=NA)
 
     ## another simple, typical case:
     if(lenRepl == 1) {
@@ -524,7 +524,8 @@ replTmat <- function (x, i, j, ..., value)
 ## if(identical(Sys.getenv("USER"),"maechler")
 ##    if(lenRepl > 2) { # __________ ___ JUST for testing! _______________
 	if(is.null(v <- getOption("Matrix.quiet")) || !v)
-	    message(gettextf("x[.,.] <- val : x being coerced from Tsparse* to CsparseMatrix"))
+	    message(gettextf("x[.,.] <- val : x being coerced from Tsparse* to CsparseMatrix"),
+		    domain = NA)
 	return(replCmat4(as(x,"CsparseMatrix"), i1, i2, iMi=iMi, jMi=jMi,
 			 value = if(spV) value else as(value, "sparseVector"),
 			 spV = TRUE))
@@ -619,7 +620,7 @@ replTmat <- function (x, i, j, ..., value)
 {
     nA <- nargs()
     if(nA != 3)
-	stop(gettextf("nargs() = %d should never happen; please report.", nA))
+	stop(gettextf("nargs() = %d should never happen; please report.", nA), domain=NA)
 
     ## else: nA == 3  i.e.,  M [ cbind(ii,jj) ] <- value or M [ Lmat ] <- value
     if(is.logical(i)) {

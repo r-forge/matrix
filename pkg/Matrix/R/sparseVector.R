@@ -269,7 +269,7 @@ spV2M <- function (x, nrow, ncol, byrow = FALSE, check = TRUE, symmetric = FALSE
     chngCl <- is.null(slotNames(newCl <- getClass(cNam, .Force=TRUE)))
     if(chngCl) { ## e.g. "igTMatrix" is not yet implemented
 	if(substr(cNam,1,1) == "z")
-	    stop(gettextf("Class '%s' is not yet implemented", cNam))
+	    stop(gettextf("Class '%s' is not yet implemented", cNam), domain=NA)
 	## coerce to "double":
 	newCl <- getClass(paste0("d", clStem))
     }
