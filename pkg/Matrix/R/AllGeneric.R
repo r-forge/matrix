@@ -74,7 +74,13 @@ setGeneric("toeplitz", function(x, ...) standardGeneric("toeplitz"),
            useAsDefault= function(x, ...) stats::toeplitz(x))
 ## and an entry in ../man/sparseVector-class.Rd
 
-if(FALSE)## on  attaching Matrix, gives "conflict" warning  about  base qr.Q :
-    ## Need ? this, as 'Dvec' should not get its default from base::qr.Q :
-setGeneric("qr.Q", function(qr, complete=FALSE, Dvec=1) standardGeneric("qr.Q"),
-           useAsDefault= base::qr.Q)
+if(FALSE)
+   ## only "need this", as 'Dvec' should not get its default from base::qr.Q :
+   ## unfortunately, this masks  base::qr.Q  with a warning
+setGeneric("qr.Q", function(qr, complete = FALSE, Dvec)
+	   standardGeneric("qr.Q"),
+	   useAsDefault = function(qr, complete = FALSE, Dvec) {
+	       if(missing(Dvec))
+		   base::qr.Q(qr, complete=complete)
+	       else base::qr.Q(qr, complete=complete, Dvec=Dvec)
+	   })
