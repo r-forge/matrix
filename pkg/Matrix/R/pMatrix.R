@@ -12,7 +12,7 @@ setAs("integer", "pMatrix",
 setAs("numeric", "pMatrix",
       function(from)
 	  if(all(from == (i <- as.integer(from)))) as(i, "pMatrix")
-	  else stop("coercion to 'pMatrix' only works from integer numeric"))
+	  else stop("coercion to \"pMatrix\" only works from integer numeric"))
 
 setAs("pMatrix", "matrix",
       function(from) {
