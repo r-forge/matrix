@@ -1,5 +1,7 @@
 #### Methods for the sparse QR decomposition
 
+## TODO: qr.R() generic that allows optional args ['backPermute']
+## --- so we can add it to our qr.R() method,  *instead* of this :
 qrR <- function(qr, complete = FALSE, backPermute = TRUE) {
     ir <- seq_len(qr@Dim[if(complete) 1L else 2L])
     r <- if(backPermute <- backPermute && (n <- length(qr@q)) && !isSeq(qr@q, n-1L))
@@ -9,23 +11,32 @@ qrR <- function(qr, complete = FALSE, backPermute = TRUE) {
 }
 setMethod("qr.R", signature(qr = "sparseQR"),
 	  function(qr, complete = FALSE) {
-	      ## FIXME: add option (e.g. argument 'backPermute = FALSE')
-	      ##	to deal with this:
 	      if((is.null(v <- getOption("Matrix.quiet.qr.R")) || !v) &&
 		 (is.null(v <- getOption("Matrix.quiet")) || !v))
 		  warning("qr.R(<sparse>) may differ from qr.R(<dense>) because of permutations.  Possibly use our qrR() instead")
 	      qrR(qr, complete=complete, backPermute=FALSE)
 	      })
 
-
+## if(identical("", as.character(formals(qr.Q)$Dvec))) { # "new"
 setMethod("qr.Q", "sparseQR",
-	  function(qr, complete=FALSE, Dvec = rep.int(1, if(complete) d[1] else min(d)))
+	  function(qr, complete=FALSE, Dvec)
       {
 	  d <- qr@Dim
 	  ir <- seq_len(d[k <- if(complete) 1L else 2L])
+	  if(missing(Dvec)) Dvec <- rep.int(1, if(complete) d[1] else min(d))
 	  D <- .sparseDiagonal(d[1], x=Dvec, cols=0L:(d[k] -1L))
 	  qr.qy(qr, D)
       })
+## } else {
+## setMethod("qr.Q", "sparseQR",
+## 	  function(qr, complete=FALSE, Dvec = rep.int(1, if(complete) d[1] else min(d)))
+##       {
+## 	  d <- qr@Dim
+## 	  ir <- seq_len(d[k <- if(complete) 1L else 2L])
+## 	  D <- .sparseDiagonal(d[1], x=Dvec, cols=0L:(d[k] -1L))
+## 	  qr.qy(qr, D)
+##       })
+## }
 
 
 setMethod("qr.qy", signature(qr = "sparseQR", y = "ddenseMatrix"),
