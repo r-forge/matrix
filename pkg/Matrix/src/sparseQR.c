@@ -30,7 +30,7 @@ SEXP sparseQR_validate(SEXP x)
  * @param beta scaling factors for the Householder transformations
  * @param p 0-based permutation vector of length V->m
  * @param trans logical value - if TRUE create Q'y[p] otherwise Qy[p]
- * @param y contents of a V->m by nrhs dense matrix
+ * @param y contents of a V->m by nrhs, i.e. dim(y) == ydims[0:1], dense matrix
  *        Note that V->m = m2 : V may contain "spurious 0 rows" (structural rank deficiency)
  * @param ydims dimensions of y
  */
@@ -67,7 +67,7 @@ void sparseQR_Qmult(cs *V, double *beta, int *p, int trans,
 * @param qr a "sparseQR" object
 * @param y a (dense) Matrix
 * @param trans logical, if TRUE compute   Q'y   else  Q y
-* @return Q'y or Qy
+* @return Q'y ("qty")  or   Qy ("qy")
 */
 SEXP sparseQR_qty(SEXP qr, SEXP y, SEXP trans)
 {
