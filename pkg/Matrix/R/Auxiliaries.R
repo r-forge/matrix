@@ -20,10 +20,10 @@ anyFalse <- function(x) isTRUE(any(!x))		 ## ~= any0
 
 as1 <- function(x, mod=mode(x))
     switch(mod, "integer"= 1L, "double"=, "numeric"= 1, "logical"= TRUE,
-	   "complex"= 1+0i, stop("invalid 'mod': ", mod))
+	   "complex"= 1+0i, stop(gettextf("invalid 'mod': %s", mod), domain = NA))
 as0 <- function(x, mod=mode(x))
     switch(mod, "integer"= 0L, "double"=, "numeric"= 0, "logical"= FALSE,
-	   "complex"= 0+0i, stop("invalid 'mod': ", mod))
+	   "complex"= 0+0i, stop(gettextf("invalid 'mod': %s", mod), domain = NA))
 
 
 .M.DN <- function(x) if(!is.null(dn <- dimnames(x))) dn else list(NULL,NULL)
@@ -357,9 +357,13 @@ emptyColnames <- function(x, msg.if.not.empty = FALSE)
     if(msg.if.not.empty && is.list(dn) && length(dn) >= 2 &&
        is.character(cn <- dn[[2]]) && any(cn != "")) {
 	lc <- length(cn)
-	message(sprintf("   [[ suppressing %d column names %s%s ]]", nc,
-			paste(sQuote(cn[1:min(3, lc)]), collapse = ", "),
-			if(lc > 3) " ..." else ""))
+	message(if(lc > 3)
+		gettextf("   [[ suppressing %d column names %s... ]]", nc,
+			 paste(sQuote(cn[1:3]), collapse = ", "))
+		else
+		gettextf("   [[ suppressing %d column names %s ]]", nc,
+			 paste(sQuote(cn[1:lc]), collapse = ", ")),
+		domain=NA)
     }
     dimnames(x) <- list(dn[[1]], character(nc))
     x
@@ -495,7 +499,7 @@ nnzSparse <- function(x, cl = class(x), cld = getClassDef(cl))
 	length(x@j)
     else if(extends(cld, "pMatrix"))	# is "sparse" too
 	x@Dim[1]
-    else stop("'x' must be sparseMatrix")
+    else stop(gettext("'x' must be \"sparseMatrix\""), domain=NA)
 }
 
 
@@ -615,7 +619,8 @@ uniqTsparse <- function(x, class.x = c(class(x))) {
 	   "nsTMatrix" = as(as(x, "nsCMatrix"), "nsTMatrix"),
 	   "ntTMatrix" = as(as(x, "ntCMatrix"), "ntTMatrix"),
 	   ## otherwise:
-	   stop("not yet implemented for class ", class.x))
+	   stop(gettextf("not yet implemented for class %s", dQuote(class.x)),
+		domain = NA))
 }
 
 ## Note: maybe, using
@@ -795,7 +800,8 @@ l2d_meth <- function(x) {
 	if     (is.numeric(x)) "d" ## also for 'integer' --> see .V.kind()
 	else if(is.logical(x)) "l" ## FIXME ? "n" if no NA ??
 	else if(is.complex(x)) "z"
-	else stop("not yet implemented for matrix w/ typeof ", typeof(x))
+	else stop(gettextf("not yet implemented for matrix with typeof %s",
+			   typeof(x)), domain = NA)
     }
     else .M.kindC(clx)
 }
@@ -808,7 +814,8 @@ l2d_meth <- function(x) {
 	else if(is.numeric(x)) "d"
 	else if(is.logical(x)) "l" ## FIXME ? "n" if no NA ??
 	else if(is.complex(x)) "z"
-	else stop("not yet implemented for matrix w/ typeof ", typeof(x))
+	else stop(gettextf("not yet implemented for matrix with typeof %s",
+			   typeof(x)), domain = NA)
     }
     else .M.kindC(clx)
 }
@@ -824,7 +831,8 @@ l2d_meth <- function(x) {
     else if(extends(clx, "pMatrix")) "n" # permutation -> pattern
     else if(extends(clx, "zMatrix")) "z"
     else if(extends(clx, "iMatrix")) "i"
-    else stop(" not yet implemented for ", clx@className)
+    else stop(gettextf(" not yet implemented for %s", clx@className),
+	      domain = NA)
 }
 
 ## typically used as .type.kind[.M.kind(x)]:
@@ -880,8 +888,8 @@ geClass <- function(x) {
     else if(is(x, "lMatrix")) "lgeMatrix"
     else if(is(x, "nMatrix") || is(x, "pMatrix")) "ngeMatrix"
     else if(is(x, "zMatrix")) "zgeMatrix"
-    else stop("general Matrix class not yet implemented for ",
-	      class(x))
+    else stop(gettextf("general Matrix class not yet implemented for %s",
+		       dQuote(class(x))), domain = NA)
 }
 
 .dense.prefixes <- c("d" = "tr", ## map diagonal to triangular
@@ -1348,10 +1356,9 @@ setparts <- function(x,y, uniqueCheck = TRUE, check = TRUE) {
 ##' @author Martin Maechler, June 2012
 chk.s <- function(...) {
     if(length(list(...)))
-	warning("arguments  ",
-		sub(")$", '', sub("^list\\(", '', deparse(list(...), control=c()))),
-		"  are disregarded in\n ", deparse(sys.call(-1), control=c()),
-		call. = FALSE)
+	warning(gettextf("arguments %s are disregarded in\n %s",
+			 sub(")$", '', sub("^list\\(", '', deparse(list(...), control=c()))),
+			 deparse(sys.call(-1), control=c())), call. = FALSE, domain=NA)
 }
 
 ##' *Only* to be used as function in

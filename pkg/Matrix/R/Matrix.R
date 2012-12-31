@@ -136,7 +136,8 @@ dimnamesGets <- function (x, value) {
     if (!is.list(value) || length(value) != 2 ||
 	!(is.null(v1 <- value[[1]]) || length(v1) == d[1]) ||
 	!(is.null(v2 <- value[[2]]) || length(v2) == d[2]))
-	stop(gettextf("invalid dimnames given for '%s' object", class(x)), domain=NA)
+	stop(gettextf("invalid dimnames given for %s object", dQuote(class(x))),
+	     domain=NA)
     x@Dimnames <- list(if(!is.null(v1)) as.character(v1),
 		       if(!is.null(v2)) as.character(v2))
     x
@@ -146,8 +147,7 @@ setMethod("dimnames<-", signature(x = "Matrix", value = "list"),
 
 setMethod("dimnames<-", signature(x = "Matrix", value = "NULL"),
 	  function(x, value) {
-	      message("dimnames(.) <- NULL:  translated to \n",
-		      "dimnames(.) <- list(NULL,NULL)  <==>  unname(.)")
+	      message("dimnames(.) <- NULL:  translated to \ndimnames(.) <- list(NULL,NULL)  <==>  unname(.)")
 	      x@Dimnames <- list(NULL,NULL)
 	      x
 	  })
@@ -476,8 +476,9 @@ setMethod("Summary", signature(x = "ANY", na.rm = "ANY"),
           if(!length(a <- list(...))) (get(.Generic, envir=baseenv()))(x, na.rm=na.rm)
           else {
                  if(!is.null(v <- getOption("Matrix.verbose")) && v >= 1)
-                     message(sprintf("in Summary(<ANY>, .): %s(<%s>, <%s>%s)\n",
-                                     .Generic, class(x), class(a[[1]]), if(length(a) > 1)", ..." else ""))
+		     message(sprintf("in Summary(<ANY>, .): %s(<%s>, <%s>%s)\n",
+				     .Generic, class(x), class(a[[1]]), if(length(a) > 1)", ..." else ""),
+			     domain = NA)
                  do.call(.Generic, c(x, a, list(na.rm=na.rm)))
              }})
 }
@@ -657,8 +658,7 @@ subset.ij <- function(x, ij) {
     nA <- nargs()
     if(nA == 2) { ##  M [ cbind(ii,jj) ] or M [ <logical matrix> ]
 	if(!is.integer(nc <- ncol(i)))
-	    stop(".M.sub.i.2col(): 'i' has no integer column number;\n",
-		 "should never happen; please report")
+	    stop(".M.sub.i.2col(): 'i' has no integer column number;\n should never happen; please report")
 	if(is.logical(i))
 	    return(.M.sub.i.logical(x, i=i)) # call with 2 args!
 	else if(!is.numeric(i) || nc != 2)
@@ -691,8 +691,7 @@ setMethod("[", signature(x = "Matrix", i = "matrix", j = "missing", drop="missin
     nA <- nargs()
     if(nA == 3) { ##  M [ cbind(ii,jj) ] <- value  or M [ Lmat ] <- value
 	if(!is.integer(nc <- ncol(i)))
-	    stop(".M.repl.i.2col(): 'i' has no integer column number;\n",
-		 "should never happen; please report")
+	    stop(".M.repl.i.2col(): 'i' has no integer column number;\n should never happen; please report")
 	else if(!is.numeric(i) || nc != 2)
 	    stop("such indexing must be by logical or 2-column numeric matrix")
 	if(is.logical(i)) {
