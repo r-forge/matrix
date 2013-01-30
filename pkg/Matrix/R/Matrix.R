@@ -203,7 +203,7 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
                                if(isSym) "s" else "g", "CMatrix"),
 			p = rep.int(0L, ncol+1L),
 			Dim = as.integer(c(nrow,ncol)),
-			Dimnames = if(is.null(dimnames)) list(NULL,NULL)
+			Dimnames = if(is.null.DN(dimnames)) list(NULL,NULL)
 			else dimnames)
 	} else { ## normal case
 	    ## Now 'forbidden' :
