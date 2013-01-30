@@ -259,7 +259,7 @@ static R_CallMethodDef CallEntries[] = {
 };
 
 static const R_ExternalMethodDef ExtEntries[] = {
-    EXTDEF(Mmatrix, 1),
+    EXTDEF(Mmatrix, 7),
     {NULL, NULL, 0}
 };
 
