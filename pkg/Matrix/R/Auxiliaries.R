@@ -28,6 +28,21 @@ as0 <- function(x, mod=mode(x))
 
 .M.DN <- function(x) if(!is.null(dn <- dimnames(x))) dn else list(NULL,NULL)
 
+.has.DN <- ## has non-trivial Dimnames slot?
+    function(x) !identical(list(NULL,NULL), x@Dimnames)
+
+## This is exported now ( -> ../man/is.null.DN.Rd ):
+is.null.DN <- function(dn) {
+    is.null(dn) || {
+	if(!is.null(names(dn))) names(dn) <- NULL
+	ch0 <- character(0)
+	identical(dn, list(NULL,NULL)) ||
+	identical(dn, list(ch0, NULL)) ||
+	identical(dn, list(NULL, ch0)) ||
+	identical(dn, list(ch0, ch0))
+    }
+}
+
 .if.NULL <- function(x, orElse) if(!is.null(x)) x else orElse
 
 ##  not %in%  :
@@ -45,8 +60,6 @@ isSeq <- function(i, n, Ostart = TRUE) {
     identical(i, if(Ostart) 0L:n else seq_len(n))
 }
 
-.has.DN <- ## has non-trivial Dimnames slot?
-    function(x) !identical(list(NULL,NULL), x@Dimnames)
 
 .bail.out.1 <- function(fun, cl) {
     stop(gettextf('not-yet-implemented method for %s(<%s>).\n ->>  Ask the package authors to implement the missing feature.', fun, cl),
