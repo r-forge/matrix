@@ -15,7 +15,8 @@ md <- as(mm, "matrix")                  # dense
 (cD <- system.time(Dq <- qr(md))) # 1.1 sec. (lynne, 2011)
 cD[1] / cS[1] # dense is  much ( ~ 100--170 times) slower
 
-chkQR <- function(a, y = seq_len(nrow(a)),
+chkQR <- function(a,
+                  y = seq_len(nrow(a)),## RHS: made to contain no 0
                   a.qr = qr(a), tol = 1e-13, # 1e-13 failing very rarely (interesting)
                   ##----------
                   Qinv.chk = !sp.rank.def, QtQ.chk = !sp.rank.def,
@@ -141,7 +142,8 @@ for(N in 1:(if(doExtras) 1008 else 24)) {
     ##                          --- => FALSE if struct. rank deficient
 }
 
-## look at single "hard" cases:
+
+## Look at single "hard" cases: --------------------------------------
 
 ## This is *REALLY* nice and small :
 A0 <- new("dgCMatrix", Dim = 4:3, i = c(0:3, 3L), p = c(0L, 3:5), x = rep(1,5))
@@ -157,6 +159,14 @@ checkQR.DS.both(A1, Qinv.chk = FALSE, QtQ.chk=FALSE)
 ##                                           ----- *both* still needed :
 try( checkQR.DS.both(A1,  TRUE, FALSE) )
 try( checkQR.DS.both(A1, FALSE,  TRUE) )
+
+
+qa <- qr(as.matrix(A0))
+qA <- qr(A0)
+
+drop0(crossprod( Qd <- qr.Q(qa) ), 1e-15) # perfect = diag( 3 )
+drop0(crossprod( Qs <- qr.Q(qA) ), 1e-15) # R[3,3] == 0 -- OOPS!
+## OTOH, qr.R() is fine, as checked in the checkQR.DS.both(A0, *) above
 
 
 ## zero-row *and* zero-column :
