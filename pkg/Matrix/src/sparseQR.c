@@ -107,7 +107,7 @@ SEXP sparseQR_qty(SEXP qr, SEXP y, SEXP trans)
 		   asLogical(trans),
 		   REAL(GET_SLOT(ans, Matrix_xSym)), ydims);
 #define EXIT_sparseQR_							\
-    if(rank_def) { /* remove the extra rows from ans */			\
+    /* remove the extra rows from ans */				\
 	d_a[0] = m;/* -> @Dim is ok;  @Dimnames (i.e. colnames) still are */ \
 	double *yy = REAL( GET_SLOT(ans, Matrix_xSym)); /* is  M  x n */ \
 	double *xx = REAL(ALLOC_SLOT(aa, Matrix_xSym, REALSXP, m * n));	\
@@ -115,10 +115,13 @@ SEXP sparseQR_qty(SEXP qr, SEXP y, SEXP trans)
 	    Memcpy(xx + j*m, yy + j*M, m); /* copy    x[ 1:m, j ] := yy[,j] */ \
 	}								\
 	ans = duplicate(aa); /*  m x n  finally */			\
-	UNPROTECT(1);							\
-    }
+	UNPROTECT(1)
 
-    EXIT_sparseQR_
+    if(rank_def) {
+	warning(_("%s(): structurally rank deficient case: possibly WRONG zeros"),
+		"sparseQR_qty");
+	EXIT_sparseQR_;
+    }
 
     UNPROTECT(1);
     return ans;
@@ -152,7 +155,11 @@ SEXP sparseQR_coef(SEXP qr, SEXP y)
 	}
     }
 
-    EXIT_sparseQR_
+    if(rank_def) {
+	warning(_("%s(): structurally rank deficient case: possibly WRONG zeros"),
+		"sparseQR_coef");
+	EXIT_sparseQR_;
+    }
 
     UNPROTECT(1);
     return ans;
@@ -184,7 +191,11 @@ SEXP sparseQR_resid_fitted(SEXP qr, SEXP y, SEXP want_resid)
     /* multiply by Q and apply inverse row permutation */
     sparseQR_Qmult(V, beta, p, /* trans = */ FALSE, ax, ydims);
 
-    EXIT_sparseQR_
+    if(rank_def) {
+	warning(_("%s(): structurally rank deficient case: possibly WRONG zeros"),
+		"sparseQR_resid_fitted");
+	EXIT_sparseQR_;
+    }
 
     UNPROTECT(1);
     return ans;
