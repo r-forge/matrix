@@ -164,6 +164,16 @@ S4_2list <- function(obj) {
    structure(lapply(sn, slot, object = obj), .Names = sn)
 }
 
+assert.EQ <- function(target, current, tol = if(show) 0 else 1e-15,
+                      show = FALSE, ...) {
+    ## Purpose: check equality *and* show non-equality
+    ## ----------------------------------------------------------------------
+    ## show: if TRUE, return (and hence typically print) all.equal(...)
+    if(show) all.equal(target, current, tol = tol)
+    else if(!isTRUE(r <- all.equal(target, current, tol = tol)))
+	stop("all.equal() |->  ", r)
+}
+
 
 ### ------- Part II  -- related to matrices, but *not* "Matrix" -----------
 
@@ -193,9 +203,7 @@ assert.EQ.mat <- function(M, m, tol = if(show) 0 else 1e-15, show=FALSE) {
     if(is.logical(MM) && is.numeric(m))
 	storage.mode(MM) <- "integer"
     attr(MM, "dimnames") <- attr(m, "dimnames") <- NULL
-    if(show) all.equal(MM, m, tol = tol)
-    else if(!isTRUE(r <- all.equal(MM, m, tol = tol)))
-	stop("all.equal() |->  ", r)
+    assert.EQ(MM, m, tol=tol, show=show)
 }
 ## a short cut
 assert.EQ.Mat <- function(M, M2, tol = if(show) 0 else 1e-15, show=FALSE)
