@@ -25,7 +25,7 @@ importFrom("methods",
 ## Generics and functions defined in this package
 export("Cholesky",
        "Diagonal", ".symDiagonal", ".sparseDiagonal",
-       "Hilbert",
+       "Hilbert", "KhatriRao",
        "Matrix",
        "spMatrix",
        "sparseMatrix",
@@ -307,6 +307,7 @@ exportMethods(## for both own and "other" generics:
               "which",
 	      "zapsmall"
 	      )
+
 
 exportMethods("rbind2")
 exportMethods("cbind2")
