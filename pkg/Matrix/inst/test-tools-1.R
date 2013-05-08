@@ -171,7 +171,7 @@ assert.EQ <- function(target, current, tol = if(show) 0 else 1e-15,
     ## show: if TRUE, return (and hence typically print) all.equal(...)
     if(show) all.equal(target, current, tol = tol)
     else if(!isTRUE(r <- all.equal(target, current, tol = tol)))
-	stop("all.equal() |->  ", r)
+	stop("all.equal() |-> ", paste(r, collapse=sprintf("%-19s","\n")))
 }
 
 
