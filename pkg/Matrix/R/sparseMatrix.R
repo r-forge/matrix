@@ -286,9 +286,10 @@ setMethod("[", signature(x = "sparseMatrix",
 ## x[] <- value :
 setReplaceMethod("[", signature(x = "sparseMatrix", i = "missing", j = "missing",
 				value = "ANY"),## double/logical/...
-	  function (x, value) {
+	  function (x, i,j,..., value) {
 	      if(all0(value)) { # be faster
 		  cld <- getClassDef(class(x))
+		  x <- diagU2N(x, cl = cld)
 		  for(nm in intersect(nsl <- names(cld@slots),
 				      c("x", "i","j", "factors")))
 		      length(slot(x, nm)) <- 0L

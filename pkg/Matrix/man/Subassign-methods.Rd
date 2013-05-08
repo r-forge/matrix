@@ -31,6 +31,7 @@
 \alias{[<-,diagonalMatrix,index,missing,replValue-method}
 \alias{[<-,diagonalMatrix,matrix,missing,replValue-method}
 \alias{[<-,diagonalMatrix,missing,index,replValue-method}
+\alias{[<-,diagonalMatrix,missing,missing,ANY-method}
 %
 \alias{[<-,diagonalMatrix,index,index,sparseMatrix-method}
 \alias{[<-,diagonalMatrix,index,missing,sparseMatrix-method}
