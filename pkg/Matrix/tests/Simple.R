@@ -70,8 +70,23 @@ if(FALSE) { ## TODO -- once R itself does better ...
     MLp <- Matrix(.Leap.seconds)## --> error (for now)
 }
 
+### Unit-diagonal and unitriangular  {methods need diagU2N() or similar}
 I <- Diagonal(3)
-stopifnot(identical(I != 0, Diagonal(3, TRUE)), I@diag == "U")
+(T <- as(I,"TsparseMatrix")) # unitriangular
+(C <- as(I,"CsparseMatrix")) #   (ditto)
+lT <- as(T,"lMatrix")
+lC <- as(C,"lMatrix")
+stopifnot(
+    identical((n0 <- I != 0), Diagonal(3, TRUE)), I@diag == "U",
+    identical(n0, I & TRUE), identical(n0, I | FALSE),
+    identical(n0, TRUE & I), identical(n0, FALSE | I),
+    all(n0 == !(I == 0)), all(I == n0), identical(n0 == I, I == n0)
+    ,
+    identical4(lT, as(Diagonal(3, x=TRUE),"TsparseMatrix"), T & TRUE, TRUE & T),
+    identical4(lC, as(Diagonal(3, x=TRUE),"CsparseMatrix"), C & TRUE, TRUE & C),
+    identical3(lT, T | FALSE, FALSE | T),
+    identical3(lC, C | FALSE, FALSE | C),
+    TRUE)
 I[,1] <- NA; I[2,2] <- NA ; I[3,] <- NaN
 stopifnot(isValid(I, "sparseMatrix"))
 I # gave error in printSpMatrix() - because of R bug in format.info()
@@ -306,6 +321,7 @@ mu <- as(tu,"matrix")
 stopifnot(isValid(cu, "CsparseMatrix"), isValid(cu, "triangularMatrix"),
           isValid(tu, "TsparseMatrix"), isValid(tu, "triangularMatrix"),
           identical(cu * 1:8, tu * 1:8), # but are no longer triangular
+          identical(cu > .1, as(tu > .1, "CsparseMatrix")),
           all(cu >= 0, na.rm=TRUE), !all(cu >= 1), is.na(all(tu >= 0)),
           ## Csparse_drop: preserves triangularity incl diag="U"
           identical(cu, .Call(Matrix:::Csparse_drop, cu, 0.))
