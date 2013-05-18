@@ -165,13 +165,16 @@ S4_2list <- function(obj) {
 }
 
 assert.EQ <- function(target, current, tol = if(show) 0 else 1e-15,
-                      show = FALSE, ...) {
+                      giveRE = FALSE, show = FALSE, ...) {
     ## Purpose: check equality *and* show non-equality
     ## ----------------------------------------------------------------------
     ## show: if TRUE, return (and hence typically print) all.equal(...)
-    if(show) all.equal(target, current, tol = tol)
-    else if(!isTRUE(r <- all.equal(target, current, tol = tol)))
-	stop("all.equal() |-> ", paste(r, collapse=sprintf("%-19s","\n")))
+    T <- isTRUE(ae <- all.equal(target, current, tol = tol, ...))
+    if(show) return(ae) else if(giveRE && T) { ## don't show if stop() later:
+	ae0 <- if(tol == 0) ae else all.equal(target, current, tol = 0, ...)
+	if(!isTRUE(ae0)) cat(ae0,"\n")
+    }
+    if(!T) stop("all.equal() |-> ", paste(ae, collapse=sprintf("%-19s","\n")))
 }
 
 
