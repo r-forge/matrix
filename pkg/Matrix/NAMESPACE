@@ -307,6 +307,8 @@ exportMethods(## for both own and "other" generics:
               "which",
 	      "zapsmall"
 	      )
+if(getRversion() > "3.1.0")
+exportMethods("anyNA")
 
 
 exportMethods("rbind2")

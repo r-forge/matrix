@@ -119,6 +119,10 @@ setMethod("symmpart", signature(x = "matrix"), function(x) (x + t(x))/2)
 setMethod("skewpart", signature(x = "matrix"), function(x) (x - t(x))/2)
 
 
+if(getRversion() > "3.1.0")
+## NB: "nsparseMatrix" has extra method
+setMethod("anyNA", signature(x = "xMatrix"),
+	  function(x) anyNA(x@x))
 
 
 setMethod("dim", signature(x = "Matrix"),

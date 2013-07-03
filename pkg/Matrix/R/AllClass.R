@@ -676,6 +676,16 @@ setClass("Schur", contains = "MatrixFactorization",
 
 setClassUnion("mMatrix", members = c("matrix", "Matrix"))
 
+## CARE: Sometimes we'd want all those for which 'x' contains all the data.
+##       e.g. Diagonal() is "ddiMatrix" with 'x' slot of length 0, does *not* contain 1
+setClassUnion("xMatrix", ## those Matrix classes with an 'x' slot
+              c("dMatrix",
+                "iMatrix",
+                "lMatrix",
+                "ndenseMatrix",
+                "zMatrix"))
+
+
 ## Definition  Packed := dense with length( . @x) < prod( . @Dim)
 ##	       ~~~~~~
 ## REPLACED the following with	isPacked() in ./Auxiliaries.R :

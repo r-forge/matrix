@@ -12,15 +12,27 @@ identical3 <- function(x,y,z)	  identical(x,y) && identical (y,z)
 identical4 <- function(a,b,c,d)   identical(a,b) && identical3(b,c,d)
 identical5 <- function(a,b,c,d,e) identical(a,b) && identical4(b,c,d,e)
 
+if( exists("assertCondition", asNamespace("tools")) ) { ## R > 3.0.1
+
+assertError <- function(expr, verbose=getOption("verbose"))
+    tools::assertCondition(expr, "error", verbose=verbose)
+assertWarning <- function(expr, verbose=getOption("verbose"))
+    tools::assertCondition(expr, "warning", verbose=verbose)
+assertWarningAtLeast <- function(expr, verbose=getOption("verbose"))
+    tools::assertCondition(expr, "error", "warning", verbose=verbose)
+
+} else { ## in R <= 3.0.1, use our old versions
+
 ##' @title Ensure evaluating 'expr' signals an error
 ##' @param expr
 ##' @return the caught error, invisibly
 ##' @author Martin Maechler
-assertError <- function(expr) {
+assertError <- function(expr, verbose=getOption("verbose")) {
     d.expr <- deparse(substitute(expr))
     t.res <- tryCatch(expr, error = function(e) e)
     if(!inherits(t.res, "error"))
 	stop(d.expr, "\n\t did not give an error", call. = FALSE)
+    cat("Asserted Error:", conditionMessage(t.res),"\n")
     invisible(t.res)
 }
 
@@ -28,11 +40,13 @@ assertError <- function(expr) {
 ##' @param expr
 ##' @return the caught error/warning, invisibly
 ##' @author Martin Maechler
-assertWarningAtLeast <- function(expr) {
+assertWarningAtLeast <- function(expr, verbose=getOption("verbose")) {
     d.expr <- deparse(substitute(expr))
     t.res <- tryCatch(expr, error = function(e)e, warning = function(w)w)
-    if(!inherits(t.res, "error") && !inherits(t.res, "warning"))
+    if(!(isE <- inherits(t.res, "error")) && !inherits(t.res, "warning"))
 	stop(d.expr, "\n\t did not give an error or warning", call. = FALSE)
+    if(verbose) cat("Asserted", if(isE) "Error:" else "Warning:",
+		    conditionMessage(t.res),"\n")
     invisible(t.res)
 }
 
@@ -40,13 +54,15 @@ assertWarningAtLeast <- function(expr) {
 ##' @param expr
 ##' @return the caught warning, invisibly
 ##' @author Martin Maechler
-assertWarning <- function(expr) {
+assertWarning <- function(expr, verbose=getOption("verbose")) {
     d.expr <- deparse(substitute(expr))
     t.res <- tryCatch(expr, warning = function(w)w)
     if(!inherits(t.res, "warning"))
 	stop(d.expr, "\n\t did not give a warning", call. = FALSE)
+    if(verbose) cat("Asserted Warning:", conditionMessage(t.res),"\n")
     invisible(t.res)
 }
+}# [else: no assertCondition ]
 
 ##' [ from R's  demo(error.catching) ]
 ##' We want to catch *and* save both errors and warnings, and in the case of
