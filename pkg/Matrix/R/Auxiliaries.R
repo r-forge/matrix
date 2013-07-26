@@ -1252,11 +1252,13 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE)
 	.Call(Csparse_diagN2U, as(x, "CsparseMatrix"))
 }
 
+.dgC.0.factors <- function(x)
+    if(!length(x@factors)) x else { x@factors <- list() ; x }
 .as.dgC.0.factors <- function(x) {
     if(!is(x, "dgCMatrix"))
 	as(x, "dgCMatrix") # will not have 'factors'
     else ## dgCMatrix
-	if(!length(x@factors)) x else { x@factors <- list() ; x }
+	.dgC.0.factors(x)
 }
 
 

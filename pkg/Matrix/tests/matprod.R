@@ -324,9 +324,9 @@ stopifnot(is(B2, "dsCMatrix"), # symmetric indexing keeps symmetry
 	  is(z.s <- solve(B2, bb), "sparseMatrix"))
 assert.EQ.mat(B2 %*% z.s, as(bb, "matrix"))
 ## -> dense RHS and dense result
-z. <- solve(as(B2, "dgCMatrix"), bb)
+z. <- solve(as(B2, "dgCMatrix"), bb)# now *sparse*
 z  <- solve( B2, as(bb,"dgeMatrix"))
-stopifnot(identical(z, z.))
+stopifnot(is(z., "sparseMatrix"), all.equal(z, as(z.,"denseMatrix")))
 ## finish calculating conditional variance matrix
 v <- b[3:5,3:5] - crossprod(bb,z)
 stopifnot(all.equal(as.mat(v),

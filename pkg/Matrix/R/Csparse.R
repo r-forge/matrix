@@ -59,14 +59,8 @@ setAs("CsparseMatrix", "matrix",
 
 setAs("CsparseMatrix", "symmetricMatrix",
       function(from) {
-	  if(isSymmetric(from)) {
-	      isTri <- is(from, "triangularMatrix")# i.e. effectively *diagonal*
-	      if (isTri && from@diag == "U")
-		  from <- .Call(Csparse_diagU2N, from)
-	      .Call(Csparse_general_to_symmetric, from,
-		    uplo = if(isTri) from@uplo else "U")
-	  } else
-	  stop("not a symmetric matrix; consider forceSymmetric() or symmpart()")
+	  if(isSymmetric(from)) forceCspSymmetric(from)
+	  else stop("not a symmetric matrix; consider forceSymmetric() or symmpart()")
       })
 
 

@@ -1,17 +1,17 @@
 ##-*- mode: org -*-
 
 * *Urgent* in some sense ------------------------------------------------------
-
-- diagonalMatrix inherits from sparseMatrix, *BUT*
-  "ddiMatrix" does not inherit from "dsparseMatrix", nor does
-  "ldiMatrix" from "lparseMatrix".   Seems an undesirable inconsistency
-
-- Look at Paul Bailey's problem -- CHOLMOD error (even seg.fault for him)
+** TODO src/CHOLMOD/MatrixOps/cholmod_symmetry.c  is "cool" and fast;
+Definitely should use it for solve(<dgCMatrix>)  {it seems MATLAB does}.
+** diagonalMatrix inherits from sparseMatrix, *BUT*
+"ddiMatrix" does not inherit from "dsparseMatrix", nor does
+"ldiMatrix" from "lparseMatrix".   Seems an undesirable inconsistency
+** Look at Paul Bailey's problem -- CHOLMOD error (even seg.fault for him)
   --> ~/R/MM/Pkg-ex/Matrix/sparseOrderedLogit.R
+** BunchKaufman()'s result is not really useful yet {but it is used on C
+ level e.g. for solve(<dsyMatrix>).   Should define  expand() method or
+ similar, see man/BunchKaufman-methods.Rd and R/dsyMatrix.R (at end).
 
-- BunchKaufman()'s result is not really useful yet {but it is used on C
-  level e.g. for solve(<dsyMatrix>).   Should define  expand() method or
-  similar, see man/BunchKaufman-methods.Rd and R/dsyMatrix.R (at end).
 
 * New smallish ideas, relatively urgent for MM --------------------------------
 

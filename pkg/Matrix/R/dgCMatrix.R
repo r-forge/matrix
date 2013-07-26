@@ -55,6 +55,10 @@ setMethod("image", "dgCMatrix",
 
 ##-> ./colSums.R  for colSums,... rowMeans
 
+setMethod("t", signature(x = "dgCMatrix"),
+	  function(x) .Call(Csparse_transpose, x, FALSE),
+	  valueClass = "dgCMatrix")
+
 setMethod("determinant", signature(x = "dgCMatrix", logarithm = "logical"),
           detSparseLU) # using mkDet() --> ./Auxiliaries.R
 
@@ -86,13 +90,21 @@ setMethod("solve", signature(a = "dgCMatrix", b = "matrix"),
 setMethod("solve", signature(a = "dgCMatrix", b = "ddenseMatrix"),
 	  function(a, b, ...) .Call(dgCMatrix_matrix_solve, a, b),
 	  valueClass = "dgeMatrix")
+
 setMethod("solve", signature(a = "dgCMatrix", b = "dsparseMatrix"),
-	  function(a, b, ...)
-	  .Call(dgCMatrix_matrix_solve, a, as(b, "denseMatrix")),
-	  valueClass = "dgeMatrix")
+	  function(a, b, ...) {
+	      if(isSymmetric(a)) # TODO: fast cholmod_symmetric() for Cholesky
+		  solve(forceCspSymmetric(a, isTri=FALSE), b) #-> sparse result
+	      else .Call(dgCMatrix_matrix_solve, a, as(b, "denseMatrix"))
+	  })
 
 ## This is a really dumb method but some people apparently want it
+## (MM: a bit less dumb now with possibility of staying sparse)
 setMethod("solve", signature(a = "dgCMatrix", b = "missing"),
-	  function(a, b, ...)
-          .Call(dgCMatrix_matrix_solve, a, b = diag(nrow(a))),
-	  valueClass = "dgeMatrix")
+	  function(a, b, ...) {
+	      if(isSymmetric(a)) # TODO: fast cholmod_symmetric() for Cholesky
+		  solve(forceCspSymmetric(a, isTri=FALSE),
+			b = Diagonal(nrow(a))) #-> sparse result
+	      else .Call(dgCMatrix_matrix_solve, a, b = diag(nrow(a)))
+	  })
+

@@ -24,6 +24,7 @@
 \alias{diag,dgCMatrix-method}
 \alias{dim,dgCMatrix-method}
 %\alias{lu,dgCMatrix-method}-> ./lu.Rd
+\alias{isSymmetric,dgCMatrix-method}
 \alias{t,dgCMatrix-method}
 \alias{solve,dgCMatrix,matrix-method}
 \alias{solve,dgCMatrix,missing-method}
@@ -79,6 +80,10 @@
       of \code{x}}
     \item{image}{\code{signature(x = "dgCMatrix")}: plots an image of
       \code{x} using the \code{\link[lattice]{levelplot}} function}
+    \item{solve}{\code{signature(a = "dgCMatrix", b = "dsparseMatrix")}:
+      checks if \code{a} is symmetric, and in that case, coerces it to
+      \code{"\linkS4class{symmetricMatrix}"}, and then computes a
+      \emph{sparse} solution.}
     \item{lu}{\code{signature(x = "dgCMatrix")}: computes the LU
       decomposition of a square \code{dgCMatrix} object}
   }
