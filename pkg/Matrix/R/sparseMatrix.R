@@ -636,6 +636,16 @@ print.sparseSummary <- function (x, ...) {
     invisible(x)
 }
 
+
+
+### FIXME [from ../TODO ]: Use cholmod_symmetry() --
+## Possibly even use 'option' as argument here for fast check to use sparse solve !!
+
+##' This case should be particularly fast
+setMethod("isSymmetric", signature(object = "dgCMatrix"),
+	  function(object, tol = 100*.Machine$double.eps, ...)
+	      isTRUE(all.equal(.dgC.0.factors(object), t(object), tol = tol, ...)))
+
 setMethod("isSymmetric", signature(object = "sparseMatrix"),
 	  function(object, tol = 100*.Machine$double.eps, ...) {
 	      ## pretest: is it square?

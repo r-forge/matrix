@@ -426,7 +426,7 @@ stopifnot(identical(i6, as(cbind(c(-4, rep(1,5))), "dgeMatrix")),
 i.m <- solve(as.mat(m))
 I1 <- m %*% i.m
 o4 <- diag(I1)
-im <- solve(m)
+im <- solve(m)# is now sparse
 (I2 <- m %*% im)
 (ms <- as(m, "symmetricMatrix"))
 ## solve(<sparse>, <sparse>):
@@ -437,7 +437,7 @@ s.ms2 <- solve(ms, ms)
 s.msm <- solve(ms, m)
 I4c <- as(Matrix(diag(4),sparse=TRUE), "generalMatrix")
 stopifnot(isValid(im, "Matrix"), isValid(I2, "Matrix"), class(I4c) == "dgCMatrix",
-          all.equal(I1, I2, tol = 1e-14),
+          all.equal(I1, as(I2,"dgeMatrix"), tol = 1e-14),
           all.equal(diag(4), as.mat(I2), tol = 1e-12),
           all.equal(s.mm,  I2, tol = 1e-14),
           all.equal(s.mms, I2, tol = 1e-14),

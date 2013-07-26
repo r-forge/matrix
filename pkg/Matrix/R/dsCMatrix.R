@@ -97,7 +97,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "numeric"),
 	  valueClass = "dgeMatrix")
 
 ## `` Fully-sparse'' solve() :
-solve.dsC.dsC <- function(a,b, tol) {
+solve.dsC.dC <- function(a,b, tol) {
     r <- tryCatch(.Call(dsCMatrix_Csparse_solve, a, b),
 		  error=function(e)NULL, warning=function(w)NULL)
     if(is.null(r)) { ## cholmod factorization was not ok
@@ -116,7 +116,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "dsparseMatrix"),
 		  cb <- getClassDef(class(b <- as(b, "CsparseMatrix")))
 	      if (extends(cb, "symmetricMatrix")) ## not supported (yet) by cholmod_spsolve
 		  b <- as(b, "dgCMatrix")
-	      solve.dsC.dsC(a,b)
+	      solve.dsC.dC(a,b)
 	  })
 
 setMethod("solve", signature(a = "dsCMatrix", b = "missing"),
