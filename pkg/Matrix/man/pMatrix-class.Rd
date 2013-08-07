@@ -41,7 +41,12 @@
 %
 \title{Permutation matrices}
 \description{The \code{"pMatrix"} class is the class of permutation
-  matrices, stored as 1-based integer permutation vectors.}
+  matrices, stored as 1-based integer permutation vectors.
+
+  Matrix (vector) multiplication with permutation matrices is equivalent
+  to row or column permutation, and is implemented that way in the
+  \pkg{Matrix} package, see the \sQuote{Details} below.
+}
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("pMatrix", ...)}
   or by coercion from an integer permutation vector, see below.
@@ -94,18 +99,50 @@
       permutation matrix).}
   }
 }
+\details{
+  Matrix multiplication with permutation matrices is equivalent to row
+  or column permutation.
+  Here are the four different cases for an arbitrary matrix \eqn{M} and
+  a permutation matrix \eqn{P} (where we assume matching dimensions):
+  %% \describe{
+  %%   \item{\eqn{MP =  }}{\code{M \%*\% P}  ..}
+  %%   \item{\eqn{PM =  }}{\code{P \%*\% M}  ..}
+  %%   \item{\eqn{P'M = }}{\code{crossprod(P,M)} (less efficiently, \code{t(P) \%*\% M})  ..}
+  %%   \item{\eqn{MP' = }}{\code{trossprod(M,P)} (less efficiently, \code{M \%*\% t(P)})  ..}
+  %% }
+
+  \tabular{lclcl}{
+   \eqn{MP  }\tab = \tab \code{M \%*\% P}					      \tab = \tab\code{M[, i(p)]}\cr
+   \eqn{PM  }\tab = \tab \code{P \%*\% M}					      \tab = \tab\code{M[ p , ]} \cr
+   \eqn{P'M }\tab = \tab \code{crossprod(P,M)} (\eqn{\approx}{~=}\code{t(P) \%*\% M}) \tab = \tab\code{M[i(p), ]}\cr
+   \eqn{MP' }\tab = \tab \code{trossprod(M,P)} (\eqn{\approx}{~=}\code{M \%*\% t(P)}) \tab = \tab\code{M[ , p ]} \cr
+  }
+  where \code{p} is the \dQuote{permutation vector} corresponding to the
+  permutation matrix \code{P} (see first note), and \code{i(p)} is short
+  for \code{\link{invPerm(p)}}.
+
+  Also one could argue that these are really only two cases if you take
+  into account that inversion (\code{\link{solve}}) and transposition
+  (\code{\link{t}}) are the same for permutation matrices \eqn{P}.
+}
 \note{
-  The inverse of the typical \code{"pMatrix"} constructor,
-  \code{P <- as(ip, "pMatrix")} is simply \code{ip <- P@perm}.
+  For every permutation matrix \code{P}, there is a corresponding
+  permutation vector \code{p} (of indices, 1:n), and these are related by
+\preformatted{ P <- as(p, "pMatrix")
+ p <- P@perm
+}
+  see also the \sQuote{Examples}.
 
   Subsetting (\dQuote{indexing}, including, \code{\link{diag}})
-  \code{"pMatrix"} objects treats themas nonzero-pattern matrices, i.e.,
+  \code{"pMatrix"} objects treats them as nonzero-pattern matrices, i.e.,
   as \code{"\linkS4class{ngTMatrix}"} such that non-matrix subsetting
   result in \code{\link{logical}} vectors.
   Sub-assignment (\code{M[i,j] <- v}) is not sensible and hence an error
   for these permutation matrices.
 }
-%\seealso{}
+\seealso{\code{\link{invPerm}(p)} computes the inverse permutation of an
+  integer (index) vector \code{p}.
+}
 \examples{
 (pm1 <- as(as.integer(c(2,3,1)), "pMatrix"))
 t(pm1) # is the same as
