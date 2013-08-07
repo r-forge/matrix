@@ -110,16 +110,15 @@
   %%   \item{\eqn{P'M = }}{\code{crossprod(P,M)} (less efficiently, \code{t(P) \%*\% M})  ..}
   %%   \item{\eqn{MP' = }}{\code{trossprod(M,P)} (less efficiently, \code{M \%*\% t(P)})  ..}
   %% }
-
   \tabular{lclcl}{
-   \eqn{MP  }\tab = \tab \code{M \%*\% P}					      \tab = \tab\code{M[, i(p)]}\cr
-   \eqn{PM  }\tab = \tab \code{P \%*\% M}					      \tab = \tab\code{M[ p , ]} \cr
-   \eqn{P'M }\tab = \tab \code{crossprod(P,M)} (\eqn{\approx}{~=}\code{t(P) \%*\% M}) \tab = \tab\code{M[i(p), ]}\cr
-   \eqn{MP' }\tab = \tab \code{trossprod(M,P)} (\eqn{\approx}{~=}\code{M \%*\% t(P)}) \tab = \tab\code{M[ , p ]} \cr
+    \eqn{MP }\tab= \tab\code{M \%*\% P}					    \tab= \tab\code{M[, i(p)]}\cr
+    \eqn{PM }\tab= \tab\code{P \%*\% M}					    \tab= \tab\code{M[ p , ]} \cr
+    \eqn{P'M}\tab= \tab\code{crossprod(P,M)} (\eqn{\approx}{~=}\code{t(P) \%*\% M})\tab= \tab\code{M[i(p), ]}\cr
+    \eqn{MP'}\tab= \tab\code{trossprod(M,P)} (\eqn{\approx}{~=}\code{M \%*\% t(P)})\tab= \tab\code{M[ , p ]} \cr
   }
   where \code{p} is the \dQuote{permutation vector} corresponding to the
   permutation matrix \code{P} (see first note), and \code{i(p)} is short
-  for \code{\link{invPerm(p)}}.
+  for \code{\link{invPerm}(p)}.
 
   Also one could argue that these are really only two cases if you take
   into account that inversion (\code{\link{solve}}) and transposition
