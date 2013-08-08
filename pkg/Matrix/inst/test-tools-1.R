@@ -211,7 +211,7 @@ as.mat <- function(m) {
     m
 }
 
-assert.EQ.mat <- function(M, m, tol = if(show) 0 else 1e-15, show=FALSE) {
+assert.EQ.mat <- function(M, m, tol = if(show) 0 else 1e-15, show=FALSE, giveRE = FALSE, ...) {
     ## Purpose: check equality of  'Matrix' M with  'matrix' m
     ## ----------------------------------------------------------------------
     ## Arguments: M: is(., "Matrix") typically {but just needs working as(., "matrix")}
@@ -222,11 +222,11 @@ assert.EQ.mat <- function(M, m, tol = if(show) 0 else 1e-15, show=FALSE) {
     if(is.logical(MM) && is.numeric(m))
 	storage.mode(MM) <- "integer"
     attr(MM, "dimnames") <- attr(m, "dimnames") <- NULL
-    assert.EQ(MM, m, tol=tol, show=show)
+    assert.EQ(MM, m, tol=tol, show=show, giveRE=giveRE)
 }
 ## a short cut
-assert.EQ.Mat <- function(M, M2, tol = if(show) 0 else 1e-15, show=FALSE)
-    assert.EQ.mat(M, as.mat(M2), tol=tol, show=show)
+assert.EQ.Mat <- function(M, M2, tol = if(show) 0 else 1e-15, show=FALSE, giveRE = FALSE, ...)
+    assert.EQ.mat(M, as.mat(M2), tol=tol, show=show, giveRE=giveRE)
 
 
 chk.matrix <- function(M) {

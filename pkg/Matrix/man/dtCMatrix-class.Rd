@@ -121,6 +121,21 @@ t1 # still triangular
 (it1 <- solve(t1))
 t1. <- solve(it1)
 all(abs(t1 - t1.) < 10 * .Machine$double.eps)
-}
+
+## 2nd example
+U5 <- new("dtCMatrix", i= c(1L, 0:3), p=c(0L,0L,0:2, 5L), Dim = c(5L, 5L),
+          x = rep(1, 5), diag = "U")
+U5
+(iu <- solve(U5)) # contains one '0'
+validObject(iu2 <- solve(U5, Diagonal(5)))# failed in earlier versions
+
+I5 <- iu  \%*\% U5 # should equal the identity matrix
+i5 <- iu2 \%*\% U5
+asDiag <- function(M) as(drop0(M), "diagonalMatrix")
+stopifnot(
+   all.equal(Diagonal(5), asDiag(I5), tol=1e-14)
+   ,
+   all.equal(Diagonal(5), asDiag(i5), tol=1e-14)
+)}
 \keyword{classes}
 \keyword{algebra}

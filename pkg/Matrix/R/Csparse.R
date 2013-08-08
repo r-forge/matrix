@@ -68,6 +68,8 @@ setAs("CsparseMatrix", "symmetricMatrix",
     .Call(Csparse_validate2, x, sort.if.needed)
 ##-> to be used in sparseMatrix(.), e.g. --- but is unused currently
 ## NB: 'sort.if.needed' is called 'maybe_modify' in C -- so be careful
+## more useful:
+.sortCsparse <- function(x) .Call(Csparse_sort, x) ## modifies 'x' !!
 
 ### Some group methods:
 

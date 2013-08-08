@@ -397,8 +397,21 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp, SEXP error_on_sing)
     return get_factors(Ap, "LU");
 }
 
-SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
+SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
 {
+    Rboolean sparse = asLogical(give_sparse);
+    if(sparse) {
+	// FIXME: implement this
+	error(_("dgCMatrix_matrix_solve(.., sparse=TRUE) not yet implemented"));
+
+	/* Idea: in the  for(j = 0; j < nrhs ..) loop below, build the *sparse* result matrix
+	 * ----- *column* wise -- which is perfect for dgCMatrix
+	 * --> build (i,p,x) slots "increasingly" [well, allocate in batches ..]
+	 *
+	 * --> maybe first a protoype in R
+	 */
+
+    }
     SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(b)),
 	lu, qslot;
     CSP L, U;
@@ -426,7 +439,7 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b)
 	cs_pvec(p, ax + j * n, x, n);  /* x = b(p) */
 	cs_lsolve(L, x);	       /* x = L\x */
 	cs_usolve(U, x);	       /* x = U\x */
-	if (q)			       /* b(q) = x */
+	if (q)			       /* r(q) = x , hence r = Q' U{^-1} L{^-1} P b = A^{-1} b */
 	    cs_ipvec(q, x, ax + j * n, n);
 	else
 	    Memcpy(ax + j * n, x, n);
