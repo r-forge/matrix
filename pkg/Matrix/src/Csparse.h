@@ -25,6 +25,7 @@ SEXP zCsparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value);
 SEXP Csparse_symmetric_to_general(SEXP x);
 SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo);
 SEXP Csparse_MatrixMarket(SEXP x, SEXP fname);
+SEXP Csparse_sort (SEXP x);
 SEXP Csparse_to_Tsparse(SEXP x, SEXP tri);
 SEXP Csparse_to_dense(SEXP x);
 SEXP Csparse_to_nz_pattern(SEXP x, SEXP tri);

@@ -53,6 +53,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Csparse_diagU2N, 1),
     CALLDEF(Csparse_drop, 2),
     CALLDEF(Csparse_horzcat, 2),
+    CALLDEF(Csparse_sort, 1),
     CALLDEF(Csparse_to_Tsparse, 2),
     CALLDEF(Csparse_to_dense, 1),
     CALLDEF(Csparse_to_nz_pattern, 2),
@@ -106,7 +107,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(ngCMatrix_colSums, 5),
     CALLDEF(dgCMatrix_cholsol, 2),
     /* CALLDEF(dgCMatrix_lusol, 2), */
-    CALLDEF(dgCMatrix_matrix_solve, 2),
+    CALLDEF(dgCMatrix_matrix_solve, 3),
     CALLDEF(dgCMatrix_qrsol, 3),
     CALLDEF(dgTMatrix_to_dgeMatrix, 1),
     CALLDEF(lgTMatrix_to_lgeMatrix, 1),

@@ -79,32 +79,65 @@ LU.dgC <- function(x, errSing = TRUE, order = TRUE, tol = 1.0, ...)
 setMethod("lu", signature(x = "dgCMatrix"), LU.dgC)
 
 setMethod("lu", signature(x = "sparseMatrix"),
-	  function(x, ...) # "FIXME": do in C, so can cache 'x@factors$LU'
-	  lu(as(as(as(x, "CsparseMatrix"), "dsparseMatrix"), "dgCMatrix"), ...))
+	  function(x, ...)
+      {
+	  ## "FIXME": do in C, so can cache 'x@factors$LU'
+	  warning(gettextf(
+	      "lu(<%s>) cannot cache the LU decomposition; consider working with \"dgCMatrix\"",
+	      class(x)),
+		  call. = FALSE, domain=NA)
+	  lu(as(as(as(x, "CsparseMatrix"), "dsparseMatrix"), "dgCMatrix"), ...)
+})
 
 
-setMethod("solve", signature(a = "dgCMatrix", b = "matrix"),
-	  function(a, b, ...) .Call(dgCMatrix_matrix_solve, a, b),
-	  valueClass = "dgeMatrix")
+## MM: see solveSparse() in  ~/R/MM/Pkg-ex/Matrix/Doran-A.R
+.solve.sparse.dgC <- function(a, b) {
+    lu.a <- lu(a)
+    ## per default:  b = Identity = Diagonal(nrow(a)), however more efficiently
+    b.miss <- missing(b)
+    b.isMat <- b.miss || !is.null(dim(b))
+    if(b.miss) b <- .sparseDiagonal(dim(a)[1L])
+    ## bp := P %*% b
+    bp <- if(b.isMat) b[lu.a@p+1L, ] else b[lu.a@p+1L]
+    ## R:= U^{-1} L^{-1} P b
+    R <- solve(lu.a@U, solve(lu.a@L, bp))
+    ## result = Q'R = Q' U^{-1} L^{-1} P  b  = A^{-1} b,  as  A = P'LUQ
+    R[, invPerm(lu.a@q, zero.p=TRUE)]
+}
 
-setMethod("solve", signature(a = "dgCMatrix", b = "ddenseMatrix"),
-	  function(a, b, ...) .Call(dgCMatrix_matrix_solve, a, b),
-	  valueClass = "dgeMatrix")
+## FIXME: workaround, till  .Call(dgCMatrix_matrix_solve, a, b, sparse=TRUE)  works:
+.solve.dgC <- function(a, b, sparse)
+    if(sparse) .solve.sparse.dgC(a, b) else .Call(dgCMatrix_matrix_solve, a, b, FALSE)
+
+.solve.dgC.mat <- function(a, b, sparse=FALSE, ...) {
+    chk.s(...)
+    if(sparse) .solve.sparse.dgC(a, b) else .Call(dgCMatrix_matrix_solve, a, b, FALSE)
+}
+
+setMethod("solve", signature(a = "dgCMatrix", b = "matrix"), .solve.dgC.mat)
+
+setMethod("solve", signature(a = "dgCMatrix", b = "ddenseMatrix"), .solve.dgC.mat)
 
 setMethod("solve", signature(a = "dgCMatrix", b = "dsparseMatrix"),
-	  function(a, b, ...) {
+	  function(a, b, sparse=FALSE, ...) { ## TODO: or rather TRUE [not back compatible] ??
+	      chk.s(...)
 	      if(isSymmetric(a)) # TODO: fast cholmod_symmetric() for Cholesky
 		  solve(forceCspSymmetric(a, isTri=FALSE), b) #-> sparse result
-	      else .Call(dgCMatrix_matrix_solve, a, as(b, "denseMatrix"))
+	      else ## FIXME: be better when sparse=TRUE (?)
+		  .solve.dgC(a, as(b, "denseMatrix"), sparse)
 	  })
 
 ## This is a really dumb method but some people apparently want it
 ## (MM: a bit less dumb now with possibility of staying sparse)
 setMethod("solve", signature(a = "dgCMatrix", b = "missing"),
-	  function(a, b, ...) {
+	  function(a, b, sparse=FALSE, ...) { ## TODO: or rather TRUE [not back compatible] ??
+	      chk.s(...)
 	      if(isSymmetric(a)) # TODO: fast cholmod_symmetric() for Cholesky
 		  solve(forceCspSymmetric(a, isTri=FALSE),
 			b = Diagonal(nrow(a))) #-> sparse result
-	      else .Call(dgCMatrix_matrix_solve, a, b = diag(nrow(a)))
+	      else ## FIXME: be better when sparse=TRUE (?)
+		  ## .solve.dgC(a, b=diag(nrow(a)), sparse)
+		  if(sparse) .solve.sparse.dgC(a) # -> "smart" diagonal b
+	      else .Call(dgCMatrix_matrix_solve, a, b=diag(nrow(a)), FALSE)
 	  })
 

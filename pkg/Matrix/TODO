@@ -2,7 +2,8 @@
 
 * *Urgent* in some sense ------------------------------------------------------
 ** TODO src/CHOLMOD/MatrixOps/cholmod_symmetry.c  is "cool" and fast;
-Definitely should use it for solve(<dgCMatrix>)  {it seems MATLAB does}.
+Definitely should use it for solve(<dgCMatrix>)  {it seems MATLAB does};
+alternatively also is_sym() [in src/cs_utils.c], see below.
 ** diagonalMatrix inherits from sparseMatrix, *BUT*
 "ddiMatrix" does not inherit from "dsparseMatrix", nor does
 "ldiMatrix" from "lparseMatrix".   Seems an undesirable inconsistency
@@ -11,6 +12,8 @@ Definitely should use it for solve(<dgCMatrix>)  {it seems MATLAB does}.
 ** BunchKaufman()'s result is not really useful yet {but it is used on C
  level e.g. for solve(<dsyMatrix>).   Should define  expand() method or
  similar, see man/BunchKaufman-methods.Rd and R/dsyMatrix.R (at end).
+** src/cs_utils.c : I think is_sym() [only used in Matrix_cs_to_SEXP()] can be made sped up:
+leave the for loops, as soon as is_lower == is_upper == 0.
 
 
 * New smallish ideas, relatively urgent for MM --------------------------------

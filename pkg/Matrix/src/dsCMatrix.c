@@ -166,6 +166,7 @@ SEXP dsCMatrix_LDL_D(SEXP Ap, SEXP permP, SEXP resultKind)
     return(ans);
 }
 
+// using cholmod_spsolve() --> sparse result
 SEXP dsCMatrix_Csparse_solve(SEXP a, SEXP b)
 {
     CHM_FR L = internal_chm_factor(a, /*perm*/-1, /*LDL*/-1, /*super*/-1, /*Imult*/0.);
@@ -183,6 +184,7 @@ SEXP dsCMatrix_Csparse_solve(SEXP a, SEXP b)
 			      /*dimnames = */ R_NilValue);
 }
 
+// using cholmod_solve() --> dense result
 SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b)
 {
     CHM_FR L = internal_chm_factor(a, -1, -1, -1, 0.);

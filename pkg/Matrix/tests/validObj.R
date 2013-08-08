@@ -117,7 +117,9 @@ ip <- c(1:2, 4:3, 6:5) # permute the 'i' and 'x' slot just "inside column":
 m.@i <- m.i <- mm@i[ip]
 m.@x <- m.x <- mm@x[ip]
 stopifnot(grep("row indices are not", validObject(m., test=TRUE)) == 1)
-##
+Matrix:::.sortCsparse(m.) # don't use this at home, boys!
+m. # now is fixed
+
 ## Make sure that validObject() objects...
 ## 1) to wrong 'p'
 m. <- mm; m.@p[1] <- 1L
