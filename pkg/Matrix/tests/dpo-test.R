@@ -7,12 +7,12 @@ stopifnot(c(0,0) == dim(Hilbert(0)),
           c(9,9) == dim(h9))
 str(h9)
 all.equal(c(determinant(h9)$modulus), -96.7369456, tol= 2e-8)
-stopifnot(0 == length(h9@factors))# nothing yet
-round(ch9 <- chol(h9), 3) ## round() preserves 'triangular' !
-str(f9 <- as(ch9, "dtrMatrix"))
-## h9 now has factorization
+## determinant() now working via chol(): ==> h9 now has factorization
 stopifnot(names(h9@factors) == "Cholesky",
-          all.equal(rcond(h9), 9.0938e-13),
+          identical(ch9 <- chol(h9), h9@factors$Cholesky))
+round(ch9, 3) ## round() preserves 'triangular' !
+str(f9 <- as(ch9, "dtrMatrix"))
+stopifnot(all.equal(rcond(h9), 9.0938e-13),
           all.equal(rcond(f9), 9.1272e-7, tol = 1e-6))# more precision fails
 str(h9)# has 'factors $ Cholesky'
 options(digits=4)
@@ -111,6 +111,7 @@ showProc.time()
 set.seed(27)
 m9 <- h9 + rnorm(9^2)/1000 ; m9 <- (m9 + t(m9))/2
 nm9 <- nearPD(m9)
+showProc.time()
 
 nRep <- if(doExtras) 50 else 4
 CPU <- 0
