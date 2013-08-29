@@ -136,6 +136,11 @@ set.seed(12) # so we know '10' is in sample
 (mm <- matrix(1:10, nrow=10, ncol=3))
 s10 \%*\% mm
 
+set.seed(27)
+IM1 <- as(sample(1:20, 100, replace=TRUE), "indMatrix")
+IM2 <- as(sample(1:18, 100, replace=TRUE), "indMatrix")
+(c12 <- crossprod(IM1,IM2))
+%% with a warning __FIXME {the logic is cannot be ok}
 
 ## not valid: the index vector must contain each value from 1:n at least once
 try( I2 <- as(sample(c(1:5,8), 20, replace=TRUE), "indMatrix") )

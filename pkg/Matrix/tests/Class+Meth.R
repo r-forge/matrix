@@ -4,13 +4,21 @@ source(system.file("test-tools.R", package = "Matrix"))# identical3(),
 if(interactive()) options(error = recover)
 cat("doExtras:",doExtras,"\n")
 
+no.Mcl <- function(cl) ## TRUE if MatrixClass() returns empty, i
+    identical(Matrix:::MatrixClass(cl), character(0))
+
 setClass("myDGC", contains = "dgCMatrix")
 M <- new("myDGC", as(Matrix(c(-2:4, rep(0,9)), 4), "CsparseMatrix"))
 M
 stopifnot(M[-4,2] == 2:4,
-	  Matrix:::MatrixClass("myDGC") == "dgCMatrix",
-	  Matrix:::MatrixClass("Cholesky") == "dtrMatrix",
-	  Matrix:::MatrixClass("pCholesky") == "dtpMatrix")
+	  Matrix:::MatrixClass("myDGC"    ) == "dgCMatrix",
+	  Matrix:::MatrixClass("Cholesky" ) == "dtrMatrix",
+	  Matrix:::MatrixClass("pCholesky") == "dtpMatrix",
+	  Matrix:::MatrixClass("corMatrix") == "dpoMatrix",
+	  no.Mcl("pMatrix"),
+	  no.Mcl("indMatrix"))
+
+
 
 setClass("posDef", contains = "dspMatrix")
 N <- as(as(crossprod(M) + Diagonal(4), "denseMatrix"),"dspMatrix")
@@ -132,7 +140,7 @@ Mat.MatFact <- c("Cholesky", "pCholesky",
 ##FIXME maybe move to ../../MatrixModels/tests/ :
 ## (modmat.classes <- .subclasses("modelMatrix"))
 no.t.etc <- c(.R.classes, dR.classes, Mat.MatFact)#, modmat.classes)
-no.t.classes <- c(no.t.etc)     # no t() available (FIXME: t() changes class for "indMat", test fails)
+no.t.classes <- c(no.t.etc)     # no t() available
 no.norm.classes <- no.t.classes
 not.Ops      <- NULL            # "Ops", e.g. "+" fails
 not.coerce1  <- no.t.etc        # not coercable from "dgeMatrix"
@@ -157,8 +165,9 @@ tstMatrixClass <-
     ## Compute a few things only once :
     mM <- as(mM, "dgeMatrix")
     trm <- mm; trm[lower.tri(mm)] <- 0
-    summList <- lapply(getGroupMembers("Summary"), get,
-                       envir = asNamespace("Matrix"))
+    ## not yet used:
+    ## summList <- lapply(getGroupMembers("Summary"), get,
+    ##                    envir = asNamespace("Matrix"))
     if(recursive)
         cList <- character(0)
 
@@ -222,9 +231,9 @@ tstMatrixClass <-
 		cat("canCoerce() ")
 		m0 <- {
 		    if(triC) trm
-		    else if(is_p){
-                mm == 1     # logical *and* "true" permutation    
-		    } else mm
+		    else if(is_p)
+			mm == 1     # logical *and* "true" permutation
+		    else mm
 		}
 		if(extends(clD, "lMatrix") ||
 		   extends(clD, "nMatrix"))
@@ -337,6 +346,8 @@ tstMatrixClass <-
     for(scl in getClass(cl)@subclasses)
         dotestMat(scl, offset + 1)
 }
+## in case we want to make progress:
+codetools::checkUsage(tstMatrixClass, all=TRUE)
 
 tstMatrixClass("Matrix")
 if(FALSE)## or just a sub class
