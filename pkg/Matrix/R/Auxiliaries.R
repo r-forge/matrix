@@ -510,7 +510,7 @@ nnzSparse <- function(x, cl = class(x), cld = getClassDef(cl))
 	length(x@i)
     else if(extends(cld, "RsparseMatrix"))
 	length(x@j)
-    else if(extends(cld, "pMatrix"))	# is "sparse" too
+    else if(extends(cld, "indMatrix"))	# is "sparse" too
 	x@Dim[1]
     else stop(gettext("'x' must be \"sparseMatrix\""), domain=NA)
 }
@@ -524,7 +524,7 @@ non0.i <- function(M, cM = class(M), uniqT=TRUE) {
 	if(uniqT && is_not_uniqT(M))
 	    .Call(compressed_non_0_ij, as(M,"CsparseMatrix"), TRUE)
 	else cbind(M@i, M@j)
-    } else if(extends(cM, "pMatrix")) {
+    } else if(extends(cM, "indMatrix")) {
 	cbind(seq_len(nrow(M)), M@perm) - 1L
     } else { ## C* or R*
 	.Call(compressed_non_0_ij, M, extends(cM, "CsparseMatrix"))
@@ -841,7 +841,7 @@ l2d_meth <- function(x) {
     else if(extends(clx, "dMatrix")) "d"
     else if(extends(clx, "nMatrix")) "n"
     else if(extends(clx, "lMatrix")) "l"
-    else if(extends(clx, "pMatrix")) "n" # permutation -> pattern
+    else if(extends(clx, "indMatrix")) "n" # permutation -> pattern
     else if(extends(clx, "zMatrix")) "z"
     else if(extends(clx, "iMatrix")) "i"
     else stop(gettextf(" not yet implemented for %s", clx@className),
@@ -899,7 +899,7 @@ class2 <- function(cl, kind = "l", do.sub = TRUE) {
 geClass <- function(x) {
     if     (is(x, "dMatrix")) "dgeMatrix"
     else if(is(x, "lMatrix")) "lgeMatrix"
-    else if(is(x, "nMatrix") || is(x, "pMatrix")) "ngeMatrix"
+    else if(is(x, "nMatrix") || is(x, "indMatrix")) "ngeMatrix"
     else if(is(x, "zMatrix")) "zgeMatrix"
     else stop(gettextf("general Matrix class not yet implemented for %s",
 		       dQuote(class(x))), domain = NA)

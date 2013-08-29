@@ -345,7 +345,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
     isSparse <- extends(cld, "sparseMatrix") # also true for diagonalMatrix !
     isSym    <- extends(cld, "symmetricMatrix")
     isDiag   <- extends(cld, "diagonalMatrix")
-    isPerm   <- extends(cld, "pMatrix")
+    isPerm   <- extends(cld, "indMatrix")
     isTri <- !isSym && !isDiag && !isPerm && extends(cld, "triangularMatrix")
     is.n     <- extends(cld, "nMatrix")
     nonMatr  <- clNam != Matrix:::MatrixClass(clNam, cld)
@@ -384,13 +384,15 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	if(isSym) ## check that t() swaps 'uplo'  L <--> U :
 	    stopifnot(c("L","U") == sort(c(m@uplo, tm@uplo)))
 	ttm <- t(tm)
-	if(extends(cld, "CsparseMatrix") ||
-	   extends(cld, "generalMatrix") || isDiag)
+	if((clNam!="indMatrix") && (extends(cld, "CsparseMatrix") ||
+	   extends(cld, "generalMatrix") || isDiag))
             stopifnot(Qidentical(m, ttm, strictClass = !nonMatr))
-	else if(do.matrix)
-	    stopifnot(nonMatr || class(ttm) == clNam,
-                      all(m == ttm | ina))
-        ## else : not testing
+	else if(do.matrix){
+	    if((clNam!="indMatrix")) stopifnot(nonMatr || class(ttm) == clNam)
+	    stopifnot(all(m == ttm | ina))
+	    ## else : not testing
+	}
+	    
 
 	## crossprod()	%*%  etc
 	if(do.prod) {

@@ -383,7 +383,7 @@ formatSparseM <- function(x, zero.print = ".", align = c("fancy", "right"),
 {
     cld <- getClassDef(class(x))
     if(is.null(asLogical)) {
-        binary <- extends(cld,"nsparseMatrix") || extends(cld, "pMatrix")# -> simple T / F
+        binary <- extends(cld,"nsparseMatrix") || extends(cld, "indMatrix")# -> simple T / F
         asLogical <- { binary || extends(cld,"lsparseMatrix") ||
                        extends(cld,"matrix") && is.logical(x) }
 					# has NA and (non-)structural FALSE
@@ -483,7 +483,7 @@ formatSpMatrix <- function(x, digits = NULL, # getOption("digits"),
         m <- as(x, "matrix")
     }
     dn <- dimnames(m) ## will be === dimnames(cx)
-    binary <- extends(cld,"nsparseMatrix") || extends(cld, "pMatrix") # -> simple T / F
+    binary <- extends(cld,"nsparseMatrix") || extends(cld, "indMatrix") # -> simple T / F
     logi <- binary || extends(cld,"lsparseMatrix") # has NA and (non-)structural FALSE
     cx <- .formatSparseSimple(m, asLogical = logi, digits=digits,
                               col.names=col.names,

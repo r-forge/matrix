@@ -132,7 +132,7 @@ Mat.MatFact <- c("Cholesky", "pCholesky",
 ##FIXME maybe move to ../../MatrixModels/tests/ :
 ## (modmat.classes <- .subclasses("modelMatrix"))
 no.t.etc <- c(.R.classes, dR.classes, Mat.MatFact)#, modmat.classes)
-no.t.classes <- c(no.t.etc)     # no t() available
+no.t.classes <- c(no.t.etc)     # no t() available (FIXME: t() changes class for "indMat", test fails)
 no.norm.classes <- no.t.classes
 not.Ops      <- NULL            # "Ops", e.g. "+" fails
 not.coerce1  <- no.t.etc        # not coercable from "dgeMatrix"
@@ -216,15 +216,15 @@ tstMatrixClass <-
 		cat("; as(matrix(,0,0), <.>): ")
 		stopifnot(Qidentical(m, as(m0, clNam))); cat("ok; ")
 	    }
-            is_p <- extends(clD, "pMatrix")
+            is_p <- extends(clD, "indMatrix")
             is_cor <- extends(clD, "corMatrix") # has diagonal divided out
 	    if(canCoerce(mm, clNam)) { ## replace 'm' by `non-empty' version
 		cat("canCoerce() ")
 		m0 <- {
 		    if(triC) trm
-		    else if(is_p)
-			mm == 1     # logical *and* "true" permutation
-		    else mm
+		    else if(is_p){
+                mm == 1     # logical *and* "true" permutation    
+		    } else mm
 		}
 		if(extends(clD, "lMatrix") ||
 		   extends(clD, "nMatrix"))
