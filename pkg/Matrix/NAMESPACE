@@ -171,7 +171,8 @@ exportClasses(
 	      "ntRMatrix",
 	      "ntTMatrix",
 
-	      "pMatrix",
+	      "indMatrix",
+          "pMatrix",
 
 	      "corMatrix", # unused
 

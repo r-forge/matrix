@@ -1,7 +1,7 @@
 #### All  %*%, crossprod() and tcrossprod() methods of the Matrix package
 #### ^^^  ----------------------------------------------------------
 ###  Exceptions: ./diagMatrix.R
-###		 ./pMatrix.R
+###		 ./indMatrix.R ./pMatrix.R
 
 ## For %*% (M = Matrix; v = vector (double or integer {complex maybe?}):
 .M.v <- function(x, y) { dim(y) <- c(length(y), 1L); callGeneric(x, y) }

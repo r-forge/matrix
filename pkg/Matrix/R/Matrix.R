@@ -506,7 +506,7 @@ Summary.np <- function(x, ..., na.rm) {
 ##
 setMethod("Summary", signature(x = "lMatrix", na.rm = "ANY"), Summary.l)
 setMethod("Summary", signature(x = "nMatrix", na.rm = "ANY"), Summary.np)
-setMethod("Summary", signature(x = "pMatrix", na.rm = "ANY"), Summary.np)
+setMethod("Summary", signature(x = "indMatrix", na.rm = "ANY"), Summary.np)
 
 ## NOTE:  "&" and "|"  are now in group "Logic" c "Ops" --> ./Ops.R
 ##        "!" is in ./not.R

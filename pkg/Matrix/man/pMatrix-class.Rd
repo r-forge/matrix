@@ -65,8 +65,7 @@
   }
 }
 \section{Extends}{
-  Class \code{"\linkS4class{sparseMatrix}"} and
-  \code{"\linkS4class{generalMatrix}"}, directly.
+  Class \code{"\linkS4class{indMatrix}"}, directly.
 }
 \section{Methods}{
   \describe{
@@ -95,7 +94,7 @@
     \item{solve}{\code{signature(a = "pMatrix", b = "missing")}: return
       the inverse permutation matrix.}
     \item{t}{\code{signature(x = "pMatrix")}: return the transpose of
-      the permuation matrix (which is also the inverse of the
+      the permutation matrix (which is also the inverse of the
       permutation matrix).}
   }
 }
@@ -114,7 +113,7 @@
     \eqn{MP }\tab= \tab\code{M \%*\% P}					    \tab= \tab\code{M[, i(p)]}\cr
     \eqn{PM }\tab= \tab\code{P \%*\% M}					    \tab= \tab\code{M[ p , ]} \cr
     \eqn{P'M}\tab= \tab\code{crossprod(P,M)} (\eqn{\approx}{~=}\code{t(P) \%*\% M})\tab= \tab\code{M[i(p), ]}\cr
-    \eqn{MP'}\tab= \tab\code{trossprod(M,P)} (\eqn{\approx}{~=}\code{M \%*\% t(P)})\tab= \tab\code{M[ , p ]} \cr
+    \eqn{MP'}\tab= \tab\code{tcrossprod(M,P)} (\eqn{\approx}{~=}\code{M \%*\% t(P)})\tab= \tab\code{M[ , p ]} \cr
   }
   where \code{p} is the \dQuote{permutation vector} corresponding to the
   permutation matrix \code{P} (see first note), and \code{i(p)} is short
