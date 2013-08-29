@@ -47,8 +47,8 @@
 \alias{[<-,sparseMatrix,missing,ANY,sparseMatrix-method}
 \alias{[<-,sparseMatrix,missing,missing,ANY-method}
 % -> ../R/indMatrix.R : -- these give errors
-\alias{[<-,indMatrix,perm,ANY,ANY-method}
-\alias{[<-,indMatrix,missing,perm,ANY-method}
+\alias{[<-,indMatrix,index,ANY,ANY-method}
+\alias{[<-,indMatrix,missing,index,ANY-method}
 \alias{[<-,indMatrix,missing,missing,ANY-method}
 % -> ../R/Tsparse.R : replValue = { numeric, logical }
 \alias{[<-,TsparseMatrix,index,index,replValue-method}

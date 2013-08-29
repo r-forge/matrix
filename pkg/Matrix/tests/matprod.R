@@ -432,4 +432,30 @@ stopifnot(isValid(tm1, "dsCMatrix"),
 		    crossprod(mm, P)),
 	  TRUE)
 
+d <- function(m) as(m,"dsparseMatrix")
+IM1 <- as(c(3,1,2), "indMatrix")
+IM2 <- as(c(1,2,1), "indMatrix")
+assert.EQ.Mat(crossprod(  IM1,   IM2),
+              crossprod(d(IM1),d(IM2)), tol=0)# failed at first
+
+set.seed(123)
+for(n in 1:250) {
+    n1 <- 2 + rpois(1, 10)
+    n2 <- 2 + rpois(1, 10)
+    N <- rpois(1, 25)
+    ii <- seq_len(N + min(n1,n2))
+    IM1 <- as(c(sample(n1), sample(n1, N, replace=TRUE))[ii], "indMatrix")
+    IM2 <- as(c(sample(n2), sample(n2, N, replace=TRUE))[ii], "indMatrix")
+    ## stopifnot(identical(crossprod(    IM1,      IM2 ),
+    ##                     crossprod(d(IM1), d(IM2))))
+    if(!identical(C1 <- crossprod(  IM1,    IM2 ),
+                  CC <- crossprod(d(IM1), d(IM2))) &&
+       !all(C1 == CC)) {
+        cat("The two crossprod()s differ: C1 - CC =\n")
+        print(C1 - CC)
+        stop("The two crossprod()s differ!")
+    } else if(n %% 25 == 0) cat(n, " ")
+}; cat("\n")
+
+
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''

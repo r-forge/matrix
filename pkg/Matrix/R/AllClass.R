@@ -541,19 +541,19 @@ setClass("isRMatrix",
 ##-------------------- index and permutation matrices--------------------------
 
 setClass("indMatrix", representation(perm = "integer"),
-         contains = c("sparseMatrix", "generalMatrix"),
-         validity = function(object) {
-             n <-  object@Dim[1] 
-             d <-  object@Dim[2] 
-             if (n < d) return("indMatrix must be skinny")
-             perm <- object@perm
-             if (length(perm) != n)
-                 return(paste("length of 'perm' slot must be", n))
-             if(n > 0 &&
-                    any(sort(unique(perm)) != 1:d))
-                 return("'perm' slot is not a valid index")
-             TRUE
-         })
+	 contains = c("sparseMatrix", "generalMatrix"),
+	 validity = function(object) {
+	     n <-  object@Dim[1]
+	     d <-  object@Dim[2]
+	     if (n < d) return("indMatrix must be skinny, i.e., nrow(.) >= ncol(.)")
+	     perm <- object@perm
+	     if (length(perm) != n)
+		 return(paste("length of 'perm' slot must be", n))
+	     if(n > 0 &&
+		    any(sort(unique(perm)) != 1:d))
+		 return("'perm' slot is not a valid index")
+	     TRUE
+	 })
 
 setClass("pMatrix", representation(perm = "integer"),
 	 contains = c("indMatrix"),

@@ -3,9 +3,8 @@
 ## The typical   'constructor' : coerce from  'index'
 setAs("integer", "pMatrix",
       function(from) {
-          n <- length(from)
           nn <- names(from)
-          new("pMatrix", Dim = rep.int(n, 2), Dimnames = list(nn,nn),
+          new("pMatrix", Dim = rep.int(length(from), 2L), Dimnames = list(nn,nn),
               perm = from)
       })
 
@@ -62,11 +61,11 @@ setMethod("solve", signature(a = "Matrix", b = "pMatrix"),
 
 
 setMethod("determinant", signature(x = "pMatrix", logarithm = "logical"),
-          function(x, logarithm, ...){
-              if(any(x@Dim == 0)) return(mkDet(numeric(0))) 
-              mkDet(logarithm=logarithm, ldet = 0, sig = signPerm(x@perm)) 
-          })
-	     
+	  function(x, logarithm, ...) {
+	      if(any(x@Dim == 0)) mkDet(numeric(0))
+	      else mkDet(logarithm=logarithm, ldet = 0, sig = signPerm(x@perm))
+	  })
+
 
 ## t(pM) is == the inverse  pM^(-1):
 setMethod("t", signature(x = "pMatrix"), function(x) solve(x))

@@ -102,7 +102,8 @@ MatrixClass <- function(cl, cld = getClassDef(cl),
     ## ----------------------------------------------------------------------
     ## Arguments: cl: string, class name
     ##		 cld: its class definition
-    ##	   ...Matrix: if TRUE, the result must be of pattern "...Matrix"
+    ##	   ...Matrix: if TRUE, the result must be of pattern "[dlniz]..Matrix"
+    ##                where the first letter "[dlniz]" denotes the content kind.
     ##	      ..... : other arguments are passed to .selectSuperClasses()
     ## ----------------------------------------------------------------------
     ## Author: Martin Maechler, Date: 24 Mar 2009
@@ -114,7 +115,7 @@ MatrixClass <- function(cl, cld = getClassDef(cl),
 	## else we use 'pkg'
     }
     if(identical(pkg, "Matrix") &&
-       (!...Matrix || identical(1L, grep("^...Matrix$", cl))))
+       (!...Matrix || (cl != "indMatrix" && identical(1L, grep("^[dlniz]..Matrix$", cl)))))
 	cl
     else { ## possibly recursively
 	r <- .selectSuperClasses(cld@contains, dropVirtual = dropVirtual,
@@ -810,7 +811,7 @@ l2d_meth <- function(x) {
 .M.kind <- function(x, clx = class(x)) {
     ## 'clx': class() *or* class definition of x
     if(is.matrix(x) || is.atomic(x)) { ## 'old style' matrix or vector
-	if     (is.numeric(x)) "d" ## also for 'integer' --> see .V.kind()
+	if     (is.numeric(x)) "d" ## also for integer: see .V.kind(), .M.kindC()
 	else if(is.logical(x)) "l" ## FIXME ? "n" if no NA ??
 	else if(is.complex(x)) "z"
 	else stop(gettextf("not yet implemented for matrix with typeof %s",
