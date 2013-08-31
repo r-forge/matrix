@@ -26,11 +26,7 @@
 %% Group methods
 \alias{Arith,dtCMatrix,dtCMatrix-method}
 %
-\alias{solve,dtCMatrix,matrix-method}
-\alias{solve,dtCMatrix,CsparseMatrix-method}
-\alias{solve,dtCMatrix,dgeMatrix-method}
-\alias{solve,dtCMatrix,missing-method}
-\alias{solve,dtCMatrix,numeric-method}
+%\alias{solve,dtCMatrix,...-method}%--> solve-methods.Rd
 \alias{t,dtCMatrix-method}
 \alias{t,dtTMatrix-method}
 \description{The \code{"dtCMatrix"} class is a class of triangular, sparse
@@ -81,13 +77,9 @@
     \item{coerce}{\code{signature(from = "dtTMatrix", to = "dgeMatrix")}}
     \item{coerce}{\code{signature(from = "dtTMatrix", to = "dtrMatrix")}}
     \item{coerce}{\code{signature(from = "dtTMatrix", to = "matrix")}}
-    \item{solve}{\code{signature(a = "dtCMatrix", b = "matrix")}}
-    \item{solve}{\code{signature(a = "dtCMatrix", b = "dgeMatrix")}}
-    \item{solve}{\code{signature(a = "dtCMatrix", b = "missing")}}
-    \item{solve}{\code{signature(a = "dtCMatrix", b = "numeric")}}
-    \item{solve}{\code{signature(a = "dtCMatrix", b = "CsparseMatrix")}:
-      fully sparse triangular solve, in traditional S/\R\ aka
-      \code{\link{backsolve}}.}
+    \item{solve}{\code{signature(a = "dtCMatrix", b = "....")}:
+      sparse triangular solve (aka \dQuote{backsolve} or
+      \dQuote{forwardsolve}), see \code{\link{solve-methods}}.}
     \item{t}{\code{signature(x = "dtCMatrix")}: returns the transpose of
       \code{x}}
     \item{t}{\code{signature(x = "dtTMatrix")}: returns the transpose of

@@ -48,15 +48,7 @@
 \alias{determinant,dppMatrix,logical-method}
 \alias{determinant,dpoMatrix,missing-method}
 \alias{determinant,dppMatrix,missing-method}
-\alias{solve,dpoMatrix,dgeMatrix-method}
-\alias{solve,dppMatrix,dgeMatrix-method}
-\alias{solve,dpoMatrix,matrix-method}
-\alias{solve,dppMatrix,matrix-method}
-\alias{solve,dpoMatrix,missing-method}
-\alias{solve,dppMatrix,missing-method}
-\alias{solve,dpoMatrix,numeric-method}
-\alias{solve,dppMatrix,numeric-method}
-\alias{solve,dppMatrix,integer-method}
+%\alias{solve,dpoMatrix,...-method}--> solve-methods.Rd
 \alias{t,dppMatrix-method}
 \description{
   The \code{"dpoMatrix"} class is the class of
@@ -108,13 +100,9 @@
       \code{x}.  The \code{norm} can be \code{"O"} for the
       one-norm (the default) or \code{"I"} for the infinity-norm.  For
       symmetric matrices the result does not depend on the norm.}
-    \item{solve}{\code{signature(a = "dpoMatrix", b = "missing")}:
-      Return the inverse of \code{a}.}
-    \item{solve}{\code{signature(a = "dpoMatrix", b = "numeric")}:
-      Solve the linear system defined by \code{a} and \code{b}, where
-      \code{b} can be a numeric vector, or a matrix, or a dgeMatrix
-      object.  The Cholesky decomposition of \code{a} is calculated (if
-      needed) while solving the system.}
+    \item{solve}{\code{signature(a = "dpoMatrix", b = "....")}}{, and}
+    \item{solve}{\code{signature(a = "dppMatrix", b = "....")}}{work
+      via the Cholesky composition, see also the Matrix \code{\link{solve-methods}}.}
     \item{Arith}{\code{signature(e1 = "dpoMatrix", e2 = "numeric")} (and
       quite a few other signatures): The result of (\dQuote{elementwise}
       defined) arithmetic operations is typically \emph{not}
