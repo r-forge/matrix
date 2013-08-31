@@ -4,12 +4,7 @@
 \alias{dsCMatrix-class}
 \alias{dsTMatrix-class}
 %
-\alias{solve,dsCMatrix,missing-method}
-\alias{solve,dsCMatrix,dsparseMatrix-method}
-\alias{solve,dsCMatrix,matrix-method}
-\alias{solve,dsCMatrix,numeric-method}
-\alias{solve,dsCMatrix,ddenseMatrix-method}
-\alias{solve,dsCMatrix,denseMatrix-method}
+%\alias{solve,dsCMatrix,...-method}--> solve-methods.Rd
 \alias{t,dsCMatrix-method}
 \alias{t,dsTMatrix-method}
 \alias{coerce,dgeMatrix,dsCMatrix-method}
@@ -84,13 +79,9 @@
 }
 \section{Methods}{
   \describe{
-    \item{solve}{\code{signature(a = "dsCMatrix", b = "dsparseMatrix")}: Solve
-      a linear system of equations defined by \code{x} using a Cholesky
-      decomposition.  All steps will be based on \emph{sparse}
-      representations.}
-    \item{solve}{\code{signature(a = "dsCMatrix", b = "matrix")}: Solve
-      a linear system of equations defined by \code{x} using a Cholesky
-      decomposition.}
+    \item{solve}{\code{signature(a = "dsCMatrix", b = "....")}: \code{x
+	<- solve(a,b)} solves \eqn{A x = b} for \eqn{x}; see
+      \code{\link{solve-methods}}.}
     \item{chol}{\code{signature(x = "dsCMatrix", pivot = "logical")}:
       Returns (and stores) the Cholesky decomposition of \code{x}, see
       \code{\link{chol}}.}

@@ -30,7 +30,7 @@ KhatriRao(X, Y = X, FUN = "*", make.dimnames = FALSE)
   \code{\link{kronecker}(X[,j], Y[,j])}.
 }
 \note{%% TODO? Could make it generic, and have dense and sparse methods
-  The current implementation is efficient fo large sparse matrices.
+  The current implementation is efficient for large sparse matrices.
 }
 \references{
   Khatri, C. G., and Rao, C. Radhakrishna (1968)

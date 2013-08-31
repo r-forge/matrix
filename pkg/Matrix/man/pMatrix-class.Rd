@@ -32,11 +32,7 @@
 \alias{coerce,nMatrix,pMatrix-method}
 \alias{determinant,pMatrix,logical-method}
 \alias{Summary,pMatrix-method}
-%
-\alias{solve,pMatrix,missing-method}
-\alias{solve,pMatrix,Matrix-method}
-\alias{solve,pMatrix,matrix-method}
-\alias{solve,Matrix,pMatrix-method}
+%\alias{solve,pMatrix,missing-method}--> solve-methods.Rd
 \alias{t,pMatrix-method}
 %
 \title{Permutation matrices}
@@ -92,7 +88,10 @@
       +1 or -1.  In fact, it is exactly the \emph{sign of the
 	permutation}.}
     \item{solve}{\code{signature(a = "pMatrix", b = "missing")}: return
-      the inverse permutation matrix.}
+      the inverse permutation matrix; note that \code{solve(P)} is
+      identical to \code{t(P)} for permutation matrices.  See
+      \code{\link{solve-methods}} for other methods.}
+
     \item{t}{\code{signature(x = "pMatrix")}: return the transpose of
       the permutation matrix (which is also the inverse of the
       permutation matrix).}
