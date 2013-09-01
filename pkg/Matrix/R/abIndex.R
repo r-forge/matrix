@@ -3,8 +3,6 @@
 ### Note: this partly builds on ideas and code from  Jens Oehlschlaegel,
 ### ----  as implemented (in the GPL'ed part of) package 'ff'.
 
-if(getRversion() < "3.1.0") dontCheck <- identity
-
 ## Basic idea:  a vector  x  of integer indices often has long stretches
 ##              i, i+1, i+2, ...  such that diff(x) has stretches of '1'.
 ## 		Now keep x[1] =: first and diff(x) =: d,
@@ -18,9 +16,8 @@ rleMaybe <- function(i, force = FALSE) {
         if(r <- isTRUE(all(is.na(i) | i. == i))) i <- i.
         r }
     ## if(int),  'i' will be coerced to integer on C level
-   .Call(dontCheck(if(int)
-		   Matrix_rle_i else Matrix_rle_d),
-	 i, force)
+    Matrix.rle <- if(int) Matrix_rle_i else Matrix_rle_d
+    .Call(Matrix.rle, i, force)
 }
 
 .rle <- function(lengths, values)
