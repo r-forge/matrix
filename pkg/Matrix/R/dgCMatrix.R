@@ -80,14 +80,9 @@ setMethod("lu", signature(x = "dgCMatrix"), LU.dgC)
 
 setMethod("lu", signature(x = "sparseMatrix"),
 	  function(x, ...)
-      {
-	  ## "FIXME": do in C, so can cache 'x@factors$LU'
-	  warning(gettextf(
-	      "lu(<%s>) cannot cache the LU decomposition; consider working with \"dgCMatrix\"",
-	      class(x)),
-		  call. = FALSE, domain=NA)
-	  lu(as(as(as(x, "CsparseMatrix"), "dsparseMatrix"), "dgCMatrix"), ...)
-})
+	  .set.factors(x, "lu",
+		       lu(as(as(as(x, "CsparseMatrix"), "dsparseMatrix"), "dgCMatrix"),
+			  ...)))
 
 
 ## MM: see solveSparse() in  ~/R/MM/Pkg-ex/Matrix/Doran-A.R

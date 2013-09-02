@@ -1,6 +1,7 @@
 \name{solve-methods}
 \title{Methods in Package Matrix for Function \code{solve()}}
 \docType{methods}
+\alias{solve}%- catch ?solve  too  (is important enough)
 \alias{solve-methods}
 \alias{solve,ANY,Matrix-method}
 \alias{solve,CHMfactor,ANY-method}
@@ -94,6 +95,10 @@
       system = c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt"), \dots)
 
 \S4method{solve}{dgCMatrix,matrix}(a, b, sparse = FALSE, tol = .Machine$double.eps, \dots)
+
+  solve(a, b, ...) ## *the* two-argument version, almost always preferred to
+# solve(a)         ## the *rarely* needed one-argument version
+% ^ must comment the above; otherwise 'R CMD check' waffles ...
 }
 \arguments{
   \item{a}{a square numeric matrix, \eqn{A}, typically of one of the
@@ -137,7 +142,6 @@
       If \code{b} is a \code{\linkS4class{sparseMatrix}}, \code{system}
       is used as above the corresponding sparse CHOLMOD algorithm is called.
     }
-
 
     \item{\code{signature(a = "ddenseMatrix", b = "....")}}{(for all
       \code{b}) work via \code{as(a, "dgeMatrix")}, using the its

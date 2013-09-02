@@ -4,8 +4,9 @@ source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 
 h9 <- Hilbert(9)
 stopifnot(c(0,0) == dim(Hilbert(0)),
-          c(9,9) == dim(h9))
-str(h9)
+          c(9,9) == dim(h9),
+	  identical(h9@factors, list()))
+str(h9)# no 'factors'
 all.equal(c(determinant(h9)$modulus), -96.7369456, tol= 2e-8)
 ## determinant() now working via chol(): ==> h9 now has factorization
 stopifnot(names(h9@factors) == "Cholesky",
@@ -14,7 +15,6 @@ round(ch9, 3) ## round() preserves 'triangular' !
 str(f9 <- as(ch9, "dtrMatrix"))
 stopifnot(all.equal(rcond(h9), 9.0938e-13),
           all.equal(rcond(f9), 9.1272e-7, tol = 1e-6))# more precision fails
-str(h9)# has 'factors $ Cholesky'
 options(digits=4)
 (cf9 <- crossprod(f9))# looks the same as  h9 :
 assert.EQ.mat(h9, as.matrix(cf9), tol=1e-15)
@@ -24,7 +24,8 @@ h9. <- round(h9, 2)# actually loses pos.def. "slightly"
 h9p  <- as(h9,  "dppMatrix")
 h9.p <- as(h9., "dppMatrix")
 ch9p <- chol(h9p)
-stopifnot(identical(ch9p, h9p@factors$pCholesky))
+stopifnot(identical(ch9p, h9p@factors$pCholesky),
+	  identical(names(h9p@factors), c("Cholesky", "pCholesky")))
 h4  <- h9.[1:4, 1:4] # this and the next
 h9.[1,1] <- 10       # had failed in 0.995-14
 h9p[1,1] <- 10

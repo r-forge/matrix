@@ -347,7 +347,7 @@ tstMatrixClass <-
         dotestMat(scl, offset + 1)
 }
 ## in case we want to make progress:
-codetools::checkUsage(tstMatrixClass, all=TRUE)
+## codetools::checkUsage(tstMatrixClass, all=TRUE)
 
 tstMatrixClass("Matrix")
 if(FALSE)## or just a sub class

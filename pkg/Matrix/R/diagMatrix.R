@@ -1173,7 +1173,8 @@ setMethod("show", signature(object = "diagonalMatrix"),
 	      }
 	  })
 
-rm(dense.subCl, diCls)# not used elsewhere
+rm(arg1, arg2, other, DI, cl, c1, c2,
+   dense.subCl, diCls)# not used elsewhere
 
 setMethod("summary", signature(object = "diagonalMatrix"),
 	  function(object, ...) {

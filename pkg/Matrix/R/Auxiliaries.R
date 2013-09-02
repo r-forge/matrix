@@ -151,11 +151,15 @@ attr.all_Mat <- function(target, current,
 
 
 ## chol() via "dpoMatrix"
+## This will only be called for *dense* matrices
 cholMat <- function(x, pivot = FALSE, ...) {
-    ## This will only be called for *dense* matrices
-    px <- as(x, if(length(x@x) < prod(dim(x))) ## packed
-	     "dppMatrix" else "dpoMatrix")
-    if (isTRUE(validObject(px, test=TRUE))) chol(px, pivot, ...)
+    packed <- length(x@x) < prod(dim(x)) ## is it packed?
+    nmCh <- if(packed) "pCholesky" else "Cholesky"
+    if(!is.null(ch <- x@factors[[nmCh]]))
+	return(ch) ## use the cache
+    px <- as(x, if(packed) "dppMatrix" else "dpoMatrix")
+    if (isTRUE(validObject(px, test=TRUE))) ## 'pivot' is not used for dpoMatrix
+	.set.factors(x, nmCh, chol(px, pivot, ...))
     else stop("'x' is not positive definite -- chol() undefined.")
 }
 
@@ -1262,6 +1266,7 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE)
 	.dgC.0.factors(x)
 }
 
+.set.factors <- function(x, name, value) .Call(R_set_factors, x, value, name)
 
 ### Fast, much simplified version of tapply()
 tapply1 <- function (X, INDEX, FUN = NULL, ..., simplify = TRUE) {

@@ -596,6 +596,7 @@ setMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY", drop = "ANY"),
 for(ii in c("lMatrix", "logical"))
     setMethod("[", signature(x = "Matrix", i = ii, j = "missing", drop = "missing"),
 	      .M.sub.i.logical)
+rm(ii)
 
 
 subset.ij <- function(x, ij) {

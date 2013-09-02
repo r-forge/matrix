@@ -920,6 +920,7 @@ for(cl in c("numeric", "logical")) # "complex", "raw" : basically "replValue"
       setMethod("Arith", signature(e1=cl, e2=Mcl),
 		function(e1, e2) callGeneric(e1, as(e2,"dMatrix")))
   }
+rm(cl, Mcl)
 
 ## FIXME: These are really too cheap: currently almost all go via dgC*() :
 ## setMethod("Compare", signature(e1="lgCMatrix", e2="lgCMatrix"),
