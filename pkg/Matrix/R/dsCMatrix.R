@@ -41,6 +41,20 @@ setAs("dsCMatrix", "dgCMatrix",
 setAs("dsCMatrix", "dsyMatrix",
       function(from) as(from, "denseMatrix"))
 
+##' Check if \code{name} (== "[sS][pP][dD]Cholesky") fits the values of the
+##' logicals (perm, LDL, super).
+##' @param name a string such as "sPdCholesky"
+##' @param perm also known as \code{pivot}
+##' @param LDL
+##' @param super
+##' @return logical: TRUE if the name matches
+.chkName.CHM <- function(name, perm, LDL, super)
+    .Call(R_chkName_Cholesky, name, perm, LDL, super)
+## ../src/dsCMatrix.c
+
+.CHM.factor.name <- function(perm, LDL, super)
+    .Call(R_chm_factor_name, perm, LDL, super)
+
 ## have rather tril() and triu() methods than
 ## setAs("dsCMatrix", "dtCMatrix", ....)
 setMethod("tril", "dsCMatrix",
@@ -96,7 +110,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "numeric"),
 	  solve.dsC.mat(a, .Call(dup_mMatrix_as_dgeMatrix, b)),
 	  valueClass = "dgeMatrix")
 
-## `` Fully-sparse'' solve() :
+## ``Fully-sparse'' solve() -- only used here; separate function for debugging etc
 solve.dsC.dC <- function(a,b, tol) {
     r <- tryCatch(.Call(dsCMatrix_Csparse_solve, a, b),
 		  error=function(e)NULL, warning=function(w)NULL)
@@ -120,7 +134,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "dsparseMatrix"),
 	  })
 
 setMethod("solve", signature(a = "dsCMatrix", b = "missing"),
-	  function(a, b, ...) solve(a, .trDiagonal(nrow(a), unitri=FALSE)))
+	  function(a, b, ...) solve(a, .trDiagonal(nrow(a), unitri=FALSE), ...))
 
 
 

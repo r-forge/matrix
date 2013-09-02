@@ -79,13 +79,13 @@ setMethod("%*%", signature(x = "matrix", y = "dtrMatrix"),
 
 
 setMethod("%*%", signature(x = "dtpMatrix", y = "ddenseMatrix"),
-	  function(x, y) .Call(dtpMatrix_matrix_mm, x, y))
+	  function(x, y) .Call(dtpMatrix_matrix_mm, x, y, FALSE, FALSE))
 setMethod("%*%", signature(x = "dgeMatrix", y = "dtpMatrix"),
 	  function(x, y) .Call(dgeMatrix_dtpMatrix_mm, x, y))
 
 ## dtpMatrix <-> matrix : will be used by the "numeric" one
 setMethod("%*%", signature(x = "dtpMatrix", y = "matrix"),
-          function(x, y) .Call(dtpMatrix_matrix_mm, x, y))
+          function(x, y) .Call(dtpMatrix_matrix_mm, x, y, FALSE, FALSE))
 setMethod("%*%", signature(x = "matrix", y = "dtpMatrix"),
           function(x, y) as(x, "dgeMatrix") %*% y)
 
@@ -115,7 +115,7 @@ for(c.x in c("lMatrix", "nMatrix")) {
     for(c.y in c("lMatrix", "nMatrix"))
     setMethod("%*%", signature(x = c.x, y = c.y),
 	      function(x, y) as(x, "dMatrix") %*% as(y, "dMatrix"))
-}
+}; rm(c.x, c.y)
 
 setMethod("%*%", signature(x = "CsparseMatrix", y = "CsparseMatrix"),
 	  function(x, y) .Call(Csparse_Csparse_prod, x, y))
@@ -235,7 +235,18 @@ setMethod("crossprod", signature(x = "dtrMatrix", y = "ddenseMatrix"),
 setMethod("crossprod", signature(x = "dtrMatrix", y = "matrix"),
 	  function(x, y) .Call(dtrMatrix_matrix_mm, x, y, FALSE, TRUE),
 	  valueClass = "dgeMatrix")
+## "dtpMatrix"
+if(FALSE) ## not yet in C
+setMethod("crossprod", signature(x = "dtpMatrix", y = "dtpMatrix"),
+	  function(x, y) .Call(dtpMatrix_dtpMatrix_mm, x, y, FALSE, TRUE))
 
+setMethod("crossprod", signature(x = "dtpMatrix", y = "ddenseMatrix"),
+	  function(x, y) .Call(dtpMatrix_matrix_mm, x, y, FALSE, TRUE),
+	  valueClass = "dgeMatrix")
+
+setMethod("crossprod", signature(x = "dtpMatrix", y = "matrix"),
+	  function(x, y) .Call(dtpMatrix_matrix_mm, x, y, FALSE, TRUE),
+	  valueClass = "dgeMatrix")
 
 
 
@@ -436,6 +447,15 @@ setMethod("tcrossprod", signature(x = "ddenseMatrix", y = "dtrMatrix"),
 
 setMethod("tcrossprod", signature(x = "matrix", y = "dtrMatrix"),
  	  function(x, y) .Call(dtrMatrix_matrix_mm, y, x, TRUE, TRUE))
+
+if(FALSE) { ## TODO in C
+setMethod("tcrossprod", signature(x = "ddenseMatrix", y = "dtpMatrix"),
+ 	  function(x, y) .Call(dtpMatrix_matrix_mm, y, x, TRUE, TRUE))
+
+setMethod("tcrossprod", signature(x = "matrix", y = "dtpMatrix"),
+ 	  function(x, y) .Call(dtpMatrix_matrix_mm, y, x, TRUE, TRUE))
+}
+
 
 
 

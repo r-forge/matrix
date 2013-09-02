@@ -144,6 +144,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dppMatrix_rcond, 2),
     CALLDEF(dppMatrix_solve, 1),
     CALLDEF(dppMatrix_validate, 1),
+    CALLDEF(R_chkName_Cholesky, 4),
+    CALLDEF(R_chm_factor_name, 3),
     CALLDEF(dsCMatrix_Cholesky, 5),
     CALLDEF(dsCMatrix_LDL_D, 3),
     CALLDEF(dsCMatrix_chol, 2),
@@ -189,7 +191,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(ltpMatrix_getDiag, 1),
     CALLDEF(dtpMatrix_setDiag, 2),
     CALLDEF(ltpMatrix_setDiag, 2),
-    CALLDEF(dtpMatrix_matrix_mm, 2),
+    CALLDEF(dtpMatrix_matrix_mm, 4),
     CALLDEF(dtpMatrix_matrix_solve, 2),
     CALLDEF(dtpMatrix_norm, 2),
     CALLDEF(dtpMatrix_rcond, 2),
@@ -255,6 +257,8 @@ static R_CallMethodDef CallEntries[] = {
 
     CALLDEF(Matrix_rle_i, 2),
     CALLDEF(Matrix_rle_d, 2),
+
+    CALLDEF(R_set_factors, 3),
 
     {NULL, NULL, 0}
 };

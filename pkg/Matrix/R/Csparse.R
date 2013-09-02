@@ -22,6 +22,7 @@ setAs("dsCMatrix", "dgCMatrix",
 for(prefix in c("d", "l", "n"))
     setAs(paste0(prefix,"sCMatrix"), "generalMatrix",
 	  function(from) .Call(Csparse_symmetric_to_general, from))
+rm(prefix)
 
 setAs("dtCMatrix", "dtTMatrix",
       function(from) .Call(Csparse_to_Tsparse, from, TRUE))
