@@ -13,13 +13,6 @@ setAs("numeric", "pMatrix",
 	  if(all(from == (i <- as.integer(from)))) as(i, "pMatrix")
 	  else stop("coercion to \"pMatrix\" only works from integer numeric"))
 
-setAs("pMatrix", "matrix",
-      function(from) {
-          fp <- from@perm
-          r <- ldiag(n = length(fp))[fp,]
-          if(.has.DN(from)) dimnames(r) <- from@Dimnames
-          r
-      })
 
 
 setAs("nMatrix", "pMatrix",
