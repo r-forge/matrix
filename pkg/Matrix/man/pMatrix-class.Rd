@@ -130,12 +130,9 @@
 }
   see also the \sQuote{Examples}.
 
-  Subsetting (\dQuote{indexing}, including, \code{\link{diag}})
-  \code{"pMatrix"} objects treats them as nonzero-pattern matrices, i.e.,
-  as \code{"\linkS4class{ngTMatrix}"} such that non-matrix subsetting
-  result in \code{\link{logical}} vectors.
-  Sub-assignment (\code{M[i,j] <- v}) is not sensible and hence an error
-  for these permutation matrices.
+  \dQuote{Row-indexing} a permutation matrix typically returns
+  an \code{"indMatrix"}.  See \code{"\linkS4class{indMatrix}"} for all other
+  subsetting/indexing and subassignment (\code{A[..] <- v}) operations.
 }
 \seealso{\code{\link{invPerm}(p)} computes the inverse permutation of an
   integer (index) vector \code{p}.
@@ -160,5 +157,8 @@ try(as(as.integer(c(3,3,1)), "pMatrix"))# Error: not a permutation
 
 as(pm1, "ngTMatrix")
 p10[1:7, 1:4] # gives an "ngTMatrix" (most economic!)
+
+## row-indexing of a <pMatrix> keeps it as an <indMatrix>:
+p10[1:3, ]
 }
 \keyword{classes}

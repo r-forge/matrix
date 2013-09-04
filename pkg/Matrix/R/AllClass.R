@@ -545,12 +545,10 @@ setClass("indMatrix", representation(perm = "integer"),
 	 validity = function(object) {
 	     n <-  object@Dim[1]
 	     d <-  object@Dim[2]
-	     if (n < d) return("indMatrix must be skinny, i.e., nrow(.) >= ncol(.)")
 	     perm <- object@perm
 	     if (length(perm) != n)
 		 return(paste("length of 'perm' slot must be", n))
-	     if(n > 0 &&
-		    any(sort(unique(perm)) != 1:d))
+	     if(n > 0 && (any(perm > d) | any(perm < 1)))
 		 return("'perm' slot is not a valid index")
 	     TRUE
 	 })

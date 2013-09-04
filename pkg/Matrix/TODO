@@ -21,11 +21,9 @@ alternatively also is_sym() [in src/cs_utils.c], see below.
 leave the for loops, as soon as is_lower == is_upper == 0.
 
 * New smallish ideas, relatively urgent for MM -----------------------------
-** TODO new "indMatrix" class from Fabian:
-  generalize it to allow 0 repetitions, of some samples, i.e., columns of
-  all 0 s.
-  It's mathematically more natural... --> typically will be useful somewhere.
-
+** DONE generalize new "indMatrix" class, to allow 0 repetitions
+ of some samples, i.e., columns of all 0 s. It's mathematically more
+ natural --> typically will be useful.
 ** TODO Investigate the "band changing (and getting) ideas  'band<-' etc,
   from Jeremy D Silver, per posts to R-devel on Aug.26,2011
   {MM: ~/R/MM/Pkg-ex/Matrix/bands-Jeremy_Silver-ex.R }

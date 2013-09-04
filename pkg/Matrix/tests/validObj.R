@@ -98,6 +98,8 @@ set.seed(3) ; (p9 <- as(sample(9), "pMatrix"))
 ind.try <- try(p9[1,1] <- 1, silent = TRUE)
 stopifnot(grep("replacing.*sensible", ind.try[1]) == 1,
 	  is.logical(p9[1,]),
+	  is(p9[2,, drop=FALSE], "indMatrix"),
+	  is(p9[9:1,], "indMatrix"),
 	  isTRUE(p9[-c(1:6, 8:9), 1]),
 	  identical(t(p9), solve(p9)),
 ##	  identical(p9[TRUE,], as(p9, "ngTMatrix")),

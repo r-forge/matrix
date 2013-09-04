@@ -97,10 +97,10 @@ setMethod("%*%", signature(x = "matrix", y = "dtpMatrix"),
 ## For multiplication operations, sparseMatrix overrides other method
 ## selections.	Coerce a ddensematrix argument to a lsparseMatrix.
 setMethod("%*%", signature(x = "lsparseMatrix", y = "ldenseMatrix"),
-	  function(x, y) x %*% as(y, "lsparseMatrix"))
+	  function(x, y) x %*% as(y, "sparseMatrix"))
 
 setMethod("%*%", signature(x = "ldenseMatrix", y = "lsparseMatrix"),
-	  function(x, y) as(x, "lsparseMatrix") %*% y)
+	  function(x, y) as(x, "sparseMatrix") %*% y)
 
 ## and coerce lsparse* to lgC*
 setMethod("%*%", signature(x = "lsparseMatrix", y = "lsparseMatrix"),
@@ -124,7 +124,7 @@ setMethod("%*%", signature(x = "CsparseMatrix", y = "ddenseMatrix"),
 	  function(x, y) .Call(Csparse_dense_prod, x, y))
 
 setMethod("%*%", signature(x = "CsparseMatrix", y = "matrix"),
-	  function(x, y) .Call(Csparse_dense_prod, x, y))
+	  function(x, y) x %*% Matrix(y))
 
 ## Not needed because of c("Matrix", "numeric") method
 ##setMethod("%*%", signature(x = "CsparseMatrix", y = "numeric"),
@@ -286,10 +286,10 @@ setMethod("crossprod", signature(x = "CsparseMatrix", y = "ddenseMatrix"),
 	  function(x, y = NULL) .Call(Csparse_dense_crossprod, x, y))
 
 setMethod("crossprod", signature(x = "CsparseMatrix", y = "matrix"),
-	  function(x, y = NULL) .Call(Csparse_dense_crossprod, x, y))
+	  function(x, y = NULL) crossprod(x, Matrix(y)))
 
 setMethod("crossprod", signature(x = "CsparseMatrix", y = "numeric"),
-	  function(x, y = NULL) .Call(Csparse_dense_crossprod, x, y))
+	  function(x, y = NULL) crossprod(x, Matrix(y)))
 
 setMethod("crossprod", signature(x = "TsparseMatrix", y = "missing"),
 	  function(x, y = NULL) {
@@ -337,20 +337,20 @@ setMethod("crossprod", signature(x = "dsparseMatrix", y = "dgeMatrix"),
 
 
 setMethod("crossprod", signature(x = "lsparseMatrix", y = "ldenseMatrix"),
-	  function(x, y = NULL) crossprod(x, as(y, "lsparseMatrix")))
+	  function(x, y = NULL) crossprod(x, as(y, "sparseMatrix")))
 
 setMethod("crossprod", signature(x = "ldenseMatrix", y = "lsparseMatrix"),
-	  function(x, y = NULL) crossprod(as(x, "lsparseMatrix"), y))
+	  function(x, y = NULL) crossprod(as(x, "sparseMatrix"), y))
 
 setMethod("crossprod", signature(x = "lsparseMatrix", y = "lsparseMatrix"),
 	  function(x, y = NULL)
 	  crossprod(as(x, "lgCMatrix"), as(y, "lgCMatrix")))
 
 setMethod("crossprod", signature(x = "nsparseMatrix", y = "ndenseMatrix"),
-	  function(x, y = NULL) crossprod(x, as(y, "nsparseMatrix")))
+	  function(x, y = NULL) crossprod(x, as(y, "sparseMatrix")))
 
 setMethod("crossprod", signature(x = "ndenseMatrix", y = "nsparseMatrix"),
-	  function(x, y = NULL) crossprod(as(x, "nsparseMatrix"), y))
+	  function(x, y = NULL) crossprod(as(x, "sparseMatrix"), y))
 
 setMethod("crossprod", signature(x = "nsparseMatrix", y = "nsparseMatrix"),
 	  function(x, y = NULL)
@@ -363,8 +363,8 @@ setMethod("crossprod", signature(x = "ddenseMatrix", y = "CsparseMatrix"),
 	  valueClass = "dgeMatrix")
 
 setMethod("crossprod", signature(x = "matrix", y = "CsparseMatrix"),
-	  function(x, y) t(.Call(Csparse_dense_crossprod, y, x)),
-	  valueClass = "dgeMatrix")
+	  function(x, y) crossprod(Matrix(x), y))
+
 
 ## "Matrix"
 cross.v.M <- function(x, y) { dim(x) <- c(length(x), 1L); crossprod(x, y) }
