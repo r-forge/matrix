@@ -12,6 +12,22 @@ setAs("numeric", "indMatrix",
 	  if(all(from == (i <- as.integer(from)))) as(i, "indMatrix")
       else stop("coercion to \"indMatrix\" only works from integer numeric"))
 
+## A constructor from a list giving the index ('perm') and the number of columns
+## (need this for cases in which the value(s) represented by the last
+## column(s) has no observations):
+.list2indMatrix <- function(from) {
+    if(length(from) == 2 &&
+       all(from[[1]] == (i <- as.integer(from[[1]]))) &&
+       from[[2]] == (d <- as.integer(from[[2]])) &&
+       length(d) == 1 && d >= max(i)) {
+	new("indMatrix", perm = i, Dim = c(length(i), d))
+    } else
+	stop("coercion from list(i1,...,ik, d) to \"indMatrix\" failed.
+ All entries must be integer valued and the number of columns, d, not smaller
+ than the maximal index i*.")
+}
+setAs("list", "indMatrix", .list2indMatrix)
+
 setAs("indMatrix", "matrix",
       function(from) {
 	  fp <- from@perm
@@ -22,22 +38,23 @@ setAs("indMatrix", "matrix",
 
 
 ## coerce to 0/1 sparse matrix, i.e. sparse pattern
-setAs("indMatrix", "ngTMatrix",
-      function(from) {
-	  d <- from@Dim
-	  new("ngTMatrix", i = seq_len(d[1]) - 1L, j = from@perm - 1L,
-	      Dim = d, Dimnames = from@Dimnames)
-      })
+.ind2ngT <- function(from) {
+    d <- from@Dim
+    new("ngTMatrix", i = seq_len(d[1]) - 1L, j = from@perm - 1L,
+        Dim = d, Dimnames = from@Dimnames)
+}
+setAs("indMatrix", "ngTMatrix", .ind2ngT)
 
-setAs("indMatrix", "TsparseMatrix", function(from) as(from, "ngTMatrix"))
-setAs("indMatrix", "nMatrix",	   function(from) as(from, "ngTMatrix"))
-setAs("indMatrix", "lMatrix", function(from) as(as(from, "nMatrix"), "lMatrix"))
-setAs("indMatrix", "dMatrix", function(from) as(as(from, "nMatrix"), "dMatrix"))
+setAs("indMatrix", "TsparseMatrix", .ind2ngT)
+setAs("indMatrix", "nMatrix", .ind2ngT)
+setAs("indMatrix", "lMatrix", function(from) as(.ind2ngT(from), "lMatrix"))
+setAs("indMatrix", "dMatrix", function(from) as(.ind2ngT(from), "dMatrix"))
 setAs("indMatrix", "dsparseMatrix", function(from) as(from, "dMatrix"))
-setAs("indMatrix", "nsparseMatrix", function(from) as(from, "nMatrix"))
+setAs("indMatrix", "lsparseMatrix", function(from) as(from, "lMatrix"))
+setAs("indMatrix", "nsparseMatrix", .ind2ngT)
 setAs("indMatrix", "CsparseMatrix",
-      function(from) as(as(from, "ngTMatrix"), "CsparseMatrix"))
-setAs("indMatrix", "ngeMatrix", function(from) as(as(from, "ngTMatrix"),"ngeMatrix"))
+      function(from) as(.ind2ngT(from), "CsparseMatrix"))
+setAs("indMatrix", "ngeMatrix", function(from) as(.ind2ngT(from),"ngeMatrix"))
 
 setAs("nMatrix", "indMatrix",
       function(from) {
@@ -60,7 +77,7 @@ setAs("nMatrix", "indMatrix",
 
 setAs("matrix", "indMatrix", function(from) as(as(from, "nMatrix"), "indMatrix"))
 
-setAs("indMatrix", "matrix", function(from) as(as(from, "nMatrix"), "matrix"))
+setAs("indMatrix", "matrix", function(from) as(.ind2ngT(from), "matrix"))
 
 setAs("sparseMatrix", "indMatrix", function(from)
     as(as(from, "nsparseMatrix"), "indMatrix"))
@@ -69,20 +86,14 @@ setMethod("is.na", signature(x = "indMatrix"), is.na_nsp)
 setMethod("is.infinite", signature(x = "indMatrix"), is.na_nsp)
 setMethod("is.finite", signature(x = "indMatrix"), allTrueMatrix)
 
-setMethod("t", signature(x = "indMatrix"), function(x) t(as(x, "ngTMatrix")))
+setMethod("t", signature(x = "indMatrix"), function(x) t(.ind2ngT(x)))
 
 
 
 setMethod("%*%", signature(x = "matrix", y = "indMatrix"),
-	  function(x, y) {
-	      mmultCheck(x,y)
-	      x %*% as(y, "CsparseMatrix")
-	  })
+	  function(x, y) x %*% as(y, "lMatrix"))
 setMethod("%*%", signature(x = "Matrix", y = "indMatrix"),
-	  function(x, y) {
-	      mmultCheck(x,y)
-	      x %*% as(y, "CsparseMatrix")
-	  })
+	  function(x, y) x %*% as(y, "lMatrix"))
 
 setMethod("%*%", signature(x = "indMatrix", y = "matrix"),
 	  function(x, y) { mmultCheck(x,y); y[x@perm ,] })
@@ -91,9 +102,9 @@ setMethod("%*%", signature(x = "indMatrix", y = "Matrix"),
 
 
 setMethod("crossprod", signature(x = "indMatrix", y = "matrix"),
-	  function(x, y) { mmultCheck(x,y, 2L); t(y %*% as(x, "CsparseMatrix"))})
+	  function(x, y) as(t(x), "lMatrix") %*% y)
 setMethod("crossprod", signature(x = "indMatrix", y = "Matrix"),
-	  function(x, y) { mmultCheck(x,y, 2L); t(y %*% as(x, "CsparseMatrix"))})
+	  function(x, y) as(t(x), "lMatrix") %*% y)
 setMethod("crossprod", signature(x = "indMatrix", y = "indMatrix"),
 	  function(x, y) {
 	      mmultCheck(x,y, 2L)
@@ -108,25 +119,39 @@ setMethod("tcrossprod", signature(x = "matrix", y = "indMatrix"),
 setMethod("tcrossprod", signature(x = "Matrix", y = "indMatrix"),
 	  function(x, y) { mmultCheck(x,y, 3L); x[, y@perm] })
 setMethod("tcrossprod", signature(x = "indMatrix", y = "indMatrix"),
-	  function(x, y) {
-	      mmultCheck(x,y, 3L)
-	      x[,y@perm]
-	  })
+	  function(x, y) { mmultCheck(x,y, 3L); x[, y@perm] })
 
 
 setMethod("crossprod", signature(x = "indMatrix", y = "missing"),
 	  function(x, y=NULL) Diagonal(x=as.numeric(table(x@perm))))
 setMethod("tcrossprod", signature(x = "indMatrix", y = "missing"),
-	  function(x, y=NULL) x[,x@perm] )
+	  function(x, y=NULL) x[,x@perm])
 
 
 setMethod("kronecker", signature(X = "indMatrix", Y = "indMatrix"),
 	  function (X, Y, FUN = "*", make.dimnames = FALSE, ...) {
 	      if (FUN != "*") stop("kronecker method must use default 'FUN'")
-	      perm <- as.integer(interaction(rep(X@perm, each=Y@Dim[1]),
-				   rep(Y@perm, times=X@Dim[1]), lex.order=TRUE))
+	      perm <- as.integer(interaction(rep(X@perm, each =Y@Dim[1]),
+					     rep(Y@perm, times=X@Dim[1]),
+					     lex.order=TRUE))
 	      new("indMatrix", perm=perm, Dim=X@Dim*Y@Dim)
 	  })
+
+
+setMethod("[", signature(x = "indMatrix", i = "index", j = "missing",
+			 drop = "logical"),
+	  function (x, i, j, ..., drop)
+      {
+	  n <- length(newperm <- x@perm[i])
+	  if(drop && n == 1) { ## -> logical unit vector
+	      newperm == seq_len(x@Dim[2])
+	  } else { ## stay matrix
+	      if(!is.null((DN <- x@Dimnames)[[1]])) DN[[1]] <- DN[[1]][i]
+	      new("indMatrix", perm = newperm,
+		  Dim = c(n, x@Dim[2]), Dimnames = DN)
+	  }
+      })
+
 
 
 .indMat.nosense <- function (x, i, j, ..., value)
@@ -136,3 +161,6 @@ setReplaceMethod("[", signature(x = "indMatrix", i = "missing", j = "index"),
 		 .indMat.nosense) ##   explicit	 ^^^^^^^^^^^^ for disambiguation
 setReplaceMethod("[", signature(x = "indMatrix", i = "missing", j = "missing"),
 		 .indMat.nosense)
+
+
+### rbind2() method: --> bind2.R

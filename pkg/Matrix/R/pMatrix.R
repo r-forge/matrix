@@ -1,5 +1,8 @@
 #### Permutation Matrices -- Coercion and Methods
 
+### NB "pMatrix" extends "indMatrix" and inherits methods -->  indMatrix.R
+
+
 ## The typical   'constructor' : coerce from  'index'
 setAs("integer", "pMatrix",
       function(from) {

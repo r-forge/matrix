@@ -377,7 +377,15 @@ stopifnot(identical( crossprod(sM), as(t(sM) %*% sM, "symmetricMatrix")),
 	  identical(tcrossprod(sM), forceSymmetric(sM %*% t(sM))))
 assert.EQ.mat( crossprod(sM),  crossprod(sm))
 assert.EQ.mat(tcrossprod(sM), as(tcrossprod(sm),"matrix"))
-
+dm <- as(sm, "denseMatrix")
+## the following 6 products (dm o sM) all failed up to 2013-09-03
+isValid(dm %*% sM,            "CsparseMatrix")## failed {missing coercion}
+isValid(crossprod (dm ,   sM),"CsparseMatrix")
+isValid(tcrossprod(dm ,   sM),"CsparseMatrix")
+dm[2,1] <- TRUE # no longer triangular
+isValid(           dm %*% sM, "CsparseMatrix")
+isValid(crossprod (dm ,   sM),"CsparseMatrix")
+isValid(tcrossprod(dm ,   sM),"CsparseMatrix")
 
 ## A sparse example - with *integer* matrix:
 M <- Matrix(cbind(c(1,0,-2,0,0,0,0,0,2.2,0),
@@ -427,7 +435,7 @@ stopifnot(isValid(tm1, "dsCMatrix"),
 	  identical(P %*% m, as.matrix(P) %*% m),
 	  all(P %*% mm	==  P %*% m),
 	  all(P %*% mm	-   P %*% m == 0),
-	  all(t(mm) %*% P	==  t(m) %*% P),
+	  all(t(mm) %*% P ==  t(m) %*% P),
 	  identical(crossprod(m, P),
 		    crossprod(mm, P)),
 	  TRUE)
@@ -446,7 +454,7 @@ for(n in 1:250) {
     ii <- seq_len(N + min(n1,n2))
     IM1 <- as(c(sample(n1), sample(n1, N, replace=TRUE))[ii], "indMatrix")
     IM2 <- as(c(sample(n2), sample(n2, N, replace=TRUE))[ii], "indMatrix")
-    ## stopifnot(identical(crossprod(    IM1,      IM2 ),
+    ## stopifnot(identical(crossprod(  IM1,    IM2),
     ##                     crossprod(d(IM1), d(IM2))))
     if(!identical(C1 <- crossprod(  IM1,    IM2 ),
                   CC <- crossprod(d(IM1), d(IM2))) &&

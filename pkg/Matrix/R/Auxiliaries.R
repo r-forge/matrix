@@ -387,6 +387,15 @@ emptyColnames <- function(x, msg.if.not.empty = FALSE)
     x
 }
 
+
+## The i-th unit vector  e[1:n] with e[j] = \delta_{i,j}
+## .E.i.log <- function(i,n)  i == (1:n)
+## .E.i <- function(i,n)
+##     r <- numeric(n)
+##     r[i] <- 1.
+##     r
+## }
+
 idiag <- function(n, p=n)
 {
     ## Purpose: diag() returning  *integer*
