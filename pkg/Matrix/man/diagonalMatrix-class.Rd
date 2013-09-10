@@ -300,6 +300,8 @@
   }
 }
 \seealso{
+  \code{\link{Diagonal}()} as constructor of these matrices, and
+  \code{\link{isDiagonal}}.
   \code{\linkS4class{ddiMatrix}} and \code{\linkS4class{ldiMatrix}} are
   \dQuote{actual} classes extending \code{"diagonalMatrix"}.
 }
