@@ -191,6 +191,10 @@ SEXP Csparse_to_matrix(SEXP x)
     return chm_dense_to_matrix(cholmod_sparse_to_dense(AS_CHM_SP__(x), &c),
 			       1 /*do_free*/, GET_SLOT(x, Matrix_DimNamesSym));
 }
+SEXP Csparse_to_vector(SEXP x)
+{
+    return chm_dense_to_vector(cholmod_sparse_to_dense(AS_CHM_SP__(x), &c), 1);
+}
 
 SEXP Csparse_to_Tsparse(SEXP x, SEXP tri)
 {

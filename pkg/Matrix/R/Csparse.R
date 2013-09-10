@@ -49,14 +49,26 @@ setAs("CsparseMatrix", "denseMatrix",
 setAs("dgCMatrix", "dgeMatrix",
       function(from) .Call(Csparse_to_dense, from))
 
+setAs("dgCMatrix", "vector", function(from) .Call(Csparse_to_vector, from))
+setAs("dsCMatrix", "vector", function(from) .Call(Csparse_to_vector, from))
+setMethod("as.vector", signature(x = "dgCMatrix", mode = "missing"),
+	  function(x, mode) .Call(Csparse_to_vector, x))
+setMethod("as.vector", signature(x = "dsCMatrix", mode = "missing"),
+	  function(x, mode) .Call(Csparse_to_vector, x))
+## could do these and more for as(., "numeric") ... but we *do* recommend  as(*,"vector"):
+## setAs("dgCMatrix", "numeric", Csp2vec)
+## setAs("dsCMatrix", "numeric", Csp2vec)
+
+## |-> cholmod_C -> cholmod_dense -> chm_dense_to_matrix
 ## cholmod_sparse_to_dense converts symmetric storage to general
 ## storage so symmetric classes are ok for conversion to matrix.
 ## unit triangular needs special handling
-setAs("CsparseMatrix", "matrix",
-      function(from) {
-          ## |-> cholmod_C -> cholmod_dense -> chm_dense_to_matrix
-	  .Call(Csparse_to_matrix, .Call(Csparse_diagU2N, from))
-      })
+setAs("dgCMatrix", "matrix", function(from) .Call(Csparse_to_matrix, from))
+setAs("dsCMatrix", "matrix", function(from) .Call(Csparse_to_matrix, from))
+setAs("dtCMatrix", "matrix", function(from)
+      .Call(Csparse_to_matrix, .Call(Csparse_diagU2N, from)))
+## NB: Would *not* be ok for l*Matrix or n*Matrix,
+## --------- as cholmod coerces to "REAL" aka "double"
 
 setAs("CsparseMatrix", "symmetricMatrix",
       function(from) {

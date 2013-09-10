@@ -58,6 +58,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Csparse_to_dense, 1),
     CALLDEF(Csparse_to_nz_pattern, 2),
     CALLDEF(Csparse_to_matrix, 1),
+    CALLDEF(Csparse_to_vector, 1),
     CALLDEF(Csparse_submatrix, 3),
     CALLDEF(dCsparse_subassign, 4),
     CALLDEF(lCsparse_subassign, 4),
@@ -225,8 +226,8 @@ static R_CallMethodDef CallEntries[] = {
 
     CALLDEF(lapack_qr, 2),
 
-    CALLDEF(lcsc_to_matrix, 1),
-    CALLDEF(ncsc_to_matrix, 1),
+    CALLDEF(lgC_to_matrix, 1),
+    CALLDEF(ngC_to_matrix, 1),
 
     CALLDEF(lspMatrix_as_lsyMatrix, 2),
     CALLDEF(lsyMatrix_as_lspMatrix, 2),

@@ -13,6 +13,7 @@
 \alias{coerce,dtCMatrix,ltCMatrix-method}
 \alias{coerce,dtCMatrix,ntCMatrix-method}
 \alias{coerce,dtCMatrix,TsparseMatrix-method}
+\alias{coerce,dtCMatrix,matrix-method}
 \alias{coerce,dtTMatrix,dgTMatrix-method}
 \alias{coerce,dtTMatrix,dgeMatrix-method}
 \alias{coerce,dtTMatrix,dtCMatrix-method}

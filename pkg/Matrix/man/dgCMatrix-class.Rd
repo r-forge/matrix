@@ -8,6 +8,7 @@
 \alias{\%*\%,ddenseMatrix,dgCMatrix-method}
 \alias{\%*\%,dgeMatrix,dgCMatrix-method}
 \alias{\%*\%,matrix,dgCMatrix-method}
+\alias{as.vector,dgCMatrix,missing-method}
 \alias{coerce,matrix,dgCMatrix-method}
 \alias{coerce,dgeMatrix,dgCMatrix-method}
 \alias{coerce,dgCMatrix,dgTMatrix-method}
@@ -15,8 +16,9 @@
 \alias{coerce,dgCMatrix,dtCMatrix-method}
 \alias{coerce,dgCMatrix,lgCMatrix-method}
 \alias{coerce,dgCMatrix,ngCMatrix-method}
-\alias{coerce,dgCMatrix,matrix-method}
 \alias{coerce,dgCMatrix,dgeMatrix-method}
+\alias{coerce,dgCMatrix,matrix-method}
+\alias{coerce,dgCMatrix,vector-method}
 \alias{coerce,factor,dgCMatrix-method}
 \alias{crossprod,dgCMatrix,missing-method}
 \alias{crossprod,dgCMatrix,matrix-method}

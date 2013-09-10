@@ -7,6 +7,7 @@
 %\alias{solve,dsCMatrix,...-method}--> solve-methods.Rd
 \alias{t,dsCMatrix-method}
 \alias{t,dsTMatrix-method}
+\alias{as.vector,dsCMatrix,missing-method}
 \alias{coerce,dgeMatrix,dsCMatrix-method}
 \alias{coerce,dgeMatrix,dsTMatrix-method}
 \alias{coerce,dsCMatrix,dgCMatrix-method}
@@ -18,6 +19,7 @@
 \alias{coerce,dsCMatrix,lsCMatrix-method}
 \alias{coerce,dsCMatrix,generalMatrix-method}
 \alias{coerce,dsCMatrix,matrix-method}
+\alias{coerce,dsCMatrix,vector-method}
 \alias{coerce,dsCMatrix,nsCMatrix-method}
 \alias{coerce,dsTMatrix,dgTMatrix-method}
 \alias{coerce,dsTMatrix,dgeMatrix-method}
