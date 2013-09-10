@@ -96,7 +96,8 @@ grMeth <- "Arith"
         for(v in ex.) {
             va <- as(v, "abIndex")
             for(s in list(-1, 17L, TRUE, FALSE)) {# numeric *and* logical
-                if(!(identical(s, FALSE) && ng == "/")) ## division by 0 often "fails"
+		if(!((identical(s, FALSE) && ng == "/")) && ## division by 0 often "fails"
+		   (Sys.info()[["sysname"]] == "Linux" || .Platform$OS.type == "windows"))# not Solaris
                 stopifnot(AEq(as(G(v, s), "abIndex"), G(va, s)),
                           AEq(as(G(s, v), "abIndex"), G(s, va)))
             }
