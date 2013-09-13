@@ -307,14 +307,6 @@ str(r2. <- v2 %*% M)
 stopifnot(identical3(r2, r2., t(as(v2, "matrix")) %*% M))
 
 
-## Sparse Cov.matrices from  Harri Kiiveri @ CSIRO
-a <- matrix(0,5,5)
-a[1,2] <- a[2,3] <- a[3,4] <- a[4,5] <- 1
-a <- a + t(a) + 2*diag(5)
-b <- as(a, "dsCMatrix") ## ok, but we recommend to use Matrix() ``almost always'' :
-(b. <- Matrix(a, sparse = TRUE))
-stopifnot(identical(b, b.))
-
 ###------------------------------------------------------------------
 ### Close to singular matrix W
 ### (from  micEconAids/tests/aids.R ... priceIndex = "S" )
@@ -380,6 +372,14 @@ assert.EQ.(dIW, IW2, tol= 8e-4)
 
 
 
+## Sparse Cov.matrices from  Harri Kiiveri @ CSIRO
+a <- matrix(0,5,5)
+a[1,2] <- a[2,3] <- a[3,4] <- a[4,5] <- 1
+a <- a + t(a) + 2*diag(5)
+b <- as(a, "dsCMatrix") ## ok, but we recommend to use Matrix() ``almost always'' :
+(b. <- Matrix(a, sparse = TRUE))
+stopifnot(identical(b, b.))
+
 ## calculate conditional variance matrix ( vars 3 4 5 given 1 2 )
 (B2 <- b[1:2, 1:2])
 bb <- b[1:2, 3:5]
@@ -391,7 +391,7 @@ assert.EQ.mat(B2 %*% z.s, as(bb, "matrix"))
 ## -> dense RHS and dense result
 z. <- solve(as(B2, "dgCMatrix"), bb)# now *sparse*
 z  <- solve( B2, as(bb,"dgeMatrix"))
-stopifnot(TRUE,## FIXME is(z., "sparseMatrix"),
+stopifnot(is(z., "sparseMatrix"),
           all.equal(z, as(z.,"denseMatrix")))
 ## finish calculating conditional variance matrix
 v <- b[3:5,3:5] - crossprod(bb,z)
