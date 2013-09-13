@@ -87,7 +87,7 @@ setMethod("lu", signature(x = "sparseMatrix"),
 
 ## MM: see solveSparse() in  ~/R/MM/Pkg-ex/Matrix/Doran-A.R
 .solve.sparse.dgC <- function(a, b, tol = .Machine$double.eps) {
-    lu.a <- lu(a)
+    lu.a <- LU.dgC(a)
     if(tol > 0) {
 	rU <- range(abs(diag(lu.a@U)))
 	if(rU[1] / rU[2] < tol)

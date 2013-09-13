@@ -318,16 +318,28 @@ stopifnot(identical(b, b.))
 ###------------------------------------------------------------------
 ### Close to singular matrix W
 ### (from  micEconAids/tests/aids.R ... priceIndex = "S" )
-(load(system.file("external", "symW.rda", package="Matrix")))
+(load(system.file("external", "symW.rda", package="Matrix"))) # "symW"
 stopifnot(is(symW, "symmetricMatrix"))
+n <- nrow(symW)
+I <- .sparseDiagonal(n, shape="g")
+S <- as(symW, "matrix")
+sis <- solve(S,    S)
+## solve(<dsCMatrix>, <sparseMatrix>) when Cholmod fails was buggy for *long*:
+SIS <- solve(symW, symW)
+iw <- solve(symW)
+iss <- iw %*% symW
+assert.EQ.(I, drop0(sis), tol = 1e-9)
+assert.EQ.(I, SIS,        tol = 1e-7)
+assert.EQ.(I, iss,        tol = 4e-4)
+
 WW <- as(symW, "generalMatrix") # the one that gave problems
 IW <- solve(WW)
 class(I1 <- IW %*% WW)# "dge" or "dgC" (!)
 class(I2 <- WW %*% IW)
 I <- diag(nr=nrow(WW))
-stopifnot(all.equal(as(I1,"matrix"), I, check.attributes=FALSE, tol = 1e-4),
-          ## "Mean relative difference: 3.296549e-05"  (or "1.999949" for Matrix_1.0-13 !!!)
-          all.equal(as(I2,"matrix"), I, check.attributes=FALSE)) #default tol gives "1" for M.._1.0-13
+## these two were wrong for for M.._1.0-13:
+assert.EQ.(as(I1,"matrix"), I, tol = 1e-4)
+assert.EQ.(as(I2,"matrix"), I, tol = 7e-7)
 
 ## now slightly perturb WW (and hence break exact symmetry
 set.seed(131); ii <- sample(length(WW), size= 100)
@@ -357,18 +369,12 @@ class(Iw2 <- solve(SW2))# FIXME? should be "symmetric" but is not
 class(IW. <- as(Iw., "denseMatrix"))
 class(IW2 <- as(Iw2, "denseMatrix"))
 
-### FIXME {but it's not new}
-all.equal(I, as.matrix(IW. %*% SW.), tol=0, check.attributes=FALSE)## TRUE (or not sparse/dense case)
-## new *AND* old Matrix: 2.000056  -- older bug !!!
-all.equal(I, as.matrix(IW2 %*% SW2), tol=0, check.attributes=FALSE)## TRUE (or not sparse/dense case)
-## new *AND* old Matrix: 2.000048
-##
+### The next two were wrong for very long, too
+assert.EQ.(I, as.matrix(IW. %*% SW.), tol= 4e-4)
+assert.EQ.(I, as.matrix(IW2 %*% SW2), tol= 4e-4)
 dIW <- as(IW, "denseMatrix")
-all.equal(dIW, IW., tol=0, check.attributes=FALSE)
-## [1] "Mean relative difference: 5.964708e-13"
-## new *AND* old Matrix: 1.999562  (~= 2)
-all.equal(dIW, IW2, tol=0, check.attributes=FALSE)## TRUE (or not sparse/dense case)
-## new *AND* old Matrix: 1.999562  (~= 2)
+assert.EQ.(dIW, IW., tol= 4e-4)
+assert.EQ.(dIW, IW2, tol= 8e-4)
 
 ##------------------------------------------------------------------
 
