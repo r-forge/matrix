@@ -111,15 +111,12 @@ setMethod("solve", signature(a = "dsCMatrix", b = "numeric"),
 	  valueClass = "dgeMatrix")
 
 ## ``Fully-sparse'' solve() -- only used here; separate function for debugging etc
-solve.dsC.dC <- function(a,b, tol) {
+solve.dsC.dC <- function(a,b, tol = .Machine$double.eps) {
     r <- tryCatch(.Call(dsCMatrix_Csparse_solve, a, b),
 		  error=function(e)NULL, warning=function(w)NULL)
     if(is.null(r)) { ## cholmod factorization was not ok
-	Matrix.msg("Cholmod Cholesky factorization was unsuccessful --> using LU")
-	if(missing(tol) || is.na(tol)) tol <- 1.# special "code" for 'order := 2' in C
-	e.a <- expand(lu.a <- LU.dgC(as(a,"dgCMatrix"), tol=tol, errSing=TRUE))
-	##  A = PLU  <--> A^{-1} x = U^-1 L^-1 P x
-	solve(e.a$U, solve(e.a$L, b[lu.a@p + 1L,]))
+	Matrix.msg("Cholmod Cholesky factorization was unsuccessful --> using LU(<dgC>)")
+	.solve.sparse.dgC(as(a,"dgCMatrix"), b=b, tol=tol)
     }
     else r
 }
