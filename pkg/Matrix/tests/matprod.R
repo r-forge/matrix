@@ -320,15 +320,23 @@ sis <- solve(S,    S)
 SIS <- solve(symW, symW)
 iw <- solve(symW)
 iss <- iw %*% symW
-assert.EQ.(I, drop0(sis), tol = 1e-9)
-assert.EQ.(I, SIS,        tol = 1e-7)
-assert.EQ.(I, iss,        tol = 4e-4)
+##                                     nb-mm3
+assert.EQ.(I, drop0(sis), tol = 1e-9)# 2.6e-10
+assert.EQ.(I, SIS,        tol = 1e-7)# 8.2e-9
+assert.EQ.(I, iss,        tol = 4e-4)# 3.3e-5
+## solve(<dsCMatrix>, <dense..>) :
+I <- diag(nr=n)
+SIS <- solve(symW, as(symW,"denseMatrix"))
+iw  <- solve(symW, I)
+iss <- iw %*% symW
+assert.EQ.mat(SIS, I, tol = 1e-7, giveRE=TRUE)
+assert.EQ.mat(iss, I, tol = 4e-4, giveRE=TRUE)
+rm(SIS,iss)
 
 WW <- as(symW, "generalMatrix") # the one that gave problems
 IW <- solve(WW)
 class(I1 <- IW %*% WW)# "dge" or "dgC" (!)
 class(I2 <- WW %*% IW)
-I <- diag(nr=nrow(WW))
 ## these two were wrong for for M.._1.0-13:
 assert.EQ.(as(I1,"matrix"), I, tol = 1e-4)
 assert.EQ.(as(I2,"matrix"), I, tol = 7e-7)
