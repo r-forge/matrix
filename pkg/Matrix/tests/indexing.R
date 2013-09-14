@@ -270,6 +270,31 @@ if(doExtras) {### {was ./AAA_index.R, MM-only}
     C.[i,j] <- val
     assert.EQ.mat(N,n)
     stopifnot(all(C. == N))
+
+    print(load(system.file("external", "symA.rda", package="Matrix"))) # "As"
+    stopifnot(isValid(As, "dsCMatrix"), identical(As@factors, list()))
+    R. <- drop0(chol(As))
+    stopifnot(1:32 == sort(diag(R.)), ## !
+              R.@x == as.integer(R.@x),## so it is an integer-valued chol-decomp !
+              ## shows that (1) As is *not* singular  (2) the matrix is not random
+              all.equal(crossprod(R.), As, tol=1e-15))
+    print(summary(evA <- eigen(As, only.values=TRUE)$val))
+    print(tail(evA)) ## largest three ~= 10^7,  smallest two *negative*
+    print(rcond(As)) # 1.722 e-21 == very bad !
+    ##-> this *is* a border line case, i.e. very close to singular !
+    ## and also determinant(.) is rather random here!
+    cc0 <- Cholesky(As)# no problem
+    try({
+        cc <- Cholesky(As, super=TRUE)
+        ## gives --on 32-bit only--
+        ## Cholmod error 'matrix not positive definite' at file:../Supernodal/t_cholmod_super_numeric.c, line 613
+        ecc <- expand(cc)
+        L.P <- with(ecc, crossprod(L,P))  ## == L'P
+        ## crossprod(L.P) == (L'P)' L'P == P'LL'P
+        stopifnot( all.equal(crossprod(L.P), As) )
+    })
+    ##---- end{ eigen( As ) -----------
+
 } ## only if(doExtras)
 
 
@@ -899,7 +924,9 @@ cat("checkMatrix() of all: \n---------\n")
 Sys.setlocale("LC_COLLATE", "C")# to keep ls() reproducible
 for(nm in ls()) if(is(.m <- get(nm), "Matrix")) {
     cat(nm, "\n")
-    checkMatrix(.m, verbose = FALSE)
+    checkMatrix(.m, verbose = FALSE
+		, doDet = nm != "As" ## <- "As" almost singular <=> det() "ill posed"
+		)
 }
 showProc.time()
 }#--------------end if(doExtras) -----------------------------------------------
