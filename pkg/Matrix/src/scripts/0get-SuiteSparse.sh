@@ -9,10 +9,11 @@ getSPQR=no
 ##     --- since late summer 2010, we no longer get SPQR
 ufl_URL=http://www.cise.ufl.edu/research/sparse/SuiteSparse/current/
 TGZ=SuiteSparse.tar.gz
-if [ -f $TGZ ]
-then echo 'Tarfile present; not downloading (remove it to change this!)' ; ls -l $TGZ
-else wget -nc  $ufl_URL/$TGZ
-fi
+# if [ -f $TGZ ]
+# then echo 'Tarfile present; not downloading (remove it to change this!)' ; ls -l $TGZ
+# else
+  wget -nc  $ufl_URL/$TGZ
+# fi
 
 SS=SuiteSparse
 SSdocDir=../inst/doc/SuiteSparse
@@ -37,14 +38,17 @@ dd=`basename $Sdir`; mv $Sdir/* $dd/
 Sdir=$SS/COLAMD
    ## install COLAMD/Source and COLAMD/Include directories
 tar zxf $TGZ $Sdir/Source/ $Sdir/Include/ $Sdir/Doc/ $Sdir/README.txt
-Rscript --vanilla -e 'source("scripts/fixup-fn.R")' -e 'fixup("'$Sdir'/Source/Makefile")'
+f=$Sdir/Source/Makefile
+if [ -f $f ]
+then Rscript --vanilla -e 'source("scripts/fixup-fn.R")' -e 'fixup("'$f'")'
+fi
   ## install documentation for COLAMD
 mv $Sdir/README.txt $SSdocDir/COLAMD.txt
 mv $Sdir/Doc/ChangeLog $SSdocDir/COLAMD-ChangeLog.txt
 patch -p0 < scripts/COLAMD.patch
 ##          ---------------------
   ## move directory *up*
-dd=`basename $Sdir`; mv $Sdir/* $dd/
+dd=`basename $Sdir`; rsync -auv $Sdir/ $dd/
 
 
 ## 3) AMD --------------------------------------------------
@@ -59,7 +63,7 @@ rm $Sdir/Source/*.f $Sdir/Lib/GNUmakefile
 patch -p0 < scripts/AMD-noprint.patch
 ##          ---------------------
   ## move directory *up*
-dd=`basename $Sdir`; mv $Sdir/* $dd/
+dd=`basename $Sdir`; rsync -auv $Sdir/ $dd/
 
 
 ## 4) CHOLMOD ----------------------------------------------
@@ -77,7 +81,7 @@ Rscript --vanilla -e 'source("scripts/fixup-fn.R")' -e 'fixup("'$Sdir'/Lib/Makef
 ## but typically, this is not good enough, so we need manual work:
 mv $Sdir/Lib/Makefile $Sdir/Lib/Makefile_pre
   ## move directory *up*
-dd=`basename $Sdir`; mv $Sdir/* $dd/
+dd=`basename $Sdir`; rsync -auv $Sdir/ $dd/
 
 svn revert $dd/Lib/Makefile
 ls -l $dd/Lib/Makefile_pre
