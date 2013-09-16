@@ -45,6 +45,7 @@ fi
   ## install documentation for COLAMD
 mv $Sdir/README.txt $SSdocDir/COLAMD.txt
 mv $Sdir/Doc/ChangeLog $SSdocDir/COLAMD-ChangeLog.txt
+rm -rf $Sdir/Doc
 patch -p0 < scripts/COLAMD.patch
 ##          ---------------------
   ## move directory *up*
