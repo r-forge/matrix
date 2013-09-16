@@ -5,7 +5,7 @@
 /* ----------------------------------------------------------------------------
  * COLAMD, Copyright (C) 2007, Timothy A. Davis.
  * See License.txt for the Version 2.1 of the GNU Lesser General Public License
- * http://www.suitesparse.com
+ * http://www.cise.ufl.edu/research/sparse
  * -------------------------------------------------------------------------- */
 
 /* Global variables for COLAMD */
@@ -19,7 +19,7 @@ int (*colamd_printf) (const char *, ...) = mexPrintf ;
 // For use with R package 'Matrix':
 #include <R_ext/Print.h>
 #define printf Rprintf
-int (*colamd_printf) (const char *, ...) = printf ;
+void (*colamd_printf) (const char *, ...) = printf ;
 #endif
 #else
 int (*colamd_printf) (const char *, ...) = ((void *) 0) ;
