@@ -1,22 +1,25 @@
---- AMD/Include/amd_internal.h.~1~	2010-07-25 04:32:06.000000000 +0200
-+++ AMD/Include/amd_internal.h	2012-01-13 11:42:19.002374000 +0100
-@@ -28,6 +28,8 @@
-  *	    function pointers amd_malloc, amd_free, amd_realloc, and
-  *	    amd_calloc at run-time for AMD to work properly.
+--- SuiteSparse/AMD/Include/amd_internal.h.~1~	2012-05-29 16:47:33.000000000 +0200
++++ SuiteSparse/AMD/Include/amd_internal.h	2013-09-16 12:45:18.673155000 +0200
+@@ -27,6 +27,9 @@
+  *          amd_calloc at run-time for AMD to work properly.
   */
+ 
 +// For use with R package 'Matrix':
 +#define NPRINT
- 
++
  /* ========================================================================= */
  /* === NDEBUG ============================================================== */
---- AMD/Source/amd_global.c.~1~	2007-05-03 17:24:25.000000000 +0200
-+++ AMD/Source/amd_global.c	2012-01-13 12:21:24.002777000 +0100
-@@ -78,6 +78,8 @@
+ /* ========================================================================= */
+--- SuiteSparse/AMD/Source/amd_global.c.~1~	2012-05-29 16:48:37.000000000 +0200
++++ SuiteSparse/AMD/Source/amd_global.c	2013-09-16 12:47:49.219927000 +0200
+@@ -76,7 +76,9 @@
  int (*amd_printf) (const char *, ...) = mexPrintf ;
  #else
  #include <stdio.h>
+-int (*amd_printf) (const char *, ...) = printf ;
++// For use with R package 'Matrix':
 +#include <R_ext/Print.h>
-+#define printf Rprintf
- int (*amd_printf) (const char *, ...) = printf ;
++void (*amd_printf) (const char *, ...) = Rprintf ;
  #endif
  #else
+ int (*amd_printf) (const char *, ...) = NULL ;

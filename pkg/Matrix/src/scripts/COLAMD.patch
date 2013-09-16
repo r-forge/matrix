@@ -1,13 +1,13 @@
---- COLAMD/Source/colamd_global.c.~1~	2010-07-25 04:32:06.000000000 +0200
-+++ COLAMD/Source/colamd_global.c	2012-01-13 12:12:17.001781000 +0100
-@@ -16,6 +16,9 @@
+--- SuiteSparse/COLAMD/Source/colamd_global.c.~1~	2012-05-29 22:09:42.000000000 +0200
++++ SuiteSparse/COLAMD/Source/colamd_global.c	2013-09-16 12:38:38.908681000 +0200
+@@ -16,7 +16,10 @@
  int (*colamd_printf) (const char *, ...) = mexPrintf ;
  #else
  #include <stdio.h>
 -int (*colamd_printf) (const char *, ...) = printf ;
 +// For use with R package 'Matrix':
 +#include <R_ext/Print.h>
-+#define printf Rprintf
-+void (*colamd_printf) (const char *, ...) = printf ;
++void (*colamd_printf) (const char *, ...) = Rprintf ;
  #endif
  #else
+ int (*colamd_printf) (const char *, ...) = ((void *) 0) ;
