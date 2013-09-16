@@ -139,7 +139,15 @@ then
 fi
 
 ## ----- remove the downloaded tar file -------------------
-echo 'Execute this eventually:
+echo 'You could (eventually) do
 
-rm '"$TGZ"
+      rm '"$TGZ"'
+
+but keeping it will not download it anew, if not changed.
+Further, consider updating the doxygen docu on the R-forge web site via
+
+ /u/maechler/R/Pkgs/Matrix-doxygen-update
+'
+
+
 
