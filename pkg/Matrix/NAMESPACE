@@ -23,7 +23,7 @@ importFrom("methods",
 
 
 ## Generics and functions defined in this package
-export("Cholesky",
+export("Cholesky", ".SuiteSparse_version",
        "Diagonal", ".symDiagonal", ".sparseDiagonal",
        "Hilbert", "KhatriRao",
        "Matrix",
