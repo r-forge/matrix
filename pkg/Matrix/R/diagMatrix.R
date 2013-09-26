@@ -251,29 +251,29 @@ setMethod("is.infinite", signature(x = "diagonalMatrix"),
 ## "hack"  instead of signature  x = "diagonalMatrix" :
 ##
 ## ddi*:
-diag2tT <- function(from) .diag2tT(from, "U", "d")
-setAs("ddiMatrix", "triangularMatrix", diag2tT)
-##_no_longer_ setAs("ddiMatrix", "sparseMatrix", diag2tT)
+di2tT <- function(from) .diag2tT(from, "U", "d")
+setAs("ddiMatrix", "triangularMatrix", di2tT)
+##_no_longer_ setAs("ddiMatrix", "sparseMatrix", di2tT)
 ## needed too (otherwise <dense> -> Tsparse is taken):
-setAs("ddiMatrix", "TsparseMatrix", diag2tT)
-setAs("ddiMatrix", "dsparseMatrix", diag2tT)
+setAs("ddiMatrix", "TsparseMatrix", di2tT)
+setAs("ddiMatrix", "dsparseMatrix", di2tT)
 setAs("ddiMatrix", "CsparseMatrix",
       function(from) as(.diag2tT(from, "U", "d"), "CsparseMatrix"))
 setAs("ddiMatrix", "symmetricMatrix",
       function(from) .diag2sT(from, "U", "d"))
 ##
 ## ldi*:
-diag2tT <- function(from) .diag2tT(from, "U", "l")
-setAs("ldiMatrix", "triangularMatrix", diag2tT)
-##_no_longer_ setAs("ldiMatrix", "sparseMatrix", diag2tT)
+di2tT <- function(from) .diag2tT(from, "U", "l")
+setAs("ldiMatrix", "triangularMatrix", di2tT)
+##_no_longer_ setAs("ldiMatrix", "sparseMatrix", di2tT)
 ## needed too (otherwise <dense> -> Tsparse is taken):
-setAs("ldiMatrix", "TsparseMatrix", diag2tT)
-setAs("ldiMatrix", "lsparseMatrix", diag2tT)
+setAs("ldiMatrix", "TsparseMatrix", di2tT)
+setAs("ldiMatrix", "lsparseMatrix", di2tT)
 setAs("ldiMatrix", "CsparseMatrix",
       function(from) as(.diag2tT(from, "U", "l"), "CsparseMatrix"))
 setAs("ldiMatrix", "symmetricMatrix",
       function(from) .diag2sT(from, "U", "l"))
-
+rm(di2tT)
 
 setAs("diagonalMatrix", "nMatrix",
       function(from) {
