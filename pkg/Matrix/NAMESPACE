@@ -2,7 +2,7 @@ useDynLib(Matrix, .registration=TRUE)
 
 ## Import non-base functions we need explicitly,
 ## notably for which we define methods:
-importFrom("lattice", levelplot)
+importFrom("lattice", levelplot, panel.levelplot.raster)
 importFrom("graphics", image)
 importFrom("utils", head, tail, assignInNamespace)
 importFrom("stats", cov2cor, toeplitz, update#, vcov
