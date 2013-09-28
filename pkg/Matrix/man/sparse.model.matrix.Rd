@@ -45,8 +45,7 @@ fac2Sparse(from, to = c("d", "i", "l", "n", "z"),
   \item{drop.unused.levels}{should factors have unused levels dropped?
     The default for \code{sparse.model.matrix} has been changed to
     \code{FALSE}, 2010-07, for compatibility with \R's standard (dense)
-    \code{\link{model.matrix}()}. 
-  }
+    \code{\link{model.matrix}()}.}
   \item{row.names}{logical indicating if row names should be used.}
   \item{verbose}{logical or integer indicating if (and how much)
     progress output should be printed.}

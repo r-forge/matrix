@@ -1,7 +1,7 @@
 ####  Utilities  for  Sparse Model Matrices
 
 ## The "first" version {no longer used}:
-fac2sparse <- function(from, to = c("d","i","l","n","z"), drop.unused.levels = TRUE)
+fac2sparse <- function(from, to = c("d","i","l","n","z"), drop.unused.levels = FALSE)
 {
     ## factor(-like) --> sparseMatrix {also works for integer, character}
     fact <- if (drop.unused.levels) factor(from) else as.factor(from)
