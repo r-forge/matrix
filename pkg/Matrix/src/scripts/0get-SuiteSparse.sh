@@ -84,6 +84,16 @@ mv $Sdir/Lib/Makefile $Sdir/Lib/Makefile_pre
   ## move directory *up*
 dd=`basename $Sdir`; rsync -auv $Sdir/ $dd/
 
+echo 'If there changes in the following you  ** MUST **  manually update  
+  <Matrix>/ inst/include/cholmod.h  --- to export what we have.
+
+Also, RcppEigen headers may also need to be updated -- ask Doug Bates.
+This can be VERY IMPORTANT,  not the least for lme4
+'
+svn diff --diff-cmd /usr/bin/diff -x "-bBw"  $dd/Include/cholmod_core.h
+echo 'Did the above show any non trivial diffs? --> do update inst/include/cholmod.h !!
+'
+
 svn revert $dd/Lib/Makefile
 ls -l $dd/Lib/Makefile_pre
 echo "now   diff $dd/Lib/Makefile $dd/Lib/Makefile_pre "
