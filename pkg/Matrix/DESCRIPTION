@@ -1,6 +1,6 @@
 Package: Matrix
-Version: 1.0-16
-Date: 2013-09-28
+Version: 1.1-0
+Date: 2013-10-13
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Author: Douglas Bates <bates@stat.wisc.edu> and Martin Maechler <maechler@stat.math.ethz.ch>
@@ -8,8 +8,8 @@ Maintainer: Martin Maechler <mmaechler+Matrix@gmail.com>
 Contact: Doug and Martin <Matrix-authors@R-project.org>
 Description: Classes and methods for dense and sparse matrices and
     operations on them using LAPACK and SuiteSparse.
-Depends: R (>= 2.15.0)
-Imports: graphics, grid, stats, methods, utils, lattice
+Depends: R (>= 2.15.0), methods
+Imports: graphics, grid, stats, utils, lattice
 Suggests: expm, MASS
 Enhances: MatrixModels, graph, SparseM, sfsmisc
 Encoding: UTF-8
