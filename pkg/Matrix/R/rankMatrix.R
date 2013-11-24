@@ -9,7 +9,7 @@
 ## (for now: use code & examples from /u/maechler/R/MM/NUMERICS/rankMat.R )
 
 rankMatrix <- function(x, tol = NULL,
-                       method = c("tolNorm2", "qrLINPACK", "useGrad", "maybeGrad"),
+                       method = c("tolNorm2", "qr", "useGrad", "maybeGrad"),
                        sval = svd(x, 0,0)$d, warn.t = TRUE)
 {
     ## Purpose: rank of a matrix ``as Matlab'' or "according to Ravi V"
@@ -34,7 +34,8 @@ rankMatrix <- function(x, tol = NULL,
     stopifnot(length(d <- dim(x)) == 2)
     p <- min(d)
     miss.meth <- missing(method)
-    method <- match.arg(method)
+    ## "qrLINPACK" is allowed for backcompatibility [change @ 2013-11-24]
+    method <- if(!miss.meth && identical(method, "qrLINPACK")) "qr" else match.arg(method)
 
     if(useGrad <- (method %in% c("useGrad", "maybeGrad"))) {
 	stopifnot(length(sval) == p,
@@ -52,13 +53,12 @@ rankMatrix <- function(x, tol = NULL,
 	    stopifnot(diff(sval) <= 0)
 	    max(d) * .Machine$double.eps * abs(sval[1])
 	}
-	if(method == "qrLINPACK") {
-	    if(is.null(tol) && x.dense) tol <- findTol()
-	    ## tol = NULL is fine for sparse QR
-	} else { ## (method != "qrLINPACK")
+	if(method == "qr") {
+	    if(is.null(tol)) tol <- findTol() # also for sparse QR
+	} else { ## (method != "qr")
 	    if(is.null(tol)) {
 		if(!x.dense && missing(sval) && prod(d) >= 100000L)
-		    warning(gettextf("rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n  Probably should rather use  method = 'qrLINPACK' !?",
+		    warning(gettextf("rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n  Probably should rather use  method = 'qr' !?",
 				     method),
 			    immediate.=TRUE, domain=NA)
 		tol <- findTol()
@@ -68,13 +68,22 @@ rankMatrix <- function(x, tol = NULL,
 
     structure(## rank :
 	      if(useGrad) which.min(diff1)
-	      else if(method == "qrLINPACK") {
+	      else if(method == "qr") {
 		  if(do.t <- (d[1L] < d[2L]))
 		      warning(gettextf(
-			"rankMatrix(x, method='qrLINPACK'): computing t(x) as nrow(x) < ncol(x)"))
+			"rankMatrix(x, method='qr'): computing t(x) as nrow(x) < ncol(x)"))
 		  q.r <- qr(if(do.t) t(x) else x, tol=tol, LAPACK = FALSE)
-		  if(is(q.r, "qr")) q.r$rank
-		  else if(is(q.r,"sparseQR")) sum(diag(q.r@R) != 0)
+		  if(is(q.r, "qr"))
+		      q.r$rank
+		  else if(is(q.r,"sparseQR")) { # 'tol' not used in qr()
+                      ## FIXME: Here, we could be quite a bit faster,
+                      ## by not returning the full sparseQR, but just
+                      ## doing the following in C, and return the rank.
+		      d <- sort(abs(diag(q.r@R))) ## is abs(.) unneeded? [FIXME]
+		      ## declare those entries to be zero that are < tol*max(.)
+		      sum(d > tol * d[length(d)])
+		      ## was sum(diag(q.r@R) != 0)
+		  }
 		  else stop(gettextf(
 			"method %s not applicable for qr() result class %s",
 				     sQuote(method), dQuote(class(q.r)[1])),
