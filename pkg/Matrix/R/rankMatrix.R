@@ -58,7 +58,7 @@ rankMatrix <- function(x, tol = NULL,
 	} else { ## (method != "qr")
 	    if(is.null(tol)) {
 		if(!x.dense && missing(sval) && prod(d) >= 100000L)
-		    warning(gettextf("rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n  Probably should rather use  method = 'qr' !?",
+		    warning(gettextf("rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n  Probably should rather use method = 'qr' !?",
 				     method),
 			    immediate.=TRUE, domain=NA)
 		tol <- findTol()
@@ -79,9 +79,9 @@ rankMatrix <- function(x, tol = NULL,
                       ## FIXME: Here, we could be quite a bit faster,
                       ## by not returning the full sparseQR, but just
                       ## doing the following in C, and return the rank.
-		      d <- sort(abs(diag(q.r@R))) ## is abs(.) unneeded? [FIXME]
+		      d <- abs(diag(q.r@R)) ## is abs(.) unneeded? [FIXME]
 		      ## declare those entries to be zero that are < tol*max(.)
-		      sum(d > tol * d[length(d)])
+		      sum(d >= tol * max(d))
 		      ## was sum(diag(q.r@R) != 0)
 		  }
 		  else stop(gettextf(

@@ -30,7 +30,8 @@ rankMatrix(x, tol = NULL,
 	for sparse \code{x}, where \code{qr()} uses a "sparseQR" method (see
 	\code{\link{qr-methods}}) to compute \eqn{QR}, it is the rank of
 	\eqn{R} defined as the number of non-"zero" diagonal entries
-	\eqn{d_i} of \eqn{R}, and non-"zero"s fulfill \eqn{d_i > tol * max(d_i)}.
+	\eqn{d_i} of \eqn{R}, and non-"zero"s fulfill
+	\eqn{d_i \ge \mathrm{tol}\cdot\max(d_i)}{d_i >= tol * max(d_i)}.
 
 	This (dense version) used to be \emph{the} recommended way to
 	compute a matrix rank for a while in the past.  For this method,
