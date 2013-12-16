@@ -9,14 +9,22 @@ isN0 <- function(x)  is.na(x) | x != 0
 is1  <- function(x) !is.na(x) & x   # also == "isTRUE componentwise"
 
 ##
-all0 <- function(x) !any(is.na(x)) && all(!x) ## ~= allFalse
-any0 <- function(x) isTRUE(any(x == 0))	      ## ~= anyFalse
+##all0 <- function(x) !any(is.na(x)) && all(!x) ## ~= allFalse
+all0 <- function(x) .Call(R_all0, x)
+
+## any0 <- function(x) isTRUE(any(x == 0))	      ## ~= anyFalse
+any0 <- function(x) .Call(R_any0, x)
+
 ## These work "identically" for  1 ('==' TRUE)  and 0 ('==' FALSE)
 ##	(but give a warning for "double"  1 or 0)
 ## TODO: C versions of these would be faster
 allTrue  <- function(x) all(x)  && !any(is.na(x))
-allFalse <- function(x) !any(x) && !any(is.na(x))## ~= all0
-anyFalse <- function(x) isTRUE(any(!x))		 ## ~= any0
+
+##allFalse <- function(x) !any(x) && !any(is.na(x))## ~= all0, but allFalse(NULL) = TRUE w/warning
+allFalse <- function(x) .Call(R_all0, x)
+
+##anyFalse <- function(x) isTRUE(any(!x))		 ## ~= any0
+anyFalse <- function(x) .Call(R_any0, x)
 
 as1 <- function(x, mod=mode(x))
     switch(mod, "integer"= 1L, "double"=, "numeric"= 1, "logical"= TRUE,
@@ -1156,9 +1164,10 @@ isTriC <- function(object, upper = NA) {
 }
 
 
-## requires that "vector-indexing" works for 'M' :
-.is.diagonal.sq.matrix <- function(M, n = dim(m)[1L])
-    all0(M[rep(c(FALSE, rep.int(TRUE,n)), length = n^2)])
+## When the matrix is known to be [n x n] aka "square"
+## (need "vector-indexing" work for 'M'):
+.is.diagonal.sq.matrix <- function(M, n = dim(M)[1L])
+    all0(M[rep_len(c(FALSE, rep.int(TRUE,n)), n^2)])
 
 .is.diagonal <- function(object) {
     ## "matrix" or "denseMatrix" (but not "diagonalMatrix")
@@ -1167,7 +1176,7 @@ isTriC <- function(object, upper = NA) {
     else if(is.matrix(object)) .is.diagonal.sq.matrix(object, n)
     else ## "denseMatrix" -- packed or unpacked
         if(is(object, "generalMatrix")) # "dge", "lge", ...
-            all0(object@x[rep(c(FALSE, rep.int(TRUE,n)), length = n^2)])
+	    .is.diagonal.sq.matrix(object@x, n)
         else { ## "dense" but not {diag, general}, i.e. triangular or symmetric:
             ## -> has 'uplo'  differentiate between packed and unpacked
 
@@ -1179,7 +1188,7 @@ isTriC <- function(object, upper = NA) {
             }
 
 ### very cheap workaround
-	    all0(as.matrix(object)[rep(c(FALSE, rep.int(TRUE,n)), length = n^2)])
+	    all0(as.matrix(object)[rep_len(c(FALSE, rep.int(TRUE,n)), n^2)])
         }
 }
 
