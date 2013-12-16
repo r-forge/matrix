@@ -21,7 +21,7 @@
 }
   Since 2013, this functionality is further exposed as the
   \code{graph2T()} and \code{T2graph()} functions (with further
-  arguments than just \code{from}), which convert a graphs to and from
+  arguments than just \code{from}), which convert graphs to and from
   the triplet form of sparse matrices (of class
   \code{"\linkS4class{TsparseMatrix}"}) .
 }
@@ -42,8 +42,8 @@ T2graph(from, need.uniq = is_not_uniqT(from), edgemode = NULL)
     are weights in the graph, and if any differ from \code{1}, weights
     are used.}
   \item{need.uniq}{a logical indicating if \code{from} may need to be
-    internally \dQuote{uniqified}; do not set this and hence use the
-    default, unless you know what you are doing!}
+    internally \dQuote{uniqified}; do not set this and hence rather use
+    the default, unless you know what you are doing!}
   \item{edgemode}{one of \code{NULL}, \code{"directed"}, or
     \code{"undirected"}.  The default \code{NULL} looks if the matrix is
     symmetric and assumes \code{"undirected"} in that case.}

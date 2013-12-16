@@ -331,7 +331,7 @@ replTmat <- function (x, i, j, ..., value)
 	if(is.logical(i)) { # full-size logical indexing
 	    n <- prod(di)
 	    if(n) {
-		if(length(i) < n) i <- rep(i, length.out = n)
+		if(length(i) < n) i <- rep_len(i, n)
 		i <- (0:(n-1))[i] # -> 0-based index vector as well {maybe LARGE!}
 	    } else i <- integer(0)
 	} else i <- as.integer(i) - 1L ## 0-based indices
@@ -368,7 +368,7 @@ replTmat <- function (x, i, j, ..., value)
 	if(length(value) != m) { ## use recycling rules
 	    if(m %% length(value) != 0)
 		warning("number of items to replace is not a multiple of replacement length")
-	    value <- rep(value, length.out = m)
+	    value <- rep_len(value, m)
 	}
 
 	## matching existing non-zeros and new entries
@@ -416,7 +416,7 @@ replTmat <- function (x, i, j, ..., value)
         keep <- !dup
         i1 <- i1[keep]
         ## keep is "internally" recycled below {and that's important: it is dense!}
-        lenV <- length(value <- rep(value, length.out = lenRepl)[keep])
+	lenV <- length(value <- rep_len(value, lenRepl)[keep])
         dind[1] <- length(i1)
         lenRepl <- prod(dind)
     }
@@ -425,12 +425,12 @@ replTmat <- function (x, i, j, ..., value)
         ## The following is correct, but  rep(keep,..) can be *HUGE*
         ## keep <- !dup
         ## i2 <- i2[keep]
-        ## lenV <- length(value <- rep(value, length.out = lenRepl)[rep(keep, each=dind[1])])
+	## lenV <- length(value <- rep_len(value, lenRepl)[rep(keep, each=dind[1])])
         ## solution: sv[-i] is efficient for sparseVector:
         i2 <- i2[- iDup]
         nr <- dind[1]
         iDup <- rep((iDup - 1)*nr, each=nr) + seq_len(nr)
-        lenV <- length(value <- rep(value, length.out = lenRepl)[-iDup])
+	lenV <- length(value <- rep_len(value, lenRepl)[-iDup])
         dind[2] <- length(i2)
         lenRepl <- prod(dind)
     }
@@ -542,7 +542,7 @@ replTmat <- function (x, i, j, ..., value)
     ##     if(r.sym) # value already adjusted, see above
     ##        lenRepl <- length(value) # shorter (since only "triangle")
     if(!r.sym && lenV < lenRepl)
-	value <- rep(value, length.out = lenRepl)
+	value <- rep_len(value, lenRepl)
 
     ## now:  length(value) == lenRepl  {but value is sparseVector if it's "long" !}
 
