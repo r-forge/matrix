@@ -1155,13 +1155,16 @@ isTriC <- function(object, upper = NA) {
     }
 }
 
+
+## requires that "vector-indexing" works for 'M' :
+.is.diagonal.sq.matrix <- function(M, n = dim(m)[1L])
+    all0(M[rep(c(FALSE, rep.int(TRUE,n)), length = n^2)])
+
 .is.diagonal <- function(object) {
     ## "matrix" or "denseMatrix" (but not "diagonalMatrix")
     d <- dim(object)
-    if(d[1] != (n <- d[2])) FALSE
-    else if(is.matrix(object))
-        ## requires that "vector-indexing" works for 'object' :
-        all0(object[rep(c(FALSE, rep.int(TRUE,n)), length = n^2)])
+    if(d[1L] != (n <- d[2L])) FALSE
+    else if(is.matrix(object)) .is.diagonal.sq.matrix(object, n)
     else ## "denseMatrix" -- packed or unpacked
         if(is(object, "generalMatrix")) # "dge", "lge", ...
             all0(object@x[rep(c(FALSE, rep.int(TRUE,n)), length = n^2)])

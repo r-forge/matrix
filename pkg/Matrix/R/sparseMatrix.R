@@ -77,7 +77,7 @@ sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames,
 	if(length(x) != (n <- length(i))) { ## recycle
 	    if(length(x) != 1 && n %% length(x) != 0)
 		warning("length(i) is not a multiple of length(x)")
-	    x <- rep(x, length.out = n)
+	    x <- rep_len(x, n)
 	}
 	r@x <- x
     }
