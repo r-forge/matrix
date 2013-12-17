@@ -54,6 +54,7 @@
 \alias{[<-,TsparseMatrix,index,index,replValue-method}
 \alias{[<-,TsparseMatrix,index,missing,replValue-method}
 \alias{[<-,TsparseMatrix,matrix,missing,replValue-method}
+\alias{[<-,TsparseMatrix,Matrix,missing,replValue-method}
 \alias{[<-,TsparseMatrix,lMatrix,missing,replValue-method}
 \alias{[<-,TsparseMatrix,nMatrix,missing,replValue-method}
 \alias{[<-,TsparseMatrix,missing,index,replValue-method}
@@ -64,6 +65,7 @@
 % -> ../R/Csparse.R :
 \alias{[<-,CsparseMatrix,index,index,replValue-method}
 \alias{[<-,CsparseMatrix,index,missing,replValue-method}
+\alias{[<-,CsparseMatrix,Matrix,missing,replValue-method}
 \alias{[<-,CsparseMatrix,matrix,missing,replValue-method}
 \alias{[<-,CsparseMatrix,lsparseMatrix,missing,replValue-method}
 \alias{[<-,CsparseMatrix,nsparseMatrix,missing,replValue-method}
