@@ -36,7 +36,7 @@ spMatrix <- function(nrow, ncol,
 
 sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames,
                          symmetric = FALSE, index1 = TRUE,
-                         giveCsparse = TRUE, check = TRUE)
+                         giveCsparse = TRUE, check = TRUE, use.last.ij = FALSE)
 {
   ## Purpose: user-level substitute for most  new(<sparseMatrix>, ..) calls
   ## Author: Douglas Bates, Date: 12 Jan 2009, based on Martin's version
@@ -48,7 +48,7 @@ sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames,
             stop("'p' must be a non-decreasing vector (0, ...)")
         ep <- rep.int(seq_along(dp), dp)
     }
-    ## i and j are now both defined.  Make them 1-based indices.
+    ## i and j are now both defined (via default = ep).  Make them 1-based indices.
     i1 <- as.logical(index1)[1]
     i <- as.integer(i + !(m.i || i1))
     j <- as.integer(j + !(m.j || i1))
@@ -79,6 +79,17 @@ sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames,
 		warning("length(i) is not a multiple of length(x)")
 	    x <- rep_len(x, n)
 	}
+        if(use.last.ij && (id <- anyDuplicated(cbind(i,j), fromLast=TRUE))) {
+            i <- i[-id]
+            j <- j[-id]
+            x <- x[-id]
+            if(any(idup <- duplicated(cbind(i,j), fromLast=TRUE))) {
+                ndup <- -which(idup)
+                i <- i[ndup]
+                j <- j[ndup]
+                x <- x[ndup]
+            }
+        }
 	r@x <- x
     }
     r@i <- i - 1L
