@@ -716,7 +716,7 @@ setMethod("[", signature(x = "Matrix", i = "matrix", j = "missing", drop="missin
 	if(length(value) > 0 && m %% length(value) != 0)
 	    warning("number of items to replace is not a multiple of replacement length")
 	## recycle:
-	value <- rep(value, length = m)
+	value <- rep_len(value, m)
 	i1 <- i[,1]
 	i2 <- i[,2]
 	if(m > 2)

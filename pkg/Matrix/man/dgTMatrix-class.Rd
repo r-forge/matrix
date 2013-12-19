@@ -9,6 +9,7 @@
 \alias{coerce,dgTMatrix,dtCMatrix-method}
 \alias{coerce,dgTMatrix,dsTMatrix-method}
 \alias{coerce,dgTMatrix,dtTMatrix-method}
+\alias{coerce,dgTMatrix,symmetricMatrix-method}
 \alias{coerce,dgTMatrix,triangularMatrix-method}
 \alias{coerce,dgeMatrix,dgTMatrix-method}
 \alias{coerce,matrix,dgTMatrix-method}
@@ -102,7 +103,7 @@ T2 <- new("dgTMatrix",
           i = as.integer(c(1,1,0,3,3)),
           j = as.integer(c(2,2,4,0,0)), x=10*1:5, Dim=4:5)
 str(T2) # contains (i,j,x) slots exactly as above, but
-T2 ## has only three non-zero entries, as for repeated (i,j)'s, 
+T2 ## has only three non-zero entries, as for repeated (i,j)'s,
    ## the corresponding x's are "implicitly" added
 stopifnot(nnzero(T2) == 3)
 }

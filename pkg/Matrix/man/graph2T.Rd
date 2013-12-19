@@ -82,12 +82,14 @@ if(isTRUE(try(require(graph)))) { ## super careful .. for "checking reasons"
    identical(as(m3,"TsparseMatrix"), Matrix:::uniqTsparse(tg3))
   )
 }
-  a. <- sparseMatrix(i= 4:1, j=1:4, dimnames=list(n4,n4), giveC=FALSE) # no 'x' 
-  show(a.)
-  show(g. <- as(a., "graph")) 
+  a. <- sparseMatrix(i= 4:1, j=1:4, dimnames=list(n4,n4), giveC=FALSE) # no 'x'
+  show(a.) # "ngTMatrix"
+  show(g. <- as(a., "graph"))
 \dontshow{
   stopifnot(edgemode(g.) == "undirected", numEdges(g.) == 2,
-            as(g.,"Matrix"), as(a., "symmetricMatrix"))
+            all.equal(as(g., "TsparseMatrix"),
+                      as(a., "symmetricMatrix"))
+)
 }
 }% only if( graph )
 }

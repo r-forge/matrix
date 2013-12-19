@@ -25,18 +25,6 @@ setAs("dgTMatrix", "dsCMatrix",
           new("dsCMatrix", Dim = uC@Dim, p = uC@p, i = uC@i, x = uC@x, uplo = "U")
       })
 
-setAs("dgTMatrix", "dsTMatrix",
-      function(from) {
-	  if(isSymmetric(from)) {
-	      upper <- from@i <= from@j
-	      new("dsTMatrix", Dim = from@Dim, Dimnames = from@Dimnames,
-		  i = from@i[upper],
-		  j = from@j[upper], x = from@x[upper], uplo = "U")
-	  }
-	  else
-	      stop("not a symmetric matrix; consider forceSymmetric() or symmpart()")
-      })
-
 ## This is faster:
 setAs("dgTMatrix", "dtCMatrix",
       function(from) {
@@ -48,11 +36,14 @@ setAs("dgTMatrix", "dtCMatrix",
       })
 
 setAs("dgTMatrix", "dtTMatrix",
-      function(from) check.gT2tT(from, cl = "dgTMatrix", toClass = "dtTMatrix",
-				 do.n = FALSE))
+      function(from) check.gT2tT(from, toClass = "dtTMatrix", do.n=FALSE))
 setAs("dgTMatrix", "triangularMatrix",
-      function(from) check.gT2tT(from, cl = "dgTMatrix", toClass = "dtTMatrix",
-				 do.n = FALSE))
+      function(from) check.gT2tT(from, toClass = "dtTMatrix", do.n=FALSE))
+
+setAs("dgTMatrix", "dsTMatrix",
+      function(from) check.gT2sT(from, toClass = "dsTMatrix", do.n=FALSE))
+setAs("dgTMatrix", "symmetricMatrix",
+      function(from) check.gT2sT(from, toClass = "dsTMatrix", do.n=FALSE))
 
 mat2dgT <- function(from) {
     x <- as.double(from)
@@ -124,7 +115,7 @@ setMethod("image", "dgTMatrix",
                     num.r <- length(col.regions)
 		    col.regions <-
 			if (num.r <= numcol)
-			    rep(col.regions, length = numcol)
+			    rep_len(col.regions, numcol)
 			else col.regions[1+ ((1:numcol-1)*(num.r-1)) %/% (numcol-1)]
                     zcol <- rep.int(NA_integer_, length(z))
 		    for (i in seq_along(col.regions))

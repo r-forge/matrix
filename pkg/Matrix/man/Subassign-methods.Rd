@@ -102,6 +102,10 @@
   \code{val} would require the class of \code{x} to be changed, e.g.,
   when \code{x} is logical, say \code{"lsparseMatrix"}, and \code{val}
   is numeric.
+  In other cases, e.g., when \code{x} is a \code{"nsparseMatrix"} and
+  \code{val} is not \code{TRUE} or \code{FALSE}, a warning is signalled,
+  and \code{val} is \dQuote{interpreted} as \code{\link{logical}}, and
+  (logical) \code{\link{NA}} is interpreted as \code{TRUE}.
 }
 \section{Methods}{
   There are \emph{many many} more than these:
