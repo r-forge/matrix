@@ -1,6 +1,8 @@
 ##-*- mode: org -*-
 
 * *Urgent* in some sense ---------------------------------------------------
+** TODO M[ <negative vector> ] <- value all fail for sparse M; invalid object for Tsparse
+ see 'FIXME:' in file:tests/indexing.R
 ** TODO src/CHOLMOD/MatrixOps/cholmod_symmetry.c  is "cool" and fast;
 Definitely should use it for solve(<dgCMatrix>)  {it seems MATLAB does};
 alternatively also is_sym() [in src/cs_utils.c], see below.
