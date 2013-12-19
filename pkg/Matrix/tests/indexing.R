@@ -10,7 +10,7 @@ cat("doExtras:",doExtras,"\n")
 
 if(interactive()) {
     options(error = recover, warn = 1)
-} else if(FALSE) { ## MM @ testing
+} else if(FALSE) { ## MM @ testing *manually* only
     options(error = recover, Matrix.verbose = TRUE, warn = 1)
 } else {
     options(Matrix.verbose = TRUE, warn = 1)
@@ -117,8 +117,9 @@ showProc.time()
 ##' @title Check sparseMatrix sub-assignment   m[i,j] <- v
 ##' @param ms sparse Matrix
 ##' @param mm its [traditional matrix]-equivalent
-##' @param k  (approximate) length of index vectors (i,j)
+##' @param k (approximate) length of index vectors (i,j)
 ##' @param n.uniq (approximate) number of unique values in  i,j
+##' @param vRNG function(n) for random 'v' generation
 ##' @param show logical; if TRUE, it will not stop on error
 ##' @return
 ##' @author Martin Maechler
@@ -128,20 +129,36 @@ chkAssign <- function(ms, mm = as(ms, "matrix"),
                                    function(n) rpois(n,lambda= 0.75)# <- about 47% zeros
                       else ## logical
                           function(n) runif(n) > 0.8 }, ## 80% zeros
-                      show=FALSE)
+                      showOnly=FALSE)
 {
     stopifnot(is(ms,"sparseMatrix"))
     s1 <- function(n) sample(n, pmin(n, pmax(1, rpois(1, n.uniq))))
     i <- sample(s1(nrow(ms)), k/2+ rpois(1, k/2), replace = TRUE)
     j <- sample(s1(ncol(ms)), k/2+ rpois(1, k/2), replace = TRUE)
     assert.EQ.mat(ms[i,j], mm[i,j])
+    ms. <- ms; mm. <- mm # save
     ## now sub*assign* to these repeated indices, and then compare -----
     v <- vRNG(length(i) * length(j))
     mm[i,j] <- v
     ms[i,j] <- v
-    if(!show) { op <- options(error = recover); on.exit(options(op)) }
-    assert.EQ.mat(ms, mm, show=show)
-}
+    ## useful to see (ii,ij), but confusing R/ESS when additionally debugging:
+    ## if(!showOnly && interactive()) { op <- options(error = recover); on.exit(options(op)) }
+    assert.EQ.mat(ms, mm, show=showOnly)
+    ## vector indexing m[cbind(i,j)] == m[i + N(j-1)] ,  N = nrow(.)
+    ii <- seq_len(min(length(i), length(j)))
+    i <- i[ii]
+    j <- j[ii]
+    ij <- cbind(i, j)
+    ii <- i + nrow(ms)*(j - 1)
+    stopifnot(identical(mm[ii], mm[ij]),
+              ## M[ cbind(i,j) ] not yet implemented for (sparse)Matrix
+              ms.[ii] == mm.[ii])
+    v <- v[seq_len(length(i))]
+    if(is(ms,"nMatrix")) v <- as.logical(v)  # !
+    mm.[ij] <- v
+    ms.[ii] <- v
+    assert.EQ.mat(ms., mm., show=showOnly)
+} ##{chkAssign}
 
 ## Get duplicated index {because these are "hard" (and rare)
 getDuplIndex <- function(n, k) {
@@ -172,11 +189,11 @@ for(kind in c("n", "l", "d")) {
               identical(mC, as(mT, Ckind)),
               Qidentical(mC[0,0], new(Ckind)),
               Qidentical(mT[0,0], new(Tkind)),
-              identical(unname(mT[0,]), new(Tkind, Dim = c(0L,20L))),
-              identical(unname(mT[,0]), new(Tkind, Dim = c(40L,0L))),
+              identical(unname(mT[0,]), new(Tkind, Dim = c(0L,ncol(m)))),
+              identical(unname(mT[,0]), new(Tkind, Dim = c(nrow(m),0L))),
               IDENT(mC[0,], as(mT[FALSE,], Ckind)),
               IDENT(mC[,0], as(mT[,FALSE], Ckind)),
-              sapply(c(0:2, 5:10),
+              sapply(pmin(min(dim(mC)), c(0:2, 5:10)),
                      function(k) {i <- seq_len(k); all(mC[i,i] == mT[i,i])}),
               TRUE)
     cat("ok\n")
@@ -188,7 +205,7 @@ for(kind in c("n", "l", "d")) {
     assert.EQ.mat(mC[,FALSE], mm[,FALSE])
     ##
     ## *repeated* (aka 'duplicated') indices - did not work at all ...
-    i <- rep(8:10,2)
+    i <- pmin(nrow(mC), rep(8:10,2))
     j <- c(2:4, 4:3)
     assert.EQ.mat(mC[i,], mm[i,])
     assert.EQ.mat(mC[,j], mm[,j])
@@ -199,12 +216,14 @@ for(kind in c("n", "l", "d")) {
     assert.EQ.mat(mC[i,j], mm[i,j])
     ##
     ## set.seed(7)
+    op <- options(Matrix.verbose = FALSE)
     cat(" for(): ")
     for(n in 1:(if(doExtras) 50 else 5)) {
-        chkAssign(mC, mm)
-        chkAssign(mC[-3,-2], mm[-3,-2])
+	chkAssign(mC, mm)
+	chkAssign(mC[-3,-2], mm[-3,-2])
         cat(".")
     }
+    options(op)
     cat(sprintf("\n[Ok]%s\n\n", repChar("-", 64)))
  }
  cat(sprintf("\nok( %s )\n== ###%s\n\n", kind, repChar("=", 70)))
@@ -478,11 +497,12 @@ for(i in 1:(if(doExtras) 200 else 25)) {
         show(drop0(Nn - nn))
     }
     cat("k")
-    ## sub-assign double precision to logical sparseMatrices should error:
-    ## well... warning for now {back compatibility: gave *no* warning, nothing .. !}:
+    ## sub-assign double precision to logical sparseMatrices: now *with* warning:
+    ##  {earlier: gave *no* warning}:
     assertWarning(Nn[1:2,] <- -pi)
     assertWarning(Nn[, 5] <- -pi)
     assertWarning(Nn[2:4, 5:8] <- -pi)
+    stopifnot(isValid(Nn,"nsparseMatrix"))
     ##
     cat(".")
     if(i %% 10 == 0) cat("\n")
@@ -492,6 +512,16 @@ for(i in 1:(if(doExtras) 200 else 25)) {
     }
 }
 showProc.time()
+Nn <- Nn0
+## Check that  NA is interpreted as TRUE (with a warning), for "nsparseMatrix":
+assertWarning(Nn[ii <- 3 ]    <- NA); stopifnot(isValid(Nn,"nsparseMatrix"), Nn[ii])
+assertWarning(Nn[ii <- 22:24] <- NA); stopifnot(isValid(Nn,"nsparseMatrix"), Nn[ii])
+## FIXME: ALl these  M[-(..)] <- v  *fail* -- Not just for "nsparse*" !
+## assertWarning(Nn[ii <- -(1:99)] <- NA); stopifnot(isValid(Nn,"nsparseMatrix"), Nn[ii])
+assertWarning(Nn[ii <- 3:4  ] <- c(0,NA))
+stopifnot(isValid(Nn,"nsparseMatrix"), Nn[ii] == 0:1)
+assertWarning(Nn[ii <- 25:27] <- c(0,1,NA))
+stopifnot(isValid(Nn,"nsparseMatrix"), Nn[ii] == c(FALSE,TRUE,TRUE))
 
 m0 <- Diagonal(5)
 stopifnot(identical(m0[2,], m0[,2]),
