@@ -297,12 +297,12 @@ replTmat <- function (x, i, j, ..., value)
     spV <- extends(clDv, "sparseVector")
     ## own version of all0() that works both for sparseVector and atomic vectors:
     .all0 <- function(v) if(spV) length(v@i) == 0 else all0(v)
-    delayedAssign("value.is.logical",
-                  if(spV) {
+    delayedAssign("value.not.logical",
+                  !(if(spV) {
                       extends(clDv, "lsparseVector") || extends(clDv, "nsparseVector")
                   } else {
                       is.logical(value) || is.logical(as.vector(value))
-                  })
+                  }))
     na <- nargs()
     if(na == 3) { ## i = vector (but *not* 2-col) indexing"  M[i] <- v
 	Matrix.msg("diagnosing replTmat(x,i,j,v): nargs()= 3; ",
@@ -334,26 +334,30 @@ replTmat <- function (x, i, j, ..., value)
 		if(length(i) < n) i <- rep_len(i, n)
 		i <- (0:(n-1))[i] # -> 0-based index vector as well {maybe LARGE!}
 	    } else i <- integer(0)
-	} else i <- as.integer(i) - 1L ## 0-based indices
+	} else i <- as.integer(i) - 1L ## 0-based indices [to match m_encodeInd2()]
 
         clx <- class(x)
         clDx <- getClassDef(clx) # extends(), is() etc all use the class definition
         has.x <- "x" %in% slotNames(clDx) # === slotNames(x)
 	if(!has.x && # <==> "n.TMatrix"
-	   ((iNA <- any(is.na(value))) || !value.is.logical))
-	    warning(if(iNA)
-		    gettextf("x[.] <- val: x is %s, val not in {TRUE, FALSE} is coerced NA |--> TRUE.",
-			     dQuote(clx))
-		    else
+	   ((iNA <- any(ina <- is.na(value))) || value.not.logical)) {
+            if(value.not.logical) value <- as.logical(value)
+	    if(iNA) {
+		value[ina] <- TRUE
+		warning(
+		    gettextf("x[.] <- val: x is %s, val not in {TRUE, FALSE} is coerced; NA |--> TRUE.",
+			     dQuote(clx)), domain=NA)
+	    }
+	    else warning(
 		    gettextf("x[.] <- val: x is %s, val not in {TRUE, FALSE} is coerced.",
 			     dQuote(clx)), domain=NA)
+	}
 
 	## now have 0-based indices   x.i (entries) and	 i (new entries)
 
 	## the simplest case:
 	if(.all0(value)) { ## just drop the non-zero entries
-	    sel <- is.na(match(x.i, i))
-	    if(any(!sel)) { ## non-zero there
+	    if(!all(sel <- is.na(match(x.i, i)))) { ## non-zero there
 		x@i <- x@i[sel]
 		x@j <- x@j[sel]
 		if(has.x)
@@ -371,21 +375,46 @@ replTmat <- function (x, i, j, ..., value)
 	    value <- rep_len(value, m)
 	}
 
-	## matching existing non-zeros and new entries
-	isE <- !is.na(mi <- match(i, x.i)) ## use  which(isE) , mi[isE]
+        ## With duplicated entries i, only use the last ones!
+        if(id <- anyDuplicated(i, fromLast=TRUE)) {
+            i <- i[-id]
+            value <- value[-id]
+            if(any(id <- duplicated(i, fromLast=TRUE))) {
+                nd <- -which(id)
+                i <- i[nd]
+                value <- value[nd]
+            }
+        }
+
+	## matching existing non-zeros and new entries; isE := "is Existing"
+	##  isE <- i %in% x.i;  mi <- {matching i's}
+        isE <- !is.na(mi <- match(i, x.i))
+        ## => mi[isE] entries in (i,j,x) to be set to new value[]s
+
 	## 1) Change the matching non-zero entries
 	if(has.x)
 	    x@x[mi[isE]] <- value[isE]
+        else if(any0(value[isE])) { ## "n.TMatrix" : remove (i,j) where value is FALSE
+            get0 <- !value[isE] ## x[i,j] is TRUE, should become FALSE
+            i.rm <- - mi[isE][get0]
+            x@i <- x@i[i.rm]
+            x@j <- x@j[i.rm]
+        }
 	## 2) add the new non-zero entries
 	i <- i[!isE]
+	xv <- value[!isE]
+	if(has.x) {
+            x@x <- c(x@x, xv)
+	} else { # n.TMatrix : assign (i,j) only where value is TRUE:
+	    i <- i[xv]
+	}
 	x@i <- c(x@i, i %%  nr)
 	x@j <- c(x@j, i %/% nr)
-	if(has.x)
-	    x@x <- c(x@x, value[!isE])
 	if(extends(clDx, "compMatrix") && length(x@factors)) # drop cashed ones
 	    x@factors <- list()
 	return(x)
-    }
+    } ## {nargs = 3;  x[ii] <- value }
+
     ## nargs() == 4 :  x[i,j] <- value
     ## --------------------------------------------------------------------------
     lenV <- length(value)
@@ -500,7 +529,7 @@ replTmat <- function (x, i, j, ..., value)
     ## now have  lenV <= lenRepl
 
     if(!has.x && # <==> "n.TMatrix"
-       ((iNA <- any(is.na(value))) || !value.is.logical))
+       ((iNA <- any(is.na(value))) || value.not.logical))
 	warning(if(iNA)
 		gettextf("x[.,.] <- val: x is %s, val not in {TRUE, FALSE} is coerced NA |--> TRUE.",
 			 dQuote(clx))
@@ -641,6 +670,10 @@ replTmat <- function (x, i, j, ..., value)
 	i <- which(as(i, if(extends(cli, "sparseMatrix")) "sparseVector" else "vector"))
 	## x[i] <- value ; return(x)
 	return(`[<-`(x,i, value=value))
+    } else if(extends(cli, "Matrix")) { # "dMatrix" or "iMatrix"
+	if(ncol(i) != 2)
+	    stop("such indexing must be by logical or 2-column numeric matrix")
+	i <- as(i, "matrix")
     } else if(!is.numeric(i) || ncol(i) != 2)
 	stop("such indexing must be by logical or 2-column numeric matrix")
     if(!is.integer(i)) storage.mode(i) <- "integer"
@@ -662,7 +695,7 @@ replTmat <- function (x, i, j, ..., value)
     if(length(value) != m) { ## use recycling rules
 	if(m %% length(value) != 0)
 	    warning("number of items to replace is not a multiple of replacement length")
-	value <- rep(value, length = m)
+	value <- rep_len(value, m)
     }
     clx <- class(x)
     clDx <- getClassDef(clx) # extends() , is() etc all use the class definition
@@ -730,12 +763,16 @@ replTmat <- function (x, i, j, ..., value)
     }
 
     ii.v <- .Call(m_encodeInd, i - 1L, di, checkBounds = TRUE)# 0-indexing
-    if(any(d <- duplicated(rev(ii.v)))) { # reverse: "last" duplicated FALSE
-	warning("duplicate ij-entries in 'Matrix[ ij ] <- value'; using last")
-	nd <- !rev(d)
-	## i  <- i    [nd, , drop=FALSE]
-	ii.v  <- ii.v [nd]
-	value <- value[nd]
+    if(id <- anyDuplicated(ii.v, fromLast=TRUE)) {
+        Matrix.msg("duplicate ij-entries in 'Matrix[ ij ] <- value'; using last",
+                   .M.level = 1)
+        ii.v  <- ii.v [-id]
+	value <- value[-id]
+        if(any(id <- duplicated(ii.v, fromLast=TRUE))) {
+            nd <- -which(id)
+            ii.v  <- ii.v [nd]
+            value <- value[nd]
+        }
     }
     ii.x <- .Call(m_encodeInd2, x@i, x@j, di, FALSE)
     m1 <- match(ii.v, ii.x)
@@ -786,6 +823,9 @@ setReplaceMethod("[", signature(x = "TsparseMatrix", i = "index", j = "index",
 		 replTmat)
 
 setReplaceMethod("[", signature(x = "TsparseMatrix", i = "matrix", j = "missing",
+				value = "replValue"),
+		 .TM.repl.i.mat)
+setReplaceMethod("[", signature(x = "TsparseMatrix", i = "Matrix", j = "missing",
 				value = "replValue"),
 		 .TM.repl.i.mat)
 
