@@ -796,7 +796,7 @@ tT2gT <- function(x, cl = class(x), toClass, cld = getClassDef(cl)) {
 ## Fast very special one
 ## .gT2tC <- function(x, uplo, diag) .Call(Tsparse_to_tCsparse, x, uplo, diag)
 
-gT2tT <- function(x, uplo, diag, cl = class(x), toClass,
+gT2tT <- function(x, uplo, diag, toClass,
 		  do.n = extends(toClass, "nMatrix"))
 {
     ## coerce *gTMatrix to *tTMatrix {general -> triangular}
@@ -818,15 +818,34 @@ gT2tT <- function(x, uplo, diag, cl = class(x), toClass,
 	    x = x@x[sel], Dim = x@Dim, Dimnames = x@Dimnames)
 }
 
-check.gT2tT <- function(from, cl = MatrixClass(class(from)),
-			toClass, do.n = extends(toClass, "nMatrix")) {
+check.gT2tT <- function(from, toClass, do.n = extends(toClass, "nMatrix")) {
     if(isTr <- isTriangular(from)) {
-        force(cl)
 	gT2tT(from, uplo = .if.NULL(attr(isTr, "kind"), "U"),
 	      diag = "N", ## improve: also test for unit diagonal
-	      cl = cl, toClass = toClass, do.n = do.n)
+	      toClass = toClass, do.n = do.n)
     } else stop("not a triangular matrix")
 }
+
+gT2sT <- function(x, toClass, do.n = extends(toClass, "nMatrix")) {
+    upper <- x@i <= x@j
+    i <- x@i[upper]
+    j <- x@j[upper]
+    if(do.n) ## no 'x' slot
+	new("nsTMatrix", Dim = x@Dim, Dimnames = x@Dimnames,
+	    i = i, j = j, uplo = "U")
+    else
+	new(toClass, Dim = x@Dim, Dimnames = x@Dimnames,
+	    i = i, j = j, x = x@x[upper], uplo = "U")
+}
+
+check.gT2sT <- function(x, toClass, do.n = extends(toClass, "nMatrix"))
+{
+    if(isSymmetric(x))
+        gT2sT(x, toClass, do.n)
+    else
+	stop("not a symmetric matrix; consider forceSymmetric() or symmpart()")
+}
+
 
 if(FALSE)# unused
 l2d_meth <- function(x) {
