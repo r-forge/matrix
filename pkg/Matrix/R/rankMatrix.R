@@ -49,19 +49,19 @@ rankMatrix <- function(x, tol = NULL,
     }
     if(!useGrad) {
 	x.dense <- is.numeric(x) || is(x,"denseMatrix")
-	findTol <- function() {         # the "Matlab" default:
-	    stopifnot(diff(sval) <= 0)
-	    max(d) * .Machine$double.eps * abs(sval[1])
-	}
 	if(method == "qr") {
-	    if(is.null(tol)) tol <- findTol() # also for sparse QR
-	} else { ## (method != "qr")
+	    if(is.null(tol)) tol <- max(d) * .Machine$double.eps
+	} else { ## (method != "qr"), i.e. "tolNorm2"
 	    if(is.null(tol)) {
 		if(!x.dense && missing(sval) && prod(d) >= 100000L)
-		    warning(gettextf("rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n  Probably should rather use method = 'qr' !?",
+		    warning(gettextf(
+ "rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.
+ Probably should rather use method = 'qr' !?",
 				     method),
 			    immediate.=TRUE, domain=NA)
-		tol <- findTol()
+                ## the "Matlab" default:
+                stopifnot(diff(sval) <= 0) #=> sval[1]= max(sval)
+                tol <- max(d) * .Machine$double.eps
 	    } else stopifnot((tol <- as.numeric(tol)[[1]]) >= 0)
 	}
     }
@@ -69,7 +69,7 @@ rankMatrix <- function(x, tol = NULL,
     structure(## rank :
 	      if(useGrad) which.min(diff1)
 	      else if(method == "qr") {
-		  if(do.t <- (d[1L] < d[2L]))
+		  if((do.t <- (d[1L] < d[2L])) && warn.t)
 		      warning(gettextf(
 			"rankMatrix(x, method='qr'): computing t(x) as nrow(x) < ncol(x)"))
 		  q.r <- qr(if(do.t) t(x) else x, tol=tol, LAPACK = FALSE)
@@ -79,16 +79,17 @@ rankMatrix <- function(x, tol = NULL,
                       ## FIXME: Here, we could be quite a bit faster,
                       ## by not returning the full sparseQR, but just
                       ## doing the following in C, and return the rank.
-		      d <- abs(diag(q.r@R)) ## is abs(.) unneeded? [FIXME]
+		      d.i <- abs(diag(q.r@R)) ## is abs(.) unneeded? [FIXME]
 		      ## declare those entries to be zero that are < tol*max(.)
-		      sum(d >= tol * max(d))
+		      sum(d.i >= tol * max(d.i))
 		      ## was sum(diag(q.r@R) != 0)
 		  }
 		  else stop(gettextf(
 			"method %s not applicable for qr() result class %s",
 				     sQuote(method), dQuote(class(q.r)[1])),
 			    domain=NA)
-	      } else sum(sval >= tol),
+	      }
+	      else sum(sval >= tol * sval[1]), ## "tolNorm2"
 	      "method" = method,
 	      "useGrad" = useGrad,
 	      "tol" = if(useGrad) NA else tol)

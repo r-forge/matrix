@@ -1,5 +1,4 @@
 \name{rankMatrix}
-\Rdversion{1.1}
 \alias{rankMatrix}
 \title{Rank of a Matrix}
 \description{
@@ -14,29 +13,35 @@ rankMatrix(x, tol = NULL,
 }
 \arguments{
   \item{x}{numeric matrix, of dimension \eqn{n \times m}{n x m}, say.}
-  \item{tol}{nonnegative number specifying a tolerance for
+  \item{tol}{nonnegative number specifying a (relative,
+    \dQuote{scalefree}) tolerance for testing of
     \dQuote{practically zero} with specific meaning depending on
-    \code{method}; by default, \code{max(dim(x)) *
-      \link{.Machine}$double.eps * abs(max(sval))} is according to
-    Matlab's default (for its only \code{method} "tolNorm2").}
+    \code{method}; by default, \code{max(dim(x)) * \link{.Machine}$double.eps}
+    is according to Matlab's default (for its only method which is our
+    \code{method="tolNorm2"}).}
   \item{method}{a character string specifying the computational method
     for the rank, can be abbreviated:
     \describe{
-      \item{\code{"tolNorm2"}:}{the number of singular values \code{>= tol};}
+      \item{\code{"tolNorm2"}:}{the number of singular values
+	\code{>= tol * max(sval)};}
       \item{\code{"qr"}:}{for a dense matrix, this is the rank of
 	\code{\link[base]{qr}(x, tol, LAPACK=FALSE)} (which is
 	\code{qr(...)$rank});
+	\cr
+	This ("qr", dense) version used to be \emph{the} recommended way to
+	compute a matrix rank for a while in the past.
 
-	for sparse \code{x}, where \code{qr()} uses a "sparseQR" method (see
+	For sparse \code{x}, where \code{qr()} uses a "sparseQR" method (see
 	\code{\link{qr-methods}}) to compute \eqn{QR}, it is the rank of
-	\eqn{R} defined as the number of non-"zero" diagonal entries
-	\eqn{d_i} of \eqn{R}, and non-"zero"s fulfill
+	\eqn{R} defined as the number of \dQuote{non-zero} diagonal entries
+	\eqn{d_i} of \eqn{R}, and \dQuote{non-zero}s fulfill
 	\eqn{d_i \ge \mathrm{tol}\cdot\max(d_i)}{d_i >= tol * max(d_i)}.
 
-	This (dense version) used to be \emph{the} recommended way to
-	compute a matrix rank for a while in the past.  For this method,
-	\code{sval} are not used (nor computed), which may be crucially
-	important for a large sparse matrix \code{x}.}
+	For method "qr", singular values \code{sval} are not used, which
+	may be crucially important for a large sparse matrix \code{x},
+	as in that case, when \code{sval} is not specified, the default,
+	computing \code{\link{svd}()} currently coerces \code{x} to a
+	dense matrix.}
       \item{\code{"useGrad"}:}{considering the \dQuote{gradient} of the
 	(decreasing) singular values, the index of the \emph{smallest} gap.}
       \item{\code{"maybeGrad"}:}{choosing method \code{"useGrad"} only when
@@ -49,8 +54,9 @@ rankMatrix(x, tol = NULL,
     \code{x}; typically unspecified and computed from \code{x} when
     needed, i.e., unless \code{method = "qr"}.}
   \item{warn.t}{logical indicating if \code{rankMatrix()} should warn
-    when it needs \code{\link{t}(x)} instead of \code{x}. Currently, for
-    \code{method = "qr"} only.}
+    when it needs \code{\link{t}(x)} instead of \code{x}.  Currently, for
+    \code{method = "qr"} only, gives a warning by default because the
+    caller often could have passed \code{t(x)} directly, more efficiently.}
 }
 % \details{
 %   FIXME
@@ -63,7 +69,7 @@ rankMatrix(x, tol = NULL,
   depending on the matrix dimensions.
 
   Note that in the case of sparse \code{x}, \code{method = "qr"}, all
-  non-strictly zero diagonal entries \eqn{d_i} where counted up to
+  non-strictly zero diagonal entries \eqn{d_i} where counted, up to
   including \pkg{Matrix} version 1.1-0, i.e., that method implicitly
   used \code{tol = 0}, see also the seed(42) example below.
 }
@@ -91,6 +97,18 @@ rankMatrix(H12, tol = 1e-20) # 12;  but  11  with default method & tol.
 sapply(meths, function(.m.) rankMatrix(H12, method = .m.))
 ## tolNorm2 qr   useGrad maybeGrad
 ##       11        12        11        11
+## The meaning of 'tol' for method="qr" and *dense* x is not entirely "scale free"
+rMQ <- function(ex, M) rankMatrix(M, method="qr",tol = 10^-ex)
+sapply(5:15, rMQ, M = H12)
+##  7  7  8 10 10 11 11 11 12 12 12  {x86_64}
+sapply(5:15, rMQ, M = 1000 * H12) # not identical unfortunately
+##  7  7  8 10 11 11 12 12 12 12 12
+\dontshow{
+  rM1 <- function(ex, M) rankMatrix(M, tol = 10^-ex)
+  (r12 <- sapply(5:15, rM1, M = H12))
+  stopifnot(identical(r12, sapply(5:15, rM1, M = H12 / 100)),
+            identical(r12, sapply(5:15, rM1, M = H12 * 1e5)))
+}
 
 ## "sparse" case:
 M15 <- kronecker(diag(x=c(100,1,10)), Hilbert(5))
@@ -98,13 +116,17 @@ sapply(meths, function(.m.) rankMatrix(M15, method = .m.))
 #--> all 15, but 'useGrad' has 14.
 
 ## "large" sparse
-n <- 200000; p <- 33; nnz <- 10000
+n <- 250000; p <- 33; nnz <- 10000
 L <- sparseMatrix(i = sample.int(n, nnz, replace=TRUE),
                   j = sample.int(p, nnz, replace=TRUE), x = rnorm(nnz))
-(st1 <- system.time(r1 <- rankMatrix(L)))                # almost 1 sec
+(st1 <- system.time(r1 <- rankMatrix(L)))                #  warning +  ~1.5 sec
 (st2 <- system.time(r2 <- rankMatrix(L, method = "qr"))) # considerably faster!
 r1[[1]] == print(r2[[1]]) ## -->  ( 33  TRUE )
-
+\dontshow{ stopifnot(r1[[1]] == 33, 33 == r2[[1]])
+ if(doExtras <- interactive() ||
+	identical("true", unname(Sys.getenv("R_PKG_CHECKING_doExtras"))))
+  stopifnot(st2[[1]] < 0.2) # seeing 0.03 (on ~ 2010-hardware; R 3.0.2)
+}
 ## another sparse-"qr" one, which ``failed'' till 2013-11-23:
 set.seed(42)
 f1 <- factor(sample(50, 1000, replace=TRUE))
