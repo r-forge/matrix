@@ -8,7 +8,8 @@
 }
 \usage{
 rankMatrix(x, tol = NULL,
-           method = c("tolNorm2", "qr", "useGrad", "maybeGrad"),
+           method = c("tolNorm2", "qr.R", "qrLINPACK", "qr",
+                      "useGrad", "maybeGrad"),
            sval = svd(x, 0, 0)$d, warn.t = TRUE)
 }
 \arguments{
@@ -24,24 +25,33 @@ rankMatrix(x, tol = NULL,
     \describe{
       \item{\code{"tolNorm2"}:}{the number of singular values
 	\code{>= tol * max(sval)};}
-      \item{\code{"qr"}:}{for a dense matrix, this is the rank of
+      \item{\code{"qrLINPACK"}:}{for a dense matrix, this is the rank of
 	\code{\link[base]{qr}(x, tol, LAPACK=FALSE)} (which is
 	\code{qr(...)$rank});
 	\cr
-	This ("qr", dense) version used to be \emph{the} recommended way to
+	This ("qr*", dense) version used to be \emph{the} recommended way to
 	compute a matrix rank for a while in the past.
 
-	For sparse \code{x}, where \code{qr()} uses a "sparseQR" method (see
-	\code{\link{qr-methods}}) to compute \eqn{QR}, it is the rank of
-	\eqn{R} defined as the number of \dQuote{non-zero} diagonal entries
-	\eqn{d_i} of \eqn{R}, and \dQuote{non-zero}s fulfill
+	For sparse \code{x}, this is equivalent to \code{"qr.R"}.
+      }
+      \item{\code{"qr.R"}:}{this is the rank of \eqn{R}, where
+	\code{qr()} uses LAPACK or a "sparseQR" method (see
+	\code{\link{qr-methods}}) to compute \eqn{QR}.  The rank of
+	\eqn{R} is then defined as the number of \dQuote{non-zero}
+	diagonal entries \eqn{d_i} of \eqn{R}, and \dQuote{non-zero}s fulfill
 	\eqn{d_i \ge \mathrm{tol}\cdot\max(d_i)}{d_i >= tol * max(d_i)}.
+      }
+      \item{\code{"qr"}:}{is for back compatibility; for dense \code{x},
+	it corresponds to \code{"qrLINPACK"}, whereas for sparse
+	\code{x}, it uses \code{"qr.R"}.
 
-	For method "qr", singular values \code{sval} are not used, which
-	may be crucially important for a large sparse matrix \code{x},
-	as in that case, when \code{sval} is not specified, the default,
-	computing \code{\link{svd}()} currently coerces \code{x} to a
-	dense matrix.}
+	For all the "qr*" methods, singular values \code{sval} are not
+	used, which may be crucially important for a large sparse matrix
+	\code{x}, as in that case, when \code{sval} is not specified,
+	the default, computing \code{\link{svd}()} currently coerces
+	\code{x} to a dense matrix.
+      }
+
       \item{\code{"useGrad"}:}{considering the \dQuote{gradient} of the
 	(decreasing) singular values, the index of the \emph{smallest} gap.}
       \item{\code{"maybeGrad"}:}{choosing method \code{"useGrad"} only when
@@ -95,15 +105,24 @@ rankMatrix(cbind(1, 0, 1:3)) # 2
 H12 <- Hilbert(12)
 rankMatrix(H12, tol = 1e-20) # 12;  but  11  with default method & tol.
 sapply(meths, function(.m.) rankMatrix(H12, method = .m.))
-## tolNorm2 qr   useGrad maybeGrad
-##       11        12        11        11
-## The meaning of 'tol' for method="qr" and *dense* x is not entirely "scale free"
-rMQ <- function(ex, M) rankMatrix(M, method="qr",tol = 10^-ex)
-sapply(5:15, rMQ, M = H12)
+## tolNorm2    qr   qr.R  qrLINPACK  useGrad maybeGrad
+##       11    12     11         12       11        11
+## The meaning of 'tol' for method="qrLINPACK" and *dense* x is not entirely "scale free"
+rMQL <- function(ex, M) rankMatrix(M, method="qrLINPACK",tol = 10^-ex)
+rMQR <- function(ex, M) rankMatrix(M, method="qr.R",     tol = 10^-ex)
+sapply(5:15, rMQL, M = H12)
 ##  7  7  8 10 10 11 11 11 12 12 12  {x86_64}
-sapply(5:15, rMQ, M = 1000 * H12) # not identical unfortunately
+sapply(5:15, rMQL, M = 1000 * H12) # not identical unfortunately
+##  7  7  8 10 11 11 12 12 12 12 12
+sapply(5:15, rMQR, M = H12)
+##  5  6  7  8  8  9  9 10 10 11 11
+sapply(5:15, rMQR, M = 1000 * H12) # the *same*
 ##  7  7  8 10 11 11 12 12 12 12 12
 \dontshow{
+  (r12 <- sapply(5:15, rMQR, M = H12))
+  stopifnot(identical(r12, sapply(5:15, rMQR, M = H12 / 100)),
+            identical(r12, sapply(5:15, rMQR, M = H12 * 1e5)))
+
   rM1 <- function(ex, M) rankMatrix(M, tol = 10^-ex)
   (r12 <- sapply(5:15, rM1, M = H12))
   stopifnot(identical(r12, sapply(5:15, rM1, M = H12 / 100)),
