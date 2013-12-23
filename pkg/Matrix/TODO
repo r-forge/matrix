@@ -1,8 +1,6 @@
 ##-*- mode: org -*-
 
 * *Urgent* in some sense ---------------------------------------------------
-** TODO M[ <negative vector> ] <- value all fail for sparse M; invalid object for Tsparse
- see 'FIXME:' in file:tests/indexing.R
 ** TODO M[<sparse 2-column Matrix>] indexing should work (but with a warning: use *dense*!)
 ** TODO src/CHOLMOD/MatrixOps/cholmod_symmetry.c  is "cool" and fast;
 Definitely should use it for solve(<dgCMatrix>)  {it seems MATLAB does};

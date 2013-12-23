@@ -103,6 +103,19 @@ setAs("ntTMatrix", "ntCMatrix",
 ##  (i , j) \in
 ##  (numeric, logical, character, missing) x (numeric, log., char., miss.)
 
+##' a simplified "subset" of  intI() below
+int2i <- function(i, n) {
+    if(any(i < 0L)) {
+	if(any(i > 0L))
+	    stop("you cannot mix negative and positive indices")
+	seq_len(n)[i]
+    } else {
+	if(length(i) && max(i, na.rm=TRUE) > n)
+	    stop(gettextf("index larger than maximal %d", n), domain=NA)
+	if(any(z <- i == 0)) i <- i[!z]
+	i
+    }
+}
 
 intI <- function(i, n, dn, give.dn = TRUE)
 {
@@ -328,13 +341,16 @@ replTmat <- function (x, i, j, ..., value)
 	    x.i <- .Call(m_encodeInd2, x@i, x@j, di=di, FALSE)
 	}
 
-	if(is.logical(i)) { # full-size logical indexing
-	    n <- prod(di)
+        n <- prod(di)
+	i <- if(is.logical(i)) { # full-size logical indexing
 	    if(n) {
 		if(length(i) < n) i <- rep_len(i, n)
-		i <- (0:(n-1))[i] # -> 0-based index vector as well {maybe LARGE!}
-	    } else i <- integer(0)
-	} else i <- as.integer(i) - 1L ## 0-based indices [to match m_encodeInd2()]
+		(0:(n-1))[i] # -> 0-based index vector as well {maybe LARGE!}
+	    } else integer(0)
+	} else {
+	    ## also works with *negative* indices etc:
+	    int2i(as.integer(i), n) - 1L ## 0-based indices [to match m_encodeInd2()]
+	}
 
         clx <- class(x)
         clDx <- getClassDef(clx) # extends(), is() etc all use the class definition
