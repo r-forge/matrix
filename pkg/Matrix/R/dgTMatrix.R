@@ -64,9 +64,8 @@ setAs("matrix", "dgTMatrix", mat2dgT)
 
 setMethod("image", "dgTMatrix",
           function(x,
-		   xlim = .5 + c(0, di[2]),
-		   ylim = .5 + c(di[1], 0),
-                   aspect = "iso", ## was default "fill"
+		   xlim = c(1, di[2]),
+		   ylim = c(di[1], 1), aspect = "iso",
                    sub = sprintf("Dimensions: %d x %d", di[1], di[2]),
 		   xlab = "Column", ylab = "Row", cuts = 15,
 		   useRaster = FALSE,
@@ -97,7 +96,11 @@ setMethod("image", "dgTMatrix",
                   }
           if(!is.null(lwd) && !(is.numeric(lwd) && all(lwd >= 0))) # allow lwd=0
               stop("'lwd' must be NULL or non-negative numeric")
-
+          stopifnot(length(xlim) == 2, length(ylim) == 2)
+	  ## ylim: the rows count from top to bottom:
+	  ylim <- sort(ylim, decreasing=TRUE)
+	  if(all(xlim == round(xlim))) xlim <- xlim+ c(-.5, .5)
+	  if(all(ylim == round(ylim))) ylim <- ylim+ c(-.5, .5)
           levelplot(x@x ~ (x@j + 1L) * (x@i + 1L),
                     sub = sub, xlab = xlab, ylab = ylab,
                     xlim = xlim, ylim = ylim, aspect = aspect,
