@@ -132,11 +132,12 @@ chkAssign <- function(ms, mm = as(ms, "matrix"),
                       showOnly=FALSE)
 {
     stopifnot(is(ms,"sparseMatrix"))
+    d <- dim(ms)
     s1 <- function(n) sample(n, pmin(n, pmax(1, rpois(1, n.uniq))))
-    i <- sample(s1(nrow(ms)), k/2+ rpois(1, k/2), replace = TRUE)
-    j <- sample(s1(ncol(ms)), k/2+ rpois(1, k/2), replace = TRUE)
+    i <- sample(s1(d[1]), k/2+ rpois(1, k/2), replace = TRUE)
+    j <- sample(s1(d[2]), k/2+ rpois(1, k/2), replace = TRUE)
     assert.EQ.mat(ms[i,j], mm[i,j])
-    ms. <- ms; mm. <- mm # save
+    ms2 <- ms. <- ms; mm. <- mm # save
     ## now sub*assign* to these repeated indices, and then compare -----
     v <- vRNG(length(i) * length(j))
     mm[i,j] <- v
@@ -150,13 +151,23 @@ chkAssign <- function(ms, mm = as(ms, "matrix"),
     j <- j[ii]
     ij <- cbind(i, j)
     ii <- i + nrow(ms)*(j - 1)
+    ord.i <- order(ii)
+    iio <- ii[ord.i]
+    ui <- unique(iio) # compare these with :
+    neg.ii <- - setdiff(seq_len(prod(d)), ii)
     stopifnot(identical(mm[ii], mm[ij]),
-              ## M[ cbind(i,j) ] not yet implemented for (sparse)Matrix
+              identical(ms.[ui], ms.[neg.ii]),
+	      ms.[ij] == mm.[ii], ## M[ cbind(i,j) ] was partly broken; now checking
               ms.[ii] == mm.[ii])
     v <- v[seq_len(length(i))]
     if(is(ms,"nMatrix")) v <- as.logical(v)  # !
     mm.[ij] <- v
     ms.[ii] <- v
+    nodup <- (length(ui) == length(ii)) ## <==>  ! anyDuplicated(iio)
+    if(nodup) { cat("[-]") # rare, unfortunately
+	ms2[neg.ii] <- v[ord.i]
+	stopifnot(identical(ms2, ms.))
+    }
     assert.EQ.mat(ms., mm., show=showOnly)
 } ##{chkAssign}
 
@@ -514,10 +525,9 @@ for(i in 1:(if(doExtras) 200 else 25)) {
 showProc.time()
 Nn <- Nn0
 ## Check that  NA is interpreted as TRUE (with a warning), for "nsparseMatrix":
-assertWarning(Nn[ii <- 3 ]    <- NA); stopifnot(isValid(Nn,"nsparseMatrix"), Nn[ii])
-assertWarning(Nn[ii <- 22:24] <- NA); stopifnot(isValid(Nn,"nsparseMatrix"), Nn[ii])
-## FIXME: ALl these  M[-(..)] <- v  *fail* -- Not just for "nsparse*" !
-## assertWarning(Nn[ii <- -(1:99)] <- NA); stopifnot(isValid(Nn,"nsparseMatrix"), Nn[ii])
+assertWarning(Nn[ii <-     3  ] <- NA); stopifnot(isValid(Nn,"nsparseMatrix"), Nn[ii])
+assertWarning(Nn[ii <-   22:24] <- NA); stopifnot(isValid(Nn,"nsparseMatrix"), Nn[ii])
+assertWarning(Nn[ii <- -(1:99)] <- NA); stopifnot(isValid(Nn,"nsparseMatrix"), Nn[ii])
 assertWarning(Nn[ii <- 3:4  ] <- c(0,NA))
 stopifnot(isValid(Nn,"nsparseMatrix"), Nn[ii] == 0:1)
 assertWarning(Nn[ii <- 25:27] <- c(0,1,NA))
@@ -576,12 +586,17 @@ showProc.time()
 
 
 ## "Vector indices" -------------------
+asLogical <- function(x) {
+    stopifnot(is.atomic(x))
+    storage.mode(x) <- "logical"
+    x
+}
 .iniDiag.example <- expression({
     D <- Diagonal(6)
     M <- as(D,"dgeMatrix")
     m <- as(D,"matrix")
-    s <- as(D,"TsparseMatrix")
-    S <- as(s,"CsparseMatrix")
+    s <- as(D,"TsparseMatrix"); N <- as(s,"nMatrix")
+    S <- as(s,"CsparseMatrix"); C <- as(S,"nMatrix")
 })
 eval(.iniDiag.example)
 i <- c(3,1,6); v <- c(10,15,20)
@@ -595,43 +610,76 @@ M[i] <- v; assert.EQ.mat(M,m) # dge
 D[i] <- v; assert.EQ.mat(D,m) # ddi -> dtT -> dgT
 s[i] <- v; assert.EQ.mat(s,m) # dtT -> dgT
 S[i] <- v; assert.EQ.mat(S,m); S # dtC -> dtT -> dgT -> dgC
+m.L <- asLogical(m)
+C[i] <- v; assert.EQ.mat(C,m.L); validObject(C)
+N[i] <- v; assert.EQ.mat(N,m.L); validObject(N)
 stopifnot(Q.C.identical(D,s, checkClass=FALSE))
-## logical
+## logical *vector* indexing
 eval(.iniDiag.example)
-m[L] <- z
+m[L] <- z; m.L <- asLogical(m)
 M[L] <- z; assert.EQ.mat(M,m)
 D[L] <- z; assert.EQ.mat(D,m)
 s[L] <- z; assert.EQ.mat(s,m)
 S[L] <- z; assert.EQ.mat(S,m) ; S
+C[L] <- z; assert.EQ.mat(C,m.L)
+N[L] <- z; assert.EQ.mat(N,m.L)
+
 
 ## indexing [i]  vs  [i,] --- now ok
 eval(.iniDiag.example)
-stopifnot(identical5(m[i], M[i], D[i], s[i], S[i]))
-stopifnot(identical5(m[L], M[L], D[L], s[L], S[L]))
+stopifnot(identical5(m[i], M[i], D[i], s[i], S[i]), identical3(as.logical(m[i]), C[i], N[i]),
+          identical5(m[L], M[L], D[L], s[L], S[L]), identical3(as.logical(m[L]), C[L], N[L]))
 ## bordercase ' drop = .' *vector* indexing {failed till 2009-04-..)
 stopifnot(identical5(m[i,drop=FALSE], M[i,drop=FALSE], D[i,drop=FALSE],
-		     s[i,drop=FALSE], S[i,drop=FALSE]))
+		     s[i,drop=FALSE], S[i,drop=FALSE]),
+	  identical3(as.logical(m[i,drop=FALSE]),
+		     C[i,drop=FALSE], N[i,drop=FALSE]))
 stopifnot(identical5(m[L,drop=FALSE], M[L,drop=FALSE], D[L,drop=FALSE],
-		     s[L,drop=FALSE], S[L,drop=FALSE]))
+		     s[L,drop=FALSE], S[L,drop=FALSE]),
+	  identical3(as.logical(m[L,drop=FALSE]),
+		     C[L,drop=FALSE], N[L,drop=FALSE]))
 ## using L for row-indexing should give an error
 assertError(m[L,]); assertError(m[L,, drop=FALSE])
 ## these did not signal an error, upto (including) 0.999375-30:
 assertError(s[L,]); assertError(s[L,, drop=FALSE])
 assertError(S[L,]); assertError(S[L,, drop=FALSE])
+assertError(N[L,]); assertError(N[L,, drop=FALSE])
 
 ## row indexing:
 assert.EQ.mat(D[i,], m[i,])
 assert.EQ.mat(M[i,], m[i,])
 assert.EQ.mat(s[i,], m[i,])
 assert.EQ.mat(S[i,], m[i,])
+assert.EQ.mat(C[i,], asLogical(m[i,]))
+assert.EQ.mat(N[i,], asLogical(m[i,]))
 ## column indexing:
 assert.EQ.mat(D[,i], m[,i])
 assert.EQ.mat(M[,i], m[,i])
 assert.EQ.mat(s[,i], m[,i])
 assert.EQ.mat(S[,i], m[,i])
+assert.EQ.mat(C[,i], asLogical(m[,i]))
+assert.EQ.mat(N[,i], asLogical(m[,i]))
 
 
-## --- negative indices ----------
+### --- negative indices ----------
+
+## 1) negative *vector* indexing
+eval(.iniDiag.example)
+i <- -(2:30)
+stopifnot(identical5(m[i], M[i], D[i], s[i], S[i]),
+          identical3(as.logical(m[i]), C[i], N[i]))
+##  negative vector subassignment :
+v <- seq_along(m[i])
+m[i] <- v; m.L <- asLogical(m)
+M[i] <- v; assert.EQ.mat(M,m) # dge
+D[i] <- v; assert.EQ.mat(D,m) # ddi -> dtT -> dgT
+s[i] <- v; assert.EQ.mat(s,m) # dtT -> dgT
+S[i] <- v; assert.EQ.mat(S,m); S # dtC -> dtT -> dgT -> dgC
+N[i] <- v; assert.EQ.mat(N,m.L); N #
+C[i] <- v; assert.EQ.mat(C,m.L); C #
+
+
+## 2) negative [i,j] indices
 mc <- mC[1:5, 1:7]
 mt <- mT[1:5, 1:7]
 ## sub matrix
