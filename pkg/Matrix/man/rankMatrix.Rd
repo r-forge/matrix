@@ -110,14 +110,13 @@ sapply(meths, function(.m.) rankMatrix(H12, method = .m.))
 ## The meaning of 'tol' for method="qrLINPACK" and *dense* x is not entirely "scale free"
 rMQL <- function(ex, M) rankMatrix(M, method="qrLINPACK",tol = 10^-ex)
 rMQR <- function(ex, M) rankMatrix(M, method="qr.R",     tol = 10^-ex)
-sapply(5:15, rMQL, M = H12)
+sapply(5:15, rMQL, M = H12) # result is platform dependent
 ##  7  7  8 10 10 11 11 11 12 12 12  {x86_64}
 sapply(5:15, rMQL, M = 1000 * H12) # not identical unfortunately
 ##  7  7  8 10 11 11 12 12 12 12 12
 sapply(5:15, rMQR, M = H12)
 ##  5  6  7  8  8  9  9 10 10 11 11
 sapply(5:15, rMQR, M = 1000 * H12) # the *same*
-##  7  7  8 10 11 11 12 12 12 12 12
 \dontshow{
   (r12 <- sapply(5:15, rMQR, M = H12))
   stopifnot(identical(r12, sapply(5:15, rMQR, M = H12 / 100)),
