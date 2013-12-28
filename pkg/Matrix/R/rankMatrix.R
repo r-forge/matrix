@@ -6,8 +6,6 @@
 ##
 ## Ideas by Martin Maechler (April 2007) and Ravi Varadhan (October 2007)
 
-## (for now: use code & examples from /u/maechler/R/MM/NUMERICS/rankMat.R )
-
 rankMatrix <- function(x, tol = NULL,
                        method = c("tolNorm2", "qr.R", "qrLINPACK", "qr",
                                   "useGrad", "maybeGrad"),
