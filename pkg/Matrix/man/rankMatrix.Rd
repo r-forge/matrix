@@ -34,12 +34,13 @@ rankMatrix(x, tol = NULL,
 
 	For sparse \code{x}, this is equivalent to \code{"qr.R"}.
       }
-      \item{\code{"qr.R"}:}{this is the rank of \eqn{R}, where
-	\code{qr()} uses LAPACK or a "sparseQR" method (see
-	\code{\link{qr-methods}}) to compute \eqn{QR}.  The rank of
-	\eqn{R} is then defined as the number of \dQuote{non-zero}
-	diagonal entries \eqn{d_i} of \eqn{R}, and \dQuote{non-zero}s fulfill
-	\eqn{d_i \ge \mathrm{tol}\cdot\max(d_i)}{d_i >= tol * max(d_i)}.
+      \item{\code{"qr.R"}:}{this is the rank of triangular matrix
+	\eqn{R}, where \code{qr()} uses LAPACK or a "sparseQR" method
+	(see \code{\link{qr-methods}}) to compute the decomposition
+	\eqn{QR}.  The rank of \eqn{R} is then defined as the number of
+	\dQuote{non-zero} diagonal entries \eqn{d_i} of \eqn{R}, and
+	\dQuote{non-zero}s fulfill
+	\eqn{|d_i| \ge \mathrm{tol}\cdot\max(|d_i|)}{|d_i| >= tol * max(|d_i|)}.
       }
       \item{\code{"qr"}:}{is for back compatibility; for dense \code{x},
 	it corresponds to \code{"qrLINPACK"}, whereas for sparse
