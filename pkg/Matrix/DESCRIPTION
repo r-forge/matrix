@@ -8,7 +8,7 @@ Maintainer: Martin Maechler <mmaechler+Matrix@gmail.com>
 Contact: Doug and Martin <Matrix-authors@R-project.org>
 Description: Classes and methods for dense and sparse matrices and
     operations on them using LAPACK and SuiteSparse.
-Depends: R (>= 2.15.0), methods
+Depends: R (>= 2.15.2), methods
 Imports: graphics, grid, stats, utils, lattice
 Suggests: expm, MASS
 Enhances: MatrixModels, graph, SparseM, sfsmisc
