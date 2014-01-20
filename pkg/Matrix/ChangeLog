@@ -1,3 +1,10 @@
+2014-01-20  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.1-2
+
+	* NAMESPACE: export fast power-user coercion utilities
+	.dsy2mat(), .dxC2mat(), .T2Cmat().
+
 2013-12-23  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/dgTMatrix.R (image): (xlim, ylim) get a slightly changed

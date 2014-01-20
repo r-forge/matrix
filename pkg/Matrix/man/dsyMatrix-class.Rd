@@ -22,6 +22,7 @@
 \alias{coerce,dsyMatrix,dpoMatrix-method}% instead of setIs
 \alias{coerce,dsyMatrix,dspMatrix-method}
 \alias{coerce,dsyMatrix,lsyMatrix-method}
+\alias{.dsy2mat}% hidden but exported
 \alias{coerce,dsyMatrix,matrix-method}
 \alias{coerce,matrix,dsyMatrix-method}
 \alias{diag,dspMatrix-method}
