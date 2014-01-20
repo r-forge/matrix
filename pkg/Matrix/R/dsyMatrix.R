@@ -16,6 +16,8 @@ setAs("dgeMatrix", "dsyMatrix",
 setAs("matrix", "dsyMatrix",
       function(from) as(as(from, "dgeMatrix"), "dsyMatrix"))
 
+.dsy2mat <- function(from, keep.dimnames=TRUE)# faster 
+    .Call(dsyMatrix_as_matrix, from, keep.dimnames)
 setAs("dsyMatrix", "matrix",
       function(from) .Call(dsyMatrix_as_matrix, from, TRUE))
 
