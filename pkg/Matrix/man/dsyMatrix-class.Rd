@@ -3,13 +3,8 @@
 \alias{dspMatrix-class}
 \alias{dsyMatrix-class}
 %
-\alias{\%*\%,ddenseMatrix,dsyMatrix-method}
-\alias{\%*\%,matrix,dsyMatrix-method}
-\alias{\%*\%,dsyMatrix,dsyMatrix-method}
-\alias{\%*\%,dspMatrix,ddenseMatrix-method}
-\alias{\%*\%,dspMatrix,matrix-method}
-\alias{\%*\%,dsyMatrix,ddenseMatrix-method}
-\alias{\%*\%,dsyMatrix,matrix-method}
+% \alias{solve, ..} --> solve-methods.Rd
+% \alias{\%*%,  ..} --> matrix-products.Rd
 \alias{coerce,dspMatrix,dsyMatrix-method}
 \alias{coerce,dspMatrix,lspMatrix-method}
 \alias{coerce,dspMatrix,matrix-method}
@@ -39,8 +34,6 @@
 \alias{rcond,dspMatrix,missing-method}
 \alias{rcond,dsyMatrix,character-method}
 \alias{rcond,dsyMatrix,missing-method}
-%% \alias{solve,dspMatrix,..-method}
-%% \alias{solve,dsyMatrix,missing-method}--> solve-methods.Rd
 \alias{t,dspMatrix-method}
 \alias{t,dsyMatrix-method}
 \title{Symmetric Dense Numeric Matrices}
