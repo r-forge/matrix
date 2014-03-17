@@ -17,6 +17,16 @@ importFrom("stats" ## potentially all these (we import into 'lme4a'):
            , update
            )
 
+importFrom("methods"
+	   , callGeneric, as, is, extends, new
+	   , getClass, getClassDef, validObject
+	   , setClass, setClassUnion
+           , setGeneric
+           , setMethod, setOldClass
+           , setRefClass
+           , setValidity, slot, "slot<-"
+	   , signature, representation, prototype)
+
 
 ## Those our methods and functions use:
 importMethodsFrom("Matrix", as.matrix, as.vector, coerce,

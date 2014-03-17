@@ -367,13 +367,14 @@ IRLS <- function(mod, control) {
     stopifnot(is(mod, "glpModel"))
     respMod <- mod@resp
     predMod <- mod@pred
+    ## localVariables("..."):
+    MXITER <- warnOnly <- verbose <- quick <- TOL <- SMIN <- finalUpdate <- NULL
     do.defaults(control,
 		list(MXITER = 200L, TOL = 0.0001, SMIN = 0.0001,
 		     verbose = 0L,# integer: for verboseness levels
 		     warnOnly = FALSE,
 		     quick = TRUE, finalUpdate = FALSE),
                 environment())
-
     cc <- predMod@coef
     respMod <- updateMu(respMod, as.vector(predMod@X %*% cc))
     iter <- nHalvings <- 0 ; DONE <- FALSE
