@@ -120,11 +120,17 @@ setMethod("symmpart", signature(x = "matrix"), function(x) (x + t(x))/2)
 setMethod("skewpart", signature(x = "matrix"), function(x) (x - t(x))/2)
 
 
-if(getRversion() >= "3.1.0")
+if(getRversion() >= "3.1.0") {
 ## NB: ./nsparseMatrix.R and ./sparseVector.R have extra methods
-setMethod("anyNA", signature(x = "xMatrix"),
-	  function(x) anyNA(x@x))
-
+setMethod("anyNA", signature(x = "xMatrix"), function(x) anyNA(x@x))
+if(TRUE) { ## BUG in R [FIXME]: The above fails to dispatch currently, the following is a workaround:
+    xMatrix.subCl <- local({ xM.scl <- getClass("xMatrix")@subclasses
+		       names(xM.scl)[vapply(xM.scl, slot, 0, "distance") == 1] })
+    for(cl in xMatrix.subCl)
+	setMethod("anyNA", signature(x = cl), function(x) anyNA(x@x))
+    rm(xMatrix.subcl)
+}
+}# R >= 3.1.0
 
 setMethod("dim", signature(x = "Matrix"),
 	  function(x) x@Dim, valueClass = "integer")
