@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.1.0 / matrix 1.1-2\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
-"POT-Creation-Date: 2013-12-23 21:27\n"
+"POT-Creation-Date: 2014-03-26 21:03\n"
 "PO-Revision-Date: 2014-03-16 17:17+0100\n"
 "Last-Translator: Detlef Steuer <steuer@hsu-hh.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
@@ -120,6 +120,12 @@ msgid "i1[1] == 0 ==> C-level verbosity will not happen!"
 msgstr "i1[1] == 0 ==> C-Ebene wird nicht detailliert sein!"
 
 msgid "using\t \"old code\" part in  Csparse subassignment"
+msgstr "benutzt wird\t 'alter Kode'-Teil in Csparse-Unterzuweisung"
+
+#, fuzzy
+msgid ""
+"using\"old code\" part in Csparse subassignment\n"
+" >>> please report to Matrix-authors@r-project.org"
 msgstr "benutzt wird\t 'alter Kode'-Teil in Csparse-Unterzuweisung"
 
 msgid ""
@@ -241,6 +247,10 @@ msgstr ""
 "Programmierfehler: min() ohne erstes Argument hätte eher abgefangen\n"
 "sein müssen"
 
+#, fuzzy
+msgid "in Summary(<ANY>, .): %s(<%s>, <%s>,...)"
+msgstr "in Summary(<ANY>, .): %s(<%s>, <%s>%s)"
+
 msgid "invalid or not-yet-implemented 'Matrix' subsetting"
 msgstr "ungültige oder noch nicht implementierte 'Matrix'-Untermenge"
 
@@ -344,11 +354,11 @@ msgstr ""
 msgid "%s %s <Matrix> is undefined"
 msgstr "%s %s <Matrix> ist undefiniert"
 
-msgid "longer object length"
-msgstr "längere Objektlänge"
-
-msgid "is not a multiple of shorter object length"
-msgstr "ist kein Vielfaches der kürzeren Objektlänge"
+#, fuzzy
+msgid "longer object length is not a multiple of shorter object length"
+msgstr ""
+"längere Objektlänge\n"
+"\tist kein Vielfaches der kürzeren Objektlänge"
 
 msgid "dim [product %d] do not match the length of object [%d]"
 msgstr "dim [produkt %d] passt nicht zur Länge des Objekts [%d]"
@@ -488,7 +498,8 @@ msgstr ""
 " deshalb müssen alle k dasselbe Vorzeichen haben."
 
 msgid "the %d-th (sub)-diagonal (k = %d) is too short; filling with NA's"
-msgstr "die  %d-te (Unter)-Diagonale (k = %d) ist zu kurz und wird mit NA aufgefüllt"
+msgstr ""
+"die  %d-te (Unter)-Diagonale (k = %d) ist zu kurz und wird mit NA aufgefüllt"
 
 msgid "'A' must be a square matrix"
 msgstr "'A' muss eine quadratische Matrix sein"
@@ -534,10 +545,13 @@ msgstr "ungültige nargs()= %d"
 msgid ""
 "LU computationally singular: ratio of extreme entries in |diag(U)| = %9.4g"
 msgstr ""
-"Die LU Zerlegung ist computational singulär; Quotient der extremen Elemente von |diag(U)| = %9.4g"
+"Die LU Zerlegung ist computational singulär; Quotient der extremen Elemente "
+"von |diag(U)| = %9.4g"
 
 msgid "cannot coerce non-symmetric \"dgTMatrix\" to \"dsCMatrix\" class"
-msgstr "nicht symmetrische \"dgTMatrix\" kann nicht in \"dsCMatrix\" Klasse umgewandelt werden"
+msgstr ""
+"nicht symmetrische \"dgTMatrix\" kann nicht in \"dsCMatrix\" Klasse "
+"umgewandelt werden"
 
 msgid "the matrix is not triangular"
 msgstr "die Matrix ist nicht dreieckig"
@@ -562,7 +576,9 @@ msgstr "nicht quadratische Matrix"
 
 msgid ""
 "matrix with non-zero off-diagonals cannot be coerced to \"diagonalMatrix\""
-msgstr "Matrix mit Nichtdiagonalelementen ungleich Null kann nicht in \"diagonalMatrix\" umgewandelt werden"
+msgstr ""
+"Matrix mit Nichtdiagonalelementen ungleich Null kann nicht in "
+"\"diagonalMatrix\" umgewandelt werden"
 
 msgid "matrix is not diagonal"
 msgstr "Matrix ist nicht diagonal"
@@ -591,13 +607,16 @@ msgstr "keine positiv definite Matrix"
 msgid ""
 "as(.,\"dsCMatrix\") is deprecated (since 2008); do use as(., "
 "\"symmetricMatrix\")"
-msgstr "as(.,\"dsCMatrix\") ist veraltet (seit 2008). Benutzen Sie as(., \"symmetricMatrix\")"
+msgstr ""
+"as(.,\"dsCMatrix\") ist veraltet (seit 2008). Benutzen Sie as(., "
+"\"symmetricMatrix\")"
 
 msgid "inefficient coercion (lost triangularity); please report"
 msgstr "ineffiziente Umwandlung (verlorene Dreieckigkeit). Bitte berichten"
 
 msgid "coercion to \"indMatrix\" only works from integer numeric"
-msgstr "Umwandlung zu \"indMatrix\" funktioniert nur von ganzzahligen numerischen "
+msgstr ""
+"Umwandlung zu \"indMatrix\" funktioniert nur von ganzzahligen numerischen "
 
 msgid ""
 "coercion from list(i1,...,ik, d) to \"indMatrix\" failed.\n"
@@ -606,7 +625,8 @@ msgid ""
 " than the maximal index i*."
 msgstr ""
 "Umwandlung von list(i1,...,ik, d) zu \"indMatrix\" gescheitert.\n"
-" Alle Elemente müssen ganzzahlig sein und die Anzahl Spalten, d, nicht kleiner\n"
+" Alle Elemente müssen ganzzahlig sein und die Anzahl Spalten, d, nicht "
+"kleiner\n"
 " als der maximale Index i*."
 
 msgid "not a skinny matrix"
@@ -641,7 +661,8 @@ msgid "temporarily disabled"
 msgstr "zeitweise ausgeschaltet"
 
 msgid "coercion to \"pMatrix\" only works from integer numeric"
-msgstr "Umwandlung zu \"pMatrix\" funktioniert nur von ganzzahligen numerischen"
+msgstr ""
+"Umwandlung zu \"pMatrix\" funktioniert nur von ganzzahligen numerischen"
 
 msgid "not a square matrix"
 msgstr "keine quadratische Matrix"
@@ -768,6 +789,12 @@ msgstr ""
 msgid "'x' is not symmetric nor triangular"
 msgstr "'x' ist weder symmetrisch noch in Dreiecksform"
 
+#~ msgid "longer object length"
+#~ msgstr "längere Objektlänge"
+
+#~ msgid "is not a multiple of shorter object length"
+#~ msgstr "ist kein Vielfaches der kürzeren Objektlänge"
+
 #~ msgid "duplicate ij-entries in 'Matrix[ ij ] <- value'; using last"
 #~ msgstr ""
 #~ "doppelte ij-Einträge in 'Matrix[ IJ ] <- value'. Letzter wird benutzt"
@@ -797,9 +824,6 @@ msgstr "'x' ist weder symmetrisch noch in Dreiecksform"
 
 #~ msgid "dimnames(.) <- NULL:  translated to"
 #~ msgstr "dimnames(.) <- NULL: übersetzt zu"
-
-#~ msgid "in Summary(<ANY>, .): %s(<%s>, <%s>%s)"
-#~ msgstr "in Summary(<ANY>, .): %s(<%s>, <%s>%s)"
 
 #~ msgid ", ..."
 #~ msgstr ", ..."
