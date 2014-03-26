@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-2-2\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
-"POT-Creation-Date: 2013-12-23 21:27\n"
+"POT-Creation-Date: 2014-03-26 21:03\n"
 "PO-Revision-Date: 2014-03-25 21:59+0100\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
@@ -221,6 +221,12 @@ msgstr "i1[1] == 0 ==> tryb 'verbose' poziomu C nie zostanie wykonany!"
 msgid "using\t \"old code\" part in  Csparse subassignment"
 msgstr "używanie\t części 'old code' w przypisaniu w 'Csparse'"
 
+#, fuzzy
+msgid ""
+"using\"old code\" part in Csparse subassignment\n"
+" >>> please report to Matrix-authors@r-project.org"
+msgstr "używanie\t części 'old code' w przypisaniu w 'Csparse'"
+
 # Matrix/R/Csparse.R: 498
 # stop("Cholesky(<nsparse...>) -> *symbolic* factorization -- not yet implemented")
 msgid ""
@@ -417,6 +423,9 @@ msgstr ""
 "błąd programistyczny: 'min()' powinno zostać wysłane z pierwszym argumentem "
 "znacznie wcześniej"
 
+msgid "in Summary(<ANY>, .): %s(<%s>, <%s>,...)"
+msgstr ""
+
 # Matrix/R/Matrix.R: 563
 # stop("invalid or not-yet-implemented 'Matrix' subsetting")
 msgid "invalid or not-yet-implemented 'Matrix' subsetting"
@@ -601,13 +610,19 @@ msgstr ""
 msgid "%s %s <Matrix> is undefined"
 msgstr "%s %s <Matrix> nie jest określone"
 
-msgid "longer object length"
-msgstr "długość dłuższego obiektu"
-
-# Matrix/R/abIndex.R: 465
-# warning("longer object length is not a multiple of shorter object length")
-msgid "is not a multiple of shorter object length"
-msgstr "nie jest wielokrotnością długości krótszego obiektu"
+# Matrix/R/Ops.R: 1117
+# warning("longer object length\n\tis not a multiple of shorter object length")
+# Matrix/R/Ops.R: 1512
+# warning("longer object length\n\tis not a multiple of shorter object length")
+# Matrix/R/Ops.R: 1604
+# warning("longer object length\n\tis not a multiple of shorter object length")
+# Matrix/R/Ops.R: 1630
+# warning("longer object length\n\tis not a multiple of shorter object length")
+#, fuzzy
+msgid "longer object length is not a multiple of shorter object length"
+msgstr ""
+"długość dłuższego obiektu\n"
+"\tnie jest wielokrotnością długości krótszego obiektu"
 
 # Matrix/R/Ops.R: 1595
 # stop(sprintf(
@@ -1362,3 +1377,11 @@ msgstr "(roz)pakowanie stosuje się jedynie do gęstych macierzy, class(x)='%s'"
 # stop("'x' is not symmetric nor triangular")
 msgid "'x' is not symmetric nor triangular"
 msgstr "'x' nie jest macierzą symetryczną ani trójkątną"
+
+#~ msgid "longer object length"
+#~ msgstr "długość dłuższego obiektu"
+
+# Matrix/R/abIndex.R: 465
+# warning("longer object length is not a multiple of shorter object length")
+#~ msgid "is not a multiple of shorter object length"
+#~ msgstr "nie jest wielokrotnością długości krótszego obiektu"

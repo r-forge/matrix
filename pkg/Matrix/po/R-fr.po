@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-1\n"
-"POT-Creation-Date: 2014-03-18 22:27\n"
+"POT-Creation-Date: 2014-03-26 21:03\n"
 "PO-Revision-Date: 2014-03-18 21:28+0100\n"
 "Last-Translator: \n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -124,6 +124,14 @@ msgstr ""
 "utilisation d'une partie\t d'\"ancien code\" dans une sous-assignation "
 "Csparse"
 
+#, fuzzy
+msgid ""
+"using\"old code\" part in Csparse subassignment\n"
+" >>> please report to Matrix-authors@r-project.org"
+msgstr ""
+"utilisation d'une partie\t d'\"ancien code\" dans une sous-assignation "
+"Csparse"
+
 msgid ""
 "Cholesky(<nsparse...>) -> *symbolic* factorization -- not yet implemented"
 msgstr ""
@@ -242,6 +250,9 @@ msgstr ""
 "erreur de programmation : min() aurait du être dispatché avec le 1er arg "
 "bien plus tôt"
 
+msgid "in Summary(<ANY>, .): %s(<%s>, <%s>,...)"
+msgstr ""
+
 msgid "invalid or not-yet-implemented 'Matrix' subsetting"
 msgstr "extraction d'un sous-ensemble de 'Matrix' incorrect ou non implémenté"
 
@@ -352,11 +363,11 @@ msgstr ""
 msgid "%s %s <Matrix> is undefined"
 msgstr "%s %s <Matrix> est indéfini"
 
-msgid "longer object length"
-msgstr "la longueur de l'objet le plus long"
-
-msgid "is not a multiple of shorter object length"
-msgstr "n'est pas un multiple de l'objet le plus court"
+#, fuzzy
+msgid "longer object length is not a multiple of shorter object length"
+msgstr ""
+"la longueur de l'objet le plus long\n"
+"\tn'est pas un multiple de la longueur de l'objet le plus court"
 
 msgid "dim [product %d] do not match the length of object [%d]"
 msgstr "dim [product %d] ne correspond pas à la longueur de l'objet [%d]"
@@ -809,3 +820,9 @@ msgstr ""
 
 msgid "'x' is not symmetric nor triangular"
 msgstr "'x' n'est ni symétrique ni triangulaire"
+
+#~ msgid "longer object length"
+#~ msgstr "la longueur de l'objet le plus long"
+
+#~ msgid "is not a multiple of shorter object length"
+#~ msgstr "n'est pas un multiple de l'objet le plus court"

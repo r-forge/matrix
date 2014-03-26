@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-2-2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-23 21:27+0100\n"
+"POT-Creation-Date: 2014-03-18 22:27+0100\n"
 "PO-Revision-Date: 2014-03-24 17:53+0100\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
@@ -377,7 +377,7 @@ msgstr ""
 
 # Matrix/src/Mutils.c: 763
 # error(_("unexpected ctype = %d in 'dup_mMatrix_as_geMatrix' function"), ctype)
-#: Mutils.c:763
+#: Mutils.c:769
 #, c-format
 msgid "unexpected ctype = %d in dup_mMatrix_as_geMatrix"
 msgstr "nieoczekiwany 'ctype = %d' w funkcji 'dup_mMatrix_as_geMatrix()'"
@@ -385,7 +385,7 @@ msgstr "nieoczekiwany 'ctype = %d' w funkcji 'dup_mMatrix_as_geMatrix()'"
 # Matrix/src/Mutils.c: 794
 # error(_("invalid class \"%s\" passed to 'dup_mMatrix_as_dgeMatrix' function"),
 # 		  class_P(A))
-#: Mutils.c:794
+#: Mutils.c:800
 #, c-format
 msgid "invalid class '%s' to dup_mMatrix_as_dgeMatrix"
 msgstr ""
@@ -393,38 +393,38 @@ msgstr ""
 
 # Matrix/src/Mutils.c: 840
 # error(_("Argument 'ij' must be 2-column integer matrix"))
-#: Mutils.c:840
+#: Mutils.c:846
 msgid "Argument ij must be 2-column integer matrix"
 msgstr "Argument 'ij' musi być 2-kolumnową macierzą liczb całkowitych"
 
 # Matrix/src/Mutils.c: 856
 # error(_("subscript 'i' out of bounds in M[ij]"))
-#: Mutils.c:856
+#: Mutils.c:862
 msgid "subscript 'i' out of bounds in M[ij]"
 msgstr "indeks 'i' poza zakresem w 'M[ij]'"
 
 # Matrix/src/Mutils.c: 858
 # error(_("subscript 'j' out of bounds in M[ij]"))
-#: Mutils.c:858
+#: Mutils.c:864
 msgid "subscript 'j' out of bounds in M[ij]"
 msgstr "indeks 'j' poza zakresem w 'M[ij]'"
 
 # Matrix/src/Mutils.c: 897
 # error(_("'i' and 'j' arguments must be integer vectors of the same length"))
-#: Mutils.c:897
+#: Mutils.c:903
 msgid "i and j must be integer vectors of the same length"
 msgstr ""
 "'i' oraz 'j' muszą być wektorami liczb całkowitych o tej samej długości"
 
 # Matrix/src/Mutils.c: 983
 # error(_("'data' must be of a vector type"))
-#: Mutils.c:983
+#: Mutils.c:989
 msgid "'data' must be of a vector type"
 msgstr "'data' musi być type wektor"
 
 # Matrix/src/Mutils.c: 990
 # error(_("invalid '%s' argument"), "byrow")
-#: Mutils.c:990
+#: Mutils.c:996
 #, c-format
 msgid "invalid '%s' argument"
 msgstr "niepoprawny argument '%s'"
@@ -433,37 +433,37 @@ msgstr "niepoprawny argument '%s'"
 # error(_("non-numeric matrix extent"))
 # Matrix/src/Mutils.c: 1005
 # error(_("non-numeric matrix extent"))
-#: Mutils.c:997 Mutils.c:1005
+#: Mutils.c:1003 Mutils.c:1011
 msgid "non-numeric matrix extent"
 msgstr "nieliczbowy rozmiar macierzy"
 
 # Matrix/src/Mutils.c: 1000
 # error(_("invalid 'nrow' value (too large or NA)"))
-#: Mutils.c:1000
+#: Mutils.c:1006
 msgid "invalid 'nrow' value (too large or NA)"
 msgstr "niepoprawna wartość 'nrow' (zbyt duża lub wartość NA)"
 
 # Matrix/src/Mutils.c: 1002
 # error(_("invalid 'nrow' value (< 0)"))
-#: Mutils.c:1002
+#: Mutils.c:1008
 msgid "invalid 'nrow' value (< 0)"
 msgstr "niepoprawna wartość 'nrow' (< 0)"
 
 # Matrix/src/Mutils.c: 1008
 # error(_("invalid 'ncol' value (too large or NA)"))
-#: Mutils.c:1008
+#: Mutils.c:1014
 msgid "invalid 'ncol' value (too large or NA)"
 msgstr "niepoprawna wartość 'ncol' (zbyt duża lub wartość NA)"
 
 # Matrix/src/Mutils.c: 1010
 # error(_("invalid 'ncol' value (< 0)"))
-#: Mutils.c:1010
+#: Mutils.c:1016
 msgid "invalid 'ncol' value (< 0)"
 msgstr "niepoprawna wartość 'ncol' (< 0)"
 
 # Matrix/src/Mutils.c: 1028
 # warning(_("data length [%d] is not a sub-multiple or multiple of the number of rows [%d]"), lendat, nr)
-#: Mutils.c:1028
+#: Mutils.c:1034
 #, c-format
 msgid ""
 "data length [%d] is not a sub-multiple or multiple of the number of rows [%d]"
@@ -473,7 +473,7 @@ msgstr ""
 
 # Matrix/src/Mutils.c: 1031
 # warning(_("data length [%d] is not a sub-multiple or multiple of the number of columns [%d]"), lendat, nc)
-#: Mutils.c:1031
+#: Mutils.c:1037
 #, c-format
 msgid ""
 "data length [%d] is not a sub-multiple or multiple of the number of columns "
@@ -484,19 +484,19 @@ msgstr ""
 
 # Matrix/src/Mutils.c: 1034
 # warning(_("data length exceeds size of matrix"))
-#: Mutils.c:1034
+#: Mutils.c:1040
 msgid "data length exceeds size of matrix"
 msgstr "długość danych przekracza rozmiar macierzy"
 
 # Matrix/src/Mutils.c: 1040
 # error(_("too many elements specified"))
-#: Mutils.c:1040
+#: Mutils.c:1046
 msgid "too many elements specified"
 msgstr "określono zbyt dużo elementów"
 
 # Matrix/src/dpoMatrix.c: 115
 # error(_("Argument 'b' must be a numeric matrix"))
-#: Mutils.c:1127 Mutils.c:1160
+#: Mutils.c:1133 Mutils.c:1166
 msgid "Argument must be numeric-like atomic vector"
 msgstr "Argument musi być atomowym wektorem liczbowym"
 
@@ -538,38 +538,38 @@ msgstr "Argument 'rho' musi być środowiskiem"
 
 # Matrix/src/chm_common.c: 230
 # error(_("invalid class of object passed to 'as_cholmod_sparse' function"))
-#: chm_common.c:237
+#: chm_common.c:232
 msgid "invalid class of object to as_cholmod_sparse"
 msgstr ""
 "niepoprawna klasa obiektu przekazanego do funkcji 'as_cholmod_sparse()'"
 
 # Matrix/src/chm_common.c: 232
 # error(_("invalid object passed to 'as_cholmod_sparse' function"))
-#: chm_common.c:239
+#: chm_common.c:234
 msgid "invalid object passed to as_cholmod_sparse"
 msgstr "niepoprawny obiekt przekazany do funkcji 'as_cholmod_sparse()'"
 
 # Matrix/src/chm_common.c: 259
 # error(_("'in_place' 'cholmod_sort' returned an error code"))
-#: chm_common.c:266
+#: chm_common.c:261
 msgid "in_place cholmod_sort returned an error code"
 msgstr "'in_place' funkcji 'cholmod_sort()' zwróciło kod błędu"
 
 # Matrix/src/chm_common.c: 265
 # error(_("'cholmod_sort' function returned an error code"))
-#: chm_common.c:272
+#: chm_common.c:267
 msgid "cholmod_sort returned an error code"
 msgstr "funkcja 'cholmod_sort' zwróciła kod błędu"
 
 # Matrix/src/chm_common.c: 346
 # error(_("chm_sparse_to_SEXP(<real>, *): invalid 'Rkind' (real kind code)"))
-#: chm_common.c:353
+#: chm_common.c:349
 msgid "chm_sparse_to_SEXP(<real>, *): invalid 'Rkind' (real kind code)"
 msgstr "chm_sparse_to_SEXP(<real>, *): niepoprawny 'Rkind' (kod 'real kind')"
 
 # Matrix/src/chm_common.c: 354
 # error(_("unknown 'xtype' in \"cholmod_sparse\" object"))
-#: chm_common.c:361
+#: chm_common.c:357
 msgid "unknown xtype in cholmod_sparse object"
 msgstr "nieznany 'xtype' w obiekcie klasy \"cholmod_sparse\""
 
@@ -581,7 +581,7 @@ msgstr "nieznany 'xtype' w obiekcie klasy \"cholmod_sparse\""
 # error(_("complex sparse matrix code not yet written"))
 # Matrix/src/chm_common.c: 862
 # error(_("complex sparse matrix code not yet written"))
-#: chm_common.c:390 chm_common.c:585 chm_common.c:820 chm_common.c:870
+#: chm_common.c:386 chm_common.c:581 chm_common.c:816 chm_common.c:866
 msgid "complex sparse matrix code not yet written"
 msgstr "kod dla zespolonych rzadkich macierzy nie został jeszcze napisany"
 
@@ -589,20 +589,20 @@ msgstr "kod dla zespolonych rzadkich macierzy nie został jeszcze napisany"
 # error(_("'symmetric' and 'triangular' both set"))
 # Matrix/src/chm_common.c: 582
 # error(_("'symmetric' and 'triangular' both set"))
-#: chm_common.c:395 chm_common.c:590
+#: chm_common.c:391 chm_common.c:586
 msgid "Symmetric and triangular both set"
 msgstr "Ustawiono jednocześnie 'symmetric' oraz 'triangular'"
 
 # Matrix/src/chm_common.c: 428
 # error(_("invalid class of object passed to 'as_cholmod_triplet' function"))
-#: chm_common.c:435
+#: chm_common.c:431
 msgid "invalid class of object to as_cholmod_triplet"
 msgstr ""
 "niepoprawna klasa obiektu przekazanego do funkcji 'as_cholmod_triplet()'"
 
 # Matrix/src/chm_common.c: 452
 # error(_("as_cholmod_triplet(): could not reallocate for internal 'diagU2N()' function"))
-#: chm_common.c:459
+#: chm_common.c:455
 msgid "as_cholmod_triplet(): could not reallocate for internal diagU2N()"
 msgstr ""
 "as_cholmod_triplet(): nie można ponownie przydzielić dla wewnętrznej funkcji "
@@ -610,19 +610,19 @@ msgstr ""
 
 # Matrix/src/chm_common.c: 549
 # error(_("unknown 'xtype' in \"cholmod_triplet\" object"))
-#: chm_common.c:557
+#: chm_common.c:553
 msgid "unknown xtype in cholmod_triplet object"
 msgstr "nieznany 'xtype' w obiekcie klasy \"cholmod_triplet\""
 
 # Matrix/src/chm_common.c: 628
 # error(_("invalid class of object passed to 'as_cholmod_dense()' function"))
-#: chm_common.c:636
+#: chm_common.c:632
 msgid "invalid class of object to as_cholmod_dense"
 msgstr "niepoprawna klasa obiektu przekazanego do funkcji 'as_cholmod_dense()'"
 
 # Matrix/src/chm_common.c: 698
 # error(_("Cholmod error '%s' at file %s, line %d"), message, file, line)
-#: chm_common.c:706
+#: chm_common.c:702
 #, c-format
 msgid "Cholmod error '%s' at file %s, line %d"
 msgstr "Błąd 'cholmod' '%s' w pliku %s, linia %d"
@@ -630,21 +630,21 @@ msgstr "Błąd 'cholmod' '%s' w pliku %s, linia %d"
 # Matrix/src/chm_common.c: 702
 # warning(_("Cholmod warning '%s' at file %s, line %d"),
 # 		message, file, line)
-#: chm_common.c:710
+#: chm_common.c:706
 #, c-format
 msgid "Cholmod warning '%s' at file %s, line %d"
 msgstr "Ostrzeżenie 'cholmod' '%s' w pliku %s, linia %d"
 
 # Matrix/src/chm_common.c: 731
 # error(_("Unable to initialize 'cholmod' function: error code %d"), res)
-#: chm_common.c:739
+#: chm_common.c:735
 #, c-format
 msgid "Unable to initialize cholmod: error code %d"
 msgstr "Nie można zainicjować funkcji 'cholmod()': kod błędu %d"
 
 # Matrix/src/chm_common.c: 778
 # error(_("unknown 'Rkind'"))
-#: chm_common.c:786
+#: chm_common.c:782
 msgid "unknown 'Rkind'"
 msgstr "nieznany 'Rkind'"
 
@@ -652,7 +652,7 @@ msgstr "nieznany 'Rkind'"
 # error(_("unknown 'xtype'"))
 # Matrix/src/chm_common.c: 848
 # error(_("unknown 'xtype'"))
-#: chm_common.c:793 chm_common.c:856
+#: chm_common.c:789 chm_common.c:852
 msgid "unknown xtype"
 msgstr "nieznany 'xtype'"
 
@@ -660,69 +660,69 @@ msgstr "nieznany 'xtype'"
 # error(_("code for 'cholmod_dense()' function with holes not yet written"))
 # Matrix/src/chm_common.c: 871
 # error(_("code for 'cholmod_dense()' functionwith holes not yet written"))
-#: chm_common.c:826 chm_common.c:879
+#: chm_common.c:822 chm_common.c:875
 msgid "code for cholmod_dense with holes not yet written"
 msgstr "kod dla funkcji 'cholmod_dense()' z dziurami nie jest jeszcze napisany"
 
 # Matrix/src/chm_common.c: 867
 # error(_("don't know if a dense pattern matrix makes sense"))
-#: chm_common.c:875
+#: chm_common.c:871
 msgid "don't know if a dense pattern matrix makes sense"
 msgstr "nie wiadomo, czy gęsty wzrór macierzy ma sens"
 
 # Matrix/src/chm_common.c: 934
 # error(_("invalid class of object passed to 'as_cholmod_factor' function"))
-#: chm_common.c:942
+#: chm_common.c:938
 msgid "invalid class of object to as_cholmod_factor"
 msgstr ""
 "niepoprawna klasa obiektu przekazanego do funkcji 'as_cholmod_factor()'"
 
 # Matrix/src/chm_common.c: 948
 # error(_("Supernodal LDL decomposition not available"))
-#: chm_common.c:956
+#: chm_common.c:952
 msgid "Supernodal LDL' decomposition not available"
 msgstr "Dekompozycja supernodalna LDL nie jest dostępna"
 
 # Matrix/src/chm_common.c: 950
 # error(_("Supernodal/simplicial class inconsistent with 'type' flags"))
-#: chm_common.c:958
+#: chm_common.c:954
 msgid "Supernodal/simplicial class inconsistent with type flags"
 msgstr "klasa supernodal/simplicial niespójna z flagami 'type'"
 
 # Matrix/src/chm_common.c: 968
 # error(_("Number of supernodes must be positive when 'is_super' argument is TRUE"))
-#: chm_common.c:976
+#: chm_common.c:972
 msgid "Number of supernodes must be positive when is_super is TRUE"
 msgstr ""
 "Liczba super węzłów musi być dodatnia gdy argument 'is_super' ma wartość TRUE"
 
 # Matrix/src/chm_common.c: 971
 # error(_("Lengths of 'super' and 'pi' arguments must be equal"))
-#: chm_common.c:979
+#: chm_common.c:975
 msgid "Lengths of super and pi must be equal"
 msgstr "Długości 'super' oraz 'pi' muszą być równe"
 
 # Matrix/src/chm_common.c: 975
 # error(_("Lengths of 'super' and 'px' arguments must be equal"))
-#: chm_common.c:983
+#: chm_common.c:979
 msgid "Lengths of super and px must be equal"
 msgstr "Długości 'super' oraz 'px' muszą być równe"
 
 # Matrix/src/chm_common.c: 988
 # error(_("failure in 'as_cholmod_factor' function"))
-#: chm_common.c:996
+#: chm_common.c:992
 msgid "failure in as_cholmod_factor"
 msgstr "niepowodzenie w funkcji 'as_cholmod_factor()'"
 
 # Matrix/src/chm_common.c: 1016
 # error(_("CHOLMOD factorization was unsuccessful"))
-#: chm_common.c:1024
+#: chm_common.c:1020
 msgid "CHOLMOD factorization was unsuccessful"
 msgstr "Faktoryzacja 'CHOLMOD' nie powiodła się"
 
 # Matrix/src/chm_common.c: 1029
 # error(_("f->xtype of %d not recognized"), f->xtype)
-#: chm_common.c:1037
+#: chm_common.c:1033
 #, c-format
 msgid "f->xtype of %d not recognized"
 msgstr "'f->xtype' dla %d nie został rozpoznany"
@@ -730,14 +730,14 @@ msgstr "'f->xtype' dla %d nie został rozpoznany"
 # Matrix/src/chm_common.c: 1094
 # error(_("chm_diagN2U(<non-square matrix>): nrow=%d, ncol=%d"),
 # 	      n, chx->ncol)
-#: chm_common.c:1102
+#: chm_common.c:1098
 #, c-format
 msgid "chm_diagN2U(<non-square matrix>): nrow=%d, ncol=%d"
 msgstr "chm_diagN2U(<niekwadratowa macierz>): nrow=%d, ncol=%d"
 
 # Matrix/src/chm_common.c: 1137
 # error(_("chm_diagN2U(x, uploT = %d): uploT should be +- 1"), uploT)
-#: chm_common.c:1145
+#: chm_common.c:1141
 #, c-format
 msgid "chm_diagN2U(x, uploT = %d): uploT should be +- 1"
 msgstr "chm_diagN2U(x, uploT = %d): 'uploT' powinien wynosić +/- 1"
@@ -1006,7 +1006,7 @@ msgstr "'dgCMatrix_lusol' wymaga kwadratowej, niepustej macierzy"
 # error(_("Dimensions of system to be solved are inconsistent"))
 # Matrix/src/dspMatrix.c: 79
 # error(_("Dimensions of system to be solved are inconsistent"))
-#: dgCMatrix.c:157 dgCMatrix.c:183 dgCMatrix.c:437 dgCMatrix.c:470
+#: dgCMatrix.c:157 dgCMatrix.c:184 dgCMatrix.c:438 dgCMatrix.c:472
 #: dgeMatrix.c:422 dpoMatrix.c:91 dpoMatrix.c:116 dppMatrix.c:80
 #: dspMatrix.c:78 dsyMatrix.c:85 dtCMatrix.c:90 dtCMatrix.c:106 dtrMatrix.c:98
 msgid "Dimensions of system to be solved are inconsistent"
@@ -1020,7 +1020,7 @@ msgstr "'cs_lusol' nie powiódł się"
 
 # Matrix/src/dgCMatrix.c: 181
 # error(_("'dgCMatrix_qrsol(., order)' function needs order in {0,..,3}"))
-#: dgCMatrix.c:180
+#: dgCMatrix.c:181
 msgid "dgCMatrix_qrsol(., order) needs order in {0,..,3}"
 msgstr ""
 "funkcja 'dgCMatrix_qrsol(., order)' potrzebuje zmiennej 'order' ze zbioru "
@@ -1029,7 +1029,7 @@ msgstr ""
 # Matrix/src/dgCMatrix.c: 190
 # error(_("'dgCMatrix_qrsol(<%d x %d>-matrix)' function requires a 'tall' rectangular matrix"),
 # 		xc->m, xc->n)
-#: dgCMatrix.c:189
+#: dgCMatrix.c:190
 #, c-format
 msgid "dgCMatrix_qrsol(<%d x %d>-matrix) requires a 'tall' rectangular matrix"
 msgstr ""
@@ -1038,58 +1038,58 @@ msgstr ""
 
 # Matrix/src/dgCMatrix.c: 201
 # error(_("'cs_qrsol()' function failed inside 'dgCMatrix_qrsol()' function"))
-#: dgCMatrix.c:200
+#: dgCMatrix.c:201
 msgid "cs_qrsol() failed inside dgCMatrix_qrsol()"
 msgstr ""
 "funkcja 'cs_qrsol()' nie powiodła się wewnątrz funkcji 'dgCMatrix_qrsol()'"
 
 # Matrix/src/dgCMatrix.c: 220
 # error(_("'A' must have #{rows} >= #{columns}"))
-#: dgCMatrix.c:219
+#: dgCMatrix.c:220
 msgid "A must have #{rows} >= #{columns}"
 msgstr "'A' musi mieć liczbę wierszy >= liczba kolumn"
 
 # Matrix/src/dgCMatrix.c: 160
 # error(_("cs_lusol failed"))
-#: dgCMatrix.c:224
+#: dgCMatrix.c:225
 msgid "cs_sqr failed"
 msgstr "funkcja 'cs_lusol()' nie powiodła się"
 
 # Matrix/src/dgCMatrix.c: 160
 # error(_("cs_lusol failed"))
-#: dgCMatrix.c:229
+#: dgCMatrix.c:230
 msgid "cs_qr failed"
 msgstr "funkcja 'cs_qr' nie powiodła się "
 
 # Matrix/src/dgCMatrix.c: 293
 # error(_("'SuiteSparseQR_C_QR' function returned an error code"))
-#: dgCMatrix.c:292
+#: dgCMatrix.c:293
 msgid "SuiteSparseQR_C_QR returned an error code"
 msgstr "funkcja 'SuiteSparseQR_C_QR()' zwróciła kod błędu"
 
 # Matrix/src/dgCMatrix.c: 337
 # error(_("LU decomposition applies only to square matrices"))
-#: dgCMatrix.c:336
+#: dgCMatrix.c:337
 msgid "LU decomposition applies only to square matrices"
 msgstr "dekompozycja LU stosuje się tylko do macierzy kwadratowych"
 
 # Matrix/src/dgCMatrix.c: 346
 # error(_("cs_lu(A) failed: near-singular 'A' (or out of memory)"))
-#: dgCMatrix.c:345
+#: dgCMatrix.c:346
 msgid "cs_lu(A) failed: near-singular A (or out of memory)"
 msgstr ""
 "'cs_lu(A)' nie powiódł się: 'A' jest bliskie osobliwości (lub brak pamięci)"
 
 # Matrix/src/dgCMatrix.c: 406
 # error(_("dgCMatrix_matrix_solve(.., sparse=TRUE) not yet implemented"))
-#: dgCMatrix.c:405
+#: dgCMatrix.c:406
 msgid "dgCMatrix_matrix_solve(.., sparse=TRUE) not yet implemented"
 msgstr ""
 "'dgCMatrix_matrix_solve(.., sparse=TRUE)' nie jest jeszcze zaimplementowane"
 
 # Matrix/src/dgCMatrix.c: 469
 # error(_("'dgCMatrix_cholsol' function requires a 'short, wide' rectangular matrix"))
-#: dgCMatrix.c:468
+#: dgCMatrix.c:470
 msgid "dgCMatrix_cholsol requires a 'short, wide' rectangular matrix"
 msgstr ""
 "funkcja 'dgCMatrix_cholsol()' wymaga krótkiej lub szerokiej macierzy "
@@ -1097,14 +1097,14 @@ msgstr ""
 
 # Matrix/src/dgCMatrix.c: 477
 # error(_("'cholmod_sdmult' function error (rhs)"))
-#: dgCMatrix.c:476
+#: dgCMatrix.c:478
 msgid "cholmod_sdmult error (rhs)"
 msgstr "błąd funkcji 'cholmod_sdmult' (prawa strona)"
 
 # Matrix/src/CHMfactor.c: 135
 # error(_("cholmod_factorize_p failed: status %d, minor %d of ncol %d"),
 # 	      c.status, f->minor, f->n)
-#: dgCMatrix.c:479
+#: dgCMatrix.c:481
 #, c-format
 msgid "cholmod_factorize failed: status %d, minor %d from ncol %d"
 msgstr ""
@@ -1113,7 +1113,7 @@ msgstr ""
 # Matrix/src/dgCMatrix.c: 484
 # error(_("'cholmod_solve' function (CHOLMOD_A) failed: status %d, minor %d from ncol %d"),
 # 	      c.status, L->minor, L->n)
-#: dgCMatrix.c:483
+#: dgCMatrix.c:485
 #, c-format
 msgid "cholmod_solve (CHOLMOD_A) failed: status %d, minor %d from ncol %d"
 msgstr ""
@@ -1122,7 +1122,7 @@ msgstr ""
 
 # Matrix/src/dgCMatrix.c: 501
 # error(_("'cholmod_sdmult' function error (resid)"))
-#: dgCMatrix.c:500
+#: dgCMatrix.c:502
 msgid "cholmod_sdmult error (resid)"
 msgstr "błąd funkcji 'cholmod_sdmult' (reszta)"
 
