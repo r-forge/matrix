@@ -22,7 +22,7 @@ importFrom("methods",
 	   , callGeneric, as, is, extends, new
 	   , getClass, getClassDef, validObject
 	   , setClass, setClassUnion, setMethod, setOldClass
-	   , setValidity, slot, "slot<-"
+	   , setValidity, slot, "slot<-", .hasSlot
 	   , signature, representation, prototype)
 
 
