@@ -1,0 +1,18 @@
+
+grep -nHi -e Translator: *.po
+----------------------------- (without the 'en@quot' ones)
+
+de.po:12:"Last-Translator: Detlef Steuer <detlef.steuer@gmx.de>\n"
+fr.po:11:"Last-Translator: Philippe.GROSJEAN@umons.ac.be\n"
+pl.po:7:"Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
+
+R-de.po:12:"Last-Translator: Detlef Steuer <steuer@hsu-hh.de>\n"
+R-fr.po:6:"Last-Translator: Philippe.GROSJEAN@umons.ac.be\n"
+R-pl.po:7:"Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
+
+---------
+E-mails
+
+To: Detlef Steuer <detlef.steuer@gmx.de, 
+    Łukasz Daniel <lukasz.daniel@gmail.com, 
+    Philippe.GROSJEAN@umons.ac.be
