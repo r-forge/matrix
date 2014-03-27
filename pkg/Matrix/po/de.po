@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.1.0 / matrix 1.1-2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-18 22:27+0100\n"
+"POT-Creation-Date: 2014-03-27 10:27+0100\n"
 "PO-Revision-Date: 2014-03-16 16:50+0100\n"
 "Last-Translator: Detlef Steuer <detlef.steuer@gmx.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
@@ -913,8 +913,11 @@ msgid "dtrMatrix must be square"
 msgstr "dtrMatrix muss quadratisch sein"
 
 #: dtrMatrix.c:160
-msgid "dtrMatrices in %*% must have matching (square) dim."
-msgstr "dtrMatrix in %*% muss quadratisch mit passender Dimension sein"
+#, fuzzy
+msgid "\"dtrMatrix\"' objects in '%*%' must have matching (square) dimension"
+msgstr ""
+"\"dtrMatrix\" Objekte in '%*%' müssen quadratisch mit passender Dimension "
+"sein"
 
 #: dtrMatrix.c:247
 msgid "cannot set diag() as long as 'diag = \"U\"'"

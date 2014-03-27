@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-2-2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-18 22:27+0100\n"
+"POT-Creation-Date: 2014-03-27 10:27+0100\n"
 "PO-Revision-Date: 2014-03-24 17:53+0100\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
@@ -1462,9 +1462,10 @@ msgstr "obiekt klasy \"dtrMatrix\" musi być kwadratowy"
 # Matrix/src/dtrMatrix.c: 161
 # error(_("objects of class \"dtrMatrices\" in %*% must have matching (square) dimensions"))
 #: dtrMatrix.c:160
-msgid "dtrMatrices in %*% must have matching (square) dim."
+#, fuzzy
+msgid "\"dtrMatrix\"' objects in '%*%' must have matching (square) dimension"
 msgstr ""
-"obiekty klasy \"dtrMatrices\" w %*% muszą mieć pasujące (kwadratowe) wymiary."
+"obiekty klasy \"dtrMatrix\" w '%*%' muszą mieć pasujące (kwadratowe) wymiary."
 
 # Matrix/src/dtrMatrix.c: 248
 # error(_("cannot set diag() as long as 'diag = \"U\"'"))
