@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: R 3.1.0 / matrix 1.1-2\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
 "POT-Creation-Date: 2014-03-26 21:03\n"
-"PO-Revision-Date: 2014-03-16 17:17+0100\n"
+"PO-Revision-Date: 2014-03-28 10:23+0100\n"
 "Last-Translator: Detlef Steuer <steuer@hsu-hh.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
 "Language: de\n"
@@ -122,11 +122,12 @@ msgstr "i1[1] == 0 ==> C-Ebene wird nicht detailliert sein!"
 msgid "using\t \"old code\" part in  Csparse subassignment"
 msgstr "benutzt wird\t 'alter Kode'-Teil in Csparse-Unterzuweisung"
 
-#, fuzzy
 msgid ""
 "using\"old code\" part in Csparse subassignment\n"
 " >>> please report to Matrix-authors@r-project.org"
-msgstr "benutzt wird\t 'alter Kode'-Teil in Csparse-Unterzuweisung"
+msgstr ""
+"benutzt wird     'alter Kode'-Teil in Csparse-Unterzuweisung\n"
+" >>> bitte an Matrix-authors@r-project.org berichten"
 
 msgid ""
 "Cholesky(<nsparse...>) -> *symbolic* factorization -- not yet implemented"
@@ -247,9 +248,8 @@ msgstr ""
 "Programmierfehler: min() ohne erstes Argument hätte eher abgefangen\n"
 "sein müssen"
 
-#, fuzzy
 msgid "in Summary(<ANY>, .): %s(<%s>, <%s>,...)"
-msgstr "in Summary(<ANY>, .): %s(<%s>, <%s>%s)"
+msgstr "in Summary(<ANY>, .): %s(<%s>, <%s>, ...)"
 
 msgid "invalid or not-yet-implemented 'Matrix' subsetting"
 msgstr "ungültige oder noch nicht implementierte 'Matrix'-Untermenge"
@@ -354,11 +354,8 @@ msgstr ""
 msgid "%s %s <Matrix> is undefined"
 msgstr "%s %s <Matrix> ist undefiniert"
 
-#, fuzzy
 msgid "longer object length is not a multiple of shorter object length"
-msgstr ""
-"längere Objektlänge\n"
-"\tist kein Vielfaches der kürzeren Objektlänge"
+msgstr "längere Objektlänge ist kein Vielfaches der kürzeren Objektlänge"
 
 msgid "dim [product %d] do not match the length of object [%d]"
 msgstr "dim [produkt %d] passt nicht zur Länge des Objekts [%d]"

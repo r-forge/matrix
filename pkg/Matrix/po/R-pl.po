@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Matrix 1.1-2-2\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
 "POT-Creation-Date: 2014-03-26 21:03\n"
-"PO-Revision-Date: 2014-03-25 21:59+0100\n"
+"PO-Revision-Date: 2014-03-27 14:47+0100\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language: pl_PL\n"
@@ -221,11 +221,12 @@ msgstr "i1[1] == 0 ==> tryb 'verbose' poziomu C nie zostanie wykonany!"
 msgid "using\t \"old code\" part in  Csparse subassignment"
 msgstr "używanie\t części 'old code' w przypisaniu w 'Csparse'"
 
-#, fuzzy
 msgid ""
 "using\"old code\" part in Csparse subassignment\n"
 " >>> please report to Matrix-authors@r-project.org"
-msgstr "używanie\t części 'old code' w przypisaniu w 'Csparse'"
+msgstr ""
+"używanie części 'old code' w przypisaniu w 'Csparse'\n"
+">>> proszę zgłosić raport na adres 'Matrix-authors@r-project.org'"
 
 # Matrix/R/Csparse.R: 498
 # stop("Cholesky(<nsparse...>) -> *symbolic* factorization -- not yet implemented")
@@ -424,7 +425,7 @@ msgstr ""
 "znacznie wcześniej"
 
 msgid "in Summary(<ANY>, .): %s(<%s>, <%s>,...)"
-msgstr ""
+msgstr "w funkcji 'Summary(<ANY>, .): %s(<%s>, <%s>,...)'"
 
 # Matrix/R/Matrix.R: 563
 # stop("invalid or not-yet-implemented 'Matrix' subsetting")
@@ -618,11 +619,9 @@ msgstr "%s %s <Matrix> nie jest określone"
 # warning("longer object length\n\tis not a multiple of shorter object length")
 # Matrix/R/Ops.R: 1630
 # warning("longer object length\n\tis not a multiple of shorter object length")
-#, fuzzy
 msgid "longer object length is not a multiple of shorter object length"
 msgstr ""
-"długość dłuższego obiektu\n"
-"\tnie jest wielokrotnością długości krótszego obiektu"
+"długość dłuższego obiektu nie jest wielokrotnością długości krótszego obiektu"
 
 # Matrix/R/Ops.R: 1595
 # stop(sprintf(
@@ -1380,8 +1379,3 @@ msgstr "'x' nie jest macierzą symetryczną ani trójkątną"
 
 #~ msgid "longer object length"
 #~ msgstr "długość dłuższego obiektu"
-
-# Matrix/R/abIndex.R: 465
-# warning("longer object length is not a multiple of shorter object length")
-#~ msgid "is not a multiple of shorter object length"
-#~ msgstr "nie jest wielokrotnością długości krótszego obiektu"
