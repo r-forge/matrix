@@ -163,9 +163,15 @@ SEXP set_factors(SEXP obj, SEXP val, char *nm)
 }
 
 // R interface [for updating the '@ factors' slot of a function *argument* [CARE!]
-SEXP R_set_factors(SEXP obj, SEXP val, SEXP name)
+SEXP R_set_factors(SEXP obj, SEXP val, SEXP name, SEXP warn)
 {
-    return set_factors(obj, val, (char *)CHAR(asChar(name)));
+    Rboolean do_warn = asLogical(warn);
+    if(R_has_slot(obj, Matrix_factorSym))
+	return set_factors(obj, val, (char *)CHAR(asChar(name)));
+    else {
+	if(do_warn) warning(_("Matrix object has no 'factors' slot"));
+	return val;
+    }
 }
 
 #if 0 				/* unused */
