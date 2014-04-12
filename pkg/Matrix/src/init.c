@@ -73,7 +73,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Csparse_vertcat, 2),
     CALLDEF(pCholesky_validate, 1),
     CALLDEF(Rsparse_validate, 1),
-    CALLDEF(diag_tC, 4),
+    CALLDEF(diag_tC, 2),
 #ifdef _valid_only_for_old_graph_package
     CALLDEF(graphNEL_as_dgTMatrix, 2),
 #endif
@@ -152,8 +152,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dsCMatrix_Cholesky, 5),
     CALLDEF(dsCMatrix_LDL_D, 3),
     CALLDEF(dsCMatrix_chol, 2),
-    CALLDEF(dsCMatrix_Csparse_solve, 2),
-    CALLDEF(dsCMatrix_matrix_solve, 2),
+    CALLDEF(dsCMatrix_Csparse_solve, 3),
+    CALLDEF(dsCMatrix_matrix_solve,  3),
     CALLDEF(dsCMatrix_to_dgTMatrix, 1),
     CALLDEF(dsTMatrix_as_dgTMatrix, 1),
     CALLDEF(lsTMatrix_as_lgTMatrix, 1),
