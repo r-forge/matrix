@@ -106,3 +106,7 @@ setMethod("solve", signature(a = "dtCMatrix", b = "numeric"),
 	  function(a, b, ...) .Call(dtCMatrix_matrix_solve, a,
                                     as.matrix(as.double(b)), FALSE),
           valueClass = "dgeMatrix")
+
+if(FALSE)## still not working
+setMethod("diag", "dtCMatrix",
+	  function(x, nrow, ncol) .Call(diag_tC, x, "diag"))

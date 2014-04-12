@@ -1,10 +1,10 @@
 
-### FIXME:  We really want the separate parts (P,L,D)  of  A = P' L D L' P'
-### -----   --> ~/R/MM/Pkg-ex/Matrix/chol-ex.R             ----------------
-setAs("CHMfactor", "sparseMatrix",
-      function(from) .Call(CHMfactor_to_sparse, from))
-
-setAs("CHMfactor", "Matrix", function(from) as(from, "sparseMatrix"))
+### TODO: We really want the separate parts (P,L,D)  of  A = P' L D L' P
+### ---   --> ~/R/MM/Pkg-ex/Matrix/chol-ex.R             ---------------
+## but we currently only get   A = P' L L' P  --- now documented in ../man/Cholesky.Rd
+setAs("CHMfactor", "sparseMatrix",     function(from) .Call(CHMfactor_to_sparse, from))
+setAs("CHMfactor", "triangularMatrix", function(from) .Call(CHMfactor_to_sparse, from))
+setAs("CHMfactor", "Matrix",           function(from) .Call(CHMfactor_to_sparse, from))
 
 setAs("CHMfactor", "pMatrix", function(from) as(from@perm + 1L, "pMatrix"))
 
