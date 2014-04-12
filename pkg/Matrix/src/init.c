@@ -261,7 +261,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Matrix_rle_i, 2),
     CALLDEF(Matrix_rle_d, 2),
 
-    CALLDEF(R_set_factors, 3),
+    CALLDEF(R_set_factors, 4),
 
     CALLDEF(get_SuiteSparse_version, 0),
     {NULL, NULL, 0}

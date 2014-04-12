@@ -1312,7 +1312,8 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE)
 	.dgC.0.factors(x)
 }
 
-.set.factors <- function(x, name, value) .Call(R_set_factors, x, value, name)
+.set.factors <- function(x, name, value, warn.no.slot=FALSE)
+    .Call(R_set_factors, x, value, name, warn.no.slot)
 
 ### Fast, much simplified version of tapply()
 tapply1 <- function (X, INDEX, FUN = NULL, ..., simplify = TRUE) {
