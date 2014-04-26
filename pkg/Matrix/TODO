@@ -60,6 +60,10 @@ leave the for loops, as soon as is_lower == is_upper == 0.
 *** DONE .chkName.CHM(name, perm, LDL, super) and .CHM.factor.name()
 *** TODO use the above
 ** TODO partly DONE; new arg 'cache=FALSE': allow  cache=FALSE to disable the caching
+** TODO 0-based vs 1-based indexing:   grep -nHE -e '[01]-(orig|ind|base)' *.R
+ Can I find a *uniform* language '1-based indexing' or '0-origin indexing' ?
+*** More systemtic possible via new argumnet 'orig_1' in  m_encodeInd(), m_encodeInd2() 
+ ->  src/Mutils.c 
 * Generalization of Existing Classes and Methods ---------------------------
 ** TODO "Math2" , "Math", "Arith": keep triangular and symmetric
  Matrices when appropriate:
