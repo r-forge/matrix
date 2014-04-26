@@ -4,6 +4,7 @@
 \alias{lu,matrix-method}
 \alias{lu,dgeMatrix-method}
 \alias{lu,dgCMatrix-method}
+\alias{lu,dtCMatrix-method}
 \usage{
 lu(x, \dots)
 \S4method{lu}{matrix}(x, warnSing = TRUE, \dots)
