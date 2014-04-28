@@ -127,7 +127,7 @@ setMethod("solve", signature(a = "dgCMatrix", b = "dsparseMatrix"),
 	      if(is.na(sparse)) {
 		  if(isSymmetric(a))
 		      ## TODO: fast cholmod_symmetric() for Cholesky
-		      return(solve(forceCspSymmetric(a, isTri=FALSE), b))
+		      return(solve(forceCspSymmetric(a, isTri=FALSE), b, tol=tol))
 					#-> sparse result
 		  ## else
 		  sparse <- FALSE # (old default)
