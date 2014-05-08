@@ -798,13 +798,14 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A)
 
 	DUP_MMATRIX_NON_CLASS;
 
-	if (isInteger(A) || isLogical(A)) {
-	    A = PROTECT(coerceVector(A, REALSXP));
-	    nprot++;
+	if (!isReal(A)) {
+	    if (isInteger(A) || isLogical(A)) {
+		A = PROTECT(coerceVector(A, REALSXP));
+		nprot++;
+	    } else
+		error(_("invalid class '%s' to dup_mMatrix_as_dgeMatrix"),
+		      class_P(A));
 	}
-	if (!isReal(A))
-	    error(_("invalid class '%s' to dup_mMatrix_as_dgeMatrix"),
-		  class_P(A));
     }
 
     DUP_MMATRIX_SET_1;
