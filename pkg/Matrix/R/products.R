@@ -424,15 +424,20 @@ setMethod("crossprod", signature(x = "symmetricMatrix", y = "ANY"),	function(x,y
 ## cheap fallbacks
 setMethod("crossprod", signature(x = "Matrix", y = "Matrix"),
 	  function(x, y) {
-	      Matrix.msg("potentially suboptimal crossprod(<Matrix>,<Matrix>) as t(.) %*% y")
+	      Matrix.msg(sprintf(
+	  "potentially suboptimal crossprod(\"%s\",\"%s\") as t(.) %s y",
+		  class(x), class(y), "%*%"))
 	      t(x) %*% y })
 setMethod("crossprod", signature(x = "Matrix", y = "missing"),
 	  function(x, y) {
-	      Matrix.msg("potentially suboptimal crossprod(<Matrix>) as	 t(.) %*% . ")
+	      Matrix.msg(paste0(
+	  "potentially suboptimal crossprod(<",class(x),">) as t(.) %*% . "))
 	      t(x) %*% x })
 setMethod("crossprod", signature(x = "Matrix", y = "ANY"),
 	  function(x, y) {
-	      Matrix.msg("potentially suboptimal crossprod(<Matrix>, <ANY>) as t(.) %*% y")
+	      Matrix.msg(sprintf(
+	  "potentially suboptimal crossprod(\"%s\", <%s>[=<ANY>]) as t(.) %s y",
+		  class(x), class(y), "%*%"))
 	      t(x) %*% y })
 setMethod("crossprod", signature(x = "ANY", y = "Matrix"),
 	  function(x, y) t(x) %*% y)
@@ -601,17 +606,22 @@ setMethod("tcrossprod", signature(x = "ANY",    y = "symmetricMatrix"),	function
 ## cheap fallbacks
 setMethod("tcrossprod", signature(x = "Matrix", y = "Matrix"),
 	  function(x, y = NULL) {
-	      Matrix.msg("potentially suboptimal tcrossprod(<Matrix>,<Matrix>) as  x %*% t(y)")
+	      Matrix.msg(sprintf(
+	  "potentially suboptimal tcrossprod(\"%s\",\"%s\") as  x %s t(y)",
+		  class(x), class(y), "%*%"))
 	      x %*% t(y) })
 setMethod("tcrossprod", signature(x = "Matrix", y = "missing"),
 	  function(x, y = NULL) {
-	      Matrix.msg("potentially suboptimal tcrossprod(<Matrix>) as  . %*% t(.)")
+	      Matrix.msg(paste0(
+	  "potentially suboptimal crossprod(<",class(x), ">) as  . %*% t(.)"))
 	      x %*% t(x) })
 setMethod("tcrossprod", signature(x = "Matrix", y = "ANY"),
 	  function(x, y = NULL) x %*% t(y))
 setMethod("tcrossprod", signature(x = "ANY", y = "Matrix"),
 	  function(x, y = NULL) {
-	      Matrix.msg("potentially suboptimal tcrossprod(<ANY>, <Matrix>) as	 x %*% t(.)")
+	      Matrix.msg(sprintf(
+	  "potentially suboptimal tcrossprod(<%s>[=<ANY>], \"%s\") as  x %s t(y)",
+		  class(x), class(y), "%*%"))
 	      x %*% t(y) })
 
 ## Local variables:
