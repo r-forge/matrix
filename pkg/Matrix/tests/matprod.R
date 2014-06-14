@@ -588,5 +588,17 @@ for(n in 1:250) {
     } else if(n %% 25 == 0) cat(n, " ")
 }; cat("\n")
 
+## two with an empty column --- these failed till 2014-06-14
+X <- as(c(1,3,4,5,3), "indMatrix")
+Y <- as(c(2,3,4,2,2), "indMatrix")
+
+## kronecker:
+stopifnot(identical(X %x% Y,
+                    as(as.matrix(X) %x% as.matrix(Y), "indMatrix")))
+## crossprod:
+(XtY <- crossprod(X, Y))# gave warning in Matrix 1.1-3
+XtY_ok <- as(crossprod(as.matrix(X), as.matrix(Y)), "dgCMatrix")
+stopifnot(identical(XtY, XtY_ok)) # not true, previously
+
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
