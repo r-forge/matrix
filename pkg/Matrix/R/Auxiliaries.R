@@ -1442,16 +1442,20 @@ setparts <- function(x,y, uniqueCheck = TRUE, check = TRUE) {
          int = if(n1 < n2) y[m1] else x[m2])
 }
 
-##' @title Warn about extraneous arguments in the "..."  (of its caller)
-## TODO NOTE:   R/src/library/base/R/seq.R  uses a simpler approach,
-##    *and* ngettext(.)  {->  singular/plural *and* translatable}
-##' @return
-##' @author Martin Maechler, June 2012
-chk.s <- function(...) {
-    if(length(list(...)))
-	warning(gettextf("arguments %s are disregarded in\n %s",
-			 sub(")$", '', sub("^list\\(", '', deparse(list(...), control=c()))),
-			 deparse(sys.call(-1), control=c())), call. = FALSE, domain=NA)
+##' @title Warn about extraneous arguments in the "..."  (of its caller).
+##' A merger of my approach and the one in seq.default()
+##' @author Martin Maechler, June 2012, May 2014
+##' @param ...
+##' @param which.call passed to sys.call().  A caller may use -2 if the message should
+##' mention *its* caller
+chk.s <- function(..., which.call = -1) {
+    if(nx <- length(list(...)))
+	warning(sprintf(ngettext(nx,
+                                 "extra argument %s will be disregarded in\n %s",
+                                 "extra arguments %s will be disregarded in\n %s"),
+                        sub(")$", '', sub("^list\\(", '', deparse(list(...), control=c()))),
+                        deparse(sys.call(which.call), control=c())),
+                call. = FALSE, domain=NA)
 }
 
 ##' *Only* to be used as function in
