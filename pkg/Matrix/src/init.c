@@ -169,7 +169,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dsyMatrix_rcond, 2),
     CALLDEF(dsyMatrix_solve, 1),
     CALLDEF(dsyMatrix_trf, 1),
-    CALLDEF(dsyMatrix_validate, 1),
     CALLDEF(dspMatrix_as_dsyMatrix, 1),
     CALLDEF(dspMatrix_matrix_mm, 2),
     CALLDEF(dspMatrix_matrix_solve, 2),
@@ -214,7 +213,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dtrMatrix_norm, 2),
     CALLDEF(dtrMatrix_rcond, 2),
     CALLDEF(dtrMatrix_solve, 1),
-    CALLDEF(dtrMatrix_validate, 1),
     CALLDEF(dup_mMatrix_as_dgeMatrix, 1),
     CALLDEF(dup_mMatrix_as_geMatrix, 1),
 
