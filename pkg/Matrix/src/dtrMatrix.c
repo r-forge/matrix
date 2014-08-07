@@ -17,13 +17,6 @@ SEXP triangularMatrix_validate(SEXP obj)
     return ScalarLogical(1);
 }
 
-SEXP dtrMatrix_validate(SEXP obj)
-{
-    /* since "dtr" inherits from "triangular", and "dMatrix", only need this:*/
-    return dense_nonpacked_validate(obj);
-}
-
-
 static
 double get_norm(SEXP obj, const char *typstr)
 {
