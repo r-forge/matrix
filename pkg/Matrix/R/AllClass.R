@@ -50,8 +50,7 @@ setClass("triangularMatrix",
 ## Virtual class of numeric matrices
 setClass("dMatrix",
 	 representation(x = "numeric", "VIRTUAL"), contains = "Matrix",
-	 validity = function(object)
-	 .Call(dMatrix_validate, object))
+	 validity = function(object) .Call(dMatrix_validate, object))
 
 ## Virtual class of integer matrices
 setClass("iMatrix",
@@ -174,9 +173,7 @@ setClass("dgeMatrix", contains = c("ddenseMatrix", "generalMatrix"),
 ## numeric, dense, non-packed, triangular matrices
 setClass("dtrMatrix",
 	 contains = c("ddenseMatrix", "triangularMatrix"),
-	 validity =
-	 function(object) .Call(dtrMatrix_validate, object)
-	 )
+	 validity = function(object) .Call(dense_nonpacked_validate, object))
 
 ## numeric, dense, packed, triangular matrices
 setClass("dtpMatrix",
@@ -188,9 +185,7 @@ setClass("dtpMatrix",
 ## numeric, dense, non-packed symmetric matrices
 setClass("dsyMatrix",
          contains = c("ddenseMatrix", "symmetricMatrix"),
-	 validity =
-	 function(object) .Call(dsyMatrix_validate, object)
-	 )
+	 validity = function(object) .Call(dense_nonpacked_validate, object))
 
 ## numeric, dense, packed symmetric matrices
 setClass("dspMatrix",
@@ -213,13 +208,14 @@ setClass("dppMatrix", contains = "dspMatrix",
 
 ## logical, dense, general matrices
 setClass("lgeMatrix", contains = c("ldenseMatrix", "generalMatrix"),
+         ## since "lge" inherits from "ldenseMatrix", only need this:
 	 ## checks that length( @ x) == prod( @ Dim):
-	 validity = function(object) stopifnot(length(object@x) == prod(object@Dim))
-	 )
+	 validity = function(object) .Call(dense_nonpacked_validate, object))
 ## i.e. "lgeMatrix" cannot be packed, but "ldenseMatrix" can ..
 
 ## logical, dense, non-packed, triangular matrices
 setClass("ltrMatrix",
+	 validity = function(object) .Call(dense_nonpacked_validate, object),
 	 contains = c("ldenseMatrix", "triangularMatrix"))
 
 ## logical, dense, packed, triangular matrices
@@ -228,6 +224,7 @@ setClass("ltpMatrix",
 
 ## logical, dense, non-packed symmetric matrices
 setClass("lsyMatrix",
+	 validity = function(object) .Call(dense_nonpacked_validate, object),
 	 contains = c("ldenseMatrix", "symmetricMatrix"))
 
 ## logical, dense, packed symmetric matrices
@@ -241,13 +238,12 @@ setClass("lspMatrix",
 
 ## logical, dense, general matrices
 setClass("ngeMatrix", contains = c("ndenseMatrix", "generalMatrix"),
-	 ## checks that length( @ x) == prod( @ Dim):
-	 validity = function(object)
-         stopifnot(length(object@x) == prod(object@Dim)))
+	 validity = function(object) .Call(dense_nonpacked_validate, object))
 ## i.e. "ngeMatrix" cannot be packed, but "ndenseMatrix" can ..
 
 ## logical, dense, non-packed, triangular matrices
 setClass("ntrMatrix",
+	 validity = function(object) .Call(dense_nonpacked_validate, object),
 	 contains = c("ndenseMatrix", "triangularMatrix"))
 
 ## logical, dense, packed, triangular matrices
@@ -256,6 +252,7 @@ setClass("ntpMatrix",
 
 ## logical, dense, non-packed symmetric matrices
 setClass("nsyMatrix",
+	 validity = function(object) .Call(dense_nonpacked_validate, object),
 	 contains = c("ndenseMatrix", "symmetricMatrix"))
 
 ## logical, dense, packed symmetric matrices
