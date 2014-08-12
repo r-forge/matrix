@@ -289,24 +289,32 @@ cl2 <- cl %*% cl
 validObject(cl2)
 
 cu3 <- tu[-1,-1]
-assert.EQ.mat(crossprod(tru, cu3),
+assert.EQ.mat(crossprod(tru, cu3),## <- "FIXME" should return triangular ...
 	      crossprod(trm, as.matrix(cu3)))
-## "FIXME" should return triangular ...
 
 cl2
+mcu <- as.matrix(cu)
 cu2. <- Diagonal(4) + Matrix(c(rep(0,9),14,0,0,6,0,0,0), 4,4)
-D4 <- Diagonal(4, x=10:7)
+D4 <- Diagonal(4, x=10:7); d4 <- as(D4, "matrix")
+D.D4 <- crossprod(D4); assert.EQ.mat(D.D4, crossprod(d4))
 stopifnot(all(cu2 == cu2.),# was wrong for ver. <= 0.999375-4
+          isValid(D.D4, "ddiMatrix"), identical(D.D4, tcrossprod(D4)),
+          identical4(crossprod(d4, D4), crossprod(D4, d4), tcrossprod(d4, D4), D.D4),
 	  is(cu2, "dtCMatrix"), is(cl2, "dtCMatrix"), # triangularity preserved
 	  cu2@diag == "U", cl2@diag == "U",# UNIT-triangularity preserved
-	  all.equal(D4 %*% cu, D4 %*% as.matrix(cu)),
-	  all.equal(cu %*% D4, as.matrix(cu) %*% D4),
+	  all.equal(D4 %*% cu, D4 %*% mcu),
+	  all.equal(cu %*% D4, mcu %*% D4),
 	  isValid(su <- crossprod(cu), "dsCMatrix"),
 	  all(D4 %*% su == D4 %*% as.mat(su)),
 	  all(su %*% D4 == as.mat(su) %*% D4),
 	  identical(t(cl2), cu2), # !!
-	  identical( crossprod(cu), Matrix( crossprod(as.matrix(cu)),sparse=TRUE)),
-	  identical(tcrossprod(cu), Matrix(tcrossprod(as.matrix(cu)),sparse=TRUE)))
+          identical ( crossprod(cu, D4),  crossprod(mcu, D4)),
+          identical4(tcrossprod(cu, D4), tcrossprod(mcu, D4), cu %*% D4, mcu %*% D4),
+          identical4(tcrossprod(D4,cu), tcrossprod(D4,mcu), D4 %*% t(cu), D4 %*% t(mcu)),
+	  identical( crossprod(cu), Matrix( crossprod(mcu),sparse=TRUE)),
+	  identical(tcrossprod(cu), Matrix(tcrossprod(mcu),sparse=TRUE)))
+assert.EQ.mat( crossprod(cu, D4),  crossprod(mcu, d4))
+assert.EQ.mat(tcrossprod(cu, D4), tcrossprod(mcu, d4))
 tr8 <- kronecker(rbind(c(2,0),c(1,4)), cl2)
 T8 <- tr8 %*% (tr8/2) # triangularity preserved?
 T8.2 <- (T8 %*% T8) / 4
