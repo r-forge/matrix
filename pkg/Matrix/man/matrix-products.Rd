@@ -129,6 +129,7 @@
 \alias{crossprod,Matrix,Matrix-method}
 \alias{crossprod,Matrix,matrix-method}
 \alias{crossprod,matrix,Matrix-method}
+\alias{crossprod,matrix,diagonalMatrix-method}
 \alias{crossprod,ddenseMatrix,dsparseMatrix-method}
 \alias{crossprod,dgeMatrix,dsparseMatrix-method}
 \alias{crossprod,dsparseMatrix,ddenseMatrix-method}
