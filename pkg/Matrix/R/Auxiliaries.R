@@ -9,10 +9,14 @@ isN0 <- function(x)  is.na(x) | x != 0
 is1  <- function(x) !is.na(x) & x   # also == "isTRUE componentwise"
 
 ##
+##allFalse <- function(x) !any(x) && !any(is.na(x))## ~= all0, but allFalse(NULL) = TRUE w/warning
 ##all0 <- function(x) !any(is.na(x)) && all(!x) ## ~= allFalse
+allFalse <-
 all0 <- function(x) .Call(R_all0, x)
 
+##anyFalse <- function(x) isTRUE(any(!x))		 ## ~= any0
 ## any0 <- function(x) isTRUE(any(x == 0))	      ## ~= anyFalse
+anyFalse <-
 any0 <- function(x) .Call(R_any0, x)
 
 ## These work "identically" for  1 ('==' TRUE)  and 0 ('==' FALSE)
@@ -20,12 +24,9 @@ any0 <- function(x) .Call(R_any0, x)
 ## TODO: C versions of these would be faster
 allTrue  <- function(x) all(x)  && !any(is.na(x))
 
-##allFalse <- function(x) !any(x) && !any(is.na(x))## ~= all0, but allFalse(NULL) = TRUE w/warning
-allFalse <- function(x) .Call(R_all0, x)
 
-##anyFalse <- function(x) isTRUE(any(!x))		 ## ~= any0
-anyFalse <- function(x) .Call(R_any0, x)
-
+## Note that mode(<integer>) = "numeric" -- as0(), as1() return "double"
+## which is good *AS LONG AS* we do not really have i..Matrix integer matrices
 as1 <- function(x, mod=mode(x))
     switch(mod, "integer"= 1L, "double"=, "numeric"= 1, "logical"= TRUE,
 	   "complex"= 1+0i, stop(gettextf("invalid 'mod': %s", mod), domain = NA))
@@ -82,6 +83,11 @@ Matrix.msg <- function(..., .M.level = 1) {
     if(!is.null(v <- getOption("Matrix.verbose")) && v >= .M.level)
         message(...)
 }
+
+## TODO: faster via C, either R's  R_data_class() [which needs to become API !]
+##       or even direct  getAttrib(x, R_ClassSymbol); ..
+##' class - single string, no "package" attribute,..
+.class0 <- function(x)  as.vector(class(x))
 
 ## we can set this to FALSE and possibly measure speedup:
 .copyClass.check <- TRUE
@@ -167,7 +173,7 @@ attr.all_Mat <- function(target, current,
 ## chol() via "dpoMatrix"
 ## This will only be called for *dense* matrices
 cholMat <- function(x, pivot = FALSE, ...) {
-    packed <- length(x@x) < prod(dim(x)) ## is it packed?
+    packed <- .isPacked(x)
     nmCh <- if(packed) "pCholesky" else "Cholesky"
     if(!is.null(ch <- x@factors[[nmCh]]))
 	return(ch) ## use the cache
@@ -375,10 +381,10 @@ isPacked <- function(x)
     ## Is 'x' a packed (dense) matrix ?
     is(x, "denseMatrix") &&
     ## unneeded(!): any("x" == slotNames(x)) &&
-    length(x@x) < prod(dim(x))
+    length(x@x) < prod(x@Dim)
 }
 ##" Is 'x' a packed (dense) matrix -- "no-check" version
-.isPacked <- function(x) length(x@x) < prod(dim(x))
+.isPacked <- function(x) length(x@x) < prod(x@Dim)
 
 emptyColnames <- function(x, msg.if.not.empty = FALSE)
 {
@@ -908,14 +914,23 @@ l2d_meth <- function(x) {
 .M.kindC <- function(clx) { ## 'clx': class() *or* classdefinition
     if(is.character(clx))		# < speedup: get it once
         clx <- getClassDef(clx)
-    if(extends(clx, "sparseVector")) ## shortcut
-	substr(as.character(clx@className), 1,1)
-    else if(extends(clx, "dMatrix")) "d"
-    else if(extends(clx, "nMatrix")) "n"
-    else if(extends(clx, "lMatrix")) "l"
-    else if(extends(clx, "indMatrix")) "n" # permutation -> pattern
-    else if(extends(clx, "zMatrix")) "z"
-    else if(extends(clx, "iMatrix")) "i"
+    ex <- extends(clx)
+    if(any(ex == "sparseVector")) {
+	## must work for class *extending* "dsparseVector" ==> cannot use  (clx@className) !
+	if     (any(ex == "dsparseVector")) "d"
+	else if(any(ex == "nsparseVector")) "n"
+	else if(any(ex == "lsparseVector")) "l"
+	else if(any(ex == "zsparseVector")) "z"
+	else if(any(ex == "isparseVector")) "i"
+	else stop(gettextf(" not yet implemented for %s", clx@className),
+		  domain = NA)
+    }
+    else if(any(ex == "dMatrix")) "d"
+    else if(any(ex == "nMatrix")) "n"
+    else if(any(ex == "lMatrix")) "l"
+    else if(any(ex == "indMatrix")) "n" # permutation -> pattern
+    else if(any(ex == "zMatrix")) "z"
+    else if(any(ex == "iMatrix")) "i"
     else stop(gettextf(" not yet implemented for %s", clx@className),
 	      domain = NA)
 }
@@ -940,9 +955,10 @@ l2d_meth <- function(x) {
     else {
 	if(is.character(clx)) # < speedup: get it once
 	    clx <- getClassDef(clx)
-	if(extends(clx, "diagonalMatrix"))  "d"
-	else if(extends(clx, "triangularMatrix"))"t"
-	else if(extends(clx, "symmetricMatrix")) "s"
+        ex <- extends(clx)
+	if(     any(ex == "diagonalMatrix"))  "d"
+	else if(any(ex == "triangularMatrix"))"t"
+	else if(any(ex == "symmetricMatrix")) "s"
 	else "g"
     }
 }
@@ -1459,7 +1475,7 @@ chk.s <- function(..., which.call = -1) {
 }
 
 ##' *Only* to be used as function in
-##'    setMethod("Compare", ...., .Cmp.swap)  -->  ./Ops.R  & ./diagMatrix.R
+##'    setMethod.("Compare", ...., .Cmp.swap)  -->  ./Ops.R  & ./diagMatrix.R
 .Cmp.swap <- function(e1,e2) {
     ## "swap RHS and LHS" and use the method below:
     switch(.Generic,
