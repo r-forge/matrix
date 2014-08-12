@@ -27,23 +27,24 @@ rm(prefix)
 setAs("dtCMatrix", "dtTMatrix",
       function(from) .Call(Csparse_to_Tsparse, from, TRUE))
 
-setAs("CsparseMatrix", "denseMatrix",
-      function(from) {
-	  ## |-> cholmod_C -> cholmod_dense -> chm_dense_to_dense
-	  cld <- getClassDef(class(from))
-	  if (extends(cld, "generalMatrix"))
-	      .Call(Csparse_to_dense, from)
-	  else {
-	      ## Csparse_to_dense  loses symmetry and triangularity properties.
-	      ## With suitable changes to chm_dense_to_SEXP (../src/chm_common.c)
-	      ## we could do this in C code -- or do differently in C {FIXME!}
-	      if (extends(cld, "triangularMatrix") && from@diag == "U")
-		  from <- .Call(Csparse_diagU2N, from)
-	      as(.Call(Csparse_to_dense, from), # -> "[dln]geMatrix"
-		 paste0(.M.kind(from, cld),
-			.dense.prefixes[.M.shape(from, cld)], "Matrix"))
-	  }
-      })
+C2dense <- function(from) {
+    ## |-> cholmod_C -> cholmod_dense -> chm_dense_to_dense
+    cld <- getClassDef(class(from))
+    if (extends(cld, "generalMatrix"))
+	.Call(Csparse_to_dense, from)
+    else {
+	## Csparse_to_dense  loses symmetry and triangularity properties.
+	## With suitable changes to chm_dense_to_SEXP (../src/chm_common.c)
+	## we could do this in C code -- or do differently in C {FIXME!}
+	if (extends(cld, "triangularMatrix") && from@diag == "U")
+	    from <- .Call(Csparse_diagU2N, from)
+	as(.Call(Csparse_to_dense, from), # -> "[dln]geMatrix"
+	   paste0(.M.kindC(cld),
+		  .dense.prefixes[.M.shape(from, cld)], "Matrix"))
+    }
+}
+setAs("CsparseMatrix", "denseMatrix", C2dense)
+
 
 ## special cases (when a specific "to" class is specified)
 setAs("dgCMatrix", "dgeMatrix",
@@ -85,44 +86,6 @@ setAs("CsparseMatrix", "symmetricMatrix",
 .sortCsparse <- function(x) .Call(Csparse_sort, x) ## modifies 'x' !!
 
 ### Some group methods:
-
-setMethod("Math",
-	  signature(x = "CsparseMatrix"),
-	  function(x) {
-	      f0 <- callGeneric(0.)
-	      if(is0(f0)) {
-		  ## sparseness, symm., triang.,... preserved
-                  cl <- class(x)
-                  has.x <- !extends(cl, "nsparseMatrix")
-                  ## has.x  <==> *not* nonzero-pattern == "nMatrix"
-                  if(has.x) {
-                      type <- storage.mode(x@x)
-                      r <- callGeneric(x@x)
-                  } else { ## nsparseMatrix
-                      type <- ""
-		      r <- rep.int(as.double(callGeneric(TRUE)),
-				   switch(.sp.class(cl),
-					  CsparseMatrix = length(x@i),
-					  TsparseMatrix = length(x@i),
-					  RsparseMatrix = length(x@j)))
-                  }
-		  if(type == storage.mode(r)) {
-		      x@x <- r
-		      x
-		  } else { ## e.g. abs( <lgC> ) --> integer Csparse
-		      ## FIXME: when we have 'i*' classes, use them here:
-		      rx <- new(sub("^.", "d", cl))
-		      rx@x <- as.double(r)
-		      ## result is "same"
-		      sNams <- slotNames(cl)
-		      for(nm in sNams[sNams != "x"])
-			  slot(rx, nm) <- slot(x, nm)
-		      rx
-		  }
-	      } else { ## no sparseness
-		  callGeneric(as_dense(x))
-	      }
-	  }) ## {Math}
 
 
 ### Subsetting -- basic things (drop = "missing") are done in ./Matrix.R

@@ -878,6 +878,9 @@ lsUtr <- lst[istri][uniC]
 r <- tryCatch(chol2inv(Diagonal(x=1:10), pi=pi), warning=identity)
 stopifnot(grepl("extra argument pi .*chol2inv\\(Diagonal", r$message))
 
+assertError(new("ltrMatrix", Dim = c(2L,2L), x=TRUE))# gave "illegal" object w/o error
+assertError(new("ntrMatrix", Dim = c(2L,2L)))#  dito
+
 
 cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
 cat("doExtras:",doExtras,"\n")
@@ -890,6 +893,15 @@ if(doExtras) {
     }
     cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
 }
+
+##  new("nsyMatrix") + new("lgeMatrix") # failed
+cln <- sort(outer(c("l","n"), paste0(c("ge","sy"), "Matrix"), paste0))
+dim(c.c <- as.matrix(expand.grid(cln, cln, KEEP.OUT.ATTRS=FALSE))) # 16 x 2
+## clTry <- function(expr) class(tryCatch(expr, error=identity))[[1]]
+## '+' [Arith] failed -- now fixed
+cbind(c.c, Res = apply(c.c, 1, function(x) class(new(x[1]) + new(x[2]))))
+## '<' [Compare] works fine
+cbind(c.c, Res = apply(c.c, 1, function(x) class(new(x[1]) < new(x[2]))))
 
 if(!interactive()) warnings()
 

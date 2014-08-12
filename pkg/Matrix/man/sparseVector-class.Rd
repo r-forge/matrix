@@ -11,8 +11,6 @@
 \alias{zsparseVector-class}
 \alias{xsparseVector-class}% the class union
 %% Group methods
-% \alias{Math,sparseVector-method}
-% %\alias{Math2,sparseVector,numeric-method}
 \alias{Arith,sparseVector,sparseVector-method}
 \alias{Arith,dsparseVector,dsparseVector-method}
 \alias{-,dsparseVector,missing-method}
@@ -37,6 +35,9 @@
 \alias{Logic,sparseVector,dMatrix-method}
 \alias{Logic,sparseVector,lMatrix-method}
 \alias{Logic,sparseVector,nMatrix-method}
+\alias{Math,sparseVector-method}
+\alias{Math2,dsparseVector-method}% or (dsparseVector, numeric) & (dsparseVector,missing) ?
+\alias{Math2,sparseVector-method}
 \alias{Summary,sparseVector-method}
 \alias{Summary,nsparseVector-method}
 %% non-group :
