@@ -106,11 +106,6 @@ setMethod("determinant", signature(x = "ddenseMatrix", logarithm = "logical"),
 ## setMethod("expm", signature(x = "ddenseMatrix"),
 ##           function(x) callGeneric(as(x, "dgeMatrix")))
 
-setMethod("Math",
-          signature(x = "ddenseMatrix"),
-          function(x) callGeneric(as(x, "dgeMatrix")))
-
-
 
 .trilDense <- function(x, k = 0, ...) {
     k <- as.integer(k[1])

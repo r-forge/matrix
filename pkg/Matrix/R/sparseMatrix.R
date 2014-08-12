@@ -342,16 +342,6 @@ setReplaceMethod("[", signature(x = "sparseMatrix", i = "ANY", j = "ANY",
 
 
 
-## Group Methods
-
-setMethod("Math",
-	  signature(x = "sparseMatrix"),
-	  function(x) callGeneric(as(x, "CsparseMatrix")))
-
-## further group methods -> see ./Ops.R {"Summary": ./dMatrix.R }
-
-
-
 ### --- print() and show() methods ---
 
 .formatSparseSimple <- function(m, asLogical=FALSE, digits=NULL,

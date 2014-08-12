@@ -36,12 +36,8 @@ setMethod("image", "dgCMatrix",
 ##
 ## "Arith" is now in ./Ops.R
 ##
-## "Math" is up in ./Csparse.R
-##
-## "Math2" is up in ./dMatrix.R
+## "Math" and "Math2"  in ./Math.R
 
-
-###---- end {Group Methods} -----------------
 
 
 ## "[<-" methods { setReplaceMethod()s }  are now in ./Csparse.R
