@@ -75,6 +75,10 @@
 #ifndef CHOLMOD_H
 #define CHOLMOD_H
 
+#ifdef GPU_BLAS
+#include <cuda_runtime.h>
+#endif
+
 /* make it easy for C++ programs to include CHOLMOD */
 #ifdef __cplusplus
 extern "C" {
@@ -116,6 +120,10 @@ extern "C" {
 
 #ifndef NSUPERNODAL
 #include "cholmod_supernodal.h"
+#endif
+
+#ifdef GPU_BLAS
+#include "cholmod_gpu.h"
 #endif
 
 #ifdef __cplusplus
