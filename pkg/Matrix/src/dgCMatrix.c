@@ -284,11 +284,11 @@ SEXP dgCMatrix_SPQR(SEXP Ap, SEXP ordering, SEXP econ, SEXP tol)
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("SPQR")));
 
     CHM_SP A = AS_CHM_SP(Ap), Q, R;
-    UF_long *E, rank;/* not always = int   FIXME  (Windows_64 ?) */
+    SuiteSparse_long *E, rank;/* not always = int   FIXME  (Windows_64 ?) */
 
     if ((rank = SuiteSparseQR_C_QR(asInteger(ordering),
 				   asReal(tol),/* originally had SPQR_DEFAULT_TOL */
-				   (UF_long)asInteger(econ),/* originally had 0 */
+				   (SuiteSparse_long)asInteger(econ),/* originally had 0 */
 				   A, &Q, &R, &E, &cl)) == -1)
 	error(_("SuiteSparseQR_C_QR returned an error code"));
 

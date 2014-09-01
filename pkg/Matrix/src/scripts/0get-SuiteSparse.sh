@@ -29,10 +29,11 @@ mv $Sdir/Makefile $Sdir/Makefile_orig
   ## touch the file $Sdir/SuiteSparse_config.mk.  We use other configuration
   ## environment variables but this name is embedded in some Makefiles
 touch $Sdir/SuiteSparse_config.mk
-  ## Need to add the Matrix-specific changes to SuiteSparse_config/SuiteSparse_config.h :
-## 2012-06: *no longer* patch -p0 < scripts/SuiteSparse_config.patch
   ## move directory *up*
 dd=`basename $Sdir`; mv $Sdir/* $dd/
+  ## Need to add the Matrix-specific changes to SuiteSparse_config/SuiteSparse_config.h :
+## 2014-08: different patch:
+patch -p0 < scripts/SuiteSparse_config.patch
 
 ## 2) COLAMD -----------------------------------------------
 Sdir=$SS/COLAMD
@@ -46,7 +47,8 @@ fi
 mv $Sdir/README.txt $SSdocDir/COLAMD.txt
 mv $Sdir/Doc/ChangeLog $SSdocDir/COLAMD-ChangeLog.txt
 rm -rf $Sdir/Doc
-patch -p0 < scripts/COLAMD.patch
+# 2014: no longer
+# patch -p0 < scripts/COLAMD.patch
 ##          ---------------------
   ## move directory *up*
 dd=`basename $Sdir`; rsync -auv $Sdir/ $dd/
@@ -61,7 +63,8 @@ mv $Sdir/README.txt $SSdocDir/AMD.txt
   ## remove Fortran source files and GNUMakefile
 rm $Sdir/Source/*.f $Sdir/Lib/GNUmakefile
 #(for f in $Sdir/Include/amd_internal.h $Sdir/Source/amd_global.c; do diff -ubBw ${f}.~1~ $f ; done ) | tee scripts/AMD-noprint.patch
-patch -p0 < scripts/AMD-noprint.patch
+## 2014: no longer
+# patch -p0 < scripts/AMD-noprint.patch
 ##          ---------------------
   ## move directory *up*
 dd=`basename $Sdir`; rsync -auv $Sdir/ $dd/
@@ -84,7 +87,7 @@ mv $Sdir/Lib/Makefile $Sdir/Lib/Makefile_pre
   ## move directory *up*
 dd=`basename $Sdir`; rsync -auv $Sdir/ $dd/
 
-echo 'If there changes in the following you  ** MUST **  manually update  
+echo 'If there changes in the following you  ** MUST **  manually update
   <Matrix>/ inst/include/cholmod.h  --- to export what we have.
 
 Also, RcppEigen headers may also need to be updated -- ask Doug Bates.
