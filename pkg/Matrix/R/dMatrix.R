@@ -43,13 +43,9 @@ setAs("dMatrix", "nMatrix",
 
 ## Group Methods:
 ## -----
-
-## "Math", "Math2" in	--> ./Math.R
-## "Summary"		--> ./Summary.R
+## "Math", "Math2" in			--> ./Math.R
+## "Summary"				--> ./Summary.R
 ## "Ops" ("Arith", "Compare", "Logic")	--> ./Ops.R
-
-## -- end{group generics} -----------------------
-
 
 
 

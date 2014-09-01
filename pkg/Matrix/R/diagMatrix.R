@@ -1100,6 +1100,8 @@ for(DI in diCls) {
     }
 }
 
+## Group methods "Math", "Math2" in			--> ./Math.R
+
 ### "Summary" : "max"   "min"   "range" "prod"  "sum"   "any"   "all"
 ### ----------   the last 4: separately here
 for(cl in diCls) {
