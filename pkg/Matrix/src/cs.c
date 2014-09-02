@@ -1408,7 +1408,7 @@ csn *cs_qr (const cs *A, const css *S)
     csi i, k, p, m, n, vnz, p1, top, m2, len, col, rnz, *s, *leftmost, *Ap, *Ai,
         *parent, *Rp, *Ri, *Vp, *Vi, *w, *pinv, *q ;
     cs *R, *V ;
-    csn *N ;
+    csn *N ; // the result
     if (!CS_CSC (A) || !S) return (NULL) ;
     m = A->m ; n = A->n ; Ap = A->p ; Ai = A->i ; Ax = A->x ;
     q = S->q ; parent = S->parent ; pinv = S->pinv ; m2 = S->m2 ;
@@ -1536,14 +1536,16 @@ csi *cs_randperm (csi n, csi seed)
     if (!p) return (NULL) ;             /* out of memory */
     for (k = 0 ; k < n ; k++) p [k] = n-k-1 ;
     if (seed == -1) return (p) ;        /* return reverse permutation */
+    GetRNGstate();/* <- for R package Matrix
     srand (seed) ;                      /* get new random number seed */
     for (k = 0 ; k < n ; k++)
     {
-        j = k + (rand ( ) % (n-k)) ;    /* j = rand integer in range k to n-1 */
+        j = k + (unif_rand ( ) % (n-k)) ; /* j = rand integer in range k to n-1 */
         t = p [j] ;                     /* swap p[k] and p[j] */
         p [j] = p [k] ;
         p [k] = t ;
     }
+    PutRNGstate(); // <- R package Matrix
     return (p) ;
 }
 /* xi [top...n-1] = nodes reachable from graph of G*P' via nodes in B(:,k).
