@@ -40,7 +40,7 @@ assertError <- function(expr, verbose=getOption("verbose")) {
     t.res <- tryCatch(expr, error = function(e) e)
     if(!inherits(t.res, "error"))
 	stop(d.expr, "\n\t did not give an error", call. = FALSE)
-    cat("Asserted Error:", conditionMessage(t.res),"\n")
+    if(verbose) cat("Asserted Error:", conditionMessage(t.res),"\n")
     invisible(t.res)
 }
 
