@@ -1,6 +1,6 @@
 --- cs.h.~1~	2012-06-19 14:34:39.040367096 -0500
 +++ cs.h	2012-06-19 14:32:40.224373237 -0500
-@@ -3,8 +3,12 @@
+@@ -3,8 +3,13 @@
  #include <stdlib.h>
  #include <limits.h>
  #include <math.h>
@@ -9,6 +9,7 @@
  #include <stddef.h>
 +// For use with R package 'Matrix'
 +# include <R_ext/Print.h>
++# include <R_ext/Random.h>
 +# define printf Rprintf
  #ifdef MATLAB_MEX_FILE
  #include "mex.h"

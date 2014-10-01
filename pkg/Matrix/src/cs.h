@@ -8,6 +8,7 @@
 #include <stddef.h>
 // For use with R package 'Matrix'
 # include <R_ext/Print.h>
+# include <R_ext/Random.h>
 # define printf Rprintf
 #ifdef MATLAB_MEX_FILE
 #include "mex.h"
