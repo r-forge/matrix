@@ -91,7 +91,7 @@ SEXP dgeMatrix_crossprod(SEXP x, SEXP trans)
     double *vx = REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, n * n)),
 	one = 1.0, zero = 0.0;
 
-    AZERO(vx, n * n);
+    Memzero(vx, n * n);
     SET_SLOT(val, Matrix_uploSym, mkString("U"));
     ALLOC_SLOT(val, Matrix_factorSym, VECSXP, 0);
     vDims[0] = vDims[1] = n;
@@ -449,7 +449,8 @@ SEXP dgeMatrix_matrix_mm(SEXP a, SEXP bP, SEXP right)
 	cdims[0] = m; cdims[1] = n;
 	if (m < 1 || n < 1 || k < 1) {
 /* 	    error(_("Matrices with zero extents cannot be multiplied")); */
-	    ALLOC_SLOT(val, Matrix_xSym, REALSXP, m * n);
+	    double *v = REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, m * n));
+	    Memzero(v, m * n);
 	} else {
 	    F77_CALL(dgemm) ("N", "N", &m, &n, &k, &one,
 			     REAL(GET_SLOT(b, Matrix_xSym)), &m,
@@ -471,7 +472,8 @@ SEXP dgeMatrix_matrix_mm(SEXP a, SEXP bP, SEXP right)
 	cdims[0] = m; cdims[1] = n;
 	if (m < 1 || n < 1 || k < 1) {
 /* 	    error(_("Matrices with zero extents cannot be multiplied")); */
-	    ALLOC_SLOT(val, Matrix_xSym, REALSXP, m * n);
+	    double *v = REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, m * n));
+	    Memzero(v, m * n);
 	} else {
 	    F77_CALL(dgemm) ("N", "N", &m, &n, &k, &one,
 			     REAL(GET_SLOT(a, Matrix_xSym)), &m,
