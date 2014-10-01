@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-1\n"
-"POT-Creation-Date: 2014-03-26 21:03\n"
+"POT-Creation-Date: 2014-10-01 09:45\n"
 "PO-Revision-Date: 2014-03-30 09:07+0100\n"
 "Last-Translator: Philippe Grosjean <phgrosjean@sciviews.org>\n"
 "Language-Team: none\n"
@@ -75,13 +75,6 @@ msgstr "pas encore implémenté pour %s"
 
 msgid "general Matrix class not yet implemented for %s"
 msgstr "classe Matrix générale pas encore implémentée pour %s"
-
-msgid ""
-"arguments %s are disregarded in\n"
-" %s"
-msgstr ""
-"les arguments %s ne sont pas utilisés dans\n"
-" %s"
 
 msgid ""
 "Quadratic matrix '%s' (=: A) is not formally\n"
@@ -246,14 +239,6 @@ msgstr ""
 msgid "'lag' and 'differences' must be integers >= 1"
 msgstr "'lag' et 'differences' doivent être des entiers >= 1"
 
-msgid "programming error: min() should have dispatched w/ 1st arg much earlier"
-msgstr ""
-"erreur de programmation : min() aurait du être dispatché avec le 1er arg "
-"bien plus tôt"
-
-msgid "in Summary(<ANY>, .): %s(<%s>, <%s>,...)"
-msgstr "dans Summary(<ANY>) : %s(<%s>, <%s>, …)"
-
 msgid "invalid or not-yet-implemented 'Matrix' subsetting"
 msgstr "extraction d'un sous-ensemble de 'Matrix' incorrect ou non implémenté"
 
@@ -374,6 +359,18 @@ msgstr "dim [product %d] ne correspond pas à la longueur de l'objet [%d]"
 
 msgid "invalid class: %s"
 msgstr "classe incorrecte : %s"
+
+msgid "programming error: min() should have dispatched w/ 1st arg much earlier"
+msgstr ""
+"erreur de programmation : min() aurait du être dispatché avec le 1er arg "
+"bien plus tôt"
+
+msgid "in Summary(<ANY>, .): %s(<%s>, <%s>,...)"
+msgstr "dans Summary(<ANY>) : %s(<%s>, <%s>, …)"
+
+#, fuzzy
+msgid "in Summary(<ANY>, .): %s(<%s>, <%s>)"
+msgstr "dans Summary(<ANY>) : %s(<%s>, <%s>, …)"
 
 msgid "not-yet-implemented coercion to \"TsparseMatrix\""
 msgstr "conversion automatique en \"TsparseMatrix\" pas encore implémentée"
@@ -768,6 +765,9 @@ msgstr "conversion automatique rcond(.) via sparse -> dense"
 msgid "'V' is not a *square* matrix"
 msgstr "'V' n'est pas une matrice *carrée*"
 
+msgid "number of non zeros is smaller than 'nnz' because of duplicated (i,j)s"
+msgstr ""
+
 msgid ""
 "qr.R(<sparse>) may differ from qr.R(<dense>) because of permutations.  "
 "Possibly use our qrR() instead"
@@ -820,6 +820,20 @@ msgstr ""
 
 msgid "'x' is not symmetric nor triangular"
 msgstr "'x' n'est ni symétrique ni triangulaire"
+
+#, fuzzy
+msgid ""
+"extra argument %s will be disregarded in\n"
+" %s"
+msgid_plural ""
+"extra arguments %s will be disregarded in\n"
+" %s"
+msgstr[0] ""
+"les arguments %s ne sont pas utilisés dans\n"
+" %s"
+msgstr[1] ""
+"les arguments %s ne sont pas utilisés dans\n"
+" %s"
 
 #~ msgid "longer object length"
 #~ msgstr "la longueur de l'objet le plus long"
