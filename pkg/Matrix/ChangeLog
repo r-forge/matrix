@@ -1,6 +1,7 @@
 2014-06-15  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 1.1-4, released to CRAN
+	* src/dsyMatrix.c (dsyMatrix_matrix_mm): fix crossprod(<vec>, <dsyMatrix>) bug
 
 2014-04-26  Martin Maechler  <maechler@stat.math.ethz.ch>
 

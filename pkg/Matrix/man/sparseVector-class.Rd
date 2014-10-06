@@ -84,6 +84,7 @@
 \alias{mean,sparseVector-method}
 \alias{rep,sparseVector-method}
 \alias{show,sparseVector-method}
+\alias{t,sparseVector-method}
 \alias{toeplitz}% only needed if(as.numeric(R.version$`svn rev`) < 60620)
 \alias{toeplitz,sparseVector-method}
 %
@@ -248,7 +249,8 @@ stopifnot(identical(hv, h2),
 	  all(!lis), !any(lis), length(nn@i) == 0, !any(nn), all(!nn),
 	  sum(lis) == 0, !prod(lis), range(lis) == c(0,0))
 
-x20 <- sparseVector(c(9,3:1), i=c(1:2,4,7), length=20)
+## create and use the t(.) method:
+t(x20 <- sparseVector(c(9,3:1), i=c(1:2,4,7), length=20))
 (T20 <- toeplitz(x20))
 stopifnot(is(T20, "symmetricMatrix"), is(T20, "sparseMatrix"),
 	  identical(unname(as.matrix(T20)),
