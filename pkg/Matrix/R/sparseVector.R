@@ -304,7 +304,7 @@ spV2M <- function (x, nrow, ncol, byrow = FALSE, check = TRUE, symmetric = FALSE
     r
 }## {spV2M}
 
-.sparseV2Mat <- function(from) spV2M(from, nrow=length(from), ncol=1L, check=FALSE)
+.sparseV2Mat <- function(from) spV2M(from, nrow=from@length, ncol=1L, check=FALSE)
 setAs("sparseVector","Matrix", .sparseV2Mat)
 setAs("sparseVector","sparseMatrix", .sparseV2Mat)
 setAs("sparseVector","TsparseMatrix", .sparseV2Mat)
@@ -323,6 +323,8 @@ setMethod("dim<-", signature(x = "sparseVector", value = "ANY"),
 
 
 setMethod("length", "sparseVector", function(x) x@length)
+
+setMethod("t", "sparseVector", function(x) spV2M(x, nrow=1L, ncol=x@length, check=FALSE))
 
 setMethod("show", signature(object = "sparseVector"),
    function(object) {

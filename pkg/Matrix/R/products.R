@@ -217,9 +217,22 @@ setMethod("%*%", signature(x = "Matrix", y = "ANY"), .local.bail.out)
 ### sparseVector
 sp.x.sp <- function(x, y) Matrix(sum(x * y), 1L, 1L, sparse=FALSE)
     ## inner product -- no sense to return sparse!
-setMethod("%*%", signature(x = "Matrix", y = "sparseVector"), .M.v)
-setMethod("%*%", signature(x = "sparseVector", y = "Matrix"), .v.M)
-setMethod("%*%", signature(x = "sparseVector", y = "sparseVector"), sp.x.sp)
+sp.X.sp <- function(x, y) {
+    if((n <- length(x)) == length(y)) sp.x.sp(x,y)
+    else if(n == 1L) spV2M(x, nrow = 1L, ncol = 1L, check = FALSE) %*% y
+    else stop("non-conformable arguments")
+}
+v.X.sp <- function(x, y) {
+    if((n <- length(x)) == length(y)) sp.x.sp(x,y)
+    else if(n == 1L) matrix(x, nrow = 1L, ncol = 1L) %*% y
+    else stop("non-conformable arguments")
+}
+
+setMethod("%*%", signature(x = "mMatrix", y = "sparseVector"), .M.v)
+setMethod("%*%", signature(x = "sparseVector", y = "mMatrix"), .v.M)
+setMethod("%*%", signature(x = "sparseVector", y = "sparseVector"), sp.X.sp)
+setMethod("%*%", signature(x = "sparseVector", y = "numLike"),      sp.X.sp)
+setMethod("%*%", signature(x = "numLike",      y = "sparseVector"), v.X.sp)
 ## setMethod("%*%", signature(x = "sparseMatrix", y = "sparseVector"),
 ##           function(x, y) x %*% .sparseV2Mat(y))
 
@@ -406,12 +419,14 @@ setMethod("crossprod", signature(x = "matrix", y = "Matrix"),
 	  function(x, y) crossprod(Matrix(x), y))
 
 ## sparseVector
-setMethod("crossprod", signature(x = "Matrix", y = "sparseVector"),
+setMethod("crossprod", signature(x = "mMatrix", y = "sparseVector"),
 	  function(x, y) crossprod(x, .sparseV2Mat(y)))
-setMethod("crossprod", signature(x = "sparseVector", y = "Matrix"),
+setMethod("crossprod", signature(x = "sparseVector", y = "mMatrix"),
 	  function(x, y)
 	  crossprod(spV2M(x, nrow = length(x), ncol = 1L, check = FALSE), y))
-setMethod("crossprod", signature(x = "sparseVector", y = "sparseVector"), sp.x.sp)
+setMethod("crossprod", signature(x = "sparseVector", y = "sparseVector"), sp.X.sp)
+setMethod("crossprod", signature(x = "sparseVector", y = "numLike"),      sp.X.sp)
+setMethod("crossprod", signature(x = "numLike",      y = "sparseVector"), v.X.sp)
 setMethod("crossprod", signature(x = "sparseVector", y = "missing"),
 	  function(x, y=NULL) sp.x.sp(x,x))
 
@@ -583,9 +598,9 @@ setMethod("tcrossprod", signature(x = "matrix", y = "Matrix"),
 	  function(x, y = NULL) tcrossprod(Matrix(x), y))
 
 ## sparseVector
-setMethod("tcrossprod", signature(x = "Matrix", y = "sparseVector"),
+setMethod("tcrossprod", signature(x = "mMatrix", y = "sparseVector"),
 	  function(x, y) tcrossprod(x, .sparseV2Mat(y)))
-setMethod("tcrossprod", signature(x = "sparseVector", y = "Matrix"), .v.Mt)
+setMethod("tcrossprod", signature(x = "sparseVector", y = "mMatrix"), .v.Mt)
 setMethod("tcrossprod", signature(x = "sparseMatrix", y = "sparseVector"),
 	  function(x, y) tcrossprod(x, .sparseV2Mat(y)))
 setMethod("tcrossprod", signature(x = "sparseVector", y = "sparseMatrix"), .v.Mt)
@@ -596,6 +611,10 @@ setMethod("tcrossprod", signature(x = "sparseVector", y = "missing"),
 	  ## could be speeded: spV2M(x, *) called twice with different ncol/nrow
 	  function(x, y=NULL) .sparseV2Mat(x) %*%
 	  spV2M(x, nrow=1L, ncol=length(x), check=FALSE))
+setMethod("tcrossprod", signature(x = "numLike",      y = "sparseVector"),
+	  function(x, y) tcrossprod(x, .sparseV2Mat(y)))
+setMethod("tcrossprod", signature(x = "sparseVector", y = "numLike"),
+	  function(x, y) .sparseV2Mat(x) %*% t(x))
 
 
 ## Fallbacks -- symmetric RHS --> saving a t(.):
