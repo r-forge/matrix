@@ -569,22 +569,23 @@ SEXP Csparse_submatrix(SEXP x, SEXP i, SEXP j)
     if (csize >= 0 && !isInteger(j))
 	error(_("Index j must be NULL or integer"));
 
+#define CHM_SUB(_M_, _i_, _j_)					\
+    cholmod_submatrix(_M_,					\
+		      (rsize < 0) ? NULL : INTEGER(_i_), rsize,	\
+		      (csize < 0) ? NULL : INTEGER(_j_), csize,	\
+		      TRUE, TRUE, &c)
+    CHM_SP ans;
     if (!chx->stype) {/* non-symmetric Matrix */
-	return chm_sparse_to_SEXP(cholmod_submatrix(chx,
-						    (rsize < 0) ? NULL : INTEGER(i), rsize,
-						    (csize < 0) ? NULL : INTEGER(j), csize,
-						    TRUE, TRUE, &c),
-				  1, 0, Rkind, "",
-				  /* FIXME: drops dimnames */ R_NilValue);
+	ans = CHM_SUB(chx, i, j);
     }
-				/* for now, cholmod_submatrix() only accepts "generalMatrix" */
-    CHM_SP tmp = cholmod_copy(chx, /* stype: */ 0, chx->xtype, &c);
-    CHM_SP ans = cholmod_submatrix(tmp,
-				   (rsize < 0) ? NULL : INTEGER(i), rsize,
-				   (csize < 0) ? NULL : INTEGER(j), csize,
-				   TRUE, TRUE, &c);
-    cholmod_free_sparse(&tmp, &c);
-    return chm_sparse_to_SEXP(ans, 1, 0, Rkind, "", R_NilValue);
+    else {
+	/* for now, cholmod_submatrix() only accepts "generalMatrix" */
+	CHM_SP tmp = cholmod_copy(chx, /* stype: */ 0, chx->xtype, &c);
+	ans = CHM_SUB(tmp, i, j);
+	cholmod_free_sparse(&tmp, &c);
+    }
+    // "FIXME": currently dropping dimnames, and adding them afterwards in R :
+    return chm_sparse_to_SEXP(ans, 1, 0, Rkind, "", /* dimnames: */ R_NilValue);
 }
 
 #define _d_Csp_
