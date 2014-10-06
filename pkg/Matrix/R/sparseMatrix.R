@@ -843,7 +843,7 @@ setMethod("writeMM", "sparseMatrix",
 ##' @param ... optionally further arguments passed to sparseMatrix()
 ##' @return a sparseMatrix of dimension (nrow, ncol)
 ##' @author Martin Maechler
-##' @examples M1 <- rSparseMatrix(1000, 20, nnz = 200)
+##' @examples M1 <- rsparsematrix(1000, 20, nnz = 200)
 ##'           summary(M1)
 if(FALSE) ## better version below
 rsparsematrix <- function(nrow, ncol, nnz,
