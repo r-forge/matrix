@@ -1,6 +1,12 @@
 ##-*- mode: org -*-
 
 * *Urgent* in some sense ---------------------------------------------------
+** TODO [t]crossprod() could/should become more lenient with *vector*s: adapt R-devel (= R 3.2.0)'s rules:
+   see misc/products-Mv.R and *.Rout
+*** DONE for  sparseVector o (sparse)vector
+*** DONE consider analagous changes to base-R
+** DONE m %*% M (crossprod, ..) with 0-dim. result give garbage
+** TODO M[i,j] should *not* drop dimnames (R-forge bug 2556, see ~/R/MM/Pkg-ex/Matrix/dimnames-prod.R)
 ** TODO M[<sparse 2-column Matrix>] indexing should work (but with a warning: use *dense*!)
 ** TODO src/CHOLMOD/MatrixOps/cholmod_symmetry.c  is "cool" and fast;
 Definitely should use it for solve(<dgCMatrix>)  {it seems MATLAB does};
@@ -26,8 +32,6 @@ leave the for loops, as soon as is_lower == is_upper == 0.
 ** DONE generalize new "indMatrix" class, to allow 0 repetitions
  of some samples, i.e., columns of all 0 s. It's mathematically more
  natural --> typically will be useful.
-** TODO misc/products-Mv.R and *.Rout -- [t]crossprod() could/should become more lenient with *vector*s
-*** TODO consider analagous changes to base-R [t]crossprod()
 ** TODO cor(<sparseMatrix>) and cov(<sparseMatrix>)  at least for y=NULL ("no y").
 -> ~/R/MM/Pkg-ex/Matrix/cor_sparse-propos.R <- http://stackoverflow.com/questions/5888287/
 ** TODO Investigate the "band changing (and getting) ideas  'band<-' etc,

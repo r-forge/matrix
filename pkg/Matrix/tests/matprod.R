@@ -189,6 +189,90 @@ all.equal((A %*% solve(A, y))@x, y)
 Atr <- new("dtrMatrix", Dim = A@Dim, x = A@x, uplo = "U")
 all.equal((Atr %*% solve(Atr, y))@x, y)
 
+## R-forge bug 5933 by Sebastian Herbert,
+## https://r-forge.r-project.org/tracker/index.php?func=detail&aid=5933&group_id=61&atid=294
+mLeft  <- matrix(data = double(0), nrow = 3, ncol = 0)
+mRight <- matrix(data = double(0), nrow = 0, ncol = 4)
+MLeft   <- Matrix(data = double(0), nrow = 3, ncol = 0)
+MRight  <- Matrix(data = double(0), nrow = 0, ncol = 4)
+stopifnot(identical3(class(mLeft), class(mRight), "matrix"))
+stopifnot(class(MLeft) ==  class(MRight),
+          class(MLeft) ==  "dgeMatrix")
+
+Qidentical3 <- function(a,b,c) Q.eq(a,b) && Q.eq(b,c)
+Qidentical4 <- function(a,b,c,d) Q.eq(a,b) && Q.eq(b,c) && Q.eq(c,d)
+chkP <- function(mLeft, mRight, MLeft, MRight, cl = class(MLeft)) {
+    ident4 <- if(extends(cl, "generalMatrix"))
+		  function(a,b,c,d) identical4(as(a, cl), b, c, d)
+	      else function(a,b,c,d) {
+		  assert.EQ.mat(M=b, m=a, tol=0)
+		  Qidentical3(b,c,d)
+	      }
+
+    mm <- mLeft %*% mRight # ok
+    m.m <- crossprod(mRight)
+    mm. <- tcrossprod(mLeft, mLeft)
+    stopifnot(mm == 0,
+              ident4(mm,
+                     mLeft %*% MRight,
+                     MLeft %*% mRight,
+                     MLeft %*% MRight),# now ok
+	      m.m == 0, identical(m.m, crossprod(mRight, mRight)),
+	      mm. == 0, identical(mm., tcrossprod(mLeft, mLeft)))
+
+    stopifnot(ident4(m.m,
+		     crossprod(MRight, MRight),
+		     crossprod(MRight, mRight),
+		     crossprod(mRight, MRight)))
+    stopifnot(ident4(mm.,
+		     tcrossprod(mLeft, MLeft),
+		     tcrossprod(MLeft, MLeft),
+		     tcrossprod(MLeft, mLeft)))
+}
+
+chkP(mLeft, mRight, MLeft, MRight, "dgeMatrix")
+m0 <- mLeft[FALSE,] # 0 x 0
+for(cls in c("triangularMatrix", "symmetricMatrix")) {
+    cat(cls,": "); isValid(ML0 <- as(MLeft[FALSE,], cls), cls)
+    chkP(m0, mRight, ML0, MRight, class(ML0))
+    chkP(mLeft, m0 , MLeft, ML0 , class(ML0))
+    chkP(m0,    m0 , ML0,   ML0 , class(ML0)); cat("\n")
+}
+
+
+## New in R 3.2.0 -- for traditional matrix m and vector v
+for(spV in c(FALSE,TRUE)) {
+    cat("sparseV:", spV, "\n")
+    v <- if(spV) as(1:3, "sparseVector") else 1:3
+    stopifnot(identical(class(v2 <- v[1:2]), class(v)))
+    assertError(crossprod(v, v2)) ; assertError(v %*% v2)
+    assertError(crossprod(v, 1:2)); assertError(v %*% 1:2)
+    assertError(crossprod(v, 2))  ; assertError(v %*% 2)
+    assertError(crossprod(1:2, v)); assertError(1:2 %*% v)
+    if(spV || getRversion() >= "3.2.0") {
+	cat("doing  vec x vec  ..\n")
+	stopifnot(identical(crossprod(2, v), t(2) %*% v),
+		  identical(5 %*% v, 5 %*% t(v)))
+    }
+    for(sp in c(FALSE, TRUE)) {
+        m <- Matrix(1:2, 1,2, sparse=sp)
+        cat(sprintf("class(m): '%s'\n", class(m)))
+        try( stopifnot(identical(crossprod(m, v), t(m) %*% v),
+        ####
+                  identical3(m %*% 1:2, tcrossprod(m, v2 ), m %*% v2) ) )
+    }
+    ## gave error "non-conformable arguments"
+}## FIXME:  .Call(dgeMatrix_matrix_crossprod, x, y,  TRUE || FALSE)   must become tolerant
+
+selectMethod(crossprod, c("dgeMatrix", "numeric"))# .Call(dgeMatrix_matrix_crossprod, x, y, FALSE)
+selectMethod(tcrossprod,c("dgeMatrix", "numeric"))# .Call(dgeMatrix_matrix_crossprod, x, y, TRUE)
+selectMethod(`%*%`, c("dgeMatrix", "numeric")) # -->
+selectMethod(`%*%`, c("dgeMatrix", "matrix"))  # .Call(dgeMatrix_matrix_mm, x, y, FALSE)
+##
+selectMethod(crossprod, c("dgCMatrix", "numeric"))# .Call(Csparse_dense_crossprod, x, y)
+selectMethod(`%*%`,     c("dgCMatrix", "numeric"))# .Call(Csparse_dense_prod,      x, y)
+selectMethod(tcrossprod,c("dgCMatrix", "numeric"))# .Call(Csparse_dense_prod, x, rbind(y, ..))
+
 ### ------ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Sparse Matrix products
 ### ------
