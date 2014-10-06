@@ -133,7 +133,7 @@ oo <- options(Matrix.quiet.qr.R = TRUE, Matrix.verbose = TRUE)
 set.seed(101)
 
 for(N in 1:(if(doExtras) 1008 else 24)) {
-    A <- rSparseMatrix(8,5, nnz = rpois(1, lambda=16))
+    A <- rsparsematrix(8,5, nnz = rpois(1, lambda=16))
     cat(sprintf("%4d -", N))
     checkQR.DS.both(A, Qinv.chk= NA, QtQ.chk=NA)
     ##                          --- => FALSE if struct. rank deficient
@@ -208,7 +208,7 @@ try( checkQR.DS.both(A5, FALSE,  TRUE) )
 
 
 for(N in 1:(if(doExtras) 2^12 else 128)) {
-    A <- round(100*rSparseMatrix(5,3, nnz = min(15,rpois(1, lambda=10))))
+    A <- round(100*rsparsematrix(5,3, nnz = min(15,rpois(1, lambda=10))))
     if(any(apply(A, 2, function(x) all(x == 0)))) ## "column of all 0"
         next
     cat(sprintf("%4d -", N))
