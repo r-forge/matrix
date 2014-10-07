@@ -942,7 +942,7 @@ l2d_meth <- function(x) {
 		"n" = "logical",
 		"z" = "complex")
 ## the reverse, a "version of" .M.kind(.):
-.kind.type <- names(.type.kind); names(.kind.type) <- as.vector(.type.kind)
+.kind.type <- setNames(names(.type.kind), as.vector(.type.kind))
 
 .M.shape <- function(x, clx = class(x)) {
     ## 'clx': class() *or* class definition of x
@@ -1122,6 +1122,20 @@ asTri <- function(from, newclass) {
     else stop("not a triangular matrix")
 }
 
+mat2tri <- function(from, sparse=NA) {
+    isTri <- isTriangular(from)
+    if(isTri) {
+	d <- dim(from)
+	if(is.na(sparse))
+	    sparse <- prod(d) > 2*sum(isN0(from)) ## <==> sparseDefault() in Matrix()
+	if(sparse)
+	    as(as(from, "sparseMatrix"), "triangularMatrix")
+	else
+	    new(paste0(.M.kind(from),"trMatrix"), x = base::as.vector(from),
+                Dim = d, Dimnames = .M.DN(from), uplo = attr(isTri, "kind"))
+    }
+    else stop("not a triangular matrix")
+}
 
 
 try_as <- function(x, classes, tryAnyway = FALSE) {

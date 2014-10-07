@@ -520,7 +520,7 @@ setMethod("t", signature(x = "diagonalMatrix"),
           function(x) { x@Dimnames <- x@Dimnames[2:1] ; x })
 
 setMethod("isDiagonal",   "diagonalMatrix", function(object) TRUE)
-setMethod("isTriangular", "diagonalMatrix", function(object, ...) TRUE)
+setMethod("isTriangular", "diagonalMatrix", function(object, upper=NA, ...) TRUE)
 setMethod("isSymmetric",  "diagonalMatrix", function(object, ...) TRUE)
 
 setMethod("symmpart", signature(x = "diagonalMatrix"), function(x) x)
