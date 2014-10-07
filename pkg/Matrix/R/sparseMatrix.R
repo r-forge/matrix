@@ -545,6 +545,7 @@ printSpMatrix <- function(x, digits = NULL, # getOption("digits"),
     invisible(x.orig)
 } ## printSpMatrix()
 
+##' The "real" show() / print() method, calling the above printSpMatrix():
 printSpMatrix2 <- function(x, digits = NULL, # getOption("digits"),
                            maxp = getOption("max.print"), zero.print = ".",
                            col.names, note.dropping.colnames = TRUE,

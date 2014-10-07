@@ -215,8 +215,9 @@ setMethod("isSymmetric", signature(object = "denseMatrix"),
 			    as(t(object), "igeMatrix"))
 	  })
 
-setMethod("isTriangular", signature(object = "triangularMatrix"),
-	  function(object, ...) TRUE)
+## rather methods in ./triangularMatrix.R
+## setMethod("isTriangular", signature(object = "triangularMatrix"),
+## 	  function(object, ...) TRUE)
 
 setMethod("isTriangular", signature(object = "denseMatrix"), isTriMat)
 
