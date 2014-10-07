@@ -1137,7 +1137,7 @@ try_as <- function(x, classes, tryAnyway = FALSE) {
 
 
 ## For *dense* matrices
-isTriMat <- function(object, upper = NA, ...) {
+isTriMat <- function(object, upper = NA) {
     ## pretest: is it square?
     d <- dim(object)
     if(d[1] != d[2]) return(FALSE)
@@ -1160,7 +1160,7 @@ isTriMat <- function(object, upper = NA, ...) {
 }
 
 ## For Tsparse matrices:
-isTriT <- function(object, upper = NA, ...) {
+isTriT <- function(object, upper = NA) {
     ## pretest: is it square?
     d <- dim(object)
     if(d[1] != d[2]) return(FALSE)
@@ -1182,7 +1182,7 @@ isTriT <- function(object, upper = NA, ...) {
 }
 
 ## For Csparse matrices
-isTriC <- function(object, upper = NA, ...) {
+isTriC <- function(object, upper = NA) {
     ## pretest: is it square?
     d <- dim(object)
     if(d[1] != d[2]) return(FALSE)
