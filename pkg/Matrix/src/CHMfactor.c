@@ -61,7 +61,7 @@ SEXP CHMfactor_spsolve(SEXP a, SEXP b, SEXP system)
 
     // dimnames:
     SEXP dn = PROTECT(allocVector(VECSXP, 2));
-    SET_VECTOR_ELT(dn, 0, duplicate(VECTOR_ELT(GET_SLOT(a, Matrix_DimNamesSym), 1)));
+    // none from a: our CHMfactor objects have no dimnames
     SET_VECTOR_ELT(dn, 1, duplicate(VECTOR_ELT(GET_SLOT(b, Matrix_DimNamesSym), 1)));
     UNPROTECT(1);
 
