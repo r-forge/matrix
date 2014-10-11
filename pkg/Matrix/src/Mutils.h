@@ -288,8 +288,9 @@ void make_i_matrix_symmetric(   int *to, SEXP from);
 
 SEXP Matrix_expand_pointers(SEXP pP);
 
-SEXP dup_mMatrix_as_dgeMatrix(SEXP A);
-SEXP dup_mMatrix_as_geMatrix (SEXP A);
+SEXP dup_mMatrix_as_dgeMatrix2(SEXP A, Rboolean tr_if_vec);
+SEXP dup_mMatrix_as_dgeMatrix (SEXP A);
+SEXP dup_mMatrix_as_geMatrix  (SEXP A);
 
 SEXP new_dgeMatrix(int nrow, int ncol);
 SEXP m_encodeInd (SEXP ij,        SEXP di, SEXP orig_1, SEXP chk_bnds);
@@ -299,9 +300,12 @@ SEXP R_all0(SEXP x);
 SEXP R_any0(SEXP x);
 
 static R_INLINE SEXP
-mMatrix_as_dgeMatrix(SEXP A)
-{
+mMatrix_as_dgeMatrix(SEXP A) {
     return strcmp(class_P(A), "dgeMatrix") ? dup_mMatrix_as_dgeMatrix(A) : A;
+}
+static R_INLINE SEXP
+mMatrix_as_dgeMatrix2(SEXP A, Rboolean tr_if_vec) {
+    return strcmp(class_P(A), "dgeMatrix") ? dup_mMatrix_as_dgeMatrix2(A, tr_if_vec) : A;
 }
 
 static R_INLINE SEXP

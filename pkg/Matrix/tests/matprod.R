@@ -208,7 +208,6 @@ chkP <- function(mLeft, mRight, MLeft, MRight, cl = class(MLeft)) {
 		  assert.EQ.mat(M=b, m=a, tol=0)
 		  Qidentical3(b,c,d)
 	      }
-
     mm <- mLeft %*% mRight # ok
     m.m <- crossprod(mRight)
     mm. <- tcrossprod(mLeft, mLeft)
@@ -219,7 +218,6 @@ chkP <- function(mLeft, mRight, MLeft, MRight, cl = class(MLeft)) {
                      MLeft %*% MRight),# now ok
 	      m.m == 0, identical(m.m, crossprod(mRight, mRight)),
 	      mm. == 0, identical(mm., tcrossprod(mLeft, mLeft)))
-
     stopifnot(ident4(m.m,
 		     crossprod(MRight, MRight),
 		     crossprod(MRight, mRight),
@@ -257,21 +255,15 @@ for(spV in c(FALSE,TRUE)) {
     for(sp in c(FALSE, TRUE)) {
         m <- Matrix(1:2, 1,2, sparse=sp)
         cat(sprintf("class(m): '%s'\n", class(m)))
-        try( stopifnot(identical(crossprod(m, v), t(m) %*% v),
-        ####
-                  identical3(m %*% 1:2, tcrossprod(m, v2 ), m %*% v2) ) )
+	stopifnot(identical( crossprod(m, v), t(m) %*% v), # m'v gave *outer* prod wrongly!
+		  identical(tcrossprod(m, v2), m %*% v2))
+	assert.EQ.Mat(m %*% v2, m %*% 1:2, tol=0)
     }
     ## gave error "non-conformable arguments"
-}## FIXME:  .Call(dgeMatrix_matrix_crossprod, x, y,  TRUE || FALSE)   must become tolerant
+}
+##  crossprod(m, v)  t(1 x 2) * 3 ==> (2 x 1) *  (1 x 3) ==> 2 x 3
+## tcrossprod(m,v2)    1 x 2  * 2 ==> (1 x 2) * t(1 x 2) ==> 1 x 1
 
-selectMethod(crossprod, c("dgeMatrix", "numeric"))# .Call(dgeMatrix_matrix_crossprod, x, y, FALSE)
-selectMethod(tcrossprod,c("dgeMatrix", "numeric"))# .Call(dgeMatrix_matrix_crossprod, x, y, TRUE)
-selectMethod(`%*%`, c("dgeMatrix", "numeric")) # -->
-selectMethod(`%*%`, c("dgeMatrix", "matrix"))  # .Call(dgeMatrix_matrix_mm, x, y, FALSE)
-##
-selectMethod(crossprod, c("dgCMatrix", "numeric"))# .Call(Csparse_dense_crossprod, x, y)
-selectMethod(`%*%`,     c("dgCMatrix", "numeric"))# .Call(Csparse_dense_prod,      x, y)
-selectMethod(tcrossprod,c("dgCMatrix", "numeric"))# .Call(Csparse_dense_prod, x, rbind(y, ..))
 
 ### ------ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Sparse Matrix products
