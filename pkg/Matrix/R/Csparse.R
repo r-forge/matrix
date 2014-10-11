@@ -99,7 +99,10 @@ subCsp_cols <- function(x, j, drop)
     r <- .Call(Csparse_submatrix, x, NULL, jj)
     if(!is.null(n <- dn[[1]])) r@Dimnames[[1]] <- n
     if(!is.null(n <- dn[[2]])) r@Dimnames[[2]] <- n[jj+1L]
-    if(drop && any(r@Dim == 1L)) drop(as(r, "matrix")) else r
+    if(drop && any(r@Dim == 1L)) drop(as(r, "matrix")) else {
+	if(!is.null(n <- names(dn))) names(r@Dimnames) <- n
+	r
+    }
 }
 
 subCsp_rows <- function(x, i, drop)# , cl = getClassDef(class(x))
@@ -110,7 +113,10 @@ subCsp_rows <- function(x, i, drop)# , cl = getClassDef(class(x))
     r <- .Call(Csparse_submatrix, x, ii, NULL)
     if(!is.null(n <- dn[[1]])) r@Dimnames[[1]] <- n[ii+1L]
     if(!is.null(n <- dn[[2]])) r@Dimnames[[2]] <- n
-    if(drop && any(r@Dim == 1L)) drop(as(r, "matrix")) else r
+    if(drop && any(r@Dim == 1L)) drop(as(r, "matrix")) else {
+	if(!is.null(n <- names(dn))) names(r@Dimnames) <- n
+	r
+    }
 }
 
 subCsp_ij <- function(x, i, j, drop)
@@ -127,17 +133,23 @@ subCsp_ij <- function(x, i, j, drop)
     if(!is.null(n <- dn[[1]])) r@Dimnames[[1]] <- n[ii + 1L]
     if(!is.null(n <- dn[[2]])) r@Dimnames[[2]] <- n[jj + 1L]
     if(!i.eq.j) {
-	if(drop && any(r@Dim == 1L)) drop(as(r, "matrix")) else r
+	if(drop && any(r@Dim == 1L)) drop(as(r, "matrix")) else {
+	    if(!is.null(n <- names(dn))) names(r@Dimnames) <- n
+	    r
+	}
     } else { ## i == j
 	if(drop) drop <- any(r@Dim == 1L)
 	if(drop)
 	    drop(as(r, "matrix"))
-	else if(extends((cx <- getClassDef(class(x))),
-                        "symmetricMatrix")) ## TODO? make more efficient:
-	    .gC2sym(r, uplo = x@uplo)## preserve uplo !
-	else if(extends(cx, "triangularMatrix") && !is.unsorted(ii))
-	    as(r, "triangularMatrix")
-	else r
+	else {
+	    if(!is.null(n <- names(dn))) names(r@Dimnames) <- n
+	    if(extends((cx <- getClassDef(class(x))),
+		       "symmetricMatrix")) ## TODO? make more efficient:
+		.gC2sym(r, uplo = x@uplo)## preserve uplo !
+	    else if(extends(cx, "triangularMatrix") && !is.unsorted(ii))
+		as(r, "triangularMatrix")
+	    else r
+	}
     }
 }
 
