@@ -1,12 +1,12 @@
 ##-*- mode: org -*-
 
 * *Urgent* in some sense ---------------------------------------------------
-** TODO [t]crossprod() could/should become more lenient with *vector*s: adapt R-devel (= R 3.2.0)'s rules:
-   see misc/products-Mv.R and *.Rout
+** DONE [t]crossprod() could/should become more lenient with *vector*s: adapt R-devel (= R 3.2.0)'s rules:
+   see misc/products-Mv.R and *.Rout -- now tests/matprod.R ("3.2.0")
 *** DONE for  sparseVector o (sparse)vector
 *** DONE consider analagous changes to base-R
 ** DONE m %*% M (crossprod, ..) with 0-dim. result give garbage
-** TODO M[i,j] should *not* drop dimnames (R-forge bug 2556, see ~/R/MM/Pkg-ex/Matrix/dimnames-prod.R)
+** DONE M[i,j] should *not* drop dimnames (R-forge bug 2556, see ~/R/MM/Pkg-ex/Matrix/dimnames-prod.R)
 ** TODO M[<sparse 2-column Matrix>] indexing should work (but with a warning: use *dense*!)
 ** TODO src/CHOLMOD/MatrixOps/cholmod_symmetry.c  is "cool" and fast;
 Definitely should use it for solve(<dgCMatrix>)  {it seems MATLAB does};
