@@ -817,7 +817,7 @@ SEXP dup_mMatrix_as_dgeMatrix2(SEXP A, Rboolean tr_if_vec)
 }
 
 SEXP dup_mMatrix_as_dgeMatrix(SEXP A) {
-     dup_mMatrix_as_dgeMatrix2(A, FALSE);
+    return dup_mMatrix_as_dgeMatrix2(A, FALSE);
 }
 
 SEXP new_dgeMatrix(int nrow, int ncol)
