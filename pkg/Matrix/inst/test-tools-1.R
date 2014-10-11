@@ -246,10 +246,11 @@ assert.EQ. <- function(target, current,
 
 ### ------- Part II  -- related to matrices, but *not* "Matrix" -----------
 
-add.simpleDimnames <- function(m) {
+add.simpleDimnames <- function(m, named=FALSE) {
     stopifnot(length(d <- dim(m)) == 2)
-    dimnames(m) <- list(if(d[1]) paste0("r", seq_len(d[1])),
-                        if(d[2]) paste0("c", seq_len(d[2])))
+    dimnames(m) <- setNames(list(if(d[1]) paste0("r", seq_len(d[1])),
+				 if(d[2]) paste0("c", seq_len(d[2]))),
+			    if(named) c("Row", "Col"))
     m
 }
 
