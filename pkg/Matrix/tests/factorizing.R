@@ -123,7 +123,7 @@ a <- matrix(round(10 * runif(90)), 10,9); a[a < 7.5] <- 0
 qD <- chkQR(a) ## using base qr
 qS <- chkQR(A) ## using Matrix "sparse qr" -- "structurally rank deficient!
 validObject(qS)# with the validity now (2012-11-18) -- ok, also for "bad" case
-chk.qr.D.S(qD, qS, y = 10 + 1:nrow(A), force=TRUE)
+chk.qr.D.S(qD, qS, y = 10 + 1:nrow(A), force=TRUE)# 6 warnings: "structurally rank deficient"
 try( ## NOTE: *Both* checks  currently fail here:
     chkQR(A, Qinv.chk=TRUE, QtQ.chk=TRUE)
 )

@@ -172,8 +172,13 @@ SEXP dgeMatrix_matrix_crossprod(SEXP x, SEXP y, SEXP trans)
 	y_has_dimNames = yDnms != R_NilValue;
     } else { // ! matrix
 	yDims = INTEGER(yD = PROTECT(allocVector(INTSXP, 2))); nprot++;
-	yDims[0] = LENGTH(y);
-	yDims[1] = 1;
+	if(xDims[0] == 1) { // "new" (2014-10-10): "be tolerant" as for R 3.2.0
+	    yDims[0] = 1;
+	    yDims[1] = LENGTH(y);
+	} else {
+	    yDims[0] = LENGTH(y);
+	    yDims[1] = 1;
+	}
 	y_has_dimNames = FALSE;
     }
     int  n = yDims[!tr],/* (m,n) -> result dim */

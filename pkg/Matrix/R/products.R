@@ -30,6 +30,12 @@
     dim(x) <- if(ncol(y) == (n <- length(x))) c(1L, n) else c(n, 1L)
     tcrossprod(x, y)
 }
+## tcrossprod(<Mat>, <sparseVector>)
+.M.vt <- function(x, y) tcrossprod(x,
+				   if(nrow(x) == 1L)
+				       spV2M(y, nrow=1L, ncol=y@length, check=FALSE)
+				   else
+				       spV2M(y, nrow=y@length, ncol=1L, check=FALSE))
 
 ###-- I --- %*% ------------------------------------------------------
 
@@ -420,7 +426,12 @@ setMethod("crossprod", signature(x = "matrix", y = "Matrix"),
 
 ## sparseVector
 setMethod("crossprod", signature(x = "mMatrix", y = "sparseVector"),
-	  function(x, y) crossprod(x, .sparseV2Mat(y)))
+	  function(x, y) crossprod(x,
+				   if(nrow(x) == 1L)
+				       spV2M(y, nrow=1L, ncol=y@length, check=FALSE)
+				   else
+				       spV2M(y, nrow=y@length, ncol=1L, check=FALSE)))
+
 setMethod("crossprod", signature(x = "sparseVector", y = "mMatrix"),
 	  function(x, y)
 	  crossprod(spV2M(x, nrow = length(x), ncol = 1L, check = FALSE), y))
@@ -543,7 +554,11 @@ setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "ddenseMatrix"),
 setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "matrix"),
 	  function(x, y) .Call(Csparse_dense_prod, x, t(y)))
 setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "numLike"),
-	  function(x, y) .Call(Csparse_dense_prod, x, rbind(y, deparse.level=0)))
+	  function(x, y) .Call(Csparse_dense_prod, x,
+			       if(nrow(x) == 1L)
+				   cbind(y, deparse.level=0)
+			       else
+				   rbind(y, deparse.level=0)))
 
 
 ### -- xy' = (yx')' --------------------
@@ -598,12 +613,11 @@ setMethod("tcrossprod", signature(x = "matrix", y = "Matrix"),
 	  function(x, y = NULL) tcrossprod(Matrix(x), y))
 
 ## sparseVector
-setMethod("tcrossprod", signature(x = "mMatrix", y = "sparseVector"),
-	  function(x, y) tcrossprod(x, .sparseV2Mat(y)))
-setMethod("tcrossprod", signature(x = "sparseVector", y = "mMatrix"), .v.Mt)
-setMethod("tcrossprod", signature(x = "sparseMatrix", y = "sparseVector"),
-	  function(x, y) tcrossprod(x, .sparseV2Mat(y)))
+## NB: the two "sparseMatrix" are "unneeded", only used to avoid ambiguity warning
+setMethod("tcrossprod", signature(x = "sparseMatrix", y = "sparseVector"), .M.vt)
+setMethod("tcrossprod", signature(x = "mMatrix",      y = "sparseVector"), .M.vt)
 setMethod("tcrossprod", signature(x = "sparseVector", y = "sparseMatrix"), .v.Mt)
+setMethod("tcrossprod", signature(x = "sparseVector", y = "mMatrix"),	   .v.Mt)
 setMethod("tcrossprod", signature(x = "sparseVector", y = "sparseVector"),
 	  function(x, y) .sparseV2Mat(x) %*%
           spV2M(y, nrow=1L, ncol=length(y), check=FALSE))

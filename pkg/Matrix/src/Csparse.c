@@ -345,7 +345,8 @@ SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans)
 SEXP Csparse_dense_prod(SEXP a, SEXP b)
 {
     CHM_SP cha = AS_CHM_SP(a);
-    SEXP b_M = PROTECT(mMatrix_as_dgeMatrix(b));
+    SEXP b_M = PROTECT(mMatrix_as_dgeMatrix2(b, // transpose_if_vector =
+					     cha->ncol == 1));
     CHM_DN chb = AS_CHM_DN(b_M);
     CHM_DN chc = cholmod_allocate_dense(cha->nrow, chb->ncol, cha->nrow,
 					chb->xtype, &c);
@@ -376,7 +377,8 @@ SEXP Csparse_dense_prod(SEXP a, SEXP b)
 SEXP Csparse_dense_crossprod(SEXP a, SEXP b)
 {
     CHM_SP cha = AS_CHM_SP(a);
-    SEXP b_M = PROTECT(mMatrix_as_dgeMatrix(b));
+    SEXP b_M = PROTECT(mMatrix_as_dgeMatrix2(b, // transpose_if_vector =
+					     cha->nrow == 1));
     CHM_DN chb = AS_CHM_DN(b_M);
     CHM_DN chc = cholmod_allocate_dense(cha->ncol, chb->ncol, cha->ncol,
 					chb->xtype, &c);
@@ -584,7 +586,11 @@ SEXP Csparse_submatrix(SEXP x, SEXP i, SEXP j)
 	ans = CHM_SUB(tmp, i, j);
 	cholmod_free_sparse(&tmp, &c);
     }
+
     // "FIXME": currently dropping dimnames, and adding them afterwards in R :
+    /* // dimnames: */
+    /* SEXP x_dns = GET_SLOT(x, Matrix_DimNamesSym), */
+    /* 	dn = PROTECT(allocVector(VECSXP, 2)); */
     return chm_sparse_to_SEXP(ans, 1, 0, Rkind, "", /* dimnames: */ R_NilValue);
 }
 

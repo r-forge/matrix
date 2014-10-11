@@ -356,7 +356,9 @@ setReplaceMethod("[", signature(x = "sparseMatrix", i = "ANY", j = "ANY",
 	if(is.null(dim(cx))) {# e.g. in	1 x 1 case
 	    dim(cx) <- dim(m)
 	    dimnames(cx) <- dn
-	}
+	} else ## workaround bug in apply() which has lost row names:
+	    if(getRversion() < "3.2" && !is.null(names(dn)))
+		names(dimnames(cx)) <- names(dn)
     }
     if (missing(col.names))
 	col.names <- {
