@@ -264,7 +264,6 @@ for(spV in c(FALSE,TRUE)) {
 ##  crossprod(m, v)  t(1 x 2) * 3 ==> (2 x 1) *  (1 x 3) ==> 2 x 3
 ## tcrossprod(m,v2)    1 x 2  * 2 ==> (1 x 2) * t(1 x 2) ==> 1 x 1
 
-
 ### ------ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Sparse Matrix products
 ### ------

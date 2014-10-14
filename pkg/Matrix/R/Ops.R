@@ -16,6 +16,7 @@
 ### Design decision for *sparseMatrix*:
 ### work via Csparse  since Tsparse are not-unique (<-> slots not compatible)
 
+### Dimnames: (partly) via  dimNamesCheck()  [ ./Auxiliaries.R ]
 
 ### --  0 -- (not dense *or* sparse) -----------------------------------
 

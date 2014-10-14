@@ -9,6 +9,8 @@
 }
 ## NB: The alternative, 'zero tolerance' { <=> isSymmetric(*, tol=0) }
 ##     breaks too much previous code -- though it would be much faster --
+
+##' usable directly as function in setAs() <== no "..."
 ..dense2sy <- function(from) {
     if(isSymmetric(from)) # < with tolerance!
 	.Call(dense_to_symmetric, from, "U", FALSE)
