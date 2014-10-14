@@ -73,13 +73,13 @@ stopifnot(identical(mn["rc", "D"], mn[3,4]), mn[3,4] == 24,
 showProc.time()
 
 ## R-forge Matrix bug #2556: Subsetting a sparse matrix did remove  names(dimnames(.)) :
-m <- matrix(1:16, 4, 4, dimnames=list(row=c('a','b','c','d'), col=c('x','y','z','w')))
+m44 <- matrix(1:16, 4, 4, dimnames=list(row=c('a','b','c','d'), col=c('x','y','z','w')))
 ## Dense matrix: ------------------------------------------
-a <- Matrix(m)
+a <- Matrix(m44)
 identical(
-    dimnames(m[,FALSE, drop=FALSE]),
-    dimnames(a[,FALSE, drop=FALSE]))
-chk.ndn <- function(a, a0=m)
+    dimnames(m44[,FALSE, drop=FALSE]),
+    dimnames(  a[,FALSE, drop=FALSE]))
+chk.ndn <- function(a, a0=m44)
     stopifnot(identical(names(dimnames(a)), names(dimnames(a0))))
 i <- 1:2
 chk.ndn(a[i,]); chk.ndn(a[i, i])

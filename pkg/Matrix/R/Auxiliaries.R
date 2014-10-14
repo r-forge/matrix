@@ -294,30 +294,82 @@ mmultCheck <- function(a, b, kind = 1L) {
     ca
 }
 
-dimNamesCheck <- function(a, b) {
-    ## Constructs "sensical" dimnames for something like  a + b ;
-    ## assume dimCheck() has happened before
+##' Constructs "sensical" dimnames for something like  a + b ;
+##' assume dimCheck() has happened before
+##'
+##' NOTA BENE:   R's  ?Arithmetic  says
+##' ---------
+##'>  For arrays (and an array result) the dimensions and dimnames are taken from
+##'>  first argument if it is an array, otherwise the second.
+##' but that's not quite correct:
+##' The dimnames are taken from second *if* the first are NULL.
+##'
+##' @title Construct dimnames for  a  o  b
+##' @param a matrix
+##' @param b matrix
+##' @param useFirst logical indicating if dimnames(a), the first, is taken, unless NULL
+##' @param check logical indicating if a warning should be signalled for mismatches
+##' @return a \code{\link{list}} of length two with dimnames
+##' @author Martin Maechler
+dimNamesCheck <- function(a, b, useFirst = TRUE, check = FALSE) {
     nullDN <- list(NULL,NULL)
     h.a <- !identical(nullDN, dna <- dimnames(a))
     h.b <- !identical(nullDN, dnb <- dimnames(b))
     if(h.a || h.b) {
-	if (!h.b) dna
-	else if(!h.a) dnb
-	else { ## both have non-trivial dimnames
-	    r <- dna # "default" result
-	    for(j in 1:2) if(!is.null(dn <- dnb[[j]])) {
-		if(is.null(r[[j]]))
-		    r[[j]] <- dn
-		else if(!identical(r[[j]], dn))
-		    warning(gettextf("dimnames [%d] mismatch in %s", j,
-				     deparse(sys.call(sys.parent()))),
-			    call. = FALSE, domain=NA)
-	    }
-	    r
-	}
+        if(useFirst) {
+            if(!h.a) dnb else dna
+        } else {
+            if (!h.b) dna
+            else if(!h.a) dnb
+            else { ## both have non-trivial dimnames
+                r <- dna # "default" result
+                for(j in 1:2) if(!is.null(dn <- dnb[[j]])) {
+                    if(is.null(r[[j]]))
+                        r[[j]] <- dn
+                    else if(check && !identical(r[[j]], dn))
+                        warning(gettextf("dimnames [%d] mismatch in %s", j,
+                                         deparse(sys.call(sys.parent()))),
+                                call. = FALSE, domain=NA)
+                }
+                r
+            }
+        }
     }
     else
 	nullDN
+}
+
+##' @title Symmetrize dimnames(.)
+##' @param x a square matrix
+##' @param col logical indicating if the column names should be taken when
+##' both are non-NULL.
+##' @param names logical indicating if the names(dimnames(.)) should be
+##' symmetrized and kept *if* they differ.
+##' @return a matrix like \code{x}, say \code{r}, with dimnames fulfilling
+##' 		dr <- dimnames(r); identical(dr[1], dr[2])
+##' @author Martin Maechler
+symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
+    dimnames(x) <- symmDN(dimnames(x), col=col, names=names)
+    x
+}
+
+symmDN <- function(dn, col=TRUE, names=TRUE) {
+    if(is.null(dn) || identical(dn[1L], dn[2L]))
+	return(dn)
+    J <-
+        if(col) {
+            if(is.null(dn[[2L]])) 1L else 2L
+        } else { ## !col : row
+            if(is.null(dn[[1L]])) 2L else 1L
+        }
+
+    if(!is.null(n <- names(dn))) {
+	if(length(n) != 2)
+	    stop("names(dimnames(<matrix>)) must be NULL or of length two")
+	if(n[1L] != n[2L])
+	    names(dn) <- if(names) n[c(J,J)] # else NULL
+    }
+    dn[c(J,J)]
 }
 
 rowCheck <- function(a, b) {
@@ -406,6 +458,7 @@ emptyColnames <- function(x, msg.if.not.empty = FALSE)
     dimnames(x) <- list(dn[[1]], character(nc))
     x
 }
+
 
 
 ## The i-th unit vector  e[1:n] with e[j] = \delta_{i,j}

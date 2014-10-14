@@ -208,13 +208,43 @@ stopifnot(identical(dimnames(m), list(c("a", "b1", "b2"), NULL)),
 	  identical(M, as(m, "dgeMatrix")),
 	  identical(dimnames(M), dimnames(m)))
 
+## dimnames(.) of symmpart() / skewpart() :
+ns <- c("symmpart", "skewpart", "forceSymmetric")
+symFUNs <- setNames(lapply(ns, get), ns); rm(ns)
+chkSS <- function(m) {
+  r <- lapply(symFUNs, function(fn) fn(m))
+  m0 <- as(m, "matrix")
+  r0 <- lapply(symFUNs, function(fn) fn(m0))
+  isValid(fS  <- r [["forceSymmetric"]], "symmetricMatrix")
+  isValid(fS0 <- r0[["forceSymmetric"]], "symmetricMatrix")
+  dnms <- dimnames(m)
+  d.sy <- dimnames(r[["symmpart"]])
+  id <- if(is.null(dnms[[2]]) && !is.null(dnms[[1]])) 1 else 2
+  stopifnot(identical(d.sy, dnms[c(id,id)]),
+	    identical(d.sy, dimnames(r [["skewpart"]])),
+	    identical(d.sy, dimnames(r0[["skewpart"]])),
+	    all(m  == with(r,  symmpart + skewpart)),
+	    all(m0 == with(r0, symmpart + skewpart)),
+	    identical(dS <- dimnames(fS), dimnames(fS0)),
+	    identical(dS[1], dS[2]),
+	    TRUE)
+}
+for(m in list(Matrix(1:4, 2,2), Matrix(c(0, rep(1:0, 3),0:1), 3,3))) {
+    cat("\n---\nm:\n"); show(m)
+    chkSS(m)
+    dn <- list(row = paste0("r", 1:nrow(m)), col = paste0("var.", 1:ncol(m)))
+    dimnames(m) <- dn		; chkSS(m)
+    colnames(m) <- NULL		; chkSS(m)
+    dimnames(m) <- unname(dn)	; chkSS(m)
+}
+
 m. <- matrix(c(0, 0, 2:0), 3, 5)
 dimnames(m.) <- list(LETTERS[1:3], letters[1:5])
 (m0 <- m <- Matrix(m.))
 m@Dimnames[[2]] <- m@Dimnames[[1]]
 ## not valid anymore:
 (val <- validObject(m, test=TRUE)); stopifnot(is.character(val))
-dm <- as(m0, "denseMatrix")
+dm <- as(m0, "denseMatrix"); rm(m)
 stopifnot(all.equal(rcond(dm), rcond(m.), tolerance = 1e-14),
 	  ##^^^^^^^ dm and m. are both dense, interestingly small differences
 	  ## show in at least one case of optimized BLAS
@@ -222,7 +252,9 @@ stopifnot(all.equal(rcond(dm), rcond(m.), tolerance = 1e-14),
           ## show(<dgRMatrix>) had revealed a bug in C:
           identical(capture.output(show(as(m0, "RsparseMatrix")))[-(1:2)],
                     gsub("0", ".",  capture.output(show(m.))[-1])))
-rm(m)
+m.1 <- m.; dimnames(m.1) <- list(row=NULL, col=NULL)
+M.1 <- Matrix(m.1, sparse=TRUE)
+show(M.1)# had bug in .formatSparseSimple()
 
 ###--  Sparse Triangular :
 
@@ -237,7 +269,8 @@ stopifnot(class(t5) == "dtCMatrix",
 ## Maybe move to R once 'Matrix' is recommended
 sm <- selectMethod(coerce, c("dgCMatrix", "triangularMatrix"), verbose=TRUE)
 stopifnot(identical(sm(g5), t5))
-
+dimnames(t5) <- list(row=paste0("r",1:5), col=paste0("C.",1:5))
+s5 <- symmpart(t5) # gave an error
 
 (t1 <- new("dtTMatrix", x= c(3,7), i= 0:1, j=3:2,
            Dim= as.integer(c(4,4))))

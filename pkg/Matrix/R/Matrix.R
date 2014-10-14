@@ -110,14 +110,13 @@ setMethod("isTriangular", signature(object = "matrix"), isTriMat)
 setMethod("isDiagonal", signature(object = "matrix"), .is.diagonal)
 
 ## The "catch all" methods -- far from optimal:
-setMethod("symmpart", signature(x = "Matrix"),
-	  function(x) as((x + t(x))/2, "symmetricMatrix"))
-setMethod("skewpart", signature(x = "Matrix"),
-	  function(x) (x - t(x))/2)
+setMethod("symmpart", signature(x = "Matrix"), function(x)
+    as(symmetrizeDimnames(x + t(x))/2, "symmetricMatrix"))
+setMethod("skewpart", signature(x = "Matrix"), function(x) symmetrizeDimnames(x - t(x))/2)
 
 ## FIXME: do this (similarly as for "ddense.." in C
-setMethod("symmpart", signature(x = "matrix"), function(x) (x + t(x))/2)
-setMethod("skewpart", signature(x = "matrix"), function(x) (x - t(x))/2)
+setMethod("symmpart", signature(x = "matrix"), function(x) symmetrizeDimnames(x + t(x))/2)
+setMethod("skewpart", signature(x = "matrix"), function(x) symmetrizeDimnames(x - t(x))/2)
 
 
 if(getRversion() >= "3.1.0")
@@ -143,8 +142,8 @@ dimnamesGets <- function (x, value) {
 	!(is.null(v2 <- value[[2]]) || length(v2) == d[2]))
 	stop(gettextf("invalid dimnames given for %s object", dQuote(class(x))),
 	     domain=NA)
-    x@Dimnames <- list(if(!is.null(v1)) as.character(v1),
-		       if(!is.null(v2)) as.character(v2))
+    x@Dimnames <- # preserve names(value)!
+	lapply(value, function(v) if(!is.null(v)) as.character(v))
     x
 }
 setMethod("dimnames<-", signature(x = "Matrix", value = "list"),

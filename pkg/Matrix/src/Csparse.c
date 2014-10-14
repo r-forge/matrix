@@ -233,13 +233,34 @@ SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo)
 	return R_NilValue; /* -Wall */
     }
     CHM_SP chx = AS_CHM_SP__(x), chgx;
-    int uploT = (*CHAR(STRING_ELT(uplo,0)) == 'U') ? 1 : -1;
+    int uploT = (*CHAR(asChar(uplo)) == 'U') ? 1 : -1;
     int Rkind = (chx->xtype != CHOLMOD_PATTERN) ? Real_kind(x) : 0;
     R_CheckStack();
     chgx = cholmod_copy(chx, /* stype: */ uploT, chx->xtype, &c);
+
+    /* need _symmetric_ dimnames */
+    SEXP dns = PROTECT(duplicate(GET_SLOT(x, Matrix_DimNamesSym))),
+	nms_dns = getAttrib(dns, R_NamesSymbol);
+    if(!equal_string_vectors(VECTOR_ELT(dns, 0),
+			     VECTOR_ELT(dns, 1))) {
+	if(uploT == 1)
+	    SET_VECTOR_ELT(dns, 0, VECTOR_ELT(dns,1));
+	else
+	    SET_VECTOR_ELT(dns, 1, VECTOR_ELT(dns,0));
+    }
+    if(!isNull(nms_dns) &&  // names(dimnames(.)) :
+       !R_compute_identical(STRING_ELT(nms_dns, 0),
+			    STRING_ELT(nms_dns, 1), 15)) {
+	if(uploT == 1)
+	    SET_STRING_ELT(nms_dns, 0, STRING_ELT(nms_dns,1));
+	else
+	    SET_STRING_ELT(nms_dns, 1, STRING_ELT(nms_dns,0));
+	setAttrib(dns, R_NamesSymbol, nms_dns);
+    }
+
+    UNPROTECT(1);
     /* xtype: pattern, "real", complex or .. */
-    return chm_sparse_to_SEXP(chgx, 1, 0, Rkind, "",
-			      GET_SLOT(x, Matrix_DimNamesSym));
+    return chm_sparse_to_SEXP(chgx, 1, 0, Rkind, "", dns);
 }
 
 SEXP Csparse_transpose(SEXP x, SEXP tri)
@@ -256,6 +277,13 @@ SEXP Csparse_transpose(SEXP x, SEXP tri)
     tmp = VECTOR_ELT(dn, 0);	/* swap the dimnames */
     SET_VECTOR_ELT(dn, 0, VECTOR_ELT(dn, 1));
     SET_VECTOR_ELT(dn, 1, tmp);
+    if(!isNull(tmp = getAttrib(dn, R_NamesSymbol))) { // swap names(dimnames(.)):
+	SEXP nms_dns = PROTECT(allocVector(VECSXP, 2));
+	SET_VECTOR_ELT(nms_dns, 1, STRING_ELT(tmp, 0));
+        SET_VECTOR_ELT(nms_dns, 0, STRING_ELT(tmp, 1));
+	setAttrib(dn, R_NamesSymbol, nms_dns);
+	UNPROTECT(1);
+    }
     UNPROTECT(1);
     return chm_sparse_to_SEXP(chxt, 1, /* SWAP 'uplo' for triangular */
 			      tr ? ((*uplo_P(x) == 'U') ? -1 : 1) : 0,

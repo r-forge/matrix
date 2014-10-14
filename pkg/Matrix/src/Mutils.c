@@ -281,8 +281,8 @@ SEXP check_scalar_string(SEXP sP, char *vals, char *nm)
 }
 
 /* FIXME? Something like this should be part of the R API ?
- *        But then, R has the more general  compute_identical()
- * in src/main/identical.c: Rboolean compute_identical(SEXP x, SEXP y);
+ *        But then, R has the more general  R_compute_identical()
+ * in src/main/identical.c: Rboolean R_compute_identical(SEXP x, SEXP y);
 */
 Rboolean equal_string_vectors(SEXP s1, SEXP s2)
 {
