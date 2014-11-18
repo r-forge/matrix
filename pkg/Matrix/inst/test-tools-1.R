@@ -199,9 +199,9 @@ relErrV <- function(target, current) {
 pkgRversion <- function(pkgname)
     sub("^R ([0-9.]+).*", "\\1", packageDescription(pkgname)[["Built"]])
 
-showSys.time <- function(expr) {
+showSys.time <- function(expr, ...) {
     ## prepend 'Time' for R CMD Rdiff
-    st <- system.time(expr)
+    st <- system.time(expr, ...)
     writeLines(paste("Time", capture.output(print(st))))
     invisible(st)
 }
@@ -231,7 +231,7 @@ assert.EQ <- function(target, current, tol = if(showOnly) 0 else 1e-15,
     T <- isTRUE(ae <- all.equal(target, current, tolerance = tol, ...))
     if(showOnly) return(ae) else if(giveRE && T) { ## don't show if stop() later:
 	ae0 <- if(tol == 0) ae else all.equal(target, current, tolerance = 0, ...)
-	if(!isTRUE(ae0)) cat(ae0,"\n")
+	if(!isTRUE(ae0)) writeLines(ae0)
     }
     if(!T) stop("all.equal() |-> ", paste(ae, collapse=sprintf("%-19s","\n")))
 }
