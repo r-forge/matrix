@@ -198,6 +198,13 @@ bdiag <- function(...) {
     as(.bdiag(alis), "CsparseMatrix")
 }
 
+setMethod("tril", "diagonalMatrix", function(x, k = 0, ...)
+    if(k >= 0) x else .setZero(x, paste0(.M.kind(x), "tCMatrix")))
+
+setMethod("triu", "diagonalMatrix", function(x, k = 0, ...)
+    if(k <= 0) x else  .setZero(x, paste0(.M.kind(x), "tCMatrix")))
+
+
 
 .diag2tT <- function(from, uplo = "U", kind = .M.kind(from)) {
     ## to triangular Tsparse
@@ -524,7 +531,7 @@ setMethod("isTriangular", "diagonalMatrix", function(object, upper=NA, ...) TRUE
 setMethod("isSymmetric",  "diagonalMatrix", function(object, ...) TRUE)
 
 setMethod("symmpart", signature(x = "diagonalMatrix"), function(x) x)
-setMethod("skewpart", signature(x = "diagonalMatrix"), setZero)
+setMethod("skewpart", signature(x = "diagonalMatrix"), function(x) .setZero(x))
 
 setMethod("chol", signature(x = "ddiMatrix"),
 	  function(x, pivot, ...) {

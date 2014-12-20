@@ -55,6 +55,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Csparse_horzcat, 2),
     CALLDEF(Csparse_sort, 1),
     CALLDEF(Csparse_to_Tsparse, 2),
+    CALLDEF(Csparse_to_tCsparse, 3),
+    CALLDEF(Csparse_to_tTsparse, 3),
     CALLDEF(Csparse_to_dense, 1),
     CALLDEF(Csparse_to_nz_pattern, 2),
     CALLDEF(Csparse_to_matrix, 2),

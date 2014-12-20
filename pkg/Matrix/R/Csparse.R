@@ -411,7 +411,7 @@ setMethod("t", signature(x = "CsparseMatrix"),
 
 
 ## NB: have extra tril(), triu() methods for symmetric ["dsC" and "lsC"] and
-## NB: for all triangular ones, where the latter may 'callNextMethod()' these:
+##     for all triangular ones, where the latter may 'callNextMethod()' these:
 setMethod("tril", "CsparseMatrix",
 	  function(x, k = 0, ...) {
 	      k <- as.integer(k[1])
@@ -419,8 +419,7 @@ setMethod("tril", "CsparseMatrix",
 	      stopifnot(-dd[1] <= k, k <= dd[1]) # had k <= 0
 	      r <- .Call(Csparse_band, x, -dd[1], k)
 	      ## return "lower triangular" if k <= 0
-	      if(sqr && k <= 0)
-		  as(r, paste0(.M.kind(x), "tCMatrix")) else r
+	      if(sqr && k <= 0) .gC2tC(r, uplo = "L") else r
 	  })
 
 setMethod("triu", "CsparseMatrix",
@@ -430,8 +429,7 @@ setMethod("triu", "CsparseMatrix",
 	      stopifnot(-dd[1] <= k, k <= dd[1]) # had k >= 0
 	      r <- .Call(Csparse_band, x, k, dd[2])
 	      ## return "upper triangular" if k >= 0
-	      if(sqr && k >= 0)
-		  as(r, paste0(.M.kind(x), "tCMatrix")) else r
+	      if(sqr && k >= 0) .gC2tC(r, uplo = "U") else r
 	  })
 
 setMethod("band", "CsparseMatrix",

@@ -63,7 +63,7 @@ setMethod("forceSymmetric", signature(x="CsparseMatrix"),
 
 
 setMethod("symmpart", signature(x = "symmetricMatrix"), function(x) x)
-setMethod("skewpart", signature(x = "symmetricMatrix"), setZero)
+setMethod("skewpart", signature(x = "symmetricMatrix"), function(x) .setZero(x))
 
 ###------- pack() and unpack() --- for *dense*  symmetric & triangular matrices:
 packM <- function(x, Mtype, kind, unpack=FALSE) {
