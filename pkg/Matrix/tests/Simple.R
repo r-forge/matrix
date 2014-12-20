@@ -308,6 +308,13 @@ stopifnot(is(Lg1, "diagonalMatrix"), is(D4m, "diagonalMatrix"),
           identical3(Lg1, Matrix(nnLg), as(nnLg, "diagonalMatrix")),
           all(Lg1 != (!Lg1)))
 
+## tri[lu](<diagonal>)
+td3 <- triu(diag(3)); stopifnot(is(td3, "triangularMatrix"), td3@uplo == "U")
+Ld3 <- tril(diag(3)); stopifnot(is(Ld3, "triangularMatrix"), Ld3@uplo == "L")
+## the latter did fail till 2014-12-20
+D3 <- Diagonal(3)
+stopifnot(identical3(D3, tril(D3), triu(D3)))
+## methods were missing
 
 ## as(<diag>, <anything>) :
 str(cls <- names(getClass("Matrix")@subclasses))# all Matrix classes

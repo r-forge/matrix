@@ -162,7 +162,7 @@ enum x_slot_kind {x_pattern=-1, x_double=0, x_logical=1, x_integer=2, x_complex=
 #define Real_KIND2(_x_)	(IS_S4_OBJECT(_x_) ? Real_kind(_x_) : \
 			 (isLogical(_x_) ? x_logical : 0))
 
-/* requires 'x' slot: */
+/* requires 'x' slot, i.e., not for ..nMatrix.  FIXME ? via R_has_slot(obj, name) */
 #define Real_kind(_x_)	(isReal(GET_SLOT(_x_, Matrix_xSym)) ? 0	:	\
 			 (isLogical(GET_SLOT(_x_, Matrix_xSym)) ? 1 : -1))
 

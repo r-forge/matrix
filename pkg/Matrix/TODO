@@ -32,6 +32,7 @@ leave the for loops, as soon as is_lower == is_upper == 0.
 ** DONE generalize new "indMatrix" class, to allow 0 repetitions
  of some samples, i.e., columns of all 0 s. It's mathematically more
  natural --> typically will be useful.
+** DONE polnish translation (e-mail!)
 ** TODO cor(<sparseMatrix>) and cov(<sparseMatrix>)  at least for y=NULL ("no y").
 -> ~/R/MM/Pkg-ex/Matrix/cor_sparse-propos.R <- http://stackoverflow.com/questions/5888287/
 ** TODO Investigate the "band changing (and getting) ideas  'band<-' etc,

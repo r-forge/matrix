@@ -304,7 +304,7 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x,
  * @param dofree 0 - don't free a; > 0 cholmod_free a; < 0 Free a
  * @param uploT 0 - not triangular; > 0 upper triangular; < 0 lower
  * @param Rkind - vector type to store for a->xtype == CHOLMOD_REAL,
- *                0 - REAL; 1 - LOGICAL
+ *                0 - REAL; 1 - LOGICAL  [unused for other a->xtype]
  * @param diag character string suitable for the diag slot of a
  *          triangular matrix (not accessed if uploT == 0).
  * @param dn either R_NilValue or an SEXP suitable for the Dimnames slot.
@@ -423,8 +423,8 @@ SEXP chm_sparse_to_SEXP(CHM_SP a, int dofree, int uploT, int Rkind,
 CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x, Rboolean check_Udiag)
 {
     static const char *valid[] = { MATRIX_VALID_Tsparse, ""};
-    int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
-	ctype = Matrix_check_class_etc(x, valid);
+    int ctype = Matrix_check_class_etc(x, valid),
+	*dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
     SEXP islot = GET_SLOT(x, Matrix_iSym);
     int m = LENGTH(islot);
     Rboolean do_Udiag = (check_Udiag && ctype % 3 == 2 && (*diag_P(x) == 'U'));

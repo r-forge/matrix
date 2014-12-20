@@ -877,8 +877,12 @@ tT2gT <- function(x, cl = class(x), toClass, cld = getClassDef(cl)) {
 ## Just *modify* the 'x' object , using attr(x, "class') <- toClass
 
 
-## Fast very special one
-## .gT2tC <- function(x, uplo, diag) .Call(Tsparse_to_tCsparse, x, uplo, diag)
+## Fast very special one ../src/Tsparse.c -- as_cholmod_triplet() in ../src/chm_common.c
+## 'x' *must* inherit from TsparseMatrix!
+.gT2tC <- function(x, uplo, diag="N") .Call(Tsparse_to_tCsparse, x, uplo, diag)
+## Ditto in ../src/Csparse.c :
+.gC2tC <- function(x, uplo, diag="N") .Call(Csparse_to_tCsparse, x, uplo, diag)
+.gC2tT <- function(x, uplo, diag="N") .Call(Csparse_to_tTsparse, x, uplo, diag)
 
 gT2tT <- function(x, uplo, diag, toClass,
 		  do.n = extends(toClass, "nMatrix"))
@@ -1480,11 +1484,10 @@ all0Matrix <- function(n,m) {
 	p = rep.int(0L, m+1L))
 }
 
-setZero <- function(x) {
+.setZero <- function(x, newclass = if(d[1] == d[2]) "dsCMatrix" else "dgCMatrix") {
     ## all-0 matrix  from x  which must inherit from 'Matrix'
     d <- x@Dim
-    new(if(d[1] == d[2]) "dsCMatrix" else "dgCMatrix",
-	Dim = d, Dimnames = x@Dimnames, p = rep.int(0L, d[2]+1L))
+    new(newclass, Dim = d, Dimnames = x@Dimnames, p = rep.int(0L, d[2]+1L))
 }
 
 .M.vectorSub <- function(x,i) { ## e.g. M[0] , M[TRUE],  M[1:2]

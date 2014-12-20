@@ -210,6 +210,30 @@ SEXP Csparse_to_Tsparse(SEXP x, SEXP tri)
 			       GET_SLOT(x, Matrix_DimNamesSym));
 }
 
+SEXP Csparse_to_tCsparse(SEXP x, SEXP uplo, SEXP diag)
+{
+    CHM_SP chxs = AS_CHM_SP__(x);
+    int Rkind = (chxs->xtype != CHOLMOD_PATTERN) ? Real_kind(x) : 0;
+    R_CheckStack();
+    return chm_sparse_to_SEXP(chxs, /* dofree = */ 0,
+			      /* uploT = */ (*CHAR(asChar(uplo)) == 'U')? 1: -1,
+			       Rkind, /* diag = */ CHAR(STRING_ELT(diag, 0)),
+			       GET_SLOT(x, Matrix_DimNamesSym));
+}
+
+SEXP Csparse_to_tTsparse(SEXP x, SEXP uplo, SEXP diag)
+{
+    CHM_SP chxs = AS_CHM_SP__(x);
+    CHM_TR chxt = cholmod_sparse_to_triplet(chxs, &c);
+    int Rkind = (chxs->xtype != CHOLMOD_PATTERN) ? Real_kind(x) : 0;
+    R_CheckStack();
+    return chm_triplet_to_SEXP(chxt, 1,
+			      /* uploT = */ (*CHAR(asChar(uplo)) == 'U')? 1: -1,
+			       Rkind, /* diag = */ CHAR(STRING_ELT(diag, 0)),
+			       GET_SLOT(x, Matrix_DimNamesSym));
+}
+
+
 /* this used to be called  sCMatrix_to_gCMatrix(..)   [in ./dsCMatrix.c ]: */
 SEXP Csparse_symmetric_to_general(SEXP x)
 {

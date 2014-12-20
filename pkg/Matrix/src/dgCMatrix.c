@@ -440,7 +440,8 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
 	    cs_pvec(p, ax + j * n, x, n);  /* x = b(p) */
 	    cs_lsolve(L, x);	       /* x = L\x */
 	    cs_usolve(U, x);	       /* x = U\x */
-	    if (q)			       /* r(q) = x , hence r = Q' U{^-1} L{^-1} P b = A^{-1} b */
+	    if (q)		       /* r(q) = x , hence
+					  r = Q' U{^-1} L{^-1} P b = A^{-1} b */
 		cs_ipvec(q, x, ax + j * n, n);
 	    else
 		Memcpy(ax + j * n, x, n);

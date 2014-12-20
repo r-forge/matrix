@@ -969,13 +969,13 @@ setMethod("Arith", signature(e1 = "dsCMatrix", e2 = "dsCMatrix"),
 
 ##-------- originally from ./dgCMatrix.R --------------------
 
-.Arith.Csparse <- function(e1, e2, Generic, class., triangular = FALSE)
+.Arith.Csparse <- function(e1, e2, Generic, class., triangular = FALSE, check.dimnames = TRUE)
 {
     ## Generic is one of  "+", "-", "*", "^", "%%", "%/%", "/"
 
     ## triangular:  TRUE  iff e1,e2 are triangular  _and_  e1@uplo == e2@uplo
     d <- dimCheck(e1, e2)
-    dn <- dimNamesCheck(e1, e2)
+    dn <- dimNamesCheck(e1, e2, check = check.dimnames)
     if(triangular) {
 	## need these for the 'x' slots in any case
 	if (e1@diag == "U") e1 <- .Call(Csparse_diagU2N, e1)
