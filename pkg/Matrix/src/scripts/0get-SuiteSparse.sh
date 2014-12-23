@@ -7,6 +7,31 @@ then echo 'Must run in Matrix/src/ !' ; exit 1
 fi
 getSPQR=no
 ##     --- since late summer 2010, we no longer get SPQR
+<<<<<<< .mine
+#
+# Tim Davis moved to Texas A&M, on July 1, 2014
+# ufl_URL=http://www.cise.ufl.edu/research/sparse/SuiteSparse/current/
+# TGZ=SuiteSparse.tar.gz
+#  wget -nc  $ufl_URL/$TGZ
+TAM_url=http://faculty.cse.tamu.edu/davis/SuiteSparse
+ifile=index.html
+if [ -f $ifile ]; then fb=index_bak.html; if [ ! -f $fb ] ;then mv $ifile $fb ;fi;fi
+wget -nc $TAM_url/$ifile
+TGZ=`grep 'SuiteSparse-[0-9].*tar' $ifile | tail -1 | sed 's/.*href=//; s/>.*//'`
+echo "Found TGZ='$TGZ' in $ifile."
+if [ -f $TGZ ]
+then
+    echo 'Tarfile present; not downloading (remove it to change this!)'
+    echo 'Maybe *continue* downloading by'; echo;
+    echo "	  wget -c $TAM_url/$TGZ" ; echo
+    echo ' >> INTERRUPT (Ctrl C) within 7 sec !) if you want do that '
+    sleep 7
+else
+    echo '  ==> Trying to get it from '"$TAM_url :"
+    wget -nc $TAM_url/$TGZ
+fi
+ls -l $TGZ
+=======
 #
 # Tim Davis moved to Texas A&M, on July 1, 2014
 # ufl_URL=http://www.cise.ufl.edu/research/sparse/SuiteSparse/current/
@@ -26,6 +51,7 @@ else
     wget -nc $TAM_url/$TGZ
 fi
 ls -l $TGZ
+>>>>>>> .r3024
 
 SS=SuiteSparse
 SSdocDir=../inst/doc/SuiteSparse
@@ -51,6 +77,7 @@ patch -p0 < scripts/SuiteSparse_config.patch
 Sdir=$SS/COLAMD
    ## install COLAMD/Source and COLAMD/Include directories
 tar zxf $TGZ $Sdir/Source/ $Sdir/Include/ $Sdir/Doc/ $Sdir/README.txt
+## MM {2014-12}: following Makefile no longer exists
 f=$Sdir/Source/Makefile
 if [ -f $f ]
 then Rscript --vanilla -e 'source("scripts/fixup-fn.R")' -e 'fixup("'$f'")'
@@ -111,9 +138,11 @@ echo 'Did the above show any non trivial diffs? --> do update inst/include/cholm
 
 svn revert $dd/Lib/Makefile
 ls -l $dd/Lib/Makefile_pre
-echo "now   diff $dd/Lib/Makefile $dd/Lib/Makefile_pre "
+echo "now   diff $dd/Lib/Makefile $dd/Lib/Makefile_pre  [I do it for you below]"
 echo ' make changes as necessary, and then (later)'
 echo " rm $dd"'/Lib/Makefile_*' ; echo
+echo "Ok, now   diff $dd/Lib/Makefile $dd/Lib/Makefile_pre :"
+diff $dd/Lib/Makefile $dd/Lib/Makefile_pre
 
 ## 5) CCparse -------------------------------------------------
 Sdir=$SS/CSparse

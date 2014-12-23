@@ -185,8 +185,8 @@ leave the for loops, as soon as is_lower == is_upper == 0.
   frequently in some computations {conditional normal distr. ...}.
   Since this can be done faster than by
     sum(diag(A %*% B))  even for traditional matrices, e.g.
-    	       sum(A * t(B)) or {even faster for "full" mat}
-	       crossprod(as.vector(A), as.vector(B))
+     sum(A * t(B)) or {sometimes even faster for "full" mat}
+	       crossprod(as.vector(A), as.vector(t(B)))
   and even more so for, e.g.  <sparse> %*% <dense>
   {used in Soeren's 'gR' computations},
   we should also provide a generic and methods.

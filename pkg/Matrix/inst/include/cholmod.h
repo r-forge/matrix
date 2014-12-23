@@ -57,11 +57,11 @@ extern struct SuiteSparse_config_struct SuiteSparse_config ;
 
 #define CHOLMOD_HAS_VERSION_FUNCTION
 
-#define CHOLMOD_DATE "July 18, 2014"
+#define CHOLMOD_DATE "Oct 23, 2014"
 #define CHOLMOD_VER_CODE(main,sub) ((main) * 1000 + (sub))
 #define CHOLMOD_MAIN_VERSION 3
 #define CHOLMOD_SUB_VERSION 0
-#define CHOLMOD_SUBSUB_VERSION 1
+#define CHOLMOD_SUBSUB_VERSION 3
 #define CHOLMOD_VERSION \
     CHOLMOD_VER_CODE(CHOLMOD_MAIN_VERSION,CHOLMOD_SUB_VERSION)
 
@@ -94,15 +94,11 @@ extern struct SuiteSparse_config_struct SuiteSparse_config ;
 /* Define buffering parameters for GPU processing */
 #ifdef GPU_BLAS
 #include <cublas_v2.h>
+#endif
+
 #define CHOLMOD_DEVICE_SUPERNODE_BUFFERS 6
 #define CHOLMOD_HOST_SUPERNODE_BUFFERS 8
 #define CHOLMOD_DEVICE_STREAMS 2
-#else
-#define CHOLMOD_DEVICE_SUPERNODE_BUFFERS 1
-#define CHOLMOD_HOST_SUPERNODE_BUFFERS 1
-#define CHOLMOD_DEVICE_STREAMS 1
-#endif
-
 
 
 /* ========================================================================== */
@@ -577,8 +573,15 @@ typedef struct cholmod_common_struct
 	* reports high fill-in.  If Common->default_nesdis is TRUE then NESDIS
 	* is used instead in the default strategy. */
 
+    /* ---------------------------------------------------------------------- */
+    /* memory management, complex divide, and hypot function pointers moved */
+    /* ---------------------------------------------------------------------- */
 
-
+    /* Function pointers moved from here (in CHOLMOD 2.2.0) to
+       SuiteSparse_config.[ch].  See CHOLMOD/Include/cholmod_back.h
+       for a set of macros that can be #include'd or copied into your
+       application to define these function pointers on any version of CHOLMOD.
+       */
 
     /* ---------------------------------------------------------------------- */
     /* METIS workarounds */
@@ -755,7 +758,10 @@ typedef struct cholmod_common_struct
     /*           0 if gpu-acceleration is prohibited */
     /*          -1 if gpu-acceleration is undefined in which case the */
     /*             environment CHOLMOD_USE_GPU will be queried and used. */
+    /*             useGPU=-1 is only used by CHOLMOD and treated as 0 by SPQR */
     int useGPU;
+
+    /* for CHOLMOD: */
     size_t maxGpuMemBytes;
     double maxGpuMemFraction;
 
@@ -821,7 +827,7 @@ typedef struct cholmod_common_struct
 
 } cholmod_common ;
 
-// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 2915 :
+// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 3001 :
 /* A sparse matrix stored in compressed-column form. */
 
 typedef struct cholmod_sparse_struct
@@ -875,7 +881,7 @@ typedef struct cholmod_sparse_struct
 
 } cholmod_sparse ;
 
-// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 1589 :
+// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 1604 :
 /* A symbolic and numeric factorization, either simplicial or supernodal.
  * In all cases, the row indices in the columns of L are kept sorted. */
 
@@ -1006,7 +1012,7 @@ typedef struct cholmod_factor_struct
 
 } cholmod_factor ;
 
-// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 1873 :
+// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 1888 :
 /* A dense matrix in column-oriented form.  It has no itype since it contains
  * no integers.  Entry in row i and column j is located in x [i+j*d].
  */
@@ -1024,7 +1030,7 @@ typedef struct cholmod_dense_struct
 
 } cholmod_dense ;
 
-// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 2072 :
+// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 2087 :
 /* A sparse matrix stored in triplet form. */
 
 typedef struct cholmod_triplet_struct
