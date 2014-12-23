@@ -1,35 +1,36 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$dgeMatrix_8h.html#a25fac53ee67024e89f6240deaa4c7ca3" title="dgeMatrix_LU_" alt="" coords="155,138,267,169"/>
-<area shape="rect" id="node15" href="$dpoMatrix_8h.html#aa951f7c9871735266da55e7d92a6ae58" title="dpoMatrix_chol" alt="" coords="155,405,267,435"/>
-<area shape="rect" id="node27" href="$dppMatrix_8h.html#a6111600bf96735d9b39d5bc193203b31" title="dppMatrix_chol" alt="" coords="155,618,267,649"/>
-<area shape="rect" id="node35" href="$dspMatrix_8h.html#a54f1c211fe36a020c613498e295f6365" title="dspMatrix_trf" alt="" coords="163,751,259,782"/>
-<area shape="rect" id="node43" href="$dsyMatrix_8h.html#ae436ba23f7410148775ce808f08d1210" title="dsyMatrix_trf" alt="" coords="163,885,259,915"/>
-<area shape="rect" id="node51" href="$dgCMatrix_8c.html#ad6045ab51c67c719a4deab2c929e4d13" title="install_lu" alt="" coords="175,1018,247,1049"/>
-<area shape="rect" id="node57" href="$dsCMatrix_8c.html#a9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm, LDL and super attributes." alt="" coords="143,1205,279,1235"/>
-<area shape="rect" id="node5" href="$dgeMatrix_8h.html#aebb502aae0db4698b17a88c6c0f0ec39" title="dgeMatrix_determinant" alt="" coords="344,5,501,35"/>
-<area shape="rect" id="node7" href="$dgeMatrix_8h.html#a14710a79940dbc67cab89dc8c302c210" title="dgeMatrix_LU" alt="" coords="371,58,475,89"/>
-<area shape="rect" id="node9" href="$dgeMatrix_8h.html#a4aaf5ed4d71841560a06e2eda9da3762" title="dgeMatrix_matrix_solve" alt="" coords="340,111,505,142"/>
-<area shape="rect" id="node11" href="$dgeMatrix_8h.html#ac4f1b4b19a004fb62c9cb68ccb1028ea" title="dgeMatrix_rcond" alt="" coords="361,165,484,195"/>
-<area shape="rect" id="node13" href="$dgeMatrix_8h.html#a8f0564cd095a4415738ef1ad8d537da1" title="dgeMatrix_solve" alt="" coords="361,218,484,249"/>
-<area shape="rect" id="node17" href="$dpoMatrix_8h.html#a6fdf4fea856fcb48318714aaa43375d5" title="dpoMatrix_dgeMatrix_solve" alt="" coords="329,271,516,302"/>
-<area shape="rect" id="node19" href="$dpoMatrix_8h.html#a915278646a8dc39fbffe059c53d19569" title="dpoMatrix_matrix_solve" alt="" coords="341,325,504,355"/>
-<area shape="rect" id="node21" href="$dpoMatrix_8h.html#ae4b3c6190a4d12048befb3d3110c2377" title="dpoMatrix_rcond" alt="" coords="361,378,484,409"/>
-<area shape="rect" id="node23" href="$dpoMatrix_8h.html#acc9a68e6726285aaea483c6652019d47" title="dpoMatrix_solve" alt="" coords="363,431,483,462"/>
-<area shape="rect" id="node25" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="375,485,471,515"/>
-<area shape="rect" id="node29" href="$dppMatrix_8h.html#a0b9f86379aec800872a5267229a7b400" title="dppMatrix_matrix_solve" alt="" coords="341,538,504,569"/>
-<area shape="rect" id="node31" href="$dppMatrix_8h.html#a192a0f023f8f371c79a98364ac64dfb7" title="dppMatrix_rcond" alt="" coords="363,591,483,622"/>
-<area shape="rect" id="node33" href="$dppMatrix_8h.html#a1b051e90cad1589623960a42821aae55" title="dppMatrix_solve" alt="" coords="363,645,483,675"/>
-<area shape="rect" id="node37" href="$dspMatrix_8h.html#ac1c54a26f283497edb9cb22e131ddd77" title="dspMatrix_matrix_solve" alt="" coords="341,698,504,729"/>
-<area shape="rect" id="node39" href="$dspMatrix_8h.html#a59ebaefdeb2938d058c5924ec3863d19" title="dspMatrix_rcond" alt="" coords="363,751,483,782"/>
-<area shape="rect" id="node41" href="$dspMatrix_8h.html#acaf6254dcf4a732af2c400882db76d69" title="dspMatrix_solve" alt="" coords="363,805,483,835"/>
-<area shape="rect" id="node45" href="$dsyMatrix_8h.html#a729dcefd1ff17369b45dcd4f7feda7ab" title="dsyMatrix_matrix_solve" alt="" coords="341,858,504,889"/>
-<area shape="rect" id="node47" href="$dsyMatrix_8h.html#ab262747a9bb8df9b06e3c234260dd92b" title="dsyMatrix_rcond" alt="" coords="363,911,483,942"/>
-<area shape="rect" id="node49" href="$dsyMatrix_8h.html#aae157f861f04cdf7e60f1ce5f5e9c96d" title="dsyMatrix_solve" alt="" coords="363,965,483,995"/>
-<area shape="rect" id="node53" href="$dgCMatrix_8h.html#a848fa1b60915b5ee7926c897b8b5f050" title="dgCMatrix_LU" alt="" coords="369,1018,476,1049"/>
-<area shape="rect" id="node55" href="$dgCMatrix_8h.html#aeae674c1f247043d2e34fe45d4239769" title="dgCMatrix_matrix_solve" alt="" coords="340,1071,505,1102"/>
-<area shape="rect" id="node59" href="$dsCMatrix_8h.html#a326fdb98f74608895abd9df179158253" title="dsCMatrix_chol" alt="" coords="365,1125,480,1155"/>
-<area shape="rect" id="node61" href="$dsCMatrix_8h.html#af424de259d431a9c8719a23188265887" title="dsCMatrix_Cholesky" alt="" coords="349,1178,496,1209"/>
-<area shape="rect" id="node63" href="$dsCMatrix_8h.html#a6e9761126a72d9a9f543ea82978b6ae9" title="dsCMatrix_Csparse_solve" alt="" coords="332,1231,513,1262"/>
-<area shape="rect" id="node65" href="$dsCMatrix_8h.html#ae60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial Cholesky LDL&#39; decomp..." alt="" coords="357,1285,488,1315"/>
-<area shape="rect" id="node67" href="$dsCMatrix_8h.html#ae03dda286063199c0f670425084f0f2d" title="dsCMatrix_matrix_solve" alt="" coords="340,1338,505,1369"/>
+<map id="set_factors" name="set_factors">
+<area shape="rect" id="node2" href="$dgeMatrix_8h.html#a25fac53ee67024e89f6240deaa4c7ca3" title="dgeMatrix_LU_" alt="" coords="154,132,265,159"/>
+<area shape="rect" id="node8" href="$dpoMatrix_8h.html#aa951f7c9871735266da55e7d92a6ae58" title="dpoMatrix_chol" alt="" coords="155,401,264,428"/>
+<area shape="rect" id="node14" href="$dppMatrix_8h.html#a6111600bf96735d9b39d5bc193203b31" title="dppMatrix_chol" alt="" coords="155,604,264,631"/>
+<area shape="rect" id="node18" href="$dspMatrix_8h.html#a54f1c211fe36a020c613498e295f6365" title="dspMatrix_trf" alt="" coords="161,756,258,783"/>
+<area shape="rect" id="node22" href="$dsyMatrix_8h.html#ae436ba23f7410148775ce808f08d1210" title="dsyMatrix_trf" alt="" coords="161,857,257,884"/>
+<area shape="rect" id="node26" href="$dgCMatrix_8c.html#ad6045ab51c67c719a4deab2c929e4d13" title="install_lu" alt="" coords="173,984,246,1011"/>
+<area shape="rect" id="node29" href="$dsCMatrix_8c.html#a9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm, LDL and super attributes. " alt="" coords="141,1136,277,1163"/>
+<area shape="rect" id="node35" href="$Mutils_8h.html#a03dde9538710cc51711fda0116697350" title="R_set_factors" alt="" coords="158,1187,261,1213"/>
+<area shape="rect" id="node3" href="$dgeMatrix_8h.html#aebb502aae0db4698b17a88c6c0f0ec39" title="dgeMatrix_determinant" alt="" coords="335,5,489,32"/>
+<area shape="rect" id="node4" href="$dgeMatrix_8h.html#a14710a79940dbc67cab89dc8c302c210" title="dgeMatrix_LU" alt="" coords="361,56,463,83"/>
+<area shape="rect" id="node5" href="$dgeMatrix_8h.html#a4aaf5ed4d71841560a06e2eda9da3762" title="dgeMatrix_matrix_solve" alt="" coords="333,107,491,133"/>
+<area shape="rect" id="node6" href="$dgeMatrix_8h.html#ac4f1b4b19a004fb62c9cb68ccb1028ea" title="dgeMatrix_rcond" alt="" coords="353,157,471,184"/>
+<area shape="rect" id="node7" href="$dgeMatrix_8h.html#a8f0564cd095a4415738ef1ad8d537da1" title="dgeMatrix_solve" alt="" coords="354,208,470,235"/>
+<area shape="rect" id="node9" href="$dpoMatrix_8h.html#a6fdf4fea856fcb48318714aaa43375d5" title="dpoMatrix_dgeMatrix\l_solve" alt="" coords="341,259,483,301"/>
+<area shape="rect" id="node10" href="$dpoMatrix_8h.html#a915278646a8dc39fbffe059c53d19569" title="dpoMatrix_matrix_solve" alt="" coords="333,325,491,352"/>
+<area shape="rect" id="node11" href="$dpoMatrix_8h.html#ae4b3c6190a4d12048befb3d3110c2377" title="dpoMatrix_rcond" alt="" coords="353,376,471,403"/>
+<area shape="rect" id="node12" href="$dpoMatrix_8h.html#acc9a68e6726285aaea483c6652019d47" title="dpoMatrix_solve" alt="" coords="354,427,470,453"/>
+<area shape="rect" id="node13" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="363,477,461,504"/>
+<area shape="rect" id="node15" href="$dppMatrix_8h.html#a0b9f86379aec800872a5267229a7b400" title="dppMatrix_matrix_solve" alt="" coords="333,528,491,555"/>
+<area shape="rect" id="node16" href="$dppMatrix_8h.html#a192a0f023f8f371c79a98364ac64dfb7" title="dppMatrix_rcond" alt="" coords="353,579,471,605"/>
+<area shape="rect" id="node17" href="$dppMatrix_8h.html#a1b051e90cad1589623960a42821aae55" title="dppMatrix_solve" alt="" coords="354,629,470,656"/>
+<area shape="rect" id="node19" href="$dspMatrix_8h.html#ac1c54a26f283497edb9cb22e131ddd77" title="dspMatrix_matrix_solve" alt="" coords="333,680,491,707"/>
+<area shape="rect" id="node20" href="$dspMatrix_8h.html#a59ebaefdeb2938d058c5924ec3863d19" title="dspMatrix_rcond" alt="" coords="353,731,471,757"/>
+<area shape="rect" id="node21" href="$dspMatrix_8h.html#acaf6254dcf4a732af2c400882db76d69" title="dspMatrix_solve" alt="" coords="354,781,470,808"/>
+<area shape="rect" id="node23" href="$dsyMatrix_8h.html#a729dcefd1ff17369b45dcd4f7feda7ab" title="dsyMatrix_matrix_solve" alt="" coords="333,832,491,859"/>
+<area shape="rect" id="node24" href="$dsyMatrix_8h.html#ab262747a9bb8df9b06e3c234260dd92b" title="dsyMatrix_rcond" alt="" coords="354,883,470,909"/>
+<area shape="rect" id="node25" href="$dsyMatrix_8h.html#aae157f861f04cdf7e60f1ce5f5e9c96d" title="dsyMatrix_solve" alt="" coords="355,933,469,960"/>
+<area shape="rect" id="node27" href="$dgCMatrix_8h.html#a848fa1b60915b5ee7926c897b8b5f050" title="dgCMatrix_LU" alt="" coords="359,984,465,1011"/>
+<area shape="rect" id="node28" href="$dgCMatrix_8h.html#af93f855ba17fa036d69aece5e0321510" title="dgCMatrix_matrix_solve" alt="" coords="332,1035,492,1061"/>
+<area shape="rect" id="node30" href="$dsCMatrix_8h.html#a326fdb98f74608895abd9df179158253" title="dsCMatrix_chol" alt="" coords="357,1085,467,1112"/>
+<area shape="rect" id="node31" href="$dsCMatrix_8h.html#af424de259d431a9c8719a23188265887" title="dsCMatrix_Cholesky" alt="" coords="342,1136,482,1163"/>
+<area shape="rect" id="node32" href="$dsCMatrix_8h.html#adcc1710e8498942adcce28ec1eab655e" title="dsCMatrix_Csparse_solve" alt="" coords="325,1187,499,1213"/>
+<area shape="rect" id="node33" href="$dsCMatrix_8h.html#ae60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial Cholesky LDL&#39; decomp..." alt="" coords="348,1237,476,1264"/>
+<area shape="rect" id="node34" href="$dsCMatrix_8h.html#a2b40f2a78566d1c13864187d2ab964af" title="dsCMatrix_matrix_solve" alt="" coords="332,1288,492,1315"/>
 </map>

@@ -1,5 +1,5 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$cs_8c.html#a27050a31d36046e833b7763fe8ef62ce" title="cs_happly" alt="" coords="176,5,259,35"/>
-<area shape="rect" id="node5" href="$cs_8c.html#a1d7df434402e7553c34dbd59fd040159" title="cs_ipvec" alt="" coords="180,58,255,89"/>
-<area shape="rect" id="node7" href="$cs_8c.html#ad854f5cf7572128900a5acb1a7c87754" title="cs_pvec" alt="" coords="181,111,253,142"/>
+<map id="sparseQR_Qmult" name="sparseQR_Qmult">
+<area shape="rect" id="node2" href="$cs_8c.html#a88a82fabd191059a8db610fbfe6b008a" title="cs_happly" alt="" coords="176,5,256,32"/>
+<area shape="rect" id="node3" href="$cs_8c.html#a0938ec08825dc07a2dab8f9477ab053b" title="cs_ipvec" alt="" coords="179,56,253,83"/>
+<area shape="rect" id="node4" href="$cs_8c.html#a79d20fcd31c30d118075e08087127c4e" title="cs_pvec" alt="" coords="181,107,251,133"/>
 </map>

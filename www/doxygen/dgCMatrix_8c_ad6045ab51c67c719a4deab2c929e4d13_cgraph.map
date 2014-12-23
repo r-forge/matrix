@@ -1,44 +1,44 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="333,43,437,73"/>
-<area shape="rect" id="node5" href="$cs_8c.html#a50c30e47141ef37dbb4b342e1b4ba924" title="cs_dropzeros" alt="" coords="145,1601,249,1632"/>
-<area shape="rect" id="node15" href="$cs_8c.html#a78c1d1194aacc65212bb0d2b03643ac7" title="cs_free" alt="" coords="936,1020,1003,1051"/>
-<area shape="rect" id="node17" href="$cs_8c.html#a6a35ad4816f210234a33eed09b19d181" title="cs_lu" alt="" coords="359,1244,412,1275"/>
-<area shape="rect" id="node26" href="$cs_8c.html#af2e6d75dfc24a842fdbce3aa510dc4bc" title="cs_nfree" alt="" coords="669,1757,741,1788"/>
-<area shape="rect" id="node29" href="$cs_8c.html#a6d705e404a7831ccf01bc0ea064215b9" title="cs_spfree" alt="" coords="805,1423,885,1453"/>
-<area shape="rect" id="node46" href="$cs_8c.html#a4ddf83c074fafd1120be9fbbfa4a29f9" title="cs_pinv" alt="" coords="164,445,231,476"/>
-<area shape="rect" id="node49" href="$cs_8c.html#ace766075ef439ad6e4347f6b076eb4b7" title="cs_sfree" alt="" coords="349,203,421,233"/>
-<area shape="rect" id="node53" href="$cs_8c.html#a31db4da8e996966094f83c7601dc08ff" title="cs_sqr" alt="" coords="167,563,228,593"/>
-<area shape="rect" id="node89" href="$cs_8c.html#a090225477a18abe5f8d5ab26e4efaf3a" title="cs_transpose" alt="" coords="505,1037,607,1068"/>
-<area shape="rect" id="node129" href="$cs__utils_8c.html#ae53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="128,149,267,180"/>
-<area shape="rect" id="node137" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="set_factors" alt="" coords="155,1808,240,1839"/>
-<area shape="rect" id="node7" href="$cs_8c.html#ade63a58ec1758250c64518d817ea3c4c" title="cs_fkeep" alt="" coords="519,1296,593,1327"/>
-<area shape="rect" id="node13" href="$cs_8c.html#a9dad9370bdde743eee26de2d53572bda" title="cs_nonzero" alt="" coords="340,1653,431,1684"/>
-<area shape="rect" id="node9" href="$cs_8c.html#a5a9bc4224732ce1cedc50119afc687c1" title="cs_sprealloc" alt="" coords="656,1231,755,1261"/>
-<area shape="rect" id="node11" href="$cs_8c.html#a7e829e1175f2c8ddb0d6d9e0bb90f985" title="cs_realloc" alt="" coords="804,1231,887,1261"/>
-<area shape="rect" id="node19" href="$cs_8c.html#ad3e846c0142a1457e8e85bcaf559fb98" title="cs_calloc" alt="" coords="807,1073,884,1104"/>
-<area shape="rect" id="node21" href="$cs_8c.html#a4c6c75c54cbdf2f3fd4574a90c2f8a86" title="cs_malloc" alt="" coords="804,536,887,567"/>
-<area shape="rect" id="node23" href="$cs_8c.html#a24796e2f78414578fd2b8e7528535cbb" title="cs_ndone" alt="" coords="516,1680,596,1711"/>
-<area shape="rect" id="node33" href="$cs_8c.html#aad3a584d9185a4fe4497a36f892b9c72" title="cs_spalloc" alt="" coords="663,1073,748,1104"/>
-<area shape="rect" id="node39" href="$cs_8c.html#adcb6aabd14949ff1294ad629276c1a05" title="cs_spsolve" alt="" coords="511,1501,601,1532"/>
-<area shape="rect" id="node41" href="$cs_8c.html#a9ec7f8c7e89af292aeb734df017aecc0" title="cs_reach" alt="" coords="667,1501,744,1532"/>
-<area shape="rect" id="node43" href="$cs_8c.html#aa2d683eb04f79a4643fbe50038e641bd" title="cs_dfs" alt="" coords="815,1501,876,1532"/>
-<area shape="rect" id="node55" href="$cs_8c.html#a633a0b0214f3ee86a27adf6ee6dea640" title="cs_amd" alt="" coords="351,931,420,961"/>
-<area shape="rect" id="node99" href="$cs_8c.html#aa7fdeead97aef81cdf18af7576a7f722" title="cs_counts" alt="" coords="344,563,427,593"/>
-<area shape="rect" id="node108" href="$cs_8c.html#a5c531804008e67c207e93f14c2551b1a" title="cs_etree" alt="" coords="348,357,423,388"/>
-<area shape="rect" id="node113" href="$cs_8c.html#ada9cc712c0db19bc1dc1ef9211e6ca3c" title="cs_permute" alt="" coords="511,931,601,961"/>
-<area shape="rect" id="node117" href="$cs_8c.html#adc01793c66e6caa0eef76be3dda7ffd5" title="cs_post" alt="" coords="352,485,419,516"/>
-<area shape="rect" id="node124" href="$cs_8c.html#a9aa3afad1ec55f96205b52d378b8000f" title="cs_vcount" alt="" coords="664,203,747,233"/>
-<area shape="rect" id="node57" href="$cs_8c.html#a12000fbd0b9198d3852978cca8386afe" title="cs_add" alt="" coords="523,824,589,855"/>
-<area shape="rect" id="node69" href="$cs_8c.html#ab744b6c0bb84f8f54496c547e8a95e16" title="cs_diag" alt="" coords="521,984,591,1015"/>
-<area shape="rect" id="node72" href="$cs_8c.html#a9c3bd8e36cdfb832d199b580e22467c7" title="cs_idone" alt="" coords="517,459,595,489"/>
-<area shape="rect" id="node77" href="$cs_8c.html#a066e18f8570c820530c73ebc88b30a97" title="cs_multiply" alt="" coords="513,877,599,908"/>
-<area shape="rect" id="node87" href="$cs_8c.html#a7b064c4799cc09da13c13d982197eff7" title="cs_tdfs" alt="" coords="524,616,588,647"/>
-<area shape="rect" id="node96" href="$cs_8c.html#a73c323ac388668ef8ab5a2aa97807fbe" title="cs_wclear" alt="" coords="515,1091,597,1121"/>
-<area shape="rect" id="node60" href="$cs_8c.html#a41590e7ef8c8f3ebce8c7bbe07303c28" title="cs_done" alt="" coords="668,1020,743,1051"/>
-<area shape="rect" id="node65" href="$cs_8c.html#a3729a7e21dbc3309ac96461ddb060328" title="cs_scatter" alt="" coords="664,865,747,896"/>
-<area shape="rect" id="node92" href="$cs_8c.html#a97200b7cc3ad296c964134a59616efdd" title="cs_cumsum" alt="" coords="659,1177,752,1208"/>
-<area shape="rect" id="node102" href="$cs_8c.html#adf3182dea8214e7a96ac2d055d60d267" title="cs_leaf" alt="" coords="524,669,588,700"/>
-<area shape="rect" id="node106" href="$cs_8c.html#a3e3f8da5491fe28fab370482d0cc3389" title="init_ata" alt="" coords="524,563,588,593"/>
-<area shape="rect" id="node133" href="$cs__utils_8c.html#a0b2592041f5b822459b7052a451c07a5" title="is_sym" alt="" coords="355,96,416,127"/>
-<area shape="rect" id="node135" href="$Mutils_8h.html#a952a7277ea90f8560245dc16801da86b" title="Return the 0&#45;based index of a string match in a vector of strings terminated by an empty string..." alt="" coords="316,149,455,180"/>
+<map id="install_lu" name="install_lu">
+<area shape="rect" id="node2" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="330,44,438,70"/>
+<area shape="rect" id="node3" href="$cs_8c.html#a038d56f7a15bb02c3b8309f3eff78d59" title="cs_dropzeros" alt="" coords="148,1564,247,1590"/>
+<area shape="rect" id="node8" href="$cs_8c.html#a78c1d1194aacc65212bb0d2b03643ac7" title="cs_free" alt="" coords="926,1006,991,1033"/>
+<area shape="rect" id="node9" href="$cs_8c.html#a6a35ad4816f210234a33eed09b19d181" title="cs_lu" alt="" coords="357,1209,411,1236"/>
+<area shape="rect" id="node13" href="$cs_8c.html#af2e6d75dfc24a842fdbce3aa510dc4bc" title="cs_nfree" alt="" coords="663,1716,735,1742"/>
+<area shape="rect" id="node14" href="$cs_8c.html#a6d705e404a7831ccf01bc0ea064215b9" title="cs_spfree" alt="" coords="797,1386,875,1413"/>
+<area shape="rect" id="node19" href="$cs_8c.html#aa27849bb0ec6e23335935fec6ac54ee8" title="cs_pinv" alt="" coords="164,436,231,462"/>
+<area shape="rect" id="node20" href="$cs_8c.html#ace766075ef439ad6e4347f6b076eb4b7" title="cs_sfree" alt="" coords="348,196,420,222"/>
+<area shape="rect" id="node21" href="$cs_8c.html#a21757f1e6b914a97fdf4b1a39e0e70b2" title="cs_sqr" alt="" coords="167,550,228,577"/>
+<area shape="rect" id="node30" href="$cs_8c.html#aee7c14539994e9ef689771b18e769a58" title="cs_transpose" alt="" coords="502,1006,602,1033"/>
+<area shape="rect" id="node40" href="$cs__utils_8c.html#ae53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="128,145,267,172"/>
+<area shape="rect" id="node43" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="154,1766,241,1793"/>
+<area shape="rect" id="node4" href="$cs_8c.html#a0467456f70ba2840b1876b42ae1f990b" title="cs_fkeep" alt="" coords="515,1260,589,1286"/>
+<area shape="rect" id="node7" href="$cs_8c.html#a2faf963624753cb7c36083c47321ef08" title="cs_nonzero" alt="" coords="340,1614,428,1641"/>
+<area shape="rect" id="node5" href="$cs_8c.html#a4f6f6d0b8acba23772fd254ec794e966" title="cs_sprealloc" alt="" coords="651,1209,746,1236"/>
+<area shape="rect" id="node6" href="$cs_8c.html#a83d5f12cd0b117a7ae11ffe82cbe0c53" title="cs_realloc" alt="" coords="795,1209,877,1236"/>
+<area shape="rect" id="node10" href="$cs_8c.html#ab0409434fb3c42f45ba194b4acfed419" title="cs_calloc" alt="" coords="797,1057,875,1084"/>
+<area shape="rect" id="node11" href="$cs_8c.html#a2762d0a71c7c3acc7bda0d4bb0befd03" title="cs_malloc" alt="" coords="795,525,877,552"/>
+<area shape="rect" id="node12" href="$cs_8c.html#a277457f63f07ee0d7f0e15e145af7c80" title="cs_ndone" alt="" coords="513,1640,591,1666"/>
+<area shape="rect" id="node15" href="$cs_8c.html#a7b4b540a4da0b23b8d3956cf0356e3ca" title="cs_spalloc" alt="" coords="657,1057,741,1084"/>
+<area shape="rect" id="node16" href="$cs_8c.html#a772ba477fdc1f6499735635e037b0c6d" title="cs_spsolve" alt="" coords="508,1462,596,1489"/>
+<area shape="rect" id="node17" href="$cs_8c.html#aa3ab9062fd3f90144bc78c76090c225c" title="cs_reach" alt="" coords="661,1462,736,1489"/>
+<area shape="rect" id="node18" href="$cs_8c.html#a43a06094fee0e062b78fd70d1c70b9c4" title="cs_dfs" alt="" coords="805,1462,867,1489"/>
+<area shape="rect" id="node22" href="$cs_8c.html#a74c3ddc73ef55ef9be0fc0ff49d9d9c1" title="cs_amd" alt="" coords="350,905,418,932"/>
+<area shape="rect" id="node33" href="$cs_8c.html#af3d404b63031ff9c94df43f34cba1355" title="cs_counts" alt="" coords="343,550,425,577"/>
+<area shape="rect" id="node36" href="$cs_8c.html#af0c3ae8e815fda9ea708aa91e6116a1a" title="cs_etree" alt="" coords="348,348,420,374"/>
+<area shape="rect" id="node37" href="$cs_8c.html#a8a8ecab7109b31346d3af9ad6f7a739c" title="cs_permute" alt="" coords="507,905,597,932"/>
+<area shape="rect" id="node38" href="$cs_8c.html#ad2c6d70d45f0b9a4a45e21b17ad84ffd" title="cs_post" alt="" coords="350,474,418,501"/>
+<area shape="rect" id="node39" href="$cs_8c.html#aa12cda78613dc6d703cc57606a6d944f" title="cs_vcount" alt="" coords="657,196,740,222"/>
+<area shape="rect" id="node23" href="$cs_8c.html#a12000fbd0b9198d3852978cca8386afe" title="cs_add" alt="" coords="520,804,584,830"/>
+<area shape="rect" id="node26" href="$cs_8c.html#ac8819c2025be41d056e1838fe1744a53" title="cs_diag" alt="" coords="519,956,585,982"/>
+<area shape="rect" id="node27" href="$cs_8c.html#a900dcea10388665ea10dffd3e4ee7e26" title="cs_idone" alt="" coords="515,449,589,476"/>
+<area shape="rect" id="node28" href="$cs_8c.html#a066e18f8570c820530c73ebc88b30a97" title="cs_multiply" alt="" coords="509,854,595,881"/>
+<area shape="rect" id="node29" href="$cs_8c.html#a763cce1cc37a21b58c8493c6c28e4afe" title="cs_tdfs" alt="" coords="519,601,585,628"/>
+<area shape="rect" id="node32" href="$cs_8c.html#ab184799bb60f5e29155f267e3f96fb91" title="cs_wclear" alt="" coords="511,1057,593,1084"/>
+<area shape="rect" id="node24" href="$cs_8c.html#acd7870b59196d21738059812d6eb9e94" title="cs_done" alt="" coords="663,1006,734,1033"/>
+<area shape="rect" id="node25" href="$cs_8c.html#a324e7bf547ed0b969275da4410563e6e" title="cs_scatter" alt="" coords="657,854,740,881"/>
+<area shape="rect" id="node31" href="$cs_8c.html#a4c92d1dd47385e119da4d37ca82c2baa" title="cs_cumsum" alt="" coords="652,1158,745,1185"/>
+<area shape="rect" id="node34" href="$cs_8c.html#aaeedf973ec2de811ead0e47f8501a81d" title="cs_leaf" alt="" coords="520,652,584,678"/>
+<area shape="rect" id="node35" href="$cs_8c.html#ada76e715fb6342f4b9a731b22f0452e3" title="init_ata" alt="" coords="520,550,584,577"/>
+<area shape="rect" id="node41" href="$cs__utils_8c.html#a0b2592041f5b822459b7052a451c07a5" title="is_sym" alt="" coords="353,94,415,121"/>
+<area shape="rect" id="node42" href="$Mutils_8h.html#a952a7277ea90f8560245dc16801da86b" title="Return the 0&#45;based index of a string match in a vector of strings terminated by an empty string..." alt="" coords="315,145,453,172"/>
 </map>

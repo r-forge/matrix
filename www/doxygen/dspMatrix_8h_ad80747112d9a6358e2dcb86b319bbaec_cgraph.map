@@ -1,4 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$dsyMatrix_8c.html#a0d501d2a856f4fdfd3acab0d14888b6e" title="symmetricMatrix_validate" alt="" coords="189,5,363,35"/>
-<area shape="rect" id="node5" href="$Mutils_8c.html#acde6ee3844e52ed5a90e619cec56bc59" title="Check validity of 1&#45;letter string from a set of possible values (typically used in S4 validity method..." alt="" coords="411,5,552,35"/>
+<map id="dspMatrix_validate" name="dspMatrix_validate">
+<area shape="rect" id="node2" href="$dsyMatrix_8c.html#a0d501d2a856f4fdfd3acab0d14888b6e" title="symmetricMatrix_validate" alt="" coords="185,5,354,32"/>
+<area shape="rect" id="node3" href="$Mutils_8c.html#acde6ee3844e52ed5a90e619cec56bc59" title="Check validity of 1&#45;letter string from a set of possible values (typically used in S4 validity method..." alt="" coords="403,5,541,32"/>
 </map>

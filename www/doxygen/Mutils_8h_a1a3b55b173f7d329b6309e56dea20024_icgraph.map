@@ -1,7 +1,7 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$dgCMatrix_8h.html#a5a606c1716b4105aa8658ec849d36f43" title="compressed_non_0_ij" alt="" coords="176,5,328,35"/>
-<area shape="rect" id="node5" href="$dgCMatrix_8h.html#ad3b5c3bc224c09316427f7e86e4e8a86" title="compressed_to_TMatrix" alt="" coords="168,58,336,89"/>
-<area shape="rect" id="node7" href="$Mutils_8h.html#af9c3d821b08775115572c042d9e61a28" title="Matrix_expand_pointers" alt="" coords="171,111,333,142"/>
-<area shape="rect" id="node9" href="$dtCMatrix_8h.html#a1b4cdbc0242e2aea3bf00cc3d6bff77c" title="tCMatrix_validate" alt="" coords="189,165,315,195"/>
-<area shape="rect" id="node11" href="$dtCMatrix_8h.html#aae01bf51a4b00f0bf789e70bbde33244" title="tRMatrix_validate" alt="" coords="189,218,315,249"/>
+<map id="expand_cmprPt" name="expand_cmprPt">
+<area shape="rect" id="node2" href="$dgCMatrix_8h.html#a5a606c1716b4105aa8658ec849d36f43" title="Return a 2 column matrix &#39;&#39; cbind(i, j) &#39;&#39; of 0&#45;origin index vectors (i,j) which entirely correspond ..." alt="" coords="173,5,321,32"/>
+<area shape="rect" id="node3" href="$dgCMatrix_8h.html#ad3b5c3bc224c09316427f7e86e4e8a86" title="compressed_to_TMatrix" alt="" coords="166,56,327,83"/>
+<area shape="rect" id="node4" href="$Mutils_8h.html#af9c3d821b08775115572c042d9e61a28" title="Matrix_expand_pointers" alt="" coords="167,107,326,133"/>
+<area shape="rect" id="node5" href="$dtCMatrix_8h.html#a1b4cdbc0242e2aea3bf00cc3d6bff77c" title="tCMatrix_validate" alt="" coords="185,157,308,184"/>
+<area shape="rect" id="node6" href="$dtCMatrix_8h.html#aae01bf51a4b00f0bf789e70bbde33244" title="tRMatrix_validate" alt="" coords="185,208,308,235"/>
 </map>

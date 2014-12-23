@@ -1,12 +1,13 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$Csparse_8c.html#a8867b77701a5fc055dee7f72ab7e0709" title="Extract the diagonal entries from *triangular* Csparse matrix __or__ a cholmod_sparse factor (LDL = T..." alt="" coords="208,58,299,89"/>
-<area shape="rect" id="node5" href="$dsCMatrix_8c.html#a9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm, LDL and super attributes." alt="" coords="185,111,321,142"/>
-<area shape="rect" id="node7" href="$dsCMatrix_8c.html#a3340463e47a1a5b85c7a529dd5c09e52" title="chk_nm" alt="" coords="417,5,484,35"/>
-<area shape="rect" id="node9" href="$chm__common_8c.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f or free both f and ..." alt="" coords="377,58,524,89"/>
-<area shape="rect" id="node17" href="$chm__common_8c.html#a9ca1fded97b51a281e6ef9f76a12c788" title="CHM_restore_common" alt="" coords="371,111,531,142"/>
-<area shape="rect" id="node19" href="$chm__common_8c.html#a4c25f5e728f63c091cdc740d9d6dd023" title="CHM_store_common" alt="" coords="377,165,524,195"/>
-<area shape="rect" id="node21" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="set_factors" alt="" coords="408,218,493,249"/>
-<area shape="rect" id="node11" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="581,5,685,35"/>
-<area shape="rect" id="node13" href="$chm__common_8h.html#a5a58b22e709dab2df84046bf89e76920" title="chm_factor_ok" alt="" coords="579,58,688,89"/>
-<area shape="rect" id="node15" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="607,111,660,142"/>
+<map id="dsCMatrix_LDL_D" name="dsCMatrix_LDL_D">
+<area shape="rect" id="node2" href="$Csparse_8c.html#a70db694dbe8d7c65d6aa8b6ebc124c0f" title="Extract the diagonal entries from triangular Csparse matrix or a cholmod_sparse factor (LDL = TRUE)..." alt="" coords="205,107,293,133"/>
+<area shape="rect" id="node3" href="$dsCMatrix_8c.html#a9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm, LDL and super attributes. " alt="" coords="181,157,317,184"/>
+<area shape="rect" id="node4" href="$dsCMatrix_8c.html#a3340463e47a1a5b85c7a529dd5c09e52" title="chk_nm" alt="" coords="410,5,478,32"/>
+<area shape="rect" id="node5" href="$dsCMatrix_8c.html#ad94e9725e9200f7a2a5a84f32603b640" title="chm_factor_name" alt="" coords="381,56,507,83"/>
+<area shape="rect" id="node6" href="$chm__common_8h.html#a5a58b22e709dab2df84046bf89e76920" title="chm_factor_ok" alt="" coords="571,107,679,133"/>
+<area shape="rect" id="node7" href="$chm__common_8c.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f or free both f and ..." alt="" coords="371,157,517,184"/>
+<area shape="rect" id="node10" href="$chm__common_8c.html#a9ca1fded97b51a281e6ef9f76a12c788" title="CHM_restore_common" alt="" coords="366,208,522,235"/>
+<area shape="rect" id="node11" href="$chm__common_8c.html#a4c25f5e728f63c091cdc740d9d6dd023" title="CHM_store_common" alt="" coords="371,259,517,285"/>
+<area shape="rect" id="node12" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="401,309,487,336"/>
+<area shape="rect" id="node8" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="571,157,679,184"/>
+<area shape="rect" id="node9" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="599,208,651,235"/>
 </map>

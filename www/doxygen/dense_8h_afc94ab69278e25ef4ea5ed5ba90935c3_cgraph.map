@@ -1,8 +1,7 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$Mutils_8c.html#a23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="152,111,331,142"/>
-<area shape="rect" id="node5" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="415,5,519,35"/>
-<area shape="rect" id="node7" href="$Mutils_8c.html#adaf5449cf279f61000d9d1a1215d4b6a" title="install_diagonal_int" alt="" coords="399,58,535,89"/>
-<area shape="rect" id="node9" href="$Mutils_8h.html#a133847040a4bd7d9bdb602c11aa6f048" title="make_i_matrix_symmetric" alt="" coords="379,111,555,142"/>
-<area shape="rect" id="node11" href="$Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title="make_i_matrix_triangular" alt="" coords="381,165,552,195"/>
-<area shape="rect" id="node13" href="$Mutils_8c.html#a883644fcb77714a9a87a4efdc4ea7ddc" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="384,218,549,249"/>
+<map id="dense_band" name="dense_band">
+<area shape="rect" id="node2" href="$Mutils_8c.html#a23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="147,81,320,108"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="401,5,509,32"/>
+<area shape="rect" id="node4" href="$Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title="make_i_matrix_triangular" alt="" coords="371,56,538,83"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#a133847040a4bd7d9bdb602c11aa6f048" title="make_i_matrix_symmetric" alt="" coords="368,107,541,133"/>
+<area shape="rect" id="node6" href="$Mutils_8c.html#adaf5449cf279f61000d9d1a1215d4b6a" title="install_diagonal_int" alt="" coords="389,157,521,184"/>
 </map>

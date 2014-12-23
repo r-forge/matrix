@@ -1,5 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$dense_8h.html#af57ee72c2df4d7eaca5ecd2084f78747" title="ddense_skewpart" alt="" coords="209,5,337,35"/>
-<area shape="rect" id="node5" href="$dense_8h.html#a270b02ab3c84accb423eaefbe42dfe8b" title="ddense_symmpart" alt="" coords="208,58,339,89"/>
-<area shape="rect" id="node7" href="$dense_8h.html#a389bdf26bd829335d25dffb4244c9ae6" title="dense_to_symmetric" alt="" coords="201,111,345,142"/>
+<map id="equal_string_vectors" name="equal_string_vectors">
+<area shape="rect" id="node2" href="$Csparse_8h.html#a24241833bc1fbb9c17404ee109ef50fd" title="Csparse_general_to\l_symmetric" alt="" coords="201,5,338,46"/>
+<area shape="rect" id="node3" href="$dense_8h.html#a389bdf26bd829335d25dffb4244c9ae6" title="dense_to_symmetric" alt="" coords="198,71,341,97"/>
 </map>

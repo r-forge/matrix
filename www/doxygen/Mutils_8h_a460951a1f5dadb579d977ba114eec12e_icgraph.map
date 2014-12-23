@@ -1,6 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$Csparse_8h.html#aef1a61ab6f25436301b8ee835106c23b" title="Csparse_dense_crossprod" alt="" coords="215,5,399,35"/>
-<area shape="rect" id="node5" href="$Csparse_8h.html#afec5dcac16fd72028456b98704632f1e" title="Csparse_dense_prod" alt="" coords="231,58,383,89"/>
-<area shape="rect" id="node7" href="$dgeMatrix_8h.html#acf21cab0cdce9d8e08d40584cbe0647c" title="dgeMatrix_matrix_mm" alt="" coords="229,111,384,142"/>
-<area shape="rect" id="node9" href="$dsCMatrix_8h.html#ae03dda286063199c0f670425084f0f2d" title="dsCMatrix_matrix_solve" alt="" coords="224,165,389,195"/>
+<map id="mMatrix_as_dgeMatrix" name="mMatrix_as_dgeMatrix">
+<area shape="rect" id="node2" href="$dgeMatrix_8h.html#acf21cab0cdce9d8e08d40584cbe0647c" title="dgeMatrix_matrix_mm" alt="" coords="211,5,360,32"/>
+<area shape="rect" id="node3" href="$dsCMatrix_8h.html#a2b40f2a78566d1c13864187d2ab964af" title="dsCMatrix_matrix_solve" alt="" coords="205,56,365,83"/>
 </map>

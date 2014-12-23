@@ -1,6 +1,6 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$dgeMatrix_8c.html#a18e14d832081c8d7d6df7bd2f9e390f9" title="get_norm" alt="" coords="156,58,233,89"/>
-<area shape="rect" id="node5" href="$dgeMatrix_8h.html#ad6b2835d2acbc142689c1d980387c5e0" title="dgeMatrix_norm" alt="" coords="285,5,403,35"/>
-<area shape="rect" id="node7" href="$dgeMatrix_8h.html#ac4f1b4b19a004fb62c9cb68ccb1028ea" title="dgeMatrix_rcond" alt="" coords="283,58,405,89"/>
-<area shape="rect" id="node9" href="$dgeMatrix_8h.html#a8f0564cd095a4415738ef1ad8d537da1" title="dgeMatrix_solve" alt="" coords="283,111,405,142"/>
+<map id="any_NA_in_x" name="any_NA_in_x">
+<area shape="rect" id="node2" href="$dgeMatrix_8c.html#a18e14d832081c8d7d6df7bd2f9e390f9" title="get_norm" alt="" coords="153,56,229,83"/>
+<area shape="rect" id="node3" href="$dgeMatrix_8h.html#ad6b2835d2acbc142689c1d980387c5e0" title="dgeMatrix_norm" alt="" coords="279,5,393,32"/>
+<area shape="rect" id="node4" href="$dgeMatrix_8h.html#ac4f1b4b19a004fb62c9cb68ccb1028ea" title="dgeMatrix_rcond" alt="" coords="277,56,395,83"/>
+<area shape="rect" id="node5" href="$dgeMatrix_8h.html#a8f0564cd095a4415738ef1ad8d537da1" title="dgeMatrix_solve" alt="" coords="278,107,394,133"/>
 </map>
