@@ -28,7 +28,8 @@ INC =   ../Include/cholmod.h \
 	../Include/cholmod_modify.h \
 	../Include/cholmod_partition.h \
 	../Include/cholmod_supernodal.h \
-	../Include/cholmod_template.h
+	../Include/cholmod_template.h \
+	../Include/cholmod_gpu.h
 
 #-------------------------------------------------------------------------------
 # The 7 CHOLMOD library modules (int, double)
@@ -434,3 +435,18 @@ cholmod_l_super_symbolic.o: ../Supernodal/cholmod_super_symbolic.c
 cholmod_l_super_solve.o: ../Supernodal/cholmod_super_solve.c \
 	../Supernodal/t_cholmod_super_solve.c
 	$(C) -DDLONG -c $(I) ../Supernodal/cholmod_super_solve.c -o $@
+
+#-------------------------------------------------------------------------------
+# GPU module
+#-------------------------------------------------------------------------------
+
+## Matrix: Not yet
+# cholmod_gpu_kernels.o: ../GPU/cholmod_gpu_kernels.cu
+# 	$(NVCC) -I../../SuiteSparse_config -Xcompiler -fPIC -O3  -gencode=arch=compute_20,code=sm_20 -gencode=arch=compute_30,code=sm_30 -gencode=arch=compute_35,code=sm_35 -c ../GPU/cholmod_gpu_kernels.cu
+
+cholmod_gpu.o: ../GPU/cholmod_gpu.c
+	$(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c ../GPU/cholmod_gpu.c -o $@
+
+cholmod_l_gpu.o: ../GPU/cholmod_gpu.c
+	$(C) -DDLONG -c $(I) ../GPU/cholmod_gpu.c -o $@
+
