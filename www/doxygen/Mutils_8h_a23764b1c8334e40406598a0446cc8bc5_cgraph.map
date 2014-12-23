@@ -1,7 +1,6 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="268,5,372,35"/>
-<area shape="rect" id="node5" href="$Mutils_8c.html#adaf5449cf279f61000d9d1a1215d4b6a" title="install_diagonal_int" alt="" coords="252,58,388,89"/>
-<area shape="rect" id="node7" href="$Mutils_8h.html#a133847040a4bd7d9bdb602c11aa6f048" title="make_i_matrix_symmetric" alt="" coords="232,111,408,142"/>
-<area shape="rect" id="node9" href="$Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title="make_i_matrix_triangular" alt="" coords="235,165,405,195"/>
-<area shape="rect" id="node11" href="$Mutils_8c.html#a883644fcb77714a9a87a4efdc4ea7ddc" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="237,218,403,249"/>
+<map id="dup_mMatrix_as_geMatrix" name="dup_mMatrix_as_geMatrix">
+<area shape="rect" id="node2" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="259,5,367,32"/>
+<area shape="rect" id="node3" href="$Mutils_8c.html#adaf5449cf279f61000d9d1a1215d4b6a" title="install_diagonal_int" alt="" coords="247,56,379,83"/>
+<area shape="rect" id="node4" href="$Mutils_8h.html#a133847040a4bd7d9bdb602c11aa6f048" title="make_i_matrix_symmetric" alt="" coords="227,107,400,133"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title="make_i_matrix_triangular" alt="" coords="230,157,397,184"/>
 </map>

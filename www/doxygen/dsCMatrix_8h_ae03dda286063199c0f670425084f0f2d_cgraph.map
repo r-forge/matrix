@@ -1,15 +1,15 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$chm__common_8c.html#ac0552f8d5248824ec90a314b69bd1408" title="Copy the contents of a to an appropriate denseMatrix object and, optionally, free a or free both a an..." alt="" coords="225,5,377,35"/>
-<area shape="rect" id="node7" href="$chm__common_8h.html#a5a58b22e709dab2df84046bf89e76920" title="chm_factor_ok" alt="" coords="692,163,801,194"/>
-<area shape="rect" id="node9" href="$dsCMatrix_8c.html#a9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm, LDL and super attributes." alt="" coords="233,189,369,219"/>
-<area shape="rect" id="node25" href="$Mutils_8h.html#a460951a1f5dadb579d977ba114eec12e" title="mMatrix_as_dgeMatrix" alt="" coords="223,295,380,326"/>
-<area shape="rect" id="node5" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="695,58,799,89"/>
-<area shape="rect" id="node11" href="$dsCMatrix_8c.html#a3340463e47a1a5b85c7a529dd5c09e52" title="chk_nm" alt="" coords="489,109,556,139"/>
-<area shape="rect" id="node13" href="$chm__common_8c.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f or free both f and ..." alt="" coords="449,322,596,353"/>
-<area shape="rect" id="node19" href="$chm__common_8c.html#a9ca1fded97b51a281e6ef9f76a12c788" title="CHM_restore_common" alt="" coords="443,162,603,193"/>
-<area shape="rect" id="node21" href="$chm__common_8c.html#a4c25f5e728f63c091cdc740d9d6dd023" title="CHM_store_common" alt="" coords="449,215,596,246"/>
-<area shape="rect" id="node23" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="set_factors" alt="" coords="480,269,565,299"/>
-<area shape="rect" id="node17" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="720,322,773,353"/>
-<area shape="rect" id="node27" href="$Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="429,375,616,406"/>
-<area shape="rect" id="node29" href="$Mutils_8c.html#a883644fcb77714a9a87a4efdc4ea7ddc" title="Return the 0&#45;based index of an is() match in a vector of class&#45;name strings terminated by an empty st..." alt="" coords="664,375,829,406"/>
+<area shape="rect" id="node3" href="$chm__common_8c.html#ac0552f8d5248824ec90a314b69bd1408" title="Copy the contents of a to an appropriate denseMatrix object and, optionally, free a or free both a an..." alt="" coords="225,85,377,115"/>
+<area shape="rect" id="node7" href="$chm__common_8h.html#a5a58b22e709dab2df84046bf89e76920" title="chm_factor_ok" alt="" coords="664,375,773,406"/>
+<area shape="rect" id="node9" href="$dsCMatrix_8c.html#a9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm, LDL and super attributes." alt="" coords="233,243,369,274"/>
+<area shape="rect" id="node28" href="$Mutils_8h.html#a460951a1f5dadb579d977ba114eec12e" title="mMatrix_as_dgeMatrix" alt="" coords="223,478,380,509"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="667,5,771,35"/>
+<area shape="rect" id="node11" href="$dsCMatrix_8c.html#a3340463e47a1a5b85c7a529dd5c09e52" title="chk_nm" alt="" coords="489,270,556,301"/>
+<area shape="rect" id="node13" href="$dsCMatrix_8c.html#ad94e9725e9200f7a2a5a84f32603b640" title="chm_factor_name" alt="" coords="459,323,587,354"/>
+<area shape="rect" id="node16" href="$chm__common_8c.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f or free both f and ..." alt="" coords="449,57,596,87"/>
+<area shape="rect" id="node22" href="$chm__common_8c.html#a9ca1fded97b51a281e6ef9f76a12c788" title="CHM_restore_common" alt="" coords="443,110,603,141"/>
+<area shape="rect" id="node24" href="$chm__common_8c.html#a4c25f5e728f63c091cdc740d9d6dd023" title="CHM_store_common" alt="" coords="449,163,596,194"/>
+<area shape="rect" id="node26" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e." alt="" coords="480,217,565,247"/>
+<area shape="rect" id="node20" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="692,58,745,89"/>
+<area shape="rect" id="node30" href="$Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="429,478,616,509"/>
 </map>

@@ -1,9 +1,9 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$lgCMatrix_8h.html" title="lgCMatrix.h" alt="" coords="283,86,371,117"/>
-<area shape="rect" id="node21" href="$dgCMatrix_8h.html" title="dgCMatrix.h" alt="" coords="401,86,495,117"/>
-<area shape="rect" id="node5" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="307,246,373,277"/>
-<area shape="rect" id="node17" href="$Syms_8h.html" title="Syms.h" alt="" coords="461,326,525,357"/>
-<area shape="rect" id="node19" href="$t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="549,326,669,357"/>
-<area shape="rect" id="node26" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="531,166,605,197"/>
-<area shape="rect" id="node28" href="$cs_8h.html" title="cs.h" alt="" coords="787,246,832,277"/>
+<map id="lgCMatrix.c" name="lgCMatrix.c">
+<area shape="rect" id="node2" href="$lgCMatrix_8h.html" title="lgCMatrix.h" alt="" coords="286,80,372,107"/>
+<area shape="rect" id="node11" href="$dgCMatrix_8h.html" title="dgCMatrix.h" alt="" coords="404,80,495,107"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="308,229,375,256"/>
+<area shape="rect" id="node9" href="$Syms_8h.html" title="Syms.h" alt="" coords="461,304,525,331"/>
+<area shape="rect" id="node10" href="$t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="551,304,671,331"/>
+<area shape="rect" id="node13" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="532,155,608,181"/>
+<area shape="rect" id="node14" href="$cs_8h.html" title="cs.h" alt="" coords="919,229,965,256"/>
 </map>

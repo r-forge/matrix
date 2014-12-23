@@ -1,3 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$Mutils_8c.html#add5d4be8679ecd4316a738f1d16e47e0" title="Copy the diagonal elements of the packed denseMatrix x to dest." alt="" coords="185,5,321,35"/>
+<map id="dtpMatrix_getDiag" name="dtpMatrix_getDiag">
+<area shape="rect" id="node2" href="$Mutils_8c.html#aab50f3afdfede9444d56182dcbec3b7b" title="tr_d_packed_getDiag" alt="" coords="181,5,325,32"/>
+<area shape="rect" id="node3" href="$Mutils_8c.html#add5d4be8679ecd4316a738f1d16e47e0" title="Copy the diagonal elements of the packed denseMatrix x to dest. " alt="" coords="374,5,503,32"/>
 </map>

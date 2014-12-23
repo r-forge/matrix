@@ -1,6 +1,6 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$cs_8h.html#aefbcfeb2d1143578988d22d116dde57b" title="cs_dalloc" alt="" coords="129,19,209,49"/>
-<area shape="rect" id="node5" href="$cs_8h.html#ae2efa3ed8c8a2931e584b6d39a293e38" title="cs_dmperm" alt="" coords="372,48,463,79"/>
-<area shape="rect" id="node10" href="$cs_8h.html#a312cb23797ac49cd9e99853f6bd2895f" title="cs_ddone" alt="" coords="128,72,211,103"/>
-<area shape="rect" id="node7" href="$cs_8h.html#a9fede5f7dcf4367d7d005ca6dd0ba100" title="cs_scc" alt="" coords="259,21,323,52"/>
+<map id="cs_dfree" name="cs_dfree">
+<area shape="rect" id="node2" href="$cs_8h.html#acf720e3edf60b1039bd68b673f9f5b78" title="cs_dalloc" alt="" coords="127,22,204,48"/>
+<area shape="rect" id="node3" href="$cs_8h.html#a9f1bf76ebd53b793b96c83f6716fdc75" title="cs_dmperm" alt="" coords="365,47,456,74"/>
+<area shape="rect" id="node5" href="$cs_8h.html#a8a3e455368b94a3d282681ef437f7483" title="cs_ddone" alt="" coords="126,72,205,99"/>
+<area shape="rect" id="node4" href="$cs_8h.html#a9fede5f7dcf4367d7d005ca6dd0ba100" title="cs_scc" alt="" coords="253,22,317,48"/>
 </map>

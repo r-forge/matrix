@@ -1,4 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$Csparse_8c.html#a4445bf9e1d6a9ee608151123b9d3aa9f" title="nz2Csparse" alt="" coords="215,5,308,35"/>
-<area shape="rect" id="node5" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="359,5,463,35"/>
+<map id="nz_pattern_to_Csparse" name="nz_pattern_to_Csparse">
+<area shape="rect" id="node2" href="$Csparse_8c.html#a4445bf9e1d6a9ee608151123b9d3aa9f" title="nz2Csparse" alt="" coords="208,5,299,32"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="347,5,455,32"/>
 </map>

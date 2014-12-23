@@ -1,6 +1,6 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$dense_8c.html#a00caca24445d05daed3f05182e00c00c" title="getGivens" alt="" coords="137,5,220,35"/>
-<area shape="rect" id="node7" href="$chm__common_8c.html#a9ea43d94a2bbd6c055ff9da6e3f24109" title="xpt" alt="" coords="160,58,197,89"/>
-<area shape="rect" id="node5" href="$dense_8c.html#a68bc52a49ead614a48ef477696af3b78" title="Perform a left cyclic shift of columns j to k in the upper triangular matrix x, then restore it to up..." alt="" coords="284,5,364,35"/>
-<area shape="rect" id="node9" href="$chm__common_8c.html#a6eb9b8c79c573099970c93d50e059039" title="RallocedREAL" alt="" coords="269,58,379,89"/>
+<map id="lapack_qr" name="lapack_qr">
+<area shape="rect" id="node2" href="$dense_8c.html#a00caca24445d05daed3f05182e00c00c" title="getGivens" alt="" coords="134,5,215,32"/>
+<area shape="rect" id="node4" href="$chm__common_8c.html#a9ea43d94a2bbd6c055ff9da6e3f24109" title="xpt" alt="" coords="155,56,194,83"/>
+<area shape="rect" id="node3" href="$dense_8c.html#a68bc52a49ead614a48ef477696af3b78" title="Perform a left cyclic shift of columns j to k in the upper triangular matrix x, then restore it to up..." alt="" coords="277,5,357,32"/>
+<area shape="rect" id="node5" href="$chm__common_8c.html#a6eb9b8c79c573099970c93d50e059039" title="RallocedREAL" alt="" coords="264,56,371,83"/>
 </map>

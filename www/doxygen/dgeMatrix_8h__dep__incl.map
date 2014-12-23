@@ -1,8 +1,8 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$dgeMatrix_8c.html" title="dgeMatrix.c" alt="" coords="20,86,111,117"/>
-<area shape="rect" id="node5" href="$dspMatrix_8h.html" title="dspMatrix.h" alt="" coords="135,86,225,117"/>
-<area shape="rect" id="node11" href="$init_8c.html" title="init.c" alt="" coords="120,246,168,277"/>
-<area shape="rect" id="node7" href="$dppMatrix_8h.html" title="dppMatrix.h" alt="" coords="11,166,101,197"/>
-<area shape="rect" id="node13" href="$dspMatrix_8c.html" title="dspMatrix.c" alt="" coords="176,166,267,197"/>
-<area shape="rect" id="node9" href="$dppMatrix_8c.html" title="dppMatrix.c" alt="" coords="5,246,96,277"/>
+<map id="dgeMatrix.h" name="dgeMatrix.h">
+<area shape="rect" id="node2" href="$dgeMatrix_8c.html" title="dgeMatrix.c" alt="" coords="21,80,109,107"/>
+<area shape="rect" id="node3" href="$dspMatrix_8h.html" title="dspMatrix.h" alt="" coords="133,80,221,107"/>
+<area shape="rect" id="node6" href="$init_8c.html" title="init.c" alt="" coords="118,229,167,256"/>
+<area shape="rect" id="node4" href="$dppMatrix_8h.html" title="dppMatrix.h" alt="" coords="11,155,99,181"/>
+<area shape="rect" id="node7" href="$dspMatrix_8c.html" title="dspMatrix.c" alt="" coords="173,155,261,181"/>
+<area shape="rect" id="node5" href="$dppMatrix_8c.html" title="dppMatrix.c" alt="" coords="5,229,93,256"/>
 </map>

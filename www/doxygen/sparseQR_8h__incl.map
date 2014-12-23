@@ -1,8 +1,8 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="411,166,477,197"/>
-<area shape="rect" id="node19" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="563,86,637,117"/>
-<area shape="rect" id="node32" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="769,86,884,117"/>
-<area shape="rect" id="node15" href="$Syms_8h.html" title="Syms.h" alt="" coords="5,246,69,277"/>
-<area shape="rect" id="node17" href="$t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="93,246,213,277"/>
-<area shape="rect" id="node21" href="$cs_8h.html" title="cs.h" alt="" coords="701,166,747,197"/>
+<map id="sparseQR.h" name="sparseQR.h">
+<area shape="rect" id="node2" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="404,163,471,189"/>
+<area shape="rect" id="node10" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="603,80,679,107"/>
+<area shape="rect" id="node19" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="876,80,991,107"/>
+<area shape="rect" id="node8" href="$Syms_8h.html" title="Syms.h" alt="" coords="461,245,525,272"/>
+<area shape="rect" id="node9" href="$t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="551,245,671,272"/>
+<area shape="rect" id="node11" href="$cs_8h.html" title="cs.h" alt="" coords="833,163,879,189"/>
 </map>

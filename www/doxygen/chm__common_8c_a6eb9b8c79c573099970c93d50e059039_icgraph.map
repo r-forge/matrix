@@ -1,12 +1,10 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$chm__common_8h.html#a0ed4e091a525ec3cdf847755a3c4b76a" title="Populate ans with the pointers from x and modify its scalar elements accordingly." alt="" coords="169,5,311,35"/>
-<area shape="rect" id="node7" href="$chm__common_8h.html#a726394f0da6f0a20ad32963d2ba3007a" title="as_cholmod_x_dense" alt="" coords="163,58,317,89"/>
-<area shape="rect" id="node9" href="$chm__common_8c.html#a9ea43d94a2bbd6c055ff9da6e3f24109" title="xpt" alt="" coords="221,111,259,142"/>
-<area shape="rect" id="node5" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="577,5,673,35"/>
-<area shape="rect" id="node11" href="$chm__common_8h.html#ac0b9d7e2006dcf1a8d388954b408d007" title="Populate ans with the pointers from x and modify its scalar elements accordingly." alt="" coords="365,58,509,89"/>
-<area shape="rect" id="node20" href="$chm__common_8h.html#a7c6132b98d7e38fc876c745c9cc8da2d" title="Populate ans with the pointers from x and modify its scalar elements accordingly." alt="" coords="371,111,504,142"/>
-<area shape="rect" id="node22" href="$dense_8h.html#a3a13ecdf06811d2b2ced413892145007" title="lapack_qr" alt="" coords="397,165,477,195"/>
-<area shape="rect" id="node13" href="$Csparse_8h.html#a10392132372fdfc01e1aff7622f5ee7f" title="Csparse_validate_" alt="" coords="559,58,692,89"/>
-<area shape="rect" id="node15" href="$Csparse_8h.html#a77f654c86c318184ef29b46dc4929e12" title="Csparse_validate" alt="" coords="745,31,873,62"/>
-<area shape="rect" id="node17" href="$Csparse_8h.html#a5b2f297662f7f5dd66097ed12b320468" title="Csparse_validate2" alt="" coords="743,85,876,115"/>
+<map id="RallocedREAL" name="RallocedREAL">
+<area shape="rect" id="node2" href="$chm__common_8h.html#a0ed4e091a525ec3cdf847755a3c4b76a" title="Populate ans with the pointers from x and modify its scalar elements accordingly. ..." alt="" coords="166,5,301,32"/>
+<area shape="rect" id="node4" href="$chm__common_8h.html#a726394f0da6f0a20ad32963d2ba3007a" title="as_cholmod_x_dense" alt="" coords="160,56,307,83"/>
+<area shape="rect" id="node5" href="$chm__common_8c.html#a9ea43d94a2bbd6c055ff9da6e3f24109" title="xpt" alt="" coords="214,107,253,133"/>
+<area shape="rect" id="node3" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="586,56,683,83"/>
+<area shape="rect" id="node6" href="$chm__common_8h.html#ac0b9d7e2006dcf1a8d388954b408d007" title="Populate ans with the pointers from x and modify its scalar elements accordingly. ..." alt="" coords="355,107,493,133"/>
+<area shape="rect" id="node8" href="$chm__common_8h.html#a7c6132b98d7e38fc876c745c9cc8da2d" title="Populate ans with the pointers from x and modify its scalar elements accordingly. ..." alt="" coords="359,56,489,83"/>
+<area shape="rect" id="node9" href="$dense_8h.html#a3a13ecdf06811d2b2ced413892145007" title="lapack_qr" alt="" coords="385,157,463,184"/>
+<area shape="rect" id="node7" href="$t__Csparse__validate_8c.html#a9b61a7b94328cfd15ca3281ca7778fb7" title="CSPARSE_VAL_FN_NAME" alt="" coords="541,107,728,133"/>
 </map>

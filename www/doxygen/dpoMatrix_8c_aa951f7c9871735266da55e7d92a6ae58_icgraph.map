@@ -1,7 +1,7 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$dpoMatrix_8h.html#a6fdf4fea856fcb48318714aaa43375d5" title="dpoMatrix_dgeMatrix_solve" alt="" coords="169,5,356,35"/>
-<area shape="rect" id="node5" href="$dpoMatrix_8h.html#a915278646a8dc39fbffe059c53d19569" title="dpoMatrix_matrix_solve" alt="" coords="181,58,344,89"/>
-<area shape="rect" id="node7" href="$dpoMatrix_8h.html#ae4b3c6190a4d12048befb3d3110c2377" title="dpoMatrix_rcond" alt="" coords="201,111,324,142"/>
-<area shape="rect" id="node9" href="$dpoMatrix_8h.html#acc9a68e6726285aaea483c6652019d47" title="dpoMatrix_solve" alt="" coords="203,165,323,195"/>
-<area shape="rect" id="node11" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="215,218,311,249"/>
+<map id="dpoMatrix_chol" name="dpoMatrix_chol">
+<area shape="rect" id="node2" href="$dpoMatrix_8h.html#a6fdf4fea856fcb48318714aaa43375d5" title="dpoMatrix_dgeMatrix\l_solve" alt="" coords="172,5,313,46"/>
+<area shape="rect" id="node3" href="$dpoMatrix_8h.html#a915278646a8dc39fbffe059c53d19569" title="dpoMatrix_matrix_solve" alt="" coords="163,71,322,97"/>
+<area shape="rect" id="node4" href="$dpoMatrix_8h.html#ae4b3c6190a4d12048befb3d3110c2377" title="dpoMatrix_rcond" alt="" coords="184,121,301,148"/>
+<area shape="rect" id="node5" href="$dpoMatrix_8h.html#acc9a68e6726285aaea483c6652019d47" title="dpoMatrix_solve" alt="" coords="185,172,301,199"/>
+<area shape="rect" id="node6" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="194,223,291,249"/>
 </map>

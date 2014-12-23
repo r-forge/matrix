@@ -1,4 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$chm__common_8h.html#a5b4b7e397d76f774a204afec64f2f09f" title="Initialize the CHOLMOD library and replace the print and error functions by R&#45;specific versions..." alt="" coords="179,5,301,35"/>
-<area shape="rect" id="node5" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="351,5,447,35"/>
+<map id="R_cholmod_error" name="R_cholmod_error">
+<area shape="rect" id="node2" href="$chm__common_8h.html#a5b4b7e397d76f774a204afec64f2f09f" title="Initialize the CHOLMOD library and replace the print and error functions by R&#45;specific versions..." alt="" coords="173,5,293,32"/>
+<area shape="rect" id="node3" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="342,5,439,32"/>
 </map>
