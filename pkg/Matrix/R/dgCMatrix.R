@@ -91,12 +91,20 @@ setMethod("lu", signature(x = "sparseMatrix"),
 			  rU[1] / rU[2]),
 		 domain=NA)
     }
+    n <- dim(a)[1L] ## == dim(a)[2], as a[.,.] is square matrix
     b.isMat <-
 	if((b.miss <- missing(b))) {
 	    ## default b = Identity = Diagonal(nrow(a)), however more efficiently
-	    b <- .sparseDiagonal(dim(a)[1L])
+	    b <- .sparseDiagonal(n)
 	    TRUE
-	} else !is.null(dim(b))
+	} else {
+	    isM <- !is.null(dim(b))
+	    if(isM && nrow(b) != n)
+		stop("RHS 'b' has wrong number of rows:", nrow(b))
+	    if(!isM && length(b) != n)
+		stop("RHS 'b' has wrong length", length(b))
+	    isM
+        }
     ## bp := P %*% b
     bp <- if(b.isMat) b[lu.a@p+1L, ] else b[lu.a@p+1L]
     ## R:= U^{-1} L^{-1} P b
