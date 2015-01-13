@@ -12,10 +12,15 @@ importFrom("stats" ## potentially all these (we import into 'lme4a'):
            , coef, coefficients # confint, cov2cor, deviance,
            , fitted, fitted.values
            , formula # predict, profile
+           , model.extract, model.matrix, model.offset, model.response, model.weights
            , residuals, resid # 'resid' needed too, unfortunately..
            # , simulate, terms
            , update
            )
+
+## according to codetoolsBioC :: writeNamespaceImports("MatrixModels"):
+importClassesFrom("methods", ANY, call, character, environment, envRefClass,
+                  integer, list, matrix, numeric, oldClass)
 
 importFrom("methods"
 	   , callGeneric, as, is, extends, new
@@ -24,7 +29,7 @@ importFrom("methods"
            , setGeneric
            , setMethod, setOldClass
            , setRefClass
-           , setValidity, slot, "slot<-"
+           , setValidity, slot, "slot<-", slotNames
 	   , signature, representation, prototype)
 
 
@@ -40,26 +45,17 @@ importMethodsFrom("Matrix", as.matrix, as.vector, coerce,
 		  )
 
 importClassesFrom("Matrix",
-                  CHMfactor,
-                  CHMsimpl,
-                  CHMsuper,
-                  Cholesky,
-                  CsparseMatrix,
-                  Matrix,
-                  compMatrix,
-                  corMatrix,
-                  dCHMsimpl,
-                  dCHMsuper,
-                  dMatrix,
-                  ddenseMatrix,
-                  denseMatrix,
-                  dgCMatrix,
-                  dgeMatrix,
-                  dsparseMatrix,
-                  generalMatrix,
-                  sparseMatrix)
+                  CHMfactor, CHMsimpl, CHMsuper, dCHMsimpl, dCHMsuper,
+                  Cholesky, CholeskyFactorization,
+                  dsparseMatrix, sparseMatrix, CsparseMatrix,
+                  compMatrix, corMatrix, dMatrix, Matrix,
+                  ddenseMatrix, denseMatrix,
+                  dgCMatrix, dgeMatrix)
 
-## Generics and functions defined in this package
+importFrom("Matrix", Diagonal, isLDL, sparse.model.matrix)
+
+
+## Generics and functions defined in this package -------------------------
 
 
 export(

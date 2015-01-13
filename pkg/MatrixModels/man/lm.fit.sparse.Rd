@@ -56,8 +56,9 @@ lm.fit.sparse(x, y, w = NULL, offset = NULL,
   \code{\link{glm4}} is an alternative (much) more general fitting
   function.
 
-  \code{\link{sparse.model.matrix}}; the non-sparse function in standard
-    \R's package \pkg{stats}: \code{\link{lm.fit}()}.
+  \code{\link{sparse.model.matrix}} from the \pkg{Matrix} package;
+  the non-sparse function in standard \R's package \pkg{stats}:
+  \code{\link{lm.fit}()}.
 }
 \examples{
 dd <- expand.grid(a = as.factor(1:3),
@@ -79,7 +80,7 @@ dM <- within(dM, { A <- c(2,5,10)[a]
 })
 str(dM) # 1870 x 7
 
-X <- sparse.model.matrix( ~ (a+b+c+d)^2 + c*x, data = dM)
+X <- Matrix::sparse.model.matrix( ~ (a+b+c+d)^2 + c*x, data = dM)
 dim(X) # 1870 x 69
 X[1:10, 1:20]
 
