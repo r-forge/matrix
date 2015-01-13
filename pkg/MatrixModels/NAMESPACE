@@ -45,12 +45,13 @@ importMethodsFrom("Matrix", as.matrix, as.vector, coerce,
 		  )
 
 importClassesFrom("Matrix",
-                  CHMfactor, CHMsimpl, CHMsuper, dCHMsimpl, dCHMsuper,
-                  Cholesky, CholeskyFactorization,
-                  dsparseMatrix, sparseMatrix, CsparseMatrix,
-                  compMatrix, corMatrix, dMatrix, Matrix,
-                  ddenseMatrix, denseMatrix,
-                  dgCMatrix, dgeMatrix)
+		  CHMfactor, CHMsimpl, CHMsuper, dCHMsimpl, dCHMsuper,
+		  Cholesky, CholeskyFactorization,
+		  compMatrix, corMatrix,
+		  dgCMatrix, dgeMatrix, dMatrix,
+		  dsparseMatrix, sparseMatrix, CsparseMatrix,
+		  ddenseMatrix, denseMatrix,
+		  generalMatrix, Matrix)
 
 importFrom("Matrix", Diagonal, isLDL, sparse.model.matrix)
 
