@@ -122,6 +122,18 @@ setMethod("lu", signature(x = "sparseMatrix"),
     if(sparse) .solve.sparse.dgC(a, b, tol=tol) else .Call(dgCMatrix_matrix_solve, a, b, FALSE)
 }
 
+## Provide also for pkg MatrixModels
+.solve.dgC.chol <- function(x, y)
+    .Call(dgCMatrix_cholsol, as(x, "CsparseMatrix"), y)
+.solve.dgC.qr <- function(x, y, order = 1L) {
+    cld <- getClass(class(x))
+    .Call(dgCMatrix_qrsol, # has AS_CSP(): must be dgC or dtC:
+          if(extends(cld, "dgCMatrix") || extends(cld, "dtCMatrix")) x
+          else as(x, "dgCMatrix"),
+          y, order)
+}
+
+
 setMethod("solve", signature(a = "dgCMatrix", b = "matrix"),	   .solve.dgC.mat)
 setMethod("solve", signature(a = "dgCMatrix", b = "ddenseMatrix"), .solve.dgC.mat)
 

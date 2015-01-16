@@ -170,7 +170,7 @@ SEXP dgCMatrix_qrsol(SEXP x, SEXP y, SEXP ord)
     SEXP ycp = PROTECT((TYPEOF(y) == REALSXP) ?
 		       duplicate(y) : coerceVector(y, REALSXP));
     CSP xc = AS_CSP(x); /* <--> x  may be  dgC* or dtC* */
-    int order = INTEGER(ord)[0];
+    int order = asInteger(ord);
 #ifdef _not_yet_do_FIXME__
     const char *nms[] = {"L", "coef", "Xty", "resid", ""};
     SEXP ans = PROTECT(Rf_mkNamed(VECSXP, nms));
