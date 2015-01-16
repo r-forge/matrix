@@ -264,9 +264,9 @@ setClass("nspMatrix",
 
 
 ## 'diagonalMatrix' already has validity checking
-## diagonal, numeric matrices;	    "d*" has 'x' slot :
+## diagonal, numeric matrices; "dMatrix" has 'x' slot :
 setClass("ddiMatrix", contains = c("diagonalMatrix", "dMatrix"))# or "dMatrix"
-## diagonal, logical matrices; "ldense*" has 'x' slot :
+## diagonal, logical matrices; "lMatrix" has 'x' slot :
 setClass("ldiMatrix", contains = c("diagonalMatrix", "lMatrix"))
 
 setClass("corMatrix", representation(sd = "numeric"), contains = "dpoMatrix",
@@ -804,11 +804,12 @@ setClass("sparseVector",
          ## note that "numeric" contains "integer" (if I like it or not..)
 	 prototype = prototype(length = 0),
          validity = function(object) {
-             n <- object@length
-	     if(any(!is.finite(i <- object@i)))# no NA's !
-		 "'i' slot is not all finite"
-	     else if(any(i < 1) || any(i > n))
-		 sprintf("'i' must be in 1:%d", n)
+	     n <- object@length
+	     if(anyNA(i <- object@i))	 "'i' slot has NAs"
+	     else if(any(!is.finite(i))) "'i' slot is not all finite"
+	     else if(any(i < 1))	 "'i' must be >= 1"
+	     else if(n == 0 && length(i))"'i' must be empty when the object length is zero"
+	     else if(any(i > n)) sprintf("'i' must be in 1:%d", n)
 	     else if(is.unsorted(i, strictly=TRUE))
 		 "'i' must be sorted strictly increasingly"
              else TRUE
@@ -817,6 +818,8 @@ setClass("sparseVector",
 ##' initialization -- ensuring that  'i' is sorted (and 'x' alongside)
 setMethod("initialize", "sparseVector", function(.Object, i, x, ...)
       {
+	  ## NB: could simplify for R(-devel) >= 2015-01-14 (i.e. >= 3.2.0),
+	  ##	 assigning 'i' and 'x' and calling  callNextMethod() {w/o arg.s}
 	  has.x <- !missing(x)
 	  if(!missing(i)) {
 	      .Object@i <- ## (be careful to assign in all cases)
@@ -832,7 +835,7 @@ setMethod("initialize", "sparseVector", function(.Object, i, x, ...)
 		  else i
 	  }
 	  if(has.x) .Object@x <- x
-	  callNextMethod()
+	  callNextMethod(.Object, ...)
       })
 
 .validXspVec <- function(object) {
