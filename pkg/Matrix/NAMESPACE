@@ -47,6 +47,7 @@ export("Cholesky", ".SuiteSparse_version",
        ## FIXME: why exactly these and not e.g. dsp2dsy and many more?
        ".dsy2mat", ".dsy2dsp", ".dxC2mat", ".T2Cmat", "..2dge", ".dense2sy",
        ".diag.dsC",# -> R/dsCMatrix.R --has FIXME
+       ".solve.dgC.chol", ".solve.dgC.qr",
        "diagN2U", "diagU2N", ".diagU2N", ".diag2tT", ".diag2sT", ".diag2mat",
        "drop0",
        "expand",
