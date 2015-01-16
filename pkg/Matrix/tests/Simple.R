@@ -556,7 +556,11 @@ m.m <- as(m1k, "matrix")
 stopifnot(all.equal(colMeans(m1k), colMeans(m.m)),
           all.equal(colSums (m1k), colSums (m.m)),
           all.equal(rowMeans(m1k), rowMeans(m.m)),
-          all.equal(rowSums (m1k), rowSums (m.m)))
+          all.equal(rowSums (m1k), rowSums (m.m)),
+          all.equal(colMeans(m1k, na.rm=TRUE), colMeans(m.m, na.rm=TRUE)),
+          all.equal(colSums (m1k, na.rm=TRUE), colSums (m.m, na.rm=TRUE)),
+          all.equal(rowMeans(m1k, na.rm=TRUE), rowMeans(m.m, na.rm=TRUE)),
+          all.equal(rowSums (m1k, na.rm=TRUE), rowSums (m.m, na.rm=TRUE)) )
 
 ###-- kronecker for nonsparse uses Matrix(.):
 stopifnot(isValid(kr <- kronecker(m1, m6), "Matrix"))

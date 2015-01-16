@@ -729,9 +729,10 @@ SEXP dgeMatrix_Schur(SEXP x, SEXP vectors, SEXP isDGE)
     return val;
 } // dgeMatrix_Schur
 
+// colSums(), colMeans(), rowSums() and rowMeans() -- called from ../R/colSums.R
 SEXP dgeMatrix_colsums(SEXP x, SEXP naRmP, SEXP cols, SEXP mean)
 {
-    int keepNA = !asLogical(naRmP);
+    int keepNA = !asLogical(naRmP); // <==>  na.rm = FALSE,  the default
     int doMean = asLogical(mean);
     int useCols = asLogical(cols);
     int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
@@ -740,28 +741,31 @@ SEXP dgeMatrix_colsums(SEXP x, SEXP naRmP, SEXP cols, SEXP mean)
     double *aa = REAL(ans), *xx = REAL(GET_SLOT(x, Matrix_xSym));
 
     if (useCols) {  /* col(Sums|Means) : */
-	int cnt = m;
-	for (j = 0; j < n; j++) {
-	    double *rx = xx + m * j;
+	int cnt = m; // := number of 'valid' entries in current column
+	for (j = 0; j < n; j++) { // column j :
+	    double *x_j = xx + m * j, s = 0.;
 
-	    aa[j] = 0;
 	    if (keepNA)
-		for (i = 0; i < m; i++) aa[j] += rx[i];
+		for (i = 0; i < m; i++) s += x_j[i];
 	    else {
 		cnt = 0;
 		for (i = 0; i < m; i++)
-		    if (!ISNAN(rx[i])) {cnt++; aa[j] += rx[i];}
+		    if (!ISNAN(x_j[i])) {cnt++; s += x_j[i];}
 	    }
 	    if (doMean) {
-		if (cnt > 0) aa[j] /= cnt; else aa[j] = NA_REAL;
+		if (cnt > 0) s /= cnt; else s = NA_REAL;
 	    }
+	    aa[j] = s;
 	}
     } else { /* row(Sums|Means) : */
-	double *Count = ((!keepNA) && doMean) ?
-	    Alloca(m, double) : (double*)NULL ;
+	Rboolean do_count = (!keepNA) && doMean;
+	int *cnt = do_count ? Alloca(m, int) : (int*) NULL;
 	R_CheckStack();
-
-	for (i = 0; i < m; i++) aa[i] = 0.0;
+	// (taking care to access x contiguously: vary i inside j)
+	for (i = 0; i < m; i++) {
+	    aa[i] = 0.;
+	    if(do_count) cnt[i] = 0;
+	}
 	for (j = 0; j < n; j++) {
 	    if (keepNA)
 		for (i = 0; i < m; i++) aa[i] += xx[i + j * m];
@@ -770,7 +774,7 @@ SEXP dgeMatrix_colsums(SEXP x, SEXP naRmP, SEXP cols, SEXP mean)
 		    double el = xx[i + j * m];
 		    if (!ISNAN(el)) {
 			aa[i] += el;
-			if (doMean) Count[i]++;
+			if (doMean) cnt[i]++;
 		    }
 		}
 	}
@@ -779,7 +783,7 @@ SEXP dgeMatrix_colsums(SEXP x, SEXP naRmP, SEXP cols, SEXP mean)
 		for (i = 0; i < m; i++) aa[i] /= n;
 	    else
 		for (i = 0; i < m; i++)
-		    aa[i] = (Count[i]>0)? aa[i]/Count[i]: NA_REAL;
+		    aa[i] = (cnt[i] > 0) ? aa[i]/cnt[i] : NA_REAL;
 	}
     }
 
