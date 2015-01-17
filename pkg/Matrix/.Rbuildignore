@@ -1,10 +1,12 @@
-.Rhistory
+2copy
+\.Rhistory
 ^Done$
 omit-SPQR.*
 assign_hidden.R
 .*\.patch
 wrld_1deg
 misc/
+/0.*\.R$
 doc/unused
 doc/DSC20.*
 po/translator.*

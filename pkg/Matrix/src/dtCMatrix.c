@@ -90,11 +90,16 @@ SEXP dtCMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
 	error(_("Dimensions of system to be solved are inconsistent"));
     Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2)), bdims, 2);
     // dimnames:
-    SEXP dn = PROTECT(allocVector(VECSXP, 2));
+    SEXP dn = PROTECT(allocVector(VECSXP, 2)), dn2;
     SET_VECTOR_ELT(dn, 0, duplicate(VECTOR_ELT(GET_SLOT(a, Matrix_DimNamesSym), 1)));
+    if(!cl) {
+	dn2 = getAttrib(b, R_DimNamesSymbol);
+	if(dn2 != R_NilValue) // either NULL or  list(<dn1>, <dn2>)
+	    dn2 = VECTOR_ELT(dn2, 1);
+    }
     SET_VECTOR_ELT(dn, 1, duplicate(cl // b can be "Matrix" or not:
 				    ? VECTOR_ELT(GET_SLOT(b, Matrix_DimNamesSym), 1)
-				    : getAttrib(b, R_DimNamesSymbol)));
+				    : dn2));
     SET_SLOT(ans, Matrix_DimNamesSym, dn);
     UNPROTECT(1);
     if(n >= 1 && nrhs >=1) {
