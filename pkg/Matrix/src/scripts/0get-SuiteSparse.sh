@@ -7,7 +7,6 @@ then echo 'Must run in Matrix/src/ !' ; exit 1
 fi
 getSPQR=no
 ##     --- since late summer 2010, we no longer get SPQR
-<<<<<<< .mine
 #
 # Tim Davis moved to Texas A&M, on July 1, 2014
 # ufl_URL=http://www.cise.ufl.edu/research/sparse/SuiteSparse/current/
@@ -31,27 +30,6 @@ else
     wget -nc $TAM_url/$TGZ
 fi
 ls -l $TGZ
-=======
-#
-# Tim Davis moved to Texas A&M, on July 1, 2014
-# ufl_URL=http://www.cise.ufl.edu/research/sparse/SuiteSparse/current/
-# TGZ=SuiteSparse.tar.gz
-#  wget -nc  $ufl_URL/$TGZ
-TAM_url=http://faculty.cse.tamu.edu/davis/SuiteSparse
-ifile=index.html
-if [ -f $ifile ]; then fb=index_bak.html; if [ ! -f $fb ] ;then mv $ifile $fb ;fi;fi
-wget -nc $TAM_url/$ifile
-TGZ=`grep 'SuiteSparse-[0-9].*tar' $ifile | tail -1 | sed 's/.*href=//; s/>.*//'`
-echo "Found TGZ='$TGZ' in $ifile."
-if [ -f $TGZ ]
-then
-    echo 'Tarfile present; not downloading (remove it to change this!):'
-else
-    echo '  ==> Trying to get it from '"$TAM_url :"
-    wget -nc $TAM_url/$TGZ
-fi
-ls -l $TGZ
->>>>>>> .r3024
 
 SS=SuiteSparse
 SSdocDir=../inst/doc/SuiteSparse
