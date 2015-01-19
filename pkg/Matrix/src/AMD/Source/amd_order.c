@@ -89,15 +89,15 @@ GLOBAL Int AMD_order
     }
 
     /* allocate two size-n integer workspaces */
-    Len  = SuiteSparse_malloc (n, sizeof (Int)) ;
-    Pinv = SuiteSparse_malloc (n, sizeof (Int)) ;
+    Len = amd_malloc (n * sizeof (Int)) ;
+    Pinv = amd_malloc (n * sizeof (Int)) ;
     mem += n ;
     mem += n ;
     if (!Len || !Pinv)
     {
 	/* :: out of memory :: */
-	SuiteSparse_free (Len) ;
-	SuiteSparse_free (Pinv) ;
+	amd_free (Len) ;
+	amd_free (Pinv) ;
 	if (info) Info [AMD_STATUS] = AMD_OUT_OF_MEMORY ;
 	return (AMD_OUT_OF_MEMORY) ;
     }
@@ -106,17 +106,17 @@ GLOBAL Int AMD_order
     {
 	/* sort the input matrix and remove duplicate entries */
 	AMD_DEBUG1 (("Matrix is jumbled\n")) ;
-	Rp = SuiteSparse_malloc (n+1, sizeof (Int)) ;
-	Ri = SuiteSparse_malloc (nz,  sizeof (Int)) ;
+	Rp = amd_malloc ((n+1) * sizeof (Int)) ;
+	Ri = amd_malloc (MAX (nz,1) * sizeof (Int)) ;
 	mem += (n+1) ;
 	mem += MAX (nz,1) ;
 	if (!Rp || !Ri)
 	{
 	    /* :: out of memory :: */
-	    SuiteSparse_free (Rp) ;
-	    SuiteSparse_free (Ri) ;
-	    SuiteSparse_free (Len) ;
-	    SuiteSparse_free (Pinv) ;
+	    amd_free (Rp) ;
+	    amd_free (Ri) ;
+	    amd_free (Len) ;
+	    amd_free (Pinv) ;
 	    if (info) Info [AMD_STATUS] = AMD_OUT_OF_MEMORY ;
 	    return (AMD_OUT_OF_MEMORY) ;
 	}
@@ -160,16 +160,16 @@ GLOBAL Int AMD_order
     ok = ok && (slen < Int_MAX) ;	/* S[i] for Int i must be OK */
     if (ok)
     {
-	S = SuiteSparse_malloc (slen, sizeof (Int)) ;
+	S = amd_malloc (slen * sizeof (Int)) ;
     }
     AMD_DEBUG1 (("slen %g\n", (double) slen)) ;
     if (!S)
     {
 	/* :: out of memory :: (or problem too large) */
-	SuiteSparse_free (Rp) ;
-	SuiteSparse_free (Ri) ;
-	SuiteSparse_free (Len) ;
-	SuiteSparse_free (Pinv) ;
+	amd_free (Rp) ;
+	amd_free (Ri) ;
+	amd_free (Len) ;
+	amd_free (Pinv) ;
 	if (info) Info [AMD_STATUS] = AMD_OUT_OF_MEMORY ;
 	return (AMD_OUT_OF_MEMORY) ;
     }
@@ -189,11 +189,11 @@ GLOBAL Int AMD_order
     /* free the workspace */
     /* --------------------------------------------------------------------- */
 
-    SuiteSparse_free (Rp) ;
-    SuiteSparse_free (Ri) ;
-    SuiteSparse_free (Len) ;
-    SuiteSparse_free (Pinv) ;
-    SuiteSparse_free (S) ;
+    amd_free (Rp) ;
+    amd_free (Ri) ;
+    amd_free (Len) ;
+    amd_free (Pinv) ;
+    amd_free (S) ;
     if (info) Info [AMD_STATUS] = status ;
     return (status) ;	    /* successful ordering */
 }

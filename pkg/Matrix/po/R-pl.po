@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-2-2\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
-"POT-Creation-Date: 2014-10-01 09:45\n"
+"POT-Creation-Date: 2015-01-17 15:31\n"
 "PO-Revision-Date: 2014-03-27 14:47+0100\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
@@ -61,6 +61,9 @@ msgstr "niezgodne wymiary macierzy w %s"
 # warning(gettextf("dimnames [%d] mismatch in %s", j, deparse(sys.call(sys.parent()))), call. = FALSE, domain = "R-Matrix")
 msgid "dimnames [%d] mismatch in %s"
 msgstr "niezgodność nazw wymiarów [%d] w %s"
+
+msgid "names(dimnames(<matrix>)) must be NULL or of length two"
+msgstr ""
 
 # Matrix/R/Auxiliaries.R: 305
 # stop(gettextf("Matrices must have same number of rows in %s", deparse(sys.call(sys.parent()))), call. = FALSE, domain = "R-Matrix")
@@ -965,6 +968,12 @@ msgid ""
 msgstr ""
 "LU obliczeniowo osobliwa: stosunek ekstremalnych wpisów w |diag(U)| = %9.4g"
 
+msgid "RHS 'b' has wrong number of rows:"
+msgstr ""
+
+msgid "RHS 'b' has wrong length"
+msgstr ""
+
 # Matrix/R/dgTMatrix.R: 20
 # stop("cannot coerce non-symmetric \"dgTMatrix\" to \"dsCMatrix\" class")
 msgid "cannot coerce non-symmetric \"dgTMatrix\" to \"dsCMatrix\" class"
@@ -1179,6 +1188,12 @@ msgstr "to nie jest macierz kwadratowa"
 # stop(gettextf("not-yet-implemented method for <%s> %%*%% <%s>", class(x), class(y)), domain = "R-Matrix")
 msgid "not-yet-implemented method for <%s> %%*%% <%s>"
 msgstr "jeszcze niezaimplementowana metoda dla <%s> %%*%% <%s>"
+
+# Matrix/R/Auxiliaries.R: 273
+# stop(gettextf("non-conformable matrix dimensions in %s", deparse(sys.call(sys.parent()))), call. = FALSE, domain = "R-Matrix")
+#, fuzzy
+msgid "non-conformable arguments"
+msgstr "niezgodne wymiary macierzy w %s"
 
 msgid ""
 "rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n"

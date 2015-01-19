@@ -733,10 +733,7 @@ int R_cholmod_start(CHM_CM c)
     int res;
     if (!(res = cholmod_start(c)))
 	error(_("Unable to initialize cholmod: error code %d"), res);
-    // SparseSuite 2014: now --> ./SuiteSparse_config/SuiteSparse_config.c
-    // c->print_function = R_cholmod_printf; /* Rprintf gives warning */
-    SuiteSparse_config.printf_func = R_cholmod_printf; /* Rprintf gives warning */
-
+    c->print_function = R_cholmod_printf; /* Rprintf gives warning */
     /* Since we provide an error handler, it may not be a good idea to allow CHOLMOD printing,
      * because that's not easily suppressed on the R level :
      * Hence consider, at least temporarily *  c->print_function = NULL; */

@@ -1,5 +1,5 @@
 Package: Matrix
-Version: 1.1-6
+Version: 1.1-5
 Date: 2015-01-18
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
@@ -19,7 +19,7 @@ ByteCompile: yes
 BuildResaveData: no
 License: GPL (>= 2)
 LicenseNote: The Matrix package includes libraries AMD, CHOLMOD,
- COLAMD, CSparse and SPQR from the SuiteSparse collection of Tim
- Davis.  All sections of that code are covered by the GPL or
- LGPL licenses.  See the directory doc/UFsparse for details.
+        COLAMD, CSparse and SPQR from the SuiteSparse collection of Tim
+        Davis.  All sections of that code are covered by the GPL or
+        LGPL licenses.  See the directory doc/UFsparse for details.
 URL: http://Matrix.R-forge.R-project.org/

@@ -14,7 +14,7 @@
 
 #include "amd_internal.h"
 
-#define PRI(format,x) { if (x >= 0) { SUITESPARSE_PRINTF ((format, x)) ; }}
+#define PRI(format,x) { if (x >= 0) { PRINTF ((format, x)) ; }}
 
 GLOBAL void AMD_info
 (
@@ -23,7 +23,7 @@ GLOBAL void AMD_info
 {
     double n, ndiv, nmultsubs_ldl, nmultsubs_lu, lnz, lnzd ;
 
-    SUITESPARSE_PRINTF (("\nAMD version %d.%d.%d, %s, results:\n",
+    PRINTF (("\nAMD version %d.%d.%d, %s, results:\n",
 	AMD_MAIN_VERSION, AMD_SUB_VERSION, AMD_SUBSUB_VERSION, AMD_DATE)) ;
 
     if (!Info)
@@ -39,26 +39,26 @@ GLOBAL void AMD_info
     lnzd = (n >= 0 && lnz >= 0) ? (n + lnz) : (-1) ;
 
     /* AMD return status */
-    SUITESPARSE_PRINTF (("    status: ")) ;
+    PRINTF (("    status: ")) ;
     if (Info [AMD_STATUS] == AMD_OK)
     {
-	SUITESPARSE_PRINTF (("OK\n")) ;
+	PRINTF (("OK\n")) ;
     }
     else if (Info [AMD_STATUS] == AMD_OUT_OF_MEMORY)
     {
-	SUITESPARSE_PRINTF (("out of memory\n")) ;
+	PRINTF (("out of memory\n")) ;
     }
     else if (Info [AMD_STATUS] == AMD_INVALID)
     {
-	SUITESPARSE_PRINTF (("invalid matrix\n")) ;
+	PRINTF (("invalid matrix\n")) ;
     }
     else if (Info [AMD_STATUS] == AMD_OK_BUT_JUMBLED)
     {
-	SUITESPARSE_PRINTF (("OK, but jumbled\n")) ;
+	PRINTF (("OK, but jumbled\n")) ;
     }
     else
     {
-	SUITESPARSE_PRINTF (("unknown\n")) ;
+	PRINTF (("unknown\n")) ;
     }
 
     /* statistics about the input matrix */
@@ -81,7 +81,7 @@ GLOBAL void AMD_info
 	Info [AMD_NCMPA]) ;
 
     /* statistics about the ordering quality */
-    SUITESPARSE_PRINTF (("\n"
+    PRINTF (("\n"
 	"    The following approximate statistics are for a subsequent\n"
 	"    factorization of A(P,P) + A(P,P)'.  They are slight upper\n"
 	"    bounds if there are no dense rows/columns in A+A', and become\n"
@@ -104,7 +104,7 @@ GLOBAL void AMD_info
 
     if (n >= 0 && ndiv >= 0 && nmultsubs_ldl >= 0 && nmultsubs_lu >= 0)
     {
-	SUITESPARSE_PRINTF (("\n"
+	PRINTF (("\n"
 	"    chol flop count for real A, sqrt counted as 1 flop: %.20g\n"
 	"    LDL' flop count for real A:                         %.20g\n"
 	"    LDL' flop count for complex A:                      %.20g\n"

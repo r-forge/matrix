@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-5\n"
-"POT-Creation-Date: 2014-10-01 09:45\n"
+"POT-Creation-Date: 2015-01-19 10:40\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,6 +29,9 @@ msgid "non-conformable matrix dimensions in %s"
 msgstr ""
 
 msgid "dimnames [%d] mismatch in %s"
+msgstr ""
+
+msgid "names(dimnames(<matrix>)) must be NULL or of length two"
 msgstr ""
 
 msgid "Matrices must have same number of rows in %s"
@@ -451,6 +454,12 @@ msgstr ""
 msgid "LU computationally singular: ratio of extreme entries in |diag(U)| = %9.4g"
 msgstr ""
 
+msgid "RHS 'b' has wrong number of rows:"
+msgstr ""
+
+msgid "RHS 'b' has wrong length"
+msgstr ""
+
 msgid "cannot coerce non-symmetric \"dgTMatrix\" to \"dsCMatrix\" class"
 msgstr ""
 
@@ -551,6 +560,9 @@ msgid "not a square matrix"
 msgstr ""
 
 msgid "not-yet-implemented method for <%s> %%*%% <%s>"
+msgstr ""
+
+msgid "non-conformable arguments"
 msgstr ""
 
 msgid "rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n Probably should rather use method = 'qr' !?"
