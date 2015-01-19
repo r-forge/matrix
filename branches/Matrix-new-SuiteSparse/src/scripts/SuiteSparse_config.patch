@@ -1,0 +1,26 @@
+--- SuiteSparse_config/SuiteSparse_config.c.~1~	2014-03-21 20:15:22.000000000 +0100
++++ SuiteSparse_config/SuiteSparse_config.c	2014-09-01 10:40:30.897372952 +0200
+@@ -11,6 +11,9 @@
+ 
+ #include <stdlib.h>
+ 
++// For use with R package 'Matrix':
++#define NPRINT
++
+ #ifndef NPRINT
+ #include <stdio.h>
+ #endif
+@@ -71,8 +74,11 @@
+             /* MATLAB mexFunction: */
+             mexPrintf,
+         #else
+-            /* standard ANSI C: */
+-            printf,
++            // /* standard ANSI C: */
++            // printf,
++	    // For use with R package 'Matrix':
++            #include <R_ext/Print.h>
++	    Rprintf,
+         #endif
+     #else
+         /* printf is disabled */

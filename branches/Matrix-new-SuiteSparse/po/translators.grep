@@ -1,0 +1,14 @@
+-*- mode: grep; default-directory: "~/R/Pkgs/Matrix/po/" -*-
+Grep started at Thu Mar 27 10:08:07
+
+grep -nHi -e Translator: *.po
+de.po:12:"Last-Translator: Detlef Steuer <detlef.steuer@gmx.de>\n"
+en@quot.po:34:"Last-Translator: Automatically generated\n"
+fr.po:11:"Last-Translator: Philippe.GROSJEAN@umons.ac.be\n"
+pl.po:7:"Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
+R-de.po:12:"Last-Translator: Detlef Steuer <steuer@hsu-hh.de>\n"
+R-en@quot.po:29:"Last-Translator: Automatically generated\n"
+R-fr.po:6:"Last-Translator: Philippe.GROSJEAN@umons.ac.be\n"
+R-pl.po:7:"Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
+
+Grep finished (matches found) at Thu Mar 27 10:08:07
