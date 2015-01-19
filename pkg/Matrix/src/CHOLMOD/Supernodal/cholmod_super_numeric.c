@@ -61,23 +61,17 @@
 #include "cholmod_internal.h"
 #include "cholmod_supernodal.h"
 
-#ifdef GPU_BLAS
-#include "cholmod_gpu.h"
-#endif
-
 /* ========================================================================== */
 /* === TEMPLATE codes for GPU and regular numeric factorization ============= */
 /* ========================================================================== */
 
-#ifdef DLONG
 #ifdef GPU_BLAS
 #define REAL
-#include "../GPU/t_cholmod_gpu.c"
+#include "t_cholmod_gpu.c"
 #define COMPLEX
-#include "../GPU/t_cholmod_gpu.c"
+#include "t_cholmod_gpu.c"
 #define ZOMPLEX
-/* no #include of "../GPU/t_cholmod_gpu.c".  Zomplex case relies on complex */
-#endif
+#include "t_cholmod_gpu.c"
 #endif
 
 #define REAL

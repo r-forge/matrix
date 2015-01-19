@@ -7,7 +7,6 @@
 /* -------------------------------------------------------------------------- */
 
 #undef TEMPLATE
-#undef TEMPLATE2
 #undef XTYPE
 #undef XTYPE2
 #undef XTYPE_OK
@@ -54,7 +53,6 @@
 
 #define PREFIX				    p_
 #define TEMPLATE(name)			    P_TEMPLATE(name)
-#define TEMPLATE2(name)			    P_TEMPLATE(name)
 #define XTYPE				    CHOLMOD_PATTERN
 #define XTYPE2				    CHOLMOD_REAL
 #define XTYPE_OK(type)			    (TRUE)
@@ -98,7 +96,6 @@
 
 #define PREFIX				    r_
 #define TEMPLATE(name)			    R_TEMPLATE(name)
-#define TEMPLATE2(name)			    R_TEMPLATE(name)
 #define XTYPE				    CHOLMOD_REAL
 #define XTYPE2				    CHOLMOD_REAL
 #define XTYPE_OK(type)			    R_XTYPE_OK(type)
@@ -146,10 +143,8 @@
 
 #ifdef NCONJUGATE
 #define TEMPLATE(name)			    CT_TEMPLATE(name)
-#define TEMPLATE2(name)			    CT_TEMPLATE(name)
 #else
 #define TEMPLATE(name)			    C_TEMPLATE(name)
-#define TEMPLATE2(name)			    C_TEMPLATE(name)
 #endif
 
 #define ASSEMBLE(x,z,p,ax,az,q)		    C_ASSEMBLE(x,z,p,ax,az,q) 
@@ -199,10 +194,8 @@
 
 #ifdef NCONJUGATE
 #define TEMPLATE(name)			    ZT_TEMPLATE(name)
-#define TEMPLATE2(name)			    CT_TEMPLATE(name)
 #else
 #define TEMPLATE(name)			    Z_TEMPLATE(name)
-#define TEMPLATE2(name)			    C_TEMPLATE(name)
 #endif
 
 #define ASSEMBLE(x,z,p,ax,az,q)		    Z_ASSEMBLE(x,z,p,ax,az,q) 

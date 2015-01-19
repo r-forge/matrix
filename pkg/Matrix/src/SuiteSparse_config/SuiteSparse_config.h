@@ -35,8 +35,8 @@
  * Author: Timothy A. Davis.
  */
 
-#ifndef SUITESPARSE_CONFIG_H
-#define SUITESPARSE_CONFIG_H
+#ifndef _SUITESPARSECONFIG_H
+#define _SUITESPARSECONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,63 +67,42 @@ extern "C" {
 #define SuiteSparse_long_id "%" SuiteSparse_long_idd
 #endif
 
+/* For backward compatibility with prior versions of SuiteSparse.  The UF_*
+ * macros are deprecated and will be removed in a future version. */
+#ifndef UF_long
+#define UF_long     SuiteSparse_long
+#define UF_long_max SuiteSparse_long_max
+#define UF_long_idd SuiteSparse_long_idd
+#define UF_long_id  SuiteSparse_long_id
+#endif
+
 /* ========================================================================== */
 /* === SuiteSparse_config parameters and functions ========================== */
 /* ========================================================================== */
 
-/* SuiteSparse-wide parameters are placed in this struct.  It is meant to be
-   an extern, globally-accessible struct.  It is not meant to be updated
-   frequently by multiple threads.  Rather, if an application needs to modify
-   SuiteSparse_config, it should do it once at the beginning of the application,
-   before multiple threads are launched.
+/* SuiteSparse-wide parameters will be placed in this struct. */
 
-   The intent of these function pointers is that they not be used in your
-   application directly, except to assign them to the desired user-provided
-   functions.  Rather, you should use the
- */
-
-struct SuiteSparse_config_struct
+typedef struct SuiteSparse_config_struct
 {
-    void *(*malloc_func) (size_t) ;             /* pointer to malloc */
-    void *(*calloc_func) (size_t, size_t) ;     /* pointer to calloc */
-    void *(*realloc_func) (void *, size_t) ;    /* pointer to realloc */
-    void (*free_func) (void *) ;                /* pointer to free */
-    int (*printf_func) (const char *, ...) ;    /* pointer to printf */
-    double (*hypot_func) (double, double) ;     /* pointer to hypot */
-    int (*divcomplex_func) (double, double, double, double, double *, double *);
-} ;
+    void *(*malloc_memory) (size_t) ;           /* pointer to malloc */
+    void *(*realloc_memory) (void *, size_t) ;  /* pointer to realloc */
+    void (*free_memory) (void *) ;              /* pointer to free */
+    void *(*calloc_memory) (size_t, size_t) ;   /* pointer to calloc */
 
-extern struct SuiteSparse_config_struct SuiteSparse_config ;
-
-void SuiteSparse_start ( void ) ;   /* called to start SuiteSparse */
-
-void SuiteSparse_finish ( void ) ;  /* called to finish SuiteSparse */
+} SuiteSparse_config ;
 
 void *SuiteSparse_malloc    /* pointer to allocated block of memory */
 (
     size_t nitems,          /* number of items to malloc (>=1 is enforced) */
-    size_t size_of_item     /* sizeof each item */
-) ;
-
-void *SuiteSparse_calloc    /* pointer to allocated block of memory */
-(
-    size_t nitems,          /* number of items to calloc (>=1 is enforced) */
-    size_t size_of_item     /* sizeof each item */
-) ;
-
-void *SuiteSparse_realloc   /* pointer to reallocated block of memory, or
-                               to original block if the realloc failed. */
-(
-    size_t nitems_new,      /* new number of items in the object */
-    size_t nitems_old,      /* old number of items in the object */
     size_t size_of_item,    /* sizeof each item */
-    void *p,                /* old object to reallocate */
-    int *ok                 /* 1 if successful, 0 otherwise */
+    int *ok,                /* TRUE if successful, FALSE otherwise */
+    SuiteSparse_config *config        /* SuiteSparse-wide configuration */
 ) ;
 
 void *SuiteSparse_free      /* always returns NULL */
 (
-    void *p                 /* block to free */
+    void *p,                /* block to free */
+    SuiteSparse_config *config        /* SuiteSparse-wide configuration */
 ) ;
 
 void SuiteSparse_tic    /* start the timer */
@@ -141,17 +120,6 @@ double SuiteSparse_time  /* returns current wall clock time in seconds */
     void
 ) ;
 
-/* returns sqrt (x^2 + y^2), computed reliably */
-double SuiteSparse_hypot (double x, double y) ;
-
-/* complex division of c = a/b */
-int SuiteSparse_divcomplex
-(
-    double ar, double ai,	/* real and imaginary parts of a */
-    double br, double bi,	/* real and imaginary parts of b */
-    double *cr, double *ci	/* real and imaginary parts of c */
-) ;
-
 /* determine which timer to use, if any */
 #ifndef NTIMER
 #ifdef _POSIX_C_SOURCE
@@ -161,15 +129,6 @@ int SuiteSparse_divcomplex
 #endif
 #endif
 
-/* SuiteSparse printf macro */
-#define SUITESPARSE_PRINTF(params) \
-{ \
-    if (SuiteSparse_config.printf_func != NULL) \
-    { \
-        (void) (SuiteSparse_config.printf_func) params ; \
-    } \
-}
-
 /* ========================================================================== */
 /* === SuiteSparse version ================================================== */
 /* ========================================================================== */
@@ -178,36 +137,32 @@ int SuiteSparse_divcomplex
  * which must be used together (UMFPACK requires AMD, CHOLMOD requires AMD,
  * COLAMD, CAMD, and CCOLAMD, etc).  A version number is provided here for the
  * collection itself.  The versions of packages within each version of
- * SuiteSparse are meant to work together.  Combining one package from one
+ * SuiteSparse are meant to work together.  Combining one packge from one
  * version of SuiteSparse, with another package from another version of
  * SuiteSparse, may or may not work.
  *
  * SuiteSparse contains the following packages:
  *
- *  SuiteSparse_config version 4.4.1 (version always the same as SuiteSparse)
- *  AMD             version 2.4.1
- *  BTF             version 1.2.1
- *  CAMD            version 2.4.1
- *  CCOLAMD         version 2.9.1
- *  CHOLMOD         version 3.0.3
- *  COLAMD          version 2.9.1
- *  CSparse         version 3.1.4
- *  CXSparse        version 3.1.4
- *  KLU             version 1.3.2
- *  LDL             version 2.2.1
- *  RBio            version 2.2.1
- *  SPQR            version 2.0.0
- *  GPUQREngine     version 1.0.0
- *  SuiteSparse_GPURuntime  version 1.0.0
- *  UMFPACK         version 5.7.1
+ *  SuiteSparse_config version 4.2.1 (version always the same as SuiteSparse)
+ *  AMD             version 2.3.1
+ *  BTF             version 1.2.0
+ *  CAMD            version 2.3.1
+ *  CCOLAMD         version 2.8.0
+ *  CHOLMOD         version 2.1.2
+ *  COLAMD          version 2.8.0
+ *  CSparse         version 3.1.2
+ *  CXSparse        version 3.1.2
+ *  KLU             version 1.2.1
+ *  LDL             version 2.1.0
+ *  RBio            version 2.1.1
+ *  SPQR            version 1.3.1 (full name is SuiteSparseQR)
+ *  UMFPACK         version 5.6.2
  *  MATLAB_Tools    various packages & M-files
  *
  * Other package dependencies:
  *  BLAS            required by CHOLMOD and UMFPACK
  *  LAPACK          required by CHOLMOD
  *  METIS 4.0.1     required by CHOLMOD (optional) and KLU (optional)
- *  CUBLAS, CUDART  NVIDIA libraries required by CHOLMOD and SPQR when
- *                  they are compiled with GPU acceleration.
  */
 
 
@@ -233,10 +188,10 @@ int SuiteSparse_version     /* returns SUITESPARSE_VERSION */
 */
 #define SUITESPARSE_HAS_VERSION_FUNCTION
 
-#define SUITESPARSE_DATE "Oct 23, 2014"
+#define SUITESPARSE_DATE "April 25, 2013"
 #define SUITESPARSE_VER_CODE(main,sub) ((main) * 1000 + (sub))
 #define SUITESPARSE_MAIN_VERSION 4
-#define SUITESPARSE_SUB_VERSION 4
+#define SUITESPARSE_SUB_VERSION 2
 #define SUITESPARSE_SUBSUB_VERSION 1
 #define SUITESPARSE_VERSION \
     SUITESPARSE_VER_CODE(SUITESPARSE_MAIN_VERSION,SUITESPARSE_SUB_VERSION)

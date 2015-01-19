@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-1\n"
-"POT-Creation-Date: 2014-10-01 09:45\n"
+"POT-Creation-Date: 2015-01-17 15:31\n"
 "PO-Revision-Date: 2014-03-30 09:07+0100\n"
 "Last-Translator: Philippe Grosjean <phgrosjean@sciviews.org>\n"
 "Language-Team: none\n"
@@ -40,6 +40,9 @@ msgstr "matrices de dimensions incompatibles dans %s"
 
 msgid "dimnames [%d] mismatch in %s"
 msgstr "dimnames [%d] incohérentes dans %s"
+
+msgid "names(dimnames(<matrix>)) must be NULL or of length two"
+msgstr ""
 
 msgid "Matrices must have same number of rows in %s"
 msgstr "Les matrices doivent avoir le même nombre de lignes dans %s"
@@ -566,6 +569,12 @@ msgid ""
 msgstr ""
 "LU calculée singulière : rapport d'entrées extrêmes dans |diag(U)| = %9.4g"
 
+msgid "RHS 'b' has wrong number of rows:"
+msgstr ""
+
+msgid "RHS 'b' has wrong length"
+msgstr ""
+
 msgid "cannot coerce non-symmetric \"dgTMatrix\" to \"dsCMatrix\" class"
 msgstr ""
 "impossible de convertir automatiquement des \"dgMAtrix\" non symétriques en "
@@ -696,6 +705,10 @@ msgstr "ce n'est pas une matrice carrée"
 
 msgid "not-yet-implemented method for <%s> %%*%% <%s>"
 msgstr "méthode pas encore implémentée pour <%s> %%*%% <%s>"
+
+#, fuzzy
+msgid "non-conformable arguments"
+msgstr "matrices de dimensions incompatibles dans %s"
 
 msgid ""
 "rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n"

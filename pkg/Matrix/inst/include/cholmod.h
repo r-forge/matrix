@@ -8,103 +8,35 @@
 extern "C" {
 #endif
 
-// from ../../src/SuiteSparse_config/SuiteSparse_config.h - line 52 :
-
-
-#ifndef SuiteSparse_long
+// from ../../src/UFconfig/UFconfig.h - line 51 :
+#ifndef UF_long
 
 #ifdef _WIN64
 
-#define SuiteSparse_long __int64
-#define SuiteSparse_long_max _I64_MAX
-#define SuiteSparse_long_idd "I64d"
+#define UF_long __int64
+#define UF_long_max _I64_MAX
+#define UF_long_idd "I64d"
 
 #else
 
-#define SuiteSparse_long long
-#define SuiteSparse_long_max LONG_MAX
-#define SuiteSparse_long_idd "ld"
+#define UF_long long
+#define UF_long_max LONG_MAX
+#define UF_long_idd "ld"
 
 #endif
-#define SuiteSparse_long_id "%" SuiteSparse_long_idd
+#define UF_long_id "%" UF_long_idd
 #endif
-
-/* ========================================================================== */
-/* === SuiteSparse_config parameters and functions ========================== */
-/* ========================================================================== */
-
-/* SuiteSparse-wide parameters are placed in this struct.  It is meant to be
-   an extern, globally-accessible struct.  It is not meant to be updated
-   frequently by multiple threads.  Rather, if an application needs to modify
-   SuiteSparse_config, it should do it once at the beginning of the application,
-   before multiple threads are launched.
- */
-
-struct SuiteSparse_config_struct
-{
-    void *(*malloc_func) (size_t) ;             /* pointer to malloc */
-    void *(*calloc_func) (size_t, size_t) ;     /* pointer to calloc */
-    void *(*realloc_func) (void *, size_t) ;    /* pointer to realloc */
-    void (*free_func) (void *) ;                /* pointer to free */
-    int (*printf_func) (const char *, ...) ;    /* pointer to printf */
-    double (*hypot_func) (double, double) ;     /* pointer to hypot */
-    int (*divcomplex_func) (double, double, double, double, double *, double *);
-} ;
-
-extern struct SuiteSparse_config_struct SuiteSparse_config ;
-
-// from ../../src/CHOLMOD/Include/cholmod_core.h - line 246 :
 
 #define CHOLMOD_HAS_VERSION_FUNCTION
 
-#define CHOLMOD_DATE "Oct 23, 2014"
+#define CHOLMOD_DATE "April 25, 2013"
 #define CHOLMOD_VER_CODE(main,sub) ((main) * 1000 + (sub))
-#define CHOLMOD_MAIN_VERSION 3
-#define CHOLMOD_SUB_VERSION 0
-#define CHOLMOD_SUBSUB_VERSION 3
+#define CHOLMOD_MAIN_VERSION 2
+#define CHOLMOD_SUB_VERSION 1
+#define CHOLMOD_SUBSUB_VERSION 2
 #define CHOLMOD_VERSION \
     CHOLMOD_VER_CODE(CHOLMOD_MAIN_VERSION,CHOLMOD_SUB_VERSION)
-
-
-/* ========================================================================== */
-/* === non-CHOLMOD include files ============================================ */
-/* ========================================================================== */
-
-/* This is the only non-CHOLMOD include file imposed on the user program.
- * It required for size_t definition used here.  CHOLMOD itself includes other
- * ANSI C89 standard #include files, but does not expose them to the user.
- *
- * CHOLMOD assumes that your C compiler is ANSI C89 compliant.  It does not make
- * use of ANSI C99 features.
- */
-
-#include <stddef.h>
-#include <stdlib.h>
-
-/* ========================================================================== */
-/* === CUDA BLAS for the GPU ================================================ */
-/* ========================================================================== */
-
-/* The number of OMP threads should typically be set to the number of cores   */
-/* per socket inthe machine being used.  This maximizes memory performance.   */
-#ifndef CHOLMOD_OMP_NUM_THREADS
-#define CHOLMOD_OMP_NUM_THREADS 4
-#endif
-
-/* Define buffering parameters for GPU processing */
-#ifdef GPU_BLAS
-#include <cublas_v2.h>
-#endif
-
-#define CHOLMOD_DEVICE_SUPERNODE_BUFFERS 6
-#define CHOLMOD_HOST_SUPERNODE_BUFFERS 8
-#define CHOLMOD_DEVICE_STREAMS 2
-
-
-/* ========================================================================== */
-/* === CHOLMOD objects ====================================================== */
-/* ========================================================================== */
-
+// from ../../src/CHOLMOD/Include/cholmod_core.h - line 275 :
 /* Each CHOLMOD object has its own type code. */
 
 #define CHOLMOD_COMMON 0
@@ -142,51 +74,6 @@ extern struct SuiteSparse_config_struct SuiteSparse_config ;
 #define CHOLMOD_REAL 1		/* a real matrix */
 #define CHOLMOD_COMPLEX 2	/* a complex matrix (ANSI C99 compatible) */
 #define CHOLMOD_ZOMPLEX 3	/* a complex matrix (MATLAB compatible) */
-
-/* The xtype of all parameters for all CHOLMOD routines must match.
- *
- * CHOLMOD_PATTERN: x and z are ignored.
- * CHOLMOD_DOUBLE:  x is non-null of size nzmax, z is ignored.
- * CHOLMOD_COMPLEX: x is non-null of size 2*nzmax doubles, z is ignored.
- * CHOLMOD_ZOMPLEX: x and z are non-null of size nzmax
- *
- * In the real case, z is ignored.  The kth entry in the matrix is x [k].
- * There are two methods for the complex case.  In the ANSI C99-compatible
- * CHOLMOD_COMPLEX case, the real and imaginary parts of the kth entry
- * are in x [2*k] and x [2*k+1], respectively.  z is ignored.  In the
- * MATLAB-compatible CHOLMOD_ZOMPLEX case, the real and imaginary
- * parts of the kth entry are in x [k] and z [k].
- *
- * Scalar floating-point values are always passed as double arrays of size 2
- * (real and imaginary parts).  The imaginary part of a scalar is ignored if
- * the routine operates on a real matrix.
- *
- * These Modules support complex and zomplex matrices, with a few exceptions:
- *
- *	Check	    all routines
- *	Cholesky    all routines
- *	Core	    all except cholmod_aat, add, band, copy
- *	Demo	    all routines
- *	Partition   all routines
- *	Supernodal  all routines support any real, complex, or zomplex input.
- *			There will never be a supernodal zomplex L; a complex
- *			supernodal L is created if A is zomplex.
- *	Tcov	    all routines
- *	Valgrind    all routines
- *
- * These Modules provide partial support for complex and zomplex matrices:
- *
- *	MATLAB	    all routines support real and zomplex only, not complex,
- *			with the exception of ldlupdate, which supports
- *			real matrices only.  This is a minor constraint since
- *			MATLAB's matrices are all real or zomplex.
- *	MatrixOps   only norm_dense, norm_sparse, and sdmult support complex
- *			and zomplex
- *
- * These Modules do not support complex and zomplex matrices at all:
- *
- *	Modify	    all routines support real matrices only
- */
 
 /* Definitions for cholmod_common: */
 #define CHOLMOD_MAXMETHODS 9	/* maximum number of different methods that */
@@ -353,23 +240,13 @@ typedef struct cholmod_common_struct
 					 * factorization will return quickly if
 	* the matrix is not positive definite.  Default: FALSE. */
 
-    int prefer_binary ;	    /* cholmod_read_triplet converts a symmetric
-			     * pattern-only matrix into a real matrix.  If
-	* prefer_binary is FALSE, the diagonal entries are set to 1 + the degree
-	* of the row/column, and off-diagonal entries are set to -1 (resulting
-	* in a positive definite matrix if the diagonal is zero-free).  Most
-	* symmetric patterns are the pattern a positive definite matrix.  If
-	* this parameter is TRUE, then the matrix is returned with a 1 in each
-	* entry, instead.  Default: FALSE.  Added in v1.3. */
-
     /* ---------------------------------------------------------------------- */
     /* printing and error handling options */
     /* ---------------------------------------------------------------------- */
 
     int print ;		/* print level. Default: 3 */
     int precise ;	/* if TRUE, print 16 digits.  Otherwise print 5 */
-
-    /* CHOLMOD print_function replaced with SuiteSparse_config.print_func */
+    int (*print_function) (const char *, ...) ;	/* pointer to printf */
 
     int try_catch ;	/* if TRUE, then ignore errors; CHOLMOD is in the middle
 			 * of a try/catch block.  No error message is printed
@@ -519,13 +396,13 @@ typedef struct cholmod_common_struct
 	    * separator is discarded if it consists of the entire graph.
 	    * Default: 1 */
 
-	double other_1 [4] ; /* future expansion */
+	double other1 [4] ; /* future expansion */
 
 	size_t nd_small ;    /* do not partition graphs with fewer nodes than
 			     * nd_small, in NESDIS.  Default: 200 (same as
 			     * METIS) */
 
-	size_t other_2 [4] ; /* future expansion */
+	size_t other2 [4] ; /* future expansion */
 
 	int aggressive ;    /* Aggresive absorption in AMD, COLAMD, SYMAMD,
 			     * CCOLAMD, and CSYMAMD.  Default: TRUE */
@@ -558,7 +435,7 @@ typedef struct cholmod_common_struct
 	/* fill-reducing ordering to use */
 	int ordering ;
 
-	size_t other_3 [4] ; /* future expansion */
+	size_t other3 [4] ; /* future expansion */
 
     } method [CHOLMOD_MAXMETHODS + 1] ;
 
@@ -567,21 +444,36 @@ typedef struct cholmod_common_struct
 	* supernode amalgamation.  Does not affect fundamental nnz(L) and
 	* flop count.  Default: TRUE. */
 
-    int default_nesdis ;    /* Default: FALSE.  If FALSE, then the default
-			     * ordering strategy (when Common->nmethods == 0)
-	* is to try the given ordering (if present), AMD, and then METIS if AMD
-	* reports high fill-in.  If Common->default_nesdis is TRUE then NESDIS
-	* is used instead in the default strategy. */
-
     /* ---------------------------------------------------------------------- */
-    /* memory management, complex divide, and hypot function pointers moved */
+    /* memory management routines */
     /* ---------------------------------------------------------------------- */
 
-    /* Function pointers moved from here (in CHOLMOD 2.2.0) to
-       SuiteSparse_config.[ch].  See CHOLMOD/Include/cholmod_back.h
-       for a set of macros that can be #include'd or copied into your
-       application to define these function pointers on any version of CHOLMOD.
-       */
+    void *(*malloc_memory) (size_t) ;		/* pointer to malloc */
+    void *(*realloc_memory) (void *, size_t) ;  /* pointer to realloc */
+    void (*free_memory) (void *) ;		/* pointer to free */
+    void *(*calloc_memory) (size_t, size_t) ;	/* pointer to calloc */
+
+    /* ---------------------------------------------------------------------- */
+    /* routines for complex arithmetic */
+    /* ---------------------------------------------------------------------- */
+
+    int (*complex_divide) (double ax, double az, double bx, double bz,
+	    double *cx, double *cz) ;
+
+	/* flag = complex_divide (ax, az, bx, bz, &cx, &cz) computes the complex
+	 * division c = a/b, where ax and az hold the real and imaginary part
+	 * of a, and b and c are stored similarly.  flag is returned as 1 if
+	 * a divide-by-zero occurs, or 0 otherwise.  By default, the function
+	 * pointer Common->complex_divide is set equal to cholmod_divcomplex.
+	 */
+
+    double (*hypotenuse) (double x, double y) ;
+
+	/* s = hypotenuse (x,y) computes s = sqrt (x*x + y*y), but does so more
+	 * accurately.  By default, the function pointer Common->hypotenuse is
+	 * set equal to cholmod_hypot.  See also the hypot function in the C99
+	 * standard, which has an identical syntax and function.  If you have
+	 * a C99-compliant compiler, you can set Common->hypotenuse = hypot.  */
 
     /* ---------------------------------------------------------------------- */
     /* METIS workarounds */
@@ -651,7 +543,7 @@ typedef struct cholmod_common_struct
      */
 
     size_t nrow ;	/* size of Flag and Head */
-    SuiteSparse_long mark ;	/* mark value for Flag array */
+    UF_long mark ;	/* mark value for Flag array */
     size_t iworksize ;	/* size of Iwork.  Upper bound: 6*nrow+ncol */
     size_t xworksize ;	/* size of Xwork,  in bytes.
 			 * maxrank*nrow*sizeof(double) for update/downdate.
@@ -676,8 +568,8 @@ typedef struct cholmod_common_struct
     void *Iwork ;	/* size iworksize, 2*nrow+ncol for most routines,
 			 * up to 6*nrow+ncol for cholmod_analyze. */
 
-    int itype ;		/* If CHOLMOD_LONG, Flag, Head, and Iwork are
-			 * SuiteSparse_long. Otherwise all three are int. */
+    int itype ;		/* If CHOLMOD_LONG, Flag, Head, and Iwork are UF_long.
+			 * Otherwise all three arrays are int. */
 
     int dtype ;		/* double or float */
 
@@ -719,115 +611,69 @@ typedef struct cholmod_common_struct
     double rowfacfl ;	    /* # of flops in last call to cholmod_rowfac */
     double aatfl ;	    /* # of flops to compute A(:,f)*A(:,f)' */
 
-    int called_nd ;	    /* TRUE if the last call to
-			     * cholmod_analyze called NESDIS or METIS. */
-    int blas_ok ;           /* FALSE if BLAS int overflow; TRUE otherwise */
+    /* ---------------------------------------------------------------------- */
+    /* future expansion */
+    /* ---------------------------------------------------------------------- */
+
+    /* To allow CHOLMOD to be updated without recompiling the user application,
+     * additional space is set aside here for future statistics, parameters,
+     * and workspace.  Note:  additional entries were added in v1.1 to the
+     * method array, above, and thus v1.0 and v1.1 are not binary compatible.
+     *
+     * v1.1 to the current version are binary compatible.
+     */
 
     /* ---------------------------------------------------------------------- */
+    double other1 [10] ;
+
+    double SPQR_xstat [4] ;     /* for SuiteSparseQR statistics */
+
     /* SuiteSparseQR control parameters: */
-    /* ---------------------------------------------------------------------- */
-
     double SPQR_grain ;         /* task size is >= max (total flops / grain) */
     double SPQR_small ;         /* task size is >= small */
+
+    /* ---------------------------------------------------------------------- */
+    UF_long SPQR_istat [10] ;   /* for SuiteSparseQR statistics */
+    UF_long other2 [6] ;        /* reduced from size 16 in v1.6 */
+
+    /* ---------------------------------------------------------------------- */
+    int other3 [10] ;       /* reduced from size 16 in v1.1. */
+
+    int prefer_binary ;	    /* cholmod_read_triplet converts a symmetric
+			     * pattern-only matrix into a real matrix.  If
+	* prefer_binary is FALSE, the diagonal entries are set to 1 + the degree
+	* of the row/column, and off-diagonal entries are set to -1 (resulting
+	* in a positive definite matrix if the diagonal is zero-free).  Most
+	* symmetric patterns are the pattern a positive definite matrix.  If
+	* this parameter is TRUE, then the matrix is returned with a 1 in each
+	* entry, instead.  Default: FALSE.  Added in v1.3. */
+
+    /* control parameter (added for v1.2): */
+    int default_nesdis ;    /* Default: FALSE.  If FALSE, then the default
+			     * ordering strategy (when Common->nmethods == 0)
+	* is to try the given ordering (if present), AMD, and then METIS if AMD
+	* reports high fill-in.  If Common->default_nesdis is TRUE then NESDIS
+	* is used instead in the default strategy. */
+
+    /* statistic (added for v1.2): */
+    int called_nd ;	    /* TRUE if the last call to
+			     * cholmod_analyze called NESDIS or METIS. */
+
+    int blas_ok ;           /* FALSE if BLAS int overflow; TRUE otherwise */
+
+    /* SuiteSparseQR control parameters: */
     int SPQR_shrink ;        /* controls stack realloc method */
     int SPQR_nthreads ;      /* number of TBB threads, 0 = auto */
 
     /* ---------------------------------------------------------------------- */
-    /* SuiteSparseQR statistics */
-    /* ---------------------------------------------------------------------- */
-
-    /* was other1 [0:3] */
-    double SPQR_flopcount ;         /* flop count for SPQR */
-    double SPQR_analyze_time ;      /* analysis time in seconds for SPQR */
-    double SPQR_factorize_time ;    /* factorize time in seconds for SPQR */
-    double SPQR_solve_time ;        /* backsolve time in seconds */
-
-    /* was SPQR_xstat [0:3] */
-    double SPQR_flopcount_bound ;   /* upper bound on flop count */
-    double SPQR_tol_used ;          /* tolerance used */
-    double SPQR_norm_E_fro ;        /* Frobenius norm of dropped entries */
-
-    /* was SPQR_istat [0:9] */
-    SuiteSparse_long SPQR_istat [10] ;
+    size_t  other4 [16] ;
 
     /* ---------------------------------------------------------------------- */
-    /* GPU configuration and statistics */
-    /* ---------------------------------------------------------------------- */
-
-    /*  useGPU:  1 if gpu-acceleration is requested */
-    /*           0 if gpu-acceleration is prohibited */
-    /*          -1 if gpu-acceleration is undefined in which case the */
-    /*             environment CHOLMOD_USE_GPU will be queried and used. */
-    /*             useGPU=-1 is only used by CHOLMOD and treated as 0 by SPQR */
-    int useGPU;
-
-    /* for CHOLMOD: */
-    size_t maxGpuMemBytes;
-    double maxGpuMemFraction;
-
-    /* If not using the GPU, these items are not used, but they should be
-       present so that the CHOLMOD Common has the same size whether the GPU
-       is used or not.  This way, all packages will agree on the size of
-       the CHOLMOD Common, regardless of whether or not they are compiled
-       with the GPU libraries or not */
-
-#ifdef GPU_BLAS
-    /* in CUDA, these three types are pointers */
-    #define CHOLMOD_CUBLAS_HANDLE cublasHandle_t
-    #define CHOLMOD_CUDASTREAM    cudaStream_t
-    #define CHOLMOD_CUDAEVENT     cudaEvent_t
-#else
-    /* ... so make them void * pointers if the GPU is not being used */
-    #define CHOLMOD_CUBLAS_HANDLE void *
-    #define CHOLMOD_CUDASTREAM    void *
-    #define CHOLMOD_CUDAEVENT     void *
-#endif
-
-    CHOLMOD_CUBLAS_HANDLE cublasHandle ;
-
-    /* a set of streams for general use */
-    CHOLMOD_CUDASTREAM    gpuStream[CHOLMOD_HOST_SUPERNODE_BUFFERS];
-
-    CHOLMOD_CUDAEVENT     cublasEventPotrf [3] ;
-    CHOLMOD_CUDAEVENT     updateCKernelsComplete;
-    CHOLMOD_CUDAEVENT     updateCBuffersFree[CHOLMOD_HOST_SUPERNODE_BUFFERS];
-
-    void *dev_mempool;    /* pointer to single allocation of device memory */
-    size_t dev_mempool_size;
-
-    void *host_pinned_mempool;  /* pointer to single allocation of pinned mem */
-    size_t host_pinned_mempool_size;
-
-    size_t devBuffSize;
-    int    ibuffer;
-
-    double syrkStart ;          /* time syrk started */
-
-    /* run times of the different parts of CHOLMOD (GPU and CPU) */
-    double cholmod_cpu_gemm_time ;
-    double cholmod_cpu_syrk_time ;
-    double cholmod_cpu_trsm_time ;
-    double cholmod_cpu_potrf_time ;
-    double cholmod_gpu_gemm_time ;
-    double cholmod_gpu_syrk_time ;
-    double cholmod_gpu_trsm_time ;
-    double cholmod_gpu_potrf_time ;
-    double cholmod_assemble_time ;
-    double cholmod_assemble_time2 ;
-
-    /* number of times the BLAS are called on the CPU and the GPU */
-    size_t cholmod_cpu_gemm_calls ;
-    size_t cholmod_cpu_syrk_calls ;
-    size_t cholmod_cpu_trsm_calls ;
-    size_t cholmod_cpu_potrf_calls ;
-    size_t cholmod_gpu_gemm_calls ;
-    size_t cholmod_gpu_syrk_calls ;
-    size_t cholmod_gpu_trsm_calls ;
-    size_t cholmod_gpu_potrf_calls ;
+    void   *other5 [16] ;
 
 } cholmod_common ;
 
-// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 3001 :
+// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 1114 :
 /* A sparse matrix stored in compressed-column form. */
 
 typedef struct cholmod_sparse_struct
@@ -836,7 +682,7 @@ typedef struct cholmod_sparse_struct
     size_t ncol ;
     size_t nzmax ;	/* maximum number of entries in the matrix */
 
-    /* pointers to int or SuiteSparse_long: */
+    /* pointers to int or UF_long: */
     void *p ;		/* p [0..ncol], the column pointers */
     void *i ;		/* i [0..nzmax-1], the row indices */
 
@@ -869,9 +715,8 @@ typedef struct cholmod_sparse_struct
 	*/
 
     int itype ;		/* CHOLMOD_INT:     p, i, and nz are int.
-			 * CHOLMOD_INTLONG: p is SuiteSparse_long,
-                         *                  i and nz are int.
-			 * CHOLMOD_LONG:    p, i, and nz are SuiteSparse_long */
+			 * CHOLMOD_INTLONG: p is UF_long, i and nz are int.
+			 * CHOLMOD_LONG:    p, i, and nz are UF_long.  */
 
     int xtype ;		/* pattern, real, complex, or zomplex */
     int dtype ;		/* x and z are double or float */
@@ -881,7 +726,7 @@ typedef struct cholmod_sparse_struct
 
 } cholmod_sparse ;
 
-// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 1604 :
+// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 1554 :
 /* A symbolic and numeric factorization, either simplicial or supernodal.
  * In all cases, the row indices in the columns of L are kept sorted. */
 
@@ -1007,12 +852,9 @@ typedef struct cholmod_factor_struct
     int xtype ; /* pattern, real, complex, or zomplex */
     int dtype ; /* x and z double or float */
 
-    int useGPU; /* Indicates the symbolic factorization supports
-		 * GPU acceleration */
-
 } cholmod_factor ;
 
-// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 1888 :
+// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 1836 :
 /* A dense matrix in column-oriented form.  It has no itype since it contains
  * no integers.  Entry in row i and column j is located in x [i+j*d].
  */
@@ -1030,7 +872,7 @@ typedef struct cholmod_dense_struct
 
 } cholmod_dense ;
 
-// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 2087 :
+// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 2033 :
 /* A sparse matrix stored in triplet form. */
 
 typedef struct cholmod_triplet_struct
@@ -1095,8 +937,6 @@ typedef struct cholmod_triplet_struct
     int dtype ; /* x and z are double or float */
 
 } cholmod_triplet ;
-
-//- - - - - end of cholmod_core.h  "cut'n'paste" --------------------------------
 
 // -------- our (Matrix)  short and const_ forms of of the pointers :
 typedef       cholmod_common*        CHM_CM;
