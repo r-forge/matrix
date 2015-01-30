@@ -7,7 +7,8 @@
 #
 R=${R:-R}
 thisdir=`dirname $0` ; cd $thisdir; thisdir=`pwd`
-echo 'preliminary thisdir='$thisdir
+echo "R = '$R' (`$R --version | head -1`)
+  preliminary thisdir='$thisdir'"
 pkgDIR=`dirname $thisdir`
 pkg=`basename $pkgDIR`
 echo '  -->        pkgDIR='$pkgDIR' ; pkg='$pkg
