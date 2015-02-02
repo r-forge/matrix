@@ -4,35 +4,89 @@ library(Matrix)
 
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 
+if(FALSE) ## not yet ready
+if(getRversion() >= "3.2.0") {
+    ## Thanks to Michael Lawrence,  base  cbind(), rbind() dispatch on S4 "when needed",
+    ## since Feb.1, 2015
+    cBind <- base::cbind
+    rBind <- base::rbind
+}
+
+
 ### --- Dense Matrices ---
 
-m1 <- m2 <- m <- Matrix(1:12, 3,4)
+m1 <- m2 <- m <- matrix(1:12, 3,4)
 dimnames(m2) <- list(LETTERS[1:3],
                      letters[1:4])
 dimnames(m1) <- list(NULL,letters[1:4])
+M  <- Matrix(m)
+M1 <- Matrix(m1)
+M2 <- Matrix(m2)
 
-stopifnot(identical(cBind ( m, 10*m) -> R,
-                    cbind2( m, 10*m))); R
-stopifnot(identical(cBind (m1,100+m1) -> R,
-                    cbind2(m1,100+m1))); R
-stopifnot(identical(cBind (m1, 10*m2) -> R,
-                    cbind2(m1, 10*m2))); R
-stopifnot(identical(cBind (m2, m1+m2) -> R,
-                    cbind2(m2, m1+m2))); R
+stopifnot(identical3(cBind ( M, 10*M),
+		show(cbind2( M, 10*M)),
+	      Matrix(cbind ( m, 10*m))),
+	  identical3(cBind (M1, 100+M1),
+		show(cbind2(M1, 100+M1)),
+	      Matrix(cbind (m1, 100+m1))),
+	  identical3(cBind (M1, 10*M2),
+		show(cbind2(M1, 10*M2)),
+	      Matrix(cbind (m1, 10*m2))),
+	  identical3(cBind (M2, M1+M2),
+		show(cbind2(M2, M1+M2)),
+	      Matrix(cbind (m2, m1+m2)))
+	 ,
+    identical(colnames(show(cBind(M1, MM = -1))),
+	      c(colnames(M1), "MM"))
+	 ,
+    Qidentical(show  (rBind(R1 = 10:11, M1)),
+	       Matrix(rbind(R1 = 10:11, m1)), strict=FALSE)
+	 , TRUE)
 
-cBind(m1, MM = -1)
-rBind(R1 = 10:11, m1)
+identical.or.eq <- function(x,y, tol=0, ...) {
+    if(identical(x,y, ...))
+        TRUE
+    else if(isTRUE(aeq <- all.equal(x,y, tolerance = tol)))
+        structure(TRUE, comment = "not identical")
+    else aeq
+}
+identicalShow <- function(x,y, ...)
+    if(!isTRUE(id <- identical.or.eq(x, y, ...))) cat(id,"\n")
+
+## Checking  deparse.level { <==> example at end of ?cbind }:
+checkRN <- function(dd, B = rbind) {
+    FN <- function(deparse.level)
+        rownames(B(1:4, c=2,"a+"=10, dd, deparse.level=deparse.level))
+    rn <- c("1:4", "c", "a+", "dd",  "")
+    isMatr <- (length(dim(dd)) == 2)
+    id <- if(isMatr) 5 else 4
+    if(!identical(B, methods:::rbind)) ## <= BUG in methods:::rbind !!
+    identicalShow(rn[c(5,2:3, 5)], FN(deparse.level= 0)) # middle two names
+    identicalShow(rn[c(5,2:3,id)], FN(deparse.level= 1)) # last shown if vector
+    identicalShow(rn[c(1,2:3,id)], FN(deparse.level= 2)) # first shown; (last if vec.)
+}
+checkRN(10) # <==> ?cbind's ex
+checkRN(1:4)
+checkRN(       rbind(c(0:1,0,0)))
+if(FALSE)# not yet
+checkRN(Matrix(rbind(c(0:1,0,0))))
+## rBind(): -- works with the above workaround methods:::rbind bug
+checkRN(10 ,				rBind)
+checkRN(1:4,				rBind)
+checkRN(       rbind(c(0:1,0,0)),  	rBind)
+checkRN(Matrix(rbind(c(0:1,0,0))), 	rBind)
+
+
 cBind(0, Matrix(0+0:1, 1,2), 3:2)# FIXME? should warn - as with matrix()
-
 as(rBind(0, Matrix(0+0:1, 1,2), 3:2),
    "sparseMatrix")
-cBind(m2, 10*m2[nrow(m2):1 ,])# keeps the rownames from the first
+cBind(M2, 10*M2[nrow(M2):1 ,])# keeps the rownames from the first
 
-(im <- cBind(I = 100, m))
+(im <- cBind(I = 100, M))
 str(im)
-(mi <- cBind(m2, I = 1000))
+(mi <- cBind(M2, I = 1000))
 str(mi)
-(m1m <- cBind(m,I=100,m2))
+(m1m <- cBind(M,I=100,M2))
 showProc.time()
 
 ### --- Diagonal / Sparse - had bugs
