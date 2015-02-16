@@ -1,7 +1,6 @@
 
-R Under development (unstable) (2012-02-27 r58508)
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
+R Under development (unstable) (2015-02-15 r67832) -- "Unsuffered Consequences"
+Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -19,64 +18,118 @@ Type 'q()' to quit R.
 > #### Testing  cBind() & rBind()
 > 
 > library(Matrix)
-Loading required package: lattice
 > 
 > source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
+Loading required package: tools
+> 
+> if(FALSE) ## not yet ready
++ if(getRversion() >= "3.2.0") {
++     ## Thanks to Michael Lawrence,  base  cbind(), rbind() dispatch on S4 "when needed",
++     ## since Feb.1, 2015
++     cBind <- base::cbind
++     rBind <- base::rbind
++ }
+> 
 > 
 > ### --- Dense Matrices ---
 > 
-> m1 <- m2 <- m <- Matrix(1:12, 3,4)
+> m1 <- m2 <- m <- matrix(1:12, 3,4)
 > dimnames(m2) <- list(LETTERS[1:3],
 +                      letters[1:4])
 > dimnames(m1) <- list(NULL,letters[1:4])
+> M  <- Matrix(m)
+> M1 <- Matrix(m1)
+> M2 <- Matrix(m2)
 > 
-> stopifnot(identical(cBind ( m, 10*m) -> R,
-+                     cbind2( m, 10*m))); R
+> stopifnot(identical3(cBind ( M, 10*M),
++ 		show(cbind2( M, 10*M)),
++ 	      Matrix(cbind ( m, 10*m))),
++ 	  identical3(cBind (M1, 100+M1),
++ 		show(cbind2(M1, 100+M1)),
++ 	      Matrix(cbind (m1, 100+m1))),
++ 	  identical3(cBind (M1, 10*M2),
++ 		show(cbind2(M1, 10*M2)),
++ 	      Matrix(cbind (m1, 10*m2))),
++ 	  identical3(cBind (M2, M1+M2),
++ 		show(cbind2(M2, M1+M2)),
++ 	      Matrix(cbind (m2, m1+m2)))
++ 	 ,
++     identical(colnames(show(cBind(M1, MM = -1))),
++ 	      c(colnames(M1), "MM"))
++ 	 ,
++     Qidentical(show  (rBind(R1 = 10:11, M1)),
++ 	       Matrix(rbind(R1 = 10:11, m1)), strict=FALSE)
++ 	 , TRUE)
 3 x 8 Matrix of class "dgeMatrix"
      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8]
 [1,]    1    4    7   10   10   40   70  100
 [2,]    2    5    8   11   20   50   80  110
 [3,]    3    6    9   12   30   60   90  120
-> stopifnot(identical(cBind (m1,100+m1) -> R,
-+                     cbind2(m1,100+m1))); R
 3 x 8 Matrix of class "dgeMatrix"
      a b c  d   a   b   c   d
 [1,] 1 4 7 10 101 104 107 110
 [2,] 2 5 8 11 102 105 108 111
 [3,] 3 6 9 12 103 106 109 112
-> stopifnot(identical(cBind (m1, 10*m2) -> R,
-+                     cbind2(m1, 10*m2))); R
 3 x 8 Matrix of class "dgeMatrix"
   a b c  d  a  b  c   d
 A 1 4 7 10 10 40 70 100
 B 2 5 8 11 20 50 80 110
 C 3 6 9 12 30 60 90 120
-> stopifnot(identical(cBind (m2, m1+m2) -> R,
-+                     cbind2(m2, m1+m2))); R
 3 x 8 Matrix of class "dgeMatrix"
   a b c  d a  b  c  d
 A 1 4 7 10 2  8 14 20
 B 2 5 8 11 4 10 16 22
 C 3 6 9 12 6 12 18 24
-> 
-> cBind(m1, MM = -1)
 3 x 5 Matrix of class "dgeMatrix"
      a b c  d MM
 [1,] 1 4 7 10 -1
 [2,] 2 5 8 11 -1
 [3,] 3 6 9 12 -1
-> rBind(R1 = 10:11, m1)
 4 x 4 Matrix of class "dgeMatrix"
     a  b  c  d
 R1 10 11 10 11
     1  4  7 10
     2  5  8 11
     3  6  9 12
+> 
+> identical.or.eq <- function(x,y, tol=0, ...) {
++     if(identical(x,y, ...))
++         TRUE
++     else if(isTRUE(aeq <- all.equal(x,y, tolerance = tol)))
++         structure(TRUE, comment = "not identical")
++     else aeq
++ }
+> identicalShow <- function(x,y, ...)
++     if(!isTRUE(id <- identical.or.eq(x, y, ...))) cat(id,"\n")
+> 
+> ## Checking  deparse.level { <==> example at end of ?cbind }:
+> checkRN <- function(dd, B = rbind) {
++     FN <- function(deparse.level)
++         rownames(B(1:4, c=2,"a+"=10, dd, deparse.level=deparse.level))
++     rn <- c("1:4", "c", "a+", "dd",  "")
++     isMatr <- (length(dim(dd)) == 2)
++     id <- if(isMatr) 5 else 4
++     if(!identical(B, methods:::rbind)) ## <= BUG in methods:::rbind !!
++     identicalShow(rn[c(5,2:3, 5)], FN(deparse.level= 0)) # middle two names
++     identicalShow(rn[c(5,2:3,id)], FN(deparse.level= 1)) # last shown if vector
++     identicalShow(rn[c(1,2:3,id)], FN(deparse.level= 2)) # first shown; (last if vec.)
++ }
+> checkRN(10) # <==> ?cbind's ex
+> checkRN(1:4)
+> checkRN(       rbind(c(0:1,0,0)))
+> if(FALSE)# not yet
++ checkRN(Matrix(rbind(c(0:1,0,0))))
+> ## rBind(): -- works with the above workaround methods:::rbind bug
+> checkRN(10 ,				rBind)
+> checkRN(1:4,				rBind)
+> checkRN(       rbind(c(0:1,0,0)),  	rBind)
+> checkRN(Matrix(rbind(c(0:1,0,0))), 	rBind)
+> 
+> 
 > cBind(0, Matrix(0+0:1, 1,2), 3:2)# FIXME? should warn - as with matrix()
 1 x 4 Matrix of class "dgeMatrix"
      [,1] [,2] [,3] [,4]
 [1,]    0    0    1    3
-> 
 > as(rBind(0, Matrix(0+0:1, 1,2), 3:2),
 +    "sparseMatrix")
 3 x 2 sparse Matrix of class "dgCMatrix"
@@ -84,14 +137,14 @@ R1 10 11 10 11
 [1,] . .
 [2,] . 1
 [3,] 3 2
-> cBind(m2, 10*m2[nrow(m2):1 ,])# keeps the rownames from the first
+> cBind(M2, 10*M2[nrow(M2):1 ,])# keeps the rownames from the first
 3 x 8 Matrix of class "dgeMatrix"
   a b c  d  a  b  c   d
 A 1 4 7 10 30 60 90 120
 B 2 5 8 11 20 50 80 110
 C 3 6 9 12 10 40 70 100
 > 
-> (im <- cBind(I = 100, m))
+> (im <- cBind(I = 100, M))
 3 x 5 Matrix of class "dgeMatrix"
        I         
 [1,] 100 1 4 7 10
@@ -105,7 +158,7 @@ Formal class 'dgeMatrix' [package "Matrix"] with 4 slots
   .. ..$ : NULL
   .. ..$ : chr [1:5] "I" "" "" "" ...
   ..@ factors : list()
-> (mi <- cBind(m2, I = 1000))
+> (mi <- cBind(M2, I = 1000))
 3 x 5 Matrix of class "dgeMatrix"
   a b c  d    I
 A 1 4 7 10 1000
@@ -119,14 +172,14 @@ Formal class 'dgeMatrix' [package "Matrix"] with 4 slots
   .. ..$ : chr [1:3] "A" "B" "C"
   .. ..$ : chr [1:5] "a" "b" "c" "d" ...
   ..@ factors : list()
-> (m1m <- cBind(m,I=100,m2))
+> (m1m <- cBind(M,I=100,M2))
 3 x 9 Matrix of class "dgeMatrix"
              I a b c  d
 A 1 4 7 10 100 1 4 7 10
 B 2 5 8 11 100 2 5 8 11
 C 3 6 9 12 100 3 6 9 12
 > showProc.time()
-Time elapsed:  0.176 0.012 0.189 
+Time elapsed:  0.052 0.005 0.058 
 > 
 > ### --- Diagonal / Sparse - had bugs
 > 
@@ -157,7 +210,7 @@ Time elapsed:  0.176 0.012 0.189
 + 	  identical(t(d4), cBind(Diagonal(4),     0:3)),
 + 	  identical(t(m4), rBind(Diagonal(x=-1:2), 0:3)))
 > showProc.time()
-Time elapsed:  0.076 0 0.076 
+Time elapsed:  0.034 0.004 0.038 
 > 
 > ### --- Sparse Matrices ---
 > 
@@ -207,7 +260,7 @@ rBind (m, v= 2 ), class(m) : dgeMatrix ,. dgCMatrix ,. dgTMatrix ,.
 cBind (m, v= c(1L, 0L) ), class(m) : dgeMatrix ,. dgCMatrix ,. dgTMatrix ,.
 rBind (m, v= c(1L, 0L) ), class(m) : dgeMatrix ,. dgCMatrix ,. dgTMatrix ,.
 > showProc.time()
-Time elapsed:  0.248 0 0.249 
+Time elapsed:  0.061 0.006 0.067 
 > 
 > cBind(0, mC); cBind(mC, 0)
 4 x 7 sparse Matrix of class "dgCMatrix"
@@ -378,8 +431,8 @@ v5 . | . | .
 [5,]    6    1    0    0    0    0   50    1
 > 
 > showProc.time()
-Time elapsed:  0.208 0.004 0.213 
+Time elapsed:  0.096 0.013 0.109 
 > 
 > proc.time()
    user  system elapsed 
-  2.716   0.060   2.779 
+  0.835   0.118   1.025 
