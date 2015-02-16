@@ -32,7 +32,7 @@ setAs("dsyMatrix", "dspMatrix", .dsy2dsp)
 
 dsy2T <- function(from) { # 'dsT': only store upper *or* lower
     uplo <- from@uplo
-    if(any((d <- dim(from)) == 0)) {
+    if(any0(dim(from))) {
 	ij <- matrix(0L, 0,2) ; m <- from@x
     } else {
 	## FIXME!	 working via "matrix" is *not* efficient:

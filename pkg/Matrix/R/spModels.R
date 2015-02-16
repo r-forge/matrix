@@ -275,7 +275,8 @@ is.model.frame <- function(x)
     is.matrix(attr(tms, "factors")) &&
     is.language(vv <- attr(tms, "variables")) &&
     vv[[1]] == as.symbol("list") &&
-    all((vars <- sapply(as.list(vv[-1]), as.character)) %in% colnames(x))
+    all(vapply(as.list(vv[-1]), as.character, "") %in% colnames(x))
+    ## all((vars <- sapply(as.list(vv[-1]), as.character)) %in% colnames(x))
     ## and we could go on testing vars
 }
 

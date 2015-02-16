@@ -38,7 +38,7 @@ setAs("nMatrix", "lMatrix",
 
 setAs("dMatrix", "lMatrix",
       function(from) {
-	  cld <- getClassDef(newCl <- class2(cl <- class(from), "l"))
+	  cld <- getClassDef(newCl <- class2(class(from), "l"))
 	  sNams <- slotNames(cld)
 	  r <- copyClass(from, newCl, sNames = sNams[sNams != "x"])
 	  r@x <- as.logical(from@x)

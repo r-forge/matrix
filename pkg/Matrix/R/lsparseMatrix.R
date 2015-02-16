@@ -2,7 +2,7 @@
 
 
 C2l <- function(from) {
-    if(extends(cld <- getClassDef(cl <- class(from)), "lsparseMatrix"))
+    if(extends(cld <- getClassDef(class(from)), "lsparseMatrix"))
 	return(from)
     ## else
     if(!(is.n <- extends(cld, "nsparseMatrix"))) {

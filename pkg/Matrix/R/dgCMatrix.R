@@ -93,7 +93,7 @@ setMethod("lu", signature(x = "sparseMatrix"),
     }
     n <- dim(a)[1L] ## == dim(a)[2], as a[.,.] is square matrix
     b.isMat <-
-	if((b.miss <- missing(b))) {
+	if(missing(b)) {
 	    ## default b = Identity = Diagonal(nrow(a)), however more efficiently
 	    b <- .sparseDiagonal(n)
 	    TRUE

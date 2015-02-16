@@ -197,7 +197,7 @@ setMethod("determinant", signature(x = "dsCMatrix", logarithm = "missing"),
 setMethod("determinant", signature(x = "dsCMatrix", logarithm = "logical"),
 	  function(x, logarithm, ...)
       {
-	  if((n <- x@Dim[1]) <= 1)
+	  if(x@Dim[1] <= 1L)
 	      return(mkDet(diag(x), logarithm))
 	  Chx <- tryCatch(suppressWarnings(Cholesky(x, LDL=TRUE)),
                           error = function(e) NULL)
