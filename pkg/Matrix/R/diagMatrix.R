@@ -282,7 +282,6 @@ rm(di2tT)
 
 setAs("diagonalMatrix", "nMatrix",
       function(from) {
-	  n <- from@Dim[1]
 	  i <- if(from@diag == "U") integer(0) else which(isN0(from@x)) - 1L
 	  new("ntTMatrix", i = i, j = i, diag = from@diag,
 	      Dim = from@Dim, Dimnames = from@Dimnames)
@@ -694,15 +693,15 @@ diagCspprod <- function(x, y) {
 	if(!all(x@x[1L] == x@x[-1L]) && is(y, "symmetricMatrix"))
 	    y <- as(y, "generalMatrix")
 	y@x <- y@x * x@x[y@i + 1L]
-        if(.hasSlot(y, "factors") && length(yf <- y@factors)) {
-            ## TODO
-            if(FALSE) { ## instead of dropping all factors, be smart about some
-                keep <- character()
-                if(any(iLU <- names(yf) == "LU")) {
-                    keep <- "LU"
-                }
-                y@factors <- yf[keep]
-            } else y@factors <- list() ## for now
+	if(.hasSlot(y, "factors") && length(y@factors)) {
+     ## if(.hasSlot(y, "factors") && length(yf <- y@factors)) { ## -- TODO? --
+	    ## instead of dropping all factors, be smart about some
+	    ## keep <- character()
+	    ## if(any(names(yf) == "LU")) { ## <- not easy: y = P'LUQ,  x y = xP'LUQ => LU ???
+	    ##     keep <- "LU"
+	    ## }
+	    ## y@factors <- yf[keep]
+	    y@factors <- list()
         }
     }
     y
@@ -841,7 +840,7 @@ diagOtri <- function(e1,e2) {
     ## result must be triangular
     r <- callGeneric(d1 <- .diag.x(e1), diag(e2)) # error if not "compatible"
     ## Check what happens with non-diagonals, i.e. (0 o 0), (FALSE o 0), ...:
-    e1.0 <- if(.n1 <- is.numeric(d1   )) 0 else FALSE
+    e1.0 <- if(is.numeric(d1)) 0 else FALSE
     r00 <- callGeneric(e1.0, if(.n2 <- is.numeric(e2[0])) 0 else FALSE)
     if(is0(r00)) { ##  r00 == 0 or FALSE --- result *is* triangular
         diag(e2) <- r

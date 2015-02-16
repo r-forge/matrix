@@ -9,7 +9,7 @@ setAs("ANY", "sparseMatrix", function(from) as(from, "CsparseMatrix"))
 
 ## If people did not use xtabs(), but table():
 setAs("table", "sparseMatrix", function(from) {
-    if(length(d <- dim(from)) != 2)
+    if(length(dim(from)) != 2L)
         stop("only 2-dimensional tables can be directly coerced to sparse matrices")
     as(unclass(from), "CsparseMatrix")
 })

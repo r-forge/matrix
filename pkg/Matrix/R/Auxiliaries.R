@@ -1164,7 +1164,7 @@ as_CspClass <- function(x, cl) {
     ##(extends(cld, "diagonalMatrix") && isDiagonal(x)) ||
     if (extends(cld, "symmetricMatrix") && isSymmetric(x))
         forceSymmetric(as(x,"CsparseMatrix"))
-    else if (extends(cld, "triangularMatrix") && (iT <- isTriangular(x)))
+    else if (extends(cld, "triangularMatrix") && isTriangular(x))
 	as(x, cl)
     else if(is(x, "CsparseMatrix")) x
     else as(x, paste0(.M.kind(x, cld), "gCMatrix"))
@@ -1312,12 +1312,10 @@ isTriC <- function(object, upper = NA) {
             ## -> has 'uplo'  differentiate between packed and unpacked
 
 ### .......... FIXME ...............
-
-            packed <- isPacked(object)
-            if(object@uplo == "U") {
-            } else { ## uplo == "L"
-            }
-
+	    ## packed <- isPacked(object)
+	    ## if(object@uplo == "U") {
+	    ## } else { ## uplo == "L"
+	    ## }
 ### very cheap workaround
 	    all0(as.matrix(object)[rep_len(c(FALSE, rep.int(TRUE,n)), n^2)])
         }

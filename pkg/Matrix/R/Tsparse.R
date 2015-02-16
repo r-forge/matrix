@@ -310,7 +310,7 @@ replTmat <- function (x, i, j, ..., value)
     ## "FIXME": could pass this (and much ? more) when this function would not *be* a
     ## method but be *called* from methods
 
-    clDv <- getClassDef(clV <- class(value))
+    clDv <- getClassDef(class(value))
     spV <- extends(clDv, "sparseVector")
     ## own version of all0() that works both for sparseVector and atomic vectors:
     .all0 <- function(v) if(spV) length(v@i) == 0 else all0(v)
