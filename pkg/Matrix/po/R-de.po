@@ -2,13 +2,13 @@
 # Copyright (C) 2001 The R Foundation
 # This file is distributed under the same license as the matrix package.
 # Chris Leick <c.leick@vollbio.de>, 2009.
-# Detlef Steuer <steuer@hsu-hh.de>, 2012-2014.
+# Detlef Steuer <steuer@hsu-hh.de>, 2012-2015.
 msgid ""
 msgstr ""
-"Project-Id-Version: R 3.1.0 / matrix 1.1-2\n"
+"Project-Id-Version: R 3.1.2 / matrix 1.1-5\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
 "POT-Creation-Date: 2015-01-17 15:31\n"
-"PO-Revision-Date: 2014-03-28 10:23+0100\n"
+"PO-Revision-Date: 2015-01-29 15:22+0100\n"
 "Last-Translator: Detlef Steuer <steuer@hsu-hh.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
 "Language: de\n"
@@ -49,7 +49,7 @@ msgid "dimnames [%d] mismatch in %s"
 msgstr "dimnames [%d] passen nicht in %s"
 
 msgid "names(dimnames(<matrix>)) must be NULL or of length two"
-msgstr ""
+msgstr "names(dimnames(<matrix>)) muss entweder NULL sein oder Länge zwei haben"
 
 msgid "Matrices must have same number of rows in %s"
 msgstr "Matrizen müssen die gleiche Anzahl Zeilen in %s haben"
@@ -361,9 +361,8 @@ msgstr ""
 msgid "in Summary(<ANY>, .): %s(<%s>, <%s>,...)"
 msgstr "in Summary(<ANY>, .): %s(<%s>, <%s>, ...)"
 
-#, fuzzy
 msgid "in Summary(<ANY>, .): %s(<%s>, <%s>)"
-msgstr "in Summary(<ANY>, .): %s(<%s>, <%s>, ...)"
+msgstr "in Summary(<ANY>, .): %s(<%s>, <%s>)"
 
 msgid "not-yet-implemented coercion to \"TsparseMatrix\""
 msgstr "noch nicht implementierte Typumwandlung zu 'TsparseMatrix'"
@@ -548,10 +547,10 @@ msgstr ""
 "von |diag(U)| = %9.4g"
 
 msgid "RHS 'b' has wrong number of rows:"
-msgstr ""
+msgstr "RHS 'b' hat die falsche Zahl Zeilen:"
 
 msgid "RHS 'b' has wrong length"
-msgstr ""
+msgstr "RHS 'b' hat die falsche Länge"
 
 msgid "cannot coerce non-symmetric \"dgTMatrix\" to \"dsCMatrix\" class"
 msgstr ""
@@ -675,9 +674,8 @@ msgstr "keine quadratische Matrix"
 msgid "not-yet-implemented method for <%s> %%*%% <%s>"
 msgstr "noch nicht implementierte Methode für <%s> %%*%% <%s>"
 
-#, fuzzy
 msgid "non-conformable arguments"
-msgstr "nicht konforme Matrixdimensionen in %s"
+msgstr "nicht konforme Argumente"
 
 msgid ""
 "rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n"
@@ -745,7 +743,7 @@ msgid "'V' is not a *square* matrix"
 msgstr "'V' ist keine *quadratische* Matrix"
 
 msgid "number of non zeros is smaller than 'nnz' because of duplicated (i,j)s"
-msgstr ""
+msgstr "Zahl von Nicht-Nullen ist kleiner als 'nnz' wegen doppelter (i,j)s"
 
 msgid ""
 "qr.R(<sparse>) may differ from qr.R(<dense>) because of permutations.  "
@@ -801,15 +799,14 @@ msgstr ""
 msgid "'x' is not symmetric nor triangular"
 msgstr "'x' ist weder symmetrisch noch in Dreiecksform"
 
-#, fuzzy
 msgid ""
 "extra argument %s will be disregarded in\n"
 " %s"
 msgid_plural ""
 "extra arguments %s will be disregarded in\n"
 " %s"
-msgstr[0] "Argumente %s werden nicht berücksichtigt in %s"
-msgstr[1] "Argumente %s werden nicht berücksichtigt in %s"
+msgstr[0] "zusätzliches Argument %s wird in %s nicht beachtet"
+msgstr[1] "zusätzliche Argumente %s werden in %s nicht beachtet"
 
 #~ msgid "longer object length"
 #~ msgstr "längere Objektlänge"

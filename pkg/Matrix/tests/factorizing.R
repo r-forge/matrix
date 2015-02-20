@@ -138,7 +138,7 @@ for(N in 1:(if(doExtras) 1008 else 24)) {
     checkQR.DS.both(A, Qinv.chk= NA, QtQ.chk=NA)
     ##                          --- => FALSE if struct. rank deficient
 }
-
+unique(warnings())
 
 ## Look at single "hard" cases: --------------------------------------
 
