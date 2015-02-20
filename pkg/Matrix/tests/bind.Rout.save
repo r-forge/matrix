@@ -1,5 +1,5 @@
 
-R Under development (unstable) (2015-02-15 r67832) -- "Unsuffered Consequences"
+R Under development (unstable) (2015-02-18 r67837) -- "Unsuffered Consequences"
 Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
@@ -22,10 +22,9 @@ Type 'q()' to quit R.
 > source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 Loading required package: tools
 > 
-> if(FALSE) ## not yet ready
-+ if(getRversion() >= "3.2.0") {
+> if(getRversion() >= "3.2.0") {
 +     ## Thanks to Michael Lawrence,  base  cbind(), rbind() dispatch on S4 "when needed",
-+     ## since Feb.1, 2015
++     ## since Feb.1, 2015, and thanks to myself, deparse.level now works too
 +     cBind <- base::cbind
 +     rBind <- base::rbind
 + }
@@ -124,6 +123,7 @@ R1 10 11 10 11
 > checkRN(1:4,				rBind)
 > checkRN(       rbind(c(0:1,0,0)),  	rBind)
 > checkRN(Matrix(rbind(c(0:1,0,0))), 	rBind)
+Modes: character, NULL Lengths: 4, 0 target is character, current is NULL 
 > 
 > 
 > cBind(0, Matrix(0+0:1, 1,2), 3:2)# FIXME? should warn - as with matrix()
@@ -179,7 +179,7 @@ A 1 4 7 10 100 1 4 7 10
 B 2 5 8 11 100 2 5 8 11
 C 3 6 9 12 100 3 6 9 12
 > showProc.time()
-Time elapsed:  0.052 0.005 0.058 
+Time elapsed:  0.053 0.005 0.059 
 > 
 > ### --- Diagonal / Sparse - had bugs
 > 
@@ -210,7 +210,7 @@ Time elapsed:  0.052 0.005 0.058
 + 	  identical(t(d4), cBind(Diagonal(4),     0:3)),
 + 	  identical(t(m4), rBind(Diagonal(x=-1:2), 0:3)))
 > showProc.time()
-Time elapsed:  0.034 0.004 0.038 
+Time elapsed:  0.031 0.002 0.033 
 > 
 > ### --- Sparse Matrices ---
 > 
@@ -260,7 +260,7 @@ rBind (m, v= 2 ), class(m) : dgeMatrix ,. dgCMatrix ,. dgTMatrix ,.
 cBind (m, v= c(1L, 0L) ), class(m) : dgeMatrix ,. dgCMatrix ,. dgTMatrix ,.
 rBind (m, v= c(1L, 0L) ), class(m) : dgeMatrix ,. dgCMatrix ,. dgTMatrix ,.
 > showProc.time()
-Time elapsed:  0.061 0.006 0.067 
+Time elapsed:  0.052 0.005 0.057 
 > 
 > cBind(0, mC); cBind(mC, 0)
 4 x 7 sparse Matrix of class "dgCMatrix"
@@ -321,6 +321,39 @@ Time elapsed:  0.061 0.006 0.067
 [2,] 2  . -1  .  1 2 1 . 22   . -11   .  11 22 . 1
 [3,] 1  2  . -1  . 1 1 . 11  22   . -11   . 11 . 2
 [4,] .  1  2  . -1 . 1 .  .  11  22   . -11  . . .
+> one <- 1
+> zero <- 0
+> dimnames(mC) <- dimnames(mT) <- list(LETTERS[1:4], letters[1:6])
+> op <- options(sparse.colnames = TRUE)# show colnames in print :
+> cBind(mC, one, 100*mC, zero, 0:2)
+4 x 15 sparse Matrix of class "dgCMatrix"
+  a  b  c  d  e f one   a    b    c    d    e   f zero  
+A . -1  .  1  2 .   1   . -100    .  100  200   .    . .
+B 2  . -1  .  1 2   1 200    . -100    .  100 200    . 1
+C 1  2  . -1  . 1   1 100  200    . -100    . 100    . 2
+D .  1  2  . -1 .   1   .  100  200    . -100   .    . .
+> cBind(mC, one, 100*mC, zero, 0:2, deparse.level=0)# no "zero", "one"
+4 x 15 sparse Matrix of class "dgCMatrix"
+  a  b  c  d  e f     a    b    c    d    e   f    
+A . -1  .  1  2 . 1   . -100    .  100  200   . . .
+B 2  . -1  .  1 2 1 200    . -100    .  100 200 . 1
+C 1  2  . -1  . 1 1 100  200    . -100    . 100 . 2
+D .  1  2  . -1 . 1   .  100  200    . -100   . . .
+> cBind(mC, one, 100*mC, zero, 0:2, deparse.level=2)# even "0:2"
+4 x 15 sparse Matrix of class "dgCMatrix"
+  a  b  c  d  e f one   a    b    c    d    e   f zero 0:2
+A . -1  .  1  2 .   1   . -100    .  100  200   .    .   .
+B 2  . -1  .  1 2   1 200    . -100    .  100 200    .   1
+C 1  2  . -1  . 1   1 100  200    . -100    . 100    .   2
+D .  1  2  . -1 .   1   .  100  200    . -100   .    .   .
+> cBind(mT, one, zero, mT+10*mT, zero, 0:2)
+4 x 16 sparse Matrix of class "dgCMatrix"
+  a  b  c  d  e f one zero  a   b   c   d   e  f zero  
+A . -1  .  1  2 .   1    .  . -11   .  11  22  .    . .
+B 2  . -1  .  1 2   1    . 22   . -11   .  11 22    . 1
+C 1  2  . -1  . 1   1    . 11  22   . -11   . 11    . 2
+D .  1  2  . -1 .   1    .  .  11  22   . -11  .    . .
+> 
 > 
 > ## logical (sparse) - should remain logical :
 > L5 <- Diagonal(n = 5, x = TRUE); v5 <- rep(x = c(FALSE,TRUE), length = ncol(L5))
@@ -329,13 +362,13 @@ Time elapsed:  0.061 0.006 0.067
 + 	  is(rBind(L5, 2* v5), "dsparseMatrix"),
 + 	  is(cBind(2* v5, L5), "dsparseMatrix"))
 6 x 5 sparse Matrix of class "lgCMatrix"
-            
-   | . . . .
-   . | . . .
-   . . | . .
-   . . . | .
-   . . . . |
-v5 . | . | .
+   [,1] [,2] [,3] [,4] [,5]
+      |    .    .    .    .
+      .    |    .    .    .
+      .    .    |    .    .
+      .    .    .    |    .
+      .    .    .    .    |
+v5    .    |    .    |    .
 5 x 6 sparse Matrix of class "lgCMatrix"
      v5          
 [1,]  . | . . . .
@@ -347,25 +380,25 @@ v5 . | . | .
 > ## print() / show() of  non-structural zeros:
 > (m <- Matrix(c(0, 0, 2:0), 3, 5))
 3 x 5 sparse Matrix of class "dgCMatrix"
-              
-[1,] . 1 . . 2
-[2,] . . 2 . 1
-[3,] 2 . 1 . .
+     [,1] [,2] [,3] [,4] [,5]
+[1,]    .    1    .    .    2
+[2,]    .    .    2    .    1
+[3,]    2    .    1    .    .
 > (m2 <- cBind(m,m))
 3 x 10 sparse Matrix of class "dgCMatrix"
-                        
-[1,] . 1 . . 2 . 1 . . 2
-[2,] . . 2 . 1 . . 2 . 1
-[3,] 2 . 1 . . 2 . 1 . .
+     [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
+[1,]    .    1    .    .    2    .    1    .    .     2
+[2,]    .    .    2    .    1    .    .    2    .     1
+[3,]    2    .    1    .    .    2    .    1    .     .
 > (m4 <- rBind(m2,m2))
 6 x 10 sparse Matrix of class "dgCMatrix"
-                        
-[1,] . 1 . . 2 . 1 . . 2
-[2,] . . 2 . 1 . . 2 . 1
-[3,] 2 . 1 . . 2 . 1 . .
-[4,] . 1 . . 2 . 1 . . 2
-[5,] . . 2 . 1 . . 2 . 1
-[6,] 2 . 1 . . 2 . 1 . .
+     [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
+[1,]    .    1    .    .    2    .    1    .    .     2
+[2,]    .    .    2    .    1    .    .    2    .     1
+[3,]    2    .    1    .    .    2    .    1    .     .
+[4,]    .    1    .    .    2    .    1    .    .     2
+[5,]    .    .    2    .    1    .    .    2    .     1
+[6,]    2    .    1    .    .    2    .    1    .     .
 > diag(m4)
 [1] 0 0 1 0 1 2
 > for(i in 1:6) {
@@ -374,38 +407,38 @@ v5 . | . | .
 + }
 > m4 ## now show some non-structural zeros:
 6 x 10 sparse Matrix of class "dgCMatrix"
-                        
-[1,] 1 . . . 2 . 1 . . 2
-[2,] . 2 . . 1 . . 2 . 1
-[3,] 2 . 3 . . 2 . 1 . .
-[4,] . 1 . 4 . . 1 . . 2
-[5,] . . 2 . 5 . . 2 . 1
-[6,] 2 . 1 . . 6 . 1 . .
+     [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
+[1,]    1    .    .    .    2    .    1    .    .     2
+[2,]    .    2    .    .    1    .    .    2    .     1
+[3,]    2    .    3    .    .    2    .    1    .     .
+[4,]    .    1    .    4    .    .    1    .    .     2
+[5,]    .    .    2    .    5    .    .    2    .     1
+[6,]    2    .    1    .    .    6    .    1    .     .
 > 
 > ## Mixture of dense and sparse/diagonal -- used to fail, even in 1.0-0
 > D5 <- Diagonal(x = 10*(1:5))
 > (D5.1 <- cbind2(D5, 1))
 5 x 6 sparse Matrix of class "dgCMatrix"
-                     
-[1,] 10  .  .  .  . 1
-[2,]  . 20  .  .  . 1
-[3,]  .  . 30  .  . 1
-[4,]  .  .  . 40  . 1
-[5,]  .  .  .  . 50 1
+     [,1] [,2] [,3] [,4] [,5] [,6]
+[1,]   10    .    .    .    .    1
+[2,]    .   20    .    .    .    1
+[3,]    .    .   30    .    .    1
+[4,]    .    .    .   40    .    1
+[5,]    .    .    .    .   50    1
 > ## "FIXME" in newer versions of R, do not need Matrix() here:
 > s42 <- Matrix(z42 <- cbind2(rep(0:1,4), rep(1:0,4)),
 +               sparse=TRUE)
 > (C86 <- rBind(1, 0, D5.1, 0))
 8 x 6 sparse Matrix of class "dgCMatrix"
-                     
-[1,]  1  1  1  1  1 1
-[2,]  .  .  .  .  . .
-[3,] 10  .  .  .  . 1
-[4,]  . 20  .  .  . 1
-[5,]  .  . 30  .  . 1
-[6,]  .  .  . 40  . 1
-[7,]  .  .  .  . 50 1
-[8,]  .  .  .  .  . .
+     [,1] [,2] [,3] [,4] [,5] [,6]
+[1,]    1    1    1    1    1    1
+[2,]    .    .    .    .    .    .
+[3,]   10    .    .    .    .    1
+[4,]    .   20    .    .    .    1
+[5,]    .    .   30    .    .    1
+[6,]    .    .    .   40    .    1
+[7,]    .    .    .    .   50    1
+[8,]    .    .    .    .    .    .
 > stopifnot(TRUE
 + 	  ,isValid(D5.1, "dgCMatrix")
 + 	  ,isValid(print(rbind2(Matrix(1:10, 2,5), D5)),   "dgCMatrix")
@@ -414,14 +447,14 @@ v5 . | . | .
 +           ,identical(zz, cbind2(s42, C86))
 + 	  )
 7 x 5 sparse Matrix of class "dgCMatrix"
-                   
-[1,]  1  3  5  7  9
-[2,]  2  4  6  8 10
-[3,] 10  .  .  .  .
-[4,]  . 20  .  .  .
-[5,]  .  . 30  .  .
-[6,]  .  .  . 40  .
-[7,]  .  .  .  . 50
+     [,1] [,2] [,3] [,4] [,5]
+[1,]    1    3    5    7    9
+[2,]    2    4    6    8   10
+[3,]   10    .    .    .    .
+[4,]    .   20    .    .    .
+[5,]    .    .   30    .    .
+[6,]    .    .    .   40    .
+[7,]    .    .    .    .   50
 5 x 8 Matrix of class "dgeMatrix"
      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8]
 [1,]   10    5   10    0    0    0    0    1
@@ -430,9 +463,10 @@ v5 . | . | .
 [4,]    7    2    0    0    0   40    0    1
 [5,]    6    1    0    0    0    0   50    1
 > 
+> options(op)
 > showProc.time()
-Time elapsed:  0.096 0.013 0.109 
+Time elapsed:  0.111 0.009 0.12 
 > 
 > proc.time()
    user  system elapsed 
-  0.835   0.118   1.025 
+  0.896   0.110   1.081 

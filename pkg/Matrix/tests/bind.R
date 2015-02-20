@@ -4,10 +4,9 @@ library(Matrix)
 
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 
-if(FALSE) ## not yet ready
 if(getRversion() >= "3.2.0") {
     ## Thanks to Michael Lawrence,  base  cbind(), rbind() dispatch on S4 "when needed",
-    ## since Feb.1, 2015
+    ## since Feb.1, 2015.  And thanks to myself, deparse.level now works too..
     cBind <- base::cbind
     rBind <- base::rbind
 }
@@ -148,6 +147,15 @@ stopifnot(identical3(cc, cBind(mT, 0,7,0, diag(nr), 0),
 
 cBind(mC, 1, 100*mC, 0, 0:2)
 cBind(mT, 1, 0, mT+10*mT, 0, 0:2)
+one <- 1
+zero <- 0
+dimnames(mC) <- dimnames(mT) <- list(LETTERS[1:4], letters[1:6])
+op <- options(sparse.colnames = TRUE)# show colnames in print :
+cBind(mC, one, 100*mC, zero, 0:2)
+cBind(mC, one, 100*mC, zero, 0:2, deparse.level=0)# no "zero", "one"
+cBind(mC, one, 100*mC, zero, 0:2, deparse.level=2)# even "0:2"
+cBind(mT, one, zero, mT+10*mT, zero, 0:2)
+
 
 ## logical (sparse) - should remain logical :
 L5 <- Diagonal(n = 5, x = TRUE); v5 <- rep(x = c(FALSE,TRUE), length = ncol(L5))
@@ -182,4 +190,5 @@ stopifnot(TRUE
           ,identical(zz, cbind2(s42, C86))
 	  )
 
+options(op)
 showProc.time()

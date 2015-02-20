@@ -15,7 +15,7 @@ echo '  -->        pkgDIR='$pkgDIR' ; pkg='$pkg
 # echo ''; echo '## FIXME ## use new Scheme from R 3.0.x on'
 # cd `$R RHOME`/po
 # make pkg-update PKG=$pkg PKGDIR=$pkgDIR
-echo "require('tools'); update_pkg_po('$pkgDIR')" | $R --slave
+echo "require('tools'); update_pkg_po('$pkgDIR')" | $R --slave | tee update.log
 ##    --------------------------------  as of R 3.0.0
 echo 'end{make pkg-update}' ; echo ''
 echo 'Test with (e.g.)'
