@@ -68,6 +68,7 @@ setMethod("which", "ldiMatrix",
 	      i <- if(x@diag == "U") seq_len(n) else which(x@x)
 	      if(arr.ind) cbind(i,i, deparse.level = 0) else i + n*(i - 1L) })
 
+## FIXME?:  not 100% compatible to "base :: which" -- here useNames=FALSE hardcoded!
 whichDense <- function(x, arr.ind = FALSE) {
     wh <- which(x@x) ## faster but "forbidden": .Internal(which(x@x))
     if (arr.ind && !is.null(d <- dim(x)))
@@ -79,16 +80,17 @@ setMethod("which", "ldenseMatrix",
 	  function(x, arr.ind) whichDense(as(x, "lgeMatrix"), arr.ind=arr.ind))
 
 setMethod("which", "nsparseMatrix",
-	  function(x, arr.ind) {
-	      if(arr.ind) which(as(x, "TsparseMatrix"), arr.ind=TRUE)
+	  function(x, arr.ind, useNames = TRUE) {
+	      if(arr.ind) which(as(x, "TsparseMatrix"), arr.ind=TRUE, useNames=useNames)
 	      else as(x, "sparseVector")@i
 	  })
 setMethod("which", "lsparseMatrix",
-	  function(x, arr.ind) {
-	      if(arr.ind) which(as(x, "TsparseMatrix"), arr.ind=TRUE)
+	  function(x, arr.ind, useNames = TRUE) {
+	      if(arr.ind) which(as(x, "TsparseMatrix"), arr.ind=TRUE, useNames=useNames)
 	      else which(as(x, "sparseVector"))
 	  })
 
+## FIXME?:  not 100% compatible to "base :: which" -- here useNames=FALSE hardcoded!
 which.ngT <- function(x, arr.ind)
     if(arr.ind) cbind(x@i, x@j) + 1L else as(x, "sparseVector")@i
 setMethod("which", "ngTMatrix", which.ngT)
@@ -97,6 +99,7 @@ setMethod("which", "ntTMatrix", function(x, arr.ind)
 setMethod("which", "nsTMatrix", function(x, arr.ind)
 	  which.ngT(as(x, "generalMatrix"), arr.ind))
 
+## FIXME?:  not 100% compatible to "base :: which" -- here useNames=FALSE hardcoded!
 which.lgT <- function(x, arr.ind) {
     if(arr.ind) {
 	iT <- is1(x@x)

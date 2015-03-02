@@ -119,7 +119,7 @@ setAs("ndenseMatrix", "TsparseMatrix",
       function(from) {
 	  if(is(from, "generalMatrix")) {
 	      ##  cheap but not so efficient:
-	      ij <- which(as(from,"matrix"), arr.ind = TRUE) - 1L
+	      ij <- which(as(from,"matrix"), arr.ind = TRUE, useNames = FALSE) - 1L
 	      new("ngTMatrix", i = ij[,1], j = ij[,2],
 		  Dim = from@Dim, Dimnames = from@Dimnames,
 		  factors = from@factors)
@@ -135,7 +135,7 @@ setAs("ndenseMatrix", "TsparseMatrix",
 setAs("ngeMatrix", "ngTMatrix",
       function(from) {
           ##  cheap but not so efficient:
-          ij <- which(as(from,"matrix"), arr.ind = TRUE) - 1L
+          ij <- which(as(from,"matrix"), arr.ind = TRUE, useNames = FALSE) - 1L
           new("ngTMatrix", i = ij[,1], j = ij[,2],
               Dim = from@Dim, Dimnames = from@Dimnames,
               factors = from@factors)
