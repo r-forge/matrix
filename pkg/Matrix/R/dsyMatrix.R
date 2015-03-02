@@ -38,7 +38,7 @@ dsy2T <- function(from) { # 'dsT': only store upper *or* lower
 	## FIXME!	 working via "matrix" is *not* efficient:
 	## the "other triangle" is filled, compared with 0, and then trashed:
 	m <- .Call(dsyMatrix_as_matrix, from, FALSE) # no dimnames!
-	ij <- which(m != 0, arr.ind = TRUE)
+	ij <- which(m != 0, arr.ind = TRUE, useNames = FALSE)
 	ij <- ij[if(uplo == "U") ij[,1] <= ij[,2] else ij[,1] >= ij[,2], , drop = FALSE]
     }
     new("dsTMatrix", i = ij[,1] - 1L, j = ij[,2] - 1L,

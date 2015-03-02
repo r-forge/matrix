@@ -26,7 +26,7 @@ setAs("matrix", "ngTMatrix",
           if(is.null.DN(dn))
               dn <- list(NULL,NULL)
           else dimnames(from) <- NULL # such that which(.) does not see any:
-	  ij <- which(from, arr.ind = TRUE) - 1L
+	  ij <- which(from, arr.ind = TRUE, useNames = FALSE) - 1L
 	  if(length(ij) == 0) ij <- matrix(ij, 0, 2)
 	  new("ngTMatrix",
 	      i = ij[,1],

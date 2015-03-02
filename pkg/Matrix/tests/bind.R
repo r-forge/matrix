@@ -1,16 +1,15 @@
 #### Testing  cBind() & rBind()
 
-library(Matrix)
-
-source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
-
+if(FALSE)### TODO: For R >= 3.2.0,  just use cbind(), rbind()
 if(getRversion() >= "3.2.0") {
-    ## Thanks to Michael Lawrence,  base  cbind(), rbind() dispatch on S4 "when needed",
-    ## since Feb.1, 2015.  And thanks to myself, deparse.level now works too..
     cBind <- base::cbind
     rBind <- base::rbind
 }
 
+
+library(Matrix)
+
+source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 
 ### --- Dense Matrices ---
 
