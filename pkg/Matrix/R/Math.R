@@ -38,7 +38,7 @@ setMethod("Math",
 			  slot(rx, nm) <- slot(x, nm)
 		      rx
 		  }
-	      } else { ## no sparseness (or no matrix!):
+	      } else { ## no sparseness (or no matrix!); C2dense() returns *numeric*
 		  callGeneric(C2dense(x))
 	      }
 	  }) ## {Math}

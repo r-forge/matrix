@@ -57,9 +57,9 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Csparse_to_Tsparse, 2),
     CALLDEF(Csparse_to_tCsparse, 3),
     CALLDEF(Csparse_to_tTsparse, 3),
-    CALLDEF(Csparse_to_dense, 1),
+    CALLDEF(Csparse_to_dense, 2),
     CALLDEF(Csparse_to_nz_pattern, 2),
-    CALLDEF(Csparse_to_matrix, 2),
+    CALLDEF(Csparse_to_matrix, 3),
     CALLDEF(Csparse_to_vector, 1),
     CALLDEF(Csparse_submatrix, 3),
     CALLDEF(dCsparse_subassign, 4),
@@ -67,7 +67,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(iCsparse_subassign, 4),
     CALLDEF(nCsparse_subassign, 4),
     CALLDEF(zCsparse_subassign, 4),
-    CALLDEF(Csparse_general_to_symmetric, 2),
+    CALLDEF(Csparse_general_to_symmetric, 3),
     CALLDEF(Csparse_symmetric_to_general, 1),
     CALLDEF(Csparse_transpose, 2),
     CALLDEF(Csparse_validate, 1),
@@ -246,6 +246,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(sparseQR_resid_fitted, 3),
     CALLDEF(triangularMatrix_validate, 1),
     CALLDEF(symmetricMatrix_validate, 1),
+    CALLDEF(R_symmetric_Dimnames, 1),
 
 /* still simple placeholders, but already used in ../R/AllClass.R : */
     CALLDEF(CHMfactor_validate, 1),

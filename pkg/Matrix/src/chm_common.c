@@ -96,6 +96,17 @@ SEXP CHM_set_common_env(SEXP rho) {
     return R_NilValue;
 }
 
+/* ./CHOLMOD/Include/cholmod_core.h says about  'int stype' entry of cholmod_sparse_struct:
+ *   ------------------------------
+ * 0:  matrix is "unsymmetric": use both upper and lower triangular parts
+ *     (the matrix may actually be symmetric in pattern and value, but
+ *     both parts are explicitly stored and used).  May be square or
+ *     rectangular.
+ * >0: matrix is square and symmetric, use upper triangular part.
+ *     Entries in the lower triangular part are ignored.
+ * <0: matrix is square and symmetric, use lower triangular part.
+ *     Entries in the upper triangular part are ignored.
+ */
 static int stype(int ctype, SEXP x)
 {
     if ((ctype % 3) == 1) return (*uplo_P(x) == 'U') ? 1 : -1;
@@ -403,6 +414,42 @@ SEXP chm_sparse_to_SEXP(CHM_SP a, int dofree, int uploT, int Rkind,
     return ans;
 }
 #undef DOFREE_MAYBE
+
+
+/**
+* Change the "type" of a cholmod_sparse matrix, i.e. modify it "in place"
+*
+* @param to_xtype requested xtype (pattern, real, complex, zomplex)
+* @param A sparse matrix to change
+* @param Common cholmod's common
+*
+* @return TRUE/FALSE , TRUE iff success
+*/
+Rboolean chm_MOD_xtype(int to_xtype, cholmod_sparse *A, CHM_CM Common) {
+//     *MOD*: shouting, as A is modified in place
+
+/* --------------------------------------------------------------------------
+ * cholmod_sparse_xtype: change the xtype of a sparse matrix
+ * --------------------------------------------------------------------------
+  int cholmod_sparse_xtype
+  (
+      // ---- input ----
+      int to_xtype,	//
+      // ---- in/out ---
+      cholmod_sparse *A, //
+      // ---------------
+      cholmod_common *Common
+  ) ;
+
+  int cholmod_l_sparse_xtype (int, cholmod_sparse *, cholmod_common *) ;
+*/
+    if((A->itype) == CHOLMOD_LONG) {
+	return (Rboolean) cholmod_l_sparse_xtype (to_xtype, A, Common);
+    } else {
+	return (Rboolean) cholmod_sparse_xtype   (to_xtype, A, Common);
+    }
+}
+
 
 /**
  * Populate ans with the pointers from x and modify its scalar

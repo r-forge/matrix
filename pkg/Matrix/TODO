@@ -7,6 +7,7 @@
 *** DONE consider analagous changes to base-R
 ** DONE m %*% M (crossprod, ..) with 0-dim. result give garbage
 ** DONE M[i,j] should *not* drop dimnames (R-forge bug 2556, see ~/R/MM/Pkg-ex/Matrix/dimnames-prod.R)
+** DONE "Math"/"Math2" *fail* entirely for sparseVectors
 ** TODO M[<sparse 2-column Matrix>] indexing should work (but with a warning: use *dense*!)
 ** TODO src/CHOLMOD/MatrixOps/cholmod_symmetry.c  is "cool" and fast;
 Definitely should use it for solve(<dgCMatrix>)  {it seems MATLAB does};
@@ -25,9 +26,10 @@ alternatively also is_sym() [in src/cs_utils.c], see below.
  level e.g. for solve(<dsyMatrix>).   Should define  expand() method or
  similar, see man/BunchKaufman-methods.Rd and R/dsyMatrix.R (at end).
 ** TODO src/cs_utils.c : I think is_sym() [only used in Matrix_cs_to_SEXP()] can be made sped up:
-leave the for loops, as soon as is_lower == is_upper == 0.
+ leave the for loops, as soon as is_lower == is_upper == 0.
 
-** DONE "Math"/"Math2" *fail* entirely for sparseVectors
+** TODO kronecker(<symmetric>, <symmetric>) should return symmetricMatrix, notably
+ when one of the arguments is diagonal
 * New smallish ideas, relatively urgent for MM -----------------------------
 ** DONE generalize new "indMatrix" class, to allow 0 repetitions
  of some samples, i.e., columns of all 0 s. It's mathematically more
@@ -42,7 +44,6 @@ leave the for loops, as soon as is_lower == is_upper == 0.
 ** TODO FIXME(2) and (3) in R/products.R: t(.Call(Csparse_dense_*))
 ** TODO cbind2() / rbind2() for sparseMatrices: dimnames propagation should
   happen in C, see  R/bind2.R and src/Csparse.c (Csparse_horzcat etc).
-
 ** TODO use  getOption("Matrix.quiet") in more places [--> less messages/warnings]
 ** TODO Check for DimNames propagation in coercion and other operations.
   Done for (%*%, crossprod, tcrossprod) -- but not systematically checked (tests/matprod.R)
@@ -57,7 +58,6 @@ leave the for loops, as soon as is_lower == is_upper == 0.
   'classed' argument.
    [done with dgeMatrix_matrix_mm();  not yet for other classes;
     and for _crossprod()]
-
 ** DONE Cache '@factors' components also from R, e.g., for "Tsparse.."
    via .set.factors()
 ** TODO chol() and Cholesky() caching unfinished: the *name* [Ss][Pp][Dd]Cholesky

@@ -87,11 +87,10 @@ assertError(new("dtrMatrix", Dim = 2:3,
 
 n <- 3:3
 assertError(new("dtCMatrix", Dim = c(n,n), diag = "U"))
-stopifnot(validObject(T <- new("dtTMatrix", Dim = c(n,n), diag = "U")),
-	  identical(as.mat(T), diag(n)),
-	  validObject(M <- new("dtCMatrix", Dim = c(n,n), diag = "U",
-			       p = rep.int(0:0, n+1)))
-	  )
+validObject(T <- new("dtTMatrix", Dim = c(n,n), diag = "U"))
+validObject(M <- new("dtCMatrix", Dim = c(n,n), diag = "U",
+		     p = rep.int(0:0, n+1)))
+stopifnot(identical(as.mat(T), diag(n)))
 
 set.seed(3) ; (p9 <- as(sample(9), "pMatrix"))
 ## Check that the correct error message is triggered
@@ -146,7 +145,7 @@ stopifnot(identical(grep("slot i is not.* increasing .*column$",
 m. <- mm
 m.@i <- c(mm@i, NA, NA, NA)
 m.@x <- c(mm@x, 10:12)
-stopifnot(validObject(m.))
+validObject(m.)
 m. # show() now works
 stopifnot(all(m. == mm), # in spite of
 	  length(m.@i) > length(mm@i),

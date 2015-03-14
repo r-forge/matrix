@@ -73,6 +73,7 @@ SEXP chm_dense_to_SEXP(CHM_DN a, int dofree, int Rkind, SEXP dn);
 SEXP chm_dense_to_matrix(CHM_DN a, int dofree, SEXP dn);
 SEXP chm_dense_to_vector(CHM_DN a, int dofree);
 
+Rboolean chm_MOD_xtype(int to_xtype, cholmod_sparse *A, CHM_CM Common);
 
 void chm_diagN2U(CHM_SP chx, int uploT, Rboolean do_realloc);
 
