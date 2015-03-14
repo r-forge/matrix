@@ -1,6 +1,5 @@
 #### Testing  cBind() & rBind()
 
-if(FALSE)### TODO: For R >= 3.2.0,  just use cbind(), rbind()
 if(getRversion() >= "3.2.0") {
     cBind <- base::cbind
     rBind <- base::rbind
@@ -21,25 +20,29 @@ M  <- Matrix(m)
 M1 <- Matrix(m1)
 M2 <- Matrix(m2)
 
-stopifnot(identical3(cBind ( M, 10*M),
+stopifnot(
+    identical3(cBind ( M, 10*M),
 		show(cbind2( M, 10*M)),
-	      Matrix(cbind ( m, 10*m))),
-	  identical3(cBind (M1, 100+M1),
-		show(cbind2(M1, 100+M1)),
-	      Matrix(cbind (m1, 100+m1))),
-	  identical3(cBind (M1, 10*M2),
-		show(cbind2(M1, 10*M2)),
-	      Matrix(cbind (m1, 10*m2))),
-	  identical3(cBind (M2, M1+M2),
-		show(cbind2(M2, M1+M2)),
-	      Matrix(cbind (m2, m1+m2)))
-	 ,
+	      Matrix(cbind ( m, 10*m)))
+   ,
+    identical3(cBind (M1, 100+M1),
+               show(cbind2(M1, 100+M1)),
+               Matrix(cbind (m1, 100+m1)))
+   ,
+    identical3(cBind (M1, 10*M2),
+               show(cbind2(M1, 10*M2)),
+               Matrix(cbind (m1, 10*m2)))
+   ,
+    identical3(cBind (M2, M1+M2),
+               show(cbind2(M2, M1+M2)),
+               Matrix(cbind (m2, m1+m2)))
+   ,
     identical(colnames(show(cBind(M1, MM = -1))),
 	      c(colnames(M1), "MM"))
-	 ,
+   ,
     Qidentical(show  (rBind(R1 = 10:11, M1)),
 	       Matrix(rbind(R1 = 10:11, m1)), strict=FALSE)
-	 , TRUE)
+  , TRUE)
 
 identical.or.eq <- function(x,y, tol=0, ...) {
     if(identical(x,y, ...))
@@ -181,13 +184,28 @@ D5 <- Diagonal(x = 10*(1:5))
 s42 <- Matrix(z42 <- cbind2(rep(0:1,4), rep(1:0,4)),
               sparse=TRUE)
 (C86 <- rBind(1, 0, D5.1, 0))
-stopifnot(TRUE
-	  ,isValid(D5.1, "dgCMatrix")
-	  ,isValid(print(rbind2(Matrix(1:10, 2,5), D5)),   "dgCMatrix")
-	  ,isValid(print(cbind2(Matrix(10:1, 5,2), D5.1)), "dgeMatrix")
-	  ,isValid(zz <- cbind2(z42, C86), "dgCMatrix")
-          ,identical(zz, cbind2(s42, C86))
-	  )
+stopifnotValid(D5.1, "dgCMatrix")
+stopifnotValid(print(rbind2(Matrix(1:10, 2,5), D5)),   "dgCMatrix")
+stopifnotValid(print(cbind2(Matrix(10:1, 5,2), D5.1)), "dgeMatrix")
+stopifnotValid(zz <- cbind2(z42, C86), "dgCMatrix")
+stopifnot(identical(zz, cbind2(s42, C86)))
+
+## Using "nMatrix"
+(m1 <- sparseMatrix(1:3, 1:3)) # ngCMatrix
+m2 <- sparseMatrix(1:3, 1:3, x = 1:3)
+stopifnotValid(c12 <- cbind(m1,m2), "dgCMatrix") # was "ngC.." because of cholmod_horzcat !
+stopifnotValid(c21 <- cbind(m2,m1), "dgCMatrix") #  ditto
+stopifnotValid(r12 <- rbind(m1,m2), "dgCMatrix") # was "ngC.." because of cholmod_vertcat !
+stopifnotValid(r21 <- rbind(m2,m1), "dgCMatrix") #  ditto
+d1 <- as(m1, "denseMatrix")
+d2 <- as(m2, "denseMatrix")
+stopifnotValid(cbind2(d2,d1), "dgeMatrix")
+stopifnotValid(cbind2(d1,d2), "dgeMatrix")## gave an error in Matrix 1.1-5
+stopifnotValid(rbind2(d2,d1), "dgeMatrix")
+stopifnotValid(rbind2(d1,d2), "dgeMatrix")## gave an error in Matrix 1.1-5
+
+
+
 
 options(op)
 showProc.time()
