@@ -138,14 +138,14 @@ isValid <- function(x, class) isTRUE(validObject(x, test=TRUE)) && is(x, class)
 ##' @title Stop if Not a Valid Object of Given Class
 ##' @param x any \R object
 ##' @param class character string specifying a class name
-##' @return the value of \code{\link{validObject}(x)}, i.e., \code{TRUE};
-##'   otherwise an error will have been signalled
+##' @return \emph{invisibly}, the value of \code{\link{validObject}(x)}, i.e.,
+##'   \code{TRUE}; otherwise an error will have been signalled
 ##' @author Martin Maechler, March 2015
 stopifnotValid <- function(x, class) {
     if(!is(x, class))
 	stop(sprintf("%s is not of class \"%s\"",
 		     deparse(substitute(x)), class), call. = FALSE)
-    validObject(x)
+    invisible(validObject(x))
 }
 
 ## Some (sparse) Lin.Alg. algorithms return 0 instead of NA, e.g.

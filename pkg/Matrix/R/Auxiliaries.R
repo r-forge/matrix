@@ -968,10 +968,9 @@ l2d_meth <- function(x) {
     else .M.kindC(clx)
 }
 
-.M.kindC <- function(clx) { ## 'clx': class() *or* classdefinition
+.M.kindC <- function(clx, ex = extends(clx)) { ## 'clx': class() *or* classdefinition
     if(is.character(clx))		# < speedup: get it once
-        clx <- getClassDef(clx)
-    ex <- extends(clx)
+	clx <- getClassDef(clx)
     if(any(ex == "sparseVector")) {
 	## must work for class *extending* "dsparseVector" ==> cannot use  (clx@className) !
 	if     (any(ex == "dsparseVector")) "d"
@@ -1116,8 +1115,6 @@ as_Csp2 <- function(x) {
     if(is(x, "triangularMatrix")) .Call(Csparse_diagU2N, x) else x
 }
 
-.gC2sym <- function(x, uplo) .Call(Csparse_general_to_symmetric, x, uplo)
-
 ## 'cl'   : class() *or* class definition of from
 as_gCsimpl2 <- function(from, cl = class(from))
     as(from, paste0(.M.kind(from, cl), "gCMatrix"))
@@ -1208,7 +1205,7 @@ try_as <- function(x, classes, tryAnyway = FALSE) {
 
 
 ## For *dense* matrices
-isTriMat <- function(object, upper = NA) {
+isTriMat <- function(object, upper = NA, ...) {
     ## pretest: is it square?
     d <- dim(object)
     if(d[1] != d[2]) return(FALSE)
@@ -1231,7 +1228,7 @@ isTriMat <- function(object, upper = NA) {
 }
 
 ## For Tsparse matrices:
-isTriT <- function(object, upper = NA) {
+isTriT <- function(object, upper = NA, ...) {
     ## pretest: is it square?
     d <- dim(object)
     if(d[1] != d[2]) return(FALSE)
@@ -1253,7 +1250,7 @@ isTriT <- function(object, upper = NA) {
 }
 
 ## For Csparse matrices
-isTriC <- function(object, upper = NA) {
+isTriC <- function(object, upper = NA, ...) {
     ## pretest: is it square?
     d <- dim(object)
     if(d[1] != d[2]) return(FALSE)

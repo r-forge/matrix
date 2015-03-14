@@ -257,7 +257,7 @@ SEXP dgeMatrix_setDiag(SEXP x, SEXP d)
     SEXP r_x = GET_SLOT(ret, Matrix_xSym);			\
     int l_d = LENGTH(d); Rboolean d_full = (l_d == nret);	\
     if (!d_full && l_d != 1)					\
-	error("replacement diagonal has wrong length")
+	error(_("replacement diagonal has wrong length"))
 
     geMatrix_setDiag_1;
     double *dv = REAL(d), *rv = REAL(r_x);
@@ -293,7 +293,7 @@ SEXP dgeMatrix_addDiag(SEXP x, SEXP d)
     double *dv = REAL(d), *rv = REAL(r_x);
     int l_d = LENGTH(d); Rboolean d_full = (l_d == nret);
     if (!d_full && l_d != 1)
-	error("diagonal to be added has wrong length");
+	error(_("diagonal to be added has wrong length"));
 
     if(d_full) for (int i = 0; i < nret; i++) rv[i * (m + 1)] += dv[i];
     else for (int i = 0; i < nret; i++)	      rv[i * (m + 1)] += *dv;

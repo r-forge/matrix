@@ -287,7 +287,7 @@ SEXP check_scalar_string(SEXP sP, char *vals, char *nm)
 Rboolean equal_string_vectors(SEXP s1, SEXP s2)
 {
     Rboolean n1 = isNull(s1), n2 = isNull(s2);
-    if (n1 || n2)
+    if (n1 || n2) // if one is NULL : "equal" if both are
 	return (n1 == n2) ? TRUE : FALSE;
     else if (TYPEOF(s1) != STRSXP || TYPEOF(s2) != STRSXP) {
 	error(_("'s1' and 's2' must be \"character\" vectors"));
@@ -414,7 +414,7 @@ SEXP d_packed_setDiag(double *diag, int l_d, SEXP x, int n)
 	r_x = GET_SLOT(ret, Matrix_xSym);		\
     Rboolean d_full = (l_d == n);			\
     if (!d_full && l_d != 1)				\
-	error("replacement diagonal has wrong length")
+	error(_("replacement diagonal has wrong length"))
 
 #define END_packed_setDiag						\
     int j, pos = 0;							\
@@ -938,46 +938,6 @@ SEXP m_encodeInd2(SEXP i, SEXP j, SEXP di, SEXP orig_1, SEXP chk_bnds)
 }
 #undef do_ii_FILL
 
-// fails, as R_SVN_REVISION is a string #if R_SVN_REVISION < 60943
-//__ no "if" so it *runs* in older R even if installed in R >= 2.15.2:
-//__ #if R_VERSION < R_Version(2, 15, 2)
-// it is *hidden* in earlier versions of R
-void copyListMatrix(SEXP s, SEXP t, Rboolean byrow)
-{
-    SEXP pt, tmp;
-    int i, j, nr, nc;
-    R_xlen_t ns;
-
-    nr = nrows(s);
-    nc = ncols(s);
-    ns = ((R_xlen_t) nr) * nc;
-    pt = t;
-    if(byrow) {
-	R_xlen_t NR = nr;
-	PROTECT(tmp = allocVector(STRSXP, ns));
-	for (i = 0; i < nr; i++)
-	    for (j = 0; j < nc; j++) {
-		SET_STRING_ELT(tmp, i + j * NR, duplicate(CAR(pt)));
-		pt = CDR(pt);
-		if(pt == R_NilValue) pt = t;
-	    }
-	for (i = 0; i < ns; i++) {
-	    SETCAR(s, STRING_ELT(tmp, i++));
-	    s = CDR(s);
-	}
-	UNPROTECT(1);
-    }
-    else {
-	for (i = 0; i < ns; i++) {
-	    SETCAR(s, duplicate(CAR(pt)));
-	    s = CDR(s);
-	    pt = CDR(pt);
-	    if(pt == R_NilValue) pt = t;
-	}
-    }
-}
-//__ #endif
-
 // Almost "Cut n Paste" from ...R../src/main/array.c  do_matrix() :
 // used in ../R/Matrix.R as
 //
@@ -1187,3 +1147,83 @@ SEXP R_any0(SEXP x) {
 
 #undef TRUE_
 #undef FALSE_
+
+/* FIXME: Compare and synchronize with MK_SYMMETRIC_DIMNAMES.. in ./dense.c
+ * -----  which *also* considers  names(dimnames(.)) !!
+*/
+
+/**
+ * Produce symmetric 'Dimnames' from possibly asymmetric ones.
+ *
+ * @param dn  list of length 2; typically 'Dimnames' slot of "symmetricMatrix"
+ */
+SEXP symmetric_DimNames(SEXP dn) {
+    Rboolean do_nm = FALSE;
+#define NON_TRIVIAL_DN					\
+  !isNull(VECTOR_ELT(dn, 0)) ||				\
+  !isNull(VECTOR_ELT(dn, 1)) ||				\
+ (do_nm = !isNull(getAttrib(dn, R_NamesSymbol)))
+
+#define SYMM_DIMNAMES							\
+	/* Fixup dimnames to be symmetric <==>				\
+	   symmetricDimnames() in ../R/symmetricMatrix.R */		\
+	PROTECT(dn = duplicate(dn));					\
+	if (isNull(VECTOR_ELT(dn,0)))					\
+	    SET_VECTOR_ELT(dn, 0, VECTOR_ELT(dn, 1));			\
+	if (isNull(VECTOR_ELT(dn,1)))					\
+	    SET_VECTOR_ELT(dn, 1, VECTOR_ELT(dn, 0));			\
+	if(do_nm) { /* names(dimnames(.)): */				\
+	    SEXP nms_dn = getAttrib(dn, R_NamesSymbol);			\
+	    if(!R_compute_identical(STRING_ELT(nms_dn, 0),		\
+				    STRING_ELT(nms_dn, 1), 16)) {	\
+		PROTECT(nms_dn);					\
+		int J = LENGTH(STRING_ELT(nms_dn, 0)) == 0; /* 0/1 */   \
+		SET_STRING_ELT(nms_dn, !J, STRING_ELT(nms_dn, J));	\
+		setAttrib(dn, R_NamesSymbol, nms_dn);			\
+		UNPROTECT(1);						\
+            }								\
+	}								\
+	UNPROTECT(1)
+
+    // Be fast (do nothing!) for the case where dimnames = list(NULL,NULL) :
+    if (NON_TRIVIAL_DN) {
+	SYMM_DIMNAMES;
+    }
+    return dn;
+}
+
+/**
+ * Even if the Dimnames slot is list(NULL, <names>) etc, return
+ * __symmetric__ dimnames: Get . @Dimnames and modify when needed.
+ *
+ * Called e.g., from symmetricDimnames() in ../R/symmetricMatrix.R
+ *
+ * @param from a symmetricMatrix
+ *
+ * @return symmetric dimnames: length-2 list twice the same, NULL or
+ * character vector (of correct length)
+ */
+SEXP R_symmetric_Dimnames(SEXP x) {
+    return symmetric_DimNames(GET_SLOT(x, Matrix_DimNamesSym));
+}
+
+
+/**
+ * Set 'Dimnames' slot of 'dest' from the one of 'src' when
+ * 'src' is a "symmetricMatrix" with possibly asymmetric dimnames,
+ * and 'dest' must contain corresponding symmetric dimnames.
+ *
+ * @param dest Matrix, typically *not* symmetric
+ * @param src  symmetricMatrix
+ */
+void SET_DimNames_symm(SEXP dest, SEXP src) {
+    SEXP dn = GET_SLOT(src, Matrix_DimNamesSym);
+    Rboolean do_nm = FALSE;
+    // Be fast (do nothing!) for the case where dimnames = list(NULL,NULL) :
+    if (NON_TRIVIAL_DN) {
+	SYMM_DIMNAMES;
+	SET_SLOT(dest, Matrix_DimNamesSym, dn);
+    }
+    return;
+}
+

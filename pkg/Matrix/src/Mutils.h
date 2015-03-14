@@ -139,9 +139,18 @@ extern	 /* stored pointers to symbols initialized in R_init_Matrix */
     if(R_has_slot(src, sym))					\
 	SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
 
-/* TODO: Make this faster for the case where dimnames = list(NULL,NULL)
- *       and hence don't have to be set ! */
-#define SET_DimNames(dest, src) slot_dup(dest, src, Matrix_DimNamesSym)
+static R_INLINE
+void SET_DimNames(SEXP dest, SEXP src) {
+    SEXP dn = GET_SLOT(src, Matrix_DimNamesSym);
+    // Be fast (do nothing!) for the case where dimnames = list(NULL,NULL) :
+    if (!(isNull(VECTOR_ELT(dn,0)) && isNull(VECTOR_ELT(dn,1))))
+	SET_SLOT(dest, Matrix_DimNamesSym, duplicate(dn));
+}
+
+// code in ./Mutils.c :
+SEXP symmetric_DimNames(SEXP dn);
+SEXP R_symmetric_Dimnames(SEXP x);
+void SET_DimNames_symm(SEXP dest, SEXP src);
 
 
 #define uplo_P(_x_) CHAR(STRING_ELT(GET_SLOT(_x_, Matrix_uploSym), 0))

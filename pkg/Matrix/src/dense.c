@@ -400,7 +400,7 @@ SEXP dense_to_symmetric(SEXP x, SEXP uplo, SEXP symm_test)
     }
     if(!isNull(nms_dns = getAttrib(dns, R_NamesSymbol)) &&
        !R_compute_identical(STRING_ELT(nms_dns, 0),
-			    STRING_ELT(nms_dns, 1), 15)) { // names(dimnames(.)) :
+			    STRING_ELT(nms_dns, 1), 16)) { // names(dimnames(.)) :
 	if(*CHAR(asChar(uplo)) == 'U')
 	    SET_STRING_ELT(nms_dns, 0, STRING_ELT(nms_dns,1));
 	else
@@ -442,6 +442,7 @@ SEXP ddense_symmpart(SEXP x)
 	    }
 	}
 
+// FIXME?: Compare and synchronize with symmetric_DimNames() in ./Mutils.c
 #       define MK_SYMMETRIC_DIMNAMES_AND_RETURN				\
 									\
 	dns = GET_SLOT(dx, Matrix_DimNamesSym);				\
@@ -452,10 +453,11 @@ SEXP ddense_symmpart(SEXP x)
 	    if(isNull(VECTOR_ELT(dns, J)))				\
 		J = !J;							\
 	    SET_VECTOR_ELT(dns, !J, VECTOR_ELT(dns, J));		\
-	} /* names(dimnames(.)):*/					\
+	}								\
+	/* names(dimnames(.)): */					\
 	if(!isNull(nms_dns = getAttrib(dns, R_NamesSymbol)) &&		\
 	   !R_compute_identical(STRING_ELT(nms_dns, 0),			\
-				STRING_ELT(nms_dns, 1), 15)) { 		\
+				STRING_ELT(nms_dns, 1), 16)) { 		\
 	    SET_STRING_ELT(nms_dns, !J, STRING_ELT(nms_dns, J));	\
 	    setAttrib(dns, R_NamesSymbol, nms_dns);			\
 	}								\
