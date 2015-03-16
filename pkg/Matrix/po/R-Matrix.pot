@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-6\n"
-"POT-Creation-Date: 2015-03-02 10:28\n"
+"POT-Creation-Date: 2015-03-16 09:31\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -410,6 +410,9 @@ msgid "for symmetric band matrix, only specify upper or lower triangle\n hence, 
 msgstr ""
 
 msgid "the %d-th (sub)-diagonal (k = %d) is too short; filling with NA's"
+msgstr ""
+
+msgid "resulting x-slot has different type than x's or y's"
 msgstr ""
 
 msgid "'A' must be a square matrix"

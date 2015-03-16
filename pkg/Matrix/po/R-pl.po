@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-2-2\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
-"POT-Creation-Date: 2015-01-17 15:31\n"
+"POT-Creation-Date: 2015-03-16 09:31\n"
 "PO-Revision-Date: 2014-03-27 14:47+0100\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
@@ -877,6 +877,9 @@ msgstr ""
 msgid "the %d-th (sub)-diagonal (k = %d) is too short; filling with NA's"
 msgstr ""
 "(pod)-diagonala %d (k = %d) jest zbyt krótkal wypełnianie wartościami NA"
+
+msgid "resulting x-slot has different type than x's or y's"
+msgstr ""
 
 # Matrix/R/condest.R: 74
 # stop("'A' must be a square matrix")
