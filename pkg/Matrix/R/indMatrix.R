@@ -127,9 +127,9 @@ setMethod("tcrossprod", signature(x = "Matrix", y = "indMatrix"),
 setMethod("tcrossprod", signature(x = "indMatrix", y = "indMatrix"),
 	  function(x, y) { mmultCheck(x,y, 3L); x[, y@perm] })
 
-
 setMethod("crossprod", signature(x = "indMatrix", y = "missing"),
-	  function(x, y=NULL) Diagonal(x=as.numeric(table(x@perm))))
+	  function(x, y=NULL) Diagonal(x = tabulate(x@perm, nbins=x@Dim[2L])))
+
 setMethod("tcrossprod", signature(x = "indMatrix", y = "missing"),
 	  function(x, y=NULL) x[,x@perm])
 

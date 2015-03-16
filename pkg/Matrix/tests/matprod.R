@@ -659,6 +659,9 @@ IM1 <- as(c(3,1,2), "indMatrix")
 IM2 <- as(c(1,2,1), "indMatrix")
 assert.EQ.Mat(crossprod(  IM1,   IM2),
               crossprod(d(IM1),d(IM2)), tol=0)# failed at first
+iM  <- as(cbind(IM2, 0), "indMatrix")
+stopifnot(identical3(crossprod(iM), # <- wrong for Matrix <= 1.1-5
+                     crossprod(iM, iM), Diagonal(x = 2:0)))
 
 set.seed(123)
 for(n in 1:250) {
