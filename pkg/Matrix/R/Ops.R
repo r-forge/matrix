@@ -1285,7 +1285,7 @@ setMethod("Compare", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 		  shape <- if(T) "t" else if(S) "s" else "g"
 	      }
 
-	      dn <- dimNamesCheck(e1, e2)
+	      dn <- dimNamesCheck(e1, e2) ## <- FIXME: for 'S'; allow staying
               ## the result object:
 	      newC <- sub("^.", "l", MatrixClass(class(e1)))
               ## FIXME: "n" result when e1 & e2 are "n", or even whenever possible

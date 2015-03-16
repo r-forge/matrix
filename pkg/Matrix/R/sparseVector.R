@@ -201,7 +201,7 @@ setAs("TsparseMatrix", "sparseVector",
 	      from <- as(from, "generalMatrix")
 	  else if(extends(cld, "triangularMatrix") && from@diag == "U")
 	      from <- .Call(Tsparse_diagU2N, from)
-	  if(is_duplicatedT(from, di = d))
+	  if(anyDuplicatedT(from, di = d))
 	      from <- uniqTsparse(from)
 	  ii <- if(n < .Machine$integer.max)
 	      1L + from@i + d[1] * from@j

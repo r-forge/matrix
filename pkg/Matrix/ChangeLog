@@ -1,3 +1,8 @@
+2015-03-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/Auxiliaries.R (anyDuplicatedT): renamed from is_duplicatedT(),
+	and exported.  uniqTsparse(): exported too.
+
 2014-06-15  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 1.1-4, released to CRAN

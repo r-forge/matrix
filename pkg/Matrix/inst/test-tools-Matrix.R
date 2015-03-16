@@ -20,16 +20,17 @@ asD <- function(m) { ## as "Dense"
 ## "normal" sparse Matrix: Csparse, no diag="U"
 asCsp <- function(x) Matrix:::diagU2N(as(x, "CsparseMatrix"))
 
+##' @title quasi-identical dimnames
 Qidentical.DN <- function(dx, dy) {
-    ## quasi-identical dimnames
+
     stopifnot(is.list(dx) || is.null(dx),
 	      is.list(dy) || is.null(dy))
     ## "empty"
     (is.null.DN(dx) && is.null.DN(dy)) || identical(dx, dy)
 }
 
+##' quasi-identical()  for 'Matrix' matrices
 Qidentical <- function(x,y, strictClass = TRUE) {
-    ## quasi-identical - for 'Matrix' matrices
     if(class(x) != class(y)) {
         if(strictClass || !is(x, class(y)))
            return(FALSE)
@@ -38,7 +39,9 @@ Qidentical <- function(x,y, strictClass = TRUE) {
     slts <- slotNames(x)
     if("Dimnames" %in% slts) { ## always (or we have no 'Matrix')
 	slts <- slts[slts != "Dimnames"]
-	if(!(Qidentical.DN(x@Dimnames, y@Dimnames)))
+	if(!Qidentical.DN(x@Dimnames, y@Dimnames) &&
+	   ## allow for "completion" of (NULL, <names>) dimnames of symmetricMatrix:
+	   !Qidentical.DN(dimnames(x), dimnames(y)))
 	    return(FALSE)
     }
     if("factors" %in% slts) { ## allow one empty and one non-empty 'factors'
@@ -498,7 +501,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	n0m <- drop0(m) #==> n0m is Csparse
 	has0 <- !Qidentical(n0m, as(m,"CsparseMatrix"))
 	if(!isInd && !isRsp &&
-           !(extends(cld, "TsparseMatrix") && Matrix:::is_duplicatedT(m, di = d)))
+           !(extends(cld, "TsparseMatrix") && anyDuplicatedT(m, di = d)))
                                         # 'diag<-' is does not change attrib:
 	    stopifnot(Qidentical(m, m.d))# e.g., @factors may differ
     }
@@ -595,7 +598,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	else if(extends(cld, "lMatrix")) { ## should fulfill even with NA:
 	    stopifnot(all(m | !m | ina), !any(!m & m & !ina))
 	    if(extends(cld, "TsparseMatrix")) # allow modify, since at end here
-		m <- Matrix:::uniqTsparse(m, clNam)
+		m <- uniqTsparse(m, clNam)
 	    stopifnot(identical(m, m & TRUE),
 		      identical(m, FALSE | m))
 	    ## also check the  coercions to [dln]Matrix

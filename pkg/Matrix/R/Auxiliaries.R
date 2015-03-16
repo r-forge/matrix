@@ -730,22 +730,12 @@ uniqTsparse <- function(x, class.x = c(class(x))) {
     ## and as() are based on C code  (all of them?)
     ##
     ## FIXME: Do it fast for the case where 'x' is already 'uniq'
-
-    switch(class.x,
-	   "dgTMatrix" = as(as(x, "dgCMatrix"), "dgTMatrix"),
-	   "dsTMatrix" = as(as(x, "dsCMatrix"), "dsTMatrix"),
-	   "dtTMatrix" = as(as(x, "dtCMatrix"), "dtTMatrix"),
-	   ## do we need this for "logical" ones, there's no sum() there!
-	   "lgTMatrix" = as(as(x, "lgCMatrix"), "lgTMatrix"),
-	   "lsTMatrix" = as(as(x, "lsCMatrix"), "lsTMatrix"),
-	   "ltTMatrix" = as(as(x, "ltCMatrix"), "ltTMatrix"),
-	   ## do we need this for "logical" ones, there's no sum() there!
-	   "ngTMatrix" = as(as(x, "ngCMatrix"), "ngTMatrix"),
-	   "nsTMatrix" = as(as(x, "nsCMatrix"), "nsTMatrix"),
-	   "ntTMatrix" = as(as(x, "ntCMatrix"), "ntTMatrix"),
-	   ## otherwise:
-	   stop(gettextf("not yet implemented for class %s", dQuote(class.x)),
-		domain = NA))
+    if(extends(class.x, "TsparseMatrix")) {
+	tri <- extends(class.x, "triangularMatrix")
+	.Call(Csparse_to_Tsparse, .Call(Tsparse_to_Csparse, x, tri), tri)
+    } else
+	stop(gettextf("not yet implemented for class %s", dQuote(class.x)),
+	     domain = NA)
 }
 
 ## Note: maybe, using
@@ -753,12 +743,10 @@ uniqTsparse <- function(x, class.x = c(class(x))) {
 ## would be slightly more efficient than as( <dgC> , "dgTMatrix")
 ## but really efficient would be to use only one .Call(.) for uniq(.) !
 
-## Earlier was:
-## drop0 <- function(x, clx = c(class(x)), tol = 0) {
 drop0 <- function(x, tol = 0, is.Csparse = NA) {
     .Call(Csparse_drop,
-	  if(isTRUE(is.Csparse) || is.na(is.Csparse) && is(x, "CsparseMatrix")) x else
-          as(x, "CsparseMatrix"),
+	  if(isTRUE(is.Csparse) || is.na(is.Csparse) && is(x, "CsparseMatrix"))
+	      x else as(x, "CsparseMatrix"),
 	  tol)
 }
 
@@ -773,10 +761,11 @@ asTuniq <- function(x) {
 
 ## is 'x' a uniq Tsparse Matrix ?
 is_not_uniqT <- function(x, di = dim(x))
-    is.unsorted(x@j) || anyDuplicated(.Call(m_encodeInd2, x@i, x@j, di, FALSE, FALSE))
+    is.unsorted(x@j) || anyDuplicatedT(x, di)
 
 ## is 'x' a TsparseMatrix with duplicated entries (to be *added* for uniq):
-is_duplicatedT <- function(x, di = dim(x))
+is_duplicatedT <- # <- keep old name for a while, as ../inst/test-tools-Matrix.R has used it
+anyDuplicatedT <- function(x, di = dim(x))
     anyDuplicated(.Call(m_encodeInd2, x@i, x@j, di, FALSE, FALSE))
 
 
