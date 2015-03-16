@@ -10,11 +10,11 @@
 # QC: PASS
 # Freezing on 28-FEB-2015 for R-3.1.3
 # Freezing on 31-MAR-2015 for R-3.2.0
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-3\n"
-"POT-Creation-Date: 2015-01-17 15:31\n"
+"POT-Creation-Date: 2015-03-16 09:31\n"
 "PO-Revision-Date: 2015-02-28 17:06-0600\n"
 "Last-Translator:Chel Hee Lee  <chl948@mail.usask.ca>\n"
 "Language-Team: Chel Hee Lee  <chl948@mail.usask.ca>\n"
@@ -42,10 +42,13 @@ msgstr ""
 " ->> 이 기능에 대한 구현을 패키지 관리자에게 문의해 주시길 바랍니다."
 
 msgid "'x' is not positive definite -- chol() undefined."
-msgstr "'x'는 양정치(positive definite) 행렬이 아니므로 chol()가 정의되어지지 않습니다."
+msgstr ""
+"'x'는 양정치(positive definite) 행렬이 아니므로 chol()가 정의되어지지 않습니"
+"다."
 
 msgid "Matrices must have same dimensions in %s"
-msgstr "%s에 입력된 행렬들은 반드시 같은 차원(dimensions)을 가지고 있어야 합니다."
+msgstr ""
+"%s에 입력된 행렬들은 반드시 같은 차원(dimensions)을 가지고 있어야 합니다."
 
 msgid "non-conformable matrix dimensions in %s"
 msgstr "%s에 입력된 행렬의 차원이 정합(conformable)하지 않습니다."
@@ -78,7 +81,9 @@ msgid "not a triangular matrix"
 msgstr "삼각행렬(triangular matrix)가 아닙니다."
 
 msgid "not a symmetric matrix; consider forceSymmetric() or symmpart()"
-msgstr "대칭행렬(symmetric matrix)가 아닙니다.  forceSymmtric() 또는 symmpart() 함수의 사용을 고려해 보시길 바랍니다."
+msgstr ""
+"대칭행렬(symmetric matrix)가 아닙니다.  forceSymmtric() 또는 symmpart() 함수"
+"의 사용을 고려해 보시길 바랍니다."
 
 msgid "not yet implemented for matrix with typeof %s"
 msgstr "저장방식(typeof) %s를 가지는 행렬의 경우에는 아직 구현되지 않았습니다."
@@ -96,20 +101,26 @@ msgstr ""
 "이차행렬(quadratic matrix) '%s' (=: A)는 형식적으로\n"
 "\t대칭(symmetric)이 아닙니다.  \tA A'와 같이 다루겠나요?"
 
-msgid "'update' must be logical or '+' or '-'; 'C' a matrix, and 'L' a \"CHMfactor\""
-msgstr "'update'는 반드시 논리형(logical) 또는 '+' 또는 '-'이어야 하며, 'C'는 행렬이어야 하고 'L'은 \"CHMfactor\"이어야 합니다."
+msgid ""
+"'update' must be logical or '+' or '-'; 'C' a matrix, and 'L' a \"CHMfactor\""
+msgstr ""
+"'update'는 반드시 논리형(logical) 또는 '+' 또는 '-'이어야 하며, 'C'는 행렬이"
+"어야 하고 'L'은 \"CHMfactor\"이어야 합니다."
 
 msgid "update must be TRUE/FALSE or '+' or '-'"
 msgstr "update는 반드시 TRUE/FALSE 또는 '+' 또는 '-'이어야 합니다."
 
 msgid "Matrix-internal error in <CsparseM>[i,,d]; please report"
-msgstr "<CsparseM>[i,,d]에서 Matrix-내부오류(internal error)가 발생한 경우입니다. 이를 보고해 주시길 부탁드립니다."
+msgstr ""
+"<CsparseM>[i,,d]에서 Matrix-내부오류(internal error)가 발생한 경우입니다. 이"
+"를 보고해 주시길 부탁드립니다."
 
 msgid "nothing to replace with"
 msgstr "교체(replace)해야 할 것이 아무것도 없습니다."
 
 msgid "number of items to replace is not a multiple of replacement length"
-msgstr "교체(replace)할 항목의 개수가 입력된 value가 가지는 길이의 배수가 아닙니다."
+msgstr ""
+"교체(replace)할 항목의 개수가 입력된 value가 가지는 길이의 배수가 아닙니다."
 
 msgid "too many replacement values"
 msgstr "교체에 이용될 값이 너무 많이 입력되었습니다."
@@ -127,14 +138,19 @@ msgstr ""
 "using\"old code\" part in Csparse subassignment\n"
 " >>> Matrix-authors@r-project.org으로 이를 보고해 주시길 바랍니다."
 
-msgid "Cholesky(<nsparse...>) -> *symbolic* factorization -- not yet implemented"
-msgstr "Cholesky(<nsparse...>) -> *symbolic* factorization -- 아직 구현되지 않았습니다."
+msgid ""
+"Cholesky(<nsparse...>) -> *symbolic* factorization -- not yet implemented"
+msgstr ""
+"Cholesky(<nsparse...>) -> *symbolic* factorization -- 아직 구현되지 않았습니"
+"다."
 
 msgid "Not a valid format"
 msgstr "올바른 형식(format)이 아닙니다."
 
 msgid "'file' must be a character string or connection"
-msgstr "'file'은 반드시 문자열(character string) 또는 커넥션(connection)이어야 합니다."
+msgstr ""
+"'file'은 반드시 문자열(character string) 또는 커넥션(connection)이어야 합니"
+"다."
 
 msgid "Invalid storage type: %s"
 msgstr "저장유형 %s은 사용할 수 없습니다."
@@ -207,7 +223,9 @@ msgstr ""
 "dimnames(.) <- list(NULL,NULL)  <==>  unname(.)"
 
 msgid "'nrow', 'ncol', etc, are disregarded when 'data' is \"Matrix\" already"
-msgstr "'data'가 이미 \"Matrix\"인 경우에는 입력된 'nrow', 'ncol' 등은 사용되지 않습니다."
+msgstr ""
+"'data'가 이미 \"Matrix\"인 경우에는 입력된 'nrow', 'ncol' 등은 사용되지 않습"
+"니다."
 
 msgid "invalid 'data'"
 msgstr "입력된 'data'는 올바르지 않습니다."
@@ -216,29 +234,38 @@ msgid "'nrow', 'ncol', etc, are disregarded for matrix 'data'"
 msgstr "행렬 'data'인 경우에 입력된 'nrow', 'ncol' 등은 사용되지 않습니다."
 
 msgid "complex matrices not yet implemented in Matrix package"
-msgstr "복소수형(complex) 행렬을 다루는 경우는 아직 Matrix 패키지내에서는 아직 구현되지 않았습니다."
+msgstr ""
+"복소수형(complex) 행렬을 다루는 경우는 아직 Matrix 패키지내에서는 아직 구현되"
+"지 않았습니다."
 
 msgid "using slow kronecker() method"
 msgstr ""
 
 msgid ""
 "Cholesky(A) called for 'A' of class \"%s\";\n"
-"\t it is currently defined for sparseMatrix only; consider using chol() instead"
+"\t it is currently defined for sparseMatrix only; consider using chol() "
+"instead"
 msgstr ""
 "Cholesky(A)는 클래스 \"%s\"를 가지는 'A'를 호출합니다.\n"
-"\t 이것은 현재 sparseMatrix 만을 위하여 정의되었으므로 chol()을 사용하시길 바랍니다."
+"\t 이것은 현재 sparseMatrix 만을 위하여 정의되었으므로 chol()을 사용하시길 바"
+"랍니다."
 
 msgid "'lag' and 'differences' must be integers >= 1"
 msgstr "'lag'과 'differences'는 반드시 1보다 크거나 같은 정수이어야 합니다."
 
 msgid "invalid or not-yet-implemented 'Matrix' subsetting"
-msgstr "올바르지 않거나 아직 구현되지 않은 'Matrix' 부분추출(subsetting)입니다."
+msgstr ""
+"올바르지 않거나 아직 구현되지 않은 'Matrix' 부분추출(subsetting)입니다."
 
 msgid "<sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient"
-msgstr "<sparse>[ <logic> ] : .M.sub.i.logical()의 사용은 비효율적(inefficient) 일 수 있습니다."
+msgstr ""
+"<sparse>[ <logic> ] : .M.sub.i.logical()의 사용은 비효율적(inefficient) 일 "
+"수 있습니다."
 
-msgid "nargs() = %d.  Extraneous illegal arguments inside '[ .. ]' (i.logical)?"
-msgstr "nargs() = %d.  필요이상의 인자들이 '[ .. ]' (i.logical)에 이용되었나요?"
+msgid ""
+"nargs() = %d.  Extraneous illegal arguments inside '[ .. ]' (i.logical)?"
+msgstr ""
+"nargs() = %d.  필요이상의 인자들이 '[ .. ]' (i.logical)에 이용되었나요?"
 
 msgid "m[ <ij-matrix> ]: inefficiently indexing single elements"
 msgstr ""
@@ -250,17 +277,21 @@ msgid ""
 ".M.sub.i.2col(): 'i' has no integer column number;\n"
 " should never happen; please report"
 msgstr ""
-".M.sub.i.2col(): 'i'는 정수형 행번호(integer column number)를 가지고 있지 않습니다.\n"
+".M.sub.i.2col(): 'i'는 정수형 행번호(integer column number)를 가지고 있지 않"
+"습니다.\n"
 " 이런 경우는 존재할 수 없으므로 패키지 관리자에게 보고해 주시길 부탁드립니다."
 
 msgid "such indexing must be by logical or 2-column numeric matrix"
-msgstr "이와 같은 유형의 인덱싱(indexing)은 반드시 논리형(logical) 또는 2개의 열로 구성된 수치형(numeric) 행렬에 의해서만 이루어져야 합니다."
+msgstr ""
+"이와 같은 유형의 인덱싱(indexing)은 반드시 논리형(logical) 또는 2개의 열로 구"
+"성된 수치형(numeric) 행렬에 의해서만 이루어져야 합니다."
 
 msgid ""
 ".M.repl.i.2col(): 'i' has no integer column number;\n"
 " should never happen; please report"
 msgstr ""
-".M.repl.i.2col(): 'i'는 정수형 행번호(integer column number)을 가지고 있지 않습니다.\n"
+".M.repl.i.2col(): 'i'는 정수형 행번호(integer column number)을 가지고 있지 않"
+"습니다.\n"
 " 이런 경우는 존재할 수 없으므로 패키지 관리자에게 보고해 주시길 부탁드립니다."
 
 msgid ".M.repl.i.2col(): drop 'matrix' case ..."
@@ -284,7 +315,7 @@ msgstr ""
 msgid "not-yet-implemented 'Matrix[<-' method"
 msgstr "아직 구현되지 않은 'Matrix[<-' 메소드(method)입니다."
 
-## from this part (wired)
+# # from this part (wired)
 msgid "inefficient method used for \"- e1\""
 msgstr ""
 
@@ -298,7 +329,9 @@ msgid "Cmp.Mat.atomic() should not be called for diagonalMatrix"
 msgstr "Cmp.Mat.atomic()은 digonalMatrix에 의하여 호출될 수 없습니다."
 
 msgid "Matrices must have same number of rows for arithmetic"
-msgstr "구성요소단위의 사칙연산을 위하여 입력된 행렬들은 반드시 같은 수의 행의 개수를 가지고 있어야 합니다."
+msgstr ""
+"구성요소단위의 사칙연산을 위하여 입력된 행렬들은 반드시 같은 수의 행의 개수"
+"를 가지고 있어야 합니다."
 
 msgid "number of rows are not compatible for %s"
 msgstr "%s의 경우에 행의 개수가 올바르지 않습니다."
@@ -310,7 +343,9 @@ msgid "length of 1st arg does not match dimension of 2nd"
 msgstr "첫번째 인자(arg)의 길이는 두번째 인자의 Dim의 값과 다릅니다."
 
 msgid "internal bug in \"Logic\" method (Logic.Mat.atomic); please report"
-msgstr "메소드 \"Logic\" (Logic.Mat.atomic) 내부에서 버그가 발생되었습니다.  이를 보고해 주시기를 부탁드립니다."
+msgstr ""
+"메소드 \"Logic\" (Logic.Mat.atomic) 내부에서 버그가 발생되었습니다.  이를 보"
+"고해 주시기를 부탁드립니다."
 
 msgid "Logic.Mat.atomic() should not be called for diagonalMatrix"
 msgstr "Logic.Mat.atomic()은 diagonalMatrix인 경우에 사용될 수 없습니다."
@@ -380,13 +415,15 @@ msgstr ""
 msgid "internal bug: matrix 'i' in replTmat(): please report"
 msgstr ""
 
-msgid "x[.] <- val: x is %s, val not in {TRUE, FALSE} is coerced; NA |--> TRUE."
+msgid ""
+"x[.] <- val: x is %s, val not in {TRUE, FALSE} is coerced; NA |--> TRUE."
 msgstr ""
 
 msgid "x[.] <- val: x is %s, val not in {TRUE, FALSE} is coerced."
 msgstr ""
 
-msgid "x[.,.] <- val: x is %s, val not in {TRUE, FALSE} is coerced NA |--> TRUE."
+msgid ""
+"x[.,.] <- val: x is %s, val not in {TRUE, FALSE} is coerced NA |--> TRUE."
 msgstr ""
 
 msgid "x[.,.] <- val: x is %s, val not in {TRUE, FALSE} is coerced."
@@ -465,6 +502,9 @@ msgstr ""
 msgid "the %d-th (sub)-diagonal (k = %d) is too short; filling with NA's"
 msgstr ""
 
+msgid "resulting x-slot has different type than x's or y's"
+msgstr ""
+
 msgid "'A' must be a square matrix"
 msgstr "'A'는 반드시 정방행렬(square matrix)이어야 합니다."
 
@@ -504,7 +544,8 @@ msgstr ""
 msgid "invalid nargs()= %d"
 msgstr ""
 
-msgid "LU computationally singular: ratio of extreme entries in |diag(U)| = %9.4g"
+msgid ""
+"LU computationally singular: ratio of extreme entries in |diag(U)| = %9.4g"
 msgstr ""
 
 msgid "RHS 'b' has wrong number of rows:"
@@ -537,7 +578,8 @@ msgstr ""
 msgid "non-square matrix"
 msgstr ""
 
-msgid "matrix with non-zero off-diagonals cannot be coerced to \"diagonalMatrix\""
+msgid ""
+"matrix with non-zero off-diagonals cannot be coerced to \"diagonalMatrix\""
 msgstr ""
 
 msgid "matrix is not diagonal"
@@ -564,7 +606,9 @@ msgstr ""
 msgid "not a positive definite matrix"
 msgstr ""
 
-msgid "as(.,\"dsCMatrix\") is deprecated (since 2008); do use as(., \"symmetricMatrix\")"
+msgid ""
+"as(.,\"dsCMatrix\") is deprecated (since 2008); do use as(., "
+"\"symmetricMatrix\")"
 msgstr ""
 
 msgid "inefficient coercion (lost triangularity); please report"
@@ -575,7 +619,8 @@ msgstr ""
 
 msgid ""
 "coercion from list(i1,...,ik, d) to \"indMatrix\" failed.\n"
-" All entries must be integer valued and the number of columns, d, not smaller\n"
+" All entries must be integer valued and the number of columns, d, not "
+"smaller\n"
 " than the maximal index i*."
 msgstr ""
 
@@ -642,7 +687,9 @@ msgid "variable '%s' is absent, its contrast will be ignored"
 msgstr ""
 
 msgid "only 2-dimensional tables can be directly coerced to sparse matrices"
-msgstr "오로지 2차원 테이블만이 희소행렬(sparse matrice)로 강제변환(coerced)될 수 있습니다."
+msgstr ""
+"오로지 2차원 테이블만이 희소행렬(sparse matrice)로 강제변환(coerced)될 수 있"
+"습니다."
 
 msgid "exactly one of 'i', 'j', or 'p' must be missing from call"
 msgstr ""
@@ -683,7 +730,9 @@ msgstr "'V'는 정방행렬(square matrix)가 아닙니다."
 msgid "number of non zeros is smaller than 'nnz' because of duplicated (i,j)s"
 msgstr ""
 
-msgid "qr.R(<sparse>) may differ from qr.R(<dense>) because of permutations.  Possibly use our qrR() instead"
+msgid ""
+"qr.R(<sparse>) may differ from qr.R(<dense>) because of permutations.  "
+"Possibly use our qrR() instead"
 msgstr ""
 
 msgid "cannot coerce 'NA's to \"nsparseVector\""
@@ -702,10 +751,12 @@ msgid "Must specify 'nrow' when 'symmetric' is true"
 msgstr "'symmetric'이 참인 경우에는 반드시 'nrow'를 지정해 주어야 합니다."
 
 msgid "'nrow' and 'ncol' must be the same when 'symmetric' is true"
-msgstr "'symmetric'이 참인 경우에는 반드시 'nrow'와 'ncol'을 지정해 주어야 합니다."
+msgstr ""
+"'symmetric'이 참인 경우에는 반드시 'nrow'와 'ncol'을 지정해 주어야 합니다."
 
 msgid "'x' must have length nrow^2 when 'symmetric' is true"
-msgstr "'symmetric'이 참인 경우에는 'x'의 길이는 반드시 nrow^2와 같아야 합니다."
+msgstr ""
+"'symmetric'이 참인 경우에는 'x'의 길이는 반드시 nrow^2와 같아야 합니다."
 
 msgid "'ncol' is not a factor of length(x)"
 msgstr "'ncol'는 길이가 length(x)인 요인(factor)가 아닙니다."
@@ -716,7 +767,8 @@ msgstr "'nrow'는 길이가 length(x)인 요인(factor)가 아닙니다."
 msgid "Class %s is not yet implemented"
 msgstr "클래스 %s는 아직 구현되지 않았습니다."
 
-msgid "index must be numeric, logical or sparseVector for indexing sparseVectors"
+msgid ""
+"index must be numeric, logical or sparseVector for indexing sparseVectors"
 msgstr ""
 
 msgid "'times >= 0' is required"
