@@ -340,7 +340,7 @@ replTmat <- function (x, i, j, ..., value)
 	}
 	nr <- di[1]
 	x.i <- .Call(m_encodeInd2, x@i, x@j, di=di, FALSE, FALSE)
-	if(anyDuplicated(x.i)) { ## == if(is_duplicatedT(x, di = di))
+	if(anyDuplicated(x.i)) { ## == if(anyDuplicatedT(x, di = di))
 	    x <- uniqTsparse(x)
 	    x.i <- .Call(m_encodeInd2, x@i, x@j, di=di, FALSE, FALSE)
 	}
@@ -487,7 +487,7 @@ replTmat <- function (x, i, j, ..., value)
     clDx <- getClassDef(clx) # extends() , is() etc all use the class definition
     stopifnot(extends(clDx, "TsparseMatrix"))
     ## Tmatrix maybe non-unique, have an entry split into a sum of several ones:
-    if(is_duplicatedT(x, di = di))
+    if(anyDuplicatedT(x, di = di))
 	x <- uniqTsparse(x)
 
     toGeneral <- r.sym <- FALSE
@@ -731,7 +731,7 @@ replTmat <- function (x, i, j, ..., value)
     if(any(i2 > nc)) stop(gettextf("column indices must be <= ncol(.) which is %d", nc), domain=NA)
 
     ## Tmatrix maybe non-unique, have an entry split into a sum of several ones:
-    if(is_duplicatedT(x, di = di))
+    if(anyDuplicatedT(x, di = di))
 	x <- uniqTsparse(x)
 
     toGeneral <- FALSE

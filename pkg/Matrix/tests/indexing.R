@@ -574,8 +574,8 @@ stopifnot(diag(tr1) == 100)# failed when 'diag<-' did not recycle
 assert.EQ.mat(m2[1:3,],    diag(5)[1:3,])
 assert.EQ.mat(m2[,c(4,1)], diag(5)[,c(4,1)])
 stopifnot(identical(m2[1:3,], as(m1[1:3,], "CsparseMatrix")),
-          identical(Matrix:::uniqTsparse(m1[, c(4,2)]),
-                    Matrix:::uniqTsparse(as(m2[, c(4,2)], "TsparseMatrix")))
+          identical(uniqTsparse(m1[, c(4,2)]),
+                    uniqTsparse(as(m2[, c(4,2)], "TsparseMatrix")))
           )## failed in 0.9975-11
 
 (uTr <- new("dtTMatrix", Dim = c(3L,3L), diag="U"))
