@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.1.2 / matrix 1.1-5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-16 09:31+0100\n"
+"POT-Creation-Date: 2015-03-17 09:46+0100\n"
 "PO-Revision-Date: 2015-01-30 12:02+0100\n"
 "Last-Translator: Detlef Steuer <detlef.steuer@gmx.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
@@ -281,52 +281,52 @@ msgstr "unerwartetes ctype = %d in dup_mMatrix_as_geMatrix"
 msgid "invalid class '%s' to dup_mMatrix_as_dgeMatrix"
 msgstr "ungültige Klasse '%s' für dup_mMatrix_as_dgeMatrix"
 
-#: Mutils.c:876
+#: Mutils.c:857
 msgid "Argument ij must be 2-column integer matrix"
 msgstr "Argument ij muss eine zweispaltige Ganzzahlmatrix sein"
 
-#: Mutils.c:895
+#: Mutils.c:876
 msgid "subscript 'i' out of bounds in M[ij]"
 msgstr "Subskript 'i' außerhalb des Bereichs in M[ij]"
 
-#: Mutils.c:897
+#: Mutils.c:878
 msgid "subscript 'j' out of bounds in M[ij]"
 msgstr "Subskript 'j' außerhalb des Bereichs in M[ij]"
 
-#: Mutils.c:941
+#: Mutils.c:922
 msgid "i and j must be integer vectors of the same length"
 msgstr "i und j müssen Ganzzahlvektoren mit der gleichen Länge sein"
 
-#: Mutils.c:986
+#: Mutils.c:967
 msgid "'data' must be of a vector type"
 msgstr "'data' muss ein Vektortyp sein"
 
-#: Mutils.c:993
+#: Mutils.c:974
 #, c-format
 msgid "invalid '%s' argument"
 msgstr "ungültiges '%s' Argument"
 
-#: Mutils.c:1000 Mutils.c:1008
+#: Mutils.c:981 Mutils.c:989
 msgid "non-numeric matrix extent"
 msgstr "nicht-numerische Matrix Ausdehnung"
 
-#: Mutils.c:1003
+#: Mutils.c:984
 msgid "invalid 'nrow' value (too large or NA)"
 msgstr "unzulässiger Wert für 'nrow' (zu groß oder NA)"
 
-#: Mutils.c:1005
+#: Mutils.c:986
 msgid "invalid 'nrow' value (< 0)"
 msgstr "unzulässiger Wert für 'nrow' (< 0)"
 
-#: Mutils.c:1011
+#: Mutils.c:992
 msgid "invalid 'ncol' value (too large or NA)"
 msgstr "unzulässiger Wert für 'ncol' (zu groß oder NA)<"
 
-#: Mutils.c:1013
+#: Mutils.c:994
 msgid "invalid 'ncol' value (< 0)"
 msgstr "unzulässiger Wert für 'ncol' (< 0)<"
 
-#: Mutils.c:1031
+#: Mutils.c:1012
 #, c-format
 msgid ""
 "data length [%d] is not a sub-multiple or multiple of the number of rows [%d]"
@@ -334,7 +334,7 @@ msgstr ""
 "Datenlänge [%d] ist kein Teilvielfaches oder Vielfaches der Zahl der\n"
 "Zeilen [%d]"
 
-#: Mutils.c:1034
+#: Mutils.c:1015
 #, c-format
 msgid ""
 "data length [%d] is not a sub-multiple or multiple of the number of columns "
@@ -343,15 +343,15 @@ msgstr ""
 "Datenlänge [%d] ist kein Teilvielfaches oder Vielfaches der Zahl der\n"
 "Spalten [%d]<"
 
-#: Mutils.c:1037
+#: Mutils.c:1018
 msgid "data length exceeds size of matrix"
 msgstr "Datenlänge überschreitet Größe der Matrix"
 
-#: Mutils.c:1043
+#: Mutils.c:1024
 msgid "too many elements specified"
 msgstr "zu viele Elemente angegeben"
 
-#: Mutils.c:1130 Mutils.c:1163
+#: Mutils.c:1111 Mutils.c:1144
 msgid "Argument must be numeric-like atomic vector"
 msgstr "Argument muss zahl-ähnlich atomar sein"
 
@@ -737,7 +737,7 @@ msgstr "cholmod_sdmult-Fehler (resid)"
 msgid "lengths of slots i and x must match"
 msgstr "Längen der Slots i und x müssen zusammen passen"
 
-#: dgTMatrix.c:56
+#: dgTMatrix.c:62
 #, c-format
 msgid "Cannot coerce to too large *geMatrix with %.0f entries"
 msgstr "Kann nicht in eine große *geMatrix mit %.0f Einträgen umwandeln"
