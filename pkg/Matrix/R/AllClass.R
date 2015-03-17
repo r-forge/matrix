@@ -540,12 +540,12 @@ setClass("isRMatrix",
 setClass("indMatrix", representation(perm = "integer"),
 	 contains = c("sparseMatrix", "generalMatrix"),
 	 validity = function(object) {
-	     n <-  object@Dim[1]
-	     d <-  object@Dim[2]
+	     n <- object@Dim[1]
+	     d <- object@Dim[2]
 	     perm <- object@perm
 	     if (length(perm) != n)
 		 return(paste("length of 'perm' slot must be", n))
-	     if(n > 0 && (any(perm > d) | any(perm < 1)))
+	     if(n > 0 && (any(perm > d) || any(perm < 1)))
 		 return("'perm' slot is not a valid index")
 	     TRUE
 	 })

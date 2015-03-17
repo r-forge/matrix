@@ -60,7 +60,6 @@ setAs("nMatrix", "indMatrix",
       function(from) {
 	  from <- as(as(from, "TsparseMatrix"), "ngTMatrix")
 	  n <- (d <- from@Dim)[1]
-	  if(n < d[2]) stop("not a skinny matrix")
 	  if(length(i <- from@i) != n)
 	      stop("the number of non-zero entries differs from nrow(.)")
 	  if((need.sort <- is.unsorted(i))) {
