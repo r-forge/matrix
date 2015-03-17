@@ -193,10 +193,10 @@ stopifnot(identical(zz, cbind2(s42, C86)))
 ## Using "nMatrix"
 (m1 <- sparseMatrix(1:3, 1:3)) # ngCMatrix
 m2 <- sparseMatrix(1:3, 1:3, x = 1:3)
-stopifnotValid(c12 <- cbind(m1,m2), "dgCMatrix") # was "ngC.." because of cholmod_horzcat !
-stopifnotValid(c21 <- cbind(m2,m1), "dgCMatrix") #  ditto
-stopifnotValid(r12 <- rbind(m1,m2), "dgCMatrix") # was "ngC.." because of cholmod_vertcat !
-stopifnotValid(r21 <- rbind(m2,m1), "dgCMatrix") #  ditto
+stopifnotValid(c12 <- cBind(m1,m2), "dgCMatrix") # was "ngC.." because of cholmod_horzcat !
+stopifnotValid(c21 <- cBind(m2,m1), "dgCMatrix") #  ditto
+stopifnotValid(r12 <- rBind(m1,m2), "dgCMatrix") # was "ngC.." because of cholmod_vertcat !
+stopifnotValid(r21 <- rBind(m2,m1), "dgCMatrix") #  ditto
 d1 <- as(m1, "denseMatrix")
 d2 <- as(m2, "denseMatrix")
 stopifnotValid(cbind2(d2,d1), "dgeMatrix")
