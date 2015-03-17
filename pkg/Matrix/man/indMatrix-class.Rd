@@ -50,12 +50,13 @@
     \item{\code{perm}:}{An integer, 1-based index vector, i.e.
       an integer vector of length \code{Dim[1]} whose elements are taken from
       \code{1:Dim[2]}.}
-    \item{\code{Dim}:}{Object of class \code{"integer"}.  The dimensions
-      of the matrix which must skinny, i.e., the first dimension has to
-      be at least as large as the second.}
-    \item{\code{Dimnames}:}{list of length two; each component
-      containing NULL or a \code{\link{character}} vector length
-      equal the corresponding \code{Dim} element.}
+    \item{\code{Dim}:}{\code{\link{integer}} vector of length two.
+      In some applications, the matrix will be skinny, i.e., with at least
+      as many rows as columns.}
+    \item{\code{Dimnames}:}{a \code{\link{list}} of length two where
+      each component is either \code{\link{NULL}} or a
+      \code{\link{character}} vector of length equal to the
+      corresponding \code{Dim} element.}
   }
 }
 \section{Extends}{

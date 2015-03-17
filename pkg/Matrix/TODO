@@ -8,6 +8,7 @@
 ** DONE m %*% M (crossprod, ..) with 0-dim. result give garbage
 ** DONE M[i,j] should *not* drop dimnames (R-forge bug 2556, see ~/R/MM/Pkg-ex/Matrix/dimnames-prod.R)
 ** DONE "Math"/"Math2" *fail* entirely for sparseVectors
+** TODO rbind2(<sparse>, <dense>) did not work, now is completely wrong !! (e.g. <dgC>, <dge>)
 ** TODO M[<sparse 2-column Matrix>] indexing should work (but with a warning: use *dense*!)
 ** TODO src/CHOLMOD/MatrixOps/cholmod_symmetry.c  is "cool" and fast;
 Definitely should use it for solve(<dgCMatrix>)  {it seems MATLAB does};
@@ -42,6 +43,8 @@ alternatively also is_sym() [in src/cs_utils.c], see below.
   {MM: ~/R/MM/Pkg-ex/Matrix/bands-Jeremy_Silver-ex.R }
 
 ** TODO FIXME(2) and (3) in R/products.R: t(.Call(Csparse_dense_*))
+** TODO finalize and activate the _unused_ code in src/t_sparseVector.c
+
 ** TODO cbind2() / rbind2() for sparseMatrices: dimnames propagation should
   happen in C, see  R/bind2.R and src/Csparse.c (Csparse_horzcat etc).
 ** TODO use  getOption("Matrix.quiet") in more places [--> less messages/warnings]
@@ -118,8 +121,6 @@ alternatively also is_sym() [in src/cs_utils.c], see below.
 
 ** TODO make sure *all* group methods have (maybe "bail-out") setMethod for "Matrix".
   e.g. zapsmall(<pMatrix>) fails "badly"
-
-** TODO rbind2(<sparse>, <dense>) does not work  (e.g. <dgC>, <dge>)
 
 ** TODO <sparse> %*% <dense>  {also in crossprod/tcrossprod}  currently always
   returns <dense>, since --> Csparse_dense_prod --> cholmod_sdmult
@@ -302,8 +303,6 @@ alternatively also is_sym() [in src/cs_utils.c], see below.
 ** TODO How can we ensure that     inst/include/cholmod.h		 remains
   correct and equivalent to  src/CHOLMOD/Include/cholmod_core.h  and  siblings ???
   {currently need to do this manually (Emacs M-x compare-windows) for the   typedefs}
-
-** finalize and activate the new *unused* code in src/t_sparseVector.c
 
 ** check all uses of  alloca()/Alloca() in  src/*.[ch]
   ensuring that the *size* allocated cannot grow with the
