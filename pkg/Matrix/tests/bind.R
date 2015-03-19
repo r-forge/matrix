@@ -40,6 +40,14 @@ stopifnot(
     identical(colnames(show(cBind(M1, MM = -1))),
 	      c(colnames(M1), "MM"))
    ,
+    identical3(rBind ( M, 10*M),
+		show(rbind2( M, 10*M)),
+	      Matrix(rbind ( m, 10*m)))
+    ,
+    identical3(rBind (M2, M1+M2),
+	       show(rbind2(M2, M1+M2)),
+	       Matrix(rbind (m2, m1+m2)))
+   ,
     Qidentical(show  (rBind(R1 = 10:11, M1)),
 	       Matrix(rbind(R1 = 10:11, m1)), strict=FALSE)
   , TRUE)
@@ -204,6 +212,22 @@ stopifnotValid(cbind2(d1,d2), "dgeMatrix")## gave an error in Matrix 1.1-5
 stopifnotValid(rbind2(d2,d1), "dgeMatrix")
 stopifnotValid(rbind2(d1,d2), "dgeMatrix")## gave an error in Matrix 1.1-5
 
+## rbind2() / cbind2() mixing sparse/dense: used to "fail",
+## ------------------- then (in 'devel', ~ 2015-03): completely wrong
+S <- .sparseDiagonal(2)
+s <- diag(2)
+S9 <- rBind(S,0,0,S,0,0,2)
+s9 <- rbind(s,0,0,s,0,0,2)
+assert.EQ.mat(S9, s9)
+D <- Matrix(1:6, 3,2); d <- as.matrix(D)
+stopifnot(identical(rbind(s9,d), rbind2(s9,d)))
+assert.EQ.mat(rbind2(S9,D), rbind2(s9,d))
+assert.EQ.mat(rbind2(D,S9), rbind2(d,s9))
+## now with cbind2() -- no problem!
+T9 <- t(S9); t9 <- t(s9); T <- t(D); t <- t(d)
+stopifnot(identical(cbind(t9,t), cbind2(t9,t)))
+assert.EQ.mat(cbind2(T9,T), cbind2(t9,t))
+assert.EQ.mat(cbind2(T,T9), cbind2(t,t9))
 
 
 
