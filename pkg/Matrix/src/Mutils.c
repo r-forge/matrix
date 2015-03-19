@@ -1072,6 +1072,71 @@ SEXP Mmatrix(SEXP args)
     return ans;
 }
 
+/**
+ * From the two 'x' slots of two dense matrices a and b,
+ * compute the 'x' slot of rbind(a, b)
+ *
+ * Currently, an auxiliary only for setMethod rbind2(<denseMatrix>, <denseMatrix>)
+ * in ../R/bind2.R
+ *
+ * @param a
+ * @param b
+ *
+ * @return
+ */SEXP R_rbind2_vector(SEXP a, SEXP b) {
+    int *d_a = INTEGER(GET_SLOT(a, Matrix_DimSym)),
+	*d_b = INTEGER(GET_SLOT(b, Matrix_DimSym)),
+	n1 = d_a[0], m = d_a[1],
+	n2 = d_b[0],
+	nprot = 1;
+    SEXP ans,
+	a_x = GET_SLOT(a, Matrix_xSym),
+	b_x = GET_SLOT(b, Matrix_xSym);
+    if(d_b[1] != m)
+	error(_("the number of columns differ in R_rbind2_vector: %d != %d"),
+	      m, d_b[1]);
+    // Care: can have "ddenseMatrix" "ldenseMatrix" or "ndenseMatrix"
+    if(TYPEOF(a_x) != TYPEOF(b_x)) { // choose the "common type"
+	// Now know: either LGLSXP or REALSXP. FIXME for iMatrix, zMatrix,..
+	if(TYPEOF(a_x) != REALSXP)
+	    a_x = PROTECT(duplicate(coerceVector(a_x, REALSXP)));
+	else if(TYPEOF(b_x) != REALSXP)
+	    b_x = PROTECT(duplicate(coerceVector(b_x, REALSXP)));
+	nprot++;
+    }
+
+    ans = PROTECT(allocVector(TYPEOF(a_x), m * (n1 + n2)));
+    int i, ii = 0;
+    switch(TYPEOF(a_x)) {
+    case LGLSXP: {
+	int
+	    *r = LOGICAL(ans),
+	    *ax= LOGICAL(a_x),
+	    *bx= LOGICAL(b_x);
+
+#define COPY_a_AND_b_j						\
+/*  FIXME faster: use Memcpy() : */				\
+	for(int j=0; j < m; j++) {				\
+	    for(i=0; i < n1; i++) r[ii++] = ax[j*n1 + i];	\
+	    for(i=0; i < n2; i++) r[ii++] = bx[j*n2 + i];	\
+	}
+
+	COPY_a_AND_b_j;
+    }
+    case REALSXP: {
+	double
+	    *r = REAL(ans),
+	    *ax= REAL(a_x),
+	    *bx= REAL(b_x);
+
+	COPY_a_AND_b_j;
+    }
+    } // switch
+
+    UNPROTECT(nprot);
+    return ans;
+}
+
 #define TRUE_  ScalarLogical(1)
 #define FALSE_ ScalarLogical(0)
 
