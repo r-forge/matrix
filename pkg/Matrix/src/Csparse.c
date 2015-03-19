@@ -405,8 +405,9 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b)
 	cha = AS_CHM_SP(a),
 	chb = AS_CHM_SP(b),
 	chc = cholmod_ssmult(cha, chb, /*out_stype:*/ 0,
-			       /* values:= is_numeric (T/F) */ cha->xtype > 0,
-			       /*out sorted:*/ 1, &c);
+			     // values:= is_numeric (T/F) if _one_ is numeric:
+			     cha->xtype > 0 || chb->xtype > 0,
+			     /*out sorted:*/ 1, &c);
     const char *cl_a = class_P(a), *cl_b = class_P(b);
     char diag[] = {'\0', '\0'};
     int uploT = 0;
