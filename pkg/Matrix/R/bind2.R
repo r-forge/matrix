@@ -177,7 +177,9 @@ setMethod("rbind2", signature(x = "denseMatrix", y = "denseMatrix"),
 	      hasDN <- !is.null.DN(dnx <- dimnames(x)) | !is.null.DN(dny <- dimnames(y))
 	      x <- as(x, geClass(x))
 	      y <- as(y, geClass(y))
-	      xx <- c(x@x, y@x)
+	      xx <- as.vector(.Internal(rbind(-1L, ## FIXME: do this fast in C
+					      array(x@x, dim=x@Dim),
+					      array(y@x, dim=y@Dim))))
 	      ## be careful, e.g., if we have an 'n' and 'd'
 	      if(identical((tr <- typeof(xx)), typeof(x@x))) {
 		  x@x <- xx
