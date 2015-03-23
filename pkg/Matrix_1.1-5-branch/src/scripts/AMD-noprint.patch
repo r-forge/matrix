@@ -1,0 +1,25 @@
+--- SuiteSparse/AMD/Include/amd_internal.h.~1~	2012-05-29 16:47:33.000000000 +0200
++++ SuiteSparse/AMD/Include/amd_internal.h	2013-09-16 12:45:18.673155000 +0200
+@@ -27,6 +27,9 @@
+  *          amd_calloc at run-time for AMD to work properly.
+  */
+ 
++// For use with R package 'Matrix':
++#define NPRINT
++
+ /* ========================================================================= */
+ /* === NDEBUG ============================================================== */
+ /* ========================================================================= */
+--- SuiteSparse/AMD/Source/amd_global.c.~1~	2012-05-29 16:48:37.000000000 +0200
++++ SuiteSparse/AMD/Source/amd_global.c	2013-09-16 12:47:49.219927000 +0200
+@@ -76,7 +76,9 @@
+ int (*amd_printf) (const char *, ...) = mexPrintf ;
+ #else
+ #include <stdio.h>
+-int (*amd_printf) (const char *, ...) = printf ;
++// For use with R package 'Matrix':
++#include <R_ext/Print.h>
++void (*amd_printf) (const char *, ...) = Rprintf ;
+ #endif
+ #else
+ int (*amd_printf) (const char *, ...) = NULL ;
