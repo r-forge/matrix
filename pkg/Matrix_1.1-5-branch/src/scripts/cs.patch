@@ -1,0 +1,80 @@
+--- cs.h.~3~	2014-10-09 22:01:10.000000000 +0200
++++ cs.h	2014-12-23 22:47:45.479919000 +0100
+@@ -3,8 +3,13 @@
+ #include <stdlib.h>
+ #include <limits.h>
+ #include <math.h>
++// needed for FILE:
+ #include <stdio.h>
+ #include <stddef.h>
++// For use with R package 'Matrix'
++# include <R_ext/Print.h>
++# include <R_ext/Random.h>
++# define printf Rprintf
+ #ifdef MATLAB_MEX_FILE
+ #include "mex.h"
+ #endif
+@@ -18,6 +23,8 @@
+ #undef csi
+ #define csi mwSignedIndex
+ #endif
++// Matrix pkg:
++#define csi int
+ #ifndef csi
+ #define csi ptrdiff_t
+ #endif
+--- cs.c.~6~	2014-12-23 19:38:11.293693813 +0100
++++ cs.c	2014-12-23 19:39:26.168581000 +0100
+@@ -1408,7 +1408,7 @@
+     csi i, k, p, m, n, vnz, p1, top, m2, len, col, rnz, *s, *leftmost, *Ap, *Ai,
+         *parent, *Rp, *Ri, *Vp, *Vi, *w, *pinv, *q ;
+     cs *R, *V ;
+-    csn *N ;
++    csn *N ; // the result
+     if (!CS_CSC (A) || !S) return (NULL) ;
+     m = A->m ; n = A->n ; Ap = A->p ; Ai = A->i ; Ax = A->x ;
+     q = S->q ; parent = S->parent ; pinv = S->pinv ; m2 = S->m2 ;
+@@ -1536,14 +1536,16 @@
+     if (!p) return (NULL) ;             /* out of memory */
+     for (k = 0 ; k < n ; k++) p [k] = n-k-1 ;
+     if (seed == -1) return (p) ;        /* return reverse permutation */
+-    srand (seed) ;                      /* get new random number seed */
++    GetRNGstate();/* <- for R package Matrix
++    srand (seed) ;                      .* get new random number seed */
+     for (k = 0 ; k < n ; k++)
+     {
+-        j = k + (rand ( ) % (n-k)) ;    /* j = rand integer in range k to n-1 */
++        j = k + (int)(unif_rand() * (n-k)); // j = rand integer in range k to n-1
+         t = p [j] ;                     /* swap p[k] and p[j] */
+         p [j] = p [k] ;
+         p [k] = t ;
+     }
++    PutRNGstate(); // <- R package Matrix
+     return (p) ;
+ }
+ /* xi [top...n-1] = nodes reachable from graph of G*P' via nodes in B(:,k).
+--- cs.h.~3~	2014-10-09 22:01:10.000000000 +0200
++++ cs.h	2014-12-23 22:47:45.479919000 +0100
+@@ -3,8 +3,13 @@
+ #include <stdlib.h>
+ #include <limits.h>
+ #include <math.h>
++// needed for FILE:
+ #include <stdio.h>
+ #include <stddef.h>
++// For use with R package 'Matrix'
++# include <R_ext/Print.h>
++# include <R_ext/Random.h>
++# define printf Rprintf
+ #ifdef MATLAB_MEX_FILE
+ #include "mex.h"
+ #endif
+@@ -18,6 +23,8 @@
+ #undef csi
+ #define csi mwSignedIndex
+ #endif
++// Matrix pkg:
++#define csi int
+ #ifndef csi
+ #define csi ptrdiff_t
+ #endif

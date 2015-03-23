@@ -1,0 +1,17 @@
+--- SPQR/Include/SuiteSparseQR_C.h~	2008-09-16 12:18:58.000000000 +0200
++++ SPQR/Include/SuiteSparseQR_C.h	2010-04-08 16:14:17.000284000 +0200
+@@ -11,8 +11,14 @@
+ extern "C" {
+ #endif
+ 
++#ifndef CHOLMOD_H
+ #include "cholmod.h"
++#endif
++
++#ifndef _UFCONFIG_H
+ #include "UFconfig.h"
++#endif
++
+ #include "SuiteSparseQR_definitions.h"
+ 
+ #ifdef __cplusplus
