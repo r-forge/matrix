@@ -1,6 +1,6 @@
 Package: Matrix
-Version: 1.1-5
-Date: 2015-01-18
+Version: 1.1-5-1
+Date: 2015-03-23
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Author: Douglas Bates <bates@stat.wisc.edu> and Martin Maechler
