@@ -5,13 +5,15 @@
 #include "Mutils.h"
 
 Rboolean isValid_Csparse(SEXP x);
+SEXP Csp_dense_products(SEXP a, SEXP b,
+			Rboolean transp_a, Rboolean transp_b, Rboolean transp_ans);
 
-SEXP Csparse_Csparse_prod(SEXP a, SEXP b);
 SEXP Csparse_band(SEXP x, SEXP k1, SEXP k2);
-SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet);
-SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans);
-SEXP Csparse_dense_crossprod(SEXP a, SEXP b);
-SEXP Csparse_dense_prod(SEXP a, SEXP b);
+SEXP Csparse_Csparse_prod(SEXP a, SEXP b, SEXP bool_arith);
+SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans, SEXP bool_arith);
+SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet, SEXP bool_arith);
+SEXP Csparse_dense_crossprod(SEXP a, SEXP b, SEXP transp);
+SEXP Csparse_dense_prod     (SEXP a, SEXP b, SEXP transp);
 SEXP Csparse_diagU2N(SEXP x);
 SEXP Csparse_diagN2U(SEXP x);
 SEXP Csparse_drop(SEXP x, SEXP tol);

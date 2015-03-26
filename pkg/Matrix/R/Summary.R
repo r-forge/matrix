@@ -31,12 +31,15 @@ setMethod("Summary", "ddenseMatrix",
 	      }
 	      else { ## triangular , possibly packed
 		  if(.Generic %in% summGener1) {
-                      if(.Generic %in% c("any","all")) {
-                          Zero <- FALSE; One <- TRUE
-                      } else {
-                          Zero <- 0; One <- 1
-                      }
-		      callGeneric(x@x, if(d[1] >= 2) Zero, if(x@diag == "U") One,
+		      if(.Generic %in% c("any","all")) {
+			  Zero <- FALSE; One <- TRUE
+		      } else {
+			  Zero <- 0; One <- 1
+		      }
+		      callGeneric(if (length(x@x) < prod(d)) x@x ## <- 'packed'
+				  else x@x[indTri(d[1], upper= x@uplo == "U",
+						  diag= TRUE)],
+				  if(d[1] >= 2) Zero, if(x@diag == "U") One,
 				  ..., na.rm = na.rm)
 		  } else callGeneric(as(x, "dgeMatrix")@x, ..., na.rm = na.rm)
 	      }

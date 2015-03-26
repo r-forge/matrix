@@ -147,16 +147,18 @@ setClass("isparseMatrix", representation("VIRTUAL"),
 setClass("nsparseMatrix", representation("VIRTUAL"),
 	 contains = c("nMatrix", "sparseMatrix"))
 
-if(FALSE) { ##-- a nice idea --- but needs more careful method re-definitions
-            ##-- such that the *correct* methods are dispatched:
-## Trying to use more economical method defs:
+## More Class Intersections {for method dispatch}:
 setClass("dCsparseMatrix", representation("VIRTUAL"),
 	 contains = c("CsparseMatrix", "dsparseMatrix"))
 setClass("lCsparseMatrix", representation("VIRTUAL"),
 	 contains = c("CsparseMatrix", "lsparseMatrix"))
 setClass("nCsparseMatrix", representation("VIRTUAL"),
 	 contains = c("CsparseMatrix", "nsparseMatrix"))
-}
+
+## dense general
+setClass("geMatrix", representation("VIRTUAL"),
+	 contains = c("denseMatrix", "generalMatrix"))
+
 
 ## ------------------ Proper (non-virtual) Classes ----------------------------
 

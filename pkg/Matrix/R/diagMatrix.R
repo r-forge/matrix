@@ -577,18 +577,50 @@ diagdiagprod <- function(x, y) {
 	return(y)
 }
 
+##' Boolean Algebra/Arithmetic Product of Diagonal Matrices
+##'  %&%
+diagdiagprodBool <- function(x, y) {
+    dimCheck(x,y)
+    if(x@diag != "U") {
+	if(!is.logical(x@x)) x <- as(x, "lMatrix")
+	if(y@diag != "U") {
+	    nx <- x@x & y@x
+	    x@x <- as.logical(nx)
+	}
+	x
+    } else { ## x is unit diagonal: return y
+	if(!is.logical(y@x)) y <- as(y, "lMatrix")
+	y
+    }
+}
+
 setMethod("%*%", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
 	  diagdiagprod, valueClass = "ddiMatrix")
 
-formals(diagdiagprod) <- alist(x=, y=x)
+setMethod("%&%", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
+	  diagdiagprodBool, valueClass = "ldiMatrix")# do *not* have "ndiMatrix" !
+
+formals(diagdiagprod) <- alist(x=, y=NULL, ...=)
+##                                  -----  ---  matching the [t]crossprod generic
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
 	  diagdiagprod, valueClass = "ddiMatrix")
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
 	  diagdiagprod, valueClass = "ddiMatrix")
+
+##' crossprod(x) := x'x
+diagprod <- function(x, y=NULL, ...) {
+    if(x@diag != "U") {
+        nx <- x@x * x@x
+        if(is.numeric(nx) && !is.numeric(x@x))
+            x <- as(x, "dMatrix")
+        x@x <- as.numeric(nx)
+    }
+    x
+}
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "missing"),
-	  diagdiagprod, valueClass = "ddiMatrix")
+	  diagprod, valueClass = "ddiMatrix")
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "missing"),
-	  diagdiagprod, valueClass = "ddiMatrix")
+	  diagprod, valueClass = "ddiMatrix")
 
 
 ## analogous to matdiagprod() below:
@@ -599,8 +631,8 @@ diagmatprod <- function(x, y) {
 }
 setMethod("%*%", signature(x = "diagonalMatrix", y = "matrix"),
 	  diagmatprod)
-## sneaky .. :
-formals(diagmatprod) <- alist(x=, y=NULL)
+
+formals(diagmatprod) <- alist(x=, y=NULL, ...=)
 setMethod("crossprod",  signature(x = "diagonalMatrix", y = "matrix"), diagmatprod)
 
 diagGeprod <- function(x, y) {
@@ -611,11 +643,21 @@ diagGeprod <- function(x, y) {
 }
 setMethod("%*%", signature(x= "diagonalMatrix", y= "dgeMatrix"), diagGeprod)
 setMethod("%*%", signature(x= "diagonalMatrix", y= "lgeMatrix"), diagGeprod)
-formals(diagGeprod) <- alist(x=, y=NULL)
+formals(diagGeprod) <- alist(x=, y=NULL, ...=)
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "dgeMatrix"),
 	  diagGeprod, valueClass = "dgeMatrix")
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "lgeMatrix"),
 	  diagGeprod)
+
+diagGeprodBool <- function(x, y) {
+    if(x@Dim[2] != y@Dim[1]) stop("non-matching dimensions")
+    if(!is.logical(y@x)) y <- as(y, "lMatrix")
+    if(x@diag != "U")
+        y@x <- x@x & y@x
+    y
+}
+setMethod("%&%", signature(x= "diagonalMatrix", y= "geMatrix"), diagGeprodBool)
+
 
 ## analogous to diagmatprod() above:
 matdiagprod <- function(x, y) {
@@ -624,10 +666,10 @@ matdiagprod <- function(x, y) {
     Matrix(if(y@diag == "U") x else x * rep(y@x, each = dx[1]))
 }
 setMethod("%*%", signature(x = "matrix", y = "diagonalMatrix"), matdiagprod)
-formals(matdiagprod) <- alist(x=, y=NULL)
+formals(matdiagprod) <- alist(x=, y=NULL, ...=)
 setMethod("tcrossprod",signature(x = "matrix", y = "diagonalMatrix"), matdiagprod)
 setMethod("crossprod", signature(x = "matrix", y = "diagonalMatrix"),
-	  function(x, y=NULL) {
+	  function(x, y=NULL, ...) {
 	      dx <- dim(x)
 	      if(dx[1] != y@Dim[1]) stop("non-matching dimensions")
 	      Matrix(t(rep.int(y@x, dx[2]) * x))
@@ -642,11 +684,21 @@ gediagprod <- function(x, y) {
 }
 setMethod("%*%", signature(x= "dgeMatrix", y= "diagonalMatrix"), gediagprod)
 setMethod("%*%", signature(x= "lgeMatrix", y= "diagonalMatrix"), gediagprod)
-formals(gediagprod) <- alist(x=, y=NULL)
+formals(gediagprod) <- alist(x=, y=NULL, ...=)
 setMethod("tcrossprod", signature(x = "dgeMatrix", y = "diagonalMatrix"),
 	  gediagprod)
 setMethod("tcrossprod", signature(x = "lgeMatrix", y = "diagonalMatrix"),
 	  gediagprod)
+
+gediagprodBool <- function(x, y) {
+    dx <- dim(x)
+    if(dx[2] != y@Dim[1]) stop("non-matching dimensions")
+    if(!is.logical(x@x)) x <- as(x, "lMatrix")
+    if(y@diag == "N")
+	x@x <- x@x & rep(y@x, each = dx[1])
+    x
+}
+setMethod("%&%", signature(x= "geMatrix", y= "diagonalMatrix"), gediagprodBool)
 
 ## crossprod {more of these}
 
@@ -666,14 +718,22 @@ setMethod("%*%", signature(x = "denseMatrix", y = "diagonalMatrix"),
 ##' @param x CsparseMatrix
 ##' @param y diagonalMatrix
 ##' @return x %*% y
-Cspdiagprod <- function(x, y) {
-    m <- ncol(x <- .Call(Csparse_diagU2N, x))
-    if(m != y@Dim[1]) stop("non-matching dimensions")
+Cspdiagprod <- function(x, y, boolArith = NA) {
+    if((m <- ncol(x)) != y@Dim[1]) stop("non-matching dimensions")
     if(y@diag == "N") { ## otherwise: y == Diagonal(n) : multiplication is identity
-	if(!all(y@x[1L] == y@x[-1L]) && is(x, "symmetricMatrix"))
+	x <- .Call(Csparse_diagU2N, x)
+	cx <- getClass(class(x))
+	if(!all(y@x[1L] == y@x[-1L]) && extends(cx, "symmetricMatrix"))
 	    x <- as(x, "generalMatrix")
 	ind <- rep.int(seq_len(m), x@p[-1] - x@p[-m-1L])
-	x@x <- x@x * y@x[ind]
+	if(isTRUE(boolArith)) {
+	    if(extends(cx, "nMatrix")) x <- as(x, "lMatrix") # so, has y@x
+	    x@x <- x@x & y@x[x@i + 1L]
+	    if(!extends(cx, "diagonalMatrix")) x <- as(drop0(x), "nMatrix")
+	} else {
+	    if(!extends(cx, "dMatrix")) x <- as(x, "dMatrix") # <- FIXME if we have zMatrix
+	    x@x <- x@x * y@x[ind]
+	}
         if(.hasSlot(x, "factors") && length(x@factors)) {# drop cashed ones
 	    ## instead of dropping all factors, be smart about some
 	    ## TODO ......
@@ -686,13 +746,21 @@ Cspdiagprod <- function(x, y) {
 ##' @param x diagonalMatrix
 ##' @param y CsparseMatrix
 ##' @return x %*% y
-diagCspprod <- function(x, y) {
-    y <- .Call(Csparse_diagU2N, y)
+diagCspprod <- function(x, y, boolArith = FALSE) {
     if(x@Dim[2] != y@Dim[1]) stop("non-matching dimensions")
     if(x@diag == "N") {
-	if(!all(x@x[1L] == x@x[-1L]) && is(y, "symmetricMatrix"))
+	y <- .Call(Csparse_diagU2N, y)
+	cy <- getClass(class(y))
+	if(!all(x@x[1L] == x@x[-1L]) && extends(cy, "symmetricMatrix"))
 	    y <- as(y, "generalMatrix")
-	y@x <- y@x * x@x[y@i + 1L]
+	if(isTRUE(boolArith)) {
+	    if(extends(cy, "nMatrix")) y <- as(y, "lMatrix") # so, has y@x
+	    y@x <- y@x & x@x[y@i + 1L]
+	    if(!extends(cy, "diagonalMatrix")) y <- as(drop0(y), "nMatrix")
+	} else {
+	    if(!extends(cy, "dMatrix")) y <- as(y, "dMatrix") # <- FIXME if we have zMatrix
+	    y@x <- y@x * x@x[y@i + 1L]
+	}
 	if(.hasSlot(y, "factors") && length(y@factors)) {
      ## if(.hasSlot(y, "factors") && length(yf <- y@factors)) { ## -- TODO? --
 	    ## instead of dropping all factors, be smart about some
@@ -707,47 +775,60 @@ diagCspprod <- function(x, y) {
     y
 }
 
+## + 'boolArith' argument  { ==> .local() is used in any case; keep formals simple :}
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
-	  function(x, y = NULL) diagCspprod(x, y))
+	  function(x, y, boolArith=NA) diagCspprod(x, y, boolArith=boolArith))
 
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "sparseMatrix"),
-	  function(x, y = NULL) diagCspprod(x, as(y, "CsparseMatrix")))
+	  function(x, y, boolArith=NA)
+	      diagCspprod(x, as(y, "CsparseMatrix"), boolArith=boolArith))
 
 ## Prefer calling diagCspprod to Cspdiagprod if going to transpose anyway
 ##  x'y == (y'x)'
 setMethod("crossprod", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
-	  function(x, y = NULL) t(diagCspprod(y, x)))
+	  function(x, y, boolArith=NA) t(diagCspprod(y, x, boolArith=boolArith)))
 
 setMethod("crossprod", signature(x = "sparseMatrix", y = "diagonalMatrix"),
-	  function(x, y = NULL) t(diagCspprod(y, as(x, "Csparsematrix"))))
+	  function(x, y, boolArith=NA) t(diagCspprod(y, as(x, "Csparsematrix"), boolArith=boolArith)))
 
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
-	  function(x, y = NULL) diagCspprod(x, t(y)))
+	  function(x, y, boolArith=NA) diagCspprod(x, t(y), boolArith=boolArith))
 
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "sparseMatrix"),
-	  function(x, y = NULL) diagCspprod(x, t(as(y, "CsparseMatrix"))))
+	  function(x, y, boolArith=NA) diagCspprod(x, t(as(y, "CsparseMatrix")), boolArith=boolArith))
 
 setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
-	  function(x, y = NULL) Cspdiagprod(x, y))
+	  function(x, y, boolArith=NA) Cspdiagprod(x, y, boolArith=boolArith))
 
 setMethod("tcrossprod", signature(x = "sparseMatrix", y = "diagonalMatrix"),
-	  function(x, y = NULL) Cspdiagprod(as(x, "CsparseMatrix"), y))
+	  function(x, y, boolArith=NA) Cspdiagprod(as(x, "CsparseMatrix"), y, boolArith=boolArith))
 
 setMethod("%*%", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
-	  function(x, y) diagCspprod(x, y))
+	  function(x, y) diagCspprod(x, y, boolArith=NA))
+setMethod("%&%", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
+	  function(x, y) diagCspprod(x, y, boolArith=TRUE))
 
 ## instead of "sparseMatrix", use: [RT]sparse.. ("closer" in method dispatch)
 for(cl in c("TsparseMatrix", "RsparseMatrix")) {
 
 setMethod("%*%", signature(x = "diagonalMatrix", y = "sparseMatrix"),
-	  function(x, y) diagCspprod(as(x, "CsparseMatrix"), y))
+	  function(x, y) diagCspprod(as(x, "CsparseMatrix"), y, boolArith=NA))
 
 setMethod("%*%", signature(x = "sparseMatrix", y = "diagonalMatrix"),
-	  function(x, y) Cspdiagprod(as(x, "CsparseMatrix"), y))
+	  function(x, y) Cspdiagprod(as(x, "CsparseMatrix"), y, boolArith=NA))
+
+setMethod("%&%", signature(x = "diagonalMatrix", y = "sparseMatrix"),
+	  function(x, y) diagCspprod(as(x, "CsparseMatrix"), y, boolArith=TRUE))
+
+setMethod("%&%", signature(x = "sparseMatrix", y = "diagonalMatrix"),
+	  function(x, y) Cspdiagprod(as(x, "CsparseMatrix"), y, boolArith=TRUE))
+
 }
 
 setMethod("%*%", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
-	  function(x, y) Cspdiagprod(x, y))
+	  function(x, y) Cspdiagprod(x, y, boolArith=NA))
+setMethod("%&%", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
+	  function(x, y) Cspdiagprod(x, y, boolArith=TRUE))
 
 ## TODO: Write tests in ./tests/ which ensure that many "ops" with diagonal*
 ##       do indeed work by going through sparse (and *not* ddense)!
@@ -1085,8 +1166,10 @@ for(other in c("ANY", "Matrix", "dMatrix")) {
 }
 
 ## Direct subclasses of "denseMatrix": currently ddenseMatrix, ldense... :
+if(FALSE) # now also contains "geMatrix"
 dense.subCl <- local({ dM.scl <- getClass("denseMatrix")@subclasses
 		       names(dM.scl)[vapply(dM.scl, slot, 0, "distance") == 1] })
+dense.subCl <- paste0(c("d","l","n"), "denseMatrix")
 for(DI in diCls) {
     dMeth <- if(extends(DI, "dMatrix"))
 	function(e1,e2) callGeneric(diag2Tsmart(e1,e2, "d"), e2)

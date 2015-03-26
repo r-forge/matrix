@@ -17,6 +17,8 @@
 \alias{\%*\%,CsparseMatrix,numLike-method}
 \alias{\%*\%,ddenseMatrix,CsparseMatrix-method}
 \alias{\%*\%,matrix,CsparseMatrix-method}
+\alias{\%*\%,matrix,sparseMatrix-method}
+\alias{\%*\%,sparseMatrix,matrix-method}
 \alias{\%*\%,ddenseMatrix,ddenseMatrix-method}
 \alias{\%*\%,dgeMatrix,diagonalMatrix-method}
 \alias{\%*\%,matrix,diagonalMatrix-method}
@@ -282,19 +284,26 @@
 }
 \usage{
 \S4method{\%*\%}{CsparseMatrix,diagonalMatrix}(x, y)
-       ## .... and many more
 
 \S4method{crossprod}{dgeMatrix,missing}(x, y = NULL)
-       ## .... and many more
+\S4method{crossprod}{CsparseMatrix,missing}(x, y = NULL, boolArith = NA)
+       ## .... and for many more signatures
 
 \S4method{tcrossprod}{CsparseMatrix,ddenseMatrix}(x, y = NULL)
-       ## .... and many more
+\S4method{tcrossprod}{TsparseMatrix,missing}(x, y = NULL, boolArith = NA)
+       ## .... and for many more signatures
 }
 \arguments{
   \item{x}{a matrix-like object}
   \item{y}{a matrix-like object, or for \code{[t]crossprod()}
     \code{NULL} (by default); the latter case is formally equivalent to
     \code{y = x}.}
+  \item{boolArith}{\code{\link{logical}}, i.e., \code{NA}, \code{TRUE},
+    or \code{FALSE}.  If true, the result is (coerced to) a pattern
+    matrix, i.e., \code{"\linkS4class{nMatrix}"}.  If false, the result
+    is (coerced to) numeric.  When \code{NA}, currently the default, the
+    result is a pattern matrix when \code{x} and \code{y} are
+    \code{"\linkS4class{nsparseMatrix}"} and numeric otherwise.}
 }
 \details{
   For some classes in the \code{Matrix} package, such as
