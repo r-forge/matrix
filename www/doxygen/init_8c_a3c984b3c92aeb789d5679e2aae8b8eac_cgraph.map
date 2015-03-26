@@ -1,30 +1,30 @@
 <map id="R_init_Matrix" name="R_init_Matrix">
-<area shape="rect" id="node2" href="$chm__common_8c.html#a0ed4e091a525ec3cdf847755a3c4b76a" title="Populate ans with the pointers from x and modify its scalar elements accordingly. ..." alt="" coords="166,55,301,81"/>
-<area shape="rect" id="node4" href="$chm__common_8c.html#a2e28b03190e5ba5fcb59935cc0a1ea9e" title="Populate ans with the pointers from x and modify its scalar elements accordingly. ..." alt="" coords="167,637,299,664"/>
-<area shape="rect" id="node5" href="$chm__common_8c.html#ac0b9d7e2006dcf1a8d388954b408d007" title="Populate ans with the pointers from x and modify its scalar elements accordingly. ..." alt="" coords="164,181,303,208"/>
-<area shape="rect" id="node12" href="$chm__common_8c.html#a7c6132b98d7e38fc876c745c9cc8da2d" title="Populate ans with the pointers from x and modify its scalar elements accordingly. ..." alt="" coords="168,283,299,309"/>
-<area shape="rect" id="node14" href="$CHMfactor_8c.html#ac81ffe4ed105e938046e467310882d56" title="Evaluate the logarithm of the square of the determinant of L. " alt="" coords="168,688,299,715"/>
-<area shape="rect" id="node15" href="$chm__common_8c.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f or free both f and ..." alt="" coords="160,384,307,411"/>
-<area shape="rect" id="node18" href="$CHMfactor_8c.html#a8f49596874078a3b8482df1ee23fe829" title="Update the numerical values in the factor f as A + mult * I, if A is symmetric, otherwise AA&#39; + mult ..." alt="" coords="167,739,300,765"/>
-<area shape="rect" id="node19" href="$chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="363,485,517,512"/>
-<area shape="rect" id="node20" href="$chm__common_8c.html#ab5d31c23691cc4a3c96a7f526dc84006" title="Copy the contents of a to an appropriate TsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="160,536,307,563"/>
-<area shape="rect" id="node21" href="$Csparse_8c.html#a0cc8d2f7047736ee111b11cb2faeaf11" title="Csparse_diagU2N" alt="" coords="169,485,297,512"/>
-<area shape="rect" id="node22" href="$dpoMatrix_8c.html#aa951f7c9871735266da55e7d92a6ae58" title="dpoMatrix_chol" alt="" coords="179,587,288,613"/>
-<area shape="rect" id="node25" href="$chm__common_8c.html#aac8221663c2752d8a26b05dd9be28314" title="numeric_as_chm_dense" alt="" coords="152,789,315,816"/>
-<area shape="rect" id="node26" href="$chm__common_8c.html#a1b14bacbdeada9ba9def1db396a98215" title="Initialize the CHOLMOD library and replace the print and error functions by R&#45;specific versions..." alt="" coords="173,840,293,867"/>
-<area shape="rect" id="node3" href="$chm__common_8c.html#a6eb9b8c79c573099970c93d50e059039" title="RallocedREAL" alt="" coords="591,80,697,107"/>
-<area shape="rect" id="node6" href="$chm__common_8c.html#a954bf0c9515c3774116e79f0ee51d43c" title="check_sorted_chm" alt="" coords="374,80,506,107"/>
-<area shape="rect" id="node7" href="$chm__common_8c.html#a66c990c6f2cab76ee049ec970bc7d5e8" title="Copy cholmod_sparse, to an R_alloc()ed version of it. " alt="" coords="395,131,485,157"/>
-<area shape="rect" id="node8" href="$chm__common_8c.html#ad988031b3c1f79de0d13da2bf40cc4c1" title="&quot;Cheap&quot; C version of Csparse_validate() &#45; not sorting : " alt="" coords="382,29,498,56"/>
-<area shape="rect" id="node9" href="$chm__common_8c.html#ad7dbb3616e40830729a242662b561897" title="stype" alt="" coords="413,232,467,259"/>
-<area shape="rect" id="node10" href="$chm__common_8c.html#a9ea43d94a2bbd6c055ff9da6e3f24109" title="xpt" alt="" coords="421,181,459,208"/>
-<area shape="rect" id="node11" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="414,283,466,309"/>
-<area shape="rect" id="node13" href="$chm__common_8c.html#ac83bdca818781738d783ca4348834b37" title="Copy cholmod_triplet to an R_alloc()ed version of it. " alt="" coords="395,333,485,360"/>
-<area shape="rect" id="node16" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="590,511,698,537"/>
-<area shape="rect" id="node17" href="$chm__common_8h.html#a5a58b22e709dab2df84046bf89e76920" title="chm_factor_ok" alt="" coords="386,435,494,461"/>
-<area shape="rect" id="node23" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="397,688,483,715"/>
-<area shape="rect" id="node24" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="397,587,483,613"/>
-<area shape="rect" id="node27" href="$chm__common_8c.html#ae04b1e8dfd9eb1c7b23c07c95e25d482" title="R_cholmod_error" alt="" coords="380,815,500,841"/>
-<area shape="rect" id="node29" href="$chm__common_8c.html#a1a8132e21c478997e6e8c7b8d7d93973" title="R_cholmod_printf" alt="" coords="379,865,501,892"/>
-<area shape="rect" id="node28" href="$chm__common_8c.html#a9ca1fded97b51a281e6ef9f76a12c788" title="CHM_restore_common" alt="" coords="566,815,722,841"/>
+<area shape="rect" id="node2" href="$chm__common_8c.html#a0ed4e091a525ec3cdf847755a3c4b76a" title="Populate ans with the pointers from x and modify its scalar elements accordingly. ..." alt="" coords="166,53,301,80"/>
+<area shape="rect" id="node4" href="$chm__common_8c.html#a2e28b03190e5ba5fcb59935cc0a1ea9e" title="Populate ans with the pointers from x and modify its scalar elements accordingly. ..." alt="" coords="167,534,299,561"/>
+<area shape="rect" id="node5" href="$chm__common_8c.html#ac0b9d7e2006dcf1a8d388954b408d007" title="Populate ans with the pointers from x and modify its scalar elements accordingly. ..." alt="" coords="164,180,303,206"/>
+<area shape="rect" id="node12" href="$chm__common_8c.html#a7c6132b98d7e38fc876c745c9cc8da2d" title="Populate ans with the pointers from x and modify its scalar elements accordingly. ..." alt="" coords="168,281,299,308"/>
+<area shape="rect" id="node14" href="$CHMfactor_8c.html#ac81ffe4ed105e938046e467310882d56" title="Evaluate the logarithm of the square of the determinant of L. " alt="" coords="169,585,298,612"/>
+<area shape="rect" id="node15" href="$chm__common_8c.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f or free both f and ..." alt="" coords="159,332,307,358"/>
+<area shape="rect" id="node18" href="$CHMfactor_8c.html#a8f49596874078a3b8482df1ee23fe829" title="Update the numerical values in the factor f as A + mult * I, if A is symmetric, otherwise AA&#39; + mult ..." alt="" coords="167,636,300,662"/>
+<area shape="rect" id="node19" href="$chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="156,433,311,460"/>
+<area shape="rect" id="node20" href="$chm__common_8c.html#ab5d31c23691cc4a3c96a7f526dc84006" title="Copy the contents of a to an appropriate TsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="160,382,307,409"/>
+<area shape="rect" id="node21" href="$Csparse_8h.html#a0cc8d2f7047736ee111b11cb2faeaf11" title="Csparse_diagU2N" alt="" coords="169,686,298,713"/>
+<area shape="rect" id="node22" href="$dpoMatrix_8c.html#aa951f7c9871735266da55e7d92a6ae58" title="dpoMatrix_chol" alt="" coords="178,484,289,510"/>
+<area shape="rect" id="node25" href="$chm__common_8c.html#aac8221663c2752d8a26b05dd9be28314" title="numeric_as_chm_dense" alt="" coords="152,737,315,764"/>
+<area shape="rect" id="node26" href="$chm__common_8c.html#a1b14bacbdeada9ba9def1db396a98215" title="Initialize the CHOLMOD library and replace the print and error functions by R&#45;specific versions..." alt="" coords="173,788,294,814"/>
+<area shape="rect" id="node3" href="$chm__common_8c.html#a6eb9b8c79c573099970c93d50e059039" title="RallocedREAL" alt="" coords="569,78,677,105"/>
+<area shape="rect" id="node6" href="$chm__common_8c.html#a954bf0c9515c3774116e79f0ee51d43c" title="check_sorted_chm" alt="" coords="363,28,495,54"/>
+<area shape="rect" id="node7" href="$chm__common_8c.html#a66c990c6f2cab76ee049ec970bc7d5e8" title="Copy cholmod_sparse, to an R_alloc()ed version of it. " alt="" coords="384,78,475,105"/>
+<area shape="rect" id="node8" href="$chm__common_8c.html#ad988031b3c1f79de0d13da2bf40cc4c1" title="&quot;Cheap&quot; C version of Csparse_validate() &#45; not sorting : " alt="" coords="371,129,488,156"/>
+<area shape="rect" id="node9" href="$chm__common_8c.html#ad7dbb3616e40830729a242662b561897" title="stype" alt="" coords="402,230,457,257"/>
+<area shape="rect" id="node10" href="$chm__common_8c.html#a9ea43d94a2bbd6c055ff9da6e3f24109" title="xpt" alt="" coords="409,180,449,206"/>
+<area shape="rect" id="node11" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="402,281,457,308"/>
+<area shape="rect" id="node13" href="$chm__common_8c.html#ac83bdca818781738d783ca4348834b37" title="Copy cholmod_triplet to an R_alloc()ed version of it. " alt="" coords="383,332,475,358"/>
+<area shape="rect" id="node16" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="376,433,483,460"/>
+<area shape="rect" id="node17" href="$chm__common_8h.html#a5a58b22e709dab2df84046bf89e76920" title="chm_factor_ok" alt="" coords="375,382,483,409"/>
+<area shape="rect" id="node23" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="386,484,473,510"/>
+<area shape="rect" id="node24" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="386,534,473,561"/>
+<area shape="rect" id="node27" href="$chm__common_8c.html#ae04b1e8dfd9eb1c7b23c07c95e25d482" title="R_cholmod_error" alt="" coords="369,762,490,789"/>
+<area shape="rect" id="node29" href="$chm__common_8c.html#a1a8132e21c478997e6e8c7b8d7d93973" title="R_cholmod_printf" alt="" coords="367,813,491,840"/>
+<area shape="rect" id="node28" href="$chm__common_8c.html#a9ca1fded97b51a281e6ef9f76a12c788" title="CHM_restore_common" alt="" coords="544,762,701,789"/>
 </map>

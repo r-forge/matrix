@@ -1,7 +1,7 @@
 <map id="dppMatrix_matrix_solve" name="dppMatrix_matrix_solve">
-<area shape="rect" id="node2" href="$dppMatrix_8c.html#a6111600bf96735d9b39d5bc193203b31" title="dppMatrix_chol" alt="" coords="249,56,359,83"/>
-<area shape="rect" id="node5" href="$Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="214,107,394,133"/>
-<area shape="rect" id="node3" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="493,5,579,32"/>
-<area shape="rect" id="node4" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="493,56,579,83"/>
-<area shape="rect" id="node6" href="$Mutils_8c.html#ac7bfe157b527715287335783f004ca8c" title="dup_mMatrix_as_dgeMatrix2" alt="" coords="443,107,629,133"/>
+<area shape="rect" id="node2" href="$dppMatrix_8c.html#a6111600bf96735d9b39d5bc193203b31" title="dppMatrix_chol" alt="" coords="250,56,361,83"/>
+<area shape="rect" id="node5" href="$Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="214,107,397,133"/>
+<area shape="rect" id="node3" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="497,5,583,32"/>
+<area shape="rect" id="node4" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="497,56,583,83"/>
+<area shape="rect" id="node6" href="$Mutils_8c.html#ac7bfe157b527715287335783f004ca8c" title="dup_mMatrix_as_dgeMatrix2" alt="" coords="445,107,635,133"/>
 </map>

@@ -1,4 +1,5 @@
 <map id="compressed_to_TMatrix" name="compressed_to_TMatrix">
-<area shape="rect" id="node2" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="218,5,326,32"/>
-<area shape="rect" id="node3" href="$Mutils_8h.html#a1a3b55b173f7d329b6309e56dea20024" title="Expand compressed pointers in the array mp into a full set of indices in the array mj..." alt="" coords="216,56,328,83"/>
+<area shape="rect" id="node2" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="224,5,331,32"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#a1a3b55b173f7d329b6309e56dea20024" title="Expand compressed pointers in the array mp into a full set of indices in the array mj..." alt="" coords="221,56,334,83"/>
+<area shape="rect" id="node4" href="$Mutils_8h.html#aeb40b76e760863cfc4e4009cf04e39e6" title="SET_DimNames" alt="" coords="217,107,338,133"/>
 </map>

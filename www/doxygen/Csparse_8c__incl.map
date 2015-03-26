@@ -1,10 +1,9 @@
 <map id="Csparse.c" name="Csparse.c">
-<area shape="rect" id="node2" href="$Csparse_8h.html" title="Csparse.h" alt="" coords="155,80,233,107"/>
-<area shape="rect" id="node11" href="$Tsparse_8h.html" title="Tsparse.h" alt="" coords="259,80,337,107"/>
-<area shape="rect" id="node12" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="363,80,477,107"/>
-<area shape="rect" id="node15" href="$t__Csparse__validate_8c.html" title="t_Csparse_validate.c" alt="" coords="502,80,644,107"/>
-<area shape="rect" id="node16" href="$t__Csparse__subassign_8c.html" title="t_Csparse_subassign.c" alt="" coords="669,80,827,107"/>
-<area shape="rect" id="node3" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="255,163,321,189"/>
-<area shape="rect" id="node9" href="$Syms_8h.html" title="Syms.h" alt="" coords="461,245,525,272"/>
-<area shape="rect" id="node10" href="$t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="551,245,671,272"/>
+<area shape="rect" id="node2" href="$Csparse_8h.html" title="Csparse.h" alt="" coords="159,80,241,107"/>
+<area shape="rect" id="node11" href="$Tsparse_8h.html" title="Tsparse.h" alt="" coords="265,80,345,107"/>
+<area shape="rect" id="node12" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="369,80,484,107"/>
+<area shape="rect" id="node15" href="$t__Csparse__validate_8c.html" title="t_Csparse_validate.c" alt="" coords="509,80,653,107"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="259,163,327,189"/>
+<area shape="rect" id="node9" href="$Syms_8h.html" title="Syms.h" alt="" coords="469,245,536,272"/>
+<area shape="rect" id="node10" href="$t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="561,245,681,272"/>
 </map>

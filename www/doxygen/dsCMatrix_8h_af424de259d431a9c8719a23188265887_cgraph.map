@@ -1,12 +1,12 @@
 <map id="dsCMatrix_Cholesky" name="dsCMatrix_Cholesky">
-<area shape="rect" id="node2" href="$chm__common_8c.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f or free both f and ..." alt="" coords="384,56,531,83"/>
-<area shape="rect" id="node6" href="$dsCMatrix_8c.html#a9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm, LDL and super attributes. " alt="" coords="195,183,331,209"/>
-<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="585,5,693,32"/>
-<area shape="rect" id="node4" href="$chm__common_8h.html#a5a58b22e709dab2df84046bf89e76920" title="chm_factor_ok" alt="" coords="585,107,693,133"/>
-<area shape="rect" id="node5" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="613,56,665,83"/>
-<area shape="rect" id="node7" href="$dsCMatrix_8c.html#a3340463e47a1a5b85c7a529dd5c09e52" title="chk_nm" alt="" coords="423,157,491,184"/>
-<area shape="rect" id="node8" href="$dsCMatrix_8c.html#ad94e9725e9200f7a2a5a84f32603b640" title="chm_factor_name" alt="" coords="394,208,521,235"/>
-<area shape="rect" id="node9" href="$chm__common_8c.html#a9ca1fded97b51a281e6ef9f76a12c788" title="CHM_restore_common" alt="" coords="379,259,535,285"/>
-<area shape="rect" id="node10" href="$chm__common_8c.html#a4c25f5e728f63c091cdc740d9d6dd023" title="CHM_store_common" alt="" coords="385,309,530,336"/>
-<area shape="rect" id="node11" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="414,360,501,387"/>
+<area shape="rect" id="node2" href="$chm__common_8c.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f or free both f and ..." alt="" coords="386,56,534,83"/>
+<area shape="rect" id="node6" href="$dsCMatrix_8c.html#a9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm, LDL and super attributes. " alt="" coords="197,183,333,209"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="588,5,695,32"/>
+<area shape="rect" id="node4" href="$chm__common_8h.html#a5a58b22e709dab2df84046bf89e76920" title="chm_factor_ok" alt="" coords="587,107,695,133"/>
+<area shape="rect" id="node5" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="614,56,669,83"/>
+<area shape="rect" id="node7" href="$dsCMatrix_8c.html#a3340463e47a1a5b85c7a529dd5c09e52" title="chk_nm" alt="" coords="426,157,494,184"/>
+<area shape="rect" id="node8" href="$dsCMatrix_8c.html#ad94e9725e9200f7a2a5a84f32603b640" title="chm_factor_name" alt="" coords="397,208,523,235"/>
+<area shape="rect" id="node9" href="$chm__common_8c.html#a9ca1fded97b51a281e6ef9f76a12c788" title="CHM_restore_common" alt="" coords="381,259,539,285"/>
+<area shape="rect" id="node10" href="$chm__common_8c.html#a4c25f5e728f63c091cdc740d9d6dd023" title="CHM_store_common" alt="" coords="387,309,533,336"/>
+<area shape="rect" id="node11" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="417,360,503,387"/>
 </map>

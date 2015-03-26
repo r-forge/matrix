@@ -76,7 +76,7 @@ Include dependency graph for TMatrix_as.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="TMatrix__as_8c__incl.png" border="0" usemap="#TMatrix__as_8c" alt=""/></div>
 <map name="TMatrix__as_8c" id="TMatrix__as_8c">
-<area shape="rect" id="node2" href="TMatrix__as_8h.html" title="TMatrix_as.h" alt="" coords="240,80,336,107"/><area shape="rect" id="node3" href="Mutils_8h.html" title="Mutils.h" alt="" coords="255,155,321,181"/><area shape="rect" id="node9" href="Syms_8h.html" title="Syms.h" alt="" coords="461,229,525,256"/><area shape="rect" id="node10" href="t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="551,229,671,256"/></map>
+<area shape="rect" id="node2" href="TMatrix__as_8h.html" title="TMatrix_as.h" alt="" coords="244,80,343,107"/><area shape="rect" id="node3" href="Mutils_8h.html" title="Mutils.h" alt="" coords="259,155,327,181"/><area shape="rect" id="node9" href="Syms_8h.html" title="Syms.h" alt="" coords="469,229,536,256"/><area shape="rect" id="node10" href="t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="561,229,681,256"/></map>
 </div>
 </div>
 <p><a href="TMatrix__as_8c_source.html">Go to the source code of this file.</a></p>
@@ -85,12 +85,12 @@ Include dependency graph for TMatrix_as.c:</div>
 Macros</h2></td></tr>
 <tr class="memitem:adf491b7da43f594951efb75e5838b2b8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TMatrix__as_8c.html#adf491b7da43f594951efb75e5838b2b8">ALLOC_val_x_SLOT</a>(__SEXP__, __S_TYPE__)&#160;&#160;&#160;vx = __SEXP__(<a class="el" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786">ALLOC_SLOT</a>(val, <a class="el" href="Syms_8h.html#a8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a>,__S_TYPE__, nv))</td></tr>
 <tr class="separator:adf491b7da43f594951efb75e5838b2b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c0d767e5ca2236a93389ef89517ef9c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TMatrix__as_8c.html#a8c0d767e5ca2236a93389ef89517ef9c">Matrix_T_as_DENSE</a>(_C_TYPE_, _SEXP_, _SEXPTYPE_)</td></tr>
-<tr class="separator:a8c0d767e5ca2236a93389ef89517ef9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d596ee84ea70ca6884670d420c2a861"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TMatrix__as_8c.html#a3d596ee84ea70ca6884670d420c2a861">Matrix_sT_as_GENERAL</a>(_C_TYPE_, _SEXP_, _SEXPTYPE_)</td></tr>
+<tr class="separator:a3d596ee84ea70ca6884670d420c2a861"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9530864ef030a6c0afef339a0885b56b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TMatrix__as_8c.html#a9530864ef030a6c0afef339a0885b56b">Matrix_T_as_DENSE</a>(_C_TYPE_, _SEXP_, _SEXPTYPE_, _SYMM_)</td></tr>
+<tr class="separator:a9530864ef030a6c0afef339a0885b56b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab348912f914a5d4d739c812d0b187d88"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TMatrix__as_8c.html#ab348912f914a5d4d739c812d0b187d88">Matrix_T_as_DENSE_FINISH</a>(_X_k_)</td></tr>
 <tr class="separator:ab348912f914a5d4d739c812d0b187d88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab14b530238e07da0152a45b929641828"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TMatrix__as_8c.html#ab14b530238e07da0152a45b929641828">Matrix_T_as_GENERAL</a>(_C_TYPE_, _SEXP_, _SEXPTYPE_)</td></tr>
-<tr class="separator:ab14b530238e07da0152a45b929641828"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c4b687d0862f0b6248da456b1fb6383"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TMatrix__as_8c.html#a9c4b687d0862f0b6248da456b1fb6383">MAYBE_ALLOC_val_x_SLOT</a>(_S1_, _S2_)&#160;&#160;&#160;<a class="el" href="TMatrix__as_8c.html#adf491b7da43f594951efb75e5838b2b8">ALLOC_val_x_SLOT</a>(_S1_, _S2_)</td></tr>
 <tr class="separator:a9c4b687d0862f0b6248da456b1fb6383"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c4b687d0862f0b6248da456b1fb6383"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TMatrix__as_8c.html#a9c4b687d0862f0b6248da456b1fb6383">MAYBE_ALLOC_val_x_SLOT</a>(_S1_, _S2_)</td></tr>
@@ -160,16 +160,16 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00070">70</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00073">73</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a8c0d767e5ca2236a93389ef89517ef9c"></a>
+<a class="anchor" id="a3d596ee84ea70ca6884670d420c2a861"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define Matrix_T_as_DENSE</td>
+          <td class="memname">#define Matrix_sT_as_GENERAL</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">_C_TYPE_, </td>
@@ -193,6 +193,48 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00085">85</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+
+<p>Referenced by <a class="el" href="TMatrix__as_8c_source.html#l00128">dsTMatrix_as_dgTMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00135">lsTMatrix_as_lgTMatrix()</a>, and <a class="el" href="TMatrix__as_8c_source.html#l00169">nsTMatrix_as_ngTMatrix()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a9530864ef030a6c0afef339a0885b56b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define Matrix_T_as_DENSE</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">_C_TYPE_, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">_SEXP_, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">_SEXPTYPE_, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">_SYMM_&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">SEXP dimP = GET_SLOT(x, <a class="code" href="Syms_8h.html#a2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>),                         \</div>
 <div class="line">          xiP = GET_SLOT(x, <a class="code" href="Syms_8h.html#a900b6b19a8e80b529c1a26eb9fb6156d">Matrix_iSym</a>);                               \</div>
 <div class="line">    int k, n = INTEGER(dimP)[0], nnz = length(xiP);                     \</div>
@@ -201,22 +243,26 @@ Functions</h2></td></tr>
 <div class="line">    _C_TYPE_ *tx = _SEXP_(<a class="code" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786">ALLOC_SLOT</a>(val, <a class="code" href="Syms_8h.html#a8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a>, _SEXPTYPE_, sz)); <a class="code" href="TMatrix__as_8c.html#af5236a989102aa4378b7a867bcf19357">\</a></div>
 <div class="line"><a class="code" href="TMatrix__as_8c.html#af5236a989102aa4378b7a867bcf19357">    MAYBE_DECLARE_AND_GET_X_SLOT</a>(_C_TYPE_, _SEXP_);                     \</div>
 <div class="line">                                                                        \</div>
-<div class="line">    SET_SLOT(val, <a class="code" href="Syms_8h.html#a2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>, duplicate(dimP));                      <a class="code" href="Mutils_8h.html#aa3427e800408f6109f4153ab4baa58bb">\</a></div>
-<div class="line"><a class="code" href="Mutils_8h.html#aa3427e800408f6109f4153ab4baa58bb">    SET_DimNames</a>(val, x);                                               <a class="code" href="Mutils_8h.html#a36a9a730e1a12cbe017064fe140aefd2">\</a></div>
+<div class="line">    SET_SLOT(val, <a class="code" href="Syms_8h.html#a2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>, duplicate(dimP));                      \</div>
+<div class="line">    if(_SYMM_)                                                          <a class="code" href="Mutils_8c.html#a82c6de771bf59b491eee661020f0a1ad">\</a></div>
+<div class="line"><a class="code" href="Mutils_8c.html#a82c6de771bf59b491eee661020f0a1ad">	SET_DimNames_symm</a>(val, x);                                     <a class="code" href="Mutils_8h.html#aeb40b76e760863cfc4e4009cf04e39e6">\</a></div>
+<div class="line"><a class="code" href="Mutils_8h.html#aeb40b76e760863cfc4e4009cf04e39e6">    else								\</a></div>
+<div class="line"><a class="code" href="Mutils_8h.html#aeb40b76e760863cfc4e4009cf04e39e6">	SET_DimNames</a>(val, x);                                          <a class="code" href="Mutils_8h.html#a36a9a730e1a12cbe017064fe140aefd2">\</a></div>
 <div class="line"><a class="code" href="Mutils_8h.html#a36a9a730e1a12cbe017064fe140aefd2">    slot_dup</a>(val, x, <a class="code" href="Syms_8h.html#ac4fa9962123be6abbeaf9c7219b62644">Matrix_uploSym</a>)</div>
 <div class="ttc" id="Syms_8h_html_a2b91d011a529c5665e032a6565275374"><div class="ttname"><a href="Syms_8h.html#a2b91d011a529c5665e032a6565275374">Matrix_DimSym</a></div><div class="ttdeci">SEXP Matrix_DimSym</div><div class="ttdef"><b>Definition:</b> <a href="Syms_8h_source.html#l00002">Syms.h:2</a></div></div>
 <div class="ttc" id="Syms_8h_html_a8e6ccf1b89de0c7d61722fd1579eb085"><div class="ttname"><a href="Syms_8h.html#a8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a></div><div class="ttdeci">SEXP Matrix_xSym</div><div class="ttdef"><b>Definition:</b> <a href="Syms_8h_source.html#l00002">Syms.h:2</a></div></div>
 <div class="ttc" id="Mutils_8h_html_a36a9a730e1a12cbe017064fe140aefd2"><div class="ttname"><a href="Mutils_8h.html#a36a9a730e1a12cbe017064fe140aefd2">slot_dup</a></div><div class="ttdeci">#define slot_dup(dest, src, sym)</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8h_source.html#l00131">Mutils.h:131</a></div></div>
 <div class="ttc" id="Syms_8h_html_ac4fa9962123be6abbeaf9c7219b62644"><div class="ttname"><a href="Syms_8h.html#ac4fa9962123be6abbeaf9c7219b62644">Matrix_uploSym</a></div><div class="ttdeci">SEXP Matrix_uploSym</div><div class="ttdef"><b>Definition:</b> <a href="Syms_8h_source.html#l00002">Syms.h:2</a></div></div>
-<div class="ttc" id="Mutils_8h_html_aa3427e800408f6109f4153ab4baa58bb"><div class="ttname"><a href="Mutils_8h.html#aa3427e800408f6109f4153ab4baa58bb">SET_DimNames</a></div><div class="ttdeci">#define SET_DimNames(dest, src)</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8h_source.html#l00144">Mutils.h:144</a></div></div>
 <div class="ttc" id="Syms_8h_html_a92da52e94414e4e2c04f11a6dce844d7"><div class="ttname"><a href="Syms_8h.html#a92da52e94414e4e2c04f11a6dce844d7">Matrix_jSym</a></div><div class="ttdeci">SEXP Matrix_jSym</div><div class="ttdef"><b>Definition:</b> <a href="Syms_8h_source.html#l00002">Syms.h:2</a></div></div>
 <div class="ttc" id="Syms_8h_html_a900b6b19a8e80b529c1a26eb9fb6156d"><div class="ttname"><a href="Syms_8h.html#a900b6b19a8e80b529c1a26eb9fb6156d">Matrix_iSym</a></div><div class="ttdeci">SEXP Matrix_iSym</div><div class="ttdef"><b>Definition:</b> <a href="Syms_8h_source.html#l00002">Syms.h:2</a></div></div>
-<div class="ttc" id="Mutils_8h_html_af7f59236ca18ab52131cf71f4a7b0786"><div class="ttname"><a href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786">ALLOC_SLOT</a></div><div class="ttdeci">static R_INLINE SEXP ALLOC_SLOT(SEXP obj, SEXP nm, SEXPTYPE type, int length)</div><div class="ttdoc">Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP...</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8h_source.html#l00211">Mutils.h:211</a></div></div>
-<div class="ttc" id="TMatrix__as_8c_html_af5236a989102aa4378b7a867bcf19357"><div class="ttname"><a href="TMatrix__as_8c.html#af5236a989102aa4378b7a867bcf19357">MAYBE_DECLARE_AND_GET_X_SLOT</a></div><div class="ttdeci">#define MAYBE_DECLARE_AND_GET_X_SLOT(__T__, __S__)</div><div class="ttdef"><b>Definition:</b> <a href="TMatrix__as_8c_source.html#l00141">TMatrix_as.c:141</a></div></div>
+<div class="ttc" id="Mutils_8c_html_a82c6de771bf59b491eee661020f0a1ad"><div class="ttname"><a href="Mutils_8c.html#a82c6de771bf59b491eee661020f0a1ad">SET_DimNames_symm</a></div><div class="ttdeci">void SET_DimNames_symm(SEXP dest, SEXP src)</div><div class="ttdoc">Set &#39;Dimnames&#39; slot of &#39;dest&#39; from the one of &#39;src&#39; when &#39;src&#39; is a &quot;symmetricMatrix&quot; with possibly...</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8c_source.html#l01265">Mutils.c:1265</a></div></div>
+<div class="ttc" id="Mutils_8h_html_aeb40b76e760863cfc4e4009cf04e39e6"><div class="ttname"><a href="Mutils_8h.html#aeb40b76e760863cfc4e4009cf04e39e6">SET_DimNames</a></div><div class="ttdeci">static R_INLINE void SET_DimNames(SEXP dest, SEXP src)</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8h_source.html#l00143">Mutils.h:143</a></div></div>
+<div class="ttc" id="Mutils_8h_html_af7f59236ca18ab52131cf71f4a7b0786"><div class="ttname"><a href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786">ALLOC_SLOT</a></div><div class="ttdeci">static R_INLINE SEXP ALLOC_SLOT(SEXP obj, SEXP nm, SEXPTYPE type, int length)</div><div class="ttdoc">Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP...</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8h_source.html#l00220">Mutils.h:220</a></div></div>
+<div class="ttc" id="TMatrix__as_8c_html_af5236a989102aa4378b7a867bcf19357"><div class="ttname"><a href="TMatrix__as_8c.html#af5236a989102aa4378b7a867bcf19357">MAYBE_DECLARE_AND_GET_X_SLOT</a></div><div class="ttdeci">#define MAYBE_DECLARE_AND_GET_X_SLOT(__T__, __S__)</div><div class="ttdef"><b>Definition:</b> <a href="TMatrix__as_8c_source.html#l00144">TMatrix_as.c:144</a></div></div>
 </div><!-- fragment -->
 <p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00007">7</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
-<p>Referenced by <a class="el" href="TMatrix__as_8c_source.html#l00028">dsTMatrix_as_dsyMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00046">dtTMatrix_as_dtrMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00036">lsTMatrix_as_lsyMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00055">ltTMatrix_as_ltrMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00149">nsTMatrix_as_nsyMatrix()</a>, and <a class="el" href="TMatrix__as_8c_source.html#l00157">ntTMatrix_as_ntrMatrix()</a>.</p>
+<p>Referenced by <a class="el" href="TMatrix__as_8c_source.html#l00031">dsTMatrix_as_dsyMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00049">dtTMatrix_as_dtrMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00039">lsTMatrix_as_lsyMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00058">ltTMatrix_as_ltrMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00152">nsTMatrix_as_nsyMatrix()</a>, and <a class="el" href="TMatrix__as_8c_source.html#l00160">ntTMatrix_as_ntrMatrix()</a>.</p>
 
 </div>
 </div>
@@ -240,45 +286,9 @@ Functions</h2></td></tr>
 <div class="line">    return val</div>
 <div class="ttc" id="Mutils_8h_html_a8388ab26cceddaa6efaccc3c51add430"><div class="ttname"><a href="Mutils_8h.html#a8388ab26cceddaa6efaccc3c51add430">AZERO</a></div><div class="ttdeci">#define AZERO(x, n)</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8h_source.html#l00122">Mutils.h:122</a></div></div>
 </div><!-- fragment -->
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00020">20</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00023">23</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
-<p>Referenced by <a class="el" href="TMatrix__as_8c_source.html#l00028">dsTMatrix_as_dsyMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00046">dtTMatrix_as_dtrMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00036">lsTMatrix_as_lsyMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00055">ltTMatrix_as_ltrMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00149">nsTMatrix_as_nsyMatrix()</a>, and <a class="el" href="TMatrix__as_8c_source.html#l00157">ntTMatrix_as_ntrMatrix()</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ab14b530238e07da0152a45b929641828"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define Matrix_T_as_GENERAL</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">_C_TYPE_, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">_SEXP_, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">_SEXPTYPE_&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00082">82</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
-
-<p>Referenced by <a class="el" href="TMatrix__as_8c_source.html#l00125">dsTMatrix_as_dgTMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00132">lsTMatrix_as_lgTMatrix()</a>, and <a class="el" href="TMatrix__as_8c_source.html#l00166">nsTMatrix_as_ngTMatrix()</a>.</p>
+<p>Referenced by <a class="el" href="TMatrix__as_8c_source.html#l00031">dsTMatrix_as_dsyMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00049">dtTMatrix_as_dtrMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00039">lsTMatrix_as_lsyMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00058">ltTMatrix_as_ltrMatrix()</a>, <a class="el" href="TMatrix__as_8c_source.html#l00152">nsTMatrix_as_nsyMatrix()</a>, and <a class="el" href="TMatrix__as_8c_source.html#l00160">ntTMatrix_as_ntrMatrix()</a>.</p>
 
 </div>
 </div>
@@ -306,7 +316,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00143">143</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00146">146</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
 </div>
 </div>
@@ -334,7 +344,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00143">143</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00146">146</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
 </div>
 </div>
@@ -362,7 +372,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00141">141</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00144">144</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
 </div>
 </div>
@@ -390,7 +400,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00141">141</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00144">144</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
 </div>
 </div>
@@ -418,7 +428,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00141">141</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00144">144</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
 </div>
 </div>
@@ -432,7 +442,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00145">145</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00148">148</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
 </div>
 </div>
@@ -446,7 +456,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00145">145</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00148">148</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
 </div>
 </div>
@@ -460,7 +470,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00147">147</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00150">150</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
 </div>
 </div>
@@ -474,7 +484,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00147">147</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00150">150</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
 </div>
 </div>
@@ -488,7 +498,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00076">76</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00079">79</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
 </div>
 </div>
@@ -502,7 +512,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00079">79</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00082">82</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
 </div>
 </div>
@@ -521,9 +531,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00125">125</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00128">128</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
-<p>References <a class="el" href="TMatrix__as_8c_source.html#l00082">Matrix_T_as_GENERAL</a>.</p>
+<p>References <a class="el" href="TMatrix__as_8c_source.html#l00085">Matrix_sT_as_GENERAL</a>.</p>
 
 </div>
 </div>
@@ -541,9 +551,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00028">28</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00031">31</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
-<p>References <a class="el" href="TMatrix__as_8c_source.html#l00007">Matrix_T_as_DENSE</a>, and <a class="el" href="TMatrix__as_8c_source.html#l00020">Matrix_T_as_DENSE_FINISH</a>.</p>
+<p>References <a class="el" href="TMatrix__as_8c_source.html#l00007">Matrix_T_as_DENSE</a>, and <a class="el" href="TMatrix__as_8c_source.html#l00023">Matrix_T_as_DENSE_FINISH</a>.</p>
 
 </div>
 </div>
@@ -561,9 +571,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00046">46</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00049">49</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
-<p>References <a class="el" href="Syms_8h_source.html#l00002">Matrix_diagSym</a>, <a class="el" href="TMatrix__as_8c_source.html#l00007">Matrix_T_as_DENSE</a>, <a class="el" href="TMatrix__as_8c_source.html#l00020">Matrix_T_as_DENSE_FINISH</a>, and <a class="el" href="Mutils_8h_source.html#l00131">slot_dup</a>.</p>
+<p>References <a class="el" href="Syms_8h_source.html#l00002">Matrix_diagSym</a>, <a class="el" href="TMatrix__as_8c_source.html#l00007">Matrix_T_as_DENSE</a>, <a class="el" href="TMatrix__as_8c_source.html#l00023">Matrix_T_as_DENSE_FINISH</a>, and <a class="el" href="Mutils_8h_source.html#l00131">slot_dup</a>.</p>
 
 </div>
 </div>
@@ -581,9 +591,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00132">132</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00135">135</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
-<p>References <a class="el" href="TMatrix__as_8c_source.html#l00082">Matrix_T_as_GENERAL</a>.</p>
+<p>References <a class="el" href="TMatrix__as_8c_source.html#l00085">Matrix_sT_as_GENERAL</a>.</p>
 
 </div>
 </div>
@@ -601,9 +611,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00036">36</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00039">39</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
-<p>References <a class="el" href="TMatrix__as_8c_source.html#l00007">Matrix_T_as_DENSE</a>, and <a class="el" href="TMatrix__as_8c_source.html#l00020">Matrix_T_as_DENSE_FINISH</a>.</p>
+<p>References <a class="el" href="TMatrix__as_8c_source.html#l00007">Matrix_T_as_DENSE</a>, and <a class="el" href="TMatrix__as_8c_source.html#l00023">Matrix_T_as_DENSE_FINISH</a>.</p>
 
 </div>
 </div>
@@ -621,9 +631,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00055">55</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00058">58</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
-<p>References <a class="el" href="Syms_8h_source.html#l00002">Matrix_diagSym</a>, <a class="el" href="TMatrix__as_8c_source.html#l00007">Matrix_T_as_DENSE</a>, <a class="el" href="TMatrix__as_8c_source.html#l00020">Matrix_T_as_DENSE_FINISH</a>, and <a class="el" href="Mutils_8h_source.html#l00131">slot_dup</a>.</p>
+<p>References <a class="el" href="Syms_8h_source.html#l00002">Matrix_diagSym</a>, <a class="el" href="TMatrix__as_8c_source.html#l00007">Matrix_T_as_DENSE</a>, <a class="el" href="TMatrix__as_8c_source.html#l00023">Matrix_T_as_DENSE_FINISH</a>, and <a class="el" href="Mutils_8h_source.html#l00131">slot_dup</a>.</p>
 
 </div>
 </div>
@@ -641,9 +651,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00166">166</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00169">169</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
-<p>References <a class="el" href="TMatrix__as_8c_source.html#l00082">Matrix_T_as_GENERAL</a>.</p>
+<p>References <a class="el" href="TMatrix__as_8c_source.html#l00085">Matrix_sT_as_GENERAL</a>.</p>
 
 </div>
 </div>
@@ -661,9 +671,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00149">149</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00152">152</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
-<p>References <a class="el" href="TMatrix__as_8c_source.html#l00007">Matrix_T_as_DENSE</a>, and <a class="el" href="TMatrix__as_8c_source.html#l00020">Matrix_T_as_DENSE_FINISH</a>.</p>
+<p>References <a class="el" href="TMatrix__as_8c_source.html#l00007">Matrix_T_as_DENSE</a>, and <a class="el" href="TMatrix__as_8c_source.html#l00023">Matrix_T_as_DENSE_FINISH</a>.</p>
 
 </div>
 </div>
@@ -681,9 +691,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00157">157</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
+<p>Definition at line <a class="el" href="TMatrix__as_8c_source.html#l00160">160</a> of file <a class="el" href="TMatrix__as_8c_source.html">TMatrix_as.c</a>.</p>
 
-<p>References <a class="el" href="Syms_8h_source.html#l00002">Matrix_diagSym</a>, <a class="el" href="TMatrix__as_8c_source.html#l00007">Matrix_T_as_DENSE</a>, <a class="el" href="TMatrix__as_8c_source.html#l00020">Matrix_T_as_DENSE_FINISH</a>, and <a class="el" href="Mutils_8h_source.html#l00131">slot_dup</a>.</p>
+<p>References <a class="el" href="Syms_8h_source.html#l00002">Matrix_diagSym</a>, <a class="el" href="TMatrix__as_8c_source.html#l00007">Matrix_T_as_DENSE</a>, <a class="el" href="TMatrix__as_8c_source.html#l00023">Matrix_T_as_DENSE_FINISH</a>, and <a class="el" href="Mutils_8h_source.html#l00131">slot_dup</a>.</p>
 
 </div>
 </div>
@@ -693,7 +703,7 @@ Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="TMatrix__as_8c.html">TMatrix_as.c</a></li>
-    <li class="footer">Generated on Tue Dec 23 2014 23:58:49 for Matrix by
+    <li class="footer">Generated on Thu Mar 26 2015 11:54:21 for Matrix by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

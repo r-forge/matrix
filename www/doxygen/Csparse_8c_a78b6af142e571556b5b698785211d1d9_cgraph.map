@@ -1,0 +1,6 @@
+<map id="Csparse_Csparse_prod" name="Csparse_Csparse_prod">
+<area shape="rect" id="node2" href="$chm__common_8c.html#a713dd9a3d6095f9b55e453d18ca87d5a" title="Drop the (unit) diagonal entries from a cholmod_sparse matrix. " alt="" coords="238,5,343,32"/>
+<area shape="rect" id="node3" href="$chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="213,56,368,83"/>
+<area shape="rect" id="node5" href="$Csparse_8c.html#a4445bf9e1d6a9ee608151123b9d3aa9f" title="nz2Csparse" alt="" coords="245,107,337,133"/>
+<area shape="rect" id="node4" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="416,81,523,108"/>
+</map>

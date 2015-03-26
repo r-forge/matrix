@@ -78,7 +78,7 @@ Include dependency graph for dense.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="dense_8c__incl.png" border="0" usemap="#dense_8c" alt=""/></div>
 <map name="dense_8c" id="dense_8c">
-<area shape="rect" id="node2" href="dense_8h.html" title="dense.h" alt="" coords="140,80,207,107"/><area shape="rect" id="node5" href="Mutils_8h.html" title="Mutils.h" alt="" coords="267,163,333,189"/><area shape="rect" id="node12" href="chm__common_8h.html" title="chm_common.h" alt="" coords="356,80,471,107"/><area shape="rect" id="node10" href="Syms_8h.html" title="Syms.h" alt="" coords="461,245,525,272"/><area shape="rect" id="node11" href="t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="551,245,671,272"/></map>
+<area shape="rect" id="node2" href="dense_8h.html" title="dense.h" alt="" coords="143,80,211,107"/><area shape="rect" id="node5" href="Mutils_8h.html" title="Mutils.h" alt="" coords="274,163,341,189"/><area shape="rect" id="node12" href="chm__common_8h.html" title="chm_common.h" alt="" coords="364,80,479,107"/><area shape="rect" id="node10" href="Syms_8h.html" title="Syms.h" alt="" coords="471,245,537,272"/><area shape="rect" id="node11" href="t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="562,245,683,272"/></map>
 </div>
 </div>
 <p><a href="dense_8c_source.html">Go to the source code of this file.</a></p>
@@ -159,10 +159,11 @@ Functions</h2></td></tr>
 <div class="line">            if(isNull(VECTOR_ELT(dns, J)))                              \</div>
 <div class="line">                J = !J;                                                 \</div>
 <div class="line">            SET_VECTOR_ELT(dns, !J, VECTOR_ELT(dns, J));                \</div>
-<div class="line">        } <span class="comment">/* names(dimnames(.)):*/</span>                                      \</div>
+<div class="line">        }                                                               \</div>
+<div class="line">        <span class="comment">/* names(dimnames(.)): */</span>                                       \</div>
 <div class="line">        if(!isNull(nms_dns = getAttrib(dns, R_NamesSymbol)) &amp;&amp;          \</div>
 <div class="line">           !R_compute_identical(STRING_ELT(nms_dns, 0),                 \</div>
-<div class="line">                                STRING_ELT(nms_dns, 1), 15)) {          \</div>
+<div class="line">                                STRING_ELT(nms_dns, 1), 16)) {          \</div>
 <div class="line">            SET_STRING_ELT(nms_dns, !J, STRING_ELT(nms_dns, J));        \</div>
 <div class="line">            setAttrib(dns, R_NamesSymbol, nms_dns);                     \</div>
 <div class="line">        }                                                               \</div>
@@ -184,7 +185,7 @@ Functions</h2></td></tr>
 <div class="ttc" id="Syms_8h_html_ac4fa9962123be6abbeaf9c7219b62644"><div class="ttname"><a href="Syms_8h.html#ac4fa9962123be6abbeaf9c7219b62644">Matrix_uploSym</a></div><div class="ttdeci">SEXP Matrix_uploSym</div><div class="ttdef"><b>Definition:</b> <a href="Syms_8h_source.html#l00002">Syms.h:2</a></div></div>
 <div class="ttc" id="Mutils_8c_html_ae0e07b5d446943159295e745388285e2"><div class="ttname"><a href="Mutils_8c.html#ae0e07b5d446943159295e745388285e2">equal_string_vectors</a></div><div class="ttdeci">Rboolean equal_string_vectors(SEXP s1, SEXP s2)</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8c_source.html#l00287">Mutils.c:287</a></div></div>
 </div><!-- fragment -->
-<p>Referenced by <a class="el" href="dense_8c_source.html#l00479">ddense_skewpart()</a>, and <a class="el" href="dense_8c_source.html#l00423">ddense_symmpart()</a>.</p>
+<p>Referenced by <a class="el" href="dense_8c_source.html#l00481">ddense_skewpart()</a>, and <a class="el" href="dense_8c_source.html#l00423">ddense_symmpart()</a>.</p>
 
 </div>
 </div>
@@ -249,7 +250,7 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="dense_8c_a4ada21e7b04deec43e792d2fc3b0d70e_cgraph.png" border="0" usemap="#dense_8c_a4ada21e7b04deec43e792d2fc3b0d70e_cgraph" alt=""/></div>
 <map name="dense_8c_a4ada21e7b04deec43e792d2fc3b0d70e_cgraph" id="dense_8c_a4ada21e7b04deec43e792d2fc3b0d70e_cgraph">
-<area shape="rect" id="node2" href="dense_8c.html#a00caca24445d05daed3f05182e00c00c" title="getGivens" alt="" coords="153,5,234,32"/><area shape="rect" id="node3" href="dense_8c.html#a68bc52a49ead614a48ef477696af3b78" title="Perform a left cyclic shift of columns j to k in the upper triangular matrix x, then restore it to up..." alt="" coords="283,5,363,32"/></map>
+<area shape="rect" id="node2" href="dense_8c.html#a00caca24445d05daed3f05182e00c00c" title="getGivens" alt="" coords="153,5,234,32"/><area shape="rect" id="node3" href="dense_8c.html#a68bc52a49ead614a48ef477696af3b78" title="Perform a left cyclic shift of columns j to k in the upper triangular matrix x, then restore it to up..." alt="" coords="283,5,365,32"/></map>
 </div>
 </p>
 
@@ -269,16 +270,16 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dense_8c_source.html#l00479">479</a> of file <a class="el" href="dense_8c_source.html">dense.c</a>.</p>
+<p>Definition at line <a class="el" href="dense_8c_source.html#l00481">481</a> of file <a class="el" href="dense_8c_source.html">dense.c</a>.</p>
 
-<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="Mutils_8c_source.html#l00819">dup_mMatrix_as_dgeMatrix()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_xSym</a>, and <a class="el" href="dense_8c.html#a5d2f05f7e4fa359cfc7655bffed72230">MK_SYMMETRIC_DIMNAMES_AND_RETURN</a>.</p>
+<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="Mutils_8c_source.html#l00800">dup_mMatrix_as_dgeMatrix()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_xSym</a>, and <a class="el" href="dense_8c.html#a5d2f05f7e4fa359cfc7655bffed72230">MK_SYMMETRIC_DIMNAMES_AND_RETURN</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="dense_8c_af57ee72c2df4d7eaca5ecd2084f78747_cgraph.png" border="0" usemap="#dense_8c_af57ee72c2df4d7eaca5ecd2084f78747_cgraph" alt=""/></div>
 <map name="dense_8c_af57ee72c2df4d7eaca5ecd2084f78747_cgraph" id="dense_8c_af57ee72c2df4d7eaca5ecd2084f78747_cgraph">
-<area shape="rect" id="node2" href="Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="179,5,359,32"/><area shape="rect" id="node3" href="Mutils_8c.html#ac7bfe157b527715287335783f004ca8c" title="dup_mMatrix_as_dgeMatrix2" alt="" coords="408,5,595,32"/></map>
+<area shape="rect" id="node2" href="Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="179,5,362,32"/><area shape="rect" id="node3" href="Mutils_8c.html#ac7bfe157b527715287335783f004ca8c" title="dup_mMatrix_as_dgeMatrix2" alt="" coords="411,5,600,32"/></map>
 </div>
 </p>
 
@@ -300,14 +301,14 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="dense_8c_source.html#l00423">423</a> of file <a class="el" href="dense_8c_source.html">dense.c</a>.</p>
 
-<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="Mutils_8c_source.html#l00819">dup_mMatrix_as_dgeMatrix()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_xSym</a>, and <a class="el" href="dense_8c.html#a5d2f05f7e4fa359cfc7655bffed72230">MK_SYMMETRIC_DIMNAMES_AND_RETURN</a>.</p>
+<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="Mutils_8c_source.html#l00800">dup_mMatrix_as_dgeMatrix()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_xSym</a>, and <a class="el" href="dense_8c.html#a5d2f05f7e4fa359cfc7655bffed72230">MK_SYMMETRIC_DIMNAMES_AND_RETURN</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="dense_8c_a270b02ab3c84accb423eaefbe42dfe8b_cgraph.png" border="0" usemap="#dense_8c_a270b02ab3c84accb423eaefbe42dfe8b_cgraph" alt=""/></div>
 <map name="dense_8c_a270b02ab3c84accb423eaefbe42dfe8b_cgraph" id="dense_8c_a270b02ab3c84accb423eaefbe42dfe8b_cgraph">
-<area shape="rect" id="node2" href="Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="182,5,362,32"/><area shape="rect" id="node3" href="Mutils_8c.html#ac7bfe157b527715287335783f004ca8c" title="dup_mMatrix_as_dgeMatrix2" alt="" coords="411,5,597,32"/></map>
+<area shape="rect" id="node2" href="Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="185,5,367,32"/><area shape="rect" id="node3" href="Mutils_8c.html#ac7bfe157b527715287335783f004ca8c" title="dup_mMatrix_as_dgeMatrix2" alt="" coords="416,5,605,32"/></map>
 </div>
 </p>
 
@@ -345,14 +346,14 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="dense_8c_source.html#l00277">277</a> of file <a class="el" href="dense_8c_source.html">dense.c</a>.</p>
 
-<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="chm__common_8c_source.html#l00014">cl</a>, <a class="el" href="Mutils_8h_source.html#l00151">class_P</a>, <a class="el" href="Mutils_8c_source.html#l00618">dup_mMatrix_as_geMatrix()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_diagSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_uploSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_xSym</a>, and <a class="el" href="dense_8c.html#ada9a48e532d50788f797da73810bb2e0">SET_ZERO_OUTSIDE</a>.</p>
+<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="chm__common_8c_source.html#l00014">cl</a>, <a class="el" href="Mutils_8h_source.html#l00160">class_P</a>, <a class="el" href="Mutils_8c_source.html#l00599">dup_mMatrix_as_geMatrix()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_diagSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_uploSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_xSym</a>, and <a class="el" href="dense_8c.html#ada9a48e532d50788f797da73810bb2e0">SET_ZERO_OUTSIDE</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="dense_8c_a51f8ef02250194b1d1a918acb369d52a_cgraph.png" border="0" usemap="#dense_8c_a51f8ef02250194b1d1a918acb369d52a_cgraph" alt=""/></div>
 <map name="dense_8c_a51f8ef02250194b1d1a918acb369d52a_cgraph" id="dense_8c_a51f8ef02250194b1d1a918acb369d52a_cgraph">
-<area shape="rect" id="node2" href="Mutils_8c.html#a23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="147,81,320,108"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="401,5,509,32"/><area shape="rect" id="node4" href="Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title="make_i_matrix_triangular" alt="" coords="371,56,538,83"/><area shape="rect" id="node5" href="Mutils_8h.html#a133847040a4bd7d9bdb602c11aa6f048" title="make_i_matrix_symmetric" alt="" coords="368,107,541,133"/><area shape="rect" id="node6" href="Mutils_8c.html#adaf5449cf279f61000d9d1a1215d4b6a" title="install_diagonal_int" alt="" coords="389,157,521,184"/></map>
+<area shape="rect" id="node2" href="Mutils_8c.html#a23764b1c8334e40406598a0446cc8bc5" title="Duplicate a [dln]denseMatrix or a numeric matrix or even vector as a [dln]geMatrix. " alt="" coords="147,81,322,108"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="405,5,512,32"/><area shape="rect" id="node4" href="Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title="make_i_matrix_triangular" alt="" coords="375,56,542,83"/><area shape="rect" id="node5" href="Mutils_8h.html#a133847040a4bd7d9bdb602c11aa6f048" title="make_i_matrix_symmetric" alt="" coords="371,107,546,133"/><area shape="rect" id="node6" href="Mutils_8c.html#adaf5449cf279f61000d9d1a1215d4b6a" title="install_diagonal_int" alt="" coords="393,157,525,184"/></map>
 </div>
 </p>
 
@@ -374,14 +375,14 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="dense_8c_source.html#l00249">249</a> of file <a class="el" href="dense_8c_source.html">dense.c</a>.</p>
 
-<p>References <a class="el" href="chm__common_8h_source.html#l00041">AS_CHM_DN</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00314">chm_sparse_to_SEXP()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Mutils_8h_source.html#l00312">mMatrix_as_geMatrix()</a>, and <a class="el" href="Mutils_8h_source.html#l00162">Real_KIND2</a>.</p>
+<p>References <a class="el" href="chm__common_8h_source.html#l00042">AS_CHM_xDN</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00331">chm_sparse_to_SEXP()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Mutils_8h_source.html#l00323">mMatrix_as_geMatrix()</a>, and <a class="el" href="Mutils_8h_source.html#l00171">Real_KIND2</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="dense_8c_a33b46f3a16a95734d4875ddfbfa079cb_cgraph.png" border="0" usemap="#dense_8c_a33b46f3a16a95734d4875ddfbfa079cb_cgraph" alt=""/></div>
 <map name="dense_8c_a33b46f3a16a95734d4875ddfbfa079cb_cgraph" id="dense_8c_a33b46f3a16a95734d4875ddfbfa079cb_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="389,5,542,32"/><area shape="rect" id="node4" href="Mutils_8h.html#a623039270a92fce0643031ef7f6e72b2" title="mMatrix_as_geMatrix" alt="" coords="185,56,330,83"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="633,5,741,32"/><area shape="rect" id="node5" href="Mutils_8h.html#a23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="379,56,552,83"/><area shape="rect" id="node6" href="Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title="make_i_matrix_triangular" alt="" coords="603,56,770,83"/><area shape="rect" id="node7" href="Mutils_8h.html#a133847040a4bd7d9bdb602c11aa6f048" title="make_i_matrix_symmetric" alt="" coords="600,107,773,133"/><area shape="rect" id="node8" href="Mutils_8c.html#adaf5449cf279f61000d9d1a1215d4b6a" title="install_diagonal_int" alt="" coords="621,157,753,184"/></map>
+<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="389,5,544,32"/><area shape="rect" id="node4" href="Mutils_8h.html#a623039270a92fce0643031ef7f6e72b2" title="mMatrix_as_geMatrix" alt="" coords="184,56,331,83"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="637,5,744,32"/><area shape="rect" id="node5" href="Mutils_8h.html#a23764b1c8334e40406598a0446cc8bc5" title="Duplicate a [dln]denseMatrix or a numeric matrix or even vector as a [dln]geMatrix. " alt="" coords="379,56,554,83"/><area shape="rect" id="node6" href="Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title="make_i_matrix_triangular" alt="" coords="607,56,774,83"/><area shape="rect" id="node7" href="Mutils_8h.html#a133847040a4bd7d9bdb602c11aa6f048" title="make_i_matrix_symmetric" alt="" coords="603,107,778,133"/><area shape="rect" id="node8" href="Mutils_8c.html#adaf5449cf279f61000d9d1a1215d4b6a" title="install_diagonal_int" alt="" coords="625,157,757,184"/></map>
 </div>
 </p>
 
@@ -419,14 +420,14 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="dense_8c_source.html#l00340">340</a> of file <a class="el" href="dense_8c_source.html">dense.c</a>.</p>
 
-<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="dense_8c.html#a66ab3a2b075e73f4a9e1db3447a3d3a9">CHECK_SYMMETRIC</a>, <a class="el" href="chm__common_8c_source.html#l00014">cl</a>, <a class="el" href="Mutils_8h_source.html#l00151">class_P</a>, <a class="el" href="Mutils_8c_source.html#l00618">dup_mMatrix_as_geMatrix()</a>, <a class="el" href="Mutils_8c_source.html#l00287">equal_string_vectors()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_uploSym</a>, and <a class="el" href="Syms_8h_source.html#l00002">Matrix_xSym</a>.</p>
+<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="dense_8c.html#a66ab3a2b075e73f4a9e1db3447a3d3a9">CHECK_SYMMETRIC</a>, <a class="el" href="chm__common_8c_source.html#l00014">cl</a>, <a class="el" href="Mutils_8h_source.html#l00160">class_P</a>, <a class="el" href="Mutils_8c_source.html#l00599">dup_mMatrix_as_geMatrix()</a>, <a class="el" href="Mutils_8c_source.html#l00287">equal_string_vectors()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_uploSym</a>, and <a class="el" href="Syms_8h_source.html#l00002">Matrix_xSym</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="dense_8c_a389bdf26bd829335d25dffb4244c9ae6_cgraph.png" border="0" usemap="#dense_8c_a389bdf26bd829335d25dffb4244c9ae6_cgraph" alt=""/></div>
 <map name="dense_8c_a389bdf26bd829335d25dffb4244c9ae6_cgraph" id="dense_8c_a389bdf26bd829335d25dffb4244c9ae6_cgraph">
-<area shape="rect" id="node2" href="Mutils_8c.html#a23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="197,81,371,108"/><area shape="rect" id="node7" href="Mutils_8c.html#ae0e07b5d446943159295e745388285e2" title="equal_string_vectors" alt="" coords="213,132,355,159"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="451,5,559,32"/><area shape="rect" id="node4" href="Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title="make_i_matrix_triangular" alt="" coords="422,56,589,83"/><area shape="rect" id="node5" href="Mutils_8h.html#a133847040a4bd7d9bdb602c11aa6f048" title="make_i_matrix_symmetric" alt="" coords="419,107,592,133"/><area shape="rect" id="node6" href="Mutils_8c.html#adaf5449cf279f61000d9d1a1215d4b6a" title="install_diagonal_int" alt="" coords="439,157,571,184"/></map>
+<area shape="rect" id="node2" href="Mutils_8c.html#a23764b1c8334e40406598a0446cc8bc5" title="Duplicate a [dln]denseMatrix or a numeric matrix or even vector as a [dln]geMatrix. " alt="" coords="198,81,373,108"/><area shape="rect" id="node7" href="Mutils_8c.html#ae0e07b5d446943159295e745388285e2" title="equal_string_vectors" alt="" coords="214,132,357,159"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="456,5,563,32"/><area shape="rect" id="node4" href="Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title="make_i_matrix_triangular" alt="" coords="426,56,593,83"/><area shape="rect" id="node5" href="Mutils_8h.html#a133847040a4bd7d9bdb602c11aa6f048" title="make_i_matrix_symmetric" alt="" coords="422,107,597,133"/><area shape="rect" id="node6" href="Mutils_8c.html#adaf5449cf279f61000d9d1a1215d4b6a" title="install_diagonal_int" alt="" coords="443,157,575,184"/></map>
 </div>
 </p>
 
@@ -487,7 +488,7 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="dense_8c_a00caca24445d05daed3f05182e00c00c_cgraph.png" border="0" usemap="#dense_8c_a00caca24445d05daed3f05182e00c00c_cgraph" alt=""/></div>
 <map name="dense_8c_a00caca24445d05daed3f05182e00c00c_cgraph" id="dense_8c_a00caca24445d05daed3f05182e00c00c_cgraph">
-<area shape="rect" id="node2" href="dense_8c.html#a68bc52a49ead614a48ef477696af3b78" title="Perform a left cyclic shift of columns j to k in the upper triangular matrix x, then restore it to up..." alt="" coords="136,5,216,32"/></map>
+<area shape="rect" id="node2" href="dense_8c.html#a68bc52a49ead614a48ef477696af3b78" title="Perform a left cyclic shift of columns j to k in the upper triangular matrix x, then restore it to up..." alt="" coords="137,5,218,32"/></map>
 </div>
 </p>
 
@@ -528,14 +529,14 @@ Here is the caller graph for this function:</div>
 
 <p>Definition at line <a class="el" href="dense_8c_source.html#l00172">172</a> of file <a class="el" href="dense_8c_source.html">dense.c</a>.</p>
 
-<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="dense_8c_source.html#l00063">getGivens()</a>, and <a class="el" href="chm__common_8c_source.html#l00133">xpt()</a>.</p>
+<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="dense_8c_source.html#l00063">getGivens()</a>, and <a class="el" href="chm__common_8c_source.html#l00150">xpt()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="dense_8c_a3a13ecdf06811d2b2ced413892145007_cgraph.png" border="0" usemap="#dense_8c_a3a13ecdf06811d2b2ced413892145007_cgraph" alt=""/></div>
 <map name="dense_8c_a3a13ecdf06811d2b2ced413892145007_cgraph" id="dense_8c_a3a13ecdf06811d2b2ced413892145007_cgraph">
-<area shape="rect" id="node2" href="dense_8c.html#a00caca24445d05daed3f05182e00c00c" title="getGivens" alt="" coords="134,5,215,32"/><area shape="rect" id="node4" href="chm__common_8c.html#a9ea43d94a2bbd6c055ff9da6e3f24109" title="xpt" alt="" coords="155,56,194,83"/><area shape="rect" id="node3" href="dense_8c.html#a68bc52a49ead614a48ef477696af3b78" title="Perform a left cyclic shift of columns j to k in the upper triangular matrix x, then restore it to up..." alt="" coords="277,5,357,32"/><area shape="rect" id="node5" href="chm__common_8c.html#a6eb9b8c79c573099970c93d50e059039" title="RallocedREAL" alt="" coords="264,56,371,83"/></map>
+<area shape="rect" id="node2" href="dense_8c.html#a00caca24445d05daed3f05182e00c00c" title="getGivens" alt="" coords="134,5,215,32"/><area shape="rect" id="node4" href="chm__common_8c.html#a9ea43d94a2bbd6c055ff9da6e3f24109" title="xpt" alt="" coords="155,56,195,83"/><area shape="rect" id="node3" href="dense_8c.html#a68bc52a49ead614a48ef477696af3b78" title="Perform a left cyclic shift of columns j to k in the upper triangular matrix x, then restore it to up..." alt="" coords="278,5,359,32"/><area shape="rect" id="node5" href="chm__common_8c.html#a6eb9b8c79c573099970c93d50e059039" title="RallocedREAL" alt="" coords="265,56,373,83"/></map>
 </div>
 </p>
 
@@ -624,7 +625,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="dense_8c_a68bc52a49ead614a48ef477696af3b78_icgraph.png" border="0" usemap="#dense_8c_a68bc52a49ead614a48ef477696af3b78_icgraph" alt=""/></div>
 <map name="dense_8c_a68bc52a49ead614a48ef477696af3b78_icgraph" id="dense_8c_a68bc52a49ead614a48ef477696af3b78_icgraph">
-<area shape="rect" id="node2" href="dense_8c.html#a00caca24445d05daed3f05182e00c00c" title="getGivens" alt="" coords="134,31,215,57"/><area shape="rect" id="node3" href="dense_8c.html#a4ada21e7b04deec43e792d2fc3b0d70e" title="checkGivens" alt="" coords="264,5,363,32"/><area shape="rect" id="node4" href="dense_8h.html#a3a13ecdf06811d2b2ced413892145007" title="lapack_qr" alt="" coords="274,56,353,83"/></map>
+<area shape="rect" id="node2" href="dense_8c.html#a00caca24445d05daed3f05182e00c00c" title="getGivens" alt="" coords="137,31,218,57"/><area shape="rect" id="node3" href="dense_8c.html#a4ada21e7b04deec43e792d2fc3b0d70e" title="checkGivens" alt="" coords="267,5,365,32"/><area shape="rect" id="node4" href="dense_8h.html#a3a13ecdf06811d2b2ced413892145007" title="lapack_qr" alt="" coords="277,56,355,83"/></map>
 </div>
 </p>
 
@@ -696,7 +697,7 @@ Here is the caller graph for this function:</div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dense_8c.html">dense.c</a></li>
-    <li class="footer">Generated on Tue Dec 23 2014 23:58:47 for Matrix by
+    <li class="footer">Generated on Thu Mar 26 2015 11:54:17 for Matrix by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

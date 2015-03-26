@@ -1,5 +1,5 @@
 <map id="nz2Csparse" name="nz2Csparse">
-<area shape="rect" id="node2" href="$Csparse_8h.html#aef1a61ab6f25436301b8ee835106c23b" title="Csparse_dense_crossprod" alt="" coords="144,5,320,32"/>
-<area shape="rect" id="node3" href="$Csparse_8h.html#afec5dcac16fd72028456b98704632f1e" title="Csparse_dense_prod" alt="" coords="160,56,304,83"/>
-<area shape="rect" id="node4" href="$Csparse_8h.html#a9a393d510bc108d7f4e5807d952fc089" title="nz_pattern_to_Csparse" alt="" coords="155,107,309,133"/>
+<area shape="rect" id="node2" href="$Csparse_8h.html#a86239e094c5ee16dfc9892f09e8077d9" title="Csparse_Csparse_crossprod" alt="" coords="147,5,338,32"/>
+<area shape="rect" id="node3" href="$Csparse_8h.html#a78b6af142e571556b5b698785211d1d9" title="Csparse_Csparse_prod" alt="" coords="163,56,322,83"/>
+<area shape="rect" id="node4" href="$Csparse_8h.html#a9a393d510bc108d7f4e5807d952fc089" title="nz_pattern_to_Csparse" alt="" coords="164,107,321,133"/>
 </map>

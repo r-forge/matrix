@@ -1,6 +1,6 @@
 <map id="dgeMatrix_matrix_mm" name="dgeMatrix_matrix_mm">
-<area shape="rect" id="node2" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="225,5,333,32"/>
-<area shape="rect" id="node3" href="$Mutils_8h.html#a460951a1f5dadb579d977ba114eec12e" title="mMatrix_as_dgeMatrix" alt="" coords="203,56,355,83"/>
-<area shape="rect" id="node4" href="$Mutils_8h.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="403,56,583,83"/>
-<area shape="rect" id="node5" href="$Mutils_8c.html#ac7bfe157b527715287335783f004ca8c" title="dup_mMatrix_as_dgeMatrix2" alt="" coords="632,56,819,83"/>
+<area shape="rect" id="node2" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="229,5,336,32"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#a460951a1f5dadb579d977ba114eec12e" title="mMatrix_as_dgeMatrix" alt="" coords="205,56,360,83"/>
+<area shape="rect" id="node4" href="$Mutils_8h.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="409,56,591,83"/>
+<area shape="rect" id="node5" href="$Mutils_8c.html#ac7bfe157b527715287335783f004ca8c" title="dup_mMatrix_as_dgeMatrix2" alt="" coords="640,56,829,83"/>
 </map>

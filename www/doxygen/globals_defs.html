@@ -108,9 +108,6 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 <li>_AS_cholmod_dense_2
 : <a class="el" href="chm__common_8c.html#a1768b6e5de381f469766ad739bcb5f6a">chm_common.c</a>
 </li>
-<li>_d_Csp_
-: <a class="el" href="Csparse_8c.html#a014a43e4629043b80e41593a639197b4">Csparse.c</a>
-</li>
 <li>_dgC_
 : <a class="el" href="dgCMatrix_8c.html#a36cbccc7e18a137d9d57a08b8e11d9c7">dgCMatrix.c</a>
 </li>
@@ -175,6 +172,9 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 <li>AS_CHM_TR__
 : <a class="el" href="chm__common_8h.html#a609d3f02935d257aa6d23b49ea811dd4">chm_common.h</a>
 </li>
+<li>AS_CHM_xDN
+: <a class="el" href="chm__common_8h.html#ada2ae4b90b637b8d3a1eac7b91633c17">chm_common.h</a>
+</li>
 <li>AS_CSP
 : <a class="el" href="cs__utils_8h.html#a76e1e45a8e468f064adf2091fbd24423">cs_utils.h</a>
 </li>
@@ -200,14 +200,14 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 <li>CHM_DENSE_TYPE
 : <a class="el" href="chm__common_8c.html#a59cd9d34f36ab38501a2a6619e936daa">chm_common.c</a>
 </li>
-<li>CHM_SUB
-: <a class="el" href="Csparse_8c.html#ab0e899c9e2cc42c482e05b170977d8c5">Csparse.c</a>
-</li>
 <li>class_P
 : <a class="el" href="Mutils_8h.html#ae692d23e2a86a20fccc024b05fc23df9">Mutils.h</a>
 </li>
 <li>CMJ
 : <a class="el" href="Mutils_8h.html#ae8d6c768e4dabb6a046b5da62429bc62">Mutils.h</a>
+</li>
+<li>COPY_a_AND_b_j
+: <a class="el" href="Mutils_8c.html#a3e11f63e04952bdd751a68ec9e10dd33">Mutils.c</a>
 </li>
 <li>CS_COPYRIGHT
 : <a class="el" href="cs_8h.html#ae6b1a40644b8ddacbbc3bd7c255dbbb4">cs.h</a>
@@ -258,9 +258,6 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 
 
 <h3><a class="anchor" id="index_d"></a>- d -</h3><ul>
-<li>ddense_CLASSES
-: <a class="el" href="Mutils_8c.html#a7be943caddc2ac63d9b5f4f88c417287">Mutils.c</a>
-</li>
 <li>DECLARE_AND_GET_X_SLOT
 : <a class="el" href="Mutils_8h.html#a032962247bfd87c1e554b1d1e4028f2b">Mutils.h</a>
 </li>
@@ -361,9 +358,6 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 
 
 <h3><a class="anchor" id="index_l"></a>- l -</h3><ul>
-<li>ldense_CLASSES
-: <a class="el" href="Mutils_8c.html#a68f52724a7b285f628e37926f3855069">Mutils.c</a>
-</li>
 <li>LFT
 : <a class="el" href="Mutils_8h.html#a6e7d00d199058e42cc157f0e0435142b">Mutils.h</a>
 </li>
@@ -395,14 +389,14 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 <li>Matrix_Error_Bufsiz
 : <a class="el" href="Mutils_8c.html#a2455d7375291ba044e134ad5e7e42614">Mutils.c</a>
 </li>
+<li>Matrix_sT_as_GENERAL
+: <a class="el" href="TMatrix__as_8c.html#a3d596ee84ea70ca6884670d420c2a861">TMatrix_as.c</a>
+</li>
 <li>Matrix_T_as_DENSE
-: <a class="el" href="TMatrix__as_8c.html#a8c0d767e5ca2236a93389ef89517ef9c">TMatrix_as.c</a>
+: <a class="el" href="TMatrix__as_8c.html#a9530864ef030a6c0afef339a0885b56b">TMatrix_as.c</a>
 </li>
 <li>Matrix_T_as_DENSE_FINISH
 : <a class="el" href="TMatrix__as_8c.html#ab348912f914a5d4d739c812d0b187d88">TMatrix_as.c</a>
-</li>
-<li>Matrix_T_as_GENERAL
-: <a class="el" href="TMatrix__as_8c.html#ab14b530238e07da0152a45b929641828">TMatrix_as.c</a>
 </li>
 <li>MATRIX_VALID_CHMfactor
 : <a class="el" href="Mutils_8h.html#a653772294c10d7a2902512d629d8a850">Mutils.h</a>
@@ -410,11 +404,23 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 <li>MATRIX_VALID_Csparse
 : <a class="el" href="Mutils_8h.html#a26137187495aa7abb0f0b0d38ee1e641">Mutils.h</a>
 </li>
+<li>MATRIX_VALID_ddense
+: <a class="el" href="Mutils_8h.html#ad0ba53374133b404c7ff06812f438991">Mutils.h</a>
+</li>
 <li>MATRIX_VALID_dense
 : <a class="el" href="Mutils_8h.html#a7672e99de8325764ce7e856633635b47">Mutils.h</a>
 </li>
+<li>MATRIX_VALID_ldense
+: <a class="el" href="Mutils_8h.html#a2ea7f71eadc06630de8938985b0c706d">Mutils.h</a>
+</li>
+<li>MATRIX_VALID_ndense
+: <a class="el" href="Mutils_8h.html#a0e254d6ae1160a8fdad68845ce8ce3da">Mutils.h</a>
+</li>
 <li>MATRIX_VALID_Rsparse
 : <a class="el" href="Mutils_8h.html#a94d3f277e792f9588c95689defb06cc9">Mutils.h</a>
+</li>
+<li>MATRIX_VALID_tri_Csparse
+: <a class="el" href="Mutils_8h.html#a3898542d8edc8f61f187ac11267d42b2">Mutils.h</a>
 </li>
 <li>MATRIX_VALID_Tsparse
 : <a class="el" href="Mutils_8h.html#aba9f0996ae1d70272367c837d2ee1370">Mutils.h</a>
@@ -447,9 +453,6 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 <li>N_AS_CHM_DN
 : <a class="el" href="chm__common_8h.html#af489cbb8f0f76c9ff95c39e1bc4b2785">chm_common.h</a>
 </li>
-<li>ndense_CLASSES
-: <a class="el" href="Mutils_8c.html#af64414a9202e362d2d85a22f3306d3cf">Mutils.c</a>
-</li>
 <li>NEXT
 : <a class="el" href="cs_8c.html#a5638f1bcf2b9b270aa560e0ec861b133">cs.c</a>
 </li>
@@ -458,6 +461,9 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 </li>
 <li>NG_I_P
 : <a class="el" href="Csparse_8h.html#ab2f87ca47499042b378c564b59d8a32f">Csparse.h</a>
+</li>
+<li>NON_TRIVIAL_DN
+: <a class="el" href="Mutils_8c.html#a85b8b70985cec0cc682a55a1b79ee79e">Mutils.c</a>
 </li>
 <li>NTR
 : <a class="el" href="Mutils_8h.html#a91effc0d155bbc8c713206e3c2bb4556">Mutils.h</a>
@@ -486,11 +492,11 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 <li>RE_PERMUTE
 : <a class="el" href="dgeMatrix_8c.html#a4d96109456cb4306feff10cde2588833">dgeMatrix.c</a>
 </li>
-<li>Real_KIND
-: <a class="el" href="Mutils_8h.html#a34b65110073c8d08fb3f41db77879299">Mutils.h</a>
-</li>
 <li>Real_kind
 : <a class="el" href="Mutils_8h.html#ad0ec8e93e7bf996d7d4f241f4820c15b">Mutils.h</a>
+</li>
+<li>Real_KIND
+: <a class="el" href="Mutils_8h.html#a34b65110073c8d08fb3f41db77879299">Mutils.h</a>
 </li>
 <li>Real_KIND2
 : <a class="el" href="Mutils_8h.html#aad19b64f619d9030b1e55b109243d83b">Mutils.h</a>
@@ -511,9 +517,6 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 
 
 <h3><a class="anchor" id="index_s"></a>- s -</h3><ul>
-<li>SET_DimNames
-: <a class="el" href="Mutils_8h.html#aa3427e800408f6109f4153ab4baa58bb">Mutils.h</a>
-</li>
 <li>SET_packed_setDiag
 : <a class="el" href="Mutils_8c.html#a6c460e992b89b812221eb7519f5f2bd4">Mutils.c</a>
 </li>
@@ -543,6 +546,9 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 </li>
 <li>SWAP_ROW
 : <a class="el" href="dgeMatrix_8c.html#a143a3b92384b532b88755349f12b074a">dgeMatrix.c</a>
+</li>
+<li>SYMM_DIMNAMES
+: <a class="el" href="Mutils_8c.html#a002cb6f3347b9702baf54a91c5d10f05">Mutils.c</a>
 </li>
 </ul>
 
@@ -583,7 +589,7 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Tue Dec 23 2014 23:58:49 for Matrix by
+    <li class="footer">Generated on Thu Mar 26 2015 11:54:21 for Matrix by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
