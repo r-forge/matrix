@@ -1,11 +1,11 @@
 <map id="dgCMatrix.c" name="dgCMatrix.c">
-<area shape="rect" id="node2" href="$dgCMatrix_8h.html" title="dgCMatrix.h" alt="" coords="752,80,843,107"/>
-<area shape="rect" id="node21" href="$Csparse_8h.html" title="Csparse.h" alt="" coords="901,80,980,107"/>
-<area shape="rect" id="node22" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="1005,80,1120,107"/>
-<area shape="rect" id="node25" href="$t__gCMatrix__colSums_8c.html" title="t_gCMatrix_colSums.c" alt="" coords="1144,80,1296,107"/>
-<area shape="rect" id="node4" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="908,245,975,272"/>
-<area shape="rect" id="node12" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="648,163,724,189"/>
-<area shape="rect" id="node10" href="$Syms_8h.html" title="Syms.h" alt="" coords="1158,320,1223,347"/>
-<area shape="rect" id="node11" href="$t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="1248,320,1368,347"/>
-<area shape="rect" id="node13" href="$cs_8h.html" title="cs.h" alt="" coords="315,245,361,272"/>
+<area shape="rect" id="node2" href="$dgCMatrix_8h.html" title="dgCMatrix.h" alt="" coords="768,80,861,107"/>
+<area shape="rect" id="node21" href="$Csparse_8h.html" title="Csparse.h" alt="" coords="920,80,1003,107"/>
+<area shape="rect" id="node22" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="1027,80,1141,107"/>
+<area shape="rect" id="node25" href="$t__gCMatrix__colSums_8c.html" title="t_gCMatrix_colSums.c" alt="" coords="1165,80,1320,107"/>
+<area shape="rect" id="node4" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="927,245,995,272"/>
+<area shape="rect" id="node12" href="$cs__utils_8h.html" title="cs_utils.h" alt="" coords="663,163,741,189"/>
+<area shape="rect" id="node10" href="$Syms_8h.html" title="Syms.h" alt="" coords="1181,320,1248,347"/>
+<area shape="rect" id="node11" href="$t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="1273,320,1393,347"/>
+<area shape="rect" id="node13" href="$cs_8h.html" title="cs.h" alt="" coords="321,245,367,272"/>
 </map>

@@ -1,0 +1,6 @@
+<map id="cs_spalloc" name="cs_spalloc">
+<area shape="rect" id="node2" href="$cs_8c.html#ab0409434fb3c42f45ba194b4acfed419" title="cs_calloc" alt="" coords="141,5,219,32"/>
+<area shape="rect" id="node3" href="$cs_8c.html#a2762d0a71c7c3acc7bda0d4bb0befd03" title="cs_malloc" alt="" coords="139,56,221,83"/>
+<area shape="rect" id="node4" href="$cs_8c.html#a6d705e404a7831ccf01bc0ea064215b9" title="cs_spfree" alt="" coords="141,107,219,133"/>
+<area shape="rect" id="node5" href="$cs_8c.html#a78c1d1194aacc65212bb0d2b03643ac7" title="cs_free" alt="" coords="270,107,335,133"/>
+</map>

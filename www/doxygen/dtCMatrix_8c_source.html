@@ -159,81 +159,86 @@ $(document).ready(function(){initNavTree('dtCMatrix_8c_source.html','');});
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        error(<a class="code" href="Mutils_8h.html#a32a3cf3d9dd914f5aeeca5423c157934">_</a>(<span class="stringliteral">&quot;Dimensions of system to be solved are inconsistent&quot;</span>));</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    Memcpy(INTEGER(<a class="code" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786">ALLOC_SLOT</a>(ans, <a class="code" href="Syms_8h.html#a2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>, INTSXP, 2)), bdims, 2);</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="comment">// dimnames:</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    SEXP dn = PROTECT(allocVector(VECSXP, 2));</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    SEXP dn = PROTECT(allocVector(VECSXP, 2)), dn2;</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    SET_VECTOR_ELT(dn, 0, duplicate(VECTOR_ELT(GET_SLOT(a, <a class="code" href="Syms_8h.html#a93d8b8a3cd9c897599b3e2d996821a0b">Matrix_DimNamesSym</a>), 1)));</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    SET_VECTOR_ELT(dn, 1, duplicate(cl <span class="comment">// b can be &quot;Matrix&quot; or not:</span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;                                    ? VECTOR_ELT(GET_SLOT(b, <a class="code" href="Syms_8h.html#a93d8b8a3cd9c897599b3e2d996821a0b">Matrix_DimNamesSym</a>), 1)</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;                                    : getAttrib(b, R_DimNamesSymbol)));</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    SET_SLOT(ans, <a class="code" href="Syms_8h.html#a93d8b8a3cd9c897599b3e2d996821a0b">Matrix_DimNamesSym</a>, dn);</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    UNPROTECT(1);</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="keywordflow">if</span>(n &gt;= 1 &amp;&amp; nrhs &gt;=1) {</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        bx = Memcpy(REAL(<a class="code" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786">ALLOC_SLOT</a>(ans, <a class="code" href="Syms_8h.html#a8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a>, REALSXP, n * nrhs)),</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;                    REAL(cl ? GET_SLOT(b, <a class="code" href="Syms_8h.html#a8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a>):b), n * nrhs);</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        <span class="keywordflow">for</span> (j = 0; j &lt; nrhs; j++)</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;            lo ? <a class="code" href="cs_8c.html#adefe244fe8757d1d7b4de55e0c81561f">cs_lsolve</a>(A, bx + n * j) : <a class="code" href="cs_8c.html#aace9cc447db7e3e293431a31f6965730">cs_usolve</a>(A, bx + n * j);</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    }</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <a class="code" href="dtCMatrix_8c.html#a3e3e60847f77c3e1b259160a3ce396a2">RETURN</a>(ans);</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;}</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
-<div class="line"><a name="l00109"></a><span class="lineno"><a class="line" href="dtCMatrix_8h.html#a4370f8d80c77fc815ac826f457e4960b">  109</a></span>&#160;SEXP <a class="code" href="dtCMatrix_8c.html#a4370f8d80c77fc815ac826f457e4960b">dtCMatrix_sparse_solve</a>(SEXP a, SEXP b)</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;{</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS(<span class="stringliteral">&quot;dgCMatrix&quot;</span>)));</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <a class="code" href="structcs__sparse.html">CSP</a> A = <a class="code" href="cs__utils_8h.html#a76e1e45a8e468f064adf2091fbd24423">AS_CSP</a>(a), B = <a class="code" href="cs__utils_8h.html#a76e1e45a8e468f064adf2091fbd24423">AS_CSP</a>(b);</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    R_CheckStack();</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keywordflow">if</span> (A-&gt;<a class="code" href="structcs__sparse.html#a8dab81f7d781bd65c7cb4f103db87ade">m</a> != A-&gt;<a class="code" href="structcs__sparse.html#ad9d0192b240c4ea51984ad0d09f56a02">n</a> || B-&gt;n &lt; 1 || A-&gt;<a class="code" href="structcs__sparse.html#ad9d0192b240c4ea51984ad0d09f56a02">n</a> &lt; 1 || A-&gt;<a class="code" href="structcs__sparse.html#ad9d0192b240c4ea51984ad0d09f56a02">n</a> != B-&gt;m)</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        error(<a class="code" href="Mutils_8h.html#a32a3cf3d9dd914f5aeeca5423c157934">_</a>(<span class="stringliteral">&quot;Dimensions of system to be solved are inconsistent&quot;</span>));</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="comment">// *before* Calloc()ing below [memory leak]! -- FIXME: 0-extent should work</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keywordtype">int</span> *xp = INTEGER(<a class="code" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786">ALLOC_SLOT</a>(ans, <a class="code" href="Syms_8h.html#af08cd6c75b2da4b71c2eb605e00e94ab">Matrix_pSym</a>, INTSXP, (B-&gt;n) + 1)),</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        xnz = 10 * B-&gt;p[B-&gt;n];  <span class="comment">/* initial estimate of nnz in x */</span></div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keywordtype">int</span> k, lo = <a class="code" href="Mutils_8h.html#a3a43f83d21f80a9d484da9f2731f76d2">uplo_P</a>(a)[0] == <span class="charliteral">&#39;L&#39;</span>, pos = 0;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordtype">int</span>    *ti = Calloc(xnz, <span class="keywordtype">int</span>),     *xi = Calloc(2*A-&gt;<a class="code" href="structcs__sparse.html#ad9d0192b240c4ea51984ad0d09f56a02">n</a>, <span class="keywordtype">int</span>); <span class="comment">/* for cs_reach */</span></div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keywordtype">double</span> *tx = Calloc(xnz, <span class="keywordtype">double</span>), *wrk = Calloc(  A-&gt;<a class="code" href="structcs__sparse.html#ad9d0192b240c4ea51984ad0d09f56a02">n</a>, <span class="keywordtype">double</span>);</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <a class="code" href="Mutils_8h.html#a36a9a730e1a12cbe017064fe140aefd2">slot_dup</a>(ans, b, <a class="code" href="Syms_8h.html#a2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>);</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    xp[0] = 0;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="keywordflow">for</span> (k = 0; k &lt; B-&gt;n; k++) {</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        <span class="keywordtype">int</span> top = <a class="code" href="cs_8c.html#a772ba477fdc1f6499735635e037b0c6d">cs_spsolve</a> (A, B, k, xi, wrk, (<span class="keywordtype">int</span> *)NULL, lo);</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        <span class="keywordtype">int</span> nz = A-&gt;<a class="code" href="structcs__sparse.html#ad9d0192b240c4ea51984ad0d09f56a02">n</a> - top;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keywordflow">if</span>(!cl) {</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        dn2 = getAttrib(b, R_DimNamesSymbol);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keywordflow">if</span>(dn2 != R_NilValue) <span class="comment">// either NULL or  list(&lt;dn1&gt;, &lt;dn2&gt;)</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;            dn2 = VECTOR_ELT(dn2, 1);</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    }</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    SET_VECTOR_ELT(dn, 1, duplicate(cl <span class="comment">// b can be &quot;Matrix&quot; or not:</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;                                    ? VECTOR_ELT(GET_SLOT(b, <a class="code" href="Syms_8h.html#a93d8b8a3cd9c897599b3e2d996821a0b">Matrix_DimNamesSym</a>), 1)</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;                                    : dn2));</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    SET_SLOT(ans, <a class="code" href="Syms_8h.html#a93d8b8a3cd9c897599b3e2d996821a0b">Matrix_DimNamesSym</a>, dn);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    UNPROTECT(1);</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keywordflow">if</span>(n &gt;= 1 &amp;&amp; nrhs &gt;=1) {</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        bx = Memcpy(REAL(<a class="code" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786">ALLOC_SLOT</a>(ans, <a class="code" href="Syms_8h.html#a8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a>, REALSXP, n * nrhs)),</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;                    REAL(cl ? GET_SLOT(b, <a class="code" href="Syms_8h.html#a8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a>):b), n * nrhs);</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        <span class="keywordflow">for</span> (j = 0; j &lt; nrhs; j++)</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            lo ? <a class="code" href="cs_8c.html#adefe244fe8757d1d7b4de55e0c81561f">cs_lsolve</a>(A, bx + n * j) : <a class="code" href="cs_8c.html#aace9cc447db7e3e293431a31f6965730">cs_usolve</a>(A, bx + n * j);</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    }</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <a class="code" href="dtCMatrix_8c.html#a3e3e60847f77c3e1b259160a3ce396a2">RETURN</a>(ans);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;}</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;</div>
+<div class="line"><a name="l00114"></a><span class="lineno"><a class="line" href="dtCMatrix_8h.html#a4370f8d80c77fc815ac826f457e4960b">  114</a></span>&#160;SEXP <a class="code" href="dtCMatrix_8c.html#a4370f8d80c77fc815ac826f457e4960b">dtCMatrix_sparse_solve</a>(SEXP a, SEXP b)</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;{</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS(<span class="stringliteral">&quot;dgCMatrix&quot;</span>)));</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <a class="code" href="structcs__sparse.html">CSP</a> A = <a class="code" href="cs__utils_8h.html#a76e1e45a8e468f064adf2091fbd24423">AS_CSP</a>(a), B = <a class="code" href="cs__utils_8h.html#a76e1e45a8e468f064adf2091fbd24423">AS_CSP</a>(b);</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    R_CheckStack();</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keywordflow">if</span> (A-&gt;<a class="code" href="structcs__sparse.html#a8dab81f7d781bd65c7cb4f103db87ade">m</a> != A-&gt;<a class="code" href="structcs__sparse.html#ad9d0192b240c4ea51984ad0d09f56a02">n</a> || B-&gt;n &lt; 1 || A-&gt;<a class="code" href="structcs__sparse.html#ad9d0192b240c4ea51984ad0d09f56a02">n</a> &lt; 1 || A-&gt;<a class="code" href="structcs__sparse.html#ad9d0192b240c4ea51984ad0d09f56a02">n</a> != B-&gt;m)</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        error(<a class="code" href="Mutils_8h.html#a32a3cf3d9dd914f5aeeca5423c157934">_</a>(<span class="stringliteral">&quot;Dimensions of system to be solved are inconsistent&quot;</span>));</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="comment">// *before* Calloc()ing below [memory leak]! -- FIXME: 0-extent should work</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordtype">int</span> *xp = INTEGER(<a class="code" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786">ALLOC_SLOT</a>(ans, <a class="code" href="Syms_8h.html#af08cd6c75b2da4b71c2eb605e00e94ab">Matrix_pSym</a>, INTSXP, (B-&gt;n) + 1)),</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        xnz = 10 * B-&gt;p[B-&gt;n];  <span class="comment">/* initial estimate of nnz in x */</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="keywordtype">int</span> k, lo = <a class="code" href="Mutils_8h.html#a3a43f83d21f80a9d484da9f2731f76d2">uplo_P</a>(a)[0] == <span class="charliteral">&#39;L&#39;</span>, pos = 0;</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keywordtype">int</span>    *ti = Calloc(xnz, <span class="keywordtype">int</span>),     *xi = Calloc(2*A-&gt;<a class="code" href="structcs__sparse.html#ad9d0192b240c4ea51984ad0d09f56a02">n</a>, <span class="keywordtype">int</span>); <span class="comment">/* for cs_reach */</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="keywordtype">double</span> *tx = Calloc(xnz, <span class="keywordtype">double</span>), *wrk = Calloc(  A-&gt;<a class="code" href="structcs__sparse.html#ad9d0192b240c4ea51984ad0d09f56a02">n</a>, <span class="keywordtype">double</span>);</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <a class="code" href="Mutils_8h.html#a36a9a730e1a12cbe017064fe140aefd2">slot_dup</a>(ans, b, <a class="code" href="Syms_8h.html#a2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>);</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        xp[k + 1] = nz + xp[k];</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        <span class="keywordflow">if</span> (xp[k + 1] &gt; xnz) {</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;            <span class="keywordflow">while</span> (xp[k + 1] &gt; xnz) xnz *= 2;</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;            ti = Realloc(ti, xnz, <span class="keywordtype">int</span>);</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;            tx = Realloc(tx, xnz, <span class="keywordtype">double</span>);</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        }</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        <span class="keywordflow">if</span> (lo)                 <span class="comment">/* increasing row order */</span></div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;            <span class="keywordflow">for</span>(<span class="keywordtype">int</span> p = top; p &lt; A-&gt;<a class="code" href="structcs__sparse.html#ad9d0192b240c4ea51984ad0d09f56a02">n</a>; p++, pos++) {</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;                ti[pos] = xi[p];</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;                tx[pos] = wrk[xi[p]];</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;            }</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        <span class="keywordflow">else</span>                    <span class="comment">/* decreasing order, reverse copy */</span></div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;            <span class="keywordflow">for</span>(<span class="keywordtype">int</span> p = A-&gt;<a class="code" href="structcs__sparse.html#ad9d0192b240c4ea51984ad0d09f56a02">n</a> - 1; p &gt;= top; p--, pos++) {</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    xp[0] = 0;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keywordflow">for</span> (k = 0; k &lt; B-&gt;n; k++) {</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        <span class="keywordtype">int</span> top = <a class="code" href="cs_8c.html#a772ba477fdc1f6499735635e037b0c6d">cs_spsolve</a> (A, B, k, xi, wrk, (<span class="keywordtype">int</span> *)NULL, lo);</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        <span class="keywordtype">int</span> nz = A-&gt;<a class="code" href="structcs__sparse.html#ad9d0192b240c4ea51984ad0d09f56a02">n</a> - top;</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        xp[k + 1] = nz + xp[k];</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        <span class="keywordflow">if</span> (xp[k + 1] &gt; xnz) {</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;            <span class="keywordflow">while</span> (xp[k + 1] &gt; xnz) xnz *= 2;</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;            ti = Realloc(ti, xnz, <span class="keywordtype">int</span>);</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;            tx = Realloc(tx, xnz, <span class="keywordtype">double</span>);</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        }</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        <span class="keywordflow">if</span> (lo)                 <span class="comment">/* increasing row order */</span></div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;            <span class="keywordflow">for</span>(<span class="keywordtype">int</span> p = top; p &lt; A-&gt;<a class="code" href="structcs__sparse.html#ad9d0192b240c4ea51984ad0d09f56a02">n</a>; p++, pos++) {</div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;                ti[pos] = xi[p];</div>
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;                tx[pos] = wrk[xi[p]];</div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;            }</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    }</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    xnz = xp[B-&gt;n];</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    Memcpy(INTEGER(<a class="code" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786">ALLOC_SLOT</a>(ans, <a class="code" href="Syms_8h.html#a900b6b19a8e80b529c1a26eb9fb6156d">Matrix_iSym</a>, INTSXP,  xnz)), ti, xnz);</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    Memcpy(   REAL(<a class="code" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786">ALLOC_SLOT</a>(ans, <a class="code" href="Syms_8h.html#a8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a>, REALSXP, xnz)), tx, xnz);</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    Free(ti);  Free(tx);</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    Free(wrk); Free(xi);</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="comment">// dimnames:</span></div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    SEXP dn = PROTECT(allocVector(VECSXP, 2));</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    SET_VECTOR_ELT(dn, 0, duplicate(VECTOR_ELT(GET_SLOT(a, <a class="code" href="Syms_8h.html#a93d8b8a3cd9c897599b3e2d996821a0b">Matrix_DimNamesSym</a>), 1)));</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    SET_VECTOR_ELT(dn, 1, duplicate(VECTOR_ELT(GET_SLOT(b, <a class="code" href="Syms_8h.html#a93d8b8a3cd9c897599b3e2d996821a0b">Matrix_DimNamesSym</a>), 1)));</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    SET_SLOT(ans, <a class="code" href="Syms_8h.html#a93d8b8a3cd9c897599b3e2d996821a0b">Matrix_DimNamesSym</a>, dn);</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    UNPROTECT(1);</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <a class="code" href="dtCMatrix_8c.html#a3e3e60847f77c3e1b259160a3ce396a2">RETURN</a>(ans);</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;}</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="preprocessor">#undef RETURN</span></div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        <span class="keywordflow">else</span>                    <span class="comment">/* decreasing order, reverse copy */</span></div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;            <span class="keywordflow">for</span>(<span class="keywordtype">int</span> p = A-&gt;<a class="code" href="structcs__sparse.html#ad9d0192b240c4ea51984ad0d09f56a02">n</a> - 1; p &gt;= top; p--, pos++) {</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;                ti[pos] = xi[p];</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;                tx[pos] = wrk[xi[p]];</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;            }</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    }</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    xnz = xp[B-&gt;n];</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    Memcpy(INTEGER(<a class="code" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786">ALLOC_SLOT</a>(ans, <a class="code" href="Syms_8h.html#a900b6b19a8e80b529c1a26eb9fb6156d">Matrix_iSym</a>, INTSXP,  xnz)), ti, xnz);</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    Memcpy(   REAL(<a class="code" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786">ALLOC_SLOT</a>(ans, <a class="code" href="Syms_8h.html#a8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a>, REALSXP, xnz)), tx, xnz);</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    Free(ti);  Free(tx);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    Free(wrk); Free(xi);</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="comment">// dimnames:</span></div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    SEXP dn = PROTECT(allocVector(VECSXP, 2));</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    SET_VECTOR_ELT(dn, 0, duplicate(VECTOR_ELT(GET_SLOT(a, <a class="code" href="Syms_8h.html#a93d8b8a3cd9c897599b3e2d996821a0b">Matrix_DimNamesSym</a>), 1)));</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    SET_VECTOR_ELT(dn, 1, duplicate(VECTOR_ELT(GET_SLOT(b, <a class="code" href="Syms_8h.html#a93d8b8a3cd9c897599b3e2d996821a0b">Matrix_DimNamesSym</a>), 1)));</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    SET_SLOT(ans, <a class="code" href="Syms_8h.html#a93d8b8a3cd9c897599b3e2d996821a0b">Matrix_DimNamesSym</a>, dn);</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    UNPROTECT(1);</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <a class="code" href="dtCMatrix_8c.html#a3e3e60847f77c3e1b259160a3ce396a2">RETURN</a>(ans);</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;}</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;<span class="preprocessor">#undef RETURN</span></div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;<span class="preprocessor"></span></div>
 <div class="ttc" id="Syms_8h_html_a2b91d011a529c5665e032a6565275374"><div class="ttname"><a href="Syms_8h.html#a2b91d011a529c5665e032a6565275374">Matrix_DimSym</a></div><div class="ttdeci">SEXP Matrix_DimSym</div><div class="ttdef"><b>Definition:</b> <a href="Syms_8h_source.html#l00002">Syms.h:2</a></div></div>
-<div class="ttc" id="dtCMatrix_8c_html_a4370f8d80c77fc815ac826f457e4960b"><div class="ttname"><a href="dtCMatrix_8c.html#a4370f8d80c77fc815ac826f457e4960b">dtCMatrix_sparse_solve</a></div><div class="ttdeci">SEXP dtCMatrix_sparse_solve(SEXP a, SEXP b)</div><div class="ttdef"><b>Definition:</b> <a href="dtCMatrix_8c_source.html#l00109">dtCMatrix.c:109</a></div></div>
+<div class="ttc" id="dtCMatrix_8c_html_a4370f8d80c77fc815ac826f457e4960b"><div class="ttname"><a href="dtCMatrix_8c.html#a4370f8d80c77fc815ac826f457e4960b">dtCMatrix_sparse_solve</a></div><div class="ttdeci">SEXP dtCMatrix_sparse_solve(SEXP a, SEXP b)</div><div class="ttdef"><b>Definition:</b> <a href="dtCMatrix_8c_source.html#l00114">dtCMatrix.c:114</a></div></div>
 <div class="ttc" id="Syms_8h_html_a8e6ccf1b89de0c7d61722fd1579eb085"><div class="ttname"><a href="Syms_8h.html#a8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a></div><div class="ttdeci">SEXP Matrix_xSym</div><div class="ttdef"><b>Definition:</b> <a href="Syms_8h_source.html#l00002">Syms.h:2</a></div></div>
 <div class="ttc" id="Mutils_8h_html_a36a9a730e1a12cbe017064fe140aefd2"><div class="ttname"><a href="Mutils_8h.html#a36a9a730e1a12cbe017064fe140aefd2">slot_dup</a></div><div class="ttdeci">#define slot_dup(dest, src, sym)</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8h_source.html#l00131">Mutils.h:131</a></div></div>
 <div class="ttc" id="structcs__sparse_html_ad9d0192b240c4ea51984ad0d09f56a02"><div class="ttname"><a href="structcs__sparse.html#ad9d0192b240c4ea51984ad0d09f56a02">cs_sparse::n</a></div><div class="ttdeci">csi n</div><div class="ttdef"><b>Definition:</b> <a href="cs_8h_source.html#l00037">cs.h:37</a></div></div>
@@ -243,9 +248,9 @@ $(document).ready(function(){initNavTree('dtCMatrix_8c_source.html','');});
 <div class="ttc" id="Syms_8h_html_a92da52e94414e4e2c04f11a6dce844d7"><div class="ttname"><a href="Syms_8h.html#a92da52e94414e4e2c04f11a6dce844d7">Matrix_jSym</a></div><div class="ttdeci">SEXP Matrix_jSym</div><div class="ttdef"><b>Definition:</b> <a href="Syms_8h_source.html#l00002">Syms.h:2</a></div></div>
 <div class="ttc" id="dgCMatrix_8c_html_abbc583bf26e1b56e0448e36893ad973d"><div class="ttname"><a href="dgCMatrix_8c.html#abbc583bf26e1b56e0448e36893ad973d">xCMatrix_validate</a></div><div class="ttdeci">SEXP xCMatrix_validate(SEXP x)</div><div class="ttdef"><b>Definition:</b> <a href="dgCMatrix_8c_source.html#l00011">dgCMatrix.c:11</a></div></div>
 <div class="ttc" id="dgCMatrix_8c_html_a55c41a66ad860e5b8a31f9024a9dd6fc"><div class="ttname"><a href="dgCMatrix_8c.html#a55c41a66ad860e5b8a31f9024a9dd6fc">xRMatrix_validate</a></div><div class="ttdeci">SEXP xRMatrix_validate(SEXP x)</div><div class="ttdef"><b>Definition:</b> <a href="dgCMatrix_8c_source.html#l00023">dgCMatrix.c:23</a></div></div>
-<div class="ttc" id="Mutils_8h_html_a1a3b55b173f7d329b6309e56dea20024"><div class="ttname"><a href="Mutils_8h.html#a1a3b55b173f7d329b6309e56dea20024">expand_cmprPt</a></div><div class="ttdeci">static R_INLINE int * expand_cmprPt(int ncol, const int mp[], int mj[])</div><div class="ttdoc">Expand compressed pointers in the array mp into a full set of indices in the array mj...</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8h_source.html#l00230">Mutils.h:230</a></div></div>
+<div class="ttc" id="Mutils_8h_html_a1a3b55b173f7d329b6309e56dea20024"><div class="ttname"><a href="Mutils_8h.html#a1a3b55b173f7d329b6309e56dea20024">expand_cmprPt</a></div><div class="ttdeci">static R_INLINE int * expand_cmprPt(int ncol, const int mp[], int mj[])</div><div class="ttdoc">Expand compressed pointers in the array mp into a full set of indices in the array mj...</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8h_source.html#l00239">Mutils.h:239</a></div></div>
 <div class="ttc" id="cs__utils_8h_html"><div class="ttname"><a href="cs__utils_8h.html">cs_utils.h</a></div></div>
-<div class="ttc" id="Mutils_8h_html_a3a43f83d21f80a9d484da9f2731f76d2"><div class="ttname"><a href="Mutils_8h.html#a3a43f83d21f80a9d484da9f2731f76d2">uplo_P</a></div><div class="ttdeci">#define uplo_P(_x_)</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8h_source.html#l00147">Mutils.h:147</a></div></div>
+<div class="ttc" id="Mutils_8h_html_a3a43f83d21f80a9d484da9f2731f76d2"><div class="ttname"><a href="Mutils_8h.html#a3a43f83d21f80a9d484da9f2731f76d2">uplo_P</a></div><div class="ttdeci">#define uplo_P(_x_)</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8h_source.html#l00156">Mutils.h:156</a></div></div>
 <div class="ttc" id="Mutils_8h_html_a32a3cf3d9dd914f5aeeca5423c157934"><div class="ttname"><a href="Mutils_8h.html#a32a3cf3d9dd914f5aeeca5423c157934">_</a></div><div class="ttdeci">#define _(String)</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8h_source.html#l00020">Mutils.h:20</a></div></div>
 <div class="ttc" id="cs_8c_html_aace9cc447db7e3e293431a31f6965730"><div class="ttname"><a href="cs_8c.html#aace9cc447db7e3e293431a31f6965730">cs_usolve</a></div><div class="ttdeci">csi cs_usolve(const cs *U, double *x)</div><div class="ttdef"><b>Definition:</b> <a href="cs_8c_source.html#l01890">cs.c:1890</a></div></div>
 <div class="ttc" id="Syms_8h_html_a900b6b19a8e80b529c1a26eb9fb6156d"><div class="ttname"><a href="Syms_8h.html#a900b6b19a8e80b529c1a26eb9fb6156d">Matrix_iSym</a></div><div class="ttdeci">SEXP Matrix_iSym</div><div class="ttdef"><b>Definition:</b> <a href="Syms_8h_source.html#l00002">Syms.h:2</a></div></div>
@@ -258,7 +263,7 @@ $(document).ready(function(){initNavTree('dtCMatrix_8c_source.html','');});
 <div class="ttc" id="dtCMatrix_8h_html"><div class="ttname"><a href="dtCMatrix_8h.html">dtCMatrix.h</a></div></div>
 <div class="ttc" id="cs_8c_html_adefe244fe8757d1d7b4de55e0c81561f"><div class="ttname"><a href="cs_8c.html#adefe244fe8757d1d7b4de55e0c81561f">cs_lsolve</a></div><div class="ttdeci">csi cs_lsolve(const cs *L, double *x)</div><div class="ttdef"><b>Definition:</b> <a href="cs_8c_source.html#l00985">cs.c:985</a></div></div>
 <div class="ttc" id="dtCMatrix_8c_html_a3e3e60847f77c3e1b259160a3ce396a2"><div class="ttname"><a href="dtCMatrix_8c.html#a3e3e60847f77c3e1b259160a3ce396a2">RETURN</a></div><div class="ttdeci">#define RETURN(_CH_)</div><div class="ttdef"><b>Definition:</b> <a href="dtCMatrix_8c_source.html#l00005">dtCMatrix.c:5</a></div></div>
-<div class="ttc" id="Mutils_8h_html_af7f59236ca18ab52131cf71f4a7b0786"><div class="ttname"><a href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786">ALLOC_SLOT</a></div><div class="ttdeci">static R_INLINE SEXP ALLOC_SLOT(SEXP obj, SEXP nm, SEXPTYPE type, int length)</div><div class="ttdoc">Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP...</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8h_source.html#l00211">Mutils.h:211</a></div></div>
+<div class="ttc" id="Mutils_8h_html_af7f59236ca18ab52131cf71f4a7b0786"><div class="ttname"><a href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786">ALLOC_SLOT</a></div><div class="ttdeci">static R_INLINE SEXP ALLOC_SLOT(SEXP obj, SEXP nm, SEXPTYPE type, int length)</div><div class="ttdoc">Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP...</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8h_source.html#l00220">Mutils.h:220</a></div></div>
 <div class="ttc" id="dtCMatrix_8c_html_aae01bf51a4b00f0bf789e70bbde33244"><div class="ttname"><a href="dtCMatrix_8c.html#aae01bf51a4b00f0bf789e70bbde33244">tRMatrix_validate</a></div><div class="ttdeci">SEXP tRMatrix_validate(SEXP x)</div><div class="ttdef"><b>Definition:</b> <a href="dtCMatrix_8c_source.html#l00043">dtCMatrix.c:43</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
@@ -266,7 +271,7 @@ $(document).ready(function(){initNavTree('dtCMatrix_8c_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dtCMatrix_8c.html">dtCMatrix.c</a></li>
-    <li class="footer">Generated on Tue Dec 23 2014 23:58:44 for Matrix by
+    <li class="footer">Generated on Thu Mar 26 2015 11:54:14 for Matrix by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

@@ -1,9 +1,9 @@
 <map id="CHM_store_common" name="CHM_store_common">
 <area shape="rect" id="node2" href="$chm__common_8h.html#a7f16af487582ba302c90cc63e9857387" title="CHM_set_common_env" alt="" coords="200,56,363,83"/>
 <area shape="rect" id="node3" href="$dsCMatrix_8c.html#a9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm, LDL and super attributes. " alt="" coords="213,107,349,133"/>
-<area shape="rect" id="node4" href="$dsCMatrix_8h.html#a326fdb98f74608895abd9df179158253" title="dsCMatrix_chol" alt="" coords="442,5,553,32"/>
-<area shape="rect" id="node5" href="$dsCMatrix_8h.html#af424de259d431a9c8719a23188265887" title="dsCMatrix_Cholesky" alt="" coords="427,56,567,83"/>
-<area shape="rect" id="node6" href="$dsCMatrix_8h.html#ae60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial Cholesky LDL&#39; decomp..." alt="" coords="433,107,561,133"/>
-<area shape="rect" id="node7" href="$dsCMatrix_8h.html#adcc1710e8498942adcce28ec1eab655e" title="dsCMatrix_Csparse_solve" alt="" coords="411,157,584,184"/>
-<area shape="rect" id="node8" href="$dsCMatrix_8h.html#a2b40f2a78566d1c13864187d2ab964af" title="dsCMatrix_matrix_solve" alt="" coords="417,208,577,235"/>
+<area shape="rect" id="node4" href="$dsCMatrix_8h.html#a326fdb98f74608895abd9df179158253" title="dsCMatrix_chol" alt="" coords="442,5,555,32"/>
+<area shape="rect" id="node5" href="$dsCMatrix_8h.html#af424de259d431a9c8719a23188265887" title="dsCMatrix_Cholesky" alt="" coords="427,56,571,83"/>
+<area shape="rect" id="node6" href="$dsCMatrix_8h.html#ae60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial Cholesky LDL&#39; decomp..." alt="" coords="433,107,564,133"/>
+<area shape="rect" id="node7" href="$dsCMatrix_8h.html#adcc1710e8498942adcce28ec1eab655e" title="dsCMatrix_Csparse_solve" alt="" coords="411,157,587,184"/>
+<area shape="rect" id="node8" href="$dsCMatrix_8h.html#a2b40f2a78566d1c13864187d2ab964af" title="dsCMatrix_matrix_solve" alt="" coords="417,208,580,235"/>
 </map>

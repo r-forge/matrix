@@ -1,7 +1,7 @@
 <map id="destructive_CHM_update" name="destructive_CHM_update">
-<area shape="rect" id="node2" href="$chm__common_8c.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f or free both f and ..." alt="" coords="224,56,371,83"/>
-<area shape="rect" id="node6" href="$CHMfactor_8c.html#a8f49596874078a3b8482df1ee23fe829" title="Update the numerical values in the factor f as A + mult * I, if A is symmetric, otherwise AA&#39; + mult ..." alt="" coords="231,107,364,133"/>
-<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="419,5,527,32"/>
-<area shape="rect" id="node4" href="$chm__common_8h.html#a5a58b22e709dab2df84046bf89e76920" title="chm_factor_ok" alt="" coords="419,56,527,83"/>
-<area shape="rect" id="node5" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="447,107,499,133"/>
+<area shape="rect" id="node2" href="$chm__common_8c.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f or free both f and ..." alt="" coords="225,56,373,83"/>
+<area shape="rect" id="node6" href="$CHMfactor_8c.html#a8f49596874078a3b8482df1ee23fe829" title="Update the numerical values in the factor f as A + mult * I, if A is symmetric, otherwise AA&#39; + mult ..." alt="" coords="232,107,365,133"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="423,5,529,32"/>
+<area shape="rect" id="node4" href="$chm__common_8h.html#a5a58b22e709dab2df84046bf89e76920" title="chm_factor_ok" alt="" coords="422,56,530,83"/>
+<area shape="rect" id="node5" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="449,107,503,133"/>
 </map>

@@ -79,7 +79,7 @@ Include dependency graph for dgTMatrix.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="dgTMatrix_8c__incl.png" border="0" usemap="#dgTMatrix_8c" alt=""/></div>
 <map name="dgTMatrix_8c" id="dgTMatrix_8c">
-<area shape="rect" id="node3" href="dgTMatrix_8h.html" title="dgTMatrix.h" alt="" coords="146,80,235,107"/><area shape="rect" id="node12" href="chm__common_8h.html" title="chm_common.h" alt="" coords="363,80,477,107"/><area shape="rect" id="node15" href="Tsparse_8h.html" title="Tsparse.h" alt="" coords="259,80,337,107"/><area shape="rect" id="node4" href="Mutils_8h.html" title="Mutils.h" alt="" coords="255,163,321,189"/><area shape="rect" id="node10" href="Syms_8h.html" title="Syms.h" alt="" coords="461,245,525,272"/><area shape="rect" id="node11" href="t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="551,245,671,272"/></map>
+<area shape="rect" id="node3" href="dgTMatrix_8h.html" title="dgTMatrix.h" alt="" coords="151,80,241,107"/><area shape="rect" id="node12" href="chm__common_8h.html" title="chm_common.h" alt="" coords="369,80,484,107"/><area shape="rect" id="node15" href="Tsparse_8h.html" title="Tsparse.h" alt="" coords="265,80,345,107"/><area shape="rect" id="node4" href="Mutils_8h.html" title="Mutils.h" alt="" coords="259,163,327,189"/><area shape="rect" id="node10" href="Syms_8h.html" title="Syms.h" alt="" coords="469,245,536,272"/><area shape="rect" id="node11" href="t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="561,245,681,272"/></map>
 </div>
 </div>
 <p><a href="dgTMatrix_8c_source.html">Go to the source code of this file.</a></p>
@@ -146,8 +146,8 @@ Functions</h2></td></tr>
 <div class="line">              len);                                                     \</div>
 <div class="line">                                                                        \</div>
 <div class="line">    SET_SLOT(ans, <a class="code" href="Syms_8h.html#a4b5b55e9543500874053fafea7b81e52">Matrix_factorSym</a>, allocVector(VECSXP, 0));            \</div>
-<div class="line">    SET_SLOT(ans, <a class="code" href="Syms_8h.html#a2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>, duplicate(dd));                        <a class="code" href="Mutils_8h.html#aa3427e800408f6109f4153ab4baa58bb">\</a></div>
-<div class="line"><a class="code" href="Mutils_8h.html#aa3427e800408f6109f4153ab4baa58bb">    SET_DimNames</a>(ans, x);                                               \</div>
+<div class="line">    SET_SLOT(ans, <a class="code" href="Syms_8h.html#a2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>, duplicate(dd));                        <a class="code" href="Mutils_8h.html#aeb40b76e760863cfc4e4009cf04e39e6">\</a></div>
+<div class="line"><a class="code" href="Mutils_8h.html#aeb40b76e760863cfc4e4009cf04e39e6">    SET_DimNames</a>(ans, x);                                               \</div>
 <div class="line">    SET_SLOT(ans, <a class="code" href="Syms_8h.html#a8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a>, allocVector(_SEXPTYPE_, (R_len_t)len));  \</div>
 <div class="line">    _t1_ ## _insert_triplets_in_array(m, n, length(islot),              \</div>
 <div class="line">                                      INTEGER(islot),                   \</div>
@@ -160,12 +160,12 @@ Functions</h2></td></tr>
 <div class="ttc" id="Syms_8h_html_a2b91d011a529c5665e032a6565275374"><div class="ttname"><a href="Syms_8h.html#a2b91d011a529c5665e032a6565275374">Matrix_DimSym</a></div><div class="ttdeci">SEXP Matrix_DimSym</div><div class="ttdef"><b>Definition:</b> <a href="Syms_8h_source.html#l00002">Syms.h:2</a></div></div>
 <div class="ttc" id="Syms_8h_html_a8e6ccf1b89de0c7d61722fd1579eb085"><div class="ttname"><a href="Syms_8h.html#a8e6ccf1b89de0c7d61722fd1579eb085">Matrix_xSym</a></div><div class="ttdeci">SEXP Matrix_xSym</div><div class="ttdef"><b>Definition:</b> <a href="Syms_8h_source.html#l00002">Syms.h:2</a></div></div>
 <div class="ttc" id="Syms_8h_html_a4b5b55e9543500874053fafea7b81e52"><div class="ttname"><a href="Syms_8h.html#a4b5b55e9543500874053fafea7b81e52">Matrix_factorSym</a></div><div class="ttdeci">SEXP Matrix_factorSym</div><div class="ttdef"><b>Definition:</b> <a href="Syms_8h_source.html#l00002">Syms.h:2</a></div></div>
-<div class="ttc" id="Mutils_8h_html_aa3427e800408f6109f4153ab4baa58bb"><div class="ttname"><a href="Mutils_8h.html#aa3427e800408f6109f4153ab4baa58bb">SET_DimNames</a></div><div class="ttdeci">#define SET_DimNames(dest, src)</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8h_source.html#l00144">Mutils.h:144</a></div></div>
 <div class="ttc" id="Syms_8h_html_a92da52e94414e4e2c04f11a6dce844d7"><div class="ttname"><a href="Syms_8h.html#a92da52e94414e4e2c04f11a6dce844d7">Matrix_jSym</a></div><div class="ttdeci">SEXP Matrix_jSym</div><div class="ttdef"><b>Definition:</b> <a href="Syms_8h_source.html#l00002">Syms.h:2</a></div></div>
 <div class="ttc" id="Mutils_8h_html_a32a3cf3d9dd914f5aeeca5423c157934"><div class="ttname"><a href="Mutils_8h.html#a32a3cf3d9dd914f5aeeca5423c157934">_</a></div><div class="ttdeci">#define _(String)</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8h_source.html#l00020">Mutils.h:20</a></div></div>
 <div class="ttc" id="Syms_8h_html_a900b6b19a8e80b529c1a26eb9fb6156d"><div class="ttname"><a href="Syms_8h.html#a900b6b19a8e80b529c1a26eb9fb6156d">Matrix_iSym</a></div><div class="ttdeci">SEXP Matrix_iSym</div><div class="ttdef"><b>Definition:</b> <a href="Syms_8h_source.html#l00002">Syms.h:2</a></div></div>
+<div class="ttc" id="Mutils_8h_html_aeb40b76e760863cfc4e4009cf04e39e6"><div class="ttname"><a href="Mutils_8h.html#aeb40b76e760863cfc4e4009cf04e39e6">SET_DimNames</a></div><div class="ttdeci">static R_INLINE void SET_DimNames(SEXP dest, SEXP src)</div><div class="ttdef"><b>Definition:</b> <a href="Mutils_8h_source.html#l00143">Mutils.h:143</a></div></div>
 </div><!-- fragment -->
-<p>Definition at line <a class="el" href="dgTMatrix_8c_source.html#l00043">43</a> of file <a class="el" href="dgTMatrix_8c_source.html">dgTMatrix.c</a>.</p>
+<p>Definition at line <a class="el" href="dgTMatrix_8c_source.html#l00049">49</a> of file <a class="el" href="dgTMatrix_8c_source.html">dgTMatrix.c</a>.</p>
 
 </div>
 </div>
@@ -383,7 +383,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="dgTMatrix_8c_aa5e44f204f7c1102be03f616393c9523_icgraph.png" border="0" usemap="#dgTMatrix_8c_aa5e44f204f7c1102be03f616393c9523_icgraph" alt=""/></div>
 <map name="dgTMatrix_8c_aa5e44f204f7c1102be03f616393c9523_icgraph" id="dgTMatrix_8c_aa5e44f204f7c1102be03f616393c9523_icgraph">
-<area shape="rect" id="node2" href="dtTMatrix_8h.html#a9d37b1942d150bfa23fcbae123bb109f" title="tTMatrix_validate" alt="" coords="177,5,298,32"/></map>
+<area shape="rect" id="node2" href="dtTMatrix_8h.html#a9d37b1942d150bfa23fcbae123bb109f" title="tTMatrix_validate" alt="" coords="179,5,301,32"/></map>
 </div>
 </p>
 
@@ -395,7 +395,7 @@ Here is the caller graph for this function:</div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dgTMatrix_8c.html">dgTMatrix.c</a></li>
-    <li class="footer">Generated on Tue Dec 23 2014 23:58:47 for Matrix by
+    <li class="footer">Generated on Thu Mar 26 2015 11:54:18 for Matrix by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

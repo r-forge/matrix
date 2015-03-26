@@ -76,14 +76,14 @@ Include dependency graph for Csparse.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="Csparse_8h__incl.png" border="0" usemap="#Csparse_8h" alt=""/></div>
 <map name="Csparse_8h" id="Csparse_8h">
-<area shape="rect" id="node2" href="Mutils_8h.html" title="Mutils.h" alt="" coords="255,80,321,107"/><area shape="rect" id="node8" href="Syms_8h.html" title="Syms.h" alt="" coords="461,155,525,181"/><area shape="rect" id="node9" href="t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="551,155,671,181"/></map>
+<area shape="rect" id="node2" href="Mutils_8h.html" title="Mutils.h" alt="" coords="259,80,327,107"/><area shape="rect" id="node8" href="Syms_8h.html" title="Syms.h" alt="" coords="469,155,536,181"/><area shape="rect" id="node9" href="t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="561,155,681,181"/></map>
 </div>
 </div><div class="textblock"><div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="Csparse_8h__dep__incl.png" border="0" usemap="#Csparse_8hdep" alt=""/></div>
 <map name="Csparse_8hdep" id="Csparse_8hdep">
-<area shape="rect" id="node2" href="Csparse_8c.html" title="Csparse.c" alt="" coords="5,80,84,107"/><area shape="rect" id="node3" href="dgCMatrix_8c.html" title="dgCMatrix.c" alt="" coords="109,80,200,107"/><area shape="rect" id="node4" href="dsCMatrix_8h.html" title="dsCMatrix.h" alt="" coords="224,80,315,107"/><area shape="rect" id="node6" href="init_8c.html" title="init.c" alt="" coords="327,155,376,181"/><area shape="rect" id="node5" href="dsCMatrix_8c.html" title="dsCMatrix.c" alt="" coords="212,155,303,181"/></map>
+<area shape="rect" id="node2" href="Csparse_8c.html" title="Csparse.c" alt="" coords="5,80,88,107"/><area shape="rect" id="node3" href="dgCMatrix_8c.html" title="dgCMatrix.c" alt="" coords="112,80,205,107"/><area shape="rect" id="node4" href="dsCMatrix_8h.html" title="dsCMatrix.h" alt="" coords="229,80,323,107"/><area shape="rect" id="node6" href="init_8c.html" title="init.c" alt="" coords="335,155,385,181"/><area shape="rect" id="node5" href="dsCMatrix_8c.html" title="dsCMatrix.c" alt="" coords="217,155,311,181"/></map>
 </div>
 </div>
 <p><a href="Csparse_8h_source.html">Go to the source code of this file.</a></p>
@@ -102,28 +102,29 @@ Macros</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a49bea3bf31864cc0553a4af67f7cdc39"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a49bea3bf31864cc0553a4af67f7cdc39">create_Csparse</a> (char *cls, int *i, int *j, int *p, int np, void *x, int nnz, int *dims, SEXP dimnames, int index1)</td></tr>
-<tr class="memdesc:a49bea3bf31864cc0553a4af67f7cdc39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a Csparse matrix object from indices and/or pointers.  <a href="#a49bea3bf31864cc0553a4af67f7cdc39">More...</a><br/></td></tr>
 <tr class="separator:a49bea3bf31864cc0553a4af67f7cdc39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac666003ee4dca32e779db1e7b12dc83b"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#ac666003ee4dca32e779db1e7b12dc83b">Csp_dense_products</a> (SEXP a, SEXP b, Rboolean transp_a, Rboolean transp_b, Rboolean transp_ans)</td></tr>
+<tr class="separator:ac666003ee4dca32e779db1e7b12dc83b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a546eddc63011f2f2af462894dbec7dc9"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a546eddc63011f2f2af462894dbec7dc9">Csparse_band</a> (SEXP x, SEXP k1, SEXP k2)</td></tr>
 <tr class="separator:a546eddc63011f2f2af462894dbec7dc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a407589b56b662830f7a14b251a8c4da3"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a407589b56b662830f7a14b251a8c4da3">Csparse_crossprod</a> (SEXP x, SEXP trans, SEXP triplet)</td></tr>
-<tr class="separator:a407589b56b662830f7a14b251a8c4da3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c4e110d10721580b2b43969800dfdb2"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a6c4e110d10721580b2b43969800dfdb2">Csparse_Csparse_crossprod</a> (SEXP a, SEXP b, SEXP trans)</td></tr>
-<tr class="separator:a6c4e110d10721580b2b43969800dfdb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8414bce86d0916499c2d63f70728176b"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a8414bce86d0916499c2d63f70728176b">Csparse_Csparse_prod</a> (SEXP a, SEXP b)</td></tr>
-<tr class="separator:a8414bce86d0916499c2d63f70728176b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef1a61ab6f25436301b8ee835106c23b"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#aef1a61ab6f25436301b8ee835106c23b">Csparse_dense_crossprod</a> (SEXP a, SEXP b)</td></tr>
-<tr class="separator:aef1a61ab6f25436301b8ee835106c23b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afec5dcac16fd72028456b98704632f1e"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#afec5dcac16fd72028456b98704632f1e">Csparse_dense_prod</a> (SEXP a, SEXP b)</td></tr>
-<tr class="separator:afec5dcac16fd72028456b98704632f1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2237e82e0b9e68dda7fed39523de6cd"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#aa2237e82e0b9e68dda7fed39523de6cd">Csparse_crossprod</a> (SEXP x, SEXP trans, SEXP triplet, SEXP bool_arith)</td></tr>
+<tr class="separator:aa2237e82e0b9e68dda7fed39523de6cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86239e094c5ee16dfc9892f09e8077d9"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a86239e094c5ee16dfc9892f09e8077d9">Csparse_Csparse_crossprod</a> (SEXP a, SEXP b, SEXP trans, SEXP bool_arith)</td></tr>
+<tr class="separator:a86239e094c5ee16dfc9892f09e8077d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78b6af142e571556b5b698785211d1d9"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a78b6af142e571556b5b698785211d1d9">Csparse_Csparse_prod</a> (SEXP a, SEXP b, SEXP bool_arith)</td></tr>
+<tr class="separator:a78b6af142e571556b5b698785211d1d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c1f024791eaa91a0325914d130892b7"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a7c1f024791eaa91a0325914d130892b7">Csparse_dense_crossprod</a> (SEXP a, SEXP b, SEXP transp)</td></tr>
+<tr class="separator:a7c1f024791eaa91a0325914d130892b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb0fcf19e652c4dca8e4b75f6e0942a6"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#aeb0fcf19e652c4dca8e4b75f6e0942a6">Csparse_dense_prod</a> (SEXP a, SEXP b, SEXP transp)</td></tr>
+<tr class="separator:aeb0fcf19e652c4dca8e4b75f6e0942a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a316d9d78254bf71714b3e44ac4ec6b01"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a316d9d78254bf71714b3e44ac4ec6b01">Csparse_diagN2U</a> (SEXP x)</td></tr>
 <tr class="separator:a316d9d78254bf71714b3e44ac4ec6b01"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0cc8d2f7047736ee111b11cb2faeaf11"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a0cc8d2f7047736ee111b11cb2faeaf11">Csparse_diagU2N</a> (SEXP x)</td></tr>
 <tr class="separator:a0cc8d2f7047736ee111b11cb2faeaf11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d165b31075f32ee0ca273f51c13f9df"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a1d165b31075f32ee0ca273f51c13f9df">Csparse_drop</a> (SEXP x, SEXP tol)</td></tr>
 <tr class="separator:a1d165b31075f32ee0ca273f51c13f9df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24241833bc1fbb9c17404ee109ef50fd"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a24241833bc1fbb9c17404ee109ef50fd">Csparse_general_to_symmetric</a> (SEXP x, SEXP uplo)</td></tr>
-<tr class="separator:a24241833bc1fbb9c17404ee109ef50fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf30d8deabe5bb928402465150189d79"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#adf30d8deabe5bb928402465150189d79">Csparse_general_to_symmetric</a> (SEXP x, SEXP uplo, SEXP sym_dmns)</td></tr>
+<tr class="separator:adf30d8deabe5bb928402465150189d79"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8973a306b51dbd6b2b66b21185bf048a"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a8973a306b51dbd6b2b66b21185bf048a">Csparse_horzcat</a> (SEXP x, SEXP y)</td></tr>
 <tr class="separator:a8973a306b51dbd6b2b66b21185bf048a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ff90b74963cd2db63b8cc7542d5aa96"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a0ff90b74963cd2db63b8cc7542d5aa96">Csparse_MatrixMarket</a> (SEXP x, SEXP fname)</td></tr>
@@ -131,14 +132,14 @@ Functions</h2></td></tr>
 <tr class="memitem:a9e54e758f6585b91c2cbb20f47bfad2f"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a9e54e758f6585b91c2cbb20f47bfad2f">Csparse_sort</a> (SEXP x)</td></tr>
 <tr class="separator:a9e54e758f6585b91c2cbb20f47bfad2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abfee8cfe834c57a1bb2144ee157b83dc"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#abfee8cfe834c57a1bb2144ee157b83dc">Csparse_submatrix</a> (SEXP x, SEXP i, SEXP j)</td></tr>
-<tr class="memdesc:abfee8cfe834c57a1bb2144ee157b83dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Indexing" aka subsetting : Compute x[i,j], also for vectors i and j Working via CHOLMOD_submatrix, see .  <a href="#abfee8cfe834c57a1bb2144ee157b83dc">More...</a><br/></td></tr>
 <tr class="separator:abfee8cfe834c57a1bb2144ee157b83dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1fe70f89e424351c54c9bf4ba618ae65"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a1fe70f89e424351c54c9bf4ba618ae65">Csparse_symmetric_to_general</a> (SEXP x)</td></tr>
 <tr class="separator:a1fe70f89e424351c54c9bf4ba618ae65"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab78e05571230070d4afb830b2e82134c"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#ab78e05571230070d4afb830b2e82134c">Csparse_to_dense</a> (SEXP x)</td></tr>
-<tr class="separator:ab78e05571230070d4afb830b2e82134c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0a77dc1e5ada05c06e5842bdc28fefc"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#af0a77dc1e5ada05c06e5842bdc28fefc">Csparse_to_matrix</a> (SEXP x, SEXP chk)</td></tr>
-<tr class="separator:af0a77dc1e5ada05c06e5842bdc28fefc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4beac0a5fdb698d99feaf1fb8da7b03"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#af4beac0a5fdb698d99feaf1fb8da7b03">Csparse_to_dense</a> (SEXP x, SEXP symm_or_tri)</td></tr>
+<tr class="memdesc:af4beac0a5fdb698d99feaf1fb8da7b03"><td class="mdescLeft">&#160;</td><td class="mdescRight">From a CsparseMatrix, produce a dense one.  <a href="#af4beac0a5fdb698d99feaf1fb8da7b03">More...</a><br/></td></tr>
+<tr class="separator:af4beac0a5fdb698d99feaf1fb8da7b03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ba5e051166f06c94c102d3e1e350a70"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a3ba5e051166f06c94c102d3e1e350a70">Csparse_to_matrix</a> (SEXP x, SEXP chk, SEXP symm)</td></tr>
+<tr class="separator:a3ba5e051166f06c94c102d3e1e350a70"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e26da2b0832ca4dc2f4cb894705bcdd"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a9e26da2b0832ca4dc2f4cb894705bcdd">Csparse_to_nz_pattern</a> (SEXP x, SEXP tri)</td></tr>
 <tr class="separator:a9e26da2b0832ca4dc2f4cb894705bcdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a213393a1709973c1b2b733c7019d3086"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a213393a1709973c1b2b733c7019d3086">Csparse_to_tCsparse</a> (SEXP x, SEXP uplo, SEXP diag)</td></tr>
@@ -162,10 +163,8 @@ Functions</h2></td></tr>
 <tr class="memitem:aa3bf5c4d39d095d7765795ab5a2ccd8b"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#aa3bf5c4d39d095d7765795ab5a2ccd8b">dCsparse_subassign</a> (SEXP x, SEXP i_, SEXP j_, SEXP value)</td></tr>
 <tr class="separator:aa3bf5c4d39d095d7765795ab5a2ccd8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14b617572ab48a35576b517b83e4657a"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a14b617572ab48a35576b517b83e4657a">diag_tC</a> (SEXP obj, SEXP resultKind)</td></tr>
-<tr class="memdesc:a14b617572ab48a35576b517b83e4657a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract the diagonal entries from <em>triangular</em> Csparse matrix <b>or</b> a cholmod_sparse factor (LDL = TRUE).  <a href="#a14b617572ab48a35576b517b83e4657a">More...</a><br/></td></tr>
 <tr class="separator:a14b617572ab48a35576b517b83e4657a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a70db694dbe8d7c65d6aa8b6ebc124c0f"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#a70db694dbe8d7c65d6aa8b6ebc124c0f">diag_tC_ptr</a> (int n, int *x_p, double *x_x, Rboolean is_U, int *perm, SEXP resultKind)</td></tr>
-<tr class="memdesc:a70db694dbe8d7c65d6aa8b6ebc124c0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract the diagonal entries from <em>triangular</em> Csparse matrix <b>or</b> a cholmod_sparse factor (LDL = TRUE).  <a href="#a70db694dbe8d7c65d6aa8b6ebc124c0f">More...</a><br/></td></tr>
 <tr class="separator:a70db694dbe8d7c65d6aa8b6ebc124c0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af4aaef903d47797011b7537270096a79"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8h.html#af4aaef903d47797011b7537270096a79">iCsparse_subassign</a> (SEXP x, SEXP i_, SEXP j_, SEXP value)</td></tr>
 <tr class="separator:af4aaef903d47797011b7537270096a79"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -222,7 +221,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8h_source.html#l00054">54</a> of file <a class="el" href="Csparse_8h_source.html">Csparse.h</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8h_source.html#l00056">56</a> of file <a class="el" href="Csparse_8h_source.html">Csparse.h</a>.</p>
 
 </div>
 </div>
@@ -268,7 +267,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8h_source.html#l00056">56</a> of file <a class="el" href="Csparse_8h_source.html">Csparse.h</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8h_source.html#l00058">58</a> of file <a class="el" href="Csparse_8h_source.html">Csparse.h</a>.</p>
 
 </div>
 </div>
@@ -302,7 +301,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8h_source.html#l00055">55</a> of file <a class="el" href="Csparse_8h_source.html">Csparse.h</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8h_source.html#l00057">57</a> of file <a class="el" href="Csparse_8h_source.html">Csparse.h</a>.</p>
 
 </div>
 </div>
@@ -342,7 +341,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8h_source.html#l00057">57</a> of file <a class="el" href="Csparse_8h_source.html">Csparse.h</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8h_source.html#l00059">59</a> of file <a class="el" href="Csparse_8h_source.html">Csparse.h</a>.</p>
 
 </div>
 </div>
@@ -419,36 +418,49 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Create a Csparse matrix object from indices and/or pointers. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">cls</td><td>name of actual class of object to create </td></tr>
-    <tr><td class="paramname">i</td><td>optional integer vector of length nnz of row indices </td></tr>
-    <tr><td class="paramname">j</td><td>optional integer vector of length nnz of column indices </td></tr>
-    <tr><td class="paramname">p</td><td>optional integer vector of length np of row or column pointers </td></tr>
-    <tr><td class="paramname">np</td><td>length of integer vector p. Must be zero if p == (int*)NULL </td></tr>
-    <tr><td class="paramname">x</td><td>optional vector of values </td></tr>
-    <tr><td class="paramname">nnz</td><td>length of vectors i, j and/or x, whichever is to be used </td></tr>
-    <tr><td class="paramname">dims</td><td>optional integer vector of length 2 to be used as dimensions. If dims == (int*)NULL then the maximum row and column index are used as the dimensions. </td></tr>
-    <tr><td class="paramname">dimnames</td><td>optional list of length 2 to be used as dimnames </td></tr>
-    <tr><td class="paramname">index1</td><td>indicator of 1-based indices</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>an SEXP of class cls inheriting from CsparseMatrix. </dd></dl>
-
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00844">844</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="Mutils_8h_source.html#l00211">ALLOC_SLOT()</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_iSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_pSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_xSym</a>, and <a class="el" href="chm__common_8c_source.html#l00105">xtype()</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="Csparse_8h_a49bea3bf31864cc0553a4af67f7cdc39_cgraph.png" border="0" usemap="#Csparse_8h_a49bea3bf31864cc0553a4af67f7cdc39_cgraph" alt=""/></div>
-<map name="Csparse_8h_a49bea3bf31864cc0553a4af67f7cdc39_cgraph" id="Csparse_8h_a49bea3bf31864cc0553a4af67f7cdc39_cgraph">
-<area shape="rect" id="node2" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="169,5,277,32"/><area shape="rect" id="node3" href="chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="197,56,249,83"/></map>
 </div>
-</p>
+</div>
+<a class="anchor" id="ac666003ee4dca32e779db1e7b12dc83b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SEXP Csp_dense_products </td>
+          <td>(</td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Rboolean&#160;</td>
+          <td class="paramname"><em>transp_a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Rboolean&#160;</td>
+          <td class="paramname"><em>transp_b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Rboolean&#160;</td>
+          <td class="paramname"><em>transp_ans</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -482,22 +494,9 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00542">542</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-<p>References <a class="el" href="chm__common_8h_source.html#l00046">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00314">chm_sparse_to_SEXP()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, and <a class="el" href="Mutils_8h_source.html#l00166">Real_kind</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="Csparse_8h_a546eddc63011f2f2af462894dbec7dc9_cgraph.png" border="0" usemap="#Csparse_8h_a546eddc63011f2f2af462894dbec7dc9_cgraph" alt=""/></div>
-<map name="Csparse_8h_a546eddc63011f2f2af462894dbec7dc9_cgraph" id="Csparse_8h_a546eddc63011f2f2af462894dbec7dc9_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="161,5,314,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="363,5,471,32"/></map>
-</div>
-</p>
-
 </div>
 </div>
-<a class="anchor" id="a407589b56b662830f7a14b251a8c4da3"></a>
+<a class="anchor" id="aa2237e82e0b9e68dda7fed39523de6cd"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -517,7 +516,13 @@ Here is the call graph for this function:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">SEXP&#160;</td>
-          <td class="paramname"><em>triplet</em>&#160;</td>
+          <td class="paramname"><em>triplet</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>bool_arith</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -527,22 +532,9 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00456">456</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="chm__common_8h_source.html#l00043">AS_CHM_SP</a>, <a class="el" href="chm__common_8h_source.html#l00044">AS_CHM_TR</a>, <a class="el" href="chm__common_8h_source.html#l00047">AS_CHM_TR__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00314">chm_sparse_to_SEXP()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, and <a class="el" href="Tsparse_8c_source.html#l00063">Tsparse_diagU2N()</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="Csparse_8h_a407589b56b662830f7a14b251a8c4da3_cgraph.png" border="0" usemap="#Csparse_8h_a407589b56b662830f7a14b251a8c4da3_cgraph" alt=""/></div>
-<map name="Csparse_8h_a407589b56b662830f7a14b251a8c4da3_cgraph" id="Csparse_8h_a407589b56b662830f7a14b251a8c4da3_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="190,5,343,32"/><area shape="rect" id="node4" href="Tsparse_8c.html#a1b1ca7081cfcbef11f1cafc4270412ed" title="Tsparse_diagU2N" alt="" coords="203,56,330,83"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="393,31,501,57"/></map>
-</div>
-</p>
-
 </div>
 </div>
-<a class="anchor" id="a6c4e110d10721580b2b43969800dfdb2"></a>
+<a class="anchor" id="a86239e094c5ee16dfc9892f09e8077d9"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -562,7 +554,13 @@ Here is the call graph for this function:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">SEXP&#160;</td>
-          <td class="paramname"><em>trans</em>&#160;</td>
+          <td class="paramname"><em>trans</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>bool_arith</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -572,22 +570,22 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00360">360</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00481">481</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
-<p>References <a class="el" href="chm__common_8h_source.html#l00043">AS_CHM_SP</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l01094">chm_diagN2U()</a>, <a class="el" href="chm__common_8c_source.html#l00314">chm_sparse_to_SEXP()</a>, <a class="el" href="Mutils_8h_source.html#l00151">class_P</a>, <a class="el" href="Mutils_8h_source.html#l00148">diag_P</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, and <a class="el" href="Mutils_8h_source.html#l00147">uplo_P</a>.</p>
+<p>References <a class="el" href="chm__common_8h_source.html#l00044">AS_CHM_SP</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l01187">chm_diagN2U()</a>, <a class="el" href="chm__common_8c_source.html#l00331">chm_sparse_to_SEXP()</a>, <a class="el" href="Mutils_8h_source.html#l00157">diag_P</a>, <a class="el" href="Mutils_8h_source.html#l00414">Matrix_check_class_etc</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Mutils_8h_source.html#l00372">MATRIX_VALID_tri_Csparse</a>, <a class="el" href="Csparse_8c_source.html#l00211">nz2Csparse()</a>, <a class="el" href="Mutils_8h_source.html#l00156">uplo_P</a>, and <a class="el" href="Mutils_8h_source.html#l00164">x_double</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="Csparse_8h_a6c4e110d10721580b2b43969800dfdb2_cgraph.png" border="0" usemap="#Csparse_8h_a6c4e110d10721580b2b43969800dfdb2_cgraph" alt=""/></div>
-<map name="Csparse_8h_a6c4e110d10721580b2b43969800dfdb2_cgraph" id="Csparse_8h_a6c4e110d10721580b2b43969800dfdb2_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#a713dd9a3d6095f9b55e453d18ca87d5a" title="Drop the (unit) diagonal entries from a cholmod_sparse matrix. " alt="" coords="267,5,373,32"/><area shape="rect" id="node3" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="243,56,397,83"/><area shape="rect" id="node4" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="446,56,554,83"/></map>
+<div class="center"><img src="Csparse_8h_a86239e094c5ee16dfc9892f09e8077d9_cgraph.png" border="0" usemap="#Csparse_8h_a86239e094c5ee16dfc9892f09e8077d9_cgraph" alt=""/></div>
+<map name="Csparse_8h_a86239e094c5ee16dfc9892f09e8077d9_cgraph" id="Csparse_8h_a86239e094c5ee16dfc9892f09e8077d9_cgraph">
+<area shape="rect" id="node2" href="chm__common_8c.html#a713dd9a3d6095f9b55e453d18ca87d5a" title="Drop the (unit) diagonal entries from a cholmod_sparse matrix. " alt="" coords="270,5,375,32"/><area shape="rect" id="node3" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="245,56,400,83"/><area shape="rect" id="node5" href="Csparse_8c.html#a4445bf9e1d6a9ee608151123b9d3aa9f" title="nz2Csparse" alt="" coords="277,107,369,133"/><area shape="rect" id="node4" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="448,81,555,108"/></map>
 </div>
 </p>
 
 </div>
 </div>
-<a class="anchor" id="a8414bce86d0916499c2d63f70728176b"></a>
+<a class="anchor" id="a78b6af142e571556b5b698785211d1d9"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -601,7 +599,13 @@ Here is the call graph for this function:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">SEXP&#160;</td>
-          <td class="paramname"><em>b</em>&#160;</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>bool_arith</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -611,22 +615,22 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00317">317</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00414">414</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
-<p>References <a class="el" href="chm__common_8h_source.html#l00043">AS_CHM_SP</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l01094">chm_diagN2U()</a>, <a class="el" href="chm__common_8c_source.html#l00314">chm_sparse_to_SEXP()</a>, <a class="el" href="Mutils_8h_source.html#l00151">class_P</a>, <a class="el" href="Mutils_8h_source.html#l00148">diag_P</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, and <a class="el" href="Mutils_8h_source.html#l00147">uplo_P</a>.</p>
+<p>References <a class="el" href="chm__common_8h_source.html#l00044">AS_CHM_SP</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l01187">chm_diagN2U()</a>, <a class="el" href="chm__common_8c_source.html#l00331">chm_sparse_to_SEXP()</a>, <a class="el" href="Mutils_8h_source.html#l00160">class_P</a>, <a class="el" href="Mutils_8h_source.html#l00157">diag_P</a>, <a class="el" href="Mutils_8h_source.html#l00414">Matrix_check_class_etc</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Mutils_8h_source.html#l00372">MATRIX_VALID_tri_Csparse</a>, <a class="el" href="Csparse_8c_source.html#l00211">nz2Csparse()</a>, <a class="el" href="Mutils_8h_source.html#l00156">uplo_P</a>, and <a class="el" href="Mutils_8h_source.html#l00164">x_double</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="Csparse_8h_a8414bce86d0916499c2d63f70728176b_cgraph.png" border="0" usemap="#Csparse_8h_a8414bce86d0916499c2d63f70728176b_cgraph" alt=""/></div>
-<map name="Csparse_8h_a8414bce86d0916499c2d63f70728176b_cgraph" id="Csparse_8h_a8414bce86d0916499c2d63f70728176b_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#a713dd9a3d6095f9b55e453d18ca87d5a" title="Drop the (unit) diagonal entries from a cholmod_sparse matrix. " alt="" coords="235,5,341,32"/><area shape="rect" id="node3" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="211,56,365,83"/><area shape="rect" id="node4" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="414,56,522,83"/></map>
+<div class="center"><img src="Csparse_8h_a78b6af142e571556b5b698785211d1d9_cgraph.png" border="0" usemap="#Csparse_8h_a78b6af142e571556b5b698785211d1d9_cgraph" alt=""/></div>
+<map name="Csparse_8h_a78b6af142e571556b5b698785211d1d9_cgraph" id="Csparse_8h_a78b6af142e571556b5b698785211d1d9_cgraph">
+<area shape="rect" id="node2" href="chm__common_8c.html#a713dd9a3d6095f9b55e453d18ca87d5a" title="Drop the (unit) diagonal entries from a cholmod_sparse matrix. " alt="" coords="238,5,343,32"/><area shape="rect" id="node3" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="213,56,368,83"/><area shape="rect" id="node5" href="Csparse_8c.html#a4445bf9e1d6a9ee608151123b9d3aa9f" title="nz2Csparse" alt="" coords="245,107,337,133"/><area shape="rect" id="node4" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="416,81,523,108"/></map>
 </div>
 </p>
 
 </div>
 </div>
-<a class="anchor" id="aef1a61ab6f25436301b8ee835106c23b"></a>
+<a class="anchor" id="a7c1f024791eaa91a0325914d130892b7"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -640,7 +644,13 @@ Here is the call graph for this function:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">SEXP&#160;</td>
-          <td class="paramname"><em>b</em>&#160;</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>transp</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -650,22 +660,9 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00429">429</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-<p>References <a class="el" href="chm__common_8h_source.html#l00041">AS_CHM_DN</a>, <a class="el" href="chm__common_8h_source.html#l00043">AS_CHM_SP</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00761">chm_dense_to_SEXP()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Mutils_8h_source.html#l00307">mMatrix_as_dgeMatrix2()</a>, <a class="el" href="Csparse_8c_source.html#l00141">nz2Csparse()</a>, and <a class="el" href="Mutils_8h_source.html#l00155">x_double</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="Csparse_8h_aef1a61ab6f25436301b8ee835106c23b_cgraph.png" border="0" usemap="#Csparse_8h_aef1a61ab6f25436301b8ee835106c23b_cgraph" alt=""/></div>
-<map name="Csparse_8h_aef1a61ab6f25436301b8ee835106c23b_cgraph" id="Csparse_8h_aef1a61ab6f25436301b8ee835106c23b_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#ac0552f8d5248824ec90a314b69bd1408" title="Copy the contents of a to an appropriate denseMatrix object and, optionally, free a or free both a an..." alt="" coords="235,5,384,32"/><area shape="rect" id="node4" href="Mutils_8h.html#a3afc658317ae5a0e0589862a48b217b5" title="mMatrix_as_dgeMatrix2" alt="" coords="230,107,389,133"/><area shape="rect" id="node6" href="Csparse_8c.html#a4445bf9e1d6a9ee608151123b9d3aa9f" title="nz2Csparse" alt="" coords="264,56,355,83"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="477,31,585,57"/><area shape="rect" id="node5" href="Mutils_8h.html#ac7bfe157b527715287335783f004ca8c" title="dup_mMatrix_as_dgeMatrix2" alt="" coords="437,107,624,133"/></map>
-</div>
-</p>
-
 </div>
 </div>
-<a class="anchor" id="afec5dcac16fd72028456b98704632f1e"></a>
+<a class="anchor" id="aeb0fcf19e652c4dca8e4b75f6e0942a6"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -679,7 +676,13 @@ Here is the call graph for this function:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">SEXP&#160;</td>
-          <td class="paramname"><em>b</em>&#160;</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>transp</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -688,19 +691,6 @@ Here is the call graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00397">397</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-<p>References <a class="el" href="chm__common_8h_source.html#l00041">AS_CHM_DN</a>, <a class="el" href="chm__common_8h_source.html#l00043">AS_CHM_SP</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00761">chm_dense_to_SEXP()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Mutils_8h_source.html#l00307">mMatrix_as_dgeMatrix2()</a>, <a class="el" href="Csparse_8c_source.html#l00141">nz2Csparse()</a>, and <a class="el" href="Mutils_8h_source.html#l00155">x_double</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="Csparse_8h_afec5dcac16fd72028456b98704632f1e_cgraph.png" border="0" usemap="#Csparse_8h_afec5dcac16fd72028456b98704632f1e_cgraph" alt=""/></div>
-<map name="Csparse_8h_afec5dcac16fd72028456b98704632f1e_cgraph" id="Csparse_8h_afec5dcac16fd72028456b98704632f1e_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#ac0552f8d5248824ec90a314b69bd1408" title="Copy the contents of a to an appropriate denseMatrix object and, optionally, free a or free both a an..." alt="" coords="203,5,352,32"/><area shape="rect" id="node4" href="Mutils_8h.html#a3afc658317ae5a0e0589862a48b217b5" title="mMatrix_as_dgeMatrix2" alt="" coords="198,107,357,133"/><area shape="rect" id="node6" href="Csparse_8c.html#a4445bf9e1d6a9ee608151123b9d3aa9f" title="nz2Csparse" alt="" coords="232,56,323,83"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="445,31,553,57"/><area shape="rect" id="node5" href="Mutils_8h.html#ac7bfe157b527715287335783f004ca8c" title="dup_mMatrix_as_dgeMatrix2" alt="" coords="405,107,592,133"/></map>
-</div>
-</p>
 
 </div>
 </div>
@@ -718,19 +708,6 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00577">577</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-<p>References <a class="el" href="chm__common_8h_source.html#l00046">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l01094">chm_diagN2U()</a>, <a class="el" href="chm__common_8c_source.html#l00314">chm_sparse_to_SEXP()</a>, <a class="el" href="chm__common_8c_source.html#l00014">cl</a>, <a class="el" href="Mutils_8h_source.html#l00151">class_P</a>, <a class="el" href="Mutils_8h_source.html#l00148">diag_P</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Mutils_8h_source.html#l00166">Real_kind</a>, and <a class="el" href="Mutils_8h_source.html#l00147">uplo_P</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="Csparse_8h_a316d9d78254bf71714b3e44ac4ec6b01_cgraph.png" border="0" usemap="#Csparse_8h_a316d9d78254bf71714b3e44ac4ec6b01_cgraph" alt=""/></div>
-<map name="Csparse_8h_a316d9d78254bf71714b3e44ac4ec6b01_cgraph" id="Csparse_8h_a316d9d78254bf71714b3e44ac4ec6b01_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#a713dd9a3d6095f9b55e453d18ca87d5a" title="Drop the (unit) diagonal entries from a cholmod_sparse matrix. " alt="" coords="206,5,311,32"/><area shape="rect" id="node3" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="182,56,335,83"/><area shape="rect" id="node4" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="385,56,493,83"/></map>
-</div>
-</p>
-
 </div>
 </div>
 <a class="anchor" id="a0cc8d2f7047736ee111b11cb2faeaf11"></a>
@@ -747,7 +724,16 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00553">553</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p>Referenced by <a class="el" href="init_8c_source.html#l00281">R_init_Matrix()</a>.</p>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="Csparse_8h_a0cc8d2f7047736ee111b11cb2faeaf11_icgraph.png" border="0" usemap="#Csparse_8h_a0cc8d2f7047736ee111b11cb2faeaf11_icgraph" alt=""/></div>
+<map name="Csparse_8h_a0cc8d2f7047736ee111b11cb2faeaf11_icgraph" id="Csparse_8h_a0cc8d2f7047736ee111b11cb2faeaf11_icgraph">
+<area shape="rect" id="node2" href="init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="184,5,283,32"/></map>
+</div>
+</p>
 
 </div>
 </div>
@@ -775,22 +761,9 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00497">497</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="chm__common_8h_source.html#l00046">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00314">chm_sparse_to_SEXP()</a>, <a class="el" href="chm__common_8c_source.html#l00014">cl</a>, <a class="el" href="Mutils_8h_source.html#l00151">class_P</a>, <a class="el" href="Mutils_8h_source.html#l00148">diag_P</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Mutils_8h_source.html#l00166">Real_kind</a>, and <a class="el" href="Mutils_8h_source.html#l00147">uplo_P</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="Csparse_8h_a1d165b31075f32ee0ca273f51c13f9df_cgraph.png" border="0" usemap="#Csparse_8h_a1d165b31075f32ee0ca273f51c13f9df_cgraph" alt=""/></div>
-<map name="Csparse_8h_a1d165b31075f32ee0ca273f51c13f9df_cgraph" id="Csparse_8h_a1d165b31075f32ee0ca273f51c13f9df_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="158,5,311,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="361,5,469,32"/></map>
-</div>
-</p>
-
 </div>
 </div>
-<a class="anchor" id="a24241833bc1fbb9c17404ee109ef50fd"></a>
+<a class="anchor" id="adf30d8deabe5bb928402465150189d79"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -804,7 +777,13 @@ Here is the call graph for this function:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">SEXP&#160;</td>
-          <td class="paramname"><em>uplo</em>&#160;</td>
+          <td class="paramname"><em>uplo</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>sym_dmns</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -814,16 +793,16 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00252">252</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00332">332</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
-<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="chm__common_8h_source.html#l00046">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00314">chm_sparse_to_SEXP()</a>, <a class="el" href="Mutils_8c_source.html#l00287">equal_string_vectors()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimSym</a>, and <a class="el" href="Mutils_8h_source.html#l00166">Real_kind</a>.</p>
+<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="chm__common_8h_source.html#l00047">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00331">chm_sparse_to_SEXP()</a>, <a class="el" href="Mutils_8c_source.html#l00287">equal_string_vectors()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimSym</a>, <a class="el" href="Mutils_8h_source.html#l00175">Real_kind</a>, and <a class="el" href="Mutils_8c_source.html#l01206">symmetric_DimNames()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="Csparse_8h_a24241833bc1fbb9c17404ee109ef50fd_cgraph.png" border="0" usemap="#Csparse_8h_a24241833bc1fbb9c17404ee109ef50fd_cgraph" alt=""/></div>
-<map name="Csparse_8h_a24241833bc1fbb9c17404ee109ef50fd_cgraph" id="Csparse_8h_a24241833bc1fbb9c17404ee109ef50fd_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="193,5,346,32"/><area shape="rect" id="node4" href="Mutils_8c.html#ae0e07b5d446943159295e745388285e2" title="equal_string_vectors" alt="" coords="198,56,341,83"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="395,5,503,32"/></map>
+<div class="center"><img src="Csparse_8h_adf30d8deabe5bb928402465150189d79_cgraph.png" border="0" usemap="#Csparse_8h_adf30d8deabe5bb928402465150189d79_cgraph" alt=""/></div>
+<map name="Csparse_8h_adf30d8deabe5bb928402465150189d79_cgraph" id="Csparse_8h_adf30d8deabe5bb928402465150189d79_cgraph">
+<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="193,5,348,32"/><area shape="rect" id="node4" href="Mutils_8c.html#ae0e07b5d446943159295e745388285e2" title="equal_string_vectors" alt="" coords="199,56,342,83"/><area shape="rect" id="node5" href="Mutils_8c.html#a316a7184387d598d6ab9d48c4a9a2da8" title="Produce symmetric &#39;Dimnames&#39; from possibly asymmetric ones. " alt="" coords="193,107,349,133"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="397,5,504,32"/></map>
 </div>
 </p>
 
@@ -853,19 +832,6 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00516">516</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-<p>References <a class="el" href="chm__common_8h_source.html#l00046">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00314">chm_sparse_to_SEXP()</a>, and <a class="el" href="Mutils_8h_source.html#l00166">Real_kind</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="Csparse_8h_a8973a306b51dbd6b2b66b21185bf048a_cgraph.png" border="0" usemap="#Csparse_8h_a8973a306b51dbd6b2b66b21185bf048a_cgraph" alt=""/></div>
-<map name="Csparse_8h_a8973a306b51dbd6b2b66b21185bf048a_cgraph" id="Csparse_8h_a8973a306b51dbd6b2b66b21185bf048a_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="174,5,327,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="377,5,485,32"/></map>
-</div>
-</p>
-
 </div>
 </div>
 <a class="anchor" id="a0ff90b74963cd2db63b8cc7542d5aa96"></a>
@@ -891,10 +857,6 @@ Here is the call graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00666">666</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="chm__common_8h_source.html#l00043">AS_CHM_SP</a>, and <a class="el" href="chm__common_8c_source.html#l00013">c</a>.</p>
 
 </div>
 </div>
@@ -948,31 +910,6 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>"Indexing" aka subsetting : Compute x[i,j], also for vectors i and j Working via CHOLMOD_submatrix, see . </p>
-<p>/CHOLMOD/MatrixOps/cholmod_submatrix.c </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">x</td><td>CsparseMatrix </td></tr>
-    <tr><td class="paramname">i</td><td>row indices (0-origin), or NULL (R's) </td></tr>
-    <tr><td class="paramname">j</td><td>columns indices (0-origin), or NULL</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>x[i,j] still CsparseMatrix &mdash; currently, this loses dimnames </dd></dl>
-
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00613">613</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="chm__common_8h_source.html#l00043">AS_CHM_SP</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00314">chm_sparse_to_SEXP()</a>, <a class="el" href="Csparse_8c.html#ab0e899c9e2cc42c482e05b170977d8c5">CHM_SUB</a>, and <a class="el" href="Mutils_8h_source.html#l00166">Real_kind</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="Csparse_8h_abfee8cfe834c57a1bb2144ee157b83dc_cgraph.png" border="0" usemap="#Csparse_8h_abfee8cfe834c57a1bb2144ee157b83dc_cgraph" alt=""/></div>
-<map name="Csparse_8h_abfee8cfe834c57a1bb2144ee157b83dc_cgraph" id="Csparse_8h_abfee8cfe834c57a1bb2144ee157b83dc_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="187,5,341,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="390,5,498,32"/></map>
-</div>
-</p>
-
 </div>
 </div>
 <a class="anchor" id="a1fe70f89e424351c54c9bf4ba618ae65"></a>
@@ -989,22 +926,22 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00238">238</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00318">318</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
-<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="chm__common_8h_source.html#l00046">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00314">chm_sparse_to_SEXP()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, and <a class="el" href="Mutils_8h_source.html#l00166">Real_kind</a>.</p>
+<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="chm__common_8h_source.html#l00047">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00331">chm_sparse_to_SEXP()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Mutils_8h_source.html#l00175">Real_kind</a>, and <a class="el" href="Mutils_8c_source.html#l01206">symmetric_DimNames()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="Csparse_8h_a1fe70f89e424351c54c9bf4ba618ae65_cgraph.png" border="0" usemap="#Csparse_8h_a1fe70f89e424351c54c9bf4ba618ae65_cgraph" alt=""/></div>
 <map name="Csparse_8h_a1fe70f89e424351c54c9bf4ba618ae65_cgraph" id="Csparse_8h_a1fe70f89e424351c54c9bf4ba618ae65_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="209,12,362,39"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="411,12,519,39"/></map>
+<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="212,5,367,32"/><area shape="rect" id="node4" href="Mutils_8c.html#a316a7184387d598d6ab9d48c4a9a2da8" title="Produce symmetric &#39;Dimnames&#39; from possibly asymmetric ones. " alt="" coords="211,56,367,83"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="416,5,523,32"/></map>
 </div>
 </p>
 
 </div>
 </div>
-<a class="anchor" id="ab78e05571230070d4afb830b2e82134c"></a>
+<a class="anchor" id="af4beac0a5fdb698d99feaf1fb8da7b03"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1012,28 +949,49 @@ Here is the call graph for this function:</div>
           <td class="memname">SEXP Csparse_to_dense </td>
           <td>(</td>
           <td class="paramtype">SEXP&#160;</td>
-          <td class="paramname"><em>x</em></td><td>)</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>symm_or_tri</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00108">108</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p>From a CsparseMatrix, produce a dense one. </p>
+<p>Directly deals with symmetric, triangular and general. Called from ../R/Csparse.R's C2dense()</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>a CsparseMatrix: currently all 9 of "[dln][gst]CMatrix" </td></tr>
+    <tr><td class="paramname">symm_or_tri</td><td>integer (NA, &lt; 0, &gt; 0, = 0) specifying the knowledge of the caller about x: NA : unknown =&gt; will be determined = 0 : "generalMatrix" (not symm or tri); &lt; 0 : "triangularMatrix" &gt; 0 : "symmetricMatrix"</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a "denseMatrix" </dd></dl>
 
-<p>References <a class="el" href="chm__common_8h_source.html#l00046">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00761">chm_dense_to_SEXP()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, and <a class="el" href="Mutils_8h_source.html#l00166">Real_kind</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00118">118</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+
+<p>References <a class="el" href="chm__common_8h_source.html#l00047">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00831">chm_dense_to_SEXP()</a>, <a class="el" href="Mutils_8h_source.html#l00160">class_P</a>, <a class="el" href="Mutils_8h_source.html#l00157">diag_P</a>, <a class="el" href="cs__utils_8c_source.html#l00005">is_sym()</a>, <a class="el" href="Mutils_8h_source.html#l00414">Matrix_check_class_etc</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_uploSym</a>, <a class="el" href="Mutils_8h_source.html#l00354">MATRIX_VALID_Csparse</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_xSym</a>, <a class="el" href="Mutils_8h_source.html#l00175">Real_kind</a>, and <a class="el" href="Mutils_8h_source.html#l00131">slot_dup</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="Csparse_8h_ab78e05571230070d4afb830b2e82134c_cgraph.png" border="0" usemap="#Csparse_8h_ab78e05571230070d4afb830b2e82134c_cgraph" alt=""/></div>
-<map name="Csparse_8h_ab78e05571230070d4afb830b2e82134c_cgraph" id="Csparse_8h_ab78e05571230070d4afb830b2e82134c_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#ac0552f8d5248824ec90a314b69bd1408" title="Copy the contents of a to an appropriate denseMatrix object and, optionally, free a or free both a an..." alt="" coords="184,5,333,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="382,5,490,32"/></map>
+<div class="center"><img src="Csparse_8h_af4beac0a5fdb698d99feaf1fb8da7b03_cgraph.png" border="0" usemap="#Csparse_8h_af4beac0a5fdb698d99feaf1fb8da7b03_cgraph" alt=""/></div>
+<map name="Csparse_8h_af4beac0a5fdb698d99feaf1fb8da7b03_cgraph" id="Csparse_8h_af4beac0a5fdb698d99feaf1fb8da7b03_cgraph">
+<area shape="rect" id="node2" href="chm__common_8c.html#ad8cdbb3c526b503d3620b16e2cf522ad" title="Copy the contents of a to an appropriate denseMatrix object and, optionally, free a or free both a an..." alt="" coords="185,5,335,32"/><area shape="rect" id="node4" href="cs__utils_8c.html#a0b2592041f5b822459b7052a451c07a5" title="is_sym" alt="" coords="228,56,292,83"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="384,5,491,32"/></map>
 </div>
 </p>
 
 </div>
 </div>
-<a class="anchor" id="af0a77dc1e5ada05c06e5842bdc28fefc"></a>
+<a class="anchor" id="a3ba5e051166f06c94c102d3e1e350a70"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1047,7 +1005,13 @@ Here is the call graph for this function:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">SEXP&#160;</td>
-          <td class="paramname"><em>chk</em>&#160;</td>
+          <td class="paramname"><em>chk</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>symm</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1057,16 +1021,16 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00189">189</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00259">259</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
-<p>References <a class="el" href="chm__common_8h_source.html#l00049">AS_CHM_SP2</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00845">chm_dense_to_matrix()</a>, and <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>.</p>
+<p>References <a class="el" href="chm__common_8h_source.html#l00050">AS_CHM_SP2</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00938">chm_dense_to_matrix()</a>, <a class="el" href="cs__utils_8c_source.html#l00005">is_sym()</a>, <a class="el" href="Mutils_8h_source.html#l00414">Matrix_check_class_etc</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Mutils_8h_source.html#l00354">MATRIX_VALID_Csparse</a>, and <a class="el" href="Mutils_8c_source.html#l01206">symmetric_DimNames()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="Csparse_8h_af0a77dc1e5ada05c06e5842bdc28fefc_cgraph.png" border="0" usemap="#Csparse_8h_af0a77dc1e5ada05c06e5842bdc28fefc_cgraph" alt=""/></div>
-<map name="Csparse_8h_af0a77dc1e5ada05c06e5842bdc28fefc_cgraph" id="Csparse_8h_af0a77dc1e5ada05c06e5842bdc28fefc_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#aa63a154e775eded261bf72b8a219de11" title="Copy the contents of a to a matrix object and, optionally, free a or free both a and its pointer to i..." alt="" coords="184,5,333,32"/></map>
+<div class="center"><img src="Csparse_8h_a3ba5e051166f06c94c102d3e1e350a70_cgraph.png" border="0" usemap="#Csparse_8h_a3ba5e051166f06c94c102d3e1e350a70_cgraph" alt=""/></div>
+<map name="Csparse_8h_a3ba5e051166f06c94c102d3e1e350a70_cgraph" id="Csparse_8h_a3ba5e051166f06c94c102d3e1e350a70_cgraph">
+<area shape="rect" id="node2" href="chm__common_8c.html#aa63a154e775eded261bf72b8a219de11" title="Copy the contents of a to a matrix object and, optionally, free a or free both a and its pointer to i..." alt="" coords="190,5,341,32"/><area shape="rect" id="node3" href="cs__utils_8c.html#a0b2592041f5b822459b7052a451c07a5" title="is_sym" alt="" coords="233,56,297,83"/><area shape="rect" id="node4" href="Mutils_8c.html#a316a7184387d598d6ab9d48c4a9a2da8" title="Produce symmetric &#39;Dimnames&#39; from possibly asymmetric ones. " alt="" coords="187,107,343,133"/></map>
 </div>
 </p>
 
@@ -1096,16 +1060,16 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00122">122</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00189">189</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
-<p>References <a class="el" href="chm__common_8h_source.html#l00046">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00314">chm_sparse_to_SEXP()</a>, <a class="el" href="Mutils_8h_source.html#l00148">diag_P</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, and <a class="el" href="Mutils_8h_source.html#l00147">uplo_P</a>.</p>
+<p>References <a class="el" href="chm__common_8h_source.html#l00047">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00331">chm_sparse_to_SEXP()</a>, <a class="el" href="Mutils_8h_source.html#l00157">diag_P</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, and <a class="el" href="Mutils_8h_source.html#l00156">uplo_P</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="Csparse_8h_a9e26da2b0832ca4dc2f4cb894705bcdd_cgraph.png" border="0" usemap="#Csparse_8h_a9e26da2b0832ca4dc2f4cb894705bcdd_cgraph" alt=""/></div>
 <map name="Csparse_8h_a9e26da2b0832ca4dc2f4cb894705bcdd_cgraph" id="Csparse_8h_a9e26da2b0832ca4dc2f4cb894705bcdd_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="209,5,362,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="411,5,519,32"/></map>
+<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="211,5,365,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="413,5,520,32"/></map>
 </div>
 </p>
 
@@ -1141,16 +1105,16 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00213">213</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00294">294</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
-<p>References <a class="el" href="chm__common_8h_source.html#l00046">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00314">chm_sparse_to_SEXP()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, and <a class="el" href="Mutils_8h_source.html#l00166">Real_kind</a>.</p>
+<p>References <a class="el" href="chm__common_8h_source.html#l00047">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00331">chm_sparse_to_SEXP()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, and <a class="el" href="Mutils_8h_source.html#l00175">Real_kind</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="Csparse_8h_a213393a1709973c1b2b733c7019d3086_cgraph.png" border="0" usemap="#Csparse_8h_a213393a1709973c1b2b733c7019d3086_cgraph" alt=""/></div>
 <map name="Csparse_8h_a213393a1709973c1b2b733c7019d3086_cgraph" id="Csparse_8h_a213393a1709973c1b2b733c7019d3086_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="201,5,354,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="403,5,511,32"/></map>
+<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="203,5,357,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="405,5,512,32"/></map>
 </div>
 </p>
 
@@ -1180,16 +1144,16 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00199">199</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00280">280</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
-<p>References <a class="el" href="chm__common_8h_source.html#l00046">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00516">chm_triplet_to_SEXP()</a>, <a class="el" href="Mutils_8h_source.html#l00148">diag_P</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Mutils_8h_source.html#l00166">Real_kind</a>, and <a class="el" href="Mutils_8h_source.html#l00147">uplo_P</a>.</p>
+<p>References <a class="el" href="chm__common_8h_source.html#l00047">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00569">chm_triplet_to_SEXP()</a>, <a class="el" href="Mutils_8h_source.html#l00157">diag_P</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Mutils_8h_source.html#l00175">Real_kind</a>, and <a class="el" href="Mutils_8h_source.html#l00156">uplo_P</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="Csparse_8h_a12b0c242957f1fad9137e767f882e6b8_cgraph.png" border="0" usemap="#Csparse_8h_a12b0c242957f1fad9137e767f882e6b8_cgraph" alt=""/></div>
 <map name="Csparse_8h_a12b0c242957f1fad9137e767f882e6b8_cgraph" id="Csparse_8h_a12b0c242957f1fad9137e767f882e6b8_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#ab5d31c23691cc4a3c96a7f526dc84006" title="Copy the contents of a to an appropriate TsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="197,5,344,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="393,5,501,32"/></map>
+<area shape="rect" id="node2" href="chm__common_8c.html#ab5d31c23691cc4a3c96a7f526dc84006" title="Copy the contents of a to an appropriate TsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="197,5,344,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="392,5,499,32"/></map>
 </div>
 </p>
 
@@ -1225,16 +1189,16 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00224">224</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00305">305</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
-<p>References <a class="el" href="chm__common_8h_source.html#l00046">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00516">chm_triplet_to_SEXP()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, and <a class="el" href="Mutils_8h_source.html#l00166">Real_kind</a>.</p>
+<p>References <a class="el" href="chm__common_8h_source.html#l00047">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00569">chm_triplet_to_SEXP()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, and <a class="el" href="Mutils_8h_source.html#l00175">Real_kind</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="Csparse_8h_a48d40e2cc334ad0df5e96008dea6eacf_cgraph.png" border="0" usemap="#Csparse_8h_a48d40e2cc334ad0df5e96008dea6eacf_cgraph" alt=""/></div>
 <map name="Csparse_8h_a48d40e2cc334ad0df5e96008dea6eacf_cgraph" id="Csparse_8h_a48d40e2cc334ad0df5e96008dea6eacf_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#ab5d31c23691cc4a3c96a7f526dc84006" title="Copy the contents of a to an appropriate TsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="200,5,347,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="395,5,503,32"/></map>
+<area shape="rect" id="node2" href="chm__common_8c.html#ab5d31c23691cc4a3c96a7f526dc84006" title="Copy the contents of a to an appropriate TsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="200,5,347,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="395,5,501,32"/></map>
 </div>
 </p>
 
@@ -1254,16 +1218,16 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00194">194</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00275">275</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
-<p>References <a class="el" href="chm__common_8h_source.html#l00046">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, and <a class="el" href="chm__common_8c_source.html#l00899">chm_dense_to_vector()</a>.</p>
+<p>References <a class="el" href="chm__common_8h_source.html#l00047">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, and <a class="el" href="chm__common_8c_source.html#l00992">chm_dense_to_vector()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="Csparse_8h_a27fdeb89a1330c785f477e967c078eca_cgraph.png" border="0" usemap="#Csparse_8h_a27fdeb89a1330c785f477e967c078eca_cgraph" alt=""/></div>
 <map name="Csparse_8h_a27fdeb89a1330c785f477e967c078eca_cgraph" id="Csparse_8h_a27fdeb89a1330c785f477e967c078eca_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#ad32e8dacf9f0444fedde957bb38e02ef" title="Copy the contents of a to a numeric R object and, optionally, free a or free both a and its pointer t..." alt="" coords="185,5,335,32"/></map>
+<area shape="rect" id="node2" href="chm__common_8c.html#ad32e8dacf9f0444fedde957bb38e02ef" title="Copy the contents of a to a numeric R object and, optionally, free a or free both a and its pointer t..." alt="" coords="187,5,338,32"/></map>
 </div>
 </p>
 
@@ -1293,18 +1257,18 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00290">290</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00377">377</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
-<p>References <a class="el" href="chm__common_8h_source.html#l00046">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00314">chm_sparse_to_SEXP()</a>, <a class="el" href="Mutils_8h_source.html#l00148">diag_P</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Mutils_8h_source.html#l00166">Real_kind</a>, and <a class="el" href="Mutils_8h_source.html#l00147">uplo_P</a>.</p>
+<p>References <a class="el" href="chm__common_8h_source.html#l00047">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00331">chm_sparse_to_SEXP()</a>, <a class="el" href="Mutils_8h_source.html#l00157">diag_P</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Mutils_8h_source.html#l00175">Real_kind</a>, and <a class="el" href="Mutils_8h_source.html#l00156">uplo_P</a>.</p>
 
-<p>Referenced by <a class="el" href="dgCMatrix_8c_source.html#l00075">R_to_CMatrix()</a>.</p>
+<p>Referenced by <a class="el" href="dgCMatrix_8c_source.html#l00076">R_to_CMatrix()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="Csparse_8h_aab695b6af65c32eac1776cf04c661518_cgraph.png" border="0" usemap="#Csparse_8h_aab695b6af65c32eac1776cf04c661518_cgraph" alt=""/></div>
 <map name="Csparse_8h_aab695b6af65c32eac1776cf04c661518_cgraph" id="Csparse_8h_aab695b6af65c32eac1776cf04c661518_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="190,5,343,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="393,5,501,32"/></map>
+<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="189,5,344,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="392,5,499,32"/></map>
 </div>
 </p>
 
@@ -1313,7 +1277,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="Csparse_8h_aab695b6af65c32eac1776cf04c661518_icgraph.png" border="0" usemap="#Csparse_8h_aab695b6af65c32eac1776cf04c661518_icgraph" alt=""/></div>
 <map name="Csparse_8h_aab695b6af65c32eac1776cf04c661518_icgraph" id="Csparse_8h_aab695b6af65c32eac1776cf04c661518_icgraph">
-<area shape="rect" id="node2" href="dgCMatrix_8h.html#ac71c15cfb9558156fb98c0f1cad60922" title="R_to_CMatrix" alt="" coords="190,5,290,32"/></map>
+<area shape="rect" id="node2" href="dgCMatrix_8h.html#ac71c15cfb9558156fb98c0f1cad60922" title="R_to_CMatrix" alt="" coords="190,5,293,32"/></map>
 </div>
 </p>
 
@@ -1342,7 +1306,7 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="Csparse_8h_a77f654c86c318184ef29b46dc4929e12_cgraph.png" border="0" usemap="#Csparse_8h_a77f654c86c318184ef29b46dc4929e12_cgraph" alt=""/></div>
 <map name="Csparse_8h_a77f654c86c318184ef29b46dc4929e12_cgraph" id="Csparse_8h_a77f654c86c318184ef29b46dc4929e12_cgraph">
-<area shape="rect" id="node2" href="Csparse_8h.html#a10392132372fdfc01e1aff7622f5ee7f" title="Csparse_validate_" alt="" coords="177,5,306,32"/></map>
+<area shape="rect" id="node2" href="Csparse_8h.html#a10392132372fdfc01e1aff7622f5ee7f" title="Csparse_validate_" alt="" coords="176,5,307,32"/></map>
 </div>
 </p>
 
@@ -1381,7 +1345,7 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="Csparse_8h_a5b2f297662f7f5dd66097ed12b320468_cgraph.png" border="0" usemap="#Csparse_8h_a5b2f297662f7f5dd66097ed12b320468_cgraph" alt=""/></div>
 <map name="Csparse_8h_a5b2f297662f7f5dd66097ed12b320468_cgraph" id="Csparse_8h_a5b2f297662f7f5dd66097ed12b320468_cgraph">
-<area shape="rect" id="node2" href="Csparse_8h.html#a10392132372fdfc01e1aff7622f5ee7f" title="Csparse_validate_" alt="" coords="185,5,314,32"/></map>
+<area shape="rect" id="node2" href="Csparse_8h.html#a10392132372fdfc01e1aff7622f5ee7f" title="Csparse_validate_" alt="" coords="184,5,315,32"/></map>
 </div>
 </p>
 
@@ -1418,7 +1382,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="Csparse_8h_a10392132372fdfc01e1aff7622f5ee7f_icgraph.png" border="0" usemap="#Csparse_8h_a10392132372fdfc01e1aff7622f5ee7f_icgraph" alt=""/></div>
 <map name="Csparse_8h_a10392132372fdfc01e1aff7622f5ee7f_icgraph" id="Csparse_8h_a10392132372fdfc01e1aff7622f5ee7f_icgraph">
-<area shape="rect" id="node2" href="Csparse_8h.html#a77f654c86c318184ef29b46dc4929e12" title="Csparse_validate" alt="" coords="188,5,311,32"/><area shape="rect" id="node3" href="Csparse_8h.html#a5b2f297662f7f5dd66097ed12b320468" title="Csparse_validate2" alt="" coords="185,56,314,83"/></map>
+<area shape="rect" id="node2" href="Csparse_8h.html#a77f654c86c318184ef29b46dc4929e12" title="Csparse_validate" alt="" coords="188,5,311,32"/><area shape="rect" id="node3" href="Csparse_8h.html#a5b2f297662f7f5dd66097ed12b320468" title="Csparse_validate2" alt="" coords="184,56,315,83"/></map>
 </div>
 </p>
 
@@ -1447,19 +1411,6 @@ Here is the caller graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00529">529</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-<p>References <a class="el" href="chm__common_8h_source.html#l00046">AS_CHM_SP__</a>, <a class="el" href="chm__common_8c_source.html#l00013">c</a>, <a class="el" href="chm__common_8c_source.html#l00314">chm_sparse_to_SEXP()</a>, and <a class="el" href="Mutils_8h_source.html#l00166">Real_kind</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="Csparse_8h_a913d061ccf8536244aae6b7157c105f1_cgraph.png" border="0" usemap="#Csparse_8h_a913d061ccf8536244aae6b7157c105f1_cgraph" alt=""/></div>
-<map name="Csparse_8h_a913d061ccf8536244aae6b7157c105f1_cgraph" id="Csparse_8h_a913d061ccf8536244aae6b7157c105f1_cgraph">
-<area shape="rect" id="node2" href="chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="171,5,325,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="374,5,482,32"/></map>
-</div>
-</p>
 
 </div>
 </div>
@@ -1525,32 +1476,6 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Extract the diagonal entries from <em>triangular</em> Csparse matrix <b>or</b> a cholmod_sparse factor (LDL = TRUE). </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">obj</td><td>&ndash; now a cholmod_sparse factor or a dtCMatrix </td></tr>
-    <tr><td class="paramname">pslot</td><td>'p' (column pointer) slot of Csparse matrix/factor </td></tr>
-    <tr><td class="paramname">xslot</td><td>'x' (non-zero entries) slot of Csparse matrix/factor </td></tr>
-    <tr><td class="paramname">perm_slot</td><td>'perm' (= permutation vector) slot of corresponding CHMfactor; only used for "diagBack" </td></tr>
-    <tr><td class="paramname">resultKind</td><td>a (SEXP) string indicating which kind of result is desired.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>a SEXP, either a (double) number or a length n-vector of diagonal entries </dd></dl>
-
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00805">805</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-<p>References <a class="el" href="Csparse_8c_source.html#l00693">diag_tC_ptr()</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_permSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_pSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_uploSym</a>, and <a class="el" href="Syms_8h_source.html#l00002">Matrix_xSym</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="Csparse_8h_a14b617572ab48a35576b517b83e4657a_cgraph.png" border="0" usemap="#Csparse_8h_a14b617572ab48a35576b517b83e4657a_cgraph" alt=""/></div>
-<map name="Csparse_8h_a14b617572ab48a35576b517b83e4657a_cgraph" id="Csparse_8h_a14b617572ab48a35576b517b83e4657a_cgraph">
-<area shape="rect" id="node2" href="Csparse_8c.html#a70db694dbe8d7c65d6aa8b6ebc124c0f" title="Extract the diagonal entries from triangular Csparse matrix or a cholmod_sparse factor (LDL = TRUE)..." alt="" coords="120,5,208,32"/></map>
-</div>
-</p>
-
 </div>
 </div>
 <a class="anchor" id="a70db694dbe8d7c65d6aa8b6ebc124c0f"></a>
@@ -1601,31 +1526,14 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Extract the diagonal entries from <em>triangular</em> Csparse matrix <b>or</b> a cholmod_sparse factor (LDL = TRUE). </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">n</td><td>dimension of the matrix. </td></tr>
-    <tr><td class="paramname">x_p</td><td>'p' (column pointer) slot contents </td></tr>
-    <tr><td class="paramname">x_x</td><td>'x' (non-zero entries) slot contents </td></tr>
-    <tr><td class="paramname">perm</td><td>'perm' (= permutation vector) slot contents; only used for "diagBack" </td></tr>
-    <tr><td class="paramname">resultKind</td><td>a (SEXP) string indicating which kind of result is desired.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>a SEXP, either a (double) number or a length n-vector of diagonal entries </dd></dl>
-
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00693">693</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>.</p>
-
-<p>Referenced by <a class="el" href="Csparse_8c_source.html#l00805">diag_tC()</a>, and <a class="el" href="dsCMatrix_8c_source.html#l00178">dsCMatrix_LDL_D()</a>.</p>
+<p>Referenced by <a class="el" href="dsCMatrix_8c_source.html#l00178">dsCMatrix_LDL_D()</a>.</p>
 
 <p><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="Csparse_8h_a70db694dbe8d7c65d6aa8b6ebc124c0f_icgraph.png" border="0" usemap="#Csparse_8h_a70db694dbe8d7c65d6aa8b6ebc124c0f_icgraph" alt=""/></div>
 <map name="Csparse_8h_a70db694dbe8d7c65d6aa8b6ebc124c0f_icgraph" id="Csparse_8h_a70db694dbe8d7c65d6aa8b6ebc124c0f_icgraph">
-<area shape="rect" id="node2" href="Csparse_8h.html#a14b617572ab48a35576b517b83e4657a" title="Extract the diagonal entries from triangular Csparse matrix or a cholmod_sparse factor (LDL = TRUE)..." alt="" coords="172,5,239,32"/><area shape="rect" id="node3" href="dsCMatrix_8h.html#ae60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial Cholesky LDL&#39; decomp..." alt="" coords="141,56,269,83"/></map>
+<area shape="rect" id="node2" href="dsCMatrix_8h.html#ae60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial Cholesky LDL&#39; decomp..." alt="" coords="144,5,275,32"/></map>
 </div>
 </p>
 
@@ -1791,18 +1699,18 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00141">141</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00211">211</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
-<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="Mutils_8h_source.html#l00211">ALLOC_SLOT()</a>, <a class="el" href="Mutils_8h_source.html#l00151">class_P</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_diagSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_iSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_pSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_uploSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_xSym</a>, <a class="el" href="Mutils_8h_source.html#l00131">slot_dup</a>, <a class="el" href="Mutils_8h_source.html#l00138">slot_dup_if_has</a>, <a class="el" href="Mutils_8h_source.html#l00155">x_double</a>, <a class="el" href="Mutils_8h_source.html#l00155">x_integer</a>, and <a class="el" href="Mutils_8h_source.html#l00155">x_logical</a>.</p>
+<p>References <a class="el" href="Mutils_8h_source.html#l00020">_</a>, <a class="el" href="Mutils_8h_source.html#l00220">ALLOC_SLOT()</a>, <a class="el" href="Mutils_8h_source.html#l00160">class_P</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_diagSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_iSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_pSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_uploSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_xSym</a>, <a class="el" href="Mutils_8h_source.html#l00131">slot_dup</a>, <a class="el" href="Mutils_8h_source.html#l00138">slot_dup_if_has</a>, <a class="el" href="Mutils_8h_source.html#l00164">x_double</a>, <a class="el" href="Mutils_8h_source.html#l00164">x_integer</a>, and <a class="el" href="Mutils_8h_source.html#l00164">x_logical</a>.</p>
 
-<p>Referenced by <a class="el" href="Csparse_8c_source.html#l00429">Csparse_dense_crossprod()</a>, <a class="el" href="Csparse_8c_source.html#l00397">Csparse_dense_prod()</a>, and <a class="el" href="Csparse_8c_source.html#l00136">nz_pattern_to_Csparse()</a>.</p>
+<p>Referenced by <a class="el" href="Csparse_8c_source.html#l00481">Csparse_Csparse_crossprod()</a>, <a class="el" href="Csparse_8c_source.html#l00414">Csparse_Csparse_prod()</a>, and <a class="el" href="Csparse_8c_source.html#l00204">nz_pattern_to_Csparse()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="Csparse_8h_a4445bf9e1d6a9ee608151123b9d3aa9f_cgraph.png" border="0" usemap="#Csparse_8h_a4445bf9e1d6a9ee608151123b9d3aa9f_cgraph" alt=""/></div>
 <map name="Csparse_8h_a4445bf9e1d6a9ee608151123b9d3aa9f_cgraph" id="Csparse_8h_a4445bf9e1d6a9ee608151123b9d3aa9f_cgraph">
-<area shape="rect" id="node2" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="145,5,253,32"/></map>
+<area shape="rect" id="node2" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="147,5,253,32"/></map>
 </div>
 </p>
 
@@ -1811,7 +1719,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="Csparse_8h_a4445bf9e1d6a9ee608151123b9d3aa9f_icgraph.png" border="0" usemap="#Csparse_8h_a4445bf9e1d6a9ee608151123b9d3aa9f_icgraph" alt=""/></div>
 <map name="Csparse_8h_a4445bf9e1d6a9ee608151123b9d3aa9f_icgraph" id="Csparse_8h_a4445bf9e1d6a9ee608151123b9d3aa9f_icgraph">
-<area shape="rect" id="node2" href="Csparse_8h.html#aef1a61ab6f25436301b8ee835106c23b" title="Csparse_dense_crossprod" alt="" coords="144,5,320,32"/><area shape="rect" id="node3" href="Csparse_8h.html#afec5dcac16fd72028456b98704632f1e" title="Csparse_dense_prod" alt="" coords="160,56,304,83"/><area shape="rect" id="node4" href="Csparse_8h.html#a9a393d510bc108d7f4e5807d952fc089" title="nz_pattern_to_Csparse" alt="" coords="155,107,309,133"/></map>
+<area shape="rect" id="node2" href="Csparse_8h.html#a86239e094c5ee16dfc9892f09e8077d9" title="Csparse_Csparse_crossprod" alt="" coords="147,5,338,32"/><area shape="rect" id="node3" href="Csparse_8h.html#a78b6af142e571556b5b698785211d1d9" title="Csparse_Csparse_prod" alt="" coords="163,56,322,83"/><area shape="rect" id="node4" href="Csparse_8h.html#a9a393d510bc108d7f4e5807d952fc089" title="nz_pattern_to_Csparse" alt="" coords="164,107,321,133"/></map>
 </div>
 </p>
 
@@ -1841,16 +1749,16 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00136">136</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p>Definition at line <a class="el" href="Csparse_8c_source.html#l00204">204</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
-<p>References <a class="el" href="Csparse_8c_source.html#l00141">nz2Csparse()</a>.</p>
+<p>References <a class="el" href="Csparse_8c_source.html#l00211">nz2Csparse()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="Csparse_8h_a9a393d510bc108d7f4e5807d952fc089_cgraph.png" border="0" usemap="#Csparse_8h_a9a393d510bc108d7f4e5807d952fc089_cgraph" alt=""/></div>
 <map name="Csparse_8h_a9a393d510bc108d7f4e5807d952fc089_cgraph" id="Csparse_8h_a9a393d510bc108d7f4e5807d952fc089_cgraph">
-<area shape="rect" id="node2" href="Csparse_8c.html#a4445bf9e1d6a9ee608151123b9d3aa9f" title="nz2Csparse" alt="" coords="208,5,299,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="347,5,455,32"/></map>
+<area shape="rect" id="node2" href="Csparse_8c.html#a4445bf9e1d6a9ee608151123b9d3aa9f" title="nz2Csparse" alt="" coords="211,5,303,32"/><area shape="rect" id="node3" href="Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="352,5,459,32"/></map>
 </div>
 </p>
 
@@ -1920,7 +1828,7 @@ Here is the call graph for this function:</div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="Csparse_8h.html">Csparse.h</a></li>
-    <li class="footer">Generated on Tue Dec 23 2014 23:58:47 for Matrix by
+    <li class="footer">Generated on Thu Mar 26 2015 11:54:17 for Matrix by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

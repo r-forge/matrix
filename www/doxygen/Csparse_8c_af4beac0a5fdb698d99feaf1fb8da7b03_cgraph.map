@@ -1,0 +1,5 @@
+<map id="Csparse_to_dense" name="Csparse_to_dense">
+<area shape="rect" id="node2" href="$chm__common_8c.html#ad8cdbb3c526b503d3620b16e2cf522ad" title="Copy the contents of a to an appropriate denseMatrix object and, optionally, free a or free both a an..." alt="" coords="185,5,335,32"/>
+<area shape="rect" id="node4" href="$cs__utils_8c.html#a0b2592041f5b822459b7052a451c07a5" title="is_sym" alt="" coords="228,56,292,83"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="384,5,491,32"/>
+</map>

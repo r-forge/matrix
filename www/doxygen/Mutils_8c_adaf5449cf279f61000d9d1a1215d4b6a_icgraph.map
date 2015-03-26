@@ -1,7 +1,7 @@
 <map id="install_diagonal_int" name="install_diagonal_int">
-<area shape="rect" id="node2" href="$Mutils_8h.html#a23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="187,56,360,83"/>
-<area shape="rect" id="node3" href="$dense_8h.html#afc94ab69278e25ef4ea5ed5ba90935c3" title="dense_band" alt="" coords="435,5,527,32"/>
-<area shape="rect" id="node4" href="$dense_8h.html#a389bdf26bd829335d25dffb4244c9ae6" title="dense_to_symmetric" alt="" coords="410,56,553,83"/>
-<area shape="rect" id="node5" href="$Mutils_8h.html#a623039270a92fce0643031ef7f6e72b2" title="mMatrix_as_geMatrix" alt="" coords="409,107,554,133"/>
-<area shape="rect" id="node6" href="$dense_8h.html#a33b46f3a16a95734d4875ddfbfa079cb" title="dense_to_Csparse" alt="" coords="603,107,733,133"/>
+<area shape="rect" id="node2" href="$Mutils_8h.html#a23764b1c8334e40406598a0446cc8bc5" title="Duplicate a [dln]denseMatrix or a numeric matrix or even vector as a [dln]geMatrix. " alt="" coords="187,56,362,83"/>
+<area shape="rect" id="node3" href="$dense_8h.html#afc94ab69278e25ef4ea5ed5ba90935c3" title="dense_band" alt="" coords="438,5,530,32"/>
+<area shape="rect" id="node4" href="$dense_8h.html#a389bdf26bd829335d25dffb4244c9ae6" title="dense_to_symmetric" alt="" coords="413,56,555,83"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#a623039270a92fce0643031ef7f6e72b2" title="mMatrix_as_geMatrix" alt="" coords="411,107,557,133"/>
+<area shape="rect" id="node6" href="$dense_8h.html#a33b46f3a16a95734d4875ddfbfa079cb" title="dense_to_Csparse" alt="" coords="605,107,736,133"/>
 </map>

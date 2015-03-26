@@ -1,18 +1,17 @@
 <map id="xtype" name="xtype">
-<area shape="rect" id="node2" href="$chm__common_8h.html#ac0b9d7e2006dcf1a8d388954b408d007" title="Populate ans with the pointers from x and modify its scalar elements accordingly. ..." alt="" coords="111,56,249,83"/>
-<area shape="rect" id="node5" href="$chm__common_8h.html#a7c6132b98d7e38fc876c745c9cc8da2d" title="Populate ans with the pointers from x and modify its scalar elements accordingly. ..." alt="" coords="115,107,245,133"/>
-<area shape="rect" id="node6" href="$chm__common_8h.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f or free both f and ..." alt="" coords="107,157,253,184"/>
-<area shape="rect" id="node17" href="$Csparse_8h.html#a49bea3bf31864cc0553a4af67f7cdc39" title="Create a Csparse matrix object from indices and/or pointers. " alt="" coords="123,208,237,235"/>
-<area shape="rect" id="node3" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="346,56,443,83"/>
-<area shape="rect" id="node4" href="$t__Csparse__validate_8c.html#a9b61a7b94328cfd15ca3281ca7778fb7" title="CSPARSE_VAL_FN_NAME" alt="" coords="301,5,488,32"/>
-<area shape="rect" id="node7" href="$CHMfactor_8h.html#a68d2867fdefa6d9a62904faffe4710f3" title="CHMfactor_updown" alt="" coords="326,208,463,235"/>
-<area shape="rect" id="node8" href="$CHMfactor_8h.html#aafc574f19837b7c6879c395a382444b0" title="CHMfactor_update" alt="" coords="329,259,460,285"/>
-<area shape="rect" id="node9" href="$CHMfactor_8h.html#a5b0d200f2e7a1d06d1c353d826af0d70" title="destructive_CHM_update" alt="" coords="310,309,479,336"/>
-<area shape="rect" id="node10" href="$dgCMatrix_8h.html#af7d6aca940ff91850aa82c28fac47a66" title="dgCMatrix_cholsol" alt="" coords="331,360,459,387"/>
-<area shape="rect" id="node11" href="$dsCMatrix_8c.html#a9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm, LDL and super attributes. " alt="" coords="327,157,463,184"/>
-<area shape="rect" id="node13" href="$dsCMatrix_8h.html#af424de259d431a9c8719a23188265887" title="dsCMatrix_Cholesky" alt="" coords="553,81,693,108"/>
-<area shape="rect" id="node12" href="$dsCMatrix_8h.html#a326fdb98f74608895abd9df179158253" title="dsCMatrix_chol" alt="" coords="567,183,678,209"/>
-<area shape="rect" id="node14" href="$dsCMatrix_8h.html#ae60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial Cholesky LDL&#39; decomp..." alt="" coords="559,233,687,260"/>
-<area shape="rect" id="node15" href="$dsCMatrix_8h.html#adcc1710e8498942adcce28ec1eab655e" title="dsCMatrix_Csparse_solve" alt="" coords="536,284,709,311"/>
-<area shape="rect" id="node16" href="$dsCMatrix_8h.html#a2b40f2a78566d1c13864187d2ab964af" title="dsCMatrix_matrix_solve" alt="" coords="543,132,703,159"/>
+<area shape="rect" id="node2" href="$chm__common_8h.html#ac0b9d7e2006dcf1a8d388954b408d007" title="Populate ans with the pointers from x and modify its scalar elements accordingly. ..." alt="" coords="115,44,253,71"/>
+<area shape="rect" id="node5" href="$chm__common_8h.html#a7c6132b98d7e38fc876c745c9cc8da2d" title="Populate ans with the pointers from x and modify its scalar elements accordingly. ..." alt="" coords="119,95,249,121"/>
+<area shape="rect" id="node6" href="$chm__common_8h.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f or free both f and ..." alt="" coords="110,171,258,197"/>
+<area shape="rect" id="node3" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="353,56,452,83"/>
+<area shape="rect" id="node4" href="$t__Csparse__validate_8c.html#a9b61a7b94328cfd15ca3281ca7778fb7" title="CSPARSE_VAL_FN_NAME" alt="" coords="307,5,498,32"/>
+<area shape="rect" id="node7" href="$CHMfactor_8h.html#a68d2867fdefa6d9a62904faffe4710f3" title="CHMfactor_updown" alt="" coords="333,208,472,235"/>
+<area shape="rect" id="node8" href="$CHMfactor_8h.html#aafc574f19837b7c6879c395a382444b0" title="CHMfactor_update" alt="" coords="337,259,469,285"/>
+<area shape="rect" id="node9" href="$CHMfactor_8h.html#a5b0d200f2e7a1d06d1c353d826af0d70" title="destructive_CHM_update" alt="" coords="317,309,488,336"/>
+<area shape="rect" id="node10" href="$dgCMatrix_8h.html#af7d6aca940ff91850aa82c28fac47a66" title="dgCMatrix_cholsol" alt="" coords="337,360,468,387"/>
+<area shape="rect" id="node11" href="$dsCMatrix_8c.html#a9c9746e3464cc26aa2abfc21dbf2a130" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm, LDL and super attributes. " alt="" coords="335,157,471,184"/>
+<area shape="rect" id="node13" href="$dsCMatrix_8h.html#af424de259d431a9c8719a23188265887" title="dsCMatrix_Cholesky" alt="" coords="563,81,707,108"/>
+<area shape="rect" id="node12" href="$dsCMatrix_8h.html#a326fdb98f74608895abd9df179158253" title="dsCMatrix_chol" alt="" coords="578,183,691,209"/>
+<area shape="rect" id="node14" href="$dsCMatrix_8h.html#ae60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial Cholesky LDL&#39; decomp..." alt="" coords="569,233,700,260"/>
+<area shape="rect" id="node15" href="$dsCMatrix_8h.html#adcc1710e8498942adcce28ec1eab655e" title="dsCMatrix_Csparse_solve" alt="" coords="547,284,723,311"/>
+<area shape="rect" id="node16" href="$dsCMatrix_8h.html#a2b40f2a78566d1c13864187d2ab964af" title="dsCMatrix_matrix_solve" alt="" coords="553,132,716,159"/>
 </map>

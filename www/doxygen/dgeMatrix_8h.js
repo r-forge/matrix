@@ -1,0 +1,26 @@
+var dgeMatrix_8h =
+[
+    [ "dgeMatrix_addDiag", "dgeMatrix_8h.html#aaf8bd607f407fe7492444169bed599b9", null ],
+    [ "dgeMatrix_colsums", "dgeMatrix_8h.html#a0b6c5f387f39437317fbfdd2b0a063a8", null ],
+    [ "dgeMatrix_crossprod", "dgeMatrix_8h.html#a1d6cfeb6b881161af7296a438c4bf1b3", null ],
+    [ "dgeMatrix_determinant", "dgeMatrix_8h.html#aebb502aae0db4698b17a88c6c0f0ec39", null ],
+    [ "dgeMatrix_dgeMatrix_crossprod", "dgeMatrix_8h.html#a49aa50c9ebf93d2eb2b83395c4709161", null ],
+    [ "dgeMatrix_exp", "dgeMatrix_8h.html#a8bb1459b2c5c175a2aba80bb94202a35", null ],
+    [ "dgeMatrix_getDiag", "dgeMatrix_8h.html#a6b7001e9250c8c936b4b1cf618122fa8", null ],
+    [ "dgeMatrix_LU", "dgeMatrix_8h.html#a14710a79940dbc67cab89dc8c302c210", null ],
+    [ "dgeMatrix_LU_", "dgeMatrix_8h.html#a25fac53ee67024e89f6240deaa4c7ca3", null ],
+    [ "dgeMatrix_matrix_crossprod", "dgeMatrix_8h.html#a81810f4f6dc67a5e62babde744317a01", null ],
+    [ "dgeMatrix_matrix_mm", "dgeMatrix_8h.html#acf21cab0cdce9d8e08d40584cbe0647c", null ],
+    [ "dgeMatrix_matrix_solve", "dgeMatrix_8h.html#a4aaf5ed4d71841560a06e2eda9da3762", null ],
+    [ "dgeMatrix_norm", "dgeMatrix_8h.html#ad6b2835d2acbc142689c1d980387c5e0", null ],
+    [ "dgeMatrix_rcond", "dgeMatrix_8h.html#ac4f1b4b19a004fb62c9cb68ccb1028ea", null ],
+    [ "dgeMatrix_Schur", "dgeMatrix_8h.html#a234f38e33e209bc00614f2d7b61748d0", null ],
+    [ "dgeMatrix_setDiag", "dgeMatrix_8h.html#a022ce38ded14a3a2d14808d7ad3ea508", null ],
+    [ "dgeMatrix_solve", "dgeMatrix_8h.html#a8f0564cd095a4415738ef1ad8d537da1", null ],
+    [ "dgeMatrix_svd", "dgeMatrix_8h.html#a474be2197aa1bf3e0c7a7ebea3721d2b", null ],
+    [ "dgeMatrix_validate", "dgeMatrix_8h.html#af754a26692ba664a4f2559d85bc06f47", null ],
+    [ "dgesdd", "dgeMatrix_8h.html#a82816694a7a62efa0b4cff7a16ec27a9", null ],
+    [ "dMatrix_validate", "dgeMatrix_8h.html#aeb856bac3027df440d5869db30a27386", null ],
+    [ "lgeMatrix_getDiag", "dgeMatrix_8h.html#adb2a7402a88c7d3850973384269dc467", null ],
+    [ "lgeMatrix_setDiag", "dgeMatrix_8h.html#ab190f90dbca6632a19ad3ebaba90d536", null ]
+];

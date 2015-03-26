@@ -1,5 +1,6 @@
 <map id="R_to_CMatrix" name="R_to_CMatrix">
-<area shape="rect" id="node2" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="542,5,650,32"/>
-<area shape="rect" id="node3" href="$Csparse_8c.html#aab695b6af65c32eac1776cf04c661518" title="Csparse_transpose" alt="" coords="155,31,290,57"/>
-<area shape="rect" id="node4" href="$chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="339,31,493,57"/>
+<area shape="rect" id="node2" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="544,5,651,32"/>
+<area shape="rect" id="node3" href="$Csparse_8c.html#aab695b6af65c32eac1776cf04c661518" title="Csparse_transpose" alt="" coords="158,31,293,57"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#aeb40b76e760863cfc4e4009cf04e39e6" title="SET_DimNames" alt="" coords="165,81,286,108"/>
+<area shape="rect" id="node4" href="$chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="341,31,496,57"/>
 </map>

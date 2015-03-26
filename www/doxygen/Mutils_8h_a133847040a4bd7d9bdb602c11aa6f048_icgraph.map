@@ -1,8 +1,8 @@
 <map id="make_i_matrix_symmetric" name="make_i_matrix_symmetric">
-<area shape="rect" id="node2" href="$Mutils_8h.html#a23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="227,56,400,83"/>
-<area shape="rect" id="node7" href="$ldense_8h.html#a0dc07e735b6fe4687f207bb06e950b70" title="lsyMatrix_as_lgeMatrix" alt="" coords="237,107,390,133"/>
-<area shape="rect" id="node3" href="$dense_8h.html#afc94ab69278e25ef4ea5ed5ba90935c3" title="dense_band" alt="" coords="475,5,567,32"/>
-<area shape="rect" id="node4" href="$dense_8h.html#a389bdf26bd829335d25dffb4244c9ae6" title="dense_to_symmetric" alt="" coords="450,56,593,83"/>
-<area shape="rect" id="node5" href="$Mutils_8h.html#a623039270a92fce0643031ef7f6e72b2" title="mMatrix_as_geMatrix" alt="" coords="449,107,594,133"/>
-<area shape="rect" id="node6" href="$dense_8h.html#a33b46f3a16a95734d4875ddfbfa079cb" title="dense_to_Csparse" alt="" coords="643,107,773,133"/>
+<area shape="rect" id="node2" href="$Mutils_8h.html#a23764b1c8334e40406598a0446cc8bc5" title="Duplicate a [dln]denseMatrix or a numeric matrix or even vector as a [dln]geMatrix. " alt="" coords="230,56,405,83"/>
+<area shape="rect" id="node7" href="$ldense_8h.html#a0dc07e735b6fe4687f207bb06e950b70" title="lsyMatrix_as_lgeMatrix" alt="" coords="239,107,395,133"/>
+<area shape="rect" id="node3" href="$dense_8h.html#afc94ab69278e25ef4ea5ed5ba90935c3" title="dense_band" alt="" coords="481,5,573,32"/>
+<area shape="rect" id="node4" href="$dense_8h.html#a389bdf26bd829335d25dffb4244c9ae6" title="dense_to_symmetric" alt="" coords="455,56,598,83"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#a623039270a92fce0643031ef7f6e72b2" title="mMatrix_as_geMatrix" alt="" coords="453,107,600,133"/>
+<area shape="rect" id="node6" href="$dense_8h.html#a33b46f3a16a95734d4875ddfbfa079cb" title="dense_to_Csparse" alt="" coords="648,107,779,133"/>
 </map>

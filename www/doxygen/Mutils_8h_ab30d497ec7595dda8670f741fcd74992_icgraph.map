@@ -1,8 +1,8 @@
 <map id="make_i_matrix_triangular" name="make_i_matrix_triangular">
-<area shape="rect" id="node2" href="$Mutils_8h.html#a23764b1c8334e40406598a0446cc8bc5" title="dup_mMatrix_as_geMatrix" alt="" coords="221,56,395,83"/>
-<area shape="rect" id="node7" href="$ldense_8h.html#abb941cad1b2099e19d38c93f89bfaee0" title="ltrMatrix_as_lgeMatrix" alt="" coords="234,107,382,133"/>
-<area shape="rect" id="node3" href="$dense_8h.html#afc94ab69278e25ef4ea5ed5ba90935c3" title="dense_band" alt="" coords="470,5,562,32"/>
-<area shape="rect" id="node4" href="$dense_8h.html#a389bdf26bd829335d25dffb4244c9ae6" title="dense_to_symmetric" alt="" coords="445,56,587,83"/>
-<area shape="rect" id="node5" href="$Mutils_8h.html#a623039270a92fce0643031ef7f6e72b2" title="mMatrix_as_geMatrix" alt="" coords="443,107,589,133"/>
-<area shape="rect" id="node6" href="$dense_8h.html#a33b46f3a16a95734d4875ddfbfa079cb" title="dense_to_Csparse" alt="" coords="637,107,768,133"/>
+<area shape="rect" id="node2" href="$Mutils_8h.html#a23764b1c8334e40406598a0446cc8bc5" title="Duplicate a [dln]denseMatrix or a numeric matrix or even vector as a [dln]geMatrix. " alt="" coords="222,56,397,83"/>
+<area shape="rect" id="node7" href="$ldense_8h.html#abb941cad1b2099e19d38c93f89bfaee0" title="ltrMatrix_as_lgeMatrix" alt="" coords="234,107,385,133"/>
+<area shape="rect" id="node3" href="$dense_8h.html#afc94ab69278e25ef4ea5ed5ba90935c3" title="dense_band" alt="" coords="473,5,565,32"/>
+<area shape="rect" id="node4" href="$dense_8h.html#a389bdf26bd829335d25dffb4244c9ae6" title="dense_to_symmetric" alt="" coords="447,56,590,83"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#a623039270a92fce0643031ef7f6e72b2" title="mMatrix_as_geMatrix" alt="" coords="445,107,592,133"/>
+<area shape="rect" id="node6" href="$dense_8h.html#a33b46f3a16a95734d4875ddfbfa079cb" title="dense_to_Csparse" alt="" coords="640,107,771,133"/>
 </map>

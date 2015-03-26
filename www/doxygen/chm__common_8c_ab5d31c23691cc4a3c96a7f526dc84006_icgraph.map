@@ -1,6 +1,6 @@
 <map id="chm_triplet_to_SEXP" name="chm_triplet_to_SEXP">
-<area shape="rect" id="node2" href="$Csparse_8h.html#a12b0c242957f1fad9137e767f882e6b8" title="Csparse_to_Tsparse" alt="" coords="210,5,353,32"/>
-<area shape="rect" id="node3" href="$Csparse_8h.html#a48d40e2cc334ad0df5e96008dea6eacf" title="Csparse_to_tTsparse" alt="" coords="208,56,355,83"/>
-<area shape="rect" id="node4" href="$dsCMatrix_8h.html#afc1c4fd1837c1e0a984de363e054e3fa" title="dsCMatrix_to_dgTMatrix" alt="" coords="200,107,363,133"/>
-<area shape="rect" id="node5" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="233,157,330,184"/>
+<area shape="rect" id="node2" href="$Csparse_8h.html#a12b0c242957f1fad9137e767f882e6b8" title="Csparse_to_Tsparse" alt="" coords="211,5,354,32"/>
+<area shape="rect" id="node3" href="$Csparse_8h.html#a48d40e2cc334ad0df5e96008dea6eacf" title="Csparse_to_tTsparse" alt="" coords="209,56,356,83"/>
+<area shape="rect" id="node4" href="$dsCMatrix_8h.html#afc1c4fd1837c1e0a984de363e054e3fa" title="dsCMatrix_to_dgTMatrix" alt="" coords="200,107,365,133"/>
+<area shape="rect" id="node5" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="233,157,332,184"/>
 </map>

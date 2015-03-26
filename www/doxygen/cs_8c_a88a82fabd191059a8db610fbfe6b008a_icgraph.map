@@ -1,0 +1,10 @@
+<map id="cs_happly" name="cs_happly">
+<area shape="rect" id="node2" href="$cs_8h.html#a767dc90c22d90fe898f72c2da0d98c03" title="cs_qr" alt="" coords="170,56,225,83"/>
+<area shape="rect" id="node3" href="$cs_8h.html#a136e729a618c610422377201351db105" title="cs_qrsol" alt="" coords="347,5,418,32"/>
+<area shape="rect" id="node6" href="$sparseQR_8c.html#ad4bb283bd0128438e01523e07feb4993" title="Apply Householder transformations and the row permutation P to y. " alt="" coords="136,132,259,159"/>
+<area shape="rect" id="node5" href="$dgCMatrix_8h.html#a2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="328,56,437,83"/>
+<area shape="rect" id="node4" href="$dgCMatrix_8h.html#a5937063a2f86fc60d92f942eb9425b86" title="dgCMatrix_qrsol" alt="" coords="507,5,624,32"/>
+<area shape="rect" id="node7" href="$sparseQR_8h.html#a77c75b1c89f4e32f426420faa76275a9" title="Given a sparse QR decomposition and y, compute Q y or Q&#39;y. " alt="" coords="329,107,436,133"/>
+<area shape="rect" id="node8" href="$sparseQR_8h.html#a614549a94002c7e1407cde03a911e16a" title="sparseQR_coef" alt="" coords="326,157,439,184"/>
+<area shape="rect" id="node9" href="$sparseQR_8h.html#a43eb94cb27f10aedba5ce50939a9b45c" title="Compute qr.resid(qr, y) or qr.fitted(qr, y) " alt="" coords="307,208,459,235"/>
+</map>

@@ -1,6 +1,6 @@
 <map id="dsyMatrix_solve" name="dsyMatrix_solve">
-<area shape="rect" id="node2" href="$dsyMatrix_8c.html#ae436ba23f7410148775ce808f08d1210" title="dsyMatrix_trf" alt="" coords="168,56,264,83"/>
-<area shape="rect" id="node3" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="323,5,410,32"/>
-<area shape="rect" id="node4" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="313,56,421,83"/>
-<area shape="rect" id="node5" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="323,107,410,133"/>
+<area shape="rect" id="node2" href="$dsyMatrix_8c.html#ae436ba23f7410148775ce808f08d1210" title="dsyMatrix_trf" alt="" coords="171,56,269,83"/>
+<area shape="rect" id="node3" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="327,5,414,32"/>
+<area shape="rect" id="node4" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="317,56,424,83"/>
+<area shape="rect" id="node5" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="327,107,414,133"/>
 </map>
