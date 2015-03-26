@@ -24,6 +24,25 @@ extern "C" {
 	"nmatrix", "ngeMatrix",			\
 	"zmatrix", "zgeMatrix"
 
+#define MATRIX_VALID_ddense					\
+		    "dgeMatrix", "dtrMatrix",			\
+		    "dsyMatrix", "dpoMatrix", "ddiMatrix",	\
+		    "dtpMatrix", "dspMatrix", "dppMatrix",	\
+		    /* sub classes of those above:*/		\
+		    /* dtr */ "Cholesky", "LDL", "BunchKaufman",\
+		    /* dtp */ "pCholesky", "pBunchKaufman",	\
+		    /* dpo */ "corMatrix"
+
+#define MATRIX_VALID_ldense			\
+		    "lgeMatrix", "ltrMatrix",	\
+		    "lsyMatrix", "ldiMatrix",	\
+		    "ltpMatrix", "lspMatrix"
+
+#define MATRIX_VALID_ndense			\
+		    "ngeMatrix", "ntrMatrix",	\
+		    "nsyMatrix",		\
+		    "ntpMatrix", "nspMatrix"
+
 #define MATRIX_VALID_Csparse			\
  "dgCMatrix", "dsCMatrix", "dtCMatrix",		\
  "lgCMatrix", "lsCMatrix", "ltCMatrix",		\
@@ -41,6 +60,9 @@ extern "C" {
  "lgRMatrix", "lsRMatrix", "ltRMatrix",		\
  "ngRMatrix", "nsRMatrix", "ntRMatrix",		\
  "zgRMatrix", "zsRMatrix", "ztRMatrix"
+
+#define MATRIX_VALID_tri_Csparse		\
+   "dtCMatrix", "ltCMatrix", "ntCMatrix", "ztCMatrix"
 
 #define MATRIX_VALID_CHMfactor "dCHMsuper", "dCHMsimpl", "nCHMsuper", "nCHMsimpl"
 

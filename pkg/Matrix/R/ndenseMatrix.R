@@ -112,8 +112,9 @@ setAs("ndenseMatrix", "matrix", ## uses the above l*M. -> lgeM.
 ## go via "l" because dense_to_Csparse can't be used for "n" [missing CHOLMOD function]
 setAs("ndenseMatrix", "CsparseMatrix",
       function(from) as(as(as(from, "lMatrix"), "CsparseMatrix"), "nMatrix"))
-## setAs("ndenseMatrix", "sparseMatrix",
-##       function(from) as(as(as(from, "lMatrix"), "sparseMatrix"), "nMatrix"))
+setAs("ndenseMatrix", "nsparseMatrix",
+      function(from) as(as(as(from, "lMatrix"), "sparseMatrix"), "nMatrix"))
+setAs("ndenseMatrix", "sparseMatrix", function(from) as(from, "nsparseMatrix"))
 
 setAs("ndenseMatrix", "TsparseMatrix",
       function(from) {

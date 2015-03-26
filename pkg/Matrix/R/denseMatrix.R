@@ -7,7 +7,7 @@ setAs("ANY",    "denseMatrix", function(from) Matrix(from, sparse=FALSE))
 ## setAs("matrix", "denseMatrix", ....) which was slightly more efficient than
 ##  Matrix(.)  but would have many things in common
 
-setAs(from = "denseMatrix", to = "generalMatrix", as_geSimpl)
+setAs("denseMatrix", "generalMatrix", as_geSimpl)
 
 ## dense to sparse:
 ## : if we do this, do it "right", i.e. preserve symmetric/triangular!

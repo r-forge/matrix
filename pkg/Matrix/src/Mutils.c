@@ -595,34 +595,15 @@ install_diagonal_int(int *dest, SEXP A)
  *            ---         ---        but are still dealt with here.
  */
 
-#define ddense_CLASSES							\
-		    "dgeMatrix", "dtrMatrix",				\
-		    "dsyMatrix", "dpoMatrix", "ddiMatrix",		\
-		    "dtpMatrix", "dspMatrix", "dppMatrix",		\
-		    /* sub classes of those above:*/			\
-		    /* dtr */ "Cholesky", "LDL", "BunchKaufman",	\
-		    /* dtp */ "pCholesky", "pBunchKaufman",		\
-		    /* dpo */ "corMatrix"
-
-#define ldense_CLASSES					\
-		    "lgeMatrix", "ltrMatrix",		\
-		    "lsyMatrix", "ldiMatrix",		\
-		    "ltpMatrix", "lspMatrix"
-
-#define ndense_CLASSES					\
-		    "ngeMatrix", "ntrMatrix",		\
-		    "nsyMatrix",			\
-		    "ntpMatrix", "nspMatrix"
-
 /* Generalized -- "geMatrix" -- dispatch where needed : */
 SEXP dup_mMatrix_as_geMatrix(SEXP A)
 {
     SEXP ans, ad = R_NilValue, an = R_NilValue;	/* -Wall */
     static const char *valid[] = {
 	"_NOT_A_CLASS_",/* *_CLASSES defined in ./Mutils.h */
-	ddense_CLASSES, /* 14 */
-	ldense_CLASSES, /* 6  */
-	ndense_CLASSES, /* 5  */
+	MATRIX_VALID_ddense, /* 14 */
+	MATRIX_VALID_ldense, /* 6  */
+	MATRIX_VALID_ndense, /* 5  */
 	""};
     int sz, ctype = Matrix_check_class_etc(A, valid),
 	nprot = 1;
@@ -789,7 +770,7 @@ SEXP dup_mMatrix_as_dgeMatrix2(SEXP A, Rboolean tr_if_vec)
 {
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
 	ad = R_NilValue , an = R_NilValue;	/* -Wall */
-    static const char *valid[] = {"_NOT_A_CLASS_", ddense_CLASSES, ""};
+    static const char *valid[] = {"_NOT_A_CLASS_", MATRIX_VALID_ddense, ""};
     int ctype = Matrix_check_class_etc(A, valid),
 	nprot = 1, sz;
     double *ansx;

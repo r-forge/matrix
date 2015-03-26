@@ -248,7 +248,7 @@ SEXP lapack_qr(SEXP Xin, SEXP tl)
 
 SEXP dense_to_Csparse(SEXP x)
 {
-    CHM_DN chxd = AS_CHM_DN(PROTECT(mMatrix_as_geMatrix(x)));
+    CHM_DN chxd = AS_CHM_xDN(PROTECT(mMatrix_as_geMatrix(x)));
     /* cholmod_dense_to_sparse() in CHOLMOD/Core/ below does only work for
        "REAL" 'xtypes', i.e. *not* for "nMatrix".
        ===> need "_x" in above call.

@@ -980,6 +980,13 @@ if(doExtras) {
     cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
 }
 
+dtr <- tr4 <- triu(Matrix(1:16, 4,4))
+dtr@x[Matrix:::indTri(4, upper=FALSE, diag=FALSE)] <- 100*(-3:2)
+stopifnot(all.equal(dtr, tr4), # because are same *as* simple matrices
+	  dtr@x[1:4] == c(1, -(3:1)*100),
+	  range(tr4) == c(0,16),
+	  range(dtr) == c(0,16)) # <- failed
+
 ##  new("nsyMatrix") + new("lgeMatrix") # failed
 cln <- sort(outer(c("l","n"), paste0(c("ge","sy"), "Matrix"), paste0))
 dim(c.c <- as.matrix(expand.grid(cln, cln, KEEP.OUT.ATTRS=FALSE))) # 16 x 2

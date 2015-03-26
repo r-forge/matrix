@@ -56,6 +56,18 @@ Qidentical <- function(x,y, strictClass = TRUE) {
     TRUE
 }
 
+##' quasi-identical()  for traditional ('matrix') matrices
+mQidentical <- function(x,y, strictClass = TRUE) {
+    if(class(x) != class(y)) {
+        if(strictClass || !is(x, class(y)))
+            return(FALSE)
+        ## else try further
+    }
+    if(!Qidentical.DN(dimnames(x), dimnames(y)))
+        return(FALSE)
+    identical(unname(x), unname(y))
+}
+
 Q.C.identical <- function(x,y, sparse = is(x,"sparseMatrix"),
                           checkClass = TRUE, strictClass = TRUE) {
     if(checkClass && class(x) != class(y)) {
