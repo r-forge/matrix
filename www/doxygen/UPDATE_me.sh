@@ -19,13 +19,17 @@ d=$SVN_MATRIX_DIR/pkg/Matrix/inst ; checkDir $d ; cd $d
 doxygen -u Doxyfile
 doxygen
 d=$SVN_MATRIX_DIR/www/doxygen; checkDir $d ; cd $d
+# Remove all the doxygen files that are old, as
+# they have not been *replaced* by a new version :
 find . -path ./.svn -prune -o \( -mtime +1 -a -type f -exec rm {} \; \)
+# but do "save myself":
+svn restore UPDATE_me.sh
 svn add *
 
 cd $SVN_MATRIX_DIR
-echo -n "svn cleanup in `pwd` : "
+echo -n "svn cleanup in `pwd` (takes a while): "
 svn cleanup .
 echo '[Ok]
-Now trying to commit all : '
+Now trying to commit all   (takes another while!): '
 set -v
 svn ci -m'after "doxygen -u" and "doxygen" and cleanup of www directory' pkg/Matrix/inst/Doxyfile www/doxygen
