@@ -803,4 +803,29 @@ stopifnot(identical(D5 %&% D., L5))
 stopifnot(identical(D5 %&% as(D.,"CsparseMatrix"),
                     as(as(L5, "nMatrix"),"CsparseMatrix")))
 
+set.seed(7)
+L <- Matrix(rnorm(20) > 1,    4,5)
+(N <- as(L, "nMatrix"))
+D <- Matrix(round(rnorm(30)), 5,6) # -> values in -1:1 (for this seed)
+L %&% D
+stopifnot(identical(L %&% D, N %&% D),
+          all(L %&% D == as((L %*% abs(D)) > 0, "sparseMatrix")))
+stopifnotValid(show(crossprod(N   ))      , "nsCMatrix") #  (TRUE/FALSE : boolean arithmetic)
+stopifnotValid(show(crossprod(N +0)) -> N0, "dsCMatrix") # -> numeric Matrix (with same "pattern")
+stopifnot(all(crossprod(N) == t(N) %&% N),
+          identical(crossprod(N, boolArith=TRUE) -> cN.,
+                    as(N0 != 0, "nMatrix")),
+          identical(cN., crossprod(L, boolArith=TRUE)),
+          identical3(N0, crossprod(L), crossprod(L, boolArith=FALSE))
+          )
+crossprod(D, boolArith = TRUE)## <- currently with warning "... not yet implemented":
+## for "many" more seeds:
+for(nn in 1:256) {
+  L <- Matrix(rnorm(20) > 1,    4,5)
+  D <- Matrix(round(rnorm(30)), 5,6)
+  stopifnot(all(L %&% D == as((L %*% abs(D)) > 0, "sparseMatrix")))
+}
+
+
+
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''

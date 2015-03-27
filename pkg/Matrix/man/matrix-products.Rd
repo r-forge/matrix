@@ -285,12 +285,12 @@
 \usage{
 \S4method{\%*\%}{CsparseMatrix,diagonalMatrix}(x, y)
 
-\S4method{crossprod}{dgeMatrix,missing}(x, y = NULL)
-\S4method{crossprod}{CsparseMatrix,missing}(x, y = NULL, boolArith = NA)
+\S4method{crossprod}{dgeMatrix,missing}(x, y = NULL, boolArith = NA, \dots)
+\S4method{crossprod}{CsparseMatrix,diagonalMatrix}(x, y = NULL, boolArith = NA, \dots)
        ## .... and for many more signatures
 
-\S4method{tcrossprod}{CsparseMatrix,ddenseMatrix}(x, y = NULL)
-\S4method{tcrossprod}{TsparseMatrix,missing}(x, y = NULL, boolArith = NA)
+\S4method{tcrossprod}{CsparseMatrix,ddenseMatrix}(x, y = NULL, boolArith = NA, \dots)
+\S4method{tcrossprod}{TsparseMatrix,missing}(x, y = NULL, boolArith = NA, \dots)
        ## .... and for many more signatures
 }
 \arguments{
@@ -304,6 +304,7 @@
     is (coerced to) numeric.  When \code{NA}, currently the default, the
     result is a pattern matrix when \code{x} and \code{y} are
     \code{"\linkS4class{nsparseMatrix}"} and numeric otherwise.}
+  \item{\dots}{potentially more arguments passed to and from methods.}
 }
 \details{
   For some classes in the \code{Matrix} package, such as

@@ -32,6 +32,7 @@ SEXP Csparse_to_Tsparse(SEXP x, SEXP tri);
 SEXP Csparse_to_tCsparse(SEXP x, SEXP uplo, SEXP diag);
 SEXP Csparse_to_tTsparse(SEXP x, SEXP uplo, SEXP diag);
 SEXP Csparse_to_dense(SEXP x, SEXP symm_or_tri);
+SEXP Csparse2nz           (SEXP x, Rboolean tri);
 SEXP Csparse_to_nz_pattern(SEXP x, SEXP tri);
 SEXP nz_pattern_to_Csparse(SEXP x, SEXP res_kind);
 SEXP nz2Csparse           (SEXP x, enum x_slot_kind r_kind);
