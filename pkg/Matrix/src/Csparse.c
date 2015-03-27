@@ -186,18 +186,26 @@ SEXP Csparse_to_dense(SEXP x, SEXP symm_or_tri)
 }
 
 // FIXME: do not go via CHM (should not be too hard, to just *drop* the x-slot, right?
-SEXP Csparse_to_nz_pattern(SEXP x, SEXP tri)
+SEXP Csparse2nz(SEXP x, Rboolean tri)
 {
     CHM_SP chxs = AS_CHM_SP__(x);
     CHM_SP chxcp = cholmod_copy(chxs, chxs->stype, CHOLMOD_PATTERN, &c);
-    int tr = asLogical(tri);
     R_CheckStack();
 
     return chm_sparse_to_SEXP(chxcp, 1/*do_free*/,
-			      tr ? ((*uplo_P(x) == 'U') ? 1 : -1) : 0,
+			      tri ? ((*uplo_P(x) == 'U') ? 1 : -1) : 0,
 			      /* Rkind: pattern */ 0,
-			      /* diag = */ tr ? diag_P(x) : "",
+			      /* diag = */ tri ? diag_P(x) : "",
 			      GET_SLOT(x, Matrix_DimNamesSym));
+}
+SEXP Csparse_to_nz_pattern(SEXP x, SEXP tri)
+{
+    int tr_ = asLogical(tri);
+    if(tr_ == NA_LOGICAL) {
+	warning(_("Csparse_to_nz_pattern(x, tri = NA): 'tri' is taken as TRUE"));
+	tr_ = TRUE;
+    }
+    return Csparse2nz(x, (Rboolean) tr_);
 }
 
 // n.CMatrix --> [dli].CMatrix  (not going through CHM!)
@@ -487,7 +495,6 @@ SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans, SEXP bool_arith)
 	chb = AS_CHM_SP(b),
 	chTr, chc;
     R_CheckStack();
-    // const char *cl_a = class_P(a), *cl_b = class_P(b);
     static const char *valid_tri[] = { MATRIX_VALID_tri_Csparse, "" };
     char diag[] = {'\0', '\0'};
     int uploT = 0;
@@ -502,16 +509,25 @@ SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans, SEXP bool_arith)
 	SEXP da = PROTECT(nz2Csparse(a, x_double)); nprot++;
 	cha = AS_CHM_SP(da);
 	R_CheckStack();
-	a_is_n = FALSE;
+	// a_is_n = FALSE;
     }
     else if(b_is_n && (force_num || (maybe_bool && !a_is_n))) {
 	// coerce 'b' to  double
 	SEXP db = PROTECT(nz2Csparse(b, x_double)); nprot++;
 	chb = AS_CHM_SP(db);
 	R_CheckStack();
-	b_is_n = FALSE;
+	// b_is_n = FALSE;
     }
-
+    else if(do_bool == TRUE) { // Want boolean arithmetic: sufficient if *one* is pattern:
+	if(!a_is_n && !b_is_n) {
+	    // coerce 'a' to pattern
+	    SEXP da = PROTECT(Csparse2nz(a, /* tri = */
+					 Matrix_check_class_etc(a, valid_tri) >= 0)); nprot++;
+	    cha = AS_CHM_SP(da);
+	    R_CheckStack();
+	    // a_is_n = TRUE;
+	}
+    }
     chTr = cholmod_transpose((tr) ? chb : cha, chb->xtype, &c);
     chc = cholmod_ssmult((tr) ? cha : chTr, (tr) ? chTr : chb,
 			 /*out_stype:*/ 0, /* values : */ do_bool != TRUE,
@@ -696,6 +712,14 @@ SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet, SEXP bool_arith)
     if(x_is_n && force_num) {
 	// coerce 'x' to  double
 	SEXP dx = PROTECT(nz2Csparse(x, x_double)); nprot++;
+	chx = AS_CHM_SP(dx);
+	R_CheckStack();
+    }
+    else if(do_bool == TRUE && !x_is_n) { // Want boolean arithmetic; need patter[n]
+	// coerce 'x' to pattern
+	static const char *valid_tri[] = { MATRIX_VALID_tri_Csparse, "" };
+	SEXP dx = PROTECT(Csparse2nz(x, /* tri = */
+				     Matrix_check_class_etc(x, valid_tri) >= 0)); nprot++;
 	chx = AS_CHM_SP(dx);
 	R_CheckStack();
     }

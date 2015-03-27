@@ -600,27 +600,54 @@ setMethod("%*%", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
 setMethod("%&%", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
 	  diagdiagprodBool, valueClass = "ldiMatrix")# do *not* have "ndiMatrix" !
 
-formals(diagdiagprod) <- alist(x=, y=NULL, ...=)
-##                                  -----  ---  matching the [t]crossprod generic
+##' Both Numeric or Boolean Algebra/Arithmetic Product of Diagonal Matrices
+diagdiagprodFlexi <- function(x, y=NULL, boolArith = NA, ...)
+{
+    dimCheck(x,y)
+    bool <- isTRUE(boolArith)
+    if(x@diag != "U") {
+	if(bool && !is.logical(x@x)) x <- as(x, "lMatrix")
+	if(y@diag != "U") {
+	    if(bool) {
+		nx <- x@x & y@x
+		x@x <- as.logical(nx)
+	    } else { ## boolArith is NA or FALSE: ==> numeric, as have *no* "diagMatrix" patter[n]:
+		nx <- x@x * y@x
+		if(is.numeric(nx) && !is.numeric(x@x))
+		    x <- as(x, "dMatrix")
+		x@x <- as.numeric(nx)
+	    }
+	}
+	x
+    } else { ## x is unit diagonal: return y
+	if(bool && !is.logical(y@x)) y <- as(y, "lMatrix")
+	y
+    }
+}
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
-	  diagdiagprod, valueClass = "ddiMatrix")
+	  diagdiagprodFlexi)
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
-	  diagdiagprod, valueClass = "ddiMatrix")
+	  diagdiagprodFlexi)
 
 ##' crossprod(x) := x'x
-diagprod <- function(x, y=NULL, ...) {
+diagprod <- function(x, y = NULL, boolArith = NA, ...) {
+    bool <- isTRUE(boolArith)
+    if(bool && !is.logical(x@x)) x <- as(x, "lMatrix")
     if(x@diag != "U") {
-        nx <- x@x * x@x
-        if(is.numeric(nx) && !is.numeric(x@x))
-            x <- as(x, "dMatrix")
-        x@x <- as.numeric(nx)
+        if(bool) {
+            nx <- x@x & y@x
+            x@x <- as.logical(nx)
+        } else { ## boolArith is NA or FALSE: ==> numeric, as have *no* "diagMatrix" patter[n]:
+            nx <- x@x * x@x
+            if(is.numeric(nx) && !is.numeric(x@x))
+                x <- as(x, "dMatrix")
+            x@x <- as.numeric(nx)
+        }
     }
     x
 }
-setMethod("crossprod", signature(x = "diagonalMatrix", y = "missing"),
-	  diagprod, valueClass = "ddiMatrix")
-setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "missing"),
-	  diagprod, valueClass = "ddiMatrix")
+setMethod( "crossprod", signature(x = "diagonalMatrix", y = "missing"), diagprod)
+setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "missing"), diagprod)
 
 
 ## analogous to matdiagprod() below:
@@ -629,10 +656,9 @@ diagmatprod <- function(x, y) {
     if(x@Dim[2] != nrow(y)) stop("non-matching dimensions")
     Matrix(if(x@diag == "U") y else x@x * y)
 }
-setMethod("%*%", signature(x = "diagonalMatrix", y = "matrix"),
-	  diagmatprod)
+setMethod("%*%", signature(x = "diagonalMatrix", y = "matrix"), diagmatprod)
 
-formals(diagmatprod) <- alist(x=, y=NULL, ...=)
+formals(diagmatprod) <- alist(x=, y=NULL, boolArith = NA, ...=)
 setMethod("crossprod",  signature(x = "diagonalMatrix", y = "matrix"), diagmatprod)
 
 diagGeprod <- function(x, y) {
@@ -643,11 +669,6 @@ diagGeprod <- function(x, y) {
 }
 setMethod("%*%", signature(x= "diagonalMatrix", y= "dgeMatrix"), diagGeprod)
 setMethod("%*%", signature(x= "diagonalMatrix", y= "lgeMatrix"), diagGeprod)
-formals(diagGeprod) <- alist(x=, y=NULL, ...=)
-setMethod("crossprod", signature(x = "diagonalMatrix", y = "dgeMatrix"),
-	  diagGeprod, valueClass = "dgeMatrix")
-setMethod("crossprod", signature(x = "diagonalMatrix", y = "lgeMatrix"),
-	  diagGeprod)
 
 diagGeprodBool <- function(x, y) {
     if(x@Dim[2] != y@Dim[1]) stop("non-matching dimensions")
@@ -658,6 +679,17 @@ diagGeprodBool <- function(x, y) {
 }
 setMethod("%&%", signature(x= "diagonalMatrix", y= "geMatrix"), diagGeprodBool)
 
+diagGeprod2 <- function(x, y=NULL, boolArith = NA, ...) {
+    if(x@Dim[2] != y@Dim[1]) stop("non-matching dimensions")
+    bool <- isTRUE(boolArith)
+    if(bool && !is.logical(y@x)) y <- as(y, "lMatrix")
+    if(x@diag != "U")
+        y@x <- if(bool) x@x & y@x else x@x * y@x
+    y
+}
+setMethod("crossprod", signature(x = "diagonalMatrix", y = "dgeMatrix"), diagGeprod2)
+setMethod("crossprod", signature(x = "diagonalMatrix", y = "lgeMatrix"), diagGeprod2)
+
 
 ## analogous to diagmatprod() above:
 matdiagprod <- function(x, y) {
@@ -666,14 +698,6 @@ matdiagprod <- function(x, y) {
     Matrix(if(y@diag == "U") x else x * rep(y@x, each = dx[1]))
 }
 setMethod("%*%", signature(x = "matrix", y = "diagonalMatrix"), matdiagprod)
-formals(matdiagprod) <- alist(x=, y=NULL, ...=)
-setMethod("tcrossprod",signature(x = "matrix", y = "diagonalMatrix"), matdiagprod)
-setMethod("crossprod", signature(x = "matrix", y = "diagonalMatrix"),
-	  function(x, y=NULL, ...) {
-	      dx <- dim(x)
-	      if(dx[1] != y@Dim[1]) stop("non-matching dimensions")
-	      Matrix(t(rep.int(y@x, dx[2]) * x))
-	  })
 
 gediagprod <- function(x, y) {
     dx <- dim(x)
@@ -684,11 +708,6 @@ gediagprod <- function(x, y) {
 }
 setMethod("%*%", signature(x= "dgeMatrix", y= "diagonalMatrix"), gediagprod)
 setMethod("%*%", signature(x= "lgeMatrix", y= "diagonalMatrix"), gediagprod)
-formals(gediagprod) <- alist(x=, y=NULL, ...=)
-setMethod("tcrossprod", signature(x = "dgeMatrix", y = "diagonalMatrix"),
-	  gediagprod)
-setMethod("tcrossprod", signature(x = "lgeMatrix", y = "diagonalMatrix"),
-	  gediagprod)
 
 gediagprodBool <- function(x, y) {
     dx <- dim(x)
@@ -699,6 +718,42 @@ gediagprodBool <- function(x, y) {
     x
 }
 setMethod("%&%", signature(x= "geMatrix", y= "diagonalMatrix"), gediagprodBool)
+
+setMethod("tcrossprod",signature(x = "matrix", y = "diagonalMatrix"),
+          function(x, y=NULL, boolArith = NA, ...) {
+              dx <- dim(x)
+              if(dx[2] != y@Dim[1]) stop("non-matching dimensions")
+              bool <- isTRUE(boolArith)
+              if(bool && !is.logical(y@x)) y <- as(y, "lMatrix")
+              Matrix(if(y@diag == "U") x else
+                     if(bool) x & rep(y@x, each = dx[1])
+                     else     x * rep(y@x, each = dx[1]))
+          })
+
+setMethod("crossprod", signature(x = "matrix", y = "diagonalMatrix"),
+	  function(x, y=NULL, boolArith = NA, ...) {
+	      dx <- dim(x)
+	      if(dx[1] != y@Dim[1]) stop("non-matching dimensions")
+              bool <- isTRUE(boolArith)
+              if(bool && !is.logical(y@x)) y <- as(y, "lMatrix")
+	      Matrix(if(bool) t(rep.int(y@x, dx[2]) & x)
+                         else t(rep.int(y@x, dx[2]) * x))
+	  })
+
+
+gediagprod2 <- function(x, y=NULL, boolArith = NA, ...) {
+    dx <- dim(x)
+    if(dx[2] != y@Dim[1]) stop("non-matching dimensions")
+    bool <- isTRUE(boolArith)
+    if(bool && !is.logical(x@x)) x <- as(x, "lMatrix")
+    if(y@diag == "N")
+	x@x <- if(bool) x@x & rep(y@x, each = dx[1])
+	       else     x@x * rep(y@x, each = dx[1])
+    x
+}
+setMethod("tcrossprod", signature(x = "dgeMatrix", y = "diagonalMatrix"), gediagprod2)
+setMethod("tcrossprod", signature(x = "lgeMatrix", y = "diagonalMatrix"), gediagprod2)
+
 
 ## crossprod {more of these}
 
@@ -718,7 +773,7 @@ setMethod("%*%", signature(x = "denseMatrix", y = "diagonalMatrix"),
 ##' @param x CsparseMatrix
 ##' @param y diagonalMatrix
 ##' @return x %*% y
-Cspdiagprod <- function(x, y, boolArith = NA) {
+Cspdiagprod <- function(x, y, boolArith = NA, ...) {
     if((m <- ncol(x)) != y@Dim[1]) stop("non-matching dimensions")
     if(y@diag == "N") { ## otherwise: y == Diagonal(n) : multiplication is identity
 	x <- .Call(Csparse_diagU2N, x)
@@ -746,7 +801,7 @@ Cspdiagprod <- function(x, y, boolArith = NA) {
 ##' @param x diagonalMatrix
 ##' @param y CsparseMatrix
 ##' @return x %*% y
-diagCspprod <- function(x, y, boolArith = FALSE) {
+diagCspprod <- function(x, y, boolArith = NA, ...) {
     if(x@Dim[2] != y@Dim[1]) stop("non-matching dimensions")
     if(x@diag == "N") {
 	y <- .Call(Csparse_diagU2N, y)
@@ -777,31 +832,31 @@ diagCspprod <- function(x, y, boolArith = FALSE) {
 
 ## + 'boolArith' argument  { ==> .local() is used in any case; keep formals simple :}
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
-	  function(x, y, boolArith=NA) diagCspprod(x, y, boolArith=boolArith))
+	  function(x, y=NULL, boolArith=NA, ...) diagCspprod(x, y, boolArith=boolArith))
 
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "sparseMatrix"),
-	  function(x, y, boolArith=NA)
+	  function(x, y=NULL, boolArith=NA, ...)
 	      diagCspprod(x, as(y, "CsparseMatrix"), boolArith=boolArith))
 
 ## Prefer calling diagCspprod to Cspdiagprod if going to transpose anyway
 ##  x'y == (y'x)'
 setMethod("crossprod", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
-	  function(x, y, boolArith=NA) t(diagCspprod(y, x, boolArith=boolArith)))
+	  function(x, y=NULL, boolArith=NA, ...) t(diagCspprod(y, x, boolArith=boolArith)))
 
 setMethod("crossprod", signature(x = "sparseMatrix", y = "diagonalMatrix"),
-	  function(x, y, boolArith=NA) t(diagCspprod(y, as(x, "Csparsematrix"), boolArith=boolArith)))
+	  function(x, y=NULL, boolArith=NA, ...) t(diagCspprod(y, as(x, "Csparsematrix"), boolArith=boolArith)))
 
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
-	  function(x, y, boolArith=NA) diagCspprod(x, t(y), boolArith=boolArith))
+	  function(x, y=NULL, boolArith=NA, ...) diagCspprod(x, t(y), boolArith=boolArith))
 
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "sparseMatrix"),
-	  function(x, y, boolArith=NA) diagCspprod(x, t(as(y, "CsparseMatrix")), boolArith=boolArith))
+	  function(x, y=NULL, boolArith=NA, ...) diagCspprod(x, t(as(y, "CsparseMatrix")), boolArith=boolArith))
 
 setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
-	  function(x, y, boolArith=NA) Cspdiagprod(x, y, boolArith=boolArith))
+	  function(x, y=NULL, boolArith=NA, ...) Cspdiagprod(x, y, boolArith=boolArith))
 
 setMethod("tcrossprod", signature(x = "sparseMatrix", y = "diagonalMatrix"),
-	  function(x, y, boolArith=NA) Cspdiagprod(as(x, "CsparseMatrix"), y, boolArith=boolArith))
+	  function(x, y=NULL, boolArith=NA, ...) Cspdiagprod(as(x, "CsparseMatrix"), y, boolArith=boolArith))
 
 setMethod("%*%", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
 	  function(x, y) diagCspprod(x, y, boolArith=NA))

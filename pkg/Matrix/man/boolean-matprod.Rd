@@ -92,17 +92,12 @@ L <- Matrix(rnorm(20) > 1,    4,5)
 D <- Matrix(round(rnorm(30)), 5,6) # -> values in -1:1 (for this seed)
 L \%&\% D
 stopifnot(identical(L \%&\% D, N \%&\% D),
-   all(L \%&\% D == as((L \%*\% abs(D)) > 0, "sparseMatrix")))
-\dontshow{% maybe move to ../tests/matprod.R later
-## for "many" more seeds:
-for(nn in 1:256) {
-  L <- Matrix(rnorm(20) > 1,    4,5)
-  D <- Matrix(round(rnorm(30)), 5,6)
-  stopifnot(all(L \%&\% D == as((L \%*\% abs(D)) > 0, "sparseMatrix")))
-}
-}%dont
-%% Fails currently :
-%% crossprod(D, boolArith = TRUE)
+          all(L \%&\% D == as((L \%*\% abs(D)) > 0, "sparseMatrix")))
+crossprod(N)     # -> sparse patter'n' (TRUE/FALSE : boolean arithmetic)
+crossprod(N  +0) # -> numeric Matrix (with same "pattern")
+stopifnot(all(crossprod(N) == t(N) \%&\% N))
+crossprod(D, boolArith =  TRUE) # <- currently with warning "... not yet implemented":
+crossprod(L, boolArith =  TRUE) # pattern: "nsCMatrix"
+crossprod(L, boolArith = FALSE) # numeric: "dsCMatrix"
 }
 \keyword{methods}
-
