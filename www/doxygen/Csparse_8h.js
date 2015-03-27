@@ -6,6 +6,7 @@ var Csparse_8h =
     [ "NG_I_P", "Csparse_8h.html#ab2f87ca47499042b378c564b59d8a32f", null ],
     [ "create_Csparse", "Csparse_8h.html#a49bea3bf31864cc0553a4af67f7cdc39", null ],
     [ "Csp_dense_products", "Csparse_8h.html#ac666003ee4dca32e779db1e7b12dc83b", null ],
+    [ "Csparse2nz", "Csparse_8h.html#ad902ff7d08b94c85a1ffb1b4c2c4e247", null ],
     [ "Csparse_band", "Csparse_8h.html#a546eddc63011f2f2af462894dbec7dc9", null ],
     [ "Csparse_crossprod", "Csparse_8h.html#aa2237e82e0b9e68dda7fed39523de6cd", null ],
     [ "Csparse_Csparse_crossprod", "Csparse_8h.html#a86239e094c5ee16dfc9892f09e8077d9", null ],

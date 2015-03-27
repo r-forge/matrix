@@ -2,6 +2,7 @@ var Csparse_8c =
 [
     [ "_t_Csparse_sort", "Csparse_8c.html#a7b30d09a524f05befc480a8c1548c8ed", null ],
     [ "_t_Csparse_validate", "Csparse_8c.html#ae9a2ded3010f22ff982429c1aa6ae33d", null ],
+    [ "Csparse2nz", "Csparse_8c.html#ad902ff7d08b94c85a1ffb1b4c2c4e247", null ],
     [ "Csparse_Csparse_crossprod", "Csparse_8c.html#a86239e094c5ee16dfc9892f09e8077d9", null ],
     [ "Csparse_Csparse_prod", "Csparse_8c.html#a78b6af142e571556b5b698785211d1d9", null ],
     [ "Csparse_general_to_symmetric", "Csparse_8c.html#adf30d8deabe5bb928402465150189d79", null ],

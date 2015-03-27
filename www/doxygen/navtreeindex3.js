@@ -1,5 +1,7 @@
 var NAVTREEINDEX3 =
 {
+"dgeMatrix_8c.html#af754a26692ba664a4f2559d85bc06f47":[1,0,16,25],
+"dgeMatrix_8c_source.html":[1,0,16],
 "dgeMatrix_8h.html":[1,0,17],
 "dgeMatrix_8h.html#a022ce38ded14a3a2d14808d7ad3ea508":[1,0,17,15],
 "dgeMatrix_8h.html#a0b6c5f387f39437317fbfdd2b0a063a8":[1,0,17,1],
@@ -244,10 +246,8 @@ var NAVTREEINDEX3 =
 "files.html":[1,0],
 "functions.html":[0,1,0],
 "functions_vars.html":[0,1,1],
-"globals.html":[1,1,0,0],
 "globals.html":[1,1,0],
+"globals.html":[1,1,0,0],
 "globals_a.html":[1,1,0,1],
-"globals_b.html":[1,1,0,2],
-"globals_c.html":[1,1,0,3],
-"globals_d.html":[1,1,0,4]
+"globals_b.html":[1,1,0,2]
 };

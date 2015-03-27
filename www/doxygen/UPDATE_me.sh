@@ -23,8 +23,8 @@ d=$SVN_MATRIX_DIR/www/doxygen; checkDir $d ; cd $d
 # they have not been *replaced* by a new version :
 find . -path ./.svn -prune -o \( -mtime +1 -a -type f -exec rm {} \; \)
 # but do "save myself":
-svn restore UPDATE_me.sh
-svn add *
+svn revert UPDATE_me.sh
+svn add * > svn-add.log 2>&1
 
 cd $SVN_MATRIX_DIR
 echo -n "svn cleanup in `pwd` (takes a while): "
