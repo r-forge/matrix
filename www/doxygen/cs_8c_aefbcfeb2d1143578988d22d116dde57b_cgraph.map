@@ -1,6 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$cs_8c.html#ad3e846c0142a1457e8e85bcaf559fb98" title="cs_calloc" alt="" coords="136,5,213,35"/>
-<area shape="rect" id="node5" href="$cs_8c.html#a7c59264397d2c5cc85c87c879aedc4f5" title="cs_dfree" alt="" coords="137,58,212,89"/>
-<area shape="rect" id="node9" href="$cs_8c.html#a4c6c75c54cbdf2f3fd4574a90c2f8a86" title="cs_malloc" alt="" coords="133,111,216,142"/>
-<area shape="rect" id="node7" href="$cs_8c.html#a78c1d1194aacc65212bb0d2b03643ac7" title="cs_free" alt="" coords="264,58,331,89"/>
-</map>

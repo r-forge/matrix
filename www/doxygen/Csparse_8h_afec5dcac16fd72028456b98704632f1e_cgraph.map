@@ -1,7 +1,0 @@
-<map id="Csparse_dense_prod" name="Csparse_dense_prod">
-<area shape="rect" id="node2" href="$chm__common_8c.html#ac0552f8d5248824ec90a314b69bd1408" title="Copy the contents of a to an appropriate denseMatrix object and, optionally, free a or free both a an..." alt="" coords="203,5,352,32"/>
-<area shape="rect" id="node4" href="$Mutils_8h.html#a3afc658317ae5a0e0589862a48b217b5" title="mMatrix_as_dgeMatrix2" alt="" coords="198,107,357,133"/>
-<area shape="rect" id="node6" href="$Csparse_8c.html#a4445bf9e1d6a9ee608151123b9d3aa9f" title="nz2Csparse" alt="" coords="232,56,323,83"/>
-<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="445,31,553,57"/>
-<area shape="rect" id="node5" href="$Mutils_8h.html#ac7bfe157b527715287335783f004ca8c" title="dup_mMatrix_as_dgeMatrix2" alt="" coords="405,107,592,133"/>
-</map>

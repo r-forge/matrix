@@ -1,9 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$cs_8c.html#ad3e846c0142a1457e8e85bcaf559fb98" title="cs_calloc" alt="" coords="296,137,373,167"/>
-<area shape="rect" id="node5" href="$cs_8c.html#a97200b7cc3ad296c964134a59616efdd" title="cs_cumsum" alt="" coords="152,187,245,218"/>
-<area shape="rect" id="node7" href="$cs_8c.html#a41590e7ef8c8f3ebce8c7bbe07303c28" title="cs_done" alt="" coords="161,30,236,61"/>
-<area shape="rect" id="node14" href="$cs_8c.html#aad3a584d9185a4fe4497a36f892b9c72" title="cs_spalloc" alt="" coords="156,83,241,114"/>
-<area shape="rect" id="node9" href="$cs_8c.html#a78c1d1194aacc65212bb0d2b03643ac7" title="cs_free" alt="" coords="424,5,491,35"/>
-<area shape="rect" id="node11" href="$cs_8c.html#a6d705e404a7831ccf01bc0ea064215b9" title="cs_spfree" alt="" coords="295,30,375,61"/>
-<area shape="rect" id="node17" href="$cs_8c.html#a4c6c75c54cbdf2f3fd4574a90c2f8a86" title="cs_malloc" alt="" coords="293,83,376,114"/>
-</map>
