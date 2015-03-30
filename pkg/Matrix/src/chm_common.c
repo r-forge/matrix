@@ -1,3 +1,5 @@
+/** @file chm_common.c
+ */
 #include "chm_common.h"
 #include "Mutils.h"
 

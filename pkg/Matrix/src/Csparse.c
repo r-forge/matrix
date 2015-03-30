@@ -1,5 +1,8 @@
-			/* Sparse matrices in compressed column-oriented form */
-
+/** @file Csparse.c
+ * The "CsparseMatrix" class from R package Matrix:
+ *
+ * Sparse matrices in compressed column-oriented form
+ */
 #include "Csparse.h"
 #include "Tsparse.h"
 #include "chm_common.h"
@@ -101,8 +104,8 @@ SEXP Rsparse_validate(SEXP x)
     return ScalarLogical(1);
 }
 
-/**
- * From a CsparseMatrix, produce a dense one.
+/** @brief From a CsparseMatrix, produce a dense one.
+ *
  * Directly deals with symmetric, triangular and general.
  * Called from ../R/Csparse.R's  C2dense()
  *
@@ -409,7 +412,15 @@ SEXP Csparse_transpose(SEXP x, SEXP tri)
 			      Rkind, tr ? diag_P(x) : "", dn);
 }
 
-/* NOTA BENE:  cholmod_ssmult(A,B, ...) ->  ./CHOLMOD/MatrixOps/cholmod_ssmult.c
+/** @brief  A %*% B  - for matrices of class CsparseMatrix (R package "Matrix")
+ *
+ * @param a
+ * @param b
+ * @param bool_arith
+ *
+ * @return
+ *
+ * NOTA BENE:  cholmod_ssmult(A,B, ...) ->  ./CHOLMOD/MatrixOps/cholmod_ssmult.c
  * ---------  computes a patter*n* matrix __always_ when
  * *one* of A or B is pattern*n*, because of this (line 73-74):
    ---------------------------------------------------------------------------
@@ -418,7 +429,6 @@ SEXP Csparse_transpose(SEXP x, SEXP tri)
    ---------------------------------------------------------------------------
  * ==> Often need to copy the patter*n* to a *l*ogical matrix first !!!
  */
-
 SEXP Csparse_Csparse_prod(SEXP a, SEXP b, SEXP bool_arith)
 {
     CHM_SP
@@ -484,8 +494,16 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b, SEXP bool_arith)
     return chm_sparse_to_SEXP(chc, 1, uploT, /*Rkind*/0, diag, dn);
 }
 
-/* trans = FALSE:  crossprod(a,b)
- * trans = TRUE : tcrossprod(a,b) */
+/** @brief [t]crossprod (<Csparse>, <Csparse>)
+ *
+ * @param a a "CsparseMatrix" object
+ * @param b a "CsparseMatrix" object
+ * @param trans trans = FALSE:  crossprod(a,b)
+ *              trans = TRUE : tcrossprod(a,b)
+ * @param bool_arith logical (TRUE / NA / FALSE): Should boolean arithmetic be used.
+ *
+ * @return a CsparseMatrix, the (t)cross product of a and b.
+ */
 SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans, SEXP bool_arith)
 {
     int tr = asLogical(trans), nprot = 1,
@@ -561,7 +579,7 @@ SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans, SEXP bool_arith)
 /**
  * All (dense * sparse)  Matrix products and cross products
  *
- *   f( f(<Csparse>)  %*%  f(<dense>) )   for  f in {t(), identity()}
+ *   f( f(<Csparse>)  %*%  f(<dense>) )   where  f ()  is either t () [tranpose] or the identity.
  *
  * @param a CsparseMatrix  (n x m)
  * @param b numeric vector, matrix, or denseMatrix (m x k) or (k x m)  if `transp` is '2' or 'B'
@@ -686,8 +704,9 @@ SEXP Csparse_dense_crossprod(SEXP a, SEXP b, SEXP transp)
 }
 
 
-/* Computes   x'x  or  x x' -- *also* for Tsparse (triplet = TRUE)
-   see Csparse_Csparse_crossprod above for  x'y and x y' */
+/** @brief Computes   x'x  or  x x' -- *also* for Tsparse (triplet = TRUE)
+    see Csparse_Csparse_crossprod above for  x'y and x y'
+*/
 SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet, SEXP bool_arith)
 {
     int tripl = asLogical(triplet),
@@ -699,7 +718,7 @@ SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet, SEXP bool_arith)
     SEXP xx = PROTECT(Tsparse_diagU2N(x));
     CHM_TR cht = tripl ? AS_CHM_TR__(xx) : (CHM_TR) NULL; int nprot = 2;
 #endif
-    CHM_SP chcp, chxt,
+    CHM_SP chcp, chxt, chxc,
 	chx = (tripl ?
 	       cholmod_triplet_to_sparse(cht, cht->nnz, &c) :
 	       AS_CHM_SP(x));
@@ -707,6 +726,7 @@ SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet, SEXP bool_arith)
     R_CheckStack();
     Rboolean
 	x_is_n = (chx->xtype == CHOLMOD_PATTERN),
+	x_is_sym = chx->stype != 0,
 	force_num = (do_bool == FALSE);
 
     if(x_is_n && force_num) {
@@ -726,8 +746,12 @@ SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet, SEXP bool_arith)
 
     if (!tr) chxt = cholmod_transpose(chx, chx->xtype, &c);
 
-    chcp = cholmod_aat((!tr) ? chxt : chx, (int *) NULL, 0,
-		       /* mode: */ chx->xtype, &c);
+    if (x_is_sym) // cholmod_aat() does not like symmetric
+	chxc = cholmod_copy(tr ? chx : chxt, /* stype: */ 0,
+			    chx->xtype, &c);
+    // CHOLMOD/Core/cholmod_aat.c :
+    chcp = cholmod_aat(x_is_sym ? chxc : (tr ? chx : chxt),
+		       (int *) NULL, 0, /* mode: */ chx->xtype, &c);
     if(!chcp) {
 	UNPROTECT(1);
 	error(_("Csparse_crossprod(): error return from cholmod_aat()"));
@@ -745,8 +769,8 @@ SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet, SEXP bool_arith)
     return chm_sparse_to_SEXP(chcp, 1, 0, 0, "", dn);
 }
 
-/* Csparse_drop(x, tol):  drop entries with absolute value < tol, i.e,
-*  at least all "explicit" zeros */
+/** @brief Csparse_drop(x, tol):  drop entries with absolute value < tol, i.e,
+ *  at least all "explicit" zeros. */
 SEXP Csparse_drop(SEXP x, SEXP tol)
 {
     const char *cl = class_P(x);
@@ -766,6 +790,8 @@ SEXP Csparse_drop(SEXP x, SEXP tol)
 			      GET_SLOT(x, Matrix_DimNamesSym));
 }
 
+/** @brief Horizontal Concatenation -  cbind( <Csparse>,  <Csparse>)
+ */
 SEXP Csparse_horzcat(SEXP x, SEXP y)
 {
 #define CSPARSE_CAT(_KIND_)						\
@@ -798,6 +824,8 @@ SEXP Csparse_horzcat(SEXP x, SEXP y)
 			      1, 0, Rkind, "", R_NilValue);
 }
 
+/** @brief Vertical Concatenation -  rbind( <Csparse>,  <Csparse>)
+ */
 SEXP Csparse_vertcat(SEXP x, SEXP y)
 {
     CSPARSE_CAT("vertcat");
@@ -870,10 +898,10 @@ SEXP Csparse_diagN2U(SEXP x)
 }
 
 /**
- * "Indexing" aka subsetting : Compute  x[i,j], also for vectors i and j
+ * Indexing aka subsetting : Compute  x[i,j], also for vectors i and j
  * Working via CHOLMOD_submatrix, see ./CHOLMOD/MatrixOps/cholmod_submatrix.c
  * @param x CsparseMatrix
- * @param i row     indices (0-origin), or NULL (R's)
+ * @param i row     indices (0-origin), or NULL (R, not C)
  * @param j columns indices (0-origin), or NULL
  *
  * @return x[i,j]  still CsparseMatrix --- currently, this loses dimnames
