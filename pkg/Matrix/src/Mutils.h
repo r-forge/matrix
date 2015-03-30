@@ -332,6 +332,11 @@ mMatrix_as_geMatrix(SEXP A)
 	"nmatrix", "ngeMatrix",			\
 	"zmatrix", "zgeMatrix"
 
+/* NB:  ddiMatrix & ldiMatrix are part of VALID_ddense / VALID_ldense
+ * --   even though they are no longer "denseMatrix" formally.
+ * CARE: dup_mMatrix_as_geMatrix() code depends on  14 ddense and 6 ldense
+ * ----  entries here :
+*/
 #define MATRIX_VALID_ddense					\
 		    "dgeMatrix", "dtrMatrix",			\
 		    "dsyMatrix", "dpoMatrix", "ddiMatrix",	\

@@ -583,33 +583,32 @@ install_diagonal_int(int *dest, SEXP A)
 }
 
 
-/** Duplicate a [dln]denseMatrix _or_ a numeric matrix or even vector as
+/** Generalized -- "geMatrix" -- dispatch where needed :
+  * Duplicate a [dln]denseMatrix _or_ a numeric matrix or even vector as
  *  a [dln]geMatrix.
  *  This is for the many "*_matrix_{prod,crossprod,tcrossprod, etc.}"
  *  functions that work with both classed and unclassed matrices.
  *
- * @param A	  either a denseMatrix object or a matrix object
+ * @param A either a denseMatrix, a diagonalMatrix or a traditional matrix object
+ *
  */
-/* NOTA BENE: If you enlarge this list, do change '14' and '6' below !
- * ---------  ddiMatrix & ldiMatrix  are no longer ddense or ldense on the R level,
- *            ---         ---        but are still dealt with here.
- */
-
-/* Generalized -- "geMatrix" -- dispatch where needed : */
 SEXP dup_mMatrix_as_geMatrix(SEXP A)
 {
-    SEXP ans, ad = R_NilValue, an = R_NilValue;	/* -Wall */
+ /* NOTA BENE: If you enlarge this list, do change '14' and '6' below !
+  * ---------  ddiMatrix & ldiMatrix  are no longer ddense or ldense on the R level,
+  *            ---         ---        but are still dealt with here: */
     static const char *valid[] = {
-	"_NOT_A_CLASS_",/* *_CLASSES defined in ./Mutils.h */
+	"_NOT_A_CLASS_",// *_CLASSES defined in ./Mutils.h  :
 	MATRIX_VALID_ddense, /* 14 */
 	MATRIX_VALID_ldense, /* 6  */
 	MATRIX_VALID_ndense, /* 5  */
 	""};
+    SEXP ans, ad = R_NilValue, an = R_NilValue;	/* -Wall */
     int sz, ctype = Matrix_check_class_etc(A, valid),
 	nprot = 1;
     enum dense_enum { ddense, ldense, ndense } M_type = ddense /* -Wall */;
 
-    if (ctype > 0) { /* a [nld]denseMatrix object */
+    if (ctype > 0) { /* a [nld]denseMatrix or [dl]diMatrix object */
 	ad = GET_SLOT(A, Matrix_DimSym);
 	an = GET_SLOT(A, Matrix_DimNamesSym);
 	M_type = (ctype <= 14) ? ddense :
