@@ -893,9 +893,14 @@ rsparsematrix <- function(nrow, ncol, density,
 	if(symmetric) sample(indTri(nrow, diag=TRUE), nnz)
 	else sample.int(maxE, nnz)
     ## i,j below correspond to  ij <- decodeInd(code, nr) :
-    sparseMatrix(i = ijI  %% nrow,
-                 j = ijI %/% nrow,
-                 index1 = FALSE, symmetric = symmetric,
-                 x = rand.x(nnz), dims = c(nrow, ncol), ...)
+    if(is.null(rand.x))
+	sparseMatrix(i = ijI  %% nrow,
+		     j = ijI %/% nrow,
+		     index1 = FALSE, symmetric = symmetric, dims = c(nrow, ncol), ...)
+    else
+	sparseMatrix(i = ijI  %% nrow,
+		     j = ijI %/% nrow,
+		     index1 = FALSE, symmetric = symmetric,
+		     x = rand.x(nnz), dims = c(nrow, ncol), ...)
 }
 
