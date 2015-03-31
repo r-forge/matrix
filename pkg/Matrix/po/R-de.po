@@ -2,13 +2,13 @@
 # Copyright (C) 2001 The R Foundation
 # This file is distributed under the same license as the matrix package.
 # Chris Leick <c.leick@vollbio.de>, 2009.
-# Detlef Steuer <steuer@hsu-hh.de>, 2012-2015.
+# Detlef Steuer <steuer@hsu-hh.de>, 2012-2014.
 msgid ""
 msgstr ""
-"Project-Id-Version: R 3.1.2 / matrix 1.1-5\n"
+"Project-Id-Version: R 3.2.0 / matrix 1.1-2\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
-"POT-Creation-Date: 2015-03-16 09:31\n"
-"PO-Revision-Date: 2015-01-29 15:22+0100\n"
+"POT-Creation-Date: 2015-03-27 10:18\n"
+"PO-Revision-Date: 2015-03-27 09:49+0100\n"
 "Last-Translator: Detlef Steuer <steuer@hsu-hh.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
 "Language: de\n"
@@ -49,8 +49,7 @@ msgid "dimnames [%d] mismatch in %s"
 msgstr "dimnames [%d] passen nicht in %s"
 
 msgid "names(dimnames(<matrix>)) must be NULL or of length two"
-msgstr ""
-"names(dimnames(<matrix>)) muss entweder NULL sein oder Länge zwei haben"
+msgstr "names(dimnames(<matrix>)) muss entweder NULL oder von Länge 2 sein"
 
 msgid "Matrices must have same number of rows in %s"
 msgstr "Matrizen müssen die gleiche Anzahl Zeilen in %s haben"
@@ -501,7 +500,7 @@ msgstr ""
 "die  %d-te (Unter)-Diagonale (k = %d) ist zu kurz und wird mit NA aufgefüllt"
 
 msgid "resulting x-slot has different type than x's or y's"
-msgstr ""
+msgstr "resultierender x-slot hat einen anderen Typ als x oder y haben"
 
 msgid "'A' must be a square matrix"
 msgstr "'A' muss eine quadratische Matrix sein"
@@ -551,10 +550,10 @@ msgstr ""
 "von |diag(U)| = %9.4g"
 
 msgid "RHS 'b' has wrong number of rows:"
-msgstr "RHS 'b' hat die falsche Zahl Zeilen:"
+msgstr "RHS 'b' hat falsche Zahl Zeilen:"
 
 msgid "RHS 'b' has wrong length"
-msgstr "RHS 'b' hat die falsche Länge"
+msgstr "RHS 'b' hat falsche Länge"
 
 msgid "cannot coerce non-symmetric \"dgTMatrix\" to \"dsCMatrix\" class"
 msgstr ""
@@ -637,9 +636,6 @@ msgstr ""
 "kleiner\n"
 " als der maximale Index i*."
 
-msgid "not a skinny matrix"
-msgstr "keine lange (\"skinny\") Matrix"
-
 msgid "the number of non-zero entries differs from nrow(.)"
 msgstr "die Anzahl der Nicht-Null-Einträge weicht von nrow(.) ab"
 
@@ -680,6 +676,10 @@ msgstr "noch nicht implementierte Methode für <%s> %%*%% <%s>"
 
 msgid "non-conformable arguments"
 msgstr "nicht konforme Argumente"
+
+#, fuzzy
+msgid "'boolArith = %d' not yet implemented"
+msgstr "%s-Art noch nicht implementiert"
 
 msgid ""
 "rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n"
@@ -747,7 +747,7 @@ msgid "'V' is not a *square* matrix"
 msgstr "'V' ist keine *quadratische* Matrix"
 
 msgid "number of non zeros is smaller than 'nnz' because of duplicated (i,j)s"
-msgstr "Zahl von Nicht-Nullen ist kleiner als 'nnz' wegen doppelter (i,j)s"
+msgstr "Anzahl von Nicht-Nullen ist kleiner als 'nnz' wegen doppelter (i,j)s"
 
 msgid ""
 "qr.R(<sparse>) may differ from qr.R(<dense>) because of permutations.  "
@@ -809,8 +809,11 @@ msgid ""
 msgid_plural ""
 "extra arguments %s will be disregarded in\n"
 " %s"
-msgstr[0] "zusätzliches Argument %s wird in %s nicht beachtet"
-msgstr[1] "zusätzliche Argumente %s werden in %s nicht beachtet"
+msgstr[0] "extra Argument %s wird nicht berücksichtigt in %s"
+msgstr[1] "extra Argumente %s werden nicht berücksichtigt in %s"
+
+#~ msgid "not a skinny matrix"
+#~ msgstr "keine lange (\"skinny\") Matrix"
 
 #~ msgid "longer object length"
 #~ msgstr "längere Objektlänge"
