@@ -160,6 +160,8 @@ void SET_DimNames_symm(SEXP dest, SEXP src);
 #define class_P(_x_) CHAR(asChar(getAttrib(_x_, R_ClassSymbol)))
 
 
+enum dense_enum { ddense, ldense, ndense };
+
 // Define this "Cholmod compatible" to some degree
 enum x_slot_kind {x_pattern=-1, x_double=0, x_logical=1, x_integer=2, x_complex=3};
 //		    n		  d	      l		   i		z
@@ -326,7 +328,7 @@ mMatrix_as_geMatrix(SEXP A)
 }
 
 // Keep centralized --- *and* in sync with ../inst/include/Matrix.h :
-#define MATRIX_VALID_dense			\
+#define MATRIX_VALID_ge_dense			\
         "dmatrix", "dgeMatrix",			\
 	"lmatrix", "lgeMatrix",			\
 	"nmatrix", "ngeMatrix",			\
