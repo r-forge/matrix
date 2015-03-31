@@ -583,11 +583,13 @@ install_diagonal_int(int *dest, SEXP A)
 }
 
 
-/** Generalized -- "geMatrix" -- dispatch where needed :
-  * Duplicate a [dln]denseMatrix _or_ a numeric matrix or even vector as
- *  a [dln]geMatrix.
+/** @brief Duplicate a [dln]denseMatrix _or_ a numeric matrix or even a vector
+ *  as a [dln]geMatrix.
+ *
  *  This is for the many "*_matrix_{prod,crossprod,tcrossprod, etc.}"
  *  functions that work with both classed and unclassed matrices.
+ *
+ *  Used generally for Generalized -- "geMatrix" -- dispatch where needed.
  *
  * @param A either a denseMatrix, a diagonalMatrix or a traditional matrix object
  *
@@ -606,7 +608,7 @@ SEXP dup_mMatrix_as_geMatrix(SEXP A)
     SEXP ans, ad = R_NilValue, an = R_NilValue;	/* -Wall */
     int sz, ctype = Matrix_check_class_etc(A, valid),
 	nprot = 1;
-    enum dense_enum { ddense, ldense, ndense } M_type = ddense /* -Wall */;
+    enum dense_enum M_type = ddense /* -Wall */;
 
     if (ctype > 0) { /* a [nld]denseMatrix or [dl]diMatrix object */
 	ad = GET_SLOT(A, Matrix_DimSym);
@@ -737,18 +739,18 @@ SEXP dup_mMatrix_as_geMatrix(SEXP A)
 	    make_i_matrix_symmetric(ansx, A);
 	    break;
 	case 4+14:			/* ldiMatrix */
-	case 4+14+6:			/* ndiMatrix */
+	    // case 4+14+6:      /* ndiMatrix _DOES NOT EXIST_ */
 	    install_diagonal_int(ansx, A);
 	    break;
 	case 5+14:			/* ltpMatrix */
-	case 5+14+6:			/* ntpMatrix */
+	case 4+14+6:			/* ntpMatrix */
 	    packed_to_full_int(ansx, LOGICAL(GET_SLOT(A, Matrix_xSym)),
 			       INTEGER(ad)[0],
 			       *uplo_P(A) == 'U' ? UPP : LOW);
 	    make_i_matrix_triangular(ansx, A);
 	    break;
 	case 6+14:			/* lspMatrix */
-	case 6+14+6:			/* nspMatrix */
+	case 5+14+6:			/* nspMatrix */
 	    packed_to_full_int(ansx, LOGICAL(GET_SLOT(A, Matrix_xSym)),
 			       INTEGER(ad)[0],
 			       *uplo_P(A) == 'U' ? UPP : LOW);
