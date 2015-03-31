@@ -658,8 +658,13 @@ diagmatprod <- function(x, y) {
 }
 setMethod("%*%", signature(x = "diagonalMatrix", y = "matrix"), diagmatprod)
 
-formals(diagmatprod) <- alist(x=, y=NULL, boolArith = NA, ...=)
-setMethod("crossprod",  signature(x = "diagonalMatrix", y = "matrix"), diagmatprod)
+formals(diagmatprod) <- alist(x=, y=NULL, boolArith = NA, ...=) ## FIXME boolArith
+diagmatprod2 <- function(x, y=NULL, boolArith = NA, ...) {
+    ## x is diagonalMatrix
+    if(x@Dim[2] != nrow(y)) stop("non-matching dimensions")
+    Matrix(if(x@diag == "U") y else x@x * y)
+}
+setMethod("crossprod",  signature(x = "diagonalMatrix", y = "matrix"), diagmatprod2)
 
 diagGeprod <- function(x, y) {
     if(x@Dim[2] != y@Dim[1]) stop("non-matching dimensions")
@@ -783,8 +788,8 @@ Cspdiagprod <- function(x, y, boolArith = NA, ...) {
 	ind <- rep.int(seq_len(m), x@p[-1] - x@p[-m-1L])
 	if(isTRUE(boolArith)) {
 	    if(extends(cx, "nMatrix")) x <- as(x, "lMatrix") # so, has y@x
-	    x@x <- x@x & y@x[x@i + 1L]
-	    if(!extends(cx, "diagonalMatrix")) x <- as(drop0(x), "nMatrix")
+	    x@x <- r <- x@x & y@x[x@i + 1L]
+	    if(!anyNA(r) && !extends(cx, "diagonalMatrix")) x <- as(drop0(x), "nMatrix")
 	} else {
 	    if(!extends(cx, "dMatrix")) x <- as(x, "dMatrix") # <- FIXME if we have zMatrix
 	    x@x <- x@x * y@x[ind]
@@ -794,8 +799,21 @@ Cspdiagprod <- function(x, y, boolArith = NA, ...) {
 	    ## TODO ......
 	    x@factors <- list()
 	}
+        x
+    } else { #	y is unit-diagonal ==> "return x"
+	cx <- getClass(class(x))
+	if(isTRUE(boolArith)) {
+	    is.l <- if(extends(cx, "dMatrix")) { ## <- FIXME: extend once we have iMatrix, zMatrix
+		x <- as(x, "lMatrix"); TRUE } else extends(cx, "lMatrix")
+	    if(is.l && !anyNA(x@x)) as(drop0(x), "nMatrix")
+	    else if(is.l) x else # defensive:
+	    as(x, "lMatrix")
+	} else {
+	    ## else boolArith is  NA or FALSE {which are equivalent here, das diagonal = "numLike"}
+	    if(extends(cx, "nMatrix") || extends(cx, "lMatrix"))
+		as(x, "dMatrix") else x
+	}
     }
-    x
 }
 
 ##' @param x diagonalMatrix
@@ -810,8 +828,8 @@ diagCspprod <- function(x, y, boolArith = NA, ...) {
 	    y <- as(y, "generalMatrix")
 	if(isTRUE(boolArith)) {
 	    if(extends(cy, "nMatrix")) y <- as(y, "lMatrix") # so, has y@x
-	    y@x <- y@x & x@x[y@i + 1L]
-	    if(!extends(cy, "diagonalMatrix")) y <- as(drop0(y), "nMatrix")
+	    y@x <- r <- y@x & x@x[y@i + 1L]
+	    if(!anyNA(r) && !extends(cy, "diagonalMatrix")) y <- as(drop0(y), "nMatrix")
 	} else {
 	    if(!extends(cy, "dMatrix")) y <- as(y, "dMatrix") # <- FIXME if we have zMatrix
 	    y@x <- y@x * x@x[y@i + 1L]
@@ -826,8 +844,21 @@ diagCspprod <- function(x, y, boolArith = NA, ...) {
 	    ## y@factors <- yf[keep]
 	    y@factors <- list()
         }
+        y
+    } else { ## x @ diag  == "U"
+	cy <- getClass(class(y))
+	if(isTRUE(boolArith)) {
+	    is.l <- if(extends(cy, "dMatrix")) { ## <- FIXME: extend once we have iMatrix, zMatrix
+		y <- as(y, "lMatrix"); TRUE } else extends(cy, "lMatrix")
+	    if(is.l && !anyNA(y@x)) as(drop0(y), "nMatrix")
+	    else if(is.l) y else # defensive:
+	    as(y, "lMatrix")
+	} else {
+	    ## else boolArith is  NA or FALSE {which are equivalent here, das diagonal = "numLike"}
+	    if(extends(cy, "nMatrix") || extends(cy, "lMatrix"))
+		as(y, "dMatrix") else y
+	}
     }
-    y
 }
 
 ## + 'boolArith' argument  { ==> .local() is used in any case; keep formals simple :}

@@ -98,8 +98,10 @@ SEXP CHM_set_common_env(SEXP rho) {
     return R_NilValue;
 }
 
-/* ./CHOLMOD/Include/cholmod_core.h says about  'int stype' entry of cholmod_sparse_struct:
- *   ------------------------------
+/** @brief stype := "symmetry type".
+ *
+ *  ./CHOLMOD/Include/cholmod_core.h says about  'int stype' entry of cholmod_sparse_struct:
+ *    ------------------------------
  * 0:  matrix is "unsymmetric": use both upper and lower triangular parts
  *     (the matrix may actually be symmetric in pattern and value, but
  *     both parts are explicitly stored and used).  May be square or
@@ -115,7 +117,7 @@ static int stype(int ctype, SEXP x)
     return 0;
 }
 
-/* xtype defines the kind of numerical values used:
+/** @brief xtype: the _kind_ of numeric (think "x slot") of Cholmod sparse matrices.
   #define CHOLMOD_PATTERN 0	 pattern only, no numerical values
   #define CHOLMOD_REAL    1	 a real matrix
   #define CHOLMOD_COMPLEX 2	 a complex matrix (ANSI C99 compatible)
@@ -670,7 +672,7 @@ SEXP chm_triplet_to_SEXP(CHM_TR a, int dofree, int uploT, int Rkind,
 CHM_DN as_cholmod_dense(CHM_DN ans, SEXP x)
 {
 #define _AS_cholmod_dense_1						\
-    static const char *valid[] = { MATRIX_VALID_dense, ""};		\
+    static const char *valid[] = { MATRIX_VALID_ge_dense, ""};		\
     int dims[2], ctype = Matrix_check_class_etc(x, valid), nprot = 0;	\
 									\
     if (ctype < 0) {		/* not a classed matrix */		\

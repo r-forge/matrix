@@ -292,9 +292,8 @@ SEXP dense_band(SEXP x, SEXP k1P, SEXP k2P)
 	    sqr = (adims[0] == adims[1]),
 	    tru = (k1 >= 0), trl = (k2 <= 0);
 	const char *cl = class_P(ans);
-	enum dense_enum { ddense, ldense, ndense
-	} M_type = ( (cl[0] == 'd') ? ddense :
-		    ((cl[0] == 'l') ? ldense : ndense));
+	enum dense_enum M_type = ( (cl[0] == 'd') ? ddense :
+			      ((cl[0] == 'l') ? ldense : ndense));
 
 
 #define SET_ZERO_OUTSIDE				\
@@ -349,9 +348,8 @@ SEXP dense_to_symmetric(SEXP x, SEXP uplo, SEXP symm_test)
     SEXP ans, dns, nms_dns;
     const char *cl = class_P(dx);
     /* same as in ..._geMatrix() above:*/
-    enum dense_enum { ddense, ldense, ndense
-    } M_type = ( (cl[0] == 'd') ? ddense :
-		((cl[0] == 'l') ? ldense : ndense));
+    enum dense_enum M_type = ( (cl[0] == 'd') ? ddense :
+			  ((cl[0] == 'l') ? ldense : ndense));
     int *adims = INTEGER(GET_SLOT(dx, Matrix_DimSym)), n = adims[0];
     if(n != adims[1]) {
 	UNPROTECT(1);

@@ -95,9 +95,11 @@ stopifnot(identical(L \%&\% D, N \%&\% D),
           all(L \%&\% D == as((L \%*\% abs(D)) > 0, "sparseMatrix")))
 crossprod(N)     # -> sparse patter'n' (TRUE/FALSE : boolean arithmetic)
 crossprod(N  +0) # -> numeric Matrix (with same "pattern")
-stopifnot(all(crossprod(N) == t(N) \%&\% N))
-crossprod(D, boolArith =  TRUE) # <- currently with warning "... not yet implemented":
-crossprod(L, boolArith =  TRUE) # pattern: "nsCMatrix"
+stopifnot(all(crossprod(N) == t(N) \%&\% N),
+          identical(crossprod(N), crossprod(N +0, boolArith=TRUE)),
+          identical(crossprod(L), crossprod(N   , boolArith=FALSE)))
+crossprod(D, boolArith =  TRUE) # pattern: "nsCMatrix"
+crossprod(L, boolArith =  TRUE) #  ditto
 crossprod(L, boolArith = FALSE) # numeric: "dsCMatrix"
 }
 \keyword{methods}

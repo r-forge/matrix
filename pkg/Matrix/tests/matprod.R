@@ -736,18 +736,24 @@ stopifnot(Q.C.identical(NM, ## <- failed
           identical(NM., C3 %*% lM)
           ,
           identical(NM., C3 %*% nM) # wrongly gave n*Matrix
-          ## ,
-          ## identical(NM., U3 %*% IM2)
-          ## ,
-          ## identical(NM., U3 %*% lM)
-          ## ,
-          ## identical(NM., U3 %*% nM)
-)
-C3 %*% nM  # wrongly gave ngCMatrix
-C3 %*% nCM # ditto
-U3 %*% IM2 # wrongly gave lgTMatrix
-U3 %*% lM  # ditto
-U3 %*% nM  # wrongly gave ngTMatrix
+          ,
+          isValid(U3 %*% IM2, "dsparseMatrix")# was l*
+          ,
+          isValid(U3 %*% lM,  "dsparseMatrix")# was l*
+          ,
+          isValid(U3 %*% nM,  "dsparseMatrix")# was n*
+          ,
+          identical(C3 %*% nM -> C3n,  # wrongly gave ngCMatrix
+                    C3 %*% nCM)
+          ,
+          isValid(C3n, "dgCMatrix")
+          ,
+          identical3(U3 %*% IM2, # wrongly gave lgTMatrix
+                     U3 %*% lM -> U3l, # ditto
+                     U3 %*% nM)  # wrongly gave ngTMatrix
+          ,
+          isValid(U3l, "dgTMatrix")
+          )
 
 selectMethod("%*%", c("dtCMatrix", "ngTMatrix")) # x %*% .T.2.C(y) -->
 selectMethod("%*%", c("dtCMatrix", "ngCMatrix")) # .Call(Csparse_Csparse_prod, x, y)
@@ -755,11 +761,12 @@ selectMethod("%*%", c("ddiMatrix", "indMatrix")) # x %*% as(y, "lMatrix") ->
 selectMethod("%*%", c("ddiMatrix", "lgTMatrix")) # diagCspprod(as(x, "Csp.."), y)
 selectMethod("%*%", c("ddiMatrix", "ngTMatrix")) #  (ditto)
 
-## the next 4 should give the same (since C3 and U3 are symmetric):
-crossprod(C3, nM) # wrongly gave ngCMatrix
-crossprod(U3, IM2)#  ditto
-crossprod(U3, nM) #  ditto
-crossprod(U3, lM) # wrongly gave lgCMatrix
+stopifnot(
+	isValid(show(crossprod(C3, nM)), "dgCMatrix"), # wrongly gave ngCMatrix
+	identical3(## the next 4 should give the same (since C3 and U3 are symmetric):
+   show(crossprod(U3, IM2)),# wrongly gave ngCMatrix
+	crossprod(U3, nM),  # ditto
+	crossprod(U3, lM))) # wrongly gave lgCMatrix
 
 
 set.seed(123)
@@ -806,24 +813,35 @@ stopifnot(identical(D5 %&% as(D.,"CsparseMatrix"),
 set.seed(7)
 L <- Matrix(rnorm(20) > 1,    4,5)
 (N <- as(L, "nMatrix"))
-D <- Matrix(round(rnorm(30)), 5,6) # -> values in -1:1 (for this seed)
+D <- Matrix(round(rnorm(30)), 5,6) # "dge", values in -1:1 (for this seed)
 L %&% D
 stopifnot(identical(L %&% D, N %&% D),
           all(L %&% D == as((L %*% abs(D)) > 0, "sparseMatrix")))
 stopifnotValid(show(crossprod(N   ))      , "nsCMatrix") #  (TRUE/FALSE : boolean arithmetic)
-stopifnotValid(show(crossprod(N +0)) -> N0, "dsCMatrix") # -> numeric Matrix (with same "pattern")
+stopifnotValid(show(crossprod(N +0)) -> cN0, "dsCMatrix") # -> numeric Matrix (with same "pattern")
 stopifnot(all(crossprod(N) == t(N) %&% N),
           identical(crossprod(N, boolArith=TRUE) -> cN.,
-                    as(N0 != 0, "nMatrix")),
-          identical(cN., crossprod(L, boolArith=TRUE)),
-          identical3(N0, crossprod(L), crossprod(L, boolArith=FALSE))
+                    as(cN0 != 0, "nMatrix")),
+          identical (cN.,               crossprod(L, boolArith=TRUE)),
+          identical3(cN0, crossprod(L), crossprod(L, boolArith=FALSE))
           )
-crossprod(D, boolArith = TRUE)## <- currently with warning "... not yet implemented":
+stopifnotValid(cD <- crossprod(D, boolArith = TRUE), "nsCMatrix") # sparse: "for now"
+## another slightly differing test "series"
+L.L <- crossprod(L)
+(NN <- as(L.L > 0,"nMatrix"))
+nsy <- as(NN,"denseMatrix")
+stopifnot(identical(NN, crossprod(NN)))# here
+stopifnotValid(csy <- crossprod(nsy), "dpoMatrix")
+## ?? or  FIXME ?  give 'nsy', as  {boolArith=NA -> TRUE if args are "nMatrix"}
+stopifnotValid(csy. <- crossprod(nsy, boolArith=TRUE),"nsCMatrix")
+stopifnot(all((csy > 0) == csy.),
+          all(csy. == (nsy %&% nsy)))
+
 ## for "many" more seeds:
-for(nn in 1:256) {
-  L <- Matrix(rnorm(20) > 1,    4,5)
-  D <- Matrix(round(rnorm(30)), 5,6)
-  stopifnot(all(L %&% D == as((L %*% abs(D)) > 0, "sparseMatrix")))
+set.seed(7); for(nn in 1:256) {
+    L <- Matrix(rnorm(20) > 1,    4,5)
+    D <- Matrix(round(rnorm(30)), 5,6)
+    stopifnot(all(L %&% D == as((L %*% abs(D)) > 0, "sparseMatrix")))
 }
 
 

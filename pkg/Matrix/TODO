@@ -25,6 +25,8 @@
 ** DONE "Math"/"Math2" *fail* entirely for sparseVectors
 ** DONE rbind2(<sparse>, <dense>) did not work, now is completely wrong !! (e.g. <dgC>, <dge>)
 ** TODO M[<sparse 2-column Matrix>] indexing should work (but with a warning: use *dense*!)
+** TODO doxygen (seed inst/Doxyfile and ../../www/doxygen/UPDATE_me.sh) now _fails_ partly, e.g., for
+        ------- e.g., for src/Csparse.c, Csp_dense_products(...)  around lines 600
 ** TODO src/CHOLMOD/MatrixOps/cholmod_symmetry.c  is "cool" and fast;
 Definitely should use it for solve(<dgCMatrix>)  {it seems MATLAB does};
 alternatively also is_sym() [in src/cs_utils.c], see below.

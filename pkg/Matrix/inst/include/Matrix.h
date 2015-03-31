@@ -18,7 +18,7 @@ extern "C" {
 #endif
 
 // Copied from ../../src/Mutils.h ----------------------------------------
-#define MATRIX_VALID_dense			\
+#define MATRIX_VALID_ge_dense			\
         "dmatrix", "dgeMatrix",			\
 	"lmatrix", "lgeMatrix",			\
 	"nmatrix", "ngeMatrix",			\
