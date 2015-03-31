@@ -1,7 +1,7 @@
 #### All  %*%, crossprod() and tcrossprod() methods of the Matrix package
 #### ^^^  ----------------------------------------------------------
-###  with EXCEPTIONS:	./diagMatrix.R
-###			./indMatrix.R ./pMatrix.R
+###  with EXCEPTIONS:	./diagMatrix.R 	./indMatrix.R ./pMatrix.R
+###	  ~~~~~~~~~~	  ------------    -----------   ---------
 
 ### NOTA BENE:   vector %*% Matrix  _and_  Matrix %*% vector
 ### ---------   The k-vector is treated as  (1,k)-matrix *or* (k,1)-matrix
@@ -45,10 +45,15 @@
 
 ## General method for dense matrix multiplication in case specific methods
 ## have not been defined.
-setMethod("%*%", signature(x = "ddenseMatrix", y = "ddenseMatrix"),
-	  function(x, y) .Call(dgeMatrix_matrix_mm,
-			       .Call(dup_mMatrix_as_dgeMatrix, x), y, FALSE),
-	  valueClass = "dgeMatrix")
+for ( c.x in paste0(c("d", "l", "n"), "denseMatrix")) {
+    for(c.y in c("matrix", paste0(c("d", "l", "n"), "denseMatrix")))
+	setMethod("%*%", signature(x = c.x, y = c.y),
+		  function(x, y) .Call(geMatrix_matrix_mm, x, y, FALSE),
+		  valueClass = "dgeMatrix")
+    setMethod("%*%", signature(x = "matrix", y = c.x),
+	      function(x, y) .Call(geMatrix_matrix_mm, y, x, TRUE),
+	      valueClass = "dgeMatrix")
+}
 
 setMethod("%*%", signature(x = "dgeMatrix", y = "dgeMatrix"),
 	  function(x, y) .Call(dgeMatrix_matrix_mm, x, y, FALSE),
@@ -254,110 +259,112 @@ setMethod("%*%", signature(x = "numLike",      y = "sparseVector"), v.X.sp)
 
 setMethod("crossprod", signature(x = "dgeMatrix", y = "missing"),
 	  function(x, y = NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dgeMatrix_crossprod, x, FALSE)
-	  },
-	  valueClass = "dpoMatrix")
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  crossprod(as(x,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(dgeMatrix_crossprod, x, FALSE)
+	  })
 
 ## crossprod (x,y)
 setMethod("crossprod", signature(x = "dgeMatrix", y = "dgeMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dgeMatrix_dgeMatrix_crossprod, x, y, FALSE)
-	  },
-	  valueClass = "dgeMatrix")
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  crossprod(as(x,"sparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(dgeMatrix_dgeMatrix_crossprod, x, y, FALSE)
+	  })
 
 setMethod("crossprod", signature(x = "dgeMatrix", y = "matrix"),
 	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dgeMatrix_matrix_crossprod, x, y, FALSE)
-	  },
-	  valueClass = "dgeMatrix")
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  crossprod(as(x,"sparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+                  .Call(dgeMatrix_matrix_crossprod, x, y, FALSE)
+	  })
+
 setMethod("crossprod", signature(x = "dgeMatrix", y = "numLike"),
 	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dgeMatrix_matrix_crossprod, x, y, FALSE)
-	  },
-	  valueClass = "dgeMatrix")
+	      if(isTRUE(boolArith))
+		  crossprod(as(x,"sparseMatrix"), as(y,"sparseVector"), boolArith=TRUE)
+	      else
+                  .Call(dgeMatrix_matrix_crossprod, x, y, FALSE)
+	  })
 
 setMethod("crossprod", signature(x = "matrix", y = "dgeMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
-	      crossprod(..2dge(x), y, boolArith=boolArith, ...),
-	  valueClass = "dgeMatrix")
+	      crossprod(..2dge(x), y, boolArith=boolArith, ...))
+
 setMethod("crossprod", signature(x = "numLike", y = "dgeMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
-	      crossprod(as.matrix(as.double(x)), y, boolArith=boolArith, ...),
-	  valueClass = "dgeMatrix")
+	      crossprod(as.matrix(as.double(x)), y, boolArith=boolArith, ...))
 
-setMethod("crossprod", signature(x = "ddenseMatrix", y = "missing"),
-	  function(x, y = NULL, boolArith=NA, ...)
-              crossprod(as(x, "dgeMatrix"), boolArith=boolArith, ...))
+for(c.x in paste0(c("d", "l", "n"), "denseMatrix")) {
+    setMethod("crossprod", signature(x = c.x, y = "missing"),
+	      function(x, y = NULL, boolArith=NA, ...)
+		  if(isTRUE(boolArith)) ## FIXME: very inefficient
+		      crossprod(as(x,"sparseMatrix"), boolArith=TRUE)
+		  else
+		      .Call(geMatrix_crossprod, x, FALSE))
 
-setMethod("crossprod", signature(x = "dtrMatrix", y = "missing"),
-	  function(x, y = NULL, boolArith=NA, ...)
-              crossprod(as(x, "dgeMatrix"), boolArith=boolArith, ...),
-	  valueClass = "dpoMatrix")
+    for(c.y in c("matrix", paste0(c("d", "l", "n"), "denseMatrix"))) {
+	setMethod("crossprod", signature(x = c.x, y = c.y),
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  crossprod(as(x,"sparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(geMatrix_geMatrix_crossprod, x, y, FALSE))
+    }
+}
+## setMethod("crossprod", signature(x = "dtrMatrix", y = "missing"),
+## 	  function(x, y = NULL, boolArith=NA, ...)
+## 	      crossprod(..2dge(x), boolArith=boolArith, ...))
 
 ## "dtrMatrix" - remaining (uni)triangular if possible
 setMethod("crossprod", signature(x = "dtrMatrix", y = "dtrMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dtrMatrix_dtrMatrix_mm, x, y, FALSE, TRUE)})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  crossprod(as(x,"sparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(dtrMatrix_dtrMatrix_mm, x, y, FALSE, TRUE))
 
 setMethod("crossprod", signature(x = "dtrMatrix", y = "ddenseMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dtrMatrix_matrix_mm, x, y, FALSE, TRUE)
-	  },
-	  valueClass = "dgeMatrix")
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  crossprod(as(x,"sparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(dtrMatrix_matrix_mm, x, y, FALSE, TRUE))
+
 
 setMethod("crossprod", signature(x = "dtrMatrix", y = "matrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dtrMatrix_matrix_mm, x, y, FALSE, TRUE)
-	  },
-	  valueClass = "dgeMatrix")
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  crossprod(as(x,"sparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(dtrMatrix_matrix_mm, x, y, FALSE, TRUE))
+
 
 ## "dtpMatrix"
 if(FALSE) ## not yet in C
 setMethod("crossprod", signature(x = "dtpMatrix", y = "dtpMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dtpMatrix_dtpMatrix_mm, x, y, FALSE, TRUE)})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith))
+		  crossprod(as(x,"sparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(dtpMatrix_dtpMatrix_mm, x, y, FALSE, TRUE))
 
 setMethod("crossprod", signature(x = "dtpMatrix", y = "ddenseMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dtpMatrix_matrix_mm, x, y, FALSE, TRUE)
-	  },
-	  valueClass = "dgeMatrix")
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith))
+		  crossprod(as(x,"sparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(dtpMatrix_matrix_mm, x, y, FALSE, TRUE))
 
 setMethod("crossprod", signature(x = "dtpMatrix", y = "matrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dtpMatrix_matrix_mm, x, y, FALSE, TRUE)
-	  },
-	  valueClass = "dgeMatrix")
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith))
+		  crossprod(as(x,"sparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(dtpMatrix_matrix_mm, x, y, FALSE, TRUE))
 
 
 
@@ -379,19 +386,8 @@ setMethod("crossprod", signature(x = "dtpMatrix", y = "matrix"),
 ##	     .Call(csc_tcrossprod, as(x, "dgCMatrix")))
 
 setMethod("crossprod", signature(x = "CsparseMatrix", y = "missing"),
-	  function(x, y = NULL, boolArith=NA, ...) {
-	      if (is(x, "symmetricMatrix"))
-		  ## crossprod() should give "symmetric*":
-		  forceSymmetric(if(isTRUE(boolArith)) x %&% x else {
-                      if(!is.na(boolArith))
-                          warning(gettextf("'boolArith = %d' not yet implemented",
-                                           boolArith), domain=NA)
-                      x %*% x },
-                                 uplo = x@uplo)
-	      else
-		  .Call(Csparse_crossprod, x, trans = FALSE, triplet = FALSE,
-			boolArith=boolArith)
-	  })
+	  function(x, y = NULL, boolArith=NA, ...)
+	      .Call(Csparse_crossprod, x, trans = FALSE, triplet = FALSE, boolArith=boolArith))
 
 setMethod("crossprod", signature(x = "CsparseMatrix", y = "CsparseMatrix"),
 	  function(x, y = NULL, boolArith = NA, ...)
@@ -399,38 +395,28 @@ setMethod("crossprod", signature(x = "CsparseMatrix", y = "CsparseMatrix"),
 
 ## FIXME: Generalize the class of y. (?? still ??)
 setMethod("crossprod", signature(x = "CsparseMatrix", y = "ddenseMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(Csparse_dense_crossprod, x, y, " ")})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith))
+		  crossprod(x, as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(Csparse_dense_crossprod, x, y, " "))
 setMethod("crossprod", signature(x = "CsparseMatrix", y = "matrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(Csparse_dense_crossprod, x, y, " ")})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith))
+		  crossprod(x, as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(Csparse_dense_crossprod, x, y, " "))
 setMethod("crossprod", signature(x = "CsparseMatrix", y = "numLike"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(Csparse_dense_crossprod, x, y, " ")})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith))
+		  crossprod(x, as(y,"sparseVector"), boolArith=TRUE)
+	      else
+		  .Call(Csparse_dense_crossprod, x, y, " "))
 
 
 setMethod("crossprod", signature(x = "TsparseMatrix", y = "missing"),
-	  function(x, y = NULL, boolArith = NA, ...) {
-	      if (is(x, "symmetricMatrix"))
-		  ## crossprod() should give "symmetric*":
-		  forceSymmetric(if(isTRUE(boolArith)) x %&% x else {
-		      if(!is.na(boolArith))
-			  warning(gettextf("'boolArith = %d' not yet implemented",
-					   boolArith), domain=NA)
-		      x %*% x },
-				 uplo = x@uplo)
-	      else
-		  .Call(Csparse_crossprod, x, trans = FALSE, triplet = TRUE, boolArith=boolArith)
-	  })
+	  function(x, y = NULL, boolArith = NA, ...)
+	      .Call(Csparse_crossprod, x, trans = FALSE, triplet = TRUE, boolArith=boolArith))
 
 setMethod("crossprod", signature(x = "TsparseMatrix", y = "ANY"),
 	  function(x, y = NULL, boolArith = NA, ...)
@@ -450,36 +436,36 @@ setMethod("crossprod", signature(x = "TsparseMatrix", y = "TsparseMatrix"),
 
 
 setMethod("crossprod", signature(x = "dsparseMatrix", y = "ddenseMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(Csparse_dense_crossprod, as(x, "CsparseMatrix"), y, " ")})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith))
+		  crossprod(as(x, "CsparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(Csparse_dense_crossprod, as(x, "CsparseMatrix"), y, " "))
 
 setMethod("crossprod", signature(x = "ddenseMatrix", y = "dgCMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(Csparse_dense_crossprod, y, x, "c")})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith))
+		  crossprod(as(x, "sparseMatrix"), y, boolArith=TRUE)
+	      else
+		  .Call(Csparse_dense_crossprod, y, x, "c"))
 setMethod("crossprod", signature(x = "ddenseMatrix", y = "dsparseMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(Csparse_dense_crossprod, as(y, "CsparseMatrix"), x, "c")})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith))
+		  crossprod(as(x, "sparseMatrix"), as(y, "CsparseMatrix"), boolArith=TRUE)
+	      else
+                  .Call(Csparse_dense_crossprod, as(y, "CsparseMatrix"), x, "c"))
 setMethod("crossprod", signature(x = "dgCMatrix", y = "dgeMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(Csparse_dense_crossprod, x, y, " ")})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith))
+		  crossprod(x, as(y, "CsparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(Csparse_dense_crossprod, x, y, " "))
 setMethod("crossprod", signature(x = "dsparseMatrix", y = "dgeMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(Csparse_dense_crossprod, as(x, "CsparseMatrix"), y, " ")})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith))
+		  crossprod(as(x, "CsparseMatrix"), as(y, "CsparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(Csparse_dense_crossprod, as(x, "CsparseMatrix"), y, " "))
 
 ## NB: there's already
 ##     ("CsparseMatrix", "missing") and ("TsparseMatrix", "missing") methods
@@ -511,26 +497,26 @@ setMethod("crossprod", signature(x = "ndenseMatrix", y = "nsparseMatrix"),
 
 setMethod("crossprod", signature(x = "nsparseMatrix", y = "nsparseMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
-              crossprod(as(x, "ngCMatrix"), as(y, "ngCMatrix"), boolArith=boolArith, ...))
+	      crossprod(as(x, "ngCMatrix"), as(y, "ngCMatrix"), boolArith=boolArith, ...))
 
 setMethod("crossprod", signature(x = "ddenseMatrix", y = "CsparseMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(Csparse_dense_crossprod, y, x, "c")})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith))
+		  crossprod(as(x, "CsparseMatrix"), y, boolArith=TRUE)
+	      else
+		  .Call(Csparse_dense_crossprod, y, x, "c"))
 setMethod("crossprod", signature(x = "matrix",	     y = "CsparseMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(Csparse_dense_crossprod, y, x, "c")})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith))
+		  crossprod(as(x, "CsparseMatrix"), y, boolArith=TRUE)
+	      else
+		  .Call(Csparse_dense_crossprod, y, x, "c"))
 setMethod("crossprod", signature(x = "numLike",	     y = "CsparseMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(Csparse_dense_crossprod, y, x, "c")})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith))
+		  crossprod(as(x, "sparseVector"), y, boolArith=TRUE)
+	      else
+		  .Call(Csparse_dense_crossprod, y, x, "c"))
 
 
 ## "Matrix" : cbind(), rbind() do  names -> dimnames
@@ -556,19 +542,44 @@ setMethod("crossprod", signature(x = "mMatrix", y = "sparseVector"),
 
 setMethod("crossprod", signature(x = "sparseVector", y = "mMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
-	  crossprod(spV2M(x, nrow = length(x), ncol = 1L, check = FALSE), y,
+	      crossprod(spV2M(x, nrow = length(x), ncol = 1L, check = FALSE), y,
 			boolArith=boolArith, ...))
-setMethod("crossprod", signature(x = "sparseVector", y = "sparseVector"), sp.X.sp)
-setMethod("crossprod", signature(x = "sparseVector", y = "numLike"),      sp.X.sp)
-setMethod("crossprod", signature(x = "numLike",      y = "sparseVector"), v.X.sp)
+
+sp.t.sp <- function(x, y=NULL, boolArith=NA, ...)
+    Matrix(if(isTRUE(boolArith)) any(x & y) else sum(x * y),
+	    1L, 1L, sparse=FALSE)
+## inner product -- no sense to return sparse!
+sp.T.sp <- function(x, y=NULL, boolArith=NA, ...) {
+    if((n <- length(x)) == length(y)) sp.t.sp(x,y, boolArith=boolArith, ...)
+    else if(n == 1L)
+	(if(isTRUE(boolArith)) `%&%` else `%*%`)(
+	    spV2M(x, nrow = 1L, ncol = 1L, check = FALSE), y)
+    else stop("non-conformable arguments")
+}
+v.T.sp <- function(x, y=NULL, boolArith=NA, ...) {
+    if((n <- length(x)) == length(y)) sp.t.sp(x,y, boolArith=boolArith, ...)
+    else if(n == 1L)
+	(if(isTRUE(boolArith)) `%&%` else `%*%`)(matrix(x, nrow = 1L, ncol = 1L), y)
+    else stop("non-conformable arguments")
+}
+
+setMethod("crossprod", signature(x = "sparseVector", y = "sparseVector"), sp.T.sp)
+setMethod("crossprod", signature(x = "sparseVector", y = "numLike"),      sp.T.sp)
+setMethod("crossprod", signature(x = "numLike",      y = "sparseVector"),  v.T.sp)
 setMethod("crossprod", signature(x = "sparseVector", y = "missing"),
-	  function(x, y=NULL, boolArith=NA, ...) sp.x.sp(x,x))
+	  function(x, y=NULL, boolArith=NA, ...) sp.t.sp(x,x, boolArith=boolArith, ...))
 
 ## Fallbacks -- symmetric LHS --> saving a t(.):
 ##  {FIXME: want the method to be `%*%` -- but primitives are not allowed as methods}
-setMethod("crossprod", signature(x = "symmetricMatrix", y = "Matrix"),	function(x,y=NULL, boolArith=NA, ...) x %*% y)
-setMethod("crossprod", signature(x = "symmetricMatrix", y = "missing"), function(x,y=NULL, boolArith=NA, ...) x %*% x)
-setMethod("crossprod", signature(x = "symmetricMatrix", y = "ANY"),	function(x,y=NULL, boolArith=NA, ...) x %*% y)
+setMethod("crossprod", signature(x = "symmetricMatrix", y = "missing"),
+	  function(x,y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) x %&% x else x %*% x)
+setMethod("crossprod", signature(x = "symmetricMatrix", y = "Matrix"),
+	  function(x,y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) x %&% y else x %*% y)
+setMethod("crossprod", signature(x = "symmetricMatrix", y = "ANY"),
+	  function(x,y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) x %&% y else x %*% y)
 ##
 ## cheap fallbacks
 setMethod("crossprod", signature(x = "Matrix", y = "Matrix"),
@@ -576,132 +587,137 @@ setMethod("crossprod", signature(x = "Matrix", y = "Matrix"),
 	      Matrix.msg(sprintf(
 	  "potentially suboptimal crossprod(\"%s\",\"%s\") as t(.) %s y",
 		  class(x), class(y), "%*%"))
-	      t(x) %*% y })
+	      if(isTRUE(boolArith)) t(x) %&% y else t(x) %*% y })
 setMethod("crossprod", signature(x = "Matrix", y = "missing"),
 	  function(x, y=NULL, boolArith=NA, ...) {
 	      Matrix.msg(paste0(
 	  "potentially suboptimal crossprod(<",class(x),">) as t(.) %*% . "))
-	      t(x) %*% x })
+	      if(isTRUE(boolArith)) t(x) %&% x else t(x) %*% x })
 setMethod("crossprod", signature(x = "Matrix", y = "ANY"),
 	  function(x, y=NULL, boolArith=NA, ...) {
 	      Matrix.msg(sprintf(
 	  "potentially suboptimal crossprod(\"%s\", <%s>[=<ANY>]) as t(.) %s y",
 		  class(x), class(y), "%*%"))
-	      t(x) %*% y })
+	      if(isTRUE(boolArith)) t(x) %&% y else t(x) %*% y })
 setMethod("crossprod", signature(x = "ANY", y = "Matrix"),
-	  function(x, y=NULL, boolArith=NA, ...) t(x) %*% y)
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) t(x) %&% y else t(x) %*% y)
 
 ###--- III --- tcrossprod ---------------------------------------------------
 
 setMethod("tcrossprod", signature(x = "dgeMatrix", y = "dgeMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dgeMatrix_dgeMatrix_crossprod, x, y, TRUE)
-	  },
-	  valueClass = "dgeMatrix")
-
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  tcrossprod(as(x, "sparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(dgeMatrix_dgeMatrix_crossprod, x, y, TRUE))
 setMethod("tcrossprod", signature(x = "dgeMatrix", y = "matrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dgeMatrix_matrix_crossprod, x, y, TRUE)
-	  },
-	  valueClass = "dgeMatrix")
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  tcrossprod(as(x, "sparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(dgeMatrix_matrix_crossprod, x, y, TRUE))
+
 setMethod("tcrossprod", signature(x = "dgeMatrix", y = "numLike"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dgeMatrix_matrix_crossprod, x, y, TRUE)
-	  },
-	  valueClass = "dgeMatrix")
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  tcrossprod(as(x, "sparseMatrix"), as(y,"sparseVector"), boolArith=TRUE)
+	      else
+		  .Call(dgeMatrix_matrix_crossprod, x, y, TRUE))
+
 setMethod("tcrossprod", signature(x = "matrix", y = "dgeMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
-              tcrossprod(..2dge(x), y, boolArith=boolArith, ...),
-	  valueClass = "dgeMatrix")
-setMethod("tcrossprod", signature(x = "numLike", y = "dgeMatrix"), .v.Mt,
-	  valueClass = "dgeMatrix")
-
+	      tcrossprod(..2dge(x), y, boolArith=boolArith, ...))
+setMethod("tcrossprod", signature(x = "numLike", y = "dgeMatrix"), .v.Mt)
 
 setMethod("tcrossprod", signature(x = "dgeMatrix", y = "missing"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dgeMatrix_crossprod, x, TRUE)
-	  },
-	  valueClass = "dpoMatrix")
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  tcrossprod(as(x, "sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(dgeMatrix_crossprod, x, TRUE))
+
+for(c.x in paste0(c("d", "l", "n"), "denseMatrix")) {
+    setMethod("tcrossprod", signature(x = c.x, y = "missing"),
+	      function(x, y=NULL, boolArith=NA, ...)
+		  if(isTRUE(boolArith)) ## FIXME: very inefficient
+		      tcrossprod(as(x, "sparseMatrix"), boolArith=TRUE)
+		  else
+		      .Call(geMatrix_crossprod, x, TRUE))
+
+    for(c.y in c("matrix", paste0(c("d", "l", "n"), "denseMatrix"))) {
+	setMethod("tcrossprod", signature(x = c.x, y = c.y),
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  tcrossprod(as(x,"sparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(geMatrix_geMatrix_crossprod, x, y, TRUE))
+    }
+}
 
 if(FALSE) { ## this would mask 'base::tcrossprod'
 setMethod("tcrossprod", signature(x = "matrix", y = "missing"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dgeMatrix_crossprod, ..2dge(x), TRUE)
-	  },
-	  valueClass = "dpoMatrix")
-
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  tcrossprod(as(x, "sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(dgeMatrix_crossprod, ..2dge(x), TRUE))
 setMethod("tcrossprod", signature(x = "numLike", y = "missing"),
 	  function(x, y=NULL, boolArith=NA, ...)
-              tcrossprod(as.matrix(as.double(x)), boolArith=boolArith, ...))
-}
+	      tcrossprod(as.matrix(as.double(x)), boolArith=boolArith, ...))
+}# FALSE
 
 setMethod("tcrossprod", signature(x = "ddenseMatrix", y = "missing"),
 	  function(x, y=NULL, boolArith=NA, ...)
-              tcrossprod(as(x, "dgeMatrix"), boolArith=boolArith, ...))
+	      tcrossprod(as(x, "dgeMatrix"), boolArith=boolArith, ...))
 
 
 setMethod("tcrossprod", signature(x = "dtrMatrix", y = "dtrMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dtrMatrix_dtrMatrix_mm, y, x, TRUE, TRUE)})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  tcrossprod(as(x, "sparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(dtrMatrix_dtrMatrix_mm, y, x, TRUE, TRUE))
 
 
-## Must  have 1st arg. = "dtrMatrix" in  dtrMatrix_matrix_mm ():
+## Must	 have 1st arg. = "dtrMatrix" in	 dtrMatrix_matrix_mm ():
 ## would need another way, to define  tcrossprod()  --- TODO? ---
 ##
 ## setMethod("tcrossprod", signature(x = "dtrMatrix", y = "ddenseMatrix"),
-## 	  function(x, y=NULL, boolArith=NA, ...) .Call(dtrMatrix_matrix_mm, y, x, TRUE, TRUE))
+##	  function(x, y=NULL, boolArith=NA, ...) .Call(dtrMatrix_matrix_mm, y, x, TRUE, TRUE))
 
 ## setMethod("tcrossprod", signature(x = "dtrMatrix", y = "matrix"),
-## 	  function(x, y=NULL, boolArith=NA, ...) .Call(dtrMatrix_matrix_mm, y, x, TRUE, TRUE))
+##	  function(x, y=NULL, boolArith=NA, ...) .Call(dtrMatrix_matrix_mm, y, x, TRUE, TRUE))
 
 setMethod("tcrossprod", signature(x = "ddenseMatrix", y = "dtrMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dtrMatrix_matrix_mm, y, x, TRUE, TRUE)})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  tcrossprod(as(x, "sparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(dtrMatrix_matrix_mm, y, x, TRUE, TRUE))
 
 setMethod("tcrossprod", signature(x = "matrix", y = "dtrMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dtrMatrix_matrix_mm, y, x, TRUE, TRUE)})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  tcrossprod(as(x, "sparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(dtrMatrix_matrix_mm, y, x, TRUE, TRUE))
 
 if(FALSE) { ## TODO in C
 setMethod("tcrossprod", signature(x = "ddenseMatrix", y = "dtpMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dtpMatrix_matrix_mm, y, x, TRUE, TRUE)})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  tcrossprod(as(x, "sparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(dtpMatrix_matrix_mm, y, x, TRUE, TRUE))
 
 setMethod("tcrossprod", signature(x = "matrix", y = "dtpMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(dtpMatrix_matrix_mm, y, x, TRUE, TRUE)})
-}
-
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  tcrossprod(as(x, "sparseMatrix"), as(y,"sparseMatrix"), boolArith=TRUE)
+	      else
+		  .Call(dtpMatrix_matrix_mm, y, x, TRUE, TRUE))
+}# FALSE
 
 
 
@@ -710,91 +726,55 @@ setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "CsparseMatrix"),
 	  .Call(Csparse_Csparse_crossprod, x, y, trans = TRUE, boolArith=boolArith))
 
 setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "missing"),
-	  function(x, y = NULL, boolArith = NA, ...) {
-	      if (is(x, "symmetricMatrix"))
-		  ## tcrossprod() should give "symmetric*":
-		  forceSymmetric(if(isTRUE(boolArith)) x %&% x else {
-                      if(!is.na(boolArith))
-                          warning(gettextf("'boolArith = %d' not yet implemented",
-                                           boolArith), domain=NA)
-                      x %*% x },
-                                 uplo = x@uplo)
+	  function(x, y = NULL, boolArith = NA, ...)
+	      .Call(Csparse_crossprod, x, trans = TRUE, triplet = FALSE, boolArith=boolArith))
+
+for(dmat in c("ddenseMatrix", "matrix")) {
+setMethod("tcrossprod", signature(x = "CsparseMatrix", y = dmat),
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  tcrossprod(x, as(y,"CsparseMatrix"), boolArith=TRUE)
 	      else
-		  .Call(Csparse_crossprod, x, trans = TRUE, triplet = FALSE, boolArith=boolArith)
-	  })
+                  .Call(Csparse_dense_prod, x, y, "2"))
+setMethod("tcrossprod", signature(x = dmat, y = "CsparseMatrix"),
+	  function(x, y=NULL, boolArith=NA, ...)
+              if(isTRUE(boolArith)) ## FIXME: very inefficient
+                  tcrossprod(as(x,"CsparseMatrix"), y, boolArith=TRUE)
+              else
+		  .Call(Csparse_dense_prod, y, x, "B"))
 
-setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "ddenseMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(Csparse_dense_prod, x, y, "2")})
-setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "matrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(Csparse_dense_prod, x, y, "2")})
+}
 setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "numLike"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      .Call(Csparse_dense_prod, x, y, "2")})
-
+	  function(x, y=NULL, boolArith=NA, ...)
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  tcrossprod(x, as(y,"sparseVector"), boolArith=TRUE)
+	      else
+                  .Call(Csparse_dense_prod, x, y, "2"))
+setMethod("tcrossprod", signature(x = "numLike",      y = "CsparseMatrix"),
+	  function(x, y=NULL, boolArith=NA, ...) ## ~== .v.Mt :
+	      if(isTRUE(boolArith)) ## FIXME: very inefficient
+		  tcrossprod(as(x,"sparseVector"), y, boolArith=TRUE)
+	      else
+                  ## x or t(x) depending on dimension of y [checked inside C]:
+                  .Call(Csparse_dense_prod, y, x, "B"))
 
 ### -- xy' = (yx')' --------------------
-for(T in c("d", "l", "n")) { ## speedup for *symmetric* RHS
-    .sCMatrix <- paste0(T, "sCMatrix")
-    setMethod("tcrossprod", signature(x = "ddenseMatrix", y = .sCMatrix),
-	      function(x, y=NULL, boolArith=NA, ...) {
-		  if(!is.na(boolArith))
-		      warning(gettextf("'boolArith = %d' not yet implemented",
-				       boolArith), domain=NA)
-		  .Call(Csparse_dense_prod, y, x, "c")})
-    setMethod("tcrossprod", signature(x = "matrix", y = .sCMatrix),
-	      function(x, y=NULL, boolArith=NA, ...) {
-		  if(!is.na(boolArith))
-		      warning(gettextf("'boolArith = %d' not yet implemented",
-				       boolArith), domain=NA)
-		  .Call(Csparse_dense_prod, y, x, "c")})
+tcr.dd.sC <- function(x, y=NULL, boolArith=NA, ...) {
+    if(isTRUE(boolArith)) ## FIXME: very inefficient
+	tcrossprod(as(x,"CsparseMatrix"), y, boolArith=TRUE)
+    else
+	.Call(Csparse_dense_prod, y, x, "c")
 }
-rm(T, .sCMatrix)
-setMethod("tcrossprod", signature(x = "ddenseMatrix", y = "CsparseMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-		  if(!is.na(boolArith))
-		      warning(gettextf("'boolArith = %d' not yet implemented",
-				       boolArith), domain=NA)
-		  .Call(Csparse_dense_prod, y, x, "B")})
-setMethod("tcrossprod", signature(x = "matrix",	      y = "CsparseMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-		  if(!is.na(boolArith))
-		      warning(gettextf("'boolArith = %d' not yet implemented",
-				       boolArith), domain=NA)
-		  .Call(Csparse_dense_prod, y, x, "B")})
-setMethod("tcrossprod", signature(x = "numLike",      y = "CsparseMatrix"),
-	  function(x, y=NULL, boolArith=NA, ...) { ## ~== .v.Mt :
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      ## x or t(x) depending on dimension of y [checked inside C]:
-	      .Call(Csparse_dense_prod, y, x, "B")
-	  })
+for(.sCMatrix in paste0(c("d", "l", "n"), "sCMatrix")) { ## speedup for *symmetric* RHS
+    setMethod("tcrossprod", signature(x = "ddenseMatrix", y = .sCMatrix), tcr.dd.sC)
+    setMethod("tcrossprod", signature(x = "matrix", y = .sCMatrix), 	  tcr.dd.sC)
+}
+rm(dmat, .sCMatrix)
 
 setMethod("tcrossprod", signature(x = "TsparseMatrix", y = "missing"),
-	  function(x, y = NULL, boolArith = NA, ...) {
-	      if (is(x, "symmetricMatrix"))
-		  ## tcrossprod() should give "symmetric*":
-		  forceSymmetric(if(isTRUE(boolArith)) x %&% x else {
-		      if(!is.na(boolArith))
-			  warning(gettextf("'boolArith = %d' not yet implemented",
-					   boolArith), domain=NA)
-		      x %*% x },
-				 uplo = x@uplo)
-	      else
-		  .Call(Csparse_crossprod, x, trans = TRUE, triplet = TRUE,
-			boolArith=boolArith)
-	  })
+	  function(x, y = NULL, boolArith = NA, ...)
+	      .Call(Csparse_crossprod, x, trans = TRUE, triplet = TRUE,
+		    boolArith=boolArith))
 
 setMethod("tcrossprod", signature(x = "ANY", y = "TsparseMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
@@ -815,11 +795,9 @@ setMethod("tcrossprod", signature(x = "TsparseMatrix", y = "TsparseMatrix"),
 
 ## "Matrix"
 setMethod("tcrossprod", signature(x = "Matrix", y = "numLike"),
-	  function(x, y=NULL, boolArith=NA, ...) {
-	      if(!is.na(boolArith))
-		  warning(gettextf("'boolArith = %d' not yet implemented",
-				   boolArith), domain=NA)
-	      x %*% rbind(y, deparse.level=0)})
+	  function(x, y=NULL, boolArith=NA, ...)
+	      (if(isTRUE(boolArith)) `%&%` else `%*%`)(x,
+                                                       rbind(y, deparse.level=0)))
 setMethod("tcrossprod", signature(x = "numLike", y = "Matrix"), .v.Mt)
 setMethod("tcrossprod", signature(x = "Matrix", y = "matrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
@@ -898,7 +876,7 @@ setMethod("tcrossprod", signature(x = "Matrix", y = "Matrix"),
 setMethod("tcrossprod", signature(x = "Matrix", y = "missing"),
 	  function(x, y=NULL, boolArith=NA, ...) {
 	      Matrix.msg(paste0(
-	  "potentially suboptimal crossprod(<",class(x), ">) as  . %*% t(.)"))
+	  "potentially suboptimal tcrossprod(<",class(x), ">) as  . %*% t(.)"))
               if(isTRUE(boolArith)) x %&% t(x) else
 	      x %*% t(x) })
 setMethod("tcrossprod", signature(x = "Matrix", y = "ANY"),
@@ -913,7 +891,7 @@ setMethod("tcrossprod", signature(x = "ANY", y = "Matrix"),
 
 ###--- IV --- %&%  Boolean Matrix Products ----------------------------------
 
-## TODO: Want crossprod / tcrossprod  with a 'boolArith' option:
+## Goal: crossprod / tcrossprod  with a 'boolArith' option:
 ## ---- boolArith = NA [default now]   <==> boolean arithmetic if *both* matrices
 ##                                           are pattern matrices
 ##     boolArith = TRUE                <==> boolean arithmetic: return n.CMatrix
