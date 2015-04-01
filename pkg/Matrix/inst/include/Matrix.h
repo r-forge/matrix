@@ -99,6 +99,10 @@ int M_Matrix_check_class_etc(SEXP x, const char **valid);
 // ./Matrix_stubs.c   "illustrative example code" (of the above):
 bool Matrix_isclass_Csparse(SEXP x);
 bool Matrix_isclass_triplet(SEXP x);
+bool Matrix_isclass_ge_dense(SEXP x);
+bool Matrix_isclass_ddense(SEXP x);
+bool Matrix_isclass_ldense(SEXP x);
+bool Matrix_isclass_ndense(SEXP x);
 bool Matrix_isclass_dense(SEXP x);
 bool Matrix_isclass_CHMfactor(SEXP x);
 
