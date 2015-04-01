@@ -1,6 +1,7 @@
 #include <Rconfig.h>
 #include <Rinternals.h>
 #include <R_ext/Rdynload.h>
+#include <R_ext/Print.h>
 #include <Rversion.h>
 #include "cholmod.h"
 #include "Matrix.h"
@@ -670,20 +671,22 @@ M_cholmod_scale(const_CHM_DN S, int scale, CHM_SP A,
 // for now still *export*  M_Matrix_check_class_etc() -- deprecate it later__FIXME__
 int M_Matrix_check_class_etc(SEXP x, const char **valid)
 {
-#if R_VERSION < R_Version(2, 15, 0) // || R_SVN_REVISION < 57849
-    static int(*fun)(SEXP, const char**) = NULL;
-    if (fun == NULL)
-	fun = (int(*)(SEXP, const char**))
-	    R_GetCCallable("Matrix", "Matrix_check_class_etc");
-    return fun(x, valid);
-#else
+    REprintf("M_Matrix_check_class_etc() is deprecated; use R_check_class_etc() instead");
     return R_check_class_etc(x, valid);
-#endif
 }
 
+const char *Matrix_valid_gedense[] = { MATRIX_VALID_gedense, ""};
+const char *Matrix_valid_ddense[] = { MATRIX_VALID_ddense, ""};
+const char *Matrix_valid_ldense[] = { MATRIX_VALID_ldense, ""};
+const char *Matrix_valid_ndense[] = { MATRIX_VALID_ndense, ""};
+const char *Matrix_valid_dense[] = {
+    MATRIX_VALID_ddense,
+    MATRIX_VALID_ldense,
+    MATRIX_VALID_ndense, ""};
+
 const char *Matrix_valid_Csparse[] = { MATRIX_VALID_Csparse, ""};
-const char *Matrix_valid_dense[]   = { MATRIX_VALID_dense, ""};
 const char *Matrix_valid_triplet[] = { MATRIX_VALID_Tsparse, ""};
+const char *Matrix_valid_Rsparse[] = { MATRIX_VALID_Rsparse, ""};
 const char *Matrix_valid_CHMfactor[]={ MATRIX_VALID_CHMfactor, ""};
 
 bool Matrix_isclass_Csparse(SEXP x) {
@@ -694,6 +697,18 @@ bool Matrix_isclass_triplet(SEXP x) {
     return M_Matrix_check_class_etc(x, Matrix_valid_triplet) >= 0;
 }
 
+bool Matrix_isclass_gedense(SEXP x) {
+    return M_Matrix_check_class_etc(x, Matrix_valid_gedense) >= 0;
+}
+bool Matrix_isclass_ddense(SEXP x) {
+    return M_Matrix_check_class_etc(x, Matrix_valid_ddense) >= 0;
+}
+bool Matrix_isclass_ldense(SEXP x) {
+    return M_Matrix_check_class_etc(x, Matrix_valid_ldense) >= 0;
+}
+bool Matrix_isclass_ndense(SEXP x) {
+    return M_Matrix_check_class_etc(x, Matrix_valid_ndense) >= 0;
+}
 bool Matrix_isclass_dense(SEXP x) {
     return M_Matrix_check_class_etc(x, Matrix_valid_dense) >= 0;
 }
