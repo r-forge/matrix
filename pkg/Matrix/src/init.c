@@ -329,6 +329,7 @@ R_init_Matrix(DllInfo *dll)
     RREGDEF(cholmod_scale);
     RREGDEF(cholmod_sdmult);
     RREGDEF(cholmod_solve);
+    RREGDEF(cholmod_solve2);
     RREGDEF(cholmod_sort);
     RREGDEF(cholmod_sparse_to_dense);
     RREGDEF(cholmod_sparse_to_triplet);
