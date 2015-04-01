@@ -476,6 +476,47 @@ M_cholmod_solve(int sys, const_CHM_FR L,
     return fun(sys, L, B, Common);
 }
 
+
+/* Feature Requests #6064, 2015-03-27
+  https://r-forge.r-project.org/tracker/?func=detail&atid=297&aid=6064&group_id=61
+*/
+int attribute_hidden
+M_cholmod_solve2(int sys,
+		 CHM_FR L,
+		 CHM_DN B, // right
+		 CHM_DN *X,// solution
+		 CHM_DN *Yworkspace,
+		 CHM_DN *Eworkspace,
+		 cholmod_common *c)
+{
+    static int(*fun)(
+	int,
+	const_CHM_FR, // L
+	const_CHM_DN, // B
+	CHM_SP, // Bset
+	CHM_DN*, // X
+	CHM_DN*, // Xset
+	CHM_DN*, // Y
+	CHM_DN*, // E
+	cholmod_common*) = NULL;
+
+    // Source: ../../src/CHOLMOD/Cholesky/cholmod_solve.c
+    if (fun == NULL)
+	fun = (int(*)(int,
+		      const_CHM_FR, // L
+		      const_CHM_DN, // B
+		      CHM_SP, // Bset
+		      CHM_DN*, // X
+		      CHM_DN*, // Xset
+		      CHM_DN*, // Y
+		      CHM_DN*, // E
+		      cholmod_common*)
+	    )R_GetCCallable("Matrix", "cholmod_solve2");
+
+    return fun(sys, L, B, NULL,
+	       X, NULL, Yworkspace, Eworkspace, c);
+}
+
 CHM_SP attribute_hidden
 M_cholmod_speye(size_t nrow, size_t ncol,
 		int xtype, CHM_CM Common)
