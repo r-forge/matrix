@@ -675,7 +675,7 @@ int M_Matrix_check_class_etc(SEXP x, const char **valid)
     return R_check_class_etc(x, valid);
 }
 
-const char *Matrix_valid_gedense[] = { MATRIX_VALID_gedense, ""};
+const char *Matrix_valid_ge_dense[] = { MATRIX_VALID_ge_dense, ""};
 const char *Matrix_valid_ddense[] = { MATRIX_VALID_ddense, ""};
 const char *Matrix_valid_ldense[] = { MATRIX_VALID_ldense, ""};
 const char *Matrix_valid_ndense[] = { MATRIX_VALID_ndense, ""};
@@ -697,8 +697,8 @@ bool Matrix_isclass_triplet(SEXP x) {
     return M_Matrix_check_class_etc(x, Matrix_valid_triplet) >= 0;
 }
 
-bool Matrix_isclass_gedense(SEXP x) {
-    return M_Matrix_check_class_etc(x, Matrix_valid_gedense) >= 0;
+bool Matrix_isclass_ge_dense(SEXP x) {
+    return M_Matrix_check_class_etc(x, Matrix_valid_ge_dense) >= 0;
 }
 bool Matrix_isclass_ddense(SEXP x) {
     return M_Matrix_check_class_etc(x, Matrix_valid_ddense) >= 0;
