@@ -140,7 +140,7 @@ setClass("lsparseMatrix", representation("VIRTUAL"),
 
 if(FALSE) { ##--not yet--
 setClass("isparseMatrix", representation("VIRTUAL"),
-	 contains = c("lMatrix", "sparseMatrix"))
+	 contains = c("iMatrix", "sparseMatrix"))
 }
 
 ## these are the "pattern" matrices for "symbolic analysis" of sparse OPs:

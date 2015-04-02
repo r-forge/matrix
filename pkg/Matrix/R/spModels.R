@@ -103,7 +103,7 @@ sparse.model.matrix <-
 	reorder <- match(sapply(attr(t,"variables"),deparse,
 				width.cutoff=500)[-1L],
 			 names(data))
-	if (any(is.na(reorder)))
+	if (anyNA(reorder))
 	    stop("model frame and formula mismatch in model.matrix()")
 	if(!isSeq(reorder, ncol(data), Ostart=FALSE))
 	    data <- data[,reorder, drop=FALSE]

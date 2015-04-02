@@ -76,7 +76,7 @@ setMethod("Summary", "dsparseMatrix",
 	  }
 	  else { ## prod() or sum() : care for "symmetric" and U2N
 	      if(!full.x && .Generic == "prod") {
-		  if(any(is.na(x@x))) NaN else 0
+		  if(anyNA(x@x)) NaN else 0
 	      }
 	      else
 		  callGeneric((if(isSym) as(x, "generalMatrix") else x)@x,
@@ -316,6 +316,6 @@ setMethod("Summary", "sparseVector",
 		  callGeneric(x@x, if(logicF) FALSE else 0, ..., na.rm = na.rm)
 	      }
 	      else { ## prod()
-		  if(any(is.na(x@x))) NaN else 0
+		  if(anyNA(x@x)) NaN else 0
 	      }
 	  })

@@ -498,7 +498,7 @@ setMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY", drop = "ANY"),
 
 	## Note: current method dispatch seems not to call this ever
 
-	if(!any(is.na(i)) && all(i)) ## select everything
+	if(!anyNA(i) && all(i)) ## select everything
 	    x
 	else ## not selecting all -> result is *NOT* diagonal/triangular/symmetric/..
 	    ## keep j missing, but  drop = "logical"
@@ -623,7 +623,7 @@ setMethod("[", signature(x = "Matrix", i = "matrix", j = "missing", drop="missin
 	if(!is.integer(i)) storage.mode(i) <- "integer"
 	if(any(i < 0))
 	    stop("negative values are not allowed in a matrix subscript")
-	if(any(is.na(i)))
+	if(anyNA(i))
 	    stop("NAs are not allowed in subscripted assignments")
 	if(any(i0 <- (i == 0))) # remove them
             i <- i[ - which(i0, arr.ind = TRUE)[,"row"], ]

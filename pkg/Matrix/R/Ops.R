@@ -195,7 +195,7 @@ Cmp.Mat.atomic <- function(e1, e2) { ## result will inherit from "lMatrix"
         }
 
         if(remainSparse) {
-            if(!any(is.na(r)) && ((Ar <- all(r)) || !any(r))) {
+            if(!anyNA(r) && ((Ar <- all(r)) || !any(r))) {
                 lClass <- class2(cl, "l") # is "lsparse*"
                 r <- new(lClass)
                 r@Dim <- d
@@ -701,7 +701,7 @@ Logic.Mat.atomic <- function(e1, e2) { ## result will typically be "like" e1:
         }
 
         if(remainSparse) {
-            if(!any(is.na(r)) && ((Ar <- all(r)) || !any(r))) {
+            if(!anyNA(r) && ((Ar <- all(r)) || !any(r))) {
                 lClass <- class2(cl, "l") # is "lsparse*"
                 r <- new(lClass)
                 r@Dim <- d

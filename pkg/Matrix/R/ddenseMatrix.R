@@ -4,11 +4,10 @@
 ## >> but << needs all sub(sub(sub)) classes of "ddenseMatrix" listed
 ##   -----  in  ../src/Mutils.c
 
-setAs("ddenseMatrix", "dgeMatrix",
-      function(from) .Call(dup_mMatrix_as_dgeMatrix, from))
+setAs("ddenseMatrix", "dgeMatrix", ..2dge)
 
 setAs("ddenseMatrix", "matrix",
-      function(from) as(as(from, "dgeMatrix"), "matrix"))
+      function(from) as(..2dge(from), "matrix"))
 
 ## d(ouble) to l(ogical):
 setAs("dgeMatrix", "lgeMatrix", function(from) d2l_Matrix(from, "dgeMatrix"))

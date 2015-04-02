@@ -7,7 +7,7 @@
 
 ## packed <->  non-packed :
 
-setAs("nspMatrix", "nsyMatrix",					##  vv for "n*", 0L for "l*"
+setAs("nspMatrix", "nsyMatrix",	##  1L for "n*", 0L for "l*" :      vv
       nsp2nsy <- function(from) .Call(lspMatrix_as_lsyMatrix, from, 1L))
 
 setAs("nsyMatrix", "nspMatrix",
