@@ -62,10 +62,10 @@
 }% {Methods}
 \note{
   The current implementation ends up coercing both \code{x} and \code{y}
-  to \code{\link{nsparseMatrix}} which may be quite inefficient.  A
-  future implementation may well return a matrix with \bold{different}
-  class, but the \dQuote{same} content, i.e., the same matrix entries
-  \eqn{m_ij}{m[i,j]}.
+  to (virtual) class \code{\linkS4class{nsparseMatrix}} which may be
+  quite inefficient.  A future implementation may well return a matrix
+  with \bold{different} class, but the \dQuote{same} content, i.e., the
+  same matrix entries \eqn{m_ij}{m[i,j]}.
 }
 \value{
   a pattern matrix, i.e., inheriting from \code{"\linkS4class{nMatrix}"},
