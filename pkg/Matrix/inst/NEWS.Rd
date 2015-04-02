@@ -123,6 +123,8 @@
     \itemize{
       \item \code{\%*\%} and \code{crossprod()} now also work with
       \code{sparseVector}s.
+      \item speedup of \code{crossprod(v, <sparseM>)}, thanks to nudge
+      by Niels Richard Hansen.
       \item new help page for all such matrix products
       (\file{../man/matrix-products.Rd}).
     }
@@ -149,51 +151,63 @@
     \itemize{
       \item export fast power-user coercion utilities
       \code{.dsy2mat()}, \code{.dxC2mat()}, \code{.T2Cmat()}, \code{..2dge()}.
-      \item
     }
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item
-      \item
+      \item matrix products now (mostly) work with \code{sparseVector}s;
+      and correctly in some more cases.
     }
   }
 }
 
-\section{Changes in version 1.1-1.1 (2013-12-30)}{
-  \subsection{Bug Fixes}{
+\section{Changes in version 1.1-1.1 (2013-12-30, svn r2957)}{
     \itemize{
-      \item
-      \item
+      \item Testing code's \code{assertWarning()} adapted for \eqn{R \le 3.0.1}.
+      \item \code{Depends: R >= 2.15.2} eases checking.
     }
-  }
 }
 
 \section{Changes in version 1.1-1 (2013-12-28)}{
   \subsection{New Features}{
     \itemize{
-      \item
-      \item
+      \item \code{image(.., xlim, ylim)}: nicer defaults %% ../R/dgTMatrix.R
+      for the axis limits, and \code{ylim} is sorted decreasingly; not
+      strictly back-compatible but should never harm.
+      \item \code{rankMatrix(*, method="qr")} now using \code{tol}
+      \item \code{T2graph()} and \code{graph2T()} export old functionality explicitly.
+      Tweaks in conversions between \code{"graph"} and
+      \code{"sparseMatrix"} objects.  Notably, \code{as(<graph>,
+	<Matrix>)} now more often returns a (0/1 pattern) "n..Matrix".
+      \item \code{sparseMatrix()}: new \code{use.last.ij} argument.
     }
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item
-      \item
+      \item \code{KhatriRao()}: fix rownames (X <-> Y)
+      \item \code{qr.coef()}, \code{qr.fitted}, and \code{qr.resid} now
+      also work with \emph{sparse} RHS \code{y}.
+      \item sparse matrix \dQuote{sub assignments}, e.g., \code{M[ii] <- v},
+      speedup and fixes.
+      \item bug fixes also in \code{M[negative indices] <- value} and
+      \code{<sparseMatrix>[cbind(i,j)]}.
     }
   }
 }
 
-\section{Changes in version 1.1-0 (2013-10-21)}{
+\section{Changes in version 1.1-0 (2013-10-21, svn r2930)}{
   \subsection{New Features}{
     \itemize{
-      \item
-      \item
+      \item \code{fac2sparse} and \code{fac2Sparse} now exported, with a
+      new \code{giveCsparse} option.
+      \item Update to latest \command{SuiteSparse} C library by Tim Davis,
+      U. Florida.
+      \item ensuing \dQuote{C API changes}
     }
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item
+      \item fixed long lasting undetected \code{solve(<dsCMatrix>, *)} bug
       \item
     }
   }
@@ -218,7 +232,7 @@
 \section{Changes in version 1.0-13 (2013-09-10)}{
   \subsection{New Features}{
     \itemize{
-      \item
+      \item New efficient \code{KhatriRao()} by Michael Cysouw
       \item
     }
   }
@@ -255,7 +269,8 @@
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item
+      \item \code{as(<csr>, "dgCMatrix")} (from package \pkg{SparseM})
+      now works again.
       \item
     }
   }
@@ -264,8 +279,9 @@
 \section{Changes in version 1.0-10 (2012-10-22)}{
   \subsection{New Features}{
     \itemize{
-      \item
-      \item
+      \item \code{.sparseDiagonal()}: new \code{unitri} argument, and
+      more flexibility;
+      \item new \code{solve(<dsCMatrix>, <missing>)} via efficient C code.
     }
   }
   \subsection{Bug Fixes}{
@@ -279,182 +295,193 @@
 \section{Changes in version 1.0-9 (2012-09-05)}{
   \subsection{New Features}{
     \itemize{
-      \item
-      \item
+      \item new \code{sparseVector()} constructor function.
+      \item \code{is.finite()} \code{is.infinite()} now work for our
+      matrices and "*sparseVector" objects.
+      \item \code{diag(.) <- V} now preserves symmetricity,
+      triangularity and even uni-triangularity sometimes.
     }
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item
-      \item
+      \item Quite a few fixes for \code{Ops} (arithmetic, logic, etc)
+      group methods.
+      \item Ditto for \code{diagonalMatrix} methods.
     }
   }
 }
 
 \section{Changes in version 1.0-6 (2012-03-16, publ. 2012-06-18)}{
   \subsection{New Features}{
-    \itemize{
-      \item
-      \item
-    }
+    %% \itemize{
+    %%   \item
+    %%   \item
+    %% }
   }
   \subsection{Bug Fixes}{
-    \itemize{
-      \item
-      \item
-    }
+    %% \itemize{
+    %%   \item
+    %%   \item
+    %% }
   }
 }
 
 \section{Changes in version 1.0-5 (2012-03-15)}{
   \subsection{New Features}{
-    \itemize{
-      \item
-      \item
-    }
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
   }
   \subsection{Bug Fixes}{
-    \itemize{
-      \item
-      \item
-    }
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
   }
 }
 
 \section{Changes in version 1.0-4 (2012-02-21)}{
   \subsection{New Features}{
-    \itemize{
-      \item
-      \item
-    }
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
   }
   \subsection{Bug Fixes}{
-    \itemize{
-      \item
-      \item
-    }
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
   }
 }
 
 \section{Changes in version 1.0-3 (2012-01-13)}{
   \subsection{New Features}{
-    \itemize{
-      \item
-      \item
-    }
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
   }
   \subsection{Bug Fixes}{
-    \itemize{
-      \item
-      \item
-    }
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
   }
 }
 
 \section{Changes in version 1.0-2 (2011-11-19)}{
   \subsection{New Features}{
-    \itemize{
-      \item
-      \item
-    }
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
   }
   \subsection{Bug Fixes}{
-    \itemize{
-      \item
-      \item
-    }
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
   }
 }
 
 \section{Changes in version 1.0-1 (2011-10-18)}{
   \subsection{New Features}{
-    \itemize{
-      \item
-      \item
-    }
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
   }
   \subsection{Bug Fixes}{
-    \itemize{
-      \item
-      \item
-    }
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
   }
 }
 
 \section{Changes in version 1.0-0 (2011-10-04)}{
   \subsection{New Features}{
-    \itemize{
-      \item
-      \item
-    }
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
   }
   \subsection{Bug Fixes}{
-    \itemize{
-      \item
-      \item
-    }
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
   }
 }
 
 \section{Changes in version 0.9996875-3 (2011-08-13)}{
   \subsection{New Features}{
-    \itemize{
-      \item
-      \item
-    }
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
   }
   \subsection{Bug Fixes}{
-    \itemize{
-      \item
-      \item
-    }
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
   }
 }
 
 \section{Changes in version 0.9996875-2 (2011-08-09)}{
-  \subsection{New Features}{
-    \itemize{
-      \item
-      \item
-    }
-  }
-  \subsection{Bug Fixes}{
-    \itemize{
-      \item
-      \item
-    }
-  }
+  %% \subsection{New Features}{
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
+  %% }
+  %% \subsection{Bug Fixes}{
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
+  %% }
 }
 
 \section{Changes in version 0.9996875-1 (2011-08-08)}{
-  \subsection{New Features}{
-    \itemize{
-      \item
-      \item
-    }
-  }
-  \subsection{Bug Fixes}{
-    \itemize{
-      \item
-      \item
-    }
-  }
+  %% \subsection{New Features}{
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
+  %% }
+
+  %% \subsection{Bug Fixes}{
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
+  %% }
 }
 
 \section{Changes in version 0.999375-50 (2011-04-08)}{
-  \subsection{New Features}{
-    \itemize{
-      \item
-      \item
-    }
-  }
-  \subsection{Bug Fixes}{
-    \itemize{
-      \item
-      \item
-    }
-  }
+  %% \subsection{New Features}{
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
+  %% }
+  %% \subsection{Bug Fixes}{
+  %%   \itemize{
+  %%     \item
+  %%     \item
+  %%   }
+  %% }
 }
+
+% How can I add vertical space ?
+% \preformatted{} is not allowed, nor is \cr
+
+%--------------- pre-pre-history: ------------------------
+
 
 \section{Version 0.2-1 (2000-07-15)}{
   The first CRAN release of the \pkg{Matrix} package,
