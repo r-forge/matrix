@@ -912,11 +912,34 @@ setMethod("%&%", signature(x = "Matrix", y = "ANY"), function(x, y) x %&% as(y, 
 setMethod("%&%", signature(x = "ANY", y = "Matrix"), function(x, y) as(x, "Matrix") %&% y)
 ## catch all
 setMethod("%&%", signature(x = "mMatrix", y = "mMatrix"),
-          function(x, y) as(x, "nMatrix") %&% as(y, "nMatrix"))
+	  function(x, y) as(x, "nMatrix") %&% as(y, "nMatrix"))
 setMethod("%&%", signature(x = "Matrix", y = "Matrix"),
-          function(x, y) as(x, "nMatrix") %&% as(y, "nMatrix"))
+	  function(x, y) as(x, "nMatrix") %&% as(y, "nMatrix"))
 setMethod("%&%", signature(x = "mMatrix", y = "nMatrix"), function(x, y) as(x, "nMatrix") %&% y)
 setMethod("%&%", signature(x = "nMatrix", y = "mMatrix"), function(x, y) x %&% as(y, "nMatrix"))
+
+## sparseVectors :
+sp.bx.sp <- function(x, y) Matrix(any(x & y), 1L, 1L, sparse=FALSE)
+sp.bX.sp <- function(x, y) {
+    if((n <- length(x)) == length(y)) sp.bx.sp(x,y)
+    else if(n == 1L) spV2M(x, nrow = 1L, ncol = 1L, check = FALSE) %&% y
+    else stop("non-conformable arguments")
+}
+v.bX.sp <- function(x, y) {
+    if((n <- length(x)) == length(y)) sp.bx.sp(x,y)
+    else if(n == 1L) matrix(x, nrow = 1L, ncol = 1L) %&% y
+    else stop("non-conformable arguments")
+}
+setMethod("%&%", signature(x = "mMatrix", y = "sparseVector"), function(x, y)
+    x %&% `dim<-`(y, if(ncol(x) == (n <- length(y))) c(n, 1L) else c(1L, n)))
+
+setMethod("%&%", signature(x = "sparseVector", y = "mMatrix"), function(x, y)
+    `dim<-`(x, if(nrow(y) == (n <- length(x))) c(1L, n) else c(n, 1L)) %&% y)
+
+setMethod("%&%", signature(x = "sparseVector", y = "sparseVector"), sp.bX.sp)
+setMethod("%&%", signature(x = "sparseVector", y = "numLike"),      sp.bX.sp)
+setMethod("%&%", signature(x = "numLike",      y = "sparseVector"), v.bX.sp)
+
 ## For now --- suboptimally!!! --- we coerce to nsparseMatrix always:
 setMethod("%&%", signature(x = "nMatrix", y = "nsparseMatrix"),
 	  function(x, y) as(x, "nsparseMatrix") %&% y)
