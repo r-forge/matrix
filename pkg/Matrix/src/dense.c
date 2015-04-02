@@ -251,7 +251,7 @@ SEXP dense_to_Csparse(SEXP x)
     CHM_DN chxd = AS_CHM_xDN(PROTECT(mMatrix_as_geMatrix(x)));
     /* cholmod_dense_to_sparse() in CHOLMOD/Core/ below does only work for
        "REAL" 'xtypes', i.e. *not* for "nMatrix".
-       ===> need "_x" in above call.
+       ===> need "_x" in above AS_CHM_xDN() call.
 
        Also it cannot keep symmetric / triangular, hence the
        as_geMatrix() above.  Note that this is already a *waste* for

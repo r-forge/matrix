@@ -281,7 +281,7 @@ setAs("ldiMatrix", "symmetricMatrix", function(from) .diag2sT(from, "U", "l"))
 rm(di2tT)
 
 setAs("diagonalMatrix", "nMatrix",
-      function(from) {
+      di2nMat <- function(from) {
 	  i <- if(from@diag == "U") integer(0) else which(isN0(from@x)) - 1L
 	  new("ntTMatrix", i = i, j = i, diag = from@diag,
 	      Dim = from@Dim, Dimnames = from@Dimnames)
@@ -334,11 +334,11 @@ setAs("diagonalMatrix", "denseMatrix",
     m
 }
 
-setAs("ddiMatrix", "dgeMatrix",
-      function(from) .Call(dup_mMatrix_as_dgeMatrix, from))
-setAs("ddiMatrix", "ddenseMatrix",
+setAs("ddiMatrix", "dgeMatrix", ..2dge)
+
+setAs("ddiMatrix", "ddenseMatrix", #-> "dtr"
       function(from) as(as(from, "triangularMatrix"),"denseMatrix"))
-setAs("ldiMatrix", "ldenseMatrix",
+setAs("ldiMatrix", "ldenseMatrix", #-> "ltr"
       function(from) as(as(from, "triangularMatrix"),"denseMatrix"))
 
 
@@ -980,7 +980,7 @@ diagOdiag <- function(e1,e2) {
 	xx <- as.vector(matrix(rbind(r, matrix(r00,n,n)), n,n))
 	newcl <-
 	    paste0(if(isNum) "d" else if(isLog) {
-		if(!any(is.na(r)) && !any(is.na(r00))) "n" else "l"
+		if(!anyNA(r) && !anyNA(r00)) "n" else "l"
 	    } else stop("not yet implemented .. please report"), "syMatrix")
 
 	new(newcl, Dim = e1@Dim, Dimnames = e1@Dimnames, x = xx)

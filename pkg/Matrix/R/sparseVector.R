@@ -49,7 +49,7 @@ setAs("xsparseVector", "zsparseVector",
 
 setAs("xsparseVector", "nsparseVector",
       function(from) {
-          if(any(is.na(from@x)))
+	  if(anyNA(from@x))
               stop("cannot coerce 'NA's to \"nsparseVector\"")
           new("nsparseVector", i = from@i, length = from@length)
       })

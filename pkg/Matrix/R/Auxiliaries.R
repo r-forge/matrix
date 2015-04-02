@@ -22,7 +22,7 @@ any0 <- function(x) .Call(R_any0, x)
 ## These work "identically" for  1 ('==' TRUE)  and 0 ('==' FALSE)
 ##	(but give a warning for "double"  1 or 0)
 ## TODO: C versions of these would be faster
-allTrue  <- function(x) all(x)  && !any(is.na(x))
+allTrue  <- function(x) all(x) && !anyNA(x)
 
 
 ## Note that mode(<integer>) = "numeric" -- as0(), as1() return "double"
@@ -233,7 +233,7 @@ detSparseLU <- function(x, logarithm = TRUE, ...) {
     ll <- lu(x, errSing = FALSE)
     ##          ^^^^^^^^^^^^^^^ no error in case of singularity
     if(identical(NA, ll)) { ## LU-decomposition failed with singularity
-	return(mkDet(ldet=if(any(is.na(x))) NaN else -Inf,
+	return(mkDet(ldet = if(anyNA(x)) NaN else -Inf,
 		     logarithm=logarithm, sig = 1L))
     }
     ## else
@@ -750,6 +750,7 @@ drop0 <- function(x, tol = 0, is.Csparse = NA) {
 	  tol)
 }
 
+
 uniq <- function(x) {
     if(is(x, "TsparseMatrix")) uniqTsparse(x) else
     if(is(x, "sparseMatrix")) drop0(x) else x
@@ -796,6 +797,10 @@ fixupDense <- function(m, from, cldm = getClassDef(class(m))) {
     }
     m
 }
+
+##' @title Transform {vectors, matrix, Matrix, ...} to  dgeMatrix
+##' @export
+..2dge <- function(from) .Call(dup_mMatrix_as_dgeMatrix, from)
 
 ## -> ./ldenseMatrix.R :
 l2d_Matrix <- function(from, cl = MatrixClass(class(from)), cld = getClassDef(cl)) {

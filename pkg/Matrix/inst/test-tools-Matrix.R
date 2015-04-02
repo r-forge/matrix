@@ -18,7 +18,7 @@ asD <- function(m) { ## as "Dense"
 }
 
 ## "normal" sparse Matrix: Csparse, no diag="U"
-asCsp <- function(x) Matrix:::diagU2N(as(x, "CsparseMatrix"))
+asCsp <- function(x) diagU2N(as(x, "CsparseMatrix"))
 
 ##' @title quasi-identical dimnames
 Qidentical.DN <- function(dx, dy) {
@@ -86,7 +86,8 @@ Q.C.identical <- function(x,y, sparse = is(x,"sparseMatrix"),
 ##' @title  Quasi-equal for  'Matrix' matrices
 ##' @param x  Matrix
 ##' @param y  Matrix
-##' @param superclasses   x and y must coincide in (not) extending these
+##' @param superclasses  x and y must coincide in (not) extending these; set to empty,
+##'  if no class/inheritance checks should happen.
 ##' @param dimnames.check  logical indicating if dimnames(.) much match
 ##' @param tol  NA (--> use "==") or numerical tolerance for all.equal()
 ##' @return   logical:  Are x and y (quasi) equal ?
@@ -344,6 +345,10 @@ allCholesky <- function(A, verbose = FALSE, silentTry = FALSE)
 	 r.uniq = CHM_to_pLs(r1[ ! dup.r1]))
 }
 
+##' Cheap  Boolean Arithmetic Matrix product
+##' Should be equivalent to  %&%  which is faster [not for large dense!].
+##' Consequently mainly used in  checkMatrix()
+boolProd <- function(x,y) as((abs(x) %*% abs(y)) > 0, "nMatrix")
 
 ###----- Checking a "Matrix" -----------------------------------------
 
@@ -450,7 +455,12 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 		      dim(tcm) == rep.int(nrow(m), 2),
 		      ## FIXME: %*% drops dimnames
 		      Q.eq2(c.m, tm %*% m, tol = tolQ),
-		      Q.eq2(tcm, m %*% tm, tol = tolQ))
+		      Q.eq2(tcm, m %*% tm, tol = tolQ),
+                      ## should work with dimnames:
+		      Q.eq(m %&% tm, boolProd(m, tm), superclasses=NULL, tol = 0)
+                     ,
+		      Q.eq(tm %&% m, boolProd(tm, m), superclasses=NULL, tol = 0)
+                      )
 	}
     }
     if(!do.matrix) {
@@ -542,7 +552,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	ns <- as(m, "nsparseMatrix")
 	stopifnot(identical(n1,ns),
 		  isDiag || ((if(isSym) Matrix:::nnzSparse else sum)(n1) ==
-			     length(if(isInd) m@perm else Matrix:::diagU2N(m)@x)))
+			     length(if(isInd) m@perm else diagU2N(m)@x)))
         Cat("ok\n")
     }
 
@@ -650,7 +660,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	    Cat("valid:", validObject(tm), "\n")
 	    if(m@uplo == tm@uplo) ## otherwise, the matrix effectively was *diagonal*
 		## note that diagU2N(<dtr>) |-> dtC :
-		stopifnot(Qidentical(tm, as(Matrix:::diagU2N(m), clNam)))
+		stopifnot(Qidentical(tm, as(diagU2N(m), clNam)))
 	}
 	else if(isDiag) {
 

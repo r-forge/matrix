@@ -323,6 +323,9 @@
   \code{tcrossprod(x)} is formally equivalent to, but faster than, the
   call \code{x \%*\% t(x)}, and so is \code{tcrossprod(x, y)} instead of
   \code{x \%*\% t(y)}.
+
+  \emph{Boolean} matrix products are computed via either
+  \code{\link{\%&\%}} or \code{boolArith = TRUE}.
 }
 \usage{
 \S4method{\%*\%}{CsparseMatrix,diagonalMatrix}(x, y)

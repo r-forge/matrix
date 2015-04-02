@@ -1,4 +1,5 @@
 \name{indMatrix-class}
+\title{Index Matrices}
 \docType{class}
 \alias{indMatrix-class}
 \alias{-,indMatrix,missing-method}
@@ -29,7 +30,6 @@
 \alias{rowSums,indMatrix-method}
 \alias{rowMeans,indMatrix-method}
 %
-\title{Index matrices}
 \description{The \code{"indMatrix"} class is the class of index
   matrices, stored as 1-based integer index vectors.  An index matrix is
   a matrix with exactly one non-zero entry per row.
