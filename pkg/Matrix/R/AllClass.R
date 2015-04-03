@@ -148,6 +148,7 @@ setClass("nsparseMatrix", representation("VIRTUAL"),
 	 contains = c("nMatrix", "sparseMatrix"))
 
 ## More Class Intersections {for method dispatch}:
+if(FALSE) { ## this is "natural" but gives WARNINGs when other packages use "it"
 setClass("dCsparseMatrix", representation("VIRTUAL"),
 	 contains = c("CsparseMatrix", "dsparseMatrix"))
 setClass("lCsparseMatrix", representation("VIRTUAL"),
@@ -158,6 +159,11 @@ setClass("nCsparseMatrix", representation("VIRTUAL"),
 ## dense general
 setClass("geMatrix", representation("VIRTUAL"),
 	 contains = c("denseMatrix", "generalMatrix"))
+
+} else { ## ----------- a version that maybe works better for other pkgs ---------
+
+ ##--> setClassUnion() ... below
+}
 
 
 ## ------------------ Proper (non-virtual) Classes ----------------------------
@@ -696,6 +702,17 @@ setClassUnion("xMatrix", ## those Matrix classes with an 'x' slot
                 "lMatrix",
                 "ndenseMatrix",
                 "zMatrix"))
+
+if(TRUE) { ##--- variant of setClass("dCsparse..." ..) etc working better for other pkgs -----
+
+setClassUnion("dCsparseMatrix", members = c("dgCMatrix", "dtCMatrix", "dsCMatrix"))
+setClassUnion("lCsparseMatrix", members = c("lgCMatrix", "ltCMatrix", "lsCMatrix"))
+setClassUnion("nCsparseMatrix", members = c("ngCMatrix", "ntCMatrix", "nsCMatrix"))
+
+## dense general
+setClassUnion("geMatrix", members = c("dgeMatrix", "lgeMatrix", "ngeMatrix"))
+}
+
 
 
 ## Definition  Packed := dense with length( . @x) < prod( . @Dim)
