@@ -4,7 +4,7 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.2-0 (2015-04-02)}{
+\section{Changes in version 1.2-0 (2015-04-03)}{
   \subsection{New Features}{
     \itemize{
       \item New \code{\%&\%} for \dQuote{boolean arithmetic} matrix product.
@@ -217,14 +217,12 @@
 \section{Changes in version 1.0-14 (2013-09-12)}{
   \subsection{New Features}{
     \itemize{
-      \item
-      \item
+      \item .
     }
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item
-      \item
+      \item .
     }
   }
 }
@@ -238,7 +236,7 @@
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item
+      \item .
       \item
     }
   }
@@ -247,13 +245,12 @@
 \section{Changes in version 1.0-12 (2013-03-26)}{
   \subsection{New Features}{
     \itemize{
-      \item
-      \item
+      \item .
     }
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item
+      \item .
       \item
     }
   }
@@ -263,15 +260,14 @@
 \section{Changes in version 1.0-11 (2013-02-02)}{
   \subsection{New Features}{
     \itemize{
-      \item
-      \item
+      \item .
     }
   }
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{as(<csr>, "dgCMatrix")} (from package \pkg{SparseM})
       now works again.
-      \item
+      \item .
     }
   }
 }
@@ -286,8 +282,7 @@
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item
-      \item
+      \item .
     }
   }
 }
@@ -313,170 +308,147 @@
 
 \section{Changes in version 1.0-6 (2012-03-16, publ. 2012-06-18)}{
   \subsection{New Features}{
-    %% \itemize{
-    %%   \item
-    %%   \item
-    %% }
+    \itemize{
+      \item .
+    }
   }
   \subsection{Bug Fixes}{
-    %% \itemize{
-    %%   \item
-    %%   \item
-    %% }
+    \itemize{
+      \item .
+    }
   }
 }
 
 \section{Changes in version 1.0-5 (2012-03-15)}{
   \subsection{New Features}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
+    \itemize{
+      \item .
+    }
   }
   \subsection{Bug Fixes}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
+    \itemize{
+      \item .
+    }
   }
 }
 
 \section{Changes in version 1.0-4 (2012-02-21)}{
   \subsection{New Features}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
+    \itemize{
+      \item .
+    }
   }
   \subsection{Bug Fixes}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
+    \itemize{
+      \item .
+    }
   }
 }
 
 \section{Changes in version 1.0-3 (2012-01-13)}{
   \subsection{New Features}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
+    \itemize{
+      \item .
+    }
   }
   \subsection{Bug Fixes}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
+    \itemize{
+      \item .
+    }
   }
 }
 
 \section{Changes in version 1.0-2 (2011-11-19)}{
   \subsection{New Features}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
+    \itemize{
+      \item .
+    }
   }
   \subsection{Bug Fixes}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
+    \itemize{
+      \item .
+    }
   }
 }
 
 \section{Changes in version 1.0-1 (2011-10-18)}{
   \subsection{New Features}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
+    \itemize{
+      \item .
+    }
   }
   \subsection{Bug Fixes}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
+    \itemize{
+      \item .
+    }
   }
 }
 
 \section{Changes in version 1.0-0 (2011-10-04)}{
   \subsection{New Features}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
+    \itemize{
+      \item .
+    }
   }
   \subsection{Bug Fixes}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
+    \itemize{
+      \item .
+    }
   }
 }
 
 \section{Changes in version 0.9996875-3 (2011-08-13)}{
   \subsection{New Features}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
+    \itemize{
+      \item .
+    }
   }
   \subsection{Bug Fixes}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
+    \itemize{
+      \item .
+    }
   }
 }
 
 \section{Changes in version 0.9996875-2 (2011-08-09)}{
-  %% \subsection{New Features}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
-  %% }
-  %% \subsection{Bug Fixes}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
-  %% }
+  \subsection{New Features}{
+    \itemize{
+      \item .
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item .
+    }
+  }
 }
 
 \section{Changes in version 0.9996875-1 (2011-08-08)}{
-  %% \subsection{New Features}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
-  %% }
+  \subsection{New Features}{
+    \itemize{
+      \item .
+    }
+  }
 
-  %% \subsection{Bug Fixes}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
-  %% }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item .
+    }
+  }
 }
 
 \section{Changes in version 0.999375-50 (2011-04-08)}{
-  %% \subsection{New Features}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
-  %% }
-  %% \subsection{Bug Fixes}{
-  %%   \itemize{
-  %%     \item
-  %%     \item
-  %%   }
-  %% }
+  \subsection{New Features}{
+    \itemize{
+      \item .
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item .
+    }
+  }
 }
-
 % How can I add vertical space ?
 % \preformatted{} is not allowed, nor is \cr
 
