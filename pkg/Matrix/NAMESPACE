@@ -77,7 +77,6 @@ export("%&%",
        "sparseVector",
        "symmpart",
        "skewpart",
-       "tcrossprod",
        "tril", "triu",
        "updown",
        "pack", "unpack"
