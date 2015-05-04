@@ -1039,4 +1039,29 @@ for(nm in ls()) if(is(.m <- get(nm), "Matrix")) {
 showProc.time()
 }#--------------end if(doExtras) -----------------------------------------------
 
+## Bug found by Peter Ralph
+x <- Matrix(0, 17, 17)
+## x must have at least three nonzero entries
+x[1,1] <- x[2,1:2] <- 1.
+x0 <- x <- as(x,"dgTMatrix")  # if x is dgCMatrix, no error
+
+z <- matrix(x) # <== not the "Matrix way":  a (n, 1) matrix
+z[1,] <- 0.0
+dim(zC <- as(z,"dgCMatrix"))
+x[] <- zC # did fail
+x1 <- x
+
+x <- x0
+x[] <- as(zC, "sparseVector") # did fail, too
+x2 <- x
+stopifnot(identical(x1,x2))
+
+x <- as(x0, "matrix")
+x[] <- z
+assert.EQ.mat(x1, x)
+
+
+
+showProc.time()
+
 if(!interactive()) warnings()

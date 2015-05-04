@@ -311,9 +311,11 @@ setMethod("Summary", "sparseVector",
 	      if(l.x == n) ## fully non-zero (and "general") - very rare but quick
 		  callGeneric(x@x, ..., na.rm = na.rm)
 	      else if(.Generic != "prod") {
-		  logicF <- .Generic %in% c("any","all")
 		  ## we rely on	 <generic>(x, NULL, y, ..) :==	<generic>(x, y, ..):
-		  callGeneric(x@x, if(logicF) FALSE else 0, ..., na.rm = na.rm)
+		  if(any(.Generic == c("any","all"))) ## logic:
+		      callGeneric(as.logical(x@x), FALSE, ..., na.rm = na.rm)
+		  else # "numeric"
+		      callGeneric(x@x, 0, ..., na.rm = na.rm)
 	      }
 	      else { ## prod()
 		  if(anyNA(x@x)) NaN else 0

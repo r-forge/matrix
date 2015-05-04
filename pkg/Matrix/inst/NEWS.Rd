@@ -14,7 +14,8 @@
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item .
+      \item \code{S[] <- T} and \code{S[] <- spV} now work (in more cases)
+      for sparse matrices S, T and sparseVector \code{spV}.
     }
   }
 }

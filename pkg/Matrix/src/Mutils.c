@@ -1126,6 +1126,11 @@ SEXP Mmatrix(SEXP args)
 // all0     <- function(x) !any(is.na(x)) && all(!x) ## ~= allFalse
 // allFalse <- function(x) !any(x) && !any(is.na(x)) ## ~= all0
 SEXP R_all0(SEXP x) {
+    if (!isVectorAtomic(x)) {
+	if(length(x) == 0) return TRUE_;
+	// Typically S4.  TODO: Call the R code above, instead!
+	error(_("Argument must be numeric-like atomic vector"));
+    }
     R_xlen_t i, n = XLENGTH(x);
     if(n == 0) return TRUE_;
 
@@ -1163,6 +1168,11 @@ SEXP R_all0(SEXP x) {
 // any0 <- function(x) isTRUE(any(x == 0)) ## ~= anyFalse
 // anyFalse <- function(x) isTRUE(any(!x)) ## ~= any0
 SEXP R_any0(SEXP x) {
+    if (!isVectorAtomic(x)) {
+	if(length(x) == 0) return FALSE_;
+	// Typically S4.  TODO: Call the R code above, instead!
+	error(_("Argument must be numeric-like atomic vector"));
+    }
     R_xlen_t i, n = XLENGTH(x);
     if(n == 0) return FALSE_;
 

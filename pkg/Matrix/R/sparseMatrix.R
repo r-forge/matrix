@@ -328,12 +328,15 @@ setReplaceMethod("[", signature(x = "sparseMatrix", i = "missing", j = "missing"
 setReplaceMethod("[", signature(x = "sparseMatrix", i = "missing", j = "ANY",
 				value = "sparseMatrix"),
 		 function (x, i, j, ..., value)
-		 callGeneric(x=x, , j=j, value = as(value, "sparseVector")))
+		     callGeneric(x=x, , j=j, value = as(value, "sparseVector")))
 
 setReplaceMethod("[", signature(x = "sparseMatrix", i = "ANY", j = "missing",
 				value = "sparseMatrix"),
 		 function (x, i, j, ..., value)
-		 callGeneric(x=x, i=i, , value = as(value, "sparseVector")))
+		     if(nargs() == 3)
+			 callGeneric(x=x, i=i, value = as(value, "sparseVector"))
+		     else
+			 callGeneric(x=x, i=i, , value = as(value, "sparseVector")))
 
 setReplaceMethod("[", signature(x = "sparseMatrix", i = "ANY", j = "ANY",
 				value = "sparseMatrix"),
