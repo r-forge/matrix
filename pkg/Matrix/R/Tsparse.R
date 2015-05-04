@@ -321,7 +321,7 @@ replTmat <- function (x, i, j, ..., value)
                       is.logical(value) || is.logical(as.vector(value))
                   }))
     na <- nargs()
-    if(na == 3) { ## i = vector (but *not* 2-col) indexing"  M[i] <- v
+    if(na == 3) { ## i = vector indexing  M[i] <- v,  e.g.,  M[TRUE] <- v or M[] <- v !
 	Matrix.msg("diagnosing replTmat(x,i,j,v): nargs()= 3; ",
 		   if(iMi | jMi) sprintf("missing (i,j) = (%d,%d)", iMi,jMi))
 	if(iMi) stop("internal bug: missing 'i' in replTmat(): please report")
@@ -348,8 +348,12 @@ replTmat <- function (x, i, j, ..., value)
         n <- prod(di)
 	i <- if(is.logical(i)) { # full-size logical indexing
 	    if(n) {
-		if(length(i) < n) i <- rep_len(i, n)
-		(0:(n-1))[i] # -> 0-based index vector as well {maybe LARGE!}
+                if(isTRUE(i)) # shortcut
+                    0:(n-1)
+                else {
+                    if(length(i) < n) i <- rep_len(i, n)
+                    (0:(n-1))[i] # -> 0-based index vector as well {maybe LARGE!}
+                }
 	    } else integer(0)
 	} else {
 	    ## also works with *negative* indices etc:
@@ -413,7 +417,7 @@ replTmat <- function (x, i, j, ..., value)
 
 	## 1) Change the matching non-zero entries
 	if(has.x)
-	    x@x[mi[isE]] <- value[isE]
+	    x@x[mi[isE]] <- as(value[isE], class(x@x))
         else if(any0(value[isE])) { ## "n.TMatrix" : remove (i,j) where value is FALSE
             get0 <- !value[isE] ## x[i,j] is TRUE, should become FALSE
             i.rm <- - mi[isE][get0]
@@ -423,13 +427,18 @@ replTmat <- function (x, i, j, ..., value)
 	## 2) add the new non-zero entries
 	i <- i[!isE]
 	xv <- value[!isE]
-	if(has.x) {
-            x@x <- c(x@x, xv)
-	} else { # n.TMatrix : assign (i,j) only where value is TRUE:
-	    i <- i[xv]
+	## --- Be be efficient when  'value' is sparse :
+	if(length(notE <- which(isN0(xv)))) { # isN0(): non-0's; NAs counted too
+	    xv <- xv[notE]
+	    i <- i[notE]
+	    if(has.x) {
+		x@x <- c(x@x, as(xv, class(x@x)))
+	    } else { # n.TMatrix : assign (i,j) only where value is TRUE:
+		i <- i[xv]
+	    }
+	    x@i <- c(x@i, i %%  nr)
+	    x@j <- c(x@j, i %/% nr)
 	}
-	x@i <- c(x@i, i %%  nr)
-	x@j <- c(x@j, i %/% nr)
 	if(.hasSlot(x, "factors") && length(x@factors)) # drop cashed ones
 	    x@factors <- list()
 	return(x)
