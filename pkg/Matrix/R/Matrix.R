@@ -662,7 +662,10 @@ setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "ANY",
 setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "missing",
 				value = "Matrix"),
 		 function (x, i, j, ..., value)
-		 callGeneric(x=x, i=i, , value = as.vector(value)))
+		     if(nargs() == 3)
+			 callGeneric(x=x, i=i, value = as.vector(value))
+		     else
+			 callGeneric(x=x, i=i, , value = as.vector(value)))
 
 setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
 				value = "Matrix"),
@@ -678,7 +681,10 @@ setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "ANY",
 setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "missing",
 				value = "matrix"),
 		 function (x, i, j, ..., value)
-		 callGeneric(x=x, i=i, , value = c(value)))
+		     if(nargs() == 3)
+			 callGeneric(x=x, i=i, value = c(value))
+		     else
+			 callGeneric(x=x, i=i, , value = c(value)))
 
 setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
 				value = "matrix"),

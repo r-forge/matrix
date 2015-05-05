@@ -534,7 +534,7 @@ replTmat <- function (x, i, j, ..., value)
 
     ## TODO (efficiency): replace  'sel' by 'which(sel)'
     get.ind.sel <- function(ii,ij)
-	(match(x@i, ii, nomatch = 0) & match(x@j, ij, nomatch = 0))
+	(match(x@i, ii, nomatch = 0L) & match(x@j, ij, nomatch = 0L))
     ## sel[k] := TRUE iff k-th non-zero entry (typically x@x[k]) is to be replaced
     sel <- get.ind.sel(i1,i2)
 
@@ -638,8 +638,8 @@ replTmat <- function (x, i, j, ..., value)
 	}
 
 	## 1b) replace non-zeros with 0 --> drop entries
-	if(any(!vN0)) {
-	    ii <- which(sel)[!vN0]
+	if(!all(vN0)) { ##-> ii will not be empty
+	    ii <- which(sel)[which(!vN0)] # <- vN0 may be sparseVector
 	    if(has.x)
 		x@x <- x@x[-ii]
 	    x@i <- x@i[-ii]
