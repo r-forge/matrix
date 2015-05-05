@@ -173,6 +173,7 @@ setAs("CsparseMatrix", "sparseVector", ## could go via TsparseMatrix, but this i
       function(from) {
 	  d <- dim(from)
 	  n <- prod(d) # -> numeric, no integer overflow
+	  if((int.n <- n <= .Machine$integer.max)) n <- as.integer(n)
           cld <- getClassDef(class(from))
 	  kind <- .M.kind(from, cld)
 	  if(extends(cld, "symmetricMatrix"))
@@ -180,7 +181,7 @@ setAs("CsparseMatrix", "sparseVector", ## could go via TsparseMatrix, but this i
 	  else if(extends(cld, "triangularMatrix") && from@diag == "U")
 	      from <- .Call(Csparse_diagU2N, from)
           xj <- .Call(Matrix_expand_pointers, from@p)
-	  ii <- if(n < .Machine$integer.max)
+	  ii <- if(int.n)
 	      1L + from@i + d[1] * xj
 	  else
 	      1 + from@i + as.double(d[1]) * xj
@@ -195,6 +196,7 @@ setAs("TsparseMatrix", "sparseVector",
       function(from) {
 	  d <- dim(from)
 	  n <- prod(d) # -> numeric, no integer overflow
+	  if((int.n <- n <= .Machine$integer.max)) n <- as.integer(n)
           cld <- getClassDef(class(from))
 	  kind <- .M.kind(from, cld)
 	  if(extends(cld, "symmetricMatrix"))
@@ -203,7 +205,7 @@ setAs("TsparseMatrix", "sparseVector",
 	      from <- .Call(Tsparse_diagU2N, from)
 	  if(anyDuplicatedT(from, di = d))
 	      from <- uniqTsparse(from)
-	  ii <- if(n < .Machine$integer.max)
+	  ii <- if(int.n)
 	      1L + from@i + d[1] * from@j
 	  else
 	      1 + from@i + as.double(d[1]) * from@j
