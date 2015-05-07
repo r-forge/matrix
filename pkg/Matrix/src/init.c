@@ -76,9 +76,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(pCholesky_validate, 1),
     CALLDEF(Rsparse_validate, 1),
     CALLDEF(diag_tC, 2),
-#ifdef _valid_only_for_old_graph_package
-    CALLDEF(graphNEL_as_dgTMatrix, 2),
-#endif
     CALLDEF(LU_expand, 1),
     CALLDEF(LU_validate, 1),
     CALLDEF(Matrix_expand_pointers, 1),
