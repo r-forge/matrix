@@ -144,7 +144,7 @@ static void *RallocedREAL(SEXP x)
     int lx = LENGTH(rx);
     /* We over-allocate the memory chunk so that it is never NULL. */
     /* The CHOLMOD code checks for a NULL pointer even in the length-0 case. */
-    double *ans = Memcpy((double*)R_alloc(sizeof(double), lx + 1),
+    double *ans = Memcpy((double*)R_alloc(lx + 1, sizeof(double)),
 			 REAL(rx), lx);
     UNPROTECT(1);
     return (void*)ans;
@@ -193,12 +193,12 @@ static void chm2Ralloc(CHM_SP dest, CHM_SP src)
     /* R_alloc the vector storage for dest and copy the contents from src */
     np1 = src->ncol + 1;
     nnz = (int) cholmod_nnz(src, &c);
-    dest->p = (void*) Memcpy((int*)R_alloc(sizeof(int), np1),
+    dest->p = (void*) Memcpy((int*)R_alloc(np1, sizeof(int)),
 			     (int*)(src->p), np1);
-    dest->i = (void*) Memcpy((int*)R_alloc(sizeof(int), nnz),
+    dest->i = (void*) Memcpy((int*)R_alloc(nnz, sizeof(int)),
 			     (int*)(src->i), nnz);
     if(src->xtype)
-	dest->x = (void*) Memcpy((double*)R_alloc(sizeof(double), nnz),
+	dest->x = (void*) Memcpy((double*)R_alloc(nnz, sizeof(double)),
 				 (double*)(src->x), nnz);
 }
 
@@ -214,12 +214,12 @@ static void chTr2Ralloc(CHM_TR dest, CHM_TR src)
 
     /* R_alloc the vector storage for dest and copy the contents from src */
     nnz = src->nnz;
-    dest->i = (void*) Memcpy((int*)R_alloc(sizeof(int), nnz),
+    dest->i = (void*) Memcpy((int*)R_alloc(nnz, sizeof(int)),
 			     (int*)(src->i), nnz);
-    dest->j = (void*) Memcpy((int*)R_alloc(sizeof(int), nnz),
+    dest->j = (void*) Memcpy((int*)R_alloc(nnz, sizeof(int)),
 			     (int*)(src->j), nnz);
     if(src->xtype)
-	dest->x = (void*) Memcpy((double*)R_alloc(sizeof(double), nnz),
+	dest->x = (void*) Memcpy((double*)R_alloc(nnz, sizeof(double)),
 				 (double*)(src->x), nnz);
 }
 
