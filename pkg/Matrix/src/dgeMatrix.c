@@ -118,10 +118,13 @@ double* gematrix_real_x(SEXP x, int nn) {
 #ifdef _potentically_more_efficient_but_not_working
     // else : 'l' or 'n' (for now !!)
     int *xi = INTEGER(GET_SLOT(x, Matrix_xSym));
-    double *x_x = Alloca(nn, double);
-    R_CheckStack();
+    double *x_x;
+    C_or_Alloca_TO(x_x, nn, double);
     for(int i=0; i < nn; i++)
 	x_x[i] = (double) xi[i];
+
+    // FIXME: this is not possible either; the *caller* would have to Free(.)
+    if(nn >= SMALL_4_Alloca) Free(x_x);
 #else
     // ideally should be PROTECT()ed ==> make sure R does not run gc() now!
     double *x_x = REAL(coerceVector(GET_SLOT(x, Matrix_xSym), REALSXP));
@@ -615,8 +618,8 @@ SEXP dgeMatrix_svd(SEXP x, SEXP nnu, SEXP nnv)
 	int m = dims[0], n = dims[1], mm = (m < n)?m:n,
 	    lwork = -1, info;
 	double tmp, *work;
-	int *iwork = Alloca(8 * mm, int);
-	R_CheckStack();
+	int *iwork, n_iw = 8 * mm;
+	C_or_Alloca_TO(iwork, n_iw, int);
 
 	SET_VECTOR_ELT(val, 0, allocVector(REALSXP, mm));
 	SET_VECTOR_ELT(val, 1, allocMatrix(REALSXP, m, mm));
@@ -627,14 +630,16 @@ SEXP dgeMatrix_svd(SEXP x, SEXP nnu, SEXP nnv)
 			 REAL(VECTOR_ELT(val, 2)), &mm,
 			 &tmp, &lwork, iwork, &info);
 	lwork = (int) tmp;
-	work = Alloca(lwork, double);
-	R_CheckStack();
+	C_or_Alloca_TO(work, lwork, double);
+
 	F77_CALL(dgesdd)("S", &m, &n, xx, &m,
 			 REAL(VECTOR_ELT(val, 0)),
 			 REAL(VECTOR_ELT(val, 1)), &m,
 			 REAL(VECTOR_ELT(val, 2)), &mm,
 			 work, &lwork, iwork, &info);
 
+	if(n_iw  >= SMALL_4_Alloca) Free(iwork);
+	if(lwork >= SMALL_4_Alloca) Free(work);
     }
     UNPROTECT(1);
     return val;
@@ -823,12 +828,13 @@ SEXP dgeMatrix_Schur(SEXP x, SEXP vectors, SEXP isDGE)
 		    &tmp, &lwork, (int *) NULL, &info);
     if (info) error(_("dgeMatrix_Schur: first call to dgees failed"));
     lwork = (int) tmp;
-    work = Alloca(lwork, double);
-    R_CheckStack();
+    C_or_Alloca_TO(work, lwork, double);
+
     F77_CALL(dgees)(vecs ? "V" : "N", "N", NULL, dims, REAL(VECTOR_ELT(val, 2)), dims,
 		    &izero, REAL(VECTOR_ELT(val, 0)), REAL(VECTOR_ELT(val, 1)),
 		    REAL(VECTOR_ELT(val, 3)), dims, work, &lwork,
 		    (int *) NULL, &info);
+    if(lwork >= SMALL_4_Alloca) Free(work);
     if (info) error(_("dgeMatrix_Schur: dgees returned code %d"), info);
     UNPROTECT(nprot);
     return val;
@@ -864,8 +870,9 @@ SEXP dgeMatrix_colsums(SEXP x, SEXP naRmP, SEXP cols, SEXP mean)
 	}
     } else { /* row(Sums|Means) : */
 	Rboolean do_count = (!keepNA) && doMean;
-	int *cnt = do_count ? Alloca(m, int) : (int*) NULL;
-	R_CheckStack();
+	int *cnt = (int*) NULL;
+	if(do_count) { C_or_Alloca_TO(cnt, m, int); }
+
 	// (taking care to access x contiguously: vary i inside j)
 	for (i = 0; i < m; i++) {
 	    aa[i] = 0.;
@@ -890,6 +897,7 @@ SEXP dgeMatrix_colsums(SEXP x, SEXP naRmP, SEXP cols, SEXP mean)
 		for (i = 0; i < m; i++)
 		    aa[i] = (cnt[i] > 0) ? aa[i]/cnt[i] : NA_REAL;
 	}
+	if(do_count && m >= SMALL_4_Alloca) Free(cnt);
     }
 
     UNPROTECT(1);

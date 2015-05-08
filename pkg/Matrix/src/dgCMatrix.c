@@ -420,9 +420,8 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
     CSP L, U;
     int *bdims = INTEGER(GET_SLOT(ans, Matrix_DimSym)), *p, *q;
     int j, n = bdims[0], nrhs = bdims[1];
-    double *ax = REAL(GET_SLOT(ans, Matrix_xSym)),
-	*x = Alloca(n, double);
-    R_CheckStack();
+    double *x, *ax = REAL(GET_SLOT(ans, Matrix_xSym));
+    C_or_Alloca_TO(x, n, double);
 
     if (isNull(lu = get_factors(Ap, "LU"))) {
 	install_lu(Ap, /* order = */ 1, /* tol = */ 1.0, /* err_sing = */ TRUE);
@@ -449,6 +448,7 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
 		Memcpy(ax + j * n, x, n);
 	}
     }
+    if(n >= SMALL_4_Alloca) Free(x);
     UNPROTECT(1);
     return ans;
 }
