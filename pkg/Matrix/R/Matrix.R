@@ -44,6 +44,7 @@ setMethod("drop", signature(x = "Matrix"),
 setMethod("as.vector", signature(x = "Matrix", mode = "missing"),
 	  function(x, mode) as.vector(as(x, "matrix"), mode))
 ## so base functions calling as.vector() work too:
+## S3 dispatch works for base::as.vector(), but S4 dispatch does not
 as.vector.Matrix <- function(x, mode) as.vector(as(x, "matrix"), mode)
 
 setAs("Matrix", "vector",  function(from) as.vector (as(from, "matrix")))

@@ -86,13 +86,22 @@ setMethod("is.finite", signature(x = "sparseVector"),
 sp2vec <- function(x, mode = .type.kind[.M.kindC(cl)]) {
     ## sparseVector  ->  vector
     cl <- class(x)
+    has.x <- any(.slotNames(cl) == "x") # cheap test for 'has x slot'
+    m.any <- (mode == "any")
+    if(m.any)
+	mode <- if(has.x) mode(x@x) else "logical"
     r <- vector(mode, x@length)
     r[x@i] <-
-	if(any(.slotNames(cl) == "x")) { # cheap test for 'has x slot'
-	    if(is(x@x, mode)) x@x else as(x@x, mode)
+	if(has.x) {
+	    if(m.any || is(x@x, mode)) x@x else as(x@x, mode)
 	} else TRUE
     r
 }
+
+## so base functions calling as.vector() work too:
+## S3 dispatch works for base::as.vector(), but S4 dispatch does not:
+as.vector.sparseVector <- sp2vec
+as.array.sparseVector <- as.matrix.sparseVector <- function(x, ...) .sparseV2Mat(x)
 
 ##' Construct new sparse vector , *dropping* zeros
 
