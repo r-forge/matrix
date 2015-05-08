@@ -80,8 +80,11 @@ if(FALSE) { ## TODO -- once R itself does better ...
 E <- rep(c(TRUE,NA,TRUE), length=8)
 F <- new("nsparseVector", length = 8L, i = c(2L, 5L, 8L))
 e <- as(E, "sparseVector"); f <- as(F,"lsparseVector")
+Fv <- as.vector(F, "any") # failed in Matrix <= 1.2.0, and base::as.vector(.) failed too:
 stopifnot(E | as.vector(F), identical(E | F, F | E),
           all(e | f), all(E | F)) # <- failed  Ops.spv.spv
+	  identical(Fv, base::as.vector(F)),
+	  is.logical(Fv), which(Fv) == c(2,5,8))
 
 dT <- new("dgTMatrix",
 	  i = c(1:2,1:2), j=rep(1:2, each=2), Dim = c(4L, 4L), x = c(1, 1, NA, 2))
