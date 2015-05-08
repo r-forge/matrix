@@ -39,11 +39,11 @@ void sparseQR_Qmult(cs *V, double *beta, int *p, int trans,
 		    double *y, int *ydims)
 {
     int j, k, m = V->m, n = V->n;
-    double *x = Alloca(m, double);	/* workspace */
-    R_CheckStack();
+    double *x; // workspace
 
     if (ydims[0] != m)
 	error(_("sparseQR_Qmult(): nrow(y) = %d != %d = nrow(V)"), ydims[0], m);
+    C_or_Alloca_TO(x, m, double);
     for (j = 0; j < ydims[1]; j++) {
 	double *yj = y + j * m;
 	if (trans) {
@@ -58,6 +58,7 @@ void sparseQR_Qmult(cs *V, double *beta, int *p, int trans,
 	    Memcpy(yj, x, m);
 	}
     }
+    if(m >= SMALL_4_Alloca) Free(x);
 }
 
 
@@ -144,8 +145,8 @@ SEXP sparseQR_coef(SEXP qr, SEXP y)
 
   // FIXME: check  n_R, M (= R->m)   vs  n, m
     int *q = INTEGER(qslot), lq = LENGTH(qslot), n_R = R->n;
-    double *x = Alloca(M, double);
-    R_CheckStack();
+    double *x;
+    C_or_Alloca_TO(x, M, double);
     for (int j = 0; j < n; j++) {
 	double *aj = ax + j * M;
 	cs_usolve(R, aj);
@@ -154,6 +155,7 @@ SEXP sparseQR_coef(SEXP qr, SEXP y)
 	    Memcpy(aj, x, n_R);
 	}
     }
+    if(M >= SMALL_4_Alloca) Free(x);
 
     if(rank_def) {
 	warning(_("%s(): structurally rank deficient case: possibly WRONG zeros"),

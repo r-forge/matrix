@@ -40,6 +40,17 @@ extern "C" {
 
 #define Alloca(n, t)   (t *) alloca( (size_t) ( (n) * sizeof(t) ) )
 
+#define SMALL_4_Alloca 10000
+//			==== R uses the same cutoff in several places
+
+#define C_or_Alloca_TO(_VAR_, _N_, _TYPE_)			\
+	if(_N_ < SMALL_4_Alloca) {				\
+	    _VAR_ = Alloca(_N_, _TYPE_);  R_CheckStack();	\
+	} else {						\
+	    _VAR_ = Calloc(_N_, _TYPE_);			\
+	}
+// and user needs to   if(_N_ >= SMALL_4_Alloca)  Free(_VAR_);
+
 SEXP triangularMatrix_validate(SEXP obj);
 SEXP symmetricMatrix_validate(SEXP obj);
 SEXP dense_nonpacked_validate(SEXP obj);
