@@ -82,7 +82,7 @@ F <- new("nsparseVector", length = 8L, i = c(2L, 5L, 8L))
 e <- as(E, "sparseVector"); f <- as(F,"lsparseVector")
 Fv <- as.vector(F, "any") # failed in Matrix <= 1.2.0, and base::as.vector(.) failed too:
 stopifnot(E | as.vector(F), identical(E | F, F | E),
-          all(e | f), all(E | F)) # <- failed  Ops.spv.spv
+	  all(e | f), all(E | F), # <- failed  Ops.spv.spv
 	  identical(Fv, base::as.vector(F)),
 	  is.logical(Fv), which(Fv) == c(2,5,8))
 
