@@ -10,12 +10,16 @@
   \subsection{New Features}{
     \itemize{
       \item better \file{NEWS.Rd} (which pleases Kurt and \command{tidy} ;-)
+      \item \code{as.vector(<sparseVector>)} etc, now work, too.
     }
   }
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{S[] <- T} and \code{S[] <- spV} now work (in more cases)
       for sparse matrices S, T and sparseVector \code{spV}.
+      \item Huge dense matrix multiplication did lead to segfaults, see
+      R-help, \dQuote{does segfault mean (always) a bug?}, May 5, 2015.
+      Fixed by using C's Alloca() only in smallish cases.
     }
   }
 }
