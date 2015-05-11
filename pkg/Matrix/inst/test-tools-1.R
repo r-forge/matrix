@@ -251,6 +251,7 @@ assert.EQ <- function(target, current, tol = if(showOnly) 0 else 1e-15,
 	if(!isTRUE(ae0)) writeLines(ae0)
     }
     if(!T) stop("all.equal() |-> ", paste(ae, collapse=sprintf("%-19s","\n")))
+    else if(giveRE) invisible(ae0)
 }
 
 ##' a version with other "useful" defaults (tol, giveRE, check.attr..)
