@@ -20,6 +20,9 @@
       \item Huge dense matrix multiplication did lead to segfaults, see
       R-help, \dQuote{does segfault mean (always) a bug?}, May 5, 2015.
       Fixed by using C's Alloca() only in smallish cases.
+      \item Optional arguments in \code{image()}, e.g., \code{main=
+	<..>)} now also work \code{lgCMatrix}, \code{nMatrix} etc;
+      thanks to a 4.5 years old report by Mstislav Elagin.
     }
   }
 }
