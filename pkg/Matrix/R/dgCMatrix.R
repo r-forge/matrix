@@ -24,11 +24,7 @@ setAs("dgCMatrix", "lgCMatrix",
 	  r
       })
 
-setMethod("image", "dgCMatrix",
-	  function(x, ...) {
-	      x <- as(x, "dgTMatrix")
-	      callGeneric()
-	  })
+setMethod("image", "dgCMatrix", function(x, ...) image(as(x, "dgTMatrix"), ...))
 
 ## Group Methods, see ?Arith (e.g.)
 ## -----
