@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Matrix 1.2-0\n"
+"Project-Id-Version: Matrix 1.2-1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-31 17:23+0200\n"
+"POT-Creation-Date: 2015-05-12 16:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -262,7 +262,7 @@ msgstr ""
 msgid "'uplo' must be UPP or LOW"
 msgstr ""
 
-#: Mutils.c:417 dgeMatrix.c:423 dtrMatrix.c:239
+#: Mutils.c:417 dgeMatrix.c:426 dtrMatrix.c:239
 msgid "replacement diagonal has wrong length"
 msgstr ""
 
@@ -352,7 +352,7 @@ msgstr ""
 msgid "the number of columns differ in R_rbind2_vector: %d != %d"
 msgstr ""
 
-#: Mutils.c:1158 Mutils.c:1191
+#: Mutils.c:1132 Mutils.c:1163 Mutils.c:1174 Mutils.c:1201
 msgid "Argument must be numeric-like atomic vector"
 msgstr ""
 
@@ -518,22 +518,22 @@ msgstr ""
 msgid "invalid class of 'x' in Matrix_as_cs(a, x)"
 msgstr ""
 
-#: cs_utils.c:126 cs_utils.c:170 cs_utils.c:185 cs_utils.c:205 cs_utils.c:218
+#: cs_utils.c:127 cs_utils.c:174 cs_utils.c:189 cs_utils.c:209 cs_utils.c:222
 #, c-format
 msgid "invalid class of object to %s"
 msgstr ""
 
-#: cs_utils.c:139
+#: cs_utils.c:141
 #, c-format
 msgid "cs matrix not compatible with class '%s'"
 msgstr ""
 
-#: cs_utils.c:242 cs_utils.c:261
+#: cs_utils.c:246 cs_utils.c:265
 #, c-format
 msgid "Inappropriate class cl='%s' in Matrix_css_to_SEXP(S, cl, ..)"
 msgstr ""
 
-#: cs_utils.c:287 cs_utils.c:306
+#: cs_utils.c:292 cs_utils.c:311
 #, c-format
 msgid "Inappropriate class cl='%s' in Matrix_csn_to_SEXP(S, cl, ..)"
 msgstr ""
@@ -575,64 +575,64 @@ msgstr ""
 msgid "Lapack routine dposv returned error code %d"
 msgstr ""
 
-#: dense.c:159
+#: dense.c:158
 #, c-format
 msgid "First call to Lapack routine dgels returned error code %d"
 msgstr ""
 
-#: dense.c:166
+#: dense.c:165
 #, c-format
 msgid "Second call to Lapack routine dgels returned error code %d"
 msgstr ""
 
-#: dense.c:179
+#: dense.c:178
 msgid "X must be a real (numeric) matrix"
 msgstr ""
 
-#: dense.c:180
+#: dense.c:179
 #, c-format
 msgid "tol, given as %g, must be non-negative"
 msgstr ""
 
-#: dense.c:181
+#: dense.c:180
 #, c-format
 msgid "tol, given as %g, must be <= 1"
 msgstr ""
 
-#: dense.c:205
+#: dense.c:204
 #, c-format
 msgid "First call to dgeqrf returned error code %d"
 msgstr ""
 
-#: dense.c:211
+#: dense.c:210
 #, c-format
 msgid "Second call to dgeqrf returned error code %d"
 msgstr ""
 
-#: dense.c:216 dense.c:236
+#: dense.c:215 dense.c:235
 #, c-format
 msgid "Lapack routine dtrcon returned error code %d"
 msgstr ""
 
-#: dense.c:285
+#: dense.c:284
 #, c-format
 msgid "Lower band %d > upper band %d"
 msgstr ""
 
-#: dense.c:356
+#: dense.c:355
 msgid "ddense_to_symmetric(): matrix is not square!"
 msgstr ""
 
-#: dense.c:367
+#: dense.c:366
 #, c-format
 msgid "matrix is not symmetric [%d,%d]"
 msgstr ""
 
-#: dense.c:428
+#: dense.c:427
 msgid "matrix is not square! (symmetric part)"
 msgstr ""
 
-#: dense.c:486
+#: dense.c:485
 msgid "matrix is not square! (skew-symmetric part)"
 msgstr ""
 
@@ -658,8 +658,8 @@ msgstr ""
 msgid "dgCMatrix_lusol requires a square, non-empty matrix"
 msgstr ""
 
-#: dgCMatrix.c:159 dgCMatrix.c:186 dgCMatrix.c:436 dgCMatrix.c:476
-#: dgeMatrix.c:594 dpoMatrix.c:95 dpoMatrix.c:120 dppMatrix.c:80
+#: dgCMatrix.c:159 dgCMatrix.c:186 dgCMatrix.c:462 dgCMatrix.c:503
+#: dgeMatrix.c:597 dpoMatrix.c:95 dpoMatrix.c:120 dppMatrix.c:80
 #: dspMatrix.c:78 dsyMatrix.c:79 dtCMatrix.c:90 dtCMatrix.c:120 dtrMatrix.c:91
 msgid "Dimensions of system to be solved are inconsistent"
 msgstr ""
@@ -689,45 +689,49 @@ msgstr ""
 msgid "cs_sqr failed"
 msgstr ""
 
-#: dgCMatrix.c:232
+#: dgCMatrix.c:230
+msgid "dgcMatrix_QR(*, keep_dimnames = NA): NA taken as TRUE"
+msgstr ""
+
+#: dgCMatrix.c:236
 msgid "cs_qr failed"
 msgstr ""
 
-#: dgCMatrix.c:295
+#: dgCMatrix.c:318
 msgid "SuiteSparseQR_C_QR returned an error code"
 msgstr ""
 
-#: dgCMatrix.c:339
+#: dgCMatrix.c:362
 msgid "LU decomposition applies only to square matrices"
 msgstr ""
 
-#: dgCMatrix.c:348
+#: dgCMatrix.c:371
 msgid "cs_lu(A) failed: near-singular A (or out of memory)"
 msgstr ""
 
-#: dgCMatrix.c:408
+#: dgCMatrix.c:434
 msgid "dgCMatrix_matrix_solve(.., sparse=TRUE) not yet implemented"
 msgstr ""
 
-#: dgCMatrix.c:474
+#: dgCMatrix.c:501
 msgid "dgCMatrix_cholsol requires a 'short, wide' rectangular matrix"
 msgstr ""
 
-#: dgCMatrix.c:482
+#: dgCMatrix.c:509
 msgid "cholmod_sdmult error (rhs)"
 msgstr ""
 
-#: dgCMatrix.c:485
+#: dgCMatrix.c:512
 #, c-format
 msgid "cholmod_factorize failed: status %d, minor %d from ncol %d"
 msgstr ""
 
-#: dgCMatrix.c:489
+#: dgCMatrix.c:516
 #, c-format
 msgid "cholmod_solve (CHOLMOD_A) failed: status %d, minor %d from ncol %d"
 msgstr ""
 
-#: dgCMatrix.c:506
+#: dgCMatrix.c:533
 msgid "cholmod_sdmult error (resid)"
 msgstr ""
 
@@ -762,94 +766,94 @@ msgstr ""
 msgid "rcond requires a square, non-empty matrix"
 msgstr ""
 
-#: dgeMatrix.c:162 dgeMatrix.c:255
+#: dgeMatrix.c:165 dgeMatrix.c:258
 #, c-format
 msgid "Dimensions of x and y are not compatible for %s"
 msgstr ""
 
-#: dgeMatrix.c:234
+#: dgeMatrix.c:237
 msgid "Argument y must be numeric, integer or logical"
 msgstr ""
 
-#: dgeMatrix.c:317 dgeMatrix.c:321 dspMatrix.c:152 dsyMatrix.c:116
+#: dgeMatrix.c:320 dgeMatrix.c:324 dspMatrix.c:154 dsyMatrix.c:119
 #: dtrMatrix.c:115
 msgid "Matrices are not conformable for multiplication"
 msgstr ""
 
-#: dgeMatrix.c:459
+#: dgeMatrix.c:462
 msgid "diagonal to be added has wrong length"
 msgstr ""
 
-#: dgeMatrix.c:478
+#: dgeMatrix.c:481
 msgid "Cannot factor a matrix with zero extents"
 msgstr ""
 
-#: dgeMatrix.c:488 dpoMatrix.c:46 dppMatrix.c:36 dspMatrix.c:181
+#: dgeMatrix.c:491 dpoMatrix.c:46 dppMatrix.c:36 dspMatrix.c:183
 #, c-format
 msgid "Lapack routine %s returned error code %d"
 msgstr ""
 
-#: dgeMatrix.c:490
+#: dgeMatrix.c:493
 #, c-format
 msgid "Exact singularity detected during LU decomposition: %s, i=%d."
 msgstr ""
 
-#: dgeMatrix.c:512
+#: dgeMatrix.c:515
 msgid "Determinant requires a square matrix"
 msgstr ""
 
-#: dgeMatrix.c:554
+#: dgeMatrix.c:557
 msgid "Solve requires a square matrix"
 msgstr ""
 
-#: dgeMatrix.c:567
+#: dgeMatrix.c:570
 #, c-format
 msgid "error [%d] from Lapack 'dgecon()'"
 msgstr ""
 
-#: dgeMatrix.c:569
+#: dgeMatrix.c:572
 #, c-format
 msgid ""
 "Lapack dgecon(): system computationally singular, reciprocal condition "
 "number = %g"
 msgstr ""
 
-#: dgeMatrix.c:579
+#: dgeMatrix.c:582
 msgid "Lapack routine dgetri: system is exactly singular"
 msgstr ""
 
-#: dgeMatrix.c:600
+#: dgeMatrix.c:603
 msgid "Lapack routine dgetrs: system is exactly singular"
 msgstr ""
 
-#: dgeMatrix.c:681
+#: dgeMatrix.c:686
 msgid "Matrix exponential requires square, non-null matrix"
 msgstr ""
 
-#: dgeMatrix.c:698 dgeMatrix.c:700
+#: dgeMatrix.c:703 dgeMatrix.c:705
 #, c-format
 msgid "dgeMatrix_exp: LAPACK routine dgebal returned %d"
 msgstr ""
 
-#: dgeMatrix.c:738
+#: dgeMatrix.c:743
 #, c-format
 msgid "dgeMatrix_exp: dgetrf returned error code %d"
 msgstr ""
 
-#: dgeMatrix.c:740
+#: dgeMatrix.c:745
 #, c-format
 msgid "dgeMatrix_exp: dgetrs returned error code %d"
 msgstr ""
 
-#: dgeMatrix.c:813
+#: dgeMatrix.c:818
 msgid "dgeMatrix_Schur: argument x must be a non-null square matrix"
 msgstr ""
 
-#: dgeMatrix.c:824
+#: dgeMatrix.c:829
 msgid "dgeMatrix_Schur: first call to dgees failed"
 msgstr ""
 
-#: dgeMatrix.c:832
+#: dgeMatrix.c:838
 #, c-format
 msgid "dgeMatrix_Schur: dgees returned code %d"
 msgstr ""
@@ -892,6 +896,11 @@ msgstr ""
 msgid "Incorrect length of 'x' slot"
 msgstr ""
 
+#: dspMatrix.c:146 dsyMatrix.c:112
+#, c-format
+msgid "Matrix dimension %d x %d (= %g) is too large"
+msgstr ""
+
 #: dsyMatrix.c:7 dtrMatrix.c:10
 msgid "'Dim' slot has length less than two"
 msgstr ""
@@ -900,7 +909,7 @@ msgstr ""
 msgid "Matrix is not square"
 msgstr ""
 
-#: dsyMatrix.c:158
+#: dsyMatrix.c:164
 #, c-format
 msgid "Lapack routine dsytrf returned error code %d"
 msgstr ""
@@ -962,12 +971,12 @@ msgstr ""
 msgid "length(q) must be zero or ncol(R)"
 msgstr ""
 
-#: sparseQR.c:46
+#: sparseQR.c:45
 #, c-format
 msgid "sparseQR_Qmult(): nrow(y) = %d != %d = nrow(V)"
 msgstr ""
 
-#: sparseQR.c:121 sparseQR.c:159 sparseQR.c:195
+#: sparseQR.c:122 sparseQR.c:161 sparseQR.c:197
 #, c-format
 msgid "%s(): structurally rank deficient case: possibly WRONG zeros"
 msgstr ""
