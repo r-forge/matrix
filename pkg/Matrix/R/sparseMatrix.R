@@ -170,9 +170,7 @@ graph2T <- function(from, use.weights =
     dm <- rep.int(length(nd), 2)
     edge2i <- function(e) {
 	## return (0-based) row indices 'i'
-	rep.int(0:(dm[1]-1L),
-		## lens <-
-		vapply(e, length, 0))
+	rep.int(0:(dm[1]-1L), lengths(e))
     }
 
     if(use.weights) {

@@ -189,7 +189,7 @@ intI <- function(i, n, dn, give.dn = TRUE)
 	   i0 = i0, anyDup = anyDup, dn = intIlist$dn),
       ## actually,  iDup  is rarely needed in calling code
       if(anyDup) list(iDup = iDup, i0i = i0i, i.x = i.x,
-		      jm = unlist(jm), i.xtra = rep.int(i.x, sapply(jm, length))))
+		      jm = unlist(jm), i.xtra = rep.int(i.x, lengths(jm))))
 } ## {.ind.prep}
 
 ##' <description>
