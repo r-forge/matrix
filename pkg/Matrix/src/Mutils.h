@@ -54,6 +54,9 @@ extern "C" {
 SEXP triangularMatrix_validate(SEXP obj);
 SEXP symmetricMatrix_validate(SEXP obj);
 SEXP dense_nonpacked_validate(SEXP obj);
+SEXP dim_validate(SEXP Dim, const char* name);
+SEXP Dim_validate(SEXP obj, SEXP name);
+SEXP dimNames_validate(SEXP obj);
 
 // La_norm_type() & La_rcond_type()  have been in R_ext/Lapack.h
 //  but have still not been available to package writers ...

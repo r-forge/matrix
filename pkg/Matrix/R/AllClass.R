@@ -8,22 +8,38 @@ setClass("Matrix",
 	 representation(Dim = "integer", Dimnames = "list", "VIRTUAL"),
 	 prototype = prototype(Dim = integer(2), Dimnames = list(NULL,NULL)),
 	 validity = function(object) {
-	     Dim <- object@Dim
-	     if (length(Dim) != 2)
-		 return("Dim slot must be of length 2")
-	     if (any(Dim < 0))
-		 return("Dim slot must contain non-negative values")
-	     Dn <- object@Dimnames
-	     if (!is.list(Dn) || length(Dn) != 2)
-		 return("'Dimnames' slot must be list of length 2")
-	     lDn <- sapply(Dn, length)
-	     if (lDn[1] > 0 && lDn[1] != Dim[1])
-		 return("length(Dimnames[[1]])' must match Dim[1]")
-	     if (lDn[2] > 0 && lDn[2] != Dim[2])
-		 return("length(Dimnames[[2]])' must match Dim[2]")
-	     ## 'else'	ok :
-	     TRUE
+	     if(!isTRUE(r <- .Call(Dim_validate, object, "Matrix")))
+                 r
+             else .Call(dimNames_validate, object)
 	 })
+
+if(getRversion() >= "3.2.0") {
+setMethod("initialize", "Matrix", function(.Object, ...)
+    {
+        .Object <- callNextMethod()
+        if(length(args <- list(...)) &&
+           any(nzchar(snames <- names(args))) && "Dimnames" %in% snames &&
+           !identical(dimNms <- .Object@Dimnames, list(NULL,NULL)) &&
+	   any(i0 <- lengths(dimNms) == 0) && !all(vapply(dimNms[i0], is.null, NA))) {
+	    ## replace character(0) etc, by NULL :
+	    .Object@Dimnames[i0] <- list(NULL)
+	}
+        .Object
+    })
+} else { ## R < 3.2.0
+setMethod("initialize", "Matrix", function(.Object, ...)
+    {
+        .Object <- callNextMethod(.Object, ...)
+        if(length(args <- list(...)) &&
+           any(nzchar(snames <- names(args))) && "Dimnames" %in% snames &&
+           !identical(dimNms <- .Object@Dimnames, list(NULL,NULL)) &&
+	   any(i0 <- lengths(dimNms) == 0) && !all(vapply(dimNms[i0], is.null, NA))) {
+	    ## replace character(0) etc, by NULL :
+	    .Object@Dimnames[i0] <- list(NULL)
+	}
+        .Object
+    })
+}
 
 ## The class of composite matrices - i.e. those for which it makes sense to
 ## create a factorization
@@ -173,9 +189,7 @@ setClass("geMatrix", representation("VIRTUAL"),
 ## numeric, dense, general matrices
 setClass("dgeMatrix", contains = c("ddenseMatrix", "generalMatrix"),
 	 ## checks that length( @ x) == prod( @ Dim):
-	 validity =
-	 function(object) .Call(dgeMatrix_validate, object)
-	 )
+	 validity = function(object) .Call(dgeMatrix_validate, object))
 ## i.e. "dgeMatrix" cannot be packed, but "ddenseMatrix" can ..
 
 ## numeric, dense, non-packed, triangular matrices
@@ -186,9 +200,8 @@ setClass("dtrMatrix",
 ## numeric, dense, packed, triangular matrices
 setClass("dtpMatrix",
 	 contains = c("ddenseMatrix", "triangularMatrix"),
-	 validity =
-	 function(object) .Call(dtpMatrix_validate, object)
-	 )
+	 validity = function(object) .Call(dtpMatrix_validate, object))
+
 
 ## numeric, dense, non-packed symmetric matrices
 setClass("dsyMatrix",
@@ -198,9 +211,7 @@ setClass("dsyMatrix",
 ## numeric, dense, packed symmetric matrices
 setClass("dspMatrix",
 	 contains = c("ddenseMatrix", "symmetricMatrix"),
-	 validity =
-	 function(object) .Call(dspMatrix_validate, object)
-	 )
+	 validity = function(object) .Call(dspMatrix_validate, object))
 
 ## numeric, dense, non-packed, positive-definite, symmetric matrices
 setClass("dpoMatrix", contains = "dsyMatrix",
@@ -576,7 +587,8 @@ setClass("pMatrix", representation(perm = "integer"),
 ### Factorization classes ---------------------------------------------
 
 ## Mother class:
-setClass("MatrixFactorization", representation(Dim = "integer", "VIRTUAL"))
+setClass("MatrixFactorization", representation(Dim = "integer", "VIRTUAL"),
+	 validity = function(object) .Call(MatrixFactorization_validate, object))
 
 setClass("CholeskyFactorization", representation = "VIRTUAL",
          contains = "MatrixFactorization")
@@ -593,15 +605,12 @@ setClass("pCholesky", contains = c("dtpMatrix", "CholeskyFactorization"))
 setClass("BunchKaufman",
 	 contains = c("dtrMatrix", "MatrixFactorization"),
 	 representation(perm = "integer"),
-	 validity =
-	 function(object) .Call(BunchKaufman_validate, object)
-	 )
+	 validity = function(object) .Call(BunchKaufman_validate, object))
 
 setClass("pBunchKaufman",
 	 contains = c("dtpMatrix", "MatrixFactorization"),
 	 representation(perm = "integer"),
-	 validity =
-	 function(object) .Call(pBunchKaufman_validate, object))
+	 validity = function(object) .Call(pBunchKaufman_validate, object))
 
 ## -- the usual ``non-Matrix'' factorizations : ---------
 
@@ -636,7 +645,7 @@ setClass("nCHMsimpl", contains = "CHMsimpl")
 setClass("LU", contains = "MatrixFactorization", representation("VIRTUAL"))
 
 setClass("denseLU", contains = "LU",
-	 representation(x = "numeric", perm = "integer"),
+	 representation(x = "numeric", perm = "integer", Dimnames = "list"),
 	 validity = function(object) .Call(LU_validate, object))
 
 setClass("sparseLU", contains = "LU",
@@ -835,10 +844,29 @@ setClass("sparseVector",
          })
 
 ##' initialization -- ensuring that  'i' is sorted (and 'x' alongside)
+if(getRversion() >= "3.2.0") {
 setMethod("initialize", "sparseVector", function(.Object, i, x, ...)
       {
-	  ## NB: could simplify for R(-devel) >= 2015-01-14 (i.e. >= 3.2.0),
-	  ##	 assigning 'i' and 'x' and calling  callNextMethod() {w/o arg.s}
+	  has.x <- !missing(x)
+	  if(!missing(i)) {
+	      i <- ## (be careful to assign in all cases)
+		  if(is.unsorted(i, strictly=TRUE)) {
+		      if(is(.Object, "xsparseVector") && has.x) {
+			  si <- sort.int(i, index.return=TRUE)
+			  x <- x[si$ix]
+			  si$x
+		      }
+		      else
+			  sort.int(i, method = "quick")
+		  }
+		  else i
+	  }
+	  if(has.x) x <- x
+	  callNextMethod()
+      })
+} else { ## R < 3.2.0
+setMethod("initialize", "sparseVector", function(.Object, i, x, ...)
+      {
 	  has.x <- !missing(x)
 	  if(!missing(i)) {
 	      .Object@i <- ## (be careful to assign in all cases)
@@ -856,6 +884,7 @@ setMethod("initialize", "sparseVector", function(.Object, i, x, ...)
 	  if(has.x) .Object@x <- x
 	  callNextMethod(.Object, ...)
       })
+}
 
 .validXspVec <- function(object) {
     ## n <- object@length

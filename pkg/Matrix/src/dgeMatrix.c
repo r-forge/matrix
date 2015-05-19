@@ -4,29 +4,22 @@ SEXP dMatrix_validate(SEXP obj)
 {
     SEXP x = GET_SLOT(obj, Matrix_xSym),
 	Dim = GET_SLOT(obj, Matrix_DimSym);
-    int m, n;
-
-    if (length(Dim) != 2)
-	return mkString(_("Dim slot must have length 2"));
-    m = INTEGER(Dim)[0]; n = INTEGER(Dim)[1];
-    if (m < 0 || n < 0)
-	return mkString(dngettext("Matrix",
-				  "Negative value in Dim",
-				  "Negative values in Dim",
-				  (m*n > 0) ? 2 : 1));
     if (!isReal(x))
 	return mkString(_("x slot must be numeric \"double\""));
+    SEXP val;
+    if (isString(val = dim_validate(Dim, "Matrix")))
+	return val;
     return ScalarLogical(1);
 }
 
 SEXP dgeMatrix_validate(SEXP obj)
 {
-    SEXP val,
-	fact = GET_SLOT(obj, Matrix_factorSym);
-
+    SEXP val;
+    if (isString(val = dim_validate(GET_SLOT(obj, Matrix_DimSym), "dgeMatrix")))
+	return(val);
     if (isString(val = dense_nonpacked_validate(obj)))
 	return(val);
-
+    SEXP fact = GET_SLOT(obj, Matrix_factorSym);
     if (length(fact) > 0 && getAttrib(fact, R_NamesSymbol) == R_NilValue)
 	return mkString(_("factors slot must be named list"));
     return ScalarLogical(1);
@@ -483,6 +476,7 @@ SEXP dgeMatrix_LU_(SEXP x, Rboolean warn_sing)
     val = PROTECT(NEW_OBJECT(MAKE_CLASS("denseLU")));
     slot_dup(val, x, Matrix_xSym);
     slot_dup(val, x, Matrix_DimSym);
+    slot_dup(val, x, Matrix_DimNamesSym);
     F77_CALL(dgetrf)(dims, dims + 1, REAL(GET_SLOT(val, Matrix_xSym)),
 		     dims,
 		     INTEGER(ALLOC_SLOT(val, Matrix_permSym, INTSXP, npiv)),
