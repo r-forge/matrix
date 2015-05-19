@@ -151,15 +151,27 @@ dimnamesGets <- function (x, value) {
 	lapply(value, function(v) if(!is.null(v)) as.character(v))
     x
 }
-setMethod("dimnames<-", signature(x = "Matrix", value = "list"),
-	  dimnamesGets)
+dimnamesGetsNULL <- function(x) {
+    message("dimnames(.) <- NULL:  translated to \ndimnames(.) <- list(NULL,NULL)  <==>  unname(.)")
+    x@Dimnames <- list(NULL,NULL)
+    x
+}
+setMethod("dimnames<-", signature(x = "compMatrix", value = "list"),
+          function(x, value) { ## "compMatrix" have 'factors' slot
+              if(length(x@factors)) x@factors <- list()
+              dimnamesGets(x, value)
+          })
+setMethod("dimnames<-", signature(x = "Matrix", value = "list"), dimnamesGets)
+
+setMethod("dimnames<-", signature(x = "compMatrix", value = "NULL"),
+          function(x, value) { ## "compMatrix" have 'factors' slot
+              if(length(x@factors)) x@factors <- list()
+              dimnamesGetsNULL(x)
+          })
 
 setMethod("dimnames<-", signature(x = "Matrix", value = "NULL"),
-	  function(x, value) {
-	      message("dimnames(.) <- NULL:  translated to \ndimnames(.) <- list(NULL,NULL)  <==>  unname(.)")
-	      x@Dimnames <- list(NULL,NULL)
-	      x
-	  })
+	  function(x, value) dimnamesGetsNULL(x))
+
 
 setMethod("unname", signature("Matrix", force="missing"),
 	  function(obj) { obj@Dimnames <- list(NULL,NULL); obj})
