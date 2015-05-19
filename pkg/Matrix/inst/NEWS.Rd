@@ -11,6 +11,9 @@
     \itemize{
       \item better \file{NEWS.Rd} (which pleases Kurt and \command{tidy} ;-)
       \item \code{as.vector(<sparseVector>)} etc, now work, too.
+      \item \code{lu(\emph{<sparseMatrix>})} now keeps \code{dimnames}.
+      \item \code{"Matrix"} now has an \code{initialization()} method
+      coercing 0-length dimnames components to \code{NULL}.
     }
   }
   \subsection{Bug Fixes}{
@@ -21,8 +24,10 @@
       R-help, \dQuote{does segfault mean (always) a bug?}, May 5, 2015.
       Fixed by using C's Alloca() only in smallish cases.
       \item Optional arguments in \code{image()}, e.g., \code{main=
-	<..>)} now also work \code{lgCMatrix}, \code{nMatrix} etc;
+	<..>)} now also work for \code{lgCMatrix}, \code{nMatrix} etc;
       thanks to a 4.5 years old report by Mstislav Elagin.
+      \item \code{dimnames(A) <- val} now resets the \code{factors} slot
+      to empty, as the factorizations now keep dimnames more often.
     }
   }
 }

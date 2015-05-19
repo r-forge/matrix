@@ -9,7 +9,8 @@
 lu(x, \dots)
 \S4method{lu}{matrix}(x, warnSing = TRUE, \dots)
 \S4method{lu}{dgeMatrix}(x, warnSing = TRUE, \dots)
-\S4method{lu}{dgCMatrix}(x, errSing = TRUE, order = TRUE, tol = 1, \dots)
+\S4method{lu}{dgCMatrix}(x, errSing = TRUE, order = TRUE, tol = 1,
+   keep.dimnames = TRUE, \dots)
 }
 \description{
   Computes (generalized) triangular decompositions of square (sparse or
@@ -33,6 +34,10 @@ lu(x, \dots)
     you know what you are doing.}
   \item{tol}{positive number indicating the pivoting tolerance used in
     \code{cs_lu}.  Do only change with much care.}
+  \item{keep.dimnames}{logical indicating that \code{\link{dimnames}}
+    should be propagated to the result, i.e., \dQuote{kept}.  This was
+    hardcoded to \code{FALSE} in upto \pkg{Matrix} version 1.2-0.
+    Setting to \code{FALSE} may gain some performance.}
   \item{\dots}{further arguments passed to or from other methods.}
 }
 \value{

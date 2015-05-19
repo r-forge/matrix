@@ -12,26 +12,31 @@ stopifnot(is((Y <- Matrix(y)), "dgeMatrix"))
 md <- as(mm, "matrix")                  # dense
 
 (cS <- system.time(Sq <- qr(mm)))
-(cD <- system.time(Dq <- qr(md))) # 1.1 sec. (lynne, 2011)
+(cD <- system.time(Dq <- qr(md))) # 1.1 sec. (lynne, 2011); 0.535 sec. (lynne, 2014)
 cD[1] / cS[1] # dense is  much ( ~ 100--170 times) slower
 
+## MM__FIXME__: move these functions to ../inst/test-tools.R
 chkQR <- function(a,
                   y = seq_len(nrow(a)),## RHS: made to contain no 0
                   a.qr = qr(a), tol = 1e-11, # 1e-13 failing very rarely (interesting)
                   ##----------
                   Qinv.chk = !sp.rank.def, QtQ.chk = !sp.rank.def,
-                  verbose=getOption("verbose"), giveRE = verbose)
+                  verbose = getOption("Matrix.verbose", FALSE), giveRE = verbose,
+                  quiet = FALSE)
 {
     d <- dim(a)
     stopifnot((n <- d[1]) >= (p <- d[2]), is.numeric(y))
     kind <- if(is.qr(a.qr)) "qr" else
     if(is(a.qr, "sparseQR")) "spQR" else stop("unknown qr() class: ", class(a.qr))
-
+    if(!missing(verbose) && verbose) {
+	op <- options(Matrix.verbose = verbose)
+	on.exit(options(op))
+    }
     ## rank.def <- switch(kind,
     ##     	       "qr"  = a.qr$rank < length(a.qr$pivot),
     ##     	       "spQR" = a.qr@V@Dim[1] > a.qr@Dim[1])
     sp.rank.def <- (kind == "spQR") && (a.qr@V@Dim[1] > a.qr@Dim[1])
-    if(sp.rank.def && (missing(Qinv.chk) || missing(QtQ.chk)))
+    if(sp.rank.def && !quiet && (missing(Qinv.chk) || missing(QtQ.chk)))
 	message("is sparse *structurally* rank deficient:  Qinv.chk=",
 		Qinv.chk,", QtQ.chk=",QtQ.chk)
     if(is.na(QtQ.chk )) QtQ.chk  <- !sp.rank.def
@@ -76,7 +81,10 @@ chk.qr.D.S <- function(d., s., y, Y = Matrix(y), force = FALSE, tol = 1e-10) {
     ## when system is rank deficient, have differing cases, not always just NA <-> 0 coef
     ## FIXME though:  resid & fitted should be well determined
     if(force || !rank.def) stopifnot(
-	is.all.equal3(	    cc	     , drop(qr.coef  (s.,y)), drop(qr.coef  (s.,Y)), tol=tol),
+### FIXME: temporary:
+###	is.all.equal3(	    cc	     , drop(qr.coef  (s.,y)), drop(qr.coef  (s.,Y)), tol=tol),
+	is.all.equal3(	unname( cc ) , drop(qr.coef  (s.,y)), drop(qr.coef  (s.,Y)), tol=tol),
+### END{FIXME}
 	is.all.equal3(qr.resid (d.,y), drop(qr.resid (s.,y)), drop(qr.resid (s.,Y)), tol=tol),
 	is.all.equal3(qr.fitted(d.,y), drop(qr.fitted(s.,y)), drop(qr.fitted(s.,Y)), tol=tol)
 	)

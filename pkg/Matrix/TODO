@@ -13,6 +13,8 @@
 ** TODO qr.R(), qrR() etc currently *lose* column/row names {compared to base R's qr.R}, see,
    	drop0(R. <- qr.R(qx), tol=1e-15) # columns are int b1 c1 c2 b2 c3
    in man/qr-methods.Rd :                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ but there are no colnames!
+** TODO lu() should preserve dimnames in a way such that lu(A) ~= PLU =.= A can rebuild A.
+    R/
 ** TODO M[<sparse 2-column Matrix>] indexing should work (but with a warning: use *dense*!)
 ** TODO doxygen (seed inst/Doxyfile and ../../www/doxygen/UPDATE_me.sh) now _fails_ partly, e.g., for
         ------- e.g., for src/Csparse.c, Csp_dense_products(...)  around lines 600
