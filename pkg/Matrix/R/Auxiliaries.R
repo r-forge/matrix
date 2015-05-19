@@ -1261,7 +1261,7 @@ isTriC <- function(object, upper = NA, ...) {
     ni <- 1:n
     ## the row indices split according to column:
     ilist <- split(object@i, factor(rep.int(ni, diff(object@p)), levels= ni))
-    lil <- unlist(lapply(ilist, length), use.names = FALSE)
+    lil <- lengths(ilist, use.names = FALSE)
     if(any(lil == 0)) {
 	pos <- lil > 0
 	if(!any(pos)) ## matrix of all 0's

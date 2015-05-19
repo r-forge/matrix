@@ -489,7 +489,7 @@ setMethod("[", signature(x = "sparseVector", i = "index"),
                       i.i <- match(ii[iDup], ii)
                       jm <- lapply(i.i, function(.) which(. == m))
                       sel <- c(which(sel), unlist(jm))
-                      x@i <- c(x@i, rep.int(which(iDup), sapply(jm, length)))
+                      x@i <- c(x@i, rep.int(which(iDup), lengths(jm)))
                   }
                   if (has.x)
                       x@x <- x@x[sel]
