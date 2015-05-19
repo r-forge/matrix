@@ -316,6 +316,55 @@ SEXP dense_nonpacked_validate(SEXP obj)
     return ScalarLogical(1);
 }
 
+SEXP dim_validate(SEXP Dim, const char* name) {
+    if (length(Dim) != 2)
+	return mkString(_("Dim slot must have length 2"));
+    if (TYPEOF(Dim) != INTSXP && TYPEOF(Dim) != REALSXP)
+	return mkString(_("Dim slot is not numeric"));
+    int
+	m = INTEGER(Dim)[0],
+	n = INTEGER(Dim)[1];
+    if (m < 0 || n < 0)
+	return mkString(dngettext(name,
+				  "Negative value in Dim",
+				  "Negative values in Dim",
+				  (m*n > 0) ? 2 : 1));
+    return ScalarLogical(1);
+}
+// to be called from R :
+SEXP Dim_validate(SEXP obj, SEXP name) {
+    return dim_validate(GET_SLOT(obj, Matrix_DimSym),
+			CHAR(STRING_ELT(name, 0)));
+}
+
+// obj must have @Dim and @Dimnames. Assume 'Dim' is already checked.
+SEXP dimNames_validate(SEXP obj)
+{
+    int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym));
+    SEXP dmNms = GET_SLOT(obj, Matrix_DimNamesSym);
+    if(!isNewList(dmNms))
+	return mkString(_("Dimnames slot is not a list"));
+    if(length(dmNms) != 2)
+	return mkString(_("Dimnames slot is a list, but not of length 2"));
+    char buf[99];
+    for(int j=0; j < 2; j++) { // x@Dimnames[j] must be NULL or character(length(x@Dim[j]))
+	if(!isNull(VECTOR_ELT(dmNms, j))) {
+	    if(TYPEOF(VECTOR_ELT(dmNms, j)) != STRSXP) {
+		sprintf(buf, _("Dimnames[%d] is not a character vector"), j+1);
+		return mkString(buf);
+	    }
+	    if(LENGTH(VECTOR_ELT(dmNms, j)) != 0 && // character(0) allowed here
+	       LENGTH(VECTOR_ELT(dmNms, j)) != dims[j]) {
+		sprintf(buf, _("length(Dimnames[%d]) differs from Dim[%d] which is %d"),
+			j+1, j+1, dims[j]);
+		return mkString(buf);
+	    }
+	}
+    }
+    return ScalarLogical(1);
+}
+
+
 
 #define PACKED_TO_FULL(TYPE)						\
 TYPE *packed_to_full_ ## TYPE(TYPE *dest, const TYPE *src,		\
