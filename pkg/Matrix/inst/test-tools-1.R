@@ -153,12 +153,14 @@ stopifnotValid <- function(x, class) {
 ## For those cases, need to compare with a version where NA's are replaced by 0
 mkNA.0 <- function(x) { x[is.na(x)] <- 0 ; x }
 
+##' ... : further arguments passed to all.equal() such as 'check.attributes'
+is.all.equal <- function(x,y, tol = .Machine$double.eps^0.5, ...)
+    identical(TRUE, all.equal(x,y, tolerance=tol, ...))
+is.all.equal3 <- function(x,y,z, tol = .Machine$double.eps^0.5, ..)
+    is.all.equal(x,y, tolerance=tol, ...) && is.all.equal(y,z, tolerance=tol, ...)
 
-is.all.equal3 <- function(x,y,z, tol = .Machine$double.eps^0.5)
-    isTRUE(all.equal(x,y, tolerance=tol)) && isTRUE(all.equal(y,z, tolerance=tol))
-
-is.all.equal4 <- function(x,y,z,u, tol = .Machine$double.eps^0.5)
-    is.all.equal3(x,y,z, tol=tol) && isTRUE(all.equal(z,u, tolerance=tol))
+is.all.equal4 <- function(x,y,z,u, tol = .Machine$double.eps^0.5, ...)
+    is.all.equal3(x,y,z, tol=tol, ...) && isTRUE(all.equal(z,u, tolerance=tol, ...))
 
 ## A version of all.equal() for the slots
 all.slot.equal <- function(x,y, ...) {
@@ -314,4 +316,19 @@ chk.matrix <- function(M) {
 isOrthogonal <- function(x, tol = 1e-15) {
     all.equal(diag(as(zapsmall(crossprod(x)), "diagonalMatrix")),
               rep(1, ncol(x)), tolerance = tol)
+}
+
+.M.DN <- Matrix:::.M.DN ## from ../R/Auxiliaries.R :
+dnIdentical <- function(x,y) identical(.M.DN(x), .M.DN(y))
+
+##' @title Are two matrices practically equal - including dimnames
+##' @param M1, M2: two matrices to be compared, maybe of _differing_ class
+##' @param tol
+##' @param dimnames logical indicating if dimnames must be equal
+##' @param ... passed to all.equal(M1, M2)
+##' @return TRUE or FALSE
+is.EQ.mat <- function(M1, M2, tol = 1e-15, dimnames = TRUE, ...) {
+    (if(dimnames) dnIdentical(M1,M2) else TRUE) &&
+    is.all.equal(unname(as(M1, "matrix")),
+                 unname(as(M2, "matrix")), tol=tol, ...)
 }
