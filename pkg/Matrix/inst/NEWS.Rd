@@ -6,7 +6,7 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.2-1 (2015-..-..)}{
+\section{Changes in version 1.2-1 (2015-05-29)}{
   \subsection{New Features}{
     \itemize{
       \item better \file{NEWS.Rd} (which pleases Kurt and \command{tidy} ;-)
@@ -28,6 +28,14 @@
       thanks to a 4.5 years old report by Mstislav Elagin.
       \item \code{dimnames(A) <- val} now resets the \code{factors} slot
       to empty, as the factorizations now keep dimnames more often.
+      \item \code{crossprod(<matrix>, Diagonal(<n>))} works again (and
+      these are tested more systematically).
+      \item Matrix products (\code{\%*\%}, \code{crossprod}, and
+      \code{tcrossprod}) for \code{"dtrMatrix"} are correct in all
+      cases, including keeping dimnames.
+      \item \code{Matrix(d)} (and other coercions to \code{"Matrix"})
+      now correctly keeps \code{dimnames} also when \code{d} is a
+      traditional \emph{diagonal} \code{"matrix"}.
     }
   }
 }

@@ -187,9 +187,8 @@ SEXP CMatrix_set_Dim(SEXP x, int nrow)
 #endif	/* unused */
 
 /* Fill in the "trivial remainder" in  n*m  array ;
- *  typically the 'x' slot of a "dtrMatrix" :
- * But should be usable for double/logical/int/complex : */
-
+ *  typically the 'x' slot of a "dtrMatrix", such that
+ *  it should be usable for double/logical/int/complex : */
 #define MAKE_TRIANGULAR_BODY(_TO_, _FROM_, _ZERO_, _ONE_)	\
 {								\
     int i, j, *dims = INTEGER(GET_SLOT(_FROM_, Matrix_DimSym));	\

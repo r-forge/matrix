@@ -52,6 +52,7 @@ is.null.DN <- function(dn) {
     }
 }
 
+##' return 'x' unless it is NULL where you'd use 'orElse'
 .if.NULL <- function(x, orElse) if(!is.null(x)) x else orElse
 
 ##  not %in%  :
@@ -64,7 +65,7 @@ is.null.DN <- function(dn) {
 ##' @return TRUE or FALSE
 ##' @author Martin Maechler
 isSeq <- function(i, n, Ostart = TRUE) {
-    ## FIXME: Port to C, use simple .Call() which is must faster notably in FALSE cases
+    ## FIXME: Port to C, use simple .Call() which is much faster notably in FALSE cases
     ##        and then *export* (and hence document)
     identical(i, if(Ostart) 0L:n else seq_len(n))
 }

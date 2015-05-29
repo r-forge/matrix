@@ -32,6 +32,9 @@ if(interactive()) {
 (tr <- Matrix(cbind(1,0:1)))
 (M4 <- Matrix(m4 <- cbind(0,rbind(6*diag(3),0))))
 dM4 <- Matrix(M4, sparse = FALSE)
+d4. <- diag(4); dimnames(d4.) <- dns <- rep(list(LETTERS[1:4]), 2)
+stopifnot(identical(dimnames(d4 <- Matrix(d4.)), dns),
+          identical3(d4, as(d4., "Matrix"), as(d4., "diagonalMatrix")))
 class(mN <-  Matrix(NA, 3,4)) # NA *is* logical
 validObject(Matrix(NA))
 bd4 <- bdiag(M4,dM4,M4)

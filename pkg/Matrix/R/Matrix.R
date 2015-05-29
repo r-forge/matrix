@@ -197,6 +197,7 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
     if(is.null(sparse1 <- sparse) && (i.M || is(data, "matrix")))
 	sparse <- sparseDefault(data)
     doDN <- TRUE
+    i.m <- is.matrix(data)
     if (i.M) {
 	if (!sV) {
 	    if(!missing(nrow) || !missing(ncol)|| !missing(byrow))
@@ -207,7 +208,7 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
 	    ## else : convert  dense <-> sparse -> at end
 	}
     }
-    else if (!is.matrix(data)) { ## cut & paste from "base::matrix" :
+    else if (!i.m) { ## cut & paste from "base::matrix" :
 	## avoid copying to strip attributes in simple cases
 	if (is.object(data) || !is.atomic(data)) data <- as.vector(data)
 	if(length(data) == 1 && is0(data) && !identical(sparse, FALSE)) {
@@ -236,8 +237,8 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
 	    if(is.null(sparse))
 		sparse <- sparseDefault(data)
 	}
-        doDN <- FALSE
-    } else if(!missing(nrow) || !missing(ncol)|| !missing(byrow))
+        doDN <- FALSE # .. set above
+    } else if(!missing(nrow) || !missing(ncol)|| !missing(byrow)) ## i.m == is.matrix(.)
 	warning("'nrow', 'ncol', etc, are disregarded for matrix 'data'")
 
     ## 'data' is now a "matrix" or "Matrix"

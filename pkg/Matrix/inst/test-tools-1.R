@@ -319,7 +319,8 @@ isOrthogonal <- function(x, tol = 1e-15) {
 }
 
 .M.DN <- Matrix:::.M.DN ## from ../R/Auxiliaries.R :
-dnIdentical <- function(x,y) identical(.M.DN(x), .M.DN(y))
+dnIdentical  <- function(x,y) identical(.M.DN(x), .M.DN(y))
+dnIdentical3 <- function(x,y,z) identical3(.M.DN(x), .M.DN(y), .M.DN(z))
 
 ##' @title Are two matrices practically equal - including dimnames
 ##' @param M1, M2: two matrices to be compared, maybe of _differing_ class
@@ -330,5 +331,13 @@ dnIdentical <- function(x,y) identical(.M.DN(x), .M.DN(y))
 is.EQ.mat <- function(M1, M2, tol = 1e-15, dimnames = TRUE, ...) {
     (if(dimnames) dnIdentical(M1,M2) else TRUE) &&
     is.all.equal(unname(as(M1, "matrix")),
-                 unname(as(M2, "matrix")), tol=tol, ...)
+		 unname(as(M2, "matrix")), tol=tol, ...)
+}
+
+##' see is.EQ.mat()
+is.EQ.mat3 <- function(M1, M2, M3, tol = 1e-15, dimnames = TRUE, ...) {
+    (if(dimnames) dnIdentical3(M1,M2,M3) else TRUE) &&
+    is.all.equal3(unname(as(M1, "matrix")),
+		  unname(as(M2, "matrix")),
+		  unname(as(M3, "matrix")), tol=tol, ...)
 }

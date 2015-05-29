@@ -63,6 +63,7 @@ alternatively also is_sym() [in src/cs_utils.c], see below.
    -> ~/R/MM/Pkg-ex/Matrix/cor_cos.R and
       ~/R/MM/Pkg-ex/Matrix/cor_cos_testing
    Provide cor.sparse() and other association measures for sparse matrices.
+** TODO port isSeq() to C [ R/Auxiliaries.R ]
 ** TODO Investigate the "band changing (and getting) ideas  'band<-' etc,
   from Jeremy D Silver, per posts to R-devel on Aug.26,2011
   {MM: ~/R/MM/Pkg-ex/Matrix/bands-Jeremy_Silver-ex.R }
@@ -73,7 +74,7 @@ alternatively also is_sym() [in src/cs_utils.c], see below.
 ** TODO use  getOption("Matrix.quiet") in more places [--> less messages/warnings]
 ** TODO Check for DimNames propagation in coercion and other operations.
   Done for (%*%, crossprod, tcrossprod) -- but not systematically checked (tests/matprod.R)
-*** TODO For colSums(), rowSums()
+*** TODO For colSums(), rowSums() [R-forge bug # 6018]
 ** TODO Report the problem in the Linux ldexp manual page.  The second and
   third calls in the Synopsis should be to ldexpf and ldexpl.
 
