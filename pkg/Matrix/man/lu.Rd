@@ -79,8 +79,8 @@ lu(x, \dots)
   \emph{Matrix Computations,}
   2nd edition, Johns Hopkins, Baltimore.
 
-  Tim Davis (2005)
-  \url{http://www.cise.ufl.edu/research/sparse/CSparse/}
+  %% Tim Davis (2005)
+  %% \url{http://www.cise.ufl.edu/research/sparse/CSparse/}
 
   Timothy A. Davis (2006)
   \emph{Direct Methods for Sparse Linear Systems}, SIAM Series

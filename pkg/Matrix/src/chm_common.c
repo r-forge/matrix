@@ -303,7 +303,7 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x,
 	CHM_SP eye = cholmod_speye(ans->nrow, ans->ncol, ans->xtype, &c);
 	CHM_SP tmp = cholmod_add(ans, eye, one, one, TRUE, TRUE, &c);
 
-#ifdef DEBUG_Matrix_verbose /* quite often, e.g. in ../tests/indexing.R */
+#ifdef DEBUG_Matrix_verbose /* happens quite often, e.g. in ../tests/indexing.R : */
 	Rprintf("Note: as_cholmod_sparse(<ctype=%d>) - diagU2N\n", ctype);
 #endif
 	chm2Ralloc(ans, tmp);
