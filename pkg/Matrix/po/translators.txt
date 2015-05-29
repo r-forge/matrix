@@ -4,10 +4,12 @@ grep -nHi -e Translator: *.po
 
 de.po:12:"Last-Translator: Detlef Steuer <detlef.steuer@gmx.de>\n"
 fr.po:11:"Last-Translator: Philippe.GROSJEAN@umons.ac.be\n"
+ko.po:17:"Last-Translator:Chel Hee Lee  <chl948@mail.usask.ca>\n"
 pl.po:7:"Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 
 R-de.po:12:"Last-Translator: Detlef Steuer <steuer@hsu-hh.de>\n"
 R-fr.po:6:"Last-Translator: Philippe.GROSJEAN@umons.ac.be\n"
+R-ko.po:18:"Last-Translator:Chel Hee Lee  <chl948@mail.usask.ca>\n"
 R-pl.po:7:"Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 
 ---------
@@ -15,4 +17,5 @@ E-mails
 
 To: Detlef Steuer <detlef.steuer@gmx.de, 
     Łukasz Daniel <lukasz.daniel@gmail.com, 
+    Chel Hee Lee  <chl948@mail.usask.ca>,
     Philippe.GROSJEAN@umons.ac.be
