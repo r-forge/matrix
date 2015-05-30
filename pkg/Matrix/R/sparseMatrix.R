@@ -95,7 +95,7 @@ sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames,
     r@i <- i - 1L
     r@j <- j - 1L
     if(!missing(dimnames))
-	r@Dimnames <- dimnames
+	r@Dimnames <- .fixupDimnames(dimnames)
     if(check) validObject(r)
     if(giveCsparse) as(r, "CsparseMatrix") else r
 }

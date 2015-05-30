@@ -6,14 +6,23 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.2-1 (2015-05-29)}{
+\section{Changes in version 1.2-1 (2015-05-30)}{
   \subsection{New Features}{
     \itemize{
-      \item better \file{NEWS.Rd} (which pleases Kurt and \command{tidy} ;-)
+      \item \code{"Matrix"} now has an \code{initialization()} method
+      coercing 0-length dimnames components to \code{NULL} and other
+      non-\code{NULL} dimnames to \code{character}.  Before, e.g.,
+      numeric dimnames components partially worked, even though it has
+      always been documented that non-\code{NULL} dimnames should be
+      \code{character}.
+      \item For \code{symmetricMatrix} objects which have symmetrical
+      dimnames by definition, it is allowed to only set one half of the
+      \code{dimnames} to save storage, e.g., \code{list(NULL, nms)} is
+      \emph{semantically} equivalent to \code{list(nms, nms)}.
+
       \item \code{as.vector(<sparseVector>)} etc, now work, too.
       \item \code{lu(\emph{<sparseMatrix>})} now keeps \code{dimnames}.
-      \item \code{"Matrix"} now has an \code{initialization()} method
-      coercing 0-length dimnames components to \code{NULL}.
+      \item better \file{NEWS.Rd} (which pleases Kurt and \command{tidy} ;-)
     }
   }
   \subsection{Bug Fixes}{

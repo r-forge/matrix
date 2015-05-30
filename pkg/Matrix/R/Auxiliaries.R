@@ -35,6 +35,8 @@ as0 <- function(x, mod=mode(x))
 	   "complex"= 0+0i, stop(gettextf("invalid 'mod': %s", mod), domain = NA))
 
 
+## NB:  .fixupDimnames() needs to be defined in ./AllClass.R
+
 .M.DN <- function(x) if(!is.null(dn <- dimnames(x))) dn else list(NULL,NULL)
 
 .has.DN <- ## has non-trivial Dimnames slot?
