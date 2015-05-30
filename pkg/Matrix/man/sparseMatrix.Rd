@@ -180,7 +180,7 @@ stopifnot(isSymmetric(sy),
 M1 <- rsparsematrix(1000, 20, nnz = 200)
 summary(M1)
 
-\donttest{% as SparseM is "outside"
+\donttest{## as 'SparseM' is outside {R + Recommended}
 ## pointers example in converting from other sparse matrix representations.
 if(require(SparseM) && packageVersion("SparseM") >= 0.87 &&
    nzchar(dfil <- system.file("textdata", "rua_32_ax.rua",

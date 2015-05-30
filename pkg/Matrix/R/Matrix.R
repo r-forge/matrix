@@ -147,8 +147,7 @@ dimnamesGets <- function (x, value) {
 	!(is.null(v2 <- value[[2]]) || length(v2) == d[2]))
 	stop(gettextf("invalid dimnames given for %s object", dQuote(class(x))),
 	     domain=NA)
-    x@Dimnames <- # preserve names(value)!
-	lapply(value, function(v) if(!is.null(v)) as.character(v))
+    x@Dimnames <- .fixupDimnames(value)
     x
 }
 dimnamesGetsNULL <- function(x) {

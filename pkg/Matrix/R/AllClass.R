@@ -1,6 +1,23 @@
 ## --- New "logic" class -- currently using "raw" instead of "logical"
 ## LOGIC setClass("logic", contains = "raw")
 
+##' To be used in initialize method or other Matrix constructors
+##'
+##' TODO: via .Call(..)
+.fixupDimnames <- function(dnms) {
+    N.N <- list(NULL, NULL)
+    if(is.null(dnms) || identical(dnms, N.N)) return(N.N)
+    ## else
+    if(any(i0 <- lengths(dnms) == 0) && !all(vapply(dnms[i0], is.null, NA)))
+	## replace character(0) etc, by NULL :
+	dnms[i0] <- list(NULL)
+    ## coerce, e.g. integer dimnames to character: -- as  R's matrix(..):
+    if(any(i0 <- vapply(dnms, function(d) !is.null(d) && !is.character(d), NA)))
+	dnms[i0] <- lapply(dnms[i0], as.character)
+    dnms
+}
+
+
 ## ------------- Virtual Classes ----------------------------------------
 
 ## Mother class of all Matrix objects
@@ -17,27 +34,17 @@ if(getRversion() >= "3.2.0") {
 setMethod("initialize", "Matrix", function(.Object, ...)
     {
         .Object <- callNextMethod()
-        if(length(args <- list(...)) &&
-           any(nzchar(snames <- names(args))) && "Dimnames" %in% snames &&
-           !identical(dimNms <- .Object@Dimnames, list(NULL,NULL)) &&
-	   any(i0 <- lengths(dimNms) == 0) && !all(vapply(dimNms[i0], is.null, NA))) {
-	    ## replace character(0) etc, by NULL :
-	    .Object@Dimnames[i0] <- list(NULL)
-	}
-        .Object
+	if(length(args <- list(...)) && any(nzchar(snames <- names(args))) && "Dimnames" %in% snames)
+	    .Object@Dimnames <- .fixupDimnames(.Object@Dimnames)
+	.Object
     })
 } else { ## R < 3.2.0
 setMethod("initialize", "Matrix", function(.Object, ...)
     {
-        .Object <- callNextMethod(.Object, ...)
-        if(length(args <- list(...)) &&
-           any(nzchar(snames <- names(args))) && "Dimnames" %in% snames &&
-           !identical(dimNms <- .Object@Dimnames, list(NULL,NULL)) &&
-	   any(i0 <- lengths(dimNms) == 0) && !all(vapply(dimNms[i0], is.null, NA))) {
-	    ## replace character(0) etc, by NULL :
-	    .Object@Dimnames[i0] <- list(NULL)
-	}
-        .Object
+	.Object <- callNextMethod(.Object, ...)
+	if(length(args <- list(...)) && any(nzchar(snames <- names(args))) && "Dimnames" %in% snames)
+	    .Object@Dimnames <- .fixupDimnames(.Object@Dimnames)
+	.Object
     })
 }
 
