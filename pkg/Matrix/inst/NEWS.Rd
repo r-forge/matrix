@@ -6,10 +6,9 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.2-2 (2015-..-.., svn r....)}{
+\section{Changes in version 1.2-2 (2015-07-03, svn r3130)}{
   \subsection{New Features}{
-    \itemize{
-    }
+    \item Explicitly import from \dQuote{base} packages such as \code{"stats"}.
   }
   \subsection{Bug Fixes}{
     \itemize{
