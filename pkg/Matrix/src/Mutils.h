@@ -7,6 +7,17 @@
 extern "C" {
 #endif
 
+#ifdef __GNUC__
+# undef alloca
+# define alloca(x) __builtin_alloca((x))
+#elif defined(__sun) || defined(_AIX)
+/* this is necessary (and sufficient) for Solaris 10 and AIX 6: */
+# include <alloca.h>
+#endif
+/* For R >= 3.2.2, the 'elif' above shall be replaced by
+#elif defined(HAVE_ALLOCA_H)
+*/
+
 #include <stdint.h> // C99 for int64_t
 #include <ctype.h>
 #include <R.h>  /* includes Rconfig.h */
@@ -20,14 +31,6 @@ extern "C" {
 #define _(String) (String)
 /* Note that this is not yet supported (for Windows, e.g.) in R 2.9.0 : */
 #define dngettext(pkg, String, StringP, N) (N > 1 ? StringP : String)
-#endif
-
-#ifdef __GNUC__
-# undef alloca
-# define alloca(x) __builtin_alloca((x))
-#elif defined(__sun) || defined(_AIX)
-/* this is necessary (and sufficient) for Solaris 10 and AIX 6: */
-# include <alloca.h>
 #endif
 
 #ifndef LONG_VECTOR_SUPPORT

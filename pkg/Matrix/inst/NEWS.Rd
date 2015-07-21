@@ -6,6 +6,22 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
+\section{Changes in version 1.2-3 (2015-07-...., svn r..........)}{
+  \subsection{New Features}{
+    \itemize{
+      \item more Korean translations
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item Packages \emph{linking} to \pkg{Matrix} (\code{LinkingTo:}
+      in \file{DESCRIPTION}) now find
+      \samp{alloca} properly defined in \file{Matrix.h} even for non-GNU
+      compilation environments such as on Solaris or AIX.
+    }
+  }
+}
+
 \section{Changes in version 1.2-2 (2015-07-03, svn r3131)}{
   \subsection{New Features}{
     \itemize{
