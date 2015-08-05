@@ -7,6 +7,13 @@
 extern "C" {
 #endif
 
+#include <stdint.h> // C99 for int64_t
+#include <ctype.h>
+#include <R.h>  /* includes Rconfig.h */
+#include <Rversion.h>
+#include <Rdefines.h> /* Rinternals.h + GET_SLOT etc */
+
+// must come after <R.h> above, for clang (2015-08-05)
 #ifdef __GNUC__
 # undef alloca
 # define alloca(x) __builtin_alloca((x))
@@ -17,12 +24,6 @@ extern "C" {
 /* For R >= 3.2.2, the 'elif' above shall be replaced by
 #elif defined(HAVE_ALLOCA_H)
 */
-
-#include <stdint.h> // C99 for int64_t
-#include <ctype.h>
-#include <R.h>  /* includes Rconfig.h */
-#include <Rversion.h>
-#include <Rdefines.h> /* Rinternals.h + GET_SLOT etc */
 
 #ifdef ENABLE_NLS
 #include <libintl.h>
