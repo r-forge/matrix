@@ -44,14 +44,6 @@ setAs("lgeMatrix", "lspMatrix", function(from) lsy2lsp(as(from, "lsyMatrix")))
 
 ### -> symmetric :
 
-if(FALSE) ## not sure if this is a good idea ... -- FIXME?
-setIs("lgeMatrix", "lsyMatrix",
-      test = function(obj) isSymmetric(obj),
-      replace = function(obj, value) { ## copy all slots
-	  for(n in slotNames(obj)) slot(obj, n) <- slot(value, n)
-      })
-
-### Alternative (at least works):
 setAs("lgeMatrix", "lsyMatrix",
       function(from) {
 	  if(isSymmetric(from))

@@ -52,14 +52,6 @@ setAs("ngeMatrix", "nspMatrix", function(from) nsy2nsp(as(from, "nsyMatrix")))
 
 ### -> symmetric :
 
-if(FALSE) ## not sure if this is a good idea ... -- FIXME?
-setIs("ngeMatrix", "nsyMatrix",
-      test = function(obj) isSymmetric(obj),
-      replace = function(obj, value) { ## copy all slots
-          for(n in slotNames(obj)) slot(obj, n) <- slot(value, n)
-      })
-
-### Alternative (at least works):
 setAs("ngeMatrix", "nsyMatrix",
       function(from) {
 	  if(isSymmetric(from))
