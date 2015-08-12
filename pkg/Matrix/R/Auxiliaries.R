@@ -504,7 +504,7 @@ indTri <- function(n, upper = TRUE, diag = FALSE) {
     ## Indices of (strict) upper/lower triangular part
     ## == which(upper.tri(diag(n), diag=diag) or
     ##	  which(lower.tri(diag(n), diag=diag) -- but
-    ## more efficiently for largish 'n'
+    ## much more efficiently for largish 'n'
     stopifnot(length(n) == 1, n == (n. <- as.integer(n)), (n <- n.) >= 0)
     if(n <= 2) {
         if(n == 0) return(integer(0))
