@@ -52,7 +52,9 @@ importClassesFrom("Matrix",
 		  ddenseMatrix, denseMatrix,
 		  generalMatrix, Matrix)
 
-importFrom("Matrix", Diagonal, isLDL, sparse.model.matrix)
+importFrom("Matrix",
+	   .solve.dgC.chol, .solve.dgC.qr,
+	   Diagonal, isLDL, sparse.model.matrix)
 
 
 ## Generics and functions defined in this package -------------------------
