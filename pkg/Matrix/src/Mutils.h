@@ -376,10 +376,15 @@ mMatrix_as_geMatrix(SEXP A)
 		    "nsyMatrix",		\
 		    "ntpMatrix", "nspMatrix"
 
+#define MATRIX_VALID_dCsparse			\
+ "dgCMatrix", "dsCMatrix", "dtCMatrix"
+#define MATRIX_VALID_nCsparse			\
+ "ngCMatrix", "nsCMatrix", "ntCMatrix"
+
 #define MATRIX_VALID_Csparse			\
- "dgCMatrix", "dsCMatrix", "dtCMatrix",		\
+    MATRIX_VALID_dCsparse,			\
  "lgCMatrix", "lsCMatrix", "ltCMatrix",		\
- "ngCMatrix", "nsCMatrix", "ntCMatrix",		\
+    MATRIX_VALID_nCsparse,			\
  "zgCMatrix", "zsCMatrix", "ztCMatrix"
 
 #define MATRIX_VALID_Tsparse			\
@@ -435,9 +440,17 @@ Matrix_check_class(char *class, const char **valid)
 /**
  * These are the ones "everyone" should use -- is() versions, also looking
  * at super classes:
+
+ * They now use R(semi_API) from  Rinternals.h :
+ * int R_check_class_and_super(SEXP x, const char **valid, SEXP rho);
+ * int R_check_class_etc      (SEXP x, const char **valid);
+
+ * R_check_class_etc      (x, v)      basically does  rho <- .classEnv(x)  and then calls
+ * R_check_class_and_super(x, v, rho)
  */
 # define Matrix_check_class_etc R_check_class_etc
 # define Matrix_check_class_and_super R_check_class_and_super
+
 
 /** Accessing  *sparseVectors :  fast (and recycling)  v[i] for v = ?sparseVector:
  * -> ./sparseVector.c  -> ./t_sparseVector.c :

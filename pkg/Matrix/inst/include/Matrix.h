@@ -56,10 +56,15 @@ extern "C" {
 		    "nsyMatrix",		\
 		    "ntpMatrix", "nspMatrix"
 
+#define MATRIX_VALID_dCsparse			\
+ "dgCMatrix", "dsCMatrix", "dtCMatrix"
+#define MATRIX_VALID_nCsparse			\
+ "ngCMatrix", "nsCMatrix", "ntCMatrix"
+
 #define MATRIX_VALID_Csparse			\
- "dgCMatrix", "dsCMatrix", "dtCMatrix",		\
+    MATRIX_VALID_dCsparse,			\
  "lgCMatrix", "lsCMatrix", "ltCMatrix",		\
- "ngCMatrix", "nsCMatrix", "ntCMatrix",		\
+    MATRIX_VALID_nCsparse,			\
  "zgCMatrix", "zsCMatrix", "ztCMatrix"
 
 #define MATRIX_VALID_Tsparse			\
