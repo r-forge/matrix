@@ -222,8 +222,16 @@ SEXP nz_pattern_to_Csparse(SEXP x, SEXP res_kind)
 SEXP nz2Csparse(SEXP x, enum x_slot_kind r_kind)
 {
     const char *cl_x = class_P(x);
-    if(cl_x[0] != 'n') error(_("not a 'n.CMatrix'"));
-    if(cl_x[2] != 'C') error(_("not a CsparseMatrix"));
+    // quick check - if ok, fast
+    if(cl_x[0] != 'n' || cl_x[2] != 'C') {
+	// e.g. class = "A", from  setClass("A", contains = "ngCMatrix")
+	static const char *valid[] = { MATRIX_VALID_nCsparse, ""};
+	int ctype = Matrix_check_class_etc(x, valid);
+	if(ctype < 0)
+	    error(_("not a 'n.CMatrix'"));
+	else // fine : get a valid  cl_x  class_P()-like string :
+	    cl_x = valid[ctype];
+    }
     int nnz = LENGTH(GET_SLOT(x, Matrix_iSym));
     SEXP ans;
     char *ncl = alloca(strlen(cl_x) + 1); /* not much memory required */
@@ -435,7 +443,6 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b, SEXP bool_arith)
 	cha = AS_CHM_SP(a),
 	chb = AS_CHM_SP(b), chc;
     R_CheckStack();
-    // const char *cl_a = class_P(a), *cl_b = class_P(b);
     static const char *valid_tri[] = { MATRIX_VALID_tri_Csparse, "" };
     char diag[] = {'\0', '\0'};
     int uploT = 0, nprot = 1,
@@ -775,7 +782,7 @@ SEXP Csparse_drop(SEXP x, SEXP tol)
 {
     const char *cl = class_P(x);
     /* dtCMatrix, etc; [1] = the second character =?= 't' for triangular */
-    int tr = (cl[1] == 't');
+    int tr = (cl[1] == 't'); // FIXME - rather  Matrix_check_class_etc(..)
     CHM_SP chx = AS_CHM_SP__(x);
     CHM_SP ans = cholmod_copy(chx, chx->stype, chx->xtype, &c);
     double dtol = asReal(tol);

@@ -111,20 +111,20 @@ copyClass <- function(x, newCl, sNames =
     r
 }
 
+##' Return the (maybe super-)class of class 'cl'   from "Matrix", returning  character(0) if there is none.
+##'
+##' @title The Matrix (Super-) Class of a Class
+##' @param cl string, class name
+##' @param cld its class definition
+##' @param ...Matrix if TRUE, the result must be of pattern "[dlniz]..Matrix"
+##'     where the first letter "[dlniz]" denotes the content kind.  
+##' @param dropVirtual 
+##' @param ... other arguments are passed to .selectSuperClasses()
+##' @return a character string
+##' @author Martin Maechler, Date: 24 Mar 2009
 MatrixClass <- function(cl, cld = getClassDef(cl),
 			...Matrix = TRUE, dropVirtual = TRUE, ...)
 {
-    ## Purpose: return the (maybe super-)class of class 'cl'   from "Matrix",
-    ##		returning  character(0) if there is none.
-    ## ----------------------------------------------------------------------
-    ## Arguments: cl: string, class name
-    ##		 cld: its class definition
-    ##	   ...Matrix: if TRUE, the result must be of pattern "[dlniz]..Matrix"
-    ##                where the first letter "[dlniz]" denotes the content kind.
-    ##	      ..... : other arguments are passed to .selectSuperClasses()
-    ## ----------------------------------------------------------------------
-    ## Author: Martin Maechler, Date: 24 Mar 2009
-
     ## stopifnot(is.character(cl))
     ## Hmm, packageSlot(cl)  *can* be misleading --> use  cld@package  first:
     if(is.null(pkg <- cld@package)) {
