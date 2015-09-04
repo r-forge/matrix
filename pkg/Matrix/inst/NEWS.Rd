@@ -6,23 +6,11 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.2-4 (2015-09-02, svn ....)}{
+\section{Changes in version 1.2-3 (2015-09-...., svn ..................)}{
   \subsection{New Features}{
     \itemize{
       \item \code{MatrixClass()} is exported now.
-    }
-  }
-  \subsection{Bug Fixes}{
-    \itemize{
-      \item extended "n?CMatrix" classes (e.g., from \code{setClass(.,
-	contains="ngCMatrix")}) now can be coerced via \code{as(.)} to \code{"d.CMatrix"}.
-    }
-  }
-}
 
-\section{Changes in version 1.2-3 (2015-07-21, svn r3136)}{
-  \subsection{New Features}{
-    \itemize{
       \item more Korean translations
     }
   }
@@ -32,6 +20,9 @@
       in \file{DESCRIPTION}) now find
       \samp{alloca} properly defined in \file{Matrix.h} even for non-GNU
       compilation environments such as on Solaris or AIX.
+
+      \item extended "n?CMatrix" classes (e.g., from \code{setClass(.,
+	contains="ngCMatrix")}) now can be coerced via \code{as(.)} to \code{"d.CMatrix"}.
     }
   }
 }
