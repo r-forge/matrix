@@ -421,6 +421,7 @@ mMatrix_as_geMatrix(SEXP A)
 /**
  * Return the 0-based index of a string match in a vector of strings
  * terminated by an empty string.  Returns -1 for no match.
+ * Is  __cheap__ :  __not__ looking at superclasses --> better use  R_check_class_etc(obj, *)
  *
  * @param class string to match
  * @param valid vector of possible matches terminated by an empty string
@@ -448,8 +449,11 @@ Matrix_check_class(char *class, const char **valid)
  * R_check_class_etc      (x, v)      basically does  rho <- .classEnv(x)  and then calls
  * R_check_class_and_super(x, v, rho)
  */
+// No longer:
+#ifdef DEPRECATED_Matrix_check_class_
 # define Matrix_check_class_etc R_check_class_etc
 # define Matrix_check_class_and_super R_check_class_and_super
+#endif
 
 
 /** Accessing  *sparseVectors :  fast (and recycling)  v[i] for v = ?sparseVector:
