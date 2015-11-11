@@ -34,6 +34,15 @@ as0 <- function(x, mod=mode(x))
     switch(mod, "integer"= 0L, "double"=, "numeric"= 0, "logical"= FALSE,
 	   "complex"= 0+0i, stop(gettextf("invalid 'mod': %s", mod), domain = NA))
 
+##' Should the matrix/Matrix  x  or a combination of x and y   be treated as  'sparse' ?
+## sparseDefault <- function(x, y=NULL) {
+##     if(is.null(y))
+##         prod(dim(x)) > 2*sum(isN0(as(x, "matrix")))
+##     else ## nrow / ncol ... differentiate  this would be for  rbind / cbind --> ./bind2.R
+##         (nnzero(x) + nnzero(y)) * 2 < (nrow(x)+nrow(y)) * nc
+## }
+sparseDefault <- function(x) prod(dim(x)) > 2*sum(isN0(as(x, "matrix")))
+
 
 ## NB:  .fixupDimnames() needs to be defined in ./AllClass.R
 
@@ -117,8 +126,8 @@ copyClass <- function(x, newCl, sNames =
 ##' @param cl string, class name
 ##' @param cld its class definition
 ##' @param ...Matrix if TRUE, the result must be of pattern "[dlniz]..Matrix"
-##'     where the first letter "[dlniz]" denotes the content kind.  
-##' @param dropVirtual 
+##'     where the first letter "[dlniz]" denotes the content kind.
+##' @param dropVirtual
 ##' @param ... other arguments are passed to .selectSuperClasses()
 ##' @return a character string
 ##' @author Martin Maechler, Date: 24 Mar 2009

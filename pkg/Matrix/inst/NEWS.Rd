@@ -6,10 +6,12 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.2-3 (2015-09-...., svn ..................)}{
+\section{Changes in version 1.2-3 (2015-11-11, svn ..................)}{
   \subsection{New Features}{
     \itemize{
       \item \code{MatrixClass()} is exported now.
+      \item More exports of semi-internal functions (for speed, named
+      \code{".<foo>"}, i.e., inofficial API), such as \code{.solve.dgC.lu()}.
 
       \item more Korean translations
     }
@@ -22,7 +24,12 @@
       compilation environments such as on Solaris or AIX.
 
       \item extended "n?CMatrix" classes (e.g., from \code{setClass(.,
-	contains="ngCMatrix")}) now can be coerced via \code{as(.)} to \code{"d.CMatrix"}.
+	contains="ngCMatrix")}) now can be coerced via \code{as(.)} to
+      \code{"d.CMatrix"}.
+
+      \item \code{cbind2()} and \code{rbind2()} no longer fail to
+      determine \code{sparse} when it is unspecified and hence
+      \code{NA}, fixing R-forge bug #6259.
     }
   }
 }
