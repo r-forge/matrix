@@ -180,8 +180,6 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
                     dimnames = NULL, sparse = NULL,
                     doDiag = TRUE, forceCheck = FALSE)
 {
-    sparseDefault <- function(m) prod(dim(m)) > 2*sum(isN0(as(m, "matrix")))
-
     i.M <- is(data, "Matrix")
     sM <- FALSE
     if(i.M) {
