@@ -218,9 +218,9 @@ S <- .sparseDiagonal(2)
 s <- diag(2)
 S9 <- rBind(S,0,0,S,0,NaN,0,0,0,2)## r/cbind2() failed to determine 'sparse' in Matrix <= 1.2-2
 s9 <- rbind(s,0,0,s,0,NaN,0,0,0,2)
-T9 <- t(S9); t9 <- t(s9); T <- t(D); t <- t(d)
 assert.EQ.mat(S9, s9)
 D <- Matrix(1:6, 3,2); d <- as.matrix(D)
+T9 <- t(S9); t9 <- t(s9); T <- t(D); t <- t(d)
 stopifnot(identical(rbind (s9,d), rbind2(s9,d)),
 	  identical(rbind2(D,S9), t(cbind2(T,T9))),
 	  identical(rbind2(S9,D), t(cbind2(T9,T))))
