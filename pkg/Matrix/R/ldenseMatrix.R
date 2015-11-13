@@ -57,7 +57,7 @@ setAs("lgeMatrix", "ltrMatrix",
       function(from) {
 	  if(isT <- isTriangular(from))
 	      new("ltrMatrix", x = from@x, Dim = from@Dim,
-		  Dimnames = from@Dimnames, uplo = .if.NULL(attr(isT, "kind"), "U"))
+		  Dimnames = from@Dimnames, uplo = attr(isT, "kind") %||% "U")
 	  ## TODO: also check 'diag'
 	  else stop("not a triangular matrix")
       })

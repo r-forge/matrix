@@ -65,7 +65,7 @@ setAs("ngeMatrix", "ntrMatrix",
       function(from) {
 	  if(isT <- isTriangular(from))
 	      new("ntrMatrix", x = from@x, Dim = from@Dim,
-		  Dimnames = from@Dimnames, uplo = .if.NULL(attr(isT, "kind"), "U"))
+		  Dimnames = from@Dimnames, uplo = attr(isT, "kind") %||% "U")
           ## TODO: also check 'diag'
 	  else stop("not a triangular matrix")
       })

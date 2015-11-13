@@ -46,7 +46,7 @@ sparseDefault <- function(x) prod(dim(x)) > 2*sum(isN0(as(x, "matrix")))
 
 ## NB:  .fixupDimnames() needs to be defined in ./AllClass.R
 
-.M.DN <- function(x) if(!is.null(dn <- dimnames(x))) dn else list(NULL,NULL)
+.M.DN <- function(x) dimnames(x) %||% list(NULL,NULL)
 
 .has.DN <- ## has non-trivial Dimnames slot?
     function(x) !identical(list(NULL,NULL), x@Dimnames)
@@ -64,7 +64,7 @@ is.null.DN <- function(dn) {
 }
 
 ##' return 'x' unless it is NULL where you'd use 'orElse'
-.if.NULL <- function(x, orElse) if(!is.null(x)) x else orElse
+`%||%` <- function(x, orElse) if(!is.null(x)) x else orElse
 
 ##  not %in%  :
 `%nin%` <- function (x, table) is.na(match(x, table))
@@ -914,7 +914,7 @@ gT2tT <- function(x, uplo, diag, toClass,
 
 check.gT2tT <- function(from, toClass, do.n = extends(toClass, "nMatrix")) {
     if(isTr <- isTriangular(from)) {
-	gT2tT(from, uplo = .if.NULL(attr(isTr, "kind"), "U"),
+	gT2tT(from, uplo = attr(isTr, "kind") %||% "U",
 	      diag = "N", ## improve: also test for unit diagonal
 	      toClass = toClass, do.n = do.n)
     } else stop("not a triangular matrix")
