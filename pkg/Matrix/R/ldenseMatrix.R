@@ -166,8 +166,8 @@ setMethod("t", signature(x = "lspMatrix"),
 ## NOTE:  "&" and "|"  are now in group "Logic" c "Ops" --> ./Ops.R
 ##        "!" is in ./not.R
 
-setMethod("as.vector", signature(x = "ldenseMatrix", mode = "missing"),
-	  function(x, mode) as(x, "lgeMatrix")@x)
+setMethod("as.vector", "ldenseMatrix",
+	  function(x, mode) as.vector(as(x, "lgeMatrix")@x, mode))
 
 setMethod("norm", signature(x = "ldenseMatrix", type = "character"),
 	  function(x, type, ...)

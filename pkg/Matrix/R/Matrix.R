@@ -41,7 +41,7 @@ setMethod("drop", signature(x = "Matrix"),
 	  function(x) if(all(dim(x) != 1)) x else drop(as(x, "matrix")))
 
 ## slow "fall back" method {subclasses should have faster ones}:
-setMethod("as.vector", signature(x = "Matrix", mode = "missing"),
+setMethod("as.vector", "Matrix",
 	  function(x, mode) as.vector(as(x, "matrix"), mode))
 ## so base functions calling as.vector() work too:
 ## S3 dispatch works for base::as.vector(), but S4 dispatch does not
