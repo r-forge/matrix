@@ -154,8 +154,8 @@ setMethod("t", signature(x = "nspMatrix"),
 ## NOTE:  "&" and "|"  are now in group "Logic" c "Ops" --> ./Ops.R
 ##        "!" is in ./not.R
 
-setMethod("as.vector", signature(x = "ndenseMatrix", mode = "missing"),
-	  function(x, mode) as(x, "ngeMatrix")@x)
+setMethod("as.vector", "ndenseMatrix",
+	  function(x, mode) as.vector(as(x, "ngeMatrix")@x, mode))
 
 setMethod("norm", signature(x = "ndenseMatrix", type = "character"),
 	  function(x, type, ...)
