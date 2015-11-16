@@ -12,7 +12,6 @@
       \item \code{MatrixClass()} is exported now.
       \item More exports of semi-internal functions (for speed, named
       \code{".<foo>"}, i.e., inofficial API), such as \code{.solve.dgC.lu()}.
-
       \item more Korean translations
     }
   }
@@ -26,6 +25,10 @@
       \item extended "n?CMatrix" classes (e.g., from \code{setClass(.,
 	contains="ngCMatrix")}) now can be coerced via \code{as(.)} to
       \code{"d.CMatrix"}.
+
+      \item The printing of largish sparse matrices is improved, notably
+      in the case where columns are suppressed, via new \code{fitWidth =
+	TRUE} option in \code{printSpMatrix2()}. %%% FIXME __ EXAMPLES __
 
       \item \code{cbind2()} and \code{rbind2()} no longer fail to
       determine \code{sparse} when it is unspecified and hence
