@@ -69,8 +69,7 @@ lm.fit.sparse <- function(x, y, w = NULL, offset = NULL,
 	    y  <- if (ny > 1L) y[ok, , drop = FALSE] else y[ok]
 	}
 	wts <- sqrt(w)
-	## keep the unweighted (x,y):
-	y. <- y ## x. <- x
+	## keep the unweighted (x,y):  y. <- y ## x. <- x
 	x <- x * wts
 	y <- y * wts
     }
