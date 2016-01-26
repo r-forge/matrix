@@ -6,6 +6,16 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
+\section{Changes in version 1.2-4 (2016-...., svn r....)}{
+  \subsection{New Features}{
+    \itemize{
+      \item \code{sparseMatrix()} gets new argument \code{triangular}
+      and a smarter default for \code{dims} when \code{symmetric} or
+      \code{triangular} is true.
+    }
+  }
+}
+
 \section{Changes in version 1.2-3 (2015-11-19, svn r3155)}{
   \subsection{New Features}{
     \itemize{
