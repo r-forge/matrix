@@ -30,7 +30,7 @@
   \pkg{maptools} package, omitting Antarctica.  A matching approximately
   one-degree grid was generated using
   \code{\link[maptools]{Sobj_SpatialGrid}}, and the grids on land were
-  found using the appropriate \code{\link[sp]{overlay}}
+  found using the appropriate \code{\link[sp]{over}}% was {overlay} till 2016-02
   method for the \sQuote{SpatialPolygons} and \sQuote{SpatialGrid} objects,
   yielding a \sQuote{SpatialPixels} one containing only the grid cells with
   centres on land.
