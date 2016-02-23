@@ -14,6 +14,13 @@
       \code{triangular} is true.
     }
   }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item creating very large dense matrices, e.g., by
+      \code{as(<sparseM.>, "matrix")} would segfault (in case it could
+      allocate enough storage).
+    }
+  }
 }
 
 \section{Changes in version 1.2-3 (2015-11-19, svn r3155)}{

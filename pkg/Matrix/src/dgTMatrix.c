@@ -21,10 +21,27 @@ d_insert_triplets_in_array(int m, int n, int nnz,
 			   const int xi[], const int xj[], const double xx[],
 			   /* --> */ double vx[])
 {
-    int i;
-    memset(vx, 0, sizeof(double) * m * n);
-    for (i = 0; i < nnz; i++) {
-	vx[xi[i] + xj[i] * m] += xx[i];	/* allow redundant entries in x */
+    // For ( m*n ) > max_int,  we here assume that size_t is using 64-bit !
+    size_t m_ = (size_t) m, len = sizeof(double) * m_ * n;
+    if(len == sizeof(double) * (double)m_ *n)
+	memset(vx, 0, len);
+    else { // len did overflow -- this should call memset() several times:
+	size_t max_l = (1 << (sizeof(size_t)-1)); // = 2^(N-1)
+	max_l += ((long)max_l - 1); // = 2^(N-1) + 2^(N-1) - 1 =  2^N - 1
+	double dlen = ((double)m_) * n;
+	if(dlen > max_l)
+	    error(_("too large matrix: %.0f"), dlen);
+	// else :   m * n does fit -- call memset() several times:
+	dlen *= sizeof(double);
+	memset(vx, 0, max_l);
+	double len_done = 0.; // length in bytes // but also need length in double
+	while((len_done += max_l) < dlen) {
+	    size_t dd = (dlen - len_done < max_l) ? (size_t)(dlen - len_done) : max_l;
+	    memset(vx + (int)(len_done/sizeof(double)), 0, dd);
+	}
+    }
+    for (int i = 0; i < nnz; i++) {
+	vx[xi[i] + xj[i] * m_] += xx[i]; /* allow redundant entries in x */
     }
 }
 
@@ -33,10 +50,28 @@ l_insert_triplets_in_array(int m, int n, int nnz,
 			   const int xi[], const int xj[], const int xx[],
 			   /* --> */ int vx[])
 {
-    int i;
-    memset(vx, 0, sizeof(int) * m * n);
-    for (i = 0; i < nnz; i++) {
-	int ind = xi[i] + xj[i] * m;
+    // For ( m*n ) > max_int,  we here assume that size_t is using 64-bit !
+    size_t m_ = (size_t) m, len = sizeof(int) * m_ * n;
+    if(len == sizeof(int) * (double)m_ *n)
+	memset(vx, 0, len);
+    else { // len did overflow -- this should call memset() several times:
+	size_t max_l = (1 << (sizeof(size_t)-1)); // = 2^(N-1)
+	max_l += ((long)max_l - 1); // = 2^(N-1) + 2^(N-1) - 1 =  2^N - 1
+	double dlen = ((double)m_) * n;
+	if(dlen > max_l)
+	    error(_("too large matrix: %.0f"), dlen);
+	// else :   m * n does fit -- call memset() several times:
+	dlen *= sizeof(int);
+	memset(vx, 0, max_l);
+	double len_done = 0.; // length in bytes // but also need length in int
+	while((len_done += max_l) < dlen) {
+	    size_t dd = (dlen - len_done < max_l) ? (size_t)(dlen - len_done) : max_l;
+	    memset(vx + (int)(len_done/sizeof(int)), 0, dd);
+	}
+    }
+
+    for (int i = 0; i < nnz; i++) {
+	size_t ind = xi[i] + xj[i] * m_;
 	if(vx[ind] == NA_LOGICAL) {
 	    // do nothing: remains NA
 	} else if(xx[i] == NA_LOGICAL)
