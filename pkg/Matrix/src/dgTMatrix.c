@@ -21,7 +21,7 @@ d_insert_triplets_in_array(int m, int n, int nnz,
 			   const int xi[], const int xj[], const double xx[],
 			   /* --> */ double vx[])
 {
-    // For ( m*n ) > max_int,  we here assume that size_t is using 64-bit !
+    // For ( m*n ) > INT_MAX,  we here assume that size_t is using 64-bit !
     size_t m_ = (size_t) m, len = sizeof(double) * m_ * n;
     if(len == sizeof(double) * (double)m_ *n)
 	memset(vx, 0, len);
@@ -50,7 +50,7 @@ l_insert_triplets_in_array(int m, int n, int nnz,
 			   const int xi[], const int xj[], const int xx[],
 			   /* --> */ int vx[])
 {
-    // For ( m*n ) > max_int,  we here assume that size_t is using 64-bit !
+    // For ( m*n ) > INT_MAX,  we here assume that size_t is using 64-bit !
     size_t m_ = (size_t) m, len = sizeof(int) * m_ * n;
     if(len == sizeof(int) * (double)m_ *n)
 	memset(vx, 0, len);
@@ -93,14 +93,14 @@ SEXP _t1_ ## gTMatrix_to_ ## _t1_ ## geMatrix(SEXP x)			\
 	n = dims[1];							\
     double len = m * (double)n;						\
 									\
-    if (len > R_LEN_T_MAX)						\
+    if (len > R_XLEN_T_MAX)						\
 	error(_("Cannot coerce to too large *geMatrix with %.0f entries"), \
               len);							\
 									\
     SET_SLOT(ans, Matrix_factorSym, allocVector(VECSXP, 0));		\
     SET_SLOT(ans, Matrix_DimSym, duplicate(dd));			\
     SET_DimNames(ans, x);						\
-    SET_SLOT(ans, Matrix_xSym, allocVector(_SEXPTYPE_, (R_len_t)len));	\
+    SET_SLOT(ans, Matrix_xSym, allocVector(_SEXPTYPE_, (R_xlen_t)len));	\
     _t1_ ## _insert_triplets_in_array(m, n, length(islot),		\
 				      INTEGER(islot),			\
 				      INTEGER(GET_SLOT(x, Matrix_jSym)),\
