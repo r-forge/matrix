@@ -6,12 +6,16 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.2-4 (2016-...., svn r....)}{
+\section{Changes in version 1.2-4 (2016-02-..., svn r....)}{
   \subsection{New Features}{
     \itemize{
       \item \code{sparseMatrix()} gets new argument \code{triangular}
       and a smarter default for \code{dims} when \code{symmetric} or
       \code{triangular} is true.
+      \item \code{as(<sparse>, "denseMatrix")} now works in more cases
+      when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
+      Hence, e.g., \code{!S} now works for much larger sparse matrices
+      \code{S}.
     }
   }
   \subsection{Bug Fixes}{
