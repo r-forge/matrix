@@ -259,12 +259,17 @@ rm(dl0, dd0)# too large to keep in memory and pass to checkMatrix()
 diag(Lrg[2:9,1:8]) <- 1:8
 ## ==:  Lrg[2:9,1:8] <- `diag<-`(Lrg[2:9,1:8], 1:8)
 e1 <- try(Lrg == Lrg) # error message almost ok
-e2 <- try(!Lrg) # now *works* on machines with enough RAM
-str(e2) # error or "worked"
+(memGB <- Sys.memGB("MemFree")) # from test-tools-1.R
+##                                             __vv__
+e2 <- if(doExtras && is.finite(memGB) && memGB > 30) { # need around 18 GB
+          try(!Lrg) # now *works* on 64-bit machines with enough RAM
+          ## and immediately errors if LONG_VECTORs are not available
+      } # else NULL
+str(e2) # error, NULL or "worked"
 ina <- is.na(Lrg)# "all FALSE"
 stopifnot(grep("too large", e1) == 1,
 	  if(inherits(e2, "try-error")) grep("too large", e2) == 1
-	  else length(e2@x) == n^2,
+	  else is.null(e2) || length(e2@x) == n^2,
           !any(ina))# <- gave warning previously
 stopifnot(suppressWarnings(any(Lrg)))# (double -> logical  warning)
 rm(e2)# too large...
