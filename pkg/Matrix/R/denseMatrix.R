@@ -201,22 +201,36 @@ setMethod("isSymmetric", signature(object = "denseMatrix"),
 	  function(object, tol = 100*.Machine$double.eps, ...) {
 	      ## pretest: is it square?
 	      d <- dim(object)
-	      if(d[1] != d[2]) return(FALSE)
+              if((n <- d[1L]) != d[2L]) return(FALSE)
+	      if(n <= 1L) return(TRUE)
+	      ## else: square (n x n) matrix, n >= 2 :
+	      ## initial tests, fast for large non-symmetric:
+	      if(is.character(all.equal(object[1L, 2L],
+					object[2L, 1L], tolerance = tol))) return(FALSE)
+	      if((is.d <- is(object,"dMatrix")) ||
+                 (is.z <- is(object, "zMatrix")))
+		 for(i in unique(c(1L, 2L, n-1L, n)))
+		     if(is.character(all.equal(object[i, ],
+					       object[, i], tolerance = tol))) return(FALSE)
+	      else # logical, integer
+		 for(i in unique(c(1L, 2L, n-1L, n)))
+		     if(!identical(object[i, ], object[, i])) return(FALSE)
 	      ## else slower test
-	      if (is(object,"dMatrix"))
-		  isTRUE(all.equal(as(object, "dgeMatrix"),
+	      if (is.d)
+		  isTRUE(all.equal(as(  object,  "dgeMatrix"),
 				   as(t(object), "dgeMatrix"),
 				   tolerance = tol, ...))
 	      else if (is(object, "nMatrix"))
-		  identical(as(object, "ngeMatrix"),
+		  identical(as(  object,  "ngeMatrix"),
 			    as(t(object), "ngeMatrix"))
 	      else if (is(object, "lMatrix"))# not possible currently
 		  ## test for exact equality; FIXME(?): identical() too strict?
-		  identical(as(object, "lgeMatrix"),
+		  identical(as(  object,  "lgeMatrix"),
 			    as(t(object), "lgeMatrix"))
-	      else if (is(object, "zMatrix")) ## will error out here
-		  identical(as(object, "zgeMatrix"),
-			    as(t(object), "zgeMatrix"))
+	      else if (is.z) ## will error out here
+		  isTRUE(all.equal(as(  object,  "zgeMatrix"),
+                                   as(t(object), "zgeMatrix"),
+				   tolerance = tol, ...))
 	      else if (is(object, "iMatrix")) ## will error out here
 		  identical(as(object, "igeMatrix"),
 			    as(t(object), "igeMatrix"))

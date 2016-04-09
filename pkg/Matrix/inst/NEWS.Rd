@@ -6,6 +6,24 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
+\section{Changes in version 1.2-5 (2016-04-.., svn r....)}{
+  \subsection{New Features}{
+    \itemize{
+      \item \code{isSymmetric(m)} now also works for \code{"indMatrix"} \code{m}.
+      \item \code{isSymmetric(m)} is faster for large dense asymmetric matrices.
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item Matrix multiplications (\code{A \%*\% B}) now work correctly
+      when one of the matrices is diagonal and the other has a zero dimension.
+      \item _NOT YET__FIXME_  needs cholmod_l_dense_to_sparse() in our dense_to_Csparse()
+      \code{as(<large-matrix>, "sparseMatrix")} no longer fails
+       when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
+    }
+  }
+}
+
 \section{Changes in version 1.2-4 (2016-02-29, svn r3162)}{
   \subsection{New Features}{
     \itemize{
