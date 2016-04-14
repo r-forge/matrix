@@ -1,7 +1,7 @@
 <map id="as_cholmod_triplet" name="as_cholmod_triplet">
-<area shape="rect" id="node2" href="$chm__common_8c.html#ac83bdca818781738d783ca4348834b37" title="Copy cholmod_triplet to an R_alloc()ed version of it. " alt="" coords="185,5,277,32"/>
-<area shape="rect" id="node3" href="$chm__common_8c.html#ad7dbb3616e40830729a242662b561897" title="stype" alt="" coords="203,56,258,83"/>
-<area shape="rect" id="node4" href="$chm__common_8c.html#a9ea43d94a2bbd6c055ff9da6e3f24109" title="xpt" alt="" coords="211,107,251,133"/>
-<area shape="rect" id="node6" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="203,157,258,184"/>
-<area shape="rect" id="node5" href="$chm__common_8c.html#a6eb9b8c79c573099970c93d50e059039" title="RallocedREAL" alt="" coords="326,107,434,133"/>
+<area shape="rect" id="node2" href="$chm__common_8c.html#ac83bdca818781738d783ca4348834b37" title="Copy cholmod_triplet to an R_alloc()ed version of it. " alt="" coords="184,5,276,32"/>
+<area shape="rect" id="node3" href="$chm__common_8c.html#ad7dbb3616e40830729a242662b561897" title="stype := &quot;symmetry type&quot;. " alt="" coords="203,56,257,83"/>
+<area shape="rect" id="node4" href="$chm__common_8c.html#a9ea43d94a2bbd6c055ff9da6e3f24109" title="xpt" alt="" coords="210,107,250,133"/>
+<area shape="rect" id="node6" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype: the kind of numeric (think &quot;x slot&quot;) of Cholmod sparse matrices. " alt="" coords="203,157,257,184"/>
+<area shape="rect" id="node5" href="$chm__common_8c.html#a6eb9b8c79c573099970c93d50e059039" title="RallocedREAL" alt="" coords="324,107,432,133"/>
 </map>

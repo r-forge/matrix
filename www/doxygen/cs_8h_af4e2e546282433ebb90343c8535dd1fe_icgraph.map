@@ -1,6 +1,6 @@
 <map id="cs_house" name="cs_house">
-<area shape="rect" id="node2" href="$cs_8h.html#a767dc90c22d90fe898f72c2da0d98c03" title="cs_qr" alt="" coords="134,31,189,57"/>
-<area shape="rect" id="node3" href="$cs_8h.html#a136e729a618c610422377201351db105" title="cs_qrsol" alt="" coords="257,5,327,32"/>
-<area shape="rect" id="node5" href="$dgCMatrix_8h.html#a2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="237,56,347,83"/>
-<area shape="rect" id="node4" href="$dgCMatrix_8h.html#a5937063a2f86fc60d92f942eb9425b86" title="dgCMatrix_qrsol" alt="" coords="395,5,512,32"/>
+<area shape="rect" id="node2" href="$cs_8h.html#a767dc90c22d90fe898f72c2da0d98c03" title="cs_qr" alt="" coords="132,31,187,57"/>
+<area shape="rect" id="node3" href="$cs_8h.html#a136e729a618c610422377201351db105" title="cs_qrsol" alt="" coords="254,5,325,32"/>
+<area shape="rect" id="node5" href="$dgCMatrix_8h.html#aa7a73c816cd343a9d7f4fd0170f4358f" title="dgCMatrix_QR" alt="" coords="235,56,344,83"/>
+<area shape="rect" id="node4" href="$dgCMatrix_8h.html#a5937063a2f86fc60d92f942eb9425b86" title="dgCMatrix_qrsol" alt="" coords="392,5,509,32"/>
 </map>

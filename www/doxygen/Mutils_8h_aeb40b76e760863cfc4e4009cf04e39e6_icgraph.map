@@ -1,6 +1,6 @@
 <map id="SET_DimNames" name="SET_DimNames">
-<area shape="rect" id="node2" href="$dgCMatrix_8h.html#ad3b5c3bc224c09316427f7e86e4e8a86" title="compressed_to_TMatrix" alt="" coords="176,5,339,32"/>
-<area shape="rect" id="node3" href="$dtrMatrix_8h.html#a4c867d5968ff8e94c0570c6b761cdabe" title="dtrMatrix_dtrMatrix_mm" alt="" coords="177,56,337,83"/>
-<area shape="rect" id="node4" href="$dgCMatrix_8h.html#ac71c15cfb9558156fb98c0f1cad60922" title="R_to_CMatrix" alt="" coords="206,107,309,133"/>
-<area shape="rect" id="node5" href="$Tsparse_8h.html#a1b1ca7081cfcbef11f1cafc4270412ed" title="Tsparse_diagU2N" alt="" coords="194,157,321,184"/>
+<area shape="rect" id="node2" href="$dgCMatrix_8h.html#ad3b5c3bc224c09316427f7e86e4e8a86" title="compressed_to_TMatrix" alt="" coords="175,5,337,32"/>
+<area shape="rect" id="node3" href="$dtrMatrix_8h.html#a4c867d5968ff8e94c0570c6b761cdabe" title="Matrix products of dense triangular Matrices. " alt="" coords="176,56,336,83"/>
+<area shape="rect" id="node4" href="$dgCMatrix_8h.html#ac71c15cfb9558156fb98c0f1cad60922" title="R_to_CMatrix" alt="" coords="205,107,307,133"/>
+<area shape="rect" id="node5" href="$Tsparse_8h.html#a1b1ca7081cfcbef11f1cafc4270412ed" title="Tsparse_diagU2N" alt="" coords="193,157,319,184"/>
 </map>

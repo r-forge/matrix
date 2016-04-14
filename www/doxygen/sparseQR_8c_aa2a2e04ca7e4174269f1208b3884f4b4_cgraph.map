@@ -1,0 +1,6 @@
+<map id="sparseQR_qty" name="sparseQR_qty">
+<area shape="rect" id="node2" href="$sparseQR_8c.html#a410d4873242b9ff945fe9cdc35e9ea89" title="Apply Householder transformations and the row permutation P to y. " alt="" coords="160,56,283,83"/>
+<area shape="rect" id="node3" href="$cs_8c.html#a88a82fabd191059a8db610fbfe6b008a" title="cs_happly" alt="" coords="331,5,412,32"/>
+<area shape="rect" id="node4" href="$cs_8c.html#a0938ec08825dc07a2dab8f9477ab053b" title="cs_ipvec" alt="" coords="334,56,409,83"/>
+<area shape="rect" id="node5" href="$cs_8c.html#a79d20fcd31c30d118075e08087127c4e" title="cs_pvec" alt="" coords="336,107,407,133"/>
+</map>

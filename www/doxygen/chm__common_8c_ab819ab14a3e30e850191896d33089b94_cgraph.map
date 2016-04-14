@@ -1,5 +1,5 @@
 <map id="chm_factor_to_SEXP" name="chm_factor_to_SEXP">
-<area shape="rect" id="node2" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="204,5,311,32"/>
-<area shape="rect" id="node3" href="$chm__common_8h.html#a5a58b22e709dab2df84046bf89e76920" title="chm_factor_ok" alt="" coords="203,56,311,83"/>
-<area shape="rect" id="node4" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="230,107,285,133"/>
+<area shape="rect" id="node2" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="202,5,309,32"/>
+<area shape="rect" id="node3" href="$chm__common_8h.html#a5a58b22e709dab2df84046bf89e76920" title="chm_factor_ok" alt="" coords="201,56,309,83"/>
+<area shape="rect" id="node4" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype: the kind of numeric (think &quot;x slot&quot;) of Cholmod sparse matrices. " alt="" coords="228,107,283,133"/>
 </map>

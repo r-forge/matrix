@@ -1,5 +1,5 @@
 <map id="dsyMatrix_as_matrix" name="dsyMatrix_as_matrix">
-<area shape="rect" id="node2" href="$Mutils_8c.html#addcd18b1a926ac2abca8b6678e4afe01" title="make_d_matrix_symmetric" alt="" coords="197,5,376,32"/>
-<area shape="rect" id="node3" href="$Mutils_8c.html#a47f3d7ddfd2644e3663c1a86264286e3" title="Even if the Dimnames slot is list(NULL, &lt;names&gt;) etc, return symmetric dimnames: Get ..." alt="" coords="201,56,372,83"/>
-<area shape="rect" id="node4" href="$Mutils_8c.html#a316a7184387d598d6ab9d48c4a9a2da8" title="Produce symmetric &#39;Dimnames&#39; from possibly asymmetric ones. " alt="" coords="425,56,581,83"/>
+<area shape="rect" id="node2" href="$Mutils_8c.html#addcd18b1a926ac2abca8b6678e4afe01" title="make_d_matrix_symmetric" alt="" coords="196,5,375,32"/>
+<area shape="rect" id="node3" href="$Mutils_8c.html#a47f3d7ddfd2644e3663c1a86264286e3" title="Even if the Dimnames slot is list(NULL, &lt;names&gt;) etc, return symmetric dimnames: Get ..." alt="" coords="200,56,371,83"/>
+<area shape="rect" id="node4" href="$Mutils_8c.html#a316a7184387d598d6ab9d48c4a9a2da8" title="Produce symmetric &#39;Dimnames&#39; from possibly asymmetric ones. " alt="" coords="423,56,579,83"/>
 </map>

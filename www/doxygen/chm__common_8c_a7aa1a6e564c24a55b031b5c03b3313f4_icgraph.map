@@ -2,8 +2,8 @@
 <area shape="rect" id="node2" href="$CHMfactor_8h.html#aae1511a0bca842168f9bf6ae554eda88" title="CHMfactor_spsolve" alt="" coords="227,5,365,32"/>
 <area shape="rect" id="node3" href="$CHMfactor_8h.html#a65d766e6b16a370b3057acf81b4c6f1a" title="CHMfactor_to_sparse" alt="" coords="221,56,371,83"/>
 <area shape="rect" id="node4" href="$Csparse_8h.html#ad902ff7d08b94c85a1ffb1b4c2c4e247" title="Csparse2nz" alt="" coords="250,107,342,133"/>
-<area shape="rect" id="node6" href="$Csparse_8h.html#a86239e094c5ee16dfc9892f09e8077d9" title="Csparse_Csparse_crossprod" alt="" coords="433,157,623,184"/>
-<area shape="rect" id="node7" href="$Csparse_8h.html#a78b6af142e571556b5b698785211d1d9" title="Csparse_Csparse_prod" alt="" coords="217,208,375,235"/>
+<area shape="rect" id="node6" href="$Csparse_8h.html#a86239e094c5ee16dfc9892f09e8077d9" title="[t]crossprod (&lt;Csparse&gt;, &lt;Csparse&gt;) " alt="" coords="432,157,623,184"/>
+<area shape="rect" id="node7" href="$Csparse_8h.html#a78b6af142e571556b5b698785211d1d9" title="A %*% B &#45; for matrices of class CsparseMatrix (R package &quot;Matrix&quot;) " alt="" coords="217,208,375,235"/>
 <area shape="rect" id="node8" href="$Csparse_8h.html#adf30d8deabe5bb928402465150189d79" title="Csparse_general_to\l_symmetric" alt="" coords="227,259,365,301"/>
 <area shape="rect" id="node9" href="$Csparse_8h.html#a1fe70f89e424351c54c9bf4ba618ae65" title="Csparse_symmetric_to\l_general" alt="" coords="217,325,375,366"/>
 <area shape="rect" id="node10" href="$Csparse_8h.html#a213393a1709973c1b2b733c7019d3086" title="Csparse_to_tCsparse" alt="" coords="221,391,371,417"/>
@@ -14,6 +14,6 @@
 <area shape="rect" id="node16" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="247,644,345,671"/>
 <area shape="rect" id="node17" href="$Tsparse_8h.html#a38a8590614d3fdaae83578d4f9dc9032" title="Tsparse_to_Csparse" alt="" coords="225,695,367,721"/>
 <area shape="rect" id="node18" href="$Tsparse_8h.html#a76665a3e79a779284b23de6f9385bbc0" title="Tsparse_to_tCsparse" alt="" coords="223,745,369,772"/>
-<area shape="rect" id="node5" href="$Csparse_8h.html#a9e26da2b0832ca4dc2f4cb894705bcdd" title="Csparse_to_nz_pattern" alt="" coords="449,107,607,133"/>
-<area shape="rect" id="node12" href="$dgCMatrix_8h.html#ac71c15cfb9558156fb98c0f1cad60922" title="R_to_CMatrix" alt="" coords="477,441,579,468"/>
+<area shape="rect" id="node5" href="$Csparse_8h.html#a9e26da2b0832ca4dc2f4cb894705bcdd" title="Csparse_to_nz_pattern" alt="" coords="449,107,606,133"/>
+<area shape="rect" id="node12" href="$dgCMatrix_8h.html#ac71c15cfb9558156fb98c0f1cad60922" title="R_to_CMatrix" alt="" coords="476,441,579,468"/>
 </map>

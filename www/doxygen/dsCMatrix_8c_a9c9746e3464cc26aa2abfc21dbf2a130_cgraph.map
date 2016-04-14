@@ -6,6 +6,6 @@
 <area shape="rect" id="node8" href="$chm__common_8c.html#a9ca1fded97b51a281e6ef9f76a12c788" title="CHM_restore_common" alt="" coords="189,208,347,235"/>
 <area shape="rect" id="node9" href="$chm__common_8c.html#a4c25f5e728f63c091cdc740d9d6dd023" title="CHM_store_common" alt="" coords="195,259,341,285"/>
 <area shape="rect" id="node10" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="225,309,311,336"/>
-<area shape="rect" id="node6" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="396,157,503,184"/>
-<area shape="rect" id="node7" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="422,208,477,235"/>
+<area shape="rect" id="node6" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="395,157,502,184"/>
+<area shape="rect" id="node7" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype: the kind of numeric (think &quot;x slot&quot;) of Cholmod sparse matrices. " alt="" coords="421,208,476,235"/>
 </map>

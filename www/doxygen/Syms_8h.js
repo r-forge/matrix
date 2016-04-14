@@ -1,5 +1,6 @@
 var Syms_8h =
 [
+    [ "Matrix_betaSym", "Syms_8h.html#a326ab3950ce69144afd6da6003e50157", null ],
     [ "Matrix_diagSym", "Syms_8h.html#aaaa2d2105381747118da72d6f1aba4e9", null ],
     [ "Matrix_DimNamesSym", "Syms_8h.html#a93d8b8a3cd9c897599b3e2d996821a0b", null ],
     [ "Matrix_DimSym", "Syms_8h.html#a2b91d011a529c5665e032a6565275374", null ],
@@ -11,5 +12,6 @@ var Syms_8h =
     [ "Matrix_permSym", "Syms_8h.html#a1e4c56ea9d2e084e0cb7154bcc13e196", null ],
     [ "Matrix_pSym", "Syms_8h.html#af08cd6c75b2da4b71c2eb605e00e94ab", null ],
     [ "Matrix_uploSym", "Syms_8h.html#ac4fa9962123be6abbeaf9c7219b62644", null ],
+    [ "Matrix_VSym", "Syms_8h.html#a9a8c0e1cbc843555762f54c35bdd6325", null ],
     [ "Matrix_xSym", "Syms_8h.html#a8e6ccf1b89de0c7d61722fd1579eb085", null ]
 ];

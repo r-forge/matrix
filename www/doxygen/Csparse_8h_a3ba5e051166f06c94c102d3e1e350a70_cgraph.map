@@ -1,5 +1,5 @@
 <map id="Csparse_to_matrix" name="Csparse_to_matrix">
-<area shape="rect" id="node2" href="$chm__common_8c.html#aa63a154e775eded261bf72b8a219de11" title="Copy the contents of a to a matrix object and, optionally, free a or free both a and its pointer to i..." alt="" coords="190,5,341,32"/>
-<area shape="rect" id="node3" href="$cs__utils_8c.html#a0b2592041f5b822459b7052a451c07a5" title="is_sym" alt="" coords="233,56,297,83"/>
-<area shape="rect" id="node4" href="$Mutils_8c.html#a316a7184387d598d6ab9d48c4a9a2da8" title="Produce symmetric &#39;Dimnames&#39; from possibly asymmetric ones. " alt="" coords="187,107,343,133"/>
+<area shape="rect" id="node2" href="$chm__common_8c.html#aa63a154e775eded261bf72b8a219de11" title="Copy the contents of a to a matrix object and, optionally, free a or free both a and its pointer to i..." alt="" coords="188,5,339,32"/>
+<area shape="rect" id="node3" href="$cs__utils_8c.html#a0b2592041f5b822459b7052a451c07a5" title="is_sym" alt="" coords="231,56,295,83"/>
+<area shape="rect" id="node4" href="$Mutils_8c.html#a316a7184387d598d6ab9d48c4a9a2da8" title="Produce symmetric &#39;Dimnames&#39; from possibly asymmetric ones. " alt="" coords="185,107,341,133"/>
 </map>

@@ -1,5 +1,5 @@
 <map id="get_norm" name="get_norm">
-<area shape="rect" id="node2" href="$dgeMatrix_8h.html#ad6b2835d2acbc142689c1d980387c5e0" title="dgeMatrix_norm" alt="" coords="133,5,248,32"/>
-<area shape="rect" id="node3" href="$dgeMatrix_8h.html#ac4f1b4b19a004fb62c9cb68ccb1028ea" title="dgeMatrix_rcond" alt="" coords="131,56,250,83"/>
-<area shape="rect" id="node4" href="$dgeMatrix_8h.html#a8f0564cd095a4415738ef1ad8d537da1" title="dgeMatrix_solve" alt="" coords="132,107,249,133"/>
+<area shape="rect" id="node2" href="$dgeMatrix_8h.html#ad6b2835d2acbc142689c1d980387c5e0" title="dgeMatrix_norm" alt="" coords="131,5,246,32"/>
+<area shape="rect" id="node3" href="$dgeMatrix_8h.html#ac4f1b4b19a004fb62c9cb68ccb1028ea" title="dgeMatrix_rcond" alt="" coords="129,56,248,83"/>
+<area shape="rect" id="node4" href="$dgeMatrix_8h.html#a8f0564cd095a4415738ef1ad8d537da1" title="dgeMatrix_solve" alt="" coords="130,107,247,133"/>
 </map>

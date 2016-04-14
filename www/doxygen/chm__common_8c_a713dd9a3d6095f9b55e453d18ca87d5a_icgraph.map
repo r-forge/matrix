@@ -1,4 +1,4 @@
 <map id="chm_diagN2U" name="chm_diagN2U">
-<area shape="rect" id="node2" href="$Csparse_8h.html#a86239e094c5ee16dfc9892f09e8077d9" title="Csparse_Csparse_crossprod" alt="" coords="161,5,351,32"/>
-<area shape="rect" id="node3" href="$Csparse_8h.html#a78b6af142e571556b5b698785211d1d9" title="Csparse_Csparse_prod" alt="" coords="177,56,335,83"/>
+<area shape="rect" id="node2" href="$Csparse_8h.html#a86239e094c5ee16dfc9892f09e8077d9" title="[t]crossprod (&lt;Csparse&gt;, &lt;Csparse&gt;) " alt="" coords="159,5,349,32"/>
+<area shape="rect" id="node3" href="$Csparse_8h.html#a78b6af142e571556b5b698785211d1d9" title="A %*% B &#45; for matrices of class CsparseMatrix (R package &quot;Matrix&quot;) " alt="" coords="175,56,333,83"/>
 </map>

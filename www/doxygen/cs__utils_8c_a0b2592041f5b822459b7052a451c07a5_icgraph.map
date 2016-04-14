@@ -1,9 +1,9 @@
 <map id="is_sym" name="is_sym">
-<area shape="rect" id="node2" href="$Csparse_8h.html#af4beac0a5fdb698d99feaf1fb8da7b03" title="From a CsparseMatrix, produce a dense one. " alt="" coords="123,5,253,32"/>
-<area shape="rect" id="node3" href="$Csparse_8h.html#a3ba5e051166f06c94c102d3e1e350a70" title="Csparse_to_matrix" alt="" coords="122,56,254,83"/>
-<area shape="rect" id="node4" href="$cs__utils_8c.html#ae53880c709c9977b041217226c202deb" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="118,107,258,133"/>
-<area shape="rect" id="node5" href="$dgCMatrix_8h.html#a2d37aad3c93e57b6dbafbf8a337273e8" title="dgCMatrix_QR" alt="" coords="307,81,416,108"/>
-<area shape="rect" id="node6" href="$dgCMatrix_8c.html#ad6045ab51c67c719a4deab2c929e4d13" title="install_lu" alt="" coords="325,132,398,159"/>
-<area shape="rect" id="node7" href="$dgCMatrix_8h.html#a848fa1b60915b5ee7926c897b8b5f050" title="dgCMatrix_LU" alt="" coords="492,107,599,133"/>
-<area shape="rect" id="node8" href="$dgCMatrix_8h.html#af93f855ba17fa036d69aece5e0321510" title="dgCMatrix_matrix_solve" alt="" coords="464,157,627,184"/>
+<area shape="rect" id="node2" href="$Csparse_8h.html#af4beac0a5fdb698d99feaf1fb8da7b03" title="From a CsparseMatrix, produce a dense one. " alt="" coords="122,5,253,32"/>
+<area shape="rect" id="node3" href="$Csparse_8h.html#a3ba5e051166f06c94c102d3e1e350a70" title="Csparse_to_matrix" alt="" coords="121,56,253,83"/>
+<area shape="rect" id="node4" href="$cs__utils_8c.html#a59f855a125252528fc15e1d269d3e250" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="117,107,257,133"/>
+<area shape="rect" id="node5" href="$dgCMatrix_8h.html#aa7a73c816cd343a9d7f4fd0170f4358f" title="dgCMatrix_QR" alt="" coords="305,81,415,108"/>
+<area shape="rect" id="node6" href="$dgCMatrix_8c.html#a96ad800167bbc6769dd31e97c38f3690" title="install_lu" alt="" coords="323,132,397,159"/>
+<area shape="rect" id="node7" href="$dgCMatrix_8h.html#aa0183ea2cfb3994e02d6a467a91de60a" title="dgCMatrix_LU" alt="" coords="491,107,597,133"/>
+<area shape="rect" id="node8" href="$dgCMatrix_8h.html#af93f855ba17fa036d69aece5e0321510" title="dgCMatrix_matrix_solve" alt="" coords="463,157,625,184"/>
 </map>

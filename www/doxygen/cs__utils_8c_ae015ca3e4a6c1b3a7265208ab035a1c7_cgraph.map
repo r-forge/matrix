@@ -1,15 +1,15 @@
 <map id="Matrix_as_cs" name="Matrix_as_cs">
-<area shape="rect" id="node2" href="$cs_8c.html#a12000fbd0b9198d3852978cca8386afe" title="cs_add" alt="" coords="173,231,237,258"/>
-<area shape="rect" id="node6" href="$cs_8c.html#a6d705e404a7831ccf01bc0ea064215b9" title="cs_spfree" alt="" coords="450,105,529,131"/>
-<area shape="rect" id="node12" href="$cs_8c.html#aee7c14539994e9ef689771b18e769a58" title="cs_transpose" alt="" coords="155,130,255,157"/>
-<area shape="rect" id="node14" href="$cs__utils_8c.html#a3f4422610da1a3e9e7268e1843ca6de5" title="Create an identity matrix of size n as a cs struct. " alt="" coords="170,181,241,207"/>
-<area shape="rect" id="node3" href="$cs_8c.html#ab0409434fb3c42f45ba194b4acfed419" title="cs_calloc" alt="" coords="451,181,528,207"/>
-<area shape="rect" id="node4" href="$cs_8c.html#acd7870b59196d21738059812d6eb9e94" title="cs_done" alt="" coords="317,79,387,106"/>
-<area shape="rect" id="node7" href="$cs_8c.html#a2762d0a71c7c3acc7bda0d4bb0befd03" title="cs_malloc" alt="" coords="449,257,530,283"/>
-<area shape="rect" id="node8" href="$cs_8c.html#a324e7bf547ed0b969275da4410563e6e" title="cs_scatter" alt="" coords="311,383,393,410"/>
-<area shape="rect" id="node9" href="$cs_8c.html#a7b4b540a4da0b23b8d3956cf0356e3ca" title="cs_spalloc" alt="" coords="310,181,394,207"/>
-<area shape="rect" id="node10" href="$cs_8c.html#a4f6f6d0b8acba23772fd254ec794e966" title="cs_sprealloc" alt="" coords="305,333,399,359"/>
-<area shape="rect" id="node5" href="$cs_8c.html#a78c1d1194aacc65212bb0d2b03643ac7" title="cs_free" alt="" coords="579,79,645,106"/>
-<area shape="rect" id="node11" href="$cs_8c.html#a83d5f12cd0b117a7ae11ffe82cbe0c53" title="cs_realloc" alt="" coords="449,333,530,359"/>
-<area shape="rect" id="node13" href="$cs_8c.html#a4c92d1dd47385e119da4d37ca82c2baa" title="cs_cumsum" alt="" coords="305,29,399,55"/>
+<area shape="rect" id="node2" href="$cs_8c.html#a12000fbd0b9198d3852978cca8386afe" title="cs_add" alt="" coords="171,231,235,258"/>
+<area shape="rect" id="node6" href="$cs_8c.html#a6d705e404a7831ccf01bc0ea064215b9" title="cs_spfree" alt="" coords="445,105,524,131"/>
+<area shape="rect" id="node12" href="$cs_8c.html#aee7c14539994e9ef689771b18e769a58" title="cs_transpose" alt="" coords="153,130,253,157"/>
+<area shape="rect" id="node14" href="$cs__utils_8c.html#a3f4422610da1a3e9e7268e1843ca6de5" title="Create an identity matrix of size n as a cs struct. " alt="" coords="168,181,239,207"/>
+<area shape="rect" id="node3" href="$cs_8c.html#ab0409434fb3c42f45ba194b4acfed419" title="cs_calloc" alt="" coords="446,181,523,207"/>
+<area shape="rect" id="node4" href="$cs_8c.html#acd7870b59196d21738059812d6eb9e94" title="cs_done" alt="" coords="313,79,384,106"/>
+<area shape="rect" id="node7" href="$cs_8c.html#a2762d0a71c7c3acc7bda0d4bb0befd03" title="cs_malloc" alt="" coords="444,257,525,283"/>
+<area shape="rect" id="node8" href="$cs_8c.html#a324e7bf547ed0b969275da4410563e6e" title="cs_scatter" alt="" coords="307,383,390,410"/>
+<area shape="rect" id="node9" href="$cs_8c.html#a7b4b540a4da0b23b8d3956cf0356e3ca" title="cs_spalloc" alt="" coords="307,181,391,207"/>
+<area shape="rect" id="node10" href="$cs_8c.html#a4f6f6d0b8acba23772fd254ec794e966" title="cs_sprealloc" alt="" coords="301,333,396,359"/>
+<area shape="rect" id="node5" href="$cs_8c.html#a78c1d1194aacc65212bb0d2b03643ac7" title="cs_free" alt="" coords="573,79,639,106"/>
+<area shape="rect" id="node11" href="$cs_8c.html#a83d5f12cd0b117a7ae11ffe82cbe0c53" title="cs_realloc" alt="" coords="444,333,525,359"/>
+<area shape="rect" id="node13" href="$cs_8c.html#a4c92d1dd47385e119da4d37ca82c2baa" title="cs_cumsum" alt="" coords="302,29,395,55"/>
 </map>
