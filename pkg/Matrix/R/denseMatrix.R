@@ -198,28 +198,25 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "matrix",  # 2-col.matrix
 
 
 setMethod("isSymmetric", signature(object = "denseMatrix"),
-	  function(object, tol = 100*.Machine$double.eps, ...) {
+	  function(object, tol = 100*.Machine$double.eps, tol1 = 8*tol, ...) {
 	      ## pretest: is it square?
 	      d <- dim(object)
               if((n <- d[1L]) != d[2L]) return(FALSE)
 	      if(n <= 1L) return(TRUE)
 	      ## else: square (n x n) matrix, n >= 2 :
+              is.z <- is(object, "zMatrix")
 	      ## initial tests, fast for large non-symmetric:
-	      if(is.character(all.equal(object[1L, 2L],
-					object[2L, 1L], tolerance = tol))) return(FALSE)
-	      if((is.d <- is(object,"dMatrix")) ||
-                 (is.z <- is(object, "zMatrix")))
-		 for(i in unique(c(1L, 2L, n-1L, n)))
-		     if(is.character(all.equal(object[i, ],
-					       object[, i], tolerance = tol))) return(FALSE)
-	      else # logical, integer
-		 for(i in unique(c(1L, 2L, n-1L, n)))
-		     if(!identical(object[i, ], object[, i])) return(FALSE)
+	      if(length(tol1)) {
+		  ## initial pre-tests, fast for large non-symmetric:
+		  Cj <- if(is.z) Conj else identity
+		  for(i in unique(c(1L, 2L, n-1L, n)))
+		      if(is.character(all.equal(object[i, ], Cj(object[, i]),
+						tolerance = tol1, ...))) return(FALSE)
+	      }
 	      ## else slower test
 	      if (is.d)
 		  isTRUE(all.equal(as(  object,  "dgeMatrix"),
-				   as(t(object), "dgeMatrix"),
-				   tolerance = tol, ...))
+				   as(t(object), "dgeMatrix"), tolerance = tol, ...))
 	      else if (is(object, "nMatrix"))
 		  identical(as(  object,  "ngeMatrix"),
 			    as(t(object), "ngeMatrix"))
@@ -228,8 +225,8 @@ setMethod("isSymmetric", signature(object = "denseMatrix"),
 		  identical(as(  object,  "lgeMatrix"),
 			    as(t(object), "lgeMatrix"))
 	      else if (is.z) ## will error out here
-		  isTRUE(all.equal(as(  object,  "zgeMatrix"),
-                                   as(t(object), "zgeMatrix"),
+		  isTRUE(all.equal(as(       object,   "zgeMatrix"),
+				   as(Conj(t(object)), "zgeMatrix"),
 				   tolerance = tol, ...))
 	      else if (is(object, "iMatrix")) ## will error out here
 		  identical(as(object, "igeMatrix"),
