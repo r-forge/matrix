@@ -1,5 +1,0 @@
-<map id="sparseQR_Qmult" name="sparseQR_Qmult">
-<area shape="rect" id="node2" href="$sparseQR_8h.html#a614549a94002c7e1407cde03a911e16a" title="sparseQR_coef" alt="" coords="195,5,309,32"/>
-<area shape="rect" id="node3" href="$sparseQR_8h.html#a77c75b1c89f4e32f426420faa76275a9" title="Given a sparse QR decomposition and y, compute Q y or Q&#39;y. " alt="" coords="199,56,305,83"/>
-<area shape="rect" id="node4" href="$sparseQR_8h.html#a43eb94cb27f10aedba5ce50939a9b45c" title="Compute qr.resid(qr, y) or qr.fitted(qr, y) " alt="" coords="176,107,328,133"/>
-</map>
