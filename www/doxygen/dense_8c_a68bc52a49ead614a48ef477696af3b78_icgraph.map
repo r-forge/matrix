@@ -1,5 +1,5 @@
 <map id="left_cyclic" name="left_cyclic">
-<area shape="rect" id="node2" href="$dense_8c.html#a00caca24445d05daed3f05182e00c00c" title="getGivens" alt="" coords="137,31,218,57"/>
-<area shape="rect" id="node3" href="$dense_8c.html#a4ada21e7b04deec43e792d2fc3b0d70e" title="checkGivens" alt="" coords="267,5,365,32"/>
-<area shape="rect" id="node4" href="$dense_8h.html#a3a13ecdf06811d2b2ced413892145007" title="lapack_qr" alt="" coords="277,56,355,83"/>
+<area shape="rect" id="node2" href="$dense_8c.html#a00caca24445d05daed3f05182e00c00c" title="getGivens" alt="" coords="135,31,216,57"/>
+<area shape="rect" id="node3" href="$dense_8c.html#a4ada21e7b04deec43e792d2fc3b0d70e" title="checkGivens" alt="" coords="264,5,363,32"/>
+<area shape="rect" id="node4" href="$dense_8h.html#a3a13ecdf06811d2b2ced413892145007" title="lapack_qr" alt="" coords="274,56,353,83"/>
 </map>

@@ -1,0 +1,10 @@
+<map id="gematrix_real_x" name="gematrix_real_x">
+<area shape="rect" id="node2" href="$dgeMatrix_8c.html#a07f64cbc9e066f4234378a7d2f0f3340" title="As dgeMatrix_dgeMatrix_crossprod(), but x and y can be [dln]geMatrix. " alt="" coords="190,5,333,47"/>
+<area shape="rect" id="node4" href="$dgeMatrix_8c.html#a108d701e70cb2ff8658747981f9a58b9" title="As dgeMatrix_crossprod(), but x can be [dln]geMatrix. " alt="" coords="190,71,333,98"/>
+<area shape="rect" id="node6" href="$dgeMatrix_8c.html#a36f2ab4b238433e5952b7efe60f90f78" title="as dgeMatrix_matrix_crossprod() but x can be [dln]geMatrix " alt="" coords="168,122,355,149"/>
+<area shape="rect" id="node8" href="$dgeMatrix_8c.html#a19ba56e4afb10588e0c82923575ce50a" title="as dgeMatrix_matrix_mm() but a can be [dln]geMatrix " alt="" coords="186,173,337,199"/>
+<area shape="rect" id="node3" href="$dgeMatrix_8h.html#ac6784dce344bdbd113867ace31c92cf9" title="geMatrix_geMatrix_crossprod" alt="" coords="403,13,596,39"/>
+<area shape="rect" id="node5" href="$dgeMatrix_8h.html#adb803b1cfa40e0d45e910674fa312e62" title="geMatrix_crossprod" alt="" coords="431,71,567,98"/>
+<area shape="rect" id="node7" href="$dgeMatrix_8h.html#a3d25a939dd674a519c2b33d647fd63a3" title="geMatrix_matrix_crossprod" alt="" coords="410,122,589,149"/>
+<area shape="rect" id="node9" href="$dgeMatrix_8h.html#af4ab598db40eb51a472eaa034ba3afbe" title="%*% – generalized from dge to *ge(): " alt="" coords="427,173,571,199"/>
+</map>

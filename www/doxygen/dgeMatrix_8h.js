@@ -21,6 +21,10 @@ var dgeMatrix_8h =
     [ "dgeMatrix_validate", "dgeMatrix_8h.html#af754a26692ba664a4f2559d85bc06f47", null ],
     [ "dgesdd", "dgeMatrix_8h.html#a82816694a7a62efa0b4cff7a16ec27a9", null ],
     [ "dMatrix_validate", "dgeMatrix_8h.html#aeb856bac3027df440d5869db30a27386", null ],
+    [ "geMatrix_crossprod", "dgeMatrix_8h.html#adb803b1cfa40e0d45e910674fa312e62", null ],
+    [ "geMatrix_geMatrix_crossprod", "dgeMatrix_8h.html#ac6784dce344bdbd113867ace31c92cf9", null ],
+    [ "geMatrix_matrix_crossprod", "dgeMatrix_8h.html#a3d25a939dd674a519c2b33d647fd63a3", null ],
+    [ "geMatrix_matrix_mm", "dgeMatrix_8h.html#af4ab598db40eb51a472eaa034ba3afbe", null ],
     [ "lgeMatrix_getDiag", "dgeMatrix_8h.html#adb2a7402a88c7d3850973384269dc467", null ],
     [ "lgeMatrix_setDiag", "dgeMatrix_8h.html#ab190f90dbca6632a19ad3ebaba90d536", null ]
 ];

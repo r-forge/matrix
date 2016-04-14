@@ -1,6 +1,6 @@
 <map id="dgCMatrix_cholsol" name="dgCMatrix_cholsol">
-<area shape="rect" id="node2" href="$chm__common_8c.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f or free both f and ..." alt="" coords="185,56,333,83"/>
-<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="383,5,489,32"/>
-<area shape="rect" id="node4" href="$chm__common_8h.html#a5a58b22e709dab2df84046bf89e76920" title="chm_factor_ok" alt="" coords="382,56,490,83"/>
-<area shape="rect" id="node5" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="409,107,463,133"/>
+<area shape="rect" id="node2" href="$chm__common_8c.html#ab819ab14a3e30e850191896d33089b94" title="Copy the contents of f to an appropriate CHMfactor object and, optionally, free f or free both f and ..." alt="" coords="184,56,332,83"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="381,5,487,32"/>
+<area shape="rect" id="node4" href="$chm__common_8h.html#a5a58b22e709dab2df84046bf89e76920" title="chm_factor_ok" alt="" coords="380,56,488,83"/>
+<area shape="rect" id="node5" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype: the kind of numeric (think &quot;x slot&quot;) of Cholmod sparse matrices. " alt="" coords="407,107,461,133"/>
 </map>

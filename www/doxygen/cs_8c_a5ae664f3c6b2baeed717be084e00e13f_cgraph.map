@@ -1,13 +1,13 @@
 <map id="cs_chol" name="cs_chol">
-<area shape="rect" id="node2" href="$cs_8c.html#ab0409434fb3c42f45ba194b4acfed419" title="cs_calloc" alt="" coords="411,8,488,35"/>
-<area shape="rect" id="node3" href="$cs_8c.html#ab6bc6149bec190fcbdc19058e7d54034" title="cs_ereach" alt="" coords="128,312,211,339"/>
-<area shape="rect" id="node4" href="$cs_8c.html#a2762d0a71c7c3acc7bda0d4bb0befd03" title="cs_malloc" alt="" coords="409,135,490,162"/>
-<area shape="rect" id="node5" href="$cs_8c.html#a277457f63f07ee0d7f0e15e145af7c80" title="cs_ndone" alt="" coords="130,262,209,288"/>
-<area shape="rect" id="node9" href="$cs_8c.html#a7b4b540a4da0b23b8d3956cf0356e3ca" title="cs_spalloc" alt="" coords="271,110,355,136"/>
-<area shape="rect" id="node10" href="$cs_8c.html#acf92b97dddb919f27a469860c75b64e9" title="cs_symperm" alt="" coords="121,59,218,86"/>
-<area shape="rect" id="node6" href="$cs_8c.html#a6d705e404a7831ccf01bc0ea064215b9" title="cs_spfree" alt="" coords="410,262,489,288"/>
-<area shape="rect" id="node7" href="$cs_8c.html#a78c1d1194aacc65212bb0d2b03643ac7" title="cs_free" alt="" coords="539,287,605,314"/>
-<area shape="rect" id="node8" href="$cs_8c.html#af2e6d75dfc24a842fdbce3aa510dc4bc" title="cs_nfree" alt="" coords="277,312,349,339"/>
-<area shape="rect" id="node11" href="$cs_8c.html#acd7870b59196d21738059812d6eb9e94" title="cs_done" alt="" coords="278,211,349,238"/>
-<area shape="rect" id="node12" href="$cs_8c.html#a4c92d1dd47385e119da4d37ca82c2baa" title="cs_cumsum" alt="" coords="267,59,360,86"/>
+<area shape="rect" id="node2" href="$cs_8c.html#ab0409434fb3c42f45ba194b4acfed419" title="cs_calloc" alt="" coords="409,8,486,35"/>
+<area shape="rect" id="node3" href="$cs_8c.html#ab6bc6149bec190fcbdc19058e7d54034" title="cs_ereach" alt="" coords="127,312,210,339"/>
+<area shape="rect" id="node4" href="$cs_8c.html#a2762d0a71c7c3acc7bda0d4bb0befd03" title="cs_malloc" alt="" coords="407,135,488,162"/>
+<area shape="rect" id="node5" href="$cs_8c.html#a277457f63f07ee0d7f0e15e145af7c80" title="cs_ndone" alt="" coords="129,262,208,288"/>
+<area shape="rect" id="node9" href="$cs_8c.html#a7b4b540a4da0b23b8d3956cf0356e3ca" title="cs_spalloc" alt="" coords="270,110,354,136"/>
+<area shape="rect" id="node10" href="$cs_8c.html#acf92b97dddb919f27a469860c75b64e9" title="cs_symperm" alt="" coords="120,59,217,86"/>
+<area shape="rect" id="node6" href="$cs_8c.html#a6d705e404a7831ccf01bc0ea064215b9" title="cs_spfree" alt="" coords="408,262,487,288"/>
+<area shape="rect" id="node7" href="$cs_8c.html#a78c1d1194aacc65212bb0d2b03643ac7" title="cs_free" alt="" coords="536,287,601,314"/>
+<area shape="rect" id="node8" href="$cs_8c.html#af2e6d75dfc24a842fdbce3aa510dc4bc" title="cs_nfree" alt="" coords="276,312,348,339"/>
+<area shape="rect" id="node11" href="$cs_8c.html#acd7870b59196d21738059812d6eb9e94" title="cs_done" alt="" coords="277,211,347,238"/>
+<area shape="rect" id="node12" href="$cs_8c.html#a4c92d1dd47385e119da4d37ca82c2baa" title="cs_cumsum" alt="" coords="265,59,359,86"/>
 </map>

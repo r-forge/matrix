@@ -4,9 +4,9 @@
 <area shape="rect" id="node3" href="$cs_8h.html#a772ba477fdc1f6499735635e037b0c6d" title="cs_spsolve" alt="" coords="239,56,327,83"/>
 <area shape="rect" id="node4" href="$cs_8h.html#a6a35ad4816f210234a33eed09b19d181" title="cs_lu" alt="" coords="431,31,484,57"/>
 <area shape="rect" id="node9" href="$dtCMatrix_8h.html#a4370f8d80c77fc815ac826f457e4960b" title="dtCMatrix_sparse_solve" alt="" coords="376,81,539,108"/>
-<area shape="rect" id="node5" href="$cs_8h.html#a99ff84a3be540f3237c33a873064e1e5" title="cs_lusol" alt="" coords="589,5,659,32"/>
-<area shape="rect" id="node6" href="$dgCMatrix_8c.html#ad6045ab51c67c719a4deab2c929e4d13" title="install_lu" alt="" coords="587,56,661,83"/>
-<area shape="rect" id="node7" href="$dgCMatrix_8h.html#a848fa1b60915b5ee7926c897b8b5f050" title="dgCMatrix_LU" alt="" coords="737,31,844,57"/>
-<area shape="rect" id="node8" href="$dgCMatrix_8h.html#af93f855ba17fa036d69aece5e0321510" title="dgCMatrix_matrix_solve" alt="" coords="709,81,872,108"/>
+<area shape="rect" id="node5" href="$cs_8h.html#a99ff84a3be540f3237c33a873064e1e5" title="cs_lusol" alt="" coords="588,5,659,32"/>
+<area shape="rect" id="node6" href="$dgCMatrix_8c.html#a96ad800167bbc6769dd31e97c38f3690" title="install_lu" alt="" coords="587,56,660,83"/>
+<area shape="rect" id="node7" href="$dgCMatrix_8h.html#aa0183ea2cfb3994e02d6a467a91de60a" title="dgCMatrix_LU" alt="" coords="736,31,843,57"/>
+<area shape="rect" id="node8" href="$dgCMatrix_8h.html#af93f855ba17fa036d69aece5e0321510" title="dgCMatrix_matrix_solve" alt="" coords="708,81,871,108"/>
 <area shape="rect" id="node11" href="$cs_8h.html#a9f1bf76ebd53b793b96c83f6716fdc75" title="cs_dmperm" alt="" coords="237,107,328,133"/>
 </map>

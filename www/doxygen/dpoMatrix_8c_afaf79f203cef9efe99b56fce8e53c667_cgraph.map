@@ -1,6 +1,6 @@
 <map id="dpoMatrix_solve" name="dpoMatrix_solve">
-<area shape="rect" id="node2" href="$dpoMatrix_8c.html#aa951f7c9871735266da55e7d92a6ae58" title="dpoMatrix_chol" alt="" coords="171,56,282,83"/>
-<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="331,5,437,32"/>
-<area shape="rect" id="node4" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="341,56,427,83"/>
-<area shape="rect" id="node5" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="341,107,427,133"/>
+<area shape="rect" id="node2" href="$dpoMatrix_8c.html#aa951f7c9871735266da55e7d92a6ae58" title="dpoMatrix_chol" alt="" coords="171,56,281,83"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="329,5,436,32"/>
+<area shape="rect" id="node4" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="339,56,426,83"/>
+<area shape="rect" id="node5" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="339,107,426,133"/>
 </map>

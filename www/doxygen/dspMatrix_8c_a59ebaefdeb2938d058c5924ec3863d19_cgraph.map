@@ -1,8 +1,8 @@
 <map id="dspMatrix_rcond" name="dspMatrix_rcond">
-<area shape="rect" id="node2" href="$dspMatrix_8c.html#a54f1c211fe36a020c613498e295f6365" title="dspMatrix_trf" alt="" coords="173,69,272,96"/>
-<area shape="rect" id="node6" href="$dspMatrix_8c.html#a2a8d63739f02971700f3a26bffe3ba52" title="get_norm_sp" alt="" coords="174,132,271,159"/>
-<area shape="rect" id="node3" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="330,5,417,32"/>
-<area shape="rect" id="node4" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="320,56,427,83"/>
-<area shape="rect" id="node5" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="330,107,417,133"/>
-<area shape="rect" id="node7" href="$Mutils_8c.html#ae83d110234906231be64768d898c866c" title="La_norm_type" alt="" coords="321,157,425,184"/>
+<area shape="rect" id="node2" href="$dspMatrix_8c.html#a54f1c211fe36a020c613498e295f6365" title="dspMatrix_trf" alt="" coords="172,69,271,96"/>
+<area shape="rect" id="node6" href="$dspMatrix_8c.html#a2a8d63739f02971700f3a26bffe3ba52" title="get_norm_sp" alt="" coords="173,132,270,159"/>
+<area shape="rect" id="node3" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="329,5,415,32"/>
+<area shape="rect" id="node4" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="319,56,425,83"/>
+<area shape="rect" id="node5" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="329,107,415,133"/>
+<area shape="rect" id="node7" href="$Mutils_8c.html#ae83d110234906231be64768d898c866c" title="La_norm_type" alt="" coords="320,157,424,184"/>
 </map>

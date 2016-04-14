@@ -1,5 +1,5 @@
 <map id="Csparse_symmetric_to_general" name="Csparse_symmetric_to_general">
-<area shape="rect" id="node2" href="$chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="212,5,367,32"/>
+<area shape="rect" id="node2" href="$chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="211,5,366,32"/>
 <area shape="rect" id="node4" href="$Mutils_8c.html#a316a7184387d598d6ab9d48c4a9a2da8" title="Produce symmetric &#39;Dimnames&#39; from possibly asymmetric ones. " alt="" coords="211,56,367,83"/>
-<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="416,5,523,32"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="415,5,521,32"/>
 </map>

@@ -1,5 +1,5 @@
 <map id="make_d_matrix_triangular" name="make_d_matrix_triangular">
 <area shape="rect" id="node2" href="$dtrMatrix_8h.html#a04120fadac4a52bcedbcb1a5804763ca" title="dtrMatrix_as_matrix" alt="" coords="235,5,373,32"/>
-<area shape="rect" id="node3" href="$dtrMatrix_8h.html#a4c867d5968ff8e94c0570c6b761cdabe" title="dtrMatrix_dtrMatrix_mm" alt="" coords="224,56,384,83"/>
+<area shape="rect" id="node3" href="$dtrMatrix_8h.html#a4c867d5968ff8e94c0570c6b761cdabe" title="Matrix products of dense triangular Matrices. " alt="" coords="224,56,384,83"/>
 <area shape="rect" id="node4" href="$factorizations_8h.html#a0ec00f455c00bf1b862139fe6d4a265a" title="LU_expand" alt="" coords="260,107,348,133"/>
 </map>

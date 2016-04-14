@@ -1,12 +1,12 @@
 <map id="La_norm_type" name="La_norm_type">
-<area shape="rect" id="node2" href="$dgeMatrix_8c.html#a18e14d832081c8d7d6df7bd2f9e390f9" title="get_norm" alt="" coords="169,81,245,108"/>
-<area shape="rect" id="node6" href="$dspMatrix_8h.html#a2a8d63739f02971700f3a26bffe3ba52" title="get_norm_sp" alt="" coords="158,183,255,209"/>
-<area shape="rect" id="node9" href="$dsyMatrix_8h.html#a886569af93c91d1856c961323c5d6bce" title="get_norm_sy" alt="" coords="158,259,255,285"/>
-<area shape="rect" id="node3" href="$dgeMatrix_8h.html#ad6b2835d2acbc142689c1d980387c5e0" title="dgeMatrix_norm" alt="" coords="307,5,421,32"/>
-<area shape="rect" id="node4" href="$dgeMatrix_8h.html#ac4f1b4b19a004fb62c9cb68ccb1028ea" title="dgeMatrix_rcond" alt="" coords="305,56,423,83"/>
-<area shape="rect" id="node5" href="$dgeMatrix_8h.html#a8f0564cd095a4415738ef1ad8d537da1" title="dgeMatrix_solve" alt="" coords="305,107,423,133"/>
-<area shape="rect" id="node7" href="$dspMatrix_8h.html#a4369a63e275fb42aeeb6f24d78eeb606" title="dspMatrix_norm" alt="" coords="307,157,421,184"/>
-<area shape="rect" id="node8" href="$dspMatrix_8h.html#a59ebaefdeb2938d058c5924ec3863d19" title="dspMatrix_rcond" alt="" coords="305,208,423,235"/>
-<area shape="rect" id="node10" href="$dsyMatrix_8h.html#aa00fb1509ab9a485786d4a74a880175d" title="dsyMatrix_norm" alt="" coords="307,259,421,285"/>
-<area shape="rect" id="node11" href="$dsyMatrix_8h.html#ab262747a9bb8df9b06e3c234260dd92b" title="dsyMatrix_rcond" alt="" coords="305,309,423,336"/>
+<area shape="rect" id="node2" href="$dgeMatrix_8c.html#a18e14d832081c8d7d6df7bd2f9e390f9" title="get_norm" alt="" coords="168,81,244,108"/>
+<area shape="rect" id="node6" href="$dspMatrix_8h.html#a2a8d63739f02971700f3a26bffe3ba52" title="get_norm_sp" alt="" coords="157,183,255,209"/>
+<area shape="rect" id="node9" href="$dsyMatrix_8h.html#a886569af93c91d1856c961323c5d6bce" title="get_norm_sy" alt="" coords="157,259,255,285"/>
+<area shape="rect" id="node3" href="$dgeMatrix_8h.html#ad6b2835d2acbc142689c1d980387c5e0" title="dgeMatrix_norm" alt="" coords="305,5,419,32"/>
+<area shape="rect" id="node4" href="$dgeMatrix_8h.html#ac4f1b4b19a004fb62c9cb68ccb1028ea" title="dgeMatrix_rcond" alt="" coords="303,56,421,83"/>
+<area shape="rect" id="node5" href="$dgeMatrix_8h.html#a8f0564cd095a4415738ef1ad8d537da1" title="dgeMatrix_solve" alt="" coords="303,107,421,133"/>
+<area shape="rect" id="node7" href="$dspMatrix_8h.html#a4369a63e275fb42aeeb6f24d78eeb606" title="dspMatrix_norm" alt="" coords="305,157,419,184"/>
+<area shape="rect" id="node8" href="$dspMatrix_8h.html#a59ebaefdeb2938d058c5924ec3863d19" title="dspMatrix_rcond" alt="" coords="303,208,421,235"/>
+<area shape="rect" id="node10" href="$dsyMatrix_8h.html#aa00fb1509ab9a485786d4a74a880175d" title="dsyMatrix_norm" alt="" coords="305,259,419,285"/>
+<area shape="rect" id="node11" href="$dsyMatrix_8h.html#ab262747a9bb8df9b06e3c234260dd92b" title="dsyMatrix_rcond" alt="" coords="303,309,421,336"/>
 </map>

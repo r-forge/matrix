@@ -1,0 +1,9 @@
+<map id="geMatrix_geMatrix_crossprod" name="geMatrix_geMatrix_crossprod">
+<area shape="rect" id="node2" href="$dgeMatrix_8c.html#a07f64cbc9e066f4234378a7d2f0f3340" title="As dgeMatrix_dgeMatrix_crossprod(), but x and y can be [dln]geMatrix. " alt="" coords="263,19,405,61"/>
+<area shape="rect" id="node4" href="$Mutils_8c.html#a23764b1c8334e40406598a0446cc8bc5" title="Duplicate a [dln]denseMatrix or a numeric matrix or even a vector as a [dln]geMatrix. " alt="" coords="247,107,421,133"/>
+<area shape="rect" id="node3" href="$dgeMatrix_8c.html#a8f5995fb861a40c66e291d29615abc33" title="gematrix_real_x" alt="" coords="499,5,614,32"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="503,56,610,83"/>
+<area shape="rect" id="node6" href="$Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title="make_i_matrix_triangular" alt="" coords="473,107,640,133"/>
+<area shape="rect" id="node7" href="$Mutils_8h.html#a133847040a4bd7d9bdb602c11aa6f048" title="make_i_matrix_symmetric" alt="" coords="469,157,644,184"/>
+<area shape="rect" id="node8" href="$Mutils_8c.html#adaf5449cf279f61000d9d1a1215d4b6a" title="install_diagonal_int" alt="" coords="491,208,623,235"/>
+</map>

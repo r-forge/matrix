@@ -1,4 +1,4 @@
 <map id="Tsparse_diagU2N" name="Tsparse_diagU2N">
-<area shape="rect" id="node2" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="189,5,296,32"/>
-<area shape="rect" id="node3" href="$Mutils_8h.html#aeb40b76e760863cfc4e4009cf04e39e6" title="SET_DimNames" alt="" coords="182,56,303,83"/>
+<area shape="rect" id="node2" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="187,5,294,32"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#aeb40b76e760863cfc4e4009cf04e39e6" title="SET_DimNames" alt="" coords="180,56,301,83"/>
 </map>

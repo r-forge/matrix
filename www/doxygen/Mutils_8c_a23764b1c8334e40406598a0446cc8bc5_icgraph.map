@@ -1,6 +1,10 @@
 <map id="dup_mMatrix_as_geMatrix" name="dup_mMatrix_as_geMatrix">
-<area shape="rect" id="node2" href="$dense_8h.html#afc94ab69278e25ef4ea5ed5ba90935c3" title="dense_band" alt="" coords="257,5,349,32"/>
-<area shape="rect" id="node3" href="$dense_8h.html#a389bdf26bd829335d25dffb4244c9ae6" title="dense_to_symmetric" alt="" coords="231,56,374,83"/>
-<area shape="rect" id="node4" href="$Mutils_8h.html#a623039270a92fce0643031ef7f6e72b2" title="mMatrix_as_geMatrix" alt="" coords="229,107,376,133"/>
-<area shape="rect" id="node5" href="$dense_8h.html#a33b46f3a16a95734d4875ddfbfa079cb" title="dense_to_Csparse" alt="" coords="424,107,555,133"/>
+<area shape="rect" id="node2" href="$dense_8h.html#afc94ab69278e25ef4ea5ed5ba90935c3" title="dense_band" alt="" coords="279,5,371,32"/>
+<area shape="rect" id="node3" href="$dense_8h.html#a389bdf26bd829335d25dffb4244c9ae6" title="dense_to_symmetric" alt="" coords="253,56,396,83"/>
+<area shape="rect" id="node4" href="$dgeMatrix_8h.html#adb803b1cfa40e0d45e910674fa312e62" title="geMatrix_crossprod" alt="" coords="257,107,393,133"/>
+<area shape="rect" id="node5" href="$dgeMatrix_8h.html#ac6784dce344bdbd113867ace31c92cf9" title="geMatrix_geMatrix_crossprod" alt="" coords="228,157,421,184"/>
+<area shape="rect" id="node6" href="$dgeMatrix_8h.html#a3d25a939dd674a519c2b33d647fd63a3" title="geMatrix_matrix_crossprod" alt="" coords="235,208,414,235"/>
+<area shape="rect" id="node7" href="$dgeMatrix_8h.html#af4ab598db40eb51a472eaa034ba3afbe" title="%*% – generalized from dge to *ge(): " alt="" coords="253,259,397,285"/>
+<area shape="rect" id="node8" href="$Mutils_8h.html#a623039270a92fce0643031ef7f6e72b2" title="mMatrix_as_geMatrix" alt="" coords="251,309,398,336"/>
+<area shape="rect" id="node9" href="$dense_8h.html#a33b46f3a16a95734d4875ddfbfa079cb" title="dense_to_Csparse" alt="" coords="469,309,600,336"/>
 </map>

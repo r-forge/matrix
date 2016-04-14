@@ -1,7 +1,7 @@
 <map id="mMatrix_as_geMatrix" name="mMatrix_as_geMatrix">
-<area shape="rect" id="node2" href="$Mutils_8h.html#a23764b1c8334e40406598a0446cc8bc5" title="Duplicate a [dln]denseMatrix or a numeric matrix or even vector as a [dln]geMatrix. " alt="" coords="201,81,375,108"/>
-<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="459,5,565,32"/>
-<area shape="rect" id="node4" href="$Mutils_8c.html#adaf5449cf279f61000d9d1a1215d4b6a" title="install_diagonal_int" alt="" coords="446,56,578,83"/>
-<area shape="rect" id="node5" href="$Mutils_8h.html#a133847040a4bd7d9bdb602c11aa6f048" title="make_i_matrix_symmetric" alt="" coords="425,107,599,133"/>
-<area shape="rect" id="node6" href="$Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title="make_i_matrix_triangular" alt="" coords="429,157,595,184"/>
+<area shape="rect" id="node2" href="$Mutils_8h.html#a23764b1c8334e40406598a0446cc8bc5" title="Duplicate a [dln]denseMatrix or a numeric matrix or even a vector as a [dln]geMatrix. " alt="" coords="200,81,375,108"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="457,5,563,32"/>
+<area shape="rect" id="node4" href="$Mutils_8c.html#adaf5449cf279f61000d9d1a1215d4b6a" title="install_diagonal_int" alt="" coords="444,56,576,83"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#a133847040a4bd7d9bdb602c11aa6f048" title="make_i_matrix_symmetric" alt="" coords="423,107,597,133"/>
+<area shape="rect" id="node6" href="$Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title="make_i_matrix_triangular" alt="" coords="427,157,593,184"/>
 </map>

@@ -12,19 +12,19 @@
 <area shape="rect" id="node22" href="$dpoMatrix_8c.html#aa951f7c9871735266da55e7d92a6ae58" title="dpoMatrix_chol" alt="" coords="178,484,289,510"/>
 <area shape="rect" id="node25" href="$chm__common_8c.html#aac8221663c2752d8a26b05dd9be28314" title="numeric_as_chm_dense" alt="" coords="152,737,315,764"/>
 <area shape="rect" id="node26" href="$chm__common_8c.html#a1b14bacbdeada9ba9def1db396a98215" title="Initialize the CHOLMOD library and replace the print and error functions by R&#45;specific versions..." alt="" coords="173,788,294,814"/>
-<area shape="rect" id="node3" href="$chm__common_8c.html#a6eb9b8c79c573099970c93d50e059039" title="RallocedREAL" alt="" coords="569,78,677,105"/>
+<area shape="rect" id="node3" href="$chm__common_8c.html#a6eb9b8c79c573099970c93d50e059039" title="RallocedREAL" alt="" coords="567,78,675,105"/>
 <area shape="rect" id="node6" href="$chm__common_8c.html#a954bf0c9515c3774116e79f0ee51d43c" title="check_sorted_chm" alt="" coords="363,28,495,54"/>
-<area shape="rect" id="node7" href="$chm__common_8c.html#a66c990c6f2cab76ee049ec970bc7d5e8" title="Copy cholmod_sparse, to an R_alloc()ed version of it. " alt="" coords="384,78,475,105"/>
-<area shape="rect" id="node8" href="$chm__common_8c.html#ad988031b3c1f79de0d13da2bf40cc4c1" title="&quot;Cheap&quot; C version of Csparse_validate() &#45; not sorting : " alt="" coords="371,129,488,156"/>
-<area shape="rect" id="node9" href="$chm__common_8c.html#ad7dbb3616e40830729a242662b561897" title="stype" alt="" coords="402,230,457,257"/>
+<area shape="rect" id="node7" href="$chm__common_8c.html#a66c990c6f2cab76ee049ec970bc7d5e8" title="Copy cholmod_sparse, to an R_alloc()ed version of it. " alt="" coords="383,78,474,105"/>
+<area shape="rect" id="node8" href="$chm__common_8c.html#ad988031b3c1f79de0d13da2bf40cc4c1" title="&quot;Cheap&quot; C version of Csparse_validate() &#45; not sorting : " alt="" coords="370,129,487,156"/>
+<area shape="rect" id="node9" href="$chm__common_8c.html#ad7dbb3616e40830729a242662b561897" title="stype := &quot;symmetry type&quot;. " alt="" coords="401,230,456,257"/>
 <area shape="rect" id="node10" href="$chm__common_8c.html#a9ea43d94a2bbd6c055ff9da6e3f24109" title="xpt" alt="" coords="409,180,449,206"/>
-<area shape="rect" id="node11" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype" alt="" coords="402,281,457,308"/>
+<area shape="rect" id="node11" href="$chm__common_8c.html#af9e93950e044e8dd6480f0b32dfe3f03" title="xtype: the kind of numeric (think &quot;x slot&quot;) of Cholmod sparse matrices. " alt="" coords="401,281,456,308"/>
 <area shape="rect" id="node13" href="$chm__common_8c.html#ac83bdca818781738d783ca4348834b37" title="Copy cholmod_triplet to an R_alloc()ed version of it. " alt="" coords="383,332,475,358"/>
-<area shape="rect" id="node16" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="376,433,483,460"/>
+<area shape="rect" id="node16" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="375,433,482,460"/>
 <area shape="rect" id="node17" href="$chm__common_8h.html#a5a58b22e709dab2df84046bf89e76920" title="chm_factor_ok" alt="" coords="375,382,483,409"/>
-<area shape="rect" id="node23" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="386,484,473,510"/>
-<area shape="rect" id="node24" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="386,534,473,561"/>
-<area shape="rect" id="node27" href="$chm__common_8c.html#ae04b1e8dfd9eb1c7b23c07c95e25d482" title="R_cholmod_error" alt="" coords="369,762,490,789"/>
+<area shape="rect" id="node23" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="385,484,472,510"/>
+<area shape="rect" id="node24" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="385,534,472,561"/>
+<area shape="rect" id="node27" href="$chm__common_8c.html#ae04b1e8dfd9eb1c7b23c07c95e25d482" title="R_cholmod_error" alt="" coords="368,762,489,789"/>
 <area shape="rect" id="node29" href="$chm__common_8c.html#a1a8132e21c478997e6e8c7b8d7d93973" title="R_cholmod_printf" alt="" coords="367,813,491,840"/>
-<area shape="rect" id="node28" href="$chm__common_8c.html#a9ca1fded97b51a281e6ef9f76a12c788" title="CHM_restore_common" alt="" coords="544,762,701,789"/>
+<area shape="rect" id="node28" href="$chm__common_8c.html#a9ca1fded97b51a281e6ef9f76a12c788" title="CHM_restore_common" alt="" coords="543,762,700,789"/>
 </map>
