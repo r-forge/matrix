@@ -214,7 +214,7 @@ setMethod("isSymmetric", signature(object = "denseMatrix"),
 						tolerance = tol1, ...))) return(FALSE)
 	      }
 	      ## else slower test
-	      if (is.d)
+	      if (is(object,"dMatrix"))
 		  isTRUE(all.equal(as(  object,  "dgeMatrix"),
 				   as(t(object), "dgeMatrix"), tolerance = tol, ...))
 	      else if (is(object, "nMatrix"))
