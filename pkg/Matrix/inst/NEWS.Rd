@@ -10,17 +10,11 @@
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 
-\section{Changes in version 1.2-5 (2016-04-14, svn r3170)}{
-  \subsection{New Features}{
-    \itemize{
-      \item \code{isSymmetric(m)} now also works for \code{"indMatrix"} \code{m}.
-      \item \code{isSymmetric(m)} is faster for large dense asymmetric matrices.
-    }
-  }
+\section{Changes in version 1.2-6 (2016-04-27, svn r3173)}{
   \subsection{Bug Fixes}{
     \itemize{
-      \item Matrix multiplications (\code{A \%*\% B}) now work correctly
-      when one of the matrices is diagonal and the other has a zero dimension.
+      \item The 0-dim. Matrix multiplication fix in 1.2-5 did trigger
+      wrong warnings in other diagonal matrix multiplications.
     }
   }
 }
