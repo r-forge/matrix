@@ -1,7 +1,9 @@
 \name{wrld_1deg}
+%% only as long as not requiring R >= 3.2.0:
+\newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\title{World 1-degree grid contiguity matrix}
 \alias{wrld_1deg}
 \docType{data}
-\title{World 1-degree grid contiguity matrix}
 \description{
   This matrix represents the distance-based contiguities of 15260
   one-degree grid cells of land areas. The representation is as a
@@ -16,7 +18,8 @@
 \details{
   The data were created into \R using the coordinates of a
   \sQuote{SpatialPixels} object containing approximately one-degree grid
-  cells for land areas only (world excluding Antarctica), using
+  cells for land areas only (world excluding Antarctica), using package
+  \CRANpkg{spdep}'s
   \code{\link[spdep]{dnearneigh}} with a cutoff distance of \code{sqrt(2)},
   and row-standardised and transformed to symmetry using
   \code{\link[spdep]{nb2listw}} and \code{\link[spdep]{similar.listw}}.
@@ -27,7 +30,7 @@
 \source{
   The shoreline data was read into \R using \code{\link[maptools]{Rgshhs}}
   from the GSHHS coarse shoreline database distributed with the
-  \pkg{maptools} package, omitting Antarctica.  A matching approximately
+  \CRANpkg{maptools} package, omitting Antarctica.  A matching approximately
   one-degree grid was generated using
   \code{\link[maptools]{Sobj_SpatialGrid}}, and the grids on land were
   found using the appropriate \code{\link[sp]{over}}% was {overlay} till 2016-02
