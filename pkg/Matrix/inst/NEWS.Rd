@@ -18,6 +18,9 @@
       \item \code{cBind()} and \code{rBind()} have been almost silently
       deprecated in \R \code{>= 3.2.0} and now give a warning,
       \dQuote{once per session} only.
+
+      \item \code{bandSparse(*, k=k, *)} now returns matrices inheriting from
+      \code{"triangularMatrix"} when obvious from the diagonal indices \code{k}.
     }
   }
   %% \subsection{Bug Fixes}{
