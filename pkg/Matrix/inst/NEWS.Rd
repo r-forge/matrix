@@ -12,7 +12,7 @@
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 
-\section{Changes in version 1.2-7 (2016-08-27, svn r...)}{
+\section{Changes in version 1.2-7 (2016-08-27, svn r3185)}{
   \subsection{New Features}{
     \itemize{
       \item \code{cBind()} and \code{rBind()} have been almost silently
