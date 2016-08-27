@@ -12,7 +12,7 @@
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 
-\section{Changes in version 1.2-7 (2016-..-.., svn r...)}{
+\section{Changes in version 1.2-7 (2016-08-27, svn r...)}{
   \subsection{New Features}{
     \itemize{
       \item \code{cBind()} and \code{rBind()} have been almost silently
@@ -23,11 +23,12 @@
       \code{"triangularMatrix"} when obvious from the diagonal indices \code{k}.
     }
   }
-  %% \subsection{Bug Fixes}{
-  %%   \itemize{
-  %%     \item
-  %%   }
-  %% }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{KhatriRao(X,Y)} now also works when \code{X} or
+      \code{Y} is completely zero.
+    }
+  }
 }
 
 \section{Changes in version 1.2-6 (2016-04-27, svn r3175)}{
