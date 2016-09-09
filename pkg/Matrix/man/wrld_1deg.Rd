@@ -1,6 +1,6 @@
 \name{wrld_1deg}
 %% only as long as not requiring R >= 3.2.0:
-\newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\newcommand{\CRANpkg}{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 \title{World 1-degree grid contiguity matrix}
 \alias{wrld_1deg}
 \docType{data}

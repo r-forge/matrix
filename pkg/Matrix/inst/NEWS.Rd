@@ -4,7 +4,7 @@
 \title{News for \R Package \pkg{Matrix}}% MM: look into ../svn-log-from.all
 \encoding{UTF-8}
 %% as long as not R >= 3.2.0, ~/R/D/r-devel/R/share/Rd/macros/system.Rd :
-\newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\newcommand{\CRANpkg}{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 \newcommand{\sspace}{\ifelse{latex}{\out{~}}{ }}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
