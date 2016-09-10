@@ -686,6 +686,8 @@ setClass("Schur", contains = "MatrixFactorization",
 ### Class Union :  no inheritance, but is(*, <class>) :
 
 setClassUnion("mMatrix", members = c("matrix", "Matrix"))
+if(FALSE) ## to be used in setMethod("c", "numM...") -- once that works
+setClassUnion("numMatrixLike", members = c("logical", "integer", "numeric", "mMatrix"))
 
 ## CARE: Sometimes we'd want all those for which 'x' contains all the data.
 ##       e.g. Diagonal() is "ddiMatrix" with 'x' slot of length 0, does *not* contain 1
