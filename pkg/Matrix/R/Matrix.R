@@ -47,6 +47,15 @@ setMethod("as.vector", "Matrix",
 ## S3 dispatch works for base::as.vector(), but S4 dispatch does not
 as.vector.Matrix <- function(x, mode) as.vector(as(x, "matrix"), mode)
 
+if(FALSE) { ## still does not work for c(1, Matrix(2))
+## For the same reason (and just in case) also do both S3 and S4 here:
+c.Matrix <- function(...) unlist(lapply(list(...), as.vector))
+## NB: Must use   signature  '(x, ..., recursive = FALSE)' :
+setMethod("c", "Matrix", function(x, ..., recursive) c.Matrix(x, ...))
+## The above is not sufficient for  c(NA, 3:2, <Matrix>, <matrix>)
+setMethod("c", "numMatrixLike", function(x, ..., recursive) c.Matrix(x, ...))
+}# not yet
+
 setAs("Matrix", "vector",  function(from) as.vector (as(from, "matrix")))
 setAs("Matrix", "numeric", function(from) as.numeric(as(from, "matrix")))
 setAs("Matrix", "logical", function(from) as.logical(as(from, "matrix")))
