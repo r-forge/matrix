@@ -799,6 +799,22 @@ setClassUnion("atomicVector", ## "double" is not needed, and not liked by some
 	      members = c("logical", "integer", "numeric",
 			  "complex", "raw", "character"))
 
+setClassUnion("numericVector", members = c("logical", "integer", "numeric"))
+
+setClassUnion("Mnumeric", members = c("numericVector", "Matrix"))
+## not "matrix" as that extends "vector" and contains "character", "structure" ...
+
+setValidity("Mnumeric",
+            function(object) {
+                if(is.numeric(object) ||
+                   is.logical(object) ||
+                   inherits(object, "Matrix")) return(TRUE)
+                ## else
+                "Not a valid 'Mnumeric' class object"
+		})
+
+
+
 ## --- Matrix - related (but not "Matrix" nor "Decomposition/Factorization):
 
 ## for 'value' in  x[..] <- value hence for all "contents" of our Matrices:
