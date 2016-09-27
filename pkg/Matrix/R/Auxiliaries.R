@@ -819,6 +819,7 @@ if(FALSE) ## FIXME: From R we want something like (but all in C - where inherits
     else .Call(dup_mMatrix_as_dgeMatrix, from)
 }
 
+
 ## -> ./ldenseMatrix.R :
 l2d_Matrix <- function(from, cl = MatrixClass(class(from)), cld = getClassDef(cl)) {
     ## stopifnot(is(from, "lMatrix"))
@@ -1535,7 +1536,7 @@ setparts <- function(x,y, uniqueCheck = TRUE, check = TRUE) {
 }
 
 ##' @title Warn about extraneous arguments in the "..."  (of its caller).
-##' A merger of my approach and the one in seq.default()
+##' A merger of my approach and the one in seq.default() -- FIXME: now have base::chkDots()
 ##' @author Martin Maechler, June 2012, May 2014
 ##' @param ...
 ##' @param which.call passed to sys.call().  A caller may use -2 if the message should
