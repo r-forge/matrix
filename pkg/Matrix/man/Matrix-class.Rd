@@ -10,6 +10,8 @@
 \alias{Ops,Matrix,Matrix-method}
 \alias{Ops,Matrix,ANY-method}
 \alias{Ops,ANY,Matrix-method}
+\alias{Ops,Matrix,NULL-method}
+\alias{Ops,NULL,Matrix-method}
 \alias{Ops,Matrix,matrix-method}
 \alias{Ops,matrix,Matrix-method}
 \alias{Ops,logical,Matrix-method}
