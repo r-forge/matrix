@@ -817,9 +817,6 @@ setValidity("Mnumeric",
 
 ## --- Matrix - related (but not "Matrix" nor "Decomposition/Factorization):
 
-## for 'value' in  x[..] <- value hence for all "contents" of our Matrices:
-setClassUnion("replValue", members = c("numeric", "logical", "complex", "raw"))
-
 ### Sparse Vectors ---- here use 1-based indexing ! -----------
 
 ## 'longindex' should allow sparseVectors of "length" > 2^32,
@@ -912,6 +909,10 @@ setClassUnion("xsparseVector", ## those sparseVector's with an 'x' slot
                 "isparseVector",
                 "lsparseVector",
                 "zsparseVector"))
+
+## for 'value' in  x[..] <- value hence for all "contents" of our Matrices:
+setClassUnion("replValue",   members = c("numeric", "logical", "complex", "raw"))
+setClassUnion("replValueSp", members = c("replValue", "sparseVector", "Matrix"))
 
 
 setClass("determinant",
