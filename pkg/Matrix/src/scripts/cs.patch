@@ -1,13 +1,15 @@
 --- cs.h.~3~	2014-10-09 22:01:10.000000000 +0200
 +++ cs.h	2014-12-23 22:47:45.479919000 +0100
-@@ -3,8 +3,13 @@
+@@ -3,8 +3,15 @@
  #include <stdlib.h>
  #include <limits.h>
  #include <math.h>
 +// needed for FILE:
  #include <stdio.h>
  #include <stddef.h>
-+// For use with R package 'Matrix'
++// For use with R package 'Matrix' (NA_REAL, warning(), REprintf(), ..)
++# include <R_ext/Arith.h>
++# include <R_ext/Error.h>
 +# include <R_ext/Print.h>
 +# include <R_ext/Random.h>
 +# define printf Rprintf
@@ -53,28 +55,3 @@
      return (p) ;
  }
  /* xi [top...n-1] = nodes reachable from graph of G*P' via nodes in B(:,k).
---- cs.h.~3~	2014-10-09 22:01:10.000000000 +0200
-+++ cs.h	2014-12-23 22:47:45.479919000 +0100
-@@ -3,8 +3,13 @@
- #include <stdlib.h>
- #include <limits.h>
- #include <math.h>
-+// needed for FILE:
- #include <stdio.h>
- #include <stddef.h>
-+// For use with R package 'Matrix'
-+# include <R_ext/Print.h>
-+# include <R_ext/Random.h>
-+# define printf Rprintf
- #ifdef MATLAB_MEX_FILE
- #include "mex.h"
- #endif
-@@ -18,6 +23,8 @@
- #undef csi
- #define csi mwSignedIndex
- #endif
-+// Matrix pkg:
-+#define csi int
- #ifndef csi
- #define csi ptrdiff_t
- #endif
