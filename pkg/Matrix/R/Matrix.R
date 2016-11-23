@@ -373,6 +373,9 @@ setMethod("diag<-", signature(x = "Matrix"),
 setMethod("t", signature(x = "Matrix"),
 	  function(x) .bail.out.1(.Generic, class(x)))
 
+## NB: "sparseMatrix" works via "sparseVector"
+setMethod("rep", "Matrix", function(x, ...) rep(as(x, "matrix"), ...))
+
 setMethod("norm", signature(x = "Matrix", type = "character"),
 	  function(x, type, ...) .bail.out.1("norm", class(x)))
 setMethod("rcond", signature(x = "Matrix", norm = "character"),

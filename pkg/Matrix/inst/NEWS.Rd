@@ -12,6 +12,29 @@
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 
+\section{Changes in version 1.2-8 (2016-11-.., svn r3...)}{
+  \subsection{New Features}{
+    \itemize{
+      \item 0-length matrix \code{"Ops"} (binary operations) are now
+      compatible to R-devel (to be \R 3.4.0).
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{x[.] <- value} now also works for
+      \code{"sparseVector"}'s, both as \code{x} and as \code{value}.
+      \item \code{x[FALSE] <- value} now also works for \code{"sparseVector"}'s.
+
+      \item \code{rep(x, *)} now works for \code{"sparseVector"}s and
+      sparse and dense \code{"Matrix"}-classed matrices \code{x}.
+
+      \item \code{solve(<sparse_LU>)} no gives an error in some cases of
+      singular matrices, where before the C code accessed illegal memory locations.
+    }
+  }
+}
+
+
 \section{Changes in version 1.2-7.1 (2016-08-29, svn r3187)}{
   \itemize{ \item in C code, protect _POSIX_C_SOURCE by #ifdef __GLIBC__ }
 }

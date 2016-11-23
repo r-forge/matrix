@@ -11,8 +11,8 @@ is1  <- function(x) !is.na(x) & x   # also == "isTRUE componentwise"
 ##
 ##allFalse <- function(x) !any(x) && !any(is.na(x))## ~= all0, but allFalse(NULL) = TRUE w/warning
 ##all0 <- function(x) !any(is.na(x)) && all(!x) ## ~= allFalse
-allFalse <-
-all0 <- function(x) if(is.atomic(x)) .Call(R_all0, x) else !any(x) && !any(is.na(x))
+allFalse <- function(x) if(is.atomic(x)) .Call(R_all0, x) else !any(x) && !any(is.na(x))
+all0     <- function(x) if(is.atomic(x)) .Call(R_all0, x) else all(!x) && !any(is.na(x))
 
 ##anyFalse <- function(x) isTRUE(any(!x))		 ## ~= any0
 ## any0 <- function(x) isTRUE(any(x == 0))	      ## ~= anyFalse

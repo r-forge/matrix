@@ -80,6 +80,7 @@
 \alias{coerce,Matrix,CsparseMatrix-method}
 \alias{coerce,Matrix,sparseMatrix-method}
 %\alias{solve,Matrix,....-method}--> ./solve-methods.Rd
+\alias{rep,Matrix-method}
 %\alias{unname,Matrix-method}
 \alias{unname,Matrix,missing-method}
 % Fake entries - so users find this:
