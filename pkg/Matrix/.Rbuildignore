@@ -10,3 +10,4 @@ misc/
 doc/unused
 doc/DSC20.*
 po/translator.*
+src/CHOLMOD/Check
