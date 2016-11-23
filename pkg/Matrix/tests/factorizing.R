@@ -135,7 +135,10 @@ a[a < 7.5] <- 0
 qD <- chkQR(a, giveRE=TRUE) ## using base qr
 qS <- chkQR(A, giveRE=TRUE) ## using Matrix "sparse qr" -- "structurally rank deficient!
 validObject(qS)# with the validity now (2012-11-18) -- ok, also for "bad" case
+## Here, have illegal access  Up[-1] in ../src/cs.c
+try( ## After patch (2016-10-04 - *NOT* committed), this fails:  __FIXME?__
 chk.qr.D.S(qD, qS, y = 10 + 1:nrow(A), force=TRUE)# 6 warnings: "structurally rank deficient"
+)
 try( ## NOTE: *Both* checks  currently fail here:
     chkQR(A, Qinv.chk=TRUE, QtQ.chk=TRUE)
 )
