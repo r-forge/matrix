@@ -4,28 +4,52 @@
 #include <stddef.h>
 #include <limits.h>
 
+// Rather use C99 -- which we require in R anyway
+#include <inttypes.h>
+
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-// from ../../src/UFconfig/UFconfig.h - line 51 :
+// from ../../src/SuiteSparse_config/SuiteSparse_config.h :
+#ifndef SuiteSparse_long
+
+/* #ifdef _WIN64 */
+
+/* #define SuiteSparse_long __int64 */
+/* #define SuiteSparse_long_max _I64_MAX */
+/* #define SuiteSparse_long_idd "I64d" */
+
+/* #else */
+
+/* #define SuiteSparse_long long */
+/* #define SuiteSparse_long_max LONG_MAX */
+/* #define SuiteSparse_long_idd "ld" */
+
+/* #endif */
+
+#define SuiteSparse_long int64_t
+    // typically long (but on WIN64)
+#define SuiteSparse_ulong uint64_t
+    //  only needed for ../COLAMD/Source/colamd.c (original has 'unsigned Int' which fails!!)
+#define SuiteSparse_long_max 9223372036854775801
+    // typically LONG_MAX (but ..)
+#define SuiteSparse_long_idd PRId64
+    // typically "ld"
+
+#define SuiteSparse_long_id "%" SuiteSparse_long_idd
+#endif
+
+/* For backward compatibility with prior versions of SuiteSparse.  The UF_*
+ * macros are deprecated and will be removed in a future version. */
 #ifndef UF_long
-
-#ifdef _WIN64
-
-#define UF_long __int64
-#define UF_long_max _I64_MAX
-#define UF_long_idd "I64d"
-
-#else
-
-#define UF_long long
-#define UF_long_max LONG_MAX
-#define UF_long_idd "ld"
-
+#define UF_long     SuiteSparse_long
+#define UF_long_max SuiteSparse_long_max
+#define UF_long_idd SuiteSparse_long_idd
+#define UF_long_id  SuiteSparse_long_id
 #endif
-#define UF_long_id "%" UF_long_idd
-#endif
+
 
 #define CHOLMOD_HAS_VERSION_FUNCTION
 
