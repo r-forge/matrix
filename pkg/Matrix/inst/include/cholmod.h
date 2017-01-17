@@ -567,7 +567,7 @@ typedef struct cholmod_common_struct
      */
 
     size_t nrow ;	/* size of Flag and Head */
-    UF_long mark ;	/* mark value for Flag array */
+    SuiteSparse_long mark ;	/* mark value for Flag array */
     size_t iworksize ;	/* size of Iwork.  Upper bound: 6*nrow+ncol */
     size_t xworksize ;	/* size of Xwork,  in bytes.
 			 * maxrank*nrow*sizeof(double) for update/downdate.
@@ -592,7 +592,7 @@ typedef struct cholmod_common_struct
     void *Iwork ;	/* size iworksize, 2*nrow+ncol for most routines,
 			 * up to 6*nrow+ncol for cholmod_analyze. */
 
-    int itype ;		/* If CHOLMOD_LONG, Flag, Head, and Iwork are UF_long.
+    int itype ;		/* If CHOLMOD_LONG, Flag, Head, and Iwork are SuiteSparse_long.
 			 * Otherwise all three arrays are int. */
 
     int dtype ;		/* double or float */
@@ -657,8 +657,8 @@ typedef struct cholmod_common_struct
     double SPQR_small ;         /* task size is >= small */
 
     /* ---------------------------------------------------------------------- */
-    UF_long SPQR_istat [10] ;   /* for SuiteSparseQR statistics */
-    UF_long other2 [6] ;        /* reduced from size 16 in v1.6 */
+    SuiteSparse_long SPQR_istat [10] ;   /* for SuiteSparseQR statistics */
+    SuiteSparse_long other2 [6] ;        /* reduced from size 16 in v1.6 */
 
     /* ---------------------------------------------------------------------- */
     int other3 [10] ;       /* reduced from size 16 in v1.1. */
@@ -697,7 +697,7 @@ typedef struct cholmod_common_struct
 
 } cholmod_common ;
 
-// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 1114 :
+// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 1170 :
 /* A sparse matrix stored in compressed-column form. */
 
 typedef struct cholmod_sparse_struct
@@ -706,7 +706,7 @@ typedef struct cholmod_sparse_struct
     size_t ncol ;
     size_t nzmax ;	/* maximum number of entries in the matrix */
 
-    /* pointers to int or UF_long: */
+    /* pointers to int or SuiteSparse_long: */
     void *p ;		/* p [0..ncol], the column pointers */
     void *i ;		/* i [0..nzmax-1], the row indices */
 
@@ -739,8 +739,9 @@ typedef struct cholmod_sparse_struct
 	*/
 
     int itype ;		/* CHOLMOD_INT:     p, i, and nz are int.
-			 * CHOLMOD_INTLONG: p is UF_long, i and nz are int.
-			 * CHOLMOD_LONG:    p, i, and nz are UF_long.  */
+			 * CHOLMOD_INTLONG: p is SuiteSparse_long,
+			 *                  i and nz are int.
+			 * CHOLMOD_LONG:    p, i, and nz are SuiteSparse_long */
 
     int xtype ;		/* pattern, real, complex, or zomplex */
     int dtype ;		/* x and z are double or float */
@@ -750,7 +751,7 @@ typedef struct cholmod_sparse_struct
 
 } cholmod_sparse ;
 
-// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 1554 :
+// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 1552 :
 /* A symbolic and numeric factorization, either simplicial or supernodal.
  * In all cases, the row indices in the columns of L are kept sorted. */
 
