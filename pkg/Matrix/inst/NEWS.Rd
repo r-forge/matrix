@@ -12,11 +12,13 @@
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 
-\section{Changes in version 1.2-8 (2016-11-.., svn r3...)}{
+\section{Changes in version 1.2-8 (2017-01-16, svn r3201)}{
   \subsection{New Features}{
     \itemize{
       \item 0-length matrix \code{"Ops"} (binary operations) are now
       compatible to R-devel (to be \R 3.4.0).
+      \item C-API: \code{SuiteSparse_long} is now defined as
+      \code{int64_t} on all platforms, and we now include (C99) \file{inttypes.h}
     }
   }
   \subsection{Bug Fixes}{
