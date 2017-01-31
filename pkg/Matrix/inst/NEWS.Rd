@@ -12,6 +12,14 @@
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 
+\section{Changes in version 1.2-9 (2017-..-.., svn r____)}{
+  \subsection{New Features}{
+    \itemize{
+      \item \code{"Ops"} between "table", "xtabs", and our matrices now work.
+    }
+  }
+}
+
 \section{Changes in version 1.2-8 (2017-01-16, svn r3201)}{
   \subsection{New Features}{
     \itemize{

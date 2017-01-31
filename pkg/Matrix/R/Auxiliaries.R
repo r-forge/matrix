@@ -83,12 +83,14 @@ isSeq <- function(i, n, Ostart = TRUE) {
 
 
 .bail.out.1 <- function(fun, cl) {
-    stop(gettextf('not-yet-implemented method for %s(<%s>).\n ->>  Ask the package authors to implement the missing feature.', fun, cl),
-	 call. = FALSE, domain=NA)
+    stop(gettextf(
+     'not-yet-implemented method for %s(<%s>).\n ->>  Ask the package authors to implement the missing feature.',
+		  fun, cl[1L]), call. = FALSE, domain=NA)
 }
 .bail.out.2 <- function(fun, cl1, cl2) {
-    stop(gettextf('not-yet-implemented method for %s(<%s>, <%s>).\n ->>  Ask the package authors to implement the missing feature.',
-		  fun, cl1, cl2), call. = FALSE, domain=NA)
+    stop(gettextf(
+     'not-yet-implemented method for %s(<%s>, <%s>).\n ->>  Ask the package authors to implement the missing feature.',
+		  fun, cl1[1L], cl2[1L]), call. = FALSE, domain=NA)
 }
 
 Matrix.msg <- function(..., .M.level = 1) {

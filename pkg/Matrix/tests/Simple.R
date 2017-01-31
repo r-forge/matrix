@@ -15,6 +15,10 @@ n
 ## this:
 m <- Matrix::Matrix(cbind(1,0,diag(x=2:4)))
 m
+mt <- m + table(gl(3,5), gl(5,3))# failed in Matrix <= 1.2.9
+mt
+stopifnot(is(mt, "sparseMatrix"))
+
 ##--------------------------------------------------------------------
 
 library(Matrix)
