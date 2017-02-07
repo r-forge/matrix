@@ -351,7 +351,7 @@ setAs("matrix", "diagonalMatrix",
 	  if(d[1] != (n <- d[2])) stop("non-square matrix")
 	  if(any(from[row(from) != col(from)] != 0))
 	      stop("matrix with non-zero off-diagonals cannot be coerced to \"diagonalMatrix\"")
-	  x <- diag(from)
+	  x <- diag(from); names(x) <- NULL # don't want them in 'x' slot
 	  if(is.logical(x)) {
 	      cl <- "ldiMatrix"
 	      uni <- allTrue(x) ## uni := {is it unit-diagonal ?}
@@ -371,7 +371,7 @@ setAs("Matrix", "diagonalMatrix",
 	  if(d[1] != (n <- d[2])) stop("non-square matrix")
 	  if(!isDiagonal(from)) stop("matrix is not diagonal")
 	  ## else:
-	  x <- diag(from)
+	  x <- diag(from); names(x) <- NULL # don't want them in 'x' slot
 	  if(is.logical(x)) {
 	      cl <- "ldiMatrix"
 	      uni <- allTrue(x)

@@ -12,10 +12,30 @@
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 
-\section{Changes in version 1.2-9 (2017-..-.., svn r____)}{
+\section{Changes in version 1.2-9 (2017-02-07, svn r3204)}{
   \subsection{New Features}{
     \itemize{
       \item \code{"Ops"} between "table", "xtabs", and our matrices now work.
+      \item \code{as(matrix(diag(3), 3, dimnames=rep(list(c("A","b","c")),2)),
+ 	             "diagonalMatrix")@x} is no longer named.
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{as(Diagonal(3), "denseMatrix")} no longer returns a
+      non-dense \code{"ddiMatrix"}.
+
+      \item \code{S[sel,] <- value} and similar no longer segfault, but
+      give a \code{"not (yet?) supported"} error
+      for sparse matrices \code{S} and logical \code{sel} when
+      \code{sel} contains \code{NA}s.
+
+      The same error (instead of a low-level one) is signalled for
+      \emph{indexing} (with NA-containing logical \code{sel}), i.e.,
+      \code{S[sel,]}.
+      %% TODO:
+      %% \item \code{S[sel,]}, \code{S[,sel] <- value} and similar now also work for
+      %% sparse matrices \code{S} and logical \code{sel} when \code{sel} contains \code{NA}s.
     }
   }
 }
