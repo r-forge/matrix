@@ -12,12 +12,13 @@
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 
-\section{Changes in version 1.2-9 (2017-02-07, svn r3204)}{
+\section{Changes in version 1.2-9 (2017-02-09, svn r3205)}{
   \subsection{New Features}{
     \itemize{
       \item \code{"Ops"} between "table", "xtabs", and our matrices now work.
       \item \code{as(matrix(diag(3), 3, dimnames=rep(list(c("A","b","c")),2)),
- 	             "diagonalMatrix")@x} is no longer named.
+ 	"diagonalMatrix")@x} is no longer named.
+      \item \code{norm(x, "2")} now works as well (and equivalently to \code{base::norm}).
     }
   }
   \subsection{Bug Fixes}{

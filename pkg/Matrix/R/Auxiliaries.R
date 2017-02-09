@@ -271,6 +271,9 @@ mkDet <- function(d, logarithm = TRUE, ldet = sum(log(abs(d))),
     val
 }
 
+##' utility, basically == norm(x, type = "2")
+norm2 <- function(x) if(anyNA(x)) NaN else svd(x, nu = 0L, nv = 0L)$d[1L]
+
 dimCheck <- function(a, b) {
     da <- dim(a)
     db <- dim(b)
