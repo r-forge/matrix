@@ -556,7 +556,7 @@ setMethod("norm", signature(x = "diagonalMatrix", type = "character"),
 	      type <- toupper(substr(type[1], 1, 1))
 	      isU <- (x@diag == "U") # unit-diagonal
 	      if(type == "F") sqrt(if(isU) n else sum(x@x^2))
-	      else { ## norm == "I","1","O","M" :
+	      else { ## norm == "I","1","O","M","2" :
 		  if(isU) 1 else max(abs(x@x))
 	      }
 	  })
