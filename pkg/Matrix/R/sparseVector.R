@@ -92,7 +92,7 @@ uniqSpVec <- function(x) {
     x
 }
 
-sp2vec <- function(x, mode = .type.kind[.M.kindC(cl)]) {
+sp2vec <- function(x, mode = .type.kind[.M.kindC(class(x))]) {
     ## sparseVector  ->  vector
     has.x <- .hasSlot(x, "x")## has "x" slot
     m.any <- (mode == "any")
@@ -736,6 +736,33 @@ setMethod("all.equal", c(target = "sparseVector", current = "ANY"),
 	  function(target, current, ...)
 	  all.equal(as.vector(target), current, ...))
 
+
+## S3 method for 'c' -- "works" (dispatch on 1st arg - only)
+### ________ FIXME___ UNFINISHED UNTESTED __ not yet S3-registered
+c.sparseVector <- function(...) {
+    svl <- lapply(list(...), as, Class = "sparseVector")
+    ## cls <- unique(unlist(lapply(svl, is)))
+    ns <- vapply(svl, slot, 1, "length")
+    narg <- length(ns)
+    iss <- lapply(svl, slot, "i")
+    ## result must have 'x' slot if we have any
+    has.x <- any(have.x <- vapply(svl, .hasSlot, logical(1L), name = "x"))
+    ## the new 'i' slot:
+    ii <- unlist(iss) +  rep(cumsum(c(0, ns[-narg])), lengths(iss))
+    if(has.x) {
+	cls <- if     (any(vapply(svl, is, NA, "zsparseVector"))) "zsparseVector"
+	       else if(any(vapply(svl, is, NA, "dsparseVector"))) "dsparseVector"
+	       else if(any(vapply(svl, is, NA, "isparseVector"))) "isparseVector"
+	       else "lsparseVector"
+        xx <- unlist(if(all(have.x)) lapply(svl, slot, "x")
+                     else lapply(seq_len(narg), function(i) {
+                         if(have.x[[i]]) svl[[i]]@x
+                         else rep_len(1, length(iss[[i]]))
+                     }))
+	new(cls, x = xx,     i = ii, length = sum(ns))
+ } else ## no "x" slot
+	new("nsparseVector", i = ii, length = sum(ns))
+}
 
 ### rep(x, ...) -- rep() is primitive with internal default method with these args:
 ### -----------
