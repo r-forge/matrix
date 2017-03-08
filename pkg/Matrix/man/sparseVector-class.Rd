@@ -89,6 +89,8 @@
 %
 \alias{head,sparseVector-method}
 \alias{tail,sparseVector-method}
+\alias{which,nsparseVector-method}
+\alias{which,lsparseVector-method}
 \alias{[,sparseVector,index,ANY,ANY-method}
 \alias{[,sparseVector,lsparseVector,ANY,ANY-method}
 \alias{[,sparseVector,nsparseVector,ANY,ANY-method}
@@ -169,7 +171,9 @@
     \item{rep}{\code{signature(x = "sparseVector")} repeat \code{x},
       with the same argument list \code{(x, times, length.out, each,
 	...)} as the default method for rep().}
-
+    \item{which}{\code{signature(x = "nsparseVector")} and}
+    \item{which}{\code{signature(x = "lsparseVector")} return the
+      indices of the non-zero entries (which is trivial for sparse vectors).}
     \item{Ops}{\code{signature(e1 = "sparseVector", e2 = "*")}: define
       arithmetic, compare and logic operations, (see
       \code{\link[=S4groupGeneric]{Ops}}).}
@@ -207,9 +211,8 @@ sx <- c(0,0,3, 3.2, 0,0,0,-3:1,0,0,2,0,0,5,0,0)
 (ss <- as(sx, "sparseVector"))
 
 ix <- as.integer(round(sx))
-(is <- as(ix, "sparseVector"))
-## an "isparseVector" (!)
-
+(is <- as(ix, "sparseVector")) ## an "isparseVector" (!)
+(ns <- sparseVector(i= c(7, 3, 2), length = 10)) # "nsparseVector"
 ## rep() works too:
 (ri <- rep(is, length.out= 25))
 

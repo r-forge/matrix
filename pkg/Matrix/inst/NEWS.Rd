@@ -12,7 +12,7 @@
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 
-\section{Changes in version 1.2-9 (2017-03-08, svn r3210)}{
+\section{Changes in version 1.2-9 (2017-03-08, svn r3211)}{
   \subsection{New Features}{
     \itemize{
       \item \code{"Ops"} between "table", "xtabs", and our matrices now work.
@@ -37,9 +37,15 @@
       The same error (instead of a low-level one) is signalled for
       \emph{indexing} (with NA-containing logical \code{sel}), i.e.,
       \code{S[sel,]}.
-      %% TODO:
+      %% from in ../TODO :
       %% \item \code{S[sel,]}, \code{S[,sel] <- value} and similar now also work for
       %% sparse matrices \code{S} and logical \code{sel} when \code{sel} contains \code{NA}s.
+
+      \item \code{which(x, arr.ind=TRUE, *)} (when \code{x} is a
+      \code{"lMatrix"} or \code{"nMatrix"}) now works the same as
+      \code{base::which}, obeying an optional \code{useNames} argument
+      which defaults to \code{TRUE}.  Previously, the resulting
+      two-column matrix typically had empty \code{dimnames}.
     }
   }
 }
