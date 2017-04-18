@@ -43,7 +43,7 @@ char La_rcond_type(const char *typstr)
 
 double get_double_by_name(SEXP obj, char *nm)
 {
-    SEXP nms = getAttrib(obj, R_NamesSymbol);
+    SEXP nms = PROTECT(getAttrib(obj, R_NamesSymbol));
     int i, len = length(obj);
 
     if ((!isReal(obj)) || (length(obj) > 0 && nms == R_NilValue))
@@ -53,6 +53,7 @@ double get_double_by_name(SEXP obj, char *nm)
 	    return REAL(obj)[i];
 	}
     }
+    UNPROTECT(1);
     return R_NaReal;
 }
 
@@ -130,7 +131,7 @@ SEXP get_factors(SEXP obj, char *nm)
 SEXP set_factors(SEXP obj, SEXP val, char *nm)
 {
     SEXP fac = GET_SLOT(obj, Matrix_factorSym),
-	nms = getAttrib(fac, R_NamesSymbol);
+	nms = PROTECT(getAttrib(fac, R_NamesSymbol));
     int i, len = length(fac);
 
     if ((!isNewList(fac)) || (length(fac) > 0 && nms == R_NilValue))
@@ -140,7 +141,7 @@ SEXP set_factors(SEXP obj, SEXP val, char *nm)
     for (i = 0; i < len; i++) {
 	if (!strcmp(nm, CHAR(STRING_ELT(nms, i)))) {
 	    SET_VECTOR_ELT(fac, i, duplicate(val));
-	    UNPROTECT(1);
+	    UNPROTECT(2);
 	    return val;
 	}
     }
@@ -158,7 +159,7 @@ SEXP set_factors(SEXP obj, SEXP val, char *nm)
     SET_VECTOR_ELT(nfac, len, duplicate(val));
     SET_STRING_ELT(nnms, len, mkChar(nm));
     SET_SLOT(obj, Matrix_factorSym, nfac);
-    UNPROTECT(3);
+    UNPROTECT(4);
     return VECTOR_ELT(nfac, len);
 }
 
@@ -497,7 +498,9 @@ SEXP l_packed_setDiag(int *diag, int l_d, SEXP x, int n)
 #define tr_END_packed_setDiag						\
     if (*diag_P(x) == 'U') { /* uni-triangular */			\
 	/* after setting, typically is not uni-triangular anymore: */	\
-	SET_STRING_ELT(GET_SLOT(ret, Matrix_diagSym), 0, mkChar("N"));	\
+	SEXP ch_N = PROTECT(mkChar("N"));				\
+	SET_STRING_ELT(GET_SLOT(ret, Matrix_diagSym), 0, ch_N);		\
+	UNPROTECT(1);							\
     }									\
     END_packed_setDiag
 
@@ -539,8 +542,11 @@ SEXP d_packed_addDiag(double *diag, int l_d, SEXP x, int n)
 SEXP tr_d_packed_addDiag(double *diag, int l_d, SEXP x, int n)
 {
     SEXP ret = PROTECT(d_packed_addDiag(diag, l_d, x, n));
-    if (*diag_P(x) == 'U') /* uni-triangular */
-	SET_STRING_ELT(GET_SLOT(ret, Matrix_diagSym), 0, mkChar("N"));
+    if (*diag_P(x) == 'U') { /* uni-triangular */
+	SEXP ch_N = PROTECT(mkChar("N"));
+	SET_STRING_ELT(GET_SLOT(ret, Matrix_diagSym), 0, ch_N);
+	UNPROTECT(1);
+    }
     UNPROTECT(1);
     return ret;
 }
@@ -697,10 +703,9 @@ SEXP dup_mMatrix_as_geMatrix(SEXP A)
 		dd[0] = LENGTH(A);					\
 		dd[1] = 1;						\
 	    }								\
-	    SEXP nms = getAttrib(A, R_NamesSymbol);			\
+	    SEXP nms = PROTECT(getAttrib(A, R_NamesSymbol)); nprot++;	\
 	    if(nms != R_NilValue) {					\
-		an = PROTECT(allocVector(VECSXP, 2));			\
-		nprot++;						\
+		an = PROTECT(allocVector(VECSXP, 2)); nprot++;		\
 	        SET_VECTOR_ELT(an, (transpose_if_vec)? 1 : 0, nms);	\
 		/* not needed: SET_VECTOR_ELT(an, 1, R_NilValue); */    \
 	    } /* else nms = NULL ==> an remains NULL */                 \
@@ -824,8 +829,7 @@ SEXP dup_mMatrix_as_dgeMatrix2(SEXP A, Rboolean tr_if_vec)
     SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
 	ad = R_NilValue , an = R_NilValue;	/* -Wall */
     static const char *valid[] = {"_NOT_A_CLASS_", MATRIX_VALID_ddense, ""};
-    int ctype = R_check_class_etc(A, valid),
-	nprot = 1, sz;
+    int sz, ctype = R_check_class_etc(A, valid), nprot = 1;
     double *ansx;
 
     if (ctype > 0) {		/* a ddenseMatrix object */
@@ -835,8 +839,7 @@ SEXP dup_mMatrix_as_dgeMatrix2(SEXP A, Rboolean tr_if_vec)
     else if (ctype < 0) {	/* not a (recognized) classed matrix */
 	if (!isReal(A)) {
 	    if (isInteger(A) || isLogical(A)) {
-		A = PROTECT(coerceVector(A, REALSXP));
-		nprot++;
+		A = PROTECT(coerceVector(A, REALSXP)); nprot++;
 	    } else
 		error(_("invalid class '%s' to dup_mMatrix_as_dgeMatrix"),
 		      class_P(A));
@@ -1283,15 +1286,14 @@ SEXP symmetric_DimNames(SEXP dn) {
 	if (isNull(VECTOR_ELT(dn,1)))					\
 	    SET_VECTOR_ELT(dn, 1, VECTOR_ELT(dn, 0));			\
 	if(do_nm) { /* names(dimnames(.)): */				\
-	    SEXP nms_dn = getAttrib(dn, R_NamesSymbol);			\
+	    SEXP nms_dn = PROTECT(getAttrib(dn, R_NamesSymbol));	\
 	    if(!R_compute_identical(STRING_ELT(nms_dn, 0),		\
 				    STRING_ELT(nms_dn, 1), 16)) {	\
-		PROTECT(nms_dn);					\
 		int J = LENGTH(STRING_ELT(nms_dn, 0)) == 0; /* 0/1 */   \
 		SET_STRING_ELT(nms_dn, !J, STRING_ELT(nms_dn, J));	\
 		setAttrib(dn, R_NamesSymbol, nms_dn);			\
-		UNPROTECT(1);						\
             }								\
+	    UNPROTECT(1);						\
 	}								\
 	UNPROTECT(1)
 
