@@ -50,6 +50,7 @@ double get_double_by_name(SEXP obj, char *nm)
 	error(_("object must be a named, numeric vector"));
     for (i = 0; i < len; i++) {
 	if (!strcmp(nm, CHAR(STRING_ELT(nms, i)))) {
+	    UNPROTECT(1);
 	    return REAL(obj)[i];
 	}
     }
@@ -60,7 +61,7 @@ double get_double_by_name(SEXP obj, char *nm)
 SEXP
 set_double_by_name(SEXP obj, double val, char *nm)
 {
-    SEXP nms = getAttrib(obj, R_NamesSymbol);
+    SEXP nms = PROTECT(getAttrib(obj, R_NamesSymbol));
     int i, len = length(obj);
 
     if ((!isReal(obj)) || (length(obj) > 0 && nms == R_NilValue))
@@ -68,6 +69,7 @@ set_double_by_name(SEXP obj, double val, char *nm)
     for (i = 0; i < len; i++) {
 	if (!strcmp(nm, CHAR(STRING_ELT(nms, i)))) {
 	    REAL(obj)[i] = val;
+	    UNPROTECT(1);
 	    return obj;
 	}
     }
@@ -82,7 +84,7 @@ set_double_by_name(SEXP obj, double val, char *nm)
 	}
 	REAL(nx)[len] = val;
 	SET_STRING_ELT(nnms, len, mkChar(nm));
-	UNPROTECT(1);
+	UNPROTECT(2);
 	return nx;
     }
 }
@@ -1125,25 +1127,25 @@ SEXP Mmatrix(SEXP args)
     int *d_a = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*d_b = INTEGER(GET_SLOT(b, Matrix_DimSym)),
 	n1 = d_a[0], m = d_a[1],
-	n2 = d_b[0],
-	nprot = 1;
-    SEXP ans,
-	a_x = GET_SLOT(a, Matrix_xSym),
-	b_x = GET_SLOT(b, Matrix_xSym);
+	n2 = d_b[0];
     if(d_b[1] != m)
 	error(_("the number of columns differ in R_rbind2_vector: %d != %d"),
 	      m, d_b[1]);
+    SEXP
+	a_x = GET_SLOT(a, Matrix_xSym),
+	b_x = GET_SLOT(b, Matrix_xSym);
+    int nprot = 1;
     // Care: can have "ddenseMatrix" "ldenseMatrix" or "ndenseMatrix"
     if(TYPEOF(a_x) != TYPEOF(b_x)) { // choose the "common type"
 	// Now know: either LGLSXP or REALSXP. FIXME for iMatrix, zMatrix,..
-	if(TYPEOF(a_x) != REALSXP)
-	    a_x = PROTECT(duplicate(coerceVector(a_x, REALSXP)));
-	else if(TYPEOF(b_x) != REALSXP)
-	    b_x = PROTECT(duplicate(coerceVector(b_x, REALSXP)));
-	nprot++;
+	if(TYPEOF(a_x) != REALSXP) {
+	    a_x = PROTECT(duplicate(coerceVector(a_x, REALSXP))); nprot++;
+	} else if(TYPEOF(b_x) != REALSXP) {
+	    b_x = PROTECT(duplicate(coerceVector(b_x, REALSXP))); nprot++;
+	}
     }
 
-    ans = PROTECT(allocVector(TYPEOF(a_x), m * (n1 + n2)));
+    SEXP ans = PROTECT(allocVector(TYPEOF(a_x), m * (n1 + n2)));
     int i, ii = 0;
     switch(TYPEOF(a_x)) {
     case LGLSXP: {
@@ -1170,7 +1172,6 @@ SEXP Mmatrix(SEXP args)
 	COPY_a_AND_b_j;
     }
     } // switch
-
     UNPROTECT(nprot);
     return ans;
 }
