@@ -1146,7 +1146,7 @@ SEXP Mmatrix(SEXP args)
     }
 
     SEXP ans = PROTECT(allocVector(TYPEOF(a_x), m * (n1 + n2)));
-    int i, ii = 0;
+    int ii = 0;
     switch(TYPEOF(a_x)) {
     case LGLSXP: {
 	int
@@ -1154,11 +1154,10 @@ SEXP Mmatrix(SEXP args)
 	    *ax= LOGICAL(a_x),
 	    *bx= LOGICAL(b_x);
 
-#define COPY_a_AND_b_j						\
-/*  FIXME faster: use Memcpy() : */				\
-	for(int j=0; j < m; j++) {				\
-	    for(i=0; i < n1; i++) r[ii++] = ax[j*n1 + i];	\
-	    for(i=0; i < n2; i++) r[ii++] = bx[j*n2 + i];	\
+#define COPY_a_AND_b_j					\
+	for(int j=0; j < m; j++) {			\
+	    Memcpy(r+ii, ax+ j*n1, n1); ii += n1;	\
+	    Memcpy(r+ii, bx+ j*n2, n2); ii += n2;	\
 	}
 
 	COPY_a_AND_b_j;
