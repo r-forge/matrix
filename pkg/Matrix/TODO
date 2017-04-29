@@ -6,6 +6,8 @@
 * *Urgent* in some sense ---------------------------------------------------
 ** TODO S[sel,] and  S[,sel] <- value should work for sparse S and NA-containing sel.
 ** TODO nnzero() is too slow for a large CsparseMatrix
+** TODO sparse.model.matrix(.) bug with NA's & na.action = "na.pass"  => ~/R/MM/Pkg-ex/Matrix/sparse.model-bugs_EB.R
+** TODO sparse.model.matrix(~ poly(x,3))  gives wrong column names    => ~/R/MM/Pkg-ex/Matrix/sparse.model-bugs_EB.R
 ** TODO qr.R(), qrR() etc currently *lose* column/row names {compared to base R's qr.R}, see,
    	drop0(R. <- qr.R(qx), tol=1e-15) # columns are int b1 c1 c2 b2 c3
    in man/qr-methods.Rd :                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ but there are no colnames!
