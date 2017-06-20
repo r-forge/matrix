@@ -12,6 +12,15 @@
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 
+\section{Changes in version 1.2-11 (2017-..-.., svn r3216)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{rankMatrix(<matrix of all 0>)} now gives zero for all
+      methods, as it should be.
+    }
+  }
+}
+
 \section{Changes in version 1.2-10 (2017-04-19, svn r3216)}{
   \subsection{Bug Fixes}{
     \itemize{
