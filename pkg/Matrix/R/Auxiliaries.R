@@ -1,7 +1,8 @@
 #### "Namespace private" Auxiliaries  such as method functions
 #### (called from more than one place --> need to be defined early)
 
-.Matrix.avoiding.as.matrix <- TRUE # for now (not (yet|ever) on CRAN)
+.Matrix.avoiding.as.matrix <- FALSE # (always on CRAN -- have documented it since 2015)
+## NB: sync with  ../NAMESPACE
 
 ## Need to consider NAs ;  "== 0" even works for logical & complex:
 ## Note that "!x" is faster than "x == 0", but does not (yet!) work for complex

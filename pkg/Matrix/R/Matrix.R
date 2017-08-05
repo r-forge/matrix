@@ -26,17 +26,22 @@ setAs("matrix", "Matrix", function(from) Matrix(from))
 ## 	  array(from@x, dim = d, dimnames = dimnames(from))
 ##       })
 
-## Such that also base functions dispatch properly on our classes:
-as.matrix.Matrix <- function(x, ...) {
-    if(nonTRUEoption("Matrix.quiet.as.matrix") && nonTRUEoption("Matrix.quiet"))
-	warning("as.matrix(<Matrix>) is deprecated (to become a no-op in the future).
-Use  as(x, \"matrix\")  or .asmatrix(x) instead.")
-    as(x, "matrix")
-}
 .asmatrix <- function(x) as(x, "matrix") # not better; just for those hating typing
-as.array.Matrix <- function(x, ...) {
-    warning("as.array(<Matrix>) is deprecated. Use  as(x, \"matrix\")  or .asmatrix(x) instead.")
-    as(x, "matrix")
+
+## Such that also base functions dispatch properly on our classes:
+if(.Matrix.avoiding.as.matrix) {
+    as.matrix.Matrix <- function(x, ...) {
+        if(nonTRUEoption("Matrix.quiet.as.matrix") && nonTRUEoption("Matrix.quiet"))
+            warning("as.matrix(<Matrix>) is deprecated (to become a no-op in the future).
+Use  as(x, \"matrix\")  or .asmatrix(x) instead.")
+        as(x, "matrix")
+    }
+    as.array.Matrix <- function(x, ...) {
+        warning("as.array(<Matrix>) is deprecated. Use  as(x, \"matrix\")  or .asmatrix(x) instead.")
+        as(x, "matrix")
+    }
+} else { ## regularly -- documented since 2005 that this works
+    as.array.Matrix <- as.matrix.Matrix <- function(x, ...) as(x, "matrix")
 }
 
 ## should propagate to all subclasses:
