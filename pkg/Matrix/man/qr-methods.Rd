@@ -1,13 +1,15 @@
 \name{qr-methods}
+\title{QR Decomposition -- S4 Methods and Generic}
 \docType{methods}
 \alias{qr}
 \alias{qrR}
 \alias{qr-methods}
 \alias{qr,dgCMatrix-method}
 \alias{qr,sparseMatrix-method}
-\title{QR Decomposition -- S4 Methods and Generic}
+\alias{qr,ddenseMatrix-method}% only if(.Matrix.avoiding.as.matrix)
+\alias{qr,denseMatrix-method}% only if(.Matrix.avoiding.as.matrix)
 \description{
-  The \code{"Matrix"} package provides methods for the QR decomposition
+  The \pkg{Matrix} package provides methods for the QR decomposition
   of special classes of matrices.  There is a generic function which uses
   \code{\link[base]{qr}} as default, but methods defined in this package
   can take extra arguments.  In particular there is an option for
@@ -47,28 +49,35 @@ qrR(qr, complete=FALSE, backPermute=TRUE, row.names = TRUE)
 \examples{
 %% FIXME: This is currently mixing example + regression tests
 ##------------- example of pivoting -- from base'  qraux.Rd -------------
-X <- Matrix(cbind(int = 1,
-                  b1=rep(1:0, each=3), b2=rep(0:1, each=3),
-                  c1=rep(c(1,0,0), 2), c2=rep(c(0,1,0), 2), c3=rep(c(0,0,1),2)),
-            sparse=TRUE)
+X <- cbind(int = 1,
+           b1=rep(1:0, each=3), b2=rep(0:1, each=3),
+           c1=rep(c(1,0,0), 2), c2=rep(c(0,1,0), 2), c3=rep(c(0,0,1),2))
 rownames(X) <- paste0("r", seq_len(nrow(X)))
 dnX <- dimnames(X)
+bX <- X
+X <- as(bX, "sparseMatrix")
 X # is singular, columns "b2" and "c3" are "extra"
+stopifnot(identical(dimnames(X), dnX))# some versions changed X's dimnames!
 c(rankMatrix(X)) # = 4 (not 6)
+
 ##----- regular case ------------------------------------------
 Xr <- X[ , -c(3,6)] # the "regular" (non-singular) version of X
 stopifnot(rankMatrix(Xr) == ncol(Xr))
 Y <- cbind(y <- setNames(1:6, paste0("y", 1:6)))
 ## regular case:
-m <- as.matrix
+m <- function(.) as(., "matrix")
 qXr <- qr(  Xr)
 qxr <- qr(m(Xr))
-qcfXy <- qr.coef (qXr, y)
-qcfXY <- qr.coef (qXr, Y)
+##
+qxrLA <- qr(m(Xr), LAPACK=TRUE) # => qr.fitted(), qr.resid() not supported
+   ## TODO: use qxrLA in *some* tests below
+qcfXy <- qr.coef (qXr, y) # vector
+qcfXY <- qr.coef (qXr, Y) # 4x1 dgeMatrix
+cf <- c(int=6, b1=-3, c1=-2, c2=-1)
 stopifnot(
-          all.equal(qr.coef(qxr, y), cf <- c(int=6, b1=-3, c1=-2, c2=-1), tol=1e-15)
+          all.equal(qr.coef(qxr, y),   cf, tol=1e-15)
 ,
-          all.equal(qr.coef(qxr, Y), as.matrix(cf), tol=1e-15)
+          all.equal(qr.coef(qxr, Y), m(cf), tol=1e-15)
 ,
           all.equal(unname(qcfXy), unname(cf), tol=1e-15) || # FAIL names: ## FIXME_______
           all.equal(qcfXy, cf, tol=1e-15)
@@ -87,11 +96,10 @@ stopifnot(
           all.equal(m(qr.resid (qXr, Y)), qr.resid (qxr, Y), tol=1e-15)
 )
 
-##----- singular case -----------------------------------------------
-(qX <- qr(  X))
- qx <- qr(m(X))
-# both @p and @q are non-trivial permutations
-stopifnot(identical(dimnames(X), dnX))# some versions changed X's dimnames!
+##----- rank-deficient ("singular") case ------------------------------------
+
+(qX <- qr(  X))           # both @p and @q are non-trivial permutations
+ qx <- qr(m(X)) ; str(qx) # $pivot is non-trivial, too
 
 drop0(R. <- qr.R(qX), tol=1e-15) # columns *permuted*: c3 b1 ..
 Q. <- qr.Q(qX)

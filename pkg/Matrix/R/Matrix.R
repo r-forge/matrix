@@ -26,12 +26,23 @@ setAs("matrix", "Matrix", function(from) Matrix(from))
 ## 	  array(from@x, dim = d, dimnames = dimnames(from))
 ##       })
 
-## should propagate to all subclasses:
-setMethod("as.matrix", signature(x = "Matrix"), function(x) as(x, "matrix"))
-## for 'Matrix' objects, as.array() should be equivalent:
-setMethod("as.array",  signature(x = "Matrix"), function(x) as(x, "matrix"))
 ## Such that also base functions dispatch properly on our classes:
-as.array.Matrix <- as.matrix.Matrix <- function(x, ...) as(x, "matrix")
+as.matrix.Matrix <- function(x, ...) {
+    if(nonTRUEoption("Matrix.quiet.as.matrix") && nonTRUEoption("Matrix.quiet"))
+	warning("as.matrix(<Matrix>) is deprecated (to become a no-op in the future).
+Use  as(x, \"matrix\")  or .asmatrix(x) instead.")
+    as(x, "matrix")
+}
+.asmatrix <- function(x) as(x, "matrix") # not better; just for those hating typing
+as.array.Matrix <- function(x, ...) {
+    warning("as.array(<Matrix>) is deprecated. Use  as(x, \"matrix\")  or .asmatrix(x) instead.")
+    as(x, "matrix")
+}
+
+## should propagate to all subclasses:
+setMethod("as.matrix", signature(x = "Matrix"), function(x) as.matrix.Matrix(x))
+## for 'Matrix' objects, as.array() should be equivalent:
+setMethod("as.array",  signature(x = "Matrix"), function(x)  as.array.Matrix(x))
 
 ## head and tail apply to all Matrix objects for which subscripting is allowed:
 setMethod("head", signature(x = "Matrix"), utils::head.matrix)
