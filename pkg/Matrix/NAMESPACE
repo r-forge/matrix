@@ -287,7 +287,7 @@ exportMethods(## for both own and "other" generics:
 	      "dimnames",
 	      "dimnames<-",
 	      "drop",
-              "eigen", "svd", # only if(.Matrix.avoiding.as.matrix)
+               ## "eigen", "svd", # only if(.Matrix.avoiding.as.matrix) <--> ./R/Auxiliaries.R
 	      "expand",
 	      "expm",
 	      "format",
