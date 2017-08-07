@@ -47,7 +47,7 @@ qrR(qr, complete=FALSE, backPermute=TRUE, row.names = TRUE)
   \code{\linkS4class{dgCMatrix}}.
 }
 \examples{
-%% FIXME: This is currently mixing example + regression tests
+%% FIXME: Currently mixing example + regression tests <--> ../tests/factorizing.R
 ##------------- example of pivoting -- from base'  qraux.Rd -------------
 X <- cbind(int = 1,
            b1=rep(1:0, each=3), b2=rep(0:1, each=3),
@@ -66,34 +66,24 @@ stopifnot(rankMatrix(Xr) == ncol(Xr))
 Y <- cbind(y <- setNames(1:6, paste0("y", 1:6)))
 ## regular case:
 m <- function(.) as(., "matrix")
-qXr <- qr(  Xr)
-qxr <- qr(m(Xr))
-##
+qXr   <- qr(  Xr)
+qxr   <- qr(m(Xr))
 qxrLA <- qr(m(Xr), LAPACK=TRUE) # => qr.fitted(), qr.resid() not supported
    ## TODO: use qxrLA in *some* tests below
 qcfXy <- qr.coef (qXr, y) # vector
 qcfXY <- qr.coef (qXr, Y) # 4x1 dgeMatrix
 cf <- c(int=6, b1=-3, c1=-2, c2=-1)
 stopifnot(
-          all.equal(qr.coef(qxr, y),   cf, tol=1e-15)
-,
-          all.equal(qr.coef(qxr, Y), m(cf), tol=1e-15)
-,
-          all.equal(unname(qcfXy), unname(cf), tol=1e-15) || # FAIL names: ## FIXME_______
-          all.equal(qcfXy, cf, tol=1e-15)
-,
-          all.equal(unname(m(qcfXY)), unname(m(cf)), tol=1e-15) || # FAIL dimnames: ## FIXME_______
-          all.equal(m(qcfXY), m(cf), tol=1e-15)
-,
-          all.equal(y, qr.fitted(qxr, y), tol=2e-15)
-,
-          all.equal(y, qr.fitted(qXr, y), tol=2e-15)
-,
-          all.equal(m(qr.fitted(qXr, Y)), qr.fitted(qxr, Y), tol=1e-15)
-,
-          all.equal(  qr.resid (qXr, y),  qr.resid (qxr, y), tol=1e-15)
-,
-          all.equal(m(qr.resid (qXr, Y)), qr.resid (qxr, Y), tol=1e-15)
+    all.equal(qr.coef(qxr,  y),   cf, tol=1e-15)
+  , all.equal(qr.coef(qxrLA,y),   cf, tol=1e-15)
+  , all.equal(qr.coef(qxr,  Y), m(cf), tol=1e-15)
+  , all.equal(  qcfXy,    cf, tol=1e-15)
+  , all.equal(m(qcfXY), m(cf), tol=1e-15)
+  , all.equal(y, qr.fitted(qxr, y), tol=2e-15)
+  , all.equal(y, qr.fitted(qXr, y), tol=2e-15)
+  , all.equal(m(qr.fitted(qXr, Y)), qr.fitted(qxr, Y), tol=1e-15)
+  , all.equal(  qr.resid (qXr, y),  qr.resid (qxr, y), tol=1e-15)
+  , all.equal(m(qr.resid (qXr, Y)), qr.resid (qxr, Y), tol=1e-15)
 )
 
 ##----- rank-deficient ("singular") case ------------------------------------
