@@ -36,7 +36,7 @@ importFrom("methods"
 ## Generics and functions defined in this package
 export("%&%",
        "Cholesky", ".SuiteSparse_version",
-       "Diagonal", ".symDiagonal", ".sparseDiagonal",
+       "Diagonal", ".symDiagonal", ".sparseDiagonal", ".trDiagonal",
        "Hilbert", "KhatriRao",
        "Matrix",
        "MatrixClass",
