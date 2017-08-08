@@ -69,13 +69,13 @@ m <- function(.) as(., "matrix")
 qXr   <- qr(  Xr)
 qxr   <- qr(m(Xr))
 qxrLA <- qr(m(Xr), LAPACK=TRUE) # => qr.fitted(), qr.resid() not supported
-   ## TODO: use qxrLA in *some* tests below
 qcfXy <- qr.coef (qXr, y) # vector
 qcfXY <- qr.coef (qXr, Y) # 4x1 dgeMatrix
 cf <- c(int=6, b1=-3, c1=-2, c2=-1)
 stopifnot(
     all.equal(qr.coef(qxr,  y),   cf, tol=1e-15)
-  , all.equal(qr.coef(qxrLA,y),   cf, tol=1e-15)
+  , getRversion() <= "3.4.1" ||
+    all.equal(qr.coef(qxrLA,y),   cf, tol=1e-15)
   , all.equal(qr.coef(qxr,  Y), m(cf), tol=1e-15)
   , all.equal(  qcfXy,    cf, tol=1e-15)
   , all.equal(m(qcfXY), m(cf), tol=1e-15)
