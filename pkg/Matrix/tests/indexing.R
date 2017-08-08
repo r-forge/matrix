@@ -1,13 +1,6 @@
 #### For both 'Extract' ("[") and 'Replace' ("[<-") Method testing
 ####    aka    subsetting     and  subassignment
 
-#### suppressPackageStartupMessages(...)  as we have an *.Rout.save to Rdiff against
-stopifnot(suppressPackageStartupMessages(require(Matrix)))
-
-source(system.file("test-tools.R", package = "Matrix"), keep.source = FALSE)
-##-> identical3() etc
-cat("doExtras:",doExtras,"\n")
-
 if(interactive()) {
     options(error = recover, warn = 1)
 } else if(FALSE) { ## MM @ testing *manually* only
@@ -15,6 +8,15 @@ if(interactive()) {
 } else {
     options(                 Matrix.verbose = TRUE, warn = 1)
 }
+## Matrix.verbose = TRUE (*before* loading 'Matrix' pkg)
+## ==> will also show method dispath ambiguity messages: getOption("ambiguousMethodSelection")
+
+#### suppressPackageStartupMessages(...)  as we have an *.Rout.save to Rdiff against
+stopifnot(suppressPackageStartupMessages(require(Matrix)))
+
+source(system.file("test-tools.R", package = "Matrix"), keep.source = FALSE)
+##-> identical3() etc
+cat("doExtras:",doExtras,"\n")
 
 
 ### Dense Matrices
