@@ -1,6 +1,7 @@
 ### Testing positive definite matrices
 library(Matrix)
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
+cat("doExtras:",doExtras,"\n")
 
 h9 <- Hilbert(9)
 stopifnot(c(0,0) == dim(Hilbert(0)),
