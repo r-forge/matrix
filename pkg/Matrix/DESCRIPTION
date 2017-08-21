@@ -1,11 +1,25 @@
 Package: Matrix
-Version: 1.2-11
-Date: 2017-08-08
+Version: 1.2-12
+Date: 2017-09-00
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
-Author: Douglas Bates <bates@stat.wisc.edu> and Martin Maechler
-Maintainer: Martin Maechler <mmaechler+Matrix@gmail.com>
 Contact: Doug and Martin <Matrix-authors@R-project.org>
+Authors@R: c(person("Douglas","Bates", role="aut")
+ , person("Martin","Maechler", email="mmaechler+Matrix@gmail.com",
+           role = c("aut","cre"))
+ , person("Timothy A.", "Davis", role="ctb",
+           comment = c("SuiteSparse and 'cs' C libraries, notably CHOLMOD, AMD;",
+	               "collaborators listed in",
+		       "dir(pattern = '^[A-Z]+\.txt$',
+		            system.file('doc','SuiteSparse', package='Matrix'))")
+ , person("Jens", "Oehlschlägel", role="ctb", comment="initial nearPD()")
+ , person("Jason", "Riedy", role="ctb",
+          comment = c("condest() and onenormest() for octave",
+ 	  	      "Copyright: Regents of the University of California"))
+ , person("R Core Team", role = "ctb", comment="base R matrix implementation")
+ , person("R Foundation", role = "ctb", comment="some po/ translation files")
+ )
+Maintainer: Martin Maechler <mmaechler+Matrix@gmail.com>
 Description: Classes and methods for dense and sparse matrices and
     operations on them using 'LAPACK' and 'SuiteSparse'.
 Depends: R (>= 3.0.1)
