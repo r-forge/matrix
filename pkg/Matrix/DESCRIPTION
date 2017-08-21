@@ -11,7 +11,7 @@ Authors@R: c(person("Douglas","Bates", role="aut")
            comment = c("SuiteSparse and 'cs' C libraries, notably CHOLMOD, AMD;",
 	               "collaborators listed in",
 		       "dir(pattern = '^[A-Z]+[.]txt$',
-		            system.file('doc','SuiteSparse', package='Matrix'))")
+		            system.file('doc','SuiteSparse', package='Matrix'))"))
  , person("Jens", "Oehlschlägel", role="ctb", comment="initial nearPD()")
  , person("Jason", "Riedy", role="ctb",
           comment = c("condest() and onenormest() for octave",
