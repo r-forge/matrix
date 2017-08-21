@@ -11,8 +11,23 @@
 %%_NOT YET__FIXME_   needs cholmod_l_dense_to_sparse() in our dense_to_Csparse()
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
+\section{Changes in version 1.2-12 (2017-..-.., svn r3...)}{
+  \subsection{New Features}{
+    \itemize{
+      \item (none yet)
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item (R-forge Matrix bug #6185): \code{c < 0} now also works for
+      derived sparse Matrices (which only \emph{contain} Matrix
+      classes); via improving hidden \code{MatrixClass()}.
+      \item using \code{Authors@R} in \file{../DESCRIPTION} to list all contributors.
+    }
+  }
+}
 
-\section{Changes in version 1.2-11 (2017-08-08, svn r3223)}{
+\section{Changes in version 1.2-11 (2017-08-10, svn r3225)}{
   \subsection{New Features}{
     \itemize{
       \item S4 method dispatch no longer emits ambiguity
