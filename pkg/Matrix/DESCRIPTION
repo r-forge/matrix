@@ -1,6 +1,6 @@
 Package: Matrix
 Version: 1.2-12
-Date: 2017-09-00
+Date: 2017-08-21
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Contact: Doug and Martin <Matrix-authors@R-project.org>
@@ -10,7 +10,7 @@ Authors@R: c(person("Douglas","Bates", role="aut")
  , person("Timothy A.", "Davis", role="ctb",
            comment = c("SuiteSparse and 'cs' C libraries, notably CHOLMOD, AMD;",
 	               "collaborators listed in",
-		       "dir(pattern = '^[A-Z]+\.txt$',
+		       "dir(pattern = '^[A-Z]+[.]txt$',
 		            system.file('doc','SuiteSparse', package='Matrix'))")
  , person("Jens", "Oehlschlägel", role="ctb", comment="initial nearPD()")
  , person("Jason", "Riedy", role="ctb",
