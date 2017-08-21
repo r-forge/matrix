@@ -154,9 +154,11 @@ MatrixClass <- function(cl, cld = getClassDef(cl),
     else { ## possibly recursively
 	r <- .selectSuperClasses(cld@contains, dropVirtual = dropVirtual,
 				 namesOnly = TRUE, ...)
-	if(length(r))
-	    Recall(r[1], ...Matrix = ...Matrix, dropVirtual = dropVirtual)
-	else r
+	if(length(r)) {
+	    while(!length(r1 <- Recall(r[1], ...Matrix = ...Matrix, dropVirtual = dropVirtual))
+		  && length(r) > 1) r <- r[-1]
+	    r1
+	} else r
     }
 }
 
