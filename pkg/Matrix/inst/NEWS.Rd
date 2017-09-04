@@ -14,7 +14,9 @@
 \section{Changes in version 1.2-12 (2017-..-.., svn r3...)}{
   \subsection{New Features}{
     \itemize{
-      \item (none yet)
+      \item \code{crossprod(x,y)} and \code{kronecker(x,y)} have become
+      considerably more efficient for large \code{"indMatrix"} objects
+      \code{x, y}, thanks to private nudging by Boris Vaillant.
     }
   }
   \subsection{Bug Fixes}{
