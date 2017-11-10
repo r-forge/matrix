@@ -53,17 +53,18 @@ In addition, we provide <strong><a href="./slides">slides</a></strong> of presen
 
 <p> <strong>Doxygen</strong> documentation of the underlying C functions is <a href="./doxygen/"><strong>here</strong></a>. </p>
 
-<p> <strong>Do read</string> on <strong><a href="./programming/">compatibility</a></strong> changes  in connection with <t>Matrix</t>.
+<p> <strong>Do read</strong> on <strong><a href="./programming/">compatibility</a></strong> changes  in connection with <t>Matrix</t>.
 </p>
 
 
 <p> The <strong>project summary page</strong> is <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>.
-
-    From there you can browse the source via viewVC, for the Matrix package more directly
+  <ul>
+    <li> From there you can browse the source via viewVC, for the Matrix package more directly
     <a href="https://r-forge.r-project.org/scm/viewvc.php/pkg/Matrix/?root=matrix"><strong>here</strong></a>,
-
-    or look at the build and `R CMD check` status and also download the result,
-    <a href="https://r-forge.r-project.org/R/?group_id=61" <strong>here</strong></a>.
+    </li>
+    <li> or look at the <tt>R CMD build</tt> and <tt>R CMD check</tt> status and also download the result,
+    <a href="https://r-forge.r-project.org/R/?group_id=61" <strong>here</strong></a>.</li>
+  </ul>
 </p>
 
 </body>
