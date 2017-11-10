@@ -1,24 +1,24 @@
 Package: Matrix
 Version: 1.2-12
-Date: 2017-09-04
+Date: 2017-11-10
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Contact: Doug and Martin <Matrix-authors@R-project.org>
+Maintainer: Martin Maechler <mmaechler+Matrix@gmail.com>
 Authors@R: c(person("Douglas","Bates", role="aut")
  , person("Martin","Maechler", email="mmaechler+Matrix@gmail.com",
            role = c("aut","cre"))
  , person("Timothy A.", "Davis", role="ctb",
-           comment = c("SuiteSparse and 'cs' C libraries, notably CHOLMOD, AMD;",
-	               "collaborators listed in",
-		       "dir(pattern = '^[A-Z]+[.]txt$',
-		            system.file('doc','SuiteSparse', package='Matrix'))"))
+           comment = c("SuiteSparse and 'cs' C libraries, notably CHOLMOD, AMD;
+		       collaborators listed in
+			dir(pattern = '^[A-Z]+[.]txt$', full.names=TRUE,
+			    system.file('doc', 'SuiteSparse', package='Matrix'))"))
  , person("Jens", "Oehlschlägel", role="ctb", comment="initial nearPD()")
  , person("Jason", "Riedy", role="ctb",
           comment = c("condest() and onenormest() for octave",
  	  	      "Copyright: Regents of the University of California"))
  , person("R Core Team", role = "ctb", comment="base R matrix implementation")
  )
-Maintainer: Martin Maechler <mmaechler+Matrix@gmail.com>
 Description: A rich hierarchy of matrix classes, including triangular,
    symmetric, and diagonal matrices, both dense and sparse and with
    pattern, logical and numeric entries.   Numerous methods for and
