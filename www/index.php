@@ -43,17 +43,17 @@ fclose($handle);
 echo $contents; } ?>
 
 <p>
-<t>Matrix</t> has been a "recommended" R package since R version 2.9.0 (October 2008). This means that it is now part of every regular installation of R.
+<code>Matrix</code> has been a "recommended" R package since R version 2.9.0 (October 2008). This means that it is now part of every regular installation of R.
 </p>
 
 <p>
-The <t>Matrix</t> package comes with several vignettes describing its functionality.
+The <code>Matrix</code> package comes with several vignettes describing its functionality.
 In addition, we provide <strong><a href="./slides">slides</a></strong> of presentations or talks about the subject.
 </p>
 
 <p> <strong>Doxygen</strong> documentation of the underlying C functions is <a href="./doxygen/"><strong>here</strong></a>. </p>
 
-<p> <strong>Do read</strong> on <strong><a href="./programming/">compatibility</a></strong> changes  in connection with <t>Matrix</t>.
+<p> <strong>Do read</strong> on <strong><a href="./programming/">compatibility</a></strong> changes  in connection with <code>Matrix</code>.
 </p>
 
 
@@ -62,7 +62,7 @@ In addition, we provide <strong><a href="./slides">slides</a></strong> of presen
     <li> From there you can browse the source via viewVC, for the Matrix package more directly
     <a href="https://r-forge.r-project.org/scm/viewvc.php/pkg/Matrix/?root=matrix"><strong>here</strong></a>,
     </li>
-    <li> or look at the <tt>R CMD build</tt> and <tt>R CMD check</tt> status and also download the result,
+    <li> or look at the <code>R CMD build</code> and <code>R CMD check</code> status and also download the result,
     <a href="https://r-forge.r-project.org/R/?group_id=61" <strong>here</strong></a>.</li>
   </ul>
 </p>
