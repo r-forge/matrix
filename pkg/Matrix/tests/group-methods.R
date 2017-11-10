@@ -210,6 +210,7 @@ if(getRversion() >= "3.5.0") { # as(*, "matrix") of these __fail__ in  R < 3.5.0
 stopifnot(identical(cc > 0, mC > 0 -> m.gt.0), ## cc > 0 - gave error in Matrix <= 1.2-11
           identical(c2 > 0, m.gt.0),
           identical(c3 > 0, m.gt.0))
+if(getRversion() < "3.5.0") rm(c2,c3) # they would "fail" below
 
 ## Just for print "show":
 z <- round(rnorm(77), 2)
