@@ -57,7 +57,14 @@ In addition, we provide <strong><a href="./slides">slides</a></strong> of presen
 </p>
 
 
-<p> The <strong>project summary page</strong> is <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </p>
+<p> The <strong>project summary page</strong> is <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>.
+
+    From there you can browse the source via viewVC, for the Matrix package more directly
+    <a href="https://r-forge.r-project.org/scm/viewvc.php/pkg/Matrix/?root=matrix"><strong>here</strong></a>,
+
+    or look at the build and `R CMD check` status and also download the result,
+    <a href="https://r-forge.r-project.org/R/?group_id=61" <strong>here</strong></a>.
+</p>
 
 </body>
 </html>
