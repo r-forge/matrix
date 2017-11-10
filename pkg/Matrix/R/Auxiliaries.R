@@ -1555,8 +1555,7 @@ setparts <- function(x,y, uniqueCheck = TRUE, check = TRUE) {
 ##' @param which.call passed to sys.call().  A caller may use -2 if the message should
 ##' mention *its* caller
 chk.s <- function(..., which.call = -1,
-                  depCtrl = if(exists("..deparseOpts") &&
-                               any("niceNames" == ..deparseOpts)) "niceNames")
+		  depCtrl = if(exists("..deparseOpts")) "niceNames")
 {
     if(nx <- length(list(...)))
 	warning(sprintf(ngettext(nx,
