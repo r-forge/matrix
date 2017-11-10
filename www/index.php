@@ -42,6 +42,13 @@ while (!feof($handle)) {
 fclose($handle);
 echo $contents; } ?>
 
+// The R-forge project description (pulled above) is limited to 255 characters
+// (in theory; in practice even a bit less).
+
+// Currently it shows this:
+
+// R package Matrix provides a hierarchy of matrix classes, both dense & sparse. Numerous methods & operations on these matrices using BLAS & Lapack; further CHOLMOD and other libraries from the SuiteSparse collection.
+
 <p>
 <code>Matrix</code> has been a "recommended" R package since R version 2.9.0 (October 2008). This means that it is now part of every regular installation of R.
 </p>
