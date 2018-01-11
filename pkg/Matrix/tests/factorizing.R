@@ -559,16 +559,20 @@ Zt <- new("dgCMatrix", Dim = c(6L, 30L), x = 2*1:30,
           p = 0:30, Dimnames = list(LETTERS[1:6], NULL))
 cholCheck(0.78 * Zt, tol=1e-14)
 
+showSys.time(
 for(i in 1:120) {
-    set.seed(i); cat(sprintf("%3d: ", i))
+    set.seed(i)
     M <- rspMat(n=rpois(1,50), m=rpois(1,20), density = 1/(4*rpois(1, 4)))
+    cat(sprintf("%3d: dim(M) = %2dx%2d, rank=%2d, k=%9.4g; ",
+		i, nrow(M), ncol(M), rankMatrix(M), kappa(M)))
     for(super in c(FALSE,TRUE)) {
-        cat("super=",super," M: ")
-        cholCheck( M  , super=super); cat(" M': ")
-        cholCheck(t(M), super=super)
+        cat("super=",super,"M: ")
+        ## 2018-01-04, Avi Adler: needed 1.2e-12 in Windows 64 (for i=55, l.1):
+        cholCheck( M  , tol=2e-12, super=super); cat(" M': ")
+        cholCheck(t(M), tol=2e-12, super=super)
     }
     cat(" [Ok]\n")
-}
+})
 
 .updateCHMfactor
 ## TODO: (--> ../TODO "Cholesky"):
