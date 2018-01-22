@@ -23,7 +23,7 @@ setMethod("cbind2", signature(x = "Matrix", y = "NULL"),
 setMethod("cbind2", signature(x = "Matrix", y = "missing"),
           function(x, y, ...) x)
 setMethod("cbind2", signature(x = "NULL", y="Matrix"),
-          function(x, y, ...) x)
+          function(x, y, ...) y)
 ## using "atomicVector" not just "numeric"
 setMethod("cbind2", signature(x = "Matrix", y = "atomicVector"),
 	  function(x, y, ...) cbind2(x, matrix(y, nrow = nrow(x))))
@@ -39,7 +39,7 @@ setMethod("rbind2", signature(x = "Matrix", y = "NULL"),
 setMethod("rbind2", signature(x = "Matrix", y = "missing"),
           function(x, y, ...) x)
 setMethod("rbind2", signature(x = "NULL", y="Matrix"),
-          function(x, y, ...) x)
+          function(x, y, ...) y)
 setMethod("rbind2", signature(x = "Matrix", y = "atomicVector"),
 	  function(x, y, ...) rbind2(x, matrix(y, ncol = ncol(x))))
 setMethod("rbind2", signature(x = "atomicVector", y = "Matrix"),
