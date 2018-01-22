@@ -11,6 +11,25 @@
 %%_NOT YET__FIXME_   needs cholmod_l_dense_to_sparse() in our dense_to_Csparse()
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
+\section{Changes in version 1.2-13 (2018-01-xx, svn r....)}{
+  \subsection{New Features}{
+    \itemize{
+      \item (none)
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{cbind(NULL,<Matrix>)} no longer return \code{NULL};
+      analogously for \code{rbind()}, \code{rbind2()}, \code{cbind2()},
+      fixing very long standing typo in the corresponsing \code{cbind2()}
+      and \code{rbind2()} methods.
+
+      \item The deprecation warning (once per session) for
+      \code{cBind()} and \code{rBind()} finally works (fixing a simple thinko).
+    }
+  }
+}
+
 \section{Changes in version 1.2-12 (2017-11-10, svn r3239)}{
   \subsection{New Features}{
     \itemize{
