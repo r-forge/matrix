@@ -250,9 +250,6 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
 			Dimnames = if(is.null.DN(dimnames)) list(NULL,NULL)
 			else dimnames)
 	} else { ## normal case
-	    ## Now 'forbidden' :
-	    ## data <- .Internal(matrix(data, nrow, ncol, byrow, dimnames,
-	    ##				missing(nrow), missing(ncol)))
 	    data <- .External(Mmatrix,
 			      data, nrow, ncol, byrow, dimnames,
 			      missing(nrow), missing(ncol))
