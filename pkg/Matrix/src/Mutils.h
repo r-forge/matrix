@@ -236,7 +236,7 @@ int packed_ncol(int len)
  * @return SEXP of given type and length assigned as slot nm in obj
  */
 static R_INLINE
-SEXP ALLOC_SLOT(SEXP obj, SEXP nm, SEXPTYPE type, int length)
+SEXP ALLOC_SLOT(SEXP obj, SEXP nm, SEXPTYPE type, R_xlen_t length)
 {
     SEXP val = allocVector(type, length);
 
