@@ -284,6 +284,31 @@ stopifnot(grep("too large", e1) == 1,
 stopifnot(suppressWarnings(any(Lrg)))# (double -> logical  warning)
 rm(e2)# too large...
 
+if(doExtras && is.finite(memGB) && memGB > 24) { # need around .. GB
+    cat("computing e3 .. ")
+
+    print(system.time(m <- matrix(0, 3e6, 1024)))
+    ##  user  system elapsed
+    ## 1.303   7.410   8.736
+    set.seed(1); inot0 <- c(1, length(m), sample(length(m), 20))
+    print(system.time(m[inot0] <- 1:22))
+    ##  user  system elapsed
+    ## 2.829   7.205  10.069
+    print(system.time(SM  <- as(m, "sparseMatrix")))
+    print(system.time(SM. <- as(m, "CsparseMatrix")))
+    ## gave 'Error in asMethod(object) : negative length vectors are not allowed'
+
+    print(system.time(n0.m <- c(m) != 0))
+    ##   user  system elapsed
+    ## 14.901  10.789  25.776
+
+    cat(" [Ok]\n")
+    rm(m)
+)
+str(SM)
+
+
+
 ## with dimnames:
 v <- c(a=1, b=2:3)
 m <- as.matrix(v)
