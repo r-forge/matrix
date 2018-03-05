@@ -191,7 +191,7 @@ try( checkQR.DS.both(A1, FALSE,  TRUE) )
 
 
 qa <- qr(as(A0,"matrix"))
-qA <- qr(A0)
+qA <- qr(A0) # -> message: ".. Matrix structurally rank deficient"
 
 drop0(crossprod( Qd <- qr.Q(qa) ), 1e-15) # perfect = diag( 3 )
 drop0(crossprod( Qs <- qr.Q(qA) ), 1e-15) # R[3,3] == 0 -- OOPS!
