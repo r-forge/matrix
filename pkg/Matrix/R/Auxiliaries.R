@@ -1206,7 +1206,7 @@ mat2tri <- function(from, sparse=NA) {
     if(isTri) {
 	d <- dim(from)
 	if(is.na(sparse))
-	    sparse <- prod(d) > 2*sum(isN0(from)) ## <==> sparseDefault() in Matrix()
+	    sparse <- prod(d) > 2*sum(isN0(from)) ## <==> sparseDefault() above
 	if(sparse)
 	    as(as(from, "sparseMatrix"), "triangularMatrix")
 	else

@@ -8,13 +8,21 @@
 \newcommand{\sspace}{\ifelse{latex}{\out{~}}{ }}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-%%_NOT YET__FIXME_   needs cholmod_l_dense_to_sparse() in our dense_to_Csparse()
+%%_NOT YET__FIXME_ : needs *MORE THAN* cholmod_l_dense_to_sparse() in
+%%----------------   our dense_to_Csparse() in ../src/dense.c (see there)
+%%
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
-\section{Changes in version 1.2-13 (2018-02-xx, svn r....)}{
+%
+\section{Changes in version 1.2-13 (2018-03-17, svn r3258)}{
   \subsection{New Features}{
     \itemize{
-      \item (none)
+      \item Faster \code{as("matrix", "sparseMatrix") and coercion
+	\code{"dgCMatrix"}, \code{"ngCMatrix"}, etc, via new direct C
+	\code{matrix_to_Csparse()} which does \emph{not} go via \code{"dgeMatrix"}.
+
+	Also provide low-level \R functions \code{.m2dgC()},
+	\code{.m2lgC()}, and \code{.m2ngC()}.
     }
   }
   \subsection{Bug Fixes}{
@@ -26,8 +34,6 @@
 
       \item The deprecation warning (once per session) for
       \code{cBind()} and \code{rBind()} finally works (fixing a simple thinko).
-
-      \item \code{as(*, "CsparseMatrix") now works in large cases which
 
       \item \code{cbind()} and \code{rbind()} for largish sparse
       matrices no longer gives an error because of integer overflow
