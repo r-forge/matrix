@@ -17,7 +17,7 @@
 \section{Changes in version 1.2-13 (2018-03-17, svn r3258)}{
   \subsection{New Features}{
     \itemize{
-      \item Faster \code{as("matrix", "sparseMatrix") and coercion
+      \item Faster \code{as("matrix", "sparseMatrix")} and coercion
 	\code{"dgCMatrix"}, \code{"ngCMatrix"}, etc, via new direct C
 	\code{matrix_to_Csparse()} which does \emph{not} go via \code{"dgeMatrix"}.
 
