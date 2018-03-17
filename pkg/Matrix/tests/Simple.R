@@ -273,7 +273,7 @@ e1 <- try(Lrg == Lrg) # ==> Cholmod error 'problem too large' at file ../Core/ch
 system.time( # ~10 sec.
     e2 <- if(doExtras && is.finite(memGB) && memGB > 30) { # need around 18 GB
               try(!Lrg) # now *works* on 64-bit machines with enough RAM
-              ## and immediately errors if LONG_VECTORs are not annvailable
+              ## and immediately errors if LONG_VECTORs are not available
     })
 str(e2) # error, NULL or "worked" (=> 50000 x 50000 lgeMatrix)
 ina <- is.na(Lrg)# "all FALSE"
@@ -284,28 +284,37 @@ stopifnot(grep("too large", e1) == 1,
 stopifnot(suppressWarnings(any(Lrg)))# (double -> logical  warning)
 rm(e2)# too large...
 
-if(doExtras && is.finite(memGB) && memGB > 24) { # need around .. GB
-    cat("computing e3 .. ")
-
+if(doExtras && is.finite(memGB) && memGB > 24) # need around .. GB
+{
+    cat("computing SM .. \n")
     print(system.time(m <- matrix(0, 3e6, 1024)))
     ##  user  system elapsed
-    ## 1.303   7.410   8.736
-    set.seed(1); inot0 <- c(1, length(m), sample(length(m), 20))
+    ## 2.475  10.688  13.196  (faster in past ??)
+    set.seed(1); inot0 <- unique(sort(c(1, length(m), sample(length(m), 20))))
+    ai0 <- arrayInd(inot0, .dim=dim(m), useNames=FALSE)
     print(system.time(m[inot0] <- 1:22))
     ##  user  system elapsed
-    ## 2.829   7.205  10.069
+    ## 5.931  11.184  17.162
     print(system.time(SM  <- as(m, "sparseMatrix")))
-    print(system.time(SM. <- as(m, "CsparseMatrix")))
     ## gave 'Error in asMethod(object) : negative length vectors are not allowed'
-
-    print(system.time(n0.m <- c(m) != 0))
+    ## now works - via new C  matrix_to_Csparse()
+    print(system.time(n0.m <- c(m) != 0))# logical (full, base R) matrix, 12 GB
     ##   user  system elapsed
     ## 14.901  10.789  25.776
-
+    if(FALSE) ## _FIXME_ in R: Error ... long vectors not supported yet
+        in0.m <- which(n0.m)
+    if(FALSE) ## Matrix FIXME: Error .. Cholmod error 'problem too large' at *dense*
+        SM[inot0] ##    FIXME: selecting only a few elements but does coerce the
+                  ##           whole matrix to dense first !!!!
+    ## Much more efficient (=> *FAST*)
+    ## ... [not yet]
     cat(" [Ok]\n")
     rm(m)
-)
-str(SM)
+    str(SM)
+    ## checking SM:
+    TM <- as(SM, "TsparseMatrix")
+    stopifnot(as.matrix(summary(TM)) == cbind(ai0, 1:22))
+}
 
 
 

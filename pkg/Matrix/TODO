@@ -1,8 +1,8 @@
 ##-*- mode: org -*-
 
 * Very *Urgent*
-** TODO as(m, "sparseMatrix") must work when length(m) > max.int for 'matrix' m
- -->  "~/R/MM/Pkg-ex/Matrix/large-mat-to-sparse.R"
+** DONE as(m, "sparseMatrix") must work when length(m) > max.int for 'matrix' m
+ -->  see SM (3e6 x 1023) ex. in tests/Simple.R
 ** TODO Using "long vectors" (i.e. 64 bit indices vectors) in CHOLMOD --> cholmod_l_*()
 *** e.g. segfault in crossprod() Csparse_crossprod -> cholmod_att()
 * *Urgent* in some sense ---------------------------------------------------
