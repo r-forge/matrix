@@ -64,11 +64,12 @@ alternatively also is_sym() [in src/cs_utils.c], see below.
 
 ** TODO kronecker(<symmetric>, <symmetric>) should return symmetricMatrix, notably
    when one of the arguments is diagonal
-** TODO as(<traditional_matrix>, "CsparseMatrix")  -> dense_to_Csparse() is inefficient:
+** DONE as(<traditional_matrix>, "CsparseMatrix")  -> dense_to_Csparse() is inefficient:
         it first *copies* the matrix to a dgeMatrix {re-allocating!}, then
         goes to sparse via  cholmod_(l_)dense_to_sparse.   ==>
-*** TODO Do this directly in C (also working around "too long // segfault problem we have);
-*** TODO Optionally check for diagonal, (upper or lower) triangular, and/or symmetric case
+*** DONE Do this directly in C (also working around "too long // segfault problem we have there):
+    matrix_to_Csparse() plus .m2dgC() etc R short cuts
+** TODO extend C's matrix_to_Csparse() to optionally check for diagonal, (upper or lower) triangular, and/or symmetric case
 ** DONE <nsparseMatrix> %*% <sparseMatrix>, crossprod() & tcrossprod() often return
    a pattern, i.e., nsparseMatrix as well *because*  cholmod_ssmult() just does that even
    if only *one* of the two matrices is a pattern matrix.  The latter case
