@@ -12,8 +12,8 @@ SEXP get_SuiteSparse_version() {
     return ans;
 }
 
-cholmod_common c;
-cholmod_common cl;
+cholmod_common c; // for cholmod_<method>  (..)
+cholmod_common cl;// for cholmod_l_<method>(..)
 
 SEXP chm_common_env;
 static SEXP dboundSym, grow0Sym, grow1Sym, grow2Sym, maxrankSym,
@@ -337,9 +337,15 @@ SEXP chm_sparse_to_SEXP(CHM_SP a, int dofree, int uploT, int Rkind,
 {
     SEXP ans;
     char *cls = "";/* -Wall */
-    int *dims, nnz, *ansp, *ansi, *aii = (int*)(a->i), *api = (int*)(a->p),
-	longi = (a->itype) == CHOLMOD_LONG;
-    SuiteSparse_long *ail = (SuiteSparse_long*)(a->i), *apl = (SuiteSparse_long*)(a->p);
+    Rboolean longi = (a->itype) == CHOLMOD_LONG;
+    int *dims, nnz, *ansp, *ansi;
+    // if (longi) :
+    SuiteSparse_long
+	*ail = (SuiteSparse_long*)(a->i),
+	*apl = (SuiteSparse_long*)(a->p);
+    // else  ((a->itype) == CHOLMOD_INT) :
+    int *aii = (int*)(a->i),
+	*api = (int*)(a->p);
 
     PROTECT(dn);  /* dn is usually UNPROTECTed before the call */
 
@@ -353,7 +359,8 @@ SEXP chm_sparse_to_SEXP(CHM_SP a, int dofree, int uploT, int Rkind,
 	longi ? cholmod_l_free_sparse(&a, &cl) : cholmod_free_sparse(&a, &c); \
     else if (dofree < 0) Free(a)
 
-    switch(a->xtype){
+
+    switch(a->xtype) {
     case CHOLMOD_PATTERN:
 	cls = uploT ? "ntCMatrix": ((a->stype) ? "nsCMatrix" : "ngCMatrix");
 	break;
@@ -385,7 +392,7 @@ SEXP chm_sparse_to_SEXP(CHM_SP a, int dofree, int uploT, int Rkind,
     ansp = INTEGER(ALLOC_SLOT(ans, Matrix_pSym, INTSXP, a->ncol + 1));
     ansi = INTEGER(ALLOC_SLOT(ans, Matrix_iSym, INTSXP, nnz));
     for (int j = 0; j <= a->ncol; j++) ansp[j] = longi ? (int)(apl[j]) : api[j];
-    for (int p = 0; p < nnz; p++) ansi[p] = longi ? (int)(ail[p]) : aii[p];
+    for (int p = 0; p < nnz; p++)      ansi[p] = longi ? (int)(ail[p]) : aii[p];
 				/* copy data slot if present */
     if (a->xtype == CHOLMOD_REAL) {
 	int i, *m_x;
@@ -505,10 +512,10 @@ CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x, Rboolean check_Udiag)
 	/* diagU2N(.) "in place", similarly to Tsparse_diagU2N [./Tsparse.c]
 	   (but without new SEXP): */
 	int k = m + dims[0];
-	CHM_TR tmp = cholmod_l_copy_triplet(ans, &c);
+	CHM_TR tmp = cholmod_l_copy_triplet(ans, &cl);
 	int *a_i, *a_j;
 
-	if(!cholmod_reallocate_triplet((size_t) k, tmp, &c))
+	if(!cholmod_reallocate_triplet((size_t) k, tmp, &cl))
 	    error(_("as_cholmod_triplet(): could not reallocate for internal diagU2N()"
 		      ));
 
