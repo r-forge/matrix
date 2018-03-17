@@ -14,6 +14,10 @@ extern "C" {
 #include <Rdefines.h> /* Rinternals.h + GET_SLOT etc */
 #include <R_ext/RS.h> /* for Memzero() */
 
+#define imax2(x, y) ((x < y) ? y : x)
+#define imin2(x, y) ((x < y) ? x : y)
+
+
 // must come after <R.h> above, for clang (2015-08-05)
 #ifdef __GNUC__
 # undef alloca
@@ -62,6 +66,8 @@ SEXP dense_nonpacked_validate(SEXP obj);
 SEXP dim_validate(SEXP Dim, const char* name);
 SEXP Dim_validate(SEXP obj, SEXP name);
 SEXP dimNames_validate(SEXP obj);
+SEXP dimNames_validate__(SEXP dmNms, int dims[], const char* obj_name);
+
 
 // La_norm_type() & La_rcond_type()  have been in R_ext/Lapack.h
 //  but have still not been available to package writers ...
@@ -180,19 +186,22 @@ void SET_DimNames_symm(SEXP dest, SEXP src);
 enum dense_enum { ddense, ldense, ndense };
 
 // Define this "Cholmod compatible" to some degree
-enum x_slot_kind {x_pattern=-1, x_double=0, x_logical=1, x_integer=2, x_complex=3};
-//		    n		  d	      l		   i		z
+    enum x_slot_kind {
+	x_unknown=-2, x_pattern=-1, x_double=0, x_logical=1, x_integer=2, x_complex=3};
+//	  NA	              n		  d	      l		   i		z
+
+// FIXME: use 'x_slot_kind' instead of 'int' everywhere  Real_(KIND2?|kind)  is used
 
 /* should also work for "matrix" matrices: */
 #define Real_KIND(_x_)	(IS_S4_OBJECT(_x_) ? Real_kind(_x_) : \
-			 (isReal(_x_) ? x_double : (isLogical(_x_) ? x_logical : -1)))
-/* This one gives '0' also for integer "matrix" :*/
+			 (isReal(_x_) ? x_double : (isLogical(_x_) ? x_logical : x_pattern)))
+/* This one gives 'x_double' also for integer "matrix" :*/
 #define Real_KIND2(_x_)	(IS_S4_OBJECT(_x_) ? Real_kind(_x_) : \
-			 (isLogical(_x_) ? x_logical : 0))
+			 (isLogical(_x_) ? x_logical : x_double))
 
 /* requires 'x' slot, i.e., not for ..nMatrix.  FIXME ? via R_has_slot(obj, name) */
-#define Real_kind(_x_)	(isReal(GET_SLOT(_x_, Matrix_xSym)) ? 0	:	\
-			 (isLogical(GET_SLOT(_x_, Matrix_xSym)) ? 1 : -1))
+#define Real_kind(_x_)	(isReal(GET_SLOT(_x_, Matrix_xSym)) ? x_double	: \
+			 (isLogical(GET_SLOT(_x_, Matrix_xSym)) ? x_logical : x_pattern))
 
 #define DECLARE_AND_GET_X_SLOT(__C_TYPE, __SEXP)	\
     __C_TYPE *xx = __SEXP(GET_SLOT(x, Matrix_xSym))
