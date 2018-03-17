@@ -342,16 +342,28 @@ SEXP Dim_validate(SEXP obj, SEXP name) {
 			CHAR(STRING_ELT(name, 0)));
 }
 
-// obj must have @Dim and @Dimnames. Assume 'Dim' is already checked.
-SEXP dimNames_validate(SEXP obj)
+/**
+ * Validate dimnames (the @Dim slot typically), assuming
+ * that 'dims' is already checked.
+ *
+ * Utility, called from  dimNames_validate(), but available to other routines.
+ *
+ * @param dmNms an R object should be valid `dimnames`
+ * @param dims  an integer vector of length 2 (must have been checked by caller!).
+
+ * @return a SEXP, either TRUE (= success) or an error message string ("character")
+ */
+SEXP dimNames_validate__(SEXP dmNms, int dims[], const char* obj_name)
 {
-    int *dims = INTEGER(GET_SLOT(obj, Matrix_DimSym));
-    SEXP dmNms = GET_SLOT(obj, Matrix_DimNamesSym);
-    if(!isNewList(dmNms))
-	return mkString(_("Dimnames slot is not a list"));
-    if(length(dmNms) != 2)
-	return mkString(_("Dimnames slot is a list, but not of length 2"));
     char buf[99];
+    if(!isNewList(dmNms)) {
+	sprintf(buf, _("%s is not a list"), obj_name);
+	return mkString(buf);
+    }
+    if(length(dmNms) != 2) {
+	sprintf(buf, _("%s is a list, but not of length 2"), obj_name);
+	return mkString(buf);
+    }
     for(int j=0; j < 2; j++) { // x@Dimnames[j] must be NULL or character(length(x@Dim[j]))
 	if(!isNull(VECTOR_ELT(dmNms, j))) {
 	    if(TYPEOF(VECTOR_ELT(dmNms, j)) != STRSXP) {
@@ -367,6 +379,23 @@ SEXP dimNames_validate(SEXP obj)
 	}
     }
     return ScalarLogical(1);
+}
+
+
+/**
+ * Check R (Matrix-like) object: must have @Dim and @Dimnames.
+ * Assume 'Dim' is already checked.
+ * (typically used in  S4 validity method)
+ *
+ * @param obj an R object (typically inheriting from `Matrix`)
+ *
+ * @return a SEXP, either TRUE (= success) or an error message string ("character")
+ */
+SEXP dimNames_validate(SEXP obj)
+{
+    return dimNames_validate__(/* dmNms = */ GET_SLOT(obj, Matrix_DimNamesSym),
+			       /* dims =  */ INTEGER(GET_SLOT(obj, Matrix_DimSym)),
+			       "Dimnames slot");
 }
 
 
