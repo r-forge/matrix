@@ -100,6 +100,43 @@ stopifnot(E | as.vector(F), identical(E | F, F | E),
 	  all(e | f), all(E | F), # <- failed  Ops.spv.spv
 	  identical(Fv, base::as.vector(F)),
 	  is.logical(Fv), which(Fv) == c(2,5,8))
+F[-8:-1] # was partly "illegal" (length = 0 is ok; nnz '3' is not)
+F.ineg <- lapply(1:8, function(k) F[-8:-k])
+F.pos <-  lapply(1:8, function(k) F[seq_len(k-1)])
+F.vec <-  lapply(1:8, function(k) Fv[seq_len(k-1)])
+str(F.vec, vec=8)
+(nT <- vapply(F.vec, sum, 1L)) # == 0 0  1 1 1  2 2 2
+str(whichT <- lapply(F.vec, which))
+i.lengths <- function(L) vapply(L, function(.) length(.@i), 1L)
+stopifnot(identical(lengths(F.vec), 0:7)
+         ,
+          identical(lengths(F.ineg), 0:7)
+         ,
+          identical(lengths(F.pos),  0:7)
+         ,
+          identical(i.lengths(F.pos),  nT)
+         ,
+          identical(i.lengths(F.ineg), nT) # failed before 2018-03-19
+         ,
+          identical(lapply(F.pos, slot, "i"), whichT)
+         ,
+          identical(lapply(F.ineg, slot, "i"), whichT) # failed before 2018-03-19
+)
+## Here, sparseVector '[' is really wrong:
+SV <- new("nsparseVector", length = 30L,
+          i = c(1L, 8L, 9L, 12L, 13L, 18L, 21L, 22L))
+NI <- -c(1:5, 7:10, 12:16, 18:27, 29,30)
+sv <- SV[1:14]; ni <- -(1:14)[-c(6,11)] # smaller example
+selectMethod("[", c("nsparseVector","index","missing","missing"))# the culprit
+if(FALSE)
+  trace("[", browser, signature=c("nsparseVector","index","missing","missing"))
+stopifnot(
+    SV[NI] == as.vector(SV)[NI] ## badly failed before 2018-03-19
+    ,
+    sv[ni] == as.vector(sv)[ni] ## ditto
+)
+if(FALSE)
+    untrace("[", signature=c("nsparseVector","index","missing","missing"))
 
 dT <- new("dgTMatrix",
 	  i = c(1:2,1:2), j=rep(1:2, each=2), Dim = c(4L, 4L), x = c(1, 1, NA, 2))
@@ -110,6 +147,16 @@ c2 <- as(dt, "CsparseMatrix")
 isValid(lc <- c1 > c2,"lgCMatrix")
 isValid(lt <- dT > dt,"lgCMatrix")
 stopifnot(identical(lc,lt))
+
+## Versions of Diagonal()
+dD <- Diagonal(x = 5:1)
+sD <- .symDiagonal(5, 5:1)
+tD <- .trDiagonal (5, 5:1) # x=<integer> had failed for both
+stopifnot(all(sD == dD)
+        , all(tD == dD)
+        , identical(sD, .symDiagonal(x = 5:1))
+        , identical(tD, .sparseDiagonal(x=5:1))
+        , identical(tD, .trDiagonal (x = 5:1)))# 'n' now has default
 
 M <- Diagonal(4); M[1,2] <- 2 ; M
 cM <- crossprod(M) # >> as_cholmod_l_triplet(): could not reallocate for internal diagU2N()
@@ -287,27 +334,29 @@ rm(e2)# too large...
 if(doExtras && is.finite(memGB) && memGB > 24) # need around .. GB
 {
     cat("computing SM .. \n")
-    print(system.time(m <- matrix(0, 3e6, 1024)))
+    showSys.time(m <- matrix(0, 3e6, 1024))
     ##  user  system elapsed
     ## 2.475  10.688  13.196  (faster in past ??)
     set.seed(1); inot0 <- unique(sort(c(1, length(m), sample(length(m), 20))))
     ai0 <- arrayInd(inot0, .dim=dim(m), useNames=FALSE)
-    print(system.time(m[inot0] <- 1:22))
+    showSys.time(m[inot0] <- 1:22)
     ##  user  system elapsed
     ## 5.931  11.184  17.162
-    print(system.time(SM  <- as(m, "sparseMatrix")))
+    showSys.time(SM  <- as(m, "sparseMatrix")) # ~ 8 sec
     ## gave 'Error in asMethod(object) : negative length vectors are not allowed'
     ## now works - via new C  matrix_to_Csparse()
-    print(system.time(n0.m <- c(m) != 0))# logical (full, base R) matrix, 12 GB
+    showSys.time(n0.m <- c(m) != 0) # logical (full, base R) matrix, 12 GB
     ##   user  system elapsed
     ## 14.901  10.789  25.776
-    if(FALSE) ## _FIXME_ in R: Error ... long vectors not supported yet
+    try( ## _FIXME_ in R: Error ... long vectors not supported yet
         in0.m <- which(n0.m)
-    if(FALSE) ## Matrix FIXME: Error .. Cholmod error 'problem too large' at *dense*
-        SM[inot0] ##    FIXME: selecting only a few elements but does coerce the
-                  ##           whole matrix to dense first !!!!
-    ## Much more efficient (=> *FAST*)
-    ## ... [not yet]
+    )
+    ## DONE: now very fast! [previously did coerce the whole matrix to dense first !]
+    subS <- SM[inot0]
+    selectMethod("[", c("dgCMatrix","numeric","missing","missing"))# -> .M.vectorSub(x,i)
+    ## Directly via arrayInd(), is *FAST*:
+    subSij <- SM[ai0]
+    stopifnot(subS == 1:22, identical(subS, subSij))
     cat(" [Ok]\n")
     rm(m)
     str(SM)
@@ -1093,6 +1142,6 @@ sessionInfo()
 c(Matrix = packageDescription("Matrix")$Built)
 if(SysI[["sysname"]] == "Linux" && require("sfsmisc")) local({
     nn <- names(.Sc <- sfsmisc::Sys.cpuinfo())
-    nn <- names(.Sc <- .Sc[nn != "flags"])
-    print(.Sc[grep("\\.[0-9]$", nn, invert=TRUE)])
+    nn <- names(.Sc <- .Sc[!grepl("^flags", nn)])
+    print(.Sc[ grep("\\.[0-9]+$", nn, invert=TRUE) ])
 })
