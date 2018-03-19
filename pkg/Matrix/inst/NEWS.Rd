@@ -44,6 +44,13 @@
 
       \item \code{.symDiagonal(5, 5:1)} and \code{.trDiagonal(x = 4:1)}
       now work as expected.
+
+      \item \code{Sp[i]} now is much more efficient for large sparse
+      matrices \code{Sp}, notably when the result is short.
+
+      \item \code{<sparseVector>[ <negative integer> ]} now also gives
+      the correct answer when the result is \dQuote{empty}, i.e., all
+      zero or false.
     }
   }
 }
