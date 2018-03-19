@@ -14,7 +14,7 @@
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
-\section{Changes in version 1.2-13 (2018-03-17, svn r3258)}{
+\section{Changes in version 1.2-13 (2018-03-19, svn r3264)}{
   \subsection{New Features}{
     \itemize{
       \item Faster \code{as(<matrix>, "sparseMatrix")} and coercion
@@ -41,6 +41,9 @@
       matrices no longer gives an error because of integer overflow
       (in the default case where \code{sparse} is not been specified
       hence is chosen by a \code{nnzero()} based heuristic).
+
+      \item \code{.symDiagonal(5, 5:1)} and \code{.trDiagonal(x = 4:1)}
+      now work as expected.
     }
   }
 }
