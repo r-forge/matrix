@@ -316,8 +316,7 @@ e1 <- try(Lrg == Lrg) # ==> Cholmod error 'problem too large' at file ../Core/ch
 ## (error message almost ok)
 
 (memGB <- Sys.memGB("MemFree")) # from test-tools-1.R
-##                                             __vv__
-system.time( # ~10 sec.
+system.time( # ~10 sec.                            __vv__
     e2 <- if(doExtras && is.finite(memGB) && memGB > 30) { # need around 18 GB
               try(!Lrg) # now *works* on 64-bit machines with enough RAM
               ## and immediately errors if LONG_VECTORs are not available
@@ -363,9 +362,25 @@ if(doExtras && is.finite(memGB) && memGB > 24) # need around .. GB
     ## checking SM:
     TM <- as(SM, "TsparseMatrix")
     stopifnot(as.matrix(summary(TM)) == cbind(ai0, 1:22))
+    ## cleanup:
+    rm(SM, TM)
 }
 
-
+## Constructing *packed* dense symmetric (dsp*) | triangular (dtp*) Matrices:
+if(doExtras && is.finite(memGB) && memGB > 35) { # need around 17.2 GB
+    m <- as.integer(2^16) ## = 65536
+    showSys.time(x <- rep(as.numeric(1:100), length.out=m*(m+1)/2))
+    ##  user  system elapsed
+    ## 6.028   8.964  15.074
+    print(object.size(x)) # 17'180'131'368 bytes: ~ 17 GB
+    mat <- new("dspMatrix", x = x, Dim = c(m, m)) # failed with
+    ## long vectors not supported yet: ../../src/include/Rinlinedfuns.h:...
+    validObject(mat)
+    mat <- new("dtpMatrix", x = x, Dim = c(m, m)) # failed .......
+    validObject(mat)
+    ## cleanup
+    rm(mat)
+}
 
 ## with dimnames:
 v <- c(a=1, b=2:3)
