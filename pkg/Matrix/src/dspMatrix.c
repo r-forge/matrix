@@ -7,9 +7,9 @@ SEXP dspMatrix_validate(SEXP obj)
     if(isString(val))
 	return(val);
     else { /* identical to the test in dtpMatrix_validate() : */
-	int d = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0],
-	    lx = length(GET_SLOT(obj, Matrix_xSym));
-	if(lx * 2 != d*(d+1))
+	int d = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
+	R_xlen_t lx = xlength(GET_SLOT(obj, Matrix_xSym));
+	if(lx * 2 != d*(R_xlen_t)(d+1))
 	    return(mkString(_("Incorrect length of 'x' slot")));
 	return ScalarLogical(1);
     }
