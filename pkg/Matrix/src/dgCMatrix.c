@@ -19,8 +19,8 @@ SEXP xCMatrix_validate(SEXP x)
 {
     /* Almost everything now in Csparse_validate ( ./Csparse.c )
      * *but* the checking of the 'x' slot : */
-    if (length(GET_SLOT(x, Matrix_iSym)) !=
-	length(GET_SLOT(x, Matrix_xSym)))
+    if (xlength(GET_SLOT(x, Matrix_iSym)) !=
+	xlength(GET_SLOT(x, Matrix_xSym)))
 	return mkString(_("lengths of slots 'i' and 'x' must match"));
 
     return ScalarLogical(1);
@@ -31,8 +31,8 @@ SEXP xRMatrix_validate(SEXP x)
 {
     /* Almost everything now in Rsparse_validate ( ./Csparse.c )
      * *but* the checking of the 'x' slot : */
-    if (length(GET_SLOT(x, Matrix_jSym)) !=
-	length(GET_SLOT(x, Matrix_xSym)))
+    if (xlength(GET_SLOT(x, Matrix_jSym)) !=
+	xlength(GET_SLOT(x, Matrix_xSym)))
 	return mkString(_("lengths of slots 'j' and 'x' must match"));
 
     return ScalarLogical(1);
