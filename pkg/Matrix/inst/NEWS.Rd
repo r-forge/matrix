@@ -57,7 +57,7 @@
       \code{length(x)} is larger than 2^31 (as the C internal
       validation method no longer suffers from integer overflow).
 
-      \item More \sampl{PROTECT()}ing to be \dQuote{rather safe than
+      \item More \samp{PROTECT()}ing to be \dQuote{rather safe than
 	sorry} thanks to Tomas Kalibera's check tools.
     }
   }
