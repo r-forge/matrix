@@ -1376,7 +1376,7 @@ void SET_DimNames_symm(SEXP dest, SEXP src) {
  *
  * @param an R character string specifying the name of a known S4 class
  */
-SEXP NEW_OBJECT_OF_CLASS(SEXP cls)
+SEXP NEW_OBJECT_OF_CLASS(const char* cls)
 {
     SEXP ans = NEW_OBJECT(PROTECT(MAKE_CLASS(cls)));
     UNPROTECT(1);
