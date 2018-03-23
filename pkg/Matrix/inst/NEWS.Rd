@@ -14,7 +14,7 @@
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
-\section{Changes in version 1.2-13 (2018-03-21, svn r3264)}{
+\section{Changes in version 1.2-13 (2018-03-23, svn r3270)}{
   \subsection{New Features}{
     \itemize{
       \item Faster \code{as(<matrix>, "sparseMatrix")} and coercion
@@ -56,6 +56,9 @@
       now be constructed via \code{new(*, Dim = *, x = *)} also when
       \code{length(x)} is larger than 2^31 (as the C internal
       validation method no longer suffers from integer overflow).
+
+      \item More \sampl{PROTECT()}ing to be \dQuote{rather safe than
+	sorry} thanks to Tomas Kalibera's check tools.
     }
   }
 }

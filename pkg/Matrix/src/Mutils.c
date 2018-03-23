@@ -1370,3 +1370,15 @@ void SET_DimNames_symm(SEXP dest, SEXP src) {
     return;
 }
 
+/**
+ * A safe  NEW_OBJECT(MAKE_CLASS(cls)),  where the caller must protect the
+ * return value of this function
+ *
+ * @param an R character string specifying the name of a known S4 class
+ */
+SEXP NEW_OBJECT_OF_CLASS(SEXP cls)
+{
+    SEXP ans = NEW_OBJECT(PROTECT(MAKE_CLASS(cls)));
+    UNPROTECT(1);
+    return ans;
+}

@@ -463,6 +463,7 @@ Matrix_check_class(char *class, const char **valid)
 # define Matrix_check_class_and_super R_check_class_and_super
 #endif
 
+SEXP NEW_OBJECT_OF_CLASS(SEXP cls);
 
 /** Accessing  *sparseVectors :  fast (and recycling)  v[i] for v = ?sparseVector:
  * -> ./sparseVector.c  -> ./t_sparseVector.c :
