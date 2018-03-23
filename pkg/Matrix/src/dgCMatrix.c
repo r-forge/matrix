@@ -59,7 +59,7 @@ SEXP compressed_to_TMatrix(SEXP x, SEXP colP)
 
     /* replace 'C' or 'R' with 'T' :*/
     ncl[2] = 'T';
-    ans = PROTECT(NEW_OBJECT(MAKE_CLASS(ncl)));
+    ans = PROTECT(NEW_OBJECT_OF_CLASS(ncl));
 
     slot_dup(ans, x, Matrix_DimSym);
     if((ctype / 3) % 4 != 2) /* not n..Matrix */
@@ -94,7 +94,7 @@ SEXP R_to_CMatrix(SEXP x)
 
     /* replace 'R' with 'C' : */
     ncl[2] = 'C';
-    PROTECT_WITH_INDEX(ans = NEW_OBJECT(MAKE_CLASS(ncl)), &ipx);
+    PROTECT_WITH_INDEX(ans = NEW_OBJECT_OF_CLASS(ncl), &ipx);
 
     a_dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
     /* reversed dim() since we will transpose: */

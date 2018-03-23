@@ -246,7 +246,7 @@ SEXP nz2Csparse(SEXP x, enum x_slot_kind r_kind)
     ncl[0] = (r_kind == x_double ? 'd' :
 	      (r_kind == x_logical ? 'l' :
 	       /* else (for now):  r_kind == x_integer : */ 'i'));
-    PROTECT(ans = NEW_OBJECT(MAKE_CLASS(ncl)));
+    PROTECT(ans = NEW_OBJECT_OF_CLASS(ncl));
     // create a correct 'x' slot:
     switch(r_kind) {
 	int i;
@@ -1261,7 +1261,7 @@ SEXP create_Csparse(char* cls, int* i, int* j, int* p, int np,
     A = cholmod_triplet_to_sparse(T, nnz, &c);
     cholmod_free_triplet(&T, &c);
     /* copy the information to the SEXP */
-    ans = PROTECT(NEW_OBJECT(MAKE_CLASS(cls)));
+    ans = PROTECT(NEW_OBJECT_OF_CLASS(cls));
 // FIXME: This has been copied from chm_sparse_to_SEXP in  chm_common.c
     /* allocate and copy common slots */
     nnz = cholmod_nnz(A, &c);
@@ -1325,7 +1325,7 @@ SEXP matrix_to_Csparse(SEXP x, SEXP cls)
     /* if (ccls[1] != 'g') */
     /* 	error(_("Only 'g'eneral sparse matrix types allowed")); */
 
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS(ccls)));
+    SEXP ans = PROTECT(NEW_OBJECT_OF_CLASS(ccls));
     SET_SLOT(ans, Matrix_DimSym, d_x);
     SET_SLOT(ans, Matrix_DimNamesSym, (!isNull(dn_x) && LENGTH(dn_x) == 2)
 	     ? duplicate(dn_x)

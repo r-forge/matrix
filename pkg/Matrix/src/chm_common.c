@@ -384,7 +384,7 @@ SEXP chm_sparse_to_SEXP(CHM_SP a, int dofree, int uploT, int Rkind,
 	DOFREE_MAYBE;
 	error(_("unknown xtype in cholmod_sparse object"));
     }
-    ans = PROTECT(NEW_OBJECT(MAKE_CLASS(cls)));
+    ans = PROTECT(NEW_OBJECT_OF_CLASS(cls));
 				/* allocate and copy common slots */
     nnz = longi ? cholmod_l_nnz(a, &cl) : cholmod_nnz(a, &c);
     dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
@@ -616,7 +616,7 @@ SEXP chm_triplet_to_SEXP(CHM_TR a, int dofree, int uploT, int Rkind,
 	DOFREE_MAYBE;
 	error(_("unknown xtype in cholmod_triplet object"));
     }
-    ans = PROTECT(NEW_OBJECT(MAKE_CLASS(cl)));
+    ans = PROTECT(NEW_OBJECT_OF_CLASS(cl));
 				/* allocate and copy common slots */
     dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
     dims[0] = a->nrow; dims[1] = a->ncol;
@@ -874,7 +874,7 @@ SEXP chm_dense_to_SEXP(CHM_DN a, int dofree, int Rkind, SEXP dn, Rboolean transp
 	error(_("unknown xtype"));
     }
 
-    ans = PROTECT(NEW_OBJECT(MAKE_CLASS(cl)));
+    ans = PROTECT(NEW_OBJECT_OF_CLASS(cl));
 				/* allocate and copy common slots */
     dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
     if(transp) {
@@ -1156,7 +1156,7 @@ SEXP chm_factor_to_SEXP(CHM_FR f, int dofree)
 	error(_("f->xtype of %d not recognized"), f->xtype);
     }
 
-    ans = PROTECT(NEW_OBJECT(MAKE_CLASS(class)));
+    ans = PROTECT(NEW_OBJECT_OF_CLASS(class));
     dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
     dims[0] = dims[1] = f->n;
 				/* copy component of known length */
