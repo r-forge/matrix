@@ -349,9 +349,8 @@ SEXP dense_band(SEXP x, SEXP k1P, SEXP k2P)
 	}
 	else {
 	    /* Copy ans to a *trMatrix object (must be square) */
-	    SEXP aa= PROTECT(NEW_OBJECT(MAKE_CLASS(M_type == ddense? "dtrMatrix":
-						   (M_type== ldense? "ltrMatrix"
-						    : "ntrMatrix"))));
+	    SEXP aa= PROTECT(NEW_OBJECT_OF_CLASS(M_type == ddense? "dtrMatrix":
+						 (M_type== ldense? "ltrMatrix": "ntrMatrix")));
 	    /* Because slots of ans are freshly allocated and ans will not be
 	     * used, we use the slots themselves and don't duplicate */
 	    SET_SLOT(aa, Matrix_xSym,       GET_SLOT(ans, Matrix_xSym));
@@ -409,10 +408,8 @@ SEXP dense_to_symmetric(SEXP x, SEXP uplo, SEXP symm_test)
     }
 #   undef CHECK_SYMMETRIC
 
-    ans = PROTECT(NEW_OBJECT(MAKE_CLASS( M_type == ddense ? "dsyMatrix" :
-					(M_type == ldense ? "lsyMatrix" :
-					 "nsyMatrix"))));
-
+    ans = PROTECT(NEW_OBJECT_OF_CLASS(M_type == ddense ? "dsyMatrix" :
+				      (M_type == ldense ? "lsyMatrix" : "nsyMatrix")));
 
 // --- FIXME: Use MK_SYMMETRIC_DIMNAMES_AND_RETURN  from below -- with "uplo" argument
 
@@ -459,7 +456,7 @@ SEXP ddense_symmpart(SEXP x)
 	return R_NilValue; /* -Wall */
     } else {
 	PROTECT(dx);
-	SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dsyMatrix"))), dns, nms_dns;
+	SEXP ans = PROTECT(NEW_OBJECT_OF_CLASS("dsyMatrix")), dns, nms_dns;
 	double *xx = REAL(GET_SLOT(dx, Matrix_xSym));
 
 	/* only need to assign the *upper* triangle (uplo = "U");
@@ -518,7 +515,7 @@ SEXP ddense_skewpart(SEXP x)
 	return R_NilValue; /* -Wall */
     } else {
 	PROTECT(dx);
-	SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))), dns, nms_dns;
+	SEXP ans = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix")), dns, nms_dns;
 	double *xx = REAL(GET_SLOT(dx, Matrix_xSym));
 
 	for (int j = 0; j < n; j++) {

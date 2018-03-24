@@ -191,7 +191,7 @@ SEXP dgeMatrix_dtpMatrix_mm(SEXP x, SEXP y)
 
 SEXP dtpMatrix_as_dtrMatrix(SEXP from)
 {
-    SEXP val = PROTECT(NEW_OBJECT(MAKE_CLASS("dtrMatrix"))),
+    SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("dtrMatrix")),
 	uplo = GET_SLOT(from, Matrix_uploSym),
 	diag = GET_SLOT(from, Matrix_diagSym),
 	dimP = GET_SLOT(from, Matrix_DimSym),

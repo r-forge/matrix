@@ -227,7 +227,7 @@ SEXP dgCMatrix_QR(SEXP Ap, SEXP order, SEXP keep_dimnames)
     R_CheckStack();
 
     if (m < n) error(_("A must have #{rows} >= #{columns}")) ;
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("sparseQR")));
+    SEXP ans = PROTECT(NEW_OBJECT_OF_CLASS("sparseQR"));
     int *dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
     dims[0] = m; dims[1] = n;
     css *S = cs_sqr(ord, A, 1);	/* symbolic QR ordering & analysis*/
@@ -317,7 +317,7 @@ SEXP dgCMatrix_QR(SEXP Ap, SEXP order, SEXP keep_dimnames)
 SEXP dgCMatrix_SPQR(SEXP Ap, SEXP ordering, SEXP econ, SEXP tol)
 {
 /* SEXP ans = PROTECT(allocVector(VECSXP, 4)); */
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("SPQR")));
+    SEXP ans = PROTECT(NEW_OBJECT_OF_CLASS("SPQR"));
 
     CHM_SP A = AS_CHM_SP(Ap), Q, R;
     SuiteSparse_long *E, rank;/* not always = int   FIXME  (Windows_64 ?) */
@@ -398,7 +398,7 @@ void install_lu(SEXP Ap, int order, double tol, Rboolean err_sing, Rboolean keep
     N->U = cs_transpose(D, 1);
     cs_spfree(D);
     p = cs_pinv(N->pinv, n);	/* p=pinv' */
-    ans = PROTECT(NEW_OBJECT(MAKE_CLASS("sparseLU")));
+    ans = PROTECT(NEW_OBJECT_OF_CLASS("sparseLU"));
     dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
     dims[0] = n; dims[1] = n;
     SEXP dn; Rboolean do_dn = FALSE;
