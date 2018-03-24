@@ -747,9 +747,9 @@ SEXP dup_mMatrix_as_geMatrix(SEXP A)
 	DUP_MMATRIX_NON_CLASS(FALSE);
     }
 
-    ans = PROTECT(NEW_OBJECT(MAKE_CLASS(M_type == ddense ? "dgeMatrix" :
-					(M_type == ldense ? "lgeMatrix" :
-					 "ngeMatrix"))));
+    ans = PROTECT(NEW_OBJECT_OF_CLASS(M_type == ddense ? "dgeMatrix" :
+				      (M_type == ldense ? "lgeMatrix" :
+					 "ngeMatrix")));
 #define DUP_MMATRIX_SET_1						\
     SET_SLOT(ans, Matrix_DimSym, duplicate(ad));			\
     SET_SLOT(ans, Matrix_DimNamesSym, (!isNull(an) && LENGTH(an) == 2) ? \
@@ -858,7 +858,7 @@ SEXP dup_mMatrix_as_geMatrix(SEXP A)
 
 SEXP dup_mMatrix_as_dgeMatrix2(SEXP A, Rboolean tr_if_vec)
 {
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
+    SEXP ans = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix")),
 	ad = R_NilValue , an = R_NilValue;	/* -Wall */
     static const char *valid[] = {"_NOT_A_CLASS_", MATRIX_VALID_ddense, ""};
     R_xlen_t sz;
@@ -892,7 +892,7 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A) {
 
 SEXP new_dgeMatrix(int nrow, int ncol)
 {
-    SEXP ans = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix"))),
+    SEXP ans = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix")),
 	 ad = PROTECT(allocVector(INTSXP, 2));
 
     INTEGER(ad)[0] = nrow;
@@ -1371,7 +1371,7 @@ void SET_DimNames_symm(SEXP dest, SEXP src) {
 }
 
 /**
- * A safe  NEW_OBJECT(MAKE_CLASS(cls)),  where the caller must protect the
+ * A safe  NEW_OBJECT_OF_CLASS(cls),  where the caller must protect the
  * return value of this function
  *
  * @param an R character string specifying the name of a known S4 class

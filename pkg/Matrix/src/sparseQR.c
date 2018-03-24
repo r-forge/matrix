@@ -99,7 +99,7 @@ SEXP sparseQR_qty(SEXP qr, SEXP y, SEXP trans, SEXP keep_dimnames)
 	m = ydims[0], n = ydims[1], M = V->m, *d_a;			\
     Rboolean rank_def = (m < M);					\
     if(rank_def) { /* must add 0-rows to y, i.e. ans, and remove them *before* return */ \
-	aa = PROTECT(NEW_OBJECT(MAKE_CLASS("dgeMatrix")));		\
+	aa = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix"));			\
 	d_a = INTEGER(GET_SLOT(aa, Matrix_DimSym)); d_a[0] = M; d_a[1] = n; \
 	SEXP dn = GET_SLOT(aa, Matrix_DimNamesSym);			\
 	SET_VECTOR_ELT(dn, 1,						\

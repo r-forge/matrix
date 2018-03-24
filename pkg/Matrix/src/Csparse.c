@@ -165,8 +165,8 @@ SEXP Csparse_to_dense(SEXP x, SEXP symm_or_tri)
     if(is_sym) { // ==> want  [dln]syMatrix
 	const char cl1 = class_P(ans)[0];
 	PROTECT(ans);
-	SEXP aa = PROTECT(NEW_OBJECT(MAKE_CLASS((cl1 == 'd') ? "dsyMatrix" :
-						((cl1 == 'l') ? "lsyMatrix" : "nsyMatrix"))));
+	SEXP aa = PROTECT(NEW_OBJECT_OF_CLASS((cl1 == 'd') ? "dsyMatrix" :
+					      ((cl1 == 'l') ? "lsyMatrix" : "nsyMatrix")));
 	// No need to duplicate() as slots of ans are freshly allocated and ans will not be used
 	SET_SLOT(aa, Matrix_xSym,       GET_SLOT(ans, Matrix_xSym));
 	SET_SLOT(aa, Matrix_DimSym,     GET_SLOT(ans, Matrix_DimSym));
@@ -178,8 +178,8 @@ SEXP Csparse_to_dense(SEXP x, SEXP symm_or_tri)
     else if(is_tri) { // ==> want  [dln]trMatrix
 	const char cl1 = class_P(ans)[0];
 	PROTECT(ans);
-	SEXP aa = PROTECT(NEW_OBJECT(MAKE_CLASS((cl1 == 'd') ? "dtrMatrix" :
-						((cl1 == 'l') ? "ltrMatrix" : "ntrMatrix"))));
+	SEXP aa = PROTECT(NEW_OBJECT_OF_CLASS((cl1 == 'd') ? "dtrMatrix" :
+					      ((cl1 == 'l') ? "ltrMatrix" : "ntrMatrix")));
 	// No need to duplicate() as slots of ans are freshly allocated and ans will not be used
 	SET_SLOT(aa, Matrix_xSym,       GET_SLOT(ans, Matrix_xSym));
 	SET_SLOT(aa, Matrix_DimSym,     GET_SLOT(ans, Matrix_DimSym));
