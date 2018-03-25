@@ -132,13 +132,13 @@ SEXP get_factors(SEXP obj, char *nm)
 */
 SEXP set_factors(SEXP obj, SEXP val, char *nm)
 {
+    PROTECT(val); /* set_factors(..) may be called as "finalizer" after UNPROTECT()*/
     SEXP fac = GET_SLOT(obj, Matrix_factorSym),
 	nms = PROTECT(getAttrib(fac, R_NamesSymbol));
     int i, len = length(fac);
 
     if ((!isNewList(fac)) || (length(fac) > 0 && nms == R_NilValue))
 	error(_("'factors' slot must be a named list"));
-    PROTECT(val); /* set_factors(..) may be called as "finalizer" after UNPROTECT()*/
     // if there's already a 'nm' factor, we replace it and return:
     for (i = 0; i < len; i++) {
 	if (!strcmp(nm, CHAR(STRING_ELT(nms, i)))) {
