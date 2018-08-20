@@ -72,7 +72,7 @@ setMethod("image", "dgTMatrix", ## *The* real one
 		   xlab = "Column", ylab = "Row", cuts = 15,
 		   useRaster = FALSE,
                    useAbs = NULL, colorkey = !useAbs, col.regions = NULL,
-                   lwd = NULL, ...)
+                   lwd = NULL, border.col = NULL, ...)
       {
           ## 'at' can remain missing and be passed to levelplot
           di <- x@Dim
@@ -138,10 +138,9 @@ setMethod("image", "dgTMatrix", ## *The* real one
                     if (any(subscripts)) {
                         ## the line-width used in grid.rect() inside
                         ## levelplot()'s panel for the *border* of the
-                        ## rectangles: levelplot()panel has lwd=1e-5:
+                        ## rectangles: levelplot()panel has lwd= 0.01:
 
-                        ## Here: use smart default !
-
+                        ## Here: use "smart" default !
                         if(is.null(lwd)) {
                             wh <- grid::current.viewport()[c("width", "height")]
                             ## wh : current viewport dimension in pixel
@@ -162,11 +161,13 @@ setMethod("image", "dgTMatrix", ## *The* real one
 				       paste(round(pSize,1), collapse=" x "),
 				       " [pixels];  --> lwd :", formatC(lwd))
                         } else stopifnot(is.numeric(lwd), all(lwd >= 0)) # allow 0
-
+			if(is.null(border.col) && lwd < .01) # no border
+			    border.col <- NA
                         grid.rect(x = x, y = y, width = 1, height = 1,
                                   default.units = "native",
+                                  ## FIXME?: allow 'gp' to be passed via '...' !!
                                   gp = gpar(fill = col.regions[zcol],
-                                  lwd = lwd, col = if(lwd < .01) NA))
+                                            lwd = lwd, col = border.col))
                     }
                 }, ...)
       })
