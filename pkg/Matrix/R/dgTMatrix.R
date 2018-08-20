@@ -62,6 +62,8 @@ setAs("matrix", "dgTMatrix", mat2dgT)
 ## "[<-" methods { setReplaceMethod()s }  too ...
 
 
+## help/man page --> ../man/image-methods.Rd
+##
 setMethod("image", "dgTMatrix", ## *The* real one
           function(x,
 		   xlim = c(1, di[2]),
@@ -75,11 +77,15 @@ setMethod("image", "dgTMatrix", ## *The* real one
           ## 'at' can remain missing and be passed to levelplot
           di <- x@Dim
           xx <- x@x
-          if(missing(useAbs)) ## use abs() when all values are non-neg
-              useAbs <- min(xx, na.rm=TRUE) >= 0
-          else if(useAbs)
+	  if(length(xx) == 0 && length(x) > 0) { # workaround having "empty" matrix
+	      x@x <- 0
+	      x@i <- x@j <- 0L
+	  }
+          if(missing(useAbs)) { ## use abs() when all values are non-neg
+              useAbs <- if(length(xx)) min(xx, na.rm=TRUE) >= 0 else TRUE
+          } else if(useAbs)
               xx <- abs(xx)
-          rx <- range(xx, finite=TRUE)
+          ## rx <- range(xx, finite=TRUE)
 	  ## FIXME: make use of 'cuts' now
 	  ##	    and call levelplot() with 'at = ', making sure  0 is included and matching
 	  ##	    *exactly* - rather than approximately
@@ -88,6 +94,7 @@ setMethod("image", "dgTMatrix", ## *The* real one
                   if(useAbs) {
                       grey(seq(from = 0.7, to = 0, length = 100))
                   } else { ## no abs(.), rx[1] < 0
+                      rx <- range(xx, finite=TRUE)
                       nn <- 100
                       n0 <- min(nn, max(0, round((0 - rx[1])/(rx[2]-rx[1]) * nn)))
                       col.regions <-
@@ -101,17 +108,19 @@ setMethod("image", "dgTMatrix", ## *The* real one
 	  ylim <- sort(ylim, decreasing=TRUE)
 	  if(all(xlim == round(xlim))) xlim <- xlim+ c(-.5, +.5)
 	  if(all(ylim == round(ylim))) ylim <- ylim+ c(+.5, -.5) # decreasing!
-          levelplot(x@x ~ (x@j + 1L) * (x@i + 1L),
+
+	  levelplot(xx ~ (x@j + 1L) * (x@i + 1L), # no 'data'
                     sub = sub, xlab = xlab, ylab = ylab,
                     xlim = xlim, ylim = ylim, aspect = aspect,
 		    colorkey = colorkey, col.regions = col.regions, cuts = cuts,
 		    par.settings = list(background = list(col = "transparent")),
+		    ##===
 		    panel = if(useRaster) panel.levelplot.raster else
 		    function(x, y, z, subscripts, at, ..., col.regions)
 		{   ## a trimmed down version of  lattice::panel.levelplot
                     x <- as.numeric(x[subscripts])
                     y <- as.numeric(y[subscripts])
-
+		    ##
                     ## FIXME: use  level.colors() here and 'at' from above --
                     ## -----  look at 'zcol' in  panel.levelplot()
                     numcol <- length(at) - 1
