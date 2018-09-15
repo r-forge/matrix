@@ -1,13 +1,13 @@
 Package: Matrix
 Version: 1.2-15
-Date: 2018-08-20
+Date: 2018-09-15
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Contact: Doug and Martin <Matrix-authors@R-project.org>
 Maintainer: Martin Maechler <mmaechler+Matrix@gmail.com>
 Authors@R: c(person("Douglas","Bates", role="aut")
- , person("Martin","Maechler", email="mmaechler+Matrix@gmail.com",
-           role = c("aut","cre"))
+ , person("Martin","Maechler", role = c("aut","cre"), email="mmaechler+Matrix@gmail.com",
+          comment = c(ORCID = "0000-0002-8685-9910"))
  , person("Timothy A.", "Davis", role="ctb",
            comment = c("SuiteSparse and 'cs' C libraries, notably CHOLMOD, AMD;
 		       collaborators listed in
