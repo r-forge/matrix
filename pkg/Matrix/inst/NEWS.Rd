@@ -14,6 +14,20 @@
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
+\section{Changes in version 1.2-16 (2019-02-14, svn r32..)}{
+  %% \subsection{New Features}{
+  %%   \itemize{
+  %%     \item
+  %%   }
+  %% }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{data(<Matrix-data>)} no longer attaches \pkg{Matrix} to
+      the search path.
+    }
+  }
+}
+
 \section{Changes in version 1.2-15 (2018-08-20, svn r3283)}{
   \subsection{New Features}{
     \itemize{
