@@ -266,6 +266,7 @@ cat("Checking all Ops group generics for a set of arguments:\n",
 op <- options(warn = 2)#, error=recover)
 for(gr in getGroupMembers("Ops")) {
   cat(gr,"\n",paste(rep.int("=",nchar(gr)),collapse=""),"\n", sep='')
+  v0 <- if(gr == "Arith") numeric() else logical()
   for(f in getGroupMembers(gr)) {
     cat(sprintf("%9s :\n%9s\n", paste0('"',f,'"'), "--"))
     for(nm in M.objs) {
@@ -279,6 +280,16 @@ for(gr in getGroupMembers("Ops")) {
         validObject(r2 <- do.call(f, list(x,M)))
         stopifnot(dim(r1) == dim(M), dim(r2) == dim(M))
       }
+      ## M  o  0-length  === M :
+      validObject(M0. <- do.call(f, list(M, numeric())))
+      validObject(.M0 <- do.call(f, list(numeric(), M)))
+      if(length(M)) # <non-0-extent M>  o  <0-length v> == 0-length v
+	  stopifnot(identical(M0., v0), identical(.M0, v0))
+      else if(is(M, "Matrix"))
+	  stopifnot(identical(M0., as(M, if(gr == "Arith") "dMatrix" else "lMatrix")),
+		    identical(M0., .M0))
+      else # if(is(M, "sparseVector")) of length 0
+	  stopifnot(identical(M0., v0), identical(.M0, v0))
       ## M  o  <sparseVector>
       x <- numeric(n.m)
       if(length(x)) x[c(1,length(x))] <- 1:2
