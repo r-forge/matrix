@@ -14,7 +14,7 @@
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
-\section{Changes in version 1.2-16 (2019-02-14, svn r32..)}{
+\section{Changes in version 1.2-16 (2019-02-25, svn r3287)}{
   %% \subsection{New Features}{
   %%   \itemize{
   %%     \item
