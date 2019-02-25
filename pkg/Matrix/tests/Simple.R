@@ -733,9 +733,18 @@ stopifnot(## something like the equivalent of  all(I. == Diagonal(3125)) :
 
 ## printSpMatrix() ;  "suppressing (columns | rows) .." {and do it correctly!}
 IT3
-op <- options(width = 70, max.print = 1000)
+op0 <- options(width = 70, max.print = 1000)
 T125[-(1:50),] ## suppression ... is it correctly done?
 
+## Still buggy -- FIXME: see ../TODO !
+op <- options(max.print=1000)
+for(mm in 1:6) {
+    options(max.print=mm)
+    cat("----------\n\nmax.print=",mm,":\n", sep="")
+    cat("\n>> U:   ") ; show(U)
+    cat("\n>> slp: ") ; show(slp)
+}
+options(op)# revert to max.print = 1000
 
 ###-- row- and column operations  {was ./rowcolOps.R }
 

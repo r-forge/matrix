@@ -147,10 +147,9 @@ Cmp.Mat.atomic <- function(e1, e2) { ## result will inherit from "lMatrix"
     cl <- class(e1)
     if((l2 <- length(e2)) == 0)
 	return(if(n1 == 0)
-                   new(class2(cl, "l"), Dim = d, Dimnames = e1@Dimnames)
+		   as(e1, class2(cl, "l"))# more expensive than (but working for "dgC*"):
+		   ## new(class2(cl, "l"), Dim = d, Dimnames = e1@Dimnames)
                else
-		   ## stop(gettextf("<Matrix> %s %s is undefined",
-		   ##     	  .Generic, paste0(class(e2),"(0)")), domain=NA)
 		   as.logical(e2))
     ## else
     if(n1 && n1 < l2)
@@ -687,10 +686,9 @@ Logic.Mat.atomic <- function(e1, e2) { ## result will typically be "like" e1:
     cl <- class(e1)
     if(l2 == 0)
 	return(if(n1 == 0)
-		   new(class2(cl, "l"), Dim = d, Dimnames = e1@Dimnames)
+		   as(e1, class2(cl, "l"))# more expensive than (but working for "dgC*"):
+		   ## new(class2(cl, "l"), Dim = d, Dimnames = e1@Dimnames)
 	       else
-		   ## stop(gettextf("<Matrix> %s %s is undefined",
-		   ##     	  .Generic, paste0(class(e2),"(0)")), domain=NA)
 		   as.logical(e2))
     ## else
     cl1 <- getClassDef(cl)
@@ -1179,7 +1177,7 @@ setMethod("Arith", signature(e1 = "numeric", e2 = "CsparseMatrix"), .Arith.atom.
 ##' compute indices for recycling <numeric> of length 'len' to match sparseMatrix 'spM'
 .Ops.recycle.ind <- function(spM, len) {
     n <- prod(d <- dim(spM))
-    if(n < len) stop("vector too long in Matrix - vector operation")
+    if(n && n < len) stop("vector too long in Matrix - vector operation")
     if(n %% len != 0) ## identical warning as in main/arithmetic.c
         warning("longer object length\n\tis not a multiple of shorter object length")
     ## TODO(speedup!): construction of [1L + in0 %%len] via one .Call()
@@ -1189,10 +1187,9 @@ setMethod("Arith", signature(e1 = "numeric", e2 = "CsparseMatrix"), .Arith.atom.
 }
 
 A.M.n <- function(e1, e2) {
-    if((l2 <- length(e2)) == 0)
-	stop(gettextf("<Matrix> %s %s is undefined",
-		      .Generic, paste0(class(e2),"(0)")), domain=NA)
-    is0f <- is0(f0 <- callGeneric(0, e2))
+    if((l2 <- length(e2)) == 0) # return 0-vector of e1's kind, as matrix()+<0>
+	return(vector(.type.kind[.M.kind(e1)]))
+    is0f <- is0(f0 <- callGeneric(0, e2)) #
     if(all(is0f)) { ## result keeps sparseness structure of e1
 	if(l2 > 1) {  #	 "recycle" e2 "carefully"
 	    e2 <- e2[.Ops.recycle.ind(e1, len = l2)]
@@ -1229,9 +1226,8 @@ setMethod("Arith", signature(e1 = "dsparseMatrix", e2 = "numeric"), .Arith.CM.at
 setMethod("Arith", signature(e1 = "dsparseMatrix", e2 = "logical"), .Arith.CM.atom)
 
 A.n.M <- function(e1, e2) {
-    if((l1 <- length(e1)) == 0)
-	stop(gettextf("%s %s <Matrix> is undefined",
-		      paste0(class(e2),"(0)"), .Generic), domain=NA)
+    if((l1 <- length(e1)) == 0) # return 0-vector of e2's kind, as <0> + matrix()
+	return(vector(.type.kind[.M.kind(e2)]))
     is0f <- is0(f0 <- callGeneric(e1, 0))
     if(all(is0f)) { ## result keeps sparseness structure of e2
 	if(l1 > 1) {  #	 "recycle" e1 "carefully"
@@ -1667,7 +1663,7 @@ Ops.M.spV <- function(e1, e2) {
     n1 <- prod(d)
     n2 <- e2@length
     if(n1 != n2) {
-	if(n1 < n2) {
+	if(n1 && n1 < n2) { # 0-extent matrix + vector is fine
 	    stop(sprintf(
 		"dim [product %d] do not match the length of object [%d]",
 			 n1, n2))
@@ -1693,7 +1689,7 @@ Ops.spV.M <- function(e1, e2) {
     d <- e2@Dim
     n2 <- prod(d)
     if(n2 != n1) {
-	if(n2 < n1) {
+	if(n2 && n2 < n1) { # vector + 0-extent matrix  is fine
 	    stop(sprintf(
 		"dim [product %d] do not match the length of object [%d]",
 			 n2, n1))

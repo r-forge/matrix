@@ -24,6 +24,10 @@
     \itemize{
       \item \code{data(<Matrix-data>)} no longer attaches \pkg{Matrix} to
       the search path.
+
+      \item \code{"Ops"} group methods, i.e., "Arith", "Compare" & "Logic",
+      now should all work with 0-extent matrices as well, thanks to bug
+      reports by Aaron Lun, University of Cambridge.
     }
   }
 }
