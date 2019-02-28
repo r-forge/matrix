@@ -330,6 +330,7 @@ stopifnot(grep("too large", e1) == 1,
 stopifnot(suppressWarnings(any(Lrg)))# (double -> logical  warning)
 rm(e2)# too large...
 
+RNGversion("3.6.0")# future proof
 if(doExtras && is.finite(memGB) && memGB > 24) # need around .. GB
 {
     cat("computing SM .. \n")
@@ -736,15 +737,15 @@ IT3
 op0 <- options(width = 70, max.print = 1000)
 T125[-(1:50),] ## suppression ... is it correctly done?
 
-## Still buggy -- FIXME: see ../TODO !
-op <- options(max.print=1000)
-for(mm in 1:6) {
+## Still buggy -- FIXME: see ../TODO --- even if we'd require max.print >= 5 or so
+for(mm in 1:21) {
     options(max.print=mm)
     cat("----------\n\nmax.print=",mm,":\n", sep="")
     cat("\n>> U:   ") ; show(U)
     cat("\n>> slp: ") ; show(slp)
 }
-options(op)# revert to max.print = 1000
+
+options(op0)# revert to max.print = 1000
 
 ###-- row- and column operations  {was ./rowcolOps.R }
 
