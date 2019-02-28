@@ -1,0 +1,7 @@
+For R 3.6.0 with new   RNGking(*, sample.kind) , these needed a setting :
+
+tests/dpo-test.R
+tests/factorizing.R
+tests/indexing.R
+tests/matprod.R
+tests/validObj.R

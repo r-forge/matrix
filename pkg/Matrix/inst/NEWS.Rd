@@ -14,12 +14,16 @@
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
-\section{Changes in version 1.2-16 (2019-02-25, svn r3287)}{
-  %% \subsection{New Features}{
-  %%   \itemize{
-  %%     \item
-  %%   }
-  %% }
+\section{Changes in version 1.2-16 (2019-02-28, svn r3289)}{
+  \subsection{New Features}{
+    \itemize{
+      \item regression tests depending on \code{sample()} now are future
+      proof reproducible, via \code{RNGversion(.)}.
+
+      \item give information about #{rows} and #{columns} that are
+      suppressed in print()ing if the matrix is larger than `max.print`.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{data(<Matrix-data>)} no longer attaches \pkg{Matrix} to
