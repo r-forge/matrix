@@ -7,7 +7,7 @@
 ** TODO Using "long vectors" (i.e. 64 bit indices vectors) in CHOLMOD --> cholmod_l_*()
 *** e.g. segfault in crossprod() Csparse_crossprod -> cholmod_att()
 * *Urgent* in some sense ---------------------------------------------------
-** TODO Embarrasing print() / show() bug for small options(max.print=<n>):
+** TODO (partly DONE via workaround "round up" to 100): print() / show() for small options(max.print=<n>):
     --> tests/Simple.R {'max.print'}
 ** DONE qr.coef() has *wrong* (column)names, even in full-rank case: see man/qr-methods.Rd ("FIXME"); maybe related to
 ** DONE qr.R(), qrR() etc have *wrong* currently *lose* column/row names {compared to base R's qr.R}, see,
