@@ -516,6 +516,7 @@ formatSpMatrix <- function(x, digits = NULL, # getOption("digits"),
 	}
     }
 
+    if(maxp < 100) maxp <- 100L # "stop gap"
     if(prod(d) > maxp) { # "Large" => will be "cut"
         ## only coerce to dense that part which won't be cut :
         nr <- maxp %/% d[2]
