@@ -557,7 +557,7 @@ formatSpMatrix <- function(x, digits = NULL, # getOption("digits"),
 ## FIXME: prTriang() in ./Auxiliaries.R  should also get  align = "fancy"
 ##
 printSpMatrix <- function(x, digits = NULL, # getOption("digits"),
-			  maxp = getOption("max.print"),
+			  maxp = max(100L, getOption("max.print")),
 			  cld = getClassDef(class(x)), zero.print = ".",
 			  col.names, note.dropping.colnames = TRUE, uniDiag = TRUE,
 			  col.trailer = '', align = c("fancy", "right"))
@@ -576,7 +576,7 @@ printSpMatrix <- function(x, digits = NULL, # getOption("digits"),
 
 ##' The "real" show() / print() method, calling the above printSpMatrix():
 printSpMatrix2 <- function(x, digits = NULL, # getOption("digits"),
-                           maxp = getOption("max.print"), zero.print = ".",
+                           maxp = max(100L, getOption("max.print")), zero.print = ".",
                            col.names, note.dropping.colnames = TRUE, uniDiag = TRUE,
                            suppRows = NULL, suppCols = NULL,
                            col.trailer = if(suppCols) "......" else "",

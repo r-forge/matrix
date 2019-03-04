@@ -14,7 +14,7 @@
 %% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
-\section{Changes in version 1.2-16 (2019-03-04, svn r3290)}{
+\section{Changes in version 1.2-16 (2019-03-04, svn r3291)}{
   \subsection{New Features}{
     \itemize{
       \item regression tests depending on \code{sample()} now are future
@@ -35,7 +35,7 @@
 
       \item when printing and formatting sparse matrices, see \code{formatSpMatrix()},
        the \code{maxp} option, e.g., from \code{getOption("max.print")}, is
-      \dQuote{rounded up} to 100, as very small values are not appropriate currently.
+      \dQuote{rounded up} to 100, as very small values are very rarely appropriate.
     }
   }
 }
