@@ -20,13 +20,13 @@ formatSpMatrix(x, digits = NULL, maxp = 1e9,
                col.names, note.dropping.colnames = TRUE, uniDiag = TRUE,
                align = c("fancy", "right"))
 
-printSpMatrix(x, digits = NULL, maxp = getOption("max.print"),
+printSpMatrix(x, digits = NULL, maxp = max(100L, getOption("max.print")),
               cld = getClassDef(class(x)),
               zero.print = ".", col.names, note.dropping.colnames = TRUE,
               uniDiag = TRUE, col.trailer = "",
               align = c("fancy", "right"))
 
-printSpMatrix2(x, digits = NULL, maxp = getOption("max.print"),
+printSpMatrix2(x, digits = NULL, maxp = max(100L, getOption("max.print")),
               zero.print = ".", col.names, note.dropping.colnames = TRUE,
               uniDiag = TRUE, suppRows = NULL, suppCols = NULL,
               col.trailer = if(suppCols) "......" else "",
