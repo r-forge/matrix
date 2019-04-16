@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Matrix 1.2-14\n"
-"POT-Creation-Date: 2018-04-06 22:43\n"
+"Project-Id-Version: Matrix 1.2-18\n"
+"POT-Creation-Date: 2019-04-02 17:10\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -281,12 +281,6 @@ msgid "vector too long in Matrix - vector operation"
 msgstr ""
 
 msgid "longer object length\n\tis not a multiple of shorter object length"
-msgstr ""
-
-msgid "<Matrix> %s %s is undefined"
-msgstr ""
-
-msgid "%s %s <Matrix> is undefined"
 msgstr ""
 
 msgid "longer object length is not a multiple of shorter object length"
@@ -640,13 +634,13 @@ msgstr ""
 msgid "in show(); maybe adjust 'options(max.print= *, width = *)'"
 msgstr ""
 
-msgid "suppressing columns and rows"
+msgid "suppressing %d columns and %d rows"
 msgstr ""
 
-msgid "suppressing rows"
+msgid "suppressing %d rows"
 msgstr ""
 
-msgid "suppressing columns"
+msgid "suppressing %d columns"
 msgstr ""
 
 msgid "logic programming error in printSpMatrix2(), please report"
