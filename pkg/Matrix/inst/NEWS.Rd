@@ -15,7 +15,15 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.2-18 (2019-04-16, svn r3296)}{
+\section{Changes in version 1.2-18 (2019-07-01, svn r3298)}{
+  \subsection{New Features}{
+    \itemize{
+      \item \code{nearPD()} gets new option: If \code{base.matrix = TRUE},
+      the resulting \code{mat} component is a \pkg{base} \code{matrix}, as
+      often used desired when \code{nearPD()} is used outside the
+      \pkg{Matrix} package context.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
       \item Fix last(?) \code{PROTECT()} warning found by \command{rchk}.
