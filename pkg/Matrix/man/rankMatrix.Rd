@@ -14,6 +14,8 @@ rankMatrix(x, tol = NULL,
            method = c("tolNorm2", "qr.R", "qrLINPACK", "qr",
                       "useGrad", "maybeGrad"),
            sval = svd(x, 0, 0)$d, warn.t = TRUE)
+
+qr2rankMatrix(qr, tol = NULL, isBqr = is.qr(qr))
 }
 \arguments{
   \item{x}{numeric matrix, of dimension \eqn{n \times m}{n x m}, say.}
@@ -71,10 +73,20 @@ rankMatrix(x, tol = NULL,
     when it needs \code{\link{t}(x)} instead of \code{x}.  Currently, for
     \code{method = "qr"} only, gives a warning by default because the
     caller often could have passed \code{t(x)} directly, more efficiently.}
+
+%% qr2rankMatrix():
+  \item{qr}{an \R object resulting from \code{\link{qr}(x,..)}, i.e.,
+    typically inheriting from \code{\link{class}} \code{"\link{qr}"} or
+    \code{"\linkS4class{qrSparse}"}.}
+  \item{isBqr}{\code{\link{logical}} indicating if \code{qr} is resulting
+    from \pkg{base} \code{\link[base]{qr}()}.  (Otherwise, it is typically from
+    \pkg{Matrix} package sparse \code{\link[Matrix]{qr}}.)}
 }
-% \details{
-%   FIXME
-% }
+\details{
+  \code{qr2rankMatrix()} is typically called from \code{rankMatrix()} for
+  the \code{"qr"}* \code{method}s, but can be used directly - much more
+  efficiently in case the \code{qr}-decomposition is available anyway.
+}
 \note{For large sparse matrices \code{x}, unless you can specify
   \code{sval} yourself, currently \code{method = "qr"} may
   be the only feasible one, as the others need \code{sval} and call
@@ -95,7 +107,7 @@ rankMatrix(x, tol = NULL,
 % \references{
 % %% ~put references to the literature/web site here ~
 % }
-\author{Martin Maechler; for the "*Grad" methods, building on
+\author{Martin Maechler; for the "*Grad" methods building on
   suggestions by Ravi Varadhan.
 }
 \seealso{

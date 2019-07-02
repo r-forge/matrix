@@ -1,6 +1,6 @@
 Package: Matrix
-Version: 1.2-17
-Date: 2019-03-11
+Version: 1.2-18
+Date: 2019-07-02
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Contact: Doug and Martin <Matrix-authors@R-project.org>
