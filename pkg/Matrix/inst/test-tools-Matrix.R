@@ -688,3 +688,50 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 
     invisible(TRUE)
 }
+
+### --- These use
+
+##' Check QR-consistency of dense and sparse
+chk.qr.D.S <- function(d., s., y, Y = Matrix(y), force = FALSE, tol = 1e-10) {
+    stopifnot(is.qr(d.), is(s., "sparseQR"))
+    cc <- qr.coef(d.,y)
+    rank.def <- any(is.na(cc)) && d.$rank < length(d.$pivot)
+    if(rank.def && force) cc <- mkNA.0(cc) ## set NA's to 0 .. ok, in some case
+
+    ## when system is rank deficient, have differing cases, not always just NA <-> 0 coef
+    ## FIXME though:  resid & fitted should be well determined
+    if(force || !rank.def) stopifnot(
+### FIXME: temporary:
+###	is.all.equal3(	    cc	     , drop(qr.coef  (s.,y)), drop(qr.coef  (s.,Y)), tol=tol),
+	is.all.equal3(	unname( cc ) , drop(qr.coef  (s.,y)), drop(qr.coef  (s.,Y)), tol=tol),
+### END{FIXME}
+	is.all.equal3(qr.resid (d.,y), drop(qr.resid (s.,y)), drop(qr.resid (s.,Y)), tol=tol),
+	is.all.equal3(qr.fitted(d.,y), drop(qr.fitted(s.,y)), drop(qr.fitted(s.,Y)), tol=tol)
+	)
+}
+
+##' "Combi" calling chkQR() on both "(sparse)Matrix" and 'traditional' version
+##' ------  and combine the two qr decompositions using chk.qr.D.S()
+##'         [ chkQR() def. in >>>>> ./test-tools-1.R <<<<< ]
+##'
+##' @title check QR-decomposition, and compare sparse and dense one
+##' @param A a 'Matrix' , typically 'sparseMatrix'
+##' @param Qinv.chk
+##' @param QtQ.chk
+##' @param quiet
+##' @return list with 'qA' (sparse QR) and 'qa' (traditional (dense) QR)
+##' @author Martin Maechler
+checkQR.DS.both <- function(A, Qinv.chk, QtQ.chk=NA,
+                            quiet=FALSE, giveRE=TRUE, tol = 1e-13)
+{
+    stopifnot(is(A,"Matrix"))
+    if(!quiet) cat("classical: ")
+    qa <- chkQR(as(A, "matrix"), Qinv.chk=TRUE, QtQ.chk=TRUE, tol=tol, giveRE=giveRE)# works always
+    if(!quiet) cat("[Ok] ---  sparse: ")
+    qA <- chkQR(A, Qinv.chk=Qinv.chk, QtQ.chk=QtQ.chk, tol=tol, giveRE=giveRE)
+    validObject(qA)
+    if(!quiet) cat("[Ok]\n")
+    chk.qr.D.S(qa, qA, y = 10 + 1:nrow(A), tol = 256*tol)# ok [not done in rank deficient case!]
+    invisible(list(qA=qA, qa=qa))
+}
+
