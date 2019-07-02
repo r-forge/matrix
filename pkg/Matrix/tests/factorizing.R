@@ -461,6 +461,27 @@ Zt <- new("dgCMatrix", Dim = c(6L, 30L), x = 2*1:30,
           p = 0:30, Dimnames = list(LETTERS[1:6], NULL))
 cholCheck(0.78 * Zt, tol=1e-14)
 
+o2 <- options(Matrix.quiet.qr.R = TRUE, warn = 2)# no warnings allowed
+qrZ <- qr(t(Zt))
+Rz <- qr.R(qrZ)
+stopifnot(exprs = {
+    inherits(qrZ, "sparseQR")
+    inherits(Rz, "sparseMatrix")
+    isTriangular(Rz)
+    isDiagonal(Rz) # even though formally a "dtCMatrix"
+    qr2rankMatrix(qrZ) == 6
+})
+options(oo)
+
+## problematic rank deficient rankMatrix() case -- only seen in large cases ??
+Z. <- readRDS(system.file("external", "Z_NA_rnk.rds", package="Matrix"))
+tools::assertWarning(rnkZ. <- rankMatrix(Z., method = "qr")) # gave errors
+qrZ <- qr(Z.)
+rnk2 <- qr2rankMatrix(qrZ)
+di <- diag(qrZ@R)
+stopifnot(is.na(rnkZ.), is(qrZ, "sparseQR"), is.na(rnk2), anyNA(di))
+
+
 showSys.time(
 for(i in 1:120) {
     set.seed(i)

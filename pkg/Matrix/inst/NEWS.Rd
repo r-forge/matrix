@@ -15,18 +15,25 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.2-18 (2019-07-01, svn r3298)}{
+\section{Changes in version 1.2-18 (2019-07-02, svn r3300)}{
   \subsection{New Features}{
     \itemize{
       \item \code{nearPD()} gets new option: If \code{base.matrix = TRUE},
       the resulting \code{mat} component is a \pkg{base} \code{matrix}, as
       often used desired when \code{nearPD()} is used outside the
       \pkg{Matrix} package context.
+
+      \item factored out new \code{qr2rankMatrix()} utility from
+      \code{rankMatrix()}.
     }
   }
   \subsection{Bug Fixes}{
     \itemize{
       \item Fix last(?) \code{PROTECT()} warning found by \command{rchk}.
+
+      \item \code{rankMatrix(<sparse>, method="qr")} now returns \code{NA}
+      (or \code{NaN}) instead of signalling an error in the case the sparse
+      \eqn{Q R} decomposition gave \code{NA}s in \code{diag(R)}.
     }
   }
 }
