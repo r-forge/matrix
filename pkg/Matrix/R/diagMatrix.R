@@ -423,6 +423,7 @@ setMethod("[", signature(x = "diagonalMatrix", i = "missing",
 ## FIXME: this now fails because the "denseMatrix" methods come first in dispatch
 ## Only(?) current bug:  x[i] <- value  is wrong when  i is *vector*
 replDiag <- function(x, i, j, ..., value) {
+## FIXME: if   (i == j)  &&  isSymmetric(value) then -- want symmetricMatrix result! -- or diagMatrix
     x <- as(x, "CsparseMatrix")# was "Tsparse.." till 2012-07
     if(missing(i))
 	x[, j] <- value
@@ -437,7 +438,9 @@ replDiag <- function(x, i, j, ..., value) {
 			   na), domain=NA)
     } else
 	x[i,j] <- value
-    if(isDiagonal(x)) as(x, "diagonalMatrix") else x
+    if(isDiagonal(x))   as(x, "diagonalMatrix") else
+    if(isTriangular(x)) as(x, "triangularMatrix") else
+    if(isSymmetric(x))  as(x, "symmetricMatrix") else x
 }
 
 setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index",
@@ -490,7 +493,7 @@ setReplaceMethod("[", signature(x = "diagonalMatrix",
 			     x@x[ii] <- value
 			     x
 			 } else { ## no longer diagonal, but remain sparse:
-			     x <- as(x, "TsparseMatrix")
+			     x <- as(x, "triangularMatrix") # was "TsparseMatrix"
 			     x[i] <- value
 			     x
 			 }

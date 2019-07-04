@@ -23,6 +23,10 @@ if((Sys.getenv("USER")=="maechler" || nzchar(Sys.getenv("R_MATRIX_CHECK_EXTRA"))
 
     } else { ## do things
 
+        if(find("which")[[1]] != "package:Matrix") ## horribly, BiocGenerics::which() masks
+            ## *and* kills the correct working of Matrix::which(.) ___ why on earth ?!??!?!! ___
+            which <- Matrix::which
+
     if(!dev.interactive(orNone=TRUE)) pdf("other-pkg-graph.pdf")
 
     ## 0) Simplest non-trivial graph: has no weights:

@@ -269,7 +269,7 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
 	isTri <- isTriangular(data)
     isDiag <- isSym # cannot be diagonal if it isn't symmetric
     if(isDiag) # do not *build*  1 x 1 diagonalMatrix
-	isDiag <- doDiag && !isTRUE(sparse1) && nrow(data) > 1 && isDiagonal(data)
+	isDiag <- doDiag && nrow(data) > 1 && isDiagonal(data)
 
     ## try to coerce ``via'' virtual classes
     if(isDiag) { ## diagonal is preferred to sparse !
@@ -295,12 +295,11 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
     }
 
     if(isTri && !is(data, "triangularMatrix")) {
-	data <- if(attr(isTri,"kind") == "L") tril(data) else triu(data)
-					#was as(data, "triangularMatrix")
+	if(attr(isTri,"kind") == "L") tril(data) else triu(data)
     } else if(isSym && !is(data, "symmetricMatrix"))
-	data <- forceSymmetric(data) #was as(data, "symmetricMatrix")
-
-    data
+	forceSymmetric(data)
+    else
+	data
 }
 
 ## Methods for operations where one argument is numeric
