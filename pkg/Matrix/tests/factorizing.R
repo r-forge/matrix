@@ -12,7 +12,7 @@ stopifnot(is((Y <- Matrix(y)), "dgeMatrix"))
 md <- as(mm, "matrix")                  # dense
 
 (cS <- system.time(Sq <- qr(mm))) # 0.009
-(cD <- system.time(Dq <- qr(md))) # 0.499 (lynne, 2014 f)
+(cD <- system.time(Dq <- qr(md))) # 0.499 (lynne, 2014 f); 1.04 lynne 2019 ?????
 cD[1] / cS[1] # dense is  much ( ~ 100--170 times) slower
 
 ## chkQR() in ../inst/test-tools-1.R ;
@@ -32,10 +32,9 @@ chk.qr.D.S(Dq, Sq, y, Y)
 suppressWarnings(RNGversion("3.5.0")); set.seed(1)
 X <- rsparsematrix(9,5, 1/4, dimnames=list(paste0("r", 1:9), LETTERS[1:5]))
 qX <- qr(X); qd <- qr(as(X, "matrix"))
-## numbers are the same, but names of sparse case are wrongly permuted
-qr.coef(qX, 1:9)
-qr.coef(qd, 1:9)
-if(FALSE) ## error:
+## are the same (now, *including* names):
+assert.EQ(print(qr.coef(qX, 1:9)), qr.coef(qd, 1:9), tol=1e-14)
+if(FALSE) ## error: (FIXME ?)
 chk.qr.D.S(d. = qd, s. = qX, y = 1:9)
 
 
@@ -461,7 +460,7 @@ Zt <- new("dgCMatrix", Dim = c(6L, 30L), x = 2*1:30,
           p = 0:30, Dimnames = list(LETTERS[1:6], NULL))
 cholCheck(0.78 * Zt, tol=1e-14)
 
-o2 <- options(Matrix.quiet.qr.R = TRUE, warn = 2)# no warnings allowed
+oo <- options(Matrix.quiet.qr.R = TRUE, warn = 2)# no warnings allowed
 qrZ <- qr(t(Zt))
 Rz <- qr.R(qrZ)
 stopifnot(exprs = {
@@ -469,18 +468,17 @@ stopifnot(exprs = {
     inherits(Rz, "sparseMatrix")
     isTriangular(Rz)
     isDiagonal(Rz) # even though formally a "dtCMatrix"
-    qr2rankMatrix(qrZ) == 6
+    qr2rankMatrix(qrZ, do.warn=FALSE) == 6
 })
 options(oo)
 
 ## problematic rank deficient rankMatrix() case -- only seen in large cases ??
 Z. <- readRDS(system.file("external", "Z_NA_rnk.rds", package="Matrix"))
 tools::assertWarning(rnkZ. <- rankMatrix(Z., method = "qr")) # gave errors
-qrZ <- qr(Z.)
-rnk2 <- qr2rankMatrix(qrZ)
-di <- diag(qrZ@R)
+qrZ. <- qr(Z.)
+rnk2 <- qr2rankMatrix(qrZ.) # warning ".. only 684 out of 822 finite diag(R) entries"
+di <- diag(qrZ.@R)
 stopifnot(is.na(rnkZ.), is(qrZ, "sparseQR"), is.na(rnk2), anyNA(di))
-
 
 showSys.time(
 for(i in 1:120) {

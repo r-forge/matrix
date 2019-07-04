@@ -15,9 +15,15 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.2-18 (2019-07-02, svn r3300)}{
+\section{Changes in version 1.2-18 (2019-07-04, svn r3302)}{
   \subsection{New Features}{
     \itemize{
+      \item \code{Matrix(*, doDiag=TRUE)} is now obeyed also in the sparse
+      case, as all \code{"diagonalMatrix"} are also \code{"sparseMatrix"}.
+      E.g.,  \code{Matrix(0, 3,3)} returns a \code{"ddiMatrix"} instead of
+      a \code{"dsCMatrix"} previously.  The latter is still returned from
+      \code{Matrix(0, 3,3, doDiag=FALSE)}.
+
       \item \code{nearPD()} gets new option: If \code{base.matrix = TRUE},
       the resulting \code{mat} component is a \pkg{base} \code{matrix}, as
       often used desired when \code{nearPD()} is used outside the
