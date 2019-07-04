@@ -24,6 +24,7 @@ stopifnot(is(mt, "sparseMatrix"))
 library(Matrix)
 
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
+(doExtras <- doExtras && getRversion() >= "3.4") # so have withAutoprint(.)
 
 if(interactive()) {
     options(error = recover, Matrix.verbose = TRUE, warn = 1)
@@ -45,12 +46,14 @@ d4da<- as(d4a, "diagonalMatrix")
 d4d <- as(d4., "denseMatrix")
 d4aS <- Matrix(d4a, sparse=TRUE, doDiag=FALSE)
 d1aS <- Matrix(m1a, sparse=TRUE, doDiag=FALSE)
-stopifnot(identical(d4di@x, numeric()), # was "named" unnecessarily
-          identical(dimnames(d4 <- Matrix(d4.)), dns),
-          identical4(d40, Matrix(diag(4)), unname(d4), unname(d4da)),
-          identical3(d4, as(d4., "Matrix"), as(d4., "diagonalMatrix")),
-          is(d4aS, "dtCMatrix"), # not "dsC*", as asymmetric dimnames
-          is(d4d, "denseMatrix"))
+stopifnot(exprs = {
+    identical(d4di@x, numeric()) # was "named" unnecessarily
+    identical(dimnames(d4 <- Matrix(d4.)), dns)
+    identical4(d40, Matrix(diag(4)), unname(d4), unname(d4da))
+    identical3(d4, as(d4., "Matrix"), as(d4., "diagonalMatrix"))
+    is(d4aS, "dtCMatrix") # not "dsC*", as asymmetric dimnames
+    is(d4d, "denseMatrix")
+})
 
 class(mN <-  Matrix(NA, 3,4)) # NA *is* logical
 validObject(Matrix(NA))
@@ -339,8 +342,7 @@ stopifnot(suppressWarnings(any(Lrg)))# (double -> logical  warning)
 rm(e2)# too large...
 
 RNGversion("3.6.0")# future proof
-if(doExtras && is.finite(memGB) && memGB > 24) # need around .. GB
-{
+if(doExtras && is.finite(memGB) && memGB > 49) withAutoprint({
     cat("computing SM .. \n")
     showSys.time(m <- matrix(0, 3e6, 1024))
     ##  user  system elapsed
@@ -352,7 +354,7 @@ if(doExtras && is.finite(memGB) && memGB > 24) # need around .. GB
     ## 5.931  11.184  17.162
     showSys.time(SM  <- as(m, "sparseMatrix")) # ~ 8 sec
     ## gave 'Error in asMethod(object) : negative length vectors are not allowed'
-    ## now works - via new C  matrix_to_Csparse()
+    ## now works - via C  matrix_to_Csparse()
     showSys.time(n0.m <- c(m) != 0) # logical (full, base R) matrix, 12 GB
     ##   user  system elapsed
     ## 14.901  10.789  25.776
@@ -373,15 +375,16 @@ if(doExtras && is.finite(memGB) && memGB > 24) # need around .. GB
     stopifnot(as.matrix(summary(TM)) == cbind(ai0, 1:22))
     ## cleanup:
     rm(SM, TM)
-}
+})
 
 ## Constructing *packed* dense symmetric (dsp*) | triangular (dtp*) Matrices:
-if(doExtras && is.finite(memGB) && memGB > 35) { # need around 17.2 GB
+if(doExtras && is.finite(memGB) && memGB > 35) withAutoprint({
     m <- as.integer(2^16) ## = 65536
     showSys.time(x <- rep(as.numeric(1:100), length.out=m*(m+1)/2))
     ##  user  system elapsed
     ## 6.028   8.964  15.074
-    print(object.size(x)) # 17'180'131'368 bytes: ~ 17 GB
+    gc()
+    object.size(x) # 17'180'131'368 bytes: ~ 17 GB
     mat <- new("dspMatrix", x = x, Dim = c(m, m)) # failed with
     ## long vectors not supported yet: ../../src/include/Rinlinedfuns.h:...
     validObject(mat)
@@ -389,7 +392,7 @@ if(doExtras && is.finite(memGB) && memGB > 35) { # need around 17.2 GB
     validObject(mat)
     ## cleanup
     rm(mat)
-}
+})
 
 ## with dimnames:
 v <- c(a=1, b=2:3)
@@ -997,7 +1000,7 @@ stopifnotValid(XX <- X - chol(crossprod(X)), "triangularMatrix")
 X
 XX
 XX <- as(drop0(XX), "dsCMatrix")
-stopifnot(identical(XX, Matrix(0, nrow(X), ncol(X))))
+stopifnot(identical(XX, Matrix(0, nrow(X), ncol(X), doDiag=FALSE)))
 
 M <- Matrix(m., sparse = FALSE)
 (sM <- Matrix(m.))
@@ -1147,7 +1150,11 @@ if(doExtras) {
 	checkMatrix(.m)
     }
     cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
-}
+} 
+## in any case, test
+d4d.2 <- Matrix:::.dense2C(!!d4da) ## <<- did wrongly make dimnames symmetric
+l4da <- as(d4da, "lMatrix")
+assert.EQ.Mat(l4da, as(l4da,"CsparseMatrix"))
 
 dtr <- tr4 <- triu(Matrix(1:16, 4,4))
 dtr@x[Matrix:::indTri(4, upper=FALSE, diag=FALSE)] <- 100*(-3:2)

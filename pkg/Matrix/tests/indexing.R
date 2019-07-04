@@ -406,10 +406,11 @@ cb <- crossprod(b)
 cB <- crossprod(Matrix(b, sparse=TRUE))
 a <- matrix(0, 6, 6)
 a[1:4, 1:4] <- cb
-A1 <- A2 <- Matrix(0, 6, 6)#-> sparse
+A1 <- A2 <- Matrix(0, 6, 6)#-> ddiMatrix
 A1[1:4, 1:4] <- cb
 A2[1:4, 1:4] <- cB
 assert.EQ.mat(A1, a)# indeed
+## "must": symmetric and sparse, i.e., ds*Matrix:
 stopifnot(identical(A1, A2), is(A1, "dsCMatrix"))
 
 ## repeated ones ``the challenge'' (to do smartly):
@@ -650,24 +651,24 @@ L <- c(TRUE, rep(FALSE,8)) ; z <- c(50,99)
 ## these now work correctly {though not very efficiently; hence warnings}
 m[i] <- v # the role model: only first column is affected
 M[i] <- v; assert.EQ.mat(M,m) # dge
-D[i] <- v; assert.EQ.mat(D,m) # ddi -> dtT -> dgT
+D[i] <- v; assert.EQ.mat(D,m) # ddi -> dtC (new! 2019-07; was dgT)
 s[i] <- v; assert.EQ.mat(s,m) # dtT -> dgT
 S[i] <- v; assert.EQ.mat(S,m); S # dtC -> dtT -> dgT -> dgC
-m.L <- asLogical(m)
-C[i] <- v # - with a warning: C is nMatrix, v not T/F
-assert.EQ.mat(C,m.L); validObject(C)
-N[i] <- v # - with a warning
+m.L <- asLogical(m) ; assertWarning(
+C[i] <- v, verbose=TRUE) # warning: C is nMatrix, v not T/F
+assert.EQ.mat(C,m.L); validObject(C); assertWarning(
+N[i] <- v, verbose=TRUE)
 assert.EQ.mat(N,m.L); validObject(N)
-stopifnot(Q.C.identical(D,s, checkClass=FALSE))
+stopifnot(identical(D, as(as(s, "triangularMatrix"), "CsparseMatrix")))
 ## logical *vector* indexing
 eval(.iniDiag.example)
 m[L] <- z; m.L <- asLogical(m)
 M[L] <- z; assert.EQ.mat(M,m)
 D[L] <- z; assert.EQ.mat(D,m)
 s[L] <- z; assert.EQ.mat(s,m)
-S[L] <- z; assert.EQ.mat(S,m) ; S
-C[L] <- z; assert.EQ.mat(C,m.L) # with a good warning
-N[L] <- z; assert.EQ.mat(N,m.L)
+S[L] <- z; assert.EQ.mat(S,m) ; S ; assertWarning(
+C[L] <- z, verbose=TRUE); assert.EQ.mat(C,m.L)  ; assertWarning(
+N[L] <- z, verbose=TRUE); assert.EQ.mat(N,m.L)
 
 
 ## indexing [i]  vs  [i,] --- now ok
@@ -719,10 +720,10 @@ m[i] <- v; m.L <- asLogical(m)
 M[i] <- v; assert.EQ.mat(M,m) # dge
 D[i] <- v; assert.EQ.mat(D,m) # ddi -> dtT -> dgT
 s[i] <- v; assert.EQ.mat(s,m) # dtT -> dgT
-S[i] <- v; assert.EQ.mat(S,m); S # dtC -> dtT -> dgT -> dgC
-N[i] <- v # with a good warning
-assert.EQ.mat(N,m.L); N
-C[i] <- v #  ..  .  ..  warning
+S[i] <- v; assert.EQ.mat(S,m); S ; assertWarning( # dtC -> dtT -> dgT -> dgC
+N[i] <- v, verbose=TRUE)
+assert.EQ.mat(N,m.L); N ; assertWarning(
+C[i] <- v, verbose=TRUE)
 assert.EQ.mat(C,m.L); C #
 
 options(warn = 2) #---------------------# NO WARNINGS from here -----------------
@@ -934,21 +935,31 @@ ii <- c(1:2, 4:5)
 d6[cbind(ii,ii)] <- 7*ii
 stopifnot(is(d6, "ddiMatrix"), identical(d6, Diagonal(x=c(7*1:2,1,7*4:5,1))))
 
-for(j in 3:6) { ## even and odd j used to behave differently
+sclass <- function(obj) as.vector(class(obj)) # as.v*(): drop attr(*,"package")
+show2cls <- function(C,D, chr = "")
+    cat(sprintf("%s & %s%s: %s %s\n",
+                deparse(substitute(C)), deparse(substitute(D)), chr,
+                sclass(C), sclass(D)))
+for(j in 2:6) { ## even and odd j used to behave differently
+    cat("j = ", j, ":\n-------\n")
     M <- Matrix(0, j,j); m <- matrix(0, j,j)
     T  <- as(M, "TsparseMatrix")
     TG <- as(T, "generalMatrix")
-    G <-  as(M, "generalMatrix")
+    G  <- as(M, "generalMatrix");  show2cls(TG, G)
+    stopifnot(is(TG, "TsparseMatrix"),
+              is(G,  "CsparseMatrix"))
     id <- cbind(1:j,1:j)
     i2 <- cbind(1:j,j:1)
     m[id] <- 1:j
-    M[id] <- 1:j ; stopifnot(is(M,"symmetricMatrix"))
-    T[id] <- 1:j ; stopifnot(is(T,"symmetricMatrix"))
+    M[id] <- 1:j
+    T[id] <- 1:j ; show2cls(M, T,' ("diag")')
+    stopifnot(is(M, "diagonalMatrix"), # since 2019-07 // FIXME (?!) for j=1
+              is(T,"triangularMatrix"), isDiagonal(T)) # was "symmetricMatrix"
     G[id] <- 1:j
     TG[id]<- 1:j
     m[i2] <- 10
-    M[i2] <- 10 ; stopifnot(is(M,"symmetricMatrix"))
-    T[i2] <- 10 ; stopifnot(is(T,"symmetricMatrix"))
+    M[i2] <- 10
+    T[i2] <- 10 ; show2cls(M, T,' ("symm")')
     G[i2] <- 10
     TG[i2]<- 10
     ##

@@ -24,10 +24,13 @@ Matrix(data=NA, nrow=1, ncol=1, byrow=FALSE, dimnames=NULL,
     Note that when the resulting matrix is diagonal (\dQuote{mathematically}),
     \code{sparse=FALSE} results in a \code{\linkS4class{diagonalMatrix}},
     unless \code{doDiag=FALSE} as well, see the first examples.}
-  \item{doDiag}{only when \code{sparse = FALSE}, logical indicating
-    if a \code{\linkS4class{diagonalMatrix}} object should be considered
-    (default).  Otherwise, in such a case, a dense (symmetric) matrix
-    will be returned.}
+  \item{doDiag}{logical indicating if a \code{\linkS4class{diagonalMatrix}}
+    object should be considered (default); as class
+    \code{\linkS4class{diagonalMatrix}} now \code{\link{extends}}
+    \code{\linkS4class{sparseMatrix}}, this is a natural default also for
+    \code{sparse=TRUE}.
+    Otherwise, if \code{doDiag} is false, in such a case, a dense or sparse
+    symmetric matrix will be returned.}
   \item{forceCheck}{logical indicating if the checks for structure
     should even happen when \code{data} is already a \code{"Matrix"}
     object.}
