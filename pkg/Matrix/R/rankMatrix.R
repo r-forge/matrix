@@ -6,7 +6,7 @@
 ##
 ## Ideas by Martin Maechler (April 2007) and Ravi Varadhan (October 2007)
 
-qr2rankMatrix <- function(qr, tol = NULL, isBqr = is.qr(qr)) {
+qr2rankMatrix <- function(qr, tol = NULL, isBqr = is.qr(qr), do.warn=TRUE) {
     ## NB: 1) base::qr(*, LAPACK = TRUE/FALSE)  differ via attr(.,"useLAPACK")
     ##     2) if LAPACK=TRUE, .$rank is useless (always = full rank)
     ##
@@ -23,24 +23,34 @@ qr2rankMatrix <- function(qr, tol = NULL, isBqr = is.qr(qr)) {
                      diag(qr@R)
 
         if(anyNA(diagR) || !all(is.finite(diagR))) {
-            warning(gettextf("qr2rankMatrix(.): QR has non-finite diag(R) entries"))
+            if(do.warn) {
+                ifi <- is.finite(diagR)
+                warning(gettextf(
+                    "qr2rankMatrix(.): QR with only %d out of %d finite diag(R) entries",
+                    sum(ifi), length(ifi)))
+            }
+            ## return
             NA_integer_
+            ## alternative: gives *too* small rank in typical cases
+            ## reduce the maximal rank by omitting all non-finite entries:
+            ## diagR <- diagR[is.finite(diagR)]
+            ## if(length(diagR) == 0)
+            ##     return(NA_integer_)
         } else {
-            if(any(diagR < 0))
+            if(do.warn && any(diagR < 0))
                 warning(gettextf("qr2rankMatrix(.): QR has negative diag(R) entries"))
-            d.i <- diagR ## had abs(diagR) .. but that counts large negative entries
+            ## diagR <- diagR ## had abs(diagR) .. but that counts large negative entries
             ## declare those entries to be zero that are < tol*max(.)
-            if((mdi <- max(d.i, na.rm=TRUE)) > 0) {
+            if((mdi <- max(diagR, na.rm=TRUE)) > 0) {
                 if(!is.numeric(tol)) {
                     ## d := dim(x) extracted from qr, in both (dense and sparse) qr() cases
                     d <- dim(if(isBqr) qr$qr else qr)
                     tol <- max(d) * .Machine$double.eps
                 }
-                sum(d.i >= tol * mdi)
+                sum(diagR >= tol * mdi)
+                ## was sum(diag(q.r@R) != 0)
             }
-            else 0L # for 0-matrix
-
-            ## was sum(diag(q.r@R) != 0)
+            else 0L # for 0-matrix or all NaN or negative diagR[]
         }
     } ## else {Lapack or sparseQR}
 }
@@ -48,7 +58,7 @@ qr2rankMatrix <- function(qr, tol = NULL, isBqr = is.qr(qr)) {
 rankMatrix <- function(x, tol = NULL,
                        method = c("tolNorm2", "qr.R", "qrLINPACK", "qr",
                                   "useGrad", "maybeGrad"),
-                       sval = svd(x, 0,0)$d, warn.t = TRUE)
+                       sval = svd(x, 0,0)$d, warn.t = TRUE, warn.qr = TRUE)
 {
     ## Purpose: rank of a matrix ``as Matlab'' or "according to Ravi V"
     ## ----------------------------------------------------------------------
@@ -120,7 +130,7 @@ rankMatrix <- function(x, tol = NULL,
 		      warning(gettextf(
 			"rankMatrix(x, method='qr'): computing t(x) as nrow(x) < ncol(x)"))
 		  q.r <- qr(if(do.t) t(x) else x, tol=tol, LAPACK = method != "qrLINPACK")
-                  qr2rankMatrix(q.r, tol=tol, isBqr = x.dense)
+                  qr2rankMatrix(q.r, tol=tol, isBqr = x.dense, do.warn = warn.qr)
 	      }
 	      else if(sval[1] > 0) sum(sval >= tol * sval[1]) else 0L, ## "tolNorm2"
 	      "method" = method,
