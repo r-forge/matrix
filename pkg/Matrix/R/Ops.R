@@ -7,8 +7,8 @@
 ###               -----    -------        -----
 ### where 'Arith'   :=  '"+"', '"-"', '"*"', '"^"', '"%%"', '"%/%"', '"/"'
 ###       'Compare' := '"=="', '">"', '"<"', '"!="', '"<="', '">="'
-###       'Logic'   :=  '"&"', '"|"'  (( but *not* '"!"' since that has
-###			                 only one argument ))
+###       'Logic'   :=  '"&"', '"|"'
+###		but *not* '"!"' since that has only one argument : >>>>> ./not.R
 
 ## cache them [rather in package 'methods' ??]
 .ArithGenerics   <- getGroupMembers("Arith")

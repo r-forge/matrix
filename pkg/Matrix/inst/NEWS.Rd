@@ -34,6 +34,10 @@
       \item \code{rankMatrix(<sparse>, method="qr")} now returns \code{NA}
       (or \code{NaN}) instead of signalling an error in the case the sparse
       \eqn{Q R} decomposition gave \code{NA}s in \code{diag(R)}.
+
+      \item Coercion (\code{as(., .)}) from (e.g.) \code{"lsyMatrix"} to
+      \code{"CsparseMatrix"} silently made asymmetric dimnames symmetric.
+      ....  as the \emph{internal} \code{forceCspSymmetric(*, dimNames)}
     }
   }
 }
