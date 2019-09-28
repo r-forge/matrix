@@ -482,8 +482,7 @@ setMethod("[", signature(x = "Matrix",
 ## missing 'drop' --> 'drop = TRUE'
 ##                     -----------
 ## select rows __ or __ vector indexing:
-setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
-			 drop = "missing"),
+setMethod("[", signature(x = "Matrix", i = "index", j = "missing", drop = "missing"),
 	  function(x,i,j, ..., drop) {
 	      Matrix.msg("M[i,m,m] : nargs()=",nargs(), .M.level = 2)
 	      if(nargs() == 2) { ## e.g. M[0] , M[TRUE], M[1:2], M[-7]
@@ -493,16 +492,14 @@ setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
 		  ##		      ^^
 	      }
 	  })
-
 ## select columns
-setMethod("[", signature(x = "Matrix", i = "missing", j = "index",
-			 drop = "missing"),
+setMethod("[", signature(x = "Matrix", i = "missing", j = "index", drop = "missing"),
 	  function(x,i,j, ..., drop) {
 	      Matrix.msg("M[m,i,m] : nargs()=",nargs(), .M.level = 2)
 	      callGeneric(x, , j=j, drop= TRUE)
 	  })
-setMethod("[", signature(x = "Matrix", i = "index", j = "index",
-			 drop = "missing"),
+## select both rows *and* columns
+setMethod("[", signature(x = "Matrix", i = "index", j = "index", drop = "missing"),
 	  function(x,i,j, ..., drop) {
 	      Matrix.msg("M[i,i,m] : nargs()=",nargs(), .M.level = 2)
 	      callGeneric(x, i=i, j=j, drop= TRUE)
@@ -519,6 +516,7 @@ setMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY", drop = "ANY"),
 .M.sub.i.logical <- function (x, i, j, ..., drop)
 {
     nA <- nargs() # counts 'M[i]' as 2 arguments,  'M[i,]' as 3
+    Matrix.msg("M[logi,m,m] : nargs()=", nA, .M.level = 2)
     if(nA == 2) { ##  M [ M >= 7 ]
 	## FIXME: when both 'x' and 'i' are sparse, this can be very inefficient
 	if(is(x, "sparseMatrix"))
@@ -532,7 +530,7 @@ setMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY", drop = "ANY"),
 
 	## Note: current method dispatch seems not to call this ever
 
-	if(!anyNA(i) && all(i)) ## select everything
+	if(length(i) && !anyNA(i) && all(i)) ## select everything
 	    x
 	else ## not selecting all -> result is *NOT* diagonal/triangular/symmetric/..
 	    ## keep j missing, but  drop = "logical"
@@ -548,7 +546,6 @@ for(ii in c("lMatrix", "logical"))
     setMethod("[", signature(x = "Matrix", i = ii, j = "missing", drop = "missing"),
 	      .M.sub.i.logical)
 rm(ii)
-
 
 ##' x[ ij ]  where ij is (i,j) 2-column matrix
 ##' @note only called from  .M.sub.i.2col(x, i) below
