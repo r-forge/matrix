@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.2-18 (2019-07-04, svn r3303)}{
+\section{Changes in version 1.2-18 (2019-09-28 r3305)}{
   \subsection{New Features}{
     \itemize{
       \item \code{Matrix(*, doDiag=TRUE)} is now obeyed also in the sparse
@@ -48,6 +48,12 @@
       \item Coercion (\code{as(., .)}) from (e.g.) \code{"lsyMatrix"} to
       \code{"CsparseMatrix"} silently made asymmetric dimnames symmetric.
       ....  as the \emph{internal} \code{forceCspSymmetric(*, dimNames)}
+
+      \item \code{as(m, "dgTMatrix")} does not lose \code{dimnames} anymore
+      when \code{m} is a (traditional) \code{matrix}.
+
+      \item \code{M[logical(0), ]} now has dimension \eqn{0 x k} for sparse
+      \code{M} as for base matrices.
     }
   }
 }

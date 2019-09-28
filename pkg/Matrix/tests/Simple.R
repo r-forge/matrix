@@ -53,6 +53,8 @@ stopifnot(exprs = {
     identical3(d4, as(d4., "Matrix"), as(d4., "diagonalMatrix"))
     is(d4aS, "dtCMatrix") # not "dsC*", as asymmetric dimnames
     is(d4d, "denseMatrix")
+    identical(dimnames(d4T <- as(d4., "TsparseMatrix")), dns) # failed till 2019-09-xx
+    identical(d4T, as(d4., "dgTMatrix"))
 })
 
 class(mN <-  Matrix(NA, 3,4)) # NA *is* logical

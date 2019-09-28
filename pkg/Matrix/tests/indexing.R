@@ -80,7 +80,7 @@ a.m <- as(mn,"matrix")
 assert.EQ(as(ms,"matrix"), a.m) # incl. dimnames
 iN4 <- c(NA, TRUE, FALSE, TRUE)
 assert.EQ(as(mn[,iN4],"matrix"), a.m[,iN4]) # (incl. dimnames)
-##assert.EQ(as.matrix(ms[,iN4]), a.m[,iN4]) # ms[, <with_NA>]  fails still :
+##assert.EQ(as.matrix(ms[,iN4]), a.m[,iN4]) # ms[, <with_NA>]  fails still : _FIXME_
 try(ms[,iN4])
 try(ms[,iN4] <- 100) ## <- segfaulted in Matrix <= 1.2-8  (!)
 
@@ -110,6 +110,12 @@ chk.ndn(tb[i, i]); chk.ndn(tb[i, ])
 chk.ndn(ts[i, i]); chk.ndn(ts[i, ])
 chk.ndn( b[ , 1, drop=FALSE]); chk.ndn( s[i, 2, drop=FALSE])
 chk.ndn(tb[ , 1, drop=FALSE]); chk.ndn(ts[i, 2, drop=FALSE])
+
+L0 <- logical(0)
+stopifnot(exprs = {
+    identical(dim(b[,L0]), c(4L, 0L))
+    identical(dim(b[L0,]), c(0L, 4L)) # failed till 2019-09-x
+})
 
 ## Printing sparse colnames:
 ms[sample(28, 20)] <- 0
