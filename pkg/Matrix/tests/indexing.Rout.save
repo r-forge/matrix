@@ -1,5 +1,5 @@
 
-R version 3.6.1 RC (2019-07-03 r76779) -- "Action of the Toes"
+R version 3.6.1 Patched (2019-09-27 r77229) -- "Action of the Toes"
 Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -137,7 +137,7 @@ Time elapsed:  0.445 0.015 0.463
 > assert.EQ(as(ms,"matrix"), a.m) # incl. dimnames
 > iN4 <- c(NA, TRUE, FALSE, TRUE)
 > assert.EQ(as(mn[,iN4],"matrix"), a.m[,iN4]) # (incl. dimnames)
-> ##assert.EQ(as.matrix(ms[,iN4]), a.m[,iN4]) # ms[, <with_NA>]  fails still :
+> ##assert.EQ(as.matrix(ms[,iN4]), a.m[,iN4]) # ms[, <with_NA>]  fails still : _FIXME_
 > try(ms[,iN4])
 Error in intI(j, n = x@Dim[2], dn[[2]], give.dn = FALSE) : 
   'NA' indices are not (yet?) supported for sparse Matrices
@@ -172,6 +172,12 @@ Error in intI(i, n = di[margin], dn = dn[[margin]], give.dn = FALSE) :
 > chk.ndn(ts[i, i]); chk.ndn(ts[i, ])
 > chk.ndn( b[ , 1, drop=FALSE]); chk.ndn( s[i, 2, drop=FALSE])
 > chk.ndn(tb[ , 1, drop=FALSE]); chk.ndn(ts[i, 2, drop=FALSE])
+> 
+> L0 <- logical(0)
+> stopifnot(exprs = {
++     identical(dim(b[,L0]), c(4L, 0L))
++     identical(dim(b[L0,]), c(0L, 4L)) # failed till 2019-09-x
++ })
 > 
 > ## Printing sparse colnames:
 > ms[sample(28, 20)] <- 0
