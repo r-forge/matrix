@@ -267,6 +267,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(m_encodeInd,  4),
     CALLDEF(m_encodeInd2, 5),
 
+    CALLDEF(matrix_trf, 2),
     CALLDEF(Matrix_rle_i, 2),
     CALLDEF(Matrix_rle_d, 2),
 
