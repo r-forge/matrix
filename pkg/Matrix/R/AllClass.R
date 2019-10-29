@@ -737,7 +737,7 @@ setClassUnion("geMatrix", members = c("dgeMatrix", "lgeMatrix", "ngeMatrix"))
 
 ## --- "General" (not Matrix at all) ----
 
-## e.g. for "Arith" methods:
+## e.g. for "Arith" methods, NB: --> see "numericVector" below (incl "integer")
 setClassUnion("numLike", members = c("numeric", "logical"))
 
 ##setClassUnion("numIndex", members = "numeric")
@@ -814,6 +814,7 @@ setClassUnion("atomicVector", ## "double" is not needed, and not liked by some
 	      members = c("logical", "integer", "numeric",
 			  "complex", "raw", "character"))
 
+## NB: --> see "numLike" above
 setClassUnion("numericVector", members = c("logical", "integer", "numeric"))
 
 setClassUnion("Mnumeric", members = c("numericVector", "Matrix"))

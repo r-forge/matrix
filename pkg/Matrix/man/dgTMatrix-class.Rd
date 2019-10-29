@@ -72,7 +72,7 @@
   classes) implicitly add \eqn{x_k}'s that belong to identical
   \eqn{(i_k, j_k)} pairs.
 
-  However this means that a matrix typically can tbe stored in more than
+  However this means that a matrix typically can be stored in more than
   one possible \code{"\linkS4class{TsparseMatrix}"} representations.
   Use \code{\link{uniqTsparse}()} in order to ensure uniqueness of the
   internal representation of such a matrix.
