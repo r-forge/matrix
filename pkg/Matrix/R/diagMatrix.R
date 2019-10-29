@@ -420,8 +420,6 @@ setMethod("[", signature(x = "diagonalMatrix", i = "missing",
 
 ## When you assign to a diagonalMatrix, the result should be
 ## diagonal or sparse ---
-## FIXME: this now fails because the "denseMatrix" methods come first in dispatch
-## Only(?) current bug:  x[i] <- value  is wrong when  i is *vector*
 replDiag <- function(x, i, j, ..., value) {
 ## FIXME: if   (i == j)  &&  isSymmetric(value) then -- want symmetricMatrix result! -- or diagMatrix
     x <- as(x, "CsparseMatrix")# was "Tsparse.." till 2012-07
@@ -438,6 +436,8 @@ replDiag <- function(x, i, j, ..., value) {
 			   na), domain=NA)
     } else
 	x[i,j] <- value
+    ## TODO: the following is a bit expensive; have cases above e.g. [i,] where
+    ## ----- we could check *much* faster :
     if(isDiagonal(x))   as(x, "diagonalMatrix") else
     if(isTriangular(x)) as(x, "triangularMatrix") else
     if(isSymmetric(x))  as(x, "symmetricMatrix") else x
@@ -493,6 +493,10 @@ setReplaceMethod("[", signature(x = "diagonalMatrix",
 			     x@x[ii] <- value
 			     x
 			 } else { ## no longer diagonal, but remain sparse:
+###  FIXME:  use  uplo="U" or uplo="L"  (or *not* "triangularMatrix") depending on LE <- i <= j
+###          all(LE) //  all(!LE) // remaining cases
+
+## --> use                        .diag2tT(from, uplo = "U", kind = .M.kind(from))
 			     x <- as(x, "triangularMatrix") # was "TsparseMatrix"
 			     x[i] <- value
 			     x
@@ -835,7 +839,7 @@ Cspdiagprod <- function(x, y, boolArith = NA, ...) {
 	    as(x, "lMatrix")
 	} else {
 	    ## else boolArith is  NA or FALSE {which are equivalent here, das diagonal = "numLike"}
-	    if(extends(cx, "nMatrix") || extends(cx, "lMatrix"))
+	    if(extends1of(cx, c("nMatrix", "lMatrix")))
 		as(x, "dMatrix") else x
 	}
     }
@@ -880,7 +884,7 @@ diagCspprod <- function(x, y, boolArith = NA, ...) {
 	    as(y, "lMatrix")
 	} else {
 	    ## else boolArith is  NA or FALSE {which are equivalent here, das diagonal = "numLike"}
-	    if(extends(cy, "nMatrix") || extends(cy, "lMatrix"))
+	    if(extends1of(cy, c("nMatrix", "lMatrix")))
 		as(y, "dMatrix") else y
 	}
     }
