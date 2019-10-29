@@ -410,9 +410,10 @@ formatSparseM <- function(x, zero.print = ".", align = c("fancy", "right"),
 {
     cld <- getClassDef(class(x))
     if(is.null(asLogical)) {
-        binary <- extends(cld,"nsparseMatrix") || extends(cld, "indMatrix")# -> simple T / F
-        asLogical <- { binary || extends(cld,"lsparseMatrix") ||
-                       extends(cld,"matrix") && is.logical(x) }
+	asLogical <- extends1of(cld,
+				c("nsparseMatrix", "indMatrix", # -> simple T / F{ binary
+				  "lsparseMatrix")) ||
+	    (extends(cld, "matrix") && is.logical(x))
 					# has NA and (non-)structural FALSE
     }
     if(missing(cx))

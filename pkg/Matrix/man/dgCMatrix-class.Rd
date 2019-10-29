@@ -26,8 +26,6 @@
 \alias{Arith,dgCMatrix,logical-method}
 \alias{Arith,dgCMatrix,numeric-method}
 \alias{Arith,dgCMatrix,dgCMatrix-method}
-%\alias{Math2,dgCMatrix,numeric-method}
-\alias{Math,dgCMatrix-method}
 % for silly reasons, need these 2+3 as well:
 \alias{round,dgCMatrix,numeric-method}
 \alias{signif,dgCMatrix,numeric-method}
