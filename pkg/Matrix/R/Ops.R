@@ -186,7 +186,7 @@ Cmp.Mat.atomic <- function(e1, e2) { ## result will inherit from "lMatrix"
 	if(full || allFalse(r0) || extends(cl1, "symmetricMatrix")) {
             isTri <- extends(cl1, "triangularMatrix")
             if(isTri) {
-                if(extends(cl1,"Cholesky") || extends(cl1,"BunchKaufman"))
+                if(extends1of(cl1, c("Cholesky","BunchKaufman")))
                     cl1 <- getClassDef(cl <- class(e1 <- as(e1, "dtrMatrix")))
             }
             ## FIXME? using copyClass() to copy "relevant" slots
@@ -726,7 +726,7 @@ Logic.Mat.atomic <- function(e1, e2) { ## result will typically be "like" e1:
 	if(full || allFalse(r0) || extends(cl1, "symmetricMatrix")) {
             isTri <- extends(cl1, "triangularMatrix")
             if(isTri) {
-                if(extends(cl1,"Cholesky") || extends(cl1,"BunchKaufman"))
+                if(extends1of(cl1, c("Cholesky","BunchKaufman")))
                     cl1 <- getClassDef(cl <- class(e1 <- as(e1, "dtrMatrix")))
             }
             ## FIXME? using copyClass() to copy "relevant" slots
