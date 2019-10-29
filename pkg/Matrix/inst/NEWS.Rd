@@ -15,14 +15,15 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.2-18 (2019-09-28 r3305)}{
+\section{Changes in version 1.2-18 (2019-10-30 r3309)}{
   \subsection{New Features}{
     \itemize{
       \item \code{Matrix(*, doDiag=TRUE)} is now obeyed also in the sparse
       case, as all \code{"diagonalMatrix"} are also \code{"sparseMatrix"}.
       E.g.,  \code{Matrix(0, 3,3)} returns a \code{"ddiMatrix"} instead of
       a \code{"dsCMatrix"} previously.  The latter is still returned from
-      \code{Matrix(0, 3,3, doDiag=FALSE)}.
+      \code{Matrix(0, 3,3, doDiag=FALSE)}.  Also a triangular matrix, e.g.,
+      \code{"dtrMatrix"} is detected now in cases with \code{NA}s.
 
       \item Subassignment to \code{"diagonalMatrix"} now returns
       sparse \code{"triangularMatrix"} more often; also (sparse)
@@ -35,6 +36,8 @@
 
       \item factored out new \code{qr2rankMatrix()} utility from
       \code{rankMatrix()}.
+
+      \item New \code{BunchKaufman(<matrix>)} method.
     }
   }
   \subsection{Bug Fixes}{
@@ -54,6 +57,9 @@
 
       \item \code{M[logical(0), ]} now has dimension \eqn{0 x k} for sparse
       \code{M} as for base matrices.
+
+      \item \code{log(M, base)} (the 2-argument version of \code{log()})
+      wrongly gave the result for \code{base = exp(1)}, i.e., the 1-argument default.
     }
   }
 }
