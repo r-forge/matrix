@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.2-18 (2019-10-29 r3310)}{
+\section{Changes in version 1.2-18 (2019-10-30 r3311)}{
   \subsection{New Features}{
     \itemize{
       \item \code{Matrix(*, doDiag=TRUE)} is now obeyed also in the sparse
@@ -38,6 +38,10 @@
       \code{rankMatrix()}.
 
       \item New \code{BunchKaufman(<matrix>)} method.
+
+      \item Added \code{wrld_1deg} sparse matrix example to
+      \emph{distributed} version of \pkg{Matrix} (no longer excluding it
+      via \file{.Rbuildignore}).
     }
   }
   \subsection{Bug Fixes}{

@@ -8,8 +8,6 @@
 \alias{expm,symmetricMatrix-method}
 \alias{expm,ddiMatrix-method}
 \alias{expm,matrix-method}% < for now
-%% only as long as not requiring R >= 3.2.0:
-\newcommand{\CRANpkg}{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 \description{
   Compute the exponential of a matrix.
 }
