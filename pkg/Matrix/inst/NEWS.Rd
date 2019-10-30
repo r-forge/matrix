@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.2-18 (2019-10-30 r3311)}{
+\section{Changes in version 1.3-0 (2019-10-30 r3312)}{
   \subsection{New Features}{
     \itemize{
       \item \code{Matrix(*, doDiag=TRUE)} is now obeyed also in the sparse
@@ -46,15 +46,17 @@
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item Fix last(?) \code{PROTECT()} warning found by \command{rchk}.
+      \item Fix last(?) \code{PROTECT()} warning found by \command{rchk} in
+      \file{src/dense.c}'s \code{ddense_skewpart()}.
 
       \item \code{rankMatrix(<sparse>, method="qr")} now returns \code{NA}
       (or \code{NaN}) instead of signalling an error in the case the sparse
       \eqn{Q R} decomposition gave \code{NA}s in \code{diag(R)}.
 
-      \item Coercion (\code{as(., .)}) from (e.g.) \code{"lsyMatrix"} to
-      \code{"CsparseMatrix"} silently made asymmetric dimnames symmetric.
-      ....  as the \emph{internal} \code{forceCspSymmetric(*, dimNames)}
+      \item Coercion (\code{as(., .)}) from e.g., \code{"lsyMatrix"} to
+      \code{"CsparseMatrix"} silently made asymmetric dimnames symmetric,
+      as did the \emph{internal} \code{forceCspSymmetric(*, dimNames)}
+      which may be called from \code{forceSymmetric()}.
 
       \item \code{as(m, "dgTMatrix")} does not lose \code{dimnames} anymore
       when \code{m} is a (traditional) \code{matrix}.
