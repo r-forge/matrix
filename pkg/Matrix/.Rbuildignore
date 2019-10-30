@@ -4,7 +4,6 @@
 omit-SPQR.*
 assign_hidden.R
 .*\.patch
-wrld_1deg
 misc/
 /0.*\.R$
 doc/unused
