@@ -172,9 +172,8 @@ subCsp_ij <- function(x, i, j, drop)
 	    drop(as(r, "matrix"))
 	else {
 	    if(!is.null(n <- names(dn))) names(r@Dimnames) <- n
-	    if(extends((cx <- getClassDef(class(x))),
-		       "symmetricMatrix")) ## TODO? make more efficient:
-		.gC2sym(r, uplo = x@uplo)## preserve uplo !
+	    if(extends((cx <- getClassDef(class(x))), "symmetricMatrix"))
+		.gC2sym(r, uplo = x@uplo) # preserving uplo
 	    else if(extends(cx, "triangularMatrix") && !is.unsorted(ii))
 		as(r, "triangularMatrix")
 	    else r

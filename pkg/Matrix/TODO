@@ -14,7 +14,7 @@
       Currently 'doDiag's documentation starts as  'doDiag: only when ‘sparse = FALSE’, ....'
       This would change, and doDiag would be active *also* for 'sparse = TRUE'
 ** TODO Do section in ./vignettes/Design-issues.Rnw (& man/symmetricMatrix-class.Rd ?) about *dimnames*
-**  also mentioning forceSymmetric() [which maybe should get another argument 'forceDimNms' in {T,F,NA}
+**  also mentioning forceSymmetric(); maybe that wd "inherit" arg. 'symDimnames' in {T,F,NA} from forceCspSymmetric().
 ** TODO sparse2int() using a X[...] * Y[...] construct which is too large --> Matrix bug #1330:
 *** See FIXME in ./R/spModels.R  and
     https://r-forge.r-project.org/tracker/index.php?func=detail&aid=1330&group_id=61&atid=294
