@@ -154,6 +154,20 @@ setClass("CsparseMatrix", contains = c("sparseMatrix", "VIRTUAL"),
          validity = function(object) .Call(Csparse_validate, object)
          )
 
+if(FALSE) { ## in theory.. would be neat for  new("dgCMatrix", Dim = c(3L,3L))
+setMethod("initialize", "CsparseMatrix", function(.Object, ...) {
+    .Object <- callNextMethod()
+    .Object@p <- integer(.Object@Dim[2L] + 1L)
+    .Object
+})
+
+setMethod("initialize", "RsparseMatrix", function(.Object, ...) {
+    .Object <- callNextMethod()
+    .Object@p <- integer(.Object@Dim[1L] + 1L)
+    .Object
+})
+}# not yet (fails)
+
 setClass("RsparseMatrix", contains = c("sparseMatrix", "VIRTUAL"),
 	 slots = c(p = "integer", j = "integer"),
 	 prototype = prototype(p = 0L),# to be valid
