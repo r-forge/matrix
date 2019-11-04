@@ -686,23 +686,28 @@ setMethod("show", signature(object = "sparseMatrix"),
 
 
 ## For very large and very sparse matrices,  the above show()
-## is not really helpful;  Use  summary() as an alternative:
+## is not really helpful;  Use  summary() showing "triplet" as an alternative:
+
+mat2triplet <- function(x, uniqT = FALSE) {
+    T <- as(x, "TsparseMatrix")
+    if(uniqT && anyDuplicatedT(T)) T <- .uniqTsparse(T)
+    if(is(T, "nsparseMatrix"))
+         list(i = T@i + 1L, j = T@j + 1L)
+    else list(i = T@i + 1L, j = T@j + 1L, x = T@x)
+}
 
 setMethod("summary", signature(object = "sparseMatrix"),
-	  function(object, ...) {
-	      d <- dim(object)
-	      T <- as(object, "TsparseMatrix")
-	      ## return a data frame (int, int,	 {double|logical|...})	:
-	      r <- if(is(object,"nsparseMatrix"))
-		  data.frame(i = T@i + 1L, j = T@j + 1L)
-	      else data.frame(i = T@i + 1L, j = T@j + 1L, x = T@x)
-	      attr(r, "header") <-
-		  sprintf('%d x %d sparse Matrix of class "%s", with %d entries',
-			  d[1], d[2], class(object), length(T@i))
-	      ## use ole' S3 technology for such a simple case
-	      class(r) <- c("sparseSummary", class(r))
-	      r
-	  })
+          function(object, uniqT = FALSE, ...) {
+              d <- dim(object)
+              ## return a data frame (int, int,	 {double|logical|...})	:
+              r <- as.data.frame(mat2triplet(object, uniqT=uniqT))
+              attr(r, "header") <-
+                  sprintf('%d x %d sparse Matrix of class "%s", with %d entries',
+                          d[1], d[2], class(object), nrow(r))
+              ## use ole' S3 technology for such a simple case
+              class(r) <- c("sparseSummary", class(r))
+              r
+          })
 
 print.sparseSummary <- function (x, ...) {
     cat(attr(x, "header"),"\n")
