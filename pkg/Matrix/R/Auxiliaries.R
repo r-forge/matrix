@@ -777,6 +777,13 @@ uniqTsparse <- function(x, class.x = c(class(x))) {
 	     domain = NA)
 }
 
+##' non-exported version with*OUT* check -- called often only  if(anyDuplicatedT(.))
+.uniqTsparse <- function(x, class.x = c(class(x))) {
+    tri <- extends(class.x, "triangularMatrix")
+    .Call(Csparse_to_Tsparse, .Call(Tsparse_to_Csparse, x, tri), tri)
+}
+
+
 ## Note: maybe, using
 ## ----    xj <- .Call(Matrix_expand_pointers, x@p)
 ## would be slightly more efficient than as( <dgC> , "dgTMatrix")

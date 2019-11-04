@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-0 (2019-10-30 r3312)}{
+\section{Changes in version 1.3-0 (2019-11-04 r3313)}{
   \subsection{New Features}{
     \itemize{
       \item \code{Matrix(*, doDiag=TRUE)} is now obeyed also in the sparse
@@ -24,6 +24,11 @@
       a \code{"dsCMatrix"} previously.  The latter is still returned from
       \code{Matrix(0, 3,3, doDiag=FALSE)}.  Also a triangular matrix, e.g.,
       \code{"dtrMatrix"} is detected now in cases with \code{NA}s.
+
+      This is both a bug fix \emph{and} an API change which breaks code
+      that assumes \code{Matrix(.)} to return a \code{"CsparseMatrix"} in
+      cases where it now returns a \code{"diagonalMatrix"} (which does
+      extend \code{"sparseMatrix"}).
 
       \item Subassignment to \code{"diagonalMatrix"} now returns
       sparse \code{"triangularMatrix"} more often; also (sparse)
@@ -42,6 +47,9 @@
       \item Added \code{wrld_1deg} sparse matrix example to
       \emph{distributed} version of \pkg{Matrix} (no longer excluding it
       via \file{.Rbuildignore}).
+
+      \item New (simple) \code{mat2triplet()} function to be used instead
+      of \code{summary(<sparseMatrix>)} in code.
     }
   }
   \subsection{Bug Fixes}{

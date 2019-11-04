@@ -1,7 +1,7 @@
-For R 3.6.0 with new   RNGking(*, sample.kind) , these needed a setting :
+For R 3.6.0 with new   RNGkind(*, sample.kind) , these needed a   RNGversion("3.5.0") :
 
-tests/dpo-test.R
-tests/factorizing.R
-tests/indexing.R
-tests/matprod.R
-tests/validObj.R
+dpo-test.R
+factorizing.R
+indexing.R
+matprod.R
+validObj.R

@@ -268,8 +268,8 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
     if((isTri <- !isSym))
 	isTri <- isTriangular(data)
     isDiag <- isSym # cannot be diagonal if it isn't symmetric
-    if(isDiag) # do not *build*  1 x 1 diagonalMatrix
-	isDiag <- doDiag && nrow(data) > 1 && isDiagonal(data)
+    if(isDiag)
+	isDiag <- doDiag && isDiagonal(data)
 
     ## try to coerce ``via'' virtual classes
     if(isDiag) { ## diagonal is preferred to sparse !
