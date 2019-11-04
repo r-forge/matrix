@@ -765,10 +765,10 @@ uniqTsparse <- function(x, class.x = c(class(x))) {
     ## Purpose: produce a *unique* triplet representation:
     ##		by having (i,j) sorted and unique
     ## -----------------------------------------------------------
-    ## The following is not quite efficient {but easy to program,
-    ## and as() are based on C code  (all of them?)
+    ## The following is not quite efficient, but easy to program,
+    ## and much based on C code
     ##
-    ## FIXME: Do it fast for the case where 'x' is already 'uniq'
+    ## TODO: faster for the case where 'x' is already 'uniq'?  if(anyDuplicatedT(.))
     if(extends(class.x, "TsparseMatrix")) {
 	tri <- extends(class.x, "triangularMatrix")
 	.Call(Csparse_to_Tsparse, .Call(Tsparse_to_Csparse, x, tri), tri)
