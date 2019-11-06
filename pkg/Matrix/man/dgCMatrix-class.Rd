@@ -4,6 +4,7 @@
 \alias{dgCMatrix-class}
 \alias{as.vector,dgCMatrix-method}
 \alias{coerce,matrix,dgCMatrix-method}
+\alias{coerce,ddiMatrix,dgCMatrix-method}
 \alias{coerce,dgeMatrix,dgCMatrix-method}
 \alias{coerce,dgCMatrix,dgTMatrix-method}
 \alias{coerce,dgCMatrix,dsCMatrix-method}% deprecated
