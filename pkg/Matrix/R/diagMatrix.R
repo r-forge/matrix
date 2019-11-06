@@ -272,7 +272,11 @@ setAs("ddiMatrix", "triangularMatrix", di2tT)
 setAs("ddiMatrix", "TsparseMatrix", di2tT)
 setAs("ddiMatrix", "dsparseMatrix", di2tT)
 setAs("ddiMatrix", "CsparseMatrix",
-      function(from) as(.diag2tT(from, "U", "d"), "CsparseMatrix"))
+      function(from) .T2Cmat(.diag2tT(from, "U", "d"), isTri=TRUE))
+## Such that  as(Matrix(0, d,d), "dgCMatrix")  continues working:
+setAs("ddiMatrix", "dgCMatrix",
+      function(from) .T2Cmat(.diag2tT(from, "U", "d"), isTri=TRUE))
+
 setAs("ddiMatrix", "symmetricMatrix", function(from) .diag2sT(from, "U", "d"))
 ##
 ## ldi*:
@@ -283,7 +287,7 @@ setAs("ldiMatrix", "triangularMatrix", di2tT)
 setAs("ldiMatrix", "TsparseMatrix", di2tT)
 setAs("ldiMatrix", "lsparseMatrix", di2tT)
 setAs("ldiMatrix", "CsparseMatrix",
-      function(from) as(.diag2tT(from, "U", "l"), "CsparseMatrix"))
+      function(from) .T2Cmat(.diag2tT(from, "U", "l"), isTri=TRUE))
 setAs("ldiMatrix", "symmetricMatrix", function(from) .diag2sT(from, "U", "l"))
 rm(di2tT)
 
