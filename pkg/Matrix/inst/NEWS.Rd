@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-0 (2019-11-04 r3313)}{
+\section{Changes in version 1.3-0 (2019-11-07 r3316)}{
   \subsection{New Features}{
     \itemize{
       \item \code{Matrix(*, doDiag=TRUE)} is now obeyed also in the sparse
@@ -39,7 +39,7 @@
       often used desired when \code{nearPD()} is used outside the
       \pkg{Matrix} package context.
 
-      \item factored out new \code{qr2rankMatrix()} utility from
+      \item Factored out new \code{qr2rankMatrix()} utility from
       \code{rankMatrix()}.
 
       \item New \code{BunchKaufman(<matrix>)} method.
@@ -50,6 +50,11 @@
 
       \item New (simple) \code{mat2triplet()} function to be used instead
       of \code{summary(<sparseMatrix>)} in code.
+
+      \item Internal \code{.diag2tT()} gains new option \code{drop0 = TRUE}
+      and hence now by default drops zero diagonal entries.  Consequently,
+      e.g., \code{as(<diagonalMatrix>, "CsparseMatrix")} now drops such
+      zeros, too.
     }
   }
   \subsection{Bug Fixes}{
