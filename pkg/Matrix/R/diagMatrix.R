@@ -213,13 +213,22 @@ setMethod("triu", "diagonalMatrix", function(x, k = 0, ...)
 
 
 
-.diag2tT <- function(from, uplo = "U", kind = .M.kind(from)) {
+.diag2tT <- function(from, uplo = "U", kind = .M.kind(from), drop0 = TRUE) {
     ## to triangular Tsparse
-    i <- if(from@diag == "U") integer(0) else seq_len(from@Dim[1]) - 1L
+    x <- from@x
+    i <- if(from@diag == "U")
+	      integer(0L)
+	  else if(drop0 & any0(x)) {
+	      ii <- which(isN0(x))
+	      x <- x[ii]
+	      ii - 1L
+	  }
+	  else
+	      seq_len(from@Dim[1]) - 1L
     new(paste0(kind, "tTMatrix"),
 	diag = from@diag, Dim = from@Dim, Dimnames = from@Dimnames,
 	uplo = uplo,
-	x = from@x, # <- ok for diag = "U" and "N" (!)
+	x = x, # <- ok for diag = "U" and "N" (!)
 	i = i, j = i)
 }
 
@@ -242,8 +251,8 @@ setMethod("triu", "diagonalMatrix", function(x, k = 0, ...)
 }
 
 ## diagonal -> triangular,  upper / lower depending on "partner" 'x':
-diag2tT.u <- function(d, x, kind = .M.kind(d))
-    .diag2tT(d, uplo = if(is(x,"triangularMatrix")) x@uplo else "U", kind)
+diag2tT.u <- function(d, x, kind = .M.kind(d), drop0 = TRUE)
+    .diag2tT(d, uplo = if(is(x,"triangularMatrix")) x@uplo else "U", kind, drop0)
 
 ## diagonal -> sparse {triangular OR symmetric} (upper / lower) depending on "partner":
 diag2Tsmart <- function(d, x, kind = .M.kind(d)) {
