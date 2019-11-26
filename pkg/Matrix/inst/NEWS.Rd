@@ -59,9 +59,6 @@
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item Fix last(?) \code{PROTECT()} warning found by \command{rchk} in
-      \file{src/dense.c}'s \code{ddense_skewpart()}.
-
       \item \code{rankMatrix(<sparse>, method="qr")} now returns \code{NA}
       (or \code{NaN}) instead of signalling an error in the case the sparse
       \eqn{Q R} decomposition gave \code{NA}s in \code{diag(R)}.
@@ -70,6 +67,16 @@
       \code{"CsparseMatrix"} silently made asymmetric dimnames symmetric,
       as did the \emph{internal} \code{forceCspSymmetric(*, dimNames)}
       which may be called from \code{forceSymmetric()}.
+    }
+  }
+}
+
+%
+\section{Changes in version 1.2-18 (2019-11-26, manually picked from svn)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item Fix last(?) \code{PROTECT()} warning found by \command{rchk} in
+      \file{src/dense.c}'s \code{ddense_skewpart()}.
 
       \item \code{as(m, "dgTMatrix")} does not lose \code{dimnames} anymore
       when \code{m} is a (traditional) \code{matrix}.
@@ -79,6 +86,12 @@
 
       \item \code{log(M, base)} (the 2-argument version of \code{log()})
       wrongly gave the result for \code{base = exp(1)}, i.e., the 1-argument default.
+
+      \item \file{test-tools-Matrix.R}: \code{Qidentical()} no longer assumes
+      \code{class(<matrix>)} to be of length 1.
+
+      \item \file{test-tools-1.R}: provide bug-fixed \code{canCoerce()} in
+      old R versions.
     }
   }
 }
