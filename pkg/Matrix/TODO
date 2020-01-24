@@ -6,7 +6,10 @@
  -->  see SM (3e6 x 1023) ex. in tests/Simple.R
 ** TODO Using "long vectors" (i.e. 64 bit indices vectors) in CHOLMOD --> cholmod_l_*()
 *** e.g. segfault in crossprod() Csparse_crossprod -> cholmod_att()
+** TODO 'symmetricMatrix' objects with *A*symmetric @Dimnames are formally "valid", but really are not,
+    see FIXME in symmetricMatrix_validate() in src/dsyMatrix.c ---> see TODO below: `forceCspSymmetric()`
 * *Urgent* in some sense ---------------------------------------------------
+** TODO `unique()` and `duplicated()` methods for "sparseVector" & "(sparse)Matrix"; have "*.matrix" S3 methods
 ** TODO (partly DONE via workaround "round up" to 100): print() / show() for small options(max.print=<n>):
     --> tests/Simple.R {'max.print'}
 ** TODO API change: Should  Matrix(diag(2), sparse=TRUE, doDiag=TRUE)  not rather give "ddiMatrix" ??

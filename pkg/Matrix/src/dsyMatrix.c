@@ -9,6 +9,11 @@ SEXP symmetricMatrix_validate(SEXP obj)
         return mkString(_("Matrix is not square"));
     if (isString(val = check_scalar_string(GET_SLOT(obj, Matrix_uploSym),
 					   "LU", "uplo"))) return val;
+    /* FIXME: Check dimnames {with a modular separate function}: Allow 1 of 2  to be NULL,
+     * -----  but otherwise may *NOT* differ !!
+     * currently,  I2 <- Diagonal(2) ; dimnames(I2) <- list(c("A","B"), c("x","y")); L2 <- !!I2
+     * produces such an "invalid" symmetric matrix:  L2[1:2,1:2] then fails
+     */
     return ScalarLogical(1);
 }
 
