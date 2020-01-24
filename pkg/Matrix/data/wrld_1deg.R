@@ -1,5 +1,4 @@
-stopifnot(requireNamespace("methods", quietly = TRUE),
-	  requireNamespace("Matrix" , quietly = TRUE))
+stopifnot(requireNamespace("Matrix" , quietly = TRUE)) # includes 'methods'
 
 wrld_1deg <-
     local({
