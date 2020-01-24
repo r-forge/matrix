@@ -353,6 +353,7 @@ SEXP Csparse_symmetric_to_general(SEXP x)
 			      symmetric_DimNames(GET_SLOT(x, Matrix_DimNamesSym)));
 }
 
+// Called from R's  forceCspSymmetric() ,  .gC2sym()
 SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo, SEXP sym_dmns)
 {
     int *adims = INTEGER(GET_SLOT(x, Matrix_DimSym)), n = adims[0];
@@ -374,6 +375,7 @@ SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo, SEXP sym_dmns)
        NA   : symmetrize if(...)
     */
     if(symDmns == FALSE) { } // *keep* asymmetric dimnames:  do nothing
+/// FIXME: TRUE: *should* do symmetric dimnames in any case, but does *NOT* --> symmetric_Dimnames()
     else if(symDmns == TRUE)
 	dns = symmetric_DimNames(dns);
     else // NA_LOGICAL (was 'FALSE' case) :
@@ -382,6 +384,7 @@ SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo, SEXP sym_dmns)
 	   !isNull(getAttrib(dns, R_NamesSymbol))) {
 	    /* symmetrize them if both are not NULL
 	     * or names(dimnames(.)) is asymmetric : */
+/// FIXME --- this is partly *MORE* than what 'TRUE' case above does !!!!
 	    dns = PROTECT(duplicate(dns));
 	    if(!equal_string_vectors(VECTOR_ELT(dns, 0),
 				     VECTOR_ELT(dns, 1))) {

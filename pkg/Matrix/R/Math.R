@@ -93,7 +93,7 @@ setMethod("Math", "ddenseMatrix", function(x)
 setMethod("log", "ddenseMatrix", function(x, base = exp(1))
 {
     if(is(x, "symmetricMatrix")) { ## -> result symmetric: keeps class
-        cld <- getClassDef(cl <- class(x))
+        cld <- getClassDef(class(x))
         if((po <- extends(cld, "dpoMatrix")) || extends(cld, "dppMatrix")) { # result is *not* pos.def!
             x <- as(x, if(po) "dsyMatrix" else "dspMatrix")
         }
