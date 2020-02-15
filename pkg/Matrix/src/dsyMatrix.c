@@ -29,7 +29,7 @@ double get_norm_sy(SEXP obj, const char *typstr)
     }
     return F77_CALL(dlansy)(typnm, uplo_P(obj),
 			    dims, REAL(GET_SLOT(obj, Matrix_xSym)),
-			    dims, work);
+			    dims, work FCONE FCONE);
 }
 
 SEXP dsyMatrix_norm(SEXP obj, SEXP type)
@@ -50,7 +50,7 @@ SEXP dsyMatrix_rcond(SEXP obj, SEXP type)
 		     INTEGER(GET_SLOT(trf, Matrix_permSym)),
 		     &anorm, &rcond,
 		     (double *) R_alloc(2*dims[0], sizeof(double)),
-		     (int *) R_alloc(dims[0], sizeof(int)), &info);
+		     (int *) R_alloc(dims[0], sizeof(int)), &info FCONE);
     return ScalarReal(rcond);
 }
 
@@ -67,7 +67,7 @@ SEXP dsyMatrix_solve(SEXP a)
 		     REAL(GET_SLOT(val, Matrix_xSym)), dims,
 		     INTEGER(GET_SLOT(trf, Matrix_permSym)),
 		     (double *) R_alloc((long) dims[0], sizeof(double)),
-		     &info);
+		     &info FCONE);
     UNPROTECT(1);
     return val;
 }
@@ -86,7 +86,7 @@ SEXP dsyMatrix_matrix_solve(SEXP a, SEXP b)
 		     REAL(GET_SLOT(trf, Matrix_xSym)), adims,
 		     INTEGER(GET_SLOT(trf, Matrix_permSym)),
 		     REAL(GET_SLOT(val, Matrix_xSym)),
-		     bdims, &info);
+		     bdims, &info FCONE);
     UNPROTECT(1);
     return val;
 }
@@ -125,7 +125,7 @@ SEXP dsyMatrix_matrix_mm(SEXP a, SEXP b, SEXP rtP)
     if (m >=1 && n >= 1)
 	F77_CALL(dsymm)(rt ? "R" :"L", uplo_P(a), &m, &n, &one,
 			REAL(GET_SLOT(a, Matrix_xSym)), adims, bcp,
-			&m, &zero, vx, &m);
+			&m, &zero, vx, &m FCONE FCONE);
     // add dimnames:
     int nd = rt ?
 	1 : // v <- b %*% a : rownames(v) == rownames(b)  are already there
@@ -153,15 +153,15 @@ SEXP dsyMatrix_trf(SEXP x)
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
     double *vx = REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, n * n));
     AZERO(vx, n * n);
-    F77_CALL(dlacpy)(uplo, &n, &n, REAL(GET_SLOT(x, Matrix_xSym)), &n, vx, &n);
+    F77_CALL(dlacpy)(uplo, &n, &n, REAL(GET_SLOT(x, Matrix_xSym)), &n, vx, &n FCONE);
     int *perm = INTEGER(ALLOC_SLOT(val, Matrix_permSym, INTSXP, n)),
 	info, lwork = -1;
     double tmp, *work;
-    F77_CALL(dsytrf)(uplo, &n, vx, &n, perm, &tmp, &lwork, &info);
+    F77_CALL(dsytrf)(uplo, &n, vx, &n, perm, &tmp, &lwork, &info FCONE);
     lwork = (int) tmp;
     C_or_Alloca_TO(work, lwork, double);
 
-    F77_CALL(dsytrf)(uplo, &n, vx, &n, perm, work, &lwork, &info);
+    F77_CALL(dsytrf)(uplo, &n, vx, &n, perm, work, &lwork, &info FCONE);
 
     if(lwork >= SMALL_4_Alloca) Free(work);
     if (info) error(_("Lapack routine dsytrf returned error code %d"), info);
@@ -202,14 +202,14 @@ SEXP matrix_trf(SEXP x, SEXP uploP)
     SET_SLOT(val, Matrix_DimSym, dimP);
     double *vx = REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, n * n)); // n x n result matrix
     AZERO(vx, n * n);
-    F77_CALL(dlacpy)(uplo, &n, &n, REAL(x), &n, vx, &n);
+    F77_CALL(dlacpy)(uplo, &n, &n, REAL(x), &n, vx, &n FCONE);
     int *perm = INTEGER(ALLOC_SLOT(val, Matrix_permSym, INTSXP, n)),
          info, lwork = -1;
     double tmp, *work;
-    F77_CALL(dsytrf)(uplo, &n, vx, &n, perm, &tmp, &lwork, &info);
+    F77_CALL(dsytrf)(uplo, &n, vx, &n, perm, &tmp, &lwork, &info FCONE);
     lwork = (int) tmp;
     C_or_Alloca_TO(work, lwork, double);
-    F77_CALL(dsytrf)(uplo, &n, vx, &n, perm, work, &lwork, &info);
+    F77_CALL(dsytrf)(uplo, &n, vx, &n, perm, work, &lwork, &info FCONE);
     if(lwork >= SMALL_4_Alloca) Free(work);
     if (info) error(_("Lapack routine dsytrf returned error code %d"), info);
     UNPROTECT(nprot);

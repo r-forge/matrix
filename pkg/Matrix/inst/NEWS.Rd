@@ -67,6 +67,9 @@
       \code{"CsparseMatrix"} silently made asymmetric dimnames symmetric,
       as did the \emph{internal} \code{forceCspSymmetric(*, dimNames)}
       which may be called from \code{forceSymmetric()}.
+
+      \item Adapt code to new Fortran requirements of passing length of
+      character arguments, thanks to Brian Ripley.
     }
   }
 }
