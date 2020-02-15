@@ -116,12 +116,12 @@ SEXP lsq_dense_Chol(SEXP X, SEXP y)
     if (k < 1 || p < 1) return allocMatrix(REALSXP, p, k);
     ans = PROTECT(allocMatrix(REALSXP, p, k));
     F77_CALL(dgemm)("T", "N", &p, &k, &n, &d_one, REAL(X), &n, REAL(y), &n,
-		    &d_zero, REAL(ans), &p);
+		    &d_zero, REAL(ans), &p FCONE FCONE);
     double *xpx = (double *) R_alloc(p * p, sizeof(double));
     F77_CALL(dsyrk)("U", "T", &p, &n, &d_one, REAL(X), &n, &d_zero,
-		    xpx, &p);
+		    xpx, &p FCONE FCONE);
     int info;
-    F77_CALL(dposv)("U", &p, &k, xpx, &p, REAL(ans), &p, &info);
+    F77_CALL(dposv)("U", &p, &k, xpx, &p, REAL(ans), &p, &info FCONE);
     if (info) error(_("Lapack routine dposv returned error code %d"), info);
     UNPROTECT(1);
     return ans;
@@ -148,14 +148,14 @@ SEXP lsq_dense_QR(SEXP X, SEXP y)
     SEXP ans = PROTECT(duplicate(y));
     int lwork = -1, info;
     F77_CALL(dgels)("N", &n, &p, &k, xvals, &n, REAL(ans), &n,
-		    &tmp, &lwork, &info);
+		    &tmp, &lwork, &info FCONE);
     if (info)
 	error(_("First call to Lapack routine dgels returned error code %d"),
 	      info);
     lwork = (int) tmp;
     double *work = (double *) R_alloc(lwork, sizeof(double));
     F77_CALL(dgels)("N", &n, &p, &k, xvals, &n, REAL(ans), &n,
-		    work, &lwork, &info);
+		    work, &lwork, &info FCONE);
     if (info)
 	error(_("Second call to Lapack routine dgels returned error code %d"),
 	      info);
@@ -217,7 +217,7 @@ SEXP lapack_qr(SEXP Xin, SEXP tl)
 	    error(_("Second call to dgeqrf returned error code %d"), info);
 	iwork = (int *) R_alloc(trsz, sizeof(int));
 	F77_CALL(dtrcon)("1", "U", "N", &rank, xpt, &n, &rcond,
-			 work, iwork, &info);
+			 work, iwork, &info FCONE FCONE FCONE);
 	if (info)
 	    error(_("Lapack routine dtrcon returned error code %d"), info);
 	while (rcond < tol) {	/* check diagonal elements */
@@ -238,7 +238,7 @@ SEXP lapack_qr(SEXP Xin, SEXP tl)
 	    rank--;
 	    // new  rcond := ... for reduced rank
 	    F77_CALL(dtrcon)("1", "U", "N", &rank, xpt, &n, &rcond,
-			     work, iwork, &info);
+			     work, iwork, &info FCONE FCONE FCONE);
 	    if (info)
 		error(_("Lapack routine dtrcon returned error code %d"), info);
 	}
