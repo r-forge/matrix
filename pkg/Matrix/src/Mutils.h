@@ -47,6 +47,10 @@ extern "C" {
 # endif
 #endif
 
+#ifndef FCONE // for R <= 3.6.1
+# define FCONE
+#endif
+
 #define Alloca(n, t)   (t *) alloca( (size_t) ( (n) * sizeof(t) ) )
 
 #define SMALL_4_Alloca 10000
