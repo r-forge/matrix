@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-0 (2019-11-07 r3316)}{
+\section{Changes in version 1.3-0 (2020-02-22 r3323)}{
   \subsection{New Features}{
     \itemize{
       \item \code{Matrix(*, doDiag=TRUE)} is now obeyed also in the sparse
