@@ -601,9 +601,14 @@ replSPvec <- function (x, i, value)
     if(length(iI0) && any(vN0 <- !v0[iI0])) {
 	## 2) add those that were structural 0 (where value != 0)
 	ij0 <- iI0[vN0]
-	x@i <- c(x@i, ii[ij0])
-	if(has.x)
-	    x@x <- c(x@x, if(v.sp) sp2vec(value[ij0], mode=typeof(x@x)) else value[ij0])
+	ii <- c(x@i, ii[ij0]) # new x@i, must be sorted:
+	iInc <- sort.list(ii)
+	x@i <- ii[iInc]
+	if(has.x) # new @x, sorted along '@i':
+	    x@x <- c(x@x, if(v.sp)
+			      sp2vec(value[ij0], mode=typeof(x@x))
+			  else value[ij0]
+		     )[iInc]
     }
     x
 }

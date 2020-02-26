@@ -1144,6 +1144,20 @@ for(vv in list(sv, sv.0))
         vv[ind] <- NA
 stopifnot(identical(sv , sv0), identical(sv., sv.0))
 
+## <sparseVector>[i] <- val -- failed to resort @i sometimes:  (R-forge Matrix bug #6659)
+y1 <- sparseVector(1:3, 13:15, 16)
+y2 <- sparseVector(1:6, c(5, 6, 7, 9, 14, 15), 16)
+i <- 1:16*12 # 12 24 36 ... 192
+x <- sparseVector(numeric(1), 1, length=200)
+x[i] <- y1     ; validObject(x[i]) # TRUE
+N <- x[i] + y2 ; validObject( N  ) # TRUE
+x[i] <- N ## <== bug was here ..
+validObject(x)
+## gave 'Error' invalid ..“dsparseVector”.. 'i' must be sorted strictly increasingly
+stopifnot(all.equal(x[i] ,  y1+y2, tolerance=0),
+		    x[i] == y1+y2)
+
+
 
 
 showProc.time()
