@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-0 (2020-02-22 r3323)}{
+\section{Changes in version 1.3-0 (2020-02-25 r3324)}{
   \subsection{New Features}{
     \itemize{
       \item \code{Matrix(*, doDiag=TRUE)} is now obeyed also in the sparse
@@ -70,6 +70,9 @@
 
       \item Adapt code to new Fortran requirements of passing length of
       character arguments, thanks to Brian Ripley.
+
+      \item (R-forge Matrix bug #6659, reported by Georg Kindermann):
+      \code{<sparseVector>[i] <- val} bug fixed.
     }
   }
 }
