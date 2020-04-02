@@ -174,7 +174,7 @@ SEXP dsyMatrix_trf(SEXP x)
 SEXP matrix_trf(SEXP x, SEXP uploP)
 {
     if (!(isReal(x) & isMatrix(x)))
-	error(_("x must be a real (numeric) matrix"));
+	error(_("x must be a \"double\" (numeric) matrix"));
     SEXP dimP = getAttrib(x, R_DimSymbol);
     int nprot = 1;
     if(TYPEOF(dimP) == INTSXP)
@@ -185,7 +185,7 @@ SEXP matrix_trf(SEXP x, SEXP uploP)
     int *dims = INTEGER(dimP),
 	n = dims[0];
     if(n != dims[1])
-	error(_("matrix_trf(x, *): matrix is not square!"));
+	error(_("matrix_trf(x, *): matrix is not square"));
     /* In principle, we "should" check that the matrix is symmetric,
        OTOH, we only use its lower or upper (depending on 'uploP') triangular part */
     if(uploP == R_NilValue) {
