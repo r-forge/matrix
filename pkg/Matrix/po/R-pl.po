@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-2-2\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
-"POT-Creation-Date: 2019-04-02 17:10\n"
+"POT-Creation-Date: 2020-04-02 16:19\n"
 "PO-Revision-Date: 2014-03-27 14:47+0100\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
@@ -1201,6 +1201,12 @@ msgstr "niezgodne wymiary macierzy w %s"
 #, fuzzy
 msgid "'boolArith = %d' not yet implemented"
 msgstr "rodzaj %s nie jest jeszcze zaimplementowany"
+
+msgid "qr2rankMatrix(.): QR with only %d out of %d finite diag(R) entries"
+msgstr ""
+
+msgid "qr2rankMatrix(.): QR has negative diag(R) entries"
+msgstr ""
 
 msgid ""
 "rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n"

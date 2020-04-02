@@ -14,7 +14,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-3\n"
-"POT-Creation-Date: 2019-04-02 17:10\n"
+"POT-Creation-Date: 2020-04-02 16:19\n"
 "PO-Revision-Date: 2015-07-15 17:14-0600\n"
 "Last-Translator:Chel Hee Lee  <chl948@mail.usask.ca>\n"
 "Language-Team: Chel Hee Lee  <chl948@mail.usask.ca>\n"
@@ -745,6 +745,12 @@ msgstr "non-conformable arguments"
 #, fuzzy
 msgid "'boolArith = %d' not yet implemented"
 msgstr "아직 구현되지 않은 종류 %s입니다."
+
+msgid "qr2rankMatrix(.): QR with only %d out of %d finite diag(R) entries"
+msgstr ""
+
+msgid "qr2rankMatrix(.): QR has negative diag(R) entries"
+msgstr ""
 
 msgid ""
 "rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n"
