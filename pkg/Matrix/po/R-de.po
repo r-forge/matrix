@@ -1,12 +1,14 @@
 # Translation of R-matrix to German
-# Copyright (C) 2001-2019 The R Foundation
+# Copyright (C) 2001-2020 The R Foundation
 # This file is distributed under the same license as the matrix package.
+# Chris Leick <c.leick@vollbio.de>, 2009.
+# Detlef Steuer <steuer@hsu-hh.de>, 2012-2020.
 msgid ""
 msgstr ""
-"Project-Id-Version: R 3.6.0 / matrix 1.2-17\n"
+"Project-Id-Version: R 4.0.0 / matrix 1.3-0\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
-"POT-Creation-Date: 2019-04-02 17:10\n"
-"PO-Revision-Date: 2019-04-02 13:04+0200\n"
+"POT-Creation-Date: 2020-04-02 16:19\n"
+"PO-Revision-Date: 2020-04-01 16:01+0200\n"
 "Last-Translator: Detlef Steuer <steuer@hsu-hh.de>\n"
 "Language-Team: R-Core <r-core@r-project.org>\n"
 "Language: de\n"
@@ -100,7 +102,7 @@ msgid "update must be TRUE/FALSE or '+' or '-'"
 msgstr "update muss entweder TRUE/FALSE, '+' oder '-' sein"
 
 msgid "cannot coerce NA values to pattern \"ngCMatrix\""
-msgstr "'NAs können nicht in Gestalt einer \"ngCMatrix\" umgewandelt werden"
+msgstr "'NA's können nicht in \"ngCMatrix\" umgewandelt werden"
 
 msgid "Matrix-internal error in <CsparseM>[i,,d]; please report"
 msgstr "Matrixinterner Fehler in <CsparseM>[i,,d]. Bitte berichten"
@@ -195,15 +197,15 @@ msgid ""
 "as.matrix(<Matrix>) is deprecated (to become a no-op in the future).\n"
 "Use  as(x, \"matrix\")  or .asmatrix(x) instead."
 msgstr ""
-"as.matrix(<Matrix>) ist veraltet (wird zukünftig no-op).\n"
-"Bitte stattdessen as(x, \"matrix\") oder .asmatrix(x) nutzen."
+"as.matrix(<Matrix>) is veraltet (und zukünftig no-op).\n"
+"Bitte as(x, \"matrix\") oder .asmatrix() stattdessen nutzen."
 
 msgid ""
 "as.array(<Matrix>) is deprecated. Use  as(x, \"matrix\")  or .asmatrix(x) "
 "instead."
 msgstr ""
-"as.array(<Matrix>) ist veraltet. Bitte as(x, \"matrix\") oder .asmatrix(x)\n"
-"nutzen."
+"as.array(<Matrix>) ist veraltet. Bitte stattdessen as(x, \"matrix\") oder ."
+"asmatrix(x) nutzen"
 
 msgid "trimmed mean of 'sparseVector' -- suboptimally using as.numeric(.)"
 msgstr ""
@@ -272,8 +274,7 @@ msgid ""
 "please report!"
 msgstr ""
 "m[ <ij-matrix> ]: ineffiziente Indexierung einzelner Elemente - sollte nicht "
-"passieren\n"
-"bitte melden!"
+"passieren, bitte rückmelden!"
 
 msgid "nargs() = %d.  Extraneous illegal arguments inside '[ .. ]' (i.2col)?"
 msgstr ""
@@ -661,7 +662,7 @@ msgid "kronecker method must use default 'FUN'"
 msgstr "kronecker-Methode muss Standard 'FUN' benutzen"
 
 msgid "resulting matrix dimension would be too large"
-msgstr "Dimension der Ergebnismatrix wäre zu groß"
+msgstr "Dimenson der Ergebnismatrix wäre zu groß"
 
 msgid "replacing \"indMatrix\" entries is not allowed, as rarely sensible"
 msgstr ""
@@ -680,7 +681,7 @@ msgid "temporarily disabled"
 msgstr "zeitweise ausgeschaltet"
 
 msgid "cannot coerce NA values to pattern \"ntCMatrix\""
-msgstr "'NAs können nicht in Gestalt einer \"ntCMatrix\" umgewandelt werden"
+msgstr "'NA's können nicht in \"ntCMatrix\" umgewandelt werden"
 
 msgid "coercion to \"pMatrix\" only works from integer numeric"
 msgstr ""
@@ -698,6 +699,12 @@ msgstr "nicht passende Argumente"
 
 msgid "'boolArith = %d' not yet implemented"
 msgstr "'boolArith = %d' noch nicht implementiert"
+
+msgid "qr2rankMatrix(.): QR with only %d out of %d finite diag(R) entries"
+msgstr "qr2rankMatrix(.): QR Zerlegung mit nur %d von %d endlichen diag(R) Werten"
+
+msgid "qr2rankMatrix(.): QR has negative diag(R) entries"
+msgstr "qr2rankMatrix(.): QR enthält negative diag(R) Werte"
 
 msgid ""
 "rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n"
@@ -771,17 +778,14 @@ msgstr "uniDiag=TRUE, aber nicht alle Einträge der Diagonalen als 1 kodiert"
 msgid "in show(); maybe adjust 'options(max.print= *, width = *)'"
 msgstr "in show(); evtl. 'options(max.print= *, width= *)' anpassen"
 
-#, fuzzy
 msgid "suppressing %d columns and %d rows"
-msgstr "unterdrücke Spalten und Zeilen"
+msgstr "%d Spalten und %d Zeilen werden unterdrückt"
 
-#, fuzzy
 msgid "suppressing %d rows"
-msgstr "unterdrücke Zeilen"
+msgstr "%d Zeilen werden unterdrückt"
 
-#, fuzzy
 msgid "suppressing %d columns"
-msgstr "unterdrücke Spalten"
+msgstr "%d Spalten werden unterdrückt"
 
 msgid "logic programming error in printSpMatrix2(), please report"
 msgstr "logischer Programmierfehler in printSpMatrix2(), bitte berichten"
@@ -800,14 +804,14 @@ msgstr "Anzahl von Nicht-Nullen ist kleiner als 'nnz' wegen doppelter (i,j)s"
 
 msgid "a sparseMatrix should rarely be centered: will not be sparse anymore"
 msgstr ""
-"eine sparseMatrix sollte nicht zentriert werden: Sie ist dann nicht mehr "
-"sparse."
+"eine schwach besetze Matrix sollte kaum je zentriert werden: sie ist dann "
+"nicht mehr schwach besetzt"
 
 msgid "length of 'center' must equal the number of columns of 'x'"
-msgstr "Länge von 'center' muss gleich der Anzahl der Spalten von 'x' sein"
+msgstr "Länge von 'center' muss der Spaltenzahl von 'x' entsprechen"
 
 msgid "length of 'scale' must equal the number of columns of 'x'"
-msgstr "Länge von 'scale' muss gleich der Anzahl der Spalten von 'x' sein"
+msgstr "Länge von 'scale' muss der Spaltenzahl von 'x' entsprechen"
 
 msgid ""
 "qr.R(<sparse>) may differ from qr.R(<dense>) because of permutations.  "
