@@ -147,9 +147,11 @@ local({
     str(BB)
     print(st)
     if(Sys.info()[["sysname"]] == "Linux") {
-        mips <- as.numeric(sub(".*: *", '',
+        mips <- try(as.numeric(sub(".*: *", '',
                                grep("bogomips", readLines("/proc/cpuinfo"),
-                                    value=TRUE)[[1]]))
+                                    ignore.case=TRUE, # e.g. ARM : "BogoMIPS"
+                                    value=TRUE)[[1]])))
+        if(is.numeric(mips) && all(mips) > 0)
         stopifnot(st[1] < 1000/mips)# ensure there was no gross inefficiency
     }
 })
