@@ -328,7 +328,7 @@ model.spmatrix <- function(trms, mf, transpose=FALSE,
 	cat(sprintf("model.spm..(): (n=%d, nVar=%d (m=%d), nTrm=%d)\n",
 		    n, nVar,m, nTrm))
     if(m > nVar) mf <- mf[seq_len(nVar)]
-    stopifnot(fnames == names(mf))
+    stopifnot(fnames == names(mf), allow.logical0 = TRUE)
     noVar <- nVar == 0
     ##>> this seems wrong; we use  1:nVar for indexing mf[] below ..
     ##>> if(noVar) nVar <- 1L # (as in ~/R/D/r-devel/R/src/main/model.c)

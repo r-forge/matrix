@@ -314,7 +314,8 @@ for(gr in getGroupMembers("Ops")) {
         cat(".")
         validObject(r1 <- do.call(f, list(M,x)))
         validObject(r2 <- do.call(f, list(x,M)))
-        stopifnot(dim(r1) == dim(M), dim(r2) == dim(M))
+        stopifnot(dim(r1) == dim(M), dim(r2) == dim(M),
+                  allow.logical0 = TRUE)
       }
       ## M  o  0-length  === M :
       validObject(M0. <- do.call(f, list(M, numeric())))
