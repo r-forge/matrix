@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-0 (2020-02-25 r3324)}{
+\section{Changes in version 1.3-0 (2020-04-21 r3330)}{
   \subsection{New Features}{
     \itemize{
       \item \code{Matrix(*, doDiag=TRUE)} is now obeyed also in the sparse
@@ -55,6 +55,9 @@
       and hence now by default drops zero diagonal entries.  Consequently,
       e.g., \code{as(<diagonalMatrix>, "CsparseMatrix")} now drops such
       zeros, too.
+
+      \item Updated the crucial underlying C libraries from SuiteSparse,
+      from 4.2.1 to 5.7.1 (from 2020-02-20), visible in \code{.SuiteSparse_version()} .
     }
   }
   \subsection{Bug Fixes}{
