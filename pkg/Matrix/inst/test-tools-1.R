@@ -274,8 +274,9 @@ Sys.memGB <- function(kind = "MemTotal") {## "MemFree" is typically more relevan
 ##' @return a list with named components where \code{obj} had slots
 ##' @author Martin Maechler
 S4_2list <- function(obj) {
-   sn <- slotNames(obj)
-   structure(lapply(sn, slot, object = obj), .Names = sn)
+   sn <- .slotNames(obj)
+   ## structure(lapply(sn, slot, object = obj), .Names = sn)
+   `names<-`(lapply(sn, slot, object = obj), sn)
 }
 
 assert.EQ <- function(target, current, tol = if(showOnly) 0 else 1e-15,
