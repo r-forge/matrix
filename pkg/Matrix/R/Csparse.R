@@ -69,12 +69,15 @@ setMethod("as.vector", "dsCMatrix",
 ## storage so symmetric classes are ok for conversion to matrix.
 ## unit triangular needs special handling
 ##' exported
-.dxC2mat <- function(from, chkUdiag=TRUE) .Call(Csparse_to_matrix, from, chkUdiag, NA)
+.dxC2mat <- function(from, chkUdiag=TRUE)   .Call(Csparse_to_matrix, from, chkUdiag, NA)
 setAs("dgCMatrix", "matrix", function(from) .Call(Csparse_to_matrix, from, FALSE, FALSE))
 setAs("dsCMatrix", "matrix", function(from) .Call(Csparse_to_matrix, from, FALSE, TRUE))
 setAs("dtCMatrix", "matrix", function(from) .Call(Csparse_to_matrix, from, TRUE,  FALSE))
 ## NB: Would *not* be ok for l*Matrix or n*Matrix,
 ## --------- as cholmod coerces to "REAL" aka "double"
+
+..m2dgC <- function(from) .Call(matrix_to_Csparse, from, "dgCMatrix")
+..m2lgC <- function(from) .Call(matrix_to_Csparse, from, "lgCMatrix")
 
 .m2dgC <- function(from) {
     if(!is.double(from)) storage.mode(from) <- "double"
@@ -94,10 +97,10 @@ setAs("matrix", "lgCMatrix", .m2lgC)
 setAs("matrix", "ngCMatrix", .m2ngC)
 
 setAs("matrix", "CsparseMatrix", ## => choosing 'l*' or 'dgCMatrix' (no tri-, sym-, diag-):
-      function(from) (if(is.logical(from)) .m2lgC else .m2dgC)(from))
+      function(from) (if(is.logical(from)) ..m2lgC else ..m2dgC)(from))
 
 setAs("numeric", "CsparseMatrix",
-      function(from) (if(is.logical(from)) .m2lgC else .m2dgC)(as.matrix.default(from)))
+      function(from) (if(is.logical(from)) ..m2lgC else ..m2dgC)(as.matrix.default(from)))
 
 
 setAs("CsparseMatrix", "symmetricMatrix",

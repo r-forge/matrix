@@ -14,7 +14,8 @@
 \usage{
 sparseMatrix(i = ep, j = ep, p, x, dims, dimnames,
              symmetric = FALSE, triangular = FALSE, index1 = TRUE,
-             giveCsparse = TRUE, check = TRUE, use.last.ij = FALSE)
+             repr = "C", giveCsparse = (repr == "C"),
+             check = TRUE, use.last.ij = FALSE)
 }
 \arguments{
   \item{i,j}{integer vectors of the same length specifying the locations
@@ -51,10 +52,17 @@ sparseMatrix(i = ep, j = ep, p, x, dims, dimnames,
     in \R.  That is, counting of rows and columns starts at 1.  If
     \code{FALSE} the index vectors are 0-based so counting of rows and
     columns starts at 0; this corresponds to the internal representation.}
-  \item{giveCsparse}{logical indicating if the result should be a
+  \item{repr}{\code{\link{character}} string, one of \code{"C"},
+    \code{"T"}, or \code{"R"}, specifying the sparse \emph{repr}esentation to
+    be used for the result, i.e., one from the super classes
+    \code{\linkS4class{CsparseMatrix}}, \code{\linkS4class{TsparseMatrix}}, or
+    \code{\linkS4class{RsparseMatrix}}.}
+  \item{giveCsparse}{(\bold{deprecated}, replaced with \code{repr}):
+    logical indicating if the result should be a
     \code{\linkS4class{CsparseMatrix}} or a
-    \code{\linkS4class{TsparseMatrix}}.  The default, \code{TRUE} is
-    very often more efficient subsequently, but not always.}
+    \code{\linkS4class{TsparseMatrix}}, where the default was \code{TRUE},
+    and now is determined from \code{repr}; very often Csparse matrices are
+    more efficient subsequently, but not always.}
   \item{check}{logical indicating if a validity check is performed; do
     not set to \code{FALSE} unless you know what you're doing!}
   \item{use.last.ij}{logical indicating if in the case of repeated,

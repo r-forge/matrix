@@ -94,7 +94,9 @@ fac2Sparse <- function(from, to = c("d","i","l","n","z"),
 sparse.model.matrix <-
     function(object, data = environment(object), contrasts.arg = NULL,
 	     xlev = NULL, transpose = FALSE,
-	     drop.unused.levels = FALSE, row.names=TRUE, verbose=FALSE, ...)
+	     drop.unused.levels = FALSE, row.names=TRUE, verbose=FALSE
+           , sep = ""
+           , ...)
 {
     t <- if(missing(data)) terms(object) else terms(object, data=data)
     if (is.null(attr(data, "terms")))
@@ -150,7 +152,7 @@ sparse.model.matrix <-
     ans <- model.spmatrix(t, data, transpose=transpose,
     ##     ==============
 			  drop.unused.levels=drop.unused.levels,
-			  row.names=row.names, verbose=verbose)
+			  row.names=row.names, sep=sep, verbose=verbose)
     ## </Sparse>
     attr(ans, "contrasts") <-
 	lapply(data[isF], function(x) attr(x, "contrasts"))
@@ -296,7 +298,7 @@ is.model.frame <- function(x)
 ##' @return sparse matrix (class "dgCMatrix")
 ##' @author Martin Maechler
 model.spmatrix <- function(trms, mf, transpose=FALSE,
-			   drop.unused.levels = FALSE, row.names=TRUE, verbose=FALSE)
+			   drop.unused.levels = FALSE, row.names=TRUE, sep="", verbose=FALSE)
 {
     ## Author: Martin Maechler, Date:  7 Jul 2009
 
@@ -370,10 +372,8 @@ model.spmatrix <- function(trms, mf, transpose=FALSE,
 		       function(s) {
 			   if(is.null(s)) return(s)
 			   ## else
-			   rownames(s) <-
-			       paste0(nam, if(is.null(rownames(s)))
-				      ## for some contr.*(), have lost rownames; hmm..
-				      seq_len(nrow(s)) else rownames(s))
+			   rownames(s) <- ## for some contr.*(), have lost rownames; hmm..
+			       paste(nam, rownames(s) %||% seq_len(nrow(s)), sep=sep)
 			   s
 		       })
 	} else { ## continuous variable --> "matrix" - for all of them
@@ -381,7 +381,7 @@ model.spmatrix <- function(trms, mf, transpose=FALSE,
 		class(f) <- if(length(cl) > 1L) cl[!iA]
 	    nr <- if(is.matrix(f)) nrow(f <- t(f)) else (dim(f) <- c(1L, length(f)))[1]
 	    if(is.null(rownames(f)))
-		rownames(f) <- if(nr == 1) nam else paste0(nam, seq_len(nr))
+		rownames(f) <- if(nr == 1) nam else paste(nam, seq_len(nr), sep=sep)
 	    mf[[i]] <- f
 	}
     }

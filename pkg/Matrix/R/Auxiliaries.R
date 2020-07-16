@@ -1127,7 +1127,7 @@ if(FALSE)
     NA_character_
 }
 
-.sp.class <- function(x) { ## find and return the "sparseness class"
+.sp.class <- function(x) { ## find and return the "sparseness class" (aka "representation")
     x <- if(!is.character(x)) MatrixClass(class(x)) else MatrixClass(x)
     if(any((ch <- substr(x,3,3)) == c("C","T","R")))
         return(paste0(ch, "sparseMatrix"))

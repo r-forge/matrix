@@ -273,7 +273,8 @@ Sys.memGB <- function(kind = "MemTotal") {## "MemFree" is typically more relevan
 ##' @param obj an R object with a formal class (aka "S4")
 ##' @return a list with named components where \code{obj} had slots
 ##' @author Martin Maechler
-S4_2list <- function(obj) {
+S4_2list <- # <- "old" name (I like less: too hard to remember)
+as.listS4 <- function(obj) {
    sn <- .slotNames(obj)
    ## structure(lapply(sn, slot, object = obj), .Names = sn)
    `names<-`(lapply(sn, slot, object = obj), sn)
