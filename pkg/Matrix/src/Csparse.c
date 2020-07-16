@@ -1297,7 +1297,7 @@ SEXP create_Csparse(char* cls, int* i, int* j, int* p, int np,
  * Create a Csparse matrix object from a traditional R matrix
  *
  * @param x   traditional R matrix (numeric, logical, ...)
- * @param cls class (a string)
+ * @param cls class (a string), currently must be  "..CMatrix"
  *
  * @return an SEXP of a class inheriting from CsparseMatrix.
  */

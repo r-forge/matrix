@@ -15,7 +15,7 @@
 sparse.model.matrix(object, data = environment(object),
 		    contrasts.arg = NULL, xlev = NULL, transpose = FALSE,
 		    drop.unused.levels = FALSE, row.names = TRUE,
-		    verbose = FALSE, \dots)
+		    sep = "", verbose = FALSE, \dots)
 
 fac2sparse(from, to = c("d", "i", "l", "n", "z"),
 	   drop.unused.levels = TRUE, giveCsparse = TRUE)
@@ -47,6 +47,8 @@ fac2Sparse(from, to = c("d", "i", "l", "n", "z"),
     \code{FALSE}, 2010-07, for compatibility with \R's standard (dense)
     \code{\link{model.matrix}()}.}
   \item{row.names}{logical indicating if row names should be used.}
+  \item{sep}{\code{\link{character}} string passed to \code{\link{paste}()}
+    when constructing column names from the variable name and its levels.}
   \item{verbose}{logical or integer indicating if (and how much)
     progress output should be printed.}
   \item{\dots}{further arguments passed to or from other methods.}

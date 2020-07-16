@@ -36,7 +36,8 @@ spMatrix <- function(nrow, ncol,
 
 sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames,
                          symmetric = FALSE, triangular = FALSE, index1 = TRUE,
-                         giveCsparse = TRUE, check = TRUE, use.last.ij = FALSE)
+                         repr = "C", giveCsparse = (repr == "C"),
+                         check = TRUE, use.last.ij = FALSE)
 {
   ## Purpose: user-level substitute for most  new(<sparseMatrix>, ..) calls
   ## Author: Douglas Bates, Date: 12 Jan 2009, based on Martin's version
@@ -47,6 +48,12 @@ sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames,
         if((lp <- length(p)) < 1 || p[1] != 0 || any((dp <- p[-1] - p[-lp]) < 0))
             stop("'p' must be a non-decreasing vector (0, ...)")
         ep <- rep.int(seq_along(dp), dp)
+    }
+    stopifnot(length(repr) == 1L, repr %in% c("C", "T", "R"))
+    ## NB: up to 2020-05, only had giveCsparse=TRUE  --> "C" or "T" -- remain back-compatible:
+    if(missing(repr) && !giveCsparse) {
+	warning("'giveCsparse' has been deprecated; setting 'repr = \"T\"' for you")
+	repr <- "T"
     }
     ## i and j are now both defined (via default = ep).  Make them 1-based indices.
     i1 <- as.logical(index1)[1]
@@ -110,7 +117,10 @@ sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames,
     if(!missing(dimnames))
 	r@Dimnames <- .fixupDimnames(dimnames)
     if(check) validObject(r)
-    if(giveCsparse) as(r, "CsparseMatrix") else r
+    switch(repr,
+           "C" = as(r, "CsparseMatrix"),
+           "T" = r # Tsparse,
+           "R" = as(r, "RsparseMatrix"))
 }
 
 ## "graph" coercions -- this needs the graph package which is currently
