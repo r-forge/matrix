@@ -119,7 +119,7 @@ sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames,
     if(check) validObject(r)
     switch(repr,
            "C" = as(r, "CsparseMatrix"),
-           "T" = r # Tsparse,
+           "T" =    r,# TsparseMatrix
            "R" = as(r, "RsparseMatrix"))
 }
 
