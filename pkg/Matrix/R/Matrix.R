@@ -45,9 +45,9 @@ Use  as(x, \"matrix\")  or .asmatrix(x) instead.")
 }
 
 ## should propagate to all subclasses:
-setMethod("as.matrix", signature(x = "Matrix"), function(x) as.matrix.Matrix(x))
+setMethod("as.matrix", signature(x = "Matrix"), function(x, ...) as(x, "matrix"))
 ## for 'Matrix' objects, as.array() should be equivalent:
-setMethod("as.array",  signature(x = "Matrix"), function(x)  as.array.Matrix(x))
+setMethod("as.array",  signature(x = "Matrix"), function(x, ...) as(x, "matrix"))
 
 ## head and tail apply to all Matrix objects for which subscripting is allowed:
 setMethod("head", signature(x = "Matrix"), utils::head.matrix)

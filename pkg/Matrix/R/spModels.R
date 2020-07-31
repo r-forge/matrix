@@ -24,7 +24,7 @@ fac2sparse <- function(from, to = c("d","i","l","n","z"), drop.unused.levels = F
 
 ## This version can deal with NA's [maybe slightly less efficient (how much?)] :
 fac2sparse <- function(from, to = c("d","i","l","n","z"),
-		       drop.unused.levels = TRUE, giveCsparse = TRUE)
+		       drop.unused.levels = TRUE, repr = c("C","T","R"), giveCsparse)
 {
     ## factor(-like) --> sparseMatrix {also works for integer, character}
     fact <- if (drop.unused.levels) factor(from) else as.factor(from)
@@ -40,7 +40,14 @@ fac2sparse <- function(from, to = c("d","i","l","n","z"),
     T <- do.call(new, c(list(Class = paste0(to, "gTMatrix"),
                              Dim = c(length(levs), n),
                              Dimnames = list(levs, names(fact))), df))
-    if(giveCsparse) .Call(Tsparse_to_Csparse, T, FALSE) else T
+    ## silent, back compatible (not yet warning about 'giveCsparse' deprecation):
+    repr <- if(missing(repr) && !missing(giveCsparse))
+		if(giveCsparse) "C" else "T"
+	    else match.arg(repr)
+    switch(repr,
+	   "C" = .Call(Tsparse_to_Csparse, T, FALSE),
+	   "T" =    T,# TsparseMatrix
+	   "R" = as(T, "RsparseMatrix"))
 }
 
 setAs("factor", "sparseMatrix", function(from) fac2sparse(from, to = "d"))
@@ -60,13 +67,13 @@ setAs("factor", "sparseMatrix", function(from) fac2sparse(from, to = "d"))
 ##' @return a list of length two, each with the corresponding t(model matrix),
 ##'	when the corresponding factorPatt12 is true.
 fac2Sparse <- function(from, to = c("d","i","l","n","z"),
-		       drop.unused.levels = TRUE, giveCsparse = TRUE,
+		       drop.unused.levels = TRUE, repr = c("C","T","R"), giveCsparse,
 		       factorPatt12, contrasts.arg = NULL)
 {
     stopifnot(is.logical(factorPatt12), length(factorPatt12) == 2)
     if(any(factorPatt12))
 	m <- fac2sparse(from, to=to, drop.unused.levels=drop.unused.levels,
-			giveCsparse=giveCsparse)
+                        repr=repr, giveCsparse=giveCsparse)
     ##
     ## code '2' : keep dummy, i.e. no contrasts :
     ans <- list(NULL, if(factorPatt12[2]) m)
@@ -94,9 +101,9 @@ fac2Sparse <- function(from, to = c("d","i","l","n","z"),
 sparse.model.matrix <-
     function(object, data = environment(object), contrasts.arg = NULL,
 	     xlev = NULL, transpose = FALSE,
-	     drop.unused.levels = FALSE, row.names=TRUE, verbose=FALSE
-           , sep = ""
-           , ...)
+	     drop.unused.levels = FALSE, row.names = TRUE
+	   , sep = ""
+	   , verbose = FALSE, ...)
 {
     t <- if(missing(data)) terms(object) else terms(object, data=data)
     if (is.null(attr(data, "terms")))

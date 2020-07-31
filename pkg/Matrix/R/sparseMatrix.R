@@ -54,7 +54,8 @@ sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames,
     if(missing(repr) && !giveCsparse) {
 	warning("'giveCsparse' has been deprecated; setting 'repr = \"T\"' for you")
 	repr <- "T"
-    }
+    } else if(!missing(repr) && !missing(giveCsparse))
+	warning("'giveCsparse' has been deprecated; will use 'repr' instead")
     ## i and j are now both defined (via default = ep).  Make them 1-based indices.
     i1 <- as.logical(index1)[1]
     i <- as.integer(i + !(m.i || i1))
@@ -118,9 +119,10 @@ sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames,
 	r@Dimnames <- .fixupDimnames(dimnames)
     if(check) validObject(r)
     switch(repr,
-           "C" = as(r, "CsparseMatrix"),
-           "T" =    r,# TsparseMatrix
-           "R" = as(r, "RsparseMatrix"))
+	   "C" = as(r, "CsparseMatrix"),
+	   "T" =    r,# TsparseMatrix
+	   "R" = as(r, "RsparseMatrix"),
+	   stop("invalid 'repr'; must be \"C\", \"T\", or \"R\""))
 }
 
 ## "graph" coercions -- this needs the graph package which is currently

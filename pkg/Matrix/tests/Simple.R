@@ -625,7 +625,7 @@ stopifnot(all(ina == is.na(cu)),
 set.seed(7)
 xx <- rpois(10, 50)
 Samp <- function(n,size) sample(n, size, replace=TRUE)
-Tn <- sparseMatrix(i=Samp(8, 50), j=Samp(9,50), x=xx, giveCsparse=FALSE)
+Tn <- sparseMatrix(i=Samp(8, 50), j=Samp(9,50), x=xx, repr = "T")
 Tn
 stopifnot(xx == Tn@x,
 	  max(xx) < max(Tn), 0 == min(Tn),

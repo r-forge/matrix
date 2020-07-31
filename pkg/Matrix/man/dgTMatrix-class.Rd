@@ -22,7 +22,7 @@
   Objects can be created by calls of the form \code{new("dgTMatrix",
     ...)}, but more typically via \code{as(*, "dgTMatrix")},
   \code{\link{spMatrix}()}, or
-  \code{\link{sparseMatrix}(*, giveCsparse=FALSE)}.
+  \code{\link{sparseMatrix}(*, repr = "T")}.
 }
 \section{Slots}{
   \describe{
