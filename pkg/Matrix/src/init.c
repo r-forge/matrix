@@ -1,4 +1,5 @@
-#include "Mutils.h"
+#include <Rinternals.h>
+#include <R_ext/Lapack.h>
 #include "abIndex.h"
 #include "chm_common.h"
 #include "CHMfactor.h"

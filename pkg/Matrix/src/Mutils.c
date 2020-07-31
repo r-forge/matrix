@@ -1,7 +1,7 @@
 #include <limits.h>
 
-#include "Mutils.h"
 #include <R_ext/Lapack.h>
+#include "Mutils.h"
 
 // La_norm_type() & La_rcond_type()  have been in R_ext/Lapack.h
 //  but have still not been available to package writers ...
