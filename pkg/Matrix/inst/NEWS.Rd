@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-0 (2020-07-16 r3335)}{
+\section{Changes in version 1.3-0 (2020-07-21 r3337)}{
   \subsection{New Features}{
     \itemize{
       \item \code{Matrix(*, doDiag=TRUE)} is now obeyed also in the sparse
@@ -62,8 +62,10 @@
       \item \code{sparseMatrix()} gets new argument \code{repr = "C"},
       superseding the (now deprecated) \code{giveCsparse = TRUE}.  Allows
       to return \code{"RsparseMatrix"} matrices.
-      % >>>> FIXME: many other functions with 'giveCsparse = TRUE'  argument,
-      % >>>> -----  should get 'repr = "C",  giveCsparse = (repr == "C")'  etc !
+
+      Similarly, \code{rsparsematrix()}, \code{fac2sparse()} and \code{fac2Sparse()}
+      get the new \code{repr} argument and their \code{giveCsparse} is
+      deprecated, sometimes only informally for now.% no deprecation warning yet
 
       \item \code{sparse.model.matrix()} gets option \code{sep = ""}, with,
       e.g., \code{sep = ":"} allowing to get easier column names; from

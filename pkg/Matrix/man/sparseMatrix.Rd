@@ -71,7 +71,7 @@ sparseMatrix(i = ep, j = ep, p, x, dims, dimnames,
     \code{"\linkS4class{TsparseMatrix}"} definition.}
 }
 \value{
-  A sparse matrix, by default (see \code{giveCsparse}) in compressed,
+  A sparse matrix, by default (from \code{repr = "C"}) in compressed,
   column-oriented form, as an \R object inheriting from both
   \code{\linkS4class{CsparseMatrix}} and \code{\linkS4class{generalMatrix}}.
 }
@@ -104,8 +104,10 @@ sparseMatrix(i = ep, j = ep, p, x, dims, dimnames,
   \code{"\linkS4class{TsparseMatrix}"} class, unless \code{use.last.ij}
   is set to true.
   %%
-  By default, when \code{giveCsparse} is true, the \code{\linkS4class{CsparseMatrix}}
-  derived from this triplet form is returned.
+  By default, when \code{repr = "C"}, the \code{\linkS4class{CsparseMatrix}}
+  derived from this triplet form is returned, where \code{repr = "R"} now
+  allows to directly get an \code{\linkS4class{RsparseMatrix}} and
+  \code{repr = "T"} leaves the result as \code{\linkS4class{TsparseMatrix}}.
 
   The reason for returning a \code{\linkS4class{CsparseMatrix}} object
   instead of the triplet format by default is that the compressed column

@@ -333,7 +333,7 @@ for(gr in getGroupMembers("Ops")) {
       sv <- as(x, "sparseVector")
       cat("s.")
       validObject(r3 <- do.call(f, list(M, sv)))
-      stopifnot(dim(r3) == dim(M))
+      stopifnot(identical(dim(r3), dim(M)))
       if(doExtras && is(M, "Matrix")) { ## M o <Matrix>
         d <- dim(M)
         ds <- sum(d * d.sig)         # signature .. match with all other sigs

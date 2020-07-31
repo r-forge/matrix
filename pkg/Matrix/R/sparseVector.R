@@ -854,10 +854,25 @@ ind4toeplitz <- function(n) {
     abs(as.vector(col(A) - row(A))) + 1L
 }
 
-.toeplitz.spV <-  function(x, symmetric=TRUE, giveCsparse=TRUE) {
+.toeplitz.spV <-  function(x, symmetric=TRUE, repr = c("C","T","R"), giveCsparse) {
     ## semantically "identical" to stats::toeplitz
     n <- length(x)
     r <- spV2M(x[ind4toeplitz(n)], n,n, symmetric=symmetric, check=FALSE)
-    if (giveCsparse) as(r, "CsparseMatrix") else r
+    if(!missing(giveCsparse)) {
+	if(missing(repr)) {
+	    repr <- if(giveCsparse) "C" else "T"
+	    warning(gettextf(
+		"'giveCsparse' has been deprecated; setting 'repr = \"%s\"' for you", repr),
+		domain=NA)
+	} else ## !missing(repr)
+            if((.w <- isTRUE(getOption("Matrix.warn"))) ||
+                      isTRUE(getOption("Matrix.verbose")))
+	    (if(.w) warning else message)(
+                "'giveCsparse' has been deprecated; will use 'repr' instead")
+    }
+    switch(match.arg(repr),
+               "C" = as(r, "CsparseMatrix"),
+               "T" =    r,# TsparseMatrix
+               "R" = as(r, "RsparseMatrix"))
 }
 setMethod("toeplitz", "sparseVector", .toeplitz.spV)

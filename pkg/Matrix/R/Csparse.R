@@ -96,11 +96,13 @@ setAs("matrix", "dgCMatrix", .m2dgC)
 setAs("matrix", "lgCMatrix", .m2lgC)
 setAs("matrix", "ngCMatrix", .m2ngC)
 
+## Here, use .m2dgC() instead of ..m2dgC() as C-level
+##  matrix_to_Csparse(x, "dgCMatrix")  fails when x is *integer* :
 setAs("matrix", "CsparseMatrix", ## => choosing 'l*' or 'dgCMatrix' (no tri-, sym-, diag-):
-      function(from) (if(is.logical(from)) ..m2lgC else ..m2dgC)(from))
+      function(from) (if(is.logical(from)) ..m2lgC else .m2dgC)(from))
 
 setAs("numeric", "CsparseMatrix",
-      function(from) (if(is.logical(from)) ..m2lgC else ..m2dgC)(as.matrix.default(from)))
+      function(from) (if(is.logical(from)) ..m2lgC else .m2dgC)(as.matrix.default(from)))
 
 
 setAs("CsparseMatrix", "symmetricMatrix",
