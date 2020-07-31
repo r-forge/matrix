@@ -182,11 +182,12 @@ sampleL <- function(n, size) {
 ##' @param m number of columns; default (=n)  ==> square matrix
 ##' @param density the desired sparseness density:
 ##' @param nnz number of non-zero entries; default from \code{density}
-##' @param giveCsparse logical specifying if result should be CsparseMatrix
-##' @return a [TC]sparseMatrix,  n x m
-##' @author Martin Maechler, Mar 2008
+##' @param repr character string specifying the sparseness kind of the result.
+##' @param giveCsparse *deprecated* logical specifying if result should be CsparseMatrix
+##' @return a [CTR]sparseMatrix,  n x m
+##' @author Martin Maechler, Mar 2008; July 2020 ('repr' instead og 'giveCsparse')
 rspMat <- function(n, m = n, density = 1/4, nnz = round(density * n*m),
-                   giveCsparse = TRUE)
+                   repr = c("C","T","R"), giveCsparse)
 {
     stopifnot(length(n) == 1, n == as.integer(n),
               length(m) == 1, m == as.integer(m),
@@ -196,7 +197,14 @@ rspMat <- function(n, m = n, density = 1/4, nnz = round(density * n*m),
     in0 <- sampleL(N, nnz)
     x <- sparseVector(i = in0, x = as.numeric(1L + seq_along(in0)), length = N)
     dim(x) <- c(n,m)#-> sparseMatrix
-    if (giveCsparse) as(x, "CsparseMatrix") else x
+    ## silent, back compatible (not yet warning about 'giveCsparse' deprecation):
+    repr <- if(missing(repr) && !missing(giveCsparse))
+		if(giveCsparse) "C" else "T"
+	    else match.arg(repr)
+    switch(repr,
+	   "C" = as(x, "CsparseMatrix"),
+	   "T" =    x,# TsparseMatrix
+	   "R" = as(x, "RsparseMatrix"))
 }
 
 ## __DEPRECATED__ !!

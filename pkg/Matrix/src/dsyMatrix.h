@@ -1,8 +1,8 @@
 #ifndef MATRIX_SYMATRIX_H
 #define MATRIX_SYMATRIX_H
 
+#include <R_ext/Lapack.h>
 #include "Mutils.h"
-#include "R_ext/Lapack.h"
 
 SEXP dsyMatrix_as_dspMatrix(SEXP from);
 SEXP dsyMatrix_as_matrix(SEXP from, SEXP keep_dimnames);
