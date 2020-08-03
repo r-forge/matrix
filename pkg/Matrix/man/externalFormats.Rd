@@ -47,9 +47,9 @@ writeMM(obj, file, \dots)
   \code{\link{sparseMatrix-class}}, and an example below.
 }
 \references{
-  \url{https://math.nist.gov/MatrixMarket}
+  \url{https://math.nist.gov/MatrixMarket/}
 
-  \url{https://www.cise.ufl.edu/research/sparse/matrices}
+  \url{https://sparse.tamu.edu/}% was https://www.cise.ufl.edu/research/sparse/matrices/
 }
 \examples{
 str(pores <- readMM(system.file("external/pores_1.mtx",
@@ -73,7 +73,7 @@ str(jgl009 <-
 data(KNex)
 ## Store as MatrixMarket (".mtx") file, here inside temporary dir./folder:
 (MMfile <- file.path(tempdir(), "mmMM.mtx"))
-writeMM(KNex$mm, file=MMfile) 
+writeMM(KNex$mm, file=MMfile)
 file.info(MMfile)[,c("size", "ctime")] # (some confirmation of the file's)
 
 ## very simple export - in triplet format - to text file:
