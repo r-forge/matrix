@@ -67,6 +67,7 @@ onenormest(A, t = min(n, 5), A.x, At.x, n,
   Pseudospectra.
   \emph{SIAM J. Matrix Anal. Appl.} \bold{21}, 4, 1185--1201.
   %% ok for ETH etc, but not free:  \doi{10.1137/S0895479899356080}
+  \url{https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.7.9804}
 
   William W. Hager (1984).
   Condition Estimates.
