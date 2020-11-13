@@ -31,7 +31,7 @@ expm(x)
   The matrix exponential of \code{x}.
 }
 \references{
-  \url{http://en.wikipedia.org/wiki/Matrix_exponential}
+  \url{https://en.wikipedia.org/wiki/Matrix_exponential}
 
   Cleve Moler and Charles Van Loan (2003)
   Nineteen dubious ways to compute the exponential of a matrix,
@@ -39,7 +39,7 @@ expm(x)
 
   %% MM: Till we have something better, this is quite good:
   Eric W. Weisstein et al. (1999) \emph{Matrix Exponential}.
-  From MathWorld, \url{http://mathworld.wolfram.com/MatrixExponential.html}
+  From MathWorld, \url{https://mathworld.wolfram.com/MatrixExponential.html}
 }
 \author{This is a translation of the implementation of the corresponding
   Octave function contributed to the Octave project by
