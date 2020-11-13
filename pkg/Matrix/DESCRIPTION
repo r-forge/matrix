@@ -1,6 +1,6 @@
 Package: Matrix
 Version: 1.3-0
-Date: 2020-07-21
+Date: 2020-11-13
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Contact: Doug and Martin <Matrix-authors@R-project.org>
@@ -26,7 +26,9 @@ Description: A rich hierarchy of matrix classes, including triangular,
 Depends: R (>= 3.6.0)
 Imports: methods, graphics, grid, stats, utils, lattice
 Suggests: expm, MASS
-Enhances: MatrixModels, graph, SparseM, sfsmisc
+Enhances: MatrixModels, graph, SparseM, sfsmisc,
+ 	  igraph, maptools, sp, spdep
+EnhancesNote: line 2: for "Rd xrefs"
 Encoding: UTF-8
 LazyData: no
 LazyDataNote: not possible, since we use data/*.R *and* our classes

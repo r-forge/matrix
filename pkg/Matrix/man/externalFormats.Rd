@@ -65,7 +65,7 @@ str(lundA <- readHB(system.file("external/lund_a.rsa",
 ## ----  even on a fast internet connection:
 if(FALSE) # the URL has been corrected, but we need an un-tar step!
 str(sm <-
- readHB(gzcon(url("http://www.cise.ufl.edu/research/sparse/RB/Boeing/msc00726.tar.gz"))))
+ readHB(gzcon(url("https://www.cise.ufl.edu/research/sparse/RB/Boeing/msc00726.tar.gz"))))
 
 str(jgl009 <-
  readMM(gzcon(url("ftp://math.nist.gov/pub/MatrixMarket2/Harwell-Boeing/counterx/jgl009.mtx.gz"))))
