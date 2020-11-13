@@ -241,11 +241,12 @@ showSys.time <- function(expr, ...) {
     invisible(st)
 }
 showProc.time <- local({ ## function + 'pct' variable
-    pct <- proc.time()
-    function(final="\n") { ## CPU elapsed __since last called__
-	ot <- pct ; pct <<- proc.time()
-	## 'Time ..' *not* to be translated:  tools::Rdiff() skips its lines!
-	cat('Time elapsed: ', (pct - ot)[1:3], final)
+    pct <- summary(proc.time())# length 3, shorter names
+    function(final="\n", ind=TRUE) { ## CPU elapsed __since last called__
+	ot <- pct ; pct <<- summary(proc.time())
+	delta <- (pct - ot)[ind]
+	##  'Time' *not* to be translated:  tools::Rdiff() skips its lines!
+	cat('Time', paste0("(",paste(names(delta),collapse=" "),"):"), delta, final)
     }
 })
 
