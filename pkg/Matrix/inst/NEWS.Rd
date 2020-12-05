@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-0 (2020-07-21 r3337)}{
+\section{Changes in version 1.3-0 (2020-12-05 r3347)}{
   \subsection{New Features}{
     \itemize{
       \item \code{Matrix(*, doDiag=TRUE)} is now obeyed also in the sparse
@@ -91,6 +91,9 @@
 
       \item (R-forge Matrix bug #6666, reported by Ezra Tucker):
       \code{which(<ldiMatrix>, array.ind=TRUE)} thinko fixed.
+
+      \item For R-devel Dec 4, 2020: adapt all.equal() check of sparse
+      matrix images (which contain panel functions with environments ..).
     }
   }
 }
