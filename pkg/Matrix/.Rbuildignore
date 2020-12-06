@@ -31,8 +31,6 @@ inst/doc/DSC20
 inst/doc/.*\.(log|blg|aux|out|tex|bbl|jpg|zip)$
 _?svn-?
 src/SuiteSparse-
-src/AMD/Source/amd_global.c
-src/COLAMD/Source/colamd_global.c
 po/translator
 vignettes/fullpage\.sty
 tests/useRNG
