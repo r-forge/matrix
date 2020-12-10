@@ -15,21 +15,28 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-0 (2020-12-06 r3349)}{
-  \subsection{New Features}{
+\section{Changes in version 1.3-0 (2020-12-07 r3350)}{
+  \subsection{Significant User-Visible Change}{
     \itemize{
-      \item \code{Matrix(*, doDiag=TRUE)} is now obeyed also in the sparse
+      \item \code{Matrix(*, doDiag=TRUE)} where \code{doDiag=TRUE} has
+      always been the \emph{default} is now obeyed also in the sparse
       case, as all \code{"diagonalMatrix"} are also \code{"sparseMatrix"}.
-      E.g.,  \code{Matrix(0, 3,3)} returns a \code{"ddiMatrix"} instead of
-      a \code{"dsCMatrix"} previously.  The latter is still returned from
-      \code{Matrix(0, 3,3, doDiag=FALSE)}.  Also a triangular matrix, e.g.,
-      \code{"dtrMatrix"} is detected now in cases with \code{NA}s.
+
+      \code{Matrix(0, 3,3)} returns a \code{"ddiMatrix"} instead of a
+      \code{"dsCMatrix"} previously.  The latter is still returned from
+      \code{Matrix(0, 3,3, doDiag=FALSE)}, and e.g., \code{.symDiagonal(3,pi)}.
+
+      Also a triangular matrix, e.g., \code{"dtrMatrix"} is detected now in
+      cases with \code{NA}s.
 
       This is both a bug fix \emph{and} an API change which breaks code
       that assumes \code{Matrix(.)} to return a \code{"CsparseMatrix"} in
       cases where it now returns a \code{"diagonalMatrix"} (which does
       extend \code{"sparseMatrix"}).
-
+    }
+  }
+  \subsection{New Features}{
+    \itemize{
       \item Subassignment to \code{"diagonalMatrix"} now returns
       sparse \code{"triangularMatrix"} more often; also (sparse)
       \code{"symmetricMatrix"}.
