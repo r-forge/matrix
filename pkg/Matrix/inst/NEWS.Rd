@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-0 (2020-12-07 r3350)}{
+\section{Changes in version 1.3-0 (2020-12-15 r3351)}{
   \subsection{Significant User-Visible Change}{
     \itemize{
       \item \code{Matrix(*, doDiag=TRUE)} where \code{doDiag=TRUE} has
@@ -101,6 +101,10 @@
 
       \item For R-devel Dec 4, 2020: adapt all.equal() check of sparse
       matrix images (which contain panel functions with environments ..).
+
+      \item tried fixing warning \emph{'cholmod_factorize_p' accessing 16
+	bytes in a region of size 8 [-Wstringop-overflow=]} in
+      \file{src/dsCMatrix.c} (in two places); seen by pre-release-gcc11 compilation.
     }
   }
 }
