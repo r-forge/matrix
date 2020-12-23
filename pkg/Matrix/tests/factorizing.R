@@ -476,9 +476,22 @@ options(oo)
 Z. <- readRDS(system.file("external", "Z_NA_rnk.rds", package="Matrix"))
 tools::assertWarning(rnkZ. <- rankMatrix(Z., method = "qr")) # gave errors
 qrZ. <- qr(Z.)
+options(warn=1)
 rnk2 <- qr2rankMatrix(qrZ.) # warning ".. only 684 out of 822 finite diag(R) entries"
+oo <- options(warn=2)# no warnings allowed from here
 di <- diag(qrZ.@R)
 stopifnot(is.na(rnkZ.), is(qrZ, "sparseQR"), is.na(rnk2), anyNA(di))
+
+## The above bug fix was partly wrongly extended to  dense matrices for "qr.R":
+x <- cbind(1, rep(0:9, 18))
+qr.R(qr(x))              # one negative diagonal
+qr.R(qr(x, LAPACK=TRUE)) # two negative diagonals
+stopifnot(exprs = {
+    rankMatrix(x) == 2
+    rankMatrix(x, method="maybeGrad") == 2 ## but "useGrad" is not !
+    rankMatrix(x, method="qrLINPACK") == 2
+    rankMatrix(x, method="qr.R"     ) == 2
+})# the last gave '0' and a warning in Matrix 1.3-0
 
 showSys.time(
 for(i in 1:120) {
@@ -568,6 +581,5 @@ ia <- chol2inv(A)
 stopifnot(is(ia, "diagonalMatrix"),
 	  all.equal(ia@x, rep(2,n), tolerance = 1e-15))
 
-
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
-if(!interactive()) warnings()
+

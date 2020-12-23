@@ -15,6 +15,15 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
+\section{Changes in version 1.3-1 (2020-12-23 r3352)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{rankMatrix(<dense>, method="qr.R")} no longer assumes
+      non-negative diagonal entries of the \eqn{R} matrix.
+    }
+  }
+}
+
 \section{Changes in version 1.3-0 (2020-12-15 r3351)}{
   \subsection{Significant User-Visible Change}{
     \itemize{

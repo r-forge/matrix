@@ -37,9 +37,9 @@ qr2rankMatrix <- function(qr, tol = NULL, isBqr = is.qr(qr), do.warn=TRUE) {
             ## if(length(diagR) == 0)
             ##     return(NA_integer_)
         } else {
-            if(do.warn && any(diagR < 0))
+            if(isBqr) diagR <- abs(diagR) # in base qr(), sign( diag(R) ) are *not* coerced to positive
+            else if(do.warn && any(diagR < 0))
                 warning(gettextf("qr2rankMatrix(.): QR has negative diag(R) entries"))
-            ## diagR <- diagR ## had abs(diagR) .. but that counts large negative entries
             ## declare those entries to be zero that are < tol*max(.)
             if((mdi <- max(diagR, na.rm=TRUE)) > 0) {
                 if(!is.numeric(tol)) {
