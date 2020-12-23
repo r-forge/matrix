@@ -86,7 +86,7 @@ rankMatrix <- function(x, tol = NULL,
 
     if(useGrad <- (method %in% c("useGrad", "maybeGrad"))) {
 	stopifnot(length(sval) == p,
-		  diff(sval) <= 0) # must be sorted non-increasingly: max = s..[1]
+		  p <= 1 || diff(sval) <= 0) # must be sorted non-increasingly: max = s..[1]
 	if(sval[1] == 0) { ## <==> all singular values are zero  <==> Matrix = 0  <==> rank = 0
 	    useGrad <- FALSE
 	    method <- eval(formals()[["method"]])[[1]]
@@ -117,7 +117,7 @@ rankMatrix <- function(x, tol = NULL,
 				     method),
 			    immediate.=TRUE, domain=NA)
                 ## the "Matlab" default:
-                stopifnot(diff(sval) <= 0) #=> sval[1]= max(sval)
+                if(p > 1) stopifnot(diff(sval) <= 0) #=> sval[1]= max(sval)
                 tol <- max(d) * .Machine$double.eps
 	    } else stopifnot((tol <- as.numeric(tol)[[1]]) >= 0)
 	}
