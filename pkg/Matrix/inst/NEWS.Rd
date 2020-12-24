@@ -15,6 +15,15 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
+\section{Changes in version 1.3-2 (2021-..-.. r33..)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{rankMatrix()} tweaks for the singular values based methods,
+      notably \code{method = "maybeGrad"}.
+    }
+  }
+}
+
 \section{Changes in version 1.3-1 (2020-12-23 r3352)}{
   \subsection{Bug Fixes}{
     \itemize{

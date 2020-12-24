@@ -486,12 +486,22 @@ stopifnot(is.na(rnkZ.), is(qrZ, "sparseQR"), is.na(rnk2), anyNA(di))
 x <- cbind(1, rep(0:9, 18))
 qr.R(qr(x))              # one negative diagonal
 qr.R(qr(x, LAPACK=TRUE)) # two negative diagonals
-stopifnot(exprs = {
-    rankMatrix(x) == 2
-    rankMatrix(x, method="maybeGrad") == 2 ## but "useGrad" is not !
-    rankMatrix(x, method="qrLINPACK") == 2
-    rankMatrix(x, method="qr.R"     ) == 2
-})# the last gave '0' and a warning in Matrix 1.3-0
+chkRnk <- function(x, rnk) {
+    stopifnot(exprs = {
+        rankMatrix(x) == rnk
+        rankMatrix(x, method="maybeGrad") == rnk ## but "useGrad" is not !
+        rankMatrix(x, method="qrLINPACK") == rnk
+        rankMatrix(x, method="qr.R"     ) == rnk
+    })# the last gave '0' and a warning in Matrix 1.3-0
+}
+chkRnk(   x,    2)
+chkRnk(diag(1), 1) # had "empty stopifnot" (-> Error in MM's experimental setup) +  warning 'min(<empty>)'
+(m3 <- cbind(2, rbind(diag(pi, 2), 8)))
+chkRnk(m3, 3)
+chkRnk(matrix(0, 4,3), 0)
+chkRnk(matrix(1, 5,5), 1) # had failed for "maybeGrad"
+chkRnk(matrix(1, 5,2), 1)
+
 
 showSys.time(
 for(i in 1:120) {
