@@ -76,7 +76,6 @@ rankMatrix <- function(x, tol = NULL,
     ## tolerance criterion,
     ##
     ## Author: Ravi Varadhan, Date: 22 October 2007 // Tweaks: MM, Oct.23
-
     ## ----------------------------------------------------------------------
 
     stopifnot(length(d <- dim(x)) == 2)
@@ -85,17 +84,18 @@ rankMatrix <- function(x, tol = NULL,
     method <- match.arg(method)
 
     if(useGrad <- (method %in% c("useGrad", "maybeGrad"))) {
-	stopifnot(length(sval) == p,
-		  p <= 1 || diff(sval) <= 0) # must be sorted non-increasingly: max = s..[1]
+	stopifnot(length(sval) == p)
+	if(p > 1) stopifnot(diff(sval) <= 0) # must be sorted non-increasingly: max = s..[1]
 	if(sval[1] == 0) { ## <==> all singular values are zero  <==> Matrix = 0  <==> rank = 0
 	    useGrad <- FALSE
 	    method <- eval(formals()[["method"]])[[1]]
 	} else {
 	    ln.av <- log(abs(sval))
+	    if(any(s0 <- sval == 0)) ln.av[s0] <- - .Machine$double.xmax # so we get diff() == 0
 	    diff1 <- diff(ln.av)
 	    if(method == "maybeGrad") {
 		grad <- (min(ln.av) - max(ln.av)) / p
-		useGrad <- !is.na(grad) &&  min(diff1) <= min(-3, 10 * grad)
+		useGrad <- !is.na(grad) && p > 1 && min(diff1) <= min(-3, 10 * grad)
 	    }#  -------
 	}
     }
