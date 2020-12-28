@@ -1,5 +1,5 @@
 
-R Under development (unstable) (2020-12-26 r79698) -- "Unsuffered Consequences"
+R version 4.0.3 Patched (2020-12-26 r79698) -- "Bunny-Wunnies Freak Out"
 Copyright (C) 2020 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -177,7 +177,7 @@ M[m,i,m] : nargs()=3
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 > showProc.time()
-Time (user system elapsed): 0.444 0.014 0.46 
+Time (user system elapsed): 0.419 0.013 0.435 
 > 
 > ## Bug found thanks to Timothy Mak, Feb 3, 2017:
 > ## sparseMatrix logical indexing with (partial) NA:
@@ -254,6 +254,10 @@ Csp[i,i,l] : nargs()=4
 +     identical(dim(b[,L0]), c(4L, 0L))
 +     identical(dim(b[L0,]), c(0L, 4L)) # failed till 2019-09-x
 + })
+M[m,i,m] : nargs()=3
+Csp[m,i,l] : nargs()=4
+M[logi,m,m] : nargs()=3
+Csp[i,m,l] : nargs()=4
 > 
 > ## Printing sparse colnames:
 > ms[sample(28, 20)] <- 0
@@ -318,7 +322,7 @@ M[logi,m,m] : nargs()=2
 M[logi,m,m] : nargs()=2
 M[logi,m,m] : nargs()=2
 > showProc.time()
-Time (user system elapsed): 0.192 0.008 0.2 
+Time (user system elapsed): 0.205 0.008 0.214 
 > 
 > ## more sparse Matrices --------------------------------------
 > 
@@ -1113,7 +1117,7 @@ ok( d )
 == ###======================================================================
 
 > showProc.time()
-Time (user system elapsed): 0.781 0.001 0.784 
+Time (user system elapsed): 0.777 0.004 0.784 
 > 
 > if(doExtras) {### {was ./AAA_index.R, MM-only}
 +     ## an nsparse-example
@@ -1342,7 +1346,7 @@ Csp[i,i,l] : nargs()=4
 M[i,i,m] : nargs()=3
 Csp[i,i,l] : nargs()=4
 > showProc.time()
-Time (user system elapsed): 0.306 0.001 0.308 
+Time (user system elapsed): 0.258 0.001 0.26 
 > 
 > stopifnot(all.equal(mC[,3], mm[,3]),
 + 	  identical(mC[ij], mC[ij + 0.4]),
@@ -1662,7 +1666,7 @@ Csp[i,m,l] : nargs()=4
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 > showProc.time()
-Time (user system elapsed): 0.216 0.001 0.218 
+Time (user system elapsed): 0.196 0.001 0.199 
 > 
 > ##---  "nsparse*" sub-assignment :----------
 > M <- Matrix(c(1, rep(0,7), 1:4), 3,4)
@@ -1819,7 +1823,7 @@ k.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=ngTMatrix; len.(value)=1; missing (i,j
 .. replTmat(x,i,j,v): nargs()= 4; cl.(x)=ngTMatrix; len.(value)=1; missing (i,j) = (1,0)
 .. replTmat(x,i,j,v): nargs()= 4; cl.(x)=ngTMatrix; len.(value)=1; 
 .> showProc.time()
-Time (user system elapsed): 0.177 0 0.179 
+Time (user system elapsed): 0.181 0.001 0.182 
 > Nn <- Nn0
 > ## Check that  NA is interpreted as TRUE (with a warning), for "nsparseMatrix":
 > assertWarning(Nn[ii <-     3  ] <- NA); stopifnot(isValid(Nn,"nsparseMatrix"), Nn[ii])
@@ -1924,19 +1928,26 @@ Csp[m,i,l] : nargs()=4
 +     identical(m0.,       as(tC0, "matrix")) # failed: Cholmod error 'invalid xtype' ..
 +     identical(numeric(), as(tC0, "numeric"))#   "
 +     identical(numeric(), tC0[ 0 ])# --> .M.vectorSub(x, i) failed in as(., "matrix")
-+     identical(m00[TRUE], tC0[TRUE])# (worked already)
++     identical(m00[TRUE ], tC0[TRUE ])# (worked already)
++     identical(m00[FALSE], tC0[FALSE])#    ditto
 +     ##
 +     identical(D0, D0[0,0]) # used to fail --> subCsp_ij  (..)
 +     identical(D0, D0[ ,0]) #  (ditto)     --> subCsp_cols(..)
 +     identical(D0, D0[0, ]) #     "        --> subCsp_rows(..)
-+     identical(m00[ 0 ],  D0[ 0 ] )# (worked already)
-+     identical(m00[TRUE], D0[TRUE])# (worked already)
++     identical(D0, D0[,])          # (worked already)
++     identical(m00[ 0 ],  D0[ 0 ] )#      ditto
++     identical(m00[TRUE ], D0[TRUE ])#      "
++     identical(m00[FALSE], D0[FALSE])#      "
 +     ##
 +     identical(tC0.,tC0[0,0]) # failed --> subCsp_ij  (..)
 +     identical(gC0, tC0[ ,0]) #   "    --> subCsp_cols(..)
 +     identical(gC0, tC0[0, ]) #   "    --> subCsp_rows(..)
++     identical(tC0, tC0[,])   # (worked already)
++     ## vector indexing
 + })
 M[i,m,m] : nargs()=2
+M[logi,m,m] : nargs()=2
+<sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
 M[logi,m,m] : nargs()=2
 <sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
 M[i,i,m] : nargs()=3
@@ -1949,6 +1960,8 @@ Csp[i,m,l] : nargs()=4
 M[i,m,m] : nargs()=2
 M[logi,m,m] : nargs()=2
 <sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
+M[logi,m,m] : nargs()=2
+<sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
 M[i,i,m] : nargs()=3
 Csp[i,i,l] : nargs()=4
 M[m,i,m] : nargs()=3
@@ -1956,71 +1969,54 @@ Csp[m,i,l] : nargs()=4
 M[i,m,m] : nargs()=3
 Csp[i,m,l] : nargs()=4
 > 
-> if(FALSE) { ## FIXME
-+   D0[TRUE, TRUE ] # used to fail --> subCsp_ij(..) -> intI()
-+   D0[FALSE,FALSE] # used to fail --> subCsp_ij(..) -> intI()
-+  tC0[TRUE, TRUE ] # used to fail --> subCsp_ij(..) -> intI()
-+  tC0[TRUE,      ] # always worked
-+  tC0[    , TRUE ] # used to fail --> subCsp_ij(..) -> intI()
-+  tC0[FALSE,FALSE] # used to fail --> subCsp_ij(..) -> intI()
-+  tC0[FALSE,     ] # used to fail --> subCsp_ij(..) -> intI()
-+  tC0[     ,FALSE] # used to fail --> subCsp_ij(..) -> intI()
-+ }
-> ## on the way to above failure, found
-> selectMethod(coerce, c(class(tC0), "matrix"))
-Method Definition:
-
-function (from, to = "matrix", strict = TRUE) 
-.Call(Csparse_to_matrix, from, TRUE, FALSE)
-<bytecode: 0x5621698>
-<environment: namespace:Matrix>
-
-Signatures:
-        from        to      
-target  "dtCMatrix" "matrix"
-defined "dtCMatrix" "matrix"
-> ##-> .Call(Csparse_to_matrix, from, TRUE, FALSE)  in ../src/Csparse.c
-> ## these two are used above
-> selectMethod("[", signature = c(class(tC0), "numeric", "missing","missing"))
-Method Definition:
-
-function (x, i, j, ..., drop = TRUE) 
-{
-    Matrix.msg("M[i,m,m] : nargs()=", nargs(), .M.level = 2)
-    if (nargs() == 2) {
-        .M.vectorSub(x, i)
-    }
-    else {
-        callGeneric(x, i = i, , drop = TRUE)
-    }
-}
-<bytecode: 0xe956788>
-<environment: namespace:Matrix>
-
-Signatures:
-        x           i         j         drop     
-target  "dtCMatrix" "numeric" "missing" "missing"
-defined "Matrix"    "index"   "missing" "missing"
-> selectMethod("[", signature = c(class(tC0), "numeric", "missing", "logical"))
-Method Definition:
-
-function (x, i, j, ..., drop = TRUE) 
-{
-    na <- nargs()
-    Matrix.msg("Csp[i,m,l] : nargs()=", na, .M.level = 2)
-    if (na == 4) 
-        subCsp_rows(x, i, drop = drop)
-    else if (na == 3) 
-        .M.vectorSub(x, i)
-    else stop("Matrix-internal error in <CsparseM>[i,,d]; please report")
-}
-<bytecode: 0xe9528c8>
-<environment: namespace:Matrix>
-
-Signatures:
-        x               i         j         drop     
-target  "dtCMatrix"     "numeric" "missing" "logical"
-defined "CsparseMatrix" "index"   "missing" "logical"
+> expr <- quote({ ## FIXME -- both 'TRUE' and 'FALSE'  should fail "out of bound",etc
++   D0[TRUE, TRUE ]
++   D0[    , TRUE ]
++   D0[TRUE,      ] # worked  but should *NOT*
++  tC0[TRUE, TRUE ]
++  tC0[    , TRUE ]
++  tC0[TRUE,      ] # worked  but should *NOT*
++   ##
++   D0[FALSE,FALSE] # fails --> subCsp_ij(..) -> intI()
++   D0[     ,FALSE] #    ditto ............
++   D0[FALSE,     ] #    ditto
++  tC0[FALSE,FALSE] #      "
++  tC0[FALSE,     ] #      "
++  tC0[     ,FALSE] #      "
++ })
+> EE <- lapply(expr[-1], function(e)
++     list(expr = e,
++          r    = tryCatch(eval(e), error = identity)))
+M[i,i,m] : nargs()=3
+Csp[i,i,l] : nargs()=4
+M[m,i,m] : nargs()=3
+Csp[m,i,l] : nargs()=4
+M[logi,m,m] : nargs()=3
+Csp[i,m,l] : nargs()=4
+M[i,i,m] : nargs()=3
+Csp[i,i,l] : nargs()=4
+M[m,i,m] : nargs()=3
+Csp[m,i,l] : nargs()=4
+M[logi,m,m] : nargs()=3
+Csp[i,m,l] : nargs()=4
+M[i,i,m] : nargs()=3
+Csp[i,i,l] : nargs()=4
+M[m,i,m] : nargs()=3
+Csp[m,i,l] : nargs()=4
+M[logi,m,m] : nargs()=3
+Csp[i,m,l] : nargs()=4
+M[i,i,m] : nargs()=3
+Csp[i,i,l] : nargs()=4
+M[logi,m,m] : nargs()=3
+Csp[i,m,l] : nargs()=4
+M[m,i,m] : nargs()=3
+Csp[m,i,l] : nargs()=4
+> exR <- lapply(EE, `[[`, "r")
+> stopifnot(exprs = {
++     vapply(exR, inherits, logical(1), what = "error")
++     unique( vapply(exR, `[[`, "<msg>", "message")
++            ) == "logical subscript too long (1, should be 0)"
++ })
 > 
 > 
 > (uTr <- new("dtTMatrix", Dim = c(3L,3L), diag="U"))
@@ -2255,7 +2251,7 @@ as(<triangular (ge)matrix>, dtCMatrix): valid: TRUE
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 > showProc.time()
-Time (user system elapsed): 0.6 0.001 0.604 
+Time (user system elapsed): 0.596 0.006 0.605 
 > 
 > 
 > ## "Vector indices" -------------------
@@ -2633,7 +2629,7 @@ M[i,m,m] : nargs()=3
 Tsp[i,m,l]: nargs()=4
 Csp[i,m,l] : nargs()=4
 > showProc.time()
-Time (user system elapsed): 0.268 0.013 0.283 
+Time (user system elapsed): 0.277 0 0.279 
 > 
 > ## Sub *Assignment* ---- now works (partially):
 > mt0 <- mt
@@ -3009,7 +3005,7 @@ M[i,j] <- v :  coercing symmetric M[] into non-symmetric
 > assert.EQ.mat(t2, m)# ok
 > assert.EQ.mat(s2, m)# failed in 0.9975-8
 > showProc.time()
-Time (user system elapsed): 0.625 0.002 0.629 
+Time (user system elapsed): 0.574 0.003 0.581 
 > 
 > 
 > ## m[cbind(i,j)] <- value: (2-column matrix subassignment):
@@ -3197,7 +3193,7 @@ M & T ("symm"): dgTMatrix dgTMatrix
 > 
 > cc <- capture.output(show(dLrg))# show(<diag>) used to error for large n
 > showProc.time()
-Time (user system elapsed): 0.456 0.009 0.467 
+Time (user system elapsed): 0.431 0.001 0.434 
 > 
 > ## Large Matrix indexing / subassignment
 > ## ------------------------------------- (from ex. by Imran Rashid)
@@ -3271,7 +3267,7 @@ M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 > 
 > showProc.time()
-Time (user system elapsed): 1.37 0.143 1.518 
+Time (user system elapsed): 1.339 0.205 1.551 
 > options(op)# revert
 > ##
 > if(doExtras) {#-----------------------------------------------------------------
@@ -3379,10 +3375,10 @@ diagnosing replTmat(x,i,j,v): nargs()= 3; missing (i,j) = (0,1)
 > 
 > 
 > showProc.time()
-Time (user system elapsed): 0.102 0 0.102 
+Time (user system elapsed): 0.1 0.001 0.102 
 > 
 > if(!interactive()) warnings()
 > 
 > proc.time()
    user  system elapsed 
-  6.513   0.291   6.876 
+  6.542   0.342   6.966 
