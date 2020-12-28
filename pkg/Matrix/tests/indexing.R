@@ -610,35 +610,48 @@ stopifnot(exprs = {
     identical(m0.,       as(tC0, "matrix")) # failed: Cholmod error 'invalid xtype' ..
     identical(numeric(), as(tC0, "numeric"))#   "
     identical(numeric(), tC0[ 0 ])# --> .M.vectorSub(x, i) failed in as(., "matrix")
-    identical(m00[TRUE], tC0[TRUE])# (worked already)
+    identical(m00[TRUE ], tC0[TRUE ])# (worked already)
+    identical(m00[FALSE], tC0[FALSE])#    ditto
     ##
     identical(D0, D0[0,0]) # used to fail --> subCsp_ij  (..)
     identical(D0, D0[ ,0]) #  (ditto)     --> subCsp_cols(..)
     identical(D0, D0[0, ]) #     "        --> subCsp_rows(..)
-    identical(m00[ 0 ],  D0[ 0 ] )# (worked already)
-    identical(m00[TRUE], D0[TRUE])# (worked already)
+    identical(D0, D0[,])          # (worked already)
+    identical(m00[ 0 ],  D0[ 0 ] )#      ditto
+    identical(m00[TRUE ], D0[TRUE ])#      "
+    identical(m00[FALSE], D0[FALSE])#      "
     ##
     identical(tC0.,tC0[0,0]) # failed --> subCsp_ij  (..)
     identical(gC0, tC0[ ,0]) #   "    --> subCsp_cols(..)
     identical(gC0, tC0[0, ]) #   "    --> subCsp_rows(..)
+    identical(tC0, tC0[,])   # (worked already)
+    ## vector indexing
 })
 
-if(FALSE) { ## FIXME
-  D0[TRUE, TRUE ] # used to fail --> subCsp_ij(..) -> intI()
-  D0[FALSE,FALSE] # used to fail --> subCsp_ij(..) -> intI()
- tC0[TRUE, TRUE ] # used to fail --> subCsp_ij(..) -> intI()
- tC0[TRUE,      ] # always worked
- tC0[    , TRUE ] # used to fail --> subCsp_ij(..) -> intI()
- tC0[FALSE,FALSE] # used to fail --> subCsp_ij(..) -> intI()
- tC0[FALSE,     ] # used to fail --> subCsp_ij(..) -> intI()
- tC0[     ,FALSE] # used to fail --> subCsp_ij(..) -> intI()
-}
-## on the way to above failure, found
-selectMethod(coerce, c(class(tC0), "matrix"))
-##-> .Call(Csparse_to_matrix, from, TRUE, FALSE)  in ../src/Csparse.c
-## these two are used above
-selectMethod("[", signature = c(class(tC0), "numeric", "missing","missing"))
-selectMethod("[", signature = c(class(tC0), "numeric", "missing", "logical"))
+expr <- quote({ ## FIXME -- both 'TRUE' and 'FALSE'  should fail "out of bound",etc
+  D0[TRUE, TRUE ]
+  D0[    , TRUE ]
+  D0[TRUE,      ] # worked  but should *NOT*
+ tC0[TRUE, TRUE ]
+ tC0[    , TRUE ]
+ tC0[TRUE,      ] # worked  but should *NOT*
+  ##
+  D0[FALSE,FALSE] # fails --> subCsp_ij(..) -> intI()
+  D0[     ,FALSE] #    ditto ............
+  D0[FALSE,     ] #    ditto
+ tC0[FALSE,FALSE] #      "
+ tC0[FALSE,     ] #      "
+ tC0[     ,FALSE] #      "
+})
+EE <- lapply(expr[-1], function(e)
+    list(expr = e,
+         r    = tryCatch(eval(e), error = identity)))
+exR <- lapply(EE, `[[`, "r")
+stopifnot(exprs = {
+    vapply(exR, inherits, logical(1), what = "error")
+    unique( vapply(exR, `[[`, "<msg>", "message")
+           ) == "logical subscript too long (1, should be 0)"
+})
 
 
 (uTr <- new("dtTMatrix", Dim = c(3L,3L), diag="U"))
