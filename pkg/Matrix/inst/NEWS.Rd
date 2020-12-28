@@ -15,11 +15,16 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-2 (2021-..-.. r33..)}{
+\section{Changes in version 1.3-2 (2022-12-28 r33..)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{rankMatrix()} tweaks for the singular values based methods,
       notably \code{method = "maybeGrad"}.
+
+      \item \code{as(new("dtCMatrix", diag="U"), "matrix")} now works, as
+      C-level \code{diagU2N()} now also works for 0-dimensional triangular
+      matrices; this also fixes a subsetting (\dQuote{indexing}) bug of
+      such 0-dimensional matrices, thanks to a report by Aaron Lun.
     }
   }
 }
