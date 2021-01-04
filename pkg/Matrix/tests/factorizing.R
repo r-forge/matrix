@@ -572,6 +572,26 @@ assert.EQ.mat(     crossprod(chol2inv(chol(Diagonal(x = 5:1)))),
 stopifnot(all.equal(C, diag((5:1)^-2)))
 ## failed in some versions because of a "wrong" implicit generic
 
+U <- cbind(1:0, 2*(1:2))
+(sU <- as(U, "dtCMatrix"))
+validObject(sS <- crossprod(sU))
+C. <- chol(sS)
+stopifnot(all.equal(C., sU, tol=1e-15))
+## chol(<triangular sparse which is diagonal>)
+tC7 <- .trDiagonal(7, 7:1)
+stopifnotValid(tC7, "dtCMatrix")
+ch7  <- chol(tC7) ## this (and the next 2) failed: 'no slot .. "factors" ..."dtCMatrix"'
+chT7 <- chol(tT7 <- as(tC7, "TsparseMatrix"))
+chR7 <- chol(tR7 <- as(tC7, "RsparseMatrix"))
+stopifnot(expr = {
+    isDiagonal(ch7)
+    identical(chT7, ch7) # "ddiMatrix" all of them
+    identical(chR7, ch7) # "ddiMatrix" all of them
+    all.equal(sqrt(7:1), diag(ch7 ))
+})
+
+
+
 ## From [Bug 14834] New: chol2inv *** caught segfault ***
 n <- 1e6 # was 595362
 A <- chol( D <- Diagonal(n) )

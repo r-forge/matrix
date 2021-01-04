@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-2 (2021-01-04 r3360)}{
+\section{Changes in version 1.3-2 (2021-01-04 r3361)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{rankMatrix()} tweaks for the singular values based methods,
@@ -31,6 +31,8 @@
 
       \item The new \code{FCONE} macros added for newer Fortran/C compiler
       combinations are now defined back compatibly with R >= 3.6.0.
+
+      \item \code{chol(<diagonal dt[CRT]Matrix>)} now works.
     }
   }
 }

@@ -908,3 +908,12 @@ setMethod("t", signature(x = "TsparseMatrix"),
 	      r@Dimnames <- x@Dimnames[2:1]
 	      r
       })
+
+isDiagTsp <- function(object) {
+    d <- dim(object)
+    if(d[1] != d[2])
+        FALSE
+    else
+        length(i <- object@i) == length(j <- object@j) && all(i == j)
+}
+setMethod("isDiagonal", signature(object = "TsparseMatrix"), isDiagTsp)
