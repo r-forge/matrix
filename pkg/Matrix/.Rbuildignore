@@ -35,3 +35,4 @@ po/translator
 vignettes/fullpage\.sty
 tests/useRNG
 tests/.*\.Rout.*[24]b
+tests/.*_(doExtra|nX)$
