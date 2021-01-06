@@ -204,7 +204,7 @@ table(Ppm@x == 0)# (194, 123) - has 123 "zero" and 14 ``almost zero" entries
 m <- matrix(c(0, NA, 0, NA, NA, 0, 0, 0, 1), 3,3)
 m0 <- rbind(0,cbind(0,m))
 M <- as(m,"Matrix"); M ## "dsCMatrix" ...
-M0 <- rBind(0, cBind(0, M))
+M0 <- rbind(0, cbind(0, M))
 dM  <- as(M, "denseMatrix")
 dM0 <- as(M0,"denseMatrix")
 try( lum  <- lu(M) )# Err: "near-singular A"

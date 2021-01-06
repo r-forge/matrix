@@ -15,6 +15,21 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
+\section{Changes in version 1.3-3 (2021-..-.. r33..)}{
+  \subsection{Deprecated and Defunct}{
+    \itemize{
+      \item \code{cBind()} and \code{rBind()} are now defunct:
+      simply use \code{cbind()} and \code{rbind()} instead.
+    }
+  }
+  \subsection{Dependency}{
+    \itemize{
+      \item For now revert to \code{R (>= 3.5.0)} dependency, as e.g.,
+      Debian stable needs it.
+    }
+  }
+}
+
 \section{Changes in version 1.3-2 (2021-01-05 r3362)}{
   \subsection{Bug Fixes}{
     \itemize{
