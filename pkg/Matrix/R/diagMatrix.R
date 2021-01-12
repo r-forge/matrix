@@ -280,25 +280,25 @@ setAs("ddiMatrix", "triangularMatrix", di2tT)
 ## needed too (otherwise <dense> -> Tsparse is taken):
 setAs("ddiMatrix", "TsparseMatrix", di2tT)
 setAs("ddiMatrix", "dsparseMatrix", di2tT)
-setAs("ddiMatrix", "CsparseMatrix",
-      function(from) .T2Cmat(.diag2tT(from, "U", "d"), isTri=TRUE))
+ddi2Csp <- function(from) .T2Cmat(.diag2tT(from, "U", "d"), isTri=TRUE) #-> dtC*
+setAs("ddiMatrix", "dtCMatrix",     ddi2Csp)
+setAs("ddiMatrix", "CsparseMatrix", ddi2Csp)
 ## Such that  as(Matrix(0, d,d), "dgCMatrix")  continues working:
-setAs("ddiMatrix", "dgCMatrix",
-      function(from) .T2Cmat(.diag2tT(from, "U", "d"), isTri=TRUE))
+setAs("ddiMatrix", "dgCMatrix", function(from) .dtC2g(ddi2Csp(from)))
 
 setAs("ddiMatrix", "symmetricMatrix", function(from) .diag2sT(from, "U", "d"))
 ##
 ## ldi*:
-di2tT <- function(from) .diag2tT(from, "U", "l")
-setAs("ldiMatrix", "triangularMatrix", di2tT)
+ldi2tT <- function(from) .diag2tT(from, "U", "l")
+setAs("ldiMatrix", "triangularMatrix", ldi2tT)
 ##_no_longer_ setAs("ldiMatrix", "sparseMatrix", di2tT)
 ## needed too (otherwise <dense> -> Tsparse is taken):
-setAs("ldiMatrix", "TsparseMatrix", di2tT)
-setAs("ldiMatrix", "lsparseMatrix", di2tT)
+setAs("ldiMatrix", "TsparseMatrix", ldi2tT)
+setAs("ldiMatrix", "lsparseMatrix", ldi2tT)
 setAs("ldiMatrix", "CsparseMatrix",
       function(from) .T2Cmat(.diag2tT(from, "U", "l"), isTri=TRUE))
 setAs("ldiMatrix", "symmetricMatrix", function(from) .diag2sT(from, "U", "l"))
-rm(di2tT)
+rm(ldi2tT)
 
 setAs("diagonalMatrix", "nMatrix",
       di2nMat <- function(from) {
