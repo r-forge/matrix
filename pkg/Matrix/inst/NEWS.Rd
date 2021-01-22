@@ -32,7 +32,7 @@
     \itemize{
       \item Fixed a thinko (in 1.3-2): Now direct coercion from
       \code{"ddiMatrix"} to \code{"dgCMatrix"}, and hence, e.g.,
-      \code{as(Matrix(1, sparse=TRUE), "dgCMatrix") now works.
+      \code{as(Matrix(1, sparse=TRUE), "dgCMatrix") now works.}
     }
   }
 }
