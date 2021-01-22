@@ -216,7 +216,7 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
 	data <- spV2M(data, nrow, ncol, byrow=byrow)
 	i.M <- sparse <- forceCheck <- sM <- sV <- TRUE
     }
-    if(is.null(sparse1 <- sparse) && (i.M || is(data, "matrix")))
+    if(is.null(sparse) && (i.M || is(data, "matrix")))
 	sparse <- sparseDefault(data)
     doDN <- TRUE # by default
     if (i.M) {
@@ -234,7 +234,7 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
 	if (is.object(data) || !is.atomic(data)) data <- as.vector(data)
 	if(length(data) == 1 && is0(data) && !identical(sparse, FALSE)) {
 	    ## Matrix(0, ...) : always sparse unless "sparse = FALSE":
-	    if(is.null(sparse)) sparse1 <- sparse <- TRUE
+	    if(is.null(sparse)) sparse <- TRUE
 	    i.M <- sM <- TRUE
 	    if (missing(nrow)) nrow <- ceiling(1/ncol) else
 	    if (missing(ncol)) ncol <- ceiling(1/nrow)

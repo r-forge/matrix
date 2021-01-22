@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-3 (2021-01-12 r3364)}{
+\section{Changes in version 1.3-3 (2021-01-22 r3365)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item \code{cBind()} and \code{rBind()} are now defunct:
