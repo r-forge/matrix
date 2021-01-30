@@ -32,11 +32,11 @@ Rv <- getRversion() # removed at end
 ## R >= "3.2.0" :
 ## New (2015-02)  base :: cbind(), rbind() which dispatch on S4 "when needed":
     cBind <- function (..., deparse.level = 1) {
-	    .Defunct(msg = "'cBind' is deprecated.
+	    .Defunct(msg = "'cBind' is defunct.
  Since R version 3.2.0, base's cbind() should work fine with S4 objects")
     }
     rBind <- function (..., deparse.level = 1) {
-	    .Defunct(msg = "'rBind' is deprecated.
+	    .Defunct(msg = "'rBind' is defunct.
  Since R version 3.2.0, base's rbind() should work fine with S4 objects")
     }
 
