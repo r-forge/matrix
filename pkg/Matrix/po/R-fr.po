@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-1\n"
-"POT-Creation-Date: 2020-04-02 16:19\n"
+"POT-Creation-Date: 2021-01-29 17:44\n"
 "PO-Revision-Date: 2014-03-30 09:07+0100\n"
 "Last-Translator: Philippe Grosjean <phgrosjean@sciviews.org>\n"
 "Language-Team: none\n"
@@ -513,6 +513,12 @@ msgstr "<abIndex>  -->  <seqMat> n'est pas encore implémenté"
 msgid "<seqMat>  -->  <abIndex>  is not yet implemented"
 msgstr "<seqMat>  -->  <abIndex> n'est pas encore implémenté"
 
+msgid "'giveCsparse' has been deprecated; setting 'repr = \"T\"' for you"
+msgstr ""
+
+msgid "'giveCsparse' has been deprecated; will use 'repr' instead"
+msgstr ""
+
 msgid "'diagonals' matrix must have %d columns (= length(k) )"
 msgstr "une matrice 'diagonals' doit avoir %d colonnes (= length(k) )"
 
@@ -534,6 +540,9 @@ msgid "the %d-th (sub)-diagonal (k = %d) is too short; filling with NA's"
 msgstr ""
 "la %d-ième (sous)-diagonale (k = %d) est trop courte ; elle est replie avec "
 "des NAs"
+
+msgid "invalid 'repr'; must be \"C\", \"T\", or \"R\""
+msgstr ""
 
 msgid "resulting x-slot has different type than x's or y's"
 msgstr ""
@@ -889,12 +898,19 @@ msgstr ""
 msgid "'times >= 0' is required"
 msgstr "'times >= 0' est requis"
 
+msgid "'giveCsparse' has been deprecated; setting 'repr = \"%s\"' for you"
+msgstr ""
+
 msgid "(un)packing only applies to dense matrices, class(x)='%s'"
 msgstr ""
 "la (dé)compaction ne s'applique qu'à des matrices denses, class(x)='%s'"
 
 msgid "'x' is not symmetric nor triangular"
 msgstr "'x' n'est ni symétrique ni triangulaire"
+
+#, fuzzy
+msgid "'x' is not symmetric -- chol() undefined."
+msgstr "'x' n'est pas positif fini --chol() non défini."
 
 #, fuzzy
 msgid ""
