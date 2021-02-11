@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-3 (2021-02-11 r3370)}{
+\section{Changes in version 1.3-3 (2021-02-11 r3371)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item \code{cBind()} and \code{rBind()} are now defunct:
@@ -33,6 +33,8 @@
       \item Fixed a thinko (in 1.3-2): Now direct coercion from
       \code{"ddiMatrix"} to \code{"dgCMatrix"}, and hence, e.g.,
       \code{as(Matrix(1, sparse=TRUE), "dgCMatrix") now works.}
+
+      \item Fixed error message in <dtrMatrix> multiplication.
     }
   }
   \subsection{Misc}{

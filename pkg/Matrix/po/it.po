@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.2-9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-29 17:44+0100\n"
-"PO-Revision-Date: \n"
+"POT-Creation-Date: 2021-02-11 12:54+0100\n"
+"PO-Revision-Date: 2021-02-11 13:08+0100\n"
 "Last-Translator: Daniele Medri <dmedri@gmail.com>\n"
 "Language-Team: Italian https://github.com/dmedri/R-italian-lang\n"
 "Language: it\n"
@@ -331,7 +331,7 @@ msgstr "length(Dimnames[%d]) differisce da Dim[%d] che è %d"
 msgid "'uplo' must be UPP or LOW"
 msgstr "'uplo' dev'essere UPP o LOW"
 
-#: Mutils.c:504 dgeMatrix.c:420 dtrMatrix.c:287
+#: Mutils.c:504 dgeMatrix.c:420 dtrMatrix.c:288
 msgid "replacement diagonal has wrong length"
 msgstr "la diagonale di ricambio ha una lunghezza errata"
 
@@ -1052,17 +1052,15 @@ msgid "dtrMatrix must be square"
 msgstr "dtrMatrix dev'essere quadrata"
 
 #: dtrMatrix.c:192
-#, fuzzy
-msgid "\"dtrMatrix\" objects in '%*%' must have matching (square) dimension"
-msgstr ""
-"gli oggetti \"dtrMatrix\" in '%*%' devono avere corrispondenti dimensioni "
-"(quadrate)"
+#, c-format
+msgid "dimension mismatch in matrix multiplication of \"dtrMatrix\": %d != %d"
+msgstr "dimensioni non corrispondenti in moltiplicazione di matrici \"dtrMatrix\": %d != %d"
 
-#: dtrMatrix.c:282
+#: dtrMatrix.c:283
 msgid "cannot set diag() as long as 'diag = \"U\"'"
 msgstr "non è possibile impostare diag() purché 'diag = \"U\"'"
 
-#: dtrMatrix.c:316
+#: dtrMatrix.c:317
 msgid "cannot add diag() as long as 'diag = \"U\"'"
 msgstr "non è possibile aggiungere diag() purché 'diag = \"U\"'"
 
@@ -1134,3 +1132,9 @@ msgstr ""
 msgid "programming error in Csparse_subassign() should never happen"
 msgstr ""
 "l'errore di programmazione in Csparse_subassign() non dovrebbe mai accadere"
+
+#, fuzzy
+#~ msgid "\"dtrMatrix\" objects in '%*%' must have matching (square) dimension"
+#~ msgstr ""
+#~ "gli oggetti \"dtrMatrix\" in '%*%' devono avere corrispondenti dimensioni "
+#~ "(quadrate)"
