@@ -988,7 +988,7 @@ setMethod("solve", signature(a = "diagonalMatrix", b = "Matrix"),
 
 ###---------------- <Ops> (<Arith>, <Logic>, <Compare> ) ----------------------
 
-## Use function for several signatures, in order to evade
+## Use as S4 method for several signatures ==>  using callGeneric()
 diagOdiag <- function(e1,e2) {
     ## result should also be diagonal _ if possible _
     r <- callGeneric(.diag.x(e1), .diag.x(e2)) # error if not "compatible"
@@ -1020,7 +1020,8 @@ diagOdiag <- function(e1,e2) {
 	n <- d[1L]
 	stopifnot(length(r) == n)
 	if(isNum && !is.double(r)) r <- as.double(r)
-	xx <- as.vector(matrix(rbind(r, matrix(r00,n,n)), n,n))
+	## faster (?) than  m <- matrix(r00,n,n); diag(m) <- r ; as.vector(m)
+        xx <- rbind(r, matrix(r00,n,n), deparse.level=0L)[seq_len(n*n)]
 	newcl <-
 	    paste0(if(isNum) "d" else if(isLog) {
 		if(!anyNA(r) && !anyNA(r00)) "n" else "l"
