@@ -1,9 +1,10 @@
 #### For both 'Extract' ("[") and 'Replace' ("[<-") Method testing
 ####    aka    subsetting     and  subassignment
+####           ~~~~~~~~~~          ~~~~~~~~~~~~~
 
 if(interactive()) {
     options(error = recover, warn = 1)
-} else if(FALSE) { ## MM @ testing *manually* only
+} else if(FALSE) { ## MM / developer  testing *manually* :
     options(error = recover, Matrix.verbose = 2,   warn = 1)
 } else {
     options(                 Matrix.verbose = 2, warn = 1)
@@ -225,9 +226,6 @@ getDuplIndex <- function(n, k) {
     i
 }
 
-## From package 'sfsmisc':
-repChar <- function (char, no) paste(rep.int(char, no), collapse = "")
-
 suppressWarnings(RNGversion("3.5.0")); set.seed(101)
 m <- 1:800
 m[sample(800, 600)] <- 0
@@ -281,9 +279,9 @@ for(kind in c("n", "l", "d")) {
         cat(".")
     }
     options(op)
-    cat(sprintf("\n[Ok]%s\n\n", repChar("-", 64)))
+    cat(sprintf("\n[Ok]%s\n\n", strrep("-", 64)))
  }
- cat(sprintf("\nok( %s )\n== ###%s\n\n", kind, repChar("=", 70)))
+ cat(sprintf("\nok( %s )\n== ###%s\n\n", kind, strrep("=", 70)))
 }## end{for}---------------------------------------------------------------
 showProc.time()
 
@@ -973,8 +971,20 @@ assert.EQ.mat(t2, m)# ok
 assert.EQ.mat(s2, m)# failed in 0.9975-8
 showProc.time()
 
+## sub-assign  RsparseMatrix -- Matrix bug [#6709] by David Cortes
+## https://r-forge.r-project.org/tracker/?func=detail&atid=294&aid=6709&group_id=61
+## simplified by MM
+X <- new("dgCMatrix", i = c(0L,3L), p = c(0L,2L,2L,2L), x = c(100, -20), Dim = c(12L,3L))
+R <- as(X, "RsparseMatrix")
+T <- as(R, "TsparseMatrix")
+T[, 2] <- 22 # works fine
+R[, 2] <- 22 # failed, as it called replTmat() giving narg() == 3
+## now R is Tsparse (as documented on ../man/RsparseMatrix-class.Rd),
+identical(R, T) ## but as this may change, rather R & T should have the same *content*
+assert.EQ.Mat(R, T)
 
-## m[cbind(i,j)] <- value: (2-column matrix subassignment):
+
+## m[cbind(i,j)] <- value: (2-column matrix subassignment): -------------------------
 m.[ cbind(3:5, 1:3) ] <- 1:3
 stopifnot(m.[3,1] == 1, m.[4,2] == 2)
 nt. <- nt ; nt[rbind(2:3, 3:4, c(3,3))] <- FALSE

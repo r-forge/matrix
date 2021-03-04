@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-3 (2021-02-24 r3373)}{
+\section{Changes in version 1.3-3 (2021-03-03 r3374)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item \code{cBind()} and \code{rBind()} are now defunct:
@@ -35,6 +35,9 @@
       \code{as(Matrix(1, sparse=TRUE), "dgCMatrix") now works.}
 
       \item Fixed error message in <dtrMatrix> multiplication.
+
+      \item Fixed long-standing bug in \code{R[,j] <- v} when \code{R} is "Rsparse*",
+      R-forge Matrix bug #6709 by David Cortes.
     }
   }
   \subsection{Misc}{
