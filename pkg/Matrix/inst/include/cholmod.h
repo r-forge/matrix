@@ -62,6 +62,29 @@ extern "C" {
 #define CHOLMOD_VERSION \
     CHOLMOD_VER_CODE(CHOLMOD_MAIN_VERSION,CHOLMOD_SUB_VERSION)
 
+
+/* ========================================================================== */
+/* === CUDA BLAS for the GPU ================================================ */
+/* ========================================================================== */
+
+/* The number of OMP threads should typically be set to the number of cores   */
+/* per socket inthe machine being used.  This maximizes memory performance.   */
+#ifndef CHOLMOD_OMP_NUM_THREADS
+#define CHOLMOD_OMP_NUM_THREADS 4
+#endif
+
+/* Define buffering parameters for GPU processing */
+#ifndef SUITESPARSE_GPU_EXTERN_ON
+#ifdef GPU_BLAS
+#include <cublas_v2.h>
+#endif
+#endif
+
+#define CHOLMOD_DEVICE_SUPERNODE_BUFFERS 6
+#define CHOLMOD_HOST_SUPERNODE_BUFFERS 8
+#define CHOLMOD_DEVICE_STREAMS 2
+
+
 // from ../../src/CHOLMOD/Include/cholmod_core.h - line 295 :  <<<<<
 /* Each CHOLMOD object has its own type code. */
 
