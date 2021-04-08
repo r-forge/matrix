@@ -1152,7 +1152,7 @@ if(doExtras) {
 	checkMatrix(.m)
     }
     cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
-} 
+}
 ## in any case, test
 d4d.2 <- Matrix:::.dense2C(!!d4da) ## <<- did wrongly make dimnames symmetric
 l4da <- as(d4da, "lMatrix")
@@ -1176,6 +1176,13 @@ cbind(c.c, Res = apply(c.c, 1, function(x) class(new(x[1]) < new(x[2]))))
 
 if(!interactive()) warnings()
 
+## R-forge matrix-Bugs [#6708] (2021-02-25, by David Cortes):
+sVec <- sparseVector(c(1,exp(1),pi), c(1,3,7), length=9)
+ vec <- c(1, 0, exp(1), 0, 0, 0, pi, 0, 0)
+stopifnot(identical(as.matrix(sVec), as.matrix(vec)),
+          identical(as.array (sVec), as.array (vec)))
+
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()
@@ -1187,3 +1194,4 @@ if(SysI[["sysname"]] == "Linux" && require("sfsmisc")) local({
     nn <- names(.Sc <- .Sc[!grepl("^flags", nn)])
     print(.Sc[ grep("\\.[0-9]+$", nn, invert=TRUE) ])
 })
+
