@@ -1,14 +1,14 @@
-# R Italian translation
+# R Italian translation                                                                    
 # This file is distributed under the same license as the R package.
 # Copyright (C) The R Foundation.
-# Daniele Medri <dmedri@gmail.com>, 2005-2020.
+# Daniele Medri <dmedri@gmail.com>, 2005-2021.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Matrix 1.2-9\n"
+"Project-Id-Version: Matrix 1.3-3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-11 12:54+0100\n"
-"PO-Revision-Date: 2021-02-11 13:08+0100\n"
+"PO-Revision-Date: 2021-04-14 12:18+0200\n"
 "Last-Translator: Daniele Medri <dmedri@gmail.com>\n"
 "Language-Team: Italian https://github.com/dmedri/R-italian-lang\n"
 "Language: it\n"
@@ -35,7 +35,7 @@ msgstr "cholmod_updown() ha restituito %d"
 #: CHMfactor.c:104
 #, c-format
 msgid "diagonal element %d of Cholesky factor is missing"
-msgstr "l'elemento diagonale %d del fattore Cholesky è mancante"
+msgstr "l'elemento diagonale %d del fattore Cholesky è assente"
 
 #: CHMfactor.c:142
 #, c-format
@@ -211,34 +211,34 @@ msgid "code not yet written for cls = \"lgCMatrix\""
 msgstr "codice non ancora scritto per cls = \"lgCMatrix\""
 
 #: Csparse.c:1307
-#, fuzzy, c-format
+#, c-format
 msgid "%s must be (traditional R) matrix"
-msgstr "A dev'essere una matrice logica"
+msgstr "%s dev'essere una matrice (tradizionale di R)"
 
 #: Csparse.c:1314
-#, fuzzy, c-format
+#, c-format
 msgid "%s must be character string"
-msgstr "'s1' e 's2' devono essere vettori di caratteri"
+msgstr "%s dev'essere una stringa di caratteri"
 
 #: Csparse.c:1318
 #, c-format
 msgid "nrow * ncol = %d * %d must equal length(x) = %ld"
-msgstr ""
+msgstr "nrow * ncol = %d * %d deve eguagliare length(x) = %ld"
 
 #: Csparse.c:1322
-#, fuzzy, c-format
+#, c-format
 msgid "strlen of cls argument = %d, should be 9"
-msgstr "strlen dell'argomento cls = %d, dovrebbe essere 8"
+msgstr "strlen dell'argomento cls = %d, dovrebbe essere 9"
 
 #: Csparse.c:1334
-#, fuzzy, c-format
+#, c-format
 msgid "cls = \"%s\" must begin with 'd', 'l' or 'n' for now"
-msgstr "cls = \"%s\" deve iniziare con 'd', 'l' o 'n'"
+msgstr "cls = \"%s\" deve iniziare con 'd', 'l' o 'n' per ora"
 
 #: Csparse.c:1392
-#, fuzzy, c-format
+#, c-format
 msgid "%s must be a logical or double vector"
-msgstr "A dev'essere una matrice logica"
+msgstr "%s dev'essere un vettore di tipo logical o double"
 
 #: Mutils.c:14 Mutils.c:33
 #, c-format
@@ -308,14 +308,14 @@ msgstr[0] "Valore negativo in Dim"
 msgstr[1] "Valori negativi in Dim"
 
 #: Mutils.c:362
-#, fuzzy, c-format
+#, c-format
 msgid "%s is not a list"
-msgstr "Lo slot dimnames non è una lista"
+msgstr "%s non è una lista"
 
 #: Mutils.c:366
-#, fuzzy, c-format
+#, c-format
 msgid "%s is a list, but not of length 2"
-msgstr "Lo slot dimnames è una lista, ma non di lunghezza 2"
+msgstr "%s è una lista, ma non di lunghezza 2"
 
 #: Mutils.c:372
 #, c-format
@@ -702,13 +702,17 @@ msgstr "La routine Lapack dtrcon ha restituito il codice di errore %d"
 #, c-format
 msgid "dense_to_Csparse(<LARGE>): cholmod_l_dense_to_sparse failure status=%d"
 msgstr ""
+"dense_to_Csparse(<LARGE>): cholmod_l_dense_to_sparse riporta il seguente "
+"errore=%d"
 
 #: dense.c:294
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Matrix dimension %d x %d (= %g) too large [FIXME calling "
 "cholmod_l_dense_to_sparse]"
-msgstr "Dimensione matrice %d x %d (= %g) è troppo grande"
+msgstr ""
+"Dimensione matrice %d x %d (= %g) troppo grande [RISOLVI chiamando "
+"cholmod_l_dense_to_sparse]"
 
 #: dense.c:323
 #, c-format
@@ -1017,18 +1021,16 @@ msgid "Lapack routine dsytrf returned error code %d"
 msgstr "La routine Lapack dsytrf ha restituito il codice di errore %d"
 
 #: dsyMatrix.c:177
-#, fuzzy
 msgid "x must be a \"double\" (numeric) matrix"
-msgstr "X dev'essere una matrice (numerica) reale"
+msgstr "x dev'essere una matrice (numerica) \"double\""
 
 #: dsyMatrix.c:187
-#, fuzzy
 msgid "matrix_trf(x, *): matrix is not square"
-msgstr "ddense_to_symmetric(): la matrice non è quadrata!"
+msgstr "matrix_trf(x, *): la matrice non è quadrata"
 
 #: dsyMatrix.c:194
 msgid "matrix_trf(*, uplo): uplo must be string"
-msgstr ""
+msgstr "matrix_trf(*, uplo): uplo dev'essere una stringa"
 
 #: dtCMatrix.c:28 dtCMatrix.c:63 dtTMatrix.c:24
 msgid "uplo='U' must not have sparse entries below the diagonal"
@@ -1054,7 +1056,9 @@ msgstr "dtrMatrix dev'essere quadrata"
 #: dtrMatrix.c:192
 #, c-format
 msgid "dimension mismatch in matrix multiplication of \"dtrMatrix\": %d != %d"
-msgstr "dimensioni non corrispondenti in moltiplicazione di matrici \"dtrMatrix\": %d != %d"
+msgstr ""
+"dimensione non conforme nella moltiplicazione matriciale di \"dtrMatrix\": "
+"%d != %d"
 
 #: dtrMatrix.c:283
 msgid "cannot set diag() as long as 'diag = \"U\"'"
@@ -1074,7 +1078,7 @@ msgstr "lo slot x non è della lunghezza corretta"
 
 #: init.c:377
 msgid "missing 'Matrix' namespace: should never happen"
-msgstr "namespace 'Matrix' mancante: non dovrebbe mai accadere"
+msgstr "namespace 'Matrix' assente: non dovrebbe mai accadere"
 
 #: init.c:388
 msgid "Matrix namespace not determined correctly"
@@ -1133,7 +1137,6 @@ msgid "programming error in Csparse_subassign() should never happen"
 msgstr ""
 "l'errore di programmazione in Csparse_subassign() non dovrebbe mai accadere"
 
-#, fuzzy
 #~ msgid "\"dtrMatrix\" objects in '%*%' must have matching (square) dimension"
 #~ msgstr ""
 #~ "gli oggetti \"dtrMatrix\" in '%*%' devono avere corrispondenti dimensioni "

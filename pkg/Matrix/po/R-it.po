@@ -1,14 +1,14 @@
 # R Italian translation                                                                    
 # This file is distributed under the same license as the R package.
 # Copyright (C) The R Foundation.
-# Daniele Medri <dmedri@gmail.com>, 2005-2020.
+# Daniele Medri <dmedri@gmail.com>, 2005-2021.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: R-Matrix 1.2-9\n"
+"Project-Id-Version: R-Matrix 1.3-3\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
 "POT-Creation-Date: 2021-01-29 17:44\n"
-"PO-Revision-Date: \n"
+"PO-Revision-Date: 2021-04-14 12:18+0200\n"
 "Last-Translator: Daniele Medri <dmedri@gmail.com>\n"
 "Language-Team: Italian https://github.com/dmedri/R-italian-lang\n"
 "Language: it\n"
@@ -27,7 +27,7 @@ msgid ""
 msgstr ""
 "metodo non ancora implementato per %s(<%s>).\n"
 "  - >> Chiedi agli autori del pacchetto di implementare la funzionalità "
-"mancante."
+"assente."
 
 msgid ""
 "not-yet-implemented method for %s(<%s>, <%s>).\n"
@@ -35,7 +35,7 @@ msgid ""
 msgstr ""
 "metodo non ancora implementato per %s(<%s>, <%s>).\n"
 "  - >> Chiedi agli autori del pacchetto di implementare la funzionalità "
-"mancante."
+"assente."
 
 msgid "'x' is not positive definite -- chol() undefined."
 msgstr "'x' non è definito positivo -- chol() non definito."
@@ -102,9 +102,9 @@ msgstr ""
 msgid "update must be TRUE/FALSE or '+' or '-'"
 msgstr "l'aggiornamento dev'essere TRUE/FALSE o '+' o '-'"
 
-#, fuzzy
 msgid "cannot coerce NA values to pattern \"ngCMatrix\""
-msgstr "non è possibile la coercizione degli 'NA' in \"nsparseMatrix\""
+msgstr ""
+"non è possibile la coercizione dei valori 'NA' nel pattern \"ngCMatrix\""
 
 msgid "Matrix-internal error in <CsparseM>[i,,d]; please report"
 msgstr "Errore interno alla matrice in <CsparseM>[i,,d]; per piacere riportalo"
@@ -201,11 +201,15 @@ msgid ""
 "as.matrix(<Matrix>) is deprecated (to become a no-op in the future).\n"
 "Use  as(x, \"matrix\")  or .asmatrix(x) instead."
 msgstr ""
+"as.matrix(<Matrix>) è deprecato (per diventare una no-op in futuro).\n"
+"Utilizza come alternativa as(x, \"matrix\") o .asmatrix(x)."
 
 msgid ""
 "as.array(<Matrix>) is deprecated. Use  as(x, \"matrix\")  or .asmatrix(x) "
 "instead."
 msgstr ""
+"as.array(<Matrix>) è deprecato. Utilizza come alternativa as(x, \"matrix\") "
+"o .asmatrix(x)."
 
 msgid "trimmed mean of 'sparseVector' -- suboptimally using as.numeric(.)"
 msgstr ""
@@ -268,11 +272,12 @@ msgstr ""
 "nargs() = %d.  Argomenti illegali estranei all'interno di '[ .. ]' (i."
 "logical)?"
 
-#, fuzzy
 msgid ""
 "m[<ij-matrix>]: inefficiently indexing single elements - should not happen, "
 "please report!"
-msgstr "m[ <ij-matrix> ]: indicizzazione inefficiente dei singoli elementi"
+msgstr ""
+"m[ <ij-matrix> ]: indicizzazione inefficiente dei singoli elementi - non "
+"dovrebbe succedere, per piacere riportalo!"
 
 msgid "nargs() = %d.  Extraneous illegal arguments inside '[ .. ]' (i.2col)?"
 msgstr ""
@@ -503,10 +508,10 @@ msgid "<seqMat>  -->  <abIndex>  is not yet implemented"
 msgstr "<seqMat>  -->  <abIndex>  non è ancora implementato"
 
 msgid "'giveCsparse' has been deprecated; setting 'repr = \"T\"' for you"
-msgstr ""
+msgstr "'giveCsparse' è stato deprecato; viene impostato 'repr = \"T\"'"
 
 msgid "'giveCsparse' has been deprecated; will use 'repr' instead"
-msgstr ""
+msgstr "'giveCsparse' è stato deprecato; si utilizzerà 'repr'"
 
 msgid "'diagonals' matrix must have %d columns (= length(k) )"
 msgstr "la matrice 'diagonals' deve avere %d colonne (= length(k) )"
@@ -529,7 +534,7 @@ msgid "the %d-th (sub)-diagonal (k = %d) is too short; filling with NA's"
 msgstr "la %d' (sotto)-diagonale (k = %d) è troppo corta; si riempie con NA"
 
 msgid "invalid 'repr'; must be \"C\", \"T\", or \"R\""
-msgstr ""
+msgstr "'repr' non valido; dev'essere \"C\", \"T\", o \"R\""
 
 msgid "resulting x-slot has different type than x's or y's"
 msgstr "lo x-slot risultante ha un tipo diverso da quelli di x o y"
@@ -675,7 +680,7 @@ msgid "kronecker method must use default 'FUN'"
 msgstr "il metodo di kronecker deve utilizzare in maniera predefinita 'FUN'"
 
 msgid "resulting matrix dimension would be too large"
-msgstr ""
+msgstr "la dimensione della matrice risultante sarà troppo grande"
 
 msgid "replacing \"indMatrix\" entries is not allowed, as rarely sensible"
 msgstr ""
@@ -694,9 +699,9 @@ msgstr "non è possibile la coercizione degli 'NA' in \"nsparseMatrix\""
 msgid "temporarily disabled"
 msgstr "temporaneamente disabilitato"
 
-#, fuzzy
 msgid "cannot coerce NA values to pattern \"ntCMatrix\""
-msgstr "non è possibile la coercizione degli 'NA' in \"nsparseMatrix\""
+msgstr ""
+"non è possibile la coercizione dei valori 'NA' nel pattern \"ntCMatrix\""
 
 msgid "coercion to \"pMatrix\" only works from integer numeric"
 msgstr "la coercizione in \"pMatrix\" funziona solo da interi numerici"
@@ -715,9 +720,10 @@ msgstr "'boolArith = %d' non ancora implementato"
 
 msgid "qr2rankMatrix(.): QR with only %d out of %d finite diag(R) entries"
 msgstr ""
+"qr2rankMatrix(.): QR con solo %d elementi fuori dai %d finiti di diag(R)"
 
 msgid "qr2rankMatrix(.): QR has negative diag(R) entries"
-msgstr ""
+msgstr "qr2rankMatrix(.): QR ha elementi diag(R) negativi"
 
 msgid ""
 "rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n"
@@ -792,17 +798,14 @@ msgstr "uniDiag=TRUE, non tutte le voci in diagonale codificate come 1"
 msgid "in show(); maybe adjust 'options(max.print= *, width = *)'"
 msgstr "in show(); si dovrebbe aggiustare 'options(max.print= *, width = *)'"
 
-#, fuzzy
 msgid "suppressing %d columns and %d rows"
-msgstr "soppressione colonne e righe"
+msgstr "soppresse %d colonne e %d righe"
 
-#, fuzzy
 msgid "suppressing %d rows"
-msgstr "soppressione righe"
+msgstr "soppresse %d righe"
 
-#, fuzzy
 msgid "suppressing %d columns"
-msgstr "soppressione colonne"
+msgstr "soppresse %d colonne"
 
 msgid "logic programming error in printSpMatrix2(), please report"
 msgstr ""
@@ -823,14 +826,13 @@ msgstr ""
 
 msgid "a sparseMatrix should rarely be centered: will not be sparse anymore"
 msgstr ""
+"una sparseMatrix dovrebbe essere raramente centrata: non sarà più sparsa."
 
-#, fuzzy
 msgid "length of 'center' must equal the number of columns of 'x'"
-msgstr "Le matrici devono avere il medesimo numero di colonne in %s"
+msgstr "la lunghezza di 'center' deve eguagliare il numero di colonne di 'x'"
 
-#, fuzzy
 msgid "length of 'scale' must equal the number of columns of 'x'"
-msgstr "Le matrici devono avere il medesimo numero di colonne in %s"
+msgstr "la lunghezza di 'scale' deve eguagliare il numero di colonne di 'x'"
 
 msgid ""
 "qr.R(<sparse>) may differ from qr.R(<dense>) because of permutations.  "
@@ -879,7 +881,7 @@ msgid "'times >= 0' is required"
 msgstr "'times >= 0' è richiesto"
 
 msgid "'giveCsparse' has been deprecated; setting 'repr = \"%s\"' for you"
-msgstr ""
+msgstr "'giveCsparse' è stato deprecato; viene impostato 'repr = \"%s\"'"
 
 msgid "(un)packing only applies to dense matrices, class(x)='%s'"
 msgstr "il (un)packing si applica solo alle matrici dense, class(x)='%s'"
@@ -887,9 +889,8 @@ msgstr "il (un)packing si applica solo alle matrici dense, class(x)='%s'"
 msgid "'x' is not symmetric nor triangular"
 msgstr "'x' non è simmetrica ne triangolare"
 
-#, fuzzy
 msgid "'x' is not symmetric -- chol() undefined."
-msgstr "'x' non è definito positivo -- chol() non definito."
+msgstr "'x' non è simmetrico -- chol() non definito."
 
 msgid ""
 "extra argument %s will be disregarded in\n"
