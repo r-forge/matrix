@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-3 (2021-04-08 r3379)}{
+\section{Changes in version 1.3-3 (2021-04-15 r3381)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item \code{cBind()} and \code{rBind()} are now defunct:
@@ -52,6 +52,7 @@
       \item translation updates (of outlines only); finally added Italian
       (by Daniele Medri) to svn; updated French (by Philippe Grosjean),
       forgotten (R part of) Korean.
+      New Lithuanian translations by Gabriele Stupuriene & Rimantas Zakauskas.
 
       \item In internal \code{diagOdiag()} method, no longer use
       \code{matrix(x, n,n)} when \code{x} is longer than n*n.
