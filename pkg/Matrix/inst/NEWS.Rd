@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-3 (2021-04-15 r3381)}{
+\section{Changes in version 1.3-3 (2021-04-17 r3383)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item \code{cBind()} and \code{rBind()} are now defunct:
@@ -45,6 +45,9 @@
 
       \item \code{as.matrix()} and \code{as.array()} now work for
       \code{"sparseVector"}s as expected; see Matrix bug #6708.
+
+      \item \code{M[,]} (and similar) now work as in base \R; ; R-forge Matrix bug #6720 by
+      David Cortes.
     }
   }
   \subsection{Misc}{

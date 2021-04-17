@@ -1222,10 +1222,50 @@ validObject(x)
 ## gave 'Error' invalid ..“dsparseVector”.. 'i' must be sorted strictly increasingly
 stopifnot(all.equal(x[i] ,  y1+y2, tolerance=0),
 		    x[i] == y1+y2)
-
-
-
-
 showProc.time()
 
 if(!interactive()) warnings()
+
+## [matrix-Bugs][#6720] Subsetting with empty indices does not drop -- 17 Apr 2021, by David Cortes
+##  https://r-forge.r-project.org/tracker/?func=detail&atid=294&aid=6720&group_id=61
+
+## extended by MM to all versions of "empty" :
+x <- c(1,8)
+(m1 <-  rbind(x))
+m1[]             # remains matrix
+m1[,,drop=FALSE] # ditto
+m1[,] # [1] 1 2 -- drops (as default drop=TRUE !)
+
+## Sparse Matrix and  actually *any* Matrix-extending class did not work
+(M1 <- as(m1, "denseMatrix")) # "dgeMatrix"
+S1 <- as(m1, "CsparseMatrix")
+R1 <- as(m1, "RsparseMatrix")
+stopifnot(exprs = {
+    identical(M1[], M1) # remains
+    identical(S1[], S1) # remains
+    identical(R1[], R1) # remains
+    identical(M1[,,drop=FALSE], M1) # ditto
+    identical(S1[,,drop=FALSE], S1) #  "
+    identical(R1[,,drop=FALSE], R1) #  "
+    ## but drop=TRUE  which is the *default* much be obeyed (also for *empty* (i,j):
+    identical(m1[,], x)
+    identical(M1[,], x) # should drop, but did not
+    identical(S1[,], x) #  "
+    identical(R1[,], x) #  "
+    identical(m1[,,drop=TRUE], x)
+    identical(M1[,,drop=TRUE], x) # should drop, but did not
+    identical(S1[,,drop=TRUE], x) #  "
+    identical(R1[,,drop=TRUE], x)  # "
+})
+
+
+## [matrix-Bugs][#6721] Assignment to 'dgRMatrix' with missing index takes only first element
+## MM: This has been fixed already!
+X <- rbind(0, 1:3, 0, c(0,1,0))
+Rx <- as(X, "RsparseMatrix")
+Cx <- as(X, "CsparseMatrix")
+X [2,] <- 0
+Cx[2,] <- 0
+Rx[2,] <- 0
+stopifnot(all(Cx == X),
+          all(Rx == X))
