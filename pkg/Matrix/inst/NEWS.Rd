@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-3 (2021-04-17 r3383)}{
+\section{Changes in version 1.3-3 (2021-04-20 r3384)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item \code{cBind()} and \code{rBind()} are now defunct:
@@ -24,8 +24,8 @@
   }
   \subsection{Dependency}{
     \itemize{
-      \item For now revert to \code{R (>= 3.5.0)} dependency, as e.g.,
-      Debian stable needs it.
+      \item For now revert to \code{R (>= 3.5.0)} dependency to accomodate
+      users on older R installations.
     }
   }
   \subsection{Bug Fixes}{
@@ -61,7 +61,10 @@
       \code{matrix(x, n,n)} when \code{x} is longer than n*n.
 
       \item Update tests/*.R to future \code{matrix(x, n,k)} warning in more
-      mismatch cases. %% FIXME !!!! NOT YET done: for backcompatibility:  suppressWarnings() ??
+      mismatch cases. %% FIXME !!!! NOT YET done: for backcompatibility: %% suppressWarnings() ??
+
+      \item Eliminating the need for \file{ftp://*}, add the very small
+      \code{jgl009} MatrixMarket example to our \file{external/} files.
     }
   }
 }
