@@ -1182,6 +1182,16 @@ sVec <- sparseVector(c(1,exp(1),pi), c(1,3,7), length=9)
 stopifnot(identical(as.matrix(sVec), as.matrix(vec)),
           identical(as.array (sVec), as.array (vec)))
 
+## R-forge matrix-Bugs [#6656] (2020-02-05, by Chun Fung (Jackson) Kwok (kcf.jackson)
+## (*is* a bug, but not in kronecker etc, but rather in Arith / Ops)
+dC <- sparseMatrix(i=1:4, j=1:4, x=5:2, triangular = TRUE)
+(dT <- as(dC, "TsparseMatrix"))
+stopifnot(identical(--dC, dC),
+          identical(--dT, dT)
+          )
+## both  - <sparse-triang.> gave : Error .... 'factors’ is not a slot in class “dtTMatrix”
+
+
 
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()

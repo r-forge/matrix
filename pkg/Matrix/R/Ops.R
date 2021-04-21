@@ -1449,7 +1449,9 @@ setMethod("-", signature(e1 = "sparseMatrix", e2 = "missing"),
 	  function(e1, e2) {
 	      e1 <- diagU2N(e1)
 	      e1@x <- -e1@x
-	      e1@factors <- list()# Drop Cholesky factors; TODO: Consider to modify & keep LU
+	      if(is(e1, "compMatrix") && length(e1@factors))
+		  ## TODO: be much smarter and try *updating* (some, e.g., LU) 'factors'
+		  e1@factors <- list()# Drop Cholesky factors
 	      e1
 	  })
 ## with the following exceptions:
