@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-3 (2021-04-21 r3385)}{
+\section{Changes in version 1.3-3 (2021-04-22 r3386)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item \code{cBind()} and \code{rBind()} are now defunct:
@@ -52,6 +52,10 @@
       \item \code{-S} now works also when \code{S} has no `factors` slot.
       It signalled an error, e.g., for sparse triangular matrices \code{S};
       R-forge Matrix bug #6656, reported by Chun Fung (Jackson) Kwok.
+
+      \item \code{M*2} and similar no longer keep cached factorizations (in
+      `factors` slot), but drop them via internal new \code{.empty.factors()}.
+      R-forge Matrix bug #6606, reported by Tomas Lumley.
     }
   }
   \subsection{Misc}{
