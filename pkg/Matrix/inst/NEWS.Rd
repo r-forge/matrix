@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-3 (2021-04-22 r3386)}{
+\section{Changes in version 1.3-3 (2021-04-24 r3387)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item \code{cBind()} and \code{rBind()} are now defunct:
@@ -56,6 +56,12 @@
       \item \code{M*2} and similar no longer keep cached factorizations (in
       `factors` slot), but drop them via internal new \code{.empty.factors()}.
       R-forge Matrix bug #6606, reported by Tomas Lumley.
+
+      \item removed the nowhere used (and unexported but still active)
+      class union \code{"Mnumeric"} which actually trickled into many base
+      classes properties.  Notably would it break validity of \code{factor}
+      with a proposed change in validity checking, as factors were also
+      \code{"Mnumeric"} but did not fulfill its validity method.
     }
   }
   \subsection{Misc}{
