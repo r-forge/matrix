@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.3-3 (2021-04-24 r3387)}{
+\section{Changes in version 1.3-3 (2021-04-27 r3388)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item \code{cBind()} and \code{rBind()} are now defunct:
@@ -62,6 +62,8 @@
       classes properties.  Notably would it break validity of \code{factor}
       with a proposed change in validity checking, as factors were also
       \code{"Mnumeric"} but did not fulfill its validity method.
+
+      \item removed a few duplicated \alias{.} from \file{man/*.Rd}.
     }
   }
   \subsection{Misc}{
