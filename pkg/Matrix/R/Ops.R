@@ -462,19 +462,19 @@ setMethod("Arith", signature(e1 = "dgeMatrix", e2 = "dgeMatrix"),
 	      if (!eqD[1])
 		  stop("Matrices must have same number of rows for arithmetic")
 	      same.dim <- eqD[2]
+              x1 <- e1@x
+              x2 <- e2@x
 	      if (same.dim) {
 		  d <- d1
 		  dn <- dimNamesCheck(e1, e2)
-                  x1 <- e1@x
-                  x2 <- e2@x
 	      }
 	      else { # nrows differ ----> maybe recycling
 		  if(d2[2] %% d1[2] == 0) { # nrow(e2) is a multiple
-		      x1 <- rep.int(e1@x, d2[2] %/% d1[2])
+		      x1 <- rep.int(x1, d2[2] %/% d1[2])
 		      d <- d2
 		      dn <- e2@Dimnames
 		  } else if(d1[2] %% d2[2] == 0) { # nrow(e1) is a multiple
-		      x2 <- rep.int(e2@x, d1[2] %/% d2[2])
+		      x2 <- rep.int(x2, d1[2] %/% d2[2])
 		      d <- d1
 		      dn <- e1@Dimnames
 		  } else
