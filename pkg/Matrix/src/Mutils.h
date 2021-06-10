@@ -50,7 +50,7 @@ extern "C" {
 #endif
 
 
-#define Alloca(n, t)   (t *) alloca( (size_t) ( (n) * sizeof(t) ) )
+#define Alloca(n, t)   (t *) alloca( ((size_t) n) * sizeof(t) )
 
 #define SMALL_4_Alloca 10000
 //			==== R uses the same cutoff in several places
