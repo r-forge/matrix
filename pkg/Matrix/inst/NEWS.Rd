@@ -15,6 +15,31 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
+
+\section{Changes in version 1.4-0 (2021-..-.. r....)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item Update many \file{src/*.c} preventing integer overflow in
+      \dQuote{pointer} and index computations for large (dense) matrices;
+      prompted by Dario Strbenac's post to R-devel.% June 7, "dgTMatrix Segmentation Fault"
+    }
+  }
+  \subsection{Misc}{
+    \itemize{
+      \item .
+    }
+  }
+}
+
+\section{Changes in version 1.3-4 (2021-05-24 r3392)}{
+  \subsection{Misc}{
+    \itemize{
+      \item Update \code{matrix(<data>, n,m)} in \file{tests/*} to work with
+      \command{R-devel CMD check --as-cran}
+    }
+  }
+}
+
 \section{Changes in version 1.3-3 (2021-05-01 r3390)}{
   \subsection{Deprecated and Defunct}{
     \itemize{

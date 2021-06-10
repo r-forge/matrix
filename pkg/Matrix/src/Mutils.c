@@ -423,26 +423,28 @@ SEXP dimNames_validate(SEXP obj)
 
 
 
-#define PACKED_TO_FULL(TYPE)						\
-TYPE *packed_to_full_ ## TYPE(TYPE *dest, const TYPE *src,		\
-		        int n, enum CBLAS_UPLO uplo)			\
-{									\
-    int i, j, pos = 0;							\
-									\
-    AZERO(dest, n*n);							\
-    for (j = 0; j < n; j++) {						\
-	switch(uplo) {							\
-	case UPP:							\
-	    for (i = 0; i <= j; i++) dest[i + j * n] = src[pos++];	\
-	    break;							\
-	case LOW:							\
-	    for (i = j; i < n; i++) dest[i + j * n] = src[pos++];	\
-	    break;							\
-	default:							\
-	    error(_("'uplo' must be UPP or LOW"));			\
-	}								\
-    }									\
-    return dest;							\
+#define PACKED_TO_FULL(TYPE)					\
+TYPE *packed_to_full_ ## TYPE(TYPE *dest, const TYPE *src,	\
+		        int n, enum CBLAS_UPLO uplo)		\
+{								\
+    int i, j, pos = 0;						\
+    size_t n2 = n * (size_t)n;					\
+								\
+    AZERO(dest, n2);						\
+    for (j = 0; j < n; j++) {					\
+        size_t jn = j * (size_t)n;				\
+	switch(uplo) {						\
+	case UPP:						\
+	    for (i = 0; i <= j; i++) dest[i + jn] = src[pos++];	\
+	    break;						\
+	case LOW:						\
+	    for (i = j; i < n; i++)  dest[i + jn] = src[pos++];	\
+	    break;						\
+	default:						\
+	    error(_("'uplo' must be UPP or LOW"));		\
+	}							\
+    }								\
+    return dest;						\
 }
 
 PACKED_TO_FULL(double)
@@ -675,10 +677,11 @@ install_diagonal(double *dest, SEXP A)
     int nc = INTEGER(GET_SLOT(A, Matrix_DimSym))[0];
     int i, ncp1 = nc + 1, unit = *diag_P(A) == 'U';
     double *ax = REAL(GET_SLOT(A, Matrix_xSym));
+    size_t in1 = 0;
 
-    AZERO(dest, nc * nc);
-    for (i = 0; i < nc; i++)
-	dest[i * ncp1] = (unit) ? 1. : ax[i];
+    AZERO(dest, nc * (size_t)nc);
+    for (i = 0; i < nc; i++, in1 += ncp1) // in1 == i * ncp1
+	dest[in1] = (unit) ? 1. : ax[i];
     return dest;
 }
 
@@ -688,10 +691,11 @@ install_diagonal_int(int *dest, SEXP A)
     int nc = INTEGER(GET_SLOT(A, Matrix_DimSym))[0];
     int i, ncp1 = nc + 1, unit = *diag_P(A) == 'U';
     int *ax = INTEGER(GET_SLOT(A, Matrix_xSym));
+    size_t in1 = 0;
 
-    AZERO(dest, nc * nc);
-    for (i = 0; i < nc; i++)
-	dest[i * ncp1] = (unit) ? 1 : ax[i];
+    AZERO(dest, nc * (size_t)nc);
+    for (i = 0; i < nc; i++, in1 += ncp1) // in1 == i * ncp1
+	dest[in1] = (unit) ? 1 : ax[i];
     return dest;
 }
 

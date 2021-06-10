@@ -508,18 +508,19 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
     if (U->n != n)
 	error(_("Dimensions of system to be solved are inconsistent"));
     if(nrhs >= 1 && n >= 1) {
+	R_xlen_t n_ = n; // <=> no overflow in j * n_
 	p = INTEGER(GET_SLOT(lu, Matrix_pSym));
 	q = LENGTH(qslot) ? INTEGER(qslot) : (int *) NULL;
 
 	for (j = 0; j < nrhs; j++) {
-	    cs_pvec(p, ax + j * n, x, n);  /* x = b(p) */
+	    cs_pvec(p, ax + j * n_, x, n);  /* x = b(p) */
 	    cs_lsolve(L, x);	       /* x = L\x */
 	    cs_usolve(U, x);	       /* x = U\x */
 	    if (q)		       /* r(q) = x , hence
 					  r = Q' U{^-1} L{^-1} P b = A^{-1} b */
-		cs_ipvec(q, x, ax + j * n, n);
+		cs_ipvec(q, x, ax + j * n_, n);
 	    else
-		Memcpy(ax + j * n, x, n);
+		Memcpy(ax + j * n_, x, n);
 	}
     }
     if(n >= SMALL_4_Alloca) Free(x);
