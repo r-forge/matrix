@@ -16,7 +16,7 @@
 %
 
 
-\section{Changes in version 1.4-0 (2021-..-.. r....)}{
+\section{Changes in version 1.4-0 (2021-06-11 r3396)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Update many \file{src/*.c} preventing integer overflow in
@@ -25,6 +25,15 @@
 
       \item \code{sparse.model.matrix(.., contrasts.arg = <.. ddiMatrix ..>)}
       now works correctly, fixing R-forge Matrix bug #6673 by Davor Josipovic.
+
+      \item \code{sparse.model.matrix(..)} now also works in cases the
+      contrast matrix has become a \code{"denseMatrix"}; e.g., in a case
+      using \code{poly(.)} in the formula; now works correctly, fixing
+      R-forge Matrix bug #6657 and useful suggestions by Nick Hanewinckel.
+
+      \item Fixed the internal \code{attr.all_Mat()} auxiliary for
+      \code{all.equal()}, notably for the case when exactly one of the
+      matrices is a base \code{matrix}.
     }
   }
   \subsection{Misc}{
