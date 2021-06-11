@@ -22,6 +22,9 @@
       \item Update many \file{src/*.c} preventing integer overflow in
       \dQuote{pointer} and index computations for large (dense) matrices;
       prompted by Dario Strbenac's post to R-devel.% June 7, "dgTMatrix Segmentation Fault"
+
+      \item \code{sparse.model.matrix(.., contrasts.arg = <.. ddiMatrix ..>)}
+      now works correctly, fixing R-forge Matrix bug #6673 by Davor Josipovic.
     }
   }
   \subsection{Misc}{

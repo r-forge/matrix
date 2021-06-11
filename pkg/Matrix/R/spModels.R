@@ -138,13 +138,16 @@ sparse.model.matrix <-
 		stop("invalid 'contrasts.arg' argument")
 	    for (nn in namC) {
 		if (is.na(ni <- match(nn, namD)))
-		    warning(gettextf("variable '%s' is absent, its contrast will be ignored", nn),
+		    warning(gettextf("variable '%s' is absent, its contrast will be ignored",
+                                     nn),
 			    domain = NA)
 		else {
 		    ca <- contrasts.arg[[nn]]
-## FIXME: work for *sparse* ca
-		    if(is.matrix(ca)) contrasts(data[[ni]], ncol(ca)) <- ca
-		    else contrasts(data[[ni]]) <- contrasts.arg[[nn]]
+		    ## for R >= 4.2 or so, simply  contrasts(*, ncol(.)) <- ca
+		    if(is.matrix(ca) || inherits(ca, "Matrix"))
+			contrasts(data[[ni]], ncol(ca)) <- ca
+		    else # function | string
+			contrasts(data[[ni]]) <- ca
 		}
 	    }
 	}

@@ -21,7 +21,7 @@ mEQ <- function(x,y, ...) {
 ##' @param frml formula
 ##' @param dat data frame
 ##' @param showFactors
-##' @param ...
+##' @param ... further arguments passed to {sparse.}model.matrix()
 isEQsparseDense <- function(frml, dat,
                             showFactors = isTRUE(getOption("verboseSparse")), ...)
 {
@@ -184,6 +184,29 @@ X. <- sparse.model.matrix(~ a + d, data = dd)
 stopifnot(dim(X.) == c(60, 12), nnzero(X.) == 234,
 	  isEQsparseDense(~ 0 + d + I(as.numeric(d)^2), dd))
 ## I(.) failed (upto 2010-05-07)
+
+## When the *contrasts* are sparse :
+spC <- as(contrasts(dd$d), "sparseMatrix")
+ddS <- dd
+contrasts(ddS$d) <- spC
+Xs <- sparse.model.matrix(~ a + d, data=ddS)
+stopifnot(exprs = {
+    inherits(spC, "sparseMatrix")
+    identical(spC, contrasts(ddS[,"d"]))
+    mEQ(X., Xs)
+})
+
+## Fixing matrix-Bugs [#6673] by Davor Josipovic
+df <- data.frame('a' = factor(1:3), 'b' = factor(4:6))
+Cid  <- lapply(df, contrasts, contrasts=FALSE)
+CidS <- lapply(df, contrasts, contrasts=FALSE, sparse=TRUE)
+X2  <- sparse.model.matrix(~ . -1, data = df, contrasts.arg = Cid)
+X2S <- sparse.model.matrix(~ . -1, data = df, contrasts.arg = CidS)
+X2
+stopifnot(all.equal(X2, X2S, tol=0))
+## X2S was missing the last column ('b6') in Matrix <= 1.x-y
+
+
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
 
