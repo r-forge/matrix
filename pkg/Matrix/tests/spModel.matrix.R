@@ -207,6 +207,26 @@ stopifnot(all.equal(X2, X2S, tol=0))
 ## X2S was missing the last column ('b6') in Matrix <= 1.x-y
 
 
+## Fixing (my repr.ex.) of Matrix bug [#6657] by Nick Hanewinckel
+mkD <-  function(n, p2 = 2^ceiling(log2(n)), sd = 10, rf = 4) {
+    stopifnot(p2 >= n, n >= 0, p2 %% 2 == 0)
+    G <- gl(2, p2/2, labels=c("M","F"))[sample.int(p2, n)]
+    data.frame(sex = G,
+               age = round(rf*rnorm(n, m = 32 + 2*as.numeric(G), sd=sd)) / rf)
+}
+set.seed(101)
+D1  <- mkD(47)
+Xs <- sparse.model.matrix(~ sex* poly(age, 2), data = D1)
+##  Error in model.spmatrix(..): no slot of name "i" for .. class "dgeMatrix"
+validObject(Xs)
+stopifnot(exprs = {
+    identical(c(47L, 6L), dim(Xs))
+    identical(colnames(Xs)[3:6],
+              c(1:2, outer("sexF", 1:2, paste, sep=":")))
+    all(Xs == model.matrix(~ sex* poly(age, 2), data = D1))
+})
+
+
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
 

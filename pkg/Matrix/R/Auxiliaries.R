@@ -190,7 +190,7 @@ attr.all_Mat <- function(target, current,
 	all.equal(attrSlots(target,  factors=factorsCheck),
 		  attrSlots(current, factors=factorsCheck),
 		  check.attributes = TRUE, ...) ## else NULL
-    if((c1 <- class(target)) != (c2 <- class(current)))
+    if(!identical((c1 <- class(target)), (c2 <- class(current))))
 	## list(): so we can easily check for this
 	list(c(if(!isTRUE(msg)) msg, paste0("class(target) is ", c1, ", current is ", c2)))
     else msg
