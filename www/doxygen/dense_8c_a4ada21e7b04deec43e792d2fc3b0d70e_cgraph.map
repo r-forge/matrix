@@ -1,4 +1,5 @@
 <map id="checkGivens" name="checkGivens">
-<area shape="rect" id="node2" href="$dense_8c.html#a00caca24445d05daed3f05182e00c00c" title="getGivens" alt="" coords="152,5,233,32"/>
-<area shape="rect" id="node3" href="$dense_8c.html#a68bc52a49ead614a48ef477696af3b78" title="Perform a left cyclic shift of columns j to k in the upper triangular matrix x, then restore it to up..." alt="" coords="281,5,363,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,5,103,32"/>
+<area shape="rect" id="node2" href="$dense_8c.html#a00caca24445d05daed3f05182e00c00c" title=" " alt="" coords="151,5,231,32"/>
+<area shape="rect" id="node3" href="$dense_8c.html#a68bc52a49ead614a48ef477696af3b78" title="Perform a left cyclic shift of columns j to k in the upper triangular matrix x, then restore it to up..." alt="" coords="279,5,359,32"/>
 </map>

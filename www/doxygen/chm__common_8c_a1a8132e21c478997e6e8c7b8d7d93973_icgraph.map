@@ -1,4 +1,5 @@
 <map id="R_cholmod_printf" name="R_cholmod_printf">
-<area shape="rect" id="node2" href="$chm__common_8h.html#a5b4b7e397d76f774a204afec64f2f09f" title="Initialize the CHOLMOD library and replace the print and error functions by R&#45;specific versions..." alt="" coords="177,5,299,32"/>
-<area shape="rect" id="node3" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="347,5,445,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="323,5,447,32"/>
+<area shape="rect" id="node2" href="$chm__common_8c.html#a1b14bacbdeada9ba9def1db396a98215" title="Initialize the CHOLMOD library and replace the print and error functions by R&#45;specific versions." alt="" coords="152,5,275,32"/>
+<area shape="rect" id="node3" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title=" " alt="" coords="5,5,104,32"/>
 </map>

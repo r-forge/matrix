@@ -1,7 +1,8 @@
 <map id="internal_chm_factor" name="internal_chm_factor">
-<area shape="rect" id="node2" href="$dsCMatrix_8h.html#a326fdb98f74608895abd9df179158253" title="dsCMatrix_chol" alt="" coords="221,5,334,32"/>
-<area shape="rect" id="node3" href="$dsCMatrix_8h.html#af424de259d431a9c8719a23188265887" title="dsCMatrix_Cholesky" alt="" coords="205,56,349,83"/>
-<area shape="rect" id="node4" href="$dsCMatrix_8h.html#adcc1710e8498942adcce28ec1eab655e" title="dsCMatrix_Csparse_solve" alt="" coords="189,107,365,133"/>
-<area shape="rect" id="node5" href="$dsCMatrix_8h.html#ae60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial Cholesky LDL&#39; decomp..." alt="" coords="212,157,343,184"/>
-<area shape="rect" id="node6" href="$dsCMatrix_8h.html#a2b40f2a78566d1c13864187d2ab964af" title="dsCMatrix_matrix_solve" alt="" coords="196,208,359,235"/>
+<area shape="rect" id="node1" title="Return a CHOLMOD copy of the cached Cholesky decomposition with the required perm,..." alt="" coords="228,107,364,133"/>
+<area shape="rect" id="node2" href="$dsCMatrix_8c.html#a326fdb98f74608895abd9df179158253" title=" " alt="" coords="36,5,149,32"/>
+<area shape="rect" id="node3" href="$dsCMatrix_8c.html#aae21eec3a70bf7840e8fc0b955156323" title=" " alt="" coords="21,56,165,83"/>
+<area shape="rect" id="node4" href="$dsCMatrix_8c.html#adcc1710e8498942adcce28ec1eab655e" title=" " alt="" coords="5,107,180,133"/>
+<area shape="rect" id="node5" href="$dsCMatrix_8c.html#ae60aeaa73a60dfa283258ced62d288f0" title="Fast version of getting at the diagonal matrix D of the (generalized) simplicial Cholesky LDL&#39; decomp..." alt="" coords="27,157,158,184"/>
+<area shape="rect" id="node6" href="$dsCMatrix_8c.html#a2b40f2a78566d1c13864187d2ab964af" title=" " alt="" coords="11,208,174,235"/>
 </map>

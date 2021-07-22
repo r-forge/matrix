@@ -1,5 +1,7 @@
 <map id="dppMatrix_solve" name="dppMatrix_solve">
-<area shape="rect" id="node2" href="$dppMatrix_8c.html#a6111600bf96735d9b39d5bc193203b31" title="dppMatrix_chol" alt="" coords="171,31,281,57"/>
-<area shape="rect" id="node3" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title="get_factors" alt="" coords="329,5,416,32"/>
-<area shape="rect" id="node4" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e. " alt="" coords="329,56,416,83"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,81,121,108"/>
+<area shape="rect" id="node2" href="$dppMatrix_8c.html#a6111600bf96735d9b39d5bc193203b31" title=" " alt="" coords="169,56,280,83"/>
+<area shape="rect" id="node4" href="$Mutils_8c.html#a6ae1b19a8224de1b3a8770a760d65722" title="A safe NEW_OBJECT(MAKE_CLASS(cls)), where the caller must protect the return value of this function." alt="" coords="328,107,517,133"/>
+<area shape="rect" id="node3" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title=" " alt="" coords="379,5,467,32"/>
+<area shape="rect" id="node5" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e." alt="" coords="379,56,467,83"/>
 </map>

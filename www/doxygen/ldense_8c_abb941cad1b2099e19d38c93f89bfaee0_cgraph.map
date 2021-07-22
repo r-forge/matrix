@@ -1,3 +1,5 @@
 <map id="ltrMatrix_as_lgeMatrix" name="ltrMatrix_as_lgeMatrix">
-<area shape="rect" id="node2" href="$Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title="make_i_matrix_triangular" alt="" coords="204,5,371,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,31,156,57"/>
+<area shape="rect" id="node2" href="$Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title=" " alt="" coords="215,5,382,32"/>
+<area shape="rect" id="node3" href="$Mutils_8c.html#a6ae1b19a8224de1b3a8770a760d65722" title="A safe NEW_OBJECT(MAKE_CLASS(cls)), where the caller must protect the return value of this function." alt="" coords="204,56,393,83"/>
 </map>

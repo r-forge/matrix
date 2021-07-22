@@ -40,6 +40,7 @@ var Csparse_8h =
     [ "iCsparse_subassign", "Csparse_8h.html#af4aaef903d47797011b7537270096a79", null ],
     [ "isValid_Csparse", "Csparse_8h.html#ad988031b3c1f79de0d13da2bf40cc4c1", null ],
     [ "lCsparse_subassign", "Csparse_8h.html#a83e4bdf2e38728c3ce9b4411974a9e78", null ],
+    [ "matrix_to_Csparse", "Csparse_8h.html#a508588f821220273756e34e55a92d646", null ],
     [ "nCsparse_subassign", "Csparse_8h.html#ab450eaab9725a7b44c855e2574cfacb7", null ],
     [ "nz2Csparse", "Csparse_8h.html#a4445bf9e1d6a9ee608151123b9d3aa9f", null ],
     [ "nz_pattern_to_Csparse", "Csparse_8h.html#a9a393d510bc108d7f4e5807d952fc089", null ],

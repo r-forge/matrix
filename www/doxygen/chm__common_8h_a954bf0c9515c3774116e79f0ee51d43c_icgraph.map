@@ -1,5 +1,6 @@
 <map id="check_sorted_chm" name="check_sorted_chm">
-<area shape="rect" id="node2" href="$chm__common_8h.html#ac0b9d7e2006dcf1a8d388954b408d007" title="Populate ans with the pointers from x and modify its scalar elements accordingly. ..." alt="" coords="185,31,324,57"/>
-<area shape="rect" id="node3" href="$t__Csparse__validate_8c.html#a9b61a7b94328cfd15ca3281ca7778fb7" title="CSPARSE_VAL_FN_NAME" alt="" coords="372,5,563,32"/>
-<area shape="rect" id="node4" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title="R_init_Matrix" alt="" coords="418,56,517,83"/>
+<area shape="rect" id="node1" title=" " alt="" coords="425,31,559,57"/>
+<area shape="rect" id="node2" href="$chm__common_8c.html#ac0b9d7e2006dcf1a8d388954b408d007" title="Populate ans with the pointers from x and modify its scalar elements accordingly." alt="" coords="239,31,377,57"/>
+<area shape="rect" id="node3" href="$t__Csparse__validate_8c.html#a9b61a7b94328cfd15ca3281ca7778fb7" title=" " alt="" coords="5,5,191,32"/>
+<area shape="rect" id="node4" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title=" " alt="" coords="49,56,147,83"/>
 </map>

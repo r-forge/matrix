@@ -1,7 +1,6 @@
 <map id="symmetric_DimNames" name="symmetric_DimNames">
-<area shape="rect" id="node2" href="$Csparse_8h.html#adf30d8deabe5bb928402465150189d79" title="Csparse_general_to\l_symmetric" alt="" coords="225,5,364,47"/>
-<area shape="rect" id="node3" href="$Csparse_8h.html#a1fe70f89e424351c54c9bf4ba618ae65" title="Csparse_symmetric_to\l_general" alt="" coords="216,71,373,112"/>
-<area shape="rect" id="node4" href="$Csparse_8h.html#a3ba5e051166f06c94c102d3e1e350a70" title="Csparse_to_matrix" alt="" coords="229,137,361,163"/>
-<area shape="rect" id="node5" href="$Mutils_8h.html#a47f3d7ddfd2644e3663c1a86264286e3" title="Even if the Dimnames slot is list(NULL, &lt;names&gt;) etc, return symmetric dimnames: Get ..." alt="" coords="209,187,380,214"/>
-<area shape="rect" id="node6" href="$dsyMatrix_8h.html#a4dccdf6fd104976ee07468b09735e62b" title="dsyMatrix_as_matrix" alt="" coords="428,187,571,214"/>
+<area shape="rect" id="node1" title="Produce symmetric &#39;Dimnames&#39; from possibly asymmetric ones." alt="" coords="209,78,364,105"/>
+<area shape="rect" id="node2" href="$Csparse_8c.html#adf30d8deabe5bb928402465150189d79" title=" " alt="" coords="14,5,153,47"/>
+<area shape="rect" id="node3" href="$Csparse_8c.html#a1fe70f89e424351c54c9bf4ba618ae65" title=" " alt="" coords="5,71,161,112"/>
+<area shape="rect" id="node4" href="$Csparse_8c.html#a3ba5e051166f06c94c102d3e1e350a70" title=" " alt="" coords="17,137,149,163"/>
 </map>

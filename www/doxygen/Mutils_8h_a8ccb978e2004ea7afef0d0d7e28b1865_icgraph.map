@@ -1,3 +1,4 @@
 <map id="d_packed_setDiag" name="d_packed_setDiag">
-<area shape="rect" id="node2" href="$dspMatrix_8h.html#a90b4903011265982cb7ec90d59a63594" title="dspMatrix_setDiag" alt="" coords="184,5,315,32"/>
+<area shape="rect" id="node1" title="diag(x) &lt;&#45; D for x a &lt;dspMatrix&gt; or dppMatrix, ..etc" alt="" coords="184,5,313,32"/>
+<area shape="rect" id="node2" href="$dspMatrix_8c.html#a90b4903011265982cb7ec90d59a63594" title=" " alt="" coords="5,5,136,32"/>
 </map>
