@@ -8,5 +8,6 @@ var dsyMatrix_8h =
     [ "dsyMatrix_rcond", "dsyMatrix_8h.html#ab262747a9bb8df9b06e3c234260dd92b", null ],
     [ "dsyMatrix_solve", "dsyMatrix_8h.html#aae157f861f04cdf7e60f1ce5f5e9c96d", null ],
     [ "dsyMatrix_trf", "dsyMatrix_8h.html#ae436ba23f7410148775ce808f08d1210", null ],
-    [ "get_norm_sy", "dsyMatrix_8h.html#a886569af93c91d1856c961323c5d6bce", null ]
+    [ "get_norm_sy", "dsyMatrix_8h.html#a886569af93c91d1856c961323c5d6bce", null ],
+    [ "matrix_trf", "dsyMatrix_8h.html#a4d5aea20205c224de72cf55ec3e5c103", null ]
 ];

@@ -1,6 +1,7 @@
 <map id="cs_lsolve" name="cs_lsolve">
-<area shape="rect" id="node2" href="$cs_8h.html#ae821a46d8293bb2e3d34880433ceb705" title="cs_cholsol" alt="" coords="170,5,254,32"/>
-<area shape="rect" id="node3" href="$cs_8h.html#a99ff84a3be540f3237c33a873064e1e5" title="cs_lusol" alt="" coords="177,56,247,83"/>
-<area shape="rect" id="node4" href="$dgCMatrix_8h.html#af93f855ba17fa036d69aece5e0321510" title="dgCMatrix_matrix_solve" alt="" coords="131,107,293,133"/>
-<area shape="rect" id="node5" href="$dtCMatrix_8h.html#a118c095d59c9a257885d3aec3aa59268" title="dtCMatrix_matrix_solve" alt="" coords="132,157,292,184"/>
+<area shape="rect" id="node1" title=" " alt="" coords="216,81,292,108"/>
+<area shape="rect" id="node2" href="$cs_8c.html#ae821a46d8293bb2e3d34880433ceb705" title=" " alt="" coords="45,5,129,32"/>
+<area shape="rect" id="node3" href="$cs_8c.html#a99ff84a3be540f3237c33a873064e1e5" title=" " alt="" coords="51,56,122,83"/>
+<area shape="rect" id="node4" href="$dgCMatrix_8c.html#a8da09e04827a1e22e332cf647b34428d" title=" " alt="" coords="5,107,168,133"/>
+<area shape="rect" id="node5" href="$dtCMatrix_8c.html#a118c095d59c9a257885d3aec3aa59268" title=" " alt="" coords="7,157,166,184"/>
 </map>

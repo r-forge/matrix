@@ -1,6 +1,8 @@
 <map id="Csparse_general_to_symmetric" name="Csparse_general_to_symmetric">
-<area shape="rect" id="node2" href="$chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="193,5,347,32"/>
-<area shape="rect" id="node4" href="$Mutils_8c.html#ae0e07b5d446943159295e745388285e2" title="equal_string_vectors" alt="" coords="199,56,341,83"/>
-<area shape="rect" id="node5" href="$Mutils_8c.html#a316a7184387d598d6ab9d48c4a9a2da8" title="Produce symmetric &#39;Dimnames&#39; from possibly asymmetric ones. " alt="" coords="192,107,348,133"/>
-<area shape="rect" id="node3" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="396,5,503,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,74,144,115"/>
+<area shape="rect" id="node2" href="$chm__common_8c.html#a7aa1a6e564c24a55b031b5c03b3313f4" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="192,31,347,57"/>
+<area shape="rect" id="node5" href="$Mutils_8c.html#ae0e07b5d446943159295e745388285e2" title=" " alt="" coords="198,81,341,108"/>
+<area shape="rect" id="node6" href="$Mutils_8c.html#a316a7184387d598d6ab9d48c4a9a2da8" title="Produce symmetric &#39;Dimnames&#39; from possibly asymmetric ones." alt="" coords="192,132,347,159"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html#a5b947aafb2d3cebd6ab10ed78af74b4a" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP." alt="" coords="436,5,543,32"/>
+<area shape="rect" id="node4" href="$Mutils_8c.html#a6ae1b19a8224de1b3a8770a760d65722" title="A safe NEW_OBJECT(MAKE_CLASS(cls)), where the caller must protect the return value of this function." alt="" coords="395,56,584,83"/>
 </map>

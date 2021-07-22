@@ -1,3 +1,4 @@
 <map id="R_symmetric_Dimnames" name="R_symmetric_Dimnames">
-<area shape="rect" id="node2" href="$dsyMatrix_8h.html#a4dccdf6fd104976ee07468b09735e62b" title="dsyMatrix_as_matrix" alt="" coords="224,5,367,32"/>
+<area shape="rect" id="node1" title="Even if the Dimnames slot is list(NULL, &lt;names&gt;) etc, return symmetric dimnames: Get ." alt="" coords="196,5,365,32"/>
+<area shape="rect" id="node2" href="$dsyMatrix_8c.html#a4dccdf6fd104976ee07468b09735e62b" title=" " alt="" coords="5,5,148,32"/>
 </map>

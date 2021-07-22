@@ -1,12 +1,13 @@
 <map id="make_i_matrix_symmetric" name="make_i_matrix_symmetric">
-<area shape="rect" id="node2" href="$Mutils_8h.html#a23764b1c8334e40406598a0446cc8bc5" title="Duplicate a [dln]denseMatrix or a numeric matrix or even a vector as a [dln]geMatrix. " alt="" coords="228,157,403,184"/>
-<area shape="rect" id="node11" href="$ldense_8h.html#a0dc07e735b6fe4687f207bb06e950b70" title="lsyMatrix_as_lgeMatrix" alt="" coords="237,208,393,235"/>
-<area shape="rect" id="node3" href="$dense_8h.html#afc94ab69278e25ef4ea5ed5ba90935c3" title="dense_band" alt="" coords="501,5,593,32"/>
-<area shape="rect" id="node4" href="$dense_8h.html#a389bdf26bd829335d25dffb4244c9ae6" title="dense_to_symmetric" alt="" coords="476,56,619,83"/>
-<area shape="rect" id="node5" href="$dgeMatrix_8h.html#adb803b1cfa40e0d45e910674fa312e62" title="geMatrix_crossprod" alt="" coords="479,107,615,133"/>
-<area shape="rect" id="node6" href="$dgeMatrix_8h.html#ac6784dce344bdbd113867ace31c92cf9" title="geMatrix_geMatrix_crossprod" alt="" coords="451,157,644,184"/>
-<area shape="rect" id="node7" href="$dgeMatrix_8h.html#a3d25a939dd674a519c2b33d647fd63a3" title="geMatrix_matrix_crossprod" alt="" coords="458,208,637,235"/>
-<area shape="rect" id="node8" href="$dgeMatrix_8h.html#af4ab598db40eb51a472eaa034ba3afbe" title="%*% – generalized from dge to *ge(): " alt="" coords="475,259,619,285"/>
-<area shape="rect" id="node9" href="$Mutils_8h.html#a623039270a92fce0643031ef7f6e72b2" title="mMatrix_as_geMatrix" alt="" coords="474,309,621,336"/>
-<area shape="rect" id="node10" href="$dense_8h.html#a33b46f3a16a95734d4875ddfbfa079cb" title="dense_to_Csparse" alt="" coords="692,309,823,336"/>
+<area shape="rect" id="node1" title=" " alt="" coords="648,183,821,209"/>
+<area shape="rect" id="node2" href="$Mutils_8c.html#a23764b1c8334e40406598a0446cc8bc5" title="Duplicate a [dln]denseMatrix or a numeric matrix or even a vector as a [dln]geMatrix." alt="" coords="425,157,600,184"/>
+<area shape="rect" id="node11" href="$ldense_8c.html#a0dc07e735b6fe4687f207bb06e950b70" title=" " alt="" coords="435,208,590,235"/>
+<area shape="rect" id="node3" href="$dense_8c.html#a51f8ef02250194b1d1a918acb369d52a" title=" " alt="" coords="235,5,327,32"/>
+<area shape="rect" id="node4" href="$dense_8c.html#a389bdf26bd829335d25dffb4244c9ae6" title=" " alt="" coords="209,56,352,83"/>
+<area shape="rect" id="node5" href="$dgeMatrix_8c.html#adb803b1cfa40e0d45e910674fa312e62" title=" " alt="" coords="213,107,349,133"/>
+<area shape="rect" id="node6" href="$dgeMatrix_8c.html#ac6784dce344bdbd113867ace31c92cf9" title=" " alt="" coords="184,157,377,184"/>
+<area shape="rect" id="node7" href="$dgeMatrix_8c.html#a3d25a939dd674a519c2b33d647fd63a3" title=" " alt="" coords="191,208,370,235"/>
+<area shape="rect" id="node8" href="$dgeMatrix_8c.html#af4ab598db40eb51a472eaa034ba3afbe" title="%*% – generalized from dge to *ge():" alt="" coords="209,259,353,285"/>
+<area shape="rect" id="node9" href="$Mutils_8h.html#a623039270a92fce0643031ef7f6e72b2" title=" " alt="" coords="207,309,354,336"/>
+<area shape="rect" id="node10" href="$dense_8c.html#a33b46f3a16a95734d4875ddfbfa079cb" title=" " alt="" coords="5,309,136,336"/>
 </map>

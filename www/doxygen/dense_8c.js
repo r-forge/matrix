@@ -1,6 +1,7 @@
 var dense_8c =
 [
     [ "CHECK_SYMMETRIC", "dense_8c.html#a66ab3a2b075e73f4a9e1db3447a3d3a9", null ],
+    [ "DLONG", "dense_8c.html#ad882e6419e74a907c39668f0175dff5c", null ],
     [ "MK_SYMMETRIC_DIMNAMES_AND_RETURN", "dense_8c.html#a5d2f05f7e4fa359cfc7655bffed72230", null ],
     [ "SET_ZERO_OUTSIDE", "dense_8c.html#ada9a48e532d50788f797da73810bb2e0", null ],
     [ "checkGivens", "dense_8c.html#a4ada21e7b04deec43e792d2fc3b0d70e", null ],

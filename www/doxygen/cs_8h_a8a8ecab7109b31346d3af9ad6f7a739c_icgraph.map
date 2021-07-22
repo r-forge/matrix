@@ -1,11 +1,12 @@
 <map id="cs_permute" name="cs_permute">
-<area shape="rect" id="node2" href="$cs_8h.html#a9f1bf76ebd53b793b96c83f6716fdc75" title="cs_dmperm" alt="" coords="144,31,235,57"/>
-<area shape="rect" id="node3" href="$cs_8h.html#a21757f1e6b914a97fdf4b1a39e0e70b2" title="cs_sqr" alt="" coords="159,81,220,108"/>
-<area shape="rect" id="node4" href="$cs_8h.html#a99ff84a3be540f3237c33a873064e1e5" title="cs_lusol" alt="" coords="302,5,373,32"/>
-<area shape="rect" id="node5" href="$cs_8h.html#a136e729a618c610422377201351db105" title="cs_qrsol" alt="" coords="302,56,373,83"/>
-<area shape="rect" id="node7" href="$dgCMatrix_8h.html#aa7a73c816cd343a9d7f4fd0170f4358f" title="dgCMatrix_QR" alt="" coords="283,107,392,133"/>
-<area shape="rect" id="node8" href="$dgCMatrix_8c.html#a96ad800167bbc6769dd31e97c38f3690" title="install_lu" alt="" coords="301,157,374,184"/>
-<area shape="rect" id="node6" href="$dgCMatrix_8h.html#a5937063a2f86fc60d92f942eb9425b86" title="dgCMatrix_qrsol" alt="" coords="463,56,580,83"/>
-<area shape="rect" id="node9" href="$dgCMatrix_8h.html#aa0183ea2cfb3994e02d6a467a91de60a" title="dgCMatrix_LU" alt="" coords="468,132,575,159"/>
-<area shape="rect" id="node10" href="$dgCMatrix_8h.html#af93f855ba17fa036d69aece5e0321510" title="dgCMatrix_matrix_solve" alt="" coords="440,183,603,209"/>
+<area shape="rect" id="node1" title=" " alt="" coords="512,56,603,83"/>
+<area shape="rect" id="node2" href="$cs_8c.html#a9f1bf76ebd53b793b96c83f6716fdc75" title=" " alt="" coords="373,31,464,57"/>
+<area shape="rect" id="node3" href="$cs_8c.html#a21757f1e6b914a97fdf4b1a39e0e70b2" title=" " alt="" coords="388,81,449,108"/>
+<area shape="rect" id="node4" href="$cs_8c.html#a99ff84a3be540f3237c33a873064e1e5" title=" " alt="" coords="235,5,306,32"/>
+<area shape="rect" id="node5" href="$cs_8c.html#a136e729a618c610422377201351db105" title=" " alt="" coords="235,56,307,83"/>
+<area shape="rect" id="node7" href="$dgCMatrix_8c.html#aa7a73c816cd343a9d7f4fd0170f4358f" title=" " alt="" coords="216,107,325,133"/>
+<area shape="rect" id="node8" href="$dgCMatrix_8c.html#a96ad800167bbc6769dd31e97c38f3690" title=" " alt="" coords="234,157,307,184"/>
+<area shape="rect" id="node6" href="$dgCMatrix_8c.html#a5937063a2f86fc60d92f942eb9425b86" title=" " alt="" coords="27,56,146,83"/>
+<area shape="rect" id="node9" href="$dgCMatrix_8c.html#aa0183ea2cfb3994e02d6a467a91de60a" title=" " alt="" coords="33,132,140,159"/>
+<area shape="rect" id="node10" href="$dgCMatrix_8c.html#a8da09e04827a1e22e332cf647b34428d" title=" " alt="" coords="5,183,168,209"/>
 </map>

@@ -1,9 +1,11 @@
 <map id="geMatrix_matrix_mm" name="geMatrix_matrix_mm">
-<area shape="rect" id="node2" href="$dgeMatrix_8c.html#a19ba56e4afb10588e0c82923575ce50a" title="as dgeMatrix_matrix_mm() but a can be [dln]geMatrix " alt="" coords="209,31,360,57"/>
-<area shape="rect" id="node4" href="$Mutils_8c.html#a23764b1c8334e40406598a0446cc8bc5" title="Duplicate a [dln]denseMatrix or a numeric matrix or even a vector as a [dln]geMatrix. " alt="" coords="197,107,372,133"/>
-<area shape="rect" id="node3" href="$dgeMatrix_8c.html#a8f5995fb861a40c66e291d29615abc33" title="gematrix_real_x" alt="" coords="450,5,565,32"/>
-<area shape="rect" id="node5" href="$Mutils_8h.html#af7f59236ca18ab52131cf71f4a7b0786" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP..." alt="" coords="454,56,561,83"/>
-<area shape="rect" id="node6" href="$Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title="make_i_matrix_triangular" alt="" coords="424,107,591,133"/>
-<area shape="rect" id="node7" href="$Mutils_8h.html#a133847040a4bd7d9bdb602c11aa6f048" title="make_i_matrix_symmetric" alt="" coords="420,157,595,184"/>
-<area shape="rect" id="node8" href="$Mutils_8c.html#adaf5449cf279f61000d9d1a1215d4b6a" title="install_diagonal_int" alt="" coords="441,208,573,235"/>
+<area shape="rect" id="node1" title="%*% – generalized from dge to *ge():" alt="" coords="5,107,149,133"/>
+<area shape="rect" id="node2" href="$dgeMatrix_8c.html#a19ba56e4afb10588e0c82923575ce50a" title="as dgeMatrix_matrix_mm() but a can be [dln]geMatrix" alt="" coords="209,44,360,71"/>
+<area shape="rect" id="node4" href="$Mutils_8c.html#a23764b1c8334e40406598a0446cc8bc5" title="Duplicate a [dln]denseMatrix or a numeric matrix or even a vector as a [dln]geMatrix." alt="" coords="197,132,372,159"/>
+<area shape="rect" id="node3" href="$dgeMatrix_8c.html#a8f5995fb861a40c66e291d29615abc33" title=" " alt="" coords="457,5,572,32"/>
+<area shape="rect" id="node5" href="$Mutils_8h.html#a5b947aafb2d3cebd6ab10ed78af74b4a" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP." alt="" coords="461,56,568,83"/>
+<area shape="rect" id="node6" href="$Mutils_8c.html#adaf5449cf279f61000d9d1a1215d4b6a" title=" " alt="" coords="449,107,581,133"/>
+<area shape="rect" id="node7" href="$Mutils_8h.html#a133847040a4bd7d9bdb602c11aa6f048" title=" " alt="" coords="428,157,601,184"/>
+<area shape="rect" id="node8" href="$Mutils_8h.html#ab30d497ec7595dda8670f741fcd74992" title=" " alt="" coords="431,208,598,235"/>
+<area shape="rect" id="node9" href="$Mutils_8c.html#a6ae1b19a8224de1b3a8770a760d65722" title="A safe NEW_OBJECT(MAKE_CLASS(cls)), where the caller must protect the return value of this function." alt="" coords="420,259,609,285"/>
 </map>

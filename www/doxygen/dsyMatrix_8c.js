@@ -9,5 +9,6 @@ var dsyMatrix_8c =
     [ "dsyMatrix_solve", "dsyMatrix_8c.html#aae157f861f04cdf7e60f1ce5f5e9c96d", null ],
     [ "dsyMatrix_trf", "dsyMatrix_8c.html#ae436ba23f7410148775ce808f08d1210", null ],
     [ "get_norm_sy", "dsyMatrix_8c.html#a886569af93c91d1856c961323c5d6bce", null ],
+    [ "matrix_trf", "dsyMatrix_8c.html#a4d5aea20205c224de72cf55ec3e5c103", null ],
     [ "symmetricMatrix_validate", "dsyMatrix_8c.html#a0d501d2a856f4fdfd3acab0d14888b6e", null ]
 ];

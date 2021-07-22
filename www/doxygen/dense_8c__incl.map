@@ -1,7 +1,20 @@
 <map id="dense.c" name="dense.c">
-<area shape="rect" id="node2" href="$dense_8h.html" title="dense.h" alt="" coords="145,80,213,107"/>
-<area shape="rect" id="node5" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="261,162,329,189"/>
-<area shape="rect" id="node13" href="$chm__common_8h.html" title="chm_common.h" alt="" coords="351,80,466,107"/>
-<area shape="rect" id="node11" href="$Syms_8h.html" title="Syms.h" alt="" coords="471,244,538,271"/>
-<area shape="rect" id="node12" href="$t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="563,244,684,271"/>
+<area shape="rect" id="node1" title=" " alt="" coords="505,5,573,32"/>
+<area shape="rect" id="node2" href="$dense_8h.html" title=" " alt="" coords="136,80,204,107"/>
+<area shape="rect" id="node7" href="$Mutils_8h.html" title=" " alt="" coords="505,162,573,189"/>
+<area shape="rect" id="node16" href="$chm__common_8h.html" title=" " alt="" coords="595,80,710,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,162,97,189"/>
+<area shape="rect" id="node4" href="$Lapack-etc_8h.html" title=" " alt="" coords="122,162,218,189"/>
+<area shape="rect" id="node5" title=" " alt="" coords="9,244,88,271"/>
+<area shape="rect" id="node6" title=" " alt="" coords="113,244,227,271"/>
+<area shape="rect" id="node8" title=" " alt="" coords="251,244,315,271"/>
+<area shape="rect" id="node9" title=" " alt="" coords="340,244,405,271"/>
+<area shape="rect" id="node10" title=" " alt="" coords="430,244,473,271"/>
+<area shape="rect" id="node11" title=" " alt="" coords="497,244,582,271"/>
+<area shape="rect" id="node12" title=" " alt="" coords="606,244,691,271"/>
+<area shape="rect" id="node13" title=" " alt="" coords="715,244,806,271"/>
+<area shape="rect" id="node14" href="$Syms_8h.html" title=" " alt="" coords="830,244,897,271"/>
+<area shape="rect" id="node15" href="$t__sparseVector_8c.html" title=" " alt="" coords="921,244,1043,271"/>
+<area shape="rect" id="node17" title=" " alt="" coords="597,155,748,196"/>
+<area shape="rect" id="node18" title=" " alt="" coords="772,162,971,189"/>
 </map>

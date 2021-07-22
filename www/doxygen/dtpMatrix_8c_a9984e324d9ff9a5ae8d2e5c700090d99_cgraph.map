@@ -1,4 +1,5 @@
 <map id="dtpMatrix_validate" name="dtpMatrix_validate">
-<area shape="rect" id="node2" href="$dtrMatrix_8c.html#a0193c7fc2f398bf2a8431b22eb76d7c3" title="triangularMatrix_validate" alt="" coords="181,5,344,32"/>
-<area shape="rect" id="node3" href="$Mutils_8c.html#acde6ee3844e52ed5a90e619cec56bc59" title="Check validity of 1&#45;letter string from a set of possible values (typically used in S4 validity method..." alt="" coords="392,5,531,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,5,132,32"/>
+<area shape="rect" id="node2" href="$dtrMatrix_8c.html#a0193c7fc2f398bf2a8431b22eb76d7c3" title=" " alt="" coords="180,5,343,32"/>
+<area shape="rect" id="node3" href="$Mutils_8c.html#acde6ee3844e52ed5a90e619cec56bc59" title="Check validity of 1&#45;letter string from a set of possible values (typically used in S4 validity method..." alt="" coords="391,5,529,32"/>
 </map>

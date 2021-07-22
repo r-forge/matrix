@@ -1,3 +1,4 @@
 <map id="compressed_non_0_ij" name="compressed_non_0_ij">
-<area shape="rect" id="node2" href="$Mutils_8h.html#a1a3b55b173f7d329b6309e56dea20024" title="Expand compressed pointers in the array mp into a full set of indices in the array mj..." alt="" coords="201,5,315,32"/>
+<area shape="rect" id="node1" title="Return a 2 column matrix &#39;&#39; cbind(i, j) &#39;&#39; of 0&#45;origin index vectors (i,j) which entirely correspond ..." alt="" coords="5,5,153,32"/>
+<area shape="rect" id="node2" href="$Mutils_8h.html#a1a3b55b173f7d329b6309e56dea20024" title="Expand compressed pointers in the array mp into a full set of indices in the array mj." alt="" coords="201,5,315,32"/>
 </map>

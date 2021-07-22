@@ -1,4 +1,6 @@
 <map id="ddense_symmpart" name="ddense_symmpart">
-<area shape="rect" id="node2" href="$Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title="dup_mMatrix_as_dgeMatrix" alt="" coords="183,5,365,32"/>
-<area shape="rect" id="node3" href="$Mutils_8c.html#ac7bfe157b527715287335783f004ca8c" title="dup_mMatrix_as_dgeMatrix2" alt="" coords="413,5,603,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,31,135,57"/>
+<area shape="rect" id="node2" href="$Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title=" " alt="" coords="183,5,365,32"/>
+<area shape="rect" id="node4" href="$Mutils_8c.html#a6ae1b19a8224de1b3a8770a760d65722" title="A safe NEW_OBJECT(MAKE_CLASS(cls)), where the caller must protect the return value of this function." alt="" coords="651,31,840,57"/>
+<area shape="rect" id="node3" href="$Mutils_8c.html#ac7bfe157b527715287335783f004ca8c" title=" " alt="" coords="413,5,603,32"/>
 </map>

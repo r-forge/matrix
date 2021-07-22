@@ -2,6 +2,8 @@ var chm__common_8h =
 [
     [ "AS_CHM_DN", "chm__common_8h.html#aaa0424486b25ff64e947e1946f1c1b2c", null ],
     [ "AS_CHM_FR", "chm__common_8h.html#ade1afdf986f10e6cf03c5061e3fa9b3e", null ],
+    [ "AS_CHM_FR2", "chm__common_8h.html#a318814d330242425d51441eb1125e3c7", null ],
+    [ "AS_CHM_FR__", "chm__common_8h.html#a10e9787ccd4cbdaa00586f8287fdbfdf", null ],
     [ "AS_CHM_SP", "chm__common_8h.html#a181c1e5f964ecab945a22c5309500afd", null ],
     [ "AS_CHM_SP2", "chm__common_8h.html#aea5df11ddd9250493b0d937a2098657e", null ],
     [ "AS_CHM_SP__", "chm__common_8h.html#a3b03d0be10b7de793f1d61046041e73e", null ],
@@ -20,6 +22,7 @@ var chm__common_8h =
     [ "const_CHM_TR", "chm__common_8h.html#a7580387025618c72e506ec5dfa0d3e0a", null ],
     [ "as_cholmod_dense", "chm__common_8h.html#a0ed4e091a525ec3cdf847755a3c4b76a", null ],
     [ "as_cholmod_factor", "chm__common_8h.html#a2e28b03190e5ba5fcb59935cc0a1ea9e", null ],
+    [ "as_cholmod_factor3", "chm__common_8h.html#a75d6d9f6140d229f79636882f646b4d3", null ],
     [ "as_cholmod_sparse", "chm__common_8h.html#ac0b9d7e2006dcf1a8d388954b408d007", null ],
     [ "as_cholmod_triplet", "chm__common_8h.html#a7c6132b98d7e38fc876c745c9cc8da2d", null ],
     [ "as_cholmod_x_dense", "chm__common_8h.html#a726394f0da6f0a20ad32963d2ba3007a", null ],

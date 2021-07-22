@@ -1,7 +1,14 @@
 <map id="abIndex.c" name="abIndex.c">
-<area shape="rect" id="node2" href="$abIndex_8h.html" title="abIndex.h" alt="" coords="255,80,333,107"/>
-<area shape="rect" id="node11" href="$t__Matrix__rle_8c.html" title="t_Matrix_rle.c" alt="" coords="358,80,459,107"/>
-<area shape="rect" id="node3" href="$Mutils_8h.html" title="Mutils.h" alt="" coords="260,155,328,181"/>
-<area shape="rect" id="node9" href="$Syms_8h.html" title="Syms.h" alt="" coords="470,229,537,256"/>
-<area shape="rect" id="node10" href="$t__sparseVector_8c.html" title="t_sparseVector.c" alt="" coords="561,229,683,256"/>
+<area shape="rect" id="node1" title="C&#45;level Methods for the `‘abstract Index’&#39; class." alt="" coords="366,5,445,32"/>
+<area shape="rect" id="node2" href="$abIndex_8h.html" title=" " alt="" coords="309,80,387,107"/>
+<area shape="rect" id="node12" href="$t__Matrix__rle_8c.html" title=" " alt="" coords="412,80,513,107"/>
+<area shape="rect" id="node3" href="$Mutils_8h.html" title=" " alt="" coords="314,155,382,181"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,229,69,256"/>
+<area shape="rect" id="node5" title=" " alt="" coords="94,229,159,256"/>
+<area shape="rect" id="node6" title=" " alt="" coords="184,229,227,256"/>
+<area shape="rect" id="node7" title=" " alt="" coords="251,229,336,256"/>
+<area shape="rect" id="node8" title=" " alt="" coords="360,229,445,256"/>
+<area shape="rect" id="node9" title=" " alt="" coords="469,229,560,256"/>
+<area shape="rect" id="node10" href="$Syms_8h.html" title=" " alt="" coords="584,229,651,256"/>
+<area shape="rect" id="node11" href="$t__sparseVector_8c.html" title=" " alt="" coords="675,229,797,256"/>
 </map>
