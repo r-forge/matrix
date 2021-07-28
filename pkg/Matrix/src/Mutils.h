@@ -11,8 +11,16 @@ extern "C" {
 #include <ctype.h>
 #include <R.h>  /* includes Rconfig.h */
 #include <Rversion.h>
-#include <Rdefines.h> /* Rinternals.h + GET_SLOT etc */
+#include <Rinternals.h>
 #include <R_ext/RS.h> /* for Memzero() */
+
+// previously from <Rdefines.h> :
+#ifndef GET_SLOT
+# define GET_SLOT(x, what)       R_do_slot(x, what)
+# define SET_SLOT(x, what, value) R_do_slot_assign(x, what, value)
+# define MAKE_CLASS(what)	R_do_MAKE_CLASS(what)
+# define NEW_OBJECT(class_def)	R_do_new_object(class_def)
+#endif
 
 // NB: For  'FCONE'  etc (for LTO), the "includer" will  #include "Lapack-etc.h"
 // --
