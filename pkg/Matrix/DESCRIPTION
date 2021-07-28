@@ -1,6 +1,6 @@
 Package: Matrix
 Version: 1.4-0
-Date: 2021-06-11
+Date: 2021-07-28
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Contact: Doug and Martin <Matrix-authors@R-project.org>
@@ -34,5 +34,6 @@ LazyData: no
 LazyDataNote: not possible, since we use data/*.R *and* our classes
 BuildResaveData: no
 License: GPL (>= 2) | file LICENCE
-URL: http://Matrix.R-forge.R-project.org/
-BugReports: https://r-forge.r-project.org/tracker/?group_id=61
+URL: https://Matrix.R-forge.R-project.org/,
+     https://Matrix.R-forge.R-project.org/doxygen/
+BugReports: https://R-forge.R-project.org/tracker/?atid=294?group_id=61

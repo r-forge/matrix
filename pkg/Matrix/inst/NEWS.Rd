@@ -16,7 +16,7 @@
 %
 
 
-\section{Changes in version 1.4-0 (2021-06-11 r3396)}{
+\section{Changes in version 1.4-0 (2021-07-28 r3400)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Update many \file{src/*.c} preventing integer overflow in
@@ -38,7 +38,7 @@
   }
   \subsection{Misc}{
     \itemize{
-      \item .
+      \item No longer include \file{Rdefines.h} as it is somewhat deprecated.
     }
   }
 }
