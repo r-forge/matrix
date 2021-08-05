@@ -1218,7 +1218,7 @@ SEXP Mmatrix(SEXP args)
 	for(int j=0; j < m; j++) {			\
 	    Memcpy(r+ii, ax+ j*n1, n1); ii += n1;	\
 	    Memcpy(r+ii, bx+ j*n2, n2); ii += n2;	\
-	}
+	} ; break
 
 	COPY_a_AND_b_j;
     }

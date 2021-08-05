@@ -24,7 +24,6 @@ stopifnot(is(mt, "sparseMatrix"))
 library(Matrix)
 
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
-(doExtras <- doExtras && getRversion() >= "3.4") # so have withAutoprint(.)
 
 if(interactive()) {
     options(error = recover, Matrix.verbose = TRUE, warn = 1)
