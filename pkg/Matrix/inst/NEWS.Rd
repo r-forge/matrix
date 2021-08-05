@@ -16,7 +16,7 @@
 %
 
 
-\section{Changes in version 1.4-0 (2021-07-28 r3400)}{
+\section{Changes in version 1.4-0 (2021-08-05 r3401)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Update many \file{src/*.c} preventing integer overflow in
@@ -34,6 +34,10 @@
       \item Fixed the internal \code{attr.all_Mat()} auxiliary for
       \code{all.equal()}, notably for the case when exactly one of the
       matrices is a base \code{matrix}.
+
+      \item Fixed long-standing bug in the \code{rbind2()} method for
+      logical dense matrices, specifically \code{"lgeMatrix"}, thanks to
+      the notice by Aaron Lun.
     }
   }
   \subsection{Misc}{

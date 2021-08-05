@@ -308,11 +308,9 @@ for(spV in c(FALSE,TRUE)) {
     assertError(crossprod(v, 1:2)); assertError(v %*% 1:2)
     assertError(crossprod(v, 2))  ; assertError(v %*% 2)
     assertError(crossprod(1:2, v)); assertError(1:2 %*% v)
-    if(spV || getRversion() >= "3.2.0") {
 	cat("doing  vec x vec  ..\n")
 	stopifnot(identical(crossprod(2, v), t(2) %*% v),
 		  identical(5 %*% v, 5 %*% t(v)))
-    }
     for(sp in c(FALSE, TRUE)) {
         m <- Matrix(1:2, 1,2, sparse=sp)
         cat(sprintf("class(m): '%s'\n", class(m)))
