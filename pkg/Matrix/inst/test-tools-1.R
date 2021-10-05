@@ -256,9 +256,10 @@ showProc.time <- local({ ## function + 'pct' variable
 
 Sys.memGB <- function(kind = "MemTotal") {## "MemFree" is typically more relevant
     if(!file.exists(pf <- "/proc/meminfo"))
-	return(if(.Platform$OS.type == "windows")
-		   memory.limit() / 1000
-	       else NA)
+	return(## if(.Platform$OS.type == "windows")
+               ##   `memory.limit() / 1000
+	       ## else
+                   NA)
     mm <- tryCatch(drop(read.dcf(pf, fields=kind)),
                    error = function(e) NULL)
     if(is.null(mm) || any(is.na(mm)) || !all(grepl(" kB$", mm)))
