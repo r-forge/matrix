@@ -15,8 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-
-\section{Changes in version 1.4-0 (2021-08-05 r3401)}{
+\section{Changes in version 1.4-0 (2021-10-05 r3404)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Update many \file{src/*.c} preventing integer overflow in
@@ -38,6 +37,9 @@
       \item Fixed long-standing bug in the \code{rbind2()} method for
       logical dense matrices, specifically \code{"lgeMatrix"}, thanks to
       the notice by Aaron Lun.
+
+      \item fix leak in C-level \code{Csparse_to_dense()} thanks to Bill
+      Dunlap in \R's \PR{18204}.
     }
   }
   \subsection{Misc}{
