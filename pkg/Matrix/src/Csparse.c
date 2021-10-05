@@ -135,16 +135,17 @@ SEXP Csparse_to_dense(SEXP x, SEXP symm_or_tri)
 	if(is_sym || is_tri)
 	    ctype = R_check_class_etc(x, valid);
     }
-    CHM_SP chxs = AS_CHM_SP__(x);// -> chxs->stype = +- 1 <==> symmetric
+    CHM_SP chxs = AS_CHM_SP__(x);// -> chxs->stype = +- 1 <==> symmetric // allocated with alloca()
     R_CheckStack();
-    if(is_tri && *diag_P(x) == 'U') { // ==>  x := diagU2N(x), directly for chxs
+    Rboolean is_U_tri = is_tri && *diag_P(x) == 'U';
+    if(is_U_tri) { // ==>  x := diagU2N(x), directly for chxs;  further: must free chxs
 	CHM_SP eye = cholmod_speye(chxs->nrow, chxs->ncol, chxs->xtype, &c);
 	double one[] = {1, 0};
 	CHM_SP ans = cholmod_add(chxs, eye, one, one,
 				 /* values: */ ((ctype / 3) != 2), // TRUE iff not "nMatrix"
 				 TRUE, &c);
 	cholmod_free_sparse(&eye, &c);
-	chxs = cholmod_copy_sparse(ans, &c);
+	chxs = cholmod_copy_sparse(ans, &c); // replacing alloca'd chxs with malloc'ed one, which must be freed
 	cholmod_free_sparse(&ans, &c);
     }
     /* The following loses the symmetry property, since cholmod_dense has none,
@@ -157,7 +158,11 @@ SEXP Csparse_to_dense(SEXP x, SEXP symm_or_tri)
      * >>>>>>>>>>> TODO <<<<<<<<<<<<
      * CHM_DN chxd = cholmod_l_sparse_to_dense(chxs, &cl); */
     //                   ^^^ important when prod(dim(.)) > INT_MAX
-    int Rkind = (chxs->xtype == CHOLMOD_PATTERN)? -1 : Real_kind(x);
+    int chxs_xtype = chxs->xtype;
+    int chxs_stype = chxs->stype;
+    if(is_U_tri)
+       cholmod_free_sparse(&chxs, &c);
+    int Rkind = (chxs_xtype == CHOLMOD_PATTERN)? -1 : Real_kind(x);
 
     SEXP ans = chm_dense_to_SEXP(chxd, 1, Rkind, GET_SLOT(x, Matrix_DimNamesSym),
 				 /* transp: */ FALSE);
@@ -171,7 +176,7 @@ SEXP Csparse_to_dense(SEXP x, SEXP symm_or_tri)
 	SET_SLOT(aa, Matrix_xSym,       GET_SLOT(ans, Matrix_xSym));
 	SET_SLOT(aa, Matrix_DimSym,     GET_SLOT(ans, Matrix_DimSym));
 	SET_SLOT(aa, Matrix_DimNamesSym,GET_SLOT(ans, Matrix_DimNamesSym));
-	SET_SLOT(aa, Matrix_uploSym, mkString((chxs->stype > 0) ? "U" : "L"));
+	SET_SLOT(aa, Matrix_uploSym, mkString((chxs_stype > 0) ? "U" : "L"));
 	UNPROTECT(2);
 	return aa;
     }
