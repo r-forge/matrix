@@ -327,7 +327,7 @@ diag(Lrg[2:9,1:8]) <- 1:8
 e1 <- try(Lrg == Lrg) # ==> Cholmod error 'problem too large' at file ../Core/cholmod_dense.c, line 105
 ## (error message almost ok)
 
-(memGB <- Sys.memGB("MemFree")) # from test-tools-1.R
+(memGB <- Sys.memGB("MemFree")) # from test-tools-1.R, only works with /proc/*
 system.time( # ~10 sec.                            __vv__
     e2 <- if(doExtras && is.finite(memGB) && memGB > 30) { # need around 18 GB
               try(!Lrg) # now *works* on 64-bit machines with enough RAM
