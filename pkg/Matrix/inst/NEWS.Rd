@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-0 (2021-10-05 r3404)}{
+\section{Changes in version 1.4-0 (2021-10-06 r3405)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Update many \file{src/*.c} preventing integer overflow in
@@ -39,7 +39,8 @@
       the notice by Aaron Lun.
 
       \item fix leak in C-level \code{Csparse_to_dense()} thanks to Bill
-      Dunlap in \R's \PR{18204}.
+      Dunlap in \R's \PR{18204} and \code{install_lu()}
+      called from \code{solve(<dgCMatrix>)} in \PR{18205}.
     }
   }
   \subsection{Misc}{
