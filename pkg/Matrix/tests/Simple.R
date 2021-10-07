@@ -1072,6 +1072,38 @@ for(k1 in (-n):m)
 	stopifnotValid(bs1 <- band(s1, k1,k2), "CsparseMatrix")
         stopifnot(all(r1 == s1))
     }
+## large dimensions -- gave integer overflow
+## R-forge bug 6743 by Ariel Paulson
+## https://r-forge.r-project.org/tracker/?func=detail&atid=294&aid=6743&group_id=61
+n <- 47000
+stopifnotValid(Mn <- sparseMatrix(i = rep(1:6, 2), dims = c(n,n),
+                                  j = c(1L,4L, 6:8, 10:12, 16:19)), "nsparseMatrix")
+stopifnotValid(M <- as(Mn, "dMatrix"), "dgCMatrix")
+dim(M) # 47000 47000
+i <- 46341
+stopifnotValid(bM <- band(M, i,   i  ), "dtCMatrix")
+## gave Error in  if (sqr && k1 * k2 >= 0) ....
+##      In addition: Warning message:
+##      In k1 * k2 : NAs produced by integer overflow
+x <- 1:999
+bM2 <- bandSparse(n, k=i+(0:3), diagonals = list(x,10*x,32*x,5*x), symmetric=TRUE)
+stopifnotValid(bM2, "dsCMatrix")
+stopifnotValid(bb2 <- band(bM2, k1=i-2, k2=i+5), "dtCMatrix")
+stopifnotValid(b0  <- band(bM2, -1000, 1000),    "dsCMatrix")
+stopifnotValid(b0a <- band(bM2, -1000, 1001),    "dgCMatrix")
+(id <- nrow(M)-i)# 659
+colN <- colSums(bM2 != 0)
+stopifnot(exprs = {
+    identical(bb2, triu(bM2))
+    identical(b0 @x, numeric(0))
+    identical(b0a@x, numeric(0))
+    identical(bM2, band(bM2, -(i+3), i+3))
+    assert.EQ(as(bM2, "generalMatrix"),
+              band(bM2, -(i+3), i+11), showOnly = TRUE)
+    colN == { cN <- c(1:3, rep(4L, id-3)); c(rev(cN), rep(0L, i-id), cN)}
+})
+## some of these failed before Matrix 1.4.0 (Oct.7, 2021)
+
 
 D. <- Diagonal(x= c(-2,3:4)); D.[lower.tri(D.)] <- 1:3 ; D.
 D0 <- Diagonal(x= 0:3);       D0[upper.tri(D0)] <- 1:6 ; D0
