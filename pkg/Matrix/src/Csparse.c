@@ -874,7 +874,7 @@ SEXP Csparse_band(SEXP x, SEXP k1, SEXP k2)
     CHM_SP ans = cholmod_band(chx, asInteger(k1), asInteger(k2), chx->xtype, &c);
     R_CheckStack();
 
-    return chm_sparse_to_SEXP(ans, 1, 0, Rkind, "",
+    return chm_sparse_to_SEXP(ans, 1, /* uploT = */ 0, Rkind, "",
 			      GET_SLOT(x, Matrix_DimNamesSym));
 }
 
