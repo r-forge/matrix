@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-0 (2021-10-07 r3406)}{
+\section{Changes in version 1.4-0 (2021-10-08 r3407)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Update many \file{src/*.c} preventing integer overflow in
@@ -46,6 +46,10 @@
       larger than 2^31-1, the maximal integer, fixing R-forge Matrix bug
       6743 by Ariel Paulson.  Further, it works when \code{M} is a sparse
       \code{"symmetricMatrix"} but the band is not symmetric, \code{k1 != -k2}.
+
+      \item fix leak in C-level code for \code{cbind(m1,m2)} or
+      \code{rbind(*)} when \code{m1} is \code{"n.Csparse"} and \code{m2} is
+      not, thanks to Bill Dunlap's diagnosis and patch in \R's \PR{18210}.
     }
   }
   \subsection{Misc}{

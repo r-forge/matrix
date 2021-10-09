@@ -828,6 +828,10 @@ SEXP Csparse_horzcat(SEXP x, SEXP y)
 #define CSPARSE_CAT(_KIND_)						\
     CHM_SP chx = AS_CHM_SP__(x), chy = AS_CHM_SP__(y);			\
     R_CheckStack();							\
+    void* chx_x = chx->x;						\
+    void* chx_z = chx->z;						\
+    void* chy_x = chy->x;						\
+    void* chy_z = chy->z;						\
     int Rk_x = (chx->xtype != CHOLMOD_PATTERN) ? Real_kind(x) : x_pattern, \
 	Rk_y = (chy->xtype != CHOLMOD_PATTERN) ? Real_kind(y) : x_pattern, Rkind; \
     if(Rk_x == x_pattern || Rk_y == x_pattern) { /* at least one of them is patter"n" */ \
@@ -852,8 +856,21 @@ SEXP Csparse_horzcat(SEXP x, SEXP y)
     CSPARSE_CAT("horzcat");
     // TODO: currently drops dimnames - and we fix at R level;
 
-    return chm_sparse_to_SEXP(cholmod_horzcat(chx, chy, 1, &c),
+    SEXP retval = chm_sparse_to_SEXP(cholmod_horzcat(chx, chy, 1, &c),
 			      1, 0, Rkind, "", R_NilValue);
+/* AS_CHM_SP(x) fills result with points to R-allocated memory but
+   chm_MOD_xtype can change ->x and ->z to cholmod_alloc'ed memory.
+   The former needs no freeing but the latter does.
+   The first 2 arguments to cholmod_free should contain the number
+   and size of things being freed, but lying about that is sort of ok. */
+#define CSPARSE_CAT_CLEANUP					\
+    if (chx_x != chx->x) cholmod_free(0, 0, chx->x, &c);	\
+    if (chx_z != chx->z) cholmod_free(0, 0, chx->z, &c);	\
+    if (chy_x != chy->x) cholmod_free(0, 0, chy->x, &c);	\
+    if (chy_z != chy->z) cholmod_free(0, 0, chy->z, &c)
+
+    CSPARSE_CAT_CLEANUP;
+    return retval;
 }
 
 /** @brief Vertical Concatenation -  rbind( <Csparse>,  <Csparse>)
@@ -863,8 +880,10 @@ SEXP Csparse_vertcat(SEXP x, SEXP y)
     CSPARSE_CAT("vertcat");
     // TODO: currently drops dimnames - and we fix at R level;
 
-    return chm_sparse_to_SEXP(cholmod_vertcat(chx, chy, 1, &c),
+    SEXP retval = chm_sparse_to_SEXP(cholmod_vertcat(chx, chy, 1, &c),
 			      1, 0, Rkind, "", R_NilValue);
+    CSPARSE_CAT_CLEANUP;
+    return retval;
 }
 
 SEXP Csparse_band(SEXP x, SEXP k1, SEXP k2)
