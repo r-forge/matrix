@@ -15,7 +15,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-0 (2021-10-08 r3407)}{
+\section{Changes in version 1.4-0 (2021-10-14 r3408)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Update many \file{src/*.c} preventing integer overflow in
@@ -50,6 +50,10 @@
       \item fix leak in C-level code for \code{cbind(m1,m2)} or
       \code{rbind(*)} when \code{m1} is \code{"n.Csparse"} and \code{m2} is
       not, thanks to Bill Dunlap's diagnosis and patch in \R's \PR{18210}.
+
+      \item \code{sparseVector(i=integer(), length=2^33)} now does show/print,
+      after fixing a bug in the \code{head()} method for \emph{empty}
+      sparseVectors.  Reported by David Cortes as Matrix bug #6745.
     }
   }
   \subsection{Misc}{
