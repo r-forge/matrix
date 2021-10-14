@@ -1269,3 +1269,18 @@ Cx[2,] <- 0
 Rx[2,] <- 0
 stopifnot(all(Cx == X),
           all(Rx == X))
+
+## [matrix-Bugs][#6745] show(<large sparseVector>)
+## NB: is from a bug in head(*); *only* applies to  *empty* sparseV: length(x@i) == 0
+op <- options(max.print=999)
+( s0 <- sparseVector(i=integer(), length=2^33)) # show -> head() failed in Matrix <= 1.3-*
+(xs0 <- sparseVector(i=integer(), length=2^33, x = numeric()))# ditto
+options(op); tail(s0) ; tail(xs0) # (always worked)
+## *related* bug in `[` --> needed to fix intIv() for such large sparseVectors
+stopifnot(exprs = {
+    identical(s0[length(s0) - 3:0], # gave Error in if (any(i < 0L)) { : missing value ....
+              new("nsparseVector", i=integer(), length=4L))
+    identical(xs0[length(s0) - 3:0], # gave Error ..
+              new("dsparseVector", i=integer(), length=4L))
+})
+
