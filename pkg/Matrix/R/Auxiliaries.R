@@ -115,6 +115,12 @@ Matrix.msg <- function(..., .M.level = 1) {
         message(...)
 }
 
+## not yet used; see also msg.and.solve.dgC.lu() in ./dsCMatrix.R
+Matrix.msg12 <- function(m1, m2, ...) {
+    if(!is.null(v <- getOption("Matrix.verbose")) && v >= 1)
+        message(if(v >= 2) m2 else m1, ...)
+}
+
 ## TODO: faster via C, either R's  R_data_class() [which needs to become API !]
 ##       or even direct  getAttrib(x, R_ClassSymbol); ..
 ##' class - single string, no "package" attribute,..

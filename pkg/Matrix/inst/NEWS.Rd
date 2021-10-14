@@ -3,9 +3,6 @@
 \name{NEWS}
 \title{News for \R Package \pkg{Matrix}}% MM: look into ../svn-log-from.all
 \encoding{UTF-8}
-%% as long as not R >= 3.2.0, ~/R/D/r-devel/R/share/Rd/macros/system.Rd :
-\newcommand{\CRANpkg}{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
-\newcommand{\sspace}{\ifelse{latex}{\out{~}}{ }}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
 %%_NOT YET__FIXME_ : needs *MORE THAN* cholmod_l_dense_to_sparse() in
@@ -15,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-0 (2021-10-14 r3408)}{
+\section{Changes in version 1.4-0 (2021-10-14 r3409)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Update many \file{src/*.c} preventing integer overflow in
@@ -54,6 +51,12 @@
       \item \code{sparseVector(i=integer(), length=2^33)} now does show/print,
       after fixing a bug in the \code{head()} method for \emph{empty}
       sparseVectors.  Reported by David Cortes as Matrix bug #6745.
+
+      \item inverting or solving \code{dsCMatrix} no longer catches C level
+      warnings too early which would not free, but rather leak memory;
+      thanks to Bill Dunlap's analysis and patch in \R's \PR{18214}.
+      Additionally, such warnings and error are \code{message()}d when
+      \code{getOption("Matrix.verbose")} is \code{ >= 1}.
     }
   }
   \subsection{Misc}{
