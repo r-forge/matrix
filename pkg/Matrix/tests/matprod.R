@@ -523,8 +523,9 @@ I <- .sparseDiagonal(n, shape="g")
 S <- as(symW, "matrix")
 sis <- solve(S,    S)
 ## solve(<dsCMatrix>, <sparseMatrix>) when Cholmod fails was buggy for *long*:
+o. <- options(Matrix.verbose = 2) # <-- showing Cholmod error & warning now
 SIS <- solve(symW, symW)
-iw <- solve(symW)
+iw <- solve(symW)  ## << TODO:  LU *not* saved in @factors
 iss <- iw %*% symW
 ##                                     nb-mm3   openBLAS (Avi A.)
 assert.EQ.(I, drop0(sis), tol = 1e-8)# 2.6e-10;  7.96e-9
@@ -556,13 +557,14 @@ stopifnot(all.equal(as(SW.,"matrix"),
                     as(SW2,"matrix"), tol = 1e-7))
 (ch <- all.equal(WW, as(SW.,"dgCMatrix"), tolerance =0))
 stopifnot(is.character(ch), length(ch) == 1)## had length(.)  2  previously
-IW <- solve(WW)
+IW <- solve(WW) # ( => stores in WW@factors !)
 class(I1 <- IW %*% WW)# "dge" or "dgC" (!)
 class(I2 <- WW %*% IW)
 I <- diag(nr=nrow(WW))
 stopifnot(all.equal(as(I1,"matrix"), I, check.attributes=FALSE, tolerance = 1e-4),
           ## "Mean relative difference: 3.296549e-05"  (or "1.999949" for Matrix_1.0-13 !!!)
           all.equal(as(I2,"matrix"), I, check.attributes=FALSE)) #default tol gives "1" for M.._1.0-13
+options(o.) # revert to less Matrix.verbose
 
 if(doExtras) {
     print(kappa(WW)) ## [1] 5.129463e+12
