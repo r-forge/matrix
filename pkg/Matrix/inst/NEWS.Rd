@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-0 (2021-10-14 r3409)}{
+\section{Changes in version 1.4-0 (2021-11-13 r3410)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Update many \file{src/*.c} preventing integer overflow in
@@ -37,7 +37,10 @@
 
       \item fix leak in C-level \code{Csparse_to_dense()} thanks to Bill
       Dunlap in \R's \PR{18204} and \code{install_lu()}
-      called from \code{solve(<dgCMatrix>)} in \PR{18205}.
+      called from \code{solve(<dgCMatrix>)} in \PR{18206}.
+
+      \item fix leak in crossprod(<dsTMatrix>), thanks to report and patch
+      in \PR{18205} by Bill Dunlap.
 
       \item \code{band(M, k1, k2)} now also works when \code{k1 * k2} is
       larger than 2^31-1, the maximal integer, fixing R-forge Matrix bug
