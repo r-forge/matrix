@@ -777,12 +777,12 @@ SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet, SEXP bool_arith)
 
     if (!tr) chxt = cholmod_transpose(chx, chx->xtype, &c);
 
-    if (x_is_sym) // cholmod_aat() does not like symmetric
-	chxc = cholmod_copy(tr ? chx : chxt, /* stype: */ 0,
-			    chx->xtype, &c);
+    // cholmod_aat() does not like symmetric
+    chxc = x_is_sym ? cholmod_copy(tr ? chx : chxt, /* stype: */ 0, chx->xtype, &c) : NULL;
     // CHOLMOD/Core/cholmod_aat.c :
     chcp = cholmod_aat(x_is_sym ? chxc : (tr ? chx : chxt),
 		       (int *) NULL, 0, /* mode: */ chx->xtype, &c);
+    if (chxc) cholmod_free_sparse(&chxc, &c);
     if(!chcp) {
 	UNPROTECT(1);
 	error(_("Csparse_crossprod(): error return from cholmod_aat()"));

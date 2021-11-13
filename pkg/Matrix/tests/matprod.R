@@ -231,9 +231,13 @@ assertError(5 %*% as.matrix(d))	 # -> error
 (pd. <- m5 %*% Diagonal(x = 1:6))
 (pd2 <- diag (10:6)	   %*% m5)
 (pd..<- Diagonal(x = 10:6) %*% m5)
-stopifnot(dim(crossprod(t(m5))) == c(5,5),
-	  c(class(p1),class(p2),class(pd1),class(pd2),
-	    class(pd.),class(pd..)) == "dgeMatrix")
+stopifnot(exprs = {
+    dim(crossprod(t(m5))) == c(5,5)
+    c(class(p1),class(p2),class(pd1),class(pd2), class(pd.),class(pd..)) == "dgeMatrix"
+    identical(dimnames(pd.),  dimnames(m5))
+    identical(dimnames(pd..), dimnames(m5))
+})
+
 assert.EQ.mat(p1, cbind(c(20,30,33,38,54)))
 assert.EQ.mat(pd1, m. %*% diag(1:6))
 assert.EQ.mat(pd2, diag(10:6) %*% m.)
