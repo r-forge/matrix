@@ -1090,6 +1090,9 @@ stopifnot(identical(Diagonal(x = 1+ 1:n), dLrg),
 cc <- capture.output(show(dLrg))# show(<diag>) used to error for large n
 showProc.time()
 
+## FIXME: "dspMatrix" (symmetric *packed*) not going via "matrix"
+
+
 ## Large Matrix indexing / subassignment
 ## ------------------------------------- (from ex. by Imran Rashid)
 n <- 7000000
@@ -1176,6 +1179,41 @@ x2 <- x0; x2[cbind(i, i+10)] <- .asmatrix(i^2)
 ## failed: nargs() = 4 ... please report
 
 stopifnot(isValid(x1, "dgTMatrix"), identical(x1, x2))
+
+
+## find erronous cases:
+get.dspError <- function(sv, n=512, negI = FALSE, verbose=FALSE) {
+    stopifnot(inherits(sv, "dsparseVector"), n >= 1)
+    d <- length(sv)
+    ## lambda=2 ==> aiming for short 'i' {easier to work with}
+    P <- rpois(n, lambda = if(negI) 5 else 2)
+    for(i in seq_len(n)) {
+        I <-
+            if(negI) { # negative indices: 2 are, 4 neither ... always "valid" !!
+                k <- max(4L, d - max(1L, P[i]))
+                if(verbose) cat(sprintf("size=k = %2d: ", k))
+                - sort(sample.int(d, size=k))# replace=FALSE
+            }
+            else
+                sample.int(d, size=1L+P[i], replace=TRUE)
+        ##
+        validObject(ss <- sv[I]) # Error if not true
+    }
+    invisible()
+}
+## after already using  order() in ~/R/Pkgs/Matrix/sparseVector.R ~ line 500 <<
+get.dspError(s)
+set.seed(3)
+(s2 <- as(rsparsematrix(ncol=1, nrow=37, density=1/4),"sparseVector"))
+(s3 <- as(rsparsematrix(ncol=1, nrow=64, density=1/4),"sparseVector"))
+set.seed(1)
+get.dspError(s2)
+get.dspError(s3)
+##
+set.seed(47)
+## system.time(e.N2 <- get.dspError(s2, negI=TRUE, verbose=TRUE))
+get.dspError(s2, negI=TRUE)
+get.dspError(s3, negI=TRUE)
 
 
 iv <- c(rep(0,100), 3, 0,0,7,0,0,0)
@@ -1283,4 +1321,5 @@ stopifnot(exprs = {
     identical(xs0[length(s0) - 3:0], # gave Error ..
               new("dsparseVector", i=integer(), length=4L))
 })
+
 

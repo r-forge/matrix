@@ -506,8 +506,12 @@ setMethod("[", signature(x = "sparseVector", i = "index"),
                       if (has.x) sel <- c(which(sel), unlist(jm))
                       x@i <- c(x@i, rep.int(which(iDup), lengths(jm)))
                   }
+                  if(doSort <- is.unsorted(x@i)) {
+                      io <- order(x@i, method="radix")
+                      x@i <- x@i[io]
+                  }
                   if (has.x)
-                      x@x <- x@x[sel]
+                      x@x <- if(doSort) x@x[sel][io] else x@x[sel]
               }
 	      x
 	  })
