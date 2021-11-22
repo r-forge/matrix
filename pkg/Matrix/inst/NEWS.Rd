@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-0 (2021-11-13 r3410)}{
+\section{Changes in version 1.4-0 (2021-11-22 r3413)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Update many \file{src/*.c} preventing integer overflow in
@@ -60,6 +60,10 @@
       thanks to Bill Dunlap's analysis and patch in \R's \PR{18214}.
       Additionally, such warnings and error are \code{message()}d when
       \code{getOption("Matrix.verbose")} is \code{ >= 1}.
+
+      \item \code{ss <-  <sparseVector>[i]} gave an invalid sparseVector
+      \code{ss} as \code{ss@i} was not necessarily sorted; thanks to a
+      report by Quran Wu.
     }
   }
   \subsection{Misc}{
