@@ -1179,10 +1179,11 @@ x2 <- x0; x2[cbind(i, i+10)] <- .asmatrix(i^2)
 ## failed: nargs() = 4 ... please report
 
 stopifnot(isValid(x1, "dgTMatrix"), identical(x1, x2))
+showProc.time()
 
 
-## find erronous cases:
-get.dspError <- function(sv, n=512, negI = FALSE, verbose=FALSE) {
+## check valid indexing (using *random* indices, often duplicated):
+chk_dsp_ind <- function(sv, n=512, negI = FALSE, verbose=FALSE) {
     stopifnot(inherits(sv, "dsparseVector"), n >= 1)
     d <- length(sv)
     ## lambda=2 ==> aiming for short 'i' {easier to work with}
@@ -1201,20 +1202,19 @@ get.dspError <- function(sv, n=512, negI = FALSE, verbose=FALSE) {
     }
     invisible()
 }
-## after already using  order() in ~/R/Pkgs/Matrix/sparseVector.R ~ line 500 <<
-get.dspError(s)
+s <- as(c(3,5,6), "sparseVector")
+set.seed(11); chk_dsp_ind(s)
 set.seed(3)
 (s2 <- as(rsparsematrix(ncol=1, nrow=37, density=1/4),"sparseVector"))
 (s3 <- as(rsparsematrix(ncol=1, nrow=64, density=1/4),"sparseVector"))
 set.seed(1)
-get.dspError(s2)
-get.dspError(s3)
+chk_dsp_ind(s2)
+chk_dsp_ind(s3)
 ##
 set.seed(47)
-## system.time(e.N2 <- get.dspError(s2, negI=TRUE, verbose=TRUE))
-get.dspError(s2, negI=TRUE)
-get.dspError(s3, negI=TRUE)
-
+## system.time(e.N2 <- chk_dsp_ind(s2, negI=TRUE, verbose=TRUE))
+chk_dsp_ind(s2, negI=TRUE)
+chk_dsp_ind(s3, negI=TRUE)
 
 iv <- c(rep(0,100), 3, 0,0,7,0,0,0)
 sv0  <- sv  <- as(iv, "sparseVector")
