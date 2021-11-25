@@ -1321,5 +1321,3 @@ stopifnot(exprs = {
     identical(xs0[length(s0) - 3:0], # gave Error ..
               new("dsparseVector", i=integer(), length=4L))
 })
-
-

@@ -1447,6 +1447,7 @@ diagU2N <- function(x, cl = getClassDef(class(x)), checkDense = FALSE)
 {
     ## as we promise that the diagonal entries are not accessed when
     ##	diag = "U",   we don't even need to set them to one !!
+    ## and *contrary* to the sparseMatrix case, we keep the diagonal entries in @x !
     x@diag <- "U"
     x
 }
