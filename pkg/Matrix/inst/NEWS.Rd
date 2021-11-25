@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-0 (2021-11-23 r3414)}{
+\section{Changes in version 1.4-0 (2021-11-25 r3415)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Update many \file{src/*.c} preventing integer overflow in
