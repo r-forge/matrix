@@ -23,7 +23,7 @@
 \description{
   The \code{"dtrMatrix"} class is the class of triangular, dense,
   numeric matrices in nonpacked storage.  The \code{"dtpMatrix"} class
-  is the same except in packed storage, see \code{\link{pack()}}.
+  is the same except in packed storage, see \code{\link{pack}()}.
 }
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("dtrMatrix", ...)}.
