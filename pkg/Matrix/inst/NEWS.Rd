@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-0 (2021-12-06 r3417)}{
+\section{Changes in version 1.4-0 (2021-12-08 r3418)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Update many \file{src/*.c} preventing integer overflow in
@@ -74,6 +74,9 @@
       (to \R's \PR{18250} by  Mikael Jagan); fixed all on C level.  As a
       consequence, you will now see \emph{more} preserved dimnames after
       matrix transformations or operations which involved symmetric matrices.
+
+      \item \code{as(<ddiMatrix>, "matrix")} no longer loses dimnames,
+      thanks to Mikael Jagan's report as Matrix bug #6751.      
     }
   }
   \subsection{Misc}{
