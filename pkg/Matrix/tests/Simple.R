@@ -1222,6 +1222,29 @@ stopifnot(identical(--dC, dC),
           )
 ## both  - <sparse-triang.> gave : Error .... 'factors’ is not a slot in class “dtTMatrix”
 
+## R PR#18250 - by Mikael Jagan
+nm2 <- c("a","b")
+x <- new("dspMatrix", x = c(3,2,1), Dim = c(2L,2L), Dimnames = list(nm2, NULL))
+dn <- list(nm2,nm2)
+stopifnotValid(x. <- unpack(x), "dsyMatrix")
+validObject( y  <- as(x , "generalMatrix") )
+validObject( y. <- as(x., "generalMatrix") )
+stopifnotValid( l  <- x > 0,     "lspMatrix")
+stopifnotValid( l. <- unpack(l), "lsyMatrix")
+stopifnotValid( lg <- as(l, "generalMatrix"), "lgeMatrix")
+stopifnotValid( lg2<- as(l.,"generalMatrix"), "lgeMatrix")
+stopifnot(exprs = {
+    identical(dimnames(x ), dn)
+    identical(dimnames(x.), dn)
+    identical(dimnames(y ), dn) # was wrong
+    identical(dimnames(y.), dn) # was wrong
+    identical(dimnames(l ), dn)
+    identical(dimnames(l.), dn)
+    identical(dimnames(lg), dn) # was wrong
+    identical(lg, lg2)
+    ## even more cases (?)
+})
+
 
 
 ## Platform - and other such info -- so we find it in old saved outputs

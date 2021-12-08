@@ -422,6 +422,9 @@ mMatrix_as_geMatrix(SEXP A)
 #define MATRIX_VALID_tri_Csparse		\
    "dtCMatrix", "ltCMatrix", "ntCMatrix", "ztCMatrix"
 
+#define MATRIX_VALID_sym_Csparse		\
+   "dsCMatrix", "lsCMatrix", "nsCMatrix", "zsCMatrix"
+
 #ifdef __UN_USED__
 #define MATRIX_VALID_tri_sparse			\
  "dtCMatrix",  "dtTMatrix", "dtRMatrix",	\

@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-0 (2021-12-01 r3416)}{
+\section{Changes in version 1.4-0 (2021-12-06 r3417)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Update many \file{src/*.c} preventing integer overflow in
@@ -68,6 +68,12 @@
       \item \code{ss <-  <sparseVector>[i]} gave an invalid sparseVector
       \code{ss} as \code{ss@i} was not necessarily sorted; thanks to a
       report by Quran Wu.
+
+      \item \code{as(<dsyMatrix>, "generalMatrix")} and similar, sometimes
+      did \emph{not} use (C-level) \code{symmetric_Dimnames()} etc; report
+      (to \R's \PR{18250} by  Mikael Jagan); fixed all on C level.  As a
+      consequence, you will now see \emph{more} preserved dimnames after
+      matrix transformations or operations which involved symmetric matrices.
     }
   }
   \subsection{Misc}{
