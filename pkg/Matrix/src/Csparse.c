@@ -516,11 +516,16 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b, SEXP bool_arith)
 	    else diag[0]= 'N';
 	}
 
+    // establish dimnames --  extra care for *symmetric* Csparse:
+    static const char *valid_sym[] = { MATRIX_VALID_sym_Csparse, "" };
+    Rboolean
+	a_symm = R_check_class_etc(a, valid_sym) >= 0,
+	b_symm = R_check_class_etc(b, valid_sym) >= 0;
     SEXP dn = PROTECT(allocVector(VECSXP, 2));
-    SET_VECTOR_ELT(dn, 0,	/* establish dimnames */
-		   duplicate(VECTOR_ELT(GET_SLOT(a, Matrix_DimNamesSym), 0)));
+    SET_VECTOR_ELT(dn, 0,
+		   duplicate(VECTOR_ELT(a_symm ? R_symmetric_Dimnames(a) : GET_SLOT(a, Matrix_DimNamesSym), 0)));
     SET_VECTOR_ELT(dn, 1,
-		   duplicate(VECTOR_ELT(GET_SLOT(b, Matrix_DimNamesSym), 1)));
+		   duplicate(VECTOR_ELT(b_symm ? R_symmetric_Dimnames(b) : GET_SLOT(b, Matrix_DimNamesSym), 1)));
     UNPROTECT(nprot);
     return chm_sparse_to_SEXP(chc, 1, uploT, /*Rkind*/0, diag, dn);
 }
