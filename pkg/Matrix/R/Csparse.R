@@ -486,7 +486,7 @@ setMethod("band", "CsparseMatrix",
 	  })
 
 setMethod("diag", "CsparseMatrix",
-	  function(x, nrow, ncol) {
+	  function(x, nrow, ncol, names=TRUE) {
               ## "FIXME": could be more efficient; creates new ..CMatrix:
 	      dm <- .Call(Csparse_band, diagU2N(x), 0, 0)
 	      dlen <- min(dm@Dim)
@@ -504,6 +504,12 @@ setMethod("diag", "CsparseMatrix",
 		  ## cMatrix not yet active but for future expansion
 		  if (is(dm, "cMatrix")) val <- as.complex(val)
 		  val[ind1] <- dm@x
+	      }
+	      if(names && dlen > 0L) {
+		  nms <- dimnames(x)
+		  if(is.list(nms) && !any(vapply(nms, is.null, NA)) &&
+                     { im <- seq_len(dlen); identical((nm <- nms[[1L]][im]), nms[[2L]][im]) })
+		      names(val) <- nm
 	      }
 	      val
 	  })
