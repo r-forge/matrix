@@ -12,6 +12,21 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
+\section{Changes in version 1.4-1 (2021-12-22 r3420)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{diag(x)} methods now mostly also keep \code{names} from
+      \code{dimnames(x)} by default and obey \code{names=*} more generally.
+    }
+  }
+  \subsection{New Features}{
+    \itemize{
+      \item New virtual class \code{packedMatrix} containing packed (dense)
+      symmetric and triangular matrices.
+    }
+  }
+}
+
 \section{Changes in version 1.4-0 (2021-12-08 r3419)}{
   \subsection{Bug Fixes}{
     \itemize{

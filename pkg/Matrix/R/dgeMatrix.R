@@ -43,8 +43,26 @@ setMethod("rcond", signature(x = "dgeMatrix", norm = "character"),
 
 setMethod("t", signature(x = "dgeMatrix"), t_geMatrix)
 
+utils::suppressForeignCheck("._GETTER_")
+..get.diag <- function(._GETTER_, x, nrow, ncol, names=TRUE) {
+    if((m <- min(dim(x))) == 0L) return(numeric(0L))
+    y <- .Call(._GETTER_, x)
+    if(names) {
+        nms <- dimnames(x)
+        if (is.list(nms) && !any(vapply(nms, is.null, NA)) &&
+            identical((nm <- nms[[1L]][seq_len(m)]), nms[[2L]][seq_len(m)]))
+            names(y) <- nm
+    }
+    y
+}
+.mkSpec.diag <- function(symb) {
+    rr <- ..get.diag
+    formals(rr) <- formals(rr)[-1]
+       body(rr)[[3]][[3]][[2]] <- symb
+    rr
+}
+.dge.diag <- .mkSpec.diag(quote(dgeMatrix_getDiag))
 
-.dge.diag <- function(x, nrow, ncol) .Call(dgeMatrix_getDiag, x)
 setMethod("diag", signature(x = "dgeMatrix"), .dge.diag)
 setMethod("diag<-", signature(x = "dgeMatrix"),
 	  function(x, value) .Call(dgeMatrix_setDiag, x, value))

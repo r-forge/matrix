@@ -104,19 +104,13 @@ setMethod("as.logical", signature(x = "ldenseMatrix"),
 
 ###----------------------------------------------------------------------
 
-setMethod("diag", signature(x = "lgeMatrix"),
-	  function(x, nrow, ncol) .Call(lgeMatrix_getDiag, x))
+setMethod("diag", signature(x = "lgeMatrix"), .mkSpec.diag(quote(lgeMatrix_getDiag)))
 
-setMethod("diag", signature(x = "lsyMatrix"),
-	  function(x, nrow, ncol) .Call(lgeMatrix_getDiag, x))
-setMethod("diag", signature(x = "lspMatrix"),
-	  function(x, nrow, ncol) .Call(lspMatrix_getDiag, x))
+setMethod("diag", signature(x = "lsyMatrix"), .mkSpec.diag(quote(lgeMatrix_getDiag)))
+setMethod("diag", signature(x = "lspMatrix"), .mkSpec.diag(quote(lspMatrix_getDiag)))
 
-setMethod("diag", signature(x = "ltrMatrix"),
-          function(x, nrow, ncol) .Call(ltrMatrix_getDiag, x))
-setMethod("diag", signature(x = "ltpMatrix"),
-          function(x, nrow, ncol) .Call(ltpMatrix_getDiag, x))
-
+setMethod("diag", signature(x = "ltrMatrix"), .mkSpec.diag(quote(ltrMatrix_getDiag)))
+setMethod("diag", signature(x = "ltpMatrix"), .mkSpec.diag(quote(ltpMatrix_getDiag)))
 
 setMethod("diag", signature(x = "ndenseMatrix"),# << the "same"
           function(x, nrow, ncol) diag(as(x, "ldenseMatrix")))
