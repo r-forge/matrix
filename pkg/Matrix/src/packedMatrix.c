@@ -261,9 +261,6 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
 	SET_SLOT(res, Matrix_DimSym, GET_SLOT(obj, Matrix_DimSym));
 	SET_SLOT(res, Matrix_DimNamesSym, GET_SLOT(obj, Matrix_DimNamesSym));
 	SET_SLOT(res, Matrix_uploSym, GET_SLOT(obj, Matrix_uploSym));
-	if (R_has_slot(obj, Matrix_factorSym)) {
-	    SET_SLOT(res, Matrix_factorSym, GET_SLOT(obj, Matrix_factorSym));
-	}
 	slot_dup(res, obj, Matrix_xSym);
     } else {
 	res = obj;
@@ -274,6 +271,11 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
      */
     if (Diag_P(res)[0] == 'U') {
 	SET_SLOT(res, Matrix_diagSym, mkString("N"));
+    }
+    /* Reset 'factors' slot when assigning to "[dln]spMatrix" */
+    if (R_has_slot(res, Matrix_factorSym) &&
+	LENGTH(GET_SLOT(res, Matrix_factorSym)) > 0) {
+	SET_SLOT(res, Matrix_factorSym, allocVector(VECSXP, 0));
     }
 
     /* ? double result : logical result */
@@ -459,7 +461,7 @@ SEXP packedMatrix_sub0_2ary(SEXP obj, SEXP index)
 		if (up) {						\
 		    if (do_col)	{					\
 			for (int j = 0; j <= i; ++j, pos += incr) {	\
-			    px1[pos] = px0[PM_AR21_UP(i, j)];		\
+			    px1[pos] = px0[PM_AR21_UP(j, i)];		\
 			}						\
 			for (int j = i + 1; j < n; ++j, pos += incr) {	\
 			    px1[pos] = _zero_;				\
@@ -478,7 +480,7 @@ SEXP packedMatrix_sub0_2ary(SEXP obj, SEXP index)
 			    px1[pos] = _zero_;				\
 			}						\
 			for (int j = i; j < n; ++j, pos += incr) {	\
-			    px1[pos] = px0[PM_AR21_LO(i, j, n2)];	\
+			    px1[pos] = px0[PM_AR21_LO(j, i, n2)];	\
 			}						\
 		    } else {						\
 			for (int j = 0; j <= i; ++j, pos += incr) {	\
