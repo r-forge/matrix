@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-1 (2021-12-22 r3420)}{
+\section{Changes in version 1.4-1 (2021-12-23 r3426)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{diag(x)} methods now mostly also keep \code{names} from
@@ -22,7 +22,10 @@
   \subsection{New Features}{
     \itemize{
       \item New virtual class \code{packedMatrix} containing packed (dense)
-      symmetric and triangular matrices.
+      symmetric and triangular matrices.  Methods for subscripting,
+      including \code{diag()}, notably keeping names by default and for
+      \code{t()} which are memory efficient, i.e., do not work via
+      unpacking, thanks to Mikael Jagan.
     }
   }
 }
@@ -91,7 +94,7 @@
       matrix transformations or operations which involved symmetric matrices.
 
       \item \code{as(<ddiMatrix>, "matrix")} no longer loses dimnames,
-      thanks to Mikael Jagan's report as Matrix bug #6751.      
+      thanks to Mikael Jagan's report as Matrix bug #6751.
     }
   }
   \subsection{Misc}{

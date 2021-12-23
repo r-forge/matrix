@@ -8,6 +8,8 @@ Maintainer: Martin Maechler <mmaechler+Matrix@gmail.com>
 Authors@R: c(person("Douglas","Bates", role="aut")
  , person("Martin","Maechler", role = c("aut","cre"), email="mmaechler+Matrix@gmail.com",
           comment = c(ORCID = "0000-0002-8685-9910"))
+ , person("Mikael", "Jagan", role="aut",
+           comment = "new 'packedMatrix' class plus subset/diag/.. methods in C")
  , person("Timothy A.", "Davis", role="ctb",
            comment = c("SuiteSparse and 'cs' C libraries, notably CHOLMOD, AMD;
 		       collaborators listed in

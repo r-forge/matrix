@@ -596,9 +596,9 @@ SEXP packedMatrix_sub1(SEXP obj, SEXP index, SEXP drop, SEXP col)
     
     SEXP x0, x1;
     x0 = GET_SLOT(obj, Matrix_xSym);
-    if (isReal(x0)) {
+    if (isReal(x0)) { // "d"
 	PM_SUB1(double, REALSXP, REAL, NA_REAL, 0.0, 1.0);
-    } else {
+    } else { // "l"
 	PM_SUB1(int, LGLSXP, LOGICAL, NA_LOGICAL, 0, 1);
     }
 
