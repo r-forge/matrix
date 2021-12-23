@@ -112,7 +112,9 @@ setMethod("diag", signature(x = "ltrMatrix"), .mkSpec.diag(quote(ltrMatrix_getDi
 
 for (.x.cl in sprintf("n%sMatrix", c("ge", "sy", "tr"))) {
     setMethod("diag", signature(x = .x.cl),# << the "same"
-              function(x, nrow, ncol) diag(as(x, "ldenseMatrix")))
+              function(x, nrow, ncol, names) {
+                  diag(as(x, "ldenseMatrix"), names = names)
+              })
 }
 rm(.x.cl)
 
