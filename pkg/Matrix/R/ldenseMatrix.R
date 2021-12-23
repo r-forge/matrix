@@ -107,14 +107,23 @@ setMethod("as.logical", signature(x = "ldenseMatrix"),
 setMethod("diag", signature(x = "lgeMatrix"), .mkSpec.diag(quote(lgeMatrix_getDiag)))
 
 setMethod("diag", signature(x = "lsyMatrix"), .mkSpec.diag(quote(lgeMatrix_getDiag)))
-setMethod("diag", signature(x = "lspMatrix"), .mkSpec.diag(quote(lspMatrix_getDiag)))
 
 setMethod("diag", signature(x = "ltrMatrix"), .mkSpec.diag(quote(ltrMatrix_getDiag)))
-setMethod("diag", signature(x = "ltpMatrix"), .mkSpec.diag(quote(ltpMatrix_getDiag)))
 
+for (.x.cl in sprintf("n%sMatrix", c("ge", "sy", "tr"))) {
+    setMethod("diag", signature(x = .x.cl),# << the "same"
+              function(x, nrow, ncol) diag(as(x, "ldenseMatrix")))
+}
+rm(.x.cl)
+
+## MJ: No longer needed ... replacement in ./packedMatrix.R
+if (FALSE) {
+setMethod("diag", signature(x = "lspMatrix"), .mkSpec.diag(quote(lspMatrix_getDiag)))
+setMethod("diag", signature(x = "ltpMatrix"), .mkSpec.diag(quote(ltpMatrix_getDiag)))
+## MJ: Still used for unpacked "ndenseMatrix", but no longer for packed!
 setMethod("diag", signature(x = "ndenseMatrix"),# << the "same"
           function(x, nrow, ncol) diag(as(x, "ldenseMatrix")))
-
+}
 
 ## --- *SETTING* of diagonal :  diag(x) <- value ---------
 ## --- =====================   faster than default  x[cbind[c(i,i)]] <- value
@@ -122,40 +131,48 @@ setMethod("diag<-", signature(x = "lgeMatrix"),
 	  function(x, value) .Call(lgeMatrix_setDiag, x, value))
 setMethod("diag<-", signature(x = "lsyMatrix"),
 	  function(x, value) .Call(lgeMatrix_setDiag, x, value))
-setMethod("diag<-", signature(x = "lspMatrix"),
-	  function(x, value) .Call(lspMatrix_setDiag, x, value))
 .diag.set.ltr <- function(x, value) {
     .Call(ltrMatrix_setDiag,
           if(x@diag == "U") .dense.diagU2N(x, "l", isPacked=FALSE) else x,
           value)
 }
-.diag.set.ltp <- function(x, value) {
-    .Call(ltpMatrix_setDiag,
-          if(x@diag == "U") .dense.diagU2N(x, "l", isPacked=TRUE) else x,
-          value)
-}
 setMethod("diag<-", signature(x = "ltrMatrix"), .diag.set.ltr)
-setMethod("diag<-", signature(x = "ltpMatrix"), .diag.set.ltp)
 
 ## the *same* for the  "ndenseMatrix" elements:
 setMethod("diag<-", signature(x = "ngeMatrix"),
 	  function(x, value) .Call(lgeMatrix_setDiag, x, value))
 setMethod("diag<-", signature(x = "nsyMatrix"),
 	  function(x, value) .Call(lgeMatrix_setDiag, x, value))
+setMethod("diag<-", signature(x = "ntrMatrix"), .diag.set.ltr)
+
+# MJ: No longer needed ... replacement in ./packedMatrix.R
+if (FALSE) {
+setMethod("diag<-", signature(x = "lspMatrix"),
+	  function(x, value) .Call(lspMatrix_setDiag, x, value))
+.diag.set.ltp <- function(x, value) {
+    .Call(ltpMatrix_setDiag,
+          if(x@diag == "U") .dense.diagU2N(x, "l", isPacked=TRUE) else x,
+          value)
+}
+setMethod("diag<-", signature(x = "ltpMatrix"), .diag.set.ltp)
 setMethod("diag<-", signature(x = "nspMatrix"),
 	  function(x, value) .Call(lspMatrix_setDiag, x, value))
-setMethod("diag<-", signature(x = "ntrMatrix"), .diag.set.ltr)
 setMethod("diag<-", signature(x = "ntpMatrix"), .diag.set.ltp)
+}
 
 rm(.diag.set.ltr, .diag.set.ltp)
 
 setMethod("t", signature(x = "lgeMatrix"), t_geMatrix)
 setMethod("t", signature(x = "ltrMatrix"), t_trMatrix)
 setMethod("t", signature(x = "lsyMatrix"), t_trMatrix)
+
+## MJ: No longer needed ... replacement in ./packedMatrix.R
+if (FALSE) {
 setMethod("t", signature(x = "ltpMatrix"),
 	  function(x) as(t(as(x, "ltrMatrix")), "ltpMatrix"))
 setMethod("t", signature(x = "lspMatrix"),
 	  function(x) as(t(as(x, "lsyMatrix")), "lspMatrix"))
+}
 
 ## NOTE:  "&" and "|"  are now in group "Logic" c "Ops" --> ./Ops.R
 ##        "!" is in ./not.R

@@ -44,8 +44,8 @@
 }
 \section{Extends}{
 Class \code{"\linkS4class{Matrix}"}, directly.
-Class \code{"\linkS4class{mMatrix}"}, by class "Matrix", distance 2.
-Class \code{"\linkS4class{replValueSp}"}, by class "Matrix", distance 2.
+Class \code{"mMatrix"}, by class "Matrix", distance 2.
+Class \code{"\linkS4class{replValue}"}, by class "Matrix", distance 2.
 }
 \section{Methods}{
   \describe{
