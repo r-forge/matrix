@@ -23,6 +23,7 @@
 #include "ldense.h"
 #include "lgCMatrix.h"
 #include "sparseQR.h"
+#include "packedMatrix.h"
 #include <R_ext/Rdynload.h>
 
 #include "Syms.h"
@@ -255,7 +256,15 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(sparseQR_resid_fitted, 3),
     CALLDEF(triangularMatrix_validate, 1),
     CALLDEF(symmetricMatrix_validate, 1),
+    CALLDEF(packedMatrix_validate, 1),
     CALLDEF(R_symmetric_Dimnames, 1),
+
+    CALLDEF(packedMatrix_t, 1),
+    CALLDEF(packedMatrix_diag_get, 2),
+    CALLDEF(packedMatrix_diag_set, 2),
+    CALLDEF(packedMatrix_sub0_1ary, 2),
+    CALLDEF(packedMatrix_sub0_2ary, 2),
+    CALLDEF(packedMatrix_sub1, 4),
 
 /* still simple placeholders, but already used in ../R/AllClass.R : */
     CALLDEF(CHMfactor_validate, 1),
