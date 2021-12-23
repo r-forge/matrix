@@ -404,12 +404,11 @@ setAs("Matrix", "diagonalMatrix",
 
 
 diag.x <- function(x, nrow, ncol, names=TRUE) {
-    if((m <- min(dim(x))) == 0L) return(numeric(0L))
     y <- .diag.x(x)
     if(names) {
         nms <- dimnames(x)
-        if (is.list(nms) && !any(vapply(nms, is.null, NA)) &&
-            identical((nm <- nms[[1L]][seq_len(m)]), nms[[2L]][seq_len(m)]))
+        if(is.list(nms) && !any(vapply(nms, is.null, NA)) &&
+           identical((nm <- nms[[1L]][im <- seq_len(min(dim(x)))]), nms[[2L]][im]))
             names(y) <- nm
     }
     y

@@ -1055,7 +1055,7 @@ SEXP Csparse_MatrixMarket(SEXP x, SEXP fname)
  * @return  a SEXP, either a (double) number or a length n-vector of diagonal entries
  */
 SEXP diag_tC_ptr(int n, int *x_p, double *x_x, Rboolean is_U, int *perm,
-/*                                ^^^^^^ FIXME[Generalize] to int / ... */
+/*                                ^^^^^^ FIXME[Generalize] to int / ... -- via x_slot_kind ? */
 		 SEXP resultKind)
 {
     const char* res_ch = CHAR(STRING_ELT(resultKind,0));
@@ -1168,7 +1168,6 @@ SEXP diag_tC_ptr(int n, int *x_p, double *x_x, Rboolean is_U, int *perm,
  */
 SEXP diag_tC(SEXP obj, SEXP resultKind)
 {
-
     SEXP
 	pslot = GET_SLOT(obj, Matrix_pSym),
 	xslot = GET_SLOT(obj, Matrix_xSym);

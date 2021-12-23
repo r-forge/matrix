@@ -45,12 +45,11 @@ setMethod("t", signature(x = "dgeMatrix"), t_geMatrix)
 
 utils::suppressForeignCheck("._GETTER_")
 ..get.diag <- function(._GETTER_, x, nrow, ncol, names=TRUE) {
-    if((m <- min(dim(x))) == 0L) return(numeric(0L))
-    y <- .Call(._GETTER_, x)
+    y <- .Call(._GETTER_, x) # double or logical
     if(names) {
         nms <- dimnames(x)
-        if (is.list(nms) && !any(vapply(nms, is.null, NA)) &&
-            identical((nm <- nms[[1L]][seq_len(m)]), nms[[2L]][seq_len(m)]))
+        if(is.list(nms) && !any(vapply(nms, is.null, NA)) &&
+           identical((nm <- nms[[1L]][im <- seq_len(min(dim(x)))]), nms[[2L]][im]))
             names(y) <- nm
     }
     y
@@ -58,7 +57,7 @@ utils::suppressForeignCheck("._GETTER_")
 .mkSpec.diag <- function(symb) {
     rr <- ..get.diag
     formals(rr) <- formals(rr)[-1]
-       body(rr)[[3]][[3]][[2]] <- symb
+       body(rr)[[2]][[3]][[2]] <- symb
     rr
 }
 .dge.diag <- .mkSpec.diag(quote(dgeMatrix_getDiag))
