@@ -562,11 +562,11 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
     /* L : */
     SET_VECTOR_ELT(ans, 0, chm_factor_to_SEXP(L, 0));
     /* coef : */
-    SET_VECTOR_ELT(ans, 1, allocVector(REALSXP, cx->nrow));
+            SET_VECTOR_ELT(ans, 1, allocVector(REALSXP,  cx->nrow));
     Memcpy(REAL(VECTOR_ELT(ans, 1)), (double*)(cAns->x), cx->nrow);
     /* X'y : */
 /* FIXME: Change this when the "effects" vector is available */
-    SET_VECTOR_ELT(ans, 2, allocVector(REALSXP, cx->nrow));
+            SET_VECTOR_ELT(ans, 2, allocVector(REALSXP, cx->nrow));
     Memcpy(REAL(VECTOR_ELT(ans, 2)), (double*)(rhs->x), cx->nrow);
     /* resid := y */
     resid = cholmod_copy_dense(cy, &c);
@@ -576,7 +576,7 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
     if (!(cholmod_sdmult(cx, 1/* trans */, neg1, one, cAns, resid, &c)))
 	error(_("cholmod_sdmult error (resid)"));
     /* FIXME: for multivariate case, i.e. resid  *matrix* with > 1 column ! */
-    SET_VECTOR_ELT(ans, 3, allocVector(REALSXP, n));
+            SET_VECTOR_ELT(ans, 3,   allocVector(REALSXP, n));
     Memcpy(REAL(VECTOR_ELT(ans, 3)), (double*)(resid->x), n);
 
     cholmod_free_factor(&L, &c);

@@ -60,21 +60,26 @@ static CSP csp_eye(int n)
  */
 cs *Matrix_as_cs(cs *ans, SEXP x, Rboolean check_Udiag)
 {
-    static const char *valid[] = {"dgCMatrix", "dtCMatrix", ""};
+    static const char *valid[] =
+	{ "dgCMatrix", "dtCMatrix"
+	  // 0            1
+	, "ngCMatrix", "ntCMatrix"
+	  // 2            3
+	, ""};
     /* had also "dsCMatrix", but that only stores one triangle */
-    int *dims, ctype = R_check_class_etc(x, valid);
-    SEXP islot;
-
+    int ctype = R_check_class_etc(x, valid);
     if (ctype < 0) error(_("invalid class of 'x' in Matrix_as_cs(a, x)"));
+    // now, ctype >= 0
+    Rboolean has_x = ctype < 2;
 				/* dimensions and nzmax */
-    dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
+    int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
     ans->m = dims[0]; ans->n = dims[1];
-    islot = GET_SLOT(x, Matrix_iSym);
+    SEXP islot = GET_SLOT(x, Matrix_iSym);
     ans->nz = -1;		/* indicates compressed column storage */
     ans->nzmax = LENGTH(islot);
     ans->i = INTEGER(islot);
     ans->p = INTEGER(GET_SLOT(x, Matrix_pSym));
-    ans->x = REAL(GET_SLOT(x, Matrix_xSym));
+    ans->x = has_x ? REAL(GET_SLOT(x, Matrix_xSym)) : NULL;
 
     if(check_Udiag && ctype == 1 && (*diag_P(x) == 'U')) { /* diagU2N(.) : */
 	int n = dims[0];
@@ -98,6 +103,7 @@ cs *Matrix_as_cs(cs *ans, SEXP x, Rboolean check_Udiag)
 			(   int*) tmp->p, n+1);
 	ans->i = Memcpy((   int*) R_alloc(nz, sizeof(int)),
 			(   int*) tmp->i, nz);
+	if(has_x)
 	ans->x = Memcpy((double*) R_alloc(nz, sizeof(double)),
 			(double*) tmp->x, nz);
 

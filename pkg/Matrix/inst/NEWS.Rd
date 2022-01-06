@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-1 (2021-12-23 r3426)}{
+\section{Changes in version 1.4-1 (2022-01-06 r3429)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{diag(x)} methods now mostly also keep \code{names} from
@@ -26,6 +26,12 @@
       including \code{diag()}, notably keeping names by default and for
       \code{t()} which are memory efficient, i.e., do not work via
       unpacking, thanks to Mikael Jagan.
+
+      \item New \code{dmperm()} implementing a Dulmage-Mendelsohn
+      decomposition, thanks to the persistency of Mauricio Vargas (@uc.cl).
+
+      \item Export more low-level conversion utilities:
+      \code{.n2dgT}, \code{.m2ngCn}, \code{.m2ngTn}.
     }
   }
 }
