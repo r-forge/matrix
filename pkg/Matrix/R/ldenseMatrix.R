@@ -146,6 +146,8 @@ setMethod("diag<-", signature(x = "ngeMatrix"),
 setMethod("diag<-", signature(x = "nsyMatrix"),
 	  function(x, value) .Call(lgeMatrix_setDiag, x, value))
 setMethod("diag<-", signature(x = "ntrMatrix"), .diag.set.ltr)
+rm(.diag.set.ltr)
+
 
 # MJ: No longer needed ... replacement in ./packedMatrix.R
 if (FALSE) {
@@ -160,9 +162,9 @@ setMethod("diag<-", signature(x = "ltpMatrix"), .diag.set.ltp)
 setMethod("diag<-", signature(x = "nspMatrix"),
 	  function(x, value) .Call(lspMatrix_setDiag, x, value))
 setMethod("diag<-", signature(x = "ntpMatrix"), .diag.set.ltp)
+rm(.diag.set.ltp)
 }
 
-rm(.diag.set.ltr, .diag.set.ltp)
 
 setMethod("t", signature(x = "lgeMatrix"), t_geMatrix)
 setMethod("t", signature(x = "ltrMatrix"), t_trMatrix)

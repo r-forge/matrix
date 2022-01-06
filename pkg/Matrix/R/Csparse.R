@@ -87,11 +87,17 @@ setAs("dtCMatrix", "matrix", function(from) .Call(Csparse_to_matrix, from, TRUE,
     if(!is.logical(from)) storage.mode(from) <- "logical"
     .Call(matrix_to_Csparse, from, "lgCMatrix")
 }
-.m2ngC <- function(from) {
+.m2ngCn <- function(from, na.is.not.0 = FALSE) {
     if(!is.logical(from)) storage.mode(from) <- "logical"
-    if(anyNA(from)) stop("cannot coerce NA values to pattern \"ngCMatrix\"")
+    if(na.is.not.0) {
+        if(any(iN <- is.na(from)))
+            from[iN] <- TRUE
+    } else if(anyNA(from))
+        stop("cannot coerce NA values to pattern \"ngCMatrix\"")
     .Call(matrix_to_Csparse, from, "ngCMatrix")
 }
+.m2ngC <- function(from) .m2ngCn(from)
+
 setAs("matrix", "dgCMatrix", .m2dgC)
 setAs("matrix", "lgCMatrix", .m2lgC)
 setAs("matrix", "ngCMatrix", .m2ngC)
@@ -549,4 +555,23 @@ setMethod("isDiagonal", signature(object = "CsparseMatrix"), isDiagCsp)
 
 setMethod("isDiagonal", signature(object = "CsparseMatrix"),
 	  function(object) isDiagTsp(.Call(Csparse_to_Tsparse, object, is(object, "triangularMatrix"))))
+
+
+dmperm <- function(x, nAns = 6L, seed = 0L) {
+    stopifnot(length(nAns <- as.integer(nAns)) == 1, nAns %in% c(2L, 4L, 6L)
+            , length(seed <- as.integer(seed)) == 1, seed %in% -1:1
+              )
+    if(isS4(x)) {
+        cl <- getClass(class(x))
+        if(!extends(cl, "dgCMatrix") && !extends(cl, "dtCMatrix") &&
+           !extends(cl, "ngCMatrix") && !extends(cl, "ntCMatrix")
+           ) {
+            x <- as(as(x, "dMatrix"), "CsparseMatrix")
+            x <- as(x, if(isTriangular(x)) "triangularMatrix" else "generalMatrix")
+        }
+    } else { # typically traditional matrix
+        x <- .m2ngCn(x, na.is.not.0=TRUE)
+    }
+    .Call(Csparse_dmperm, x, seed, nAns)
+}
 

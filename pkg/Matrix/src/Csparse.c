@@ -6,6 +6,7 @@
 #include "Csparse.h"
 #include "Tsparse.h"
 #include "chm_common.h"
+#include "cs_utils.h" /* -> ./cs.h  for cs_dmperm() */
 
 /** "Cheap" C version of  Csparse_validate() - *not* sorting : */
 Rboolean isValid_Csparse(SEXP x)
@@ -432,7 +433,7 @@ SEXP Csparse_transpose(SEXP x, SEXP tri)
     if(!isNull(tmp)) { // swap names(dimnames(.)):
 	SEXP nms_dns = PROTECT(allocVector(VECSXP, 2));
 	SET_VECTOR_ELT(nms_dns, 1, STRING_ELT(tmp, 0));
-        SET_VECTOR_ELT(nms_dns, 0, STRING_ELT(tmp, 1));
+	SET_VECTOR_ELT(nms_dns, 0, STRING_ELT(tmp, 1));
 	setAttrib(dn, R_NamesSymbol, nms_dns);
 	UNPROTECT(1);
     }
@@ -978,12 +979,12 @@ SEXP Csparse_submatrix(SEXP x, SEXP i, SEXP j)
     /* Must treat 'NA's in i[] and j[] here -- they are *not* treated by Cholmod!
      * haveNA := ...
        if(haveNA) {
-         a. i = removeNA(i); j =removeNA(j), and remember where they were
+	 a. i = removeNA(i); j =removeNA(j), and remember where they were
 	 b. ans = CHM_SUB(.., i, j)
 	 c. add NA rows and/or columns to 'ans' according to
 	    place of NA's in i and/or j.
        } else {
-         ans = CHM_SUB(.....)  // == current code
+	 ans = CHM_SUB(.....)  // == current code
        }
      */
 #define CHM_SUB(_M_, _i_, _j_)					\
@@ -1429,5 +1430,84 @@ SEXP matrix_to_Csparse(SEXP x, SEXP cls)
 }
 
 
+// seed will *not* be used unless it's -1 (inverse perm.) or  0 ("no" / identity) perm.
+static csd* Csparse_dmperm_raw(SEXP mat, SEXP seed)
+{
+    mat = PROTECT(duplicate(mat));
+    CSP matx = AS_CSP__(mat); /* m x n ; compressed column, *double* 'x' or none */
+    int iseed = asInteger(seed);
+    R_CheckStack();
+    UNPROTECT(1);
+    return cs_dmperm(matx, iseed); // -> ./cs.c
+}
 
+/* NB:  cs.h  defines the 'csd' struct as  (NB: csi :== int in  Matrix, for now)
 
+   typedef struct cs_dmperm_results    // cs_dmperm or cs_scc output
+   {
+   csi *p ;        // size m, row permutation
+   csi *q ;        // size n, column permutation
+   csi *r ;        // size nb+1, block k is rows r[k] to r[k+1]-1 in A(p,q)
+   csi *s ;        // size nb+1, block k is cols s[k] to s[k+1]-1 in A(p,q)
+   csi nb ;        // # of blocks in fine dmperm decomposition
+   csi rr [5] ;    // coarse row decomposition
+   csi cc [5] ;    // coarse column decomposition
+   } csd ;
+*/
+
+/* MM: should allow to return the full info above
+   (Timothy Davis, p.126, explains why it's interesting ..) */
+
+/* Here, return the full *named* list to R */
+SEXP Csparse_dmperm(SEXP mat, SEXP seed, SEXP nAns) {
+    csd *DMp = Csparse_dmperm_raw(mat, seed);
+    if(DMp == NULL) // "failure" in cs_dmperm()
+	return(R_NilValue);
+    int *dims = INTEGER(GET_SLOT(mat, Matrix_DimSym)),
+	m = dims[0],
+	n = dims[1],
+	n_ans = asInteger(nAns),
+	nb = DMp->nb;
+
+    SEXP nms = PROTECT(allocVector(STRSXP, n_ans));
+    SEXP ans = PROTECT(allocVector(VECSXP, n_ans));
+    R_CheckStack();
+    int *ip;
+    /* p : */SET_STRING_ELT(nms, 0, mkChar("p"));
+             SET_VECTOR_ELT(ans, 0, allocVector(INTSXP, m));
+    ip = INTEGER(VECTOR_ELT(ans, 0));
+    /* 0-based permutation:
+     * Memcpy(ip , (int*)(DMp->p), m); */
+    // 1-based permutation:
+    for(int i=0; i < m; i++) ip[i] = DMp->p[i] + 1;
+
+    /* q : */SET_STRING_ELT(nms, 1, mkChar("q"));
+             SET_VECTOR_ELT(ans, 1, allocVector(INTSXP, n));
+    ip = INTEGER(VECTOR_ELT(ans, 1));
+    /* 0-based permutation:
+     * Memcpy(ip , (int*)(DMp->q), m); */
+    // 1-based permutation:
+    for(int i=0; i < n; i++) ip[i] = DMp->q[i] + 1;
+
+    if(n_ans > 2) {
+      /* r : */  SET_STRING_ELT(nms, 2, mkChar("r"));
+		 SET_VECTOR_ELT(ans, 2, allocVector(INTSXP, nb+1));
+      Memcpy(INTEGER(VECTOR_ELT(ans, 2)), (int*)(DMp->r),   nb+1);
+
+      /* s : */  SET_STRING_ELT(nms, 3, mkChar("s"));
+		 SET_VECTOR_ELT(ans, 3, allocVector(INTSXP, nb+1));
+      Memcpy(INTEGER(VECTOR_ELT(ans, 3)), (int*)(DMp->s),   nb+1);
+      if(n_ans > 4) {
+	/* rr5 :*/ SET_STRING_ELT(nms, 4, mkChar("rr5"));
+		   SET_VECTOR_ELT(ans, 4, allocVector(INTSXP, 5));
+	Memcpy(INTEGER(VECTOR_ELT(ans, 4)), (int*)(DMp->rr),  5);
+
+	/* cc5 :*/ SET_STRING_ELT(nms, 5, mkChar("cc5"));
+		   SET_VECTOR_ELT(ans, 5, allocVector(INTSXP, 5));
+	Memcpy(INTEGER(VECTOR_ELT(ans, 5)), (int*)(DMp->cc),  5);
+      }
+    }
+    setAttrib(ans, R_NamesSymbol, nms);
+    UNPROTECT(2);
+    return ans;
+}
