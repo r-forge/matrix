@@ -347,7 +347,7 @@ SEXP dgCMatrix_SPQR(SEXP Ap, SEXP ordering, SEXP econ, SEXP tol)
 	SET_VECTOR_ELT(ans, 2, allocVector(INTSXP, A->ncol));
 	int *Er = INTEGER(VECTOR_ELT(ans, 2));
 	for (int i = 0; i < A->ncol; i++) Er[i] = (int) E[i];
-	Free(E);
+	R_Free(E);
     } else SET_VECTOR_ELT(ans, 2, allocVector(INTSXP, 0));
     SET_VECTOR_ELT(ans, 3, ScalarInteger((int)rank));
     UNPROTECT(1);
@@ -518,7 +518,7 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
 		Memcpy(ax + j * n_, x, n);
 	}
     }
-    if(n >= SMALL_4_Alloca) Free(x);
+    if(n >= SMALL_4_Alloca) R_Free(x);
     UNPROTECT(1);
     return ans;
 }

@@ -156,7 +156,7 @@ SEXP dspMatrix_matrix_mm(SEXP a, SEXP b)
 	    F77_CALL(dspmv)(uplo, &n, &one, ax, bx + in, &ione,
 			    &zero, vx + in, &ione FCONE);
 	}
-	if(nn >= SMALL_4_Alloca) Free(bx);
+	if(nn >= SMALL_4_Alloca) R_Free(bx);
     }
     UNPROTECT(1);
     return val;
