@@ -1233,7 +1233,7 @@ SEXP create_Csparse(char* cls, int* i, int* j, int* p, int np,
 		    error(_("p must be non-decreasing"));
 	    if (p[np] != nnz)
 		error("p[np] = %d != nnz = %d", p[np], nnz);
-	    ij = Calloc(nnz, int);
+	    ij = R_Calloc(nnz, int);
 	    if (mi) {
 		i = ij;
 		nrow = np;
@@ -1375,7 +1375,7 @@ SEXP matrix_to_Csparse(SEXP x, SEXP cls)
 	nnz = imax2(256, imax2(nr,nc));/* nnz := final number of nonzero entries, yet unknown;
 					   -- must start with guess and then grow */
     int *rp = INTEGER(ALLOC_SLOT(ans, Matrix_pSym, INTSXP, nc + 1)),
-	*ri = Calloc(nnz, int); // to become i slot -- of not-yet-known length nnz
+	*ri = R_Calloc(nnz, int); // to become i slot -- of not-yet-known length nnz
 
     rp[0] = 0; // always
 
@@ -1423,7 +1423,7 @@ SEXP matrix_to_Csparse(SEXP x, SEXP cls)
     }
 
     Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_iSym,  INTSXP, nnz)), ri, nnz);
-    Free(ri);
+    R_Free(ri);
 
     UNPROTECT(1);
     return ans;

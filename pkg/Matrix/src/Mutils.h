@@ -67,9 +67,9 @@ extern "C" {
 	if(_N_ < SMALL_4_Alloca) {				\
 	    _VAR_ = Alloca(_N_, _TYPE_);  R_CheckStack();	\
 	} else {						\
-	    _VAR_ = Calloc(_N_, _TYPE_);			\
+	    _VAR_ = R_Calloc(_N_, _TYPE_);			\
 	}
-// and user needs to   if(_N_ >= SMALL_4_Alloca)  Free(_VAR_);
+// and user needs to   if(_N_ >= SMALL_4_Alloca)  R_Free(_VAR_);
 
 SEXP triangularMatrix_validate(SEXP obj);
 SEXP symmetricMatrix_validate(SEXP obj);

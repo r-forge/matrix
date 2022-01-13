@@ -118,7 +118,7 @@ cs *Matrix_as_cs(cs *ans, SEXP x, Rboolean check_Udiag)
  *
  * @param a matrix to be converted
  * @param cl the name of the S4 class of the object to be generated
- * @param dofree 0 - don't free a; > 0 cs_free a; < 0 Free a
+ * @param dofree 0 - don't free a; > 0 cs_free a; < 0 R_Free a
  * @param dn either R_NilValue or an SEXP suitable for the Dimnames slot.
  *
  * @return SEXP containing a copy of a
@@ -150,7 +150,7 @@ SEXP Matrix_cs_to_SEXP(cs *a, char *cl, int dofree, SEXP dn)
 	SET_SLOT(ans, Matrix_uploSym, mkString(uplo < 0 ? "L" : "U"));
     }
     if (dofree > 0) cs_spfree(a);
-    if (dofree < 0) Free(a);
+    if (dofree < 0) R_Free(a);
     if (dn != R_NilValue)
 	SET_SLOT(ans, Matrix_DimNamesSym, duplicate(dn));
     UNPROTECT(2);
@@ -236,7 +236,7 @@ csn *Matrix_as_csn(csn *ans, SEXP x)
  *
  * @param a css object to be converted
  * @param cl the name of the S4 class of the object to be generated
- * @param dofree 0 - don't free a; > 0 cs_free a; < 0 Free a
+ * @param dofree 0 - don't free a; > 0 cs_free a; < 0 R_Free a
  * @param m number of rows in original matrix
  * @param n number of columns in original matrix
  *
@@ -272,7 +272,7 @@ SEXP Matrix_css_to_SEXP(css *S, char *cl, int dofree, int m, int n)
 	      cl);
     }
     if (dofree > 0) cs_sfree(S);
-    if (dofree < 0) Free(S);
+    if (dofree < 0) R_Free(S);
     UNPROTECT(1);
     return ans;
 }
@@ -283,7 +283,7 @@ SEXP Matrix_css_to_SEXP(css *S, char *cl, int dofree, int m, int n)
  *
  * @param a csn object to be converted
  * @param cl the name of the S4 class of the object to be generated
- * @param dofree 0 - don't free a; > 0 cs_free a; < 0 Free a
+ * @param dofree 0 - don't free a; > 0 cs_free a; < 0 R_Free a
  * @param dn either R_NilValue or an SEXP suitable for the Dimnames slot. FIXME (L,U!)
  *
  * @return SEXP containing a copy of S
@@ -319,7 +319,7 @@ SEXP Matrix_csn_to_SEXP(csn *N, char *cl, int dofree, SEXP dn)
     }
     if (dofree > 0) cs_nfree(N);
     if (dofree < 0) {
-	Free(N->L); Free(N->U); Free(N);
+	R_Free(N->L); R_Free(N->U); R_Free(N);
     }
     UNPROTECT(1);
     return ans;
