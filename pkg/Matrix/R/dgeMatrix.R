@@ -44,7 +44,7 @@ setMethod("rcond", signature(x = "dgeMatrix", norm = "character"),
 setMethod("t", signature(x = "dgeMatrix"), t_geMatrix)
 
 utils::suppressForeignCheck("._GETTER_")
-..get.diag <- function(._GETTER_, x, nrow, ncol, names=TRUE) {
+..get.diag <- function(x, nrow, ncol, names=TRUE) {
     y <- .Call(._GETTER_, x) # double or logical
     if(names) {
         nms <- dimnames(x)
@@ -56,8 +56,7 @@ utils::suppressForeignCheck("._GETTER_")
 }
 .mkSpec.diag <- function(symb) {
     rr <- ..get.diag
-    formals(rr) <- formals(rr)[-1]
-       body(rr)[[2]][[3]][[2]] <- symb
+    body(rr)[[2]][[3]][[2]] <- symb
     rr
 }
 .dge.diag <- .mkSpec.diag(quote(dgeMatrix_getDiag))
