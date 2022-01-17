@@ -1,5 +1,6 @@
 #include "dgeMatrix.h"
 // -> Mutils.h  etc
+#include <float.h>
 
 SEXP dMatrix_validate(SEXP obj)
 {
@@ -567,7 +568,7 @@ SEXP dgeMatrix_solve(SEXP a)
                          (int *) R_alloc(dims[0], sizeof(int)), &info FCONE);
         if (info)
             error(_("error [%d] from Lapack 'dgecon()'"), info);
-        if(rcond < DOUBLE_EPS)
+        if(rcond < DBL_EPSILON)
             error(_("Lapack dgecon(): system computationally singular, reciprocal condition number = %g"),
 		  rcond);
 
