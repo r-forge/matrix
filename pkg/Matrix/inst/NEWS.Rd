@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-1 (2022-01-13 r3430)}{
+\section{Changes in version 1.4-1 (2022-01-17 r3431)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{diag(x)} methods now mostly also keep \code{names} from
@@ -39,6 +39,7 @@
       \item Our C sources now use \code{R_Calloc()}, \code{R_Free()}
       etc, instead of the shorter versions with 'R_'. Consequently, we
       get closer to \code{STRICT_R_HEADERS}.
+      Also, include \code{<float.h>} for \code{DBL_EPSILON}.
     }
   }
 }
