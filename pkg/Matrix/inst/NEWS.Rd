@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-1 (2022-01-17 r3431)}{
+\section{Changes in version 1.4-1 (2022-01-24 r3433)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{diag(x)} methods now mostly also keep \code{names} from
@@ -32,6 +32,8 @@
 
       \item Export more low-level conversion utilities:
       \code{.n2dgT}, \code{.m2ngCn}, \code{.m2ngTn}.
+
+      \item Provide some matrix multiplication methods for \code{"RsparseMatrix"}.
     }
   }
   \subsection{Misc}{
