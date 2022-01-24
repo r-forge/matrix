@@ -120,6 +120,8 @@ SEXP R_to_CMatrix(SEXP x)
     UNPROTECT(2);
     return ans;
 }
+// NB: C_to_RMatrix(.)  may be nice, but would need Rsparse_transpose()
+
 
 /** Return a 2 column matrix  '' cbind(i, j) ''  of 0-origin index vectors (i,j)
  *  which entirely correspond to the (i,j) slots of
