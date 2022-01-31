@@ -43,14 +43,9 @@ setMethod("rcond", signature(x = "dgeMatrix", norm = "character"),
 
 setMethod("t", signature(x = "dgeMatrix"), t_geMatrix)
 
-## next lines only for  'R CMD check' ..
-## fails:
-##  ._GETTER_ <- dgeMatrix_getDiag
-## warns about wrong class:
-##  ._GETTER_ <- NULL # a dummy
-utils::suppressForeignCheck("._GETTER_")
 ..get.diag <- function(x, nrow, ncol, names=TRUE) {
-    y <- .Call(._GETTER_, x) # double or logical
+    ##         vvvvvvvvvvvvvvvvv here just a place holder, replaced in .mkSpec.diag()
+    y <- .Call(dgeMatrix_getDiag, x) # double or logical
     if(names) {
         nms <- dimnames(x)
         if(is.list(nms) && !any(vapply(nms, is.null, NA)) &&
