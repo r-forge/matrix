@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-1 (2022-01-31 r3434)}{
+\section{Changes in version 1.4-1 (2022-01-31 r3435)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{diag(x)} methods now mostly also keep \code{names} from
@@ -42,6 +42,8 @@
       etc, instead of the shorter versions with 'R_'. Consequently, we
       get closer to \code{STRICT_R_HEADERS}.
       Also, include \code{<float.h>} for \code{DBL_EPSILON}.
+
+      \item \code{PROTECT()} 3 more; as from \samp{rchk} for Matrix 1.4-0.
     }
   }
 }
