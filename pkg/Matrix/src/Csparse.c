@@ -862,8 +862,9 @@ SEXP Csparse_horzcat(SEXP x, SEXP y)
     CSPARSE_CAT("horzcat");
     // TODO: currently drops dimnames - and we fix at R level;
 
-    SEXP retval = chm_sparse_to_SEXP(cholmod_horzcat(chx, chy, 1, &c),
-			      1, 0, Rkind, "", R_NilValue);
+    SEXP retval = PROTECT(
+	chm_sparse_to_SEXP(cholmod_horzcat(chx, chy, 1, &c),
+			   1, 0, Rkind, "", R_NilValue));
 /* AS_CHM_SP(x) fills result with points to R-allocated memory but
    chm_MOD_xtype can change ->x and ->z to cholmod_alloc'ed memory.
    The former needs no freeing but the latter does.
@@ -873,7 +874,8 @@ SEXP Csparse_horzcat(SEXP x, SEXP y)
     if (chx_x != chx->x) cholmod_free(0, 0, chx->x, &c);	\
     if (chx_z != chx->z) cholmod_free(0, 0, chx->z, &c);	\
     if (chy_x != chy->x) cholmod_free(0, 0, chy->x, &c);	\
-    if (chy_z != chy->z) cholmod_free(0, 0, chy->z, &c)
+    if (chy_z != chy->z) cholmod_free(0, 0, chy->z, &c);	\
+    UNPROTECT(1);
 
     CSPARSE_CAT_CLEANUP;
     return retval;
@@ -886,8 +888,9 @@ SEXP Csparse_vertcat(SEXP x, SEXP y)
     CSPARSE_CAT("vertcat");
     // TODO: currently drops dimnames - and we fix at R level;
 
-    SEXP retval = chm_sparse_to_SEXP(cholmod_vertcat(chx, chy, 1, &c),
-			      1, 0, Rkind, "", R_NilValue);
+    SEXP retval  = PROTECT(
+	chm_sparse_to_SEXP(cholmod_vertcat(chx, chy, 1, &c),
+			   1, 0, Rkind, "", R_NilValue));
     CSPARSE_CAT_CLEANUP;
     return retval;
 }
