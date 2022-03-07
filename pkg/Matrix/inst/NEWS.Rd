@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-1 (2022-01-31 r3435)}{
+\section{Changes in version 1.4-1 (2022-03-07 r3436)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{diag(x)} methods now mostly also keep \code{names} from
@@ -1005,7 +1005,8 @@
     }
   }
 }
-
+%% TODO: fill in from here <<<<<<<<<<<<<<<<<<<
+%% ----  using ../ChangeLog and notably my ../svn-log-from.all
 \section{Changes in version 1.0-12 (2013-03-26, svn r2872)}{
   \subsection{New Features}{
     \itemize{
