@@ -1528,8 +1528,8 @@ csi cs_qrsol (csi order, const cs *A, double *b)
 }
 /* return a random permutation vector, the identity perm, or p = n-1:-1:0.
  * seed = -1 means p = n-1:-1:0.  seed = 0 means p = identity.  otherwise
- * p = random permutation.
- *
+ * p = random permutation. */
+/*
  * NB: We use R's RNG *and* its state; i.e., if seed is not -1 or 0,
  * ==  'seed' is *not* used at all in this version of cs_randperm() !
 */

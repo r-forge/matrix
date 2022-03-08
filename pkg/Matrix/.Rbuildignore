@@ -1,18 +1,19 @@
+-----------NOTE__matched case__in__sensitively
 2copy
 \.Rhistory
 ^Done$
 omit-SPQR
 assign_hidden.R
-misc/
+^misc/
 auto$
 ^old$
 -log-
 -[a-zA-Z0-9]*$
-[._]mail
+[-._]mail
 \.MM$
 \.diff$
+\.patch
 \.grep$
-\.patch$
 [-_\.]log$
 \.orig$
 \.rej$
@@ -22,6 +23,11 @@ auto$
 [A-Za-z]\+$
 [A-Za-z]\+[A-Za-z0-9]$
 /0.*\.R$
+Jagan[_-]
+M1mac
+Matrix_[1-9][0-9]*\..+
+jss.submit
+.*_results
 TAGS
 etags
 R/.*\.R__*$

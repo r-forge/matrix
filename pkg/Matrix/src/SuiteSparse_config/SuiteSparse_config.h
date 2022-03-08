@@ -45,41 +45,25 @@ extern "C" {
 #include <limits.h>
 #include <stdlib.h>
 
-// R: Rather use C99 -- which we require in R anyway
-#include <inttypes.h>
-
 /* ========================================================================== */
 /* === SuiteSparse_long ===================================================== */
 /* ========================================================================== */
 
-/*------->>>>>>>>>>>>>>>>>>>>>> Sync the section below with <<<<<<<<<<<<<<<<<<<<
- * ../../inst/include/cholmod.h
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 #ifndef SuiteSparse_long
 
-// -----> for Matrix in R -- replace these by the SuiteSparse_long* defs below :
-/* #ifdef _WIN64 */
+#ifdef _WIN64
 
-/* #define SuiteSparse_long __int64 */
-/* #define SuiteSparse_long_max _I64_MAX */
-/* #define SuiteSparse_long_idd "I64d" */
+#define SuiteSparse_long __int64
+#define SuiteSparse_long_max _I64_MAX
+#define SuiteSparse_long_idd "I64d"
 
-/* #else */
+#else
 
-/* #define SuiteSparse_long long */
-/* #define SuiteSparse_long_max LONG_MAX */
-/* #define SuiteSparse_long_idd "ld" */
+#define SuiteSparse_long long
+#define SuiteSparse_long_max LONG_MAX
+#define SuiteSparse_long_idd "ld"
 
-/* #endif */
-
-#define SuiteSparse_long int64_t
-    // typically long (but on WIN64)
-#define SuiteSparse_long_max 9223372036854775801
-    // typically LONG_MAX (but ..)
-#define SuiteSparse_long_idd PRId64
-    // typically "ld"
-//--------------------------------- end of changes for Matrix in R ---
-
+#endif
 #define SuiteSparse_long_id "%" SuiteSparse_long_idd
 #endif
 
@@ -218,10 +202,10 @@ int SuiteSparse_version     /* returns SUITESPARSE_VERSION */
 */
 #define SUITESPARSE_HAS_VERSION_FUNCTION
 
-#define SUITESPARSE_DATE "Feb 20, 2020"
+#define SUITESPARSE_DATE "May 17, 2021"
 #define SUITESPARSE_VER_CODE(main,sub) ((main) * 1000 + (sub))
 #define SUITESPARSE_MAIN_VERSION 5
-#define SUITESPARSE_SUB_VERSION 7
+#define SUITESPARSE_SUB_VERSION 10
 #define SUITESPARSE_SUBSUB_VERSION 1
 #define SUITESPARSE_VERSION \
     SUITESPARSE_VER_CODE(SUITESPARSE_MAIN_VERSION,SUITESPARSE_SUB_VERSION)
