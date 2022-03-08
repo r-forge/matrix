@@ -1,42 +1,34 @@
---- cs.h.~3~	2014-10-09 22:01:10.000000000 +0200
-+++ cs.h	2014-12-23 22:47:45.479919000 +0100
-@@ -3,8 +3,15 @@
- #include <stdlib.h>
- #include <limits.h>
- #include <math.h>
-+// needed for FILE:
- #include <stdio.h>
- #include <stddef.h>
-+// For use with R package 'Matrix' (NA_REAL, warning(), REprintf(), ..)
-+# include <R_ext/Arith.h>
-+# include <R_ext/Error.h>
-+# include <R_ext/Print.h>
-+# include <R_ext/Random.h>
-+# define printf Rprintf
- #ifdef MATLAB_MEX_FILE
- #include "mex.h"
- #endif
-@@ -18,6 +23,8 @@
- #undef csi
- #define csi mwSignedIndex
- #endif
-+// Matrix pkg:
-+#define csi int
- #ifndef csi
- #define csi ptrdiff_t
- #endif
---- cs.c.~6~	2014-12-23 19:38:11.293693813 +0100
-+++ cs.c	2014-12-23 19:39:26.168581000 +0100
-@@ -1408,7 +1408,7 @@
-     csi i, k, p, m, n, vnz, p1, top, m2, len, col, rnz, *s, *leftmost, *Ap, *Ai,
+--- SuiteSparse-5.10.1/CSparse/Source/cs.c	2022-03-07 18:06:08.411763319 +0100
++++ cs.c	2022-03-07 18:09:23.674127214 +0100
+@@ -1406,12 +1406,12 @@
+ csn *cs_qr (const cs *A, const css *S)
+ {
+     double *Rx, *Vx, *Ax, *x,  *Beta ;
+-    csi i, k, p, m, n, vnz, p1, top, m2, len, col, rnz, *s, *leftmost, *Ap, *Ai,
++    csi i, k, p, n, vnz, p1, top, m2, len, col, rnz, *s, *leftmost, *Ap, *Ai,
          *parent, *Rp, *Ri, *Vp, *Vi, *w, *pinv, *q ;
      cs *R, *V ;
 -    csn *N ;
 +    csn *N ; // the result
      if (!CS_CSC (A) || !S) return (NULL) ;
-     m = A->m ; n = A->n ; Ap = A->p ; Ai = A->i ; Ax = A->x ;
+-    m = A->m ; n = A->n ; Ap = A->p ; Ai = A->i ; Ax = A->x ;
++    n = A->n ; Ap = A->p ; Ai = A->i ; Ax = A->x ;
      q = S->q ; parent = S->parent ; pinv = S->pinv ; m2 = S->m2 ;
-@@ -1536,14 +1536,16 @@
+     vnz = S->lnz ; rnz = S->unz ; leftmost = S->leftmost ;
+     w = cs_malloc (m2+n, sizeof (csi)) ;            /* get csi workspace */
+@@ -1529,6 +1529,11 @@
+ /* return a random permutation vector, the identity perm, or p = n-1:-1:0.
+  * seed = -1 means p = n-1:-1:0.  seed = 0 means p = identity.  otherwise
+  * p = random permutation.  */
++/*
++ * NB: We use R's RNG *and* its state; i.e., if seed is not -1 or 0,
++ * ==  'seed' is *not* used at all in this version of cs_randperm() !
++*/
++
+ csi *cs_randperm (csi n, csi seed)
+ {
+     csi *p, k, j, t ;
+@@ -1537,14 +1542,16 @@
      if (!p) return (NULL) ;             /* out of memory */
      for (k = 0 ; k < n ; k++) p [k] = n-k-1 ;
      if (seed == -1) return (p) ;        /* return reverse permutation */
