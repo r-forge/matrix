@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-1 (2022-03-08 r3439)}{
+\section{Changes in version 1.4-1 (2022-03-09 r3440)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{diag(x)} methods now mostly also keep \code{names} from
@@ -44,6 +44,9 @@
       Also, include \code{<float.h>} for \code{DBL_EPSILON}.
 
       \item \code{PROTECT()} 3 more; as from \samp{rchk} for Matrix 1.4-0.
+
+      \item Slightly better patch notably for Windows,
+      for \file{src/SuiteSparse_config/SuiteSparse_config.h}
     }
   }
 }

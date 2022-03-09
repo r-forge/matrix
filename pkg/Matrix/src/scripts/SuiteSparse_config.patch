@@ -24,3 +24,52 @@
          #endif
      #else
          /* printf is disabled */
+--- SuiteSparse-5.10.1/SuiteSparse_config/SuiteSparse_config.h	2021-05-18 15:01:16.000000000 +0200
++++ SuiteSparse_config/SuiteSparse_config.h	2022-03-09 10:03:04.415680000 +0100
+@@ -49,21 +49,39 @@
+ /* === SuiteSparse_long ===================================================== */
+ /* ========================================================================== */
+ 
+-#ifndef SuiteSparse_long
+-
+-#ifdef _WIN64
++// Rather use C99 -- which we require in R anyway
++#include <inttypes.h>
+ 
+-#define SuiteSparse_long __int64
+-#define SuiteSparse_long_max _I64_MAX
+-#define SuiteSparse_long_idd "I64d"
++#ifndef SuiteSparse_long
+ 
+-#else
++// -----> for Matrix in R -- replace these by the SuiteSparse_long* defs below :
++/* PROBLEM: 1) ../COLAMD/Source/colamd.c  ifdef DLONG has  `#define Int SuiteSparse_long`
++ *             and then declares  ` unsigned Int hash ; ` which gives a compilation error
++ *             on Windows for int64_t
++ *          2) PRId64 seems wrong on current R-devel Windows _UCRT
++*/
++#if !defined(_WIN64) || defined(_UCRT)
+ 
+ #define SuiteSparse_long long
+ #define SuiteSparse_long_max LONG_MAX
+ #define SuiteSparse_long_idd "ld"
+ 
++#else // _WIN64 but not _UCRT
++
++#define SuiteSparse_long __int64
++#define SuiteSparse_long_max _I64_MAX
++#define SuiteSparse_long_idd PRId64
++
+ #endif
++
++/* #define SuiteSparse_long int64_t */
++/*     // typically long (but on WIN64) */
++/* #define SuiteSparse_long_max 9223372036854775801 */
++/*     // typically LONG_MAX (but ..) */
++/* #define SuiteSparse_long_idd PRId64 */
++    // typically "ld"
++//--------------------------------- end of changes for Matrix in R ---
++
+ #define SuiteSparse_long_id "%" SuiteSparse_long_idd
+ #endif
+ 

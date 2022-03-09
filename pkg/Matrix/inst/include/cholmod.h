@@ -8,31 +8,32 @@
 extern "C" {
 #endif
 
+// synced from >>>> ../../src/SuiteSparse_config/SuiteSparse_config.h :
+
 // Rather use C99 -- which we require in R anyway
 #include <inttypes.h>
 
-// from ../../src/SuiteSparse_config/SuiteSparse_config.h :
 #ifndef SuiteSparse_long
 
-/* #ifdef _WIN64 */
+#if !defined(_WIN64) || defined(_UCRT)
 
-/* #define SuiteSparse_long __int64 */
-/* #define SuiteSparse_long_max _I64_MAX */
-/* #define SuiteSparse_long_idd "I64d" */
+#define SuiteSparse_long long
+#define SuiteSparse_long_max LONG_MAX
+#define SuiteSparse_long_idd "ld"
 
-/* #else */
+#else // _WIN64 but not _UCRT
 
-/* #define SuiteSparse_long long */
-/* #define SuiteSparse_long_max LONG_MAX */
-/* #define SuiteSparse_long_idd "ld" */
-
-/* #endif */
-
-#define SuiteSparse_long int64_t
-    // typically long (but on WIN64)
-#define SuiteSparse_long_max 9223372036854775801
-    // typically LONG_MAX (but ..)
+#define SuiteSparse_long __int64
+#define SuiteSparse_long_max _I64_MAX
 #define SuiteSparse_long_idd PRId64
+
+#endif
+
+/* #define SuiteSparse_long int64_t */
+/*     // typically long (but on WIN64) */
+/* #define SuiteSparse_long_max 9223372036854775801 */
+/*     // typically LONG_MAX (but ..) */
+/* #define SuiteSparse_long_idd PRId64 */
     // typically "ld"
 
 #define SuiteSparse_long_id "%" SuiteSparse_long_idd
