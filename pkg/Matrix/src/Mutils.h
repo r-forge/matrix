@@ -123,17 +123,19 @@ SEXP dgCMatrix_set_Dim(SEXP x, int nrow);
 SEXP check_scalar_string(SEXP sP, char *vals, char *nm);
 Rboolean equal_string_vectors(SEXP s1, SEXP s2);
 
+/* MJ: No longer needed ... replacement in ./packedMatrix.c */
+#if 0
 void d_packed_getDiag(double *dest, SEXP x, int n);
 void l_packed_getDiag(   int *dest, SEXP x, int n);
 SEXP d_packed_setDiag(double *diag, int l_d, SEXP x, int n);
 SEXP l_packed_setDiag(   int *diag, int l_d, SEXP x, int n);
-SEXP d_packed_addDiag(double *diag, int l_d, SEXP x, int n);
-
 void tr_d_packed_getDiag(double *dest, SEXP x, int n);
 void tr_l_packed_getDiag(   int *dest, SEXP x, int n);
-
 SEXP tr_d_packed_setDiag(double *diag, int l_d, SEXP x, int n);
 SEXP tr_l_packed_setDiag(   int *diag, int l_d, SEXP x, int n);
+#endif /* MJ */
+
+SEXP d_packed_addDiag(double *diag, int l_d, SEXP x, int n);
 SEXP tr_d_packed_addDiag(double *diag, int l_d, SEXP x, int n);
 
 SEXP Matrix_getElement(SEXP list, char *nm);
