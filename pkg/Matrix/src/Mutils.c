@@ -476,7 +476,11 @@ TYPE *full_to_packed_ ## TYPE(TYPE *dest, const TYPE *src, int n,	\
 FULL_TO_PACKED(double)
 FULL_TO_PACKED(int)
 
+//----------------------------------------------------------------------
 
+
+/* MJ: No longer needed ... replacement in ./packedMatrix.c */
+#if 0
 
 /**
  * Copy the diagonal elements of the packed denseMatrix x to dest
@@ -512,8 +516,6 @@ void l_packed_getDiag(int *dest, SEXP x, int n)
 }
 
 #undef END_packed_getDiag
-
-//----------------------------------------------------------------------
 
 /** diag(x) <- D  for   x a  <dspMatrix>  or dppMatrix, ..etc
  */
@@ -562,7 +564,6 @@ SEXP l_packed_setDiag(int *diag, int l_d, SEXP x, int n)
     }									\
     END_packed_setDiag
 
-
 SEXP tr_d_packed_setDiag(double *diag, int l_d, SEXP x, int n)
 {
     SET_packed_setDiag; double *xx = REAL(r_x);
@@ -575,10 +576,32 @@ SEXP tr_l_packed_setDiag(int *diag, int l_d, SEXP x, int n)
     tr_END_packed_setDiag;
 }
 
-
 #undef SET_packed_setDiag
 #undef END_packed_setDiag
 #undef tr_END_packed_setDiag
+
+void tr_d_packed_getDiag(double *dest, SEXP x, int n)
+{
+    if (*diag_P(x) == 'U') {
+	for (int j = 0; j < n; j++) dest[j] = 1.;
+    } else {
+	d_packed_getDiag(dest, x, n);
+    }
+    return;
+}
+
+void tr_l_packed_getDiag(   int *dest, SEXP x, int n)
+{
+    if (*diag_P(x) == 'U')
+	for (int j = 0; j < n; j++) dest[j] = 1;
+    else
+	l_packed_getDiag(dest, x, n);
+    return;
+}
+
+#endif /* MJ */
+
+
 //----------------------------------------------------------------------
 
 SEXP d_packed_addDiag(double *diag, int l_d, SEXP x, int n)
@@ -609,28 +632,7 @@ SEXP tr_d_packed_addDiag(double *diag, int l_d, SEXP x, int n)
     return ret;
 }
 
-
 //----------------------------------------------------------------------
-
-void tr_d_packed_getDiag(double *dest, SEXP x, int n)
-{
-    if (*diag_P(x) == 'U') {
-	for (int j = 0; j < n; j++) dest[j] = 1.;
-    } else {
-	d_packed_getDiag(dest, x, n);
-    }
-    return;
-}
-
-void tr_l_packed_getDiag(   int *dest, SEXP x, int n)
-{
-    if (*diag_P(x) == 'U')
-	for (int j = 0; j < n; j++) dest[j] = 1;
-    else
-	l_packed_getDiag(dest, x, n);
-    return;
-}
-
 
 SEXP Matrix_expand_pointers(SEXP pP)
 {
