@@ -161,9 +161,6 @@ extern	 /* stored pointers to symbols initialized in R_init_Matrix */
 /* zero an array */
 #define AZERO(x, n) {int _I_, _SZ_ = (n); for(_I_ = 0; _I_ < _SZ_; _I_++) (x)[_I_] = 0;}
 
-/* number of elements in one triangle of a square matrix of order n */
-#define PACKED_LENGTH(n)   ((n) * ((n) + 1))/2
-
 /* duplicate the slot with name given by sym from src to dest */
 
 #define slot_dup(dest, src, sym)  SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
