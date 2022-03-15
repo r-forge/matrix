@@ -56,7 +56,7 @@
                        ## use numeric representation of factors, etc.
                        class(i) <- NULL
                    }
-                   if (any(i < 0L, na.rm = TRUE)) {
+                   if (any(i <= -1L, na.rm = TRUE)) {
                        i <- seq_len(as.double(n) * n)[i]
                    } else {
                        i <- i[i >= 1L]
