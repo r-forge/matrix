@@ -1,9 +1,9 @@
 Package: Matrix
 Version: 1.4-1
-Date: 2022-03-15
+Date: 2022-03-19
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
-Contact: Doug and Martin <Matrix-authors@R-project.org>
+Contact: Matrix-authors@R-project.org
 Maintainer: Martin Maechler <mmaechler+Matrix@gmail.com>
 Authors@R: c(person("Douglas","Bates", role="aut")
  , person("Martin","Maechler", role = c("aut","cre"), email="mmaechler+Matrix@gmail.com",
