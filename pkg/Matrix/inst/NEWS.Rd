@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-1 (2022-03-09 r3440)}{
+\section{Changes in version 1.4-1 (2022-03-19 r3443)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{diag(x)} methods now mostly also keep \code{names} from
@@ -47,6 +47,10 @@
 
       \item Slightly better patch notably for Windows,
       for \file{src/SuiteSparse_config/SuiteSparse_config.h}
+
+      \item Fix to continue working for \R 3.5.0 and newer, providing
+      \code{tryInvokeRestart()} for older versions of \R, thanking
+      Michael Chirico for the heads up.
     }
   }
 }
