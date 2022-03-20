@@ -114,7 +114,7 @@ SEXP packedMatrix_t(SEXP obj)
     SET_SLOT(res, Matrix_uploSym, mkString(up ? "L" : "U"));
     /* Preserve 'Dim' slot */
     SET_SLOT(res, Matrix_DimSym, GET_SLOT(obj, Matrix_DimSym));
-    /* Reverse 'Dimnames' slot and (if not absent) 'names(Dimnames)' */
+    /* Reverse 'Dimnames' slot and 'names(Dimnames)' (if not absent) */
     SEXP dn0 = GET_SLOT(obj, Matrix_DimNamesSym);
     SEXP dn1 = PROTECT(allocVector(VECSXP, 2));
     SET_VECTOR_ELT(dn1, 0, VECTOR_ELT(dn0, 1));
@@ -246,7 +246,7 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
     /* Initialize result object of same class */
     SEXP res;
     int nprotect = 0;
-    if (MAYBE_REFERENCED(obj)) { /* MAYBE_SHARED seems less safe ... */
+    if (MAYBE_REFERENCED(obj)) {
 	res = PROTECT(NEW_OBJECT_OF_CLASS(class_P(obj))); ++nprotect;
 	SET_SLOT(res, Matrix_DimSym, GET_SLOT(obj, Matrix_DimSym));
 	SET_SLOT(res, Matrix_DimNamesSym, GET_SLOT(obj, Matrix_DimNamesSym));
@@ -531,9 +531,9 @@ SEXP packedMatrix_sub1_mat(SEXP obj, SEXP index)
 	UNPROTECT(1);							\
     } while (0)
 
-/* 'x[i, ]', 'x[, j]', and 'x[i, j]'
-   where 'i' and 'j' are integer vectors supplying integers 
-   in 'c(1:n, NA)' _only_ ... NULL indicates missingness
+/* 'x[index1, ]', 'x[, index2]', and 'x[index1, index2]'
+   where 'index1' and 'index2' are integer vectors supplying
+   integers in 'c(1:n, NA)' _only_ ... NULL indicates missingness
 */
 SEXP packedMatrix_sub2(SEXP obj, SEXP index1, SEXP index2, SEXP drop)
 {
@@ -578,7 +578,7 @@ SEXP packedMatrix_sub2(SEXP obj, SEXP index1, SEXP index2, SEXP drop)
     */
     static const char *valid[] = {
 	"dspMatrix", "lspMatrix", "nspMatrix",
-	"dtpMatrix", "ltpMatrix", "ntpMatrix"};
+	"dtpMatrix", "ltpMatrix", "ntpMatrix", ""};
     char *cl = strdup(valid[R_check_class_etc(obj, valid)]);
     Rboolean do_sp = (cl[1] == 's' && !mi && !mj && ni == nj &&
 		      !memcmp(pi, pj, ni * sizeof(int))); 
