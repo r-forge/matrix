@@ -536,13 +536,13 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
     /* FIXME: extend this to work in multivariate case, i.e. y a matrix with > 1 column ! */
     SEXP y_ = PROTECT(coerceVector(y, REALSXP));
     CHM_DN cy = AS_CHM_DN(y_), rhs, cAns, resid;
-    CHM_FR L;
-    int n = cx->ncol;/* #{obs.} {x = t(X) !} */
+    /* const -- but do not fit when used in calls: */
     double one[] = {1,0}, zero[] = {0,0}, neg1[] = {-1,0};
     const char *nms[] = {"L", "coef", "Xty", "resid", ""};
     SEXP ans = PROTECT(Rf_mkNamed(VECSXP, nms));
     R_CheckStack();
 
+    size_t n = cx->ncol;/* #{obs.} {x = t(X) !} */
     if (n < cx->nrow || n <= 0)
 	error(_("dgCMatrix_cholsol requires a 'short, wide' rectangular matrix"));
     if (cy->nrow != n)
@@ -553,7 +553,7 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
      * here: rhs := 1 * x %*% y + 0 =  x %*% y =  X'y  */
     if (!(cholmod_sdmult(cx, 0 /* trans */, one, zero, cy, rhs, &c)))
 	error(_("cholmod_sdmult error (rhs)"));
-    L = cholmod_analyze(cx, &c);
+    CHM_FR L = cholmod_analyze(cx, &c);
     if (!cholmod_factorize(cx, L, &c))
 	error(_("cholmod_factorize failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);

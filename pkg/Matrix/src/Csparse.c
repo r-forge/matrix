@@ -646,7 +646,8 @@ SEXP Csp_dense_products(SEXP a, SEXP b,
 			Rboolean transp_a, Rboolean transp_b, Rboolean transp_ans)
 {
     CHM_SP cha = AS_CHM_SP(a);
-    int a_nc = transp_a ? cha->nrow : cha->ncol,
+    size_t
+	a_nc = transp_a ? cha->nrow : cha->ncol,
 	a_nr = transp_a ? cha->ncol : cha->nrow;
     Rboolean
 	maybe_transp_b = (a_nc == 1),
@@ -671,7 +672,7 @@ SEXP Csp_dense_products(SEXP a, SEXP b,
 	/* determine *if* we want/need to transpose at all:
 	 * if (length(b) == ncol(A)) have match: use dim = c(n, 1) (<=> do *not* transp);
 	 *  otherwise, try to transpose: ok  if (ncol(A) == 1) [see also above]:  */
-	maybe_transp_b = (LENGTH(b) != a_nc);
+	maybe_transp_b = (XLENGTH(b) != a_nc);
 	// Here, we transpose already in mMatrix_as_dge*()  ==> don't do it later:
 	transp_b = FALSE;
     }
@@ -679,7 +680,7 @@ SEXP Csp_dense_products(SEXP a, SEXP b,
 
     CHM_DN chb = AS_CHM_DN(b_M), b_t;
     R_CheckStack();
-    int ncol_b;
+    size_t ncol_b;
     if(transp_b) { // transpose b:
 	b_t = cholmod_allocate_dense(chb->ncol, chb->nrow, chb->ncol, chb->xtype, &c);
 	chm_transpose_dense(b_t, chb);
@@ -1307,9 +1308,10 @@ SEXP create_Csparse(char* cls, int* i, int* j, int* p, int np,
     ans = PROTECT(NEW_OBJECT_OF_CLASS(cls));
 // FIXME: This has been copied from chm_sparse_to_SEXP in  chm_common.c
     /* allocate and copy common slots */
-    nnz = cholmod_nnz(A, &c);
+    nnz = (int) cholmod_nnz(A, &c);
     dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
-    dims[0] = A->nrow; dims[1] = A->ncol;
+    dims[0] = (int) A->nrow;
+    dims[1] = (int) A->ncol;
     Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_pSym, INTSXP, A->ncol + 1)), (int*)A->p, A->ncol + 1);
     Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_iSym, INTSXP, nnz)), (int*)A->i, nnz);
     switch(cls[0]) {
