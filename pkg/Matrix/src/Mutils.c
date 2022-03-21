@@ -430,7 +430,7 @@ TYPE *packed_to_full_ ## TYPE(TYPE *dest, const TYPE *src,	\
     int i, j, pos = 0;						\
     size_t n2 = n * (size_t)n;					\
 								\
-    AZERO(dest, n2);						\
+    Memzero(dest, n2);						\
     for (j = 0; j < n; j++) {					\
         size_t jn = j * (size_t)n;				\
 	switch(uplo) {						\
@@ -677,12 +677,12 @@ static double *
 install_diagonal(double *dest, SEXP A)
 {
     int nc = INTEGER(GET_SLOT(A, Matrix_DimSym))[0];
-    int i, ncp1 = nc + 1, unit = *diag_P(A) == 'U';
+    int i, unit = *diag_P(A) == 'U';
     double *ax = REAL(GET_SLOT(A, Matrix_xSym));
-    size_t in1 = 0;
+    size_t in1, ncp1 = nc + 1;
 
-    AZERO(dest, nc * (size_t)nc);
-    for (i = 0; i < nc; i++, in1 += ncp1) // in1 == i * ncp1
+    Memzero(dest, nc * (size_t)nc);
+    for (i = 0, in1 = 0; i < nc; i++, in1 += ncp1) // in1 == i * ncp1
 	dest[in1] = (unit) ? 1. : ax[i];
     return dest;
 }
@@ -691,12 +691,12 @@ static int *
 install_diagonal_int(int *dest, SEXP A)
 {
     int nc = INTEGER(GET_SLOT(A, Matrix_DimSym))[0];
-    int i, ncp1 = nc + 1, unit = *diag_P(A) == 'U';
+    int i, unit = *diag_P(A) == 'U';
     int *ax = INTEGER(GET_SLOT(A, Matrix_xSym));
-    size_t in1 = 0;
+    size_t in1, ncp1 = nc + 1;
 
-    AZERO(dest, nc * (size_t)nc);
-    for (i = 0; i < nc; i++, in1 += ncp1) // in1 == i * ncp1
+    Memzero(dest, nc * (size_t)nc);
+    for (i = 0, in1 = 0; i < nc; i++, in1 += ncp1) // in1 == i * ncp1
 	dest[in1] = (unit) ? 1 : ax[i];
     return dest;
 }

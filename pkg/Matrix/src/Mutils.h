@@ -158,8 +158,10 @@ FULL_TO_PACKED(int);
 extern	 /* stored pointers to symbols initialized in R_init_Matrix */
 #include "Syms.h"
 
-/* zero an array */
-#define AZERO(x, n) {int _I_, _SZ_ = (n); for(_I_ = 0; _I_ < _SZ_; _I_++) (x)[_I_] = 0;}
+/* zero an array --- but note   Memzero() which might be FASTER and uses R_SIZE_T (== size_t for C) */
+#define AZERO3(x, n, itype) {itype _I_, _SZ_ = (n); for(_I_ = 0; _I_ < _SZ_; _I_++) (x)[_I_] = 0;}
+#define AZERO(x, n)  AZERO3(x, n, R_xlen_t)
+#define AZEROs(x, n) AZERO3(x, n, size_t)
 
 /* duplicate the slot with name given by sym from src to dest */
 
