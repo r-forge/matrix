@@ -425,10 +425,15 @@ chkSS <- function(m) {
 }
 cat(sprintf("chkSS() {valid %s} for a list of matrices:\n",
             paste(paste0(names(symFUNs), "()"), collapse=", ")))
-for(m in list(Matrix(1:4, 2,2), Matrix(c(0, rep(1:0, 3),0:1), 3,3))) {
+L <- list(M1 = Matrix(1:4, 2,2),
+          M2 = Matrix(c(0, rep(1:0, 3),0:1), 3,3))
+L$M3 <- pack(as(forceSymmetric(L$M2), "denseMatrix"))
+stopifnotValid(L$M3, "dspMatrix")
+for(m in L) {
     cat("\n---\nm:\n"); show(m)
     chkSS(m)
     dn <- list(row = paste0("r", 1:nrow(m)), col = paste0("var.", 1:ncol(m)))
+    if(inherits(m, "dspMatrix")) break ## FIXME: `dimnames<-` below
     dimnames(m) <- dn		; chkSS(m)
     colnames(m) <- NULL		; chkSS(m)
     dimnames(m) <- unname(dn)	; chkSS(m)
