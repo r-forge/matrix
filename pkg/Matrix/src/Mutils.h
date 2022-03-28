@@ -104,8 +104,11 @@ enum CBLAS_SIDE {CblasLeft=141, CblasRight=142};
 #define LFT CblasLeft
 #define RGT CblasRight
 
+#if 0 /* unused */
 double get_double_by_name(SEXP obj, char *nm);
 SEXP set_double_by_name(SEXP obj, double val, char *nm);
+#endif /* unused */
+
 SEXP as_det_obj(double val, int log, int sign);
 SEXP get_factors(SEXP obj, char *nm);
 SEXP set_factors(SEXP obj, SEXP val, char *nm);

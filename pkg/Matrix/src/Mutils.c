@@ -3,8 +3,10 @@
 #include <R_ext/Lapack.h>
 #include "Mutils.h"
 
-// La_norm_type() & La_rcond_type()  have been in R_ext/Lapack.h
-//  but have still not been available to package writers ...
+/* La_norm_type() & La_rcond_type() have been in include/R_ext/Lapack.h
+   and later in modules/lapack/Lapack.c, but have still not been available
+   to package writers ...
+*/
 char La_norm_type(const char *typstr)
 {
     char typup;
@@ -41,6 +43,7 @@ char La_rcond_type(const char *typstr)
     return typup;
 }
 
+#if 0 /* unused */
 double get_double_by_name(SEXP obj, char *nm)
 {
     SEXP nms = PROTECT(getAttrib(obj, R_NamesSymbol));
@@ -58,8 +61,7 @@ double get_double_by_name(SEXP obj, char *nm)
     return R_NaReal;
 }
 
-SEXP
-set_double_by_name(SEXP obj, double val, char *nm)
+SEXP set_double_by_name(SEXP obj, double val, char *nm)
 {
     SEXP nms = PROTECT(getAttrib(obj, R_NamesSymbol));
     int i, len = length(obj);
@@ -90,6 +92,7 @@ set_double_by_name(SEXP obj, double val, char *nm)
 	return nx;
     }
 }
+#endif /* unused */
 
 SEXP as_det_obj(double val, int log, int sign)
 {
@@ -1341,33 +1344,36 @@ SEXP R_any0(SEXP x) {
  * @param dn  list of length 2; typically 'Dimnames' slot of "symmetricMatrix"
  */
 SEXP symmetric_DimNames(SEXP dn) {
-    Rboolean do_nm = FALSE;
-#define NON_TRIVIAL_DN					\
-  !isNull(VECTOR_ELT(dn, 0)) ||				\
-  !isNull(VECTOR_ELT(dn, 1)) ||				\
- (do_nm = !isNull(getAttrib(dn, R_NamesSymbol)))
-
+    
+#define NON_TRIVIAL_DN							\
+        !(isNull(VECTOR_ELT(dn, 0)) &&					\
+	  isNull(VECTOR_ELT(dn, 1)) &&					\
+	  isNull(getAttrib(dn, R_NamesSymbol)))
+    
 #define SYMM_DIMNAMES							\
-	/* Fixup dimnames to be symmetric <==>				\
-	   symmetricDimnames() in ../R/symmetricMatrix.R */		\
-	PROTECT(dn = duplicate(dn));					\
-	if (isNull(VECTOR_ELT(dn,0)))					\
-	    SET_VECTOR_ELT(dn, 0, VECTOR_ELT(dn, 1));			\
-	if (isNull(VECTOR_ELT(dn,1)))					\
-	    SET_VECTOR_ELT(dn, 1, VECTOR_ELT(dn, 0));			\
-	if(do_nm) { /* names(dimnames(.)): */				\
-	    SEXP nms_dn = PROTECT(getAttrib(dn, R_NamesSymbol));	\
-	    if(!R_compute_identical(STRING_ELT(nms_dn, 0),		\
-				    STRING_ELT(nms_dn, 1), 16)) {	\
-		int J = LENGTH(STRING_ELT(nms_dn, 0)) == 0; /* 0/1 */   \
-		SET_STRING_ELT(nms_dn, !J, STRING_ELT(nms_dn, J));	\
-		setAttrib(dn, R_NamesSymbol, nms_dn);			\
-            }								\
+        do {								\
+            /* Fixup dimnames to be symmetric <==>           */	       	\
+            /* symmetricDimnames() in ../R/symmetricMatrix.R */	       	\
+	    PROTECT(dn = duplicate(dn));				\
+	    SEXP s;							\
+	    if (!isNull(s = VECTOR_ELT(dn, 0))) {			\
+		SET_VECTOR_ELT(dn, 1, s);				\
+	    } else if (!isNull(s = VECTOR_ELT(dn, 1))) {		\
+		SET_VECTOR_ELT(dn, 0, s);				\
+	    }								\
+	    /* names(dimnames(.)) : */					\
+	    if (!isNull(s = getAttrib(dn, R_NamesSymbol))) {		\
+		PROTECT(s);						\
+		/* MJ: Why LENGTH(.) == 0 instead of . == NA_STRING? */	\
+		int J = LENGTH(STRING_ELT(s, 0)) == 0; /* 0/1 */	\
+		SET_STRING_ELT(s, !J, STRING_ELT(s, J));		\
+		setAttrib(dn, R_NamesSymbol, s);			\
+		UNPROTECT(1);						\
+	    }								\
 	    UNPROTECT(1);						\
-	}								\
-	UNPROTECT(1)
-
-    // Be fast (do nothing!) for the case where dimnames = list(NULL,NULL) :
+	} while (0)
+    
+    /* Be fast (do nothing!) when dimnames = list(NULL, NULL) : */
     if (NON_TRIVIAL_DN) {
 	SYMM_DIMNAMES;
     }
@@ -1399,8 +1405,7 @@ SEXP R_symmetric_Dimnames(SEXP x) {
  */
 void SET_DimNames_symm(SEXP dest, SEXP src) {
     SEXP dn = GET_SLOT(src, Matrix_DimNamesSym);
-    Rboolean do_nm = FALSE;
-    // Be fast (do nothing!) for the case where dimnames = list(NULL,NULL) :
+    /* Be fast (do nothing!) when dimnames = list(NULL, NULL) : */
     if (NON_TRIVIAL_DN) {
 	SYMM_DIMNAMES;
 	SET_SLOT(dest, Matrix_DimNamesSym, dn);
