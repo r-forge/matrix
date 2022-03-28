@@ -12,6 +12,18 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
+\section{Changes in version 1.4-2 (2022-03-28 r3447)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{symmetricDimnames(x)} now _actually_ symmetrizes
+      \code{x@Dimnames} of the form \code{list(rn, cn)} with
+      \code{rn} and \code{cn} non-\code{NULL} but asymmetric,
+      and \code{names(x@Dimnames)} when at least one of
+      \code{rn} and \code{cn} is non-\code{NULL}.
+    }
+  }
+}
+
 \section{Changes in version 1.4-1 (2022-03-21 r3446)}{
   \subsection{Bug Fixes}{
     \itemize{
