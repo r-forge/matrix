@@ -308,6 +308,7 @@ SEXP check_scalar_string(SEXP sP, char *vals, char *nm)
 #undef SPRINTF
 }
 
+#if 0 /* unused */
 /* FIXME? Something like this should be part of the R API ?
  *        But then, R has the more general  R_compute_identical()
  * in src/main/identical.c: Rboolean R_compute_identical(SEXP x, SEXP y);
@@ -334,7 +335,7 @@ Rboolean equal_string_vectors(SEXP s1, SEXP s2)
 	return TRUE; /* they *are* equal */
     }
 }
-
+#endif /* unused */
 
 SEXP dense_nonpacked_validate(SEXP obj)
 {
@@ -785,7 +786,7 @@ SEXP dup_mMatrix_as_geMatrix(SEXP A)
 					 "ngeMatrix")));
 #define DUP_MMATRIX_SET_1(_IS_SYM_) do {				\
     SET_SLOT(ans, Matrix_DimSym, duplicate(ad));			\
-    SET_SLOT(ans, Matrix_DimNamesSym, _IS_SYM_ ? symmetric_DimNames(an) : \
+    SET_SLOT(ans, Matrix_DimNamesSym, _IS_SYM_ ? R_symmetrize_DimNames(an) : \
        (!isNull(an) && LENGTH(an) == 2) ? duplicate(an): allocVector(VECSXP,2)); \
 } while(0)
 
@@ -1334,44 +1335,56 @@ SEXP R_any0(SEXP x) {
 #undef TRUE_
 #undef FALSE_
 
-/* FIXME: Compare and synchronize with MK_SYMMETRIC_DIMNAMES.. in ./dense.c
- * -----  which *also* considers  names(dimnames(.)) !!
-*/
+void symmetrize_DimNames(SEXP dn, int J /* -1|0|1 */) {
+    SEXP s;
+    if (J < 0) {
+	/* Use rownames if only rownames are non-NULL, otherwise use colnames */
+	if (!isNull(s = VECTOR_ELT(dn, J = 1)) ||
+	    !isNull(s = VECTOR_ELT(dn, J = 0))) {
+	    SET_VECTOR_ELT(dn, !J, s);
+	} else {
+	    J = 1;
+	}
+    } else {
+	/* Use rownames or colnames according to J */
+    	SET_VECTOR_ELT(dn, !J, VECTOR_ELT(dn, J));	
+    }
+    /* names(dimnames(.)) */
+    if (!isNull(s = getAttrib(dn, R_NamesSymbol))) {
+	PROTECT(s);
+	SET_STRING_ELT(s, !J, STRING_ELT(s, J));
+	setAttrib(dn, R_NamesSymbol, s);
+	UNPROTECT(1);
+    }
+    return;
+}
 
 /**
- * Produce symmetric 'Dimnames' from possibly asymmetric ones.
+ * Produces symmetric `Dimnames` from possibly asymmetric ones.
+ * Replaces `symmDN` from `../R/Auxiliaries.R` and is intended
+ * to behave as `symmDN(dn, col = TRUE, names = TRUE)` did.
  *
- * @param dn  list of length 2; typically 'Dimnames' slot of "symmetricMatrix"
+ * Called from `symmetrizeDimnames` in `../R/Auxiliaries.R`.
+ *
+ * @param dn A list of length 2, typically the `Dimnames` slot
+ * of a `symmetricMatrix`.
+ * 
+ * @return `rep(dn[1], 2)` if `is.null(dn[[2]])` and `!is.null(dn[[1]])`, 
+ * `rep(dn[2], 2)` otherwise.
  */
-SEXP symmetric_DimNames(SEXP dn) {
+SEXP R_symmetrize_DimNames(SEXP dn) {
     
 #define NON_TRIVIAL_DN							\
-        !(isNull(VECTOR_ELT(dn, 0)) &&					\
-	  isNull(VECTOR_ELT(dn, 1)) &&					\
-	  isNull(getAttrib(dn, R_NamesSymbol)))
+    !(isNull(VECTOR_ELT(dn, 1)) &&					\
+      isNull(VECTOR_ELT(dn, 0)) &&					\
+      isNull(getAttrib(dn, R_NamesSymbol)))
     
 #define SYMM_DIMNAMES							\
-        do {								\
-            /* Fixup dimnames to be symmetric <==>           */	       	\
-            /* symmetricDimnames() in ../R/symmetricMatrix.R */	       	\
-	    PROTECT(dn = duplicate(dn));				\
-	    SEXP s;							\
-	    if (!isNull(s = VECTOR_ELT(dn, 0))) {			\
-		SET_VECTOR_ELT(dn, 1, s);				\
-	    } else if (!isNull(s = VECTOR_ELT(dn, 1))) {		\
-		SET_VECTOR_ELT(dn, 0, s);				\
-	    }								\
-	    /* names(dimnames(.)) : */					\
-	    if (!isNull(s = getAttrib(dn, R_NamesSymbol))) {		\
-		PROTECT(s);						\
-		/* MJ: Why LENGTH(.) == 0 instead of . == NA_STRING? */	\
-		int J = LENGTH(STRING_ELT(s, 0)) == 0; /* 0/1 */	\
-		SET_STRING_ELT(s, !J, STRING_ELT(s, J));		\
-		setAttrib(dn, R_NamesSymbol, s);			\
-		UNPROTECT(1);						\
-	    }								\
-	    UNPROTECT(1);						\
-	} while (0)
+    do {								\
+	PROTECT(dn = duplicate(dn));					\
+	symmetrize_DimNames(dn, -1);					\
+	UNPROTECT(1);							\
+    } while (0)
     
     /* Be fast (do nothing!) when dimnames = list(NULL, NULL) : */
     if (NON_TRIVIAL_DN) {
@@ -1381,18 +1394,16 @@ SEXP symmetric_DimNames(SEXP dn) {
 }
 
 /**
- * Even if the Dimnames slot is list(NULL, <names>) etc, return
- * __symmetric__ dimnames: Get . @Dimnames and modify when needed.
+ * A convenience wrapper for `R_symmetrize_DimNames`, getting the
+ * `Dimnames` slot from a `Matrix` and symmetrizing _if necessary_.
  *
- * Called e.g., from symmetricDimnames() in ../R/symmetricMatrix.R
+ * @param from A `Matrix`, typically a `symmetricMatrix`.
  *
- * @param from a symmetricMatrix
- *
- * @return symmetric dimnames: length-2 list twice the same, NULL or
- * character vector (of correct length)
+ * @return A list `dn` of length 2 satisfying `identical(dn[1], dn[2])`,
+ * giving a suitable (symmetric) value for the `Dimnames` slot of `from`.
  */
-SEXP R_symmetric_Dimnames(SEXP x) {
-    return symmetric_DimNames(GET_SLOT(x, Matrix_DimNamesSym));
+SEXP R_symmetric_DimNames(SEXP x) {
+    return R_symmetrize_DimNames(GET_SLOT(x, Matrix_DimNamesSym));
 }
 
 /**

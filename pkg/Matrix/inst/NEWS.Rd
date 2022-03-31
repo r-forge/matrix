@@ -12,14 +12,12 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-03-28 r3447)}{
+\section{Changes in version 1.4-2 (2022-03-31 r3450)}{
   \subsection{Bug Fixes}{
     \itemize{
-      \item \code{symmetricDimnames(x)} now _actually_ symmetrizes
-      \code{x@Dimnames} of the form \code{list(rn, cn)} with
-      \code{rn} and \code{cn} non-\code{NULL} but asymmetric,
-      and \code{names(x@Dimnames)} when at least one of
-      \code{rn} and \code{cn} is non-\code{NULL}.
+      \item Symmetrization of `<Matrix>@Dimnames` and `dimnames(<matrix>)`
+      now goes through (new) C utility \code{symmetrize_DimNames} in most
+      cases, resolving some earlier inconsistencies.
     }
   }
 }

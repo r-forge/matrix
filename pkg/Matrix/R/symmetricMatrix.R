@@ -76,18 +76,8 @@ setMethod("forceSymmetric", signature(x="CsparseMatrix"),
 setMethod("symmpart", signature(x = "symmetricMatrix"), function(x) x)
 setMethod("skewpart", signature(x = "symmetricMatrix"), function(x) .setZero(x))
 
-##' Allow x@Dimnames to be contain one NULL with still symmetric dimnames()
-if(FALSE) ##' R version {overwritten, just below}:
-symmetricDimnames <- function(x) {
-    r <- x@Dimnames # validity ==> r is length-2 list
-    if(is.null(r[[1L]]) && !is.null(r[[2L]]))
-	r[[1L]] <- r[[2L]]
-    else if(is.null(r[[2L]]) && !is.null(r[[1L]]))
-	r[[2L]] <- r[[1L]]
-    r
-}
-symmetricDimnames <- function(x) .Call(R_symmetric_Dimnames, x)
-setMethod("dimnames", signature(x = "symmetricMatrix"), symmetricDimnames)
+setMethod("dimnames", signature(x = "symmetricMatrix"),
+          function(x) symmetrizeDimnames(x@Dimnames))
 
 ###------- pack() and unpack() --- for *dense*  symmetric & triangular matrices:
 packM <- function(x, Mtype, kind, unpack=FALSE) {

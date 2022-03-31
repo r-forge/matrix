@@ -381,6 +381,15 @@ dimNamesCheck <- function(a, b, useFirst = TRUE, check = FALSE) {
 	nullDN
 }
 
+symmetrizeDimnames <- function(dn) .Call(R_symmetrize_DimNames, dn)
+.M.symmDN <- function(x) `dimnames<-`(x, symmetrizeDimnames(x@Dimnames))
+.m.symmDN <- function(x) `dimnames<-`(x, symmetrizeDimnames(dimnames(x)))
+
+## MJ: no longer ... note that semantics are switched now (above):
+## 'symmetrizeDimnames' takes '[dD]imnames' and returns '[dD]imnames'
+## while '.[mM].symmDN' takes [mM]atrix and returns [mM]atrix
+if (FALSE) {
+
 ##' @title Symmetrize dimnames(.)
 ##' @param x a square matrix
 ##' @param col logical indicating if the column names should be taken when
@@ -413,6 +422,8 @@ symmDN <- function(dn, col=TRUE, names=TRUE) {
     }
     dn[c(J,J)]
 }
+
+} ## MJ
 
 rowCheck <- function(a, b) {
     da <- dim(a)

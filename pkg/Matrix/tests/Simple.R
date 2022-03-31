@@ -433,7 +433,6 @@ for(m in L) {
     cat("\n---\nm:\n"); show(m)
     chkSS(m)
     dn <- list(row = paste0("r", 1:nrow(m)), col = paste0("var.", 1:ncol(m)))
-    if(inherits(m, "dspMatrix")) break ## FIXME: `dimnames<-` below
     dimnames(m) <- dn		; chkSS(m)
     colnames(m) <- NULL		; chkSS(m)
     dimnames(m) <- unname(dn)	; chkSS(m)
@@ -1183,9 +1182,11 @@ cat("doExtras:",doExtras,"\n")
 if(doExtras) {
     cat("checkMatrix() of all: \n---------\n")
     Sys.setlocale("LC_COLLATE", "C")    # to keep ls() reproducible
-    for(nm in ls()) if(is(.m <- get(nm), "Matrix")) {
-	cat("\n", rep("-",nchar(nm)),"\n",nm, ":\n", sep='')
-	checkMatrix(.m)
+    for(nm in setdiff(ls(), "d4da")) { # FIXME: d4da
+        if(is(.m <- get(nm), "Matrix")) {
+            cat("\n", rep("-",nchar(nm)),"\n",nm, ":\n", sep='')
+            checkMatrix(.m)
+        }
     }
     cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
 }
