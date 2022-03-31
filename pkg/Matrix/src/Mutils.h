@@ -115,16 +115,19 @@ SEXP set_factors(SEXP obj, SEXP val, char *nm);
 SEXP R_set_factors(SEXP obj, SEXP val, SEXP name, SEXP warn);
 SEXP R_empty_factors(SEXP obj, SEXP warn);
 
-#if 0
+#if 0 /* unused */
 SEXP dgCMatrix_set_Dim(SEXP x, int nrow);
-#endif	/* unused */
+#endif /* unused */
 
 /* int csc_unsorted_columns(int ncol, const int p[], const int i[]); */
 /* void csc_sort_columns(int ncol, const int p[], int i[], double x[]); */
 /* SEXP csc_check_column_sorting(SEXP A); */
 
 SEXP check_scalar_string(SEXP sP, char *vals, char *nm);
+
+#if 0 /* unused */
 Rboolean equal_string_vectors(SEXP s1, SEXP s2);
+#endif /* unused */
 
 /* MJ: No longer needed ... replacement in ./packedMatrix.c */
 #if 0
@@ -188,8 +191,9 @@ void SET_DimNames(SEXP dest, SEXP src) {
 }
 
 // code in ./Mutils.c :
-SEXP symmetric_DimNames(SEXP dn);
-SEXP R_symmetric_Dimnames(SEXP x);
+void symmetrize_DimNames(SEXP dn, int J);
+SEXP R_symmetrize_DimNames(SEXP dn);
+SEXP R_symmetric_DimNames(SEXP x);
 void SET_DimNames_symm(SEXP dest, SEXP src);
 
 

@@ -9,26 +9,6 @@
 #define PM_AR21_LO(i, j, n2) (i) + ((j) * ((n2) - (j) - 1)) / 2
 #define PM_LENGTH(n) ((n) * (((R_xlen_t) (n)) + 1)) / 2
 
-/* An alternative to the existing utility 'symmetric_DimNames' 
-   enabling users to avoid a copy in cases where it is avoidable ...
-   perhaps the existing utility can be rebuilt around this one 
-   so that they remain in sync ...
-*/
-void fast_symmetric_DimNames(SEXP dn, SEXP *vec, SEXP *nm)
-{
-    *vec = VECTOR_ELT(dn, 0);
-    if (isNull(*vec)) {
-	*vec = VECTOR_ELT(dn, 1);
-    }
-    *nm = getAttrib(dn, R_NamesSymbol);
-    if (!isNull(*nm)) {
-	*nm = STRING_ELT(*nm, 0);
-	if (*nm == NA_STRING) {
-	    *nm = STRING_ELT(*nm, 1);
-	}
-    }
-}
-
 /* FIXME: could avoid some duplication by calling 'symmetricMatrix_validate'
    or 'triangularMatrix_validate' conditional on existence of 'diag' slot ...
    would still need to check length(.@x) though
@@ -612,12 +592,14 @@ SEXP packedMatrix_sub2(SEXP obj, SEXP index1, SEXP index2, SEXP drop)
 	    setAttrib(dn1, R_NamesSymbol, ndn0);
 	}
     } else {
+	int j;
+	if (isNull(rn0 = cn0 = VECTOR_ELT(dn0, j = 1))) {
+	    rn0 = cn0 = VECTOR_ELT(dn0, j = 0);
+	}
 	SEXP s;
-	fast_symmetric_DimNames(dn0, &rn0, &s);
-	cn0 = rn0;
-	if (!isNull(s)) {
+	if (!isNull(s = getAttrib(dn0, R_NamesSymbol))) {
 	    SEXP ndn1 = PROTECT(allocVector(STRSXP, 2));
-	    SET_STRING_ELT(ndn1, 0, s);
+	    SET_STRING_ELT(ndn1, 0, s = STRING_ELT(s, j));
 	    SET_STRING_ELT(ndn1, 1, s);
 	    setAttrib(dn1, R_NamesSymbol, ndn1);
 	    UNPROTECT(1);

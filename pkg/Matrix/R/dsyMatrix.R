@@ -111,7 +111,7 @@ setAs("dsyMatrix", "dpoMatrix",
     if(min(dim(x)) == 0L) return(numeric(0L))
     y <- .Call(dgeMatrix_getDiag, x)
     if(names) {
-        nms <- symmetricDimnames(x)
+        nms <- dimnames(x) # rely on method for "symmetricMatrix" to symmetrize
         if(is.list(nms) && length(nms) == 2L)
             names(y) <- nms[[1L]]
     }

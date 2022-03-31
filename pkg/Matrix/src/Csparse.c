@@ -299,8 +299,8 @@ SEXP Csparse_to_matrix(SEXP x, SEXP chk, SEXP symm)
 	cholmod_sparse_to_dense(AS_CHM_SP2(x, asLogical(chk)), &c),
 	1 /*do_free*/,
 	(is_sym
-	 ? symmetric_DimNames(GET_SLOT(x, Matrix_DimNamesSym))
-	 :                    GET_SLOT(x, Matrix_DimNamesSym)));
+	 ? R_symmetric_DimNames(x)
+	 : GET_SLOT(x, Matrix_DimNamesSym)));
 }
 
 SEXP Csparse_to_vector(SEXP x)
@@ -355,8 +355,7 @@ SEXP Csparse_symmetric_to_general(SEXP x)
     if (!(chx->stype))
 	error(_("Nonsymmetric matrix in Csparse_symmetric_to_general"));
     chgx = cholmod_copy(chx, /* stype: */ 0, chx->xtype, &c);
-    return chm_sparse_to_SEXP(chgx, 1, 0, Rkind, "",
-			      symmetric_DimNames(GET_SLOT(x, Matrix_DimNamesSym)));
+    return chm_sparse_to_SEXP(chgx, 1, 0, Rkind, "", R_symmetric_DimNames(x));
 }
 
 // Called from R's  forceCspSymmetric() ,  .gC2sym()
@@ -368,12 +367,12 @@ SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo, SEXP sym_dmns)
 	return R_NilValue; /* -Wall */
     }
     CHM_SP chx = AS_CHM_SP__(x), chgx;
-    int uploT = (*CHAR(asChar(uplo)) == 'U') ? 1 : -1;
+    int uploT = (*CHAR(asChar(uplo)) == 'U');
     int Rkind = (chx->xtype != CHOLMOD_PATTERN) ? Real_kind(x) : 0;
     R_CheckStack();
-    chgx = cholmod_copy(chx, /* stype: */ uploT, chx->xtype, &c);
+    chgx = cholmod_copy(chx, /* stype: */ (uploT ? 1 : -1), chx->xtype, &c);
 
-    SEXP dns = GET_SLOT(x, Matrix_DimNamesSym);
+    SEXP dn = GET_SLOT(x, Matrix_DimNamesSym);
     int symDmns = asLogical(sym_dmns); /* 1, NA_LOGICAL or 0 */
     /* 3 cases:
        FALSE: keep as is;
@@ -381,38 +380,30 @@ SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo, SEXP sym_dmns)
        NA   : symmetrize if(...)
     */
     if(symDmns == FALSE) { } // *keep* asymmetric dimnames:  do nothing
-/// FIXME: TRUE: *should* do symmetric dimnames in any case, but does *NOT* --> symmetric_Dimnames()
     else if(symDmns == TRUE)
-	dns = symmetric_DimNames(dns);
+	symmetrize_DimNames(dn, -1);
     else // NA_LOGICAL (was 'FALSE' case) :
-	if((!isNull(VECTOR_ELT(dns, 0)) &&
-	    !isNull(VECTOR_ELT(dns, 1))) ||
-	   !isNull(getAttrib(dns, R_NamesSymbol))) {
-	    /* symmetrize them if both are not NULL
-	     * or names(dimnames(.)) is asymmetric : */
-/// FIXME --- this is partly *MORE* than what 'TRUE' case above does !!!!
-	    dns = PROTECT(duplicate(dns));
-	    if(!equal_string_vectors(VECTOR_ELT(dns, 0),
-				     VECTOR_ELT(dns, 1))) {
-		if(uploT == 1)
-		    SET_VECTOR_ELT(dns, 0, VECTOR_ELT(dns,1));
-		else
-		    SET_VECTOR_ELT(dns, 1, VECTOR_ELT(dns,0));
-	    }
-	    SEXP nms_dns = getAttrib(dns, R_NamesSymbol);
-	    if(!isNull(nms_dns) &&  // names(dimnames(.)) :
-	       !R_compute_identical(STRING_ELT(nms_dns, 0),
-				    STRING_ELT(nms_dns, 1), 16)) {
-		if(uploT == 1)
-		    SET_STRING_ELT(nms_dns, 0, STRING_ELT(nms_dns,1));
-		else
-		    SET_STRING_ELT(nms_dns, 1, STRING_ELT(nms_dns,0));
-		setAttrib(dns, R_NamesSymbol, nms_dns);
-	    }
+	if((!isNull(VECTOR_ELT(dn, 0)) &&
+	    !isNull(VECTOR_ELT(dn, 1))) ||
+	   !isNull(getAttrib(dn, R_NamesSymbol))) {
+	    /* Symmetrize if both rownames and colnames are non-NULL
+	       _or_ if names(dimnames(.)) is non-NULL
+	       
+	       FIXME: Inconsistent with 'dense_to_symmetric',
+	              which symmetrizes unconditionally ...
+		      _and_ inconsistent with TRUE case which
+		      uses colnames if non-NULL and rownames
+		      otherwise, regardless of 'uploT' ...
+		      _and_ it is slightly awkward to symmetrize
+		      the dimnames _just_ because names(dimnames(.))
+		      is non-NULL ...
+	    */
+	    dn = PROTECT(duplicate(dn));
+	    symmetrize_DimNames(dn, uploT);
 	    UNPROTECT(1);
 	}
     /* Rkind: pattern, "real", complex or .. */
-    return chm_sparse_to_SEXP(chgx, 1, 0, Rkind, "", dns);
+    return chm_sparse_to_SEXP(chgx, 1, 0, Rkind, "", dn);
 }
 
 SEXP Csparse_transpose(SEXP x, SEXP tri)
@@ -524,9 +515,9 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b, SEXP bool_arith)
 	b_symm = R_check_class_etc(b, valid_sym) >= 0;
     SEXP dn = PROTECT(allocVector(VECSXP, 2));
     SET_VECTOR_ELT(dn, 0,
-		   duplicate(VECTOR_ELT(a_symm ? R_symmetric_Dimnames(a) : GET_SLOT(a, Matrix_DimNamesSym), 0)));
+		   duplicate(VECTOR_ELT(a_symm ? R_symmetric_DimNames(a) : GET_SLOT(a, Matrix_DimNamesSym), 0)));
     SET_VECTOR_ELT(dn, 1,
-		   duplicate(VECTOR_ELT(b_symm ? R_symmetric_Dimnames(b) : GET_SLOT(b, Matrix_DimNamesSym), 1)));
+		   duplicate(VECTOR_ELT(b_symm ? R_symmetric_DimNames(b) : GET_SLOT(b, Matrix_DimNamesSym), 1)));
     UNPROTECT(nprot);
     return chm_sparse_to_SEXP(chc, 1, uploT, /*Rkind*/0, diag, dn);
 }
