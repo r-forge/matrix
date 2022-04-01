@@ -141,15 +141,15 @@ setMethod("isDiagonal", signature(object = "matrix"), .is.diagonal)
 
 ## The "catch all" methods -- far from optimal:
 setMethod("symmpart", signature(x = "Matrix"),
-          function(x) as(.M.symmDN(x + t(x)) / 2, "symmetricMatrix"))
+          function(x) as(symmetrizeDimnames(x + t(x)) / 2, "symmetricMatrix"))
 setMethod("skewpart", signature(x = "Matrix"),
-          function(x) .M.symmDN(x - t(x)) / 2)
+          function(x) symmetrizeDimnames(x - t(x)) / 2)
 
 ## FIXME: do this (similarly as for "ddense.." in C
 setMethod("symmpart", signature(x = "matrix"),
-          function(x) .m.symmDN(x + t(x)) / 2)
+          function(x) symmetrizeDimnames(x + t(x)) / 2)
 setMethod("skewpart", signature(x = "matrix"),
-          function(x) .m.symmDN(x - t(x)) / 2)
+          function(x) symmetrizeDimnames(x - t(x)) / 2)
 
 
 if(getRversion() >= "3.1.0")

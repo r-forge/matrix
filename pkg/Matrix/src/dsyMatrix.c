@@ -101,7 +101,7 @@ SEXP dsyMatrix_as_matrix(SEXP from, SEXP keep_dimnames)
 				   REAL(GET_SLOT(from, Matrix_xSym)), nsqr),
 			    from);
     if(asLogical(keep_dimnames))
-	setAttrib(val, R_DimNamesSymbol, R_symmetric_DimNames(from));
+	setAttrib(val, R_DimNamesSymbol, GET_symmetrized_DimNames(from));
     UNPROTECT(1);
     return val;
 }
@@ -131,7 +131,7 @@ SEXP dsyMatrix_matrix_mm(SEXP a, SEXP b, SEXP rtP)
     int nd = rt ?
 	1 : // v <- b %*% a : rownames(v) == rownames(b)  are already there
 	0;  // v <- a %*% b : colnames(v) == colnames(b)  are already there
-    SEXP nms = PROTECT(VECTOR_ELT(R_symmetric_DimNames(a), nd));
+    SEXP nms = PROTECT(VECTOR_ELT(GET_symmetrized_DimNames(a), nd));
     SET_VECTOR_ELT(GET_SLOT(val, Matrix_DimNamesSym), nd, nms);
     if(mn >= SMALL_4_Alloca) R_Free(bcp);
     UNPROTECT(2);

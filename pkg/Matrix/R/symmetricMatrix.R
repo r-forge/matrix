@@ -77,7 +77,7 @@ setMethod("symmpart", signature(x = "symmetricMatrix"), function(x) x)
 setMethod("skewpart", signature(x = "symmetricMatrix"), function(x) .setZero(x))
 
 setMethod("dimnames", signature(x = "symmetricMatrix"),
-          function(x) symmetrizeDimnames(x@Dimnames))
+          function(x) symmDN(x@Dimnames))
 
 ###------- pack() and unpack() --- for *dense*  symmetric & triangular matrices:
 packM <- function(x, Mtype, kind, unpack=FALSE) {
