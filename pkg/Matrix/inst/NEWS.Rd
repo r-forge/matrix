@@ -12,12 +12,13 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-04-01 r3451)}{
+\section{Changes in version 1.4-2 (2022-04-01 r3454)}{
   \subsection{Bug Fixes}{
     \itemize{
-      \item Symmetrization of `<Matrix>@Dimnames` and `dimnames(<matrix>)`
-      now goes through (new) C utility \code{symmetrize_DimNames} in most
-      cases, resolving some earlier inconsistencies.
+      \item Symmetrization of \code{<Matrix>@Dimnames} and
+      \code{dimnames(<matrix>)} now goes through C utility \code{symmDN}
+      instead of the so-named R utility used previously, resolving some
+      earlier inconsistencies.
     }
   }
   \subsection{New Features}{
