@@ -1149,13 +1149,13 @@ setMethod("Arith", signature(e1 = "ddiMatrix", e2 = arg2),
 		  return(if(n) numeric() else e1)
 	      f0 <- callGeneric(0, e2)
 	      if(all0(f0)) { # remain diagonal
-		  L1 <- (le <- length(e2)) == 1L
 		  if(e1@diag == "U") {
 		      if(any((r <- callGeneric(1, e2)) != 1)) {
 			  e1@diag <- "N"
 			  e1@x[seq_len(n)] <- r # possibly recycling r
 		      } ## else: result = e1  (is "U" diag)
-		  } else {
+		  } else if(n) {
+		      L1 <- (le <- length(e2)) == 1L
 		      r <- callGeneric(e1@x, e2)
 		      ## "future fixme": if we have idiMatrix, and r is 'integer', use idiMatrix
 		      e1@x[] <- if(L1) r else r[1L + ((n+1)*(0:(n-1L))) %% le]
@@ -1173,13 +1173,13 @@ setMethod("Arith", signature(e1 = arg1, e2 = "ddiMatrix"),
 		  return(if(n) numeric() else e2)
 	      f0 <- callGeneric(e1, 0)
 	      if(all0(f0)) { # remain diagonal
-		  L1 <- (le <- length(e1)) == 1L
 		  if(e2@diag == "U") {
 		      if(any((r <- callGeneric(e1, 1)) != 1)) {
 			  e2@diag <- "N"
 			  e2@x[seq_len(n)] <- r # possibly recycling r
 		      } ## else: result = e2  (is "U" diag)
 		  } else {
+		      L1 <- (le <- length(e1)) == 1L
 		      r <- callGeneric(e1, e2@x)
 		      ## "future fixme": if we have idiMatrix, and r is 'integer', use idiMatrix
 		      e2@x[] <- if(L1) r else r[1L + ((n+1)*(0:(n-1L))) %% le]
@@ -1199,7 +1199,6 @@ setMethod("Arith", signature(e1 = "ldiMatrix", e2 = arg2),
 			 else copyClass(e1, "ddiMatrix", c("diag", "Dim", "Dimnames"), check=FALSE))
 	      f0 <- callGeneric(0, e2)
 	      if(all0(f0)) { # remain diagonal
-		  L1 <- (le <- length(e2)) == 1L
 		  E <- copyClass(e1, "ddiMatrix", c("diag", "Dim", "Dimnames"), check=FALSE)
 		  ## storage.mode(E@x) <- "double"
 		  if(e1@diag == "U") {
@@ -1207,7 +1206,8 @@ setMethod("Arith", signature(e1 = "ldiMatrix", e2 = arg2),
 			  E@diag <- "N"
 			  E@x[seq_len(n)] <- r # possibly recycling r
 		      } ## else: result = E  (is "U" diag)
-		  } else {
+		  } else if(n) {
+		      L1 <- (le <- length(e2)) == 1L
 		      r <- callGeneric(e1@x, e2)
 		      ## "future fixme": if we have idiMatrix, and r is 'integer', use idiMatrix
 		      E@x[seq_len(n)] <- if(L1) r else r[1L + ((n+1)*(0:(n-1L))) %% le]
@@ -1226,7 +1226,6 @@ setMethod("Arith", signature(e1 = arg1, e2 = "ldiMatrix"),
 			 else copyClass(e2, "ddiMatrix", c("diag", "Dim", "Dimnames"), check=FALSE))
 	      f0 <- callGeneric(e1, 0)
 	      if(all0(f0)) { # remain diagonal
-		  L1 <- (le <- length(e1)) == 1L
 		  E <- copyClass(e2, "ddiMatrix", c("diag", "Dim", "Dimnames"), check=FALSE)
 		  ## storage.mode(E@x) <- "double"
 		  if(e2@diag == "U") {
@@ -1234,7 +1233,8 @@ setMethod("Arith", signature(e1 = arg1, e2 = "ldiMatrix"),
 			  E@diag <- "N"
 			  E@x[seq_len(n)] <- r # possibly recycling r
 		      } ## else: result = E  (is "U" diag)
-		  } else {
+		  } else if(n) {
+		      L1 <- (le <- length(e1)) == 1L
 		      r <- callGeneric(e1, e2@x)
 		      ## "future fixme": if we have idiMatrix, and r is 'integer', use idiMatrix
 		      E@x[seq_len(n)] <- if(L1) r else r[1L + ((n+1)*(0:(n-1L))) %% le]
@@ -1261,7 +1261,6 @@ setMethod("Ops", signature(e1 = "ddiMatrix", e2 = arg2),
 			 else copyClass(e1, "ldiMatrix", c("diag", "Dim", "Dimnames"), check=FALSE))
 	      f0 <- callGeneric(0, e2)
 	      if(all0(f0)) { # remain diagonal
-		  L1 <- (le <- length(e2)) == 1L
 		  E <- copyClass(e1, "ldiMatrix", c("diag", "Dim", "Dimnames"), check=FALSE)
 		  ## storage.mode(E@x) <- "logical"
 		  if(e1@diag == "U") {
@@ -1269,7 +1268,8 @@ setMethod("Ops", signature(e1 = "ddiMatrix", e2 = arg2),
 			  E@diag <- "N"
 			  E@x[seq_len(n)] <- r # possibly recycling r
 		      } ## else: result = E  (is "U" diag)
-		  } else {
+		  } else if(n) {
+		      L1 <- (le <- length(e2)) == 1L
 		      r <- callGeneric(e1@x, e2)
 		      ## "future fixme": if we have idiMatrix, and r is 'integer', use idiMatrix
 		      E@x[seq_len(n)] <- if(L1) r else r[1L + ((n+1)*(0:(n-1L))) %% le]
@@ -1288,14 +1288,13 @@ setMethod("Ops", signature(e1 = "ldiMatrix", e2 = arg2),
                   return(if(n) logical() else e1)
 	      f0 <- callGeneric(FALSE, e2)
 	      if(all0(f0)) { # remain diagonal
-		  L1 <- (le <- length(e2)) == 1L
-
 		  if(e1@diag == "U") {
 		      if(any((r <- callGeneric(TRUE, e2)) != 1)) {
 			  e1@diag <- "N"
 			  e1@x[seq_len(n)] <- r # possibly recycling r
 		      } ## else: result = e1  (is "U" diag)
-		  } else {
+		  } else if(n) {
+		      L1 <- (le <- length(e2)) == 1L
 		      r <- callGeneric(e1@x, e2)
 		      ## "future fixme": if we have idiMatrix, and r is 'integer', use idiMatrix
 		      e1@x[] <- if(L1) r else r[1L + ((n+1)*(0:(n-1L))) %% le]

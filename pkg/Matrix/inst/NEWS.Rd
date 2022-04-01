@@ -12,12 +12,18 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-03-31 r3450)}{
+\section{Changes in version 1.4-2 (2022-04-01 r3451)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of `<Matrix>@Dimnames` and `dimnames(<matrix>)`
       now goes through (new) C utility \code{symmetrize_DimNames} in most
       cases, resolving some earlier inconsistencies.
+    }
+  }
+  \subsection{New Features}{
+    \itemize{
+      \item \code{KhatriRao()} gets new \code{sparseY = TRUE} option and also
+      works for more \code{Matrix} classes.
     }
   }
 }

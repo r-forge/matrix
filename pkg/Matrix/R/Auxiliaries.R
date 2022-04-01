@@ -667,9 +667,18 @@ non0.i <- function(M, cM = class(M), uniqT=TRUE) {
 	    .Call(compressed_non_0_ij, as(M,"CsparseMatrix"), TRUE)
 	else cbind(M@i, M@j)
     } else if(extends(cM, "indMatrix")) {
-	cbind(seq_len(nrow(M)), M@perm) - 1L
+	cbind(seq_len(nrow(M)), M@perm, deparse.level=0L) - 1L
+    } else if(extends(cM, "diagonalMatrix")) {
+	i <- seq_len(dim(M)[1]) - 1L
+	if(M@diag != "U") # e.g. Diagonal(3)
+	    i <- i[isN0(M@x)]
+	cbind(i,i, deparse.level=0L)
     } else { ## C* or R*
-	.Call(compressed_non_0_ij, M, extends(cM, "CsparseMatrix"))
+	if(!(isCsp <- extends(cM, "CsparseMatrix")) &&
+	   !extends(cM, "RsparseMatrix"))
+            stop(gettextf("not yet implemented for class %s", dQuote(cM)),
+                 domain = NA)
+	.Call(compressed_non_0_ij, M, isCsp)
     }
 }
 
@@ -1384,6 +1393,15 @@ isTriC <- function(object, upper = NA, ...) {
 
 ## Purpose: Transform a *unit diagonal* sparse triangular matrix
 ##	into one with explicit diagonal entries '1'
+
+## as(x, <not-U-diagonal CsparseMatrix>):
+asCspN <- function(x, cl = getClassDef(class(x))) { # works also for Diagonal(n),
+    if(!extends(cl, "CsparseMatrix"))
+        cl <- getClass(class(x <- as(x, "CsparseMatrix")))
+    if(extends(cl, "triangularMatrix") && x@diag == "U")
+        .Call(Csparse_diagU2N, x)
+    else x
+}
 
 ## for "dtC*", "ltC* ..: directly
 xtC.diagU2N <- function(x) if(x@diag == "U") .Call(Csparse_diagU2N, x) else x
