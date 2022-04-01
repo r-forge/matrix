@@ -381,24 +381,25 @@ dimNamesCheck <- function(a, b, useFirst = TRUE, check = FALSE) {
 	nullDN
 }
 
-symmetrizeDimnames <- function(dn) .Call(R_symmetrize_DimNames, dn)
-.M.symmDN <- function(x) `dimnames<-`(x, symmetrizeDimnames(x@Dimnames))
-.m.symmDN <- function(x) `dimnames<-`(x, symmetrizeDimnames(dimnames(x)))
+##' @title Symmetrize dimnames
+##' @param x A square matrix.
+##' @return
+##' \code{y} identical to \code{x} except with \code{dny <- dimnames(y)}
+##' given by \code{rep(dimnames(x)[J], 2)} rather than \code{dimnames(x)}
+##' (where \code{J} is 1 if \code{x} has row names but not column names,
+##' and 2 otherwise) and thus satisfying \code{identical(dny[1], dny[2])}.
+##' @author Martin Maechler and Mikael Jagan
+symmetrizeDimnames <- function(x) {
+    `dimnames<-`(x, symmDN(if (is(x, "Matrix")) x@Dimnames else dimnames(x)))
+}
 
-## MJ: no longer ... note that semantics are switched now (above):
-## 'symmetrizeDimnames' takes '[dD]imnames' and returns '[dD]imnames'
-## while '.[mM].symmDN' takes [mM]atrix and returns [mM]atrix
+symmDN <- function(dn) {
+    .Call(R_symmDN, dn)
+}
+
+## MJ: no longer ... see above
 if (FALSE) {
 
-##' @title Symmetrize dimnames(.)
-##' @param x a square matrix
-##' @param col logical indicating if the column names should be taken when
-##' both are non-NULL.
-##' @param names logical indicating if the names(dimnames(.)) should be
-##' symmetrized and kept *if* they differ.
-##' @return a matrix like \code{x}, say \code{r}, with dimnames fulfilling
-##' 		dr <- dimnames(r); identical(dr[1], dr[2])
-##' @author Martin Maechler
 symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
     dimnames(x) <- symmDN(dimnames(x), col=col, names=names)
     x

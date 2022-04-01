@@ -191,10 +191,10 @@ void SET_DimNames(SEXP dest, SEXP src) {
 }
 
 // code in ./Mutils.c :
-void symmetrize_DimNames(SEXP dn, int J);
-SEXP R_symmetrize_DimNames(SEXP dn);
-SEXP R_symmetric_DimNames(SEXP x);
-void SET_DimNames_symm(SEXP dest, SEXP src);
+void symmDN(SEXP dn, int J);
+SEXP R_symmDN(SEXP dn);
+SEXP GET_symmetrized_DimNames(SEXP x);
+void SET_symmetrized_DimNames(SEXP dest, SEXP src);
 
 
 #define uplo_P(_x_) CHAR(STRING_ELT(GET_SLOT(_x_, Matrix_uploSym), 0))

@@ -784,11 +784,16 @@ SEXP dup_mMatrix_as_geMatrix(SEXP A)
     ans = PROTECT(NEW_OBJECT_OF_CLASS(M_type == ddense ? "dgeMatrix" :
 				      (M_type == ldense ? "lgeMatrix" :
 					 "ngeMatrix")));
-#define DUP_MMATRIX_SET_1(_IS_SYM_) do {				\
-    SET_SLOT(ans, Matrix_DimSym, duplicate(ad));			\
-    SET_SLOT(ans, Matrix_DimNamesSym, _IS_SYM_ ? R_symmetrize_DimNames(an) : \
-       (!isNull(an) && LENGTH(an) == 2) ? duplicate(an): allocVector(VECSXP,2)); \
-} while(0)
+#define DUP_MMATRIX_SET_1(_IS_SYM_)					\
+    do {								\
+	SET_SLOT(ans, Matrix_DimSym, duplicate(ad));			\
+	SET_SLOT(ans, Matrix_DimNamesSym,				\
+		 _IS_SYM_						\
+		 ? R_symmDN(an)						\
+		 : ((!isNull(an) && LENGTH(an) == 2)			\
+		    ? duplicate(an)					\
+		    : allocVector(VECSXP,2)));				\
+    } while(0)
 
     R_xlen_t sz = ((R_xlen_t) INTEGER(ad)[0]) * INTEGER(ad)[1];
     Rboolean is_symm = FALSE;
@@ -1335,7 +1340,7 @@ SEXP R_any0(SEXP x) {
 #undef TRUE_
 #undef FALSE_
 
-void symmetrize_DimNames(SEXP dn, int J /* -1|0|1 */) {
+void symmDN(SEXP dn, int J /* -1|0|1 */) {
     SEXP s;
     if (J < 0) {
 	/* Use rownames if only rownames are non-NULL, otherwise use colnames */
@@ -1361,10 +1366,7 @@ void symmetrize_DimNames(SEXP dn, int J /* -1|0|1 */) {
 
 /**
  * Produces symmetric `Dimnames` from possibly asymmetric ones.
- * Replaces `symmDN` from `../R/Auxiliaries.R` and is intended
- * to behave as `symmDN(dn, col = TRUE, names = TRUE)` did.
- *
- * Called from `symmetrizeDimnames` in `../R/Auxiliaries.R`.
+ * Called from `symmDN` in `../R/Auxiliaries.R`.
  *
  * @param dn A list of length 2, typically the `Dimnames` slot
  * of a `symmetricMatrix`.
@@ -1372,38 +1374,33 @@ void symmetrize_DimNames(SEXP dn, int J /* -1|0|1 */) {
  * @return `rep(dn[1], 2)` if `is.null(dn[[2]])` and `!is.null(dn[[1]])`, 
  * `rep(dn[2], 2)` otherwise.
  */
-SEXP R_symmetrize_DimNames(SEXP dn) {
+SEXP R_symmDN(SEXP dn) {
     
 #define NON_TRIVIAL_DN							\
     !(isNull(VECTOR_ELT(dn, 1)) &&					\
       isNull(VECTOR_ELT(dn, 0)) &&					\
       isNull(getAttrib(dn, R_NamesSymbol)))
     
-#define SYMM_DIMNAMES							\
-    do {								\
-	PROTECT(dn = duplicate(dn));					\
-	symmetrize_DimNames(dn, -1);					\
-	UNPROTECT(1);							\
-    } while (0)
-    
     /* Be fast (do nothing!) when dimnames = list(NULL, NULL) : */
     if (NON_TRIVIAL_DN) {
-	SYMM_DIMNAMES;
+	PROTECT(dn = duplicate(dn));
+	symmDN(dn, -1);
+	UNPROTECT(1);
     }
     return dn;
 }
 
 /**
- * A convenience wrapper for `R_symmetrize_DimNames`, getting the
- * `Dimnames` slot from a `Matrix` and symmetrizing _if necessary_.
+ * A convenience wrapper for `R_symmDN`, getting the `Dimnames` slot 
+ * from a `Matrix` and symmetrizing _if necessary_.
  *
  * @param from A `Matrix`, typically a `symmetricMatrix`.
  *
  * @return A list `dn` of length 2 satisfying `identical(dn[1], dn[2])`,
  * giving a suitable (symmetric) value for the `Dimnames` slot of `from`.
  */
-SEXP R_symmetric_DimNames(SEXP x) {
-    return R_symmetrize_DimNames(GET_SLOT(x, Matrix_DimNamesSym));
+SEXP GET_symmetrized_DimNames(SEXP x) {
+    return R_symmDN(GET_SLOT(x, Matrix_DimNamesSym));
 }
 
 /**
@@ -1414,12 +1411,14 @@ SEXP R_symmetric_DimNames(SEXP x) {
  * @param dest Matrix, typically *not* symmetric
  * @param src  symmetricMatrix
  */
-void SET_DimNames_symm(SEXP dest, SEXP src) {
+void SET_symmetrized_DimNames(SEXP dest, SEXP src) {
     SEXP dn = GET_SLOT(src, Matrix_DimNamesSym);
     /* Be fast (do nothing!) when dimnames = list(NULL, NULL) : */
     if (NON_TRIVIAL_DN) {
-	SYMM_DIMNAMES;
+	PROTECT(dn = duplicate(dn));
+	symmDN(dn, -1);
 	SET_SLOT(dest, Matrix_DimNamesSym, dn);
+	UNPROTECT(1);
     }
     return;
 }

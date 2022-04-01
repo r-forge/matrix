@@ -434,7 +434,7 @@ SEXP dense_to_symmetric(SEXP x, SEXP uplo, SEXP symm_test)
 #define MK_SYMMETRIC_DIMNAMES_AND_RETURN(_UPLO_ /* -1|0|1 */)		\
     SEXP dn = PROTECT(GET_SLOT(dx, Matrix_DimNamesSym));		\
     /* Need _symmetric_ dimnames and names(dimnames) */			\
-    symmetrize_DimNames(dn, _UPLO_);					\
+    symmDN(dn, _UPLO_);							\
     /* Copy dx to ans;							\
        Because slots of dx are freshly allocated and dx will not be	\
        used, we use the slots themselves and don't duplicate            \ 

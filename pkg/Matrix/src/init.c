@@ -268,7 +268,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(triangularMatrix_validate, 1),
     CALLDEF(symmetricMatrix_validate, 1),
     CALLDEF(packedMatrix_validate, 1),
-    CALLDEF(R_symmetrize_DimNames, 1),
+    CALLDEF(R_symmDN, 1),
 
     CALLDEF(packedMatrix_t, 1),
     CALLDEF(packedMatrix_diag_get, 2),
