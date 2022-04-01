@@ -367,8 +367,11 @@ isOrthogonal <- function(x, tol = 1e-15) {
               rep(1, ncol(x)), tolerance = tol)
 }
 
-.M.DN <- Matrix:::.M.DN ## from ../R/Auxiliaries.R :
-dnIdentical  <- function(x,y) identical(.M.DN(x), .M.DN(y))
+## .M.DN <- Matrix:::.M.DN -- but do *NOT* want to load Matrix namespace!
+## from ../R/Auxiliaries.R :
+`%||%` <- function(x, orElse) if(!is.null(x)) x else orElse
+.M.DN <- function(x) dimnames(x) %||% list(NULL,NULL)
+dnIdentical  <- function(x,y)   identical (.M.DN(x), .M.DN(y))
 dnIdentical3 <- function(x,y,z) identical3(.M.DN(x), .M.DN(y), .M.DN(z))
 
 ##' @title Are two matrices practically equal - including dimnames
