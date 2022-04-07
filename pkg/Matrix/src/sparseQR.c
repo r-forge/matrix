@@ -46,7 +46,7 @@ void sparseQR_Qmult(cs *V, SEXP dmns, double *beta, int *p, int trans,
     if (ydims[0] != m)
 	error(_("sparseQR_Qmult(): nrow(y) = %d != %d = nrow(V)"), ydims[0], m);
     double *x; // workspace
-    C_or_Alloca_TO(x, m, double);
+    Calloc_or_Alloca_TO(x, m, double);
     if (trans) {
 	for (int j = 0; j < ydims[1]; j++) {
 	    double *yj = y + j * m_;
@@ -64,7 +64,7 @@ void sparseQR_Qmult(cs *V, SEXP dmns, double *beta, int *p, int trans,
 	    Memcpy(yj, x, m);
 	}
     }
-    if(m >= SMALL_4_Alloca) R_Free(x);
+    Free_FROM(x, m);
     if(!isNull(dmns)) { // assign rownames to 'ans' matrix
 	// FIXME? colnames taken from 'y' ?!
 	if(!isNull(VECTOR_ELT(dmns, 0))) {
@@ -172,7 +172,7 @@ SEXP sparseQR_coef(SEXP qr, SEXP y)
 
     double *ax = REAL(GET_SLOT(ans, Matrix_xSym)),
 	*x = (double*) NULL;
-    if(lq) { C_or_Alloca_TO(x, M, double); }
+    if (lq) Calloc_or_Alloca_TO(x, M, double);
     for (int j = 0; j < n; j++) {
 	double *aj = ax + j * M;
 	cs_usolve(R, aj);
@@ -181,7 +181,7 @@ SEXP sparseQR_coef(SEXP qr, SEXP y)
 	    Memcpy(aj, x, n_R);
 	}
     }
-    if(lq && M >= SMALL_4_Alloca) R_Free(x);
+    if (lq) Free_FROM(x, M);
 
     if(rank_def) {
 	warning(_("%s(): structurally rank deficient case: possibly WRONG zeros"),

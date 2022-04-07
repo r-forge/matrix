@@ -7,69 +7,80 @@
 extern "C" {
 #endif
 
-#include <stdint.h> // C99 for int64_t
+#include <stdint.h> /* C99 for int64_t */
 #include <ctype.h>
-#include <R.h>  /* includes Rconfig.h */
+#include <R.h> /* includes <Rconfig.h> */
 #include <Rversion.h>
 #include <Rinternals.h>
 #include <R_ext/RS.h> /* for Memzero() */
 
-// previously from <Rdefines.h> :
-#ifndef GET_SLOT
-# define GET_SLOT(x, what)       R_do_slot(x, what)
-# define SET_SLOT(x, what, value) R_do_slot_assign(x, what, value)
-# define MAKE_CLASS(what)	R_do_MAKE_CLASS(what)
-# define NEW_OBJECT(class_def)	R_do_new_object(class_def)
-#endif
-
-// NB: For  'FCONE'  etc (for LTO), the "includer" will  #include "Lapack-etc.h"
-// --
-
-#define imax2(x, y) ((x < y) ? y : x)
-#define imin2(x, y) ((x < y) ? x : y)
-
-// must come after <R.h> above, for clang (2015-08-05)
-#ifdef __GNUC__
-# undef alloca
-# define alloca(x) __builtin_alloca((x))
-#elif defined(__sun) || defined(_AIX)
-/* this is necessary (and sufficient) for Solaris 10 and AIX 6: */
-# include <alloca.h>
-#endif
-/* For R >= 3.2.2, the 'elif' above shall be replaced by
-#elif defined(HAVE_ALLOCA_H)
+/* NB: For 'USE_FC_LEN_T' and 'FCONE' (for LTO), 
+   the "includer" will #include "Lapack-etc.h"
 */
 
-#ifdef ENABLE_NLS
-#include <libintl.h>
-#define _(String) dgettext ("Matrix", String)
-#else
-#define _(String) (String)
-/* Note that this is not yet supported (for Windows, e.g.) in R 2.9.0 : */
-#define dngettext(pkg, String, StringP, N) (N > 1 ? StringP : String)
+/* Previously from <Rdefines.h> : */
+#ifndef GET_SLOT
+# define GET_SLOT(x, what)        R_do_slot(x, what)
+# define SET_SLOT(x, what, value) R_do_slot_assign(x, what, value)
+# define MAKE_CLASS(what)	  R_do_MAKE_CLASS(what)
+# define NEW_OBJECT(class_def)	  R_do_new_object(class_def)
 #endif
 
-#ifndef LONG_VECTOR_SUPPORT
-// notably for  R <= 2.15.x :
-# define XLENGTH(x) LENGTH(x)
-# if R_VERSION < R_Version(2,16,0)
-  typedef int R_xlen_t;
+/* From <Defn.h> : */
+/* 'alloca' is neither C99 nor POSIX */
+#ifdef __GNUC__
+/* This covers GNU, Clang and Intel compilers */
+/* #undef needed in case some other header, e.g. malloc.h, already did this */
+# undef alloca
+# define alloca(x) __builtin_alloca((x))
+#else
+# ifdef HAVE_ALLOCA_H
+/* This covers native compilers on Solaris and AIX */
+#  include <alloca.h>
+# endif
+/* It might have been defined via some other standard header, e.g. stdlib.h */
+# if !HAVE_DECL_ALLOCA
+extern void *alloca(size_t);
 # endif
 #endif
 
+#define Alloca(_N_, _TYPE_) (_TYPE_ *) alloca(((size_t) _N_) * sizeof(_TYPE_))
+#define Matrix_Calloc_Threshold 10000 /* R uses same cutoff in several places */
 
-#define Alloca(n, t)   (t *) alloca( ((size_t) n) * sizeof(t) )
-
-#define SMALL_4_Alloca 10000
-//			==== R uses the same cutoff in several places
-
-#define C_or_Alloca_TO(_VAR_, _N_, _TYPE_)			\
-	if(_N_ < SMALL_4_Alloca) {				\
-	    _VAR_ = Alloca(_N_, _TYPE_);  R_CheckStack();	\
-	} else {						\
+#define Calloc_or_Alloca_TO(_VAR_, _N_, _TYPE_)			\
+    do {							\
+	if (_N_ >= Matrix_Calloc_Threshold) {			\
 	    _VAR_ = R_Calloc(_N_, _TYPE_);			\
-	}
-// and user needs to   if(_N_ >= SMALL_4_Alloca)  R_Free(_VAR_);
+	} else {						\
+	    _VAR_ = Alloca(_N_, _TYPE_); R_CheckStack();	\
+	}							\
+    } while (0)
+#define Free_FROM(_VAR_, _N_)					\
+    do {							\
+	if ((_N_) >= Matrix_Calloc_Threshold) {			\
+	    R_Free(_VAR_);					\
+	}							\
+    } while (0)
+
+#ifdef ENABLE_NLS
+# include <libintl.h>
+# define _(String) dgettext ("Matrix", String)
+#else
+# define _(String) (String)
+/* 'dngettext' in <libintl.h> tests N == 1, _not_ N > 1 */
+# define dngettext(Domain, String, StringP, N) ((N == 1) ? String : StringP)
+#endif
+
+#ifndef LONG_VECTOR_SUPPORT
+/* Notably for R <= 2.15.x : */
+# define XLENGTH(x) LENGTH(x)
+# if R_VERSION < R_Version(2,16,0)
+typedef int R_xlen_t;
+# endif
+#endif
+
+#define imax2(x, y) ((x < y) ? y : x)
+#define imin2(x, y) ((x < y) ? x : y)
 
 SEXP triangularMatrix_validate(SEXP obj);
 SEXP symmetricMatrix_validate(SEXP obj);
@@ -206,23 +217,36 @@ void SET_symmetrized_DimNames(SEXP dest, SEXP src);
 
 enum dense_enum { ddense, ldense, ndense };
 
-// Define this "Cholmod compatible" to some degree
-    enum x_slot_kind {
-	x_unknown=-2, x_pattern=-1, x_double=0, x_logical=1, x_integer=2, x_complex=3};
-//	  NA	              n		  d	      l		   i		z
+/* Define this to be "Cholmod compatible" to some degree */
+enum x_slot_kind {
+    x_unknown = -2, /* NA */
+    x_pattern = -1, /* n */
+    x_double  = 0,  /* d */
+    x_logical = 1,  /* l */
+    x_integer = 2,  /* i */
+    x_complex = 3}; /* z */
+/* FIXME: use 'x_slot_kind' instead of 'int' 
+   everywhere 'Real_(KIND2?|kind_?)' is used
+*/
 
-// FIXME: use 'x_slot_kind' instead of 'int' everywhere  Real_(KIND2?|kind)  is used
+#define Real_kind_(_x_)							\
+    (isReal(_x_) ? x_double : (isLogical(_x_) ? x_logical : x_pattern))
 
-/* should also work for "matrix" matrices: */
-#define Real_KIND(_x_)	(IS_S4_OBJECT(_x_) ? Real_kind(_x_) : \
-			 (isReal(_x_) ? x_double : (isLogical(_x_) ? x_logical : x_pattern)))
+/* Requires 'x' slot, i.e., not for "..nMatrix"
+   FIXME? via R_has_slot(obj, name)
+*/
+#define Real_kind(_x_)				\
+    (Real_kind_(GET_SLOT(_x_, Matrix_xSym)))
+    
+/* Should also work for "matrix" matrices : */
+#define Real_KIND(_x_)						\
+    (IS_S4_OBJECT(_x_) ? Real_kind(_x_) : Real_kind_(_x_))
+    
 /* This one gives 'x_double' also for integer "matrix" :*/
-#define Real_KIND2(_x_)	(IS_S4_OBJECT(_x_) ? Real_kind(_x_) : \
-			 (isLogical(_x_) ? x_logical : x_double))
+#define Real_KIND2(_x_)						\
+    (IS_S4_OBJECT(_x_) ? Real_kind(_x_) :			\
+     (isLogical(_x_) ? x_logical : x_double))
 
-/* requires 'x' slot, i.e., not for ..nMatrix.  FIXME ? via R_has_slot(obj, name) */
-#define Real_kind(_x_)	(isReal(GET_SLOT(_x_, Matrix_xSym)) ? x_double	: \
-			 (isLogical(GET_SLOT(_x_, Matrix_xSym)) ? x_logical : x_pattern))
 
 #define DECLARE_AND_GET_X_SLOT(__C_TYPE, __SEXP)	\
     __C_TYPE *xx = __SEXP(GET_SLOT(x, Matrix_xSym))

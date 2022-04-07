@@ -152,7 +152,7 @@ SEXP dspMatrix_matrix_mm(SEXP a, SEXP b)
     double *ax = REAL(GET_SLOT(a, Matrix_xSym)), one = 1., zero = 0.,
 	*vx = REAL(GET_SLOT(val, Matrix_xSym)), *bx;
 
-    C_or_Alloca_TO(bx, nn, double);
+    Calloc_or_Alloca_TO(bx, nn, double);
     Memcpy(bx, vx, nn);
     if (bdims[0] != n)
 	error(_("Matrices are not conformable for multiplication"));
@@ -162,7 +162,7 @@ SEXP dspMatrix_matrix_mm(SEXP a, SEXP b)
 	    F77_CALL(dspmv)(uplo, &n, &one, ax, bx + in, &ione,
 			    &zero, vx + in, &ione FCONE);
 	}
-	if(nn >= SMALL_4_Alloca) R_Free(bx);
+	Free_FROM(bx, nn);
     }
     UNPROTECT(1);
     return val;

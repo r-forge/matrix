@@ -139,7 +139,7 @@ SEXP LU_expand(SEXP x)
     if(!is_sq) // m != n -- P is  m x m
 	INTEGER(GET_SLOT(P, Matrix_DimSym))[1] = m;
     perm = INTEGER(ALLOC_SLOT(P, Matrix_permSym, INTSXP, m));
-    C_or_Alloca_TO(iperm, m, int);
+    Calloc_or_Alloca_TO(iperm, m, int);
 
     for (i = 0; i < m; i++) iperm[i] = i + 1; /* initialize permutation*/
     for (i = 0; i < nn; i++) {	/* generate inverse permutation */
@@ -151,7 +151,7 @@ SEXP LU_expand(SEXP x)
     // invert the inverse
     for (i = 0; i < m; i++) perm[iperm[i] - 1] = i + 1;
 
-    if(m >= SMALL_4_Alloca) R_Free(iperm);
+    Free_FROM(iperm, m);
     UNPROTECT(1);
     return val;
 }
