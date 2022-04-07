@@ -120,7 +120,7 @@ SEXP dsyMatrix_matrix_mm(SEXP a, SEXP b, SEXP rtP)
     double one = 1., zero = 0.;
     R_xlen_t mn = m * (R_xlen_t)n;
     double *bcp, *vx = REAL(GET_SLOT(val, Matrix_xSym));
-    C_or_Alloca_TO(bcp, mn, double);
+    Calloc_or_Alloca_TO(bcp, mn, double);
     Memcpy(bcp, vx, mn);
 
     if (m >=1 && n >= 1)
@@ -133,7 +133,7 @@ SEXP dsyMatrix_matrix_mm(SEXP a, SEXP b, SEXP rtP)
 	0;  // v <- a %*% b : colnames(v) == colnames(b)  are already there
     SEXP nms = PROTECT(VECTOR_ELT(GET_symmetrized_DimNames(a), nd));
     SET_VECTOR_ELT(GET_SLOT(val, Matrix_DimNamesSym), nd, nms);
-    if(mn >= SMALL_4_Alloca) R_Free(bcp);
+    Free_FROM(bcp, mn);
     UNPROTECT(2);
     return val;
 }
@@ -161,11 +161,11 @@ SEXP dsyMatrix_trf(SEXP x)
     double tmp, *work;
     F77_CALL(dsytrf)(uplo, &n, vx, &n, perm, &tmp, &lwork, &info FCONE);
     lwork = (int) tmp;
-    C_or_Alloca_TO(work, lwork, double);
+    Calloc_or_Alloca_TO(work, lwork, double);
 
     F77_CALL(dsytrf)(uplo, &n, vx, &n, perm, work, &lwork, &info FCONE);
 
-    if(lwork >= SMALL_4_Alloca) R_Free(work);
+    Free_FROM(work, lwork);
     if (info) error(_("Lapack routine dsytrf returned error code %d"), info);
     UNPROTECT(1);
     return set_factors(x, val, "BunchKaufman");
@@ -212,9 +212,9 @@ SEXP matrix_trf(SEXP x, SEXP uploP)
     double tmp, *work;
     F77_CALL(dsytrf)(uplo, &n, vx, &n, perm, &tmp, &lwork, &info FCONE);
     lwork = (int) tmp;
-    C_or_Alloca_TO(work, lwork, double);
+    Calloc_or_Alloca_TO(work, lwork, double);
     F77_CALL(dsytrf)(uplo, &n, vx, &n, perm, work, &lwork, &info FCONE);
-    if(lwork >= SMALL_4_Alloca) R_Free(work);
+    Free_FROM(work, lwork);
     if (info) error(_("Lapack routine dsytrf returned error code %d"), info);
     UNPROTECT(3);
     return val;
