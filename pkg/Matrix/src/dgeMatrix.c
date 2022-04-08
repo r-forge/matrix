@@ -718,8 +718,8 @@ SEXP dgeMatrix_exp(SEXP x)
     }
 
     /* Pade' approximation. Powers v^8, v^7, ..., v^1 */
-    AZERO(npp, nsqr);
-    AZERO(dpp, nsqr);
+    AZERO(npp, nsqr, 0.0);
+    AZERO(dpp, nsqr, 0.0);
     m1_j = -1;
     for (j = 7; j >=0; j--) {
 	double mult = padec[j];

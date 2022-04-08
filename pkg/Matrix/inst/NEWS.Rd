@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-04-01 r3454)}{
+\section{Changes in version 1.4-2 (2022-04-01 r3458)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -25,6 +25,12 @@
     \itemize{
       \item \code{KhatriRao()} gets new \code{sparseY = TRUE} option and also
       works for more \code{Matrix} classes.
+    }
+  }
+  \subsection{Misc}{
+    \itemize{
+      \item \code{AZERO()} gets a third argument specifying a zero
+      constant (0 for \code{int} arrays, 0.0 for \code{double} arrays).
     }
   }
 }
@@ -56,8 +62,8 @@
   \subsection{Misc}{
     \itemize{
       \item Our C sources now use \code{R_Calloc()}, \code{R_Free()}
-      etc, instead of the shorter versions with 'R_'. Consequently, we
-      get closer to \code{STRICT_R_HEADERS}.
+      etc, instead of the shorter versions without 'R_'. Consequently,
+      we get closer to \code{STRICT_R_HEADERS}.
       Also, include \code{<float.h>} for \code{DBL_EPSILON}.
 
       \item \code{PROTECT()} 3 more; as from \samp{rchk} for Matrix 1.4-0.

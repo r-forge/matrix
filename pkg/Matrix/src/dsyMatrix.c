@@ -154,7 +154,7 @@ SEXP dsyMatrix_trf(SEXP x)
     SET_SLOT(val, Matrix_diagSym, mkString("N"));
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
     double *vx = REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, nsqr));
-    AZERO(vx, nsqr);
+    AZERO(vx, nsqr, 0.0);
     F77_CALL(dlacpy)(uplo, &n, &n, REAL(GET_SLOT(x, Matrix_xSym)), &n, vx, &n FCONE);
     int *perm = INTEGER(ALLOC_SLOT(val, Matrix_permSym, INTSXP, n)),
 	info, lwork = -1;
@@ -205,7 +205,7 @@ SEXP matrix_trf(SEXP x, SEXP uploP)
     SET_SLOT(val, Matrix_diagSym, mkString("N"));
     SET_SLOT(val, Matrix_DimSym, dimP);
     double *vx = REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, nsqr)); // n x n result matrix
-    AZERO(vx, nsqr);
+    AZERO(vx, nsqr, 0.0);
     F77_CALL(dlacpy)(uplo, &n, &n, REAL(x), &n, vx, &n FCONE);
     int *perm = INTEGER(ALLOC_SLOT(val, Matrix_permSym, INTSXP, n)),
          info, lwork = -1;
