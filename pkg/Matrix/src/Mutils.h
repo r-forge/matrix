@@ -105,10 +105,14 @@ extern
 /* Zero an array, but note Memzero() which might be FASTER 
    and uses R_SIZE_T (== size_t for C)
 */
-#define AZERO3(x, n, itype)						\
-    {itype _I_, _SZ_ = (n); for (_I_ = 0; _I_ < _SZ_; _I_++) (x)[_I_] = 0;}
-#define AZERO(x, n)  AZERO3(x, n, R_xlen_t)
-#define AZEROs(x, n) AZERO3(x, n, size_t)
+#define AZERO4(_X_, _N_, _ZERO_, _ITYPE_)				\
+    do {								\
+	for (_ITYPE_ _I_ = 0, _LEN_ = (_N_); _I_ < _LEN_; ++_I_) {	\
+	    (_X_)[_I_] = _ZERO_;					\
+	}								\
+    } while (0)
+#define  AZERO(_X_, _N_, _ZERO_) AZERO4(_X_, _N_, 0.0, R_xlen_t)
+#define AZEROs(_X_, _N_, _ZERO_) AZERO4(_X_, _N_, 0.0,   size_t)
 
 /* enum constants from cblas.h and some short forms */
 enum CBLAS_ORDER {CblasRowMajor=101, CblasColMajor=102};

@@ -20,8 +20,8 @@
 	SET_DimNames(val, x);						\
     slot_dup(val, x, Matrix_uploSym)
 
-#define Matrix_T_as_DENSE_FINISH(_X_k_)		\
-    AZERO(tx, sz);				\
+#define Matrix_T_as_DENSE_FINISH(_X_k_, _ZERO_)	\
+    AZERO(tx, sz, _ZERO_);			\
     for (k = 0; k < nnz; k++)			\
 	tx[xi[k] + xj[k] * n_] = _X_k_;		\
     UNPROTECT(1);				\
@@ -33,7 +33,7 @@ SEXP dsTMatrix_as_dsyMatrix(SEXP x)
     SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("dsyMatrix"));
 
     Matrix_T_as_DENSE(double, REAL, REALSXP, FALSE);
-    Matrix_T_as_DENSE_FINISH(xx[k]);
+    Matrix_T_as_DENSE_FINISH(xx[k], 0.0);
 }
 
 SEXP lsTMatrix_as_lsyMatrix(SEXP x)
@@ -41,7 +41,7 @@ SEXP lsTMatrix_as_lsyMatrix(SEXP x)
     SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("lsyMatrix"));
 
     Matrix_T_as_DENSE(int, LOGICAL, LGLSXP, FALSE);
-    Matrix_T_as_DENSE_FINISH(xx[k]);
+    Matrix_T_as_DENSE_FINISH(xx[k], 0);
 }
 
 /* ---- Now the triangular ones --  have an extra  'diag'  slot : ------ */
@@ -52,7 +52,7 @@ SEXP dtTMatrix_as_dtrMatrix(SEXP x)
 
     Matrix_T_as_DENSE(double, REAL, REALSXP, FALSE);
     slot_dup(val, x, Matrix_diagSym);
-    Matrix_T_as_DENSE_FINISH(xx[k]);
+    Matrix_T_as_DENSE_FINISH(xx[k], 0.0);
 }
 
 SEXP ltTMatrix_as_ltrMatrix(SEXP x)
@@ -61,7 +61,7 @@ SEXP ltTMatrix_as_ltrMatrix(SEXP x)
 
     Matrix_T_as_DENSE(int, LOGICAL, LGLSXP, FALSE);
     slot_dup(val, x, Matrix_diagSym);
-    Matrix_T_as_DENSE_FINISH(xx[k]);
+    Matrix_T_as_DENSE_FINISH(xx[k], 0);
 }
 
 /*===================== Coercion to  gTMatrix ================================*/
@@ -154,7 +154,7 @@ SEXP nsTMatrix_as_nsyMatrix(SEXP x)
     SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("nsyMatrix"));
 
     Matrix_T_as_DENSE(int, LOGICAL, LGLSXP, FALSE);
-    Matrix_T_as_DENSE_FINISH(1);
+    Matrix_T_as_DENSE_FINISH(1, 0);
 }
 
 SEXP ntTMatrix_as_ntrMatrix(SEXP x)
@@ -163,7 +163,7 @@ SEXP ntTMatrix_as_ntrMatrix(SEXP x)
 
     Matrix_T_as_DENSE(int, LOGICAL, LGLSXP, FALSE);
     slot_dup(val, x, Matrix_diagSym);
-    Matrix_T_as_DENSE_FINISH(1);
+    Matrix_T_as_DENSE_FINISH(1, 0);
 }
 
 SEXP nsTMatrix_as_ngTMatrix(SEXP x)
