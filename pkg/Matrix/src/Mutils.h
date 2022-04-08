@@ -17,15 +17,7 @@ extern "C" {
 /* NB: For 'USE_FC_LEN_T' and 'FCONE' (for LTO), 
    the "includer" will #include "Lapack-etc.h"
 */
-
-/* Previously from <Rdefines.h> : */
-#ifndef GET_SLOT
-# define GET_SLOT(x, what)        R_do_slot(x, what)
-# define SET_SLOT(x, what, value) R_do_slot_assign(x, what, value)
-# define MAKE_CLASS(what)	  R_do_MAKE_CLASS(what)
-# define NEW_OBJECT(class_def)	  R_do_new_object(class_def)
-#endif
-
+    
 /* From <Defn.h> : */
 /* 'alloca' is neither C99 nor POSIX */
 #ifdef __GNUC__
@@ -64,10 +56,10 @@ extern void *alloca(size_t);
 
 #ifdef ENABLE_NLS
 # include <libintl.h>
-# define _(String) dgettext ("Matrix", String)
+# define _(String) dgettext("Matrix", String)
 #else
 # define _(String) (String)
-/* 'dngettext' in <libintl.h> tests N == 1, _not_ N > 1 */
+/* <libintl.h> tests N == 1, _not_ N > 1 */
 # define dngettext(Domain, String, StringP, N) ((N == 1) ? String : StringP)
 #endif
 
@@ -79,23 +71,44 @@ typedef int R_xlen_t;
 # endif
 #endif
 
+/* Previously from <Rdefines.h> : */
+#ifndef GET_SLOT
+# define GET_SLOT(x, what)        R_do_slot(x, what)
+# define SET_SLOT(x, what, value) R_do_slot_assign(x, what, value)
+# define MAKE_CLASS(what)	  R_do_MAKE_CLASS(what)
+# define NEW_OBJECT(class_def)	  R_do_new_object(class_def)
+#endif
+    
+/* Stored pointers to symbols initialized in R_init_Matrix() from ./init.c */
+extern
+#include "Syms.h"
+
+/* Duplicate the slot with name given by 'sym' from 'src' to 'dest' */
+#define slot_dup(dest, src, sym)			\
+    SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
+#define slot_dup_if_has(dest, src, sym)				\
+    if (R_has_slot(src, sym))					\
+	SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
+#define slot_dup_if_not_null(dest, src, sym)			\
+    if (!isNull(GET_SLOT(src, sym)))				\
+	SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
+
+#define class_P(x) CHAR(asChar(getAttrib(x, R_ClassSymbol)))
+#define uplo_P(x)  CHAR(STRING_ELT(GET_SLOT(x, Matrix_uploSym), 0))
+#define Uplo_P(x)  (R_has_slot(x, Matrix_uploSym) ? uplo_P(x) : " ")
+#define diag_P(x)  CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0))
+#define Diag_P(x)  (R_has_slot(x, Matrix_diagSym) ? diag_P(x) : " ")
+
 #define imax2(x, y) ((x < y) ? y : x)
 #define imin2(x, y) ((x < y) ? x : y)
 
-SEXP triangularMatrix_validate(SEXP obj);
-SEXP symmetricMatrix_validate(SEXP obj);
-SEXP packedMatrix_validate(SEXP obj);
-SEXP dense_nonpacked_validate(SEXP obj);
-SEXP dim_validate(SEXP Dim, const char* name);
-SEXP Dim_validate(SEXP obj, SEXP name);
-SEXP dimNames_validate(SEXP obj);
-SEXP dimNames_validate__(SEXP dmNms, int dims[], const char* obj_name);
-
-
-// La_norm_type() & La_rcond_type()  have been in R_ext/Lapack.h
-//  but have still not been available to package writers ...
-char La_norm_type (const char *typstr);
-char La_rcond_type(const char *typstr);
+/* Zero an array, but note Memzero() which might be FASTER 
+   and uses R_SIZE_T (== size_t for C)
+*/
+#define AZERO3(x, n, itype)						\
+    {itype _I_, _SZ_ = (n); for (_I_ = 0; _I_ < _SZ_; _I_++) (x)[_I_] = 0;}
+#define AZERO(x, n)  AZERO3(x, n, R_xlen_t)
+#define AZEROs(x, n) AZERO3(x, n, size_t)
 
 /* enum constants from cblas.h and some short forms */
 enum CBLAS_ORDER {CblasRowMajor=101, CblasColMajor=102};
@@ -114,6 +127,57 @@ enum CBLAS_SIDE {CblasLeft=141, CblasRight=142};
 #define UNT CblasUnit
 #define LFT CblasLeft
 #define RGT CblasRight
+
+enum dense_enum { ddense, ldense, ndense };
+
+/* Define this to be "Cholmod compatible" to some degree */
+enum x_slot_kind {
+    x_unknown = -2, /* NA */
+    x_pattern = -1, /* n */
+    x_double  = 0,  /* d */
+    x_logical = 1,  /* l */
+    x_integer = 2,  /* i */
+    x_complex = 3}; /* z */
+/* FIXME: use 'x_slot_kind' instead of 'int' 
+   everywhere 'Real_(KIND2?|kind_?)' is used
+*/
+
+#define Real_kind_(_x_)							\
+    (isReal(_x_) ? x_double : (isLogical(_x_) ? x_logical : x_pattern))
+
+/* Requires 'x' slot, i.e., not for "..nMatrix"
+   FIXME? via R_has_slot(obj, name)
+*/
+#define Real_kind(_x_)				\
+    (Real_kind_(GET_SLOT(_x_, Matrix_xSym)))
+    
+/* Should also work for "matrix" matrices : */
+#define Real_KIND(_x_)						\
+    (IS_S4_OBJECT(_x_) ? Real_kind(_x_) : Real_kind_(_x_))
+    
+/* This one gives 'x_double' also for integer "matrix" :*/
+#define Real_KIND2(_x_)						\
+    (IS_S4_OBJECT(_x_) ? Real_kind(_x_) :			\
+     (isLogical(_x_) ? x_logical : x_double))
+    
+#define DECLARE_AND_GET_X_SLOT(__C_TYPE, __SEXP)	\
+    __C_TYPE *xx = __SEXP(GET_SLOT(x, Matrix_xSym))
+
+
+SEXP triangularMatrix_validate(SEXP obj);
+SEXP symmetricMatrix_validate(SEXP obj);
+SEXP packedMatrix_validate(SEXP obj);
+SEXP dense_nonpacked_validate(SEXP obj);
+SEXP dim_validate(SEXP Dim, const char* name);
+SEXP Dim_validate(SEXP obj, SEXP name);
+SEXP dimNames_validate(SEXP obj);
+SEXP dimNames_validate__(SEXP dmNms, int dims[], const char* obj_name);
+
+
+// La_norm_type() & La_rcond_type()  have been in R_ext/Lapack.h
+//  but have still not been available to package writers ...
+char La_norm_type (const char *typstr);
+char La_rcond_type(const char *typstr);
 
 #if 0 /* unused */
 double get_double_by_name(SEXP obj, char *nm);
@@ -171,28 +235,6 @@ FULL_TO_PACKED(double);
 FULL_TO_PACKED(int);
 #undef FULL_TO_PACKED
 
-
-extern	 /* stored pointers to symbols initialized in R_init_Matrix */
-#include "Syms.h"
-
-/* zero an array --- but note   Memzero() which might be FASTER and uses R_SIZE_T (== size_t for C) */
-#define AZERO3(x, n, itype) {itype _I_, _SZ_ = (n); for(_I_ = 0; _I_ < _SZ_; _I_++) (x)[_I_] = 0;}
-#define AZERO(x, n)  AZERO3(x, n, R_xlen_t)
-#define AZEROs(x, n) AZERO3(x, n, size_t)
-
-/* duplicate the slot with name given by sym from src to dest */
-
-#define slot_dup(dest, src, sym)  SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
-
-/* is not yet used: */
-#define slot_nonNull_dup(dest, src, sym)			\
-    if(GET_SLOT(src, sym) != R_NilValue)			\
-	SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
-
-#define slot_dup_if_has(dest, src, sym)				\
-    if(R_has_slot(src, sym))					\
-	SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
-
 static R_INLINE
 void SET_DimNames(SEXP dest, SEXP src) {
     SEXP dn = GET_SLOT(src, Matrix_DimNamesSym);
@@ -206,51 +248,6 @@ void symmDN(SEXP dn, int J);
 SEXP R_symmDN(SEXP dn);
 SEXP GET_symmetrized_DimNames(SEXP x);
 void SET_symmetrized_DimNames(SEXP dest, SEXP src);
-
-
-#define uplo_P(_x_) CHAR(STRING_ELT(GET_SLOT(_x_, Matrix_uploSym), 0))
-#define diag_P(_x_) CHAR(STRING_ELT(GET_SLOT(_x_, Matrix_diagSym), 0))
-#define Diag_P(_x_) (R_has_slot(_x_, Matrix_diagSym) ?			\
-		     CHAR(STRING_ELT(GET_SLOT(_x_, Matrix_diagSym), 0)) : " ")
-#define class_P(_x_) CHAR(asChar(getAttrib(_x_, R_ClassSymbol)))
-
-
-enum dense_enum { ddense, ldense, ndense };
-
-/* Define this to be "Cholmod compatible" to some degree */
-enum x_slot_kind {
-    x_unknown = -2, /* NA */
-    x_pattern = -1, /* n */
-    x_double  = 0,  /* d */
-    x_logical = 1,  /* l */
-    x_integer = 2,  /* i */
-    x_complex = 3}; /* z */
-/* FIXME: use 'x_slot_kind' instead of 'int' 
-   everywhere 'Real_(KIND2?|kind_?)' is used
-*/
-
-#define Real_kind_(_x_)							\
-    (isReal(_x_) ? x_double : (isLogical(_x_) ? x_logical : x_pattern))
-
-/* Requires 'x' slot, i.e., not for "..nMatrix"
-   FIXME? via R_has_slot(obj, name)
-*/
-#define Real_kind(_x_)				\
-    (Real_kind_(GET_SLOT(_x_, Matrix_xSym)))
-    
-/* Should also work for "matrix" matrices : */
-#define Real_KIND(_x_)						\
-    (IS_S4_OBJECT(_x_) ? Real_kind(_x_) : Real_kind_(_x_))
-    
-/* This one gives 'x_double' also for integer "matrix" :*/
-#define Real_KIND2(_x_)						\
-    (IS_S4_OBJECT(_x_) ? Real_kind(_x_) :			\
-     (isLogical(_x_) ? x_logical : x_double))
-
-
-#define DECLARE_AND_GET_X_SLOT(__C_TYPE, __SEXP)	\
-    __C_TYPE *xx = __SEXP(GET_SLOT(x, Matrix_xSym))
-
 
 /**
  * Check for valid length of a packed triangular array and return the
