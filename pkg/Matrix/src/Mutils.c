@@ -264,9 +264,6 @@ void make_d_matrix_symmetric(double *to, SEXP from)
 void make_i_matrix_symmetric(int *to, SEXP from)
     MAKE_SYMMETRIC_BODY(to, from)
 
-
-#define Matrix_Error_Bufsiz    4096
-
 /**
  * Check validity of 1-letter string from a set of possible values
  * (typically used in  S4 validity method)
@@ -281,8 +278,10 @@ SEXP check_scalar_string(SEXP sP, char *vals, char *nm)
 {
     SEXP val = ScalarLogical(1);
     char *buf;
-    /* only allocate when needed: in good case, none is needed */
-#define SPRINTF buf = Alloca(Matrix_Error_Bufsiz, char); R_CheckStack(); sprintf
+    
+    /* Allocate only when needed: in valid case, it is _not_ needed */
+#define SPRINTF								\
+    buf = Alloca(Matrix_Error_Buf_Size, char); R_CheckStack(); sprintf
 
     if (length(sP) != 1) {
 	SPRINTF(buf, _("'%s' slot must have length 1"), nm);
@@ -305,34 +304,28 @@ SEXP check_scalar_string(SEXP sP, char *vals, char *nm)
 #undef SPRINTF
 }
 
-#if 0 /* unused */
-/* FIXME? Something like this should be part of the R API ?
- *        But then, R has the more general  R_compute_identical()
- * in src/main/identical.c: Rboolean R_compute_identical(SEXP x, SEXP y);
+/* That both 's1' and 's2' are STRSXP should be checked by caller 
+   ... see 'Dimnames_validate()' above (currently the only use case)
 */
 Rboolean equal_string_vectors(SEXP s1, SEXP s2)
 {
-    Rboolean n1 = isNull(s1), n2 = isNull(s2);
-    if (n1 || n2) // if one is NULL : "equal" if both are
-	return (n1 == n2) ? TRUE : FALSE;
-    else if (TYPEOF(s1) != STRSXP || TYPEOF(s2) != STRSXP) {
-	error(_("'s1' and 's2' must be \"character\" vectors"));
-	return FALSE; /* -Wall */
-    } else {
-	int n = LENGTH(s1), i;
-	if (n != LENGTH(s2))
-	    return FALSE;
-	for(i = 0; i < n; i++) {
-	    /* note that compute_identical() code for STRSXP
-	       is careful about NA's which we don't need */
-	    if(strcmp(CHAR(STRING_ELT(s1, i)),
-		      CHAR(STRING_ELT(s2, i))))
-		return FALSE;
-	}
-	return TRUE; /* they *are* equal */
+    int n = LENGTH(s1);
+    if (LENGTH(s2) != n) {
+	return FALSE;
     }
+    for (int i = 0; i < n; ++i) {
+	/* Note that 'R_compute_identical()' in src/main/identical.c
+	   is careful to distinguish between NA_STRING and "NA" in STRSXP, 
+	   but we need not be here ...
+	   
+	   MJ: Why not?
+	*/
+	if (strcmp(CHAR(STRING_ELT(s1, i)), CHAR(STRING_ELT(s2, i)))) {
+	    return FALSE;
+	}
+    }
+    return TRUE;
 }
-#endif /* unused */
 
 SEXP dense_nonpacked_validate(SEXP obj)
 {
@@ -342,87 +335,172 @@ SEXP dense_nonpacked_validate(SEXP obj)
     return ScalarLogical(1);
 }
 
-SEXP dim_validate(SEXP Dim, const char* name) {
-    if (length(Dim) != 2)
-	return mkString(_("Dim slot must have length 2"));
-    /* if (TYPEOF(Dim) != INTSXP && TYPEOF(Dim) != REALSXP) */
-    /* 	return mkString(_("Dim slot is not numeric")); */
-    if (TYPEOF(Dim) != INTSXP)
-	// TODO?: coerce REALSXP to INTSXP in the "double" case ???
-    	return mkString(_("Dim slot is not integer"));
-    int
-	m = INTEGER(Dim)[0],
-	n = INTEGER(Dim)[1];
+/**
+ * @brief Check that `Dim` is a length-2, non-negative integer vector.
+ * 
+ * Called from `R_Dim_validate()`, but available to other routines.
+ *
+ * @param dim A `SEXP`, typically the `Dim` slot of a `Matrix`.
+ * @param square An `Rboolean`. Require `dim[1] == dim[2]`?
+ * @param domain Domain for message translation.
+ *
+ * @return A `SEXP`, either `TRUE` (indicating success)
+ *     or a length-1 `STRSXP` containing an error message.
+ */
+SEXP Dim_validate(SEXP dim, Rboolean square, const char* domain) {
+    /* TODO? coerce from REALSXP to INTSXP?
+       // if (TYPEOF(dim) != INTSXP && TYPEOF(dim) != REALSXP)
+       //     return mkString(_("'Dim' slot is not numeric"));
+       though above is not enough as we must prohibit Dim[i] > INT_MAX
+
+       FIXME? Prohibit inherits(dim, "factor") and return a different
+       error message in that case?
+    */
+    if (TYPEOF(dim) != INTSXP)
+	return mkString(_("'Dim' slot is not of type \"integer\""));
+    if (LENGTH(dim) != 2)
+	return mkString(_("'Dim' slot does not have length 2"));
+    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
     if (m < 0 || n < 0)
-	return mkString(dngettext(name,
-				  "Negative value in Dim",
-				  "Negative values in Dim",
-				  (m*n > 0) ? 2 : 1));
+	return mkString(dngettext(domain,
+				  "'Dim' slot contains negative value",
+				  "'Dim' slot contains negative values",
+				  (m < 0 && n < 0) ? 2 : 1));
+    if (square && m != n)
+	return mkString("Dim[1] != Dim[2] (matrix is not square)");
     return ScalarLogical(1);
 }
-// to be called from R :
-SEXP Dim_validate(SEXP obj, SEXP name) {
-    return dim_validate(GET_SLOT(obj, Matrix_DimSym),
-			CHAR(STRING_ELT(name, 0)));
+
+SEXP R_Dim_validate(SEXP obj, SEXP square, SEXP domain) {
+    return Dim_validate(GET_SLOT(obj, Matrix_DimSym),
+			asLogical(square) ? TRUE : FALSE,
+			CHAR(asChar(domain)));
 }
 
 /**
- * Validate dimnames (the @Dim slot typically), assuming
- * that 'dims' is already checked.
+ * @brief Validate `Dimnames` assuming that `Dim` is already checked.
+ * 
+ * Called from `R_DimNames_validate()`, but available to other routines.
  *
- * Utility, called from  dimNames_validate(), but available to other routines.
+ * @param dimnames A `SEXP`, typically the `Dimnames` slot of a `Matrix`.
+ * @param pdim A pointer to a length-2, non-negative `int` array, 
+ *     typically from the `Dim` slot of a `Matrix`.
+ * @param symmetric An `Rboolean`. Require symmetry when both `rownames`
+ *     and `colnames` are non-`NULL`?
  *
- * @param dmNms an R object should be valid `dimnames`
- * @param dims  an integer vector of length 2 (must have been checked by caller!).
-
- * @return a SEXP, either TRUE (= success) or an error message string ("character")
+ * @return A `SEXP`, either `TRUE` (indicating success)
+ *     or a length-1 `STRSXP` containing an error message.
  */
-SEXP dimNames_validate__(SEXP dmNms, int dims[], const char* obj_name)
+SEXP DimNames_validate(SEXP dimnames, int pdim[], Rboolean symmetric)
 {
-    char buf[99];
-    if(!isNewList(dmNms)) {
-	sprintf(buf, _("%s is not a list"), obj_name);
+    char *buf;
+
+    /* Allocate only when needed: in valid case, it is _not_ needed */
+#define SPRINTF								\
+    buf = Alloca(Matrix_Error_Buf_Size, char); R_CheckStack(); sprintf
+
+    if (TYPEOF(dimnames) != VECSXP) {
+	SPRINTF(buf, _("'Dimnames' slot is not a list"));
 	return mkString(buf);
     }
-    if(length(dmNms) != 2) {
-	sprintf(buf, _("%s is a list, but not of length 2"), obj_name);
+    if (LENGTH(dimnames) != 2) {
+	SPRINTF(buf, _("'Dimnames' slot does not have length 2"));
 	return mkString(buf);
     }
-    for(int j=0; j < 2; j++) { // x@Dimnames[j] must be NULL or character(length(x@Dim[j]))
-	if(!isNull(VECTOR_ELT(dmNms, j))) {
-	    if(TYPEOF(VECTOR_ELT(dmNms, j)) != STRSXP) {
-		sprintf(buf, _("Dimnames[%d] is not a character vector"), j+1);
+    SEXP s;
+    int nfull = 0;
+    for (int j = 0; j < 2; ++j) {
+	/* Behave as 'do_matrix()' from src/main/array.c:
+	   Dimnames[[j]] must be NULL or _coercible to_ character
+	   of length Dim[j] or 0 ... see 'R_Dimnames_fixup()' below
+	*/
+	s = VECTOR_ELT(dimnames, j);
+	if (!isNull(s)) {
+	    if (!isVector(s)) {
+		SPRINTF(buf, _("Dimnames[[%d]] is not NULL or a vector"), j+1);
 		return mkString(buf);
 	    }
-	    if(LENGTH(VECTOR_ELT(dmNms, j)) != 0 && // character(0) allowed here
-	       LENGTH(VECTOR_ELT(dmNms, j)) != dims[j]) {
-		sprintf(buf, _("length(Dimnames[%d]) differs from Dim[%d] which is %d"),
-			j+1, j+1, dims[j]);
-		return mkString(buf);
+	    if (LENGTH(s) != pdim[j]) {
+		if (LENGTH(s) != 0) {
+		    SPRINTF(buf, _("length of Dimnames[[%d]] (%d) is not equal to Dim[%d] (%d)"), j+1, LENGTH(s), j+1, pdim[j]);
+		    return mkString(buf);
+		}
+	    } else {
+		++nfull;
 	    }
 	}
     }
+    /* symmetric == FALSE _always_ for now, though 'symmetricMatrix_validate'
+       may call with symmetric == TRUE at some point in the future ...
+    */
+    if (symmetric && nfull == 2) {
+	SEXP rn = VECTOR_ELT(dimnames, 0), cn = VECTOR_ELT(dimnames, 1);
+
+#define ANY_TO_STRING(x)					\
+	(isString(x)						\
+	 ? x							\
+	 : (inherits(x, "factor")				\
+	    ? asCharacterFactor(x)				\
+	    : coerceVector(x, STRSXP)))
+	    
+	if (!equal_string_vectors(ANY_TO_STRING(rn), ANY_TO_STRING(cn))) {
+	    SPRINTF(buf, _("Dimnames[[1]] differs from Dimnames[[2]]"));
+	    return mkString(buf);
+	}
+    }
+
+#undef ANY_TO_STRING
+#undef SPRINTF
+
     return ScalarLogical(1);
 }
 
-
-/**
- * Check R (Matrix-like) object: must have @Dim and @Dimnames.
- * Assume 'Dim' is already checked.
- * (typically used in  S4 validity method)
- *
- * @param obj an R object (typically inheriting from `Matrix`)
- *
- * @return a SEXP, either TRUE (= success) or an error message string ("character")
- */
-SEXP dimNames_validate(SEXP obj)
+SEXP R_DimNames_validate(SEXP obj, SEXP symmetric)
 {
-    return dimNames_validate__(/* dmNms = */ GET_SLOT(obj, Matrix_DimNamesSym),
-			       /* dims =  */ INTEGER(GET_SLOT(obj, Matrix_DimSym)),
-			       "Dimnames slot");
+    return DimNames_validate(GET_SLOT(obj, Matrix_DimNamesSym),
+			     INTEGER(GET_SLOT(obj, Matrix_DimSym)),
+			     asLogical(symmetric) ? TRUE : FALSE);
 }
 
-
+SEXP R_DimNames_fixup(SEXP dimnames)
+{
+    /* Behave as 'do_matrix()' from src/main/array.c ...
+       and ultimately as 'dimnamesgets1()' from src/main/attrib.c
+    */
+    SEXP s;
+    int i;
+    Rboolean do_fixup = FALSE;
+    for (i = 0; i < 2; ++i) {
+	s = VECTOR_ELT(dimnames, i);
+	if (!isNull(s) && (LENGTH(s) == 0 || !isString(s))) {
+	    do_fixup = TRUE;
+	    break;
+	}
+    }
+    if (do_fixup) {
+	PROTECT(dimnames = duplicate(dimnames));
+	for (i = 0; i < 2; ++i) {
+	    s = VECTOR_ELT(dimnames, i);
+	    if (!isNull(s)) {
+		if (LENGTH(s) == 0) {
+		    SET_VECTOR_ELT(dimnames, i, R_NilValue);
+		} else if (!isString(s)) {
+		    if (inherits(s, "factor")) {
+			SET_VECTOR_ELT(dimnames, i, asCharacterFactor(s));
+		    } else {
+			PROTECT(s = coerceVector(s, STRSXP));
+			SET_ATTRIB(s, R_NilValue);
+			SET_OBJECT(s, 0);
+			SET_VECTOR_ELT(dimnames, i, s);
+			UNPROTECT(1);
+		    }
+		}
+	    }
+	}
+	UNPROTECT(1);
+    }
+    return dimnames;
+}
 
 #define PACKED_TO_FULL(TYPE)					\
 TYPE *packed_to_full_ ## TYPE(TYPE *dest, const TYPE *src,	\

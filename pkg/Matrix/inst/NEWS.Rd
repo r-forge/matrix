@@ -12,25 +12,36 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-04-01 r3458)}{
+\section{Changes in version 1.4-2 (2022-04-01 r3459)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
       \code{dimnames(<matrix>)} now goes through C utility \code{symmDN}
-      instead of the so-named R utility used previously, resolving some
-      earlier inconsistencies.
+      in most places, resolving some earlier inconsistencies.
+      
+      \item Validation of \code{<Matrix>@Dim} now looks at type
+      \emph{before} length, avoiding misleading error messages.
+
+      \item Validation of \code{<Matrix>@Dimnames} avoids
+      \code{isNewList}, which had allowed an error message
+      suggesting that \code{NULL} is a list.
     }
   }
   \subsection{New Features}{
     \itemize{
       \item \code{KhatriRao()} gets new \code{sparseY = TRUE} option and also
       works for more \code{Matrix} classes.
+
+      \item Validation of \code{<Matrix>@Dimnames[[i]]} now tolerates
+      vector types other than character, which are coerced to character
+      in C via the new \code{R_DimNames_fixup()}, for greater
+      consistency with base \code{matrix()}.
     }
   }
   \subsection{Misc}{
     \itemize{
-      \item \code{AZERO()} gets a third argument specifying a zero
-      constant (0 for \code{int} arrays, 0.0 for \code{double} arrays).
+      \item \code{AZERO()} and friends gain an argument specifying
+      a zero constant (0 for \code{int} arrays, 0.0 for \code{double} arrays).
     }
   }
 }

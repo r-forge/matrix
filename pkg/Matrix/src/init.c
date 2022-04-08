@@ -104,8 +104,9 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dense_to_symmetric, 3),
     CALLDEF(ddense_symmpart, 1),
     CALLDEF(ddense_skewpart, 1),
-    CALLDEF(dimNames_validate, 1),
-    CALLDEF(Dim_validate, 2),
+    CALLDEF(R_Dim_validate, 3),
+    CALLDEF(R_DimNames_validate, 2),
+    CALLDEF(R_DimNames_fixup, 1),
     CALLDEF(dMatrix_validate, 1),
 
     CALLDEF(dgCMatrix_LU, 5),

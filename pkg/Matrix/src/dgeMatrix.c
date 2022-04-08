@@ -9,7 +9,7 @@ SEXP dMatrix_validate(SEXP obj)
     if (!isReal(x))
 	return mkString(_("x slot must be numeric \"double\""));
     SEXP val;
-    if (isString(val = dim_validate(Dim, "Matrix")))
+    if (isString(val = Dim_validate(Dim, FALSE, "Matrix")))
 	return val;
     return ScalarLogical(1);
 }
@@ -17,7 +17,7 @@ SEXP dMatrix_validate(SEXP obj)
 SEXP dgeMatrix_validate(SEXP obj)
 {
     SEXP val;
-    if (isString(val = dim_validate(GET_SLOT(obj, Matrix_DimSym), "dgeMatrix")))
+    if (isString(val = Dim_validate(GET_SLOT(obj, Matrix_DimSym), FALSE, "dgeMatrix")))
 	return(val);
     if (isString(val = dense_nonpacked_validate(obj)))
 	return(val);

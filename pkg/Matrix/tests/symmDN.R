@@ -116,4 +116,11 @@ for (dn in ldn) {
     }
 }
 
+## r3459: allowing initialization with typeof(Dimnames[[i]]) != "character"
+## ... nothing to do with symmetry, but here for now ...
+stopifnot(identical(new("dgeMatrix", x = as.double(1:4), Dim = c(2L, 2L),
+                        Dimnames = list(1:2, as.factor(3:4))),
+                    new("dgeMatrix", x = as.double(1:4), Dim = c(2L, 2L),
+                        Dimnames = list(c("1", "2"), c("3", "4")))))
+
 cat("Time elapsed:", proc.time(), "\n") # "stats"
