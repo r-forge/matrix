@@ -71,6 +71,8 @@ typedef int R_xlen_t;
 # endif
 #endif
 
+#define Matrix_Error_Buf_Size 4096
+
 /* Previously from <Rdefines.h> : */
 #ifndef GET_SLOT
 # define GET_SLOT(x, what)        R_do_slot(x, what)
@@ -167,19 +169,16 @@ enum x_slot_kind {
 #define DECLARE_AND_GET_X_SLOT(__C_TYPE, __SEXP)	\
     __C_TYPE *xx = __SEXP(GET_SLOT(x, Matrix_xSym))
 
-
 SEXP triangularMatrix_validate(SEXP obj);
 SEXP symmetricMatrix_validate(SEXP obj);
 SEXP packedMatrix_validate(SEXP obj);
 SEXP dense_nonpacked_validate(SEXP obj);
-SEXP dim_validate(SEXP Dim, const char* name);
-SEXP Dim_validate(SEXP obj, SEXP name);
-SEXP dimNames_validate(SEXP obj);
-SEXP dimNames_validate__(SEXP dmNms, int dims[], const char* obj_name);
+SEXP Dim_validate(SEXP Dim, Rboolean square, const char* domain);
+SEXP R_Dim_validate(SEXP obj, SEXP square, SEXP domain);
+SEXP DimNames_validate(SEXP dimnames, int pdim[], Rboolean symmetric);
+SEXP R_DimNames_validate(SEXP obj, SEXP symmetric);
+SEXP R_DimNames_fixup(SEXP dimnames);
 
-
-// La_norm_type() & La_rcond_type()  have been in R_ext/Lapack.h
-//  but have still not been available to package writers ...
 char La_norm_type (const char *typstr);
 char La_rcond_type(const char *typstr);
 

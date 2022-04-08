@@ -2,8 +2,10 @@
 ## LOGIC setClass("logic", contains = "raw")
 
 ##' To be used in initialize method or other Matrix constructors
-##'
-##' TODO: via .Call(..)
+.fixupDimnames <- function(dn) .Call(R_DimNames_fixup, dn)
+
+## MJ: no longer
+if (FALSE) {
 .fixupDimnames <- function(dnms) {
     N.N <- list(NULL, NULL)
     if(is.null(dnms) || identical(dnms, N.N)) return(N.N)
@@ -16,6 +18,7 @@
 	dnms[i0] <- lapply(dnms[i0], as.character)
     dnms
 }
+}
 
 
 ## ------------- Virtual Classes ----------------------------------------
@@ -25,13 +28,13 @@ setClass("Matrix", contains = "VIRTUAL",
 	 slots = c(Dim = "integer", Dimnames = "list"),
 	 prototype = prototype(Dim = integer(2), Dimnames = list(NULL,NULL)),
 	 validity = function(object) {
-	     if(!isTRUE(r <- .Call(Dim_validate, object, "Matrix")))
+	     if(!isTRUE(r <- .Call(R_Dim_validate, object, FALSE, "Matrix")))
                  r
-             else .Call(dimNames_validate, object)
+             else .Call(R_DimNames_validate, object, FALSE)
 	 })
 
 if(FALSE)## Allowing 'Dimnames' to define 'Dim' --> would require changes in
-    ##  ../src/Mutils.c dimNames_validate() and how it is used in validity above
+    ##  ../src/Mutils.c DimNames_validate() and how it is used in validity above
 setMethod("initialize", "Matrix", function(.Object, ...)
     {
         .Object <- callNextMethod()
