@@ -215,7 +215,7 @@ SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
 			&n FCONE FCONE FCONE FCONE);
     }
     if(matching_uplo) {
-	make_d_matrix_triangular(valx, tr ? b : a); /* set "other triangle" to 0 */
+	ddense_unpacked_make_triangular(valx, tr ? b : a); /* set "other triangle" to 0 */
 	if(*diag_a_ch == 'U' && uDiag_b) /* result remains uni-diagonal */
 	    SET_SLOT(val, Matrix_diagSym, duplicate(diag_a));
     }
@@ -229,9 +229,10 @@ SEXP dtrMatrix_as_matrix(SEXP from, SEXP keep_dimnames)
     int *Dim = INTEGER(GET_SLOT(from, Matrix_DimSym));
     int m = Dim[0], n = Dim[1];
     SEXP val = PROTECT(allocMatrix(REALSXP, m, n));
-    make_d_matrix_triangular(Memcpy(REAL(val),
-				    REAL(GET_SLOT(from, Matrix_xSym)), m * n),
-			     from);
+    ddense_unpacked_make_triangular(Memcpy(REAL(val),
+					   REAL(GET_SLOT(from, Matrix_xSym)),
+					   m * n),
+				    from);
     if(asLogical(keep_dimnames))
 	setAttrib(val, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
     UNPROTECT(1);
@@ -318,11 +319,12 @@ SEXP dtrMatrix_as_dtpMatrix(SEXP from)
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
     SET_SLOT(val, Matrix_diagSym, duplicate(diag));
     SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
-    full_to_packed_double(
+    ddense_pack(
 	REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, (n*(n+1))/2)),
-	REAL(GET_SLOT(from, Matrix_xSym)), n,
+	REAL(GET_SLOT(from, Matrix_xSym)),
+	n,
 	*CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW,
-	*CHAR(STRING_ELT(diag, 0)) == 'U' ? UNT : NUN);
+	*CHAR(STRING_ELT(diag, 0)) == 'N' ? NUN : UNT);
     SET_SLOT(val, Matrix_DimNamesSym,
 	     duplicate(GET_SLOT(from, Matrix_DimNamesSym)));
     UNPROTECT(1);

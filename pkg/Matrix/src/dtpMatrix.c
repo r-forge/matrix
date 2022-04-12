@@ -193,9 +193,11 @@ SEXP dtpMatrix_as_dtrMatrix(SEXP from)
     SET_SLOT(val, Matrix_DimNamesSym, duplicate(dmnP));
     SET_SLOT(val, Matrix_diagSym, duplicate(diag));
     SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
-    packed_to_full_double(REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, n*n)),
-			  REAL(GET_SLOT(from, Matrix_xSym)), n,
-			  *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW);
+    ddense_unpack(REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, n*n)),
+		  REAL(GET_SLOT(from, Matrix_xSym)),
+		  n,
+		  *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW,
+		  *CHAR(STRING_ELT(diag, 0)) == 'N' ? NUN : UNT);
     SET_SLOT(val, Matrix_DimNamesSym,
 	     duplicate(GET_SLOT(from, Matrix_DimNamesSym)));
     UNPROTECT(1);

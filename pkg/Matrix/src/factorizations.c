@@ -85,7 +85,7 @@ SEXP LU_expand(SEXP x)
 	double *Lx = REAL(ALLOC_SLOT(L, Matrix_xSym, REALSXP, m2));
 	int *dL = INTEGER(ALLOC_SLOT(L, Matrix_DimSym, INTSXP, 2));
 	dL[0] = dL[1] = m;
-	// fill lower-diagonal (non-{0,1}) part -- remainder by make_d_matrix*() below:
+	// fill lower-diagonal (non-{0,1}) part -- remainder by ddense_unpacked_make_*() below:
 	Memcpy(Lx, REAL(lux), m2);
     }
     if(is_sq || !U_is_tri) {
@@ -96,7 +96,7 @@ SEXP LU_expand(SEXP x)
 	       *xx = REAL(lux);
 	int *dU = INTEGER(ALLOC_SLOT(U, Matrix_DimSym, INTSXP, 2));
 	dU[0] = dU[1] = n;
-	/* fill upper-diagonal (non-0) part -- remainder by make_d_matrix*() below:
+	/* fill upper-diagonal (non-0) part -- remainder by ddense_unpacked_make_*() below:
 	 * this is more complicated than in the L case, as the x / lux part we need
 	 * is  *not*  continguous:  Memcpy(Ux, REAL(lux), n * n); -- is  WRONG */
 	for (size_t j = 0; j < n; j++) {
@@ -108,7 +108,7 @@ SEXP LU_expand(SEXP x)
     if(L_is_tri) {
 	SET_SLOT(L, Matrix_uploSym, mkString("L"));
 	SET_SLOT(L, Matrix_diagSym, mkString("U"));
-	make_d_matrix_triangular(REAL(GET_SLOT(L, Matrix_xSym)), L);
+	ddense_unpacked_make_triangular(REAL(GET_SLOT(L, Matrix_xSym)), L);
     } else { // L is "unit-diagonal" trapezoidal -- m > n -- "long"
 	// fill the upper right part with 0  *and* the diagonal with 1
 	double *Lx = REAL(GET_SLOT(L, Matrix_xSym));
@@ -123,7 +123,7 @@ SEXP LU_expand(SEXP x)
     if(U_is_tri) {
 	SET_SLOT(U, Matrix_uploSym, mkString("U"));
 	SET_SLOT(U, Matrix_diagSym, mkString("N"));
-	make_d_matrix_triangular(REAL(GET_SLOT(U, Matrix_xSym)), U);
+	ddense_unpacked_make_triangular(REAL(GET_SLOT(U, Matrix_xSym)), U);
     } else { // U is trapezoidal -- m < n
 	// fill the lower left part with 0
 	double *Ux = REAL(GET_SLOT(U, Matrix_xSym));

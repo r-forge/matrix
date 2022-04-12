@@ -80,9 +80,10 @@ SEXP dsyMatrix_as_matrix(SEXP from, SEXP keep_dimnames)
     SEXP val = PROTECT(allocMatrix(REALSXP, n, n));
     R_xlen_t nsqr = n; nsqr *= n;
 
-    make_d_matrix_symmetric(Memcpy(REAL(val),
-				   REAL(GET_SLOT(from, Matrix_xSym)), nsqr),
-			    from);
+    ddense_unpacked_make_symmetric(Memcpy(REAL(val),
+					  REAL(GET_SLOT(from, Matrix_xSym)),
+					  nsqr),
+				   from);
     if(asLogical(keep_dimnames))
 	setAttrib(val, R_DimNamesSymbol, get_symmetrized_DimNames(from));
     UNPROTECT(1);
@@ -215,10 +216,12 @@ SEXP dsyMatrix_as_dspMatrix(SEXP from)
 
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
     SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
-    full_to_packed_double(
+    ddense_pack(
 	REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, (n*(n+1))/2)),
-	REAL( GET_SLOT(from, Matrix_xSym)), n,
-	*CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW, NUN);
+	REAL( GET_SLOT(from, Matrix_xSym)),
+	n,
+	*CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW,
+	NUN);
     SET_SLOT(val, Matrix_DimNamesSym,
 	     duplicate(GET_SLOT(from, Matrix_DimNamesSym)));
     SET_SLOT(val, Matrix_factorSym,
