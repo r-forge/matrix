@@ -2,24 +2,36 @@
 
 SEXP dpoMatrix_validate(SEXP obj)
 {
-    SEXP val;
-    if (isString(val = dense_nonpacked_validate(obj)))
-	return(val);
-
-    int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
-    R_xlen_t np1 = n + 1;
     double *x = REAL(GET_SLOT(obj, Matrix_xSym));
+    int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
+    R_xlen_t pos = 0, np1 = (R_xlen_t) n + 1;
+    
+    /* Non-negative diagonal elements are necessary but _not_ sufficient */
+    for (int i = 0; i < n; ++i, pos += np1)
+	if (x[pos] < 0)
+	    return mkString(_("'dpoMatrix' is not positive semidefinite"));
+    return ScalarLogical(1);
+}
 
-    /* quick but nondefinitive check on positive definiteness */
-    for (int i = 0; i < n; i++)
-	if (x[i * np1] < 0)
-	    return mkString(_("dpoMatrix is not positive definite"));
+SEXP corMatrix_validate(SEXP obj)
+{
+    int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
+    SEXP sd = GET_SLOT(obj, install("sd"));
+    if (XLENGTH(sd) != n)
+	return mkString(_("length of 'sd' slot is not equal to n=Dim[1]"));
+    double *psd = REAL(sd);
+    for (int i = 0; i < n; ++i) {
+	if (!R_FINITE(psd[i]))
+	    return mkString(_("'sd' slot has nonfinite elements"));
+	if (psd[i] < 0)
+	    return mkString(_("'sd' slot has negative elements"));
+    }
     return ScalarLogical(1);
 }
 
 SEXP dpoMatrix_chol(SEXP x)
 {
-    SEXP val = get_factors(x, "Cholesky"),
+    SEXP val = get_factor(x, "Cholesky"),
 	dimP = GET_SLOT(x, Matrix_DimSym),
 	uploP = GET_SLOT(x, Matrix_uploSym);
     const char *uplo = CHAR(STRING_ELT(uploP, 0));
@@ -48,8 +60,9 @@ SEXP dpoMatrix_chol(SEXP x)
 		error(_("Lapack routine %s returned error code %d"), "dpotrf", info);
 	}
     }
+    set_factor(x, "Cholesky", val);
     UNPROTECT(1);
-    return set_factors(x, val, "Cholesky");
+    return val;
 }
 
 SEXP dpoMatrix_rcond(SEXP obj, SEXP type)

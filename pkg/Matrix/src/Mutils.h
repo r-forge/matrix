@@ -169,15 +169,38 @@ enum x_slot_kind {
 #define DECLARE_AND_GET_X_SLOT(__C_TYPE, __SEXP)	\
     __C_TYPE *xx = __SEXP(GET_SLOT(x, Matrix_xSym))
 
+SEXP Dim_validate(SEXP Dim, const char* domain);
+SEXP DimNames_validate(SEXP dimnames, int pdim[]);
+SEXP string_scalar_validate(SEXP s, char *valid, char *nm);
+
+SEXP Matrix_validate(SEXP obj);
+SEXP compMatrix_validate(SEXP obj);
 SEXP triangularMatrix_validate(SEXP obj);
 SEXP symmetricMatrix_validate(SEXP obj);
+SEXP diagonalMatrix_validate(SEXP obj);
+SEXP unpackedMatrix_validate(SEXP obj);
 SEXP packedMatrix_validate(SEXP obj);
-SEXP dense_nonpacked_validate(SEXP obj);
-SEXP Dim_validate(SEXP Dim, Rboolean square, const char* domain);
-SEXP R_Dim_validate(SEXP obj, SEXP square, SEXP domain);
-SEXP DimNames_validate(SEXP dimnames, int pdim[], Rboolean symmetric);
-SEXP R_DimNames_validate(SEXP obj, SEXP symmetric);
+SEXP dMatrix_validate(SEXP obj);
+SEXP lMatrix_validate(SEXP obj);
+SEXP ndenseMatrix_validate(SEXP obj);
+SEXP iMatrix_validate(SEXP obj);
+SEXP zMatrix_validate(SEXP obj);
+
 SEXP R_DimNames_fixup(SEXP dimnames);
+void symmDN(SEXP dn, int J);
+SEXP R_symmDN(SEXP dn);
+SEXP get_symmetrized_DimNames(SEXP x);
+void set_symmetrized_DimNames(SEXP dest, SEXP src);
+void set_DimNames(SEXP dest, SEXP src);
+
+SEXP get_factor(SEXP obj, char *nm);
+void set_factor(SEXP obj, char *nm, SEXP val);
+SEXP R_set_factor(SEXP obj, SEXP val, SEXP nm, SEXP warn);
+SEXP R_empty_factors(SEXP obj, SEXP warn);
+
+Rboolean equal_string_vectors(SEXP s1, SEXP s2);
+R_xlen_t strmatch(char *nm, SEXP s);
+SEXP append_to_named_list(SEXP x, char *nm, SEXP val);
 
 char La_norm_type (const char *typstr);
 char La_rcond_type(const char *typstr);
@@ -188,10 +211,6 @@ SEXP set_double_by_name(SEXP obj, double val, char *nm);
 #endif /* unused */
 
 SEXP as_det_obj(double val, int log, int sign);
-SEXP get_factors(SEXP obj, char *nm);
-SEXP set_factors(SEXP obj, SEXP val, char *nm);
-SEXP R_set_factors(SEXP obj, SEXP val, SEXP name, SEXP warn);
-SEXP R_empty_factors(SEXP obj, SEXP warn);
 
 #if 0 /* unused */
 SEXP dgCMatrix_set_Dim(SEXP x, int nrow);
@@ -201,11 +220,6 @@ SEXP dgCMatrix_set_Dim(SEXP x, int nrow);
 /* void csc_sort_columns(int ncol, const int p[], int i[], double x[]); */
 /* SEXP csc_check_column_sorting(SEXP A); */
 
-SEXP check_scalar_string(SEXP sP, char *vals, char *nm);
-
-#if 0 /* unused */
-Rboolean equal_string_vectors(SEXP s1, SEXP s2);
-#endif /* unused */
 
 /* MJ: No longer needed ... replacement in ./packedMatrix.c */
 #if 0
@@ -237,20 +251,6 @@ TYPE *full_to_packed_ ## TYPE(TYPE *dest, const TYPE *src, int n,	\
 FULL_TO_PACKED(double);
 FULL_TO_PACKED(int);
 #undef FULL_TO_PACKED
-
-static R_INLINE
-void SET_DimNames(SEXP dest, SEXP src) {
-    SEXP dn = GET_SLOT(src, Matrix_DimNamesSym);
-    // Be fast (do nothing!) for the case where dimnames = list(NULL,NULL) :
-    if (!(isNull(VECTOR_ELT(dn,0)) && isNull(VECTOR_ELT(dn,1))))
-	SET_SLOT(dest, Matrix_DimNamesSym, duplicate(dn));
-}
-
-// code in ./Mutils.c :
-void symmDN(SEXP dn, int J);
-SEXP R_symmDN(SEXP dn);
-SEXP GET_symmetrized_DimNames(SEXP x);
-void SET_symmetrized_DimNames(SEXP dest, SEXP src);
 
 /**
  * Check for valid length of a packed triangular array and return the

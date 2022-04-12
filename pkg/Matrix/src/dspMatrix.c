@@ -1,20 +1,5 @@
 #include "dspMatrix.h"
 
-/* Note:  also used for lspMatrix */
-SEXP dspMatrix_validate(SEXP obj)
-{
-    SEXP val = symmetricMatrix_validate(obj);
-    if(isString(val))
-	return(val);
-    else { /* identical to the test in dtpMatrix_validate() : */
-	int d = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
-	R_xlen_t lx = xlength(GET_SLOT(obj, Matrix_xSym));
-	if(lx * 2 != d*(R_xlen_t)(d+1))
-	    return(mkString(_("Incorrect length of 'x' slot")));
-	return ScalarLogical(1);
-    }
-}
-
 double get_norm_sp(SEXP obj, const char *typstr)
 {
     char typnm[] = {'\0', '\0'};
@@ -170,7 +155,7 @@ SEXP dspMatrix_matrix_mm(SEXP a, SEXP b)
 
 SEXP dspMatrix_trf(SEXP x)
 {
-    SEXP val = get_factors(x, "pBunchKaufman"),
+    SEXP val = get_factor(x, "pBunchKaufman"),
 	dimP = GET_SLOT(x, Matrix_DimSym),
 	uploP = GET_SLOT(x, Matrix_uploSym);
     int *dims = INTEGER(dimP), *perm, info;
@@ -187,7 +172,8 @@ SEXP dspMatrix_trf(SEXP x)
     perm = INTEGER(ALLOC_SLOT(val, Matrix_permSym, INTSXP, n));
     F77_CALL(dsptrf)(uplo, dims, REAL(GET_SLOT(val, Matrix_xSym)), perm, &info FCONE);
     if (info) error(_("Lapack routine %s returned error code %d"), "dsptrf", info);
+    set_factor(x, "pBunchKaufman", val);
     UNPROTECT(1);
-    return set_factors(x, val, "pBunchKaufman");
+    return val;
 }
 

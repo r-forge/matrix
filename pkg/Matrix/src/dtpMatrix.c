@@ -4,21 +4,6 @@
 
 #include "dtpMatrix.h"
 
-SEXP dtpMatrix_validate(SEXP obj)
-{
-    SEXP val = triangularMatrix_validate(obj);
-    if(isString(val))
-	return(val);
-    else {
-	int d = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
-	R_xlen_t lx = xlength(GET_SLOT(obj, Matrix_xSym));
-	/* packed_ncol() [Mutils.h] checks, but gives *error* .. need string: */
-	if(lx * 2 != d*(R_xlen_t)(d+1))
-	    return(mkString(_("Incorrect length of 'x' slot")));
-	return ScalarLogical(1);
-    }
-}
-
 static
 double get_norm(SEXP obj, const char *typstr)
 {

@@ -12,36 +12,71 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-04-01 r3459)}{
+\section{Changes in version 1.4-2 (2022-04-12 r3460)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
       \code{dimnames(<matrix>)} now goes through C utility \code{symmDN}
       in most places, resolving some earlier inconsistencies.
+
+      \item Many more validity methods now correctly operate under the
+      assumption that methods for superclasses have already been called,
+      eliminating many redundant checks.
       
       \item Validation of \code{<Matrix>@Dim} now looks at type
       \emph{before} length, avoiding misleading error messages.
 
-      \item Validation of \code{<Matrix>@Dimnames} avoids
-      \code{isNewList}, which had allowed an error message
-      suggesting that \code{NULL} is a list.
+      \item Validation of \code{<Matrix>@Dimnames} now avoids
+      \code{isNewList}, which had allowed an error message suggesting
+      that \code{NULL} is a list.
     }
   }
   \subsection{New Features}{
     \itemize{
-      \item \code{KhatriRao()} gets new \code{sparseY = TRUE} option and also
-      works for more \code{Matrix} classes.
+      \item \code{KhatriRao()} gets new \code{sparseY = TRUE} option and
+      also works for more \code{Matrix} classes.
+
+      \item New virtual class \code{unpackedMatrix} containing
+      \code{denseMatrix} _without_ \code{packedMatrix}, allowing methods
+      to be defined for \code{.(ge|sy|tr)Matrix} together.
+
+      \item Many more validity methods are now implemented in C,
+      for efficiency, including methods for
+      \code{Matrix}, \code{compMatrix}, \code{diagonalMatrix},
+      \code{corMatrix}, \code{[liz]Matrix}, and \code{ndenseMatrix}.
+
+      \item \code{dppMatrix_validate()} now behaves as
+      \code{dpoMatrix_validate()} by requiring non-negative diagonal
+      elements.
 
       \item Validation of \code{<Matrix>@Dimnames[[i]]} now tolerates
       vector types other than character, which are coerced to character
       in C via the new \code{R_DimNames_fixup()}, for greater
       consistency with base \code{matrix()}.
+
+      \item Setting a factor on a \code{compMatrix} is now to install
+      the factor itself, not a duplicate, for efficiency and consistency
+      with the semantics of \code{<compMatrix>@factors[[name]] <- value}.
     }
   }
   \subsection{Misc}{
     \itemize{
       \item \code{AZERO()} and friends gain an argument specifying
-      a zero constant (0 for \code{int} arrays, 0.0 for \code{double} arrays).
+      a zero constant (0 for \code{int} arrays, 0.0 for \code{double}
+      arrays).
+
+      \item \code{(R_)?[gs]et_factors()} have been renamed to
+      \code{(R_)?[gs]et_factor()}, as they only ever get and set _one_
+      factor.
+
+      \item The signature of \code{set_factor()} has been changed to
+      match other \code{set*()} functions:
+      to \code{(object,name,value)} from \code{(object,value,name)}.
+
+      \item For clarity, \code{set_factor()} now returns \code{void}
+      and is used like other \code{set*()} functions (i.e., for its
+      side effect).  The R interface is unchanged: \code{R_set_factor()}
+      continues to return the value being set.
     }
   }
 }

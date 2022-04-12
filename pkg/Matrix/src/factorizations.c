@@ -2,19 +2,20 @@
 
 SEXP MatrixFactorization_validate(SEXP obj)
 {
-    return Dim_validate(GET_SLOT(obj, Matrix_DimSym), FALSE,
-			"MatrixFactorization");
+    return Dim_validate(GET_SLOT(obj, Matrix_DimSym), "MatrixFactorization");
 }
 
 SEXP LU_validate(SEXP obj)
 {
+    /* NB: 'Dim' already checked by MatrixFactorization_validate() */
+    
     SEXP x = GET_SLOT(obj, Matrix_xSym);
-    int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym)); /* checked already in MatrixF.._validate() */
-    if (isReal(x))
-	return mkString(_("x slot is not \"double\""));
-    if (XLENGTH(x) != ((double) pdim[0]) * pdim[1])
-	return mkString(_("x slot is not of correct length"));
-    return DimNames_validate(obj, pdim, FALSE);
+    if (!isReal(x))
+	return mkString(_("'x' slot is not of type \"double\""));
+    int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym));
+    if (XLENGTH(x) != pdim[0] * (double) pdim[1])
+	return mkString(_("length of 'x' slot is not prod(Dim)"));
+    return DimNames_validate(obj, pdim);
 }
 
 SEXP BunchKaufman_validate(SEXP obj)

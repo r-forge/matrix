@@ -4,7 +4,6 @@
 #include "Lapack-etc.h"
 #include "Mutils.h"
 
-void fast_symmetric_DimNames(SEXP dn, SEXP *vec, SEXP *nm);
 SEXP packedMatrix_t(SEXP obj);
 SEXP packedMatrix_diag_get(SEXP obj, SEXP nms);
 SEXP packedMatrix_diag_set(SEXP obj, SEXP val);

@@ -299,7 +299,7 @@ SEXP Csparse_to_matrix(SEXP x, SEXP chk, SEXP symm)
 	cholmod_sparse_to_dense(AS_CHM_SP2(x, asLogical(chk)), &c),
 	1 /*do_free*/,
 	(is_sym
-	 ? GET_symmetrized_DimNames(x)
+	 ? get_symmetrized_DimNames(x)
 	 : GET_SLOT(x, Matrix_DimNamesSym)));
 }
 
@@ -356,7 +356,7 @@ SEXP Csparse_symmetric_to_general(SEXP x)
 	error(_("Nonsymmetric matrix in Csparse_symmetric_to_general"));
     chgx = cholmod_copy(chx, /* stype: */ 0, chx->xtype, &c);
     return chm_sparse_to_SEXP(chgx, 1, 0, Rkind, "",
-			      GET_symmetrized_DimNames(x));
+			      get_symmetrized_DimNames(x));
 }
 
 // Called from R's  forceCspSymmetric() ,  .gC2sym()
@@ -516,9 +516,9 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b, SEXP bool_arith)
 	b_symm = R_check_class_etc(b, valid_sym) >= 0;
     SEXP dn = PROTECT(allocVector(VECSXP, 2));
     SET_VECTOR_ELT(dn, 0,
-		   duplicate(VECTOR_ELT(a_symm ? GET_symmetrized_DimNames(a) : GET_SLOT(a, Matrix_DimNamesSym), 0)));
+		   duplicate(VECTOR_ELT(a_symm ? get_symmetrized_DimNames(a) : GET_SLOT(a, Matrix_DimNamesSym), 0)));
     SET_VECTOR_ELT(dn, 1,
-		   duplicate(VECTOR_ELT(b_symm ? GET_symmetrized_DimNames(b) : GET_SLOT(b, Matrix_DimNamesSym), 1)));
+		   duplicate(VECTOR_ELT(b_symm ? get_symmetrized_DimNames(b) : GET_SLOT(b, Matrix_DimNamesSym), 1)));
     UNPROTECT(nprot);
     return chm_sparse_to_SEXP(chc, 1, uploT, /*Rkind*/0, diag, dn);
 }

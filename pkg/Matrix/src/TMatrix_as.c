@@ -15,9 +15,9 @@
 									\
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));			\
     if(_SYMM_)								\
-	SET_symmetrized_DimNames(val, x);				\
+	set_symmetrized_DimNames(val, x);				\
     else								\
-	SET_DimNames(val, x);						\
+	set_DimNames(val, x);						\
     slot_dup(val, x, Matrix_uploSym)
 
 #define Matrix_T_as_DENSE_FINISH(_X_k_, _ZERO_)	\
@@ -102,7 +102,7 @@ SEXP ltTMatrix_as_ltrMatrix(SEXP x)
     MAYBE_ALLOC_val_x_SLOT(_SEXP_, _SEXPTYPE_);				\
 									\
     slot_dup(val, x, Matrix_DimSym);					\
-    SET_symmetrized_DimNames(val, x);					\
+    set_symmetrized_DimNames(val, x);					\
     /* copy the upper/lower triangle (including the diagonal)*/		\
     /* "at end" ([nv]): */						\
     nv = nnz - n0d;							\

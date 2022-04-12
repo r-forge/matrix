@@ -1505,7 +1505,7 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE)
 ## Caches 'value' in the 'factors' slot of 'x', i.e. modifies 'x', and returns 'value'
 ## WARNING:: for updating the '@ factors' slot of a function *argument* [CARE!]
 .set.factors <- function(x, name, value, warn.no.slot=FALSE)
-    .Call(R_set_factors, x, value, name, warn.no.slot)
+    .Call(R_set_factor, x, name, value, warn.no.slot)
 
 ##' Change function *argument* 'x', emptying its 'factors' slot; USE with CARE! __ DANGER ! __
 ##' @return TRUE iff 'x' is modified, FALSE if not.
