@@ -99,16 +99,11 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(compressed_non_0_ij, 2),
     CALLDEF(dense_to_Csparse, 1),
     CALLDEF(nz_pattern_to_Csparse, 2),
-    CALLDEF(dense_nonpacked_validate, 1),
     CALLDEF(dense_band, 3),
     CALLDEF(dense_to_symmetric, 3),
     CALLDEF(ddense_symmpart, 1),
     CALLDEF(ddense_skewpart, 1),
-    CALLDEF(R_Dim_validate, 3),
-    CALLDEF(R_DimNames_validate, 2),
-    CALLDEF(R_DimNames_fixup, 1),
-    CALLDEF(dMatrix_validate, 1),
-
+    
     CALLDEF(dgCMatrix_LU, 5),
     CALLDEF(dgCMatrix_QR, 3),
 #ifdef Matrix_with_SPQR
@@ -149,13 +144,13 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dgeMatrix_norm, 2),
     CALLDEF(dgeMatrix_rcond, 2),
     CALLDEF(dgeMatrix_solve, 1),
-    CALLDEF(dgeMatrix_validate, 1),
     CALLDEF(dpoMatrix_chol, 1),
     CALLDEF(dpoMatrix_dgeMatrix_solve, 2),
     CALLDEF(dpoMatrix_matrix_solve, 2),
     CALLDEF(dpoMatrix_rcond, 2),
     CALLDEF(dpoMatrix_solve, 1),
     CALLDEF(dpoMatrix_validate, 1),
+    CALLDEF(corMatrix_validate, 1),
     CALLDEF(dppMatrix_chol, 1),
     CALLDEF(dppMatrix_matrix_solve, 2),
     CALLDEF(dppMatrix_rcond, 2),
@@ -190,8 +185,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dspMatrix_rcond, 2),
     CALLDEF(dspMatrix_solve, 1),
     CALLDEF(dspMatrix_trf, 1),
-    CALLDEF(dspMatrix_validate, 1),
-
+    
 /* MJ: No longer needed ... replacement in ./packedMatrix.c */
 #if 0
     CALLDEF(dspMatrix_getDiag, 1),
@@ -222,7 +216,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dtpMatrix_norm, 2),
     CALLDEF(dtpMatrix_rcond, 2),
     CALLDEF(dtpMatrix_solve, 1),
-    CALLDEF(dtpMatrix_validate, 1),
     CALLDEF(dtrMatrix_as_dtpMatrix, 1),
     CALLDEF(dtrMatrix_as_matrix, 2),
     CALLDEF(dtrMatrix_matrix_mm,    4),
@@ -266,9 +259,21 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(sparseQR_qty, 4),
     CALLDEF(sparseQR_coef, 2),
     CALLDEF(sparseQR_resid_fitted, 3),
+
+    CALLDEF(Matrix_validate, 1),
+    CALLDEF(compMatrix_validate, 1),
     CALLDEF(triangularMatrix_validate, 1),
     CALLDEF(symmetricMatrix_validate, 1),
+    CALLDEF(diagonalMatrix_validate, 1),
+    CALLDEF(unpackedMatrix_validate, 1),
     CALLDEF(packedMatrix_validate, 1),
+    CALLDEF(dMatrix_validate, 1),
+    CALLDEF(lMatrix_validate, 1),
+    CALLDEF(ndenseMatrix_validate, 1),
+    CALLDEF(iMatrix_validate, 1),
+    CALLDEF(zMatrix_validate, 1),
+    
+    CALLDEF(R_DimNames_fixup, 1),
     CALLDEF(R_symmDN, 1),
 
     CALLDEF(packedMatrix_t, 1),
@@ -293,7 +298,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Matrix_rle_i, 2),
     CALLDEF(Matrix_rle_d, 2),
 
-    CALLDEF(R_set_factors, 4),
+    CALLDEF(R_set_factor, 4),
     CALLDEF(R_empty_factors, 2),
 
     CALLDEF(get_SuiteSparse_version, 0),

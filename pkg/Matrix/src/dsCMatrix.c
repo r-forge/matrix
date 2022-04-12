@@ -114,7 +114,7 @@ internal_chm_factor(SEXP Ap, int perm, int LDL, int super, double Imult)
 	char fnm[12] = "...Cholesky";// 11 + final \0
 	chm_factor_name(fnm, perm, LDL, super);
 
-	set_factors(Ap, chm_factor_to_SEXP(L, 0), fnm);
+	set_factor(Ap, fnm, chm_factor_to_SEXP(L, 0));
     }
     CHM_restore_common();
     UNPROTECT(1);

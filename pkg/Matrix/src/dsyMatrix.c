@@ -1,22 +1,5 @@
 #include "dsyMatrix.h"
 
-SEXP symmetricMatrix_validate(SEXP obj)
-{
-    SEXP val = GET_SLOT(obj, Matrix_DimSym);
-    if (LENGTH(val) < 2)
-	return mkString(_("'Dim' slot has length less than two"));
-    if (INTEGER(val)[0] != INTEGER(val)[1])
-        return mkString(_("Matrix is not square"));
-    if (isString(val = check_scalar_string(GET_SLOT(obj, Matrix_uploSym),
-					   "LU", "uplo"))) return val;
-    /* FIXME: Check dimnames {with a modular separate function}: Allow 1 of 2  to be NULL,
-     * -----  but otherwise may *NOT* differ !!
-     * currently,  I2 <- Diagonal(2) ; dimnames(I2) <- list(c("A","B"), c("x","y")); L2 <- !!I2
-     * produces such an "invalid" symmetric matrix:  L2[1:2,1:2] then fails
-     */
-    return ScalarLogical(1);
-}
-
 double get_norm_sy(SEXP obj, const char *typstr)
 {
     char typnm[] = {'\0', '\0'};
@@ -101,7 +84,7 @@ SEXP dsyMatrix_as_matrix(SEXP from, SEXP keep_dimnames)
 				   REAL(GET_SLOT(from, Matrix_xSym)), nsqr),
 			    from);
     if(asLogical(keep_dimnames))
-	setAttrib(val, R_DimNamesSymbol, GET_symmetrized_DimNames(from));
+	setAttrib(val, R_DimNamesSymbol, get_symmetrized_DimNames(from));
     UNPROTECT(1);
     return val;
 }
@@ -131,7 +114,7 @@ SEXP dsyMatrix_matrix_mm(SEXP a, SEXP b, SEXP rtP)
     int nd = rt ?
 	1 : // v <- b %*% a : rownames(v) == rownames(b)  are already there
 	0;  // v <- a %*% b : colnames(v) == colnames(b)  are already there
-    SEXP nms = PROTECT(VECTOR_ELT(GET_symmetrized_DimNames(a), nd));
+    SEXP nms = PROTECT(VECTOR_ELT(get_symmetrized_DimNames(a), nd));
     SET_VECTOR_ELT(GET_SLOT(val, Matrix_DimNamesSym), nd, nms);
     Free_FROM(bcp, mn);
     UNPROTECT(2);
@@ -140,7 +123,7 @@ SEXP dsyMatrix_matrix_mm(SEXP a, SEXP b, SEXP rtP)
 
 SEXP dsyMatrix_trf(SEXP x)
 {
-    SEXP val = get_factors(x, "BunchKaufman");
+    SEXP val = get_factor(x, "BunchKaufman");
     if (val != R_NilValue) return val;
 
     SEXP dimP = GET_SLOT(x, Matrix_DimSym),
@@ -167,8 +150,9 @@ SEXP dsyMatrix_trf(SEXP x)
 
     Free_FROM(work, lwork);
     if (info) error(_("Lapack routine dsytrf returned error code %d"), info);
+    set_factor(x, "BunchKaufman", val);
     UNPROTECT(1);
-    return set_factors(x, val, "BunchKaufman");
+    return val;
 }
 
 /** BunchKaufmann(<simple matrix>)

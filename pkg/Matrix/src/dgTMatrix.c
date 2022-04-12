@@ -99,7 +99,7 @@ SEXP _t1_ ## gTMatrix_to_ ## _t1_ ## geMatrix(SEXP x)			\
 									\
     SET_SLOT(ans, Matrix_factorSym, allocVector(VECSXP, 0));		\
     SET_SLOT(ans, Matrix_DimSym, duplicate(dd));			\
-    SET_DimNames(ans, x);						\
+    set_DimNames(ans, x);						\
     SET_SLOT(ans, Matrix_xSym, allocVector(_SEXPTYPE_, (R_xlen_t)len));	\
     _t1_ ## _insert_triplets_in_array(m, n, length(islot),		\
 				      INTEGER(islot),			\

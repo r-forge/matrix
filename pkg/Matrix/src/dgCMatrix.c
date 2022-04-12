@@ -69,7 +69,7 @@ SEXP compressed_to_TMatrix(SEXP x, SEXP colP)
 	if(ctype % 3 == 2) /* t(riangular) : */
 	    slot_dup(ans, x, Matrix_diagSym);
     }
-    SET_DimNames(ans, x);
+    set_DimNames(ans, x);
     // possibly asymmetric for symmetricMatrix is ok
     SET_SLOT(ans, indSym, duplicate(indP));
     expand_cmprPt(npt, INTEGER(pP),
@@ -114,7 +114,7 @@ SEXP R_to_CMatrix(SEXP x)
     SET_SLOT(ans, Matrix_iSym, duplicate(GET_SLOT(x, Matrix_jSym)));
     slot_dup(ans, x, Matrix_pSym);
     REPROTECT(ans = Csparse_transpose(ans, tri), ipx);
-    SET_DimNames(ans, x);
+    set_DimNames(ans, x);
     // possibly asymmetric for symmetricMatrix is ok
     free(ncl);
     UNPROTECT(2);
@@ -381,7 +381,7 @@ void install_lu(SEXP Ap, int order, double tol, Rboolean err_sing, Rboolean keep
 	else {
 	    /* No warning: The useR should be careful :
 	     * Put  NA  into  "LU" factor */
-	    set_factors(Ap, ScalarLogical(NA_LOGICAL), "LU");
+	    set_factor(Ap, "LU", ScalarLogical(NA_LOGICAL));
 	    return;
 	}
     }
@@ -444,8 +444,9 @@ void install_lu(SEXP Ap, int order, double tol, Rboolean err_sing, Rboolean keep
     cs_nfree(N);
     cs_sfree(S);
     cs_free(p);
+    set_factor(Ap, "LU", ans);
     UNPROTECT(1);
-    set_factors(Ap, ans, "LU");
+    return;
 }
 
 SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp, SEXP error_on_sing, SEXP keep_dimnames)
@@ -459,14 +460,14 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp, SEXP error_on_sing, SEXP keep
      * OTOH, currently  (order, tol) === (1, 1) always.
      * It is true that length(LU@q) does flag the order argument.
      */
-    if (!isNull(ans = get_factors(Ap, "LU")))
+    if (!isNull(ans = get_factor(Ap, "LU")))
 	return ans;
     int keep_dimnms = asLogical(keep_dimnames);
     if(keep_dimnms == NA_LOGICAL) { keep_dimnms = TRUE;
 	warning(_("dgcMatrix_LU(*, keep_dimnames = NA): NA taken as TRUE"));
     }
     install_lu(Ap, asInteger(orderp), asReal(tolp), err_sing, keep_dimnms);
-    return get_factors(Ap, "LU");
+    return get_factor(Ap, "LU");
 }
 
 SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
@@ -493,10 +494,10 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
     double *x, *ax = REAL(GET_SLOT(ans, Matrix_xSym));
     Calloc_or_Alloca_TO(x, n, double);
 
-    if (isNull(lu = get_factors(Ap, "LU"))) {
+    if (isNull(lu = get_factor(Ap, "LU"))) {
 	install_lu(Ap, /* order = */ 1, /* tol = */ 1.0, /* err_sing = */ TRUE,
 		   /* keep_dimnames = */ TRUE);
-	lu = get_factors(Ap, "LU");
+	lu = get_factor(Ap, "LU");
     }
     qslot = GET_SLOT(lu, install("q"));
     L = AS_CSP__(GET_SLOT(lu, Matrix_LSym));

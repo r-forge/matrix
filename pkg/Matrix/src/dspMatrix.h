@@ -5,7 +5,6 @@
 #include "Mutils.h"
 //was #include "dgeMatrix.h" -- seems much too much
 
-SEXP dspMatrix_validate(SEXP obj);
 double get_norm_sp(SEXP obj, const char *typstr);
 SEXP dspMatrix_norm(SEXP obj, SEXP type);
 SEXP dspMatrix_rcond(SEXP obj, SEXP type);

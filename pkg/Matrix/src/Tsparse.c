@@ -18,10 +18,7 @@ SEXP Tsparse_validate(SEXP x)
 
     if (length(jslot) != nnz)
 	return mkString(_("lengths of slots i and j must match"));
-    /* FIXME: this is checked in super class -- no need to do here: */
-    if (length(dimslot) != 2)
-	return mkString(_("slot Dim must have length 2"));
-
+    
     for (j = 0; j < nnz; j++) {
 	if (xi[j] < 0 || xi[j] >= nrow)
 	    return mkString(_("all row indices (slot 'i') must be between 0 and nrow-1 in a TsparseMatrix"));
@@ -87,7 +84,7 @@ SEXP Tsparse_diagU2N(SEXP x)
 	    *jslot = INTEGER(ALLOC_SLOT(ans, Matrix_jSym, INTSXP, new_n));
 
 	slot_dup(ans, x, Matrix_DimSym);
-	SET_DimNames(ans, x);
+	set_DimNames(ans, x);
 	slot_dup(ans, x, Matrix_uploSym);
 	SET_SLOT(ans, Matrix_diagSym, mkString("N"));
 

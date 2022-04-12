@@ -2,31 +2,6 @@
 // -> Mutils.h  etc
 #include <float.h>
 
-SEXP dMatrix_validate(SEXP obj)
-{
-    SEXP x = GET_SLOT(obj, Matrix_xSym),
-	Dim = GET_SLOT(obj, Matrix_DimSym);
-    if (!isReal(x))
-	return mkString(_("x slot must be numeric \"double\""));
-    SEXP val;
-    if (isString(val = Dim_validate(Dim, FALSE, "Matrix")))
-	return val;
-    return ScalarLogical(1);
-}
-
-SEXP dgeMatrix_validate(SEXP obj)
-{
-    SEXP val;
-    if (isString(val = Dim_validate(GET_SLOT(obj, Matrix_DimSym), FALSE, "dgeMatrix")))
-	return(val);
-    if (isString(val = dense_nonpacked_validate(obj)))
-	return(val);
-    SEXP fact = GET_SLOT(obj, Matrix_factorSym);
-    if (length(fact) > 0 && getAttrib(fact, R_NamesSymbol) == R_NilValue)
-	return mkString(_("factors slot must be named list"));
-    return ScalarLogical(1);
-}
-
 static
 double get_norm(SEXP obj, const char *typstr)
 {
@@ -470,7 +445,7 @@ SEXP dgeMatrix_addDiag(SEXP x, SEXP d)
 
 SEXP dgeMatrix_LU_(SEXP x, Rboolean warn_sing)
 {
-    SEXP val = get_factors(x, "LU");
+    SEXP val = get_factor(x, "LU");
     int *dims, npiv, info;
 
     if (val != R_NilValue) /* nothing to do if it's there in 'factors' slot */
@@ -492,8 +467,9 @@ SEXP dgeMatrix_LU_(SEXP x, Rboolean warn_sing)
     else if (info > 0 && warn_sing)
 	warning(_("Exact singularity detected during LU decomposition: %s, i=%d."),
 		"U[i,i]=0", info);
+    set_factor(x, "LU", val);
     UNPROTECT(1);
-    return set_factors(x, val, "LU");
+    return val;
 }
 // FIXME: also allow an interface to LAPACK's  dgesvx()  which uses LU fact.
 //        and then optionally does "equilibration" (row and column scaling)

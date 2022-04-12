@@ -4,8 +4,10 @@
 #include "Lapack-etc.h"
 #include "Mutils.h"
 
-SEXP dpoMatrix_rcond(SEXP obj, SEXP type);
 SEXP dpoMatrix_validate(SEXP obj);
+SEXP corMatrix_validate(SEXP obj);
+
+SEXP dpoMatrix_rcond(SEXP obj, SEXP type);
 SEXP dpoMatrix_solve(SEXP a);
 SEXP dpoMatrix_matrix_solve(SEXP a, SEXP b);
 SEXP dpoMatrix_dgeMatrix_solve(SEXP a, SEXP b);

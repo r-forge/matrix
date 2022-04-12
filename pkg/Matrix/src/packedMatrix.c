@@ -9,37 +9,6 @@
 #define PM_AR21_LO(i, j, n2) (i) + ((j) * ((n2) - (j) - 1)) / 2
 #define PM_LENGTH(n) ((n) * (((R_xlen_t) (n)) + 1)) / 2
 
-/* FIXME: could avoid some duplication by calling 'symmetricMatrix_validate'
-   or 'triangularMatrix_validate' conditional on existence of 'diag' slot ...
-   would still need to check length(.@x) though
-*/
-SEXP packedMatrix_validate(SEXP obj)
-{
-    SEXP val = GET_SLOT(obj, Matrix_DimSym);
-    if (LENGTH(val) != 2) {
-        return mkString(_("'Dim' slot does not have length 2"));
-    }
-    int n = INTEGER(val)[0];
-    if (INTEGER(val)[1] != n) {
-        return mkString(_("matrix is not square"));
-    }
-    val = check_scalar_string(GET_SLOT(obj, Matrix_uploSym), "LU", "uplo");
-    if (isString(val)) {
-        return val;
-    }
-    if (R_has_slot(obj, Matrix_diagSym)) {
-	val = check_scalar_string(GET_SLOT(obj, Matrix_diagSym), "NU", "diag");
-	if (isString(val)) {
-	    return val;
-	}
-    }
-    val = GET_SLOT(obj, Matrix_xSym);
-    if (XLENGTH(val) != PM_LENGTH(n)) {
-        return mkString(_("'x' slot does not have length 'n*(n+1)/2', n=Dim[1]"));
-    }
-    return ScalarLogical(1);
-}
-
 #define PM_T_LOOP							\
     do {								\
 	if (up) {							\

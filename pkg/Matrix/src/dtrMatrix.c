@@ -2,21 +2,6 @@
 
 #include "dtrMatrix.h"
 
-SEXP triangularMatrix_validate(SEXP obj)
-{
-    SEXP val = GET_SLOT(obj, Matrix_DimSym);
-
-    if (LENGTH(val) < 2)
-	return mkString(_("'Dim' slot has length less than two"));
-    if (INTEGER(val)[0] != INTEGER(val)[1])
-        return mkString(_("Matrix is not square"));
-    if (isString(val = check_scalar_string(GET_SLOT(obj, Matrix_uploSym),
-					   "LU", "uplo"))) return val;
-    if (isString(val = check_scalar_string(GET_SLOT(obj, Matrix_diagSym),
-					   "NU", "diag"))) return val;
-    return ScalarLogical(1);
-}
-
 static
 double get_norm(SEXP obj, const char *typstr)
 {
@@ -198,7 +183,7 @@ SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
 	val = PROTECT(NEW_OBJECT_OF_CLASS("dtrMatrix"));
 	SET_SLOT(val, Matrix_uploSym, duplicate(uplo_b));
 	SET_SLOT(val, Matrix_DimSym,  duplicate(d_a));
-	SET_DimNames(val, b);
+	set_DimNames(val, b);
 	valx = REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, sz));
 	Memcpy(valx, REAL(GET_SLOT(b, Matrix_xSym)), sz);
 	if((uDiag_b = (*diag_b_ch == 'U'))) {
