@@ -252,13 +252,19 @@ SEXP _PREFIX_ ## Matrix_validate(SEXP obj)				\
     else								\
 	return ScalarLogical(1);					\
 }
+/* dMatrix_validate() */
 TYPEMATRIX_VALIDATE(     d,  double, REALSXP)
+/* lMatrix_validate() */
 TYPEMATRIX_VALIDATE(     l, logical,  LGLSXP)
-/* "nsparseMatrix" has no 'x' slot, only "ndenseMatrix" ... */
+/* ndenseMatrix_validate() */
+/* NB: "nsparseMatrix" has no 'x' slot, only "ndenseMatrix" ... */
 TYPEMATRIX_VALIDATE(ndense, logical,  LGLSXP)
+/* iMatrix_validate() */
 TYPEMATRIX_VALIDATE(     i, integer,  INTSXP)
+/* zMatrix_validate() */
 TYPEMATRIX_VALIDATE(     z, complex, CPLXSXP)
 #undef TYPEMATRIX_VALIDATE
+
 
 /* More for 'Dimnames' ============================================== */
 
@@ -599,6 +605,281 @@ char La_rcond_type(const char *typstr)
     return typup; /* 'O' or 'I' */
 }
 
+SEXP as_det_obj(double mod, int log, int sign)
+{
+    SEXP det = PROTECT(allocVector(VECSXP, 2)),
+	nms = PROTECT(allocVector(STRSXP, 2)),
+	val = PROTECT(ScalarReal(mod));
+
+    setAttrib(det, R_NamesSymbol, nms);
+    SET_STRING_ELT(nms, 0, mkChar("modulus"));
+    SET_STRING_ELT(nms, 1, mkChar("sign"));
+    setAttrib(val, install("logarithm"), ScalarLogical(log));
+    SET_VECTOR_ELT(det, 0, val);
+    SET_VECTOR_ELT(det, 1, ScalarInteger(sign));
+    setAttrib(det, R_ClassSymbol, mkString("det"));
+    UNPROTECT(3);
+    return det;
+}
+
+#define MAKE_TRIANGULAR_LOOP(_X_, _DIM_, _UPLO_, _DIAG_, _ZERO_, _ONE_)	\
+    do {								\
+        int i, j, m = _DIM_[0], n = _DIM_[1], r = (m < n) ? m : n;	\
+	R_xlen_t pos;							\
+									\
+	if (_UPLO_ == 'U') {						\
+	    pos = 1;							\
+	    for (j = 0; j < r; pos += (++j)+1) {			\
+		for (i = j+1; i < m; ++i) {				\
+		    _X_[pos++] = _ZERO_;				\
+		}							\
+	    }								\
+	} else {							\
+	    pos = m;							\
+	    for (j = 1; j < r; pos += m-(j++)) {			\
+		for (i = 0; i < j; ++i) {				\
+		    _X_[pos++] = _ZERO_;				\
+		}							\
+	    }								\
+	    for (j = r; j < n; ++j) {					\
+		for (i = 0; i < m; ++i) {				\
+		    _X_[pos++] = _ZERO_;				\
+		}							\
+	    }								\
+	}								\
+	if (_DIAG_ == 'U') {						\
+	    pos = 0;							\
+	    R_xlen_t mp1 = (R_xlen_t) m + 1;				\
+	    for (j = 0; j < r; ++j, pos += mp1) {			\
+		_X_[pos] = _ONE_;					\
+	    }								\
+	}								\
+    } while(0)
+
+#define MAKE_TRIANGULAR(_PREFIX_, _TYPE_, _ZERO_, _ONE_)		\
+void _PREFIX_ ## dense_unpacked_make_triangular(_TYPE_ *to, SEXP from)  \
+{									\
+    int *pdim = INTEGER(GET_SLOT(from, Matrix_DimSym));			\
+    MAKE_TRIANGULAR_LOOP(to, pdim, *uplo_P(from), *diag_P(from),	\
+			 _ZERO_, _ONE_);				\
+}
+
+/**
+ * @brief Make triangular an `unpackedMatrix`.
+ * 
+ * Fills the "trivial" part of an `unpackedMatrix` with zeros to force 
+ * triangularity, or with zeros _and_ ones to force unit triangularity.
+ * The `unpackedMatrix` need not be square, though all `triangularMatrix` 
+ * _are_.
+ * 
+ * @param to A pointer to the first element of a length-`m*n` array,
+ *     usually the "data" of the `x` slot of an `unpackedMatrix`.
+ * @param from A `Matrix` with `Dim`, `uplo` and `diag` slots.
+ */
+/* ddense_unpacked_make_triangular() */
+MAKE_TRIANGULAR(d, double, 0.0, 1.0)
+/* ldense_unpacked_make_triangular() */
+MAKE_TRIANGULAR(l, int, 0, 1)
+
+#undef MAKE_TRIANGULAR
+#undef MAKE_TRIANGULAR_LOOP
+
+#define MAKE_SYMMETRIC_LOOP(_X_, _DIM_, _UPLO_)				\
+    do {								\
+        int i, j, n = _DIM_[0];						\
+	R_xlen_t upos = 0, lpos = 0;					\
+									\
+	if (_UPLO_ == 'U') {						\
+	    for (j = 0; j < n; lpos += (++j)+1, upos = lpos) {		\
+		for (i = j+1; i < n; ++i) {				\
+		    _X_[++lpos] = _X_[upos += n];			\
+		}							\
+	    }								\
+	} else {							\
+	    for (j = 0; j < n; lpos += (++j)+1, upos = lpos) {		\
+		for (i = j+1; i < n; ++i) {				\
+		    _X_[upos += n] = _X_[++lpos];			\
+		}							\
+	    }								\
+	}								\
+    } while(0)
+
+#define MAKE_SYMMETRIC(_PREFIX_, _TYPE_)				\
+void _PREFIX_ ## dense_unpacked_make_symmetric(_TYPE_ *to, SEXP from)   \
+{									\
+    int *pdim = INTEGER(GET_SLOT(from, Matrix_DimSym));			\
+    MAKE_SYMMETRIC_LOOP(to, pdim, *uplo_P(from));			\
+}
+
+/**
+ * @brief Make symmetric a square `unpackedMatrix`.
+ * 
+ * Symmetrizes the elements of a square `unpackedMatrix`.
+ * 
+ * @param to A pointer to the first element of a length-`n*n` array,
+ *     usually the "data" of the `x` slot of a square `unpackedMatrix`.
+ * @param from A `Matrix` with `Dim` and `uplo` slots.
+ */
+/* ddense_unpacked_make_symmetric() */
+MAKE_SYMMETRIC(d, double)
+/* ldense_unpacked_make_symmetric() */
+MAKE_SYMMETRIC(l, int)
+
+#undef MAKE_SYMMETRIC
+#undef MAKE_SYMMETRIC_LOOP
+
+#define MAKE_DIAGONAL(_PREFIX_, _TYPE_, _PTR_, _ONE_)		        \
+void _PREFIX_ ## dense_unpacked_make_diagonal(_TYPE_ *to, SEXP from)    \
+{									\
+    int n = INTEGER(GET_SLOT(from, Matrix_DimSym))[0];			\
+    R_xlen_t pos = 0, np1 = (R_xlen_t) n + 1;				\
+    									\
+    Memzero(to, n * (size_t) n);					\
+    if (*diag_P(from) == 'U') {						\
+	for (int j = 0; j < n; ++j, pos += np1) {			\
+	    to[pos] = _ONE_;						\
+	}								\
+    } else {								\
+	_TYPE_ *px = _PTR_(GET_SLOT(from, Matrix_xSym));		\
+	for (int j = 0; j < n; ++j, pos += np1) {			\
+	    to[pos] = px[j];						\
+	}								\
+    }									\
+}
+
+/**
+ * @brief Make diagonal a square `unpackedMatrix`.
+ *
+ * Copy a length-`n` diagonal from a `[dl]diMatrix` to a length-`n*n` 
+ * array (after zero-ing the array).
+ * 
+ * @param to A pointer to the first element of a length-`n*n` array,
+ *     usually the "data" of the `x` slot of a square `unpackedMatrix`.
+ * @param from A `[dl]diMatrix`.
+ */
+/* ddense_unpacked_make_diagonal() */
+MAKE_DIAGONAL(d, double, REAL, 1.0)
+/* ldense_unpacked_make_diagonal() */
+MAKE_DIAGONAL(l, int, LOGICAL, 1)
+
+#undef MAKE_DIAGONAL
+
+#define PACK(_PREFIX_, _TYPE_, _ONE_)				        \
+_TYPE_* _PREFIX_ ## dense_pack(_TYPE_ *dest, const _TYPE_ *src, int n,  \
+			       enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag) \
+{									\
+    int i, j;								\
+    R_xlen_t dpos = 0, spos = 0;					\
+									\
+    switch (uplo) {							\
+    case UPP:								\
+        for (j = 0; j < n; spos += n-(++j))				\
+	    for (i = 0; i <= j; ++i)					\
+		dest[dpos++] = src[spos++];				\
+	if (diag == UNT) {						\
+	    dpos = 0;							\
+	    for (j = 0; j < n; dpos += (++j)+1)				\
+		dest[dpos] = _ONE_;					\
+	}								\
+	break;								\
+    case LOW:								\
+    	for (j = 0; j < n; spos += (++j))				\
+	    for (i = j; i <  n; ++i)					\
+		dest[dpos++] = src[spos++];				\
+	if (diag == UNT) {						\
+	    dpos = 0;							\
+	    for (j = 0; j < n; dpos += n-(j++))				\
+		dest[dpos] = _ONE_;					\
+	}								\
+	break;								\
+    default:								\
+    	error(_("'uplo' must be UPP or LOW"));				\
+	break;								\
+    }									\
+    return dest;							\
+}
+
+/**
+ * @brief Pack a square `unpackedMatrix`.
+ * 
+ * Copies the upper or lower triangular part of `src` to `dest`,
+ * where it is stored contiguously ("packed"). Optionally resets 
+ * the diagonal elements to 1.
+ * 
+ * @param dest,src Pointers to the first elements of length-`n*(n+1)/2`
+ *     and length-`n*n` (resp.) arrays, usually the "data" of the  
+ *     `x` slot of a `.(sp|tp)Matrix` and `.(sy|tr)Matrix` (resp.).
+ * @param n Size of matrix being packed.
+ * @param uplo,diag `enum` constants specifying whether the 
+ *     "nontrivial part" is upper (`UPP`) or lower (`LOW`) and
+ *     whether to "force" a unit diagonal (`UNT`) or not (`NUN`).
+ * 
+ * @return `dest`
+ */
+/* ddense_pack() */
+PACK(d, double, 1.0)
+/* ldense_pack() */
+PACK(l, int, 1)
+
+#undef PACK
+
+#define UNPACK(_PREFIX_, _TYPE_, _ONE_)					\
+_TYPE_* _PREFIX_ ## dense_unpack(_TYPE_ *dest, const _TYPE_ *src, int n, \
+				 enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag) \
+{									\
+    int i, j;								\
+    R_xlen_t dpos = 0, spos = 0;					\
+    									\
+    Memzero(dest, n * (size_t) n);					\
+    switch (uplo) {							\
+    case UPP:								\
+        for (j = 0; j < n; dpos += n-(++j))				\
+	    for (i = 0; i <= j; ++i)					\
+		dest[dpos++] = src[spos++];				\
+	break;								\
+    case LOW:								\
+    	for (j = 0; j < n; dpos += (++j))				\
+	    for (i = j; i <  n; ++i)					\
+		dest[dpos++] = src[spos++];				\
+	break;								\
+    default:								\
+    	error(_("'uplo' must be UPP or LOW"));				\
+	break;								\
+    }									\
+    if (diag == UNT) {							\
+	dpos = 0;							\
+	R_xlen_t np1 = (R_xlen_t) n + 1;				\
+	for (j = 0; j < n; ++j, dpos += np1)				\
+	    dest[dpos] = _ONE_;						\
+    }									\
+    return dest;							\
+}
+
+/**
+ * @brief Unpack a `packedMatrix`.
+ * 
+ * Copies `src` to the upper or lower triangular part of `dest`
+ * (after zero-ing `dest`), where it is stored _non_-contiguously 
+ * ("unpacked"). Optionally resets the diagonal elements to 1.
+ * 
+ * @param dest,src Pointers to the first elements of length-`n*n` 
+ *     and length-`n*(n+1)/2` (resp.) arrays, usually the "data" of the  
+ *     `x` slot of a `.(sp|tp)Matrix` and `.(sy|tr)Matrix` (resp.).
+ * @param n Size of matrix being unpacked.
+ * @param uplo,diag `enum` constants specifying whether to copy `src`
+ *     to the upper (`UPP`) or lower (`LOW`) triangle of `dest` and 
+ *     whether to "force" a unit diagonal (`UNT`) or not (`NUN`).
+ * 
+ * @return `dest`
+ */
+/* ddense_unpack() */
+UNPACK(d, double, 1.0)
+/* ldense_unpack() */
+UNPACK(l, int, 1)
+
+#undef UNPACK
+
+
 #if 0 /* unused */
 double get_double_by_name(SEXP obj, char *nm)
 {
@@ -648,27 +929,7 @@ SEXP set_double_by_name(SEXP obj, double val, char *nm)
 	return nx;
     }
 }
-#endif /* unused */
 
-SEXP as_det_obj(double val, int log, int sign)
-{
-    SEXP det = PROTECT(allocVector(VECSXP, 2)),
-	nms = PROTECT(allocVector(STRSXP, 2)),
-	vv = PROTECT(ScalarReal(val));
-
-    setAttrib(det, R_NamesSymbol, nms);
-    SET_STRING_ELT(nms, 0, mkChar("modulus"));
-    SET_STRING_ELT(nms, 1, mkChar("sign"));
-    setAttrib(vv, install("logarithm"), ScalarLogical(log));
-    SET_VECTOR_ELT(det, 0, vv);
-    SET_VECTOR_ELT(det, 1, ScalarInteger(sign));
-    setAttrib(det, R_ClassSymbol, mkString("det"));
-    UNPROTECT(3);
-    return det;
-}
-
-
-#if 0 				/* unused */
 /* useful for all the ..CMatrix classes (and ..R by [0] <-> [1]); but unused */
 SEXP CMatrix_set_Dim(SEXP x, int nrow)
 {
@@ -679,115 +940,6 @@ SEXP CMatrix_set_Dim(SEXP x, int nrow)
     return x;
 }
 #endif	/* unused */
-
-/* Fill in the "trivial remainder" in  n*m  array ;
- *  typically the 'x' slot of a "dtrMatrix", such that
- *  it should be usable for double/logical/int/complex : */
-#define MAKE_TRIANGULAR_BODY(_TO_, _FROM_, _ZERO_, _ONE_)	\
-{								\
-    int i, j, *dims = INTEGER(GET_SLOT(_FROM_, Matrix_DimSym));	\
-    int n = dims[0], m = dims[1];				\
-								\
-    if (*uplo_P(_FROM_) == 'U') {				\
-	for (j = 0; j < n; j++)					\
-	    for (i = j+1; i < m; i++)				\
-		_TO_[i + j*m] = _ZERO_;				\
-    } else {							\
-	for (j = 1; j < n; j++)					\
-	    for (i = 0; i < j && i < m; i++)			\
-		_TO_[i + j*m] = _ZERO_;				\
-    }								\
-    if (*diag_P(_FROM_) == 'U') {				\
-	j = (n < m) ? n : m;					\
-	for (i = 0; i < j; i++)					\
-	    _TO_[i * (m + 1)] = _ONE_;				\
-    }								\
-}
-
-void make_d_matrix_triangular(double *to, SEXP from)
-    MAKE_TRIANGULAR_BODY(to, from, 0., 1.)
-void make_i_matrix_triangular(int *to, SEXP from)
-    MAKE_TRIANGULAR_BODY(to, from, 0, 1)
-
-
-/* Should work for double/logical/int/complex : */
-#define MAKE_SYMMETRIC_BODY(_TO_, _FROM_)			\
-{								\
-    int i, j, n = INTEGER(GET_SLOT(_FROM_, Matrix_DimSym))[0];	\
-								\
-    if (*uplo_P(_FROM_) == 'U') {				\
-	for (j = 0; j < n; j++)					\
-	    for (i = j+1; i < n; i++)				\
-		_TO_[i + j*n] = _TO_[j + i*n];			\
-    } else {							\
-	for (j = 1; j < n; j++)					\
-	    for (i = 0; i < j && i < n; i++)			\
-		_TO_[i + j*n] = _TO_[j + i*n];			\
-    }								\
-}
-
-void make_d_matrix_symmetric(double *to, SEXP from)
-    MAKE_SYMMETRIC_BODY(to, from)
-
-void make_i_matrix_symmetric(int *to, SEXP from)
-    MAKE_SYMMETRIC_BODY(to, from)
-
-
-#define PACKED_TO_FULL(TYPE)					\
-TYPE *packed_to_full_ ## TYPE(TYPE *dest, const TYPE *src,	\
-		        int n, enum CBLAS_UPLO uplo)		\
-{								\
-    int i, j, pos = 0;						\
-    size_t n2 = n * (size_t)n;					\
-								\
-    Memzero(dest, n2);						\
-    for (j = 0; j < n; j++) {					\
-        size_t jn = j * (size_t)n;				\
-	switch(uplo) {						\
-	case UPP:						\
-	    for (i = 0; i <= j; i++) dest[i + jn] = src[pos++];	\
-	    break;						\
-	case LOW:						\
-	    for (i = j; i < n; i++)  dest[i + jn] = src[pos++];	\
-	    break;						\
-	default:						\
-	    error(_("'uplo' must be UPP or LOW"));		\
-	}							\
-    }								\
-    return dest;						\
-}
-
-PACKED_TO_FULL(double)
-PACKED_TO_FULL(int)
-
-#define FULL_TO_PACKED(TYPE)						\
-TYPE *full_to_packed_ ## TYPE(TYPE *dest, const TYPE *src, int n,	\
-		      enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag)	\
-{									\
-    int i, j, pos = 0;							\
-									\
-    for (j = 0; j < n; j++) {						\
-	switch(uplo) {							\
-	case UPP:							\
-	    for (i = 0; i <= j; i++)					\
-		dest[pos++] = (i == j && diag== UNT) ? 1 : src[i + j*n]; \
-	    break;							\
-	case LOW:							\
-	    for (i = j; i < n; i++)					\
-		dest[pos++] = (i == j && diag== UNT) ? 1 : src[i + j*n]; \
-	    break;							\
-	default:							\
-	    error(_("'uplo' must be UPP or LOW"));			\
-	}								\
-    }									\
-    return dest;							\
-}
-
-FULL_TO_PACKED(double)
-FULL_TO_PACKED(int)
-
-//----------------------------------------------------------------------
-
 
 /* MJ: No longer needed ... replacement in ./packedMatrix.c */
 #if 0
@@ -911,9 +1063,6 @@ void tr_l_packed_getDiag(   int *dest, SEXP x, int n)
 
 #endif /* MJ */
 
-
-//----------------------------------------------------------------------
-
 SEXP d_packed_addDiag(double *diag, int l_d, SEXP x, int n)
 {
     SEXP ret = PROTECT(duplicate(x)),
@@ -942,8 +1091,6 @@ SEXP tr_d_packed_addDiag(double *diag, int l_d, SEXP x, int n)
     return ret;
 }
 
-//----------------------------------------------------------------------
-
 SEXP Matrix_expand_pointers(SEXP pP)
 {
     int n = length(pP) - 1;
@@ -954,63 +1101,6 @@ SEXP Matrix_expand_pointers(SEXP pP)
     UNPROTECT(1);
     return ans;
 }
-
-
-/**
- * Return the element of a given name from a named list
- *
- * @param list
- * @param nm name of desired element
- *
- * @return element of list with name nm
- */
-SEXP
-Matrix_getElement(SEXP list, char *nm) {
-    SEXP names = getAttrib(list, R_NamesSymbol);
-    int i;
-
-    for (i = 0; i < LENGTH(names); i++)
-	if (!strcmp(CHAR(STRING_ELT(names, i)), nm))
-	    return(VECTOR_ELT(list, i));
-    return R_NilValue;
-}
-
-/**
- * Zero a square matrix of size nc then copy a vector to the diagonal
- *
- * @param dest destination array of length nc * nc
- * @param A pointer to a square Matrix object
- *
- * @return dest
- */
-static double *
-install_diagonal(double *dest, SEXP A)
-{
-    int nc = INTEGER(GET_SLOT(A, Matrix_DimSym))[0];
-    int i, unit = *diag_P(A) == 'U';
-    double *ax = REAL(GET_SLOT(A, Matrix_xSym));
-    size_t in1, ncp1 = nc + 1;
-
-    Memzero(dest, nc * (size_t)nc);
-    for (i = 0, in1 = 0; i < nc; i++, in1 += ncp1) // in1 == i * ncp1
-	dest[in1] = (unit) ? 1. : ax[i];
-    return dest;
-}
-
-static int *
-install_diagonal_int(int *dest, SEXP A)
-{
-    int nc = INTEGER(GET_SLOT(A, Matrix_DimSym))[0];
-    int i, unit = *diag_P(A) == 'U';
-    int *ax = INTEGER(GET_SLOT(A, Matrix_xSym));
-    size_t in1, ncp1 = nc + 1;
-
-    Memzero(dest, nc * (size_t)nc);
-    for (i = 0, in1 = 0; i < nc; i++, in1 += ncp1) // in1 == i * ncp1
-	dest[in1] = (unit) ? 1 : ax[i];
-    return dest;
-}
-
 
 /** @brief Duplicate a [dln]denseMatrix _or_ a numeric matrix or even a vector
  *  as a [dln]geMatrix.
@@ -1087,9 +1177,11 @@ SEXP dup_mMatrix_as_geMatrix(SEXP A)
 	DUP_MMATRIX_NON_CLASS(FALSE);
     }
 
-    ans = PROTECT(NEW_OBJECT_OF_CLASS(M_type == ddense ? "dgeMatrix" :
-				      (M_type == ldense ? "lgeMatrix" :
-					 "ngeMatrix")));
+    ans = PROTECT(NEW_OBJECT_OF_CLASS(M_type == ddense
+				      ? "dgeMatrix"
+				      : (M_type == ldense
+					 ? "lgeMatrix"
+					 : "ngeMatrix")));
 #define DUP_MMATRIX_SET_1(_IS_SYM_)					\
     do {								\
 	SET_SLOT(ans, Matrix_DimSym, duplicate(ad));			\
@@ -1108,47 +1200,49 @@ SEXP dup_mMatrix_as_geMatrix(SEXP A)
 
 	double *ansx;
 
-#define DUP_MMATRIX_ddense_CASES						\
-	ansx = REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, sz));			\
-	switch(ctype) {								\
-	case 0:			/* unclassed real matrix */			\
-	    Memcpy(ansx, REAL(A), sz);						\
-	    break;								\
-	case 1:			/* dgeMatrix */					\
-	    Memcpy(ansx, REAL(GET_SLOT(A, Matrix_xSym)), sz);			\
-	    break;								\
-	case 2:			/* dtrMatrix   and subclasses */		\
-	case 9: case 10: case 11:   /* ---	Cholesky, LDL, BunchKaufman */	\
-	    Memcpy(ansx, REAL(GET_SLOT(A, Matrix_xSym)), sz);			\
-	    make_d_matrix_triangular(ansx, A);					\
-	    break;								\
-	case 3:			/* dsyMatrix */					\
-	case 4:			/* dpoMatrix  + subclass */			\
-	case 14:	 		/* ---	corMatrix */			\
-	    Memcpy(ansx, REAL(GET_SLOT(A, Matrix_xSym)), sz);			\
-	    make_d_matrix_symmetric(ansx, A);					\
-	    is_symm = TRUE;							\
-	    break;								\
-	case 5:			/* ddiMatrix */					\
-	    install_diagonal(ansx, A);						\
-	    break;								\
-	case 6:			/* dtpMatrix  + subclasses */			\
-	case 12: case 13: 		/* ---	pCholesky, pBunchKaufman */	\
-	    packed_to_full_double(ansx, REAL(GET_SLOT(A, Matrix_xSym)),		\
-				  INTEGER(ad)[0],				\
-				  *uplo_P(A) == 'U' ? UPP : LOW);		\
-	    make_d_matrix_triangular(ansx, A);					\
-	    break;								\
-	case 7:			/* dspMatrix */					\
-	case 8:			/* dppMatrix */					\
-	    packed_to_full_double(ansx, REAL(GET_SLOT(A, Matrix_xSym)),		\
-				  INTEGER(ad)[0],				\
-				  *uplo_P(A) == 'U' ? UPP : LOW);		\
-	    make_d_matrix_symmetric(ansx, A);					\
-	    is_symm = TRUE;							\
-	    break;								\
+#define DUP_MMATRIX_ddense_CASES					\
+	ansx = REAL(ALLOC_SLOT(ans, Matrix_xSym, REALSXP, sz));		\
+	switch(ctype) {							\
+	case 0:			/* unclassed real matrix */		\
+	    Memcpy(ansx, REAL(A), sz);					\
+	    break;							\
+	case 1:			/* dgeMatrix */				\
+	    Memcpy(ansx, REAL(GET_SLOT(A, Matrix_xSym)), sz);		\
+	    break;							\
+	case 2:			/* dtrMatrix   and subclasses */	\
+	case 9: case 10: case 11:   /* ---	Cholesky, LDL, BunchKaufman */ \
+	    Memcpy(ansx, REAL(GET_SLOT(A, Matrix_xSym)), sz);		\
+	    ddense_unpacked_make_triangular(ansx, A);			\
+	    break;							\
+	case 3:			/* dsyMatrix */				\
+	case 4:			/* dpoMatrix  + subclass */		\
+	case 14:	 		/* ---	corMatrix */		\
+	    Memcpy(ansx, REAL(GET_SLOT(A, Matrix_xSym)), sz);		\
+	    ddense_unpacked_make_symmetric(ansx, A);			\
+	    is_symm = TRUE;						\
+	    break;							\
+	case 5:			/* ddiMatrix */				\
+	    ddense_unpacked_make_diagonal(ansx, A);			\
+	    break;							\
+	case 6:			/* dtpMatrix  + subclasses */		\
+	case 12: case 13: 		/* ---	pCholesky, pBunchKaufman */ \
+	    ddense_unpack(ansx, REAL(GET_SLOT(A, Matrix_xSym)),		\
+			  INTEGER(ad)[0],				\
+			  *uplo_P(A) == 'U' ? UPP : LOW,		\
+			  *diag_P(A) == 'N' ? NUN : UNT);		\
+	    ddense_unpacked_make_triangular(ansx, A);			\
+	    break;							\
+	case 7:			/* dspMatrix */				\
+	case 8:			/* dppMatrix */				\
+	    ddense_unpack(ansx, REAL(GET_SLOT(A, Matrix_xSym)),		\
+			  INTEGER(ad)[0],				\
+			  *uplo_P(A) == 'U' ? UPP : LOW,		\
+			  NUN);						\
+	    ddense_unpacked_make_symmetric(ansx, A);			\
+	    is_symm = TRUE;						\
+	    break;							\
 	}  /* switch(ctype) */
-
+	
 	DUP_MMATRIX_ddense_CASES; // also setting  is_symm
 	DUP_MMATRIX_SET_1(is_symm);
     }
@@ -1156,12 +1250,12 @@ SEXP dup_mMatrix_as_geMatrix(SEXP A)
 	/* ldense -> lge */
 	/* ndense -> nge */
 	int *ansx = LOGICAL(ALLOC_SLOT(ans, Matrix_xSym, LGLSXP, sz));
-
+	
 	switch(ctype) {
 	case 0:			/* unclassed logical matrix */
 	    Memcpy(ansx, LOGICAL(A), sz);
 	    break;
-
+	    
 	case 1+14:			/* lgeMatrix */
 	case 1+14+6:			/* ngeMatrix */
 	    Memcpy(ansx, LOGICAL(GET_SLOT(A, Matrix_xSym)), sz);
@@ -1169,31 +1263,33 @@ SEXP dup_mMatrix_as_geMatrix(SEXP A)
 	case 2+14:			/* ltrMatrix */
 	case 2+14+6:			/* ntrMatrix */
 	    Memcpy(ansx, LOGICAL(GET_SLOT(A, Matrix_xSym)), sz);
-	    make_i_matrix_triangular(ansx, A);
+	    ldense_unpacked_make_triangular(ansx, A);
 	    break;
 	case 3+14:			/* lsyMatrix */
 	case 3+14+6:			/* nsyMatrix */
 	    Memcpy(ansx, LOGICAL(GET_SLOT(A, Matrix_xSym)), sz);
-	    make_i_matrix_symmetric(ansx, A);
+	    ldense_unpacked_make_symmetric(ansx, A);
 	    is_symm = TRUE;
 	    break;
 	case 4+14:			/* ldiMatrix */
 	    // case 4+14+6:      /* ndiMatrix _DOES NOT EXIST_ */
-	    install_diagonal_int(ansx, A);
+	    ldense_unpacked_make_diagonal(ansx, A);
 	    break;
 	case 5+14:			/* ltpMatrix */
 	case 4+14+6:			/* ntpMatrix */
-	    packed_to_full_int(ansx, LOGICAL(GET_SLOT(A, Matrix_xSym)),
-			       INTEGER(ad)[0],
-			       *uplo_P(A) == 'U' ? UPP : LOW);
-	    make_i_matrix_triangular(ansx, A);
+	    ldense_unpack(ansx, LOGICAL(GET_SLOT(A, Matrix_xSym)),
+			  INTEGER(ad)[0],
+			  *uplo_P(A) == 'U' ? UPP : LOW,
+			  *diag_P(A) == 'N' ? NUN : UNT);
+	    ldense_unpacked_make_triangular(ansx, A);
 	    break;
 	case 6+14:			/* lspMatrix */
 	case 5+14+6:			/* nspMatrix */
-	    packed_to_full_int(ansx, LOGICAL(GET_SLOT(A, Matrix_xSym)),
-			       INTEGER(ad)[0],
-			       *uplo_P(A) == 'U' ? UPP : LOW);
-	    make_i_matrix_symmetric(ansx, A);
+	    ldense_unpack(ansx, LOGICAL(GET_SLOT(A, Matrix_xSym)),
+			  INTEGER(ad)[0],
+			  *uplo_P(A) == 'U' ? UPP : LOW,
+			  NUN);
+	    ldense_unpacked_make_symmetric(ansx, A);
 	    is_symm = TRUE;
 	    break;
 

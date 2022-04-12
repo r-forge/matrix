@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-04-12 r3460)}{
+\section{Changes in version 1.4-2 (2022-04-12 r3461)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -29,6 +29,13 @@
       \item Validation of \code{<Matrix>@Dimnames} now avoids
       \code{isNewList}, which had allowed an error message suggesting
       that \code{NULL} is a list.
+
+      \item Setting a factor on a \code{compMatrix} is now to install
+      the factor itself, not a duplicate, for efficiency and consistency
+      with the semantics of \code{<compMatrix>@factors[[name]] <- value}.
+
+      \item Long vector support in methods for packing and unpacking
+      \code{denseMatrix}, and others.
     }
   }
   \subsection{New Features}{
@@ -53,10 +60,6 @@
       vector types other than character, which are coerced to character
       in C via the new \code{R_DimNames_fixup()}, for greater
       consistency with base \code{matrix()}.
-
-      \item Setting a factor on a \code{compMatrix} is now to install
-      the factor itself, not a duplicate, for efficiency and consistency
-      with the semantics of \code{<compMatrix>@factors[[name]] <- value}.
     }
   }
   \subsection{Misc}{
@@ -77,6 +80,13 @@
       and is used like other \code{set*()} functions (i.e., for its
       side effect).  The R interface is unchanged: \code{R_set_factor()}
       continues to return the value being set.
+
+      \item C-level utilities
+      \code{make_[di]_matrix_(triangular|symmetric)()},
+      \code{packed_to_full_(double|int)()},
+      \code{full_to_packed_(double|int)()}, and
+      \code{install_diagonal(_int)?()}
+      are superceded by safer, consistently named ones.
     }
   }
 }

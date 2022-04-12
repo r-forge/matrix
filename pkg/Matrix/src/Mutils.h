@@ -204,22 +204,29 @@ SEXP append_to_named_list(SEXP x, char *nm, SEXP val);
 
 char La_norm_type (const char *typstr);
 char La_rcond_type(const char *typstr);
+SEXP as_det_obj(double mod, int log, int sign);
+
+void ddense_unpacked_make_triangular(double *to, SEXP from);
+void ldense_unpacked_make_triangular(   int *to, SEXP from);
+void ddense_unpacked_make_symmetric( double *to, SEXP from);
+void ldense_unpacked_make_symmetric(    int *to, SEXP from);
+void ddense_unpacked_make_diagonal(  double *to, SEXP from);
+void ldense_unpacked_make_diagonal(     int *to, SEXP from);
+
+double *ddense_pack(double *dest, const double *src, int n,
+		    enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
+int *ldense_pack(int *dest, const int *src, int n,
+		 enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
+double *ddense_unpack(double *dest, const double *src, int n,
+		      enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
+int *ldense_unpack(int *dest, const int *src, int n,
+		   enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
 
 #if 0 /* unused */
 double get_double_by_name(SEXP obj, char *nm);
 SEXP set_double_by_name(SEXP obj, double val, char *nm);
-#endif /* unused */
-
-SEXP as_det_obj(double val, int log, int sign);
-
-#if 0 /* unused */
 SEXP dgCMatrix_set_Dim(SEXP x, int nrow);
 #endif /* unused */
-
-/* int csc_unsorted_columns(int ncol, const int p[], const int i[]); */
-/* void csc_sort_columns(int ncol, const int p[], int i[], double x[]); */
-/* SEXP csc_check_column_sorting(SEXP A); */
-
 
 /* MJ: No longer needed ... replacement in ./packedMatrix.c */
 #if 0
@@ -235,41 +242,6 @@ SEXP tr_l_packed_setDiag(   int *diag, int l_d, SEXP x, int n);
 
 SEXP d_packed_addDiag(double *diag, int l_d, SEXP x, int n);
 SEXP tr_d_packed_addDiag(double *diag, int l_d, SEXP x, int n);
-
-SEXP Matrix_getElement(SEXP list, char *nm);
-
-#define PACKED_TO_FULL(TYPE)						\
-TYPE *packed_to_full_ ## TYPE(TYPE *dest, const TYPE *src,		\
-			     int n, enum CBLAS_UPLO uplo)
-PACKED_TO_FULL(double);
-PACKED_TO_FULL(int);
-#undef PACKED_TO_FULL
-
-#define FULL_TO_PACKED(TYPE)						\
-TYPE *full_to_packed_ ## TYPE(TYPE *dest, const TYPE *src, int n,	\
-			      enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag)
-FULL_TO_PACKED(double);
-FULL_TO_PACKED(int);
-#undef FULL_TO_PACKED
-
-/**
- * Check for valid length of a packed triangular array and return the
- * corresponding number of columns
- *
- * @param len length of a packed triangular array
- *
- * @return number of columns
- */
-static R_INLINE
-int packed_ncol(int len)
-{
-    int disc = 8 * len + 1;	/* discriminant */
-    int sqrtd = (int) sqrt((double) disc);
-
-    if (len < 0 || disc != sqrtd * sqrtd)
-	error(_("invalid 'len' = %d in packed_ncol"));
-    return (sqrtd - 1)/2;
-}
 
 /**
  * Allocate an SEXP of given type and length, assign it as slot nm in
@@ -337,8 +309,6 @@ Rboolean any_NA_in_x(SEXP obj)
     return FALSE;
 }
 
-
-
 /** Inverse Permutation
  * C version of   .inv.perm.R <- function(p) { p[p] <- seq_along(p) ; p }
  */
@@ -361,12 +331,6 @@ SEXP inv_permutation(SEXP p_, SEXP zero_p, SEXP zero_res)
 }
 
 SEXP Mmatrix(SEXP args);
-
-void make_d_matrix_triangular(double *x, SEXP from);
-void make_i_matrix_triangular(   int *x, SEXP from);
-
-void make_d_matrix_symmetric(double *to, SEXP from);
-void make_i_matrix_symmetric(   int *to, SEXP from);
 
 SEXP Matrix_expand_pointers(SEXP pP);
 
