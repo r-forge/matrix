@@ -192,6 +192,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(lspMatrix_getDiag, 1),
     CALLDEF(dspMatrix_setDiag, 2),
     CALLDEF(lspMatrix_setDiag, 2),
+    /* was unused, not replaced: */
+    CALLDEF(dtpMatrix_addDiag, 2),
 #endif
     
     /* CALLDEF(dtCMatrix_solve, 1), */
@@ -201,7 +203,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(ltTMatrix_as_ltrMatrix, 1),
     CALLDEF(ntTMatrix_as_ntrMatrix, 1),
     CALLDEF(dtpMatrix_as_dtrMatrix, 1),
-    CALLDEF(dtpMatrix_addDiag, 2),
 
 /* MJ: No longer needed ... replacement in ./packedMatrix.c */
 #if 0
@@ -230,9 +231,9 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dtrMatrix_norm, 2),
     CALLDEF(dtrMatrix_rcond, 2),
     CALLDEF(dtrMatrix_solve, 1),
-    CALLDEF(dup_mMatrix_as_dgeMatrix, 1),
-    CALLDEF(dup_mMatrix_as_geMatrix, 1),
-
+    CALLDEF(R_dup_mMatrix_as_geMatrix, 2),
+    CALLDEF(R_dup_mMatrix_as_dgeMatrix, 2),
+    
     /* for dgC* _and_ lgC* : */
     CALLDEF(xCMatrix_validate, 1),
     CALLDEF(xRMatrix_validate, 1),

@@ -95,7 +95,7 @@ SEXP sparseQR_qty(SEXP qr, SEXP y, SEXP trans, SEXP keep_dimnames)
     SEXP ans, aa, dmns = R_NilValue;					\
     if(_DM_NMS_) dmns = GET_SLOT(V_, Matrix_DimNamesSym);		\
     PROTECT_INDEX ipx;                                                  \
-    PROTECT_WITH_INDEX(ans = dup_mMatrix_as_dgeMatrix(y), &ipx);	\
+    PROTECT_WITH_INDEX(ans = dup_mMatrix_as_dgeMatrix(y, TRUE), &ipx);	\
     int *ydims = INTEGER(GET_SLOT(ans, Matrix_DimSym)),			\
 	m = ydims[0], n = ydims[1], M = V->m, *d_a;			\
     Rboolean rank_def = (m < M);					\

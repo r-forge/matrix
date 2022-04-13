@@ -355,7 +355,7 @@ setAs("diagonalMatrix", "denseMatrix",
     m
 }
 
-setAs("ddiMatrix", "dgeMatrix", ..2dge)
+setAs("ddiMatrix", "dgeMatrix", function(from) ..2dge(from))
 
 setAs("ddiMatrix", "ddenseMatrix", #-> "dtr"
       function(from) as(as(from, "triangularMatrix"),"denseMatrix"))

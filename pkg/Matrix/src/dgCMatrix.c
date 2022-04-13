@@ -486,7 +486,7 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
 	 */
 
     }
-    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(b)),
+    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(b, TRUE)),
 	lu, qslot;
     CSP L, U;
     int *bdims = INTEGER(GET_SLOT(ans, Matrix_DimSym)), *p, *q;

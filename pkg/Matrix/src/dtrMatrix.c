@@ -68,7 +68,7 @@ SEXP dtrMatrix_chol2inv(SEXP a)
 
 SEXP dtrMatrix_matrix_solve(SEXP a, SEXP b)
 {
-    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(b));
+    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(b, TRUE));
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(ans, Matrix_DimSym));
     int n = bdims[0], nrhs = bdims[1];
@@ -101,7 +101,7 @@ SEXP dtrMatrix_matrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
      *
      * Because 'a' must be square, the size of the answer 'val',
      * is the same as the size of 'b' */
-    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b));
+    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b, TRUE));
     int rt = asLogical(right); /* if(rt), compute b %*% op(a),  else  op(a) %*% b */
     int tr = asLogical(trans);/* if true, use t(a) */
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
@@ -155,7 +155,7 @@ SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
      * TWO cases : (1) result is triangular  <=> uplo's "match" (i.e., non-equal iff trans)
      * ===         (2) result is "general"
      */
-    SEXP val,/* = in case (2):  PROTECT(dup_mMatrix_as_dgeMatrix(b)); */
+    SEXP val,/* = in case (2):  PROTECT(dup_mMatrix_as_dgeMatrix(b, TRUE)); */
 	d_a = GET_SLOT(a, Matrix_DimSym),
 	uplo_a = GET_SLOT(a, Matrix_uploSym),  diag_a = GET_SLOT(a, Matrix_diagSym),
 	uplo_b = GET_SLOT(b, Matrix_uploSym),  diag_b = GET_SLOT(b, Matrix_diagSym);
@@ -178,7 +178,7 @@ SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
 	      n, INTEGER(GET_SLOT(b, Matrix_DimSym))[0]);
     if(matching_uplo) {
 	/* ==> result is triangular -- "dtrMatrix" !
-	 * val := dup_mMatrix_as_dtrMatrix(b) : */
+	 * val := dup_mMatrix_as_dtrMatrix(b, TRUE) : */
 	R_xlen_t sz = n * (R_xlen_t) n, np1 = n+1;
 	val = PROTECT(NEW_OBJECT_OF_CLASS("dtrMatrix"));
 	SET_SLOT(val, Matrix_uploSym, duplicate(uplo_b));
@@ -192,7 +192,7 @@ SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
 		valx[i * np1] = 1.;
 	}
     } else { /* different "uplo" ==> result is "dgeMatrix" ! */
-	val = PROTECT(dup_mMatrix_as_dgeMatrix(b));
+	val = PROTECT(dup_mMatrix_as_dgeMatrix(b, TRUE));
 	SEXP
 	    dn_a = GET_SLOT( a , Matrix_DimNamesSym),
 	    dn   = GET_SLOT(val, Matrix_DimNamesSym);

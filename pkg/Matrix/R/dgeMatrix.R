@@ -1,8 +1,8 @@
 
 ## ..2dge() -> ./Auxiliaries.R
 
-setAs("matrix",  "dgeMatrix", ..2dge)
-setAs("numLike", "dgeMatrix", ..2dge)
+setAs("matrix",  "dgeMatrix", function(from) ..2dge(from))
+setAs("numLike", "dgeMatrix", function(from) ..2dge(from))
 
 ge2mat <- function(from) array(from@x, dim = from@Dim, dimnames = from@Dimnames)
 setAs("dgeMatrix", "matrix", ge2mat)

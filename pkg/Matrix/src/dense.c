@@ -256,7 +256,7 @@ SEXP lapack_qr(SEXP Xin, SEXP tl)
 
 SEXP dense_to_Csparse(SEXP x)
 {
-    SEXP ge_x = PROTECT(mMatrix_as_geMatrix(x)),
+    SEXP ge_x = PROTECT(dup_mMatrix_as_geMatrix(x, FALSE)),
 	Dim = GET_SLOT(ge_x, Matrix_DimSym);
     int *dims = INTEGER(Dim);
     Rboolean longi = (dims[0] * (double)dims[1] > INT_MAX);
@@ -324,7 +324,7 @@ SEXP dense_band(SEXP x, SEXP k1P, SEXP k2P)
 	return R_NilValue; /* -Wall */
     }
     else {
-	SEXP ans = PROTECT(dup_mMatrix_as_geMatrix(x));
+	SEXP ans = PROTECT(dup_mMatrix_as_geMatrix(x, TRUE));
 	int *adims = INTEGER(GET_SLOT(ans, Matrix_DimSym)),
 	    j, m = adims[0], n = adims[1],
 	    sqr = (adims[0] == adims[1]),
@@ -385,7 +385,7 @@ SEXP dense_to_symmetric(SEXP x, SEXP uplo, SEXP symm_test)
  */
     
     int symm_tst = asLogical(symm_test);
-    SEXP dx = PROTECT(dup_mMatrix_as_geMatrix(x));
+    SEXP dx = PROTECT(dup_mMatrix_as_geMatrix(x, TRUE));
     SEXP ans;
     const char *cl = class_P(dx);
     /* same as in ..._geMatrix() above:*/
@@ -453,7 +453,7 @@ SEXP dense_to_symmetric(SEXP x, SEXP uplo, SEXP symm_test)
 SEXP ddense_symmpart(SEXP x)
 /* Class of the value will be dsyMatrix */
 {
-    SEXP dx = PROTECT(dup_mMatrix_as_dgeMatrix(x));
+    SEXP dx = PROTECT(dup_mMatrix_as_dgeMatrix(x, TRUE));
     int *adims = INTEGER(GET_SLOT(dx, Matrix_DimSym)), n = adims[0];
 
     if(n != adims[1]) {
@@ -479,7 +479,7 @@ SEXP ddense_symmpart(SEXP x)
 SEXP ddense_skewpart(SEXP x)
 /* Class of the value will be dgeMatrix */
 {
-    SEXP dx = PROTECT(dup_mMatrix_as_dgeMatrix(x));
+    SEXP dx = PROTECT(dup_mMatrix_as_dgeMatrix(x, TRUE));
     int *adims = INTEGER(GET_SLOT(dx, Matrix_DimSym)), n = adims[0];
 
     if(n != adims[1]) {

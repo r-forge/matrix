@@ -86,18 +86,18 @@ SEXP ltpMatrix_setDiag(SEXP x, SEXP d)
     return tr_l_packed_setDiag(INTEGER(d), LENGTH(d), x, n);
 }
 
-#endif /* MJ */
-
-
+/* was unused, not replaced: */
 SEXP dtpMatrix_addDiag(SEXP x, SEXP d)
 {
     int n = INTEGER(GET_SLOT(x, Matrix_DimSym))[0];
     return tr_d_packed_addDiag(REAL(d), LENGTH(d), x, n);
 }
 
+#endif /* MJ */
+
 SEXP dtpMatrix_matrix_mm(SEXP x, SEXP y, SEXP right, SEXP trans)
 {
-    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(y));
+    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(y, TRUE));
     int rt = asLogical(right); // if(rt), compute b %*% op(a), else op(a) %*% b
     int tr = asLogical(trans); // if(tr), op(a) = t(a), else op(a) = a
     /* Since 'x' is square (n x n ),   dim(x %*% y) = dim(y) */
@@ -132,7 +132,7 @@ SEXP dtpMatrix_matrix_mm(SEXP x, SEXP y, SEXP right, SEXP trans)
 
 SEXP dtpMatrix_matrix_solve(SEXP a, SEXP b)
 {
-    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b));
+    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b, TRUE));
     /* Since 'a' is square (n x n ),   dim(a %*% b) = dim(b) */
     int *aDim = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bDim = INTEGER(GET_SLOT(val, Matrix_DimSym));
