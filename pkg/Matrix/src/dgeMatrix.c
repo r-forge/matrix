@@ -113,7 +113,7 @@ SEXP _geMatrix_crossprod(SEXP x, SEXP trans)
 
 SEXP geMatrix_crossprod(SEXP x, SEXP trans)
 {
-    SEXP y = PROTECT(dup_mMatrix_as_geMatrix(x)),
+    SEXP y = PROTECT(dup_mMatrix_as_geMatrix(x, TRUE)),
 	val = _geMatrix_crossprod(y, trans);
     UNPROTECT(1);
     return val;
@@ -178,8 +178,8 @@ SEXP _geMatrix__geMatrix_crossprod(SEXP x, SEXP y, SEXP trans)
 
 SEXP geMatrix_geMatrix_crossprod(SEXP x, SEXP y, SEXP trans)
 {
-    SEXP gx = PROTECT(dup_mMatrix_as_geMatrix(x)),
-	 gy = PROTECT(dup_mMatrix_as_geMatrix(y)),
+    SEXP gx = PROTECT(dup_mMatrix_as_geMatrix(x, TRUE)),
+	gy = PROTECT(dup_mMatrix_as_geMatrix(y, TRUE)),
 	val = _geMatrix__geMatrix_crossprod(gx, gy, trans);
     UNPROTECT(2);
     return val;
@@ -266,7 +266,7 @@ SEXP _geMatrix_matrix_crossprod(SEXP x, SEXP y, SEXP trans) {
 }
 
 SEXP geMatrix_matrix_crossprod(SEXP x, SEXP y, SEXP trans) {
-    SEXP dx = PROTECT(dup_mMatrix_as_geMatrix(x)),
+    SEXP dx = PROTECT(dup_mMatrix_as_geMatrix(x, TRUE)),
 	val = _geMatrix_matrix_crossprod(dx, y, trans);
     UNPROTECT(1);
     return val;
@@ -322,7 +322,7 @@ SEXP dgeMatrix_matrix_mm(SEXP a, SEXP bP, SEXP right)
     UNPROTECT(nprot);							\
     return val
 
-    SEXP b = PROTECT(mMatrix_as_dgeMatrix(bP));
+    SEXP b = PROTECT(dup_mMatrix_as_dgeMatrix(bP, FALSE));
     DGE_MAT_MM_1(1);
     DGE_MAT_MM_DO(REAL(GET_SLOT(a, Matrix_xSym)),
                   REAL(GET_SLOT(b, Matrix_xSym)));
@@ -339,8 +339,8 @@ SEXP _geMatrix_matrix_mm(SEXP a, SEXP b, SEXP right) {
 //! %*% -- generalized from dge to *ge():
 SEXP geMatrix_matrix_mm(SEXP a, SEXP b, SEXP right) {
     SEXP
-	da = PROTECT(dup_mMatrix_as_geMatrix(a)),
-	db = PROTECT(dup_mMatrix_as_geMatrix(b)),
+	da = PROTECT(dup_mMatrix_as_geMatrix(a, TRUE)),
+	db = PROTECT(dup_mMatrix_as_geMatrix(b, TRUE)),
 	val = _geMatrix_matrix_mm(da, db, right);
     UNPROTECT(2);
     return val;
@@ -563,7 +563,7 @@ SEXP dgeMatrix_solve(SEXP a)
 
 SEXP dgeMatrix_matrix_solve(SEXP a, SEXP b)
 {
-    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b)),
+    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b, TRUE)),
 	lu = PROTECT(dgeMatrix_LU_(a, TRUE));
     int *adims = INTEGER(GET_SLOT(lu, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym));

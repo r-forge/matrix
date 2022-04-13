@@ -54,7 +54,7 @@ SEXP dspMatrix_solve(SEXP a)
 SEXP dspMatrix_matrix_solve(SEXP a, SEXP b)
 {
     SEXP trf = dspMatrix_trf(a),
-	val = PROTECT(dup_mMatrix_as_dgeMatrix(b));
+	val = PROTECT(dup_mMatrix_as_dgeMatrix(b, TRUE));
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym));
     int n = bdims[0], nrhs = bdims[1], info;
@@ -131,7 +131,7 @@ SEXP dspMatrix_as_dsyMatrix(SEXP from)
 
 SEXP dspMatrix_matrix_mm(SEXP a, SEXP b)
 {
-    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b));
+    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b, TRUE));
     int *bdims = INTEGER(GET_SLOT(val, Matrix_DimSym));
     int i, ione = 1, n = bdims[0], nrhs = bdims[1];
     R_xlen_t nn = n * (R_xlen_t) nrhs;

@@ -4,7 +4,8 @@
 ## >> but << needs all sub(sub(sub)) classes of "ddenseMatrix" listed
 ##   -----  in  ../src/Mutils.c
 
-setAs("ddenseMatrix", "dgeMatrix", ..2dge)
+setAs("ddenseMatrix", "dgeMatrix",
+      function(from) ..2dge(from))
 
 setAs("ddenseMatrix", "matrix",
       function(from) as(..2dge(from), "matrix"))

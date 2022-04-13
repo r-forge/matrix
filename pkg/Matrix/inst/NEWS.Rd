@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-04-12 r3461)}{
+\section{Changes in version 1.4-2 (2022-04-14 r3462)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -36,6 +36,9 @@
 
       \item Long vector support in methods for packing and unpacking
       \code{denseMatrix}, and others.
+
+      \code{..2d?ge(x)} now fail gracefully when \code{x} is a
+      long vector, which cannot be made into a valid 1-column matrix.
     }
   }
   \subsection{New Features}{
@@ -68,9 +71,9 @@
       a zero constant (0 for \code{int} arrays, 0.0 for \code{double}
       arrays).
 
-      \item \code{(R_)?[gs]et_factors()} have been renamed to
-      \code{(R_)?[gs]et_factor()}, as they only ever get and set _one_
-      factor.
+      \item \code{(R_)?[gs]et_factors()} have been renamed
+      \code{(R_)?[gs]et_factor()}, as they only ever get and set
+      \emph{one} factor.
 
       \item The signature of \code{set_factor()} has been changed to
       match other \code{set*()} functions:
@@ -86,7 +89,15 @@
       \code{packed_to_full_(double|int)()},
       \code{full_to_packed_(double|int)()}, and
       \code{install_diagonal(_int)?()}
-      are superceded by safer, consistently named ones.
+      are replaced by safer, consistently named ones.
+      Previous versions allowed integer overflow.
+
+      \item C-level utilities \code{dup_mMatrix_as_d?geMatrix()} gain an
+      argument indicating whether a \code{.geMatrix} should be duplicated
+      of not.  R interfaces \code{..2dge()} and (new) \code{..2ge()} get
+      the same option, and their default behaviour is now to \emph{not}
+      duplicate, for efficiency.  \code{mMatrix_as_d?geMatrix()} are 
+      no longer.
     }
   }
 }

@@ -871,15 +871,20 @@ fixupDense <- function(m, from, cldm = getClassDef(class(m))) {
     m
 }
 
-##' @title Transform {vectors, matrix, Matrix, ...} to  dgeMatrix
+##' @title Transform {vectors, matrix, Matrix, ...} to dgeMatrix
+##' @param from An \R{} object.
+##' @param force Logical flag.  If \code{TRUE}, a \emph{duplicate}
+##'     of \code{from} is returned even if \code{from} is already
+##'     a \code{dgeMatrix}.  Otherwise, \code{from} is returned
+##'     uncopied in that case.
 ##' @export
-..2dge <- function(from) .Call(dup_mMatrix_as_dgeMatrix, from)
-if(FALSE) ## FIXME: From R we want something like (but all in C - where inherits() is "free"
-..2dge <- function(from, check=TRUE) {
-    if(check && inherits(from,"geMatrix")) from
-    else .Call(dup_mMatrix_as_dgeMatrix, from)
+..2dge <- function(from, force=FALSE) {
+    .Call(R_dup_mMatrix_as_dgeMatrix, from, force)
 }
 
+..2ge <- function(from, force=FALSE) { # MJ: export?
+    .Call(R_dup_mMatrix_as_geMatrix, from, force)
+}
 
 ## -> ./ldenseMatrix.R :
 l2d_Matrix <- function(from, cl = MatrixClass(class(from)), cld = getClassDef(cl)) {

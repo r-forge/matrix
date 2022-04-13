@@ -232,7 +232,7 @@ SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b, SEXP LDL)
 	return R_NilValue;// == "CHOLMOD factorization failed"
     }
 
-    CHM_DN cx, cb = AS_CHM_DN(PROTECT(mMatrix_as_dgeMatrix(b)));
+    CHM_DN cx, cb = AS_CHM_DN(PROTECT(dup_mMatrix_as_dgeMatrix(b, FALSE)));
     R_CheckStack();
     cx = cholmod_solve(CHOLMOD_A, L, cb, &c);
     cholmod_free_factor(&L, &c);

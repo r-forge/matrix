@@ -650,13 +650,11 @@ SEXP Csp_dense_products(SEXP a, SEXP b,
        according to the general R philosophy of treating vectors in matrix products.
     */
 
-    /* repeating a "cheap part" of  mMatrix_as_dgeMatrix2(b, .)  to see if
-     * we have a vector that we might 'transpose_if_vector' : */
-    static const char *valid[] = {"_NOT_A_CLASS_", MATRIX_VALID_ddense, ""};
-    /* int ctype = R_check_class_etc(b, valid);
-     * if (ctype > 0)   /.* a ddenseMatrix object */
+    /* repeating a "cheap part" of  dup_mMatrix_as_dgeMatrix2(b, FALSE, .)  
+     * to see if we have a vector that we might 'transpose_if_vector' : */
+    static const char *valid[] = {MATRIX_VALID_ddense, ""};
     if (R_check_class_etc(b, valid) < 0) {
-	// not a ddenseM*:  is.matrix() or vector:
+	// _not_ a ddenseM* or a ddiM*:  is.matrix() or vector:
 	b_is_vector = !isMatrix(b);
     }
 
@@ -668,7 +666,7 @@ SEXP Csp_dense_products(SEXP a, SEXP b,
 	// Here, we transpose already in mMatrix_as_dge*()  ==> don't do it later:
 	transp_b = FALSE;
     }
-    SEXP b_M = PROTECT(mMatrix_as_dgeMatrix2(b, maybe_transp_b));
+    SEXP b_M = PROTECT(dup_mMatrix_as_dgeMatrix2(b, FALSE, maybe_transp_b));
 
     CHM_DN chb = AS_CHM_DN(b_M), b_t;
     R_CheckStack();

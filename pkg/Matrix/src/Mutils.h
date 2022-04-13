@@ -17,7 +17,7 @@ extern "C" {
 /* NB: For 'USE_FC_LEN_T' and 'FCONE' (for LTO), 
    the "includer" will #include "Lapack-etc.h"
 */
-    
+
 /* From <Defn.h> : */
 /* 'alloca' is neither C99 nor POSIX */
 #ifdef __GNUC__
@@ -80,6 +80,8 @@ typedef int R_xlen_t;
 # define MAKE_CLASS(what)	  R_do_MAKE_CLASS(what)
 # define NEW_OBJECT(class_def)	  R_do_new_object(class_def)
 #endif
+/* A safe NEW_OBJECT(MAKE_CLASS(what)) : */
+SEXP NEW_OBJECT_OF_CLASS(const char* what);
     
 /* Stored pointers to symbols initialized in R_init_Matrix() from ./init.c */
 extern
@@ -198,14 +200,6 @@ void set_factor(SEXP obj, char *nm, SEXP val);
 SEXP R_set_factor(SEXP obj, SEXP val, SEXP nm, SEXP warn);
 SEXP R_empty_factors(SEXP obj, SEXP warn);
 
-Rboolean equal_string_vectors(SEXP s1, SEXP s2);
-R_xlen_t strmatch(char *nm, SEXP s);
-SEXP append_to_named_list(SEXP x, char *nm, SEXP val);
-
-char La_norm_type (const char *typstr);
-char La_rcond_type(const char *typstr);
-SEXP as_det_obj(double mod, int log, int sign);
-
 void ddense_unpacked_make_triangular(double *to, SEXP from);
 void ldense_unpacked_make_triangular(   int *to, SEXP from);
 void ddense_unpacked_make_symmetric( double *to, SEXP from);
@@ -217,16 +211,29 @@ double *ddense_pack(double *dest, const double *src, int n,
 		    enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
 int *ldense_pack(int *dest, const int *src, int n,
 		 enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
+
 double *ddense_unpack(double *dest, const double *src, int n,
 		      enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
 int *ldense_unpack(int *dest, const int *src, int n,
 		   enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
 
-#if 0 /* unused */
-double get_double_by_name(SEXP obj, char *nm);
-SEXP set_double_by_name(SEXP obj, double val, char *nm);
-SEXP dgCMatrix_set_Dim(SEXP x, int nrow);
-#endif /* unused */
+SEXP R_dup_mMatrix_as_geMatrix(SEXP A, SEXP force);
+SEXP dup_mMatrix_as_geMatrix(SEXP A, Rboolean force);
+SEXP dup_mMatrix_as_geMatrix2(SEXP A, Rboolean force,
+			      Rboolean transpose_if_vector);
+
+SEXP R_dup_mMatrix_as_dgeMatrix(SEXP A, SEXP force);
+SEXP dup_mMatrix_as_dgeMatrix(SEXP A, Rboolean force);
+SEXP dup_mMatrix_as_dgeMatrix2(SEXP A, Rboolean force,
+			       Rboolean transpose_if_vector);
+
+Rboolean equal_string_vectors(SEXP s1, SEXP s2);
+R_xlen_t strmatch(char *nm, SEXP s);
+SEXP append_to_named_list(SEXP x, char *nm, SEXP val);
+
+char La_norm_type(const char *typstr);
+char La_rcond_type(const char *typstr);
+SEXP as_det_obj(double mod, int log, int sign);
 
 /* MJ: No longer needed ... replacement in ./packedMatrix.c */
 #if 0
@@ -238,10 +245,26 @@ void tr_d_packed_getDiag(double *dest, SEXP x, int n);
 void tr_l_packed_getDiag(   int *dest, SEXP x, int n);
 SEXP tr_d_packed_setDiag(double *diag, int l_d, SEXP x, int n);
 SEXP tr_l_packed_setDiag(   int *diag, int l_d, SEXP x, int n);
+/* These two *_addDiag() were unused and not replaced */
+SEXP d_packed_addDiag(double *diag, int l_d, SEXP x, int n); 
+SEXP tr_d_packed_addDiag(double *diag, int l_d, SEXP x, int n);
 #endif /* MJ */
 
-SEXP d_packed_addDiag(double *diag, int l_d, SEXP x, int n);
-SEXP tr_d_packed_addDiag(double *diag, int l_d, SEXP x, int n);
+#if 0 /* unused */
+double get_double_by_name(SEXP obj, char *nm);
+SEXP set_double_by_name(SEXP obj, double val, char *nm);
+SEXP dgCMatrix_set_Dim(SEXP x, int nrow);
+SEXP new_dgeMatrix(int nrow, int ncol);
+#endif /* unused */
+
+SEXP Matrix_expand_pointers(SEXP pP);
+SEXP m_encodeInd (SEXP ij,        SEXP di, SEXP orig_1, SEXP chk_bnds);
+SEXP m_encodeInd2(SEXP i, SEXP j, SEXP di, SEXP orig_1, SEXP chk_bnds);
+SEXP Mmatrix(SEXP args);
+
+SEXP R_rbind2_vector(SEXP a, SEXP b);
+SEXP R_all0(SEXP x);
+SEXP R_any0(SEXP x);
 
 /**
  * Allocate an SEXP of given type and length, assign it as slot nm in
@@ -330,37 +353,50 @@ SEXP inv_permutation(SEXP p_, SEXP zero_p, SEXP zero_res)
     return val;
 }
 
-SEXP Mmatrix(SEXP args);
-
-SEXP Matrix_expand_pointers(SEXP pP);
-
-SEXP dup_mMatrix_as_dgeMatrix2(SEXP A, Rboolean tr_if_vec);
-SEXP dup_mMatrix_as_dgeMatrix (SEXP A);
-SEXP dup_mMatrix_as_geMatrix  (SEXP A);
-
-SEXP new_dgeMatrix(int nrow, int ncol);
-SEXP m_encodeInd (SEXP ij,        SEXP di, SEXP orig_1, SEXP chk_bnds);
-SEXP m_encodeInd2(SEXP i, SEXP j, SEXP di, SEXP orig_1, SEXP chk_bnds);
-
-SEXP R_rbind2_vector(SEXP a, SEXP b);
-
-SEXP R_all0(SEXP x);
-SEXP R_any0(SEXP x);
-
-static R_INLINE SEXP
-mMatrix_as_dgeMatrix(SEXP A) {
-    return strcmp(class_P(A), "dgeMatrix") ? dup_mMatrix_as_dgeMatrix(A) : A;
-}
-static R_INLINE SEXP
-mMatrix_as_dgeMatrix2(SEXP A, Rboolean tr_if_vec) {
-    return strcmp(class_P(A), "dgeMatrix") ? dup_mMatrix_as_dgeMatrix2(A, tr_if_vec) : A;
-}
-
-static R_INLINE SEXP
-mMatrix_as_geMatrix(SEXP A)
+/**
+ * Return the 0-based index of a string match in a vector of strings
+ * terminated by an empty string.  Returns -1 for no match.
+ * Is  __cheap__ :  __not__ looking at superclasses --> better use  R_check_class_etc(obj, *)
+ *
+ * @param x string to match
+ * @param valid vector of possible matches terminated by an empty string
+ *
+ * @return index of match or -1 for no match
+ */
+static R_INLINE
+int Matrix_check_class_(char *x, const char **valid)
 {
-    return strcmp(class_P(A) + 1, "geMatrix") ? dup_mMatrix_as_geMatrix(A) : A;
+    int ans = 0;
+    while (strlen(valid[ans]))
+	if (!strcmp(x, valid[ans]))
+	    return ans;
+	else
+	    ++ans;
+    return -1;
 }
+
+static R_INLINE
+int Matrix_check_class(SEXP x, const char **valid)
+{
+    return Matrix_check_class_((char *) class_P(x), valid);
+}
+
+/**
+ * These are the ones "everyone" should use -- is() versions, also looking
+ * at super classes:
+
+ * They now use R(semi_API) from  Rinternals.h :
+ * int R_check_class_and_super(SEXP x, const char **valid, SEXP rho);
+ * int R_check_class_etc      (SEXP x, const char **valid);
+
+ * R_check_class_etc      (x, v)      basically does  rho <- .classEnv(x)  and then calls
+ * R_check_class_and_super(x, v, rho)
+ */
+// No longer:
+#ifdef DEPRECATED_Matrix_check_class_
+# define Matrix_check_class_etc R_check_class_etc
+# define Matrix_check_class_and_super R_check_class_and_super
+#endif
 
 // Keep centralized --- *and* in sync with ../inst/include/Matrix.h :
 #define MATRIX_VALID_ge_dense			\
@@ -437,45 +473,6 @@ mMatrix_as_geMatrix(SEXP A)
 #endif
 
 #define MATRIX_VALID_CHMfactor "dCHMsuper", "dCHMsimpl", "nCHMsuper", "nCHMsimpl"
-
-/**
- * Return the 0-based index of a string match in a vector of strings
- * terminated by an empty string.  Returns -1 for no match.
- * Is  __cheap__ :  __not__ looking at superclasses --> better use  R_check_class_etc(obj, *)
- *
- * @param class string to match
- * @param valid vector of possible matches terminated by an empty string
- *
- * @return index of match or -1 for no match
- */
-static R_INLINE int
-Matrix_check_class(char *class, const char **valid)
-{
-    int ans;
-    for (ans = 0; ; ans++) {
-	if (!strlen(valid[ans])) return -1;
-	if (!strcmp(class, valid[ans])) return ans;
-    }
-}
-
-/**
- * These are the ones "everyone" should use -- is() versions, also looking
- * at super classes:
-
- * They now use R(semi_API) from  Rinternals.h :
- * int R_check_class_and_super(SEXP x, const char **valid, SEXP rho);
- * int R_check_class_etc      (SEXP x, const char **valid);
-
- * R_check_class_etc      (x, v)      basically does  rho <- .classEnv(x)  and then calls
- * R_check_class_and_super(x, v, rho)
- */
-// No longer:
-#ifdef DEPRECATED_Matrix_check_class_
-# define Matrix_check_class_etc R_check_class_etc
-# define Matrix_check_class_and_super R_check_class_and_super
-#endif
-
-SEXP NEW_OBJECT_OF_CLASS(const char* cls);
 
 /** Accessing  *sparseVectors :  fast (and recycling)  v[i] for v = ?sparseVector:
  * -> ./sparseVector.c  -> ./t_sparseVector.c :
