@@ -186,6 +186,7 @@ all.equal.X <- function(x,y, except, tol = .Machine$double.eps^0.5, ...)
 ##  all.equal.X(env(m1), env(m2), except = c("call", "frame"))
 
 ## The relative error typically returned by all.equal:
+if(!exists("relErr", mode="function"))##  use sfsmisc::relErr  if {sfsmisc} is attached:
 relErr <- function(target, current) { ## make this work for 'Matrix' ==> no mean() ..
     n <- length(current)
     if(length(target) < n)
@@ -199,6 +200,10 @@ relErr <- function(target, current) { ## make this work for 'Matrix' ==> no mean
 ##' @param current numeric of length() a multiple of length(target)
 ##' @return *vector* of the same length as current
 ##' @author Martin Maechler
+##'
+##' @note OUTDATED/SUPERSEDED by  sfsmisc::relErrV() which deals with Inf, denormalized, ...
+##'    ==> define it only if it does not exist visibly at this point:
+if(!exists("relErrV", mode="function"))
 relErrV <- function(target, current) {
     n <- length(target <- as.vector(target))
     ## assert( <length current> is multiple of <length target>) :
