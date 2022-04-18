@@ -23,7 +23,7 @@
 }
 \source{ %% no \url anymore, as broken (Jan. 2015)
   The data were retrieved from \code{http://sal.uiuc.edu/weights/zips/usc.zip},
-  files \dQuote{usc.txt} and \dQuote{usc\_q.GAL}, with permission for use
+  files \dQuote{usc.txt} and \dQuote{usc_q.GAL}, with permission for use
   and distribution from Luc Anselin (in early 2008).
 }
 \references{
