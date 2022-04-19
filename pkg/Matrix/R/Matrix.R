@@ -128,16 +128,12 @@ setMethod("cov2cor", signature(V = "Matrix"),
 	      as(forceSymmetric(r), "dpoMatrix")
           })
 
+## MJ: No longer needed ... replacement in ./unpackedMatrix.R
+if(FALSE) {
 ## "base" has an isSymmetric() S3-generic since R 2.3.0
-setMethod("isSymmetric", signature(object = "symmetricMatrix"),
-	  function(object, ...) TRUE)
-setMethod("isSymmetric", signature(object = "triangularMatrix"),
-	  ## TRUE iff diagonal:
-	  function(object, ...) isDiagonal(object))
-
 setMethod("isTriangular", signature(object = "matrix"), isTriMat)
-
 setMethod("isDiagonal", signature(object = "matrix"), .is.diagonal)
+}
 
 ## The "catch all" methods -- far from optimal:
 setMethod("symmpart", signature(x = "Matrix"),

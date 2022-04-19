@@ -842,7 +842,7 @@ is_duplicatedT <- # <- keep old name for a while, as ../inst/test-tools-Matrix.R
 anyDuplicatedT <- function(x, di = dim(x))
     anyDuplicated(.Call(m_encodeInd2, x@i, x@j, di, FALSE, FALSE))
 
-
+if(FALSE) { ## MJ: No longer needed ... replacement in ./unpackedMatrix.R
 t_geMatrix <- function(x) {
     x@x <- as.vector(t(array(x@x, dim = x@Dim))) # no dimnames here
     x@Dim <- x@Dim[2:1]
@@ -860,6 +860,7 @@ t_trMatrix <- function(x) {
     # and keep x@diag
     x
 }
+} ## MJ
 
 fixupDense <- function(m, from, cldm = getClassDef(class(m))) {
     if(extends(cldm, "triangularMatrix")) {
@@ -1281,7 +1282,7 @@ try_as <- function(x, classes, tryAnyway = FALSE) {
     if(ok) as(x, classes[1]) else x
 }
 
-
+if (FALSE) { ## MJ: No longer needed ... replacement in ./(un)?packedMatrix.R
 ## For *dense* matrices
 isTriMat <- function(object, upper = NA, ...) {
     ## pretest: is it square?
@@ -1303,6 +1304,7 @@ isTriMat <- function(object, upper = NA, ...) {
 	if(all0(object[lower.tri(object)])) TRUE.U else FALSE
     else ## upper is FALSE
 	if(all0(object[upper.tri(object)])) TRUE.L else FALSE
+}
 }
 
 ## For Tsparse matrices:
@@ -1369,7 +1371,7 @@ isTriC <- function(object, upper = NA, ...) {
     }
 }
 
-
+if (FALSE) { ## MJ: No longer needed ... replacement in ./(un)?packedMatrix.R
 ## When the matrix is known to be [n x n] aka "square"
 ## (need "vector-indexing" work for 'M'):
 .is.diagonal.sq.matrix <- function(M, n = dim(M)[1L])
@@ -1395,7 +1397,7 @@ isTriC <- function(object, upper = NA, ...) {
 	    all0(as(object,"matrix")[rep_len(c(FALSE, rep.int(TRUE,n)), n^2)])
         }
 }
-
+}
 
 ## Purpose: Transform a *unit diagonal* sparse triangular matrix
 ##	into one with explicit diagonal entries '1'

@@ -394,7 +394,7 @@ SEXP dense_to_symmetric(SEXP x, SEXP uplo, SEXP symm_test)
     int *adims = INTEGER(GET_SLOT(dx, Matrix_DimSym)), n = adims[0];
     if(n != adims[1]) {
 	UNPROTECT(1);
-	error(_("ddense_to_symmetric(): matrix is not square!"));
+	error(_("dense_to_symmetric(): matrix is not square!"));
 	return R_NilValue; /* -Wall */
     }
 

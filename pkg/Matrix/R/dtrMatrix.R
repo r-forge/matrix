@@ -41,6 +41,9 @@ setMethod("determinant", signature(x = "dtrMatrix", logarithm = "missing"),
 setMethod("determinant", signature(x = "dtrMatrix", logarithm = "logical"),
 	  function(x, logarithm, ...) mkDet(diag(x), logarithm))
 
+## MJ: No longer needed ... replacement in ./unpackedMatrix.R
+if (FALSE) {
+setMethod("t", signature(x = "dtrMatrix"), t_trMatrix)
 setMethod("diag", signature(x = "dtrMatrix"),
           .mkSpec.diag(quote(dtrMatrix_getDiag)),
           valueClass = "numeric")
@@ -50,6 +53,7 @@ setMethod("diag<-", signature(x = "dtrMatrix"),
 		    if(x@diag == "U") .dense.diagU2N(x, "d", isPacked=FALSE) else x,
 		    value)
 	  })
+} ## MJ
 
 setMethod("norm", signature(x = "dtrMatrix", type = "character"),
 	  function(x, type, ...)
@@ -108,5 +112,3 @@ setMethod("solve", signature(a = "dtrMatrix", b="matrix"),
 	      chk.s(..., which.call=-2)
 	      .Call(dtrMatrix_matrix_solve, a, b)
 	  }, valueClass = "dgeMatrix")
-
-setMethod("t", signature(x = "dtrMatrix"), t_trMatrix)

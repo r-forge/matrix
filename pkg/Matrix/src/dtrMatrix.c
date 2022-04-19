@@ -239,6 +239,9 @@ SEXP dtrMatrix_as_matrix(SEXP from, SEXP keep_dimnames)
     return val;
 }
 
+/* MJ: No longer needed ... replacement in ./unpackedMatrix.c */
+#if 0
+
 #define GET_trMatrix_Diag(_C_TYPE_, _SEXPTYPE_, _SEXP_, _ONE_)		\
     int i, n = INTEGER(GET_SLOT(x, Matrix_DimSym))[0];			\
     SEXP x_x = GET_SLOT(x, Matrix_xSym);				\
@@ -292,6 +295,8 @@ SEXP dtrMatrix_setDiag(SEXP x, SEXP d) {
 SEXP ltrMatrix_setDiag(SEXP x, SEXP d) {
     SET_trMatrix_Diag(  int, LOGICAL);
 }
+
+#endif /* MJ */
 
 SEXP dtrMatrix_addDiag(SEXP x, SEXP d) {
     int n = INTEGER(GET_SLOT(x, Matrix_DimSym))[0];

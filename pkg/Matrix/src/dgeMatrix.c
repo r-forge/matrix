@@ -346,7 +346,8 @@ SEXP geMatrix_matrix_mm(SEXP a, SEXP b, SEXP right) {
     return val;
 }
 
-//---------------------------------------------------------------------
+/* MJ: No longer needed ... replacement in ./unpackedMatrix.c */
+#if 0
 
 SEXP dgeMatrix_getDiag(SEXP x)
 {
@@ -385,7 +386,6 @@ SEXP lgeMatrix_getDiag(SEXP x)
 #undef geMatrix_getDiag_1
 #undef geMatrix_getDiag_2
 
-
 SEXP dgeMatrix_setDiag(SEXP x, SEXP d)
 {
 #define geMatrix_setDiag_1					\
@@ -422,6 +422,8 @@ SEXP lgeMatrix_setDiag(SEXP x, SEXP d)
 
 #undef geMatrix_setDiag_1
 #undef geMatrix_setDiag_2
+
+#endif /* MJ */
 
 SEXP dgeMatrix_addDiag(SEXP x, SEXP d)
 {

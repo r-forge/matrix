@@ -37,7 +37,7 @@ setAs("matrix", "triangularMatrix", function(from) mat2tri(from))
 ## we use this hack instead of signature  x = "triangularMatrix" :
 
 trCls <- names(getClass("triangularMatrix")@subclasses)
-trCls. <- trCls[grep(".t.Matrix", trCls)]  # not "*Cholesky", "*Kaufman" ..
+trCls. <- grep("^.t.Matrix$", trCls, value = TRUE) # not "p?Cholesky", etc.
 for(cls in trCls.) {
     setMethod("tril", cls, .tril.tr)
     setMethod("triu", cls, .triu.tr)
@@ -45,17 +45,19 @@ for(cls in trCls.) {
 
 ## ditto here:
 
-isTriTri <- function(x, upper=NA) {
-    if(is.na(upper)) structure(TRUE, kind=x@uplo)
-    else if(upper) x@uplo == "U"
-    else           x@uplo == "L"
+isTriTri <- function(object, upper = NA, ...) {
+    if(is.na(upper)) `attr<-`(TRUE, "kind", object@uplo)
+    else if(upper)   object@uplo == "U"
+    else             object@uplo == "L"
 }
 for(cls in trCls)
-    setMethod("isTriangular", signature(object = cls),
-	      function(object, upper=NA, ...) isTriTri(object, upper))
-## instead of just for ....   signature(object = "triangularMatrix")
-
+    setMethod("isTriangular", signature(object = cls), isTriTri)
+## instead of just for ...    signature(object = "triangularMatrix")
 rm(trCls, trCls., cls)
+
+setMethod("isSymmetric", signature(object = "triangularMatrix"),
+	  ## TRUE iff diagonal:
+	  function(object, ...) isDiagonal(object))
 
 cholTrimat <- function(x, ...) {
     if(isDiagonal(x))

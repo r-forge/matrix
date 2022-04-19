@@ -1016,3 +1016,10 @@ scale.sparseMatrix <- function(x, center = FALSE, scale = TRUE) {
     if(is.numeric(scale)) attr(x, "scaled:scale") <- scale
     x
 }
+
+setMethod("pack", signature(x = "sparseMatrix"),
+          function(x, ...) stop(sprintf("invalid class \"%s\" to 'pack()'; only dense matrices can be packed", class(x))))
+
+setMethod("unpack", signature(x = "sparseMatrix"),
+          function(x, ...) stop(sprintf("invalid class \"%s\" to 'unpack()'; only dense matrices can be unpacked", class(x))))
+

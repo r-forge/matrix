@@ -22,9 +22,8 @@ SEXP Dim_validate(SEXP dim, const char* domain) {
        //     return mkString(_("'Dim' slot is not numeric"));
        though above is not enough as we must prohibit Dim[i] > INT_MAX
 
-       FIXME? Prohibit inherits(dim, "factor") and return a different
-       error message in that case? What about S3-classed slot values,
-       more generally?
+       FIXME? Prohibit is.object(dim) or maybe just inherits(dim, "factor") 
+       and return a different error message in that case?
     */
     if (TYPEOF(dim) != INTSXP)
 	return mkString(_("'Dim' slot is not of type \"integer\""));
@@ -154,20 +153,6 @@ SEXP compMatrix_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
-SEXP triangularMatrix_validate(SEXP obj)
-{
-    int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym));
-    if (pdim[1] != pdim[0])
-	return mkString(_("Dim[1] != Dim[2] (matrix is not square)"));
-    SEXP val = string_scalar_validate(GET_SLOT(obj, Matrix_uploSym),
-				      "UL", "'uplo' slot");
-    if (isString(val))
-	return val;
-    else
-	return string_scalar_validate(GET_SLOT(obj, Matrix_diagSym),
-				      "NU", "'diag' slot");
-}
-
 SEXP symmetricMatrix_validate(SEXP obj)
 {
     int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym)), n = pdim[0];
@@ -190,10 +175,11 @@ SEXP symmetricMatrix_validate(SEXP obj)
 	: coerceVector(x, STRSXP)))
     
     if (n > 0) {
+	/* It is already known that the length of 'dn[[i]]' is 0 or 'n' */ 
 	SEXP dn = GET_SLOT(obj, Matrix_DimNamesSym), rn, cn;
 	if (LENGTH(rn = VECTOR_ELT(dn, 0)) == n &&
 	    LENGTH(cn = VECTOR_ELT(dn, 1)) == n &&
-	    !equal_string_vectors(ANY_TO_STRING(rn), ANY_TO_STRING(cn)))
+	    !equal_string_vectors(ANY_TO_STRING(rn), ANY_TO_STRING(cn), n))
 	    return mkString(_("Dimnames[[1]] differs from Dimnames[[2]]"));
     }
     
@@ -202,6 +188,20 @@ SEXP symmetricMatrix_validate(SEXP obj)
 
     return string_scalar_validate(GET_SLOT(obj, Matrix_uploSym),
 				  "UL", "'uplo' slot");
+}
+
+SEXP triangularMatrix_validate(SEXP obj)
+{
+    int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym));
+    if (pdim[1] != pdim[0])
+	return mkString(_("Dim[1] != Dim[2] (matrix is not square)"));
+    SEXP val = string_scalar_validate(GET_SLOT(obj, Matrix_uploSym),
+				      "UL", "'uplo' slot");
+    if (isString(val))
+	return val;
+    else
+	return string_scalar_validate(GET_SLOT(obj, Matrix_diagSym),
+				      "NU", "'diag' slot");
 }
 
 SEXP diagonalMatrix_validate(SEXP obj)
@@ -501,155 +501,13 @@ SEXP R_empty_factors(SEXP obj, SEXP warn)
 
 /* For coercions ==================================================== */
 
-#define MAKE_TRIANGULAR_LOOP(_X_, _DIM_, _UPLO_, _DIAG_, _ZERO_, _ONE_)	\
-    do {								\
-        int i, j, m = _DIM_[0], n = _DIM_[1], r = (m < n) ? m : n;	\
-	R_xlen_t pos;							\
-									\
-	if (_UPLO_ == 'U') {						\
-	    pos = 1;							\
-	    for (j = 0; j < r; pos += (++j)+1) {			\
-		for (i = j+1; i < m; ++i) {				\
-		    _X_[pos++] = _ZERO_;				\
-		}							\
-	    }								\
-	} else {							\
-	    pos = m;							\
-	    for (j = 1; j < r; pos += m-(j++)) {			\
-		for (i = 0; i < j; ++i) {				\
-		    _X_[pos++] = _ZERO_;				\
-		}							\
-	    }								\
-	    for (j = r; j < n; ++j) {					\
-		for (i = 0; i < m; ++i) {				\
-		    _X_[pos++] = _ZERO_;				\
-		}							\
-	    }								\
-	}								\
-	if (_DIAG_ == 'U') {						\
-	    pos = 0;							\
-	    R_xlen_t mp1 = (R_xlen_t) m + 1;				\
-	    for (j = 0; j < r; ++j, pos += mp1) {			\
-		_X_[pos] = _ONE_;					\
-	    }								\
-	}								\
-    } while(0)
-
-#define MAKE_TRIANGULAR(_PREFIX_, _TYPE_, _ZERO_, _ONE_)		\
-void _PREFIX_ ## dense_unpacked_make_triangular(_TYPE_ *to, SEXP from)  \
-{									\
-    int *pdim = INTEGER(GET_SLOT(from, Matrix_DimSym));			\
-    MAKE_TRIANGULAR_LOOP(to, pdim, *uplo_P(from), *diag_P(from),	\
-			 _ZERO_, _ONE_);				\
-}
-
-/**
- * @brief Make triangular an `unpackedMatrix`.
- * 
- * Fills the "trivial" part of an `unpackedMatrix` with zeros to force 
- * triangularity, or with zeros _and_ ones to force unit triangularity.
- * The `unpackedMatrix` need not be square, though all `triangularMatrix` 
- * _are_.
- * 
- * @param to A pointer to the first element of a length-`m*n` array,
- *     usually the "data" of the `x` slot of an `unpackedMatrix`.
- * @param from A `Matrix` with `Dim`, `uplo` and `diag` slots.
- */
-/* ddense_unpacked_make_triangular() */
-MAKE_TRIANGULAR(d, double, 0.0, 1.0)
-/* ldense_unpacked_make_triangular() */
-MAKE_TRIANGULAR(l, int, 0, 1)
-
-#undef MAKE_TRIANGULAR
-#undef MAKE_TRIANGULAR_LOOP
-
-#define MAKE_SYMMETRIC_LOOP(_X_, _DIM_, _UPLO_)				\
-    do {								\
-        int i, j, n = _DIM_[0];						\
-	R_xlen_t upos = 0, lpos = 0;					\
-									\
-	if (_UPLO_ == 'U') {						\
-	    for (j = 0; j < n; lpos += (++j)+1, upos = lpos) {		\
-		for (i = j+1; i < n; ++i) {				\
-		    _X_[++lpos] = _X_[upos += n];			\
-		}							\
-	    }								\
-	} else {							\
-	    for (j = 0; j < n; lpos += (++j)+1, upos = lpos) {		\
-		for (i = j+1; i < n; ++i) {				\
-		    _X_[upos += n] = _X_[++lpos];			\
-		}							\
-	    }								\
-	}								\
-    } while(0)
-
-#define MAKE_SYMMETRIC(_PREFIX_, _TYPE_)				\
-void _PREFIX_ ## dense_unpacked_make_symmetric(_TYPE_ *to, SEXP from)   \
-{									\
-    int *pdim = INTEGER(GET_SLOT(from, Matrix_DimSym));			\
-    MAKE_SYMMETRIC_LOOP(to, pdim, *uplo_P(from));			\
-}
-
-/**
- * @brief Make symmetric a square `unpackedMatrix`.
- * 
- * Symmetrizes the elements of a square `unpackedMatrix`.
- * 
- * @param to A pointer to the first element of a length-`n*n` array,
- *     usually the "data" of the `x` slot of a square `unpackedMatrix`.
- * @param from A `Matrix` with `Dim` and `uplo` slots.
- */
-/* ddense_unpacked_make_symmetric() */
-MAKE_SYMMETRIC(d, double)
-/* ldense_unpacked_make_symmetric() */
-MAKE_SYMMETRIC(l, int)
-
-#undef MAKE_SYMMETRIC
-#undef MAKE_SYMMETRIC_LOOP
-
-#define MAKE_DIAGONAL(_PREFIX_, _TYPE_, _PTR_, _ONE_)		        \
-void _PREFIX_ ## dense_unpacked_make_diagonal(_TYPE_ *to, SEXP from)    \
-{									\
-    int n = INTEGER(GET_SLOT(from, Matrix_DimSym))[0];			\
-    R_xlen_t pos = 0, np1 = (R_xlen_t) n + 1;				\
-    									\
-    Memzero(to, n * (size_t) n);					\
-    if (*diag_P(from) == 'U') {						\
-	for (int j = 0; j < n; ++j, pos += np1) {			\
-	    to[pos] = _ONE_;						\
-	}								\
-    } else {								\
-	_TYPE_ *px = _PTR_(GET_SLOT(from, Matrix_xSym));		\
-	for (int j = 0; j < n; ++j, pos += np1) {			\
-	    to[pos] = px[j];						\
-	}								\
-    }									\
-}
-
-/**
- * @brief Make diagonal a square `unpackedMatrix`.
- *
- * Copy a length-`n` diagonal from a `[dl]diMatrix` to a length-`n*n` 
- * array (after zero-ing the array).
- * 
- * @param to A pointer to the first element of a length-`n*n` array,
- *     usually the "data" of the `x` slot of a square `unpackedMatrix`.
- * @param from A `[dl]diMatrix`.
- */
-/* ddense_unpacked_make_diagonal() */
-MAKE_DIAGONAL(d, double, REAL, 1.0)
-/* ldense_unpacked_make_diagonal() */
-MAKE_DIAGONAL(l, int, LOGICAL, 1)
-
-#undef MAKE_DIAGONAL
-
-#define PACK(_PREFIX_, _TYPE_, _ONE_)				        \
-_TYPE_* _PREFIX_ ## dense_pack(_TYPE_ *dest, const _TYPE_ *src, int n,  \
-			       enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag) \
+#define PACK(_PREFIX_, _CTYPE_, _INIT_ONE_, _ONE_)			\
+_CTYPE_* _PREFIX_ ## dense_pack(_CTYPE_ *dest, const _CTYPE_ *src, int n, \
+				enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag) \
 {									\
     int i, j;								\
     R_xlen_t dpos = 0, spos = 0;					\
-									\
+    _INIT_ONE_;								\
     switch (uplo) {							\
     case UPP:								\
         for (j = 0; j < n; spos += n-(++j))				\
@@ -663,7 +521,7 @@ _TYPE_* _PREFIX_ ## dense_pack(_TYPE_ *dest, const _TYPE_ *src, int n,  \
 	break;								\
     case LOW:								\
     	for (j = 0; j < n; spos += (++j))				\
-	    for (i = j; i <  n; ++i)					\
+	    for (i = j; i < n; ++i)					\
 		dest[dpos++] = src[spos++];				\
 	if (diag == UNT) {						\
 	    dpos = 0;							\
@@ -696,19 +554,21 @@ _TYPE_* _PREFIX_ ## dense_pack(_TYPE_ *dest, const _TYPE_ *src, int n,  \
  * @return `dest`
  */
 /* ddense_pack() */
-PACK(d, double, 1.0)
-/* ldense_pack() */
-PACK(l, int, 1)
+PACK(d, double, , 1.0)
+/* idense_pack() */
+PACK(i, int, , 1)
+/* zdense_pack() */
+PACK(z, Rcomplex, Rcomplex one; one.r = 1.0; one.i = 0.0, one)
 
 #undef PACK
 
-#define UNPACK(_PREFIX_, _TYPE_, _ONE_)					\
-_TYPE_* _PREFIX_ ## dense_unpack(_TYPE_ *dest, const _TYPE_ *src, int n, \
-				 enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag) \
+#define UNPACK(_PREFIX_, _CTYPE_, _INIT_ONE_, _ONE_)			\
+_CTYPE_* _PREFIX_ ## dense_unpack(_CTYPE_ *dest, const _CTYPE_ *src, int n, \
+				  enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag) \
 {									\
     int i, j;								\
     R_xlen_t dpos = 0, spos = 0;					\
-    									\
+    _INIT_ONE_;								\
     Memzero(dest, n * (size_t) n);					\
     switch (uplo) {							\
     case UPP:								\
@@ -752,11 +612,301 @@ _TYPE_* _PREFIX_ ## dense_unpack(_TYPE_ *dest, const _TYPE_ *src, int n, \
  * @return `dest`
  */
 /* ddense_unpack() */
-UNPACK(d, double, 1.0)
-/* ldense_unpack() */
-UNPACK(l, int, 1)
+UNPACK(d, double, , 1.0)
+/* idense_unpack() */
+UNPACK(i, int, , 1)
+/* zdense_unpack() */
+UNPACK(z, Rcomplex, Rcomplex one; one.r = 1.0; one.i = 0.0;, one)
 
 #undef UNPACK
+
+#define MAKE_SYMMETRIC_SET_EQ(_X_, _DEST_, _SRC_)	\
+    _X_[_DEST_] = _X_[_SRC_]
+
+#define MAKE_SYMMETRIC_SET_CJ(_X_, _DEST_, _SRC_)			\
+    do {								\
+	_X_[_DEST_].r =  _X_[_SRC_].r;					\
+	_X_[_DEST_].i = -_X_[_SRC_].i;					\
+    } while (0)
+
+#define MAKE_SYMMETRIC(_PREFIX_, _CTYPE_, _SET_)			\
+void _PREFIX_ ## dense_unpacked_make_symmetric(_CTYPE_ *to, SEXP from)  \
+{									\
+    int i, j, n = INTEGER(GET_SLOT(from, Matrix_DimSym))[0], nm1 = n - 1; \
+    R_xlen_t upos = n, lpos = 1;					\
+    if (*uplo_P(from) == 'U')						\
+	for (j = 0; j < n; upos = (lpos += (++j)+1) + nm1)		\
+	    for (i = j+1; i < n; ++i, upos += n, ++lpos)		\
+		_SET_(to, lpos, upos);					\
+    else								\
+	for (j = 0; j < n; upos = (lpos += (++j)+1) + nm1)		\
+	    for (i = j+1; i < n; ++i, upos += n, ++lpos)		\
+		_SET_(to, upos, lpos);					\
+    return;								\
+}
+
+/**
+ * @brief Make symmetric a square `unpackedMatrix`.
+ * 
+ * Symmetrizes the elements of a square `unpackedMatrix`.
+ * 
+ * @param to A pointer to the first element of a length-`n*n` array,
+ *     usually the "data" of the `x` slot of a square `unpackedMatrix`.
+ * @param from A `Matrix` with `Dim` and `uplo` slots.
+ */
+/* ddense_unpacked_make_symmetric() */
+MAKE_SYMMETRIC(d, double, MAKE_SYMMETRIC_SET_EQ)
+/* idense_unpacked_make_symmetric() */
+MAKE_SYMMETRIC(i, int, MAKE_SYMMETRIC_SET_EQ)
+/* zdense_unpacked_make_symmetric() */
+MAKE_SYMMETRIC(z, Rcomplex, MAKE_SYMMETRIC_SET_CJ)
+
+#undef MAKE_SYMMETRIC
+#undef MAKE_SYMMETRIC_SET_CJ
+#undef MAKE_SYMMETRIC_SET_EQ
+
+#define MAKE_TRIANGULAR(_PREFIX_, _CTYPE_,				\
+			_INIT_ZERO_, _ZERO_, _INIT_ONE_, _ONE_)		\
+void _PREFIX_ ## dense_unpacked_make_triangular(_CTYPE_ *to, SEXP from) \
+{									\
+    int *pdim = INTEGER(GET_SLOT(from, Matrix_DimSym)),			\
+	i, j, m = pdim[0], n = pdim[1], r = (m < n) ? m : n;		\
+    R_xlen_t pos = 0;							\
+    _INIT_ZERO_;							\
+    if (*uplo_P(from) == 'U') {						\
+	for (j = 0; j < r; pos += (++j)+1)				\
+	    for (i = j+1; i < m; ++i)					\
+		to[++pos] = _ZERO_;					\
+    } else {								\
+	for (j = 0; j < r; pos += m-(j++))				\
+	    for (i = 0; i < j; ++i)					\
+		to[pos++] = _ZERO_;					\
+	for (j = r; j < n; ++j)						\
+	    for (i = 0; i < m; ++i)					\
+		to[pos++] = _ZERO_;					\
+    }									\
+    if (*diag_P(from) == 'U') {						\
+	pos = 0;							\
+	_INIT_ONE_;							\
+	R_xlen_t mp1 = (R_xlen_t) m + 1;				\
+	for (j = 0; j < r; ++j, pos += mp1)				\
+	    to[pos] = _ONE_;						\
+    }									\
+    return;								\
+}
+
+/**
+ * @brief Make triangular an `unpackedMatrix`.
+ * 
+ * Fills the "trivial" part of an `unpackedMatrix` with zeros to force 
+ * triangularity, or with zeros _and_ ones to force unit triangularity.
+ * The `unpackedMatrix` need not be square, though all `triangularMatrix` 
+ * _are_.
+ * 
+ * @param to A pointer to the first element of a length-`m*n` array,
+ *     usually the "data" of the `x` slot of an `unpackedMatrix`.
+ * @param from A `Matrix` with `Dim`, `uplo` and `diag` slots.
+ */
+/* ddense_unpacked_make_triangular() */
+MAKE_TRIANGULAR(d, double, , 0.0, , 1.0)
+/* idense_unpacked_make_triangular() */
+MAKE_TRIANGULAR(i, int, , 0, , 1)
+/* zdense_unpacked_make_triangular() */
+MAKE_TRIANGULAR(z, Rcomplex,
+		Rcomplex zero; zero.r = 0.0; zero.i = 0.0;,
+		zero,
+		zero.r = 1.0;,
+		zero)
+
+#undef MAKE_TRIANGULAR
+
+#define MAKE_DIAGONAL(_PREFIX_, _CTYPE_, _PTR_, _INIT_ONE_, _ONE_)	\
+void _PREFIX_ ## dense_unpacked_make_diagonal(_CTYPE_ *to, SEXP from)   \
+{									\
+    int j, n = INTEGER(GET_SLOT(from, Matrix_DimSym))[0];		\
+    R_xlen_t pos = 0, np1 = (R_xlen_t) n + 1;				\
+    Memzero(to, n * (size_t) n);					\
+    if (*diag_P(from) == 'U') {						\
+	_INIT_ONE_;							\
+	for (j = 0; j < n; ++j, pos += np1)				\
+	    to[pos] = _ONE_;						\
+    } else {								\
+	_CTYPE_ *px = _PTR_(GET_SLOT(from, Matrix_xSym));		\
+	for (j = 0; j < n; ++j, pos += np1)				\
+	    to[pos] = px[j];						\
+    }									\
+    return;								\
+}
+
+/**
+ * @brief Make diagonal a square `unpackedMatrix`.
+ *
+ * Copy a length-`n` diagonal from a `.diMatrix` to a length-`n*n` 
+ * array (after zero-ing the array).
+ * 
+ * @param to A pointer to the first element of a length-`n*n` array,
+ *     usually the "data" of the `x` slot of a square `unpackedMatrix`.
+ * @param from A `.diMatrix`.
+ */
+/* ddense_unpacked_make_diagonal() */
+MAKE_DIAGONAL(d, double, REAL, , 1.0)
+/* idense_unpacked_make_diagonal() */
+MAKE_DIAGONAL(i, int, INTEGER, , 1)
+/* zdense_unpacked_make_diagonal() */
+MAKE_DIAGONAL(z, Rcomplex, COMPLEX,
+	      Rcomplex one; one.r = 1.0; one.i = 0.0;, one)
+
+#undef MAKE_DIAGONAL  
+
+#define IS_SYMMETRIC(_PREFIX_, _CTYPE_,					\
+		     _U_IS_NA_, _L_IS_NOT_NA_, _L_IS_NOT_EQUAL_)	\
+Rboolean _PREFIX_ ## dense_unpacked_is_symmetric(_CTYPE_ *px, int *pdim) \
+{									\
+    int n = pdim[0];							\
+    if (pdim[1] != n)							\
+	return FALSE;							\
+    int i, j, nm1 = n - 1;						\
+    R_xlen_t upos = n, lpos = 1;					\
+    for (j = 0; j < n; upos = (lpos += (++j)+1) + nm1)			\
+	for (i = j+1; i < n; ++i, upos += n, ++lpos)			\
+	    if (_U_IS_NA_) {						\
+		if (_L_IS_NOT_NA_)					\
+		    return FALSE;					\
+	    } else {							\
+		if (_L_IS_NOT_EQUAL_)					\
+		    return FALSE;					\
+	    }								\
+    return TRUE;							\
+}
+
+/* ddense_unpacked_is_symmetric() [does not allow fuzz, hence is unused] */
+IS_SYMMETRIC(d, double,
+	     ISNAN(px[upos]),
+	     !ISNAN(px[lpos]),
+	     ISNAN(px[lpos]) || px[lpos] != px[upos])
+/* ldense_unpacked_is_symmetric() */
+IS_SYMMETRIC(l, int,
+	     px[upos] == NA_LOGICAL,
+	     px[lpos] != NA_LOGICAL,
+	     (px[upos] == 0) ? (px[lpos] != 0) : (px[lpos] == 0))
+/* idense_unpacked_is_symmetric() */
+IS_SYMMETRIC(i, int,
+	     px[upos] == NA_INTEGER,
+	     px[lpos] != NA_INTEGER,
+	     px[lpos] != px[upos])
+/* zdense_unpacked_is_symmetric() [does not allow fuzz, hence is unused] */
+IS_SYMMETRIC(z, Rcomplex,
+	     ISNAN(px[upos].r) || ISNAN(px[upos].i) ,
+	     !(ISNAN(px[lpos].r) || ISNAN(px[lpos].i)),
+	     ISNAN(px[lpos].r) || ISNAN(px[lpos].i) ||
+	     px[upos].r != px[lpos].r || px[upos].i != -px[lpos].i)
+
+#undef IS_SYMMETRIC
+
+#define IS_TRIANGULAR(_PREFIX_, _CTYPE_, _L_IS_NOT_ZERO_, _U_IS_NOT_ZERO_) \
+Rboolean _PREFIX_ ## dense_unpacked_is_triangular(_CTYPE_ *px, int *pdim, \
+						  Rboolean upper)	\
+{									\
+    int n = pdim[0];							\
+    if (pdim[1] != n)							\
+	return FALSE;							\
+    int i, j;								\
+    if (upper) {							\
+	for (j = 0; j < n; px += (++j)+1)				\
+	    for (i = j+1; i < n; ++i)					\
+		if (_L_IS_NOT_ZERO_)					\
+		    return FALSE;					\
+    } else {								\
+	for (j = 0; j < n; px += n-(j++))				\
+	    for (i = 0; i < j; ++i)					\
+		if (_U_IS_NOT_ZERO_)					\
+		    return FALSE;					\
+    }									\
+    return TRUE;							\
+}
+
+/* ddense_unpacked_is_triangular() */
+IS_TRIANGULAR(d, double,
+	      ISNAN(*(++px)) || *px != 0.0,
+	      ISNAN(*px) || *(px++) != 0.0)
+/* idense_unpacked_is_triangular() */
+IS_TRIANGULAR(i, int,
+	      *(++px) != 0,
+	      *(px++) != 0)
+/* zdense_unpacked_is_triangular() */
+IS_TRIANGULAR(z, Rcomplex,
+	      ISNAN((*(++px)).r) || (*px).r != 0.0 ||
+	      ISNAN((*px).i) || (*px).i != 0.0,
+	      ISNAN((*px).r) || (*px).r != 0.0 ||
+	      ISNAN((*px).i) || (*(px++)).i != 0.0)
+
+#undef IS_TRIANGULAR
+
+#define IS_DIAGONAL(_PREFIX_, _CTYPE_, _OD_IS_NOT_ZERO_)		\
+Rboolean _PREFIX_ ## dense_unpacked_is_diagonal(_CTYPE_ *px, int *pdim) \
+{									\
+    int n = pdim[0];							\
+    if (pdim[1] != n)							\
+	return FALSE;							\
+    int i, j;								\
+    for (j = 0; j < n; ++j) {						\
+	for (i = 0; i < j; ++i)						\
+	    if (_OD_IS_NOT_ZERO_)					\
+		return FALSE;						\
+	++px; /* skip over diagonal */					\
+	for (i = j+1; i < n; ++i)					\
+	    if (_OD_IS_NOT_ZERO_)					\
+		return FALSE;						\
+    }									\
+    return TRUE;							\
+}
+
+/* ddense_unpacked_is_diagonal() */
+IS_DIAGONAL(d, double, ISNAN(*px) || *(px++) != 0.0)
+/* idense_unpacked_is_diagonal() */
+IS_DIAGONAL(i, int, *(px++) != 0)
+/* zdense_unpacked_is_diagonal() */
+IS_DIAGONAL(z, Rcomplex,
+	    ISNAN((*px).r) || (*(px)).r != 0.0 ||
+	    ISNAN((*px).i) || (*(px++)).i != 0.0)
+
+#undef IS_DIAGONAL
+
+#define IS_DIAGONAL(_PREFIX_, _CTYPE_, _U_IS_NOT_ZERO_, _L_IS_NOT_ZERO_) \
+Rboolean _PREFIX_ ## dense_packed_is_diagonal(_CTYPE_ *px, int *pdim,	\
+					      Rboolean up)		\
+{									\
+    int i, j, n = pdim[0];						\
+    if (up) {								\
+	for (j = 0; j < n; ++j, ++px)					\
+	    for (i = 0; i < j; ++j)					\
+		if (_U_IS_NOT_ZERO_)					\
+		    return FALSE;					\
+    } else {								\
+	for (j = 0; j < n; ++j, ++px)					\
+	    for (i = j+1; i < n; ++i)					\
+		if (_L_IS_NOT_ZERO_)					\
+		    return FALSE;					\
+    }									\
+    return TRUE;							\
+}
+
+/* ddense_packed_is_diagonal() */
+IS_DIAGONAL(d, double,
+	    ISNAN(*px) || *(px++) != 0.0,
+	    ISNAN(*(++px)) || *px != 0.0)
+/* idense_packed_is_diagonal() */
+IS_DIAGONAL(i, int,
+	    *(px++) != 0,
+	    *(++px) != 0)
+/* zdense_packed_is_diagonal() */
+IS_DIAGONAL(z, Rcomplex,
+	    ISNAN((*px).r) || (*px).r != 0.0 ||
+	    ISNAN((*px).i) || (*(px++)).i != 0.0,
+	    ISNAN((*(++px)).r) || (*px).r != 0.0 ||
+	    ISNAN((*px).i) || (*px).i != 0.0)
+
+#undef IS_DIAGONAL
 
 /** @brief Duplicate `.denseMatrix` (and others) as `.geMatrix`.
  *
@@ -948,33 +1098,33 @@ SEXP dup_mMatrix_as_geMatrix2(SEXP A, Rboolean force,
 	    case 2+14: /* ltrMatrix */					\
 	    case 2+14+6: /* ntrMatrix */				\
 		Memcpy(px, LOGICAL(GET_SLOT(A, Matrix_xSym)), len);	\
-		ldense_unpacked_make_triangular(px, A);			\
+		idense_unpacked_make_triangular(px, A);			\
 		break;							\
 	    case 3+14: /* lsyMatrix */					\
 	    case 3+14+6: /* nsyMatrix */				\
 		Memcpy(px, LOGICAL(GET_SLOT(A, Matrix_xSym)), len);	\
-		ldense_unpacked_make_symmetric(px, A);			\
+		idense_unpacked_make_symmetric(px, A);			\
 		symmetric = TRUE;					\
 		break;							\
 	    case 4+14: /* ldiMatrix */					\
 		/* NB: ndiMatrix _does not exist_ */			\
-		ldense_unpacked_make_diagonal(px, A);			\
+		idense_unpacked_make_diagonal(px, A);			\
 		break;							\
 	    case 5+14: /* ltpMatrix */					\
 	    case 5+14+6-1: /* ntpMatrix */				\
-		ldense_unpack(px, LOGICAL(GET_SLOT(A, Matrix_xSym)),	\
+		idense_unpack(px, LOGICAL(GET_SLOT(A, Matrix_xSym)),	\
 			      pdim[0],					\
 			      *uplo_P(A) == 'U' ? UPP : LOW,		\
 			      *diag_P(A) == 'N' ? NUN : UNT);		\
-		ldense_unpacked_make_triangular(px, A);			\
+		idense_unpacked_make_triangular(px, A);			\
 		break;							\
 	    case 6+14: /* lspMatrix */					\
 	    case 6+14+6-1: /* nspMatrix */				\
-		ldense_unpack(px, LOGICAL(GET_SLOT(A, Matrix_xSym)),	\
+		idense_unpack(px, LOGICAL(GET_SLOT(A, Matrix_xSym)),	\
 			      pdim[0],					\
 			      *uplo_P(A) == 'U' ? UPP : LOW,		\
 			      NUN);					\
-		ldense_unpacked_make_symmetric(px, A);			\
+		idense_unpacked_make_symmetric(px, A);			\
 		symmetric = TRUE;					\
 		break;							\
 	    default:							\
@@ -1052,15 +1202,12 @@ SEXP dup_mMatrix_as_dgeMatrix2(SEXP A, Rboolean force,
 
 /* "General" purpose ================================================ */
 
-/* That both 's1' and 's2' are STRSXP must be checked by the caller ...
-   see symmetricMatrix_validate() above (currently the only use case)
+/* That both 's1' and 's2' are STRSXP of length at least 'n' must be 
+   checked by the caller ... see, e.g., symmetricMatrix_validate() above
 */
-Rboolean equal_string_vectors(SEXP s1, SEXP s2)
+Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n)
 {
-    int n = LENGTH(s1);
-    if (LENGTH(s2) != n) {
-	return FALSE;
-    }
+    /* Only check the first 'n' elements, even if 's1' or 's2' is longer */ 
     for (int i = 0; i < n; ++i) {
 	/* Note that 'R_compute_identical()' in src/main/identical.c
 	   is careful to distinguish between NA_STRING and "NA" in STRSXP, 
@@ -1117,7 +1264,9 @@ APPEND_TO_NAMED(list, VECSXP, SEXP,
 #undef APPEND_TO_NAMED
 
 
-/* "General purpose" ================================================ */
+
+/* ================================================================== */
+/* ================================================================== */
     
 /* La_norm_type() and La_rcond_type() have been in src/include/R_ext/Lapack.h
    and later in src/modules/lapack/Lapack.c but have still not been available 

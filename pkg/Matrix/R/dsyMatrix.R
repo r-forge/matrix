@@ -87,10 +87,6 @@ setMethod("norm", signature(x = "dsyMatrix", type = "missing"),
           function(x, type, ...) .Call(dsyMatrix_norm, x, "O"),
           valueClass = "numeric")
 
-## *Should* create the opposite storage format:  "U" -> "L"  and vice-versa:
-setMethod("t", signature(x = "dsyMatrix"), t_trMatrix,
-          valueClass = "dsyMatrix")
-
 setMethod("BunchKaufman", signature(x = "dsyMatrix"),
 	  function(x, ...) .Call(dsyMatrix_trf, x))
 
@@ -107,6 +103,9 @@ setAs("dsyMatrix", "dpoMatrix",
 		    sNames = c("x", "Dim", "Dimnames", "uplo", "factors"))
       })
 
+
+## MJ: No longer needed ... replacement in ./unpackedMatrix.R
+if(FALSE) {
 .dsy.diag <- function(x, nrow, ncol, names=TRUE) {
     if(min(dim(x)) == 0L) return(numeric(0L))
     y <- .Call(dgeMatrix_getDiag, x)
@@ -117,9 +116,13 @@ setAs("dsyMatrix", "dpoMatrix",
     }
     y
 }
+## *Should* create the opposite storage format:  "U" -> "L"  and vice-versa:
+setMethod("t", signature(x = "dsyMatrix"), t_trMatrix,
+          valueClass = "dsyMatrix")
 setMethod("diag", signature(x = "dsyMatrix"), .dsy.diag)
 setMethod("diag<-", signature(x = "dsyMatrix"),
 	  function(x, value) .Call(dgeMatrix_setDiag, x, value))
+} ## MJ
 
 ## Now that we have "chol", we can define  "determinant" methods,
 ## exactly like in ./dsCMatrix.R

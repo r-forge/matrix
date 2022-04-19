@@ -41,8 +41,8 @@ setMethod("rcond", signature(x = "dgeMatrix", norm = "character"),
 ## 	  function(x, type, ...) .Call(dgeMatrix_norm, ..2dge(x), type),
 ## 	  valueClass = "numeric")
 
-setMethod("t", signature(x = "dgeMatrix"), t_geMatrix)
-
+## MJ: No longer needed ... replacement in ./unpackedMatrix.R
+if (FALSE) {
 ..get.diag <- function(x, nrow, ncol, names=TRUE) {
     ##         vvvvvvvvvvvvvvvvv here just a place holder, replaced in .mkSpec.diag()
     y <- .Call(dgeMatrix_getDiag, x) # double or logical
@@ -61,9 +61,11 @@ setMethod("t", signature(x = "dgeMatrix"), t_geMatrix)
 }
 .dge.diag <- .mkSpec.diag(quote(dgeMatrix_getDiag))
 
+setMethod("t", signature(x = "dgeMatrix"), t_geMatrix)
 setMethod("diag", signature(x = "dgeMatrix"), .dge.diag)
 setMethod("diag<-", signature(x = "dgeMatrix"),
 	  function(x, value) .Call(dgeMatrix_setDiag, x, value))
+} ## MJ
 
 setMethod("chol", signature(x = "dgeMatrix"), cholMat)
 
