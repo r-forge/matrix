@@ -24,6 +24,7 @@
 #include "lgCMatrix.h"
 #include "sparseQR.h"
 #include "packedMatrix.h"
+#include "unpackedMatrix.h"
 #include <R_ext/Rdynload.h>
 
 #include "Syms.h"
@@ -135,10 +136,15 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dgeMatrix_dtpMatrix_mm, 2),
     CALLDEF(dgeMatrix_exp, 1),
     CALLDEF(dgeMatrix_addDiag, 2),
+
+/* MJ: No longer needed ... replacement in ./unpackedMatrix.c */
+#if 0
     CALLDEF(dgeMatrix_getDiag, 1),
     CALLDEF(lgeMatrix_getDiag, 1),
     CALLDEF(dgeMatrix_setDiag, 2),
     CALLDEF(lgeMatrix_setDiag, 2),
+#endif
+    
     CALLDEF(dgeMatrix_matrix_crossprod, 3),
     CALLDEF (geMatrix_matrix_crossprod, 3),
     CALLDEF(dgeMatrix_norm, 2),
@@ -211,6 +217,13 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dtpMatrix_setDiag, 2),
     CALLDEF(ltpMatrix_setDiag, 2),
 #endif
+/* MJ: No longer needed ... replacement in ./unpackedMatrix.c */
+#if 0
+    CALLDEF(dtrMatrix_getDiag, 1),
+    CALLDEF(ltrMatrix_getDiag, 1),
+    CALLDEF(dtrMatrix_setDiag, 2),
+    CALLDEF(ltrMatrix_setDiag, 2),
+#endif
     
     CALLDEF(dtpMatrix_matrix_mm, 4),
     CALLDEF(dtpMatrix_matrix_solve, 2),
@@ -223,10 +236,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dtrMatrix_dtrMatrix_mm, 4),
     CALLDEF(dtrMatrix_chol2inv, 1),
     CALLDEF(dtrMatrix_addDiag, 2),
-    CALLDEF(dtrMatrix_getDiag, 1),
-    CALLDEF(ltrMatrix_getDiag, 1),
-    CALLDEF(dtrMatrix_setDiag, 2),
-    CALLDEF(ltrMatrix_setDiag, 2),
     CALLDEF(dtrMatrix_matrix_solve, 2),
     CALLDEF(dtrMatrix_norm, 2),
     CALLDEF(dtrMatrix_rcond, 2),
@@ -276,7 +285,24 @@ static R_CallMethodDef CallEntries[] = {
     
     CALLDEF(R_DimNames_fixup, 1),
     CALLDEF(R_symmDN, 1),
+    
+    CALLDEF(matrix_pack, 3),
+    CALLDEF(matrix_is_symmetric, 1),
+    CALLDEF(matrix_is_triangular, 2),
+    CALLDEF(matrix_is_diagonal, 1),
 
+    CALLDEF(unpackedMatrix_pack, 3),
+    CALLDEF(unpackedMatrix_is_symmetric, 1),
+    CALLDEF(unpackedMatrix_is_triangular, 2),
+    CALLDEF(unpackedMatrix_is_diagonal, 1),
+    CALLDEF(unpackedMatrix_t, 1),
+    CALLDEF(unpackedMatrix_diag_get, 2),
+    CALLDEF(unpackedMatrix_diag_set, 2),
+
+    CALLDEF(packedMatrix_unpack, 1),
+    CALLDEF(packedMatrix_is_symmetric, 1),
+    CALLDEF(packedMatrix_is_triangular, 2),
+    CALLDEF(packedMatrix_is_diagonal, 1),
     CALLDEF(packedMatrix_t, 1),
     CALLDEF(packedMatrix_diag_get, 2),
     CALLDEF(packedMatrix_diag_set, 2),

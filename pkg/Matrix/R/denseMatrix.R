@@ -196,7 +196,8 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "matrix",  # 2-col.matrix
 		     as(r, geClass(x))
 		 })
 
-
+## MJ: No longer needed ... replacement in ./(un)?packedMatrix.R
+if(FALSE) {
 setMethod("isSymmetric", signature(object = "denseMatrix"),
 	  function(object, tol = 100*.Machine$double.eps, tol1 = 8*tol, ...) {
 	      ## pretest: is it square?
@@ -232,14 +233,9 @@ setMethod("isSymmetric", signature(object = "denseMatrix"),
 		  identical(as(object, "igeMatrix"),
 			    as(t(object), "igeMatrix"))
 	  })
-
-## rather methods in ./triangularMatrix.R
-## setMethod("isTriangular", signature(object = "triangularMatrix"),
-## 	  function(object, ...) TRUE)
-
 setMethod("isTriangular", signature(object = "denseMatrix"), isTriMat)
-
 setMethod("isDiagonal", signature(object = "denseMatrix"), .is.diagonal)
+}
 
 setMethod("rcond", signature(x = "denseMatrix", norm = "character"),
 	  function(x, norm, ...)

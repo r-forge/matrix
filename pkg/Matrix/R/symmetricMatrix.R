@@ -6,6 +6,9 @@ setAs("denseMatrix", "symmetricMatrix",
 setAs("matrix", "symmetricMatrix",
       function(from) .Call(dense_to_symmetric, from, "U", TRUE))
 
+setMethod("isSymmetric", signature(object = "symmetricMatrix"),
+	  function(object, ...) TRUE)
+
 ### ----------- forceSymmetric() ----- *all* methods ------------------------
 
 ## forceSymmetric() coerces to "symmetricMatrix"  withOUT  testing
@@ -79,6 +82,8 @@ setMethod("skewpart", signature(x = "symmetricMatrix"), function(x) .setZero(x))
 setMethod("dimnames", signature(x = "symmetricMatrix"),
           function(x) symmDN(x@Dimnames))
 
+## MJ: No longer needed ... replacement in ./(un)?packedMatrix.R
+if (FALSE) {
 ###------- pack() and unpack() --- for *dense*  symmetric & triangular matrices:
 packM <- function(x, Mtype, kind, unpack=FALSE) {
     cd <- getClassDef(cx <- class(x))
@@ -134,8 +139,7 @@ setMethod("unpack", "dspMatrix",
 	  function(x, ...) dsp2dsy(x), valueClass = "dsyMatrix")
 setMethod("unpack", "dtpMatrix",
 	  function(x, ...) dtp2dtr(x), valueClass = "dtrMatrix")
-###
-
+} ## MJ
 
 ## autogenerate coercions
 ##  as(*,  "symmetricMatrix")

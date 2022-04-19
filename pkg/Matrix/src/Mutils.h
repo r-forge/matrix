@@ -177,8 +177,8 @@ SEXP string_scalar_validate(SEXP s, char *valid, char *nm);
 
 SEXP Matrix_validate(SEXP obj);
 SEXP compMatrix_validate(SEXP obj);
-SEXP triangularMatrix_validate(SEXP obj);
 SEXP symmetricMatrix_validate(SEXP obj);
+SEXP triangularMatrix_validate(SEXP obj);
 SEXP diagonalMatrix_validate(SEXP obj);
 SEXP unpackedMatrix_validate(SEXP obj);
 SEXP packedMatrix_validate(SEXP obj);
@@ -200,22 +200,48 @@ void set_factor(SEXP obj, char *nm, SEXP val);
 SEXP R_set_factor(SEXP obj, SEXP val, SEXP nm, SEXP warn);
 SEXP R_empty_factors(SEXP obj, SEXP warn);
 
-void ddense_unpacked_make_triangular(double *to, SEXP from);
-void ldense_unpacked_make_triangular(   int *to, SEXP from);
-void ddense_unpacked_make_symmetric( double *to, SEXP from);
-void ldense_unpacked_make_symmetric(    int *to, SEXP from);
-void ddense_unpacked_make_diagonal(  double *to, SEXP from);
-void ldense_unpacked_make_diagonal(     int *to, SEXP from);
-
 double *ddense_pack(double *dest, const double *src, int n,
 		    enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
-int *ldense_pack(int *dest, const int *src, int n,
+int *idense_pack(int *dest, const int *src, int n,
 		 enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
+Rcomplex *zdense_pack(Rcomplex *dest, const Rcomplex *src, int n,
+		      enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
 
 double *ddense_unpack(double *dest, const double *src, int n,
 		      enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
-int *ldense_unpack(int *dest, const int *src, int n,
+int *idense_unpack(int *dest, const int *src, int n,
 		   enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
+Rcomplex *zdense_unpack(Rcomplex *dest, const Rcomplex *src, int n,
+			enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
+
+void ddense_unpacked_make_symmetric(  double *to, SEXP from);
+void idense_unpacked_make_symmetric(     int *to, SEXP from);
+void zdense_unpacked_make_symmetric(Rcomplex *to, SEXP from);
+
+void ddense_unpacked_make_triangular(  double *to, SEXP from);
+void idense_unpacked_make_triangular(     int *to, SEXP from);
+void zdense_unpacked_make_triangular(Rcomplex *to, SEXP from);
+
+void ddense_unpacked_make_diagonal(  double *to, SEXP from);
+void idense_unpacked_make_diagonal(     int *to, SEXP from);
+void zdense_unpacked_make_diagonal(Rcomplex *to, SEXP from);
+
+Rboolean ddense_unpacked_is_symmetric(  double *px, int *pdim);
+Rboolean ldense_unpacked_is_symmetric(     int *px, int *pdim);
+Rboolean idense_unpacked_is_symmetric(     int *px, int *pdim);
+Rboolean zdense_unpacked_is_symmetric(Rcomplex *px, int *pdim);
+
+Rboolean ddense_unpacked_is_triangular(  double *px, int *pdim, Rboolean upper);
+Rboolean idense_unpacked_is_triangular(     int *px, int *pdim, Rboolean upper);
+Rboolean zdense_unpacked_is_triangular(Rcomplex *px, int *pdim, Rboolean upper);
+
+Rboolean ddense_unpacked_is_diagonal(  double *px, int *pdim);
+Rboolean idense_unpacked_is_diagonal(     int *px, int *pdim);
+Rboolean zdense_unpacked_is_diagonal(Rcomplex *px, int *pdim);
+    
+Rboolean ddense_packed_is_diagonal(  double *px, int *pdim, Rboolean up);
+Rboolean idense_packed_is_diagonal(     int *px, int *pdim, Rboolean up);
+Rboolean zdense_packed_is_diagonal(Rcomplex *px, int *pdim, Rboolean up);
 
 SEXP R_dup_mMatrix_as_geMatrix(SEXP A, SEXP force);
 SEXP dup_mMatrix_as_geMatrix(SEXP A, Rboolean force);
@@ -227,7 +253,7 @@ SEXP dup_mMatrix_as_dgeMatrix(SEXP A, Rboolean force);
 SEXP dup_mMatrix_as_dgeMatrix2(SEXP A, Rboolean force,
 			       Rboolean transpose_if_vector);
 
-Rboolean equal_string_vectors(SEXP s1, SEXP s2);
+Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n);
 R_xlen_t strmatch(char *nm, SEXP s);
 SEXP append_to_named_list(SEXP x, char *nm, SEXP val);
 

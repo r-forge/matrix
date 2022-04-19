@@ -152,14 +152,12 @@ setClass("denseMatrix", contains = c("Matrix", "VIRTUAL"))
 
 ## Virtual class of dense, "unpacked" matrices, s.t. length(.@x) == n*n
 setClass("unpackedMatrix", contains = c("denseMatrix", "VIRTUAL"),
-         ## FIXME??
-         ## slots = c(x = "vector"),
-	 validity = function(object) .Call(unpackedMatrix_validate, object))
+         validity = function(object) .Call(unpackedMatrix_validate, object))
 
 ## Virtual class of dense, "packed" matrices, s.t. length(.@x) == n*(n+1)/2
 setClass("packedMatrix", contains = c("denseMatrix", "VIRTUAL"),
-         ## FIXME??
-         ## slots = c(x = "vector"),
+         slots = c(uplo = "character"),
+         prototype = prototype(uplo = "U"),
 	 validity = function(object) .Call(packedMatrix_validate, object))
 
 
@@ -178,6 +176,7 @@ setClass("ndenseMatrix", contains = c("nMatrix", "denseMatrix", "VIRTUAL"),
 
 if(FALSE) { # --NOT YET--
 setClass("idenseMatrix", contains = c("iMatrix", "denseMatrix", "VIRTUAL"))
+setClass("zdenseMatrix", contains = c("zMatrix", "denseMatrix", "VIRTUAL"))
 } # --NOT YET--
 
 
@@ -204,24 +203,24 @@ setClass("sparseMatrix", contains = c("Matrix", "VIRTUAL"))
 
 ## Virtual class of diagonal matrices
 setClass("diagonalMatrix", contains = c("sparseMatrix", "VIRTUAL"),
-         slots = c(diag = "character"), # FIXME?? x = "vector"
+         slots = c(diag = "character"),
 	 prototype = prototype(diag = "N"),
          validity = function(object) .Call(diagonalMatrix_validate, object))
 
 ## Virtual class of sparse matrices with triplet representation
 setClass("TsparseMatrix", contains = c("sparseMatrix", "VIRTUAL"),
-	 slots = c(i = "integer", j = "integer"), # FIXME?? x = "vector"
+	 slots = c(i = "integer", j = "integer"),
 	 validity = function(object) .Call(Tsparse_validate, object))
 
 ## Virtual class of compressed sparse column-oriented matrices
 setClass("CsparseMatrix", contains = c("sparseMatrix", "VIRTUAL"),
-	 slots = c(i = "integer", p = "integer"), # FIXME?? x = "vector"
+	 slots = c(i = "integer", p = "integer"),
 	 prototype = prototype(p = 0L), # to be valid
          validity = function(object) .Call(Csparse_validate, object))
 
 ## Virtual class of compressed sparse row-oriented matrices
 setClass("RsparseMatrix", contains = c("sparseMatrix", "VIRTUAL"),
-	 slots = c(p = "integer", j = "integer"), # FIXME?? x = "vector"
+	 slots = c(p = "integer", j = "integer"),
 	 prototype = prototype(p = 0L), # to be valid
 	 validity = function(object) .Call(Rsparse_validate, object))
 
@@ -283,23 +282,23 @@ setClass("nCsparseMatrix",
 ## General
 ## NB: always "unpacked"
 setClass("dgeMatrix",
-         contains = c("ddenseMatrix", "unpackedMatrix", "generalMatrix"))
+         contains = c("unpackedMatrix", "ddenseMatrix", "generalMatrix"))
 
 ## Unpacked, triangular
 setClass("dtrMatrix",
-	 contains = c("ddenseMatrix", "unpackedMatrix", "triangularMatrix"))
+	 contains = c("unpackedMatrix", "ddenseMatrix", "triangularMatrix"))
 
 ## Packed, triangular
 setClass("dtpMatrix",
-	 contains = c("ddenseMatrix", "packedMatrix", "triangularMatrix"))
+	 contains = c("packedMatrix", "ddenseMatrix", "triangularMatrix"))
 
 ## Unpacked, symmetric
 setClass("dsyMatrix",
-         contains = c("ddenseMatrix", "unpackedMatrix", "symmetricMatrix"))
+         contains = c("unpackedMatrix", "ddenseMatrix", "symmetricMatrix"))
 
 ## Packed, symmetric
 setClass("dspMatrix",
-	 contains = c("ddenseMatrix", "packedMatrix", "symmetricMatrix"))
+	 contains = c("packedMatrix", "ddenseMatrix", "symmetricMatrix"))
 
 ## Unpacked, symmetric, positive semidefinite
 setClass("dpoMatrix", contains = "dsyMatrix",
@@ -319,23 +318,23 @@ setClass("corMatrix", contains = "dpoMatrix", slots = c(sd = "numeric"),
 ## General
 ## NB: always "unpacked"
 setClass("lgeMatrix",
-         contains = c("ldenseMatrix", "unpackedMatrix", "generalMatrix"))
+         contains = c("unpackedMatrix", "ldenseMatrix", "generalMatrix"))
 
 ## Unpacked, triangular
 setClass("ltrMatrix",
-	 contains = c("ldenseMatrix", "unpackedMatrix", "triangularMatrix"))
+	 contains = c("unpackedMatrix", "ldenseMatrix", "triangularMatrix"))
 
 ## Packed, triangular
 setClass("ltpMatrix",
-	 contains = c("ldenseMatrix", "packedMatrix", "triangularMatrix"))
+	 contains = c("packedMatrix", "ldenseMatrix", "triangularMatrix"))
 
 ## Unpacked, symmetric
 setClass("lsyMatrix",
-         contains = c("ldenseMatrix", "unpackedMatrix", "symmetricMatrix"))
+         contains = c("unpackedMatrix", "ldenseMatrix", "symmetricMatrix"))
 
 ## Packed, symmetric
 setClass("lspMatrix",
-	 contains = c("ldenseMatrix", "packedMatrix", "symmetricMatrix"))
+	 contains = c("packedMatrix", "ldenseMatrix", "symmetricMatrix"))
 
 
 ## ...... Dense, nonzero pattern .......................................
@@ -343,23 +342,23 @@ setClass("lspMatrix",
 ## General
 ## NB: always "unpacked"
 setClass("ngeMatrix",
-         contains = c("ndenseMatrix", "unpackedMatrix", "generalMatrix"))
+         contains = c("unpackedMatrix", "ndenseMatrix", "generalMatrix"))
 
 ## Unpacked, triangular
 setClass("ntrMatrix",
-	 contains = c("ndenseMatrix", "unpackedMatrix", "triangularMatrix"))
+	 contains = c("unpackedMatrix", "ndenseMatrix", "triangularMatrix"))
 
 ## Packed, triangular
 setClass("ntpMatrix",
-	 contains = c("ndenseMatrix", "packedMatrix", "triangularMatrix"))
+	 contains = c("packedMatrix", "ndenseMatrix", "triangularMatrix"))
 
 ## Unpacked, symmetric
 setClass("nsyMatrix",
-         contains = c("ndenseMatrix", "unpackedMatrix", "symmetricMatrix"))
+         contains = c("unpackedMatrix", "ndenseMatrix", "symmetricMatrix"))
 
 ## Packed, symmetric
 setClass("nspMatrix",
-	 contains = c("ndenseMatrix", "packedMatrix", "symmetricMatrix"))
+	 contains = c("packedMatrix", "ndenseMatrix", "symmetricMatrix"))
 
 
 ## ------ Proper (Non-Virtual) Sparse ----------------------------------

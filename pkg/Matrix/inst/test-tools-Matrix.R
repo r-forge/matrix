@@ -44,7 +44,7 @@ Qidentical <- function(x,y, strictClass = TRUE) {
            return(FALSE)
         ## else try further
     }
-    slts <- slotNames(x)
+    slts <- slotNames(x) ## MJ: should be slotNames(y), since is(x, class(y)) ??
     if("Dimnames" %in% slts) { ## always (or we have no 'Matrix')
 	slts <- slts[slts != "Dimnames"]
 	if(!Qidentical.DN(x@Dimnames, y@Dimnames) &&
@@ -60,6 +60,42 @@ Qidentical <- function(x,y, strictClass = TRUE) {
     }
     for(sl in slts)
         if(!identical(slot(x,sl), slot(y,sl)))
+            return(FALSE)
+    TRUE
+}
+
+## MJ: It seems intuitive to allow either of is(x, class(y))
+##     and is(y, class(x)) when strictClass=FALSE ...
+.MJ.Qidentical <- function(x, y, strictClass = TRUE, skipSlots = NULL) {
+    isxy <- identical(cx <- class(x), cy <- class(y))
+    if (!isxy) {
+        if (strictClass)
+            return(FALSE)
+        isxy <- is(x, cy)
+        if (!(isxy || is(y, cx)))
+            return(FALSE)
+        ## else try further
+    }
+    slts <- slotNames(if (isxy) y else x)
+    if (length(skipSlots))
+        slts <- setdiff(slts, skipSlots)
+    if ("Dimnames" %in% slts) { ## always, or we have no "Matrix"
+	## allow symmetrization of 'Dimnames' for "symmetricMatrix" :
+	slts <- slts[slts != "Dimnames"]
+        if(!Qidentical.DN(x@Dimnames, y@Dimnames) &&
+	   !Qidentical.DN(dimnames(x), dimnames(y)))
+	    return(FALSE)
+    }
+    if ("factors" %in% slts) {
+        ## allow one empty and one non-empty 'factors' :
+        slts <- slts[slts != "factors"]
+        ## if both are not empty, they must be the same:
+        if (length(xf <- x@factors) && length(yf <- y@factors) &&
+           !identical(xf, yf))
+            return(FALSE)
+    }
+    for (slt in slts)
+        if (!identical(slot(x, slt), slot(y, slt)))
             return(FALSE)
     TRUE
 }
@@ -542,15 +578,19 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	n0m <- drop0(m) #==> n0m is Csparse
 	has0 <- !Qidentical(n0m, as(m,"CsparseMatrix"))
 	if(!isInd && !isRsp &&
-           !(extends(cld, "TsparseMatrix") && anyDuplicatedT(m, di = d)))
-                                        # 'diag<-' is does not change attrib:
-	    stopifnot(Qidentical(m, m.d))# e.g., @factors may differ
-    }
-    else if(!identical(m, m.d)) { # dense : 'diag<-' is does not change attrib
-	if(isTri && m@diag == "U" && m.d@diag == "N" &&
-	   all(m == m.d))
-	    message("unitriangular m: diag(m) <- diag(m) lost \"U\" .. is ok")
-	else stop("diag(m) <- diag(m) has changed 'm' too much")
+           !(extends(cld, "TsparseMatrix") && anyDuplicatedT(m, di = d))) {
+            stopifnot(Qidentical(m, m.d)) # e.g., @factors may differ
+        }
+    } else if(!.MJ.Qidentical(m, m.d, strictClass=FALSE,
+                              skipSlots =
+                                  if (isTri && .hasSlot(m.d, "diag") &&
+                                      m@diag == "U" && m.d@diag == "N" &&
+                                      all(m == m.d))
+                                      c("x", "diag"))) {
+        ## Above allows coercion to more general class,
+        ## e.g., is(`diag<-`(x=<dppMatrix>, value=-1), "dspMatrix")
+        ## and `diag<-`(x=<unit triangularMatrix>, value=.)@diag == "N"
+        stop("diag(m) <- diag(m) has changed 'm' too much")
     }
     ## use non-square matrix when "allowed":
 

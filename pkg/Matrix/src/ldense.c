@@ -17,7 +17,7 @@ SEXP lspMatrix_as_lsyMatrix(SEXP from, SEXP kind)
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
     SET_SLOT(val, Matrix_DimNamesSym, duplicate(dmnP));
     SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
-    ldense_unpack(LOGICAL(ALLOC_SLOT(val, Matrix_xSym, LGLSXP, n*n)),
+    idense_unpack(LOGICAL(ALLOC_SLOT(val, Matrix_xSym, LGLSXP, n*n)),
 		  LOGICAL( GET_SLOT(from, Matrix_xSym)),
 		  n,
 		  *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW,
@@ -37,7 +37,7 @@ SEXP lsyMatrix_as_lspMatrix(SEXP from, SEXP kind)
 
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
     SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
-    ldense_pack(
+    idense_pack(
 	LOGICAL(ALLOC_SLOT(val, Matrix_xSym, LGLSXP, (n*(n+1))/2)),
 	LOGICAL( GET_SLOT(from, Matrix_xSym)),
 	n,
@@ -66,7 +66,7 @@ SEXP ltpMatrix_as_ltrMatrix(SEXP from, SEXP kind)
     SET_SLOT(val, Matrix_DimNamesSym, duplicate(dmnP));
     SET_SLOT(val, Matrix_diagSym, duplicate(diag));
     SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
-    ldense_unpack(LOGICAL(ALLOC_SLOT(val, Matrix_xSym, LGLSXP, n*n)),
+    idense_unpack(LOGICAL(ALLOC_SLOT(val, Matrix_xSym, LGLSXP, n*n)),
 		  LOGICAL(GET_SLOT(from, Matrix_xSym)),
 		  n,
 		  *CHAR(STRING_ELT(uplo, 0)) == 'U' ? UPP : LOW,
@@ -90,7 +90,7 @@ SEXP ltrMatrix_as_ltpMatrix(SEXP from, SEXP kind)
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
     SET_SLOT(val, Matrix_diagSym, duplicate(diag));
     SET_SLOT(val, Matrix_uploSym, duplicate(uplo));
-    ldense_pack(
+    idense_pack(
 	LOGICAL(ALLOC_SLOT(val, Matrix_xSym, LGLSXP, (n*(n+1))/2)),
 	LOGICAL(GET_SLOT(from, Matrix_xSym)),
 	n,
@@ -112,7 +112,7 @@ SEXP ltrMatrix_as_lgeMatrix(SEXP from, SEXP kind)
     slot_dup(val, from, Matrix_DimNamesSym);
     SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
 
-    ldense_unpacked_make_triangular(LOGICAL(GET_SLOT(val, Matrix_xSym)), from);
+    idense_unpacked_make_triangular(LOGICAL(GET_SLOT(val, Matrix_xSym)), from);
     UNPROTECT(1);
     return val;
 }
@@ -129,7 +129,7 @@ SEXP lsyMatrix_as_lgeMatrix(SEXP from, SEXP kind)
     SET_SLOT(val, Matrix_DimNamesSym, R_symmDN(d_nms));
     SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
 
-    ldense_unpacked_make_symmetric(LOGICAL(GET_SLOT(val, Matrix_xSym)), from);
+    idense_unpacked_make_symmetric(LOGICAL(GET_SLOT(val, Matrix_xSym)), from);
     UNPROTECT(2);
     return val;
 }

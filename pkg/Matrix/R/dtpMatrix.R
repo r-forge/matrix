@@ -34,7 +34,8 @@ setMethod("determinant", signature(x = "dtpMatrix", logarithm = "missing"),
 setMethod("determinant", signature(x = "dtpMatrix", logarithm = "logical"),
 	  function(x, logarithm, ...) mkDet(diag(x), logarithm))
 
-if(FALSE) { ## MJ: No longer needed ... replacement in ./packedMatrix.R
+## MJ: No longer needed ... replacement in ./packedMatrix.R
+if (FALSE) {
 setMethod("diag", signature(x = "dtpMatrix"),
 	  function(x, nrow, ncol) .Call(dtpMatrix_getDiag, x),
 	  valueClass = "numeric")
@@ -44,7 +45,7 @@ setMethod("diag<-", signature(x = "dtpMatrix"),
 		    if(x@diag == "U") .dense.diagU2N(x, "d", isPacked=TRUE) else x,
 		    value)
 	  })
-}##
+} ## MJ
 
 setMethod("norm", signature(x = "dtpMatrix", type = "character"),
 	  function(x, type, ...)
@@ -77,9 +78,10 @@ setMethod("solve", signature(a = "dtpMatrix", b="matrix"),
 	  function(a, b, ...) .Call(dtpMatrix_matrix_solve, a, b),
 	  valueClass = "dgeMatrix")
 
-if(FALSE) { ## ==> ./packedMatrix.R
+## MJ: No longer needed ... replacement in ./packedMatrix.R
+if (FALSE) {
 ## FIXME: speed up
 setMethod("t", "dtpMatrix",
 	  function(x) dtr2dtp(t(dtp2dtr(x))), valueClass = "dtpMatrix")
-}##
+} ## MJ
 

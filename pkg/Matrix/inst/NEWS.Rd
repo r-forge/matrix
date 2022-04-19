@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-04-14 r3462)}{
+\section{Changes in version 1.4-2 (2022-04-20 r3464)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -24,14 +24,14 @@
       eliminating many redundant checks.
       
       \item Validation of \code{<Matrix>@Dim} now looks at type
-      \emph{before} length, avoiding misleading error messages.
+      \emph{before} length, avoiding a misleading error message.
 
       \item Validation of \code{<Matrix>@Dimnames} now avoids
       \code{isNewList}, which had allowed an error message suggesting
       that \code{NULL} is a list.
 
       \item Setting a factor on a \code{compMatrix} is now to install
-      the factor itself, not a duplicate, for efficiency and consistency
+      the factor itself, not a copy, for efficiency and consistency
       with the semantics of \code{<compMatrix>@factors[[name]] <- value}.
 
       \item Long vector support in methods for packing and unpacking
@@ -39,6 +39,22 @@
 
       \code{..2d?ge(x)} now fail gracefully when \code{x} is a
       long vector, which cannot be made into a valid 1-column matrix.
+
+      \code{diag<-} incorrectly preserved the class of dense matrices,
+      so that, e.g., \code{diag<-(x=<dpoMatrix>, value=-1)} was still a
+      \code{dpoMatrix}.  Now the result is always one of the more general
+      \code{.(ge|sp|sy|tp|tr)Matrix}.
+
+      \code{t} no longer reverses the \code{Dimnames} of dense symmetric
+      matrices. \code{symmDN(dn <- x@Dimnames)} and
+      \code{symmDN(t(x)@Dimnames)} had given different results when
+      \code{dn[[1]]} and \code{dn[[2]]} were non-\code{NULL} and
+      asymmetric.
+
+      \code{isSymmetric} was equivalent to \code{isDiagonal} for dense
+      triangular matrices, \emph{not} allowing numerical fuzz via an
+      argument \code{tol}.  A \code{tol} argument is now available
+      and respected (see also New Features).
     }
   }
   \subsection{New Features}{
@@ -46,14 +62,40 @@
       \item \code{KhatriRao()} gets new \code{sparseY = TRUE} option and
       also works for more \code{Matrix} classes.
 
+      \item Virtual class \code{packedMatrix} gains methods for
+      \code{pack}, \code{unpack}, \code{isSymmetric},
+      \code{isTriangular}, and \code{isDiagonal} implemented in C,
+      replacing those defined for many subclasses individually.
+      
       \item New virtual class \code{unpackedMatrix} containing
-      \code{denseMatrix} _without_ \code{packedMatrix}, allowing methods
-      to be defined for \code{.(ge|sy|tr)Matrix} together.
+      \code{denseMatrix} _without_ \code{packedMatrix}, with methods
+      for \code{pack}, \code{unpack}, \code{isSymmetric},
+      \code{isTriangular}, \code{isDiagonal}, \code{t}, \code{diag},
+      and \code{diag<-} implemented in C, replacing those defined for
+      many subclasses individually.
 
-      \item Many more validity methods are now implemented in C,
-      for efficiency, including methods for
-      \code{Matrix}, \code{compMatrix}, \code{diagonalMatrix},
-      \code{corMatrix}, \code{[liz]Matrix}, and \code{ndenseMatrix}.
+      \item \code{isSymmetric}, \code{isTriangular}, and
+      \code{isDiagonal} are implemented in C also for standard
+      \code{matrix}.  (The S3 method \code{base::isSymmetric.matrix}
+      is called from the S4 methods for \code{denseMatrix} and
+      \code{matrix}, but now only for double and complex arguments
+      and only when \code{tol > 0}.)
+
+      \item \code{diag(<unpackedMatrix>) <- value} now behaves like
+      \code{diag(<packedMatrix>) <- value}, supporting coercions
+      depending on \code{typeof(value)}, in line with \code{diag<-}
+      from \pkg{base}.
+
+      \item \code{pack} and \code{unpack} are now identity functions
+      for \code{packedMatrix} and \code{unpackedMatrix} arguments,
+      respectively (previously an error). \code{pack(<.geMatrix>)}
+      (previously an error) now behaves as \code{pack(<matrix>)},
+      i.e., by checking for symmetry or triangularity before packing.
+      
+      \item Many more validity methods implemented in C, for efficiency,
+      including methods for \code{Matrix}, \code{compMatrix},
+      \code{diagonalMatrix}, \code{corMatrix}, \code{[liz]Matrix},
+      and \code{ndenseMatrix}.
 
       \item \code{dppMatrix_validate()} now behaves as
       \code{dpoMatrix_validate()} by requiring non-negative diagonal
@@ -89,7 +131,7 @@
       \code{packed_to_full_(double|int)()},
       \code{full_to_packed_(double|int)()}, and
       \code{install_diagonal(_int)?()}
-      are replaced by safer, consistently named ones.
+      are replaced by safer, more consistently named ones.
       Previous versions allowed integer overflow.
 
       \item C-level utilities \code{dup_mMatrix_as_d?geMatrix()} gain an

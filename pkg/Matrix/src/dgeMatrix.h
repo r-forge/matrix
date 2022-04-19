@@ -18,11 +18,15 @@ SEXP  geMatrix_matrix_crossprod(SEXP x, SEXP y, SEXP trans);
 SEXP dgeMatrix_matrix_mm(SEXP a, SEXP b, SEXP right);
 SEXP  geMatrix_matrix_mm(SEXP a, SEXP b, SEXP right);
 
-SEXP dgeMatrix_addDiag(SEXP x, SEXP d);
+/* MJ: No longer needed ... replacement in ./packedMatrix.c */
+#if 0 
 SEXP dgeMatrix_getDiag(SEXP x);
 SEXP lgeMatrix_getDiag(SEXP x);
+#endif
+
 SEXP dgeMatrix_setDiag(SEXP x, SEXP d);
 SEXP lgeMatrix_setDiag(SEXP x, SEXP d);
+SEXP dgeMatrix_addDiag(SEXP x, SEXP d);
 SEXP dgeMatrix_LU (SEXP x, SEXP warn_singularity);
 SEXP dgeMatrix_LU_(SEXP x, Rboolean warn_sing);
 SEXP dgeMatrix_determinant(SEXP x, SEXP logarithm);
