@@ -6,7 +6,7 @@
 
 SEXP packedMatrix_unpack(SEXP from);
 
-SEXP packedMatrix_is_symmetric(SEXP obj);
+SEXP packedMatrix_is_symmetric(SEXP obj, SEXP checkDN);
 SEXP packedMatrix_is_triangular(SEXP obj, SEXP upper);
 SEXP packedMatrix_is_diagonal(SEXP obj);
 

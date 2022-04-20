@@ -249,7 +249,7 @@ SEXP matrix_pack(SEXP from, SEXP tr, SEXP up)
     } while (0)
 
 /* isSymmetric(x, tol = 0) */
-SEXP unpackedMatrix_is_symmetric(SEXP obj)
+SEXP unpackedMatrix_is_symmetric(SEXP obj, SEXP checkDN)
 {
     static const char *valid[] = {
 	"dsyMatrix", "lsyMatrix", "nsyMatrix", /* be fast */
@@ -263,6 +263,7 @@ SEXP unpackedMatrix_is_symmetric(SEXP obj)
 	/* .syMatrix: symmetric by definition */
 	return ScalarLogical(1);
     } else {
+	/* .(ge|tr)Matrix */
 	Rboolean res = FALSE;
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym));
@@ -274,17 +275,31 @@ SEXP unpackedMatrix_is_symmetric(SEXP obj)
 	    /* .geMatrix: need to do a complete symmetry check */
 	    UPM_IS_SY(res, x, pdim, "is_symmetric");
 	}
+	if (res && asLogical(checkDN)) {
+	    SEXP rn, cn, dn = GET_SLOT(obj, Matrix_DimNamesSym);
+	    if (!isNull(rn = VECTOR_ELT(dn, 0)) &&
+		!isNull(cn = VECTOR_ELT(dn, 1)) &&
+		!equal_string_vectors(rn, cn, pdim[0]))
+		res = FALSE;
+	}
 	return ScalarLogical(res);
     }
 }
 
 /* isSymmetric(x, tol = 0) */
-SEXP matrix_is_symmetric(SEXP obj)
+SEXP matrix_is_symmetric(SEXP obj, SEXP checkDN)
 {
     Rboolean res = FALSE;
     int *pdim = INTEGER(getAttrib(obj, R_DimSymbol));
     UPM_IS_SY(res, obj, pdim, "is_symmetric");
     /* ^FIXME: wrong function name in error message */
+    if (res && asLogical(checkDN)) {
+	SEXP rn, cn, dn = getAttrib(obj, R_DimNamesSymbol);
+	if (!isNull(rn = VECTOR_ELT(dn, 0)) &&
+	    !isNull(cn = VECTOR_ELT(dn, 1)) &&
+	    !equal_string_vectors(rn, cn, pdim[0]))
+	    res = FALSE;
+    }
     return ScalarLogical(res);
 }
 

@@ -7,8 +7,8 @@
 SEXP unpackedMatrix_pack(SEXP from, SEXP tr_if_ge, SEXP up_if_ge);
 SEXP matrix_pack(SEXP from, SEXP tr, SEXP up);
 
-SEXP unpackedMatrix_is_symmetric(SEXP obj);
-SEXP matrix_is_symmetric(SEXP obj);
+SEXP unpackedMatrix_is_symmetric(SEXP obj, SEXP checkDN);
+SEXP matrix_is_symmetric(SEXP obj, SEXP checkDN);
 
 SEXP unpackedMatrix_is_triangular(SEXP obj, SEXP upper);
 SEXP matrix_is_triangular(SEXP obj, SEXP upper);

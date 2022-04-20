@@ -18,7 +18,6 @@
 \alias{diag,dgCMatrix-method}
 \alias{dim,dgCMatrix-method}
 %\alias{lu,dgCMatrix-method}-> ./lu.Rd
-\alias{isSymmetric,dgCMatrix-method}
 \alias{t,dgCMatrix-method}
 %\alias{solve,dgCMatrix,matrix-method}--> solve-methods.Rd
 %% Group methods --------- FIXME: These are not tested yet (or documented)

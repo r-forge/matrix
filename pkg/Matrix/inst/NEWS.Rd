@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-04-20 r3464)}{
+\section{Changes in version 1.4-2 (2022-04-20 r3465)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -51,10 +51,12 @@
       \code{dn[[1]]} and \code{dn[[2]]} were non-\code{NULL} and
       asymmetric.
 
-      \code{isSymmetric} was equivalent to \code{isDiagonal} for dense
-      triangular matrices, \emph{not} allowing numerical fuzz via an
-      argument \code{tol}.  A \code{tol} argument is now available
-      and respected (see also New Features).
+      \code{isSymmetric} was equivalent to \code{isDiagonal} for all
+      dense triangular matrices, \emph{not} allowing numerical fuzz
+      via an argument \code{tol} and \emph{not} checking
+      \code{Dimnames}.  The usual interface (with \code{tol}
+      and \code{tol1} arguments) is now available for all
+      \code{ddenseMatrix}.  (See also New Features.)
     }
   }
   \subsection{New Features}{
@@ -74,16 +76,21 @@
       and \code{diag<-} implemented in C, replacing those defined for
       many subclasses individually.
 
-      \item \code{isSymmetric}, \code{isTriangular}, and
-      \code{isDiagonal} are implemented in C also for standard
-      \code{matrix}.  (The S3 method \code{base::isSymmetric.matrix}
-      is called from the S4 methods for \code{denseMatrix} and
-      \code{matrix}, but now only for double and complex arguments
-      and only when \code{tol > 0}.)
+      \item \code{isTriangular} and \code{isDiagonal} are implemented
+      in C also for standard \code{matrix}.
 
+      \item For dense general and triangular matrices,
+      \code{isSymmetric} gains an argument \code{checkDN = TRUE}
+      indicating whether symmetry of \code{Dimnames} should be checked.
+      For backwards compatibility in certain cases, \code{checkDN}
+      is replaced with \code{checkDN && check.attributes}, but
+      \code{check.attributes} is otherwise ignored (for speed,
+      as \code{Dimnames} is the only \dQuote{attribute} apart from
+      \code{x} affecting symmetry).
+      
       \item \code{diag(<unpackedMatrix>) <- value} now behaves like
       \code{diag(<packedMatrix>) <- value}, supporting coercions
-      depending on \code{typeof(value)}, in line with \code{diag<-}
+      depending on \code{typeof(value)}, consistent with \code{diag<-}
       from \pkg{base}.
 
       \item \code{pack} and \code{unpack} are now identity functions
@@ -136,8 +143,8 @@
 
       \item C-level utilities \code{dup_mMatrix_as_d?geMatrix()} gain an
       argument indicating whether a \code{.geMatrix} should be duplicated
-      of not.  R interfaces \code{..2dge()} and (new) \code{..2ge()} get
-      the same option, and their default behaviour is now to \emph{not}
+      (or not).  R interfaces \code{..2dge()} and (new) \code{..2ge()}
+      get the same option, and their default behaviour is now to \emph{not}
       duplicate, for efficiency.  \code{mMatrix_as_d?geMatrix()} are 
       no longer.
     }
