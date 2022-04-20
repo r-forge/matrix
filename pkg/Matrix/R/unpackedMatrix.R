@@ -31,19 +31,40 @@ for (.cl in grep("^.geMatrix$", .upM.subclasses, value = TRUE))
 
 setMethod("pack", signature(x = "matrix"), .m.pack)
 
-.upM.is.sy <- function(object, ...) {
-    .Call(unpackedMatrix_is_symmetric, object) # requiring exact symmetry
+.upM.is.sy <- function(object, checkDN = TRUE, ...) {
+    ## backwards compatibility: don't check DN if check.attributes=FALSE
+    if (checkDN) {
+        ca <- function(check.attributes = TRUE, ...) check.attributes
+        checkDN <- ca(...)
+    }
+    ## requiring exact symmetry:
+    .Call(unpackedMatrix_is_symmetric, object, checkDN)
 }
 .upM.is.sy.dz <- function(object, tol = 100 * .Machine$double.eps,
-                          tol1 = 8 * tol, ...) {
+                          tol1 = 8 * tol, checkDN = TRUE, ...) {
+    ## backwards compatibility: don't check DN if check.attributes=FALSE
+    if (checkDN) {
+        ca <- function(check.attributes = TRUE, ...) check.attributes
+        checkDN <- ca(...)
+    }
     ## be very fast when requiring exact symmetry
     if (tol <= 0)
-        return(.Call(unpackedMatrix_is_symmetric, object))
+        return(.Call(unpackedMatrix_is_symmetric, object, checkDN))
     ## pretest: is it square?
     d <- object@Dim
-    if((n <- d[1L]) != d[2L]) return(FALSE)
-    if(n <= 1L) return(TRUE)
-    ## now handling n-by-n [dz]..Matrix, n >= 2 :
+    if((n <- d[1L]) != d[2L])
+        return(FALSE)
+    if(n == 0L)
+        return(TRUE)
+    ## pretest: are DN symmetric in the sense of getValidity(<symmetricMatrix>)?
+    if(checkDN &&
+       !is.null(rn <- object@Dimnames[[1L]]) &&
+       !is.null(cn <- object@Dimnames[[2L]]) &&
+       !identical(rn, cn))
+        return(FALSE)
+    if(n == 1L)
+        return(TRUE)
+    ## now handling n-by-n [dz]..Matrix, n >= 2:
     if(is(object, "zMatrix")) {
         ge <- "zgeMatrix"
         Cj <- Conj
@@ -51,16 +72,22 @@ setMethod("pack", signature(x = "matrix"), .m.pack)
         ge <- "dgeMatrix"
         Cj <- identity
     }
+    ## discarding possible user-supplied check.attributes:
+    ae <- function(check.attributes, ...) {
+        all.equal(..., check.attributes = FALSE)
+    }
     ## pretest: outermost rows ~= outermost columns? (fast for large asymmetric)
     if(length(tol1)) {
         i. <- if (n <= 4L) 1:n else c(1L, 2L, n-1L, n)
         for(i in i.)
-            if(!isTRUE(all.equal(object[i, ], Cj(object[, i]),
-                                 tolerance = tol1, ...))) return(FALSE)
+            if(!isTRUE(ae(target = object[i, ],
+                          current = Cj(object[, i]),
+                          tolerance = tol1, ...))) return(FALSE)
     }
     ## followed by slower test
-    isTRUE(all.equal(as(     object  , ge),
-                     as(Cj(t(object)), ge), tolerance = tol, ...))
+    isTRUE(ae(target = as(object, ge),
+              current = as(Cj(t(object)), ge),
+              tolerance = tol, ...))
 }
 .upM.is.tr <- function(object, upper = NA, ...) {
     .Call(unpackedMatrix_is_triangular, object, upper)
@@ -69,11 +96,28 @@ setMethod("pack", signature(x = "matrix"), .m.pack)
     .Call(unpackedMatrix_is_diagonal, object)
 }
 .m.is.sy <- function(object, tol = 100 * .Machine$double.eps,
-                     tol1 = 8 * tol, ...) {
-    if (is.logical(object) || is.integer(object) || tol <= 0)
-        .Call(matrix_is_symmetric, object) # requiring exact symmetry
-    else
-        isSymmetric.matrix(object, tol = tol, tol1 = tol1, ...)
+                     tol1 = 8 * tol, checkDN = TRUE, ...) {
+    ## backwards compatibility: don't check DN if check.attributes=FALSE
+    if (checkDN) {
+        ca <- function(check.attributes = TRUE, ...) check.attributes
+        checkDN <- ca(...)
+    }
+    if (is.logical(object) || is.integer(object) || tol <= 0) {
+        ## requiring exact symmetry:
+        .Call(matrix_is_symmetric, object, checkDN)
+    } else {
+        if(checkDN &&
+           !is.null(dn <- dimnames(object)) &&
+           !is.null(rn <- dn[[1L]]) &&
+           !is.null(cn <- dn[[2L]]) &&
+           !identical(rn, cn))
+            return(FALSE)
+        ## discarding possible user-supplied check.attributes:
+        iS.m <- function(check.attributes, ...) {
+            isSymmetric.matrix(..., check.attributes = FALSE)
+        }
+        iS.m(object = object, tol = tol, tol1 = tol1, ...)
+    }
 }
 .m.is.tr <- function(object, upper = NA, ...) {
     .Call(matrix_is_triangular, object, upper)
@@ -97,7 +141,11 @@ for (.cl in c("unpackedMatrix",
 
 setMethod("isDiagonal", signature(object = "unpackedMatrix"), .upM.is.di)
 
+if (FALSE) {
+## Would override isSymmetric.matrix and be faster in the logical and integer
+## cases and in the tol<=0 case ... but leaving out until properly tested ...
 setMethod("isSymmetric", signature(object = "matrix"), .m.is.sy)
+}
 setMethod("isTriangular", signature(object = "matrix"), .m.is.tr)
 setMethod("isDiagonal", signature(object = "matrix"), .m.is.di)
 

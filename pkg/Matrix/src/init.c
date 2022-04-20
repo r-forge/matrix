@@ -287,12 +287,12 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(R_symmDN, 1),
     
     CALLDEF(matrix_pack, 3),
-    CALLDEF(matrix_is_symmetric, 1),
+    CALLDEF(matrix_is_symmetric, 2),
     CALLDEF(matrix_is_triangular, 2),
     CALLDEF(matrix_is_diagonal, 1),
 
     CALLDEF(unpackedMatrix_pack, 3),
-    CALLDEF(unpackedMatrix_is_symmetric, 1),
+    CALLDEF(unpackedMatrix_is_symmetric, 2),
     CALLDEF(unpackedMatrix_is_triangular, 2),
     CALLDEF(unpackedMatrix_is_diagonal, 1),
     CALLDEF(unpackedMatrix_t, 1),
@@ -300,7 +300,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(unpackedMatrix_diag_set, 2),
 
     CALLDEF(packedMatrix_unpack, 1),
-    CALLDEF(packedMatrix_is_symmetric, 1),
+    CALLDEF(packedMatrix_is_symmetric, 2),
     CALLDEF(packedMatrix_is_triangular, 2),
     CALLDEF(packedMatrix_is_diagonal, 1),
     CALLDEF(packedMatrix_t, 1),

@@ -21,7 +21,6 @@
 \alias{coerce,indMatrix,nsparseMatrix-method}
 \alias{coerce,nMatrix,indMatrix-method}
 \alias{determinant,indMatrix,logical-method}
-\alias{isSymmetric,indMatrix-method}
 \alias{Summary,indMatrix-method}
 %-- see also ./matrix-products.Rd, kronecker-methods.Rd, is.na-methods.Rd, ...
 \alias{rbind2,indMatrix,indMatrix-method}

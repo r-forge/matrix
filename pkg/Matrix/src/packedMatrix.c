@@ -99,7 +99,7 @@ SEXP packedMatrix_unpack(SEXP from)
     } while (0)
 
 /* isSymmetric(x, tol = 0) */ 
-SEXP packedMatrix_is_symmetric(SEXP obj)
+SEXP packedMatrix_is_symmetric(SEXP obj, SEXP checkDN)
 {
     static const char *valid[] = {
 	"dspMatrix", "lspMatrix", "nspMatrix", /* be fast */
@@ -117,6 +117,13 @@ SEXP packedMatrix_is_symmetric(SEXP obj)
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym));
 	PM_IS_DI(res, x, pdim, up, "is_symmetric");
+	if (res && asLogical(checkDN)) {
+	    SEXP rn, cn, dn = GET_SLOT(obj, Matrix_DimNamesSym);
+	    if (!isNull(rn = VECTOR_ELT(dn, 0)) &&
+		!isNull(cn = VECTOR_ELT(dn, 1)) &&
+		!equal_string_vectors(rn, cn, pdim[0]))
+		res = FALSE;
+	}
 	return ScalarLogical(res);
     }
 }
