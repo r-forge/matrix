@@ -161,10 +161,11 @@ SEXP symmetricMatrix_validate(SEXP obj)
     
 #undef ENFORCE_SYMMETRIC_DIMNAMES /* NOT YET */
 #ifdef ENFORCE_SYMMETRIC_DIMNAMES
-    /* This check is expensive when both rownames and colnames 
-       have nonzero length, and even more so when a coercion to
-       character is required ... Users can avoid the expense by
-       setting at least one of rownames and colnames to NULL ...
+    /* This check can be expensive when both rownames and colnames have 
+       nonzero length, and even more so when coercions to character are 
+       required ... Users can avoid the expense by setting at least one 
+       of rownames and colnames to NULL or by ensuring that they are the 
+       same object, as testing for pointer equality is fast ...
      */
     
 # define ANY_TO_STRING(x)					\
@@ -176,9 +177,10 @@ SEXP symmetricMatrix_validate(SEXP obj)
     
     if (n > 0) {
 	/* It is already known that the length of 'dn[[i]]' is 0 or 'n' */ 
-	SEXP dn = GET_SLOT(obj, Matrix_DimNamesSym), rn, cn;
-	if (LENGTH(rn = VECTOR_ELT(dn, 0)) == n &&
-	    LENGTH(cn = VECTOR_ELT(dn, 1)) == n &&
+	SEXP dn = GET_SLOT(obj, Matrix_DimNamesSym),
+	    rn = VECTOR_ELT(dn, 0),
+	    cn = VECTOR_ELT(dn, 1);
+	if (rn != cn && LENGTH(rn) == n && LENGTH(cn) == n &&
 	    !equal_string_vectors(ANY_TO_STRING(rn), ANY_TO_STRING(cn), n))
 	    return mkString(_("Dimnames[[1]] differs from Dimnames[[2]]"));
     }

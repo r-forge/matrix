@@ -61,7 +61,7 @@ SEXP unpackedMatrix_pack(SEXP from, SEXP tr_if_ge, SEXP up_if_ge)
 	SEXP x_to = PROTECT(allocVector(_SEXPTYPE_, len));		\
 	_PREFIX_ ## dense_pack(_PTR_(x_to), _PTR_(x_from), n,		\
 			       (*uplo_P(to) == 'U') ? UPP : LOW,	\
-			       (*Diag_P(to) == 'U') ? UNT : NUN);	\
+			       NUN /* for speed */);			\
 	SET_SLOT(to, Matrix_xSym, x_to);				\
 	UNPROTECT(1);							\
     } while (0)
@@ -437,9 +437,15 @@ SEXP matrix_is_diagonal(SEXP obj)
 /*     but then identical(x, t(t(x))) can be FALSE ...                 */
 SEXP unpackedMatrix_t(SEXP obj)
 {
-    /* Initialize result of same class */
-    SEXP res = PROTECT(NEW_OBJECT_OF_CLASS(class_P(obj))),
-	x0 = GET_SLOT(obj, Matrix_xSym);
+    /* Initialize result of same class, except for BunchKaufman */
+    const char *cl = class_P(obj);
+    SEXP res, x0 = GET_SLOT(obj, Matrix_xSym);
+    if (TYPEOF(x0) == REALSXP) {
+	static const char *valid[] = { "BunchKaufman", "" };
+	if (!R_check_class_etc(obj, valid))
+	    cl = "dtrMatrix";
+    }
+    res = PROTECT(NEW_OBJECT_OF_CLASS(cl));
     int *pdim0 = INTEGER(GET_SLOT(obj, Matrix_DimSym)),
 	m = pdim0[0], n = pdim0[1];
     R_xlen_t len = XLENGTH(x0);
@@ -530,12 +536,19 @@ SEXP unpackedMatrix_t(SEXP obj)
 	SET_SLOT(res, Matrix_DimNamesSym, dn1);
 	UNPROTECT(1);
     }
-    /* Toggle 'uplo' slot */
-    if (*uplo != ' ')
+    if (*uplo != ' ') {
+	/* Toggle 'uplo' slot */
 	SET_SLOT(res, Matrix_uploSym, mkString(*uplo == 'U' ? "L" : "U"));
-    /* Preserve 'diag' slot */
-    if (*diag == 'U')
-	SET_SLOT(res, Matrix_diagSym, GET_SLOT(obj, Matrix_diagSym));
+	if (*diag == 'U') {
+	    /* Preserve 'diag' slot */
+	    SET_SLOT(res, Matrix_diagSym, GET_SLOT(obj, Matrix_diagSym));
+	} else if (*diag == ' ') {
+	    static const char *valid[] = { "corMatrix", "" };
+	    if (!R_check_class_etc(obj, valid))
+		/* Preserve 'sd' slot */
+		SET_SLOT(res, install("sd"), GET_SLOT(obj, install("sd")));
+	}
+    }
     /* NB: Nothing to do for 'factors' slot: prototype is already list() ...
        FIXME: However, it would be much better to transpose and reverse
        the factors in each factorization

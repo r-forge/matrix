@@ -74,7 +74,9 @@ setMethod("solve", signature(a = "dppMatrix", b = "integer"),
               .Call(dppMatrix_matrix_solve, a, cbind(b, deparse.level=0L))
           }, valueClass = "dgeMatrix")
 
+## MJ: No longer needed ... replacement in ./packedMatrix.R
+if (FALSE) {
 setMethod("t", signature(x = "dppMatrix"),
           function(x) as(t(as(x, "dspMatrix")), "dppMatrix"),
           valueClass = "dppMatrix")
-
+}

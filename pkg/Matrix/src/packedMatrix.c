@@ -47,7 +47,7 @@ SEXP packedMatrix_unpack(SEXP from)
 	SEXP x_to = PROTECT(allocVector(_SEXPTYPE_, len));		\
 	_PREFIX_ ## dense_unpack(_PTR_(x_to), _PTR_(x_from), n,		\
 				 (*uplo_P(to) == 'U') ? UPP : LOW,	\
-				 (*Diag_P(to) == 'U') ? UNT : NUN);	\
+				 NUN /* for speed */);			\
 	SET_SLOT(to, Matrix_xSym, x_to);				\
 	UNPROTECT(1);							\
     } while (0)
@@ -199,9 +199,15 @@ SEXP packedMatrix_is_diagonal(SEXP obj)
 /* t(x) */
 SEXP packedMatrix_t(SEXP obj)
 {
-    /* Initialize result of same class */
-    SEXP res = PROTECT(NEW_OBJECT_OF_CLASS(class_P(obj))),
-	x0 = GET_SLOT(obj, Matrix_xSym);
+    /* Initialize result of same class, except for pBunchKaufman */
+    const char *cl = class_P(obj);
+    SEXP res, x0 = GET_SLOT(obj, Matrix_xSym);
+    if (TYPEOF(x0) == REALSXP) {
+	static const char *valid[] = { "pBunchKaufman", "" };
+	if (!R_check_class_etc(obj, valid))
+	    cl = "dtpMatrix";
+    }
+    res = PROTECT(NEW_OBJECT_OF_CLASS(cl));
     int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
     const char *uplo = uplo_P(obj), *diag = Diag_P(obj);
 
