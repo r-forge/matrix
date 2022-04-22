@@ -1,3 +1,7 @@
+## These are tests related to the centralization (since r~3454) of various
+## methods for symmetrizing the (possibly asymmetric) 'Dimnames' of symmetric
+## matrices.
+
 library(Matrix)
 
 if (interactive()) {

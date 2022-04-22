@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-04-20 r3465)}{
+\section{Changes in version 1.4-2 (2022-04-22 r3466)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -37,22 +37,25 @@
       \item Long vector support in methods for packing and unpacking
       \code{denseMatrix}, and others.
 
-      \code{..2d?ge(x)} now fail gracefully when \code{x} is a
+      \item \code{..2d?ge(x)} now fail gracefully when \code{x} is a
       long vector, which cannot be made into a valid 1-column matrix.
 
-      \code{diag<-} incorrectly preserved the class of dense matrices,
+      \item \code{diag<-} incorrectly preserved the class of dense matrices,
       so that, e.g., \code{diag<-(x=<dpoMatrix>, value=-1)} was still a
       \code{dpoMatrix}.  Now the result is always one of the more general
       \code{.(ge|sp|sy|tp|tr)Matrix}.
 
-      \code{t} no longer reverses the \code{Dimnames} of dense symmetric
-      matrices. \code{symmDN(dn <- x@Dimnames)} and
-      \code{symmDN(t(x)@Dimnames)} had given different results when
-      \code{dn[[1]]} and \code{dn[[2]]} were non-\code{NULL} and
-      asymmetric.
+      \item \code{t(<corMatrix>)} no longer clears the \code{sd} slot.
+      \code{t(<p?BunchKaufman>)} now returns one of the more general
+      \code{dt[pr]Matrix}, rather than preserving class and clearing
+      the \code{perm} slot. \code{t(<.s[py]Matrix)} no longer reverses
+      the \code{Dimnames} slot.
+      Symmetrization of \code{dn <- x@Dimnames} and \code{t(x)@Dimnames}
+      had given different results when \code{dn[[1]]} and \code{dn[[2]]}
+      were non-\code{NULL} and asymmetric.
 
-      \code{isSymmetric} was equivalent to \code{isDiagonal} for all
-      dense triangular matrices, \emph{not} allowing numerical fuzz
+      \item \code{isSymmetric} was equivalent to \code{isDiagonal} for
+      all dense triangular matrices, \emph{not} allowing numerical fuzz
       via an argument \code{tol} and \emph{not} checking
       \code{Dimnames}.  The usual interface (with \code{tol}
       and \code{tol1} arguments) is now available for all
@@ -82,8 +85,8 @@
       \item For dense general and triangular matrices,
       \code{isSymmetric} gains an argument \code{checkDN = TRUE}
       indicating whether symmetry of \code{Dimnames} should be checked.
-      For backwards compatibility in certain cases, \code{checkDN}
-      is replaced with \code{checkDN && check.attributes}, but
+      For backwards compatibility in certain cases, the condition
+      is actually \code{checkDN && check.attributes}, but
       \code{check.attributes} is otherwise ignored (for speed,
       as \code{Dimnames} is the only \dQuote{attribute} apart from
       \code{x} affecting symmetry).
