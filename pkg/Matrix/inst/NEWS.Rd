@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-04-22 r3466)}{
+\section{Changes in version 1.4-2 (2022-04-23 r3467)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -54,6 +54,13 @@
       had given different results when \code{dn[[1]]} and \code{dn[[2]]}
       were non-\code{NULL} and asymmetric.
 
+      \item \code{isTriangular(x, upper)} had incorrectly returned
+      \code{FALSE} for \code{x} of class \code{triangularMatrix}
+      when \code{upper = TRUE} and \code{x@uplo = "L"} or when
+      \code{upper = FALSE} and \code{x@uplo = "U"}.
+      \code{isTriangular} is now equivalent to \code{isDiagonal}
+      in those cases.
+
       \item \code{isSymmetric} was equivalent to \code{isDiagonal} for
       all dense triangular matrices, \emph{not} allowing numerical fuzz
       via an argument \code{tol} and \emph{not} checking
@@ -82,14 +89,14 @@
       \item \code{isTriangular} and \code{isDiagonal} are implemented
       in C also for standard \code{matrix}.
 
-      \item For dense general and triangular matrices,
-      \code{isSymmetric} gains an argument \code{checkDN = TRUE}
+      \item For dense general and triangular matrices, methods
+      for \code{isSymmetric} gain an argument \code{checkDN = TRUE}
       indicating whether symmetry of \code{Dimnames} should be checked.
-      For backwards compatibility in certain cases, the condition
-      is actually \code{checkDN && check.attributes}, but
-      \code{check.attributes} is otherwise ignored (for speed,
-      as \code{Dimnames} is the only \dQuote{attribute} apart from
-      \code{x} affecting symmetry).
+      For backwards compatibility in certain cases,
+      the condition is actually \code{checkDN && check.attributes},
+      but \code{check.attributes} is otherwise ignored
+      (i.e., only slots \code{x} and \code{Dimnames} are examined
+      when testing symmetry).
       
       \item \code{diag(<unpackedMatrix>) <- value} now behaves like
       \code{diag(<packedMatrix>) <- value}, supporting coercions
