@@ -177,10 +177,10 @@ SEXP symmetricMatrix_validate(SEXP obj)
     
     if (n > 0) {
 	/* It is already known that the length of 'dn[[i]]' is 0 or 'n' */ 
-	SEXP dn = GET_SLOT(obj, Matrix_DimNamesSym),
-	    rn = VECTOR_ELT(dn, 0),
-	    cn = VECTOR_ELT(dn, 1);
-	if (rn != cn && LENGTH(rn) == n && LENGTH(cn) == n &&
+	SEXP rn, cn, dn = GET_SLOT(obj, Matrix_DimNamesSym);
+	if (LENGTH(rn = VECTOR_ELT(dn, 0)) == n &&
+	    LENGTH(cn = VECTOR_ELT(dn, 1)) == n &&
+	    rn != cn &&
 	    !equal_string_vectors(ANY_TO_STRING(rn), ANY_TO_STRING(cn), n))
 	    return mkString(_("Dimnames[[1]] differs from Dimnames[[2]]"));
     }
@@ -881,7 +881,7 @@ Rboolean _PREFIX_ ## dense_packed_is_diagonal(_CTYPE_ *px, int *pdim,	\
     int i, j, n = pdim[0];						\
     if (up) {								\
 	for (j = 0; j < n; ++j, ++px)					\
-	    for (i = 0; i < j; ++j)					\
+	    for (i = 0; i < j; ++i)					\
 		if (_U_IS_NOT_ZERO_)					\
 		    return FALSE;					\
     } else {								\
