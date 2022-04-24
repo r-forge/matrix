@@ -174,15 +174,22 @@ SEXP symmetricMatrix_validate(SEXP obj)
      : (inherits(x, "factor")					\
 	? asCharacterFactor(x)					\
 	: coerceVector(x, STRSXP)))
-    
+
+    SEXP dn = GET_SLOT(obj, Matrix_DimNamesSym),
+	ndn = getAttrib(dn, R_NamesSymbol);
+    if (!isNull(ndn) &&
+	!strcmp(CHAR(STRING_ELT(ndn, 0)), CHAR(STRING_ELT(ndn, 1))))
+	return mkString(_("Dimnames[1] differs from Dimnames[2]"));
     if (n > 0) {
-	/* It is already known that the length of 'dn[[i]]' is 0 or 'n' */ 
-	SEXP rn, cn, dn = GET_SLOT(obj, Matrix_DimNamesSym);
-	if (LENGTH(rn = VECTOR_ELT(dn, 0)) == n &&
-	    LENGTH(cn = VECTOR_ELT(dn, 1)) == n &&
+	/* NB: It is already known that the length of 'dn[[i]]' is 0 or 'n' */ 
+	SEXP rn, cn;
+	if (!isNull(rn = VECTOR_ELT(dn, 0)) &&
+	    !isNull(cn = VECTOR_ELT(dn, 1)) &&
+	    LENGTH(rn) == n &&
+	    LENGTH(cn) == n &&
 	    rn != cn &&
 	    !equal_string_vectors(ANY_TO_STRING(rn), ANY_TO_STRING(cn), n))
-	    return mkString(_("Dimnames[[1]] differs from Dimnames[[2]]"));
+	    return mkString(_("Dimnames[1] differs from Dimnames[2]"));
     }
     
 # undef ANY_TO_STRING
@@ -317,6 +324,34 @@ SEXP R_DimNames_fixup(SEXP dn)
 	UNPROTECT(1);
     }
     return dn;
+}
+
+SEXP R_DimNames_is_symmetric(SEXP dn) {
+    return ScalarLogical(DimNames_is_symmetric(dn));
+}
+
+Rboolean DimNames_is_symmetric(SEXP dn) {
+    /* NB: Assuming here that we have the 'Dimnames' slot 
+       of a _valid_ matrix, so that the elements are either 
+       NULL or character vectors
+
+       Keep synchronized with symmetricMatrix_validate() above,
+       (which must do slightly more)!
+    */
+    SEXP ndn = getAttrib(dn, R_NamesSymbol);
+    if (!isNull(ndn) &&
+	strcmp(CHAR(STRING_ELT(ndn, 0)), CHAR(STRING_ELT(ndn, 1)))) {
+	return FALSE;
+    }
+    int n;
+    SEXP rn, cn;
+    if (!isNull(rn = VECTOR_ELT(dn, 0)) &&
+	!isNull(cn = VECTOR_ELT(dn, 1)) &&
+	rn != cn &&
+	((n = LENGTH(rn)) != LENGTH(cn) || !equal_string_vectors(rn, cn, n))) {
+	return FALSE;
+    }
+    return TRUE;
 }
 
 /**
@@ -762,11 +797,8 @@ MAKE_DIAGONAL(z, Rcomplex, COMPLEX,
 
 #define IS_SYMMETRIC(_PREFIX_, _CTYPE_,					\
 		     _U_IS_NA_, _L_IS_NOT_NA_, _L_IS_NOT_EQUAL_)	\
-Rboolean _PREFIX_ ## dense_unpacked_is_symmetric(_CTYPE_ *px, int *pdim) \
+Rboolean _PREFIX_ ## dense_unpacked_is_symmetric(_CTYPE_ *px, int n)    \
 {									\
-    int n = pdim[0];							\
-    if (pdim[1] != n)							\
-	return FALSE;							\
     int i, j, nm1 = n - 1;						\
     R_xlen_t upos = n, lpos = 1;					\
     for (j = 0; j < n; upos = (lpos += (++j)+1) + nm1)			\
@@ -806,12 +838,9 @@ IS_SYMMETRIC(z, Rcomplex,
 #undef IS_SYMMETRIC
 
 #define IS_TRIANGULAR(_PREFIX_, _CTYPE_, _L_IS_NOT_ZERO_, _U_IS_NOT_ZERO_) \
-Rboolean _PREFIX_ ## dense_unpacked_is_triangular(_CTYPE_ *px, int *pdim, \
+Rboolean _PREFIX_ ## dense_unpacked_is_triangular(_CTYPE_ *px, int n,   \
 						  Rboolean upper)	\
 {									\
-    int n = pdim[0];							\
-    if (pdim[1] != n)							\
-	return FALSE;							\
     int i, j;								\
     if (upper) {							\
 	for (j = 0; j < n; px += (++j)+1)				\
@@ -845,11 +874,8 @@ IS_TRIANGULAR(z, Rcomplex,
 #undef IS_TRIANGULAR
 
 #define IS_DIAGONAL(_PREFIX_, _CTYPE_, _OD_IS_NOT_ZERO_)		\
-Rboolean _PREFIX_ ## dense_unpacked_is_diagonal(_CTYPE_ *px, int *pdim) \
+Rboolean _PREFIX_ ## dense_unpacked_is_diagonal(_CTYPE_ *px, int n)     \
 {									\
-    int n = pdim[0];							\
-    if (pdim[1] != n)							\
-	return FALSE;							\
     int i, j;								\
     for (j = 0; j < n; ++j) {						\
 	for (i = 0; i < j; ++i)						\
@@ -875,10 +901,10 @@ IS_DIAGONAL(z, Rcomplex,
 #undef IS_DIAGONAL
 
 #define IS_DIAGONAL(_PREFIX_, _CTYPE_, _U_IS_NOT_ZERO_, _L_IS_NOT_ZERO_) \
-Rboolean _PREFIX_ ## dense_packed_is_diagonal(_CTYPE_ *px, int *pdim,	\
+Rboolean _PREFIX_ ## dense_packed_is_diagonal(_CTYPE_ *px, int n,	\
 					      Rboolean up)		\
 {									\
-    int i, j, n = pdim[0];						\
+    int i, j;								\
     if (up) {								\
 	for (j = 0; j < n; ++j, ++px)					\
 	    for (i = 0; i < j; ++i)					\

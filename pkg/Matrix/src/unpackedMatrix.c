@@ -183,20 +183,20 @@ SEXP matrix_pack(SEXP from, SEXP tr, SEXP up)
     return to;
 }
 
-#define UPM_IS_SY(_RES_, _X_, _DIM_, _METHOD_)				\
+#define UPM_IS_SY(_RES_, _X_, _N_, _METHOD_)				\
     do {								\
 	switch (TYPEOF(_X_)) {						\
 	case REALSXP:							\
-	    _RES_ = ddense_unpacked_is_symmetric(REAL(_X_), _DIM_);	\
+	    _RES_ = ddense_unpacked_is_symmetric(REAL(_X_), _N_);	\
 	    break;							\
 	case LGLSXP:							\
-	    _RES_ = ldense_unpacked_is_symmetric(LOGICAL(_X_), _DIM_);	\
+	    _RES_ = ldense_unpacked_is_symmetric(LOGICAL(_X_), _N_);	\
 	    break;							\
 	case INTSXP:							\
-	    _RES_ = idense_unpacked_is_symmetric(INTEGER(_X_), _DIM_);	\
+	    _RES_ = idense_unpacked_is_symmetric(INTEGER(_X_), _N_);	\
 	    break;							\
 	case CPLXSXP:							\
-	    _RES_ = zdense_unpacked_is_symmetric(COMPLEX(_X_), _DIM_);	\
+	    _RES_ = zdense_unpacked_is_symmetric(COMPLEX(_X_), _N_);	\
 	    break;							\
 	default:							\
 	    UPM_ERROR_INVALID_SLOT_TYPE("x", TYPEOF(_X_), _METHOD_);	\
@@ -205,24 +205,24 @@ SEXP matrix_pack(SEXP from, SEXP tr, SEXP up)
 	}								\
     } while (0)
 
-#define UPM_IS_TR(_RES_, _X_, _DIM_, _UPPER_, _METHOD_)			\
+#define UPM_IS_TR(_RES_, _X_, _N_, _UPPER_, _METHOD_)			\
     do {								\
 	switch (TYPEOF(_X_)) {						\
 	case REALSXP:							\
 	    _RES_ =							\
-		ddense_unpacked_is_triangular(REAL(_X_), _DIM_, _UPPER_); \
+		ddense_unpacked_is_triangular(REAL(_X_), _N_, _UPPER_); \
 	    break;							\
 	case LGLSXP:							\
 	    _RES_ =							\
-		idense_unpacked_is_triangular(LOGICAL(_X_), _DIM_, _UPPER_); \
+		idense_unpacked_is_triangular(LOGICAL(_X_), _N_, _UPPER_); \
 	    break;							\
 	case INTSXP:							\
 	    _RES_ =							\
-		idense_unpacked_is_triangular(INTEGER(_X_), _DIM_, _UPPER_); \
+		idense_unpacked_is_triangular(INTEGER(_X_), _N_, _UPPER_); \
 	    break;							\
 	case CPLXSXP:							\
 	    _RES_ =							\
-		zdense_unpacked_is_triangular(COMPLEX(_X_), _DIM_, _UPPER_); \
+		zdense_unpacked_is_triangular(COMPLEX(_X_), _N_, _UPPER_); \
 	    break;							\
 	default:							\
 	    UPM_ERROR_INVALID_SLOT_TYPE("x", TYPEOF(_X_), _METHOD_);	\
@@ -231,20 +231,20 @@ SEXP matrix_pack(SEXP from, SEXP tr, SEXP up)
 	}								\
     } while (0)
 
-#define UPM_IS_DI(_RES_, _X_, _DIM_, _METHOD_)				\
+#define UPM_IS_DI(_RES_, _X_, _N_, _METHOD_)				\
     do {								\
 	switch (TYPEOF(_X_)) {						\
 	case REALSXP:							\
-	    _RES_ = ddense_unpacked_is_diagonal(REAL(_X_), _DIM_);	\
+	    _RES_ = ddense_unpacked_is_diagonal(REAL(_X_), _N_);	\
 	    break;							\
 	case LGLSXP:							\
-	    _RES_ = idense_unpacked_is_diagonal(LOGICAL(_X_), _DIM_);	\
+	    _RES_ = idense_unpacked_is_diagonal(LOGICAL(_X_), _N_);	\
 	    break;							\
 	case INTSXP:							\
-	    _RES_ = idense_unpacked_is_diagonal(INTEGER(_X_), _DIM_);	\
+	    _RES_ = idense_unpacked_is_diagonal(INTEGER(_X_), _N_);	\
 	    break;							\
 	case CPLXSXP:							\
-	    _RES_ = zdense_unpacked_is_diagonal(COMPLEX(_X_), _DIM_);	\
+	    _RES_ = zdense_unpacked_is_diagonal(COMPLEX(_X_), _N_);	\
 	    break;							\
 	default:							\
 	    UPM_ERROR_INVALID_SLOT_TYPE("x", TYPEOF(_X_), _METHOD_);	\
@@ -269,25 +269,23 @@ SEXP unpackedMatrix_is_symmetric(SEXP obj, SEXP checkDN)
 	return ScalarLogical(1);
     } else {
 	/* .(ge|tr)Matrix */
+	int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym)), n = pdim[0];
+	if (icl > 5 && pdim[1] != n) {
+	    return ScalarLogical(0);
+	}
+	if (asLogical(checkDN) != 0 &&
+	    !DimNames_is_symmetric(GET_SLOT(obj, Matrix_DimNamesSym))) {
+	    return ScalarLogical(0);
+	}
 	Rboolean res = FALSE;
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym));
 	if (icl <= 5) {
 	    /* .trMatrix: symmetric iff diagonal (upper _and_ lower tri.) */
 	    Rboolean upper = (*uplo_P(obj) == 'U') ? FALSE : TRUE;
-	    UPM_IS_TR(res, x, pdim, upper, "is_symmetric");
+	    UPM_IS_TR(res, x, n, upper, "is_symmetric");
 	} else {
 	    /* .geMatrix: need to do a complete symmetry check */
-	    UPM_IS_SY(res, x, pdim, "is_symmetric");
-	}
-	if (res && asLogical(checkDN)) {
-	    SEXP rn, cn, dn = GET_SLOT(obj, Matrix_DimNamesSym);
-	    if (!isNull(rn = VECTOR_ELT(dn, 0)) &&
-		!isNull(cn = VECTOR_ELT(dn, 1)) &&
-		rn != cn &&
-		!equal_string_vectors(rn, cn, pdim[0])) {
-		res = FALSE;
-	    }
+	    UPM_IS_SY(res, x, n, "is_symmetric");
 	}
 	return ScalarLogical(res);
     }
@@ -296,19 +294,19 @@ SEXP unpackedMatrix_is_symmetric(SEXP obj, SEXP checkDN)
 /* isSymmetric(x, tol = 0) */
 SEXP matrix_is_symmetric(SEXP obj, SEXP checkDN)
 {
-    Rboolean res = FALSE;
-    int *pdim = INTEGER(getAttrib(obj, R_DimSymbol));
-    UPM_IS_SY(res, obj, pdim, "is_symmetric");
-    /* ^FIXME: wrong function name in error message */
-    if (res && asLogical(checkDN)) {
-	SEXP rn, cn, dn = getAttrib(obj, R_DimNamesSymbol);
-	if (!isNull(rn = VECTOR_ELT(dn, 0)) &&
-	    !isNull(cn = VECTOR_ELT(dn, 1)) &&
-	    rn != cn &&
-	    !equal_string_vectors(rn, cn, pdim[0])) {
-	    res = FALSE;
+    int *pdim = INTEGER(getAttrib(obj, R_DimSymbol)), n = pdim[0];
+    if (pdim[1] != n) {
+	return ScalarLogical(0);
+    }
+    if (asLogical(checkDN) != 0) {
+	SEXP dn = getAttrib(obj, R_DimNamesSymbol);
+	if (!isNull(dn) && !DimNames_is_symmetric(dn)) {
+	    return ScalarLogical(0);
 	}
     }
+    Rboolean res = FALSE;
+    UPM_IS_SY(res, obj, n, "is_symmetric");
+    /* ^FIXME: wrong function name in error message */
     return ScalarLogical(res);
 }
 
@@ -321,27 +319,29 @@ SEXP matrix_is_symmetric(SEXP obj, SEXP checkDN)
 	return ans;							\
     } while (0)
 
-#define RETURN_TRUE_IF_GE_IS_TR(_RES_, _X_, _DIM_, _UPPER_)		\
+#define RETURN_GE_IS_TR(_X_, _N_, _UPPER_)				\
     do {								\
+	Rboolean res = FALSE;						\
 	if (_UPPER_ == NA_LOGICAL) {					\
-	    UPM_IS_TR(_RES_, _X_, _DIM_, TRUE, "is_triangular");	\
-	    if (_RES_) {						\
+	    UPM_IS_TR(res, _X_, _N_, TRUE, "is_triangular");		\
+	    if (res) {							\
 	        RETURN_TRUE(mkString("U"));				\
 	    }								\
-	    UPM_IS_TR(_RES_, _X_, _DIM_, FALSE, "is_triangular");	\
-	    if (_RES_) {						\
+	    UPM_IS_TR(res, _X_, _N_, FALSE, "is_triangular");		\
+	    if (res) {							\
 		RETURN_TRUE(mkString("L"));				\
 	    }								\
 	} else {							\
 	    if (_UPPER_ != 0) {						\
-		UPM_IS_TR(_RES_, _X_, _DIM_, TRUE, "is_triangular");	\
+		UPM_IS_TR(res, _X_, _N_, TRUE, "is_triangular");	\
 	    } else { 							\
-		UPM_IS_TR(_RES_, _X_, _DIM_, FALSE, "is_triangular");	\
+		UPM_IS_TR(res, _X_, _N_, FALSE, "is_triangular");	\
 	    }								\
-	    if (_RES_) {						\
+	    if (res) {							\
 		return ScalarLogical(1);				\
 	    }								\
 	}								\
+	return ScalarLogical(0);					\
     } while (0)
 
 /* isTriangular(x, upper) */
@@ -364,14 +364,11 @@ SEXP unpackedMatrix_is_triangular(SEXP obj, SEXP upper)
 	have_upper = (*CHAR(STRING_ELT(uplo, 0)) == 'U') ? TRUE : FALSE;
     }
 
-#define IF_DIAGONAL_HEAD						\
+#define IF_DIAGONAL							\
     Rboolean res = FALSE;						\
     SEXP x = GET_SLOT(obj, Matrix_xSym);				\
-    int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym))			\
-	
-#define IF_DIAGONAL							\
-    IF_DIAGONAL_HEAD;							\
-    UPM_IS_TR(res, x, pdim, have_upper ? FALSE : TRUE,			\
+    int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];			\
+    UPM_IS_TR(res, x, n, have_upper ? FALSE : TRUE,			\
 	      "is_triangular");						\
     if (res)
     
@@ -387,6 +384,7 @@ SEXP unpackedMatrix_is_triangular(SEXP obj, SEXP upper)
 		return ScalarLogical(1);
 	    }
 	}
+	return ScalarLogical(0);
     } else if (icl <= 5) {
 	/* .syMatrix: triangular iff diagonal (upper _and_ lower tri.) */
 	IF_DIAGONAL {
@@ -396,30 +394,34 @@ SEXP unpackedMatrix_is_triangular(SEXP obj, SEXP upper)
 		return ScalarLogical(1);
 	    }
 	}
-    } else {
-	/* .geMatrix: need to do a complete triangularity check */
-	IF_DIAGONAL_HEAD;
-	RETURN_TRUE_IF_GE_IS_TR(res, x, pdim, need_upper);
-    }
+	return ScalarLogical(0);
 
 #undef IF_DIAGONAL
-#undef IF_DIAGONAL_HEAD
-    
-    return ScalarLogical(0);
+	
+    } else {
+	/* .geMatrix: need to do a complete triangularity check */
+	int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym)), n = pdim[0];
+	if (pdim[1] != n) {
+	    return ScalarLogical(0);
+	}
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	RETURN_GE_IS_TR(x, n, need_upper);
+    }
 }
 
 /* isTriangular(x, upper) */
 SEXP matrix_is_triangular(SEXP obj, SEXP upper)
 {
-    Rboolean res = FALSE;
-    int *pdim = INTEGER(getAttrib(obj, R_DimSymbol));
+    int *pdim = INTEGER(getAttrib(obj, R_DimSymbol)), n = pdim[0];
+    if (pdim[1] != n) {
+	return ScalarLogical(0);
+    }
     int need_upper = asLogical(upper);
-    RETURN_TRUE_IF_GE_IS_TR(res, obj, pdim, need_upper);
+    RETURN_GE_IS_TR(obj, n, need_upper);
     /* ^FIXME: wrong function name in error message */
-    return ScalarLogical(res);
 }
 
-#undef RETURN_TRUE_IF_GE_IS_TR
+#undef RETURN_GE_IS_TR
 #undef RETURN_TRUE
 
 /* isDiagonal(x) */
@@ -432,29 +434,33 @@ SEXP unpackedMatrix_is_diagonal(SEXP obj)
     int icl = R_check_class_etc(obj, valid);
     if (icl < 0) {
 	UPM_ERROR_INVALID_CLASS(class_P(obj), "is_diagonal");
-	return R_NilValue;
-    } else {
-	Rboolean res = FALSE;
-	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym));
-	if (icl <= 5) {
-	    /* .(sy|tr)Matrix: diagonal iff stored triangle is zero off diag. */
-	    Rboolean upper = (*uplo_P(obj) == 'U') ? FALSE : TRUE;
-	    UPM_IS_TR(res, x, pdim, upper, "is_diagonal");
-	} else {
-	    /* .geMatrix: need to do a complete diagonality check */
-	    UPM_IS_DI(res, x, pdim, "is_diagonal");
-	}
-	return ScalarLogical(res);
     }
+    int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym)), n = pdim[0];
+    if (pdim[1] != n) {
+	return ScalarLogical(0);
+    }
+    Rboolean res = FALSE;
+    SEXP x = GET_SLOT(obj, Matrix_xSym);
+    if (icl <= 5) {
+	/* .(sy|tr)Matrix: diagonal iff stored triangle is zero off diagonal */
+	Rboolean upper = (*uplo_P(obj) == 'U') ? FALSE : TRUE;
+	UPM_IS_TR(res, x, n, upper, "is_diagonal");
+    } else {
+	/* .geMatrix: need to do a complete diagonality check */
+	UPM_IS_DI(res, x, n, "is_diagonal");
+    }
+    return ScalarLogical(res);
 }
 
 /* isDiagonal(x) */
 SEXP matrix_is_diagonal(SEXP obj)
 {
+    int *pdim = INTEGER(getAttrib(obj, R_DimSymbol)), n = pdim[0];
+    if (pdim[1] != n) {
+	return ScalarLogical(0);
+    }
     Rboolean res = FALSE;
-    int *pdim = INTEGER(getAttrib(obj, R_DimSymbol));
-    UPM_IS_DI(res, obj, pdim, "is_diagonal");
+    UPM_IS_DI(res, obj, n, "is_diagonal");
     /* ^FIXME: wrong function name in error message */
     return ScalarLogical(res);
 }
