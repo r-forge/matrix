@@ -189,8 +189,10 @@ SEXP iMatrix_validate(SEXP obj);
 SEXP zMatrix_validate(SEXP obj);
 
 SEXP R_DimNames_fixup(SEXP dimnames);
-void symmDN(SEXP dn, int J);
+SEXP R_DimNames_is_symmetric(SEXP dn);
+Rboolean DimNames_is_symmetric(SEXP dn);
 SEXP R_symmDN(SEXP dn);
+void symmDN(SEXP dn, int J);
 SEXP get_symmetrized_DimNames(SEXP x);
 void set_symmetrized_DimNames(SEXP dest, SEXP src);
 void set_DimNames(SEXP dest, SEXP src);
@@ -226,22 +228,22 @@ void ddense_unpacked_make_diagonal(  double *to, SEXP from);
 void idense_unpacked_make_diagonal(     int *to, SEXP from);
 void zdense_unpacked_make_diagonal(Rcomplex *to, SEXP from);
 
-Rboolean ddense_unpacked_is_symmetric(  double *px, int *pdim);
-Rboolean ldense_unpacked_is_symmetric(     int *px, int *pdim);
-Rboolean idense_unpacked_is_symmetric(     int *px, int *pdim);
-Rboolean zdense_unpacked_is_symmetric(Rcomplex *px, int *pdim);
+Rboolean ddense_unpacked_is_symmetric(  double *px, int n);
+Rboolean ldense_unpacked_is_symmetric(     int *px, int n);
+Rboolean idense_unpacked_is_symmetric(     int *px, int n);
+Rboolean zdense_unpacked_is_symmetric(Rcomplex *px, int n);
 
-Rboolean ddense_unpacked_is_triangular(  double *px, int *pdim, Rboolean upper);
-Rboolean idense_unpacked_is_triangular(     int *px, int *pdim, Rboolean upper);
-Rboolean zdense_unpacked_is_triangular(Rcomplex *px, int *pdim, Rboolean upper);
+Rboolean ddense_unpacked_is_triangular(  double *px, int n, Rboolean upper);
+Rboolean idense_unpacked_is_triangular(     int *px, int n, Rboolean upper);
+Rboolean zdense_unpacked_is_triangular(Rcomplex *px, int n, Rboolean upper);
 
-Rboolean ddense_unpacked_is_diagonal(  double *px, int *pdim);
-Rboolean idense_unpacked_is_diagonal(     int *px, int *pdim);
-Rboolean zdense_unpacked_is_diagonal(Rcomplex *px, int *pdim);
+Rboolean ddense_unpacked_is_diagonal(  double *px, int n);
+Rboolean idense_unpacked_is_diagonal(     int *px, int n);
+Rboolean zdense_unpacked_is_diagonal(Rcomplex *px, int n);
     
-Rboolean ddense_packed_is_diagonal(  double *px, int *pdim, Rboolean up);
-Rboolean idense_packed_is_diagonal(     int *px, int *pdim, Rboolean up);
-Rboolean zdense_packed_is_diagonal(Rcomplex *px, int *pdim, Rboolean up);
+Rboolean ddense_packed_is_diagonal(  double *px, int n, Rboolean up);
+Rboolean idense_packed_is_diagonal(     int *px, int n, Rboolean up);
+Rboolean zdense_packed_is_diagonal(Rcomplex *px, int n, Rboolean up);
 
 SEXP R_dup_mMatrix_as_geMatrix(SEXP A, SEXP force);
 SEXP dup_mMatrix_as_geMatrix(SEXP A, Rboolean force);

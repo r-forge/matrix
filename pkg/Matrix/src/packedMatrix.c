@@ -77,20 +77,20 @@ SEXP packedMatrix_unpack(SEXP from)
     return to;
 }
 
-#define PM_IS_DI(_RES_, _X_, _DIM_, _UP_, _METHOD_)			\
+#define PM_IS_DI(_RES_, _X_, _N_, _UP_, _METHOD_)			\
     do {								\
 	switch (TYPEOF(_X_)) {						\
 	case REALSXP:							\
-	    _RES_ = ddense_packed_is_diagonal(REAL(_X_), _DIM_, _UP_);	\
+	    _RES_ = ddense_packed_is_diagonal(REAL(_X_), _N_, _UP_);	\
 	    break;							\
 	case LGLSXP:							\
-	    _RES_ = idense_packed_is_diagonal(LOGICAL(_X_), _DIM_, _UP_); \
+	    _RES_ = idense_packed_is_diagonal(LOGICAL(_X_), _N_, _UP_); \
 	    break;							\
 	case INTSXP:							\
-	    _RES_ = idense_packed_is_diagonal(INTEGER(_X_), _DIM_, _UP_); \
+	    _RES_ = idense_packed_is_diagonal(INTEGER(_X_), _N_, _UP_); \
 	    break;							\
 	case CPLXSXP:							\
-	    _RES_ = zdense_packed_is_diagonal(COMPLEX(_X_), _DIM_, _UP_); \
+	    _RES_ = zdense_packed_is_diagonal(COMPLEX(_X_), _N_, _UP_); \
 	    break;							\
 	default:							\
 	    PM_ERROR_INVALID_SLOT_TYPE("x", TYPEOF(_X_), _METHOD_);	\
@@ -114,19 +114,14 @@ SEXP packedMatrix_is_symmetric(SEXP obj, SEXP checkDN)
 	return ScalarLogical(1);
     } else {
 	/* .tpMatrix: symmetric iff diagonal */
+	if (asLogical(checkDN) != 0 &&
+	    !DimNames_is_symmetric(GET_SLOT(obj, Matrix_DimNamesSym))) {
+	    return ScalarLogical(0);
+	}
 	Rboolean res = FALSE, up = (*uplo_P(obj) == 'U') ? TRUE : FALSE;
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym));
-	PM_IS_DI(res, x, pdim, up, "is_symmetric");
-	if (res && asLogical(checkDN)) {
-	    SEXP rn, cn, dn = GET_SLOT(obj, Matrix_DimNamesSym);
-	    if (!isNull(rn = VECTOR_ELT(dn, 0)) &&
-		!isNull(cn = VECTOR_ELT(dn, 1)) &&
-		rn != cn &&
-		!equal_string_vectors(rn, cn, pdim[0])) {
-		res = FALSE;
-	    }
-	}
+	int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
+	PM_IS_DI(res, x, n, up, "is_symmetric");
 	return ScalarLogical(res);
     }
 }
@@ -158,8 +153,8 @@ SEXP packedMatrix_is_triangular(SEXP obj, SEXP upper)
 #define IF_DIAGONAL							\
     Rboolean res = FALSE;						\
     SEXP x = GET_SLOT(obj, Matrix_xSym);				\
-    int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym));			\
-    PM_IS_DI(res, x, pdim, have_upper, "is_triangular");		\
+    int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];			\
+    PM_IS_DI(res, x, n, have_upper, "is_triangular");			\
     if (res)
     
     if (icl <= 2) {
@@ -198,8 +193,8 @@ SEXP packedMatrix_is_diagonal(SEXP obj)
     /* _Not_ checking class of 'obj' */
     Rboolean res = FALSE, up = (*uplo_P(obj) == 'U') ? TRUE : FALSE;
     SEXP x = GET_SLOT(obj, Matrix_xSym);
-    int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym));
-    PM_IS_DI(res, x, pdim, up, "is_diagonal");
+    int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
+    PM_IS_DI(res, x, n, up, "is_diagonal");
     return ScalarLogical(res);
 }
 

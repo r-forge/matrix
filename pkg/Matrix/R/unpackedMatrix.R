@@ -54,15 +54,10 @@ setMethod("pack", signature(x = "matrix"), .m.pack)
     d <- object@Dim
     if((n <- d[1L]) != d[2L])
         return(FALSE)
-    if(n == 0L)
-        return(TRUE)
-    ## pretest: are DN symmetric in the sense of getValidity(<symmetricMatrix>)?
-    if(checkDN &&
-       !is.null(rn <- object@Dimnames[[1L]]) &&
-       !is.null(cn <- object@Dimnames[[2L]]) &&
-       !identical(rn, cn))
+    ## pretest: are DN symmetric in the sense of validObject(<symmetricMatrix>)?
+    if(checkDN && !isSymmetricDN(object@Dimnames))
         return(FALSE)
-    if(n == 1L)
+    if(n <= 1L)
         return(TRUE)
     ## now handling n-by-n [dz]..Matrix, n >= 2:
     if(is(object, "zMatrix")) {

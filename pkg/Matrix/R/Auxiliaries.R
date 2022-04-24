@@ -397,6 +397,11 @@ symmDN <- function(dn) {
     .Call(R_symmDN, dn)
 }
 
+isSymmetricDN <- function(dn) {
+    .Call(R_DimNames_is_symmetric, dn)
+}
+
+
 ## MJ: no longer ... see above
 if (FALSE) {
 
@@ -459,16 +464,15 @@ is.na_nsp <- function(x) {
     d <- x@Dim
     dn <- x@Dimnames
     ## step-wise construction ==> no validity check for speedup
-    r <- new(if(d[1] == d[2] && identical(dn[[1]], dn[[2]]))
-	     "nsCMatrix" else "ngCMatrix")
+    r <- new(if(d[1] == d[2] && isSymmetricDN(dn)) "nsCMatrix" else "ngCMatrix")
     r@Dim <- d
     r@Dimnames <- dn
     r@p <- rep.int(0L, d[2]+1L)
     r
 }
 
-allTrueMat <- function(x, sym = (d[1] == d[2] && identical(dn[[1]], dn[[2]])),
-		       packed=TRUE)
+allTrueMat <- function(x, sym = (d[1] == d[2] && isSymmetricDN(dn)),
+                       packed = TRUE)
 {
     d <- x@Dim
     dn <- x@Dimnames

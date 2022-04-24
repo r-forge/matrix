@@ -49,7 +49,7 @@ isTriTri <- function(object, upper = NA, ...) {
     if(is.na(upper))
         `attr<-`(TRUE, "kind", object@uplo)
     else
-        object@uplo == (if (upper) "U" else "L") || isDiagonal(object)
+        object@uplo == (if(upper) "U" else "L") || isDiagonal(object)
 }
 for(cls in trCls)
     setMethod("isTriangular", signature(object = cls), isTriTri)

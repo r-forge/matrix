@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-04-23 r3467)}{
+\section{Changes in version 1.4-2 (2022-04-24 r3468)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -61,12 +61,16 @@
       \code{isTriangular} is now equivalent to \code{isDiagonal}
       in those cases.
 
-      \item \code{isSymmetric} was equivalent to \code{isDiagonal} for
-      all dense triangular matrices, \emph{not} allowing numerical fuzz
-      via an argument \code{tol} and \emph{not} checking
-      \code{Dimnames}.  The usual interface (with \code{tol}
-      and \code{tol1} arguments) is now available for all
-      \code{ddenseMatrix}.  (See also New Features.)
+      \item \code{isSymmetric} was equivalent to \code{isDiagonal}
+      for all dense triangular matrices, \emph{not} allowing
+      numerical fuzz via an argument \code{tol} and \emph{not}
+      checking \code{Dimnames}.  The usual interface
+      (with \code{tol} and \code{tol1} arguments) is now available
+      for all \code{ddenseMatrix}.  (See also New Features.)
+
+      \item \code{isSymmetric} now also looks at \code{names(Dimnames)}
+      for all \code{denseMatrix}, following \code{isSymmetric.matrix}
+      from \pkg{base}.
     }
   }
   \subsection{New Features}{
@@ -157,6 +161,14 @@
       get the same option, and their default behaviour is now to \emph{not}
       duplicate, for efficiency.  \code{mMatrix_as_d?geMatrix()} are 
       no longer.
+
+      \item New C-level utility \code{DimNames_is_symmetric()}
+      with R interface \code{isSymmetricDN()}, which should be
+      used consistently to test for symmetry of \code{[dD]imnames}.
+      Note that these are intended to behave consistently with
+      \code{symmetricMatrix_validate()},
+      by allowing, e.g., \code{list(NULL, nms)},
+      but not, e.g., \code{list(A = NULL, B = nms)}.
     }
   }
 }
