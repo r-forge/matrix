@@ -177,8 +177,11 @@ SEXP symmetricMatrix_validate(SEXP obj)
 
     SEXP dn = GET_SLOT(obj, Matrix_DimNamesSym),
 	ndn = getAttrib(dn, R_NamesSymbol);
+    const char *ndn0, *ndn1;
     if (!isNull(ndn) &&
-	!strcmp(CHAR(STRING_ELT(ndn, 0)), CHAR(STRING_ELT(ndn, 1))))
+	*(ndn0 = CHAR(STRING_ELT(ndn, 0))) != '\0' &&
+	*(ndn1 = CHAR(STRING_ELT(ndn, 1))) != '\0' &&
+	strcmp(ndn0, ndn1) != 0)
 	return mkString(_("Dimnames[1] differs from Dimnames[2]"));
     if (n > 0) {
 	/* NB: It is already known that the length of 'dn[[i]]' is 0 or 'n' */ 
@@ -339,8 +342,11 @@ Rboolean DimNames_is_symmetric(SEXP dn) {
        (which must do slightly more)!
     */
     SEXP ndn = getAttrib(dn, R_NamesSymbol);
+    const char *ndn0, *ndn1;
     if (!isNull(ndn) &&
-	strcmp(CHAR(STRING_ELT(ndn, 0)), CHAR(STRING_ELT(ndn, 1)))) {
+	*(ndn0 = CHAR(STRING_ELT(ndn, 0))) != '\0' &&
+	*(ndn1 = CHAR(STRING_ELT(ndn, 1))) != '\0' &&
+	strcmp(ndn0, ndn1) != 0) {
 	return FALSE;
     }
     int n;
