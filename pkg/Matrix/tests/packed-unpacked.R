@@ -11,31 +11,6 @@ if (interactive()) {
     options(Matrix.verbose = TRUE, warn = 1)
 }
 
-.className <- function(Class) {
-    if (is.character(Class)) {
-        Class
-    } else if (is(Class, "classRepresentation")) {
-        Class@className
-    } else {
-        stop("'Class' is not a class name or a class definition")
-    }
-}
-
-stopifnotExtends1 <- function(Class1, Class2) {
-    if (!extends(Class1, Class2) || Class1@virtual) {
-        stop(sprintf("'%s' is not a proper subclass of \"%s\"",
-                     deparse(substitute(Class1)), .className(Class2)))
-    }
-}
-
-stopifnotExtends2 <- function(Class1, Class2, Class3, Class4) {
-    if (!extends(Class3, Class4)) {
-        stop(sprintf("'%s' extends \"%s\" but '%s' does not extend \"%s\"",
-                     deparse(substitute(Class1)), .className(Class2),
-                     deparse(substitute(Class3)), .className(Class4)))
-    }
-}
-
 U <- function(x, diag = FALSE) x[upper.tri(x, diag)]
 L <- function(x, diag = FALSE) x[lower.tri(x, diag)]
 `U<-` <- function(x, diag = FALSE, value) { x[upper.tri(x, diag)] <- value; x }
@@ -54,63 +29,70 @@ dMatrix          <- getClassDef("dMatrix")
 lMatrix          <- getClassDef("lMatrix")
 nMatrix          <- getClassDef("nMatrix")
 
-## unpacked -> packed
-.PMAP <- c(dgeMatrix = NA,
-           lgeMatrix = NA,
-           ngeMatrix = NA,
-           dsyMatrix = "dspMatrix",
-           lsyMatrix = "lspMatrix",
-           nsyMatrix = "nspMatrix",
-           dtrMatrix = "dtpMatrix",
-           ltrMatrix = "ltpMatrix",
-           ntrMatrix = "ntpMatrix",
-           dpoMatrix = "dppMatrix",
-           corMatrix = "dppMatrix", # no pcorMatrix yet
-           Cholesky     = "pCholesky",
-           BunchKaufman = "pBunchKaufman")
+## FIXME: Implement in C??
+unpackedClass <- function(packedClass) {
+    getClassDef(c(dspMatrix = "dsyMatrix",
+                  lspMatrix = "lsyMatrix",
+                  nspMatrix = "nsyMatrix",
+                  dtpMatrix = "dtrMatrix",
+                  ltpMatrix = "ltrMatrix",
+                  ntpMatrix = "ntrMatrix",
+                  dppMatrix = "dpoMatrix",
+                  pCholesky     = "Cholesky",
+                  pBunchKaufman = "BunchKaufman")[[packedClass@className]])
+}
+packedClass <- function(unpackedClass) {
+    getClassDef(c(dgeMatrix = NA,
+                  lgeMatrix = NA,
+                  ngeMatrix = NA,
+                  dsyMatrix = "dspMatrix",
+                  lsyMatrix = "lspMatrix",
+                  nsyMatrix = "nspMatrix",
+                  dtrMatrix = "dtpMatrix",
+                  ltrMatrix = "ltpMatrix",
+                  ntrMatrix = "ntpMatrix",
+                  dpoMatrix = "dppMatrix",
+                  corMatrix = "dppMatrix", # no pcorMatrix yet
+                  Cholesky     = "pCholesky",
+                  BunchKaufman = "pBunchKaufman")[[unpackedClass@className]])
+}
+...Class <- function(denseClass) {
+    cl <- "...Matrix"
+    substr(cl, 1L, 1L) <-
+        if (d <- extends(denseClass, dMatrix))
+            "d"
+        else if (extends(denseClass, lMatrix))
+            "l"
+        else
+            "n"
+    substr(cl, 2L, 3L) <-
+        if (g <- extends(denseClass, generalMatrix))
+            "ge"
+        else if (extends(denseClass, symmetricMatrix))
+            "sy"
+        else
+            "tr"
+    if (!g && extends(denseClass, packedMatrix)) {
+        substr(cl, 3L, 3L) <- "p"
+    }
+    getClassDef(cl)
+}
 
-## packed -> unpacked
-.UPMAP <- .PMAP[-c(1:3, 11L)]
-.UPMAP <- `names<-`(names(.UPMAP), .UPMAP)
-
-## Tests methods for packed (unpacked) class 'Class1'
-## with corresponding unpacked (packed) class 'Class2'
+## Tests methods for packed (unpacked) class 'Class'
 ## using randomly generated matrices of size 'n'
-testDenseClass <- function(Class1, Class2, n) {
-    if (!is(Class1, "classRepresentation")) {
-        Class1 <- getClassDef(Class1)
+testDenseClass <- function(Class, n) {
+    if (!is(Class, "classRepresentation")) {
+        Class <- getClassDef(Class)
     }
-    stopifnotExtends1(Class1, denseMatrix)
+    stopifnot(extends(Class, denseMatrix), !Class@virtual)
 
-    is.p  <- extends(Class1, packedMatrix)
-    is.ge <- extends(Class1, generalMatrix)
-    is.sy <- !is.ge && extends(Class1, symmetricMatrix)
+    is.p  <- extends(Class, packedMatrix)
+    is.ge <- extends(Class, generalMatrix)
+    is.sy <- !is.ge && extends(Class, symmetricMatrix)
     is.tr <- !is.ge && !is.sy
-    is.d  <- extends(Class1, dMatrix)
-    is.l  <- !is.d && extends(Class1, lMatrix)
+    is.d  <- extends(Class, dMatrix)
+    is.l  <- !is.d && extends(Class, lMatrix)
     is.n  <- !is.d && !is.l
-
-    ## .geMatrix is formally unpacked but has no packed counterpart
-    if (is.ge) {
-        Class2 <- NULL
-    } else if (!is.null(Class2)) {
-        if (!is(Class2, "classRepresentation")) {
-            Class2 <- getClassDef(Class2)
-        }
-        stopifnotExtends1(Class2, denseMatrix)
-        if (is.p) {
-            stopifnotExtends2(Class1, packedMatrix, Class2, unpackedMatrix)
-        } else {
-            stopifnotExtends2(Class1, unpackedMatrix, Class2, packedMatrix)
-        }
-        if (is.d) {
-            stopifnotExtends2(Class1, dMatrix, Class2, dMatrix)
-        } else if (is.l) {
-            stopifnotExtends2(Class1, lMatrix, Class2, lMatrix)
-        } else {
-            stopifnotExtends2(Class1, nMatrix, Class2, nMatrix)
-        }
-    }
 
     ## For randomly generating matrix data
     .mkX <- if (is.d)
@@ -118,7 +100,7 @@ testDenseClass <- function(Class1, Class2, n) {
             else
                 function(n) sample(c(NA, FALSE, TRUE), n, TRUE)
     mkX <- if (is.p)
-               function(Dim) .mkX(choose(Dim[1L]+1L, 2L))
+               function(Dim) .mkX((Dim[1L] * (Dim[1L] + 1L)) %/% 2L)
            else
                function(Dim) .mkX(prod(Dim))
 
@@ -134,28 +116,25 @@ testDenseClass <- function(Class1, Class2, n) {
     newargs[["x"]] <- lapply(.Dim, mkX)[.i]
 
     ## Test the matrices generated by each set of arguments to 'new'
-    all(unlist(.mapply(testDenseMatrix, newargs,
-                       list(Class1 = Class1, Class2 = Class2))))
+    all(unlist(.mapply(testDenseMatrix, newargs, list(Class = Class))))
 }
 
-testDenseMatrix <- function(Class1, Class2, ...) {
-    cN <- Class1@className
-
-    is.p  <- extends(Class1, packedMatrix)
-    is.ge <- extends(Class1, generalMatrix)
-    is.sy <- !is.ge && extends(Class1, symmetricMatrix)
+testDenseMatrix <- function(Class, ...) {
+    is.p  <- extends(Class, packedMatrix)
+    is.ge <- extends(Class, generalMatrix)
+    is.sy <- !is.ge && extends(Class, symmetricMatrix)
     is.tr <- !is.ge && !is.sy
-    is.d  <- extends(Class1, dMatrix)
-    is.l  <- !is.d  && extends(Class1, lMatrix)
+    is.d  <- extends(Class, dMatrix)
+    is.l  <- !is.d  && extends(Class, lMatrix)
     is.n  <- !is.d  && !is.l
 
     ## These classes need special care because they have an additional
     ## 'perm' or 'sd' slot
     is.bk <- is.tr &&
-        extends(Class1, if (is.p) "pBunchKaufman" else "BunchKaufman")
-    is.cr <- is.sy && !is.p && extends(Class1, "corMatrix")
+        extends(Class, if (is.p) "pBunchKaufman" else "BunchKaufman")
+    is.cr <- is.sy && !is.p && extends(Class, "corMatrix")
 
-    newargs <- list(Class = Class1, ...)
+    newargs <- list(Class = Class, ...)
     if (is.bk) {
         ## FIXME: Possibly not valid, but fine for now,
         ## as p?BunchKaufman has no validity method:
@@ -164,18 +143,20 @@ testDenseMatrix <- function(Class1, Class2, ...) {
     if (is.cr) {
         newargs[["sd"]] <- rep.int(1, newargs[["Dim"]][2L])
     }
-    M <- do.call(new, newargs)
+    .M <- M <- do.call(new, newargs)
 
     m <- M@Dim[1L]
     n <- M@Dim[2L]
-    p <- (n * (n - 1L)) %/% 2L
+    r <- min(m, n)
+    p0 <- (n * (n - 1L)) %/% 2L
+    p1 <- (n * (n + 1L)) %/% 2L
     .ZERO  <- as.vector(0, typeof(M@x))
     .ONE  <- as.vector(1, typeof(M@x))
     .NA <- as.vector(NA, typeof(M@x))
     loup <- if (is.ge) NA_character_ else if (M@uplo == "U") "L" else "U"
 
     ## For conveniently getting and setting (non)trivial triangles
-    ## of unpacked symmetric or triangular matrices
+    ## of _traditional_ symmetric or triangular matrices
     if (!is.ge) {
         if (M@uplo == "U") {
             tri1 <- U; `tri1<-` <- `U<-`
@@ -186,11 +167,18 @@ testDenseMatrix <- function(Class1, Class2, ...) {
         }
     }
 
-    m1 <- m2 <- if (is.p)
-                    `tri1<-`(array(.ZERO, dim = M@Dim, dimnames = M@Dimnames),
-                             diag = TRUE, M@x)
-                else
-                    array(M@x, dim = M@Dim, dimnames = M@Dimnames)
+    .m <- m1 <- m2 <-
+        if (is.p)
+            `tri1<-`(array(.ZERO, dim = M@Dim, dimnames = M@Dimnames),
+                     diag = TRUE, M@x)
+        else
+            array(M@x, dim = M@Dim, dimnames = M@Dimnames)
+
+    diag(.M) <- diag(.m) <-
+        if (is.d)
+            rlnorm(r)
+        else
+            sample(c(.NA, .ZERO, .ONE), r, TRUE)
 
     if (is.sy) {
         tri0(m2, diag = TRUE) <- tri0(t(m2), diag = TRUE)
@@ -200,49 +188,57 @@ testDenseMatrix <- function(Class1, Class2, ...) {
         diag(m2) <- .ONE
     }
 
-    if (is.p) {
-        pM <- M
-        upM <- do.call(new, replace(newargs,
-                                    c("Class", "x"),
-                                    list(.UPMAP[[cN]], as.vector(m1))))
-        tM <- do.call(new, replace(newargs[names(newargs) != "perm"],
-                                   c("Class", "Dimnames", "x", "uplo"),
-                                   list(if (is.bk) "dtpMatrix" else cN,
-                                        M@Dimnames[if (is.sy) 1:2 else 2:1],
-                                        as.vector(tri0(t(m1), diag = TRUE)),
-                                        loup)))
-    } else {
-        if (!is.ge) {
-            ## pack(<corMatrix>) discards the 'sd' slot,
-            ## only because we have not yet defined a pcorMatrix
-            ## and so must return the more the general dppMatrix
-            pM <- do.call(new, replace(newargs[names(newargs) != "sd"],
-                                       c("Class", "x"),
-                                       list(.PMAP[[cN]],
-                                            tri1(m1, diag = TRUE))))
-        }
-        upM <- M
-        tM <- do.call(new, replace(newargs[names(newargs) != "perm"],
-                                   c("Class", "Dim", "Dimnames", "x",
-                                     if (!is.ge) "uplo"),
-                                   c(list(if (is.bk) "dtrMatrix" else cN,
-                                          M@Dim[2:1],
-                                          M@Dimnames[if (is.sy) 1:2 else 2:1],
+    pM <-
+        if (is.p)
+            M
+        else if (!is.ge)
+            do.call(new, replace(newargs[names(newargs) != "sd"],
+                                 c("Class", "x"),
+                                 list(packedClass(Class),
+                                      tri1(m1, diag = TRUE))))
+
+    upM <-
+        if (!is.p)
+            M
+        else
+            do.call(new, replace(newargs,
+                                 c("Class", "x"),
+                                 list(unpackedClass(Class), as.vector(m1))))
+
+    tM <- do.call(new, replace(newargs[names(newargs) != "perm"],
+                               c(if (is.bk) "Class",
+                                 "Dim", "Dimnames", "x",
+                                 if (!is.ge) "uplo"),
+                               c(if (is.bk) list(...Class(Class)),
+                                 list(M@Dim[2:1],
+                                      M@Dimnames[if (is.sy) 1:2 else 2:1],
+                                      if (is.p)
+                                          tri0(t(m1), diag = TRUE)
+                                      else
                                           as.vector(t(m1))),
-                                     if (!is.ge) loup)))
-    }
+                                 if (!is.ge) list(loup))))
+
+    dM <- do.call(new, replace(newargs[setdiff(names(newargs),c("sd", "perm"))],
+                               c("Class", "x", if (is.tr) "diag"),
+                               c(list(...Class(Class),
+                                      if (is.p)
+                                          tri1(.m, diag = TRUE)
+                                      else
+                                          as.vector(.m)),
+                                 if (is.tr) list("N"))))
 
     stopifnot(is.ge || identical(pack(M), pM),
               identical(unpack(M), upM),
               identical(t(M), tM),
               identical(diag(M, names = FALSE), diag(m2, names = FALSE)),
-              identical(diag(M, names = TRUE),  diag(m2, names = TRUE)))
+              identical(diag(M, names = TRUE),  diag(m2, names = TRUE)),
+              identical(.M, dM))
 
     if (is.ge) {
         if (m == n) {
             ## Not symmetric and not triangular
-            U(m2) <- if (is.d)  rlnorm(p) else rep_len(c(.NA, .ZERO, .ONE), p)
-            L(m2) <- if (is.d) -rlnorm(p) else rep_len(c(.ONE, .ZERO, .NA), p)
+            U(m2) <- if (is.d)  rlnorm(p0) else rep_len(c(.NA, .ZERO, .ONE), p0)
+            L(m2) <- if (is.d) -rlnorm(p0) else rep_len(c(.ONE, .ZERO, .NA), p0)
             M@x <- as.vector(m2)
             stopifnot(isSymmetric(M, tol = 0, checkDN = FALSE) == (n <= 1L),
                       isTriangular(M, upper = NA) == (n <= 1L),
@@ -280,9 +276,10 @@ testDenseMatrix <- function(Class1, Class2, ...) {
                       !isTriangular(M, upper = NA),
                       !isDiagonal(M))
         }
+
     } else if (is.sy) {
         ## Not triangular
-        tri1(m2) <- if (is.d) rlnorm(p) else rep_len(c(.NA, .ZERO, .ONE), p)
+        tri1(m2) <- if (is.d) rlnorm(p0) else rep_len(c(.NA, .ZERO, .ONE), p0)
         M@x <- if (is.p) tri1(m2, diag = TRUE) else as.vector(m2)
         stopifnot(isSymmetric(M, tol = 0, checkDN = FALSE),
                   isTriangular(M, upper = NA) == (n <= 1L),
@@ -299,7 +296,7 @@ testDenseMatrix <- function(Class1, Class2, ...) {
                   isDiagonal(M))
     } else {
         ## Not symmetric
-        tri1(m2) <- if (is.d) rlnorm(p) else rep_len(c(.NA, .ZERO, .ONE), p)
+        tri1(m2) <- if (is.d) rlnorm(p0) else rep_len(c(.NA, .ZERO, .ONE), p0)
         M@x <- if (is.p) tri1(m2, diag = TRUE) else as.vector(m2)
         stopifnot(isSymmetric(M, tol = 0, checkDN = FALSE) == (n <= 1L),
                   identical(isTriangular(M, upper = M@uplo == "U"), TRUE),
@@ -324,9 +321,6 @@ testDenseMatrix <- function(Class1, Class2, ...) {
 
 .dense.subclasses <- c(names(getClassDef("packedMatrix")@subclasses),
                        names(getClassDef("unpackedMatrix")@subclasses))
-mapply(testDenseClass,
-       Class1 = .dense.subclasses,
-       Class2 = c(.PMAP, .UPMAP)[.dense.subclasses],
-       n = 4L)
+stopifnot(all(vapply(.dense.subclasses, testDenseClass, NA, n = 4L)))
 
 cat("Time elapsed:", proc.time(), "\n") # "stats"

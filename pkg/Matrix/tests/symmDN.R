@@ -39,14 +39,34 @@ SDN2 <- function(dn, uplo = NULL) {
     rep(dn[J], 2L)
 }
 
+## isSDN1(dn) is documented to behave as isSDN2(dn)
+isSDN1 <- Matrix:::isSymmetricDN
+isSDN2 <- function(dn) {
+    (is.null(ndn <- names(dn)) || !all(nzchar(ndn)) || ndn[1L] == ndn[2L]) &&
+        (is.null(rn <- dn[[1L]]) || is.null(cn <- dn[[2L]]) ||
+         isTRUE(all(rn == cn | (is.na(rn) & is.na(cn)))))
+}
+
 ## Various possible (a)symmetries of 'Dimnames'
 n <- 4L
 rn <- letters[seq_len(n)]
 cn <- LETTERS[seq_len(n)]
-ldn <- list(list(rn, cn),
+ldn <- list(list(rn, rn),
+            list(rn, cn),
             list(rn, NULL),
             list(NULL, cn),
             list(NULL, NULL),
+            list(x = rn, rn),
+            list(x = rn, cn),
+            list(x = rn, NULL),
+            list(x = NULL, cn),
+            list(x = NULL, NULL),
+            list(rn, y = rn),
+            list(rn, y = cn),
+            list(rn, y = NULL),
+            list(NULL, y = cn),
+            list(NULL, y = NULL),
+            list(x = rn, y = rn),
             list(x = rn, y = cn),
             list(x = rn, y = NULL),
             list(x = NULL, y = cn),
@@ -76,8 +96,26 @@ lM <- c(list(matrix(0, n, n),
                 list(x = double(0L), Dim = c(n, n),
                      i = integer(0L), p = rep.int(0L, n + 1L))))
 
+## A few dense symmetric matrices, which are _not_ symmetricMatrix
+## and whose symmetry (in the sense of 'isSymmetric') should depend
+## only on their 'Dimnames' slot
+.d <- diag(n)
+.lM <- list(new("dgeMatrix",
+                x = as.vector(.d), Dim = c(n, n)),
+            new("ltrMatrix",
+                x = as.vector(.d != 0), Dim = c(n, n), uplo = "U"),
+            new("ntpMatrix",
+                x = .d[upper.tri(.d, TRUE)] != 0, Dim = c(n, n), uplo = "U"))
+.iS <- function(M, dn) {
+    M@Dimnames <- dn
+    isSymmetric(M, tol = 0, checkDN = TRUE)
+}
+
 for (dn in ldn) {
-    stopifnot(identical(sdn <- SDN1(dn), SDN2(dn)))
+    stopifnot(identical(sdn <- SDN1(dn), SDN2(dn)),
+              (isdn <- isSDN1(dn)) == isSDN2(dn),
+              vapply(.lM, .iS, NA, dn = dn) == isdn)
+
     for (M in lM) {
         DN(M) <- dn
         if (is.s <- is(M, "symmetricMatrix")) {
@@ -126,5 +164,8 @@ stopifnot(identical(new("dgeMatrix", x = as.double(1:4), Dim = c(2L, 2L),
                         Dimnames = list(1:2, as.factor(3:4))),
                     new("dgeMatrix", x = as.double(1:4), Dim = c(2L, 2L),
                         Dimnames = list(c("1", "2"), c("3", "4")))))
+
+
+stopifnot(vapply(ldn, isSDN1, NA) == vapply(ldn, isSDN2, NA))
 
 cat("Time elapsed:", proc.time(), "\n") # "stats"
