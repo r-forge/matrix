@@ -165,7 +165,6 @@ stopifnot(identical(new("dgeMatrix", x = as.double(1:4), Dim = c(2L, 2L),
                     new("dgeMatrix", x = as.double(1:4), Dim = c(2L, 2L),
                         Dimnames = list(c("1", "2"), c("3", "4")))))
 
-
 stopifnot(vapply(ldn, isSDN1, NA) == vapply(ldn, isSDN2, NA))
 
 cat("Time elapsed:", proc.time(), "\n") # "stats"
