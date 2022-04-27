@@ -323,4 +323,18 @@ testDenseMatrix <- function(Class, ...) {
                        names(getClassDef("unpackedMatrix")@subclasses))
 stopifnot(all(vapply(.dense.subclasses, testDenseClass, NA, n = 4L)))
 
+
+## diag(<non-square .geMatrix>, names = TRUE) preserves names
+## if head of longer character vector matches shorter character vector
+n <- 4L
+m <- array(rnorm(n * (n + 1L)), dim = c(n, n + 1L))
+M <- new("dgeMatrix", x = as.vector(m), Dim = dim(m))
+rn <- letters[seq_len(n)]
+cn <- letters[seq_len(n + 1L)]
+ldn <- list(list(rn, cn), list(rn, replace(cn, 1L, "")))
+for (dn in ldn) {
+    stopifnot(identical(diag(`slot<-`(M, "Dimnames", TRUE, dn), names = TRUE),
+                        diag(`dimnames<-`(m, dn), names = TRUE)))
+}
+
 cat("Time elapsed:", proc.time(), "\n") # "stats"
