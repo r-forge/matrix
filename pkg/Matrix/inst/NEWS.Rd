@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-04-26 r3469)}{
+\section{Changes in version 1.4-2 (2022-04-27 r3471)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -48,11 +48,13 @@
       \item \code{t(<corMatrix>)} no longer clears the \code{sd} slot.
       \code{t(<p?BunchKaufman>)} now returns one of the more general
       \code{dt[pr]Matrix}, rather than preserving class and clearing
-      the \code{perm} slot. \code{t(<.s[py]Matrix)} no longer reverses
-      the \code{Dimnames} slot.
-      Symmetrization of \code{dn <- x@Dimnames} and \code{t(x)@Dimnames}
-      had given different results when \code{dn[[1]]} and \code{dn[[2]]}
-      were non-\code{NULL} and asymmetric.
+      the \code{perm} slot.
+
+      \item \code{t(<.s[py]Matrix)} no longer reverses the
+      \code{Dimnames} slot. Symmetrization of \code{dn <- x@Dimnames}
+      and \code{t(x)@Dimnames} had given different results when
+      \code{dn[[1]]} and \code{dn[[2]]} were non-\code{NULL} and
+      asymmetric.
 
       \item \code{isTriangular(x, upper)} had incorrectly returned
       \code{FALSE} for \code{x} of class \code{triangularMatrix}
@@ -62,15 +64,15 @@
       in those cases.
 
       \item \code{isSymmetric} was equivalent to \code{isDiagonal}
-      for all dense triangular matrices, \emph{not} allowing
-      numerical fuzz via an argument \code{tol} and \emph{not}
-      checking \code{Dimnames}.  The usual interface
-      (with \code{tol} and \code{tol1} arguments) is now available
-      for all \code{ddenseMatrix}.  (See also New Features.)
-
-      \item \code{isSymmetric} now also looks at \code{names(Dimnames)}
-      for all \code{denseMatrix}, following \code{isSymmetric.matrix}
-      from \pkg{base}.
+      for triangular matrices, \emph{not} allowing numerical fuzz
+      via an argument \code{tol}.  A \code{tol} argument is now
+      implemented for all subclasses of \code{dMatrix} except
+      those for which symmetry holds \dQuote{by definition}.
+      
+      \item Methods for \code{isSymmetric} now also look at
+      \code{Dimnames} and \code{names(Dimnames)}, following
+      \code{isSymmetric.matrix} from \pkg{base}.  See also
+      New Features.
     }
   }
   \subsection{New Features}{
@@ -93,14 +95,11 @@
       \item \code{isTriangular} and \code{isDiagonal} are implemented
       in C also for standard \code{matrix}.
 
-      \item For dense general and triangular matrices, methods
-      for \code{isSymmetric} gain an argument \code{checkDN = TRUE}
-      indicating whether symmetry of \code{Dimnames} should be checked.
-      For backwards compatibility in certain cases,
-      the condition is actually \code{checkDN && check.attributes},
-      but \code{check.attributes} is otherwise ignored
-      (i.e., only slots \code{x} and \code{Dimnames} are examined
-      when testing symmetry).
+      \item Methods for \code{isSymmetric} gain an argument
+      \code{checkDN = TRUE} indicating whether symmetry of
+      \code{Dimnames} should be checked.  For backwards compatibility
+      and consistency with \code{isSymmetric.matrix} from \pkg{base},
+      the actual condition is \code{checkDN && check.attributes}.
       
       \item \code{diag(<unpackedMatrix>) <- value} now behaves like
       \code{diag(<packedMatrix>) <- value}, supporting coercions

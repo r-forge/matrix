@@ -88,12 +88,17 @@ setMethod("is.finite", signature(x = "indMatrix"), allTrueMatrix)
 setMethod("t", signature(x = "indMatrix"), function(x) t(.ind2ngT(x)))
 
 setMethod("isSymmetric", signature(object = "indMatrix"),
-	  function(object, ...) {
-	      d <- dim(object)
+	  function(object, checkDN = TRUE, ...) {
+	      d <- object@Dim
 	      if(d[1L] != d[2L])
-		  FALSE
-	      else ## using "!=" (instead of "==") as the former is typically sparse
-		  !any(object != t(object))
+		  return(FALSE)
+              if(checkDN) {
+                  ca <- function(check.attributes = TRUE, ...) check.attributes
+                  if(ca(...) && !isSymmetricDN(object@Dimnames))
+                      return(FALSE)
+              }
+              ## using '!=' instead of '==' as former is typically sparse
+              !any(object != t(object))
 	  })
 
 
