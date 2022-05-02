@@ -564,7 +564,15 @@ setMethod("t", signature(x = "diagonalMatrix"),
 
 setMethod("isDiagonal",   "diagonalMatrix", function(object) TRUE)
 setMethod("isTriangular", "diagonalMatrix", function(object, upper=NA, ...) TRUE)
-setMethod("isSymmetric",  "diagonalMatrix", function(object, ...) TRUE)
+setMethod("isSymmetric",  "diagonalMatrix",
+          function(object, checkDN = TRUE, ...) {
+              if(checkDN) {
+                  ca <- function(check.attributes = TRUE, ...) check.attributes
+                  if(ca(...) && !isSymmetricDN(object@Dimnames))
+                      return(FALSE)
+              }
+              TRUE
+          })
 
 setMethod("symmpart", signature(x = "diagonalMatrix"), function(x) x)
 setMethod("skewpart", signature(x = "diagonalMatrix"), function(x) .setZero(x))

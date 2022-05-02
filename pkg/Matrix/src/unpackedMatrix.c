@@ -700,7 +700,7 @@ SEXP unpackedMatrix_diag_set(SEXP obj, SEXP val)
 	"ngeMatrix", "nsyMatrix", "ntrMatrix", ""};
     int icl = R_check_class_etc(obj, valid);
     if (icl < 0) {
-	UPM_ERROR_INVALID_CLASS(class_P(obj), "is_symmetric");
+	UPM_ERROR_INVALID_CLASS(class_P(obj), "diag_set");
     }
     const char *cl = valid[icl];
 

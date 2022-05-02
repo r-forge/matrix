@@ -56,9 +56,17 @@ for(cls in trCls)
 ## instead of just for ...    signature(object = "triangularMatrix")
 rm(trCls, trCls., cls)
 
+## NB: methods for [dz]Matrix should _not_ rely on this method,
+## as it does not tolerate numerical fuzz
 setMethod("isSymmetric", signature(object = "triangularMatrix"),
-	  ## TRUE iff diagonal:
-	  function(object, ...) isDiagonal(object))
+	  function(object, checkDN = TRUE, ...) {
+              if(checkDN) {
+                  ca <- function(check.attributes = TRUE, ...) check.attributes
+                  if(ca(...) && !isSymmetricDN(object@Dimnames))
+                      return(FALSE)
+              }
+              isDiagonal(object)
+          })
 
 cholTrimat <- function(x, ...) {
     if(isDiagonal(x))

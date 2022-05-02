@@ -182,17 +182,24 @@ setMethod("unpack", "packedMatrix",
           function(x, ...) .Call(packedMatrix_unpack, x))
 
 .pM.is.sy <- function(object, checkDN = TRUE, ...) {
+    ## backwards compatibility: don't check DN if check.attributes=FALSE
+    if(checkDN) {
+        ca <- function(check.attributes = TRUE, ...) check.attributes
+        checkDN <- ca(...)
+    }
+    ## requiring exact symmetry:
     .Call(packedMatrix_is_symmetric, object, checkDN)
 }
 .pM.is.sy.dz <- function(object, tol = 100 * .Machine$double.eps,
                          tol1 = 8 * tol, checkDN = TRUE, ...) {
-    if (tol <= 0)
-        ## requiring exact symmetry:
-        .Call(packedMatrix_is_symmetric, object, checkDN)
-    else
+    if (tol <= 0) {
+        .
+    } else {
         isSymmetric(unpack(object), tol = tol, tol1 = tol1,
                     checkDN = checkDN, ...)
+    }
 }
+body(.pM.is.sy.dz)[[2L]][[3L]] <- body(.pM.is.sy)
 .pM.is.tr <- function(object, upper = NA, ...) {
     .Call(packedMatrix_is_triangular, object, upper)
 }

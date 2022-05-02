@@ -208,6 +208,13 @@ attr.all_Mat <- function(target, current,
     else c(if(!isTRUE(msg)) msg, if(!r.ok) r)
 }
 
+identicalSlots <- function(x, y, slots, ...) {
+    for (name in slots)
+        if (!identical(slot(x, name), slot(y, name), ...))
+            return(FALSE)
+    TRUE
+}
+
 
 ## chol() via "dpoMatrix"
 ## This will only be called for *dense* matrices
@@ -397,6 +404,7 @@ symmDN <- function(dn) {
     .Call(R_symmDN, dn)
 }
 
+## Allowing, e.g., list(NULL, nms), unlike identical(dn[1], dn[2])
 isSymmetricDN <- function(dn) {
     .Call(R_DimNames_is_symmetric, dn)
 }
@@ -1504,6 +1512,7 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE)
 	.Call(Csparse_diagN2U, as(x, "CsparseMatrix"))
 }
 
+if(FALSE) { # MJ: no longer used
 .dgC.0.factors <- function(x)
     if(!length(x@factors)) x else { x@factors <- list() ; x }
 .as.dgC.0.factors <- function(x) {
@@ -1511,6 +1520,7 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE)
 	as(x, "dgCMatrix") # will not have 'factors'
     else ## dgCMatrix
 	.dgC.0.factors(x)
+}
 }
 
 ## Caches 'value' in the 'factors' slot of 'x', i.e. modifies 'x', and returns 'value'

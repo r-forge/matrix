@@ -728,45 +728,82 @@ print.sparseSummary <- function (x, ...) {
 }
 
 
-
 ### FIXME [from ../TODO ]: Use cholmod_symmetry() --
 ## Possibly even use 'option' as argument here for fast check to use sparse solve !!
 
+## FIXME (for tol = 0): use cholmod_symmetry(A, 1, ...)
+##        for tol > 0   should modify  cholmod_symmetry(..) to work with tol
+
+## or slightly simpler, rename and export is_sym() in ../src/cs_utils.c
+
+.sM.is.sy <- function(object, tol = 100 * .Machine$double.eps,
+                      checkDN = TRUE, ...) {
+    ## pretest: is it square?
+    d <- object@Dim
+    if((n <- d[1L]) != d[2L])
+        return(FALSE)
+    ## pretest: are DN symmetric in the sense of validObject(<symmetricMatrix>)?
+    if(checkDN) {
+        ca <- function(check.attributes = TRUE, ...) check.attributes
+        if(ca(...) && !isSymmetricDN(object@Dimnames))
+            return(FALSE)
+    }
+    if(n <= 1L)
+        return(TRUE)
+    cd <- getClassDef(class(object))
+    if(!extends(cd, "CsparseMatrix")) {
+        ## triplet (TsparseMatrix) representation is not unique!
+        object <- as(object, "CsparseMatrix")
+        cd <- getClassDef(class(object))
+    }
+    if(!extends(cd, "generalMatrix")) {
+        object <- as(object, "generalMatrix")
+        cd <- getClassDef(class(object))
+    }
+    ## now handling an n-by-n .gCMatrix, n >= 2:
+    if((is.d <- extends(cd, "dMatrix")) || extends(cd, "zMatrix")) {
+        Cj <- if(is.d) identity else Conj
+        ae <- function(check.attributes, ...) {
+            ## discarding possible user-supplied check.attributes:
+            all.equal(..., check.attributes = FALSE)
+        }
+        identicalSlots(object, tobject <- t(object), c("i", "p")) &&
+            isTRUE(ae(target = object@x, current = Cj(tobject@x),
+                      tolerance = tol, ...))
+    } else {
+        identicalSlots(object, t(object),
+                       c("i", "p", if(!extends(cd, "nMatrix")) "x"))
+    }
+}
+
+.sM.subclasses <- names(getClass("sparseMatrix")@subclasses)
+for (.cl in c("sparseMatrix",
+              ## method for triangularMatrix does not tolerate numerical fuzz
+              grep("^[dz]t[CRT]Matrix$", .sM.subclasses, value = TRUE)))
+    setMethod("isSymmetric", signature(object = .cl), .sM.is.sy)
+rm(.sM.is.sy, .sM.subclasses, .cl)
+
 ##' This case should be particularly fast
 setMethod("isSymmetric", signature(object = "dgCMatrix"),
-	  function(object, tol = 100*.Machine$double.eps, ...)
-	      isTRUE(all.equal(.dgC.0.factors(object), t(object), tolerance = tol, ...)))
-
-setMethod("isSymmetric", signature(object = "sparseMatrix"),
-	  function(object, tol = 100*.Machine$double.eps, ...) {
-	      ## pretest: is it square?
-	      d <- dim(object)
-	      if(d[1] != d[2]) return(FALSE)
-
-	      ## else slower test using t()  --
-
-	      ## FIXME (for tol = 0): use cholmod_symmetry(A, 1, ...)
-	      ##        for tol > 0   should modify  cholmod_symmetry(..) to work with tol
-
-	      ## or slightly simpler, rename and export	 is_sym() in ../src/cs_utils.c
-
-
-	      if (is(object, "dMatrix"))
-		  ## use gC; "T" (triplet) is *not* unique!
-		  isTRUE(all.equal(.as.dgC.0.factors(  object),
-				   .as.dgC.0.factors(t(object)),
-				   tolerance = tol, ...))
-	      else if (is(object, "lMatrix"))
-		  ## test for exact equality; FIXME(?): identical() too strict?
-		  identical(as(	 object,  "lgCMatrix"),
-			    as(t(object), "lgCMatrix"))
-	      else if (is(object, "nMatrix"))
-		  ## test for exact equality; FIXME(?): identical() too strict?
-		  identical(as(	 object,  "ngCMatrix"),
-			    as(t(object), "ngCMatrix"))
-	      else stop("not yet implemented")
-	  })
-
+	  function(object, tol = 100 * .Machine$double.eps,
+                   checkDN = TRUE, ...) {
+              d <- object@Dim
+              if((n <- d[1L]) != d[2L])
+                  return(FALSE)
+              if(checkDN) {
+                  ca <- function(check.attributes = TRUE, ...) check.attributes
+                  if(ca(...) && !isSymmetricDN(object@Dimnames))
+                      return(FALSE)
+              }
+              if (n <= 1L)
+                  return(TRUE)
+              ae <- function(check.attributes, ...) {
+                  all.equal(..., check.attributes = FALSE)
+              }
+              identicalSlots(object, tobject <- t(object), c("i", "p")) &&
+                  isTRUE(ae(target = object@x, current = tobject@x,
+                            tolerance = tol, ...))
+          })
 
 setMethod("isTriangular", signature(object = "CsparseMatrix"), isTriC)
 setMethod("isTriangular", signature(object = "TsparseMatrix"), isTriT)
