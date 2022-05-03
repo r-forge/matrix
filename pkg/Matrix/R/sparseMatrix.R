@@ -750,18 +750,18 @@ print.sparseSummary <- function (x, ...) {
     }
     if(n <= 1L)
         return(TRUE)
-    cd <- getClassDef(class(object))
-    if(!extends(cd, "CsparseMatrix")) {
+    cld <- getClassDef(class(object))
+    if(!extends(cld, "CsparseMatrix")) {
         ## triplet (TsparseMatrix) representation is not unique!
         object <- as(object, "CsparseMatrix")
-        cd <- getClassDef(class(object))
+        cld <- getClassDef(class(object))
     }
-    if(!extends(cd, "generalMatrix")) {
+    if(!extends(cld, "generalMatrix")) {
         object <- as(object, "generalMatrix")
-        cd <- getClassDef(class(object))
+        cld <- getClassDef(class(object))
     }
     ## now handling an n-by-n .gCMatrix, n >= 2:
-    if((is.d <- extends(cd, "dMatrix")) || extends(cd, "zMatrix")) {
+    if((is.d <- extends(cld, "dMatrix")) || extends(cld, "zMatrix")) {
         Cj <- if(is.d) identity else Conj
         ae <- function(check.attributes, ...) {
             ## discarding possible user-supplied check.attributes:
@@ -772,18 +772,19 @@ print.sparseSummary <- function (x, ...) {
                       tolerance = tol, ...))
     } else {
         identicalSlots(object, t(object),
-                       c("i", "p", if(!extends(cd, "nMatrix")) "x"))
+                       c("i", "p", if(!extends(cld, "nMatrix")) "x"))
     }
 }
 
+## method for     .s[CTR]Matrix in ./symmetricMatrix.R
+## method for [lni]t[CTR]Matrix in ./triangularMatrix.R
 .sM.subclasses <- names(getClass("sparseMatrix")@subclasses)
 for (.cl in c("sparseMatrix",
-              ## method for triangularMatrix does not tolerate numerical fuzz
               grep("^[dz]t[CRT]Matrix$", .sM.subclasses, value = TRUE)))
     setMethod("isSymmetric", signature(object = .cl), .sM.is.sy)
 rm(.sM.is.sy, .sM.subclasses, .cl)
 
-##' This case should be particularly fast
+##' This case should be optimized
 setMethod("isSymmetric", signature(object = "dgCMatrix"),
 	  function(object, tol = 100 * .Machine$double.eps,
                    checkDN = TRUE, ...) {
@@ -795,7 +796,7 @@ setMethod("isSymmetric", signature(object = "dgCMatrix"),
                   if(ca(...) && !isSymmetricDN(object@Dimnames))
                       return(FALSE)
               }
-              if (n <= 1L)
+              if(n <= 1L)
                   return(TRUE)
               ae <- function(check.attributes, ...) {
                   all.equal(..., check.attributes = FALSE)
@@ -805,20 +806,24 @@ setMethod("isSymmetric", signature(object = "dgCMatrix"),
                             tolerance = tol, ...))
           })
 
-setMethod("isTriangular", signature(object = "CsparseMatrix"), isTriC)
-setMethod("isTriangular", signature(object = "TsparseMatrix"), isTriT)
+## Fallback, used for RsparseMatrix and others, but not [CT]sparseMatrix,
+## triangularMatrix, or symmetricMatrix which have their own methods
+setMethod("isTriangular", signature(object = "sparseMatrix"),
+          function(object, upper = NA, ...) {
+              d <- object@Dim
+              if(d[1L] == d[2L])
+                  callGeneric(as(object, "TsparseMatrix"), upper = upper, ...)
+              else
+                  FALSE
+          })
 
-## no longer used for "Csparse*" which has own method in ./Csparse.R , nor
-##                for "Tsparse*" which has own method in ./Tsparse.R ... so only for Rsparse*?
+## Fallback, used for RsparseMatrix and others, but not [CT]sparseMatrix,
+## which have their own methods
 setMethod("isDiagonal", signature(object = "sparseMatrix"),
 	  function(object) {
-              d <- dim(object)
-              if(d[1] != d[2]) return(FALSE)
-              ## else
-	      gT <- as(object, "TsparseMatrix")
-	      all(gT@i == gT@j)
-	  })
-
+              d <- object@Dim
+              d[1L] == d[2L] && callGeneric(as(object, "TsparseMatrix"))
+          })
 
 setMethod("determinant", signature(x = "sparseMatrix", logarithm = "missing"),
 	  function(x, logarithm, ...)

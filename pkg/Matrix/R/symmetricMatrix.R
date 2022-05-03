@@ -7,7 +7,16 @@ setAs("matrix", "symmetricMatrix",
       function(from) .Call(dense_to_symmetric, from, "U", TRUE))
 
 setMethod("isSymmetric", signature(object = "symmetricMatrix"),
-	  function(object, ...) TRUE)
+          function(object, ...) TRUE)
+setMethod("isTriangular", signature(object = "symmetricMatrix"),
+          function(object, upper = NA, ...) {
+              if(!isDiagonal(object))
+                  FALSE
+              else if(is.na(upper))
+                  `attr<-`(TRUE, "kind", "U")
+              else
+                  TRUE
+          })
 
 ### ----------- forceSymmetric() ----- *all* methods ------------------------
 

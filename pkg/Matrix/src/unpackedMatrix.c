@@ -497,8 +497,8 @@ SEXP unpackedMatrix_t(SEXP obj)
 	_CTYPE_ *px1 = _PTR_(x1);					\
 	int i, j;							\
 	/* if (*uplo == ' ') { */					\
-	R_xlen_t lm1 = len - 1;						\
-	for (j = 0; j < m; ++j, px0 -= lm1)				\
+	R_xlen_t len1s = len - 1;					\
+	for (j = 0; j < m; ++j, px0 -= len1s)				\
 	    for (i = 0; i < n; ++i, px0 += m)				\
 		*(px1++) = *px0;					\
 	/* } else { */							\

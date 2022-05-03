@@ -562,9 +562,7 @@ setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index", j = "index",
 setMethod("t", signature(x = "diagonalMatrix"),
           function(x) { x@Dimnames <- x@Dimnames[2:1] ; x })
 
-setMethod("isDiagonal",   "diagonalMatrix", function(object) TRUE)
-setMethod("isTriangular", "diagonalMatrix", function(object, upper=NA, ...) TRUE)
-setMethod("isSymmetric",  "diagonalMatrix",
+setMethod("isSymmetric", signature(object = "diagonalMatrix"),
           function(object, checkDN = TRUE, ...) {
               if(checkDN) {
                   ca <- function(check.attributes = TRUE, ...) check.attributes
@@ -573,6 +571,12 @@ setMethod("isSymmetric",  "diagonalMatrix",
               }
               TRUE
           })
+setMethod("isTriangular", signature(object = "diagonalMatrix"),
+          function(object, upper = NA, ...) {
+              if(is.na(upper)) `attr<-`(TRUE, "kind", "U") else TRUE
+          })
+setMethod("isDiagonal", signature(object = "diagonalMatrix"),
+          function(object) TRUE)
 
 setMethod("symmpart", signature(x = "diagonalMatrix"), function(x) x)
 setMethod("skewpart", signature(x = "diagonalMatrix"), function(x) .setZero(x))
