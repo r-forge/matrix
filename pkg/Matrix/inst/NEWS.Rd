@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-04-27 r3471)}{
+\section{Changes in version 1.4-2 (2022-05-03 r3472)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -100,6 +100,12 @@
       \code{Dimnames} should be checked.  For backwards compatibility
       and consistency with \code{isSymmetric.matrix} from \pkg{base},
       the actual condition is \code{checkDN && check.attributes}.
+
+      \item \code{isTriangular(x, upper=NA)} now \emph{always} has a
+      \code{kind} attribute when \code{x} is triangular.
+
+      \item \code{isTriangular} gains a fallback method for
+      \code{sparseMatrix} going via \code{TsparseMatrix}.
       
       \item \code{diag(<unpackedMatrix>) <- value} now behaves like
       \code{diag(<packedMatrix>) <- value}, supporting coercions

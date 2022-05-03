@@ -675,14 +675,14 @@ UNPACK(z, Rcomplex, Rcomplex one; one.r = 1.0; one.i = 0.0;, one)
 #define MAKE_SYMMETRIC(_PREFIX_, _CTYPE_, _SET_)			\
 void _PREFIX_ ## dense_unpacked_make_symmetric(_CTYPE_ *to, SEXP from)  \
 {									\
-    int i, j, n = INTEGER(GET_SLOT(from, Matrix_DimSym))[0], nm1 = n - 1; \
+    int i, j, n = INTEGER(GET_SLOT(from, Matrix_DimSym))[0], n1s = n - 1; \
     R_xlen_t upos = n, lpos = 1;					\
     if (*uplo_P(from) == 'U')						\
-	for (j = 0; j < n; upos = (lpos += (++j)+1) + nm1)		\
+	for (j = 0; j < n; upos = (lpos += (++j)+1) + n1s)		\
 	    for (i = j+1; i < n; ++i, upos += n, ++lpos)		\
 		_SET_(to, lpos, upos);					\
     else								\
-	for (j = 0; j < n; upos = (lpos += (++j)+1) + nm1)		\
+	for (j = 0; j < n; upos = (lpos += (++j)+1) + n1s)		\
 	    for (i = j+1; i < n; ++i, upos += n, ++lpos)		\
 		_SET_(to, upos, lpos);					\
     return;								\
@@ -805,9 +805,9 @@ MAKE_DIAGONAL(z, Rcomplex, COMPLEX,
 		     _U_IS_NA_, _L_IS_NOT_NA_, _L_IS_NOT_EQUAL_)	\
 Rboolean _PREFIX_ ## dense_unpacked_is_symmetric(_CTYPE_ *px, int n)    \
 {									\
-    int i, j, nm1 = n - 1;						\
+    int i, j, n1s = n - 1;						\
     R_xlen_t upos = n, lpos = 1;					\
-    for (j = 0; j < n; upos = (lpos += (++j)+1) + nm1)			\
+    for (j = 0; j < n; upos = (lpos += (++j)+1) + n1s)			\
 	for (i = j+1; i < n; ++i, upos += n, ++lpos)			\
 	    if (_U_IS_NA_) {						\
 		if (_L_IS_NOT_NA_)					\

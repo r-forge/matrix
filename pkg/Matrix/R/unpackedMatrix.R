@@ -114,17 +114,16 @@ setMethod("pack", signature(x = "matrix"), .m.pack)
     .Call(matrix_is_diagonal, object)
 }
 
-## methods for .syMatrix in ./symmetricMatrix.R
-for (.cl in c("unpackedMatrix",
-              grep("^[lni](ge|tr)Matrix$", .upM.subclasses, value = TRUE)))
+## method for     .syMatrix in ./symmetricMatrix.R
+## method for [lni]trMatrix in ./triangularMatrix.R
+for (.cl in grep("^[lni]geMatrix$", .upM.subclasses, value = TRUE))
     setMethod("isSymmetric", signature(object = .cl), .upM.is.sy)
-
 for (.cl in grep("^[dz](ge|tr)Matrix$", .upM.subclasses, value = TRUE))
     setMethod("isSymmetric", signature(object = .cl), .upM.is.sy.dz)
 
-## methods for .trMatrix in ./triangularMatrix.R
-for (.cl in c("unpackedMatrix",
-              grep("^.(ge|sy)Matrix$", .upM.subclasses, value = TRUE)))
+## method for .syMatrix in ./symmetricMatrix.R
+## method for .trMatrix in ./triangularMatrix.R
+for (.cl in grep("^.geMatrix$", .upM.subclasses, value = TRUE))
     setMethod("isTriangular", signature(object = .cl), .upM.is.tr)
 
 setMethod("isDiagonal", signature(object = "unpackedMatrix"), .upM.is.di)

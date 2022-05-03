@@ -909,11 +909,35 @@ setMethod("t", signature(x = "TsparseMatrix"),
 	      r
       })
 
-isDiagTsp <- function(object) {
-    d <- dim(object)
-    if(d[1] != d[2])
-        FALSE
-    else
-        length(i <- object@i) == length(j <- object@j) && all(i == j)
+setMethod("isDiagonal", signature(object = "TsparseMatrix"),
+          function(object) {
+              d <- object@Dim
+              d[1L] == d[2L] && all(object@i == object@j)
+          })
+
+.Tsp.is.tr <- function(object, upper = NA, ...) {
+    d <- object@Dim
+    if(d[1L] != d[2L])
+        return(FALSE)
+    i <- object@i
+    j <- object@j
+    if(is.na(upper)) {
+	if(all(i <= j))
+            `attr<-`(TRUE, "kind", "U")
+        else if(all(i >= j))
+            `attr<-`(TRUE, "kind", "L")
+        else
+            FALSE
+    } else if(upper) {
+	all(i <= j)
+    } else {
+	all(i >= j)
+    }
 }
-setMethod("isDiagonal", signature(object = "TsparseMatrix"), isDiagTsp)
+
+## method for .sTMatrix in ./symmetricMatrix.R
+## method for .tTMatrix in ./triangularMatrix.R
+.Tsp.subclasses <- names(getClassDef("TsparseMatrix")@subclasses)
+for (.cl in grep("^.gTMatrix$", .Tsp.subclasses, value = TRUE))
+    setMethod("isTriangular", signature(object = .cl), .Tsp.is.tr)
+rm(.Tsp.is.tr, .Tsp.subclasses, .cl)

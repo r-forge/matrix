@@ -1319,6 +1319,7 @@ isTriMat <- function(object, upper = NA, ...) {
 }
 }
 
+if (FALSE) { ## MJ: moved to and modified in ./Tsparse.R
 ## For Tsparse matrices:
 isTriT <- function(object, upper = NA, ...) {
     ## pretest: is it square?
@@ -1340,7 +1341,9 @@ isTriT <- function(object, upper = NA, ...) {
 	if(all(object@i >= object@j)) TRUE.L else FALSE
     }
 }
+}
 
+if (FALSE) { ## MJ: moved to and modified in ./Csparse.R
 ## For Csparse matrices
 isTriC <- function(object, upper = NA, ...) {
     ## pretest: is it square?
@@ -1381,6 +1384,7 @@ isTriC <- function(object, upper = NA, ...) {
 	if(all(sapply(ilist, min, USE.NAMES = FALSE) >= ni0))
 	    TRUE.L else FALSE
     }
+}
 }
 
 if (FALSE) { ## MJ: No longer needed ... replacement in ./(un)?packedMatrix.R

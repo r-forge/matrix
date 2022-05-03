@@ -200,6 +200,7 @@ setMethod("unpack", "packedMatrix",
     }
 }
 body(.pM.is.sy.dz)[[2L]][[3L]] <- body(.pM.is.sy)
+
 .pM.is.tr <- function(object, upper = NA, ...) {
     .Call(packedMatrix_is_triangular, object, upper)
 }
@@ -207,18 +208,10 @@ body(.pM.is.sy.dz)[[2L]][[3L]] <- body(.pM.is.sy)
     .Call(packedMatrix_is_diagonal, object)
 }
 
-## methods for .spMatrix in ./symmetricMatrix.R
-for (.cl in c("packedMatrix",
-              grep("^[lni]tpMatrix$", .pM.subclasses, value = TRUE)))
-    setMethod("isSymmetric", signature(object = .cl), .pM.is.sy)
-
+## method for     .spMatrix in ./symmetricMatrix.R
+## method for [lni]tpMatrix in ./triangularMatrix.R
 for (.cl in grep("^[dz]tpMatrix$", .pM.subclasses, value = TRUE))
     setMethod("isSymmetric", signature(object = .cl), .pM.is.sy.dz)
-
-## methods for .tpMatrix in ./triangularMatrix.R
-for (.cl in c("packedMatrix",
-              grep("^.spMatrix$", .pM.subclasses, value = TRUE)))
-    setMethod("isTriangular", signature(object = .cl), .pM.is.tr)
 
 setMethod("isDiagonal", signature(object = "packedMatrix"), .pM.is.di)
 
@@ -325,5 +318,5 @@ for (.k in seq_len(nrow(.cl))) {
     setMethod("[", do.call(signature, .cl[.k, ]), .definition)
 }
 
-rm(.pM.is.sy, .pM.is.tr, .pM.is.di, .cl, .pM.subclasses,
+rm(.pM.is.sy, .pM.is.sy.dz, .pM.is.tr, .pM.is.di, .cl, .pM.subclasses,
    .ms, .k, .i1, .f1, .definition)

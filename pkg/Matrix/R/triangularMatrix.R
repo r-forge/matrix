@@ -42,22 +42,18 @@ for(cls in trCls.) {
     setMethod("tril", cls, .tril.tr)
     setMethod("triu", cls, .triu.tr)
 }
-
-## ditto here:
-
-isTriTri <- function(object, upper = NA, ...) {
-    if(is.na(upper))
-        `attr<-`(TRUE, "kind", object@uplo)
-    else
-        object@uplo == (if(upper) "U" else "L") || isDiagonal(object)
-}
-for(cls in trCls)
-    setMethod("isTriangular", signature(object = cls), isTriTri)
-## instead of just for ...    signature(object = "triangularMatrix")
 rm(trCls, trCls., cls)
 
-## NB: methods for [dz]Matrix should _not_ rely on this method,
-## as it does not tolerate numerical fuzz
+setMethod("isTriangular", signature(object = "triangularMatrix"),
+          function(object, upper = NA, ...) {
+              if(is.na(upper))
+                  `attr<-`(TRUE, "kind", object@uplo)
+              else
+                  object@uplo == (if(upper) "U" else "L") || isDiagonal(object)
+          })
+
+## NB: [dz]t.Matrix should _not_ use this method as it does not
+## tolerate numerical fuzz
 setMethod("isSymmetric", signature(object = "triangularMatrix"),
 	  function(object, checkDN = TRUE, ...) {
               if(checkDN) {

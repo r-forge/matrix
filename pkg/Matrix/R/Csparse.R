@@ -534,28 +534,74 @@ setMethod("Cholesky", signature(A = "nsparseMatrix"),
 	  function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
 	  stop("Cholesky(<nsparse...>) -> *symbolic* factorization -- not yet implemented"))
 
-if(FALSE)
-isDiagCsp <- function(object) {
-    d <- dim(object)
-    if((n <- d[1]) != d[2])
-        FALSE
-    else if(n == 0)
-        TRUE
-    else # (n >= 1)
-        ## "FIXME": do this in C  --->>> for now use Csparse_to_Tsparse
-        (m <- length(i <- object@i)) == 0 || {
-            m <= n && !anyDuplicated(i) &&
-                ## length(p <- object@p) == n+1L &&
-                all((dp <- diff(object@p)) <= 1L) &&
-                length(j <- base::which(dp == 1L)) == m && all(j == i+1L)
-        }
-}
-if(FALSE)
-setMethod("isDiagonal", signature(object = "CsparseMatrix"), isDiagCsp)
-
+## FIXME: do isDiagonal(<CsparseMatrix>) in C ...
+## going via TsparseMatrix for now as coercion is done in C
+## and isDiagonal(<TsparseMatrix>) is fast
 setMethod("isDiagonal", signature(object = "CsparseMatrix"),
-	  function(object) isDiagTsp(.Call(Csparse_to_Tsparse, object, is(object, "triangularMatrix"))))
+	  function(object) {
+              d <- object@Dim
+              d[1L] == d[2L] && callGeneric(as(object, "TsparseMatrix"))
+          })
+if(FALSE) {
+setMethod("isDiagonal", signature(object = "CsparseMatrix"),
+          function(object) {
+              d <- object@Dim
+              i <- object@i
+              nnz <- length(i)
+              if((n <- d[1L]) != d[2L] || nnz > n)
+                  return(FALSE)
+              if(n <= 1L || nnz == 0L)
+                  return(TRUE)
+              ## now handling n-by-n ..CMatrix, n >= 2,
+              ## with at least one non-zero:
+              !anyDuplicated(i) && all((dp <- p[2:(n+1L)] - p[1:n]) <= 1L) &&
+                  length(j <- base::which(dp == 1L)) == nnz && all(j == i + 1L)
+          })
+}
 
+## FIXME: do isTriangular(<CsparseMatrix>, upper) in C
+.gCsp.is.tr <- function(object, upper = NA, ...) {
+    d <- object@Dim
+    if((n <- d[1L]) != d[2L])
+        return(FALSE)
+    i <- object@i
+    if(n <= 1L || length(i) == 0L)
+        return(if(is.na(upper)) `attr<-`(TRUE, "kind", "U") else TRUE)
+    ## now handling n-by-n .gCMatrix, n >= 2, with at least one non-zero:
+    ## splitting row indices by column:
+    p <- object@p
+    j1 <- seq_len(n)
+    j <- rep.int(j1, p[2:(n+1L)] - p[1:n])
+    levels(j) <- as.character(j1)
+    class(j) <- "factor"
+    si <- split.default(i, j)
+    ## discarding empty groups:
+    has.nz <- lengths(si, use.names = FALSE) > 0L
+    if(!all(has.nz)) {
+        j1 <- base::which(has.nz)
+	si <- si[j1]
+    }
+    j0 <- j1 - 1L
+    if(is.na(upper)) {
+	if(all(vapply(si, max, 0L, USE.NAMES = FALSE) <= j0))
+	    `attr<-`(TRUE, "kind", "U")
+	else if(all(vapply(si, min, 0L, USE.NAMES = FALSE) >= j0))
+	    `attr<-`(TRUE, "kind", "L")
+	else
+            FALSE
+    } else if(upper) {
+	all(vapply(si, max, 0L, USE.NAMES = FALSE) <= j0)
+    } else {
+	all(vapply(si, min, 0L, USE.NAMES = FALSE) >= j0)
+    }
+}
+
+## method for .sCMatrix in ./symmetricMatrix.R
+## method for .tCMatrix in ./triangularMatrix.R
+.Csp.subclasses <- names(getClassDef("CsparseMatrix")@subclasses)
+for (.cl in grep("^.gCMatrix$", .Csp.subclasses, value = TRUE))
+    setMethod("isTriangular", signature(object = .cl), .gCsp.is.tr)
+rm(.gCsp.is.tr, .Csp.subclasses, .cl)
 
 dmperm <- function(x, nAns = 6L, seed = 0L) {
     stopifnot(length(nAns <- as.integer(nAns)) == 1, nAns %in% c(2L, 4L, 6L)
@@ -574,4 +620,5 @@ dmperm <- function(x, nAns = 6L, seed = 0L) {
     }
     .Call(Csparse_dmperm, x, seed, nAns)
 }
+
 
