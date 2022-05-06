@@ -730,7 +730,10 @@ all.equal.sparseV <- function(target, current, ...)
     ## *and* have sorted the respective i-slot, the i-slots should match!
     stopifnot(all(i.c == i.t))
 
-    all.equal.numeric(c.x, t.x, ...)
+    if(is.logical(t.x))
+        all.equal.raw(t.x, c.x, ...)
+    else
+        all.equal.numeric(t.x, c.x, ...)
 } ## all.equal.sparseV
 
 

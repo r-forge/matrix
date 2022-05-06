@@ -13,7 +13,6 @@
 \alias{isSymmetric,ngeMatrix-method}
 \alias{isSymmetric,dtrMatrix-method}
 \alias{isSymmetric,dtpMatrix-method}
-\alias{isSymmetric,dgCMatrix-method}
 \alias{isSymmetric,dtCMatrix-method}
 \alias{isSymmetric,dtRMatrix-method}
 \alias{isSymmetric,dtTMatrix-method}
@@ -40,7 +39,6 @@
 \S4method{isSymmetric}{ngeMatrix}(object, checkDN = TRUE, \dots)
 \S4method{isSymmetric}{dtrMatrix}(object, tol = 100 * .Machine$double.eps, tol1 = 8 * tol, checkDN = TRUE, \dots)
 \S4method{isSymmetric}{dtpMatrix}(object, tol = 100 * .Machine$double.eps, tol1 = 8 * tol, checkDN = TRUE, \dots)
-\S4method{isSymmetric}{dgCMatrix}(object, tol = 100 * .Machine$double.eps, checkDN = TRUE, \dots)
 \S4method{isSymmetric}{dtCMatrix}(object, tol = 100 * .Machine$double.eps, checkDN = TRUE, \dots)
 \S4method{isSymmetric}{dtRMatrix}(object, tol = 100 * .Machine$double.eps, checkDN = TRUE, \dots)
 \S4method{isSymmetric}{dtTMatrix}(object, tol = 100 * .Machine$double.eps, checkDN = TRUE, \dots)

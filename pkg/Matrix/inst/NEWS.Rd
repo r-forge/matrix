@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-05-03 r3472)}{
+\section{Changes in version 1.4-2 (2022-05-06 r3473)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -91,9 +91,9 @@
       \code{isTriangular}, \code{isDiagonal}, \code{t}, \code{diag},
       and \code{diag<-} implemented in C, replacing those defined for
       many subclasses individually.
-
-      \item \code{isTriangular} and \code{isDiagonal} are implemented
-      in C also for standard \code{matrix}.
+      
+      \item \code{isTriangular} and \code{isDiagonal} are now
+      implemented in C also for standard \code{matrix}.
 
       \item Methods for \code{isSymmetric} gain an argument
       \code{checkDN = TRUE} indicating whether symmetry of
@@ -101,8 +101,9 @@
       and consistency with \code{isSymmetric.matrix} from \pkg{base},
       the actual condition is \code{checkDN && check.attributes}.
 
-      \item \code{isTriangular(x, upper=NA)} now \emph{always} has a
-      \code{kind} attribute when \code{x} is triangular.
+      \item \code{isTriangular(x, upper)} now has a \code{kind}
+      attribute \emph{if and only if} \code{x} is triangular and
+      \code{upper} is \code{NA}.
 
       \item \code{isTriangular} gains a fallback method for
       \code{sparseMatrix} going via \code{TsparseMatrix}.

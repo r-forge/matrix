@@ -8,8 +8,9 @@
 ## the 'contains' recursively!!
 
 
-##' To be used in 'initialize' method for "Matrix", or other constructors
-.fixupDimnames <- function(dn) .Call(R_DimNames_fixup, dn)
+## To be used in 'initialize' method for "Matrix", or other constructors
+## NB: This must be defined _here_ and _not_ be migrated to ./Auxiliaries.R
+fixupDN <- function(dn) .Call(R_DimNames_fixup, dn)
 
 ## MJ: no longer
 if (FALSE) {
@@ -50,7 +51,7 @@ setMethod("initialize", "Matrix",
                   "Dimnames" %in% anames) {
                   ## Coerce non-character 'Dimnames[[i]]' to character
                   ## and set zero-length 'Dimnames[[i]]' to NULL
-                  .Object@Dimnames <- DN <- .fixupDimnames(.Object@Dimnames)
+                  .Object@Dimnames <- DN <- fixupDN(.Object@Dimnames)
                   if (!("Dim" %in% anames ||
                         is.null(DN[[1L]]) || is.null(DN[[2L]]))) {
                       ## Take 'Dim' from lengths of 'Dimnames'
@@ -70,7 +71,7 @@ setMethod("initialize", "Matrix",
                  "Dimnames" %in% anames) {
                  ## Coerce non-character 'Dimnames[[i]]' to character
                  ## and set zero-length 'Dimnames[[i]]' to NULL
-                 .Object@Dimnames <- .fixupDimnames(.Object@Dimnames)
+                 .Object@Dimnames <- fixupDN(.Object@Dimnames)
              }
              .Object
           })
@@ -83,7 +84,7 @@ setMethod("initialize", "Matrix",
                   "Dimnames" %in% anames) {
                   ## Coerce non-character 'Dimnames[[i]]' to character
                   ## and set zero-length 'Dimnames[[i]]' to NULL
-                  .Object@Dimnames <- .fixupDimnames(.Object@Dimnames)
+                  .Object@Dimnames <- fixupDN(.Object@Dimnames)
               }
               .Object
           })

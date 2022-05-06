@@ -620,5 +620,3 @@ dmperm <- function(x, nAns = 6L, seed = 0L) {
     }
     .Call(Csparse_dmperm, x, seed, nAns)
 }
-
-

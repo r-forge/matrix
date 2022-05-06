@@ -9,14 +9,15 @@
 /**
  * Test that `dim` is a length-2, non-negative integer vector.
  *
- * @param obj A `SEXP`, 
+ * @param dim A `SEXP`, 
  *     typically the `Dim` slot of a (to be validated) `Matrix`.
  * @param domain A string specifying a domain for message translation.
  *
  * @return Either `TRUE` (indicating success) or a length-1 `STRSXP`
  *     containing an error message.
  */
-SEXP Dim_validate(SEXP dim, const char* domain) {
+SEXP Dim_validate(SEXP dim, const char* domain)
+{
     /* TODO? coerce from REALSXP to INTSXP?
        // if (TYPEOF(dim) != INTSXP && TYPEOF(dim) != REALSXP)
        //     return mkString(_("'Dim' slot is not numeric"));
@@ -30,6 +31,8 @@ SEXP Dim_validate(SEXP dim, const char* domain) {
     if (LENGTH(dim) != 2)
 	return mkString(_("'Dim' slot does not have length 2"));
     int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+    if (m == NA_INTEGER || n == NA_INTEGER)
+	return mkString(_("'Dim' slot contains NA"));
     if (m < 0 || n < 0)
 	return mkString(dngettext(domain,
 				  "'Dim' slot contains negative value",
@@ -38,10 +41,15 @@ SEXP Dim_validate(SEXP dim, const char* domain) {
     return ScalarLogical(1);
 }
 
+SEXP R_Dim_validate(SEXP dim)
+{
+    return Dim_validate(dim, "Matrix");
+}
+
 /**
  * Test that `dimnames` is a valid length-2 list.
  *
- * @param obj A `SEXP`,
+ * @param dimnames A `SEXP`,
  *     typically the `Dimnames` slot of a (to be validated) `Matrix`.
  * @param pdim Pointer to a length-2, non-negative `int` array,
  *     typically from the `Dim` slot of a (to be validated) `Matrix`.
@@ -87,6 +95,10 @@ SEXP DimNames_validate(SEXP dimnames, int *pdim)
 	}
     }
     return ScalarLogical(1);
+}
+
+SEXP R_DimNames_validate(SEXP dimnames, SEXP dim) {
+    return DimNames_validate(dimnames, INTEGER(dim));
 }
 
 /**
@@ -281,7 +293,7 @@ TYPEMATRIX_VALIDATE(     z, complex, CPLXSXP)
 /* More for 'Dimnames' ============================================== */
 
 /**
- * @brief Standardize user-supplied `Dimnames`.
+ * @brief Standardize user-supplied `[dD]imnames`.
  *
  * Replaces length-0 vectors with `NULL` and non-character vectors
  * with the result of coercing to character. Intended to emulate the
@@ -327,7 +339,7 @@ SEXP R_DimNames_fixup(SEXP dn)
 	UNPROTECT(1);
     }
     return dn;
-}
+}    
 
 SEXP R_DimNames_is_symmetric(SEXP dn) {
     return ScalarLogical(DimNames_is_symmetric(dn));

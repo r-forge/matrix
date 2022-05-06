@@ -149,55 +149,49 @@ setMethod("skewpart", signature(x = "matrix"),
 
 
 if(getRversion() >= "3.1.0")
-## NB: ./nsparseMatrix.R and ./sparseVector.R have extra methods
-setMethod("anyNA", signature(x = "xMatrix"),
-	  function(x) anyNA(x@x))
+## NB: classes without 'x' slot must have their own methods;
+## see, e.g., ./nsparseMatrix.R and ./sparseVector.R
+setMethod("anyNA", signature(x = "xMatrix"), function(x) anyNA(x@x))
 
+setMethod("dim", signature(x = "Matrix"), function(x) x@Dim)
 
-setMethod("dim", signature(x = "Matrix"),
-	  function(x) x@Dim, valueClass = "integer")
-
-setMethod("length", "Matrix", function(x) prod(dim(x)))
+setMethod("length", "Matrix", function(x) prod(x@Dim))
 
 setMethod("dimnames", signature(x = "Matrix"), function(x) x@Dimnames)
 
-
 ## not exported but used more than once for "dimnames<-" method :
 ## -- or do only once for all "Matrix" classes ??
-dimnamesGets <- function (x, value) {
-    d <- dim(x)
-    if (!is.list(value) || length(value) != 2 ||
-	!(is.null(v1 <- value[[1]]) || length(v1) == d[1]) ||
-	!(is.null(v2 <- value[[2]]) || length(v2) == d[2]))
-	stop(gettextf("invalid dimnames given for %s object", dQuote(class(x))),
-	     domain=NA)
-    x@Dimnames <- .fixupDimnames(value)
+dimnamesGets <- function(x, value) {
+    if (is.character(s <- validDN(value, dim(x)))) stop(s)
+    x@Dimnames <- fixupDN(value)
     x
 }
 dimnamesGetsNULL <- function(x) {
-    message("dimnames(.) <- NULL:  translated to \ndimnames(.) <- list(NULL,NULL)  <==>  unname(.)")
-    x@Dimnames <- list(NULL,NULL)
+    message("dimnames(.) <- NULL translated to\ndimnames(.) <- list(NULL,NULL)")
+    x@Dimnames <- list(NULL, NULL)
     x
 }
-setMethod("dimnames<-", signature(x = "compMatrix", value = "list"),
-          function(x, value) { ## "compMatrix" have 'factors' slot
-              if(length(x@factors)) x@factors <- list()
-              dimnamesGets(x, value)
-          })
-setMethod("dimnames<-", signature(x = "Matrix", value = "list"), dimnamesGets)
 
-setMethod("dimnames<-", signature(x = "compMatrix", value = "NULL"),
-          function(x, value) { ## "compMatrix" have 'factors' slot
-              if(length(x@factors)) x@factors <- list()
-              dimnamesGetsNULL(x)
-          })
+setMethod("dimnames<-", signature(x = "Matrix", value = "list"),
+          dimnamesGets)
 
 setMethod("dimnames<-", signature(x = "Matrix", value = "NULL"),
 	  function(x, value) dimnamesGetsNULL(x))
 
+setMethod("dimnames<-", signature(x = "compMatrix", value = "list"),
+          function(x, value) {
+              if(length(x@factors)) x@factors <- list()
+              dimnamesGets(x, value)
+          })
 
-setMethod("unname", signature("Matrix", force="missing"),
-	  function(obj) { obj@Dimnames <- list(NULL,NULL); obj})
+setMethod("dimnames<-", signature(x = "compMatrix", value = "NULL"),
+          function(x, value) {
+              if(length(x@factors)) x@factors <- list()
+              dimnamesGetsNULL(x)
+          })
+
+setMethod("unname", signature("Matrix", force = "missing"),
+	  function(obj) { obj@Dimnames <- list(NULL, NULL); obj})
 
 
 Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,

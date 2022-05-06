@@ -84,7 +84,7 @@ testDenseClass <- function(Class, n) {
     if (!is(Class, "classRepresentation")) {
         Class <- getClassDef(Class)
     }
-    stopifnot(extends(Class, denseMatrix), !Class@virtual)
+    stopifnot(extends(Class, denseMatrix), !isVirtualClass(Class))
 
     is.p  <- extends(Class, packedMatrix)
     is.ge <- extends(Class, generalMatrix)
