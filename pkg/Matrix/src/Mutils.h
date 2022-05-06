@@ -171,8 +171,10 @@ enum x_slot_kind {
 #define DECLARE_AND_GET_X_SLOT(__C_TYPE, __SEXP)	\
     __C_TYPE *xx = __SEXP(GET_SLOT(x, Matrix_xSym))
 
-SEXP Dim_validate(SEXP Dim, const char* domain);
+SEXP Dim_validate(SEXP dim, const char* domain);
+SEXP R_Dim_validate(SEXP dim);
 SEXP DimNames_validate(SEXP dimnames, int pdim[]);
+SEXP R_DimNames_validate(SEXP dimnames, SEXP dim);
 SEXP string_scalar_validate(SEXP s, char *valid, char *nm);
 
 SEXP Matrix_validate(SEXP obj);

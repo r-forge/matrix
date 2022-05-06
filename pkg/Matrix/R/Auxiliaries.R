@@ -57,26 +57,6 @@ extends1of <- function(class, classes, ...) {
 ## }
 sparseDefault <- function(x) prod(dim(x)) > 2*sum(isN0(as(x, "matrix")))
 
-
-## NB:  .fixupDimnames() needs to be defined in ./AllClass.R
-
-.M.DN <- function(x) dimnames(x) %||% list(NULL,NULL)
-
-.has.DN <- ## has non-trivial Dimnames slot?
-    function(x) !identical(list(NULL,NULL), x@Dimnames)
-
-## This is exported now ( -> ../man/is.null.DN.Rd ):
-is.null.DN <- function(dn) {
-    is.null(dn) || {
-	if(!is.null(names(dn))) names(dn) <- NULL
-	ch0 <- character(0)
-	identical(dn, list(NULL,NULL)) ||
-	identical(dn, list(ch0, NULL)) ||
-	identical(dn, list(NULL, ch0)) ||
-	identical(dn, list(ch0, ch0))
-    }
-}
-
 ##' return 'x' unless it is NULL where you'd use 'orElse'
 `%||%` <- function(x, orElse) if(!is.null(x)) x else orElse
 
@@ -388,6 +368,44 @@ dimNamesCheck <- function(a, b, useFirst = TRUE, check = FALSE) {
 	nullDN
 }
 
+.M.DN <- function(x) dimnames(x) %||% list(NULL, NULL)
+
+## NB: Now exported and documented in ../man/is.null.DN.Rd:
+is.null.DN <- function(dn) {
+    if(is.null(dn))
+        return(TRUE)
+    if(!is.null(names(dn)))
+        names(dn) <- NULL
+    identical(dn, list(NULL, NULL)) ||
+        identical(dn, list(ch0 <- character(0L), NULL)) ||
+        identical(dn, list(NULL, ch0)) ||
+        identical(dn, list(ch0, ch0))
+}
+
+## Does 'x' have a non-trivial 'Dimnames' slot?
+hasDN <- function(x) !identical(x@Dimnames, list(NULL, NULL))
+
+## Is 'dn' valid in the sense of 'validObject(<Matrix>)'?
+## It is assumed that 'dim' is a length-2 non-negative integer vector.
+validDN <- function(dn, dim) {
+    .Call(R_DimNames_validate, dn, dim)
+}
+
+validDim <- function(dim) {
+    .Call(R_Dim_validate, dim)
+}
+
+## Is 'dn' symmetric?
+## This allows, e.g., list(NULL, nms), _unlike_ identical(dn[1], dn[2]),
+## the definition used by base::isSymmetric.matrix ...
+isSymmetricDN <- function(dn) {
+    .Call(R_DimNames_is_symmetric, dn)
+}
+
+symmDN <- function(dn) {
+    .Call(R_symmDN, dn)
+}
+
 ##' @title Symmetrize dimnames
 ##' @param x A square matrix.
 ##' @return
@@ -397,26 +415,16 @@ dimNamesCheck <- function(a, b, useFirst = TRUE, check = FALSE) {
 ##' and 2 otherwise) and thus satisfying \code{identical(dny[1], dny[2])}.
 ##' @author Martin Maechler and Mikael Jagan
 symmetrizeDimnames <- function(x) {
-    `dimnames<-`(x, symmDN(if (is(x, "Matrix")) x@Dimnames else dimnames(x)))
+    if(isS4(x)) # assuming is(x, "Matrix")
+        `dimnames<-`(x, symmDN(x@Dimnames))
+    else if(!is.null(dn <- dimnames(x))) # assuming list of length 2
+        `dimnames<-`(x, symmDN(dn))
+    else
+        x
 }
-
-symmDN <- function(dn) {
-    .Call(R_symmDN, dn)
-}
-
-## Allowing, e.g., list(NULL, nms), unlike identical(dn[1], dn[2])
-isSymmetricDN <- function(dn) {
-    .Call(R_DimNames_is_symmetric, dn)
-}
-
 
 ## MJ: no longer ... see above
 if (FALSE) {
-
-symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
-    dimnames(x) <- symmDN(dimnames(x), col=col, names=names)
-    x
-}
 
 symmDN <- function(dn, col=TRUE, names=TRUE) {
     if(is.null(dn) || identical(dn[1L], dn[2L]))
@@ -435,6 +443,11 @@ symmDN <- function(dn, col=TRUE, names=TRUE) {
 	    names(dn) <- if(names) n[c(J,J)] # else NULL
     }
     dn[c(J,J)]
+}
+
+symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
+    dimnames(x) <- symmDN(dimnames(x), col=col, names=names)
+    x
 }
 
 } ## MJ

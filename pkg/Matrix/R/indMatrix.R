@@ -32,7 +32,7 @@ setAs("indMatrix", "matrix",
       function(from) {
 	  fp <- from@perm
 	  r <- ldiag(n = from@Dim[2])[fp,]
-	  if(.has.DN(from)) dimnames(r) <- from@Dimnames
+	  if(hasDN(from)) dimnames(r) <- from@Dimnames
 	  r
       })
 

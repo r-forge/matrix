@@ -115,9 +115,14 @@ sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames,
     }
     r@i <- i - 1L
     r@j <- j - 1L
-    if(!missing(dimnames))
-	r@Dimnames <- .fixupDimnames(dimnames)
-    if(check) validObject(r)
+    if(haveDN <- !missing(dimnames) && !is.null(dimnames))
+        r@Dimnames <- dimnames
+    if(check)
+        validObject(r)
+    if(haveDN && (check || !(is.character(validDim(dims)) ||
+                             is.character(validDN(dimnames, dims)))))
+        ## fixup* needs a valid argument!
+        r@Dimnames <- fixupDN(r@Dimnames)
     switch(repr,
 	   "C" = as(r, "CsparseMatrix"),
 	   "T" =    r,# TsparseMatrix
@@ -750,30 +755,16 @@ print.sparseSummary <- function (x, ...) {
     }
     if(n <= 1L)
         return(TRUE)
-    cld <- getClassDef(class(object))
-    if(!extends(cld, "CsparseMatrix")) {
-        ## triplet (TsparseMatrix) representation is not unique!
-        object <- as(object, "CsparseMatrix")
-        cld <- getClassDef(class(object))
+    ## now handling an n-by-n sparseMatrix, n >= 2:
+    x  <- as(  object,  "sparseVector")
+    tx <- as(t(object), "sparseVector")
+    if(is(tx, "zsparseVector"))
+        tx@x <- Conj(tx@x)
+    ae <- function(check.attributes, ...) {
+        ## discarding possible user-supplied check.attributes:
+        all.equal(..., check.attributes = FALSE)
     }
-    if(!extends(cld, "generalMatrix")) {
-        object <- as(object, "generalMatrix")
-        cld <- getClassDef(class(object))
-    }
-    ## now handling an n-by-n .gCMatrix, n >= 2:
-    if((is.d <- extends(cld, "dMatrix")) || extends(cld, "zMatrix")) {
-        Cj <- if(is.d) identity else Conj
-        ae <- function(check.attributes, ...) {
-            ## discarding possible user-supplied check.attributes:
-            all.equal(..., check.attributes = FALSE)
-        }
-        identicalSlots(object, tobject <- t(object), c("i", "p")) &&
-            isTRUE(ae(target = object@x, current = Cj(tobject@x),
-                      tolerance = tol, ...))
-    } else {
-        identicalSlots(object, t(object),
-                       c("i", "p", if(!extends(cld, "nMatrix")) "x"))
-    }
+    isTRUE(ae(target = x, current = tx, tolerance = tol, ...))
 }
 
 ## method for     .s[CTR]Matrix in ./symmetricMatrix.R
@@ -783,28 +774,6 @@ for (.cl in c("sparseMatrix",
               grep("^[dz]t[CRT]Matrix$", .sM.subclasses, value = TRUE)))
     setMethod("isSymmetric", signature(object = .cl), .sM.is.sy)
 rm(.sM.is.sy, .sM.subclasses, .cl)
-
-##' This case should be optimized
-setMethod("isSymmetric", signature(object = "dgCMatrix"),
-	  function(object, tol = 100 * .Machine$double.eps,
-                   checkDN = TRUE, ...) {
-              d <- object@Dim
-              if((n <- d[1L]) != d[2L])
-                  return(FALSE)
-              if(checkDN) {
-                  ca <- function(check.attributes = TRUE, ...) check.attributes
-                  if(ca(...) && !isSymmetricDN(object@Dimnames))
-                      return(FALSE)
-              }
-              if(n <= 1L)
-                  return(TRUE)
-              ae <- function(check.attributes, ...) {
-                  all.equal(..., check.attributes = FALSE)
-              }
-              identicalSlots(object, tobject <- t(object), c("i", "p")) &&
-                  isTRUE(ae(target = object@x, current = tobject@x,
-                            tolerance = tol, ...))
-          })
 
 ## Fallback, used for RsparseMatrix and others, but not [CT]sparseMatrix,
 ## triangularMatrix, or symmetricMatrix which have their own methods

@@ -152,7 +152,9 @@ exportClasses(
 	      "RsparseMatrix",
 	      "ddenseMatrix",
 	      "ldenseMatrix",
-	      "ndenseMatrix",
+              "ndenseMatrix",
+              "unpackedMatrix",
+              "packedMatrix",
 
 	      "dgCMatrix",
 	      "dgRMatrix",
