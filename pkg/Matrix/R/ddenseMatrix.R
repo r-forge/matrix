@@ -20,7 +20,7 @@ setAs("dtpMatrix", "ltpMatrix", function(from) d2l_Matrix(from, "dtpMatrix"))
 if(FALSE) ## FIXME, this fails for ("dtpMatrix" -> "CsparseMatrix") where .dense2C() works
 setAs("ddenseMatrix", "CsparseMatrix",
       function(from) {
-	  if (class(from) != "dgeMatrix") # don't lose symmetry/triangularity/...
+	  if (!inherits(from, "dgeMatrix")) # don't lose symmetry/triangularity/...
 	      as_Csparse(from)
 	  else .Call(dense_to_Csparse, from)
       })
