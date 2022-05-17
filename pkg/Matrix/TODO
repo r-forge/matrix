@@ -309,7 +309,12 @@ alternatively also is_sym() [in src/cs_utils.c], see below.
   is simple {and remains sparse, as solve(L) is still block triangular}
 ** facmul() has no single method defined;  it looks like a good idea though
   (instead of the infamous qr.qy, qr.qty,.... functions)
-
+** TODO tests/dpo-test.R
+        tests/factorizing.R
+	tests/indexing.R
+	tests/matprod.R
+	tests/validObj.R    :  have RNGversion("3.5.0")
+   ... rerun with RNGversion("4.2.0") { == ("3.6.0") }  and fix tolerances! etc
 ** TODO symmpart() and skewpart()  for *sparse* matrices still use (x +/- t(x))/2
   and could be made more efficient.
   Consider going via  asTuniq() or something very close to
