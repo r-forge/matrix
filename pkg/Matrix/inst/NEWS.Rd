@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-05-06 r3473)}{
+\section{Changes in version 1.4-2 (2022-05-16 r3475)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -22,7 +22,7 @@
       \item Many more validity methods now correctly operate under the
       assumption that methods for superclasses have already been called,
       eliminating many redundant checks.
-      
+
       \item Validation of \code{<Matrix>@Dim} now looks at type
       \emph{before} length, avoiding a misleading error message.
 
@@ -68,7 +68,7 @@
       via an argument \code{tol}.  A \code{tol} argument is now
       implemented for all subclasses of \code{dMatrix} except
       those for which symmetry holds \dQuote{by definition}.
-      
+
       \item Methods for \code{isSymmetric} now also look at
       \code{Dimnames} and \code{names(Dimnames)}, following
       \code{isSymmetric.matrix} from \pkg{base}.  See also
@@ -84,14 +84,14 @@
       \code{pack}, \code{unpack}, \code{isSymmetric},
       \code{isTriangular}, and \code{isDiagonal} implemented in C,
       replacing those defined for many subclasses individually.
-      
+
       \item New virtual class \code{unpackedMatrix} containing
       \code{denseMatrix} _without_ \code{packedMatrix}, with methods
       for \code{pack}, \code{unpack}, \code{isSymmetric},
       \code{isTriangular}, \code{isDiagonal}, \code{t}, \code{diag},
       and \code{diag<-} implemented in C, replacing those defined for
       many subclasses individually.
-      
+
       \item \code{isTriangular} and \code{isDiagonal} are now
       implemented in C also for standard \code{matrix}.
 
@@ -107,7 +107,7 @@
 
       \item \code{isTriangular} gains a fallback method for
       \code{sparseMatrix} going via \code{TsparseMatrix}.
-      
+
       \item \code{diag(<unpackedMatrix>) <- value} now behaves like
       \code{diag(<packedMatrix>) <- value}, supporting coercions
       depending on \code{typeof(value)}, consistent with \code{diag<-}
@@ -118,7 +118,7 @@
       respectively (previously an error). \code{pack(<.geMatrix>)}
       (previously an error) now behaves as \code{pack(<matrix>)},
       i.e., by checking for symmetry or triangularity before packing.
-      
+
       \item Many more validity methods implemented in C, for efficiency,
       including methods for \code{Matrix}, \code{compMatrix},
       \code{diagonalMatrix}, \code{corMatrix}, \code{[liz]Matrix},
@@ -165,7 +165,7 @@
       argument indicating whether a \code{.geMatrix} should be duplicated
       (or not).  R interfaces \code{..2dge()} and (new) \code{..2ge()}
       get the same option, and their default behaviour is now to \emph{not}
-      duplicate, for efficiency.  \code{mMatrix_as_d?geMatrix()} are 
+      duplicate, for efficiency.  \code{mMatrix_as_d?geMatrix()} are
       no longer.
 
       \item New C-level utility \code{DimNames_is_symmetric()}

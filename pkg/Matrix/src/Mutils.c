@@ -74,13 +74,12 @@ SEXP DimNames_validate(SEXP dimnames, int *pdim)
 	SPRINTF(buf, _("'Dimnames' slot does not have length 2"));
 	return mkString(buf);
     }
-    SEXP s;
     for (int j = 0; j < 2; ++j) {
 	/* Behave as 'do_matrix()' from src/main/array.c:
 	   Dimnames[[j]] must be NULL or _coercible to_ character
 	   of length Dim[j] or 0 ... see 'R_Dimnames_fixup()' below
 	*/
-	s = VECTOR_ELT(dimnames, j);
+	SEXP s = VECTOR_ELT(dimnames, j);
 	if (!isNull(s)) {
 	    if (!isVector(s)) {
 		SPRINTF(buf, _("Dimnames[[%d]] is not NULL or a vector"), j+1);
@@ -88,7 +87,8 @@ SEXP DimNames_validate(SEXP dimnames, int *pdim)
 	    }
 	    if (LENGTH(s) != pdim[j]) {
 		if (LENGTH(s) != 0) {
-		    SPRINTF(buf, _("length of Dimnames[[%d]] (%d) is not equal to Dim[%d] (%d)"), j+1, LENGTH(s), j+1, pdim[j]);
+		    SPRINTF(buf, _("length of Dimnames[[%d]] (%d) is not equal to Dim[%d] (%d)"),
+			    j+1, LENGTH(s), j+1, pdim[j]);
 		    return mkString(buf);
 		}
 	    }
@@ -240,11 +240,13 @@ SEXP diagonalMatrix_validate(SEXP obj)
 	return val;
     if (*CHAR(asChar(diag)) == 'N') {
 	if (LENGTH(GET_SLOT(obj, Matrix_xSym)) != n) {
-	    return mkString(_("'diag' slot equal to \"N\" requires 'x' slot of length n=Dim[1]"));
+	    return mkString(
+		_("'diag' slot equal to \"N\" requires 'x' slot of length n=Dim[1]"));
 	}
     } else {
 	if (LENGTH(GET_SLOT(obj, Matrix_xSym)) != 0) {
-	    return mkString(_("'diag' slot equal to \"U\" (identity matrix) requires 'x' slot of length 0"));
+	    return mkString(
+		_("'diag' slot equal to \"U\" (identity matrix) requires 'x' slot of length 0"));
 	}
     }
     return ScalarLogical(1);
@@ -992,7 +994,7 @@ SEXP dup_mMatrix_as_geMatrix2(SEXP A, Rboolean force,
     int ctype = R_check_class_etc(A, valid);
 
     /* Be fast if 'A' is already a '.geMatrix' */
-    if (ctype == 1 | ctype == 1+14 || ctype == 1+14+6) {
+    if (ctype == 1 || ctype == 1+14 || ctype == 1+14+6) {
 	return force ? duplicate(A) : A;
     }
     
@@ -1783,10 +1785,14 @@ SEXP Mmatrix(SEXP args)
 	if (lendat > 1 && nrc % lendat != 0) {
 	    if (((lendat > nr) && (lendat / nr) * nr != lendat) ||
 		((lendat < nr) && (nr / lendat) * lendat != nr))
-		warning(_("data length [%d] is not a sub-multiple or multiple of the number of rows [%d]"), lendat, nr);
+		warning(
+		 _("data length [%d] is not a sub-multiple or multiple of the number of rows [%d]"),
+			lendat, nr);
 	    else if (((lendat > nc) && (lendat / nc) * nc != lendat) ||
 		     ((lendat < nc) && (nc / lendat) * lendat != nc))
-		warning(_("data length [%d] is not a sub-multiple or multiple of the number of columns [%d]"), lendat, nc);
+		warning(
+		 _("data length [%d] is not a sub-multiple or multiple of the number of columns [%d]"),
+			lendat, nc);
 	}
 	else if ((lendat > 1) && (nrc == 0)){
 	    warning(_("data length exceeds size of matrix"));
