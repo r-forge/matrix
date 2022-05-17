@@ -3,8 +3,10 @@
 library(Matrix)
 
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
-doExtras
-(is64bit <- .Machine$sizeof.pointer == 8)
+options(warn = 0)
+is64bit <- .Machine$sizeof.pointer == 8
+cat("doExtras:", doExtras,";  is64bit:", is64bit, "\n")
+
 ### "sparseQR" : Check consistency of methods
 ##   --------
 data(KNex); mm <- KNex$mm; y <- KNex$y
@@ -61,17 +63,19 @@ try( ## NOTE: *Both* checks  currently fail here:
 
 
 ## Larger Scale random testing
-oo <- options(Matrix.quiet.qr.R = TRUE, Matrix.verbose = TRUE)
+oo <- options(Matrix.quiet.qr.R = TRUE, Matrix.verbose = TRUE, nwarnings = 1e4)
 set.seed(101)
 
+quiet <- doExtras
 for(N in 1:(if(doExtras) 1008 else 24)) {
     A <- rsparsematrix(8,5, nnz = rpois(1, lambda=16))
-    cat(sprintf("%4d -", N))
-    checkQR.DS.both(A, Qinv.chk= NA, QtQ.chk=NA,
+    cat(sprintf(if(quiet) "%d " else "%4d -", N)); if(quiet && N %% 50 == 0) cat("\n")
+    checkQR.DS.both(A, Qinv.chk= NA, QtQ.chk=NA, quiet=quiet,
     ##                          --- => FALSE if struct. rank deficient
-		    giveRE = FALSE, tol = if(is64bit) 2e-13 else 1e-12)
+		    giveRE = FALSE, tol = 1e-12)
+    ## with doExtras = TRUE, 64bit (F34, R 4.3.0-dev. 2022-05): seen 8.188e-13
 }
-unique(warnings())
+summary(warnings())
 
 ## Look at single "hard" cases: --------------------------------------
 
@@ -140,16 +144,17 @@ try( checkQR.DS.both(A5,  TRUE, FALSE) )
 try( checkQR.DS.both(A5, FALSE,  TRUE) )
 
 
+quiet <- doExtras
 for(N in 1:(if(doExtras) 2^12 else 128)) {
     A <- round(100*rsparsematrix(5,3, nnz = min(15,rpois(1, lambda=10))))
     if(any(apply(A, 2, function(x) all(x == 0)))) ## "column of all 0"
         next
-    cat(sprintf("%4d -", N))
-    checkQR.DS.both(A, Qinv.chk=NA, giveRE=FALSE, tol = 1e-12)
+    cat(sprintf(if(quiet) "%d " else "%4d -", N)); if(quiet && N %% 50 == 0) cat("\n")
+    checkQR.DS.both(A, Qinv.chk=NA, giveRE=FALSE, tol = 1e-12, quiet = quiet)
     ##                         --- => FALSE if struct. rank deficient
 }
 
-unique(warnings())
+summary(warnings())
 
 
 options(oo)
