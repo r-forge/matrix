@@ -1258,13 +1258,24 @@ stopifnot(identical(dimnames(m4), dn4),
           Q.eq(D4n, m4, superclasses = "mMatrix"))
 ## as(<ddi>, "matrix")  had lost dimnames before
 
+s24 <- new("dgCMatrix", Dim = c(2L, 4L), p = integer(5L))
+triu(s24, k = 4L) # was an error
+tril(s24, k = 4L) # was an error
+
+## band(<sparseMatrix>, -k, k) used isSymmetric(tol > 0) to test
+## for symmetry of the result, and forcing symmetry lost information
+s44 <- new("dgCMatrix", Dim = c(4L, 4L), p = c(0L, 0L, 1L, 1L, 1L),
+           i = 0L, x = .Machine$double.xmin)
+(bs44 <- band(s44, -1L, 1L))
+stopifnot(identical(s44, bs44))
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()
 structure(Sys.info()[c(4,5,1:3)], class="simple.list")
 sessionInfo()
 c(Matrix = packageDescription("Matrix")$Built)
-if(SysI[["sysname"]] == "Linux" && require("sfsmisc")) local({
+if(SysI[["sysname"]] == "Linux" && requireNamespace("sfsmisc")) local({
     nn <- names(.Sc <- sfsmisc::Sys.cpuinfo())
     nn <- names(.Sc <- .Sc[!grepl("^flags", nn)])
     print(.Sc[ grep("\\.[0-9]+$", nn, invert=TRUE) ])
