@@ -128,30 +128,13 @@ for (dn in ldn) {
             ## for efficiency ... should they?
             next
         }
-
-        ## FIXME: Conditions for symmetrization are inconsistent
-        ## between 'Csparse_general_to_symmetric' from ../src/Csparse.c
-        ## and 'dense_to_symmetric' from ../src/dense.c
-        fsdn <-
-            if (is.s) {
-                sdn
-            } else if (is(M, "sparseMatrix") &&
-                       (is.null(dn[[1L]]) || is.null(dn[[2L]])) &&
-                       is.null(names(dn))) {
-                dn
-            } else if (is(M, "triangularMatrix")) {
-                SDN2(dn, M@uplo)
-            } else {
-                SDN2(dn, "U")
-            }
-        stopifnot(identical(DN(forceSymmetric(M)), fsdn))
+        stopifnot(identical(DN(forceSymmetric(M)), sdn))
 
         if (is(M, "diagonalMatrix")) {
             ## Methods for 'diagonalMatrix' assume symmetric 'Dimnames'
             ## for efficiency (or maybe by accident?) ... should they?
             next
         }
-
         stopifnot(identical(DN(symmpart(M)), sdn),
                   identical(DN(skewpart(M)), sdn))
         ## others?

@@ -104,6 +104,8 @@ setMethod("rowMeans", signature(x = "dgCMatrix"),
 	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
           .Call(dgCMatrix_colSums, x, na.rm, sparseResult, TRUE, TRUE))
 
+## not yet
+if(FALSE) {
 setMethod("colSums", signature(x = "igCMatrix"),
 	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
           .Call(igCMatrix_colSums, x, na.rm, sparseResult, FALSE, FALSE))
@@ -119,6 +121,7 @@ setMethod("colMeans", signature(x = "igCMatrix"),
 setMethod("rowMeans", signature(x = "igCMatrix"),
 	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
           .Call(igCMatrix_colSums, x, na.rm, sparseResult, TRUE, TRUE))
+}
 
 setMethod("colSums", signature(x = "lgCMatrix"),
 	  function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)

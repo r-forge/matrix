@@ -1,5 +1,332 @@
-#### All methods for "diagonalMatrix" and its subclasses,
-####  currently "ddiMatrix", "ldiMatrix"
+## Methods for "diagonalMatrix" and its subclasses, currently "[dl]diMatrix"
+
+## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.M2diag <- function(from) {
+    if (!isDiagonal(from))
+        stop("matrix is not diagonal; consider diag(diag())")
+    x <- diag(from, names = FALSE)
+    switch(typeof(x),
+           double = {
+               cl <- "ddiMatrix"
+               unit <- allTrue(x == 1) },
+           integer = {
+               cl <- "ddiMatrix"
+               unit <- allTrue(x == 1L)
+               storage.mode(x) <- "double" },
+           ## integer = {
+           ##     cl <- "idiMatrix"
+           ##     unit <- allTrue(x == 1L) },
+           logical = {
+               cl <- "ldiMatrix"
+               unit <- allTrue(x) },
+           complex = stop("complex \"diagonalMatrix\" not yet implemented"),
+           ## complex = {
+           ##     cl <- "zdiMatrix"
+           ##     unit = allTrue(x == 1+0i) },
+           stop(sprintf("cannot coerce matrix of type \"%s\" to \"diagonalMatrix\""), typeof(x)))
+    new(cl, Dim = dim(from), Dimnames = .M.DN(from),
+        diag = if(unit) "U" else "N", x = if(unit) x[FALSE] else x)
+}
+
+setAs("Matrix", "diagonalMatrix", .M2diag)
+setAs("matrix", "diagonalMatrix", .M2diag)
+
+## MJ: no longer needed ... replacement above
+if(FALSE) {
+setAs("matrix", "diagonalMatrix",
+      function(from) {
+	  d <- dim(from)
+	  if(d[1] != (n <- d[2])) stop("non-square matrix")
+	  if(any(from[row(from) != col(from)] != 0))
+	      stop("matrix with non-zero off-diagonals cannot be coerced to \"diagonalMatrix\"")
+	  x <- diag(from); names(x) <- NULL # don't want them in 'x' slot
+	  if(is.logical(x)) {
+	      cl <- "ldiMatrix"
+	      uni <- allTrue(x) ## uni := {is it unit-diagonal ?}
+	  } else {
+	      cl <- "ddiMatrix"
+	      uni <- allTrue(x == 1)
+	      storage.mode(x) <- "double"
+	  } ## TODO: complex
+	  new(cl, Dim = c(n,n), diag = if(uni) "U" else "N",
+	      x = if(uni) x[FALSE] else x, Dimnames = .M.DN(from))
+      })
+
+## ``generic'' coercion to  diagonalMatrix : build on  isDiagonal() and diag()
+setAs("Matrix", "diagonalMatrix",
+      function(from) {
+	  d <- dim(from)
+	  if(d[1] != (n <- d[2])) stop("non-square matrix")
+	  if(!isDiagonal(from)) stop("matrix is not diagonal")
+	  ## else:
+	  x <- diag(from); names(x) <- NULL # don't want them in 'x' slot
+	  if(is.logical(x)) {
+	      cl <- "ldiMatrix"
+	      uni <- allTrue(x)
+	  } else {
+	      cl <- "ddiMatrix"
+	      uni <- allTrue(x == 1)
+	      storage.mode(x) <- "double"
+	  } ## TODO: complex
+	  new(cl, Dim = c(n,n), diag = if(uni) "U" else "N",
+	      x = if(uni) x[FALSE] else x, Dimnames = from@Dimnames)
+      })
+} ## MJ
+
+
+## ~~~~ COERCIONS FROM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+..diag2dkind <- function(from)
+    .Call(R_diagonal_as_sparse, from, "ddi", NULL, NULL)
+..diag2lkind <- function(from)
+    .Call(R_diagonal_as_sparse, from, "ldi", NULL, NULL)
+
+..diag2dsparse <- function(from)
+    .Call(R_diagonal_as_sparse, from, "dtT", "U", TRUE)
+..diag2lsparse <- function(from)
+    .Call(R_diagonal_as_sparse, from, "ltT", "U", TRUE)
+..diag2nsparse <- function(from)
+    .Call(R_diagonal_as_sparse, from, "ntT", "U", TRUE)
+
+..diag2tC <- function(from)
+    .Call(R_diagonal_as_sparse, from, ".tC", "U", TRUE)
+..diag2tR <- function(from)
+    .Call(R_diagonal_as_sparse, from, ".tR", "U", TRUE)
+..diag2tT <- function(from)
+    .Call(R_diagonal_as_sparse, from, ".tT", "U", TRUE)
+..diag2sC <- function(from)
+    .Call(R_diagonal_as_sparse, from, ".sC", "U", TRUE)
+..diag2sR <- function(from)
+    .Call(R_diagonal_as_sparse, from, ".sR", "U", TRUE)
+..diag2sT <- function(from)
+    .Call(R_diagonal_as_sparse, from, ".sT", "U", TRUE)
+..diag2gC <- function(from)
+    .Call(R_diagonal_as_sparse, from, ".gC", "U", TRUE)
+..diag2gR <- function(from)
+    .Call(R_diagonal_as_sparse, from, ".gR", "U", TRUE)
+..diag2gT <- function(from)
+    .Call(R_diagonal_as_sparse, from, ".gT", "U", TRUE)
+
+## .diag2[ts]T() are exported ...
+.diag2tT <- function(from, uplo = "U", kind = ".", drop0 = TRUE)
+    .Call(R_diagonal_as_sparse, from,
+          `substr<-`(".tT", 1L, 1L, kind), uplo, drop0)
+.diag2sT <- function(from, uplo = "U", kind = ".", drop0 = TRUE)
+    .Call(R_diagonal_as_sparse, from,
+          `substr<-`(".sT", 1L, 1L, kind), uplo, drop0)
+
+## For group methods
+.diag2tT.smart <- function(from, x, uplo = "U", kind = ".", drop0 = TRUE) {
+    .Call(R_diagonal_as_sparse, from,
+          `substr<-`(".sT", 1L, 1L, kind),
+          if(is(x, "triangularMatrix")) x@uplo else uplo,
+          drop0)
+}
+.diag2T.smart <- function(from, x, uplo = "U", kind = ".", drop0 = TRUE) {
+    symmetric <- extends(cld <- getClassDef(class(x)), "symmetricMatrix")
+    .Call(R_diagonal_as_sparse, from,
+          `substr<-`(if(symmetric) ".sT" else ".tT", 1L, 1L, kind),
+          if(symmetric || extends(cld, "triangularMatrix")) x@uplo else uplo,
+          drop0)
+}
+
+..diag2tr  <- function(from)           triu(.dense2ge(from, "."))
+..diag2dtr <- function(from)           triu(.dense2ge(from, "d"))
+..diag2ltr <- function(from)           triu(.dense2ge(from, "l"))
+..diag2ntr <- function(from)           triu(.dense2ge(from, "n"))
+
+..diag2dsy <- function(from) forceSymmetric(.dense2ge(from, "d"))
+..diag2lsy <- function(from) forceSymmetric(.dense2ge(from, "l"))
+..diag2nsy <- function(from) forceSymmetric(.dense2ge(from, "n"))
+
+..diag2dge <- function(from)                .dense2ge(from, "d")
+..diag2lge <- function(from)                .dense2ge(from, "l")
+..diag2nge <- function(from)                .dense2ge(from, "n")
+
+..diag2m <- function(from)
+    `dimnames<-`(base::diag(if(from@diag == "N") from@x else as1(from@x),
+                            nrow = from@Dim[1L]),
+                 from@Dimnames)
+.diag2mat <- ..diag2m ## MJ: for backwards compatibility, until deprecated
+
+setAs("diagonalMatrix",          "dMatrix", ..diag2dkind)
+setAs("diagonalMatrix",          "lMatrix", ..diag2lkind)
+setAs("diagonalMatrix",          "nMatrix", ..diag2nsparse)
+
+setAs("diagonalMatrix",    "dsparseMatrix", ..diag2dsparse)
+setAs("diagonalMatrix",    "lsparseMatrix", ..diag2lsparse)
+setAs("diagonalMatrix",    "nsparseMatrix", ..diag2nsparse)
+
+setAs("diagonalMatrix",    "CsparseMatrix", ..diag2tC)
+setAs("diagonalMatrix",    "RsparseMatrix", ..diag2tR)
+setAs("diagonalMatrix",    "TsparseMatrix", ..diag2tT)
+
+setAs("diagonalMatrix", "triangularMatrix", ..diag2tT)
+setAs("diagonalMatrix",  "symmetricMatrix", ..diag2sC)
+setAs("diagonalMatrix",    "generalMatrix", ..diag2gC)
+
+setAs("diagonalMatrix",      "denseMatrix", ..diag2tr)
+setAs("diagonalMatrix",     "ddenseMatrix", ..diag2dtr)
+setAs("diagonalMatrix",     "ldenseMatrix", ..diag2ltr)
+setAs("diagonalMatrix",     "ndenseMatrix", ..diag2ntr)
+setAs("diagonalMatrix",           "matrix", ..diag2m)
+
+for (.kind in c("d", "l"))
+    for (.x in c("t", "s", "g"))
+        for (.y in c("C", "R", "T"))
+            setAs(paste0(.kind, "diMatrix"),
+                  paste0(.kind, .x, .y, "Matrix"),
+                  get(paste0("..diag2", .x, .y),
+                      mode = "function", inherits = FALSE))
+
+for (.kind in c("d", "l"))
+    for (.xy in c("tr", "sy", "ge"))
+        setAs(paste0(.kind, "diMatrix"),
+              paste0(.kind, .xy, "Matrix"),
+              get(paste0("..diag2", .kind, .xy),
+                  mode = "function", inherits = FALSE))
+rm(.kind, .x, .y, .xy)
+
+rm(..diag2dkind, ..diag2lkind,
+   ..diag2dsparse, ..diag2lsparse, ..diag2nsparse,
+   ..diag2tC, ..diag2tR, ..diag2tT,
+   ..diag2sC, ..diag2sR, ..diag2sT,
+   ..diag2gC, ..diag2gR, ..diag2gT,
+   ..diag2tr,
+   ..diag2dtr, ..diag2ltr, ..diag2ntr,
+   ..diag2dsy, ..diag2lsy, ..diag2nsy,
+   ..diag2dge, ..diag2lge, ..diag2nge,
+   ..diag2m)
+
+## MJ: no longer needed ... replacement above
+if(FALSE) {
+.diag2tT <- function(from, uplo = "U", kind = .M.kind(from), drop0 = TRUE) {
+    ## to triangular Tsparse
+    x <- from@x
+    i <- if(from@diag == "U")
+	      integer(0L)
+	  else if(drop0 & any0(x)) {
+	      ii <- which(isN0(x))
+	      x <- x[ii]
+	      ii - 1L
+	  }
+	  else
+	      seq_len(from@Dim[1]) - 1L
+    new(paste0(kind, "tTMatrix"),
+	diag = from@diag, Dim = from@Dim, Dimnames = from@Dimnames,
+	uplo = uplo,
+	x = x, # <- ok for diag = "U" and "N" (!)
+	i = i, j = i)
+}
+
+.diag2sT <- function(from, uplo = "U", kind = .M.kind(from)) {
+    ## to symmetric Tsparse
+    n <- from@Dim[1]
+    i <- seq_len(n) - 1L
+    new(paste0(kind, "sTMatrix"),
+	Dim = from@Dim, Dimnames = from@Dimnames,
+	i = i, j = i, uplo = uplo,
+	x = if(from@diag == "N") from@x else ## "U"-diag
+	rep.int(switch(kind,
+		       "d" = 1.,
+		       "l" =,
+		       "n" = TRUE,
+		       ## otherwise
+		       stop(gettextf("%s kind not yet implemented",
+				     sQuote(kind)), domain=NA)),
+		n))
+}
+
+## diagonal -> triangular,  upper / lower depending on "partner" 'x':
+diag2tT.u <- function(d, x, kind = .M.kind(d), drop0 = TRUE)
+    .diag2tT(d, uplo = if(is(x,"triangularMatrix")) x@uplo else "U", kind, drop0)
+
+## diagonal -> sparse {triangular OR symmetric} (upper / lower) depending on "partner":
+diag2Tsmart <- function(d, x, kind = .M.kind(d)) {
+    clx <- getClassDef(class(x))
+    if(extends(clx, "symmetricMatrix"))
+	.diag2sT(d, uplo = x@uplo, kind)
+    else
+	.diag2tT(d, uplo = if(extends(clx,"triangularMatrix")) x@uplo else "U", kind)
+}
+
+## In order to evade method dispatch ambiguity warnings,
+## and because we can save a .M.kind() call, we use this explicit
+## "hack"  instead of signature  x = "diagonalMatrix" :
+##
+## ddi*:
+di2tT <- function(from) .diag2tT(from, "U", "d")
+setAs("ddiMatrix", "triangularMatrix", di2tT)
+##_no_longer_ setAs("ddiMatrix", "sparseMatrix", di2tT)
+## needed too (otherwise <dense> -> Tsparse is taken):
+setAs("ddiMatrix", "TsparseMatrix", di2tT)
+setAs("ddiMatrix", "dsparseMatrix", di2tT)
+ddi2Csp <- function(from) .T2Cmat(.diag2tT(from, "U", "d"), isTri=TRUE) #-> dtC*
+setAs("ddiMatrix", "dtCMatrix",     ddi2Csp)
+setAs("ddiMatrix", "CsparseMatrix", ddi2Csp)
+## Such that  as(Matrix(0, d,d), "dgCMatrix")  continues working:
+setAs("ddiMatrix", "dgCMatrix", function(from) .dtC2g(ddi2Csp(from)))
+
+setAs("ddiMatrix", "symmetricMatrix", function(from) .diag2sT(from, "U", "d"))
+##
+## ldi*:
+ldi2tT <- function(from) .diag2tT(from, "U", "l")
+setAs("ldiMatrix", "triangularMatrix", ldi2tT)
+##_no_longer_ setAs("ldiMatrix", "sparseMatrix", di2tT)
+## needed too (otherwise <dense> -> Tsparse is taken):
+setAs("ldiMatrix", "TsparseMatrix", ldi2tT)
+setAs("ldiMatrix", "lsparseMatrix", ldi2tT)
+setAs("ldiMatrix", "CsparseMatrix",
+      function(from) .T2Cmat(.diag2tT(from, "U", "l"), isTri=TRUE))
+setAs("ldiMatrix", "symmetricMatrix", function(from) .diag2sT(from, "U", "l"))
+rm(ldi2tT)
+
+setAs("diagonalMatrix", "nMatrix",
+      di2nMat <- function(from) {
+	  i <- if(from@diag == "U") integer(0) else which(isN0(from@x)) - 1L
+	  new("ntTMatrix", i = i, j = i, diag = from@diag,
+	      Dim = from@Dim, Dimnames = from@Dimnames)
+      })
+setAs("diagonalMatrix", "nsparseMatrix", function(from) as(from, "nMatrix"))
+
+##' A version of diag(x,n) which *does* preserve the mode of x, where diag() "fails"
+mkDiag <- function(x, n) {
+    y <- matrix(as0(mod=mode(x)), n,n)
+    if (n > 0) y[1L + 0:(n - 1L) * (n + 1)] <- x
+    y
+}
+## NB: diag(x,n) is really faster for n >= 20, and even more for large n
+## --> using diag() where possible, ==> .ddi2mat()
+
+.diag2mat <- function(from)
+    ## want "ldiMatrix" -> <logical> "matrix"  (but integer -> <double> for now)
+    mkDiag(if(from@diag == "U") as1(from@x) else from@x, n = from@Dim[1])
+
+.ddi2mat <- function(from)
+    `dimnames<-`(base::diag(if(from@diag == "U") as1(from@x) else from@x, nrow = from@Dim[1]),
+                 from@Dimnames)
+
+setAs("ddiMatrix", "matrix", .ddi2mat)
+## the non-ddi diagonalMatrix -- only "ldiMatrix" currently:
+setAs("diagonalMatrix", "matrix", .diag2mat)
+
+setAs("diagonalMatrix", "generalMatrix", # prefer sparse:
+      function(from) as(as(from, "CsparseMatrix"), "generalMatrix"))
+
+setAs("diagonalMatrix", "denseMatrix",
+      function(from) as(as(from, "CsparseMatrix"), "denseMatrix"))
+
+setAs("ddiMatrix", "dgeMatrix", function(from) ..2dge(from))
+
+setAs("ddiMatrix", "ddenseMatrix", #-> "dtr"
+      function(from) as(as(from, "triangularMatrix"),"denseMatrix"))
+setAs("ldiMatrix", "ldenseMatrix", #-> "ltr"
+      function(from) as(as(from, "triangularMatrix"),"denseMatrix"))
+} ## MJ
+
+
+## ~~~~ CONSTRUCTORS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Purpose: Constructor of diagonal matrices -- ~= diag() ,
 ##          but *not* diag() extractor!
@@ -205,6 +532,9 @@ bdiag <- function(...) {
     as(.bdiag(alis), "CsparseMatrix")
 }
 
+
+## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 setMethod("tril", "diagonalMatrix", function(x, k = 0, ...)
     if(k >= 0) x else .setZero(x, paste0(.M.kind(x), "tCMatrix")))
 
@@ -212,123 +542,11 @@ setMethod("triu", "diagonalMatrix", function(x, k = 0, ...)
     if(k <= 0) x else  .setZero(x, paste0(.M.kind(x), "tCMatrix")))
 
 
-
-.diag2tT <- function(from, uplo = "U", kind = .M.kind(from), drop0 = TRUE) {
-    ## to triangular Tsparse
-    x <- from@x
-    i <- if(from@diag == "U")
-	      integer(0L)
-	  else if(drop0 & any0(x)) {
-	      ii <- which(isN0(x))
-	      x <- x[ii]
-	      ii - 1L
-	  }
-	  else
-	      seq_len(from@Dim[1]) - 1L
-    new(paste0(kind, "tTMatrix"),
-	diag = from@diag, Dim = from@Dim, Dimnames = from@Dimnames,
-	uplo = uplo,
-	x = x, # <- ok for diag = "U" and "N" (!)
-	i = i, j = i)
-}
-
-.diag2sT <- function(from, uplo = "U", kind = .M.kind(from)) {
-    ## to symmetric Tsparse
-    n <- from@Dim[1]
-    i <- seq_len(n) - 1L
-    new(paste0(kind, "sTMatrix"),
-	Dim = from@Dim, Dimnames = from@Dimnames,
-	i = i, j = i, uplo = uplo,
-	x = if(from@diag == "N") from@x else ## "U"-diag
-	rep.int(switch(kind,
-		       "d" = 1.,
-		       "l" =,
-		       "n" = TRUE,
-		       ## otherwise
-		       stop(gettextf("%s kind not yet implemented",
-				     sQuote(kind)), domain=NA)),
-		n))
-}
-
-## diagonal -> triangular,  upper / lower depending on "partner" 'x':
-diag2tT.u <- function(d, x, kind = .M.kind(d), drop0 = TRUE)
-    .diag2tT(d, uplo = if(is(x,"triangularMatrix")) x@uplo else "U", kind, drop0)
-
-## diagonal -> sparse {triangular OR symmetric} (upper / lower) depending on "partner":
-diag2Tsmart <- function(d, x, kind = .M.kind(d)) {
-    clx <- getClassDef(class(x))
-    if(extends(clx, "symmetricMatrix"))
-	.diag2sT(d, uplo = x@uplo, kind)
-    else
-	.diag2tT(d, uplo = if(extends(clx,"triangularMatrix")) x@uplo else "U", kind)
-}
-
 ## FIXME: should not be needed {when ddi* is dsparse* etc}:
 setMethod("is.finite", signature(x = "diagonalMatrix"),
 	  function(x) is.finite(.diag2tT(x)))
 setMethod("is.infinite", signature(x = "diagonalMatrix"),
 	  function(x) is.infinite(.diag2tT(x)))
-
-## In order to evade method dispatch ambiguity warnings,
-## and because we can save a .M.kind() call, we use this explicit
-## "hack"  instead of signature  x = "diagonalMatrix" :
-##
-## ddi*:
-di2tT <- function(from) .diag2tT(from, "U", "d")
-setAs("ddiMatrix", "triangularMatrix", di2tT)
-##_no_longer_ setAs("ddiMatrix", "sparseMatrix", di2tT)
-## needed too (otherwise <dense> -> Tsparse is taken):
-setAs("ddiMatrix", "TsparseMatrix", di2tT)
-setAs("ddiMatrix", "dsparseMatrix", di2tT)
-ddi2Csp <- function(from) .T2Cmat(.diag2tT(from, "U", "d"), isTri=TRUE) #-> dtC*
-setAs("ddiMatrix", "dtCMatrix",     ddi2Csp)
-setAs("ddiMatrix", "CsparseMatrix", ddi2Csp)
-## Such that  as(Matrix(0, d,d), "dgCMatrix")  continues working:
-setAs("ddiMatrix", "dgCMatrix", function(from) .dtC2g(ddi2Csp(from)))
-
-setAs("ddiMatrix", "symmetricMatrix", function(from) .diag2sT(from, "U", "d"))
-##
-## ldi*:
-ldi2tT <- function(from) .diag2tT(from, "U", "l")
-setAs("ldiMatrix", "triangularMatrix", ldi2tT)
-##_no_longer_ setAs("ldiMatrix", "sparseMatrix", di2tT)
-## needed too (otherwise <dense> -> Tsparse is taken):
-setAs("ldiMatrix", "TsparseMatrix", ldi2tT)
-setAs("ldiMatrix", "lsparseMatrix", ldi2tT)
-setAs("ldiMatrix", "CsparseMatrix",
-      function(from) .T2Cmat(.diag2tT(from, "U", "l"), isTri=TRUE))
-setAs("ldiMatrix", "symmetricMatrix", function(from) .diag2sT(from, "U", "l"))
-rm(ldi2tT)
-
-setAs("diagonalMatrix", "nMatrix",
-      di2nMat <- function(from) {
-	  i <- if(from@diag == "U") integer(0) else which(isN0(from@x)) - 1L
-	  new("ntTMatrix", i = i, j = i, diag = from@diag,
-	      Dim = from@Dim, Dimnames = from@Dimnames)
-      })
-
-setAs("diagonalMatrix", "nsparseMatrix", function(from) as(from, "nMatrix"))
-
-##' A version of diag(x,n) which *does* preserve the mode of x, where diag() "fails"
-mkDiag <- function(x, n) {
-    y <- matrix(as0(mod=mode(x)), n,n)
-    if (n > 0) y[1L + 0:(n - 1L) * (n + 1)] <- x
-    y
-}
-## NB: diag(x,n) is really faster for n >= 20, and even more for large n
-## --> using diag() where possible, ==> .ddi2mat()
-
-.diag2mat <- function(from)
-    ## want "ldiMatrix" -> <logical> "matrix"  (but integer -> <double> for now)
-    mkDiag(if(from@diag == "U") as1(from@x) else from@x, n = from@Dim[1])
-
-.ddi2mat <- function(from)
-    `dimnames<-`(base::diag(if(from@diag == "U") as1(from@x) else from@x, nrow = from@Dim[1]),
-                 from@Dimnames)
-
-setAs("ddiMatrix", "matrix", .ddi2mat)
-## the non-ddi diagonalMatrix -- only "ldiMatrix" currently:
-setAs("diagonalMatrix", "matrix", .diag2mat)
 
 setMethod("as.vector", "diagonalMatrix",
 	  function(x, mode) {
@@ -341,12 +559,6 @@ setMethod("as.vector", "diagonalMatrix",
 	      as.vector(r, mode)
 	  })
 
-setAs("diagonalMatrix", "generalMatrix", # prefer sparse:
-      function(from) as(as(from, "CsparseMatrix"), "generalMatrix"))
-
-setAs("diagonalMatrix", "denseMatrix",
-      function(from) as(as(from, "CsparseMatrix"), "denseMatrix"))
-
 ..diag.x <- function(m)                   rep.int(as1(m@x), m@Dim[1])
 .diag.x  <- function(m) if(m@diag == "U") rep.int(as1(m@x), m@Dim[1]) else m@x
 
@@ -354,54 +566,6 @@ setAs("diagonalMatrix", "denseMatrix",
     if(m@diag == "U") m@diag <- "N"
     m
 }
-
-setAs("ddiMatrix", "dgeMatrix", function(from) ..2dge(from))
-
-setAs("ddiMatrix", "ddenseMatrix", #-> "dtr"
-      function(from) as(as(from, "triangularMatrix"),"denseMatrix"))
-setAs("ldiMatrix", "ldenseMatrix", #-> "ltr"
-      function(from) as(as(from, "triangularMatrix"),"denseMatrix"))
-
-
-setAs("matrix", "diagonalMatrix",
-      function(from) {
-	  d <- dim(from)
-	  if(d[1] != (n <- d[2])) stop("non-square matrix")
-	  if(any(from[row(from) != col(from)] != 0))
-	      stop("matrix with non-zero off-diagonals cannot be coerced to \"diagonalMatrix\"")
-	  x <- diag(from); names(x) <- NULL # don't want them in 'x' slot
-	  if(is.logical(x)) {
-	      cl <- "ldiMatrix"
-	      uni <- allTrue(x) ## uni := {is it unit-diagonal ?}
-	  } else {
-	      cl <- "ddiMatrix"
-	      uni <- allTrue(x == 1)
-	      storage.mode(x) <- "double"
-	  } ## TODO: complex
-	  new(cl, Dim = c(n,n), diag = if(uni) "U" else "N",
-	      x = if(uni) x[FALSE] else x, Dimnames = .M.DN(from))
-      })
-
-## ``generic'' coercion to  diagonalMatrix : build on  isDiagonal() and diag()
-setAs("Matrix", "diagonalMatrix",
-      function(from) {
-	  d <- dim(from)
-	  if(d[1] != (n <- d[2])) stop("non-square matrix")
-	  if(!isDiagonal(from)) stop("matrix is not diagonal")
-	  ## else:
-	  x <- diag(from); names(x) <- NULL # don't want them in 'x' slot
-	  if(is.logical(x)) {
-	      cl <- "ldiMatrix"
-	      uni <- allTrue(x)
-	  } else {
-	      cl <- "ddiMatrix"
-	      uni <- allTrue(x == 1)
-	      storage.mode(x) <- "double"
-	  } ## TODO: complex
-	  new(cl, Dim = c(n,n), diag = if(uni) "U" else "N",
-	      x = if(uni) x[FALSE] else x, Dimnames = from@Dimnames)
-      })
-
 
 diag.x <- function(x, nrow, ncol, names=TRUE) {
     y <- .diag.x(x)
@@ -1119,7 +1283,7 @@ setMethod("Arith", signature(e1 = "triangularMatrix", e2 = "diagonalMatrix"),
 		     e1 ^ as(e2, "denseMatrix")
 		 },
 		 ## otherwise:
-		 callGeneric(e1, diag2Tsmart(e2,e1)))
+		 callGeneric(e1, .diag2T.smart(e2, e1)))
 })
 
 ## Compare --> 'swap' (e.g.   e1 < e2   <==>  e2 > e1 ):
@@ -1138,14 +1302,14 @@ setMethod("Logic", signature(e1 = "triangularMatrix", e2 = "diagonalMatrix"),
 ##
 ## ddi*:
 setMethod("Ops", signature(e1 = "ddiMatrix", e2 = "sparseMatrix"),
-	  function(e1,e2) callGeneric(diag2Tsmart(e1,e2, "d"), e2))
+	  function(e1,e2) callGeneric(.diag2T.smart(e1, e2, kind = "d"), e2))
 setMethod("Ops", signature(e1 = "sparseMatrix", e2 = "ddiMatrix"),
-	  function(e1,e2) callGeneric(e1, diag2Tsmart(e2,e1, "d")))
+	  function(e1,e2) callGeneric(e1, .diag2T.smart(e2, e1, kind = "d")))
 ## ldi*
 setMethod("Ops", signature(e1 = "ldiMatrix", e2 = "sparseMatrix"),
-	  function(e1,e2) callGeneric(diag2Tsmart(e1,e2, "l"), e2))
+	  function(e1,e2) callGeneric(.diag2T.smart(e1, e2, kind = "l"), e2))
 setMethod("Ops", signature(e1 = "sparseMatrix", e2 = "ldiMatrix"),
-	  function(e1,e2) callGeneric(e1, diag2Tsmart(e2,e1, "l")))
+	  function(e1,e2) callGeneric(e1, .diag2T.smart(e2, e1, kind = "l")))
 
 ## Ops:	 Arith	--> numeric : "dMatrix"
 ##	 Compare --> logical
@@ -1174,7 +1338,7 @@ setMethod("Arith", signature(e1 = "ddiMatrix", e2 = arg2),
 		  }
 		  e1
 	      } else
-		  callGeneric(diag2tT.u(e1,e2, "d"), e2)
+		  callGeneric(.diag2tT.smart(e1, e2, kind = "d"), e2)
 	  })
 
 for(arg1 in c("numeric","logical"))
@@ -1198,7 +1362,7 @@ setMethod("Arith", signature(e1 = arg1, e2 = "ddiMatrix"),
 		  }
 		  e2
 	      } else
-		  callGeneric(e1, diag2tT.u(e2,e1, "d"))
+		  callGeneric(e1, .diag2tT.smart(e2, e1, kind = "d"))
 	  })
 
 ## ldi* Arith --> result numeric, potentially ddiMatrix
@@ -1226,7 +1390,7 @@ setMethod("Arith", signature(e1 = "ldiMatrix", e2 = arg2),
 		  }
 		  E
 	      } else
-		  callGeneric(diag2tT.u(e1,e2, "l"), e2)
+		  callGeneric(.diag2tT.smart(e1, e2, kind = "l"), e2)
 	  })
 
 for(arg1 in c("numeric","logical"))
@@ -1253,7 +1417,7 @@ setMethod("Arith", signature(e1 = arg1, e2 = "ldiMatrix"),
 		  }
 		  E
 	      } else
-		  callGeneric(e1, diag2tT.u(e2,e1, "l"))
+		  callGeneric(e1, .diag2tT.smart(e2, e1, kind = "l"))
 	  })
 
 ## ddi*: for "Ops" without "Arith": <Compare> or <Logic> --> result logical, potentially ldi
@@ -1288,7 +1452,7 @@ setMethod("Ops", signature(e1 = "ddiMatrix", e2 = arg2),
 		  }
 		  E
 	      } else
-		  callGeneric(diag2tT.u(e1,e2, "d"), e2)
+		  callGeneric(.diag2tT.smart(e1, e2, kind = "d"), e2)
 	  })
 
 ## ldi*: for "Ops" without "Arith": <Compare> or <Logic> --> result logical, potentially ldi
@@ -1313,7 +1477,7 @@ setMethod("Ops", signature(e1 = "ldiMatrix", e2 = arg2),
 		  }
 		  e1
 	      } else
-		  callGeneric(diag2tT.u(e1,e2, "l"), e2)
+		  callGeneric(.diag2tT.smart(e1, e2, kind = "l"), e2)
 	  })
 
 
@@ -1321,14 +1485,14 @@ setMethod("Ops", signature(e1 = "ldiMatrix", e2 = arg2),
 for(other in c("ANY", "Matrix", "dMatrix")) {
     ## ddi*:
     setMethod("Ops", signature(e1 = "ddiMatrix", e2 = other),
-	      function(e1,e2) callGeneric(diag2Tsmart(e1,e2, "d"), e2))
+	      function(e1,e2) callGeneric(.diag2T.smart(e1, e2, kind="d"), e2))
     setMethod("Ops", signature(e1 = other, e2 = "ddiMatrix"),
-	      function(e1,e2) callGeneric(e1, diag2Tsmart(e2,e1, "d")))
+	      function(e1,e2) callGeneric(e1, .diag2T.smart(e2, e1, kind="d")))
     ## ldi*:
     setMethod("Ops", signature(e1 = "ldiMatrix", e2 = other),
-	      function(e1,e2) callGeneric(diag2Tsmart(e1,e2, "l"), e2))
+	      function(e1,e2) callGeneric(.diag2T.smart(e1, e2, kind="l"), e2))
     setMethod("Ops", signature(e1 = other, e2 = "ldiMatrix"),
-	      function(e1,e2) callGeneric(e1, diag2Tsmart(e2,e1, "l")))
+	      function(e1,e2) callGeneric(e1, .diag2T.smart(e2, e1, kind="l")))
 }
 
 ## Direct subclasses of "denseMatrix": currently ddenseMatrix, ldense... :
@@ -1338,9 +1502,9 @@ dense.subCl <- local({ dM.scl <- getClass("denseMatrix")@subclasses
 dense.subCl <- paste0(c("d","l","n"), "denseMatrix")
 for(DI in diCls) {
     dMeth <- if(extends(DI, "dMatrix"))
-	function(e1,e2) callGeneric(diag2Tsmart(e1,e2, "d"), e2)
+	function(e1,e2) callGeneric(.diag2T.smart(e1, e2, kind = "d"), e2)
     else # "lMatrix", the only other kind for now
-	function(e1,e2) callGeneric(diag2Tsmart(e1,e2, "l"), e2)
+	function(e1,e2) callGeneric(.diag2T.smart(e1, e2, kind = "l"), e2)
     for(c2 in c(dense.subCl, "Matrix")) {
 	for(Fun in c("*", "&")) {
 	    setMethod(Fun, signature(e1 = DI, e2 = c2),

@@ -1,24 +1,23 @@
 \name{chol}
 \title{Choleski Decomposition - 'Matrix' S4 Generic and Methods}
+%
 \alias{chol}
 \alias{chol-methods}
+%
 \alias{chol,Matrix-method}
-% dense methods
 \alias{chol,ddenseMatrix-method}
+\alias{chol,ddiMatrix-method}
 \alias{chol,dgeMatrix-method}
 \alias{chol,dpoMatrix-method}
 \alias{chol,dppMatrix-method}
-%   diagonal
-\alias{chol,ddiMatrix-method}
-\alias{chol,ldiMatrix-method}
-% sparse methods
-\alias{chol,dsparseMatrix-method}
 \alias{chol,dsCMatrix-method}
-\alias{chol,lsCMatrix-method}
-\alias{chol,nsCMatrix-method}
+\alias{chol,dsparseMatrix-method}
 \alias{chol,dtCMatrix-method}
 \alias{chol,dtRMatrix-method}
 \alias{chol,dtTMatrix-method}
+\alias{chol,ldiMatrix-method}
+\alias{chol,lsCMatrix-method}
+\alias{chol,nsCMatrix-method}
 %
 \description{
   Compute the Choleski factorization of a real symmetric

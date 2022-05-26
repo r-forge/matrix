@@ -1,6 +1,6 @@
 \name{dmperm}
-\alias{dmperm}
 \title{Dulmage-Mendelsohn Permutation / Decomposition}
+\alias{dmperm}
 \description{
   For any \eqn{n \times m}{n * m} (typically) sparse matrix \code{x}
   compute the Dulmage-Mendelsohn row and columns permutations which at

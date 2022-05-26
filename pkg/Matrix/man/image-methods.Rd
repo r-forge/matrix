@@ -1,17 +1,20 @@
 \name{image-methods}
 \title{Methods for image() in Package 'Matrix'}
 \docType{methods}
-%\alias{image}% <- needed for \usage{.}
+%
+%\alias{image} % needed for \usage{}
 \alias{image-methods}
+%
 \alias{image,ANY-method}
 \alias{image,CHMfactor-method}
 \alias{image,Matrix-method}
-\alias{image,dgRMatrix-method}
 \alias{image,dgCMatrix-method}
+\alias{image,dgRMatrix-method}
 \alias{image,dgTMatrix-method}
 \alias{image,dsparseMatrix-method}
 \alias{image,lsparseMatrix-method}
 \alias{image,nsparseMatrix-method}
+%
 \description{
   Methods for function \code{\link[graphics]{image}} in package
   \pkg{Matrix}.  An image of a matrix simply color codes all matrix
@@ -23,7 +26,7 @@
   these methods return an \dQuote{object} of class \code{"trellis"},
   producing a graphic when (auto-) \code{\link{print}()}ed.
 }
-\usage{% want \usage{} since we have many "surprising arguments"
+\usage{ % want \usage{} since we have many "surprising arguments"
 \S4method{image}{dgTMatrix}(x,
       xlim = c(1, di[2]),
       ylim = c(di[1], 1), aspect = "iso",

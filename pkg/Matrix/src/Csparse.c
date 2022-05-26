@@ -299,7 +299,7 @@ SEXP Csparse_to_matrix(SEXP x, SEXP chk, SEXP symm)
 	cholmod_sparse_to_dense(AS_CHM_SP2(x, asLogical(chk)), &c),
 	1 /*do_free*/,
 	(is_sym
-	 ? get_symmetrized_DimNames(x)
+	 ? get_symmetrized_DimNames(x, -1)
 	 : GET_SLOT(x, Matrix_DimNamesSym)));
 }
 
@@ -356,7 +356,7 @@ SEXP Csparse_symmetric_to_general(SEXP x)
 	error(_("Nonsymmetric matrix in Csparse_symmetric_to_general"));
     chgx = cholmod_copy(chx, /* stype: */ 0, chx->xtype, &c);
     return chm_sparse_to_SEXP(chgx, 1, 0, Rkind, "",
-			      get_symmetrized_DimNames(x));
+			      get_symmetrized_DimNames(x, -1));
 }
 
 // Called from R's  forceCspSymmetric() ,  .gC2sym()
@@ -373,38 +373,24 @@ SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo, SEXP sym_dmns)
     R_CheckStack();
     chgx = cholmod_copy(chx, /* stype: */ (uploT ? 1 : -1), chx->xtype, &c);
 
-    SEXP dn = GET_SLOT(x, Matrix_DimNamesSym);
-    int symDmns = asLogical(sym_dmns); /* 1, NA_LOGICAL or 0 */
-    /* 3 cases:
-       FALSE: keep as is;
-       TRUE : symmetric dimnames in any case
-       NA   : symmetrize if(...)
+    SEXP ans, dn = GET_SLOT(x, Matrix_DimNamesSym);
+    int symDmns = asLogical(sym_dmns);
+    /* 3 cases ... 0: do nothing
+                   1: symmetrize
+          NA_LOGICAL: symmetrize if necessary
     */
-    if(symDmns == FALSE) { } // *keep* asymmetric dimnames:  do nothing
-    else if(symDmns == TRUE)
-	symmDN(dn, -1);
-    else // NA_LOGICAL (was 'FALSE' case) :
-	if((!isNull(VECTOR_ELT(dn, 0)) &&
-	    !isNull(VECTOR_ELT(dn, 1))) ||
-	   !isNull(getAttrib(dn, R_NamesSymbol))) {
-	    /* Symmetrize if both rownames and colnames are non-NULL
-	       _or_ if names(dimnames(.)) is non-NULL
-	       
-	       FIXME: Inconsistent with 'dense_to_symmetric',
-	              which symmetrizes unconditionally ...
-		      _and_ inconsistent with TRUE case which
-		      uses colnames if non-NULL and rownames
-		      otherwise, regardless of 'uploT' ...
-		      _and_ it is slightly awkward to symmetrize
-		      the dimnames _just_ because names(dimnames(.))
-		      is non-NULL ...
-	    */
-	    dn = PROTECT(duplicate(dn));
-	    symmDN(dn, uploT);
-	    UNPROTECT(1);
-	}
-    /* Rkind: pattern, "real", complex or .. */
-    return chm_sparse_to_SEXP(chgx, 1, 0, Rkind, "", dn);
+    symDmns = (symDmns == 1 ||
+	       (symDmns != 0 &&
+		((!isNull(VECTOR_ELT(dn, 0)) && !isNull(VECTOR_ELT(dn, 1))) ||
+		 !isNull(getAttrib(dn, R_NamesSymbol)))));
+    if (symDmns) {
+	SEXP newdn = PROTECT(allocVector(VECSXP, 2));
+	symmDN(newdn, dn, -1);
+	dn = newdn;
+    }
+    ans = chm_sparse_to_SEXP(chgx, 1, 0, Rkind, "", dn);
+    UNPROTECT(symDmns);
+    return ans;
 }
 
 SEXP Csparse_transpose(SEXP x, SEXP tri)
@@ -516,9 +502,13 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b, SEXP bool_arith)
 	b_symm = R_check_class_etc(b, valid_sym) >= 0;
     SEXP dn = PROTECT(allocVector(VECSXP, 2));
     SET_VECTOR_ELT(dn, 0,
-		   duplicate(VECTOR_ELT(a_symm ? get_symmetrized_DimNames(a) : GET_SLOT(a, Matrix_DimNamesSym), 0)));
+		   duplicate(VECTOR_ELT(a_symm ?
+					get_symmetrized_DimNames(a, -1)
+					: GET_SLOT(a, Matrix_DimNamesSym), 0)));
     SET_VECTOR_ELT(dn, 1,
-		   duplicate(VECTOR_ELT(b_symm ? get_symmetrized_DimNames(b) : GET_SLOT(b, Matrix_DimNamesSym), 1)));
+		   duplicate(VECTOR_ELT(b_symm
+					? get_symmetrized_DimNames(b, -1)
+					: GET_SLOT(b, Matrix_DimNamesSym), 1)));
     UNPROTECT(nprot);
     return chm_sparse_to_SEXP(chc, 1, uploT, /*Rkind*/0, diag, dn);
 }
@@ -650,23 +640,22 @@ SEXP Csp_dense_products(SEXP a, SEXP b,
        according to the general R philosophy of treating vectors in matrix products.
     */
 
-    /* repeating a "cheap part" of  dup_mMatrix_as_dgeMatrix2(b, FALSE, .)  
-     * to see if we have a vector that we might 'transpose_if_vector' : */
+    /* repeating a "cheap part" of dense_as_geMatrix() 
+       to see if we have a vector that we might 'transpose_if_vector' : */
     static const char *valid[] = {MATRIX_VALID_ddense, ""};
-    if (R_check_class_etc(b, valid) < 0) {
+    if (R_check_class_etc(b, valid) < 0)
 	// _not_ a ddenseM* or a ddiM*:  is.matrix() or vector:
 	b_is_vector = !isMatrix(b);
-    }
 
     if(b_is_vector) {
 	/* determine *if* we want/need to transpose at all:
 	 * if (length(b) == ncol(A)) have match: use dim = c(n, 1) (<=> do *not* transp);
 	 *  otherwise, try to transpose: ok  if (ncol(A) == 1) [see also above]:  */
 	maybe_transp_b = (XLENGTH(b) != a_nc);
-	// Here, we transpose already in mMatrix_as_dge*()  ==> don't do it later:
+	// Here, we transpose already in dense_as_ge*()  ==> don't do it later:
 	transp_b = FALSE;
     }
-    SEXP b_M = PROTECT(dup_mMatrix_as_dgeMatrix2(b, FALSE, maybe_transp_b));
+    SEXP b_M = PROTECT(dense_as_geMatrix(b, 'd', 2, maybe_transp_b));
 
     CHM_DN chb = AS_CHM_DN(b_M), b_t;
     R_CheckStack();

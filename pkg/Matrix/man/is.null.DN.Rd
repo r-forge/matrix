@@ -1,6 +1,6 @@
 \name{is.null.DN}
-\alias{is.null.DN}
 \title{Are the Dimnames \code{dn} NULL-like ?}
+\alias{is.null.DN}
 \description{
   Are the \code{\link{dimnames}} \code{dn} \code{\link{NULL}}-like?
 

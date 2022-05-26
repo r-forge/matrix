@@ -1,13 +1,30 @@
-#### symmetricMatrix : virtual class
+## Methods for virtual class "symmetricMatrix" of symmetric matrices
+.sM.subclasses <- names(getClassDef("symmetricMatrix")@subclasses)
 
-setAs("denseMatrix", "symmetricMatrix",
-      function(from) ##		           vvvv  do *check* symmetry
-      .Call(dense_to_symmetric, from, "U", TRUE))
-setAs("matrix", "symmetricMatrix",
-      function(from) .Call(dense_to_symmetric, from, "U", TRUE))
+## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+setAs("Matrix", "symmetricMatrix", ..M2symm)
+setAs("matrix", "symmetricMatrix", ..M2symm)
+
+## MJ: prefer more general methods above going via forceSymmetric(),
+##     for which specialized methods should be defined
+## MJ: methods above _do_ tolerate numerical fuzz; those below _did not_ ...
+if(FALSE) {
+setAs("denseMatrix", "symmetricMatrix", # checking symmetry vvvv
+      function(from) .Call(dense_to_symmetric, from, "U",   TRUE))
+setAs("matrix", "symmetricMatrix",      # checking symmetry vvvv
+      function(from) .Call(dense_to_symmetric, from, "U",   TRUE))
+} ## MJ
+
+
+## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+setMethod("dimnames", signature(x = "symmetricMatrix"),
+          function(x) symmDN(x@Dimnames))
 
 setMethod("isSymmetric", signature(object = "symmetricMatrix"),
           function(object, ...) TRUE)
+
 setMethod("isTriangular", signature(object = "symmetricMatrix"),
           function(object, upper = NA, ...) {
               if(!isDiagonal(object))
@@ -18,58 +35,46 @@ setMethod("isTriangular", signature(object = "symmetricMatrix"),
                   TRUE
           })
 
-### ----------- forceSymmetric() ----- *all* methods ------------------------
+.sM.force1 <- function(x, uplo) x
+.sM.force2 <- function(x, uplo) if(uplo == x@uplo) x else t(x)
+for (.cl in setdiff(.sM.subclasses, c("dpoMatrix", "dppMatrix", "corMatrix"))) {
+    setMethod("forceSymmetric", signature(x = .cl, uplo = "missing"),
+	      .sM.force1)
+    setMethod("forceSymmetric", signature(x = .cl, uplo = "character"),
+	      .sM.force2)
+}
+rm(.sM.force1, .sM.force2, .cl)
 
+## MJ: no longer needed ... replacement in ./(un)?packedMatrix.R
+if(FALSE) {
 ## forceSymmetric() coerces to "symmetricMatrix"  withOUT  testing
 ## ---------------- contrary to  as(M, <symmetric>)  which should only
 ## work when 'M' is a symmetric matrix __ in the sense of isSymmetric() __
 ## i.e., with allowing a little bit of asymmetric numeric fuzz:
-
-setMethod("forceSymmetric", signature(x = "matrix", uplo="ANY"),
-	  function(x, uplo)
-	      .Call(dense_to_symmetric, x,
-		    if(missing(uplo)) "U" else uplo, FALSE))
-
-
-symCls <- names(getClass("symmetricMatrix")@subclasses)
-for(cls in symCls) {
-    ## When x is symmetric and uplo is missing, we keep 'uplo' from 'x':
-    setMethod("forceSymmetric", signature(x = cls, uplo="missing"),
-	      function(x, uplo) x)
-
-    setMethod("forceSymmetric", signature(x = cls, uplo="character"),
-	      function(x, uplo) {
-		  if(uplo == x@uplo)
-		      x
-		  else ## uplo is "wrong" for x
-		      t(x)
-	      })
-}
-
-setMethod("forceSymmetric", signature(x = "denseMatrix", uplo="character"),
-	  function(x, uplo) .Call(dense_to_symmetric, x, uplo, FALSE))
-setMethod("forceSymmetric", signature(x = "denseMatrix", uplo="missing"),
+setMethod("forceSymmetric", signature(x = "denseMatrix", uplo = "missing"),
 	  function(x, uplo) {
 	      uplo <- if(is(x, "triangularMatrix")) x@uplo else "U"
-	      ## FIXME?	 diagU2N() ??
-	      .Call(dense_to_symmetric, x, uplo, FALSE)
-	  })
+	      .Call(dense_to_symmetric, x, uplo, FALSE) ## FIXME? diagU2N()?
+          })
+setMethod("forceSymmetric", signature(x = "denseMatrix", uplo = "character"),
+	  function(x, uplo) .Call(dense_to_symmetric, x, uplo, FALSE))
+setMethod("forceSymmetric", signature(x = "matrix", uplo = "missing"),
+	  function(x, uplo) .Call(dense_to_symmetric, x,  "U", FALSE))
+setMethod("forceSymmetric", signature(x = "matrix", uplo = "character"),
+	  function(x, uplo) .Call(dense_to_symmetric, x, uplo, FALSE))
+}
 
-setMethod("forceSymmetric", signature(x="sparseMatrix"),
-	  function(x, uplo) {
-	      x <- as(x, "CsparseMatrix")
-	      callGeneric()
-	  })
-
-##' @title Transform a CsparseMatrix into a [dln]sCMatrix (symmetricMatrix)
-##' @param x CsparseMatrix
-##' @param uplo missing, "U", or "L"
-##' @param isTri logical specifying if 'x' is triangular
-##' @param symDimnames logical specifying if dimnames() will be forced to
-##'  symmetric even when one of the two is NULL.
-##' New: 3 cases  {FALSE, NA, TRUE} [default: now 'NA' was equivalent to originally 'FALSE']
-forceCspSymmetric <- function(x, uplo, isTri = is(x, "triangularMatrix"), symDimnames = NA)
-{
+##' @title Symmetrize (coerce to '.sCMatrix') a 'CsparseMatrix'
+##' @param x a \code{"CsparseMatrix"}.
+##' @param uplo \code{"U"}, \code{"L"}, or missing.
+##' @param isTri a logical indicating if \code{x} is triangular.
+##' @param symDimnames a logical indicating if the \code{Dimnames} slot
+##'     should be symmetrized; \code{NA} is to symmetrize if and only if
+##'     \code{Dimnames[[1]]} and \code{Dimnames[[2]]} are non-\code{NULL}
+##'     or \code{names(Dimnames)} is non-\code{NULL}.
+forceCspSymmetric <- function(x, uplo,
+                              isTri = is(x, "triangularMatrix"),
+                              symDimnames = NA) {
     ## isTri ==> effectively *diagonal*
     if(isTri && x@diag == "U")
 	x <- .Call(Csparse_diagU2N, x)
@@ -77,21 +82,27 @@ forceCspSymmetric <- function(x, uplo, isTri = is(x, "triangularMatrix"), symDim
 	uplo <- if(isTri) x@uplo else "U"
     .Call(Csparse_general_to_symmetric, x, uplo, symDimnames)
 }
-.gC2sym <- function(x, uplo, symDimnames = NA)
+
+.gC2sym <- function(x, uplo, symDimnames = NA) {
     .Call(Csparse_general_to_symmetric, x, uplo, symDimnames)
+}
 
-
-setMethod("forceSymmetric", signature(x="CsparseMatrix"),
-	  function(x, uplo) forceCspSymmetric(x, uplo))
-
-
+## MJ: symmetrizing 'Dimnames' slot unconditionally for consistency with
+##     methods for denseMatrix, which had always symmetrized unconditionally
+setMethod("forceSymmetric", signature(x = "CsparseMatrix"),
+	  function(x, uplo) {
+              forceCspSymmetric(x, uplo,
+                                symDimnames = TRUE)
+          })
+setMethod("forceSymmetric", signature(x = "sparseMatrix"),
+	  function(x, uplo) {
+              forceCspSymmetric(as(x, "CsparseMatrix"), uplo,
+                                symDimnames = TRUE)
+          })
 setMethod("symmpart", signature(x = "symmetricMatrix"), function(x) x)
 setMethod("skewpart", signature(x = "symmetricMatrix"), function(x) .setZero(x))
 
-setMethod("dimnames", signature(x = "symmetricMatrix"),
-          function(x) symmDN(x@Dimnames))
-
-## MJ: No longer needed ... replacement in ./(un)?packedMatrix.R
+## MJ: no longer needed ... replacement in ./(un)?packedMatrix.R
 if (FALSE) {
 ###------- pack() and unpack() --- for *dense*  symmetric & triangular matrices:
 packM <- function(x, Mtype, kind, unpack=FALSE) {
@@ -155,7 +166,7 @@ setMethod("unpack", "dtpMatrix",
 ##  ~~~~~~~~~~~~~~~~~~~~~~~~~
 ## Basic problem:
 ## This should work at package install time when package:Matrix does not exist!
-if(FALSE)
+if(FALSE) {
 local({
     allCl <- getClasses("package:Matrix") ## << fails at install time!!!!
     clss <- allCl[sapply(allCl, extends, class2 = "Matrix")]
@@ -176,3 +187,6 @@ local({
         }
     }## for
 })
+}
+
+rm(.sM.subclasses)

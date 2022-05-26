@@ -2,7 +2,6 @@
 \title{Symmetric Sparse Compressed Row Matrices}
 \docType{class}
 \alias{dsRMatrix-class}
-%
 \description{The \code{dsRMatrix} class is a class of symmetric, sparse
   matrices in the compressed, row-oriented format.  In this
   implementation the non-zero elements in the rows are sorted into

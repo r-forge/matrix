@@ -1,6 +1,10 @@
 setAs("matrix", "lMatrix",
       function(from) { storage.mode(from) <- "logical" ; Matrix(from) })
 
+## MJ: no longer ... prefer more efficient methods defined for denseMatrix,
+##     .sparseMatrix, and diagonalMatrix separately, going via C utilities
+##     R_(dense|sparse)_as_kind() and R_diagonal_as_sparse()
+if(FALSE) {
 ## NOTE: This is *VERY* parallel to  ("dMatrix" -> "nMatrix") in ./dMatrix.R :
 setAs("lMatrix", "nMatrix",
       function(from) {
@@ -57,6 +61,7 @@ setAs("lMatrix", "dMatrix",
 	  r@x <- as.double(from@x)
 	  r
       })
+}
 
 ## needed at least for lsparse* :
 setAs("lMatrix", "dgCMatrix",

@@ -1,16 +1,21 @@
 \name{dsparseMatrix-class}
+\title{Virtual Class "dsparseMatrix" of Numeric Sparse Matrices}
 \docType{class}
+%
 \alias{dsparseMatrix-class}
-% Group
-\alias{Summary,dsparseMatrix-method}
+%
 \alias{Arith,dsparseMatrix,logical-method}
 \alias{Arith,dsparseMatrix,numeric-method}
 \alias{Arith,logical,dsparseMatrix-method}
 \alias{Arith,numeric,dsparseMatrix-method}
+\alias{Ops,dsparseMatrix,nsparseMatrix-method}
+\alias{Summary,dsparseMatrix-method}
+\alias{coerce,dsparseMatrix,lMatrix-method}
+\alias{coerce,dsparseMatrix,lsparseMatrix-method}
+\alias{coerce,dsparseMatrix,nMatrix-method}
+\alias{coerce,dsparseMatrix,nsparseMatrix-method}
+\alias{determinant,dsparseMatrix,logical-method}
 %
-\alias{lu,dsparseMatrix-method}
-%
-\title{Virtual Class "dsparseMatrix" of Numeric Sparse Matrices}
 \description{The Class \code{"dsparseMatrix"} is the virtual (super) class of
   all numeric sparse matrices.
 }

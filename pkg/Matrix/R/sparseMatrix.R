@@ -1,5 +1,22 @@
 ### Define Methods that can be inherited for all subclasses
 
+.sparse2dkind <- function(from) .Call(R_sparse_as_kind, from, "d")
+.sparse2lkind <- function(from) .Call(R_sparse_as_kind, from, "l")
+.sparse2nkind <- function(from) .Call(R_sparse_as_kind, from, "n")
+setAs("dsparseMatrix", "lMatrix", .sparse2lkind)
+setAs("dsparseMatrix", "nMatrix", .sparse2nkind)
+setAs("lsparseMatrix", "dMatrix", .sparse2dkind)
+setAs("lsparseMatrix", "nMatrix", .sparse2nkind)
+setAs("nsparseMatrix", "dMatrix", .sparse2dkind)
+setAs("nsparseMatrix", "lMatrix", .sparse2lkind)
+setAs("dsparseMatrix", "lsparseMatrix", .sparse2lkind)
+setAs("dsparseMatrix", "nsparseMatrix", .sparse2nkind)
+setAs("lsparseMatrix", "dsparseMatrix", .sparse2dkind)
+setAs("lsparseMatrix", "nsparseMatrix", .sparse2nkind)
+setAs("nsparseMatrix", "dsparseMatrix", .sparse2dkind)
+setAs("nsparseMatrix", "lsparseMatrix", .sparse2lkind)
+rm(.sparse2dkind, .sparse2lkind, .sparse2nkind)
+
 ### Idea: Coercion between *VIRTUAL* classes -- as() chooses "closest" classes
 ### ----  should also work e.g. for  dense-triangular --> sparse-triangular !
 
@@ -19,6 +36,8 @@ setAs("sparseMatrix", "generalMatrix", as_gSparse)
 setAs("sparseMatrix", "symmetricMatrix", as_sSparse)
 
 setAs("sparseMatrix", "triangularMatrix", as_tSparse)
+
+
 
 spMatrix <- function(nrow, ncol,
                      i = integer(), j = integer(), x = numeric())

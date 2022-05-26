@@ -1,8 +1,10 @@
 \name{diagU2N}
 \title{Transform Triangular Matrices from Unit Triangular to General Triangular and Back}
+%
 \alias{diagN2U}
 \alias{diagU2N}
 \alias{.diagU2N}
+%
 \description{
   Transform a triangular matrix \code{x}, i.e., of \code{\link{class}}
   \code{"\linkS4class{triangularMatrix}"},

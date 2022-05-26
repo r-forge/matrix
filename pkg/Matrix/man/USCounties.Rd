@@ -1,7 +1,7 @@
 \name{USCounties}
-\alias{USCounties}
-\docType{data}
 \title{USCounties Contiguity Matrix}
+\docType{data}
+\alias{USCounties}
 \description{
   This matrix represents the contiguities of 3111 US counties using the
   Queen criterion of at least a single shared boundary point. The

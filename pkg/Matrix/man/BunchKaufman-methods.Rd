@@ -1,11 +1,14 @@
 \name{BunchKaufman-methods}
 \title{Bunch-Kaufman Decomposition Methods}
 \docType{methods}
+%
 \alias{BunchKaufman}
 \alias{BunchKaufman-methods}
+%
 \alias{BunchKaufman,dspMatrix-method}
 \alias{BunchKaufman,dsyMatrix-method}
 \alias{BunchKaufman,matrix-method}
+%
 \description{
   The Bunch-Kaufman Decomposition of a square symmetric matrix \eqn{A}
   is \eqn{A = P LDL' P'} where \eqn{P} is a permutation matrix, \eqn{L}

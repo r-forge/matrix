@@ -2,11 +2,15 @@
 \title{Virtual Class \code{"unpackedMatrix"} of Unpacked Dense Matrices}
 \Rdversion{1.1}
 \docType{class}
+%
 \alias{unpackedMatrix-class}
 %
-\alias{t,unpackedMatrix-method}
+\alias{coerce,matrix,unpackedMatrix-method}
+\alias{coerce,numLike,unpackedMatrix-method}
 \alias{diag,unpackedMatrix-method}
 \alias{diag<-,unpackedMatrix-method}
+\alias{t,unpackedMatrix-method}
+%
 \description{
   Class \code{"unpackedMatrix"} is the \emph{virtual} class of dense
   matrices in "unpacked" format, storing all \code{m*n} elements of

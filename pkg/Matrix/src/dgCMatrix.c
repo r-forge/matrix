@@ -69,7 +69,7 @@ SEXP compressed_to_TMatrix(SEXP x, SEXP colP)
 	if(ctype % 3 == 2) /* t(riangular) : */
 	    slot_dup(ans, x, Matrix_diagSym);
     }
-    set_DimNames(ans, x);
+    set_DimNames(ans, GET_SLOT(x, Matrix_DimNamesSym));
     // possibly asymmetric for symmetricMatrix is ok
     SET_SLOT(ans, indSym, duplicate(indP));
     expand_cmprPt(npt, INTEGER(pP),
@@ -114,7 +114,7 @@ SEXP R_to_CMatrix(SEXP x)
     SET_SLOT(ans, Matrix_iSym, duplicate(GET_SLOT(x, Matrix_jSym)));
     slot_dup(ans, x, Matrix_pSym);
     REPROTECT(ans = Csparse_transpose(ans, tri), ipx);
-    set_DimNames(ans, x);
+    set_DimNames(ans, GET_SLOT(x, Matrix_DimNamesSym));
     // possibly asymmetric for symmetricMatrix is ok
     free(ncl);
     UNPROTECT(2);
@@ -486,7 +486,7 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
 	 */
 
     }
-    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(b, TRUE)),
+    SEXP ans = PROTECT(dense_as_geMatrix(b, 'd', 2, 0)),
 	lu, qslot;
     CSP L, U;
     int *bdims = INTEGER(GET_SLOT(ans, Matrix_DimSym)), *p, *q;

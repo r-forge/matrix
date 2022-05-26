@@ -3,6 +3,9 @@
 
 #undef Matrix_with_SPQR
 
+#undef HAVE_PROPER_IMATRIX
+#undef HAVE_PROPER_ZMATRIX
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -15,8 +18,7 @@ extern "C" {
 #include <R_ext/RS.h> /* for Memzero() */
 
 /* NB: For 'USE_FC_LEN_T' and 'FCONE' (for LTO), 
-   the "includer" will #include "Lapack-etc.h"
-*/
+   the "includer" will #include "Lapack-etc.h" */
 
 /* From <Defn.h> : */
 /* 'alloca' is neither C99 nor POSIX */
@@ -106,9 +108,13 @@ extern
 #define imax2(x, y) ((x < y) ? y : x)
 #define imin2(x, y) ((x < y) ? x : y)
 
+/* int i, j, n; R_xlen_t n2; */
+#define PM_AR21_UP(i, j) ((i) + ((j) * (((R_xlen_t) (j)) + 1)) / 2)
+#define PM_AR21_LO(i, j, n2) ((i) + ((j) * ((n2) - (j) - 1)) / 2)
+#define PM_LENGTH(n) (((n) * ((R_xlen_t) (n) + 1)) / 2)
+
 /* Zero an array, but note Memzero() which might be FASTER 
-   and uses R_SIZE_T (== size_t for C)
-*/
+   and uses R_SIZE_T (== size_t for C) */
 #define AZERO4(_X_, _N_, _ZERO_, _ITYPE_)				\
     do {								\
 	for (_ITYPE_ _I_ = 0, _LEN_ = (_N_); _I_ < _LEN_; ++_I_) {	\
@@ -147,15 +153,13 @@ enum x_slot_kind {
     x_integer = 2,  /* i */
     x_complex = 3}; /* z */
 /* FIXME: use 'x_slot_kind' instead of 'int' 
-   everywhere 'Real_(KIND2?|kind_?)' is used
-*/
+   everywhere 'Real_(KIND2?|kind_?)' is used */
 
 #define Real_kind_(_x_)							\
     (isReal(_x_) ? x_double : (isLogical(_x_) ? x_logical : x_pattern))
 
 /* Requires 'x' slot, i.e., not for "..nMatrix"
-   FIXME? via R_has_slot(obj, name)
-*/
+   FIXME? via R_has_slot(obj, name) */
 #define Real_kind(_x_)				\
     (Real_kind_(GET_SLOT(_x_, Matrix_xSym)))
     
@@ -190,72 +194,150 @@ SEXP ndenseMatrix_validate(SEXP obj);
 SEXP iMatrix_validate(SEXP obj);
 SEXP zMatrix_validate(SEXP obj);
 
-SEXP R_DimNames_fixup(SEXP dimnames);
-SEXP R_DimNames_is_symmetric(SEXP dn);
+SEXP R_DimNames_fixup(SEXP dn);
+
 Rboolean DimNames_is_symmetric(SEXP dn);
+SEXP R_DimNames_is_symmetric(SEXP dn);
+    
+void symmDN(SEXP dest, SEXP src, int J);
 SEXP R_symmDN(SEXP dn);
-void symmDN(SEXP dn, int J);
-SEXP get_symmetrized_DimNames(SEXP x);
-void set_symmetrized_DimNames(SEXP dest, SEXP src);
-void set_DimNames(SEXP dest, SEXP src);
+SEXP get_symmetrized_DimNames(SEXP obj, int J);
+void set_symmetrized_DimNames(SEXP obj, SEXP dn, int J);
+
+void revDN(SEXP dest, SEXP src);
+SEXP R_revDN(SEXP dn);
+SEXP get_reversed_DimNames(SEXP obj);
+void set_reversed_DimNames(SEXP obj, SEXP dn);
+
+void set_DimNames(SEXP obj, SEXP dn);
 
 SEXP get_factor(SEXP obj, char *nm);
 void set_factor(SEXP obj, char *nm, SEXP val);
 SEXP R_set_factor(SEXP obj, SEXP val, SEXP nm, SEXP warn);
 SEXP R_empty_factors(SEXP obj, SEXP warn);
 
-double *ddense_pack(double *dest, const double *src, int n,
-		    enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
-int *idense_pack(int *dest, const int *src, int n,
-		 enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
-Rcomplex *zdense_pack(Rcomplex *dest, const Rcomplex *src, int n,
-		      enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
+#define PACK(_PREFIX_, _CTYPE_)						\
+void _PREFIX_ ## dense_pack(_CTYPE_ *dest, const _CTYPE_ *src, int n,	\
+			    char uplo, char diag)
+PACK(d, double);
+PACK(i, int);
+PACK(z, Rcomplex);
+#undef PACK
 
-double *ddense_unpack(double *dest, const double *src, int n,
-		      enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
-int *idense_unpack(int *dest, const int *src, int n,
-		   enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
-Rcomplex *zdense_unpack(Rcomplex *dest, const Rcomplex *src, int n,
-			enum CBLAS_UPLO uplo, enum CBLAS_DIAG diag);
+#define UNPACK(_PREFIX_, _CTYPE_)					\
+void _PREFIX_ ## dense_unpack(_CTYPE_ *dest, const _CTYPE_ *src, int n, \
+			      char uplo, char diag)
+UNPACK(d, double);
+UNPACK(i, int);
+UNPACK(z, Rcomplex);
+#undef UNPACK
 
-void ddense_unpacked_make_symmetric(  double *to, SEXP from);
-void idense_unpacked_make_symmetric(     int *to, SEXP from);
-void zdense_unpacked_make_symmetric(Rcomplex *to, SEXP from);
+#define UNPACKED_MAKE_SYMMETRIC(_PREFIX_, _CTYPE_)			\
+void _PREFIX_ ## dense_unpacked_make_symmetric(_CTYPE_ *x, int n, char uplo)
+UNPACKED_MAKE_SYMMETRIC(d, double);
+UNPACKED_MAKE_SYMMETRIC(i, int);
+UNPACKED_MAKE_SYMMETRIC(z, Rcomplex);
+#undef UNPACKED_MAKE_SYMMETRIC
 
-void ddense_unpacked_make_triangular(  double *to, SEXP from);
-void idense_unpacked_make_triangular(     int *to, SEXP from);
-void zdense_unpacked_make_triangular(Rcomplex *to, SEXP from);
+#define UNPACKED_MAKE_TRIANGULAR(_PREFIX_, _CTYPE_)			\
+void _PREFIX_ ## dense_unpacked_make_triangular(_CTYPE_ *x, int m, int n, \
+						char uplo, char diag)
+UNPACKED_MAKE_TRIANGULAR(d, double);
+UNPACKED_MAKE_TRIANGULAR(i, int);
+UNPACKED_MAKE_TRIANGULAR(z, Rcomplex);
+#undef UNPACKED_MAKE_TRIANGULAR
 
-void ddense_unpacked_make_diagonal(  double *to, SEXP from);
-void idense_unpacked_make_diagonal(     int *to, SEXP from);
-void zdense_unpacked_make_diagonal(Rcomplex *to, SEXP from);
+#define UNPACKED_MAKE_BANDED(_PREFIX_, _CTYPE_)				\
+void _PREFIX_ ## dense_unpacked_make_banded(_CTYPE_ *x,			\
+					    int m, int n, int a, int b,	\
+					    char diag)
+UNPACKED_MAKE_BANDED(d, double);
+UNPACKED_MAKE_BANDED(i, int);
+UNPACKED_MAKE_BANDED(z, Rcomplex);
+#undef UNPACKED_MAKE_BANDED
 
-Rboolean ddense_unpacked_is_symmetric(  double *px, int n);
-Rboolean ldense_unpacked_is_symmetric(     int *px, int n);
-Rboolean idense_unpacked_is_symmetric(     int *px, int n);
-Rboolean zdense_unpacked_is_symmetric(Rcomplex *px, int n);
+#define PACKED_MAKE_BANDED(_PREFIX_, _CTYPE_)				\
+void _PREFIX_ ## dense_packed_make_banded(_CTYPE_ *x,			\
+					  int n, int a, int b,		\
+					  char uplo, char diag)
+PACKED_MAKE_BANDED(d, double);
+PACKED_MAKE_BANDED(i, int);
+PACKED_MAKE_BANDED(z, Rcomplex);
+#undef PACKED_MAKE_BANDED
 
-Rboolean ddense_unpacked_is_triangular(  double *px, int n, Rboolean upper);
-Rboolean idense_unpacked_is_triangular(     int *px, int n, Rboolean upper);
-Rboolean zdense_unpacked_is_triangular(Rcomplex *px, int n, Rboolean upper);
+#define UNPACKED_COPY_DIAGONAL(_PREFIX_, _CTYPE_)			\
+void _PREFIX_ ## dense_unpacked_copy_diagonal(_CTYPE_ *dest,	        \
+					      const _CTYPE_ *src,	\
+					      int n, R_xlen_t len,	\
+					      char uplo, char diag)
+UNPACKED_COPY_DIAGONAL(d, double);
+UNPACKED_COPY_DIAGONAL(i, int);
+UNPACKED_COPY_DIAGONAL(z, Rcomplex);
+#undef UNPACKED_COPY_DIAGONAL
 
-Rboolean ddense_unpacked_is_diagonal(  double *px, int n);
-Rboolean idense_unpacked_is_diagonal(     int *px, int n);
-Rboolean zdense_unpacked_is_diagonal(Rcomplex *px, int n);
+#define PACKED_COPY_DIAGONAL(_PREFIX_, _CTYPE_)				\
+void _PREFIX_ ## dense_packed_copy_diagonal(_CTYPE_ *dest,		\
+					    const _CTYPE_ *src,		\
+					    int n, R_xlen_t len,	\
+					    char uplo_dest,		\
+					    char uplo_src,		\
+					    char diag)
+PACKED_COPY_DIAGONAL(d, double);
+PACKED_COPY_DIAGONAL(i, int);
+PACKED_COPY_DIAGONAL(z, Rcomplex);
+#undef PACKED_COPY_DIAGONAL
+
+#define UNPACKED_IS_SYMMETRIC(_PREFIX_, _CTYPE_)			\
+Rboolean _PREFIX_ ## dense_unpacked_is_symmetric(const _CTYPE_ *x, int n)
+UNPACKED_IS_SYMMETRIC(d, double);
+UNPACKED_IS_SYMMETRIC(l, int);
+UNPACKED_IS_SYMMETRIC(n, int);
+UNPACKED_IS_SYMMETRIC(i, int);
+UNPACKED_IS_SYMMETRIC(z, Rcomplex);
+#undef UNPACKED_IS_SYMMETRIC
     
-Rboolean ddense_packed_is_diagonal(  double *px, int n, Rboolean up);
-Rboolean idense_packed_is_diagonal(     int *px, int n, Rboolean up);
-Rboolean zdense_packed_is_diagonal(Rcomplex *px, int n, Rboolean up);
+#define UNPACKED_IS_TRIANGULAR(_PREFIX_, _CTYPE_)			\
+Rboolean _PREFIX_ ## dense_unpacked_is_triangular(const _CTYPE_ *x, int n, \
+						  char uplo)
+UNPACKED_IS_TRIANGULAR(d, double);
+UNPACKED_IS_TRIANGULAR(i, int);
+UNPACKED_IS_TRIANGULAR(z, Rcomplex);
+#undef UNPACKED_IS_TRIANGULAR
 
-SEXP R_dup_mMatrix_as_geMatrix(SEXP A, SEXP force);
-SEXP dup_mMatrix_as_geMatrix(SEXP A, Rboolean force);
-SEXP dup_mMatrix_as_geMatrix2(SEXP A, Rboolean force,
-			      Rboolean transpose_if_vector);
+#define UNPACKED_IS_DIAGONAL(_PREFIX_, _CTYPE_)				\
+Rboolean _PREFIX_ ## dense_unpacked_is_diagonal(const _CTYPE_ *x, int n)
+UNPACKED_IS_DIAGONAL(d, double);
+UNPACKED_IS_DIAGONAL(i, int);
+UNPACKED_IS_DIAGONAL(z, Rcomplex);
+#undef UNPACKED_IS_DIAGONAL
+    
+#define PACKED_IS_DIAGONAL(_PREFIX_, _CTYPE_)			       \
+Rboolean _PREFIX_ ## dense_packed_is_diagonal(const _CTYPE_ *x, int n, \
+					      char uplo)
+PACKED_IS_DIAGONAL(d, double);
+PACKED_IS_DIAGONAL(i, int);
+PACKED_IS_DIAGONAL(z, Rcomplex);
+#undef PACKED_IS_DIAGONAL
 
-SEXP R_dup_mMatrix_as_dgeMatrix(SEXP A, SEXP force);
-SEXP dup_mMatrix_as_dgeMatrix(SEXP A, Rboolean force);
-SEXP dup_mMatrix_as_dgeMatrix2(SEXP A, Rboolean force,
-			       Rboolean transpose_if_vector);
+#define PACKED_TRANSPOSE(_PREFIX_, _CTYPE_)				\
+void _PREFIX_ ## dense_packed_transpose(_CTYPE_ *dest, const _CTYPE_ *src, \
+					int n, char uplo)
+PACKED_TRANSPOSE(d, double);
+PACKED_TRANSPOSE(i, int);
+PACKED_TRANSPOSE(z, Rcomplex);
+#undef PACKED_TRANSPOSE
+
+SEXP packed_transpose(SEXP x, int n, char uplo);
+SEXP unpacked_force(SEXP x, int n, char uplo, char diag);
+    
+char type2kind(SEXPTYPE type);
+SEXPTYPE kind2type(char kind);
+
+SEXP R_matrix_as_geMatrix(SEXP from, SEXP kind);
+SEXP matrix_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector);
+
+SEXP R_dense_as_geMatrix(SEXP from, SEXP kind);
+SEXP dense_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector);
 
 Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n);
 R_xlen_t strmatch(char *nm, SEXP s);
@@ -265,7 +347,7 @@ char La_norm_type(const char *typstr);
 char La_rcond_type(const char *typstr);
 SEXP as_det_obj(double mod, int log, int sign);
 
-/* MJ: No longer needed ... replacement in ./packedMatrix.c */
+/* MJ: no longer needed ... prefer more general (un)?packedMatrix_diag_[gs]et() */
 #if 0
 void d_packed_getDiag(double *dest, SEXP x, int n);
 void l_packed_getDiag(   int *dest, SEXP x, int n);
@@ -275,7 +357,7 @@ void tr_d_packed_getDiag(double *dest, SEXP x, int n);
 void tr_l_packed_getDiag(   int *dest, SEXP x, int n);
 SEXP tr_d_packed_setDiag(double *diag, int l_d, SEXP x, int n);
 SEXP tr_l_packed_setDiag(   int *diag, int l_d, SEXP x, int n);
-/* These two *_addDiag() were unused and not replaced */
+/* were unused, not replaced: */
 SEXP d_packed_addDiag(double *diag, int l_d, SEXP x, int n); 
 SEXP tr_d_packed_addDiag(double *diag, int l_d, SEXP x, int n);
 #endif /* MJ */
@@ -397,8 +479,8 @@ static R_INLINE
 int Matrix_check_class_(char *x, const char **valid)
 {
     int ans = 0;
-    while (strlen(valid[ans]))
-	if (!strcmp(x, valid[ans]))
+    while (strlen(valid[ans]) > 0)
+	if (strcmp(x, valid[ans]) == 0)
 	    return ans;
 	else
 	    ++ans;
@@ -437,8 +519,6 @@ int Matrix_check_class(SEXP x, const char **valid)
 
 /* NB:  ddiMatrix & ldiMatrix are part of VALID_ddense / VALID_ldense
  * --   even though they are no longer "denseMatrix" formally.
- * CARE: dup_mMatrix_as_geMatrix() code depends on  14 ddense and 6 ldense
- * ----  entries here :
 */
 #define MATRIX_VALID_ddense					\
 		    "dgeMatrix", "dtrMatrix",			\

@@ -23,8 +23,7 @@ KhatriRao(X, Y = X, FUN = "*", sparseY = TRUE, make.dimnames = FALSE)
   \item{make.dimnames}{logical indicating if the result should inherit
     \code{\link{dimnames}} from \code{X} and \code{Y} in a simple way.}
 }
-%\details{
-%}
+%\details{}
 \value{
   a \code{"\linkS4class{CsparseMatrix}"}, say \code{R}, the Khatri-Rao
   product of \code{X} (\eqn{n \times k}{n x k}) and \code{Y} (\eqn{m

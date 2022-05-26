@@ -694,12 +694,8 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	}
 	else if(extends(cld, "dMatrix")) {
 	    m. <- if(isSparse && has0) n0m else m
-	    m1 <- (m. != 0)*1
-	    if(!isSparse && substr(clNam,1,3) == "dpp")
-		## no "nppMatrix" possible
-		m1 <- unpack(m1)
-
-	    m1. <- m1 # replace NA by 1 in m1. , carefully not changing class:
+	    m1 <- m1. <- (m. != 0)*1
+            ## replace NA by 1 in m1. , carefully not changing class:
 	    if(any(ina)) m1.@x[is.na(m1.@x)] <- 1
 	    ## coercion to n* (nz-pattern!) and back: only identical when no extra 0s and no NAs:
 	    stopifnot(Q.C.identical(m1., as(as(m., "nMatrix"),"dMatrix"),

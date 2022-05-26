@@ -1,7 +1,7 @@
 \name{wrld_1deg}
 \title{World 1-degree grid contiguity matrix}
-\alias{wrld_1deg}
 \docType{data}
+\alias{wrld_1deg}
 \description{
   This matrix represents the distance-based contiguities of 15260
   one-degree grid cells of land areas. The representation is as a

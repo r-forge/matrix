@@ -84,7 +84,7 @@ SEXP Tsparse_diagU2N(SEXP x)
 	    *jslot = INTEGER(ALLOC_SLOT(ans, Matrix_jSym, INTSXP, new_n));
 
 	slot_dup(ans, x, Matrix_DimSym);
-	set_DimNames(ans, x);
+	set_DimNames(ans, GET_SLOT(x, Matrix_DimNamesSym));
 	slot_dup(ans, x, Matrix_uploSym);
 	SET_SLOT(ans, Matrix_diagSym, mkString("N"));
 

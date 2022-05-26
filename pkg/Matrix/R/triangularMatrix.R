@@ -1,14 +1,32 @@
-#### Methods for the virtual class 'triangularMatrix' of triangular matrices
-#### Note that specific methods are in (8 different) ./?t?Matrix.R
+## Methods for virtual class "triangularMatrix" of triangular matrices
+.tM.subclasses <- names(getClassDef("triangularMatrix")@subclasses)
 
-setAs("triangularMatrix", "symmetricMatrix",
-      function(from) as(as(from, "generalMatrix"), "symmetricMatrix"))
+## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+setAs("Matrix", "triangularMatrix", ..M2tri)
+setAs("matrix", "triangularMatrix", ..M2tri)
+
+## MJ: prefer more general methods above going via triu() and tril(),
+##     for which specialized methods should be defined
+if(FALSE) {
+setAs(   "matrix", "triangularMatrix", function(from) mat2tri(from))
 setAs("dgeMatrix", "triangularMatrix", function(from) asTri(from, "dtrMatrix"))
 setAs("lgeMatrix", "triangularMatrix", function(from) asTri(from, "ltrMatrix"))
 setAs("ngeMatrix", "triangularMatrix", function(from) asTri(from, "ntrMatrix"))
+}
 
-setAs("matrix", "triangularMatrix", function(from) mat2tri(from))
+
+## ~~~~ COERCIONS FROM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## MJ: prefer more general method in ./symmetricMatrix going via
+##     forceSymmetric(), for which specialized methods should be defined
+if(FALSE) {
+setAs("triangularMatrix", "symmetricMatrix",
+      function(from) as(as(from, "generalMatrix"), "symmetricMatrix"))
+}
+
+
+## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .tril.tr <- function(x, k = 0, ...) {  # are always square
     k <- as.integer(k[1])
@@ -32,17 +50,19 @@ setAs("matrix", "triangularMatrix", function(from) mat2tri(from))
     }
 }
 
-## In order to evade method dispatch ambiguity (with [CTR]sparse* and ddense*),
+## In order to evade method dispatch ambiguity (with [CTR]sparse* and dense*),
 ## but still remain "general"
 ## we use this hack instead of signature  x = "triangularMatrix" :
 
-trCls <- names(getClass("triangularMatrix")@subclasses)
-trCls. <- grep("^.t.Matrix$", trCls, value = TRUE) # not "p?Cholesky", etc.
-for(cls in trCls.) {
-    setMethod("tril", cls, .tril.tr)
-    setMethod("triu", cls, .triu.tr)
+## NB: denseMatrix goes via C utility R_dense_band() from ../src/dense.c
+##     which obviates the need for .tri[ul].tr() above ...
+.dM.subclasses <- names(getClassDef("denseMatrix")@subclasses)
+for (.cl in grep("^.t.Matrix$",
+                 setdiff(.tM.subclasses, .dM.subclasses), value = TRUE)) {
+    setMethod("tril", signature(x = .cl), .tril.tr)
+    setMethod("triu", signature(x = .cl), .triu.tr)
 }
-rm(trCls, trCls., cls)
+rm(.cl, .dM.subclasses)
 
 setMethod("isTriangular", signature(object = "triangularMatrix"),
           function(object, upper = NA, ...) {
@@ -74,3 +94,4 @@ setMethod("chol", signature(x = "dtTMatrix"), cholTrimat)
 setMethod("chol", signature(x = "dtRMatrix"), cholTrimat)
 ## setMethod("chol", signature(x = "triangularMatrix"), cholTrimat)
 
+rm(.tM.subclasses)

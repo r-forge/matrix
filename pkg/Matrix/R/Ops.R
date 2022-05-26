@@ -311,12 +311,8 @@ Ops.x.x <- function(e1, e2)
 			    e2 <- t(e2)
 			if((p1 <- isPacked(e1)) | (p2 <- isPacked(e2))) { ## at least one is packed
 			    if(p1 != p2) { # one is not packed --> *do* pack it:
-				pack.sy <- function(x)
-				    if(is.numeric(x@x))
-					 .Call(dsyMatrix_as_dspMatrix, x)
-				    else .Call(lsyMatrix_as_lspMatrix, x, 0L)
-				if(p1) e2 <- pack.sy(e2)
-				else   e1 <- pack.sy(e1)
+				if(p1) e2 <- pack(e2)
+				else   e1 <- pack(e1)
 			    }
 			    "spMatrix"
 			} else
@@ -331,11 +327,8 @@ Ops.x.x <- function(e1, e2)
 			    if(e2@diag == "U") e2 <- .dense.diagU2N(e2, isPacked=p2)
 			    if(p1 | p2) { ## at least one is packed
 				if(p1 != p2) { # one is not packed --> *do* pack it:
-				    pack.tr <- function(x)
-					if(is.numeric(x@x)) .Call(dtrMatrix_as_dtpMatrix, x)
-					else .Call(ltrMatrix_as_ltpMatrix, x, 0L)
-				    if(p1) e2 <- pack.tr(e2)
-				    else   e1 <- pack.tr(e1)
+				    if(p1) e2 <- pack(e2)
+				    else   e1 <- pack(e1)
 				}
 				"tpMatrix"
 			    } else

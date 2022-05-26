@@ -1,28 +1,16 @@
 \name{pMatrix-class}
+\title{Permutation matrices}
 \docType{class}
+%
 \alias{pMatrix-class}
+%
 \alias{-,pMatrix,missing-method}
 \alias{coerce,integer,pMatrix-method}
-\alias{coerce,numeric,pMatrix-method}
 \alias{coerce,matrix,pMatrix-method}
-\alias{coerce,sparseMatrix,pMatrix-method}
-\alias{coerce,pMatrix,matrix-method}
-\alias{coerce,pMatrix,ngeMatrix-method}
-\alias{coerce,pMatrix,ngTMatrix-method}
-\alias{coerce,pMatrix,lMatrix-method}
-\alias{coerce,pMatrix,dMatrix-method}
-\alias{coerce,pMatrix,nMatrix-method}
-\alias{coerce,pMatrix,CsparseMatrix-method}
-\alias{coerce,pMatrix,TsparseMatrix-method}
-\alias{coerce,pMatrix,dsparseMatrix-method}
-\alias{coerce,pMatrix,nsparseMatrix-method}
-\alias{coerce,nMatrix,pMatrix-method}
+\alias{coerce,numeric,pMatrix-method}
 \alias{determinant,pMatrix,logical-method}
-\alias{Summary,pMatrix-method}
-%\alias{solve,pMatrix,missing-method}--> solve-methods.Rd
 \alias{t,pMatrix-method}
 %
-\title{Permutation matrices}
 \description{The \code{"pMatrix"} class is the class of permutation
   matrices, stored as 1-based integer permutation vectors.
 

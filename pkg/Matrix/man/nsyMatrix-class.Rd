@@ -1,22 +1,23 @@
 \name{nsyMatrix-class}
 \title{Symmetric Dense Nonzero-Pattern Matrices}
 \docType{class}
+%
 \alias{nspMatrix-class}
 \alias{nsyMatrix-class}
 %
+\alias{coerce,matrix,nspMatrix-method}
 \alias{coerce,nspMatrix,dspMatrix-method}
-\alias{coerce,nspMatrix,nsyMatrix-method}
+\alias{coerce,nspMatrix,lspMatrix-method}
 \alias{coerce,nspMatrix,ngeMatrix-method}
+\alias{coerce,nspMatrix,nsyMatrix-method}
+\alias{coerce,nspMatrix,ntpMatrix-method}
+
+\alias{coerce,matrix,nsyMatrix-method}
 \alias{coerce,nsyMatrix,dsyMatrix-method}
+\alias{coerce,nsyMatrix,lsyMatrix-method}
 \alias{coerce,nsyMatrix,ngeMatrix-method}
 \alias{coerce,nsyMatrix,nspMatrix-method}
-\alias{coerce,matrix,nsyMatrix-method}
-\alias{coerce,matrix,nspMatrix-method}
-\alias{diag,nsyMatrix-method}
-% \alias{diag<-,nspMatrix-method} -> ./packedMatrix-class.Rd
-\alias{diag<-,nsyMatrix-method}
-% \alias{t,nspMatrix-method}
-\alias{t,nsyMatrix-method}
+\alias{coerce,nsyMatrix,ntrMatrix-method}
 %
 \description{
   The \code{"nsyMatrix"} class is the class of symmetric, dense nonzero-pattern

@@ -6,7 +6,8 @@
 
 #define Matrix_T_as_DENSE(_C_TYPE_, _SEXP_, _SEXPTYPE_, _SYMM_)		\
     SEXP dimP = GET_SLOT(x, Matrix_DimSym),				\
-	  xiP = GET_SLOT(x, Matrix_iSym);				\
+	dnP = GET_SLOT(x, Matrix_DimNamesSym),				\
+	xiP = GET_SLOT(x, Matrix_iSym);					\
     int k, n = INTEGER(dimP)[0]; R_xlen_t nnz = xlength(xiP);		\
     int *xi = INTEGER(xiP), *xj = INTEGER(GET_SLOT(x, Matrix_jSym));	\
     R_xlen_t n_ = n, sz = n * n_;					\
@@ -15,9 +16,9 @@
 									\
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));			\
     if(_SYMM_)								\
-	set_symmetrized_DimNames(val, x);				\
+	set_symmetrized_DimNames(val, dnP, -1);				\
     else								\
-	set_DimNames(val, x);						\
+	set_DimNames(val, dnP);						\
     slot_dup(val, x, Matrix_uploSym)
 
 #define Matrix_T_as_DENSE_FINISH(_X_k_, _ZERO_)	\
@@ -102,7 +103,7 @@ SEXP ltTMatrix_as_ltrMatrix(SEXP x)
     MAYBE_ALLOC_val_x_SLOT(_SEXP_, _SEXPTYPE_);				\
 									\
     slot_dup(val, x, Matrix_DimSym);					\
-    set_symmetrized_DimNames(val, x);					\
+    set_symmetrized_DimNames(val, GET_SLOT(x, Matrix_DimNamesSym), -1);	\
     /* copy the upper/lower triangle (including the diagonal)*/		\
     /* "at end" ([nv]): */						\
     nv = nnz - n0d;							\

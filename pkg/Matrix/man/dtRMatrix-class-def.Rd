@@ -2,7 +2,6 @@
 \title{Triangular Sparse Compressed Row Matrices}
 \docType{class}
 \alias{dtRMatrix-class}
-%%--- No methods currently --- see ./dtCMatrix-class.Rd for more
 \description{The \code{dtRMatrix} class is a class of triangular, sparse
   matrices in the compressed, row-oriented format.  In this
   implementation the non-zero elements in the rows are sorted into

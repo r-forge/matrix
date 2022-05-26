@@ -1,12 +1,12 @@
 \name{Matrix}
-\alias{Matrix}
 \title{Construct a Classed Matrix}
+\alias{Matrix}
+\description{
+  Construct a Matrix of a class that inherits from \code{Matrix}.
+}
 \usage{
 Matrix(data=NA, nrow=1, ncol=1, byrow=FALSE, dimnames=NULL,
        sparse = NULL, doDiag = TRUE, forceCheck = FALSE)
-}
-\description{
-  Construct a Matrix of a class that inherits from \code{Matrix}.
 }
 \arguments{
   \item{data}{an optional numeric data vector or matrix.}

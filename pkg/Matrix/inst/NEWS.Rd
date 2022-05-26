@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-05-16 r3475)}{
+\section{Changes in version 1.4-2 (2022-05-26 r3477)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -22,7 +22,7 @@
       \item Many more validity methods now correctly operate under the
       assumption that methods for superclasses have already been called,
       eliminating many redundant checks.
-
+      
       \item Validation of \code{<Matrix>@Dim} now looks at type
       \emph{before} length, avoiding a misleading error message.
 
@@ -37,9 +37,6 @@
       \item Long vector support in methods for packing and unpacking
       \code{denseMatrix}, and others.
 
-      \item \code{..2d?ge(x)} now fail gracefully when \code{x} is a
-      long vector, which cannot be made into a valid 1-column matrix.
-
       \item \code{diag<-} incorrectly preserved the class of dense matrices,
       so that, e.g., \code{diag<-(x=<dpoMatrix>, value=-1)} was still a
       \code{dpoMatrix}.  Now the result is always one of the more general
@@ -51,7 +48,7 @@
       the \code{perm} slot.
 
       \item \code{t(<.s[py]Matrix)} no longer reverses the
-      \code{Dimnames} slot. Symmetrization of \code{dn <- x@Dimnames}
+      \code{Dimnames} slot.  Symmetrization of \code{dn <- x@Dimnames}
       and \code{t(x)@Dimnames} had given different results when
       \code{dn[[1]]} and \code{dn[[2]]} were non-\code{NULL} and
       asymmetric.
@@ -67,8 +64,8 @@
       for triangular matrices, \emph{not} allowing numerical fuzz
       via an argument \code{tol}.  A \code{tol} argument is now
       implemented for all subclasses of \code{dMatrix} except
-      those for which symmetry holds \dQuote{by definition}.
-
+      those inheriting from \code{symmetricMatrix}.
+      
       \item Methods for \code{isSymmetric} now also look at
       \code{Dimnames} and \code{names(Dimnames)}, following
       \code{isSymmetric.matrix} from \pkg{base}.  See also
@@ -84,14 +81,14 @@
       \code{pack}, \code{unpack}, \code{isSymmetric},
       \code{isTriangular}, and \code{isDiagonal} implemented in C,
       replacing those defined for many subclasses individually.
-
+      
       \item New virtual class \code{unpackedMatrix} containing
       \code{denseMatrix} _without_ \code{packedMatrix}, with methods
       for \code{pack}, \code{unpack}, \code{isSymmetric},
       \code{isTriangular}, \code{isDiagonal}, \code{t}, \code{diag},
       and \code{diag<-} implemented in C, replacing those defined for
       many subclasses individually.
-
+      
       \item \code{isTriangular} and \code{isDiagonal} are now
       implemented in C also for standard \code{matrix}.
 
@@ -107,7 +104,7 @@
 
       \item \code{isTriangular} gains a fallback method for
       \code{sparseMatrix} going via \code{TsparseMatrix}.
-
+      
       \item \code{diag(<unpackedMatrix>) <- value} now behaves like
       \code{diag(<packedMatrix>) <- value}, supporting coercions
       depending on \code{typeof(value)}, consistent with \code{diag<-}
@@ -118,7 +115,7 @@
       respectively (previously an error). \code{pack(<.geMatrix>)}
       (previously an error) now behaves as \code{pack(<matrix>)},
       i.e., by checking for symmetry or triangularity before packing.
-
+      
       \item Many more validity methods implemented in C, for efficiency,
       including methods for \code{Matrix}, \code{compMatrix},
       \code{diagonalMatrix}, \code{corMatrix}, \code{[liz]Matrix},
@@ -132,6 +129,19 @@
       vector types other than character, which are coerced to character
       in C via the new \code{R_DimNames_fixup()}, for greater
       consistency with base \code{matrix()}.
+
+      \item New C-level utilities \code{R_dense_as_kind()},
+      \code{R_sparse_as_kind()} and \code{R_diagonal_as_sparse()}
+      for efficient coercion to classes of a given \dQuote{kind}.
+      \code{R_diagonal_as_sparse()} is even more general,
+      also supporting coercion from \code{diagonalMatrix} to any
+      \code{[CRT]sparseMatrix}.
+
+      \item \code{band(x, k1, k2)} is optimized further for dense
+      \code{x}, returning \code{triangularMatrix},
+      \code{symmetricMatrix}, and \code{packedMatrix} in more cases.
+      In the past, the result was always general or triangular
+      and always unpacked.
     }
   }
   \subsection{Misc}{
@@ -161,12 +171,10 @@
       are replaced by safer, more consistently named ones.
       Previous versions allowed integer overflow.
 
-      \item C-level utilities \code{dup_mMatrix_as_d?geMatrix()} gain an
-      argument indicating whether a \code{.geMatrix} should be duplicated
-      (or not).  R interfaces \code{..2dge()} and (new) \code{..2ge()}
-      get the same option, and their default behaviour is now to \emph{not}
-      duplicate, for efficiency.  \code{mMatrix_as_d?geMatrix()} are
-      no longer.
+      \item C-level utilities \code{dup_mMatrix_as_d?geMatrix()} are
+      replaced by the more general \code{dense_as_geMatrix()}, which
+      takes arguments controlling memory allocation and the
+      \dQuote{kind} of the \code{.geMatrix} result.
 
       \item New C-level utility \code{DimNames_is_symmetric()}
       with R interface \code{isSymmetricDN()}, which should be

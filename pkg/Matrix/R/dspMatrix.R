@@ -1,21 +1,24 @@
 ### Coercion and Methods for Symmetric Packed Matrices
 
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 dsp2dsy <- function(from) .Call(dspMatrix_as_dsyMatrix, from)
 dsp2C <- function(from) dsy2C(.Call(dspMatrix_as_dsyMatrix, from))
 setAs("dspMatrix", "dsyMatrix", dsp2dsy)
-## setAs("dspMatrix", "dsCMatrix", dsp2C)
-setAs("dspMatrix", "CsparseMatrix", dsp2C)
-setAs("dspMatrix", "sparseMatrix", dsp2C)
 
 ## dge <--> dsp   via  dsy
 .dense2sp <- function(from) .dsy2dsp(.dense2sy(from))
 setAs("dgeMatrix", "dspMatrix", .dense2sp)
 setAs("matrix", "dspMatrix",
       function(from) .dense2sp(..2dge(from)))
+
 ## S3-matrix <--> dsp   via  dsy
 setAs("dspMatrix", "matrix", function(from) .dsy2mat(dsp2dsy(from)))
+} ## MJ
 
-
+dsp2C <- function(from) dsy2C(unpack(from))
+setAs("dspMatrix", "CsparseMatrix", dsp2C)
+setAs("dspMatrix", "sparseMatrix", dsp2C)
 
 setMethod("rcond", signature(x = "dspMatrix", norm = "character"),
           function(x, norm, ...)
@@ -44,17 +47,19 @@ setMethod("solve", signature(a = "dspMatrix", b = "ddenseMatrix"),
 	  function(a, b, ...) .Call(dspMatrix_matrix_solve, a, b),
 	  valueClass = "dgeMatrix")
 
-##setMethod("solve", signature(a = "dspMatrix", b = "numeric"),
-##	  function(a, b, ...)
-##	  .Call(dspMatrix_matrix_solve, a, as.matrix(b)),
-##	  valueClass = "dgeMatrix")
-
 ## No longer needed
-## setMethod("solve", signature(a = "dspMatrix", b = "integer"),
-## 	  function(a, b, ...) {
-## 	      storage.mode(b) <- "double"
-## 	      .Call(dspMatrix_matrix_solve, a, as.matrix(b))
-## 	  }, valueClass = "dgeMatrix")
+if(FALSE) {
+setMethod("solve", signature(a = "dspMatrix", b = "numeric"),
+	  function(a, b, ...) .Call(dspMatrix_matrix_solve, a, as.matrix(b)),
+	  valueClass = "dgeMatrix")
+
+setMethod("solve", signature(a = "dspMatrix", b = "integer"),
+ 	  function(a, b, ...) {
+ 	      storage.mode(b) <- "double"
+ 	      .Call(dspMatrix_matrix_solve, a, as.matrix(b))
+          },
+          valueClass = "dgeMatrix")
+}
 
 setMethod("norm", signature(x = "dspMatrix", type = "character"),
 	  function(x, type, ...)
@@ -65,7 +70,7 @@ setMethod("norm", signature(x = "dspMatrix", type = "missing"),
           function(x, type, ...) .Call(dspMatrix_norm, x, "O"),
           valueClass = "numeric")
 
-## MJ: No longer needed ... replacement in ./packedMatrix.R
+## MJ: no longer needed ... replacement in ./packedMatrix.R
 if (FALSE) {
 setMethod("t", signature(x = "dspMatrix"),
           function(x) .dsy2dsp(t(dsp2dsy(x))), # FIXME inefficient

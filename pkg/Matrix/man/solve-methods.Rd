@@ -1,8 +1,11 @@
 \name{solve-methods}
 \title{Methods in Package Matrix for Function \code{solve()}}
 \docType{methods}
-\alias{solve}%- catch ?solve  too  (is important enough)
+%
+\alias{solve} % catch ?solve too
 \alias{solve-methods}
+%
+\alias{solve,ANY,ANY-method}
 \alias{solve,ANY,Matrix-method}
 \alias{solve,CHMfactor,ANY-method}
 \alias{solve,CHMfactor,ddenseMatrix-method}
@@ -11,9 +14,21 @@
 \alias{solve,CHMfactor,matrix-method}
 \alias{solve,CHMfactor,missing-method}
 \alias{solve,CHMfactor,numeric-method}
+\alias{solve,Matrix,ANY-method}
+\alias{solve,Matrix,diagonalMatrix-method}
+\alias{solve,Matrix,matrix-method}
+\alias{solve,Matrix,missing-method}
+\alias{solve,Matrix,numeric-method}
+\alias{solve,Matrix,pMatrix-method}
+\alias{solve,Matrix,sparseVector-method}
+\alias{solve,MatrixFactorization,ANY-method}
+\alias{solve,MatrixFactorization,missing-method}
+\alias{solve,MatrixFactorization,numeric-method}
+\alias{solve,TsparseMatrix,ANY-method}
+\alias{solve,TsparseMatrix,missing-method}
 \alias{solve,ddenseMatrix,ANY-method}
-\alias{solve,ddenseMatrix,matrix-method}
 \alias{solve,ddenseMatrix,Matrix-method}
+\alias{solve,ddenseMatrix,matrix-method}
 \alias{solve,ddenseMatrix,missing-method}
 \alias{solve,ddenseMatrix,numeric-method}
 \alias{solve,denseLU,missing-method}
@@ -25,8 +40,8 @@
 \alias{solve,dgeMatrix,matrix-method}
 \alias{solve,dgeMatrix,missing-method}
 \alias{solve,dgeMatrix,sparseMatrix-method}
-\alias{solve,diagonalMatrix,matrix-method}
 \alias{solve,diagonalMatrix,Matrix-method}
+\alias{solve,diagonalMatrix,matrix-method}
 \alias{solve,diagonalMatrix,missing-method}
 \alias{solve,dpoMatrix,dgeMatrix-method}
 \alias{solve,dpoMatrix,matrix-method}
@@ -56,28 +71,17 @@
 \alias{solve,dtpMatrix,ddenseMatrix-method}
 \alias{solve,dtpMatrix,matrix-method}
 \alias{solve,dtpMatrix,missing-method}
-\alias{solve,dtrMatrix,ddenseMatrix-method}
-\alias{solve,dtrMatrix,dMatrix-method}
-\alias{solve,dtrMatrix,matrix-method}
 \alias{solve,dtrMatrix,Matrix-method}
+\alias{solve,dtrMatrix,dMatrix-method}
+\alias{solve,dtrMatrix,ddenseMatrix-method}
+\alias{solve,dtrMatrix,matrix-method}
 \alias{solve,dtrMatrix,missing-method}
-\alias{solve,Matrix,ANY-method}
-\alias{solve,Matrix,diagonalMatrix-method}
 \alias{solve,matrix,Matrix-method}
-\alias{solve,Matrix,matrix-method}
-\alias{solve,Matrix,missing-method}
-\alias{solve,Matrix,numeric-method}
-\alias{solve,Matrix,pMatrix-method}
-\alias{solve,Matrix,sparseVector-method}
-\alias{solve,MatrixFactorization,ANY-method}
-\alias{solve,MatrixFactorization,missing-method}
-\alias{solve,MatrixFactorization,numeric-method}
-\alias{solve,pMatrix,matrix-method}
 \alias{solve,pMatrix,Matrix-method}
+\alias{solve,pMatrix,matrix-method}
 \alias{solve,pMatrix,missing-method}
 \alias{solve,sparseQR,ANY-method}
-\alias{solve,TsparseMatrix,ANY-method}
-\alias{solve,TsparseMatrix,missing-method}
+%
 \description{
   Methods for function \code{\link{solve}} to solve a linear system of
   equations, or equivalently, solve for \eqn{X} in

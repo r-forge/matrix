@@ -424,8 +424,7 @@ symmetrizeDimnames <- function(x) {
 }
 
 ## MJ: no longer ... see above
-if (FALSE) {
-
+if(FALSE) {
 symmDN <- function(dn, col=TRUE, names=TRUE) {
     if(is.null(dn) || identical(dn[1L], dn[2L]))
 	return(dn)
@@ -449,8 +448,97 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
     dimnames(x) <- symmDN(dimnames(x), col=col, names=names)
     x
 }
-
 } ## MJ
+
+.M2symm <- function(from, ...) {
+    if(isSymmetric(from, ...))
+        forceSymmetric(from)
+    else
+        stop("matrix is not symmetric; consider forceSymmetric() or symmpart()")
+}
+..M2symm <- function(from) { # for setAs()
+    if(isSymmetric(from))
+        forceSymmetric(from)
+    else
+        stop("matrix is not symmetric; consider forceSymmetric() or symmpart()")
+}
+.dense2sy <- .M2symm # MJ: for backwards compatibility, until deprecated
+
+.M2tri <- function(from, ...) {
+    if(!(it <- isTriangular(from, ...)))
+        stop("matrix is not triangular; consider triu() or tril()")
+    else if(attr(it, "kind") == "U")
+        triu(from)
+    else
+        tril(from)
+}
+..M2tri <- function(from) { # for setAs()
+    if(!(it <- isTriangular(from)))
+        stop("matrix is not triangular; consider triu() or tril()")
+    else if(attr(it, "kind") == "U")
+        triu(from)
+    else
+        tril(from)
+}
+
+##' @title Coerce from "dense" to '.geMatrix'
+##' @param from vector, matrix, \code{denseMatrix}, or \code{diagonalMatrix}.
+##' @param kind character flag, either the empty string \code{""}
+##'     or a letter matching \code{^[dln]$}, indicating the desired
+##'     "kind" of \code{.geMatrix}; \code{""} (the default) is to
+##'     preserve the "kind" of \code{from}.
+.dense2ge <- function(from, kind = ".") {
+    .Call(R_dense_as_geMatrix, from, kind)
+}
+.dense2dge <- function(from) {
+    .Call(R_dense_as_geMatrix, from, "d")
+}
+..2dge <- .dense2dge # MJ: for backwards compatibility, until deprecated
+
+.m2ge <- function(from, kind = ".") {
+    .Call(R_matrix_as_geMatrix, from, kind)
+}
+
+.ge2m <- function(from) {
+    .Call(R_geMatrix_as_matrix, from)
+}
+
+.m2dense <- function(from, ...) {
+    if(isSymmetric(from, ...))
+        forceSymmetric(from)
+    else if(!(it <- isTriangular(from)))
+        .m2ge(from)
+    else if(attr(it, "kind") == "U")
+        triu(from)
+    else
+        tril(from)
+}
+..m2dense <- function(from) { # for setAs()
+    if(isSymmetric(from))
+        forceSymmetric(from)
+    else if(!(it <- isTriangular(from)))
+        .m2ge(from)
+    else if(attr(it, "kind") == "U")
+        triu(from)
+    else
+        tril(from)
+}
+
+.dense2m <- function(from) {
+    .Call(R_dense_as_matrix, from)
+}
+
+.dense2kind <- function(from, kind) {
+    .Call(R_dense_as_kind, from, kind)
+}
+
+.sparse2kind <- function(from, kind) {
+    .Call(R_sparse_as_kind, from, kind)
+}
+
+.diag2sparse <- function(from, code, uplo, drop0) {
+    .Call(R_diagonal_as_sparse, from, code, uplo, drop0)
+}
 
 rowCheck <- function(a, b) {
     da <- dim(a)
@@ -867,7 +955,8 @@ is_duplicatedT <- # <- keep old name for a while, as ../inst/test-tools-Matrix.R
 anyDuplicatedT <- function(x, di = dim(x))
     anyDuplicated(.Call(m_encodeInd2, x@i, x@j, di, FALSE, FALSE))
 
-if(FALSE) { ## MJ: No longer needed ... replacement in ./unpackedMatrix.R
+## MJ: no longer needed ... replacement in ./unpackedMatrix.R
+if(FALSE) {
 t_geMatrix <- function(x) {
     x@x <- as.vector(t(array(x@x, dim = x@Dim))) # no dimnames here
     x@Dim <- x@Dim[2:1]
@@ -887,6 +976,8 @@ t_trMatrix <- function(x) {
 }
 } ## MJ
 
+## MJ: no longer needed ... replaced by .dense2kind() above
+if(FALSE) {
 fixupDense <- function(m, from, cldm = getClassDef(class(m))) {
     if(extends(cldm, "triangularMatrix")) {
 	m@uplo <- from@uplo
@@ -895,21 +986,6 @@ fixupDense <- function(m, from, cldm = getClassDef(class(m))) {
 	m@uplo <- from@uplo
     }
     m
-}
-
-##' @title Transform {vectors, matrix, Matrix, ...} to dgeMatrix
-##' @param from An \R{} object.
-##' @param force Logical flag.  If \code{TRUE}, a \emph{duplicate}
-##'     of \code{from} is returned even if \code{from} is already
-##'     a \code{dgeMatrix}.  Otherwise, \code{from} is returned
-##'     uncopied in that case.
-##' @export
-..2dge <- function(from, force=FALSE) {
-    .Call(R_dup_mMatrix_as_dgeMatrix, from, force)
-}
-
-..2ge <- function(from, force=FALSE) { # MJ: export?
-    .Call(R_dup_mMatrix_as_geMatrix, from, force)
 }
 
 ## -> ./ldenseMatrix.R :
@@ -950,6 +1026,7 @@ n2l_spMatrix <- function(from) {
         ##x = as.double(from@x),
         Dim = from@Dim, Dimnames = from@Dimnames)
 }
+} ## MJ
 
 tT2gT <- function(x, cl = class(x), toClass, cld = getClassDef(cl)) {
     ## coerce *tTMatrix to *gTMatrix {triangular -> general}
@@ -1237,6 +1314,7 @@ as_gSparse <- function(from) as_Sp(from, "g", getClassDef(class(from)))
 as_sSparse <- function(from) as_Sp(from, "s", getClassDef(class(from)))
 as_tSparse <- function(from) as_Sp(from, "t", getClassDef(class(from)))
 
+
 as_geSimpl2 <- function(from, cl = class(from))
     as(from, paste0(.M.kind(from, cl), "geMatrix"))
 ## to be used directly in setAs(.) needs one-argument-only  (from) :
@@ -1271,6 +1349,8 @@ as_CspClass <- function(x, cl) {
     else as(x, paste0(.M.kind(x, cld), "gCMatrix"))
 }
 
+## MJ: no longer used
+if(FALSE) {
 asTri <- function(from, newclass) {
     ## TODO: also check for unit-diagonal: 'diag = "U"'
     isTri <- isTriangular(from)
@@ -1294,7 +1374,7 @@ mat2tri <- function(from, sparse=NA) {
     }
     else stop("not a triangular matrix")
 }
-
+} ## MJ
 
 try_as <- function(x, classes, tryAnyway = FALSE) {
     if(!tryAnyway && !is(x, "Matrix"))
@@ -1307,7 +1387,8 @@ try_as <- function(x, classes, tryAnyway = FALSE) {
     if(ok) as(x, classes[1]) else x
 }
 
-if (FALSE) { ## MJ: No longer needed ... replacement in ./(un)?packedMatrix.R
+## MJ: no longer needed ... replacement in ./(un)?packedMatrix.R
+if(FALSE) {
 ## For *dense* matrices
 isTriMat <- function(object, upper = NA, ...) {
     ## pretest: is it square?
@@ -1330,9 +1411,10 @@ isTriMat <- function(object, upper = NA, ...) {
     else ## upper is FALSE
 	if(all0(object[upper.tri(object)])) TRUE.L else FALSE
 }
-}
+} ## MJ
 
-if (FALSE) { ## MJ: moved to and modified in ./Tsparse.R
+## MJ: moved to and modified in ./Tsparse.R
+if(FALSE) {
 ## For Tsparse matrices:
 isTriT <- function(object, upper = NA, ...) {
     ## pretest: is it square?
@@ -1354,9 +1436,10 @@ isTriT <- function(object, upper = NA, ...) {
 	if(all(object@i >= object@j)) TRUE.L else FALSE
     }
 }
-}
+} ## MJ
 
-if (FALSE) { ## MJ: moved to and modified in ./Csparse.R
+## MJ: moved to and modified in ./Csparse.R
+if(FALSE) {
 ## For Csparse matrices
 isTriC <- function(object, upper = NA, ...) {
     ## pretest: is it square?
@@ -1398,9 +1481,10 @@ isTriC <- function(object, upper = NA, ...) {
 	    TRUE.L else FALSE
     }
 }
-}
+} ## MJ
 
-if (FALSE) { ## MJ: No longer needed ... replacement in ./(un)?packedMatrix.R
+## MJ: no longer needed ... replacement in ./(un)?packedMatrix.R
+if(FALSE) {
 ## When the matrix is known to be [n x n] aka "square"
 ## (need "vector-indexing" work for 'M'):
 .is.diagonal.sq.matrix <- function(M, n = dim(M)[1L])
@@ -1426,7 +1510,7 @@ if (FALSE) { ## MJ: No longer needed ... replacement in ./(un)?packedMatrix.R
 	    all0(as(object,"matrix")[rep_len(c(FALSE, rep.int(TRUE,n)), n^2)])
         }
 }
-}
+} ## MJ
 
 ## Purpose: Transform a *unit diagonal* sparse triangular matrix
 ##	into one with explicit diagonal entries '1'
@@ -1529,7 +1613,8 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE)
 	.Call(Csparse_diagN2U, as(x, "CsparseMatrix"))
 }
 
-if(FALSE) { # MJ: no longer used
+# MJ: no longer used
+if(FALSE) {
 .dgC.0.factors <- function(x)
     if(!length(x@factors)) x else { x@factors <- list() ; x }
 .as.dgC.0.factors <- function(x) {

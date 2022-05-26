@@ -1,13 +1,17 @@
 \name{Cholesky}
-\alias{Cholesky}
-\alias{Cholesky,dsCMatrix-method}% -> ../R/dsCMatrix.R
-\alias{Cholesky,CsparseMatrix-method}% coerce
-\alias{Cholesky,sparseMatrix-method}%  coerce
-\alias{Cholesky,nsparseMatrix-method}%  error for now; todo in the future
-\alias{Cholesky,Matrix-method}% <- "good" error message
-\alias{.SuiteSparse_version}
+\concept{Choleski} % alternate English spelling
 \title{Cholesky Decomposition of a Sparse Matrix}
-\concept{Choleski}% alternative English form
+%
+\alias{Cholesky}
+%
+\alias{Cholesky,CsparseMatrix-method}
+\alias{Cholesky,Matrix-method}
+\alias{Cholesky,dsCMatrix-method}
+\alias{Cholesky,nsparseMatrix-method}
+\alias{Cholesky,sparseMatrix-method}
+%
+\alias{.SuiteSparse_version}
+%
 \usage{
 Cholesky(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, \dots)
 }

@@ -1,31 +1,31 @@
 #### Triangular Matrices -- Coercion and Methods
 
-## FIXME: get rid of this (coerce to "triangular..") ?!?
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 setAs("dgeMatrix", "dtrMatrix", function(from) asTri(from, "dtrMatrix"))
-
 setAs("dtrMatrix", "dtpMatrix",
       dtr2dtp <- function(from) .Call(dtrMatrix_as_dtpMatrix, from))
+setAs("matrix", "dtrMatrix",
+      function(from) as(..2dge(from), "dtrMatrix"))
+}
 
-setAs("dtrMatrix", "sparseMatrix", function(from)
-    .dense2C(from, kind="tri", uplo=from@uplo))
-setAs("dtrMatrix", "CsparseMatrix", function(from)
-    .dense2C(from, kind="tri", uplo=from@uplo))
-
-
+## MJ: these coercions are now inherited; see ./denseMatrix.R
+if(FALSE) {
 .dtr2mat <- function(from, keep.dimnames=TRUE)
     .Call(dtrMatrix_as_matrix, from, keep.dimnames)
 ## needed for t() method
 setAs("dtrMatrix", "matrix",
       function(from) .Call(dtrMatrix_as_matrix, from, TRUE))
-
-setAs("matrix", "dtrMatrix",
-      function(from) as(..2dge(from), "dtrMatrix"))
-
 setAs("Cholesky", "lMatrix",
       function(from) as(as(from, "dtrMatrix"), "lMatrix"))
 setAs("BunchKaufman", "lMatrix",
       function(from) as(as(from, "dtrMatrix"), "lMatrix"))
+} ## MJ
 
+setAs("dtrMatrix", "sparseMatrix",
+      function(from) .dense2C(from, kind = "tri", uplo = from@uplo))
+setAs("dtrMatrix", "CsparseMatrix",
+      function(from) .dense2C(from, kind = "tri", uplo = from@uplo))
 
 ## Group Methods:
 ## TODO: carefully check for the cases where the result remains triangular
@@ -41,7 +41,7 @@ setMethod("determinant", signature(x = "dtrMatrix", logarithm = "missing"),
 setMethod("determinant", signature(x = "dtrMatrix", logarithm = "logical"),
 	  function(x, logarithm, ...) mkDet(diag(x), logarithm))
 
-## MJ: No longer needed ... replacement in ./unpackedMatrix.R
+## MJ: no longer needed ... replacement in ./unpackedMatrix.R
 if (FALSE) {
 setMethod("t", signature(x = "dtrMatrix"), t_trMatrix)
 setMethod("diag", signature(x = "dtrMatrix"),

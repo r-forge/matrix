@@ -1,11 +1,11 @@
 \name{dgRMatrix-class}
-\docType{class}
 \title{Sparse Compressed, Row-oriented Numeric Matrices}
+\docType{class}
+%
 \alias{dgRMatrix-class}
-% all alias{coerce,...} are currently in ./RsparseMatrix-class.Rd
-\alias{diag,dgRMatrix-method}
-\alias{dim,dgRMatrix-method}
-\alias{t,dgRMatrix-method}
+%
+\alias{coerce,matrix,dgRMatrix-method}
+%
 \description{The \code{dgRMatrix} class is a class of sparse numeric
   matrices in the compressed, sparse, row-oriented format.  In this
   implementation the non-zero elements in the rows are sorted into

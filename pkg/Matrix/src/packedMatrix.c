@@ -4,8 +4,15 @@
 #include <string.h>
 #include "packedMatrix.h"
 
-/* unpack(x) */
-SEXP packedMatrix_unpack(SEXP from)
+#define PM_ERROR_INVALID_CLASS(_CLASS_, _METHOD_)			\
+    error(_("invalid class \"%s\" to 'packedMatrix_%s()'"),		\
+	  _CLASS_, _METHOD_)
+#define PM_ERROR_INVALID_SLOT_TYPE(_SLOT_, _SEXPTYPE_, _METHOD_)	\
+    error(_("'%s' slot of invalid type \"%s\" in 'packedMatrix_%s()'"), \
+	  _SLOT_, type2char(_SEXPTYPE_), _METHOD_)
+
+/* unpack(x), returning unpackedMatrix */
+SEXP packedMatrix_unpack(SEXP from, SEXP strict)
 {
     static const char *valid_from[] = {
 	"dppMatrix", /* must match before "dspMatrix" */
@@ -17,80 +24,157 @@ SEXP packedMatrix_unpack(SEXP from)
 	"dsyMatrix", "lsyMatrix", "nsyMatrix",
 	"Cholesky", "BunchKaufman",
 	"dtrMatrix", "ltrMatrix", "ntrMatrix", ""};
-    int icl = R_check_class_etc(from, valid_from);
-    if (icl < 0) {
+    int ivalid = R_check_class_etc(from, valid_from);
+    if (ivalid < 0)
 	PM_ERROR_INVALID_CLASS(class_P(from), "unpack");
-    }
-    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(valid_to[icl]));
-    SEXP dim = GET_SLOT(from, Matrix_DimSym);
+    if (asLogical(strict) == 0 && (ivalid == 4 || ivalid == 5))
+	ivalid = 6; /* pCholesky,pBunchKaufman->dtrMatrix */
+
+    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(valid_to[ivalid])),
+	dim = GET_SLOT(from, Matrix_DimSym),
+	dimnames = GET_SLOT(from, Matrix_DimNamesSym),
+	uplo = GET_SLOT(from, Matrix_uploSym),
+	x_from = GET_SLOT(from, Matrix_xSym),
+	x_to;
+
     int n = INTEGER(dim)[0];
+    char ul = *CHAR(STRING_ELT(uplo, 0));
+    SEXPTYPE tx = TYPEOF(x_from);
+    R_xlen_t nx = (R_xlen_t) n * n;
+    PROTECT(x_to = allocVector(tx, nx));
+
+#define UNPACK(_PREFIX_, _PTR_)						\
+    do {								\
+	Memzero(_PTR_(x_to), nx);					\
+	_PREFIX_ ## dense_unpack(_PTR_(x_to), _PTR_(x_from), n, ul, 'N'); \
+    } while (0)
+    
+    switch (tx) {
+    case REALSXP: /* d..Matrix */
+	UNPACK(d, REAL);
+	break; 
+    case LGLSXP: /* [ln]..Matrix */
+	UNPACK(i, LOGICAL);
+	break;
+    case INTSXP: /* i..Matrix */
+	UNPACK(i, INTEGER);
+	break;
+    case CPLXSXP: /* z..Matrix */
+	UNPACK(z, COMPLEX);
+	break;
+    default:
+	PM_ERROR_INVALID_SLOT_TYPE("x", tx, "unpack");
+	break;
+    }
+
+#undef UNPACK
     
     SET_SLOT(to, Matrix_DimSym, dim);
-    SET_SLOT(to, Matrix_DimNamesSym, GET_SLOT(from, Matrix_DimNamesSym));
-    SET_SLOT(to, Matrix_uploSym, GET_SLOT(from, Matrix_uploSym));
-    if (icl <= 3) {
+    SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+    SET_SLOT(to, Matrix_uploSym, uplo);
+    SET_SLOT(to, Matrix_xSym, x_to);
+    if (ivalid <= 3) {
 	/* .syMatrix */
 	SET_SLOT(to, Matrix_factorSym, GET_SLOT(from, Matrix_factorSym));
     } else {
 	/* .trMatrix */
 	SET_SLOT(to, Matrix_diagSym, GET_SLOT(from, Matrix_diagSym));
-	if (icl == 5) {
+	if (ivalid == 5)
 	    /* pBunchKaufman */
 	    SET_SLOT(to, Matrix_permSym, GET_SLOT(from, Matrix_permSym));
+    }
+    UNPROTECT(2);
+    return to;
+}
+
+/* forceSymmetric(x, uplo), returning .spMatrix */
+SEXP packedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
+{
+    static const char *valid[] = {
+	"dspMatrix", "lspMatrix", "nspMatrix", /* be fast */
+	"dtpMatrix", "ltpMatrix", "ntpMatrix", ""};
+    int ivalid = R_check_class_etc(from, valid);
+    if (ivalid < 0)
+	PM_ERROR_INVALID_CLASS(class_P(from), "force_symmetric");
+    
+    char ulf = *uplo_P(from), ult = *CHAR(asChar(uplo_to));
+    if (ivalid <= 2)
+	/* .spMatrix */
+	return (ulf == ult) ? from : packedMatrix_t(from);
+
+    /* Now handling just .tpMatrix ... */
+    
+    char *cl = strdup(valid[ivalid]);
+    cl[1] = 's';
+    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
+	dim = GET_SLOT(from, Matrix_DimSym),
+	dimnames = GET_SLOT(from, Matrix_DimNamesSym),
+	x_from = GET_SLOT(from, Matrix_xSym);
+    free(cl);
+    
+    if (ulf == ult) {
+	/* .tpMatrix with correct uplo */
+	SET_SLOT(to, Matrix_xSym, x_from);
+    } else {
+	/* .tpMatrix with incorrect uplo */
+	int n = INTEGER(dim)[0];
+	char di = *diag_P(from);
+	SEXPTYPE tx = TYPEOF(x_from);
+	R_xlen_t nx = XLENGTH(x_from);
+	SEXP x_to = PROTECT(allocVector(tx, nx));
+
+#define COPY_DIAGONAL(_PREFIX_, _PTR_)					\
+	do {								\
+	    Memzero(_PTR_(x_to), nx);					\
+	    _PREFIX_ ## dense_packed_copy_diagonal(			\
+		_PTR_(x_to), _PTR_(x_from), n, nx, ult, ulf, di);	\
+	} while (0)
+	
+	switch (tx) {
+	case REALSXP: /* d..Matrix */
+	    COPY_DIAGONAL(d, REAL);
+	    break;
+	case LGLSXP: /* [ln]..Matrix */
+	    COPY_DIAGONAL(i, LOGICAL);
+	    break;
+	case INTSXP: /* i..Matrix */
+	    COPY_DIAGONAL(i, INTEGER);
+	    break;
+	case CPLXSXP: /* z..Matrix */
+	    COPY_DIAGONAL(z, COMPLEX);
+	    break;
+	default:
+	    PM_ERROR_INVALID_SLOT_TYPE("x", tx, "force_symmetric");
+	    break;
 	}
-    }
 
-    SEXP x_from = GET_SLOT(from, Matrix_xSym);
-
-#define PM_UNPACK(_PREFIX_, _CTYPE_, _SEXPTYPE_, _PTR_)			\
-    do {								\
-	R_xlen_t len = n * (R_xlen_t) n;				\
-	SEXP x_to = PROTECT(allocVector(_SEXPTYPE_, len));		\
-	_PREFIX_ ## dense_unpack(_PTR_(x_to), _PTR_(x_from), n,		\
-				 (*uplo_P(to) == 'U') ? UPP : LOW,	\
-				 NUN /* for speed */);			\
-	SET_SLOT(to, Matrix_xSym, x_to);				\
-	UNPROTECT(1);							\
-    } while (0)
-    
-    switch (TYPEOF(x_from)) {
-    case REALSXP: /* d..Matrix */
-	PM_UNPACK(d, double, REALSXP, REAL);
-	break;
-    case LGLSXP: /* [ln]..Matrix */
-	PM_UNPACK(i, int, LGLSXP, LOGICAL);
-	break;
-    case INTSXP: /* i..Matrix */
-	PM_UNPACK(i, int, INTSXP, INTEGER);
-	break;
-    case CPLXSXP: /* z..Matrix */
-    	PM_UNPACK(z, Rcomplex, CPLXSXP, COMPLEX);
-	break;
-    default:
-	PM_ERROR_INVALID_SLOT_TYPE("x", TYPEOF(x_from), "unpack");
-	break;
+#undef COPY_DIAGONAL
+	
+	SET_SLOT(to, Matrix_xSym, x_to);
+	UNPROTECT(1);
     }
     
-#undef PM_UNPACK
-    
+    SET_SLOT(to, Matrix_DimSym, dim);
+    set_symmetrized_DimNames(to, dimnames, -1);
+    SET_SLOT(to, Matrix_uploSym, mkString((ult == 'U') ? "U" : "L"));
     UNPROTECT(1);
     return to;
 }
 
-#define PM_IS_DI(_RES_, _X_, _N_, _UP_, _METHOD_)			\
+#define PM_IS_DI(_RES_, _X_, _N_, _UPLO_, _METHOD_)			\
     do {								\
 	switch (TYPEOF(_X_)) {						\
 	case REALSXP:							\
-	    _RES_ = ddense_packed_is_diagonal(REAL(_X_), _N_, _UP_);	\
+	    _RES_ = ddense_packed_is_diagonal(REAL(_X_), _N_, _UPLO_);	\
 	    break;							\
 	case LGLSXP:							\
-	    _RES_ = idense_packed_is_diagonal(LOGICAL(_X_), _N_, _UP_); \
+	    _RES_ = idense_packed_is_diagonal(LOGICAL(_X_), _N_, _UPLO_); \
 	    break;							\
 	case INTSXP:							\
-	    _RES_ = idense_packed_is_diagonal(INTEGER(_X_), _N_, _UP_); \
+	    _RES_ = idense_packed_is_diagonal(INTEGER(_X_), _N_, _UPLO_); \
 	    break;							\
 	case CPLXSXP:							\
-	    _RES_ = zdense_packed_is_diagonal(COMPLEX(_X_), _N_, _UP_); \
+	    _RES_ = zdense_packed_is_diagonal(COMPLEX(_X_), _N_, _UPLO_); \
 	    break;							\
 	default:							\
 	    PM_ERROR_INVALID_SLOT_TYPE("x", TYPEOF(_X_), _METHOD_);	\
@@ -105,28 +189,28 @@ SEXP packedMatrix_is_symmetric(SEXP obj, SEXP checkDN)
     static const char *valid[] = {
 	"dspMatrix", "lspMatrix", "nspMatrix", /* be fast */
 	"dtpMatrix", "ltpMatrix", "ntpMatrix", ""};
-    int icl = R_check_class_etc(obj, valid);
-    if (icl < 0) {
+    int ivalid = R_check_class_etc(obj, valid);
+    if (ivalid < 0) {
 	PM_ERROR_INVALID_CLASS(class_P(obj), "is_symmetric");
 	return R_NilValue;
-    } else if (icl <= 2) {
+    } else if (ivalid <= 2) {
 	/* .spMatrix: symmetric by definition */
 	return ScalarLogical(1);
     } else {
 	/* .tpMatrix: symmetric iff diagonal */
 	if (asLogical(checkDN) != 0 &&
-	    !DimNames_is_symmetric(GET_SLOT(obj, Matrix_DimNamesSym))) {
+	    !DimNames_is_symmetric(GET_SLOT(obj, Matrix_DimNamesSym)))
 	    return ScalarLogical(0);
-	}
-	Rboolean res = FALSE, up = (*uplo_P(obj) == 'U') ? TRUE : FALSE;
+	Rboolean res = FALSE;
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
-	PM_IS_DI(res, x, n, up, "is_symmetric");
+	char ul = *uplo_P(obj);
+	PM_IS_DI(res, x, n, ul, "is_symmetric");
 	return ScalarLogical(res);
     }
 }
 
-#define RETURN_TRUE(_KIND_)						\
+#define RETURN_TRUE_OF_KIND(_KIND_)					\
     do {								\
 	SEXP ans = PROTECT(allocVector(LGLSXP, 1));			\
 	LOGICAL(ans)[0] = 1;						\
@@ -141,28 +225,27 @@ SEXP packedMatrix_is_triangular(SEXP obj, SEXP upper)
     static const char *valid[] = {
 	"dtpMatrix", "ltpMatrix", "ntpMatrix", /* be fast */
 	"dspMatrix", "lspMatrix", "nspMatrix", ""};
-    int icl = R_check_class_etc(obj, valid);
-    if (icl < 0) {
+    int ivalid = R_check_class_etc(obj, valid);
+    if (ivalid < 0)
 	PM_ERROR_INVALID_CLASS(class_P(obj), "is_triangular");
-    }
 
     SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-    Rboolean have_upper = (*CHAR(STRING_ELT(uplo, 0)) == 'U') ? TRUE : FALSE;
+    char ul = *CHAR(STRING_ELT(uplo, 0));
     int need_upper = asLogical(upper);
 
 #define IF_DIAGONAL							\
     Rboolean res = FALSE;						\
     SEXP x = GET_SLOT(obj, Matrix_xSym);				\
     int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];			\
-    PM_IS_DI(res, x, n, have_upper, "is_triangular");			\
+    PM_IS_DI(res, x, n, ul, "is_triangular");				\
     if (res)
     
-    if (icl <= 2) {
+    if (ivalid <= 2) {
 	/* .tpMatrix: be fast if 'upper', 'uplo' agree; else need diagonal */
 	if (need_upper == NA_LOGICAL) {
-	    RETURN_TRUE(uplo);
-	} else if ((need_upper != 0 &&  have_upper) ||
-		   (need_upper == 0 && !have_upper)) {
+	    RETURN_TRUE_OF_KIND(uplo);
+	} else if ((need_upper != 0 && ul == 'U') ||
+		   (need_upper == 0 && ul != 'U')) {
 	    return ScalarLogical(1);
 	} else {
 	    IF_DIAGONAL {
@@ -173,7 +256,7 @@ SEXP packedMatrix_is_triangular(SEXP obj, SEXP upper)
 	/* .spMatrix: triangular iff diagonal */
 	IF_DIAGONAL {
 	    if (need_upper == NA_LOGICAL) {
-		RETURN_TRUE(mkString("U"));
+		RETURN_TRUE_OF_KIND(mkString("U"));
 	    } else {
 		return ScalarLogical(1);
 	    }
@@ -185,169 +268,119 @@ SEXP packedMatrix_is_triangular(SEXP obj, SEXP upper)
     return ScalarLogical(0);
 }
 
-#undef RETURN_TRUE
+#undef RETURN_TRUE_OF_KIND
 
 /* isDiagonal(x) */
 SEXP packedMatrix_is_diagonal(SEXP obj)
 {
     /* _Not_ checking class of 'obj' */
-    Rboolean res = FALSE, up = (*uplo_P(obj) == 'U') ? TRUE : FALSE;
+    Rboolean res = FALSE;
     SEXP x = GET_SLOT(obj, Matrix_xSym);
     int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
-    PM_IS_DI(res, x, n, up, "is_diagonal");
+    char ul = *uplo_P(obj);
+    PM_IS_DI(res, x, n, ul, "is_diagonal");
     return ScalarLogical(res);
 }
 
 #undef PM_IS_DI
 
-/* t(x) */
-SEXP packedMatrix_t(SEXP obj)
+/* t(x), typically preserving class */
+SEXP packedMatrix_t(SEXP from)
 {
+    SEXP to, diag,
+	dim = GET_SLOT(from, Matrix_DimSym),
+	dimnames = GET_SLOT(from, Matrix_DimNamesSym),
+	x = GET_SLOT(from, Matrix_xSym);
+    int n = INTEGER(dim)[0];
+    char ul = *uplo_P(from), di = ' ';
+    if (R_has_slot(from, Matrix_diagSym)) {
+	diag = GET_SLOT(from, Matrix_diagSym);
+	di = *CHAR(STRING_ELT(diag, 0));
+    }
+    
     /* Initialize result of same class, except for pBunchKaufman */
-    const char *cl = class_P(obj);
-    SEXP res, x0 = GET_SLOT(obj, Matrix_xSym);
-    if (TYPEOF(x0) == REALSXP) {
+    const char *cl = class_P(from);
+    if (TYPEOF(x) == REALSXP && di != ' ') {
 	static const char *valid[] = { "pBunchKaufman", "" };
-	if (!R_check_class_etc(obj, valid)) {
+	if (R_check_class_etc(from, valid) == 0)
 	    cl = "dtpMatrix";
-	}
     }
-    res = PROTECT(NEW_OBJECT_OF_CLASS(cl));
-    int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
-    const char *uplo = uplo_P(obj), *diag = Diag_P(obj);
-
-#define PM_T(_CTYPE_, _SEXPTYPE_, _PTR_)				\
-    do {								\
-	SEXP x1 = PROTECT(allocVector(_SEXPTYPE_, XLENGTH(x0)));	\
-	_CTYPE_ *px0 = _PTR_(x0);					\
-	_CTYPE_ *px1 = _PTR_(x1);					\
-	int i, j;							\
-	if (*uplo == 'U') {						\
-	    for (j = 0; j < n; ++j)					\
-		for (i = j; i < n; ++i)					\
-		    *(px1++) = *(px0 + PM_AR21_UP(j, i));		\
-	} else {							\
-	    R_xlen_t n2 = ((R_xlen_t) n) * 2;				\
-	    for (j = 0; j < n; ++j)					\
-		for (i = 0; i <= j; ++i)				\
-		    *(px1++) = *(px0 + PM_AR21_LO(j, i, n2));		\
-	}								\
-	SET_SLOT(res, Matrix_xSym, x1);					\
-	UNPROTECT(1);							\
-    } while (0)
+    PROTECT(to = NEW_OBJECT_OF_CLASS(cl));
     
-    if (n > 1) {
-	/* Permute 'x' slot */
-	switch (TYPEOF(x0)) {
-	case REALSXP: /* d..Matrix */
-	    PM_T(double, REALSXP, REAL);
-	    break;
-	case LGLSXP: /* [ln]..Matrix */
-	    PM_T(int, LGLSXP, LOGICAL);
-	    break;
-	case INTSXP: /* i..Matrix */
-	    PM_T(int, INTSXP, INTEGER);
-	    break;
-	case CPLXSXP: /* z..Matrix */
-	    PM_T(Rcomplex, CPLXSXP, COMPLEX);
-	    break;
-	default:
-	    PM_ERROR_INVALID_SLOT_TYPE("x", TYPEOF(x0), "t");
-	    break;
-	}
-    } else {
-	/* Preserve 'x' slot */
-	SET_SLOT(res, Matrix_xSym, x0);
-    }
-
-#undef PM_T
-    
+    /* Permute 'x' slot */
+    SET_SLOT(to, Matrix_xSym, packed_transpose(x, n, ul));
     /* Preserve 'Dim' slot */
-    SET_SLOT(res, Matrix_DimSym, GET_SLOT(obj, Matrix_DimSym));
+    SET_SLOT(to, Matrix_DimSym, dim);
     /* Preserve or reverse 'Dimnames' slot and 'names(Dimnames)' 
-       (preserving if symmetric) 
-    */
-    if (*diag == ' ') {
-	SET_SLOT(res, Matrix_DimNamesSym, GET_SLOT(obj, Matrix_DimNamesSym));
-    } else {
-	SEXP dn0 = GET_SLOT(obj, Matrix_DimNamesSym);
-	SEXP dn1 = PROTECT(allocVector(VECSXP, 2));
-	SET_VECTOR_ELT(dn1, 0, VECTOR_ELT(dn0, 1));
-	SET_VECTOR_ELT(dn1, 1, VECTOR_ELT(dn0, 0));
-	SEXP ndn0 = getAttrib(dn0, R_NamesSymbol);
-	if (!isNull(ndn0)) {
-	    SEXP ndn1 = PROTECT(allocVector(STRSXP, 2));
-	    SET_STRING_ELT(ndn1, 0, STRING_ELT(ndn0, 1));
-	    SET_STRING_ELT(ndn1, 1, STRING_ELT(ndn0, 0));
-	    setAttrib(dn1, R_NamesSymbol, ndn1);
-	    UNPROTECT(1);
-	}
-	SET_SLOT(res, Matrix_DimNamesSym, dn1);
-	UNPROTECT(1);
-    }
+       (preserving if symmetric) */
+    if (di == ' ')
+	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+    else
+	set_reversed_DimNames(to, dimnames);
     /* Toggle 'uplo' slot */
-    SET_SLOT(res, Matrix_uploSym, mkString(*uplo == 'U' ? "L" : "U"));
+    SET_SLOT(to, Matrix_uploSym, mkString((ul == 'U') ? "L" : "U"));
     /* Preserve 'diag' slot */
-    if (*diag == 'U') {
-	SET_SLOT(res, Matrix_diagSym, GET_SLOT(obj, Matrix_diagSym));
-    }
+    if (di == 'U')
+	SET_SLOT(to, Matrix_diagSym, diag);
     /* NB: Nothing to do for 'factors' slot: prototype is already list() ...
-       FIXME: However, it would be much better to transpose and reverse
-       the factors in each factorization
-    */
+       FIXME: However, it would be much better to also "transpose" each 
+       factorization ... */
     
     UNPROTECT(1);
-    return res;
+    return to;
 }
 
 /* diag(x, names) */
 SEXP packedMatrix_diag_get(SEXP obj, SEXP nms)
 {
     int do_nms = asLogical(nms);
-    if (do_nms == NA_LOGICAL) {
+    if (do_nms == NA_LOGICAL)
 	error(_("'names' must be TRUE or FALSE"));
-    }
 
-    SEXP res = R_NilValue, x = GET_SLOT(obj, Matrix_xSym);
+    SEXPTYPE tx;
     int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
-    const char *uplo = uplo_P(obj), *diag = Diag_P(obj);
+    SEXP x = GET_SLOT(obj, Matrix_xSym),
+	res = PROTECT(allocVector(tx = TYPEOF(x), n));
+    char ul = *uplo_P(obj), di = *Diag_P(obj);
     
-#define PM_D_G(_CTYPE_, _SEXPTYPE_, _PTR_, _INIT_ONE_, _ONE_)		\
+#define PM_D_G(_CTYPE_, _PTR_, _ONE_)					\
     do {								\
-	res = PROTECT(allocVector(_SEXPTYPE_, n));			\
 	_CTYPE_ *pres = _PTR_(res);					\
-	if (*diag == 'U') {						\
-	    _INIT_ONE_;							\
-	    for (int j = 0; j < n; ++j)					\
+	int j;								\
+	if (di == 'U') {						\
+	    for (j = 0; j < n; ++j)					\
 		*(pres++) = _ONE_;					\
 	} else {							\
 	    _CTYPE_ *px = _PTR_(x);					\
-	    if (*uplo == 'U') {						\
-		for (int j = 0; j < n; px += (++j)+1)			\
+	    if (ul == 'U')						\
+		for (j = 0; j < n; px += (++j)+1)			\
 		    *(pres++) = *px;					\
-	    } else {							\
-		for (int j = 0; j < n; px += n-(j++))			\
+	    else							\
+		for (j = 0; j < n; px += n-(j++))			\
 		    *(pres++) = *px;					\
-	    }								\
 	}								\
     } while (0)
 
-    switch (TYPEOF(x)) {
+    switch (tx) {
     case REALSXP: /* d..Matrix */
-	PM_D_G(double, REALSXP, REAL, , 1.0);
+	PM_D_G(double, REAL, 1.0);
 	break;
     case LGLSXP: /* [ln]..Matrix */
-	PM_D_G(int, LGLSXP, LOGICAL, , 1);
+	PM_D_G(int, LOGICAL, 1);
 	break;
     case INTSXP: /* i..Matrix */
-	PM_D_G(int, INTSXP, INTEGER, , 1);
+	PM_D_G(int, INTEGER, 1);
 	break;
     case CPLXSXP: /* z..Matrix */
-	PM_D_G(Rcomplex, CPLXSXP, COMPLEX,
-	       Rcomplex one; one.r = 1.0; one.i = 0.0;, one);
+    {
+	Rcomplex one;
+	one.r = 1.0;
+	one.i = 0.0;
+	PM_D_G(Rcomplex, COMPLEX, one);
 	break;
+    }
     default:
-	PM_ERROR_INVALID_SLOT_TYPE("x", TYPEOF(x), "diag_get");
+	PM_ERROR_INVALID_SLOT_TYPE("x", tx, "diag_get");
 	break;
     }
 
@@ -355,20 +388,17 @@ SEXP packedMatrix_diag_get(SEXP obj, SEXP nms)
     
     if (do_nms) {
 	/* NB: The logic here must be adjusted once the validity method 
-	       for 'symmetricMatrix' enforces symmetric 'Dimnames'
-	*/
+	       for 'symmetricMatrix' enforces symmetric 'Dimnames' */
 	SEXP dn = GET_SLOT(obj, Matrix_DimNamesSym),
 	    rn = VECTOR_ELT(dn, 0),
 	    cn = VECTOR_ELT(dn, 1);
-	Rboolean symmetric = (*diag == ' ') ? TRUE : FALSE;
 	if (isNull(cn)) {
-	    if (symmetric && !isNull(rn))
+	    if (di == ' ' && !isNull(rn))
 		setAttrib(res, R_NamesSymbol, rn);
 	} else {
-	    if (symmetric || (!isNull(rn) &&
-			      (rn == cn || equal_string_vectors(rn, cn, n)))) {
+	    if (di == ' ' || (!isNull(rn) &&
+			      (rn == cn || equal_string_vectors(rn, cn, n))))
 		setAttrib(res, R_NamesSymbol, cn);
-	    }
 	}
     }
     UNPROTECT(1);
@@ -376,88 +406,81 @@ SEXP packedMatrix_diag_get(SEXP obj, SEXP nms)
 }
 
 /* diag(x) <- value */
-/* MJ: Is NO_REFERENCES(x@x) ever true?? (in which case do in-place??) */
 SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
 {
-    int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0], nv = LENGTH(val);
-    if (nv != 1 && nv != n) {
+    SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+    int n = INTEGER(dim)[0];
+    R_xlen_t nv = XLENGTH(val);
+    if (nv != 1 && nv != n)
 	error(_("replacement diagonal has wrong length"));
-    }
     
     SEXP x = GET_SLOT(obj, Matrix_xSym);
     SEXPTYPE tx = TYPEOF(x), tv = TYPEOF(val);
-    if (tx < LGLSXP || tx > CPLXSXP) {
+    if (tx < LGLSXP || tx > CPLXSXP)
 	PM_ERROR_INVALID_SLOT_TYPE("x", tx, "diag_set");
-    }
-    if (tv < LGLSXP || tv > REALSXP) {
-	/* Upper bound can become CPLXSXP once we have proper zdenseMatrix */
+    if (tv < LGLSXP || tv > REALSXP)
+	/* Upper bound can become CPLXSXP once we have proper zMatrix */
 	error(_("replacement diagonal has incompatible type \"%s\""),
 	      type2char(tv));
-    }
     
     static const char *valid[] = {
 	"dspMatrix", "dtpMatrix",
 	"lspMatrix", "ltpMatrix",
 	"nspMatrix", "ntpMatrix", ""};
-    int icl = R_check_class_etc(obj, valid);
-    if (icl < 0) {
+    int ivalid = R_check_class_etc(obj, valid);
+    if (ivalid < 0)
 	PM_ERROR_INVALID_CLASS(class_P(obj), "diag_set");
-    }
-    const char *cl = valid[icl];
-    
-    SEXP res = R_NilValue;
+
+    SEXP res,
+	dimnames = GET_SLOT(obj, Matrix_DimNamesSym),
+	uplo = GET_SLOT(obj, Matrix_uploSym);
+    char ul = *CHAR(STRING_ELT(uplo, 0));
     int nprotect = 0;
 
     /* Allocate and coerce as necessary */
     if (tv <= tx) {
 	if (tv < tx) {
-	    val = PROTECT(coerceVector(val, tx)); ++nprotect;
-	    tv = tx;
+	    PROTECT(val = coerceVector(val, tv = tx)); ++nprotect;
 	}
-	res = PROTECT(NEW_OBJECT_OF_CLASS(cl)); ++nprotect;
-	SET_SLOT(res, Matrix_xSym, duplicate(x));
+	PROTECT(res = NEW_OBJECT_OF_CLASS(valid[ivalid])); ++nprotect;
+	PROTECT(x = duplicate(x)); ++nprotect;
     } else { /* tv > tx */
 	/* dMatrix result is only possibility until we have proper [iz]Matrix */
 	if (tv < REALSXP) {
-	    val = PROTECT(coerceVector(val, REALSXP)); ++nprotect;
-	    tv = REALSXP;
+	    PROTECT(val = coerceVector(val, tv = REALSXP)); ++nprotect;
 	}
-	char *dcl = strdup(cl);
-	dcl[0] = 'd';
-	res = PROTECT(NEW_OBJECT_OF_CLASS(dcl)); ++nprotect;
-	SET_SLOT(res, Matrix_xSym, coerceVector(x, tv));
-	free(dcl);
-	tx = tv;
+	char *cl = strdup(valid[ivalid]);
+	cl[0] = 'd';
+	PROTECT(res = NEW_OBJECT_OF_CLASS(cl)); ++nprotect;
+	free(cl);
+	PROTECT(x = coerceVector(x, tx = tv)); ++nprotect;
     }
-    x = PROTECT(GET_SLOT(res, Matrix_xSym)); ++nprotect;
+    SET_SLOT(res, Matrix_xSym, x);
     
     /* Transfer slots other than 'x', 'diag', and 'factors';
-       latter two should keep their prototypes "N" and list()
-    */
-    SET_SLOT(res, Matrix_DimSym, GET_SLOT(obj, Matrix_DimSym));
-    SET_SLOT(res, Matrix_DimNamesSym, GET_SLOT(obj, Matrix_DimNamesSym));
-    SET_SLOT(res, Matrix_uploSym, GET_SLOT(obj, Matrix_uploSym));
+       latter two should keep their prototypes "N" and list() */
+    SET_SLOT(res, Matrix_DimSym, dim);
+    SET_SLOT(res, Matrix_DimNamesSym, dimnames);
+    SET_SLOT(res, Matrix_uploSym, uplo);
     
 #define PM_D_S(_CTYPE_, _PTR_)						\
     do {								\
-	_CTYPE_ *px = _PTR_(x);						\
-	_CTYPE_ *pval = _PTR_(val);					\
+	_CTYPE_ *px = _PTR_(x), *pval = _PTR_(val);			\
+	int j;								\
 	if (nv == 1) {							\
-	    if (*uplo_P(res) == 'U') {					\
-		for (int j = 0; j < n; px += (++j)+1)			\
+	    if (ul == 'U')						\
+		for (j = 0; j < n; px += (++j)+1)			\
 		    *px = *pval;					\
-	    } else {							\
-		for (int j = 0; j < n; px += n-(j++))			\
+	    else							\
+		for (j = 0; j < n; px += n-(j++))			\
 		    *px = *pval;					\
-	    }								\
 	} else {							\
-	    if (*uplo_P(res) == 'U') {					\
-		for (int j = 0; j < n; px += (++j)+1)			\
+	    if (ul == 'U')						\
+		for (j = 0; j < n; px += (++j)+1)			\
 		    *px = *(pval++);					\
-	    } else {							\
-		for (int j = 0; j < n; px += n-(j++))			\
+	    else							\
+		for (j = 0; j < n; px += n-(j++))			\
 		    *px = *(pval++);					\
-	    }								\
 	}								\
     } while (0)
 
@@ -474,7 +497,7 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
     case CPLXSXP:
 	PM_D_S(Rcomplex, COMPLEX);
 	break;
-    default: /* should never happen */
+    default:
 	PM_ERROR_INVALID_SLOT_TYPE("x", tx, "diag_set");
 	break;
     }
@@ -518,9 +541,10 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
 #define PM_SUB1_LOOP(_XIJ_, _NA_, _ZERO_, _ONE_)			\
     do {								\
 	int i, j;							\
+	R_xlen_t k;							\
 	if (TYPEOF(index) == INTSXP) {					\
 	    int pos, *pindex = INTEGER(index);				\
-	    for (R_xlen_t k = 0; k < nindex; ++k) {			\
+	    for (k = 0; k < nindex; ++k) {				\
 		pos = *(pindex++);					\
 		if (pos == NA_INTEGER || pos > nn) {			\
 		    *(pres++) = _NA_;					\
@@ -534,7 +558,7 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
 	} else {							\
 	    double pos, *pindex = REAL(index);				\
 	    R_xlen_t truncpos;						\
-	    for (R_xlen_t k = 0; k < nindex; ++k) {			\
+	    for (k = 0; k < nindex; ++k) {				\
 		pos = *(pindex++);					\
 		if (!R_FINITE(pos) || (truncpos = (R_xlen_t) pos) > nn) { \
 		    *(pres++) = _NA_;					\
@@ -548,61 +572,61 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
 	}								\
     } while (0)
 
-#define PM_SUB1_END(_CTYPE_, _SEXPTYPE_, _PTR_, _NA_, _ZERO_, _ONE_)	\
+#define PM_SUB1_END(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_)		\
     do {								\
-	SEXP res = PROTECT(allocVector(_SEXPTYPE_, nindex));		\
 	_CTYPE_ *pres = _PTR_(res), *px = _PTR_(x);			\
-	if (*diag == ' ') { /* symmetric */				\
-	    if (*uplo == 'U') {						\
+	if (diag == ' ') { /* symmetric */				\
+	    if (uplo == 'U') {						\
 		PM_SUB1_LOOP(PM_XIJ_SY_UP, _NA_, _ZERO_, _ONE_);	\
 	    } else {							\
 		PM_SUB1_LOOP(PM_XIJ_SY_LO, _NA_, _ZERO_, _ONE_);	\
 	    }								\
-	} else if (*diag == 'N') { /* non-unit triangular */		\
-	    if (*uplo == 'U') {						\
+	} else if (diag == 'N') { /* non-unit triangular */		\
+	    if (uplo == 'U') {						\
 		PM_SUB1_LOOP(PM_XIJ_TR_UP_NUN, _NA_, _ZERO_, _ONE_);	\
 	    } else {							\
 		PM_SUB1_LOOP(PM_XIJ_TR_LO_NUN, _NA_, _ZERO_, _ONE_);	\
 	    }								\
 	} else { /* unit triangular */					\
-	    if (*uplo == 'U') {						\
+	    if (uplo == 'U') {						\
 		PM_SUB1_LOOP(PM_XIJ_TR_UP_UNT, _NA_, _ZERO_, _ONE_);	\
 	    } else {							\
 		PM_SUB1_LOOP(PM_XIJ_TR_LO_UNT, _NA_, _ZERO_, _ONE_);	\
 	    }								\
 	}    								\
-	UNPROTECT(1);							\
-	return res;							\
     } while (0)
 
 #define PM_SUB1								\
     do {								\
-	SEXP x = GET_SLOT(obj, Matrix_xSym);				\
-	const char *uplo = uplo_P(obj), *diag = Diag_P(obj);		\
+    	SEXPTYPE tx;							\
+	SEXP x = GET_SLOT(obj, Matrix_xSym),				\
+	    res = PROTECT(allocVector(tx = TYPEOF(x), nindex));		\
+	char uplo = *uplo_P(obj), diag = *Diag_P(obj);			\
 									\
-	switch (TYPEOF(x)) {						\
+	switch (tx) {							\
 	case REALSXP: /* d..Matrix */					\
-	    PM_SUB1_END(double, REALSXP, REAL, NA_REAL, 0.0, 1.0);	\
+	    PM_SUB1_END(double, REAL, NA_REAL, 0.0, 1.0);		\
 	    break;							\
 	case LGLSXP: /* [ln]..Matrix */					\
-	    PM_SUB1_END(int, LGLSXP, LOGICAL, NA_LOGICAL, 0, 1);	\
+	    PM_SUB1_END(int, LOGICAL, NA_LOGICAL, 0, 1);		\
 	    break;							\
 	case INTSXP: /* i..Matrix */					\
-	    PM_SUB1_END(int, INTSXP, INTEGER, NA_INTEGER, 0, 1);	\
+	    PM_SUB1_END(int, INTEGER, NA_INTEGER, 0, 1);		\
 	    break;							\
 	case CPLXSXP: /* z..Matrix */					\
 	{								\
 	    Rcomplex na, zero, one;					\
 	    na.r = NA_REAL; zero.r = 0.0; one.r = 1.0;			\
 	    na.i = NA_REAL; zero.i = 0.0; one.i = 0.0;			\
-	    PM_SUB1_END(Rcomplex, CPLXSXP, COMPLEX, na, zero, one);	\
+	    PM_SUB1_END(Rcomplex, COMPLEX, na, zero, one);		\
 	    break;							\
 	}								\
 	default:							\
-	    PM_ERROR_INVALID_SLOT_TYPE("x", TYPEOF(x), "sub1");		\
+	    PM_ERROR_INVALID_SLOT_TYPE("x", tx, "sub1");		\
 	    break;							\
 	}								\
-	return R_NilValue;						\
+	UNPROTECT(1);							\
+	return res;							\
     } while (0)
 	  
 /* 'x[i]' where 'i' is an integer or double vector with elements 
@@ -611,7 +635,7 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
 SEXP packedMatrix_sub1(SEXP obj, SEXP index)
 {
     int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
-    R_xlen_t n2 = ((R_xlen_t) n) * 2, nn = ((R_xlen_t) n) * n,
+    R_xlen_t n2 = (R_xlen_t) n * 2, nn = (R_xlen_t) n * n,
 	nindex = XLENGTH(index);
     PM_SUB1;
 }
@@ -620,8 +644,8 @@ SEXP packedMatrix_sub1(SEXP obj, SEXP index)
 
 #define PM_SUB1_LOOP(_XIJ_, _NA_, _ZERO_, _ONE_)			\
     do {								\
-	int i, j, *pi = INTEGER(index), *pj = pi + nindex;		\
-	for (int k = 0; k < nindex; ++k) {				\
+	int i, j, k, *pi = INTEGER(index), *pj = pi + nindex;		\
+	for (k = 0; k < nindex; ++k) {					\
 	    i = *(pi++);						\
 	    j = *(pj++);						\
 	    if (i == NA_INTEGER || j == NA_INTEGER) {			\
@@ -641,7 +665,7 @@ SEXP packedMatrix_sub1_mat(SEXP obj, SEXP index)
 {
     int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0],
 	nindex = INTEGER(getAttrib(index, R_DimSymbol))[0];
-    R_xlen_t n2 = ((R_xlen_t) n) * 2;
+    R_xlen_t n2 = (R_xlen_t) n * 2;
     PM_SUB1;
 }
 
@@ -650,8 +674,8 @@ SEXP packedMatrix_sub1_mat(SEXP obj, SEXP index)
 
 #define PM_SUB2_LOOP(_FOR_, _XIJ_, _NA_, _ZERO_, _ONE_)			\
     do {								\
-        int i, j;							\
-	for (int kj = 0; kj < nj; ++kj) {				\
+        int i, j, ki, kj;						\
+	for (kj = 0; kj < nj; ++kj) {					\
 	    if (mj) {							\
 		j = kj;							\
 	    } else {							\
@@ -687,7 +711,7 @@ SEXP packedMatrix_sub1_mat(SEXP obj, SEXP index)
 	    }								\
 	}								\
 	if (do_rn) {							\
-	    for (int ki = 0; ki < ni; ++ki) {				\
+	    for (ki = 0; ki < ni; ++ki) {				\
 		if (mi) {						\
 		    i = ki;						\
 		} else {						\
@@ -704,47 +728,45 @@ SEXP packedMatrix_sub1_mat(SEXP obj, SEXP index)
 	}								\
     } while (0)
 
-#define PM_SUB2(_CTYPE_, _SEXPTYPE_, _PTR_, _NA_, _ZERO_, _ONE_)	\
+#define PM_SUB2(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_)			\
     do {								\
-	SEXP x1 = PROTECT(allocVector(_SEXPTYPE_, len));		\
 	_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);			\
-	if (*diag == ' ') { /* symmetric */				\
-	    if (*uplo == 'U') {						\
+	if (diag == ' ') { /* symmetric */				\
+	    if (uplo == 'U') {						\
 		if (do_sp) {						\
-		    PM_SUB2_LOOP(for (int ki = 0; ki <= kj; ++ki),	\
+		    PM_SUB2_LOOP(for (ki = 0; ki <= kj; ++ki),		\
 				 PM_XIJ_SY_UP, _NA_, _ZERO_, _ONE_);	\
 		} else {						\
-		    PM_SUB2_LOOP(for (int ki = 0; ki < ni; ++ki),	\
+		    PM_SUB2_LOOP(for (ki = 0; ki < ni; ++ki),		\
 				 PM_XIJ_SY_UP, _NA_, _ZERO_, _ONE_);	\
 		}							\
 	    } else {							\
 		if (do_sp) {						\
-		    PM_SUB2_LOOP(for (int ki = kj; ki < ni; ++ki),	\
+		    PM_SUB2_LOOP(for (ki = kj; ki < ni; ++ki),		\
 				 PM_XIJ_SY_LO, _NA_, _ZERO_, _ONE_);	\
 		} else { 						\
-		    PM_SUB2_LOOP(for (int ki = 0; ki < ni; ++ki),	\
+		    PM_SUB2_LOOP(for (ki = 0; ki < ni; ++ki),		\
 				 PM_XIJ_SY_LO, _NA_, _ZERO_, _ONE_);	\
 		}							\
 	    }								\
-	} else if (*diag == 'N') { /* non-unit triangular */		\
-	    if (*uplo == 'U') {						\
-		PM_SUB2_LOOP(for (int ki = 0; ki < ni; ++ki),		\
+	} else if (diag == 'N') { /* non-unit triangular */		\
+	    if (uplo == 'U') {						\
+		PM_SUB2_LOOP(for (ki = 0; ki < ni; ++ki),		\
 			     PM_XIJ_TR_UP_NUN, _NA_, _ZERO_, _ONE_);	\
 	    } else {							\
-		PM_SUB2_LOOP(for (int ki = 0; ki < ni; ++ki),		\
+		PM_SUB2_LOOP(for (ki = 0; ki < ni; ++ki),		\
 			     PM_XIJ_TR_LO_NUN, _NA_, _ZERO_, _ONE_);	\
 	    }								\
 	} else { /* unit triangular */					\
-	    if (*uplo == 'U') {						\
-		PM_SUB2_LOOP(for (int ki = 0; ki < ni; ++ki),		\
+	    if (uplo == 'U') {						\
+		PM_SUB2_LOOP(for (ki = 0; ki < ni; ++ki),		\
 			     PM_XIJ_TR_UP_UNT, _NA_, _ZERO_, _ONE_);	\
 	    } else {							\
-		PM_SUB2_LOOP(for (int ki = 0; ki < ni; ++ki),		\
+		PM_SUB2_LOOP(for (ki = 0; ki < ni; ++ki),		\
 			     PM_XIJ_TR_LO_UNT, _NA_, _ZERO_, _ONE_);	\
 	    }								\
 	}								\
 	SET_SLOT(res, Matrix_xSym, x1);					\
-	UNPROTECT(1);							\
     } while (0)
 
 /* 'x[i, ]', 'x[, j]', and 'x[i, j]' where 'i' and 'j' are integer vectors 
@@ -754,7 +776,7 @@ SEXP packedMatrix_sub2(SEXP obj, SEXP index1, SEXP index2, SEXP drop)
 {
     Rboolean mi = isNull(index1), mj = isNull(index2);
     int *pi, *pj, n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
-    R_xlen_t ni, nj, n2 = ((R_xlen_t) n) * 2;
+    R_xlen_t ni, nj, n2 = (R_xlen_t) n * 2;
     
     if (mi) {
 	ni = n;
@@ -778,52 +800,50 @@ SEXP packedMatrix_sub2(SEXP obj, SEXP index1, SEXP index2, SEXP drop)
     static const char *valid[] = {
 	"dspMatrix", "lspMatrix", "nspMatrix",
 	"dtpMatrix", "ltpMatrix", "ntpMatrix", ""};
-    int icl = R_check_class_etc(obj, valid), nprotect = 0;
-    if (icl < 0) {
+    int ivalid = R_check_class_etc(obj, valid), nprotect = 0;
+    if (ivalid < 0) {
 	PM_ERROR_INVALID_CLASS(class_P(obj), "sub2");
     }
-    const char *uplo = uplo_P(obj), *diag = Diag_P(obj);
+    char uplo = *uplo_P(obj), diag = *Diag_P(obj);
 
     /* Initialize result of same type but "general" class,
        except for symmetric indexing of symmetric matrix, 
        when class is retained also
     */
     SEXP res;
-    Rboolean do_sp = (icl <= 2 && !mi && !mj && ni == nj &&
-		      !memcmp(pi, pj, ni * sizeof(int)));
+    Rboolean do_sp = (ivalid <= 2 && !mi && !mj && ni == nj &&
+		      memcmp(pi, pj, ni * sizeof(int)) == 0);
     if (do_sp) {
-	res = PROTECT(NEW_OBJECT_OF_CLASS(valid[icl])); ++nprotect;
+	PROTECT(res = NEW_OBJECT_OF_CLASS(valid[ivalid])); ++nprotect;
 	SET_SLOT(res, Matrix_uploSym, GET_SLOT(obj, Matrix_uploSym));
     } else {
-	char *cl = strdup(valid[icl]);
+	char *cl = strdup(valid[ivalid]);
 	cl[1] = 'g';
 	cl[2] = 'e';
-	res = PROTECT(NEW_OBJECT_OF_CLASS(cl)); ++nprotect;
+	PROTECT(res = NEW_OBJECT_OF_CLASS(cl)); ++nprotect;
 	free(cl);
     }
 
     /* Set 'Dim' slot */
-    SEXP d1 = PROTECT(GET_SLOT(res, Matrix_DimSym));
+    SEXP d1 = PROTECT(GET_SLOT(res, Matrix_DimSym)); ++nprotect;
     INTEGER(d1)[0] = ni;
     INTEGER(d1)[1] = nj;
-    UNPROTECT(1);
 
     /* Set 'Dimnames' slot and 'names(Dimnames)' */
-    SEXP dn0, dn1, rn0, rn1, cn0, cn1;
-    dn0 = GET_SLOT(obj, Matrix_DimNamesSym);
-    dn1 = PROTECT(GET_SLOT(res, Matrix_DimNamesSym)); ++nprotect;
-    if (*diag == ' ') { /* symmetric */
-    	int j;
-	if (isNull(rn0 = cn0 = VECTOR_ELT(dn0, j = 1))) {
-	    rn0 = cn0 = VECTOR_ELT(dn0, j = 0);
+    SEXP rn0, rn1, cn0, cn1,
+	dn0 = GET_SLOT(obj, Matrix_DimNamesSym),
+	dn1 = PROTECT(GET_SLOT(res, Matrix_DimNamesSym)); ++nprotect;
+    if (diag == ' ') { /* symmetric */
+    	int J;
+	if (isNull(rn0 = cn0 = VECTOR_ELT(dn0, J = 1))) {
+	    rn0 = cn0 = VECTOR_ELT(dn0, J = 0);
 	}
 	SEXP s;
 	if (!isNull(s = getAttrib(dn0, R_NamesSymbol))) {
-	    SEXP ndn1 = PROTECT(allocVector(STRSXP, 2));
-	    SET_STRING_ELT(ndn1, 0, s = STRING_ELT(s, j));
+	    SEXP ndn1 = PROTECT(allocVector(STRSXP, 2)); ++nprotect;
+	    SET_STRING_ELT(ndn1, 0, s = STRING_ELT(s, J));
 	    SET_STRING_ELT(ndn1, 1, s);
 	    setAttrib(dn1, R_NamesSymbol, ndn1);
-	    UNPROTECT(1);
 	}
     } else { /* triangular */
 	rn0 = VECTOR_ELT(dn0, 0);
@@ -841,7 +861,7 @@ SEXP packedMatrix_sub2(SEXP obj, SEXP index1, SEXP index2, SEXP drop)
 	if (mi) {
 	    SET_VECTOR_ELT(dn1, 0, rn0);
 	} else {
-	    rn1 = PROTECT(allocVector(STRSXP, ni)); ++nprotect;
+	    PROTECT(rn1 = allocVector(STRSXP, ni)); ++nprotect;
 	    SET_VECTOR_ELT(dn1, 0, rn1);
 	    do_rn = TRUE;
 	}
@@ -850,40 +870,43 @@ SEXP packedMatrix_sub2(SEXP obj, SEXP index1, SEXP index2, SEXP drop)
 	if (mj) {
 	    SET_VECTOR_ELT(dn1, 1, cn0);
 	} else {
-	    cn1 = PROTECT(allocVector(STRSXP, nj)); ++nprotect;
+	    PROTECT(cn1 = allocVector(STRSXP, nj)); ++nprotect;
 	    SET_VECTOR_ELT(dn1, 1, cn1);
 	    do_cn = TRUE;
 	}
     }
 
     /* Set 'x' slot */
-    SEXP x0 = GET_SLOT(obj, Matrix_xSym);
-    R_xlen_t len = (do_sp ? (ni * (ni + 1)) / 2 : ni * nj);
-    switch (TYPEOF(x0)) {
+    SEXPTYPE tx;
+    R_xlen_t nx = (do_sp ? (ni * (ni + 1)) / 2 : ni * nj);
+    SEXP x0 = GET_SLOT(obj, Matrix_xSym),
+	x1 = PROTECT(allocVector(tx = TYPEOF(x0), nx)); ++nprotect;
+    switch (tx) {
     case REALSXP: /* d..Matrix */
-	PM_SUB2(double, REALSXP, REAL, NA_REAL, 0.0, 1.0);
+	PM_SUB2(double, REAL, NA_REAL, 0.0, 1.0);
 	break;
     case LGLSXP: /* [ln]..Matrix */
-	PM_SUB2(int, LGLSXP, LOGICAL, NA_LOGICAL, 0, 1);
+	PM_SUB2(int, LOGICAL, NA_LOGICAL, 0, 1);
 	break;
     case INTSXP: /* i..Matrix */
-	PM_SUB2(int, INTSXP, INTEGER, NA_INTEGER, 0, 1);
+	PM_SUB2(int, INTEGER, NA_INTEGER, 0, 1);
 	break;
     case CPLXSXP: /* z..Matrix */
     {
 	Rcomplex na, zero, one;
 	na.r = NA_REAL; zero.r = 0.0; one.r = 1.0;
 	na.i = NA_REAL; zero.i = 0.0; one.i = 0.0;
-	PM_SUB2(Rcomplex, CPLXSXP, COMPLEX, na, zero, one);
+	PM_SUB2(Rcomplex, COMPLEX, na, zero, one);
 	break;
     }
     default:
-	PM_ERROR_INVALID_SLOT_TYPE("x", TYPEOF(x0), "sub2");
+	PM_ERROR_INVALID_SLOT_TYPE("x", tx, "sub2");
+	break;
     }
 
     /* Drop dimensions in this special case */
     if (asLogical(drop) != 0 && (ni == 1 || nj == 1)) {
-	res = PROTECT(GET_SLOT(res, Matrix_xSym)); ++nprotect;
+	PROTECT(res = GET_SLOT(res, Matrix_xSym)); ++nprotect;
 	if (has_rn && nj == 1 && ni != 1) {
 	    setAttrib(res, R_NamesSymbol, VECTOR_ELT(dn1, 0));
 	} else if (has_cn && ni == 1 && nj != 1) {
