@@ -58,6 +58,7 @@
 \alias{coerce,ddiMatrix,dtRMatrix-method}
 \alias{coerce,ddiMatrix,dtTMatrix-method}
 \alias{coerce,ddiMatrix,dtrMatrix-method}
+\alias{coerce,ddiMatrix,ldiMatrix-method}
 \alias{prod,ddiMatrix-method}
 \alias{rbind2,ddiMatrix,atomicVector-method}
 \alias{rbind2,ddiMatrix,matrix-method}

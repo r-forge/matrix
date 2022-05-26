@@ -54,47 +54,54 @@
 \alias{tril,nsCMatrix-method}
 %
 \description{
-  Returns a new matrix formed by extracting the lower triangle
-  (\code{tril}) or the upper triangle (\code{triu}) or a general band
-  relative to the diagonal (\code{band}), and setting other elements
-  to zero.  The general forms of these functions include integer
-  arguments to specify how many diagonal bands above or below the main
-  diagonal are not set to zero.
+  Return the matrix obtained by setting to zero elements below a diagonal
+  (\code{triu}), above a diagonal (\code{tril}), or outside of a general
+  band (\code{band}).
 }
 \usage{
 band(x, k1, k2, \dots)
-tril(x, k = 0, \dots)
 triu(x, k = 0, \dots)
+tril(x, k = 0, \dots)
 }
 \arguments{
   \item{x}{a matrix-like object}
-  \item{k,k1,k2}{integers specifying the diagonal bands that will not
-  be set to zero.  These are given relative to the main diagonal,
-  which is \code{k=0}.  A negative value of \code{k} indicates a
-  diagonal below the main diagonal and a positive value indicates a
-  diagonal above the main diagonal.}
- \item{\dots}{Optional arguments used by specific methods. (None used at present.)}
+  \item{k,k1,k2}{integers specifying the diagonals that are not set to
+    zero.  These are interpreted relative to the main diagonal, which
+    is \code{k=0}.  Positive and negative values of \code{k} indicate
+    diagonals above and below the main diagonal, respectively.}
+  \item{\dots}{optional arguments passed methods (currently unused
+    by package \pkg{Matrix})}
+}
+\details{
+  \code{triu(x, k)} is equivalent to \code{band(x, k, dim(x)[2])}.
+  Similarly,
+  \code{tril(x, k)} is equivalent to \code{band(x, -dim(x)[1], k)}.
 }
 \value{
-  An object of an appropriate matrix class.  The class of the value of
-  \code{tril} or \code{triu} inherits from
-  \code{\linkS4class{triangularMatrix}} when appropriate.  Note that the
-  result is of class \code{\linkS4class{sparseMatrix}} only if \code{x} is.
+  An object of a suitable matrix class, inheriting from
+  \code{\linkS4class{triangularMatrix}} where appropriate.
+  It inherits from \code{\linkS4class{sparseMatrix}} only
+  if \code{x} does (and the same can be said for
+  \code{\linkS4class{packedMatrix}} and
+  \code{\linkS4class{symmetricMatrix}}).
 }
 \section{Methods}{
   \describe{
     \item{x = "CsparseMatrix"}{method for compressed, sparse,
       column-oriented matrices.}
-    \item{x = "TsparseMatrix"}{method for sparse matrices in triplet format.}
     \item{x = "RsparseMatrix"}{method for compressed, sparse,
       row-oriented matrices.}
-    \item{x = "ddenseMatrix"}{method for dense numeric matrices,
-      including packed numeric matrices.}
+    \item{x = "TsparseMatrix"}{method for sparse matrices in
+      triplet format.}
+    \item{x = "denseMatrix"}{method for dense matrices in
+      packed or unpacked format.}
+    \item{x = "matrix"}{method for traditional matrices
+      of implicit class \code{\link{matrix}}.}
   }
 }
 \seealso{
-  \code{\link{bandSparse}} for the \emph{construction} of a banded
-  sparse matrix directly from its non-zero diagonals.
+  \code{\link{bandSparse}} for the \emph{construction} of a
+  banded sparse matrix directly from its non-zero diagonals.
 }
 \examples{
 ## A random sparse matrix :

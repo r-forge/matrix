@@ -481,6 +481,34 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
         tril(from)
 }
 
+.M2diag <- function(from) {
+    if (!isDiagonal(from))
+        stop("matrix is not diagonal; consider diag(diag())")
+    x <- diag(from, names = FALSE)
+    cl <- switch(typeof(x),
+                 double = {
+                     unit <- allTrue(x == 1)
+                     "ddiMatrix" },
+                 integer = {
+                     unit <- allTrue(x == 1L)
+                     storage.mode(x) <- "double"
+                     "ddiMatrix" },
+                 ## integer = {
+                 ##     unit <- allTrue(x == 1L)
+                 ##     "idiMatrix" },
+                 logical = {
+                     unit <- allTrue(x)
+                     "ldiMatrix" },
+                 complex =
+                     stop("complex \"diagonalMatrix\" not yet implemented"),
+                 ## complex = {
+                 ##     unit <- allTrue(x == 1+0i)
+                 ##     "zdiMatrix" },
+                 stop(sprintf("cannot coerce matrix of type \"%s\" to \"diagonalMatrix\"", typeof(x))))
+    new(cl, Dim = dim(from), Dimnames = .M.DN(from),
+        diag = if(unit) "U" else "N", x = if(unit) x[FALSE] else x)
+}
+
 ##' @title Coerce from "dense" to '.geMatrix'
 ##' @param from vector, matrix, \code{denseMatrix}, or \code{diagonalMatrix}.
 ##' @param kind character flag, either the empty string \code{""}

@@ -47,6 +47,7 @@
 \alias{cbind2,ldiMatrix,atomicVector-method}
 \alias{cbind2,ldiMatrix,matrix-method}
 \alias{cbind2,matrix,ldiMatrix-method}
+\alias{coerce,ldiMatrix,ddiMatrix-method}
 \alias{coerce,ldiMatrix,lgCMatrix-method}
 \alias{coerce,ldiMatrix,lgRMatrix-method}
 \alias{coerce,ldiMatrix,lgTMatrix-method}
