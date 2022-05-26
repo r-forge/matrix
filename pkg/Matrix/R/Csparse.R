@@ -452,43 +452,57 @@ setMethod("t", signature(x = "CsparseMatrix"),
 ##     for all triangular ones, where the latter may 'callNextMethod()' these:
 setMethod("tril", "CsparseMatrix",
 	  function(x, k = 0, ...) {
-	      k <- as.integer(k[1])
-	      dd <- dim(x); sqr <- dd[1] == dd[2]
-	      stopifnot(-dd[1] <= k, k <= dd[1]) # had k <= 0
-	      r <- .Call(Csparse_band, x, -dd[1], k)
-	      ## return "lower triangular" if k <= 0
-	      if(sqr && k <= 0) .gC2tC(r, uplo = "L") else r
+	      k <- as.integer(k[1L])
+	      m <- (d <- x@Dim)[1L]
+              n <- d[2L]
+              stopifnot(-m <= k, k <= n)
+	      r <- .Call(Csparse_band, x, -m, k)
+	      if(m == n && k <= 0L)
+                  ## lower triangular result
+                  .gC2tC(r, uplo = "L")
+              else r
 	  })
 
 setMethod("triu", "CsparseMatrix",
 	  function(x, k = 0, ...) {
-	      k <- as.integer(k[1])
-	      dd <- dim(x); sqr <- dd[1] == dd[2]
-	      stopifnot(-dd[1] <= k, k <= dd[1]) # had k >= 0
-	      r <- .Call(Csparse_band, x, k, dd[2])
-	      ## return "upper triangular" if k >= 0
-	      if(sqr && k >= 0) .gC2tC(r, uplo = "U") else r
+	      k <- as.integer(k[1L])
+	      m <- (d <- x@Dim)[1L]
+              n <- d[2L]
+              stopifnot(-m <= k, k <= n)
+	      r <- .Call(Csparse_band, x, k, n)
+	      if(m == n && k >= 0L)
+                  ## upper triangular result
+                  .gC2tC(r, uplo = "U")
+              else r
 	  })
 
 setMethod("band", "CsparseMatrix",
 	  function(x, k1, k2, ...) {
-	      k1 <- as.integer(k1[1])
-	      k2 <- as.integer(k2[1])
-	      dd <- dim(x); sqr <- dd[1] == dd[2]
-	      stopifnot(-dd[1] <= k1, k1 <= k2, k2 <= dd[2])
-	      if(extends(cl <- getClassDef(class(x)), "symmetricMatrix") && k1 != -k2) {
-		  ## result is *not* symmetric (but C's Csparse_band will keep '->stype'):
-		  x <- as(x, "generalMatrix") # -> .Call(Csparse_symmetric_to_general, .)
-	      } else if(extends(cl, "triangularMatrix") && x@diag == "U")
-		  x <- .diagU2N(x, cl)
+	      k1 <- as.integer(k1[1L])
+	      k2 <- as.integer(k2[1L])
+              m <- (d <- x@Dim)[1L]
+              n <- d[2L]
+	      stopifnot(-m <= k1, k2 <= n, k1 <= k2)
+              square <- symmetric <- m == n
+              if(square) {
+                  cld <- getClassDef(class(x))
+                  if((symmetric <- extends(cld, "symmetricMatrix")) &&
+                     k1 != -k2) {
+                      ## result is not symmetric
+                      ## but C-level Csparse_band() keeps '->stype':
+                      x <- as(x, "generalMatrix")
+                  } else if(extends(cld, "triangularMatrix") &&
+                            x@diag == "U")
+                      x <- .diagU2N(x, cld)
+              }
 	      r <- .Call(Csparse_band, x, k1, k2)
-	      if(sqr && as.numeric(k1) * k2 >= 0) ## triangular result
+	      if(square && as.double(k1) * k2 >= 0)
+                  ## triangular result (does this always work ??)
 		  as(r, paste0(.M.kind(x), "tCMatrix"))
-	      else if (k1 < 0  &&  k1 == -k2  && isSymmetric(x)) ## symmetric
-		  ## does this always work ??
+	      else if(symmetric && k1 == -k2)
+                  ## symmetric result (does this always work ??)
 		  as(r, paste0(.M.kind(x), "sCMatrix"))
-	      else
-		  r
+	      else r
 	  })
 
 setMethod("diag", "CsparseMatrix",

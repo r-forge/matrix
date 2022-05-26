@@ -2,33 +2,6 @@
 
 ## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.M2diag <- function(from) {
-    if (!isDiagonal(from))
-        stop("matrix is not diagonal; consider diag(diag())")
-    x <- diag(from, names = FALSE)
-    switch(typeof(x),
-           double = {
-               cl <- "ddiMatrix"
-               unit <- allTrue(x == 1) },
-           integer = {
-               cl <- "ddiMatrix"
-               unit <- allTrue(x == 1L)
-               storage.mode(x) <- "double" },
-           ## integer = {
-           ##     cl <- "idiMatrix"
-           ##     unit <- allTrue(x == 1L) },
-           logical = {
-               cl <- "ldiMatrix"
-               unit <- allTrue(x) },
-           complex = stop("complex \"diagonalMatrix\" not yet implemented"),
-           ## complex = {
-           ##     cl <- "zdiMatrix"
-           ##     unit = allTrue(x == 1+0i) },
-           stop(sprintf("cannot coerce matrix of type \"%s\" to \"diagonalMatrix\""), typeof(x)))
-    new(cl, Dim = dim(from), Dimnames = .M.DN(from),
-        diag = if(unit) "U" else "N", x = if(unit) x[FALSE] else x)
-}
-
 setAs("Matrix", "diagonalMatrix", .M2diag)
 setAs("matrix", "diagonalMatrix", .M2diag)
 
@@ -172,21 +145,29 @@ setAs("diagonalMatrix",     "ldenseMatrix", ..diag2ltr)
 setAs("diagonalMatrix",     "ndenseMatrix", ..diag2ntr)
 setAs("diagonalMatrix",           "matrix", ..diag2m)
 
-for (.kind in c("d", "l"))
+.kinds <- c("d", "l")
+for (.kind in .kinds) {
+    ## ddi->[^d]di and similar
+    for (.otherkind in .kinds[.kinds != .kind])
+        setAs(paste0(     .kind, "diMatrix"),
+              paste0(.otherkind, "diMatrix"),
+              get(paste0("..diag2", .otherkind, "kind"),
+                  mode = "function", inherits = FALSE))
+    ## ddi->d[tsg][CRT] and similar
     for (.x in c("t", "s", "g"))
         for (.y in c("C", "R", "T"))
             setAs(paste0(.kind, "diMatrix"),
                   paste0(.kind, .x, .y, "Matrix"),
                   get(paste0("..diag2", .x, .y),
                       mode = "function", inherits = FALSE))
-
-for (.kind in c("d", "l"))
+    ## ddi->d(tr|sy|ge) and similar
     for (.xy in c("tr", "sy", "ge"))
         setAs(paste0(.kind, "diMatrix"),
               paste0(.kind, .xy, "Matrix"),
               get(paste0("..diag2", .kind, .xy),
                   mode = "function", inherits = FALSE))
-rm(.kind, .x, .y, .xy)
+}
+rm(.kinds, .kind, .otherkind, .x, .y, .xy)
 
 rm(..diag2dkind, ..diag2lkind,
    ..diag2dsparse, ..diag2lsparse, ..diag2nsparse,

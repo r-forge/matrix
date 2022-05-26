@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-05-26 r3477)}{
+\section{Changes in version 1.4-2 (2022-05-26 r3478)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -70,6 +70,18 @@
       \code{Dimnames} and \code{names(Dimnames)}, following
       \code{isSymmetric.matrix} from \pkg{base}.  See also
       New Features.
+
+      \item \code{band(x, -k, k)} for sparse \code{x} used
+      \code{isSymmetric(x)} (which tolerates numerical fuzz) to test
+      for symmetry, resulting in loss of information in some cases.
+      Now it tests that \code{x} inherits from \code{symmetricMatrix},
+      and so returns \code{symmetricMatrix} in fewer cases.
+      
+      \item \code{triu(x, k)} and \code{tril(x, k)} incorrectly
+      required \code{k <= m} (instead of \code{k <= n}),
+      for \code{m}-by-\code{n} sparse \code{x}.  They now accept
+      all \code{k} from \code{-m} to \code{n}, with fewer errors
+      in the \code{m < n} case.
     }
   }
   \subsection{New Features}{
