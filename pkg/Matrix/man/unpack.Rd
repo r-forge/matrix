@@ -2,18 +2,29 @@
 \title{Representation of Packed and Unpacked Dense Matrices}
 %
 \alias{pack}
-\alias{pack,packedMatrix-method}
-\alias{pack,unpackedMatrix-method}
+\alias{unpack}
+%
 \alias{pack,dgeMatrix-method}
 \alias{pack,lgeMatrix-method}
-\alias{pack,ngeMatrix-method}
 \alias{pack,matrix-method}
+\alias{pack,ngeMatrix-method}
+\alias{pack,packedMatrix-method}
 \alias{pack,sparseMatrix-method}
-\alias{unpack}
-\alias{unpack,packedMatrix-method}
-\alias{unpack,unpackedMatrix-method}
-\alias{unpack,sparseMatrix-method}
+\alias{pack,unpackedMatrix-method}
 %
+\alias{unpack,matrix-method}
+\alias{unpack,packedMatrix-method}
+\alias{unpack,sparseMatrix-method}
+\alias{unpack,unpackedMatrix-method}
+%
+\description{
+  \code{pack()} coerces dense symmetric and dense triangular matrices
+  from unpacked format (storing the full matrix) to packed format
+  (storing only one of the upper and lower triangles).  \code{unpack()}
+  performs the reverse coercion. The two formats are formalized
+  by the virtual classes \code{"\linkS4class{packedMatrix}"} and
+  \code{"\linkS4class{unpackedMatrix}"}.
+}
 \usage{
 pack(x, \dots)
 \S4method{pack}{dgeMatrix}(x, symmetric = NA, upperTri = NA, \dots)
@@ -22,14 +33,6 @@ pack(x, \dots)
 \S4method{pack}{matrix}(x, symmetric = NA, upperTri = NA, \dots)
 
 unpack(x, \dots)
-}
-\description{
-  \code{pack()} coerces dense symmetric and dense triangular matrices
-  from unpacked format (storing the full matrix) to packed format
-  (storing only one of the upper and lower triangles).  \code{unpack()}
-  performs the reverse coercion. The two formats are formalized
-  by the virtual classes \code{"\linkS4class{packedMatrix}"} and
-  \code{"\linkS4class{unpackedMatrix}"}.
 }
 \arguments{
   \item{x}{A dense symmetric or dense triangular matrix.

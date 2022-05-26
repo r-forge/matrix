@@ -1,12 +1,12 @@
-
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 ## ..2dge() -> ./Auxiliaries.R
-
 setAs("matrix",  "dgeMatrix", function(from) ..2dge(from))
 setAs("numLike", "dgeMatrix", function(from) ..2dge(from))
 
 ge2mat <- function(from) array(from@x, dim = from@Dim, dimnames = from@Dimnames)
 setAs("dgeMatrix", "matrix", ge2mat)
-
+} ## MJ
 
 ##  "[" settings are "up in"  Matrix.R & denseMatrix.R
 
@@ -41,7 +41,7 @@ setMethod("rcond", signature(x = "dgeMatrix", norm = "character"),
 ## 	  function(x, type, ...) .Call(dgeMatrix_norm, ..2dge(x), type),
 ## 	  valueClass = "numeric")
 
-## MJ: No longer needed ... replacement in ./unpackedMatrix.R
+## MJ: no longer needed ... replacement in ./unpackedMatrix.R
 if (FALSE) {
 ..get.diag <- function(x, nrow, ncol, names=TRUE) {
     ##         vvvvvvvvvvvvvvvvv here just a place holder, replaced in .mkSpec.diag()

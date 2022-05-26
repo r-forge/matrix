@@ -108,30 +108,20 @@ SEXP LU_expand(SEXP x)
     if(L_is_tri) {
 	SET_SLOT(L, Matrix_uploSym, mkString("L"));
 	SET_SLOT(L, Matrix_diagSym, mkString("U"));
-	ddense_unpacked_make_triangular(REAL(GET_SLOT(L, Matrix_xSym)), L);
-    } else { // L is "unit-diagonal" trapezoidal -- m > n -- "long"
-	// fill the upper right part with 0  *and* the diagonal with 1
-	double *Lx = REAL(GET_SLOT(L, Matrix_xSym));
-	size_t ii;
-	for (i = 0, ii = 0; i < n; i++, ii+=(m+1)) { // ii = i*(m+1)
-	    Lx[ii] = 1.;
-	    for (size_t j = i*m_; j < ii; j++)
-		Lx[j] = 0.;
-	}
     }
+    // fill the upper right part with 0  *and* the diagonal with 1
+    ddense_unpacked_make_triangular(REAL(GET_SLOT(L, Matrix_xSym)),
+				    m, (is_sq || !L_is_tri) ? n : m, 'L', 'U');
 
     if(U_is_tri) {
 	SET_SLOT(U, Matrix_uploSym, mkString("U"));
 	SET_SLOT(U, Matrix_diagSym, mkString("N"));
-	ddense_unpacked_make_triangular(REAL(GET_SLOT(U, Matrix_xSym)), U);
-    } else { // U is trapezoidal -- m < n
-	// fill the lower left part with 0
-	double *Ux = REAL(GET_SLOT(U, Matrix_xSym));
-	for (i = 0; i < m; i++)
-	    for (size_t j = i*(m_+1) +1; j < (i+1)*m_; j++)
-		Ux[j] = 0.;
+	
     }
-
+    // fill the lower left part with 0
+    ddense_unpacked_make_triangular(REAL(GET_SLOT(U, Matrix_xSym)),
+				    (is_sq || !U_is_tri) ? m : n, n, 'U', 'N');
+    
     SET_SLOT(P, Matrix_DimSym, duplicate(dd));
     if(!is_sq) // m != n -- P is  m x m
 	INTEGER(GET_SLOT(P, Matrix_DimSym))[1] = m;

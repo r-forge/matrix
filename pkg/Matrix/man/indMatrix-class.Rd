@@ -1,34 +1,28 @@
 \name{indMatrix-class}
 \title{Index Matrices}
 \docType{class}
+%
 \alias{indMatrix-class}
-\alias{-,indMatrix,missing-method}
-\alias{coerce,integer,indMatrix-method}
-\alias{coerce,numeric,indMatrix-method}
-\alias{coerce,list,indMatrix-method}
-\alias{coerce,matrix,indMatrix-method}
-\alias{coerce,sparseMatrix,indMatrix-method}
-\alias{coerce,indMatrix,matrix-method}
-\alias{coerce,indMatrix,ngeMatrix-method}
-\alias{coerce,indMatrix,ngTMatrix-method}
-\alias{coerce,indMatrix,dMatrix-method}
-\alias{coerce,indMatrix,lMatrix-method}
-\alias{coerce,indMatrix,nMatrix-method}
+%
+\alias{Summary,indMatrix-method}
 \alias{coerce,indMatrix,CsparseMatrix-method}
 \alias{coerce,indMatrix,TsparseMatrix-method}
+\alias{coerce,indMatrix,dMatrix-method}
 \alias{coerce,indMatrix,dsparseMatrix-method}
+\alias{coerce,indMatrix,lMatrix-method}
 \alias{coerce,indMatrix,lsparseMatrix-method}
+\alias{coerce,indMatrix,matrix-method}
+\alias{coerce,indMatrix,nMatrix-method}
+\alias{coerce,indMatrix,ngTMatrix-method}
+\alias{coerce,indMatrix,ngeMatrix-method}
 \alias{coerce,indMatrix,nsparseMatrix-method}
-\alias{coerce,nMatrix,indMatrix-method}
+\alias{coerce,integer,indMatrix-method}
+\alias{coerce,list,indMatrix-method}
+\alias{coerce,matrix,indMatrix-method}
+\alias{coerce,numeric,indMatrix-method}
 \alias{determinant,indMatrix,logical-method}
-\alias{Summary,indMatrix-method}
-%-- see also ./matrix-products.Rd, kronecker-methods.Rd, is.na-methods.Rd, ...
 \alias{rbind2,indMatrix,indMatrix-method}
 \alias{t,indMatrix-method}
-\alias{colSums,indMatrix-method}
-\alias{colMeans,indMatrix-method}
-\alias{rowSums,indMatrix-method}
-\alias{rowMeans,indMatrix-method}
 %
 \description{The \code{"indMatrix"} class is the class of index
   matrices, stored as 1-based integer index vectors.  An index matrix is

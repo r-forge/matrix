@@ -120,22 +120,22 @@ solve.dsC.dC <- function(a,b, LDL = NA, tol = .Machine$double.eps) {
 
 setMethod("solve", signature(a = "dsCMatrix", b = "ddenseMatrix"),
 	  function(a, b, LDL = NA, tol = .Machine$double.eps, ...) {
-	      solve.dsC.mat(a, b = ..2dge(b), LDL=LDL, tol=tol)
+	      solve.dsC.mat(a, b = .dense2dge(b), LDL=LDL, tol=tol)
 	  },
 	  valueClass = "dgeMatrix")
 setMethod("solve", signature(a = "dsCMatrix", b = "denseMatrix"),
 	  ## only triggers for diagonal*, ldense*.. (but *not* ddense: above)
 	  function(a, b, LDL = NA, tol = .Machine$double.eps, ...)
-	  solve.dsC.mat(a, as(..2ge(b), "dgeMatrix"), LDL=LDL, tol=tol))
+	  solve.dsC.mat(a, .dense2dge(b), LDL=LDL, tol=tol))
 
 setMethod("solve", signature(a = "dsCMatrix", b = "matrix"),
 	  function(a, b, LDL = NA, tol = .Machine$double.eps, ...)
-	  solve.dsC.mat(a, ..2dge(b), LDL=LDL, tol=tol),
+	  solve.dsC.mat(a, .dense2dge(b), LDL=LDL, tol=tol),
 	  valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dsCMatrix", b = "numeric"),
 	  function(a, b, LDL = NA, tol = .Machine$double.eps, ...)
-	  solve.dsC.mat(a, ..2dge(b), LDL=LDL, tol=tol),
+	  solve.dsC.mat(a, .dense2dge(b), LDL=LDL, tol=tol),
 	  valueClass = "dgeMatrix")
 
 ## <sparse> . <sparse> ------------------------

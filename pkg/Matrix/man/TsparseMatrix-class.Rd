@@ -1,21 +1,18 @@
 \name{TsparseMatrix-class}
 \title{Class "TsparseMatrix" of Sparse Matrices in Triplet Form}
 \docType{class}
+%
 \alias{TsparseMatrix-class}
-%% Methods:
+%
 \alias{coerce,TsparseMatrix,CsparseMatrix-method}
-\alias{coerce,TsparseMatrix,lsparseMatrix-method}
 \alias{coerce,TsparseMatrix,lMatrix-method}
-\alias{coerce,TsparseMatrix,nsparseMatrix-method}
-\alias{coerce,TsparseMatrix,nMatrix-method}
+\alias{coerce,TsparseMatrix,lsparseMatrix-method}
 \alias{coerce,TsparseMatrix,matrix-method}
-\alias{coerce,Matrix,TsparseMatrix-method}
+\alias{coerce,TsparseMatrix,nMatrix-method}
+\alias{coerce,TsparseMatrix,nsparseMatrix-method}
+\alias{coerce,TsparseMatrix,sparseVector-method}
 \alias{coerce,matrix,TsparseMatrix-method}
 \alias{coerce,numeric,TsparseMatrix-method}
-%
-% "[" are in ./Xtrct-methods.Rd;  "[<-" in ./Subassign-methods.Rd
-%\alias{solve,...} --> solve-methods.Rd
-%\alias{\%*%,... } --> matrix-products.Rd
 \alias{t,TsparseMatrix-method}
 %
 \description{The \code{"TsparseMatrix"} class is the virtual class of

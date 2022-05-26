@@ -1,20 +1,26 @@
 \name{lu}
 \title{(Generalized) Triangular Decomposition of a Matrix}
+%
 \alias{lu}
-\alias{lu,matrix-method}
-\alias{lu,dgeMatrix-method}
+%
+\alias{lu,ddenseMatrix-method}
 \alias{lu,dgCMatrix-method}
+\alias{lu,dgeMatrix-method}
+\alias{lu,dsparseMatrix-method}
 \alias{lu,dtCMatrix-method}
+\alias{lu,matrix-method}
+\alias{lu,sparseMatrix-method}
+%
+\description{
+  Computes (generalized) triangular decompositions of square (sparse or
+  dense) and non-square dense matrices.
+}
 \usage{
 lu(x, \dots)
 \S4method{lu}{matrix}(x, warnSing = TRUE, \dots)
 \S4method{lu}{dgeMatrix}(x, warnSing = TRUE, \dots)
 \S4method{lu}{dgCMatrix}(x, errSing = TRUE, order = TRUE, tol = 1,
    keep.dimnames = TRUE, \dots)
-}
-\description{
-  Computes (generalized) triangular decompositions of square (sparse or
-  dense) and non-square dense matrices.
 }
 \arguments{
   \item{x}{a dense or sparse matrix, in the latter case of square

@@ -238,7 +238,7 @@ testDenseMatrix <- function(Class, ...) {
         if (m == n) {
             ## Not symmetric and not triangular
             U(m2) <- if (is.d)  rlnorm(p0) else rep_len(c(.NA, .ZERO, .ONE), p0)
-            L(m2) <- if (is.d) -rlnorm(p0) else rep_len(c(.ONE, .ZERO, .NA), p0)
+            L(m2) <- if (is.d) -rlnorm(p0) else rep_len(c(.ZERO, .ONE, .NA), p0)
             M@x <- as.vector(m2)
             stopifnot(isSymmetric(M, tol = 0, checkDN = FALSE) == (n <= 1L),
                       isTriangular(M, upper = NA) == (n <= 1L),

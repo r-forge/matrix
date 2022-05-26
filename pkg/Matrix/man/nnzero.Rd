@@ -1,12 +1,15 @@
 \name{nnzero}
 \title{The Number of Non-Zero Values of a Matrix}
+%
 \alias{nnzero}
+%
 \alias{nnzero,ANY-method}
+\alias{nnzero,CHMfactor-method}
 \alias{nnzero,denseMatrix-method}
 \alias{nnzero,diagonalMatrix-method}
 \alias{nnzero,indMatrix-method}
 \alias{nnzero,sparseMatrix-method}
-\alias{nnzero,CHMfactor-method}
+%
 \description{
   Returns the number of non-zero values of a numeric-like \R object, and
   in particular an object \code{x} inheriting from class

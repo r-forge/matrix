@@ -1,45 +1,57 @@
 #### Positive-definite Symmetric Matrices -- Coercion and Methods
 
+## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.dsy2dpo <- function(from) {
+    if(is.null(tryCatch(.Call(dpoMatrix_chol, from), error = function(e) NULL)))
+        stop("not a positive definite matrix")
+    ## FIXME: check=FALSE
+    copyClass(from, "dpoMatrix",
+              sNames = c("Dim", "Dimnames", "uplo", "x", "factors"))
+}
+.M2dpo.via.dsy <- function(from) {
+    .dsy2dpo(as(from, "dsyMatrix"))
+}
+.M2dpo.via.virtual <- function(from) {
+    ## still needs as(<ds[py]Matrix>, "dpoMatrix") to work
+    as(as(as(as(from,"symmetricMatrix"),"dMatrix"),"denseMatrix"),"dpoMatrix")
+}
+
+setAs("dsyMatrix", "dpoMatrix", .dsy2dpo)
+setAs("dspMatrix", "dpoMatrix", .M2dpo.via.dsy)
+setAs(   "matrix", "dpoMatrix", .M2dpo.via.dsy)
+setAs(   "Matrix", "dpoMatrix", .M2dpo.via.virtual)
+
+rm(.M2dpo.via.dsy, .M2dpo.via.virtual)
+
+
+## ~~~~ COERCIONS FROM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+..pack <- function(from) pack(from)
+setAs("dpoMatrix", "dppMatrix", ..pack)
+setAs("dpoMatrix", "dspMatrix", ..pack)
+rm(..pack)
+
+## MJ: no longer needed ... prefer variant above going via pack()
+if(FALSE) {
 setAs("dpoMatrix", "dppMatrix",
-      function(from)
-      copyClass(.Call(dsyMatrix_as_dspMatrix, from),
-		"dppMatrix",
-		sNames = c("x", "Dim", "Dimnames", "uplo", "factors")))#FIXME , check=FALSE
-
-setAs("dpoMatrix", "corMatrix",
       function(from) {
-	  if(!is.null(cm <- from@factors$correlation)) return(cm)
-          ## else
-	  sd <- sqrt(diag(from))
-	  if(is.null(names(sd)) && !is.null(nms <- from@Dimnames[[1]]))
-	      names(sd) <- nms
-	  Is <- Diagonal(x = 1/sd)
-	  .set.factors(from, "correlation",
-		       new("corMatrix", as(forceSymmetric(Is %*% from %*% Is),
-					   "dpoMatrix"),
-			   sd = unname(sd)))
+          ## FIXME: check=FALSE
+          copyClass(.Call(dsyMatrix_as_dspMatrix, from), "dppMatrix",
+                    sNames = c("x", "Dim", "Dimnames", "uplo", "factors"))
       })
+} ## MJ
 
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 setAs("dpoMatrix", "lMatrix",
       function(from) as(as(from, "dsyMatrix"), "lMatrix"))
 setAs("dpoMatrix", "nMatrix",
       function(from) as(as(from, "dsyMatrix"), "nMatrix"))
-
-if(FALSE) # should no longer be needed
-setAs("corMatrix", "lMatrix",
-      function(from) as(as(from, "dpoMatrix"), "lMatrix"))
-
-## Needed *in addition* to the general to_dpo() method below:
-setAs("dspMatrix", "dpoMatrix",
-      function(from) as(as(from,"dsyMatrix"), "dpoMatrix"))
-
-to_dpo <- function(from) # not coercing to "dsy*" explicitly:
-    as(as(as(as(from, "symmetricMatrix"), "dMatrix"),
-	  "denseMatrix"), "dpoMatrix")
-setAs("Matrix", "dpoMatrix", to_dpo)
-setAs("matrix", "dpoMatrix", to_dpo)
+} ## MJ
 
 
+## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("chol", signature(x = "dpoMatrix"),
 	  function(x, pivot, ...) .Call(dpoMatrix_chol, x))

@@ -1,23 +1,23 @@
 \name{lsyMatrix-class}
 \title{Symmetric Dense Logical Matrices}
 \docType{class}
+%
 \alias{lspMatrix-class}
 \alias{lsyMatrix-class}
 %
 \alias{coerce,lspMatrix,dspMatrix-method}
-\alias{coerce,lspMatrix,lsyMatrix-method}
 \alias{coerce,lspMatrix,lgeMatrix-method}
+\alias{coerce,lspMatrix,lsyMatrix-method}
+\alias{coerce,lspMatrix,ltpMatrix-method}
+\alias{coerce,lspMatrix,nspMatrix-method}
+\alias{coerce,matrix,lspMatrix-method}
+%
 \alias{coerce,lsyMatrix,dsyMatrix-method}
 \alias{coerce,lsyMatrix,lgeMatrix-method}
 \alias{coerce,lsyMatrix,lspMatrix-method}
+\alias{coerce,lsyMatrix,ltrMatrix-method}
+\alias{coerce,lsyMatrix,nsyMatrix-method}
 \alias{coerce,matrix,lsyMatrix-method}
-\alias{coerce,matrix,lspMatrix-method}
-% \alias{diag,lspMatrix-method} -> ./packedMatrix-class.Rd
-\alias{diag,lsyMatrix-method}
-% \alias{diag<-,lspMatrix-method}
-\alias{diag<-,lsyMatrix-method}
-% \alias{t,lspMatrix-method}
-\alias{t,lsyMatrix-method}
 %
 \description{
   The \code{"lsyMatrix"} class is the class of symmetric, dense logical

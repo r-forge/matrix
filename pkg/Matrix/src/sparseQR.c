@@ -95,7 +95,7 @@ SEXP sparseQR_qty(SEXP qr, SEXP y, SEXP trans, SEXP keep_dimnames)
     SEXP ans, aa, dmns = R_NilValue;					\
     if(_DM_NMS_) dmns = GET_SLOT(V_, Matrix_DimNamesSym);		\
     PROTECT_INDEX ipx;                                                  \
-    PROTECT_WITH_INDEX(ans = dup_mMatrix_as_dgeMatrix(y, TRUE), &ipx);	\
+    PROTECT_WITH_INDEX(ans = dense_as_geMatrix(y, 'd', 2, 0), &ipx); \
     int *ydims = INTEGER(GET_SLOT(ans, Matrix_DimSym)),			\
 	m = ydims[0], n = ydims[1], M = V->m, *d_a;			\
     Rboolean rank_def = (m < M);					\
@@ -163,7 +163,7 @@ SEXP sparseQR_coef(SEXP qr, SEXP y)
 
     // rownames(ans) := colnames(ans)
     SET_VECTOR_ELT(dmns, 0, VECTOR_ELT(dmns, 1));
-
+    
     /* apply row permutation and multiply by Q' */
     sparseQR_Qmult(V, dmns, REAL(GET_SLOT(qr, Matrix_betaSym)),
 		   INTEGER(GET_SLOT(qr, Matrix_pSym)), /* trans = */ TRUE,

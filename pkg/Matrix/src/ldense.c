@@ -1,5 +1,8 @@
 #include "ldense.h"
 
+/* MJ: no longer needed ... prefer more general (un)?pack() */
+#if 0
+
 /* dense logical Matrices "ldenseMatrix" classes --- almost identical to
  * dense nonzero-pattern: "ndenseMatrix" ones
  */
@@ -102,6 +105,11 @@ SEXP ltrMatrix_as_ltpMatrix(SEXP from, SEXP kind)
     return val;
 }
 
+#endif
+
+/* MJ: no longer needed ... prefer more general dense_as_geMatrix() */
+#if 0
+
 /* this is very close to dtrMatrix_as_dge*() :*/
 SEXP ltrMatrix_as_lgeMatrix(SEXP from, SEXP kind)
 {
@@ -117,19 +125,19 @@ SEXP ltrMatrix_as_lgeMatrix(SEXP from, SEXP kind)
     return val;
 }
 
-// this is somewhat close to dup_mMatrix_as_geMatrix(.)) :
+// this is somewhat close to dense_as_geMatrix() :
 SEXP lsyMatrix_as_lgeMatrix(SEXP from, SEXP kind)
 {
     SEXP val = PROTECT(NEW_OBJECT_OF_CLASS(
 			   (asInteger(kind) == 1) ? "ngeMatrix" : "lgeMatrix"));
     slot_dup(val, from, Matrix_xSym);
     slot_dup(val, from, Matrix_DimSym);
-    // slot_dup(val, from, Matrix_DimNamesSym) + R_symmDN():
-    SEXP d_nms = PROTECT(duplicate(GET_SLOT(from, Matrix_DimNamesSym)));
-    SET_SLOT(val, Matrix_DimNamesSym, R_symmDN(d_nms));
+    set_symmetrized_DimNames(val, GET_SLOT(from, Matrix_DimNamesSym), -1);
     SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
 
     idense_unpacked_make_symmetric(LOGICAL(GET_SLOT(val, Matrix_xSym)), from);
     UNPROTECT(2);
     return val;
 }
+
+#endif /* MJ */

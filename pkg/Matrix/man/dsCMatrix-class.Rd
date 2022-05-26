@@ -1,43 +1,39 @@
 \name{dsCMatrix-class}
 \title{Numeric Symmetric Sparse (column compressed) Matrices}
 \docType{class}
+%
 \alias{dsCMatrix-class}
 \alias{dsTMatrix-class}
 %
-%\alias{solve,dsCMatrix,...-method}--> solve-methods.Rd
-\alias{t,dsCMatrix-method}
-\alias{t,dsTMatrix-method}
+\alias{Arith,dsCMatrix,dsCMatrix-method}
 \alias{as.vector,dsCMatrix-method}
-\alias{coerce,dgeMatrix,dsCMatrix-method}
-\alias{coerce,dgeMatrix,dsTMatrix-method}
+\alias{coerce,dsCMatrix,denseMatrix-method}
 \alias{coerce,dsCMatrix,dgCMatrix-method}
 \alias{coerce,dsCMatrix,dgTMatrix-method}
 \alias{coerce,dsCMatrix,dgeMatrix-method}
 \alias{coerce,dsCMatrix,dsRMatrix-method}
 \alias{coerce,dsCMatrix,dsTMatrix-method}
 \alias{coerce,dsCMatrix,dsyMatrix-method}
-\alias{coerce,dsCMatrix,lsCMatrix-method}
 \alias{coerce,dsCMatrix,generalMatrix-method}
-\alias{coerce,dsCMatrix,denseMatrix-method}
+\alias{coerce,dsCMatrix,lsCMatrix-method}
 \alias{coerce,dsCMatrix,matrix-method}
-\alias{coerce,dsCMatrix,vector-method}
 \alias{coerce,dsCMatrix,nsCMatrix-method}
+\alias{coerce,dsCMatrix,vector-method}
+\alias{coerce,matrix,dsCMatrix-method}
+\alias{determinant,dsCMatrix,logical-method}
+\alias{determinant,dsCMatrix,missing-method}
+\alias{t,dsCMatrix-method}
+%
 \alias{coerce,dsTMatrix,dgTMatrix-method}
 \alias{coerce,dsTMatrix,dgeMatrix-method}
+\alias{coerce,dsTMatrix,dsRMatrix-method}
 \alias{coerce,dsTMatrix,dsCMatrix-method}
 \alias{coerce,dsTMatrix,dsyMatrix-method}
 \alias{coerce,dsTMatrix,lsTMatrix-method}
 \alias{coerce,dsTMatrix,matrix-method}
-\alias{coerce,dsyMatrix,dsCMatrix-method}
-\alias{coerce,dsyMatrix,dsTMatrix-method}
-\alias{coerce,dtCMatrix,dtRMatrix-method}
-\alias{coerce,matrix,dsCMatrix-method}
 \alias{coerce,matrix,dsTMatrix-method}
-\alias{coerce,graphNEL,dsCMatrix-method}
-%% Group methods
-\alias{Arith,dsCMatrix,dsCMatrix-method}
-\alias{determinant,dsCMatrix,missing-method}
-\alias{determinant,dsCMatrix,logical-method}
+\alias{t,dsTMatrix-method}
+%
 \description{The \code{dsCMatrix} class is a class of symmetric, sparse
   numeric matrices in the compressed, \bold{c}olumn-oriented format.  In
   this implementation the non-zero elements in the columns are sorted

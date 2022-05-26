@@ -1,7 +1,22 @@
 #### Triangular Packed Matrices -- Coercion and Methods
 
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 setAs("dtpMatrix", "dtrMatrix",
       dtp2dtr <- function(from) .Call(dtpMatrix_as_dtrMatrix, from))
+setAs("matrix", "dtpMatrix",
+      function(from) as(as(from, "dtrMatrix"), "dtpMatrix"))
+}
+
+## MJ: these coercions are now inherited; see ./denseMatrix.R
+if(FALSE) {
+setAs("dtpMatrix", "matrix",
+      function(from) as(dtp2dtr(from), "matrix"))
+setAs("pCholesky", "lMatrix",
+      function(from) as(as(from, "dtpMatrix"), "lMatrix"))
+setAs("pBunchKaufman", "lMatrix",
+      function(from) as(as(from, "dtpMatrix"), "lMatrix"))
+} ## MJ
 
 ## Is this needed?  already have coercion to "TsparseMatrix" {FIXME}
 setAs("dtpMatrix", "dtTMatrix",
@@ -17,24 +32,13 @@ setAs("dtpMatrix", "dtTMatrix",
 	  }
       })
 
-setAs("dtpMatrix", "matrix",
-      function(from) as(dtp2dtr(from), "matrix"))
-setAs("matrix", "dtpMatrix",
-      function(from) as(as(from, "dtrMatrix"), "dtpMatrix"))
-
-setAs("pCholesky", "lMatrix",
-      function(from) as(as(from, "dtpMatrix"), "lMatrix"))
-setAs("pBunchKaufman", "lMatrix",
-      function(from) as(as(from, "dtpMatrix"), "lMatrix"))
-
-
 setMethod("determinant", signature(x = "dtpMatrix", logarithm = "missing"),
 	  function(x, logarithm, ...) determinant(x, TRUE))
 
 setMethod("determinant", signature(x = "dtpMatrix", logarithm = "logical"),
 	  function(x, logarithm, ...) mkDet(diag(x), logarithm))
 
-## MJ: No longer needed ... replacement in ./packedMatrix.R
+## MJ: no longer needed ... replacement in ./packedMatrix.R
 if (FALSE) {
 setMethod("diag", signature(x = "dtpMatrix"),
 	  function(x, nrow, ncol) .Call(dtpMatrix_getDiag, x),
@@ -78,7 +82,7 @@ setMethod("solve", signature(a = "dtpMatrix", b="matrix"),
 	  function(a, b, ...) .Call(dtpMatrix_matrix_solve, a, b),
 	  valueClass = "dgeMatrix")
 
-## MJ: No longer needed ... replacement in ./packedMatrix.R
+## MJ: no longer needed ... replacement in ./packedMatrix.R
 if (FALSE) {
 ## FIXME: speed up
 setMethod("t", "dtpMatrix",

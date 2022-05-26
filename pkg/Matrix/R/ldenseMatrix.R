@@ -2,6 +2,8 @@
 ####  ------------
 #### Contains  lge*;  ltr*, ltp*;  lsy*, lsp*;	 ldi*
 
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 ### NOTA BENE: Much of this is *very* parallel to ./ndenseMatrix.R
 ###						  ~~~~~~~~~~~~~~~~
 
@@ -90,6 +92,8 @@ setAs("matrix", "ldenseMatrix", function(from) as(from, "lgeMatrix"))
 
 setAs("ldenseMatrix", "matrix", ## uses the above l*M. -> lgeM.
       function(from) as(as(from, "lgeMatrix"), "matrix"))
+} ## MJ
+
 
 ## dense |-> compressed :
 
@@ -102,9 +106,7 @@ setAs("lgeMatrix", "lgCMatrix", # TODO: need as(*, ..) ?
 setMethod("as.logical", signature(x = "ldenseMatrix"),
 	  function(x, ...) as(x, "lgeMatrix")@x)
 
-###----------------------------------------------------------------------
-
-## MJ: No longer needed ... replacement in ./unpackedMatrix.R
+## MJ: no longer needed ... replacement in ./unpackedMatrix.R
 if (FALSE) {
 setMethod("diag", signature(x = "lgeMatrix"), .mkSpec.diag(quote(lgeMatrix_getDiag)))
 
@@ -121,7 +123,7 @@ for (.x.cl in sprintf("n%sMatrix", c("ge", "sy", "tr"))) {
 rm(.x.cl)
 } ## MJ
 
-## MJ: No longer needed ... replacement in ./packedMatrix.R
+## MJ: no longer needed ... replacement in ./packedMatrix.R
 if (FALSE) {
 setMethod("diag", signature(x = "lspMatrix"), .mkSpec.diag(quote(lspMatrix_getDiag)))
 setMethod("diag", signature(x = "ltpMatrix"), .mkSpec.diag(quote(ltpMatrix_getDiag)))
@@ -129,7 +131,7 @@ setMethod("diag", signature(x = "ndenseMatrix"),# << the "same"
           function(x, nrow, ncol) diag(as(x, "ldenseMatrix")))
 }
 
-## MJ: No longer needed ... replacement in ./unpackedMatrix.R
+## MJ: no longer needed ... replacement in ./unpackedMatrix.R
 if (FALSE) {
 ## --- *SETTING* of diagonal :  diag(x) <- value ---------
 ## --- =====================   faster than default  x[cbind[c(i,i)]] <- value
@@ -152,7 +154,7 @@ setMethod("diag<-", signature(x = "ntrMatrix"), .diag.set.ltr)
 rm(.diag.set.ltr)
 } ## MJ
 
-# MJ: No longer needed ... replacement in ./packedMatrix.R
+# MJ: no longer needed ... replacement in ./packedMatrix.R
 if (FALSE) {
 .diag.set.ltp <- function(x, value) {
     .Call(ltpMatrix_setDiag,
@@ -168,14 +170,14 @@ setMethod("diag<-", signature(x = "ntpMatrix"), .diag.set.ltp)
 rm(.diag.set.ltp)
 } ## MJ
 
-## MJ: No longer needed ... replacement in ./unpackedMatrix.R
+## MJ: no longer needed ... replacement in ./unpackedMatrix.R
 if(FALSE) {
 setMethod("t", signature(x = "lgeMatrix"), t_geMatrix)
 setMethod("t", signature(x = "ltrMatrix"), t_trMatrix)
 setMethod("t", signature(x = "lsyMatrix"), t_trMatrix)
 } ## MJ
 
-## MJ: No longer needed ... replacement in ./packedMatrix.R
+## MJ: no longer needed ... replacement in ./packedMatrix.R
 if (FALSE) {
 setMethod("t", signature(x = "ltpMatrix"),
 	  function(x) as(t(as(x, "ltrMatrix")), "ltpMatrix"))

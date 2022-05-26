@@ -1,6 +1,299 @@
+#ifdef __GLIBC__
+# define _POSIX_C_SOURCE 200809L
+#endif
+#include <string.h>
 #include "dense.h"
-#include "Mutils.h"
 #include "chm_common.h"
+
+#define DENSE_ERROR_INVALID_CLASS(_CLASS_, _METHOD_)			\
+    error(_("invalid class \"%s\" to 'R_dense_%s()'"),			\
+	  _CLASS_, _METHOD_)
+
+#define DENSE_ERROR_INVALID_SLOT_TYPE(_SLOT_, _SEXPTYPE_, _METHOD_)	\
+    error(_("'%s' slot of invalid type \"%s\" in 'R_dense_%s()'"),	\
+	  _SLOT_, type2char(_SEXPTYPE_), _METHOD_)
+
+/* as(<denseMatrix>, "[dlniz](dense)?Matrix") */
+SEXP R_dense_as_kind(SEXP from, SEXP kind)
+{
+    char k;
+    if ((kind = asChar(kind)) == NA_STRING || (k = *CHAR(kind)) == '\0')
+	error(_("invalid 'kind' to 'R_dense_as_kind()'"));
+    static const char *valid[] = {
+	"dgeMatrix", "dtrMatrix", "dsyMatrix", "dtpMatrix", "dspMatrix",
+	"lgeMatrix", "ltrMatrix", "lsyMatrix", "ltpMatrix", "lspMatrix",
+	"ngeMatrix", "ntrMatrix", "nsyMatrix", "ntpMatrix", "nspMatrix", ""};
+    int ivalid = R_check_class_etc(from, valid);
+    if (ivalid < 0)
+	DENSE_ERROR_INVALID_CLASS(class_P(from), "as_kind");
+    const char *clf = valid[ivalid];
+    if (k == '.')
+	k = clf[0];
+    if (k == clf[0])
+	return from;
+    SEXPTYPE tt = kind2type(k); /* validating 'k' before doing more */
+    
+    char *clt = strdup(clf);
+    clt[0] = k;
+    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
+	x = GET_SLOT(from, Matrix_xSym);
+    SEXPTYPE tf = TYPEOF(x);
+    free(clt);
+    
+    SET_SLOT(to, Matrix_DimSym, GET_SLOT(from, Matrix_DimSym));
+    SET_SLOT(to, Matrix_DimNamesSym, GET_SLOT(from, Matrix_DimNamesSym));
+    SET_SLOT(to, Matrix_xSym, (tf == tt) ? x : coerceVector(x, tt));
+    if (clf[1] != 'g') {
+	SET_SLOT(to, Matrix_uploSym, GET_SLOT(from, Matrix_uploSym));
+	if (clf[1] == 't')
+	    SET_SLOT(to, Matrix_diagSym, GET_SLOT(from, Matrix_diagSym));
+    }
+    UNPROTECT(1);
+    return to;
+}
+
+/* as(<denseMatrix>, "matrix") */
+SEXP R_dense_as_matrix(SEXP from)
+{
+    PROTECT(from = dense_as_geMatrix(from, '.', 1, 0));
+    SEXP to = PROTECT(GET_SLOT(from, Matrix_xSym));
+    setAttrib(to, R_DimSymbol, GET_SLOT(from, Matrix_DimSym));
+    setAttrib(to, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
+    UNPROTECT(2);
+    return to;
+}
+
+/* as(<.geMatrix>, "matrix") */
+SEXP R_geMatrix_as_matrix(SEXP from)
+{
+    SEXP to = PROTECT(duplicate(GET_SLOT(from, Matrix_xSym)));
+    setAttrib(to, R_DimSymbol, GET_SLOT(from, Matrix_DimSym));
+    setAttrib(to, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
+    UNPROTECT(1);
+    return to;
+}
+
+/* band(<denseMatrix>, k1, k2), tri[ul](<denseMatrix>, k)
+   band(     <matrix>, k1, k2), tri[ul](     <matrix>, k) */
+SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
+{
+    const char *clf;
+    static const char *valid[] = {
+	"dgeMatrix", "dtrMatrix", "dsyMatrix", "dtpMatrix", "dspMatrix",
+	"lgeMatrix", "ltrMatrix", "lsyMatrix", "ltpMatrix", "lspMatrix",
+	"ngeMatrix", "ntrMatrix", "nsyMatrix", "ntpMatrix", "nspMatrix", ""};
+    int ivalid = R_check_class_etc(from, valid);
+    if (ivalid >= 0) {
+	clf = valid[ivalid];
+    } else {
+	/* matrix->.geMatrix with unreferenced 'x' slot ... modify directly */
+	PROTECT(from = matrix_as_geMatrix(from, '.', 0, 0));
+	clf = class_P(from);
+    }
+    
+    SEXP dim = GET_SLOT(from, Matrix_DimSym);
+    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], a, b;
+    if (isNull(k1))
+	a = (m > 0) ? 1 - m : 0;
+    else if ((a = asInteger(k1)) == NA_INTEGER || a < -m || a > n)
+	error(_("'k1' must be an integer from -Dim[1] to Dim[2]"));
+    if (isNull(k2))
+	b = (n > 0) ? n - 1 : 0;
+    else if ((b = asInteger(k2)) == NA_INTEGER || b < -m || b > n)
+	error(_("'k2' must be an integer from -Dim[1] to Dim[2]"));
+    else if (b < a)
+	error(_("'k1' must be less than or equal to 'k2'"));
+    /* Need tri[ul](<0-by-0>) and triu(<1-by-1>) to be triangularMatrix */
+    if (a <= 1 - m && b >= n - 1 && (clf[1] == 't' || m != n || m > 1 || n > 1))
+	return from;
+    
+    SEXP uplo_from;
+    char ulf;
+    if (clf[1] != 'g') {
+	uplo_from = GET_SLOT(from, Matrix_uploSym);
+	ulf = *CHAR(STRING_ELT(uplo_from, 0));
+	if (clf[1] == 't' &&
+	    ((ulf == 'U') ? (a <= 0 && b >= n - 1) : (b >= 0 && a <= 1 - m)))
+	    return from;
+    }
+    
+    SEXP to, x_to,
+	x_from = GET_SLOT(from, Matrix_xSym),
+	dimnames = GET_SLOT(from, Matrix_DimNamesSym);
+    SEXPTYPE tx = TYPEOF(x_from);
+    char ult, di = 'N';
+    Rboolean tr, sy;
+
+#define UNPACKED_MAKE_BANDED(_PREFIX_, _PTR_)				\
+    _PREFIX_ ## dense_unpacked_make_banded(_PTR_(x_to), m, n, a, b, di)
+    
+#define DENSE_BAND(_MAKE_BANDED_)					\
+    do {								\
+	switch (tx) {							\
+	case REALSXP: /* d..Matrix */					\
+	    _MAKE_BANDED_(d, REAL);					\
+	    break;							\
+	case LGLSXP: /* [ln]..Matrix */					\
+	    _MAKE_BANDED_(i, LOGICAL);					\
+	    break;							\
+	case INTSXP: /* i..Matrix */					\
+	    _MAKE_BANDED_(i, INTEGER);					\
+	    break;							\
+	case CPLXSXP: /* z..Matrix */					\
+	    _MAKE_BANDED_(z, COMPLEX);					\
+	    break;							\
+	default:							\
+	    DENSE_ERROR_INVALID_SLOT_TYPE("x", tx, "band");		\
+	    break;							\
+	}								\
+    } while (0)
+
+    if (m != n || (!(tr = a >= 0 || b <= 0 || clf[1] == 't') &&
+		   !(sy = a == -b && clf[1] == 's'))) { /* return .geMatrix */
+
+	if (clf[1] == 'g') {
+	    if (ivalid >= 0) {
+		PROTECT(to = NEW_OBJECT_OF_CLASS(clf));
+		PROTECT(x_to = duplicate(x_from));
+		SET_SLOT(to, Matrix_DimSym, dim);
+		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+		SET_SLOT(to, Matrix_xSym, x_to);
+	    } else {
+		to = from;
+		PROTECT(x_to = x_from);
+	    }
+	} else { /* clf[1] == 's' */
+	    PROTECT(to = dense_as_geMatrix(from, '.', 1, 0));
+	    PROTECT(x_to = GET_SLOT(to, Matrix_xSym));
+	}
+	DENSE_BAND(UNPACKED_MAKE_BANDED);
+	UNPROTECT(2);
+	return to;
+
+    }
+    
+#define PACKED_MAKE_BANDED(_PREFIX_, _PTR_)				\
+    _PREFIX_ ## dense_packed_make_banded(_PTR_(x_to), n, a, b, ult, di)
+    
+#define DENSE_BAND_CONSTRICT			\
+    do {					\
+	if (ulf == 'U') {			\
+	    if (a < 0) a = 0;			\
+	} else {				\
+	    if (b > 0) b = 0;			\
+	}					\
+    } while(0)
+
+    if (tr) { /* return .t.Matrix */
+	
+	ult = (a >= 0) ? 'U' : ((b <= 0) ? 'L' : ulf);
+
+	if (clf[1] == 't') {
+	    SEXP diag = GET_SLOT(from, Matrix_diagSym);
+	    di = *CHAR(STRING_ELT(diag, 0));
+
+	    PROTECT(to = NEW_OBJECT_OF_CLASS(clf));
+	    SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+	    if (di != 'N')
+		SET_SLOT(to, Matrix_diagSym, diag);
+	    
+	    DENSE_BAND_CONSTRICT;
+	    if (ulf == ult) {
+		PROTECT(x_to = duplicate(x_from));
+		if (clf[2] == 'p')
+		    DENSE_BAND(PACKED_MAKE_BANDED);
+		else
+		    DENSE_BAND(UNPACKED_MAKE_BANDED);
+	    } else {
+		R_xlen_t nx = XLENGTH(x_from);
+		PROTECT(x_to = allocVector(tx, nx));
+		
+#define PACKED_COPY_DIAGONAL(_PREFIX_, _PTR_)				\
+		do {							\
+		    Memzero(_PTR_(x_to), nx);				\
+		    if (a <= b)						\
+			_PREFIX_ ## dense_packed_copy_diagonal(		\
+			    _PTR_(x_to), _PTR_(x_from),			\
+			    n, nx, ult, ulf, di);			\
+		} while (0)
+		
+#define UNPACKED_COPY_DIAGONAL(_PREFIX_, _PTR_)				\
+		do {							\
+		    Memzero(_PTR_(x_to), nx);				\
+		    if (a <= b)						\
+			_PREFIX_ ## dense_unpacked_copy_diagonal(	\
+			    _PTR_(x_to), _PTR_(x_from),			\
+			    n, nx, 'U' /* unused */, di);		\
+		} while (0)
+		
+		if (clf[2] == 'p')
+		    DENSE_BAND(PACKED_COPY_DIAGONAL);
+		else
+		    DENSE_BAND(UNPACKED_COPY_DIAGONAL);
+	    }
+	    
+	} else { /* clf[1] == 'g' || clf[1] == 's' */
+	    char *clt = strdup(clf);
+	    clt[1] = 't';
+	    if (clf[2] != 'p')
+		clt[2] = 'r';
+	    PROTECT(to = NEW_OBJECT_OF_CLASS(clt));
+	    free(clt);
+	    if (clf[1] == 's')
+		set_symmetrized_DimNames(to, dimnames, -1);
+	    else
+		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+	    
+	    PROTECT(x_to = (clf[1] == 'g' || n <= 1
+			    ? (ivalid >= 0
+			       ? duplicate(x_from)
+			       : x_from)
+			    : (ulf == ult
+			       ? duplicate(x_from)
+			       : (clf[2] == 'p'
+				  ? packed_transpose(x_from, n, ulf)
+				  : unpacked_force(x_from, n, ulf, '\0')))));
+	    
+	    if (clf[2] == 'p')
+		DENSE_BAND(PACKED_MAKE_BANDED);
+	    else
+		DENSE_BAND(UNPACKED_MAKE_BANDED);
+	}
+	
+	SET_SLOT(to, Matrix_uploSym, mkString((ult == 'U') ? "U" : "L"));
+
+    } else if (sy) { /* return .s.Matrix */
+
+	PROTECT(to = NEW_OBJECT_OF_CLASS(clf));
+	PROTECT(x_to = duplicate(x_from));
+	ult = ulf;
+	DENSE_BAND_CONSTRICT;
+	
+	if (clf[2] == 'p')
+	    DENSE_BAND(PACKED_MAKE_BANDED);
+	else
+	    DENSE_BAND(UNPACKED_MAKE_BANDED);
+	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+	SET_SLOT(to, Matrix_uploSym, uplo_from);
+	
+    } else {
+	
+	error(_("should never happen; probably a bug in 'R_dense_band()'; please report!"));
+	
+    }
+
+#undef PACKED_COPY_DIAGONAL
+#undef PACKED_MAKE_BANDED
+#undef UNPACKED_COPY_DIAGONAL
+#undef UNPACKED_MAKE_BANDED
+#undef DENSE_BAND_CONSTRICT
+#undef DENSE_BAND
+
+    SET_SLOT(to, Matrix_DimSym, dim);
+    SET_SLOT(to, Matrix_xSym, x_to);
+    UNPROTECT((ivalid >= 0) ? 2 : 3);
+    return to;
+}
 
 /**
  * Perform a left cyclic shift of columns j to k in the upper triangular
@@ -256,7 +549,7 @@ SEXP lapack_qr(SEXP Xin, SEXP tl)
 
 SEXP dense_to_Csparse(SEXP x)
 {
-    SEXP ge_x = PROTECT(dup_mMatrix_as_geMatrix(x, FALSE)),
+    SEXP ge_x = PROTECT(dense_as_geMatrix(x, '.', 2, 0)),
 	Dim = GET_SLOT(ge_x, Matrix_DimSym);
     int *dims = INTEGER(Dim);
     Rboolean longi = (dims[0] * (double)dims[1] > INT_MAX);
@@ -311,6 +604,134 @@ SEXP dense_to_Csparse(SEXP x)
 			      : GET_SLOT(x, Matrix_DimNamesSym));
 }
 
+SEXP ddense_symmpart(SEXP x)
+/* Class of the value will be dsyMatrix */
+{
+    SEXP dx = PROTECT(dense_as_geMatrix(x, 'd', 2, 0));
+    int *adims = INTEGER(GET_SLOT(dx, Matrix_DimSym)), n = adims[0];
+
+    if(n != adims[1]) {
+	error(_("matrix is not square! (symmetric part)"));
+	return R_NilValue; /* -Wall */
+    } else {
+	SEXP ans = PROTECT(NEW_OBJECT_OF_CLASS("dsyMatrix"));
+	double *xx = REAL(GET_SLOT(dx, Matrix_xSym));
+
+	/* only need to assign the *upper* triangle (uplo = "U");
+	 * noting that diagonal remains unchanged */
+	R_xlen_t n_ = n;
+	for (int j = 0; j < n; j++) {
+	    for (int i = 0; i < j; i++) {
+		xx[j * n_ + i] = (xx[j * n_ + i] + xx[i * n_ + j]) / 2.;
+	    }
+	}
+
+/* Copy dx to ans:
+   Because slots of dx are freshly allocated and dx will not
+   be used, we use the slots themselves and don't duplicate */	
+#define MK_SYMMETRIC_DIMNAMES_AND_RETURN(_J_ /* -1|0|1 */)		\
+	SET_SLOT(ans, Matrix_DimSym,  GET_SLOT(dx, Matrix_DimSym));	\
+	set_symmetrized_DimNames(ans, GET_SLOT(dx, Matrix_DimNamesSym), _J_); \
+	SET_SLOT(ans, Matrix_uploSym, mkString((_J_) ? "U" : "L"));	\
+	SET_SLOT(ans, Matrix_xSym,    GET_SLOT(dx, Matrix_xSym));	\
+	UNPROTECT(2);							\
+	return ans
+
+        MK_SYMMETRIC_DIMNAMES_AND_RETURN(-1);
+    }
+}
+
+SEXP ddense_skewpart(SEXP x)
+/* Class of the value will be dgeMatrix */
+{
+    SEXP dx = PROTECT(dense_as_geMatrix(x, 'd', 2, 0));
+    int *adims = INTEGER(GET_SLOT(dx, Matrix_DimSym)), n = adims[0];
+
+    if(n != adims[1]) {
+	error(_("matrix is not square! (skew-symmetric part)"));
+	return R_NilValue; /* -Wall */
+    } else {
+	SEXP ans = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix"));
+	double *xx = REAL(GET_SLOT(dx, Matrix_xSym));
+	R_xlen_t n_ = n;
+
+	for (int j = 0; j < n_; j++) {
+	    xx[j * n_ + j] = 0.;
+	    for (int i = 0; i < j; i++) {
+		double s = (xx[j * n_ + i] - xx[i * n_ + j]) / 2.;
+		xx[j * n_ + i] =  s;
+		xx[i * n_ + j] = -s;
+	    }
+	}
+
+        MK_SYMMETRIC_DIMNAMES_AND_RETURN(-1);
+    }
+}
+
+/* MJ: no longer needed ... prefer (un)?packedMatrix_force_symmetric() */
+#if 0
+
+SEXP dense_to_symmetric(SEXP x, SEXP uplo, SEXP symm_test)
+/* Class of result will be [dln]syMatrix */
+{
+/*== FIXME: allow  uplo = NA   and then behave a bit like symmpart():
+ *== -----  would use the *dimnames* to determine U or L   (??)
+ */
+    
+    int symm_tst = asLogical(symm_test);
+    SEXP dx = PROTECT(dense_as_geMatrix(x, '.', 2, 0));
+    SEXP ans;
+    const char *cl = class_P(dx);
+    /* same as in ..._geMatrix() above:*/
+    enum dense_enum M_type = ( (cl[0] == 'd') ? ddense :
+			       ((cl[0] == 'l') ? ldense : ndense) );
+    int *adims = INTEGER(GET_SLOT(dx, Matrix_DimSym)), n = adims[0];
+    if(n != adims[1]) {
+	UNPROTECT(1);
+	error(_("dense_to_symmetric(): matrix is not square!"));
+	return R_NilValue; /* -Wall */
+    }
+
+    if(symm_tst) {
+	int i, j;
+	R_xlen_t n_ = n;
+	
+#define CHECK_SYMMETRIC							\
+	do {								\
+	    for (j = 0; j < n; j++) {					\
+		for (i = 0; i < j; i++)	{				\
+		    if(xx[j * n_ + i] != xx[i * n_ + j]) {		\
+			UNPROTECT(1);					\
+			error(_("matrix is not symmetric [%d,%d]"), i+1, j+1); \
+			return R_NilValue; /* -Wall */			\
+		    }							\
+		}							\
+	    }								\
+	} while (0)
+	
+	if(M_type == ddense) {
+	    double *xx = REAL(GET_SLOT(dx, Matrix_xSym));
+	    CHECK_SYMMETRIC;
+	} else { /* (M_type == ldense || M_type == ndense) */
+	    int *xx = LOGICAL(GET_SLOT(dx, Matrix_xSym));
+	    CHECK_SYMMETRIC;
+	}
+    }
+#undef CHECK_SYMMETRIC
+    
+    ans = PROTECT(NEW_OBJECT_OF_CLASS(M_type == ddense
+				      ? "dsyMatrix"
+				      : (M_type == ldense
+					 ? "lsyMatrix"
+					 : "nsyMatrix")));
+    int uploT = (*CHAR(asChar(uplo)) == 'U');
+    MK_SYMMETRIC_DIMNAMES_AND_RETURN(uploT);
+}
+
+#endif /* MJ */
+
+/* MJ: no longer needed ... prefer R_dense_band() above */
+#if 0
 
 SEXP dense_band(SEXP x, SEXP k1P, SEXP k2P)
 /* Always returns a full matrix with entries outside the band zeroed
@@ -324,7 +745,7 @@ SEXP dense_band(SEXP x, SEXP k1P, SEXP k2P)
 	return R_NilValue; /* -Wall */
     }
     else {
-	SEXP ans = PROTECT(dup_mMatrix_as_geMatrix(x, TRUE));
+	SEXP ans = PROTECT(dense_as_geMatrix(x, '.', 2, 0));
 	int *adims = INTEGER(GET_SLOT(ans, Matrix_DimSym)),
 	    j, m = adims[0], n = adims[1],
 	    sqr = (adims[0] == adims[1]),
@@ -377,128 +798,4 @@ SEXP dense_band(SEXP x, SEXP k1P, SEXP k2P)
     }
 }
 
-SEXP dense_to_symmetric(SEXP x, SEXP uplo, SEXP symm_test)
-/* Class of result will be [dln]syMatrix */
-{
-/*== FIXME: allow  uplo = NA   and then behave a bit like symmpart():
- *== -----  would use the *dimnames* to determine U or L   (??)
- */
-    
-    int symm_tst = asLogical(symm_test);
-    SEXP dx = PROTECT(dup_mMatrix_as_geMatrix(x, TRUE));
-    SEXP ans;
-    const char *cl = class_P(dx);
-    /* same as in ..._geMatrix() above:*/
-    enum dense_enum M_type = ( (cl[0] == 'd') ? ddense :
-			       ((cl[0] == 'l') ? ldense : ndense) );
-    int *adims = INTEGER(GET_SLOT(dx, Matrix_DimSym)), n = adims[0];
-    if(n != adims[1]) {
-	UNPROTECT(1);
-	error(_("dense_to_symmetric(): matrix is not square!"));
-	return R_NilValue; /* -Wall */
-    }
-
-    if(symm_tst) {
-	int i, j;
-	R_xlen_t n_ = n;
-	
-#define CHECK_SYMMETRIC							\
-	do {								\
-	    for (j = 0; j < n; j++) {					\
-		for (i = 0; i < j; i++)	{				\
-		    if(xx[j * n_ + i] != xx[i * n_ + j]) {		\
-			UNPROTECT(1);					\
-			error(_("matrix is not symmetric [%d,%d]"), i+1, j+1); \
-			return R_NilValue; /* -Wall */			\
-		    }							\
-		}							\
-	    }								\
-	} while (0)
-	
-	if(M_type == ddense) {
-	    double *xx = REAL(GET_SLOT(dx, Matrix_xSym));
-	    CHECK_SYMMETRIC;
-	} else { /* (M_type == ldense || M_type == ndense) */
-	    int *xx = LOGICAL(GET_SLOT(dx, Matrix_xSym));
-	    CHECK_SYMMETRIC;
-	}
-    }
-#undef CHECK_SYMMETRIC
-    
-    ans = PROTECT(NEW_OBJECT_OF_CLASS(M_type == ddense
-				      ? "dsyMatrix"
-				      : (M_type == ldense
-					 ? "lsyMatrix"
-					 : "nsyMatrix")));
-    
-#define MK_SYMMETRIC_DIMNAMES_AND_RETURN(_UPLO_ /* -1|0|1 */)		\
-    SEXP dn = PROTECT(GET_SLOT(dx, Matrix_DimNamesSym));		\
-    /* Need _symmetric_ dimnames and names(dimnames) */			\
-    symmDN(dn, _UPLO_);							\
-    /* Copy dx to ans;							\
-       Because slots of dx are freshly allocated and dx will not be	\
-       used, we use the slots themselves and don't duplicate            \ 
-    */									\
-    SET_SLOT(ans, Matrix_xSym,        GET_SLOT(dx, Matrix_xSym));	\
-    SET_SLOT(ans, Matrix_DimSym,      GET_SLOT(dx, Matrix_DimSym));	\
-    SET_SLOT(ans, Matrix_DimNamesSym, dn);				\
-    SET_SLOT(ans, Matrix_uploSym,     mkString((_UPLO_) ? "U" : "L"));	\
-    UNPROTECT(3);							\
-    return ans
-
-    int uploT = (*CHAR(asChar(uplo)) == 'U');
-    MK_SYMMETRIC_DIMNAMES_AND_RETURN(uploT);
-}
-
-SEXP ddense_symmpart(SEXP x)
-/* Class of the value will be dsyMatrix */
-{
-    SEXP dx = PROTECT(dup_mMatrix_as_dgeMatrix(x, TRUE));
-    int *adims = INTEGER(GET_SLOT(dx, Matrix_DimSym)), n = adims[0];
-
-    if(n != adims[1]) {
-	error(_("matrix is not square! (symmetric part)"));
-	return R_NilValue; /* -Wall */
-    } else {
-	SEXP ans = PROTECT(NEW_OBJECT_OF_CLASS("dsyMatrix"));
-	double *xx = REAL(GET_SLOT(dx, Matrix_xSym));
-
-	/* only need to assign the *upper* triangle (uplo = "U");
-	 * noting that diagonal remains unchanged */
-	R_xlen_t n_ = n;
-	for (int j = 0; j < n; j++) {
-	    for (int i = 0; i < j; i++) {
-		xx[j * n_ + i] = (xx[j * n_ + i] + xx[i * n_ + j]) / 2.;
-	    }
-	}
-
-        MK_SYMMETRIC_DIMNAMES_AND_RETURN(-1);
-    }
-}
-
-SEXP ddense_skewpart(SEXP x)
-/* Class of the value will be dgeMatrix */
-{
-    SEXP dx = PROTECT(dup_mMatrix_as_dgeMatrix(x, TRUE));
-    int *adims = INTEGER(GET_SLOT(dx, Matrix_DimSym)), n = adims[0];
-
-    if(n != adims[1]) {
-	error(_("matrix is not square! (skew-symmetric part)"));
-	return R_NilValue; /* -Wall */
-    } else {
-	SEXP ans = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix"));
-	double *xx = REAL(GET_SLOT(dx, Matrix_xSym));
-	R_xlen_t n_ = n;
-
-	for (int j = 0; j < n_; j++) {
-	    xx[j * n_ + j] = 0.;
-	    for (int i = 0; i < j; i++) {
-		double s = (xx[j * n_ + i] - xx[i * n_ + j]) / 2.;
-		xx[j * n_ + i] =  s;
-		xx[i * n_ + j] = -s;
-	    }
-	}
-
-        MK_SYMMETRIC_DIMNAMES_AND_RETURN(-1);
-    }
-}
+#endif /* MJ */

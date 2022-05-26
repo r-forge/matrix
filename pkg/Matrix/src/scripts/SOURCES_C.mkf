@@ -27,4 +27,5 @@ SOURCES_C =  \
 	    sparseQR.c \
 	    abIndex.c \
 	    packedMatrix.c \
-	    unpackedMatrix.c
+	    unpackedMatrix.c \
+	    sparse.c

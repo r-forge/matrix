@@ -1,36 +1,28 @@
 \name{ddenseMatrix-class}
-\docType{class}
-\alias{ddenseMatrix-class}
 \title{Virtual Class "ddenseMatrix" of Numeric Dense Matrices}
-% now separated from ./dgeMatrix-class.Rd - on purpose
-% METHODS:
-% undocu (FIXME)
-\alias{show,ddenseMatrix-method}
-\alias{coerce,ddenseMatrix,matrix-method}
-\alias{coerce,ddenseMatrix,dgeMatrix-method}
-%\alias{coerce,ddenseMatrix,CsparseMatrix-method}
+\docType{class}
 %
-% Group
-\alias{Arith,ddenseMatrix,ddenseMatrix-method}
+\alias{ddenseMatrix-class}
+%
+\alias{&,ddenseMatrix,ddiMatrix-method}
+\alias{&,ddenseMatrix,ldiMatrix-method}
+\alias{*,ddenseMatrix,ddiMatrix-method}
+\alias{*,ddenseMatrix,ldiMatrix-method}
 \alias{Arith,ddenseMatrix,logical-method}
 \alias{Arith,ddenseMatrix,numeric-method}
+\alias{Arith,ddenseMatrix,sparseVector-method}
 \alias{Arith,logical,ddenseMatrix-method}
 \alias{Arith,numeric,ddenseMatrix-method}
 \alias{Math,ddenseMatrix-method}
-\alias{log,ddenseMatrix-method}
 \alias{Summary,ddenseMatrix-method}
-%
+\alias{^,ddenseMatrix,ddiMatrix-method}
+\alias{^,ddenseMatrix,ldiMatrix-method}
 \alias{as.numeric,ddenseMatrix-method}
-\alias{diag,ddenseMatrix-method}
-\alias{determinant,ddenseMatrix,missing-method}
+\alias{coerce,matrix,ddenseMatrix-method}
+\alias{coerce,numLike,ddenseMatrix-method}
 \alias{determinant,ddenseMatrix,logical-method}
-\alias{lu,ddenseMatrix-method}
-\alias{norm,ddenseMatrix,missing-method}
-\alias{norm,ddenseMatrix,character-method}
-\alias{rcond,ddenseMatrix,missing-method}
-\alias{rcond,ddenseMatrix,character-method}
-%% \alias{solve,ddenseMatrix,ANY-method}--> solve-methods.Rd
-\alias{t,ddenseMatrix-method}
+\alias{determinant,ddenseMatrix,missing-method}
+\alias{log,ddenseMatrix-method}
 %
 \description{This is the virtual class of all dense numeric (i.e.,
   \bold{d}ouble, hence \emph{\dQuote{ddense}}) S4 matrices.

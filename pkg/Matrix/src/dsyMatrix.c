@@ -20,7 +20,6 @@ SEXP dsyMatrix_norm(SEXP obj, SEXP type)
     return ScalarReal(get_norm_sy(obj, CHAR(asChar(type))));
 }
 
-
 SEXP dsyMatrix_rcond(SEXP obj, SEXP type)
 {
     SEXP trf = dsyMatrix_trf(obj);
@@ -58,7 +57,7 @@ SEXP dsyMatrix_solve(SEXP a)
 SEXP dsyMatrix_matrix_solve(SEXP a, SEXP b)
 {
     SEXP trf = dsyMatrix_trf(a),
-	val = PROTECT(dup_mMatrix_as_dgeMatrix(b, TRUE));
+	val = PROTECT(dense_as_geMatrix(b, 'd', 2, 0));
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym)),
 	info;
@@ -74,25 +73,9 @@ SEXP dsyMatrix_matrix_solve(SEXP a, SEXP b)
     return val;
 }
 
-SEXP dsyMatrix_as_matrix(SEXP from, SEXP keep_dimnames)
-{
-    int n = INTEGER(GET_SLOT(from, Matrix_DimSym))[0];
-    SEXP val = PROTECT(allocMatrix(REALSXP, n, n));
-    R_xlen_t nsqr = n; nsqr *= n;
-
-    ddense_unpacked_make_symmetric(Memcpy(REAL(val),
-					  REAL(GET_SLOT(from, Matrix_xSym)),
-					  nsqr),
-				   from);
-    if(asLogical(keep_dimnames))
-	setAttrib(val, R_DimNamesSymbol, get_symmetrized_DimNames(from));
-    UNPROTECT(1);
-    return val;
-}
-
 SEXP dsyMatrix_matrix_mm(SEXP a, SEXP b, SEXP rtP)
 {
-    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b, TRUE));// incl. its dimnames
+    SEXP val = PROTECT(dense_as_geMatrix(b, 'd', 2, 0));// incl. dimnames
     int rt = asLogical(rtP); /* if(rt), compute b %*% a,  else  a %*% b */
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym)),
@@ -115,7 +98,7 @@ SEXP dsyMatrix_matrix_mm(SEXP a, SEXP b, SEXP rtP)
     int nd = rt ?
 	1 : // v <- b %*% a : rownames(v) == rownames(b)  are already there
 	0;  // v <- a %*% b : colnames(v) == colnames(b)  are already there
-    SEXP nms = PROTECT(VECTOR_ELT(get_symmetrized_DimNames(a), nd));
+    SEXP nms = PROTECT(VECTOR_ELT(get_symmetrized_DimNames(a, -1), nd));
     SET_VECTOR_ELT(GET_SLOT(val, Matrix_DimNamesSym), nd, nms);
     Free_FROM(bcp, mn);
     UNPROTECT(2);
@@ -205,6 +188,8 @@ SEXP matrix_trf(SEXP x, SEXP uploP)
     return val;
 }
 
+/* MJ: no longer needed ... prefer more general unpackedMatrix_pack() */
+#if 0
 
 // this is very close to lsyMatrix_as_lsp*() in ./ldense.c  -- keep synced !
 SEXP dsyMatrix_as_dspMatrix(SEXP from)
@@ -229,3 +214,28 @@ SEXP dsyMatrix_as_dspMatrix(SEXP from)
     UNPROTECT(1);
     return val;
 }
+
+#endif /* MJ */
+
+/* MJ: no longer needed ... prefer more general R_dense_as_matrix() */
+#if 0
+
+SEXP dsyMatrix_as_matrix(SEXP from, SEXP keep_dimnames)
+{
+    int n = INTEGER(GET_SLOT(from, Matrix_DimSym))[0];
+    SEXP val = PROTECT(allocMatrix(REALSXP, n, n));
+    R_xlen_t nsqr = n; nsqr *= n;
+
+    ddense_unpacked_make_symmetric(Memcpy(REAL(val),
+					  REAL(GET_SLOT(from, Matrix_xSym)),
+					  nsqr),
+				   from);
+    if(asLogical(keep_dimnames))
+	setAttrib(val, R_DimNamesSymbol, get_symmetrized_DimNames(from, -1));
+    UNPROTECT(1);
+    return val;
+}
+
+#endif /* MJ */
+
+

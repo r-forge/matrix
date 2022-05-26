@@ -18,7 +18,6 @@ double get_norm(SEXP obj, const char *typstr)
 			    work FCONE FCONE FCONE);
 }
 
-
 SEXP dtrMatrix_norm(SEXP obj, SEXP type)
 {
     return ScalarReal(get_norm(obj, CHAR(asChar(type))));
@@ -68,7 +67,7 @@ SEXP dtrMatrix_chol2inv(SEXP a)
 
 SEXP dtrMatrix_matrix_solve(SEXP a, SEXP b)
 {
-    SEXP ans = PROTECT(dup_mMatrix_as_dgeMatrix(b, TRUE));
+    SEXP ans = PROTECT(dense_as_geMatrix(b, 'd', 2, 0));
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(ans, Matrix_DimSym));
     int n = bdims[0], nrhs = bdims[1];
@@ -101,7 +100,7 @@ SEXP dtrMatrix_matrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
      *
      * Because 'a' must be square, the size of the answer 'val',
      * is the same as the size of 'b' */
-    SEXP val = PROTECT(dup_mMatrix_as_dgeMatrix(b, TRUE));
+    SEXP val = PROTECT(dense_as_geMatrix(b, 'd', 2, 0));
     int rt = asLogical(right); /* if(rt), compute b %*% op(a),  else  op(a) %*% b */
     int tr = asLogical(trans);/* if true, use t(a) */
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
@@ -155,7 +154,7 @@ SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
      * TWO cases : (1) result is triangular  <=> uplo's "match" (i.e., non-equal iff trans)
      * ===         (2) result is "general"
      */
-    SEXP val,/* = in case (2):  PROTECT(dup_mMatrix_as_dgeMatrix(b, TRUE)); */
+    SEXP val,/* = in case (2):  dense_as_geMatrix(b, 'd', 2, 0); */
 	d_a = GET_SLOT(a, Matrix_DimSym),
 	uplo_a = GET_SLOT(a, Matrix_uploSym),  diag_a = GET_SLOT(a, Matrix_diagSym),
 	uplo_b = GET_SLOT(b, Matrix_uploSym),  diag_b = GET_SLOT(b, Matrix_diagSym);
@@ -177,13 +176,12 @@ SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
 	error(_("dimension mismatch in matrix multiplication of \"dtrMatrix\": %d != %d"),
 	      n, INTEGER(GET_SLOT(b, Matrix_DimSym))[0]);
     if(matching_uplo) {
-	/* ==> result is triangular -- "dtrMatrix" !
-	 * val := dup_mMatrix_as_dtrMatrix(b, TRUE) : */
+	/* ==> result is triangular -- "dtrMatrix" ! */
 	R_xlen_t sz = n * (R_xlen_t) n, np1 = n+1;
 	val = PROTECT(NEW_OBJECT_OF_CLASS("dtrMatrix"));
 	SET_SLOT(val, Matrix_uploSym, duplicate(uplo_b));
 	SET_SLOT(val, Matrix_DimSym,  duplicate(d_a));
-	set_DimNames(val, b);
+	set_DimNames(val, GET_SLOT(b, Matrix_DimNamesSym));
 	valx = REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, sz));
 	Memcpy(valx, REAL(GET_SLOT(b, Matrix_xSym)), sz);
 	if((uDiag_b = (*diag_b_ch == 'U'))) {
@@ -192,7 +190,7 @@ SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
 		valx[i * np1] = 1.;
 	}
     } else { /* different "uplo" ==> result is "dgeMatrix" ! */
-	val = PROTECT(dup_mMatrix_as_dgeMatrix(b, TRUE));
+	val = PROTECT(dense_as_geMatrix(b, 'd', 2, 0));
 	SEXP
 	    dn_a = GET_SLOT( a , Matrix_DimNamesSym),
 	    dn   = GET_SLOT(val, Matrix_DimNamesSym);
@@ -215,7 +213,11 @@ SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
 			&n FCONE FCONE FCONE FCONE);
     }
     if(matching_uplo) {
-	ddense_unpacked_make_triangular(valx, tr ? b : a); /* set "other triangle" to 0 */
+	/* set "other triangle" to 0 */
+	if (tr)
+	    ddense_unpacked_make_triangular(valx, n, n, *uplo_b_ch, *diag_b_ch);
+	else
+	    ddense_unpacked_make_triangular(valx, n, n, *uplo_a_ch, *diag_a_ch);
 	if(*diag_a_ch == 'U' && uDiag_b) /* result remains uni-diagonal */
 	    SET_SLOT(val, Matrix_diagSym, duplicate(diag_a));
     }
@@ -223,23 +225,7 @@ SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
     return val;
 }
 
-
-SEXP dtrMatrix_as_matrix(SEXP from, SEXP keep_dimnames)
-{
-    int *Dim = INTEGER(GET_SLOT(from, Matrix_DimSym));
-    int m = Dim[0], n = Dim[1];
-    SEXP val = PROTECT(allocMatrix(REALSXP, m, n));
-    ddense_unpacked_make_triangular(Memcpy(REAL(val),
-					   REAL(GET_SLOT(from, Matrix_xSym)),
-					   m * n),
-				    from);
-    if(asLogical(keep_dimnames))
-	setAttrib(val, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
-    UNPROTECT(1);
-    return val;
-}
-
-/* MJ: No longer needed ... replacement in ./unpackedMatrix.c */
+/* MJ: no longer needed ... prefer more general unpackedMatrix_diag_[gs]et() */
 #if 0
 
 #define GET_trMatrix_Diag(_C_TYPE_, _SEXPTYPE_, _SEXP_, _ONE_)		\
@@ -312,6 +298,8 @@ SEXP dtrMatrix_addDiag(SEXP x, SEXP d) {
     return ret;
 }
 
+/* MJ: no longer needed ... prefer more general unpackedMatrix_pack() */
+#if 0
 
 SEXP dtrMatrix_as_dtpMatrix(SEXP from)
 {
@@ -335,3 +323,25 @@ SEXP dtrMatrix_as_dtpMatrix(SEXP from)
     UNPROTECT(1);
     return val;
 }
+
+#endif /* MJ */
+
+/* MJ: no longer needed ... prefer more general R_dense_as_matrix() */
+#if 0
+
+SEXP dtrMatrix_as_matrix(SEXP from, SEXP keep_dimnames)
+{
+    int *Dim = INTEGER(GET_SLOT(from, Matrix_DimSym));
+    int m = Dim[0], n = Dim[1];
+    SEXP val = PROTECT(allocMatrix(REALSXP, m, n));
+    ddense_unpacked_make_triangular(Memcpy(REAL(val),
+					   REAL(GET_SLOT(from, Matrix_xSym)),
+					   m * n),
+				    from);
+    if(asLogical(keep_dimnames))
+	setAttrib(val, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
+    UNPROTECT(1);
+    return val;
+}
+
+#endif /* MJ */

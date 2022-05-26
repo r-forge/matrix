@@ -1,66 +1,62 @@
 \name{lsparseMatrix-classes}
 \title{Sparse logical matrices}
 \docType{class}
+%
 \alias{lsparseMatrix-class}
 \alias{lgCMatrix-class}
-\alias{ltCMatrix-class}
-\alias{lsCMatrix-class}
 \alias{lgRMatrix-class}
-\alias{ltRMatrix-class}
-\alias{lsRMatrix-class}
 \alias{lgTMatrix-class}
+\alias{ltCMatrix-class}
+\alias{ltRMatrix-class}
 \alias{ltTMatrix-class}
+\alias{lsCMatrix-class}
+\alias{lsRMatrix-class}
 \alias{lsTMatrix-class}
-% Group(like)
-\alias{Ops,lsparseMatrix,lsparseMatrix-method}
-\alias{Arith,lsparseMatrix,Matrix-method}
-\alias{Arith,Matrix,lsparseMatrix-method}
-\alias{Arith,lgCMatrix,lgCMatrix-method}
-\alias{Arith,lgTMatrix,lgTMatrix-method}
-\alias{Compare,lsparseMatrix,lsparseMatrix-method}
-\alias{Logic,lsparseMatrix,lsparseMatrix-method}
-\alias{Logic,lgCMatrix,lgCMatrix-method}
-\alias{Logic,lgTMatrix,lgTMatrix-method}
-\alias{Logic,lsCMatrix,lsCMatrix-method}
-\alias{Logic,ltCMatrix,ltCMatrix-method}
-
-\alias{-,lsparseMatrix,missing-method}
+% lsparse
 \alias{!,lsparseMatrix-method}
-%
-\alias{coerce,lsparseMatrix,matrix-method}
+\alias{Arith,lsparseMatrix,Matrix-method}
+\alias{Logic,lsparseMatrix,ldenseMatrix-method}
+\alias{Logic,lsparseMatrix,lsparseMatrix-method}
+\alias{Ops,lsparseMatrix,lsparseMatrix-method}
+\alias{Ops,lsparseMatrix,nsparseMatrix-method}
+\alias{coerce,lsparseMatrix,dMatrix-method}
 \alias{coerce,lsparseMatrix,dsparseMatrix-method}
+\alias{coerce,lsparseMatrix,matrix-method}
+\alias{coerce,lsparseMatrix,nMatrix-method}
+\alias{coerce,lsparseMatrix,nsparseMatrix-method}
+\alias{which,lsparseMatrix-method}
+% lgC
+\alias{Arith,lgCMatrix,lgCMatrix-method}
+\alias{Logic,lgCMatrix,lgCMatrix-method}
 \alias{coerce,lgCMatrix,dgCMatrix-method}
 \alias{coerce,lgCMatrix,lgTMatrix-method}
 \alias{coerce,lgCMatrix,lgeMatrix-method}
-\alias{coerce,lgCMatrix,lsCMatrix-method}
 \alias{coerce,lgCMatrix,ltCMatrix-method}
 \alias{coerce,lgCMatrix,matrix-method}
+\alias{coerce,matrix,lgCMatrix-method}
+% lgR
+% lgT
+\alias{Arith,lgTMatrix,lgTMatrix-method}
+\alias{Logic,lgTMatrix,lgTMatrix-method}
 \alias{coerce,lgTMatrix,dgTMatrix-method}
 \alias{coerce,lgTMatrix,lgCMatrix-method}
 \alias{coerce,lgTMatrix,lgeMatrix-method}
 \alias{coerce,lgTMatrix,lsCMatrix-method}
-\alias{coerce,lgTMatrix,triangularMatrix-method}
-\alias{coerce,lgTMatrix,symmetricMatrix-method}
 \alias{coerce,lgTMatrix,ltTMatrix-method}
 \alias{coerce,lgTMatrix,matrix-method}
-\alias{coerce,lsCMatrix,dgTMatrix-method}
-\alias{coerce,lsCMatrix,dsCMatrix-method}
-\alias{coerce,lsCMatrix,generalMatrix-method}
-\alias{coerce,lsCMatrix,lgCMatrix-method}
-\alias{coerce,lsCMatrix,lgTMatrix-method}
-\alias{coerce,lsCMatrix,lsTMatrix-method}
-\alias{coerce,lsCMatrix,matrix-method}
-\alias{coerce,lsTMatrix,dsTMatrix-method}
-\alias{coerce,lsTMatrix,lgCMatrix-method}
-\alias{coerce,lsTMatrix,lgTMatrix-method}
-\alias{coerce,lsTMatrix,lsCMatrix-method}
-\alias{coerce,lsTMatrix,lsyMatrix-method}
-\alias{coerce,lsTMatrix,matrix-method}
+\alias{coerce,lgTMatrix,symmetricMatrix-method}
+\alias{coerce,lgTMatrix,triangularMatrix-method}
+\alias{coerce,matrix,lgTMatrix-method}
+\alias{which,lgTMatrix-method}
+% ltC
+\alias{Logic,ltCMatrix,ltCMatrix-method}
 \alias{coerce,ltCMatrix,dMatrix-method}
-\alias{coerce,ltCMatrix,dtCMatrix-method}
 \alias{coerce,ltCMatrix,lgCMatrix-method}
 \alias{coerce,ltCMatrix,ltTMatrix-method}
 \alias{coerce,ltCMatrix,matrix-method}
+\alias{coerce,matrix,ltCMatrix-method}
+% ltR
+% ltT
 \alias{coerce,ltTMatrix,dtTMatrix-method}
 \alias{coerce,ltTMatrix,generalMatrix-method}
 \alias{coerce,ltTMatrix,lgCMatrix-method}
@@ -68,23 +64,27 @@
 \alias{coerce,ltTMatrix,ltCMatrix-method}
 \alias{coerce,ltTMatrix,ltrMatrix-method}
 \alias{coerce,ltTMatrix,matrix-method}
-
-\alias{coerce,matrix,lgCMatrix-method}
-\alias{coerce,matrix,lgTMatrix-method}
-\alias{coerce,matrix,lsCMatrix-method}
-\alias{coerce,matrix,ltCMatrix-method}
 \alias{coerce,matrix,ltTMatrix-method}
-%
-\alias{t,lgCMatrix-method}
-\alias{t,lgTMatrix-method}
-\alias{t,lsCMatrix-method}
-\alias{t,ltCMatrix-method}
-\alias{t,lsTMatrix-method}
 \alias{t,ltTMatrix-method}
-\alias{which,lgTMatrix-method}
-\alias{which,lsparseMatrix-method}
-\alias{which,lsTMatrix-method}
 \alias{which,ltTMatrix-method}
+% lsC
+\alias{Logic,lsCMatrix,lsCMatrix-method}
+\alias{coerce,lsCMatrix,dsCMatrix-method}
+\alias{coerce,lsCMatrix,generalMatrix-method}
+\alias{coerce,lsCMatrix,lgCMatrix-method}
+\alias{coerce,lsCMatrix,lgTMatrix-method}
+\alias{coerce,lsCMatrix,lsTMatrix-method}
+\alias{coerce,lsCMatrix,matrix-method}
+\alias{coerce,matrix,lsCMatrix-method}
+% lsR
+% lsT
+\alias{coerce,lsTMatrix,lgCMatrix-method}
+\alias{coerce,lsTMatrix,lgTMatrix-method}
+\alias{coerce,lsTMatrix,lsCMatrix-method}
+\alias{coerce,lsTMatrix,lsyMatrix-method}
+\alias{coerce,lsTMatrix,matrix-method}
+\alias{t,lsTMatrix-method}
+\alias{which,lsTMatrix-method}
 %
 \description{The \code{lsparseMatrix} class is a virtual class of sparse
   matrices with \code{TRUE}/\code{FALSE} or \code{NA} entries.  Only the

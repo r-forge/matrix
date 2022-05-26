@@ -1,5 +1,7 @@
 ### Define Methods that can be inherited for all subclasses
 
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 ## This replaces many "d..Matrix" -> "dgeMatrix" ones
 ## >> but << needs all sub(sub(sub)) classes of "ddenseMatrix" listed
 ##   -----  in  ../src/Mutils.c
@@ -16,14 +18,17 @@ setAs("dsyMatrix", "lsyMatrix", function(from) d2l_Matrix(from, "dsyMatrix"))
 setAs("dspMatrix", "lspMatrix", function(from) d2l_Matrix(from, "dspMatrix"))
 setAs("dtrMatrix", "ltrMatrix", function(from) d2l_Matrix(from, "dtrMatrix"))
 setAs("dtpMatrix", "ltpMatrix", function(from) d2l_Matrix(from, "dtpMatrix"))
+} ## MJ
 
-if(FALSE) ## FIXME, this fails for ("dtpMatrix" -> "CsparseMatrix") where .dense2C() works
+if(FALSE) {
+## FIXME, this fails for ("dtpMatrix" -> "CsparseMatrix") where .dense2C() works
 setAs("ddenseMatrix", "CsparseMatrix",
       function(from) {
-	  if (!inherits(from, "dgeMatrix")) # don't lose symmetry/triangularity/...
-	      as_Csparse(from)
-	  else .Call(dense_to_Csparse, from)
+	  if (is(from, "dgeMatrix"))
+	      .Call(dense_to_Csparse, from)
+	  else as_Csparse(from) # don't lose symmetry/triangularity/...
       })
+}
 
 ## special case
 setAs("dgeMatrix", "dgCMatrix",
@@ -83,7 +88,8 @@ setMethod("determinant", signature(x = "ddenseMatrix", logarithm = "logical"),
 ## setMethod("expm", signature(x = "ddenseMatrix"),
 ##           function(x) callGeneric(..2dge(x)))
 
-
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 .trilDense <- function(x, k = 0, ...) {
     k <- as.integer(k[1])
     d <- dim(x)
@@ -120,7 +126,7 @@ setMethod("triu",      "matrix", .triuDense)
 }
 setMethod("band", "denseMatrix", .bandDense)
 setMethod("band",      "matrix", .bandDense)
-
+} ## MJ
 
 setMethod("symmpart", signature(x = "ddenseMatrix"),
 	  function(x) .Call(ddense_symmpart, x))

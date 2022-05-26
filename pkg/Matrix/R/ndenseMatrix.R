@@ -2,6 +2,8 @@
 ####  ------------
 #### Contains  nge*;  ntr*, ntp*;  nsy*, nsp*;   ndi*
 
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 ### NOTA BENE: Much of this is *very* parallel to ./ldenseMatrix.R
 ###						  ~~~~~~~~~~~~~~~~
 
@@ -98,6 +100,7 @@ setAs("matrix", "ndenseMatrix", function(from) as(from, "ngeMatrix"))
 
 setAs("ndenseMatrix", "matrix", ## uses the above l*M. -> lgeM.
       function(from) as(as(from, "ngeMatrix"), "matrix"))
+} ## MJ
 
 ## dense |-> compressed :
 
@@ -142,14 +145,14 @@ setMethod("as.logical", signature(x = "ndenseMatrix"),
 
 ###----------------------------------------------------------------------
 
-## MJ: No longer needed ... replacement in ./unpackedMatrix.R
+## MJ: no longer needed ... replacement in ./unpackedMatrix.R
 if (FALSE) {
 setMethod("t", signature(x = "ngeMatrix"), t_geMatrix)
 setMethod("t", signature(x = "ntrMatrix"), t_trMatrix)
 setMethod("t", signature(x = "nsyMatrix"), t_trMatrix)
 } ## MJ
 
-## MJ: No longer needed ... replacement in ./packedMatrix.R
+## MJ: no longer needed ... replacement in ./packedMatrix.R
 if (FALSE) {
 setMethod("t", signature(x = "ntpMatrix"),
 	  function(x) as(t(as(x, "ntrMatrix")), "ntpMatrix"))

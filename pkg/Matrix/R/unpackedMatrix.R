@@ -1,35 +1,77 @@
+## Methods for virtual class "unpackedMatrix" of full storage, dense matrices
+## ... and many for base "matrix", too
 .upM.subclasses <- names(getClass("unpackedMatrix")@subclasses)
 
+## ~~~~ COERCIONS FROM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## as(<unpackedMatrix>,           "matrix") inherited from denseMatrix
+## as(<unpackedMatrix>,     "packedMatrix") inherited from denseMatrix
+## as(<unpackedMatrix>,    "generalMatrix") inherited from denseMatrix
+## as(<unpackedMatrix>,  "symmetricMatrix") inherited from      Matrix
+## as(<unpackedMatrix>, "triangularMatrix") inherited from      Matrix
+
+
+## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## as( <denseMatrix>, "unpackedMatrix") in ./denseMatrix.R
+## as(<packedMatrix>, "unpackedMatrix") inherited from denseMatrix
+## as(      <matrix>, "unpackedMatrix") in ./denseMatrix.R
+
+
+## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+setMethod("unpack", signature(x = "unpackedMatrix"),
+          function(x, ...) x)
+setMethod("unpack", signature(x = "matrix"),
+          function(x, ...) {
+              .Call(R_matrix_as_geMatrix, x, "", FALSE)
+          })
+
 .upM.pack <- function(x, ...) {
-    .Call(unpackedMatrix_pack, x, NA, NA)
+    .Call(unpackedMatrix_pack, x, TRUE, NA, NA)
 }
+
 .upM.pack.ge <- .m.pack <- function(x, symmetric = NA, upperTri = NA, ...) {
-    if(((sna <- is.na(symmetric)) || symmetric) && isSymmetric(x)) {
-        .Call(unpackedMatrix_pack, x, FALSE, TRUE)
+    if(((sna <- is.na(symmetric)) || symmetric) && isSymmetric(x, ...)) {
+        .C1
     } else if((sna || !symmetric) &&
-               (tt <- isTriangular(x, upper = upperTri))) {
+              (tt <- isTriangular(x, upper = upperTri))) {
         upper <- if(is.null(kind <- attr(tt, "kind"))) upperTri else kind == "U"
-        .Call(unpackedMatrix_pack, x, TRUE, upper)
+        .C2
     } else {
         kind <- if(is.na(upperTri)) "" else if(upperTri) "upper " else "lower "
         if(sna)
-            stop("'x' is not symmetric or ", kind, "triangular")
+            stop("matrix is not symmetric or ", kind, "triangular")
         else if(symmetric)
-            stop("'x' is not symmetric")
+            stop("matrix is not symmetric")
         else
-            stop("'x' is not ", kind, "triangular")
+            stop("matrix is not ", kind, "triangular")
     }
 }
-body(.m.pack)[[2L]][[3L]][[2L]][[2L]] <-
-body(.m.pack)[[2L]][[4L]][[3L]][[3L]][[2L]] <- quote(matrix_pack)
+.l <- list(.C1 = quote(.Call(unpackedMatrix_pack, x, TRUE, FALSE, TRUE)),
+           .C2 = quote(.Call(unpackedMatrix_pack, x, TRUE, TRUE, upper)))
+body(.upM.pack.ge) <- do.call(substitute, list(body(.upM.pack.ge), .l))
+.l <- list(.C1 = quote(.Call(matrix_pack, x, FALSE, TRUE)),
+           .C2 = quote(.Call(matrix_pack, x, TRUE, upper)))
+body(.m.pack) <- do.call(substitute, list(body(.m.pack), .l))
+rm(.l)
 
-setMethod("unpack", "unpackedMatrix", function(x, ...) x)
-setMethod("pack", "unpackedMatrix", .upM.pack)
-
+setMethod("pack", signature(x = "unpackedMatrix"), .upM.pack)
 for (.cl in grep("^.geMatrix$", .upM.subclasses, value = TRUE))
     setMethod("pack", signature(x = .cl), .upM.pack.ge)
-
 setMethod("pack", signature(x = "matrix"), .m.pack)
+rm(.upM.pack, .upM.pack.ge, .m.pack)
+
+setMethod("forceSymmetric", signature(x = "unpackedMatrix", uplo = "missing"),
+          function(x, uplo) .Call(unpackedMatrix_force_symmetric, x,
+                                  if(.hasSlot(x, "uplo")) x@uplo else "U"))
+setMethod("forceSymmetric", signature(x = "unpackedMatrix", uplo = "character"),
+          function(x, uplo) .Call(unpackedMatrix_force_symmetric, x, uplo))
+
+setMethod("forceSymmetric", signature(x = "matrix", uplo = "missing"),
+          function(x, uplo) .Call(matrix_force_symmetric, x, "U"))
+setMethod("forceSymmetric", signature(x = "matrix", uplo = "character"),
+          function(x, uplo) .Call(matrix_force_symmetric, x, uplo))
 
 .upM.is.sy <- function(object, checkDN = TRUE, ...) {
     ## backwards compatibility: don't check DN if check.attributes=FALSE
@@ -40,6 +82,7 @@ setMethod("pack", signature(x = "matrix"), .m.pack)
     ## requiring exact symmetry:
     .Call(unpackedMatrix_is_symmetric, object, checkDN)
 }
+
 .upM.is.sy.dz <- function(object, tol = 100 * .Machine$double.eps,
                           tol1 = 8 * tol, checkDN = TRUE, ...) {
     ## backwards compatibility: don't check DN if check.attributes=FALSE
@@ -83,12 +126,15 @@ setMethod("pack", signature(x = "matrix"), .m.pack)
     isTRUE(ae(target = object@x, current = Cj(t(object))@x,
               tolerance = tol, ...))
 }
+
 .upM.is.tr <- function(object, upper = NA, ...) {
     .Call(unpackedMatrix_is_triangular, object, upper)
 }
+
 .upM.is.di <- function(object) {
     .Call(unpackedMatrix_is_diagonal, object)
 }
+
 .m.is.sy <- function(object, tol = 100 * .Machine$double.eps,
                      tol1 = 8 * tol, checkDN = TRUE, ...) {
     ## backwards compatibility: don't check DN if check.attributes=FALSE
@@ -107,9 +153,11 @@ setMethod("pack", signature(x = "matrix"), .m.pack)
     }
     iS.m(object = object, tol = tol, tol1 = tol1, ...)
 }
+
 .m.is.tr <- function(object, upper = NA, ...) {
     .Call(matrix_is_triangular, object, upper)
 }
+
 .m.is.di <- function(object) {
     .Call(matrix_is_diagonal, object)
 }
@@ -131,10 +179,14 @@ setMethod("isDiagonal", signature(object = "unpackedMatrix"), .upM.is.di)
 if (FALSE) {
 ## Would override isSymmetric.matrix and be faster in the logical and integer
 ## cases and in the tol<=0 case, but use a looser notion of symmetric 'dimnames'
+## and so probably break too much ...
 setMethod("isSymmetric", signature(object = "matrix"), .m.is.sy)
 }
 setMethod("isTriangular", signature(object = "matrix"), .m.is.tr)
 setMethod("isDiagonal", signature(object = "matrix"), .m.is.di)
+
+rm(.upM.is.sy, .upM.is.sy.dz, .upM.is.tr, .upM.is.di,
+   .m.is.sy, .m.is.tr, .m.is.di, .cl)
 
 setMethod("t", signature(x = "unpackedMatrix"),
           function(x) .Call(unpackedMatrix_t, x))
@@ -143,5 +195,4 @@ setMethod("diag", signature(x = "unpackedMatrix"),
 setMethod("diag<-", signature(x = "unpackedMatrix"),
           function(x, value) .Call(unpackedMatrix_diag_set, x, value))
 
-rm(.upM.pack, .upM.pack.ge, .upM.is.sy, .upM.is.sy.dz, .upM.is.tr, .upM.is.di,
-   .m.pack, .m.is.sy, .m.is.tr, .m.is.di, .cl, .upM.subclasses)
+rm(.upM.subclasses)

@@ -1,12 +1,14 @@
 \name{triangularMatrix-class}
+\title{Virtual Class of Triangular Matrices in Package Matrix}
 \docType{class}
+%
 \alias{triangularMatrix-class}
-\alias{coerce,triangularMatrix,symmetricMatrix-method}
-\alias{coerce,lgeMatrix,triangularMatrix-method}
-\alias{coerce,ngeMatrix,triangularMatrix-method}
+%
+\alias{Arith,triangularMatrix,diagonalMatrix-method}
+\alias{Compare,triangularMatrix,diagonalMatrix-method}
+\alias{Logic,triangularMatrix,diagonalMatrix-method}
 \alias{coerce,matrix,triangularMatrix-method}
 %
-\title{Virtual Class of Triangular Matrices in Package Matrix}
 \description{
   The virtual class of triangular matrices,\code{"triangularMatrix"},
   the package \pkg{Matrix} contains \emph{square} (\code{\link{nrow} ==

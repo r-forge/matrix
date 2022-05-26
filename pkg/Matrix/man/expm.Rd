@@ -1,13 +1,16 @@
 \name{expm}
 \title{Matrix Exponential}
+%
 \alias{expm}
+%
 \alias{expm,Matrix-method}
 \alias{expm,dMatrix-method}
-\alias{expm,dgeMatrix-method}
-\alias{expm,triangularMatrix-method}
-\alias{expm,symmetricMatrix-method}
 \alias{expm,ddiMatrix-method}
-\alias{expm,matrix-method}% < for now
+\alias{expm,dgeMatrix-method}
+\alias{expm,matrix-method}
+\alias{expm,symmetricMatrix-method}
+\alias{expm,triangularMatrix-method}
+%
 \description{
   Compute the exponential of a matrix.
 }

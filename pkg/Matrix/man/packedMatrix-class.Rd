@@ -1,42 +1,15 @@
 \name{packedMatrix-class}
 \title{Virtual Class \code{"packedMatrix"} of Packed Dense Matrices}
-\Rdversion{1.1}
 \docType{class}
+\Rdversion{1.1}
+%
 \alias{packedMatrix-class}
 %
-\alias{t,packedMatrix-method}
+\alias{coerce,matrix,packedMatrix-method}
 \alias{diag,packedMatrix-method}
 \alias{diag<-,packedMatrix-method}
-\alias{[,packedMatrix,missing,missing,missing-method}
-\alias{[,packedMatrix,NULL,missing,missing-method}
-\alias{[,packedMatrix,index,missing,missing-method}
-\alias{[,packedMatrix,matrix,missing,missing-method}
-\alias{[,packedMatrix,lMatrix,missing,missing-method}
-\alias{[,packedMatrix,missing,NULL,missing-method}
-\alias{[,packedMatrix,NULL,NULL,missing-method}
-\alias{[,packedMatrix,index,NULL,missing-method}
-\alias{[,packedMatrix,matrix,NULL,missing-method}
-\alias{[,packedMatrix,lMatrix,NULL,missing-method}
-\alias{[,packedMatrix,missing,index,missing-method}
-\alias{[,packedMatrix,NULL,index,missing-method}
-\alias{[,packedMatrix,index,index,missing-method}
-\alias{[,packedMatrix,matrix,index,missing-method}
-\alias{[,packedMatrix,lMatrix,index,missing-method}
-\alias{[,packedMatrix,missing,missing,logical-method}
-\alias{[,packedMatrix,NULL,missing,logical-method}
-\alias{[,packedMatrix,index,missing,logical-method}
-\alias{[,packedMatrix,matrix,missing,logical-method}
-\alias{[,packedMatrix,lMatrix,missing,logical-method}
-\alias{[,packedMatrix,missing,NULL,logical-method}
-\alias{[,packedMatrix,NULL,NULL,logical-method}
-\alias{[,packedMatrix,index,NULL,logical-method}
-\alias{[,packedMatrix,matrix,NULL,logical-method}
-\alias{[,packedMatrix,lMatrix,NULL,logical-method}
-\alias{[,packedMatrix,missing,index,logical-method}
-\alias{[,packedMatrix,NULL,index,logical-method}
-\alias{[,packedMatrix,index,index,logical-method}
-\alias{[,packedMatrix,matrix,index,logical-method}
-\alias{[,packedMatrix,lMatrix,index,logical-method}
+\alias{t,packedMatrix-method}
+%
 \description{
   Class \code{"packedMatrix"} is the \emph{virtual} class of dense
   symmetric or triangular matrices in "packed" format, storing only

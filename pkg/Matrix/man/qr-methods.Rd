@@ -1,13 +1,16 @@
 \name{qr-methods}
 \title{QR Decomposition -- S4 Methods and Generic}
 \docType{methods}
+%
 \alias{qr}
-\alias{qrR}
 \alias{qr-methods}
+\alias{qrR}
+%
+\alias{qr,ddenseMatrix-method} % if(.Matrix.avoiding.as.matrix)
+\alias{qr,denseMatrix-method} % if(.Matrix.avoiding.as.matrix)
 \alias{qr,dgCMatrix-method}
 \alias{qr,sparseMatrix-method}
-\alias{qr,ddenseMatrix-method}% only if(.Matrix.avoiding.as.matrix)
-\alias{qr,denseMatrix-method}% only if(.Matrix.avoiding.as.matrix)
+%
 \description{
   The \pkg{Matrix} package provides methods for the QR decomposition
   of special classes of matrices.  There is a generic function which uses

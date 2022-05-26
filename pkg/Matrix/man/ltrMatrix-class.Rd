@@ -1,26 +1,26 @@
 \name{ltrMatrix-class}
+\title{Triangular Dense Logical Matrices}
 \docType{class}
+%
 \alias{ltpMatrix-class}
 \alias{ltrMatrix-class}
 %
 \alias{!,ltpMatrix-method}
-\alias{!,ltrMatrix-method}
 \alias{coerce,ltpMatrix,dtpMatrix-method}
 \alias{coerce,ltpMatrix,lgeMatrix-method}
+\alias{coerce,ltpMatrix,lspMatrix-method}
 \alias{coerce,ltpMatrix,ltrMatrix-method}
+\alias{coerce,ltpMatrix,ntpMatrix-method}
+\alias{coerce,matrix,ltpMatrix-method}
+%
+\alias{!,ltrMatrix-method}
 \alias{coerce,ltrMatrix,dtrMatrix-method}
 \alias{coerce,ltrMatrix,lgeMatrix-method}
+\alias{coerce,ltrMatrix,lsyMatrix-method}
 \alias{coerce,ltrMatrix,ltpMatrix-method}
+\alias{coerce,ltrMatrix,ntrMatrix-method}
 \alias{coerce,matrix,ltrMatrix-method}
-\alias{coerce,matrix,ltpMatrix-method}
-% \alias{diag,ltpMatrix-method} -> ./packedMatrix-class.Rd
-\alias{diag,ltrMatrix-method}
-% \alias{diag<-,ltpMatrix-method}
-\alias{diag<-,ltrMatrix-method}
-% \alias{t,ltpMatrix-method}
-\alias{t,ltrMatrix-method}
 %
-\title{Triangular Dense Logical Matrices}
 \description{
   The \code{"ltrMatrix"} class is the class of triangular, dense,
   logical matrices in nonpacked storage.  The \code{"ltpMatrix"} class

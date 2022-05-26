@@ -1,13 +1,285 @@
-### Simple fallback methods for all dense matrices
-### These are "cheap" to program, but potentially far from efficient;
-### Methods for specific subclasses will overwrite these:
+## Methods for virtual class "denseMatrix" of dense matrices
+##
+## Some of these are merely fallback methods, which are "cheap" to implement
+## but potentially far from efficient. More efficient methods for subclasses
+## will overwrite these.
 
-setAs("ANY", "denseMatrix", function(from) Matrix(from, sparse=FALSE, doDiag=FALSE))
-## Conceivably, could write
-## setAs("matrix", "denseMatrix", ....) which was slightly more efficient than
-##  Matrix(.)  but would have many things in common
+## ~~~~ COERCIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+## README: Many of these coercions are for _subclasses_ of denseMatrix.
+##         They have been centralized here quite on purpose, for easier
+##         maintenance, to prevent infelicities among groups of similar
+##         methods, and to avoid accidental gaps in implementation.
+
+..dense2ge  <- function(from) .Call(R_dense_as_geMatrix, from, ".")
+..dense2dge <- function(from) .Call(R_dense_as_geMatrix, from, "d")
+..dense2lge <- function(from) .Call(R_dense_as_geMatrix, from, "l")
+..dense2nge <- function(from) .Call(R_dense_as_geMatrix, from, "n")
+
+..m2ge  <- function(from) .Call(R_matrix_as_geMatrix, from, ".")
+..m2dge <- function(from) .Call(R_matrix_as_geMatrix, from, "d")
+..m2lge <- function(from) .Call(R_matrix_as_geMatrix, from, "l")
+..m2nge <- function(from) .Call(R_matrix_as_geMatrix, from, "n")
+
+..dense2dkind <- function(from) .Call(R_dense_as_kind, from, "d")
+..dense2lkind <- function(from) .Call(R_dense_as_kind, from, "l")
+..dense2nkind <- function(from) .Call(R_dense_as_kind, from, "n")
+
+..pack   <- function(from) pack(from)
+..packT  <- function(from) pack(from, symmetric = FALSE)
+..packS  <- function(from) pack(from, symmetric = TRUE)
+..unpack <- function(from) unpack(from)
+
+..pack3    <- function(from) .Call(unpackedMatrix_pack, from, FALSE, NA, NA)
+..unpack3  <- function(from) .Call(packedMatrix_unpack, from, FALSE)
+
+## To denseMatrix ..........................................
+
+setAs("ANY", "denseMatrix",
+      function(from) Matrix(from, sparse = FALSE, doDiag = FALSE))
+
+## Keep synchronized with Matrix() in ./Matrix.R, where diagonal "matrix"
+## (which are both symmetric and triangular) are coerced to "symmetricMatrix",
+## _not_ "triangularMatrix"
+setAs( "matrix", "denseMatrix", ..m2dense)
+setAs("numLike", "denseMatrix", ..m2ge)
+
+## To base matrix ..........................................
+
+setAs("denseMatrix", "matrix", .dense2m)
+.dsy2mat <- function(from, ## MJ: for backwards compatibility, until deprecated
+                     keep.dimnames = TRUE) {
+    to <- .dense2m(from)
+    if (!keep.dimnames)
+        dimnames(to) <- NULL
+    to
+}
+
+## Faster:
+setAs("dgeMatrix", "matrix", .ge2m)
+setAs("lgeMatrix", "matrix", .ge2m)
+setAs("ngeMatrix", "matrix", .ge2m)
+
+## To packed ...............................................
+
+setAs("denseMatrix", "packedMatrix", ..pack)
+setAs(     "matrix", "packedMatrix", ..pack)
+.dsy2dsp <- ..pack # MJ: for backwards compatibility, until deprecated
+
+## To unpacked .............................................
+
+setAs("denseMatrix", "unpackedMatrix", ..unpack)
+setAs(     "matrix", "unpackedMatrix", ..m2ge)
+setAs(    "numLike", "unpackedMatrix", ..m2ge)
+
+## To general ..............................................
+
+setAs("denseMatrix", "generalMatrix", ..dense2ge)
+setAs(     "matrix", "generalMatrix", ..m2ge)
+setAs(    "numLike", "generalMatrix", ..m2ge)
+
+## MJ: no longer
+if(FALSE) {
 setAs("denseMatrix", "generalMatrix", as_geSimpl)
+} ## MJ
+
+## To symmetric ............................................
+
+## setAs("denseMatrix", "symmetricMatrix", .) # inherited from Matrix
+## setAs(     "matrix", "symmetricMatrix", .) # in ./symmetricMatrix.R
+
+## To triangular ...........................................
+
+## setAs("denseMatrix", "triangularMatrix", .) # inherited from Matrix
+## setAs(     "matrix", "triangularMatrix", .) # in ./triangularMatrix.R
+
+## To "kind" ...............................................
+
+setAs("denseMatrix", "dMatrix", ..dense2dkind)
+setAs("denseMatrix", "lMatrix", ..dense2lkind)
+setAs("denseMatrix", "nMatrix", ..dense2nkind)
+setAs("denseMatrix", "ddenseMatrix", ..dense2dkind)
+setAs("denseMatrix", "ldenseMatrix", ..dense2lkind)
+setAs("denseMatrix", "ndenseMatrix", ..dense2nkind)
+
+setAs("matrix", "ddenseMatrix",
+      function(from) {
+          if (!is.double(from))
+              storage.mode(from) <- "double"
+          .m2dense(from)
+      })
+setAs("matrix", "ldenseMatrix",
+      function(from) {
+          if (!is.logical(from))
+              storage.mode(from) <- "logical"
+          .m2dense(from)
+      })
+setAs("matrix", "ndenseMatrix",
+      function(from) as(as(from, "ldenseMatrix"), "nMatrix"))
+
+setAs("numLike", "ddenseMatrix", ..m2dge)
+setAs("numLike", "ldenseMatrix", ..m2lge)
+setAs("numLike", "ndenseMatrix", ..m2nge)
+
+## FIXME: Conceivably, we could also have
+##
+## setAs( "matrix", "[dln]Matrix", .)
+## setAs("numLike", "[dln]Matrix", .)
+##
+## but those ought to return dense _or_ sparse.
+## Note that there is already:
+##
+## setAs("matrix", "lMatrix", .)  [ in ./lMatrix.R   ]
+## setAs("matrix", "nMatrix", .)  [ in ./ngTMatrix.R ]
+##
+## the former returning Matrix(`storage.mode<-`(from, "logical"))
+## and the latter always returning an ngTMatrix (i.e.,
+## the current implementation is neither complete nor consistent) ...
+
+## More granular coercions .................................
+
+.kinds <- c("d", "l", "n")
+for (.kind in .kinds) {
+    ## General to non-general, preserving kind
+    setAs(paste0(.kind, "geMatrix"), paste0(.kind, "trMatrix"), ..M2tri)
+    setAs(paste0(.kind, "geMatrix"), paste0(.kind, "syMatrix"), ..M2symm)
+    setAs(paste0(.kind, "geMatrix"), paste0(.kind, "tpMatrix"), ..packT)
+    setAs(paste0(.kind, "geMatrix"), paste0(.kind, "spMatrix"), ..packS)
+
+    ## Non-general to general, preserving kind
+    .f <- get(paste0("..dense2", .kind, "ge"),
+              mode = "function", inherits = FALSE)
+    for (.xx in c("tr", "sy", "tp", "sp"))
+        setAs(paste0(.kind, .xx,   "Matrix"),
+              paste0(.kind,      "geMatrix"), .f)
+
+    ## Unpacked to packed, preserving kind and structure
+    setAs(paste0(.kind, "trMatrix"), paste0(.kind, "tpMatrix"), ..pack3)
+    setAs(paste0(.kind, "syMatrix"), paste0(.kind, "spMatrix"), ..pack3)
+
+    ## Packed to unpacked, preserving kind and structure
+    setAs(paste0(.kind, "tpMatrix"), paste0(.kind, "trMatrix"), ..unpack3)
+    setAs(paste0(.kind, "spMatrix"), paste0(.kind, "syMatrix"), ..unpack3)
+
+    ## Triangular to symmetric, preserving kind and storage
+    setAs(paste0(.kind, "trMatrix"), paste0(.kind, "syMatrix"), ..M2symm)
+    setAs(paste0(.kind, "tpMatrix"), paste0(.kind, "spMatrix"), ..M2symm)
+
+    ## Symmetric to triangular, preserving kind and storage
+    setAs(paste0(.kind, "syMatrix"), paste0(.kind, "trMatrix"), ..M2tri)
+    setAs(paste0(.kind, "spMatrix"), paste0(.kind, "tpMatrix"), ..M2tri)
+
+    ## Other kinds to this kind, preserving structure and storage
+    .g <- get(paste0("..dense2", .kind, "kind"),
+              mode = "function", inherits = FALSE)
+    .otherkinds <- .kinds[.kinds != .kind]
+    for (.otherkind in .otherkinds)
+        for (.xx in c("ge", "tr", "sy", "tp", "sp"))
+            setAs(paste0(.otherkind, .xx, "Matrix"),
+                  paste0(     .kind, .xx, "Matrix"), .g)
+
+    ## Rely on coercions to virtual classes when changing two or more
+    ## of kind, structure, and storage at once:
+
+    ##  NO: as(<dsyMatrix>, "dtpMatrix")
+    ## YES: as(as(<dsyMatrix>, "triangularMatrix"), "packedMatrix")
+
+    ##  NO: as(<lgeMatrix>, "nspMatrix")
+    ## YES: as(as(<lgeMatrix>, "lspMatrix"), "nMatrix")
+}
+rm(.kind, .kinds, .otherkind, .otherkinds, .f, .g, .xx)
+
+## From base matrix ........................................
+
+## m->ge
+setAs("matrix", "dgeMatrix", ..m2dge)
+setAs("matrix", "lgeMatrix", ..m2lge)
+setAs("matrix", "ngeMatrix", ..m2nge)
+
+## m->tr
+setAs("matrix", "dtrMatrix",
+      function(from) {
+          if(!is.double(from))
+              storage.mode(from) <- "double"
+          .M2tri(from)
+      })
+setAs("matrix", "ltrMatrix",
+      function(from) {
+          if(!is.logical(from))
+              storage.mode(from) <- "logical"
+          .M2tri(from)
+      })
+setAs("matrix", "ntrMatrix",
+      function(from) as(as(from, "ltrMatrix"), "nMatrix"))
+
+## m->sy
+setAs("matrix", "dsyMatrix",
+      function(from) {
+          if(!is.double(from))
+              storage.mode(from) <- "double"
+          .M2symm(from)
+      })
+setAs("matrix", "lsyMatrix",
+      function(from) {
+          if(!is.logical(from))
+              storage.mode(from) <- "logical"
+          .M2symm(from)
+      })
+setAs("matrix", "nsyMatrix",
+      function(from) {
+          if(anyNA(from))
+              from <- is.na(from) | from
+          as(as(from, "lsyMatrix"), "nMatrix")
+      })
+
+## m->tp
+setAs("matrix", "dtpMatrix",
+      function(from) {
+          if(!is.double(from))
+              storage.mode(from) <- "double"
+          pack(from, symmetric = FALSE)
+      })
+setAs("matrix", "ltpMatrix",
+      function(from) {
+          if(!is.logical(from))
+              storage.mode(from) <- "logical"
+          pack(from, symmetric = FALSE)
+      })
+setAs("matrix", "ntpMatrix",
+      function(from) as(as(from, "ltpMatrix"), "nMatrix"))
+
+## m->sp
+setAs("matrix", "dspMatrix",
+      function(from) {
+          if(!is.double(from))
+              storage.mode(from) <- "double"
+          pack(from, symmetric = TRUE)
+      })
+setAs("matrix", "lspMatrix",
+      function(from) {
+          if(!is.logical(from))
+              storage.mode(from) <- "logical"
+          pack(from, symmetric = TRUE)
+      })
+setAs("matrix", "nspMatrix",
+      function(from) {
+          if(anyNA(from))
+              from <- is.na(from) | from
+          as(as(from, "lspMatrix"), "nMatrix")
+      })
+
+## From base vector ........................................
+
+setAs("numLike", "dgeMatrix", ..m2dge)
+setAs("numLike", "lgeMatrix", ..m2lge)
+setAs("numLike", "ngeMatrix", ..m2nge)
+
+rm(..dense2ge, ..dense2dge, ..dense2lge, ..dense2nge,
+   ..m2ge, ..m2dge, ..m2lge, ..m2nge,
+   ..dense2dkind, ..dense2lkind, ..dense2nkind,
+   ..pack, ..packT, ..packS, ..unpack, ..pack3, ..unpack3)
+
+## To sparse ...............................................
 
 ## dense to sparse:
 ## : if we do this, do it "right", i.e. preserve symmetric/triangular!
@@ -61,6 +333,18 @@ setAs("denseMatrix", "CsparseMatrix", function(from) .dense2C(from))
 setAs("denseMatrix", "TsparseMatrix",
       function(from) as(.dense2C(from), "TsparseMatrix"))
 
+
+## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.dense.band <- function(x, k1, k2, ...) .Call(R_dense_band, x, k1, k2)
+.dense.triu <- function(x, k = 0,  ...) .Call(R_dense_band, x, k, NULL)
+.dense.tril <- function(x, k = 0,  ...) .Call(R_dense_band, x, NULL, k)
+for (.cl in c("denseMatrix", "matrix")) {
+    setMethod("band", signature(x = .cl), .dense.band)
+    setMethod("triu", signature(x = .cl), .dense.triu)
+    setMethod("tril", signature(x = .cl), .dense.tril)
+}
+rm(.dense.band, .dense.triu, .dense.tril, .cl)
 
 setMethod("show", signature(object = "denseMatrix"),
           function(object) prMatrix(object))
@@ -196,7 +480,7 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "matrix",  # 2-col.matrix
 		     as(r, geClass(x))
 		 })
 
-## MJ: No longer needed ... replacement in ./(un)?packedMatrix.R
+## MJ: no longer needed ... replacement in ./(un)?packedMatrix.R
 if(FALSE) {
 setMethod("isSymmetric", signature(object = "denseMatrix"),
 	  function(object, tol = 100*.Machine$double.eps, tol1 = 8*tol, ...) {
@@ -235,7 +519,7 @@ setMethod("isSymmetric", signature(object = "denseMatrix"),
 	  })
 setMethod("isTriangular", signature(object = "denseMatrix"), isTriMat)
 setMethod("isDiagonal", signature(object = "denseMatrix"), .is.diagonal)
-}
+} ## MJ
 
 setMethod("rcond", signature(x = "denseMatrix", norm = "character"),
 	  function(x, norm, ...)
@@ -261,7 +545,7 @@ setMethod("is.na", signature(x = "denseMatrix"),
 
 if(.Matrix.avoiding.as.matrix) {
 setMethod("qr", signature(x = "ddenseMatrix"),
-	  function(x, ...) qr.default(ge2mat(..2dge(x)), ...))
+	  function(x, ...) qr.default(.dense2m(x), ...))
 setMethod("qr", signature(x = "denseMatrix"),
 	  function(x, ...) qr(as(x, "ddenseMatrix"), ...))
 }

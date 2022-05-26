@@ -1,81 +1,58 @@
 \name{band}
+\title{Extract bands of a matrix}
 \docType{methods}
+%
+\alias{band}
 \alias{band-methods}
-\alias{tril-methods}
+\alias{triu}
 \alias{triu-methods}
+\alias{tril}
+\alias{tril-methods}
+%
 \alias{band,CsparseMatrix-method}
-\alias{tril,CsparseMatrix-method}
-\alias{triu,CsparseMatrix-method}
 \alias{band,RsparseMatrix-method}
-\alias{tril,RsparseMatrix-method}
-\alias{triu,RsparseMatrix-method}
 \alias{band,TsparseMatrix-method}
-\alias{tril,TsparseMatrix-method}
-\alias{triu,TsparseMatrix-method}
-%FIXME! \alias{band,diagonalMatrix-method}
-\alias{tril,diagonalMatrix-method}
-\alias{triu,diagonalMatrix-method}
-\alias{tril,dsCMatrix-method}
-\alias{tril,lsCMatrix-method}
-\alias{tril,nsCMatrix-method}
-\alias{triu,dsCMatrix-method}
-\alias{triu,lsCMatrix-method}
-\alias{triu,nsCMatrix-method}
-\alias{band,ddenseMatrix-method}
-\alias{tril,ddenseMatrix-method}
-\alias{triu,ddenseMatrix-method}
 \alias{band,denseMatrix-method}
-\alias{tril,denseMatrix-method}
-\alias{triu,denseMatrix-method}
 \alias{band,matrix-method}
-\alias{tril,matrix-method}
+\alias{triu,CsparseMatrix-method}
+\alias{triu,RsparseMatrix-method}
+\alias{triu,TsparseMatrix-method}
+\alias{triu,denseMatrix-method}
+\alias{triu,diagonalMatrix-method}
 \alias{triu,matrix-method}
-% Begin{UGLY-disAMBIGUATION-hack} -- in ../R/triangularMatrix.R
-% we would want to define 'triangularMatrix' methods, but they ambiguate with the above!
-% \alias{tril,triangularMatrix-method}
-% \alias{triu,triangularMatrix-method}
-\alias{tril,dtCMatrix-method}
-\alias{tril,dtRMatrix-method}
-\alias{tril,dtTMatrix-method}
-\alias{tril,dtpMatrix-method}
-\alias{tril,dtrMatrix-method}
-\alias{tril,ltCMatrix-method}
-\alias{tril,ltRMatrix-method}
-\alias{tril,ltTMatrix-method}
-\alias{tril,ltpMatrix-method}
-\alias{tril,ltrMatrix-method}
-\alias{tril,ntCMatrix-method}
-\alias{tril,ntRMatrix-method}
-\alias{tril,ntTMatrix-method}
-\alias{tril,ntpMatrix-method}
-\alias{tril,ntrMatrix-method}
-\alias{tril,itTMatrix-method}
-\alias{tril,itCMatrix-method}
-\alias{tril,itRMatrix-method}
+\alias{tril,CsparseMatrix-method}
+\alias{tril,RsparseMatrix-method}
+\alias{tril,TsparseMatrix-method}
+\alias{tril,denseMatrix-method}
+\alias{tril,diagonalMatrix-method}
+\alias{tril,matrix-method}
+% due to disambiguation hack:
 \alias{triu,dtCMatrix-method}
 \alias{triu,dtRMatrix-method}
 \alias{triu,dtTMatrix-method}
-\alias{triu,dtpMatrix-method}
-\alias{triu,dtrMatrix-method}
 \alias{triu,ltCMatrix-method}
 \alias{triu,ltRMatrix-method}
 \alias{triu,ltTMatrix-method}
-\alias{triu,ltpMatrix-method}
-\alias{triu,ltrMatrix-method}
 \alias{triu,ntCMatrix-method}
 \alias{triu,ntRMatrix-method}
 \alias{triu,ntTMatrix-method}
-\alias{triu,ntpMatrix-method}
-\alias{triu,ntrMatrix-method}
-\alias{triu,itTMatrix-method}
-\alias{triu,itCMatrix-method}
-\alias{triu,itRMatrix-method}
-% End{UGLY-disAMBIGUATION-hack}
+\alias{tril,dtCMatrix-method}
+\alias{tril,dtRMatrix-method}
+\alias{tril,dtTMatrix-method}
+\alias{tril,ltCMatrix-method}
+\alias{tril,ltRMatrix-method}
+\alias{tril,ltTMatrix-method}
+\alias{tril,ntCMatrix-method}
+\alias{tril,ntRMatrix-method}
+\alias{tril,ntTMatrix-method}
+% only for speed (?):
+\alias{triu,dsCMatrix-method}
+\alias{triu,lsCMatrix-method}
+\alias{triu,nsCMatrix-method}
+\alias{tril,dsCMatrix-method}
+\alias{tril,lsCMatrix-method}
+\alias{tril,nsCMatrix-method}
 %
-\alias{band}
-\alias{tril}
-\alias{triu}
-\title{Extract bands of a matrix}
 \description{
   Returns a new matrix formed by extracting the lower triangle
   (\code{tril}) or the upper triangle (\code{triu}) or a general band

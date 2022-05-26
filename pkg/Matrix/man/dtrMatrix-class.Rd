@@ -1,25 +1,22 @@
 \name{dtrMatrix-class}
 \title{Triangular, dense, numeric matrices}
 \docType{class}
-\alias{coerce,dgeMatrix,dtrMatrix-method}% or rather setIs?
+%
+\alias{dtrMatrix-class}
+%
+\alias{coerce,dtrMatrix,CsparseMatrix-method}
+\alias{coerce,dtrMatrix,dgeMatrix-method}
+\alias{coerce,dtrMatrix,dgeMatrix-method}
+\alias{coerce,dtrMatrix,dsyMatrix-method}
 \alias{coerce,dtrMatrix,dtpMatrix-method}
 \alias{coerce,dtrMatrix,ltrMatrix-method}
-\alias{coerce,dtrMatrix,matrix-method}
+\alias{coerce,dtrMatrix,ntrMatrix-method}
 \alias{coerce,dtrMatrix,sparseMatrix-method}
-\alias{coerce,dtrMatrix,CsparseMatrix-method}
 \alias{coerce,matrix,dtrMatrix-method}
 \alias{determinant,dtrMatrix,logical-method}
 \alias{determinant,dtrMatrix,missing-method}
-\alias{diag,dtrMatrix-method}
-\alias{diag<-,dtrMatrix-method}
-\alias{norm,dtrMatrix,character-method}
-\alias{norm,dtrMatrix,missing-method}
-\alias{rcond,dtrMatrix,character-method}
-\alias{rcond,dtrMatrix,missing-method}
 \alias{show,dtrMatrix-method}
-%\alias{solve,dtrMatrix,matrix-method}--> solve-methods.Rd
-\alias{t,dtrMatrix-method}
-\alias{dtrMatrix-class}
+%
 \description{
   The \code{"dtrMatrix"} class is the class of triangular, dense,
   numeric matrices in nonpacked storage.  The \code{"dtpMatrix"} class

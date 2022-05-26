@@ -128,7 +128,7 @@ setMethod("cov2cor", signature(V = "Matrix"),
 	      as(forceSymmetric(r), "dpoMatrix")
           })
 
-## MJ: No longer needed ... replacement in ./unpackedMatrix.R
+## MJ: no longer needed ... replacement in ./unpackedMatrix.R
 if(FALSE) {
 ## "base" has an isSymmetric() S3-generic since R 2.3.0
 setMethod("isTriangular", signature(object = "matrix"), isTriMat)

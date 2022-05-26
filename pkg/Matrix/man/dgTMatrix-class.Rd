@@ -1,18 +1,20 @@
 \name{dgTMatrix-class}
 \title{Sparse matrices in triplet form}
 \docType{class}
+%
 \alias{dgTMatrix-class}
+%
 \alias{+,dgTMatrix,dgTMatrix-method}
 \alias{coerce,dgTMatrix,dgCMatrix-method}
 \alias{coerce,dgTMatrix,dgeMatrix-method}
-\alias{coerce,dgTMatrix,matrix-method}
-\alias{coerce,dgTMatrix,dtCMatrix-method}
 \alias{coerce,dgTMatrix,dsTMatrix-method}
+\alias{coerce,dgTMatrix,dtCMatrix-method}
 \alias{coerce,dgTMatrix,dtTMatrix-method}
+\alias{coerce,dgTMatrix,matrix-method}
 \alias{coerce,dgTMatrix,symmetricMatrix-method}
 \alias{coerce,dgTMatrix,triangularMatrix-method}
-\alias{coerce,dgeMatrix,dgTMatrix-method}
 \alias{coerce,matrix,dgTMatrix-method}
+%
 \description{The \code{"dgTMatrix"} class is the class of sparse
   matrices stored as (possibly redundant) triplets.  The internal
   representation is not at all unique, contrary to the one for class
