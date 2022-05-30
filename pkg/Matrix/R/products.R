@@ -595,14 +595,15 @@ setMethod("crossprod", signature(x = "symmetricMatrix", y = "Matrix"),
 setMethod("crossprod", signature(x = "symmetricMatrix", y = "ANY"),
 	  function(x,y=NULL, boolArith=NA, ...)
 	      if(isTRUE(boolArith)) x %&% y else x %*% y)
-##
 
 ## RsparseMatrix -- via CsparseMatrix:
 for(mClass in c("mMatrix", "ANY")) {
     setMethod("crossprod", signature(x = mClass, y = "RsparseMatrix"),
-	      function(x, y) crossprod(x, .R.2.C(y)))
+	      function(x, y, boolArith=NA, ...)
+		  crossprod(x, .R.2.C(y), boolArith=boolArith, ...))
     setMethod("crossprod", signature(x = "RsparseMatrix", y = mClass),
-	      function(x, y) crossprod(.R.2.C(x), y))
+	      function(x, y, boolArith=NA, ...)
+		  crossprod(.R.2.C(x), y, boolArith=boolArith, ...))
 }
 
 ## cheap fallbacks
@@ -884,9 +885,11 @@ setMethod("tcrossprod", signature(x = "sparseVector", y = "numLike"),
 ## RsparseMatrix -- via CsparseMatrix:
 for(mClass in c("mMatrix", "ANY")) {
     setMethod("tcrossprod", signature(x = mClass, y = "RsparseMatrix"),
-	      function(x, y) crossprod(x, .R.2.C(y)))
+	      function(x, y, boolArith=NA, ...)
+		  tcrossprod(x, .R.2.C(y), boolArith=boolArith, ...))
     setMethod("tcrossprod", signature(x = "RsparseMatrix", y = mClass),
-	      function(x, y) crossprod(.R.2.C(x), y))
+	      function(x, y, boolArith=NA, ...)
+		  tcrossprod(.R.2.C(x), y, boolArith=boolArith, ...))
 }
 
 

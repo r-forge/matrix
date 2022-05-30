@@ -1,6 +1,6 @@
 
-R version 4.1.1 RC (2021-08-03 r80706) -- "Kick Things"
-Copyright (C) 2021 The R Foundation for Statistical Computing
+R version 4.2.0 Patched (2022-05-15 r82368) -- "Vigorous Calisthenics"
+Copyright (C) 2022 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -170,11 +170,11 @@ C 3 6 9 12 10 40 70 100
 [3,] 100 3 6 9 12
 > str(im)
 Formal class 'dgeMatrix' [package "Matrix"] with 4 slots
-  ..@ x       : num [1:15] 100 100 100 1 2 3 4 5 6 7 ...
   ..@ Dim     : int [1:2] 3 5
   ..@ Dimnames:List of 2
   .. ..$ : NULL
   .. ..$ : chr [1:5] "I" "" "" "" ...
+  ..@ x       : num [1:15] 100 100 100 1 2 3 4 5 6 7 ...
   ..@ factors : list()
 > (mi <- cbind(M2, I = 1000))
 3 x 5 Matrix of class "dgeMatrix"
@@ -184,11 +184,11 @@ B 2 5 8 11 1000
 C 3 6 9 12 1000
 > str(mi)
 Formal class 'dgeMatrix' [package "Matrix"] with 4 slots
-  ..@ x       : num [1:15] 1 2 3 4 5 6 7 8 9 10 ...
   ..@ Dim     : int [1:2] 3 5
   ..@ Dimnames:List of 2
   .. ..$ : chr [1:3] "A" "B" "C"
   .. ..$ : chr [1:5] "a" "b" "c" "d" ...
+  ..@ x       : num [1:15] 1 2 3 4 5 6 7 8 9 10 ...
   ..@ factors : list()
 > (m1m <- cbind(M,I=100,M2))
 3 x 9 Matrix of class "dgeMatrix"

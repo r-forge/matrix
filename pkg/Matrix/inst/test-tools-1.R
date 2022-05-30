@@ -155,7 +155,7 @@ mkNA.0 <- function(x) { x[is.na(x)] <- 0 ; x }
 
 ##' ... : further arguments passed to all.equal() such as 'check.attributes'
 is.all.equal <- function(x,y, tol = .Machine$double.eps^0.5, ...)
-    identical(TRUE, all.equal(x,y, tolerance=tol, ...))
+    isTRUE(all.equal(x,y, tolerance=tol, ...))
 is.all.equal3 <- function(x,y,z, tol = .Machine$double.eps^0.5, ...)
     is.all.equal(x,y, tol=tol, ...) && is.all.equal(y,z, tol=tol, ...)
 

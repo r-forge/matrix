@@ -920,13 +920,19 @@ stopifnot(identical(dim(m02 %*% Diagonal(x=c(1,2))), c(0L, 2L)),
           identical(dim(M02 %*% Diagonal(x=2:1)   ), c(0L, 2L)))
 
 ## RsparseMatrix --- Arko Bose (Jan.2022): "Method for <dgRMatrix> %*% <dgCMatrix>"
-m <- Matrix(c(0,0,2:0), 3,5)
-(R <- as(m, "RsparseMatrix"))
-stopifnot(exprs = {
-    all.equal(t(R) %*% R,  crossprod(R))
-    all.equal(R %*% t(R), tcrossprod(R)) # both dgC {latter could improve to dsC*}
+(m <- Matrix(c(0,0,2:0), 3,5))
+stopifnotValid(R <- as(m, "RsparseMatrix"), "RsparseMatrix")
+stopifnotValid(T <- as(m, "TsparseMatrix"), "TsparseMatrix")
+stopifnot(exprs = { ## may change, once (t)crossprod(R) returns dsC*
+    all.equal(t(R) %*% R,  crossprod(R) -> cR)
+    all.equal(R %*% t(R), tcrossprod(R) -> tR) # both dgC {latter could improve to dsC*}
     all.equal(as(R %*% t(m),"symmetricMatrix"), tcrossprod(m))
     all.equal(as(m %*% t(R),"symmetricMatrix"), tcrossprod(m))
+    ## failed in Matrix <= 1.4.1  (since 1.2.0, when 'boolArith' was introduced):
+    all.equal(cR,  crossprod(R,T))
+    all.equal(cR,  crossprod(T,R))
+    all.equal(tR, tcrossprod(R,T))
+    all.equal(tR, tcrossprod(T,R))
 })
 
 
