@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-05-26 r3478)}{
+\section{Changes in version 1.4-2 (2022-05-30 r3481)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -22,7 +22,7 @@
       \item Many more validity methods now correctly operate under the
       assumption that methods for superclasses have already been called,
       eliminating many redundant checks.
-      
+
       \item Validation of \code{<Matrix>@Dim} now looks at type
       \emph{before} length, avoiding a misleading error message.
 
@@ -65,7 +65,7 @@
       via an argument \code{tol}.  A \code{tol} argument is now
       implemented for all subclasses of \code{dMatrix} except
       those inheriting from \code{symmetricMatrix}.
-      
+
       \item Methods for \code{isSymmetric} now also look at
       \code{Dimnames} and \code{names(Dimnames)}, following
       \code{isSymmetric.matrix} from \pkg{base}.  See also
@@ -76,12 +76,18 @@
       for symmetry, resulting in loss of information in some cases.
       Now it tests that \code{x} inherits from \code{symmetricMatrix},
       and so returns \code{symmetricMatrix} in fewer cases.
-      
+
       \item \code{triu(x, k)} and \code{tril(x, k)} incorrectly
       required \code{k <= m} (instead of \code{k <= n}),
       for \code{m}-by-\code{n} sparse \code{x}.  They now accept
       all \code{k} from \code{-m} to \code{n}, with fewer errors
       in the \code{m < n} case.
+
+      \item \code{crossprod(<Rsparse>, <Tsparse>)} and similar now works
+      again (optional \code{boolArith} was not passed on), fixing Matrix
+      bug #6766 by David Cortes.
+      Ditto for \code{tcrossprod()}, where the old result was even wrong
+      when it had \dQuote{worked}, before Matrix 1.2-0.
     }
   }
   \subsection{New Features}{
@@ -93,14 +99,14 @@
       \code{pack}, \code{unpack}, \code{isSymmetric},
       \code{isTriangular}, and \code{isDiagonal} implemented in C,
       replacing those defined for many subclasses individually.
-      
+
       \item New virtual class \code{unpackedMatrix} containing
       \code{denseMatrix} _without_ \code{packedMatrix}, with methods
       for \code{pack}, \code{unpack}, \code{isSymmetric},
       \code{isTriangular}, \code{isDiagonal}, \code{t}, \code{diag},
       and \code{diag<-} implemented in C, replacing those defined for
       many subclasses individually.
-      
+
       \item \code{isTriangular} and \code{isDiagonal} are now
       implemented in C also for standard \code{matrix}.
 
@@ -116,7 +122,7 @@
 
       \item \code{isTriangular} gains a fallback method for
       \code{sparseMatrix} going via \code{TsparseMatrix}.
-      
+
       \item \code{diag(<unpackedMatrix>) <- value} now behaves like
       \code{diag(<packedMatrix>) <- value}, supporting coercions
       depending on \code{typeof(value)}, consistent with \code{diag<-}
@@ -127,7 +133,7 @@
       respectively (previously an error). \code{pack(<.geMatrix>)}
       (previously an error) now behaves as \code{pack(<matrix>)},
       i.e., by checking for symmetry or triangularity before packing.
-      
+
       \item Many more validity methods implemented in C, for efficiency,
       including methods for \code{Matrix}, \code{compMatrix},
       \code{diagonalMatrix}, \code{corMatrix}, \code{[liz]Matrix},
