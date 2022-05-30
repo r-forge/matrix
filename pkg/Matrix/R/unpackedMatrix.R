@@ -23,9 +23,7 @@
 setMethod("unpack", signature(x = "unpackedMatrix"),
           function(x, ...) x)
 setMethod("unpack", signature(x = "matrix"),
-          function(x, ...) {
-              .Call(R_matrix_as_geMatrix, x, "", FALSE)
-          })
+          function(x, ...) .Call(R_matrix_as_geMatrix, x, ""))
 
 .upM.pack <- function(x, ...) {
     .Call(unpackedMatrix_pack, x, TRUE, NA, NA)
