@@ -1439,6 +1439,53 @@ SEXPTYPE kind2type(char kind)
     }
 }
 
+char Matrix_kind(SEXP obj, int iok)
+{
+    if (IS_S4_OBJECT(obj)) {
+	static const char *valid[] = {
+	    "indMatrix",
+	    "dMatrix", "lMatrix", "nMatrix",
+	    "iMatrix", "zMatrix",
+	    "dsparseVector", "lsparseVector", "nsparseVector",
+	    "isparseVector", "zsparseVector",
+	    ""};
+	int ivalid = R_check_class_etc(obj, valid);
+	if (ivalid < 0)
+	    error(_("\"kind\" not yet defined for objects of class \"%s\""),
+		  class_P(obj));
+	if (ivalid == 0)
+	    return 'n'; /* indMatrix */
+	char k = valid[ivalid][0];
+	if (!iok && k == 'i')
+	    error(_("class \"%s\" not yet supported"), valid[ivalid]);
+	return k;
+    } else {
+	switch (TYPEOF(obj)) {
+	case LGLSXP:
+	    return 'l';
+	case INTSXP:
+	    return (iok) ? 'i' : 'd';
+	case REALSXP:
+	    return 'd';
+	case CPLXSXP:
+	    return 'z';
+	default:
+	    error(_("\"kind\" not yet defined for objects of type \"%s\""),
+		  type2char(TYPEOF(obj)));
+	    return '\0';
+	}
+    }
+}
+
+SEXP R_Matrix_kind(SEXP obj, SEXP iok)
+{
+    char k = Matrix_kind(obj, asLogical(iok));
+    if (k == '\0')
+	return R_BlankString;
+    char s[] = { k, '\0' };
+    return mkString(s);
+}
+
 SEXP R_matrix_as_geMatrix(SEXP from, SEXP kind)
 {
     char k;
@@ -1468,11 +1515,9 @@ SEXP matrix_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector)
 #endif
     default:
 	if (IS_S4_OBJECT(from) || inherits(from, "factor"))
-	    error(_("invalid class \"%s\" to 'matrix_as_geMatrix()'"),
-		  class_P(from));
+	    ERROR_INVALID_CLASS(class_P(from), "matrix_as_geMatrix");
 	else
-	    error(_("invalid type \"%s\" to 'matrix_as_geMatrix()'"),
-		  type2char(TYPEOF(from)));
+	    ERROR_INVALID_TYPE("object", tf, "matrix_as_geMatrix");
 	break;
     }
     
