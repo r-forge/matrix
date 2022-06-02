@@ -345,11 +345,14 @@ SEXP unpacked_force(SEXP x, int n, char uplo, char diag);
 char type2kind(SEXPTYPE type);
 SEXPTYPE kind2type(char kind);
 
-SEXP R_matrix_as_geMatrix(SEXP from, SEXP kind);
+char Matrix_kind(SEXP obj, int iok);
+SEXP R_Matrix_kind(SEXP obj, SEXP iok);
+    
 SEXP matrix_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector);
+SEXP R_matrix_as_geMatrix(SEXP from, SEXP kind);
 
-SEXP R_dense_as_geMatrix(SEXP from, SEXP kind);
 SEXP dense_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector);
+SEXP R_dense_as_geMatrix(SEXP from, SEXP kind);
 
 Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n);
 R_xlen_t strmatch(char *nm, SEXP s);
