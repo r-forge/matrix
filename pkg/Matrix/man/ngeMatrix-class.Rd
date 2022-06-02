@@ -13,6 +13,7 @@
 \alias{coerce,ngeMatrix,lgeMatrix-method}
 \alias{coerce,ngeMatrix,matrix-method}
 \alias{coerce,ngeMatrix,ngCMatrix-method}
+\alias{coerce,ngeMatrix,ngRMatrix-method}
 \alias{coerce,ngeMatrix,ngTMatrix-method}
 \alias{coerce,ngeMatrix,nspMatrix-method}
 \alias{coerce,ngeMatrix,nsyMatrix-method}

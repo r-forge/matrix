@@ -9,9 +9,9 @@ setAs("lgTMatrix", "lgeMatrix",
 
 setAs("lgTMatrix", "matrix",
       function(from) .Call(lgTMatrix_to_matrix, from))
-## setAs("lgTMatrix", "matrix", # go via fast C code:
-##       function(from) as(as(from, "lgCMatrix"), "matrix"))
 
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 setAs("matrix", "lgTMatrix",
       function(from) {
 	  stopifnot(is.logical(from))
@@ -29,7 +29,10 @@ setAs("matrix", "lgTMatrix",
 	      Dim = as.integer(dim(from)),
 	      Dimnames = dn)
 	  })
+} ## MJ
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("lgTMatrix", "dgTMatrix",
       function(from)
       ## more efficient than
@@ -38,18 +41,19 @@ setAs("lgTMatrix", "dgTMatrix",
           x = as.double(from@x),
           ## cannot copy factors, but can we use them?
           Dim = from@Dim, Dimnames= from@Dimnames))
+} ## MJ
 
 setAs("lgTMatrix", "triangularMatrix",
       function(from) check.gT2tT(from, toClass = "ltTMatrix", do.n=FALSE))
 setAs("lgTMatrix", "ltTMatrix",
       function(from) check.gT2tT(from, toClass = "ltTMatrix", do.n=FALSE))
 
+## MJ: no longer needed ... method now inherited from Matrix
+if(FALSE) {
+## Favor coercion to superclasses: here "symmetricMatrix" not "lsTMatrix"
 setAs("lgTMatrix", "symmetricMatrix",
       function(from) check.gT2sT(from, toClass = "lsTMatrix", do.n=FALSE))
-## We favor coercion to super-classes, here, "symmetricMatrix"
-## setAs("lgTMatrix", "lsTMatrix",
-##       function(from) check.gT2sT(from, toClass = "lsTMatrix", do.n=FALSE))
-
+} ## MJ
 
 if(FALSE) ## unneeded: use t.<TsparseMatrix>
 setMethod("t", signature(x = "lgTMatrix"),

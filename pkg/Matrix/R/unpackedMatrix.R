@@ -1,5 +1,5 @@
 ## Methods for virtual class "unpackedMatrix" of full storage, dense matrices
-## ... and many for base "matrix", too
+## ... and many for base matrices, too
 .upM.subclasses <- names(getClass("unpackedMatrix")@subclasses)
 
 ## ~~~~ COERCIONS FROM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -23,7 +23,7 @@
 setMethod("unpack", signature(x = "unpackedMatrix"),
           function(x, ...) x)
 setMethod("unpack", signature(x = "matrix"),
-          function(x, ...) .Call(R_matrix_as_geMatrix, x, ""))
+          function(x, ...) .Call(R_matrix_as_geMatrix, x, "."))
 
 .upM.pack <- function(x, ...) {
     .Call(unpackedMatrix_pack, x, TRUE, NA, NA)
@@ -100,12 +100,12 @@ setMethod("forceSymmetric", signature(x = "matrix", uplo = "character"),
         return(FALSE)
     if(n <= 1L)
         return(TRUE)
-    cd <- getClassDef(class(object))
-    if(!extends(cd, "generalMatrix"))
+    cld <- getClassDef(class(object))
+    if(!extends(cld, "generalMatrix"))
         object <- as(object, "generalMatrix")
     ## now handling n-by-n [dz]geMatrix, n >= 2:
 
-    Cj <- if(extends(cd, "dMatrix")) identity else Conj
+    Cj <- if(extends(cld, "dMatrix")) identity else Conj
     ae <- function(check.attributes, ...) {
         ## discarding possible user-supplied check.attributes
         all.equal(..., check.attributes = FALSE)

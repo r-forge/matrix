@@ -9,13 +9,16 @@ setAs("ngTMatrix", "lgeMatrix",
 setAs("ngTMatrix", "ngeMatrix",
       function(from) as(as(from, "lgeMatrix"), "nMatrix"))
 
+## MJ: ngTMatrix already inherits from generalMatrix ??
+if(FALSE) {
 setAs("ngTMatrix", "generalMatrix", function(from) as(from, "ngeMatrix"))
+}
 
 setAs("ngTMatrix", "matrix",
       function(from) .Call(lgTMatrix_to_matrix, as(from, "lgTMatrix")))
-## setAs("ngTMatrix", "matrix", # go via fast C code:
-##       function(from) as(as(from, "ngCMatrix"), "matrix"))
 
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 .m2ngTn <- function(from, na.is.not.0 = FALSE) {
     if(!is.logical(from)) storage.mode(from) <- "logical"
     if(na.is.not.0) {
@@ -38,7 +41,10 @@ setAs("ngTMatrix", "matrix",
 
 setAs("matrix", "ngTMatrix", function(from) .m2ngTn(from))
 setAs("matrix", "nMatrix",   function(from) .m2ngTn(from))
+} ## MJ
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 ## also works for lgT* or ltT* when it has no NA nor FALSE in @x :
 .n2dgT <- function(from)
     new("dgTMatrix", i = from@i, j = from@j,
@@ -50,7 +56,6 @@ setAs("ngTMatrix", "dgTMatrix",     .n2dgT)
 setAs("ngTMatrix", "dMatrix",       .n2dgT)
 setAs("ngTMatrix", "dsparseMatrix", .n2dgT)
 
-
 .n2lgT <- function(from)
     new("lgTMatrix", i = from@i, j = from@j,
         x = rep.int(TRUE, length(from@i)),
@@ -59,17 +64,18 @@ setAs("ngTMatrix", "dsparseMatrix", .n2dgT)
 
 setAs("ngTMatrix", "lgTMatrix", .n2lgT)
 setAs("ngTMatrix", "lMatrix",   .n2lgT)
+} ## MJ
 
 setAs("ngTMatrix", "triangularMatrix",
       function(from) check.gT2tT(from, toClass = "ntTMatrix", do.n=TRUE))
 setAs("ngTMatrix", "ntTMatrix",
       function(from) check.gT2tT(from, toClass = "ntTMatrix", do.n=TRUE))
+
+## MJ: no longer needed ... method now inherited from Matrix
+if(FALSE) {
 setAs("ngTMatrix", "symmetricMatrix",
       function(from) check.gT2sT(from, toClass = "nsTMatrix", do.n=TRUE))
-## We favor coercion to super-classes, here, "symmetricMatrix"
-## setAs("ngTMatrix", "nsTMatrix",
-##       function(from) check.gT2sT(from, toClass = "nsTMatrix", do.n=TRUE))
-
+} ## MJ
 
 if(FALSE) ## unneeded: use t.<TsparseMatrix>
 setMethod("t", signature(x = "ngTMatrix"),

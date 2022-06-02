@@ -64,41 +64,6 @@ setMethod("forceSymmetric", signature(x = "matrix", uplo = "character"),
 	  function(x, uplo) .Call(dense_to_symmetric, x, uplo, FALSE))
 }
 
-##' @title Symmetrize (coerce to '.sCMatrix') a 'CsparseMatrix'
-##' @param x a \code{"CsparseMatrix"}.
-##' @param uplo \code{"U"}, \code{"L"}, or missing.
-##' @param isTri a logical indicating if \code{x} is triangular.
-##' @param symDimnames a logical indicating if the \code{Dimnames} slot
-##'     should be symmetrized; \code{NA} is to symmetrize if and only if
-##'     \code{Dimnames[[1]]} and \code{Dimnames[[2]]} are non-\code{NULL}
-##'     or \code{names(Dimnames)} is non-\code{NULL}.
-forceCspSymmetric <- function(x, uplo,
-                              isTri = is(x, "triangularMatrix"),
-                              symDimnames = NA) {
-    ## isTri ==> effectively *diagonal*
-    if(isTri && x@diag == "U")
-	x <- .Call(Csparse_diagU2N, x)
-    if(missing(uplo))
-	uplo <- if(isTri) x@uplo else "U"
-    .Call(Csparse_general_to_symmetric, x, uplo, symDimnames)
-}
-
-.gC2sym <- function(x, uplo, symDimnames = NA) {
-    .Call(Csparse_general_to_symmetric, x, uplo, symDimnames)
-}
-
-## MJ: symmetrizing 'Dimnames' slot unconditionally for consistency with
-##     methods for denseMatrix, which had always symmetrized unconditionally
-setMethod("forceSymmetric", signature(x = "CsparseMatrix"),
-	  function(x, uplo) {
-              forceCspSymmetric(x, uplo,
-                                symDimnames = TRUE)
-          })
-setMethod("forceSymmetric", signature(x = "sparseMatrix"),
-	  function(x, uplo) {
-              forceCspSymmetric(as(x, "CsparseMatrix"), uplo,
-                                symDimnames = TRUE)
-          })
 setMethod("symmpart", signature(x = "symmetricMatrix"), function(x) x)
 setMethod("skewpart", signature(x = "symmetricMatrix"), function(x) .setZero(x))
 

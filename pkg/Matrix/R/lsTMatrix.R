@@ -11,17 +11,17 @@ setAs("lsTMatrix", "lgCMatrix", # for diag
 setAs("lsTMatrix", "lgTMatrix",
       function(from) .Call(lsTMatrix_as_lgTMatrix, from))
 
-
-if(FALSE) # should use  as(., "dMatrix")
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("lsTMatrix", "dsTMatrix",
       function(from)
       new("dsTMatrix", i = from@i, j = from@j, uplo = from@uplo,
 	  x = as.double(from@x), # *not* just 1; from@x *can* have FALSE
 	  Dim = from@Dim, Dimnames = from@Dimnames))
+}
 
 setAs("lsTMatrix", "lsyMatrix",
       function(from) .Call(lsTMatrix_as_lsyMatrix, from))
-
 
 setMethod("t", "lsTMatrix",
 	  function(x)

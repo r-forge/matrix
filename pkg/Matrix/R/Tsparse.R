@@ -1,5 +1,7 @@
 #### "TsparseMatrix" : Virtual class of sparse matrices in triplet-format
 
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 ## more efficient than going via Csparse:
 setAs("matrix", "TsparseMatrix",
       function(from)
@@ -9,21 +11,15 @@ setAs("matrix", "TsparseMatrix",
 
 setAs("numeric", "TsparseMatrix",
       function(from) as(as.matrix(from), "TsparseMatrix"))
+} ## MJ
 
 setAs("TsparseMatrix", "matrix",
       function(from) .Call(dgTMatrix_to_matrix, as(from, "dgTMatrix")))
 
-## in ../src/Tsparse.c :  |-> cholmod_T -> cholmod_C -> chm_sparse_to_SEXP
-## adjusted for triangular matrices not represented in cholmod
-.T.2.C <- function(from) .Call(Tsparse_to_Csparse, from, ##
-			       is(from, "triangularMatrix"))
-## fast, exported for power users
-.T2Cmat <- function(from, isTri = is(from, "triangularMatrix"))
-    .Call(Tsparse_to_Csparse, from, isTri)
-
-
 setAs("TsparseMatrix", "CsparseMatrix", .T.2.C)
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 .T.2.n <- function(from) {
     ## No: coercing to n(sparse)Matrix gives the "full" pattern including 0's
     ## if(any(is0(from@x))) ## 0 or FALSE -- the following should have drop0Tsp(.)
@@ -61,8 +57,7 @@ setAs("TsparseMatrix", "nMatrix", .T.2.n)
 
 setAs("TsparseMatrix", "lsparseMatrix", .T.2.l)
 setAs("TsparseMatrix", "lMatrix", .T.2.l)
-
-
+} ## MJ
 
 ## Special cases   ("d", "l", "n")  %o%  ("g", "s", "t") :
 ## used e.g. in triu()
@@ -95,6 +90,16 @@ setAs("nsTMatrix", "nsCMatrix",
 
 setAs("ntTMatrix", "ntCMatrix",
       function(from) .Call(Tsparse_to_Csparse, from, TRUE))
+
+
+## NOTE/FIXME(?):
+## these do not work for subclasses inheriting from symmetricMatrix,
+## which have their own (much simpler) methods; see ./symmetricMatrix.R
+setMethod("forceSymmetric", signature(x = "TsparseMatrix", uplo = "missing"),
+	  forceSymmetricTsparse)
+setMethod("forceSymmetric", signature(x = "TsparseMatrix", uplo = "character"),
+	  forceSymmetricTsparse)
+
 
 ### "[" :
 ### -----

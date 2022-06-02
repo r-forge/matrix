@@ -2,11 +2,15 @@
 
 setAs("ltCMatrix", "matrix",
       function(from) as(as(from, "lgCMatrix"), "matrix"))
+
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 setAs("matrix", "ltCMatrix",
       function(from) {
 	  if(!is.logical(from)) storage.mode(from) <- "logical"
 	  .Call(matrix_to_Csparse, from, "ltCMatrix")
       })
+} ## MJ
 
 setAs("ltCMatrix", "lgCMatrix",
       function(from) copyClass(diagU2N(from), "lgCMatrix",
@@ -15,11 +19,14 @@ setAs("ltCMatrix", "lgCMatrix",
 setAs("ltCMatrix", "ltTMatrix",
       function(from) .Call(Csparse_to_Tsparse, from, TRUE))
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("ltCMatrix", "dMatrix", # < instead of "dtCMatrix"
       function(from) new("dtCMatrix", i = from@i, p = from@p,
                          x = as.double(from@x), uplo = from@uplo,
                          diag = from@diag,
                          Dim = from@Dim, Dimnames = from@Dimnames))
+} ## MJ
 
 setAs("lgCMatrix", "ltCMatrix", # to triangular {needed in triu() }
       function(from) as(as(as(from, "lgTMatrix"), "ltTMatrix"), "ltCMatrix"))

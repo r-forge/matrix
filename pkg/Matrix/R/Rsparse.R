@@ -7,15 +7,8 @@
 
 ### contains = "dMatrix"
 
-## compressed_to_TMatrix -- fails on 32bit--enable-R-shlib with segfault {Kurt}
-## ------------ --> ../src/dgCMatrix.c
-.R.2.T <- function(from) .Call(compressed_to_TMatrix, from, FALSE)
-
-## R_to_CMatrix
-## ------------ --> ../src/dgCMatrix.c
-.R.2.C <- function(from) .Call(R_to_CMatrix, from)
-
-if(FALSE)## "slow" unneeded R-level version
+## MJ: all in C now, and moved to ./Auxiliaries.R
+if(FALSE) {
 .R.2.C <- function(from)
 {
     cl <- class(from)
@@ -43,8 +36,7 @@ if(FALSE)## "slow" unneeded R-level version
 }
 
 ## However, a quick way to "treat a t(<R..>) as corresponding <C..> " :
-.tR.2.C <- function(from)
-{
+.tR.2.C <- function(from) {
     cl <- class(from)
     valid <- c("dgRMatrix", "dsRMatrix", "dtRMatrix",
                "lgRMatrix", "lsRMatrix", "ltRMatrix",
@@ -70,50 +62,6 @@ if(FALSE)## "slow" unneeded R-level version
     r
 }
 
-
-
-## coercion to other virtual classes --- the functionality we want to encourage
-
-setAs("RsparseMatrix", "TsparseMatrix", .R.2.T)
-setAs("RsparseMatrix", "CsparseMatrix", .R.2.C)
-
-setAs("RsparseMatrix", "denseMatrix",
-      function(from) as(.R.2.C(from), "denseMatrix"))
-
-setAs("RsparseMatrix", "dsparseMatrix",
-      function(from) as(.R.2.C(from), "dsparseMatrix"))
-setAs("RsparseMatrix", "lsparseMatrix",
-      function(from) as(.R.2.C(from), "lsparseMatrix"))
-setAs("RsparseMatrix", "nsparseMatrix",
-      function(from) as(.R.2.C(from), "nsparseMatrix"))
-
-setAs("RsparseMatrix", "dMatrix",
-      function(from) as(.R.2.C(from), "dMatrix"))
-setAs("RsparseMatrix", "lMatrix",
-      function(from) as(.R.2.C(from), "lMatrix"))
-setAs("RsparseMatrix", "nMatrix",
-      function(from) as(.R.2.C(from), "nMatrix"))
-
-setAs("RsparseMatrix", "generalMatrix",
-      function(from) as(.R.2.C(from), "generalMatrix"))
-
-
-## for printing etc:
-setAs("RsparseMatrix", "dgeMatrix",
-      function(from) as(.R.2.C(from), "dgeMatrix"))
-setAs("RsparseMatrix", "matrix",
-      function(from) as(.R.2.C(from), "matrix"))
-
-## **VERY** cheap substitute:  work via dgC and t(.)
-.viaC.to.dgR <- function(from) {
-    m <- as(t(from), "dgCMatrix")
-    new("dgRMatrix", Dim = dim(from), Dimnames = .M.DN(from),
-	p = m@p, j = m@i, x = m@x)
-}
-
-## one of the few coercions "to <specific>" {tested in ../tests/Class+Meth.R}
-setAs("matrix", "dgRMatrix", .viaC.to.dgR)
-
 .tC.2.R <- function(m, cl = class(m), clx = getClassDef(cl)) {
     has.x <- !extends(clx, "nsparseMatrix")## <==> has 'x' slot
     sh <- .M.shapeC(m,clx)
@@ -131,29 +79,71 @@ setAs("matrix", "dgRMatrix", .viaC.to.dgR)
     }
     r
 }
+} ## MJ
 
-## *very* cheap substitute:  work via t(.) and Csparse
-.viaC.to.R <- function(from) {
-    m <- as(t(from), "CsparseMatrix")# preserve symmetry/triangular
-    .tC.2.R(m)
-}
+## coercion to other virtual classes --- the functionality we want to encourage
 
-setAs("matrix",      "RsparseMatrix", .viaC.to.R)
-setAs("denseMatrix", "RsparseMatrix", .viaC.to.R)
-setAs("sparseMatrix","RsparseMatrix", .viaC.to.R)
-.C.2.R <- function(from) { ## slightly more efficiently than .viaC.to.R() :
-    cld <- getClassDef(class(from))
-    .tC.2.R(.Call(Csparse_transpose, from, extends(cld, "triangularMatrix")),
-            clx = cld)
-}
+setAs("RsparseMatrix", "TsparseMatrix", .R.2.T)
+setAs("RsparseMatrix", "CsparseMatrix", .R.2.C)
+
+setAs("RsparseMatrix", "denseMatrix",
+      function(from) as(.R.2.C(from), "denseMatrix"))
+
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
+setAs("RsparseMatrix", "dsparseMatrix",
+      function(from) as(.R.2.C(from), "dsparseMatrix"))
+setAs("RsparseMatrix", "lsparseMatrix",
+      function(from) as(.R.2.C(from), "lsparseMatrix"))
+setAs("RsparseMatrix", "nsparseMatrix",
+      function(from) as(.R.2.C(from), "nsparseMatrix"))
+
+setAs("RsparseMatrix", "dMatrix",
+      function(from) as(.R.2.C(from), "dMatrix"))
+setAs("RsparseMatrix", "lMatrix",
+      function(from) as(.R.2.C(from), "lMatrix"))
+setAs("RsparseMatrix", "nMatrix",
+      function(from) as(.R.2.C(from), "nMatrix"))
+} ## MJ
+
+setAs("RsparseMatrix", "generalMatrix",
+      function(from) as(.R.2.C(from), "generalMatrix"))
+
+
+## for printing etc:
+setAs("RsparseMatrix", "dgeMatrix",
+      function(from) as(.R.2.C(from), "dgeMatrix"))
+setAs("RsparseMatrix", "matrix",
+      function(from) as(.R.2.C(from), "matrix"))
+
+setAs("sparseMatrix", "RsparseMatrix", .viaC.2.R)
 setAs("CsparseMatrix", "RsparseMatrix", .C.2.R)
 
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
+## **VERY** cheap substitute:  work via dgC and t(.)
+.viaC.2.dgR <- function(from) {
+    m <- as(t(from), "dgCMatrix")
+    new("dgRMatrix", Dim = dim(from), Dimnames = .M.DN(from),
+	p = m@p, j = m@i, x = m@x)
+}
+
+## one of the few coercions "to <specific>" {tested in ../tests/Class+Meth.R}
+setAs("matrix", "dgRMatrix", .viaC.2.dgR)
+
+setAs("matrix",      "RsparseMatrix", .viaC.2.R)
+setAs("denseMatrix", "RsparseMatrix", .viaC.2.R)
+} ## MJ
+
+## MJ: "fixed" in ./sparseMatrix.R
+if(FALSE) {
 ## symmetric: can use same 'p' slot
 setAs("dsCMatrix", "dsRMatrix",
       function(from) new("dsRMatrix", Dim = dim(from), Dimnames = .M.DN(from),
 	      p = from@p, j = from@i, x = from@x,
 	      uplo = if (from@uplo == "U") "L" else "U"))
 ## FIXME: if this makes sense, do it for "l" and "n" as well as "d"
+}
 
 ## setAs("dtCMatrix", "dtRMatrix", .viaC.to.dgR) # should work; can NOT use 'p'
 
@@ -183,6 +173,13 @@ setMethod("image", "dgRMatrix", function(x, ...) image(.R.2.T(x), ...))
 
 setMethod("t", "RsparseMatrix", function(x) .C.2.R(.tR.2.C(x)))
 
+## NOTE/FIXME(?):
+## these do not work for subclasses inheriting from symmetricMatrix,
+## which have their own (much simpler) methods; see ./symmetricMatrix.R
+setMethod("forceSymmetric", signature(x = "RsparseMatrix", uplo = "missing"),
+	  forceSymmetricRsparse)
+setMethod("forceSymmetric", signature(x = "RsparseMatrix", uplo = "character"),
+	  forceSymmetricRsparse)
 
 ## Want tril(), triu(), band() --- just as "indexing" ---
 ## return a "close" class:

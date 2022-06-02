@@ -4,22 +4,8 @@
 #include <string.h>
 #include "sparse.h"
 
-#define SPARSE_ERROR_INVALID_CLASS(_CLASS_, _METHOD_)			\
-    error(_("invalid class \"%s\" to 'R_sparse_%s()'"),			\
-	  _CLASS_, _METHOD_)
-
-#define DIAGONAL_ERROR_INVALID_CLASS(_CLASS_, _METHOD_)			\
-    error(_("invalid class \"%s\" to 'R_diagonal_%s()'"),		\
-	  _CLASS_, _METHOD_)
-
-#define NZREAL(_X_) ((_X_) != 0.0)
-
-#define NZINTEGER(_X_) ((_X_) != 0)
-
-#define NZCOMPLEX(_X_) ((_X_).r != 0.0 || (_X_).i != 0.0)
-
-/* as(<sparseMatrix>, "[dlniz](sparse)?Matrix") */
-SEXP R_sparse_as_kind(SEXP from, SEXP kind)
+/* as(<[CRT]sparseMatrix>, "[dlniz]Matrix") */
+SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
 {
     char k;
     if ((kind = asChar(kind)) == NA_STRING || (k = *CHAR(kind)) == '\0')
@@ -36,7 +22,7 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind)
 	"ngTMatrix", "nsTMatrix", "ntTMatrix", ""};
     int ivalid = R_check_class_etc(from, valid);
     if (ivalid < 0)
-	SPARSE_ERROR_INVALID_CLASS(class_P(from), "as_kind");
+	ERROR_INVALID_CLASS(class_P(from), "R_sparse_as_kind");
     const char *clf = valid[ivalid];
     if (k == '.')
 	k = clf[0];
@@ -44,7 +30,14 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind)
 	return from;
     SEXPTYPE tx = kind2type(k); /* validating 'k' before doing more */
 
-    if (k == 'n')
+#if 0 /* MJ: what I think makes sense */
+    int do_drop0 = (k == 'n' ||
+		    asLogical(drop0) != 0);
+#else /* MJ: behaviour in Matrix 1.4-1 ?? */
+    int do_drop0 = ((clf[0] != 'n' && clf[2] != 'T' && k == 'l') ||
+		    asLogical(drop0) != 0);
+#endif
+    if (do_drop0)
 	PROTECT(from = (clf[2] == 'C'
 			? Csparse_drop0(from)
 			: (clf[2] == 'R'
@@ -69,9 +62,9 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind)
 	SET_SLOT(to, Matrix_iSym, i = GET_SLOT(from, Matrix_iSym));
     if (clf[2] != 'C')
 	SET_SLOT(to, Matrix_jSym, j = GET_SLOT(from, Matrix_jSym));
-    
+
     if (clf[0] == 'n') {
-	R_xlen_t ix, nx = (clf[2] == 'C') ? XLENGTH(i) : XLENGTH(j);
+	int ix, nx = LENGTH((clf[2] == 'C') ? i : j);
 	SEXP x = PROTECT(allocVector(tx, nx));
 
 #define SET_ONES(_X_, _I_, _N_, _CTYPE_, _PTR_, _ONE_)	\
@@ -112,11 +105,11 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind)
 		 coerceVector(GET_SLOT(from, Matrix_xSym), tx));
     }
 
-    UNPROTECT((k == 'n') ? 2 : 1);
+    UNPROTECT(do_drop0 ? 2 : 1);
     return to;
 }
 
-/* as(<diagonalMatrix>, "(.di|.[gst][CRT]|.sparse|.)Matrix") */
+/* as(<diagonalMatrix>, ".(di|[gst][CRT])Matrix") */
 SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 {
     const char *c;
@@ -133,7 +126,7 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
     static const char *valid[] = { "ddiMatrix", "ldiMatrix", "" };
     int ivalid = R_check_class_etc(from, valid);
     if (ivalid < 0)
-	DIAGONAL_ERROR_INVALID_CLASS(class_P(from), "as_sparse");
+	ERROR_INVALID_CLASS(class_P(from), "R_diagonal_as_sparse");
 
     const char *clf = valid[ivalid];
     if (c0 == '.')
@@ -171,7 +164,7 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 	return to;
     }
 
-    /* Now coercing from diagonalMatrix to .sparseMatrix ... */
+    /* Now coercing from diagonalMatrix to [CRT]sparseMatrix ... */
     
     if (c1 == 't' || c1 == 's')
 	SET_SLOT(to, Matrix_uploSym, mkString((ul == 'U') ? "U" : "L"));
@@ -276,16 +269,16 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 	    do {						\
 		switch (_SEXPTYPE_) {				\
 		case REALSXP:					\
-		    _MACRO_(double, REAL, NZREAL);		\
+		    _MACRO_(double, REAL, NZ_REAL);		\
 		    break;					\
 		case LGLSXP:					\
-		    _MACRO_(int, LOGICAL, NZINTEGER);		\
+		    _MACRO_(int, LOGICAL, NZ_INTEGER);		\
 		    break;					\
 		case INTSXP:					\
-		    _MACRO_(int, INTEGER, NZINTEGER);		\
+		    _MACRO_(int, INTEGER, NZ_INTEGER);		\
 		    break;					\
 		case CPLXSXP:					\
-		    _MACRO_(Rcomplex, COMPLEX, NZCOMPLEX);	\
+		    _MACRO_(Rcomplex, COMPLEX, NZ_COMPLEX);	\
 		    break;					\
 		default:					\
 		    break;					\
@@ -486,3 +479,51 @@ SEXP Tsparse_drop0(SEXP from)
 #undef DROP0_END_INIT
 #undef DROP0_SET_COMMON
 #undef DROP0_SET_EXTRA
+
+#define TCR_AS_RC(_C_, _R_, _I_, _J_, _R_CHAR_)				\
+SEXP t ## _C_ ## sparse_as_ ## _R_ ## sparse(SEXP from)			\
+{									\
+    static const char *valid[] = {					\
+	"dg" #_C_ "Matrix", "dt" #_C_ "Matrix", "ds" #_C_ "Matrix",	\
+	"lg" #_C_ "Matrix", "lt" #_C_ "Matrix", "ls" #_C_ "Matrix",	\
+	"ng" #_C_ "Matrix", "nt" #_C_ "Matrix", "ns" #_C_ "Matrix", ""}; \
+    int ivalid = R_check_class_etc(from, valid);			\
+    if (ivalid < 0)							\
+	ERROR_INVALID_CLASS(class_P(from),				\
+			    "t" #_C_ "sparse_as_" #_R_ "sparse");	\
+									\
+    char *cl = strdup(valid[ivalid]);					\
+    cl[2] = _R_CHAR_;							\
+    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl)),				\
+	dim = GET_SLOT(from, Matrix_DimSym);				\
+    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];			\
+									\
+    PROTECT(dim = allocVector(INTSXP, 2));				\
+    pdim = INTEGER(dim);						\
+    pdim[0] = n;							\
+    pdim[1] = m;							\
+    SET_SLOT(to, Matrix_DimSym, dim);					\
+									\
+    set_reversed_DimNames(to, GET_SLOT(from, Matrix_DimNamesSym));	\
+    SET_SLOT(to, Matrix_pSym, GET_SLOT(from, Matrix_pSym));		\
+    SET_SLOT(to, Matrix_ ## _J_ ## Sym,					\
+	     GET_SLOT(from, Matrix_ ## _I_ ## Sym));			\
+    if (cl[0] != 'n')							\
+	SET_SLOT(to, Matrix_xSym, GET_SLOT(from, Matrix_xSym));		\
+    if (cl[1] != 'g') {							\
+	SET_SLOT(to, Matrix_uploSym,					\
+		 mkString((*uplo_P(from) == 'U') ? "L" : "U"));		\
+	if (cl[1] == 't')						\
+	    SET_SLOT(to, Matrix_diagSym, GET_SLOT(from, Matrix_diagSym)); \
+    }									\
+									\
+    UNPROTECT(2);							\
+    return to;								\
+}
+
+/* tCsparse_as_Rsparse() */
+TCR_AS_RC(C, R, i, j, 'R')
+/* tRsparse_as_Csparse() */
+TCR_AS_RC(R, C, j, i, 'C')
+
+#undef TCR_AS_RC

@@ -7,6 +7,7 @@
 %
 \alias{Arith,dsCMatrix,dsCMatrix-method}
 \alias{as.vector,dsCMatrix-method}
+\alias{coerce,dsCMatrix,RsparseMatrix-method}
 \alias{coerce,dsCMatrix,denseMatrix-method}
 \alias{coerce,dsCMatrix,dgCMatrix-method}
 \alias{coerce,dsCMatrix,dgTMatrix-method}
@@ -30,6 +31,7 @@
 \alias{coerce,dsTMatrix,dsCMatrix-method}
 \alias{coerce,dsTMatrix,dsyMatrix-method}
 \alias{coerce,dsTMatrix,lsTMatrix-method}
+\alias{coerce,dsTMatrix,nsTMatrix-method}
 \alias{coerce,dsTMatrix,matrix-method}
 \alias{coerce,matrix,dsTMatrix-method}
 \alias{t,dsTMatrix-method}
@@ -132,18 +134,18 @@ str(mm)
 mT <- as(mm, "dgTMatrix")
 
 ## Either
-(symM <- as(mT, "symmetricMatrix"))# dsT
-(symC <- as(symM, "CsparseMatrix"))# dsC
+(symM <- as(mT, "symmetricMatrix")) # dsT
+(symC <- as(symM, "CsparseMatrix")) # dsC
 ## or
-sC <- Matrix(mT, sparse=TRUE, forceCheck=TRUE)
+sT <- Matrix(mT, sparse=TRUE, forceCheck=TRUE) # dsT
 
 sym2 <- as(symC, "TsparseMatrix")
 ## --> the same as 'symM', a "dsTMatrix"
 \dontshow{
-stopifnot(identical(symC, sC), identical(sym2, symM),
+stopifnot(identical(sT, symM), identical(sym2, symM),
           class(sym2) == "dsTMatrix",
-	  identical(sym2[1,], sC[1,]),
-	  identical(sym2[,2], sC[,2]))
+	  identical(sym2[1,], sT[1,]),
+	  identical(sym2[,2], sT[,2]))
 }
 }
 \keyword{classes}

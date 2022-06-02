@@ -196,7 +196,10 @@ sparse2int <- function(X, Y, do.names = TRUE, forceSparse = FALSE, verbose = FAL
 	if((nX <- is.numeric(X)) | (nY <- is.numeric(Y))) {
 	    if(nX) {
 		if (nY || nx > 1) { # both numeric, or X >=2 "columns"
-		    F <- if(forceSparse) function(m) .Call(dense_to_Csparse, m) else identity
+		    F <- if(forceSparse)
+                             function(m)
+                                 .Call(R_dense_as_sparse, m, ".gC", NULL, NULL)
+                         else identity
 		    F((if(ny == 1) X else X[rep.int(seq_len(nx),  ny)	, ]) *
 		      (if(nx == 1) Y else Y[rep	   (seq_len(ny),each=nx), ]))
 		}
@@ -258,7 +261,8 @@ sparseInt.r <- function(rList, do.names = TRUE, forceSparse = FALSE, verbose=FAL
     nl <- length(rList)
     if(forceSparse)
 	F <- function(m)
-            if(is.matrix(m) || is(m, "denseMatrix")) .Call(dense_to_Csparse, m)
+            if(is.matrix(m) || is(m, "denseMatrix"))
+                .Call(R_dense_as_sparse, m, ".gC", NULL, NULL)
             else m
     if(verbose)
 	cat("sparseInt.r(<list>[1:",nl,"], f.Sp=",forceSparse,"): is.mat()= (",

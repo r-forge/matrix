@@ -9,6 +9,9 @@
 \alias{coerce,dspMatrix,dgeMatrix-method}
 \alias{coerce,dspMatrix,dpoMatrix-method}
 \alias{coerce,dspMatrix,dppMatrix-method}
+\alias{coerce,dspMatrix,dsCMatrix-method}
+\alias{coerce,dspMatrix,dsRMatrix-method}
+\alias{coerce,dspMatrix,dsTMatrix-method}
 \alias{coerce,dspMatrix,dsyMatrix-method}
 \alias{coerce,dspMatrix,dtpMatrix-method}
 \alias{coerce,dspMatrix,lspMatrix-method}
@@ -21,6 +24,7 @@
 \alias{coerce,dsyMatrix,dpoMatrix-method}
 \alias{coerce,dsyMatrix,dppMatrix-method}
 \alias{coerce,dsyMatrix,dsCMatrix-method}
+\alias{coerce,dsyMatrix,dsRMatrix-method}
 \alias{coerce,dsyMatrix,dsTMatrix-method}
 \alias{coerce,dsyMatrix,dspMatrix-method}
 \alias{coerce,dsyMatrix,dtrMatrix-method}

@@ -7,6 +7,9 @@
 %
 \alias{coerce,lspMatrix,dspMatrix-method}
 \alias{coerce,lspMatrix,lgeMatrix-method}
+\alias{coerce,lspMatrix,lsCMatrix-method}
+\alias{coerce,lspMatrix,lsRMatrix-method}
+\alias{coerce,lspMatrix,lsTMatrix-method}
 \alias{coerce,lspMatrix,lsyMatrix-method}
 \alias{coerce,lspMatrix,ltpMatrix-method}
 \alias{coerce,lspMatrix,nspMatrix-method}
@@ -14,6 +17,9 @@
 %
 \alias{coerce,lsyMatrix,dsyMatrix-method}
 \alias{coerce,lsyMatrix,lgeMatrix-method}
+\alias{coerce,lsyMatrix,lsCMatrix-method}
+\alias{coerce,lsyMatrix,lsRMatrix-method}
+\alias{coerce,lsyMatrix,lsTMatrix-method}
 \alias{coerce,lsyMatrix,lspMatrix-method}
 \alias{coerce,lsyMatrix,ltrMatrix-method}
 \alias{coerce,lsyMatrix,nsyMatrix-method}

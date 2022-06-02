@@ -17,7 +17,7 @@ extern "C" {
 #include <Rinternals.h>
 #include <R_ext/RS.h> /* for Memzero() */
 
-/* NB: For 'USE_FC_LEN_T' and 'FCONE' (for LTO), 
+/* NB: For 'USE_FC_LEN_T' and 'FCONE' (for LTO),
    the "includer" will #include "Lapack-etc.h" */
 
 /* From <Defn.h> : */
@@ -105,13 +105,25 @@ extern
 #define diag_P(x)  CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0))
 #define Diag_P(x)  (R_has_slot(x, Matrix_diagSym) ? diag_P(x) : " ")
 
-#define imax2(x, y) ((x < y) ? y : x)
-#define imin2(x, y) ((x < y) ? x : y)
+#define MAXOF(x, y) ((x < y) ? y : x)
+#define MINOF(x, y) ((x < y) ? x : y)
+
+#define NZ_REAL(_X_)    ((_X_) != 0.0)
+#define NZ_INTEGER(_X_) ((_X_) != 0)
+#define NZ_COMPLEX(_X_) ((_X_).r != 0.0 || (_X_).i != 0.0)
 
 /* int i, j, n; R_xlen_t n2; */
 #define PM_AR21_UP(i, j) ((i) + ((j) * (((R_xlen_t) (j)) + 1)) / 2)
 #define PM_AR21_LO(i, j, n2) ((i) + ((j) * ((n2) - (j) - 1)) / 2)
 #define PM_LENGTH(n) (((n) * ((R_xlen_t) (n) + 1)) / 2)
+
+#define ERROR_INVALID_CLASS(_CLASS_, _METHOD_)				\
+    error(_("invalid class \"%s\" to '%s()'"),				\
+	  _CLASS_, _METHOD_)
+
+#define ERROR_INVALID_TYPE(_WHAT_, _SEXPTYPE_, _METHOD_)		\
+    error(_("%s of invalid type \"%s\" in '%s()'"),			\
+	  _WHAT_, type2char(_SEXPTYPE_), _METHOD_)
 
 /* Zero an array, but note Memzero() which might be FASTER 
    and uses R_SIZE_T (== size_t for C) */

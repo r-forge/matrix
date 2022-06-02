@@ -13,6 +13,7 @@
 \alias{Math,dgeMatrix-method}
 \alias{as.vector,dgeMatrix-method}
 \alias{coerce,dgeMatrix,dgCMatrix-method}
+\alias{coerce,dgeMatrix,dgRMatrix-method}
 \alias{coerce,dgeMatrix,dgTMatrix-method}
 \alias{coerce,dgeMatrix,dsTMatrix-method}
 \alias{coerce,dgeMatrix,dspMatrix-method}

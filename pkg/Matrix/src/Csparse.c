@@ -213,6 +213,10 @@ SEXP Csparse2nz(SEXP x, Rboolean tri)
 			      /* diag = */ tri ? diag_P(x) : "",
 			      GET_SLOT(x, Matrix_DimNamesSym));
 }
+
+/* MJ: no longer needed ... prefer R_sparse_as_kind() */
+#if 0
+
 SEXP Csparse_to_nz_pattern(SEXP x, SEXP tri)
 {
     int tr_ = asLogical(tri);
@@ -222,6 +226,8 @@ SEXP Csparse_to_nz_pattern(SEXP x, SEXP tri)
     }
     return Csparse2nz(x, (Rboolean) tr_);
 }
+
+#endif /* MJ */
 
 // n.CMatrix --> [dli].CMatrix  (not going through CHM!)
 SEXP nz_pattern_to_Csparse(SEXP x, SEXP res_kind)
@@ -1306,6 +1312,9 @@ SEXP create_Csparse(char* cls, int* i, int* j, int* p, int np,
     return ans;
 }
 
+/* MJ: no longer needed ... prefer R_dense_as_sparse() */
+#if 0
+
 /**
  * Create a Csparse matrix object from a traditional R matrix
  *
@@ -1356,7 +1365,7 @@ SEXP matrix_to_Csparse(SEXP x, SEXP cls)
 	     : allocVector(VECSXP, 2));
 
     int nz = 0, // current number of nonzero entries
-	nnz = imax2(256, imax2(nr,nc));/* nnz := final number of nonzero entries, yet unknown;
+	nnz = MAXOF(256, MAXOF(nr,nc));/* nnz := final number of nonzero entries, yet unknown;
 					   -- must start with guess and then grow */
     int *rp = INTEGER(ALLOC_SLOT(ans, Matrix_pSym, INTSXP, nc + 1)),
 	*ri = R_Calloc(nnz, int); // to become i slot -- of not-yet-known length nnz
@@ -1413,6 +1422,7 @@ SEXP matrix_to_Csparse(SEXP x, SEXP cls)
     return ans;
 }
 
+#endif /* MJ */
 
 // seed will *not* be used unless it's -1 (inverse perm.) or  0 ("no" / identity) perm.
 static csd* Csparse_dmperm_raw(SEXP mat, SEXP seed)

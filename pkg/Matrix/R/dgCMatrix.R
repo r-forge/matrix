@@ -2,14 +2,8 @@
 
 ### contains = "dsparseMatrix", "CsparseMatrix"
 
-## Specific conversions, should they be necessary.  Better to convert as
-## as(x, "TsparseMatrix") or as(x, "denseMatrix")
-
-## Moved to ./Csparse.R :
-## setAs("dgCMatrix", "dgTMatrix", ....
-## setAs("dgCMatrix", "dgeMatrix", ....
-## setAs("dgeMatrix", "dgCMatrix", ....
-
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("dgCMatrix", "ngCMatrix", function(from) .C2nC(from, FALSE))
 
 ## rather use Csparse* to lsparse* in ./lsparseMatrix.R ,
@@ -23,6 +17,7 @@ setAs("dgCMatrix", "lgCMatrix",
 	      slot(r, nm) <- slot(from, nm)
 	  r
       })
+} ## MJ
 
 setMethod("image", "dgCMatrix", function(x, ...) image(as(x, "dgTMatrix"), ...))
 
@@ -139,7 +134,7 @@ setMethod("solve", signature(a = "dgCMatrix", b = "dsparseMatrix"),
 	      if(is.na(sparse)) {
 		  if(isSymmetric(a))
 		      ## TODO: fast cholmod_symmetric() for Cholesky
-		      return(solve(forceCspSymmetric(a, isTri=FALSE), b, tol=tol))
+		      return(solve(forceSymmetricCsparse(a), b, tol=tol))
 					#-> sparse result
 		  ## else
 		  sparse <- FALSE # (old default)
@@ -156,7 +151,7 @@ setMethod("solve", signature(a = "dgCMatrix", b = "missing"),
 	      if(is.na(sparse)) {
 		  if(isSymmetric(a))
 		      ## TODO: fast cholmod_symmetric() for Cholesky
-		      return(solve(forceCspSymmetric(a, isTri=FALSE),
+		      return(solve(forceSymmetricCsparse(a),
 				   b = Diagonal(nrow(a)))) #-> sparse result
 		  ## else
 		  sparse <- FALSE # (old default)

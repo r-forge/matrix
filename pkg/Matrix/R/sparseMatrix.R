@@ -1,43 +1,121 @@
-### Define Methods that can be inherited for all subclasses
+## Methods for virtual class "sparseMatrix" of sparse matrices
 
-.sparse2dkind <- function(from) .Call(R_sparse_as_kind, from, "d")
-.sparse2lkind <- function(from) .Call(R_sparse_as_kind, from, "l")
-.sparse2nkind <- function(from) .Call(R_sparse_as_kind, from, "n")
-setAs("dsparseMatrix", "lMatrix", .sparse2lkind)
-setAs("dsparseMatrix", "nMatrix", .sparse2nkind)
-setAs("lsparseMatrix", "dMatrix", .sparse2dkind)
-setAs("lsparseMatrix", "nMatrix", .sparse2nkind)
-setAs("nsparseMatrix", "dMatrix", .sparse2dkind)
-setAs("nsparseMatrix", "lMatrix", .sparse2lkind)
-setAs("dsparseMatrix", "lsparseMatrix", .sparse2lkind)
-setAs("dsparseMatrix", "nsparseMatrix", .sparse2nkind)
-setAs("lsparseMatrix", "dsparseMatrix", .sparse2dkind)
-setAs("lsparseMatrix", "nsparseMatrix", .sparse2nkind)
-setAs("nsparseMatrix", "dsparseMatrix", .sparse2dkind)
-setAs("nsparseMatrix", "lsparseMatrix", .sparse2lkind)
-rm(.sparse2dkind, .sparse2lkind, .sparse2nkind)
+## ~~~~ COERCIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Idea: Coercion between *VIRTUAL* classes -- as() chooses "closest" classes
-### ----  should also work e.g. for  dense-triangular --> sparse-triangular !
+..sparse2dsparse <- function(from) .Call(R_sparse_as_kind, from, "d", FALSE)
+..sparse2lsparse <- function(from) .Call(R_sparse_as_kind, from, "l", FALSE)
+..sparse2nsparse <- function(from) .Call(R_sparse_as_kind, from, "n", FALSE)
 
-##-> see als ./dMatrix.R, ./ddenseMatrix.R  and  ./lMatrix.R
+## To sparseMatrix .........................................
 
 setAs("ANY", "sparseMatrix", function(from) as(from, "CsparseMatrix"))
 
-## If people did not use xtabs(), but table():
-setAs("table", "sparseMatrix", function(from) {
-    if(length(dim(from)) != 2L)
-        stop("only 2-dimensional tables can be directly coerced to sparse matrices")
-    as(unclass(from), "CsparseMatrix")
-})
+## If people used table() instead of xtabs():
+setAs("table", "sparseMatrix",
+      function(from) {
+          if(length(dim(from)) != 2L)
+              stop("only 2-dimensional tables can be coerced to sparseMatrix")
+          as(unclass(from), "CsparseMatrix")
+      })
 
-setAs("sparseMatrix", "generalMatrix", as_gSparse)
+## To "kind" ...............................................
 
-setAs("sparseMatrix", "symmetricMatrix", as_sSparse)
+.kinds <- c("d", "l", "n")
+for (.kind in .kinds) {
+    .otherkinds <- .kinds[.kinds != .kind]
+    for (.otherkind in .otherkinds) {
+        .def <- get(sprintf("..sparse2%ssparse", .otherkind),
+                    mode = "function", inherits = FALSE)
+        ## dsparseMatrix->[^d]Matrix, etc.
+        setAs(paste0(     .kind, "sparseMatrix"),
+              paste0(.otherkind,       "Matrix"), .def)
+        ## dsparseMatrix->[^d]sparseMatrix, etc.
+        setAs(paste0(     .kind, "sparseMatrix"),
+              paste0(.otherkind, "sparseMatrix"), .def)
+    }
+}
+rm(.kinds, .kind, .otherkinds, .otherkind, .def)
 
+## To "structure" ..........................................
+
+setAs("sparseMatrix",    "generalMatrix", as_gSparse)
 setAs("sparseMatrix", "triangularMatrix", as_tSparse)
+## setAs("denseMatrix", "symmetricMatrix", .) # inherited from Matrix
+
+## More granular coercions .................................
+
+.kinds <- c("d", "l", "n")
+for (.kind in .kinds) {
+    ## This kind to other kinds, preserving structure and storage
+    .otherkinds <- .kinds[.kinds != .kind]
+    for (.otherkind in .otherkinds) {
+        .def <- get(sprintf("..sparse2%ssparse", .otherkind),
+                    mode = "function", inherits = FALSE)
+        for (.str in c("g", "t", "s"))
+            for (.repr in c("C", "T", "R"))
+                setAs(paste0(     .kind, .str, .repr, "Matrix"),
+                      paste0(.otherkind, .str, .repr, "Matrix"), .def)
+    }
+
+    ## Nonsymmetric to symmetric, preserving kind and storage
+    for (.str in c("g", "t"))
+        for (.repr in c("C", "R", "T"))
+            setAs(paste0(.kind, .str, .repr, "Matrix"),
+                  paste0(.kind,  "s", .repr, "Matrix"), ..M2symm)
+
+    ## Nontriangular to triangular, preserving kind and storage
+    if(FALSE) {
+    ## MJ: not yet ... needs triu(), tril() to be optimized
+    for (.str in c("g", "s"))
+        for (.repr in c("C", "R", "T"))
+            setAs(paste0(.kind, .str, .repr, "Matrix"),
+                  paste0(.kind,  "t", .repr, "Matrix"), ..M2tri)
+    }
+
+    ## sC<->sR, preserving kind
+    .cl0 <- paste0(.kind, "s.Matrix")
+    .def0 <- function(from)
+        new(.TO, Dim = from@Dim, Dimnames = from@Dimnames,
+            uplo = if(from@uplo == "U") "L" else "U",
+            p = from@p, j = from@i, x = from@x)
+    for (.repr in c("C", "R")) {
+        .otherrepr <- if(.repr == "C") "R" else "C"
+        .from <- `substr<-`(.cl0, 3L, 3L,      .repr)
+        .to   <- `substr<-`(.cl0, 3L, 3L, .otherrepr)
+
+        .b <- body(.def <- .def0)
+        .b[[2L]] <- .to
+        if(.repr != "C") { # reverse j = from@i
+            .m <- match("j", names(.b))
+            names(.b)[.m] <- "i"
+            .b[[.m]][[3L]] <- quote(j)
+        }
+        if(.kind == "n") { # delete x = from@x
+            .m <- match("x", names(.b))
+            .b[[.m]] <- NULL
+        }
+        body(.def) <- .b
+
+        setAs(.from, .to, .def)
+        setAs(.from, paste0(.otherrepr, "sparseMatrix"), .def)
+    }
+}
+rm(.kinds, .kind, .otherkinds, .otherkind, .str, .repr, .otherrepr,
+   .cl0, .from, .to, .def0, .def, .b, .m)
+
+## Exported functions, now just aliases or wrappers ........
+## (some or all could be made deprecated) ..................
+
+.C2nC <- function(from, isTri) .BODY; body(.C2nC) <- body(..sparse2nsparse)
+.nC2d <- ..sparse2dsparse
+.nC2l <- ..sparse2lsparse
+.n2dgT <- ..sparse2dsparse
+.diag2mat <- .diag2m
+
+rm(..sparse2dsparse, ..sparse2lsparse, ..sparse2nsparse)
 
 
+## ~~~~ CONSTRUCTORS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 spMatrix <- function(nrow, ncol,
                      i = integer(), j = integer(), x = numeric())
@@ -149,13 +227,15 @@ sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames,
 	   stop("invalid 'repr'; must be \"C\", \"T\", or \"R\""))
 }
 
-## "graph" coercions -- this needs the graph package which is currently
-##  -----               *not* required on purpose
+
+## ~~~~ COERCIONS (for package 'graph') ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## These need package 'graph' which is currently *not* imported, on purpose.
+## Use graph:: as 'graph' may only be loaded, not attached ...
+
 ## Note: 'undirected' graph <==> 'symmetric' matrix
 
-## Use 'graph::'  as it is not impoted into Matrix, and may only be loaded, not attached:
-
-## Add some utils that may no longer be needed in future versions of the 'graph' package
+## Some utilities that may no longer be needed in future versions of 'graph'
 graph.has.weights <- function(g) "weight" %in% names(graph::edgeDataDefaults(g))
 
 graph.non.1.weights <- function(g) any(unlist(graph::edgeData(g, attr = "weight")) != 1)
@@ -190,7 +270,6 @@ graph.wgtMatrix <- function(g)
     }
     else m
 }
-
 
 setAs("graphAM", "sparseMatrix",
       function(from) {
@@ -290,6 +369,8 @@ T2graph <- function(from, need.uniq = is_not_uniqT(from), edgemode = NULL) {
 			V = rn, edgemode=edgemode)
 }
 
+
+## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Subsetting -- basic things (drop = "missing") are done in ./Matrix.R
 
@@ -1053,3 +1134,10 @@ setMethod("pack", signature(x = "sparseMatrix"),
 setMethod("unpack", signature(x = "sparseMatrix"),
           function(x, ...) stop(sprintf("invalid class \"%s\" to 'unpack()'; only dense matrices can be unpacked", class(x))))
 
+## NOTE/FIXME(?):
+## these do not work for subclasses inheriting from symmetricMatrix,
+## which have their own (much simpler) methods; see ./symmetricMatrix.R
+setMethod("forceSymmetric", signature(x = "sparseMatrix", uplo = "missing"),
+	  function(x, uplo) forceSymmetricCsparse(as(x, "CsparseMatrix")))
+setMethod("forceSymmetric", signature(x = "sparseMatrix", uplo = "character"),
+	  function(x, uplo) forceSymmetricCsparse(as(x, "CsparseMatrix"), uplo))

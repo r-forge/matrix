@@ -14,22 +14,26 @@ setAs("lsCMatrix", "lgTMatrix",
 
 aslsC.by.lgC <- function(from) as(as(from, "lgCMatrix"), "symmetricMatrix")
 setAs("lgTMatrix", "lsCMatrix", aslsC.by.lgC) # <-> needed for Matrix()
-setAs("matrix",    "lsCMatrix", aslsC.by.lgC)
 
-## Specific conversions, should they be necessary.  Better to convert as
-## as(x, "TsparseMatrix") or as(x, "denseMatrix")
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
+setAs("matrix", "lsCMatrix", aslsC.by.lgC)
+}
+
 setAs("lsCMatrix", "lsTMatrix",
       function(from) .Call(Csparse_to_Tsparse, from, FALSE))
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("lsCMatrix", "dsCMatrix",
       function(from) new("dsCMatrix", i = from@i, p = from@p,
                          x = as.double(from@x), uplo = from@uplo,
                          Dim = from@Dim, Dimnames = from@Dimnames))
+} ## MJ
 
 if(FALSE) # needed ?
 setAs("lsCMatrix", "dgTMatrix",
       function(from) as(as(from, "dsCMatrix"), "dgTMatrix"))
-
 
 ## have rather tril() and triu() methods than
 ## setAs("lsCMatrix", "ltCMatrix", ....)

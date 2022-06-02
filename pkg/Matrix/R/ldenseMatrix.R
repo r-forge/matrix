@@ -92,8 +92,6 @@ setAs("matrix", "ldenseMatrix", function(from) as(from, "lgeMatrix"))
 
 setAs("ldenseMatrix", "matrix", ## uses the above l*M. -> lgeM.
       function(from) as(as(from, "lgeMatrix"), "matrix"))
-} ## MJ
-
 
 ## dense |-> compressed :
 
@@ -102,9 +100,7 @@ setAs("lgeMatrix", "lgTMatrix",
 
 setAs("lgeMatrix", "lgCMatrix", # TODO: need as(*, ..) ?
       function(from) as(.dense2C(from, kind = "gen"), "lgCMatrix"))
-
-setMethod("as.logical", signature(x = "ldenseMatrix"),
-	  function(x, ...) as(x, "lgeMatrix")@x)
+} ## MJ
 
 ## MJ: no longer needed ... replacement in ./unpackedMatrix.R
 if (FALSE) {
@@ -187,6 +183,9 @@ setMethod("t", signature(x = "lspMatrix"),
 
 ## NOTE:  "&" and "|"  are now in group "Logic" c "Ops" --> ./Ops.R
 ##        "!" is in ./not.R
+
+setMethod("as.logical", signature(x = "ldenseMatrix"),
+	  function(x, ...) as(x, "lgeMatrix")@x)
 
 setMethod("as.vector", "ldenseMatrix",
 	  function(x, mode) as.vector(as(x, "lgeMatrix")@x, mode))

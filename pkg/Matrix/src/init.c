@@ -62,7 +62,12 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Csparse_to_tCsparse, 3),
     CALLDEF(Csparse_to_tTsparse, 3),
     CALLDEF(Csparse_to_dense, 2),
+
+/* MJ: no longer needed ... prefer R_sparse_as_kind() */
+#if 0
     CALLDEF(Csparse_to_nz_pattern, 2),
+#endif
+    
     CALLDEF(Csparse_to_matrix, 3),
     CALLDEF(Csparse_to_vector, 1),
     CALLDEF(Csparse_submatrix, 3),
@@ -83,7 +88,12 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(diag_tC, 2),
     CALLDEF(LU_expand, 1),
     CALLDEF(LU_validate, 1),
+
+/* MJ: no longer needed ... prefer R_dense_as_sparse() */
+#if 0
     CALLDEF(matrix_to_Csparse, 2),
+#endif
+    
     CALLDEF(MatrixFactorization_validate, 1),
     CALLDEF(Matrix_expand_pointers, 1),
     CALLDEF(R_rbind2_vector, 2),
@@ -99,7 +109,12 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Tsparse_to_tCsparse, 3),
     CALLDEF(compressed_to_TMatrix, 2),
     CALLDEF(compressed_non_0_ij, 2),
+
+/* MJ: no longer needed ... prefer R_dense_as_sparse() */
+#if 0
     CALLDEF(dense_to_Csparse, 1),
+#endif
+    
     CALLDEF(nz_pattern_to_Csparse, 2),
 
 /* MJ: no longer needed ... prefer R_dense_band() */
@@ -328,14 +343,17 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(R_symmDN, 1),
     CALLDEF(R_revDN, 1),
 
-    CALLDEF(R_sparse_as_kind, 2),
+    CALLDEF(R_sparse_as_kind, 3),
     CALLDEF(R_diagonal_as_sparse, 4),
     CALLDEF(Csparse_drop0, 1),
     CALLDEF(Rsparse_drop0, 1),
     CALLDEF(Tsparse_drop0, 1),
+    CALLDEF(tCsparse_as_Rsparse, 1),
+    CALLDEF(tRsparse_as_Csparse, 1),
 
     CALLDEF(R_matrix_as_geMatrix, 2),
     CALLDEF(R_dense_as_geMatrix, 2),
+    CALLDEF(R_dense_as_sparse, 4),
     CALLDEF(R_dense_as_kind, 2),
     CALLDEF(R_dense_as_matrix, 1),
     CALLDEF(R_geMatrix_as_matrix, 1),

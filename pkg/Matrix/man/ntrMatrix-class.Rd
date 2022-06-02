@@ -11,6 +11,9 @@
 \alias{coerce,ntpMatrix,ltpMatrix-method}
 \alias{coerce,ntpMatrix,ngeMatrix-method}
 \alias{coerce,ntpMatrix,nspMatrix-method}
+\alias{coerce,ntpMatrix,ntCMatrix-method}
+\alias{coerce,ntpMatrix,ntRMatrix-method}
+\alias{coerce,ntpMatrix,ntTMatrix-method}
 \alias{coerce,ntpMatrix,ntrMatrix-method}
 %
 \alias{!,ntrMatrix-method}
@@ -19,6 +22,9 @@
 \alias{coerce,ntrMatrix,ltrMatrix-method}
 \alias{coerce,ntrMatrix,ngeMatrix-method}
 \alias{coerce,ntrMatrix,nsyMatrix-method}
+\alias{coerce,ntrMatrix,ntCMatrix-method}
+\alias{coerce,ntrMatrix,ntRMatrix-method}
+\alias{coerce,ntrMatrix,ntTMatrix-method}
 \alias{coerce,ntrMatrix,ntpMatrix-method}
 %
 \description{

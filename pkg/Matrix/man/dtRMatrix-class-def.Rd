@@ -1,7 +1,14 @@
 \name{dtRMatrix-class}
 \title{Triangular Sparse Compressed Row Matrices}
 \docType{class}
+%
 \alias{dtRMatrix-class}
+%
+\alias{coerce,dtRMatrix,dsRMatrix-method}
+\alias{coerce,dtRMatrix,ltRMatrix-method}
+\alias{coerce,dtRMatrix,ntRMatrix-method}
+\alias{coerce,matrix,dtRMatrix-method}
+%
 \description{The \code{dtRMatrix} class is a class of triangular, sparse
   matrices in the compressed, row-oriented format.  In this
   implementation the non-zero elements in the rows are sorted into

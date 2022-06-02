@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-05-30 r3481)}{
+\section{Changes in version 1.4-2 (2022-06-02 r3482)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -88,6 +88,15 @@
       bug #6766 by David Cortes.
       Ditto for \code{tcrossprod()}, where the old result was even wrong
       when it had \dQuote{worked}, before Matrix 1.2-0.
+
+      \item \code{as(<matrix>, "nMatrix")} can now be sparse \emph{or}
+      dense, going via \code{Matrix()}, for greater consistency with
+      coercions to \code{dMatrix} and \code{lMatrix}.  (Previously,
+      the result was always an \code{ngTMatrix}.)
+
+      \item \code{forceSymmetric(<RsparseMatrix>)} is now more
+      efficient, returning a symmetric \code{RsparseMatrix} without
+      a \dQuote{true} coercion to \code{CsparseMatrix}.
     }
   }
   \subsection{New Features}{
@@ -133,6 +142,9 @@
       respectively (previously an error). \code{pack(<.geMatrix>)}
       (previously an error) now behaves as \code{pack(<matrix>)},
       i.e., by checking for symmetry or triangularity before packing.
+      \code{unpack(<matrix>)} now works and is equivalent to
+      \code{as(<matrix>, "denseMatrix")}, with result inheriting from
+      \code{.(ge|tr|sy)Matrix}, as appropriate.
 
       \item Many more validity methods implemented in C, for efficiency,
       including methods for \code{Matrix}, \code{compMatrix},
@@ -160,6 +172,19 @@
       \code{symmetricMatrix}, and \code{packedMatrix} in more cases.
       In the past, the result was always general or triangular
       and always unpacked.
+
+      \item \code{.ge}, \code{.t[rp]}, and \code{.s[yp]} can now be
+      coerced directly to \code{.g[CRT]}, \code{.t[CRT]}, and
+      \code{.s[CRT]}, respectively, without intermediate coercions.
+      Traditional matrices can be coerced directly to \emph{any}
+      \code{.[gts][CRT]}.
+
+      \item \code{.tC.2.R()} and \code{.tR.2.C()} are now done in C,
+      for speed.
+
+      \item All cases of \code{as(<[CRT]sparseMatrix>, "[dln]Matrix")}
+      now go through new C-level utility, \code{R_sparse_as_kind()},
+      for speed.
     }
   }
   \subsection{Misc}{
@@ -201,6 +226,16 @@
       \code{symmetricMatrix_validate()},
       by allowing, e.g., \code{list(NULL, nms)},
       but not, e.g., \code{list(A = NULL, B = nms)}.
+
+      \item Coercions to \code{symmetricMatrix} are now inherited
+      from \code{Matrix}, whose method calls \code{forceSymmetric()}
+      if \code{isSymmetric()} returns \code{TRUE}.
+
+      \item Many of the exported \code{.*2*} utilities have been
+      redefined as aliases or wrappers of new, more general
+      (but still fast) functions.  These not-yet-deprecated
+      functions have been centralized in \file{R/denseMatrix.R}
+      and \file{R/sparseMatrix.R}.
     }
   }
 }

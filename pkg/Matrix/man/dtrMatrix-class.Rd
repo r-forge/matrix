@@ -8,10 +8,12 @@
 \alias{coerce,dtrMatrix,dgeMatrix-method}
 \alias{coerce,dtrMatrix,dgeMatrix-method}
 \alias{coerce,dtrMatrix,dsyMatrix-method}
+\alias{coerce,dtrMatrix,dtCMatrix-method}
+\alias{coerce,dtrMatrix,dtRMatrix-method}
+\alias{coerce,dtrMatrix,dtTMatrix-method}
 \alias{coerce,dtrMatrix,dtpMatrix-method}
 \alias{coerce,dtrMatrix,ltrMatrix-method}
 \alias{coerce,dtrMatrix,ntrMatrix-method}
-\alias{coerce,dtrMatrix,sparseMatrix-method}
 \alias{coerce,matrix,dtrMatrix-method}
 \alias{determinant,dtrMatrix,logical-method}
 \alias{determinant,dtrMatrix,missing-method}

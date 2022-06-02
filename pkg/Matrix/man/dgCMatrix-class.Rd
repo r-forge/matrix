@@ -19,6 +19,7 @@
 \alias{coerce,dgCMatrix,ngCMatrix-method}
 \alias{coerce,dgCMatrix,vector-method}
 \alias{coerce,matrix,dgCMatrix-method}
+\alias{coerce,numLike,dgCMatrix-method}
 \alias{determinant,dgCMatrix,logical-method}
 \alias{t,dgCMatrix-method}
 %

@@ -2,6 +2,8 @@
 
 ### contains = "nsparseMatrix"
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 .nC2d <- function(from) .Call(nz_pattern_to_Csparse, from, 0L)## 0 --> "double"
 .nC2l <- function(from) .Call(nz_pattern_to_Csparse, from, 1L)## 1 --> "logical"
 
@@ -22,9 +24,7 @@ setAs("ngCMatrix", "lMatrix", .nC2l)
 setAs("ngCMatrix", "lsparseMatrix", .nC2l)
 setAs("ngCMatrix", "lgCMatrix", .nC2l)
 }
+} ## MJ
 
 setAs("ngCMatrix", "matrix", function(from) .Call(ngC_to_matrix, from))
 ## not this: .Call(Csparse_to_matrix, from)), since it goes via dense -> double precision
-
-setAs("matrix", "ngCMatrix", .m2ngC)
-

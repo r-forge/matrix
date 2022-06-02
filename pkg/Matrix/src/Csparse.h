@@ -33,7 +33,12 @@ SEXP Csparse_to_tCsparse(SEXP x, SEXP uplo, SEXP diag);
 SEXP Csparse_to_tTsparse(SEXP x, SEXP uplo, SEXP diag);
 SEXP Csparse_to_dense(SEXP x, SEXP symm_or_tri);
 SEXP Csparse2nz           (SEXP x, Rboolean tri);
+
+/* MJ: no longer needed ... prefer R_sparse_as_kind() */
+#if 0
 SEXP Csparse_to_nz_pattern(SEXP x, SEXP tri);
+#endif /* MJ */
+
 SEXP nz_pattern_to_Csparse(SEXP x, SEXP res_kind);
 SEXP nz2Csparse           (SEXP x, enum x_slot_kind r_kind);
 SEXP Csparse_to_matrix(SEXP x, SEXP chk, SEXP symm);
@@ -51,8 +56,11 @@ SEXP diag_tC_ptr(int n, int *x_p, double *x_x, Rboolean is_U, int *perm,
 		 SEXP resultKind);
 SEXP diag_tC(SEXP obj, SEXP resultKind);
 
-// SEXP atomic_to_Csparse(SEXP cls, SEXP x, SEXP nrow, SEXP ncol, SEXP dimnames);
+/* MJ: no longer needed ... prefer R_dense_as_sparse() */
+#if 0
+//SEXP atomic_to_Csparse(SEXP cls, SEXP x, SEXP nrow, SEXP ncol, SEXP dimnames);
 SEXP matrix_to_Csparse(SEXP x, SEXP cls);
+#endif /* MJ */
 
 // FIXME: these are nowhere used (are they?)
 SEXP create_Csparse(char* cls, int* i, int* j, int* p, int np,
