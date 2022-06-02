@@ -10,10 +10,12 @@
 \alias{coerce,dgTMatrix,dsTMatrix-method}
 \alias{coerce,dgTMatrix,dtCMatrix-method}
 \alias{coerce,dgTMatrix,dtTMatrix-method}
+\alias{coerce,dgTMatrix,lgTMatrix-method}
 \alias{coerce,dgTMatrix,matrix-method}
-\alias{coerce,dgTMatrix,symmetricMatrix-method}
+\alias{coerce,dgTMatrix,ngTMatrix-method}
 \alias{coerce,dgTMatrix,triangularMatrix-method}
 \alias{coerce,matrix,dgTMatrix-method}
+\alias{coerce,numLike,dgTMatrix-method}
 %
 \description{The \code{"dgTMatrix"} class is the class of sparse
   matrices stored as (possibly redundant) triplets.  The internal

@@ -6,6 +6,8 @@
 %
 \alias{coerce,dtpMatrix,dgeMatrix-method}
 \alias{coerce,dtpMatrix,dspMatrix-method}
+\alias{coerce,dtpMatrix,dtCMatrix-method}
+\alias{coerce,dtpMatrix,dtRMatrix-method}
 \alias{coerce,dtpMatrix,dtTMatrix-method}
 \alias{coerce,dtpMatrix,dtrMatrix-method}
 \alias{coerce,dtpMatrix,ltpMatrix-method}

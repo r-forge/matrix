@@ -3,12 +3,18 @@
 %
 \alias{forceSymmetric}
 %
-\alias{forceSymmetric,CsparseMatrix,ANY-method}
+\alias{forceSymmetric,CsparseMatrix,character-method}
+\alias{forceSymmetric,CsparseMatrix,missing-method}
+\alias{forceSymmetric,RsparseMatrix,character-method}
+\alias{forceSymmetric,RsparseMatrix,missing-method}
+\alias{forceSymmetric,TsparseMatrix,character-method}
+\alias{forceSymmetric,TsparseMatrix,missing-method}
 \alias{forceSymmetric,matrix,character-method}
 \alias{forceSymmetric,matrix,missing-method}
 \alias{forceSymmetric,packedMatrix,character-method}
 \alias{forceSymmetric,packedMatrix,missing-method}
-\alias{forceSymmetric,sparseMatrix,ANY-method}
+\alias{forceSymmetric,sparseMatrix,character-method}
+\alias{forceSymmetric,sparseMatrix,missing-method}
 \alias{forceSymmetric,unpackedMatrix,character-method}
 \alias{forceSymmetric,unpackedMatrix,missing-method}
 % due to disambiguation hack:

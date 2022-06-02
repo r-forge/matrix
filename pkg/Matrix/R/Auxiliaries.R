@@ -462,7 +462,6 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
     else
         stop("matrix is not symmetric; consider forceSymmetric() or symmpart()")
 }
-.dense2sy <- .M2symm # MJ: for backwards compatibility, until deprecated
 
 .M2tri <- function(from, ...) {
     if(!(it <- isTriangular(from, ...)))
@@ -515,15 +514,14 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 ##'     or a letter matching \code{^[dln]$}, indicating the desired
 ##'     "kind" of \code{.geMatrix}; \code{""} (the default) is to
 ##'     preserve the "kind" of \code{from}.
-.dense2ge <- function(from, kind = ".") {
+.dense2ge <- function(from, kind) {
     .Call(R_dense_as_geMatrix, from, kind)
 }
 .dense2dge <- function(from) {
     .Call(R_dense_as_geMatrix, from, "d")
 }
-..2dge <- .dense2dge # MJ: for backwards compatibility, until deprecated
 
-.m2ge <- function(from, kind = ".") {
+.m2ge <- function(from, kind) {
     .Call(R_matrix_as_geMatrix, from, kind)
 }
 
@@ -531,41 +529,74 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
     .Call(R_geMatrix_as_matrix, from)
 }
 
-.m2dense <- function(from, ...) {
+.dense2m <- function(from) {
+    .Call(R_dense_as_matrix, from)
+}
+
+.diag2m <- function(from)
+    `dimnames<-`(base::diag(if(from@diag == "N") from@x else as1(from@x),
+                            nrow = from@Dim[1L]),
+                 from@Dimnames)
+
+.dense2kind <- function(from, kind) {
+    .Call(R_dense_as_kind, from, kind)
+}
+
+.sparse2kind <- function(from, kind, drop0) {
+    .Call(R_sparse_as_kind, from, kind, drop0)
+}
+
+.dense2sparse <- function(from, code, uplo, diag) {
+    .Call(R_dense_as_sparse, from, code, uplo, diag)
+}
+
+.diag2sparse <- function(from, code, uplo, drop0) {
+    .Call(R_diagonal_as_sparse, from, code, uplo, drop0)
+}
+
+## Keep synchronized with Matrix() in ./Matrix.R, where diagonal "matrix"
+## (which are both symmetric and triangular) are coerced to "symmetricMatrix",
+## _not_ "triangularMatrix"
+.m2dense <- function(from, kind, ...) {
+    from <- .m2ge(from, kind)
     if(isSymmetric(from, ...))
         forceSymmetric(from)
     else if(!(it <- isTriangular(from)))
-        .m2ge(from)
+        from
     else if(attr(it, "kind") == "U")
         triu(from)
     else
         tril(from)
 }
 ..m2dense <- function(from) { # for setAs()
+    from <- .m2ge(from, ".")
     if(isSymmetric(from))
         forceSymmetric(from)
     else if(!(it <- isTriangular(from)))
-        .m2ge(from)
+        from
     else if(attr(it, "kind") == "U")
         triu(from)
     else
         tril(from)
 }
 
-.dense2m <- function(from) {
-    .Call(R_dense_as_matrix, from)
+.m2sparse <- function(from, kind, repr, ...) {
+    code <- `substr<-`(`substr<-`(".g.", 1L, 1L, kind), 3L, 3L, repr)
+    if(isSymmetric(from, ...))
+        .dense2sparse(from, `substr<-`(code,2L,2L,"s"), "U", NULL)
+    else if(it <- isTriangular(from))
+        .dense2sparse(from, `substr<-`(code,2L,2L,"t"), attr(it, "kind"), "N")
+    else
+        .dense2sparse(from, code, NULL, NULL)
 }
-
-.dense2kind <- function(from, kind) {
-    .Call(R_dense_as_kind, from, kind)
-}
-
-.sparse2kind <- function(from, kind) {
-    .Call(R_sparse_as_kind, from, kind)
-}
-
-.diag2sparse <- function(from, code, uplo, drop0) {
-    .Call(R_diagonal_as_sparse, from, code, uplo, drop0)
+..m2sparse <- function(from) { # for setAs()
+    code <- ".gC"
+    if(isSymmetric(from))
+        .dense2sparse(from, `substr<-`(code,2L,2L,"s"), "U", NULL)
+    else if(it <- isTriangular(from))
+        .dense2sparse(from, `substr<-`(code,2L,2L,"t"), attr(it, "kind"), "N")
+    else
+        .dense2sparse(from, code, NULL, NULL)
 }
 
 rowCheck <- function(a, b) {
@@ -1056,6 +1087,74 @@ n2l_spMatrix <- function(from) {
 }
 } ## MJ
 
+
+.tR.2.C <- function(from) .Call(tRsparse_as_Csparse, from)
+.tC.2.R <- function(from) .Call(tCsparse_as_Rsparse, from)
+
+## .R.2.T() fails on 32bit--enable-R-shlib with segfault {Kurt}
+.R.2.T  <- function(from) .Call(compressed_to_TMatrix, from, FALSE)
+.R.2.C  <- function(from) .Call(R_to_CMatrix, from)
+.C.2.R  <- function(from)
+    .tC.2.R(.Call(Csparse_transpose, from, is(from, "triangularMatrix")))
+
+## slightly less efficient than above, but preserves symmetry correctly
+.viaC.2.R <- function(from) .tC.2.R(as(t(from), "CsparseMatrix"))
+
+## in ../src/Tsparse.c :  |-> cholmod_T -> cholmod_C -> chm_sparse_to_SEXP
+## adjusted for triangular matrices not represented in cholmod
+.T.2.C <- function(from)
+    .Call(Tsparse_to_Csparse, from, is(from, "triangularMatrix"))
+
+## fast, exported for power users
+.T2Cmat <- function(from, isTri = is(from, "triangularMatrix"))
+    .Call(Tsparse_to_Csparse, from, isTri)
+
+
+forceSymmetricCsparse <- function(x, uplo) {
+    d <- x@Dim
+    if (d[1L] != d[2L])
+        stop("attempt to symmetrize a non-square matrix")
+    if((tri <- .hasSlot(x, "diag")) && x@diag == "U")
+	x <- .Call(Csparse_diagU2N, x)
+    if(missing(uplo))
+        uplo <- if(tri) x@uplo else "U"
+    .Call(Csparse_general_to_symmetric, x, uplo, TRUE)
+}
+
+forceSymmetricRsparse <- function(x, uplo) {
+    d <- x@Dim
+    if (d[1L] != d[2L])
+        stop("attempt to symmetrize a non-square matrix")
+    tx <- .tR.2.C(x)
+    if((tri <- .hasSlot(tx, "diag")) && tx@diag == "U")
+	tx <- .Call(Csparse_diagU2N, tx)
+    if(missing(uplo))
+        uplo <- if(tri) x@uplo else "U"
+    .tC.2.R(.Call(Csparse_general_to_symmetric, tx,
+                  if(uplo == "U") "L" else "U", TRUE))
+}
+
+forceSymmetricTsparse <- function(x, uplo) {
+    d <- x@Dim
+    if (d[1L] != d[2L])
+        stop("attempt to symmetrize a non-square matrix")
+    if((tri <- .hasSlot(x, "diag")) && x@diag == "U")
+	x <- .Call(Tsparse_diagU2N, x)
+    if(missing(uplo))
+        uplo <- if(tri) x@uplo else "U"
+    dn <- symmDN(x@Dimnames)
+    i <- x@i
+    j <- x@j
+    k <- if(uplo == "U") i <= j else i >= j
+    Class <- paste0(kind <- .M.kind(x), "sTMatrix")
+    if(kind == "n")
+        new(Class, Dim = d, Dimnames = dn, uplo = uplo,
+            i = i[k], j = j[k])
+    else
+        new(Class, Dim = d, Dimnames = dn, uplo = uplo,
+            i = i[k], j = j[k], x = x@x[k])
+}
+
 tT2gT <- function(x, cl = class(x), toClass, cld = getClassDef(cl)) {
     ## coerce *tTMatrix to *gTMatrix {triangular -> general}
     d <- x@Dim
@@ -1092,6 +1191,7 @@ tT2gT <- function(x, cl = class(x), toClass, cld = getClassDef(cl)) {
 ## Ditto in ../src/Csparse.c :
 .gC2tC <- function(x, uplo, diag="N") .Call(Csparse_to_tCsparse, x, uplo, diag)
 .gC2tT <- function(x, uplo, diag="N") .Call(Csparse_to_tTsparse, x, uplo, diag)
+.gC2sC <- function(x, uplo) .Call(Csparse_general_to_symmetric, x, uplo, TRUE)
 
 gT2tT <- function(x, uplo, diag, toClass,
 		  do.n = extends(toClass, "nMatrix"))
@@ -1123,6 +1223,8 @@ check.gT2tT <- function(from, toClass, do.n = extends(toClass, "nMatrix")) {
     } else stop("not a triangular matrix")
 }
 
+## MJ: no longer needed ... prefer forceSymmetric[CRT]sparse(), .M2symm() above
+if(FALSE) {
 gT2sT <- function(x, toClass, do.n = extends(toClass, "nMatrix")) {
     upper <- x@i <= x@j
     i <- x@i[upper]
@@ -1142,12 +1244,6 @@ check.gT2sT <- function(x, toClass, do.n = extends(toClass, "nMatrix"))
     else
 	stop("not a symmetric matrix; consider forceSymmetric() or symmpart()")
 }
-
-
-if(FALSE)# unused
-l2d_meth <- function(x) {
-    cl <- MatrixClass(class(x))
-    as(callGeneric(as(x, sub("^l", "d", cl))), cl)
 }
 
 ## return "d" or "l" or "n" or "z"
@@ -1339,9 +1435,12 @@ as_Sp <- function(from, shape, cl = class(from)) {
 }
 ## These are used in ./sparseMatrix.R:
 as_gSparse <- function(from) as_Sp(from, "g", getClassDef(class(from)))
-as_sSparse <- function(from) as_Sp(from, "s", getClassDef(class(from)))
 as_tSparse <- function(from) as_Sp(from, "t", getClassDef(class(from)))
 
+## MJ: no longer needed ... prefer forceSymmetric[CRT]sparse() above
+if(FALSE) {
+as_sSparse <- function(from) as_Sp(from, "s", getClassDef(class(from)))
+}
 
 as_geSimpl2 <- function(from, cl = class(from))
     as(from, paste0(.M.kind(from, cl), "geMatrix"))

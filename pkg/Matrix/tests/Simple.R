@@ -53,7 +53,7 @@ stopifnot(exprs = {
     is(d4aS, "dtCMatrix") # not "dsC*", as asymmetric dimnames
     is(d4d, "denseMatrix")
     identical(dimnames(d4T <- as(d4., "TsparseMatrix")), dns) # failed till 2019-09-xx
-    identical(d4T, as(d4., "dgTMatrix"))
+    identical(d4T, as(d4., "dsTMatrix"))
 })
 
 class(mN <-  Matrix(NA, 3,4)) # NA *is* logical
@@ -1191,7 +1191,7 @@ if(doExtras) {
     cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
 }
 ## in any case, test
-d4d.2 <- Matrix:::.dense2C(!!d4da) ## <<- did wrongly make dimnames symmetric
+d4d.2 <- Matrix:::.dense2sparse(!!d4da, "..C", NULL, NULL) ## <<- did wrongly make dimnames symmetric
 l4da <- as(d4da, "lMatrix")
 assert.EQ.Mat(l4da, as(l4da,"CsparseMatrix"))
 

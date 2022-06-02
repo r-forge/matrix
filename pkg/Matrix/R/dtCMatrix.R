@@ -1,5 +1,7 @@
 #### Triangular Sparse Matrices in compressed column-oriented format
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("dtCMatrix", "ltCMatrix",
       function(from) new("ltCMatrix", i = from@i, p = from@p,
 			 uplo = from@uplo, diag = from@diag,
@@ -11,10 +13,13 @@ setAs("dtCMatrix", "ntCMatrix", # just drop 'x' slot:
 			 uplo = from@uplo, diag = from@diag,
 			 ## FIXME?: use from@factors smartly
 			 Dim = from@Dim, Dimnames = from@Dimnames))
+} ## MJ
 
-
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 setAs("matrix", "dtCMatrix",
       function(from) as(as(from, "dtTMatrix"), "dtCMatrix"))
+} ## MJ
 
 ##' dtC* |-> dgC*  (provide for direct use in other coercions) :
 .dtC2g <- function(from) {
@@ -26,7 +31,10 @@ setAs("matrix", "dtCMatrix",
 }
 setAs("dtCMatrix", "dgCMatrix", .dtC2g)
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("dtCMatrix", "dsCMatrix", function(from) as(from, "symmetricMatrix"))
+} ## MJ
 
 setAs("dtCMatrix", "dgTMatrix",
       function(from) {

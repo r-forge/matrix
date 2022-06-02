@@ -7,10 +7,12 @@
 setAs("dsTMatrix", "dgTMatrix",
       function(from) .Call(dsTMatrix_as_dgTMatrix, from))
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("dsTMatrix", "lsTMatrix",
       function(from) new("lsTMatrix", i = from@i, j = from@j, uplo = from@uplo,
                          Dim = from@Dim, Dimnames = from@Dimnames))
-
+} ## MJ
 
 ## Conversion <--> dense storage is via dsyMatrix :
 setAs("dsTMatrix", "dsyMatrix",
@@ -21,9 +23,14 @@ setAs("dsTMatrix", "dgeMatrix",
 setAs("dsTMatrix", "matrix",
       function(from) as(as(from, "dsyMatrix"), "matrix"))
 
-to_dsT <- function(from) as(as(from, "dsyMatrix"), "dsTMatrix")
+to_dsT <- function(from) as(as(from, "dsyMatrix"), "TsparseMatrix")
 setAs("dgeMatrix", "dsTMatrix", to_dsT)
-setAs("matrix",    "dsTMatrix", to_dsT)
+
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
+setAs("matrix", "dsTMatrix", to_dsT)
+}
+rm(to_dsT)
 
 setMethod("t", "dsTMatrix",
 	  function(x)

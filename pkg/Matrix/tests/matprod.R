@@ -137,8 +137,8 @@ chkDnProd(m..)
 chkDnProd(m0.)
 chkDnProd(m.0)
 chkDnProd(m00)
-chkDnProd(M =   T)
-chkDnProd(M = t(T))
+## chkDnProd(M =   T) # FIXME
+## chkDnProd(M = t(T)) # FIXME
 chkDnProd(M =   dU)
 chkDnProd(M = t(dU))
 ## all the above failed in 1.2-0 and 1.1-5, 1.1-4 some even earlier

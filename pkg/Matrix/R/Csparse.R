@@ -76,6 +76,8 @@ setAs("dtCMatrix", "matrix", function(from) .Call(Csparse_to_matrix, from, TRUE,
 ## NB: Would *not* be ok for l*Matrix or n*Matrix,
 ## --------- as cholmod coerces to "REAL" aka "double"
 
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 ..m2dgC <- function(from) .Call(matrix_to_Csparse, from, "dgCMatrix")
 ..m2lgC <- function(from) .Call(matrix_to_Csparse, from, "lgCMatrix")
 
@@ -109,14 +111,24 @@ setAs("matrix", "CsparseMatrix", ## => choosing 'l*' or 'dgCMatrix' (no tri-, sy
 
 setAs("numeric", "CsparseMatrix",
       function(from) (if(is.logical(from)) ..m2lgC else .m2dgC)(as.matrix.default(from)))
+} ## MJ
 
-
+## MJ: no longer needed ... method now inherited from Matrix
+if(FALSE) {
 setAs("CsparseMatrix", "symmetricMatrix",
       function(from) {
-	  if(isSymmetric(from)) forceCspSymmetric(from)
+	  if(isSymmetric(from)) forceSymmetricCsparse(from)
 	  else stop("not a symmetric matrix; consider forceSymmetric() or symmpart()")
       })
+} ## MJ
 
+## NOTE/FIXME(?):
+## these do not work for subclasses inheriting from symmetricMatrix,
+## which have their own (much simpler) methods; see ./symmetricMatrix.R
+setMethod("forceSymmetric", signature(x = "CsparseMatrix", uplo = "missing"),
+	  forceSymmetricCsparse)
+setMethod("forceSymmetric", signature(x = "CsparseMatrix", uplo = "character"),
+	  forceSymmetricCsparse)
 
 .validateCsparse <- function(x, sort.if.needed = FALSE)
     .Call(Csparse_validate2, x, sort.if.needed)
@@ -184,7 +196,7 @@ subCsp_ij <- function(x, i, j, drop)
 	else {
 	    if(!is.null(n <- names(dn))) names(r@Dimnames) <- n
 	    if(extends((cx <- getClassDef(class(x))), "symmetricMatrix"))
-		.gC2sym(r, uplo = x@uplo) # preserving uplo
+		.gC2sC(r, uplo = x@uplo) # preserving uplo
 	    else if(extends(cx, "triangularMatrix") && !is.unsorted(ii))
 		as(r, "triangularMatrix")
 	    else r

@@ -10,6 +10,7 @@
 \alias{Logic,lgeMatrix,lgeMatrix-method}
 \alias{coerce,lgeMatrix,dgeMatrix-method}
 \alias{coerce,lgeMatrix,lgCMatrix-method}
+\alias{coerce,lgeMatrix,lgRMatrix-method}
 \alias{coerce,lgeMatrix,lgTMatrix-method}
 \alias{coerce,lgeMatrix,lspMatrix-method}
 \alias{coerce,lgeMatrix,lsyMatrix-method}

@@ -6,17 +6,12 @@
 %
 \alias{coerce,RsparseMatrix,CsparseMatrix-method}
 \alias{coerce,RsparseMatrix,TsparseMatrix-method}
-\alias{coerce,RsparseMatrix,dMatrix-method}
 \alias{coerce,RsparseMatrix,denseMatrix-method}
 \alias{coerce,RsparseMatrix,dgeMatrix-method}
-\alias{coerce,RsparseMatrix,dsparseMatrix-method}
 \alias{coerce,RsparseMatrix,generalMatrix-method}
-\alias{coerce,RsparseMatrix,lMatrix-method}
-\alias{coerce,RsparseMatrix,lsparseMatrix-method}
 \alias{coerce,RsparseMatrix,matrix-method}
-\alias{coerce,RsparseMatrix,nMatrix-method}
-\alias{coerce,RsparseMatrix,nsparseMatrix-method}
 \alias{coerce,matrix,RsparseMatrix-method}
+\alias{coerce,numLike,RsparseMatrix-method}
 \alias{t,RsparseMatrix-method}
 %
 \description{The \code{"RsparseMatrix"} class is the virtual class of

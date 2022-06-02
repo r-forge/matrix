@@ -24,6 +24,8 @@
 \alias{coerce,lsparseMatrix,matrix-method}
 \alias{coerce,lsparseMatrix,nMatrix-method}
 \alias{coerce,lsparseMatrix,nsparseMatrix-method}
+\alias{coerce,matrix,lsparseMatrix-method}
+\alias{coerce,numLike,lsparseMatrix-method}
 \alias{which,lsparseMatrix-method}
 % lgC
 \alias{Arith,lgCMatrix,lgCMatrix-method}
@@ -31,10 +33,18 @@
 \alias{coerce,lgCMatrix,dgCMatrix-method}
 \alias{coerce,lgCMatrix,lgTMatrix-method}
 \alias{coerce,lgCMatrix,lgeMatrix-method}
+\alias{coerce,lgCMatrix,lsCMatrix-method}
 \alias{coerce,lgCMatrix,ltCMatrix-method}
 \alias{coerce,lgCMatrix,matrix-method}
+\alias{coerce,lgCMatrix,ngCMatrix-method}
 \alias{coerce,matrix,lgCMatrix-method}
+\alias{coerce,numLike,lgCMatrix-method}
 % lgR
+\alias{coerce,lgRMatrix,dgRMatrix-method}
+\alias{coerce,lgRMatrix,lsRMatrix-method}
+\alias{coerce,lgRMatrix,ngRMatrix-method}
+\alias{coerce,matrix,lgRMatrix-method}
+\alias{coerce,numLike,lgRMatrix-method}
 % lgT
 \alias{Arith,lgTMatrix,lgTMatrix-method}
 \alias{Logic,lgTMatrix,lgTMatrix-method}
@@ -42,47 +52,68 @@
 \alias{coerce,lgTMatrix,lgCMatrix-method}
 \alias{coerce,lgTMatrix,lgeMatrix-method}
 \alias{coerce,lgTMatrix,lsCMatrix-method}
+\alias{coerce,lgTMatrix,lsTMatrix-method}
 \alias{coerce,lgTMatrix,ltTMatrix-method}
 \alias{coerce,lgTMatrix,matrix-method}
-\alias{coerce,lgTMatrix,symmetricMatrix-method}
+\alias{coerce,lgTMatrix,ngTMatrix-method}
 \alias{coerce,lgTMatrix,triangularMatrix-method}
 \alias{coerce,matrix,lgTMatrix-method}
+\alias{coerce,numLike,lgTMatrix-method}
 \alias{which,lgTMatrix-method}
 % ltC
 \alias{Logic,ltCMatrix,ltCMatrix-method}
-\alias{coerce,ltCMatrix,dMatrix-method}
+\alias{coerce,ltCMatrix,dtCMatrix-method}
 \alias{coerce,ltCMatrix,lgCMatrix-method}
+\alias{coerce,ltCMatrix,lsCMatrix-method}
 \alias{coerce,ltCMatrix,ltTMatrix-method}
 \alias{coerce,ltCMatrix,matrix-method}
+\alias{coerce,ltCMatrix,ntCMatrix-method}
 \alias{coerce,matrix,ltCMatrix-method}
 % ltR
+\alias{coerce,ltRMatrix,dtRMatrix-method}
+\alias{coerce,ltRMatrix,lsRMatrix-method}
+\alias{coerce,ltRMatrix,ntRMatrix-method}
+\alias{coerce,matrix,ltRMatrix-method}
 % ltT
 \alias{coerce,ltTMatrix,dtTMatrix-method}
 \alias{coerce,ltTMatrix,generalMatrix-method}
 \alias{coerce,ltTMatrix,lgCMatrix-method}
 \alias{coerce,ltTMatrix,lgTMatrix-method}
+\alias{coerce,ltTMatrix,lsTMatrix-method}
 \alias{coerce,ltTMatrix,ltCMatrix-method}
 \alias{coerce,ltTMatrix,ltrMatrix-method}
 \alias{coerce,ltTMatrix,matrix-method}
+\alias{coerce,ltTMatrix,ntTMatrix-method}
 \alias{coerce,matrix,ltTMatrix-method}
 \alias{t,ltTMatrix-method}
 \alias{which,ltTMatrix-method}
 % lsC
 \alias{Logic,lsCMatrix,lsCMatrix-method}
+\alias{coerce,lsCMatrix,RsparseMatrix-method}
 \alias{coerce,lsCMatrix,dsCMatrix-method}
 \alias{coerce,lsCMatrix,generalMatrix-method}
 \alias{coerce,lsCMatrix,lgCMatrix-method}
 \alias{coerce,lsCMatrix,lgTMatrix-method}
+\alias{coerce,lsCMatrix,lsRMatrix-method}
 \alias{coerce,lsCMatrix,lsTMatrix-method}
 \alias{coerce,lsCMatrix,matrix-method}
+\alias{coerce,lsCMatrix,nsCMatrix-method}
 \alias{coerce,matrix,lsCMatrix-method}
 % lsR
+\alias{coerce,lsRMatrix,CsparseMatrix-method}
+\alias{coerce,lsRMatrix,dsRMatrix-method}
+\alias{coerce,lsRMatrix,lsCMatrix-method}
+\alias{coerce,lsRMatrix,nsRMatrix-method}
+\alias{coerce,matrix,lsRMatrix-method}
 % lsT
+\alias{coerce,lsTMatrix,dsTMatrix-method}
 \alias{coerce,lsTMatrix,lgCMatrix-method}
 \alias{coerce,lsTMatrix,lgTMatrix-method}
 \alias{coerce,lsTMatrix,lsCMatrix-method}
 \alias{coerce,lsTMatrix,lsyMatrix-method}
 \alias{coerce,lsTMatrix,matrix-method}
+\alias{coerce,lsTMatrix,nsTMatrix-method}
+\alias{coerce,matrix,lsTMatrix-method}
 \alias{t,lsTMatrix-method}
 \alias{which,lsTMatrix-method}
 %
@@ -188,7 +219,8 @@ nmG.1 <- as(mmG.1, "nMatrix") # <<< has "TRUE" also where mmG.1 had FALSE
 dmG.1 <- as(mmG.1, "dMatrix") # has '0' and back:
 lmG.1 <- as(dmG.1, "lMatrix") # has no extra FALSE, i.e. drop0() included
 stopifnot(identical(nmG.1, as((KNex $ mm) != 0,"nMatrix")),
-          validObject(lmG.1), all(lmG.1@x),
+          validObject(lmG.1),
+          all(lmG.1@x),
           # same "logical" but lmG.1 has no 'FALSE' in x slot:
           all(lmG.1 == mmG.1))
 

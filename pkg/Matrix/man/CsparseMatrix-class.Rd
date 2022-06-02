@@ -11,16 +11,11 @@
 \alias{Logic,CsparseMatrix,CsparseMatrix-method}
 \alias{Math,CsparseMatrix-method}
 \alias{coerce,CsparseMatrix,denseMatrix-method}
-\alias{coerce,CsparseMatrix,lMatrix-method}
-\alias{coerce,CsparseMatrix,lsparseMatrix-method}
-\alias{coerce,CsparseMatrix,nMatrix-method}
-\alias{coerce,CsparseMatrix,nsparseMatrix-method}
 \alias{coerce,CsparseMatrix,RsparseMatrix-method}
 \alias{coerce,CsparseMatrix,sparseVector-method}
-\alias{coerce,CsparseMatrix,symmetricMatrix-method}
 \alias{coerce,CsparseMatrix,TsparseMatrix-method}
 \alias{coerce,matrix,CsparseMatrix-method}
-\alias{coerce,numeric,CsparseMatrix-method}
+\alias{coerce,numLike,CsparseMatrix-method}
 \alias{diag,CsparseMatrix-method}
 \alias{log,CsparseMatrix-method}
 \alias{t,CsparseMatrix-method}

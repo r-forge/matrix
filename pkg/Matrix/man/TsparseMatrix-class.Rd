@@ -5,14 +5,10 @@
 \alias{TsparseMatrix-class}
 %
 \alias{coerce,TsparseMatrix,CsparseMatrix-method}
-\alias{coerce,TsparseMatrix,lMatrix-method}
-\alias{coerce,TsparseMatrix,lsparseMatrix-method}
 \alias{coerce,TsparseMatrix,matrix-method}
-\alias{coerce,TsparseMatrix,nMatrix-method}
-\alias{coerce,TsparseMatrix,nsparseMatrix-method}
 \alias{coerce,TsparseMatrix,sparseVector-method}
 \alias{coerce,matrix,TsparseMatrix-method}
-\alias{coerce,numeric,TsparseMatrix-method}
+\alias{coerce,numLike,TsparseMatrix-method}
 \alias{t,TsparseMatrix-method}
 %
 \description{The \code{"TsparseMatrix"} class is the virtual class of

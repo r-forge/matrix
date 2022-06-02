@@ -19,11 +19,12 @@
 \alias{cbind2,sparseMatrix,sparseMatrix-method}
 \alias{coerce,ANY,sparseMatrix-method}
 \alias{coerce,factor,sparseMatrix-method}
+\alias{coerce,matrix,sparseMatrix-method}
+\alias{coerce,numLike,sparseMatrix-method}
 \alias{coerce,sparseMatrix,RsparseMatrix-method}
 \alias{coerce,sparseMatrix,generalMatrix-method}
 \alias{coerce,sparseMatrix,indMatrix-method}
 \alias{coerce,sparseMatrix,sparseVector-method}
-\alias{coerce,sparseMatrix,symmetricMatrix-method}
 \alias{coerce,sparseMatrix,triangularMatrix-method}
 \alias{coerce,table,sparseMatrix-method}
 \alias{cov2cor,sparseMatrix-method}

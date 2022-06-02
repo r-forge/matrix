@@ -20,6 +20,8 @@
 \alias{Ops,dMatrix,lMatrix-method}
 \alias{Ops,dMatrix,ldiMatrix-method}
 \alias{Ops,dMatrix,nMatrix-method}
+\alias{coerce,matrix,dMatrix-method}
+\alias{coerce,numLike,dMatrix-method}
 \alias{zapsmall,dMatrix-method}
 %
 \alias{Arith,lMatrix,numeric-method}
@@ -43,6 +45,7 @@
 \alias{Summary,lMatrix-method}
 \alias{coerce,lMatrix,dgCMatrix-method}
 \alias{coerce,matrix,lMatrix-method}
+\alias{coerce,numLike,lMatrix-method}
 %
 \description{
   The \code{dMatrix} class is a virtual class contained by all actual

@@ -8,6 +8,9 @@
 \alias{!,ltpMatrix-method}
 \alias{coerce,ltpMatrix,dtpMatrix-method}
 \alias{coerce,ltpMatrix,lgeMatrix-method}
+\alias{coerce,ltpMatrix,ltCMatrix-method}
+\alias{coerce,ltpMatrix,ltRMatrix-method}
+\alias{coerce,ltpMatrix,ltTMatrix-method}
 \alias{coerce,ltpMatrix,lspMatrix-method}
 \alias{coerce,ltpMatrix,ltrMatrix-method}
 \alias{coerce,ltpMatrix,ntpMatrix-method}
@@ -16,6 +19,9 @@
 \alias{!,ltrMatrix-method}
 \alias{coerce,ltrMatrix,dtrMatrix-method}
 \alias{coerce,ltrMatrix,lgeMatrix-method}
+\alias{coerce,ltrMatrix,ltCMatrix-method}
+\alias{coerce,ltrMatrix,ltRMatrix-method}
+\alias{coerce,ltrMatrix,ltTMatrix-method}
 \alias{coerce,ltrMatrix,lsyMatrix-method}
 \alias{coerce,ltrMatrix,ltpMatrix-method}
 \alias{coerce,ltrMatrix,ntrMatrix-method}

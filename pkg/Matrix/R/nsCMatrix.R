@@ -8,20 +8,19 @@ setAs("nsCMatrix", "matrix",
 setAs("nsCMatrix", "ngCMatrix",
       function(from) .Call(Csparse_symmetric_to_general, from))
 
-## Specific conversions, should they be necessary.  Better to convert as
-## as(x, "TsparseMatrix") or as(x, "denseMatrix")
 setAs("nsCMatrix", "nsTMatrix",
       function(from) .Call(Csparse_to_Tsparse, from, FALSE))
 
-
-## Not needed, once we use "nCsparseMatrix" (-> ./ngCMatrix.R ):
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("nsCMatrix", "dMatrix", .nC2d)
 setAs("nsCMatrix", "dsparseMatrix", .nC2d)
 setAs("nsCMatrix", "dsCMatrix", .nC2d)
-##
+
 setAs("nsCMatrix", "lMatrix", .nC2l)
 setAs("nsCMatrix", "lsparseMatrix", .nC2l)
 setAs("nsCMatrix", "lsCMatrix", .nC2l)
+} ## MJ
 
 ## have rather tril() and triu() methods than
 ## setAs("nsCMatrix", "ntCMatrix", ....)

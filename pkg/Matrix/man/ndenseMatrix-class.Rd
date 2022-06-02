@@ -16,10 +16,6 @@
 \alias{as.logical,ndenseMatrix-method}
 \alias{as.vector,ndenseMatrix-method}
 \alias{coerce,matrix,ndenseMatrix-method}
-\alias{coerce,ndenseMatrix,CsparseMatrix-method}
-\alias{coerce,ndenseMatrix,TsparseMatrix-method}
-\alias{coerce,ndenseMatrix,nsparseMatrix-method}
-\alias{coerce,ndenseMatrix,sparseMatrix-method}
 \alias{coerce,numLike,ndenseMatrix-method}
 \alias{which,ndenseMatrix-method}
 %

@@ -117,12 +117,6 @@ setAs("Matrix", "diagonalMatrix",
 ..diag2lge <- function(from)                .dense2ge(from, "l")
 ..diag2nge <- function(from)                .dense2ge(from, "n")
 
-..diag2m <- function(from)
-    `dimnames<-`(base::diag(if(from@diag == "N") from@x else as1(from@x),
-                            nrow = from@Dim[1L]),
-                 from@Dimnames)
-.diag2mat <- ..diag2m ## MJ: for backwards compatibility, until deprecated
-
 setAs("diagonalMatrix",          "dMatrix", ..diag2dkind)
 setAs("diagonalMatrix",          "lMatrix", ..diag2lkind)
 setAs("diagonalMatrix",          "nMatrix", ..diag2nsparse)
@@ -143,7 +137,7 @@ setAs("diagonalMatrix",      "denseMatrix", ..diag2tr)
 setAs("diagonalMatrix",     "ddenseMatrix", ..diag2dtr)
 setAs("diagonalMatrix",     "ldenseMatrix", ..diag2ltr)
 setAs("diagonalMatrix",     "ndenseMatrix", ..diag2ntr)
-setAs("diagonalMatrix",           "matrix", ..diag2m)
+setAs("diagonalMatrix",           "matrix", .diag2m)
 
 .kinds <- c("d", "l")
 for (.kind in .kinds) {
@@ -177,8 +171,7 @@ rm(..diag2dkind, ..diag2lkind,
    ..diag2tr,
    ..diag2dtr, ..diag2ltr, ..diag2ntr,
    ..diag2dsy, ..diag2lsy, ..diag2nsy,
-   ..diag2dge, ..diag2lge, ..diag2nge,
-   ..diag2m)
+   ..diag2dge, ..diag2lge, ..diag2nge)
 
 ## MJ: no longer needed ... replacement above
 if(FALSE) {

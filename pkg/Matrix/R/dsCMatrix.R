@@ -6,13 +6,6 @@ setAs("dgCMatrix", "dsCMatrix",
 	  as(from, "symmetricMatrix")
       })
 
-## Specific conversions, should they be necessary.  Better to convert as
-## as(x, "TsparseMatrix") or as(x, "denseMatrix")
-
-## Moved to ./Csparse.R
-## setAs("dsCMatrix", "dsTMatrix",
-##       function(from) .Call(Csparse_to_Tsparse, from, FALSE))
-
 setAs("dsCMatrix", "dgTMatrix", # needed for show(), image()
       function(from)
       ## pre-Cholmod -- FIXME: get rid of
@@ -23,9 +16,15 @@ setAs("dsCMatrix", "dgeMatrix",
 
 setAs("dsCMatrix", "matrix",
       function(from) as(as(from, "generalMatrix"), "matrix"))
+
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 setAs("matrix", "dsCMatrix",
       function(from) as(.m2dgC(from), "symmetricMatrix"))
+}
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("dsCMatrix", "lsCMatrix",
       function(from) new("lsCMatrix", i = from@i, p = from@p, uplo = from@uplo,
                          x = as.logical(from@x),
@@ -33,6 +32,7 @@ setAs("dsCMatrix", "lsCMatrix",
 setAs("dsCMatrix", "nsCMatrix",
       function(from) new("nsCMatrix", i = from@i, p = from@p, uplo = from@uplo,
                          Dim = from@Dim, Dimnames = from@Dimnames))
+} ## MJ
 
 setAs("dsCMatrix", "dgCMatrix",
       function(from) .Call(Csparse_symmetric_to_general, from))

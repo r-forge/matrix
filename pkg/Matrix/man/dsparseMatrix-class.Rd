@@ -14,6 +14,8 @@
 \alias{coerce,dsparseMatrix,lsparseMatrix-method}
 \alias{coerce,dsparseMatrix,nMatrix-method}
 \alias{coerce,dsparseMatrix,nsparseMatrix-method}
+\alias{coerce,matrix,dsparseMatrix-method}
+\alias{coerce,numLike,dsparseMatrix-method}
 \alias{determinant,dsparseMatrix,logical-method}
 %
 \description{The Class \code{"dsparseMatrix"} is the virtual (super) class of

@@ -71,14 +71,14 @@ dimnames(d) <- list(paste0("d", 10*1:4), paste0("D", 1:4))
 (Kmd <- KhatriRao(m,d, make.dimnames=TRUE))
 (Kdm <- KhatriRao(d,m, make.dimnames=TRUE))
 
-nm <- as(m,"nMatrix")
-nd <- as(d,"nMatrix")
+nm <- as(m, "nsparseMatrix")
+nd <- as(d, "nsparseMatrix")
 KhatriRao(nm,nd, make.dimnames=TRUE)
 KhatriRao(nd,nm, make.dimnames=TRUE)
 
 stopifnot(dim(KhatriRao(m,d)) == c(nrow(m)*nrow(d), ncol(d)))
 ## border cases / checks:
-zm <- nm; zm[] <- 0 # all 0 matrix
+zm <- nm; zm[] <- FALSE # all FALSE matrix
 stopifnot(all(K1 <- KhatriRao(nd, zm) == 0), identical(dim(K1), c(12L, 4L)),
           all(K2 <- KhatriRao(zm, nd) == 0), identical(dim(K2), c(12L, 4L)))
 

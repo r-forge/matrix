@@ -9,9 +9,11 @@ setAs("dgTMatrix", "dgeMatrix",
 setAs("dgTMatrix", "matrix",
       function(from) .Call(dgTMatrix_to_matrix, from))
 
-
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 setAs("dgeMatrix", "dgTMatrix",
       function(from) as(as(from, "dgCMatrix"), "dgTMatrix"))
+} ## MJ
 
 if(FALSE) ## special case, relatively ugly, needed ??
 setAs("dgTMatrix", "dsCMatrix",
@@ -40,11 +42,16 @@ setAs("dgTMatrix", "dtTMatrix",
 setAs("dgTMatrix", "triangularMatrix",
       function(from) check.gT2tT(from, toClass = "dtTMatrix", do.n=FALSE))
 
+## MJ: no longer needed ... prefer forceSymmetricTsparse(), ..M2symm()
+if(FALSE) {
 setAs("dgTMatrix", "dsTMatrix",
       function(from) check.gT2sT(from, toClass = "dsTMatrix", do.n=FALSE))
 setAs("dgTMatrix", "symmetricMatrix",
       function(from) check.gT2sT(from, toClass = "dsTMatrix", do.n=FALSE))
+} ## MJ
 
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 mat2dgT <- function(from) {
     x <- as.double(from)
     nz <- isN0(x)
@@ -56,7 +63,7 @@ mat2dgT <- function(from) {
 }
 
 setAs("matrix", "dgTMatrix", mat2dgT)
-
+} ## MJ
 
 ## "[" methods are now in ./Tsparse.R
 

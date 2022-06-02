@@ -21,10 +21,13 @@
 %
 \alias{coerce,dtTMatrix,dgTMatrix-method}
 \alias{coerce,dtTMatrix,dgeMatrix-method}
+\alias{coerce,dtTMatrix,dsTMatrix-method}
 \alias{coerce,dtTMatrix,dtCMatrix-method}
 \alias{coerce,dtTMatrix,dtrMatrix-method}
 \alias{coerce,dtTMatrix,generalMatrix-method}
+\alias{coerce,dtTMatrix,ltTMatrix-method}
 \alias{coerce,dtTMatrix,matrix-method}
+\alias{coerce,dtTMatrix,ntTMatrix-method}
 \alias{coerce,matrix,dtTMatrix-method}
 \alias{t,dtTMatrix-method}
 %

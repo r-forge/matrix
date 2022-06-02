@@ -4,7 +4,11 @@
 %
 \alias{dgRMatrix-class}
 %
+\alias{coerce,dgRMatrix,dsRMatrix-method}
+\alias{coerce,dgRMatrix,lgRMatrix-method}
+\alias{coerce,dgRMatrix,ngRMatrix-method}
 \alias{coerce,matrix,dgRMatrix-method}
+\alias{coerce,numLike,dgRMatrix-method}
 %
 \description{The \code{dgRMatrix} class is a class of sparse numeric
   matrices in the compressed, sparse, row-oriented format.  In this

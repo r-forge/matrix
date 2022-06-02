@@ -20,12 +20,11 @@ setAs("Cholesky", "lMatrix",
       function(from) as(as(from, "dtrMatrix"), "lMatrix"))
 setAs("BunchKaufman", "lMatrix",
       function(from) as(as(from, "dtrMatrix"), "lMatrix"))
-} ## MJ
-
 setAs("dtrMatrix", "sparseMatrix",
       function(from) .dense2C(from, kind = "tri", uplo = from@uplo))
 setAs("dtrMatrix", "CsparseMatrix",
       function(from) .dense2C(from, kind = "tri", uplo = from@uplo))
+} ## MJ
 
 ## Group Methods:
 ## TODO: carefully check for the cases where the result remains triangular

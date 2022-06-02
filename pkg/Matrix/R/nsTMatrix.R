@@ -11,11 +11,14 @@ setAs("nsTMatrix", "ngCMatrix", # for diag
 setAs("nsTMatrix", "ngTMatrix",
       function(from) .Call(nsTMatrix_as_ngTMatrix, from))
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("nsTMatrix", "dsTMatrix",
       function(from)
       new("dsTMatrix", i = from@i, j = from@j, uplo = from@uplo,
 	  x = rep.int(1., length(from@i)),
 	  Dim = from@Dim, Dimnames = from@Dimnames))
+} ## MJ
 
 setAs("nsTMatrix", "nsyMatrix",
       function(from) .Call(nsTMatrix_as_nsyMatrix, from))

@@ -18,13 +18,17 @@
 \alias{coerce,denseMatrix,TsparseMatrix-method}
 \alias{coerce,denseMatrix,dMatrix-method}
 \alias{coerce,denseMatrix,ddenseMatrix-method}
+\alias{coerce,denseMatrix,dsparseMatrix-method}
 \alias{coerce,denseMatrix,generalMatrix-method}
 \alias{coerce,denseMatrix,lMatrix-method}
 \alias{coerce,denseMatrix,ldenseMatrix-method}
+\alias{coerce,denseMatrix,lsparseMatrix-method}
 \alias{coerce,denseMatrix,matrix-method}
 \alias{coerce,denseMatrix,nMatrix-method}
 \alias{coerce,denseMatrix,ndenseMatrix-method}
+\alias{coerce,denseMatrix,nsparseMatrix-method}
 \alias{coerce,denseMatrix,packedMatrix-method}
+\alias{coerce,denseMatrix,sparseMatrix-method}
 \alias{coerce,denseMatrix,unpackedMatrix-method}
 \alias{coerce,matrix,denseMatrix-method}
 \alias{coerce,numLike,denseMatrix-method}

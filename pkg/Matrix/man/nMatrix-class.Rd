@@ -28,6 +28,7 @@
 \alias{coerce,matrix,nMatrix-method}
 \alias{coerce,nMatrix,indMatrix-method}
 \alias{coerce,nMatrix,pMatrix-method}
+\alias{coerce,numLike,nMatrix-method}
 %
 \description{
   The \code{nMatrix} class is the virtual \dQuote{mother} class of all

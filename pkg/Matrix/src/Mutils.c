@@ -1412,7 +1412,7 @@ char type2kind(SEXPTYPE type)
 	return 'z';
 #endif
     default:
-	error(_("unexpected type \"%s\" in 'kindofX()'"), type2char(type)); 
+	error(_("unexpected type \"%s\" in 'type2kind()'"), type2char(type)); 
 	return '\0';
     }
 }
@@ -1490,7 +1490,8 @@ SEXP matrix_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector)
 	doDN = !(isNull(dimnames) || DIMNAMES_IS_TRIVIAL(dimnames));
     } else {
 	if (len > INT_MAX)
-	    error(_("vector of length exceeding 2^31-1 to 'matrix_as_geMatrix()'"));
+	    error(_("vector of length exceeding 2^31-1 "
+		    "to 'matrix_as_geMatrix()'"));
 	PROTECT(dim = allocVector(INTSXP, 2)); ++nprotect;
 	int *pdim = INTEGER(dim);
 	if (transpose_if_vector) {

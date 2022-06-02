@@ -100,7 +100,6 @@ setAs("matrix", "ndenseMatrix", function(from) as(from, "ngeMatrix"))
 
 setAs("ndenseMatrix", "matrix", ## uses the above l*M. -> lgeM.
       function(from) as(as(from, "ngeMatrix"), "matrix"))
-} ## MJ
 
 ## dense |-> compressed :
 
@@ -139,11 +138,7 @@ setAs("ngeMatrix", "ngTMatrix",
 
 setAs("ngeMatrix", "ngCMatrix",
       function(from) as(as(from, "ngTMatrix"), "ngCMatrix"))
-
-setMethod("as.logical", signature(x = "ndenseMatrix"),
-	  function(x, ...) as(x, "ngeMatrix")@x)
-
-###----------------------------------------------------------------------
+} ## MJ
 
 ## MJ: no longer needed ... replacement in ./unpackedMatrix.R
 if (FALSE) {
@@ -162,6 +157,9 @@ setMethod("t", signature(x = "nspMatrix"),
 
 ## NOTE:  "&" and "|"  are now in group "Logic" c "Ops" --> ./Ops.R
 ##        "!" is in ./not.R
+
+setMethod("as.logical", signature(x = "ndenseMatrix"),
+	  function(x, ...) as(x, "ngeMatrix")@x)
 
 setMethod("as.vector", "ndenseMatrix",
 	  function(x, mode) as.vector(as(x, "ngeMatrix")@x, mode))

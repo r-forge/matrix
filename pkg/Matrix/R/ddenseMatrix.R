@@ -18,7 +18,6 @@ setAs("dsyMatrix", "lsyMatrix", function(from) d2l_Matrix(from, "dsyMatrix"))
 setAs("dspMatrix", "lspMatrix", function(from) d2l_Matrix(from, "dspMatrix"))
 setAs("dtrMatrix", "ltrMatrix", function(from) d2l_Matrix(from, "dtrMatrix"))
 setAs("dtpMatrix", "ltpMatrix", function(from) d2l_Matrix(from, "dtpMatrix"))
-} ## MJ
 
 if(FALSE) {
 ## FIXME, this fails for ("dtpMatrix" -> "CsparseMatrix") where .dense2C() works
@@ -33,6 +32,7 @@ setAs("ddenseMatrix", "CsparseMatrix",
 ## special case
 setAs("dgeMatrix", "dgCMatrix",
       function(from) .Call(dense_to_Csparse, from))
+} ## MJ
 
 setMethod("as.numeric", "ddenseMatrix", function(x, ...) ..2dge(x)@x)
 

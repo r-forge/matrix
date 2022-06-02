@@ -4,13 +4,6 @@
 #include <string.h>
 #include "packedMatrix.h"
 
-#define PM_ERROR_INVALID_CLASS(_CLASS_, _METHOD_)			\
-    error(_("invalid class \"%s\" to 'packedMatrix_%s()'"),		\
-	  _CLASS_, _METHOD_)
-#define PM_ERROR_INVALID_SLOT_TYPE(_SLOT_, _SEXPTYPE_, _METHOD_)	\
-    error(_("'%s' slot of invalid type \"%s\" in 'packedMatrix_%s()'"), \
-	  _SLOT_, type2char(_SEXPTYPE_), _METHOD_)
-
 /* unpack(x), returning unpackedMatrix */
 SEXP packedMatrix_unpack(SEXP from, SEXP strict)
 {
@@ -26,7 +19,7 @@ SEXP packedMatrix_unpack(SEXP from, SEXP strict)
 	"dtrMatrix", "ltrMatrix", "ntrMatrix", ""};
     int ivalid = R_check_class_etc(from, valid_from);
     if (ivalid < 0)
-	PM_ERROR_INVALID_CLASS(class_P(from), "unpack");
+	ERROR_INVALID_CLASS(class_P(from), "packedMatrix_unpack");
     if (asLogical(strict) == 0 && (ivalid == 4 || ivalid == 5))
 	ivalid = 6; /* pCholesky,pBunchKaufman->dtrMatrix */
 
@@ -63,7 +56,7 @@ SEXP packedMatrix_unpack(SEXP from, SEXP strict)
 	UNPACK(z, COMPLEX);
 	break;
     default:
-	PM_ERROR_INVALID_SLOT_TYPE("x", tx, "unpack");
+	ERROR_INVALID_TYPE("'x' slot", tx, "packedMatrix_unpack");
 	break;
     }
 
@@ -95,7 +88,7 @@ SEXP packedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
 	"dtpMatrix", "ltpMatrix", "ntpMatrix", ""};
     int ivalid = R_check_class_etc(from, valid);
     if (ivalid < 0)
-	PM_ERROR_INVALID_CLASS(class_P(from), "force_symmetric");
+	ERROR_INVALID_CLASS(class_P(from), "packedMatrix_force_symmetric");
     
     char ulf = *uplo_P(from), ult = *CHAR(asChar(uplo_to));
     if (ivalid <= 2)
@@ -144,7 +137,7 @@ SEXP packedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
 	    COPY_DIAGONAL(z, COMPLEX);
 	    break;
 	default:
-	    PM_ERROR_INVALID_SLOT_TYPE("x", tx, "force_symmetric");
+	    ERROR_INVALID_TYPE("'x' slot", tx, "packedMatrix_force_symmetric");
 	    break;
 	}
 
@@ -177,7 +170,7 @@ SEXP packedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
 	    _RES_ = zdense_packed_is_diagonal(COMPLEX(_X_), _N_, _UPLO_); \
 	    break;							\
 	default:							\
-	    PM_ERROR_INVALID_SLOT_TYPE("x", TYPEOF(_X_), _METHOD_);	\
+	    ERROR_INVALID_TYPE("'x' slot", TYPEOF(_X_), _METHOD_);	\
 	    _RES_ = FALSE;						\
 	    break;							\
 	}								\
@@ -191,7 +184,7 @@ SEXP packedMatrix_is_symmetric(SEXP obj, SEXP checkDN)
 	"dtpMatrix", "ltpMatrix", "ntpMatrix", ""};
     int ivalid = R_check_class_etc(obj, valid);
     if (ivalid < 0) {
-	PM_ERROR_INVALID_CLASS(class_P(obj), "is_symmetric");
+	ERROR_INVALID_CLASS(class_P(obj), "packedMatrix_is_symmetric");
 	return R_NilValue;
     } else if (ivalid <= 2) {
 	/* .spMatrix: symmetric by definition */
@@ -205,7 +198,7 @@ SEXP packedMatrix_is_symmetric(SEXP obj, SEXP checkDN)
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
 	char ul = *uplo_P(obj);
-	PM_IS_DI(res, x, n, ul, "is_symmetric");
+	PM_IS_DI(res, x, n, ul, "packedMatrix_is_symmetric");
 	return ScalarLogical(res);
     }
 }
@@ -227,7 +220,7 @@ SEXP packedMatrix_is_triangular(SEXP obj, SEXP upper)
 	"dspMatrix", "lspMatrix", "nspMatrix", ""};
     int ivalid = R_check_class_etc(obj, valid);
     if (ivalid < 0)
-	PM_ERROR_INVALID_CLASS(class_P(obj), "is_triangular");
+	ERROR_INVALID_CLASS(class_P(obj), "packedMatrix_is_triangular");
 
     SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
     char ul = *CHAR(STRING_ELT(uplo, 0));
@@ -237,7 +230,7 @@ SEXP packedMatrix_is_triangular(SEXP obj, SEXP upper)
     Rboolean res = FALSE;						\
     SEXP x = GET_SLOT(obj, Matrix_xSym);				\
     int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];			\
-    PM_IS_DI(res, x, n, ul, "is_triangular");				\
+    PM_IS_DI(res, x, n, ul, "packedMatrix_is_triangular");		\
     if (res)
     
     if (ivalid <= 2) {
@@ -278,7 +271,7 @@ SEXP packedMatrix_is_diagonal(SEXP obj)
     SEXP x = GET_SLOT(obj, Matrix_xSym);
     int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
     char ul = *uplo_P(obj);
-    PM_IS_DI(res, x, n, ul, "is_diagonal");
+    PM_IS_DI(res, x, n, ul, "packedMatrix_is_diagonal");
     return ScalarLogical(res);
 }
 
@@ -380,7 +373,7 @@ SEXP packedMatrix_diag_get(SEXP obj, SEXP nms)
 	break;
     }
     default:
-	PM_ERROR_INVALID_SLOT_TYPE("x", tx, "diag_get");
+	ERROR_INVALID_TYPE("'x' slot", tx, "packedMatrix_diag_get");
 	break;
     }
 
@@ -417,7 +410,7 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
     SEXP x = GET_SLOT(obj, Matrix_xSym);
     SEXPTYPE tx = TYPEOF(x), tv = TYPEOF(val);
     if (tx < LGLSXP || tx > CPLXSXP)
-	PM_ERROR_INVALID_SLOT_TYPE("x", tx, "diag_set");
+	ERROR_INVALID_TYPE("'x' slot", tx, "packedMatrix_diag_set");
     if (tv < LGLSXP || tv > REALSXP)
 	/* Upper bound can become CPLXSXP once we have proper zMatrix */
 	error(_("replacement diagonal has incompatible type \"%s\""),
@@ -429,7 +422,7 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
 	"nspMatrix", "ntpMatrix", ""};
     int ivalid = R_check_class_etc(obj, valid);
     if (ivalid < 0)
-	PM_ERROR_INVALID_CLASS(class_P(obj), "diag_set");
+	ERROR_INVALID_CLASS(class_P(obj), "packedMatrix_diag_set");
 
     SEXP res,
 	dimnames = GET_SLOT(obj, Matrix_DimNamesSym),
@@ -498,7 +491,7 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
 	PM_D_S(Rcomplex, COMPLEX);
 	break;
     default:
-	PM_ERROR_INVALID_SLOT_TYPE("x", tx, "diag_set");
+	ERROR_INVALID_TYPE("'x' slot", tx, "packedMatrix_diag_set");
 	break;
     }
     
@@ -622,7 +615,7 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
 	    break;							\
 	}								\
 	default:							\
-	    PM_ERROR_INVALID_SLOT_TYPE("x", tx, "sub1");		\
+	    ERROR_INVALID_TYPE("'x' slot", tx, "packedMatrix_sub1");	\
 	    break;							\
 	}								\
 	UNPROTECT(1);							\
@@ -802,7 +795,7 @@ SEXP packedMatrix_sub2(SEXP obj, SEXP index1, SEXP index2, SEXP drop)
 	"dtpMatrix", "ltpMatrix", "ntpMatrix", ""};
     int ivalid = R_check_class_etc(obj, valid), nprotect = 0;
     if (ivalid < 0) {
-	PM_ERROR_INVALID_CLASS(class_P(obj), "sub2");
+	ERROR_INVALID_CLASS(class_P(obj), "packedMatrix_sub2");
     }
     char uplo = *uplo_P(obj), diag = *Diag_P(obj);
 
@@ -900,7 +893,7 @@ SEXP packedMatrix_sub2(SEXP obj, SEXP index1, SEXP index2, SEXP drop)
 	break;
     }
     default:
-	PM_ERROR_INVALID_SLOT_TYPE("x", tx, "sub2");
+	ERROR_INVALID_TYPE("'x' slot", tx, "packedMatrix_sub2");
 	break;
     }
 
