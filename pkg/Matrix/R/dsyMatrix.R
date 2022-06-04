@@ -3,7 +3,7 @@
 ## MJ: no longer needed ... replacement in ./symmetricMatrix.R
 ##     and ./denseMatrix.R
 ##     { where .dense2sy(), .dsy2mat() and .dsy2dsp(), which
-##     all been exported, are defined as simple aliases ... }
+##     have all been exported, are defined as simple aliases ... }
 if(FALSE) {
 .dense2sy <- function(from, ...) {
     if(isSymmetric(from, ...)) # < with tolerance!
@@ -35,6 +35,8 @@ setAs("dsyMatrix",    "matrix", ..dsy2mat)
 setAs("dsyMatrix", "dspMatrix", .dsy2dsp)
 } ## MJ
 
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
 dsy2T <- function(from) { # 'dsT': only store upper *or* lower
     uplo <- from@uplo
     if(any0(dim(from))) {
@@ -54,6 +56,8 @@ setAs("dsyMatrix", "dsTMatrix", dsy2T)
 
 setAs("dsyMatrix", "dsCMatrix",
       dsy2C <- function(from) .T2Cmat(dsy2T(from), isTri=FALSE))
+} ## MJ
+
 
 ## Note: Just *because* we have an explicit  dtr -> dge coercion,
 ##       show( <ddenseMatrix> ) is not okay, and we need our own:

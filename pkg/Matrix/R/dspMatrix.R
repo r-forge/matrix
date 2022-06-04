@@ -14,11 +14,11 @@ setAs("matrix", "dspMatrix",
 
 ## S3-matrix <--> dsp   via  dsy
 setAs("dspMatrix", "matrix", function(from) .dsy2mat(dsp2dsy(from)))
-} ## MJ
 
 dsp2C <- function(from) dsy2C(unpack(from))
 setAs("dspMatrix", "CsparseMatrix", dsp2C)
 setAs("dspMatrix", "sparseMatrix", dsp2C)
+} ## MJ
 
 setMethod("rcond", signature(x = "dspMatrix", norm = "character"),
           function(x, norm, ...)
