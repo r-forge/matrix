@@ -129,7 +129,7 @@ setAs("diagonalMatrix",    "CsparseMatrix", ..diag2tC)
 setAs("diagonalMatrix",    "RsparseMatrix", ..diag2tR)
 setAs("diagonalMatrix",    "TsparseMatrix", ..diag2tT)
 
-setAs("diagonalMatrix", "triangularMatrix", ..diag2tT)
+setAs("diagonalMatrix", "triangularMatrix", ..diag2tC)
 setAs("diagonalMatrix",  "symmetricMatrix", ..diag2sC)
 setAs("diagonalMatrix",    "generalMatrix", ..diag2gC)
 
