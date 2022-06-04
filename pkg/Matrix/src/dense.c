@@ -595,25 +595,30 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
     if (a <= 1 - m && b >= n - 1 && (clf[1] == 't' || m != n || m > 1 || n > 1))
 	return from;
     
-    SEXP uplo_from;
-    char ulf;
+    SEXP uplo_from, diag;
+    char ulf = 'U', ult = 'U', di = 'N';
     if (clf[1] != 'g') {
 	uplo_from = GET_SLOT(from, Matrix_uploSym);
 	ulf = *CHAR(STRING_ELT(uplo_from, 0));
-	if (clf[1] == 't' &&
-	    ((ulf == 'U') ? (a <= 0 && b >= n - 1) : (b >= 0 && a <= 1 - m)))
-	    return from;
+	if (clf[1] == 't') {
+	    if ((ulf == 'U') ? (a <= 0 && b >= n - 1) : (b >= 0 && a <= 1 - m))
+		return from;
+	    diag = GET_SLOT(from, Matrix_diagSym);
+	    di = *CHAR(STRING_ELT(diag, 0));
+	}
     }
     
     SEXP to, x_to,
 	x_from = GET_SLOT(from, Matrix_xSym),
 	dimnames = GET_SLOT(from, Matrix_DimNamesSym);
     SEXPTYPE tx = TYPEOF(x_from);
-    char ult, di = 'N';
     Rboolean tr, sy;
-
+    
 #define UNPACKED_MAKE_BANDED(_PREFIX_, _PTR_)				\
     _PREFIX_ ## dense_unpacked_make_banded(_PTR_(x_to), m, n, a, b, di)
+
+#define PACKED_MAKE_BANDED(_PREFIX_, _PTR_)				\
+    _PREFIX_ ## dense_packed_make_banded(_PTR_(x_to), n, a, b, ult, di)
     
 #define DENSE_BAND(_MAKE_BANDED_)					\
     do {								\
@@ -636,9 +641,18 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 	}								\
     } while (0)
 
+#define DENSE_BAND_CONSTRICT			\
+    do {					\
+	if (ulf == 'U') {			\
+	    if (a < 0) a = 0;			\
+	} else {				\
+	    if (b > 0) b = 0;			\
+	}					\
+    } while(0)
+    
     if (m != n || (!(tr = a >= 0 || b <= 0 || clf[1] == 't') &&
 		   !(sy = a == -b && clf[1] == 's'))) { /* return .geMatrix */
-
+	
 	if (clf[1] == 'g') {
 	    if (ivalid >= 0) {
 		PROTECT(to = NEW_OBJECT_OF_CLASS(clf));
@@ -658,28 +672,11 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 	UNPROTECT(2);
 	return to;
 
-    }
-    
-#define PACKED_MAKE_BANDED(_PREFIX_, _PTR_)				\
-    _PREFIX_ ## dense_packed_make_banded(_PTR_(x_to), n, a, b, ult, di)
-    
-#define DENSE_BAND_CONSTRICT			\
-    do {					\
-	if (ulf == 'U') {			\
-	    if (a < 0) a = 0;			\
-	} else {				\
-	    if (b > 0) b = 0;			\
-	}					\
-    } while(0)
-
-    if (tr) { /* return .t.Matrix */
+    } else if (tr) { /* return .t.Matrix */
 	
 	ult = (a >= 0) ? 'U' : ((b <= 0) ? 'L' : ulf);
 
 	if (clf[1] == 't') {
-	    SEXP diag = GET_SLOT(from, Matrix_diagSym);
-	    di = *CHAR(STRING_ELT(diag, 0));
-
 	    PROTECT(to = NEW_OBJECT_OF_CLASS(clf));
 	    SET_SLOT(to, Matrix_DimNamesSym, dimnames);
 	    if (di != 'N')
@@ -766,7 +763,8 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 	
     } else {
 	
-	error(_("should never happen; probably a bug in 'R_dense_band()'; please report!"));
+	error(_("should never happen; probably a bug in 'R_dense_band()'; "
+		"please report!"));
 	
     }
 
