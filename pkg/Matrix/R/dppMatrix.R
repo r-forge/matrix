@@ -9,30 +9,28 @@
     copyClass(from, "dppMatrix",
               sNames = c("Dim", "Dimnames", "uplo", "x", "factors"))
 }
-.M2dpp.via.dsp <- function(from) {
-    .dsp2dpp(as(from, "dspMatrix"))
-}
-.M2dpp.via.virtual <- function(from) {
-    ## still needs as(<ds[py]Matrix>, "dppMatrix") to work
-    as(as(as(as(from,"symmetricMatrix"),"dMatrix"),"denseMatrix"),"dppMatrix")
-}
 
 setAs("dspMatrix", "dppMatrix", .dsp2dpp)
-setAs("dsyMatrix", "dppMatrix", .M2dpp.via.dsp)
-setAs(   "matrix", "dppMatrix", .M2dpp.via.dsp)
-setAs(   "Matrix", "dppMatrix", .M2dpp.via.virtual)
-
-rm(.M2dpp.via.dsp, .M2dpp.via.virtual)
+setAs("dsyMatrix", "dppMatrix",
+      function(from) pack(.dsy2dpo(from)))
+setAs("matrix", "dppMatrix",
+      function(from) {
+          storage.mode(from) <- "double"
+          .dsp2dpp(pack(from, symmetric = TRUE))
+      })
+setAs("Matrix", "dppMatrix",
+      function(from) {
+          ## still needs as(<ds[py]Matrix>, "dppMatrix") to work
+          as(as(as(as(from,"symmetricMatrix"),"dMatrix"),"denseMatrix"),
+             "dppMatrix")
+      })
 
 
 ## ~~~~ COERCIONS FROM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-..unpack <- function(from) unpack(from)
-setAs("dppMatrix", "dpoMatrix", ..unpack)
-setAs("dppMatrix", "dsyMatrix", ..unpack)
-rm(..unpack)
+setAs("dppMatrix", "dpoMatrix", function(from) unpack(from))
 
-## MJ: no longer needed ... prefer variant above going via unpack()
+## MJ: no longer needed
 if(FALSE) {
 setAs("dppMatrix", "dpoMatrix",
       function(from) {
