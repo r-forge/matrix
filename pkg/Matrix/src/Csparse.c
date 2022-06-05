@@ -578,11 +578,11 @@ SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans, SEXP bool_arith)
     cholmod_free_sparse(&chTr, &c);
 
     /* Preserve triangularity and unit-triangularity if appropriate;
-     * see Csparse_Csparse_prod() for comments */
+     * see Csparse_Csparse_prod() for more comments */
     if(R_check_class_etc(a, valid_tri) >= 0 &&
        R_check_class_etc(b, valid_tri) >= 0)
 	if(*uplo_P(a) != *uplo_P(b)) { /* one 'U', the other 'L' */
-	    uploT = (*uplo_P(b) == 'U') ? 1 : -1;
+	    uploT = (*uplo_P(b) == (tr ? 'L' : 'U')) ? 1 : -1;
 	    if(*diag_P(a) == 'U' && *diag_P(b) == 'U') { /* return UNIT-triag. */
 		chm_diagN2U(chc, uploT, /* do_realloc */ FALSE);
 		diag[0]= 'U';
