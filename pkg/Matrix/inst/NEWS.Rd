@@ -97,6 +97,9 @@
       \item \code{forceSymmetric(<RsparseMatrix>)} is now more
       efficient, returning a symmetric \code{RsparseMatrix} without
       a \dQuote{true} coercion to \code{CsparseMatrix}.
+
+      \item \code{tcrossprod(a,b)} for unitriangular sparse
+      matrices now works correctly.
     }
   }
   \subsection{New Features}{

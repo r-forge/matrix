@@ -129,19 +129,23 @@ dimnames(m0.)[1] <- list(NULL); m0.
 dimnames(m.0)[2] <- list(NULL); m.0
 d <- diag(3); dimnames(d) <- list(c("u","v","w"), c("X","Y","Z")); d
 dU <- diagN2U(Matrix(d)) # unitriangular sparse
+tU <- dU; tU[1,2:3] <- 3:4; tU[2,3] <- 7; tU # ditto  "unitri" sparse
 (T <- new("dtrMatrix", diag = "U", x= c(0,0,5,0), Dim= c(2L,2L),
           Dimnames= list(paste0("r",1:2),paste0("C",1:2)))) # unitriangular dense
-##                                                                   ^^^^^^^^^^^^
+##                                                            ^^^^^^^^^^^^
 ## currently many warnings about sub-optimal matrix products :
 chkDnProd(m..)
 chkDnProd(m0.)
 chkDnProd(m.0)
 chkDnProd(m00)
-## chkDnProd(M =   T) # FIXME
-## chkDnProd(M = t(T)) # FIXME
+chkDnProd(M =   T)
+chkDnProd(M = t(T))
 chkDnProd(M =   dU)
 chkDnProd(M = t(dU))
 ## all the above failed in 1.2-0 and 1.1-5, 1.1-4 some even earlier
+chkDnProd(M = tU)
+chkDnProd(M = t(tU))
+## the two above failed in R <= 1.4-1
 chkDnProd(M = Diagonal(4))
 chkDnProd(diag(x=3:1))
 chkDnProd(d)
