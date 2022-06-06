@@ -38,6 +38,7 @@
 \alias{coerce,ngRMatrix,dgRMatrix-method}
 \alias{coerce,ngRMatrix,lgRMatrix-method}
 \alias{coerce,ngRMatrix,nsRMatrix-method}
+\alias{coerce,ngRMatrix,ntRMatrix-method}
 \alias{coerce,numLike,ngRMatrix-method}
 % ngT
 \alias{coerce,matrix,ngTMatrix-method}
@@ -50,7 +51,6 @@
 \alias{coerce,ngTMatrix,ngeMatrix-method}
 \alias{coerce,ngTMatrix,nsTMatrix-method}
 \alias{coerce,ngTMatrix,ntTMatrix-method}
-\alias{coerce,ngTMatrix,triangularMatrix-method}
 \alias{coerce,numLike,ngTMatrix-method}
 \alias{coerce<-,ngTMatrix,generalMatrix-method}
 \alias{which,ngTMatrix-method}
@@ -90,12 +90,14 @@
 \alias{coerce,nsCMatrix,ngCMatrix-method}
 \alias{coerce,nsCMatrix,nsRMatrix-method}
 \alias{coerce,nsCMatrix,nsTMatrix-method}
+\alias{coerce,nsCMatrix,ntCMatrix-method}
 % nsR
 \alias{coerce,matrix,nsRMatrix-method}
 \alias{coerce,nsRMatrix,CsparseMatrix-method}
 \alias{coerce,nsRMatrix,dsRMatrix-method}
 \alias{coerce,nsRMatrix,lsRMatrix-method}
 \alias{coerce,nsRMatrix,nsCMatrix-method}
+\alias{coerce,nsRMatrix,ntRMatrix-method}
 % nsT
 \alias{coerce,matrix,nsTMatrix-method}
 \alias{coerce,nsTMatrix,dsTMatrix-method}
@@ -105,6 +107,7 @@
 \alias{coerce,nsTMatrix,ngTMatrix-method}
 \alias{coerce,nsTMatrix,nsCMatrix-method}
 \alias{coerce,nsTMatrix,nsyMatrix-method}
+\alias{coerce,nsTMatrix,ntTMatrix-method}
 \alias{t,nsTMatrix-method}
 \alias{which,nsTMatrix-method}
 %

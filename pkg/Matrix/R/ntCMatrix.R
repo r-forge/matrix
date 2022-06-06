@@ -28,11 +28,11 @@ setAs("ntCMatrix", "dtCMatrix", .nC2d)
 setAs("ntCMatrix", "lMatrix", .nC2l)
 setAs("ntCMatrix", "lsparseMatrix", .nC2l)
 setAs("ntCMatrix", "ltCMatrix", .nC2l)
-} ## MJ
 
 setAs("ngCMatrix", "ntCMatrix", # to triangular, needed for triu,..
       function(from) as(as(as(from, "TsparseMatrix"),
                            "ntTMatrix"), "ntCMatrix"))
+} ## MJ
 
 ## setMethod("t", signature(x = "ntCMatrix"),
 ##           function(x) .Call(ntCMatrix_trans, x),

@@ -26,11 +26,10 @@ setAs("ltCMatrix", "dMatrix", # < instead of "dtCMatrix"
                          x = as.double(from@x), uplo = from@uplo,
                          diag = from@diag,
                          Dim = from@Dim, Dimnames = from@Dimnames))
-} ## MJ
 
 setAs("lgCMatrix", "ltCMatrix", # to triangular {needed in triu() }
       function(from) as(as(as(from, "lgTMatrix"), "ltTMatrix"), "ltCMatrix"))
-
+} ## MJ
 
 ## setAs("ltCMatrix", "generalMatrix",
 ##       function(from) ......)

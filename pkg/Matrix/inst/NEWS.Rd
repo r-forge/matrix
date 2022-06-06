@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-06-04 r3488)}{
+\section{Changes in version 1.4-2 (2022-06-07 r3490)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -166,16 +166,18 @@
       \item New C-level utilities \code{R_dense_as_kind()},
       \code{R_sparse_as_kind()} and \code{R_diagonal_as_sparse()}
       for efficient coercion to classes of a given \dQuote{kind}.
-      \code{R_diagonal_as_sparse()} is even more general,
-      also supporting coercion from \code{diagonalMatrix} to any
-      \code{[CRT]sparseMatrix}.
+      \code{R_dense_as_sparse()} and \code{R_diagonal_as_sparse()}
+      are even more general, supporting coercion from
+      \code{denseMatrix} and \code{diagonalMatrix}
+      to any \code{[CRT]sparseMatrix}.
 
-      \item \code{band(x, k1, k2)} is optimized further for dense
-      \code{x}, returning \code{triangularMatrix},
+      \item \code{band(x, k1, k2)} is optimized further for both
+      dense and sparse \code{x}, returning \code{triangularMatrix},
       \code{symmetricMatrix}, and \code{packedMatrix} in more cases.
-      In the past, the result was always general or triangular
-      and always unpacked.
 
+      \item \code{band()} is now implemented also for
+      \code{diagonalMatrix} (only \code{tri[ul]()} worked before).
+      
       \item \code{.ge}, \code{.t[rp]}, and \code{.s[yp]} can now be
       coerced directly to \code{.g[CRT]}, \code{.t[CRT]}, and
       \code{.s[CRT]}, respectively, without intermediate coercions.
@@ -183,10 +185,6 @@
       \code{.[gts][CRT]}.
 
       \item \code{.tC.2.R()} and \code{.tR.2.C()} are now done in C,
-      for speed.
-
-      \item All cases of \code{as(<[CRT]sparseMatrix>, "[dln]Matrix")}
-      now go through new C-level utility, \code{R_sparse_as_kind()},
       for speed.
     }
   }
@@ -230,9 +228,11 @@
       by allowing, e.g., \code{list(NULL, nms)},
       but not, e.g., \code{list(A = NULL, B = nms)}.
 
-      \item Coercions to \code{symmetricMatrix} are now inherited
-      from \code{Matrix}, whose method calls \code{forceSymmetric()}
-      if \code{isSymmetric()} returns \code{TRUE}.
+      \item Coercions to \code{triangularMatrix} and
+      \code{symmetricMatrix} are now almost all inherited from
+      \code{Matrix}, whose methods simply call \code{tri[ul]()}
+      and \code{forceSymmetric()} if \code{isTriangular()} and
+      \code{isSymmetric()}, respectively, return \code{TRUE}.
 
       \item Many of the exported \code{.*2*} utilities have been
       redefined as aliases or wrappers of new, more general

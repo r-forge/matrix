@@ -11,15 +11,15 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
     if ((kind = asChar(kind)) == NA_STRING || (k = *CHAR(kind)) == '\0')
 	error(_("invalid 'kind' to 'R_sparse_as_kind()'"));
     static const char *valid[] = {
-	"dgCMatrix", "dsCMatrix", "dtCMatrix",
-	"dgRMatrix", "dsRMatrix", "dtRMatrix",
-	"dgTMatrix", "dsTMatrix", "dtTMatrix",
-	"lgCMatrix", "lsCMatrix", "ltCMatrix",
-	"lgRMatrix", "lsRMatrix", "ltRMatrix",
-	"lgTMatrix", "lsTMatrix", "ltTMatrix",
-	"ngCMatrix", "nsCMatrix", "ntCMatrix",
-	"ngRMatrix", "nsRMatrix", "ntRMatrix",
-	"ngTMatrix", "nsTMatrix", "ntTMatrix", ""};
+	"dgCMatrix", "dtCMatrix", "dsCMatrix",
+	"dgRMatrix", "dtRMatrix", "dsRMatrix",
+	"dgTMatrix", "dtTMatrix", "dsTMatrix",
+	"lgCMatrix", "ltCMatrix", "lsCMatrix",
+	"lgRMatrix", "ltRMatrix", "lsRMatrix",
+	"lgTMatrix", "ltTMatrix", "lsTMatrix",
+	"ngCMatrix", "ntCMatrix", "nsCMatrix",
+	"ngRMatrix", "ntRMatrix", "nsRMatrix",
+	"ngTMatrix", "ntTMatrix", "nsTMatrix", ""};
     int ivalid = R_check_class_etc(from, valid);
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(class_P(from), "R_sparse_as_kind");
@@ -112,14 +112,14 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
 /* as(<diagonalMatrix>, ".(di|[gst][CRT])Matrix") */
 SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 {
-    const char *c;
-    char c0, c1, c2, ul;
+    const char *zzz;
+    char z0, z1, z2, ul;
     if ((code = asChar(code)) == NA_STRING ||
-	(c0 = (c = CHAR(code))[0]) == '\0' ||
-	(c1 = c[1]) == '\0' ||
-	(c2 = c[2]) == '\0')
+	(z0 = (zzz = CHAR(code))[0]) == '\0' ||
+	(z1 = zzz[1]) == '\0' ||
+	(z2 = zzz[2]) == '\0')
 	error(_("invalid 'code' to 'R_diagonal_as_sparse()'"));
-    if ((c1 == 't' || c1 == 's') &&
+    if ((z1 == 't' || z1 == 's') &&
 	(((uplo = asChar(uplo)) == NA_STRING || (ul = *CHAR(uplo)) == '\0')))
 	error(_("invalid 'uplo' to 'R_diagonal_as_sparse()'"));
     
@@ -129,16 +129,16 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 	ERROR_INVALID_CLASS(class_P(from), "R_diagonal_as_sparse");
 
     const char *clf = valid[ivalid];
-    if (c0 == '.')
-	c0 = clf[0];
-    if (c0 == clf[0] && c1 == clf[1] && c2 == clf[2])
+    if (z0 == '.')
+	z0 = clf[0];
+    if (z0 == clf[0] && z1 == clf[1] && z2 == clf[2])
 	return from;
     
-    SEXPTYPE tx = kind2type(c0); /* validating 'c0' before doing more */
+    SEXPTYPE tx = kind2type(z0); /* validating 'z0' before doing more */
     char clt[] = "...Matrix";
-    clt[0] = c0;
-    clt[1] = c1;
-    clt[2] = c2;
+    clt[0] = z0;
+    clt[1] = z1;
+    clt[2] = z2;
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
 	dim = GET_SLOT(from, Matrix_DimSym),
 	dimnames = GET_SLOT(from, Matrix_DimNamesSym),
@@ -146,16 +146,16 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
     char di = *CHAR(STRING_ELT(diag, 0));
 
     SET_SLOT(to, Matrix_DimSym, dim);
-    if (c1 == 's')
+    if (z1 == 's')
 	set_symmetrized_DimNames(to, dimnames, -1);
     else
 	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-    if (c1 == 'd' || c1 == 't')
+    if (z1 == 'd' || z1 == 't')
 	SET_SLOT(to, Matrix_diagSym, diag);
 
     /* Be fast when coercing between subclasses of diagonalMatrix ... */
 
-    if (c1 == 'd') {
+    if (z1 == 'd') {
 	SET_SLOT(to, Matrix_xSym,
 		 (di != 'N'
 		  ? allocVector(tx, 0)
@@ -166,7 +166,7 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 
     /* Now coercing from diagonalMatrix to [CRT]sparseMatrix ... */
     
-    if (c1 == 't' || c1 == 's')
+    if (z1 == 't' || z1 == 's')
 	SET_SLOT(to, Matrix_uploSym, mkString((ul == 'U') ? "U" : "L"));
 
     SEXP p, i, x;
@@ -175,28 +175,33 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
     
     if (di != 'N') { /* unit diagonal */
 	
-	if (c2 != 'T') {
-	    PROTECT(p = allocVector(INTSXP, n1a)); ++nprotect;
+	if (z2 != 'T') {
+	    PROTECT(p = allocVector(INTSXP, n1a));
+	    ++nprotect;
 	    int *pp = INTEGER(p);
-	    if (c1 == 't')
+	    if (z1 == 't')
 		Memzero(pp, n1a);
 	    else
 		for (k = 0; k <= n; ++k)
 		    *(pp++) = k;
 	}
-	if (c1 == 't') {
-	    PROTECT(i = allocVector(INTSXP, 0)); ++nprotect;
-	    if (c0 != 'n') {
-		PROTECT(x = allocVector(tx, 0)); ++nprotect;
+	if (z1 == 't') {
+	    PROTECT(i = allocVector(INTSXP, 0));
+	    ++nprotect;
+	    if (z0 != 'n') {
+		PROTECT(x = allocVector(tx, 0));
+		++nprotect;
 	    }
 	} else {
-	    PROTECT(i = allocVector(INTSXP, n)); ++nprotect;
+	    PROTECT(i = allocVector(INTSXP, n));
+	    ++nprotect;
 	    int *pi = INTEGER(i);
-	    if (c0 == 'n') {
+	    if (z0 == 'n') {
 		for (k = 0; k < n; ++k)
 		    *(pi++) = k;
 	    } else {
-		PROTECT(x = allocVector(tx, n)); ++nprotect;
+		PROTECT(x = allocVector(tx, n));
+		++nprotect;
 
 #undef SET_ONES
 #define SET_ONES(_X_, _I_, _N_, _CTYPE_, _PTR_, _ONE_)		\
@@ -219,30 +224,34 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
     } else { /* non-unit diagonal */
 	
 	if (TYPEOF(x = GET_SLOT(from, Matrix_xSym)) != tx) {
-	    PROTECT(x = coerceVector(x, tx)); ++nprotect;
+	    PROTECT(x = coerceVector(x, tx));
+	    ++nprotect;
 	}
 	    
-	if (c0 == 'n' || asLogical(drop0) != 0) { /* _do_ drop zeros (if any) */
+	if (z0 == 'n' || asLogical(drop0) != 0) { /* _do_ drop zeros (if any) */
 	    
 	    int nnz = 0;
 	    
 #define DROP0_DIAGONAL(_CTYPE_, _PTR_, _NZ_)				\
 	    do {							\
 		_CTYPE_ *px = _PTR_(x);					\
-		if (c2 == 'T') {					\
+		if (z2 == 'T') {					\
 		    for (k = 0; k < n; ++k)				\
 			if (_NZ_(px[k]))				\
 			    ++nnz;					\
 		} else {						\
-		    PROTECT(p = allocVector(INTSXP, n1a)); ++nprotect;	\
+		    PROTECT(p = allocVector(INTSXP, n1a));		\
+		    ++nprotect;						\
 		    int *pp = INTEGER(p);				\
 		    *(pp++) = 0;					\
 		    for (k = 0; k < n; ++k)				\
 			*(pp++) = (_NZ_(px[k])) ? ++nnz : nnz;		\
 		}							\
-		PROTECT(i = allocVector(INTSXP, nnz)); ++nprotect;	\
-		if (nnz != n && c0 != 'n') {				\
-		    PROTECT(x = allocVector(tx, nnz)); ++nprotect;	\
+		PROTECT(i = allocVector(INTSXP, nnz));			\
+		++nprotect;						\
+		if (nnz != n && z0 != 'n') {				\
+		    PROTECT(x = allocVector(tx, nnz));			\
+		    ++nprotect;						\
 		}							\
 		if (nnz == 0)						\
 		    continue;						\
@@ -250,7 +259,7 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 		if (nnz == n) {						\
 		    for (k = 0; k < n; ++k)				\
 			*(pi++) = k;					\
-		} else if (c0 == 'n') {					\
+		} else if (z0 == 'n') {					\
 		    for (k = 0; k < n; ++k)				\
 			if (_NZ_(px[k]))				\
 			    *(pi++) = k;				\
@@ -289,10 +298,12 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 	    
 	} else { /* _don't_ drop zeros */
 	    
-	    PROTECT(i = allocVector(INTSXP, n)); ++nprotect;
+	    PROTECT(i = allocVector(INTSXP, n));
+	    ++nprotect;
 	    int *pi = INTEGER(i);
-	    if (c2 == 'T') {
-		PROTECT(p = allocVector(INTSXP, n1a)); ++nprotect;
+	    if (z2 == 'T') {
+		PROTECT(p = allocVector(INTSXP, n1a));
+		++nprotect;
 		int *pp = INTEGER(p);
 		*(pp++) = 0;
 		for (k = 0; k < n; ++k)
@@ -305,13 +316,13 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 	}
     }
 
-    if (c2 != 'T')
+    if (z2 != 'T')
 	SET_SLOT(to, Matrix_pSym, p);
-    if (c2 != 'R')
+    if (z2 != 'R')
 	SET_SLOT(to, Matrix_iSym, i);
-    if (c2 != 'C')
+    if (z2 != 'C')
 	SET_SLOT(to, Matrix_jSym, i);
-    if (c0 != 'n')
+    if (z0 != 'n')
 	SET_SLOT(to, Matrix_xSym, x);
     UNPROTECT(nprotect);
     return to;
@@ -323,7 +334,7 @@ SEXP Csparse_drop0(SEXP from)
 #define DROP0_START_INIT			\
     SEXP x0 = GET_SLOT(from, Matrix_xSym);	\
     SEXPTYPE tx = TYPEOF(x0);			\
-    int nx = LENGTH(x0), i, nnz = 0, nnz_;
+    int k, nx = LENGTH(x0), nnz = 0, nnz_;
 
     DROP0_START_INIT;
     
@@ -331,12 +342,13 @@ SEXP Csparse_drop0(SEXP from)
     do {							\
 	_CTYPE_ *px0 = _PTR_(x0);				\
 	while (nnz < nx && _NZ_(*px0)) {			\
-	    ++nnz; ++px0;					\
+	    ++nnz;						\
+	    ++px0;						\
 	}							\
 	if (nnz == nx)						\
 	    return from;					\
 	nnz_ = nnz;						\
-	for (i = nnz_; i < nx; ++i, ++px0)			\
+	for (k = nnz_; k < nx; ++k, ++px0)			\
 	    if (_NZ_(*px0))					\
 		++nnz;						\
     } while (0)
@@ -344,14 +356,14 @@ SEXP Csparse_drop0(SEXP from)
     DROP0_CASES(tx, DROP0_START);
 
 #define DROP0_END_INIT(_ISYM_)						\
-    R_xlen_t ncol1a, col1a;						\
+    R_xlen_t n1a;							\
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(class_P(from))),		\
 	p0 = GET_SLOT(from, Matrix_pSym),				\
 	i0 = GET_SLOT(from, _ISYM_),					\
-	p1 = PROTECT(allocVector(INTSXP, ncol1a = XLENGTH(p0))),	\
+	p1 = PROTECT(allocVector(INTSXP, n1a = XLENGTH(p0))),		\
 	i1 = PROTECT(allocVector(INTSXP, nnz)),				\
 	x1 = PROTECT(allocVector(tx, nnz));				\
-    int s, t,								\
+    int j, kend, n = (int) (n1a - 1),					\
 	*pp0 = INTEGER(p0),						\
 	*pi0 = INTEGER(i0),						\
 	*pp1 = INTEGER(p1),						\
@@ -364,28 +376,28 @@ SEXP Csparse_drop0(SEXP from)
 	_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 	Memcpy(pi1, pi0, nnz_);				\
 	Memcpy(px1, px0, nnz_);				\
-	col1a = 0;					\
-	while ((s = pp0[col1a]) <= nnz_)		\
-	    pp1[col1a++] = s;				\
-	for (i = nnz_; i < s; ++i) {			\
-	    if (_NZ_(px0[i])) {				\
-		pi1[nnz_] = pi0[i];			\
-		px1[nnz_] = px0[i];			\
+	j = 0;						\
+	while ((kend = pp0[j]) <= nnz_)			\
+	    pp1[j++] = kend;				\
+	for (k = nnz_; k < kend; ++k) {			\
+	    if (_NZ_(px0[k])) {				\
+		pi1[nnz_] = pi0[k];			\
+		px1[nnz_] = px0[k];			\
 		++nnz_;					\
 	    }						\
 	}						\
-	pp1[col1a] = nnz_;				\
-	while (++col1a < ncol1a) {			\
-	    t = pp0[col1a];				\
-	    for (i = s; i < t; ++i) {			\
-		if (_NZ_(px0[i])) {			\
-		    pi1[nnz_] = pi0[i];			\
-		    px1[nnz_] = px0[i];			\
+	pp1[j] = nnz_;					\
+	while (++j <= n) {				\
+	    kend = pp0[j];				\
+	    while (k < kend) {				\
+		if (_NZ_(px0[k])) {			\
+		    pi1[nnz_] = pi0[k];			\
+		    px1[nnz_] = px0[k];			\
 		    ++nnz_;				\
 		}					\
+		++k;					\
 	    }						\
-	    pp1[col1a] = nnz_;				\
-	    s = t;					\
+	    pp1[j] = nnz_;				\
 	}						\
     } while (0)
     
@@ -454,11 +466,11 @@ SEXP Tsparse_drop0(SEXP from)
 	Memcpy(pi1, pi0, nnz_);					\
 	Memcpy(pj1, pj0, nnz_);					\
 	Memcpy(px1, px0, nnz_);					\
-	for (i = nnz_; i < nx; ++i) {				\
-	    if (_NZ_(px0[i])) {					\
-		pi1[nnz_] = pi0[i];				\
-		pj1[nnz_] = pj0[i];				\
-		px1[nnz_] = px0[i];				\
+	for (k = nnz_; k < nx; ++k) {				\
+	    if (_NZ_(px0[k])) {					\
+		pi1[nnz_] = pi0[k];				\
+		pj1[nnz_] = pj0[k];				\
+		px1[nnz_] = px0[k];				\
 		++nnz_;						\
 	    }							\
 	}							\
@@ -527,3 +539,310 @@ TCR_AS_RC(C, R, i, j, 'R')
 TCR_AS_RC(R, C, j, i, 'C')
 
 #undef TCR_AS_RC
+
+/* band(<sparseMatrix>, k1, k2), tri[ul](<sparseMatrix>, k) */
+/* NB: argument validation more or less copied from R_dense_band() */
+SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
+{
+    static const char *valid[] = {
+	"dgCMatrix", "dtCMatrix", "dsCMatrix",
+	"dgRMatrix", "dtRMatrix", "dsRMatrix",
+	"dgTMatrix", "dtTMatrix", "dsTMatrix",
+	"lgCMatrix", "ltCMatrix", "lsCMatrix",
+	"lgRMatrix", "ltRMatrix", "lsRMatrix",
+	"lgTMatrix", "ltTMatrix", "lsTMatrix",
+	"ngCMatrix", "ntCMatrix", "nsCMatrix",
+	"ngRMatrix", "ntRMatrix", "nsRMatrix",
+	"ngTMatrix", "ntTMatrix", "nsTMatrix", ""};
+    int ivalid = R_check_class_etc(from, valid);
+    if (ivalid < 0)
+	ERROR_INVALID_CLASS(class_P(from), "R_sparse_band");
+    const char *clf = valid[ivalid];
+    
+    SEXP dim = GET_SLOT(from, Matrix_DimSym);
+    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], a, b;
+    if (isNull(k1))
+	a = (m > 0) ? 1 - m : 0;
+    else if ((a = asInteger(k1)) == NA_INTEGER || a < -m || a > n)
+	error(_("'k1' must be an integer from -Dim[1] to Dim[2]"));
+    if (isNull(k2))
+	b = (n > 0) ? n - 1 : 0;
+    else if ((b = asInteger(k2)) == NA_INTEGER || b < -m || b > n)
+	error(_("'k2' must be an integer from -Dim[1] to Dim[2]"));
+    else if (b < a)
+	error(_("'k1' must be less than or equal to 'k2'"));
+    /* Need tri[ul](<0-by-0>) and tri[ul](<1-by-1>) to be triangularMatrix */
+    if (a <= 1 - m && b >= n - 1 && (clf[1] == 't' || m != n || m > 1 || n > 1))
+	return from;
+
+    char ulf = 'U', ult = 'U', di = 'N';
+    if (clf[1] != 'g') {
+	ulf = *uplo_P(from);
+	if (clf[1] == 't') {
+	    /* Be fast if band contains entire triangle */
+	    if ((ulf == 'U') ? (a <= 0 && b >= n - 1) : (b >= 0 && a <= 1 - m))
+		return from;
+	    if (a <= 0 && b >= 0)
+		di = *diag_P(from);
+	}
+    }
+
+    char *clt = strdup(clf);
+    int ge = 0, tr = 0, sy = 0, nprotect = 0;
+    ge = m != n || (!(tr = a >= 0 || b <= 0 || clf[1] == 't') &&
+		    !(sy = a == -b && clf[1] == 's'));   
+    clt[1] = (ge) ? 'g' : ((tr) ? 't' : 's');
+
+    /* band(<R>, a, b) is equivalent to t(band(t(<R>), -b, -a)) ! */
+    if (clf[2] == 'R') {
+	int tmp;
+	tmp = m; m =  n; n =  tmp;
+	tmp = a; a = -b; b = -tmp;
+	ulf = (ulf == 'U') ? 'L' : 'U';
+	clt[2] = 'C';
+	PROTECT(from = tRsparse_as_Csparse(from));
+	++nprotect;
+	if (m != n)
+	    dim = GET_SLOT(from, Matrix_DimSym);
+    }
+
+    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
+	dimnames = GET_SLOT(from, Matrix_DimNamesSym);
+    ++nprotect;
+    free(clt);
+
+    SET_SLOT(to, Matrix_DimSym, dim);
+    if (!sy && clf[1] == 's')
+	set_symmetrized_DimNames(to, dimnames, -1);
+    else
+	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+
+    if (!ge) {
+	if (sy || clf[1] == 't') {
+	    /* We can tighten the band ... but does it help?? FIXME */
+	    if (ulf == 'U') {
+		if (b >= 0 && a < 0)
+		    a = 0;
+	    } else {
+		if (a <= 0 && b > 0)
+		    b = 0;
+	    }
+	}
+	
+	ult = (tr && clf[1] != 't') ? ((a >= 0) ? 'U' : 'L') : ulf;
+	if (ult != 'U')
+	    SET_SLOT(to, Matrix_uploSym, mkString("L"));
+	if (di != 'N')
+	    SET_SLOT(to, Matrix_diagSym, mkString("U"));
+    }
+
+    /* It remains to set some subset of 'p', 'i', 'j', 'x' ... */
+    
+    SEXP p0, p1, i0, j0, x0;
+    int *pp0, *pp1, *pi0, *pj0, nnz0, nnz1, d, j, k, kend;
+
+    i0 = GET_SLOT(from, Matrix_iSym);
+    pi0 = INTEGER(i0);
+    if (clf[2] == 'T') {
+	j0 = GET_SLOT(from, Matrix_jSym);
+	pj0 = INTEGER(j0);
+    } else {
+	p0 = GET_SLOT(from, Matrix_pSym);
+	pp0 = INTEGER(p0) + 1;
+    }
+    if (clf[0] != 'n')
+	x0 = GET_SLOT(from, Matrix_xSym);    
+    nnz0 = LENGTH(i0);
+    nnz1 = 0;
+
+    /* Count number of nonzero elements in band */
+    if (clf[2] == 'T') {
+
+	if (!sy && clf[1] == 's') {
+	    for (k = 0; k < nnz0; ++k) {
+		if ((d = pj0[k] - pi0[k]) >= a && d <= b)
+		    ++nnz1;
+		if (d != 0 && -d >= a && -d <= b)
+		    ++nnz1;
+	    }
+	} else {
+	    for (k = 0; k < nnz0; ++k) {
+		if ((d = pj0[k] - pi0[k]) >= a && d <= b)
+		    ++nnz1;
+	    }
+	}
+
+    } else {
+
+	PROTECT(p1 = allocVector(INTSXP, (R_xlen_t) n + 1));
+	++nprotect;
+	SET_SLOT(to, Matrix_pSym, p1);
+	pp1 = INTEGER(p1);
+	*(pp1++) = 0;
+	k = 0;
+	
+	if (!sy && clf[1] == 's') {
+	    Memzero(pp1, n);
+	    for (j = 0; j < n; ++j) {
+		kend = pp0[j];
+		while (k < kend) {
+		    if ((d = j - pi0[k]) >= a && d <= b)
+			++pp1[j];
+		    if (d != 0 && -d >= a && -d <= b)
+			++pp1[pi0[k]];
+		    ++k;
+		}
+	    }
+	    for (j = 0; j < n; ++j) {
+		nnz1 += pp1[j];
+		pp1[j] = nnz1;
+	    }
+	} else {
+	    for (j = 0; j < n; ++j) {
+		kend = pp0[j];
+		while (k < kend) {
+		    if ((d = j - pi0[k]) >= a && d <= b)
+			++nnz1;
+		    ++k;
+		}
+		pp1[j] = nnz1;
+	    }
+	}
+	
+    }
+
+    /* Be fast if band contains all nonzero elements */
+    if (nnz1 == nnz0 && (sy || clf[1] != 's')) {
+	SET_SLOT(to, Matrix_iSym, i0);
+	if (clf[2] == 'T')
+	    SET_SLOT(to, Matrix_jSym, j0);
+	if (clf[0] != 'n')
+	    SET_SLOT(to, Matrix_xSym, x0);	
+	if (clf[2] == 'R')
+	    to = tCsparse_as_Rsparse(to);
+	UNPROTECT(nprotect);
+	return to;
+    }
+
+    SEXP i1, j1, x1;
+    int *pi1, *pj1;
+    
+    PROTECT(i1 = allocVector(INTSXP, nnz1));
+    ++nprotect;
+    SET_SLOT(to, Matrix_iSym, i1);
+    pi1 = INTEGER(i1);
+    if (clf[2] == 'T') {
+	PROTECT(j1 = allocVector(INTSXP, nnz1));
+	++nprotect;
+	SET_SLOT(to, Matrix_jSym, j1);
+	pj1 = INTEGER(j1);	
+    }
+    if (clf[0] != 'n') {
+	PROTECT(x1 = allocVector(TYPEOF(x0), nnz1));
+	++nprotect;
+	SET_SLOT(to, Matrix_xSym, x1);
+    }
+
+#define SPARSE_MAKE_BANDED(_XSET0_, _XSET1_, _XSET2_)			\
+    do {								\
+	if (clf[2] == 'T') {						\
+	    if (!sy && clf[1] == 's') {					\
+		for (k = 0; k < nnz0; ++k) {				\
+		    if ((d = pj0[k] - pi0[k]) >= a && d <= b) {		\
+			*(pi1++) = pi0[k];				\
+			*(pj1++) = pj0[k];				\
+			_XSET0_; /* *(px1++) = px0[k]; */		\
+		    }							\
+		    if (d != 0 && -d >= a && -d <= b) {			\
+			*(pi1++) = pj0[k];				\
+			*(pj1++) = pi0[k];				\
+			_XSET0_; /* *(px1++) = px0[k]; */		\
+		    }							\
+		}							\
+	    } else {							\
+		for (k = 0; k < nnz0; ++k) {				\
+		    if ((d = pj0[k] - pi0[k]) >= a && d <= b) {		\
+			*(pi1++) = pi0[k];				\
+			*(pj1++) = pj0[k];				\
+			_XSET0_; /* *(px1++) = px0[k]; */		\
+		    }							\
+		}							\
+	    }								\
+	} else {							\
+	    k = 0;							\
+	    if (!sy && clf[1] == 's') {					\
+		int *pp1_;						\
+		Calloc_or_Alloca_TO(pp1_, n, int);			\
+		Memcpy(pp1_, pp1 - 1, n);				\
+		for (j = 0; j < n; ++j) {				\
+		    kend = pp0[j];					\
+		    while (k < kend) {					\
+			if ((d = j - pi0[k]) >= a && d <= b) {		\
+			    pi1[pp1_[j]] = pi0[k];			\
+			    _XSET1_; /* px1[pp1_[j]] = px0[k]; */	\
+			    ++pp1_[j];					\
+			}						\
+			if (d != 0 && -d >= a && -d <= b) {		\
+			    pi1[pp1_[pi0[k]]] = j;			\
+			    _XSET2_; /* px1[pp1_[pi0[k]]] = px0[k]; */	\
+			    ++pp1_[pi0[k]];				\
+			}						\
+			++k;						\
+		    }							\
+		}							\
+		Free_FROM(pp1_, n);					\
+	    } else {							\
+		for (j = 0; j < n; ++j) {				\
+		    kend = pp0[j];					\
+		    while (k < kend) {					\
+			if ((d = j - pi0[k]) >= a && d <= b) {		\
+			    *(pi1++) = pi0[k];				\
+			    _XSET0_; /* *(px1++) = px0[k]; */		\
+			}						\
+			++k;						\
+		    }							\
+		}							\
+	    }								\
+									\
+	}								\
+    } while (0)
+
+#define SPARSE_MAKE_BANDED_X(_CTYPE_, _PTR_)		\
+    do {						\
+	_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
+	SPARSE_MAKE_BANDED(*(px1++) = px0[k],		\
+			   px1[pp1_[j]] = px0[k],	\
+			   px1[pp1_[pi0[k]]] = px0[k]);	\
+    } while (0)
+
+#define SPARSE_MAKE_BANDED_N SPARSE_MAKE_BANDED(, , )
+
+    switch (clf[0]) {
+    case 'd':
+	SPARSE_MAKE_BANDED_X(double, REAL);
+	break;
+    case 'l':
+	SPARSE_MAKE_BANDED_X(int, LOGICAL);
+	break;
+    case 'n':
+	SPARSE_MAKE_BANDED_N;
+	break;
+    case 'i':
+	SPARSE_MAKE_BANDED_X(int, INTEGER);
+	break;
+    case 'z':
+    	SPARSE_MAKE_BANDED_X(Rcomplex, COMPLEX);
+	break;
+    default:
+	break;
+    }
+
+#undef SPARSE_MAKE_BANDED_X
+#undef SPARSE_MAKE_BANDED_N
+#undef SPARSE_MAKE_BANDED
+    
+    if (clf[2] == 'R')
+	to = tCsparse_as_Rsparse(to);
+    UNPROTECT(nprotect);
+    return to;
+}

@@ -10,8 +10,9 @@ setAs("dsTMatrix", "dgTMatrix",
 ## MJ: no longer needed ... replacement in ./sparseMatrix.R
 if(FALSE) {
 setAs("dsTMatrix", "lsTMatrix",
-      function(from) new("lsTMatrix", i = from@i, j = from@j, uplo = from@uplo,
-                         Dim = from@Dim, Dimnames = from@Dimnames))
+      function(from) new("lsTMatrix", x = as.logical(from@x),
+                         Dim = from@Dim, Dimnames = from@Dimnames,
+                         uplo = from@uplo, i = from@i, j = from@j))
 } ## MJ
 
 ## Conversion <--> dense storage is via dsyMatrix :

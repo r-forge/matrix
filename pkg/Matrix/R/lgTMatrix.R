@@ -41,15 +41,15 @@ setAs("lgTMatrix", "dgTMatrix",
           x = as.double(from@x),
           ## cannot copy factors, but can we use them?
           Dim = from@Dim, Dimnames= from@Dimnames))
-} ## MJ
 
-setAs("lgTMatrix", "triangularMatrix",
-      function(from) check.gT2tT(from, toClass = "ltTMatrix", do.n=FALSE))
 setAs("lgTMatrix", "ltTMatrix",
       function(from) check.gT2tT(from, toClass = "ltTMatrix", do.n=FALSE))
+} ## MJ
 
-## MJ: no longer needed ... method now inherited from Matrix
+## MJ: no longer needed ... methods now inherited from Matrix
 if(FALSE) {
+setAs("lgTMatrix", "triangularMatrix",
+      function(from) check.gT2tT(from, toClass = "ltTMatrix", do.n=FALSE))
 ## Favor coercion to superclasses: here "symmetricMatrix" not "lsTMatrix"
 setAs("lgTMatrix", "symmetricMatrix",
       function(from) check.gT2sT(from, toClass = "lsTMatrix", do.n=FALSE))

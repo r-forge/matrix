@@ -37,15 +37,18 @@ setAs("dgTMatrix", "dtCMatrix",
 	  .Call(Tsparse_to_tCsparse, from, uplo, "N")
       })
 
+## MJ no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("dgTMatrix", "dtTMatrix",
       function(from) check.gT2tT(from, toClass = "dtTMatrix", do.n=FALSE))
-setAs("dgTMatrix", "triangularMatrix",
-      function(from) check.gT2tT(from, toClass = "dtTMatrix", do.n=FALSE))
-
-## MJ: no longer needed ... prefer forceSymmetricTsparse(), ..M2symm()
-if(FALSE) {
 setAs("dgTMatrix", "dsTMatrix",
       function(from) check.gT2sT(from, toClass = "dsTMatrix", do.n=FALSE))
+} ## MJ
+
+## MJ: no longer needed ... methods now inherited from Matrix
+if(FALSE) {
+setAs("dgTMatrix", "triangularMatrix",
+      function(from) check.gT2tT(from, toClass = "dtTMatrix", do.n=FALSE))
 setAs("dgTMatrix", "symmetricMatrix",
       function(from) check.gT2sT(from, toClass = "dsTMatrix", do.n=FALSE))
 } ## MJ
@@ -61,7 +64,6 @@ mat2dgT <- function(from) {
         j = col(from)[nz] - 1L,
         x = x[nz])
 }
-
 setAs("matrix", "dgTMatrix", mat2dgT)
 } ## MJ
 

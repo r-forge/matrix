@@ -5,6 +5,7 @@
 \alias{dgRMatrix-class}
 %
 \alias{coerce,dgRMatrix,dsRMatrix-method}
+\alias{coerce,dgRMatrix,dtRMatrix-method}
 \alias{coerce,dgRMatrix,lgRMatrix-method}
 \alias{coerce,dgRMatrix,ngRMatrix-method}
 \alias{coerce,matrix,dgRMatrix-method}

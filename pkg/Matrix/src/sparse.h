@@ -14,4 +14,6 @@ SEXP Tsparse_drop0(SEXP from);
 SEXP tCsparse_as_Rsparse(SEXP from);
 SEXP tRsparse_as_Csparse(SEXP from);
 
+SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2);
+
 #endif

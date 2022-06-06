@@ -1109,52 +1109,6 @@ n2l_spMatrix <- function(from) {
 .T2Cmat <- function(from, isTri = is(from, "triangularMatrix"))
     .Call(Tsparse_to_Csparse, from, isTri)
 
-
-forceSymmetricCsparse <- function(x, uplo) {
-    d <- x@Dim
-    if (d[1L] != d[2L])
-        stop("attempt to symmetrize a non-square matrix")
-    if((tri <- .hasSlot(x, "diag")) && x@diag == "U")
-	x <- .Call(Csparse_diagU2N, x)
-    if(missing(uplo))
-        uplo <- if(tri) x@uplo else "U"
-    .Call(Csparse_general_to_symmetric, x, uplo, TRUE)
-}
-
-forceSymmetricRsparse <- function(x, uplo) {
-    d <- x@Dim
-    if (d[1L] != d[2L])
-        stop("attempt to symmetrize a non-square matrix")
-    tx <- .tR.2.C(x)
-    if((tri <- .hasSlot(tx, "diag")) && tx@diag == "U")
-	tx <- .Call(Csparse_diagU2N, tx)
-    if(missing(uplo))
-        uplo <- if(tri) x@uplo else "U"
-    .tC.2.R(.Call(Csparse_general_to_symmetric, tx,
-                  if(uplo == "U") "L" else "U", TRUE))
-}
-
-forceSymmetricTsparse <- function(x, uplo) {
-    d <- x@Dim
-    if (d[1L] != d[2L])
-        stop("attempt to symmetrize a non-square matrix")
-    if((tri <- .hasSlot(x, "diag")) && x@diag == "U")
-	x <- .Call(Tsparse_diagU2N, x)
-    if(missing(uplo))
-        uplo <- if(tri) x@uplo else "U"
-    dn <- symmDN(x@Dimnames)
-    i <- x@i
-    j <- x@j
-    k <- if(uplo == "U") i <= j else i >= j
-    Class <- paste0(kind <- .M.kind(x), "sTMatrix")
-    if(kind == "n")
-        new(Class, Dim = d, Dimnames = dn, uplo = uplo,
-            i = i[k], j = j[k])
-    else
-        new(Class, Dim = d, Dimnames = dn, uplo = uplo,
-            i = i[k], j = j[k], x = x@x[k])
-}
-
 tT2gT <- function(x, cl = class(x), toClass, cld = getClassDef(cl)) {
     ## coerce *tTMatrix to *gTMatrix {triangular -> general}
     d <- x@Dim
@@ -1184,15 +1138,17 @@ tT2gT <- function(x, cl = class(x), toClass, cld = getClassDef(cl)) {
 ## Hack for the above, possibly considerably faster:
 ## Just *modify* the 'x' object , using attr(x, "class') <- toClass
 
-
-## Fast very special one ../src/Tsparse.c -- as_cholmod_triplet() in ../src/chm_common.c
+## Fast very special one ../src/Tsparse.c -- as_cholmod_triplet()
+## in ../src/chm_common.c
 ## 'x' *must* inherit from TsparseMatrix!
 .gT2tC <- function(x, uplo, diag="N") .Call(Tsparse_to_tCsparse, x, uplo, diag)
 ## Ditto in ../src/Csparse.c :
-.gC2tC <- function(x, uplo, diag="N") .Call(Csparse_to_tCsparse, x, uplo, diag)
 .gC2tT <- function(x, uplo, diag="N") .Call(Csparse_to_tTsparse, x, uplo, diag)
+.gC2tC <- function(x, uplo, diag="N") .Call(Csparse_to_tCsparse, x, uplo, diag)
 .gC2sC <- function(x, uplo) .Call(Csparse_general_to_symmetric, x, uplo, TRUE)
 
+## MJ: no longer needed
+if(FALSE) {
 gT2tT <- function(x, uplo, diag, toClass,
 		  do.n = extends(toClass, "nMatrix"))
 {
@@ -1223,8 +1179,6 @@ check.gT2tT <- function(from, toClass, do.n = extends(toClass, "nMatrix")) {
     } else stop("not a triangular matrix")
 }
 
-## MJ: no longer needed ... prefer forceSymmetric[CRT]sparse(), .M2symm() above
-if(FALSE) {
 gT2sT <- function(x, toClass, do.n = extends(toClass, "nMatrix")) {
     upper <- x@i <= x@j
     i <- x@i[upper]
@@ -1244,7 +1198,7 @@ check.gT2sT <- function(x, toClass, do.n = extends(toClass, "nMatrix"))
     else
 	stop("not a symmetric matrix; consider forceSymmetric() or symmpart()")
 }
-}
+} ## MJ
 
 ## return "d" or "l" or "n" or "z"
 .M.kind <- function(x, clx = class(x)) {

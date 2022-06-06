@@ -13,7 +13,6 @@
 \alias{coerce,dgTMatrix,lgTMatrix-method}
 \alias{coerce,dgTMatrix,matrix-method}
 \alias{coerce,dgTMatrix,ngTMatrix-method}
-\alias{coerce,dgTMatrix,triangularMatrix-method}
 \alias{coerce,matrix,dgTMatrix-method}
 \alias{coerce,numLike,dgTMatrix-method}
 %

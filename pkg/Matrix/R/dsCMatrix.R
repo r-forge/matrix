@@ -54,6 +54,8 @@ setAs("dsCMatrix", "dsyMatrix",
 .CHM.factor.name <- function(perm, LDL, super)
     .Call(R_chm_factor_name, perm, LDL, super)
 
+## MJ: no longer needed ... methods now inherited from CsparseMatrix
+if(FALSE) {
 ## have rather tril() and triu() methods than
 ## setAs("dsCMatrix", "dtCMatrix", ....)
 setMethod("tril", "dsCMatrix",
@@ -73,7 +75,7 @@ setMethod("triu", "dsCMatrix",
 		      x = x@x, Dim = x@Dim, Dimnames = x@Dimnames)
 	      else triu(as(x, "dgCMatrix"), k = k, ...)
 	  })
-
+} ## MJ
 
 msg.and.solve.dgC.lu <- function(name, r, wrns,  a, b, tol) {
     if ((E <- inherits(r, "error")) || length(wrns) > 0) {

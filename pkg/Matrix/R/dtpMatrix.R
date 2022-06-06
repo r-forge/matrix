@@ -18,6 +18,8 @@ setAs("pBunchKaufman", "lMatrix",
       function(from) as(as(from, "dtpMatrix"), "lMatrix"))
 } ## MJ
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 ## Is this needed?  already have coercion to "TsparseMatrix" {FIXME}
 setAs("dtpMatrix", "dtTMatrix",
       function(from) {
@@ -31,6 +33,7 @@ setAs("dtpMatrix", "dtTMatrix",
 		    toClass = "dtTMatrix", do.n = FALSE)
 	  }
       })
+} ## MJ
 
 setMethod("determinant", signature(x = "dtpMatrix", logarithm = "missing"),
 	  function(x, logarithm, ...) determinant(x, TRUE))

@@ -38,9 +38,9 @@ rm(.kinds, .kind, .otherkinds, .otherkind, .def)
 
 ## To "structure" ..........................................
 
-setAs("sparseMatrix",    "generalMatrix", as_gSparse)
-setAs("sparseMatrix", "triangularMatrix", as_tSparse)
-## setAs("denseMatrix", "symmetricMatrix", .) # inherited from Matrix
+setAs("sparseMatrix", "generalMatrix", as_gSparse)
+## setAs("sparseMatrix", "triangularMatrix", .) # inherited from Matrix
+## setAs("sparseMatrix",  "symmetricMatrix", .) # inherited from Matrix
 
 ## More granular coercions .................................
 
@@ -64,13 +64,10 @@ for (.kind in .kinds) {
                   paste0(.kind,  "s", .repr, "Matrix"), ..M2symm)
 
     ## Nontriangular to triangular, preserving kind and storage
-    if(FALSE) {
-    ## MJ: not yet ... needs triu(), tril() to be optimized
     for (.str in c("g", "s"))
         for (.repr in c("C", "R", "T"))
             setAs(paste0(.kind, .str, .repr, "Matrix"),
                   paste0(.kind,  "t", .repr, "Matrix"), ..M2tri)
-    }
 
     ## sC<->sR, preserving kind
     .cl0 <- paste0(.kind, "s.Matrix")
@@ -1134,6 +1131,55 @@ setMethod("pack", signature(x = "sparseMatrix"),
 setMethod("unpack", signature(x = "sparseMatrix"),
           function(x, ...) stop(sprintf("invalid class \"%s\" to 'unpack()'; only dense matrices can be unpacked", class(x))))
 
+forceSymmetricCsparse <- function(x, uplo) {
+    d <- x@Dim
+    if (d[1L] != d[2L])
+        stop("attempt to symmetrize a non-square matrix")
+    if((tri <- .hasSlot(x, "diag")) && x@diag == "U")
+	x <- .Call(Csparse_diagU2N, x)
+    if(missing(uplo))
+        uplo <- if(tri) x@uplo else "U"
+    .Call(Csparse_general_to_symmetric, x, uplo, TRUE)
+}
+
+forceSymmetricRsparse <- function(x, uplo) {
+    d <- x@Dim
+    if (d[1L] != d[2L])
+        stop("attempt to symmetrize a non-square matrix")
+    tx <- .tR.2.C(x)
+    if((tri <- .hasSlot(tx, "diag")) && tx@diag == "U")
+	tx <- .Call(Csparse_diagU2N, tx)
+    if(missing(uplo))
+        uplo <- if(tri) x@uplo else "U"
+    .tC.2.R(.Call(Csparse_general_to_symmetric, tx,
+                  if(uplo == "U") "L" else "U", TRUE))
+}
+
+forceSymmetricTsparse <- function(x, uplo) {
+    d <- x@Dim
+    if (d[1L] != d[2L])
+        stop("attempt to symmetrize a non-square matrix")
+    if((tri <- .hasSlot(x, "diag")) && x@diag == "U")
+	x <- .Call(Tsparse_diagU2N, x)
+    if(missing(uplo))
+        uplo <- if(tri) x@uplo else "U"
+    dn <- symmDN(x@Dimnames)
+    i <- x@i
+    j <- x@j
+    k <- if(uplo == "U") i <= j else i >= j
+    Class <- paste0(kind <- .M.kind(x), "sTMatrix")
+    if(kind == "n")
+        new(Class, Dim = d, Dimnames = dn, uplo = uplo,
+            i = i[k], j = j[k])
+    else
+        new(Class, Dim = d, Dimnames = dn, uplo = uplo,
+            i = i[k], j = j[k], x = x@x[k])
+}
+
+.sparse.band <- function(x, k1, k2, ...) .Call(R_sparse_band, x, k1, k2)
+.sparse.triu <- function(x, k = 0,  ...) .Call(R_sparse_band, x, k, NULL)
+.sparse.tril <- function(x, k = 0,  ...) .Call(R_sparse_band, x, NULL, k)
+
 ## NOTE/FIXME(?):
 ## these do not work for subclasses inheriting from symmetricMatrix,
 ## which have their own (much simpler) methods; see ./symmetricMatrix.R
@@ -1141,3 +1187,16 @@ setMethod("forceSymmetric", signature(x = "sparseMatrix", uplo = "missing"),
 	  function(x, uplo) forceSymmetricCsparse(as(x, "CsparseMatrix")))
 setMethod("forceSymmetric", signature(x = "sparseMatrix", uplo = "character"),
 	  function(x, uplo) forceSymmetricCsparse(as(x, "CsparseMatrix"), uplo))
+
+for (.repr in c("C", "R", "T")) {
+    .cl <- paste0(.repr, "sparseMatrix")
+    .fS <- get(paste0("forceSymmetric", .repr, "sparse"),
+               mode = "function", inherits = FALSE)
+
+    setMethod("forceSymmetric", signature(x = .cl, uplo = "missing"), .fS)
+    setMethod("forceSymmetric", signature(x = .cl, uplo = "character"), .fS)
+    setMethod("band", signature(x = .cl), .sparse.band)
+    setMethod("triu", signature(x = .cl), .sparse.triu)
+    setMethod("tril", signature(x = .cl), .sparse.tril)
+}
+rm(.sparse.band, .sparse.triu, .sparse.tril, .repr, .cl, .fS)
