@@ -509,11 +509,14 @@ bdiag <- function(...) {
 
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+setMethod("band", "diagonalMatrix", function(x, k1, k2, ...)
+    if(k1 <= 0L && k2 >= 0L) x else .setZero(x, paste0(.M.kind(x), "tTMatrix")))
+
 setMethod("tril", "diagonalMatrix", function(x, k = 0, ...)
-    if(k >= 0) x else .setZero(x, paste0(.M.kind(x), "tCMatrix")))
+    if(k >= 0L) x else .setZero(x, paste0(.M.kind(x), "tCMatrix")))
 
 setMethod("triu", "diagonalMatrix", function(x, k = 0, ...)
-    if(k <= 0) x else  .setZero(x, paste0(.M.kind(x), "tCMatrix")))
+    if(k <= 0L) x else .setZero(x, paste0(.M.kind(x), "tCMatrix")))
 
 
 ## FIXME: should not be needed {when ddi* is dsparse* etc}:

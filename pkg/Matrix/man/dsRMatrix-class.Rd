@@ -6,6 +6,7 @@
 %
 \alias{coerce,dsRMatrix,CsparseMatrix-method}
 \alias{coerce,dsRMatrix,dsCMatrix-method}
+\alias{coerce,dsRMatrix,dtRMatrix-method}
 \alias{coerce,dsRMatrix,lsRMatrix-method}
 \alias{coerce,dsRMatrix,nsRMatrix-method}
 \alias{coerce,matrix,dsRMatrix-method}

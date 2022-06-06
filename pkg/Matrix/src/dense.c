@@ -8,16 +8,16 @@
 /* as(<denseMatrix>, "[CRT]sparseMatrix") */
 SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 {
-    const char *c;
-    char c0, c1, c2;
+    const char *zzz;
+    char z0, z1, z2;
     if ((code = asChar(code)) == NA_STRING ||
-	(c0 = (c = CHAR(code))[0]) == '\0' ||
-	((c1 = c[1]) != '.' && c1 != 'g' && c1 != 't' && c1 != 's') ||
-	((c2 = c[2]) != 'C' && c2 != 'R' && c2 != 'T'))
+	(z0 = (zzz = CHAR(code))[0]) == '\0' ||
+	((z1 = zzz[1]) != '.' && z1 != 'g' && z1 != 't' && z1 != 's') ||
+	((z2 = zzz[2]) != 'C' && z2 != 'R' && z2 != 'T'))
 	error(_("invalid 'code' to 'R_dense_as_sparse()'"));
     
     SEXPTYPE txf,
-	txt = (c0 == '.') ? NILSXP : kind2type(c0); /* before doing more */
+	txt = (z0 == '.') ? NILSXP : kind2type(z0); /* before doing more */
 
     char *cl, ul = 'U', di = 'N';
     static const char *valid[] = {
@@ -77,35 +77,35 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 		SET_VECTOR_ELT(dimnames, 0, nms);
 	    }
 	}
-	if (c1 == 't' || c1 == 's') {
+	if (z1 == 't' || z1 == 's') {
 	    if (pdim[0] != pdim[1])
 		error(_("attempt to construct triangular or symmetric "
-			"%csparseMatrix from non-square matrix"), c2);
+			"%csparseMatrix from non-square matrix"), z2);
 	    if ((uplo = asChar(uplo)) == NA_STRING ||
 		(ul = *CHAR(uplo)) == '\0')
 		error(_("invalid 'uplo' to 'R_dense_as_sparse()'"));
 	    uplo = mkString((ul == 'U') ? "U" : "L");
-	    if (c1 == 't') {
+	    if (z1 == 't') {
 		if ((diag = asChar(diag)) == NA_STRING ||
 		    (di = *CHAR(diag)) == '\0')
 		    error(_("invalid 'diag' to 'R_dense_as_sparse()'"));
 		diag = mkString((di == 'N') ? "N" : "U");
 	    }
-	    cl[1] = c1;
+	    cl[1] = z1;
 	}
 #ifndef HAVE_PROPER_IMATRIX
-	if (c0 == '.' && txf == INTSXP) {
+	if (z0 == '.' && txf == INTSXP) {
 	    PROTECT(x_from = coerceVector(x_from, txf = REALSXP));
 	    ++nprotect;
 	}
 #endif
     }
 
-    if (c0 != '.')
-	cl[0] = c0;
+    if (z0 != '.')
+	cl[0] = z0;
     else
 	txt = txf;
-    cl[2] = c2;
+    cl[2] = z2;
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl)), p_to, i_to, j_to, x_to;
     ++nprotect;
     int m = pdim[0], n = pdim[1], i, j, *pp, *pi, *pj;
@@ -574,7 +574,7 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
     if (ivalid >= 0) {
 	clf = valid[ivalid];
     } else {
-	/* matrix->.geMatrix with unreferenced 'x' slot ... modify directly */
+	/* matrix->.geMatrix with unreferenced 'x' slot ... modify directly! */
 	PROTECT(from = matrix_as_geMatrix(from, '.', 0, 0));
 	clf = class_P(from);
     }
@@ -594,26 +594,27 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
     /* Need tri[ul](<0-by-0>) and tri[ul](<1-by-1>) to be triangularMatrix */
     if (a <= 1 - m && b >= n - 1 && (clf[1] == 't' || m != n || m > 1 || n > 1))
 	return from;
-    
-    SEXP uplo_from, diag;
+
     char ulf = 'U', ult = 'U', di = 'N';
     if (clf[1] != 'g') {
-	uplo_from = GET_SLOT(from, Matrix_uploSym);
-	ulf = *CHAR(STRING_ELT(uplo_from, 0));
+	ulf = *uplo_P(from);
 	if (clf[1] == 't') {
+	    /* Be fast if band contains entire triangle */
 	    if ((ulf == 'U') ? (a <= 0 && b >= n - 1) : (b >= 0 && a <= 1 - m))
 		return from;
-	    diag = GET_SLOT(from, Matrix_diagSym);
-	    di = *CHAR(STRING_ELT(diag, 0));
+	    if (a <= 0 && b >= 0)
+		di = *diag_P(from);
 	}
     }
-    
-    SEXP to, x_to,
+
+    SEXP to,
+	dimnames = GET_SLOT(from, Matrix_DimNamesSym),
 	x_from = GET_SLOT(from, Matrix_xSym),
-	dimnames = GET_SLOT(from, Matrix_DimNamesSym);
-    SEXPTYPE tx = TYPEOF(x_from);
-    Rboolean tr, sy;
-    
+	x_to;
+    int ge = 0, tr = 0, sy = 0;
+    ge = m != n || (!(tr = a >= 0 || b <= 0 || clf[1] == 't') &&
+		    !(sy = a == -b && clf[1] == 's'));
+
 #define UNPACKED_MAKE_BANDED(_PREFIX_, _PTR_)				\
     _PREFIX_ ## dense_unpacked_make_banded(_PTR_(x_to), m, n, a, b, di)
 
@@ -622,7 +623,7 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
     
 #define DENSE_BAND(_MAKE_BANDED_)					\
     do {								\
-	switch (tx) {							\
+	switch (TYPEOF(x_to)) {						\
 	case REALSXP: /* d..Matrix */					\
 	    _MAKE_BANDED_(d, REAL);					\
 	    break;							\
@@ -636,23 +637,13 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 	    _MAKE_BANDED_(z, COMPLEX);					\
 	    break;							\
 	default:							\
-	    ERROR_INVALID_TYPE("'x' slot", tx, "R_dense_band");		\
+	    ERROR_INVALID_TYPE("'x' slot", TYPEOF(x_to), "R_dense_band"); \
 	    break;							\
 	}								\
     } while (0)
-
-#define DENSE_BAND_CONSTRICT			\
-    do {					\
-	if (ulf == 'U') {			\
-	    if (a < 0) a = 0;			\
-	} else {				\
-	    if (b > 0) b = 0;			\
-	}					\
-    } while(0)
     
-    if (m != n || (!(tr = a >= 0 || b <= 0 || clf[1] == 't') &&
-		   !(sy = a == -b && clf[1] == 's'))) { /* return .geMatrix */
-	
+    if (ge) {
+	/* Returning .geMatrix */
 	if (clf[1] == 'g') {
 	    if (ivalid >= 0) {
 		PROTECT(to = NEW_OBJECT_OF_CLASS(clf));
@@ -664,39 +655,76 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 		to = from;
 		PROTECT(x_to = x_from);
 	    }
-	} else { /* clf[1] == 's' */
+	} else {
 	    PROTECT(to = dense_as_geMatrix(from, '.', 1, 0));
 	    PROTECT(x_to = GET_SLOT(to, Matrix_xSym));
 	}
 	DENSE_BAND(UNPACKED_MAKE_BANDED);
 	UNPROTECT(2);
 	return to;
+    }
 
-    } else if (tr) { /* return .t.Matrix */
-	
-	ult = (a >= 0) ? 'U' : ((b <= 0) ? 'L' : ulf);
+    /* Returning .(tr|sy|tp|sp)Matrix */
 
+    if (tr) {
+	char *clt = strdup(clf);
+	clt[1] = 't';
+	if (clt[2] != 'p')
+	    clt[2] = 'r';
+	PROTECT(to = NEW_OBJECT_OF_CLASS(clt));
+	free(clt);
+    } else {
+	PROTECT(to = NEW_OBJECT_OF_CLASS(clf));
+    }
+
+    SET_SLOT(to, Matrix_DimSym, dim);
+    if (!sy && clf[1] == 's')
+	set_symmetrized_DimNames(to, dimnames, -1);
+    else
+	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+
+    if (sy || clf[1] == 't') {
+	/* We can tighten the band ... but does it help?? FIXME */
+	if (ulf == 'U') {
+	    if (b >= 0 && a < 0)
+		a = 0;
+	} else {
+	    if (a <= 0 && b > 0)
+		b = 0;
+	}
+    }
+
+    ult = (tr && clf[1] != 't') ? ((a >= 0) ? 'U' : 'L') : ulf;
+    if (ult != 'U')
+	SET_SLOT(to, Matrix_uploSym, mkString("L"));
+    if (di != 'N')
+	SET_SLOT(to, Matrix_diagSym, mkString("U"));   
+    
+    /* It remains to set 'x' ... */
+
+#define IF_PACKED_ELSE(_IF_, _ELSE_)		\
+    do {					\
+	if (clf[2] == 'p')			\
+	    DENSE_BAND(_IF_);			\
+	else					\
+	    DENSE_BAND(_ELSE_);			\
+    } while (0)
+
+    if (tr) {
+	/* Returning .t[rp]Matrix */
 	if (clf[1] == 't') {
-	    PROTECT(to = NEW_OBJECT_OF_CLASS(clf));
-	    SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-	    if (di != 'N')
-		SET_SLOT(to, Matrix_diagSym, diag);
-	    
-	    DENSE_BAND_CONSTRICT;
 	    if (ulf == ult) {
 		PROTECT(x_to = duplicate(x_from));
-		if (clf[2] == 'p')
-		    DENSE_BAND(PACKED_MAKE_BANDED);
-		else
-		    DENSE_BAND(UNPACKED_MAKE_BANDED);
+		IF_PACKED_ELSE(PACKED_MAKE_BANDED, UNPACKED_MAKE_BANDED);
 	    } else {
+		/* Result is either a diagonal matrix or a zero matrix */
 		R_xlen_t nx = XLENGTH(x_from);
-		PROTECT(x_to = allocVector(tx, nx));
+		PROTECT(x_to = allocVector(TYPEOF(x_from), nx));
 		
 #define PACKED_COPY_DIAGONAL(_PREFIX_, _PTR_)				\
 		do {							\
 		    Memzero(_PTR_(x_to), nx);				\
-		    if (a <= b)						\
+		    if (a <= 0 && b >= 0)				\
 			_PREFIX_ ## dense_packed_copy_diagonal(		\
 			    _PTR_(x_to), _PTR_(x_from),			\
 			    n, nx, ult, ulf, di);			\
@@ -705,77 +733,41 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 #define UNPACKED_COPY_DIAGONAL(_PREFIX_, _PTR_)				\
 		do {							\
 		    Memzero(_PTR_(x_to), nx);				\
-		    if (a <= b)						\
+		    if (a <= 0 && b >= 0)				\
 			_PREFIX_ ## dense_unpacked_copy_diagonal(	\
 			    _PTR_(x_to), _PTR_(x_from),			\
 			    n, nx, 'U' /* unused */, di);		\
 		} while (0)
 		
-		if (clf[2] == 'p')
-		    DENSE_BAND(PACKED_COPY_DIAGONAL);
-		else
-		    DENSE_BAND(UNPACKED_COPY_DIAGONAL);
+		IF_PACKED_ELSE(PACKED_COPY_DIAGONAL, UNPACKED_COPY_DIAGONAL);
 	    }
 	    
 	} else { /* clf[1] == 'g' || clf[1] == 's' */
-	    char *clt = strdup(clf);
-	    clt[1] = 't';
-	    if (clf[2] != 'p')
-		clt[2] = 'r';
-	    PROTECT(to = NEW_OBJECT_OF_CLASS(clt));
-	    free(clt);
-	    if (clf[1] == 's')
-		set_symmetrized_DimNames(to, dimnames, -1);
-	    else
-		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-	    
 	    PROTECT(x_to = (clf[1] == 'g' || n <= 1
 			    ? (ivalid >= 0
 			       ? duplicate(x_from)
 			       : x_from)
 			    : (ulf == ult
 			       ? duplicate(x_from)
+			       /* band is "opposite" the stored triangle: */
 			       : (clf[2] == 'p'
 				  ? packed_transpose(x_from, n, ulf)
 				  : unpacked_force(x_from, n, ulf, '\0')))));
-	    
-	    if (clf[2] == 'p')
-		DENSE_BAND(PACKED_MAKE_BANDED);
-	    else
-		DENSE_BAND(UNPACKED_MAKE_BANDED);
+	    IF_PACKED_ELSE(PACKED_MAKE_BANDED, UNPACKED_MAKE_BANDED);
 	}
-	
-	SET_SLOT(to, Matrix_uploSym, mkString((ult == 'U') ? "U" : "L"));
-
-    } else if (sy) { /* return .s.Matrix */
-
-	PROTECT(to = NEW_OBJECT_OF_CLASS(clf));
-	PROTECT(x_to = duplicate(x_from));
-	ult = ulf;
-	DENSE_BAND_CONSTRICT;
-	
-	if (clf[2] == 'p')
-	    DENSE_BAND(PACKED_MAKE_BANDED);
-	else
-	    DENSE_BAND(UNPACKED_MAKE_BANDED);
-	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-	SET_SLOT(to, Matrix_uploSym, uplo_from);
-	
     } else {
-	
-	error(_("should never happen; probably a bug in 'R_dense_band()'; "
-		"please report!"));
-	
+	/* Returning .s[yp]Matrix */
+	PROTECT(x_to = duplicate(x_from));
+	IF_PACKED_ELSE(PACKED_MAKE_BANDED, UNPACKED_MAKE_BANDED);
     }
 
+#undef IF_PACKED_ELSE
 #undef PACKED_COPY_DIAGONAL
 #undef PACKED_MAKE_BANDED
 #undef UNPACKED_COPY_DIAGONAL
 #undef UNPACKED_MAKE_BANDED
-#undef DENSE_BAND_CONSTRICT
 #undef DENSE_BAND
 
-    SET_SLOT(to, Matrix_DimSym, dim);
     SET_SLOT(to, Matrix_xSym, x_to);
     UNPROTECT((ivalid >= 0) ? 2 : 3);
     return to;

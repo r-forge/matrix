@@ -86,27 +86,21 @@ setMethod("kronecker", signature(X = "dtTMatrix", Y = "dtTMatrix"),
 
 setMethod("kronecker", signature(X = "dtTMatrix", Y = "dgTMatrix"),
 	  function (X, Y, FUN = "*", make.dimnames = FALSE, ...) {
-	      if(trY <- isTriangular(Y)) {
-		  Y <- gT2tT(Y, uplo = attr(trY, "kind") %||% "U",
-			     diag = "N", ## improve: also test for unit diagonal
-			     toClass = "dtTMatrix", do.n= FALSE)
-	      }
-	      else {
-		  X <- as(X, "dgTMatrix")
-	      }
+              if(it <- isTriangular(Y))
+                  ## improve: also test for unit diagonal
+                  Y <- if(attr(it, "kind") == "U") triu(Y) else tril(Y)
+	      else
+                  X <- as(X, "dgTMatrix")
 	      callGeneric() #-> dtT o dtT   or	 dgT o dgT
 	  })
 
 setMethod("kronecker", signature(X = "dgTMatrix", Y = "dtTMatrix"),
 	  function (X, Y, FUN = "*", make.dimnames = FALSE, ...) {
-	      if(trX <- isTriangular(X)) {
-		  X <- gT2tT(X, uplo = attr(trX, "kind") %||% "U",
-			     diag = "N", ## improve: also test for unit diagonal
-			     toClass = "dtTMatrix", do.n= FALSE)
-	      }
-	      else {
+              if(it <- isTriangular(X))
+                  ## improve: also test for unit diagonal
+                  X <- if(attr(it, "kind") == "U") triu(X) else tril(X)
+	      else
 		  Y <- as(Y, "dgTMatrix")
-	      }
 	      callGeneric() #-> dtT o dtT   or	 dgT o dgT
 	  })
 

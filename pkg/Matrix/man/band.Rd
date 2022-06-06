@@ -13,6 +13,7 @@
 \alias{band,RsparseMatrix-method}
 \alias{band,TsparseMatrix-method}
 \alias{band,denseMatrix-method}
+\alias{band,diagonalMatrix-method}
 \alias{band,matrix-method}
 \alias{triu,CsparseMatrix-method}
 \alias{triu,RsparseMatrix-method}
@@ -26,32 +27,6 @@
 \alias{tril,denseMatrix-method}
 \alias{tril,diagonalMatrix-method}
 \alias{tril,matrix-method}
-% due to disambiguation hack:
-\alias{triu,dtCMatrix-method}
-\alias{triu,dtRMatrix-method}
-\alias{triu,dtTMatrix-method}
-\alias{triu,ltCMatrix-method}
-\alias{triu,ltRMatrix-method}
-\alias{triu,ltTMatrix-method}
-\alias{triu,ntCMatrix-method}
-\alias{triu,ntRMatrix-method}
-\alias{triu,ntTMatrix-method}
-\alias{tril,dtCMatrix-method}
-\alias{tril,dtRMatrix-method}
-\alias{tril,dtTMatrix-method}
-\alias{tril,ltCMatrix-method}
-\alias{tril,ltRMatrix-method}
-\alias{tril,ltTMatrix-method}
-\alias{tril,ntCMatrix-method}
-\alias{tril,ntRMatrix-method}
-\alias{tril,ntTMatrix-method}
-% only for speed (?):
-\alias{triu,dsCMatrix-method}
-\alias{triu,lsCMatrix-method}
-\alias{triu,nsCMatrix-method}
-\alias{tril,dsCMatrix-method}
-\alias{tril,lsCMatrix-method}
-\alias{tril,nsCMatrix-method}
 %
 \description{
   Return the matrix obtained by setting to zero elements below a diagonal
@@ -80,10 +55,8 @@ tril(x, k = 0, \dots)
 \value{
   An object of a suitable matrix class, inheriting from
   \code{\linkS4class{triangularMatrix}} where appropriate.
-  It inherits from \code{\linkS4class{sparseMatrix}} only
-  if \code{x} does (and the same can be said for
-  \code{\linkS4class{packedMatrix}} and
-  \code{\linkS4class{symmetricMatrix}}).
+  It inherits from \code{\linkS4class{sparseMatrix}} if
+  and only if \code{x} does.
 }
 \section{Methods}{
   \describe{
@@ -93,6 +66,7 @@ tril(x, k = 0, \dots)
       row-oriented matrices.}
     \item{x = "TsparseMatrix"}{method for sparse matrices in
       triplet format.}
+    \item{x = "diagonalMatrix"}{method for diagonal matrices.}
     \item{x = "denseMatrix"}{method for dense matrices in
       packed or unpacked format.}
     \item{x = "matrix"}{method for traditional matrices

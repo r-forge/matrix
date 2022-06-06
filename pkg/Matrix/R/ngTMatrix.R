@@ -64,15 +64,15 @@ setAs("ngTMatrix", "dsparseMatrix", .n2dgT)
 
 setAs("ngTMatrix", "lgTMatrix", .n2lgT)
 setAs("ngTMatrix", "lMatrix",   .n2lgT)
-} ## MJ
 
-setAs("ngTMatrix", "triangularMatrix",
-      function(from) check.gT2tT(from, toClass = "ntTMatrix", do.n=TRUE))
 setAs("ngTMatrix", "ntTMatrix",
       function(from) check.gT2tT(from, toClass = "ntTMatrix", do.n=TRUE))
+} ## MJ
 
-## MJ: no longer needed ... method now inherited from Matrix
+## MJ: no longer needed ... methods now inherited from Matrix
 if(FALSE) {
+setAs("ngTMatrix", "triangularMatrix",
+      function(from) check.gT2tT(from, toClass = "ntTMatrix", do.n=TRUE))
 setAs("ngTMatrix", "symmetricMatrix",
       function(from) check.gT2sT(from, toClass = "nsTMatrix", do.n=TRUE))
 } ## MJ

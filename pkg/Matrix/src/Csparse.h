@@ -8,7 +8,11 @@ Rboolean isValid_Csparse(SEXP x);
 SEXP Csp_dense_products(SEXP a, SEXP b,
 			Rboolean transp_a, Rboolean transp_b, Rboolean transp_ans);
 
+/* MJ: no longer needed ... prefer R_sparse_band() */
+#if 0
 SEXP Csparse_band(SEXP x, SEXP k1, SEXP k2);
+#endif /* MJ */
+
 SEXP Csparse_Csparse_prod(SEXP a, SEXP b, SEXP bool_arith);
 SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans, SEXP bool_arith);
 SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet, SEXP bool_arith);

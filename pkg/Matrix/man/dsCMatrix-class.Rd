@@ -15,6 +15,7 @@
 \alias{coerce,dsCMatrix,dsRMatrix-method}
 \alias{coerce,dsCMatrix,dsTMatrix-method}
 \alias{coerce,dsCMatrix,dsyMatrix-method}
+\alias{coerce,dsCMatrix,dtCMatrix-method}
 \alias{coerce,dsCMatrix,generalMatrix-method}
 \alias{coerce,dsCMatrix,lsCMatrix-method}
 \alias{coerce,dsCMatrix,matrix-method}
@@ -30,6 +31,7 @@
 \alias{coerce,dsTMatrix,dsRMatrix-method}
 \alias{coerce,dsTMatrix,dsCMatrix-method}
 \alias{coerce,dsTMatrix,dsyMatrix-method}
+\alias{coerce,dsTMatrix,dtTMatrix-method}
 \alias{coerce,dsTMatrix,lsTMatrix-method}
 \alias{coerce,dsTMatrix,nsTMatrix-method}
 \alias{coerce,dsTMatrix,matrix-method}

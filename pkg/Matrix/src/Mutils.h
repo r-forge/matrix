@@ -38,20 +38,23 @@ extern void *alloca(size_t);
 # endif
 #endif
 
-#define Alloca(_N_, _TYPE_) (_TYPE_ *) alloca(((size_t) _N_) * sizeof(_TYPE_))
 #define Matrix_Calloc_Threshold 10000 /* R uses same cutoff in several places */
 
-#define Calloc_or_Alloca_TO(_VAR_, _N_, _TYPE_)			\
+#define Alloca(_N_, _CTYPE_)					\
+    (_CTYPE_ *) alloca((size_t) (_N_) * sizeof(_CTYPE_))
+    
+#define Calloc_or_Alloca_TO(_VAR_, _N_, _CTYPE_)		\
     do {							\
 	if (_N_ >= Matrix_Calloc_Threshold) {			\
-	    _VAR_ = R_Calloc(_N_, _TYPE_);			\
+	    _VAR_ = R_Calloc(_N_, _CTYPE_);			\
 	} else {						\
-	    _VAR_ = Alloca(_N_, _TYPE_); R_CheckStack();	\
+	    _VAR_ = Alloca(_N_, _CTYPE_);			\
+	    R_CheckStack();					\
 	}							\
     } while (0)
 #define Free_FROM(_VAR_, _N_)					\
     do {							\
-	if ((_N_) >= Matrix_Calloc_Threshold) {			\
+	if (_N_ >= Matrix_Calloc_Threshold) {			\
 	    R_Free(_VAR_);					\
 	}							\
     } while (0)

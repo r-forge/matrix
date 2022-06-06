@@ -173,14 +173,8 @@ setMethod("image", "dgRMatrix", function(x, ...) image(.R.2.T(x), ...))
 
 setMethod("t", "RsparseMatrix", function(x) .C.2.R(.tR.2.C(x)))
 
-## NOTE/FIXME(?):
-## these do not work for subclasses inheriting from symmetricMatrix,
-## which have their own (much simpler) methods; see ./symmetricMatrix.R
-setMethod("forceSymmetric", signature(x = "RsparseMatrix", uplo = "missing"),
-	  forceSymmetricRsparse)
-setMethod("forceSymmetric", signature(x = "RsparseMatrix", uplo = "character"),
-	  forceSymmetricRsparse)
-
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 ## Want tril(), triu(), band() --- just as "indexing" ---
 ## return a "close" class:
 setMethod("tril", "RsparseMatrix",
@@ -192,6 +186,7 @@ setMethod("triu", "RsparseMatrix",
 setMethod("band", "RsparseMatrix",
 	  function(x, k1, k2, ...)
 	  as(band(.R.2.C(x), k1 = k1, k2 = k2, ...), "RsparseMatrix"))
+} ## MJ
 
 setReplaceMethod("[", signature(x = "RsparseMatrix", i = "index", j = "missing",
 				value = "replValue"),

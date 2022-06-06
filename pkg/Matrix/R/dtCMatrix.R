@@ -34,6 +34,11 @@ setAs("dtCMatrix", "dgCMatrix", .dtC2g)
 ## MJ: no longer needed ... replacement in ./sparseMatrix.R
 if(FALSE) {
 setAs("dtCMatrix", "dsCMatrix", function(from) as(from, "symmetricMatrix"))
+
+## FIXME: make more efficient
+## -----  and  as(., "triangularMatrix") is even worse via as_Sp()
+setAs("dgCMatrix", "dtCMatrix", # to triangular, needed for triu,..
+      function(from) as(.Call(Csparse_to_Tsparse, from, FALSE), "dtCMatrix"))
 } ## MJ
 
 setAs("dtCMatrix", "dgTMatrix",
@@ -42,11 +47,6 @@ setAs("dtCMatrix", "dgTMatrix",
           ## ignore triangularity in conversion to TsparseMatrix
           .Call(Csparse_to_Tsparse, from, FALSE)
       })
-
-## FIXME: make more efficient
-## -----  and  as(., "triangularMatrix") is even worse via as_Sp()
-setAs("dgCMatrix", "dtCMatrix", # to triangular, needed for triu,..
-      function(from) as(.Call(Csparse_to_Tsparse, from, FALSE), "dtCMatrix"))
 
 setAs("dtCMatrix", "dgeMatrix",
       function(from) as(as(from, "dgTMatrix"), "dgeMatrix"))
@@ -85,13 +85,22 @@ setMethod("determinant", signature(x = "dtCMatrix", logarithm = "logical"),
 			    class = "det")
 	  })
 
-
+## FIXME: dtCMatrix_sparse_solve() can return an invalid dtCMatrix:
+##
+## a <- new("dtCMatrix", Dim = c(5L, 5L), diag = "U",
+##          p = c(0L, 0L, 0:2, 5L), i = c(1L, 0:3), x = rep(1, 5))
+## b <- .trDiagonal(n, unitri = FALSE)
+## .Call(dtCMatrix_sparse_solve, a, b)
+##
+## should be fixed at C level so that we do not rely on ugly hacks
+## such as this one:
 setMethod("solve", signature(a = "dtCMatrix", b = "missing"),
 	  function(a, b, ...) {
-	      stopifnot((n <- nrow(a)) == ncol(a))
-	      as(.Call(dtCMatrix_sparse_solve, a, .trDiagonal(n, unitri=FALSE)),
-                 "dtCMatrix")
-          }, valueClass = "dtCMatrix")
+              b <- .trDiagonal(a@Dim[1L], unitri = FALSE)
+              gC <- .Call(dtCMatrix_sparse_solve, a, b)
+              gT <- .Call(Csparse_to_Tsparse, gC, FALSE)
+              as(gT, "dtCMatrix")
+          })
 
 setMethod("solve", signature(a = "dtCMatrix", b = "dgeMatrix"),
 	  function(a, b, ...) .Call(dtCMatrix_matrix_solve, a, b, TRUE),

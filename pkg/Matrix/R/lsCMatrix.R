@@ -35,6 +35,8 @@ if(FALSE) # needed ?
 setAs("lsCMatrix", "dgTMatrix",
       function(from) as(as(from, "dsCMatrix"), "dgTMatrix"))
 
+## MJ: no longer needed ... methods now inherited from CsparseMatrix
+if(FALSE) {
 ## have rather tril() and triu() methods than
 ## setAs("lsCMatrix", "ltCMatrix", ....)
 setMethod("tril", "lsCMatrix",
@@ -52,6 +54,7 @@ setMethod("triu", "lsCMatrix",
 		      x = x@x, Dim = x@Dim, Dimnames = x@Dimnames)
 	      else triu(as(x, "lgCMatrix"), k = k, ...)
 	  })
+} ## MJ
 
 setMethod("chol", signature(x = "lsCMatrix"),
 	  function(x, pivot=FALSE, ...)

@@ -49,7 +49,12 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Csparse_Csparse_prod, 3),
     CALLDEF(Csparse_Csparse_crossprod, 4),
     CALLDEF(Csparse_MatrixMarket, 2),
+    
+/* MJ: no longer needed ... prefer R_sparse_band() */
+#if 0
     CALLDEF(Csparse_band, 3),
+#endif
+
     CALLDEF(Csparse_crossprod, 4),
     CALLDEF(Csparse_dense_crossprod, 3),
     CALLDEF(Csparse_dense_prod, 3),
@@ -351,6 +356,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Tsparse_drop0, 1),
     CALLDEF(tCsparse_as_Rsparse, 1),
     CALLDEF(tRsparse_as_Csparse, 1),
+    CALLDEF(R_sparse_band, 3),
 
     CALLDEF(R_matrix_as_geMatrix, 2),
     CALLDEF(R_dense_as_geMatrix, 2),

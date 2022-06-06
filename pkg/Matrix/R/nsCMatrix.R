@@ -22,6 +22,8 @@ setAs("nsCMatrix", "lsparseMatrix", .nC2l)
 setAs("nsCMatrix", "lsCMatrix", .nC2l)
 } ## MJ
 
+## MJ: no longer needed ... methods now inherited from CsparseMatrix
+if(FALSE) {
 ## have rather tril() and triu() methods than
 ## setAs("nsCMatrix", "ntCMatrix", ....)
 setMethod("tril", "nsCMatrix",
@@ -39,6 +41,7 @@ setMethod("triu", "nsCMatrix",
 		      Dim = x@Dim, Dimnames = x@Dimnames)
 	      else triu(as(x, "ngCMatrix"), k = k, ...)
 	  })
+}
 
 setMethod("chol", signature(x = "nsCMatrix"),
 	  function(x, pivot=FALSE, ...) stop("temporarily disabled"))## FIXME

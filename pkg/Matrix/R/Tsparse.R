@@ -91,16 +91,6 @@ setAs("nsTMatrix", "nsCMatrix",
 setAs("ntTMatrix", "ntCMatrix",
       function(from) .Call(Tsparse_to_Csparse, from, TRUE))
 
-
-## NOTE/FIXME(?):
-## these do not work for subclasses inheriting from symmetricMatrix,
-## which have their own (much simpler) methods; see ./symmetricMatrix.R
-setMethod("forceSymmetric", signature(x = "TsparseMatrix", uplo = "missing"),
-	  forceSymmetricTsparse)
-setMethod("forceSymmetric", signature(x = "TsparseMatrix", uplo = "character"),
-	  forceSymmetricTsparse)
-
-
 ### "[" :
 ### -----
 
@@ -886,7 +876,8 @@ setMethod("solve", signature(a = "TsparseMatrix", b = "ANY"),
 setMethod("solve", signature(a = "TsparseMatrix", b = "missing"),
 	  function(a, b, ...) solve(as(a, "CsparseMatrix")))
 
-
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 ## Want tril(), triu(), band() --- just as "indexing" ---
 ## return a "close" class:
 setMethod("tril", "TsparseMatrix",
@@ -898,7 +889,7 @@ setMethod("triu", "TsparseMatrix",
 setMethod("band", "TsparseMatrix",
 	  function(x, k1, k2, ...)
 	  as(band(.T.2.C(x), k1 = k1, k2 = k2, ...), "TsparseMatrix"))
-
+} ## MJ
 
 ## For the "general" T ones (triangular & symmetric have special methods):
 setMethod("t", signature(x = "TsparseMatrix"),

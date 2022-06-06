@@ -25,7 +25,6 @@
 \alias{coerce,sparseMatrix,generalMatrix-method}
 \alias{coerce,sparseMatrix,indMatrix-method}
 \alias{coerce,sparseMatrix,sparseVector-method}
-\alias{coerce,sparseMatrix,triangularMatrix-method}
 \alias{coerce,table,sparseMatrix-method}
 \alias{cov2cor,sparseMatrix-method}
 \alias{determinant,sparseMatrix,logical-method}

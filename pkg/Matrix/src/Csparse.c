@@ -881,6 +881,9 @@ SEXP Csparse_vertcat(SEXP x, SEXP y)
     return retval;
 }
 
+/* MJ: no longer needed ... prefer R_sparse_band() */
+#if 0
+
 SEXP Csparse_band(SEXP x, SEXP k1, SEXP k2)
 {
     CHM_SP chx = AS_CHM_SP__(x);
@@ -891,6 +894,8 @@ SEXP Csparse_band(SEXP x, SEXP k1, SEXP k2)
     return chm_sparse_to_SEXP(ans, 1, /* uploT = */ 0, Rkind, "",
 			      GET_SLOT(x, Matrix_DimNamesSym));
 }
+
+#endif /* MJ */
 
 SEXP Csparse_diagU2N(SEXP x)
 {

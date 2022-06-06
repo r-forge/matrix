@@ -145,7 +145,7 @@ chkDnProd(M = t(dU))
 ## all the above failed in 1.2-0 and 1.1-5, 1.1-4 some even earlier
 chkDnProd(M = tU)
 chkDnProd(M = t(tU))
-## the two above failed in R <= 1.4-1
+## the two above failed in Matrix <= 1.4-1
 chkDnProd(M = Diagonal(4))
 chkDnProd(diag(x=3:1))
 chkDnProd(d)

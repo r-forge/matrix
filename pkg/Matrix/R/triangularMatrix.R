@@ -28,6 +28,9 @@ setAs("triangularMatrix", "symmetricMatrix",
 
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+## MJ: no longer needed ... methods now inherited from denseMatrix,
+##     [CRT]sparseMatrix, and diagonalMatrix separately (all now efficient)
+if(FALSE) {
 .tril.tr <- function(x, k = 0, ...) {  # are always square
     k <- as.integer(k[1])
     dd <- dim(x)
@@ -53,16 +56,12 @@ setAs("triangularMatrix", "symmetricMatrix",
 ## In order to evade method dispatch ambiguity (with [CTR]sparse* and dense*),
 ## but still remain "general"
 ## we use this hack instead of signature  x = "triangularMatrix" :
-
-## NB: denseMatrix goes via C utility R_dense_band() from ../src/dense.c
-##     which obviates the need for .tri[ul].tr() above ...
-.dM.subclasses <- names(getClassDef("denseMatrix")@subclasses)
-for (.cl in grep("^.t.Matrix$",
-                 setdiff(.tM.subclasses, .dM.subclasses), value = TRUE)) {
+for (.cl in .tM.subclasses) {
     setMethod("tril", signature(x = .cl), .tril.tr)
     setMethod("triu", signature(x = .cl), .triu.tr)
 }
-rm(.cl, .dM.subclasses)
+rm(.cl)
+} ## MJ
 
 setMethod("isTriangular", signature(object = "triangularMatrix"),
           function(object, upper = NA, ...) {

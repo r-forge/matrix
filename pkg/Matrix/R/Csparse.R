@@ -122,14 +122,6 @@ setAs("CsparseMatrix", "symmetricMatrix",
       })
 } ## MJ
 
-## NOTE/FIXME(?):
-## these do not work for subclasses inheriting from symmetricMatrix,
-## which have their own (much simpler) methods; see ./symmetricMatrix.R
-setMethod("forceSymmetric", signature(x = "CsparseMatrix", uplo = "missing"),
-	  forceSymmetricCsparse)
-setMethod("forceSymmetric", signature(x = "CsparseMatrix", uplo = "character"),
-	  forceSymmetricCsparse)
-
 .validateCsparse <- function(x, sort.if.needed = FALSE)
     .Call(Csparse_validate2, x, sort.if.needed)
 ##-> to be used in sparseMatrix(.), e.g. --- but is unused currently
@@ -196,8 +188,9 @@ subCsp_ij <- function(x, i, j, drop)
 	else {
 	    if(!is.null(n <- names(dn))) names(r@Dimnames) <- n
 	    if(extends((cx <- getClassDef(class(x))), "symmetricMatrix"))
-		.gC2sC(r, uplo = x@uplo) # preserving uplo
-	    else if(extends(cx, "triangularMatrix") && !is.unsorted(ii))
+                ## preserving uplo
+                .Call(Csparse_general_to_symmetric, r, x@uplo, TRUE)
+            else if(extends(cx, "triangularMatrix") && !is.unsorted(ii))
 		as(r, "triangularMatrix")
 	    else r
 	}
@@ -459,7 +452,8 @@ setReplaceMethod("[", signature(x = "CsparseMatrix", i = "Matrix", j = "missing"
 setMethod("t", signature(x = "CsparseMatrix"),
 	  function(x) .Call(Csparse_transpose, x, is(x, "triangularMatrix")))
 
-
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 ## NB: have extra tril(), triu() methods for symmetric ["dsC" and "lsC"] and
 ##     for all triangular ones, where the latter may 'callNextMethod()' these:
 setMethod("tril", "CsparseMatrix",
@@ -507,14 +501,15 @@ setMethod("band", "CsparseMatrix",
 	      r <- .Call(Csparse_band, x, k1, k2)
 	      if(square && as.double(k1) * k2 >= 0)
                   ## triangular result (does this always work ??)
-		  as(r, paste0(.M.kind(x), "tCMatrix"))
+                  as(r, paste0(.M.kind(x), "tCMatrix"))
 	      else r
-	  })
+          })
+} ## MJ
 
 setMethod("diag", "CsparseMatrix",
 	  function(x, nrow, ncol, names=TRUE) {
               ## "FIXME": could be more efficient; creates new ..CMatrix:
-	      dm <- .Call(Csparse_band, diagU2N(x), 0, 0)
+	      dm <- .Call(R_sparse_band, diagU2N(x), 0, 0)
 	      dlen <- min(dm@Dim)
 	      ind1 <- dm@i + 1L	# 1-based index vector
 	      if (is(dm, "nMatrix")) {
