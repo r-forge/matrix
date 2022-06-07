@@ -206,20 +206,20 @@ setMethod("rowMeans", signature(x = "TsparseMatrix"), .as.C.Fun)
 ## row <-> col of the "transposed, seen as C" :
 setMethod("rowSums", signature(x = "RsparseMatrix"),
           function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
-          colSums(.tR.2.C(x),
+          colSums(.tCR2RC(x),
                   na.rm=na.rm, dims=dims, sparseResult=sparseResult))
 
 setMethod("rowMeans", signature(x = "RsparseMatrix"),
           function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
-          colMeans(.tR.2.C(x),
+          colMeans(.tCR2RC(x),
                    na.rm=na.rm, dims=dims, sparseResult=sparseResult))
 setMethod("colSums", signature(x = "RsparseMatrix"),
           function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
-          rowSums(.tR.2.C(x),
+          rowSums(.tCR2RC(x),
                   na.rm=na.rm, dims=dims, sparseResult=sparseResult))
 setMethod("colMeans", signature(x = "RsparseMatrix"),
           function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
-          rowMeans(.tR.2.C(x),
+          rowMeans(.tCR2RC(x),
                    na.rm=na.rm, dims=dims, sparseResult=sparseResult))
 
 ## ## These two are obviously more efficient than going through Tsparse:

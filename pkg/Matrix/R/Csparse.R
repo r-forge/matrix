@@ -448,12 +448,11 @@ setReplaceMethod("[", signature(x = "CsparseMatrix", i = "Matrix", j = "missing"
 		 as(.TM.repl.i.mat(as(x, "TsparseMatrix"), i=i, value=value),
 		    "CsparseMatrix"))
 
-
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setMethod("t", signature(x = "CsparseMatrix"),
 	  function(x) .Call(Csparse_transpose, x, is(x, "triangularMatrix")))
 
-## MJ: no longer needed ... replacement in ./sparseMatrix.R
-if(FALSE) {
 ## NB: have extra tril(), triu() methods for symmetric ["dsC" and "lsC"] and
 ##     for all triangular ones, where the latter may 'callNextMethod()' these:
 setMethod("tril", "CsparseMatrix",

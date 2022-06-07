@@ -74,7 +74,7 @@ setMethod("isDiagonal", signature(object = "packedMatrix"), .pM.is.di)
 rm(.pM.is.sy, .pM.is.sy.dz, .pM.is.tr, .pM.is.di, .cl)
 
 setMethod("t", signature(x = "packedMatrix"),
-          function(x) .Call(packedMatrix_t, x))
+          function(x) .Call(packedMatrix_transpose, x))
 setMethod("diag", signature(x = "packedMatrix"),
           function(x, nrow, ncol, names) .Call(packedMatrix_diag_get, x, names))
 setMethod("diag<-", signature(x = "packedMatrix"),

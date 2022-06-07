@@ -105,8 +105,8 @@ setMethod("solve", signature(a = "dppMatrix", b = "integer"),
           }, valueClass = "dgeMatrix")
 
 ## MJ: no longer needed ... replacement in ./packedMatrix.R
-if (FALSE) {
+if(FALSE) {
 setMethod("t", signature(x = "dppMatrix"),
           function(x) as(t(as(x, "dspMatrix")), "dppMatrix"),
           valueClass = "dppMatrix")
-}
+} ## MJ

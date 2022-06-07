@@ -187,7 +187,7 @@ rm(.upM.is.sy, .upM.is.sy.dz, .upM.is.tr, .upM.is.di,
    .m.is.sy, .m.is.tr, .m.is.di, .cl)
 
 setMethod("t", signature(x = "unpackedMatrix"),
-          function(x) .Call(unpackedMatrix_t, x))
+          function(x) .Call(unpackedMatrix_transpose, x))
 setMethod("diag", signature(x = "unpackedMatrix"),
           function(x, nrow, ncol, names) .Call(unpackedMatrix_diag_get, x, names))
 setMethod("diag<-", signature(x = "unpackedMatrix"),

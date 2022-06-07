@@ -60,8 +60,9 @@ setMethod("chol", signature(x = "lsCMatrix"),
 	  function(x, pivot=FALSE, ...)
 	  chol(as(x, "dgCMatrix"), pivot=pivot, ...))
 
-## Use more general method from CsparseMatrix class
-## setMethod("t", signature(x = "lsCMatrix"),
-##           function(x)
-##           .Call(lsCMatrix_trans, x),
-##           valueClass = "lsCMatrix")
+## MJ: no longer needed ... method now inherited from CsparseMatrix
+if(FALSE) {
+setMethod("t", signature(x = "lsCMatrix"),
+          function(x) .Call(lsCMatrix_trans, x),
+          valueClass = "lsCMatrix")
+} ## MJ

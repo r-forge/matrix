@@ -247,8 +247,9 @@ dimnames(tt) <- list(NULL, cn <- letters[1:ncol(tt)])
 stopifnotValid(tt, "dsTMatrix")
 (cc <- as(tt, "CsparseMatrix")) # shows *symmetric* dimnames
 stopifnot(identical3(  cc @Dimnames,   tt @Dimnames, list(NULL, cn)),
-	  identical3(t(cc)@Dimnames, t(tt)@Dimnames, list(cn, NULL)),
-	  identical3(dimnames(cc), dimnames(tt), list(cn, cn)))# now symmetric !
+          ## t() does not reverse 'Dimnames' slot for symmetricMatrix
+	  identical3(t(cc)@Dimnames, t(tt)@Dimnames, list(NULL, cn)),
+	  identical3(dimnames(cc), dimnames(tt), list(cn, cn))) # now symmetric!
 
 stopifnot(identical3(dimnames(cc),
                      dimnames(as(cc, "generalMatrix")), ## should fixup dimnames to *symmetric*

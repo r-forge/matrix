@@ -77,9 +77,11 @@ setAs("ngTMatrix", "symmetricMatrix",
       function(from) check.gT2sT(from, toClass = "nsTMatrix", do.n=TRUE))
 } ## MJ
 
-if(FALSE) ## unneeded: use t.<TsparseMatrix>
+## MJ: no longer needed ... method now inherited from TsparseMatrix
+if(FALSE) {
 setMethod("t", signature(x = "ngTMatrix"),
 	  function(x) new("ngTMatrix", i = x@j, j = x@i,
 			  Dim = x@Dim[2:1],
 			  Dimnames= x@Dimnames[2:1]),
 	  valueClass = "ngTMatrix")
+} ## MJ

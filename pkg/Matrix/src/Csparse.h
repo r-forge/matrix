@@ -47,7 +47,12 @@ SEXP nz_pattern_to_Csparse(SEXP x, SEXP res_kind);
 SEXP nz2Csparse           (SEXP x, enum x_slot_kind r_kind);
 SEXP Csparse_to_matrix(SEXP x, SEXP chk, SEXP symm);
 SEXP Csparse_to_vector(SEXP x);
+
+/* MJ: no longer needed ... prefer R_sparse_transpose() */
+#if 0
 SEXP Csparse_transpose(SEXP x, SEXP tri);
+#endif /* MJ */
+
 SEXP Csparse_validate (SEXP x);
 SEXP Csparse_validate2(SEXP x, SEXP maybe_modify);
 SEXP Csparse_validate_(SEXP x, Rboolean maybe_modify);

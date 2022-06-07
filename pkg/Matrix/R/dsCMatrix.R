@@ -167,10 +167,12 @@ setMethod("Cholesky", signature(A = "dsCMatrix"),
           function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
           .Call(dsCMatrix_Cholesky, A, perm, LDL, super, Imult))
 
-
+## MJ: no longer needed ... method now inherited from CsparseMatrix
+if(FALSE) {
 setMethod("t", signature(x = "dsCMatrix"),
           function(x) .Call(Csparse_transpose, x, FALSE),
           valueClass = "dsCMatrix")
+} ## MJ
 
 ### These two are very similar, the first one has the advantage to be applicable to 'Chx' directly:
 

@@ -21,7 +21,6 @@
 \alias{coerce,matrix,dgCMatrix-method}
 \alias{coerce,numLike,dgCMatrix-method}
 \alias{determinant,dgCMatrix,logical-method}
-\alias{t,dgCMatrix-method}
 %
 \description{The \code{dgCMatrix} class is a class of sparse numeric
   matrices in the compressed, sparse, column-oriented format.  In this

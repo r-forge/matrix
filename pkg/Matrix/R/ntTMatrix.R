@@ -33,9 +33,11 @@ setAs("ntTMatrix", "ntrMatrix",
 setAs("ntTMatrix", "matrix",
       function(from) as(as(from, "ntrMatrix"), "matrix"))
 
-
+## MJ: no longer needed ... method now inherited from TsparseMatrix
+if(FALSE) {
 setMethod("t", "ntTMatrix",
 	  function(x)
 	  new("ntTMatrix", Dim = x@Dim[2:1], Dimnames = x@Dimnames[2:1],
 	      i = x@j, j = x@i, diag = x@diag,
 	      uplo = if (x@uplo == "U") "L" else "U"))
+} ## MJ

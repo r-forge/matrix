@@ -30,15 +30,17 @@ setAs("dgeMatrix", "dsTMatrix", to_dsT)
 ## MJ: no longer needed ... replacement in ./denseMatrix.R
 if(FALSE) {
 setAs("matrix", "dsTMatrix", to_dsT)
-}
+} ## MJ
 rm(to_dsT)
 
+## MJ: no longer needed ... method now inherited from TsparseMatrix
+if(FALSE) {
 setMethod("t", "dsTMatrix",
 	  function(x)
 	  new("dsTMatrix", Dim = x@Dim, Dimnames = x@Dimnames[2:1],
 	      i = x@j, j = x@i, x = x@x,
 	      uplo = if (x@uplo == "U") "L" else "U"))
-
+} ## MJ
 
 ## setMethod("writeHB", signature(obj = "dsTMatrix"),
 ##           function(obj, file, ...) callGeneric(as(obj, "CsparseMatrix"), file, ...))

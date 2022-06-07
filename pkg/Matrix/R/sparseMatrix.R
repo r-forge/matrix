@@ -1146,12 +1146,12 @@ forceSymmetricRsparse <- function(x, uplo) {
     d <- x@Dim
     if (d[1L] != d[2L])
         stop("attempt to symmetrize a non-square matrix")
-    tx <- .tR.2.C(x)
+    tx <- .tCR2RC(x)
     if((tri <- .hasSlot(tx, "diag")) && tx@diag == "U")
 	tx <- .Call(Csparse_diagU2N, tx)
     if(missing(uplo))
         uplo <- if(tri) x@uplo else "U"
-    .tC.2.R(.Call(Csparse_general_to_symmetric, tx,
+    .tCR2RC(.Call(Csparse_general_to_symmetric, tx,
                   if(uplo == "U") "L" else "U", TRUE))
 }
 
@@ -1179,6 +1179,7 @@ forceSymmetricTsparse <- function(x, uplo) {
 .sparse.band <- function(x, k1, k2, ...) .Call(R_sparse_band, x, k1, k2)
 .sparse.triu <- function(x, k = 0,  ...) .Call(R_sparse_band, x, k, NULL)
 .sparse.tril <- function(x, k = 0,  ...) .Call(R_sparse_band, x, NULL, k)
+.sparse.transpose <- function(x) .Call(R_sparse_transpose, x)
 
 ## NOTE/FIXME(?):
 ## these do not work for subclasses inheriting from symmetricMatrix,
@@ -1198,5 +1199,7 @@ for (.repr in c("C", "R", "T")) {
     setMethod("band", signature(x = .cl), .sparse.band)
     setMethod("triu", signature(x = .cl), .sparse.triu)
     setMethod("tril", signature(x = .cl), .sparse.tril)
+    setMethod("t", signature(x = .cl), .sparse.transpose)
 }
-rm(.sparse.band, .sparse.triu, .sparse.tril, .repr, .cl, .fS)
+rm(.sparse.band, .sparse.triu, .sparse.tril, .sparse.transpose,
+   .repr, .cl, .fS)

@@ -41,9 +41,12 @@ setMethod("image", "dgCMatrix", function(x, ...) image(as(x, "dgTMatrix"), ...))
 
 ##-> ./colSums.R  for colSums,... rowMeans
 
+## MJ: no longer needed ... method now inherited from CsparseMatrix
+if(FALSE) {
 setMethod("t", signature(x = "dgCMatrix"),
 	  function(x) .Call(Csparse_transpose, x, FALSE),
 	  valueClass = "dgCMatrix")
+} ## MJ
 
 setMethod("determinant", signature(x = "dgCMatrix", logarithm = "logical"),
           detSparseLU) # using mkDet() --> ./Auxiliaries.R

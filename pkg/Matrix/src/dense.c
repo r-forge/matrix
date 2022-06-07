@@ -65,16 +65,16 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 		error(_("vector of length exceeding 2^31-1 "
 			"to 'R_dense_as_sparse()'"));
 	    PROTECT(dim = allocVector(INTSXP, 2));
-	    ++nprotect;
 	    pdim = INTEGER(dim);
 	    pdim[0] = (int) len;
 	    pdim[1] = 1;
+	    ++nprotect;
 	    SEXP nms = getAttrib(from, R_NamesSymbol);
 	    doDN = !isNull(nms);
 	    if (doDN) {
 		PROTECT(dimnames = allocVector(VECSXP, 2));
-		++nprotect;
 		SET_VECTOR_ELT(dimnames, 0, nms);
+		++nprotect;
 	    }
 	}
 	if (z1 == 't' || z1 == 's') {
@@ -107,10 +107,10 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 	txt = txf;
     cl[2] = z2;
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl)), p_to, i_to, j_to, x_to;
-    ++nprotect;
     int m = pdim[0], n = pdim[1], i, j, *pp, *pi, *pj;
     R_xlen_t nnz = 0;
-
+    ++nprotect;
+    
     SET_SLOT(to, Matrix_DimSym, dim);
     if (doDN)
 	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
@@ -121,9 +121,9 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
     if (cl[2] != 'T') {
 	PROTECT(p_to = allocVector(INTSXP,
 				   (R_xlen_t) ((cl[2] == 'C') ? n : m) + 1));
-	++nprotect;
 	SET_SLOT(to, Matrix_pSym, p_to);
 	pp = INTEGER(p_to);
+	++nprotect;
 	*(pp++) = 0;
 	if (n > 0 && di != 'N' && ul == ((cl[2] == 'R') ? 'L' : 'U'))
 	    *(pp++) = 0; /* first row or column skipped in these loops */
@@ -393,21 +393,21 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
     /* Then we allocate ... */
     if (cl[2] != 'R') {
 	PROTECT(i_to = allocVector(INTSXP, nnz));
-	++nprotect;
 	SET_SLOT(to, Matrix_iSym, i_to);
 	pi = INTEGER(i_to);
+	++nprotect;
     }
     if (cl[2] != 'C') {
 	PROTECT(j_to = allocVector(INTSXP, nnz));
-	++nprotect;
 	SET_SLOT(to, Matrix_jSym, j_to);
 	pj = INTEGER(j_to);
+	++nprotect;
     }
     if (cl[0] != 'n') {
 	PROTECT(x_to = allocVector(txf, nnz));
-	++nprotect;
 	if (txf == txt)
 	    SET_SLOT(to, Matrix_xSym, x_to);
+	++nprotect;
     }
 
 #define DAS_SUBSUBCASES(_X_, _Y_, _NZ_, _LOOP_2C_, _LOOP_2R_)		\
