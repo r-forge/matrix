@@ -34,6 +34,9 @@ setAs("lgCMatrix", "ltCMatrix", # to triangular {needed in triu() }
 ## setAs("ltCMatrix", "generalMatrix",
 ##       function(from) ......)
 
-## setMethod("t", signature(x = "ltCMatrix"),
-##           function(x) .Call(ltCMatrix_trans, x),
-##           valueClass = "ltCMatrix")
+## MJ: no longer needed ... method now inherited from CsparseMatrix
+if(FALSE) {
+setMethod("t", signature(x = "ltCMatrix"),
+          function(x) .Call(ltCMatrix_trans, x),
+          valueClass = "ltCMatrix")
+} ## MJ

@@ -84,10 +84,10 @@ if(FALSE) {
 ## coercion to other virtual classes --- the functionality we want to encourage
 
 setAs("RsparseMatrix", "TsparseMatrix", .R.2.T)
-setAs("RsparseMatrix", "CsparseMatrix", .R.2.C)
+setAs("RsparseMatrix", "CsparseMatrix", .CR2RC)
 
 setAs("RsparseMatrix", "denseMatrix",
-      function(from) as(.R.2.C(from), "denseMatrix"))
+      function(from) as(.CR2RC(from), "denseMatrix"))
 
 ## MJ: no longer needed ... replacement in ./sparseMatrix.R
 if(FALSE) {
@@ -107,17 +107,17 @@ setAs("RsparseMatrix", "nMatrix",
 } ## MJ
 
 setAs("RsparseMatrix", "generalMatrix",
-      function(from) as(.R.2.C(from), "generalMatrix"))
-
+      function(from) as(.CR2RC(from), "generalMatrix"))
 
 ## for printing etc:
 setAs("RsparseMatrix", "dgeMatrix",
-      function(from) as(.R.2.C(from), "dgeMatrix"))
+      function(from) as(.CR2RC(from), "dgeMatrix"))
 setAs("RsparseMatrix", "matrix",
-      function(from) as(.R.2.C(from), "matrix"))
+      function(from) as(.CR2RC(from), "matrix"))
 
-setAs("sparseMatrix", "RsparseMatrix", .viaC.2.R)
-setAs("CsparseMatrix", "RsparseMatrix", .C.2.R)
+setAs("sparseMatrix", "RsparseMatrix",
+      function(from) .tCR2RC(as(t(from), "CsparseMatrix")))
+setAs("CsparseMatrix", "RsparseMatrix", .CR2RC)
 
 ## MJ: no longer needed ... replacement in ./denseMatrix.R
 if(FALSE) {
@@ -130,9 +130,16 @@ if(FALSE) {
 
 ## one of the few coercions "to <specific>" {tested in ../tests/Class+Meth.R}
 setAs("matrix", "dgRMatrix", .viaC.2.dgR)
+## setAs("dtCMatrix", "dtRMatrix", .viaC.to.dgR) # should work; can NOT use 'p'
 
 setAs("matrix",      "RsparseMatrix", .viaC.2.R)
 setAs("denseMatrix", "RsparseMatrix", .viaC.2.R)
+
+##setAs("matrix", "dgRMatrix",
+##      function(from) {
+##          storage.mode(from) <- "double"
+##          .Call(matrix_to_csc, from)
+##      })
 } ## MJ
 
 ## MJ: "fixed" in ./sparseMatrix.R
@@ -145,36 +152,19 @@ setAs("dsCMatrix", "dsRMatrix",
 ## FIXME: if this makes sense, do it for "l" and "n" as well as "d"
 }
 
-## setAs("dtCMatrix", "dtRMatrix", .viaC.to.dgR) # should work; can NOT use 'p'
-
 
 ##setAs("dgRMatrix", "dgeMatrix",
 ##      function(from) .Call(csc_to_dgeMatrix, from))
 
-##setAs("matrix", "dgRMatrix",
-##      function(from) {
-##          storage.mode(from) <- "double"
-##          .Call(matrix_to_csc, from)
-##      })
-
-
 ##setMethod("diag", signature(x = "dgRMatrix"),
 ##          function(x = 1, nrow, ncol = n) .Call(csc_getDiag, x))
 
-## try to define for "Matrix" -- once and for all -- but that fails -- why? __ FIXME __
-## setMethod("dim", signature(x = "dgRMatrix"),
-##           function(x) x@Dim, valueClass = "integer")
-
-##setMethod("t", signature(x = "dgRMatrix"),
-##          function(x) .Call(csc_transpose, x),
-##          valueClass = "dgRMatrix")
-
 setMethod("image", "dgRMatrix", function(x, ...) image(.R.2.T(x), ...))
-
-setMethod("t", "RsparseMatrix", function(x) .C.2.R(.tR.2.C(x)))
 
 ## MJ: no longer needed ... replacement in ./sparseMatrix.R
 if(FALSE) {
+setMethod("t", "RsparseMatrix", function(x) .C.2.R(.tCR2RC(x)))
+
 ## Want tril(), triu(), band() --- just as "indexing" ---
 ## return a "close" class:
 setMethod("tril", "RsparseMatrix",

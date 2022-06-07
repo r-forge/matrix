@@ -2,15 +2,15 @@
 // to get strdup declared in glibc (when strict -std=c11 or -stdc99):
 #define _POSIX_C_SOURCE 200809L
 #endif
-
 #include <string.h>
-
 #include "dgCMatrix.h"
+#include "chm_common.h"
 
+/* MJ: no longer */
+#if 0
 /* for Csparse_transpose() : */
 #include "Csparse.h"
-#include "chm_common.h"
-/* -> Mutils.h / SPQR ... */
+#endif /* MJ */
 
 /* FIXME -- we "forget" about dimnames almost everywhere : */
 
@@ -80,6 +80,10 @@ SEXP compressed_to_TMatrix(SEXP x, SEXP colP)
     return ans;
 }
 
+/* MJ: no longer needed ... 
+   now done via R_sparse_transpose(), tCRsparse_as_RCsparse() */
+#if 0
+
 SEXP R_to_CMatrix(SEXP x)
 {
     char *ncl = strdup(class_P(x));
@@ -122,6 +126,7 @@ SEXP R_to_CMatrix(SEXP x)
 }
 // NB: C_to_RMatrix(.)  may be nice, but would need Rsparse_transpose()
 
+#endif /* MJ */
 
 /** Return a 2 column matrix  '' cbind(i, j) ''  of 0-origin index vectors (i,j)
  *  which entirely correspond to the (i,j) slots of

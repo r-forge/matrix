@@ -54,12 +54,6 @@ setMethod("rcond", signature(x = "ddenseMatrix", norm = "missing"),
 setMethod("rcond", signature(x = "ddenseMatrix", norm = "character"),
 	  function(x, norm, ...) rcond(..2dge(x), norm, ...))
 
-## Not really useful; now require *identical* class for result:
-## setMethod("t", signature(x = "ddenseMatrix"),
-## 	  function(x) callGeneric(..2dge(x)))
-
-## "diag" --> specific methods for dge, dtr,dtp, dsy,dsp
-
 setMethod("solve", signature(a = "ddenseMatrix", b = "missing"),
           function(a, b, ...) solve(..2dge(a)))
 

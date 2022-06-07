@@ -399,6 +399,9 @@ SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo, SEXP sym_dmns)
     return ans;
 }
 
+/* MJ: no longer needed ... prefer R_sparse_transpose() */
+#if 0
+
 SEXP Csparse_transpose(SEXP x, SEXP tri)
 {
     /* TODO: lgCMatrix & igC* currently go via double prec. cholmod -
@@ -428,6 +431,8 @@ SEXP Csparse_transpose(SEXP x, SEXP tri)
     UNPROTECT(2);
     return ans;
 }
+
+#endif /* MJ */
 
 /** @brief  A %*% B  - for matrices of class CsparseMatrix (R package "Matrix")
  *

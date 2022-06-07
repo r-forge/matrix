@@ -227,9 +227,9 @@ setMethod("%*%", signature(x = "matrix", y = "Matrix"),
 
 ## RsparseMatrix -- via CsparseMatrix:
 setMethod("%*%", signature(x = "mMatrix", y = "RsparseMatrix"),
-	  function(x, y) x %*% .R.2.C(y))
+	  function(x, y) x %*% .CR2RC(y))
 setMethod("%*%", signature(x = "RsparseMatrix", y = "mMatrix"),
-	  function(x, y) .R.2.C(x) %*% y)
+	  function(x, y) .CR2RC(x) %*% y)
 
 
 ## bail-out methods in order to get better error messages
@@ -600,10 +600,10 @@ setMethod("crossprod", signature(x = "symmetricMatrix", y = "ANY"),
 for(mClass in c("mMatrix", "ANY")) {
     setMethod("crossprod", signature(x = mClass, y = "RsparseMatrix"),
 	      function(x, y, boolArith=NA, ...)
-		  crossprod(x, .R.2.C(y), boolArith=boolArith, ...))
+		  crossprod(x, .CR2RC(y), boolArith=boolArith, ...))
     setMethod("crossprod", signature(x = "RsparseMatrix", y = mClass),
 	      function(x, y, boolArith=NA, ...)
-		  crossprod(.R.2.C(x), y, boolArith=boolArith, ...))
+		  crossprod(.CR2RC(x), y, boolArith=boolArith, ...))
 }
 
 ## cheap fallbacks
@@ -886,10 +886,10 @@ setMethod("tcrossprod", signature(x = "sparseVector", y = "numLike"),
 for(mClass in c("mMatrix", "ANY")) {
     setMethod("tcrossprod", signature(x = mClass, y = "RsparseMatrix"),
 	      function(x, y, boolArith=NA, ...)
-		  tcrossprod(x, .R.2.C(y), boolArith=boolArith, ...))
+		  tcrossprod(x, .CR2RC(y), boolArith=boolArith, ...))
     setMethod("tcrossprod", signature(x = "RsparseMatrix", y = mClass),
 	      function(x, y, boolArith=NA, ...)
-		  tcrossprod(.R.2.C(x), y, boolArith=boolArith, ...))
+		  tcrossprod(.CR2RC(x), y, boolArith=boolArith, ...))
 }
 
 

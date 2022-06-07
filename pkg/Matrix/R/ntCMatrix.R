@@ -34,6 +34,9 @@ setAs("ngCMatrix", "ntCMatrix", # to triangular, needed for triu,..
                            "ntTMatrix"), "ntCMatrix"))
 } ## MJ
 
-## setMethod("t", signature(x = "ntCMatrix"),
-##           function(x) .Call(ntCMatrix_trans, x),
-##           valueClass = "ntCMatrix")
+## MJ: no longer needed ... method now inherited from CsparseMatrix
+if(FALSE) {
+setMethod("t", signature(x = "ntCMatrix"),
+          function(x) .Call(ntCMatrix_trans, x),
+          valueClass = "ntCMatrix")
+} ## MJ

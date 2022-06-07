@@ -85,7 +85,6 @@
 \alias{coerce,ltTMatrix,matrix-method}
 \alias{coerce,ltTMatrix,ntTMatrix-method}
 \alias{coerce,matrix,ltTMatrix-method}
-\alias{t,ltTMatrix-method}
 \alias{which,ltTMatrix-method}
 % lsC
 \alias{Logic,lsCMatrix,lsCMatrix-method}
@@ -117,7 +116,6 @@
 \alias{coerce,lsTMatrix,matrix-method}
 \alias{coerce,lsTMatrix,nsTMatrix-method}
 \alias{coerce,matrix,lsTMatrix-method}
-\alias{t,lsTMatrix-method}
 \alias{which,lsTMatrix-method}
 %
 \description{The \code{lsparseMatrix} class is a virtual class of sparse

@@ -1087,18 +1087,20 @@ n2l_spMatrix <- function(from) {
 }
 } ## MJ
 
+## MJ: no longer needed ... replacement below
+if(FALSE) {
+.R.2.C  <- function(from) .Call(R_to_CMatrix, from)
+.C.2.R  <- function(from)
+    .tCR2RC(.Call(Csparse_transpose, from, is(from, "triangularMatrix")))
+## slightly less efficient than above, but preserves symmetry correctly
+.viaC.2.R <- function(from) .tCR2RC(as(t(from), "CsparseMatrix"))
+} ## MJ
 
-.tR.2.C <- function(from) .Call(tRsparse_as_Csparse, from)
-.tC.2.R <- function(from) .Call(tCsparse_as_Rsparse, from)
+.tCR2RC <- function(from) .Call(tCRsparse_as_RCsparse, from)
+.CR2RC <- function(from) .tCR2RC(.Call(R_sparse_transpose, from))
 
 ## .R.2.T() fails on 32bit--enable-R-shlib with segfault {Kurt}
 .R.2.T  <- function(from) .Call(compressed_to_TMatrix, from, FALSE)
-.R.2.C  <- function(from) .Call(R_to_CMatrix, from)
-.C.2.R  <- function(from)
-    .tC.2.R(.Call(Csparse_transpose, from, is(from, "triangularMatrix")))
-
-## slightly less efficient than above, but preserves symmetry correctly
-.viaC.2.R <- function(from) .tC.2.R(as(t(from), "CsparseMatrix"))
 
 ## in ../src/Tsparse.c :  |-> cholmod_T -> cholmod_C -> chm_sparse_to_SEXP
 ## adjusted for triangular matrices not represented in cholmod

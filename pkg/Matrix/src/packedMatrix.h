@@ -12,7 +12,7 @@ SEXP packedMatrix_is_symmetric(SEXP obj, SEXP checkDN);
 SEXP packedMatrix_is_triangular(SEXP obj, SEXP upper);
 SEXP packedMatrix_is_diagonal(SEXP obj);
 
-SEXP packedMatrix_t(SEXP from);
+SEXP packedMatrix_transpose(SEXP from);
 
 SEXP packedMatrix_diag_get(SEXP obj, SEXP nms);
 SEXP packedMatrix_diag_set(SEXP obj, SEXP val);

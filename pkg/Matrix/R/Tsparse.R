@@ -889,7 +889,6 @@ setMethod("triu", "TsparseMatrix",
 setMethod("band", "TsparseMatrix",
 	  function(x, k1, k2, ...)
 	  as(band(.T.2.C(x), k1 = k1, k2 = k2, ...), "TsparseMatrix"))
-} ## MJ
 
 ## For the "general" T ones (triangular & symmetric have special methods):
 setMethod("t", signature(x = "TsparseMatrix"),
@@ -904,6 +903,7 @@ setMethod("t", signature(x = "TsparseMatrix"),
 	      r@Dimnames <- x@Dimnames[2:1]
 	      r
       })
+} ## MJ
 
 setMethod("isDiagonal", signature(object = "TsparseMatrix"),
           function(object) {

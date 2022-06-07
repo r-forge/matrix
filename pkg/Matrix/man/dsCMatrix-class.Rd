@@ -24,7 +24,6 @@
 \alias{coerce,matrix,dsCMatrix-method}
 \alias{determinant,dsCMatrix,logical-method}
 \alias{determinant,dsCMatrix,missing-method}
-\alias{t,dsCMatrix-method}
 %
 \alias{coerce,dsTMatrix,dgTMatrix-method}
 \alias{coerce,dsTMatrix,dgeMatrix-method}
@@ -36,7 +35,6 @@
 \alias{coerce,dsTMatrix,nsTMatrix-method}
 \alias{coerce,dsTMatrix,matrix-method}
 \alias{coerce,matrix,dsTMatrix-method}
-\alias{t,dsTMatrix-method}
 %
 \description{The \code{dsCMatrix} class is a class of symmetric, sparse
   numeric matrices in the compressed, \bold{c}olumn-oriented format.  In

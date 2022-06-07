@@ -83,7 +83,12 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(zCsparse_subassign, 4),
     CALLDEF(Csparse_general_to_symmetric, 3),
     CALLDEF(Csparse_symmetric_to_general, 1),
+
+/* MJ: no longer needed ... prefer R_sparse_transpose() */
+#if 0
     CALLDEF(Csparse_transpose, 2),
+#endif
+    
     CALLDEF(Csparse_validate, 1),
     CALLDEF(Csparse_validate2, 2),
     CALLDEF(Csparse_vertcat, 2),
@@ -104,7 +109,13 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(R_rbind2_vector, 2),
     CALLDEF(R_all0, 1),
     CALLDEF(R_any0, 1),
+
+/* MJ: no longer needed ... 
+   now done via R_sparse_transpose(), tCRsparse_as_RCsparse() */
+#if 0
     CALLDEF(R_to_CMatrix, 1),
+#endif
+    
 #ifdef _Matrix_has_SVD_
     CALLDEF(SVD_validate, 1),
 #endif
@@ -349,15 +360,13 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(R_revDN, 1),
     CALLDEF(R_Matrix_kind, 2),
 
+    CALLDEF(R_sparse_drop0, 1),
     CALLDEF(R_sparse_as_kind, 3),
     CALLDEF(R_diagonal_as_sparse, 4),
-    CALLDEF(Csparse_drop0, 1),
-    CALLDEF(Rsparse_drop0, 1),
-    CALLDEF(Tsparse_drop0, 1),
-    CALLDEF(tCsparse_as_Rsparse, 1),
-    CALLDEF(tRsparse_as_Csparse, 1),
     CALLDEF(R_sparse_band, 3),
-
+    CALLDEF(R_sparse_transpose, 1),
+    CALLDEF(tCRsparse_as_RCsparse, 1),
+    
     CALLDEF(R_matrix_as_geMatrix, 2),
     CALLDEF(R_dense_as_geMatrix, 2),
     CALLDEF(R_dense_as_sparse, 4),
@@ -377,7 +386,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(unpackedMatrix_is_symmetric, 2),
     CALLDEF(unpackedMatrix_is_triangular, 2),
     CALLDEF(unpackedMatrix_is_diagonal, 1),
-    CALLDEF(unpackedMatrix_t, 1),
+    CALLDEF(unpackedMatrix_transpose, 1),
     CALLDEF(unpackedMatrix_diag_get, 2),
     CALLDEF(unpackedMatrix_diag_set, 2),
 
@@ -386,7 +395,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(packedMatrix_is_symmetric, 2),
     CALLDEF(packedMatrix_is_triangular, 2),
     CALLDEF(packedMatrix_is_diagonal, 1),
-    CALLDEF(packedMatrix_t, 1),
+    CALLDEF(packedMatrix_transpose, 1),
     CALLDEF(packedMatrix_diag_get, 2),
     CALLDEF(packedMatrix_diag_set, 2),
     CALLDEF(packedMatrix_sub1, 2),

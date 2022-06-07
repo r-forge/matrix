@@ -29,7 +29,6 @@
 \alias{coerce,dtTMatrix,matrix-method}
 \alias{coerce,dtTMatrix,ntTMatrix-method}
 \alias{coerce,matrix,dtTMatrix-method}
-\alias{t,dtTMatrix-method}
 %
 \description{The \code{"dtCMatrix"} class is a class of triangular, sparse
   matrices in the compressed, column-oriented format.  In this

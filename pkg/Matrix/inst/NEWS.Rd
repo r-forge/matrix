@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-06-07 r3490)}{
+\section{Changes in version 1.4-2 (2022-06-07 r3491)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -47,7 +47,7 @@
       \code{dt[pr]Matrix}, rather than preserving class and clearing
       the \code{perm} slot.
 
-      \item \code{t(<.s[py]Matrix)} no longer reverses the
+      \item \code{t(<symmetricMatrix>)} no longer reverses the
       \code{Dimnames} slot.  Symmetrization of \code{dn <- x@Dimnames}
       and \code{t(x)@Dimnames} had given different results when
       \code{dn[[1]]} and \code{dn[[2]]} were non-\code{NULL} and
@@ -184,8 +184,9 @@
       Traditional matrices can be coerced directly to \emph{any}
       \code{.[gts][CRT]}.
 
-      \item \code{.tC.2.R()} and \code{.tR.2.C()} are now done in C,
-      for speed.
+      \item \code{t()} is now done entirely in C for all
+      \code{[CRT]sparseMatrix} and without coercions of logical
+      and integer types to double.
     }
   }
   \subsection{Misc}{
@@ -194,9 +195,9 @@
       a zero constant (0 for \code{int} arrays, 0.0 for \code{double}
       arrays).
 
-      \item \code{(R_)?[gs]et_factors()} have been renamed
-      \code{(R_)?[gs]et_factor()}, as they only ever get and set
-      \emph{one} factor.
+      \item C-level utilities \code{(R_)?[gs]et_factors()} have been
+      renamed \code{(R_)?[gs]et_factor()}, as they only ever get and
+      set \emph{one} factor.
 
       \item The signature of \code{set_factor()} has been changed to
       match other \code{set*()} functions:
@@ -239,6 +240,9 @@
       (but still fast) functions.  These not-yet-deprecated
       functions have been centralized in \file{R/denseMatrix.R}
       and \file{R/sparseMatrix.R}.
+
+      \item R-level utilities \code{.t?R.2.C()} and \code{.t?C.2.R()},
+      have been superceded by \code{.t?CR2RC()}.
     }
   }
 }

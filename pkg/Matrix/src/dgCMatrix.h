@@ -9,7 +9,13 @@ SEXP xCMatrix_validate(SEXP x);
 SEXP xRMatrix_validate(SEXP x);
 SEXP compressed_to_TMatrix(SEXP x, SEXP colP);
 SEXP compressed_non_0_ij(SEXP x, SEXP colP);
+
+/* MJ: no longer needed ... 
+   now done via R_sparse_transpose(), tCRsparse_as_RCsparse() */
+#if 0
 SEXP R_to_CMatrix(SEXP x);
+#endif /* MJ */
+
 SEXP dgCMatrix_colSums(SEXP x, SEXP NArm, SEXP spRes, SEXP trans, SEXP means);
 SEXP igCMatrix_colSums(SEXP x, SEXP NArm, SEXP spRes, SEXP trans, SEXP means);
 SEXP lgCMatrix_colSums(SEXP x, SEXP NArm, SEXP spRes, SEXP trans, SEXP means);

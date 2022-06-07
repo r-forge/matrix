@@ -78,7 +78,6 @@
 \alias{coerce,ntTMatrix,nsTMatrix-method}
 \alias{coerce,ntTMatrix,ntCMatrix-method}
 \alias{coerce,ntTMatrix,ntrMatrix-method}
-\alias{t,ntTMatrix-method}
 \alias{which,ntTMatrix-method}
 % nsC
 \alias{coerce,matrix,nsCMatrix-method}
@@ -108,7 +107,6 @@
 \alias{coerce,nsTMatrix,nsCMatrix-method}
 \alias{coerce,nsTMatrix,nsyMatrix-method}
 \alias{coerce,nsTMatrix,ntTMatrix-method}
-\alias{t,nsTMatrix-method}
 \alias{which,nsTMatrix-method}
 %
 \description{The \code{nsparseMatrix} class is a virtual class of sparse

@@ -46,8 +46,9 @@ setMethod("triu", "nsCMatrix",
 setMethod("chol", signature(x = "nsCMatrix"),
 	  function(x, pivot=FALSE, ...) stop("temporarily disabled"))## FIXME
 
-## Use more general method from CsparseMatrix class
-## setMethod("t", signature(x = "nsCMatrix"),
-##           function(x)
-##           .Call(nsCMatrix_trans, x),
-##           valueClass = "nsCMatrix")
+## MJ: no longer needed ... method now inherited from CsparseMatrix
+if(FALSE) {
+setMethod("t", signature(x = "nsCMatrix"),
+          function(x) .Call(nsCMatrix_trans, x),
+          valueClass = "nsCMatrix")
+} ## MJ
