@@ -1147,10 +1147,11 @@ tT2gT <- function(x, cl = class(x), toClass, cld = getClassDef(cl)) {
 ## Ditto in ../src/Csparse.c :
 .gC2tT <- function(x, uplo, diag="N") .Call(Csparse_to_tTsparse, x, uplo, diag)
 .gC2tC <- function(x, uplo, diag="N") .Call(Csparse_to_tCsparse, x, uplo, diag)
-.gC2sC <- function(x, uplo) .Call(Csparse_general_to_symmetric, x, uplo, TRUE)
 
 ## MJ: no longer needed
 if(FALSE) {
+.gC2sC <- function(x, uplo) .Call(Csparse_general_to_symmetric, x, uplo, TRUE)
+
 gT2tT <- function(x, uplo, diag, toClass,
 		  do.n = extends(toClass, "nMatrix"))
 {

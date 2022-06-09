@@ -829,49 +829,15 @@ print.sparseSummary <- function (x, ...) {
     invisible(x)
 }
 
-
-### FIXME [from ../TODO ]: Use cholmod_symmetry() --
-## Possibly even use 'option' as argument here for fast check to use sparse solve !!
-
-## FIXME (for tol = 0): use cholmod_symmetry(A, 1, ...)
-##        for tol > 0   should modify  cholmod_symmetry(..) to work with tol
-
-## or slightly simpler, rename and export is_sym() in ../src/cs_utils.c
-
-.sM.is.sy <- function(object, tol = 100 * .Machine$double.eps,
-                      checkDN = TRUE, ...) {
-    ## pretest: is it square?
-    d <- object@Dim
-    if((n <- d[1L]) != d[2L])
-        return(FALSE)
-    ## pretest: are DN symmetric in the sense of validObject(<symmetricMatrix>)?
-    if(checkDN) {
-        ca <- function(check.attributes = TRUE, ...) check.attributes
-        if(ca(...) && !isSymmetricDN(object@Dimnames))
-            return(FALSE)
-    }
-    if(n <= 1L)
-        return(TRUE)
-    ## now handling an n-by-n sparseMatrix, n >= 2:
-    x  <- as(  object,  "sparseVector")
-    tx <- as(t(object), "sparseVector")
-    if(is(tx, "zsparseVector"))
-        tx@x <- Conj(tx@x)
-    ae <- function(check.attributes, ...) {
-        ## discarding possible user-supplied check.attributes:
-        all.equal(..., check.attributes = FALSE)
-    }
-    isTRUE(ae(target = x, current = tx, tolerance = tol, ...))
-}
-
-## method for     .s[CTR]Matrix in ./symmetricMatrix.R
-## method for [lni]t[CTR]Matrix in ./triangularMatrix.R
-.sM.subclasses <- names(getClass("sparseMatrix")@subclasses)
-for (.cl in c("sparseMatrix",
-              grep("^[dz]t[CRT]Matrix$", .sM.subclasses, value = TRUE)))
-    setMethod("isSymmetric", signature(object = .cl), .sM.is.sy)
-rm(.sM.is.sy, .sM.subclasses, .cl)
-
+## MJ: no longer needed ... replacement below
+if(FALSE) {
+## Fallback, used for RsparseMatrix and others, but not [CT]sparseMatrix,
+## which have their own methods
+setMethod("isDiagonal", signature(object = "sparseMatrix"),
+	  function(object) {
+              d <- object@Dim
+              d[1L] == d[2L] && callGeneric(as(object, "TsparseMatrix"))
+          })
 ## Fallback, used for RsparseMatrix and others, but not [CT]sparseMatrix,
 ## triangularMatrix, or symmetricMatrix which have their own methods
 setMethod("isTriangular", signature(object = "sparseMatrix"),
@@ -882,14 +848,7 @@ setMethod("isTriangular", signature(object = "sparseMatrix"),
               else
                   FALSE
           })
-
-## Fallback, used for RsparseMatrix and others, but not [CT]sparseMatrix,
-## which have their own methods
-setMethod("isDiagonal", signature(object = "sparseMatrix"),
-	  function(object) {
-              d <- object@Dim
-              d[1L] == d[2L] && callGeneric(as(object, "TsparseMatrix"))
-          })
+} ## MJ
 
 setMethod("determinant", signature(x = "sparseMatrix", logarithm = "missing"),
 	  function(x, logarithm, ...)
@@ -1131,6 +1090,8 @@ setMethod("pack", signature(x = "sparseMatrix"),
 setMethod("unpack", signature(x = "sparseMatrix"),
           function(x, ...) stop(sprintf("invalid class \"%s\" to 'unpack()'; only dense matrices can be unpacked", class(x))))
 
+## MJ: no longer needed ... replacement below
+if(FALSE) {
 forceSymmetricCsparse <- function(x, uplo) {
     d <- x@Dim
     if (d[1L] != d[2L])
@@ -1175,31 +1136,111 @@ forceSymmetricTsparse <- function(x, uplo) {
         new(Class, Dim = d, Dimnames = dn, uplo = uplo,
             i = i[k], j = j[k], x = x@x[k])
 }
+} ## MJ
 
 .sparse.band <- function(x, k1, k2, ...) .Call(R_sparse_band, x, k1, k2)
 .sparse.triu <- function(x, k = 0,  ...) .Call(R_sparse_band, x, k, NULL)
 .sparse.tril <- function(x, k = 0,  ...) .Call(R_sparse_band, x, NULL, k)
-.sparse.transpose <- function(x) .Call(R_sparse_transpose, x)
+.sparse.t    <- function(x)              .Call(R_sparse_transpose, x)
+.sparse.fS2  <- function(x, uplo) .Call(R_sparse_force_symmetric, x, uplo)
+.sparse.fS1  <- function(x, uplo) .Call(R_sparse_force_symmetric, x, "")
+.C.is.di <- function(object)
+    .Call(Csparse_is_diagonal, object)
+.R.is.di <- function(object)
+    .Call(Rsparse_is_diagonal, object)
+.T.is.di <- function(object)
+    .Call(Tsparse_is_diagonal, object)
+.C.is.tr <- function(object, upper = NA, ...)
+    .Call(Csparse_is_triangular, object, upper)
+.R.is.tr <- function(object, upper = NA, ...)
+    .Call(Rsparse_is_triangular, object, upper)
+.T.is.tr <- function(object, upper = NA, ...)
+    .Call(Tsparse_is_triangular, object, upper)
+.C.is.sy <- function(object, checkDN = TRUE, ...) {
+    if(checkDN) {
+        ca <- function(check.attributes = TRUE, ...) check.attributes
+        checkDN <- ca(...)
+    }
+    .Call(Csparse_is_symmetric, object, checkDN)
+}
+.R.is.sy <- function(object, checkDN = TRUE, ...) {
+    if(checkDN) {
+        ca <- function(check.attributes = TRUE, ...) check.attributes
+        checkDN <- ca(...)
+    }
+    .Call(Rsparse_is_symmetric, object, checkDN)
+}
+.T.is.sy <- function(object, checkDN = TRUE, ...) {
+    if(checkDN) {
+        ca <- function(check.attributes = TRUE, ...) check.attributes
+        checkDN <- ca(...)
+    }
+    .Call(Csparse_is_symmetric, as(object, "CsparseMatrix"), checkDN)
+}
+.sparse.is.sy.dz <- function(object, tol = 100 * .Machine$double.eps,
+                             checkDN = TRUE, ...) {
+    ## backwards compatibility: don't check DN if check.attributes=FALSE
+    if(checkDN) {
+        ca <- function(check.attributes = TRUE, ...) check.attributes
+        checkDN <- ca(...)
+    }
+    ## be very fast when requiring exact symmetry
+    if(tol <= 0) {
+        if(!.hasSlot(object, "p"))
+            return(.Call(Csparse_is_symmetric, as(object, "CsparseMatrix"), checkDN))
+        else if(.hasSlot(object, "i"))
+            return(.Call(Csparse_is_symmetric, object, checkDN))
+        else
+            return(.Call(Rsparse_is_symmetric, object, checkDN))
+    }
+    ## pretest: is it square?
+    d <- object@Dim
+    if((n <- d[1L]) != d[2L])
+        return(FALSE)
+    ## pretest: are DN symmetric in the sense of validObject(<symmetricMatrix>)?
+    if(checkDN && !isSymmetricDN(object@Dimnames))
+        return(FALSE)
+    if(n <= 1L)
+        return(TRUE)
+    ## now handling an n-by-n [CRT]sparseMatrix, n >= 2:
+    x  <- as(  object,  "sparseVector")
+    tx <- as(t(object), "sparseVector")
+    if(is(tx, "zsparseVector"))
+        tx@x <- Conj(tx@x)
+    ae <- function(check.attributes, ...) {
+        ## discarding possible user-supplied check.attributes:
+        all.equal(..., check.attributes = FALSE)
+    }
+    isTRUE(ae(target = x, current = tx, tolerance = tol, ...))
+}
+.sparse.subclasses <- names(getClass("sparseMatrix")@subclasses)
 
-## NOTE/FIXME(?):
-## these do not work for subclasses inheriting from symmetricMatrix,
-## which have their own (much simpler) methods; see ./symmetricMatrix.R
-setMethod("forceSymmetric", signature(x = "sparseMatrix", uplo = "missing"),
-	  function(x, uplo) forceSymmetricCsparse(as(x, "CsparseMatrix")))
-setMethod("forceSymmetric", signature(x = "sparseMatrix", uplo = "character"),
-	  function(x, uplo) forceSymmetricCsparse(as(x, "CsparseMatrix"), uplo))
-
-for (.repr in c("C", "R", "T")) {
-    .cl <- paste0(.repr, "sparseMatrix")
-    .fS <- get(paste0("forceSymmetric", .repr, "sparse"),
-               mode = "function", inherits = FALSE)
-
-    setMethod("forceSymmetric", signature(x = .cl, uplo = "missing"), .fS)
-    setMethod("forceSymmetric", signature(x = .cl, uplo = "character"), .fS)
+for (.cl in grep("^[CRT]sparseMatrix$", .sparse.subclasses, value = TRUE)) {
     setMethod("band", signature(x = .cl), .sparse.band)
     setMethod("triu", signature(x = .cl), .sparse.triu)
     setMethod("tril", signature(x = .cl), .sparse.tril)
-    setMethod("t", signature(x = .cl), .sparse.transpose)
+    setMethod("t",    signature(x = .cl), .sparse.t)
+    setMethod("forceSymmetric", signature(x = .cl, uplo = "character"),
+              .sparse.fS2)
+    setMethod("forceSymmetric", signature(x = .cl, uplo = "missing"),
+              .sparse.fS1)
+    setMethod("isDiagonal", signature(object = .cl),
+              get(paste0(".", substr(.cl, 1L, 1L), ".is.di"),
+                  mode = "function", inherits = FALSE))
 }
-rm(.sparse.band, .sparse.triu, .sparse.tril, .sparse.transpose,
-   .repr, .cl, .fS)
+
+for (.cl in grep("^.g[CRT]Matrix$", .sparse.subclasses, value = TRUE))
+    setMethod("isTriangular", signature(object = .cl),
+              get(paste0(".", substr(.cl, 3L, 3L), ".is.tr"),
+                  mode = "function", inherits = FALSE))
+for (.cl in grep("^[lni]g[CRT]Matrix$", .sparse.subclasses, value = TRUE))
+    setMethod("isSymmetric", signature(object = .cl),
+              get(paste0(".", substr(.cl, 3L, 3L), ".is.sy"),
+                  mode = "function", inherits = FALSE))
+for (.cl in grep("^[dz][gt][CRT]Matrix$", .sparse.subclasses, value = TRUE))
+    setMethod("isSymmetric", signature(object = .cl), .sparse.is.sy.dz)
+
+rm(.cl, .sparse.subclasses, .sparse.is.sy.dz,
+   list = c(grep("^[.]sparse[.](band|tri[ul]|t|fS[21])$", ls(), value = TRUE),
+            grep("^[.][CRT][.]is[.](di|tr|sy)$", ls(), value = TRUE)))
+

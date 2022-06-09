@@ -29,7 +29,12 @@ SEXP iCsparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value);
 SEXP nCsparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value);
 SEXP zCsparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value);
 SEXP Csparse_symmetric_to_general(SEXP x);
+
+/* MJ: no longer needed ... prefer R_sparse_force_symmetric */
+#if 0
 SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo, SEXP sym_dmns);
+#endif /* MJ */
+
 SEXP Csparse_MatrixMarket(SEXP x, SEXP fname);
 SEXP Csparse_sort (SEXP x);
 SEXP Csparse_to_Tsparse(SEXP x, SEXP tri);

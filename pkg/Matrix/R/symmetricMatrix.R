@@ -35,6 +35,10 @@ setMethod("isTriangular", signature(object = "symmetricMatrix"),
                   TRUE
           })
 
+## MJ: no longer needed ...
+##     methods for [CRT]sparseMatrix, (un)?packedMatrix do the same in C
+##     and it is best to avoid hacks like these where possible
+if(FALSE) {
 .sM.force1 <- function(x, uplo) x
 .sM.force2 <- function(x, uplo) if(uplo == x@uplo) x else t(x)
 for (.cl in setdiff(.sM.subclasses, c("dpoMatrix", "dppMatrix", "corMatrix"))) {
@@ -44,6 +48,7 @@ for (.cl in setdiff(.sM.subclasses, c("dpoMatrix", "dppMatrix", "corMatrix"))) {
 	      .sM.force2)
 }
 rm(.sM.force1, .sM.force2, .cl)
+}
 
 ## MJ: no longer needed ... replacement in ./(un)?packedMatrix.R
 if(FALSE) {

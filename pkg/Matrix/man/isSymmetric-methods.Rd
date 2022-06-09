@@ -4,19 +4,29 @@
 %
 \alias{isSymmetric-methods}
 %
-\alias{isSymmetric,dgeMatrix-method}
 \alias{isSymmetric,diagonalMatrix-method}
+\alias{isSymmetric,indMatrix-method}
+\alias{isSymmetric,symmetricMatrix-method}
+\alias{isSymmetric,triangularMatrix-method}
+% disambiguation:
+\alias{isSymmetric,dgCMatrix-method}
+\alias{isSymmetric,dgRMatrix-method}
+\alias{isSymmetric,dgTMatrix-method}
+\alias{isSymmetric,dgeMatrix-method}
+\alias{isSymmetric,lgCMatrix-method}
+\alias{isSymmetric,lgRMatrix-method}
+\alias{isSymmetric,lgTMatrix-method}
+\alias{isSymmetric,lgeMatrix-method}
+\alias{isSymmetric,ngCMatrix-method}
+\alias{isSymmetric,ngRMatrix-method}
+\alias{isSymmetric,ngTMatrix-method}
+\alias{isSymmetric,ngeMatrix-method}
+% tolerating numerical fuzz for [dz]Matrix:
 \alias{isSymmetric,dtCMatrix-method}
 \alias{isSymmetric,dtRMatrix-method}
 \alias{isSymmetric,dtTMatrix-method}
 \alias{isSymmetric,dtpMatrix-method}
 \alias{isSymmetric,dtrMatrix-method}
-\alias{isSymmetric,indMatrix-method}
-\alias{isSymmetric,lgeMatrix-method}
-\alias{isSymmetric,ngeMatrix-method}
-\alias{isSymmetric,sparseMatrix-method}
-\alias{isSymmetric,symmetricMatrix-method}
-\alias{isSymmetric,triangularMatrix-method}
 %
 \description{
   \code{isSymmetric} tests whether its argument is a symmetric square
@@ -32,17 +42,14 @@
 \usage{
 \S4method{isSymmetric}{symmetricMatrix}(object, \dots)
 \S4method{isSymmetric}{triangularMatrix}(object, checkDN = TRUE, \dots)
-\S4method{isSymmetric}{sparseMatrix}(object, tol = 100 * .Machine$double.eps, checkDN = TRUE, \dots)
 \S4method{isSymmetric}{diagonalMatrix}(object, checkDN = TRUE, \dots)
 \S4method{isSymmetric}{indMatrix}(object, checkDN = TRUE, \dots)
 \S4method{isSymmetric}{dgeMatrix}(object, tol = 100 * .Machine$double.eps, tol1 = 8 * tol, checkDN = TRUE, \dots)
 \S4method{isSymmetric}{lgeMatrix}(object, checkDN = TRUE, \dots)
 \S4method{isSymmetric}{ngeMatrix}(object, checkDN = TRUE, \dots)
-\S4method{isSymmetric}{dtrMatrix}(object, tol = 100 * .Machine$double.eps, tol1 = 8 * tol, checkDN = TRUE, \dots)
-\S4method{isSymmetric}{dtpMatrix}(object, tol = 100 * .Machine$double.eps, tol1 = 8 * tol, checkDN = TRUE, \dots)
-\S4method{isSymmetric}{dtCMatrix}(object, tol = 100 * .Machine$double.eps, checkDN = TRUE, \dots)
-\S4method{isSymmetric}{dtRMatrix}(object, tol = 100 * .Machine$double.eps, checkDN = TRUE, \dots)
-\S4method{isSymmetric}{dtTMatrix}(object, tol = 100 * .Machine$double.eps, checkDN = TRUE, \dots)
+\S4method{isSymmetric}{dgCMatrix}(object, tol = 100 * .Machine$double.eps, checkDN = TRUE, \dots)
+\S4method{isSymmetric}{lgCMatrix}(object, checkDN = TRUE, \dots)
+\S4method{isSymmetric}{ngCMatrix}(object, checkDN = TRUE, \dots)
 }
 \arguments{
   \item{object}{a \code{"Matrix"}.}

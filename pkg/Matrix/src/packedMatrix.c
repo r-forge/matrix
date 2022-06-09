@@ -93,21 +93,35 @@ SEXP packedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
     int ivalid = R_check_class_etc(from, valid);
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(class_P(from), "packedMatrix_force_symmetric");
+    const char *clf = valid[ivalid];
     
     char ulf = *uplo_P(from), ult = *CHAR(asChar(uplo_to));
-    if (ivalid <= 2)
+    if (ult == '\0') /* to handle missing(uplo) */
+	ult = ulf;
+    if (clf[1] == 's') {
 	/* .spMatrix */
-	return (ulf == ult) ? from : packedMatrix_transpose(from);
-
+	if (ulf == ult)
+	    return from;
+	SEXP to = PROTECT(packedMatrix_transpose(from));
+	if (clf[0] == 'z') {
+	    /* Need _conjugate_ transpose */
+	    SEXP x = PROTECT(GET_SLOT(from, Matrix_xSym));
+	    conjugate(x);
+	    UNPROTECT(1);
+	}
+	UNPROTECT(1);
+	return to;
+    }
+    
     /* Now handling just .tpMatrix ... */
     
-    char *cl = strdup(valid[ivalid]);
-    cl[1] = 's';
-    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
+    char *clt = strdup(clf);
+    clt[1] = 's';
+    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
 	dim = GET_SLOT(from, Matrix_DimSym),
 	dimnames = GET_SLOT(from, Matrix_DimNamesSym),
 	x_from = GET_SLOT(from, Matrix_xSym);
-    free(cl);
+    free(clt);
     
     if (ulf == ult) {
 	/* .tpMatrix with correct uplo */
@@ -180,7 +194,7 @@ SEXP packedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
 	}								\
     } while (0)
 
-/* isSymmetric(x, tol = 0) */ 
+/* isSymmetric(x, tol = 0, checkDN) */ 
 SEXP packedMatrix_is_symmetric(SEXP obj, SEXP checkDN)
 {
     static const char *valid[] = {
@@ -190,7 +204,7 @@ SEXP packedMatrix_is_symmetric(SEXP obj, SEXP checkDN)
     if (ivalid < 0) {
 	ERROR_INVALID_CLASS(class_P(obj), "packedMatrix_is_symmetric");
 	return R_NilValue;
-    } else if (ivalid <= 2) {
+    } else if (ivalid < 3) {
 	/* .spMatrix: symmetric by definition */
 	return ScalarLogical(1);
     } else {
@@ -237,7 +251,7 @@ SEXP packedMatrix_is_triangular(SEXP obj, SEXP upper)
     PM_IS_DI(res, x, n, ul, "packedMatrix_is_triangular");		\
     if (res)
     
-    if (ivalid <= 2) {
+    if (ivalid < 3) {
 	/* .tpMatrix: be fast if 'upper', 'uplo' agree; else need diagonal */
 	if (need_upper == NA_LOGICAL) {
 	    RETURN_TRUE_OF_KIND(uplo);
@@ -810,7 +824,7 @@ SEXP packedMatrix_sub2(SEXP obj, SEXP index1, SEXP index2, SEXP drop)
        when class is retained also
     */
     SEXP res;
-    Rboolean do_sp = (ivalid <= 2 && !mi && !mj && ni == nj &&
+    Rboolean do_sp = (ivalid < 3 && !mi && !mj && ni == nj &&
 		      memcmp(pi, pj, ni * sizeof(int)) == 0);
     if (do_sp) {
 	PROTECT(res = NEW_OBJECT_OF_CLASS(valid[ivalid]));

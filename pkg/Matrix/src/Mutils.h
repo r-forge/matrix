@@ -357,6 +357,8 @@ SEXP R_matrix_as_geMatrix(SEXP from, SEXP kind);
 SEXP dense_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector);
 SEXP R_dense_as_geMatrix(SEXP from, SEXP kind);
 
+void conjugate(SEXP x);
+    
 Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n);
 R_xlen_t strmatch(char *nm, SEXP s);
 SEXP append_to_named_list(SEXP x, char *nm, SEXP val);

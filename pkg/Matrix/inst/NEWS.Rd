@@ -12,11 +12,11 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-06-07 r3491)}{
+\section{Changes in version 1.4-2 (2022-06-08 r3492)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
-      \code{dimnames(<matrix>)} now goes through C utility \code{symmDN}
+      \code{dimnames(<matrix>)} now goes through C utility \code{symmDN()}
       in most places, resolving some earlier inconsistencies.
 
       \item Many more validity methods now correctly operate under the
@@ -60,11 +60,11 @@
       \code{isTriangular} is now equivalent to \code{isDiagonal}
       in those cases.
 
-      \item \code{isSymmetric} was equivalent to \code{isDiagonal}
-      for triangular matrices, \emph{not} allowing numerical fuzz
-      via an argument \code{tol}.  A \code{tol} argument is now
-      implemented for all subclasses of \code{dMatrix} except
-      those inheriting from \code{symmetricMatrix}.
+      \item \code{isSymmetric()} was equivalent to \code{isDiagonal()}
+      for triangular matrices, \emph{not} allowing numerical fuzz via an
+      argument \code{tol}.  A \code{tol} argument is now implemented
+      for all subclasses of \code{dMatrix} except those inheriting from
+      \code{symmetricMatrix}.
 
       \item Methods for \code{isSymmetric} now also look at
       \code{Dimnames} and \code{names(Dimnames)}, following
@@ -120,7 +120,12 @@
       many subclasses individually.
 
       \item \code{isTriangular} and \code{isDiagonal} are now
-      implemented in C also for standard \code{matrix}.
+      implemented in C also for \code{[CRT]sparseMatrix} and standard
+      \code{matrix}.  \code{isSymmetric} is now implemented in C
+      for all \code{denseMatrix} and all \code{[CRT]sparseMatrix},
+      though these C routines are currently only called when testing
+      for \emph{exact} symmetry (always for \code{[ln]Matrix},
+      only when \code{tol = 0} for \code{dMatrix}).
 
       \item Methods for \code{isSymmetric} gain an argument
       \code{checkDN = TRUE} indicating whether symmetry of
@@ -184,9 +189,12 @@
       Traditional matrices can be coerced directly to \emph{any}
       \code{.[gts][CRT]}.
 
-      \item \code{t()} is now done entirely in C for all
-      \code{[CRT]sparseMatrix} and without coercions of logical
-      and integer types to double.
+      \item \code{t()} and \code{forceSymmetric()} are now done
+      entirely in C for all \code{[CRT]sparseMatrix}, without coercions
+      of logical and integer types to double.
+
+      \item \code{isTriangular()}, and
+      \code{isDiagonal()} are done 
     }
   }
   \subsection{Misc}{

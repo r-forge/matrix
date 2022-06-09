@@ -1,6 +1,6 @@
 ## Methods for virtual class "unpackedMatrix" of full storage, dense matrices
 ## ... and many for base matrices, too
-.upM.subclasses <- names(getClass("unpackedMatrix")@subclasses)
+.upM.subclasses <- names(getClassDef("unpackedMatrix")@subclasses)
 
 ## ~~~~ COERCIONS FROM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -61,8 +61,7 @@ setMethod("pack", signature(x = "matrix"), .m.pack)
 rm(.upM.pack, .upM.pack.ge, .m.pack)
 
 setMethod("forceSymmetric", signature(x = "unpackedMatrix", uplo = "missing"),
-          function(x, uplo) .Call(unpackedMatrix_force_symmetric, x,
-                                  if(.hasSlot(x, "uplo")) x@uplo else "U"))
+          function(x, uplo) .Call(unpackedMatrix_force_symmetric, x, ""))
 setMethod("forceSymmetric", signature(x = "unpackedMatrix", uplo = "character"),
           function(x, uplo) .Call(unpackedMatrix_force_symmetric, x, uplo))
 

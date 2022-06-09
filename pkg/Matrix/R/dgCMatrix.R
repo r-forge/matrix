@@ -137,7 +137,7 @@ setMethod("solve", signature(a = "dgCMatrix", b = "dsparseMatrix"),
 	      if(is.na(sparse)) {
 		  if(isSymmetric(a))
 		      ## TODO: fast cholmod_symmetric() for Cholesky
-		      return(solve(forceSymmetricCsparse(a), b, tol=tol))
+		      return(solve(forceSymmetric(a), b, tol=tol))
 					#-> sparse result
 		  ## else
 		  sparse <- FALSE # (old default)
@@ -154,7 +154,7 @@ setMethod("solve", signature(a = "dgCMatrix", b = "missing"),
 	      if(is.na(sparse)) {
 		  if(isSymmetric(a))
 		      ## TODO: fast cholmod_symmetric() for Cholesky
-		      return(solve(forceSymmetricCsparse(a),
+		      return(solve(forceSymmetric(a),
 				   b = Diagonal(nrow(a)))) #-> sparse result
 		  ## else
 		  sparse <- FALSE # (old default)

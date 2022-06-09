@@ -1,5 +1,5 @@
 ## Methods for virtual class "packedMatrix" of packed, dense matrices
-.pM.subclasses <- names(getClass("packedMatrix")@subclasses)
+.pM.subclasses <- names(getClassDef("packedMatrix")@subclasses)
 
 ## ~~~~ COERCIONS FROM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -25,7 +25,7 @@ setMethod("unpack", signature(x = "packedMatrix"),
           function(x, ...) .Call(packedMatrix_unpack, x, TRUE))
 
 setMethod("forceSymmetric", signature(x = "packedMatrix", uplo = "missing"),
-          function(x, uplo) .Call(packedMatrix_force_symmetric, x, x@uplo))
+          function(x, uplo) .Call(packedMatrix_force_symmetric, x, ""))
 setMethod("forceSymmetric", signature(x = "packedMatrix", uplo = "character"),
           function(x, uplo) .Call(packedMatrix_force_symmetric, x, uplo))
 

@@ -509,15 +509,32 @@ bdiag <- function(...) {
 
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("band", "diagonalMatrix", function(x, k1, k2, ...)
-    if(k1 <= 0L && k2 >= 0L) x else .setZero(x, paste0(.M.kind(x), "tTMatrix")))
+setMethod("band", signature(x = "diagonalMatrix"),
+          function(x, k1, k2, ...) {
+              if(k1 <= 0L && k2 >= 0L)
+                  x
+              else .setZero(x, paste0(.M.kind(x), "tCMatrix"))
+          })
 
-setMethod("tril", "diagonalMatrix", function(x, k = 0, ...)
-    if(k >= 0L) x else .setZero(x, paste0(.M.kind(x), "tCMatrix")))
+setMethod("tril", signature(x = "diagonalMatrix"),
+          function(x, k = 0, ...) {
+              if(k >= 0L)
+                  x
+              else .setZero(x, paste0(.M.kind(x), "tCMatrix"))
+          })
 
-setMethod("triu", "diagonalMatrix", function(x, k = 0, ...)
-    if(k <= 0L) x else .setZero(x, paste0(.M.kind(x), "tCMatrix")))
+setMethod("triu", signature(x = "diagonalMatrix"),
+          function(x, k = 0, ...) {
+              if(k <= 0L)
+                  x
+              else .setZero(x, paste0(.M.kind(x), "tCMatrix"))
+          })
 
+setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "character"),
+          function(x, uplo) .Call(R_diagonal_as_sparse, x, ".sC", uplo, TRUE))
+
+setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "missing"),
+          function(x, uplo) .Call(R_diagonal_as_sparse, x, ".sC",  "U", TRUE))
 
 ## FIXME: should not be needed {when ddi* is dsparse* etc}:
 setMethod("is.finite", signature(x = "diagonalMatrix"),
