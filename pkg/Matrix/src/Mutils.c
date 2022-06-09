@@ -1756,6 +1756,17 @@ SEXP dense_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector)
 
 /* "General" purpose ================================================ */
 
+void conjugate(SEXP x)
+{
+    Rcomplex *px = COMPLEX(x);
+    R_xlen_t nx = XLENGTH(x);
+    while (nx-- > 0) {
+	(*px).i = -(*px).i;
+	++px;
+    }
+    return;
+}
+
 /* That both 's1' and 's2' are STRSXP of length at least 'n' must be 
    checked by the caller ... see, e.g., symmetricMatrix_validate() above
 */

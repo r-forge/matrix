@@ -187,34 +187,48 @@ SEXP unpackedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
     int ivalid = R_check_class_etc(from, valid);
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(class_P(from), "unpackedMatrix_force_symmetric");
-
+    const char *clf = valid[ivalid];
+    
     SEXP uplo_from;
-    char ulf, ult = *CHAR(asChar(uplo_to));
-    if (ivalid < 6) {
+    char ulf = 'U', ult = *CHAR(asChar(uplo_to));
+    if (clf[1] != 'g') {
 	/* .(sy|tr)Matrix */
 	uplo_from = GET_SLOT(from, Matrix_uploSym);
 	ulf = *CHAR(STRING_ELT(uplo_from, 0));
-	if (ivalid < 3)
-	    /* .syMatrix */
-	    return (ulf == ult) ? from : unpackedMatrix_transpose(from);
+    }
+    if (ult == '\0') /* to handle missing(uplo) */
+	ult = ulf;
+    if (clf[1] == 's') {
+	/* .syMatrix */
+	if (ulf == ult)
+	    return from;
+	SEXP to = PROTECT(unpackedMatrix_transpose(from));
+	if (clf[0] == 'z') {
+	    /* Need _conjugate_ transpose */
+	    SEXP x = PROTECT(GET_SLOT(from, Matrix_xSym));
+	    conjugate(x);
+	    UNPROTECT(1);
+	}
+	UNPROTECT(1);
+	return to;
     }
     
     SEXP dim = GET_SLOT(from, Matrix_DimSym);
     int *pdim = INTEGER(dim), n = pdim[0];
-    if (ivalid > 5 && pdim[1] != n)
+    if (pdim[1] != n)
 	error(_("attempt to symmetrize a non-square matrix"));
 
     /* Now handling just square .(tr|ge)Matrix ... */
     
-    char* cl = strdup(valid[ivalid]);
-    cl[1] = 's';
-    cl[2] = 'y';
-    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
+    char *clt = strdup(clf);
+    clt[1] = 's';
+    clt[2] = 'y';
+    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
 	dimnames = GET_SLOT(from, Matrix_DimNamesSym),
 	x_from = GET_SLOT(from, Matrix_xSym);
-    free(cl);
+    free(clt);
     
-    if (ivalid >= 6 || ulf == ult) {
+    if (clf[1] == 'g' || ulf == ult) {
 	/* .geMatrix or .trMatrix with correct uplo */
 	SET_SLOT(to, Matrix_xSym, x_from);
     } else {
@@ -411,7 +425,7 @@ SEXP matrix_force_symmetric(SEXP from, SEXP uplo_to) {
 	}								\
     } while (0)
 
-/* isSymmetric(x, tol = 0) */
+/* isSymmetric(x, tol = 0, checkDN) */
 SEXP unpackedMatrix_is_symmetric(SEXP obj, SEXP checkDN)
 {
     static const char *valid[] = {
@@ -422,20 +436,20 @@ SEXP unpackedMatrix_is_symmetric(SEXP obj, SEXP checkDN)
     if (ivalid < 0) {
 	ERROR_INVALID_CLASS(class_P(obj), "unpackedMatrix_is_symmetric");
 	return R_NilValue;
-    } else if (ivalid <= 2) {
+    } else if (ivalid < 3) {
 	/* .syMatrix: symmetric by definition */
 	return ScalarLogical(1);
     } else {
 	/* .(ge|tr)Matrix */
 	int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym)), n = pdim[0];
-	if (ivalid > 5 && pdim[1] != n)
+	if (ivalid >= 6 && pdim[1] != n)
 	    return ScalarLogical(0);
 	if (asLogical(checkDN) != 0 &&
 	    !DimNames_is_symmetric(GET_SLOT(obj, Matrix_DimNamesSym)))
 	    return ScalarLogical(0);
 	Rboolean res = FALSE;
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	if (ivalid <= 5) {
+	if (ivalid < 6) {
 	    /* .trMatrix: symmetric iff diagonal (upper _and_ lower tri.) */
 	    char ul = (*uplo_P(obj) == 'U') ? 'L' : 'U';
 	    UPM_IS_TR(res, x, n, ul,
@@ -507,7 +521,7 @@ SEXP unpackedMatrix_is_triangular(SEXP obj, SEXP upper)
     SEXP uplo;
     char ul;
     int need_upper = asLogical(upper);
-    if (ivalid <= 5) {
+    if (ivalid < 6) {
 	uplo = GET_SLOT(obj, Matrix_uploSym);
 	ul = *CHAR(STRING_ELT(uplo, 0));
     }
@@ -520,7 +534,7 @@ SEXP unpackedMatrix_is_triangular(SEXP obj, SEXP upper)
 	      "'x' slot", "unpackedMatrix_is_triangular");		\
     if (res)
     
-    if (ivalid <= 2) {
+    if (ivalid < 3) {
 	/* .trMatrix: be fast if 'upper', 'uplo' agree; else need diagonal */
 	if (need_upper == NA_LOGICAL) {
 	    RETURN_TRUE_OF_KIND(uplo);
@@ -533,7 +547,7 @@ SEXP unpackedMatrix_is_triangular(SEXP obj, SEXP upper)
 	    }
 	}
 	return ScalarLogical(0);
-    } else if (ivalid <= 5) {
+    } else if (ivalid < 6) {
 	/* .syMatrix: triangular iff diagonal (upper _and_ lower tri.) */
 	IF_DIAGONAL {
 	    if (need_upper == NA_LOGICAL) {

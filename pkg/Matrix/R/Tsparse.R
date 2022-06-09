@@ -903,7 +903,6 @@ setMethod("t", signature(x = "TsparseMatrix"),
 	      r@Dimnames <- x@Dimnames[2:1]
 	      r
       })
-} ## MJ
 
 setMethod("isDiagonal", signature(object = "TsparseMatrix"),
           function(object) {
@@ -937,3 +936,4 @@ setMethod("isDiagonal", signature(object = "TsparseMatrix"),
 for (.cl in grep("^.gTMatrix$", .Tsp.subclasses, value = TRUE))
     setMethod("isTriangular", signature(object = .cl), .Tsp.is.tr)
 rm(.Tsp.is.tr, .Tsp.subclasses, .cl)
+} ## MJ

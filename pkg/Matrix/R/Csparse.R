@@ -189,7 +189,7 @@ subCsp_ij <- function(x, i, j, drop)
 	    if(!is.null(n <- names(dn))) names(r@Dimnames) <- n
 	    if(extends((cx <- getClassDef(class(x))), "symmetricMatrix"))
                 ## preserving uplo
-                .Call(Csparse_general_to_symmetric, r, x@uplo, TRUE)
+                .Call(R_sparse_force_symmetric, r, x@uplo)
             else if(extends(cx, "triangularMatrix") && !is.unsorted(ii))
 		as(r, "triangularMatrix")
 	    else r
@@ -548,6 +548,8 @@ setMethod("Cholesky", signature(A = "nsparseMatrix"),
 	  function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
 	  stop("Cholesky(<nsparse...>) -> *symbolic* factorization -- not yet implemented"))
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 ## FIXME: do isDiagonal(<CsparseMatrix>) in C ...
 ## going via TsparseMatrix for now as coercion is done in C
 ## and isDiagonal(<TsparseMatrix>) is fast
@@ -572,7 +574,6 @@ setMethod("isDiagonal", signature(object = "CsparseMatrix"),
                   length(j <- base::which(dp == 1L)) == nnz && all(j == i + 1L)
           })
 }
-
 ## FIXME: do isTriangular(<CsparseMatrix>, upper) in C
 .gCsp.is.tr <- function(object, upper = NA, ...) {
     d <- object@Dim
@@ -616,6 +617,7 @@ setMethod("isDiagonal", signature(object = "CsparseMatrix"),
 for (.cl in grep("^.gCMatrix$", .Csp.subclasses, value = TRUE))
     setMethod("isTriangular", signature(object = .cl), .gCsp.is.tr)
 rm(.gCsp.is.tr, .Csp.subclasses, .cl)
+} ## MJ
 
 dmperm <- function(x, nAns = 6L, seed = 0L) {
     stopifnot(length(nAns <- as.integer(nAns)) == 1, nAns %in% c(2L, 4L, 6L)

@@ -81,7 +81,12 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(iCsparse_subassign, 4),
     CALLDEF(nCsparse_subassign, 4),
     CALLDEF(zCsparse_subassign, 4),
+
+/* MJ: no longer needed ... prefer R_sparse_force_symmetric() */
+#if 0    
     CALLDEF(Csparse_general_to_symmetric, 3),
+#endif
+
     CALLDEF(Csparse_symmetric_to_general, 1),
 
 /* MJ: no longer needed ... prefer R_sparse_transpose() */
@@ -365,7 +370,17 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(R_diagonal_as_sparse, 4),
     CALLDEF(R_sparse_band, 3),
     CALLDEF(R_sparse_transpose, 1),
+    CALLDEF(R_sparse_force_symmetric, 2),
+
     CALLDEF(tCRsparse_as_RCsparse, 1),
+    CALLDEF(Csparse_is_diagonal, 1),
+    CALLDEF(Rsparse_is_diagonal, 1),
+    CALLDEF(Tsparse_is_diagonal, 1),
+    CALLDEF(Csparse_is_triangular, 2),
+    CALLDEF(Rsparse_is_triangular, 2),
+    CALLDEF(Tsparse_is_triangular, 2),
+    CALLDEF(Csparse_is_symmetric, 2),
+    CALLDEF(Rsparse_is_symmetric, 2),
     
     CALLDEF(R_matrix_as_geMatrix, 2),
     CALLDEF(R_dense_as_geMatrix, 2),

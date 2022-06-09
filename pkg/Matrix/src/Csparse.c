@@ -365,7 +365,10 @@ SEXP Csparse_symmetric_to_general(SEXP x)
 			      get_symmetrized_DimNames(x, -1));
 }
 
-// Called from R's  forceCspSymmetric() ,  .gC2sym()
+/* MJ: no longer needed ... prefer R_sparse_force_symmetric() */
+#if 0
+
+// Called from R's forceSymmetricCsparse(), .gC2sC()
 SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo, SEXP sym_dmns)
 {
     int *adims = INTEGER(GET_SLOT(x, Matrix_DimSym)), n = adims[0];
@@ -398,6 +401,8 @@ SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo, SEXP sym_dmns)
     UNPROTECT(symDmns);
     return ans;
 }
+
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer R_sparse_transpose() */
 #if 0
