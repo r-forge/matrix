@@ -1,6 +1,6 @@
 
-R Under development (unstable) (2021-11-30 r81267) -- "Unsuffered Consequences"
-Copyright (C) 2021 The R Foundation for Statistical Computing
+R version 4.2.0 Patched (2022-06-10 r82474) -- "Vigorous Calisthenics"
+Copyright (C) 2022 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -37,6 +37,12 @@ Loading required package: tools
 > ##-> identical3() etc
 > cat("doExtras:",doExtras,"\n")
 doExtras: FALSE 
+> if(exists("Sys.setLanguage", mode="function"))
++     Sys.setLanguage("en")
+> englishMsgs <- (lang <- Sys.getenv("LANGUAGE")) %in% c("en", "C")
+> cat(sprintf("LANGUAGE env.: '%s'; englishMsgs: %s\n",
++             lang, englishMsgs))
+LANGUAGE env.: 'en'; englishMsgs: TRUE
 > 
 > 
 > ### Dense Matrices
@@ -179,7 +185,7 @@ M[m,i,m] : nargs()=3
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 > showProc.time()
-Time (user system elapsed): 0.361 0.014 0.377 
+Time (user system elapsed): 0.436 0.009 0.448 
 > 
 > ## Bug found thanks to Timothy Mak, Feb 3, 2017:
 > ## sparseMatrix logical indexing with (partial) NA:
@@ -324,7 +330,7 @@ M[logi,m,m] : nargs()=2
 M[logi,m,m] : nargs()=2
 M[logi,m,m] : nargs()=2
 > showProc.time()
-Time (user system elapsed): 0.121 0.001 0.122 
+Time (user system elapsed): 0.145 0.001 0.146 
 > 
 > ## more sparse Matrices --------------------------------------
 > 
@@ -408,17 +414,20 @@ Time (user system elapsed): 0.121 0.001 0.122
 +     str(mT <- as(as(as(m, kClass), "TsparseMatrix"), Tkind))
 +     mm <- as(mC, "matrix") # also logical or double
 +     IDENT <- if(kind == "n") function(x,y) Q.eq2(x,y, tol=0) else identical
-+     stopifnot(identical(mT, as(as(mC, "TsparseMatrix"), Tkind)),
-+               identical(mC, as(mT, Ckind)),
-+               Qidentical(mC[0,0], new(Ckind)),
-+               Qidentical(mT[0,0], new(Tkind)),
-+               identical(unname(mT[0,]), new(Tkind, Dim = c(0L,ncol(m)))),
-+               identical(unname(mT[,0]), new(Tkind, Dim = c(nrow(m),0L))),
-+               IDENT(mC[0,], as(mT[FALSE,], Ckind)),
-+               IDENT(mC[,0], as(mT[,FALSE], Ckind)),
-+               sapply(pmin(min(dim(mC)), c(0:2, 5:10)),
-+                      function(k) {i <- seq_len(k); all(mC[i,i] == mT[i,i])}),
-+               TRUE)
++     stopifnot(exprs = {
++         identical(mT, as(mC, "TsparseMatrix"))
++         identical(mC, as(mT, Ckind))
++         Qidentical(mC[0,0], new(Ckind)) # M..3 Csp..4
++         Qidentical(mT[0,0], new(Tkind)) #  "
++         identical(unname(mT[0,]), new(Tkind, Dim = c(0L,ncol(m))))# M.3 T.4 C.4
++         identical(unname(mT[,0]), new(Tkind, Dim = c(nrow(m),0L)))# M.3 C.4
++         is.null(cat("IDENT():\n"))
++         IDENT(mC[0,], as(mT[FALSE,], Ckind)) # M.3 C.4 M.3 + Tsp..4 Csp..4
++         IDENT(mC[,0], as(mT[,FALSE], Ckind)) # M.3 C.4 M.3 C.4
++         is.null(cat("sapply(..):\n"))
++         sapply(pmin(min(dim(mC)), c(0:2, 5:10)),
++                function(k) {i <- seq_len(k); all(mC[i,i] == mT[i,i])})
++     })
 +     cat("ok\n")
 +     show(mC[,1])
 +     show(mC[1:2,])
@@ -476,13 +485,17 @@ Tsp[i,m,l]: nargs()=4
 Csp[i,m,l] : nargs()=4
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
+IDENT():
 M[i,m,m] : nargs()=3
 Csp[i,m,l] : nargs()=4
 M[logi,m,m] : nargs()=3
+Tsp[i,m,l]: nargs()=4
+Csp[i,m,l] : nargs()=4
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
+sapply(..):
 M[i,i,m] : nargs()=3
 Csp[i,i,l] : nargs()=4
 M[i,i,m] : nargs()=3
@@ -583,13 +596,17 @@ Tsp[i,m,l]: nargs()=4
 Csp[i,m,l] : nargs()=4
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
+IDENT():
 M[i,m,m] : nargs()=3
 Csp[i,m,l] : nargs()=4
 M[logi,m,m] : nargs()=3
+Tsp[i,m,l]: nargs()=4
+Csp[i,m,l] : nargs()=4
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
+sapply(..):
 M[i,i,m] : nargs()=3
 Csp[i,i,l] : nargs()=4
 M[i,i,m] : nargs()=3
@@ -698,6 +715,7 @@ Tsp[i,m,l]: nargs()=4
 Csp[i,m,l] : nargs()=4
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
+IDENT():
 M[i,m,m] : nargs()=3
 Csp[i,m,l] : nargs()=4
 M[logi,m,m] : nargs()=3
@@ -707,6 +725,7 @@ M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
+sapply(..):
 M[i,i,m] : nargs()=3
 Csp[i,i,l] : nargs()=4
 M[i,i,m] : nargs()=3
@@ -806,6 +825,7 @@ Tsp[i,m,l]: nargs()=4
 Csp[i,m,l] : nargs()=4
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
+IDENT():
 M[i,m,m] : nargs()=3
 Csp[i,m,l] : nargs()=4
 M[logi,m,m] : nargs()=3
@@ -815,6 +835,7 @@ M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
+sapply(..):
 M[i,i,m] : nargs()=3
 Csp[i,i,l] : nargs()=4
 M[i,i,m] : nargs()=3
@@ -923,6 +944,7 @@ Tsp[i,m,l]: nargs()=4
 Csp[i,m,l] : nargs()=4
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
+IDENT():
 M[i,m,m] : nargs()=3
 Csp[i,m,l] : nargs()=4
 M[logi,m,m] : nargs()=3
@@ -932,6 +954,7 @@ M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
+sapply(..):
 M[i,i,m] : nargs()=3
 Csp[i,i,l] : nargs()=4
 M[i,i,m] : nargs()=3
@@ -1029,6 +1052,7 @@ Tsp[i,m,l]: nargs()=4
 Csp[i,m,l] : nargs()=4
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
+IDENT():
 M[i,m,m] : nargs()=3
 Csp[i,m,l] : nargs()=4
 M[logi,m,m] : nargs()=3
@@ -1038,6 +1062,7 @@ M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
+sapply(..):
 M[i,i,m] : nargs()=3
 Csp[i,i,l] : nargs()=4
 M[i,i,m] : nargs()=3
@@ -1116,7 +1141,7 @@ ok( d )
 == ###======================================================================
 
 > showProc.time()
-Time (user system elapsed): 0.62 0.007 0.629 
+Time (user system elapsed): 0.705 0.033 0.741 
 > 
 > if(doExtras) {### {was ./AAA_index.R, MM-only}
 +     ## an nsparse-example
@@ -1181,10 +1206,13 @@ Time (user system elapsed): 0.62 0.007 0.629
 +     print(load(system.file("external", "symA.rda", package="Matrix"))) # "As"
 +     stopifnotValid(As, "dsCMatrix"); stopifnot(identical(As@factors, list()))
 +     R. <- drop0(chol(As))
-+     stopifnot(1:32 == sort(diag(R.)), ## !
-+               R.@x == as.integer(R.@x),## so it is an integer-valued chol-decomp !
-+               ## shows that (1) As is *not* singular  (2) the matrix is not random
-+               all.equal(crossprod(R.), As, tolerance =1e-15))
++     stopifnot(exprs = {
++         1:32 == sort(diag(R.))  ## !
++         R.@x > 0
++         R.@x == as.integer(R.@x)## so it is an integer-valued chol-decomp !
++         ## shows that (1) As is *not* singular  (2) the matrix is not random
++         all.equal(crossprod(R.), As, tolerance=1e-15)
++     })
 +     print(summary(evA <- eigen(As, only.values=TRUE)$val))
 +     print(tail(evA)) ## largest three ~= 10^7,  smallest two *negative*
 +     print(rcond(As)) # 1.722 e-21 == very bad !
@@ -1215,14 +1243,6 @@ replCmat[x,i,j,.., val] : nargs()=4; missing (i,j) = (1,0)
 > ## NA-indexing of *dense* Matrices: should work as traditionally
 > assert.EQ.mat(ds[NA,NA], ss[NA,NA])
 M[i,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
 > assert.EQ.mat(ds[NA,  ], ss[NA,])
 M[logi,m,m] : nargs()=3
 > assert.EQ.mat(ds[  ,NA], ss[,NA])
@@ -1243,7 +1263,8 @@ Csp[i,i,l] : nargs()=4
 > er <- tryCatch(T[i,i], error = function(e)e)
 M[i,i,m] : nargs()=3
 Csp[i,i,l] : nargs()=4
-> stopifnot(as.logical(grep("indices.*sparse Matrices", er$message)))
+> if(englishMsgs)
++ stopifnot(as.logical(grep("indices.*sparse Matrices", er$message)))
 > 
 > N <- nrow(T)
 > set.seed(11)
@@ -1345,7 +1366,7 @@ Csp[i,i,l] : nargs()=4
 M[i,i,m] : nargs()=3
 Csp[i,i,l] : nargs()=4
 > showProc.time()
-Time (user system elapsed): 0.172 0.001 0.174 
+Time (user system elapsed): 0.287 0.001 0.289 
 > 
 > stopifnot(all.equal(mC[,3], mm[,3]),
 + 	  identical(mC[ij], mC[ij + 0.4]),
@@ -1666,7 +1687,7 @@ Csp[i,m,l] : nargs()=4
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 > showProc.time()
-Time (user system elapsed): 0.153 0 0.153 
+Time (user system elapsed): 0.173 0.003 0.178 
 > 
 > ##---  "nsparse*" sub-assignment :----------
 > M <- Matrix(c(1, rep(0,7), 1:4), 3,4)
@@ -1823,7 +1844,7 @@ k.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=ngTMatrix; len.(value)=1; missing (i,j
 .. replTmat(x,i,j,v): nargs()= 4; cl.(x)=ngTMatrix; len.(value)=1; missing (i,j) = (1,0)
 .. replTmat(x,i,j,v): nargs()= 4; cl.(x)=ngTMatrix; len.(value)=1; 
 .> showProc.time()
-Time (user system elapsed): 0.146 0.001 0.147 
+Time (user system elapsed): 0.125 0 0.125 
 > Nn <- Nn0
 > ## Check that  NA is interpreted as TRUE (with a warning), for "nsparseMatrix":
 > assertWarning(Nn[ii <-     3  ] <- NA); stopifnot(isValid(Nn,"nsparseMatrix"), Nn[ii])
@@ -2018,6 +2039,7 @@ Csp[m,i,l] : nargs()=4
 > exR <- lapply(EE, `[[`, "r")
 > stopifnot(exprs = {
 +     vapply(exR, inherits, logical(1), what = "error")
++     !englishMsgs ||
 +     unique( vapply(exR, `[[`, "<msg>", "message")
 +            ) == "logical subscript too long (1, should be 0)"
 + })
@@ -2053,14 +2075,6 @@ Csp[m,i,l] : nargs()=4
 Note: method with signature 'sparseMatrix#ldiMatrix' chosen for function '==',
  target signature 'nsCMatrix#ldiMatrix'.
  "nsparseMatrix#sparseMatrix", "nMatrix#lMatrix" would also be valid
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 Csp[m,i,l] : nargs()=4
@@ -2107,14 +2121,6 @@ M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 > Z <- m1; Z[] <- 0
 > checkMatrix(M)
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 Csp[m,i,l] : nargs()=4
@@ -2144,14 +2150,6 @@ symmpart(m) + skewpart(m) == m: ok;  determinant(): ok
 > assert.EQ.mat(M, diag(c(1,1, 0, 1,1)), tol=0)
 > T <- m1; T[1:3, 3] <- 10; checkMatrix(T)
 .. replTmat(x,i,j,v): nargs()= 4; cl.(x)=dtTMatrix; len.(value)=1; 
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 Csp[m,i,l] : nargs()=4
@@ -2189,14 +2187,6 @@ replCmat[x,i,j,.., val] : nargs()=4; missing (i,j) = (1,0)
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 > checkMatrix(M)
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 Csp[m,i,l] : nargs()=4
@@ -2224,14 +2214,6 @@ replCmat[x,i,j,.., val] : nargs()=4;
 > assert.EQ.mat(M, diag(c(1,1, 0, 1,1)), tol=0)
 > T <- m2; T[1:3, 3] <- 10; checkMatrix(T)
 replCmat[x,i,j,.., val] : nargs()=4; 
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
-M[i,m,m] : nargs()=3
-M[m,i,m] : nargs()=3
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 Csp[m,i,l] : nargs()=4
@@ -2255,7 +2237,7 @@ as(<triangular (ge)matrix>, dtCMatrix): valid: TRUE
 M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 > showProc.time()
-Time (user system elapsed): 0.499 0.017 0.518 
+Time (user system elapsed): 0.482 0.016 0.5 
 > 
 > 
 > ## "Vector indices" -------------------
@@ -2633,7 +2615,7 @@ M[i,m,m] : nargs()=3
 Tsp[i,m,l]: nargs()=4
 Csp[i,m,l] : nargs()=4
 > showProc.time()
-Time (user system elapsed): 0.26 0.016 0.278 
+Time (user system elapsed): 0.193 0.004 0.198 
 > 
 > ## Sub *Assignment* ---- now works (partially):
 > mt0 <- mt
@@ -2788,7 +2770,7 @@ Csp[i,i,l] : nargs()=4
 r2  2
 r4  .
 > showProc.time()
-Time (user system elapsed): 0.168 0.001 0.17 
+Time (user system elapsed): 0.168 0.002 0.171 
 > options(Matrix.verbose = TRUE)
 > 
 > mc # no longer has non-structural zeros
@@ -3009,7 +2991,7 @@ M[i,j] <- v :  coercing symmetric M[] into non-symmetric
 > assert.EQ.mat(t2, m)# ok
 > assert.EQ.mat(s2, m)# failed in 0.9975-8
 > showProc.time()
-Time (user system elapsed): 0.443 0.001 0.444 
+Time (user system elapsed): 0.464 0.003 0.467 
 > 
 > ## sub-assign  RsparseMatrix -- Matrix bug [#6709] by David Cortes
 > ## https://r-forge.r-project.org/tracker/?func=detail&atid=294&aid=6709&group_id=61
@@ -3101,35 +3083,35 @@ TG & G: dgTMatrix dgCMatrix
 M & T ("diag"): ddiMatrix dtTMatrix
 M[ij] <- v :  coercing symmetric M[] into non-symmetric
 M[ij] <- v :  coercing symmetric M[] into non-symmetric
-M & T ("symm"): dgTMatrix dgTMatrix
+M & T ("symm"): dgCMatrix dgTMatrix
 j =  3 :
 -------
 TG & G: dgTMatrix dgCMatrix
 M & T ("diag"): ddiMatrix dtTMatrix
 M[ij] <- v :  coercing symmetric M[] into non-symmetric
 M[ij] <- v :  coercing symmetric M[] into non-symmetric
-M & T ("symm"): dgTMatrix dgTMatrix
+M & T ("symm"): dgCMatrix dgTMatrix
 j =  4 :
 -------
 TG & G: dgTMatrix dgCMatrix
 M & T ("diag"): ddiMatrix dtTMatrix
 M[ij] <- v :  coercing symmetric M[] into non-symmetric
 M[ij] <- v :  coercing symmetric M[] into non-symmetric
-M & T ("symm"): dgTMatrix dgTMatrix
+M & T ("symm"): dgCMatrix dgTMatrix
 j =  5 :
 -------
 TG & G: dgTMatrix dgCMatrix
 M & T ("diag"): ddiMatrix dtTMatrix
 M[ij] <- v :  coercing symmetric M[] into non-symmetric
 M[ij] <- v :  coercing symmetric M[] into non-symmetric
-M & T ("symm"): dgTMatrix dgTMatrix
+M & T ("symm"): dgCMatrix dgTMatrix
 j =  6 :
 -------
 TG & G: dgTMatrix dgCMatrix
 M & T ("diag"): ddiMatrix dtTMatrix
 M[ij] <- v :  coercing symmetric M[] into non-symmetric
 M[ij] <- v :  coercing symmetric M[] into non-symmetric
-M & T ("symm"): dgTMatrix dgTMatrix
+M & T ("symm"): dgCMatrix dgTMatrix
 > 
 > 
 > ## drop, triangular, ...
@@ -3210,7 +3192,7 @@ M & T ("symm"): dgTMatrix dgTMatrix
 > 
 > cc <- capture.output(show(dLrg))# show(<diag>) used to error for large n
 > showProc.time()
-Time (user system elapsed): 0.308 0.009 0.318 
+Time (user system elapsed): 0.325 0.003 0.329 
 > 
 > ## FIXME: "dspMatrix" (symmetric *packed*) not going via "matrix"
 > 
@@ -3287,7 +3269,7 @@ M[m,i,m] : nargs()=3
 Csp[m,i,l] : nargs()=4
 > 
 > showProc.time()
-Time (user system elapsed): 1.242 0.222 1.467 
+Time (user system elapsed): 1.231 0.212 1.447 
 > options(op)# revert
 > ##
 > if(doExtras) {#-----------------------------------------------------------------
@@ -3439,7 +3421,7 @@ sparse vector (nnz/length = 16/64) of class "dsparseVector"
 > stopifnot(all.equal(x[i] ,  y1+y2, tolerance=0),
 + 		    x[i] == y1+y2)
 > showProc.time()
-Time (user system elapsed): 0.688 0.001 0.691 
+Time (user system elapsed): 0.706 0.001 0.708 
 > 
 > if(!interactive()) warnings()
 > 
@@ -3581,4 +3563,4 @@ sparse vector (nnz/length = 0/6) of class "dsparseVector"
 > 
 > proc.time()
    user  system elapsed 
-  5.780   0.353   6.241 
+  6.256   0.383   6.702 

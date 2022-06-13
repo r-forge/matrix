@@ -140,24 +140,29 @@ setMethod("is.finite", signature(x = "dgeMatrix"),
 	      else is.na_nsp(x)
 	  })
 
+## *not* dge* but ddense ==>  triangular | symmetric
 ## TODO? -- rather methods for specific subclasses of ddenseMatrix
 setMethod("is.finite", signature(x = "ddenseMatrix"),
 	  function(x) {
 	      if(all(ifin <- is.finite(x@x))) return(allTrueMat(x))
+
 	      ## *NOT* dge, i.e., either triangular or symmetric
 	      ## (possibly packed): has finite 0-triangle
 	      cdx <- getClassDef(class(x))
-
-	      r <- new(if(extends(cdx,"symmetricMatrix"))"nsyMatrix" else "ngeMatrix")
-	      r@Dim <- (d <- x@Dim)
-	      r@Dimnames <- x@Dimnames
+	      d <- x@Dim
 	      isPacked <- (le <- prod(d)) > length(ifin)
-	      r@x <- rep.int(TRUE, le)
-	      iTr <- indTri(d[1], upper= x@uplo == "U", diag= TRUE)
-	      if(isPacked) { ## x@x is "usable"
-		  r@x[iTr] <- ifin
-	      } else {
-		  r@x[iTr] <- ifin[iTr]
+	      r <- new(if(isSym <- extends(cdx,"symmetricMatrix")) {
+			   if(isPacked) "nspMatrix" else "nsyMatrix"
+		       } else "ngeMatrix")
+	      r@Dim <- d
+	      r@Dimnames <- x@Dimnames
+	      if(isSym) r@uplo <- x@uplo
+	      if(isSym && isPacked) {
+		  r@x <- ifin
+	      } else { # result has "full"  x
+		  r@x <- rep.int(TRUE, le)
+		  iTr <- indTri(d[1], upper= x@uplo == "U", diag= TRUE)
+		  r@x[iTr] <- if(isPacked) ifin else ifin[iTr]
 	      }
 	      r
 	  })

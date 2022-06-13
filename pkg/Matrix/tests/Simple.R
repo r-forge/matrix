@@ -88,7 +88,7 @@ image(d4) # gave infinite recursion
 ## Steve Walker, Mar 12, 2014:
 n <- 7
 (M <- triu(Matrix(seq_len(n^2), n, sparse=TRUE)))
-im <- image(M) # should be an n-by-n image plot, but is not
+im <- image(M) # was not an n-by-n image plot
 stopifnot(n == diff(sort(im$y.limits)))
 ## ylimits were too small (by 1 on each side)
 
@@ -99,9 +99,11 @@ Mlp <- Matrix(.leap.seconds)
 stopifnot(identical(dim(Mlp), c(n.lsec, 1L)))
 assert.EQ.mat(Mlp, mlp)
 .Leap.seconds <- as.POSIXlt(.leap.seconds)
-if(FALSE) { ## TODO -- once R itself does better ...
-    mLp <- matrix(.Leap.seconds)##  11 x 1 list of (Numeric,Int.,Char.) each of length 27 -- yuck!!!
-    MLp <- Matrix(.Leap.seconds)## --> error (for now)
+(MLp <- as(.Leap.seconds, "Matrix"))# nice sparse  dgC* w/ col.names
+stopifnot(is.EQ.mat(MLp, as.matrix(.Leap.seconds)))
+(mLp <- matrix(.Leap.seconds))## prints fine as 27 x 1 matrix of dates (internally is list+dim)
+if(FALSE) { ## TODO?  POSIXlt -> numeric ??
+    MLp <- Matrix(.Leap.seconds)## --> error
 }
 
 E <- rep(c(TRUE,NA,TRUE), length=8)
@@ -1183,7 +1185,7 @@ cat("doExtras:",doExtras,"\n")
 if(doExtras) {
     cat("checkMatrix() of all: \n---------\n")
     Sys.setlocale("LC_COLLATE", "C")    # to keep ls() reproducible
-    for(nm in setdiff(ls(), "d4da")) { # FIXME: d4da
+    for(nm in setdiff(ls(), "d4da")) { # FIXME: checkMatrix(d4da)
         if(is(.m <- get(nm), "Matrix")) {
             cat("\n", rep("-",nchar(nm)),"\n",nm, ":\n", sep='')
             checkMatrix(.m)
@@ -1281,4 +1283,3 @@ if(SysI[["sysname"]] == "Linux" && requireNamespace("sfsmisc")) local({
     nn <- names(.Sc <- .Sc[!grepl("^flags", nn)])
     print(.Sc[ grep("\\.[0-9]+$", nn, invert=TRUE) ])
 })
-
