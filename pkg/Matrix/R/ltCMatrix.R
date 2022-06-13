@@ -12,9 +12,10 @@ setAs("matrix", "ltCMatrix",
       })
 } ## MJ
 
-setAs("ltCMatrix", "lgCMatrix",
+t2lgC <-  # also used in  ./Ops.R
       function(from) copyClass(diagU2N(from), "lgCMatrix",
-			       c("i", "p", "x", "Dim", "Dimnames")))
+			       c("i", "p", "x", "Dim", "Dimnames"))
+setAs("ltCMatrix", "lgCMatrix", t2lgC)
 
 setAs("ltCMatrix", "ltTMatrix",
       function(from) .Call(Csparse_to_Tsparse, from, TRUE))

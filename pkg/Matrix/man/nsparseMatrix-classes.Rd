@@ -15,6 +15,10 @@
 % nsparse
 \alias{-,nsparseMatrix,missing-method}
 \alias{Arith,nsparseMatrix,Matrix-method}
+\alias{Arith,dsparseMatrix,nsparseMatrix-method}
+\alias{Arith,lsparseMatrix,nsparseMatrix-method}
+\alias{Arith,nsparseMatrix,dsparseMatrix-method}
+\alias{Arith,nsparseMatrix,lsparseMatrix-method}
 \alias{Ops,nsparseMatrix,dsparseMatrix-method}
 \alias{Ops,nsparseMatrix,lsparseMatrix-method}
 \alias{Ops,nsparseMatrix,sparseMatrix-method}

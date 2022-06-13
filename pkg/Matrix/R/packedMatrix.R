@@ -56,13 +56,10 @@ setMethod("forceSymmetric", signature(x = "packedMatrix", uplo = "character"),
 body(.pM.is.sy.dz) <-
     do.call(substitute, list(body(.pM.is.sy.dz), list(. = body(.pM.is.sy))))
 
-.pM.is.tr <- function(object, upper = NA, ...) {
+.pM.is.tr <- function(object, upper = NA, ...)
     .Call(packedMatrix_is_triangular, object, upper)
-}
 
-.pM.is.di <- function(object) {
-    .Call(packedMatrix_is_diagonal, object)
-}
+.pM.is.di <- function(object) .Call(packedMatrix_is_diagonal, object)
 
 ## method for     .spMatrix in ./symmetricMatrix.R
 ## method for [lni]tpMatrix in ./triangularMatrix.R

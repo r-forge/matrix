@@ -628,22 +628,11 @@ setMethod("Compare", signature(e1="ngeMatrix", e2="ngeMatrix"), .Ops.via.x)
 setMethod("Logic",   signature(e1="ngeMatrix", e2="ngeMatrix"), .Ops.via.x)
 setMethod("Arith",   signature(e1="ngeMatrix", e2="ngeMatrix"), .Ops2dge.via.x)
 
-
-## FIXME: These lose symmmetry & triangularity
-setMethod("Ops", signature(e1="ldenseMatrix", e2="ldenseMatrix"),
-	  function(e1,e2) {
-	      dimCheck(e1, e2)
-	      callGeneric(as(e1, "lgeMatrix"), as(e2, "lgeMatrix"))
-	  })
-
-setMethod("Ops", signature(e1="ndenseMatrix", e2="ndenseMatrix"),
-	  function(e1,e2) {
-	      dimCheck(e1, e2)
-	      callGeneric(as(e1, "ngeMatrix"), as(e2, "ngeMatrix"))
-	  })
-
 ## nMatrix -> lMatrix  conversions when "the other" is not nMatrix
 ## Use Ops.x.x unless both are sparse
+setMethod("Ops", signature(e1="dMatrix", e2="dMatrix"), Ops.x.x)
+setMethod("Ops", signature(e1="lMatrix", e2="lMatrix"), Ops.x.x)
+setMethod("Ops", signature(e1="nMatrix", e2="nMatrix"), Ops.x.x)
 setMethod("Ops", signature(e1="nMatrix", e2="lMatrix"), Ops.x.x)
 setMethod("Ops", signature(e1="lMatrix", e2="nMatrix"), Ops.x.x)
 setMethod("Ops", signature(e1="nMatrix", e2="dMatrix"), Ops.x.x)
@@ -657,6 +646,38 @@ setMethod("Ops", signature(e1="nsparseMatrix", e2="dsparseMatrix"),
 	  function(e1,e2) callGeneric(as(e1,"lMatrix"), e2))
 setMethod("Ops", signature(e1="dsparseMatrix", e2="nsparseMatrix"),
 	  function(e1,e2) callGeneric(e1, as(e2,"lMatrix")))
+## For "Arith"  go to "d*", not "l*": {the above, replaced "l by "d :
+setMethod("Arith", signature(e1="nsparseMatrix", e2="lsparseMatrix"),
+	  function(e1,e2) callGeneric(as(e1,"dMatrix"), e2))
+setMethod("Arith", signature(e1="lsparseMatrix", e2="nsparseMatrix"),
+	  function(e1,e2) callGeneric(e1, as(e2,"dMatrix")))
+setMethod("Arith", signature(e1="nsparseMatrix", e2="dsparseMatrix"),
+	  function(e1,e2) callGeneric(as(e1,"dMatrix"), e2))
+setMethod("Arith", signature(e1="dsparseMatrix", e2="nsparseMatrix"),
+	  function(e1,e2) callGeneric(e1, as(e2,"dMatrix")))
+if(FALSE) { ##-- not yet ---------
+## New: for both "nsparseMatrix", *preserve* nsparse* -- via Tsp -- "nTsparseMatrix" 
+setMethod("Ops", signature(e1="nsparseMatrix", e2="nsparseMatrix"),
+	  function(e1,e2) callGeneric(as(e1,"TsparseMatrix"), as(e2,"TsparseMatrix")))
+
+Ops.nT.nT <- function(e1,e2) {
+    d <- dimCheck(e1,e2)
+    ## e1, e2 are nTsparse, i.e., inheriting from  "ngTMatrix", "ntTMatrix", "nsTMatrix"
+    gen1 <- extends(cD1 <- getClassDef(class(e1)), "generalMatrix")
+    gen2 <- extends(cD2 <- getClassDef(class(e2)), "generalMatrix")
+    sym1 <- !gen1 && extends(cD1, "symmetricMatrix")
+    sym2 <- !gen2 && extends(cD2, "symmetricMatrix")
+    tri1 <- !gen1 && !sym1
+    tri2 <- !gen2 && !sym2
+    G <- gen1 && gen2
+    S <- sym1 && sym2 && e1@uplo == e2@uplo
+    T <- tri1 && tri2 && e1@uplo == e2@uplo
+
+}
+
+setMethod("Ops", signature(e1="nTsparseMatrix", e2="nTsparseMatrix"), Ops.nT.nT)
+}##--- not yet -------------
+
 
 
 ## Have this for "Ops" already above
@@ -895,8 +916,11 @@ for(Mcl in c("lMatrix","nMatrix","dMatrix"))
 	j <- j[x.]
 	x <- x[x.]
     }
-    new(paste0("l",shape,"TMatrix"), Dim = d, Dimnames = dn,
-        i = i, j = j, x = x)
+    if(shape == "g")
+	new("lgTMatrix", Dim = d, Dimnames = dn, i = i, j = j, x = x)
+    else
+	new(paste0("l",shape,"TMatrix"), Dim = d, Dimnames = dn,
+	    i = i, j = j, x = x, uplo = e1@uplo)
 }
 
 Logic.lCMat <- function(e1, e2, isOR) {
@@ -949,22 +973,25 @@ setMethod("Logic", signature(e1 = "lsCMatrix", e2 = "lsCMatrix"),
 
 setMethod("Logic", signature(e1 = "ltCMatrix", e2 = "ltCMatrix"),
 	  function(e1, e2) {
+              isOR <- .Generic == "|"
 	      if(e1@uplo == e2@uplo) {
 		  if(e1@diag == e2@diag) ## both "N" or both "U" (!)
-		      Logic.lCMat(e1, e2, isOR = .Generic == "|")
+		      Logic.lCMat(e1, e2, isOR=isOR)
 		  else if(e1@diag == "U")
-		      Logic.lCMat(diagU2N(e1), e2, isOR = .Generic == "|")
+		      Logic.lCMat(diagU2N(e1), e2, isOR=isOR)
 		  else ## e1@diag == "N"  *and*	 e2@diag == "U"
-		      Logic.lCMat(e1, diagU2N(e2), isOR = .Generic == "|")
+		      Logic.lCMat(e1, diagU2N(e2), isOR=isOR)
 	      }
-	      else {
-		  d <- dimCheck(e1, e2)
-		  ## differing triangle (upper <-> lower):
-		  ## all will be FALSE apart from diagonal
-		  as(.diag2tT(new("ldiMatrix", Dim=d,
-				  x = get(.Generic)(diag(e1), diag(e2))),
-			      uplo = e1@uplo, kind = "l"),
-		     "dtCMatrix")
+	      else { ## differing triangle (upper *and* lower):
+		  if(isOR) { # both triangles => "general"
+		      Logic.lCMat(t2lgC(e1), t2lgC(e2), isOR=TRUE)
+		  } else { ## have '&': all FALSE apart from diagonal
+		      d <- dimCheck(e1, e2)
+		      as(.diag2tT(new("ldiMatrix", Dim=d,
+				      x = get(.Generic)(diag(e1), diag(e2))),
+				  uplo = e1@uplo, kind = "l"),
+			 "ltCMatrix")
+		  }
 	      }
 	  })
 
@@ -1430,11 +1457,15 @@ setMethod("Compare", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 		  }
 		  .Call(Tsparse_to_Csparse,
 			if(e1is.n && e2is.n)
-			new(paste0("n",shape,"TMatrix"), Dim = d,
-			    Dimnames = dn, i = i, j = j)
-			else new(paste0("l",shape,"TMatrix"), Dim = d,
-				 Dimnames = dn, i = i, j = j, x = x),
-			FALSE)
+			    new(paste0("n",shape,"TMatrix"), Dim = d,
+				Dimnames = dn, i = i, j = j)
+			else if(!S && !T)
+			    new(paste0("l",shape,"TMatrix"), Dim = d,
+				Dimnames = dn, i = i, j = j, x = x)
+			else # S or T
+			    new(paste0("l",shape,"TMatrix"), Dim = d,
+				Dimnames = dn, i = i, j = j, x = x, uplo = e1@uplo)
+		      , FALSE)
               }
 	  })
 

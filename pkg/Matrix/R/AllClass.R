@@ -748,6 +748,12 @@ setClassUnion("nCsparseMatrix", members = c("ngCMatrix", "ntCMatrix", "nsCMatrix
 
 ## dense general
 setClassUnion("geMatrix", members = c("dgeMatrix", "lgeMatrix", "ngeMatrix"))
+
+## dput(intersect(names(getClass("nsparseMatrix")@subclasses),
+##                names(getClass("TsparseMatrix")@subclasses)))
+if(FALSE)  ##-- not yet ---------
+setClassUnion("nTsparseMatrix", members = c("ngTMatrix", "ntTMatrix", "nsTMatrix"))
+
 }
 
 

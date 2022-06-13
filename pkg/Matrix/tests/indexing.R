@@ -18,6 +18,11 @@ stopifnot(suppressPackageStartupMessages(require(Matrix)))
 source(system.file("test-tools.R", package = "Matrix"), keep.source = FALSE)
 ##-> identical3() etc
 cat("doExtras:",doExtras,"\n")
+if(exists("Sys.setLanguage", mode="function"))
+    Sys.setLanguage("en")
+englishMsgs <- (lang <- Sys.getenv("LANGUAGE")) %in% c("en", "C")
+cat(sprintf("LANGUAGE env.: '%s'; englishMsgs: %s\n",
+            lang, englishMsgs))
 
 
 ### Dense Matrices
@@ -240,17 +245,20 @@ for(kind in c("n", "l", "d")) {
     str(mT <- as(as(as(m, kClass), "TsparseMatrix"), Tkind))
     mm <- as(mC, "matrix") # also logical or double
     IDENT <- if(kind == "n") function(x,y) Q.eq2(x,y, tol=0) else identical
-    stopifnot(identical(mT, as(as(mC, "TsparseMatrix"), Tkind)),
-              identical(mC, as(mT, Ckind)),
-              Qidentical(mC[0,0], new(Ckind)),
-              Qidentical(mT[0,0], new(Tkind)),
-              identical(unname(mT[0,]), new(Tkind, Dim = c(0L,ncol(m)))),
-              identical(unname(mT[,0]), new(Tkind, Dim = c(nrow(m),0L))),
-              IDENT(mC[0,], as(mT[FALSE,], Ckind)),
-              IDENT(mC[,0], as(mT[,FALSE], Ckind)),
-              sapply(pmin(min(dim(mC)), c(0:2, 5:10)),
-                     function(k) {i <- seq_len(k); all(mC[i,i] == mT[i,i])}),
-              TRUE)
+    stopifnot(exprs = {
+        identical(mT, as(mC, "TsparseMatrix"))
+        identical(mC, as(mT, Ckind))
+        Qidentical(mC[0,0], new(Ckind)) # M..3 Csp..4
+        Qidentical(mT[0,0], new(Tkind)) #  "
+        identical(unname(mT[0,]), new(Tkind, Dim = c(0L,ncol(m))))# M.3 T.4 C.4
+        identical(unname(mT[,0]), new(Tkind, Dim = c(nrow(m),0L)))# M.3 C.4
+        is.null(cat("IDENT():\n"))
+        IDENT(mC[0,], as(mT[FALSE,], Ckind)) # M.3 C.4 M.3 + Tsp..4 Csp..4
+        IDENT(mC[,0], as(mT[,FALSE], Ckind)) # M.3 C.4 M.3 C.4
+        is.null(cat("sapply(..):\n"))
+        sapply(pmin(min(dim(mC)), c(0:2, 5:10)),
+               function(k) {i <- seq_len(k); all(mC[i,i] == mT[i,i])})
+    })
     cat("ok\n")
     show(mC[,1])
     show(mC[1:2,])
@@ -348,10 +356,13 @@ if(doExtras) {### {was ./AAA_index.R, MM-only}
     print(load(system.file("external", "symA.rda", package="Matrix"))) # "As"
     stopifnotValid(As, "dsCMatrix"); stopifnot(identical(As@factors, list()))
     R. <- drop0(chol(As))
-    stopifnot(1:32 == sort(diag(R.)), ## !
-              R.@x == as.integer(R.@x),## so it is an integer-valued chol-decomp !
-              ## shows that (1) As is *not* singular  (2) the matrix is not random
-              all.equal(crossprod(R.), As, tolerance =1e-15))
+    stopifnot(exprs = {
+        1:32 == sort(diag(R.))  ## !
+        R.@x > 0
+        R.@x == as.integer(R.@x)## so it is an integer-valued chol-decomp !
+        ## shows that (1) As is *not* singular  (2) the matrix is not random
+        all.equal(crossprod(R.), As, tolerance=1e-15)
+    })
     print(summary(evA <- eigen(As, only.values=TRUE)$val))
     print(tail(evA)) ## largest three ~= 10^7,  smallest two *negative*
     print(rcond(As)) # 1.722 e-21 == very bad !
@@ -392,6 +403,7 @@ i <- c(7:5, 2:4);assert.EQ.mat(T[i,i], ss[i,i])
 ## NA in indices  -- check that we get a helpful error message:
 i[2] <- NA
 er <- tryCatch(T[i,i], error = function(e)e)
+if(englishMsgs)
 stopifnot(as.logical(grep("indices.*sparse Matrices", er$message)))
 
 N <- nrow(T)
@@ -647,6 +659,7 @@ EE <- lapply(expr[-1], function(e)
 exR <- lapply(EE, `[[`, "r")
 stopifnot(exprs = {
     vapply(exR, inherits, logical(1), what = "error")
+    !englishMsgs ||
     unique( vapply(exR, `[[`, "<msg>", "message")
            ) == "logical subscript too long (1, should be 0)"
 })

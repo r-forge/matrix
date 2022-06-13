@@ -22,6 +22,7 @@
 \alias{Logic,numeric,nMatrix-method}
 \alias{Ops,nMatrix,dMatrix-method}
 \alias{Ops,nMatrix,lMatrix-method}
+\alias{Ops,nMatrix,nMatrix-method}
 \alias{Ops,nMatrix,numeric-method}
 \alias{Ops,numeric,nMatrix-method}
 \alias{Summary,nMatrix-method}

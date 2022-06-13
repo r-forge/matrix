@@ -12,7 +12,7 @@
 %%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
 %
 
-\section{Changes in version 1.4-2 (2022-06-08 r3492)}{
+\section{Changes in version 1.4-2 (2022-06-13 r3493)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -182,7 +182,7 @@
 
       \item \code{band()} is now implemented also for
       \code{diagonalMatrix} (only \code{tri[ul]()} worked before).
-      
+
       \item \code{.ge}, \code{.t[rp]}, and \code{.s[yp]} can now be
       coerced directly to \code{.g[CRT]}, \code{.t[CRT]}, and
       \code{.s[CRT]}, respectively, without intermediate coercions.
@@ -193,8 +193,11 @@
       entirely in C for all \code{[CRT]sparseMatrix}, without coercions
       of logical and integer types to double.
 
-      \item \code{isTriangular()}, and
-      \code{isDiagonal()} are done 
+      \item \code{isTriangular()} and \code{isDiagonal()} implemented in C throughout.
+
+      \item Fixes in group methods, e.g. \code{>}, \code{&}, \code{|},
+      notably for symmetric, triangular, \code{lMatrix} and \code{nMatrix}
+      classed matrices.
     }
   }
   \subsection{Misc}{

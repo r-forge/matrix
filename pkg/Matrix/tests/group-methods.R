@@ -5,6 +5,7 @@ source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 assertErrV <- function(e) tools::assertError(e, verbose=TRUE)
 
 cat("doExtras:",doExtras,"\n")
+options(nwarnings = 1e4)
 
 set.seed(2001)
 
@@ -118,10 +119,12 @@ stopifnot({
     isValid(dsyL <- t(dsyU),    "dsyMatrix") && dsyL@uplo == "L"
     isValid(dspU <- pack(dsyU), "dspMatrix") && dspU@uplo == "U"
     isValid(dspL <- pack(dsyL), "dspMatrix") && dspL@uplo == "L"
+    identical(dspU, t(dspL))
     isValid(lsyU,               "lsyMatrix") && lsyU@uplo == "U"
     isValid(lsyL <- t(lsyU),    "lsyMatrix") && lsyL@uplo == "L"
     isValid(lspU <- pack(lsyU), "lspMatrix") && lspU@uplo == "U"
     isValid(lspL <- pack(lsyL), "lspMatrix") && lspL@uplo == "L"
+    identical(lspL, t(lspU))
     ##
     ## log(x, <base>) -- was mostly *wrong* upto 2019-10 [Matrix <= 1.2-17]
     all.equal(log(abs(dsy), 2), log2(abs(dsy)))
@@ -139,6 +142,41 @@ stopifnot({
     all.equal(log(abs(xpp), 2), log2(abs(xpp)))
     all.equal(log(abs( D3), 2), log2(abs( D3)))
     all.equal(log(abs( L7), 2), log2(abs( L7)))
+})
+showProc.time()
+
+## is.finite() -- notably for symmetric packed / uplo="L" with NA :
+spU <- new("dspMatrix", Dim = c(3L, 3L), x = c(0, NA, 0, NA, NA, 0),           uplo = "U")
+sU  <- new("dsyMatrix", Dim = c(3L, 3L), x = c(1, NA, NA, NA, 1, NA, 8, 2, 1), uplo = "U")
+sL  <- t(sU)
+spL <- t(spU)
+trU <- triu(spU)
+trL <- tril(spL)
+stopifnot(exprs = {
+    spL@uplo == "L"
+    trU@uplo == "U"
+    trL@uplo == "L"
+    identical(trU, triu(spL))
+    identical(trL, tril(spU))
+})
+isU <- is.finite(sU)
+isL <- is.finite(sL)
+stopifnot(exprs = {
+    identical(isU, t(isL))
+    all(isU == isL)
+    which(!isU, arr.ind = TRUE) == c(2:1, 1:2)
+})
+isFu <- is.finite(spU)
+isFl <- is.finite(spL)
+isFtu <- is.finite(trU)
+isFtl <- is.finite(trL)
+stopifnot(exprs = {
+    all(isFu == diag(TRUE, 3))
+    all(isFu == isFl) # has failed till 2022-06-11
+    isTriangular(isFtu)
+    isTriangular(isFtl)
+    identical(rep(TRUE, 6), pack(tril(isFtu))@x)
+    identical(rep(TRUE, 6), pack(triu(isFtl))@x)
 })
 
 showProc.time()
@@ -304,6 +342,32 @@ MatDims <- t(vapply(Mat.objs, function(nm) dim(get(nm)), 0:1))
 ## Nice summary info :
 noquote(cbind(Mcl[Mat.objs], format(MatDims)))
 
+## dtCMatrix, uplo="L" :
+(CtL <- t(as(Diagonal(x=4:2), "CsparseMatrix")))
+m2 <- cbind(c(0, NA, NA),
+            c(0,  0, NA), 0)
+op <- options(Matrix.verbose = 2)
+r <- CtL > m2 # failed in Matrix <= 1.4-1, with
+## Compare <Csparse> -- "dtCMatrix" > "dtCMatrix" :
+stopifnot(identical(is.na(m2), as.matrix(is.na(r))), diag(r), isDiagonal(triu(r)))
+M <- new("dtCMatrix", i = c(0L, 0:1, 0:2), p = c(0:1, 3L, 6L),
+         x = c(10,1, 10,1, 1,10), Dim = c(3L, 3L), uplo = "U")
+m2 <- matrix(c(0, NA, NA, 0, 0, NA, 0, 0, 0), 3)
+r <- M & m2 # failed in Matrix <= 1.4-1
+assert.EQ.mat(M        | m2 -> ro,
+              as.mat(M)| m2, tol=0)
+D4 <- Diagonal(x=0+ 4:2)
+rd <- D4 | m2 # gave  invalid class “ltTMatrix” object: uplo='U' must not have sparse entries below the diagonal
+M2 <- Matrix(m2); T2 <- Matrix:::.diag2T.smart(D4, M2, kind="l")
+stopifnot(exprs = {
+    all(!r)
+    ## fix in .do.Logic.lsparse() {needed uplo="L"}
+    identical(rd,    T2                   |    M2)
+    identical(rd, as(T2, "CsparseMatrix") | as(M2, "lMatrix"))
+})
+
+options(op)
+
 if(!doExtras && !interactive()) q("no") ## (saving testing time)
 
 ### Systematically look at all "Ops" group generics for "all" Matrix classes
@@ -367,7 +431,7 @@ for(gr in getGroupMembers("Ops")) {
               cat(sprintf("\n %s %s %s gave not identical r4 & R4:\n",
                           nm, f, oM));     print(r4); print(R4)
               C1 <- (eq <- R4 == r4) | (N4 <- as.logical((nr4 <- is.na(eq)) & !is.finite(R4)))
-              if(isTRUE(all(C1)))
+              if(isTRUE(all(C1)) || isTRUE(all.equal(as.mat(R4), r4, tol = 1e-14)))
                   cat(sprintf(
                       " --> %s %s %s (ok): only difference is %s (matrix) and %s (Matrix)\n",
                       M.knd(M), f, M.knd(M2)
@@ -460,7 +524,7 @@ for(f in c(mM, mM2)) {
     } else { ## (almost always:) matrix result
         assert.EQ.mat(R, r)
 	## check preservation of properties, notably super class
-	if(prod(dim(M)) > 1 && is(M, "diagonalMatrix"  ) && isDiagonal  (R) && !is(R, "diagonalMatrix"  )) doStop()
+	if(prod(dim(M)) > 1 && is(M, "diagonalMatrix"  ) && isDiagonal(R) && !is(R, "diagonalMatrix"  )) doStop()
 	if(prod(dim(M)) > 1 && is(M, "triangularMatrix") && (iT <- isTriangular(R)) && attr(iT, "kind") == M@uplo &&
            !is(R, "triangularMatrix")) doStop()
     }
@@ -472,8 +536,6 @@ showProc.time()
 ##
 cat("Checking the Summary group generics for a set of arguments:\n",
     "------------ ======= ------------------------------------------------\n", sep='')
-doStop <- function()
-    warning("**Summary: ", f,"(<",class(M),">) is not all.equal(..)", immediate.=TRUE)
 for(f in getGroupMembers("Summary")) {
   cat(sprintf("%-9s :\n %-7s\n", paste0('"',f,'"'), paste(rep("-", nchar(f)), collapse="")))
   givesVec <- f %in% mVec
@@ -491,7 +553,6 @@ for(f in getGroupMembers("Summary")) {
   cat("\n")
   if(length(warnings())) print(summary(warnings()))
 }
-
 
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
