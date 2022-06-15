@@ -33,8 +33,8 @@ setMethod("unpack", signature(x = "matrix"),
     if(((sna <- is.na(symmetric)) || symmetric) && isSymmetric(x, ...)) {
         .C1
     } else if((sna || !symmetric) &&
-              (tt <- isTriangular(x, upper = upperTri))) {
-        upper <- if(is.null(kind <- attr(tt, "kind"))) upperTri else kind == "U"
+              (it <- isTriangular(x, upper = upperTri))) {
+        upper <- if(is.null(kind <- attr(it, "kind"))) upperTri else kind == "U"
         .C2
     } else {
         kind <- if(is.na(upperTri)) "" else if(upperTri) "upper " else "lower "

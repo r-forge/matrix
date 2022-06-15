@@ -656,7 +656,7 @@ setMethod("Arith", signature(e1="nsparseMatrix", e2="dsparseMatrix"),
 setMethod("Arith", signature(e1="dsparseMatrix", e2="nsparseMatrix"),
 	  function(e1,e2) callGeneric(e1, as(e2,"dMatrix")))
 if(FALSE) { ##-- not yet ---------
-## New: for both "nsparseMatrix", *preserve* nsparse* -- via Tsp -- "nTsparseMatrix" 
+## New: for both "nsparseMatrix", *preserve* nsparse* -- via Tsp -- "nTsparseMatrix"
 setMethod("Ops", signature(e1="nsparseMatrix", e2="nsparseMatrix"),
 	  function(e1,e2) callGeneric(as(e1,"TsparseMatrix"), as(e2,"TsparseMatrix")))
 
@@ -984,7 +984,7 @@ setMethod("Logic", signature(e1 = "ltCMatrix", e2 = "ltCMatrix"),
 	      }
 	      else { ## differing triangle (upper *and* lower):
 		  if(isOR) { # both triangles => "general"
-		      Logic.lCMat(t2lgC(e1), t2lgC(e2), isOR=TRUE)
+		      Logic.lCMat(.sparse2g(e1), .sparse2g(e2), isOR=TRUE)
 		  } else { ## have '&': all FALSE apart from diagonal
 		      d <- dimCheck(e1, e2)
 		      as(.diag2tT(new("ldiMatrix", Dim=d,

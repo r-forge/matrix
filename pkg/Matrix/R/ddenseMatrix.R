@@ -32,9 +32,9 @@ setAs("ddenseMatrix", "CsparseMatrix",
 ## special case
 setAs("dgeMatrix", "dgCMatrix",
       function(from) .Call(dense_to_Csparse, from))
-} ## MJ
 
 setMethod("as.numeric", "ddenseMatrix", function(x, ...) ..2dge(x)@x)
+} ## MJ
 
 ## -- see also ./Matrix.R  e.g., for a show() method
 

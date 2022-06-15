@@ -81,16 +81,16 @@ if(FALSE) {
 }
 } ## MJ
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 ## coercion to other virtual classes --- the functionality we want to encourage
 
 setAs("RsparseMatrix", "TsparseMatrix", .R.2.T)
-setAs("RsparseMatrix", "CsparseMatrix", .CR2RC)
+setAs("RsparseMatrix", "CsparseMatrix", .R.2.C)
 
 setAs("RsparseMatrix", "denseMatrix",
-      function(from) as(.CR2RC(from), "denseMatrix"))
+      function(from) as(.R.2.C(from), "denseMatrix"))
 
-## MJ: no longer needed ... replacement in ./sparseMatrix.R
-if(FALSE) {
 setAs("RsparseMatrix", "dsparseMatrix",
       function(from) as(.R.2.C(from), "dsparseMatrix"))
 setAs("RsparseMatrix", "lsparseMatrix",
@@ -104,20 +104,22 @@ setAs("RsparseMatrix", "lMatrix",
       function(from) as(.R.2.C(from), "lMatrix"))
 setAs("RsparseMatrix", "nMatrix",
       function(from) as(.R.2.C(from), "nMatrix"))
-} ## MJ
 
 setAs("RsparseMatrix", "generalMatrix",
-      function(from) as(.CR2RC(from), "generalMatrix"))
+      function(from) as(.R.2.C(from), "generalMatrix"))
 
 ## for printing etc:
 setAs("RsparseMatrix", "dgeMatrix",
-      function(from) as(.CR2RC(from), "dgeMatrix"))
+      function(from) as(.R.2.C(from), "dgeMatrix"))
 setAs("RsparseMatrix", "matrix",
-      function(from) as(.CR2RC(from), "matrix"))
+      function(from) as(.R.2.C(from), "matrix"))
 
-setAs("sparseMatrix", "RsparseMatrix",
-      function(from) .tCR2RC(as(t(from), "CsparseMatrix")))
-setAs("CsparseMatrix", "RsparseMatrix", .CR2RC)
+setAs("sparseMatrix", "RsparseMatrix", .viaC.2.R)
+setAs("CsparseMatrix", "RsparseMatrix", .C.2.R)
+
+##setAs("dgRMatrix", "dgeMatrix",
+##      function(from) .Call(csc_to_dgeMatrix, from))
+} ## MJ
 
 ## MJ: no longer needed ... replacement in ./denseMatrix.R
 if(FALSE) {
@@ -152,18 +154,14 @@ setAs("dsCMatrix", "dsRMatrix",
 ## FIXME: if this makes sense, do it for "l" and "n" as well as "d"
 }
 
-
-##setAs("dgRMatrix", "dgeMatrix",
-##      function(from) .Call(csc_to_dgeMatrix, from))
-
 ##setMethod("diag", signature(x = "dgRMatrix"),
 ##          function(x = 1, nrow, ncol = n) .Call(csc_getDiag, x))
 
-setMethod("image", "dgRMatrix", function(x, ...) image(.R.2.T(x), ...))
+setMethod("image", "dgRMatrix", function(x, ...) image(.CR2T(x), ...))
 
 ## MJ: no longer needed ... replacement in ./sparseMatrix.R
 if(FALSE) {
-setMethod("t", "RsparseMatrix", function(x) .C.2.R(.tCR2RC(x)))
+setMethod("t", "RsparseMatrix", function(x) .C.2.R(.tR.2.C(x)))
 
 ## Want tril(), triu(), band() --- just as "indexing" ---
 ## return a "close" class:

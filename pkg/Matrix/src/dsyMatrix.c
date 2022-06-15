@@ -57,7 +57,7 @@ SEXP dsyMatrix_solve(SEXP a)
 SEXP dsyMatrix_matrix_solve(SEXP a, SEXP b)
 {
     SEXP trf = dsyMatrix_trf(a),
-	val = PROTECT(dense_as_geMatrix(b, 'd', 2, 0));
+	val = PROTECT(dense_as_general(b, 'd', 2, 0));
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym)),
 	info;
@@ -75,7 +75,7 @@ SEXP dsyMatrix_matrix_solve(SEXP a, SEXP b)
 
 SEXP dsyMatrix_matrix_mm(SEXP a, SEXP b, SEXP rtP)
 {
-    SEXP val = PROTECT(dense_as_geMatrix(b, 'd', 2, 0));// incl. dimnames
+    SEXP val = PROTECT(dense_as_general(b, 'd', 2, 0));// incl. dimnames
     int rt = asLogical(rtP); /* if(rt), compute b %*% a,  else  a %*% b */
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym)),

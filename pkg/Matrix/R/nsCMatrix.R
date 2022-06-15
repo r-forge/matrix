@@ -2,6 +2,8 @@
 
 ### contains = "nsparseMatrix"
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("nsCMatrix", "matrix",
       function(from) as(as(from, "ngCMatrix"), "matrix"))
 
@@ -11,8 +13,6 @@ setAs("nsCMatrix", "ngCMatrix",
 setAs("nsCMatrix", "nsTMatrix",
       function(from) .Call(Csparse_to_Tsparse, from, FALSE))
 
-## MJ: no longer needed ... replacement in ./sparseMatrix.R
-if(FALSE) {
 setAs("nsCMatrix", "dMatrix", .nC2d)
 setAs("nsCMatrix", "dsparseMatrix", .nC2d)
 setAs("nsCMatrix", "dsCMatrix", .nC2d)
@@ -41,14 +41,10 @@ setMethod("triu", "nsCMatrix",
 		      Dim = x@Dim, Dimnames = x@Dimnames)
 	      else triu(as(x, "ngCMatrix"), k = k, ...)
 	  })
+setMethod("t", signature(x = "nsCMatrix"),
+          function(x) .Call(nsCMatrix_trans, x),
+          valueClass = "nsCMatrix")
 }
 
 setMethod("chol", signature(x = "nsCMatrix"),
 	  function(x, pivot=FALSE, ...) stop("temporarily disabled"))## FIXME
-
-## MJ: no longer needed ... method now inherited from CsparseMatrix
-if(FALSE) {
-setMethod("t", signature(x = "nsCMatrix"),
-          function(x) .Call(nsCMatrix_trans, x),
-          valueClass = "nsCMatrix")
-} ## MJ

@@ -105,6 +105,9 @@ SEXP Rsparse_validate(SEXP x)
     return ScalarLogical(1);
 }
 
+/* MJ: no longer needed ... prefer R_sparse_as_dense() */
+#if 0
+
 /** @brief From a CsparseMatrix, produce a dense one.
  *
  * Directly deals with symmetric, triangular and general.
@@ -200,6 +203,8 @@ SEXP Csparse_to_dense(SEXP x, SEXP symm_or_tri)
 	return ans;
 }
 
+#endif /* MJ */
+
 // FIXME: do not go via CHM (should not be too hard, to just *drop* the x-slot, right?
 SEXP Csparse2nz(SEXP x, Rboolean tri)
 {
@@ -227,13 +232,13 @@ SEXP Csparse_to_nz_pattern(SEXP x, SEXP tri)
     return Csparse2nz(x, (Rboolean) tr_);
 }
 
-#endif /* MJ */
-
 // n.CMatrix --> [dli].CMatrix  (not going through CHM!)
 SEXP nz_pattern_to_Csparse(SEXP x, SEXP res_kind)
 {
     return nz2Csparse(x, asInteger(res_kind));
 }
+
+#endif /* MJ */
 
 // n.CMatrix --> [dli].CMatrix  (not going through CHM!)
 // NOTE: use chm_MOD_xtype(() to change type of  'cholmod_sparse' matrix
@@ -293,6 +298,9 @@ SEXP nz2Csparse(SEXP x, enum x_slot_kind r_kind)
     return ans;
 }
 
+/* MJ: no longer needed ... prefer R_sparse_as_matrix() */
+#if 0
+
 SEXP Csparse_to_matrix(SEXP x, SEXP chk, SEXP symm)
 {
     int is_sym = asLogical(symm);
@@ -309,10 +317,17 @@ SEXP Csparse_to_matrix(SEXP x, SEXP chk, SEXP symm)
 	 : GET_SLOT(x, Matrix_DimNamesSym)));
 }
 
+#endif /* MJ */
+
+/* MJ: no longer needed ... prefer R_sparse_as_vector() */
+#if 0
+
 SEXP Csparse_to_vector(SEXP x)
 {
     return chm_dense_to_vector(cholmod_sparse_to_dense(AS_CHM_SP__(x), &c), 1);
 }
+
+#endif /* MJ */
 
 SEXP Csparse_to_Tsparse(SEXP x, SEXP tri)
 {
@@ -327,6 +342,9 @@ SEXP Csparse_to_Tsparse(SEXP x, SEXP tri)
 			       Rkind, tr ? diag_P(x) : "",
 			       GET_SLOT(x, Matrix_DimNamesSym));
 }
+
+/* MJ: unused */
+#if 0
 
 SEXP Csparse_to_tCsparse(SEXP x, SEXP uplo, SEXP diag)
 {
@@ -351,6 +369,10 @@ SEXP Csparse_to_tTsparse(SEXP x, SEXP uplo, SEXP diag)
 			       GET_SLOT(x, Matrix_DimNamesSym));
 }
 
+#endif
+
+/* MJ: no longer needed ... prefer R_sparse_as_general() */
+#if 0
 
 SEXP Csparse_symmetric_to_general(SEXP x)
 {
@@ -364,6 +386,8 @@ SEXP Csparse_symmetric_to_general(SEXP x)
     return chm_sparse_to_SEXP(chgx, 1, 0, Rkind, "",
 			      get_symmetrized_DimNames(x, -1));
 }
+
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer R_sparse_force_symmetric() */
 #if 0
@@ -656,7 +680,7 @@ SEXP Csp_dense_products(SEXP a, SEXP b,
        according to the general R philosophy of treating vectors in matrix products.
     */
 
-    /* repeating a "cheap part" of dense_as_geMatrix() 
+    /* repeating a "cheap part" of dense_as_general() 
        to see if we have a vector that we might 'transpose_if_vector' : */
     static const char *valid[] = {MATRIX_VALID_ddense, ""};
     if (R_check_class_etc(b, valid) < 0)
@@ -671,7 +695,7 @@ SEXP Csp_dense_products(SEXP a, SEXP b,
 	// Here, we transpose already in dense_as_ge*()  ==> don't do it later:
 	transp_b = FALSE;
     }
-    SEXP b_M = PROTECT(dense_as_geMatrix(b, 'd', 2, maybe_transp_b));
+    SEXP b_M = PROTECT(dense_as_general(b, 'd', 2, maybe_transp_b));
 
     CHM_DN chb = AS_CHM_DN(b_M), b_t;
     R_CheckStack();

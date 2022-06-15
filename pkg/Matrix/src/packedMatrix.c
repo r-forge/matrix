@@ -35,6 +35,9 @@ SEXP packedMatrix_unpack(SEXP from, SEXP strict)
 	x_to;
 
     int n = INTEGER(dim)[0];
+    if ((double) n * n > R_XLEN_T_MAX)
+	error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
+
     char ul = *CHAR(STRING_ELT(uplo, 0));
     SEXPTYPE tx = TYPEOF(x_from);
     R_xlen_t nx = (R_xlen_t) n * n;
@@ -611,7 +614,7 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
 
 #define PM_SUB1								\
     do {								\
-    	SEXPTYPE tx;							\
+	SEXPTYPE tx;							\
 	SEXP x = GET_SLOT(obj, Matrix_xSym),				\
 	    res = PROTECT(allocVector(tx = TYPEOF(x), nindex));		\
 	char uplo = *uplo_P(obj), diag = *Diag_P(obj);			\
@@ -648,6 +651,9 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
 SEXP packedMatrix_sub1(SEXP obj, SEXP index)
 {
     int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
+    if ((double) n * n > R_XLEN_T_MAX)
+	error(_("indexing n-by-n packedMatrix is not supported "
+		"for n*n exceeding R_XLEN_T_MAX"));
     R_xlen_t n2 = (R_xlen_t) n * 2, nn = (R_xlen_t) n * n,
 	nindex = XLENGTH(index);
     PM_SUB1;
@@ -678,6 +684,9 @@ SEXP packedMatrix_sub1_mat(SEXP obj, SEXP index)
 {
     int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0],
 	nindex = INTEGER(getAttrib(index, R_DimSymbol))[0];
+    if ((double) n * n > R_XLEN_T_MAX)
+	error(_("indexing n-by-n packedMatrix is not supported "
+		"for n*n exceeding R_XLEN_T_MAX"));
     R_xlen_t n2 = (R_xlen_t) n * 2;
     PM_SUB1;
 }
@@ -791,6 +800,9 @@ SEXP packedMatrix_sub2(SEXP obj, SEXP index1, SEXP index2, SEXP drop)
     int *pi, *pj, n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
     R_xlen_t ni, nj, n2 = (R_xlen_t) n * 2;
     
+    if ((double) n * n > R_XLEN_T_MAX)
+	error(_("indexing of n-by-n packedMatrix with n*n "
+		"exceeding R_XLEN_T_MAX is not supported"));
     if (mi) {
 	ni = n;
     } else {

@@ -4,7 +4,12 @@
 %
 \alias{dtRMatrix-class}
 %
+\alias{coerce,dtRMatrix,dgRMatrix-method}
 \alias{coerce,dtRMatrix,dsRMatrix-method}
+\alias{coerce,dtRMatrix,dtCMatrix-method}
+\alias{coerce,dtRMatrix,dtTMatrix-method}
+\alias{coerce,dtRMatrix,dtpMatrix-method}
+\alias{coerce,dtRMatrix,dtrMatrix-method}
 \alias{coerce,dtRMatrix,ltRMatrix-method}
 \alias{coerce,dtRMatrix,ntRMatrix-method}
 \alias{coerce,matrix,dtRMatrix-method}

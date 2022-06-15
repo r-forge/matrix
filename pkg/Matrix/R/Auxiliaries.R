@@ -508,51 +508,62 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
         diag = if(unit) "U" else "N", x = if(unit) x[FALSE] else x)
 }
 
-##' @title Coerce from "dense" to '.geMatrix'
-##' @param from vector, matrix, \code{denseMatrix}, or \code{diagonalMatrix}.
-##' @param kind character flag, either the empty string \code{""}
-##'     or a letter matching \code{^[dln]$}, indicating the desired
-##'     "kind" of \code{.geMatrix}; \code{""} (the default) is to
-##'     preserve the "kind" of \code{from}.
-.dense2ge <- function(from, kind) {
-    .Call(R_dense_as_geMatrix, from, kind)
-}
-.dense2dge <- function(from) {
-    .Call(R_dense_as_geMatrix, from, "d")
-}
+.dense2g <- function(from, kind)
+    .Call(R_dense_as_general, from, kind)
 
-.m2ge <- function(from, kind) {
-    .Call(R_matrix_as_geMatrix, from, kind)
-}
+.sparse2g <- function(from)
+    .Call(R_sparse_as_general, from)
 
-.ge2m <- function(from) {
-    .Call(R_geMatrix_as_matrix, from)
-}
-
-.dense2m <- function(from) {
+.dense2m <- function(from)
     .Call(R_dense_as_matrix, from)
-}
+
+.sparse2m <- function(from)
+    .Call(R_sparse_as_matrix, from)
 
 .diag2m <- function(from)
     `dimnames<-`(base::diag(if(from@diag == "N") from@x else as1(from@x),
                             nrow = from@Dim[1L]),
                  from@Dimnames)
 
-.dense2kind <- function(from, kind) {
+.dense2v <- function(from)
+    .Call(R_dense_as_vector, from)
+
+.sparse2v <- function(from)
+    .Call(R_sparse_as_vector, from)
+
+.diag2v <- function(from) {
+    n <- from@Dim[1L]
+    x <- from@x
+    m <- mode(x)
+    r <- vector(m, length = n^2)
+    if(n > 0L)
+        r[1 + 0:(n - 1L) * (n + 1)] <- if(from@diag == "N") x else as1(mod = m)
+    r
+}
+
+.dense2kind <- function(from, kind)
     .Call(R_dense_as_kind, from, kind)
-}
 
-.sparse2kind <- function(from, kind, drop0) {
+.sparse2kind <- function(from, kind, drop0)
     .Call(R_sparse_as_kind, from, kind, drop0)
-}
 
-.dense2sparse <- function(from, code, uplo, diag) {
+.dense2sparse <- function(from, code, uplo, diag)
     .Call(R_dense_as_sparse, from, code, uplo, diag)
-}
 
-.diag2sparse <- function(from, code, uplo, drop0) {
+.sparse2dense <- function(from, packed)
+    .Call(R_sparse_as_dense, from, packed)
+
+.diag2sparse <- function(from, code, uplo, drop0)
     .Call(R_diagonal_as_sparse, from, code, uplo, drop0)
-}
+
+.m2ge <- function(from, kind)
+    .Call(R_matrix_as_geMatrix, from, kind)
+
+.ge2m <- function(from)
+    .Call(R_geMatrix_as_matrix, from)
+
+.ge2v <- function(from)
+    from@x
 
 ## Keep synchronized with Matrix() in ./Matrix.R, where diagonal "matrix"
 ## (which are both symmetric and triangular) are coerced to "symmetricMatrix",
@@ -598,6 +609,36 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
     else
         .dense2sparse(from, code, NULL, NULL)
 }
+
+.CR2T <- function(from) .Call(CRsparse_as_Tsparse, from)
+.tCR2RC <- function(from) .Call(tCRsparse_as_RCsparse, from)
+.CR2RC <- function(from) {
+    to <- .tCR2RC(.Call(R_sparse_transpose, from))
+    if(.hasSlot(from, "factors"))
+        to@factors <- from@factors
+    to
+}
+
+## in ../src/Tsparse.c :  |-> cholmod_T -> cholmod_C -> chm_sparse_to_SEXP
+## adjusted for triangular matrices not represented in cholmod
+.T2C <- function(from) {
+    to <- .Call(Tsparse_to_Csparse, from, is(from, "triangularMatrix"))
+    if(.hasSlot(from, "factors"))
+        to@factors <- from@factors
+    to
+}
+
+.T2R <- function(from) {
+    to <- .tCR2RC(.Call(Tsparse_to_Csparse, .Call(R_sparse_transpose, from),
+                        is(from, "triangularMatrix")))
+    if(.hasSlot(from, "factors"))
+        to@factors <- from@factors
+    to
+}
+
+## fast, exported for power users
+.T2Cmat <- function(from, isTri = is(from, "triangularMatrix"))
+    .Call(Tsparse_to_Csparse, from, isTri)
 
 rowCheck <- function(a, b) {
     da <- dim(a)
@@ -968,19 +1009,14 @@ uniqTsparse <- function(x, class.x = c(class(x))) {
     ## and much based on C code
     ##
     ## TODO: faster for the case where 'x' is already 'uniq'?  if(anyDuplicatedT(.))
-    if(extends(class.x, "TsparseMatrix")) {
-	tri <- extends(class.x, "triangularMatrix")
-	.Call(Csparse_to_Tsparse, .Call(Tsparse_to_Csparse, x, tri), tri)
-    } else
-	stop(gettextf("not yet implemented for class %s", dQuote(class.x)),
+    if(!extends(class.x, "TsparseMatrix"))
+	stop(gettextf("not yet implemented for class \"%s\"", dQuote(class.x)),
 	     domain = NA)
+    .CR2T(.T2C(x))
 }
 
 ##' non-exported version with*OUT* check -- called often only  if(anyDuplicatedT(.))
-.uniqTsparse <- function(x, class.x = c(class(x))) {
-    tri <- extends(class.x, "triangularMatrix")
-    .Call(Csparse_to_Tsparse, .Call(Tsparse_to_Csparse, x, tri), tri)
-}
+.uniqTsparse <- function(x) .CR2T(.T2C(x))
 
 
 ## Note: maybe, using
@@ -1087,29 +1123,15 @@ n2l_spMatrix <- function(from) {
 }
 } ## MJ
 
-## MJ: no longer needed ... replacement below
+## MJ: no longer needed
 if(FALSE) {
 .R.2.C  <- function(from) .Call(R_to_CMatrix, from)
 .C.2.R  <- function(from)
     .tCR2RC(.Call(Csparse_transpose, from, is(from, "triangularMatrix")))
 ## slightly less efficient than above, but preserves symmetry correctly
-.viaC.2.R <- function(from) .tCR2RC(as(t(from), "CsparseMatrix"))
-} ## MJ
-
-.tCR2RC <- function(from) .Call(tCRsparse_as_RCsparse, from)
-.CR2RC <- function(from) .tCR2RC(.Call(R_sparse_transpose, from))
-
+.viaC.2.R <- function(from) .tC.2.R(as(t(from), "CsparseMatrix"))
 ## .R.2.T() fails on 32bit--enable-R-shlib with segfault {Kurt}
 .R.2.T  <- function(from) .Call(compressed_to_TMatrix, from, FALSE)
-
-## in ../src/Tsparse.c :  |-> cholmod_T -> cholmod_C -> chm_sparse_to_SEXP
-## adjusted for triangular matrices not represented in cholmod
-.T.2.C <- function(from)
-    .Call(Tsparse_to_Csparse, from, is(from, "triangularMatrix"))
-
-## fast, exported for power users
-.T2Cmat <- function(from, isTri = is(from, "triangularMatrix"))
-    .Call(Tsparse_to_Csparse, from, isTri)
 
 tT2gT <- function(x, cl = class(x), toClass, cld = getClassDef(cl)) {
     ## coerce *tTMatrix to *gTMatrix {triangular -> general}
@@ -1148,13 +1170,10 @@ tT2gT <- function(x, cl = class(x), toClass, cld = getClassDef(cl)) {
 .gC2tT <- function(x, uplo, diag="N") .Call(Csparse_to_tTsparse, x, uplo, diag)
 .gC2tC <- function(x, uplo, diag="N") .Call(Csparse_to_tCsparse, x, uplo, diag)
 
-## MJ: no longer needed
-if(FALSE) {
 .gC2sC <- function(x, uplo) .Call(Csparse_general_to_symmetric, x, uplo, TRUE)
 
 gT2tT <- function(x, uplo, diag, toClass,
-		  do.n = extends(toClass, "nMatrix"))
-{
+		  do.n = extends(toClass, "nMatrix")) {
     ## coerce *gTMatrix to *tTMatrix {general -> triangular}
     i <- x@i
     j <- x@j

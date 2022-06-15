@@ -4,7 +4,6 @@
 %
 \alias{dtrMatrix-class}
 %
-\alias{coerce,dtrMatrix,CsparseMatrix-method}
 \alias{coerce,dtrMatrix,dgeMatrix-method}
 \alias{coerce,dtrMatrix,dgeMatrix-method}
 \alias{coerce,dtrMatrix,dsyMatrix-method}

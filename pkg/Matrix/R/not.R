@@ -41,7 +41,7 @@ setMethod("!", "ltrMatrix",
 	      ##	a variation of make_array_triangular:
 	      r <- as(x, "lgeMatrix")
 	      n <- x@Dim[1]
-	      if(x@diag == "U")
+	      if(n > 0L && x@diag == "U")
 		  r@x[indDiag(n)] <- FALSE ## result has diagonal all FALSE
 	      r@x[indTri(n, upper=x@uplo != "U")] <- TRUE
 	      r

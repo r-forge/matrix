@@ -107,7 +107,7 @@ SEXP ltrMatrix_as_ltpMatrix(SEXP from, SEXP kind)
 
 #endif
 
-/* MJ: no longer needed ... prefer more general dense_as_geMatrix() */
+/* MJ: no longer needed ... prefer more general dense_as_general() */
 #if 0
 
 /* this is very close to dtrMatrix_as_dge*() :*/
@@ -125,7 +125,7 @@ SEXP ltrMatrix_as_lgeMatrix(SEXP from, SEXP kind)
     return val;
 }
 
-// this is somewhat close to dense_as_geMatrix() :
+// this is somewhat close to dense_as_general() :
 SEXP lsyMatrix_as_lgeMatrix(SEXP from, SEXP kind)
 {
     SEXP val = PROTECT(NEW_OBJECT_OF_CLASS(

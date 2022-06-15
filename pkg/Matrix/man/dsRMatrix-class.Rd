@@ -5,7 +5,11 @@
 \alias{dsRMatrix-class}
 %
 \alias{coerce,dsRMatrix,CsparseMatrix-method}
+\alias{coerce,dsRMatrix,dgRMatrix-method}
 \alias{coerce,dsRMatrix,dsCMatrix-method}
+\alias{coerce,dsRMatrix,dsTMatrix-method}
+\alias{coerce,dsRMatrix,dspMatrix-method}
+\alias{coerce,dsRMatrix,dsyMatrix-method}
 \alias{coerce,dsRMatrix,dtRMatrix-method}
 \alias{coerce,dsRMatrix,lsRMatrix-method}
 \alias{coerce,dsRMatrix,nsRMatrix-method}

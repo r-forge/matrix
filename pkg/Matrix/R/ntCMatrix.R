@@ -1,8 +1,5 @@
 #### Logical Sparse Triangular Matrices in Compressed column-oriented format
 
-setAs("ntCMatrix", "matrix",
-      function(from) as(copyClass(diagU2N(from), "ngCMatrix"), "matrix"))
-
 ## MJ: no longer needed ... replacement in ./denseMatrix.R
 if(FALSE) {
 setAs("matrix", "ntCMatrix",
@@ -13,14 +10,17 @@ setAs("matrix", "ntCMatrix",
       })
 } ## MJ
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
+setAs("ntCMatrix", "matrix",
+      function(from) as(copyClass(diagU2N(from), "ngCMatrix"), "matrix"))
+
 setAs("ntCMatrix", "TsparseMatrix",
       function(from) .Call(Csparse_to_Tsparse, from, TRUE))
 
 setAs("ntCMatrix", "ngCMatrix",
       function(from) copyClass(diagU2N(from), "ngCMatrix"))
 
-## MJ: no longer needed ... replacement in ./sparseMatrix.R
-if(FALSE) {
 setAs("ntCMatrix", "dMatrix", .nC2d)
 setAs("ntCMatrix", "dsparseMatrix", .nC2d)
 setAs("ntCMatrix", "dtCMatrix", .nC2d)

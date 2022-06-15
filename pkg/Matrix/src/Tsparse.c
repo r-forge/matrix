@@ -42,6 +42,9 @@ SEXP Tsparse_to_Csparse(SEXP x, SEXP tri)
 			      GET_SLOT(x, Matrix_DimNamesSym));
 }
 
+/* MJ: unused */
+#if 0
+
 /* speedup utility, needed e.g. after subsetting: */
 SEXP Tsparse_to_tCsparse(SEXP x, SEXP uplo, SEXP diag)
 {
@@ -56,6 +59,8 @@ SEXP Tsparse_to_tCsparse(SEXP x, SEXP uplo, SEXP diag)
 			      /* diag = */ CHAR(STRING_ELT(diag, 0)),
 			      GET_SLOT(x, Matrix_DimNamesSym));
 }
+
+#endif /* MJ */
 
 SEXP Tsparse_diagU2N(SEXP x)
 {

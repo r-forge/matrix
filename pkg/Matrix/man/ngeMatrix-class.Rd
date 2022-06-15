@@ -8,6 +8,7 @@
 \alias{Arith,ngeMatrix,ngeMatrix-method}
 \alias{Compare,ngeMatrix,ngeMatrix-method}
 \alias{Logic,ngeMatrix,ngeMatrix-method}
+\alias{as.vector,ngeMatrix-method}
 \alias{coerce,matrix,ngeMatrix-method}
 \alias{coerce,ngeMatrix,dgeMatrix-method}
 \alias{coerce,ngeMatrix,lgeMatrix-method}
@@ -19,6 +20,7 @@
 \alias{coerce,ngeMatrix,nsyMatrix-method}
 \alias{coerce,ngeMatrix,ntpMatrix-method}
 \alias{coerce,ngeMatrix,ntrMatrix-method}
+\alias{coerce,ngeMatrix,vector-method}
 \alias{coerce,numLike,ngeMatrix-method}
 %
 \description{This is the class of general dense nonzero-pattern

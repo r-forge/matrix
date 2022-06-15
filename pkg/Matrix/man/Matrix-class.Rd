@@ -67,7 +67,6 @@
 \alias{diff,Matrix-method}
 \alias{dim,Matrix-method}
 \alias{dimnames,Matrix-method}
-\alias{dim<-,Matrix-method}
 \alias{dimnames<-,Matrix,NULL-method}
 \alias{dimnames<-,Matrix,list-method}
 \alias{drop,Matrix-method}

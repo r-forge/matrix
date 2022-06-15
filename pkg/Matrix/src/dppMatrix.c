@@ -78,7 +78,7 @@ SEXP dppMatrix_solve(SEXP x)
 
 SEXP dppMatrix_matrix_solve(SEXP a, SEXP b)
 {
-    SEXP val = PROTECT(dense_as_geMatrix(b, 'd', 2, 0));
+    SEXP val = PROTECT(dense_as_general(b, 'd', 2, 0));
     SEXP Chol = dppMatrix_chol(a);
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym));

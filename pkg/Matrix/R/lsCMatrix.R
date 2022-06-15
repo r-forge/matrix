@@ -2,6 +2,13 @@
 
 ### contains = "lsparseMatrix"
 
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
+setAs("matrix", "lsCMatrix", aslsC.by.lgC)
+}
+
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("lsCMatrix", "matrix",
       function(from) as(as(from, "generalMatrix"), "matrix"))
 
@@ -15,25 +22,19 @@ setAs("lsCMatrix", "lgTMatrix",
 aslsC.by.lgC <- function(from) as(as(from, "lgCMatrix"), "symmetricMatrix")
 setAs("lgTMatrix", "lsCMatrix", aslsC.by.lgC) # <-> needed for Matrix()
 
-## MJ: no longer needed ... replacement in ./denseMatrix.R
-if(FALSE) {
-setAs("matrix", "lsCMatrix", aslsC.by.lgC)
-}
 
 setAs("lsCMatrix", "lsTMatrix",
       function(from) .Call(Csparse_to_Tsparse, from, FALSE))
 
-## MJ: no longer needed ... replacement in ./sparseMatrix.R
-if(FALSE) {
 setAs("lsCMatrix", "dsCMatrix",
       function(from) new("dsCMatrix", i = from@i, p = from@p,
                          x = as.double(from@x), uplo = from@uplo,
                          Dim = from@Dim, Dimnames = from@Dimnames))
-} ## MJ
 
 if(FALSE) # needed ?
 setAs("lsCMatrix", "dgTMatrix",
       function(from) as(as(from, "dsCMatrix"), "dgTMatrix"))
+} ## MJ
 
 ## MJ: no longer needed ... methods now inherited from CsparseMatrix
 if(FALSE) {
@@ -54,15 +55,11 @@ setMethod("triu", "lsCMatrix",
 		      x = x@x, Dim = x@Dim, Dimnames = x@Dimnames)
 	      else triu(as(x, "lgCMatrix"), k = k, ...)
 	  })
+setMethod("t", signature(x = "lsCMatrix"),
+          function(x) .Call(lsCMatrix_trans, x),
+          valueClass = "lsCMatrix")
 } ## MJ
 
 setMethod("chol", signature(x = "lsCMatrix"),
 	  function(x, pivot=FALSE, ...)
 	  chol(as(x, "dgCMatrix"), pivot=pivot, ...))
-
-## MJ: no longer needed ... method now inherited from CsparseMatrix
-if(FALSE) {
-setMethod("t", signature(x = "lsCMatrix"),
-          function(x) .Call(lsCMatrix_trans, x),
-          valueClass = "lsCMatrix")
-} ## MJ

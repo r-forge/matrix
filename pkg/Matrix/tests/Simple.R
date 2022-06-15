@@ -1272,6 +1272,30 @@ s44 <- new("dgCMatrix", Dim = c(4L, 4L), p = c(0L, 0L, 1L, 1L, 1L),
 (bs44 <- band(s44, -1L, 1L))
 stopifnot(identical(s44, bs44))
 
+l0.u <- new("ltrMatrix", diag = "U")
+!l0.u # was an error
+
+## coercions preserving mathematical equality ought to preserve 'factors' slot;
+## though currently only for sparse->sparse and dense->dense
+mT <- as(as(Diagonal(x = rlnorm(5)), "TsparseMatrix"), "generalMatrix")
+stopifnot(identical(mT@factors, list()))
+chol(mT)
+mR <- as(mT, "RsparseMatrix")
+mC <- as(mR, "CsparseMatrix")
+stopifnot(!identical(mTf <- mT@factors, list()),
+          identical(mTf, mR@factors),
+          identical(mTf, mC@factors))
+
+## overallocated l.T should follow usual logic ... NA || TRUE -> TRUE, etc.
+lT. <- lT0 <- lT1 <-
+    new("lgTMatrix", Dim = c(1L, 1L), i = c(0L, 0L), j = c(0L, 0L),
+        x = c(NA, NA))
+lT0@x[1L] <- FALSE
+lT1@x[1L] <- TRUE
+stopifnot(identical(as.vector(lT.), NA),
+          identical(as.vector(lT0), NA),
+          identical(as.vector(lT1), TRUE))
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()

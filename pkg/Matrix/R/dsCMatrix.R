@@ -1,5 +1,13 @@
 #### Symmetric Sparse Matrices in compressed column-oriented format
 
+## MJ: no longer needed ... replacement in ./denseMatrix.R
+if(FALSE) {
+setAs("matrix", "dsCMatrix",
+      function(from) as(.m2dgC(from), "symmetricMatrix"))
+} ## MJ
+
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("dgCMatrix", "dsCMatrix",
       function(from) { ## r2130 ... | 2008-03-14 | added deprecation warning
 	  warning("as(.,\"dsCMatrix\") is deprecated (since 2008); do use as(., \"symmetricMatrix\")")
@@ -17,14 +25,6 @@ setAs("dsCMatrix", "dgeMatrix",
 setAs("dsCMatrix", "matrix",
       function(from) as(as(from, "generalMatrix"), "matrix"))
 
-## MJ: no longer needed ... replacement in ./denseMatrix.R
-if(FALSE) {
-setAs("matrix", "dsCMatrix",
-      function(from) as(.m2dgC(from), "symmetricMatrix"))
-}
-
-## MJ: no longer needed ... replacement in ./sparseMatrix.R
-if(FALSE) {
 setAs("dsCMatrix", "lsCMatrix",
       function(from) new("lsCMatrix", i = from@i, p = from@p, uplo = from@uplo,
                          x = as.logical(from@x),
@@ -32,13 +32,13 @@ setAs("dsCMatrix", "lsCMatrix",
 setAs("dsCMatrix", "nsCMatrix",
       function(from) new("nsCMatrix", i = from@i, p = from@p, uplo = from@uplo,
                          Dim = from@Dim, Dimnames = from@Dimnames))
-} ## MJ
 
 setAs("dsCMatrix", "dgCMatrix",
       function(from) .Call(Csparse_symmetric_to_general, from))
 
 setAs("dsCMatrix", "dsyMatrix",
       function(from) as(from, "denseMatrix"))
+} ## MJ
 
 ##' Check if \code{name} (== "[sS][pP][dD]Cholesky") fits the values of the
 ##' logicals (perm, LDL, super).
@@ -122,22 +122,22 @@ solve.dsC.dC <- function(a,b, LDL = NA, tol = .Machine$double.eps) {
 
 setMethod("solve", signature(a = "dsCMatrix", b = "ddenseMatrix"),
 	  function(a, b, LDL = NA, tol = .Machine$double.eps, ...) {
-	      solve.dsC.mat(a, b = .dense2dge(b), LDL=LDL, tol=tol)
+	      solve.dsC.mat(a, b = .dense2g(b, "d"), LDL=LDL, tol=tol)
 	  },
 	  valueClass = "dgeMatrix")
 setMethod("solve", signature(a = "dsCMatrix", b = "denseMatrix"),
 	  ## only triggers for diagonal*, ldense*.. (but *not* ddense: above)
 	  function(a, b, LDL = NA, tol = .Machine$double.eps, ...)
-	  solve.dsC.mat(a, .dense2dge(b), LDL=LDL, tol=tol))
+	  solve.dsC.mat(a, .dense2g(b, "d"), LDL=LDL, tol=tol))
 
 setMethod("solve", signature(a = "dsCMatrix", b = "matrix"),
 	  function(a, b, LDL = NA, tol = .Machine$double.eps, ...)
-	  solve.dsC.mat(a, .dense2dge(b), LDL=LDL, tol=tol),
+	  solve.dsC.mat(a, .dense2g(b, "d"), LDL=LDL, tol=tol),
 	  valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "dsCMatrix", b = "numeric"),
 	  function(a, b, LDL = NA, tol = .Machine$double.eps, ...)
-	  solve.dsC.mat(a, .dense2dge(b), LDL=LDL, tol=tol),
+	  solve.dsC.mat(a, .dense2g(b, "d"), LDL=LDL, tol=tol),
 	  valueClass = "dgeMatrix")
 
 ## <sparse> . <sparse> ------------------------

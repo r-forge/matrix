@@ -20,7 +20,6 @@
 \alias{coerce,list,indMatrix-method}
 \alias{coerce,matrix,indMatrix-method}
 \alias{coerce,numeric,indMatrix-method}
-\alias{determinant,indMatrix,logical-method}
 \alias{rbind2,indMatrix,indMatrix-method}
 \alias{t,indMatrix-method}
 %

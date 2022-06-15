@@ -1,8 +1,5 @@
 #### Logical Sparse Triangular Matrices in Compressed column-oriented format
 
-setAs("ltCMatrix", "matrix",
-      function(from) as(as(from, "lgCMatrix"), "matrix"))
-
 ## MJ: no longer needed ... replacement in ./denseMatrix.R
 if(FALSE) {
 setAs("matrix", "ltCMatrix",
@@ -12,16 +9,18 @@ setAs("matrix", "ltCMatrix",
       })
 } ## MJ
 
-t2lgC <-  # also used in  ./Ops.R
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
+setAs("ltCMatrix", "matrix",
+      function(from) as(as(from, "lgCMatrix"), "matrix"))
+
+setAs("ltCMatrix", "lgCMatrix",
       function(from) copyClass(diagU2N(from), "lgCMatrix",
-			       c("i", "p", "x", "Dim", "Dimnames"))
-setAs("ltCMatrix", "lgCMatrix", t2lgC)
+			       c("i", "p", "x", "Dim", "Dimnames")))
 
 setAs("ltCMatrix", "ltTMatrix",
       function(from) .Call(Csparse_to_Tsparse, from, TRUE))
 
-## MJ: no longer needed ... replacement in ./sparseMatrix.R
-if(FALSE) {
 setAs("ltCMatrix", "dMatrix", # < instead of "dtCMatrix"
       function(from) new("dtCMatrix", i = from@i, p = from@p,
                          x = as.double(from@x), uplo = from@uplo,
@@ -30,10 +29,10 @@ setAs("ltCMatrix", "dMatrix", # < instead of "dtCMatrix"
 
 setAs("lgCMatrix", "ltCMatrix", # to triangular {needed in triu() }
       function(from) as(as(as(from, "lgTMatrix"), "ltTMatrix"), "ltCMatrix"))
-} ## MJ
 
 ## setAs("ltCMatrix", "generalMatrix",
 ##       function(from) ......)
+} ## MJ
 
 ## MJ: no longer needed ... method now inherited from CsparseMatrix
 if(FALSE) {

@@ -8,6 +8,8 @@ setAs("matrix", "ltTMatrix",
       function(from) as(as(from, "ltrMatrix"), "TsparseMatrix"))
 } ## MJ
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("ltTMatrix", "lgTMatrix",
       function(from) tT2gT(from, cl = "ltTMatrix", toClass = "lgTMatrix"))
 setAs("ltTMatrix", "generalMatrix",
@@ -18,20 +20,18 @@ setAs("ltTMatrix", "ltCMatrix",
 setAs("ltTMatrix", "lgCMatrix",
       function(from) as(.Call(Tsparse_to_Csparse, from, TRUE), "lgCMatrix"))
 
-## MJ: no longer needed ... replacement in ./sparseMatrix.R
-if(FALSE) {
 setAs("ltTMatrix", "dtTMatrix",
       function(from) new("dtTMatrix", i = from@i, j = from@j,
                          x = rep.int(1, length(from@i)), uplo = from@uplo,
                          diag = from@diag,
                          Dim = from@Dim, Dimnames = from@Dimnames))
-} ## MJ
 
 setAs("ltTMatrix", "ltrMatrix",
       function(from) .Call(ltTMatrix_as_ltrMatrix, from))
 
 setAs("ltTMatrix", "matrix",
       function(from) as(as(from, "ltrMatrix"), "matrix"))
+} ## MJ
 
 ## MJ: no longer needed ... method now inherited from TsparseMatrix
 if(FALSE) {

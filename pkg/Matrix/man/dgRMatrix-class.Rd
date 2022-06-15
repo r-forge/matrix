@@ -4,6 +4,9 @@
 %
 \alias{dgRMatrix-class}
 %
+\alias{coerce,dgRMatrix,dgCMatrix-method}
+\alias{coerce,dgRMatrix,dgTMatrix-method}
+\alias{coerce,dgRMatrix,dgeMatrix-method}
 \alias{coerce,dgRMatrix,dsRMatrix-method}
 \alias{coerce,dgRMatrix,dtRMatrix-method}
 \alias{coerce,dgRMatrix,lgRMatrix-method}

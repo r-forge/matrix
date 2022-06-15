@@ -38,6 +38,9 @@ SEXP xRMatrix_validate(SEXP x)
     return ScalarLogical(1);
 }
 
+/* MJ: no longer needed ... prefer CRsparse_as_Tsparse */
+#if 0
+
 /* This and the following R_to_CMatrix() lead to memory-not-mapped seg.faults
  * only with {32bit + R-devel + enable-R-shlib} -- no idea why */
 SEXP compressed_to_TMatrix(SEXP x, SEXP colP)
@@ -79,6 +82,8 @@ SEXP compressed_to_TMatrix(SEXP x, SEXP colP)
     UNPROTECT(3);
     return ans;
 }
+
+#endif /* MJ */
 
 /* MJ: no longer needed ... 
    now done via R_sparse_transpose(), tCRsparse_as_RCsparse() */
@@ -491,7 +496,7 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
 	 */
 
     }
-    SEXP ans = PROTECT(dense_as_geMatrix(b, 'd', 2, 0)),
+    SEXP ans = PROTECT(dense_as_general(b, 'd', 2, 0)),
 	lu, qslot;
     CSP L, U;
     int *bdims = INTEGER(GET_SLOT(ans, Matrix_DimSym)), *p, *q;

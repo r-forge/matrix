@@ -40,12 +40,13 @@ setMethod("Math", "CsparseMatrix", function(x)
                 slot(rx, nm) <- slot(x, nm)
             rx
         }
-    } else { ## no sparseness (or no matrix!); C2dense() returns *numeric*
-        callGeneric(C2dense(x))
+    } else { ## no sparseness (or no matrix!)
+        callGeneric(.sparse2dense(x, FALSE))
     }
 }) ## {Math}
 
-setMethod("log", "CsparseMatrix", function(x, base = exp(1)) log(C2dense(x), base))
+setMethod("log", "CsparseMatrix",
+          function(x, base = exp(1)) log(.sparse2dense(x, FALSE), base))
 
 ###--------- ddenseMatrix
 

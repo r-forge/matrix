@@ -51,7 +51,7 @@ SEXP dtpMatrix_solve(SEXP a)
 
 SEXP dtpMatrix_matrix_mm(SEXP x, SEXP y, SEXP right, SEXP trans)
 {
-    SEXP val = PROTECT(dense_as_geMatrix(y, 'd', 2, 0));
+    SEXP val = PROTECT(dense_as_general(y, 'd', 2, 0));
     int rt = asLogical(right); // if(rt), compute b %*% op(a), else op(a) %*% b
     int tr = asLogical(trans); // if(tr), op(a) = t(a), else op(a) = a
     /* Since 'x' is square (n x n ),   dim(x %*% y) = dim(y) */
@@ -85,7 +85,7 @@ SEXP dtpMatrix_matrix_mm(SEXP x, SEXP y, SEXP right, SEXP trans)
 
 SEXP dtpMatrix_matrix_solve(SEXP a, SEXP b)
 {
-    SEXP val = PROTECT(dense_as_geMatrix(b, 'd', 2, 0));
+    SEXP val = PROTECT(dense_as_general(b, 'd', 2, 0));
     /* Since 'a' is square (n x n ),   dim(a %*% b) = dim(b) */
     int *aDim = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bDim = INTEGER(GET_SLOT(val, Matrix_DimSym));
