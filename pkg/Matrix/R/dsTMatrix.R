@@ -1,5 +1,7 @@
 ### Coercion and Methods for Symmetric Triplet Matrices
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 ## Now in ./Tsparse.R
 ## setAs("dsTMatrix", "dsCMatrix",
 ##       function(from) .Call(Tsparse_to_Csparse, from, FALSE))
@@ -7,13 +9,10 @@
 setAs("dsTMatrix", "dgTMatrix",
       function(from) .Call(dsTMatrix_as_dgTMatrix, from))
 
-## MJ: no longer needed ... replacement in ./sparseMatrix.R
-if(FALSE) {
 setAs("dsTMatrix", "lsTMatrix",
       function(from) new("lsTMatrix", x = as.logical(from@x),
                          Dim = from@Dim, Dimnames = from@Dimnames,
                          uplo = from@uplo, i = from@i, j = from@j))
-} ## MJ
 
 ## Conversion <--> dense storage is via dsyMatrix :
 setAs("dsTMatrix", "dsyMatrix",
@@ -23,15 +22,15 @@ setAs("dsTMatrix", "dgeMatrix",
       function(from) as(as(from, "dsyMatrix"), "dgeMatrix"))
 setAs("dsTMatrix", "matrix",
       function(from) as(as(from, "dsyMatrix"), "matrix"))
-
-to_dsT <- function(from) as(as(from, "dsyMatrix"), "TsparseMatrix")
-setAs("dgeMatrix", "dsTMatrix", to_dsT)
+} ## MJ
 
 ## MJ: no longer needed ... replacement in ./denseMatrix.R
 if(FALSE) {
+to_dsT <- function(from) as(as(from, "dsyMatrix"), "TsparseMatrix")
+setAs("dgeMatrix", "dsTMatrix", to_dsT)
 setAs("matrix", "dsTMatrix", to_dsT)
-} ## MJ
 rm(to_dsT)
+} ## MJ
 
 ## MJ: no longer needed ... method now inherited from TsparseMatrix
 if(FALSE) {

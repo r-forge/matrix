@@ -9,15 +9,15 @@
 \alias{Arith,dgCMatrix,numeric-method}
 \alias{Arith,logical,dgCMatrix-method}
 \alias{Arith,numeric,dgCMatrix-method}
-\alias{as.vector,dgCMatrix-method}
+\alias{coerce,dgCMatrix,dgRMatrix-method}
 \alias{coerce,dgCMatrix,dgTMatrix-method}
 \alias{coerce,dgCMatrix,dgeMatrix-method}
-\alias{coerce,dgCMatrix,dsCMatrix-method} % deprecated
+\alias{coerce,dgCMatrix,dsCMatrix-method}
+\alias{coerce,dgCMatrix,dsTMatrix-method}
 \alias{coerce,dgCMatrix,dtCMatrix-method}
+\alias{coerce,dgCMatrix,dtTMatrix-method}
 \alias{coerce,dgCMatrix,lgCMatrix-method}
-\alias{coerce,dgCMatrix,matrix-method}
 \alias{coerce,dgCMatrix,ngCMatrix-method}
-\alias{coerce,dgCMatrix,vector-method}
 \alias{coerce,matrix,dgCMatrix-method}
 \alias{coerce,numLike,dgCMatrix-method}
 \alias{determinant,dgCMatrix,logical-method}

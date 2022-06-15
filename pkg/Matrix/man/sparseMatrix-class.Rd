@@ -21,7 +21,6 @@
 \alias{coerce,factor,sparseMatrix-method}
 \alias{coerce,matrix,sparseMatrix-method}
 \alias{coerce,numLike,sparseMatrix-method}
-\alias{coerce,sparseMatrix,RsparseMatrix-method}
 \alias{coerce,sparseMatrix,generalMatrix-method}
 \alias{coerce,sparseMatrix,indMatrix-method}
 \alias{coerce,sparseMatrix,sparseVector-method}

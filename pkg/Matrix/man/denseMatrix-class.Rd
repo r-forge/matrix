@@ -6,6 +6,9 @@
 %
 \alias{-,denseMatrix,missing-method}
 \alias{Math,denseMatrix-method}
+\alias{as.logical,denseMatrix-method}
+\alias{as.numeric,denseMatrix-method}
+\alias{as.vector,denseMatrix-method}
 \alias{cbind2,denseMatrix,denseMatrix-method}
 \alias{cbind2,denseMatrix,matrix-method}
 \alias{cbind2,denseMatrix,numeric-method}
@@ -30,6 +33,7 @@
 \alias{coerce,denseMatrix,packedMatrix-method}
 \alias{coerce,denseMatrix,sparseMatrix-method}
 \alias{coerce,denseMatrix,unpackedMatrix-method}
+\alias{coerce,denseMatrix,vector-method}
 \alias{coerce,matrix,denseMatrix-method}
 \alias{coerce,numLike,denseMatrix-method}
 \alias{dim<-,denseMatrix-method}

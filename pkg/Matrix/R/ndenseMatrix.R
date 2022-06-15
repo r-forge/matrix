@@ -138,6 +138,11 @@ setAs("ngeMatrix", "ngTMatrix",
 
 setAs("ngeMatrix", "ngCMatrix",
       function(from) as(as(from, "ngTMatrix"), "ngCMatrix"))
+
+setMethod("as.vector", "ndenseMatrix",
+	  function(x, mode) as.vector(as(x, "ngeMatrix")@x, mode))
+setMethod("as.logical", signature(x = "ndenseMatrix"),
+	  function(x, ...) as(x, "ngeMatrix")@x)
 } ## MJ
 
 ## MJ: no longer needed ... replacement in ./unpackedMatrix.R
@@ -157,12 +162,6 @@ setMethod("t", signature(x = "nspMatrix"),
 
 ## NOTE:  "&" and "|"  are now in group "Logic" c "Ops" --> ./Ops.R
 ##        "!" is in ./not.R
-
-setMethod("as.logical", signature(x = "ndenseMatrix"),
-	  function(x, ...) as(x, "ngeMatrix")@x)
-
-setMethod("as.vector", "ndenseMatrix",
-	  function(x, mode) as.vector(as(x, "ngeMatrix")@x, mode))
 
 setMethod("norm", signature(x = "ndenseMatrix", type = "character"),
 	  function(x, type, ...)

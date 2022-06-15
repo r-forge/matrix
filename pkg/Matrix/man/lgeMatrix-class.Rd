@@ -8,6 +8,7 @@
 \alias{Arith,lgeMatrix,lgeMatrix-method}
 \alias{Compare,lgeMatrix,lgeMatrix-method}
 \alias{Logic,lgeMatrix,lgeMatrix-method}
+\alias{as.vector,lgeMatrix-method}
 \alias{coerce,lgeMatrix,dgeMatrix-method}
 \alias{coerce,lgeMatrix,lgCMatrix-method}
 \alias{coerce,lgeMatrix,lgRMatrix-method}
@@ -18,6 +19,7 @@
 \alias{coerce,lgeMatrix,ltrMatrix-method}
 \alias{coerce,lgeMatrix,matrix-method}
 \alias{coerce,lgeMatrix,ngeMatrix-method}
+\alias{coerce,lgeMatrix,vector-method}
 \alias{coerce,matrix,lgeMatrix-method}
 \alias{coerce,numLike,lgeMatrix-method}
 %

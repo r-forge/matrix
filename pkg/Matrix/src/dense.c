@@ -543,7 +543,7 @@ SEXP R_dense_as_kind(SEXP from, SEXP kind)
 /* as(<denseMatrix>, "matrix") */
 SEXP R_dense_as_matrix(SEXP from)
 {
-    PROTECT(from = dense_as_geMatrix(from, '.', 1, 0));
+    PROTECT(from = dense_as_general(from, '.', 1, 0));
     SEXP to = PROTECT(GET_SLOT(from, Matrix_xSym));
     setAttrib(to, R_DimSymbol, GET_SLOT(from, Matrix_DimSym));
     setAttrib(to, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
@@ -559,6 +559,15 @@ SEXP R_geMatrix_as_matrix(SEXP from)
     setAttrib(to, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
     UNPROTECT(1);
     return to;
+}
+
+/* as(<denseMatrix>, "vector") */
+SEXP R_dense_as_vector(SEXP from)
+{
+    PROTECT(from = dense_as_general(from, '.', 0, 0));
+    from = GET_SLOT(from, Matrix_xSym);
+    UNPROTECT(1);
+    return from;
 }
 
 /* band(<denseMatrix>, k1, k2), tri[ul](<denseMatrix>, k)
@@ -656,7 +665,7 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 		PROTECT(x_to = x_from);
 	    }
 	} else {
-	    PROTECT(to = dense_as_geMatrix(from, '.', 1, 0));
+	    PROTECT(to = dense_as_general(from, '.', 1, 0));
 	    PROTECT(x_to = GET_SLOT(to, Matrix_xSym));
 	}
 	DENSE_BAND(UNPACKED_MAKE_BANDED);
@@ -1030,7 +1039,7 @@ SEXP lapack_qr(SEXP Xin, SEXP tl)
 
 SEXP dense_to_Csparse(SEXP x)
 {
-    SEXP ge_x = PROTECT(dense_as_geMatrix(x, '.', 2, 0)),
+    SEXP ge_x = PROTECT(dense_as_general(x, '.', 2, 0)),
 	Dim = GET_SLOT(ge_x, Matrix_DimSym);
     int *dims = INTEGER(Dim);
     Rboolean longi = (dims[0] * (double)dims[1] > INT_MAX);
@@ -1042,8 +1051,8 @@ SEXP dense_to_Csparse(SEXP x)
        ===> need "_x" in above AS_CHM_xDN() call.
 
        Also it cannot keep symmetric / triangular, hence the
-       as_geMatrix() above.  Note that this is already a *waste* for
-       symmetric matrices; However, we could conceivably use an
+       dense_as_general() above.  Note that this is already a *waste*
+       for symmetric matrices; However, we could conceivably use an
        enhanced cholmod_dense_to_sparse(), with an extra boolean
        argument for symmetry.
     */
@@ -1090,7 +1099,7 @@ SEXP dense_to_Csparse(SEXP x)
 SEXP ddense_symmpart(SEXP x)
 /* Class of the value will be dsyMatrix */
 {
-    SEXP dx = PROTECT(dense_as_geMatrix(x, 'd', 2, 0));
+    SEXP dx = PROTECT(dense_as_general(x, 'd', 2, 0));
     int *adims = INTEGER(GET_SLOT(dx, Matrix_DimSym)), n = adims[0];
 
     if(n != adims[1]) {
@@ -1127,7 +1136,7 @@ SEXP ddense_symmpart(SEXP x)
 SEXP ddense_skewpart(SEXP x)
 /* Class of the value will be dgeMatrix */
 {
-    SEXP dx = PROTECT(dense_as_geMatrix(x, 'd', 2, 0));
+    SEXP dx = PROTECT(dense_as_general(x, 'd', 2, 0));
     int *adims = INTEGER(GET_SLOT(dx, Matrix_DimSym)), n = adims[0];
 
     if(n != adims[1]) {
@@ -1162,7 +1171,7 @@ SEXP dense_to_symmetric(SEXP x, SEXP uplo, SEXP symm_test)
  */
     
     int symm_tst = asLogical(symm_test);
-    SEXP dx = PROTECT(dense_as_geMatrix(x, '.', 2, 0));
+    SEXP dx = PROTECT(dense_as_general(x, '.', 2, 0));
     SEXP ans;
     const char *cl = class_P(dx);
     /* same as in ..._geMatrix() above:*/
@@ -1228,7 +1237,7 @@ SEXP dense_band(SEXP x, SEXP k1P, SEXP k2P)
 	return R_NilValue; /* -Wall */
     }
     else {
-	SEXP ans = PROTECT(dense_as_geMatrix(x, '.', 2, 0));
+	SEXP ans = PROTECT(dense_as_general(x, '.', 2, 0));
 	int *adims = INTEGER(GET_SLOT(ans, Matrix_DimSym)),
 	    j, m = adims[0], n = adims[1],
 	    sqr = (adims[0] == adims[1]),

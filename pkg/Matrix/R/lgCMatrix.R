@@ -8,7 +8,6 @@ setAs("lgCMatrix", "dgCMatrix",
       function(from) new("dgCMatrix", i = from@i, p = from@p,
                          x = as.double(from@x),
                          Dim = from@Dim, Dimnames = from@Dimnames))
-} ## MJ
 
 setAs("lgCMatrix", "lgTMatrix",
       function(from) new("lgTMatrix", i = from@i, x = from@x,
@@ -22,6 +21,7 @@ setAs("lgCMatrix", "lgeMatrix",
 
 setAs("lgCMatrix", "matrix", function(from) .Call(lgC_to_matrix, from))
 ## not this: .Call(Csparse_to_matrix, from)), since it goes via dense -> double precision
+} ## MJ
 
 ## MJ: no longer needed ... replacement in ./denseMatrix.R
 if(FALSE) {

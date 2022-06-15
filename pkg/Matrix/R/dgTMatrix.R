@@ -1,3 +1,5 @@
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 ## Now in ./Tsparse.R
 ## setAs("dgTMatrix", "dgCMatrix",
 ##       function(from) .Call(Tsparse_to_Csparse, from, FALSE)
@@ -9,11 +11,6 @@ setAs("dgTMatrix", "dgeMatrix",
 setAs("dgTMatrix", "matrix",
       function(from) .Call(dgTMatrix_to_matrix, from))
 
-## MJ: no longer needed ... replacement in ./denseMatrix.R
-if(FALSE) {
-setAs("dgeMatrix", "dgTMatrix",
-      function(from) as(as(from, "dgCMatrix"), "dgTMatrix"))
-} ## MJ
 
 if(FALSE) ## special case, relatively ugly, needed ??
 setAs("dgTMatrix", "dsCMatrix",
@@ -37,8 +34,6 @@ setAs("dgTMatrix", "dtCMatrix",
 	  .Call(Tsparse_to_tCsparse, from, uplo, "N")
       })
 
-## MJ no longer needed ... replacement in ./sparseMatrix.R
-if(FALSE) {
 setAs("dgTMatrix", "dtTMatrix",
       function(from) check.gT2tT(from, toClass = "dtTMatrix", do.n=FALSE))
 setAs("dgTMatrix", "dsTMatrix",
@@ -65,6 +60,9 @@ mat2dgT <- function(from) {
         x = x[nz])
 }
 setAs("matrix", "dgTMatrix", mat2dgT)
+
+setAs("dgeMatrix", "dgTMatrix",
+      function(from) as(as(from, "dgCMatrix"), "dgTMatrix"))
 } ## MJ
 
 ## "[" methods are now in ./Tsparse.R

@@ -40,10 +40,7 @@
 \alias{Ops,ldiMatrix,numeric-method}
 \alias{Ops,ldiMatrix,sparseMatrix-method}
 \alias{Summary,ldiMatrix-method}
-\alias{^,ldiMatrix,Matrix-method}
-\alias{^,ldiMatrix,ddenseMatrix-method}
-\alias{^,ldiMatrix,ldenseMatrix-method}
-\alias{^,ldiMatrix,ndenseMatrix-method}
+\alias{as.logical,ldiMatrix-method}
 \alias{cbind2,ldiMatrix,atomicVector-method}
 \alias{cbind2,ldiMatrix,matrix-method}
 \alias{cbind2,matrix,ldiMatrix-method}

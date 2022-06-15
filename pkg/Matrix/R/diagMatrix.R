@@ -104,18 +104,18 @@ setAs("Matrix", "diagonalMatrix",
           drop0)
 }
 
-..diag2tr  <- function(from)           triu(.dense2ge(from, "."))
-..diag2dtr <- function(from)           triu(.dense2ge(from, "d"))
-..diag2ltr <- function(from)           triu(.dense2ge(from, "l"))
-..diag2ntr <- function(from)           triu(.dense2ge(from, "n"))
+..diag2tr  <- function(from)           triu(.dense2g(from, "."))
+..diag2dtr <- function(from)           triu(.dense2g(from, "d"))
+..diag2ltr <- function(from)           triu(.dense2g(from, "l"))
+..diag2ntr <- function(from)           triu(.dense2g(from, "n"))
 
-..diag2dsy <- function(from) forceSymmetric(.dense2ge(from, "d"))
-..diag2lsy <- function(from) forceSymmetric(.dense2ge(from, "l"))
-..diag2nsy <- function(from) forceSymmetric(.dense2ge(from, "n"))
+..diag2dsy <- function(from) forceSymmetric(.dense2g(from, "d"))
+..diag2lsy <- function(from) forceSymmetric(.dense2g(from, "l"))
+..diag2nsy <- function(from) forceSymmetric(.dense2g(from, "n"))
 
-..diag2dge <- function(from)                .dense2ge(from, "d")
-..diag2lge <- function(from)                .dense2ge(from, "l")
-..diag2nge <- function(from)                .dense2ge(from, "n")
+..diag2dge <- function(from)                .dense2g(from, "d")
+..diag2lge <- function(from)                .dense2g(from, "l")
+..diag2nge <- function(from)                .dense2g(from, "n")
 
 setAs("diagonalMatrix",          "dMatrix", ..diag2dkind)
 setAs("diagonalMatrix",          "lMatrix", ..diag2lkind)
@@ -138,6 +138,20 @@ setAs("diagonalMatrix",     "ddenseMatrix", ..diag2dtr)
 setAs("diagonalMatrix",     "ldenseMatrix", ..diag2ltr)
 setAs("diagonalMatrix",     "ndenseMatrix", ..diag2ntr)
 setAs("diagonalMatrix",           "matrix", .diag2m)
+setAs("diagonalMatrix",           "vector", .diag2v)
+
+setMethod("as.vector", signature(x = "diagonalMatrix"),
+          function(x, mode) as.vector(.diag2v(x), mode))
+
+setMethod("as.numeric", signature(x = "diagonalMatrix"),
+          function(x, ...) as.double(.diag2v(x)))
+setMethod("as.numeric", signature(x = "ddiMatrix"),
+          function(x, ...) .diag2v(x))
+
+setMethod("as.logical", signature(x = "diagonalMatrix"),
+          function(x, ...) as.logical(.diag2v(x)))
+setMethod("as.logical", signature(x = "ldiMatrix"),
+          function(x, ...) .diag2v(x))
 
 .kinds <- c("d", "l")
 for (.kind in .kinds) {
@@ -541,17 +555,6 @@ setMethod("is.finite", signature(x = "diagonalMatrix"),
 	  function(x) is.finite(.diag2tT(x)))
 setMethod("is.infinite", signature(x = "diagonalMatrix"),
 	  function(x) is.infinite(.diag2tT(x)))
-
-setMethod("as.vector", "diagonalMatrix",
-	  function(x, mode) {
-	      n <- x@Dim[1]
-              mod.x <- mode(x@x)
-	      r <- vector(mod.x, length = n^2)
-	      if(n)
-		  r[1 + 0:(n - 1L) * (n + 1)] <-
-		      if(x@diag == "U") as1(mod=mod.x) else x@x
-	      as.vector(r, mode)
-	  })
 
 ..diag.x <- function(m)                   rep.int(as1(m@x), m@Dim[1])
 .diag.x  <- function(m) if(m@diag == "U") rep.int(as1(m@x), m@Dim[1]) else m@x

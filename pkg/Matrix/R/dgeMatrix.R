@@ -6,13 +6,12 @@ setAs("numLike", "dgeMatrix", function(from) ..2dge(from))
 
 ge2mat <- function(from) array(from@x, dim = from@Dim, dimnames = from@Dimnames)
 setAs("dgeMatrix", "matrix", ge2mat)
-} ## MJ
-
-##  "[" settings are "up in"  Matrix.R & denseMatrix.R
-
 
 setMethod("as.vector", "dgeMatrix",
           function(x, mode) as.vector(x@x, mode))
+} ## MJ
+
+##  "[" settings are "up in"  Matrix.R & denseMatrix.R
 
 setMethod("norm", signature(x = "dgeMatrix", type = "missing"),
 	  function(x, type, ...) norm(x, type = "O", ...))

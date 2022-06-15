@@ -3,19 +3,10 @@
 ### contains = "nsparseMatrix"
 ###             ============= ---> superclass methods in ./nsparseMatrix.R
 
-
-setAs("ngTMatrix", "lgeMatrix",
-      function(from) .Call(lgTMatrix_to_lgeMatrix, as(from,"lgTMatrix")))
-setAs("ngTMatrix", "ngeMatrix",
-      function(from) as(as(from, "lgeMatrix"), "nMatrix"))
-
 ## MJ: ngTMatrix already inherits from generalMatrix ??
 if(FALSE) {
 setAs("ngTMatrix", "generalMatrix", function(from) as(from, "ngeMatrix"))
 }
-
-setAs("ngTMatrix", "matrix",
-      function(from) .Call(lgTMatrix_to_matrix, as(from, "lgTMatrix")))
 
 ## MJ: no longer needed ... replacement in ./denseMatrix.R
 if(FALSE) {
@@ -45,6 +36,15 @@ setAs("matrix", "nMatrix",   function(from) .m2ngTn(from))
 
 ## MJ: no longer needed ... replacement in ./sparseMatrix.R
 if(FALSE) {
+setAs("ngTMatrix", "lgeMatrix",
+      function(from) .Call(lgTMatrix_to_lgeMatrix, as(from,"lgTMatrix")))
+
+setAs("ngTMatrix", "ngeMatrix",
+      function(from) as(as(from, "lgeMatrix"), "nMatrix"))
+
+setAs("ngTMatrix", "matrix",
+      function(from) .Call(lgTMatrix_to_matrix, as(from, "lgTMatrix")))
+
 ## also works for lgT* or ltT* when it has no NA nor FALSE in @x :
 .n2dgT <- function(from)
     new("dgTMatrix", i = from@i, j = from@j,

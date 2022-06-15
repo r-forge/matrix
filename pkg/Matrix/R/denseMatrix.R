@@ -8,10 +8,10 @@
 ##         maintenance, to prevent infelicities among groups of similar
 ##         methods, and to avoid accidental gaps in implementation.
 
-..dense2ge  <- function(from) .Call(R_dense_as_geMatrix, from, ".")
-..dense2dge <- function(from) .Call(R_dense_as_geMatrix, from, "d")
-..dense2lge <- function(from) .Call(R_dense_as_geMatrix, from, "l")
-..dense2nge <- function(from) .Call(R_dense_as_geMatrix, from, "n")
+..dense2g  <- function(from) .Call(R_dense_as_general, from, ".")
+..dense2dg <- function(from) .Call(R_dense_as_general, from, "d")
+..dense2lg <- function(from) .Call(R_dense_as_general, from, "l")
+..dense2ng <- function(from) .Call(R_dense_as_general, from, "n")
 
 ..dense2ddense <- function(from) .Call(R_dense_as_kind, from, "d")
 ..dense2ldense <- function(from) .Call(R_dense_as_kind, from, "l")
@@ -65,41 +65,52 @@ setAs("ANY", "denseMatrix",
 setAs( "matrix", "denseMatrix", ..m2dense)
 setAs("numLike", "denseMatrix", ..m2ge)
 
-## To base matrix ..........................................
+## To sparse ...............................................
+
+setAs("denseMatrix",  "sparseMatrix", ..dense2Csparse)
+setAs("denseMatrix", "CsparseMatrix", ..dense2Csparse)
+setAs("denseMatrix", "RsparseMatrix", ..dense2Rsparse)
+setAs("denseMatrix", "TsparseMatrix", ..dense2Tsparse)
+
+setAs("matrix",  "sparseMatrix", ..m2Csparse)
+setAs("matrix", "CsparseMatrix", ..m2Csparse)
+setAs("matrix", "RsparseMatrix", ..m2Rsparse)
+setAs("matrix", "TsparseMatrix", ..m2Tsparse)
+
+setAs("numLike",  "sparseMatrix", ..dense2Csparse)
+setAs("numLike", "CsparseMatrix", ..dense2Csparse)
+setAs("numLike", "RsparseMatrix", ..dense2Rsparse)
+setAs("numLike", "TsparseMatrix", ..dense2Tsparse)
+
+## To base matrix, base vector .............................
 
 setAs("denseMatrix", "matrix", .dense2m)
+setAs("denseMatrix", "vector", .dense2v)
+
+setMethod("as.vector", signature(x = "denseMatrix"),
+          function(x, mode) as.vector(.dense2v(x), mode))
+
+setMethod("as.numeric", signature(x = "denseMatrix"),
+          function(x, ...) as.double(.dense2v(x)))
+setMethod("as.numeric", signature(x = "ddenseMatrix"),
+          function(x, ...) .dense2v(x))
+
+setMethod("as.logical", signature(x = "denseMatrix"),
+          function(x, ...) as.logical(.dense2v(x)))
+setMethod("as.logical", signature(x = "ldenseMatrix"),
+          function(x, ...) .dense2v(x))
+setMethod("as.logical", signature(x = "ndenseMatrix"),
+          function(x, ...) .dense2v(x))
 
 ## Faster:
-setAs("dgeMatrix", "matrix", .ge2m)
-setAs("lgeMatrix", "matrix", .ge2m)
-setAs("ngeMatrix", "matrix", .ge2m)
+for (.from in paste0(c("d", "l", "n"), "geMatrix")) {
+    setAs(.from, "matrix", .ge2m)
+    setAs(.from, "vector", .ge2v)
 
-## To packed ...............................................
-
-setAs("denseMatrix", "packedMatrix", ..pack)
-setAs(     "matrix", "packedMatrix", ..pack)
-
-## To unpacked .............................................
-
-setAs("denseMatrix", "unpackedMatrix", ..unpack)
-setAs(     "matrix", "unpackedMatrix", ..m2dense)
-setAs(    "numLike", "unpackedMatrix", ..m2ge)
-
-## To general ..............................................
-
-setAs("denseMatrix", "generalMatrix", ..dense2ge)
-setAs(     "matrix", "generalMatrix", ..m2ge)
-setAs(    "numLike", "generalMatrix", ..m2ge)
-
-## To symmetric ............................................
-
-## setAs("denseMatrix", "symmetricMatrix", .) # inherited from Matrix
-## setAs(     "matrix", "symmetricMatrix", .) # in ./symmetricMatrix.R
-
-## To triangular ...........................................
-
-## setAs("denseMatrix", "triangularMatrix", .) # inherited from Matrix
-## setAs(     "matrix", "triangularMatrix", .) # in ./triangularMatrix.R
+    setMethod("as.vector", signature(x = .from),
+              function(x, mode) as.vector(x@x, mode))
+}
+rm(.from)
 
 ## To "kind" ...............................................
 
@@ -153,22 +164,32 @@ setAs("numLike", "dsparseMatrix", ..dense2dsparse)
 setAs("numLike", "lsparseMatrix", ..dense2lsparse)
 setAs("numLike", "nsparseMatrix", ..dense2nsparse)
 
-## To sparse ...............................................
+## To general ..............................................
 
-setAs("denseMatrix",  "sparseMatrix", ..dense2Csparse)
-setAs("denseMatrix", "CsparseMatrix", ..dense2Csparse)
-setAs("denseMatrix", "RsparseMatrix", ..dense2Rsparse)
-setAs("denseMatrix", "TsparseMatrix", ..dense2Tsparse)
+setAs("denseMatrix", "generalMatrix", ..dense2g)
+setAs(     "matrix", "generalMatrix", ..m2ge)
+setAs(    "numLike", "generalMatrix", ..m2ge)
 
-setAs("matrix",  "sparseMatrix", ..m2Csparse)
-setAs("matrix", "CsparseMatrix", ..m2Csparse)
-setAs("matrix", "RsparseMatrix", ..m2Rsparse)
-setAs("matrix", "TsparseMatrix", ..m2Tsparse)
+## To symmetric ............................................
 
-setAs("numLike",  "sparseMatrix", ..dense2Csparse)
-setAs("numLike", "CsparseMatrix", ..dense2Csparse)
-setAs("numLike", "RsparseMatrix", ..dense2Rsparse)
-setAs("numLike", "TsparseMatrix", ..dense2Tsparse)
+## setAs("denseMatrix", "symmetricMatrix", .) # inherited from Matrix
+## setAs(     "matrix", "symmetricMatrix", .) # in ./symmetricMatrix.R
+
+## To triangular ...........................................
+
+## setAs("denseMatrix", "triangularMatrix", .) # inherited from Matrix
+## setAs(     "matrix", "triangularMatrix", .) # in ./triangularMatrix.R
+
+## To unpacked .............................................
+
+setAs("denseMatrix", "unpackedMatrix", ..unpack)
+setAs(     "matrix", "unpackedMatrix", ..m2dense)
+setAs(    "numLike", "unpackedMatrix", ..m2ge)
+
+## To packed ...............................................
+
+setAs("denseMatrix", "packedMatrix", ..pack)
+setAs(     "matrix", "packedMatrix", ..pack)
 
 ## More granular coercions .................................
 
@@ -184,7 +205,7 @@ for (.kind in .kinds) {
     for (.xy in c("tr", "sy", "tp", "sp"))
         setAs(paste0(.kind, .xy,   "Matrix"),
               paste0(.kind,      "geMatrix"),
-              get(sprintf("..dense2%sge", .kind),
+              get(sprintf("..dense2%sg", .kind),
                   mode = "function", inherits = FALSE))
 
     ## Unpacked to packed, preserving kind and structure
@@ -219,17 +240,12 @@ for (.kind in .kinds) {
                   paste0(.kind, `substr<-`(.xy, 2L, 2L, .repr), "Matrix"),
                   get(sprintf("..dense2%ssparse", .repr),
                       mode = "function", inherits = FALSE))
-
-    ## Rely on coercions to virtual classes when changing two or more
-    ## of kind, structure, and storage at once:
-
-    ##  NO: as(<dsyMatrix>, "dtpMatrix")
-    ## YES: as(as(<dsyMatrix>, "triangularMatrix"), "packedMatrix")
-
-    ##  NO: as(<lgeMatrix>, "nspMatrix")
-    ## YES: as(as(<lgeMatrix>, "lspMatrix"), "nMatrix")
 }
 rm(.kind, .kinds, .otherkind, .otherkinds, .xy, .repr)
+
+## For whatever reason, we also have these granular ones in Matrix 1.4-1:
+setAs("dgeMatrix", "dsTMatrix",
+      function(from) .dense2sparse(.M2symm(from), "..T", NULL, NULL))
 
 ## From base matrix, base vector ...........................
 
@@ -366,7 +382,7 @@ rm(.from, .to, .def, .b, .kind, .repr)
 ## Exported functions, now just aliases or wrappers ........
 ## (some or all could be made deprecated) ..................
 
-..2dge <- ..dense2dge
+..2dge <- ..dense2dg
 .dense2sy <- .M2symm
 .dsy2dsp <- ..pack3
 .dsy2mat <- function(from, keep.dimnames = TRUE) {
@@ -389,7 +405,7 @@ rm(.from, .to, .def, .b, .kind, .repr)
 .m2lgC <- function(from) .dense2sparse(from, "lgC", NULL, NULL)
 .m2ngC <- function(from) .m2ngCn(from)
 
-rm(..dense2ge, ..dense2dge, ..dense2lge, ..dense2nge,
+rm(..dense2g, ..dense2dg, ..dense2lg, ..dense2ng,
    ..dense2ddense, ..dense2ldense, ..dense2ndense,
    ..dense2dsparse, ..dense2lsparse, ..dense2nsparse,
    ..dense2Csparse, ..dense2Rsparse, ..dense2Tsparse,

@@ -24,7 +24,7 @@ setAs("ngCMatrix", "lMatrix", .nC2l)
 setAs("ngCMatrix", "lsparseMatrix", .nC2l)
 setAs("ngCMatrix", "lgCMatrix", .nC2l)
 }
-} ## MJ
 
 setAs("ngCMatrix", "matrix", function(from) .Call(ngC_to_matrix, from))
 ## not this: .Call(Csparse_to_matrix, from)), since it goes via dense -> double precision
+} ## MJ

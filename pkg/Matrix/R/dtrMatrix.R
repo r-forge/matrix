@@ -7,7 +7,7 @@ setAs("dtrMatrix", "dtpMatrix",
       dtr2dtp <- function(from) .Call(dtrMatrix_as_dtpMatrix, from))
 setAs("matrix", "dtrMatrix",
       function(from) as(..2dge(from), "dtrMatrix"))
-}
+} ## MJ
 
 ## MJ: these coercions are now inherited; see ./denseMatrix.R
 if(FALSE) {

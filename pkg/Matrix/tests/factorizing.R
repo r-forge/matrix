@@ -238,8 +238,9 @@ for(n in c(5:12)) {
 	      all(with(rr, A == tcrossprod(L %*% sqrt(D)))))
     d <- rr$d.half
     A <- rr$A
+    .A <- as(A, "TsparseMatrix") # 'factors' slot is retained => do chol() _after_ coercion
     R <- chol(A)
-    assert.EQ.Mat(R, chol(as(A, "TsparseMatrix"))) # gave infinite recursion
+    assert.EQ.Mat(R, chol(.A)) # gave infinite recursion
     print(d. <- diag(R))
     D. <- Diagonal(x= d.^2)
     L. <- t(R) %*% Diagonal(x = 1/d.)

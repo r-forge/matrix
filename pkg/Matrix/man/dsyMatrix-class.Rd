@@ -5,7 +5,6 @@
 \alias{dspMatrix-class}
 \alias{dsyMatrix-class}
 %
-\alias{coerce,dspMatrix,CsparseMatrix-method}
 \alias{coerce,dspMatrix,dgeMatrix-method}
 \alias{coerce,dspMatrix,dpoMatrix-method}
 \alias{coerce,dspMatrix,dppMatrix-method}
@@ -16,7 +15,6 @@
 \alias{coerce,dspMatrix,dtpMatrix-method}
 \alias{coerce,dspMatrix,lspMatrix-method}
 \alias{coerce,dspMatrix,nspMatrix-method}
-\alias{coerce,dspMatrix,sparseMatrix-method}
 \alias{coerce,matrix,dspMatrix-method}
 %
 \alias{coerce,dsyMatrix,corMatrix-method}

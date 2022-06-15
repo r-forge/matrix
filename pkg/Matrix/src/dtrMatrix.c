@@ -67,7 +67,7 @@ SEXP dtrMatrix_chol2inv(SEXP a)
 
 SEXP dtrMatrix_matrix_solve(SEXP a, SEXP b)
 {
-    SEXP ans = PROTECT(dense_as_geMatrix(b, 'd', 2, 0));
+    SEXP ans = PROTECT(dense_as_general(b, 'd', 2, 0));
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(ans, Matrix_DimSym));
     int n = bdims[0], nrhs = bdims[1];
@@ -100,7 +100,7 @@ SEXP dtrMatrix_matrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
      *
      * Because 'a' must be square, the size of the answer 'val',
      * is the same as the size of 'b' */
-    SEXP val = PROTECT(dense_as_geMatrix(b, 'd', 2, 0));
+    SEXP val = PROTECT(dense_as_general(b, 'd', 2, 0));
     int rt = asLogical(right); /* if(rt), compute b %*% op(a),  else  op(a) %*% b */
     int tr = asLogical(trans);/* if true, use t(a) */
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
@@ -154,7 +154,7 @@ SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
      * TWO cases : (1) result is triangular  <=> uplo's "match" (i.e., non-equal iff trans)
      * ===         (2) result is "general"
      */
-    SEXP val,/* = in case (2):  dense_as_geMatrix(b, 'd', 2, 0); */
+    SEXP val,/* = in case (2):  dense_as_general(b, 'd', 2, 0); */
 	d_a = GET_SLOT(a, Matrix_DimSym),
 	uplo_a = GET_SLOT(a, Matrix_uploSym),  diag_a = GET_SLOT(a, Matrix_diagSym),
 	uplo_b = GET_SLOT(b, Matrix_uploSym),  diag_b = GET_SLOT(b, Matrix_diagSym);
@@ -190,7 +190,7 @@ SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
 		valx[i * np1] = 1.;
 	}
     } else { /* different "uplo" ==> result is "dgeMatrix" ! */
-	val = PROTECT(dense_as_geMatrix(b, 'd', 2, 0));
+	val = PROTECT(dense_as_general(b, 'd', 2, 0));
 	SEXP
 	    dn_a = GET_SLOT( a , Matrix_DimNamesSym),
 	    dn   = GET_SLOT(val, Matrix_DimNamesSym);

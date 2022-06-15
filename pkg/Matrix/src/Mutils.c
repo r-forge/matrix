@@ -1597,12 +1597,12 @@ SEXP matrix_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector)
     return to;
 }
 
-SEXP R_dense_as_geMatrix(SEXP from, SEXP kind)
+SEXP R_dense_as_general(SEXP from, SEXP kind)
 {
     char k;
     if ((kind = asChar(kind)) == NA_STRING || (k = *CHAR(kind)) == '\0')
-	error(_("invalid 'kind' to 'R_dense_as_geMatrix()'"));
-    return dense_as_geMatrix(from, k, 0, 0);
+	error(_("invalid 'kind' to 'R_dense_as_general()'"));
+    return dense_as_general(from, k, 0, 0);
 }
 
 /** @brief Coerce `denseMatrix` (and others) to `.geMatrix`.
@@ -1625,7 +1625,7 @@ SEXP R_dense_as_geMatrix(SEXP from, SEXP kind)
  *
  * @return A `.geMatrix`.
  */
-SEXP dense_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector)
+SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
 {
     /* NB: diagonalMatrix is no longer a subclass of denseMatrix 
            but .diMatrix are nonetheless dealt with here ... */

@@ -16,7 +16,6 @@
 \alias{Ops,numeric,dpoMatrix-method}
 \alias{coerce,dpoMatrix,corMatrix-method}
 \alias{coerce,dpoMatrix,dppMatrix-method}
-\alias{coerce,dpoMatrix,dspMatrix-method}
 \alias{coerce,matrix,dpoMatrix-method}
 \alias{determinant,dpoMatrix,logical-method}
 \alias{determinant,dpoMatrix,missing-method}
@@ -31,7 +30,6 @@
 \alias{Ops,numeric,dppMatrix-method}
 \alias{coerce,dppMatrix,corMatrix-method}
 \alias{coerce,dppMatrix,dpoMatrix-method}
-\alias{coerce,dppMatrix,dsyMatrix-method}
 \alias{coerce,matrix,dppMatrix-method}
 \alias{determinant,dppMatrix,logical-method}
 \alias{determinant,dppMatrix,missing-method}

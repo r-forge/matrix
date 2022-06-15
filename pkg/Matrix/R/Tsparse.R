@@ -13,13 +13,13 @@ setAs("numeric", "TsparseMatrix",
       function(from) as(as.matrix(from), "TsparseMatrix"))
 } ## MJ
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("TsparseMatrix", "matrix",
       function(from) .Call(dgTMatrix_to_matrix, as(from, "dgTMatrix")))
 
 setAs("TsparseMatrix", "CsparseMatrix", .T.2.C)
 
-## MJ: no longer needed ... replacement in ./sparseMatrix.R
-if(FALSE) {
 .T.2.n <- function(from) {
     ## No: coercing to n(sparse)Matrix gives the "full" pattern including 0's
     ## if(any(is0(from@x))) ## 0 or FALSE -- the following should have drop0Tsp(.)
@@ -57,7 +57,6 @@ setAs("TsparseMatrix", "nMatrix", .T.2.n)
 
 setAs("TsparseMatrix", "lsparseMatrix", .T.2.l)
 setAs("TsparseMatrix", "lMatrix", .T.2.l)
-} ## MJ
 
 ## Special cases   ("d", "l", "n")  %o%  ("g", "s", "t") :
 ## used e.g. in triu()
@@ -90,6 +89,7 @@ setAs("nsTMatrix", "nsCMatrix",
 
 setAs("ntTMatrix", "ntCMatrix",
       function(from) .Call(Tsparse_to_Csparse, from, TRUE))
+} ## MJ
 
 ### "[" :
 ### -----
@@ -882,13 +882,13 @@ if(FALSE) {
 ## return a "close" class:
 setMethod("tril", "TsparseMatrix",
 	  function(x, k = 0, ...)
-	  as(tril(.T.2.C(x), k = k, ...), "TsparseMatrix"))
+	  as(tril(.T2C(x), k = k, ...), "TsparseMatrix"))
 setMethod("triu", "TsparseMatrix",
 	  function(x, k = 0, ...)
-	  as(triu(.T.2.C(x), k = k, ...), "TsparseMatrix"))
+	  as(triu(.T2C(x), k = k, ...), "TsparseMatrix"))
 setMethod("band", "TsparseMatrix",
 	  function(x, k1, k2, ...)
-	  as(band(.T.2.C(x), k1 = k1, k2 = k2, ...), "TsparseMatrix"))
+	  as(band(.T2C(x), k1 = k1, k2 = k2, ...), "TsparseMatrix"))
 
 ## For the "general" T ones (triangular & symmetric have special methods):
 setMethod("t", signature(x = "TsparseMatrix"),

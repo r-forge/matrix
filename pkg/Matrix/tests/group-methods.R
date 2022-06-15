@@ -349,7 +349,7 @@ m2 <- cbind(c(0, NA, NA),
 op <- options(Matrix.verbose = 2)
 r <- CtL > m2 # failed in Matrix <= 1.4-1, with
 ## Compare <Csparse> -- "dtCMatrix" > "dtCMatrix" :
-stopifnot(identical(is.na(m2), as.matrix(is.na(r))), diag(r), isDiagonal(triu(r)))
+stopifnot(identical(is.na(m2), unname(as.matrix(is.na(r)))), diag(r), isDiagonal(triu(r)))
 M <- new("dtCMatrix", i = c(0L, 0:1, 0:2), p = c(0:1, 3L, 6L),
          x = c(10,1, 10,1, 1,10), Dim = c(3L, 3L), uplo = "U")
 m2 <- matrix(c(0, NA, NA, 0, 0, NA, 0, 0, 0), 3)

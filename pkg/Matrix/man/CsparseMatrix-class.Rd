@@ -10,10 +10,15 @@
 \alias{Compare,CsparseMatrix,CsparseMatrix-method}
 \alias{Logic,CsparseMatrix,CsparseMatrix-method}
 \alias{Math,CsparseMatrix-method}
-\alias{coerce,CsparseMatrix,denseMatrix-method}
+\alias{as.vector,CsparseMatrix-method}
 \alias{coerce,CsparseMatrix,RsparseMatrix-method}
-\alias{coerce,CsparseMatrix,sparseVector-method}
 \alias{coerce,CsparseMatrix,TsparseMatrix-method}
+\alias{coerce,CsparseMatrix,denseMatrix-method}
+\alias{coerce,CsparseMatrix,matrix-method}
+\alias{coerce,CsparseMatrix,packedMatrix-method}
+\alias{coerce,CsparseMatrix,sparseVector-method}
+\alias{coerce,CsparseMatrix,unpackedMatrix-method}
+\alias{coerce,CsparseMatrix,vector-method}
 \alias{coerce,matrix,CsparseMatrix-method}
 \alias{coerce,numLike,CsparseMatrix-method}
 \alias{diag,CsparseMatrix-method}

@@ -2,6 +2,8 @@
 ####  "column compressed" format.
 #### -- many more specific things are e.g. in ./dgCMatrix.R
 
+## MJ: no longer needed ... replacement in ./sparseMatrix.R
+if(FALSE) {
 setAs("CsparseMatrix", "TsparseMatrix",
       function(from)
           ## |-> cholmod_C -> cholmod_T -> chm_triplet_to_SEXP
@@ -75,6 +77,7 @@ setAs("dsCMatrix", "matrix", function(from) .Call(Csparse_to_matrix, from, FALSE
 setAs("dtCMatrix", "matrix", function(from) .Call(Csparse_to_matrix, from, TRUE,  FALSE))
 ## NB: Would *not* be ok for l*Matrix or n*Matrix,
 ## --------- as cholmod coerces to "REAL" aka "double"
+} ## MJ
 
 ## MJ: no longer needed ... replacement in ./denseMatrix.R
 if(FALSE) {
@@ -284,7 +287,7 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value, spV = is(value,"sparseVector")
 	     (lenRepl == 1 || lenV == 1 ||
 	      isSymmetric(mkArray(value, dim=dind))))
 	## x.sym : result is *still* symmetric
-	x <- .Call(Csparse_symmetric_to_general, x) ## but do *not* redefine clx!
+	x <- .sparse2g(x) ## but do *not* redefine clx!
     }
     else if(extends(clDx, "triangularMatrix")) {
 	xU <- x@uplo == "U"

@@ -5,6 +5,8 @@
 %
 \alias{Math,diagonalMatrix-method}
 \alias{Ops,diagonalMatrix,triangularMatrix-method}
+\alias{as.logical,diagonalMatrix-method}
+\alias{as.numeric,diagonalMatrix-method}
 \alias{as.vector,diagonalMatrix-method}
 \alias{cbind2,diagonalMatrix,sparseMatrix-method}
 \alias{coerce,diagonalMatrix,CsparseMatrix-method}
@@ -26,6 +28,7 @@
 \alias{coerce,diagonalMatrix,nMatrix-method}
 \alias{coerce,diagonalMatrix,symmetricMatrix-method}
 \alias{coerce,diagonalMatrix,triangularMatrix-method}
+\alias{coerce,diagonalMatrix,vector-method}
 \alias{coerce,matrix,diagonalMatrix-method}
 \alias{determinant,diagonalMatrix,logical-method}
 \alias{diag,diagonalMatrix-method}

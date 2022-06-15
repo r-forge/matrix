@@ -174,15 +174,15 @@ setMethod("%*%", signature(x = "sparseMatrix", y = "matrix"),
 #	   function(x, y) callGeneric(x, as(y, "CsparseMatrix")))
 
 setMethod("%*%", signature(x = "TsparseMatrix", y = "ANY"),
-	  function(x, y) .T.2.C(x) %*% y)
+	  function(x, y) .T2C(x) %*% y)
 setMethod("%*%", signature(x = "ANY", y = "TsparseMatrix"),
-	  function(x, y) x %*% .T.2.C(y))
+	  function(x, y) x %*% .T2C(y))
 setMethod("%*%", signature(x = "TsparseMatrix", y = "Matrix"),
-	  function(x, y) .T.2.C(x) %*% y)
+	  function(x, y) .T2C(x) %*% y)
 setMethod("%*%", signature(x = "Matrix", y = "TsparseMatrix"),
-	  function(x, y) x %*% .T.2.C(y))
+	  function(x, y) x %*% .T2C(y))
 setMethod("%*%", signature(x = "TsparseMatrix", y = "TsparseMatrix"),
-	  function(x, y) .T.2.C(x) %*% .T.2.C(y))
+	  function(x, y) .T2C(x) %*% .T2C(y))
 
 
 
@@ -435,19 +435,19 @@ setMethod("crossprod", signature(x = "TsparseMatrix", y = "missing"),
 
 setMethod("crossprod", signature(x = "TsparseMatrix", y = "ANY"),
 	  function(x, y = NULL, boolArith = NA, ...)
-              crossprod(.T.2.C(x), y, boolArith=boolArith, ...))
+              crossprod(.T2C(x), y, boolArith=boolArith, ...))
 setMethod("crossprod", signature(x = "ANY", y = "TsparseMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
-              crossprod(x, .T.2.C(y), boolArith=boolArith, ...))
+              crossprod(x, .T2C(y), boolArith=boolArith, ...))
 setMethod("crossprod", signature(x = "TsparseMatrix", y = "Matrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
-              crossprod(.T.2.C(x), y, boolArith=boolArith, ...))
+              crossprod(.T2C(x), y, boolArith=boolArith, ...))
 setMethod("crossprod", signature(x = "Matrix", y = "TsparseMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
-              crossprod(x, .T.2.C(y), boolArith=boolArith, ...))
+              crossprod(x, .T2C(y), boolArith=boolArith, ...))
 setMethod("crossprod", signature(x = "TsparseMatrix", y = "TsparseMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
-              crossprod(.T.2.C(x), .T.2.C(y), boolArith=boolArith, ...))
+              crossprod(.T2C(x), .T2C(y), boolArith=boolArith, ...))
 
 
 setMethod("crossprod", signature(x = "dsparseMatrix", y = "ddenseMatrix"),
@@ -804,19 +804,19 @@ setMethod("tcrossprod", signature(x = "TsparseMatrix", y = "missing"),
 
 setMethod("tcrossprod", signature(x = "ANY", y = "TsparseMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
-	      tcrossprod(x, .T.2.C(y), boolArith=boolArith, ...))
+	      tcrossprod(x, .T2C(y), boolArith=boolArith, ...))
 setMethod("tcrossprod", signature(x = "TsparseMatrix", y = "ANY"),
 	  function(x, y=NULL, boolArith=NA, ...)
-	      tcrossprod(.T.2.C(x), y, boolArith=boolArith, ...))
+	      tcrossprod(.T2C(x), y, boolArith=boolArith, ...))
 setMethod("tcrossprod", signature(x = "Matrix", y = "TsparseMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
-	      tcrossprod(x, .T.2.C(y), boolArith=boolArith, ...))
+	      tcrossprod(x, .T2C(y), boolArith=boolArith, ...))
 setMethod("tcrossprod", signature(x = "TsparseMatrix", y = "Matrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
-	      tcrossprod(.T.2.C(x), y, boolArith=boolArith, ...))
+	      tcrossprod(.T2C(x), y, boolArith=boolArith, ...))
 setMethod("tcrossprod", signature(x = "TsparseMatrix", y = "TsparseMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
-	      tcrossprod(.T.2.C(x), .T.2.C(y), boolArith=boolArith, ...))
+	      tcrossprod(.T2C(x), .T2C(y), boolArith=boolArith, ...))
 
 
 ## "Matrix"

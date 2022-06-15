@@ -24,11 +24,10 @@ setAs("CsparseMatrix", "lMatrix", C2l)
 setAs("CsparseMatrix", "lsparseMatrix", C2l)
 
 setAs("lsparseMatrix", "dsparseMatrix", function(from) as(from, "dMatrix"))
-} ## MJ
 
 setAs("lsparseMatrix", "matrix",
       function(from) as(as(from, "ldenseMatrix"), "matrix"))
-
+} ## MJ
 
 
 

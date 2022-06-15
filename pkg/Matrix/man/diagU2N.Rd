@@ -58,13 +58,12 @@ stopifnot(all(T == uT), diag(t.u) == 1,
           identical(T, diagU2N(uT)))
 T[upper.tri(T)] <- 5
 T <- diagN2U(as(T,"triangularMatrix"))
-stopifnot(T@diag == "U")
 dT <- as(T, "denseMatrix")
-dt. <- diagN2U(dT)
-dtU <- diagN2U(dT, checkDense=TRUE)
-stopifnot(is(dtU, "denseMatrix"), is(dt., "sparseMatrix"),
-          all(dT == dt.), all(dT == dtU),
-          dt.@diag == "U", dtU@diag == "U")
+dT.n <- diagU2N(dT, checkDense = TRUE)
+sT.n <- diagU2N(dT)
+stopifnot(is(dT.n, "denseMatrix"), is(sT.n, "sparseMatrix"),
+          dT@diag == "U", dT.n@diag == "N", sT.n@diag == "N",
+          all(dT == dT.n), all(dT == sT.n))
 }
 \keyword{utilities}
 \keyword{classes}

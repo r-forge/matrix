@@ -23,6 +23,7 @@
 \alias{coerce,dgeMatrix,lgeMatrix-method}
 \alias{coerce,dgeMatrix,matrix-method}
 \alias{coerce,dgeMatrix,ngeMatrix-method}
+\alias{coerce,dgeMatrix,vector-method}
 \alias{coerce,matrix,dgeMatrix-method}
 \alias{coerce,numLike,dgeMatrix-method}
 \alias{determinant,dgeMatrix,logical-method}

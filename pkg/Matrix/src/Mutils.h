@@ -115,10 +115,10 @@ extern
 #define NZ_INTEGER(_X_) ((_X_) != 0)
 #define NZ_COMPLEX(_X_) ((_X_).r != 0.0 || (_X_).i != 0.0)
 
-/* int i, j, n; R_xlen_t n2; */
-#define PM_AR21_UP(i, j) ((i) + ((j) * (((R_xlen_t) (j)) + 1)) / 2)
+/* int i, j, m, n; R_xlen_t n2; */
+#define PM_AR21_UP(i, j) ((i) + (j) + ((R_xlen_t) (j) * ((j) - 1)) / 2)
 #define PM_AR21_LO(i, j, n2) ((i) + ((j) * ((n2) - (j) - 1)) / 2)
-#define PM_LENGTH(n) (((n) * ((R_xlen_t) (n) + 1)) / 2)
+#define PM_LENGTH(n) (n + ((R_xlen_t) (n) * ((n) - 1)) / 2)
 
 #define ERROR_INVALID_CLASS(_CLASS_, _METHOD_)				\
     error(_("invalid class \"%s\" to '%s()'"),				\
@@ -354,8 +354,8 @@ SEXP R_Matrix_kind(SEXP obj, SEXP iok);
 SEXP matrix_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector);
 SEXP R_matrix_as_geMatrix(SEXP from, SEXP kind);
 
-SEXP dense_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector);
-SEXP R_dense_as_geMatrix(SEXP from, SEXP kind);
+SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector);
+SEXP R_dense_as_general(SEXP from, SEXP kind);
 
 void conjugate(SEXP x);
     

@@ -1,10 +1,7 @@
 #include <Rinternals.h>
-/* for R_LEN... */
-
 #include "dgTMatrix.h"
-
-#include "chm_common.h"
 #include "Tsparse.h"
+/* #include "chm_common.h" */
 
 SEXP xTMatrix_validate(SEXP x)
 {
@@ -15,6 +12,9 @@ SEXP xTMatrix_validate(SEXP x)
 	return mkString(_("lengths of slots i and x must match"));
     return ScalarLogical(1);
 }
+
+/* MJ: no longer needed ... prefer R_sparse_as_dense(), R_sparse_as_matrix() */
+#if 0
 
 static void
 d_insert_triplets_in_array(int m, int n, int nnz,
@@ -142,3 +142,5 @@ MAKE_gTMatrix_to_matrix(d, REALSXP, REAL)
 MAKE_gTMatrix_to_matrix(l, LGLSXP, LOGICAL)
 
 #undef MAKE_gTMatrix_to_matrix
+
+#endif /* MJ */

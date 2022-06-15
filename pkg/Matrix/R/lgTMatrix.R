@@ -3,13 +3,6 @@
 ### contains = "lsparseMatrix"
 ###             ============= ---> superclass methods in ./lsparseMatrix.R
 
-
-setAs("lgTMatrix", "lgeMatrix",
-      function(from) .Call(lgTMatrix_to_lgeMatrix, from))
-
-setAs("lgTMatrix", "matrix",
-      function(from) .Call(lgTMatrix_to_matrix, from))
-
 ## MJ: no longer needed ... replacement in ./denseMatrix.R
 if(FALSE) {
 setAs("matrix", "lgTMatrix",
@@ -33,6 +26,12 @@ setAs("matrix", "lgTMatrix",
 
 ## MJ: no longer needed ... replacement in ./sparseMatrix.R
 if(FALSE) {
+setAs("lgTMatrix", "lgeMatrix",
+      function(from) .Call(lgTMatrix_to_lgeMatrix, from))
+
+setAs("lgTMatrix", "matrix",
+      function(from) .Call(lgTMatrix_to_matrix, from))
+
 setAs("lgTMatrix", "dgTMatrix",
       function(from)
       ## more efficient than

@@ -39,10 +39,7 @@
 \alias{Ops,ddiMatrix,numeric-method}
 \alias{Ops,ddiMatrix,sparseMatrix-method}
 \alias{Summary,ddiMatrix-method}
-\alias{^,ddiMatrix,Matrix-method}
-\alias{^,ddiMatrix,ddenseMatrix-method}
-\alias{^,ddiMatrix,ldenseMatrix-method}
-\alias{^,ddiMatrix,ndenseMatrix-method}
+\alias{as.numeric,ddiMatrix-method}
 \alias{cbind2,ddiMatrix,atomicVector-method}
 \alias{cbind2,ddiMatrix,matrix-method}
 \alias{cbind2,matrix,ddiMatrix-method}
