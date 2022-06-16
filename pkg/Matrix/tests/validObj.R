@@ -95,18 +95,17 @@ validObject(M <- new("dtCMatrix", Dim = c(n,n), diag = "U",
 stopifnot(identical(as.mat(T), diag(n)))
 
 suppressWarnings(RNGversion("3.5.0")); set.seed(3)
-(p9 <- as(sample(9), "pMatrix"))
-## Check that the correct error message is triggered:
-ind.try <- try(p9[1,1] <- 1, silent = TRUE)
-np9 <- as(p9, "ngTMatrix")
-stopifnot(grepl("replacing.*sensible", ind.try[1]),
-	  is.logical(p9[1,]),
+(p9 <- p9. <- as(sample(9), "pMatrix"))
+(np9 <- np9. <- as(p9, "TsparseMatrix"))
+p9.[1,1] <- np9.[1,1] <- TRUE
+stopifnot(is.logical(p9[1,]),
 	  is(p9[2,, drop=FALSE], "indMatrix"),
 	  is(p9[9:1,], "indMatrix"),
 	  isTRUE(p9[-c(1:6, 8:9), 1]),
 	  identical(t(p9), solve(p9)),
 	  identical(p9[TRUE, ], p9),
           all.equal(p9[, TRUE], np9), # currently...
+          identical(p9., np9.),
 	  identical(as(diag(9), "pMatrix"), as(1:9, "pMatrix"))
 	  )
 assert.EQ.mat(p9[TRUE,], as.matrix(np9))

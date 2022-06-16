@@ -5,14 +5,19 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-%%_NOT YET__FIXME_ : needs *MORE THAN* cholmod_l_dense_to_sparse() in
-%%----------------   our dense_to_Csparse() in ../src/dense.c (see there)
-%%
-%% \item \code{as(<large-matrix>, "sparseMatrix")} no longer fails
-%%  when \code{prod(dim(.))} is larger than \eqn{2^{31} - 1}.
-%
-
-\section{Changes in version 1.4-2 (2022-06-15 r3494)}{
+\section{Changes in version 1.4-2 (2022-06-16 r3495)}{
+  \subsection{Deprecated and Defunct}{
+    \itemize{
+      \item With a few exceptions, direct coercions to non-virtual classes
+      (e.g., \code{dsCMatrix}) have been formally deprecated.  For now,
+      these will continue to work as before, but with a warning indicating
+      how to accomplish the desired coercion via virtual classes
+      (e.g., \code{symmetricMatrix}) alone.  Such warnings can be controlled
+      via the global option \code{Matrix.warnDeprecatedCoerce}.  \code{NA}
+      (the session default) is to warn once and not again, \code{TRUE} is
+      to always warn, and \code{FALSE} is to never warn.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
@@ -167,8 +172,8 @@
 
       \item Many more validity methods implemented in C, for efficiency,
       including methods for \code{Matrix}, \code{compMatrix},
-      \code{diagonalMatrix}, \code{corMatrix}, \code{[liz]Matrix},
-      and \code{ndenseMatrix}.
+      \code{diagonalMatrix}, \code{indMatrix}, \code{pMatrix},
+      \code{corMatrix}, \code{[liz]Matrix}, and \code{ndenseMatrix}.
 
       \item \code{dppMatrix_validate()} now behaves as
       \code{dpoMatrix_validate()} by requiring non-negative diagonal
@@ -193,16 +198,22 @@
       which had handled integer types as double and required
       preprocessing in many cases (with \code{diagU2N()}, etc.).
 
-      \item \code{isTriangular()} and \code{isDiagonal()} implemented
-      in C throughout.
-
       \item Fixes in group methods (e.g., \code{>}, \code{&}, \code{|}),
       notably for matrices inheriting from class \code{symmetricMatrix},
       \code{triangularMatrix}, \code{lMatrix}, or \code{nMatrix}.
 
       \item \code{as.vector}, \code{as.numeric}, and \code{as.logical}
-      are now implemented for all \code{[dln]denseMatrix},
-      \code{[dln]sparseMatrix}, and \code{diagonalMatrix}.
+      are now implemented for all \code{denseMatrix} and all
+      \code{sparseMatrix}.
+
+      \item Subassignment to \code{indMatrix} is no longer prohibited,
+      now going via \code{TsparseMatrix}.
+
+      \item \code{indMatrix} gains methods for \code{isTriangular},
+      \code{isDiagonal}, \code{diag}, \code{diag<-}, \code{band},
+      \code{tri[ul]}, and \code{forceSymmetric}.  It also gains
+      coercions to many virtual classes, notably \code{denseMatrix}
+      and a coercion to \code{pMatrix}.
     }
   }
   \subsection{Misc}{

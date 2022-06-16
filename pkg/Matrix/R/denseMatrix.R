@@ -193,6 +193,8 @@ setAs(     "matrix", "packedMatrix", ..pack)
 
 ## More granular coercions .................................
 
+## DEPRECATED IN 1.4-2; see ./zzz.R
+if(FALSE) {
 .kinds <- c("d", "l", "n")
 for (.kind in .kinds) {
     ## General to non-general, preserving kind
@@ -246,9 +248,12 @@ rm(.kind, .kinds, .otherkind, .otherkinds, .xy, .repr)
 ## For whatever reason, we also have these granular ones in Matrix 1.4-1:
 setAs("dgeMatrix", "dsTMatrix",
       function(from) .dense2sparse(.M2symm(from), "..T", NULL, NULL))
+} ## DEPRECATED IN 1.4-2; see ./zzz.R
 
 ## From base matrix, base vector ...........................
 
+## DEPRECATED IN 1.4-2; see ./zzz.R
+if(FALSE) {
 ## m|v->ge
 for (.from in c("matrix", "numLike")) {
     setAs(.from, "dgeMatrix", ..m2dge)
@@ -378,6 +383,7 @@ for (.kind in c("d", "l", "n")) {
     }
 }
 rm(.from, .to, .def, .b, .kind, .repr)
+} ## DEPRECATED IN 1.4-2; see ./zzz.R
 
 ## Exported functions, now just aliases or wrappers ........
 ## (some or all could be made deprecated) ..................

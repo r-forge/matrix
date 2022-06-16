@@ -382,9 +382,6 @@ is.null.DN <- function(dn) {
         identical(dn, list(ch0, ch0))
 }
 
-## Does 'x' have a non-trivial 'Dimnames' slot?
-hasDN <- function(x) !identical(x@Dimnames, list(NULL, NULL))
-
 ## Is 'dn' valid in the sense of 'validObject(<Matrix>)'?
 ## It is assumed that 'dim' is a length-2 non-negative integer vector.
 validDN <- function(dn, dim) {
@@ -482,7 +479,7 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 
 .M2diag <- function(from) {
     if (!isDiagonal(from))
-        stop("matrix is not diagonal; consider diag(diag())")
+        stop("matrix is not diagonal; consider Diagonal(x=diag(.))")
     x <- diag(from, names = FALSE)
     cl <- switch(typeof(x),
                  double = {
@@ -525,6 +522,13 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
                             nrow = from@Dim[1L]),
                  from@Dimnames)
 
+.ind2m <- function(from) {
+    P <- array(FALSE, d <- from@Dim, from@Dimnames)
+    if((n <- d[1L]) > 0L)
+        P[seq_len(n) + (from@perm - 1L) * as.double(n)] <- TRUE
+    P
+}
+
 .dense2v <- function(from)
     .Call(R_dense_as_vector, from)
 
@@ -539,6 +543,13 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
     if(n > 0L)
         r[1 + 0:(n - 1L) * (n + 1)] <- if(from@diag == "N") x else as1(mod = m)
     r
+}
+
+.ind2v <- function(from) {
+    x <- logical(prod(d <- from@Dim))
+    if((n <- d[1L]) > 0L)
+        x[seq_len(n) + (from@perm - 1L) * as.double(n)] <- TRUE
+    x
 }
 
 .dense2kind <- function(from, kind)

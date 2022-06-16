@@ -51,10 +51,12 @@
 \alias{coerce,Matrix,dpoMatrix-method}
 \alias{coerce,Matrix,dppMatrix-method}
 \alias{coerce,Matrix,denseMatrix-method}
+\alias{coerce,Matrix,indMatrix-method}
 \alias{coerce,Matrix,integer-method}
 \alias{coerce,Matrix,logical-method}
 \alias{coerce,Matrix,matrix-method}
 \alias{coerce,Matrix,numeric-method}
+\alias{coerce,Matrix,pMatrix-method}
 \alias{coerce,Matrix,sparseMatrix-method}
 \alias{coerce,Matrix,symmetricMatrix-method}
 \alias{coerce,Matrix,triangularMatrix-method}

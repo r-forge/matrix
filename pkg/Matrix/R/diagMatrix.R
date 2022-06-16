@@ -153,6 +153,8 @@ setMethod("as.logical", signature(x = "diagonalMatrix"),
 setMethod("as.logical", signature(x = "ldiMatrix"),
           function(x, ...) .diag2v(x))
 
+## DEPRECATED IN 1.4-2; see ./zzz.R
+if(FALSE) {
 .kinds <- c("d", "l")
 for (.kind in .kinds) {
     ## ddi->[^d]di and similar
@@ -176,6 +178,7 @@ for (.kind in .kinds) {
                   mode = "function", inherits = FALSE))
 }
 rm(.kinds, .kind, .otherkind, .x, .y, .xy)
+} ## DEPRECATED IN 1.4-2; see ./zzz.R
 
 rm(..diag2dkind, ..diag2lkind,
    ..diag2dsparse, ..diag2lsparse, ..diag2nsparse,

@@ -5,7 +5,8 @@ library(Matrix)
 source(system.file("test-tools.R", package = "Matrix")) # is.EQ.mat(), dnIdentical() ..etc
 doExtras
 options(warn=1, # show as they happen
-	Matrix.verbose = doExtras)
+	Matrix.verbose = doExtras,
+        Matrix.warnDeprecatedCoerce = NA)
 
 ##' Check matrix multiplications with (unit) Diagonal matrices
 chkDiagProd <- function(M) {
@@ -41,7 +42,7 @@ chkDnProd <- function(m = as(M, "matrix"), M = Matrix(m), browse=FALSE, warn.ok=
     ## TODO:
     ## if(browse) stopifnot <- f.unction(...)  such that it enters browser() when it is not fulfilled
     if(!warn.ok) { # NO warnings allowd
-        op <- options(warn = 2)
+        op <- options(warn = 2, Matrix.warnDeprecatedCoerce = FALSE)
         on.exit(options(op))
     }
     stopifnot(is.matrix(m), is(M, "Matrix"), identical(dim(m), dim(M)), dnIdentical(m,M))
@@ -821,7 +822,7 @@ stopifnot(Q.C.identical(NM, ## <- failed
                      U3 %*% lM -> U3l, # ditto
                      U3 %*% nM)  # wrongly gave ngTMatrix
           ,
-          isValid(U3l, "dgTMatrix")
+          isValid(U3l, "dgCMatrix")
           )
 
 selectMethod("%*%", c("dtCMatrix", "ngTMatrix")) # x %*% .T.2.C(y) -->

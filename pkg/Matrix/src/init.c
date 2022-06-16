@@ -406,6 +406,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(ndenseMatrix_validate, 1),
     CALLDEF(iMatrix_validate, 1),
     CALLDEF(zMatrix_validate, 1),
+    CALLDEF(indMatrix_validate, 1),
+    CALLDEF(pMatrix_validate, 1),
 
     CALLDEF(R_Dim_validate, 1),
     CALLDEF(R_DimNames_validate, 2),

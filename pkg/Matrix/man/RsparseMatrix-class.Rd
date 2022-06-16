@@ -9,6 +9,7 @@
 \alias{coerce,RsparseMatrix,TsparseMatrix-method}
 \alias{coerce,RsparseMatrix,denseMatrix-method}
 \alias{coerce,RsparseMatrix,dgeMatrix-method}
+\alias{coerce,RsparseMatrix,generalMatrix-method}
 \alias{coerce,RsparseMatrix,matrix-method}
 \alias{coerce,RsparseMatrix,packedMatrix-method}
 \alias{coerce,RsparseMatrix,unpackedMatrix-method}

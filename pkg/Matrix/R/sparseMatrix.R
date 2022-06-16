@@ -15,8 +15,7 @@
                 stop("matrix is not symmetric or triangular")
             else if (attr(it, "kind") == "U")
                 triu(from)
-            else
-                tril(from)
+            else tril(from)
     }
     .Call(R_sparse_as_dense, from, TRUE)
 }
@@ -101,7 +100,9 @@ rm(.kinds, .kind, .otherkinds, .otherkind, .def)
 
 ## To "structure" ..........................................
 
-setAs("sparseMatrix", "generalMatrix", .sparse2g)
+setAs("CsparseMatrix", "generalMatrix", .sparse2g)
+setAs("RsparseMatrix", "generalMatrix", .sparse2g)
+setAs("TsparseMatrix", "generalMatrix", .sparse2g)
 ## setAs("sparseMatrix", "triangularMatrix", .) # inherited from Matrix
 ## setAs("sparseMatrix",  "symmetricMatrix", .) # inherited from Matrix
 
@@ -113,13 +114,41 @@ setAs("RsparseMatrix", "CsparseMatrix", .CR2RC)
 setAs("RsparseMatrix", "TsparseMatrix", .CR2T)
 setAs("TsparseMatrix", "CsparseMatrix", .T2C)
 setAs("TsparseMatrix", "RsparseMatrix", .T2R)
-## setAs("[CRT]sparseMatrix",    "diagonalMatrix", .) # inherited from Matrix
-## setAs(   "diagonalMatrix", "[CRT]sparseMatrix", .) # in ./diagMatrix.R
-## setAs(     "sparseMatrix",         "indMatrix", .) # in ./indMatrix.R
-## setAs(        "indMatrix", "[CRT]sparseMatrix", .) # in ./indMatrix.R
+
+## sC<->R, sR->C, preserving kind and symmetry
+.def.template <- function(from)
+    new(.TO, Dim = from@Dim, Dimnames = from@Dimnames,
+        uplo = if(from@uplo == "U") "L" else "U",
+        p = from@p, j = from@i, x = from@x)
+for (.kind in c("d", "l", "n")) {
+    for (.repr in c("C", "R")) {
+        .otherrepr <- if(.repr == "C") "R" else "C"
+        .from <- paste0(.kind, "s",      .repr, "Matrix")
+        .to   <- paste0(.kind, "s", .otherrepr, "Matrix")
+        .def <- .def.template
+
+        .b <- body(.def)
+        .b[[2L]] <- .to
+        if(.repr != "C") { # reverse j = from@i
+            .m <- match("j", names(.b))
+            names(.b)[.m] <- "i"
+            .b[[.m]][[3L]] <- quote(j)
+        }
+        if(.kind == "n") { # delete x = from@x
+            .m <- match("x", names(.b))
+            .b[[.m]] <- NULL
+        }
+        body(.def) <- .b
+
+        setAs(.from, paste0(.otherrepr, "sparseMatrix"), .def)
+    }
+}
+rm(.def.template, .def, .b, .from, .to, .kind, .repr, .otherrepr, .m)
 
 ## More granular coercions .................................
 
+## DEPRECATED IN 1.4-2; see ./zzz.R
+if(FALSE) {
 .kinds <- c("d", "l", "n")
 .strs  <- c("g", "t", "s")
 .reprs <- c("C", "R", "T")
@@ -236,6 +265,7 @@ setAs(    "dsCMatrix", "dgeMatrix", ..sparse2dge)
 setAs(    "dtTMatrix", "dgeMatrix", ..sparse2dge)
 setAs(    "dsTMatrix", "dgeMatrix", ..sparse2dge)
 setAs(    "ngTMatrix", "lgeMatrix", ..sparse2lge)
+} ## DEPRECATED IN 1.4-2; see ./zzz.R
 
 ## Exported functions, now just aliases or wrappers ........
 ## (some or all could be made deprecated) ..................

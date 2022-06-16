@@ -1,25 +1,26 @@
 Package: Matrix
 Version: 1.4-2
-Date: 2022-06-15
+Date: 2022-06-16
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Contact: Matrix-authors@R-project.org
 Maintainer: Martin Maechler <mmaechler+Matrix@gmail.com>
-Authors@R: c(person("Douglas","Bates", role="aut")
- , person("Martin","Maechler", role = c("aut","cre"), email="mmaechler+Matrix@gmail.com",
+Authors@R: c(person("Douglas", "Bates", role = "aut")
+ , person("Martin", "Maechler", role = c("aut", "cre"),
+          email = "mmaechler+Matrix@gmail.com",
           comment = c(ORCID = "0000-0002-8685-9910"))
- , person("Mikael", "Jagan", role="aut",
-           comment = "new 'packedMatrix' class plus subset/diag/.. methods in C")
- , person("Timothy A.", "Davis", role="ctb",
-           comment = c("SuiteSparse and 'cs' C libraries, notably CHOLMOD, AMD;
-		       collaborators listed in
-			dir(pattern = '^[A-Z]+[.]txt$', full.names=TRUE,
-			    system.file('doc', 'SuiteSparse', package='Matrix'))"))
- , person("Jens", "Oehlschlägel", role="ctb", comment="initial nearPD()")
- , person("Jason", "Riedy", role="ctb",
+ , person("Mikael", "Jagan", role = "aut",
+          comment = c(ORCID = "0000-0002-3542-2938"))
+ , person("Timothy A.", "Davis", role = "ctb",
+          comment = c("SuiteSparse and 'cs' C libraries, notably CHOLMOD and AMD",
+	              "collaborators listed in dir(pattern=\"^[A-Z]+[.]txt$\", full.names=TRUE, system.file(\"doc\", \"SuiteSparse\", package=\"Matrix\"))"))
+ , person("Jens", "Oehlschlägel", role = "ctb",
+          comment = "initial nearPD()")	 
+ , person("Jason", "Riedy", role = "ctb",
           comment = c("condest() and onenormest() for octave",
  	  	      "Copyright: Regents of the University of California"))
- , person("R Core Team", role = "ctb", comment="base R matrix implementation")
+ , person("R Core Team", role = "ctb",
+          comment = "base R matrix implementation")
  )
 Description: A rich hierarchy of matrix classes, including triangular,
    symmetric, and diagonal matrices, both dense and sparse and with

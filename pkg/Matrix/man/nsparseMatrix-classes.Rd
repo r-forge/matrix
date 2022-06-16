@@ -27,8 +27,10 @@
 \alias{coerce,matrix,nsparseMatrix-method}
 \alias{coerce,nsparseMatrix,dMatrix-method}
 \alias{coerce,nsparseMatrix,dsparseMatrix-method}
+\alias{coerce,nsparseMatrix,indMatrix-method}
 \alias{coerce,nsparseMatrix,lMatrix-method}
 \alias{coerce,nsparseMatrix,lsparseMatrix-method}
+\alias{coerce,nsparseMatrix,pMatrix-method}
 \alias{coerce,numLike,nsparseMatrix-method}
 \alias{which,nsparseMatrix-method}
 % ngC
