@@ -292,6 +292,46 @@ TYPEMATRIX_VALIDATE(     i, integer,  INTSXP)
 TYPEMATRIX_VALIDATE(     z, complex, CPLXSXP)
 #undef TYPEMATRIX_VALIDATE
 
+SEXP indMatrix_validate(SEXP obj)
+{
+    SEXP perm = GET_SLOT(obj, Matrix_permSym);
+    if (TYPEOF(perm) != INTSXP)
+	return mkString(_("'perm' slot is not of type \"integer\""));
+    int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym)),
+	m = pdim[0], n = pdim[1];
+    if (XLENGTH(perm) != m)
+	return mkString(_("length of 'perm' slot is not equal to Dim[1]"));
+    int i, *pperm = INTEGER(perm);
+    for (i = 0; i < m; ++i, ++pperm) {
+	if (*pperm == NA_INTEGER)
+	    return mkString(_("'perm' slot contains NA"));
+	if (*pperm < 1)
+	    return mkString(_("'perm' slot has elements less than 1"));
+	if (*pperm > n)
+	    return mkString(_("'perm' slot has elements greater than "
+			      "Dim[2]"));
+    }
+    return ScalarLogical(1);
+}
+
+SEXP pMatrix_validate(SEXP obj)
+{
+    int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym)), n = pdim[0];
+    if (pdim[1] != n)
+	return mkString(_("Dim[1] != Dim[2] (matrix is not square)"));
+    int i, *u, *pperm = INTEGER(GET_SLOT(obj, Matrix_permSym));
+    Calloc_or_Alloca_TO(u, n, int);
+    Memzero(u, n);
+    --u;
+    for (i = 0; i < n; ++i, ++pperm)
+	if (u[*pperm])
+	    return mkString(_("'perm' slot contains duplicates"));
+	else
+	    u[*pperm] = 1;
+    Free_FROM(u, n);
+    return ScalarLogical(1);
+}
+    
 
 /* More for 'Dimnames' ============================================== */
 

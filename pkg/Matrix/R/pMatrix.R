@@ -2,41 +2,56 @@
 
 ### NB "pMatrix" extends "indMatrix" and inherits methods -->  indMatrix.R
 
+## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## The typical   'constructor' : coerce from  'index'
 setAs("integer", "pMatrix",
       function(from) {
-          nn <- names(from)
-          new("pMatrix", Dim = rep.int(length(from), 2L), Dimnames = list(nn,nn),
-              perm = from)
+          if ((n <- length(from)) == 0L)
+              return(new("pMatrix"))
+          if(anyNA(from))
+              stop("'perm' slot cannot contain NA")
+          if(min(from) < 1L)
+              stop("elements of 'perm' slot must be positive integers")
+          nms <- names(from)
+          new("pMatrix", Dim = c(n, n), Dimnames = list(nms, nms), perm = from)
       })
 
 setAs("numeric", "pMatrix",
-      function(from)
-	  if(all(from == (i <- as.integer(from)))) as(i, "pMatrix")
-	  else stop("coercion to \"pMatrix\" only works from integer numeric"))
-
-
-
-setAs("nMatrix", "pMatrix",
       function(from) {
-	  from <- as(as(from, "TsparseMatrix"), "ngTMatrix")
-	  n <- (d <- from@Dim)[1]
-	  if(n != d[2]) stop("not a square matrix")
-	  if(length(i <- from@i) != n)
-	      stop("the number of non-zero entries differs from nrow(.)")
-	  if((need.sort <- is.unsorted(i))) {
-	      ii <- sort.list(i)
-	      i <- i[ii]
-	  }
-	  if(n >= 1 && !identical(i, 0:(n - 1)))
-	      stop("must have exactly one non-zero entry per row")
-	  new("pMatrix", ## validity checking checks the 'perm' slot:
-	      perm = 1L + if(need.sort) from@j[ii] else from@j,
-	      Dim = d, Dimnames = from@Dimnames)
+          if ((n <- length(from)) == 0L)
+              return(new("pMatrix"))
+          if(anyNA(from))
+              stop("'perm' slot cannot contain NA")
+          r <- range(from)
+          if((r2 <- r[2L]) > .Machine$integer.max)
+              stop("elements of 'perm' slot cannot exceed 2^31-1")
+          if(r[1L] < 1 || any(from != (from.i <- as.integer(from))))
+              stop("elements of 'perm' slot must be positive integers")
+          nms <- names(from)
+         new("pMatrix", Dim = c(n, n), Dimnames = list(nms, nms), perm = from.i)
       })
 
-setAs("matrix", "pMatrix", function(from) as(as(from, "nMatrix"), "pMatrix"))
+setAs("nsparseMatrix", "pMatrix",
+      function(from) {
+          d <- from@Dim
+          if((n <- d[1L]) != d[2L])
+              stop("attempt to a coerce a non-square matrix to pMatrix")
+          from <- as(as(from, "RsparseMatrix"), "generalMatrix")
+          p <- from@p
+          if(n > 0L && any(p != 0:n))
+              stop("matrix must have exactly one nonzero element in each row")
+          new("pMatrix", Dim = from@Dim, Dimnames = from@Dimnames,
+              perm = from@j + 1L) # validity method checks 'perm' for duplicates
+      })
+
+setAs("Matrix", "pMatrix",
+      function(from) as(as(from, "nsparseMatrix"), "pMatrix"))
+
+setAs("matrix", "pMatrix",
+      function(from) as(as(from, "nsparseMatrix"), "pMatrix"))
+
+
+## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("solve", signature(a = "pMatrix", b = "missing"),
 	  function(a, b, ...) {

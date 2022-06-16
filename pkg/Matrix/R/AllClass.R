@@ -587,30 +587,11 @@ setClass("isRMatrix",
 
 setClass("indMatrix", slots = c(perm = "integer"),
 	 contains = c("sparseMatrix", "generalMatrix"),
-	 validity = function(object) {
-	     n <- object@Dim[1]
-	     d <- object@Dim[2]
-	     perm <- object@perm
-	     if (length(perm) != n)
-		 return(paste("length of 'perm' slot must be", n))
-	     if(n > 0 && (any(perm > d) || any(perm < 1)))
-		 return("'perm' slot is not a valid index")
-	     TRUE
-	 })
+	 validity = function(object) .Call(indMatrix_validate, object))
 
 setClass("pMatrix", slots = c(perm = "integer"),
 	 contains = c("indMatrix"),
-	 validity = function(object) {
-	     d <- object@Dim
-	     if (d[2] != (n <- d[1])) return("pMatrix must be square")
-	     perm <- object@perm
-	     if (length(perm) != n)
-		 return(paste("length of 'perm' slot must be", n))
-	     if(n > 0 &&
-		!(all(range(perm) == c(1, n)) && length(unique(perm)) == n))
-		 return("'perm' slot is not a valid permutation")
-	     TRUE
-	 })
+	 validity = function(object) .Call(pMatrix_validate, object))
 
 
 ### Factorization classes ---------------------------------------------

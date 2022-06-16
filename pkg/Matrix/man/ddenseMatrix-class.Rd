@@ -18,6 +18,7 @@
 \alias{^,ddenseMatrix,ddiMatrix-method}
 \alias{^,ddenseMatrix,ldiMatrix-method}
 \alias{as.numeric,ddenseMatrix-method}
+\alias{coerce,ddenseMatrix,dgeMatrix-method}
 \alias{coerce,matrix,ddenseMatrix-method}
 \alias{coerce,numLike,ddenseMatrix-method}
 \alias{determinant,ddenseMatrix,logical-method}

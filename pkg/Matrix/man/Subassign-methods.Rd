@@ -56,7 +56,8 @@
 \alias{[<-,diagonalMatrix,missing,index,sparseMatrix-method}
 \alias{[<-,diagonalMatrix,missing,index,sparseVector-method}
 \alias{[<-,diagonalMatrix,missing,missing,ANY-method}
-\alias{[<-,indMatrix,index,ANY,ANY-method}
+\alias{[<-,indMatrix,index,index,ANY-method}
+\alias{[<-,indMatrix,index,missing,ANY-method}
 \alias{[<-,indMatrix,missing,index,ANY-method}
 \alias{[<-,indMatrix,missing,missing,ANY-method}
 \alias{[<-,sparseMatrix,ANY,ANY,sparseMatrix-method}

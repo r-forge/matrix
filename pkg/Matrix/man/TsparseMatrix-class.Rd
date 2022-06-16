@@ -8,6 +8,7 @@
 \alias{coerce,TsparseMatrix,CsparseMatrix-method}
 \alias{coerce,TsparseMatrix,RsparseMatrix-method}
 \alias{coerce,TsparseMatrix,denseMatrix-method}
+\alias{coerce,TsparseMatrix,generalMatrix-method}
 \alias{coerce,TsparseMatrix,matrix-method}
 \alias{coerce,TsparseMatrix,packedMatrix-method}
 \alias{coerce,TsparseMatrix,unpackedMatrix-method}

@@ -208,6 +208,8 @@ SEXP lMatrix_validate(SEXP obj);
 SEXP ndenseMatrix_validate(SEXP obj);
 SEXP iMatrix_validate(SEXP obj);
 SEXP zMatrix_validate(SEXP obj);
+SEXP indMatrix_validate(SEXP obj);
+SEXP pMatrix_validate(SEXP obj);
 
 SEXP R_DimNames_fixup(SEXP dn);
 

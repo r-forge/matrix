@@ -14,6 +14,7 @@
 \alias{coerce,CsparseMatrix,RsparseMatrix-method}
 \alias{coerce,CsparseMatrix,TsparseMatrix-method}
 \alias{coerce,CsparseMatrix,denseMatrix-method}
+\alias{coerce,CsparseMatrix,generalMatrix-method}
 \alias{coerce,CsparseMatrix,matrix-method}
 \alias{coerce,CsparseMatrix,packedMatrix-method}
 \alias{coerce,CsparseMatrix,sparseVector-method}

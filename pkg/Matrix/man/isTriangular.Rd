@@ -7,6 +7,7 @@
 \alias{isDiagonal-methods}
 %
 \alias{isTriangular,diagonalMatrix-method}
+\alias{isTriangular,indMatrix-method}
 \alias{isTriangular,matrix-method}
 \alias{isTriangular,symmetricMatrix-method}
 \alias{isTriangular,triangularMatrix-method}
@@ -15,6 +16,7 @@
 \alias{isDiagonal,RsparseMatrix-method}
 \alias{isDiagonal,TsparseMatrix-method}
 \alias{isDiagonal,diagonalMatrix-method}
+\alias{isDiagonal,indMatrix-method}
 \alias{isDiagonal,matrix-method}
 \alias{isDiagonal,packedMatrix-method}
 \alias{isDiagonal,unpackedMatrix-method}
