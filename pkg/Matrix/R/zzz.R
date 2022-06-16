@@ -106,7 +106,7 @@ Matrix.DeprecatedCoerce <- function(Class1, Class2) {
     if(is.null(w <- getOption("Matrix.warnDeprecatedCoerce")))
         w <- .MatrixEnv[["warnDeprecatedCoerce"]]
     if(is.logical(w) && length(w) == 1L && (is.na(w) || w)) {
-        warning(gettextf("as(<%s>, \"%s\") is deprecated since Matrix 1.4-2; do '%s' instead",
+        warning(gettextf("as(<%s>, \"%s\") is deprecated since Matrix 1.4-2; do %s instead",
                          Class1@className, Class2@className,
                          deparse1(.as.via.virtual(Class1, Class2, quote(.)))),
                 call. = FALSE, domain = NA)
