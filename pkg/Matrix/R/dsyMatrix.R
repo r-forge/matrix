@@ -1,7 +1,8 @@
-### Coercion and Methods for Dense Numeric Symmetric Matrices
+## METHODS FOR CLASS: dsyMatrix
+## dense (unpacked) symmetric matrices with 'x' slot of type "double"
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## MJ: no longer needed ... replacement in ./symmetricMatrix.R
-##     and ./denseMatrix.R
+## MJ: no longer needed ... replacement in ./symmetricMatrix.R, ./denseMatrix.R
 ##     { where .dense2sy(), .dsy2mat() and .dsy2dsp(), which
 ##     have all been exported, are defined as simple aliases ... }
 if(FALSE) {
@@ -33,10 +34,7 @@ setAs("dgeMatrix", "dsyMatrix", ..dense2sy)
 setAs(   "matrix", "dsyMatrix", function(from) .dense2sy(..2dge(from)))
 setAs("dsyMatrix",    "matrix", ..dsy2mat)
 setAs("dsyMatrix", "dspMatrix", .dsy2dsp)
-} ## MJ
 
-## MJ: no longer needed ... replacement in ./denseMatrix.R
-if(FALSE) {
 dsy2T <- function(from) { # 'dsT': only store upper *or* lower
     uplo <- from@uplo
     if(any0(dim(from))) {
@@ -52,54 +50,11 @@ dsy2T <- function(from) { # 'dsT': only store upper *or* lower
 	x = as.vector(m[ij]), uplo = uplo,
 	Dim = from@Dim, Dimnames = from@Dimnames)
 }
+dsy2C <- function(from) .T2Cmat(dsy2T(from), isTri=FALSE)
+
 setAs("dsyMatrix", "dsTMatrix", dsy2T)
-
-setAs("dsyMatrix", "dsCMatrix",
-      dsy2C <- function(from) .T2Cmat(dsy2T(from), isTri=FALSE))
+setAs("dsyMatrix", "dsCMatrix", dsy2C)
 } ## MJ
-
-
-## Note: Just *because* we have an explicit  dtr -> dge coercion,
-##       show( <ddenseMatrix> ) is not okay, and we need our own:
-setMethod("show", "dsyMatrix", function(object) prMatrix(object))
-
-setMethod("rcond", signature(x = "dsyMatrix", norm = "character"),
-          function(x, norm, ...)
-          .Call(dsyMatrix_rcond, x, norm),
-          valueClass = "numeric")
-
-setMethod("rcond", signature(x = "dsyMatrix", norm = "missing"),
-          function(x, norm, ...)
-          .Call(dsyMatrix_rcond, x, "O"),
-          valueClass = "numeric")
-
-setMethod("solve", signature(a = "dsyMatrix", b = "missing"),
-          function(a, b, ...) .Call(dsyMatrix_solve, a),
-          valueClass = "dsyMatrix")
-
-setMethod("solve", signature(a = "dsyMatrix", b = "matrix"),
-          function(a, b, ...) .Call(dsyMatrix_matrix_solve, a, b),
-          valueClass = "dgeMatrix")
-
-setMethod("solve", signature(a = "dsyMatrix", b = "ddenseMatrix"),
-	  function(a, b, ...) .Call(dsyMatrix_matrix_solve, a, b))
-setMethod("solve", signature(a = "dsyMatrix", b = "denseMatrix"), ## eg. for ddi* or ldi*
-	  function(a, b, ...) .Call(dsyMatrix_matrix_solve, a, as(b,"dMatrix")))
-
-setMethod("norm", signature(x = "dsyMatrix", type = "character"),
-          function(x, type, ...)
-	      if(identical("2", type)) norm2(x) else .Call(dsyMatrix_norm, x, type),
-          valueClass = "numeric")
-
-setMethod("norm", signature(x = "dsyMatrix", type = "missing"),
-          function(x, type, ...) .Call(dsyMatrix_norm, x, "O"),
-          valueClass = "numeric")
-
-setMethod("BunchKaufman", signature(x = "dsyMatrix"),
-	  function(x, ...) .Call(dsyMatrix_trf, x))
-
-setMethod("BunchKaufman", signature(x = "matrix"),
-	  function(x, uplo=NULL, ...) .Call(matrix_trf, x, uplo))
 
 ## MJ: no longer needed ... replacement in ./unpackedMatrix.R
 if(FALSE) {
@@ -121,11 +76,76 @@ setMethod("diag<-", signature(x = "dsyMatrix"),
 	  function(x, value) .Call(dgeMatrix_setDiag, x, value))
 } ## MJ
 
+## MJ: now inherited from ANY
+if(FALSE) {
+setMethod("norm", signature(x = "dsyMatrix", type = "missing"),
+          function(x, type, ...) .Call(dsyMatrix_norm, x, "O"))
+
+setMethod("rcond", signature(x = "dsyMatrix", norm = "missing"),
+          function(x, norm, ...) .Call(dsyMatrix_rcond, x, "O"))
+} ## MJ
+
 ## Now that we have "chol", we can define  "determinant" methods,
-## exactly like in ./dsCMatrix.R
+## exactly like in ./dsCMatrix.R  [[ also in ./dpoMatrix.R ]]
 ## DB - Probably figure out how to use the BunchKaufman decomposition instead
 ## {{FIXME: Shouldn't it be possible to have "determinant" work by
 ## default automatically for "Matrix"es  when there's a "chol" method available?
 ## ..> work with ss <- selectMethod("chol", signature("dgCMatrix"))
 ## -- not have to define showMethod("determinant", ...) for all classes
 
+setMethod("BunchKaufman", signature(x = "dsyMatrix"),
+	  function(x, ...) .Call(dsyMatrix_trf, x))
+
+setMethod("BunchKaufman", signature(x = "matrix"),
+	  function(x, uplo = NULL, ...) .Call(matrix_trf, x, uplo))
+
+## TODO: currently inherited from ddenseMatrix which goes via dgeMatrix
+if(FALSE) {
+setMethod("determinant", signature(x = "dsyMatrix", logarithm = "logical"),
+          function(x, logarithm, ...) .)
+}
+
+setMethod("norm", signature(x = "dsyMatrix", type = "character"),
+          function(x, type, ...)
+              if(identical(type, "2"))
+                  norm2(x)
+              else .Call(dsyMatrix_norm, x, type))
+
+setMethod("rcond", signature(x = "dsyMatrix", norm = "character"),
+          function(x, norm, ...) .Call(dsyMatrix_rcond, x, norm))
+
+setMethod("solve", signature(a = "dsyMatrix", b = "missing"),
+          function(a, b, ...) .Call(dsyMatrix_solve, a))
+
+setMethod("solve", signature(a = "dsyMatrix", b = "Matrix"),
+	  function(a, b, ...)
+              .Call(dsyMatrix_matrix_solve, a, as(b, "denseMatrix")))
+
+setMethod("solve", signature(a = "dsyMatrix", b = "matrix"),
+          function(a, b, ...) .Call(dsyMatrix_matrix_solve, a, b))
+
+setMethod("solve", signature(a = "dsyMatrix", b = "numLike"),
+	  function(a, b, ...) .Call(dsyMatrix_matrix_solve, a, b))
+
+.is.na <- .is.infinite <- .is.finite <- function(x) {
+    n <- (d <- x@Dim)[1L]
+    i <- is.na(x@x)
+    uplo <- x@uplo
+    if(any(i[indTri(n, uplo == "U", TRUE)]))
+        new("nsyMatrix", Dim = d, Dimnames = x@Dimnames,
+            uplo = uplo, x = i)
+    else is.na_nsp(x)
+}
+body(.is.infinite) <-
+    do.call(substitute, list(body(.is.infinite),
+                             list(is.na = quote(is.infinite))))
+body(.is.finite) <-
+    do.call(substitute, list(body(.is.finite),
+                             list(is.na = quote(is.finite))))
+
+for(.cl in paste0(c("d", "l"), "syMatrix"))
+    setMethod("is.na", signature(x = .cl), .is.na)
+setMethod("is.infinite", signature(x = "dsyMatrix"), .is.infinite)
+setMethod("is.finite", signature(x = "dsyMatrix"), .is.finite)
+
+rm(.cl, .is.na, .is.infinite, .is.finite)

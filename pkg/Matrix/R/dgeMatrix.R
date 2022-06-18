@@ -1,3 +1,7 @@
+## METHODS FOR CLASS: dgeMatrix
+## dense general matrices with 'x' slot of type "double"
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 ## MJ: no longer needed ... replacement in ./denseMatrix.R
 if(FALSE) {
 ## ..2dge() -> ./Auxiliaries.R
@@ -10,35 +14,6 @@ setAs("dgeMatrix", "matrix", ge2mat)
 setMethod("as.vector", "dgeMatrix",
           function(x, mode) as.vector(x@x, mode))
 } ## MJ
-
-##  "[" settings are "up in"  Matrix.R & denseMatrix.R
-
-setMethod("norm", signature(x = "dgeMatrix", type = "missing"),
-	  function(x, type, ...) norm(x, type = "O", ...))
-setMethod("norm", signature(x = "dgeMatrix", type = "character"),
-	  function(x, type, ...)
-	      if(identical("2", type)) norm2(x) else .Call(dgeMatrix_norm, x, type),
-	  valueClass = "numeric")
-
-setMethod("rcond", signature(x = "dgeMatrix", norm = "missing"),
-	  function(x, norm, ...) rcond(x, norm = "O", ...))
-setMethod("rcond", signature(x = "dgeMatrix", norm = "character"),
-	  function(x, norm, ...)  {
-	      if({d <- dim(x); d[1] == d[2]})
-		  .Call(dgeMatrix_rcond, x, norm)
-	      else rcond(qr.R(qr(if(d[1] < d[2]) t(x) else x)), norm=norm, ...)
-	  },
-	  valueClass = "numeric")
-
-##> FIXME: R-devel (2.11.0) norm() is *wrong* for NAs, whereas this dgeMatrix
-##> -----  one works,  even though both should call the identical LAPACK 'dlange' ?????
-##> Hence, keep the Matrix version active for now:
-##> if(getRversion() < "2.11.0" || R.version$`svn rev` < 51018)
-##--- the same for "traditional"  'matrix':
-## 2017-02-08: Rather keep using base norm for 'matrix'
-## setMethod("norm", signature(x = "matrix", type = "character"),
-## 	  function(x, type, ...) .Call(dgeMatrix_norm, ..2dge(x), type),
-## 	  valueClass = "numeric")
 
 ## MJ: no longer needed ... replacement in ./unpackedMatrix.R
 if (FALSE) {
@@ -66,41 +41,70 @@ setMethod("diag<-", signature(x = "dgeMatrix"),
 	  function(x, value) .Call(dgeMatrix_setDiag, x, value))
 } ## MJ
 
+## MJ: now inherited from ANY
+if(FALSE) {
+setMethod("determinant", signature(x = "dgeMatrix", logarithm = "missing"),
+	  function(x, logarithm, ...) .Call(dgeMatrix_determinant, x, TRUE))
+
+setMethod("norm", signature(x = "dgeMatrix", type = "missing"),
+	  function(x, type, ...) .Call(dgeMatrix_norm, x, "O"))
+
+setMethod("rcond", signature(x = "dgeMatrix", norm = "missing"),
+	  function(x, norm, ...) rcond(x, norm = "O", ...))
+} ## MJ
+
 setMethod("chol", signature(x = "dgeMatrix"), cholMat)
 
-setMethod("solve", signature(a = "dgeMatrix", b = "missing"),
-	  function(a, b, ...) .Call(dgeMatrix_solve, a),
-	  valueClass = "dgeMatrix")
-
-setMethod("solve", signature(a = "dgeMatrix", b = "ddenseMatrix"),
-	  function(a, b, ...) .Call(dgeMatrix_matrix_solve, a, b),
-	  valueClass = "dgeMatrix")
-
-setMethod("solve", signature(a = "dgeMatrix", b = "matrix"),
-	  function(a, b, ...) .Call(dgeMatrix_matrix_solve, a, b),
-          valueClass = "dgeMatrix")
-
-setMethod("solve", signature(a = "dgeMatrix", b = "sparseMatrix"),
-	  function(a, b, ...) .Call(dgeMatrix_matrix_solve, a,
-				    as(b, "denseMatrix")),
-	  valueClass = "dgeMatrix")
-## not needed - method for numeric defined for Matrix class
-## setMethod("solve", signature(a = "dgeMatrix", b = "numeric"),
-## 	  function(a, b, ...)
-## 	  .Call(dgeMatrix_matrix_solve, a, as.matrix(as.double(b))))
-
 setMethod("lu", signature(x = "dgeMatrix"),
-	  function(x, warnSing = TRUE, ...) .Call(dgeMatrix_LU, x, warnSing),
-	  valueClass = "denseLU")
-
-setMethod("determinant", signature(x = "dgeMatrix", logarithm = "missing"),
-	  function(x, logarithm, ...)
-	  .Call(dgeMatrix_determinant, x, TRUE))
+	  function(x, warnSing = TRUE, ...) .Call(dgeMatrix_LU, x, warnSing))
 
 setMethod("determinant", signature(x = "dgeMatrix", logarithm = "logical"),
 	  function(x, logarithm, ...)
-	  .Call(dgeMatrix_determinant, x, logarithm))
+              .Call(dgeMatrix_determinant, x, logarithm))
 
-##-> ./expm.R  for expm()
+setMethod("norm", signature(x = "dgeMatrix", type = "character"),
+	  function(x, type, ...)
+              if(identical(type, "2"))
+                  norm2(x)
+              else .Call(dgeMatrix_norm, x, type))
 
-##-> ./colSums.R  for colSums,... rowMeans
+setMethod("rcond", signature(x = "dgeMatrix", norm = "character"),
+	  function(x, norm, ...) {
+              d <- x@Dim
+	      if(d[1L] != d[2L])
+		  rcond(qr.R(qr(if(d[1L] < d[2L]) t(x) else x)),
+                        norm = norm, ...)
+              else .Call(dgeMatrix_rcond, x, norm)
+	  })
+
+setMethod("solve", signature(a = "dgeMatrix", b = "missing"),
+	  function(a, b, ...) .Call(dgeMatrix_solve, a))
+
+setMethod("solve", signature(a = "dgeMatrix", b = "Matrix"),
+	  function(a, b, ...)
+              .Call(dgeMatrix_matrix_solve, a, as(b, "denseMatrix")))
+
+setMethod("solve", signature(a = "dgeMatrix", b = "matrix"),
+	  function(a, b, ...) .Call(dgeMatrix_matrix_solve, a, b))
+
+setMethod("solve", signature(a = "dgeMatrix", b = "numLike"),
+	  function(a, b, ...) .Call(dgeMatrix_matrix_solve, a, b))
+
+.is.na <- .is.infinite <- .is.finite <- function(x) {
+    if(any(i <- is.na(x@x)))
+        new("ngeMatrix", Dim = x@Dim, Dimnames = x@Dimnames, x = i)
+    else is.na_nsp(x)
+}
+body(.is.infinite) <-
+    do.call(substitute, list(body(.is.infinite),
+                             list(is.na = quote(is.infinite))))
+body(.is.finite) <-
+    do.call(substitute, list(body(.is.finite),
+                             list(is.na = quote(is.finite))))
+
+for(.cl in paste0(c("d", "l"), "geMatrix"))
+    setMethod("is.na", signature(x = .cl), .is.na)
+setMethod("is.infinite", signature(x = "dgeMatrix"), .is.infinite)
+setMethod("is.finite", signature(x = "dgeMatrix"), .is.finite)
+
+rm(.cl, .is.na, .is.infinite, .is.finite)

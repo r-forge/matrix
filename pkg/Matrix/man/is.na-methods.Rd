@@ -10,18 +10,31 @@
 \alias{anyNA,xMatrix-method}
 %
 \alias{is.na,abIndex-method}
-\alias{is.na,denseMatrix-method}
+\alias{is.na,dgeMatrix-method}
+\alias{is.na,dspMatrix-method}
+\alias{is.na,dsyMatrix-method}
+\alias{is.na,dtpMatrix-method}
+\alias{is.na,dtrMatrix-method}
 \alias{is.na,indMatrix-method}
+\alias{is.na,lgeMatrix-method}
+\alias{is.na,lspMatrix-method}
+\alias{is.na,lsyMatrix-method}
+\alias{is.na,ltpMatrix-method}
+\alias{is.na,ltrMatrix-method}
+\alias{is.na,ndenseMatrix-method}
 \alias{is.na,nsparseMatrix-method}
 \alias{is.na,nsparseVector-method}
 \alias{is.na,sparseMatrix-method}
 \alias{is.na,sparseVector-method}
 %
 \alias{is.finite,abIndex-method}
-\alias{is.finite,ddenseMatrix-method}
 \alias{is.finite,dgeMatrix-method}
 \alias{is.finite,diagonalMatrix-method}
+\alias{is.finite,dspMatrix-method}
 \alias{is.finite,dsparseMatrix-method}
+\alias{is.finite,dsyMatrix-method}
+\alias{is.finite,dtpMatrix-method}
+\alias{is.finite,dtrMatrix-method}
 \alias{is.finite,indMatrix-method}
 \alias{is.finite,lMatrix-method}
 \alias{is.finite,nMatrix-method}
@@ -29,9 +42,13 @@
 \alias{is.finite,sparseVector-method}
 %
 \alias{is.infinite,abIndex-method}
-\alias{is.infinite,ddenseMatrix-method}
+\alias{is.infinite,dgeMatrix-method}
 \alias{is.infinite,diagonalMatrix-method}
+\alias{is.infinite,dspMatrix-method}
 \alias{is.infinite,dsparseMatrix-method}
+\alias{is.infinite,dsyMatrix-method}
+\alias{is.infinite,dtpMatrix-method}
+\alias{is.infinite,dtrMatrix-method}
 \alias{is.infinite,indMatrix-method}
 \alias{is.infinite,lMatrix-method}
 \alias{is.infinite,nMatrix-method}
@@ -53,7 +70,7 @@
 \usage{
 \S4method{is.na}{sparseMatrix}(x)
 \S4method{is.finite}{dsparseMatrix}(x)
-\S4method{is.infinite}{ddenseMatrix}(x)
+\S4method{is.infinite}{dgeMatrix}(x)
 ## ...
 ## and for other classes
 

@@ -29,7 +29,6 @@
 \alias{coerce,dsyMatrix,lsyMatrix-method}
 \alias{coerce,dsyMatrix,nsyMatrix-method}
 \alias{coerce,matrix,dsyMatrix-method}
-\alias{show,dsyMatrix-method}
 %
 \description{
   \itemize{

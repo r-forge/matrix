@@ -1,6 +1,6 @@
-#### "ndenseMatrix" - virtual class of nonzero pattern dense matrices
-####  ------------
-#### Contains  nge*;  ntr*, ntp*;  nsy*, nsp*;   ndi*
+## METHODS FOR CLASS: ndenseMatrix (virtual)
+## dense matrices with 'x' slot of type "logical" (nonzero pattern)
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## MJ: no longer needed ... replacement in ./denseMatrix.R
 if(FALSE) {
@@ -160,9 +160,8 @@ setMethod("t", signature(x = "nspMatrix"),
 	  function(x) as(t(as(x, "nsyMatrix")), "nspMatrix"))
 } ## MJ
 
-## NOTE:  "&" and "|"  are now in group "Logic" c "Ops" --> ./Ops.R
-##        "!" is in ./not.R
-
+## MJ: no longer needed ... methods now inherited from denseMatrix
+if(FALSE) {
 setMethod("norm", signature(x = "ndenseMatrix", type = "character"),
 	  function(x, type, ...)
 	      if(identical("2", type))
@@ -173,3 +172,6 @@ setMethod("norm", signature(x = "ndenseMatrix", type = "character"),
 
 setMethod("rcond", signature(x = "ndenseMatrix", norm = "character"),
 	  .rcond_via_d, valueClass = "numeric")
+} ## MJ
+
+setMethod("is.na", signature(x = "ndenseMatrix"), is.na_nsp)

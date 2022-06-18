@@ -482,6 +482,12 @@ setAs("denseMatrix", "TsparseMatrix",
 
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+setMethod("norm", signature(x = "denseMatrix", type = "character"),
+	  function(x, type, ...) norm(as(x, "dMatrix"), type = type, ...))
+
+setMethod("rcond", signature(x = "denseMatrix", norm = "character"),
+	  function(x, norm, ...) rcond(as(x, "dMatrix"), norm = norm, ...))
+
 .dense.band <- function(x, k1, k2, ...) .Call(R_dense_band, x, k1, k2)
 .dense.triu <- function(x, k = 0,  ...) .Call(R_dense_band, x, k, NULL)
 .dense.tril <- function(x, k = 0,  ...) .Call(R_dense_band, x, NULL, k)
@@ -667,27 +673,11 @@ setMethod("isTriangular", signature(object = "denseMatrix"), isTriMat)
 setMethod("isDiagonal", signature(object = "denseMatrix"), .is.diagonal)
 } ## MJ
 
-setMethod("rcond", signature(x = "denseMatrix", norm = "character"),
-	  function(x, norm, ...)
-	  rcond(as(as(x, "dMatrix"), "dgeMatrix"), norm=norm, ...))
-
 setMethod("symmpart", signature(x = "denseMatrix"),
 	  function(x) symmpart(as(x, "dMatrix")))
+
 setMethod("skewpart", signature(x = "denseMatrix"),
 	  function(x) skewpart(as(x, "dMatrix")))
-
-setMethod("is.na", signature(x = "denseMatrix"),
-	  function(x) {
-	      if(any((inax <- is.na(x@x)))) {
-		  r <- as(x, "lMatrix")#-> logical x-slot
-		  r@x <- inax
-		  as(r, "nMatrix")
-	      } else {
-		  d <- x@Dim
-		  new("ngCMatrix", Dim = d, Dimnames = dimnames(x),
-		      i = integer(0), p = rep.int(0L, d[2]+1L))
-	      }
-	  })
 
 if(.Matrix.avoiding.as.matrix) {
 setMethod("qr", signature(x = "ddenseMatrix"),
@@ -695,4 +685,3 @@ setMethod("qr", signature(x = "ddenseMatrix"),
 setMethod("qr", signature(x = "denseMatrix"),
 	  function(x, ...) qr(as(x, "ddenseMatrix"), ...))
 }
-

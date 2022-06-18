@@ -98,44 +98,20 @@ SEXP dpoMatrix_solve(SEXP x)
     return val;
 }
 
-SEXP dpoMatrix_dgeMatrix_solve(SEXP a, SEXP b)
-{
-    SEXP Chol = dpoMatrix_chol(a),
-	val = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix"));
-    int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
-	*bdims = INTEGER(GET_SLOT(b, Matrix_DimSym)),
-	info;
-
-    if (adims[1] != bdims[0])
-	error(_("Dimensions of system to be solved are inconsistent"));
-    if (adims[0] < 1 || bdims[1] < 1)
-	error(_("Cannot solve() for matrices with zero extents"));
-    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
-    slot_dup(val, b, Matrix_DimSym);
-    slot_dup(val, b, Matrix_xSym);
-    F77_CALL(dpotrs)(uplo_P(Chol), adims, bdims + 1,
-		     REAL(GET_SLOT(Chol, Matrix_xSym)), adims,
-		     REAL(GET_SLOT(val, Matrix_xSym)),
-		     bdims, &info FCONE);
-    UNPROTECT(1);
-    return val;
-}
-
 SEXP dpoMatrix_matrix_solve(SEXP a, SEXP b)
 {
     SEXP Chol = dpoMatrix_chol(a),
-	val = PROTECT(duplicate(b));
+	val = PROTECT(dense_as_general(b, 'd', 2, 0));
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
-	*bdims = INTEGER(getAttrib(b, R_DimSymbol)),
+	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym)),
 	info;
 
-    if (!(isReal(b) && isMatrix(b)))
-	error(_("Argument b must be a numeric matrix"));
     if (*adims != *bdims || bdims[1] < 1 || *adims < 1)
 	error(_("Dimensions of system to be solved are inconsistent"));
     F77_CALL(dpotrs)(uplo_P(Chol), adims, bdims + 1,
 		     REAL(GET_SLOT(Chol, Matrix_xSym)), adims,
-		     REAL(val), bdims, &info FCONE);
+		     REAL(GET_SLOT(val, Matrix_xSym)),
+		     bdims, &info FCONE);
     UNPROTECT(1);
     return val;
 }

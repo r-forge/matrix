@@ -22,7 +22,6 @@
 \alias{coerce,matrix,ddenseMatrix-method}
 \alias{coerce,numLike,ddenseMatrix-method}
 \alias{determinant,ddenseMatrix,logical-method}
-\alias{determinant,ddenseMatrix,missing-method}
 \alias{log,ddenseMatrix-method}
 %
 \description{This is the virtual class of all dense numeric (i.e.,

@@ -63,8 +63,8 @@
 \alias{coerce,Matrix,vector-method}
 \alias{coerce,matrix,Matrix-method}
 \alias{cov2cor,Matrix-method}
+\alias{determinant,ANY,missing-method}
 \alias{determinant,Matrix,logical-method}
-\alias{determinant,Matrix,missing-method}
 \alias{diag,Matrix-method}
 \alias{diff,Matrix-method}
 \alias{dim,Matrix-method}

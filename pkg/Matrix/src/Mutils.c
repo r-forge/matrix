@@ -1796,6 +1796,144 @@ SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
 
 /* "General" purpose ================================================ */
 
+SEXP R_index_triangle(SEXP n_, SEXP upper_, SEXP diag_, SEXP packed_)
+{
+    int n = asInteger(n_), packed = asLogical(packed_),
+	upper = asLogical(upper_), diag = asLogical(diag_);
+    double nn = (double) n * n,
+	nx = (packed) ? nn : (nn + n) / 2.0,
+	nr = (diag) ? (nn + n) / 2.0 : (nn - n) / 2.0;
+    if (nx > R_XLEN_T_MAX)
+	error(_("cannot index a vector of length exceeding R_XLEN_T_MAX"));
+    SEXP r;
+    int i, j;
+    if (nx > INT_MAX) {
+	PROTECT(r = allocVector(REALSXP, (R_xlen_t) nr));
+	double k = 1.0, *pr = REAL(r);
+
+#define DO_INDEX(_ONE_, _NR_)				\
+	do {						\
+	    if (packed) {				\
+		if (diag) {				\
+		    while (k <= _NR_) {			\
+			*(pr++) = k;			\
+			k += _ONE_;			\
+		    }					\
+		} else if (upper) {			\
+		    for (j = 0; j < n; ++j) {		\
+			for (i = 0; i < j; ++i) {	\
+			    *(pr++) = k;		\
+			    k += _ONE_;			\
+			}				\
+			k += _ONE_;			\
+		    }					\
+		} else {				\
+		    for (j = 0; j < n; ++j) {		\
+			k += 1.0;			\
+			for (i = j+1; i < n; ++i) {	\
+			    *(pr++) = k;		\
+			    k += _ONE_;			\
+			}				\
+		    }					\
+		}					\
+	    } else if (diag) {				\
+		if (upper) {				\
+		    for (j = 0; j < n; ++j) {		\
+			for (i = 0; i <= j; ++i) {	\
+			    *(pr++) = k;		\
+			    k += _ONE_;			\
+			}				\
+			k += n-j-1;			\
+		    }					\
+		} else {				\
+		    for (j = 0; j < n; ++j) {		\
+			k += j;				\
+			for (i = j; i < n; ++i) {	\
+			    *(pr++) = k;		\
+			    k += _ONE_;			\
+			}				\
+		    }					\
+		}					\
+	    } else {					\
+		if (upper) {				\
+		    for (j = 0; j < n; ++j) {		\
+			for (i = 0; i < j; ++i) {	\
+			    *(pr++) = k;		\
+			    k += _ONE_;			\
+			}				\
+			k += n-j;			\
+		    }					\
+		} else {				\
+		    for (j = 0; j < n; ++j) {		\
+			k += j+1;			\
+			for (i = j+1; i < n; ++i) {	\
+			    *(pr++) = k;		\
+			    k += _ONE_;			\
+			}				\
+		    }					\
+		}					\
+	    }						\
+	} while (0)
+
+	DO_INDEX(1.0, nr);
+    } else {
+	PROTECT(r = allocVector(INTSXP, (R_xlen_t) nr));
+	int k = 1, nr_ = (int) nr, *pr = INTEGER(r);
+	DO_INDEX(1, nr_);
+
+#undef DO_INDEX
+	
+    }
+    UNPROTECT(1);
+    return r;
+}
+
+SEXP R_index_diagonal(SEXP n_, SEXP upper_, SEXP packed_)
+{
+    int n = asInteger(n_), packed = asLogical(packed_),
+	upper = (packed) ? asLogical(upper_) : NA_LOGICAL;
+    double nn = (double) n * n, nx = (packed) ? nn : (nn + n) / 2.0;
+    if (nx > R_XLEN_T_MAX)
+	error(_("cannot index a vector of length exceeding R_XLEN_T_MAX"));
+    SEXP r;
+    int j;
+    if (nx > INT_MAX) {
+	PROTECT(r = allocVector(REALSXP, n));
+	double k = 1.0, *pr = REAL(r);
+
+#define DO_INDEX				\
+	do {					\
+	    if (!packed) {			\
+		for (j = 0; j < n; ++j) {	\
+		    *(pr++) = k;		\
+		    k += n+1;			\
+		}				\
+	    } else if (upper) {			\
+		for (j = 0; j < n; ++j) {	\
+		    *(pr++) = k;		\
+		    k += j+2;			\
+		}				\
+	    } else {				\
+		for (j = 0; j < n; ++j) {	\
+		    *(pr++) = k;		\
+		    k += n-j;			\
+		}				\
+	    }					\
+	} while (0)
+
+	DO_INDEX;
+    } else {
+	PROTECT(r = allocVector(INTSXP, n));
+	int k = 1, *pr = INTEGER(r);
+	DO_INDEX;
+
+#undef DO_INDEX
+	
+    }
+    UNPROTECT(1);
+    return r;
+}
+
 void conjugate(SEXP x)
 {
     Rcomplex *px = COMPLEX(x);

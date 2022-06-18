@@ -1,6 +1,6 @@
-#### "ldenseMatrix" - virtual class of logical dense matrices
-####  ------------
-#### Contains  lge*;  ltr*, ltp*;  lsy*, lsp*;	 ldi*
+## METHODS FOR CLASS: ldenseMatrix (virtual)
+## dense matrices with 'x' slot of type "logical" (TRUE, FALSE, or NA)
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## MJ: no longer needed ... replacement in ./denseMatrix.R
 if(FALSE) {
@@ -186,9 +186,8 @@ setMethod("t", signature(x = "lspMatrix"),
 	  function(x) as(t(as(x, "lsyMatrix")), "lspMatrix"))
 } ## MJ
 
-## NOTE:  "&" and "|"  are now in group "Logic" c "Ops" --> ./Ops.R
-##        "!" is in ./not.R
-
+## MJ: no longer needed ... methods now inherited from denseMatrix
+if(FALSE) {
 setMethod("norm", signature(x = "ldenseMatrix", type = "character"),
 	  function(x, type, ...)
 	      if(identical("2", type))
@@ -203,4 +202,4 @@ setMethod("norm", signature(x = "ldenseMatrix", type = "character"),
 
 setMethod("rcond", signature(x = "ldenseMatrix", norm = "character"),
 	  .rcond_via_d, valueClass = "numeric")
-
+} ## MJ

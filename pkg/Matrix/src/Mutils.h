@@ -359,6 +359,9 @@ SEXP R_matrix_as_geMatrix(SEXP from, SEXP kind);
 SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector);
 SEXP R_dense_as_general(SEXP from, SEXP kind);
 
+SEXP R_index_triangle(SEXP n_, SEXP upper_, SEXP diag_, SEXP packed_);
+SEXP R_index_diagonal(SEXP n_, SEXP upper_, SEXP packed_);
+
 void conjugate(SEXP x);
     
 Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n);
