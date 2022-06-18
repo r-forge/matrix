@@ -1,4 +1,6 @@
-### Define Methods that can be inherited for all subclasses
+## METHODS FOR CLASS: ddenseMatrix (virtual)
+## dense matrices with 'x' slot of type "double"
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## MJ: no longer needed ... replacement in ./denseMatrix.R
 if(FALSE) {
@@ -33,57 +35,9 @@ setAs("ddenseMatrix", "CsparseMatrix",
 setAs("dgeMatrix", "dgCMatrix",
       function(from) .Call(dense_to_Csparse, from))
 
-setMethod("as.numeric", "ddenseMatrix", function(x, ...) ..2dge(x)@x)
-} ## MJ
+setMethod("as.numeric", "ddenseMatrix",
+          function(x, ...) ..2dge(x)@x)
 
-## -- see also ./Matrix.R  e.g., for a show() method
-
-## These methods are the 'fallback' methods for all dense numeric
-## matrices in that they simply coerce the ddenseMatrix to a
-## dgeMatrix. Methods for special forms override these.
-
-setMethod("norm", signature(x = "ddenseMatrix", type = "missing"),
-	  function(x, type, ...) norm(..2dge(x)))
-
-setMethod("norm", signature(x = "ddenseMatrix", type = "character"),
-	  function(x, type, ...) norm(..2dge(x), type))
-
-setMethod("rcond", signature(x = "ddenseMatrix", norm = "missing"),
-	  function(x, norm, ...) rcond(..2dge(x), ...))
-
-setMethod("rcond", signature(x = "ddenseMatrix", norm = "character"),
-	  function(x, norm, ...) rcond(..2dge(x), norm, ...))
-
-setMethod("solve", signature(a = "ddenseMatrix", b = "missing"),
-          function(a, b, ...) solve(..2dge(a)))
-
-for(.b in c("Matrix","ANY")) ## << against ambiguity notes
-setMethod("solve", signature(a = "ddenseMatrix", b = .b),
-	  function(a, b, ...) solve(..2dge(a), b))
-for(.b in c("matrix","numeric")) ## << against ambiguity notes
-setMethod("solve", signature(a = "ddenseMatrix", b = .b),
-	  function(a, b, ...) solve(..2dge(a), Matrix(b)))
-rm(.b)
-
-setMethod("lu", signature(x = "ddenseMatrix"),
-	  function(x, ...)
-	  .set.factors(x, "LU", lu(..2dge(x), ...)))
-
-setMethod("chol", signature(x = "ddenseMatrix"), cholMat)
-
-setMethod("determinant", signature(x = "ddenseMatrix", logarithm = "missing"),
-	  function(x, logarithm, ...) determinant(..2dge(x)))
-
-setMethod("determinant", signature(x = "ddenseMatrix", logarithm = "logical"),
-	  function(x, logarithm, ...)
-	  determinant(..2dge(x), logarithm))
-
-## now done for "dMatrix":
-## setMethod("expm", signature(x = "ddenseMatrix"),
-##           function(x) callGeneric(..2dge(x)))
-
-## MJ: no longer needed ... replacement in ./denseMatrix.R
-if(FALSE) {
 .trilDense <- function(x, k = 0, ...) {
     k <- as.integer(k[1])
     d <- dim(x)
@@ -122,23 +76,29 @@ setMethod("band", "denseMatrix", .bandDense)
 setMethod("band",      "matrix", .bandDense)
 } ## MJ
 
-setMethod("symmpart", signature(x = "ddenseMatrix"),
-	  function(x) .Call(ddense_symmpart, x))
-setMethod("skewpart", signature(x = "ddenseMatrix"),
-	  function(x) .Call(ddense_skewpart, x))
+## MJ: no longer needed ... methods are defined for all subclasses
+if(FALSE) {
+## These methods are the 'fallback' methods for all dense numeric
+## matrices in that they simply coerce the ddenseMatrix to a
+## dgeMatrix. Methods for special forms override these.
 
+setMethod("norm", signature(x = "ddenseMatrix", type = "character"),
+	  function(x, type, ...) norm(..2dge(x), type))
 
-setMethod("is.finite", signature(x = "dgeMatrix"),
-	  function(x) {
-	      if(all(ifin <- is.finite(x@x)))
-		  allTrueMat(x)
-	      else if(any(ifin)) {
-		  r <- as(x, "lMatrix") #-> logical x-slot
-		  r@x <- ifin
-		  as(r, "nMatrix")
-	      }
-	      else is.na_nsp(x)
-	  })
+setMethod("rcond", signature(x = "ddenseMatrix", norm = "character"),
+	  function(x, norm, ...) rcond(..2dge(x), norm, ...))
+
+setMethod("solve", signature(a = "ddenseMatrix", b = "missing"),
+          function(a, b, ...) solve(..2dge(a)))
+
+for(.b in c("Matrix","ANY")) ## << against ambiguity notes
+setMethod("solve", signature(a = "ddenseMatrix", b = .b),
+	  function(a, b, ...) solve(..2dge(a), b))
+
+for(.b in c("matrix","numeric")) ## << against ambiguity notes
+setMethod("solve", signature(a = "ddenseMatrix", b = .b),
+	  function(a, b, ...) solve(..2dge(a), Matrix(b)))
+rm(.b)
 
 ## *not* dge* but ddense ==>  triangular | symmetric
 ## TODO? -- rather methods for specific subclasses of ddenseMatrix
@@ -176,3 +136,32 @@ setMethod("is.infinite", signature(x = "ddenseMatrix"),
 	      }
 	      else is.na_nsp(x)
 	  })
+} ## MJ
+
+## MJ: now inherited from ANY
+if(FALSE) {
+setMethod("determinant", signature(x = "ddenseMatrix", logarithm = "missing"),
+	  function(x, logarithm, ...) determinant(.dense2g(x, "."), TRUE, ...))
+
+setMethod("norm", signature(x = "ddenseMatrix", type = "missing"),
+	  function(x, type, ...) norm(..2dge(x), "O", ...))
+
+setMethod("rcond", signature(x = "ddenseMatrix", norm = "missing"),
+	  function(x, norm, ...) rcond(..2dge(x), "O", ...))
+} ## MJ
+
+## TODO: currently inherited by ds[yp]Matrix, which should get own methods
+setMethod("determinant", signature(x = "ddenseMatrix", logarithm = "logical"),
+	  function(x, logarithm, ...)
+              determinant(.dense2g(x, "."), logarithm, ...))
+
+setMethod("chol", signature(x = "ddenseMatrix"), cholMat)
+
+setMethod("lu", signature(x = "ddenseMatrix"),
+	  function(x, ...) .set.factors(x, "LU", lu(.dense2g(x, "."), ...)))
+
+setMethod("symmpart", signature(x = "ddenseMatrix"),
+	  function(x) .Call(ddense_symmpart, x))
+
+setMethod("skewpart", signature(x = "ddenseMatrix"),
+	  function(x) .Call(ddense_skewpart, x))

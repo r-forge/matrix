@@ -236,7 +236,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dgeMatrix_rcond, 2),
     CALLDEF(dgeMatrix_solve, 1),
     CALLDEF(dpoMatrix_chol, 1),
-    CALLDEF(dpoMatrix_dgeMatrix_solve, 2),
     CALLDEF(dpoMatrix_matrix_solve, 2),
     CALLDEF(dpoMatrix_rcond, 2),
     CALLDEF(dpoMatrix_solve, 1),
@@ -416,6 +415,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(R_symmDN, 1),
     CALLDEF(R_revDN, 1),
     CALLDEF(R_Matrix_kind, 2),
+    CALLDEF(R_index_triangle, 4),
+    CALLDEF(R_index_diagonal, 3), 
 
     CALLDEF(R_sparse_as_dense, 2),
     CALLDEF(R_sparse_as_matrix, 1),

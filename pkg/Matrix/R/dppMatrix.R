@@ -1,4 +1,6 @@
-#### Positive-definite Symmetric Packed Matrices -- Coercion and Methods
+## METHODS FOR CLASS: dppMatrix
+## dense (packed) symmetric positive definite matrices
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -11,13 +13,16 @@
 }
 
 setAs("dspMatrix", "dppMatrix", .dsp2dpp)
+
 setAs("dsyMatrix", "dppMatrix",
       function(from) pack(.dsy2dpo(from)))
+
 setAs("matrix", "dppMatrix",
       function(from) {
           storage.mode(from) <- "double"
           .dsp2dpp(pack(from, symmetric = TRUE))
       })
+
 setAs("Matrix", "dppMatrix",
       function(from) {
           ## still needs as(<ds[py]Matrix>, "dppMatrix") to work
@@ -61,52 +66,40 @@ setAs("dppMatrix", "nMatrix",
 
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("chol", signature(x = "dppMatrix"),
-	  function(x, pivot, LINPACK) .Call(dppMatrix_chol, x))
-
-setMethod("determinant", signature(x = "dppMatrix", logarithm = "logical"), mkDet.via.chol)
-setMethod("determinant", signature(x = "dppMatrix", logarithm = "missing"),
-	  function(x, logarithm, ...) mkDet.via.chol(x, logarithm=TRUE))
-
-setMethod("rcond", signature(x = "dppMatrix", norm = "character"),
-	  function(x, norm, ...)
-	  .Call(dppMatrix_rcond, x, norm),
-	  valueClass = "numeric")
-
-setMethod("rcond", signature(x = "dppMatrix", norm = "missing"),
-          function(x, norm, ...)
-          .Call(dppMatrix_rcond, x, "O"),
-          valueClass = "numeric")
-
-setMethod("solve", signature(a = "dppMatrix", b = "missing"),
-          function(a, b, ...)
-          .Call(dppMatrix_solve, a),
-          valueClass = "dppMatrix")
-
-setMethod("solve", signature(a = "dppMatrix", b = "dgeMatrix"),
-          function(a, b, ...)
-          .Call(dppMatrix_matrix_solve, a, b),
-          valueClass = "dgeMatrix")
-
-setMethod("solve", signature(a = "dppMatrix", b = "matrix"),
-          function(a, b, ...)
-          .Call(dppMatrix_matrix_solve, a, b),
-          valueClass = "dgeMatrix")
-
-##setMethod("solve", signature(a = "dppMatrix", b = "numeric"),
-##          function(a, b, ...)
-##          .Call(dppMatrix_matrix_solve, a, as.matrix(b)),
-##          valueClass = "dgeMatrix")
-
-setMethod("solve", signature(a = "dppMatrix", b = "integer"),
-          function(a, b, ...) {
-              storage.mode(b) <- "double"
-              .Call(dppMatrix_matrix_solve, a, cbind(b, deparse.level=0L))
-          }, valueClass = "dgeMatrix")
-
 ## MJ: no longer needed ... replacement in ./packedMatrix.R
 if(FALSE) {
 setMethod("t", signature(x = "dppMatrix"),
           function(x) as(t(as(x, "dspMatrix")), "dppMatrix"),
           valueClass = "dppMatrix")
 } ## MJ
+
+## MJ: now inherited from ANY
+if(FALSE) {
+setMethod("determinant", signature(x = "dppMatrix", logarithm = "missing"),
+	  function(x, logarithm, ...) mkDet.via.chol(x, logarithm = TRUE, ...))
+
+setMethod("rcond", signature(x = "dppMatrix", norm = "missing"),
+          function(x, norm, ...) .Call(dppMatrix_rcond, x, "O"))
+} ## MJ
+
+setMethod("chol", signature(x = "dppMatrix"),
+	  function(x, ...) .Call(dppMatrix_chol, x))
+
+setMethod("determinant", signature(x = "dppMatrix", logarithm = "logical"),
+          mkDet.via.chol)
+
+setMethod("rcond", signature(x = "dppMatrix", norm = "character"),
+	  function(x, norm, ...) .Call(dppMatrix_rcond, x, norm))
+
+setMethod("solve", signature(a = "dppMatrix", b = "missing"),
+          function(a, b, ...) .Call(dppMatrix_solve, a))
+
+setMethod("solve", signature(a = "dppMatrix", b = "Matrix"),
+          function(a, b, ...)
+              .Call(dppMatrix_matrix_solve, a, as(b, "denseMatrix")))
+
+setMethod("solve", signature(a = "dppMatrix", b = "matrix"),
+          function(a, b, ...) .Call(dppMatrix_matrix_solve, a, b))
+
+setMethod("solve", signature(a = "dppMatrix", b = "numLike"),
+          function(a, b, ...) .Call(dppMatrix_matrix_solve, a, b))

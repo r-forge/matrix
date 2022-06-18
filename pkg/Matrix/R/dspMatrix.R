@@ -1,4 +1,6 @@
-### Coercion and Methods for Symmetric Packed Matrices
+## METHODS FOR CLASS: dspMatrix
+## dense (packed) symmetric matrices with 'x' slot of type "double"
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## MJ: no longer needed ... replacement in ./denseMatrix.R
 if(FALSE) {
@@ -20,56 +22,6 @@ setAs("dspMatrix", "CsparseMatrix", dsp2C)
 setAs("dspMatrix", "sparseMatrix", dsp2C)
 } ## MJ
 
-setMethod("rcond", signature(x = "dspMatrix", norm = "character"),
-          function(x, norm, ...)
-          .Call(dspMatrix_rcond, x, norm),
-          valueClass = "numeric")
-
-setMethod("rcond", signature(x = "dspMatrix", norm = "missing"),
-          function(x, norm, ...)
-          .Call(dspMatrix_rcond, x, "O"),
-          valueClass = "numeric")
-
-setMethod("BunchKaufman", signature(x = "dspMatrix"),
-	  function(x, ...) .Call(dspMatrix_trf, x))
-
-## Should define multiplication from the right
-
-setMethod("solve", signature(a = "dspMatrix", b = "missing"),
-	  function(a, b, ...) .Call(dspMatrix_solve, a),
-	  valueClass = "dspMatrix")
-
-setMethod("solve", signature(a = "dspMatrix", b = "matrix"),
-	  function(a, b, ...) .Call(dspMatrix_matrix_solve, a, b),
-	  valueClass = "dgeMatrix")
-
-setMethod("solve", signature(a = "dspMatrix", b = "ddenseMatrix"),
-	  function(a, b, ...) .Call(dspMatrix_matrix_solve, a, b),
-	  valueClass = "dgeMatrix")
-
-## No longer needed
-if(FALSE) {
-setMethod("solve", signature(a = "dspMatrix", b = "numeric"),
-	  function(a, b, ...) .Call(dspMatrix_matrix_solve, a, as.matrix(b)),
-	  valueClass = "dgeMatrix")
-
-setMethod("solve", signature(a = "dspMatrix", b = "integer"),
- 	  function(a, b, ...) {
- 	      storage.mode(b) <- "double"
- 	      .Call(dspMatrix_matrix_solve, a, as.matrix(b))
-          },
-          valueClass = "dgeMatrix")
-}
-
-setMethod("norm", signature(x = "dspMatrix", type = "character"),
-	  function(x, type, ...)
-	      if(identical("2", type)) norm2(x) else .Call(dspMatrix_norm, x, type),
-          valueClass = "numeric")
-
-setMethod("norm", signature(x = "dspMatrix", type = "missing"),
-          function(x, type, ...) .Call(dspMatrix_norm, x, "O"),
-          valueClass = "numeric")
-
 ## MJ: no longer needed ... replacement in ./packedMatrix.R
 if (FALSE) {
 setMethod("t", signature(x = "dspMatrix"),
@@ -81,3 +33,63 @@ setMethod("diag", signature(x = "dspMatrix"),
 setMethod("diag<-", signature(x = "dspMatrix"),
 	  function(x, value) .Call(dspMatrix_setDiag, x, value))
 } ## MJ
+
+## MJ: now inherited from ANY
+if(FALSE) {
+setMethod("norm", signature(x = "dspMatrix", type = "missing"),
+          function(x, type, ...) .Call(dspMatrix_norm, x, "O"))
+
+setMethod("rcond", signature(x = "dspMatrix", norm = "missing"),
+          function(x, norm, ...) .Call(dspMatrix_rcond, x, "O"))
+} ## MJ
+
+setMethod("BunchKaufman", signature(x = "dspMatrix"),
+	  function(x, ...) .Call(dspMatrix_trf, x))
+
+## TODO: currently inherited from ddenseMatrix which goes via dgeMatrix
+if(FALSE) {
+setMethod("determinant", signature(x = "dspMatrix", logarithm = "logical"),
+          function(x, logarithm, ...) .)
+}
+
+setMethod("norm", signature(x = "dspMatrix", type = "character"),
+	  function(x, type, ...)
+              if(identical(type, "2"))
+                  norm2(x)
+              else .Call(dspMatrix_norm, x, type))
+
+setMethod("rcond", signature(x = "dspMatrix", norm = "character"),
+          function(x, norm, ...) .Call(dspMatrix_rcond, x, norm))
+
+setMethod("solve", signature(a = "dspMatrix", b = "missing"),
+	  function(a, b, ...) .Call(dspMatrix_solve, a))
+
+setMethod("solve", signature(a = "dspMatrix", b = "Matrix"),
+	  function(a, b, ...)
+              .Call(dspMatrix_matrix_solve, a, as(b, "denseMatrix")))
+
+setMethod("solve", signature(a = "dspMatrix", b = "matrix"),
+	  function(a, b, ...) .Call(dspMatrix_matrix_solve, a, b))
+
+setMethod("solve", signature(a = "dspMatrix", b = "numLike"),
+	  function(a, b, ...) .Call(dspMatrix_matrix_solve, a, b))
+
+.is.na <- .is.infinite <- .is.finite <- function(x) {
+    if(any(i <- is.na(x@x)))
+        new("nspMatrix", Dim = x@Dim, Dimnames = x@Dimnames,
+            uplo = x@uplo, x = i)
+    else is.na_nsp(x)
+}
+body(.is.infinite) <-
+    do.call(substitute, list(body(.is.infinite),
+                             list(is.na = quote(is.infinite))))
+body(.is.finite) <-
+    do.call(substitute, list(body(.is.finite),
+                             list(is.na = quote(is.finite))))
+
+for(.cl in paste0(c("d", "l"), "spMatrix"))
+    setMethod("is.na", signature(x = .cl), .is.na)
+setMethod("is.infinite", signature(x = "dspMatrix"), .is.infinite)
+setMethod("is.finite", signature(x = "dspMatrix"), .is.finite)
+
+rm(.cl, .is.na, .is.infinite, .is.finite)

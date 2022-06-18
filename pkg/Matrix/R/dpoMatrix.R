@@ -1,4 +1,6 @@
-#### Positive-definite Symmetric Matrices -- Coercion and Methods
+## METHODS FOR CLASS: dpoMatrix
+## dense (unpacked) symmetric positive definite matrices
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -11,13 +13,16 @@
 }
 
 setAs("dsyMatrix", "dpoMatrix", .dsy2dpo)
+
 setAs("dspMatrix", "dpoMatrix",
       function(from) unpack(.dsp2dpp(from)))
+
 setAs("matrix", "dpoMatrix",
       function(from) {
           storage.mode(from) <- "double"
           .dsy2dpo(.M2symm(from))
       })
+
 setAs("Matrix", "dpoMatrix",
       function(from) {
           ## still needs as(<ds[yp]Matrix>, "dpoMatrix") to work
@@ -30,7 +35,7 @@ setAs("Matrix", "dpoMatrix",
 
 setAs("dpoMatrix", "dppMatrix", function(from) pack(from))
 
-## MJ: no longer needed
+## MJ: no longer needed ... prefer above
 if(FALSE) {
 setAs("dpoMatrix", "dppMatrix",
       function(from) {
@@ -51,37 +56,33 @@ setAs("dpoMatrix", "nMatrix",
 
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+## MJ: now inherited from ANY
+if(FALSE) {
+setMethod("determinant", signature(x = "dpoMatrix", logarithm = "missing"),
+	  function(x, logarithm, ...) mkDet.via.chol(x, logarithm = TRUE, ...))
+
+setMethod("rcond", signature(x = "dpoMatrix", norm = "missing"),
+          function(x, norm, ...) .Call(dpoMatrix_rcond, x, "O"))
+} ## MJ
+
 setMethod("chol", signature(x = "dpoMatrix"),
-	  function(x, pivot, ...) .Call(dpoMatrix_chol, x))
+	  function(x, ...) .Call(dpoMatrix_chol, x))
+
+setMethod("determinant", signature(x = "dpoMatrix", logarithm = "logical"),
+          mkDet.via.chol)
 
 setMethod("rcond", signature(x = "dpoMatrix", norm = "character"),
           function(x, norm, ...) .Call(dpoMatrix_rcond, x, norm))
 
-setMethod("rcond", signature(x = "dpoMatrix", norm = "missing"),
-          function(x, norm, ...) .Call(dpoMatrix_rcond, x, "O"))
-
 setMethod("solve", signature(a = "dpoMatrix", b = "missing"),
-          function(a, b, ...) .Call(dpoMatrix_solve, a),
-          valueClass = "dpoMatrix")
+          function(a, b, ...) .Call(dpoMatrix_solve, a))
 
-setMethod("solve", signature(a = "dpoMatrix", b = "dgeMatrix"),
-          function(a, b, ...) .Call(dpoMatrix_dgeMatrix_solve, a, b),
-          valueClass = "dgeMatrix")
+setMethod("solve", signature(a = "dpoMatrix", b = "Matrix"),
+          function(a, b, ...)
+              .Call(dpoMatrix_matrix_solve, a, as(b, "denseMatrix")))
 
 setMethod("solve", signature(a = "dpoMatrix", b = "matrix"),
-          function(a, b, ...) .Call(dpoMatrix_matrix_solve, a, b),
-          valueClass = "matrix")
+          function(a, b, ...) .Call(dpoMatrix_matrix_solve, a, b))
 
-mkDet.via.chol <- function(x, logarithm, ...)
-    mkDet(logarithm, ldet = 2*sum(log(abs(diag(chol(x))))), sig = 1L)
-
-setMethod("determinant", signature(x = "dpoMatrix", logarithm = "logical"), mkDet.via.chol)
-setMethod("determinant", signature(x = "dpoMatrix", logarithm = "missing"),
-	  function(x, logarithm, ...) mkDet.via.chol(x, logarithm=TRUE))
-
-## Is this usable / necessary?  -- FIXME!
-## setMethod("solve", signature(a = "dpoMatrix", b = "numeric"),
-##          function(a, b, ...)
-##          as.numeric(.Call(dpoMatrix_matrix_solve,
-##                           a, as.matrix(b))),
-##          valueClass = "numeric")
+setMethod("solve", signature(a = "dpoMatrix", b = "numLike"),
+          function(a, b, ...) .Call(dpoMatrix_matrix_solve, a, b))

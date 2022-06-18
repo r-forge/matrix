@@ -1,4 +1,6 @@
-#### Triangular Matrices -- Coercion and Methods
+## METHODS FOR CLASS: dtrMatrix
+## dense (unpacked) triangular matrices with 'x' slot of type "double"
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## MJ: no longer needed ... replacement in ./denseMatrix.R
 if(FALSE) {
@@ -7,10 +9,7 @@ setAs("dtrMatrix", "dtpMatrix",
       dtr2dtp <- function(from) .Call(dtrMatrix_as_dtpMatrix, from))
 setAs("matrix", "dtrMatrix",
       function(from) as(..2dge(from), "dtrMatrix"))
-} ## MJ
 
-## MJ: these coercions are now inherited; see ./denseMatrix.R
-if(FALSE) {
 .dtr2mat <- function(from, keep.dimnames=TRUE)
     .Call(dtrMatrix_as_matrix, from, keep.dimnames)
 ## needed for t() method
@@ -26,20 +25,6 @@ setAs("dtrMatrix", "CsparseMatrix",
       function(from) .dense2C(from, kind = "tri", uplo = from@uplo))
 } ## MJ
 
-## Group Methods:
-## TODO: carefully check for the cases where the result remains triangular
-## instead : inherit them from "dgeMatrix" via definition in ./dMatrix.R
-
-## Note: Just *because* we have an explicit  dtr -> dge coercion,
-##       show( <ddenseMatrix> ) is not okay, and we need our own:
-setMethod("show", "dtrMatrix", function(object) prMatrix(object))
-
-setMethod("determinant", signature(x = "dtrMatrix", logarithm = "missing"),
-	  function(x, logarithm, ...) callGeneric(x, TRUE))
-
-setMethod("determinant", signature(x = "dtrMatrix", logarithm = "logical"),
-	  function(x, logarithm, ...) mkDet(diag(x), logarithm))
-
 ## MJ: no longer needed ... replacement in ./unpackedMatrix.R
 if (FALSE) {
 setMethod("t", signature(x = "dtrMatrix"), t_trMatrix)
@@ -54,60 +39,74 @@ setMethod("diag<-", signature(x = "dtrMatrix"),
 	  })
 } ## MJ
 
-setMethod("norm", signature(x = "dtrMatrix", type = "character"),
-	  function(x, type, ...)
-	      if(identical("2", type)) norm2(x) else .Call(dtrMatrix_norm, x, type),
-	  valueClass = "numeric")
+## MJ: now inherited from ANY
+if(FALSE) {
+setMethod("determinant", signature(x = "dtrMatrix", logarithm = "missing"),
+	  function(x, logarithm, ...) mkDet(diag(x), TRUE))
 
 setMethod("norm", signature(x = "dtrMatrix", type = "missing"),
-	  function(x, type, ...)
-	  .Call(dtrMatrix_norm, x, "O"),
-	  valueClass = "numeric")
-
-setMethod("rcond", signature(x = "dtrMatrix", norm = "character"),
-	  function(x, norm, ...)
-	  .Call(dtrMatrix_rcond, x, norm),
-	  valueClass = "numeric")
+	  function(x, type, ...) .Call(dtrMatrix_norm, x, "O"))
 
 setMethod("rcond", signature(x = "dtrMatrix", norm = "missing"),
-	  function(x, norm, ...)
-	  .Call(dtrMatrix_rcond, x, "O"),
-	  valueClass = "numeric")
+	  function(x, norm, ...) .Call(dtrMatrix_rcond, x, "O"))
+} ## MJ
+
+setMethod("determinant", signature(x = "dtrMatrix", logarithm = "logical"),
+	  function(x, logarithm, ...) mkDet(diag(x), logarithm))
+
+setMethod("norm", signature(x = "dtrMatrix", type = "character"),
+	  function(x, type, ...) {
+              if(identical(type, "2"))
+                  norm2(x)
+              else .Call(dtrMatrix_norm, x, type)
+          })
+
+setMethod("rcond", signature(x = "dtrMatrix", norm = "character"),
+	  function(x, norm, ...) .Call(dtrMatrix_rcond, x, norm))
 
 setMethod("chol2inv", signature(x = "dtrMatrix"),
 	  function (x, ...) {
-	      chk.s(..., which.call=-2)
-	      if (x@diag != "N") x <- diagU2N(x)
+	      if(x@diag != "N")
+                  x <- diagU2N(x)
 	      .Call(dtrMatrix_chol2inv, x)
 	  })
 
-setMethod("solve", signature(a = "dtrMatrix", b="missing"),
-	  function(a, b, ...) {
-	      ## warn, as e.g. CHMfactor have 'system' as third argument
-	      chk.s(..., which.call=-2)
-	      .Call(dtrMatrix_solve, a)
-	  }, valueClass = "dtrMatrix")
+setMethod("solve", signature(a = "dtrMatrix", b = "missing"),
+	  function(a, b, ...) .Call(dtrMatrix_solve, a))
 
-setMethod("solve", signature(a = "dtrMatrix", b="ddenseMatrix"),
-	  function(a, b, ...) {
-	      chk.s(..., which.call=-2)
-	      .Call(dtrMatrix_matrix_solve, a, b)
-	  }, valueClass = "dgeMatrix")
+setMethod("solve", signature(a = "dtrMatrix", b = "Matrix"),
+	  function(a, b, ...)
+              .Call(dtrMatrix_matrix_solve, a, as(b, "denseMatrix")))
 
-setMethod("solve", signature(a = "dtrMatrix", b="dMatrix"),
-	  function(a, b, ...) {
-	      chk.s(..., which.call=-2)
-	      .Call(dtrMatrix_matrix_solve, a, as(b,"denseMatrix"))
-	  }, valueClass = "dgeMatrix")
-setMethod("solve", signature(a = "dtrMatrix", b="Matrix"),
-	  function(a, b, ...) {
-	      chk.s(..., which.call=-2)
-	      .Call(dtrMatrix_matrix_solve, a, as(as(b, "dMatrix"),
-						  "denseMatrix"))
-	  }, valueClass = "dgeMatrix")
+setMethod("solve", signature(a = "dtrMatrix", b = "matrix"),
+	  function(a, b, ...) .Call(dtrMatrix_matrix_solve, a, b))
 
-setMethod("solve", signature(a = "dtrMatrix", b="matrix"),
-	  function(a, b, ...) {
-	      chk.s(..., which.call=-2)
-	      .Call(dtrMatrix_matrix_solve, a, b)
-	  }, valueClass = "dgeMatrix")
+setMethod("solve", signature(a = "dtrMatrix", b = "numLike"),
+	  function(a, b, ...) .Call(dtrMatrix_matrix_solve, a, b))
+
+.is.na <- .is.infinite <- function(x) {
+    n <- (d <- x@Dim)[1L]
+    i <- is.na(x@x)
+    i[indTri(n, (uplo <- x@uplo) != "U", x@diag != "N")] <- FALSE
+    if(any(i))
+        new("ntrMatrix", Dim = d, Dimnames = x@Dimnames,
+            uplo = uplo, diag = "N", x = i)
+    else is.na_nsp(x)
+}
+body(.is.infinite) <-
+    do.call(substitute, list(body(.is.infinite),
+                             list(is.na = quote(is.infinite))))
+
+.is.finite <- function(x) {
+    n <- (d <- x@Dim)[1L]
+    i <- is.finite(x@x)
+    i[indTri(n, x@uplo != "U", x@diag != "N")] <- TRUE
+    new("ngeMatrix", Dim = d, Dimnames = x@Dimnames, x = i)
+}
+
+for(.cl in paste0(c("d", "l"), "trMatrix"))
+    setMethod("is.na", signature(x = .cl), .is.na)
+setMethod("is.infinite", signature(x = "dtrMatrix"), .is.infinite)
+setMethod("is.finite", signature(x = "dtrMatrix"), .is.finite)
+
+rm(.cl, .is.na, .is.infinite, .is.finite)

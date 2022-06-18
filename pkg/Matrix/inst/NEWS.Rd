@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-06-16 r3496)}{
+\section{Changes in version 1.4-2 (2022-06-18 r3497)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual classes
@@ -119,6 +119,34 @@
       \item Methods for unpacking and indexing \code{packedMatrix} and
       for coercing from \code{[CRT]sparseMatrix} to \code{denseMatrix}
       now check more consistently for overflow of \code{R_XLEN_T_MAX}.
+
+      \item \code{solve(<ddenseMatrix>, <ANY>)} is removed from
+      the method list.  It had allowed infinite recursion, e.g.,
+      with \code{solve(new("dgeMatrix"), NULL)}.
+
+      \item \code{is.na(<ndenseMatrix>)} gave \code{TRUE} where
+      the \code{x} slot had \code{NA}.  Now the result is always
+      a \dQuote{zero} matrix.
+
+      \item \code{is.na(<.t[rp]Matrix>)} and
+      \code{is.infinite(<.t[rp]Matrix>)} ignored the \code{diag} slot,
+      behaving always as though \code{diag == "N"}.  They now give
+      \code{FALSE} on the diagonal in the \code{diag != "N"} case.
+
+      \item Now only \dQuote{nontrivial} matrix elements determine
+      whether \code{is.na(<denseMatrix>)} is an \code{ndenseMatrix}
+      or an \code{nsparseMatrix}.
+
+      \item \code{is.na(<ddenseMatrix>)} coerced to \code{lMatrix}.
+      This unnecessary step is avoided now, saving a potentially
+      nontrivial allocation.
+
+      \item \code{solve(<ddenseMatrix>, b)} coerced the first argument
+      to \code{dgeMatrix} when \code{b} was not a \code{ddenseMatrix}
+      or traditional \code{matrix}.  This unnecessary step is avoided now,
+      so that specialized methods for \code{d(tr|sy|po|tp|sp|pp)Matrix} 
+      are used where possible (including for \code{b} inheriting from
+      \code{[ln]denseMatrix}, \code{sparseMatrix}, or \code{numLike}).
     }
   }
   \subsection{New Features}{
@@ -214,6 +242,8 @@
       \code{tri[ul]}, and \code{forceSymmetric}.  It also gains
       coercions to many virtual classes, notably \code{denseMatrix}
       and a coercion to \code{pMatrix}.
+
+      \item{solve(<ddenseMatrix>, <numLike>)} now works more 
     }
   }
   \subsection{Misc}{
@@ -287,6 +317,11 @@
       \code{tCRsparse_as_RCsparse()} for the idioms
       \code{as(t(<[CR]sparseMatrix>), "[RC]sparseMatrix")}.
       These all have not-yet-exported R wrappers.
+
+      \item \code{indTri()} and \code{indDiag()} now in C,
+      with a new argument \code{packed} for efficiently indexing
+      \code{packedMatrix}.  \code{indDiag()} now behaves sensibly
+      in the \code{n = 0} case.
     }
   }
 }

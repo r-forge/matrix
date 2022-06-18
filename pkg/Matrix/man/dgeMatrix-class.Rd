@@ -27,7 +27,6 @@
 \alias{coerce,matrix,dgeMatrix-method}
 \alias{coerce,numLike,dgeMatrix-method}
 \alias{determinant,dgeMatrix,logical-method}
-\alias{determinant,dgeMatrix,missing-method}
 \alias{log,dgeMatrix-method}
 %
 \description{A general numeric dense matrix in the S4 Matrix

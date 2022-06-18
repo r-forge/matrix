@@ -273,15 +273,21 @@ detSparseLU <- function(x, logarithm = TRUE, ...) {
 
 ## Log(Determinant) from diagonal ... used several times
 
-mkDet <- function(d, logarithm = TRUE, ldet = sum(log(abs(d))),
-                  sig = -1L+2L*as.integer(prod(sign(d)) >= 0))
-{		# sig: -1 or +1 (not 0 !)
+mkDet <- function(d, logarithm = TRUE,
+                  ldet = sum(log(abs(d))),
+                  sig = -1L+2L*as.integer(prod(sign(d)) >= 0)) {
+    ##            ^^^ -1 or 1, _not_ 0 !
     modulus <- if (logarithm) ldet else exp(ldet)
     attr(modulus, "logarithm") <- logarithm
     val <- list(modulus = modulus, sign = sig)
     class(val) <- "det"
     val
 }
+
+## for setMethod("determinant")
+mkDet.via.chol <- function(x, logarithm, ...)
+    mkDet(ldet = 2 * sum(log(abs(diag(chol(x))))),
+          logarithm = logarithm, sig = 1L)
 
 ##' utility, basically == norm(x, type = "2")
 norm2 <- function(x) if(anyNA(x)) NaN else svd(x, nu = 0L, nv = 0L)$d[1L]
@@ -684,22 +690,36 @@ is.na_nsp <- function(x) {
     d <- x@Dim
     dn <- x@Dimnames
     ## step-wise construction ==> no validity check for speedup
-    r <- new(if(d[1] == d[2] && isSymmetricDN(dn)) "nsCMatrix" else "ngCMatrix")
+    r <- new(if(!.hasSlot(x, "uplo"))
+                 "ngCMatrix"
+             else if (.hasSlot(x, "diag"))
+                 "ntCMatrix"
+             else "nsCMatrix")
     r@Dim <- d
     r@Dimnames <- dn
-    r@p <- rep.int(0L, d[2]+1L)
+    r@p <- rep.int(0L, d[2L] + 1)
     r
 }
 
-allTrueMat <- function(x, sym = (d[1] == d[2] && isSymmetricDN(dn)),
-                       packed = TRUE)
-{
-    d <- x@Dim
-    dn <- x@Dimnames
-    r <- new("ngeMatrix", Dim=d, Dimnames=dn, x = rep.int(TRUE, prod(d)))
-    if(sym) as(r, if(packed) "nspMatrix" else "nsyMatrix")
-    else r
+allTrueMat <- function(x,
+                       symmetric = .hasSlot(x, "uplo") && !.hasSlot(x, "diag"),
+                       packed = TRUE) {
+    r <- new(if(!symmetric)
+                 "ngeMatrix"
+             else if(packed)
+                 "nspMatrix"
+             else "nsyMatrix")
+    r@Dim <- d <- x@Dim
+    r@Dimnames <- x@Dimnames
+    r@x <- rep.int(TRUE, if(symmetric && packed) {
+                             n <- d[1L]
+                             n + (n^2 - n) / 2
+                         } else prod(d))
+    if(symmetric)
+        r@uplo <- x@uplo
+    r
 }
+
 allTrueMatrix <- function(x) allTrueMat(x)
 
 
@@ -767,6 +787,14 @@ ldiag <- function(n, p=n)
     r
 }
 
+indDiag <- function(n, upper = TRUE, packed = FALSE)
+    .Call(R_index_diagonal, n, upper, packed)
+
+indTri <- function(n, upper = TRUE, diag = FALSE, packed = FALSE)
+    .Call(R_index_triangle, n, upper, diag, packed)
+
+## MJ: now done in C, above, with options for packedMatrix
+if(FALSE) {
 ## The indices of the diagonal entries of an  n x n matrix,  n >= 1
 ## i.e. indDiag(n) === which(diag(n) == 1)
 indDiag <- function(n) cumsum(c(1L, rep.int(n+1L, n-1)))
@@ -802,7 +830,7 @@ indTri <- function(n, upper = TRUE, diag = FALSE) {
     ## now have differences; revert to "original":
     cumsum(c(if(diag) 1L else if(upper) n+1L else 2L, r))
 }
-
+} ## MJ
 
 prTriang <- function(x, digits = getOption("digits"),
                      maxp = getOption("max.print"),

@@ -346,11 +346,6 @@ setMethod("kronecker", signature(X = "ANY", Y = "Matrix",
 		  warning("using slow kronecker() method")
 	      Y <- as(Y, "matrix") ; Matrix(callGeneric()) })
 
-
-setMethod("determinant", signature(x = "Matrix", logarithm = "missing"),
-          function(x, logarithm, ...)
-          determinant(x, logarithm = TRUE, ...))
-
 ## The ``Right Thing'' to do :
 ## base::det() calls [base::]determinant();
 ## our det() should call our determinant() :
@@ -387,6 +382,8 @@ setMethod("rcond", signature(x = "Matrix", norm = "character"),
 
 
 ## for all :
+setMethod("determinant", signature(x = "ANY", logarithm = "missing"),
+          function(x, logarithm, ...) determinant(x, logarithm = TRUE, ...))
 setMethod("norm", signature(x = "ANY", type = "missing"),
 	  function(x, type, ...) norm(x, type = "O", ...))
 setMethod("rcond", signature(x = "ANY", norm = "missing"),
