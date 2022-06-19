@@ -342,20 +342,29 @@ setAs("sparseVector","TsparseMatrix", .sparseV2Mat)
 setAs("sparseVector","CsparseMatrix",
       function(from) .Call(Tsparse_to_Csparse, .sparseV2Mat(from), FALSE))
 
-## This is very similar to the 'x = "sparseMatrix"' method in ./sparseMatrix.R:
-setMethod("dim<-", signature(x = "sparseVector", value = "ANY"),
+setMethod("dim<-", signature(x = "sparseVector"),
 	  function(x, value) {
-	      if(!is.numeric(value) || length(value) != 2)
-		  stop("dim(.) value must be numeric of length 2")
-	      if(length(x) != prod(value <- round(value)))
-		  stop("dimensions don't match the number of cells")
-	      spV2M(x, nrow=value[1], ncol=value[2])
+	      if(!is.numeric(value) || length(value) != 2L)
+		  stop("dimensions must be numeric of length 2")
+              if(anyNA(value))
+		  stop("dimensions cannot contain NA")
+              if(any(value < 0))
+                  stop("dimensions cannot contain negative values")
+              if(!is.integer(value)) {
+                  if(any(value > .Machine$integer.max))
+                      stop("dimensions cannot exceed 2^31-1")
+                  value <- as.integer(value)
+              }
+	      if((p <- prod(value)) != (len <- length(x)))
+		  stop(gettextf("assigned dimensions [product %.0f] do not match object length [%.0f]",
+                                p, len, domain = NA))
+	      spV2M(x, nrow = value[1L], ncol = value[2L])
 	  })
-
 
 setMethod("length", "sparseVector", function(x) x@length)
 
-setMethod("t", "sparseVector", function(x) spV2M(x, nrow=1L, ncol=x@length, check=FALSE))
+setMethod("t", "sparseVector",
+          function(x) spV2M(x, nrow = 1L, ncol = x@length, check = FALSE))
 
 setMethod("show", signature(object = "sparseVector"),
    function(object) {

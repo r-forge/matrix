@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-06-18 r3497)}{
+\section{Changes in version 1.4-2 (2022-06-19 r3498)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual classes
@@ -147,6 +147,19 @@
       so that specialized methods for \code{d(tr|sy|po|tp|sp|pp)Matrix} 
       are used where possible (including for \code{b} inheriting from
       \code{[ln]denseMatrix}, \code{sparseMatrix}, or \code{numLike}).
+
+      \item \code{`dim<-`(x, -x@Dim)} is now an error, no longer
+      yielding an invalid \code{Matrix} object.
+
+      \item \code{`dim<-`(x, x@Dim)} is now faster, returning \code{x}
+      without allocation in all cases.
+
+      \item \code{`dim<-`(x, value)} gives a better error when
+      \code{value} contains \code{NA} or elements exceeding
+      \code{INT_MAX}.
+
+      \item \code{`dim<-`(<RsparseMatrix>, value)} is now an
+      \code{RsparseMatrix}, rather than a \code{TsparseMatrix}.
     }
   }
   \subsection{New Features}{

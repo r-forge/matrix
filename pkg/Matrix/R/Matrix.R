@@ -135,18 +135,17 @@ setMethod("isTriangular", signature(object = "matrix"), isTriMat)
 setMethod("isDiagonal", signature(object = "matrix"), .is.diagonal)
 }
 
-## The "catch all" methods -- far from optimal:
 setMethod("symmpart", signature(x = "Matrix"),
-          function(x) as(symmetrizeDimnames(x + t(x)) / 2, "symmetricMatrix"))
-setMethod("skewpart", signature(x = "Matrix"),
-          function(x) symmetrizeDimnames(x - t(x)) / 2)
+	  function(x) symmpart(as(x, "dMatrix")))
 
-## FIXME: do this (similarly as for "ddense.." in C
+setMethod("skewpart", signature(x = "Matrix"),
+	  function(x) skewpart(as(x, "dMatrix")))
+
 setMethod("symmpart", signature(x = "matrix"),
           function(x) symmetrizeDimnames(x + t(x)) / 2)
+
 setMethod("skewpart", signature(x = "matrix"),
           function(x) symmetrizeDimnames(x - t(x)) / 2)
-
 
 if(getRversion() >= "3.1.0")
 ## NB: classes without 'x' slot must have their own methods;
