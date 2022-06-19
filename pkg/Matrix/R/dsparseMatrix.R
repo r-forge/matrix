@@ -56,6 +56,12 @@ setMethod("is.infinite", signature(x = "dsparseMatrix"),
 	      else is.na_nsp(x)
 	  })
 
+setMethod("symmpart", signature(x = "dsparseMatrix"),
+          function(x) forceSymmetric(symmetrizeDimnames(x + t(x)) / 2))
+
+setMethod("skewpart", signature(x = "dsparseMatrix"),
+          function(x) symmetrizeDimnames(x - t(x)) / 2)
+
 ## Group Methods, see ?Arith (e.g.): "Ops" --> ./Ops.R, "Math" in ./Math.R, ...
 ## -----
 

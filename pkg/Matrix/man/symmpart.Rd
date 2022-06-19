@@ -8,15 +8,15 @@
 %
 \alias{symmpart,Matrix-method}
 \alias{symmpart,ddenseMatrix-method}
-\alias{symmpart,denseMatrix-method}
 \alias{symmpart,diagonalMatrix-method}
+\alias{symmpart,dsparseMatrix-method}
 \alias{symmpart,matrix-method}
 \alias{symmpart,symmetricMatrix-method}
 %
 \alias{skewpart,Matrix-method}
 \alias{skewpart,ddenseMatrix-method}
-\alias{skewpart,denseMatrix-method}
 \alias{skewpart,diagonalMatrix-method}
+\alias{skewpart,dsparseMatrix-method}
 \alias{skewpart,matrix-method}
 \alias{skewpart,symmetricMatrix-method}
 %

@@ -1,12 +1,14 @@
-## Methods for virtual class "denseMatrix" of dense matrices
-## ... and many for base matrices and base vectors, too
+## METHODS FOR CLASS: denseMatrix (virtual)
+## dense matrices with unpacked _or_ packed storage
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## README: Many of these methods are for _subclasses_ of denseMatrix,
+##         for base matrices, or for base vectors.  They have been
+##         centralized here quite on purpose, for easier maintenance,
+##         to prevent infelicities among groups of similar methods,
+##         and to avoid accidental gaps in implementation.
 
 ## ~~~~ COERCIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-## README: Many of these coercions are for _subclasses_ of denseMatrix.
-##         They have been centralized here quite on purpose, for easier
-##         maintenance, to prevent infelicities among groups of similar
-##         methods, and to avoid accidental gaps in implementation.
 
 ..dense2g  <- function(from) .Call(R_dense_as_general, from, ".")
 ..dense2dg <- function(from) .Call(R_dense_as_general, from, "d")
@@ -482,6 +484,33 @@ setAs("denseMatrix", "TsparseMatrix",
 
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+setMethod("dim<-", signature(x = "denseMatrix"),
+	  function(x, value) {
+	      if(!is.numeric(value) || length(value) != 2L)
+		  stop("dimensions must be numeric of length 2")
+              if(anyNA(value))
+		  stop("dimensions cannot contain NA")
+              if(any(value < 0))
+                  stop("dimensions cannot contain negative values")
+              if(!is.integer(value)) {
+                  if(any(value > .Machine$integer.max))
+                      stop("dimensions cannot exceed 2^31-1")
+                  value <- as.integer(value)
+              }
+              if(all(value == (d <- x@Dim)))
+                  return(x)
+	      if((pv <- prod(value)) != (pd <- prod(d)))
+		  stop(gettextf("assigned dimensions [product %.0f] do not match Matrix length [%.0f]",
+                                pv, pd, domain = NA))
+              r <- as(x, "generalMatrix")
+              r@Dim <- value
+              r@factors <- list()
+              r
+          })
+
+setMethod("show", signature(object = "denseMatrix"),
+          function(object) prMatrix(object))
+
 setMethod("norm", signature(x = "denseMatrix", type = "character"),
 	  function(x, type, ...) norm(as(x, "dMatrix"), type = type, ...))
 
@@ -498,36 +527,12 @@ for (.cl in c("denseMatrix", "matrix")) {
 }
 rm(.dense.band, .dense.triu, .dense.tril, .cl)
 
-setMethod("show", signature(object = "denseMatrix"),
-          function(object) prMatrix(object))
-##- ## FIXME: The following is only for the "dMatrix" objects that are not
-##- ##	      "dense" nor "sparse" -- i.e. "packed" ones :
-##- ## But these could be printed better -- "." for structural zeros.
-##- setMethod("show", signature(object = "dMatrix"), prMatrix)
-##- ## and improve this as well:
-##- setMethod("show", signature(object = "pMatrix"), prMatrix)
-##- ## this should now be superfluous [keep for safety for the moment]:
-
-setMethod("dim<-", signature(x = "denseMatrix", value = "ANY"),
-	  function(x, value) {
-	      if(!is.numeric(value) || length(value) != 2)
-		  stop("dim(.) value must be numeric of length 2")
-	      if(prod(dim(x)) != prod(value <- as.integer(value)))
-		  stop("dimensions don't match the number of cells")
-	      clx <- as.character(MatrixClass(class(x))) # as.*(): drop attr
-	      if(substring(clx,2) == "geMatrix") {
-		  x@Dim <- value
-		  if(length(x@factors) > 0)
-		      x@factors <- list()
-		  x
-	      } else { ## other "denseMatrix"
-		  x <- as_geSimpl2(x, clx)
-		  dim(x) <- value
-                  x
-	      }
-          })
-
-
+if(.Matrix.avoiding.as.matrix) {
+setMethod("qr", signature(x = "ddenseMatrix"),
+	  function(x, ...) qr.default(as(x, "matrix"), ...))
+setMethod("qr", signature(x = "denseMatrix"),
+	  function(x, ...) qr(as(x, "ddenseMatrix"), ...))
+}
 
 ## Using "index" for indices should allow
 ## integer (numeric), logical, or character (names!) indices :
@@ -672,16 +677,3 @@ setMethod("isSymmetric", signature(object = "denseMatrix"),
 setMethod("isTriangular", signature(object = "denseMatrix"), isTriMat)
 setMethod("isDiagonal", signature(object = "denseMatrix"), .is.diagonal)
 } ## MJ
-
-setMethod("symmpart", signature(x = "denseMatrix"),
-	  function(x) symmpart(as(x, "dMatrix")))
-
-setMethod("skewpart", signature(x = "denseMatrix"),
-	  function(x) skewpart(as(x, "dMatrix")))
-
-if(.Matrix.avoiding.as.matrix) {
-setMethod("qr", signature(x = "ddenseMatrix"),
-	  function(x, ...) qr.default(.dense2m(x), ...))
-setMethod("qr", signature(x = "denseMatrix"),
-	  function(x, ...) qr(as(x, "ddenseMatrix"), ...))
-}

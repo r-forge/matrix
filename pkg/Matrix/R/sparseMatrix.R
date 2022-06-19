@@ -1035,16 +1035,32 @@ setMethod("Cholesky", signature(A = "sparseMatrix"),
 setMethod("diag", signature(x = "sparseMatrix"),
 	  function(x, nrow, ncol, names=TRUE) diag(as(x, "CsparseMatrix"), names=names))
 
-setMethod("dim<-", signature(x = "sparseMatrix", value = "ANY"),
+setMethod("dim<-", signature(x = "sparseMatrix"),
 	  function(x, value) {
-	      if(!is.numeric(value) || length(value) != 2)
-		  stop("dim(.) value must be numeric of length 2")
-	      if(prod(dim(x)) != prod(value <- round(value))) # *not* as.integer !
-		  stop("dimensions don't match the number of cells")
-	      ## be careful to keep things sparse
-	      r <- spV2M(as(x, "sparseVector"), nrow=value[1], ncol=value[2])
-	      ## r now is "dgTMatrix"
-	      if(is(x, "CsparseMatrix")) as(r, "CsparseMatrix") else r
+	      if(!is.numeric(value) || length(value) != 2L)
+		  stop("dimensions must be numeric of length 2")
+              if(anyNA(value))
+		  stop("dimensions cannot contain NA")
+              if(any(value < 0))
+                  stop("dimensions cannot contain negative values")
+              if(!is.integer(value)) {
+                  if(any(value > .Machine$integer.max))
+                      stop("dimensions cannot exceed 2^31-1")
+                  value <- as.integer(value)
+              }
+	      if(all(value == (d <- x@Dim)))
+                  return(x)
+	      if((pv <- prod(value)) != (pd <- prod(d)))
+		  stop(gettextf("assigned dimensions [product %.0f] do not match object length [%.0f]",
+                                pv, pd, domain = NA))
+              r <- spV2M(as(x, "sparseVector"),
+                         nrow = value[1L], ncol = value[2L])
+	      ## 'r' is a TsparseMatrix
+              if(extends(cd <- getClassDef(class(x)) , "CsparseMatrix"))
+                  as(r, "CsparseMatrix")
+              else if(extends(cd, "RsparseMatrix"))
+                  as(r, "RsparseMatrix")
+              else r
 	  })
 
 setMethod("rep", "sparseMatrix", function(x, ...) rep(as(x, "sparseVector"), ...))
@@ -1413,4 +1429,3 @@ for (.cl in grep("^[dz][gt][CRT]Matrix$", .sparse.subclasses, value = TRUE))
 rm(.cl, .sparse.subclasses, .sparse.is.sy.dz,
    list = c(grep("^[.]sparse[.](band|tri[ul]|t|fS[21])$", ls(), value = TRUE),
             grep("^[.][CRT][.]is[.](di|tr|sy)$", ls(), value = TRUE)))
-

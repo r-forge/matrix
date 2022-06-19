@@ -1296,6 +1296,21 @@ stopifnot(identical(as.vector(lT.), NA),
           identical(as.vector(lT0), NA),
           identical(as.vector(lT1), TRUE))
 
+## various is.na() bugs in Matrix <= 1.4-1
+.nge <- new("ngeMatrix", Dim = c(2L, 2L), x = rep.int(NA, 4L))
+.dtr <- new("dtrMatrix", Dim = c(2L, 2L), x = c(NA, 1, 2, Inf), diag = "U")
+.dsy <- new("dsyMatrix", Dim = c(2L, 2L), x = c(1, NA, 2, 3))
+stopifnot(!any(is.na(.nge)),
+          !any(is.na(.dtr)),
+          !any(is.infinite(.dtr)),
+          !any(is.na(.dsy)),
+          is(is.na(.dsy), "sparseMatrix"))
+
+## various `dim<-`() bugs in Matrix <= 1.4-1
+x <- new("dgRMatrix", Dim = c(2L, 2L), p = integer(3L))
+assertError(`dim<-`(x, -x@Dim)) # had yielded an invalid object
+stopifnot(is(`dim<-`(x, c(4L, 1L)), "RsparseMatrix")) # was TsparseMatrix
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()

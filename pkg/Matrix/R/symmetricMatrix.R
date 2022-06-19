@@ -1,5 +1,4 @@
 ## Methods for virtual class "symmetricMatrix" of symmetric matrices
-.sM.subclasses <- names(getClassDef("symmetricMatrix")@subclasses)
 
 ## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -14,6 +13,33 @@ setAs("denseMatrix", "symmetricMatrix", # checking symmetry vvvv
       function(from) .Call(dense_to_symmetric, from, "U",   TRUE))
 setAs("matrix", "symmetricMatrix",      # checking symmetry vvvv
       function(from) .Call(dense_to_symmetric, from, "U",   TRUE))
+
+## autogenerate coercions
+##  as(*,  "symmetricMatrix")
+##  ~~~~~~~~~~~~~~~~~~~~~~~~~
+## Basic problem:
+## This should work at package install time when package:Matrix does not exist!
+if(FALSE)
+local({
+    allCl <- getClasses("package:Matrix") ## << fails at install time!!!!
+    clss <- allCl[sapply(allCl, extends, class2 = "Matrix")]
+    virt <- sapply(clss, isVirtualClass)
+    ## Now ensure coercions for all  non-virtual "Matrix" inheriting classes:
+    for(cl in clss[!virt]) {
+        cld <- getClassDef(cl)
+        if(extends(cld, "symmetricMatrix"))
+            cat("\tsymmetric:\t", cl,"\n")
+        else if(extends(cld, "triangularMatrix"))
+            cat("\ttriangular:\t", cl,"\n")
+        else if(extends(cld, "diagonalMatrix"))
+            cat("\tdiagonal:\t", cl,"\n")
+        else {
+            cat("do ",cl,"\n")
+##             setAs(cl, "symmetricMatrix",
+##                   function(from) as(from, ".s.Matrix"))
+        }
+    }## for
+})
 } ## MJ
 
 
@@ -31,9 +57,11 @@ setMethod("isTriangular", signature(object = "symmetricMatrix"),
                   FALSE
               else if(is.na(upper))
                   `attr<-`(TRUE, "kind", "U")
-              else
-                  TRUE
+              else TRUE
           })
+
+setMethod("symmpart", signature(x = "symmetricMatrix"), function(x) x)
+setMethod("skewpart", signature(x = "symmetricMatrix"), function(x) .setZero(x))
 
 ## MJ: no longer needed ...
 ##     methods for [CRT]sparseMatrix, (un)?packedMatrix do the same in C
@@ -41,6 +69,7 @@ setMethod("isTriangular", signature(object = "symmetricMatrix"),
 if(FALSE) {
 .sM.force1 <- function(x, uplo) x
 .sM.force2 <- function(x, uplo) if(uplo == x@uplo) x else t(x)
+.sM.subclasses <- names(getClassDef("symmetricMatrix")@subclasses)
 for (.cl in setdiff(.sM.subclasses, c("dpoMatrix", "dppMatrix", "corMatrix"))) {
     setMethod("forceSymmetric", signature(x = .cl, uplo = "missing"),
 	      .sM.force1)
@@ -48,7 +77,7 @@ for (.cl in setdiff(.sM.subclasses, c("dpoMatrix", "dppMatrix", "corMatrix"))) {
 	      .sM.force2)
 }
 rm(.sM.force1, .sM.force2, .cl)
-}
+} ## MJ
 
 ## MJ: no longer needed ... replacement in ./(un)?packedMatrix.R
 if(FALSE) {
@@ -67,13 +96,7 @@ setMethod("forceSymmetric", signature(x = "matrix", uplo = "missing"),
 	  function(x, uplo) .Call(dense_to_symmetric, x,  "U", FALSE))
 setMethod("forceSymmetric", signature(x = "matrix", uplo = "character"),
 	  function(x, uplo) .Call(dense_to_symmetric, x, uplo, FALSE))
-}
 
-setMethod("symmpart", signature(x = "symmetricMatrix"), function(x) x)
-setMethod("skewpart", signature(x = "symmetricMatrix"), function(x) .setZero(x))
-
-## MJ: no longer needed ... replacement in ./(un)?packedMatrix.R
-if (FALSE) {
 ###------- pack() and unpack() --- for *dense*  symmetric & triangular matrices:
 packM <- function(x, Mtype, kind, unpack=FALSE) {
     cd <- getClassDef(cx <- class(x))
@@ -130,33 +153,3 @@ setMethod("unpack", "dspMatrix",
 setMethod("unpack", "dtpMatrix",
 	  function(x, ...) dtp2dtr(x), valueClass = "dtrMatrix")
 } ## MJ
-
-## autogenerate coercions
-##  as(*,  "symmetricMatrix")
-##  ~~~~~~~~~~~~~~~~~~~~~~~~~
-## Basic problem:
-## This should work at package install time when package:Matrix does not exist!
-if(FALSE) {
-local({
-    allCl <- getClasses("package:Matrix") ## << fails at install time!!!!
-    clss <- allCl[sapply(allCl, extends, class2 = "Matrix")]
-    virt <- sapply(clss, isVirtualClass)
-    ## Now ensure coercions for all  non-virtual "Matrix" inheriting classes:
-    for(cl in clss[!virt]) {
-        cld <- getClassDef(cl)
-        if(extends(cld, "symmetricMatrix"))
-            cat("\tsymmetric:\t", cl,"\n")
-        else if(extends(cld, "triangularMatrix"))
-            cat("\ttriangular:\t", cl,"\n")
-        else if(extends(cld, "diagonalMatrix"))
-            cat("\tdiagonal:\t", cl,"\n")
-        else {
-            cat("do ",cl,"\n")
-##             setAs(cl, "symmetricMatrix",
-##                   function(from) as(from, ".s.Matrix"))
-        }
-    }## for
-})
-}
-
-rm(.sM.subclasses)
