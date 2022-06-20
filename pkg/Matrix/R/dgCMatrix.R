@@ -63,7 +63,7 @@ setMethod("qr", signature(x = "sparseMatrix"),
 	  qr(as(as(as(x, "CsparseMatrix"), "dsparseMatrix"), "dgCMatrix"), ...))
 
 LU.dgC <- function(x, errSing = TRUE, order = TRUE, tol = 1.0, keep.dimnames = TRUE, ...) {
-    chk.s(..., which.call=-2)
+    chkDots(..., which.call=-2)
     .Call(dgCMatrix_LU, x, order, tol, errSing, keep.dimnames) ## ../src/dgCMatrix.c
 }
 setMethod("lu", signature(x = "dgCMatrix"), LU.dgC)
@@ -112,7 +112,7 @@ setMethod("lu", signature(x = "sparseMatrix"),
     if(sparse) .solve.dgC.lu(a, b, tol=tol) else .Call(dgCMatrix_matrix_solve, a, b, FALSE)
 
 .solve.dgC.mat <- function(a, b, sparse=FALSE, tol = .Machine$double.eps, ...) {
-    chk.s(..., which.call=-2)
+    chkDots(..., which.call=-2)
     if(sparse) .solve.dgC.lu(a, b, tol=tol) else .Call(dgCMatrix_matrix_solve, a, b, FALSE)
 }
 
@@ -133,7 +133,7 @@ setMethod("solve", signature(a = "dgCMatrix", b = "ddenseMatrix"), .solve.dgC.ma
 
 setMethod("solve", signature(a = "dgCMatrix", b = "dsparseMatrix"),
 	  function(a, b, sparse=NA, tol = .Machine$double.eps, ...) {
-	      chk.s(..., which.call=-2)
+	      chkDots(..., which.call=-2)
 	      if(is.na(sparse)) {
 		  if(isSymmetric(a))
 		      ## TODO: fast cholmod_symmetric() for Cholesky
@@ -150,7 +150,7 @@ setMethod("solve", signature(a = "dgCMatrix", b = "dsparseMatrix"),
 ## (MM: a bit less dumb now with possibility of staying sparse)
 setMethod("solve", signature(a = "dgCMatrix", b = "missing"),
 	  function(a, b, sparse=NA, tol = .Machine$double.eps, ...) {
-	      chk.s(..., which.call=-2)
+	      chkDots(..., which.call=-2)
 	      if(is.na(sparse)) {
 		  if(isSymmetric(a))
 		      ## TODO: fast cholmod_symmetric() for Cholesky

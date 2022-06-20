@@ -62,7 +62,6 @@ setMethod("initialize", "Matrix",
           })
 }
 
-if(getRversion() >= "3.2.0") {
 setMethod("initialize", "Matrix",
           function(.Object, ...) {
              .Object <- callNextMethod()
@@ -75,20 +74,6 @@ setMethod("initialize", "Matrix",
              }
              .Object
           })
-} else { # R < 3.2.0
-setMethod("initialize", "Matrix",
-          function(.Object, ...) {
-              .Object <- callNextMethod(.Object, ...)
-              if (length(args <- list(...)) &&
-                  any(nzchar(anames <- names(args))) &&
-                  "Dimnames" %in% anames) {
-                  ## Coerce non-character 'Dimnames[[i]]' to character
-                  ## and set zero-length 'Dimnames[[i]]' to NULL
-                  .Object@Dimnames <- fixupDN(.Object@Dimnames)
-              }
-              .Object
-          })
-}
 
 
 ## ------ Virtual by structure -----------------------------------------
@@ -852,47 +837,23 @@ setClass("sparseVector",
          })
 
 ##' initialization -- ensuring that  'i' is sorted (and 'x' alongside)
-if(getRversion() >= "3.2.0") {
-setMethod("initialize", "sparseVector", function(.Object, i, x, ...)
-      {
-	  has.x <- !missing(x)
-	  if(!missing(i)) {
-	      i <- ## (be careful to assign in all cases)
-		  if(is.unsorted(i, strictly=TRUE)) {
-		      if(is(.Object, "xsparseVector") && has.x) {
-			  si <- sort.int(i, index.return=TRUE)
-			  x <- x[si$ix]
-			  si$x
-		      }
-		      else
-			  sort.int(i, method = "quick")
-		  }
-		  else i
-	  }
-	  if(has.x) x <- x
-	  callNextMethod()
-      })
-} else { ## R < 3.2.0
-setMethod("initialize", "sparseVector", function(.Object, i, x, ...)
-      {
-	  has.x <- !missing(x)
-	  if(!missing(i)) {
-	      .Object@i <- ## (be careful to assign in all cases)
-		  if(is.unsorted(i, strictly=TRUE)) {
-		      if(is(.Object, "xsparseVector") && has.x) {
-			  si <- sort.int(i, index.return=TRUE)
-			  x <- x[si$ix]
-			  si$x
-		      }
-		      else
-			  sort.int(i, method = "quick")
-		  }
-		  else i
-	  }
-	  if(has.x) .Object@x <- x
-	  callNextMethod(.Object, ...)
-      })
-}
+setMethod("initialize", "sparseVector",
+          function(.Object, i, x, ...) {
+              has.x <- !missing(x)
+              if(!missing(i)) {
+                  i <- ## (be careful to assign in all cases)
+                      if(is.unsorted(i, strictly=TRUE)) {
+                          if(is(.Object, "xsparseVector") && has.x) {
+                              si <- sort.int(i, index.return=TRUE)
+                              x <- x[si$ix]
+                              si$x
+                          } else sort.int(i, method = "quick")
+                      } else i
+              }
+              if(has.x)
+                  x <- x
+              callNextMethod()
+          })
 
 .validXspVec <- function(object) {
     ## n <- object@length

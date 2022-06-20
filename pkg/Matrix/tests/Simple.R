@@ -1018,7 +1018,7 @@ stopifnotValid(sM, "sparseMatrix")
 stopifnotValid(dlM, "denseMatrix")
 (lM  <- as(dlM, "sparseMatrix"))
 lM2 <- as(dlM, "CsparseMatrix") #-> now ok
-lM0 <- Matrix:::as_Csparse(dlM)
+lM0 <- Matrix:::.dense2sparse(dlM, "..C", NULL, NULL)
 stopifnot(identical3(lM, lM2, lM0))
 
 selectMethod("coerce",	c("lgeMatrix", "CsparseMatrix"),
@@ -1174,7 +1174,7 @@ lsUtr <- lst[istri][uniC]
 ## TODO: use %*%, crossprod(), .. on all those  4 x 4 -- and check "triangular rules"
 
 r <- tryCatch(chol2inv(Diagonal(x=1:10), pi=pi), warning=identity)
-stopifnot(grepl("extra argument pi .*chol2inv\\(Diagonal", r$message))
+stopifnot(grepl("extra argument .pi.", r$message))
 
 assertError(new("ltrMatrix", Dim = c(2L,2L), x=TRUE))# gave "illegal" object w/o error
 assertError(new("ntrMatrix", Dim = c(2L,2L)))#  dito
@@ -1307,9 +1307,17 @@ stopifnot(!any(is.na(.nge)),
           is(is.na(.dsy), "sparseMatrix"))
 
 ## various `dim<-`() bugs in Matrix <= 1.4-1
-x <- new("dgRMatrix", Dim = c(2L, 2L), p = integer(3L))
-assertError(`dim<-`(x, -x@Dim)) # had yielded an invalid object
-stopifnot(is(`dim<-`(x, c(4L, 1L)), "RsparseMatrix")) # was TsparseMatrix
+.dgR <- new("dgRMatrix", Dim = c(2L, 2L), p = integer(3L))
+assertError(`dim<-`(.dgR, -x@Dim)) # had yielded an invalid object
+stopifnot(is(`dim<-`(.dgR, c(4L, 1L)), "RsparseMatrix")) # was TsparseMatrix
+
+## symmpart(<ldiMatrix>) was not a dMatrix nor a symmetricMatrix;
+## symmpart(<diagonalMatrix>) did not get symmetrized 'Dimnames'
+.ldi.sp <- symmpart(new("ldiMatrix", Dim = c(1L, 1L), Dimnames = list("a", "b"),
+                        x = TRUE))
+stopifnot(is(.ldi.sp, "dMatrix"),
+          is(.ldi.sp, "symmetricMatrix"),
+          Matrix:::isSymmetricDN(.ldi.sp@Dimnames))
 
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()

@@ -80,7 +80,7 @@ setMethod("cbind2", signature(x = "denseMatrix", y = "numeric"),
 	      d <- dim(x); nr <- d[1]; nc <- d[2]
 	      y <- rep_len(y, nr) # 'silent procrustes'
 	      ## beware of (packed) triangular, symmetric, ...
-	      x <- as(x, geClass(x))
+	      x <- as(x, "generalMatrix")
 	      x@x <- c(x@x, as.double(y))
 	      x@Dim[2] <- nc + 1L
 	      if(is.character(dn <- x@Dimnames[[2]]))
@@ -92,7 +92,7 @@ setMethod("cbind2", signature(x = "numeric", y = "denseMatrix"),
 	  function(x, y, ...) {
 	      d <- dim(y); nr <- d[1]; nc <- d[2]
 	      x <- rep_len(x, nr)
-	      y <- as(y, geClass(y))
+	      y <- as(y, "generalMatrix")
 	      y@x <- c(as.double(x), y@x)
 	      y@Dim[2] <- nc + 1L
 	      if(is.character(dn <- y@Dimnames[[2]]))
@@ -102,9 +102,9 @@ setMethod("cbind2", signature(x = "numeric", y = "denseMatrix"),
 
 
 setMethod("cbind2", signature(x = "denseMatrix", y = "matrix"),
-	  function(x, y, ...) cbind2(x, as_geSimpl(y)))
+	  function(x, y, ...) cbind2(x, .m2ge(y, ".")))
 setMethod("cbind2", signature(x = "matrix", y = "denseMatrix"),
-	  function(x, y, ...) cbind2(as_geSimpl(x), y))
+	  function(x, y, ...) cbind2(.m2ge(x, "."), y))
 
 cbind2DN <- function(dnx,dny, ncx,ncy) {
     ## R and S+ are different in which names they take
@@ -124,8 +124,8 @@ setMethod("cbind2", signature(x = "denseMatrix", y = "denseMatrix"),
 	      ncy <- y@Dim[2]
 	      ## beware of (packed) triangular, symmetric, ...
 	      hasDN <- !is.null.DN(dnx <- dimnames(x)) | !is.null.DN(dny <- dimnames(y))
-	      x <- as(x, geClass(x))
-	      y <- as(y, geClass(y))
+	      x <- as(x, "generalMatrix")
+	      y <- as(y, "generalMatrix")
 	      xx <- c(x@x, y@x)
 	      ## be careful, e.g., if we have an 'n' and 'd'
 	      if(identical((tr <- typeof(xx)), typeof(x@x))) {
@@ -160,9 +160,9 @@ setMethod("rbind2", signature(x = "numeric", y = "denseMatrix"),
 	  })
 
 setMethod("rbind2", signature(x = "denseMatrix", y = "matrix"),
-	  function(x, y, ...) rbind2(x, as_geSimpl(y)))
+	  function(x, y, ...) rbind2(x, .m2ge(y, ".")))
 setMethod("rbind2", signature(x = "matrix", y = "denseMatrix"),
-	  function(x, y, ...) rbind2(as_geSimpl(x), y))
+	  function(x, y, ...) rbind2(.m2ge(x, "."), y))
 
 rbind2DN <- function(dnx, dny, nrx,nry) {
     if(!is.null.DN(dnx) || !is.null.DN(dny)) {
@@ -183,8 +183,8 @@ setMethod("rbind2", signature(x = "denseMatrix", y = "denseMatrix"),
 	      nry <- y@Dim[1]
 	      ## beware of (packed) triangular, symmetric, ...
 	      hasDN <- !is.null.DN(dnx <- dimnames(x)) | !is.null.DN(dny <- dimnames(y))
-	      x <- as(x, geClass(x))
-	      y <- as(y, geClass(y))
+	      x <- as(x, "generalMatrix")
+	      y <- as(y, "generalMatrix")
 	      xx <- .Call(R_rbind2_vector, x, y)
 	      ## be careful, e.g., if we have an 'n' and 'd'
 	      if(identical((tr <- typeof(xx)), typeof(x@x))) {
@@ -260,8 +260,8 @@ for(cls in names(getClass("diagonalMatrix")@subclasses)) {
 ## ------> ../src/Csparse.c
 
 ## Fast - almost non-checking methods
-.cbind2Csp <- function(x,y) .Call(Csparse_horzcat, as_Csp2(x), as_Csp2(y))
-.rbind2Csp <- function(x,y) .Call(Csparse_vertcat, as_Csp2(x), as_Csp2(y))
+.cbind2Csp <- function(x,y) .Call(Csparse_horzcat, asCspN(x), asCspN(y))
+.rbind2Csp <- function(x,y) .Call(Csparse_vertcat, asCspN(x), asCspN(y))
 
 cbind2sparse <- function(x,y) {
     ## beware of (packed) triangular, symmetric, ...

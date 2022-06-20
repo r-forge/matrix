@@ -24,12 +24,12 @@
 }
 
 .as.gC.Fun <- function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE) {
-    x <- as_gCsimpl(x)
+    x <- as(as(x, "CsparseMatrix"), "generalMatrix")
     callGeneric()
 }
 
 .as.C.Fun <- function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE) {
-    x <- as(x, "CsparseMatrix") ## or if necessary  as_Csparse(.)
+    x <- as(x, "CsparseMatrix")
     callGeneric()
 }
 

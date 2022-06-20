@@ -537,7 +537,7 @@ setMethod("qr", signature(x = "denseMatrix"),
 ## Using "index" for indices should allow
 ## integer (numeric), logical, or character (names!) indices :
 
-## use geClass() when 'i' or 'j' are missing:
+## use .m2ge() when 'i' or 'j' are missing:
 ## since  symmetric, triangular, .. will not be preserved anyway:
 setMethod("[", signature(x = "denseMatrix", i = "index", j = "missing",
 			 drop = "logical"),
@@ -547,14 +547,14 @@ setMethod("[", signature(x = "denseMatrix", i = "index", j = "missing",
 	      else if(na == 4)
 		  r <- as(x, "matrix")[i, , drop=drop]
 	      else stop(gettextf("invalid nargs()= %d", na), domain=NA)
-	      if(is.null(dim(r))) r else as(r, geClass(x))
+	      if(is.null(dim(r))) r else .m2ge(r, .M.kind(x))
 	  })
 
 setMethod("[", signature(x = "denseMatrix", i = "missing", j = "index",
 			 drop = "logical"),
 	  function (x, i, j, ..., drop) {
 	      r <- as(x, "matrix")[, j, drop=drop]
-	      if(is.null(dim(r))) r else as(r, geClass(x))
+	      if(is.null(dim(r))) r else .m2ge(r, .M.kind(x))
 	  })
 
 setMethod("[", signature(x = "denseMatrix", i = "index", j = "index",
@@ -570,13 +570,13 @@ setMethod("[", signature(x = "denseMatrix", i = "index", j = "index",
                       ## keep original symmetric class (but not "dpo")
                       as(r, class2(cl, .M.kindC(cld)))
 
-		  else as_smartClass(r, cl)
+		  else as_denseClass(r, cl)
 	      }
 	  })
 
 .dense.sub.i.2col <- function(x, i, j, ..., drop) {
     r <- as(x, "matrix")[ i ]
-    if(is.null(dim(r))) r else as(r, geClass(x))
+    if(is.null(dim(r))) r else .m2ge(r, .M.kind(x))
 }
 setMethod("[", signature(x = "denseMatrix", i = "matrix", j = "missing"),#drop="ANY"
 	  .dense.sub.i.2col)
@@ -610,7 +610,7 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "index", j = "missing",
 		     else if(na == 4)
 			 r[i, ] <- value
 		     else stop(gettextf("invalid nargs()= %d", na), domain=NA)
-		     as(r, geClass(x))
+		     .m2ge(r, .M.kind(x))
 		 })
 
 setReplaceMethod("[", signature(x = "denseMatrix", i = "missing", j = "index",
@@ -618,7 +618,7 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "missing", j = "index",
 		 function (x, i, j, ..., value) {
 		     r <- as(x, "matrix")
 		     r[, j] <- value
-		     as(r, geClass(x))
+		     .m2ge(r, .M.kind(x))
 		 })
 
 setReplaceMethod("[", signature(x = "denseMatrix", i = "index", j = "index",
@@ -626,7 +626,7 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "index", j = "index",
 		 function (x, i, j, ..., value) {
 		     r <- as(x, "matrix")
 		     r[i, j] <- value
-		     as_smartClass(r, class(x)) ## was as(r, class(x))
+		     as_denseClass(r, class(x)) ## was as(r, class(x))
 		 })
 
 setReplaceMethod("[", signature(x = "denseMatrix", i = "matrix",  # 2-col.matrix
@@ -634,7 +634,7 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "matrix",  # 2-col.matrix
 		 function(x, i, j, ..., value) {
 		     r <- as(x, "matrix")
 		     r[ i ] <- value
-		     as(r, geClass(x))
+		     .m2ge(r, .M.kind(x))
 		 })
 
 ## MJ: no longer needed ... replacement in ./(un)?packedMatrix.R

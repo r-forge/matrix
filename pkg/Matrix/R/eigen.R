@@ -14,8 +14,6 @@ if(.Matrix.avoiding.as.matrix) {
 		  base::eigen(as(x,"matrix"), symmetric, only.values))
 
     ## base::svd()  using  as.matrix() :=  asRbasematrix()
-    if(getRversion() < "3.5.0") # svd not yet implicit generic
-    setGeneric("svd", function(x, ...) base::svd(x, ...))
     setMethod("svd", "Matrix",
 	      function (x, ...) base::svd(as(x,"matrix"), ...))
 }

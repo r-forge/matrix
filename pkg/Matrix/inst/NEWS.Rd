@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-06-19 r3498)}{
+\section{Changes in version 1.4-2 (2022-06-20 r3499)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual classes
@@ -160,6 +160,12 @@
 
       \item \code{`dim<-`(<RsparseMatrix>, value)} is now an
       \code{RsparseMatrix}, rather than a \code{TsparseMatrix}.
+
+      \item For consistency with other methods,
+      \code{symmpart(<diagonalMatrix>)} now always inherits from
+      both \code{dMatrix} and \code{symmetricMatrix}, and
+      \code{skewpart(<diagonalMatrix>)} now always has symmetric
+      \code{Dimnames}.
     }
   }
   \subsection{New Features}{

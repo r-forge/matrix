@@ -2,8 +2,8 @@
 
 ## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setAs("Matrix", "diagonalMatrix", .M2diag)
-setAs("matrix", "diagonalMatrix", .M2diag)
+setAs("Matrix", "diagonalMatrix", ..M2diag)
+setAs("matrix", "diagonalMatrix", ..M2diag)
 
 ## MJ: no longer needed ... replacement above
 if(FALSE) {
@@ -443,7 +443,7 @@ if(FALSE)##--- no longer used:
     stopifnot(is.list(lst), (nl <- length(lst)) >= 1)
 
 ### FIXME: next line is *slow* when lst = list of 75'000  dense 3x3 matrices
-    Tlst <- lapply(lapply(lst, as_Csp2), # includes "diagU2N"
+    Tlst <- lapply(lapply(lst, asCspN), # includes "diagU2N"
 		   as, "TsparseMatrix")
     if(nl == 1) return(Tlst[[1]])
     ## else
@@ -527,25 +527,16 @@ bdiag <- function(...) {
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("band", signature(x = "diagonalMatrix"),
-          function(x, k1, k2, ...) {
-              if(k1 <= 0L && k2 >= 0L)
-                  x
-              else .setZero(x, paste0(.M.kind(x), "tCMatrix"))
-          })
+          function(x, k1, k2, ...)
+              if(k1 <= 0L && k2 >= 0L) x else .setZero(x))
 
 setMethod("tril", signature(x = "diagonalMatrix"),
-          function(x, k = 0, ...) {
-              if(k >= 0L)
-                  x
-              else .setZero(x, paste0(.M.kind(x), "tCMatrix"))
-          })
+          function(x, k = 0, ...)
+              if(k >= 0L) x else .setZero(x))
 
 setMethod("triu", signature(x = "diagonalMatrix"),
-          function(x, k = 0, ...) {
-              if(k <= 0L)
-                  x
-              else .setZero(x, paste0(.M.kind(x), "tCMatrix"))
-          })
+          function(x, k = 0, ...)
+              if(k <= 0L) x else .setZero(x))
 
 setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "character"),
           function(x, uplo) .Call(R_diagonal_as_sparse, x, ".sC", uplo, TRUE))
@@ -736,14 +727,16 @@ setMethod("isSymmetric", signature(object = "diagonalMatrix"),
               TRUE
           })
 setMethod("isTriangular", signature(object = "diagonalMatrix"),
-          function(object, upper = NA, ...) {
-              if(is.na(upper)) `attr<-`(TRUE, "kind", "U") else TRUE
-          })
+          function(object, upper = NA, ...)
+              if(is.na(upper)) `attr<-`(TRUE, "kind", "U") else TRUE)
 setMethod("isDiagonal", signature(object = "diagonalMatrix"),
           function(object) TRUE)
 
-setMethod("symmpart", signature(x = "diagonalMatrix"), function(x) x)
-setMethod("skewpart", signature(x = "diagonalMatrix"), function(x) .setZero(x))
+setMethod("symmpart", signature(x = "diagonalMatrix"),
+          function(x) forceSymmetric(as(x, "dMatrix")))
+
+setMethod("skewpart", signature(x = "diagonalMatrix"),
+          function(x) symmetrizeDimnames(.setZero(x, "d")))
 
 cholDiag <- function(x, pivot, ...) { ## x : typically "ddiMatrix"
     if(x@diag == "U") return(x)

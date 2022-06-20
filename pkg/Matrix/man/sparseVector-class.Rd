@@ -34,11 +34,16 @@
 \alias{coerce,sparseVector,CsparseMatrix-method}
 \alias{coerce,sparseVector,Matrix-method}
 \alias{coerce,sparseVector,TsparseMatrix-method}
+\alias{coerce,sparseVector,dsparseVector-method}
 \alias{coerce,sparseVector,integer-method}
+\alias{coerce,sparseVector,isparseVector-method}
 \alias{coerce,sparseVector,logical-method}
+\alias{coerce,sparseVector,lsparseVector-method}
+\alias{coerce,sparseVector,nsparseVector-method}
 \alias{coerce,sparseVector,numeric-method}
 \alias{coerce,sparseVector,sparseMatrix-method}
 \alias{coerce,sparseVector,vector-method}
+\alias{coerce,sparseVector,zsparseVector-method}
 \alias{dim<-,sparseVector-method}
 \alias{head,sparseVector-method}
 \alias{initialize,sparseVector-method}
@@ -67,12 +72,6 @@
 \alias{coerce,nsparseVector,zsparseVector-method}
 \alias{which,nsparseVector-method}
 % zsparse
-% xsparse
-\alias{coerce,xsparseVector,dsparseVector-method}
-\alias{coerce,xsparseVector,isparseVector-method}
-\alias{coerce,xsparseVector,lsparseVector-method}
-\alias{coerce,xsparseVector,nsparseVector-method}
-\alias{coerce,xsparseVector,zsparseVector-method}
 %
 \description{Sparse Vector Classes: The virtual mother class
   \code{"sparseVector"} has the five actual daughter classes

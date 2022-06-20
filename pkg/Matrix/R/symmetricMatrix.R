@@ -60,8 +60,10 @@ setMethod("isTriangular", signature(object = "symmetricMatrix"),
               else TRUE
           })
 
-setMethod("symmpart", signature(x = "symmetricMatrix"), function(x) x)
-setMethod("skewpart", signature(x = "symmetricMatrix"), function(x) .setZero(x))
+setMethod("symmpart", signature(x = "symmetricMatrix"),
+          function(x) x)
+setMethod("skewpart", signature(x = "symmetricMatrix"),
+          function(x) .setZero(x))
 
 ## MJ: no longer needed ...
 ##     methods for [CRT]sparseMatrix, (un)?packedMatrix do the same in C

@@ -1,11 +1,12 @@
 #### Toplevel ``virtual'' class "Matrix"
 
-
+## MJ: no longer needed ... have methods for all relevant subclasses
+if(FALSE) {
 ### Virtual coercions -- via smart "helpers" (-> ./Auxiliaries.R)
-
-setAs("Matrix", "sparseMatrix", function(from) as(from, "CsparseMatrix"))
 setAs("Matrix", "CsparseMatrix", function(from) as_Csparse(from))
+setAs("Matrix", "sparseMatrix", function(from) as(from, "CsparseMatrix"))
 setAs("Matrix", "denseMatrix",  function(from) as_dense(from))
+} ## MJ
 
 ## Maybe TODO:
 ## setAs("Matrix", "nMatrix", function(from) ....)
@@ -147,7 +148,6 @@ setMethod("symmpart", signature(x = "matrix"),
 setMethod("skewpart", signature(x = "matrix"),
           function(x) symmetrizeDimnames(x - t(x)) / 2)
 
-if(getRversion() >= "3.1.0")
 ## NB: classes without 'x' slot must have their own methods;
 ## see, e.g., ./nsparseMatrix.R and ./sparseVector.R
 setMethod("anyNA", signature(x = "xMatrix"), function(x) anyNA(x@x))
@@ -320,12 +320,12 @@ setMethod("chol2inv", signature(x = "denseMatrix"),
 	  function (x, ...) chol2inv(as(as(x, "dMatrix"), "dtrMatrix"), ...))
 setMethod("chol2inv", signature(x = "diagonalMatrix"),
 	  function (x, ...) {
-	      chk.s(..., which.call=-2)
+	      chkDots(..., which.call=-2)
 	      tcrossprod(solve(x))
 	  })
 setMethod("chol2inv", signature(x = "sparseMatrix"),
 	  function (x, ...) {
-	      chk.s(..., which.call=-2)
+	      chkDots(..., which.call=-2)
 	      ## for now:
 	      tcrossprod(solve(as(x,"triangularMatrix")))
 	  })
@@ -527,10 +527,8 @@ setMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY", drop = "ANY"),
     if(nA == 2) { ##  M [ M >= 7 ]
 	## FIXME: when both 'x' and 'i' are sparse, this can be very inefficient
 	if(is(x, "sparseMatrix"))
-	    message("<sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient")
-	toC <- geClass(x)
-	if(canCoerce(x, toC)) as(x, toC)@x[as.vector(i)]
-	else as(as(as(x, "generalMatrix"), "denseMatrix"), toC)@x[as.vector(i)]
+	    message("<sparse>[ <logic> ]: .M.sub.i.logical() maybe inefficient")
+	as(as(x, "generalMatrix"), "denseMatrix")@x[as.vector(i)]
 	## -> error when lengths don't match
     }
     else if(nA == 3) { ## M[ <logic>, ]  e.g.,  M [ M[,1, drop=FALSE] >= 7, ]  or M[TRUE,]
