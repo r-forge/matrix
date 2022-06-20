@@ -1020,12 +1020,16 @@ setMethod("isTriangular", signature(object = "sparseMatrix"),
           })
 } ## MJ
 
+## MJ: now inherited from ANY
+if(FALSE) {
 setMethod("determinant", signature(x = "sparseMatrix", logarithm = "missing"),
-	  function(x, logarithm, ...)
-	  determinant(x, logarithm = TRUE, ...))
+	  function(x, logarithm, ...) determinant(x, logarithm = TRUE, ...))
+} ## MJ
+
 setMethod("determinant", signature(x = "sparseMatrix", logarithm = "logical"),
 	  function(x, logarithm = TRUE, ...)
-	  determinant(as(x,"dsparseMatrix"), logarithm, ...))
+              determinant(as(as(x, "CsparseMatrix"), "dMatrix"),
+                          logarithm, ...))
 
 setMethod("Cholesky", signature(A = "sparseMatrix"),
 	  function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)

@@ -359,10 +359,6 @@ setMethod("Cholesky", signature(A = "Matrix"),
 ## FIXME: All of these should never be called
 setMethod("chol", signature(x = "Matrix"),
 	  function(x, pivot, ...) .bail.out.1("chol", class(x)))
-setMethod("determinant", signature(x = "Matrix", logarithm = "logical"),
-	  function(x, logarithm, ...)
-	  determinant(as(x,"dMatrix"), logarithm=logarithm, ...))
-
 setMethod("diag", signature(x = "Matrix"),
 	  function(x, nrow, ncol, names=TRUE) .bail.out.1("diag", class(x)))
 if(FALSE)## TODO: activate later
@@ -440,9 +436,8 @@ setMethod("diff", signature(x = "Matrix"),
 setMethod("image", "Matrix",
 	  function(x, ...) { # coercing to sparse is not inefficient,
 	      ##	       since we need 'i' and 'j' for levelplot()
-	      x <- as(as(x, "sparseMatrix"), "dsparseMatrix")
-              ## note that "ddiMatrix" is "sparse*" and "d*", but *not* dsparse
-	      callGeneric()
+	      x <- as(as(as(x, "TsparseMatrix"), "generalMatrix"), "dMatrix")
+              callGeneric()
 	  })
 
 

@@ -19,7 +19,10 @@ setAs("dgCMatrix", "lgCMatrix",
       })
 } ## MJ
 
+## MJ: no longer needed ... now inherited from Matrix
+if(FALSE) {
 setMethod("image", "dgCMatrix", function(x, ...) image(as(x, "dgTMatrix"), ...))
+} ## MJ
 
 ## Group Methods, see ?Arith (e.g.)
 ## -----
@@ -41,7 +44,7 @@ setMethod("image", "dgCMatrix", function(x, ...) image(as(x, "dgTMatrix"), ...))
 
 ##-> ./colSums.R  for colSums,... rowMeans
 
-## MJ: no longer needed ... method now inherited from CsparseMatrix
+## MJ: no longer needed ... now inherited from CsparseMatrix
 if(FALSE) {
 setMethod("t", signature(x = "dgCMatrix"),
 	  function(x) .Call(Csparse_transpose, x, FALSE),

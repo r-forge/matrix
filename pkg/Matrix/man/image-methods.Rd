@@ -2,18 +2,12 @@
 \title{Methods for image() in Package 'Matrix'}
 \docType{methods}
 %
-%\alias{image} % needed for \usage{}
 \alias{image-methods}
 %
 \alias{image,ANY-method}
 \alias{image,CHMfactor-method}
 \alias{image,Matrix-method}
-\alias{image,dgCMatrix-method}
-\alias{image,dgRMatrix-method}
 \alias{image,dgTMatrix-method}
-\alias{image,dsparseMatrix-method}
-\alias{image,lsparseMatrix-method}
-\alias{image,nsparseMatrix-method}
 %
 \description{
   Methods for function \code{\link[graphics]{image}} in package

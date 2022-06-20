@@ -36,6 +36,7 @@
 \alias{coerce,denseMatrix,vector-method}
 \alias{coerce,matrix,denseMatrix-method}
 \alias{coerce,numLike,denseMatrix-method}
+\alias{determinant,denseMatrix,logical-method}
 \alias{dim<-,denseMatrix-method}
 \alias{log,denseMatrix-method}
 \alias{rbind2,denseMatrix,denseMatrix-method}

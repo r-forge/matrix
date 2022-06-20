@@ -26,7 +26,6 @@
 \alias{coerce,table,sparseMatrix-method}
 \alias{cov2cor,sparseMatrix-method}
 \alias{determinant,sparseMatrix,logical-method}
-\alias{determinant,sparseMatrix,missing-method}
 \alias{diag,sparseMatrix-method}
 \alias{dim<-,sparseMatrix-method}
 \alias{format,sparseMatrix-method}

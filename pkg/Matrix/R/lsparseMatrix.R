@@ -1,4 +1,13 @@
-#### Superclass Methods for all sparse logical matrices
+## METHODS FOR CLASS: lsparseMatrix (virtual)
+## sparse matrices with 'x' slot of type "logical" (TRUE, FALSE, or NA)
+## ... but _excluding_ ldiMatrix (FIXME?)
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## MJ: no longer needed ... now inherited from Matrix
+if(FALSE) {
+setMethod("image", "lsparseMatrix",
+          function(x, ...) image(as(x, "dMatrix"), ...))
+} ## MJ
 
 ## MJ: no longer needed ... replacement in ./sparseMatrix.R
 if(FALSE) {
@@ -28,8 +37,3 @@ setAs("lsparseMatrix", "dsparseMatrix", function(from) as(from, "dMatrix"))
 setAs("lsparseMatrix", "matrix",
       function(from) as(as(from, "ldenseMatrix"), "matrix"))
 } ## MJ
-
-
-
-setMethod("image", "lsparseMatrix",
-          function(x, ...) image(as(x, "dMatrix"), ...))

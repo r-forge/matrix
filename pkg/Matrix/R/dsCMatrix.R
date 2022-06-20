@@ -212,8 +212,11 @@ ldet2.dsC <- function(x, ...) {
 ldet3.dsC <- function(x, perm = TRUE)
     .Call(dsCMatrix_LDL_D, x, perm=perm, "sumLog")
 
+## MJ: now inherited from ANY
+if(FALSE) {
 setMethod("determinant", signature(x = "dsCMatrix", logarithm = "missing"),
           function(x, logarithm, ...) determinant(x, TRUE))
+} ## MJ
 
 setMethod("determinant", signature(x = "dsCMatrix", logarithm = "logical"),
 	  function(x, logarithm, ...)

@@ -1,4 +1,14 @@
-#### Superclass Methods for all sparse nonzero-pattern matrices
+## METHODS FOR CLASS: lsparseMatrix (virtual)
+## sparse matrices with no 'x' slot (nonzero pattern)
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+setMethod("is.na", signature(x = "nsparseMatrix"), is.na_nsp)
+
+## MJ: no longer needed ... now inherited from Matrix
+if(FALSE) {
+setMethod("image", "nsparseMatrix",
+          function(x, ...) image(as(x, "dMatrix"), ...))
+} ## MJ
 
 ## MJ: no longer needed ... replacement in ./sparseMatrix.R
 if(FALSE) {
@@ -10,8 +20,3 @@ setAs("CsparseMatrix", "nMatrix",       function(from) .C2nC(from))
 
 setAs("nsparseMatrix", "dsparseMatrix", function(from) as(from, "dMatrix"))
 } ## MJ
-
-setMethod("is.na", signature(x = "nsparseMatrix"), is.na_nsp)
-
-setMethod("image", "nsparseMatrix",
-          function(x, ...) image(as(x, "dMatrix"), ...))
