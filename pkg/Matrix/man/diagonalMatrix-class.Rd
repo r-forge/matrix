@@ -24,10 +24,12 @@
 \alias{coerce,diagonalMatrix,nMatrix-method}
 \alias{coerce,diagonalMatrix,ndenseMatrix-method}
 \alias{coerce,diagonalMatrix,nsparseMatrix-method}
+\alias{coerce,diagonalMatrix,packedMatrix-method}
 \alias{coerce,diagonalMatrix,sparseVector-method}
 \alias{coerce,diagonalMatrix,nMatrix-method}
 \alias{coerce,diagonalMatrix,symmetricMatrix-method}
 \alias{coerce,diagonalMatrix,triangularMatrix-method}
+\alias{coerce,diagonalMatrix,unpackedMatrix-method}
 \alias{coerce,diagonalMatrix,vector-method}
 \alias{coerce,matrix,diagonalMatrix-method}
 \alias{determinant,diagonalMatrix,logical-method}

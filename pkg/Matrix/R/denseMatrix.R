@@ -8,6 +8,7 @@
 ##         to prevent infelicities among groups of similar methods,
 ##         and to avoid accidental gaps in implementation.
 
+
 ## ~~~~ COERCIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ..dense2g  <- function(from) .Call(R_dense_as_general, from, ".")

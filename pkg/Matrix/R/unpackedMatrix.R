@@ -1,21 +1,33 @@
-## Methods for virtual class "unpackedMatrix" of full storage, dense matrices
-## ... and many for base matrices, too
+## METHODS FOR CLASS: unpackedMatrix (virtual) ... and many for base matrices
+## dense matrices with unpacked storage
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .upM.subclasses <- names(getClassDef("unpackedMatrix")@subclasses)
+
 
 ## ~~~~ COERCIONS FROM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## as(<unpackedMatrix>,           "matrix") inherited from denseMatrix
-## as(<unpackedMatrix>,     "packedMatrix") inherited from denseMatrix
-## as(<unpackedMatrix>,    "generalMatrix") inherited from denseMatrix
-## as(<unpackedMatrix>,  "symmetricMatrix") inherited from      Matrix
-## as(<unpackedMatrix>, "triangularMatrix") inherited from      Matrix
+## as(<unpackedMatrix>,             "matrix") inherited from denseMatrix
+## as(<unpackedMatrix>,        "[dln]Matrix") inherited from denseMatrix
+## as(<unpackedMatrix>,   "[dln]denseMatrix") inherited from denseMatrix
+## as(<unpackedMatrix>,  "[dln]sparseMatrix") inherited from denseMatrix
+## as(<unpackedMatrix>,      "generalMatrix") inherited from denseMatrix
+## as(<unpackedMatrix>,   "triangularMatrix") inherited from      Matrix
+## as(<unpackedMatrix>,    "symmetricMatrix") inherited from      Matrix
+## as(<unpackedMatrix>,       "packedMatrix") inherited from denseMatrix
+## as(<unpackedMatrix>, "[CRT]?sparseMatrix") inherited from denseMatrix
+## as(<unpackedMatrix>,     "diagonalMatrix") inherited from      Matrix
+## as(<unpackedMatrix>,          "indMatrix") inherited from      Matrix
 
 
 ## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## as( <denseMatrix>, "unpackedMatrix") in ./denseMatrix.R
-## as(<packedMatrix>, "unpackedMatrix") inherited from denseMatrix
-## as(      <matrix>, "unpackedMatrix") in ./denseMatrix.R
+## as(          <numLike>, "unpackedMatrix") in ./denseMatrix.R
+## as(           <matrix>, "unpackedMatrix") in ./denseMatrix.R
+## as(      <denseMatrix>, "unpackedMatrix") in ./denseMatrix.R
+## as(<[CRT]sparseMatrix>, "unpackedMatrix") in ./sparseMatrix.R
+## as(   <diagonalMatrix>, "unpackedMatrix") in ./diagMatrix.R
+## as(        <indMatrix>, "unpackedMatrix") in ./indMatrix.R
 
 
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -25,9 +37,8 @@ setMethod("unpack", signature(x = "unpackedMatrix"),
 setMethod("unpack", signature(x = "matrix"),
           function(x, ...) .m2dense(x, "."))
 
-.upM.pack <- function(x, ...) {
+.upM.pack <- function(x, ...)
     .Call(unpackedMatrix_pack, x, TRUE, NA, NA)
-}
 
 .upM.pack.ge <- .m.pack <- function(x, symmetric = NA, upperTri = NA, ...) {
     if(((sna <- is.na(symmetric)) || symmetric) && isSymmetric(x, ...)) {
@@ -124,13 +135,11 @@ setMethod("forceSymmetric", signature(x = "matrix", uplo = "character"),
               tolerance = tol, ...))
 }
 
-.upM.is.tr <- function(object, upper = NA, ...) {
+.upM.is.tr <- function(object, upper = NA, ...)
     .Call(unpackedMatrix_is_triangular, object, upper)
-}
 
-.upM.is.di <- function(object) {
+.upM.is.di <- function(object)
     .Call(unpackedMatrix_is_diagonal, object)
-}
 
 .m.is.sy <- function(object, tol = 100 * .Machine$double.eps,
                      tol1 = 8 * tol, checkDN = TRUE, ...) {
@@ -151,13 +160,11 @@ setMethod("forceSymmetric", signature(x = "matrix", uplo = "character"),
     iS.m(object = object, tol = tol, tol1 = tol1, ...)
 }
 
-.m.is.tr <- function(object, upper = NA, ...) {
+.m.is.tr <- function(object, upper = NA, ...)
     .Call(matrix_is_triangular, object, upper)
-}
 
-.m.is.di <- function(object) {
+.m.is.di <- function(object)
     .Call(matrix_is_diagonal, object)
-}
 
 ## method for     .syMatrix in ./symmetricMatrix.R
 ## method for [lni]trMatrix in ./triangularMatrix.R
@@ -173,7 +180,7 @@ for (.cl in grep("^.geMatrix$", .upM.subclasses, value = TRUE))
 
 setMethod("isDiagonal", signature(object = "unpackedMatrix"), .upM.is.di)
 
-if (FALSE) {
+if(FALSE) {
 ## Would override isSymmetric.matrix and be faster in the logical and integer
 ## cases and in the tol<=0 case, but use a looser notion of symmetric 'dimnames'
 ## and so probably break too much ...
@@ -186,10 +193,13 @@ rm(.upM.is.sy, .upM.is.sy.dz, .upM.is.tr, .upM.is.di,
    .m.is.sy, .m.is.tr, .m.is.di, .cl)
 
 setMethod("t", signature(x = "unpackedMatrix"),
-          function(x) .Call(unpackedMatrix_transpose, x))
+          function(x)
+              .Call(unpackedMatrix_transpose, x))
 setMethod("diag", signature(x = "unpackedMatrix"),
-          function(x, nrow, ncol, names) .Call(unpackedMatrix_diag_get, x, names))
+          function(x, nrow, ncol, names)
+              .Call(unpackedMatrix_diag_get, x, names))
 setMethod("diag<-", signature(x = "unpackedMatrix"),
-          function(x, value) .Call(unpackedMatrix_diag_set, x, value))
+          function(x, value)
+              .Call(unpackedMatrix_diag_set, x, value))
 
 rm(.upM.subclasses)
