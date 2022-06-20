@@ -11,6 +11,7 @@ SEXP R_sparse_as_vector(SEXP from);
 SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0);
 SEXP R_sparse_as_general(SEXP from);
 SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0);
+SEXP R_diagonal_as_dense(SEXP from, SEXP code, SEXP uplo);
 
 SEXP R_sparse_drop0(SEXP from);
 SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2);

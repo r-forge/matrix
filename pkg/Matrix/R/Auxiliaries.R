@@ -571,11 +571,14 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 .dense2sparse <- function(from, code, uplo, diag)
     .Call(R_dense_as_sparse, from, code, uplo, diag)
 
+.diag2sparse <- function(from, code, uplo, drop0)
+    .Call(R_diagonal_as_sparse, from, code, uplo, drop0)
+
 .sparse2dense <- function(from, packed)
     .Call(R_sparse_as_dense, from, packed)
 
-.diag2sparse <- function(from, code, uplo, drop0)
-    .Call(R_diagonal_as_sparse, from, code, uplo, drop0)
+.diag2dense <- function(from, code, uplo)
+    .Call(R_diagonal_as_dense, from, code, uplo)
 
 .m2ge <- function(from, kind)
     .Call(R_matrix_as_geMatrix, from, kind)

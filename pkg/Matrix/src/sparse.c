@@ -24,8 +24,8 @@ SEXP sparse_as_dense(SEXP from, int packed)
     free(clt);
 
     int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-    double mn = (double) m * n;
-    if (((packed) ? (mn + n) / 2.0 : mn) > R_XLEN_T_MAX)
+    double mn = (double) m * n, nx_ = (packed) ? (mn + n) / 2.0 : mn;
+    if (nx_ > R_XLEN_T_MAX)
 	error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
     if (packed && clf[2] != 'C' && mn > R_XLEN_T_MAX)
 	error(_("coercing n-by-n [RT]sparseMatrix to packedMatrix "
@@ -33,7 +33,7 @@ SEXP sparse_as_dense(SEXP from, int packed)
     
     char ul = 'U', di = 'N';
     SEXPTYPE tx = kind2type(clf[0]);
-    R_xlen_t nx = (packed) ? PM_LENGTH(n) : ((R_xlen_t) m * n);
+    R_xlen_t nx = (R_xlen_t) nx_;
     SEXP x1 = PROTECT(allocVector(tx, nx));
     
     SET_SLOT(to, Matrix_DimSym, dim);
@@ -690,7 +690,7 @@ SEXP R_sparse_as_general(SEXP from)
     return to;
 }
 
-/* as(<diagonalMatrix>, ".(di|[gst][CRT])Matrix") */
+/* as(<diagonalMatrix>, ".(di|[gts][CRT])Matrix") */
 SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 {
     const char *zzz;
@@ -886,6 +886,94 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
     if (z0 != 'n')
 	SET_SLOT(to, Matrix_xSym, x);
     UNPROTECT(nprotect);
+    return to;
+}
+
+/* as(<diagonalMatrix>, ".(ge|tr|sy|tp|sp)Matrix") */
+SEXP R_diagonal_as_dense(SEXP from, SEXP code, SEXP uplo)
+{
+    const char *zzz;
+    char z0, z1, z2, ul;
+    if ((code = asChar(code)) == NA_STRING ||
+	(z0 = (zzz = CHAR(code))[0]) == '\0' ||
+	(z1 = zzz[1]) == '\0' ||
+	(z2 = zzz[2]) == '\0')
+	error(_("invalid 'code' to 'R_diagonal_as_dense()'"));
+    if ((z1 == 't' || z1 == 's') &&
+	(((uplo = asChar(uplo)) == NA_STRING || (ul = *CHAR(uplo)) == '\0')))
+	error(_("invalid 'uplo' to 'R_diagonal_as_dense()'"));
+    
+    static const char *valid[] = { VALID_DIAGONAL, "" };
+    int ivalid = R_check_class_etc(from, valid);
+    if (ivalid < 0)
+	ERROR_INVALID_CLASS(class_P(from), "R_diagonal_as_dense");
+
+    const char *clf = valid[ivalid];
+    if (z0 == '.')
+	z0 = clf[0];
+    
+    SEXPTYPE tx = kind2type(z0); /* validating 'z0' before doing more */
+    char clt[] = "...Matrix";
+    clt[0] = z0;
+    clt[1] = z1;
+    clt[2] = z2;
+    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
+	dim = GET_SLOT(from, Matrix_DimSym),
+	dimnames = GET_SLOT(from, Matrix_DimNamesSym),
+	diag = GET_SLOT(from, Matrix_diagSym);
+
+    char di = *CHAR(STRING_ELT(diag, 0));
+    int n = INTEGER(dim)[0];
+    double nn = (double) n * n, nx_ = (z2 == 'p') ? (nn + n) / 2.0 : nn;
+    if (nx_ > R_XLEN_T_MAX)
+	error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
+    R_xlen_t nx = (R_xlen_t) nx_;
+    SEXP x = PROTECT(allocVector(tx, nx));
+    
+    SET_SLOT(to, Matrix_DimSym, dim);
+    if (z1 == 's')
+	set_symmetrized_DimNames(to, dimnames, -1);
+    else
+	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+    if (z1 == 't' || z1 == 's')
+	SET_SLOT(to, Matrix_uploSym, mkString((ul == 'U') ? "U" : "L"));
+    if (z1 == 't')
+	SET_SLOT(to, Matrix_diagSym, diag);
+    SET_SLOT(to, Matrix_xSym, x);
+    
+#define DAD_COPY_DIAGONAL(_PREFIX_, _PTR_)				\
+    do {								\
+	Memzero(_PTR_(x), nx);						\
+	if (z1 != 't' || di == 'N') {					\
+	    SEXP y = PROTECT(coerceVector(GET_SLOT(from, Matrix_xSym), tx)); \
+	    if (z2 == 'p')						\
+		_PREFIX_ ## dense_packed_copy_diagonal(			\
+		    _PTR_(x), _PTR_(y), n, n, ul, ul /* unused */, di);	\
+	    else							\
+		_PREFIX_ ## dense_unpacked_copy_diagonal(		\
+		    _PTR_(x), _PTR_(y), n, n,     ul /* unused */, di);	\
+	    UNPROTECT(1);						\
+	}								\
+    } while (0)
+	
+    switch (tx) {
+    case REALSXP:
+	DAD_COPY_DIAGONAL(d, REAL);
+	break;
+    case LGLSXP:
+	DAD_COPY_DIAGONAL(i, LOGICAL);
+	break;
+    case INTSXP:
+	DAD_COPY_DIAGONAL(i, INTEGER);
+	break;
+    case CPLXSXP:
+	DAD_COPY_DIAGONAL(z, COMPLEX);
+	break;
+    default:
+	break;
+    }
+
+    UNPROTECT(2);
     return to;
 }
 
