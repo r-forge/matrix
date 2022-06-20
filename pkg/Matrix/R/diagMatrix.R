@@ -104,6 +104,18 @@ setAs("Matrix", "diagonalMatrix",
           drop0)
 }
 
+..diag2tp <- function(from) {
+    n <- (d <- from@Dim)[1L]
+    x <- from@x
+    tx <- typeof(x)
+    y <- vector(tx, n + (n * (n - 1)) / 2)
+    if((diag <- from@diag) == "N")
+        y[indDiag(n, TRUE, packed = TRUE)] <- x
+    cl <- ".tpMatrix"
+    substr(cl, 1L, 1L) <- .kind.type[[tx]]
+    new(cl, Dim = d, Dimnames = from@Dimnames, diag = diag, x = y)
+}
+
 ..diag2tr  <- function(from)           triu(.dense2g(from, "."))
 ..diag2dtr <- function(from)           triu(.dense2g(from, "d"))
 ..diag2ltr <- function(from)           triu(.dense2g(from, "l"))
@@ -134,6 +146,8 @@ setAs("diagonalMatrix",  "symmetricMatrix", ..diag2sC)
 setAs("diagonalMatrix",    "generalMatrix", ..diag2gC)
 
 setAs("diagonalMatrix",      "denseMatrix", ..diag2tr)
+setAs("diagonalMatrix",   "unpackedMatrix", ..diag2tr)
+setAs("diagonalMatrix",     "packedMatrix", ..diag2tp)
 setAs("diagonalMatrix",     "ddenseMatrix", ..diag2dtr)
 setAs("diagonalMatrix",     "ldenseMatrix", ..diag2ltr)
 setAs("diagonalMatrix",     "ndenseMatrix", ..diag2ntr)
@@ -185,7 +199,7 @@ rm(..diag2dkind, ..diag2lkind,
    ..diag2tC, ..diag2tR, ..diag2tT,
    ..diag2sC, ..diag2sR, ..diag2sT,
    ..diag2gC, ..diag2gR, ..diag2gT,
-   ..diag2tr,
+   ..diag2tp, ..diag2tr,
    ..diag2dtr, ..diag2ltr, ..diag2ntr,
    ..diag2dsy, ..diag2lsy, ..diag2nsy,
    ..diag2dge, ..diag2lge, ..diag2nge)

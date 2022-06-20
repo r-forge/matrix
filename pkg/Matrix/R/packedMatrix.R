@@ -1,20 +1,32 @@
-## Methods for virtual class "packedMatrix" of packed, dense matrices
+## METHODS FOR CLASS: packedMatrix (virtual)
+## dense triangular or symmetric matrices with packed storage
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .pM.subclasses <- names(getClassDef("packedMatrix")@subclasses)
+
 
 ## ~~~~ COERCIONS FROM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## as(<packedMatrix>,           "matrix") inherited from denseMatrix
-## as(<packedMatrix>,   "unpackedMatrix") inherited from denseMatrix
-## as(<packedMatrix>,    "generalMatrix") inherited from denseMatrix
-## as(<packedMatrix>,  "symmetricMatrix") inherited from      Matrix
-## as(<packedMatrix>, "triangularMatrix") inherited from      Matrix
+## as(<packedMatrix>,             "matrix") inherited from denseMatrix
+## as(<packedMatrix>,        "[dln]Matrix") inherited from denseMatrix
+## as(<packedMatrix>,   "[dln]denseMatrix") inherited from denseMatrix
+## as(<packedMatrix>,  "[dln]sparseMatrix") inherited from denseMatrix
+## as(<packedMatrix>,      "generalMatrix") inherited from denseMatrix
+## as(<packedMatrix>,   "triangularMatrix") inherited from      Matrix
+## as(<packedMatrix>,    "symmetricMatrix") inherited from      Matrix
+## as(<packedMatrix>,     "unpackedMatrix") inherited from denseMatrix
+## as(<packedMatrix>, "[CRT]?sparseMatrix") inherited from denseMatrix
+## as(<packedMatrix>,     "diagonalMatrix") inherited from      Matrix
+## as(<packedMatrix>,          "indMatrix") inherited from      Matrix
 
 
 ## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## as(   <denseMatrix>, "packedMatrix") in ./denseMatrix.R
-## as(<unpackedMatrix>, "packedMatrix") inherited from denseMatrix
-## as(        <matrix>, "packedMatrix") in ./denseMatrix.R
+## as(           <matrix>, "packedMatrix") in ./denseMatrix.R
+## as(      <denseMatrix>, "packedMatrix") in ./denseMatrix.R
+## as(<[CRT]sparseMatrix>, "packedMatrix") in ./sparseMatrix.R
+## as(   <diagonalMatrix>, "packedMatrix") in ./diagMatrix.R
+## as(        <indMatrix>, "packedMatrix") in ./indMatrix.R
 
 
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
