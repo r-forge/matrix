@@ -157,7 +157,10 @@ setAs("dsCMatrix", "dsRMatrix",
 ##setMethod("diag", signature(x = "dgRMatrix"),
 ##          function(x = 1, nrow, ncol = n) .Call(csc_getDiag, x))
 
+## MJ: no longer needed ... now inherited from Matrix
+if(FALSE) {
 setMethod("image", "dgRMatrix", function(x, ...) image(.CR2T(x), ...))
+} ## MJ
 
 ## MJ: no longer needed ... replacement in ./sparseMatrix.R
 if(FALSE) {

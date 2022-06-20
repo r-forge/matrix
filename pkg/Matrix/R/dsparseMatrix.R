@@ -1,7 +1,7 @@
-### d(ouble)sparseMatrix methods :
-
-setMethod("image", "dsparseMatrix",
-	  function(x, ...) image(as(x, "dgTMatrix"), ...))
+## METHODS FOR CLASS: dsparseMatrix (virtual)
+## sparse matrices with 'x' slot of type "double"
+## ... but _excluding_ ddiMatrix (FIXME?)
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## fails e.g. for 'dtCMatrix'; "triangularMatrix" has own method in ./triangularMatrix.R
 setMethod("chol", signature(x = "dsparseMatrix"),
@@ -18,11 +18,6 @@ setMethod("chol", signature(x = "dsparseMatrix"),
                }
 	       else stop("'x' is not positive definite -- chol() undefined.")
 	   })
-
-setMethod("determinant", signature(x = "dsparseMatrix", logarithm = "logical"),
-          function(x, logarithm = TRUE, ...)
-          determinant(as(x,"CsparseMatrix"), logarithm, ...))
-##-> now dgC or dsC or dtC .. which *have* their methods
 
 setMethod("lu", signature(x = "dsparseMatrix"),
 	  function(x, cache=TRUE, ...)
@@ -61,3 +56,17 @@ setMethod("symmpart", signature(x = "dsparseMatrix"),
 
 setMethod("skewpart", signature(x = "dsparseMatrix"),
           function(x) symmetrizeDimnames(x - t(x)) / 2)
+
+## MJ: no longer needed ... now inherited from sparseMatrix
+if(FALSE) {
+setMethod("determinant", signature(x = "dsparseMatrix", logarithm = "logical"),
+          function(x, logarithm = TRUE, ...)
+          determinant(as(x, "CsparseMatrix"), logarithm, ...))
+##-> now dgC or dsC or dtC .. which *have* their methods
+}
+
+## MJ: no longer needed ... now inherited from Matrix
+if(FALSE) {
+setMethod("image", "dsparseMatrix",
+	  function(x, ...) image(as(x, "dgTMatrix"), ...))
+} ## MJ

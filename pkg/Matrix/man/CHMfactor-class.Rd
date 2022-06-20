@@ -15,7 +15,6 @@
 \alias{coerce,CHMfactor,sparseMatrix-method}
 \alias{coerce,CHMfactor,triangularMatrix-method}
 \alias{determinant,CHMfactor,logical-method}
-\alias{determinant,CHMfactor,missing-method}
 \alias{update,CHMfactor-method}
 %
 \alias{.updateCHMfactor}

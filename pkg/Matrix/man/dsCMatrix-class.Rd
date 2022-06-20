@@ -19,7 +19,6 @@
 \alias{coerce,dsCMatrix,nsCMatrix-method}
 \alias{coerce,matrix,dsCMatrix-method}
 \alias{determinant,dsCMatrix,logical-method}
-\alias{determinant,dsCMatrix,missing-method}
 %
 \alias{coerce,dsTMatrix,dgCMatrix-method}
 \alias{coerce,dsTMatrix,dgTMatrix-method}

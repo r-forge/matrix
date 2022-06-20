@@ -23,7 +23,7 @@ isLDL <- function(x)
 .isLDL <- function(x) as.logical(! x@type[2])# "!" = not as type[2] := (cholmod_factor)->is_ll
 
 setMethod("image", "CHMfactor",
-          function(x, ...) image(as(as(x, "sparseMatrix"), "dgTMatrix"), ...))
+          function(x, ...) image(as(x, "sparseMatrix"), ...))
 
 .CHM_solve <-
     function(a, b,
@@ -95,8 +95,11 @@ setMethod("chol2inv", signature(x = "CHMfactor"),
 	      solve(x, system = "A")
 	  })
 
+## MJ: now inherited from ANY
+if(FALSE) {
 setMethod("determinant", signature(x = "CHMfactor", logarithm = "missing"),
           function(x, logarithm, ...) determinant(x, TRUE))
+} ## MJ
 
 setMethod("determinant", signature(x = "CHMfactor", logarithm = "logical"),
           function(x, logarithm, ...)

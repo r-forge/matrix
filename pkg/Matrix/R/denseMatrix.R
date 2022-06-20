@@ -512,6 +512,10 @@ setMethod("dim<-", signature(x = "denseMatrix"),
 setMethod("show", signature(object = "denseMatrix"),
           function(object) prMatrix(object))
 
+setMethod("determinant", signature(x = "denseMatrix", logarithm = "logical"),
+	  function(x, logarithm, ...)
+              determinant(as(x, "dMatrix"), logarithm = logarithm, ...))
+
 setMethod("norm", signature(x = "denseMatrix", type = "character"),
 	  function(x, type, ...) norm(as(x, "dMatrix"), type = type, ...))
 
