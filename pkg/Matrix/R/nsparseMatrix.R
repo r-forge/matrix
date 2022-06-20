@@ -13,8 +13,5 @@ setAs("nsparseMatrix", "dsparseMatrix", function(from) as(from, "dMatrix"))
 
 setMethod("is.na", signature(x = "nsparseMatrix"), is.na_nsp)
 
-if(getRversion() >= "3.1.0")
-setMethod("anyNA", signature(x = "nsparseMatrix"), function(x) FALSE)
-
-
-setMethod("image", "nsparseMatrix", function(x, ...) image(as(x,"dMatrix"), ...))
+setMethod("image", "nsparseMatrix",
+          function(x, ...) image(as(x, "dMatrix"), ...))

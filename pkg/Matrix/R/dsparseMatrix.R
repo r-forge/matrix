@@ -29,7 +29,6 @@ setMethod("lu", signature(x = "dsparseMatrix"),
 	  if(cache) .set.factors(x, "lu", lu(as(x, "dgCMatrix"), ...))
 	  else lu(as(x, "dgCMatrix"), ...))
 
-
 setMethod("is.finite", signature(x = "dsparseMatrix"),
 	  function(x) {
 	      if(any(!is.finite(x@x))) {
@@ -40,7 +39,8 @@ setMethod("is.finite", signature(x = "dsparseMatrix"),
                   r
 	      }
               else allTrueMat(x)
-	  })
+          })
+
 setMethod("is.infinite", signature(x = "dsparseMatrix"),
 	  function(x) {
 	      if(any((isInf <- is.infinite(x@x)))) {
@@ -57,13 +57,7 @@ setMethod("is.infinite", signature(x = "dsparseMatrix"),
 	  })
 
 setMethod("symmpart", signature(x = "dsparseMatrix"),
-          function(x) forceSymmetric(symmetrizeDimnames(x + t(x)) / 2))
+          function(x) forceSymmetric(x + t(x)) / 2)
 
 setMethod("skewpart", signature(x = "dsparseMatrix"),
           function(x) symmetrizeDimnames(x - t(x)) / 2)
-
-## Group Methods, see ?Arith (e.g.): "Ops" --> ./Ops.R, "Math" in ./Math.R, ...
-## -----
-
-
-

@@ -103,21 +103,21 @@ setAs("matrix", "indMatrix",
     perm <- from@perm
     d <- from@Dim
     new("dgCMatrix", Dim = d, Dimnames = from@Dimnames,
-        p = c(0L, cumsum(tabulate(perm, d[2L]))), i = order(perm) - 1L,
+        p = c(0L, cumsum(tabulate(perm, d[2L]))), i = sort.list(perm) - 1L,
         x = rep.int(1, length(perm)))
 }
 .ind2lgC <- function(from) {
     perm <- from@perm
     d <- from@Dim
     new("lgCMatrix", Dim = d, Dimnames = from@Dimnames,
-        p = c(0L, cumsum(tabulate(perm, d[2L]))), i = order(perm) - 1L,
+        p = c(0L, cumsum(tabulate(perm, d[2L]))), i = sort.list(perm) - 1L,
         x = rep.int(TRUE, length(perm)))
 }
 .ind2ngC <- function(from) {
     perm <- from@perm
     d <- from@Dim
     new("ngCMatrix", Dim = d, Dimnames = from@Dimnames,
-        p = c(0L, cumsum(tabulate(perm, d[2L]))), i = order(perm) - 1L)
+        p = c(0L, cumsum(tabulate(perm, d[2L]))), i = sort.list(perm) - 1L)
 }
 .ind2ngR <- function(from) {
     perm <- from@perm

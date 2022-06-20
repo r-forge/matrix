@@ -1,83 +1,85 @@
 #### All Methods in relation with the sparseVector (sub)classes
 
-
-## atomicVector : classUnion (logical,integer,double,....)
 setAs("atomicVector", "sparseVector",
       function(from) {
-	  n <- length(from)# *is* integer for atomic vectors
-	  r <- new(paste0(.V.kind(from), "sparseVector"), length = n)
-	  ii <- isN0(from)
-	  r@x <- from[ii]
-	  r@i <- seq_len(n)[ii]
+	  r <- new(paste0(.V.kind(from), "sparseVector"))
+	  r@length <- length(from)
+	  r@i <- ii <- which(isN0(from))
+          r@x <- from[ii]
 	  r
       })
-## dsparseVector: currently important, as later potentially made into d..Matrix :
+
 setAs("atomicVector", "dsparseVector",
       function(from) {
-	  n <- length(from)# *is* integer for atomic vectors
-	  r <- new("dsparseVector", length = n)
-	  ii <- isN0(from)
-	  r@x <- as.numeric(from)[ii]
-	  r@i <- seq_len(n)[ii]
+	  r <- new("dsparseVector")
+	  r@length <- length(from)
+          r@i <- ii <- which(isN0(from))
+	  r@x <- as.double(from)[ii]
 	  r
       })
 
 setAs("nsparseVector", "lsparseVector",
-      function(from) new("lsparseVector", i = from@i, length = from@length,
-			 x = rep.int(TRUE, length(from@i))))
-setAs("nsparseVector", "dsparseVector", function(from)
-      as(as(from, "lsparseVector"), "dsparseVector"))
-setAs("nsparseVector", "isparseVector", function(from)
-      as(as(from, "lsparseVector"), "isparseVector"))
-setAs("nsparseVector", "zsparseVector", function(from)
-      as(as(from, "lsparseVector"), "zsparseVector"))
+      function(from)
+          new("lsparseVector", length = from@length, i = from@i,
+              x = rep.int(TRUE, length(from@i))))
+setAs("nsparseVector", "isparseVector",
+      function(from)
+          new("isparseVector", length = from@length, i = from@i,
+              x = rep.int(1L, length(from@i))))
+setAs("nsparseVector", "dsparseVector",
+      function(from)
+          new("dsparseVector", length = from@length, i = from@i,
+              x = rep.int(1, length(from@i))))
+setAs("nsparseVector", "zsparseVector",
+      function(from)
+          new("zsparseVector", length = from@length, i = from@i,
+              x = rep.int(1+0i, length(from@i))))
 
-
-## "xsparseVector" : those with an 'x' slot (i.e., currently := not nsparse*)
-setAs("xsparseVector", "dsparseVector",
+setAs("sparseVector", "nsparseVector",
       function(from)
-      new("dsparseVector", x= as.double(from@x) , i= from@i, length= from@length))
-setAs("xsparseVector", "isparseVector",
+	  new("nsparseVector", length = from@length, i = from@i))
+setAs("sparseVector", "lsparseVector",
       function(from)
-      new("isparseVector", x= as.integer(from@x), i= from@i, length= from@length))
-setAs("xsparseVector", "lsparseVector",
+          new("lsparseVector", length = from@length, i = from@i,
+              x = as.logical(from@x)))
+setAs("sparseVector", "isparseVector",
       function(from)
-      new("lsparseVector", x= as.logical(from@x), i= from@i, length= from@length))
-setAs("xsparseVector", "zsparseVector",
+          new("isparseVector", length = from@length, i = from@i,
+              x = as.integer(from@x)))
+setAs("sparseVector", "dsparseVector",
       function(from)
-      new("zsparseVector", x= as.complex(from@x), i= from@i, length= from@length))
-
-setAs("xsparseVector", "nsparseVector",
-      function(from) {
-	  if(anyNA(from@x))
-              stop("cannot coerce 'NA's to \"nsparseVector\"")
-          new("nsparseVector", i = from@i, length = from@length)
-      })
+          new("dsparseVector", length = from@length, i = from@i,
+              x = as.double(from@x)))
+setAs("sparseVector", "zsparseVector",
+      function(from)
+          new("zsparseVector", length = from@length, i = from@i,
+              x = as.complex(from@x)))
 
 setMethod("is.na", signature(x = "nsparseVector"),
-	  function(x) new("nsparseVector", length = x@length))## all FALSE
+	  function(x)
+              new("nsparseVector", length = x@length))
 setMethod("is.na", signature(x = "sparseVector"),
-	  ## x is *not* "nsparse*" as that has own method
-	  function(x) new("nsparseVector", i = x@i[is.na(x@x)], length= x@length))
+	  function(x)
+              new("nsparseVector", length = x@length, i = x@i[is.na(x@x)]))
 
-
-if(getRversion() >= "3.1.0") {
-setMethod("anyNA", signature(x = "nsparseVector"), function(x) FALSE)
-setMethod("anyNA", signature(x = "sparseVector"), function(x) anyNA(x@x))
-}
+setMethod("anyNA", signature(x = "nsparseVector"),
+          function(x) FALSE)
+setMethod("anyNA", signature(x = "sparseVector"),
+          function(x) anyNA(x@x))
 
 setMethod("is.infinite", signature(x = "nsparseVector"),
-	  function(x) new("nsparseVector", length = x@length))## all FALSE
+	  function(x)
+              new("nsparseVector", length = x@length))
 setMethod("is.infinite", signature(x = "sparseVector"),
-	  ## x is *not* "nsparse*" as that has own method
-	  function(x) new("nsparseVector", i = x@i[is.infinite(x@x)], length= x@length))
+	  function(x)
+              new("nsparseVector", length = x@length,
+                  i = x@i[is.infinite(x@x)]))
 
 setMethod("is.finite", signature(x = "nsparseVector"),
-	  function(x) rep.int(TRUE, x@length))## all TRUE
+	  function(x) rep.int(TRUE, x@length))
 setMethod("is.finite", signature(x = "sparseVector"),
 	  function(x)  {
-	      ## x is *not* "nsparse*" as that has own method
-	      r <- rep.int(TRUE, x@length) ## mostly TRUE
+	      r <- rep.int(TRUE, x@length)
 	      r[x@i[!is.finite(x@x)]] <- FALSE
 	      r
 	  })

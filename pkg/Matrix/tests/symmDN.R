@@ -128,15 +128,9 @@ for (dn in ldn) {
             ## for efficiency ... should they?
             next
         }
-        stopifnot(identical(DN(forceSymmetric(M)), sdn))
-
-        if (is(M, "diagonalMatrix")) {
-            ## Methods for 'diagonalMatrix' assume symmetric 'Dimnames'
-            ## for efficiency (or maybe by accident?) ... should they?
-            next
-        }
-        stopifnot(identical(DN(symmpart(M)), sdn),
-                  identical(DN(skewpart(M)), sdn))
+        stopifnot(identical(DN(forceSymmetric(M)), sdn),
+                  identical(DN(symmpart(M)),       sdn),
+                  identical(DN(skewpart(M)),       sdn))
         ## others?
     }
 }
