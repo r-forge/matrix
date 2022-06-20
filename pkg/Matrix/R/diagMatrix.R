@@ -104,30 +104,17 @@ setAs("Matrix", "diagonalMatrix",
           drop0)
 }
 
-..diag2tp <- function(from) {
-    n <- (d <- from@Dim)[1L]
-    x <- from@x
-    tx <- typeof(x)
-    y <- vector(tx, n + (n * (n - 1)) / 2)
-    if((diag <- from@diag) == "N")
-        y[indDiag(n, TRUE, packed = TRUE)] <- x
-    cl <- ".tpMatrix"
-    substr(cl, 1L, 1L) <- .kind.type[[tx]]
-    new(cl, Dim = d, Dimnames = from@Dimnames, diag = diag, x = y)
-}
-
-..diag2tr  <- function(from)           triu(.dense2g(from, "."))
-..diag2dtr <- function(from)           triu(.dense2g(from, "d"))
-..diag2ltr <- function(from)           triu(.dense2g(from, "l"))
-..diag2ntr <- function(from)           triu(.dense2g(from, "n"))
-
-..diag2dsy <- function(from) forceSymmetric(.dense2g(from, "d"))
-..diag2lsy <- function(from) forceSymmetric(.dense2g(from, "l"))
-..diag2nsy <- function(from) forceSymmetric(.dense2g(from, "n"))
-
-..diag2dge <- function(from)                .dense2g(from, "d")
-..diag2lge <- function(from)                .dense2g(from, "l")
-..diag2nge <- function(from)                .dense2g(from, "n")
+..diag2tp  <- function(from) .diag2dense(from, ".tp", "U")
+..diag2tr  <- function(from) .diag2dense(from, ".tr", "U")
+..diag2dtr <- function(from) .diag2dense(from, "dtr", "U")
+..diag2ltr <- function(from) .diag2dense(from, "ltr", "U")
+..diag2ntr <- function(from) .diag2dense(from, "ntr", "U")
+..diag2dsy <- function(from) .diag2dense(from, "dsy", "U")
+..diag2lsy <- function(from) .diag2dense(from, "lsy", "U")
+..diag2nsy <- function(from) .diag2dense(from, "nsy", "U")
+..diag2dge <- function(from) .diag2dense(from, "dge", NULL)
+..diag2lge <- function(from) .diag2dense(from, "lge", NULL)
+..diag2nge <- function(from) .diag2dense(from, "nge", NULL)
 
 setAs("diagonalMatrix",          "dMatrix", ..diag2dkind)
 setAs("diagonalMatrix",          "lMatrix", ..diag2lkind)
