@@ -217,10 +217,7 @@ invPerm.R <- function(p) { p[p] <- seq_along(p) ; p }
 invPerm <- function(p, zero.p = FALSE, zero.res = FALSE)
     .Call(inv_permutation, p, zero.p, zero.res)
 
-
-
 ##  sign( <permutation> ) == determinant( <pMatrix>)
-
 signPerm <- function(p)
 {
     ## Purpose: sign(<permutation>) via the cycles
@@ -250,46 +247,6 @@ signPerm <- function(p)
     ## the cycle factorization contains an odd number of even-length cycles:
     1L - (sum(clen %% 2 == 0) %% 2L)*2L
 }
-
-
-detSparseLU <- function(x, logarithm = TRUE, ...) {
-    ## Purpose: Compute determinant() from  lu.x = lu(x)
-    ## ----------------------------------------------------------------------
-    ## Author: Martin Maechler, Date: 15 Apr 2008
-
-    if(any(x@Dim == 0)) return(mkDet(numeric(0)))
-    ll <- lu(x, errSing = FALSE)
-    ##          ^^^^^^^^^^^^^^^ no error in case of singularity
-    if(identical(NA, ll)) { ## LU-decomposition failed with singularity
-	return(mkDet(ldet = if(anyNA(x)) NaN else -Inf,
-		     logarithm=logarithm, sig = 1L))
-    }
-    ## else
-    stopifnot(all(c("L","U") %in% slotNames(ll))) # ensure we have *sparse* LU
-    r <- mkDet(diag(ll@U), logarithm)
-    ## Det(x) == Det(P L U Q) == Det(P) * 1 * Det(U) * Det(Q); where Det(P), Det(Q) in {-1,1}
-    r$sign <- r$sign * signPerm(ll@p + 1L) * signPerm(ll@q + 1L)
-    r
-}
-
-
-## Log(Determinant) from diagonal ... used several times
-
-mkDet <- function(d, logarithm = TRUE,
-                  ldet = sum(log(abs(d))),
-                  sig = -1L+2L*as.integer(prod(sign(d)) >= 0)) {
-    ##            ^^^ -1 or 1, _not_ 0 !
-    modulus <- if (logarithm) ldet else exp(ldet)
-    attr(modulus, "logarithm") <- logarithm
-    val <- list(modulus = modulus, sign = sig)
-    class(val) <- "det"
-    val
-}
-
-## for setMethod("determinant")
-mkDet.via.chol <- function(x, logarithm, ...)
-    mkDet(ldet = 2 * sum(log(abs(diag(chol(x))))),
-          logarithm = logarithm, sig = 1L)
 
 ##' utility, basically == norm(x, type = "2")
 norm2 <- function(x) if(anyNA(x)) NaN else svd(x, nu = 0L, nv = 0L)$d[1L]

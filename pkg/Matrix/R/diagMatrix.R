@@ -752,9 +752,6 @@ setMethod("chol", signature(x = "ddiMatrix"), cholDiag)
 ## chol(L) is L for logical diagonal:
 setMethod("chol", signature(x = "ldiMatrix"), function(x, pivot, ...) x)
 
-setMethod("determinant", signature(x = "diagonalMatrix", logarithm = "logical"),
-	  function(x, logarithm, ...) mkDet(.diag.x(x), logarithm))
-
 setMethod("norm", signature(x = "diagonalMatrix", type = "character"),
 	  function(x, type, ...) {
 	      if((n <- x@Dim[1]) == 0) return(0) # as for "sparseMatrix"

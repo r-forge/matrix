@@ -140,20 +140,12 @@ setMethod("is.infinite", signature(x = "ddenseMatrix"),
 
 ## MJ: now inherited from ANY
 if(FALSE) {
-setMethod("determinant", signature(x = "ddenseMatrix", logarithm = "missing"),
-	  function(x, logarithm, ...) determinant(.dense2g(x, "."), TRUE, ...))
-
 setMethod("norm", signature(x = "ddenseMatrix", type = "missing"),
 	  function(x, type, ...) norm(..2dge(x), "O", ...))
 
 setMethod("rcond", signature(x = "ddenseMatrix", norm = "missing"),
 	  function(x, norm, ...) rcond(..2dge(x), "O", ...))
 } ## MJ
-
-## TODO: currently inherited by ds[yp]Matrix, which should get own methods
-setMethod("determinant", signature(x = "ddenseMatrix", logarithm = "logical"),
-	  function(x, logarithm, ...)
-              determinant(.dense2g(x, "."), logarithm, ...))
 
 setMethod("chol", signature(x = "ddenseMatrix"), cholMat)
 

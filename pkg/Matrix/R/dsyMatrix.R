@@ -85,25 +85,11 @@ setMethod("rcond", signature(x = "dsyMatrix", norm = "missing"),
           function(x, norm, ...) .Call(dsyMatrix_rcond, x, "O"))
 } ## MJ
 
-## Now that we have "chol", we can define  "determinant" methods,
-## exactly like in ./dsCMatrix.R  [[ also in ./dpoMatrix.R ]]
-## DB - Probably figure out how to use the BunchKaufman decomposition instead
-## {{FIXME: Shouldn't it be possible to have "determinant" work by
-## default automatically for "Matrix"es  when there's a "chol" method available?
-## ..> work with ss <- selectMethod("chol", signature("dgCMatrix"))
-## -- not have to define showMethod("determinant", ...) for all classes
-
 setMethod("BunchKaufman", signature(x = "dsyMatrix"),
 	  function(x, ...) .Call(dsyMatrix_trf, x))
 
 setMethod("BunchKaufman", signature(x = "matrix"),
 	  function(x, uplo = NULL, ...) .Call(matrix_trf, x, uplo))
-
-## TODO: currently inherited from ddenseMatrix which goes via dgeMatrix
-if(FALSE) {
-setMethod("determinant", signature(x = "dsyMatrix", logarithm = "logical"),
-          function(x, logarithm, ...) .)
-}
 
 setMethod("norm", signature(x = "dsyMatrix", type = "character"),
           function(x, type, ...)

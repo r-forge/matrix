@@ -95,19 +95,6 @@ setMethod("chol2inv", signature(x = "CHMfactor"),
 	      solve(x, system = "A")
 	  })
 
-## MJ: now inherited from ANY
-if(FALSE) {
-setMethod("determinant", signature(x = "CHMfactor", logarithm = "missing"),
-          function(x, logarithm, ...) determinant(x, TRUE))
-} ## MJ
-
-setMethod("determinant", signature(x = "CHMfactor", logarithm = "logical"),
-          function(x, logarithm, ...)
-      {
-	  ldet <- .Call(CHMfactor_ldetL2, x) / 2
-	  mkDet(logarithm=logarithm, ldet=ldet, sig = 1L)
-      })
-
 setMethod("update", signature(object = "CHMfactor"),
 	  function(object, parent, mult = 0, ...)
       {

@@ -57,14 +57,6 @@ setMethod("symmpart", signature(x = "dsparseMatrix"),
 setMethod("skewpart", signature(x = "dsparseMatrix"),
           function(x) symmetrizeDimnames(x - t(x)) / 2)
 
-## MJ: no longer needed ... now inherited from sparseMatrix
-if(FALSE) {
-setMethod("determinant", signature(x = "dsparseMatrix", logarithm = "logical"),
-          function(x, logarithm = TRUE, ...)
-          determinant(as(x, "CsparseMatrix"), logarithm, ...))
-##-> now dgC or dsC or dtC .. which *have* their methods
-}
-
 ## MJ: no longer needed ... now inherited from Matrix
 if(FALSE) {
 setMethod("image", "dsparseMatrix",

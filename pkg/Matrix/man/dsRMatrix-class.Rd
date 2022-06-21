@@ -14,6 +14,7 @@
 \alias{coerce,dsRMatrix,lsRMatrix-method}
 \alias{coerce,dsRMatrix,nsRMatrix-method}
 \alias{coerce,matrix,dsRMatrix-method}
+\alias{determinant,dsRMatrix,logical-method}
 %
 \description{The \code{dsRMatrix} class is a class of symmetric, sparse
   matrices in the compressed, row-oriented format.  In this

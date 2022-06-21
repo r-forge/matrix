@@ -13,7 +13,6 @@
 \alias{coerce,dtpMatrix,ltpMatrix-method}
 \alias{coerce,dtpMatrix,ntpMatrix-method}
 \alias{coerce,matrix,dtpMatrix-method}
-\alias{determinant,dtpMatrix,logical-method}
 %
 \description{The \code{"dtpMatrix"} class is the class of triangular,
   dense, numeric matrices in packed storage.  The \code{"dtrMatrix"}

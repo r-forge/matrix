@@ -70,17 +70,8 @@ setMethod("solve", signature(a = "Matrix", b = "pMatrix"),
 	  ## Or alternatively  solve(a, as(b, "CsparseMatrix"))
 	  solve(a)[, invPerm(b@perm)])
 
-
-setMethod("determinant", signature(x = "pMatrix", logarithm = "logical"),
-	  function(x, logarithm, ...) {
-	      if(any(x@Dim == 0)) mkDet(numeric(0))
-	      else mkDet(logarithm=logarithm, ldet = 0, sig = signPerm(x@perm))
-	  })
-
-
 ## t(pM) is == the inverse  pM^(-1):
 setMethod("t", signature(x = "pMatrix"), function(x) solve(x))
-
 
 setMethod("%*%", signature(x = "matrix", y = "pMatrix"),
 	  function(x, y) { mmultCheck(x,y); x[, invPerm(y@perm)] })

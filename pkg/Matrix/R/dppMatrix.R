@@ -75,18 +75,12 @@ setMethod("t", signature(x = "dppMatrix"),
 
 ## MJ: now inherited from ANY
 if(FALSE) {
-setMethod("determinant", signature(x = "dppMatrix", logarithm = "missing"),
-	  function(x, logarithm, ...) mkDet.via.chol(x, logarithm = TRUE, ...))
-
 setMethod("rcond", signature(x = "dppMatrix", norm = "missing"),
           function(x, norm, ...) .Call(dppMatrix_rcond, x, "O"))
 } ## MJ
 
 setMethod("chol", signature(x = "dppMatrix"),
 	  function(x, ...) .Call(dppMatrix_chol, x))
-
-setMethod("determinant", signature(x = "dppMatrix", logarithm = "logical"),
-          mkDet.via.chol)
 
 setMethod("rcond", signature(x = "dppMatrix", norm = "character"),
 	  function(x, norm, ...) .Call(dppMatrix_rcond, x, norm))

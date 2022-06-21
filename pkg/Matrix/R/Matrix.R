@@ -377,8 +377,6 @@ setMethod("rcond", signature(x = "Matrix", norm = "character"),
 
 
 ## for all :
-setMethod("determinant", signature(x = "ANY", logarithm = "missing"),
-          function(x, logarithm, ...) determinant(x, logarithm = TRUE, ...))
 setMethod("norm", signature(x = "ANY", type = "missing"),
 	  function(x, type, ...) norm(x, type = "O", ...))
 setMethod("rcond", signature(x = "ANY", norm = "missing"),

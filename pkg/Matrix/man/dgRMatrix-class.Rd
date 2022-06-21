@@ -13,6 +13,7 @@
 \alias{coerce,dgRMatrix,ngRMatrix-method}
 \alias{coerce,matrix,dgRMatrix-method}
 \alias{coerce,numLike,dgRMatrix-method}
+\alias{determinant,dgRMatrix,logical-method}
 %
 \description{The \code{dgRMatrix} class is a class of sparse numeric
   matrices in the compressed, sparse, row-oriented format.  In this

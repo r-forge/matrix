@@ -16,6 +16,7 @@
 \alias{coerce,dspMatrix,lspMatrix-method}
 \alias{coerce,dspMatrix,nspMatrix-method}
 \alias{coerce,matrix,dspMatrix-method}
+\alias{determinant,dspMatrix,logical-method}
 %
 \alias{coerce,dsyMatrix,corMatrix-method}
 \alias{coerce,dsyMatrix,dgeMatrix-method}
@@ -29,6 +30,7 @@
 \alias{coerce,dsyMatrix,lsyMatrix-method}
 \alias{coerce,dsyMatrix,nsyMatrix-method}
 \alias{coerce,matrix,dsyMatrix-method}
+\alias{determinant,dsyMatrix,logical-method}
 %
 \description{
   \itemize{

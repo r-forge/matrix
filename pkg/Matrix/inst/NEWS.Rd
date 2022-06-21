@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-06-20 r3502)}{
+\section{Changes in version 1.4-2 (2022-06-21 r3503)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual classes
@@ -262,7 +262,11 @@
       coercions to many virtual classes, notably \code{denseMatrix}
       and a coercion to \code{pMatrix}.
 
-      \item{solve(<ddenseMatrix>, <numLike>)} now works more 
+      \item \code{solve(<ddenseMatrix>, <numLike>)} now works in all
+      cases.
+
+      \item \code{determinant(<ds[yp]Matrix>)} is now much faster
+      in the positive definite case, no longer going via \code{dgeMatrix}.
     }
   }
   \subsection{Misc}{

@@ -8,6 +8,7 @@
 \alias{Compare,triangularMatrix,diagonalMatrix-method}
 \alias{Logic,triangularMatrix,diagonalMatrix-method}
 \alias{coerce,matrix,triangularMatrix-method}
+\alias{determinant,triangularMatrix,logical-method}
 %
 \description{
   The virtual class of triangular matrices,\code{"triangularMatrix"},
