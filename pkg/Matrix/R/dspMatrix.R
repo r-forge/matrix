@@ -46,12 +46,6 @@ setMethod("rcond", signature(x = "dspMatrix", norm = "missing"),
 setMethod("BunchKaufman", signature(x = "dspMatrix"),
 	  function(x, ...) .Call(dspMatrix_trf, x))
 
-## TODO: currently inherited from ddenseMatrix which goes via dgeMatrix
-if(FALSE) {
-setMethod("determinant", signature(x = "dspMatrix", logarithm = "logical"),
-          function(x, logarithm, ...) .)
-}
-
 setMethod("norm", signature(x = "dspMatrix", type = "character"),
 	  function(x, type, ...)
               if(identical(type, "2"))

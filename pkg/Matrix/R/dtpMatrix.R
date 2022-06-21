@@ -50,18 +50,12 @@ setMethod("diag<-", signature(x = "dtpMatrix"),
 
 ## MJ: now inherited from ANY
 if(FALSE) {
-setMethod("determinant", signature(x = "dtpMatrix", logarithm = "missing"),
-	  function(x, logarithm, ...) mkDet(diag(x), TRUE))
-
 setMethod("norm", signature(x = "dtpMatrix", type = "missing"),
 	  function(x, type, ...) .Call(dtpMatrix_norm, x, "O"))
 
 setMethod("rcond", signature(x = "dtpMatrix", norm = "missing"),
 	  function(x, norm, ...) .Call(dtpMatrix_rcond, x, "O"))
 } ## MJ
-
-setMethod("determinant", signature(x = "dtpMatrix", logarithm = "logical"),
-	  function(x, logarithm, ...) mkDet(diag(x), logarithm))
 
 setMethod("norm", signature(x = "dtpMatrix", type = "character"),
 	  function(x, type, ...)

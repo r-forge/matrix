@@ -58,18 +58,12 @@ setAs("dpoMatrix", "nMatrix",
 
 ## MJ: now inherited from ANY
 if(FALSE) {
-setMethod("determinant", signature(x = "dpoMatrix", logarithm = "missing"),
-	  function(x, logarithm, ...) mkDet.via.chol(x, logarithm = TRUE, ...))
-
 setMethod("rcond", signature(x = "dpoMatrix", norm = "missing"),
           function(x, norm, ...) .Call(dpoMatrix_rcond, x, "O"))
 } ## MJ
 
 setMethod("chol", signature(x = "dpoMatrix"),
 	  function(x, ...) .Call(dpoMatrix_chol, x))
-
-setMethod("determinant", signature(x = "dpoMatrix", logarithm = "logical"),
-          mkDet.via.chol)
 
 setMethod("rcond", signature(x = "dpoMatrix", norm = "character"),
           function(x, norm, ...) .Call(dpoMatrix_rcond, x, norm))

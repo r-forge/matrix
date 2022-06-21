@@ -31,6 +31,7 @@
 \alias{coerce,dsTMatrix,lsTMatrix-method}
 \alias{coerce,dsTMatrix,nsTMatrix-method}
 \alias{coerce,matrix,dsTMatrix-method}
+\alias{determinant,dsTMatrix,logical-method}
 %
 \description{The \code{dsCMatrix} class is a class of symmetric, sparse
   numeric matrices in the compressed, \bold{c}olumn-oriented format.  In

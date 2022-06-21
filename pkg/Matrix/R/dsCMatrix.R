@@ -192,52 +192,12 @@ setMethod("t", signature(x = "dsCMatrix"),
     ##    ^^^^^^^^^^^^^^^^ from ../src/dsCMatrix.c
 }
 
-
 ## FIXME:  kind = "diagBack" is not yet implemented
 ##	would be much more efficient, but there's no CHOLMOD UI (?)
 ##
 ## Note: for det(), permutation is unimportant;
 ##       for diag(), apply *inverse* permutation
 ##    	q <- p ; q[q] <- seq_along(q); q
-
-
-
-ldet1.dsC <- function(x, ...) .Call(CHMfactor_ldetL2, Cholesky(x, ...))
-## these are slightly faster (ca. 3 to 4 %):
-ldet2.dsC <- function(x, ...) {
-    Ch <- Cholesky(x, super = FALSE, ...)
-    .Call(diag_tC, Ch, "sumLog")
-}
-## only very slightly ( ~ < 1% ) faster (than "ldet2"):
-ldet3.dsC <- function(x, perm = TRUE)
-    .Call(dsCMatrix_LDL_D, x, perm=perm, "sumLog")
-
-## MJ: now inherited from ANY
-if(FALSE) {
-setMethod("determinant", signature(x = "dsCMatrix", logarithm = "missing"),
-          function(x, logarithm, ...) determinant(x, TRUE))
-} ## MJ
-
-setMethod("determinant", signature(x = "dsCMatrix", logarithm = "logical"),
-	  function(x, logarithm, ...)
-      {
-	  if(x@Dim[1] <= 1L)
-	      return(mkDet(diag(x), logarithm))
-	  Chx <- tryCatch(suppressWarnings(Cholesky(x, LDL=TRUE)),
-                          error = function(e) NULL)
-	  ## or
-	  ## ldet <- .Call("CHMfactor_ldetL2", Chx) # which would also work
-	  ##				     when Chx <- Cholesky(x, super=TRUE)
-          ## ldet <- tryCatch(.Call(dsCMatrix_LDL_D, x, perm=TRUE, "sumLog"),
-	  ## if(is.null(ldet))
-
-          if(is.null(Chx))  ## we do *not* have a positive definite matrix
-	      detSparseLU(x, logarithm)
-	  else {
-              d <- .Call(diag_tC, Chx, res.kind = "diag")
-	      mkDet(d, logarithm=logarithm)
-          }
-      })
 
 ## setMethod("writeHB", signature(obj = "dsCMatrix"),
 ##           function(obj, file, ...) {

@@ -17,7 +17,6 @@
 \alias{coerce,dtCMatrix,ltCMatrix-method}
 \alias{coerce,dtCMatrix,ntCMatrix-method}
 \alias{coerce,matrix,dtCMatrix-method}
-\alias{determinant,dtCMatrix,logical-method}
 %
 \alias{coerce,dtTMatrix,dgCMatrix-method}
 \alias{coerce,dtTMatrix,dgTMatrix-method}

@@ -71,17 +71,6 @@ setAs("dtCMatrix", "dtrMatrix",
       function(from) as(as(from, "dtTMatrix"), "dtrMatrix"))
 } ## MJ
 
-setMethod("determinant", signature(x = "dtCMatrix", logarithm = "logical"),
-	  function(x, logarithm = TRUE, ...) {
-	      if(x@diag == "N")
-		  mkDet(diag(x), logarithm)
-	      else
-		  structure(list(modulus = structure(if (logarithm) 0 else 1,
-				 "logarithm" = logarithm),
-				 sign = 1L),
-			    class = "det")
-	  })
-
 ## FIXME: dtCMatrix_sparse_solve() can return an invalid dtCMatrix:
 ##
 ## a <- new("dtCMatrix", Dim = c(5L, 5L), diag = "U",

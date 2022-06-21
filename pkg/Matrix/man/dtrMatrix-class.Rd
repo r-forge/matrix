@@ -14,7 +14,6 @@
 \alias{coerce,dtrMatrix,ltrMatrix-method}
 \alias{coerce,dtrMatrix,ntrMatrix-method}
 \alias{coerce,matrix,dtrMatrix-method}
-\alias{determinant,dtrMatrix,logical-method}
 %
 \description{
   The \code{"dtrMatrix"} class is the class of triangular, dense,

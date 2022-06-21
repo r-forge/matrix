@@ -43,9 +43,6 @@ setMethod("diag<-", signature(x = "dgeMatrix"),
 
 ## MJ: now inherited from ANY
 if(FALSE) {
-setMethod("determinant", signature(x = "dgeMatrix", logarithm = "missing"),
-	  function(x, logarithm, ...) .Call(dgeMatrix_determinant, x, TRUE))
-
 setMethod("norm", signature(x = "dgeMatrix", type = "missing"),
 	  function(x, type, ...) .Call(dgeMatrix_norm, x, "O"))
 
@@ -57,10 +54,6 @@ setMethod("chol", signature(x = "dgeMatrix"), cholMat)
 
 setMethod("lu", signature(x = "dgeMatrix"),
 	  function(x, warnSing = TRUE, ...) .Call(dgeMatrix_LU, x, warnSing))
-
-setMethod("determinant", signature(x = "dgeMatrix", logarithm = "logical"),
-	  function(x, logarithm, ...)
-              .Call(dgeMatrix_determinant, x, logarithm))
 
 setMethod("norm", signature(x = "dgeMatrix", type = "character"),
 	  function(x, type, ...)

@@ -51,9 +51,6 @@ setMethod("t", signature(x = "dgCMatrix"),
 	  valueClass = "dgCMatrix")
 } ## MJ
 
-setMethod("determinant", signature(x = "dgCMatrix", logarithm = "logical"),
-          detSparseLU) # using mkDet() --> ./Auxiliaries.R
-
 setMethod("qr", signature(x = "dgCMatrix"),
 	  function(x, tol = 1e-07, LAPACK = FALSE, keep.dimnames = TRUE,
                    verbose = !is.null(v <- getOption("Matrix.verbose")) && v >= 1)

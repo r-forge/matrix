@@ -16,6 +16,7 @@
 \alias{coerce,dgTMatrix,ngTMatrix-method}
 \alias{coerce,matrix,dgTMatrix-method}
 \alias{coerce,numLike,dgTMatrix-method}
+\alias{determinant,dgTMatrix,logical-method}
 %
 \description{The \code{"dgTMatrix"} class is the class of sparse
   matrices stored as (possibly redundant) triplets.  The internal

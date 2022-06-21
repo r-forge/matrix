@@ -5,6 +5,7 @@
 \alias{MatrixFactorization-class}
 \alias{CholeskyFactorization-class}
 %
+\alias{determinant,MatrixFactorization,missing-method}
 \alias{dim,MatrixFactorization-method}
 \alias{show,MatrixFactorization-method}
 %
