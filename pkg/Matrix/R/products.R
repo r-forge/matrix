@@ -694,7 +694,7 @@ setMethod("tcrossprod", signature(x = "numLike", y = "missing"),
 
 setMethod("tcrossprod", signature(x = "ddenseMatrix", y = "missing"),
 	  function(x, y=NULL, boolArith=NA, ...)
-	      tcrossprod(as(x, "dgeMatrix"), boolArith=boolArith, ...))
+	      tcrossprod(.dense2g(x, "."), boolArith=boolArith, ...))
 
 
 setMethod("tcrossprod", signature(x = "dtrMatrix", y = "dtrMatrix"),
