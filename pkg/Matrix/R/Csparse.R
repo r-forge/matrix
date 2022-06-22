@@ -506,7 +506,6 @@ setMethod("band", "CsparseMatrix",
                   as(r, paste0(.M.kind(x), "tCMatrix"))
 	      else r
           })
-} ## MJ
 
 setMethod("diag", "CsparseMatrix",
 	  function(x, nrow, ncol, names=TRUE) {
@@ -536,6 +535,7 @@ setMethod("diag", "CsparseMatrix",
 	      }
 	      val
 	  })
+} ## MJ
 
 setMethod("writeMM", "CsparseMatrix",
 	  function(obj, file, ...)

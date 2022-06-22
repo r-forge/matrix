@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-06-21 r3503)}{
+\section{Changes in version 1.4-2 (2022-06-22 r3504)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual classes
@@ -267,6 +267,9 @@
 
       \item \code{determinant(<ds[yp]Matrix>)} is now much faster
       in the positive definite case, no longer going via \code{dgeMatrix}.
+
+      \item \code{diag(<[CRT]sparseMatrix>)} is now done in C
+      and is highly optimized in the \code{.[ts][CR]Matrix} case.
     }
   }
   \subsection{Misc}{
