@@ -293,7 +293,7 @@ SEXP sparse_as_dense(SEXP from, int packed)
 
 	int j;
 	
-#define SET1(_CTYPE_, _PTR_, _ONE_)			\
+#define SET1(_CTYPE_, _PTR_, _ZERO_, _ONE_)		\
 	do {						\
 	    _CTYPE_ *px1 = _PTR_(x1);			\
 	    if (!packed) {				\
@@ -401,7 +401,7 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
 	int ix, nx = (clf[2] == 'T') ? LENGTH(i) : INTEGER(p)[XLENGTH(p) - 1];
 	SEXP x = PROTECT(allocVector(tx, nx));
 
-#define SET1(_CTYPE_, _PTR_, _ONE_)			\
+#define SET1(_CTYPE_, _PTR_, _ZERO_, _ONE_)		\
 	do {						\
 	    _CTYPE_ *px = _PTR_(x);			\
 	    for (ix = 0; ix < nx; ++ix)			\
@@ -511,7 +511,7 @@ SEXP R_sparse_as_general(SEXP from)
 		}						\
 	    } while (0)
 	    
-#define SAG_T_X(_CTYPE_, _PTR_, _ONE_)				\
+#define SAG_T_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
 	    do {						\
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 		Memcpy(px1, px0, nnz0);				\
@@ -537,7 +537,7 @@ SEXP R_sparse_as_general(SEXP from)
 		}						\
 	    } while (0)
 
-#define SAG_T_X(_CTYPE_, _PTR_, _ONE_)				\
+#define SAG_T_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
 	    do {						\
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 		Memcpy(px1, px0, nnz0);				\
@@ -622,7 +622,7 @@ SEXP R_sparse_as_general(SEXP from)
 		}							\
 	    } while (0)
 	    
-#define SAG_CR_X(_CTYPE_, _PTR_, _ONE_)				\
+#define SAG_CR_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
 	    do {						\
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 		SAG_CR(px1[pp1_[j]] = px0[k],			\
@@ -668,7 +668,7 @@ SEXP R_sparse_as_general(SEXP from)
 		}							\
 	    } while (0)
 
-#define SAG_CR_X(_CTYPE_, _PTR_, _ONE_)				\
+#define SAG_CR_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
 	    do {						\
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 		SAG_CR(*(px1++) = *(px0++), *(px1++) = _ONE_);	\
@@ -784,7 +784,7 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 		PROTECT(x = allocVector(tx, n));
 		++nprotect;
 
-#define SET1(_CTYPE_, _PTR_, _ONE_)				\
+#define SET1(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
 		do {						\
 		    _CTYPE_ *px = _PTR_(x);			\
 		    for (k = 0; k < n; ++k) {			\
@@ -1371,7 +1371,7 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
 	}								\
     } while (0)
 
-#define SPARSE_BAND_X(_CTYPE_, _PTR_, _ONE_)		\
+#define SPARSE_BAND_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)	\
     do {						\
 	_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 	SPARSE_BAND(*(px1++) = px0[k],			\
@@ -1397,6 +1397,202 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
 	to = tCRsparse_as_RCsparse(to);
     UNPROTECT(nprotect);
     return to;
+}
+
+/* diag(<[CRT]sparseMatrix>, names) */
+SEXP R_sparse_diag_get(SEXP obj, SEXP nms)
+{
+    int do_nms = asLogical(nms);
+    if (do_nms == NA_LOGICAL)
+	error(_("'names' must be TRUE or FALSE"));
+
+    static const char *valid[] = {
+	VALID_DSPARSE, VALID_LSPARSE, VALID_NSPARSE, "" };
+    int ivalid = R_check_class_etc(obj, valid);
+    if (ivalid < 0)
+	ERROR_INVALID_CLASS(class_P(obj), "R_sparse_diag_get");
+    const char *cl = valid[ivalid];
+
+    char kind = cl[0];
+    SEXPTYPE type = kind2type(kind);
+    int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym)),
+	m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
+    SEXP res = PROTECT(allocVector(type, r));
+
+    if (cl[1] == 't' && *diag_P(obj) != 'N') {
+
+	/* .t[CRT]Matrix with unit diagonal */
+
+	int i;
+	
+#define DO_ONES(_CTYPE_, _PTR_, _ZERO_, _ONE_)	\
+	do {					\
+	    _CTYPE_ *pres = _PTR_(res);		\
+	    for (i = 0; i < r; ++i)		\
+		*(pres++) = _ONE_;		\
+	} while (0)
+
+	SPARSE_CASES(type, DO_ONES);
+
+#undef DO_ONES
+	
+    } else if (cl[2] == 'T') {
+
+	/* ..TMatrix with non-unit diagonal */
+	
+	SEXP x = (kind != 'n') ? GET_SLOT(obj, Matrix_xSym) : R_NilValue,
+	    i = GET_SLOT(obj, Matrix_iSym),
+	    j = GET_SLOT(obj, Matrix_jSym);
+	int *pi = INTEGER(i), *pj = INTEGER(j);
+	R_xlen_t k, nnz = XLENGTH(i);
+
+	switch (kind) {
+	case 'd':
+	{
+	    double *px = REAL(x), *pres = REAL(res);
+	    Memzero(pres, r);
+	    for (k = 0; k < nnz; ++k, ++pi, ++pj, ++px)
+		if (*pi == *pj)
+		    pres[*pi] += *px;
+	    break;
+	}
+	case 'l':
+	{
+	    int *px = LOGICAL(x), *pres = LOGICAL(res);
+	    Memzero(pres, r);
+	    for (k = 0; k < nnz; ++k, ++pi, ++pj, ++px) {
+		if (*pi == *pj && *px != 0) {
+		    if (*px == NA_LOGICAL) {
+			if (pres[*pi] == 0)
+			    pres[*pi] = NA_LOGICAL;
+		    } else {
+			pres[*pi] = 1;
+		    }
+		}
+	    }
+	    break;
+	}
+	case 'n':
+	{
+	    int *pres = LOGICAL(res);
+	    Memzero(pres, r);
+	    for (k = 0; k < nnz; ++k, ++pi, ++pj)
+		if (*pi == *pj)
+		    pres[*pi] = 1;
+	    break;
+	}
+	case 'i':
+	{
+	    /* FIXME: not detecting integer overflow here */
+	    int *px = INTEGER(x), *pres = INTEGER(res);
+	    Memzero(pres, r);
+	    for (k = 0; k < nnz; ++k, ++pi, ++pj, ++px)
+		if (*pi == *pj)
+		    pres[*pi] += *px;
+	    break;
+	}
+	case 'z':
+	{
+	    Rcomplex *px = COMPLEX(x), *pres = COMPLEX(res);
+	    Memzero(pres, r);
+	    for (k = 0; k < nnz; ++k, ++pi, ++pj, ++px) {
+		if (*pi == *pj) {
+		    pres[*pi].r += (*px).r;
+		    pres[*pi].i += (*px).i;
+		}
+	    }
+	    break;
+	}
+	default:
+	    break;
+	}
+	
+    } else {
+
+	/* ..[CR]Matrix with non-unit diagonal */
+	
+	SEXP x = (kind != 'n') ? GET_SLOT(obj, Matrix_xSym) : R_NilValue,
+	    iSym = (cl[2] == 'C') ? Matrix_iSym : Matrix_jSym;
+	int j, k, kend,
+	    *pp = INTEGER(GET_SLOT(obj, Matrix_pSym)) + 1,
+	    *pi = INTEGER(GET_SLOT(obj, iSym));
+	char ul = (cl[1] != 'g') ? *uplo_P(obj) : '\0';
+	
+#define DO_DIAG(_RES_, _VAL_GENERAL_, _VAL_TRAILING_, _VAL_LEADING_, _ZERO_) \
+	do {								\
+	    if (ul == '\0') {						\
+		/* .g[CR]Matrix */					\
+	    	for (j = 0, k = 0; j < r; ++j) {			\
+		    _RES_[j] = _ZERO_;					\
+		    kend = pp[j];					\
+		    while (k < kend) {					\
+			if (pi[k] == j) {				\
+			    _RES_[j] = _VAL_GENERAL_ /* px[k] */;	\
+			    k = kend;					\
+			    break;					\
+			}						\
+			++k;						\
+		    }							\
+		}							\
+	    } else if (ul == ((cl[2] == 'C') ? 'U' : 'L')) {		\
+		/* .[ts][CR]Matrix with "trailing" diagonal */		\
+	    	for (j = 0, k = 0; j < r; ++j) {			\
+		    kend = pp[j];					\
+		    _RES_[j] = (kend - k > 0 && pi[kend-1] == j		\
+				? _VAL_TRAILING_ /* px[kend-1] */	\
+				: _ZERO_);				\
+		    k = kend;						\
+		}							\
+	    } else {							\
+		/* .[ts][CR]Matrix with "leading" diagonal */		\
+		for (j = 0, k = 0; j < r; ++j) {			\
+		    kend = pp[j];					\
+		    _RES_[j] = (kend - k > 0 && pi[k] == j		\
+				? _VAL_LEADING_	/* px[k] */		\
+				: _ZERO_);				\
+		    k = kend;						\
+		}							\
+	    }								\
+	} while (0)
+	
+#define DO_DIAG_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)		\
+	do {							\
+	    _CTYPE_ *px = _PTR_(x), *pres = _PTR_(res);		\
+	    DO_DIAG(pres, px[k], px[kend-1], px[k], _ZERO_);	\
+	} while (0)
+	    
+	if (kind == 'n') {
+	    int *pres = LOGICAL(res);
+	    DO_DIAG(pres, 1, 1, 1, 0);
+	} else {
+	    SPARSE_CASES(type, DO_DIAG_X);
+	}
+
+#undef DO_DIAG_X
+#undef DO_DIAG
+	
+    }
+
+    if (do_nms) {
+	/* NB: The logic here must be adjusted once the validity method 
+	       for 'symmetricMatrix' enforces symmetric 'Dimnames' */
+	SEXP dn = GET_SLOT(obj, Matrix_DimNamesSym),
+	    rn = VECTOR_ELT(dn, 0),
+	    cn = VECTOR_ELT(dn, 1);
+	if (isNull(cn)) {
+	    if (cl[1] == 's' && !isNull(rn))
+		setAttrib(res, R_NamesSymbol, rn);
+	} else {
+	    if (cl[1] == 's')
+		setAttrib(res, R_NamesSymbol, cn);
+	    else if (!isNull(rn) &&
+		     (rn == cn || equal_string_vectors(rn, cn, r)))
+		setAttrib(res, R_NamesSymbol, (r == m) ? rn : cn);
+	}
+    }
+
+    UNPROTECT(1);
+    return res;
 }
 
 /* t(<[CRT]sparseMatrix>) */
@@ -1503,7 +1699,7 @@ SEXP R_sparse_transpose(SEXP from)
 	}						\
     } while (0)
 
-#define SPARSE_T_X(_CTYPE_, _PTR_, _ONE_)		\
+#define SPARSE_T_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)	\
     do {						\
 	_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 	SPARSE_T(px1[pp1_[i]] = px0[k]);		\
@@ -1654,7 +1850,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 		}					\
 	    } while (0)
 
-#define SPARSE_FS_X(_CTYPE_, _PTR_, _ONE_)				\
+#define SPARSE_FS_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
 	    do {							\
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);		\
 		if (ulf == ult) {					\
@@ -1695,7 +1891,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 		}						\
 	    } while (0)
 
-#define SPARSE_FS_X_BASIC(_CTYPE_, _PTR_, _ONE_)		\
+#define SPARSE_FS_X_BASIC(_CTYPE_, _PTR_, _ZERO_, _ONE_)	\
 	    do {						\
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 		SPARSE_FS(*(px1++) = px0[k]);			\
@@ -1759,7 +1955,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 		    pp1[j] = nnz1;
 		}
 	    }
-	} else if (ult == 'U') {
+	} else if (ult == ((clf[2] == 'C') ? 'U' : 'L')) {
 	    /* Have general matrix and returning upper triangle */
 	    for (j = 0, k = 0; j < n; ++j) {
 		kend = pp0[j];
@@ -1810,7 +2006,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 			}					\
 		    } while (0)
 
-#define SPARSE_FS_X(_CTYPE_, _PTR_, _ONE_)		\
+#define SPARSE_FS_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)	\
 		    do {				\
 			_CTYPE_ *px1 = _PTR_(x1);	\
 			SPARSE_FS(*(px1++) = _ONE_);	\
@@ -1842,7 +2038,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 			}						\
 		    } while (0)
 		    
-#define SPARSE_FS_X(_CTYPE_, _PTR_, _ONE_)				\
+#define SPARSE_FS_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
 		    do {						\
 			_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 			SPARSE_FS(*(px1++) = px0[k], *(px1++) = _ONE_);	\
@@ -1896,7 +2092,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 		    }							\
 		} while (0)
 		
-#define SPARSE_FS_X(_CTYPE_, _PTR_, _ONE_)				\
+#define SPARSE_FS_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
 		do {							\
 		    _CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);		\
 		    SPARSE_FS(*(px1++) = px0[pp0[j]-1]);		\
@@ -1924,7 +2120,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 		    }							\
 		} while (0)
 		
-#define SPARSE_FS_X(_CTYPE_, _PTR_, _ONE_)				\
+#define SPARSE_FS_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
 		do {							\
 		    _CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);		\
 		    SPARSE_FS(*(px1++) = px0[pp0[j-1]]);		\
@@ -1939,7 +2135,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 #undef SPARSE_FS
 		
 	    }
-	} else if (ult == 'U') {
+	} else if (ult == ((clf[2] == 'C') ? 'U' : 'L')) {
 	    /* Have general matrix and returning upper triangle */
 
 #define SPARSE_FS(_XASSIGN_)					\

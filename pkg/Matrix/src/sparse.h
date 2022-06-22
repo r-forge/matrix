@@ -15,6 +15,7 @@ SEXP R_diagonal_as_dense(SEXP from, SEXP code, SEXP uplo);
 
 SEXP R_sparse_drop0(SEXP from);
 SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2);
+SEXP R_sparse_diag_get(SEXP obj, SEXP nms);
 SEXP R_sparse_transpose(SEXP from);
 SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to);
 
@@ -77,18 +78,20 @@ SEXP Rsparse_is_symmetric(SEXP obj, SEXP checkDN);
     do {						\
 	switch (_SEXPTYPE_) {				\
 	case REALSXP:					\
-	    _DO_(double, REAL, 1.0);			\
+	    _DO_(double, REAL, 0.0, 1.0);		\
 	    break;					\
 	case LGLSXP:					\
-	    _DO_(int, LOGICAL, 1);			\
+	    _DO_(int, LOGICAL, 0, 1);			\
 	    break;					\
 	case INTSXP:					\
-	    _DO_(int, INTEGER, 1);			\
+	    _DO_(int, INTEGER, 0, 1);			\
 	    break;					\
 	case CPLXSXP:					\
 	{						\
-	    Rcomplex one; one.r = 1.0; one.i = 0.0;	\
-	    _DO_(Rcomplex, COMPLEX, one);		\
+	    Rcomplex zero, one;				\
+	    zero.r = 0.0; one.r = 1.0;			\
+	    zero.i = 0.0; one.i = 0.0;			\
+	    _DO_(Rcomplex, COMPLEX, zero, one);		\
 	    break;					\
 	}						\
 	default:					\

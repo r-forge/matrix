@@ -1015,18 +1015,18 @@ setMethod("isTriangular", signature(object = "sparseMatrix"),
               d <- object@Dim
               if(d[1L] == d[2L])
                   callGeneric(as(object, "TsparseMatrix"), upper = upper, ...)
-              else
-                  FALSE
+              else FALSE
           })
+
+setMethod("diag", signature(x = "sparseMatrix"),
+	  function(x, nrow, ncol, names)
+              diag(as(x, "CsparseMatrix"), names = names))
 } ## MJ
 
 setMethod("Cholesky", signature(A = "sparseMatrix"),
 	  function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
 	  Cholesky(as(A, "CsparseMatrix"),
 		   perm=perm, LDL=LDL, super=super, Imult=Imult, ...))
-
-setMethod("diag", signature(x = "sparseMatrix"),
-	  function(x, nrow, ncol, names=TRUE) diag(as(x, "CsparseMatrix"), names=names))
 
 setMethod("dim<-", signature(x = "sparseMatrix"),
 	  function(x, value) {
@@ -1317,6 +1317,7 @@ forceSymmetricTsparse <- function(x, uplo) {
 }
 } ## MJ
 
+.sparse.diag <- function(x,nrow,ncol,names) .Call(R_sparse_diag_get, x, names)
 .sparse.band <- function(x, k1, k2, ...) .Call(R_sparse_band, x, k1, k2)
 .sparse.triu <- function(x, k = 0,  ...) .Call(R_sparse_band, x, k, NULL)
 .sparse.tril <- function(x, k = 0,  ...) .Call(R_sparse_band, x, NULL, k)
@@ -1395,6 +1396,7 @@ forceSymmetricTsparse <- function(x, uplo) {
 .sparse.subclasses <- names(getClass("sparseMatrix")@subclasses)
 
 for (.cl in grep("^[CRT]sparseMatrix$", .sparse.subclasses, value = TRUE)) {
+    setMethod("diag", signature(x = .cl), .sparse.diag)
     setMethod("band", signature(x = .cl), .sparse.band)
     setMethod("triu", signature(x = .cl), .sparse.triu)
     setMethod("tril", signature(x = .cl), .sparse.tril)

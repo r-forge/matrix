@@ -16,6 +16,7 @@
 \alias{coerce,TsparseMatrix,vector-method}
 \alias{coerce,matrix,TsparseMatrix-method}
 \alias{coerce,numLike,TsparseMatrix-method}
+\alias{diag,TsparseMatrix-method}
 \alias{t,TsparseMatrix-method}
 %
 \description{The \code{"TsparseMatrix"} class is the virtual class of
