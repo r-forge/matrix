@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-06-30 r3507)}{
+\section{Changes in version 1.4-2 (2022-06-30 r3508)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual classes
@@ -166,6 +166,9 @@
       both \code{dMatrix} and \code{symmetricMatrix}, and
       \code{skewpart(<diagonalMatrix>)} now always has symmetric
       \code{Dimnames}.
+
+      \item \code{as(<ndenseMatrix>, "(vector|matrix|[dl]Matrix)")}
+      now correctly treat \code{NA} in the \code{x} slot as \code{TRUE}.
     }
   }
   \subsection{New Features}{
