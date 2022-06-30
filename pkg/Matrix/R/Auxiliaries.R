@@ -474,8 +474,8 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 .sparse2g <- function(from)
     .Call(R_sparse_as_general, from)
 
-.dense2m <- function(from)
-    .Call(R_dense_as_matrix, from)
+.dense2m <- function(from, ndense)
+    .Call(R_dense_as_matrix, from, ndense)
 
 .sparse2m <- function(from)
     .Call(R_sparse_as_matrix, from)
@@ -492,8 +492,8 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
     P
 }
 
-.dense2v <- function(from)
-    .Call(R_dense_as_vector, from)
+.dense2v <- function(from, ndense)
+    .Call(R_dense_as_vector, from, ndense)
 
 .sparse2v <- function(from)
     .Call(R_sparse_as_vector, from)
@@ -522,8 +522,7 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
     .Call(R_sparse_as_kind, from, kind, drop0)
 
 .diag2kind <- function(from, kind)
-    .Call(R_diagonal_as_sparse, from,
-          `substr<-`(".di", 1L, 1L, kind), NULL, NULL)
+    .Call(R_diagonal_as_kind, from, kind)
 
 .dense2sparse <- function(from, code, uplo, diag)
     .Call(R_dense_as_sparse, from, code, uplo, diag)
@@ -540,11 +539,11 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 .m2ge <- function(from, kind)
     .Call(R_matrix_as_geMatrix, from, kind)
 
-.ge2m <- function(from)
-    .Call(R_geMatrix_as_matrix, from)
+.ge2m <- function(from, ndense)
+    .Call(R_geMatrix_as_matrix, from, ndense)
 
-.ge2v <- function(from)
-    from@x
+.ge2v <- function(from, ndense)
+    .Call(R_geMatrix_as_vector, from, ndense)
 
 ## Keep synchronized with Matrix() in ./Matrix.R, where diagonal "matrix"
 ## (which are both symmetric and triangular) are coerced to "symmetricMatrix",

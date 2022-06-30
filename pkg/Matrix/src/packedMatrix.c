@@ -197,7 +197,8 @@ SEXP packedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
 	}								\
     } while (0)
 
-/* isSymmetric(x, tol = 0, checkDN) */ 
+/* isSymmetric(x, tol = 0, checkDN) */
+/* FIXME: not checking for real diagonal in complex case */
 SEXP packedMatrix_is_symmetric(SEXP obj, SEXP checkDN)
 {
     static const char *valid[] = {
@@ -436,9 +437,9 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
 	      type2char(tv));
     
     static const char *valid[] = {
-	"dspMatrix", "dtpMatrix",
-	"lspMatrix", "ltpMatrix",
-	"nspMatrix", "ntpMatrix", ""};
+	"dtpMatrix", "dspMatrix",
+	"ltpMatrix", "lspMatrix",
+	"ntpMatrix", "nspMatrix", ""};
     int ivalid = R_check_class_etc(obj, valid);
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(class_P(obj), "packedMatrix_diag_set");
@@ -447,7 +448,7 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
 	dimnames = GET_SLOT(obj, Matrix_DimNamesSym),
 	uplo = GET_SLOT(obj, Matrix_uploSym);
     char ul = *CHAR(STRING_ELT(uplo, 0));
-    int nprotect = 0;
+    int nprotect = 2;
 
     /* Allocate and coerce as necessary */
     if (tv <= tx) {
@@ -457,7 +458,6 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
 	}
 	PROTECT(res = NEW_OBJECT_OF_CLASS(valid[ivalid]));
 	PROTECT(x = duplicate(x));
-	nprotect += 2;
     } else { /* tv > tx */
 	/* dMatrix result is only possibility until we have proper [iz]Matrix */
 	if (tv < REALSXP) {
@@ -469,7 +469,6 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
 	PROTECT(res = NEW_OBJECT_OF_CLASS(cl));
 	PROTECT(x = coerceVector(x, tx = tv));
 	free(cl);
-	nprotect += 2;
     }
     SET_SLOT(res, Matrix_xSym, x);
     
@@ -522,6 +521,240 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
     
     UNPROTECT(nprotect);
     return res;
+}
+
+/* symmpart(x) */
+SEXP packedMatrix_symmpart(SEXP from)
+{
+    static const char *valid[] = {
+	"dtpMatrix", "dspMatrix",
+	"ltpMatrix", "lspMatrix",
+	"ntpMatrix", "nspMatrix", ""};
+    int ivalid = R_check_class_etc(from, valid);
+    if (ivalid < 0)
+	ERROR_INVALID_CLASS(class_P(from), "packedMatrix_symmpart");
+    const char *clf = valid[ivalid];
+    if (clf[1] == 's' && clf[0] == 'd')
+	return from;
+
+    char clt[] = ".spMatrix";
+    clt[0] = (clf[0] != 'z') ? 'd' : 'z';
+    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
+	dim = GET_SLOT(from, Matrix_DimSym),
+	dimnames = GET_SLOT(from, Matrix_DimNamesSym),
+	uplo = GET_SLOT(from, Matrix_uploSym),
+	x = GET_SLOT(from, Matrix_xSym);
+    
+    PROTECT(x = (clf[0] == clt[0]) ? duplicate(x) : coerceVector(x, REALSXP));
+    if (clf[0] == 'n')
+	na2one(x);
+
+    SET_SLOT(to, Matrix_DimSym, dim);
+    SET_SLOT(to, Matrix_uploSym, uplo);
+    SET_SLOT(to, Matrix_xSym, x);
+    
+    if (clf[1] == 't') {
+
+	int i, j, n = INTEGER(dim)[0];
+	char ul = *CHAR(STRING_ELT(uplo, 0)), di = *diag_P(from);
+
+#define PM_SYMMPART_TP(_CTYPE_, _PTR_, _ASSIGN_OFFDIAG_, _ASSIGN_ONDIAG_) \
+	do {								\
+	    _CTYPE_ *px = _PTR_(x);					\
+	    if (ul == 'U') {						\
+		for (j = 0; j < n; ++j) {				\
+		    for (i = 0; i < j; ++i, ++px)			\
+			_ASSIGN_OFFDIAG_;				\
+		    ++px;						\
+		}							\
+		if (di != 'N') {					\
+		    px = _PTR_(x);					\
+		    for (j = 0; j < n; px += (++j)+1)			\
+			_ASSIGN_ONDIAG_;				\
+		}							\
+	    } else {							\
+		for (j = 0; j < n; ++j) {				\
+		    ++px;						\
+		    for (i = j+1; i < n; ++i, ++px)			\
+			_ASSIGN_OFFDIAG_;				\
+		}							\
+		if (di != 'N') {					\
+		    px = _PTR_(x);					\
+		    for (j = 0; j < n; px += n-(j++))			\
+			_ASSIGN_ONDIAG_;				\
+		}							\
+	    }								\
+	} while (0)
+
+	if (clt[0] != 'z')
+	    PM_SYMMPART_TP(double, REAL,
+			   *px *= 0.5,
+			   *px  = 1.0);
+	else
+	    PM_SYMMPART_TP(Rcomplex, COMPLEX,
+			   do { (*px).r *= 0.5; (*px).i *= 0.5; } while (0),
+			   do { (*px).r  = 1.0; (*px).i  = 0.0; } while (0));
+
+#undef PM_SYMMPART_TP
+	
+	set_symmetrized_DimNames(to, dimnames, -1);
+	
+    } else { /* clf[1] == 's' */
+	
+	if (clt[0] == 'z')
+	    /* Symmetric part of Hermitian matrix is real part */
+	    zeroIm(x);
+
+	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+	
+    }
+
+    UNPROTECT(2);
+    return to;
+}
+
+/* skewpart(x) */
+SEXP packedMatrix_skewpart(SEXP from)
+{
+    static const char *valid[] = {
+	"dtpMatrix", "dspMatrix",
+	"ltpMatrix", "lspMatrix",
+	"ntpMatrix", "nspMatrix", ""};
+    int ivalid = R_check_class_etc(from, valid);
+    if (ivalid < 0)
+	ERROR_INVALID_CLASS(class_P(from), "packedMatrix_skewpart");
+    const char *clf = valid[ivalid];
+
+    SEXP to,
+	dim = GET_SLOT(from, Matrix_DimSym),
+	dimnames = GET_SLOT(from, Matrix_DimNamesSym),
+	uplo = GET_SLOT(from, Matrix_uploSym),
+	x = GET_SLOT(from, Matrix_xSym);
+    int n = INTEGER(dim)[0];
+    
+    if (clf[1] == 't') {
+	
+	if ((double) n * n > R_XLEN_T_MAX)
+	    error(_("attempt to allocate vector of length exceeding "
+		    "R_XLEN_T_MAX"));
+	SEXP y;
+	char ul = *CHAR(STRING_ELT(uplo, 0));
+	R_xlen_t upos = 0, lpos = 0;
+	int i, j;
+
+#define PM_SKEWPART(_CTYPE_, _PTR_, _ASSIGN_OFFDIAG_, _ASSIGN_ONDIAG_)	\
+	do {								\
+	    _CTYPE_ *px = _PTR_(x), *py = _PTR_(y);			\
+	    if (ul == 'U') {						\
+		for (j = 0; j < n; ++j) {				\
+		    lpos = j;						\
+		    for (i = 0; i < j; ++i) {				\
+			_ASSIGN_OFFDIAG_(upos, lpos);			\
+			++px; ++upos; lpos += n;			\
+		    }							\
+		    _ASSIGN_ONDIAG_(upos);				\
+		    ++px; upos += n-j;					\
+		}							\
+	    } else {							\
+		for (j = 0; j < n; ++j) {				\
+		    upos = lpos;					\
+		    _ASSIGN_ONDIAG_(lpos);				\
+		    for (i = j+1; i < n; ++i) {				\
+			++px; upos += n; ++lpos;			\
+			_ASSIGN_OFFDIAG_(lpos, upos);			\
+		    }							\
+		    ++px; lpos += j+2;					\
+		}							\
+	    }								\
+	} while (0)	    
+	
+	if (clf[0] != 'z') {
+	    
+	    PROTECT(to = NEW_OBJECT_OF_CLASS("dgeMatrix"));
+	    PROTECT(y = allocVector(REALSXP, (R_xlen_t) n * n));
+	    PROTECT(x = coerceVector(x, REALSXP));
+	    if (clf[0] == 'n')
+		na2one(x);
+
+#define ASSIGN_OFFDIAG_DTP(_UPOS_, _LPOS_)			\
+	    do {						\
+		if (ISNAN(*px)) {				\
+		    py[_UPOS_] = py[_LPOS_] = NA_REAL;		\
+		} else {					\
+		    py[_UPOS_] = 0.5 * *px;			\
+		    py[_LPOS_] = -py[_UPOS_];			\
+		}						\
+	    } while (0)
+
+#define ASSIGN_ONDIAG_DTP(_DPOS_) py[_DPOS_] = 0.0
+
+	    PM_SKEWPART(double, REAL,
+			ASSIGN_OFFDIAG_DTP, ASSIGN_ONDIAG_DTP);
+	    UNPROTECT(1);
+	    
+#undef ASSIGN_OFFDIAG_DTP
+#undef ASSIGN_ONDIAG_DTP
+	    
+	} else { /* clf[0] == 'z' */
+
+	    PROTECT(to = NEW_OBJECT_OF_CLASS("zgeMatrix"));
+	    PROTECT(y = allocVector(CPLXSXP, (R_xlen_t) n * n));
+	    
+#define ASSIGN_OFFDIAG_ZTP(_UPOS_, _LPOS_)			\
+	    do {						\
+		if (ISNAN((*px).r) || ISNAN((*px).i)) {		\
+		    py[_UPOS_].r = py[_UPOS_].i =		\
+			py[_LPOS_].r = py[_LPOS_].i = NA_REAL;	\
+		} else {					\
+		    py[_UPOS_].r = 0.5 * (*px).r;		\
+		    py[_UPOS_].i = 0.5 * (*px).i;		\
+		    py[_LPOS_].r = -py[upos].r;			\
+		    py[_LPOS_].i = -py[upos].i;			\
+		}						\
+	    } while (0)
+
+#define ASSIGN_ONDIAG_ZTP(_DPOS_) py[_DPOS_].r = py[_DPOS_].i = 0.0
+		
+	    PM_SKEWPART(Rcomplex, COMPLEX,
+			ASSIGN_OFFDIAG_ZTP, ASSIGN_ONDIAG_ZTP);
+
+#undef ASSIGN_OFFDIAG_ZTP
+#undef ASSIGN_ONDIAG_ZTP
+
+	}
+
+#undef PM_SKEWPART
+	
+	SET_SLOT(to, Matrix_DimSym, dim);
+	set_symmetrized_DimNames(to, dimnames, -1);
+	SET_SLOT(to, Matrix_xSym, y);
+	
+    } else { /* clf[1] == 's' */
+	
+	if (clf[0] != 'z') {
+	    /* Skew-symmetric part of symmetric matrix is zero matrix */
+	    PROTECT(to = NEW_OBJECT_OF_CLASS("dsCMatrix"));
+	    R_xlen_t n1a = (R_xlen_t) n + 1;
+	    SEXP p = PROTECT(allocVector(INTSXP, n1a));
+	    int *pp = INTEGER(p);
+	    Memzero(pp, n1a);
+	    SET_SLOT(to, Matrix_pSym, p);
+	} else {
+	    /* Skew-symmetric part of Hermitian matrix is imaginary part */
+	    PROTECT(to = NEW_OBJECT_OF_CLASS(clf));
+	    PROTECT(x = duplicate(x));
+	    zeroRe(x);
+	    SET_SLOT(to, Matrix_xSym, x);
+	}
+
+	SET_SLOT(to, Matrix_DimSym, dim);
+	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+	SET_SLOT(to, Matrix_uploSym, uplo);
+
+    }
+    
+    UNPROTECT(2);
+    return to;
 }
 
 #define PM_XIJ_TR_UP_NUN(_X_, _I_, _J_, _N2_, _ZERO_, _ONE_)	\
@@ -909,7 +1142,7 @@ SEXP packedMatrix_sub2(SEXP obj, SEXP index1, SEXP index2, SEXP drop)
 
     /* Set 'x' slot */
     SEXPTYPE tx;
-    R_xlen_t nx = (do_sp ? (ni * (ni + 1)) / 2 : ni * nj);
+    R_xlen_t nx = (do_sp ? ni + (ni * (ni - 1)) / 2 : ni * nj);
     SEXP x0 = GET_SLOT(obj, Matrix_xSym),
 	x1 = PROTECT(allocVector(tx = TYPEOF(x0), nx));
     ++nprotect;

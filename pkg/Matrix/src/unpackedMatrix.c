@@ -426,6 +426,7 @@ SEXP matrix_force_symmetric(SEXP from, SEXP uplo_to) {
     } while (0)
 
 /* isSymmetric(x, tol = 0, checkDN) */
+/* FIXME: not checking for real diagonal in complex case */
 SEXP unpackedMatrix_is_symmetric(SEXP obj, SEXP checkDN)
 {
     static const char *valid[] = {
@@ -901,3 +902,429 @@ SEXP unpackedMatrix_diag_set(SEXP obj, SEXP val)
     UNPROTECT(nprotect);
     return res;
 }
+
+/* symmpart(x) */
+SEXP unpackedMatrix_symmpart(SEXP from)
+{
+    static const char *valid[] = {
+	"dgeMatrix", "dtrMatrix", "dsyMatrix",
+	"lgeMatrix", "ltrMatrix", "lsyMatrix",
+	"ngeMatrix", "ntrMatrix", "nsyMatrix", ""};
+    int ivalid = R_check_class_etc(from, valid);
+    if (ivalid < 0)
+	ERROR_INVALID_CLASS(class_P(from), "unpackedMatrix_symmpart");
+    const char *clf = valid[ivalid];
+    if (clf[1] == 's' && clf[0] == 'd')
+	return from;
+
+    char clt[] = ".syMatrix";
+    clt[0] = (clf[0] != 'z') ? 'd' : 'z';
+    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
+	dim = GET_SLOT(from, Matrix_DimSym),
+	dimnames = GET_SLOT(from, Matrix_DimNamesSym),
+	uplo = (clf[1] != 'g') ? GET_SLOT(from, Matrix_uploSym) : R_NilValue,
+	x = GET_SLOT(from, Matrix_xSym);
+    
+    int *pdim = INTEGER(dim), n = pdim[0];
+    if (pdim[1] != n)	
+	error(_("attempt to get symmetric part of non-square matrix"));
+    
+    PROTECT(x = (clf[0] == clt[0]) ? duplicate(x) : coerceVector(x, REALSXP));
+    if (clf[0] == 'n')
+	na2one(x);
+
+    SET_SLOT(to, Matrix_DimSym, dim);
+    SET_SLOT(to, Matrix_xSym, x);
+
+    if (clf[1] == 'g') {
+
+	int i, j;
+	R_xlen_t upos = 0, lpos = 0;
+	
+#define UPM_SYMMPART(_CTYPE_, _PTR_, _ASSIGN_OFFDIAG_)		\
+	do {							\
+	    _CTYPE_ *px = _PTR_(x);				\
+	    for (j = 0; j < n; ++j) {				\
+		for (i = j+1; i < n; ++i) {			\
+		    upos += n; ++lpos;				\
+		    _ASSIGN_OFFDIAG_(upos, lpos);		\
+		}						\
+		upos = (lpos += j+2);				\
+	    }							\
+	} while (0)
+	
+#define ASSIGN_OFFDIAG_DGE(_UPOS_, _LPOS_)	\
+	do {					\
+	    px[_UPOS_] += px[_LPOS_];		\
+	    px[_UPOS_] *= 0.5;			\
+	} while (0)
+
+#define ASSIGN_OFFDIAG_ZGE(_UPOS_, _LPOS_)	\
+	do {					\
+	    px[_UPOS_].r += px[_LPOS_].r;	\
+	    px[_UPOS_].i += px[_LPOS_].i;	\
+	    px[_UPOS_].r *= 0.5;		\
+	    px[_UPOS_].i *= 0.5;		\
+	} while (0)
+	
+	if (clf[0] != 'z')
+	    UPM_SYMMPART(double, REAL, ASSIGN_OFFDIAG_DGE);
+	else
+	    UPM_SYMMPART(Rcomplex, COMPLEX, ASSIGN_OFFDIAG_ZGE);
+	
+	set_symmetrized_DimNames(to, dimnames, -1);
+	
+    } else if (clf[1] == 't') {
+
+	int i, j;
+	char ul = *CHAR(STRING_ELT(uplo, 0)), di = *diag_P(from);
+
+#define UPM_SYMMPART_TR(_CTYPE_, _PTR_, _ASSIGN_OFFDIAG_, _ASSIGN_ONDIAG_) \
+	do {								\
+	    _CTYPE_ *px = _PTR_(x);					\
+	    if (ul == 'U') {						\
+		for (j = 0; j < n; ++j) {				\
+		    for (i = 0; i < j; ++i, ++px)			\
+			_ASSIGN_OFFDIAG_;				\
+		    px += n-j;						\
+		}							\
+	    } else {							\
+		for (j = 0; j < n; ++j) {				\
+		    px += j+1;						\
+		    for (i = j+1; i < n; ++i, ++px)			\
+			_ASSIGN_OFFDIAG_;				\
+		}							\
+	    }								\
+	    if (di != 'N') {						\
+		R_xlen_t n1a = (R_xlen_t) n + 1;			\
+		px = _PTR_(x);						\
+		for (j = 0; j < n; ++j, px += n1a)			\
+		    _ASSIGN_ONDIAG_;					\
+	    }								\
+	} while (0)
+	
+	if (clt[0] != 'z')
+	    UPM_SYMMPART_TR(double, REAL,
+			    *px *= 0.5,
+			    *px  = 1.0);
+	else
+	    UPM_SYMMPART_TR(Rcomplex, COMPLEX,
+			    do { (*px).r *= 0.5; (*px).i *= 0.5; } while (0),
+			    do { (*px).r  = 1.0; (*px).i  = 0.0; } while (0));
+	
+	set_symmetrized_DimNames(to, dimnames, -1);
+	SET_SLOT(to, Matrix_uploSym, uplo);
+	
+    } else { /* clf[1] == 's' */
+
+	if (clt[0] == 'z')
+	    /* Symmetric part of Hermitian matrix is real part */
+	    zeroIm(x);
+
+	SET_SLOT(to, Matrix_DimNamesSym, dimnames);	
+	SET_SLOT(to, Matrix_uploSym, uplo);
+	
+    }
+
+    UNPROTECT(2);
+    return to;
+}
+
+/* symmpart(x) */
+SEXP matrix_symmpart(SEXP from)
+{
+    SEXP to,
+	dim = getAttrib(from, R_DimSymbol),
+	dimnames = getAttrib(from, R_DimNamesSymbol),
+	x = from;
+    int *pdim = INTEGER(dim), n = pdim[0], i, j, nprotect = 1;
+    R_xlen_t upos = 0, lpos = 0, nn = (R_xlen_t) n * n;
+
+    if (pdim[1] != n)	
+	error(_("attempt to get symmetric part of non-square matrix"));
+    
+    switch (TYPEOF(x)) {
+    case LGLSXP:
+    case INTSXP:
+	PROTECT(x = coerceVector(x, REALSXP));
+	++nprotect;
+    case REALSXP:
+	PROTECT(to = NEW_OBJECT_OF_CLASS("dsyMatrix"));
+	if (MAYBE_REFERENCED(x)) {
+	    PROTECT(x = allocVector(REALSXP, nn));
+	    Memcpy(REAL(x), REAL(from), nn);
+	    ++nprotect;
+	} else {
+	    SET_ATTRIB(x, R_NilValue);
+	}
+	UPM_SYMMPART(double, REAL, ASSIGN_OFFDIAG_DGE);
+	break;
+#ifdef HAVE_PROPER_ZMATRIX
+    case CPLXSXP:
+	PROTECT(to = NEW_OBJECT_OF_CLASS("zsyMatrix"));
+	if (MAYBE_REFERENCED(x)) {
+	    PROTECT(x = allocVector(CPLXSXP, nn));
+	    Memcpy(COMPLEX(x), COMPLEX(from), nn);
+	    ++nprotect;
+	} else {
+	    SET_ATTRIB(x, R_NilValue);
+	}
+	UPM_SYMMPART(Rcomplex, COMPLEX, ASSIGN_OFFDIAG_ZGE);
+	break;
+#endif
+    default:
+	ERROR_INVALID_TYPE("matrix", TYPEOF(x), "matrix_symmpart");
+	break;
+    }
+    
+    SET_SLOT(to, Matrix_DimSym, dim);
+    if (!isNull(dimnames))
+	set_symmetrized_DimNames(to, dimnames, -1);
+    SET_SLOT(to, Matrix_xSym, x);
+
+    UNPROTECT(nprotect);
+    return to;
+}
+
+#undef ASSIGN_OFFDIAG_DGE
+#undef ASSIGN_OFFDIAG_ZGE
+#undef UPM_SYMMPART
+#undef UPM_SYMMPART_TR
+
+/* skewpart(x) */
+SEXP unpackedMatrix_skewpart(SEXP from)
+{
+    static const char *valid[] = {
+	"dgeMatrix", "dtrMatrix", "dsyMatrix",
+	"lgeMatrix", "ltrMatrix", "lsyMatrix",
+	"ngeMatrix", "ntrMatrix", "nsyMatrix", ""};
+    int ivalid = R_check_class_etc(from, valid);
+    if (ivalid < 0)
+	ERROR_INVALID_CLASS(class_P(from), "unpackedMatrix_skewpart");
+    const char *clf = valid[ivalid];
+
+    SEXP to,
+	dim = GET_SLOT(from, Matrix_DimSym),
+	dimnames = GET_SLOT(from, Matrix_DimNamesSym),
+	uplo = (clf[1] != 'g') ? GET_SLOT(from, Matrix_uploSym) : R_NilValue,
+	x = GET_SLOT(from, Matrix_xSym);
+    
+    int *pdim = INTEGER(dim), n = pdim[0];
+    if (pdim[1] != n)	
+	error(_("attempt to get skew-symmetric part of non-square matrix"));
+
+    if (clf[1] != 's') {
+
+	SEXP y;
+	char ul = (clf[1] != 'g') ? *CHAR(STRING_ELT(uplo, 0)) : 'U';
+	R_xlen_t upos = 0, lpos = 0;
+	int i, j;
+
+#define UPM_SKEWPART(_CTYPE_, _PTR_, _X_, _Y_,				\
+		     _ASSIGN_OFFDIAG_, _ASSIGN_ONDIAG_)			\
+	do {								\
+	    _CTYPE_ *px = _PTR_(_X_), *py = _PTR_(_Y_);			\
+	    if (ul == 'U') {						\
+		for (j = 0; j < n; ++j) {				\
+		    lpos = j;						\
+		    for (i = 0; i < j; ++i) {				\
+			_ASSIGN_OFFDIAG_(upos, lpos);			\
+			++upos; lpos += n;				\
+		    }							\
+		    _ASSIGN_ONDIAG_(upos);				\
+		    upos += n-j;					\
+		}							\
+	    } else {							\
+		for (j = 0; j < n; ++j) {				\
+		    upos = lpos;					\
+		    _ASSIGN_ONDIAG_(lpos);				\
+		    for (i = j+1; i < n; ++i) {				\
+			upos += n; ++lpos;				\
+			_ASSIGN_OFFDIAG_(lpos, upos);			\
+		    }							\
+		    lpos += j+2;					\
+		}							\
+	    }								\
+	} while (0)
+
+#define ASSIGN_ONDIAG_DGE(_DPOS_) py[_DPOS_] = 0.0
+	
+#define ASSIGN_OFFDIAG_DGE(_UPOS_, _LPOS_)				\
+	    do {							\
+		if (ISNAN(px[_UPOS_]) || ISNAN(px[_LPOS_])) {		\
+		    py[_UPOS_] = py[_LPOS_] = NA_REAL;			\
+		} else {						\
+		    py[_UPOS_] = 0.5 * (px[_UPOS_] - px[_LPOS_]);	\
+		    py[_LPOS_] = -py[_UPOS_];				\
+		}							\
+	    } while (0)
+
+#define ASSIGN_OFFDIAG_DTR(_UPOS_, _LPOS_)			\
+	    do {						\
+		if (ISNAN(px[_UPOS_])) {			\
+		    py[_UPOS_] = py[_LPOS_] = NA_REAL;		\
+		} else {					\
+		    py[_UPOS_] = 0.5 * px[_UPOS_];		\
+		    py[_LPOS_] = -py[_UPOS_];			\
+		}						\
+	    } while (0)
+
+#define ASSIGN_ONDIAG_ZGE(_DPOS_) py[_DPOS_].r = py[_DPOS_].i = 0.0
+	
+#define ASSIGN_OFFDIAG_ZGE(_UPOS_, _LPOS_)				\
+	    do {							\
+		if (ISNAN(px[_UPOS_].r) || ISNAN(px[_UPOS_].i) ||	\
+		    ISNAN(px[_LPOS_].r) || ISNAN(px[_LPOS_].i)) {	\
+		    py[_UPOS_].r = py[_UPOS_].i =			\
+			py[_LPOS_].r = py[_LPOS_].i = NA_REAL;		\
+		} else {						\
+		    py[_UPOS_].r = 0.5 * (px[_UPOS_].r - px[_LPOS_].r);	\
+		    py[_UPOS_].i = 0.5 * (px[_UPOS_].i - px[_LPOS_].i);	\
+		    py[_LPOS_].r = -py[upos].r;				\
+		    py[_LPOS_].i = -py[upos].i;				\
+		}							\
+	    } while (0)
+
+#define ASSIGN_OFFDIAG_ZTR(_UPOS_, _LPOS_)				\
+	    do {							\
+		if (ISNAN(px[_UPOS_].r) || ISNAN(px[_UPOS_].i)) {	\
+		    py[_UPOS_].r = py[_UPOS_].i =			\
+			py[_LPOS_].r = py[_LPOS_].i = NA_REAL;		\
+		} else {						\
+		    py[_UPOS_].r = 0.5 * px[_UPOS_].r;			\
+		    py[_UPOS_].i = 0.5 * px[_UPOS_].i;			\
+		    py[_LPOS_].r = -py[upos].r;				\
+		    py[_LPOS_].i = -py[upos].i;				\
+		}							\
+	    } while (0)	    
+	
+	if (clf[0] != 'z') {
+	    PROTECT(to = NEW_OBJECT_OF_CLASS("dgeMatrix"));
+	    if (clf[0] == 'd') {
+		PROTECT(y = allocVector(REALSXP, (R_xlen_t) n * n));
+		if (clf[1] == 'g')
+		    UPM_SKEWPART(double, REAL, x, y,
+				 ASSIGN_OFFDIAG_DGE, ASSIGN_ONDIAG_DGE);
+		else
+		    UPM_SKEWPART(double, REAL, x, y,
+				 ASSIGN_OFFDIAG_DTR, ASSIGN_ONDIAG_DGE);
+	    } else {
+		PROTECT(y = coerceVector(x, REALSXP));
+		if (clf[1] == 'g')
+		    UPM_SKEWPART(double, REAL, y, y,
+				 ASSIGN_OFFDIAG_DGE, ASSIGN_ONDIAG_DGE);
+		else
+		    UPM_SKEWPART(double, REAL, y, y,
+				 ASSIGN_OFFDIAG_DTR, ASSIGN_ONDIAG_DGE);
+	    }
+	} else { /* clf[0] == 'z' */
+	    PROTECT(to = NEW_OBJECT_OF_CLASS("zgeMatrix"));
+	    PROTECT(y = allocVector(CPLXSXP, (R_xlen_t) n * n));
+	    if (clf[1] == 'g')
+		UPM_SKEWPART(Rcomplex, COMPLEX, x, y,
+			     ASSIGN_OFFDIAG_ZGE, ASSIGN_ONDIAG_ZGE);
+	    else
+		UPM_SKEWPART(Rcomplex, COMPLEX, x, y,
+			     ASSIGN_OFFDIAG_ZTR, ASSIGN_ONDIAG_ZGE);
+	}
+
+	SET_SLOT(to, Matrix_DimSym, dim);
+	set_symmetrized_DimNames(to, dimnames, -1);
+	SET_SLOT(to, Matrix_xSym, y);
+
+    } else { /* clf[1] == 's' */
+
+	if (clf[0] != 'z') {
+	    /* Skew-symmetric part of symmetric matrix is zero matrix */
+	    PROTECT(to = NEW_OBJECT_OF_CLASS("dsCMatrix"));
+	    R_xlen_t n1a = (R_xlen_t) n + 1;
+	    SEXP p = PROTECT(allocVector(INTSXP, n1a));
+	    int *pp = INTEGER(p);
+	    Memzero(pp, n1a);
+	    SET_SLOT(to, Matrix_pSym, p);
+	} else {
+	    /* Skew-symmetric part of Hermitian matrix is imaginary part */
+	    PROTECT(to = NEW_OBJECT_OF_CLASS(clf));
+	    PROTECT(x = duplicate(GET_SLOT(from, Matrix_xSym)));
+	    zeroRe(x);
+	    SET_SLOT(to, Matrix_xSym, x);
+	}
+
+	SET_SLOT(to, Matrix_DimSym, dim);
+	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+	SET_SLOT(to, Matrix_uploSym, uplo);
+
+    }
+
+    UNPROTECT(2);
+    return to;
+}
+
+/* skewpart(x) */
+SEXP matrix_skewpart(SEXP from)
+{
+    SEXP to,
+	dim = getAttrib(from, R_DimSymbol),
+	dimnames = getAttrib(from, R_DimNamesSymbol),
+	x = from;
+    int *pdim = INTEGER(dim), n = pdim[0], i, j, nprotect = 1;
+    R_xlen_t upos = 0, lpos = 0;
+    char ul = 'U';
+    
+    if (pdim[1] != n)	
+	error(_("attempt to get skew-symmetric part of non-square matrix"));
+    
+    switch (TYPEOF(x)) {
+    case LGLSXP:
+    case INTSXP:
+	PROTECT(x = coerceVector(x, REALSXP));
+	++nprotect;
+    case REALSXP:
+	PROTECT(to = NEW_OBJECT_OF_CLASS("dgeMatrix"));
+	if (MAYBE_REFERENCED(x)) {
+	    PROTECT(x = allocVector(REALSXP, (R_xlen_t) n * n));
+	    UPM_SKEWPART(double, REAL, from, x,
+			 ASSIGN_OFFDIAG_DGE, ASSIGN_ONDIAG_DGE);
+	    ++nprotect;
+	} else {
+	    SET_ATTRIB(x, R_NilValue);
+	    UPM_SKEWPART(double, REAL, x, x,
+			 ASSIGN_OFFDIAG_DGE, ASSIGN_ONDIAG_DGE);
+	}
+	break;
+#ifdef HAVE_PROPER_ZMATRIX
+    case CPLXSXP:
+	PROTECT(to = NEW_OBJECT_OF_CLASS("zgeMatrix"));
+	if (MAYBE_REFERENCED(from)) {
+	    PROTECT(x = allocVector(CPLXSXP, (R_xlen_t) n * n));
+	    UPM_SKEWPART(Rcomplex, COMPLEX, from, x,
+			 ASSIGN_OFFDIAG_ZGE, ASSIGN_ONDIAG_ZGE);
+	    ++nprotect;
+	} else {
+	    SET_ATTRIB(x, R_NilValue);
+	    UPM_SKEWPART(Rcomplex, COMPLEX, x, x,
+			 ASSIGN_OFFDIAG_DGE, ASSIGN_ONDIAG_DGE);
+	}
+	break;
+#endif
+    default:
+	ERROR_INVALID_TYPE("matrix", TYPEOF(x), "matrix_skewpart");
+	break;
+    }
+    
+    SET_SLOT(to, Matrix_DimSym, dim);
+    if (!isNull(dimnames))
+	set_symmetrized_DimNames(to, dimnames, -1);
+    SET_SLOT(to, Matrix_xSym, x);
+    
+    UNPROTECT(nprotect);
+    return to;
+}
+
+#undef ASSIGN_ONDIAG_DGE
+#undef ASSIGN_ONDIAG_ZGE
+#undef ASSIGN_OFFDIAG_DGE
+#undef ASSIGN_OFFDIAG_DTR
+#undef ASSIGN_OFFDIAG_ZGE
+#undef ASSIGN_OFFDIAG_ZTR
+#undef UPM_SKEWPART

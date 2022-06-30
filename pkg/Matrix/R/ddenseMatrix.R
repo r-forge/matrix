@@ -76,6 +76,14 @@ setMethod("band", "denseMatrix", .bandDense)
 setMethod("band",      "matrix", .bandDense)
 } ## MJ
 
+## MJ: no longer needed ... now inherited from (un)?packedMatrix
+if(FALSE) {
+setMethod("symmpart", signature(x = "ddenseMatrix"),
+	  function(x) .Call(ddense_symmpart, x))
+setMethod("skewpart", signature(x = "ddenseMatrix"),
+	  function(x) .Call(ddense_skewpart, x))
+} ## MJ
+
 ## MJ: no longer needed ... methods are defined for all subclasses
 if(FALSE) {
 ## These methods are the 'fallback' methods for all dense numeric
@@ -151,9 +159,3 @@ setMethod("chol", signature(x = "ddenseMatrix"), cholMat)
 
 setMethod("lu", signature(x = "ddenseMatrix"),
 	  function(x, ...) .set.factors(x, "LU", lu(.dense2g(x, "."), ...)))
-
-setMethod("symmpart", signature(x = "ddenseMatrix"),
-	  function(x) .Call(ddense_symmpart, x))
-
-setMethod("skewpart", signature(x = "ddenseMatrix"),
-	  function(x) .Call(ddense_skewpart, x))

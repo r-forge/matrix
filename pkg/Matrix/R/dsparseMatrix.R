@@ -51,11 +51,13 @@ setMethod("is.infinite", signature(x = "dsparseMatrix"),
 	      else is.na_nsp(x)
 	  })
 
+## MJ: no longer needed ... now inherited from [CRT]sparseMatrix
+if(FALSE) {
 setMethod("symmpart", signature(x = "dsparseMatrix"),
           function(x) forceSymmetric(x + t(x)) / 2)
-
 setMethod("skewpart", signature(x = "dsparseMatrix"),
           function(x) symmetrizeDimnames(x - t(x)) / 2)
+} ## MJ
 
 ## MJ: no longer needed ... now inherited from Matrix
 if(FALSE) {

@@ -202,4 +202,14 @@ setMethod("diag<-", signature(x = "unpackedMatrix"),
           function(x, value)
               .Call(unpackedMatrix_diag_set, x, value))
 
+setMethod("symmpart", signature(x = "unpackedMatrix"),
+          function(x) .Call(unpackedMatrix_symmpart, x))
+setMethod("symmpart", signature(x = "matrix"),
+          function(x) .Call(matrix_symmpart, x))
+
+setMethod("skewpart", signature(x = "unpackedMatrix"),
+          function(x) .Call(unpackedMatrix_skewpart, x))
+setMethod("skewpart", signature(x = "matrix"),
+          function(x) .Call(matrix_skewpart, x))
+
 rm(.upM.subclasses)

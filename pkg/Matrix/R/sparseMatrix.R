@@ -1324,18 +1324,29 @@ forceSymmetricTsparse <- function(x, uplo) {
 .sparse.t    <- function(x)              .Call(R_sparse_transpose, x)
 .sparse.fS2  <- function(x, uplo) .Call(R_sparse_force_symmetric, x, uplo)
 .sparse.fS1  <- function(x, uplo) .Call(R_sparse_force_symmetric, x, "")
+
+.C.symmpart <- function(x) .Call(CRsparse_symmpart, x)
+.R.symmpart <- .C.symmpart
+.T.symmpart <- function(x) .Call( Tsparse_symmpart, x)
+
+.C.skewpart <- function(x) .Call(CRsparse_skewpart, x)
+.R.skewpart <- .C.skewpart
+.T.skewpart <- function(x) .Call( Tsparse_skewpart, x)
+
 .C.is.di <- function(object)
     .Call(Csparse_is_diagonal, object)
 .R.is.di <- function(object)
     .Call(Rsparse_is_diagonal, object)
 .T.is.di <- function(object)
     .Call(Tsparse_is_diagonal, object)
+
 .C.is.tr <- function(object, upper = NA, ...)
     .Call(Csparse_is_triangular, object, upper)
 .R.is.tr <- function(object, upper = NA, ...)
     .Call(Rsparse_is_triangular, object, upper)
 .T.is.tr <- function(object, upper = NA, ...)
     .Call(Tsparse_is_triangular, object, upper)
+
 .C.is.sy <- function(object, checkDN = TRUE, ...) {
     if(checkDN) {
         ca <- function(check.attributes = TRUE, ...) check.attributes
@@ -1393,6 +1404,7 @@ forceSymmetricTsparse <- function(x, uplo) {
     }
     isTRUE(ae(target = x, current = tx, tolerance = tol, ...))
 }
+
 .sparse.subclasses <- names(getClass("sparseMatrix")@subclasses)
 
 for (.cl in grep("^[CRT]sparseMatrix$", .sparse.subclasses, value = TRUE)) {
@@ -1403,6 +1415,12 @@ for (.cl in grep("^[CRT]sparseMatrix$", .sparse.subclasses, value = TRUE)) {
     setMethod("t",    signature(x = .cl), .sparse.t)
     setMethod("forceSymmetric", signature(x = .cl, uplo = "character"),
               .sparse.fS2)
+    setMethod("symmpart", signature(x = .cl),
+              get(paste0(".", substr(.cl, 1L, 1L), ".symmpart"),
+                  mode = "function", inherits = FALSE))
+    setMethod("skewpart", signature(x = .cl),
+              get(paste0(".", substr(.cl, 1L, 1L), ".skewpart"),
+                  mode = "function", inherits = FALSE))
     setMethod("forceSymmetric", signature(x = .cl, uplo = "missing"),
               .sparse.fS1)
     setMethod("isDiagonal", signature(object = .cl),

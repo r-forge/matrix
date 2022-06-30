@@ -363,6 +363,9 @@ SEXP R_index_triangle(SEXP n_, SEXP upper_, SEXP diag_, SEXP packed_);
 SEXP R_index_diagonal(SEXP n_, SEXP upper_, SEXP packed_);
 
 void conjugate(SEXP x);
+void zeroRe(SEXP x);
+void zeroIm(SEXP x);
+void na2one(SEXP x);
     
 Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n);
 R_xlen_t strmatch(char *nm, SEXP s);

@@ -176,9 +176,12 @@ static R_CallMethodDef CallEntries[] = {
 #if 0
     CALLDEF(dense_to_symmetric, 3),
 #endif
-    
+
+/* MJ: no longer needed ... prefer (un)?packedMatrix_(symm|skew)part() */
+#if 0
     CALLDEF(ddense_symmpart, 1),
     CALLDEF(ddense_skewpart, 1),
+#endif
     
     CALLDEF(dgCMatrix_LU, 5),
     CALLDEF(dgCMatrix_QR, 3),
@@ -423,13 +426,21 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(R_sparse_as_vector, 1),
     CALLDEF(R_sparse_as_kind, 3),
     CALLDEF(R_sparse_as_general, 1),
+
     CALLDEF(R_diagonal_as_sparse, 4),
     CALLDEF(R_diagonal_as_dense, 3),
+    CALLDEF(R_diagonal_as_kind, 2),
+
     CALLDEF(R_sparse_drop0, 1),
     CALLDEF(R_sparse_band, 3),
     CALLDEF(R_sparse_diag_get, 2),
     CALLDEF(R_sparse_transpose, 1),
     CALLDEF(R_sparse_force_symmetric, 2),
+
+    CALLDEF(CRsparse_symmpart, 1),
+    CALLDEF(Tsparse_symmpart, 1),
+    CALLDEF(CRsparse_skewpart, 1),
+    CALLDEF(Tsparse_skewpart, 1),
 
     CALLDEF(CRsparse_as_Tsparse, 1),
     CALLDEF(tCRsparse_as_RCsparse, 1),
@@ -446,9 +457,10 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(R_dense_as_general, 2),
     CALLDEF(R_dense_as_sparse, 4),
     CALLDEF(R_dense_as_kind, 2),
-    CALLDEF(R_dense_as_matrix, 1),
-    CALLDEF(R_geMatrix_as_matrix, 1),
-    CALLDEF(R_dense_as_vector, 1),
+    CALLDEF(R_dense_as_matrix, 2),
+    CALLDEF(R_geMatrix_as_matrix, 2),
+    CALLDEF(R_dense_as_vector, 2),
+    CALLDEF(R_geMatrix_as_vector, 2),
     CALLDEF(R_dense_band, 3),
     
     CALLDEF(matrix_pack, 3),
@@ -456,6 +468,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(matrix_is_symmetric, 2),
     CALLDEF(matrix_is_triangular, 2),
     CALLDEF(matrix_is_diagonal, 1),
+    CALLDEF(matrix_symmpart, 1),
+    CALLDEF(matrix_skewpart, 1),
 
     CALLDEF(unpackedMatrix_pack, 4),
     CALLDEF(unpackedMatrix_force_symmetric, 2),
@@ -465,7 +479,9 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(unpackedMatrix_transpose, 1),
     CALLDEF(unpackedMatrix_diag_get, 2),
     CALLDEF(unpackedMatrix_diag_set, 2),
-
+    CALLDEF(unpackedMatrix_symmpart, 1),
+    CALLDEF(unpackedMatrix_skewpart, 1),
+    
     CALLDEF(packedMatrix_unpack, 2),
     CALLDEF(packedMatrix_force_symmetric, 2),
     CALLDEF(packedMatrix_is_symmetric, 2),
@@ -474,6 +490,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(packedMatrix_transpose, 1),
     CALLDEF(packedMatrix_diag_get, 2),
     CALLDEF(packedMatrix_diag_set, 2),
+    CALLDEF(packedMatrix_symmpart, 1),
+    CALLDEF(packedMatrix_skewpart, 1),
     CALLDEF(packedMatrix_sub1, 2),
     CALLDEF(packedMatrix_sub1_mat, 2),
     CALLDEF(packedMatrix_sub2, 4),
