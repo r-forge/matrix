@@ -678,12 +678,8 @@ SEXP packedMatrix_skewpart(SEXP from)
 
 #define ASSIGN_OFFDIAG_DTP(_UPOS_, _LPOS_)			\
 	    do {						\
-		if (ISNAN(*px)) {				\
-		    py[_UPOS_] = py[_LPOS_] = NA_REAL;		\
-		} else {					\
-		    py[_UPOS_] = 0.5 * *px;			\
-		    py[_LPOS_] = -py[_UPOS_];			\
-		}						\
+		py[_UPOS_] = 0.5 * *px;				\
+		py[_LPOS_] = -py[_UPOS_];			\
 	    } while (0)
 
 #define ASSIGN_ONDIAG_DTP(_DPOS_) py[_DPOS_] = 0.0
@@ -702,15 +698,10 @@ SEXP packedMatrix_skewpart(SEXP from)
 	    
 #define ASSIGN_OFFDIAG_ZTP(_UPOS_, _LPOS_)			\
 	    do {						\
-		if (ISNAN((*px).r) || ISNAN((*px).i)) {		\
-		    py[_UPOS_].r = py[_UPOS_].i =		\
-			py[_LPOS_].r = py[_LPOS_].i = NA_REAL;	\
-		} else {					\
-		    py[_UPOS_].r = 0.5 * (*px).r;		\
-		    py[_UPOS_].i = 0.5 * (*px).i;		\
-		    py[_LPOS_].r = -py[upos].r;			\
-		    py[_LPOS_].i = -py[upos].i;			\
-		}						\
+		py[_UPOS_].r = 0.5 * (*px).r;			\
+		py[_UPOS_].i = 0.5 * (*px).i;			\
+		py[_LPOS_].r = -py[upos].r;			\
+		py[_LPOS_].i = -py[upos].i;			\
 	    } while (0)
 
 #define ASSIGN_ONDIAG_ZTP(_DPOS_) py[_DPOS_].r = py[_DPOS_].i = 0.0
