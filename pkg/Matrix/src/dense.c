@@ -21,9 +21,7 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 
     char *cl, ul = 'U', di = 'N';
     static const char *valid[] = {
-	"dgeMatrix", "dtrMatrix", "dsyMatrix", "dtpMatrix", "dspMatrix",
-	"lgeMatrix", "ltrMatrix", "lsyMatrix", "ltpMatrix", "lspMatrix",
-	"ngeMatrix", "ntrMatrix", "nsyMatrix", "ntpMatrix", "nspMatrix", ""};
+	VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
     int ivalid = R_check_class_etc(from, valid), nprotect = 0,
 	*pdim = NULL, doDN = 1, packed = 0;
     SEXP dim, dimnames, x_from;
@@ -435,7 +433,7 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 			      *(_Y_++) = *_X_;				\
 			  } while (0), );				\
 	    break;							\
-	default: /* 'T' */						\
+	case 'T':							\
 	    if (cl[0] == 'n')						\
 		_LOOP_2C_(_X_, _NZ_,					\
 			  do {						\
@@ -449,6 +447,8 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 			      *(pj++) = j;				\
 			      *(_Y_++) = *_X_;				\
 			  } while (0), );				\
+	    break;							\
+	default:							\
 	    break;							\
 	}								\
     } while (0)
@@ -501,23 +501,19 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
     return to;
 }
 
-/* as(<denseMatrix>, "[dlniz](dense)?Matrix") */
+/* as(<denseMatrix>, "[nlidz](dense)?Matrix") */
 SEXP R_dense_as_kind(SEXP from, SEXP kind)
 {
     char k;
     if ((kind = asChar(kind)) == NA_STRING || (k = *CHAR(kind)) == '\0')
 	error(_("invalid 'kind' to 'R_dense_as_kind()'"));
     static const char *valid[] = {
-	"dgeMatrix", "dtrMatrix", "dsyMatrix", "dtpMatrix", "dspMatrix",
-	"lgeMatrix", "ltrMatrix", "lsyMatrix", "ltpMatrix", "lspMatrix",
-	"ngeMatrix", "ntrMatrix", "nsyMatrix", "ntpMatrix", "nspMatrix", ""};
+	VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
     int ivalid = R_check_class_etc(from, valid);
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(class_P(from), "R_dense_as_kind");
     const char *clf = valid[ivalid];
-    if (k == '.')
-	k = clf[0];
-    if (k == clf[0])
+    if (k == '.' || k == clf[0])
 	return from;
     SEXPTYPE tt = kind2type(k); /* validating 'k' before doing more */
     
@@ -530,20 +526,82 @@ SEXP R_dense_as_kind(SEXP from, SEXP kind)
     
     SET_SLOT(to, Matrix_DimSym, GET_SLOT(from, Matrix_DimSym));
     SET_SLOT(to, Matrix_DimNamesSym, GET_SLOT(from, Matrix_DimNamesSym));
-    SET_SLOT(to, Matrix_xSym, (tf == tt) ? x : coerceVector(x, tt));
     if (clf[1] != 'g') {
 	SET_SLOT(to, Matrix_uploSym, GET_SLOT(from, Matrix_uploSym));
 	if (clf[1] == 't')
 	    SET_SLOT(to, Matrix_diagSym, GET_SLOT(from, Matrix_diagSym));
     }
+
+    if (clf[0] != 'n') {
+	SET_SLOT(to, Matrix_xSym, (tf == tt) ? x : coerceVector(x, tt));
+    } else {
+	R_xlen_t ix, nx = XLENGTH(x);
+	if (tf == tt) {
+	    /* n->l ... allocate iff 'x' contains NA */
+	    int *px = LOGICAL(x);
+	    for (ix = 0; ix < nx; ++ix, ++px)
+		if (*px == NA_LOGICAL)
+		    break;
+	    if (ix == nx) {
+		SET_SLOT(to, Matrix_xSym, x);
+	    } else {
+		PROTECT(x = duplicate(x));
+		px = LOGICAL(x);
+		for (ix = 0; ix < nx; ++ix, ++px)
+		    if (*px == NA_LOGICAL)
+			*px = 1;
+		SET_SLOT(to, Matrix_xSym, x);
+		UNPROTECT(1);
+	    }
+	} else {
+	    /* n->[diz] */
+	    PROTECT(x = coerceVector(x, tt));
+	    switch (tt) {
+	    case REALSXP:
+	    {
+		double *px = REAL(x);
+		for (ix = 0; ix < nx; ++ix, ++px)
+		    if (ISNAN(*px))
+			*px = 1.0;
+		break;
+	    }
+	    case INTSXP:
+	    {
+		int *px = INTEGER(x);
+		for (ix = 0; ix < nx; ++ix, ++px)
+		    if (*px == NA_INTEGER)
+			*px = 1;
+		break;
+	    }
+	    case CPLXSXP:
+	    {
+		Rcomplex *px = COMPLEX(x);
+		for (ix = 0; ix < nx; ++ix, ++px) {
+		    if (ISNAN((*px).r) || ISNAN((*px).i)) {
+			(*px).r = 1.0;
+			(*px).i = 0.0;
+		    }
+		}
+		break;
+	    }
+	    default:
+		break;
+	    }
+	    SET_SLOT(to, Matrix_xSym, x);
+	    UNPROTECT(1);
+	}
+    }
+    
     UNPROTECT(1);
     return to;
 }
 
 /* as(<denseMatrix>, "matrix") */
-SEXP R_dense_as_matrix(SEXP from)
+SEXP R_dense_as_matrix(SEXP from, SEXP ndense)
 {
-    PROTECT(from = dense_as_general(from, '.', 1, 0));
+    /* Result must be newly allocated because we add attributes */
+    PROTECT(from = dense_as_general(
+		from, (asLogical(ndense) != 0) ? 'l' : '.', 1, 0));
     SEXP to = PROTECT(GET_SLOT(from, Matrix_xSym));
     setAttrib(to, R_DimSymbol, GET_SLOT(from, Matrix_DimSym));
     setAttrib(to, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
@@ -552,9 +610,12 @@ SEXP R_dense_as_matrix(SEXP from)
 }
 
 /* as(<.geMatrix>, "matrix") */
-SEXP R_geMatrix_as_matrix(SEXP from)
+SEXP R_geMatrix_as_matrix(SEXP from, SEXP ndense)
 {
+    /* Result must be newly allocated because we add attributes */
     SEXP to = PROTECT(duplicate(GET_SLOT(from, Matrix_xSym)));
+    if (asLogical(ndense) != 0)
+	na2one(to);
     setAttrib(to, R_DimSymbol, GET_SLOT(from, Matrix_DimSym));
     setAttrib(to, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
     UNPROTECT(1);
@@ -562,11 +623,33 @@ SEXP R_geMatrix_as_matrix(SEXP from)
 }
 
 /* as(<denseMatrix>, "vector") */
-SEXP R_dense_as_vector(SEXP from)
+SEXP R_dense_as_vector(SEXP from, SEXP ndense)
 {
-    PROTECT(from = dense_as_general(from, '.', 0, 0));
+    /* Result must be newly allocated if and only if different from 'x' slot */
+    PROTECT(from = dense_as_general(
+		from, (asLogical(ndense) != 0) ? 'l' : '.', 0, 0));
     from = GET_SLOT(from, Matrix_xSym);
     UNPROTECT(1);
+    return from;
+}
+
+/* as(<.geMatrix>, "vector") */
+SEXP R_geMatrix_as_vector(SEXP from, SEXP ndense)
+{
+    /* Result must be newly allocated if and only if different from 'x' slot */
+    from = GET_SLOT(from, Matrix_xSym);
+    if (asLogical(ndense) != 0) {
+	int *px = LOGICAL(from);
+	R_xlen_t nx = XLENGTH(from);
+	while (nx--) {
+	    if (*(px++) == NA_LOGICAL) {
+		PROTECT(from = duplicate(from));
+		na2one(from);
+		UNPROTECT(1);
+		break;
+	    }
+	}
+    }
     return from;
 }
 
@@ -576,9 +659,7 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 {
     const char *clf;
     static const char *valid[] = {
-	"dgeMatrix", "dtrMatrix", "dsyMatrix", "dtpMatrix", "dspMatrix",
-	"lgeMatrix", "ltrMatrix", "lsyMatrix", "ltpMatrix", "lspMatrix",
-	"ngeMatrix", "ntrMatrix", "nsyMatrix", "ntpMatrix", "nspMatrix", ""};
+	VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
     int ivalid = R_check_class_etc(from, valid);
     if (ivalid >= 0) {
 	clf = valid[ivalid];
@@ -907,7 +988,6 @@ SEXP lsq_dense_Chol(SEXP X, SEXP y)
     return ans;
 }
 
-
 SEXP lsq_dense_QR(SEXP X, SEXP y)
 {
     if (!(isReal(X) & isMatrix(X)))
@@ -1096,6 +1176,9 @@ SEXP dense_to_Csparse(SEXP x)
 
 #endif /* MJ */
 
+/* MJ: no longer needed ... prefer (un)?packedMatrix_(symm|skew)part() */
+#if 0
+
 SEXP ddense_symmpart(SEXP x)
 /* Class of the value will be dsyMatrix */
 {
@@ -1159,6 +1242,8 @@ SEXP ddense_skewpart(SEXP x)
         MK_SYMMETRIC_DIMNAMES_AND_RETURN(-1);
     }
 }
+
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer (un)?packedMatrix_force_symmetric() */
 #if 0

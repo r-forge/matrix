@@ -14,7 +14,11 @@
 \alias{^,ndenseMatrix,ddiMatrix-method}
 \alias{^,ndenseMatrix,ldiMatrix-method}
 \alias{as.logical,ndenseMatrix-method}
+\alias{as.numeric,ndenseMatrix-method}
+\alias{as.vector,ndenseMatrix-method}
 \alias{coerce,matrix,ndenseMatrix-method}
+\alias{coerce,ndenseMatrix,matrix-method}
+\alias{coerce,ndenseMatrix,vector-method}
 \alias{coerce,numLike,ndenseMatrix-method}
 \alias{which,ndenseMatrix-method}
 %

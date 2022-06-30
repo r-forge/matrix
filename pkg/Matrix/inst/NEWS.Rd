@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-06-22 r3506)}{
+\section{Changes in version 1.4-2 (2022-06-30 r3507)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual classes
@@ -270,6 +270,14 @@
 
       \item \code{diag(<[CRT]sparseMatrix>)} is now done in C
       and is highly optimized in the \code{.[ts][CR]Matrix} case.
+
+      \item \code{symmpart} and \code{skewpart} are now done in C
+      for all \code{denseMatrix} and all \code{[CRT]sparseMatrix}.
+      Both now more faithfully preserve the \dQuote{storage} of
+      their argument.  (Previously, \code{symmpart(packedMatrix)}
+      was an \code{unpackedMatrix},
+      and \code{(symm|skew)part([RT]sparseMatrix)}
+      was a \code{CsparseMatrix}.)
     }
   }
   \subsection{Misc}{
@@ -338,7 +346,7 @@
       \code{R_diagonal_as_sparse()}
       for coercion from \code{diagonalMatrix} to any
       \code{[CRT]sparseMatrix};
-      \code{R_(dense|sparse)_as_(matrix|vector)()}
+      \code{R_(dense|sparse|geMatrix)_as_(matrix|vector)()}
       for coercion to base matrix and vector; and
       \code{tCRsparse_as_RCsparse()} for the idioms
       \code{as(t(<[CR]sparseMatrix>), "[RC]sparseMatrix")}.

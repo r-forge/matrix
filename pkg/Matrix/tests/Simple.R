@@ -1311,13 +1311,21 @@ stopifnot(!any(is.na(.nge)),
 assertError(`dim<-`(.dgR, -x@Dim)) # had yielded an invalid object
 stopifnot(is(`dim<-`(.dgR, c(4L, 1L)), "RsparseMatrix")) # was TsparseMatrix
 
-## symmpart(<ldiMatrix>) was not a dMatrix nor a symmetricMatrix;
+## symmpart(<ldiMatrix>) was not a dMatrix or a symmetricMatrix;
 ## symmpart(<diagonalMatrix>) did not get symmetrized 'Dimnames'
 .ldi.sp <- symmpart(new("ldiMatrix", Dim = c(1L, 1L), Dimnames = list("a", "b"),
                         x = TRUE))
 stopifnot(is(.ldi.sp, "dMatrix"),
           is(.ldi.sp, "symmetricMatrix"),
           Matrix:::isSymmetricDN(.ldi.sp@Dimnames))
+
+## as.vector(<ndenseMatrix>), etc. must do NA->TRUE
+stopifnot(identical(as.vector(.nge), rep.int(TRUE, 4L)),
+          identical(as.logical(.nge), rep.int(TRUE, 4L)),
+          identical(as.double(.nge), rep.int(1, 4L)),
+          identical(as(.nge, "vector"), rep.int(TRUE, 4L)),
+          identical(as(.nge, "matrix"), array(TRUE, .nge@Dim, list(NULL,NULL))),
+          identical(as(.nge, "dMatrix")@x, rep.int(1, 4L)))
 
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()

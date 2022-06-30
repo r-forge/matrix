@@ -14,7 +14,6 @@
 \alias{Summary,ldenseMatrix-method}
 \alias{^,ldenseMatrix,ddiMatrix-method}
 \alias{^,ldenseMatrix,ldiMatrix-method}
-\alias{as.logical,ldenseMatrix-method}
 \alias{coerce,matrix,ldenseMatrix-method}
 \alias{coerce,numLike,ldenseMatrix-method}
 \alias{which,ldenseMatrix-method}

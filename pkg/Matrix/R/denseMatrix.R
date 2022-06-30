@@ -60,6 +60,19 @@
 ..pack3   <- function(from) .Call(unpackedMatrix_pack, from, FALSE, NA, NA)
 ..unpack3 <- function(from) .Call(packedMatrix_unpack, from, FALSE)
 
+..dense2m <- function(from) .Call(R_dense_as_matrix, from, FALSE)
+..ndense2m <- function(from) .Call(R_dense_as_matrix, from, TRUE)
+
+..dense2v <- function(from) .Call(R_dense_as_vector, from, FALSE)
+..ndense2v <- function(from) .Call(R_dense_as_vector, from, TRUE)
+
+..ge2m <- function(from) .Call(R_geMatrix_as_matrix, from, FALSE)
+..nge2m <- function(from) .Call(R_geMatrix_as_matrix, from, TRUE)
+
+..ge2v <- function(from) .Call(R_geMatrix_as_vector, from, FALSE)
+..nge2v <- function(from) .Call(R_geMatrix_as_vector, from, TRUE)
+
+
 ## To denseMatrix ..........................................
 
 setAs("ANY", "denseMatrix",
@@ -87,33 +100,39 @@ setAs("numLike", "TsparseMatrix", ..dense2Tsparse)
 
 ## To base matrix, base vector .............................
 
-setAs("denseMatrix", "matrix", .dense2m)
-setAs("denseMatrix", "vector", .dense2v)
+setAs( "denseMatrix", "matrix", ..dense2m)
+setAs( "denseMatrix", "vector", ..dense2v)
+setAs("ndenseMatrix", "matrix", ..ndense2m)
+setAs("ndenseMatrix", "vector", ..ndense2v)
 
 setMethod("as.vector", signature(x = "denseMatrix"),
-          function(x, mode) as.vector(.dense2v(x), mode))
+          function(x, mode) as.vector(.dense2v(x, FALSE), mode))
+setMethod("as.vector", signature(x = "ndenseMatrix"),
+          function(x, mode) as.vector(.dense2v(x, TRUE), mode))
 
 setMethod("as.numeric", signature(x = "denseMatrix"),
-          function(x, ...) as.double(.dense2v(x)))
-setMethod("as.numeric", signature(x = "ddenseMatrix"),
-          function(x, ...) .dense2v(x))
+          function(x, ...) as.double(.dense2v(x, FALSE)))
+setMethod("as.numeric", signature(x = "ndenseMatrix"),
+          function(x, ...) as.double(.dense2v(x, TRUE)))
 
 setMethod("as.logical", signature(x = "denseMatrix"),
-          function(x, ...) as.logical(.dense2v(x)))
-setMethod("as.logical", signature(x = "ldenseMatrix"),
-          function(x, ...) .dense2v(x))
+          function(x, ...) as.logical(.dense2v(x, FALSE)))
 setMethod("as.logical", signature(x = "ndenseMatrix"),
-          function(x, ...) .dense2v(x))
+          function(x, ...) .dense2v(x, TRUE))
 
 ## Faster:
-for (.from in paste0(c("d", "l", "n"), "geMatrix")) {
-    setAs(.from, "matrix", .ge2m)
-    setAs(.from, "vector", .ge2v)
+for (.kind in c("d", "l", "n")) {
+    .from <- paste0(.kind, "geMatrix")
+    setAs(.from, "matrix", if(.kind != "n") ..ge2m else ..nge2m)
+    setAs(.from, "vector", if(.kind != "n") ..ge2v else ..nge2v)
 
     setMethod("as.vector", signature(x = .from),
-              function(x, mode) as.vector(x@x, mode))
+              if(.kind != "n")
+                  function(x, mode) as.vector(.ge2v(x, FALSE), mode)
+              else
+                  function(x, mode) as.vector(.ge2v(x,  TRUE), mode))
 }
-rm(.from)
+rm(.kind, .from)
 
 ## To "kind" ...............................................
 

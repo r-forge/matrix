@@ -51,9 +51,9 @@ setAs("Matrix", "diagonalMatrix",
 ## ~~~~ COERCIONS FROM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ..diag2dkind <- function(from)
-    .Call(R_diagonal_as_sparse, from, "ddi", NULL, NULL)
+    .Call(R_diagonal_as_kind, from, "d")
 ..diag2lkind <- function(from)
-    .Call(R_diagonal_as_sparse, from, "ldi", NULL, NULL)
+    .Call(R_diagonal_as_kind, from, "l")
 
 ..diag2dsparse <- function(from)
     .Call(R_diagonal_as_sparse, from, "dtT", "U", TRUE)
@@ -727,9 +727,11 @@ setMethod("isSymmetric", signature(object = "diagonalMatrix"),
               }
               TRUE
           })
+
 setMethod("isTriangular", signature(object = "diagonalMatrix"),
           function(object, upper = NA, ...)
               if(is.na(upper)) `attr<-`(TRUE, "kind", "U") else TRUE)
+
 setMethod("isDiagonal", signature(object = "diagonalMatrix"),
           function(object) TRUE)
 

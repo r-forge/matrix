@@ -10,14 +10,21 @@ SEXP R_sparse_as_matrix(SEXP from);
 SEXP R_sparse_as_vector(SEXP from);
 SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0);
 SEXP R_sparse_as_general(SEXP from);
+
 SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0);
 SEXP R_diagonal_as_dense(SEXP from, SEXP code, SEXP uplo);
+SEXP R_diagonal_as_kind(SEXP from, SEXP kind);
 
 SEXP R_sparse_drop0(SEXP from);
 SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2);
 SEXP R_sparse_diag_get(SEXP obj, SEXP nms);
 SEXP R_sparse_transpose(SEXP from);
 SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to);
+
+SEXP CRsparse_symmpart(SEXP from);
+SEXP  Tsparse_symmpart(SEXP from);
+SEXP CRsparse_skewpart(SEXP from);
+SEXP  Tsparse_skewpart(SEXP from);
 
 SEXP CRsparse_as_Tsparse(SEXP from);
 SEXP tCRsparse_as_RCsparse(SEXP from);
@@ -30,6 +37,9 @@ SEXP Rsparse_is_triangular(SEXP obj, SEXP upper);
 SEXP Tsparse_is_triangular(SEXP obj, SEXP upper);
 SEXP Csparse_is_symmetric(SEXP obj, SEXP checkDN);
 SEXP Rsparse_is_symmetric(SEXP obj, SEXP checkDN);
+#if 0 /* unimplemented ... currently going via CsparseMatrix */
+SEXP Tsparse_is_symmetric(SEXP obj, SEXP checkDN);
+#endif
 
 /* TODO: compare with macros in ./Mutils.h */
 

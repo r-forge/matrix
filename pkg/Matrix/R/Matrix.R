@@ -134,19 +134,18 @@ if(FALSE) {
 ## "base" has an isSymmetric() S3-generic since R 2.3.0
 setMethod("isTriangular", signature(object = "matrix"), isTriMat)
 setMethod("isDiagonal", signature(object = "matrix"), .is.diagonal)
-}
-
-setMethod("symmpart", signature(x = "Matrix"),
-	  function(x) symmpart(as(x, "dMatrix")))
-
-setMethod("skewpart", signature(x = "Matrix"),
-	  function(x) skewpart(as(x, "dMatrix")))
 
 setMethod("symmpart", signature(x = "matrix"),
           function(x) symmetrizeDimnames(x + t(x)) / 2)
-
 setMethod("skewpart", signature(x = "matrix"),
           function(x) symmetrizeDimnames(x - t(x)) / 2)
+} ## MJ
+
+setMethod("symmpart", signature(x = "Matrix"),
+	  function(x) callGeneric(as(x, "dMatrix")))
+
+setMethod("skewpart", signature(x = "Matrix"),
+	  function(x) callGeneric(as(x, "dMatrix")))
 
 ## NB: classes without 'x' slot must have their own methods;
 ## see, e.g., ./nsparseMatrix.R and ./sparseVector.R

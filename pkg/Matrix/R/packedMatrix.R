@@ -89,6 +89,11 @@ setMethod("diag", signature(x = "packedMatrix"),
 setMethod("diag<-", signature(x = "packedMatrix"),
           function(x, value) .Call(packedMatrix_diag_set, x, value))
 
+setMethod("symmpart", signature(x = "packedMatrix"),
+          function(x) .Call(packedMatrix_symmpart, x))
+setMethod("skewpart", signature(x = "packedMatrix"),
+          function(x) .Call(packedMatrix_skewpart, x))
+
 
 ## ~~~~ UTILITIES FOR INDEXING ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

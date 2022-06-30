@@ -1,4 +1,4 @@
-#include<limits.h>
+#include <limits.h>
 #include <R_ext/Lapack.h>
 #include "Mutils.h"
 
@@ -1154,10 +1154,11 @@ PACKED_COPY_DIAGONAL(z, Rcomplex,
 			      _U_IS_NA_, _L_IS_NOT_NA_, _L_IS_NOT_EQUAL_) \
 Rboolean _PREFIX_ ## dense_unpacked_is_symmetric(const _CTYPE_ *x, int n) \
 {									\
-    int i, j, n1s = n - 1;						\
-    R_xlen_t upos = n, lpos = 1;					\
-    for (j = 0; j < n; upos = (lpos += (++j)+1) + n1s)			\
-	for (i = j+1; i < n; ++i, upos += n, ++lpos)			\
+    int i, j;								\
+    R_xlen_t upos = 0, lpos = 0;					\
+    for (j = 0; j < n; upos = (lpos += (++j)+1)) {			\
+	for (i = j+1; i < n; ++i) {					\
+	    upos += n; ++lpos;						\
 	    if (_U_IS_NA_) {						\
 		if (_L_IS_NOT_NA_)					\
 		    return FALSE;					\
@@ -1165,6 +1166,8 @@ Rboolean _PREFIX_ ## dense_unpacked_is_symmetric(const _CTYPE_ *x, int n) \
 		if (_L_IS_NOT_EQUAL_)					\
 		    return FALSE;					\
 	    }								\
+	}								\
+    }									\
     return TRUE;							\
 }
 
@@ -1577,7 +1580,8 @@ SEXP matrix_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector)
 	if (len > INT_MAX)
 	    error(_("vector of length exceeding 2^31-1 "
 		    "to 'matrix_as_geMatrix()'"));
-	PROTECT(dim = allocVector(INTSXP, 2)); ++nprotect;
+	PROTECT(dim = allocVector(INTSXP, 2));
+	++nprotect;
 	int *pdim = INTEGER(dim);
 	if (transpose_if_vector) {
 	    pdim[0] = 1;
@@ -1589,15 +1593,18 @@ SEXP matrix_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector)
 	SEXP nms = getAttrib(from, R_NamesSymbol);
 	doDN = !isNull(nms);
 	if (doDN) {
-	    PROTECT(dimnames = allocVector(VECSXP, 2)); ++nprotect;
+	    PROTECT(dimnames = allocVector(VECSXP, 2));
+	    ++nprotect;
 	    SET_VECTOR_ELT(dimnames, transpose_if_vector ? 1 : 0, nms);
 	}
     }
 		 
     if (tf != tt) {
-	PROTECT(from = coerceVector(from, tt)); ++nprotect;
-    } else if (new > 0 || MAYBE_REFERENCED(from)) {
-	SEXP tmp = PROTECT(allocVector(tt, len)); ++nprotect;
+	PROTECT(from = coerceVector(from, tt));
+	++nprotect;
+    } else if (new > 0 || (new == 0 && MAYBE_REFERENCED(from))) {
+	SEXP tmp = PROTECT(allocVector(tt, len));
+	++nprotect;
 	switch (tt) {
 	case REALSXP:
 	    Memcpy(REAL(tmp), REAL(from), len);
@@ -1624,7 +1631,8 @@ SEXP matrix_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector)
 
     char cl[] = ".geMatrix";
     cl[0] = kind;
-    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl)); ++nprotect;
+    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+    ++nprotect;
     SET_SLOT(to, Matrix_DimSym, (new > 1) ? duplicate(dim) : dim);
     if (doDN) {
 	if (new > 1)
@@ -1654,12 +1662,18 @@ SEXP R_dense_as_general(SEXP from, SEXP kind)
  * @param from A `denseMatrix`, a `diagonalMatrix`, a numeric or logical 
  *     `matrix`, or a numeric or logical vector.
  * @param kind A `char` flag, one of `'.'`, `'d'`, `'l'`, and `'n'`, 
- *     indicating the "kind" of `.geMatrix` desired.  A dot `"."` means 
+ *     indicating the "kind" of `.geMatrix` desired.  A dot `'.'` means 
  *     to preserve the "kind" of `from`.
- * @param new An `int` flag allowing the user to force allocation.  
- *     If greater than 0, then the `x` slot of the result is always newly 
- *     allocated.  If greater than 1, then so are the `Dim` and `Dimnames` 
- *     slots (but never the _elements_ of `Dimnames`).
+ * @param new An `int` flag allowing the user to control allocation.
+ *     If 0, then usual copy-on-modify rules are employed.  
+ *     If less than 0, then the `x` slot of the result is the result 
+ *     of modifying in place the `x` slot of `from` (or `from` itself 
+ *     if it is a `matrix` or vector), unless the two have different 
+ *     lengths or types.
+ *     If greater than 0, then the `x` slot of the result is always 
+ *     newly allocated.
+ *     If greater than 1, then the `Dim` and `Dimnames` slots are also 
+ *     always newly allocated (but never the _elements_ of `Dimnames`).
  * @param transpose_if_vector Should length-`n` vectors without a `dim` 
  *     attribute become 1-by-`n` (rather than `n`-by-1) matrices?
  *
@@ -1713,40 +1727,61 @@ SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
 	set_DimNames(to, dimnames);
     else
 	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-
+    
     if (kge) {
 	SET_SLOT(to, Matrix_xSym, duplicate(x0));
 	UNPROTECT(1);
 	return to;
     }
 
+    SEXP x1;
     SEXPTYPE tf = TYPEOF(x0), tt = kind2type(kind);
+    int do_na2one = clf[0] == 'n' && kind != 'n';
     if (ge) {
-	SET_SLOT(to, Matrix_xSym, (tf == tt
-				   ? ((new > 0) ? duplicate(x0) : x0)
-				   : coerceVector(x0, tt)));
-	UNPROTECT(1);
+	if (new == 0 && do_na2one) {
+	    /* Try to avoid an allocation ... */
+	    R_xlen_t ix, nx = XLENGTH(x0);
+	    int *px0 = LOGICAL(x0);
+	    for (ix = 0; ix < nx; ++ix)
+		if (*(px0++) == NA_LOGICAL)
+		    break;
+	    do_na2one = (ix < nx);
+	}
+	PROTECT(x1 = (tf == tt
+		      ? (new > 0 || (new == 0 && do_na2one)
+			 ? duplicate(x0)
+			 : x0)
+		      : coerceVector(x0, tt)));
+	if (do_na2one)
+	    na2one(x1);
+	SET_SLOT(to, Matrix_xSym, x1);
+	UNPROTECT(2);
 	return to;
     }
     
     /* Now handling 'from' inheriting from .(tr|sy|tp|sp|di)Matrix ... */
     
-    SEXP x1;
-    char ul = (clf[1] == 'd') ? 'U' : *uplo_P(from),
+    char
+	ul = (clf[1] == 'd') ? 'U' : *uplo_P(from),
 	di = (clf[1] == 's') ? 'N' : *diag_P(from);
-    int nprotect = 1, n = INTEGER(dim)[0];
-    if (clf[2] != 'p' && clf[2] != 'i') { /* XLENGTH(x0) == (R_xlen_t) n * n */
+    int n = INTEGER(dim)[0], nprotect = 2;
+    if (clf[2] != 'p' && clf[1] != 'd') {
 	/* (tr|sy)->ge */
-	PROTECT(x1 = (tf == tt) ? duplicate(x0) : coerceVector(x0, tt));
-	++nprotect;
+	PROTECT(x1 = (tf == tt
+		      ? (new >= 0
+			 ? duplicate(x0)
+			 : x0)
+		      : coerceVector(x0, tt)));
     } else {
 	/* (tp|sp|di)->ge */
+	if ((double) n * n > R_XLEN_T_MAX)
+	    error(_("attempt to allocate vector of length exceeding "
+		    "R_XLEN_T_MAX"));
 	if (tf != tt) {
 	    PROTECT(x0 = coerceVector(x0, tt));
 	    ++nprotect;
 	}
 	PROTECT(x1 = allocVector(tt, (R_xlen_t) n * n));
-	++nprotect;
     }
 
 #define AS_GE(_PREFIX_, _CTYPE_, _PTR_)					\
@@ -1756,7 +1791,7 @@ SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
 	    /* di->ge */						\
 	    Memzero(px1, (R_xlen_t) n * n);				\
 	    _PREFIX_ ## dense_unpacked_copy_diagonal(			\
-		px1, _PTR_(x0), n, (R_xlen_t) n, ul /* unused */, di);	\
+		px1, _PTR_(x0), n, n, ul /* unused */, di);		\
 	} else {							\
 	    /* (tr|sy|tp|sp)->ge */					\
 	    if (clf[2] == 'p')						\
@@ -1788,6 +1823,8 @@ SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
 
 #undef AS_GE
 
+    if (do_na2one)
+	na2one(x1);
     SET_SLOT(to, Matrix_xSym, x1);
     UNPROTECT(nprotect);
     return to;
@@ -1938,9 +1975,77 @@ void conjugate(SEXP x)
 {
     Rcomplex *px = COMPLEX(x);
     R_xlen_t nx = XLENGTH(x);
-    while (nx-- > 0) {
+    while (nx--) {
 	(*px).i = -(*px).i;
 	++px;
+    }
+    return;
+}
+
+void zeroRe(SEXP x)
+{
+    Rcomplex *px = COMPLEX(x);
+    R_xlen_t nx = XLENGTH(x);
+    while (nx--) {
+	if (!ISNAN((*px).r))
+	    (*px).r = 0.0;
+	++px;
+    }
+    return;
+}
+
+void zeroIm(SEXP x)
+{
+    Rcomplex *px = COMPLEX(x);
+    R_xlen_t nx = XLENGTH(x);
+    while (nx--) {
+	if (!ISNAN((*px).i))
+	    (*px).i = 0.0;
+	++px;
+    }
+    return;
+}
+
+void na2one(SEXP x)
+{
+    R_xlen_t i, n = XLENGTH(x);
+    switch (TYPEOF(x)) {
+    case LGLSXP:
+    {
+	int *px = LOGICAL(x);
+	for (i = 0; i < n; ++i, ++px)
+	    if (*px == NA_LOGICAL)
+		*px = 1;
+	break;
+    }
+    case INTSXP:
+    {
+	int *px = INTEGER(x);
+	for (i = 0; i < n; ++i, ++px)
+	    if (*px == NA_INTEGER)
+		*px = 1;
+	break;
+    }
+    case REALSXP:
+    {
+	double *px = REAL(x);
+	for (i = 0; i < n; ++i, ++px)
+	    if (ISNAN(*px))
+		*px = 1.0;
+	break;
+    }
+    case CPLXSXP:
+    {
+	Rcomplex one, *px = COMPLEX(x);
+	one.r = 1.0; one.i = 0.0;
+	for (i = 0; i < n; ++i, ++px)
+	    if (ISNAN((*px).r) || ISNAN((*px).i))
+		*px = one;
+	break;
+    }
+    default:
+	ERROR_INVALID_TYPE("'x'", TYPEOF(x), "na2one");
+	break;
     }
     return;
 }
