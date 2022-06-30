@@ -1151,52 +1151,33 @@ SEXP unpackedMatrix_skewpart(SEXP from)
 	
 #define ASSIGN_OFFDIAG_DGE(_UPOS_, _LPOS_)				\
 	    do {							\
-		if (ISNAN(px[_UPOS_]) || ISNAN(px[_LPOS_])) {		\
-		    py[_UPOS_] = py[_LPOS_] = NA_REAL;			\
-		} else {						\
-		    py[_UPOS_] = 0.5 * (px[_UPOS_] - px[_LPOS_]);	\
-		    py[_LPOS_] = -py[_UPOS_];				\
-		}							\
+		py[_UPOS_] = 0.5 * (px[_UPOS_] - px[_LPOS_]);		\
+		py[_LPOS_] = -py[_UPOS_];				\
 	    } while (0)
 
 #define ASSIGN_OFFDIAG_DTR(_UPOS_, _LPOS_)			\
 	    do {						\
-		if (ISNAN(px[_UPOS_])) {			\
-		    py[_UPOS_] = py[_LPOS_] = NA_REAL;		\
-		} else {					\
-		    py[_UPOS_] = 0.5 * px[_UPOS_];		\
-		    py[_LPOS_] = -py[_UPOS_];			\
-		}						\
+		py[_UPOS_] = 0.5 * px[_UPOS_];			\
+		py[_LPOS_] = -py[_UPOS_];			\
 	    } while (0)
 
 #define ASSIGN_ONDIAG_ZGE(_DPOS_) py[_DPOS_].r = py[_DPOS_].i = 0.0
 	
 #define ASSIGN_OFFDIAG_ZGE(_UPOS_, _LPOS_)				\
 	    do {							\
-		if (ISNAN(px[_UPOS_].r) || ISNAN(px[_UPOS_].i) ||	\
-		    ISNAN(px[_LPOS_].r) || ISNAN(px[_LPOS_].i)) {	\
-		    py[_UPOS_].r = py[_UPOS_].i =			\
-			py[_LPOS_].r = py[_LPOS_].i = NA_REAL;		\
-		} else {						\
-		    py[_UPOS_].r = 0.5 * (px[_UPOS_].r - px[_LPOS_].r);	\
-		    py[_UPOS_].i = 0.5 * (px[_UPOS_].i - px[_LPOS_].i);	\
-		    py[_LPOS_].r = -py[upos].r;				\
-		    py[_LPOS_].i = -py[upos].i;				\
-		}							\
+		py[_UPOS_].r = 0.5 * (px[_UPOS_].r - px[_LPOS_].r);	\
+		py[_UPOS_].i = 0.5 * (px[_UPOS_].i - px[_LPOS_].i);	\
+		py[_LPOS_].r = -py[upos].r;				\
+		py[_LPOS_].i = -py[upos].i;				\
 	    } while (0)
 
 #define ASSIGN_OFFDIAG_ZTR(_UPOS_, _LPOS_)				\
 	    do {							\
-		if (ISNAN(px[_UPOS_].r) || ISNAN(px[_UPOS_].i)) {	\
-		    py[_UPOS_].r = py[_UPOS_].i =			\
-			py[_LPOS_].r = py[_LPOS_].i = NA_REAL;		\
-		} else {						\
-		    py[_UPOS_].r = 0.5 * px[_UPOS_].r;			\
-		    py[_UPOS_].i = 0.5 * px[_UPOS_].i;			\
-		    py[_LPOS_].r = -py[upos].r;				\
-		    py[_LPOS_].i = -py[upos].i;				\
-		}							\
-	    } while (0)	    
+		py[_UPOS_].r = 0.5 * px[_UPOS_].r;			\
+		py[_UPOS_].i = 0.5 * px[_UPOS_].i;			\
+		py[_LPOS_].r = -py[upos].r;				\
+		py[_LPOS_].i = -py[upos].i;				\
+	    } while (0)
 	
 	if (clf[0] != 'z') {
 	    PROTECT(to = NEW_OBJECT_OF_CLASS("dgeMatrix"));

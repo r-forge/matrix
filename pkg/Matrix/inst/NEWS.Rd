@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-06-30 r3508)}{
+\section{Changes in version 1.4-2 (2022-06-30 r3509)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual classes
@@ -167,6 +167,9 @@
       \code{skewpart(<diagonalMatrix>)} now always has symmetric
       \code{Dimnames}.
 
+      \item Zeros on the diagonal of \code{skewpart(<[CRT]sparseMatrix>)}
+      are now \emph{structural}.
+
       \item \code{as(<ndenseMatrix>, "(vector|matrix|[dl]Matrix)")}
       now correctly treat \code{NA} in the \code{x} slot as \code{TRUE}.
     }
@@ -275,7 +278,8 @@
       and is highly optimized in the \code{.[ts][CR]Matrix} case.
 
       \item \code{symmpart} and \code{skewpart} are now done in C
-      for all \code{denseMatrix} and all \code{[CRT]sparseMatrix}.
+      for all \code{denseMatrix} and all \code{[CRT]sparseMatrix},
+      as well as for base \code{matrix}.
       Both now more faithfully preserve the \dQuote{storage} of
       their argument.  (Previously, \code{symmpart(packedMatrix)}
       was an \code{unpackedMatrix},
