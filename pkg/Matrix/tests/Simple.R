@@ -1294,7 +1294,8 @@ lT0@x[1L] <- FALSE
 lT1@x[1L] <- TRUE
 stopifnot(identical(as.vector(lT.), NA),
           identical(as.vector(lT0), NA),
-          identical(as.vector(lT1), TRUE))
+          identical(as.vector(lT1), TRUE),
+          identical(as(lT1, "CsparseMatrix")@x, TRUE))
 
 ## various is.na() bugs in Matrix <= 1.4-1
 .nge <- new("ngeMatrix", Dim = c(2L, 2L), x = rep.int(NA, 4L))
