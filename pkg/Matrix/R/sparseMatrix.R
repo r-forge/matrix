@@ -115,11 +115,19 @@ setAs("RsparseMatrix", "TsparseMatrix", .CR2T)
 setAs("TsparseMatrix", "CsparseMatrix", .T2C)
 setAs("TsparseMatrix", "RsparseMatrix", .T2R)
 
-## sC<->R, sR->C, preserving kind and symmetry
-.def.template <- function(from)
-    new(.TO, Dim = from@Dim, Dimnames = from@Dimnames,
-        uplo = if(from@uplo == "U") "L" else "U",
-        p = from@p, j = from@i, x = from@x)
+## sC->R, sR->C, preserving kind and symmetry
+.def.template <- function(from) {
+    to <- new(.TO)
+    to@Dim <- from@Dim
+    to@Dimnames <- from@Dimnames
+    if(from@uplo == "U")
+        to@uplo <- "L"
+    to@p <- from@p
+    to@j <- from@i
+    to@x <- from@x
+    to@factors <- from@factors
+    to
+}
 for (.kind in c("d", "l", "n")) {
     for (.repr in c("C", "R")) {
         .otherrepr <- if(.repr == "C") "R" else "C"
@@ -128,22 +136,21 @@ for (.kind in c("d", "l", "n")) {
         .def <- .def.template
 
         .b <- body(.def)
-        .b[[2L]] <- .to
-        if(.repr != "C") { # reverse j = from@i
-            .m <- match("j", names(.b))
-            names(.b)[.m] <- "i"
-            .b[[.m]][[3L]] <- quote(j)
+        .b[[2L]][[3L]][[2L]] <- .to
+        if(.repr != "C") {
+            ## reverse to@j <- from@i
+            .b[[7L]][[2L]][[3L]] <- quote(i)
+            .b[[7L]][[3L]][[3L]] <- quote(j)
         }
-        if(.kind == "n") { # delete x = from@x
-            .m <- match("x", names(.b))
-            .b[[.m]] <- NULL
-        }
+        if(.kind == "n")
+            ## delete to@x <- from@x
+            .b[[8L]] <- NULL
         body(.def) <- .b
 
         setAs(.from, paste0(.otherrepr, "sparseMatrix"), .def)
     }
 }
-rm(.def.template, .def, .b, .from, .to, .kind, .repr, .otherrepr, .m)
+rm(.def.template, .def, .b, .from, .to, .kind, .repr, .otherrepr)
 
 ## More granular coercions .................................
 
@@ -270,6 +277,7 @@ setAs(    "ngTMatrix", "lgeMatrix", ..sparse2lge)
 ## Exported functions, now just aliases or wrappers ........
 ## (some or all could be made deprecated) ..................
 
+.T2Cmat <- function(from, isTri) .BODY; body(.T2Cmat) <- body(.T2C)
 .C2nC <- function(from, isTri) .BODY; body(.C2nC) <- body(..sparse2nsparse)
 .nC2d <- ..sparse2dsparse
 .nC2l <- ..sparse2lsparse

@@ -337,12 +337,13 @@ spV2M <- function (x, nrow, ncol, byrow = FALSE, check = TRUE, symmetric = FALSE
     r
 }## {spV2M}
 
-.sparseV2Mat <- function(from) spV2M(from, nrow=from@length, ncol=1L, check=FALSE)
-setAs("sparseVector","Matrix", .sparseV2Mat)
-setAs("sparseVector","sparseMatrix", .sparseV2Mat)
-setAs("sparseVector","TsparseMatrix", .sparseV2Mat)
-setAs("sparseVector","CsparseMatrix",
-      function(from) .Call(Tsparse_to_Csparse, .sparseV2Mat(from), FALSE))
+.sparseV2Mat <- function(from)
+    spV2M(from, nrow = from@length, ncol = 1L, check = FALSE)
+setAs("sparseVector", "Matrix", .sparseV2Mat)
+setAs("sparseVector", "sparseMatrix", .sparseV2Mat)
+setAs("sparseVector", "TsparseMatrix", .sparseV2Mat)
+setAs("sparseVector", "CsparseMatrix", function(from) .T2C(.sparseV2Mat(from)))
+setAs("sparseVector", "RsparseMatrix", function(from) .T2R(.sparseV2Mat(from)))
 
 setMethod("dim<-", signature(x = "sparseVector"),
 	  function(x, value) {

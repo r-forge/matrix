@@ -1,7 +1,3 @@
-#ifdef __GLIBC__
-# define _POSIX_C_SOURCE 200809L
-#endif
-#include <string.h>
 #include "unpackedMatrix.h"
 
 /* pack(x), returning packedMatrix */
@@ -220,13 +216,11 @@ SEXP unpackedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
 
     /* Now handling just square .(tr|ge)Matrix ... */
     
-    char *clt = strdup(clf);
-    clt[1] = 's';
-    clt[2] = 'y';
+    char clt[] = ".syMatrix";
+    clt[0] = clf[0];
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
 	dimnames = GET_SLOT(from, Matrix_DimNamesSym),
 	x_from = GET_SLOT(from, Matrix_xSym);
-    free(clt);
     
     if (clf[1] == 'g' || ulf == ult) {
 	/* .geMatrix or .trMatrix with correct uplo */
@@ -850,12 +844,12 @@ SEXP unpackedMatrix_diag_set(SEXP obj, SEXP val)
 	    PROTECT(val = coerceVector(val, tv = REALSXP));
 	    ++nprotect;
 	}
-	char *cl = strdup(valid[ivalid]);
-	cl[0] = 'd';
+	char cl[] = "d..Matrix";
+	cl[1] = valid[ivalid][1];
+	cl[2] = valid[ivalid][2];
 	PROTECT(res = NEW_OBJECT_OF_CLASS(cl));
 	PROTECT(x = coerceVector(x, tx = tv));
 	++nprotect;
-    	free(cl);
     }
     SET_SLOT(res, Matrix_xSym, x);
     

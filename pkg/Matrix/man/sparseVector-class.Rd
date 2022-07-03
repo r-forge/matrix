@@ -33,6 +33,7 @@
 \alias{coerce,ANY,sparseVector-method}
 \alias{coerce,sparseVector,CsparseMatrix-method}
 \alias{coerce,sparseVector,Matrix-method}
+\alias{coerce,sparseVector,RsparseMatrix-method}
 \alias{coerce,sparseVector,TsparseMatrix-method}
 \alias{coerce,sparseVector,dsparseVector-method}
 \alias{coerce,sparseVector,integer-method}

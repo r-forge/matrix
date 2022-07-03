@@ -54,7 +54,7 @@ setMethod("Summary", "dsparseMatrix",
 	  clx <- getClassDef(class(x))
 	  isTri <- extends(clx, "triangularMatrix")
 	  if(extends(clx, "TsparseMatrix") && anyDuplicatedT(x, di = d))
-	      x <- .Call(Tsparse_to_Csparse, x, isTri)# = as(x, "Csparsematrix")
+	      x <- .T2C(x) # = as(x, "Csparsematrix")
 	  l.x <- length(x@x)
 	  if(l.x == ne) ## fully non-zero (and "general") - very rare but quick
 	      return( callGeneric(x@x, ..., na.rm = na.rm) )

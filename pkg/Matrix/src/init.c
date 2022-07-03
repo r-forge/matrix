@@ -153,7 +153,11 @@ static R_CallMethodDef CallEntries[] = {
     
     CALLDEF(Tsparse_validate, 1),
     CALLDEF(Tsparse_diagU2N, 1),
+
+/* MJ: no longer needed ... prefer Tsparse_as_CRsparse() */
+#if 0
     CALLDEF(Tsparse_to_Csparse, 2),
+#endif
 
 /* MJ: unused */
 #if 0    
@@ -443,6 +447,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Tsparse_skewpart, 1),
 
     CALLDEF(CRsparse_as_Tsparse, 1),
+    CALLDEF(Tsparse_as_CRsparse, 2),
     CALLDEF(tCRsparse_as_RCsparse, 1),
     CALLDEF(Csparse_is_diagonal, 1),
     CALLDEF(Rsparse_is_diagonal, 1),

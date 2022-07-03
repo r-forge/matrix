@@ -1,7 +1,3 @@
-#ifdef __GLIBC__
-# define _POSIX_C_SOURCE 200809L
-#endif
-#include <string.h>
 #include "packedMatrix.h"
 
 /* unpack(x), returning unpackedMatrix */
@@ -118,13 +114,12 @@ SEXP packedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
     
     /* Now handling just .tpMatrix ... */
     
-    char *clt = strdup(clf);
-    clt[1] = 's';
+    char clt[] = ".spMatrix";
+    clt[0] = clf[0];
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
 	dim = GET_SLOT(from, Matrix_DimSym),
 	dimnames = GET_SLOT(from, Matrix_DimNamesSym),
 	x_from = GET_SLOT(from, Matrix_xSym);
-    free(clt);
     
     if (ulf == ult) {
 	/* .tpMatrix with correct uplo */
@@ -464,11 +459,10 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
 	    PROTECT(val = coerceVector(val, tv = REALSXP));
 	    ++nprotect;
 	}
-	char *cl = strdup(valid[ivalid]);
-	cl[0] = 'd';
+	char cl[] = "d.pMatrix";
+	cl[1] = valid[ivalid][1];
 	PROTECT(res = NEW_OBJECT_OF_CLASS(cl));
 	PROTECT(x = coerceVector(x, tx = tv));
-	free(cl);
     }
     SET_SLOT(res, Matrix_xSym, x);
     
@@ -1067,11 +1061,9 @@ SEXP packedMatrix_sub2(SEXP obj, SEXP index1, SEXP index2, SEXP drop)
 	SET_SLOT(res, Matrix_uploSym, GET_SLOT(obj, Matrix_uploSym));
 	++nprotect;
     } else {
-	char *cl = strdup(valid[ivalid]);
-	cl[1] = 'g';
-	cl[2] = 'e';
+	char cl[] = ".geMatrix";
+	cl[0] = valid[ivalid][0];
 	PROTECT(res = NEW_OBJECT_OF_CLASS(cl));
-	free(cl);
 	++nprotect;
     }
 

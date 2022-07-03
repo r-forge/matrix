@@ -1,7 +1,3 @@
-#ifdef __GLIBC__
-# define _POSIX_C_SOURCE 200809L
-#endif
-#include <string.h>
 #include "sparse.h"
 
 SEXP sparse_as_dense(SEXP from, int packed)
@@ -14,14 +10,15 @@ SEXP sparse_as_dense(SEXP from, int packed)
     const char *clf = valid[ivalid];
     packed = packed && clf[1] != 'g';
 
-    char *clt = strdup(clf);
+    char clt[] = "...Matrix";
+    clt[0] = clf[0];
+    clt[1] = clf[1];
     clt[2] = (clf[1] == 'g')
 	? 'e' : ((packed) ? 'p' : ((clf[1] == 't') ? 'r' : 'y'));
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
 	dim = GET_SLOT(from, Matrix_DimSym),
 	dimnames = GET_SLOT(from, Matrix_DimNamesSym),
 	x0 = (clf[0] != 'n') ? GET_SLOT(from, Matrix_xSym) : R_NilValue;
-    free(clt);
 
     int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
     double mn = (double) m * n, nx_ = (packed) ? (mn + n) / 2.0 : mn;
@@ -50,43 +47,6 @@ SEXP sparse_as_dense(SEXP from, int packed)
 	}
     }
 
-#define SAD_CASES(_KIND_, _MACRO_)				\
-    switch (_KIND_) {						\
-    case 'd':							\
-    {								\
-	double *px0 = REAL(x0), *px1 = REAL(x1);		\
-	_MACRO_(px1, *(px0++));					\
-	break;							\
-    }								\
-    case 'l':							\
-    {								\
-	int *px0 = LOGICAL(x0), *px1 = LOGICAL(x1);		\
-	_MACRO_(px1, *(px0++));					\
-	break;							\
-    }								\
-    case 'n':							\
-    {								\
-	int *px1 = LOGICAL(x1);					\
-	_MACRO_(px1, 1);					\
-	break;							\
-    }								\
-    case 'i':							\
-    {								\
-	int *px0 = INTEGER(x0), *px1 = INTEGER(x1);		\
-	_MACRO_(px1, *(px0++));					\
-	break;							\
-    }								\
-    case 'z':							\
-    {								\
-	Rcomplex *px0 = COMPLEX(x0), *px1 = COMPLEX(x1);	\
-	_MACRO_(px1, *(px0++));					\
-	break;							\
-    }								\
-    default:							\
-	ERROR_INVALID_TYPE("'x' slot", tx, "sparse_as_dense");	\
-	break;							\
-    }
-
     /* It remains to fill 'x' ... */
     
     if (clf[2] == 'C') {
@@ -96,38 +56,51 @@ SEXP sparse_as_dense(SEXP from, int packed)
 	int *pp = INTEGER(p), *pi = INTEGER(i), j, k, kend;
 	++pp;
 	
-#define SAD_C(_X_, _VAL_)						\
-	do {								\
-	    Memzero(_X_, nx);						\
-	    if (!packed) {						\
-		for (j = 0, k = 0; j < n; ++j, _X_ += m) {		\
-		    kend = pp[j];					\
-		    while (k < kend) {					\
-			_X_[*pi] = _VAL_;				\
-			++pi; ++k;					\
-		    }							\
-		}							\
-	    } else if (ul == 'U') {					\
-		for (j = 0, k = 0; j < n; _X_ += (++j)) {		\
-		    kend = pp[j];					\
-		    while (k < kend) {					\
-			_X_[*pi] = _VAL_;				\
-			++pi; ++k;					\
-		    }							\
-		}							\
-	    } else {							\
-		for (j = 0, k = 0; j < n; _X_ += n-(j++)) {		\
-		    kend = pp[j];					\
-		    while (k < kend) {					\
-			_X_[*pi - j] = _VAL_;				\
-			++pi; ++k;					\
-		    }							\
-		}							\
-	    }								\
+#define SAD_C(_VAL_)						\
+	do {							\
+	    if (!packed) {					\
+		for (j = 0, k = 0; j < n; ++j, px1 += m) {	\
+		    kend = pp[j];				\
+		    while (k < kend) {				\
+			px1[*pi] = _VAL_;			\
+			++pi; ++k;				\
+		    }						\
+		}						\
+	    } else if (ul == 'U') {				\
+		for (j = 0, k = 0; j < n; px1 += (++j)) {	\
+		    kend = pp[j];				\
+		    while (k < kend) {				\
+			px1[*pi] = _VAL_;			\
+			++pi; ++k;				\
+		    }						\
+		}						\
+	    } else {						\
+		for (j = 0, k = 0; j < n; px1 += n-(j++)) {	\
+		    kend = pp[j];				\
+		    while (k < kend) {				\
+			px1[*pi - j] = _VAL_;			\
+			++pi; ++k;				\
+		    }						\
+		}						\
+	    }							\
 	} while (0)
-
-	SAD_CASES(clf[0], SAD_C);
-
+	
+#define SAD_C_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)		\
+	do {						\
+	    _CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
+	    Memzero(px1, nx);				\
+	    SAD_C(*(px0++));				\
+	} while (0)
+	    
+	if (clf[0] == 'n') {
+	    int *px1 = LOGICAL(x1);
+	    Memzero(px1, nx);
+	    SAD_C(1);
+	} else {
+	    SPARSE_CASES(tx, SAD_C_X);
+	}
+	
+#undef SAD_C_X
 #undef SAD_C
 	
     } else if (clf[2] == 'R') {
@@ -137,63 +110,75 @@ SEXP sparse_as_dense(SEXP from, int packed)
 	int *pp = INTEGER(p), *pj = INTEGER(j), i, k, kend;
 	++pp;
 	
-#define SAD_R(_X_, _VAL_)						\
-	do {								\
-	    Memzero(_X_, nx);						\
-	    if (!packed) {						\
-		R_xlen_t m1 = (R_xlen_t) m;				\
-		for (i = 0, k = 0; i < m; ++i, ++_X_) {			\
-		    kend = pp[i];					\
-		    while (k < kend) {					\
-			_X_[m1 * *pj] = _VAL_;				\
-			++pj; ++k;					\
-		    }							\
-		}							\
-	    } else if (ul == 'U') {					\
-		for (i = 0, k = 0; i < n; ++i) {			\
-		    kend = pp[i];					\
-		    while (k < kend) {					\
-			_X_[PM_AR21_UP(i, *pj)] = _VAL_;		\
-			++pj; ++k;					\
-		    }							\
-		}							\
-	    } else {							\
-		R_xlen_t n2 = (R_xlen_t) n * 2;				\
-		for (i = 0, k = 0; i < n; ++i) {			\
-		    kend = pp[i];					\
-		    while (k < kend) {					\
-			_X_[PM_AR21_LO(i, *pj, n2)] = _VAL_;		\
-			++pj; ++k;					\
-		    }							\
-		}							\
-	    }								\
+#define SAD_R(_VAL_)						\
+	do {							\
+	    if (!packed) {					\
+		R_xlen_t m1 = (R_xlen_t) m;			\
+		for (i = 0, k = 0; i < m; ++i, ++px1) {		\
+		    kend = pp[i];				\
+		    while (k < kend) {				\
+			px1[m1 * *pj] = _VAL_;			\
+			++pj; ++k;				\
+		    }						\
+		}						\
+	    } else if (ul == 'U') {				\
+		for (i = 0, k = 0; i < n; ++i) {		\
+		    kend = pp[i];				\
+		    while (k < kend) {				\
+			px1[PM_AR21_UP(i, *pj)] = _VAL_;	\
+			++pj; ++k;				\
+		    }						\
+		}						\
+	    } else {						\
+		R_xlen_t n2 = (R_xlen_t) n * 2;			\
+		for (i = 0, k = 0; i < n; ++i) {		\
+		    kend = pp[i];				\
+		    while (k < kend) {				\
+			px1[PM_AR21_LO(i, *pj, n2)] = _VAL_;	\
+			++pj; ++k;				\
+		    }						\
+		}						\
+	    }							\
 	} while (0)
-	
-	SAD_CASES(clf[0], SAD_R);
 
+#define SAD_R_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)		\
+	do {						\
+	    _CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
+	    Memzero(px1, nx);				\
+	    SAD_R(*(px0++));				\
+	} while (0)
+
+	if (clf[0] == 'n') {
+	    int *px1 = LOGICAL(x1);
+	    Memzero(px1, nx);
+	    SAD_R(1);
+	} else {
+	    SPARSE_CASES(tx, SAD_R_X);
+	}
+	
+#undef SAD_R_X
 #undef SAD_R
-#undef SAD_CASES
 	
     } else { /* clf[2] == 'T' */
 	
 	SEXP i = GET_SLOT(from, Matrix_iSym),
 	    j = GET_SLOT(from, Matrix_jSym);
 	int *pi = INTEGER(i), *pj = INTEGER(j);
-	R_xlen_t k, nnz = XLENGTH(i);
+	R_xlen_t index, k, nnz = XLENGTH(i);
 
-#define SAD_SUBCASES(_DO_LOOP_)				\
+#define SAD_T(_DO_FOR_)					\
 	do {						\
 	    if (!packed) {				\
 		R_xlen_t m1 = (R_xlen_t) m;		\
-		_DO_LOOP_(m1 * *pj + *pi);		\
+		_DO_FOR_(m1 * *pj + *pi);		\
 	    } else if (ul == 'U') {			\
-		_DO_LOOP_(PM_AR21_UP(*pi, *pj));	\
+		_DO_FOR_(PM_AR21_UP(*pi, *pj));		\
 	    } else {					\
 		R_xlen_t n2 = (R_xlen_t) n * 2;		\
-		_DO_LOOP_(PM_AR21_LO(*pi, *pj, n2));	\
+		_DO_FOR_(PM_AR21_LO(*pi, *pj, n2));	\
 	    }						\
 	} while (0)
-		
+	
 	switch (clf[0]) {
 	case 'd':
 	{
@@ -206,31 +191,28 @@ SEXP sparse_as_dense(SEXP from, int packed)
 		    px1[_INDEX_] += *px0;			\
 	    } while (0)
 	    
-	    SAD_SUBCASES(SAD_T_D);
+	    SAD_T(SAD_T_D);
 	    break;
 	}
 	case 'l':
 	{
 	    int *px0 = LOGICAL(x0), *px1 = LOGICAL(x1);
-	    R_xlen_t index;
 	    Memzero(px1, nx);
 
-#define SAD_T_L(_INDEX_)						\
-	    do {							\
-		for (k = 0; k < nnz; ++k, ++pi, ++pj, ++px0) {		\
-		    if (*px0 != 0) {					\
-			index = _INDEX_;				\
-			if (*px0 == NA_LOGICAL) {			\
-			    if (px1[index] == 0)			\
-				px1[index] = NA_LOGICAL;		\
-			} else {					\
-			    px1[index] = 1;				\
-			}						\
-		    }							\
-		}							\
+#define SAD_T_L(_INDEX_)					\
+	    do {						\
+		for (k = 0; k < nnz; ++k, ++pi, ++pj, ++px0) {	\
+		    if (*px0 != 0) {				\
+			index = _INDEX_;			\
+			if (*px0 != NA_LOGICAL)			\
+			    px1[index] = 1;			\
+			else if (px1[index] == 0)		\
+			    px1[index] = NA_LOGICAL;		\
+		    }						\
+		}						\
 	    } while (0)
 
-	    SAD_SUBCASES(SAD_T_L);
+	    SAD_T(SAD_T_L);
 	    break;
 	}
 	case 'n':
@@ -238,13 +220,13 @@ SEXP sparse_as_dense(SEXP from, int packed)
 	    int *px1 = LOGICAL(x1);
 	    Memzero(px1, nx);
 	    
-#define SAD_T_N(_INDEX_)						\
-	    do {							\
-		for (k = 0; k < nnz; ++k, ++pi, ++pj)			\
-		    px1[_INDEX_] = 1;					\
+#define SAD_T_N(_INDEX_)				\
+	    do {					\
+		for (k = 0; k < nnz; ++k, ++pi, ++pj)	\
+		    px1[_INDEX_] = 1;			\
 	    } while (0)
 
-	    SAD_SUBCASES(SAD_T_N);
+	    SAD_T(SAD_T_N);
 	    break;
 	}
 	case 'i':
@@ -254,8 +236,8 @@ SEXP sparse_as_dense(SEXP from, int packed)
 
 /* FIXME: not detecting integer overflow here */
 #define SAD_T_I(_INDEX_) SAD_T_D(_INDEX_)
-
-	    SAD_SUBCASES(SAD_T_I);
+	    
+	    SAD_T(SAD_T_I);
 	    break;
 	}
 	case 'z':
@@ -273,7 +255,7 @@ SEXP sparse_as_dense(SEXP from, int packed)
 		}						\
 	    } while (0)
 	    
-	    SAD_SUBCASES(SAD_T_Z);
+	    SAD_T(SAD_T_Z);
 	    break;
 	}
 	default:
@@ -286,7 +268,7 @@ SEXP sparse_as_dense(SEXP from, int packed)
 #undef SAD_T_N
 #undef SAD_T_I
 #undef SAD_T_Z
-#undef SAD_SUBCASES
+#undef SAD_T
     
     }
     
@@ -378,10 +360,11 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
     if (do_drop0)
 	PROTECT(from = R_sparse_drop0(from));
     
-    char *clt = strdup(clf);
+    char clt[] = "...Matrix";
     clt[0] = k;
+    clt[1] = clf[1];
+    clt[2] = clf[2];
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)), p, i;
-    free(clt);
     
     SET_SLOT(to, Matrix_DimSym, GET_SLOT(from, Matrix_DimSym));
     SET_SLOT(to, Matrix_DimNamesSym, GET_SLOT(from, Matrix_DimNamesSym));
@@ -434,12 +417,12 @@ SEXP R_sparse_as_general(SEXP from)
     if (clf[1] == 'g')
 	return from;
     
-    char *clt = strdup(clf);
-    clt[1] = 'g';
+    char clt[] = ".g.Matrix";
+    clt[0] = clf[0];
+    clt[2] = clf[2];
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
 	dim = GET_SLOT(from, Matrix_DimSym),
 	dimnames = GET_SLOT(from, Matrix_DimNamesSym);
-    free(clt);
     
     SET_SLOT(to, Matrix_DimSym, dim);
     if (clf[1] == 's') {
@@ -769,17 +752,17 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 		PROTECT(x = allocVector(tx, n));
 		++nprotect;
 
-#define SET1(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
-		do {						\
-		    _CTYPE_ *px = _PTR_(x);			\
-		    for (k = 0; k < n; ++k) {			\
-			*(pi++) = k;				\
-			*(px++) = _ONE_;			\
-		    }						\
+#define SET1(_CTYPE_, _PTR_, _ZERO_, _ONE_)	\
+		do {				\
+		    _CTYPE_ *px = _PTR_(x);	\
+		    for (k = 0; k < n; ++k) {	\
+			*(pi++) = k;		\
+			*(px++) = _ONE_;	\
+		    }				\
 		} while (0)
 		
 		SPARSE_CASES(tx, SET1);
-
+		
 #undef SET1
 
 	    }
@@ -1169,11 +1152,14 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
 	}
     }
 
-    char *clt = strdup(clf);
     int ge = 0, tr = 0, sy = 0, nprotect = 0;
     ge = m != n || (!(tr = a >= 0 || b <= 0 || clf[1] == 't') &&
 		    !(sy = a == -b && clf[1] == 's'));   
+
+    char clt[] = "...Matrix";
+    clt[0] = clf[0];
     clt[1] = (ge) ? 'g' : ((tr) ? 't' : 's');
+    clt[2] = clf[2];
 
     /* band(<R>, a, b) is equivalent to t(band(t(<R>), -b, -a)) ! */
     
@@ -1191,7 +1177,6 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
 
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
 	dimnames = GET_SLOT(from, Matrix_DimNamesSym);
-    free(clt);
     ++nprotect;
     
     SET_SLOT(to, Matrix_DimSym, dim);
@@ -1476,12 +1461,10 @@ SEXP R_sparse_diag_get(SEXP obj, SEXP nms)
 	    Memzero(pres, r);
 	    for (k = 0; k < nnz; ++k, ++pi, ++pj, ++px) {
 		if (*pi == *pj && *px != 0) {
-		    if (*px == NA_LOGICAL) {
-			if (pres[*pi] == 0)
-			    pres[*pi] = NA_LOGICAL;
-		    } else {
+		    if (*px != NA_LOGICAL)
 			pres[*pi] = 1;
-		    }
+		    else if (pres[*pi] == 0)
+			pres[*pi] = NA_LOGICAL;
 		}
 	    }
 	    break;
@@ -1780,11 +1763,11 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 
     /* Now handling just square .[gt][CRT]Matrix ... */
 
-    char *clt = strdup(clf);
-    clt[1] = 's';
+    char clt[] = ".s.Matrix";
+    clt[0] = clf[0];
+    clt[2] = clf[2];
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
 	dimnames = GET_SLOT(from, Matrix_DimNamesSym);
-    free(clt);
 
     SET_SLOT(to, Matrix_DimSym, dim);
     set_symmetrized_DimNames(to, dimnames, -1);
@@ -3070,12 +3053,12 @@ SEXP CRsparse_as_Tsparse(SEXP from)
 	ERROR_INVALID_CLASS(class_P(from), "CRsparse_as_Tsparse");
     const char *clf = valid[ivalid];
 
-    char *clt = strdup(clf);
-    clt[2] = 'T';
+    char clt[] = "..TMatrix";
+    clt[0] = clf[0];
+    clt[1] = clf[1];
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
 	dim = GET_SLOT(from, Matrix_DimSym),
 	dimnames = GET_SLOT(from, Matrix_DimNamesSym);
-    free(clt);
     
     SET_SLOT(to, Matrix_DimSym, dim);
     SET_SLOT(to, Matrix_DimNamesSym, dimnames);
@@ -3118,6 +3101,267 @@ SEXP CRsparse_as_Tsparse(SEXP from)
     return to;
 }
 
+SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
+{
+    static const char *valid[] = { VALID_TSPARSE, "" };
+    int ivalid = R_check_class_etc(from, valid);
+    if (ivalid < 0)
+	ERROR_INVALID_CLASS(class_P(from), "Tsparse_as_CRsparse");
+    const char *clf = valid[ivalid];
+    int doC = (asLogical(Csparse) != 0);
+
+    char clt[] = "...Matrix";
+    clt[0] = clf[0];
+    clt[1] = clf[1];
+    clt[2] = (doC) ? 'C' : 'R';
+    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
+	dim = GET_SLOT(from, Matrix_DimSym),
+	iSym = (doC) ? Matrix_iSym : Matrix_jSym,
+	jSym = (doC) ? Matrix_jSym : Matrix_iSym,
+	i0 = GET_SLOT(from, iSym),
+	j0 = GET_SLOT(from, jSym),
+	x0 = (clf[0] != 'n') ? GET_SLOT(from, Matrix_xSym) : R_NilValue;
+    int *pdim = INTEGER(dim), *pi0 = INTEGER(i0), *pj0 = INTEGER(j0),
+	m = pdim[0],
+	n = pdim[1],
+	m_ = (doC) ? m : n,
+	n_ = (doC) ? n : m,
+	r = (m < n) ? n : m;
+    R_xlen_t nnz0 = XLENGTH(i0), nnz1 = 0;
+
+    /* FIXME? we would ideally only throw an error if the number
+       of _unique_ (i,j) pairs exceeds INT_MAX ... 
+    */
+    if (nnz0 > INT_MAX)
+	error(_("unable to coerce from TsparseMatrix to [CR]sparseMatrix"
+		"when length of 'i' slot exceeds 2^31-1"));
+    
+    SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n_ + 1)),
+	i1 = R_NilValue, x1 = R_NilValue;
+    R_xlen_t k, kstart, kend, kend_, w = (R_xlen_t) m_ + r + m_;
+    int *pp1 = INTEGER(p1), *pi1, *pj_, *workA, *workB, *workC, i, j;
+    *(pp1++) = 0;
+    Calloc_or_Alloca_TO(pj_, nnz0, int);
+    Calloc_or_Alloca_TO(workA, w, int);
+    workB = workA + m_;
+    workC = workB + r;
+    
+    /* 1. Tabulate column indices in workA[i]
+       
+          workA[.]: unused
+          workB[.]: unused
+          workC[.]: unused			  
+    */
+    
+#define T_AS_CR_1				\
+    do {					\
+	Memzero(workA, m_);			\
+	for (k = 0; k < nnz0; ++k)		\
+	    ++workA[pi0[k]];			\
+    } while (0)
+    
+    /* 2. Compute cumulative sum in workA[i], copying to workB[i]
+       
+          workA[i]: number of column indices listed for row i,
+	  incl. duplicates
+    */
+    
+#define T_AS_CR_2					\
+    do {						\
+	workB[0] = 0;					\
+	for (i = 1; i < m_; ++i)			\
+	    workA[i] += (workB[i] = workA[i-1]);	\
+    } while (0)
+    
+    /* 3. Group column indices and data by row in pj_[k], px_[k]
+
+          workA[i]: number of column indices listed for row <= i,
+                    incl. duplicates
+          workB[i]: number of column indices listed for row <  i,
+                    incl. duplicates
+    */
+    
+#define T_AS_CR_3(_XASSIGN_)					\
+    do {							\
+	for (k = 0; k < nnz0; ++k) {				\
+	    pj_[workB[pi0[k]]] = pj0[k];			\
+	    _XASSIGN_; /* px_[workB[pi0[k]]] = px0[k]; */	\
+	    ++workB[pi0[k]];					\
+	}							\
+    } while (0)
+    
+    /* 4. Gather _unique_ column indices at the front of each group,
+          aggregating data accordingly; record in workC[i] where the
+	  unique column indices stop and the duplicates begin
+
+	  workB[.]: unused
+	    pj_[k]: column indices grouped by row, incl. duplicates, unsorted
+	    px_[k]: corresponding data
+    */
+    
+#define T_AS_CR_4(_XASSIGN_, _XINCR_)					\
+    do {								\
+	k = 0;								\
+	for (j = 0; j < n_; ++j)					\
+	    workB[j] = -1;						\
+	for (i = 0; i < m_; ++i) {					\
+	    kstart = k;							\
+	    kend_ = k;							\
+	    kend = workA[i];						\
+	    while (k < kend) {						\
+		if (workB[pj_[k]] < kstart) {				\
+		    /* Have not yet seen this column index */		\
+		    workB[pj_[k]] = kend_;				\
+		    pj_[kend_] = pj_[k];				\
+		    _XASSIGN_; /* px_[kend_] = px_[k]; */		\
+		    ++kend_;						\
+		} else {						\
+		    /* Have already seen this column index */		\
+		    _XINCR_; /* px_[workB[pj_[k]]] += px_[k]; */	\
+		}							\
+		++k;							\
+	    }								\
+	    workC[i] = kend_;						\
+	    nnz1 += kend_ - kstart;					\
+	}								\
+    } while (0)
+    
+    /* 5. Tabulate _unique_ column indices in workB[j]
+
+          workC[i]: pointer to first non-unique column index in row i  
+            pi_[k]: column indices grouped by row, with unique indices in front
+                    i.e., in positions workA[i-1] <= k < workC[i]
+	    px_[k]: corresponding data, "cumulated" appropriately 
+    */
+
+#define T_AS_CR_5				\
+    do {					\
+	k = 0;					\
+	Memzero(workB, n_);			\
+	for (i = 0; i < m_; ++i) {		\
+	    kend_ = workC[i];			\
+	    while (k < kend_) {			\
+		++workB[pj_[k]];		\
+		++k;				\
+	    }					\
+	    k = workA[i];			\
+	}					\
+    } while (0)
+    
+    /* 6. Compute cumulative sum in pp1[j], copying to workB[j]
+    
+          workB[j]: number of nonzero elements in column j
+    */
+
+#define T_AS_CR_6				\
+    do {					\
+	for (j = 0; j < n_; ++j) {		\
+	    pp1[j] = pp1[j-1] + workB[j];	\
+	    workB[j] = pp1[j-1];		\
+	}					\
+    } while (0)
+
+    /* 7. Pop unique (i,j) pairs from the unsorted stacks 0 <= i < m
+          onto new stacks 0 <= j < n, which will be sorted 
+       
+	  workB[j]: number of nonzero elements in columns <  j
+	    pp1[j]: number of nonzero elements in columns <= j
+    */
+
+#define T_AS_CR_7(_XASSIGN_)					\
+    do {							\
+	PROTECT(i1 = allocVector(INTSXP, nnz1));		\
+	pi1 = INTEGER(i1);					\
+	k = 0;							\
+	for (i = 0; i < m_; ++i) {				\
+	    kend_ = workC[i];					\
+	    while (k < kend_) {					\
+		pi1[workB[pj_[k]]] = i;				\
+		_XASSIGN_; /* px1[workB[pj_[k]]] = px_[k]; */	\
+		++workB[pj_[k]];				\
+		++k;						\
+	    }							\
+	    k = workA[i];					\
+	}							\
+    } while (0)
+
+#define T_AS_CR_X(_CTYPE_, _PTR_, _SEXPTYPE_, _XINCR_)	\
+    do {						\
+	_CTYPE_ *px0 = _PTR_(x0), *px1, *px_;		\
+	Calloc_or_Alloca_TO(px_, nnz0, _CTYPE_);	\
+	T_AS_CR_1;					\
+	T_AS_CR_2;					\
+	T_AS_CR_3(px_[workB[pi0[k]]] = px0[k]);		\
+	T_AS_CR_4(px_[kend_] = px_[k], _XINCR_);	\
+	T_AS_CR_5;					\
+	T_AS_CR_6;					\
+	PROTECT(x1 = allocVector(_SEXPTYPE_, nnz1));	\
+	px1 = _PTR_(x1);				\
+	T_AS_CR_7(px1[workB[pj_[k]]] = px_[k]);		\
+	Free_FROM(px_, nnz0);				\
+    } while (0)
+    
+    switch (clf[0]) {
+    case 'n':
+	T_AS_CR_1;
+	T_AS_CR_2;
+	T_AS_CR_3();
+	T_AS_CR_4(, );
+	T_AS_CR_5;
+	T_AS_CR_6;
+	T_AS_CR_7();
+	break;
+    case 'l':
+	T_AS_CR_X(int, LOGICAL, LGLSXP,
+		  do {
+		      if (px_[k] != 0) {
+			  if (px_[k] != NA_LOGICAL)
+			      px_[workB[pj_[k]]] = 1;
+			  else if (px_[workB[pj_[k]]] == 0)
+			      px_[workB[pj_[k]]] = NA_LOGICAL;
+		      }
+		  } while (0));
+	break;
+    case 'i':
+	T_AS_CR_X(int, INTEGER, INTSXP,
+		  /* FIXME: not detecting integer overflow here */
+		  px_[workB[pj_[k]]] += px_[k]);
+	break;
+    case 'd':
+	T_AS_CR_X(double, REAL, REALSXP,
+		  px_[workB[pj_[k]]] += px_[k]);
+	break;
+    case 'z':
+	T_AS_CR_X(Rcomplex, COMPLEX, CPLXSXP,
+		  do {
+		      px_[workB[pj_[k]]].r += px_[k].r;
+		      px_[workB[pj_[k]]].i += px_[k].i;
+		  } while (0));
+	break;
+    default:
+	break;
+    }
+    
+    Free_FROM(workA, w);
+    Free_FROM(pj_, nnz0);
+    
+    SET_SLOT(to, Matrix_DimSym, dim);
+    SET_SLOT(to, Matrix_DimNamesSym, GET_SLOT(from, Matrix_DimNamesSym));
+    if (clf[1] != 'g')
+	SET_SLOT(to, Matrix_uploSym, GET_SLOT(from, Matrix_uploSym));
+    if (clf[1] == 't')
+	SET_SLOT(to, Matrix_diagSym, GET_SLOT(from, Matrix_diagSym));
+    else
+	SET_SLOT(to, Matrix_factorSym, GET_SLOT(from, Matrix_factorSym));
+    SET_SLOT(to, Matrix_pSym, p1);
+    SET_SLOT(to, iSym, i1);
+    if (clf[0] != 'n')
+	SET_SLOT(to, Matrix_xSym, x1);
+    
+    UNPROTECT((clf[0] == 'n') ? 3 : 4);
+    return to;
+}
+
 /* as(t(<[CR]sparseMatrix>), "[RC]sparseMatrix") */
 SEXP tCRsparse_as_RCsparse(SEXP from)
 {
@@ -3127,13 +3371,14 @@ SEXP tCRsparse_as_RCsparse(SEXP from)
 	ERROR_INVALID_CLASS(class_P(from), "tCRsparse_as_RCsparse");
     const char *clf = valid[ivalid];
     
-    char *clt = strdup(clf);
+    char clt[] = "...Matrix";
+    clt[0] = clf[0];
+    clt[1] = clf[1];
     clt[2] = (clf[2] == 'C') ? 'R' : 'C';
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
 	dim = GET_SLOT(from, Matrix_DimSym),
 	dimnames = GET_SLOT(from, Matrix_DimNamesSym);
     int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-    free(clt);
     
     if (m == n)	{
 	SET_SLOT(to, Matrix_DimSym, dim);
@@ -3343,8 +3588,8 @@ SEXP _C_ ## sparse_is_symmetric(SEXP obj, SEXP checkDN)			\
     Memcpy(pp_, pp, n);							\
     ++pp;								\
 									\
-    /* For all X[i,j] in "leading" triangle,				\
-       need that X[j,i] exists and X[j,i] == X[i,j] */			\
+    /* For all X[i,j] in "leading" triangle, */				\
+    /* need that X[j,i] exists and X[j,i] == X[i,j] */			\
     if (R_has_slot(obj, Matrix_xSym)) {					\
 	SEXP x = GET_SLOT(obj, Matrix_xSym);				\
 	SEXPTYPE tx = TYPEOF(x);					\

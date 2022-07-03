@@ -144,3 +144,19 @@ BM(symmpart(dgC), symmpart(dsC), symmpart(dtC),
    skewpart(dgR), skewpart(dsR), skewpart(dtR),
    skewpart(dgT), skewpart(dsT), skewpart(dtT),
    unit = "microseconds")
+
+
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## COERCING BETWEEN [CRT]sparseMatrix
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+BM(as(dgC, "RsparseMatrix"), as(dgC, "TsparseMatrix"),
+   as(dgR, "CsparseMatrix"), as(dgR, "TsparseMatrix"),
+   as(dgT, "CsparseMatrix"), as(dgT, "RsparseMatrix"),
+   as(dsC, "RsparseMatrix"), as(dsC, "TsparseMatrix"),
+   as(dsR, "CsparseMatrix"), as(dsR, "TsparseMatrix"),
+   as(dsT, "CsparseMatrix"), as(dsT, "RsparseMatrix"),
+   as(dtC, "RsparseMatrix"), as(dtC, "TsparseMatrix"),
+   as(dtR, "CsparseMatrix"), as(dtR, "TsparseMatrix"),
+   as(dtT, "CsparseMatrix"), as(dtT, "RsparseMatrix"),
+   unit = "microseconds")

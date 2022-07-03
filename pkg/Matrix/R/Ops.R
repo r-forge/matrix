@@ -935,11 +935,9 @@ Logic.lCMat <- function(e1, e2, isOR) {
     }
     ## else :
 
-    .Call(Tsparse_to_Csparse,
-          .do.Logic.lsparse(e1, e2, d = d, dn = dn, isOR = isOR,
-                            ij1 = .Call(compressed_non_0_ij, e1, TRUE),
-                            ij2 = .Call(compressed_non_0_ij, e2, TRUE)),
-          FALSE)
+    .T2C(.do.Logic.lsparse(e1, e2, d = d, dn = dn, isOR = isOR,
+                           ij1 = .Call(compressed_non_0_ij, e1, TRUE),
+                           ij2 = .Call(compressed_non_0_ij, e2, TRUE)))
 }
 
 m.Logic.lCMat <- function(e1, e2) Logic.lCMat(e1, e2, isOR = .Generic == "|")
@@ -1106,22 +1104,18 @@ setMethod("Arith", signature(e1 = "dsCMatrix", e2 = "dsCMatrix"),
 	       if((nz <- e1@p[nc1]) < length(e1@x)) e1@x <- e1@x[seq_len(nz)]
 	       if((nz <- e2@p[nc1]) < length(e2@x)) e2@x <- e2@x[seq_len(nz)]
 	       ## special "T" convention: repeated entries are *summed*
-	       .Call(Tsparse_to_Csparse,
-		     newTMat(i = c(ij1[,1], ij2[,1]),
-			     j = c(ij1[,2], ij2[,2]),
-			     x = if(Generic == "+") c(e1@x, e2@x) else c(e1@x, - e2@x)),
-		     triangular)
+	       .T2C(newTMat(i = c(ij1[,1], ij2[,1]),
+                            j = c(ij1[,2], ij2[,2]),
+                            x = if(Generic == "+") c(e1@x, e2@x) else c(e1@x, - e2@x)))
 	   },
 
 	   "*" =
        { ##  X * 0 == 0 * X == 0 --> keep common non-0
 	   ii <- WhichintersectInd(ij1, ij2, di=d)
 	   ij <- ij1[ii[[1]], , drop = FALSE]
-	   .Call(Tsparse_to_Csparse,
-		 newTMat(i = ij[,1],
-			 j = ij[,2],
-			 x = e1@x[ii[[1]]] * e2@x[ii[[2]]]),
-		 triangular)
+	   .T2C(newTMat(i = ij[,1],
+                        j = ij[,2],
+                        x = e1@x[ii[[1]]] * e2@x[ii[[2]]]))
        },
 
 	   "^" =
@@ -1455,17 +1449,15 @@ setMethod("Compare", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 		      j <- j[n0]
 		      x <- x[n0]
 		  }
-		  .Call(Tsparse_to_Csparse,
-			if(e1is.n && e2is.n)
-			    new(paste0("n",shape,"TMatrix"), Dim = d,
-				Dimnames = dn, i = i, j = j)
-			else if(!S && !T)
-			    new(paste0("l",shape,"TMatrix"), Dim = d,
-				Dimnames = dn, i = i, j = j, x = x)
-			else # S or T
-			    new(paste0("l",shape,"TMatrix"), Dim = d,
-				Dimnames = dn, i = i, j = j, x = x, uplo = e1@uplo)
-		      , FALSE)
+		  .T2C(if(e1is.n && e2is.n)
+                           new(paste0("n",shape,"TMatrix"), Dim = d,
+                               Dimnames = dn, i = i, j = j)
+                       else if(!S && !T)
+                           new(paste0("l",shape,"TMatrix"), Dim = d,
+                               Dimnames = dn, i = i, j = j, x = x)
+                       else # S or T
+                           new(paste0("l",shape,"TMatrix"), Dim = d,
+                               Dimnames = dn, i = i, j = j, x = x, uplo = e1@uplo))
               }
 	  })
 

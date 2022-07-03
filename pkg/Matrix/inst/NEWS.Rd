@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-06-30 r3509)}{
+\section{Changes in version 1.4-2 (2022-07-03 r3510)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual classes
@@ -112,9 +112,10 @@
       \item Coercions among \code{[CRT]sparseMatrix} preserve the
       \code{factors} slot in more cases.
 
-      \item Coercion of overallocated \code{l.TMatrix} to
-      \code{denseMatrix} now gives \code{TRUE} instead of \code{NA}
-      in the \code{NA || TRUE} case, following conventional logic.
+      \item Coercions of overallocated \code{l.TMatrix} to
+      \code{denseMatrix} or \code{CsparseMatrix} now give \code{TRUE}
+      instead of \code{NA} in the \code{NA || TRUE} case, following
+      conventional logic.
 
       \item Methods for unpacking and indexing \code{packedMatrix} and
       for coercing from \code{[CRT]sparseMatrix} to \code{denseMatrix}
@@ -171,7 +172,7 @@
       are now \emph{structural}.
 
       \item \code{as(<ndenseMatrix>, "(vector|matrix|[dl]Matrix)")}
-      now correctly treat \code{NA} in the \code{x} slot as \code{TRUE}.
+      now correctly treat \code{NA} in the \code{x} slot as \code{TRUE}. 
     }
   }
   \subsection{New Features}{
@@ -245,8 +246,8 @@
       \code{diagonalMatrix} (only \code{tri[ul]()} worked before).
 
       \item Coercions \code{.ge<->.g[CRT]}, \code{.t[rp]<->.t[CRT]},
-      and \code{.s[yp]<->.s[CRT]}, and \code{..[CRT]<->matrix} are
-      now fully implemented and optimized, with minimal intermediate
+      \code{.s[yp]<->.s[CRT]}, and \code{..[CRT]<->matrix} are now
+      fully implemented and optimized, with minimal intermediate
       allocations.  These (and others) no longer rely on CHOLMOD,
       which had handled integer types as double and required
       preprocessing in many cases (with \code{diagU2N()}, etc.).
