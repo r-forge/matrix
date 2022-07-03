@@ -334,7 +334,6 @@ SEXP R_sparse_as_vector(SEXP from)
 }
 
 /* as(<[CRT]sparseMatrix>, "[nlidz]Matrix") */
-/* FIXME: overallocated [nl].T->[idz].T can be wrong ... TRUE+TRUE -> 1+1 */
 SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
 {
     char k;
@@ -359,6 +358,11 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
 #endif
     if (do_drop0)
 	PROTECT(from = R_sparse_drop0(from));
+
+    int do_aggr = (clf[2] == 'T' &&
+		   (clf[0] == 'n' || clf[0] == 'l') && k != 'n' && k != 'l');
+    if (do_aggr)
+	PROTECT(from = Tsparse_aggregate(from));
     
     char clt[] = "...Matrix";
     clt[0] = k;
@@ -401,7 +405,7 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
 	UNPROTECT(1);
     }
 
-    UNPROTECT(do_drop0 ? 2 : 1);
+    UNPROTECT((do_drop0 || do_aggr) ? 2 : 1);
     return to;
 }
 
@@ -3126,7 +3130,7 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
 	n = pdim[1],
 	m_ = (doC) ? m : n,
 	n_ = (doC) ? n : m,
-	r = (m < n) ? n : m;
+	r_ = (m_ < n_) ? n_ : m_;
     R_xlen_t nnz0 = XLENGTH(i0), nnz1 = 0;
 
     /* FIXME? we would ideally only throw an error if the number
@@ -3138,13 +3142,13 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
     
     SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n_ + 1)),
 	i1 = R_NilValue, x1 = R_NilValue;
-    R_xlen_t k, kstart, kend, kend_, w = (R_xlen_t) m_ + r + m_;
+    R_xlen_t k, kstart, kend, kend_, w = (R_xlen_t) m_ + r_ + m_;
     int *pp1 = INTEGER(p1), *pi1, *pj_, *workA, *workB, *workC, i, j;
     *(pp1++) = 0;
     Calloc_or_Alloca_TO(pj_, nnz0, int);
     Calloc_or_Alloca_TO(workA, w, int);
     workB = workA + m_;
-    workC = workB + r;
+    workC = workB + r_;
     
     /* 1. Tabulate column indices in workA[i]
        
@@ -3285,6 +3289,17 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
 	}							\
     } while (0)
 
+#define T_AS_CR_N				\
+    do {					\
+	T_AS_CR_1;				\
+	T_AS_CR_2;				\
+	T_AS_CR_3();				\
+	T_AS_CR_4(, );				\
+	T_AS_CR_5;				\
+	T_AS_CR_6;				\
+	T_AS_CR_7();				\
+    } while (0)
+    
 #define T_AS_CR_X(_CTYPE_, _PTR_, _SEXPTYPE_, _XINCR_)	\
     do {						\
 	_CTYPE_ *px0 = _PTR_(x0), *px1, *px_;		\
@@ -3300,48 +3315,46 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
 	T_AS_CR_7(px1[workB[pj_[k]]] = px_[k]);		\
 	Free_FROM(px_, nnz0);				\
     } while (0)
-    
-    switch (clf[0]) {
-    case 'n':
-	T_AS_CR_1;
-	T_AS_CR_2;
-	T_AS_CR_3();
-	T_AS_CR_4(, );
-	T_AS_CR_5;
-	T_AS_CR_6;
-	T_AS_CR_7();
-	break;
-    case 'l':
-	T_AS_CR_X(int, LOGICAL, LGLSXP,
-		  do {
-		      if (px_[k] != 0) {
-			  if (px_[k] != NA_LOGICAL)
-			      px_[workB[pj_[k]]] = 1;
-			  else if (px_[workB[pj_[k]]] == 0)
-			      px_[workB[pj_[k]]] = NA_LOGICAL;
-		      }
-		  } while (0));
-	break;
-    case 'i':
-	T_AS_CR_X(int, INTEGER, INTSXP,
-		  /* FIXME: not detecting integer overflow here */
-		  px_[workB[pj_[k]]] += px_[k]);
-	break;
-    case 'd':
-	T_AS_CR_X(double, REAL, REALSXP,
-		  px_[workB[pj_[k]]] += px_[k]);
-	break;
-    case 'z':
-	T_AS_CR_X(Rcomplex, COMPLEX, CPLXSXP,
-		  do {
-		      px_[workB[pj_[k]]].r += px_[k].r;
-		      px_[workB[pj_[k]]].i += px_[k].i;
-		  } while (0));
-	break;
-    default:
-	break;
-    }
-    
+
+#define T_AS_CR_CASES(_KIND_, _DO_N_, _DO_X_)				\
+    do {								\
+	switch (_KIND_) {						\
+	case 'n':							\
+	    _DO_N_;							\
+	    break;							\
+	case 'l':							\
+	    _DO_X_(int, LOGICAL, LGLSXP,				\
+		   do {							\
+		       if (px_[k] != 0) {				\
+			   if (px_[k] != NA_LOGICAL)			\
+			       px_[workB[pj_[k]]] = 1;			\
+			   else if (px_[workB[pj_[k]]] == 0)		\
+			       px_[workB[pj_[k]]] = NA_LOGICAL;		\
+		       }						\
+		   } while (0));					\
+	    break;							\
+	case 'i':							\
+	    _DO_X_(int, INTEGER, INTSXP,				\
+		   /* FIXME: not detecting integer overflow here */	\
+		   px_[workB[pj_[k]]] += px_[k]);			\
+	    break;							\
+	case 'd':							\
+	    _DO_X_(double, REAL, REALSXP,				\
+		   px_[workB[pj_[k]]] += px_[k]);			\
+	    break;							\
+	case 'z':							\
+	    _DO_X_(Rcomplex, COMPLEX, CPLXSXP,				\
+		   do {							\
+		       px_[workB[pj_[k]]].r += px_[k].r;		\
+		       px_[workB[pj_[k]]].i += px_[k].i;		\
+		   } while (0));					\
+	    break;							\
+	default:							\
+	    break;							\
+	}								\
+    } while (0)
+
+    T_AS_CR_CASES(clf[0], T_AS_CR_N, T_AS_CR_X);
     Free_FROM(workA, w);
     Free_FROM(pj_, nnz0);
     
@@ -3359,6 +3372,109 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
 	SET_SLOT(to, Matrix_xSym, x1);
     
     UNPROTECT((clf[0] == 'n') ? 3 : 4);
+    return to;
+}
+
+SEXP Tsparse_aggregate(SEXP from)
+{
+    static const char *valid[] = { VALID_TSPARSE, "" };
+    int ivalid = R_check_class_etc(from, valid);
+    if (ivalid < 0)
+	ERROR_INVALID_CLASS(class_P(from), "Tsparse_aggregate");
+    const char *cl = valid[ivalid];
+
+    /* Need to behave as Tsparse_as_CRsparse(from, FALSE) 
+       in order to get aggregated triplets sorted by column */
+    SEXP to,
+	dim = GET_SLOT(from, Matrix_DimSym),
+	i0 = GET_SLOT(from, Matrix_jSym),
+	j0 = GET_SLOT(from, Matrix_iSym),
+	x0 = (cl[0] != 'n') ? GET_SLOT(from, Matrix_xSym) : R_NilValue,
+	i1 = R_NilValue,
+	j1 = R_NilValue,
+	x1 = R_NilValue;
+    int *pdim = INTEGER(dim),
+	*pi0 = INTEGER(i0), *pj0 = INTEGER(j0), *pi1, *pj1,
+	m_ = pdim[1], n_ = pdim[0], r_ = (m_ < n_) ? n_ : m_;
+    R_xlen_t nnz0 = XLENGTH(j0), nnz1 = 0;
+
+    if (nnz0 > INT_MAX)
+	error(_("unable to aggregate TsparseMatrix with 'i' slot "
+		"of length exceeding 2^31-1"));
+    
+    R_xlen_t k, kstart, kend, kend_, w = (R_xlen_t) m_ + r_ + m_;
+    int *pj_, *workA, *workB, *workC, i, j;
+    Calloc_or_Alloca_TO(pj_, nnz0, int);
+    Calloc_or_Alloca_TO(workA, w, int);
+    workB = workA + m_;
+    workC = workB + r_;
+    
+#define ALLOC_TRIPLET(_XASSIGN_)			\
+    do {						\
+	PROTECT(i1 = allocVector(INTSXP, nnz1));	\
+	PROTECT(j1 = allocVector(INTSXP, nnz1));	\
+	pi1 = INTEGER(i1);				\
+	pj1 = INTEGER(j1);				\
+							\
+	k = 0;						\
+	for (i = 0; i < m_; ++i) {			\
+	    kend_ = workC[i];				\
+	    while (k < kend_) {				\
+		*(pi1++) = i;				\
+		*(pj1++) = pj_[k];			\
+		_XASSIGN_; /* *(px1++) = px_[k]; */	\
+		++k;					\
+	    }						\
+	    k = workA[i];				\
+	}						\
+    } while (0)
+
+#define T_AGGR_N				\
+    do {					\
+	T_AS_CR_1;				\
+	T_AS_CR_2;				\
+	T_AS_CR_3();				\
+	T_AS_CR_4(, );				\
+	if (nnz1 == nnz0)			\
+	    return from;			\
+	ALLOC_TRIPLET();			\
+    } while (0)
+
+#define T_AGGR_X(_CTYPE_, _PTR_, _SEXPTYPE_, _XINCR_)	\
+    do {						\
+	_CTYPE_ *px0 = _PTR_(x0), *px1, *px_;		\
+	Calloc_or_Alloca_TO(px_, nnz0, _CTYPE_);	\
+	T_AS_CR_1;					\
+	T_AS_CR_2;					\
+	T_AS_CR_3(px_[workB[pi0[k]]] = px0[k]);		\
+	T_AS_CR_4(px_[kend_] = px_[k], _XINCR_);	\
+	if (nnz1 == nnz0)				\
+	    return from;				\
+	PROTECT(x1 = allocVector(_SEXPTYPE_, nnz1));	\
+	px1 = _PTR_(x1);				\
+	ALLOC_TRIPLET(*(px1++) = px_[k]);		\
+	Free_FROM(px_, nnz0);				\
+    } while (0)
+
+    T_AS_CR_CASES(cl[0], T_AGGR_N, T_AGGR_X);
+    Free_FROM(workA, w);
+    Free_FROM(pj_, nnz0);
+
+    PROTECT(to = NEW_OBJECT_OF_CLASS(cl));
+    SET_SLOT(to, Matrix_DimSym, dim);
+    SET_SLOT(to, Matrix_DimNamesSym, GET_SLOT(from, Matrix_DimNamesSym));
+    if (cl[1] != 'g')
+	SET_SLOT(to, Matrix_uploSym, GET_SLOT(from, Matrix_uploSym));
+    if (cl[1] == 't')
+	SET_SLOT(to, Matrix_diagSym, GET_SLOT(from, Matrix_diagSym));
+    else
+	SET_SLOT(to, Matrix_factorSym, GET_SLOT(from, Matrix_factorSym));
+    SET_SLOT(to, Matrix_iSym, j1);
+    SET_SLOT(to, Matrix_jSym, i1);
+    if (cl[0] != 'n')
+	SET_SLOT(to, Matrix_xSym, x1);
+
+    UNPROTECT((cl[0] == 'n') ? 3 : 4);
     return to;
 }
 
