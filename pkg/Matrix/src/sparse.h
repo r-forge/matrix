@@ -27,6 +27,7 @@ SEXP CRsparse_skewpart(SEXP from);
 SEXP  Tsparse_skewpart(SEXP from);
 
 SEXP CRsparse_as_Tsparse(SEXP from);
+SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse);
 SEXP tCRsparse_as_RCsparse(SEXP from);
 
 SEXP Csparse_is_diagonal(SEXP obj);

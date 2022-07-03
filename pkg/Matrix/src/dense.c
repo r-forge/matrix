@@ -1,9 +1,4 @@
-#ifdef __GLIBC__
-# define _POSIX_C_SOURCE 200809L
-#endif
-#include <string.h>
 #include "dense.h"
-/* #include "chm_common.h" */
 
 /* as(<denseMatrix>, "[CRT]sparseMatrix") */
 SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
@@ -16,42 +11,40 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 	((z2 = zzz[2]) != 'C' && z2 != 'R' && z2 != 'T'))
 	error(_("invalid 'code' to 'R_dense_as_sparse()'"));
     
-    SEXPTYPE txf,
-	txt = (z0 == '.') ? NILSXP : kind2type(z0); /* before doing more */
-
-    char *cl, ul = 'U', di = 'N';
+    SEXPTYPE txf, txt = (z0 == '.') ? NILSXP : kind2type(z0);
+    SEXP dim, dimnames, x_from;
+    
     static const char *valid[] = {
 	VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
-    int ivalid = R_check_class_etc(from, valid), nprotect = 0,
-	*pdim = NULL, doDN = 1, packed = 0;
-    SEXP dim, dimnames, x_from;
+    int ivalid = R_check_class_etc(from, valid),
+	*pdim = NULL, doDN = 1, packed = 0, nprotect = 0;
+    char clt[] = "...Matrix", ul = 'U', di = 'N';
+    clt[2] = z2;
+
     if (ivalid >= 0) {
-	cl = strdup(valid[ivalid]);
-	packed = (cl[2] == 'p');
+	const char *clf = valid[ivalid];
+	packed = (clf[2] == 'p');
 	dim = GET_SLOT(from, Matrix_DimSym);
 	dimnames = GET_SLOT(from, Matrix_DimNamesSym);
 	x_from = GET_SLOT(from, Matrix_xSym);
+	pdim = INTEGER(dim);
 	txf = TYPEOF(x_from);
-	if (cl[1] != 'g') {
+	if (clf[1] != 'g') {
 	    uplo = GET_SLOT(from, Matrix_uploSym);
 	    ul = *CHAR(STRING_ELT(uplo, 0));
-	    if (cl[1] == 't') {
+	    if (clf[1] == 't') {
 		diag = GET_SLOT(from, Matrix_diagSym);
 		di = *CHAR(STRING_ELT(diag, 0));
 	    }
 	}
-	pdim = INTEGER(dim);
+	clt[0] = (z0 != '.') ? z0 : clf[0]; 
+	clt[1] = clf[1];
     } else {
 	/* 'from' is a base matrix or base vector, but we behave as though
 	   it is the 'x' slot of a .(ge|tr|sy)Matrix (depending on 'code')
 	   for efficiency, relying on the user to specify 'uplo' and 'diag'
 	   as necessary ...
 	*/
-	x_from = from;
-	txf = TYPEOF(x_from);
-	char tmp[] = ".g.Matrix";
-	cl = &tmp[0];
-	cl[0] = type2kind(txf); /* before doing more */
 	if (isMatrix(from)) {
 	    dim = getAttrib(from, R_DimSymbol);
 	    dimnames = getAttrib(from, R_DimNamesSymbol);
@@ -89,22 +82,25 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 		    error(_("invalid 'diag' to 'R_dense_as_sparse()'"));
 		diag = mkString((di == 'N') ? "N" : "U");
 	    }
-	    cl[1] = z1;
 	}
+	x_from = from;
+	txf = TYPEOF(x_from);
+	
 #ifndef HAVE_PROPER_IMATRIX
 	if (z0 == '.' && txf == INTSXP) {
 	    PROTECT(x_from = coerceVector(x_from, txf = REALSXP));
 	    ++nprotect;
 	}
 #endif
+	
+	clt[0] = (z0 != '.') ? z0 : type2kind(txf);
+	clt[1] = (z1 != '.') ? z1 : 'g';
     }
-
-    if (z0 != '.')
-	cl[0] = z0;
-    else
+    
+    if (z0 == '.')
 	txt = txf;
-    cl[2] = z2;
-    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl)), p_to, i_to, j_to, x_to;
+
+    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)), p_to, i_to, j_to, x_to;
     int m = pdim[0], n = pdim[1], i, j, *pp, *pi, *pj;
     R_xlen_t nnz = 0;
     ++nprotect;
@@ -112,18 +108,18 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
     SET_SLOT(to, Matrix_DimSym, dim);
     if (doDN)
 	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-    if (cl[1] != 'g')
+    if (clt[1] != 'g')
 	SET_SLOT(to, Matrix_uploSym, uplo);
-    if (cl[1] == 't')
+    if (clt[1] == 't')
 	SET_SLOT(to, Matrix_diagSym, diag);
-    if (cl[2] != 'T') {
-	PROTECT(p_to = allocVector(INTSXP,
-				   (R_xlen_t) ((cl[2] == 'C') ? n : m) + 1));
+    if (clt[2] != 'T') {
+	PROTECT(p_to = allocVector(
+		    INTSXP, (R_xlen_t) ((clt[2] == 'C') ? n : m) + 1));
 	SET_SLOT(to, Matrix_pSym, p_to);
 	pp = INTEGER(p_to);
 	++nprotect;
 	*(pp++) = 0;
-	if (n > 0 && di != 'N' && ul == ((cl[2] == 'R') ? 'L' : 'U'))
+	if (n > 0 && di != 'N' && ul == ((clt[2] == 'R') ? 'L' : 'U'))
 	    *(pp++) = 0; /* first row or column skipped in these loops */
     }
 
@@ -323,15 +319,17 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
     
 #define DAS_SUBSUBCASES(_X_, _NZ_, _LOOP_2C_, _LOOP_2R_)	\
     do {							\
-	switch (cl[2]) {					\
+	switch (clt[2]) {					\
 	case 'C':						\
 	    _LOOP_2C_(_X_, _NZ_, ++nnz, DAS_VALID2C);		\
 	    break;						\
 	case 'R':						\
 	    _LOOP_2R_(_X_, _NZ_, ++nnz, DAS_VALID2C);		\
 	    break;						\
-	default: /* 'T' */					\
+	case 'T':						\
 	    _LOOP_2C_(_X_, _NZ_, ++nnz, DAS_VALID2T);		\
+	    break;						\
+	default:						\
 	    break;						\
 	}							\
     } while (0)
@@ -339,7 +337,7 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 #define DAS_SUBCASES(_CTYPE_, _PTR_, _NZ_)				\
     do {								\
 	_CTYPE_ *px = _PTR_(x_from);					\
-	if (cl[1] == 'g')						\
+	if (clt[1] == 'g')						\
 	    /* .geMatrix */						\
 	    DAS_SUBSUBCASES(px, _NZ_, DAS_LOOP_GE2C,  DAS_LOOP_GE2R);	\
 	else if (!packed && di == 'N')					\
@@ -389,19 +387,19 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 #undef DAS_VALID2T
 
     /* Then we allocate ... */
-    if (cl[2] != 'R') {
+    if (clt[2] != 'R') {
 	PROTECT(i_to = allocVector(INTSXP, nnz));
 	SET_SLOT(to, Matrix_iSym, i_to);
 	pi = INTEGER(i_to);
 	++nprotect;
     }
-    if (cl[2] != 'C') {
+    if (clt[2] != 'C') {
 	PROTECT(j_to = allocVector(INTSXP, nnz));
 	SET_SLOT(to, Matrix_jSym, j_to);
 	pj = INTEGER(j_to);
 	++nprotect;
     }
-    if (cl[0] != 'n') {
+    if (clt[0] != 'n') {
 	PROTECT(x_to = allocVector(txf, nnz));
 	if (txf == txt)
 	    SET_SLOT(to, Matrix_xSym, x_to);
@@ -410,9 +408,9 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 
 #define DAS_SUBSUBCASES(_X_, _Y_, _NZ_, _LOOP_2C_, _LOOP_2R_)		\
     do {								\
-	switch (cl[2]) {						\
+	switch (clt[2]) {						\
 	case 'C':							\
-	    if (cl[0] == 'n')						\
+	    if (clt[0] == 'n')						\
 		_LOOP_2C_(_X_, _NZ_,					\
 			  *(pi++) = i, );				\
 	    else							\
@@ -423,7 +421,7 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 			  } while (0), );				\
 	    break;							\
 	case 'R':							\
-	    if (cl[0] == 'n')						\
+	    if (clt[0] == 'n')						\
 		_LOOP_2R_(_X_, _NZ_,					\
 			  *(pj++) = j, );				\
 	    else							\
@@ -434,7 +432,7 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 			  } while (0), );				\
 	    break;							\
 	case 'T':							\
-	    if (cl[0] == 'n')						\
+	    if (clt[0] == 'n')						\
 		_LOOP_2C_(_X_, _NZ_,					\
 			  do {						\
 			      *(pi++) = i;				\
@@ -456,9 +454,9 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 #define DAS_SUBCASES(_CTYPE_, _PTR_, _NZ_)				\
     do {								\
 	_CTYPE_ *px = _PTR_(x_from), *py;				\
-	if (cl[0] != 'n')						\
+	if (clt[0] != 'n')						\
 	    py = _PTR_(x_to);						\
-	if (cl[1] == 'g')						\
+	if (clt[1] == 'g')						\
 	    /* .geMatrix */						\
 	    DAS_SUBSUBCASES(px, py, _NZ_, DAS_LOOP_GE2C,  DAS_LOOP_GE2R); \
 	else if (!packed && di == 'N')					\
@@ -493,10 +491,8 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 #undef DAS_LOOP_TPU2C
 #undef DAS_LOOP_TPU2R
 
-    if (cl[0] != 'n' && txf != txt)
+    if (clt[0] != 'n' && txf != txt)
 	SET_SLOT(to, Matrix_xSym, coerceVector(x_to, txt));
-    if (ivalid >= 0)
-	free(cl);
     UNPROTECT(nprotect);
     return to;
 }
@@ -517,12 +513,13 @@ SEXP R_dense_as_kind(SEXP from, SEXP kind)
 	return from;
     SEXPTYPE tt = kind2type(k); /* validating 'k' before doing more */
     
-    char *clt = strdup(clf);
+    char clt[] = "...Matrix";
     clt[0] = k;
+    clt[1] = clf[1];
+    clt[2] = clf[2];
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
 	x = GET_SLOT(from, Matrix_xSym);
     SEXPTYPE tf = TYPEOF(x);
-    free(clt);
     
     SET_SLOT(to, Matrix_DimSym, GET_SLOT(from, Matrix_DimSym));
     SET_SLOT(to, Matrix_DimNamesSym, GET_SLOT(from, Matrix_DimNamesSym));
@@ -757,12 +754,10 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
     /* Returning .(tr|sy|tp|sp)Matrix */
 
     if (tr) {
-	char *clt = strdup(clf);
-	clt[1] = 't';
-	if (clt[2] != 'p')
-	    clt[2] = 'r';
+	char clt[] = ".t.Matrix";
+	clt[0] = clf[0];
+	clt[2] = (clf[2] == 'p') ? 'p' : 'r';
 	PROTECT(to = NEW_OBJECT_OF_CLASS(clt));
-	free(clt);
     } else {
 	PROTECT(to = NEW_OBJECT_OF_CLASS(clf));
     }

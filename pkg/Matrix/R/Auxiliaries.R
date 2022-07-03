@@ -586,6 +586,11 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 }
 
 .CR2T <- function(from) .Call(CRsparse_as_Tsparse, from)
+.T2CR <- function(from, Csparse) .Call(Tsparse_as_CRsparse, from, Csparse)
+
+.T2C  <- function(from) .Call(Tsparse_as_CRsparse, from,  TRUE)
+.T2R  <- function(from) .Call(Tsparse_as_CRsparse, from, FALSE)
+
 .tCR2RC <- function(from) .Call(tCRsparse_as_RCsparse, from)
 .CR2RC <- function(from) {
     to <- .tCR2RC(.Call(R_sparse_transpose, from))
@@ -593,27 +598,6 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
         to@factors <- from@factors
     to
 }
-
-## in ../src/Tsparse.c :  |-> cholmod_T -> cholmod_C -> chm_sparse_to_SEXP
-## adjusted for triangular matrices not represented in cholmod
-.T2C <- function(from) {
-    to <- .Call(Tsparse_to_Csparse, from, is(from, "triangularMatrix"))
-    if(.hasSlot(from, "factors"))
-        to@factors <- from@factors
-    to
-}
-
-.T2R <- function(from) {
-    to <- .tCR2RC(.Call(Tsparse_to_Csparse, .Call(R_sparse_transpose, from),
-                        is(from, "triangularMatrix")))
-    if(.hasSlot(from, "factors"))
-        to@factors <- from@factors
-    to
-}
-
-## fast, exported for power users
-.T2Cmat <- function(from, isTri = is(from, "triangularMatrix"))
-    .Call(Tsparse_to_Csparse, from, isTri)
 
 rowCheck <- function(a, b) {
     da <- dim(a)
@@ -1131,6 +1115,26 @@ if(FALSE) {
 .viaC.2.R <- function(from) .tC.2.R(as(t(from), "CsparseMatrix"))
 ## .R.2.T() fails on 32bit--enable-R-shlib with segfault {Kurt}
 .R.2.T  <- function(from) .Call(compressed_to_TMatrix, from, FALSE)
+
+## in ../src/Tsparse.c :  |-> cholmod_T -> cholmod_C -> chm_sparse_to_SEXP
+## adjusted for triangular matrices not represented in cholmod
+.T2C <- function(from) {
+    to <- .Call(Tsparse_to_Csparse, from, is(from, "triangularMatrix"))
+    if(.hasSlot(from, "factors"))
+        to@factors <- from@factors
+    to
+}
+
+.T2R <- function(from) {
+    to <- .tCR2RC(.Call(Tsparse_to_Csparse, .Call(R_sparse_transpose, from),
+                        is(from, "triangularMatrix")))
+    if(.hasSlot(from, "factors"))
+        to@factors <- from@factors
+    to
+}
+
+.T2Cmat <- function(from, isTri = is(from, "triangularMatrix"))
+    .Call(Tsparse_to_Csparse, from, isTri)
 
 tT2gT <- function(x, cl = class(x), toClass, cld = getClassDef(cl)) {
     ## coerce *tTMatrix to *gTMatrix {triangular -> general}

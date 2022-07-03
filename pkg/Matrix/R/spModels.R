@@ -45,9 +45,9 @@ fac2sparse <- function(from, to = c("d","i","l","n","z"),
 		if(giveCsparse) "C" else "T"
 	    else match.arg(repr)
     switch(repr,
-	   "C" = .Call(Tsparse_to_Csparse, T, FALSE),
+	   "C" = .T2C(T),
 	   "T" =    T,# TsparseMatrix
-	   "R" = as(T, "RsparseMatrix"))
+	   "R" = .T2R(T))
 }
 
 setAs("factor", "sparseMatrix", function(from) fac2sparse(from, to = "d"))

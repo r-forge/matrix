@@ -28,6 +28,9 @@ SEXP Tsparse_validate(SEXP x)
     return ScalarLogical(1);
 }
 
+/* MJ: no longer needed ... prefer Tsparse_as_CRsparse() */
+#if 0
+
 SEXP Tsparse_to_Csparse(SEXP x, SEXP tri)
 {
     CHM_TR chxt = AS_CHM_TR__(x); /* << should *preserve*  diag = "U" ! */
@@ -41,6 +44,8 @@ SEXP Tsparse_to_Csparse(SEXP x, SEXP tri)
 			      Rkind, tr ? diag_P(x) : "",
 			      GET_SLOT(x, Matrix_DimNamesSym));
 }
+
+#endif /* MJ */
 
 /* MJ: unused */
 #if 0
