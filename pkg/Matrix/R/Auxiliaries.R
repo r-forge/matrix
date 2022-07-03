@@ -837,6 +837,8 @@ nz.NA <- function(x, na.value) {
     else		x != 0 & !is.na(x)
 }
 
+## MJ: no longer used
+if(FALSE) {
 ### This assumes that e.g. the i-slot in Csparse is *not* over-allocated:
 nnzSparse <- function(x, cl = class(x), cld = getClassDef(cl))
 {
@@ -853,7 +855,7 @@ nnzSparse <- function(x, cl = class(x), cld = getClassDef(cl))
 	x@Dim[1]
     else stop(gettext("'x' must be \"sparseMatrix\""), domain=NA)
 }
-
+} ## MJ
 
 ## For sparseness handling, return a
 ## 2-column (i,j) matrix of 0-based indices of non-zero entries:

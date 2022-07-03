@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-07-03 r3511)}{
+\section{Changes in version 1.4-2 (2022-07-03 r3512)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual classes
@@ -172,7 +172,15 @@
       are now \emph{structural}.
 
       \item \code{as(<ndenseMatrix>, "(vector|matrix|[dl]Matrix)")}
-      now correctly treat \code{NA} in the \code{x} slot as \code{TRUE}. 
+      now correctly treat \code{NA} in the \code{x} slot as
+      \code{TRUE}. 
+
+      \item \code{as(<[nl].TMatrix>, "dMatrix")} now correctly handles
+      the overallocated case: data for each unique \code{[i,j]}
+      pair are aggregated logically (\code{x1 || ... || xn}) rather than
+      arithmetically (\code{x1 + ... + xn}), so that elements of the
+      result are restricted to the set \code{c(0, 1, NA)}.
+      This bug had also affected the result of \code{sum(<[nl].TMatrix>)}.
     }
   }
   \subsection{New Features}{

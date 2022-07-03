@@ -610,8 +610,12 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	n1 <- as(m, "nMatrix")
 	ns <- as(m, "nsparseMatrix")
 	stopifnot(identical(n1,ns),
-		  isDiag || ((if(isSym) Matrix:::nnzSparse else sum)(n1) ==
-			     length(if(isInd) m@perm else diagU2N(m)@x)))
+                  ## only testing [CR]sparseMatrix and indMatrix here ...
+                  ## sum(<n.T>) excludes duplicated (i,j) pairs whereas
+                  ## length(diagU2N(<[^n].T>)) includes them ...
+                  isDiag || extends(cld, "TsparseMatrix") ||
+                  (if(isSym) length(if(.hasSlot(n1, "i")) n1@i else n1@j)
+                   else sum(n1)) == length(if(isInd) m@perm else diagU2N(m)@x))
         Cat("ok\n")
     }
 
