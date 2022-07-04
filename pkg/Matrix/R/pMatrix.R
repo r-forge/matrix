@@ -23,7 +23,7 @@ setAs("numeric", "pMatrix",
           if(anyNA(from))
               stop("'perm' slot cannot contain NA")
           r <- range(from)
-          if((r2 <- r[2L]) > .Machine$integer.max)
+          if(r[2L] > .Machine$integer.max)
               stop("elements of 'perm' slot cannot exceed 2^31-1")
           if(r[1L] < 1 || any(from != (from.i <- as.integer(from))))
               stop("elements of 'perm' slot must be positive integers")
