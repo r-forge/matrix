@@ -32,7 +32,7 @@ rm(.Rv)
 .onLoad <- function(libname, pkgname) {
     verbose <-
         (!is.null(v <- getOption("Matrix.verbose")) && v >= 1L) ||
-        (interactive() && (identical(u <- Sys.info()[["user"]], "maechler")))
+        (interactive() && identical(Sys.info()[["user"]], "maechler"))
 
     ## ambiguityNotes:
     ## show S4 method dispatch ambiguity notes iff TRUE
