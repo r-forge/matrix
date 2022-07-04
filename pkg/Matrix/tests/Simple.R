@@ -1327,7 +1327,8 @@ stopifnot(identical(as.vector(.nge), rep.int(TRUE, 4L)),
           identical(as.double(.nge), rep.int(1, 4L)),
           identical(as(.nge, "vector"), rep.int(TRUE, 4L)),
           identical(as(.nge, "matrix"), array(TRUE, .nge@Dim, list(NULL,NULL))),
-          identical(as(.nge, "dMatrix")@x, rep.int(1, 4L)))
+          identical(as(.nge, "dMatrix")@x, rep.int(1, 4L)),
+          identical(nnzero(.nge), 4L))
 
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()

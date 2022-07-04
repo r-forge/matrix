@@ -1971,6 +1971,75 @@ SEXP R_index_diagonal(SEXP n_, SEXP upper_, SEXP packed_)
     return r;
 }
 
+SEXP R_nnz(SEXP x, SEXP countNA, SEXP nnzmax)
+{
+    int do_countNA = asLogical(countNA);
+    R_xlen_t n = XLENGTH(x), nnz = 0;
+    double n_ = asReal(nnzmax);
+    if (!ISNAN(n_) && n_ >= 0.0 && n_ < (double) n)
+	n = (R_xlen_t) n_;
+
+#define DO_NNZ(_CTYPE_, _PTR_, _NA_, _NZ_, _STRICTLY_NZ_)	\
+    do {							\
+	_CTYPE_ *px = _PTR_(x);					\
+	if (do_countNA == NA_LOGICAL) {				\
+	    while (n-- > 0) {					\
+		if (_NA_(*px))					\
+		    return ScalarInteger(NA_INTEGER);		\
+		if (_NZ_(*px))					\
+		    ++nnz;					\
+		++px;						\
+	    }							\
+	} else if (do_countNA != 0) {				\
+	    while (n-- > 0) {					\
+		if (_NZ_(*px))					\
+		    ++nnz;					\
+		++px;						\
+	    }							\
+	} else {						\
+	    while (n-- > 0) {					\
+		if (_STRICTLY_NZ_(*px))				\
+		    ++nnz;					\
+		++px;						\
+	    }							\
+	}							\
+    } while (0)
+
+    switch (TYPEOF(x)) {
+    case LGLSXP:
+    {
+	DO_NNZ(int, LOGICAL,
+	       ISNA_LOGICAL, ISNZ_LOGICAL, STRICTLY_ISNZ_LOGICAL);
+	break;
+    }
+    case INTSXP:
+    {
+	DO_NNZ(int, INTEGER,
+	       ISNA_INTEGER, ISNZ_INTEGER, STRICTLY_ISNZ_INTEGER);
+	break;
+    }
+    case REALSXP:
+    {
+	DO_NNZ(double, REAL,
+	       ISNA_REAL, ISNZ_REAL, STRICTLY_ISNZ_REAL);
+	break;
+    }
+    case CPLXSXP:
+    {
+	DO_NNZ(Rcomplex, COMPLEX,
+	       ISNA_COMPLEX, ISNZ_COMPLEX, STRICTLY_ISNZ_COMPLEX);
+	break;
+    }
+    default:
+	ERROR_INVALID_TYPE("'x'", TYPEOF(x), "R_nnz");
+    }
+
+#undef DO_NNZ
+
+    return
+	(nnz <= INT_MAX) ? ScalarInteger((int) nnz) : ScalarReal((double) nnz);
+}
+
 void conjugate(SEXP x)
 {
     Rcomplex *px = COMPLEX(x);
