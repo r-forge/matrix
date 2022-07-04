@@ -358,16 +358,16 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
     do {								\
 	switch (_SEXPTYPE_) {						\
 	case REALSXP:							\
-	    DAS_SUBCASES(double, REAL, NZ_REAL);			\
+	    DAS_SUBCASES(double, REAL, ISNZ_REAL);			\
 	    break;							\
 	case LGLSXP:							\
-	    DAS_SUBCASES(int, LOGICAL, NZ_INTEGER);			\
+	    DAS_SUBCASES(int, LOGICAL, ISNZ_LOGICAL);			\
 	    break;							\
 	case INTSXP:							\
-	    DAS_SUBCASES(int, INTEGER, NZ_INTEGER);			\
+	    DAS_SUBCASES(int, INTEGER, ISNZ_INTEGER);			\
 	    break;							\
 	case CPLXSXP:							\
-	    DAS_SUBCASES(Rcomplex, COMPLEX, NZ_COMPLEX);		\
+	    DAS_SUBCASES(Rcomplex, COMPLEX, ISNZ_COMPLEX);		\
 	    break;							\
 	default:							\
 	    ERROR_INVALID_TYPE("'x' slot", _SEXPTYPE_, "R_dense_as_sparse"); \

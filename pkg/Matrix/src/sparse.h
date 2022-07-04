@@ -115,16 +115,16 @@ SEXP Tsparse_is_symmetric(SEXP obj, SEXP checkDN);
     do {						\
 	switch (_SEXPTYPE_) {				\
 	case REALSXP:					\
-	    _DO_(double, REAL, NZ_REAL);		\
+	    _DO_(double, REAL, ISNZ_REAL);		\
 	    break;					\
 	case LGLSXP:					\
-	    _DO_(int, LOGICAL, NZ_INTEGER);		\
+	    _DO_(int, LOGICAL, ISNZ_LOGICAL);		\
 	    break;					\
 	case INTSXP:					\
-	    _DO_(int, INTEGER, NZ_INTEGER);		\
+	    _DO_(int, INTEGER, ISNZ_INTEGER);		\
 	    break;					\
 	case CPLXSXP:					\
-	    _DO_(Rcomplex, COMPLEX, NZ_COMPLEX);	\
+	    _DO_(Rcomplex, COMPLEX, ISNZ_COMPLEX);	\
 	    break;					\
 	default:					\
 	    break;					\

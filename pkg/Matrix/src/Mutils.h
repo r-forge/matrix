@@ -111,9 +111,20 @@ extern
 #define MAXOF(x, y) ((x < y) ? y : x)
 #define MINOF(x, y) ((x < y) ? x : y)
 
-#define NZ_REAL(_X_)    ((_X_) != 0.0)
-#define NZ_INTEGER(_X_) ((_X_) != 0)
-#define NZ_COMPLEX(_X_) ((_X_).r != 0.0 || (_X_).i != 0.0)
+#define ISNA_LOGICAL(_X_) ((_X_) == NA_LOGICAL)
+#define ISNA_INTEGER(_X_) ((_X_) == NA_INTEGER)
+#define ISNA_REAL(_X_)    ISNAN(_X_)
+#define ISNA_COMPLEX(_X_) (ISNAN((_X_).r) || ISNAN((_X_).i))
+
+#define ISNZ_LOGICAL(_X_) ((_X_) != 0)
+#define ISNZ_INTEGER(_X_) ((_X_) != 0)
+#define ISNZ_REAL(_X_)    ((_X_) != 0.0)
+#define ISNZ_COMPLEX(_X_) ((_X_).r != 0.0 || (_X_).i != 0.0)
+
+#define STRICTLY_ISNZ_LOGICAL(_X_) (!ISNA_LOGICAL(_X_) && ISNZ_LOGICAL(_X_))
+#define STRICTLY_ISNZ_INTEGER(_X_) (!ISNA_INTEGER(_X_) && ISNZ_INTEGER(_X_))
+#define STRICTLY_ISNZ_REAL(_X_)    (!ISNA_REAL(_X_)    && ISNZ_REAL(_X_))
+#define STRICTLY_ISNZ_COMPLEX(_X_) (!ISNA_COMPLEX(_X_) && ISNZ_COMPLEX(_X_))
 
 /* int i, j, m, n; R_xlen_t n2; */
 #define PM_AR21_UP(i, j) ((i) + (j) + ((R_xlen_t) (j) * ((j) - 1)) / 2)
@@ -360,7 +371,9 @@ SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector);
 SEXP R_dense_as_general(SEXP from, SEXP kind);
 
 SEXP R_index_triangle(SEXP n_, SEXP upper_, SEXP diag_, SEXP packed_);
-SEXP R_index_diagonal(SEXP n_, SEXP upper_, SEXP packed_);
+SEXP R_index_diagonal(SEXP n_, SEXP upper_,             SEXP packed_);
+
+SEXP R_nnz(SEXP x, SEXP countNA, SEXP nnzmax);
 
 void conjugate(SEXP x);
 void zeroRe(SEXP x);

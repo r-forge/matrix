@@ -826,6 +826,8 @@ nonFALSE <- function(x) {
     x
 }
 
+## MJ: no longer used
+if(FALSE) {
 nz.NA <- function(x, na.value) {
     ## Non-Zeros of x
     ## na.value: TRUE: NA's give TRUE, they are not 0
@@ -837,8 +839,6 @@ nz.NA <- function(x, na.value) {
     else		x != 0 & !is.na(x)
 }
 
-## MJ: no longer used
-if(FALSE) {
 ### This assumes that e.g. the i-slot in Csparse is *not* over-allocated:
 nnzSparse <- function(x, cl = class(x), cld = getClassDef(cl))
 {

@@ -423,7 +423,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(R_revDN, 1),
     CALLDEF(R_Matrix_kind, 2),
     CALLDEF(R_index_triangle, 4),
-    CALLDEF(R_index_diagonal, 3), 
+    CALLDEF(R_index_diagonal, 3),
+    CALLDEF(R_nnz, 3),
 
     CALLDEF(R_sparse_as_dense, 2),
     CALLDEF(R_sparse_as_matrix, 1),
@@ -448,6 +449,7 @@ static R_CallMethodDef CallEntries[] = {
 
     CALLDEF(CRsparse_as_Tsparse, 1),
     CALLDEF(Tsparse_as_CRsparse, 2),
+    CALLDEF(Tsparse_aggregate, 1),
     CALLDEF(tCRsparse_as_RCsparse, 1),
     CALLDEF(Csparse_is_diagonal, 1),
     CALLDEF(Rsparse_is_diagonal, 1),
