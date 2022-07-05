@@ -6,6 +6,7 @@ BM <- microbenchmark::microbenchmark
 library(Matrix)
 set.seed(82919)
 options(width = 200L)
+MatrixVersion <- packageVersion("Matrix")
 
 dgC <- rsparsematrix(1000L, 1000L, 0.01)
 dgR <- as(dgC, "RsparseMatrix")
@@ -26,7 +27,7 @@ dtr <- triu(dge)
 dsp <- pack(dsy)
 dtp <- pack(dtr)
 
-if(packageVersion("Matrix") <= "1.4.1") {
+if(MatrixVersion <= "1.4.1") {
     ## due to "bugs" in Matrix <= 1.4-1
     dsR <- as(dsR, "RsparseMatrix")
     dsT <- as(dsT, "TsparseMatrix")
@@ -38,7 +39,7 @@ if(packageVersion("Matrix") <= "1.4.1") {
 
 
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-## GETTING DIAGONAL FROM [CRT]sparseMatrix
+## Getting diagonal from [CRT]sparseMatrix
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 BM(diag(dgC), diag(dgR), diag(dgT),
@@ -48,7 +49,7 @@ BM(diag(dgC), diag(dgR), diag(dgT),
 
 
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-## TRANSPOSE OF [CRT]sparseMatrix
+## Transpose of [CRT]sparseMatrix
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 BM(t(dgC), t(dgR), t(dgT),
@@ -58,7 +59,7 @@ BM(t(dgC), t(dgR), t(dgT),
 
 
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-## FORCE SYMMETRIC|TRIANGULAR for .g[CRT]Matrix
+## Coerce .g[CRT]Matrix to .[st][CRT]Matrix
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 BM(forceSymmetric(dgC), triu(dgC), tril(dgC),
@@ -68,7 +69,7 @@ BM(forceSymmetric(dgC), triu(dgC), tril(dgC),
 
 
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-## TEST FOR SYMMETRIC .g[CRT]Matrix
+## Test for symmetric .g[CRT]Matrix
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 dsC.as.g <- as(dsC, "generalMatrix")
@@ -85,7 +86,7 @@ BM(isSymmetric(dsC.as.g),
 
 
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-## TEST FOR TRIANGULAR .g[CRT]Matrix
+## Test for triangular .g[CRT]Matrix
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 dtC.as.g <- as(dtC, "generalMatrix")
@@ -99,7 +100,7 @@ BM(isTriangular(dtC.as.g, upper = TRUE),
 
 
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-## TEST FOR DIAGONAL .g[CRT]Matrix
+## Test for diagonal .g[CRT]Matrix
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ddC.as.g <- as(ddC, "generalMatrix")
@@ -113,7 +114,7 @@ BM(isDiagonal(ddC.as.g),
 
 
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-## DETERMINANT OF POSITIVE DEFINITE ds[yp]Matrix
+## Determinant of positive definite ds[yp]Matrix
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 dsy.spd <- as(tcrossprod(dsy), "dsyMatrix")
@@ -125,7 +126,7 @@ BM(determinant(dsy, TRUE), determinant(dsy.spd, TRUE),
 
 
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-## GETTING (SKEW-)SYMMETRIC PART FROM denseMatrix
+## Getting (skew-)symmetric part of denseMatrix
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 BM(symmpart(dge), symmpart(dsy), symmpart(dtr), symmpart(dsp), symmpart(dtp),
@@ -134,7 +135,7 @@ BM(symmpart(dge), symmpart(dsy), symmpart(dtr), symmpart(dsp), symmpart(dtp),
 
 
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-## GETTING (SKEW-)SYMMETRIC PART FROM [CRT]sparseMatrix
+## Getting (skew-)symmetric part of [CRT]sparseMatrix
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 BM(symmpart(dgC), symmpart(dsC), symmpart(dtC),
@@ -147,7 +148,7 @@ BM(symmpart(dgC), symmpart(dsC), symmpart(dtC),
 
 
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-## COERCING BETWEEN [CRT]sparseMatrix
+## Coercing between [CRT]sparseMatrix
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 BM(as(dgC, "RsparseMatrix"), as(dgC, "TsparseMatrix"),
@@ -159,4 +160,37 @@ BM(as(dgC, "RsparseMatrix"), as(dgC, "TsparseMatrix"),
    as(dtC, "RsparseMatrix"), as(dtC, "TsparseMatrix"),
    as(dtR, "CsparseMatrix"), as(dtR, "TsparseMatrix"),
    as(dtT, "CsparseMatrix"), as(dtT, "RsparseMatrix"),
+   unit = "microseconds")
+
+
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## Coercing from denseMatrix to [CRT]sparseMatrix
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+BM(as(dge, "CsparseMatrix"), as(dge, "RsparseMatrix"), as(dge, "TsparseMatrix"),
+   as(dsy, "CsparseMatrix"), as(dsy, "RsparseMatrix"), as(dsy, "TsparseMatrix"),
+   as(dtr, "CsparseMatrix"), as(dtr, "RsparseMatrix"), as(dtr, "TsparseMatrix"),
+   as(dsp, "CsparseMatrix"), as(dsp, "RsparseMatrix"), as(dsp, "TsparseMatrix"),
+   as(dtp, "CsparseMatrix"), as(dtp, "RsparseMatrix"), as(dtp, "TsparseMatrix"),
+   unit = "microseconds")
+
+
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## Coercing from [CRT]sparseMatrix to denseMatrix
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+if(MatrixVersion > "1.4.1") {
+    .to.unpacked <- function(from) as(from, "unpackedMatrix")
+    .to.packed   <- function(from) as(from, "packedMatrix")
+} else {
+    .to.unpacked <- function(from) as(from, "denseMatrix")
+    .to.packed   <- function(from) pack(as(from, "denseMatrix"))
+}
+
+BM(.to.unpacked(dgC), .to.unpacked(dsC), .to.unpacked(dtC),
+   .to.packed(dsC), .to.packed(dtC),
+   .to.unpacked(dgR), .to.unpacked(dsR), .to.unpacked(dtR),
+   .to.packed(dsR), .to.packed(dtR),
+   .to.unpacked(dgT), .to.unpacked(dsT), .to.unpacked(dtT),
+   .to.packed(dsT), .to.packed(dtT),
    unit = "microseconds")
