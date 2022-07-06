@@ -1477,8 +1477,29 @@ SEXPTYPE kind2type(char kind)
 	return CPLXSXP;
 #endif
     default:
-	error(_("unexpected kind \"%c\" in 'typeofX()'"), kind);
+	error(_("unexpected kind \"%c\" in 'kind2type()'"), kind);
 	return NILSXP;
+    }
+}
+
+size_t kind2size(char kind)
+{
+    switch (kind) {
+    case 'd':
+	return sizeof(double);
+    case 'l':
+    case 'n':
+#ifdef HAVE_PROPER_IMATRIX
+    case 'i':
+#endif
+	return sizeof(int);
+#ifdef HAVE_PROPER_ZMATRIX
+    case 'z':
+	return sizeof(Rcomplex);
+#endif
+    default:
+	error(_("unexpected kind \"%c\" in 'kind2size()'"), kind);
+	return 0;
     }
 }
 

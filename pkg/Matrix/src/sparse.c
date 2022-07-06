@@ -19,18 +19,23 @@ SEXP sparse_as_dense(SEXP from, int packed)
 	dim = GET_SLOT(from, Matrix_DimSym),
 	dimnames = GET_SLOT(from, Matrix_DimNamesSym),
 	x0 = (clf[0] != 'n') ? GET_SLOT(from, Matrix_xSym) : R_NilValue;
-
+    
     int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-    double mn = (double) m * n, nx_ = (packed) ? (mn + n) / 2.0 : mn;
-    if (nx_ > R_XLEN_T_MAX)
+    double mn = (double) m * n, dnx = (packed) ? 0.5 * (mn + n) : mn,
+	dsize = dnx * kind2size(clt[0]);
+    if (dnx > R_XLEN_T_MAX)
 	error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
     if (packed && clf[2] != 'C' && mn > R_XLEN_T_MAX)
 	error(_("coercing n-by-n [RT]sparseMatrix to packedMatrix "
 		"is not supported for n*n exceeding R_XLEN_T_MAX"));
+    if (dsize > 0x1p+30 /* 1 GiB */)
+	warning(_("sparse->dense coercion: "
+		  "allocating vector of size %0.1f GiB"),
+		0x1p-30 * dsize);
     
     char ul = 'U', di = 'N';
     SEXPTYPE tx = kind2type(clf[0]);
-    R_xlen_t nx = (R_xlen_t) nx_;
+    R_xlen_t nx = (R_xlen_t) dnx;
     SEXP x1 = PROTECT(allocVector(tx, nx));
     
     SET_SLOT(to, Matrix_DimSym, dim);
@@ -895,10 +900,16 @@ SEXP R_diagonal_as_dense(SEXP from, SEXP code, SEXP uplo)
 
     char di = *CHAR(STRING_ELT(diag, 0));
     int n = INTEGER(dim)[0];
-    double nn = (double) n * n, nx_ = (z2 == 'p') ? (nn + n) / 2.0 : nn;
-    if (nx_ > R_XLEN_T_MAX)
+    double nn = (double) n * n, dnx = (z2 == 'p') ? 0.5 * (nn + n) : nn,
+	dsize = dnx * kind2size(z0);
+    if (dnx > R_XLEN_T_MAX)
 	error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
-    R_xlen_t nx = (R_xlen_t) nx_;
+    if (dsize > 0x1p+30 /* 1 GiB */)
+	warning(_("sparse->dense coercion: "
+		  "allocating vector of size %0.1f GiB"),
+		0x1p-30 * dsize);
+
+    R_xlen_t nx = (R_xlen_t) dnx;
     SEXP x = PROTECT(allocVector(tx, nx));
     
     SET_SLOT(to, Matrix_DimSym, dim);

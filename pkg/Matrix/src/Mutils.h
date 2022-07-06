@@ -360,6 +360,7 @@ SEXP unpacked_force(SEXP x, int n, char uplo, char diag);
     
 char type2kind(SEXPTYPE type);
 SEXPTYPE kind2type(char kind);
+size_t kind2size(char kind);
 
 char Matrix_kind(SEXP obj, int iok);
 SEXP R_Matrix_kind(SEXP obj, SEXP iok);
