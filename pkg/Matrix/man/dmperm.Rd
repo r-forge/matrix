@@ -4,7 +4,7 @@
 \description{
   For any \eqn{n \times m}{n * m} (typically) sparse matrix \code{x}
   compute the Dulmage-Mendelsohn row and columns permutations which at
-  first splits the \eqn{n} rows and \code{m} columns into course partitions
+  first splits the \eqn{n} rows and \code{m} columns into coarse partitions
   each; and then a finer one, reordering rows and columns such that the
   permutated matrix is \dQuote{as upper triangular} as possible.
 }

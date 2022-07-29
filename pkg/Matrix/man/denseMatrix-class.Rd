@@ -47,15 +47,22 @@
 \alias{show,denseMatrix-method}
 %
 \description{This is the virtual class of all dense (S4) matrices.
-  It is the direct superclass of
+  It partitions into two subclasses
+  \code{\linkS4class{packedMatrix}} and
+  \code{\linkS4class{unpackedMatrix}}.
+  Alternatively into the (currently) three subclasses
   \code{\linkS4class{ddenseMatrix}},
-  \code{\linkS4class{ldenseMatrix}}
+  \code{\linkS4class{ldenseMatrix}}, and
+  \code{\linkS4class{ndenseMatrix}}.
+
+  \code{denseMatrix} is (hence) the direct superclass of these (\eqn{2+3 = 5}) classes.
 }
 \section{Extends}{
   class \code{"Matrix"} directly.
 }
 \section{Slots}{
-  exactly those of its superclass \code{"\linkS4class{Matrix}"}.
+  exactly those of its superclass \code{"\linkS4class{Matrix}"}, i.e.,
+  \code{"Dim"} and \code{"Dimnames"}.
 }
 %
 \section{Methods}{
