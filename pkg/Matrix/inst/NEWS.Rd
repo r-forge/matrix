@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-03 r3518)}{
+\section{Changes in version 1.4-2 (2022-08-03 r3519)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual classes
@@ -49,7 +49,7 @@
 
       \item \code{t(<corMatrix>)} no longer clears the \code{sd} slot.
       \code{t(<p?BunchKaufman>)} now returns one of the more general
-      \code{dt[pr]Matrix}, rather than preserving class and clearing
+      \code{dt[rp]Matrix}, rather than preserving class and clearing
       the \code{perm} slot.
 
       \item \code{t(<symmetricMatrix>)} no longer reverses the
@@ -103,7 +103,7 @@
       efficient, returning a symmetric \code{RsparseMatrix} without
       a \dQuote{true} coercion to \code{CsparseMatrix}.
 
-      \item \code{tcrossprod(a,b)} for unitriangular sparse
+      \item \code{tcrossprod(a, b)} for unitriangular sparse
       matrices now works correctly.
 
       \item \code{!<ltrMatrix>} is no longer an error in the 0-by-0
@@ -181,6 +181,10 @@
       arithmetically (\code{x1 + ... + xn}), so that elements of the
       result are restricted to the set \code{c(0, 1, NA)}.
       This bug had also affected the result of \code{sum(<[nl].TMatrix>)}.
+      
+      \item \code{dimnames(as(x, "matrix"))} is now \code{NULL}
+      for \emph{all} \code{x} inheriting from \code{Matrix},
+      when \code{x@Dimnames} is the trivial \code{list(NULL, NULL)}.
     }
   }
   \subsection{New Features}{
@@ -265,8 +269,7 @@
       \code{triangularMatrix}, \code{lMatrix}, or \code{nMatrix}.
 
       \item \code{as.vector}, \code{as.numeric}, and \code{as.logical}
-      are now implemented for all \code{denseMatrix} and all
-      \code{sparseMatrix}.
+      are now implemented for all \code{Matrix}.
 
       \item Subassignment to \code{indMatrix} is no longer prohibited,
       now going via \code{TsparseMatrix}.

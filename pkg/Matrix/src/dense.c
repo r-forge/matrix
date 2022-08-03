@@ -599,9 +599,12 @@ SEXP R_dense_as_matrix(SEXP from, SEXP ndense)
     /* Result must be newly allocated because we add attributes */
     PROTECT(from = dense_as_general(
 		from, (asLogical(ndense) != 0) ? 'l' : '.', 1, 0));
-    SEXP to = PROTECT(GET_SLOT(from, Matrix_xSym));
-    setAttrib(to, R_DimSymbol, GET_SLOT(from, Matrix_DimSym));
-    setAttrib(to, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
+    SEXP to = PROTECT(GET_SLOT(from, Matrix_xSym)),
+	dim = GET_SLOT(from, Matrix_DimSym),
+	dimnames = GET_SLOT(from, Matrix_DimNamesSym);
+    setAttrib(to, R_DimSymbol, dim);
+    if (!TRIVIAL_DIMNAMES(dimnames))
+	setAttrib(to, R_DimNamesSymbol, dimnames);
     UNPROTECT(2);
     return to;
 }
@@ -610,11 +613,14 @@ SEXP R_dense_as_matrix(SEXP from, SEXP ndense)
 SEXP R_geMatrix_as_matrix(SEXP from, SEXP ndense)
 {
     /* Result must be newly allocated because we add attributes */
-    SEXP to = PROTECT(duplicate(GET_SLOT(from, Matrix_xSym)));
+    SEXP to = PROTECT(duplicate(GET_SLOT(from, Matrix_xSym))),
+	dim = GET_SLOT(from, Matrix_DimSym),
+	dimnames = GET_SLOT(from, Matrix_DimNamesSym);
     if (asLogical(ndense) != 0)
 	na2one(to);
-    setAttrib(to, R_DimSymbol, GET_SLOT(from, Matrix_DimSym));
-    setAttrib(to, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
+    setAttrib(to, R_DimSymbol, dim);
+    if (!TRIVIAL_DIMNAMES(dimnames))
+	setAttrib(to, R_DimNamesSymbol, dimnames);
     UNPROTECT(1);
     return to;
 }

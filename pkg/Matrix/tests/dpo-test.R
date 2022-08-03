@@ -63,7 +63,7 @@ stopifnot(diag(hs) == seq(1, by = 2, length = 9))
 s9 <- solve(h9p, seq(nrow(h9p)))
 signif(t(s9)/10000, 4)# only rounded numbers are platform-independent
 (I9 <- h9p %*% s9)
-m9 <- matrix(1:9, dimnames = list(NULL,NULL))
+m9 <- as.matrix(1:9)
 stopifnot(all.equal(m9, .asmatrix(I9), tolerance = 2e-9))
 
 ### Testing nearPD() --- this is partly in  ../man/nearPD.Rd :

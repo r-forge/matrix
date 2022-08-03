@@ -480,15 +480,20 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 .sparse2m <- function(from)
     .Call(R_sparse_as_matrix, from)
 
-.diag2m <- function(from)
-    `dimnames<-`(base::diag(if(from@diag == "N") from@x else as1(from@x),
-                            nrow = from@Dim[1L]),
-                 from@Dimnames)
+.diag2m <- function(from) {
+    D <- base::diag(if(from@diag == "N") from@x else as1(from@x),
+                    nrow = from@Dim[1L])
+    if(!identical(dn <- from@Dimnames, list(NULL, NULL)))
+        dimnames(D) <- dn
+    D
+}
 
 .ind2m <- function(from) {
-    P <- array(FALSE, d <- from@Dim, from@Dimnames)
+    P <- array(FALSE, d <- from@Dim)
     if((n <- d[1L]) > 0L)
         P[seq_len(n) + (from@perm - 1L) * as.double(n)] <- TRUE
+    if(!identical(dn <- from@Dimnames, list(NULL, NULL)))
+        dimnames(P) <- dn
     P
 }
 

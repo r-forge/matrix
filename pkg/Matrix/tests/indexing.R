@@ -613,7 +613,6 @@ stopifnot(identical(m2[1:3,], as(m1[1:3,], "CsparseMatrix")),
 ## 0-dimensional diagonal - subsetting ----------------------------
 ## before that diagU2N() etc for 0-dim. dtC*:
 m0. <- m00 <- matrix(numeric(),0,0)
-dimnames(m0.) <- list(NULL, NULL)
  tC0.<- new("dtCMatrix")
  tC0 <- new("dtCMatrix", diag="U")
 (gC0 <- new("dgCMatrix")) # 0 x 0

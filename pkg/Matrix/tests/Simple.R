@@ -420,7 +420,9 @@ chkSS <- function(m) {
   id <- if(is.null(dnms[[2]]) && !is.null(dnms[[1]])) 1 else 2
   stopifnot(identical(d.sy, dnms[c(id,id)]),
 	    identical(d.sy, dimnames(r [["skewpart"]])),
-	    identical(d.sy, dimnames(r0[["skewpart"]])),
+            if(identical(dnms, list(NULL, NULL)))
+                is.null(dimnames(r0[["skewpart"]]))
+	    else identical(d.sy, dimnames(r0[["skewpart"]])),
 	    all(m  == with(r,  symmpart + skewpart)),
 	    all(m0 == with(r0, symmpart + skewpart)),
 	    identical(dS <- dimnames(fS), dimnames(fS0)),
@@ -1326,7 +1328,7 @@ stopifnot(identical(as.vector(.nge), rep.int(TRUE, 4L)),
           identical(as.logical(.nge), rep.int(TRUE, 4L)),
           identical(as.double(.nge), rep.int(1, 4L)),
           identical(as(.nge, "vector"), rep.int(TRUE, 4L)),
-          identical(as(.nge, "matrix"), array(TRUE, .nge@Dim, list(NULL,NULL))),
+          identical(as(.nge, "matrix"), array(TRUE, .nge@Dim)),
           identical(as(.nge, "dMatrix")@x, rep.int(1, 4L)),
           identical(nnzero(.nge), 4L))
 
