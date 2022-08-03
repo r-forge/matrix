@@ -205,11 +205,13 @@ setMethod("diag<-", signature(x = "unpackedMatrix"),
 setMethod("symmpart", signature(x = "unpackedMatrix"),
           function(x) .Call(unpackedMatrix_symmpart, x))
 setMethod("symmpart", signature(x = "matrix"),
-          function(x) .Call(matrix_symmpart, x))
+          ## function(x) .Call(matrix_symmpart, x)) # returning .syMatrix
+          function(x) symmetrizeDimnames(x + t(x)) / 2) # returning matrix
 
 setMethod("skewpart", signature(x = "unpackedMatrix"),
           function(x) .Call(unpackedMatrix_skewpart, x))
 setMethod("skewpart", signature(x = "matrix"),
-          function(x) .Call(matrix_skewpart, x))
+          ## function(x) .Call(matrix_skewpart, x)) # returning .geMatrix
+          function(x) symmetrizeDimnames(x - t(x)) / 2) # returning matrix
 
 rm(.upM.subclasses)

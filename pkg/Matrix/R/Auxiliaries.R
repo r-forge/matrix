@@ -1114,7 +1114,7 @@ n2l_spMatrix <- function(from) {
 if(FALSE) {
 .R.2.C  <- function(from) .Call(R_to_CMatrix, from)
 .C.2.R  <- function(from)
-    .tCR2RC(.Call(Csparse_transpose, from, is(from, "triangularMatrix")))
+    .tC.2.R(.Call(Csparse_transpose, from, is(from, "triangularMatrix")))
 ## slightly less efficient than above, but preserves symmetry correctly
 .viaC.2.R <- function(from) .tC.2.R(as(t(from), "CsparseMatrix"))
 ## .R.2.T() fails on 32bit--enable-R-shlib with segfault {Kurt}
