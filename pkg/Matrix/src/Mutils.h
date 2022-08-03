@@ -131,6 +131,11 @@ extern
 #define PM_AR21_LO(i, j, n2) ((i) + ((j) * ((n2) - (j) - 1)) / 2)
 #define PM_LENGTH(n) (n + ((R_xlen_t) (n) * ((n) - 1)) / 2)
 
+#define TRIVIAL_DIMNAMES(_DIMNAMES_)			\
+    (isNull(VECTOR_ELT(_DIMNAMES_, 0)) &&		\
+     isNull(VECTOR_ELT(_DIMNAMES_, 1)) &&		\
+     isNull(getAttrib(_DIMNAMES_, R_NamesSymbol)))
+
 #define ERROR_INVALID_CLASS(_CLASS_, _METHOD_)				\
     error(_("invalid class \"%s\" to '%s()'"),				\
 	  _CLASS_, _METHOD_)

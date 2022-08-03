@@ -676,7 +676,7 @@ isPacked <- function(x)
     ## unneeded(!): any("x" == slotNames(x)) &&
     length(x@x) < prod(x@Dim)
 }
-}
+} ## MJ
 
 ##" Is 'x' a packed (dense) matrix -- "no-check" version
 .isPacked <- function(x) length(x@x) < prod(x@Dim)
@@ -983,7 +983,6 @@ WhichintersectInd <- function(ij1, ij2, di, orig1=FALSE, checkBnds=FALSE) {
     list(which(ni), m1[ni])
 }
 
-
 ### There is a test on this in ../tests/dgTMatrix.R !
 
 uniqTsparse <- function(x, class.x = c(class(x))) {
@@ -1003,7 +1002,6 @@ uniqTsparse <- function(x, class.x = c(class(x))) {
 ##' non-exported version with*OUT* check -- called often only  if(anyDuplicatedT(.))
 .uniqTsparse <- function(x) .CR2T(.T2C(x))
 
-
 ## Note: maybe, using
 ## ----    xj <- .Call(Matrix_expand_pointers, x@p)
 ## would be slightly more efficient than as( <dgC> , "dgTMatrix")
@@ -1015,7 +1013,6 @@ drop0 <- function(x, tol = 0, is.Csparse = NA) {
 	      x else as(x, "CsparseMatrix"),
 	  tol)
 }
-
 
 uniq <- function(x) {
     if(is(x, "TsparseMatrix")) uniqTsparse(x) else
@@ -1120,16 +1117,15 @@ if(FALSE) {
 
 ## in ../src/Tsparse.c :  |-> cholmod_T -> cholmod_C -> chm_sparse_to_SEXP
 ## adjusted for triangular matrices not represented in cholmod
-.T2C <- function(from) {
+.T.2.C <- function(from) {
     to <- .Call(Tsparse_to_Csparse, from, is(from, "triangularMatrix"))
     if(.hasSlot(from, "factors"))
         to@factors <- from@factors
     to
 }
 
-.T2R <- function(from) {
-    to <- .tCR2RC(.Call(Tsparse_to_Csparse, .Call(R_sparse_transpose, from),
-                        is(from, "triangularMatrix")))
+.T.2.R <- function(from) {
+    to <- .tC.2.R(.Call(Tsparse_to_Csparse, t(from), is(from, "triangularMatrix")))
     if(.hasSlot(from, "factors"))
         to@factors <- from@factors
     to

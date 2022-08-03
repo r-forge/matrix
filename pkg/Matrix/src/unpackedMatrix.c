@@ -935,7 +935,7 @@ SEXP unpackedMatrix_symmpart(SEXP from)
 	int i, j;
 	R_xlen_t upos = 0, lpos = 0;
 	
-#define UPM_SYMMPART(_CTYPE_, _PTR_, _ASSIGN_OFFDIAG_)		\
+#define UPM_SYMMPART_GE(_CTYPE_, _PTR_, _ASSIGN_OFFDIAG_)	\
 	do {							\
 	    _CTYPE_ *px = _PTR_(x);				\
 	    for (j = 0; j < n; ++j) {				\
@@ -962,9 +962,9 @@ SEXP unpackedMatrix_symmpart(SEXP from)
 	} while (0)
 	
 	if (clf[0] != 'z')
-	    UPM_SYMMPART(double, REAL, ASSIGN_OFFDIAG_DGE);
+	    UPM_SYMMPART_GE(double, REAL, ASSIGN_OFFDIAG_DGE);
 	else
-	    UPM_SYMMPART(Rcomplex, COMPLEX, ASSIGN_OFFDIAG_ZGE);
+	    UPM_SYMMPART_GE(Rcomplex, COMPLEX, ASSIGN_OFFDIAG_ZGE);
 	
 	set_symmetrized_DimNames(to, dimnames, -1);
 	
@@ -1051,7 +1051,7 @@ SEXP matrix_symmpart(SEXP from)
 	} else {
 	    SET_ATTRIB(x, R_NilValue);
 	}
-	UPM_SYMMPART(double, REAL, ASSIGN_OFFDIAG_DGE);
+	UPM_SYMMPART_GE(double, REAL, ASSIGN_OFFDIAG_DGE);
 	break;
 #ifdef HAVE_PROPER_ZMATRIX
     case CPLXSXP:
@@ -1063,7 +1063,7 @@ SEXP matrix_symmpart(SEXP from)
 	} else {
 	    SET_ATTRIB(x, R_NilValue);
 	}
-	UPM_SYMMPART(Rcomplex, COMPLEX, ASSIGN_OFFDIAG_ZGE);
+	UPM_SYMMPART_GE(Rcomplex, COMPLEX, ASSIGN_OFFDIAG_ZGE);
 	break;
 #endif
     default:
@@ -1082,7 +1082,7 @@ SEXP matrix_symmpart(SEXP from)
 
 #undef ASSIGN_OFFDIAG_DGE
 #undef ASSIGN_OFFDIAG_ZGE
-#undef UPM_SYMMPART
+#undef UPM_SYMMPART_GE
 #undef UPM_SYMMPART_TR
 
 /* skewpart(x) */

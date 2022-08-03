@@ -487,15 +487,10 @@ void revDN(SEXP dest, SEXP src) {
     return;
 }
 
-#define DIMNAMES_IS_TRIVIAL(_DIMNAMES_)			\
-    (isNull(VECTOR_ELT(_DIMNAMES_, 0)) &&		\
-     isNull(VECTOR_ELT(_DIMNAMES_, 1)) &&		\
-     isNull(getAttrib(_DIMNAMES_, R_NamesSymbol)))
-
 SEXP R_symmDN(SEXP dn)
 {
     /* Be fast (do nothing!) when dimnames = list(NULL, NULL) */
-    if (DIMNAMES_IS_TRIVIAL(dn))
+    if (TRIVIAL_DIMNAMES(dn))
 	return dn;
     SEXP newdn = PROTECT(allocVector(VECSXP, 2));
     symmDN(newdn, dn, -1);
@@ -506,7 +501,7 @@ SEXP R_symmDN(SEXP dn)
 SEXP R_revDN(SEXP dn)
 {
     /* Be fast (do nothing!) when dimnames = list(NULL, NULL) */
-    if (DIMNAMES_IS_TRIVIAL(dn))
+    if (TRIVIAL_DIMNAMES(dn))
 	return dn;
     SEXP newdn = PROTECT(allocVector(VECSXP, 2));
     revDN(newdn, dn);
@@ -516,7 +511,7 @@ SEXP R_revDN(SEXP dn)
 
 SEXP get_symmetrized_DimNames(SEXP obj, int J) {
     SEXP dn = GET_SLOT(obj, Matrix_DimNamesSym);
-    if (DIMNAMES_IS_TRIVIAL(dn))
+    if (TRIVIAL_DIMNAMES(dn))
 	return dn;
     SEXP newdn = PROTECT(allocVector(VECSXP, 2));
     symmDN(newdn, dn, J);
@@ -526,7 +521,7 @@ SEXP get_symmetrized_DimNames(SEXP obj, int J) {
 
 SEXP get_reversed_DimNames(SEXP obj) {
     SEXP dn = GET_SLOT(obj, Matrix_DimNamesSym);
-    if (DIMNAMES_IS_TRIVIAL(dn))
+    if (TRIVIAL_DIMNAMES(dn))
 	return dn;
     SEXP newdn = PROTECT(allocVector(VECSXP, 2));
     revDN(newdn, dn);
@@ -535,7 +530,7 @@ SEXP get_reversed_DimNames(SEXP obj) {
 }
 
 void set_symmetrized_DimNames(SEXP obj, SEXP dn, int J) {
-    if (!DIMNAMES_IS_TRIVIAL(dn)) {
+    if (!TRIVIAL_DIMNAMES(dn)) {
 	SEXP newdn = PROTECT(allocVector(VECSXP, 2));
 	symmDN(newdn, dn, J);
 	SET_SLOT(obj, Matrix_DimNamesSym, newdn);
@@ -545,7 +540,7 @@ void set_symmetrized_DimNames(SEXP obj, SEXP dn, int J) {
 }
 
 void set_reversed_DimNames(SEXP obj, SEXP dn) {
-    if (!DIMNAMES_IS_TRIVIAL(dn)) {
+    if (!TRIVIAL_DIMNAMES(dn)) {
 	SEXP newdn = PROTECT(allocVector(VECSXP, 2));
 	revDN(newdn, dn);
 	SET_SLOT(obj, Matrix_DimNamesSym, newdn);
@@ -556,7 +551,7 @@ void set_reversed_DimNames(SEXP obj, SEXP dn) {
 
 void set_DimNames(SEXP obj, SEXP dn)
 {
-    if (!DIMNAMES_IS_TRIVIAL(dn)) {
+    if (!TRIVIAL_DIMNAMES(dn)) {
 	SEXP s, newdn = PROTECT(allocVector(VECSXP, 2));
 	if (!isNull(s = VECTOR_ELT(dn, 0)))
 	    SET_VECTOR_ELT(newdn, 0, s);
@@ -1596,7 +1591,7 @@ SEXP matrix_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector)
     if (isMatrix(from)) {
 	dim = getAttrib(from, R_DimSymbol);
 	dimnames = getAttrib(from, R_DimNamesSymbol);
-	doDN = !(isNull(dimnames) || DIMNAMES_IS_TRIVIAL(dimnames));
+	doDN = !(isNull(dimnames) || TRIVIAL_DIMNAMES(dimnames));
     } else {
 	if (len > INT_MAX)
 	    error(_("vector of length exceeding 2^31-1 "
