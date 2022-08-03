@@ -444,7 +444,7 @@ if(FALSE)##--- no longer used:
     stopifnot(is.list(lst), (nl <- length(lst)) >= 1)
 
 ### FIXME: next line is *slow* when lst = list of 75'000  dense 3x3 matrices
-    Tlst <- lapply(lapply(lst, asCspN), # includes "diagU2N"
+    Tlst <- lapply(lapply(unname(lst), asCspN), # includes "diagU2N"
 		   as, "TsparseMatrix")
     if(nl == 1) return(Tlst[[1]])
     ## else
@@ -765,7 +765,7 @@ setMethod("norm", signature(x = "diagonalMatrix", type = "character"),
 	      }
 	  })
 
-
+## FIXME: Many of these products are not handling 'Dimnames' appropriately ...
 
 ## Basic Matrix Multiplication {many more to add}
 ##       ---------------------
@@ -783,6 +783,8 @@ diagdiagprod <- function(x, y) {
     } else ## x is unit diagonal
 	y
 }
+setMethod("%*%", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
+	  diagdiagprod, valueClass = "ddiMatrix")
 
 ##' Boolean Algebra/Arithmetic Product of Diagonal Matrices
 ##'  %&%
@@ -800,10 +802,6 @@ diagdiagprodBool <- function(x, y) {
 	y
     }
 }
-
-setMethod("%*%", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
-	  diagdiagprod, valueClass = "ddiMatrix")
-
 setMethod("%&%", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
 	  diagdiagprodBool, valueClass = "ldiMatrix")# do *not* have "ndiMatrix" !
 
@@ -855,7 +853,6 @@ diagprod <- function(x, y = NULL, boolArith = NA, ...) {
 }
 setMethod( "crossprod", signature(x = "diagonalMatrix", y = "missing"), diagprod)
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "missing"), diagprod)
-
 
 ## analogous to matdiagprod() below:
 diagmatprod <- function(x, y) {
@@ -912,7 +909,6 @@ diagGeprod2 <- function(x, y=NULL, boolArith = NA, ...) {
 }
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "dgeMatrix"), diagGeprod2)
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "lgeMatrix"), diagGeprod2)
-
 
 ## analogous to diagmatprod() above:
 matdiagprod <- function(x, y) {

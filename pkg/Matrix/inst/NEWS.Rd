@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-03 r3520)}{
+\section{Changes in version 1.4-2 (2022-08-03 r3521)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual classes
@@ -185,6 +185,9 @@
       \item \code{dimnames(as(x, "matrix"))} is now \code{NULL}
       for \emph{all} \code{x} inheriting from \code{Matrix},
       when \code{x@Dimnames} is the trivial \code{list(NULL, NULL)}.
+
+      \item \code{.bdiag(<named list>)} no longer propagates names
+      to the \code{Dim} slot of the result.
     }
   }
   \subsection{New Features}{
