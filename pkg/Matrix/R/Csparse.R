@@ -510,7 +510,7 @@ setMethod("band", "CsparseMatrix",
 setMethod("diag", "CsparseMatrix",
 	  function(x, nrow, ncol, names=TRUE) {
               ## "FIXME": could be more efficient; creates new ..CMatrix:
-	      dm <- .Call(R_sparse_band, diagU2N(x), 0, 0)
+	      dm <- .Call(Csparse_band, diagU2N(x), 0, 0)
 	      dlen <- min(dm@Dim)
 	      ind1 <- dm@i + 1L	# 1-based index vector
 	      if (is(dm, "nMatrix")) {
@@ -523,8 +523,8 @@ setMethod("diag", "CsparseMatrix",
 	      }
 	      else {
 		  val <- rep.int(0, dlen)
-		  ## cMatrix not yet active but for future expansion
-		  if (is(dm, "cMatrix")) val <- as.complex(val)
+		  ## zMatrix not yet active but for future expansion
+		  if (is(dm, "zMatrix")) val <- as.complex(val)
 		  val[ind1] <- dm@x
 	      }
 	      if(names && dlen > 0L) {

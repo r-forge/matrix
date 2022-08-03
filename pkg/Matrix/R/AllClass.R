@@ -100,7 +100,7 @@ setClass("triangularMatrix", contains = c("Matrix", "VIRTUAL"),
 	 validity = function(object) .Call(triangularMatrix_validate, object))
 
 
-## ------ Virtual by SEXPTYPE ------------------------------------------
+## ------ Virtual by kind ----------------------------------------------
 
 ## Virtual class of double matrices
 setClass("dMatrix", contains = c("Matrix", "VIRTUAL"), slots = c(x = "numeric"),
@@ -147,7 +147,7 @@ setClass("packedMatrix", contains = c("denseMatrix", "VIRTUAL"),
 	 validity = function(object) .Call(packedMatrix_validate, object))
 
 
-## ...... Virtual Dense ... by SEXPTYPE ................................
+## ...... Virtual Dense ... by kind ....................................
 
 ## Virtual class of dense, double matrices
 setClass("ddenseMatrix", contains = c("dMatrix", "denseMatrix", "VIRTUAL"))
@@ -226,7 +226,7 @@ setMethod("initialize", "RsparseMatrix",
           })
 } # --NOT YET--
 
-## ...... Virtual Sparse ... by storage ................................
+## ...... Virtual Sparse ... by kind ...................................
 
 ## Virtual class of sparse, double matrices
 setClass("dsparseMatrix", contains = c("dMatrix", "sparseMatrix", "VIRTUAL"))
@@ -240,6 +240,7 @@ setClass("nsparseMatrix", contains = c("nMatrix", "sparseMatrix", "VIRTUAL"))
 
 if(FALSE) { # --NOT YET--
 setClass("isparseMatrix", contains = c("iMatrix", "sparseMatrix", "VIRTUAL"))
+setClass("zsparseMatrix", contains = c("zMatrix", "sparseMatrix", "VIRTUAL"))
 } # --NOT YET--
 
 ## ...... Virtual Sparse ... class intersections .......................
@@ -366,7 +367,7 @@ setClass("dtTMatrix",
 
 ## NB: We should _not_ have ".tTMatrix" inherit from ".gTMatrix",
 ## because a ".tTMatrix" could be less than fully stored if diag = "U".
-## Methods for ".gTMatrix" applied to ".tTMatrix" would produce
+## Methods for ".gTMatrix" applied to such ".tTMatrix" would produce
 ## incorrect results, even though all slots are present.
 
 ## Triplet, symmetric
