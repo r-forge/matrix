@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-03 r3519)}{
+\section{Changes in version 1.4-2 (2022-08-03 r3520)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual classes
@@ -290,8 +290,7 @@
       and is highly optimized in the \code{.[ts][CR]Matrix} case.
 
       \item \code{symmpart} and \code{skewpart} are now done in C
-      for all \code{denseMatrix} and all \code{[CRT]sparseMatrix},
-      as well as for base \code{matrix}.
+      for all \code{denseMatrix} and all \code{[CRT]sparseMatrix}.
       Both now more faithfully preserve the \dQuote{storage} of
       their argument.  (Previously, \code{symmpart(packedMatrix)}
       was an \code{unpackedMatrix},

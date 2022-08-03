@@ -1332,6 +1332,13 @@ stopifnot(identical(as.vector(.nge), rep.int(TRUE, 4L)),
           identical(as(.nge, "dMatrix")@x, rep.int(1, 4L)),
           identical(nnzero(.nge), 4L))
 
+## symmpart(<matrix>) and skewpart(<matrix>) have been documented
+## as returning matrix, _not_ Matrix
+z0 <- matrix((-2)^(0:3), 2L, 2L)
+z1 <- symmpart(z0)
+z2 <- skewpart(z0)
+stopifnot(!isS4(z1), is.matrix(z1), !isS4(z2), is.matrix(z2))
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()
