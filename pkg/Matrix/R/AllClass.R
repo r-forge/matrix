@@ -46,14 +46,14 @@ if(FALSE) {
 setMethod("initialize", "Matrix",
           function(.Object, ...) {
               .Object <- callNextMethod()
-              if (length(args <- list(...)) &&
+              if(length(args <- list(...)) &&
                   any(nzchar(anames <- names(args))) &&
                   "Dimnames" %in% anames) {
                   ## Coerce non-character 'Dimnames[[i]]' to character
                   ## and set zero-length 'Dimnames[[i]]' to NULL
                   .Object@Dimnames <- DN <- fixupDN(.Object@Dimnames)
-                  if (!("Dim" %in% anames ||
-                        is.null(DN[[1L]]) || is.null(DN[[2L]]))) {
+                  if(!("Dim" %in% anames ||
+                       is.null(DN[[1L]]) || is.null(DN[[2L]]))) {
                       ## Take 'Dim' from lengths of 'Dimnames'
                       .Object@Dim <- lengths(DN, use.names = FALSE)
                   }
@@ -64,15 +64,15 @@ setMethod("initialize", "Matrix",
 
 setMethod("initialize", "Matrix",
           function(.Object, ...) {
-             .Object <- callNextMethod()
-             if (length(args <- list(...)) &&
-                 any(nzchar(anames <- names(args))) &&
-                 "Dimnames" %in% anames) {
-                 ## Coerce non-character 'Dimnames[[i]]' to character
-                 ## and set zero-length 'Dimnames[[i]]' to NULL
-                 .Object@Dimnames <- fixupDN(.Object@Dimnames)
-             }
-             .Object
+              .Object <- callNextMethod()
+              if(length(args <- list(...)) &&
+                  any(nzchar(anames <- names(args))) &&
+                  "Dimnames" %in% anames) {
+                  ## Coerce non-character 'Dimnames[[i]]' to character
+                  ## and set zero-length 'Dimnames[[i]]' to NULL
+                  .Object@Dimnames <- fixupDN(.Object@Dimnames)
+              }
+              .Object
           })
 
 

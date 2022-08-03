@@ -320,9 +320,12 @@ SEXP R_sparse_as_matrix(SEXP from)
     PROTECT_INDEX pid;
     PROTECT_WITH_INDEX(from = sparse_as_dense(from, 0), &pid);
     REPROTECT(from = dense_as_general(from, '.', -1, 0), pid); /* in-place */
-    SEXP to = PROTECT(GET_SLOT(from, Matrix_xSym));
-    setAttrib(to, R_DimSymbol, GET_SLOT(from, Matrix_DimSym));
-    setAttrib(to, R_DimNamesSymbol, GET_SLOT(from, Matrix_DimNamesSym));
+    SEXP to = PROTECT(GET_SLOT(from, Matrix_xSym)),
+	dim = GET_SLOT(from, Matrix_DimSym),
+	dimnames = GET_SLOT(from, Matrix_DimNamesSym);
+    setAttrib(to, R_DimSymbol, dim);
+    if (!TRIVIAL_DIMNAMES(dimnames))
+	setAttrib(to, R_DimNamesSymbol, dimnames);
     UNPROTECT(2);
     return to;
 }
@@ -355,11 +358,9 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
     SEXPTYPE tx = kind2type(k); /* validating 'k' before doing more */
 
 #if 0 /* MJ: what I think makes sense */
-    int do_drop0 = (k == 'n' ||
-		    asLogical(drop0) != 0);
-#else /* MJ: behaviour in Matrix 1.4-1 ?? */
-    int do_drop0 = ((clf[0] != 'n' && clf[2] != 'T' && k == 'l') ||
-		    asLogical(drop0) != 0);
+    int do_drop0 = clf[0] != 'n' && asLogical(drop0) != 0;
+#else /* MJ: Matrix 1.4-1: forcing for (only??) dg[CR]Matrix->lMatrix */
+    int do_drop0 = clf[0] == 'd' && (clf[2] != 'T' || asLogical(drop0) != 0);
 #endif
     if (do_drop0)
 	PROTECT(from = R_sparse_drop0(from));
