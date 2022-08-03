@@ -511,7 +511,9 @@ assert.EQ.mat(Lg1, diag(x= c(FALSE, rep(TRUE,3))))
 stopifnot(is(Lg1, "diagonalMatrix"), is(D4m, "diagonalMatrix"),
 	  is(D4., "diagonalMatrix"),
           is(nLg, "symmetricMatrix"), is(nnLg, "symmetricMatrix"),
-          identical3(Lg1, Matrix(nnLg), as(nnLg, "diagonalMatrix")),
+          identical3(Lg1,
+                     Matrix(nnLg, forceCheck = TRUE),
+                     as(nnLg, "diagonalMatrix")),
           all(Lg1 != (!Lg1)))
 
 ## tri[lu](<diagonal>)

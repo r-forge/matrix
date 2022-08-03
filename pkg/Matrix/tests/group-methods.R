@@ -482,7 +482,8 @@ assertErrV(m == mm)
 ## in R <= 3.3.x, relop returned logical(0) and  m + 2:3  returned numeric(0)
 ##
 ## arithmetic, logic, and comparison (relop) -- inconsistency for 1x1 array o <vector >= 2>:
-(m1 <- Matrix(1,1,1, dimnames=list("Ro","col")))
+## FIXME: desired errors are _not_ thrown for ddiMatrix (when doDiag=TRUE)
+(m1 <- Matrix(1, 1L, 1L, dimnames = list("Ro", "col"), doDiag = FALSE))
 ##    col
 ## Ro   1
 ## Before Sep.2016, here, Matrix was the *CONTRARY* to R:

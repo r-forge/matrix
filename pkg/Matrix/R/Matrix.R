@@ -191,7 +191,30 @@ setMethod("dimnames<-", signature(x = "compMatrix", value = "NULL"),
 setMethod("unname", signature("Matrix", force = "missing"),
 	  function(obj) { obj@Dimnames <- list(NULL, NULL); obj})
 
-
+if(FALSE) {
+## This version was used in Matrix <= 1.4-1 but has several "bugs":
+## * Matrix(`dimnames<-`(diag(1), list("A", "B")), doDiag = TRUE)
+##   is not a diagonalMatrix
+## * Matrix(`dimnames<-`(diag(1), list("A", "B")), doDiag = FALSE)
+##   is not a symmetricMatrix
+## * Matrix(table(1)), Matrix(table(1, 1, 1)), etc. give bad errors
+## * Matrix(<sparseMatrix>, sparse = NULL) calls sparseDefault(data),
+##   requiring a sparseMatrix->matrix coercion
+## * Matrix(sparseVector(1, 1L, 10L)), etc. fail because spV2M()
+##   does not "see" the missingness of 'nrow', 'ncol'
+## * Matrix(<diagonalMatrix>, doDiag = FALSE) is a diagonalMatrix
+##   rather than a symmetricMatrix
+## * Matrix(x, ...), where 'x' is a vector of type other than logical,
+##   integer, and double, evaluates .External(Mmatrix, ...) before
+##   throwing an error, hence allocating unnecessarily
+## * Matrix(0, n, n) constructs an intermediate dsCMatrix instead
+##   of returning a ddiMatrix right away
+## * Matrix(0, nrow, ), Matrix(0, , ncol) are wrong for 'nrow', 'ncol'
+##   in the interval (0, 1) and throw bad errors for 'nrow', 'ncol'
+##   equal to 0
+## * Calls is(data, .) much more than necessary ...
+## * Matrix(structure(matrix(1, 2, 2), class = "zzz")) throws a bad
+##   error rather than unclassing as it essentially does for "table"
 Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
                     dimnames = NULL, sparse = NULL,
                     doDiag = TRUE, forceCheck = FALSE)
@@ -291,6 +314,132 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
 	forceSymmetric(data)
     else
 	data
+}
+} else {
+## This version fixes the issues documented above
+Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
+                   dimnames = NULL, sparse = NULL,
+                   doDiag = TRUE, forceCheck = FALSE)
+{
+    i.M <- i.sM <- i.dM <- i.sV <- i.m <- FALSE
+    mnrow <- missing(nrow)
+    mncol <- missing(ncol)
+    if(isS4(data)) {
+        cld <- getClassDef(class(data))
+        i.M <- extends(cld, "Matrix")
+        if(i.M) {
+            i.sM <- extends(cld, "sparseMatrix")
+            i.dM <- i.sM && extends(cld, "diagonalMatrix")
+        } else if(extends(cld, "sparseVector")) {
+            ## need to transmit missingness to 'spV2M'
+            call. <- quote(spV2M(x = data, nrow =, ncol =, byrow = byrow))
+            if(!mnrow)
+                call.[[3L]] <- quote(nrow)
+            if(!mncol)
+                call.[[4L]] <- quote(ncol)
+            data <- eval(call.)
+            i.M <- i.sM <- i.sV <- forceCheck <- TRUE
+        }
+    } else {
+        i.m <- is.matrix(data)
+    }
+    if(!i.M) {
+        ## validate non-Matrix 'data', throwing type errors _early_
+         if(is.object(data)) {
+            if(i.m)
+                class(data) <- NULL # retaining 'dim'
+            else
+                data <- as.vector(data)
+        }
+        mode. <- mode(data)
+        kind <- switch(mode., numeric = "d", logical = "l",
+                       stop("invalid 'data'"))
+    }
+    if(i.M || i.m) {
+        ## 'data' is a Matrix or a numeric or logical matrix
+        ## without a 'class' attribute
+        if(!i.sV && !(mnrow && mncol && missing(byrow)))
+            warning("'nrow', 'ncol', 'byrow' disregarded for [mM]atrix 'data'")
+        if(!is.null(dimnames))
+            dimnames(data) <- dimnames
+        if(is.null(sparse))
+            sparse <- i.sM || sparseDefault(data)
+        if(i.M) {
+            ## return early in these cases:
+            if(i.dM)
+                ## !doDiag has been documented to result in a coercion to
+                ## symmetricMatrix; we must use diag2*() below because the
+                ## "usual" as(<diagonalMatrix>, "(Csparse|unpacked)Matrix")
+                ## inherits from triangularMatrix, _not_ symmetricMatrix
+                return(if(doDiag)
+                           data
+                       else if(sparse)
+                           .diag2sparse(data, ".sC", "U", FALSE)
+                       else .diag2dense(data, ".sy", "U"))
+            if(!forceCheck)
+                return(if(i.sM == sparse)
+                           data
+                       else if(sparse)
+                           as(data, "CsparseMatrix")
+                       else as(data, "unpackedMatrix"))
+        }
+    } else {
+        ## 'data' is a numeric or logical vector or non-matrix array
+        ## without a 'class' attribute
+        if(length(data) == 1L && !is.na(data) && data == 0 &&
+           (is.null(sparse) || sparse)) {
+            ## Matrix(0, ...): sparseMatrix unless sparse=FALSE
+            if(mnrow == mncol) {
+                nrow <- as.integer(nrow)
+                ncol <- as.integer(ncol)
+            } else if(mnrow) {
+                ncol <- as.integer(ncol)
+                nrow <- if(ncol) as.integer(ceiling(1 / ncol)) else 0L
+            } else {
+                nrow <- as.integer(nrow)
+                ncol <- if(nrow) as.integer(ceiling(1 / nrow)) else 0L
+            }
+            square <- nrow == ncol
+            if(is.null(dimnames))
+                dimnames <- list(NULL, NULL)
+            if(square && doDiag)
+                return(new(paste0(kind, "diMatrix"),
+                           Dim = c(nrow, ncol),
+                           Dimnames = dimnames,
+                           x = vector(mode., nrow)))
+            data <- new(paste0(kind, if(square) "s" else "g", "CMatrix"),
+                        Dim = c(nrow, ncol),
+			Dimnames = dimnames,
+                        p = integer(ncol + 1))
+            i.M <- i.sM <- sparse <- TRUE
+	} else {
+            ## usual case: vector|array->matrix
+	    data <- .External(Mmatrix,
+			      data, nrow, ncol, byrow, dimnames, mnrow, mncol)
+            if(is.null(sparse))
+                sparse <- sparseDefault(data)
+            i.m <- TRUE
+	}
+    }
+
+    ## 'data' is a Matrix (but _not_ a diagonalMatrix) or a
+    ## numeric or logical matrix without a 'class' attribute
+    if(doDiag && isDiagonal(data))
+        return(as(data, "diagonalMatrix"))
+    if(sparse && !i.sM)
+        data <- as(data, "CsparseMatrix")
+    else if(!sparse && (i.m || i.sM))
+        data <- as(data, "unpackedMatrix")
+    if(!is(data, "generalMatrix"))
+        data
+    else if(isSymmetric(data))
+        forceSymmetric(data)
+    else if(!(it <- isTriangular(data)))
+        data
+    else if(attr(it, "kind") == "U")
+        triu(data)
+    else tril(data)
+}
 }
 
 ## Methods for operations where one argument is numeric
