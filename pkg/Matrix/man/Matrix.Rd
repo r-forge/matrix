@@ -28,6 +28,8 @@ Matrix(data=NA, nrow=1, ncol=1, byrow=FALSE, dimnames=NULL,
 
     Otherwise, if \code{doDiag} is false, a dense or sparse (depending on
     \code{sparse}) \emph{symmetric} matrix will be returned.}
+% MJ: not quite ... if 'dimnames' is asymmetric then the result
+%     is a triangularMatrix, not a symmetricMatrix ...
 
   \item{forceCheck}{logical indicating if the checks for structure
     should even happen when \code{data} is already a \code{"Matrix"}
