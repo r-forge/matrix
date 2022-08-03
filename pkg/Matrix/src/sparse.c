@@ -357,11 +357,11 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
 	return from;
     SEXPTYPE tx = kind2type(k); /* validating 'k' before doing more */
 
-#if 0 /* MJ: what I think makes sense */
-    int do_drop0 = clf[0] != 'n' && asLogical(drop0) != 0;
-#else /* MJ: Matrix 1.4-1: forcing for (only??) dg[CR]Matrix->lMatrix */
-    int do_drop0 = clf[0] == 'd' && (clf[2] != 'T' || asLogical(drop0) != 0);
+    int do_drop0 =
+#if 1 /* MJ: Matrix <= 1.4-1 forces for (only??) d.[CR]Matrix->lMatrix */
+	(clf[0] == 'd' && k != 'n' && clf[2] != 'T') ||
 #endif
+	(clf[0] != 'n' && asLogical(drop0) != 0);
     if (do_drop0)
 	PROTECT(from = R_sparse_drop0(from));
 
