@@ -204,6 +204,10 @@ if(FALSE) {
 ##   does not "see" the missingness of 'nrow', 'ncol'
 ## * Matrix(<diagonalMatrix>, doDiag = FALSE) is a diagonalMatrix
 ##   rather than a symmetricMatrix
+## * Matrix(<dgeMatrix>, sparse =  TRUE, forceCheck = FALSE),
+##   Matrix(<dgCMatrix>, sparse = FALSE, forceCheck = FALSE)
+##   _do_ check for structure, possibly resulting in symmetricMatrix
+##   or triangularMatrix
 ## * Matrix(x, ...), where 'x' is a vector of type other than logical,
 ##   integer, and double, evaluates .External(Mmatrix, ...) before
 ##   throwing an error, hence allocating unnecessarily
@@ -426,10 +430,13 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
     ## numeric or logical matrix without a 'class' attribute
     if(doDiag && isDiagonal(data))
         return(as(data, "diagonalMatrix"))
-    if(sparse && !i.sM)
-        data <- as(data, "CsparseMatrix")
-    else if(!sparse && (i.m || i.sM))
-        data <- as(data, "unpackedMatrix")
+    if(i.m || i.sM != sparse) {
+        data <- as(data, if(sparse) "CsparseMatrix" else "unpackedMatrix")
+        if(i.m)
+            ## matrix->CsparseMatrix and matrix->unpackedMatrix coercions
+            ## already test for symmetric, triangular structure
+            return(data)
+    }
     if(!is(data, "generalMatrix"))
         data
     else if(isSymmetric(data))
