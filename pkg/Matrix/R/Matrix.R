@@ -349,7 +349,7 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
     }
     if(!i.M) {
         ## validate non-Matrix 'data', throwing type errors _early_
-         if(is.object(data)) {
+        if(is.object(data)) {
             if(i.m)
                 class(data) <- NULL # retaining 'dim'
             else
