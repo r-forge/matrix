@@ -1182,7 +1182,7 @@ setMethod("Arith", signature(e1 = "dtCMatrix", e2 = "dtCMatrix"),
 	}
     }
     ## all other (potentially non-sparse) cases: give up symm, tri,..
-    callGeneric(as(as(as(e1, "dMatrix"), "CsparseMatrix"), "dgCMatrix"), e2)
+    callGeneric(as(as(as(e1, "dMatrix"), "CsparseMatrix"), "generalMatrix"), e2)
 }
 ## The same,  e1 <-> e2 :
 .Arith.atom.CM <- function(e1, e2) {
@@ -1200,7 +1200,7 @@ setMethod("Arith", signature(e1 = "dtCMatrix", e2 = "dtCMatrix"),
 	    return(e2)
 	}
     }
-    callGeneric(e1, as(as(as(e2, "dMatrix"), "CsparseMatrix"), "dgCMatrix"))
+    callGeneric(e1, as(as(as(e2, "dMatrix"), "CsparseMatrix"), "generalMatrix"))
 }
 setMethod("Arith", signature(e1 = "CsparseMatrix", e2 = "numeric"), .Arith.CM.atom)
 setMethod("Arith", signature(e1 = "numeric", e2 = "CsparseMatrix"), .Arith.atom.CM)

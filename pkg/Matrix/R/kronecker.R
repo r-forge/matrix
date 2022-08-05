@@ -51,8 +51,8 @@ setMethod("kronecker", signature(X = "dtTMatrix", Y = "dtTMatrix"),
 	  if (FUN != "*") stop("kronecker method must use default 'FUN'")
 	  ## otherwise we don't know that many results will be zero
 	  if(X@uplo != Y@uplo) { ## result not triangular
-	      X <- as(X, "dgTMatrix")
-	      Y <- as(Y, "dgTMatrix")
+	      X <- as(X, "generalMatrix")
+	      Y <- as(Y, "generalMatrix")
 	      return(callGeneric())
 	  }
 	  ## else: both 'uplo' are the same -- result *is* triangular
@@ -90,7 +90,7 @@ setMethod("kronecker", signature(X = "dtTMatrix", Y = "dgTMatrix"),
                   ## improve: also test for unit diagonal
                   Y <- if(attr(it, "kind") == "U") triu(Y) else tril(Y)
 	      else
-                  X <- as(X, "dgTMatrix")
+                  X <- as(X, "generalMatrix")
 	      callGeneric() #-> dtT o dtT   or	 dgT o dgT
 	  })
 
@@ -100,7 +100,7 @@ setMethod("kronecker", signature(X = "dgTMatrix", Y = "dtTMatrix"),
                   ## improve: also test for unit diagonal
                   X <- if(attr(it, "kind") == "U") triu(X) else tril(X)
 	      else
-		  Y <- as(Y, "dgTMatrix")
+		  Y <- as(Y, "generalMatrix")
 	      callGeneric() #-> dtT o dtT   or	 dgT o dgT
 	  })
 
