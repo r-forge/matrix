@@ -377,6 +377,10 @@
       with a new argument \code{packed} for efficiently indexing
       \code{packedMatrix}.  \code{indDiag()} now behaves sensibly
       in the \code{n = 0} case.
+
+      \item \code{as(<d.[CR]Matrix>, "lMatrix")} no longer drops
+      non-structural zeros, for greater consistency with analogous
+      coercions.
     }
   }
 }

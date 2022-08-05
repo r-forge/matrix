@@ -238,12 +238,10 @@ table(mmG.1@x)# however with many ``non-structural zeros''
 nmG.1 <- as(mmG.1, "nMatrix") # <<< has "TRUE" also where mmG.1 had FALSE
 ## from logical to "double"
 dmG.1 <- as(mmG.1, "dMatrix") # has '0' and back:
-lmG.1 <- as(dmG.1, "lMatrix") # has no extra FALSE, i.e. drop0() included
+lmG.1 <- as(dmG.1, "lMatrix")
 stopifnot(identical(nmG.1, as((KNex $ mm) != 0,"nMatrix")),
           validObject(lmG.1),
-          all(lmG.1@x),
-          # same "logical" but lmG.1 has no 'FALSE' in x slot:
-          all(lmG.1 == mmG.1))
+          identical(lmG.1, mmG.1))
 
 class(xnx <- crossprod(nmG.1))# "nsC.."
 class(xlx <- crossprod(mmG.1))# "dsC.." : numeric
