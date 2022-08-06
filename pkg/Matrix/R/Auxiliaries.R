@@ -63,7 +63,14 @@ extends1of <- function(class, classes, ...) {
 ##     else ## nrow / ncol ... differentiate  this would be for  rbind / cbind --> ./bind2.R
 ##         (nnzero(x) + nnzero(y)) * 2 < (nrow(x)+nrow(y)) * nc
 ## }
-sparseDefault <- function(x) prod(dim(x)) > 2*sum(isN0(as(x, "matrix")))
+
+## MJ: Prefer methods for 'nnzero' which can be rather more efficient
+if(FALSE) {
+sparseDefault <- function(x) prod(dim(x)) > 2 * sum(isN0(as(x, "matrix")))
+} else {
+sparseDefault <- function(x) prod(dim(x)) > 2 * nnzero(x, na.counted = TRUE)
+}
+
 
 ##' return 'x' unless it is NULL where you'd use 'orElse'
 `%||%` <- function(x, orElse) if(!is.null(x)) x else orElse
