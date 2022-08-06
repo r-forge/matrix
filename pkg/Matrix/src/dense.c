@@ -75,12 +75,14 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 	    if ((uplo = asChar(uplo)) == NA_STRING ||
 		(ul = *CHAR(uplo)) == '\0')
 		error(_("invalid 'uplo' to 'R_dense_as_sparse()'"));
-	    uplo = mkString((ul == 'U') ? "U" : "L");
+	    PROTECT(uplo = mkString((ul == 'U') ? "U" : "L"));
+	    ++nprotect;
 	    if (z1 == 't') {
 		if ((diag = asChar(diag)) == NA_STRING ||
 		    (di = *CHAR(diag)) == '\0')
 		    error(_("invalid 'diag' to 'R_dense_as_sparse()'"));
-		diag = mkString((di == 'N') ? "N" : "U");
+		PROTECT(diag = mkString((di == 'N') ? "N" : "U"));
+		++nprotect;
 	    }
 	}
 	x_from = from;
