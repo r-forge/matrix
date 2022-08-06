@@ -76,7 +76,8 @@ typedef int R_xlen_t;
 # endif
 #endif
 
-#define Matrix_Error_Buf_Size 4096
+#define Matrix_ErrorBufferSize 4096
+#define Matrix_SupportingCachedMethods
 
 /* Previously from <Rdefines.h> : */
 #ifndef GET_SLOT
@@ -208,8 +209,18 @@ enum x_slot_kind {
 
 SEXP Dim_validate(SEXP dim, const char* domain);
 SEXP R_Dim_validate(SEXP dim);
+
+#ifdef Matrix_SupportingCachedMethods
+SEXP R_Dim_validate_old(SEXP obj, SEXP domain);
+#endif
+
 SEXP DimNames_validate(SEXP dimnames, int pdim[]);
 SEXP R_DimNames_validate(SEXP dimnames, SEXP dim);
+    
+#ifdef Matrix_SupportingCachedMethods
+SEXP R_DimNames_validate_old(SEXP obj);
+#endif
+
 SEXP string_scalar_validate(SEXP s, char *valid, char *nm);
 
 SEXP Matrix_validate(SEXP obj);
