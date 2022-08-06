@@ -46,6 +46,16 @@ SEXP R_Dim_validate(SEXP dim)
     return Dim_validate(dim, "Matrix");
 }
 
+#ifdef Matrix_SupportingCachedMethods
+
+SEXP R_Dim_validate_old(SEXP obj, SEXP domain)
+{
+    return Dim_validate(GET_SLOT(obj, Matrix_DimSym),
+			CHAR(STRING_ELT(domain, 0)));
+}
+
+#endif
+
 /**
  * Test that `dimnames` is a valid length-2 list.
  *
@@ -64,7 +74,7 @@ SEXP DimNames_validate(SEXP dimnames, int *pdim)
 
     /* Allocate only when needed: in valid case, it is _not_ needed */
 #define SPRINTF								\
-    buf = Alloca(Matrix_Error_Buf_Size, char); R_CheckStack(); sprintf
+    buf = Alloca(Matrix_ErrorBufferSize, char); R_CheckStack(); sprintf
 
     if (TYPEOF(dimnames) != VECSXP) {
 	SPRINTF(buf, _("'Dimnames' slot is not a list"));
@@ -101,6 +111,16 @@ SEXP DimNames_validate(SEXP dimnames, int *pdim)
 SEXP R_DimNames_validate(SEXP dimnames, SEXP dim) {
     return DimNames_validate(dimnames, INTEGER(dim));
 }
+
+#ifdef Matrix_SupportingCachedMethods
+
+SEXP R_DimNames_validate_old(SEXP obj)
+{
+    return DimNames_validate(GET_SLOT(obj, Matrix_DimNamesSym),
+			     INTEGER(GET_SLOT(obj, Matrix_DimSym)));
+}
+
+#endif
 
 /**
  * Test that an R object is a valid 1-character string,

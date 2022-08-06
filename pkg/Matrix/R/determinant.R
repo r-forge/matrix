@@ -175,6 +175,10 @@ setMethod("determinant",
 
 rm(.det.tri, .det.diag, .det.dsy, .det.dsp)
 
+if(.Matrix.supporting.cached.methods) {
+mkDet <- .mkDet
+}
+
 ## MJ: used only in tests
 if(TRUE) {
 ldet1.dsC <- function(x, ...)
@@ -209,7 +213,7 @@ setMethod("determinant", signature(x = "dsCMatrix", logarithm = "logical"),
 	      detSparseLU(x, logarithm)
 	  else {
               d <- .Call(diag_tC, Chx, res.kind = "diag")
-	      .mkDet(d, logarithm=logarithm)
+	      mkDet(d, logarithm=logarithm)
           }
       })
 } ## MJ

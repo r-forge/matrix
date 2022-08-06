@@ -51,7 +51,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Csparse_MatrixMarket, 2),
     
 /* MJ: no longer needed ... prefer R_sparse_band() */
-#if 0
+/* MJ: however, some reverse dependencies built with Matrix < 1.4-2 need it */
+#ifdef Matrix_SupportingCachedMethods
     CALLDEF(Csparse_band, 3),
 #endif
 
@@ -116,7 +117,8 @@ static R_CallMethodDef CallEntries[] = {
 #endif    
 
 /* MJ: no longer needed ... prefer R_sparse_transpose() */
-#if 0
+/* MJ: however, some reverse dependencies built with Matrix < 1.4-2 need it */
+#ifdef Matrix_SupportingCachedMethods
     CALLDEF(Csparse_transpose, 2),
 #endif
     
@@ -417,6 +419,13 @@ static R_CallMethodDef CallEntries[] = {
 
     CALLDEF(R_Dim_validate, 1),
     CALLDEF(R_DimNames_validate, 2),
+
+/* MJ: some reverse dependencies built with Matrix < 1.4-2 need these */
+#ifdef Matrix_SupportingCachedMethods
+    {     "Dim_validate", (DL_FUNC)      &R_Dim_validate_old, 2},
+    {"dimNames_validate", (DL_FUNC) &R_DimNames_validate_old, 1},
+#endif
+    
     CALLDEF(R_DimNames_fixup, 1),
     CALLDEF(R_DimNames_is_symmetric, 1),
     CALLDEF(R_symmDN, 1),

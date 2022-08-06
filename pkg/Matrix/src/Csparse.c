@@ -429,7 +429,8 @@ SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo, SEXP sym_dmns)
 #endif /* MJ */
 
 /* MJ: no longer needed ... prefer R_sparse_transpose() */
-#if 0
+/* MJ: however, some reverse dependencies built with Matrix < 1.4-2 need it */
+#ifdef Matrix_SupportingCachedMethods
 
 SEXP Csparse_transpose(SEXP x, SEXP tri)
 {
@@ -916,7 +917,8 @@ SEXP Csparse_vertcat(SEXP x, SEXP y)
 }
 
 /* MJ: no longer needed ... prefer R_sparse_band() */
-#if 0
+/* MJ: however, some reverse dependencies built with Matrix < 1.4-2 need it */
+#ifdef Matrix_SupportingCachedMethods
 
 SEXP Csparse_band(SEXP x, SEXP k1, SEXP k2)
 {

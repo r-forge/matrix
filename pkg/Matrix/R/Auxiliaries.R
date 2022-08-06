@@ -1,8 +1,16 @@
 #### "Namespace private" Auxiliaries  such as method functions
 #### (called from more than one place --> need to be defined early)
 
-.Matrix.avoiding.as.matrix <- FALSE # (always on CRAN -- have documented it since 2015)
-## NB: sync with  ../NAMESPACE
+## Always FALSE when building for CRAN ... documented since 2015
+## NB: keep ../NAMESPACE synchronized
+.Matrix.avoiding.as.matrix <- FALSE
+
+## Some reverse dependencies built with Matrix <= 1.4.1 cache methods
+## referring to objects that we no longer strictly need in the namespace.
+## TRUE ensures that these "unused" objects continue to exist, so that
+## the cached methods continue to work as before if called ...
+## NB: keep Matrix_SupportingCachedMethods in ../src/Mutils.h synchronized
+.Matrix.supporting.cached.methods <- TRUE
 
 ## Need to consider NAs ;  "== 0" even works for logical & complex:
 ## Note that "!x" is faster than "x == 0", but does not (yet!) work for complex
@@ -602,6 +610,15 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
     if(.hasSlot(from, "factors"))
         to@factors <- from@factors
     to
+}
+
+if(.Matrix.supporting.cached.methods) {
+.C.2.R <- .CR2RC
+.R.2.C <- .CR2RC
+.R.2.T <- .CR2T
+.T.2.C <- .T2C
+.tC.2.R <- function(m, cl, clx) .tCR2RC(m)
+.tR.2.C <- .tCR2RC
 }
 
 rowCheck <- function(a, b) {
@@ -1424,6 +1441,10 @@ as_geSimpl2 <- function(from, cl = class(from))
 as_geSimpl <- function(from) as(from, paste0(.M.kind(from), "geMatrix"))
 } ## MJ
 
+if(.Matrix.supporting.cached.methods) {
+as_gCsimpl <- function(from) as(as(from, "CsparseMatrix"), "generalMatrix")
+}
+
 ## (matrix|denseMatrix)->denseMatrix as similar as possible to "target"
 as_denseClass <- function(x, cl, cld = getClassDef(cl)) {
     kind <- .M.kindC(cld)
@@ -1715,13 +1736,16 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
 	.Call(Csparse_diagN2U, as(x, "CsparseMatrix"))
 }
 
-# MJ: no longer used
-if(FALSE) {
+if(.Matrix.supporting.cached.methods) {
 .dgC.0.factors <- function(x) {
     if(length(x@factors))
         x@factors <- list()
     x
 }
+}
+
+# MJ: no longer used
+if(FALSE) {
 .as.dgC.0.factors <- function(x) {
     if(is(x, "dgCMatrix"))
         .dgC.0.factors(x)
