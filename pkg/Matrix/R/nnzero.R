@@ -4,29 +4,32 @@
 ## * like MATLAB's nnz() but more sophisticated due to handling of NA
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.nnz <- function(x, countNA = NA, nnzmax = length(x))
-    .Call(R_nnz, x, countNA, nnzmax)
-
 ## na.counted:
 ## FALSE ... NA is treated as    zero and so excluded from count
 ##  TRUE ... NA is treated as nonzero and so included   in count
 ##    NA ... NA is indeterminate (could be zero or nonzero) hence count is NA
 
-## A fallback for any class with methods for 'is.na' and '!=' ...
-setMethod("nnzero", "ANY",
-	  function(x, na.counted = NA) {
-              sum(if(is.na(na.counted))
-                      x != 0
-                  else if(na.counted)
-                      is.na(x) | x != 0
-                  else !is.na(x) & x != 0)
-          })
+## For logical, integer, double, and complex vectors
+.nnz <- function(x, na.counted = NA, nnzmax = length(x))
+    .Call(R_nnz, x, na.counted, nnzmax)
 
-setMethod("nnzero", "vector",
-	  function(x, na.counted = NA) .nnz(x, na.counted))
+## For any class with methods for 'is.na' and '!='
+.nnz.fallback <- function(x, na.counted = NA)
+    sum(if(is.na(na.counted))
+            x != 0
+        else if(na.counted)
+            is.na(x) | x != 0
+        else !is.na(x) & x != 0)
 
-setMethod("nnzero", "array",
-	  function(x, na.counted = NA) .nnz(x, na.counted))
+.nnz.dispatching <- function(x, na.counted = NA)
+    switch(typeof(x), logical =, integer =, double =, complex = .nnz,
+           .nnz.fallback)(x, na.counted)
+
+setMethod("nnzero",    "ANY", .nnz.fallback)
+setMethod("nnzero", "vector", .nnz.dispatching)
+setMethod("nnzero",  "array", .nnz.dispatching)
+
+rm(.nnz.dispatching)
 
 setMethod("nnzero", "CHMfactor",
 	  function(x, na.counted = NA)
