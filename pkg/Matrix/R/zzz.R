@@ -35,7 +35,7 @@ rm(.Rv)
         (interactive() && identical(Sys.info()[["user"]], "maechler"))
 
     ## ambiguityNotes:
-    ## show S4 method dispatch ambiguity notes iff TRUE
+    ## show S4 method dispatch ambiguity notes if TRUE
     aN <-
         !is.null(getOption("ambiguousMethodSelection")) ||
         verbose || isTRUE(getOption("Matrix.ambiguityNotes"))
@@ -45,17 +45,19 @@ rm(.Rv)
     assign("ambiguityNotes", aN, envir = .MatrixEnv)
 
     ## warnDeprecatedCoerce:
-    ##    NA ... show next S4 method deprecation warning and none after
-    ##  TRUE ... show all warnings
-    ## FALSE ... suppress all warnings
+    ## <=0 ... no conditions signaled
+    ##   1 ... persistent warning
+    ## >=2 ... persistent error
+    ##  NA ... one-time message { d(g.|.C)Matrix } or warning { others }
     wDC <-
-        if(is.logical(w <- getOption("Matrix.warnDeprecatedCoerce")) &&
+        if(is.atomic(w <- getOption("Matrix.warnDeprecatedCoerce")) &&
            length(w) == 1L)
-            w
+            as.integer(w)
         else if(verbose)
-            TRUE
-        else NA
-    options(Matrix.warnDeprecatedCoerce = wDC)
+            1L
+        else NA_integer_
+    if(!is.null(w))
+        options(Matrix.warnDeprecatedCoerce = wDC)
     assign("warnDeprecatedCoerce", wDC, envir = .MatrixEnv)
 
     .Call(CHM_set_common_env, .chm_common)
@@ -88,7 +90,7 @@ rm(.Rv)
                     c("CsparseMatrix", "RsparseMatrix", "TsparseMatrix",
                       "diagonalMatrix", "unpackedMatrix", "packedMatrix"))
     to <- from
-    for (v in virtual) {
+    for(v in virtual) {
         if(any(m <- match(v, contains2, 0L) > 0L)) {
             v1 <- v[m][1L]
             if(match(v1, contains1, 0L) == 0L)
@@ -105,15 +107,24 @@ Matrix.DeprecatedCoerce <- function(Class1, Class2) {
         Class2 <- getClassDef(Class2)
     if(is.null(w <- getOption("Matrix.warnDeprecatedCoerce")))
         w <- .MatrixEnv[["warnDeprecatedCoerce"]]
-    if(is.logical(w) && length(w) == 1L && (is.na(w) || w)) {
-        warning(gettextf("as(<%s>, \"%s\") is deprecated since Matrix 1.4-2; do %s instead",
-                         Class1@className, Class2@className,
-                         deparse1(.as.via.virtual(Class1, Class2, quote(.)))),
-                call. = FALSE, domain = NA)
-        if(is.na(w))
-            options(Matrix.warnDeprecatedCoerce = FALSE)
+    if(is.atomic(w) && length(w) == 1L &&
+       ((w.na <- is.na(w <- as.integer(w))) || w > 0L)) {
+        cln1 <- Class1@className
+        cln2 <- Class2@className
+        warning. <-
+            if(w.na && grepl("d(g.|.C)Matrix", cln2))
+                function(..., call., domain) message(..., domain = domain)
+            else if(w.na || w == 1L)
+                warning
+            else stop
+        warning.(gettextf("as(<%s>, \"%s\") is deprecated since Matrix 1.4-2; do %s instead",
+                          cln1, cln2,
+                          deparse1(.as.via.virtual(Class1, Class2, quote(.)))),
+                 call. = FALSE, domain = NA)
+        if(w.na)
+            options(Matrix.warnDeprecatedCoerce = 0L)
     }
-    invisible()
+    invisible(NULL)
 }
 
 ## "Granular" coercions available in Matrix 1.4-1,
