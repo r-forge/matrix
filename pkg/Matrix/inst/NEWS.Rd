@@ -5,17 +5,32 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-06 r3529)}{
+\section{Changes in version 1.4-2 (2022-08-08 r3531)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
-      \item With a few exceptions, direct coercions to non-virtual classes
-      (e.g., \code{dsCMatrix}) have been formally deprecated.  For now,
-      these will continue to work as before, but with a warning indicating
-      how to accomplish the desired coercion via virtual classes
-      (e.g., \code{symmetricMatrix}) alone.  Such warnings can be controlled
-      via the global option \code{Matrix.warnDeprecatedCoerce}.  \code{NA}
-      (the session default) is to warn once and not again, \code{TRUE} is
-      to always warn, and \code{FALSE} is to never warn.
+      \item With a few exceptions, direct coercions to non-virtual subclasses 
+      of \code{Matrix} (e.g., \code{dsCMatrix}) have been formally deprecated.
+      For now, these will continue to work as before, but with a warning
+      indicating how to accomplish the desired coercion via virtual classes 
+      (e.g., \code{symmetricMatrix}) alone.  How such warnings are signaled 
+      is controlled by the global option \code{Matrix.warnDeprecatedCoerce}.
+      %
+      0 or less is to suppress all warnings.
+      1 is to signal a warning with each deprecated coercion.
+      2 or greater is equivalent to 1 but with warnings converted to errors.
+      \code{NA} is to signal a warning with the next deprecated coercion
+      and suppress later warnings.
+      %
+      If unset or invalid (non-atomic or atomic of length other than one),
+      then the value of the option when the \pkg{Matrix} namespace was loaded 
+      is used. If unset or invalid at load time, then \code{NA} is used.
+      %
+      Option values are coerced to integer before use.
+      %
+      To reduce disruption to existing code, warnings in the \code{NA} case 
+      are converted to \emph{messages} for coercions to the most-used
+      non-virtual subclasses of \code{Matrix}, namely \code{dg.Matrix}
+      and \code{d.CMatrix}.  This may change in the future.
     }
   }
   \subsection{Bug Fixes}{
@@ -43,9 +58,9 @@
       \code{denseMatrix}, and others.
 
       \item \code{diag<-} incorrectly preserved the class of dense matrices,
-      so that, e.g., \code{diag<-(x=<dpoMatrix>, value=-1)} was still a
+      so that, e.g., \code{`diag<-`(x=<dpoMatrix>, value=-1)} was still a
       \code{dpoMatrix}.  Now the result is always one of the more general
-      \code{.(ge|sp|sy|tp|tr)Matrix}.
+      \code{.(ge|tr|sy|tp|sp)Matrix}.
 
       \item \code{t(<corMatrix>)} no longer clears the \code{sd} slot.
       \code{t(<p?BunchKaufman>)} now returns one of the more general
@@ -96,15 +111,15 @@
 
       \item \code{as(<matrix>, "nMatrix")} can now be sparse \emph{or}
       dense, going via \code{Matrix()}, for greater consistency with
-      coercions to \code{dMatrix} and \code{lMatrix}.  (Previously,
-      the result was always an \code{ngTMatrix}.)
+      coercions to \code{dMatrix} and \code{lMatrix}.
+      (Previously, the result was always an \code{ngTMatrix}.)
 
       \item \code{forceSymmetric(<RsparseMatrix>)} is now more
       efficient, returning a symmetric \code{RsparseMatrix} without
       a \dQuote{true} coercion to \code{CsparseMatrix}.
 
-      \item \code{tcrossprod(a, b)} for unitriangular sparse
-      matrices now works correctly.
+      \item \code{tcrossprod(a, b)} for unit triangular sparse matrices
+      now works correctly.
 
       \item \code{!<ltrMatrix>} is no longer an error in the 0-by-0
       unit diagonal case.
@@ -127,7 +142,7 @@
 
       \item \code{is.na(<ndenseMatrix>)} gave \code{TRUE} where
       the \code{x} slot had \code{NA}.  Now the result is always
-      a \dQuote{zero} matrix.
+      a zero matrix.
 
       \item \code{is.na(<.t[rp]Matrix>)} and
       \code{is.infinite(<.t[rp]Matrix>)} ignored the \code{diag} slot,
@@ -224,30 +239,30 @@
       \item \code{isTriangular(x, upper)} now has a \code{kind}
       attribute \emph{if and only if} \code{x} is triangular and
       \code{upper} is \code{NA}.
-
+      
       \item \code{diag(<unpackedMatrix>) <- value} now behaves like
       \code{diag(<packedMatrix>) <- value}, supporting coercions
       depending on \code{typeof(value)}, consistent with \code{diag<-}
       from \pkg{base}.
-
+      
       \item \code{pack} and \code{unpack} are now identity functions
       for \code{packedMatrix} and \code{unpackedMatrix} arguments,
       respectively (previously an error).  \code{pack(<.geMatrix>)}
       (previously an error) now behaves as \code{pack(<matrix>)},
       i.e., by checking for symmetry or triangularity before packing.
       \code{unpack(<matrix>)} now works and is equivalent to
-      \code{as(<matrix>, "denseMatrix")}, with result inheriting from
-      \code{.(ge|tr|sy)Matrix}, as appropriate.
-
+      \code{as(<matrix>, "unpackedMatrix")}, with result inheriting
+      from \code{.(ge|tr|sy)Matrix}, as appropriate.
+      
       \item Many more validity methods implemented in C, for efficiency,
       including methods for \code{Matrix}, \code{compMatrix},
       \code{diagonalMatrix}, \code{indMatrix}, \code{pMatrix},
       \code{corMatrix}, \code{[liz]Matrix}, and \code{ndenseMatrix}.
-
-      \item \code{dppMatrix_validate()} now behaves as
-      \code{dpoMatrix_validate()} by requiring non-negative diagonal
-      elements.
-
+      
+      \item The validity method of \code{dppMatrix} now follows
+      the validity method of \code{dpoMatrix}, requiring non-negative
+      diagonal elements.
+      
       \item Validation of \code{<Matrix>@Dimnames[[i]]} now tolerates
       vector types other than character, which are coerced to character
       in C via the new \code{R_DimNames_fixup()}, for greater
@@ -280,7 +295,7 @@
       \item \code{indMatrix} gains methods for \code{isTriangular},
       \code{isDiagonal}, \code{diag}, \code{diag<-}, \code{band},
       \code{tri[ul]}, and \code{forceSymmetric}.  It also gains
-      coercions to many virtual classes, notably \code{denseMatrix}
+      coercions to more virtual classes (notably \code{denseMatrix})
       and a coercion to \code{pMatrix}.
 
       \item \code{solve(<ddenseMatrix>, <numLike>)} now works in all
