@@ -12,12 +12,19 @@
 ## NB: keep Matrix_SupportingCachedMethods in ../src/Mutils.h synchronized
 .Matrix.supporting.cached.methods <- TRUE
 
+## These would be faster by a factor ~2 if done in C:
+if(FALSE) {
 ## Need to consider NAs ;  "== 0" even works for logical & complex:
 ## Note that "!x" is faster than "x == 0", but does not (yet!) work for complex
-## if we did these in C, would gain a factor 2 (or so):
 is0  <- function(x) !is.na(x) & x == 0
 isN0 <- function(x)  is.na(x) | x != 0
-is1  <- function(x) !is.na(x) & x   # also == "isTRUE componentwise"
+is1  <- function(x) !is.na(x) & x
+} else {
+## MJ: Simpler ... ?
+is0  <- function(x) !(is.na(x) | x)
+isN0 <- function(x)   is.na(x) | x
+is1  <- function(x)  !is.na(x) & x
+}
 
 ##
 ##allFalse <- function(x) !any(x) && !any(is.na(x))## ~= all0, but allFalse(NULL) = TRUE w/warning
