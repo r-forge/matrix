@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-08 r3531)}{
+\section{Changes in version 1.4-2 (2022-08-09 r3532)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses 
@@ -203,6 +203,10 @@
 
       \item \code{.bdiag(<named list>)} no longer propagates names
       to the \code{Dim} slot of the result.
+
+      \item \code{chol(<dsCMatrix>)} now gets \emph{symmetrized}
+      \code{Dimnames} rather than a copy of the \code{Dimnames} slot
+      of the argument, which (currently) can be asymmetric.
     }
   }
   \subsection{New Features}{
