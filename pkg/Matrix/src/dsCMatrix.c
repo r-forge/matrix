@@ -133,8 +133,8 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
     R = cholmod_transpose(Rt, /*values*/ 1, &c);
     cholmod_free_sparse(&Rt, &c);
     ans = PROTECT(chm_sparse_to_SEXP(R, 1/*do_free*/, 1/*uploT*/, 0/*Rkind*/,
-				     "N"/*diag*/, GET_SLOT(x, Matrix_DimNamesSym)));
-
+				     "N"/*diag*/, R_NilValue));
+    set_symmetrized_DimNames(ans, GET_SLOT(x, Matrix_DimNamesSym), -1);
     if (pivP) {
 	SEXP piv = PROTECT(allocVector(INTSXP, L->n)),
 	     L_n = PROTECT(ScalarInteger((size_t) L->minor));
