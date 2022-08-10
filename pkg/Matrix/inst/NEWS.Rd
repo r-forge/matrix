@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-09 r3532)}{
+\section{Changes in version 1.4-2 (2022-08-10 r3533)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses 
@@ -15,11 +15,11 @@
       (e.g., \code{symmetricMatrix}) alone.  How such warnings are signaled 
       is controlled by the global option \code{Matrix.warnDeprecatedCoerce}.
       %
-      0 or less is to suppress all warnings.
+      0 or less is to be silent.
       1 is to signal a warning with each deprecated coercion.
-      2 or greater is equivalent to 1 but with warnings converted to errors.
-      \code{NA} is to signal a warning with the next deprecated coercion
-      and suppress later warnings.
+      2 or greater is signal an error with each deprecated coercion.
+      \code{NA} is to signal a message or warning (see below)
+      with the next deprecated coercion and be silent after that.
       %
       If unset or invalid (non-atomic or atomic of length other than one),
       then the value of the option when the \pkg{Matrix} namespace was loaded 
@@ -27,8 +27,8 @@
       %
       Option values are coerced to integer before use.
       %
-      To reduce disruption to existing code, warnings in the \code{NA} case 
-      are converted to \emph{messages} for coercions to the most-used
+      To reduce disruption to existing code, the \code{NA} case signals
+      messages rather than warnings with coercions to the most-used
       non-virtual subclasses of \code{Matrix}, namely \code{dg.Matrix}
       and \code{d.CMatrix}.  This may change in the future.
     }

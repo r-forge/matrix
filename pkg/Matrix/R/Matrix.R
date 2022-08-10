@@ -429,12 +429,13 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
     ## 'data' is a Matrix (but _not_ a diagonalMatrix) or a
     ## numeric or logical matrix without a 'class' attribute
     if(doDiag && isDiagonal(data))
-        return(as(data, "diagonalMatrix"))
+        ## as(<[mM]atrix>, "diagonalMatrix") uses check = TRUE (a waste)
+        return(.M2diag(data, check = FALSE))
     if(i.m || i.sM != sparse) {
         data <- as(data, if(sparse) "CsparseMatrix" else "unpackedMatrix")
         if(i.m)
-            ## matrix->CsparseMatrix and matrix->unpackedMatrix coercions
-            ## already test for symmetric, triangular structure
+            ## as(<matrix>, "CsparseMatrix"), as(<matrix>, "unpackedMatrix")
+            ## already check for symmetric, triangular structure
             return(data)
     }
     if(!is(data, "generalMatrix"))
